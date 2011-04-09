@@ -3,10 +3,11 @@
  *****************************************************************************
  * VLC specific code:
  * 
- * Copyright © 2008 the VideoLAN team
+ * Copyright © 2008,2011 the VideoLAN team
  * $Id$
  *
  * Authors: Rafaël Carré <funman@videolanorg>
+ *          Felix Paul Kühne <fkuehne@videolan.org
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -50,7 +51,7 @@
 # include "config.h"
 #endif
 
-#import <Foundation/Foundation.h>
+#import <CoreFoundation/CoreFoundation.h>
 #import <Growl/GrowlDefines.h>
 
 #include <vlc_common.h>
@@ -67,9 +68,10 @@
 struct intf_sys_t
 {
     CFDataRef           default_icon;
-    NSAutoreleasePool   *p_pool;
     CFStringRef         app_name;
     CFStringRef         notification_type;
+    int             i_id;
+    int             i_item_changes;
 };
 
 /*****************************************************************************
@@ -79,7 +81,7 @@ static int  Open    ( vlc_object_t * );
 static void Close   ( vlc_object_t * );
 
 static int ItemChange( vlc_object_t *, const char *,
-                       vlc_value_t, vlc_value_t, void * );
+                      vlc_value_t, vlc_value_t, void * );
 
 static void RegisterToGrowl( vlc_object_t * );
 static void NotifyToGrowl( intf_thread_t *, const char *, CFDataRef );
@@ -91,12 +93,12 @@ static CFDataRef readFile(const char *);
  ****************************************************************************/
 
 vlc_module_begin ()
-    set_category( CAT_INTERFACE )
-    set_subcategory( SUBCAT_INTERFACE_CONTROL )
-    set_shortname( "Growl" )
-    set_description( N_("Growl Notification Plugin") )
-    set_capability( "interface", 0 )
-    set_callbacks( Open, Close )
+set_category( CAT_INTERFACE )
+set_subcategory( SUBCAT_INTERFACE_CONTROL )
+set_shortname( "Growl" )
+set_description( N_("Growl Notification Plugin") )
+set_capability( "interface", 0 )
+set_callbacks( Open, Close )
 vlc_module_end ()
 
 /*****************************************************************************
@@ -105,24 +107,27 @@ vlc_module_end ()
 static int Open( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
+    playlist_t *p_playlist;
     intf_sys_t    *p_sys;
-
+    
     p_sys = p_intf->p_sys = calloc( 1, sizeof(intf_sys_t) );
     if( !p_sys )
         return VLC_ENOMEM;
-
-    p_sys->p_pool = [[NSAutoreleasePool alloc] init];
+    
     p_sys->app_name = CFSTR( "VLC media player" );
     p_sys->notification_type = CFSTR( "New input playing" );
-
+    
     char *data_path = config_GetDataDir ( p_this );
-    char buf[strlen (data_path) + sizeof ("/vlc48x48.png")];
-    snprintf (buf, sizeof (buf), "%s/vlc48x48.png", data_path);
+    char buf[strlen (data_path) + sizeof ("/vlc512x512.png")];
+    snprintf (buf, sizeof (buf), "%s/vlc512x512.png", data_path);
+    msg_Dbg( p_this, "looking for icon at %s", buf );
     free( data_path );
     p_sys->default_icon = (CFDataRef) readFile( buf );
-
-    var_AddCallback( pl_Get( p_intf ), "item-current", ItemChange, p_intf );
-
+    
+    p_playlist = pl_Get( p_intf );
+    var_AddCallback( p_playlist, "item-change", ItemChange, p_intf );
+    var_AddCallback( p_playlist, "item-current", ItemChange, p_intf );
+    
     RegisterToGrowl( p_this );
     return VLC_SUCCESS;
 }
@@ -132,14 +137,16 @@ static int Open( vlc_object_t *p_this )
  *****************************************************************************/
 static void Close( vlc_object_t *p_this )
 {
-    intf_sys_t *p_sys = ((intf_thread_t*)p_this)->p_sys;
-
-    var_DelCallback( pl_Get( p_this ), "item-current", ItemChange, p_this );
-
+    intf_thread_t *p_intf = (intf_thread_t *)p_this;
+    playlist_t *p_playlist = pl_Get( p_this );
+    intf_sys_t *p_sys = p_intf->p_sys;
+    
+    var_DelCallback( p_playlist, "item-change", ItemChange, p_intf );
+    var_DelCallback( p_playlist, "item-current", ItemChange, p_intf );
+    
     CFRelease( p_sys->default_icon );
     CFRelease( p_sys->app_name );
     CFRelease( p_sys->notification_type );
-    [p_sys->p_pool release];
     free( p_sys );
 }
 
@@ -147,59 +154,79 @@ static void Close( vlc_object_t *p_this )
  * ItemChange: Playlist item change callback
  *****************************************************************************/
 static int ItemChange( vlc_object_t *p_this, const char *psz_var,
-                       vlc_value_t oldval, vlc_value_t newval, void *param )
+                      vlc_value_t oldval, vlc_value_t newval, void *param )
 {
-    VLC_UNUSED(psz_var); VLC_UNUSED(oldval); VLC_UNUSED(newval);
-
-    intf_thread_t *p_intf   = (intf_thread_t*)param;
+    VLC_UNUSED(oldval);
+    
+    intf_thread_t *p_intf = (intf_thread_t *)param;
     char *psz_tmp           = NULL;
     char *psz_title         = NULL;
     char *psz_artist        = NULL;
     char *psz_album         = NULL;
-    input_thread_t *p_input;
-    p_input = playlist_CurrentInput( (playlist_t*)p_this );
-
+    input_item_t *p_item = newval.p_address;
+    
+    bool b_is_item_current = !strcmp( "item-current", psz_var );
+    
+    /* Don't update each time an item has been preparsed */
+    if( b_is_item_current )
+    { /* stores the current input item id */
+        p_intf->p_sys->i_id = p_item->i_id;
+        p_intf->p_sys->i_item_changes = 0;
+        return VLC_SUCCESS;
+    }
+    else
+    {
+        if( p_item->i_id != p_intf->p_sys->i_id ) { /* "item-change" */
+            p_intf->p_sys->i_item_changes = 0;
+            return VLC_SUCCESS;
+        }
+        /* Some variable bitrate inputs call "item-change" callbacks each time
+         * their length is updated, that is several times per second.
+         * We'll limit the number of changes to 1 per input. */
+        if( p_intf->p_sys->i_item_changes > 0 )
+            return VLC_SUCCESS;
+        
+        p_intf->p_sys->i_item_changes++;
+    }
+    
+    
+    input_thread_t *p_input = playlist_CurrentInput( (playlist_t*)p_this );
+    
     if( !p_input ) return VLC_SUCCESS;
-
-    char *psz_name = input_item_GetName( input_GetItem( p_input ) );
-    if( p_input->b_dead || !psz_name )
+    
+    if( p_input->b_dead || !input_GetItem(p_input)->psz_name )
     {
         /* Not playing anything ... */
-        free( psz_name );
         vlc_object_release( p_input );
         return VLC_SUCCESS;
     }
-    free( psz_name );
-
+    
     /* Playing something ... */
-    input_item_t *p_item = input_GetItem( p_input );
-
-    psz_title = input_item_GetTitleFbName( p_item );
+    if( input_item_GetNowPlaying( p_item ) )
+        psz_title = input_item_GetNowPlaying( p_item );
+    else
+        psz_title = input_item_GetTitleFbName( p_item );
     if( EMPTY_STR( psz_title ) )
     {
         free( psz_title );
         vlc_object_release( p_input );
         return VLC_SUCCESS;
     }
-
+    
     psz_artist = input_item_GetArtist( p_item );
     if( EMPTY_STR( psz_artist ) ) FREENULL( psz_artist );
     psz_album = input_item_GetAlbum( p_item ) ;
     if( EMPTY_STR( psz_album ) ) FREENULL( psz_album );
-
+    
     int i_ret;
     if( psz_artist && psz_album )
         i_ret = asprintf( &psz_tmp, "%s\n%s [%s]",
-                psz_title, psz_artist, psz_album );
+                         psz_title, psz_artist, psz_album );
     else if( psz_artist )
         i_ret = asprintf( &psz_tmp, "%s\n%s", psz_title, psz_artist );
     else
-    {
-        psz_tmp = strdup( psz_title );
-        if( psz_tmp == NULL )
-           i_ret = -1;
-    }
-
+        i_ret = asprintf(&psz_tmp, "%s", psz_title );
+    
     if( i_ret == -1 )
     {
         free( psz_title );
@@ -208,7 +235,7 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
         vlc_object_release( p_input );
         return VLC_ENOMEM;
     }
-
+    
     char *psz_arturl = input_item_GetArtURL( p_item );
     if( psz_arturl )
     {
@@ -219,17 +246,17 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     CFDataRef art = NULL;
     if( psz_arturl )
         art = (CFDataRef) readFile( psz_arturl );
-
+    
     free( psz_title );
     free( psz_artist );
     free( psz_album );
     free( psz_arturl );
-
+    
     NotifyToGrowl( p_intf, psz_tmp, art );
-
+    
     if( art ) CFRelease( art );
     free( psz_tmp );
-
+    
     vlc_object_release( p_input );
     return VLC_SUCCESS;
 }
@@ -240,10 +267,10 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
 static void RegisterToGrowl( vlc_object_t *p_this )
 {
     intf_sys_t *p_sys = ((intf_thread_t *)p_this)->p_sys;
-
+    
     CFArrayRef defaultAndAllNotifications = CFArrayCreate(
-        kCFAllocatorDefault, (const void **)&(p_sys->notification_type), 1,
-        &kCFTypeArrayCallBacks );
+                                                          kCFAllocatorDefault, (const void **)&(p_sys->notification_type), 1,
+                                                          &kCFTypeArrayCallBacks );
     
     CFTypeRef registerKeys[4] = {
         GROWL_APP_NAME,
@@ -251,54 +278,54 @@ static void RegisterToGrowl( vlc_object_t *p_this )
         GROWL_NOTIFICATIONS_DEFAULT,
         GROWL_APP_ICON
     };
-
+    
     CFTypeRef registerValues[4] = {
         p_sys->app_name,
         defaultAndAllNotifications,
         defaultAndAllNotifications,
         p_sys->default_icon
     };
-
+    
     CFDictionaryRef registerInfo = CFDictionaryCreate(
-        kCFAllocatorDefault, registerKeys, registerValues, 4,
-        &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks );
-
+                                                      kCFAllocatorDefault, registerKeys, registerValues, 4,
+                                                      &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks );
+    
     CFRelease( defaultAndAllNotifications );
-
+    
     CFNotificationCenterPostNotificationWithOptions(
-        CFNotificationCenterGetDistributedCenter(),
-        (CFStringRef)GROWL_APP_REGISTRATION, NULL, registerInfo,
-        kCFNotificationPostToAllSessions );
+                                                    CFNotificationCenterGetDistributedCenter(),
+                                                    (CFStringRef)GROWL_APP_REGISTRATION, NULL, registerInfo,
+                                                    kCFNotificationPostToAllSessions );
     CFRelease( registerInfo );
 }
 
 static void NotifyToGrowl( intf_thread_t *p_intf, const char *psz_desc, CFDataRef art )
 {
     intf_sys_t *p_sys = p_intf->p_sys;
-
+    
     CFStringRef title = CFStringCreateWithCString( kCFAllocatorDefault, _("Now playing"), kCFStringEncodingUTF8 );
     CFStringRef desc = CFStringCreateWithCString( kCFAllocatorDefault, psz_desc, kCFStringEncodingUTF8 );
-
+    
     CFMutableDictionaryRef notificationInfo = CFDictionaryCreateMutable(
-        kCFAllocatorDefault, 5, &kCFTypeDictionaryKeyCallBacks,
-        &kCFTypeDictionaryValueCallBacks);
-
+                                                                        kCFAllocatorDefault, 5, &kCFTypeDictionaryKeyCallBacks,
+                                                                        &kCFTypeDictionaryValueCallBacks);
+    
     CFDictionarySetValue( notificationInfo, GROWL_NOTIFICATION_NAME, p_sys->notification_type );
     CFDictionarySetValue( notificationInfo, GROWL_APP_NAME, p_sys->app_name );
     CFDictionarySetValue( notificationInfo, GROWL_NOTIFICATION_TITLE, title );
     CFDictionarySetValue( notificationInfo, GROWL_NOTIFICATION_DESCRIPTION, desc );
-
+    
     CFDictionarySetValue( notificationInfo, GROWL_NOTIFICATION_ICON, 
-        art ? art : p_sys->default_icon );
-
+                         art ? art : p_sys->default_icon );
+    
     CFRelease( title );
     CFRelease( desc );
-
+    
     CFNotificationCenterPostNotificationWithOptions(
-        CFNotificationCenterGetDistributedCenter(),
-        (CFStringRef)GROWL_NOTIFICATION, NULL, notificationInfo,
-        kCFNotificationPostToAllSessions );
-
+                                                    CFNotificationCenterGetDistributedCenter(),
+                                                    (CFStringRef)GROWL_NOTIFICATION, NULL, notificationInfo,
+                                                    kCFNotificationPostToAllSessions );
+    
     CFRelease( notificationInfo );
 }
 
@@ -311,8 +338,8 @@ static CFDataRef readFile(const char *filename)
     // read the file into a CFDataRef
     FILE *fp = fopen(filename, "r");
     if( !fp )
-    return NULL;
-
+        return NULL;
+    
     fseek(fp, 0, SEEK_END);
     long dataLength = ftell(fp);
     fseek(fp, 0, SEEK_SET);
@@ -320,6 +347,6 @@ static CFDataRef readFile(const char *filename)
     fread(fileData, 1, dataLength, fp);
     fclose(fp);
     return CFDataCreateWithBytesNoCopy(kCFAllocatorDefault, fileData,
-        dataLength, kCFAllocatorMalloc);
+                                       dataLength, kCFAllocatorMalloc);
 }
 

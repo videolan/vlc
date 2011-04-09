@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		CC0FB34C0F8BED1100F057F7 /* CoreDialogs.nib in Resources */ = {isa = PBXBuildFile; fileRef = CC0FB34A0F8BED1100F057F7 /* CoreDialogs.nib */; };
+		CC3F9F861350B2A000B0E885 /* Growl.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC3F9F851350B2A000B0E885 /* Growl.framework */; };
 		CC402EB00E00ABBB006A4BA4 /* vlc.icns in Resources */ = {isa = PBXBuildFile; fileRef = F74F13DF02C2A53401EE194C /* vlc.icns */; };
 		CC402EB10E00ABBB006A4BA4 /* MainMenu.nib in Resources */ = {isa = PBXBuildFile; fileRef = F74F13EA02C2A79C01EE194C /* MainMenu.nib */; };
 		CC402EB30E00ABBB006A4BA4 /* generic.icns in Resources */ = {isa = PBXBuildFile; fileRef = F6E4F90B02D2648B01A80112 /* generic.icns */; };
@@ -298,6 +299,7 @@
 		CC33C24F0D2578F5008C4683 /* volumeslider_graphite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = volumeslider_graphite.png; path = Resources/volumeslider_graphite.png; sourceTree = "<group>"; };
 		CC33C2500D2578F5008C4683 /* fullscreen_graphite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = fullscreen_graphite.png; path = Resources/fullscreen_graphite.png; sourceTree = "<group>"; };
 		CC3DC89B0A7CDB9600B53F32 /* ApplicationServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ApplicationServices.framework; path = /System/Library/Frameworks/ApplicationServices.framework; sourceTree = "<absolute>"; };
+		CC3F9F851350B2A000B0E885 /* Growl.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Growl.framework; path = "../../contrib/Growl/Growl.framework"; sourceTree = "<group>"; };
 		CC402F4B0E00ABBB006A4BA4 /* VLC.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = VLC.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
 		CC426FD01020D44F00A32659 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sparkle.framework; path = ../../contrib/Sparkle/Sparkle.framework; sourceTree = SOURCE_ROOT; };
 		CC4A33210F8CB017000FC4A7 /* coredialogs.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = coredialogs.m; path = ../../../modules/gui/macosx/coredialogs.m; sourceTree = SOURCE_ROOT; };
@@ -444,6 +446,7 @@
 				CCBE999F0F922C51000705F8 /* CoreServices.framework in Frameworks */,
 				CC426FD11020D44F00A32659 /* Sparkle.framework in Frameworks */,
 				CC84FB2D130083BB00816D38 /* BGHUDAppKit.framework in Frameworks */,
+				CC3F9F861350B2A000B0E885 /* Growl.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -552,6 +555,7 @@
 		1058C7ACFEA557BF11CA2CBB /* Linked Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				CC3F9F851350B2A000B0E885 /* Growl.framework */,
 				CC84FB2C130083BB00816D38 /* BGHUDAppKit.framework */,
 				CC426FD01020D44F00A32659 /* Sparkle.framework */,
 				CCBE999E0F922C51000705F8 /* CoreServices.framework */,
@@ -857,7 +861,6 @@
 			buildPhases = (
 				CC402EAF0E00ABBB006A4BA4 /* Resources */,
 				CC402F400E00ABBB006A4BA4 /* Frameworks */,
-				CC402F450E00ABBB006A4BA4 /* Rez */,
 				CC426FD81020D48700A32659 /* Copy Frameworks */,
 			);
 			buildRules = (
@@ -1061,16 +1064,6 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
-/* Begin PBXRezBuildPhase section */
-		CC402F450E00ABBB006A4BA4 /* Rez */ = {
-			isa = PBXRezBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXRezBuildPhase section */
-
 /* Begin PBXVariantGroup section */
 		CC0FB34A0F8BED1100F057F7 /* CoreDialogs.nib */ = {
 			isa = PBXVariantGroup;
@@ -1192,6 +1185,7 @@
 					"$(inherited)",
 					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
 					"\"$(SRCROOT)/../../contrib/BGHUDAppKit\"",
+					"\"$(SRCROOT)/../../contrib/Growl\"",
 				);
 				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/../../contrib/Sparkle\"";
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -1227,6 +1221,7 @@
 					"$(inherited)",
 					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
 					"\"$(SRCROOT)/../../contrib/BGHUDAppKit\"",
+					"\"$(SRCROOT)/../../contrib/Growl\"",
 				);
 				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/../../contrib/Sparkle\"";
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
@@ -1258,6 +1253,7 @@
 					"$(inherited)",
 					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
 					"\"$(SRCROOT)/../../contrib/BGHUDAppKit\"",
+					"\"$(SRCROOT)/../../contrib/Growl\"",
 				);
 				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/../../contrib/Sparkle\"";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
