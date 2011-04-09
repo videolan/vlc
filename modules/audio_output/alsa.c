@@ -942,13 +942,14 @@ static void GetDevices (vlc_object_t *obj, module_config_t *item)
     {
         void *hint = hints[i];
         char *name = snd_device_name_get_hint(hint, "NAME");
+        if (unlikely(name == NULL))
+            continue;
+
         char *desc = snd_device_name_get_hint(hint, "DESC");
-
-        for (char *lf = strchr(desc, '\n'); lf; lf = strchr(lf, '\n'))
-             *lf = ' ';
-
-        if (likely(desc != NULL && name != NULL))
-            msg_Dbg(obj, " %s (%s)", desc, name);
+        if (desc != NULL)
+            for (char *lf = strchr(desc, '\n'); lf; lf = strchr(lf, '\n'))
+                 *lf = ' ';
+        msg_Dbg(obj, " %s (%s)", (desc != NULL) ? desc : name, name);
 
         if (item != NULL)
         {
@@ -957,6 +958,8 @@ static void GetDevices (vlc_object_t *obj, module_config_t *item)
             item->ppsz_list_text = xrealloc(item->ppsz_list_text,
                                           (item->i_list + 2) * sizeof(char *));
             item->ppsz_list[item->i_list] = name;
+            if (desc == NULL)
+                desc = strdup(name);
             item->ppsz_list_text[item->i_list] = desc;
             item->i_list++;
         }
