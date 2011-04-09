@@ -148,23 +148,27 @@ int aout_VolumeSet (vlc_object_t *obj, audio_volume_t volume)
 #undef aout_VolumeUp
 /**
  * Raises the volume.
+ * \param value how much to increase (> 0) or decrease (< 0) the volume
  * \param volp if non-NULL, will contain contain the resulting volume
  */
-int aout_VolumeUp (vlc_object_t *obj, int steps, audio_volume_t *volp)
+int aout_VolumeUp (vlc_object_t *obj, int value, audio_volume_t *volp)
 {
     aout_instance_t *aout;
     int ret;
-    int volume;
+    audio_volume_t volume;
     bool mute;
 
-    steps *= var_InheritInteger (obj, "volume-step");
+    value *= var_InheritInteger (obj, "volume-step");
 
     prepareVolume (obj, &aout, &volume, &mute);
-    volume += steps;
-    if (volume < AOUT_VOLUME_MIN)
+    value += volume;
+    if (value < AOUT_VOLUME_MIN)
         volume = AOUT_VOLUME_MIN;
-    if (volume > AOUT_VOLUME_MAX)
+    else
+    if (value > AOUT_VOLUME_MAX)
         volume = AOUT_VOLUME_MAX;
+    else
+        volume = value;
     ret = commitVolume (obj, aout, volume, mute);
     if (volp != NULL)
         *volp = volume;
