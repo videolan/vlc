@@ -50,7 +50,6 @@ struct aout_input_t
     vlc_mutex_t             lock;
 
     audio_sample_format_t   input;
-    aout_alloc_t            input_alloc;
 
     /* pre-filters */
     filter_t *              pp_filters[AOUT_MAX_FILTERS];
