@@ -221,8 +221,8 @@ int aout_DecDelete( aout_instance_t * p_aout, aout_input_t * p_input )
 aout_buffer_t * aout_DecNewBuffer( aout_input_t * p_input,
                                    size_t i_nb_samples )
 {
-    aout_buffer_t * p_buffer;
-    mtime_t duration;
+    block_t *block;
+    size_t length;
 
     aout_lock_input( NULL, p_input );
 
@@ -232,25 +232,21 @@ aout_buffer_t * aout_DecNewBuffer( aout_input_t * p_input,
         return NULL;
     }
 
-    duration = (1000000 * (mtime_t)i_nb_samples) / p_input->input.i_rate;
-
-    /* This necessarily allocates in the heap. */
-    p_buffer = aout_BufferAlloc( &p_input->input_alloc, duration, NULL );
-    if( p_buffer != NULL )
-        p_buffer->i_buffer = i_nb_samples * p_input->input.i_bytes_per_frame
-                                  / p_input->input.i_frame_length;
+    length = i_nb_samples * p_input->input.i_bytes_per_frame
+                          / p_input->input.i_frame_length;
+    block = block_Alloc( length );
 
     /* Suppose the decoder doesn't have more than one buffered buffer */
     p_input->b_changed = false;
 
     aout_unlock_input( NULL, p_input );
 
-    if( p_buffer == NULL )
-        return NULL;
-
-    p_buffer->i_nb_samples = i_nb_samples;
-    p_buffer->i_pts = p_buffer->i_length = 0;
-    return p_buffer;
+    if( likely(block != NULL) )
+    {
+        block->i_nb_samples = i_nb_samples;
+        block->i_pts = block->i_length = 0;
+    }
+    return block;
 }
 
 /*****************************************************************************
