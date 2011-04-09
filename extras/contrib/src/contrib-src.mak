@@ -2445,6 +2445,24 @@ CLEAN_PKG += BGHUDAppKit
 DISTCLEAN_PKG += BGHUDAppKit-$(BGHUDAPPKIT_VERSION).zip
 
 # ***************************************************************************
+# Growl
+# ***************************************************************************
+
+Growl-$(GROWL_VERSION).zip:
+	$(WGET) $(GROWL_URL)
+
+.Growl: Growl-$(GROWL_VERSION).zip
+	rm -rf $@ || true
+	(mkdir Growl && cd Growl && unzip ../$<)
+	rm -rf $(PREFIX)/Growl
+	mv Growl $(PREFIX)
+	touch $@
+
+CLEAN_FILE += .Growl
+CLEAN_PKG += Growl
+DISTCLEAN_PKG += Growl-$(GROWL_VERSION).zip
+
+# ***************************************************************************
 # UPNP library
 # ***************************************************************************
 
