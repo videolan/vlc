@@ -365,9 +365,9 @@ static int Open(vlc_object_t *obj)
     if (aout->output.output.i_physical_channels & AOUT_CHAN_RIGHT)
         map.map[map.channels++] = PA_CHANNEL_POSITION_FRONT_RIGHT;
     if (aout->output.output.i_physical_channels & AOUT_CHAN_MIDDLELEFT)
-        map.map[map.channels++] = PA_CHANNEL_POSITION_FRONT_LEFT_OF_CENTER;
+        map.map[map.channels++] = PA_CHANNEL_POSITION_SIDE_LEFT;
     if (aout->output.output.i_physical_channels & AOUT_CHAN_MIDDLERIGHT)
-        map.map[map.channels++] = PA_CHANNEL_POSITION_FRONT_RIGHT_OF_CENTER;
+        map.map[map.channels++] = PA_CHANNEL_POSITION_SIDE_RIGHT;
     if (aout->output.output.i_physical_channels & AOUT_CHAN_REARLEFT)
         map.map[map.channels++] = PA_CHANNEL_POSITION_REAR_LEFT;
     if (aout->output.output.i_physical_channels & AOUT_CHAN_REARRIGHT)
