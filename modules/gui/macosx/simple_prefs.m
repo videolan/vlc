@@ -234,6 +234,7 @@ create_toolbar_item( NSString * o_itemIdent, NSString * o_name, NSString * o_des
     [o_intf_mediakeys_bg_ckb setTitle: _NS("...when VLC is in background")];
     [o_intf_update_ckb setTitle: _NS("Automatically check for updates")];
     [o_intf_last_update_lbl setStringValue: @""];
+    [o_intf_enableGrowl_ckb setStringValue: _NS("Enable Growl notifications (on playlist item change)")];
 
     /* Subtitles and OSD */
     [o_osd_encoding_txt setStringValue: _NS("Default Encoding")];
@@ -427,6 +428,13 @@ static inline char * __config_GetLabel( vlc_object_t *p_this, const char *psz_na
         [o_intf_last_update_lbl setStringValue: [NSString stringWithFormat: _NS("Last check on: %@"), [[[SUUpdater sharedUpdater] lastUpdateCheckDate] descriptionWithLocale: [[NSUserDefaults standardUserDefaults] dictionaryRepresentation]]]];
     else
         [o_intf_last_update_lbl setStringValue: _NS("No check was performed yet.")];
+    psz_tmp = config_GetPsz( p_intf, "control" );
+    if (psz_tmp) {
+        [o_intf_enableGrowl_ckb setState: (NSInteger)strstr( psz_tmp, "growl")];
+        free( psz_tmp );
+    }
+    else
+        [o_intf_enableGrowl_ckb setState: NSOffState];
 
     /******************
      * audio settings *
@@ -773,6 +781,29 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
 		config_PutInt( p_intf, "macosx-appleremote", [o_intf_appleremote_ckb state] );
 		config_PutInt( p_intf, "macosx-mediakeys", [o_intf_mediakeys_ckb state] );
         config_PutInt( p_intf, "macosx-mediakeys-background", [o_intf_mediakeys_bg_ckb state] );
+        if( [o_intf_enableGrowl_ckb state] == NSOnState )
+        {
+            psz_tmp = config_GetPsz( p_intf, "control" );
+            if(! psz_tmp)
+                config_PutPsz( p_intf, "control", "growl" );
+            else if( (NSInteger)strstr( psz_tmp, "control" ) == NO )
+            {
+                psz_tmp = (char *)[[NSString stringWithFormat: @"%s:growl", psz_tmp] UTF8String];
+                config_PutPsz( p_intf, "control", psz_tmp );
+                free( psz_tmp );
+            }
+        }
+        else
+        {
+            psz_tmp = config_GetPsz( p_intf, "control" );
+            if( psz_tmp )
+            {
+                psz_tmp = (char *)[[[NSString stringWithUTF8String: psz_tmp] stringByTrimmingCharactersInSet: [NSCharacterSet characterSetWithCharactersInString:@":growl"]] UTF8String];
+                psz_tmp = (char *)[[[NSString stringWithUTF8String: psz_tmp] stringByTrimmingCharactersInSet: [NSCharacterSet characterSetWithCharactersInString:@"growl:"]] UTF8String];
+                psz_tmp = (char *)[[[NSString stringWithUTF8String: psz_tmp] stringByTrimmingCharactersInSet: [NSCharacterSet characterSetWithCharactersInString:@"growl"]] UTF8String];
+                config_PutPsz( p_intf, "control", psz_tmp );
+            }
+        }
 
 		/* activate stuff without restart */
 		if( [o_intf_appleremote_ckb state] == YES )
@@ -819,7 +850,6 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
                 config_PutPsz( p_intf, "audio-filter", "volnorm" );
             else if( (NSInteger)strstr( psz_tmp, "normvol" ) == NO )
             {
-                /* work-around a GCC 4.0.1 bug */
                 psz_tmp = (char *)[[NSString stringWithFormat: @"%s:volnorm", psz_tmp] UTF8String];
                 config_PutPsz( p_intf, "audio-filter", psz_tmp );
                 free( psz_tmp );
@@ -830,11 +860,10 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
             psz_tmp = config_GetPsz( p_intf, "audio-filter" );
             if( psz_tmp )
             {
-                char *psz_tmp2 = (char *)[[[NSString stringWithUTF8String: psz_tmp] stringByTrimmingCharactersInSet: [NSCharacterSet characterSetWithCharactersInString:@":volnorm"]] UTF8String];
-                psz_tmp2 = (char *)[[[NSString stringWithUTF8String: psz_tmp2] stringByTrimmingCharactersInSet: [NSCharacterSet characterSetWithCharactersInString:@"volnorm:"]] UTF8String];
-                psz_tmp2 = (char *)[[[NSString stringWithUTF8String: psz_tmp2] stringByTrimmingCharactersInSet: [NSCharacterSet characterSetWithCharactersInString:@"volnorm"]] UTF8String];
+                psz_tmp = (char *)[[[NSString stringWithUTF8String: psz_tmp] stringByTrimmingCharactersInSet: [NSCharacterSet characterSetWithCharactersInString:@":volnorm"]] UTF8String];
+                psz_tmp = (char *)[[[NSString stringWithUTF8String: psz_tmp] stringByTrimmingCharactersInSet: [NSCharacterSet characterSetWithCharactersInString:@"volnorm:"]] UTF8String];
+                psz_tmp = (char *)[[[NSString stringWithUTF8String: psz_tmp] stringByTrimmingCharactersInSet: [NSCharacterSet characterSetWithCharactersInString:@"volnorm"]] UTF8String];
                 config_PutPsz( p_intf, "audio-filter", psz_tmp );
-                free( psz_tmp );
             }
         }
         config_PutFloat( p_intf, "norm-max-level", [o_audio_norm_fld floatValue] );
