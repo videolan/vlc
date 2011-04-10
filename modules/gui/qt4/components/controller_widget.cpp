@@ -112,8 +112,8 @@ SoundWidget::SoundWidget( QWidget *_parent, intf_thread_t * _p_intf,
     updateMuteStatus();
 
     /* Volume control connection */
-    CONNECT( volumeSlider, valueChanged( int ), this, refreshLabels( void ) );
-    CONNECT( volumeSlider, sliderMoved( int ), this, userUpdateVolume( int ) );
+    volumeSlider->setTracking( true );
+    CONNECT( volumeSlider, valueChanged( int ), this, userUpdateVolume( int ) );
     CONNECT( THEMIM, volumeChanged( void ), this, libUpdateVolume( void ) );
     CONNECT( THEMIM, soundMuteChanged( void ), this, updateMuteStatus( void ) );
 }
@@ -151,6 +151,7 @@ void SoundWidget::userUpdateVolume( int i_sliderVolume )
     playlist_t *p_playlist = pl_Get( p_intf );
     int i_res = i_sliderVolume  * (AOUT_VOLUME_MAX / 2) / VOLUME_MAX;
     aout_VolumeSet( p_playlist, i_res );
+    refreshLabels();
 }
 
 /* libvlc changed value event slot */
