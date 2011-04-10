@@ -266,6 +266,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             QComboBox * name ## Device = new QComboBox( name ## Control ); \
             name ## Layout->addWidget( name ## Device ); \
             name ## Label->setBuddy( name ## Device ); \
+            name ## Device->setSizePolicy( QSizePolicy::Ignored, QSizePolicy::Preferred  );\
             outputAudioLayout->addWidget( name ## Control, outputAudioLayout->rowCount(), 0, 1, -1 );
 
 #define audioControl2( name) \
@@ -289,7 +290,6 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             {
                 audioControl( alsa );
                 optionWidgets.append( alsaControl );
-
                 CONFIG_GENERIC_NO_UI( "alsa-audio-device" , StringList, alsaLabel,
                                 alsaDevice );
             }
