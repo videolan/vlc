@@ -533,12 +533,14 @@ typedef union
 #if defined( __GNUC__ ) && __GNUC__ > 3
 # ifndef __cplusplus
 #  define VLC_OBJECT( x ) \
-    __builtin_choose_expr(__builtin_offsetof(__typeof__(*x), psz_object_type), \
-                          (void)0 /* screw you */, (vlc_object_t *)(x))
+    __builtin_choose_expr( \
+        __builtin_offsetof(__typeof__(*(x)), psz_object_type), \
+        (void)0 /* screw you */, \
+        (vlc_object_t *)(x))
 # else
 #  define VLC_OBJECT( x ) \
     ((vlc_object_t *)(x) \
-      + 0 * __builtin_offsetof(__typeof__(*x), psz_object_type))
+      + 0 * __builtin_offsetof(__typeof__(*(x)), psz_object_type))
 # endif
 #else
 # define VLC_OBJECT( x ) ((vlc_object_t *)(x))
