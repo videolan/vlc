@@ -39,7 +39,6 @@
 #include <CoreAudio/CoreAudio.h>
 #include <AudioUnit/AudioUnit.h>
 #include <AudioToolbox/AudioFormat.h>
-#include <AudioUnit/AudioComponent.h>
 
 #include <CoreServices/CoreServices.h>
 
