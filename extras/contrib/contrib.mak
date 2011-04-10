@@ -49,7 +49,7 @@ src: using-src
 
 ifdef HAVE_DARWIN_OS
 
-CONTRIBREV=44
+CONTRIBREV=45
 
 contrib-macosx-$(ARCH)-$(CONTRIBREV).tar.bz2:
 	$(WGET) http://downloads.videolan.org/pub/videolan/testing/contrib/$@
@@ -99,7 +99,7 @@ package-macosx:
 		exit 1 ; \
 	fi
 	mkdir tmp
-	(cd $(PREFIX); tar cf - Sparkle BGHUDAppKit bin sbin include lib share/aclocal* share/autoconf* \
+	(cd $(PREFIX); tar cf - Sparkle Growl BGHUDAppKit bin sbin include lib share/aclocal* share/autoconf* \
 		share/automake* share/gettext* share/libtool*) | (cd tmp; tar xf -)
 	./change_prefix.sh tmp $(PREFIX) @@CONTRIB_PREFIX@@
 	(cd tmp; tar cf - .) | bzip2 -c > contrib-macosx.tar.bz2
