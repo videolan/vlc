@@ -43,7 +43,7 @@
 SoundWidget::SoundWidget( QWidget *_parent, intf_thread_t * _p_intf,
                           bool b_shiny, bool b_special )
                          : QWidget( _parent ), p_intf( _p_intf),
-                           b_is_muted( false )
+                           b_is_muted( false ), b_ignore_valuechanged( false )
 {
     /* We need a layout for this widget */
     QHBoxLayout *layout = new QHBoxLayout( this );
@@ -113,7 +113,8 @@ SoundWidget::SoundWidget( QWidget *_parent, intf_thread_t * _p_intf,
 
     /* Volume control connection */
     volumeSlider->setTracking( true );
-    CONNECT( volumeSlider, valueChanged( int ), this, userUpdateVolume( int ) );
+    CONNECT( volumeSlider, valueChanged( int ), this, valueChangedFilter( int ) );
+    CONNECT( this, valueReallyChanged( int ), this, userUpdateVolume( int ) );
     CONNECT( THEMIM, volumeChanged( void ), this, libUpdateVolume( void ) );
     CONNECT( THEMIM, soundMuteChanged( void ), this, updateMuteStatus( void ) );
 }
@@ -164,12 +165,19 @@ void SoundWidget::libUpdateVolume()
     i_volume = aout_VolumeGet( p_playlist );
     i_volume = ( ( i_volume + 1 ) *  VOLUME_MAX )/ (AOUT_VOLUME_MAX/2);
     int i_gauge = volumeSlider->value();
-    if ( !b_is_muted && /* do not show mute effect on volume (set to 0) */
-        ( i_volume - i_gauge > 1 || i_gauge - i_volume > 1 )
-    )
+    if ( i_volume - i_gauge != 0 )
     {
+        b_ignore_valuechanged = true;
         volumeSlider->setValue( i_volume );
+        b_ignore_valuechanged = false;
     }
+    refreshLabels();
+}
+
+void SoundWidget::valueChangedFilter( int i_val )
+{
+    /* valueChanged is also emitted when the lib setValue() */
+    if ( !b_ignore_valuechanged ) emit valueReallyChanged( i_val );
 }
 
 /* libvlc mute/unmute event slot */

@@ -86,6 +86,7 @@ private:
     QMenu               *volumeMenu;
     virtual bool eventFilter( QObject *obj, QEvent *e );
     bool                b_is_muted;
+    bool                b_ignore_valuechanged;
 
 protected slots:
     void userUpdateVolume( int );
@@ -93,6 +94,10 @@ protected slots:
     void updateMuteStatus( void );
     void refreshLabels( void );
     void showVolumeMenu( QPoint pos );
+    void valueChangedFilter( int );
+
+signals:
+    void valueReallyChanged( int );
 };
 
 #endif
