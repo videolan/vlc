@@ -467,7 +467,7 @@
     s_rc.origin.x = 481;
     s_rc.origin.y = 64;
     s_rc.size.width = 55;
-    addTextfield( VLCTimefield, o_streamPosition_txt, NSRightTextAlignment, systemFontOfSize, whiteColor, 0 );
+    addTextfield( VLCTimeField, o_streamPosition_txt, NSRightTextAlignment, systemFontOfSize, whiteColor, 0 );
 
     return view;
 }

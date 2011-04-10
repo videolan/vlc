@@ -1,7 +1,7 @@
 /*****************************************************************************
  * open.m: Open dialogues for VLC's MacOS X port
  *****************************************************************************
- * Copyright (C) 2002-2009 the VideoLAN team
+ * Copyright (C) 2002-2011 the VideoLAN team
  * $Id$
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -479,23 +479,24 @@ static VLCOpen *_o_sharedMainInstance = nil;
         o_win_rect.origin.y = ( o_win_rect.origin.y + o_view_rect.size.height ) - o_view_rect.size.height;
 
         /* remove the MRL view */
-        [o_mrl_view removeFromSuperviewWithoutNeedingDisplay];
+        [o_mrl_view removeFromSuperview];
     } else {
         /* we need to expand */
         [o_mrl_view setFrame: NSMakeRect( 0,
                                          [o_mrl_btn frame].origin.y,
                                          o_view_rect.size.width,
                                          o_view_rect.size.height )];
-        [o_mrl_view setNeedsDisplay: YES];
+        [o_mrl_view setNeedsDisplay: NO];
         [o_mrl_view setAutoresizesSubviews: YES];
 
-        /* add the MRL view */
-        [[o_panel contentView] addSubview: o_mrl_view];
+        /* enlarge panel size for MRL view */
         o_win_rect.size.height = o_win_rect.size.height + o_view_rect.size.height;
     }
 
     [o_panel setFrame: o_win_rect display:YES animate: YES];
     [o_panel displayIfNeeded];
+    if( [o_mrl_btn state] == NSOnState )
+        [[o_panel contentView] addSubview: o_mrl_view];
 }
 
 - (IBAction)inputSlaveAction:(id)sender

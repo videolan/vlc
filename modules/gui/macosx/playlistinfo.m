@@ -256,8 +256,8 @@ static VLCInfo *_o_sharedInstance = nil;
         }
 
         /* fill uri info */
-        char * psz_url = input_item_GetURI( p_item );
-        [o_uri_txt setStringValue: [NSString stringWithUTF8String: psz_url ? psz_url : ""  ]];
+        char * psz_url = decode_URI( input_item_GetURI( p_item ) );
+        [o_uri_txt setStringValue: [NSString stringWithUTF8String: psz_url ? psz_url : ""]];
         free( psz_url );
 
         /* fill title info */
