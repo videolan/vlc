@@ -400,8 +400,8 @@
     [o_button setAction: @selector(action:)];                                                   \
     [self addSubview:o_button];
 
-#define addTextfield( o_text, align, font, color, size )                                    \
-    o_text = [[NSTextField alloc] initWithFrame: s_rc];                            \
+#define addTextfield( class, o_text, align, font, color, size )                                    \
+    o_text = [[class alloc] initWithFrame: s_rc];                            \
     [o_text setDrawsBackground: NO];                                                        \
     [o_text setBordered: NO];                                                               \
     [o_text setEditable: NO];                                                               \
@@ -463,11 +463,11 @@
     s_rc.origin.y = 64;
     s_rc.size.width = 352;
     s_rc.size.height = 14;
-    addTextfield( o_streamTitle_txt, NSCenterTextAlignment, systemFontOfSize, whiteColor, 0 );
-    s_rc.origin.x = 486;
+    addTextfield( NSTextField, o_streamTitle_txt, NSCenterTextAlignment, systemFontOfSize, whiteColor, 0 );
+    s_rc.origin.x = 481;
     s_rc.origin.y = 64;
-    s_rc.size.width = 50;
-    addTextfield( o_streamPosition_txt, NSRightTextAlignment, systemFontOfSize, whiteColor, 0 );
+    s_rc.size.width = 55;
+    addTextfield( VLCTimefield, o_streamPosition_txt, NSRightTextAlignment, systemFontOfSize, whiteColor, 0 );
 
     return view;
 }
