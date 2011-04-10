@@ -74,10 +74,10 @@ static int RateCallback( vlc_object_t *p_this, char const *psz_cmd,
     return VLC_SUCCESS;
 }
 
-static int RateOffsetCallback( vlc_object_t *p_this, char const *psz_cmd,
+static int RateOffsetCallback( vlc_object_t *obj, char const *psz_cmd,
                                vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
-    playlist_t *p_playlist = (playlist_t*)p_this;
+    playlist_t *p_playlist = (playlist_t *)obj;
     VLC_UNUSED(oldval); VLC_UNUSED(p_data); VLC_UNUSED(newval);
 
     static const float pf_rate[] = {
@@ -85,48 +85,40 @@ static int RateOffsetCallback( vlc_object_t *p_this, char const *psz_cmd,
         1.0/1,
         3.0/2, 2.0/1, 3.0/1, 4.0/1, 8.0/1, 16.0/1, 32.0/1, 64.0/1,
     };
-    const unsigned i_rate_count = sizeof(pf_rate)/sizeof(*pf_rate);
+    const size_t i_rate_count = sizeof(pf_rate)/sizeof(*pf_rate);
+
+    float f_rate;
+    struct input_thread_t *input;
 
     PL_LOCK;
-    float f_rate = 1.;
-    if( pl_priv( p_playlist )->p_input )
+    input = pl_priv( p_playlist )->p_input;
+    f_rate = var_GetFloat( input ? (vlc_object_t *)input : obj, "rate" );
+    PL_UNLOCK;
+
+    if( !strcmp( psz_cmd, "rate-faster" ) )
     {
-       f_rate = var_GetFloat( pl_priv(p_playlist)->p_input, "rate" );
+        /* compensate for input rounding errors */
+        float r = f_rate * 1.1;
+        for( size_t i = 0; i < i_rate_count; i++ )
+            if( r < pf_rate[i] )
+            {
+                f_rate = pf_rate[i];
+                break;
+            }
     }
     else
     {
-       f_rate = var_GetFloat( p_playlist, "rate" );
+        /* compensate for input rounding errors */
+        float r = f_rate * .9;
+        for( size_t i = 1; i < i_rate_count; i++ )
+            if( r <= pf_rate[i] )
+            {
+                f_rate = pf_rate[i - 1];
+                break;
+            }
     }
-    PL_UNLOCK;
 
-    /* Determine the factor closest to the current rate */
-    float f_error;
-    int i_idx;
-    for( unsigned i = 0; i < i_rate_count; i++ )
-    {
-        const float f_test_e = fabs( fabs( f_rate ) - pf_rate[i] );
-        if( i == 0 || f_test_e < f_error )
-        {
-            i_idx = i;
-            f_error = f_test_e;
-        }
-    }
-    assert( i_idx < (int)i_rate_count );
-
-    /* */
-    i_idx += strcmp( psz_cmd, "rate-faster" ) == 0 ? 1 : -1;
-    if( i_idx >= 0 && i_idx < (int)i_rate_count )
-    {
-        const float f_rate_min = (float)INPUT_RATE_DEFAULT / INPUT_RATE_MAX;
-        const float f_rate_max = (float)INPUT_RATE_DEFAULT / INPUT_RATE_MIN;
-        const float f_sign = f_rate >= 0 ? +1. : -1.;
-
-        var_SetFloat( p_playlist, "rate",
-                      f_sign * __MAX( __MIN( pf_rate[i_idx],
-                                             f_rate_max ),
-                                      f_rate_min ) );
-
-    }
+    var_SetFloat( p_playlist, "rate", f_rate );
     return VLC_SUCCESS;
 }
 
