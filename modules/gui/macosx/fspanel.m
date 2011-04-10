@@ -84,10 +84,10 @@
          object: NSApp];
 }
 
-/* Windows created with NSBorderlessWindowMask normally can't be key, but we want ours to be */
+/* make sure that we don't become key, since we can't handle hotkeys */
 - (BOOL)canBecomeKeyWindow
 {
-    return YES;
+    return NO;
 }
 
 - (BOOL)mouseDownCanMoveWindow
