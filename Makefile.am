@@ -543,6 +543,7 @@ VLC-release.app: vlc
 	  $(INSTALL) -m 644 $${i} $(top_builddir)/VLC-release.app/Contents/MacOS/share/http/requests/`basename $${i}` ; \
 	done
 	$(INSTALL) -m 644 $(srcdir)/share/http/requests/README.txt $(top_builddir)/VLC-release.app/Contents/MacOS/share/http/requests/README.txt
+	$(INSTALL) -m 644 $(srcdir)/share/vlc512x512.png $(top_builddir)/VLC-release.app/Contents/MacOS/share/vlc512x512.png
 	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS/share/locale
 	cat $(top_srcdir)/po/LINGUAS | while read i; do \
 	  $(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS/share/locale/$${i}/LC_MESSAGES ; \
