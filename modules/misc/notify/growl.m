@@ -174,6 +174,9 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
         p_intf->p_sys->i_item_changes = 0;
         return VLC_SUCCESS;
     }
+    /* ignore items which weren't pre-parsed yet */
+    else if( !input_item_IsPreparsed(p_item) )
+        return VLC_SUCCESS;
     else
     {
         if( p_item->i_id != p_intf->p_sys->i_id ) { /* "item-change" */
