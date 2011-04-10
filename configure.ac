@@ -456,14 +456,14 @@ VLC_ADD_LIBS([libvlccore],[${LTLIBICONV}])
 dnl Check for broken versions of mingw-runtime compatability library
 AS_IF([test "${SYS}" = "mingw32" -o "${SYS}" = "mingwce"], [
     AC_MSG_CHECKING(for broken mingw-runtime)
-    AC_PREPROC_IFELSE([
+    AC_PREPROC_IFELSE([AC_LANG_SOURCE([
 #include <_mingw.h>
 #if (__MINGW32_MAJOR_VERSION == 3) && (__MINGW32_MINOR_VERSION < 15)
 #ifndef __MINGW64_VERSION_MAJOR
 # error Attempting to use mingw-runtime with broken vsnprintf support
 #endif
 #endif
-    ], [
+    ])], [
         AC_MSG_RESULT([ok])
     ], [
         AC_MSG_RESULT([present])
@@ -527,13 +527,13 @@ dnl See sourceware.org bugs 5058 and 5443.
 dnl Ubuntu alone has 20 bug numbers for this...
 dnl
 AC_MSG_CHECKING(for buggy GNU/libc versions)
-AC_PREPROC_IFELSE([
+AC_PREPROC_IFELSE([AC_LANG_SOURCE([
 #include <limits.h>
 #if defined (__GLIBC__) && (__GLIBC__ == 2) \
   && (__GLIBC_MINOR__ >= 5) && (__GLIBC_MINOR__ <= 7)
 # error GNU/libc with dcgettext killer bug!
 #endif
-], [
+])], [
   AC_MSG_RESULT([not present])
 ], [
   AC_MSG_RESULT([found])
@@ -1510,7 +1510,7 @@ AS_IF([test "${CFLAGS_TUNING}"],
     CFLAGS="${CFLAGS} ${CFLAGS_TUNING}"
 
     AC_MSG_CHECKING([whether $CC accepts ${CFLAGS_TUNING}])
-    AC_COMPILE_IFELSE([ ],
+    AC_COMPILE_IFELSE([AC_LANG_SOURCE([])],
                       [tuning="yes"],
                       [CFLAGS_TUNING=""; tuning="no"
                        AS_IF([test "${with_tuning}"],
@@ -3620,12 +3620,12 @@ AS_IF([test "${enable_qt4}" != "no"], [
 
     AC_MSG_CHECKING([whether Qt uses X11])
     CPPFLAGS="${CPPFLAGS} ${QT4_CFLAGS}"
-    AC_PREPROC_IFELSE([
+    AC_PREPROC_IFELSE([AC_LANG_SOURCE([
 #include <QWidget>
 #if !defined (Q_WS_X11)
 # error Fail
 #endif
-    ], [
+    ])], [
       AC_MSG_RESULT([yes])
       VLC_ADD_LIBS([qt4],[${X_LIBS} ${X_PRE_LIBS} -lX11])
       VLC_ADD_CXXFLAGS([qt4],[${X_CFLAGS}])
