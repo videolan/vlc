@@ -176,6 +176,7 @@ struct vout_display_sys_t
     // core objects
     HINSTANCE               hd3d9_dll;       /* handle of the opened d3d9 dll */
     LPDIRECT3D9             d3dobj;
+    D3DCAPS9                d3dcaps;
     LPDIRECT3DDEVICE9       d3ddev;
     D3DPRESENT_PARAMETERS   d3dpp;
     // scene objects

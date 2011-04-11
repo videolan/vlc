@@ -464,13 +464,13 @@ static int Direct3DCreate(vout_display_t *vd)
     /*
     ** Get device capabilities
     */
-    D3DCAPS9 d3dCaps;
-    ZeroMemory(&d3dCaps, sizeof(d3dCaps));
-    HRESULT hr = IDirect3D9_GetDeviceCaps(d3dobj, D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, &d3dCaps);
+    ZeroMemory(&sys->d3dcaps, sizeof(sys->d3dcaps));
+    HRESULT hr = IDirect3D9_GetDeviceCaps(d3dobj, D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, &sys->d3dcaps);
     if (FAILED(hr)) {
        msg_Err(vd, "Could not read adapter capabilities. (hr=0x%lX)", hr);
        return VLC_EGENERIC;
     }
+
     /* TODO: need to test device capabilities and select the right render function */
 
     return VLC_SUCCESS;
