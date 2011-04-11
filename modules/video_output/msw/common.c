@@ -403,10 +403,9 @@ void UpdateRects(vout_display_t *vd,
 
 #endif
 
-#if defined(MODULE_NAME_IS_directx) || defined(MODULE_NAME_IS_direct3d) || defined(MODULE_NAME_IS_direct2d)
+#if defined(MODULE_NAME_IS_directx)
     /* UpdateOverlay directdraw function doesn't automatically clip to the
-     * display size so we need to do it otherwise it will fail
-     * It is also needed for d3d to avoid exceding our surface size */
+     * display size so we need to do it otherwise it will fail */
 
     /* Clip the destination window */
     if (!IntersectRect(&rect_dest_clipped, &rect_dest,
