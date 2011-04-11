@@ -47,7 +47,7 @@ typedef xcb_atom_t Atom;
 
 #define XID_TEXT N_("X11 window ID")
 #define XID_LONGTEXT N_( \
-    "Video will be embedded in this pre-existing X11 window. " \
+    "Video will be embedded in this pre-existing window. " \
     "If zero, a new window will be created.")
 
 static int  Open (vout_window_t *, const vout_window_cfg_t *);
