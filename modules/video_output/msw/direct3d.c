@@ -651,7 +651,7 @@ static int Direct3DReset(vout_display_t *vd)
 static int  Direct3DCreatePool(vout_display_t *vd, video_format_t *fmt);
 static void Direct3DDestroyPool(vout_display_t *vd);
 
-static int  Direct3DCreateScene(vout_display_t *vd);
+static int  Direct3DCreateScene(vout_display_t *vd, const video_format_t *fmt);
 static void Direct3DDestroyScene(vout_display_t *vd);
 
 /**
@@ -663,7 +663,7 @@ static int Direct3DCreateResources(vout_display_t *vd, video_format_t *fmt)
         msg_Err(vd, "Direct3D picture pool initialization failed");
         return VLC_EGENERIC;
     }
-    if (Direct3DCreateScene(vd)) {
+    if (Direct3DCreateScene(vd, fmt)) {
         msg_Err(vd, "Direct3D scene initialization failed !");
         return VLC_EGENERIC;
     }
@@ -917,7 +917,7 @@ typedef struct
 /**
  * It allocates and initializes the resources needed to render the scene.
  */
-static int Direct3DCreateScene(vout_display_t *vd)
+static int Direct3DCreateScene(vout_display_t *vd, const video_format_t *fmt)
 {
     vout_display_sys_t *sys = vd->sys;
     LPDIRECT3DDEVICE9       d3ddev = sys->d3ddev;
@@ -930,8 +930,8 @@ static int Direct3DCreateScene(vout_display_t *vd)
      */
     LPDIRECT3DTEXTURE9 d3dtex;
     hr = IDirect3DDevice9_CreateTexture(d3ddev,
-                                        sys->d3dpp.BackBufferWidth,
-                                        sys->d3dpp.BackBufferHeight,
+                                        fmt->i_width,
+                                        fmt->i_height,
                                         1,
                                         D3DUSAGE_RENDERTARGET,
                                         sys->d3dpp.BackBufferFormat,
@@ -1034,8 +1034,9 @@ static void Direct3DDestroyScene(vout_display_t *vd)
 
 static int Direct3DSetupVertices(vout_display_t *vd,
                                  LPDIRECT3DVERTEXBUFFER9 d3dvtc,
-                                 float f_x, float f_y,
-                                 float f_width, float f_height)
+                                 const RECT src_full,
+                                 const RECT src_crop,
+                                 const RECT dst)
 {
     HRESULT hr;
 
@@ -1046,39 +1047,38 @@ static int Direct3DSetupVertices(vout_display_t *vd,
         return -1;
     }
 
-    /* -0.5f is a "feature" of DirectX and it seems to apply to Direct3d also */
-    /* http://www.sjbrown.co.uk/2003/05/01/fix-directx-rasterisation/ */
-    vertices[0].x       = f_x - 0.5f;       // left
-    vertices[0].y       = f_y - 0.5f;       // top
-    vertices[0].z       = 0.0f;
-    vertices[0].diffuse = D3DCOLOR_ARGB(255, 255, 255, 255);
-    vertices[0].rhw     = 1.0f;
-    vertices[0].tu      = 0.0f;
-    vertices[0].tv      = 0.0f;
+    const float src_full_width  = src_full.right  - src_full.left;
+    const float src_full_height = src_full.bottom - src_full.top;
+    vertices[0].x  = dst.left;
+    vertices[0].y  = dst.top;
+    vertices[0].tu = src_crop.left / src_full_width;
+    vertices[0].tv = src_crop.top  / src_full_height;
 
-    vertices[1].x       = f_x + f_width - 0.5f;    // right
-    vertices[1].y       = f_y - 0.5f;              // top
-    vertices[1].z       = 0.0f;
-    vertices[1].diffuse = D3DCOLOR_ARGB(255, 255, 255, 255);
-    vertices[1].rhw     = 1.0f;
-    vertices[1].tu      = 1.0f;
-    vertices[1].tv      = 0.0f;
+    vertices[1].x  = dst.right;
+    vertices[1].y  = dst.top;
+    vertices[1].tu = src_crop.right / src_full_width;
+    vertices[1].tv = src_crop.top   / src_full_height;
 
-    vertices[2].x       = f_x + f_width - 0.5f;    // right
-    vertices[2].y       = f_y + f_height - 0.5f;   // bottom
-    vertices[2].z       = 0.0f;
-    vertices[2].diffuse = D3DCOLOR_ARGB(255, 255, 255, 255);
-    vertices[2].rhw     = 1.0f;
-    vertices[2].tu      = 1.0f;
-    vertices[2].tv      = 1.0f;
+    vertices[2].x  = dst.right;
+    vertices[2].y  = dst.bottom;
+    vertices[2].tu = src_crop.right  / src_full_width;
+    vertices[2].tv = src_crop.bottom / src_full_height;
 
-    vertices[3].x       = f_x - 0.5f;       // left
-    vertices[3].y       = f_y + f_height - 0.5f;   // bottom
-    vertices[3].z       = 0.0f;
-    vertices[3].diffuse = D3DCOLOR_ARGB(255, 255, 255, 255);
-    vertices[3].rhw     = 1.0f;
-    vertices[3].tu      = 0.0f;
-    vertices[3].tv      = 1.0f;
+    vertices[3].x  = dst.left;
+    vertices[3].y  = dst.bottom;
+    vertices[3].tu = src_crop.left   / src_full_width;
+    vertices[3].tv = src_crop.bottom / src_full_height;
+
+    for (int i = 0; i < 4; i++) {
+        /* -0.5f is a "feature" of DirectX and it seems to apply to Direct3d also */
+        /* http://www.sjbrown.co.uk/2003/05/01/fix-directx-rasterisation/ */
+        vertices[i].x -= 0.5;
+        vertices[i].y -= 0.5;
+
+        vertices[i].z       = 0.0f;
+        vertices[i].rhw     = 1.0f;
+        vertices[i].diffuse = D3DCOLOR_ARGB(255, 255, 255, 255);
+    }
 
     hr= IDirect3DVertexBuffer9_Unlock(d3dvtc);
     if (FAILED(hr)) {
@@ -1178,11 +1178,8 @@ static void Direct3DRenderScene(vout_display_t *vd, LPDIRECT3DSURFACE9 surface)
     }
 
     /* Copy picture surface into texture surface
-     * color space conversion and scaling happen here */
-    RECT src = vd->sys->rect_src_clipped;
-    RECT dst = vd->sys->rect_dest_clipped;
-
-    hr = IDirect3DDevice9_StretchRect(d3ddev, d3dsrc, &src, d3ddest, &dst, D3DTEXF_LINEAR);
+     * color space conversion happen here */
+    hr = IDirect3DDevice9_StretchRect(d3ddev, d3dsrc, NULL, d3ddest, NULL, D3DTEXF_NONE);
     IDirect3DSurface9_Release(d3ddest);
     if (FAILED(hr)) {
         msg_Dbg(vd, "%s:%d (hr=0x%0lX)", __FUNCTION__, __LINE__, hr);
@@ -1196,11 +1193,11 @@ static void Direct3DRenderScene(vout_display_t *vd, LPDIRECT3DSURFACE9 surface)
         return;
     }
 
-    /* Update the vertex buffer */
+    /* Update the vertex buffer (scaling is setup here) */
     if (Direct3DSetupVertices(vd, d3dvtc,
-                              0, 0,
-                              vd->sys->d3dpp.BackBufferWidth,
-                              vd->sys->d3dpp.BackBufferHeight)) {
+                              vd->sys->rect_src,
+                              vd->sys->rect_src_clipped,
+                              vd->sys->rect_dest_clipped)) {
         IDirect3DDevice9_EndScene(d3ddev);
         return;
     }
