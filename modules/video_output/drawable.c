@@ -49,7 +49,10 @@ vlc_module_end ()
 
 static int Control (vout_window_t *, int, va_list);
 
+/* Keep a list of busy drawables, so we don't overlap videos if there are
+ * more than one video track in the stream. */
 static vlc_mutex_t serializer = VLC_STATIC_MUTEX;
+static void **used = NULL;
 
 /**
  * Find the drawable set by libvlc application.
@@ -61,39 +64,29 @@ static int Open (vout_window_t *wnd, const vout_window_cfg_t *cfg)
     if (val == NULL)
         return VLC_EGENERIC;
 
-    if (var_Create (wnd->p_libvlc, "hwnd-in-use", VLC_VAR_ADDRESS))
-        return VLC_ENOMEM;
-
-    /* Keep a list of busy drawables, so we don't overlap videos if there are
-     * more than one video track in the stream. */
-    void **used;
+    void **tab;
     size_t n = 0;
 
     vlc_mutex_lock (&serializer);
-    used = var_GetAddress (wnd->p_libvlc, "hwnd-in-use");
     if (used != NULL)
-    {
-        while (used[n] != NULL)
-        {
+        for (/*n = 0*/; used[n] != NULL; n++)
             if (used[n] == val)
+            {
+                msg_Warn (wnd, "HWND %p is busy", val);
+                val = NULL;
                 goto skip;
-            n++;
-        }
-    }
+            }
 
-    used = realloc (used, sizeof (*used) * (n + 2));
-    if (used != NULL)
+    tab = realloc (used, sizeof (*used) * (n + 2));
+    if (likely(tab != NULL))
     {
+        used = tab;
         used[n] = val;
         used[n + 1] = NULL;
-        var_SetAddress (wnd->p_libvlc, "hwnd-in-use", used);
     }
     else
-    {
-skip:
-        msg_Warn (wnd, "HWND %p is busy", val);
         val = NULL;
-    }
+skip:
     vlc_mutex_unlock (&serializer);
 
     if (val == NULL)
@@ -110,16 +103,15 @@ skip:
  */
 static void Close (vout_window_t *wnd)
 {
-    void **used, *val = wnd->sys;
+    void *val = wnd->sys;
     size_t n = 0;
 
     /* Remove this drawable from the list of busy ones */
     vlc_mutex_lock (&serializer);
-    used = var_GetAddress (wnd->p_libvlc, "hwnd-in-use");
-    assert (used);
+    assert (used != NULL);
     while (used[n] != val)
     {
-        assert (used[n]);
+        assert (used[n] != NULL);
         n++;
     }
     do
@@ -127,13 +119,11 @@ static void Close (vout_window_t *wnd)
     while (used[++n] != NULL);
 
     if (n == 0)
-         var_SetAddress (wnd->p_libvlc, "hwnd-in-use", NULL);
+    {
+         free (used);
+         used = NULL;
+    }
     vlc_mutex_unlock (&serializer);
-
-    if (n == 0)
-        free (used);
-    /* Variables are reference-counted... */
-    var_Destroy (wnd->p_libvlc, "hwnd-in-use");
 }
 
 
