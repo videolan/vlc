@@ -955,7 +955,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     var_Create( p_libvlc, "drawable-nsobject", VLC_VAR_ADDRESS );
 #endif
 #ifdef WIN32
-    var_Create( p_libvlc, "drawable-hwnd", VLC_VAR_ADDRESS );
+    var_Create( p_libvlc, "drawable-hwnd", VLC_VAR_INTEGER );
 #endif
 
     /*

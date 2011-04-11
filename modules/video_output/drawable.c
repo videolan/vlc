@@ -31,6 +31,11 @@
 #include <vlc_plugin.h>
 #include <vlc_vout_window.h>
 
+#define HWND_TEXT N_("Window handle (HWND)")
+#define HWND_LONGTEXT N_( \
+    "Video will be embedded in this pre-existing window. " \
+    "If zero, a new window will be created.")
+
 static int  Open (vout_window_t *, const vout_window_cfg_t *);
 static void Close(vout_window_t *);
 
@@ -45,6 +50,9 @@ vlc_module_begin ()
     set_capability ("vout window hwnd", 0)
     set_callbacks (Open, Close)
     add_shortcut ("embed-hwnd")
+
+    add_integer ("drawable-hwnd", 0, HWND_TEXT, HWND_LONGTEXT, true)
+        change_volatile ()
 vlc_module_end ()
 
 static int Control (vout_window_t *, int, va_list);
@@ -52,7 +60,7 @@ static int Control (vout_window_t *, int, va_list);
 /* Keep a list of busy drawables, so we don't overlap videos if there are
  * more than one video track in the stream. */
 static vlc_mutex_t serializer = VLC_STATIC_MUTEX;
-static void **used = NULL;
+static uintptr_t *used = NULL;
 
 /**
  * Find the drawable set by libvlc application.
@@ -60,20 +68,20 @@ static void **used = NULL;
 static int Open (vout_window_t *wnd, const vout_window_cfg_t *cfg)
 {
     VLC_UNUSED (cfg);
-    void *val = var_InheritAddress (wnd, "drawable-hwnd");
-    if (val == NULL)
+    uintptr_t val = var_InheritInteger (wnd, "drawable-hwnd");
+    if (val == 0)
         return VLC_EGENERIC;
 
-    void **tab;
+    uintptr_t *tab;
     size_t n = 0;
 
     vlc_mutex_lock (&serializer);
     if (used != NULL)
-        for (/*n = 0*/; used[n] != NULL; n++)
+        for (/*n = 0*/; used[n]; n++)
             if (used[n] == val)
             {
-                msg_Warn (wnd, "HWND %p is busy", val);
-                val = NULL;
+                msg_Warn (wnd, "HWND 0x%zX is busy", val);
+                val = 0;
                 goto skip;
             }
 
@@ -82,19 +90,19 @@ static int Open (vout_window_t *wnd, const vout_window_cfg_t *cfg)
     {
         used = tab;
         used[n] = val;
-        used[n + 1] = NULL;
+        used[n + 1] = 0;
     }
     else
-        val = NULL;
+        val = 0;
 skip:
     vlc_mutex_unlock (&serializer);
 
-    if (val == NULL)
+    if (val == 0)
         return VLC_EGENERIC;
 
-    wnd->handle.hwnd = val;
+    wnd->handle.hwnd = (void *)val;
     wnd->control = Control;
-    wnd->sys = val;
+    wnd->sys = (void *)val;
     return VLC_SUCCESS;
 }
 
@@ -103,7 +111,7 @@ skip:
  */
 static void Close (vout_window_t *wnd)
 {
-    void *val = wnd->sys;
+    uintptr_t val = (uintptr_t)wnd->sys;
     size_t n = 0;
 
     /* Remove this drawable from the list of busy ones */
@@ -111,12 +119,12 @@ static void Close (vout_window_t *wnd)
     assert (used != NULL);
     while (used[n] != val)
     {
-        assert (used[n] != NULL);
+        assert (used[n]);
         n++;
     }
     do
         used[n] = used[n + 1];
-    while (used[++n] != NULL);
+    while (used[++n] != 0);
 
     if (n == 0)
     {
@@ -141,4 +149,3 @@ static int Control (vout_window_t *wnd, int query, va_list ap)
             return VLC_EGENERIC;
     }
 }
-
