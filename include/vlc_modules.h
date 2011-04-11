@@ -33,17 +33,17 @@ typedef void (*vlc_deactivate_t)(void *func, va_list args);
  * Exported functions.
  *****************************************************************************/
 
-VLC_EXPORT( module_t *, vlc_module_load, ( vlc_object_t *obj, const char *cap, const char *name, bool strict, vlc_activate_t probe, ... ) );
+VLC_EXPORT( module_t *, vlc_module_load, ( vlc_object_t *obj, const char *cap, const char *name, bool strict, vlc_activate_t probe, ... ) LIBVLC_USED );
 #define vlc_module_load(o,c,n,s,...) \
         vlc_module_load(VLC_OBJECT(o),c,n,s,__VA_ARGS__)
 VLC_EXPORT( void, vlc_module_unload, ( module_t *, vlc_deactivate_t deinit, ... ) );
 
-VLC_EXPORT( module_t *, module_need, ( vlc_object_t *, const char *, const char *, bool ) );
+VLC_EXPORT( module_t *, module_need, ( vlc_object_t *, const char *, const char *, bool ) LIBVLC_USED );
 #define module_need(a,b,c,d) module_need(VLC_OBJECT(a),b,c,d)
 VLC_EXPORT( void, module_unneed, ( vlc_object_t *, module_t * ) );
 #define module_unneed(a,b) module_unneed(VLC_OBJECT(a),b)
-VLC_EXPORT( bool,  module_exists, (const char *) );
-VLC_EXPORT( module_t *, module_find, (const char *) );
+VLC_EXPORT( bool,  module_exists, (const char *) LIBVLC_USED );
+VLC_EXPORT( module_t *, module_find, (const char *) LIBVLC_USED );
 
 int module_start(vlc_object_t *, module_t *);
 #define module_start(o, m) module_start(VLC_OBJECT(o),m)
@@ -56,24 +56,24 @@ VLC_EXPORT( void, module_config_free, ( module_config_t * ) );
 VLC_EXPORT( module_t *, module_hold, (module_t *module) );
 VLC_EXPORT( void, module_release, (module_t *module) );
 VLC_EXPORT( void, module_list_free, (module_t **) );
-VLC_EXPORT( module_t **, module_list_get, (size_t *n) );
+VLC_EXPORT( module_t **, module_list_get, (size_t *n) LIBVLC_USED );
 
 VLC_EXPORT( bool, module_provides, ( const module_t *m, const char *cap ) );
-VLC_EXPORT( const char *, module_get_object, ( const module_t *m ) );
-VLC_EXPORT( const char *, module_get_name, ( const module_t *m, bool long_name ) );
+VLC_EXPORT( const char *, module_get_object, ( const module_t *m ) LIBVLC_USED );
+VLC_EXPORT( const char *, module_get_name, ( const module_t *m, bool long_name ) LIBVLC_USED );
 #define module_GetLongName( m ) module_get_name( m, true )
-VLC_EXPORT( const char *, module_get_help, ( const module_t *m ) );
-VLC_EXPORT( const char *, module_get_capability, ( const module_t *m ) );
-VLC_EXPORT( int, module_get_score, ( const module_t *m ) );
-VLC_EXPORT( const char *, module_gettext, ( const module_t *, const char * ) );
+VLC_EXPORT( const char *, module_get_help, ( const module_t *m ) LIBVLC_USED );
+VLC_EXPORT( const char *, module_get_capability, ( const module_t *m ) LIBVLC_USED );
+VLC_EXPORT( int, module_get_score, ( const module_t *m ) LIBVLC_USED );
+VLC_EXPORT( const char *, module_gettext, ( const module_t *, const char * ) LIBVLC_USED );
 
-static inline module_t *module_get_main (void)
+LIBVLC_USED static inline module_t *module_get_main (void)
 {
     return module_find ("main");
 }
 #define module_get_main(a) module_get_main()
 
-static inline bool module_is_main( const module_t * p_module )
+LIBVLC_USED static inline bool module_is_main( const module_t * p_module )
 {
     return !strcmp( module_get_object( p_module ), "main" );
 }
