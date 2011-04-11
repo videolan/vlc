@@ -344,7 +344,7 @@ libcompat:
 libvlc: libcompat
 	cd src && $(MAKE) $(AM_MAKEFLAGS) libvlc.la
 
-core: libvlc vlc
+core: libvlc vlc$(EXEEXT)
 	cd bin && $(MAKE) $(AM_MAKEFLAGS) vlc$(EXEEXT) vlc-static$(EXEEXT)
 
 doc:
