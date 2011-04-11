@@ -970,8 +970,20 @@ static int Direct3DCreateScene(vout_display_t *vd, const video_format_t *fmt)
     IDirect3DDevice9_SetSamplerState(d3ddev, 0, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP);
 
     // Set linear filtering quality
-    IDirect3DDevice9_SetSamplerState(d3ddev, 0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
-    IDirect3DDevice9_SetSamplerState(d3ddev, 0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
+    if (sys->d3dcaps.TextureFilterCaps & D3DPTFILTERCAPS_MINFLINEAR) {
+        msg_Dbg(vd, "Using D3DTEXF_LINEAR for minification");
+        IDirect3DDevice9_SetSamplerState(d3ddev, 0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
+    } else {
+        msg_Dbg(vd, "Using D3DTEXF_POINT for minification");
+        IDirect3DDevice9_SetSamplerState(d3ddev, 0, D3DSAMP_MINFILTER, D3DTEXF_POINT);
+    }
+    if (sys->d3dcaps.TextureFilterCaps & D3DPTFILTERCAPS_MAGFLINEAR) {
+        msg_Dbg(vd, "Using D3DTEXF_LINEAR for magnification");
+        IDirect3DDevice9_SetSamplerState(d3ddev, 0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
+    } else {
+        msg_Dbg(vd, "Using D3DTEXF_POINT for magnification");
+        IDirect3DDevice9_SetSamplerState(d3ddev, 0, D3DSAMP_MAGFILTER, D3DTEXF_POINT);
+    }
 
     // set maximum ambient light
     IDirect3DDevice9_SetRenderState(d3ddev, D3DRS_AMBIENT, D3DCOLOR_XRGB(255,255,255));
