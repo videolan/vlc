@@ -358,7 +358,7 @@ static void *Thread( void *p_data )
     if ( psz_preset_path == NULL )
     {
         char *psz_data_path = config_GetDataDir( p_filter );
-        asprintf( &psz_preset_path, "%s" DIR_SEP "visualisation", psz_data_path );
+        asprintf( &psz_preset_path, "%s" DIR_SEP "visualization", psz_data_path );
         free( psz_data_path );
     }
 #endif
