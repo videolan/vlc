@@ -50,7 +50,7 @@ class QBoxLayout;
 
 class QAbstractSlider;
 class QAbstractButton;
-class InputSlider;
+class SeekSlider;
 class QToolButton;
 
 class VolumeClickHandler;

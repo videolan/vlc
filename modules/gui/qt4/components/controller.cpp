@@ -37,7 +37,7 @@
 #include "input_manager.hpp"
 #include "actions_manager.hpp"
 
-#include "util/input_slider.hpp" /* InputSlider */
+#include "util/input_slider.hpp" /* SeekSlider */
 #include "util/customwidgets.hpp" /* qEventToKey */
 
 #include <QSpacerItem>
@@ -289,7 +289,7 @@ QWidget *AbstractController::createWidget( buttonType_e button, int options )
         }
         break;
     case INPUT_SLIDER: {
-        InputSlider *slider = new InputSlider( Qt::Horizontal, NULL );
+        SeekSlider *slider = new SeekSlider( Qt::Horizontal, NULL );
 
         /* Update the position when the IM has changed */
         CONNECT( THEMIM->getIM(), positionUpdated( float, int64_t, int ),

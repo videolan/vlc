@@ -39,12 +39,12 @@
 #define MINIMUM 0
 #define MAXIMUM 1000
 
-InputSlider::InputSlider( QWidget *_parent ) : QSlider( _parent )
+SeekSlider::SeekSlider( QWidget *_parent ) : QSlider( _parent )
 {
-    InputSlider( Qt::Horizontal, _parent );
+    SeekSlider( Qt::Horizontal, _parent );
 }
 
-InputSlider::InputSlider( Qt::Orientation q, QWidget *_parent )
+SeekSlider::SeekSlider( Qt::Orientation q, QWidget *_parent )
             : QSlider( q, _parent )
 {
     b_isSliding = false;
@@ -72,7 +72,7 @@ InputSlider::InputSlider( Qt::Orientation q, QWidget *_parent )
 /***
  * \brief Public interface, like setValue,  but disabling the slider too
  ***/
-void InputSlider::setPosition( float pos, int64_t a, int b )
+void SeekSlider::setPosition( float pos, int64_t a, int b )
 {
     if( pos == -1.0 )
     {
@@ -88,20 +88,20 @@ void InputSlider::setPosition( float pos, int64_t a, int b )
     inputLength = b;
 }
 
-void InputSlider::startSeekTimer( int new_value )
+void SeekSlider::startSeekTimer( int new_value )
 {
     /* Only fire one update, when sliding, every 150ms */
     if( b_isSliding && !seekLimitTimer->isActive() )
         seekLimitTimer->start( 150 );
 }
 
-void InputSlider::updatePos()
+void SeekSlider::updatePos()
 {
     float f_pos = (float)(value())/1000.0;
     emit sliderDragged( f_pos ); /* Send new position to VLC's core */
 }
 
-void InputSlider::mouseReleaseEvent( QMouseEvent *event )
+void SeekSlider::mouseReleaseEvent( QMouseEvent *event )
 {
     event->accept();
     b_isSliding = false;
@@ -110,7 +110,7 @@ void InputSlider::mouseReleaseEvent( QMouseEvent *event )
     updatePos();
 }
 
-void InputSlider::mousePressEvent(QMouseEvent* event)
+void SeekSlider::mousePressEvent(QMouseEvent* event)
 {
     /* Right-click */
     if( event->button() != Qt::LeftButton &&
@@ -125,7 +125,7 @@ void InputSlider::mousePressEvent(QMouseEvent* event)
     event->accept();
 }
 
-void InputSlider::mouseMoveEvent(QMouseEvent *event)
+void SeekSlider::mouseMoveEvent(QMouseEvent *event)
 {
     if( b_isSliding )
     {
@@ -138,7 +138,7 @@ void InputSlider::mouseMoveEvent(QMouseEvent *event)
     event->accept();
 }
 
-void InputSlider::wheelEvent( QWheelEvent *event)
+void SeekSlider::wheelEvent( QWheelEvent *event)
 {
     /* Don't do anything if we are for somehow reason sliding */
     if( !b_isSliding )
@@ -154,19 +154,19 @@ void InputSlider::wheelEvent( QWheelEvent *event)
     event->accept();
 }
 
-QSize InputSlider::sizeHint() const
+QSize SeekSlider::sizeHint() const
 {
     return ( orientation() == Qt::Horizontal ) ? QSize( 100, 18 )
                                                : QSize( 18, 100 );
 }
 
-QSize InputSlider::handleSize() const
+QSize SeekSlider::handleSize() const
 {
     const int size = ( orientation() == Qt::Horizontal ? height() : width() );
     return QSize( size, size );
 }
 
-void InputSlider::paintEvent( QPaintEvent *event )
+void SeekSlider::paintEvent( QPaintEvent *event )
 {
     Q_UNUSED( event );
 

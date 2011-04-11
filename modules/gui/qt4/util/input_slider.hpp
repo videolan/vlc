@@ -34,12 +34,12 @@
 #include <QTimer>
 
 /* Input Slider derived from QSlider */
-class InputSlider : public QSlider
+class SeekSlider : public QSlider
 {
     Q_OBJECT
 public:
-    InputSlider( QWidget *_parent );
-    InputSlider( Qt::Orientation q, QWidget *_parent );
+    SeekSlider( QWidget *_parent );
+    SeekSlider( Qt::Orientation q, QWidget *_parent );
 
 protected:
     virtual void mouseMoveEvent(QMouseEvent *event);
