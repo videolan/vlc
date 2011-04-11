@@ -241,7 +241,11 @@ void InputSlider::paintEvent( QPaintEvent *event )
 
     if ( option.sliderPosition > minimum() && option.sliderPosition <= maximum() ) {
         painter.setPen( Qt::black );
-        painter.setBrush( foregroundGradient );
+    //    painter.setBrush( foregroundGradient );
+
+        QBrush brush;
+        brush.setTexture( QPixmap( ":/progress" ) );
+        painter.setBrush( brush );
         painter.drawRoundedRect( barRect.adjusted( 1, 1, -1, -1 ), barCorner, barCorner );
     }
 
