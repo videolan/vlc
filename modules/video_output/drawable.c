@@ -57,18 +57,18 @@ static vlc_mutex_t serializer = VLC_STATIC_MUTEX;
 static int Open (vout_window_t *wnd, const vout_window_cfg_t *cfg)
 {
     VLC_UNUSED (cfg);
-    void **used, *val;
-    size_t n = 0;
+    void *val = var_InheritAddress (wnd, "drawable-hwnd");
+    if (val == NULL)
+        return VLC_EGENERIC;
 
-    if (var_Create (wnd->p_libvlc, "hwnd-in-use", VLC_VAR_ADDRESS)
-     || var_Create (wnd, "drawable-hwnd", VLC_VAR_DOINHERIT | VLC_VAR_ADDRESS))
+    if (var_Create (wnd->p_libvlc, "hwnd-in-use", VLC_VAR_ADDRESS))
         return VLC_ENOMEM;
-
-    val = var_GetAddress (wnd, "drawable-hwnd");
-    var_Destroy (wnd, "drawable-hwnd");
 
     /* Keep a list of busy drawables, so we don't overlap videos if there are
      * more than one video track in the stream. */
+    void **used;
+    size_t n = 0;
+
     vlc_mutex_lock (&serializer);
     used = var_GetAddress (wnd->p_libvlc, "hwnd-in-use");
     if (used != NULL)
