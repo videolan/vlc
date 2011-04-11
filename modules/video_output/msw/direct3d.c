@@ -105,7 +105,9 @@ static void Direct3DDestroy(vout_display_t *);
 static int  Direct3DOpen (vout_display_t *, video_format_t *);
 static void Direct3DClose(vout_display_t *);
 
-static void Direct3DRenderScene(vout_display_t *vd, LPDIRECT3DSURFACE9 surface);
+static int  Direct3DImportPicture(vout_display_t *vd, LPDIRECT3DSURFACE9 surface);
+
+static void Direct3DRenderScene(vout_display_t *vd);
 
 /* */
 static int DesktopCallback(vlc_object_t *, char const *, vlc_value_t, vlc_value_t, void *);
@@ -242,11 +244,11 @@ static void Direct3DUnlockSurface(picture_t *);
 
 static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpicture)
 {
+    vout_display_sys_t *sys = vd->sys;
     LPDIRECT3DSURFACE9 surface = picture->p_sys->surface;
 #if 0
     picture_Release(picture);
     VLC_UNUSED(subpicture);
-    Direct3DRenderScene(vd, surface);
 #else
     /* FIXME it is a bit ugly, we need the surface to be unlocked for
      * rendering.
@@ -255,10 +257,22 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
      * wrapper, we can't */
 
     Direct3DUnlockSurface(picture);
-
-    Direct3DRenderScene(vd, surface);
     VLC_UNUSED(subpicture);
 #endif
+
+    /* check if device is still available */
+    HRESULT hr = IDirect3DDevice9_TestCooperativeLevel(sys->d3ddev);
+    if (FAILED(hr)) {
+        if (hr == D3DERR_DEVICENOTRESET && !sys->reset_device) {
+            vout_display_SendEventPicturesInvalid(vd);
+            sys->reset_device = true;
+        }
+        return;
+    }
+
+    if (!Direct3DImportPicture(vd, surface)) {
+        Direct3DRenderScene(vd);
+    }
 }
 
 static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpicture)
@@ -1141,58 +1155,53 @@ static int Direct3DRenderTexture(vout_display_t *vd,
     return 0;
 }
 
+/**
+ * It copies picture surface into a texture.
+ */
+static int Direct3DImportPicture(vout_display_t *vd, LPDIRECT3DSURFACE9 source)
+{
+    vout_display_sys_t *sys = vd->sys;
+    HRESULT hr;
+
+    if (!source) {
+        msg_Dbg(vd, "no surface to render ?");
+        return VLC_EGENERIC;
+    }
+
+    /* retrieve texture top-level surface */
+    LPDIRECT3DSURFACE9 destination;
+    hr = IDirect3DTexture9_GetSurfaceLevel(sys->d3dtex, 0, &destination);
+    if (FAILED(hr)) {
+        msg_Dbg(vd, "%s:%d (hr=0x%0lX)", __FUNCTION__, __LINE__, hr);
+        return VLC_EGENERIC;
+    }
+
+    /* Copy picture surface into texture surface
+     * color space conversion happen here */
+    hr = IDirect3DDevice9_StretchRect(sys->d3ddev, source, NULL, destination, NULL, D3DTEXF_NONE);
+    IDirect3DSurface9_Release(destination);
+    if (FAILED(hr)) {
+        msg_Dbg(vd, "%s:%d (hr=0x%0lX)", __FUNCTION__, __LINE__, hr);
+        return VLC_EGENERIC;
+    }
+    return VLC_SUCCESS;
+}
 
 /**
- * It copies picture surface into a texture and renders into a scene.
+ * It renders the scene.
  *
  * This function is intented for higher end 3D cards, with pixel shader support
  * and at least 64 MiB of video RAM.
  */
-static void Direct3DRenderScene(vout_display_t *vd, LPDIRECT3DSURFACE9 surface)
+static void Direct3DRenderScene(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
     LPDIRECT3DDEVICE9 d3ddev = sys->d3ddev;
     HRESULT hr;
 
-    // check if device is still available
-    hr = IDirect3DDevice9_TestCooperativeLevel(d3ddev);
-    if (FAILED(hr)) {
-        if (hr == D3DERR_DEVICENOTRESET && !sys->reset_device) {
-            vout_display_SendEventPicturesInvalid(vd);
-            sys->reset_device = true;
-        }
-        return;
-    }
-    /* */
-    LPDIRECT3DTEXTURE9      d3dtex  = sys->d3dtex;
-    LPDIRECT3DVERTEXBUFFER9 d3dvtc  = sys->d3dvtc;
-
     /* Clear the backbuffer and the zbuffer */
     hr = IDirect3DDevice9_Clear(d3ddev, 0, NULL, D3DCLEAR_TARGET,
                               D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0);
-    if (FAILED(hr)) {
-        msg_Dbg(vd, "%s:%d (hr=0x%0lX)", __FUNCTION__, __LINE__, hr);
-        return;
-    }
-    /*  retrieve picture surface */
-    LPDIRECT3DSURFACE9 d3dsrc = surface;
-    if (!d3dsrc) {
-        msg_Dbg(vd, "no surface to render ?");
-        return;
-    }
-
-    /* retrieve texture top-level surface */
-    LPDIRECT3DSURFACE9 d3ddest;
-    hr = IDirect3DTexture9_GetSurfaceLevel(d3dtex, 0, &d3ddest);
-    if (FAILED(hr)) {
-        msg_Dbg(vd, "%s:%d (hr=0x%0lX)", __FUNCTION__, __LINE__, hr);
-        return;
-    }
-
-    /* Copy picture surface into texture surface
-     * color space conversion happen here */
-    hr = IDirect3DDevice9_StretchRect(d3ddev, d3dsrc, NULL, d3ddest, NULL, D3DTEXF_NONE);
-    IDirect3DSurface9_Release(d3ddest);
     if (FAILED(hr)) {
         msg_Dbg(vd, "%s:%d (hr=0x%0lX)", __FUNCTION__, __LINE__, hr);
         return;
@@ -1206,6 +1215,7 @@ static void Direct3DRenderScene(vout_display_t *vd, LPDIRECT3DSURFACE9 surface)
     }
 
     /* Update the vertex buffer (scaling is setup here) */
+    LPDIRECT3DVERTEXBUFFER9 d3dvtc  = sys->d3dvtc;
     if (Direct3DSetupVertices(vd, d3dvtc,
                               vd->sys->rect_src,
                               vd->sys->rect_src_clipped,
@@ -1215,6 +1225,7 @@ static void Direct3DRenderScene(vout_display_t *vd, LPDIRECT3DSURFACE9 surface)
     }
 
     /* Render the texture */
+    LPDIRECT3DTEXTURE9      d3dtex  = sys->d3dtex;
     if (Direct3DRenderTexture(vd, d3dvtc, d3dtex)) {
         IDirect3DDevice9_EndScene(d3ddev);
         return;
