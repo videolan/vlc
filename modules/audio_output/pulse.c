@@ -142,6 +142,38 @@ static void stream_moved_cb(pa_stream *s, void *userdata)
         pa_operation_unref(op);
 }
 
+static void stream_overflow_cb(pa_stream *s, void *userdata)
+{
+    aout_instance_t *aout = userdata;
+
+    msg_Err(aout, "overflow");
+    (void) s;
+}
+
+static void stream_started_cb(pa_stream *s, void *userdata)
+{
+    aout_instance_t *aout = userdata;
+
+    msg_Dbg(aout, "started");
+    (void) s;
+}
+
+static void stream_suspended_cb(pa_stream *s, void *userdata)
+{
+    aout_instance_t *aout = userdata;
+
+    msg_Dbg(aout, "suspended");
+    (void) s;
+}
+
+static void stream_underflow_cb(pa_stream *s, void *userdata)
+{
+    aout_instance_t *aout = userdata;
+
+    msg_Dbg(aout, "underflow");
+    (void) s;
+}
+
 static int stream_wait(pa_threaded_mainloop *mainloop, pa_stream *stream)
 {
     pa_stream_state_t state;
@@ -465,6 +497,10 @@ static int Open(vlc_object_t *obj)
     sys->stream = s;
     pa_stream_set_state_callback(s, stream_state_cb, mainloop);
     pa_stream_set_moved_callback(s, stream_moved_cb, aout);
+    pa_stream_set_overflow_callback(s, stream_overflow_cb, aout);
+    pa_stream_set_started_callback(s, stream_started_cb, aout);
+    pa_stream_set_suspended_callback(s, stream_suspended_cb, aout);
+    pa_stream_set_underflow_callback(s, stream_underflow_cb, aout);
 
     if (pa_stream_connect_playback(s, NULL, &attr, flags, NULL, NULL) < 0
      || stream_wait(mainloop, s)) {
