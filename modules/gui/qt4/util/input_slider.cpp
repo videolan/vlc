@@ -52,8 +52,14 @@ SeekSlider::SeekSlider( Qt::Orientation q, QWidget *_parent )
     b_isSliding = false;
 
     /* Timer used to fire intermediate updatePos() when sliding */
-    seekLimitTimer = new QTimer(this);
-    seekLimitTimer->setSingleShot(true);
+    seekLimitTimer = new QTimer( this );
+    seekLimitTimer->setSingleShot( true );
+
+    hideTooltipTimer = new QTimer( this );
+    hideTooltipTimer->setSingleShot( true );
+
+    /* Tooltip bubble */
+    mTimeTooltip = new TimeTooltip( this );
 
     /* Properties */
     setRange( MINIMUM, MAXIMUM );
@@ -69,6 +75,9 @@ SeekSlider::SeekSlider( Qt::Orientation q, QWidget *_parent )
 
     CONNECT( this, sliderMoved(int), this, startSeekTimer( int ) );
     CONNECT( seekLimitTimer, timeout(), this, updatePos() );
+    CONNECT( hideTooltipTimer, timeout(), mTimeTooltip, hide() );
+
+    mTimeTooltip->installEventFilter( this );
 }
 
 /***
@@ -139,8 +148,12 @@ void SeekSlider::mouseMoveEvent(QMouseEvent *event)
     }
 
     /* Tooltip */
+     QPoint p( event->globalX() - mTimeTooltip->width() / 2,
+               QWidget::mapToGlobal( pos() ).y() - ( mTimeTooltip->height() + 2 ) );
+
     secstotimestr( psz_length, ( event->x() * inputLength) / size().width() );
-    setToolTip( psz_length );
+    mTimeTooltip->setTime( psz_length );
+    mTimeTooltip->move( p );
     event->accept();
 }
 
@@ -156,6 +169,36 @@ void SeekSlider::wheelEvent( QWheelEvent *event)
         emit sliderDragged( value()/1000.0 );
     }
     event->accept();
+}
+
+void SeekSlider::enterEvent( QEvent *e )
+{
+    if (isEnabled())
+    {
+        hideTooltipTimer->stop();
+        mTimeTooltip->show();
+    }
+}
+
+void SeekSlider::leaveEvent( QEvent *e )
+{
+    hideTooltipTimer->start(100);
+}
+
+bool SeekSlider::eventFilter( QObject *obj, QEvent *event )
+{
+    // This eventFilter avoids a flicker that occurs if the
+    // mouse cursor leaves the SeekSlider for the TimeTooltip.
+    if (obj == mTimeTooltip)
+    {
+        if (event->type() == QEvent::Enter)
+            hideTooltipTimer->stop();
+        else if (event->type() == QEvent::Leave)
+            hideTooltipTimer->start(100);
+        return false;
+    }
+    else
+        return QSlider::eventFilter( obj, event );
 }
 
 QSize SeekSlider::sizeHint() const

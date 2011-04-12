@@ -25,9 +25,11 @@
 #ifndef _INPUTSLIDER_H_
 #define _INPUTSLIDER_H_
 
+#include <vlc_common.h>
+#include "timetooltip.hpp"
+
 #include <QSlider>
 
-#include <vlc_common.h>
 #define MSTRTIME_MAX_SIZE 22
 
 class QMouseEvent;
@@ -47,8 +49,11 @@ protected:
     virtual void mousePressEvent(QMouseEvent* event);
     virtual void mouseReleaseEvent(QMouseEvent* event);
     virtual void wheelEvent(QWheelEvent *event);
+    virtual void enterEvent( QEvent * );
+    virtual void leaveEvent( QEvent * );
 
     virtual void paintEvent( QPaintEvent* event );
+    virtual bool eventFilter(QObject *obj, QEvent *event);
 
     QSize handleSize() const;
     QSize sizeHint() const;
@@ -58,6 +63,8 @@ private:
     int inputLength;        /* InputLength that can change */
     char psz_length[MSTRTIME_MAX_SIZE]; /* Used for the ToolTip */
     QTimer *seekLimitTimer;
+    QTimer *hideTooltipTimer;
+    TimeTooltip *mTimeTooltip;
 
 public slots:
     void setPosition( float, int64_t, int );

@@ -66,6 +66,7 @@ nodist_SOURCES_qt4 = \
 		components/sout/profile_selector.moc.cpp \
 		components/sout/sout_widgets.moc.cpp \
 		util/input_slider.moc.cpp \
+		util/timetooltip.moc.cpp \
 		util/customwidgets.moc.cpp \
 		util/searchlineedit.moc.cpp \
 		util/qvlcapp.moc.cpp \
@@ -297,6 +298,7 @@ SOURCES_qt4 = 	qt4.cpp \
 		components/sout/profile_selector.cpp \
 		components/sout/sout_widgets.cpp \
 		util/input_slider.cpp \
+ 		util/timetooltip.cpp \
 		util/customwidgets.cpp \
 		util/searchlineedit.cpp \
 		util/registry.cpp \
@@ -370,6 +372,7 @@ noinst_HEADERS = \
 	components/sout/sout_widgets.hpp \
 	components/sout/profiles.hpp \
 	util/input_slider.hpp \
+	util/timetooltip.hpp \
 	util/customwidgets.hpp \
 	util/searchlineedit.hpp \
 	util/qvlcframe.hpp \
