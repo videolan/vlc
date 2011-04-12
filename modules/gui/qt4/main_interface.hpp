@@ -170,6 +170,7 @@ private:
     bool                 b_plDocked;            ///< Is the playlist docked ?
 
     bool                 b_hasPausedWhenMinimized;
+    bool                 b_statusbarVisible;
 
 #ifdef WIN32
     HIMAGELIST himl;
