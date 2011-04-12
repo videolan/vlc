@@ -1663,6 +1663,7 @@ static void Usage( libvlc_int_t *p_this, char const *psz_search )
             i_cur_width = b_description && !b_description_hack
                           ? i_width_description
                           : i_width;
+            if( !*psz_text ) strcpy(psz_text, " ");
             while( *psz_text )
             {
                 char *psz_parser, *psz_word;
