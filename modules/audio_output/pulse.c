@@ -281,9 +281,8 @@ static void Play(aout_instance_t *aout)
 
         if (pa_stream_write(s, ptr, len, data_free, 0, PA_SEEK_RELATIVE) < 0)
         {
+            error(aout, "cannot write", sys->context);
             block_Release(block);
-            msg_Err(aout, "cannot write: %s",
-                    pa_strerror(pa_context_errno(sys->context)));
         }
     }
 
