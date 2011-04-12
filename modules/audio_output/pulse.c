@@ -163,6 +163,10 @@ static void stream_moved_cb(pa_stream *s, void *userdata)
                                            sink_info_cb, aout);
     if (likely(op != NULL))
         pa_operation_unref(op);
+
+    /* Update the variable if someone else moved our stream */
+    var_Change(aout, "audio-device", VLC_VAR_SETVALUE,
+               &(vlc_value_t){ .i_int = idx }, NULL);
 }
 
 static void stream_overflow_cb(pa_stream *s, void *userdata)
@@ -553,7 +557,6 @@ static int Open(vlc_object_t *obj)
         error(aout, "cannot connect stream", ctx);
         goto fail;
     }
-    stream_moved_cb(s, aout);
 
     const struct pa_buffer_attr *pba = pa_stream_get_buffer_attr(s);
     msg_Dbg(aout, "using buffer metrics: maxlength=%u, tlength=%u, "
@@ -571,6 +574,7 @@ static int Open(vlc_object_t *obj)
     /* We may need to wait for completion... once LibVLC supports this */
     if (op != NULL)
         pa_operation_unref(op);
+    stream_moved_cb(s, aout);
     pa_threaded_mainloop_unlock(mainloop);
 
     aout->output.pf_play = Play;
