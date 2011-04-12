@@ -1,7 +1,7 @@
 /*****************************************************************************
- * input_slider.hpp : A slider that controls an input
+ * input_slider.hpp : VolumeSlider and SeekSlider
  ****************************************************************************
- * Copyright (C) 2006 the VideoLAN team
+ * Copyright (C) 2006-2011 the VideoLAN team
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
@@ -18,20 +18,20 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ * along with this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
 #ifndef _INPUTSLIDER_H_
 #define _INPUTSLIDER_H_
 
-#include "qt4.hpp"
-
 #include <QSlider>
 
-#include <QMouseEvent>
-#include <QWheelEvent>
-#include <QTimer>
+#define MSTRTIME_MAX_SIZE 22
+
+class QMouseEvent;
+class QWheelEvent;
+class QTimer;
 
 /* Input Slider derived from QSlider */
 class SeekSlider : public QSlider

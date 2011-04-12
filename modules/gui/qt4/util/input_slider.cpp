@@ -1,7 +1,7 @@
 /*****************************************************************************
- * input_manager.cpp : Manage an input and interact with its GUI elements
+ * input_slider.cpp : VolumeSlider and SeekSlider
  ****************************************************************************
- * Copyright (C) 2006 the VideoLAN team
+ * Copyright (C) 2006-2011 the VideoLAN team
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
@@ -26,6 +26,8 @@
 # include "config.h"
 #endif
 
+#include "qt4.hpp"
+
 #include "util/input_slider.hpp"
 
 #include <QPaintEvent>
@@ -34,7 +36,7 @@
 #include <QPainter>
 #include <QStyleOptionSlider>
 #include <QLinearGradient>
-
+#include <QTimer>
 
 #define MINIMUM 0
 #define MAXIMUM 1000
@@ -45,7 +47,7 @@ SeekSlider::SeekSlider( QWidget *_parent ) : QSlider( _parent )
 }
 
 SeekSlider::SeekSlider( Qt::Orientation q, QWidget *_parent )
-            : QSlider( q, _parent )
+          : QSlider( q, _parent )
 {
     b_isSliding = false;
 
@@ -70,9 +72,13 @@ SeekSlider::SeekSlider( Qt::Orientation q, QWidget *_parent )
 }
 
 /***
- * \brief Public interface, like setValue,  but disabling the slider too
+ * \brief Main public method, superseeding setValue. Disabling the slider when neeeded
+ *
+ * \param pos Position, between 0 and 1. -1 disables the slider
+ * \param time Elapsed time. Unused
+ * \param legnth Duration time.
  ***/
-void SeekSlider::setPosition( float pos, int64_t a, int b )
+void SeekSlider::setPosition( float pos, int64_t time, int length )
 {
     if( pos == -1.0 )
     {
@@ -85,7 +91,7 @@ void SeekSlider::setPosition( float pos, int64_t a, int b )
     if( !b_isSliding )
         setValue( (int)(pos * 1000.0 ) );
 
-    inputLength = b;
+    inputLength = length;
 }
 
 void SeekSlider::startSeekTimer( int new_value )
@@ -149,8 +155,6 @@ void SeekSlider::wheelEvent( QWheelEvent *event)
          increment of position */
         emit sliderDragged( value()/1000.0 );
     }
-    /* We do accept because for we don't want the parent to change the sound
-       vol */
     event->accept();
 }
 
