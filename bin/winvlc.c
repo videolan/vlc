@@ -295,7 +295,7 @@ LONG WINAPI vlc_exception_filter(struct _EXCEPTION_POINTERS *lpExceptionInfo)
         {
             unsigned int i;
             for( i = 0; i < pException->NumberParameters; i++ )
-                fprintf( fd, " | %08x", pException->ExceptionInformation[i] );
+                fwprintf( fd, L" | %08x", pException->ExceptionInformation[i] );
         }
 
         fwprintf( fd, L"\n\n[context]\nEDI:%08x\nESI:%08x\n" \
