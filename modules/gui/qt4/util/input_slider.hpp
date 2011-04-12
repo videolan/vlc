@@ -27,6 +27,7 @@
 
 #include <QSlider>
 
+#include <vlc_common.h>
 #define MSTRTIME_MAX_SIZE 22
 
 class QMouseEvent;
