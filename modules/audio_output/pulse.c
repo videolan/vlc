@@ -47,6 +47,12 @@ vlc_module_end ()
 
 /* TODO: single static mainloop */
 
+/* NOTE:
+ * Be careful what you do when the PulseAudio mainloop is held, which is to say
+ * within PulseAudio callbacks, or after pa_threaded_mainloop_lock().
+ * In particular, the VLC audio output object variables can be manipulated with
+ * the PulseAudio mainloop lock held, but not vice versa! */
+
 struct aout_sys_t
 {
     pa_stream *stream; /**< PulseAudio playback stream object */
@@ -90,6 +96,23 @@ static void error(aout_instance_t *aout, const char *msg, pa_context *context)
 }
 
 /* Sink */
+static void sink_list_cb(pa_context *c, const pa_sink_info *i, int eol,
+                         void *userdata)
+{
+    aout_instance_t *aout = userdata;
+    vlc_value_t val, text;
+
+    if (eol)
+        return;
+    (void) c;
+
+    msg_Dbg(aout, "listing sink %s (%"PRIu32"): %s", i->name, i->index,
+            i->description);
+    val.i_int = i->index;
+    text.psz_string = (char *)i->description;
+    var_Change(aout, "audio-device", VLC_VAR_ADDCHOICE, &val, &text);
+}
+
 static void sink_info_cb(pa_context *c, const pa_sink_info *i, int eol,
                          void *userdata)
 {
@@ -317,12 +340,36 @@ static int VolumeSet(aout_instance_t *aout, audio_volume_t vol, bool mute)
     return 0;
 }
 
+static int StreamMove(vlc_object_t *obj, const char *varname, vlc_value_t old,
+                      vlc_value_t val, void *userdata)
+{
+    aout_instance_t *aout = (aout_instance_t *)obj;
+    aout_sys_t *sys = aout->output.p_sys;
+    pa_stream *s = userdata;
+    pa_operation *op;
+    uint32_t idx = pa_stream_get_index(s);
+    uint32_t sink_idx = val.i_int;
+
+    op = pa_context_move_sink_input_by_index(sys->context, idx, sink_idx,
+                                             NULL, NULL);
+    if (unlikely(op == NULL)) {
+        error(aout, "cannot move sink", sys->context);
+        return VLC_EGENERIC;
+    }
+    pa_operation_unref(op);
+    msg_Dbg(aout, "moving to sink %"PRIu32, sink_idx);
+    (void) varname; (void) old;
+    return VLC_SUCCESS;
+}
+
+
 /*****************************************************************************
  * Open: open the audio device
  *****************************************************************************/
 static int Open(vlc_object_t *obj)
 {
     aout_instance_t *aout = (aout_instance_t *)obj;
+    pa_operation *op;
 
     /* Sample format specification */
     struct pa_sample_spec ss;
@@ -514,6 +561,16 @@ static int Open(vlc_object_t *obj)
             pba->maxlength, pba->tlength, pba->prebuf, pba->minreq);
 
     aout->output.i_nb_samples = pba->minreq / pa_frame_size(&ss);
+
+    var_Create(aout, "audio-device", VLC_VAR_INTEGER|VLC_VAR_HASCHOICE);
+    var_Change(aout, "audio-device", VLC_VAR_SETTEXT,
+               &(vlc_value_t){ .psz_string = (char *)_("Audio device") },
+               NULL);
+    var_AddCallback (aout, "audio-device", StreamMove, s);
+    op = pa_context_get_sink_info_list(ctx, sink_list_cb, aout);
+    /* We may need to wait for completion... once LibVLC supports this */
+    if (op != NULL)
+        pa_operation_unref(op);
     pa_threaded_mainloop_unlock(mainloop);
 
     aout->output.pf_play = Play;
@@ -536,6 +593,12 @@ static void Close (vlc_object_t *obj)
     pa_threaded_mainloop *mainloop = sys->mainloop;
     pa_context *ctx = sys->context;
     pa_stream *s = sys->stream;
+
+    if (s != NULL) {
+        /* The callback takes mainloop lock, so it CANNOT be held here! */
+        var_DelCallback (aout, "audio-device", StreamMove, s);
+        var_Destroy (aout, "audio-device");
+    }
 
     pa_threaded_mainloop_lock(mainloop);
     if (s != NULL) {
