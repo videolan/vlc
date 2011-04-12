@@ -50,8 +50,8 @@ vlc_module_end ()
 /* NOTE:
  * Be careful what you do when the PulseAudio mainloop is held, which is to say
  * within PulseAudio callbacks, or after pa_threaded_mainloop_lock().
- * In particular, the VLC audio output object variables can be manipulated with
- * the PulseAudio mainloop lock held, but not vice versa! */
+ * In particular, a VLC variable callback cannot be triggered nor deleted with
+ * the PulseAudio mainloop lock held, if the callback acquires the lock. */
 
 struct aout_sys_t
 {
@@ -354,16 +354,19 @@ static int StreamMove(vlc_object_t *obj, const char *varname, vlc_value_t old,
     uint32_t idx = pa_stream_get_index(s);
     uint32_t sink_idx = val.i_int;
 
+    (void) varname; (void) old;
+
+    pa_threaded_mainloop_lock(sys->mainloop);
     op = pa_context_move_sink_input_by_index(sys->context, idx, sink_idx,
                                              NULL, NULL);
-    if (unlikely(op == NULL)) {
+    if (likely(op != NULL)) {
+        pa_operation_unref(op);
+        msg_Dbg(aout, "moving to sink %"PRIu32, sink_idx);
+    } else
         error(aout, "cannot move sink", sys->context);
-        return VLC_EGENERIC;
-    }
-    pa_operation_unref(op);
-    msg_Dbg(aout, "moving to sink %"PRIu32, sink_idx);
-    (void) varname; (void) old;
-    return VLC_SUCCESS;
+    pa_threaded_mainloop_unlock(sys->mainloop);
+
+    return (op != NULL) ? VLC_SUCCESS : VLC_EGENERIC;
 }
 
 
