@@ -503,12 +503,8 @@ AdvPrefsPanel::AdvPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 
 void AdvPrefsPanel::apply()
 {
-    QList<ConfigControl *>::Iterator i;
-    for( i = controls.begin() ; i != controls.end() ; i++ )
-    {
-        ConfigControl *c = qobject_cast<ConfigControl *>(*i);
-        c->doApply( p_intf );
-    }
+    foreach ( ConfigControl *cfg, controls )
+        cfg->doApply( p_intf );
 }
 
 void AdvPrefsPanel::clean()
