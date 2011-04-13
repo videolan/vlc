@@ -156,7 +156,6 @@ $Id$
  * image: Image file video output
  * inhibit: preventing the computer from suspending
  * invert: inverse video filter
- * invmem: module for VLC to display images from an external application
  * jack: jack server audio output
  * kate: kate text bitstream decoder
  * libass: Subtitle renderers using libass

@@ -23,7 +23,6 @@ SOURCES_dirac = dirac.c
 SOURCES_png = png.c
 SOURCES_svcdsub = svcdsub.c
 SOURCES_cvdsub = cvdsub.c
-SOURCES_invmem = invmem.c
 SOURCES_realvideo = realvideo.c
 SOURCES_sdl_image = sdl_image.c
 SOURCES_zvbi = zvbi.c
@@ -53,7 +52,6 @@ libvlc_LTLIBRARIES += \
 	libmpeg_audio_plugin.la \
 	librawvideo_plugin.la \
 	libsvcdsub_plugin.la \
-	libinvmem_plugin.la \
 	libsubsdec_plugin.la \
 	libsubsusf_plugin.la \
 	libt140_plugin.la \
