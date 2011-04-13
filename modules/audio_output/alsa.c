@@ -85,7 +85,7 @@ struct aout_sys_t
 /* Why not ? --Bozo */
 /* Right. --Meuuh */
 
-#define DEFAULT_ALSA_DEVICE "default"
+#define DEFAULT_ALSA_DEVICE "plug:default"
 
 /*****************************************************************************
  * Local prototypes
@@ -353,14 +353,14 @@ static int Open( vlc_object_t *p_this )
                | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT
                | AOUT_CHAN_LFE;
         free( psz_device );
-        psz_device = strdup( "surround51" );
+        psz_device = strdup( "plug:surround51" );
         break;
       case AOUT_VAR_2F2R:
         p_aout->output.output.i_physical_channels
             = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT
                | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT;
         free( psz_device );
-        psz_device = strdup( "surround40" );
+        psz_device = strdup( "plug:surround40" );
         break;
     case AOUT_VAR_STEREO:
         p_aout->output.output.i_physical_channels
@@ -886,9 +886,16 @@ static void GetDevices (vlc_object_t *obj, module_config_t *item)
     for (size_t i = 0; hints[i] != NULL; i++)
     {
         void *hint = hints[i];
+        char *dev;
+
         char *name = snd_device_name_get_hint(hint, "NAME");
         if (unlikely(name == NULL))
             continue;
+        if (unlikely(asprintf (&dev, "plug:'%s'", name) == -1))
+        {
+            free(name);
+            continue;
+        }
 
         char *desc = snd_device_name_get_hint(hint, "DESC");
         if (desc != NULL)
@@ -902,7 +909,7 @@ static void GetDevices (vlc_object_t *obj, module_config_t *item)
                                        (item->i_list + 2) * sizeof(char *));
             item->ppsz_list_text = xrealloc(item->ppsz_list_text,
                                           (item->i_list + 2) * sizeof(char *));
-            item->ppsz_list[item->i_list] = name;
+            item->ppsz_list[item->i_list] = dev;
             if (desc == NULL)
                 desc = strdup(name);
             item->ppsz_list_text[item->i_list] = desc;
@@ -911,6 +918,7 @@ static void GetDevices (vlc_object_t *obj, module_config_t *item)
         else
         {
             free(desc);
+            free(dev);
             free(name);
         }
     }
