@@ -435,41 +435,18 @@ static int Open( vlc_object_t *p_this )
 
     /* Open the device */
     msg_Dbg( p_aout, "opening ALSA device `%s'", psz_device );
-    for( unsigned i = 10; i; i-- )
+    int val = snd_pcm_open (&p_sys->p_snd_pcm, psz_device,
+                            SND_PCM_STREAM_PLAYBACK, SND_PCM_NONBLOCK);
+    if (val != 0)
     {
-        int val = snd_pcm_open( &p_sys->p_snd_pcm, psz_device,
-                                SND_PCM_STREAM_PLAYBACK, SND_PCM_NONBLOCK );
-        if( val == 0 )
-            break; /* success! */
-
-        if( val != -EBUSY )
-        {
-            msg_Err( p_aout, "cannot open ALSA device `%s' (%s)",
-                     psz_device, snd_strerror( val ) );
-            dialog_Fatal( p_aout, _("Audio output failed"),
-                          _("VLC could not open the ALSA device \"%s\" (%s)."),
-                          psz_device, snd_strerror( val ) );
-            free( psz_device );
-            free( p_sys );
-            return VLC_EGENERIC;
-        }
-
-        /* Since it seems snd_pcm_close hasn't really released the device at
-          the time it returns, probe if the device is available in loop for 1s.
-          We cannot use blocking mode since the we would wait indefinitely when
-          switching from a dmx device to surround51. */
-        if( i == 1 )
-        {
-            msg_Err( p_aout, "audio device %s is already in use",
-                     psz_device );
-            dialog_Fatal( p_aout, _("Audio output failed"),
-                          _("The audio device \"%s\" is already in use."),
-                          psz_device );
-            free( psz_device );
-            free( p_sys );
-            return VLC_EGENERIC;
-        }
-        msleep( CLOCK_FREQ / 10 );
+        msg_Err (p_aout, "cannot open ALSA device `%s' (%s)",
+                 psz_device, snd_strerror (val));
+        dialog_Fatal (p_aout, _("Audio output failed"),
+                      _("The audio device \"%s\" could not be used:\n%s."),
+                      psz_device, snd_strerror (val));
+        free (psz_device);
+        free (p_sys);
+        return VLC_EGENERIC;
     }
     free( psz_device );
 
@@ -512,7 +489,6 @@ static int Open( vlc_object_t *p_this )
 
     /* Due to some bugs in alsa with some drivers, we need to retry in s16l
        if snd_pcm_hw_params fails in fl32 */
-    int val;
 retry:
     /* Get Initial hardware parameters */
     val = snd_pcm_hw_params_any( p_sys->p_snd_pcm, p_hw );
