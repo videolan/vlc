@@ -1,7 +1,7 @@
 /*****************************************************************************
  * Upnp.cpp :  UPnP discovery module (libupnp)
  *****************************************************************************
- * Copyright (C) 2004-2008 the VideoLAN team
+ * Copyright (C) 2004-2011 the VideoLAN team
  * $Id$
  *
  * Authors: Rémi Denis-Courmont <rem # videolan.org> (original plugin)
@@ -25,9 +25,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-/*
-  \TODO: Debug messages: "__FILE__, __LINE__" ok ???, Wrn/Err ???
-*/
 #undef PACKAGE_NAME
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -221,11 +218,9 @@ static int Callback( Upnp_EventType event_type, void* p_event, void* p_user_data
         i_res = UpnpDownloadXmlDoc( p_discovery->Location, &p_description_doc );
         if ( i_res != UPNP_E_SUCCESS )
         {
-            msg_Dbg( p_sd,
-                    "%s:%d: Could not download device description!",
-                    __FILE__, __LINE__ );
-            msg_Dbg( p_sd, "Fetching data from %s failed: %s",
-                                         p_discovery->Location, UpnpGetErrorMessage( i_res ) );
+            msg_Warn( p_sd, "Could not download device description! "
+                            "Fetching data from %s failed: %s",
+                            p_discovery->Location, UpnpGetErrorMessage( i_res ) );
             return i_res;
         }
 
@@ -274,10 +269,8 @@ static int Callback( Upnp_EventType event_type, void* p_event, void* p_user_data
         break;
 
     default:
-    msg_Dbg( p_sd,
-            "%s:%d: DEBUG: UNHANDLED EVENT ( TYPE=%d )",
-            __FILE__, __LINE__, event_type );
-    break;
+        msg_Err( p_sd, "Unhandled event, please report ( type=%d )", event_type );
+        break;
     }
 
     return UPNP_E_SUCCESS;
@@ -294,13 +287,13 @@ void MediaServer::parseDeviceDescription( IXML_Document* p_doc,
 {
     if ( !p_doc )
     {
-        msg_Dbg( p_sd, "%s:%d: NULL", __FILE__, __LINE__ );
+        msg_Err( p_sd, "Null IXML_Document" );
         return;
     }
 
     if ( !p_location )
     {
-        msg_Dbg( p_sd, "%s:%d: NULL", __FILE__, __LINE__ );
+        msg_Err( p_sd, "Null location" );
         return;
     }
 
@@ -335,9 +328,7 @@ void MediaServer::parseDeviceDescription( IXML_Document* p_doc,
                                                                "deviceType" );
             if ( !psz_device_type )
             {
-                msg_Dbg( p_sd,
-                        "%s:%d: no deviceType!",
-                        __FILE__, __LINE__ );
+                msg_Warn( p_sd, "No deviceType found!" );
                 continue;
             }
 
@@ -347,16 +338,14 @@ void MediaServer::parseDeviceDescription( IXML_Document* p_doc,
             const char* psz_udn = xml_getChildElementValue( p_device_element, "UDN" );
             if ( !psz_udn )
             {
-                msg_Dbg( p_sd, "%s:%d: no UDN!",
-                        __FILE__, __LINE__ );
+                msg_Warn( p_sd, "No UDN!" );
                 continue;
             }
 
             // Check if server is already added
             if ( p_sd->p_sys->p_server_list->getServer( psz_udn ) != 0 )
             {
-                msg_Dbg( p_sd, "%s:%d: server with uuid '%s' already exists.",
-                        __FILE__, __LINE__, psz_udn );
+                msg_Warn( p_sd, "Server with uuid '%s' already exists.", psz_udn );
                 continue;
             }
 
@@ -366,7 +355,7 @@ void MediaServer::parseDeviceDescription( IXML_Document* p_doc,
 
             if ( !psz_friendly_name )
             {
-                msg_Dbg( p_sd, "%s:%d: no friendlyName!", __FILE__, __LINE__ );
+                msg_Dbg( p_sd, "No friendlyName!" );
                 continue;
             }
 
@@ -531,8 +520,7 @@ void MediaServer::subscribeToContentDirectory()
     }
     else
     {
-        msg_Dbg( _p_sd,
-                "%s:%d: WARNING: '%s': %s", __FILE__, __LINE__,
+        msg_Dbg( _p_sd, "Subscribe failed: '%s': %s",
                 getFriendlyName(), UpnpGetErrorMessage( i_res ) );
     }
 }
@@ -569,9 +557,8 @@ IXML_Document* MediaServer::_browseAction( const char* psz_object_id_,
 
     if ( i_res != UPNP_E_SUCCESS )
     {
-        msg_Dbg( _p_sd,
-                 "%s:%d: ERROR: %s", __FILE__, __LINE__,
-                 UpnpGetErrorMessage( i_res ) );
+        msg_Dbg( _p_sd, "AddToAction 'ObjectID' failed: %s",
+                UpnpGetErrorMessage( i_res ) );
         goto browseActionCleanup;
     }
 
@@ -580,9 +567,8 @@ IXML_Document* MediaServer::_browseAction( const char* psz_object_id_,
 
     if ( i_res != UPNP_E_SUCCESS )
     {
-        msg_Dbg( _p_sd,
-             "%s:%d: ERROR: %s", __FILE__, __LINE__,
-             UpnpGetErrorMessage( i_res ) );
+        msg_Dbg( _p_sd, "AddToAction 'BrowseFlag' failed: %s", 
+                UpnpGetErrorMessage( i_res ) );
         goto browseActionCleanup;
     }
 
@@ -591,9 +577,8 @@ IXML_Document* MediaServer::_browseAction( const char* psz_object_id_,
 
     if ( i_res != UPNP_E_SUCCESS )
     {
-        msg_Dbg( _p_sd,
-             "%s:%d: ERROR: %s", __FILE__, __LINE__,
-             UpnpGetErrorMessage( i_res ) );
+        msg_Dbg( _p_sd, "AddToAction 'Filter' failed: %s",
+                UpnpGetErrorMessage( i_res ) );
         goto browseActionCleanup;
     }
 
@@ -602,9 +587,8 @@ IXML_Document* MediaServer::_browseAction( const char* psz_object_id_,
 
     if ( i_res != UPNP_E_SUCCESS )
     {
-        msg_Dbg( _p_sd,
-             "%s:%d: ERROR: %s", __FILE__, __LINE__,
-             UpnpGetErrorMessage( i_res ) );
+        msg_Dbg( _p_sd, "AddToAction 'StartingIndex' failed: %s",
+                UpnpGetErrorMessage( i_res ) );
         goto browseActionCleanup;
     }
 
@@ -613,18 +597,18 @@ IXML_Document* MediaServer::_browseAction( const char* psz_object_id_,
 
     if ( i_res != UPNP_E_SUCCESS )
     {
-        msg_Dbg( _p_sd,
-                "%s:%d: ERROR: %s", __FILE__, __LINE__,
-                UpnpGetErrorMessage( i_res ) ); goto browseActionCleanup; }
+        msg_Dbg( _p_sd, "AddToAction 'RequestedCount' failed: %s",
+                UpnpGetErrorMessage( i_res ) );
+        goto browseActionCleanup;
+    }
 
     i_res = UpnpAddToAction( &p_action, "Browse",
             psz_service_type, "SortCriteria", psz_sort_criteria );
 
     if ( i_res != UPNP_E_SUCCESS )
     {
-        msg_Dbg( _p_sd,
-             "%s:%d: ERROR: %s", __FILE__, __LINE__,
-             UpnpGetErrorMessage( i_res ) );
+        msg_Dbg( _p_sd, "AddToAction 'SortCriteria' failed: %s",
+                UpnpGetErrorMessage( i_res ) );
         goto browseActionCleanup;
     }
 
@@ -637,16 +621,14 @@ IXML_Document* MediaServer::_browseAction( const char* psz_object_id_,
 
     if ( i_res != UPNP_E_SUCCESS )
     {
-        msg_Dbg( _p_sd,
-                "%s:%d: ERROR: %s when trying the send() action with URL: %s",
-                __FILE__, __LINE__,
+        msg_Err( _p_sd, "%s when trying the send() action with URL: %s",
                 UpnpGetErrorMessage( i_res ), psz_url );
 
         ixmlDocument_free( p_response );
         p_response = 0;
     }
 
- browseActionCleanup:
+browseActionCleanup:
 
     free( psz_object_id );
     free( psz_browse_flag );
@@ -685,8 +667,7 @@ bool MediaServer::_fetchContents( Container* p_parent )
 {
     if (!p_parent)
     {
-        msg_Dbg( _p_sd,
-                "%s:%d: parent==NULL", __FILE__, __LINE__ );
+        msg_Err( _p_sd, "No parent" );
         return false;
     }
 
@@ -695,9 +676,7 @@ bool MediaServer::_fetchContents( Container* p_parent )
                                       "*", "0", "0", "" );
     if ( !p_response )
     {
-        msg_Dbg( _p_sd,
-                "%s:%d: ERROR! No response from browse() action",
-                __FILE__, __LINE__ );
+        msg_Err( _p_sd, "No response from browse() action" );
         return false;
     }
 
@@ -706,8 +685,7 @@ bool MediaServer::_fetchContents( Container* p_parent )
 
     if ( !p_result )
     {
-        msg_Dbg( _p_sd, "%s:%d: ERROR! browse() response parsing failed",
-                __FILE__, __LINE__ );
+        msg_Err( _p_sd, "browse() response parsing failed" );
         return false;
     }
 
@@ -921,8 +899,7 @@ void MediaServerList::removeServer( const char* psz_udn )
     MediaServer* p_server = getServer( psz_udn );
     if ( !p_server ) return;
 
-    msg_Dbg( _p_sd,
-            "Removing server '%s'", p_server->getFriendlyName() );
+    msg_Dbg( _p_sd, "Removing server '%s'", p_server->getFriendlyName() );
 
     std::vector<MediaServer*>::iterator it;
     for ( it = _list.begin(); it != _list.end(); ++it )
