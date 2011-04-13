@@ -130,7 +130,7 @@ static const int mode = SND_PCM_NO_AUTO_RESAMPLE
  *****************************************************************************/
 static void Probe (aout_instance_t *p_aout,
                    const char *psz_device, const char *psz_iec_device,
-                   int *pi_snd_pcm_format)
+                   snd_pcm_format_t pcm_format)
 {
     struct aout_sys_t * p_sys = p_aout->output.p_sys;
     vlc_value_t value, text;
@@ -161,24 +161,11 @@ static void Probe (aout_instance_t *p_aout,
             return;
         }
 
-        if ( snd_pcm_hw_params_set_format( p_sys->p_snd_pcm, p_hw,
-                                           *pi_snd_pcm_format ) < 0 )
+        if (snd_pcm_hw_params_set_format (p_sys->p_snd_pcm, p_hw,
+                                          pcm_format) < 0)
         {
-            int i_snd_rc = -1;
-
-            if( *pi_snd_pcm_format != SND_PCM_FORMAT_S16 )
-            {
-                *pi_snd_pcm_format = SND_PCM_FORMAT_S16;
-                i_snd_rc = snd_pcm_hw_params_set_format( p_sys->p_snd_pcm,
-                                                    p_hw, *pi_snd_pcm_format );
-            }
-            if ( i_snd_rc < 0 )
-            {
-                msg_Warn( p_aout, "unable to set stream sample size and "
-                          "word order, disabling linear PCM audio" );
-                snd_pcm_close( p_sys->p_snd_pcm );
-                return;
-            }
+            snd_pcm_close( p_sys->p_snd_pcm );
+            return;
         }
 
         i_channels = aout_FormatNbChannels( &p_aout->output.output );
@@ -335,18 +322,79 @@ static int Open( vlc_object_t *p_this )
             psz_iec_device = strdup( psz_device );
     }
 
-    /* Choose the linear PCM format (read the comment above about FPU
-       and float32) */
-    int i_snd_pcm_format; /* Audio format for ALSA's data */
-    if( HAVE_FPU )
-        i_snd_pcm_format = SND_PCM_FORMAT_FLOAT;
-    else
-        i_snd_pcm_format = SND_PCM_FORMAT_S16;
+    snd_pcm_format_t pcm_format; /* ALSA sample format */
+    vlc_fourcc_t fourcc = p_aout->output.output.i_format;
+    switch (fourcc)
+    {
+        case VLC_CODEC_F64B:
+            pcm_format = SND_PCM_FORMAT_FLOAT64_BE;
+            break;
+        case VLC_CODEC_F64L:
+            pcm_format = SND_PCM_FORMAT_FLOAT64_LE;
+            break;
+        case VLC_CODEC_F32B:
+            pcm_format = SND_PCM_FORMAT_FLOAT_BE;
+            break;
+        case VLC_CODEC_F32L:
+            pcm_format = SND_PCM_FORMAT_FLOAT_LE;
+            break;
+        case VLC_CODEC_FI32:
+            fourcc = VLC_CODEC_FL32;
+            pcm_format = SND_PCM_FORMAT_FLOAT;
+            break;
+        case VLC_CODEC_S32B:
+            pcm_format = SND_PCM_FORMAT_S32_BE;
+            break;
+        case VLC_CODEC_S32L:
+            pcm_format = SND_PCM_FORMAT_S32_LE;
+            break;
+        case VLC_CODEC_S24B:
+            pcm_format = SND_PCM_FORMAT_S24_3BE;
+            break;
+        case VLC_CODEC_S24L:
+            pcm_format = SND_PCM_FORMAT_S24_3LE;
+            break;
+        case VLC_CODEC_U24B:
+            pcm_format = SND_PCM_FORMAT_U24_3BE;
+            break;
+        case VLC_CODEC_U24L:
+            pcm_format = SND_PCM_FORMAT_U24_3LE;
+            break;
+        case VLC_CODEC_S16B:
+            pcm_format = SND_PCM_FORMAT_S16_BE;
+            break;
+        case VLC_CODEC_S16L:
+            pcm_format = SND_PCM_FORMAT_S16_LE;
+            break;
+        case VLC_CODEC_U16B:
+            pcm_format = SND_PCM_FORMAT_U16_BE;
+            break;
+        case VLC_CODEC_U16L:
+            pcm_format = SND_PCM_FORMAT_U16_LE;
+            break;
+        case VLC_CODEC_S8:
+            pcm_format = SND_PCM_FORMAT_S8;
+            break;
+        case VLC_CODEC_U8:
+            pcm_format = SND_PCM_FORMAT_U8;
+            break;
+        default:
+            if (HAVE_FPU)
+            {
+                fourcc = VLC_CODEC_FL32;
+                pcm_format = SND_PCM_FORMAT_FLOAT;
+            }
+            else
+            {
+                fourcc = VLC_CODEC_S16N;
+                pcm_format = SND_PCM_FORMAT_S16;
+            }
+    }
 
     /* If the variable doesn't exist then it's the first time we're called
        and we have to probe the available audio formats and channels */
     if (var_Type (p_aout, "audio-device") == 0)
-        Probe (p_aout, psz_device, psz_iec_device, &i_snd_pcm_format);
+        Probe (p_aout, psz_device, psz_iec_device, pcm_format);
 
     bool spdif = false;
     switch( var_GetInteger( p_aout, "audio-device") )
@@ -433,7 +481,7 @@ static int Open( vlc_object_t *p_this )
     if( spdif )
     {
         i_buffer_size = ALSA_SPDIF_BUFFER_SIZE;
-        i_snd_pcm_format = SND_PCM_FORMAT_S16;
+        pcm_format = SND_PCM_FORMAT_S16;
         i_channels = 2;
 
         p_aout->output.i_nb_samples = i_period_size = ALSA_SPDIF_PERIOD_SIZE;
@@ -460,9 +508,6 @@ static int Open( vlc_object_t *p_this )
     snd_pcm_hw_params_alloca(&p_hw);
     snd_pcm_sw_params_alloca(&p_sw);
 
-    /* Due to some bugs in alsa with some drivers, we need to retry in s16l
-       if snd_pcm_hw_params fails in fl32 */
-retry:
     /* Get Initial hardware parameters */
     val = snd_pcm_hw_params_any( p_sys->p_snd_pcm, p_hw );
     if( val < 0 )
@@ -473,40 +518,16 @@ retry:
     }
 
     /* Set format. */
-    val = snd_pcm_hw_params_set_format( p_sys->p_snd_pcm, p_hw,
-                                        i_snd_pcm_format );
+    val = snd_pcm_hw_params_set_format (p_sys->p_snd_pcm, p_hw, pcm_format);
     if( val < 0 )
     {
-        if( i_snd_pcm_format != SND_PCM_FORMAT_S16 )
-        {
-            i_snd_pcm_format = SND_PCM_FORMAT_S16;
-            val = snd_pcm_hw_params_set_format( p_sys->p_snd_pcm,
-                                                    p_hw, i_snd_pcm_format );
-        }
-        if ( val < 0 )
-        {
-            msg_Err( p_aout, "unable to set stream sample size and "
-                     "word order (%s)", snd_strerror( val ) );
-            goto error;
-        }
+        msg_Err (p_aout, "cannot set sample format: %s", snd_strerror (val));
+        goto error;
     }
 
-    vlc_fourcc_t i_vlc_pcm_format;
     if( spdif )
-        i_vlc_pcm_format = VLC_CODEC_SPDIFL;
-    else
-        switch( i_snd_pcm_format )
-        {
-          case SND_PCM_FORMAT_FLOAT:
-            i_vlc_pcm_format = VLC_CODEC_FL32;
-            break;
-          case SND_PCM_FORMAT_S16:
-            i_vlc_pcm_format = VLC_CODEC_S16N;
-            break;
-          default:
-            assert(0);
-        }
-    p_aout->output.output.i_format = i_vlc_pcm_format;
+        fourcc = VLC_CODEC_SPDIFL;
+    p_aout->output.output.i_format = fourcc;
 
     val = snd_pcm_hw_params_set_access( p_sys->p_snd_pcm, p_hw,
                                         SND_PCM_ACCESS_RW_INTERLEAVED );
@@ -566,15 +587,6 @@ retry:
     val = snd_pcm_hw_params( p_sys->p_snd_pcm, p_hw );
     if( val < 0 )
     {
-        if( i_snd_pcm_format == SND_PCM_FORMAT_FLOAT )
-        {
-            i_snd_pcm_format = SND_PCM_FORMAT_S16;
-            p_aout->output.output.i_format = VLC_CODEC_S16N;
-            msg_Warn( p_aout, "unable to commit hardware configuration "
-                     "with fl32 samples (%s). Retrying with s16l.",
-                     snd_strerror( val ) );
-            goto retry;
-        }
         msg_Err( p_aout, "unable to commit hardware configuration (%s)",
                  snd_strerror( val ) );
         goto error;
