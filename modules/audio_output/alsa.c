@@ -121,7 +121,9 @@ vlc_module_end ()
 
 /* VLC will insert a resampling filter in any case, so it is best to turn off
  * ALSA (plug) resampling. */
-static const int mode = SND_PCM_NO_AUTO_RESAMPLE;
+static const int mode = SND_PCM_NO_AUTO_RESAMPLE
+/* VLC is currently unable to leverage ALSA softvol. Disable it. */
+                      | SND_PCM_NO_SOFTVOL;
 
 /*****************************************************************************
  * Probe: probe the audio device for available formats and channels
