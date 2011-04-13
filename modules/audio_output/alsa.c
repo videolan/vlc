@@ -436,7 +436,7 @@ static int Open( vlc_object_t *p_this )
     /* Open the device */
     msg_Dbg( p_aout, "opening ALSA device `%s'", psz_device );
     int val = snd_pcm_open (&p_sys->p_snd_pcm, psz_device,
-                            SND_PCM_STREAM_PLAYBACK, SND_PCM_NONBLOCK);
+                            SND_PCM_STREAM_PLAYBACK, 0);
     if (val != 0)
     {
         msg_Err (p_aout, "cannot open ALSA device `%s' (%s)",
@@ -449,9 +449,6 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
     free( psz_device );
-
-    /* We want blocking mode */
-    snd_pcm_nonblock( p_sys->p_snd_pcm, 0 );
 
     snd_pcm_uframes_t i_buffer_size;
     snd_pcm_uframes_t i_period_size;
