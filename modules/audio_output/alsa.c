@@ -122,9 +122,9 @@ vlc_module_end ()
 /*****************************************************************************
  * Probe: probe the audio device for available formats and channels
  *****************************************************************************/
-static int Probe( aout_instance_t * p_aout,
-                  const char * psz_device, const char * psz_iec_device,
-                  int *pi_snd_pcm_format )
+static void Probe (aout_instance_t *p_aout,
+                   const char *psz_device, const char *psz_iec_device,
+                   int *pi_snd_pcm_format)
 {
     struct aout_sys_t * p_sys = p_aout->output.p_sys;
     vlc_value_t val, text;
@@ -152,8 +152,7 @@ static int Probe( aout_instance_t * p_aout,
             msg_Warn( p_aout, "unable to retrieve initial hardware parameters"
                               ", disabling linear PCM audio" );
             snd_pcm_close( p_sys->p_snd_pcm );
-            var_Destroy( p_aout, "audio-device" );
-            return VLC_EGENERIC;
+            return;
         }
 
         if ( snd_pcm_hw_params_set_format( p_sys->p_snd_pcm, p_hw,
@@ -172,8 +171,7 @@ static int Probe( aout_instance_t * p_aout,
                 msg_Warn( p_aout, "unable to set stream sample size and "
                           "word order, disabling linear PCM audio" );
                 snd_pcm_close( p_sys->p_snd_pcm );
-                var_Destroy( p_aout, "audio-device" );
-                return VLC_EGENERIC;
+                return;
             }
         }
 
@@ -264,46 +262,9 @@ static int Probe( aout_instance_t * p_aout,
         }
     }
 
-    var_Change( p_aout, "audio-device", VLC_VAR_CHOICESCOUNT, &val, NULL );
-#if (SND_LIB_VERSION <= 0x010015)
-# warning Please update alsa-lib to version > 1.0.21a.
-    var_Create( p_aout->p_libvlc, "alsa-working", VLC_VAR_BOOL );
-    if( val.i_int <= 0 )
-    {
-        if( var_GetBool( p_aout->p_libvlc, "alsa-working" ) )
-            dialog_Fatal( p_aout, "ALSA version problem",
-                "VLC failed to re-initialize your sound output device.\n"
-                "Please update alsa-lib to version 1.0.22 or higher "
-                "to fix this issue." );
-    }
-    else
-        var_SetBool( p_aout->p_libvlc, "alsa-working", true );
-#endif
-    if( val.i_int <= 0 )
-    {
-        /* Probe() has failed. */
-#if (SND_LIB_VERSION <= 0x010017)
-# warning Please update alsa-lib to version > 1.0.23.
-        var_Create( p_aout->p_libvlc, "alsa-broken", VLC_VAR_BOOL );
-        if( !var_GetBool( p_aout->p_libvlc, "alsa-broken" ) )
-        {
-            var_SetBool( p_aout->p_libvlc, "alsa-broken", true );
-            dialog_Fatal( p_aout, "Potential ALSA version problem",
-                "VLC failed to initialize your sound output device (if any).\n"
-                "Please update alsa-lib to version 1.0.24 or higher "
-                "to try to fix this issue." );
-        }
-#endif
-        msg_Dbg( p_aout, "failed to find a usable ALSA configuration" );
-        var_Destroy( p_aout, "audio-device" );
-        GetDevices( VLC_OBJECT(p_aout), NULL );
-        return VLC_EGENERIC;
-    }
-
     /* Add final settings to the variable */
     var_AddCallback( p_aout, "audio-device", aout_ChannelsRestart, NULL );
     var_TriggerCallback( p_aout, "intf-change" );
-    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -380,14 +341,8 @@ static int Open( vlc_object_t *p_this )
 
     /* If the variable doesn't exist then it's the first time we're called
        and we have to probe the available audio formats and channels */
-    if( var_Type( p_aout, "audio-device" ) == 0
-     && Probe( p_aout, psz_device, psz_iec_device, &i_snd_pcm_format ) )
-    {
-         free( psz_iec_device );
-         free( psz_device );
-         free( p_sys );
-         return VLC_EGENERIC;
-    }
+    if (var_Type (p_aout, "audio-device") == 0)
+        Probe (p_aout, psz_device, psz_iec_device, &i_snd_pcm_format);
 
     bool spdif = false;
     switch( var_GetInteger( p_aout, "audio-device") )
@@ -421,12 +376,7 @@ static int Open( vlc_object_t *p_this )
         psz_iec_device = NULL;
         break;
     default:
-        /* This should not happen ! */
-        msg_Err( p_aout, "cannot find audio-device" );
-        free( psz_iec_device );
-        free( psz_device );
-        free( p_sys );
-        return VLC_EGENERIC;
+        msg_Warn( p_aout, "cannot find audio-device" );
     }
 
 #ifdef ALSA_DEBUG
@@ -437,8 +387,30 @@ static int Open( vlc_object_t *p_this )
     msg_Dbg( p_aout, "opening ALSA device `%s'", psz_device );
     int val = snd_pcm_open (&p_sys->p_snd_pcm, psz_device,
                             SND_PCM_STREAM_PLAYBACK, 0);
+#if (SND_LIB_VERSION <= 0x010015)
+# warning Please update alsa-lib to version > 1.0.21a.
+    var_Create (p_aout->p_libvlc, "alsa-working", VLC_VAR_BOOL);
+    if (val != 0 && var_GetBool (p_aout->p_libvlc, "alsa-working"))
+        dialog_Fatal (p_aout, "ALSA version problem",
+            "VLC failed to re-initialize your audio output device.\n"
+            "Please update alsa-lib to version 1.0.22 or higher "
+            "to fix this issue.");
+    var_SetBool (p_aout->p_libvlc, "alsa-working", !val);
+#endif
     if (val != 0)
     {
+#if (SND_LIB_VERSION <= 0x010017)
+# warning Please update alsa-lib to version > 1.0.23.
+        var_Create (p_aout->p_libvlc, "alsa-broken", VLC_VAR_BOOL);
+        if (!var_GetBool (p_aout->p_libvlc, "alsa-broken"))
+        {
+            var_SetBool (p_aout->p_libvlc, "alsa-broken", true);
+            dialog_Fatal (p_aout, "Potential ALSA version problem",
+                "VLC failed to initialize your audio output device (if any).\n"
+                "Please update alsa-lib to version 1.0.24 or higher "
+                "to try to fix this issue.");
+        }
+#endif
         msg_Err (p_aout, "cannot open ALSA device `%s' (%s)",
                  psz_device, snd_strerror (val));
         dialog_Fatal (p_aout, _("Audio output failed"),
