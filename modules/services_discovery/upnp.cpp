@@ -225,7 +225,7 @@ static int Callback( Upnp_EventType event_type, void* p_event, void* p_user_data
                     "%s:%d: Could not download device description!",
                     __FILE__, __LINE__ );
             msg_Dbg( p_sd, "Fetching data from %s failed: %s",
-					 p_discovery->Location, UpnpGetErrorMessage( i_res ) );
+                                         p_discovery->Location, UpnpGetErrorMessage( i_res ) );
             return i_res;
         }
 
@@ -353,13 +353,13 @@ void MediaServer::parseDeviceDescription( IXML_Document* p_doc,
                 continue;
             }
 
-	    // Check if server is already added
+            // Check if server is already added
             if ( p_sd->p_sys->p_server_list->getServer( psz_udn ) != 0 )
-	    {
-		msg_Dbg( p_sd, "%s:%d: server with uuid '%s' already exists.",
+            {
+                msg_Dbg( p_sd, "%s:%d: server with uuid '%s' already exists.",
                         __FILE__, __LINE__, psz_udn );
                 continue;
-	    }
+            }
 
             const char* psz_friendly_name =
                        xml_getChildElementValue( p_device_element,
@@ -667,9 +667,9 @@ void MediaServer::fetchContents()
     // Delete previous contents to prevent duplicate entries
     if ( _p_contents )
     {
-	delete _p_contents;
-	services_discovery_RemoveItem( _p_sd, _p_input_item );
-	services_discovery_AddItem( _p_sd, _p_input_item, NULL );
+        delete _p_contents;
+        services_discovery_RemoveItem( _p_sd, _p_input_item );
+        services_discovery_AddItem( _p_sd, _p_input_item, NULL );
     }
 
     Container* root = new Container( 0, "0", getFriendlyName() );
@@ -810,7 +810,7 @@ void MediaServer::_buildPlaylist( Container* p_parent, input_item_node_t *p_inpu
         Container* p_container = p_parent->getContainer( i );
 
         input_item_t* p_input_item = input_item_New( _p_sd, "vlc://nop",
-						    p_container->getTitle() );
+                                                    p_container->getTitle() );
         input_item_node_t *p_new_node =
             input_item_node_AppendItem( p_input_node, p_input_item );
 
@@ -875,7 +875,7 @@ bool MediaServerList::addServer( MediaServer* p_server )
     msg_Dbg( _p_sd, "Adding server '%s' with uuid '%s'", p_server->getFriendlyName(), p_server->getUDN() );
 
     p_input_item = input_item_New( _p_sd, "vlc://nop",
-				  p_server->getFriendlyName() );
+                                  p_server->getFriendlyName() );
     p_server->setInputItem( p_input_item );
 
     services_discovery_AddItem( _p_sd, p_input_item, NULL );
@@ -941,7 +941,7 @@ void MediaServerList::removeServer( const char* psz_udn )
 // Item...
 
 Item::Item( Container* p_parent, const char* psz_object_id, const char* psz_title,
-	   const char* psz_resource )
+           const char* psz_resource )
 {
     _parent = p_parent;
 
