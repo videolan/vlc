@@ -3459,11 +3459,11 @@ AC_ARG_ENABLE(alsa,
   [  --enable-alsa           Advanced Linux Sound Architecture (default auto)])
 have_alsa="no"
 AS_IF([test "${enable_alsa}" != "no"], [
-  PKG_CHECK_MODULES([ALSA], [alsa >= 1.0.0], [
+  PKG_CHECK_MODULES([ALSA], [alsa >= 1.0.16], [
     have_alsa="yes"
   ], [
     AS_IF([test "x${enable_alsa}" != "x"], [
-      AC_MSG_ERROR([alsa-lib not found])
+      AC_MSG_ERROR([alsa-lib version 1.0.16 or later not found])
     ])
   ])
 ])
