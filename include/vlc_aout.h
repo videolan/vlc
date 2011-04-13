@@ -295,7 +295,11 @@ VLC_EXPORT( bool, aout_CheckChannelExtraction, ( int *pi_selection, uint32_t *pi
 VLC_EXPORT( void, aout_ChannelExtract, ( void *p_dst, int i_dst_channels, const void *p_src, int i_src_channels, int i_sample_count, const int *pi_selection, int i_bits_per_sample ) );
 
 /* */
-VLC_EXPORT( unsigned int, aout_FormatNbChannels, ( const audio_sample_format_t * p_format ) LIBVLC_USED );
+static inline unsigned aout_FormatNbChannels(const audio_sample_format_t *fmt)
+{
+    return popcount(fmt->i_physical_channels & AOUT_CHAN_PHYSMASK);
+}
+
 VLC_EXPORT( unsigned int, aout_BitsPerSample, ( vlc_fourcc_t i_format ) LIBVLC_USED );
 VLC_EXPORT( void, aout_FormatPrepare, ( audio_sample_format_t * p_format ) );
 VLC_EXPORT( void, aout_FormatPrint, ( aout_instance_t * p_aout, const char * psz_text, const audio_sample_format_t * p_format ) );

@@ -179,25 +179,6 @@ void aout_unlock (unsigned i)
  */
 
 /*****************************************************************************
- * aout_FormatNbChannels : return the number of channels
- *****************************************************************************/
-unsigned int aout_FormatNbChannels( const audio_sample_format_t * p_format )
-{
-    static const uint32_t pi_channels[] =
-        { AOUT_CHAN_CENTER, AOUT_CHAN_LEFT, AOUT_CHAN_RIGHT,
-          AOUT_CHAN_REARCENTER, AOUT_CHAN_REARLEFT, AOUT_CHAN_REARRIGHT,
-          AOUT_CHAN_MIDDLELEFT, AOUT_CHAN_MIDDLERIGHT, AOUT_CHAN_LFE };
-    unsigned int i_nb = 0, i;
-
-    for ( i = 0; i < sizeof(pi_channels)/sizeof(uint32_t); i++ )
-    {
-        if ( p_format->i_physical_channels & pi_channels[i] ) i_nb++;
-    }
-
-    return i_nb;
-}
-
-/*****************************************************************************
  * aout_BitsPerSample : get the number of bits per sample
  *****************************************************************************/
 unsigned int aout_BitsPerSample( vlc_fourcc_t i_format )
