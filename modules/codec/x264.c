@@ -70,9 +70,17 @@ static void Close( vlc_object_t * );
     "I-frames, but do not start a new GOP." )
 
 #define OPENGOP_TEXT N_("Use recovery points to close GOPs")
+#if X264_BUILD < 115
 #define OPENGOP_LONGTEXT N_("none: use closed GOPs only\n"\
     "normal: use standard open GOPs\n" \
     "bluray: use Blu-ray compatible open GOPs" )
+#else
+#define OPENGOP_LONGTEXT N_("use open GOP, for bluray compatibility use also bluray-compat option")
+#endif
+
+#define BLURAY_TEXT N_("Enable compatibility hacks for Blu-ray support")
+#define BLURAY_LONGTEXT N_("Enable hacks for Blu-ray support, this doesn't enforce every aspect of Blu-ray compatibility\n" \
+    "e.g. resolution, framerate, level" )
 
 #define SCENE_TEXT N_("Extra I-frames aggressivity" )
 #define SCENE_LONGTEXT N_( "Scene-cut detection. Controls how " \
@@ -425,10 +433,15 @@ vlc_module_begin ()
     add_integer( SOUT_CFG_PREFIX "min-keyint", 25, MIN_KEYINT_TEXT,
                  MIN_KEYINT_LONGTEXT, true )
 
-#if X264_BUILD >= 102
+#if X264_BUILD >= 102 && X264_BUILD <= 114
     add_string( SOUT_CFG_PREFIX "opengop", "none", OPENGOP_TEXT,
                OPENGOP_LONGTEXT, true )
         change_string_list( x264_open_gop_names, x264_open_gop_names, 0 );
+#elif X264_BUILD > 114
+    add_bool( SOUT_CFG_PREFIX "opengop", false, OPENGOP_TEXT,
+               OPENGOP_LONGTEXT, true )
+    add_bool( SOUT_CFG_PREFIX "bluray-compat", false, BLURAY_TEXT,
+               BLURAY_LONGTEXT, true )
 #endif
 
     add_integer( SOUT_CFG_PREFIX "scenecut", 40, SCENE_TEXT,
@@ -701,7 +714,7 @@ static const char *const ppsz_sout_options[] = {
     "verbose", "vbv-bufsize", "vbv-init", "vbv-maxrate", "weightb", "weightp",
     "aq-mode", "aq-strength", "psy-rd", "psy", "profile", "lookahead", "slices",
     "slice-max-size", "slice-max-mbs", "intra-refresh", "mbtree", "hrd",
-    "tune","preset", "opengop", NULL
+    "tune","preset", "opengop", "bluray-compat", NULL
 };
 
 static block_t *Encode( encoder_t *, picture_t * );
@@ -916,7 +929,7 @@ static int  Open ( vlc_object_t *p_this )
     i_val = var_GetInteger( p_enc, SOUT_CFG_PREFIX "min-keyint" );
     if( i_val > 0 && i_val != 25 ) p_sys->param.i_keyint_min = i_val;
 
-#if X264_BUILD >= 102
+#if X264_BUILD >= 102 && X264_BUILD <= 114
     psz_val = var_GetString( p_enc, SOUT_CFG_PREFIX "opengop" );
     if( !strcmp( psz_val, "none" ) )
         p_sys->param.i_open_gop = X264_OPEN_GOP_NONE;
@@ -925,6 +938,9 @@ static int  Open ( vlc_object_t *p_this )
     else if( !strcmp( psz_val, "bluray" ) )
         p_sys->param.i_open_gop = X264_OPEN_GOP_BLURAY;
     free( psz_val );
+#elif X264_BUILD >= 115
+    p_sys->param.b_open_gop = var_GetBool( p_enc, SOUT_CFG_PREFIX "open-gop" );
+    p_sys->param.b_bluray_compat = var_GetBool( p_enc, SOUT_CFG_PREFIX "bluray-compat" );
 #endif
     i_val = var_GetInteger( p_enc, SOUT_CFG_PREFIX "bframes" );
     if( i_val >= 0 && i_val <= 16 && i_val != 3 )
