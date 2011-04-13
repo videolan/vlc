@@ -125,137 +125,26 @@ static const int mode = SND_PCM_NO_AUTO_RESAMPLE
 /* VLC is currently unable to leverage ALSA softvol. Disable it. */
                       | SND_PCM_NO_SOFTVOL;
 
-/*****************************************************************************
- * Probe: probe the audio device for available formats and channels
- *****************************************************************************/
-static void Probe (aout_instance_t *p_aout,
-                   const char *psz_device, const char *psz_iec_device,
-                   snd_pcm_format_t pcm_format)
+/**
+ * Initializes list of devices.
+ */
+static void Probe (vlc_object_t *obj)
 {
-    struct aout_sys_t * p_sys = p_aout->output.p_sys;
-    vlc_value_t value, text;
-    int val;
+    /* Due to design bug in audio output core, this hack is required: */
+    if (var_Type (obj, "audio-device"))
+        return;
 
-    var_Create ( p_aout, "audio-device", VLC_VAR_INTEGER | VLC_VAR_HASCHOICE );
+    /* The variable does not exist - first call. */
+    vlc_value_t text;
+
+    var_Create (obj, "audio-device", VLC_VAR_STRING | VLC_VAR_HASCHOICE);
     text.psz_string = _("Audio Device");
-    var_Change( p_aout, "audio-device", VLC_VAR_SETTEXT, &text, NULL );
+    var_Change (obj, "audio-device", VLC_VAR_SETTEXT, &text, NULL);
 
-    /* We'll open the audio device in non blocking mode so we can just exit
-     * when it is already in use, but for the real stuff we'll still use
-     * the blocking mode */
+    GetDevices (obj, NULL);
 
-    /* Now test linear PCM capabilities */
-    val = snd_pcm_open (&p_sys->p_snd_pcm, psz_device,
-                        SND_PCM_STREAM_PLAYBACK, SND_PCM_NONBLOCK | mode);
-    if (val == 0)
-    {
-        int i_channels;
-        snd_pcm_hw_params_t * p_hw;
-        snd_pcm_hw_params_alloca (&p_hw);
-
-        if ( snd_pcm_hw_params_any( p_sys->p_snd_pcm, p_hw ) < 0 )
-        {
-            msg_Warn( p_aout, "unable to retrieve initial hardware parameters"
-                              ", disabling linear PCM audio" );
-            snd_pcm_close( p_sys->p_snd_pcm );
-            return;
-        }
-
-        if (snd_pcm_hw_params_set_format (p_sys->p_snd_pcm, p_hw,
-                                          pcm_format) < 0)
-        {
-            snd_pcm_close( p_sys->p_snd_pcm );
-            return;
-        }
-
-        i_channels = aout_FormatNbChannels( &p_aout->output.output );
-
-        while ( i_channels > 0 )
-        {
-            if ( !snd_pcm_hw_params_test_channels( p_sys->p_snd_pcm, p_hw,
-                                                   i_channels ) )
-            {
-                switch ( i_channels )
-                {
-                case 1:
-                    value.i_int = AOUT_VAR_MONO;
-                    text.psz_string = _("Mono");
-                    var_Change (p_aout, "audio-device",
-                                VLC_VAR_ADDCHOICE, &value, &text);
-                    break;
-                case 2:
-                    value.i_int = AOUT_VAR_STEREO;
-                    text.psz_string = _("Stereo");
-                    var_Change (p_aout, "audio-device",
-                                VLC_VAR_ADDCHOICE, &value, &text);
-                    var_Set (p_aout, "audio-device", value);
-                    break;
-                case 4:
-                    value.i_int = AOUT_VAR_2F2R;
-                    text.psz_string = _("2 Front 2 Rear");
-                    var_Change (p_aout, "audio-device",
-                                VLC_VAR_ADDCHOICE, &value, &text);
-                    break;
-                case 6:
-                    value.i_int = AOUT_VAR_5_1;
-                    text.psz_string = (char *)"5.1";
-                    var_Change (p_aout, "audio-device",
-                                VLC_VAR_ADDCHOICE, &value, &text);
-                    break;
-                }
-            }
-
-            --i_channels;
-        }
-
-        /* Special case for mono on stereo only boards */
-        i_channels = aout_FormatNbChannels( &p_aout->output.output );
-        var_Change (p_aout, "audio-device", VLC_VAR_CHOICESCOUNT, &value, NULL);
-        if (value.i_int <= 0 && i_channels == 1)
-        {
-            if ( !snd_pcm_hw_params_test_channels( p_sys->p_snd_pcm, p_hw, 2 ))
-            {
-                value.i_int = AOUT_VAR_STEREO;
-                text.psz_string = (char*)N_("Stereo");
-                var_Change (p_aout, "audio-device",
-                            VLC_VAR_ADDCHOICE, &value, &text);
-                var_Set (p_aout, "audio-device", value);
-            }
-        }
-
-        /* Close the previously opened device */
-        snd_pcm_close( p_sys->p_snd_pcm );
-    }
-    else
-    if (val == -EBUSY)
-        msg_Warn( p_aout, "audio device: %s is already in use", psz_device );
-
-    /* Test for S/PDIF device if needed */
-    if ( psz_iec_device )
-    {
-        /* Opening the device should be enough */
-        val = snd_pcm_open (&p_sys->p_snd_pcm, psz_iec_device,
-                            SND_PCM_STREAM_PLAYBACK, SND_PCM_NONBLOCK | mode);
-        if (val == 0)
-        {
-            value.i_int = AOUT_VAR_SPDIF;
-            text.psz_string = (char*)N_("A/52 over S/PDIF");
-            var_Change (p_aout, "audio-device",
-                        VLC_VAR_ADDCHOICE, &value, &text);
-            if( var_InheritBool( p_aout, "spdif" ) )
-                var_Set (p_aout, "audio-device", value);
-
-            snd_pcm_close( p_sys->p_snd_pcm );
-        }
-        else
-        if (val == -EBUSY)
-            msg_Warn( p_aout, "audio device: %s is already in use",
-                      psz_iec_device );
-    }
-
-    /* Add final settings to the variable */
-    var_AddCallback( p_aout, "audio-device", aout_ChannelsRestart, NULL );
-    var_TriggerCallback( p_aout, "intf-change" );
+    var_AddCallback (obj, "audio-device", aout_ChannelsRestart, NULL);
+    var_TriggerCallback (obj, "intf-change");
 }
 
 /*****************************************************************************
@@ -266,9 +155,9 @@ static void Probe (aout_instance_t *p_aout,
  * Note: the only heap-allocated string is psz_device. All the other pointers
  * are references to psz_device or to stack-allocated data.
  *****************************************************************************/
-static int Open( vlc_object_t *p_this )
+static int Open (vlc_object_t *obj)
 {
-    aout_instance_t * p_aout = (aout_instance_t *)p_this;
+    aout_instance_t * p_aout = (aout_instance_t *)obj;
 
     /* Allocate structures */
     aout_sys_t * p_sys = malloc( sizeof( aout_sys_t ) );
@@ -277,11 +166,16 @@ static int Open( vlc_object_t *p_this )
     p_aout->output.p_sys = p_sys;
 
     /* Get device name */
-    char *psz_device = var_InheritString( p_aout, "alsa-audio-device" );
+    char *psz_device;
+
+    if (var_Type (p_aout, "audio-device"))
+        psz_device = var_GetString (p_aout, "audio-device");
+    else
+        psz_device = var_InheritString( p_aout, "alsa-audio-device" );
     if( unlikely(psz_device == NULL) )
     {
         free( p_sys );
-        return VLC_EGENERIC;
+        return VLC_ENOMEM;
     }
 
     /* Choose the IEC device for S/PDIF output:
@@ -391,46 +285,6 @@ static int Open( vlc_object_t *p_this )
             }
     }
 
-    /* If the variable doesn't exist then it's the first time we're called
-       and we have to probe the available audio formats and channels */
-    if (var_Type (p_aout, "audio-device") == 0)
-        Probe (p_aout, psz_device, psz_iec_device, pcm_format);
-
-    bool spdif = false;
-    switch( var_GetInteger( p_aout, "audio-device") )
-    {
-      case AOUT_VAR_5_1:
-        p_aout->output.output.i_physical_channels
-            = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
-               | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT
-               | AOUT_CHAN_LFE;
-        free( psz_device );
-        psz_device = strdup( "plug:surround51" );
-        break;
-      case AOUT_VAR_2F2R:
-        p_aout->output.output.i_physical_channels
-            = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT
-               | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT;
-        free( psz_device );
-        psz_device = strdup( "plug:surround40" );
-        break;
-    case AOUT_VAR_STEREO:
-        p_aout->output.output.i_physical_channels
-            = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
-        break;
-    case AOUT_VAR_MONO:
-        p_aout->output.output.i_physical_channels = AOUT_CHAN_CENTER;
-        break;
-    case AOUT_VAR_SPDIF:
-        spdif = true;
-        free( psz_device );
-        psz_device = psz_iec_device;
-        psz_iec_device = NULL;
-        break;
-    default:
-        msg_Warn( p_aout, "cannot find audio-device" );
-    }
-
 #ifdef ALSA_DEBUG
     snd_output_stdio_attach( &p_sys->p_snd_stderr, stderr, 0 );
 #endif
@@ -478,8 +332,9 @@ static int Open( vlc_object_t *p_this )
     snd_pcm_uframes_t i_period_size;
     int i_channels;
 
-    if( spdif )
+    if (var_InheritBool (obj, "spdif"))
     {
+        fourcc = VLC_CODEC_SPDIFL;
         i_buffer_size = ALSA_SPDIF_BUFFER_SIZE;
         pcm_format = SND_PCM_FORMAT_S16;
         i_channels = 2;
@@ -525,8 +380,6 @@ static int Open( vlc_object_t *p_this )
         goto error;
     }
 
-    if( spdif )
-        fourcc = VLC_CODEC_SPDIFL;
     p_aout->output.output.i_format = fourcc;
 
     val = snd_pcm_hw_params_set_access( p_sys->p_snd_pcm, p_hw,
@@ -643,6 +496,7 @@ static int Open( vlc_object_t *p_this )
         goto error;
     }
 
+    Probe (obj);
     return 0;
 
 error:
@@ -677,9 +531,9 @@ static void Play( aout_instance_t *p_aout )
 /*****************************************************************************
  * Close: close the ALSA device
  *****************************************************************************/
-static void Close( vlc_object_t *p_this )
+static void Close (vlc_object_t *obj)
 {
-    aout_instance_t *p_aout = (aout_instance_t *)p_this;
+    aout_instance_t *p_aout = (aout_instance_t *)obj;
     struct aout_sys_t * p_sys = p_aout->output.p_sys;
 
     /* Make sure that the thread will stop once it is waken up */
@@ -936,6 +790,11 @@ static void GetDevices (vlc_object_t *obj, module_config_t *item)
         }
         else
         {
+            vlc_value_t val, text;
+
+            val.psz_string = dev;
+            text.psz_string = desc;
+            var_Change(obj, "audio-device", VLC_VAR_ADDCHOICE, &val, &text);
             free(desc);
             free(dev);
             free(name);
