@@ -112,6 +112,34 @@ Removed modules:
  * upnp: use upnp_intel
 
 
+Changes between 1.1.8 and 1.1.9:
+--------------------------------
+
+Windows and Mac OS X:
+ * Update of external library modplug, to address a security issue
+
+Demuxers:
+ * mp4: Fix heap-based buffer overflow (VideoLAN-SA-1103)
+
+Mac OS X Interface:
+ * Miscellaneous interface look adjustments
+ * Improve Apple Remote handling
+ * Fixe bugs in the Streaming / Transcoding wizard
+ * Layout fixes in the Preferences and Controls windows
+ * Fix incomplete list of hotkeys in the Preferences dialog
+ * Fix quitting through Apple Events (Dock menu, App Switcher, AppleScript, etc.)
+
+Mac OS X Port:
+ * Fix Growl local notification plugin
+ * VLC bundle now includes the Growl framework
+ * Fixes for eyeTV
+
+Translations:
+ * Updates of Lithuanian, Estonian, Chinese, Japanese, Bengali, Dutch, Polish,
+   German, Galician, Traditional Chinese translations
+ * New Luganda Translation
+
+
 Changes between 1.1.7 and 1.1.8:
 --------------------------------
 
