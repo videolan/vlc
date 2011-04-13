@@ -119,6 +119,10 @@ vlc_module_begin ()
     set_callbacks( Open, Close )
 vlc_module_end ()
 
+/* VLC will insert a resampling filter in any case, so it is best to turn off
+ * ALSA (plug) resampling. */
+static const int mode = SND_PCM_NO_AUTO_RESAMPLE;
+
 /*****************************************************************************
  * Probe: probe the audio device for available formats and channels
  *****************************************************************************/
@@ -127,8 +131,8 @@ static void Probe (aout_instance_t *p_aout,
                    int *pi_snd_pcm_format)
 {
     struct aout_sys_t * p_sys = p_aout->output.p_sys;
-    vlc_value_t val, text;
-    int i_ret;
+    vlc_value_t value, text;
+    int val;
 
     var_Create ( p_aout, "audio-device", VLC_VAR_INTEGER | VLC_VAR_HASCHOICE );
     text.psz_string = _("Audio Device");
@@ -139,9 +143,9 @@ static void Probe (aout_instance_t *p_aout,
      * the blocking mode */
 
     /* Now test linear PCM capabilities */
-    i_ret = snd_pcm_open( &p_sys->p_snd_pcm, psz_device,
-                          SND_PCM_STREAM_PLAYBACK, SND_PCM_NONBLOCK );
-    if( i_ret == 0 )
+    val = snd_pcm_open (&p_sys->p_snd_pcm, psz_device,
+                        SND_PCM_STREAM_PLAYBACK, SND_PCM_NONBLOCK | mode);
+    if (val == 0)
     {
         int i_channels;
         snd_pcm_hw_params_t * p_hw;
@@ -185,29 +189,29 @@ static void Probe (aout_instance_t *p_aout,
                 switch ( i_channels )
                 {
                 case 1:
-                    val.i_int = AOUT_VAR_MONO;
+                    value.i_int = AOUT_VAR_MONO;
                     text.psz_string = _("Mono");
-                    var_Change( p_aout, "audio-device",
-                                VLC_VAR_ADDCHOICE, &val, &text );
+                    var_Change (p_aout, "audio-device",
+                                VLC_VAR_ADDCHOICE, &value, &text);
                     break;
                 case 2:
-                    val.i_int = AOUT_VAR_STEREO;
+                    value.i_int = AOUT_VAR_STEREO;
                     text.psz_string = _("Stereo");
-                    var_Change( p_aout, "audio-device",
-                                VLC_VAR_ADDCHOICE, &val, &text );
-                    var_Set( p_aout, "audio-device", val );
+                    var_Change (p_aout, "audio-device",
+                                VLC_VAR_ADDCHOICE, &value, &text);
+                    var_Set (p_aout, "audio-device", value);
                     break;
                 case 4:
-                    val.i_int = AOUT_VAR_2F2R;
+                    value.i_int = AOUT_VAR_2F2R;
                     text.psz_string = _("2 Front 2 Rear");
-                    var_Change( p_aout, "audio-device",
-                                VLC_VAR_ADDCHOICE, &val, &text );
+                    var_Change (p_aout, "audio-device",
+                                VLC_VAR_ADDCHOICE, &value, &text);
                     break;
                 case 6:
-                    val.i_int = AOUT_VAR_5_1;
+                    value.i_int = AOUT_VAR_5_1;
                     text.psz_string = (char *)"5.1";
-                    var_Change( p_aout, "audio-device",
-                                VLC_VAR_ADDCHOICE, &val, &text );
+                    var_Change (p_aout, "audio-device",
+                                VLC_VAR_ADDCHOICE, &value, &text);
                     break;
                 }
             }
@@ -217,49 +221,47 @@ static void Probe (aout_instance_t *p_aout,
 
         /* Special case for mono on stereo only boards */
         i_channels = aout_FormatNbChannels( &p_aout->output.output );
-        var_Change( p_aout, "audio-device", VLC_VAR_CHOICESCOUNT, &val, NULL );
-        if( val.i_int <= 0 && i_channels == 1 )
+        var_Change (p_aout, "audio-device", VLC_VAR_CHOICESCOUNT, &value, NULL);
+        if (value.i_int <= 0 && i_channels == 1)
         {
             if ( !snd_pcm_hw_params_test_channels( p_sys->p_snd_pcm, p_hw, 2 ))
             {
-                val.i_int = AOUT_VAR_STEREO;
+                value.i_int = AOUT_VAR_STEREO;
                 text.psz_string = (char*)N_("Stereo");
-                var_Change( p_aout, "audio-device",
-                            VLC_VAR_ADDCHOICE, &val, &text );
-                var_Set( p_aout, "audio-device", val );
+                var_Change (p_aout, "audio-device",
+                            VLC_VAR_ADDCHOICE, &value, &text);
+                var_Set (p_aout, "audio-device", value);
             }
         }
 
         /* Close the previously opened device */
         snd_pcm_close( p_sys->p_snd_pcm );
     }
-    else if ( i_ret == -EBUSY )
-    {
+    else
+    if (val == -EBUSY)
         msg_Warn( p_aout, "audio device: %s is already in use", psz_device );
-    }
 
     /* Test for S/PDIF device if needed */
     if ( psz_iec_device )
     {
         /* Opening the device should be enough */
-        i_ret = snd_pcm_open( &p_sys->p_snd_pcm, psz_iec_device,
-                              SND_PCM_STREAM_PLAYBACK, SND_PCM_NONBLOCK );
-        if( i_ret == 0 )
+        val = snd_pcm_open (&p_sys->p_snd_pcm, psz_iec_device,
+                            SND_PCM_STREAM_PLAYBACK, SND_PCM_NONBLOCK | mode);
+        if (val == 0)
         {
-            val.i_int = AOUT_VAR_SPDIF;
+            value.i_int = AOUT_VAR_SPDIF;
             text.psz_string = (char*)N_("A/52 over S/PDIF");
-            var_Change( p_aout, "audio-device",
-                        VLC_VAR_ADDCHOICE, &val, &text );
+            var_Change (p_aout, "audio-device",
+                        VLC_VAR_ADDCHOICE, &value, &text);
             if( var_InheritBool( p_aout, "spdif" ) )
-                var_Set( p_aout, "audio-device", val );
+                var_Set (p_aout, "audio-device", value);
 
             snd_pcm_close( p_sys->p_snd_pcm );
         }
-        else if ( i_ret == -EBUSY )
-        {
+        else
+        if (val == -EBUSY)
             msg_Warn( p_aout, "audio device: %s is already in use",
                       psz_iec_device );
-        }
     }
 
     /* Add final settings to the variable */
@@ -386,7 +388,7 @@ static int Open( vlc_object_t *p_this )
     /* Open the device */
     msg_Dbg( p_aout, "opening ALSA device `%s'", psz_device );
     int val = snd_pcm_open (&p_sys->p_snd_pcm, psz_device,
-                            SND_PCM_STREAM_PLAYBACK, 0);
+                            SND_PCM_STREAM_PLAYBACK, mode);
 #if (SND_LIB_VERSION <= 0x010015)
 # warning Please update alsa-lib to version > 1.0.21a.
     var_Create (p_aout->p_libvlc, "alsa-working", VLC_VAR_BOOL);
@@ -523,16 +525,19 @@ retry:
     }
 
     /* Set rate. */
-    unsigned i_old_rate = p_aout->output.output.i_rate;
-    val = snd_pcm_hw_params_set_rate_near( p_sys->p_snd_pcm, p_hw,
+    unsigned old_rate = p_aout->output.output.i_rate;
+    val = snd_pcm_hw_params_set_rate_near (p_sys->p_snd_pcm, p_hw,
                                            &p_aout->output.output.i_rate,
-                                           NULL );
-    if( val < 0 || p_aout->output.output.i_rate != i_old_rate )
+                                           NULL);
+    if (val < 0)
     {
-        msg_Warn( p_aout, "The rate %d Hz is not supported by your " \
-                  "hardware. Using %d Hz instead.\n", i_old_rate, \
-                  p_aout->output.output.i_rate );
+        msg_Err (p_aout, "unable to set sampling rate (%s)",
+                 snd_strerror (val));
+        goto error;
     }
+    if (p_aout->output.output.i_rate != old_rate)
+        msg_Warn (p_aout, "resampling from %d Hz to %d Hz\n", old_rate,
+                  p_aout->output.output.i_rate);
 
     /* Set period size. */
     val = snd_pcm_hw_params_set_period_size_near( p_sys->p_snd_pcm, p_hw,
