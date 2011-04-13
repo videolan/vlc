@@ -319,9 +319,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     if( !id )
         return NULL;
 
-    if( p_fmt->i_cat == VIDEO_ES &&
-        ( p_fmt->i_codec == VLC_CODEC_MPGV ||
-          p_fmt->i_codec == VLC_FOURCC('f', 'a', 'k', 'e') ) )
+    if( p_fmt->i_cat == VIDEO_ES && p_fmt->i_codec == VLC_CODEC_MPGV )
     {
         id->b_switcher_video = true;
         p_fmt->i_codec = VLC_CODEC_MPGV;
