@@ -939,7 +939,7 @@ static int  Open ( vlc_object_t *p_this )
         p_sys->param.i_open_gop = X264_OPEN_GOP_BLURAY;
     free( psz_val );
 #elif X264_BUILD >= 115
-    p_sys->param.b_open_gop = var_GetBool( p_enc, SOUT_CFG_PREFIX "open-gop" );
+    p_sys->param.b_open_gop = var_GetBool( p_enc, SOUT_CFG_PREFIX "opengop" );
     p_sys->param.b_bluray_compat = var_GetBool( p_enc, SOUT_CFG_PREFIX "bluray-compat" );
 #endif
     i_val = var_GetInteger( p_enc, SOUT_CFG_PREFIX "bframes" );
