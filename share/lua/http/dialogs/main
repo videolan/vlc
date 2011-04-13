@@ -95,7 +95,7 @@ sout and playlist .
       <span class="btn_text">Increase Volume</span>
     </button>
     <button id="btn_volume_mute" onclick="volume_mute();" onmouseover="button_over(this);" onmouseout="button_out(this);" title="Mute Volume" >
-      <img src="images/volume_mute.png" alt="Mute Volume" />
+      <img src="images/speaker_mute.png" alt="Mute Volume" />
       <span class="btn_text">Mute Volume</span>
     </button>
 
