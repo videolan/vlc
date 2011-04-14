@@ -102,8 +102,22 @@ static void GetDevices( vlc_object_t *, module_config_t * );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-static const char *const ppsz_devices[] = { DEFAULT_ALSA_DEVICE };
-static const char *const ppsz_devices_text[] = { N_("Default") };
+static const char *const ppsz_devices[] = {
+    "default", "plug:front",
+    "plug:side", "plug:rear", "plug:center_lfe",
+    "plug:surround40", "plug:surround41",
+    "plug:surround50", "plug:surround51",
+    "plug:surround71",
+    "hdmi", "iec958",
+};
+static const char *const ppsz_devices_text[] = {
+    N_("Default"), N_("Front speakers"),
+    N_("Side speakers"), N_("Rear speakers"), N_("Center and subwoofer"),
+    N_("Surround 4.0"), N_("Surround 4.1"),
+    N_("Surround 5.0"), N_("Surround 5.1"),
+    N_("Surround 7.1"),
+    N_("HDMI"), N_("S/PDIF"),
+};
 vlc_module_begin ()
     set_shortname( "ALSA" )
     set_description( N_("ALSA audio output") )
