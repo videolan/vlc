@@ -961,12 +961,6 @@ void Item::setInputItem( input_item_t* p_input_item )
     _p_input_item = p_input_item;
 }
 
-input_item_t* Item::getInputItem() const
-{
-    return _p_input_item;
-}
-
-
 // Container...
 
 Container::Container( Container*  p_parent,
