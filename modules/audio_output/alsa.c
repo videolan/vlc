@@ -159,12 +159,6 @@ static int Open (vlc_object_t *obj)
 {
     aout_instance_t * p_aout = (aout_instance_t *)obj;
 
-    /* Allocate structures */
-    aout_sys_t * p_sys = malloc( sizeof( aout_sys_t ) );
-    if( p_sys == NULL )
-        return VLC_ENOMEM;
-    p_aout->output.p_sys = p_sys;
-
     /* Get device name */
     char *psz_device;
 
@@ -172,48 +166,37 @@ static int Open (vlc_object_t *obj)
         psz_device = var_GetString (p_aout, "audio-device");
     else
         psz_device = var_InheritString( p_aout, "alsa-audio-device" );
-    if( unlikely(psz_device == NULL) )
-    {
-        free( p_sys );
+    if (unlikely(psz_device == NULL))
         return VLC_ENOMEM;
-    }
 
     /* Choose the IEC device for S/PDIF output:
        if the device is overridden by the user then it will be the one
        otherwise we compute the default device based on the output format. */
-    char *psz_iec_device = NULL;
-    if( AOUT_FMT_NON_LINEAR( &p_aout->output.output ) )
+    if (AOUT_FMT_NON_LINEAR(&p_aout->output.output)
+     && !strcmp (psz_device, DEFAULT_ALSA_DEVICE))
     {
-        if( !strcmp( psz_device, DEFAULT_ALSA_DEVICE ) )
-        {
-            unsigned aes3;
+        unsigned aes3;
 
-            switch( p_aout->output.output.i_rate )
-            {
-              case 48000:
+        switch (p_aout->output.output.i_rate)
+        {
+            case 48000:
                 aes3 = IEC958_AES3_CON_FS_48000;
                 break;
-              case 44100:
+            case 44100:
                 aes3 = IEC958_AES3_CON_FS_44100;
                 break;
-              default:
+            default:
                 aes3 = IEC958_AES3_CON_FS_32000;
                 break;
-            }
-
-            if( asprintf( &psz_iec_device,
-                          "iec958:AES0=0x%x,AES1=0x%x,AES2=0x%x,AES3=0x%x",
-                          IEC958_AES0_CON_EMPHASIS_NONE | IEC958_AES0_NONAUDIO,
-                          IEC958_AES1_CON_ORIGINAL | IEC958_AES1_CON_PCM_CODER,
-                          0, aes3 ) == -1 )
-            {
-                free( psz_device );
-                free( p_sys );
-                return VLC_ENOMEM;
-            }
         }
-        else
-            psz_iec_device = strdup( psz_device );
+
+        free (psz_device);
+        if (asprintf (&psz_device,
+                      "iec958:AES0=0x%x,AES1=0x%x,AES2=0x%x,AES3=0x%x",
+                      IEC958_AES0_CON_EMPHASIS_NONE | IEC958_AES0_NONAUDIO,
+                      IEC958_AES1_CON_ORIGINAL | IEC958_AES1_CON_PCM_CODER,
+                      0, aes3) == -1)
+            return VLC_ENOMEM;
     }
 
     snd_pcm_format_t pcm_format; /* ALSA sample format */
@@ -284,6 +267,15 @@ static int Open (vlc_object_t *obj)
                 pcm_format = SND_PCM_FORMAT_S16;
             }
     }
+
+    /* Allocate structures */
+    aout_sys_t *p_sys = malloc (sizeof (*p_sys));
+    if (unlikely(p_sys == NULL))
+    {
+        free (psz_device);
+        return VLC_ENOMEM;
+    }
+    p_aout->output.p_sys = p_sys;
 
 #ifdef ALSA_DEBUG
     snd_output_stdio_attach( &p_sys->p_snd_stderr, stderr, 0 );
