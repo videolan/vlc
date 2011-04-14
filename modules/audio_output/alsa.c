@@ -102,7 +102,7 @@ static void GetDevices( vlc_object_t *, module_config_t * );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-static const char *const ppsz_devices[] = { "default" };
+static const char *const ppsz_devices[] = { DEFAULT_ALSA_DEVICE };
 static const char *const ppsz_devices_text[] = { N_("Default") };
 vlc_module_begin ()
     set_shortname( "ALSA" )
