@@ -161,33 +161,22 @@ EXTRA_DIST += \
 	extras/package/macosx/Resources/wma.icns \
 	extras/package/macosx/Resources/wmv.icns \
 	extras/package/macosx/Resources/pause.png \
-	extras/package/macosx/Resources/pause_blue.png \
 	extras/package/macosx/Resources/play.png \
-	extras/package/macosx/Resources/play_blue.png \
 	extras/package/macosx/Resources/stop.png \
-	extras/package/macosx/Resources/stop_blue.png \
 	extras/package/macosx/Resources/display_left.png \
 	extras/package/macosx/Resources/display_middle.png \
 	extras/package/macosx/Resources/display_right.png \
 	extras/package/macosx/Resources/display_slider.png \
 	extras/package/macosx/Resources/display_track.png \
 	extras/package/macosx/Resources/equalizerdrawer_active.png \
-	extras/package/macosx/Resources/equalizerdrawer_blue.png \
 	extras/package/macosx/Resources/fullscreen_active.png \
-	extras/package/macosx/Resources/fullscreen_blue.png \
 	extras/package/macosx/Resources/next_active.png \
-	extras/package/macosx/Resources/next_blue.png \
 	extras/package/macosx/Resources/playlistdrawer_active.png \
-	extras/package/macosx/Resources/playlistdrawer_blue.png \
 	extras/package/macosx/Resources/previous_active.png \
-	extras/package/macosx/Resources/previous_blue.png \
 	extras/package/macosx/Resources/skip_forward_active.png \
-	extras/package/macosx/Resources/skip_forward_blue.png \
 	extras/package/macosx/Resources/skip_previous_active.png \
-	extras/package/macosx/Resources/skip_previous_blue.png \
 	extras/package/macosx/Resources/volume_high.png \
 	extras/package/macosx/Resources/volume_low.png \
-	extras/package/macosx/Resources/volumeslider_blue.png \
 	extras/package/macosx/Resources/volumeslider_normal.png \
 	extras/package/macosx/Resources/volumetrack.png \
 	extras/package/macosx/Resources/about_bg.png \
@@ -195,20 +184,12 @@ EXTRA_DIST += \
 	extras/package/macosx/Resources/play_embedded.png \
 	extras/package/macosx/Resources/pause_embedded.png \
 	extras/package/macosx/Resources/skip_previous_active_embedded.png \
-	extras/package/macosx/Resources/pause_embedded_blue.png \
-	extras/package/macosx/Resources/play_embedded_blue.png \
-	extras/package/macosx/Resources/skip_forward_embedded_blue.png \
-	extras/package/macosx/Resources/skip_previous_embedded_blue.png \
 	extras/package/macosx/Resources/vlc.scriptSuite \
 	extras/package/macosx/Resources/vlc.scriptTerminology \
 	extras/package/macosx/Resources/README \
 	extras/package/macosx/Resources/add_embedded.png \
-	extras/package/macosx/Resources/add_embedded_blue.png \
 	extras/package/macosx/Resources/repeat_embedded.png \
-	extras/package/macosx/Resources/repeat_embedded_blue.png \
-	extras/package/macosx/Resources/repeat_single_embedded_blue.png \
 	extras/package/macosx/Resources/shuffle_embedded.png \
-	extras/package/macosx/Resources/shuffle_embedded_blue.png \
 	extras/package/macosx/Resources/fs_volume_slider_knob_highlight.png \
 	extras/package/macosx/Resources/fs_volume_slider_knob.png \
 	extras/package/macosx/Resources/fs_volume_slider_bar.png \
