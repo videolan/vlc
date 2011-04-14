@@ -179,14 +179,15 @@ static int Open (vlc_object_t *obj)
 
         switch (p_aout->output.output.i_rate)
         {
-            case 48000:
-                aes3 = IEC958_AES3_CON_FS_48000;
-                break;
-            case 44100:
-                aes3 = IEC958_AES3_CON_FS_44100;
-                break;
+#define FS(freq) \
+            case freq: aes3 = IEC958_AES3_CON_FS_ ## freq; break;
+            FS( 44100) /* def. */ FS( 48000) FS( 32000)
+            FS( 22050)            FS( 24000)
+            FS( 88200) FS(768000) FS( 96000)
+            FS(176400)            FS(192000)
+#undef FS
             default:
-                aes3 = IEC958_AES3_CON_FS_32000;
+                aes3 = IEC958_AES3_CON_FS_NOTID;
                 break;
         }
 
