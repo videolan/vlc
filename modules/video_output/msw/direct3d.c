@@ -105,9 +105,24 @@ static void Direct3DDestroy(vout_display_t *);
 static int  Direct3DOpen (vout_display_t *, video_format_t *);
 static void Direct3DClose(vout_display_t *);
 
-static int  Direct3DImportPicture(vout_display_t *vd, LPDIRECT3DSURFACE9 surface);
+/* */
+typedef struct
+{
+    FLOAT       x,y,z;      // vertex untransformed position
+    FLOAT       rhw;        // eye distance
+    D3DCOLOR    diffuse;    // diffuse color
+    FLOAT       tu, tv;     // texture relative coordinates
+} CUSTOMVERTEX;
+#define D3DFVF_CUSTOMVERTEX (D3DFVF_XYZRHW|D3DFVF_DIFFUSE|D3DFVF_TEX1)
 
-static void Direct3DRenderScene(vout_display_t *vd);
+typedef struct {
+    CUSTOMVERTEX       vertex[4];
+    LPDIRECT3DTEXTURE9 texture;
+} d3d_region_t;
+
+static int  Direct3DImportPicture(vout_display_t *vd, d3d_region_t *, LPDIRECT3DSURFACE9 surface);
+
+static void Direct3DRenderScene(vout_display_t *vd, d3d_region_t *);
 
 /* */
 static int DesktopCallback(vlc_object_t *, char const *, vlc_value_t, vlc_value_t, void *);
@@ -270,8 +285,9 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
         return;
     }
 
-    if (!Direct3DImportPicture(vd, surface)) {
-        Direct3DRenderScene(vd);
+    d3d_region_t region;
+    if (!Direct3DImportPicture(vd, &region, surface)) {
+        Direct3DRenderScene(vd, &region);
     }
 }
 
@@ -917,17 +933,6 @@ static void Direct3DDestroyPool(vout_display_t *vd)
     sys->pool = NULL;
 }
 
-/* */
-typedef struct
-{
-    FLOAT       x,y,z;      // vertex untransformed position
-    FLOAT       rhw;        // eye distance
-    D3DCOLOR    diffuse;    // diffuse color
-    FLOAT       tu, tv;     // texture relative coordinates
-} CUSTOMVERTEX;
-
-#define D3DFVF_CUSTOMVERTEX (D3DFVF_XYZRHW|D3DFVF_DIFFUSE|D3DFVF_TEX1)
-
 /**
  * It allocates and initializes the resources needed to render the scene.
  */
@@ -1058,21 +1063,11 @@ static void Direct3DDestroyScene(vout_display_t *vd)
     msg_Dbg(vd, "Direct3D scene released successfully");
 }
 
-static int Direct3DSetupVertices(vout_display_t *vd,
-                                 LPDIRECT3DVERTEXBUFFER9 d3dvtc,
-                                 const RECT src_full,
-                                 const RECT src_crop,
-                                 const RECT dst)
+static void Direct3DSetupVertices(CUSTOMVERTEX *vertices,
+                                  const RECT src_full,
+                                  const RECT src_crop,
+                                  const RECT dst)
 {
-    HRESULT hr;
-
-    CUSTOMVERTEX *vertices;
-    hr = IDirect3DVertexBuffer9_Lock(d3dvtc, 0, 0, (void **)&vertices, D3DLOCK_DISCARD);
-    if (FAILED(hr)) {
-        msg_Dbg(vd, "%s:%d (hr=0x%0lX)", __FUNCTION__, __LINE__, hr);
-        return -1;
-    }
-
     const float src_full_width  = src_full.right  - src_full.left;
     const float src_full_height = src_full.bottom - src_full.top;
     vertices[0].x  = dst.left;
@@ -1105,22 +1100,74 @@ static int Direct3DSetupVertices(vout_display_t *vd,
         vertices[i].rhw     = 1.0f;
         vertices[i].diffuse = D3DCOLOR_ARGB(255, 255, 255, 255);
     }
+}
 
-    hr= IDirect3DVertexBuffer9_Unlock(d3dvtc);
+/**
+ * It copies picture surface into a texture and setup the associated d3d_region_t.
+ */
+static int Direct3DImportPicture(vout_display_t *vd,
+                                 d3d_region_t *region,
+                                 LPDIRECT3DSURFACE9 source)
+{
+    vout_display_sys_t *sys = vd->sys;
+    HRESULT hr;
+
+    if (!source) {
+        msg_Dbg(vd, "no surface to render ?");
+        return VLC_EGENERIC;
+    }
+
+    /* retrieve texture top-level surface */
+    LPDIRECT3DSURFACE9 destination;
+    hr = IDirect3DTexture9_GetSurfaceLevel(sys->d3dtex, 0, &destination);
+    if (FAILED(hr)) {
+        msg_Dbg(vd, "%s:%d (hr=0x%0lX)", __FUNCTION__, __LINE__, hr);
+        return VLC_EGENERIC;
+    }
+
+    /* Copy picture surface into texture surface
+     * color space conversion happen here */
+    hr = IDirect3DDevice9_StretchRect(sys->d3ddev, source, NULL, destination, NULL, D3DTEXF_NONE);
+    IDirect3DSurface9_Release(destination);
+    if (FAILED(hr)) {
+        msg_Dbg(vd, "%s:%d (hr=0x%0lX)", __FUNCTION__, __LINE__, hr);
+        return VLC_EGENERIC;
+    }
+
+    /* */
+    region->texture = sys->d3dtex;
+    Direct3DSetupVertices(region->vertex,
+                          vd->sys->rect_src,
+                          vd->sys->rect_src_clipped,
+                          vd->sys->rect_dest_clipped);
+    return VLC_SUCCESS;
+}
+
+static int Direct3DRenderRegion(vout_display_t *vd,
+                                d3d_region_t *region)
+{
+    vout_display_sys_t *sys = vd->sys;
+
+    LPDIRECT3DDEVICE9 d3ddev = vd->sys->d3ddev;
+
+    LPDIRECT3DVERTEXBUFFER9 d3dvtc = sys->d3dvtc;
+    LPDIRECT3DTEXTURE9      d3dtex = region->texture;
+
+    HRESULT hr;
+
+    /* Import vertices */
+    void *vertex;
+    hr = IDirect3DVertexBuffer9_Lock(d3dvtc, 0, 0, &vertex, D3DLOCK_DISCARD);
     if (FAILED(hr)) {
         msg_Dbg(vd, "%s:%d (hr=0x%0lX)", __FUNCTION__, __LINE__, hr);
         return -1;
     }
-    return 0;
-}
-
-static int Direct3DRenderTexture(vout_display_t *vd,
-                                 LPDIRECT3DVERTEXBUFFER9 d3dvtc,
-                                 LPDIRECT3DTEXTURE9 d3dtex)
-{
-    HRESULT hr;
-
-    LPDIRECT3DDEVICE9 d3ddev = vd->sys->d3ddev;
+    memcpy(vertex, region->vertex, sizeof(region->vertex));
+    hr = IDirect3DVertexBuffer9_Unlock(d3dvtc);
+    if (FAILED(hr)) {
+        msg_Dbg(vd, "%s:%d (hr=0x%0lX)", __FUNCTION__, __LINE__, hr);
+        return -1;
+    }
 
     // Setup our texture. Using textures introduces the texture stage states,
     // which govern how textures get blended together (in the case of multiple
@@ -1156,44 +1203,13 @@ static int Direct3DRenderTexture(vout_display_t *vd,
 }
 
 /**
- * It copies picture surface into a texture.
- */
-static int Direct3DImportPicture(vout_display_t *vd, LPDIRECT3DSURFACE9 source)
-{
-    vout_display_sys_t *sys = vd->sys;
-    HRESULT hr;
-
-    if (!source) {
-        msg_Dbg(vd, "no surface to render ?");
-        return VLC_EGENERIC;
-    }
-
-    /* retrieve texture top-level surface */
-    LPDIRECT3DSURFACE9 destination;
-    hr = IDirect3DTexture9_GetSurfaceLevel(sys->d3dtex, 0, &destination);
-    if (FAILED(hr)) {
-        msg_Dbg(vd, "%s:%d (hr=0x%0lX)", __FUNCTION__, __LINE__, hr);
-        return VLC_EGENERIC;
-    }
-
-    /* Copy picture surface into texture surface
-     * color space conversion happen here */
-    hr = IDirect3DDevice9_StretchRect(sys->d3ddev, source, NULL, destination, NULL, D3DTEXF_NONE);
-    IDirect3DSurface9_Release(destination);
-    if (FAILED(hr)) {
-        msg_Dbg(vd, "%s:%d (hr=0x%0lX)", __FUNCTION__, __LINE__, hr);
-        return VLC_EGENERIC;
-    }
-    return VLC_SUCCESS;
-}
-
-/**
  * It renders the scene.
  *
  * This function is intented for higher end 3D cards, with pixel shader support
  * and at least 64 MiB of video RAM.
  */
-static void Direct3DRenderScene(vout_display_t *vd)
+static void Direct3DRenderScene(vout_display_t *vd,
+                                d3d_region_t *region)
 {
     vout_display_sys_t *sys = vd->sys;
     LPDIRECT3DDEVICE9 d3ddev = sys->d3ddev;
@@ -1214,22 +1230,7 @@ static void Direct3DRenderScene(vout_display_t *vd)
         return;
     }
 
-    /* Update the vertex buffer (scaling is setup here) */
-    LPDIRECT3DVERTEXBUFFER9 d3dvtc  = sys->d3dvtc;
-    if (Direct3DSetupVertices(vd, d3dvtc,
-                              vd->sys->rect_src,
-                              vd->sys->rect_src_clipped,
-                              vd->sys->rect_dest_clipped)) {
-        IDirect3DDevice9_EndScene(d3ddev);
-        return;
-    }
-
-    /* Render the texture */
-    LPDIRECT3DTEXTURE9      d3dtex  = sys->d3dtex;
-    if (Direct3DRenderTexture(vd, d3dvtc, d3dtex)) {
-        IDirect3DDevice9_EndScene(d3ddev);
-        return;
-    }
+    Direct3DRenderRegion(vd, region);
 
     // End the scene
     hr = IDirect3DDevice9_EndScene(d3ddev);
