@@ -541,11 +541,6 @@ static VLCMain *_o_sharedMainInstance = nil;
     /* take care of tint changes during runtime */
     o_img_play = [NSImage imageNamed: @"play"];
     o_img_pause = [NSImage imageNamed: @"pause"];
-    [self controlTintChanged];
-    [[NSNotificationCenter defaultCenter] addObserver: self
-                                             selector: @selector( controlTintChanged )
-                                                 name: NSControlTintDidChangeNotification
-                                               object: nil];
 
     /* init Apple Remote support */
     o_remote = [[AppleRemote alloc] init];
@@ -972,48 +967,6 @@ static NSString * VLCToolbarMediaControl     = @"VLCToolbarMediaControl";
 
 #pragma mark -
 #pragma mark Other notification
-
-- (void)controlTintChanged
-{
-    BOOL b_playing = NO;
-
-    if( [o_btn_play alternateImage] == o_img_play_pressed )
-        b_playing = YES;
-
-    if( [NSColor currentControlTint] == NSGraphiteControlTint )
-    {
-        o_img_play_pressed = [NSImage imageNamed: @"play_graphite"];
-        o_img_pause_pressed = [NSImage imageNamed: @"pause_graphite"];
-
-        [o_btn_prev setAlternateImage: [NSImage imageNamed: @"previous_graphite"]];
-        [o_btn_rewind setAlternateImage: [NSImage imageNamed: @"skip_previous_graphite"]];
-        [o_btn_stop setAlternateImage: [NSImage imageNamed: @"stop_graphite"]];
-        [o_btn_ff setAlternateImage: [NSImage imageNamed: @"skip_forward_graphite"]];
-        [o_btn_next setAlternateImage: [NSImage imageNamed: @"next_graphite"]];
-        [o_btn_fullscreen setAlternateImage: [NSImage imageNamed: @"fullscreen_graphite"]];
-        [o_btn_playlist setAlternateImage: [NSImage imageNamed: @"playlistdrawer_graphite"]];
-        [o_btn_equalizer setAlternateImage: [NSImage imageNamed: @"equalizerdrawer_graphite"]];
-    }
-    else
-    {
-        o_img_play_pressed = [NSImage imageNamed: @"play_blue"];
-        o_img_pause_pressed = [NSImage imageNamed: @"pause_blue"];
-
-        [o_btn_prev setAlternateImage: [NSImage imageNamed: @"previous_blue"]];
-        [o_btn_rewind setAlternateImage: [NSImage imageNamed: @"skip_previous_blue"]];
-        [o_btn_stop setAlternateImage: [NSImage imageNamed: @"stop_blue"]];
-        [o_btn_ff setAlternateImage: [NSImage imageNamed: @"skip_forward_blue"]];
-        [o_btn_next setAlternateImage: [NSImage imageNamed: @"next_blue"]];
-        [o_btn_fullscreen setAlternateImage: [NSImage imageNamed: @"fullscreen_blue"]];
-        [o_btn_playlist setAlternateImage: [NSImage imageNamed: @"playlistdrawer_blue"]];
-        [o_btn_equalizer setAlternateImage: [NSImage imageNamed: @"equalizerdrawer_blue"]];
-    }
-
-    if( b_playing )
-        [o_btn_play setAlternateImage: o_img_play_pressed];
-    else
-        [o_btn_play setAlternateImage: o_img_pause_pressed];
-}
 
 /* Listen to the remote in exclusive mode, only when VLC is the active
    application */

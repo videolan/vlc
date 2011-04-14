@@ -150,6 +150,5 @@
     NSImage *_knobOn;
     BOOL b_mouse_down;
 }
-- (void)controlTintChanged;
 
 @end

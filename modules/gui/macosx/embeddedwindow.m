@@ -78,12 +78,6 @@
     o_img_play = [NSImage imageNamed: @"play_embedded"];
     o_img_pause = [NSImage imageNamed: @"pause_embedded"];
 
-    [self controlTintChanged];
-    [[NSNotificationCenter defaultCenter] addObserver: self
-                                             selector: @selector( controlTintChanged )
-                                                 name: NSControlTintDidChangeNotification
-                                               object: nil];
-
     /* Set color of sidebar to Leopard's "Sidebar Blue" */
     [o_sidebar_list setBackgroundColor: [NSColor colorWithCalibratedRed:0.820
                                                                   green:0.843
