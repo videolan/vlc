@@ -3103,6 +3103,8 @@ static int CalculateInterlaceScore( const picture_t* p_pic_top,
             uint8_t *p_p = &ngh->p[i_plane].p_pixels[(y-1)*wn]; /* prev line */
             uint8_t *p_n = &ngh->p[i_plane].p_pixels[(y+1)*wn]; /* next line */
 
+            int x = 0;
+
 /* Threshold (value from Transcode 1.1.5) */
 #define T 100
 #ifdef CAN_COMPILE_MMXEXT
@@ -3118,7 +3120,7 @@ static int CalculateInterlaceScore( const picture_t* p_pic_top,
                 static const mmx_t b128 = { .uq = 0x8080808080808080ULL };
                 static const mmx_t bT   = { .ub = { T, T, T, T, T, T, T, T } };
 
-                for( int x = 0; x < w8; x += 8 )
+                for( ; x < w8; x += 8 )
                 {
                     movq_m2r( *((int64_t*)p_c), mm0 );
                     movq_m2r( *((int64_t*)p_p), mm1 );
@@ -3153,55 +3155,32 @@ static int CalculateInterlaceScore( const picture_t* p_pic_top,
                     p_p += 8;
                     p_n += 8;
                 }
-                /* Handle the width remainder if any. */
-                if( wm8 )
-                {
-                    for( int x = 0; x < wm8; ++x )
-                    {
-                        int_fast32_t C = *p_c;
-                        int_fast32_t P = *p_p;
-                        int_fast32_t N = *p_n;
-
-                        int_fast32_t comb = (P - C) * (N - C);
-                        if( comb > T )
-                            ++i_score;
-
-                        ++p_c;
-                        ++p_p;
-                        ++p_n;
-                    }
-                }
             }
-            else
+#endif
+            for( ; x < w; ++x )
             {
-#endif
-                for( int x = 0; x < w; ++x )
-                {
-                    /* Worst case: need 17 bits for "comb". */
-                    int_fast32_t C = *p_c;
-                    int_fast32_t P = *p_p;
-                    int_fast32_t N = *p_n;
+                /* Worst case: need 17 bits for "comb". */
+                int_fast32_t C = *p_c;
+                int_fast32_t P = *p_p;
+                int_fast32_t N = *p_n;
 
-                    /* Comments in Transcode's filter_ivtc.c attribute this
-                       combing metric to Gunnar Thalin.
+                /* Comments in Transcode's filter_ivtc.c attribute this
+                   combing metric to Gunnar Thalin.
 
-                        The idea is that if the picture is interlaced, both
-                        expressions will have the same sign, and this comes
-                        up positive. The value T = 100 has been chosen such
-                        that a pixel difference of 10 (on average) will
-                        trigger the detector.
-                    */
-                    int_fast32_t comb = (P - C) * (N - C);
-                    if( comb > T )
-                        ++i_score;
+                    The idea is that if the picture is interlaced, both
+                    expressions will have the same sign, and this comes
+                    up positive. The value T = 100 has been chosen such
+                    that a pixel difference of 10 (on average) will
+                    trigger the detector.
+                */
+                int_fast32_t comb = (P - C) * (N - C);
+                if( comb > T )
+                    ++i_score;
 
-                    ++p_c;
-                    ++p_p;
-                    ++p_n;
-                }
-#ifdef CAN_COMPILE_MMXEXT
+                ++p_c;
+                ++p_p;
+                ++p_n;
             }
-#endif
 
             /* Now the other field - swap current and neighbour pictures */
             const picture_t *tmp = cur;
