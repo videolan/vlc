@@ -1064,6 +1064,8 @@ static subpicture_t *SpuRenderSubpictures( spu_t *p_spu,
     subpicture_t *p_output = subpicture_New( NULL );
     if( !p_output )
         return NULL;
+    p_output->i_original_picture_width  = p_fmt_dst->i_width;
+    p_output->i_original_picture_height = p_fmt_dst->i_height;
     subpicture_region_t **pp_output_last = &p_output->p_region;
 
     /* Allocate area array for subtitle overlap */
