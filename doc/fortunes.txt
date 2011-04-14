@@ -953,3 +953,8 @@ VLC development is NOT about being a sed god.
 < mru> documentation only attracts users too stupid to rtfs
  -- #videolan, speaking of documentation
 %
+"As already stated several times, libfluidsynth leaks memory like a Fukushima
+reactor leaks ionizing radiations."
+ -- courmisch, on forum.videolan.org
+%
+
