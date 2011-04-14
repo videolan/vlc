@@ -224,7 +224,7 @@ vlc_module_begin ()
                   "cable", "dvb-c", "satellite", "dvb-s", "dvb-s2",
                   "terrestrial", "dvb-t", "atsc", "cqam")
 
-    /* All options starting with dvb- can be overriden in the MRL, so they
+    /* All options starting with dvb- can be overridden in the MRL, so they
      * must all be "safe". Nevertheless, we do not mark as safe those that are
      * really specific to the local system (e.g. device ID...).
      * It wouldn't make sense to deliver those through a playlist. */

@@ -47,7 +47,7 @@
 
 #define YUV4MPEG2_TEXT N_("YUV4MPEG2 header (default disabled)")
 #define YUV4MPEG2_LONGTEXT N_("The YUV4MPEG2 header is compatible " \
-    "with mplayer yuv video ouput and requires YV12/I420 fourcc. By default "\
+    "with mplayer yuv video output and requires YV12/I420 fourcc. By default "\
     "vlc writes the fourcc of the picture frame into the output destination.")
 
 #define CFG_PREFIX "yuv-"

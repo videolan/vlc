@@ -74,7 +74,7 @@ static int SetFont( filter_t *, int );
 #define FONTSIZER_TEXT N_("Relative font size")
 #define FONTSIZER_LONGTEXT N_("This is the relative default size of the " \
   "fonts that will be rendered on the video. If absolute font size is set, "\
-   "relative size will be overriden." )
+   "relative size will be overridden." )
 
 static int const pi_sizes[] = { 20, 18, 16, 12, 6 };
 static char *const ppsz_sizes_text[] = {
