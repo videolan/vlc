@@ -918,7 +918,18 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
     const vlc_fourcc_t *subpicture_chromas;
     video_format_t fmt_spu;
     if (do_dr_spu) {
-        fmt_spu = vd->source; /* TODO improve */
+        vout_display_place_t place;
+        vout_display_PlacePicture(&place, &vd->source, vd->cfg, false);
+
+        fmt_spu = vd->source;
+        if (fmt_spu.i_width * fmt_spu.i_height < place.width * place.height) {
+            fmt_spu.i_sar_num = vd->cfg->display.sar.num;
+            fmt_spu.i_sar_den = vd->cfg->display.sar.den;
+            fmt_spu.i_width          =
+            fmt_spu.i_visible_width  = place.width;
+            fmt_spu.i_height         =
+            fmt_spu.i_visible_height = place.height;
+        }
         subpicture_chromas = vd->info.subpicture_chromas;
     } else {
         if (do_early_spu) {
