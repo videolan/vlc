@@ -1,0 +1,11 @@
+--- goom/xmms-goom/Makefile.am	2005-02-07 22:46:42.000000000 +0900
++++ goom.new/xmms-goom/Makefile.am	2011-04-16 02:03:15.420291009 +0900
+@@ -2,7 +2,7 @@
+ 
+ if HAVE_XMMS
+ xmms_lib_LTLIBRARIES = libxmmsgoom2.la
+-xmms_libdir = $(XMMS_VISUALIZATION_PLUGIN_DIR)
++xmms_libdir = $(libdir)
+ libxmmsgoom2_la_LIBADD = $(top_builddir)/src/libgoom2.la $(XMMS_LIBS)
+ libxmmsgoom2_la_SOURCES = xmms_goom.c
+ INCLUDES=-DDATADIR=\"@XMMS_DATA_DIR@\" @XMMS_CFLAGS@ -Wall -I../src/

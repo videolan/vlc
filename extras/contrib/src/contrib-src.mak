@@ -1370,6 +1370,7 @@ ifdef HAVE_MACOSX
 	patch -p0 < Patches/goom2k4-osx.patch
 endif
 	patch -p0 < Patches/goom2k4-noxmmx.patch
+	patch -p0 < Patches/goom2k4-xmmslibdir.patch
 	(cd $@; rm -f configure; autoreconf -ivf)
 
 .goom2k4: goom
