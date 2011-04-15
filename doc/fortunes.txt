@@ -957,4 +957,7 @@ VLC development is NOT about being a sed god.
 reactor leaks ionizing radiations."
  -- courmisch, on forum.videolan.org
 %
+< courmisch> aww, I had a genius idea, and then I figured out it did not work
+ -- #videolan, maybe an evil plan?!?
+%
 
