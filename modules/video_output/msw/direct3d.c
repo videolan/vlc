@@ -125,10 +125,15 @@ typedef struct
 } CUSTOMVERTEX;
 #define D3DFVF_CUSTOMVERTEX (D3DFVF_XYZRHW|D3DFVF_DIFFUSE|D3DFVF_TEX1)
 
-typedef struct {
+typedef struct d3d_region_t {
+    D3DFORMAT          format;
+    unsigned           width;
+    unsigned           height;
     CUSTOMVERTEX       vertex[4];
     LPDIRECT3DTEXTURE9 texture;
 } d3d_region_t;
+
+static void Direct3DDeleteRegions(int, d3d_region_t *);
 
 static int  Direct3DImportPicture(vout_display_t *vd, d3d_region_t *, LPDIRECT3DSURFACE9 surface);
 static void Direct3DImportSubpicture(vout_display_t *vd, int *, d3d_region_t **, subpicture_t *);
@@ -316,9 +321,9 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
         Direct3DRenderScene(vd, &picture_region,
                             subpicture_region_count, subpicture_region);
 
-        for (int i = 0; i < subpicture_region_count; i++)
-            IDirect3DTexture9_Release(subpicture_region[i].texture);
-        free(subpicture_region);
+        Direct3DDeleteRegions(sys->d3dregion_count, sys->d3dregion);
+        sys->d3dregion_count = subpicture_region_count;
+        sys->d3dregion       = subpicture_region;
     }
 }
 
@@ -1015,6 +1020,9 @@ static int Direct3DCreateScene(vout_display_t *vd, const video_format_t *fmt)
     sys->d3dtex = d3dtex;
     sys->d3dvtc = d3dvtc;
 
+    sys->d3dregion_count = 0;
+    sys->d3dregion       = NULL;
+
     // Texture coordinates outside the range [0.0, 1.0] are set
     // to the texture color at 0.0 or 1.0, respectively.
     IDirect3DDevice9_SetSamplerState(d3ddev, 0, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP);
@@ -1085,6 +1093,8 @@ static void Direct3DDestroyScene(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
 
+    Direct3DDeleteRegions(sys->d3dregion_count, sys->d3dregion);
+
     LPDIRECT3DVERTEXBUFFER9 d3dvtc = sys->d3dvtc;
     if (d3dvtc)
         IDirect3DVertexBuffer9_Release(d3dvtc);
@@ -1095,6 +1105,10 @@ static void Direct3DDestroyScene(vout_display_t *vd)
 
     sys->d3dvtc = NULL;
     sys->d3dtex = NULL;
+
+    sys->d3dregion_count = 0;
+    sys->d3dregion       = NULL;
+
     msg_Dbg(vd, "Direct3D scene released successfully");
 }
 
@@ -1179,6 +1193,15 @@ static int Direct3DImportPicture(vout_display_t *vd,
     return VLC_SUCCESS;
 }
 
+static void Direct3DDeleteRegions(int count, d3d_region_t *region)
+{
+    for (int i = 0; i < count; i++) {
+        if (region[i].texture)
+            IDirect3DTexture9_Release(region[i].texture);
+    }
+    free(region);
+}
+
 static void Direct3DImportSubpicture(vout_display_t *vd,
                                      int *count_ptr, d3d_region_t **region,
                                      subpicture_t *subpicture)
@@ -1202,22 +1225,39 @@ static void Direct3DImportSubpicture(vout_display_t *vd,
         HRESULT hr;
 
         d3dr->texture = NULL;
-        hr = IDirect3DDevice9_CreateTexture(sys->d3ddev,
-                                            r->fmt.i_visible_width, r->fmt.i_visible_height,
-                                            1,
-                                            D3DUSAGE_DYNAMIC,
-                                            D3DFMT_A8R8G8B8,
-                                            D3DPOOL_DEFAULT,
-                                            &d3dr->texture,
-                                            NULL);
-        if (FAILED(hr)) {
-            d3dr->texture = NULL;
-            msg_Err(vd, "Failed to create %dx%d texture for OSD",
-                    r->fmt.i_visible_width, r->fmt.i_visible_height);
-            continue;
+        for (int j = 0; j < sys->d3dregion_count; j++) {
+            d3d_region_t *cache = &sys->d3dregion[j];
+            if (cache->texture &&
+                cache->format == D3DFMT_A8R8G8B8 &&
+                cache->width  == r->fmt.i_visible_width &&
+                cache->height == r->fmt.i_visible_height) {
+                msg_Dbg(vd, "Reusing %dx%d texture for OSD",
+                        cache->width, cache->height);
+                *d3dr = *cache;
+                memset(cache, 0, sizeof(*cache));
+            }
         }
-        msg_Dbg(vd, "Created %dx%d texture for OSD",
-                r->fmt.i_visible_width, r->fmt.i_visible_height);
+        if (!d3dr->texture) {
+            d3dr->format = D3DFMT_A8R8G8B8;
+            d3dr->width  = r->fmt.i_visible_width;
+            d3dr->height = r->fmt.i_visible_height;
+            hr = IDirect3DDevice9_CreateTexture(sys->d3ddev,
+                                                d3dr->width, d3dr->height,
+                                                1,
+                                                D3DUSAGE_DYNAMIC,
+                                                d3dr->format,
+                                                D3DPOOL_DEFAULT,
+                                                &d3dr->texture,
+                                                NULL);
+            if (FAILED(hr)) {
+                d3dr->texture = NULL;
+                msg_Err(vd, "Failed to create %dx%d texture for OSD",
+                        d3dr->width, d3dr->height);
+                continue;
+            }
+            msg_Dbg(vd, "Created %dx%d texture for OSD",
+                    r->fmt.i_visible_width, r->fmt.i_visible_height);
+        }
 
         D3DLOCKED_RECT lock;
         hr = IDirect3DTexture9_LockRect(d3dr->texture, 0, &lock, NULL, 0);

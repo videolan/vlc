@@ -182,6 +182,8 @@ struct vout_display_sys_t
     // scene objects
     LPDIRECT3DTEXTURE9      d3dtex;
     LPDIRECT3DVERTEXBUFFER9 d3dvtc;
+    int                     d3dregion_count;
+    struct d3d_region_t     *d3dregion;
 
     picture_resource_t      resource;
 
