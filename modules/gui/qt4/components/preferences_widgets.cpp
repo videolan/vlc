@@ -707,11 +707,8 @@ ModuleListConfigControl::ModuleListConfigControl( vlc_object_t *_p_this,
     finish( bycat );
 
     int boxline = 0;
-    for( QVector<checkBoxListItem*>::iterator it = modules.begin();
-            it != modules.end(); ++it )
-    {
-        layoutGroupBox->addWidget( (*it)->checkBox, boxline++, 0 );
-    }
+    foreach ( checkBoxListItem *it, modules )
+        layoutGroupBox->addWidget( it->checkBox, boxline++, 0 );
     layoutGroupBox->addWidget( text, boxline, 0 );
 
     if( !l )
@@ -731,11 +728,8 @@ ModuleListConfigControl::ModuleListConfigControl( vlc_object_t *_p_this,
 
 ModuleListConfigControl::~ModuleListConfigControl()
 {
-    for( QVector<checkBoxListItem*>::iterator it = modules.begin();
-            it != modules.end(); ++it )
-    {
-        delete *it;
-    }
+    qDeleteAll( modules );
+    modules.clear();
     delete groupBox;
 }
 
@@ -811,21 +805,15 @@ QString ModuleListConfigControl::getValue() const
 
 void ModuleListConfigControl::hide()
 {
-    for( QVector<checkBoxListItem*>::iterator it = modules.begin();
-         it != modules.end(); ++it )
-    {
-        (*it)->checkBox->hide();
-    }
+    foreach ( checkBoxListItem *it, modules )
+        it->checkBox->hide();
     groupBox->hide();
 }
 
 void ModuleListConfigControl::show()
 {
-    for( QVector<checkBoxListItem*>::iterator it = modules.begin();
-         it != modules.end(); ++it )
-    {
-        (*it)->checkBox->show();
-    }
+    foreach ( checkBoxListItem *it, modules )
+        it->checkBox->show();
     groupBox->show();
 }
 
@@ -835,19 +823,18 @@ void ModuleListConfigControl::onUpdate()
     text->clear();
     bool first = true;
 
-    for( QVector<checkBoxListItem*>::iterator it = modules.begin();
-         it != modules.end(); ++it )
+    foreach ( checkBoxListItem *it, modules )
     {
-        if( (*it)->checkBox->isChecked() )
+        if( it->checkBox->isChecked() )
         {
             if( first )
             {
-                text->setText( text->text() + (*it)->psz_module );
+                text->setText( text->text() + it->psz_module );
                 first = false;
             }
             else
             {
-                text->setText( text->text() + ":" + (*it)->psz_module );
+                text->setText( text->text() + ":" + it->psz_module );
             }
         }
     }
