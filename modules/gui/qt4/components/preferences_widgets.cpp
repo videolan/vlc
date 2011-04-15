@@ -560,7 +560,7 @@ void StringListConfigControl::finish(module_config_t *p_module_config, bool byca
         label->setBuddy( combo );
 }
 
-QString StringListConfigControl::getValue()
+QString StringListConfigControl::getValue() const
 {
     return combo->itemData( combo->currentIndex() ).toString();
 }
@@ -685,7 +685,7 @@ void ModuleConfigControl::finish( bool bycat )
         label->setBuddy( combo );
 }
 
-QString ModuleConfigControl::getValue()
+QString ModuleConfigControl::getValue() const
 {
     return combo->itemData( combo->currentIndex() ).toString();
 }
@@ -803,7 +803,7 @@ void ModuleListConfigControl::finish( bool bycat )
 }
 #undef CHECKBOX_LISTS
 
-QString ModuleListConfigControl::getValue()
+QString ModuleListConfigControl::getValue() const
 {
     assert( text );
     return text->text();
@@ -909,7 +909,7 @@ void IntegerConfigControl::finish()
         label->setBuddy( spin );
 }
 
-int IntegerConfigControl::getValue()
+int IntegerConfigControl::getValue() const
 {
     return spin->value();
 }
@@ -960,7 +960,7 @@ IntegerRangeSliderConfigControl::IntegerRangeSliderConfigControl(
         label->setBuddy( slider );
 }
 
-int IntegerRangeSliderConfigControl::getValue()
+int IntegerRangeSliderConfigControl::getValue() const
 {
         return slider->value();
 }
@@ -1081,7 +1081,7 @@ void IntegerListConfigControl::actionRequested( int i_action )
     }
 }
 
-int IntegerListConfigControl::getValue()
+int IntegerListConfigControl::getValue() const
 {
     return combo->itemData( combo->currentIndex() ).toInt();
 }
@@ -1127,7 +1127,7 @@ void BoolConfigControl::finish()
         checkbox->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
 }
 
-int BoolConfigControl::getValue()
+int BoolConfigControl::getValue() const
 {
     return checkbox->isChecked();
 }
@@ -1191,7 +1191,7 @@ void FloatConfigControl::finish()
         label->setBuddy( spin );
 }
 
-float FloatConfigControl::getValue()
+float FloatConfigControl::getValue() const
 {
     return (float)spin->value();
 }
