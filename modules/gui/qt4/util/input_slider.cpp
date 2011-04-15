@@ -37,6 +37,7 @@
 #include <QStyleOptionSlider>
 #include <QLinearGradient>
 #include <QTimer>
+#include <QRadialGradient>
 
 #define MINIMUM 0
 #define MAXIMUM 1000
@@ -288,32 +289,31 @@ void SeekSlider::paintEvent( QPaintEvent *event )
 
     // draw handle
     if ( option.state & QStyle::State_MouseOver ) {
-        QLinearGradient buttonGradient( 0, 0, 0, height() );
-        buttonGradient.setColorAt( 0.0, QColor( 1, 92, 195 ) );
-        buttonGradient.setColorAt( 0.40, QColor( 41, 80, 124 ) );
-        buttonGradient.setColorAt( 1.0, QColor( 1, 92, 195 ) );
-
-        painter.setPen( QPen( Qt::blue ) );
-        painter.setBrush( buttonGradient );
 
         if ( sliderPos != -1 ) {
             const int margin = 5;
-            QSize hs = handleSize() -QSize( 2, 2 );
+            QSize hs = handleSize() -QSize( 5, 5 );
             QPoint pos;
 
             switch ( orientation() ) {
                 case Qt::Horizontal:
-                    pos = QPoint( sliderPos -( handleSize().width() /2 ), 1 );
+                    pos = QPoint( sliderPos -( hs.width() /2 ), 2 );
                     pos.rx() = qMax( margin, pos.x() );
                     pos.rx() = qMin( width() -hs.width() -margin, pos.x() );
                     break;
                 case Qt::Vertical:
-                    pos = QPoint( 1, height() -( sliderPos +( handleSize().height() /2 ) ) );
+                    pos = QPoint( 2, height() -( sliderPos +( hs.height() /2 ) ) );
                     pos.ry() = qMax( margin, pos.y() );
                     pos.ry() = qMin( height() -hs.height() -margin, pos.y() );
                     break;
             }
 
+            QRadialGradient buttonGradient( pos.x() + ( hs.width() / 2 ) - 2, pos.y() + ( hs.height() / 2 ) - 2, qMax( hs.width(), hs.height() ) );
+            buttonGradient.setColorAt( 0.0, QColor(  0,  0,  0 ) );
+            buttonGradient.setColorAt( 1.0, QColor( 80, 80, 80 ) );
+
+            painter.setPen( Qt::NoPen );
+            painter.setBrush( buttonGradient );
             painter.drawEllipse( pos.x(), pos.y(), hs.width(), hs.height() );
         }
     }
