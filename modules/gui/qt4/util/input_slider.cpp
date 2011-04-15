@@ -252,29 +252,23 @@ void SeekSlider::paintEvent( QPaintEvent *event )
 
     barRect.moveCenter( rect().center() );
 
+    QColor backgroundBase( 135, 135, 135 );
     QLinearGradient backgroundGradient( 0, 0, 0, height() );
-    backgroundGradient.setColorAt( 0.0, QColor( 126, 126, 126 ) );
-    backgroundGradient.setColorAt( 0.30, QColor( 110, 110, 110 ) );
-    backgroundGradient.setColorAt( 0.31, QColor( 101, 101, 101 ) );
-    backgroundGradient.setColorAt( 1.0, QColor( 86, 86, 86 ) );
+    backgroundGradient.setColorAt( 0.0, backgroundBase );
+    backgroundGradient.setColorAt( 1.0, backgroundBase.lighter( 150 ) );
 
+    QColor foregroundBase( 50, 156, 255 );
     QLinearGradient foregroundGradient( 0, 0, 0, height() );
-    foregroundGradient.setColorAt( 0.0,  QColor( 26, 49, 128 ) );
-    foregroundGradient.setColorAt( 0.30, QColor( 28, 77, 175) );
-    foregroundGradient.setColorAt( 0.32, QColor( 32, 85, 177) );
-    foregroundGradient.setColorAt( 1.0,  QColor( 81, 50, 210 ) );
+    foregroundGradient.setColorAt( 0.0,  foregroundBase );
+    foregroundGradient.setColorAt( 1.0,  foregroundBase.darker( 140 ) );
 
-    //foregroundGradient.setColorAt( 0.0, palette().color( QPalette::Inactive, QPalette::Mid ) );
-    //foregroundGradient.setColorAt( 0.30, palette().color( QPalette::Inactive, QPalette::Light ) );
-    //foregroundGradient.setColorAt( 1.0, palette().color( QPalette::Inactive, QPalette::Midlight ) );
-
-    //foregroundGradient.setColorAt( 0.0, QColor( 35, 213, 7 ) );
-    //foregroundGradient.setColorAt( 0.30, QColor( 37, 133, 21 ) );
-    //foregroundGradient.setColorAt( 1.0, QColor( 81, 215, 55 ) );
+    painter.setPen( QColor( 230, 230, 230 ) );
+    painter.setBrush( Qt::NoBrush );
+    painter.drawRoundedRect( barRect.adjusted( 0, 2, 0, 0 ), barCorner, barCorner );
 
     painter.setPen( Qt::NoPen );
     painter.setBrush( backgroundGradient );
-    painter.drawRoundedRect( barRect.adjusted( 0, 0, 0, 0 ), barCorner, barCorner );
+    painter.drawRoundedRect( barRect, barCorner, barCorner );
 
     switch ( orientation() ) {
         case Qt::Horizontal:
@@ -287,13 +281,9 @@ void SeekSlider::paintEvent( QPaintEvent *event )
     }
 
     if ( option.sliderPosition > minimum() && option.sliderPosition <= maximum() ) {
-        painter.setPen( Qt::black );
-    //    painter.setBrush( foregroundGradient );
-
-        QBrush brush;
-        brush.setTexture( QPixmap( ":/progress" ) );
-        painter.setBrush( brush );
-        painter.drawRoundedRect( barRect.adjusted( 1, 1, -1, -1 ), barCorner, barCorner );
+        painter.setPen( Qt::NoPen );
+        painter.setBrush( foregroundGradient );
+        painter.drawRoundedRect( barRect.adjusted( 1, 1, -1, 0 ), barCorner, barCorner );
     }
 
     // draw handle
