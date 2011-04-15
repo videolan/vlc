@@ -43,7 +43,6 @@
 #include <QLabel>
 #include <QDoubleSpinBox>
 #include <QPushButton>
-#include <QVector>
 #include <QDialog>
 #include <QFontComboBox>
 
@@ -374,7 +373,7 @@ public slots:
     void onUpdate();
 private:
     void finish( bool );
-    QVector<checkBoxListItem*> modules;
+    QList<checkBoxListItem*> modules;
     QGroupBox *groupBox;
     QLineEdit *text;
 };
