@@ -403,26 +403,24 @@ add_makefile_cfg "EXTRA_LDFLAGS = ${EXTRA_LDFLAGS}"
 add_makefile_cfg "EXTRA_PATH = ${EXTRA_PATH}"
 
 #CMAKE
-if test "$TARGET" != "$BUILD"; then
-    toolchain_cmake="${BUILDDIR}/toolchain.cmake"
-    rm -f ${BUILDDIR}/toolchain.cmake
-    if test ${DISTRO} = "win32"; then
-        echo "SET(CMAKE_SYSTEM_NAME Windows)" >> "${toolchain_cmake}"
-        echo "SET(CMAKE_RC_COMPILER ${TARGET}-windres)" >> "${toolchain_cmake}"
-    fi
-    case "$DISTRO" in macosx*)
-        echo "SET(CMAKE_SYSTEM_NAME Darwin)" >> "${toolchain_cmake}"
-        echo "set(CMAKE_C_FLAGS ${CFLAGS_TUNING} ${EXTRA_CFLAGS})" >> "${toolchain_cmake}"
-        echo "set(CMAKE_CXX_FLAGS ${CFLAGS_TUNING} ${EXTRA_CFLAGS})" >> "${toolchain_cmake}"
-        echo "set(CMAKE_LD_FLAGS ${EXTRA_LDFLAGS})" >> "${toolchain_cmake}"
-    esac
-    echo "SET(CMAKE_C_COMPILER ${CC})" >> "${toolchain_cmake}"
-    echo "SET(CMAKE_CXX_COMPILER ${CXX})" >> "${toolchain_cmake}"
-    echo "SET(CMAKE_FIND_ROOT_PATH  `pwd` )" >> "${toolchain_cmake}"
-    echo "set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)" >> "${toolchain_cmake}"
-    echo "set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)" >> "${toolchain_cmake}"
-    echo "set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)" >> "${toolchain_cmake}"
+toolchain_cmake="${BUILDDIR}/toolchain.cmake"
+rm -f ${BUILDDIR}/toolchain.cmake
+if test ${DISTRO} = "win32"; then
+    echo "SET(CMAKE_SYSTEM_NAME Windows)" >> "${toolchain_cmake}"
+    echo "SET(CMAKE_RC_COMPILER ${TARGET}-windres)" >> "${toolchain_cmake}"
 fi
+case "$DISTRO" in macosx*)
+    echo "SET(CMAKE_SYSTEM_NAME Darwin)" >> "${toolchain_cmake}"
+    echo "set(CMAKE_C_FLAGS ${CFLAGS_TUNING} ${EXTRA_CFLAGS})" >> "${toolchain_cmake}"
+    echo "set(CMAKE_CXX_FLAGS ${CFLAGS_TUNING} ${EXTRA_CFLAGS})" >> "${toolchain_cmake}"
+    echo "set(CMAKE_LD_FLAGS ${EXTRA_LDFLAGS})" >> "${toolchain_cmake}"
+esac
+echo "SET(CMAKE_C_COMPILER ${CC})" >> "${toolchain_cmake}"
+echo "SET(CMAKE_CXX_COMPILER ${CXX})" >> "${toolchain_cmake}"
+echo "SET(CMAKE_FIND_ROOT_PATH  `pwd` )" >> "${toolchain_cmake}"
+echo "set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)" >> "${toolchain_cmake}"
+echo "set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)" >> "${toolchain_cmake}"
+echo "set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)" >> "${toolchain_cmake}"
 
 if wget --version >/dev/null 2>&1; then
     add_makefile_cfg "WGET = \"`which wget`\" -c --passive"
