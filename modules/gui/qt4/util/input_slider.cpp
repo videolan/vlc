@@ -56,6 +56,8 @@ SeekSlider::SeekSlider( Qt::Orientation q, QWidget *_parent )
     seekLimitTimer = new QTimer( this );
     seekLimitTimer->setSingleShot( true );
 
+    /* Timer used to avoid flickering when the mouse leave the slider
+       and is over the tooltip */
     hideTooltipTimer = new QTimer( this );
     hideTooltipTimer->setSingleShot( true );
 
@@ -175,6 +177,7 @@ void SeekSlider::wheelEvent( QWheelEvent *event )
 
 void SeekSlider::enterEvent( QEvent *e )
 {
+    /* Don't show the tooltip if the slider is disabled */
     if ( isEnabled() )
     {
         hideTooltipTimer->stop();
@@ -184,13 +187,14 @@ void SeekSlider::enterEvent( QEvent *e )
 
 void SeekSlider::leaveEvent( QEvent *e )
 {
+    /* Wait 100ms before hiding the tooltip */
     hideTooltipTimer->start( 100 );
 }
 
 bool SeekSlider::eventFilter( QObject *obj, QEvent *event )
 {
-    // This eventFilter avoids a flicker that occurs if the
-    // mouse cursor leaves the SeekSlider for the TimeTooltip.
+    /* This eventFilter avoids a flicker that occurs if the
+       mouse cursor leaves the SeekSlider for the TimeTooltip. */
     if ( obj == mTimeTooltip )
     {
         if ( event->type() == QEvent::Enter )
@@ -232,6 +236,7 @@ void SeekSlider::paintEvent( QPaintEvent *event )
     int range           = MAXIMUM;
     QRect barRect       = rect();
 
+    // adjust positions based on the current orientation
     if ( option.sliderPosition != 0 )
     {
         switch ( orientation() )
@@ -259,24 +264,29 @@ void SeekSlider::paintEvent( QPaintEvent *event )
 
     barRect.moveCenter( rect().center() );
 
+    // set the background color and gradient
     QColor backgroundBase( 135, 135, 135 );
     QLinearGradient backgroundGradient( 0, 0, 0, height() );
     backgroundGradient.setColorAt( 0.0, backgroundBase );
     backgroundGradient.setColorAt( 1.0, backgroundBase.lighter( 150 ) );
 
+    // set the foreground color and gradient
     QColor foregroundBase( 50, 156, 255 );
     QLinearGradient foregroundGradient( 0, 0, 0, height() );
     foregroundGradient.setColorAt( 0.0,  foregroundBase );
     foregroundGradient.setColorAt( 1.0,  foregroundBase.darker( 140 ) );
 
+    // draw a slight 3d effect on the bottom
     painter.setPen( QColor( 230, 230, 230 ) );
     painter.setBrush( Qt::NoBrush );
     painter.drawRoundedRect( barRect.adjusted( 0, 2, 0, 0 ), barCorner, barCorner );
 
+    // draw background
     painter.setPen( Qt::NoPen );
     painter.setBrush( backgroundGradient );
     painter.drawRoundedRect( barRect, barCorner, barCorner );
 
+    // adjusted foreground rectangle
     QRect valueRect = barRect.adjusted( 1, 1, -1, 0 );
 
     switch ( orientation() )
@@ -292,6 +302,7 @@ void SeekSlider::paintEvent( QPaintEvent *event )
 
     if ( option.sliderPosition > minimum() && option.sliderPosition <= maximum() )
     {
+        // draw foreground
         painter.setPen( Qt::NoPen );
         painter.setBrush( foregroundGradient );
         painter.drawRoundedRect( valueRect, barCorner, barCorner );
