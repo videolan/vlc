@@ -293,7 +293,7 @@ void SeekSlider::paintEvent( QPaintEvent *event )
     if ( option.state & QStyle::State_MouseOver ) {
 
         if ( sliderPos != -1 ) {
-            const int margin = 5;
+            const int margin = 0;
             QSize hs = handleSize() -QSize( 5, 5 );
             QPoint pos;
 
