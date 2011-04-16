@@ -271,20 +271,22 @@ void SeekSlider::paintEvent( QPaintEvent *event )
     painter.setBrush( backgroundGradient );
     painter.drawRoundedRect( barRect, barCorner, barCorner );
 
+    QRect valueRect = barRect.adjusted( 1, 1, -1, 0 );
+
     switch ( orientation() ) {
         case Qt::Horizontal:
-            barRect.setWidth( qMin( width(), int( sliderPos ) ) );
+            valueRect.setWidth( qMin( width(), int( sliderPos ) ) );
             break;
         case Qt::Vertical:
-            barRect.setHeight( qMin( height(), int( sliderPos ) ) );
-            barRect.moveBottom( rect().bottom() );
+            valueRect.setHeight( qMin( height(), int( sliderPos ) ) );
+            valueRect.moveBottom( rect().bottom() );
             break;
     }
 
     if ( option.sliderPosition > minimum() && option.sliderPosition <= maximum() ) {
         painter.setPen( Qt::NoPen );
         painter.setBrush( foregroundGradient );
-        painter.drawRoundedRect( barRect.adjusted( 1, 1, -1, 0 ), barCorner, barCorner );
+        painter.drawRoundedRect( valueRect, barCorner, barCorner );
     }
 
     // draw handle
