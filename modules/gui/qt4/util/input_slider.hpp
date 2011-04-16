@@ -45,15 +45,15 @@ public:
     SeekSlider( Qt::Orientation q, QWidget *_parent );
 
 protected:
-    virtual void mouseMoveEvent(QMouseEvent *event);
-    virtual void mousePressEvent(QMouseEvent* event);
-    virtual void mouseReleaseEvent(QMouseEvent* event);
-    virtual void wheelEvent(QWheelEvent *event);
+    virtual void mouseMoveEvent( QMouseEvent *event );
+    virtual void mousePressEvent( QMouseEvent* event );
+    virtual void mouseReleaseEvent( QMouseEvent *event );
+    virtual void wheelEvent( QWheelEvent *event );
     virtual void enterEvent( QEvent * );
     virtual void leaveEvent( QEvent * );
 
     virtual void paintEvent( QPaintEvent* event );
-    virtual bool eventFilter(QObject *obj, QEvent *event);
+    virtual bool eventFilter( QObject *obj, QEvent *event );
 
     QSize handleSize() const;
     QSize sizeHint() const;
@@ -92,7 +92,7 @@ protected:
     const static int paddingL = 3;
     const static int paddingR = 2;
 
-    virtual void paintEvent(QPaintEvent *);
+    virtual void paintEvent( QPaintEvent *);
     virtual void wheelEvent( QWheelEvent *event );
     virtual void mousePressEvent( QMouseEvent * );
     virtual void mouseMoveEvent( QMouseEvent * );

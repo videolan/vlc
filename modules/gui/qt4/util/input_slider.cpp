@@ -66,7 +66,7 @@ SeekSlider::SeekSlider( Qt::Orientation q, QWidget *_parent )
     setRange( MINIMUM, MAXIMUM );
     setSingleStep( 2 );
     setPageStep( 10 );
-    setMouseTracking(true);
+    setMouseTracking( true );
     setTracking( true );
     setFocusPolicy( Qt::NoFocus );
 
@@ -74,7 +74,7 @@ SeekSlider::SeekSlider( Qt::Orientation q, QWidget *_parent )
     setPosition( -1.0, 0, 0 );
     secstotimestr( psz_length, 0 );
 
-    CONNECT( this, sliderMoved(int), this, startSeekTimer( int ) );
+    CONNECT( this, sliderMoved( int ), this, startSeekTimer( int ) );
     CONNECT( seekLimitTimer, timeout(), this, updatePos() );
     CONNECT( hideTooltipTimer, timeout(), mTimeTooltip, hide() );
 
@@ -99,7 +99,7 @@ void SeekSlider::setPosition( float pos, int64_t time, int length )
         setEnabled( true );
 
     if( !b_isSliding )
-        setValue( (int)(pos * 1000.0 ) );
+        setValue( (int)( pos * 1000.0 ) );
 
     inputLength = length;
 }
@@ -113,7 +113,7 @@ void SeekSlider::startSeekTimer( int new_value )
 
 void SeekSlider::updatePos()
 {
-    float f_pos = (float)(value())/1000.0;
+    float f_pos = (float)( value() ) / 1000.0;
     emit sliderDragged( f_pos ); /* Send new position to VLC's core */
 }
 
@@ -126,7 +126,7 @@ void SeekSlider::mouseReleaseEvent( QMouseEvent *event )
     updatePos();
 }
 
-void SeekSlider::mousePressEvent(QMouseEvent* event)
+void SeekSlider::mousePressEvent( QMouseEvent* event )
 {
     /* Right-click */
     if( event->button() != Qt::LeftButton &&
@@ -137,11 +137,11 @@ void SeekSlider::mousePressEvent(QMouseEvent* event)
     }
 
     b_isSliding = true ;
-    setValue( QStyle::sliderValueFromPosition( MINIMUM, MAXIMUM, event->x(), width(), false) );
+    setValue( QStyle::sliderValueFromPosition( MINIMUM, MAXIMUM, event->x(), width(), false ) );
     event->accept();
 }
 
-void SeekSlider::mouseMoveEvent(QMouseEvent *event)
+void SeekSlider::mouseMoveEvent( QMouseEvent *event )
 {
     if( b_isSliding )
     {
@@ -153,29 +153,29 @@ void SeekSlider::mouseMoveEvent(QMouseEvent *event)
      QPoint p( event->globalX() - mTimeTooltip->width() / 2,
                QWidget::mapToGlobal( pos() ).y() - ( mTimeTooltip->height() + 2 ) );
 
-    secstotimestr( psz_length, ( event->x() * inputLength) / size().width() );
+    secstotimestr( psz_length, ( event->x() * inputLength ) / size().width() );
     mTimeTooltip->setTime( psz_length );
     mTimeTooltip->move( p );
     event->accept();
 }
 
-void SeekSlider::wheelEvent( QWheelEvent *event)
+void SeekSlider::wheelEvent( QWheelEvent *event )
 {
     /* Don't do anything if we are for somehow reason sliding */
     if( !b_isSliding )
     {
-        setValue( value() + event->delta()/12 ); /* 12 = 8 * 15 / 10
+        setValue( value() + event->delta() / 12 ); /* 12 = 8 * 15 / 10
          Since delta is in 1/8 of ° and mouse have steps of 15 °
          and that our slider is in 0.1% and we want one step to be a 1%
          increment of position */
-        emit sliderDragged( value()/1000.0 );
+        emit sliderDragged( value() / 1000.0 );
     }
     event->accept();
 }
 
 void SeekSlider::enterEvent( QEvent *e )
 {
-    if (isEnabled())
+    if ( isEnabled() )
     {
         hideTooltipTimer->stop();
         mTimeTooltip->show();
@@ -184,19 +184,19 @@ void SeekSlider::enterEvent( QEvent *e )
 
 void SeekSlider::leaveEvent( QEvent *e )
 {
-    hideTooltipTimer->start(100);
+    hideTooltipTimer->start( 100 );
 }
 
 bool SeekSlider::eventFilter( QObject *obj, QEvent *event )
 {
     // This eventFilter avoids a flicker that occurs if the
     // mouse cursor leaves the SeekSlider for the TimeTooltip.
-    if (obj == mTimeTooltip)
+    if ( obj == mTimeTooltip )
     {
-        if (event->type() == QEvent::Enter)
+        if ( event->type() == QEvent::Enter )
             hideTooltipTimer->stop();
-        else if (event->type() == QEvent::Leave)
-            hideTooltipTimer->start(100);
+        else if ( event->type() == QEvent::Leave )
+            hideTooltipTimer->start( 100 );
         return false;
     }
     else
@@ -230,20 +230,25 @@ void SeekSlider::paintEvent( QPaintEvent *event )
     const int barCorner = 3;
     qreal sliderPos     = -1;
     int range           = MAXIMUM;
-    QRect barRect = rect();
+    QRect barRect       = rect();
 
-    if ( option.sliderPosition != 0 ) {
-        switch ( orientation() ) {
+    if ( option.sliderPosition != 0 )
+    {
+        switch ( orientation() )
+        {
             case Qt::Horizontal:
-                sliderPos = ( ( (qreal)width() ) /(qreal)range ) *(qreal)option.sliderPosition;
+                sliderPos = ( ( (qreal)width() ) / (qreal)range )
+                        * (qreal)option.sliderPosition;
                 break;
             case Qt::Vertical:
-                sliderPos = ( ( (qreal)height() ) /(qreal)range ) *(qreal)option.sliderPosition;
+                sliderPos = ( ( (qreal)height() ) / (qreal)range )
+                        * (qreal)option.sliderPosition;
                 break;
         }
     }
 
-    switch ( orientation() ) {
+    switch ( orientation() )
+    {
         case Qt::Horizontal:
             barRect.setHeight( handleSize().height() /2 );
             break;
@@ -274,7 +279,8 @@ void SeekSlider::paintEvent( QPaintEvent *event )
 
     QRect valueRect = barRect.adjusted( 1, 1, -1, 0 );
 
-    switch ( orientation() ) {
+    switch ( orientation() )
+    {
         case Qt::Horizontal:
             valueRect.setWidth( qMin( width(), int( sliderPos ) ) );
             break;
@@ -284,34 +290,39 @@ void SeekSlider::paintEvent( QPaintEvent *event )
             break;
     }
 
-    if ( option.sliderPosition > minimum() && option.sliderPosition <= maximum() ) {
+    if ( option.sliderPosition > minimum() && option.sliderPosition <= maximum() )
+    {
         painter.setPen( Qt::NoPen );
         painter.setBrush( foregroundGradient );
         painter.drawRoundedRect( valueRect, barCorner, barCorner );
     }
 
     // draw handle
-    if ( option.state & QStyle::State_MouseOver ) {
-
-        if ( sliderPos != -1 ) {
+    if ( option.state & QStyle::State_MouseOver )
+    {
+        if ( sliderPos != -1 )
+        {
             const int margin = 0;
-            QSize hs = handleSize() -QSize( 5, 5 );
+            QSize hs = handleSize() - QSize( 5, 5 );
             QPoint pos;
 
-            switch ( orientation() ) {
+            switch ( orientation() )
+            {
                 case Qt::Horizontal:
-                    pos = QPoint( sliderPos -( hs.width() /2 ), 2 );
+                    pos = QPoint( sliderPos - ( hs.width() / 2 ), 2 );
                     pos.rx() = qMax( margin, pos.x() );
-                    pos.rx() = qMin( width() -hs.width() -margin, pos.x() );
+                    pos.rx() = qMin( width() - hs.width() - margin, pos.x() );
                     break;
                 case Qt::Vertical:
-                    pos = QPoint( 2, height() -( sliderPos +( hs.height() /2 ) ) );
+                    pos = QPoint( 2, height() - ( sliderPos + ( hs.height() / 2 ) ) );
                     pos.ry() = qMax( margin, pos.y() );
-                    pos.ry() = qMin( height() -hs.height() -margin, pos.y() );
+                    pos.ry() = qMin( height() - hs.height() - margin, pos.y() );
                     break;
             }
 
-            QRadialGradient buttonGradient( pos.x() + ( hs.width() / 2 ) - 2, pos.y() + ( hs.height() / 2 ) - 2, qMax( hs.width(), hs.height() ) );
+            QRadialGradient buttonGradient( pos.x() + ( hs.width() / 2 ) - 2,
+                                            pos.y() + ( hs.height() / 2 ) - 2,
+                                            qMax( hs.width(), hs.height() ) );
             buttonGradient.setColorAt( 0.0, QColor(  0,  0,  0 ) );
             buttonGradient.setColorAt( 1.0, QColor( 80, 80, 80 ) );
 
