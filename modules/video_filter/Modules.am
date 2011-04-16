@@ -76,6 +76,7 @@ SOURCES_atmo = atmo/atmo.cpp \
 	atmo/FnordlichtConnection.cpp atmo/FnordlichtConnection.h \
 	atmo/AtmoPacketQueue.cpp atmo/AtmoPacketQueue.h
 SOURCES_gradfun = gradfun.c gradfun.h
+SOURCES_subsdelay = subsdelay.c
 noinst_HEADERS = filter_picture.h
 
 libvlc_LTLIBRARIES += \
@@ -117,6 +118,7 @@ libvlc_LTLIBRARIES += \
 	libscene_plugin.la \
 	libsepia_plugin.la \
 	libsharpen_plugin.la \
+	libsubsdelay_plugin.la \
 	libtransform_plugin.la \
 	libwall_plugin.la \
 	libwave_plugin.la \
