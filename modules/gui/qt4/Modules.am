@@ -104,7 +104,6 @@ DEPS_res = \
 	pixmaps/eject.png \
 	pixmaps/faster.png \
 	pixmaps/go-next.png \
-	pixmaps/progress.png \
 	pixmaps/menus/help_16px.png \
 	pixmaps/menus/info_16px.png \
 	pixmaps/menus/messages_16px.png \
