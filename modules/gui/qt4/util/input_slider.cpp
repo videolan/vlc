@@ -146,6 +146,7 @@ void SeekSlider::mouseMoveEvent(QMouseEvent *event)
     if( b_isSliding )
     {
         setValue( QStyle::sliderValueFromPosition( MINIMUM, MAXIMUM, event->x(), width(), false) );
+        emit sliderMoved( value() );
     }
 
     /* Tooltip */
