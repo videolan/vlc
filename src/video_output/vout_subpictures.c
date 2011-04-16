@@ -1454,6 +1454,8 @@ void spu_PutSubpicture( spu_t *p_spu, subpicture_t *p_subpic )
     p_sys->psz_filter_chain_update = NULL;
     vlc_mutex_unlock( &p_sys->lock );
 
+    bool b_left_empty = false;
+
     vlc_mutex_lock( &p_sys->filter_chain_lock );
     if( psz_chain_update )
     {
@@ -1461,9 +1463,29 @@ void spu_PutSubpicture( spu_t *p_spu, subpicture_t *p_subpic )
 
         filter_chain_AppendFromString( p_spu->p->p_filter_chain, psz_chain_update );
 
-        free( psz_chain_update );
+        /* "sub-source"  was formerly "sub-filter", so now the "sub-filter"
+        configuration may contain sub-filters or sub-sources configurations.
+        if the filters chain was left empty it may indicate that it's a sub-source configuration */
+        b_left_empty = ( filter_chain_GetLength( p_spu->p->p_filter_chain ) == 0 );
     }
     vlc_mutex_unlock( &p_sys->filter_chain_lock );
+
+
+    if ( b_left_empty )
+    {
+        /* try to use the configuration as a sub-source configuration */
+
+        vlc_mutex_lock( &p_sys->lock );
+        if ( !p_sys->psz_source_chain_update || !*p_sys->psz_source_chain_update) /* null or empty */
+        {
+            free( p_sys->psz_source_chain_update );
+            p_sys->psz_source_chain_update = psz_chain_update;
+            psz_chain_update = NULL;
+        }
+        vlc_mutex_unlock( &p_sys->lock );
+    }
+
+    free( psz_chain_update );
 
     /* Run filter chain on the new subpicture */
     p_subpic = filter_chain_SubFilter(p_spu->p->p_filter_chain, p_subpic);
