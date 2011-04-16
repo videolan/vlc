@@ -67,6 +67,8 @@ static int VideoFilterCallback( vlc_object_t *, char const *,
                                 vlc_value_t, vlc_value_t, void * );
 static int SubSourceCallback( vlc_object_t *, char const *,
                               vlc_value_t, vlc_value_t, void * );
+static int SubFilterCallback( vlc_object_t *, char const *,
+                              vlc_value_t, vlc_value_t, void * );
 static int SubMarginCallback( vlc_object_t *, char const *,
                               vlc_value_t, vlc_value_t, void * );
 
@@ -320,6 +322,12 @@ void vout_IntfInit( vout_thread_t *p_vout )
     var_AddCallback( p_vout, "sub-source", SubSourceCallback, NULL );
     var_TriggerCallback( p_vout, "sub-source" );
 
+    /* Add a sub-filter variable */
+    var_Create( p_vout, "sub-filter",
+                VLC_VAR_STRING | VLC_VAR_DOINHERIT | VLC_VAR_ISCOMMAND );
+    var_AddCallback( p_vout, "sub-filter", SubFilterCallback, NULL );
+    var_TriggerCallback( p_vout, "sub-filter" );
+
     /* Add sub-margin variable */
     var_Create( p_vout, "sub-margin",
                 VLC_VAR_INTEGER | VLC_VAR_DOINHERIT | VLC_VAR_ISCOMMAND );
@@ -469,6 +477,10 @@ void vout_EnableFilter( vout_thread_t *p_vout, const char *psz_name,
     else if( module_provides( p_obj, "sub source" ) )
     {
         psz_filter_type = "sub-source";
+    }
+    else if( module_provides( p_obj, "sub filter" ) )
+    {
+        psz_filter_type = "sub-filter";
     }
     else
     {
@@ -660,6 +672,16 @@ static int SubSourceCallback( vlc_object_t *p_this, char const *psz_cmd,
     VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval); VLC_UNUSED(p_data);
 
     vout_ControlChangeSubSources( p_vout, newval.psz_string );
+    return VLC_SUCCESS;
+}
+
+static int SubFilterCallback( vlc_object_t *p_this, char const *psz_cmd,
+                              vlc_value_t oldval, vlc_value_t newval, void *p_data)
+{
+    vout_thread_t *p_vout = (vout_thread_t *)p_this;
+    VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval); VLC_UNUSED(p_data);
+
+    vout_ControlChangeSubFilters( p_vout, newval.psz_string );
     return VLC_SUCCESS;
 }
 

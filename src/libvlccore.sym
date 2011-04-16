@@ -133,6 +133,7 @@ filter_chain_MouseEvent
 filter_chain_New
 filter_chain_Reset
 filter_chain_SubSource
+filter_chain_SubFilter
 filter_chain_VideoFilter
 filter_chain_VideoFlush
 filter_ConfigureBlend
@@ -400,6 +401,7 @@ spu_Create
 spu_Destroy
 spu_PutSubpicture
 spu_ChangeSources
+spu_ChangeFilters
 spu_Render
 spu_RegisterChannel
 spu_ClearChannel

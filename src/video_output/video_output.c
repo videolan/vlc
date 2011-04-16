@@ -557,6 +557,11 @@ void vout_ControlChangeSubSources(vout_thread_t *vout, const char *filters)
     vout_control_PushString(&vout->p->control, VOUT_CONTROL_CHANGE_SUB_SOURCES,
                             filters);
 }
+void vout_ControlChangeSubFilters(vout_thread_t *vout, const char *filters)
+{
+    vout_control_PushString(&vout->p->control, VOUT_CONTROL_CHANGE_SUB_FILTERS,
+                            filters);
+}
 void vout_ControlChangeSubMargin(vout_thread_t *vout, int margin)
 {
     vout_control_PushInteger(&vout->p->control, VOUT_CONTROL_CHANGE_SUB_MARGIN,
@@ -1176,6 +1181,12 @@ static void ThreadChangeSubSources(vout_thread_t *vout, const char *filters)
 {
     spu_ChangeSources(vout->p->spu, filters);
 }
+
+static void ThreadChangeSubFilters(vout_thread_t *vout, const char *filters)
+{
+    spu_ChangeFilters(vout->p->spu, filters);
+}
+
 static void ThreadChangeSubMargin(vout_thread_t *vout, int margin)
 {
     spu_ChangeMargin(vout->p->spu, margin);
@@ -1517,6 +1528,9 @@ static void *Thread(void *object)
                 break;
             case VOUT_CONTROL_CHANGE_SUB_SOURCES:
                 ThreadChangeSubSources(vout, cmd.u.string);
+                break;
+            case VOUT_CONTROL_CHANGE_SUB_FILTERS:
+                ThreadChangeSubFilters(vout, cmd.u.string);
                 break;
             case VOUT_CONTROL_CHANGE_SUB_MARGIN:
                 ThreadChangeSubMargin(vout, cmd.u.integer);

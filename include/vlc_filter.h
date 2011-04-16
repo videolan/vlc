@@ -118,6 +118,12 @@ struct filter_t
 
         struct
         {
+            subpicture_t * (*pf_filter) ( filter_t *, subpicture_t * );
+        } subf;
+#define pf_sub_filter      u.subf.pf_filter
+
+        struct
+        {
             int         (*pf_text) ( filter_t *, subpicture_region_t *,
                                      subpicture_region_t * );
             int         (*pf_html) ( filter_t *, subpicture_region_t *,
@@ -400,6 +406,15 @@ VLC_EXPORT( block_t *, filter_chain_AudioFilter, ( filter_chain_t *, block_t * )
  * \param display_date of subpictures
  */
 VLC_EXPORT( void, filter_chain_SubSource, ( filter_chain_t *, mtime_t ) );
+
+/**
+ * Apply filter chain to subpictures.
+ *
+ * \param p_chain pointer to filter chain
+ * \param p_subpicture subpicture to apply filters on
+ * \return modified subpicture after applying all subpicture filters
+ */
+VLC_EXPORT( subpicture_t *, filter_chain_SubFilter, ( filter_chain_t *, subpicture_t * ) );
 
 /**
  * Apply the filter chain to a mouse state.

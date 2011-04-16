@@ -814,6 +814,11 @@ static const char *const ppsz_clock_descriptions[] =
     "This adds so-called \"subpicture sources\". These filters overlay " \
     "some images or text over the video (like a logo, arbitrary text, ...)." )
 
+#define SUB_FILTER_TEXT N_("Subpictures filter module")
+#define SUB_FILTER_LONGTEXT N_( \
+    "This adds so-called \"subpicture filters\". These filter subpictures " \
+    "created by subtitles decoders or other subpictures sources." )
+
 #define SUB_AUTO_TEXT N_("Autodetect subtitle files")
 #define SUB_AUTO_LONGTEXT N_( \
     "Automatically detect a subtitle file, if no subtitle filename is " \
@@ -1804,6 +1809,8 @@ vlc_module_begin ()
     set_section( N_( "Overlays" ) , NULL )
     add_module_list_cat( "sub-source", SUBCAT_VIDEO_SUBPIC, NULL, NULL,
                 SUB_SOURCE_TEXT, SUB_SOURCE_LONGTEXT, false )
+    add_module_list_cat( "sub-filter", SUBCAT_VIDEO_SUBPIC, NULL, NULL,
+                SUB_FILTER_TEXT, SUB_FILTER_LONGTEXT, false )
 
 /* Input options */
     set_category( CAT_INPUT )

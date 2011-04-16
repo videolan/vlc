@@ -303,6 +303,10 @@ void ExtVideo::ChangeVFiltersString( const char *psz_name, bool b_add )
     {
         psz_filter_type = "sub-source";
     }
+    else if( module_provides( p_obj, "sub filter" ) )
+    {
+        psz_filter_type = "sub-filter";
+    }
     else
     {
         module_release (p_obj);

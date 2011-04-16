@@ -40,6 +40,7 @@ enum {
     VOUT_CONTROL_OSD_TITLE,             /* string */
     VOUT_CONTROL_CHANGE_FILTERS,        /* string */
     VOUT_CONTROL_CHANGE_SUB_SOURCES,    /* string */
+    VOUT_CONTROL_CHANGE_SUB_FILTERS,    /* string */
     VOUT_CONTROL_CHANGE_SUB_MARGIN,     /* integer */
 
     VOUT_CONTROL_PAUSE,

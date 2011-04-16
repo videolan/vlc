@@ -83,9 +83,12 @@ struct spu_private_t
     uint8_t palette[4][4];                               /**< forced palette */
 
     /* Subpiture filters */
-    char           *psz_chain_update;
-    vlc_mutex_t    chain_lock;
-    filter_chain_t *p_chain;
+    char           *psz_source_chain_update;
+    vlc_mutex_t    source_chain_lock;
+    filter_chain_t *p_source_chain;
+    char           *psz_filter_chain_update;
+    vlc_mutex_t    filter_chain_lock;
+    filter_chain_t *p_filter_chain;
 
     /* */
     mtime_t i_last_sort_date;
@@ -1317,11 +1320,17 @@ spu_t *spu_Create( vlc_object_t *p_this )
     /* Register the default subpicture channel */
     p_sys->i_channel = SPU_DEFAULT_CHANNEL + 1;
 
-    p_sys->psz_chain_update = NULL;
-    vlc_mutex_init( &p_sys->chain_lock );
-    p_sys->p_chain = filter_chain_New( p_spu, "sub source", false,
+    p_sys->psz_source_chain_update = NULL;
+    p_sys->psz_filter_chain_update = NULL;
+    vlc_mutex_init( &p_sys->source_chain_lock );
+    vlc_mutex_init( &p_sys->filter_chain_lock );
+    p_sys->p_source_chain = filter_chain_New( p_spu, "sub source", false,
                                        SubSourceAllocationInit,
                                        SubSourceAllocationClean,
+                                       p_spu );
+    p_sys->p_filter_chain = filter_chain_New( p_spu, "sub filter", false,
+                                       NULL,
+                                       NULL,
                                        p_spu );
 
     /* Load text and scale module */
@@ -1361,9 +1370,12 @@ void spu_Destroy( spu_t *p_spu )
     if( p_sys->p_scale )
         FilterRelease( p_sys->p_scale );
 
-    filter_chain_Delete( p_sys->p_chain );
-    vlc_mutex_destroy( &p_sys->chain_lock );
-    free( p_sys->psz_chain_update );
+    filter_chain_Delete( p_sys->p_source_chain );
+    filter_chain_Delete( p_sys->p_filter_chain );
+    vlc_mutex_destroy( &p_sys->source_chain_lock );
+    vlc_mutex_destroy( &p_sys->filter_chain_lock );
+    free( p_sys->psz_source_chain_update );
+    free( p_sys->psz_filter_chain_update );
 
     /* Destroy all remaining subpictures */
     SpuHeapClean( &p_sys->heap );
@@ -1417,9 +1429,9 @@ int spu_ProcessMouse( spu_t *p_spu,
 {
     spu_private_t *p_sys = p_spu->p;
 
-    vlc_mutex_lock( &p_sys->chain_lock );
-    filter_chain_MouseEvent( p_sys->p_chain, p_mouse, p_fmt );
-    vlc_mutex_unlock( &p_sys->chain_lock );
+    vlc_mutex_lock( &p_sys->source_chain_lock );
+    filter_chain_MouseEvent( p_sys->p_source_chain, p_mouse, p_fmt );
+    vlc_mutex_unlock( &p_sys->source_chain_lock );
 
     return VLC_SUCCESS;
 }
@@ -1435,6 +1447,28 @@ int spu_ProcessMouse( spu_t *p_spu,
 void spu_PutSubpicture( spu_t *p_spu, subpicture_t *p_subpic )
 {
     spu_private_t *p_sys = p_spu->p;
+
+    /* Update sub-filter chain */
+    vlc_mutex_lock( &p_sys->lock );
+    char *psz_chain_update = p_sys->psz_filter_chain_update;
+    p_sys->psz_filter_chain_update = NULL;
+    vlc_mutex_unlock( &p_sys->lock );
+
+    vlc_mutex_lock( &p_sys->filter_chain_lock );
+    if( psz_chain_update )
+    {
+        filter_chain_Reset( p_sys->p_filter_chain, NULL, NULL );
+
+        filter_chain_AppendFromString( p_spu->p->p_filter_chain, psz_chain_update );
+
+        free( psz_chain_update );
+    }
+    vlc_mutex_unlock( &p_sys->filter_chain_lock );
+
+    /* Run filter chain on the new subpicture */
+    p_subpic = filter_chain_SubFilter(p_spu->p->p_filter_chain, p_subpic);
+    if( !p_subpic )
+        return;
 
     /* SPU_DEFAULT_CHANNEL always reset itself */
     if( p_subpic->i_channel == SPU_DEFAULT_CHANNEL )
@@ -1468,22 +1502,22 @@ subpicture_t *spu_Render( spu_t *p_spu,
 
     /* Update sub-source chain */
     vlc_mutex_lock( &p_sys->lock );
-    char *psz_chain_update = p_sys->psz_chain_update;
-    p_sys->psz_chain_update = NULL;
+    char *psz_chain_update = p_sys->psz_source_chain_update;
+    p_sys->psz_source_chain_update = NULL;
     vlc_mutex_unlock( &p_sys->lock );
 
-    vlc_mutex_lock( &p_sys->chain_lock );
+    vlc_mutex_lock( &p_sys->source_chain_lock );
     if( psz_chain_update )
     {
-        filter_chain_Reset( p_sys->p_chain, NULL, NULL );
+        filter_chain_Reset( p_sys->p_source_chain, NULL, NULL );
 
-        filter_chain_AppendFromString( p_spu->p->p_chain, psz_chain_update );
+        filter_chain_AppendFromString( p_spu->p->p_source_chain, psz_chain_update );
 
         free( psz_chain_update );
     }
     /* Run subpicture sources */
-    filter_chain_SubSource( p_sys->p_chain, render_osd_date );
-    vlc_mutex_unlock( &p_sys->chain_lock );
+    filter_chain_SubSource( p_sys->p_source_chain, render_osd_date );
+    vlc_mutex_unlock( &p_sys->source_chain_lock );
 
     static const vlc_fourcc_t p_chroma_list_default_yuv[] = {
         VLC_CODEC_YUVA,
@@ -1603,8 +1637,20 @@ void spu_ChangeSources( spu_t *p_spu, const char *psz_filters )
 
     vlc_mutex_lock( &p_sys->lock );
 
-    free( p_sys->psz_chain_update );
-    p_sys->psz_chain_update = strdup( psz_filters );
+    free( p_sys->psz_source_chain_update );
+    p_sys->psz_source_chain_update = strdup( psz_filters );
+
+    vlc_mutex_unlock( &p_sys->lock );
+}
+
+void spu_ChangeFilters( spu_t *p_spu, const char *psz_filters )
+{
+    spu_private_t *p_sys = p_spu->p;
+
+    vlc_mutex_lock( &p_sys->lock );
+
+    free( p_sys->psz_filter_chain_update );
+    p_sys->psz_filter_chain_update = strdup( psz_filters );
 
     vlc_mutex_unlock( &p_sys->lock );
 }
