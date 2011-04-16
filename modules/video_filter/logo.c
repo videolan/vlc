@@ -87,9 +87,9 @@ vlc_module_begin ()
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_SUBPIC )
     set_help(LOGO_HELP)
-    set_capability( "sub filter", 0 )
+    set_capability( "sub source", 0 )
     set_callbacks( OpenSub, Close )
-    set_description( N_("Logo sub filter") )
+    set_description( N_("Logo sub source") )
     set_shortname( N_("Logo overlay") )
     add_shortcut( "logo" )
 
@@ -200,7 +200,7 @@ static logo_t *LogoListNext( logo_list_t *p_list, mtime_t i_date );
 static logo_t *LogoListCurrent( logo_list_t *p_list );
 
 /**
- * Open the sub filter
+ * Open the sub source
  */
 static int OpenSub( vlc_object_t *p_this )
 {
@@ -293,7 +293,7 @@ static int OpenCommon( vlc_object_t *p_this, bool b_sub )
     /* Misc init */
     if( b_sub )
     {
-        p_filter->pf_sub_filter = FilterSub;
+        p_filter->pf_sub_source = FilterSub;
     }
     else
     {
@@ -326,7 +326,7 @@ static void Close( vlc_object_t *p_this )
 }
 
 /**
- * Sub filter
+ * Sub source
  */
 static subpicture_t *FilterSub( filter_t *p_filter, mtime_t date )
 {

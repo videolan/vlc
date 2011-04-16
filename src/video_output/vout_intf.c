@@ -65,7 +65,7 @@ static int SnapshotCallback( vlc_object_t *, char const *,
                              vlc_value_t, vlc_value_t, void * );
 static int VideoFilterCallback( vlc_object_t *, char const *,
                                 vlc_value_t, vlc_value_t, void * );
-static int SubFilterCallback( vlc_object_t *, char const *,
+static int SubSourceCallback( vlc_object_t *, char const *,
                               vlc_value_t, vlc_value_t, void * );
 static int SubMarginCallback( vlc_object_t *, char const *,
                               vlc_value_t, vlc_value_t, void * );
@@ -314,11 +314,11 @@ void vout_IntfInit( vout_thread_t *p_vout )
     var_AddCallback( p_vout, "video-filter", VideoFilterCallback, NULL );
     var_TriggerCallback( p_vout, "video-filter" );
 
-    /* Add a sub-filter variable */
-    var_Create( p_vout, "sub-filter",
+    /* Add a sub-source variable */
+    var_Create( p_vout, "sub-source",
                 VLC_VAR_STRING | VLC_VAR_DOINHERIT | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_vout, "sub-filter", SubFilterCallback, NULL );
-    var_TriggerCallback( p_vout, "sub-filter" );
+    var_AddCallback( p_vout, "sub-source", SubSourceCallback, NULL );
+    var_TriggerCallback( p_vout, "sub-source" );
 
     /* Add sub-margin variable */
     var_Create( p_vout, "sub-margin",
@@ -466,9 +466,9 @@ void vout_EnableFilter( vout_thread_t *p_vout, const char *psz_name,
     {
         psz_filter_type = "video-filter";
     }
-    else if( module_provides( p_obj, "sub filter" ) )
+    else if( module_provides( p_obj, "sub source" ) )
     {
-        psz_filter_type = "sub-filter";
+        psz_filter_type = "sub-source";
     }
     else
     {
@@ -653,13 +653,13 @@ static int VideoFilterCallback( vlc_object_t *p_this, char const *psz_cmd,
     return VLC_SUCCESS;
 }
 
-static int SubFilterCallback( vlc_object_t *p_this, char const *psz_cmd,
+static int SubSourceCallback( vlc_object_t *p_this, char const *psz_cmd,
                               vlc_value_t oldval, vlc_value_t newval, void *p_data)
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
     VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval); VLC_UNUSED(p_data);
 
-    vout_ControlChangeSubFilters( p_vout, newval.psz_string );
+    vout_ControlChangeSubSources( p_vout, newval.psz_string );
     return VLC_SUCCESS;
 }
 

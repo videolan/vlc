@@ -318,7 +318,7 @@ int main( int i_argc, char *ppsz_argv[] ) {
 
     printf( "Please make sure vlc is running.\n"
             "You should append parameters similar to the following:\n"
-            "--sub-filter overlay{input=%s,output=%s}\n",
+            "--sub-source overlay{input=%s,output=%s}\n",
             ppsz_argv[1], ppsz_argv[2] );
 
     printf( "Opening FIFOs..." );

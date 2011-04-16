@@ -351,7 +351,7 @@ static VLCExtended *_o_sharedInstance = nil;
         } 
         else
         {
-            msg_Warn( p_intf, "the corresponding subfilter coundn't be found" );
+            msg_Warn( p_intf, "the corresponding subsource coundn't be found" );
         }
     } 
     else

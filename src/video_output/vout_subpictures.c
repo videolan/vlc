@@ -1253,7 +1253,7 @@ static void sub_del_buffer( filter_t *p_filter, subpicture_t *p_subpic )
     subpicture_Delete( p_subpic );
 }
 
-static int SubFilterAllocationInit( filter_t *p_filter, void *p_data )
+static int SubSourceAllocationInit( filter_t *p_filter, void *p_data )
 {
     spu_t *p_spu = p_data;
 
@@ -1271,7 +1271,7 @@ static int SubFilterAllocationInit( filter_t *p_filter, void *p_data )
     return VLC_SUCCESS;
 }
 
-static void SubFilterAllocationClean( filter_t *p_filter )
+static void SubSourceAllocationClean( filter_t *p_filter )
 {
     filter_owner_sys_t *p_sys = p_filter->p_owner;
 
@@ -1319,9 +1319,9 @@ spu_t *spu_Create( vlc_object_t *p_this )
 
     p_sys->psz_chain_update = NULL;
     vlc_mutex_init( &p_sys->chain_lock );
-    p_sys->p_chain = filter_chain_New( p_spu, "sub filter", false,
-                                       SubFilterAllocationInit,
-                                       SubFilterAllocationClean,
+    p_sys->p_chain = filter_chain_New( p_spu, "sub source", false,
+                                       SubSourceAllocationInit,
+                                       SubSourceAllocationClean,
                                        p_spu );
 
     /* Load text and scale module */
@@ -1466,7 +1466,7 @@ subpicture_t *spu_Render( spu_t *p_spu,
 {
     spu_private_t *p_sys = p_spu->p;
 
-    /* Update sub-filter chain */
+    /* Update sub-source chain */
     vlc_mutex_lock( &p_sys->lock );
     char *psz_chain_update = p_sys->psz_chain_update;
     p_sys->psz_chain_update = NULL;
@@ -1481,8 +1481,8 @@ subpicture_t *spu_Render( spu_t *p_spu,
 
         free( psz_chain_update );
     }
-    /* Run subpicture filters */
-    filter_chain_SubFilter( p_sys->p_chain, render_osd_date );
+    /* Run subpicture sources */
+    filter_chain_SubSource( p_sys->p_chain, render_osd_date );
     vlc_mutex_unlock( &p_sys->chain_lock );
 
     static const vlc_fourcc_t p_chroma_list_default_yuv[] = {
@@ -1597,7 +1597,7 @@ void spu_ClearChannel( spu_t *p_spu, int i_channel )
     vlc_mutex_unlock( &p_sys->lock );
 }
 
-void spu_ChangeFilters( spu_t *p_spu, const char *psz_filters )
+void spu_ChangeSources( spu_t *p_spu, const char *psz_filters )
 {
     spu_private_t *p_sys = p_spu->p;
 

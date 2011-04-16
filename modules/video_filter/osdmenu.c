@@ -84,7 +84,7 @@ static const char *const ppsz_pos_descriptions[] =
 { N_("Center"), N_("Left"), N_("Right"), N_("Top"), N_("Bottom"),
   N_("Top-Left"), N_("Top-Right"), N_("Bottom-Left"), N_("Bottom-Right") };
 
-/* subfilter functions */
+/* subsource functions */
 static int  CreateFilter ( vlc_object_t * );
 static void DestroyFilter( vlc_object_t * );
 static subpicture_t *Filter( filter_t *, mtime_t );
@@ -114,7 +114,7 @@ static int MouseEvent( filter_t *,
 #define OSD_UPDATE_MAX     1000
 
 vlc_module_begin ()
-    set_capability( "sub filter", 100 )
+    set_capability( "sub source", 100 )
     set_description( N_("On Screen Display menu") )
     set_shortname( N_("OSD menu") )
     add_shortcut( "osdmenu" )
@@ -144,7 +144,7 @@ vlc_module_begin ()
 vlc_module_end ()
 
 /*****************************************************************************
- * Sub filter code
+ * Sub source code
  *****************************************************************************/
 
 /*****************************************************************************
@@ -250,8 +250,8 @@ static int CreateFilter ( vlc_object_t *p_this )
     var_AddCallback( p_sys->p_menu, "osd-menu-visible",
                      OSDMenuVisibleEvent, p_filter );
 
-    /* Attach subpicture filter callback */
-    p_filter->pf_sub_filter = Filter;
+    /* Attach subpicture source callback */
+    p_filter->pf_sub_source = Filter;
     p_filter->pf_sub_mouse  = MouseEvent;
 
     es_format_Init( &p_filter->fmt_out, SPU_ES, VLC_CODEC_SPU );

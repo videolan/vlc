@@ -51,11 +51,11 @@ extern "C" {
  * The OSD menu core creates the OSD menu structure in memory. It parses a
  * configuration file that defines all elements that are part of the menu. The
  * core also handles all actions and menu structure updates on behalf of video
- * subpicture filters.
+ * subpicture sources.
  *
- * The file modules/video_filters/osdmenu.c implements a subpicture filter that
+ * The file modules/video_filters/osdmenu.c implements a subpicture source that
  * specifies the final information on positioning of the current state image.
- * A subpicture filter is called each time a video picture has to be rendered,
+ * A subpicture source is called each time a video picture has to be rendered,
  * it also gives a start and end date to the subpicture. The subpicture can be
  * streamed if used inside a transcoding command. For example:
  *
@@ -66,7 +66,7 @@ extern "C" {
  * An example for local usage of the OSD menu is:
  *
  *  vlc dvdsimple:///dev/dvd --extraintf rc
- *  --sub-filter osdmenu
+ *  --sub-source osdmenu
  *  --osdmenu-file=share/osdmenu/dvd.cfg
  *
  * Each OSD menu element, called "action", defines a hotkey action. Each action

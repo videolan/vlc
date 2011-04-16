@@ -201,7 +201,7 @@ function mosaic_code_update()
     if(! o.test( value( 'mosaic_output' ) ) )
     {
         code.value +=
-"setup bg option    sub-filter=mosaic\n"+
+"setup bg option    sub-source=mosaic\n"+
 "setup bg output    #bridge-in{offset=100}:display\n";
     }
     code.value+=

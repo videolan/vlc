@@ -174,11 +174,11 @@ static const char *const ppsz_align_descriptions[] =
 #define CFG_PREFIX "mosaic-"
 
 vlc_module_begin ()
-    set_description( N_("Mosaic video sub filter") )
+    set_description( N_("Mosaic video sub source") )
     set_shortname( N_("Mosaic") )
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_SUBPIC)
-    set_capability( "sub filter", 0 )
+    set_capability( "sub source", 0 )
     set_callbacks( CreateFilter, DestroyFilter )
 
     add_integer_with_range( CFG_PREFIX "alpha", 255, 0, 255, NULL,
@@ -294,7 +294,7 @@ static int CreateFilter( vlc_object_t *p_this )
     if( p_sys == NULL )
         return VLC_ENOMEM;
 
-    p_filter->pf_sub_filter = Filter;
+    p_filter->pf_sub_source = Filter;
 
     vlc_mutex_init( &p_sys->lock );
     vlc_mutex_lock( &p_sys->lock );

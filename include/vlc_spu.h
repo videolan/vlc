@@ -93,9 +93,9 @@ VLC_EXPORT( int, spu_RegisterChannel, ( spu_t * ) );
 VLC_EXPORT( void, spu_ClearChannel, ( spu_t *, int ) );
 
 /**
- * It changes the sub filters list
+ * It changes the sub sources list
  */
-VLC_EXPORT( void, spu_ChangeFilters, ( spu_t *, const char * ) );
+VLC_EXPORT( void, spu_ChangeSources, ( spu_t *, const char * ) );
 
 /** @}*/
 

@@ -103,7 +103,7 @@ struct filter_t
 
         struct
         {
-            subpicture_t * (*pf_filter)    ( filter_t *, mtime_t );
+            subpicture_t * (*pf_source)    ( filter_t *, mtime_t );
             subpicture_t * (*pf_buffer_new)( filter_t * );
             void           (*pf_buffer_del)( filter_t *, subpicture_t * );
             int            (*pf_mouse)     ( filter_t *,
@@ -111,7 +111,7 @@ struct filter_t
                                              const vlc_mouse_t *p_new,
                                              const video_format_t * );
         } sub;
-#define pf_sub_filter      u.sub.pf_filter
+#define pf_sub_source      u.sub.pf_source
 #define pf_sub_buffer_new  u.sub.pf_buffer_new
 #define pf_sub_buffer_del  u.sub.pf_buffer_del
 #define pf_sub_mouse       u.sub.pf_mouse
@@ -177,7 +177,7 @@ static inline void filter_FlushPictures( filter_t *p_filter )
 /**
  * This function will return a new subpicture usable by p_filter as an output
  * buffer. You have to release it using filter_DeleteSubpicture or by returning
- * it to the caller as a pf_sub_filter return value.
+ * it to the caller as a pf_sub_source return value.
  * Provided for convenience.
  *
  * \param p_filter filter_t object
@@ -399,7 +399,7 @@ VLC_EXPORT( block_t *, filter_chain_AudioFilter, ( filter_chain_t *, block_t * )
  * \param p_chain pointer to filter chain
  * \param display_date of subpictures
  */
-VLC_EXPORT( void, filter_chain_SubFilter, ( filter_chain_t *, mtime_t ) );
+VLC_EXPORT( void, filter_chain_SubSource, ( filter_chain_t *, mtime_t ) );
 
 /**
  * Apply the filter chain to a mouse state.
@@ -414,7 +414,7 @@ VLC_EXPORT( int, filter_chain_MouseFilter, ( filter_chain_t *, vlc_mouse_t *, co
 /**
  * Inform the filter chain of mouse state.
  *
- * It makes sense only for a sub filter chain.
+ * It makes sense only for a sub source chain.
  */
 VLC_EXPORT( int, filter_chain_MouseEvent, ( filter_chain_t *, const vlc_mouse_t *, const video_format_t * ) );
 

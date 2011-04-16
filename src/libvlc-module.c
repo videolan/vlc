@@ -786,9 +786,9 @@ static const char *const ppsz_clock_descriptions[] =
 // DEPRECATED
 #define SUB_CAT_LONGTEXT N_( \
     "These options allow you to modify the behavior of the subpictures " \
-    "subsystem. You can for example enable subpictures filters (logo, etc.). " \
+    "subsystem. You can for example enable subpictures sources (logo, etc.). " \
     "Enable these filters here and configure them in the " \
-    "\"subpictures filters\" modules section. You can also set many " \
+    "\"subsources filters\" modules section. You can also set many " \
     "miscellaneous subpictures options." )
 
 #define SUB_MARGIN_TEXT N_("Force subtitle position")
@@ -809,9 +809,9 @@ static const char *const ppsz_clock_descriptions[] =
 #define TEXTRENDERER_LONGTEXT N_( \
     "VLC normally uses Freetype for rendering, but this allows you to use svg for instance.")
 
-#define SUB_FILTER_TEXT N_("Subpictures filter module")
-#define SUB_FILTER_LONGTEXT N_( \
-    "This adds so-called \"subpicture filters\". These filters overlay " \
+#define SUB_SOURCE_TEXT N_("Subpictures source module")
+#define SUB_SOURCE_LONGTEXT N_( \
+    "This adds so-called \"subpicture sources\". These filters overlay " \
     "some images or text over the video (like a logo, arbitrary text, ...)." )
 
 #define SUB_AUTO_TEXT N_("Autodetect subtitle files")
@@ -1802,8 +1802,8 @@ vlc_module_begin ()
     add_integer( "sub-margin", 0, SUB_MARGIN_TEXT,
                  SUB_MARGIN_LONGTEXT, true )
     set_section( N_( "Overlays" ) , NULL )
-    add_module_list_cat( "sub-filter", SUBCAT_VIDEO_SUBPIC, NULL, NULL,
-                SUB_FILTER_TEXT, SUB_FILTER_LONGTEXT, false )
+    add_module_list_cat( "sub-source", SUBCAT_VIDEO_SUBPIC, NULL, NULL,
+                SUB_SOURCE_TEXT, SUB_SOURCE_LONGTEXT, false )
 
 /* Input options */
     set_category( CAT_INPUT )

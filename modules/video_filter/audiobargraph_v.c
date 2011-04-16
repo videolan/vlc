@@ -82,9 +82,9 @@ vlc_module_begin ()
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_SUBPIC )
 
-    set_capability( "sub filter", 0 )
+    set_capability( "sub source", 0 )
     set_callbacks( OpenSub, Close )
-    set_description( N_("Audio Bar Graph Video sub filter") )
+    set_description( N_("Audio Bar Graph Video sub source") )
     set_shortname( N_("Audio Bar Graph Video") )
     add_shortcut( "audiobargraph_v" )
 
@@ -102,7 +102,7 @@ vlc_module_begin ()
     add_submodule ()
     set_capability( "video filter2", 0 )
     set_callbacks( OpenVideo, Close )
-    set_description( N_("Audio Bar Graph Video sub filter") )
+    set_description( N_("Audio Bar Graph Video sub source") )
     add_shortcut( "audiobargraph_v" )
 vlc_module_end ()
 
@@ -174,7 +174,7 @@ static void LoadBarGraph( vlc_object_t *, BarGraph_t *);
 void parse_i_values( BarGraph_t *p_BarGraph, char *i_values);
 
 /**
- * Open the sub filter
+ * Open the sub source
  */
 static int OpenSub( vlc_object_t *p_this )
 {
@@ -262,7 +262,7 @@ static int OpenCommon( vlc_object_t *p_this, bool b_sub )
     /* Misc init */
     if( b_sub )
     {
-        p_filter->pf_sub_filter = FilterSub;
+        p_filter->pf_sub_source = FilterSub;
     }
     else
     {
@@ -302,7 +302,7 @@ static void Close( vlc_object_t *p_this )
 }
 
 /**
- * Sub filter
+ * Sub source
  */
 static subpicture_t *FilterSub( filter_t *p_filter, mtime_t date )
 {

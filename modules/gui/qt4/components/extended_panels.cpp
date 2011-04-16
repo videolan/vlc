@@ -299,9 +299,9 @@ void ExtVideo::ChangeVFiltersString( const char *psz_name, bool b_add )
     {
         psz_filter_type = "video-filter";
     }
-    else if( module_provides( p_obj, "sub filter" ) )
+    else if( module_provides( p_obj, "sub source" ) )
     {
-        psz_filter_type = "sub-filter";
+        psz_filter_type = "sub-source";
     }
     else
     {
