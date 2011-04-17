@@ -163,6 +163,8 @@ private:
     QFrame *discFrame();
     QFrame *telexFrame();
     void applyAttributes( QToolButton *, bool b_flat, bool b_big );
+
+    QHBoxLayout         *buttonGroupLayout;
 protected slots:
     virtual void setStatus( int );
 
@@ -197,7 +199,6 @@ public:
     /* p_intf, advanced control visible or not, blingbling or not */
     ControlsWidget( intf_thread_t *_p_i, bool b_advControls,
                     QWidget *_parent = 0 );
-    virtual ~ControlsWidget();
 
 protected:
     friend class MainInterface;

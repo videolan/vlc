@@ -61,6 +61,7 @@ AbstractController::AbstractController( intf_thread_t * _p_i, QWidget *_parent )
 {
     p_intf = _p_i;
     advControls = NULL;
+    buttonGroupLayout = NULL;
 
     /* Main action provider */
     toolbarActionsMapper = new QSignalMapper( this );
@@ -111,7 +112,7 @@ void AbstractController::parseAndCreate( const QString& config,
         QStringList list2 = list.at( i ).split( "-" );
         if( list2.size() < 1 )
         {
-            msg_Warn( p_intf, "Parsing error. Report this" );
+            msg_Warn( p_intf, "Parsing error 1. Please, report this." );
             continue;
         }
 
@@ -120,7 +121,7 @@ void AbstractController::parseAndCreate( const QString& config,
         buttonType_e i_type = (buttonType_e)list2.at( 0 ).toInt( &ok );
         if( !ok )
         {
-            msg_Warn( p_intf, "Parsing error 0. Please report this" );
+            msg_Warn( p_intf, "Parsing error 2. Please report this." );
             continue;
         }
 
@@ -129,12 +130,18 @@ void AbstractController::parseAndCreate( const QString& config,
             i_option = list2.at( 1 ).toInt( &ok );
             if( !ok )
             {
-                msg_Warn( p_intf, "Parsing error 1. Please report this" );
+                msg_Warn( p_intf, "Parsing error 3. Please, report this." );
                 continue;
             }
         }
 
         createAndAddWidget( controlLayout, -1, i_type, i_option );
+    }
+
+    if( buttonGroupLayout )
+    {
+        controlLayout->addLayout( buttonGroupLayout );
+        buttonGroupLayout = NULL;
     }
 }
 
@@ -143,23 +150,45 @@ void AbstractController::createAndAddWidget( QBoxLayout *controlLayout,
                                              buttonType_e i_type,
                                              int i_option )
 {
+    VLC_UNUSED( i_index ); // i_index should only be required for edition
+
+    /* Close the current buttonGroup if we have a special widget or a spacer */
+    if( buttonGroupLayout && i_type > BUTTON_MAX )
+    {
+        controlLayout->addLayout( buttonGroupLayout );
+        buttonGroupLayout = NULL;
+    }
+
     /* Special case for SPACERS, who aren't QWidgets */
     if( i_type == WIDGET_SPACER )
     {
-        controlLayout->insertSpacing( i_index, 12 );
-        return;
+        controlLayout->addSpacing( 12 );
     }
-
-    if(  i_type == WIDGET_SPACER_EXTEND )
+    else if(  i_type == WIDGET_SPACER_EXTEND )
     {
-        controlLayout->insertStretch( i_index, 12 );
-        return;
+        controlLayout->addStretch( 12 );
     }
+    else
+    {
+        /* Create the widget */
+        QWidget *widg = createWidget( i_type, i_option );
+        if( !widg ) return;
 
-    QWidget *widg = createWidget( i_type, i_option );
-    if( !widg ) return;
+        /* Buttons */
+        if( i_type < BUTTON_MAX )
+        {
+            if( !buttonGroupLayout )
+            {
+                buttonGroupLayout = new QHBoxLayout;
 
-    controlLayout->insertWidget( i_index, widg );
+            }
+            buttonGroupLayout->addWidget( widg );
+        }
+        else /* Special widgets */
+        {
+            controlLayout->addWidget( widg );
+        }
+    }
 }
 
 
