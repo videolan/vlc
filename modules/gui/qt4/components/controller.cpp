@@ -33,14 +33,12 @@
 #include "components/controller_widget.hpp"
 #include "components/interface_widgets.hpp"
 
-#include "dialogs_provider.hpp" /* Opening Dialogs */
-#include "input_manager.hpp"
-#include "actions_manager.hpp"
+#include "dialogs_provider.hpp"                     /* Opening Dialogs */
+#include "actions_manager.hpp"                             /* *_ACTION */
 
-#include "util/input_slider.hpp" /* SeekSlider */
-#include "util/customwidgets.hpp" /* qEventToKey */
+#include "util/input_slider.hpp"                         /* SeekSlider */
+#include "util/customwidgets.hpp"                       /* qEventToKey */
 
-#include <QSpacerItem>
 #include <QToolButton>
 #include <QHBoxLayout>
 #include <QRegion>
@@ -554,7 +552,7 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
     /* advanced Controls handling */
     b_advancedVisible = b_advControls;
 #if DEBUG_LAYOUT
-    setStyleSheet( " background: red ");
+    setStyleSheet( "background: red ");
 #endif
 
     setAttribute( Qt::WA_MacBrushedMetal);
@@ -580,9 +578,6 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
     controlLayout->addLayout( controlLayout2 );
 }
 
-ControlsWidget::~ControlsWidget()
-{}
-
 void ControlsWidget::toggleAdvanced()
 {
     if( !advControls ) return;
@@ -607,7 +602,7 @@ AdvControlsWidget::AdvControlsWidget( intf_thread_t *_p_i, QWidget *_parent ) :
     controlLayout->setMargin( 0 );
     controlLayout->setSpacing( 0 );
 #if DEBUG_LAYOUT
-    setStyleSheet( " background: orange ");
+    setStyleSheet( "background: orange ");
 #endif
 
 
@@ -623,7 +618,7 @@ InputControlsWidget::InputControlsWidget( intf_thread_t *_p_i, QWidget *_parent 
     controlLayout->setMargin( 0 );
     controlLayout->setSpacing( 0 );
 #if DEBUG_LAYOUT
-    setStyleSheet( " background: green ");
+    setStyleSheet( "background: green ");
 #endif
 
     QString line = getSettings()->value( "InputToolbar", INPT_TB_DEFAULT ).toString();

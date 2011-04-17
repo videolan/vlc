@@ -27,6 +27,7 @@
 
 #include "dialogs/toolbar.hpp"
 
+/* Widgets */
 #include "util/input_slider.hpp"
 #include "util/customwidgets.hpp"
 #include "components/interface_widgets.hpp"
@@ -37,6 +38,7 @@
 #include <QComboBox>
 #include <QListWidget>
 #include <QSpinBox>
+#include <QRubberBand>
 
 #include <QDragEnterEvent>
 #include <QDialogButtonBox>
@@ -770,4 +772,3 @@ bool DroppingController::eventFilter( QObject *obj, QEvent *event )
             return false;
     }
 }
-

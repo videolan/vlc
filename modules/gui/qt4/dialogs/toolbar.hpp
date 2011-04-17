@@ -27,13 +27,12 @@
 #include "util/qvlcframe.hpp"
 #include "components/controller.hpp"
 
-#include <QRubberBand>
 #include <QListWidget>
 #include <QCheckBox>
 
-#define PROFILE_NAME_1 "Modern Style"
+#define PROFILE_NAME_1 "VLC 1.1.x Style"
 #define VALUE_1 "0|64;39;64;38;65;|0-2;64;3;1;4;64;7;9;64;10;20;19;64-4;37;65;35-4;|12;11;13;14;|5-1;33;6-1;|0-2;64;3;1;4;64;37;64;38;64;8;65;35-4;34;"
-#define PROFILE_NAME_2 "Classic Style"
+#define PROFILE_NAME_2 "VLC 0.8.x Style"
 #define VALUE_2 "1|64;39-1;64;38;|2-1;32-4;0-5;1-5;32-5;3-5;5-5;6-5;4-5;32-5;10-1;64-1;35-1;65;|12-1;11-1;13-1;14-1;|33;37-4;|0-5;1-5;32-1;1-5;5-1;6-1;4-5;32-1;12-5;11-1;65;34-4;35-1;"
 #define PROFILE_NAME_3 "Minimalist Style"
 #define VALUE_3 "0|64;65;|0-7;64;3-1;1-5;4-1;64;12-5;64-5;37-5;38-5;64-4;10-1;65;36-4;|11-5;13-5;14-5;|5-1;33;6-1;|0-5;64;3-5;1-5;4-5;64;12-5;65;34-4;35-1;"
@@ -46,6 +45,7 @@ class ToolbarEditDialog;
 class DroppingController;
 class QCheckBox;
 class QComboBox;
+class QRubberBand;
 
 class WidgetListing : public QListWidget
 {
@@ -121,4 +121,3 @@ private:
 };
 
 #endif
-
