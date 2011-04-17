@@ -202,24 +202,38 @@ vlc_module_begin ()
     add_bool( "qt-minimal-view", false, QT_MINIMAL_MODE_TEXT,
               QT_MINIMAL_MODE_TEXT, false );
 
+    add_bool( "qt-system-tray", true, SYSTRAY_TEXT,
+          SYSTRAY_LONGTEXT, false)
     add_bool( "qt-notification", true, NOTIFICATION_TEXT,
               NOTIFICATION_LONGTEXT, false )
+    add_bool( "qt-start-minimized", false, MINIMIZED_TEXT,
+              MINIMIZED_LONGTEXT, true)
+    add_bool( "qt-pause-minimized", true, QT_PAUSE_MINIMIZED_TEXT,
+              QT_PAUSE_MINIMIZED_LONGTEXT, false )
 
     add_float_with_range( "qt-opacity", 1., 0.1, 1., NULL, OPACITY_TEXT,
                           OPACITY_LONGTEXT, false )
     add_float_with_range( "qt-fs-opacity", 0.8, 0.1, 1., NULL, OPACITY_FS_TEXT,
                           OPACITY_FS_LONGTEXT, false )
 
-    add_bool( "qt-system-tray", true, SYSTRAY_TEXT,
-              SYSTRAY_LONGTEXT, false)
-    add_bool( "qt-start-minimized", false, MINIMIZED_TEXT,
-              MINIMIZED_LONGTEXT, true)
     add_bool( "qt-video-autoresize", true, KEEPSIZE_TEXT,
               KEEPSIZE_LONGTEXT, false )
     add_bool( "qt-name-in-title", true, TITLE_TEXT,
               TITLE_LONGTEXT, false )
     add_bool( "qt-fs-controller", true, QT_FULLSCREEN_TEXT,
               QT_FULLSCREEN_TEXT, false )
+
+    add_bool( "qt-recentplay", true, RECENTPLAY_TEXT,
+              RECENTPLAY_TEXT, false )
+    add_string( "qt-recentplay-filter", "",
+                RECENTPLAY_FILTER_TEXT, RECENTPLAY_FILTER_LONGTEXT, false )
+
+#ifdef UPDATE_CHECK
+    add_bool( "qt-updates-notif", true, UPDATER_TEXT,
+              UPDATER_LONGTEXT, false )
+    add_integer( "qt-updates-days", 3, UPDATER_DAYS_TEXT,
+                 UPDATER_DAYS_TEXT, false )
+#endif
 
     add_bool( "qt-volume-complete", false, COMPLETEVOL_TEXT,
               COMPLETEVOL_LONGTEXT, true )
@@ -228,25 +242,23 @@ vlc_module_begin ()
     add_integer_with_range( "qt-startvolume", QT_VOLUME_DEFAULT, 0,
                QT_VOLUME_MAX, NULL, STARTVOL_TEXT, STARTVOL_TEXT, true )
 
+#ifdef WIN32
+    add_bool( "qt-disable-volume-keys"             /* name */,
+              true                                 /* default value */,
+              QT_DISABLE_VOLUME_KEYS_TEXT          /* text */,
+              QT_DISABLE_VOLUME_KEYS_LONGTEXT      /* longtext */,
+              false                                /* advanced mode only */)
+#endif
+
     add_bool( "qt-embedded-open", false, QT_NATIVEOPEN_TEXT,
                QT_NATIVEOPEN_TEXT, false )
-    add_bool( "qt-recentplay", true, RECENTPLAY_TEXT,
-              RECENTPLAY_TEXT, false )
-    add_string( "qt-recentplay-filter", "",
-                RECENTPLAY_FILTER_TEXT, RECENTPLAY_FILTER_LONGTEXT, false )
 
-    add_bool( "qt-adv-options", false, ADVANCED_OPTIONS_TEXT,
-              ADVANCED_OPTIONS_LONGTEXT, true )
+
     add_bool( "qt-advanced-pref", false, ADVANCED_PREFS_TEXT,
               ADVANCED_PREFS_LONGTEXT, false )
     add_bool( "qt-error-dialogs", true, ERROR_TEXT,
               ERROR_TEXT, false )
-#ifdef UPDATE_CHECK
-    add_bool( "qt-updates-notif", true, UPDATER_TEXT,
-              UPDATER_LONGTEXT, false )
-    add_integer( "qt-updates-days", 3, UPDATER_DAYS_TEXT,
-                 UPDATER_DAYS_TEXT, false )
-#endif
+
     add_string( "qt-slider-colours", "255;255;255;20;210;20;255;199;15;245;39;29",
                 SLIDERCOL_TEXT, SLIDERCOL_LONGTEXT, false )
 
@@ -265,21 +277,13 @@ vlc_module_begin ()
     add_bool( "qt-bgcone-expands", false, QT_BGCONE_EXPANDS_TEXT,
               QT_BGCONE_EXPANDS_LONGTEXT, true )
 
-#ifdef WIN32
-    add_bool( "qt-disable-volume-keys"             /* name */,
-              true                                 /* default value */,
-              QT_DISABLE_VOLUME_KEYS_TEXT          /* text */,
-              QT_DISABLE_VOLUME_KEYS_LONGTEXT      /* longtext */,
-              false                                /* advanced mode only */)
-#endif
-
-    add_bool( "qt-pause-minimized", true, QT_PAUSE_MINIMIZED_TEXT,
-              QT_PAUSE_MINIMIZED_LONGTEXT, false )
 
     add_obsolete_bool( "qt-blingbling" ) /* Suppressed since 1.0.0 */
     add_obsolete_integer( "qt-display-mode" ) /* Suppressed since 1.1.0 */
 
     add_bool( "qt-icon-change", true, ICONCHANGE_TEXT, ICONCHANGE_LONGTEXT, true )
+
+    add_obsolete_bool( "qt-adv-options" ) /* Since 1.2.0 */
 
 #ifdef WIN32
     cannot_unload_broken_library()
