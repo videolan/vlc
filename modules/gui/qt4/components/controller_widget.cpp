@@ -35,7 +35,6 @@
 
 #include <QLabel>
 #include <QHBoxLayout>
-#include <QSpinBox>
 #include <QMenu>
 #include <QWidgetAction>
 #include <QMouseEvent>
@@ -164,8 +163,8 @@ void SoundWidget::libUpdateVolume()
 
     i_volume = aout_VolumeGet( p_playlist );
     i_volume = ( ( i_volume + 1 ) *  VOLUME_MAX )/ (AOUT_VOLUME_MAX/2);
-    int i_gauge = volumeSlider->value();
-    if ( i_volume - i_gauge != 0 )
+
+    if ( i_volume - volumeSlider->value() != 0 )
     {
         b_ignore_valuechanged = true;
         volumeSlider->setValue( i_volume );

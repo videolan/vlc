@@ -31,10 +31,10 @@
 #include "qt4.hpp"
 
 #include <QWidget>
-#include <QFrame>
 #include <QToolButton>
 
 class QLabel;
+class QFrame;
 class QSpinBox;
 class QAbstractSlider;
 
@@ -78,13 +78,16 @@ public:
     virtual ~SoundWidget();
     void setMuted( bool );
 
+protected:
+    virtual bool eventFilter( QObject *obj, QEvent *e );
+
 private:
     intf_thread_t       *p_intf;
     QLabel              *volMuteLabel;
     QAbstractSlider     *volumeSlider;
     QFrame              *volumeControlWidget;
     QMenu               *volumeMenu;
-    virtual bool eventFilter( QObject *obj, QEvent *e );
+
     bool                b_is_muted;
     bool                b_ignore_valuechanged;
 
