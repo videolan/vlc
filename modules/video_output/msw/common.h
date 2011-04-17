@@ -190,6 +190,7 @@ struct vout_display_sys_t
     /* */
     bool                    reset_device;
     bool                    reopen_device;
+    bool                    clear_scene;
 
     /* It protects the following variables */
     vlc_mutex_t    lock;

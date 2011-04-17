@@ -473,10 +473,7 @@ static void Manage (vout_display_t *vd)
         vout_display_SendEventPicturesInvalid(vd);
     }
 
-#if 0
-    /*
-     * Position Change
-     */
+    /* Position Change */
     if (sys->changes & DX_POSITION_CHANGE) {
 #if 0 /* need that when bicubic filter is available */
         RECT rect;
@@ -494,9 +491,9 @@ static void Manage (vout_display_t *vd)
                 return VLC_EGENERIC;
         }
 #endif
+        sys->clear_scene = true;
         sys->changes &= ~DX_POSITION_CHANGE;
     }
-#endif
 }
 
 /**
@@ -1023,6 +1020,8 @@ static int Direct3DCreateScene(vout_display_t *vd, const video_format_t *fmt)
     sys->d3dregion_count = 0;
     sys->d3dregion       = NULL;
 
+    sys->clear_scene = true;
+
     // Texture coordinates outside the range [0.0, 1.0] are set
     // to the texture color at 0.0 or 1.0, respectively.
     IDirect3DDevice9_SetSamplerState(d3ddev, 0, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP);
@@ -1373,12 +1372,15 @@ static void Direct3DRenderScene(vout_display_t *vd,
     LPDIRECT3DDEVICE9 d3ddev = sys->d3ddev;
     HRESULT hr;
 
-    /* Clear the backbuffer and the zbuffer */
-    hr = IDirect3DDevice9_Clear(d3ddev, 0, NULL, D3DCLEAR_TARGET,
-                              D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0);
-    if (FAILED(hr)) {
-        msg_Dbg(vd, "%s:%d (hr=0x%0lX)", __FUNCTION__, __LINE__, hr);
-        return;
+    if (sys->clear_scene) {
+        /* Clear the backbuffer and the zbuffer */
+        hr = IDirect3DDevice9_Clear(d3ddev, 0, NULL, D3DCLEAR_TARGET,
+                                  D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0);
+        if (FAILED(hr)) {
+            msg_Dbg(vd, "%s:%d (hr=0x%0lX)", __FUNCTION__, __LINE__, hr);
+            return;
+        }
+        sys->clear_scene = false;
     }
 
     // Begin the scene
