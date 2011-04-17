@@ -1928,9 +1928,9 @@ endif
 
 .gnutls: gnutls .gcrypt .gpg-error
 ifdef HAVE_WIN32
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS)" --target=i586-mingw32msvc --disable-cxx -disable-shared --enable-static --disable-nls --with-included-opencdk --with-included-libtasn1 &&  cd gl && make && cd ../lib && make && make install )
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS)" --with-libgcrypt --target=i586-mingw32msvc --disable-cxx -disable-shared --enable-static --disable-nls --with-included-opencdk --with-included-libtasn1 &&  cd gl && make && cd ../lib && make && make install )
 else
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS)" --disable-cxx --with-included-opencdk --disable-guile && make && make install)
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS)" --with-libgcrypt  --disable-cxx --with-included-opencdk --disable-guile && make && make install)
 endif
 	$(INSTALL_NAME)
 	touch $@
