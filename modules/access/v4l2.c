@@ -1851,6 +1851,32 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
     }
 #endif
 
+    /* Select standard */
+
+    if( p_sys->i_selected_standard_id != V4L2_STD_UNKNOWN )
+    {
+        if( v4l2_ioctl( i_fd, VIDIOC_S_STD, &p_sys->i_selected_standard_id ) < 0 )
+        {
+            msg_Err( p_obj, "cannot set standard (%m)" );
+            goto open_failed;
+        }
+        if( v4l2_ioctl( i_fd, VIDIOC_G_STD, &p_sys->i_selected_standard_id ) < 0 )
+        {
+            msg_Err( p_obj, "cannot get standard (%m). This should never happen!" );
+            goto open_failed;
+        }
+        msg_Dbg( p_obj, "Set standard to (0x%"PRIx64"):", p_sys->i_selected_standard_id );
+        int i_standard;
+        for( i_standard = 0; i_standard<p_sys->i_standard; i_standard++)
+        {
+            if( p_sys->p_standards[i_standard].id & p_sys->i_selected_standard_id )
+            {
+                msg_Dbg( p_obj, "  %s",
+                        p_sys->p_standards[i_standard].name );
+            }
+        }
+    }
+
     /* Tune the tuner */
     if( p_sys->i_frequency >= 0 )
     {
@@ -1890,32 +1916,6 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
             goto open_failed;
         }
         msg_Dbg( p_obj, "Tuner audio mode set" );
-    }
-
-    /* Select standard */
-
-    if( p_sys->i_selected_standard_id != V4L2_STD_UNKNOWN )
-    {
-        if( v4l2_ioctl( i_fd, VIDIOC_S_STD, &p_sys->i_selected_standard_id ) < 0 )
-        {
-            msg_Err( p_obj, "cannot set standard (%m)" );
-            goto open_failed;
-        }
-        if( v4l2_ioctl( i_fd, VIDIOC_G_STD, &p_sys->i_selected_standard_id ) < 0 )
-        {
-            msg_Err( p_obj, "cannot get standard (%m). This should never happen!" );
-            goto open_failed;
-        }
-        msg_Dbg( p_obj, "Set standard to (0x%"PRIx64"):", p_sys->i_selected_standard_id );
-        int i_standard;
-        for( i_standard = 0; i_standard<p_sys->i_standard; i_standard++)
-        {
-            if( p_sys->p_standards[i_standard].id & p_sys->i_selected_standard_id )
-            {
-                msg_Dbg( p_obj, "  %s",
-                        p_sys->p_standards[i_standard].name );
-            }
-        }
     }
 
     /* Select input */
