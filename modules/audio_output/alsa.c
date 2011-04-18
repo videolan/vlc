@@ -183,39 +183,10 @@ static int Open (vlc_object_t *obj)
     if (unlikely(psz_device == NULL))
         return VLC_ENOMEM;
 
-    /* Choose the IEC device for S/PDIF output:
-       if the device is overridden by the user then it will be the one
-       otherwise we compute the default device based on the output format. */
-    if (AOUT_FMT_NON_LINEAR(&p_aout->output.output)
-     && !strcmp (psz_device, DEFAULT_ALSA_DEVICE))
-    {
-        unsigned aes3;
-
-        switch (p_aout->output.output.i_rate)
-        {
-#define FS(freq) \
-            case freq: aes3 = IEC958_AES3_CON_FS_ ## freq; break;
-            FS( 44100) /* def. */ FS( 48000) FS( 32000)
-            FS( 22050)            FS( 24000)
-            FS( 88200) FS(768000) FS( 96000)
-            FS(176400)            FS(192000)
-#undef FS
-            default:
-                aes3 = IEC958_AES3_CON_FS_NOTID;
-                break;
-        }
-
-        free (psz_device);
-        if (asprintf (&psz_device,
-                      "iec958:AES0=0x%x,AES1=0x%x,AES2=0x%x,AES3=0x%x",
-                      IEC958_AES0_CON_EMPHASIS_NONE | IEC958_AES0_NONAUDIO,
-                      IEC958_AES1_CON_ORIGINAL | IEC958_AES1_CON_PCM_CODER,
-                      0, aes3) == -1)
-            return VLC_ENOMEM;
-    }
-
     snd_pcm_format_t pcm_format; /* ALSA sample format */
     vlc_fourcc_t fourcc = p_aout->output.output.i_format;
+    bool spdif = false;
+
     switch (fourcc)
     {
         case VLC_CODEC_F64B:
@@ -271,6 +242,8 @@ static int Open (vlc_object_t *obj)
             pcm_format = SND_PCM_FORMAT_U8;
             break;
         default:
+            if (AOUT_FMT_NON_LINEAR(&p_aout->output.output))
+                spdif = var_InheritBool (p_aout, "spdif");
             if (HAVE_FPU)
             {
                 fourcc = VLC_CODEC_FL32;
@@ -281,6 +254,36 @@ static int Open (vlc_object_t *obj)
                 fourcc = VLC_CODEC_S16N;
                 pcm_format = SND_PCM_FORMAT_S16;
             }
+    }
+
+    /* Choose the IEC device for S/PDIF output:
+       if the device is overridden by the user then it will be the one
+       otherwise we compute the default device based on the output format. */
+    if (spdif && !strcmp (psz_device, DEFAULT_ALSA_DEVICE))
+    {
+        unsigned aes3;
+
+        switch (p_aout->output.output.i_rate)
+        {
+#define FS(freq) \
+            case freq: aes3 = IEC958_AES3_CON_FS_ ## freq; break;
+            FS( 44100) /* def. */ FS( 48000) FS( 32000)
+            FS( 22050)            FS( 24000)
+            FS( 88200) FS(768000) FS( 96000)
+            FS(176400)            FS(192000)
+#undef FS
+            default:
+                aes3 = IEC958_AES3_CON_FS_NOTID;
+                break;
+        }
+
+        free (psz_device);
+        if (asprintf (&psz_device,
+                      "iec958:AES0=0x%x,AES1=0x%x,AES2=0x%x,AES3=0x%x",
+                      IEC958_AES0_CON_EMPHASIS_NONE | IEC958_AES0_NONAUDIO,
+                      IEC958_AES1_CON_ORIGINAL | IEC958_AES1_CON_PCM_CODER,
+                      0, aes3) == -1)
+            return VLC_ENOMEM;
     }
 
     /* Allocate structures */
@@ -339,7 +342,7 @@ static int Open (vlc_object_t *obj)
     snd_pcm_uframes_t i_period_size;
     int i_channels;
 
-    if (var_InheritBool (obj, "spdif"))
+    if (spdif)
     {
         fourcc = VLC_CODEC_SPDIFL;
         i_buffer_size = ALSA_SPDIF_BUFFER_SIZE;
