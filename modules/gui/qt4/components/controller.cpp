@@ -675,7 +675,7 @@ FullscreenControllerWidget::FullscreenControllerWidget( intf_thread_t *_p_i, QWi
     vout.clear();
 
 #ifdef Q_WS_X11
-    setWindowFlags( Qt::Window | Qt::FramelessWindowHint );
+    setWindowFlags( Qt::Window | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint );
     setWindowModality( Qt::ApplicationModal );
 #else
     setWindowFlags( Qt::ToolTip );
