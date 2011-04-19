@@ -1818,7 +1818,7 @@ libraw1394: libraw1394-$(LIBRAW1394_VERSION).tar.gz
 	$(EXTRACT_GZ)
 
 .raw1394: libraw1394
-	(cd $<; ./configure --prefix=$(PREFIX) && make && make DESTDIR=$(PREFIX) install)
+	(cd $<; ./configure --prefix=$(PREFIX) && make && make install)
 #	sed 's/^typedef u_int8_t  byte_t;/\/* typedef u_int8_t  byte_t;\*\//'
 	touch $@
 
