@@ -46,14 +46,6 @@
 #   include <vlc_charset.h>
 #endif
 
-/* Compatibility with old libass */
-#if !defined(LIBASS_VERSION) || LIBASS_VERSION < 0x00907010
-#   define ASS_Renderer    ass_renderer_t
-#   define ASS_Library     ass_library_t
-#   define ASS_Track       ass_track_t
-#   define ASS_Image       ass_image_t
-#endif
-
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -337,12 +329,7 @@ static int SubpictureValidate( subpicture_t *p_subpic,
         ass_set_frame_size( p_ass->p_renderer, fmt.i_width, fmt.i_height );
         const double src_ratio = (double)p_fmt_src->i_width / p_fmt_src->i_height;
         const double dst_ratio = (double)p_fmt_dst->i_width / p_fmt_dst->i_height;
-        const double factor    = dst_ratio / src_ratio;
-#if defined( LIBASS_VERSION ) && LIBASS_VERSION >= 0x00907000
-        ass_set_aspect_ratio( p_ass->p_renderer, factor, 1 );
-#else
-        ass_set_aspect_ratio( p_ass->p_renderer, factor );
-#endif
+        ass_set_aspect_ratio( p_ass->p_renderer, dst_ratio / src_ratio, 1 );
         p_ass->fmt = fmt;
     }
 
@@ -744,11 +731,7 @@ static ass_handle_t *AssHandleHold( decoder_t *p_dec )
     if( p_dialog )
         dialog_ProgressSet( p_dialog, NULL, 0.2 );
 #endif
-#if defined( LIBASS_VERSION ) && LIBASS_VERSION >= 0x00907000
     ass_set_fonts( p_renderer, psz_font, psz_family, true, NULL, 1 );  // setup default font/family
-#else
-    ass_set_fonts( p_renderer, psz_font, psz_family );  // setup default font/family
-#endif
 #ifdef WIN32
     if( p_dialog )
     {
@@ -759,11 +742,7 @@ static ass_handle_t *AssHandleHold( decoder_t *p_dec )
 #endif
 #else
     /* FIXME you HAVE to give him a font if no fontconfig */
-#if defined( LIBASS_VERSION ) && LIBASS_VERSION >= 0x00907000
     ass_set_fonts( p_renderer, psz_font, psz_family, false, NULL, 1 );
-#else
-    ass_set_fonts_nofc( p_renderer, psz_font, psz_family );
-#endif
 #endif
     memset( &p_ass->fmt, 0, sizeof(p_ass->fmt) );
 
