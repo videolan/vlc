@@ -3032,13 +3032,13 @@ static int RenderPhosphor( filter_t *p_filter,
  * every chroma line, even if the chroma format is 4:2:0!
  *
  * This is just a raw detector that produces a score. The overall score
- * indicating a progressive or indicated frame may vary wildly, depending on
+ * indicating a progressive or interlaced frame may vary wildly, depending on
  * the material, especially in anime. The scores should be compared to
  * each other locally (in the temporal sense) to make meaningful decisions
  * about progressive or interlaced frames.
  *
  * @param p_pic_top Picture to take the top field from.
- * @param p_pic_bot Picture to take the bottom field from.
+ * @param p_pic_bot Picture to take the bottom field from (same or different).
  * @return Interlace score, >= 0. Higher values mean more interlaced.
  * @retval -1 Error: incompatible input pictures.
  * @see RenderIVTC()
@@ -3363,12 +3363,16 @@ static inline int TestForMotionInBlock( uint8_t *p_pix_p, uint8_t *p_pix_c,
  * Note that the return value is NOT simply *pi_top + *pi_bot, because
  * the fields and the full block use different motion thresholds.
  *
- * It is allowed to set pi_top and pi_bot to NULL, if the caller does not want
- * the separate field scores. This does not affect computation speed, and is
- * only provided as a syntactic convenience.
+ * If you do not want the separate field scores, pass NULL for pi_top and
+ * pi_bot. This does not affect computation speed, and is only provided as
+ * a syntactic convenience.
  *
  * Motion in each picture plane (Y, U, V) counts separately.
  * The sum of number of blocks with motion across all planes is returned.
+ *
+ * For 4:2:0 chroma, even-numbered chroma lines make up the "top field" for
+ * chroma, and odd-numbered chroma lines the "bottom field" for chroma.
+ * This is correct for IVTC purposes.
  *
  * @param[in] p_prev Previous picture
  * @param[in] p_curr Current picture
@@ -3504,7 +3508,10 @@ typedef enum { CADENCE_POS_INVALID     = -1,
 #define CADENCE_POS_BFF_END   9
 
 /**
- * For Vektor-like cadence detector algorithm.
+ * For the "vektor" cadence detector algorithm.
+ *
+ * The algorithm produces a set of possible positions instead of a unique
+ * position, until it locks on. The set is represented as a bitmask.
  *
  * The bitmask is stored in a word, and its layout is:
  * blank blank BFF_CARRY BFF4 BFF3 BFF2 BFF1 BFF0   (high byte)
@@ -3514,7 +3521,8 @@ typedef enum { CADENCE_POS_INVALID     = -1,
  * result by one bit, copying the CARRY bits to the respective zeroth position,
  * and ANDing with 0x1F1F.
  *
- * The table is indexed with a valid ivtc_cadence_pos.
+ * This table is indexed with a valid ivtc_cadence_pos.
+ * @see ivtc_cadence_pos
  */
 const int pi_detected_pos_to_bitmask[NUM_CADENCE_POS] = { 0x0808, /* prog. */
                                                           0x0001, /* TFF ABC */
@@ -3538,12 +3546,12 @@ const int pi_detected_pos_to_bitmask[NUM_CADENCE_POS] = { 0x0808, /* prog. */
 typedef enum { TFD_INVALID = -1, TFD_TFF = 0, TFD_BFF = 1 } ivtc_tfd;
 
 /**
- * Position detection table.
+ * Position detection table for the "scores" cadence detector algorithm.
  *
  * These are the (only) field pair combinations that should give progressive
- * frames.
+ * frames. There are three for each position.
  *
- * First index: detected pos
+ * First index: ivtc_cadence_pos
  */
 static const ivtc_field_pair pi_best_field_pairs[NUM_CADENCE_POS][3] = {
     {FIELD_PAIR_TPBP, FIELD_PAIR_TCBC, FIELD_PAIR_TNBN}, /* prog. */
@@ -3560,9 +3568,13 @@ static const ivtc_field_pair pi_best_field_pairs[NUM_CADENCE_POS][3] = {
 };
 
 /**
- * Alternative position detection table.
+ * Alternative position detection table for the "scores" cadence detector
+ * algorithm.
  *
  * These field pair combinations should give only interlaced frames.
+ * There are four for each position.
+ *
+ * First index: ivtc_cadence_pos
  *
  * Currently unused. During development it was tested that whether we detect
  * best or worst, the resulting detected cadence positions are identical
@@ -3635,7 +3647,8 @@ static const int pi_detected_pos_to_tfd[NUM_CADENCE_POS] = {
 /* Valid telecine sequences (TFF and BFF). Indices: [TFD][i_cadence_pos] */
 /* Currently unused and left here for documentation only.
    There is an easier way - just decode the i_cadence_pos part of the
-   detected position using the pi_detected_pos_to_cadence_pos table. */
+   detected position using the pi_detected_pos_to_cadence_pos table,
+   and check that it is successive mod 5. See IVTCCadenceAnalyze(). */
 /*static const int pi_valid_cadences[2][5] = { {CADENCE_POS_TFF_ABC,
                                              CADENCE_POS_TFF_BCD,
                                              CADENCE_POS_TFF_CDE,
@@ -3694,7 +3707,7 @@ static const ivtc_op pi_reconstruction_ops[2][5] = { /* TFF */
  *
  * This is used in the 29.97 -> 23.976 fps conversion.
  *
- * Index: i_cadence_pos.
+ * Index: i_cadence_pos, 0..4.
  *
  * Valid values are nonnegative. The -1 corresponds to the dropped frame
  * and is never used, except for a debug assert.
@@ -3715,7 +3728,8 @@ static const int pi_timestamp_deltas[5] = { 1, 2, 3, -1, 0 };
  * In practice, this slides detector histories.
  *
  * This function should only perform initialization that does NOT require
- * the input frame history buffer.
+ * the input frame history buffer. This runs at every frame, including
+ * the first two.
  *
  * This is an internal function only used by RenderIVTC().
  * There is no need to call this function manually.
@@ -3765,6 +3779,10 @@ static inline void IVTCFrameInit( filter_t *p_filter )
     p_ivtc->pi_scores[FIELD_PAIR_TPBC] = p_ivtc->pi_scores[FIELD_PAIR_TCBN];
     p_ivtc->pi_scores[FIELD_PAIR_TCBP] = p_ivtc->pi_scores[FIELD_PAIR_TNBC];
     p_ivtc->pi_scores[FIELD_PAIR_TCBC] = p_ivtc->pi_scores[FIELD_PAIR_TNBN];
+    /* These have not been detected yet */
+    p_ivtc->pi_scores[FIELD_PAIR_TCBN] = 0;
+    p_ivtc->pi_scores[FIELD_PAIR_TNBC] = 0;
+    p_ivtc->pi_scores[FIELD_PAIR_TNBN] = 0;
 }
 
 /**
@@ -3807,9 +3825,8 @@ static inline void IVTCLowLevelDetect( filter_t *p_filter )
     int i_motion = EstimateNumBlocksWithMotion(p_curr, p_next, &i_top, &i_bot);
     p_ivtc->pi_motion[IVTC_LATEST] = i_motion;
 
-    /* It's very rare if nonexistent that only one field changes between
-       frames. Thus, if one field changes "clearly more" than the other,
-       we know the less changed one is a likely duplicate.
+    /* If one field changes "clearly more" than the other, we know the
+       less changed one is a likely duplicate.
 
        Threshold 1/2 is too low for some scenes (e.g. pan of the space junk
        at beginning of The Third ep. 1, right after the OP). Thus, we use 2/3,
@@ -3821,7 +3838,7 @@ static inline void IVTCLowLevelDetect( filter_t *p_filter )
 
 /**
  * Internal helper function for RenderIVTC(): using raw detector data,
- * detect cadence position by an interlace scores based algorithm.
+ * detect cadence position by an interlace scores based algorithm ("scores").
  *
  * IVTCFrameInit() and IVTCLowLevelDetect() must have been called first.
  * Last frame must be available in the history buffer.
@@ -3856,9 +3873,8 @@ static inline void IVTCCadenceDetectAlgoScores( filter_t *p_filter )
     /* Find minimum */
     int j = CADENCE_POS_PROGRESSIVE; /* valid regardless of TFD */
     int minscore = pi_ivtc_scores[j];
-    /* Note that a TFF (respectively BFF) stream may only have TFF
-       (respectively BFF) telecine. Don't bother looking at solutions
-       we already know to be wrong. */
+    /* A TFF (respectively BFF) stream may only have TFF (respectively BFF)
+       telecine. Don't bother looking at the wrong table. */
     int imin = CADENCE_POS_TFF_FIRST; /* first TFF-only entry */
     int iend = CADENCE_POS_TFF_END;   /* one past last TFF-only entry */
     if( !p_next->b_top_field_first )
@@ -3909,13 +3925,13 @@ static inline void IVTCCadenceDetectAlgoScores( filter_t *p_filter )
     double mean_ratio = (double)mean_except_min / (double)mean;
 
     /* Let's pretend that the detected position is a stochastic variable.
-        Compute sample variance with the winner included and without.
+       Compute sample variance with the winner included and without.
 
-        var = sum( (x_i - mu)^2, i ) / N ,
+       var = sum( (x_i - mu)^2, i ) / N ,
 
-        where mu is the sample mean.
+       where mu is the sample mean.
 
-        Note that we really need int64_t; the numbers are pretty large.
+       Note that we really need int64_t; the numbers are pretty large.
     */
     int64_t diff = (int64_t)(pi_ivtc_scores[CADENCE_POS_PROGRESSIVE] - mean);
     int64_t var = diff*diff;
@@ -3991,7 +4007,7 @@ static inline void IVTCCadenceDetectAlgoScores( filter_t *p_filter )
 
 /**
  * Internal helper function for RenderIVTC(): using raw detector data,
- * detect cadence position by a hard field repeat based algorithm.
+ * detect cadence position by a hard field repeat based algorithm ("vektor").
  *
  * This algorithm is inspired by the classic TVTime/Xine IVTC filter
  * by Billy Biggs (Vektor); hence the name. There are however some
@@ -4020,46 +4036,55 @@ static inline void IVTCCadenceDetectAlgoVektor( filter_t *p_filter )
 
     assert( p_next != NULL );
 
-    /* Vektor-like cadence detection algorithm.
+    /* This algorithm is based on detecting hard-repeated fields (by motion
+       detection), and conservatively estimating what the seen repeats could
+       mean for the cadence position.
 
-       This is based on detecting repeated fields (by motion detection),
-       and conservatively estimating what the seen repeats could mean
-       for the cadence position.
+       "Conservative" means that we do not rule out possibilities if repeats
+       are *not* seen, but only *add* possibilities based on what repeats
+       *are* seen. This is important. Otherwise full-frame repeats in the
+       original film (8fps or 12fps animation is very common in anime),
+       causing spurious field repeats, would mess up the detection.
+       With this strategy, spurious repeats will only slow down the lock-on,
+       and will not break an existing lock-on once acquired.
 
        Several possibilities are kept open until the sequence gives enough
        information to make a unique detection. When the sequence becomes
        inconsistent (e.g. bad cut), the detector resets itself.
 
-       The main ideas taken from Vektor's algorithm are:
-        1) conservatively using information from detected field repeats,
-        2) cadence counting the earlier detection results and combining with
+       The main ideas taken from the TVTime/Xine algorithm are:
+        1) Conservatively using information from detected field repeats,
+        2) Cadence counting the earlier detection results and combining with
            the new detection result, and
-        3) the observation that video TFF/BFF uniquely determines TFD.
+        3) The observation that video TFF/BFF uniquely determines TFD.
 
-        The main differences are
-        1) different motion detection (see EstimateNumBlocksWithMotion()).
+       The main differences are
+        1) Different motion detection (see EstimateNumBlocksWithMotion()).
            Vektor's original estimates the average top/bottom field diff
            over the last 3 frames, while ours uses a block-based approach
-           for diffing and just compares the field diffs of the "next" frame
-           against each other. Both approaches are adaptive, but in a
-           different way.
-        2) the specific detection logic used is a bit different (see both codes
-           for details; the original is in xine-lib, function
+           for diffing and just compares the field diffs between "curr" and
+           "next" against each other (see IVTCLowLevelDetect()).
+           Both approaches are adaptive, but in a different way.
+        2) The specific detection logic used is a bit different (see both
+           codes for details; the original is in xine-lib, function
            determine_pulldown_offset_short_history_new() in pulldown.c;
-           ours is obviously given below). I think this one is a bit simpler.
+           ours is obviously given below). I think the one given here
+           is a bit simpler.
+
+       Note that we don't have to worry about getting a detection in all cases.
+       It's enough if we work reliably, say, 99% of the time, and the other 1%
+       of the time just admit that we don't know the cadence position.
+       (This mostly happens after a bad cut, when the new scene has
+       "difficult" motion characteristics, such as repeated film frames.)
+       Our frame composer is built to handle also cases where we have no
+       reliable detection of the cadence position; see IVTCOutputOrDropFrame().
+       More important is to never lock on incorrectly, as this would both
+       generate interlacing artifacts where none existed, and cause motion
+       to stutter (because duplicate frames would be shown and unique ones
+       dropped).
     */
 
-    bool b_top_rep = p_ivtc->pi_top_rep[IVTC_LATEST];
-    bool b_bot_rep = p_ivtc->pi_bot_rep[IVTC_LATEST];
-    bool b_old_top_rep = p_ivtc->pi_top_rep[IVTC_LATEST-1];
-    bool b_old_bot_rep = p_ivtc->pi_bot_rep[IVTC_LATEST-1];
-
-    /* This is a conservative algorithm: we do not rule out possibilities
-       if repeats are *not* seen, but only *add* possibilities based on what
-       repeats *are* seen. We will do a raw detection, whose result is then
-       filtered against what we already know.
-
-       Progressive requires no repeats, so it is always a possibility.
+    /* Progressive requires no repeats, so it is always a possibility.
        Filtering will drop it out if we know that the current position
        cannot be "dea".
     */
@@ -4069,34 +4094,11 @@ static inline void IVTCCadenceDetectAlgoVektor( filter_t *p_filter )
     /* Add in other possibilities depending on field repeats seen during the
        last three input frames (i.e. two transitions between input frames).
        See the "Dups." column in the cadence tables.
-
-       Note that we always add and never explicitly rule anything out.
-       This is important. Otherwise full-frame repeats in the original film
-       (8fps or 12fps animation is common in anime) - causing spurious
-       field repeats - would mess up the detection. Handling that in a more
-       sophisticated way would be a nightmare - one would have to keep track
-       of full-frame repeats in the *outgoing* frames, too, and take into
-       account what would happen in the output if a particular cadence position
-       was chosen. Accounting for repeats in input frames only (i.e. limiting
-       the detection to the progressive parts of the cadence), this has been
-       tried, and found less reliable than the current, simpler strategy
-       that just ignores full-frame repeats.
-
-       Note also that we don't have to worry about getting the detection right
-       in *all* cases. It's enough if we work reliably, say, 99% of the time,
-       and the other 1% of the time just admit that we don't know the cadence
-       position. (This mostly happens after a bad cut, when the new scene has
-       "difficult" motion characteristics, such as repeated film frames.)
-
-       The alternative, "Transcode" strategy in the frame composer will catch
-       any telecined frames that slip through. Although in that case there will
-       be duplicates and the output PTSs will be wrong, this is less noticeable
-       than getting PTS jumps from an incorrectly locked-on cadence. Note that
-       it is mostly anime, and even there mostly low-motion scenes with
-       duplicate film frames that trigger the misbehavior - and in such cases
-       any slight irregularity in the output timings will go unnoticed,
-       as long as we get rid of interlacing artifacts.
     */
+    bool b_top_rep     = p_ivtc->pi_top_rep[IVTC_LATEST];
+    bool b_bot_rep     = p_ivtc->pi_bot_rep[IVTC_LATEST];
+    bool b_old_top_rep = p_ivtc->pi_top_rep[IVTC_LATEST-1];
+    bool b_old_bot_rep = p_ivtc->pi_bot_rep[IVTC_LATEST-1];
     if( b_top_rep )
     {
         detected |= pi_detected_pos_to_bitmask[ CADENCE_POS_TFF_EAB ];
@@ -4119,10 +4121,10 @@ static inline void IVTCCadenceDetectAlgoVektor( filter_t *p_filter )
     }
 
     /* A TFF stream may only have TFF telecine, and similarly for BFF.
-        Discard the possibility we know to be incorrect for this stream.
-        (Note that the stream may flipflop between the possibilities
-        if it contains soft-telecined sequences or lone field repeats,
-        so we must keep detecting this for each incoming frame.)
+       Discard the possibility we know to be incorrect for this stream.
+       (The stream may flipflop between the possibilities if it contains
+        soft-telecined sequences or lone field repeats, so we must keep
+        detecting this for each incoming frame.)
     */
     bool b_tff = p_next->b_top_field_first;
     if( b_tff )
@@ -4149,7 +4151,8 @@ static inline void IVTCCadenceDetectAlgoVektor( filter_t *p_filter )
 
     /* Filter: narrow down possibilities based on previous detection,
        if consistent. If not consistent, reset the detector.
-       This works better than just using the latest raw detection. */
+       Reset works better than just using the latest raw detection.
+    */
     if( (detected & predicted) != 0 )
         detected = detected & predicted;
     else
@@ -4158,9 +4161,9 @@ static inline void IVTCCadenceDetectAlgoVektor( filter_t *p_filter )
     /* We're done. Save result to our internal storage so we can use it
        for prediction at the next frame.
 
-       Note that the outgoing frame check in IVTCReconstructFrame()
-       has a veto right, resetting us if it determines that the cadence
-       has become broken.
+       Note that the outgoing frame check in IVTCOutputOrDropFrame()
+       has a veto right, resetting our state if it determines that
+       the cadence has become broken.
     */
     p_ivtc->pi_v_raw[IVTC_LATEST] = detected;
 
@@ -4194,7 +4197,7 @@ static inline void IVTCCadenceDetectAlgoVektor( filter_t *p_filter )
 
 /**
  * Internal helper function for RenderIVTC(): decide the final detected
- * cadence position for the current position of the stencil,
+ * cadence position for the current position of the PCN stencil,
  * using the results of the different cadence detection algorithms.
  *
  * Must be called after all IVTCCadenceDetectAlgo*() functions.
@@ -4218,7 +4221,8 @@ static inline void IVTCCadenceDetectFinalize( filter_t *p_filter )
        take longer to lock on. Thus, we prefer "vektor" if its reliable bit
        is set, then "scores", and finally just give up.
 
-       For progressive sequences, "vektor" outputs "3, -, 3, -, ...".
+       For progressive sequences, "vektor" outputs "3, -, 3, -, ...",
+       because the repeated progressive position is an inconsistent prediction.
        In this case, "scores" fills in the blanks. (This particular task
        could also be done without another cadence detector, by just
        detecting the alternating pattern of "3" and no result.)
@@ -4268,16 +4272,16 @@ static inline void IVTCSoftTelecineDetect( filter_t *p_filter )
        nb_fields = 3,2,3,2,... and *video* TFF = true, false, false, true
        (TFF telecine) or false, true, true, false (BFF telecine).
 
-       We don't particularly care which field goes first, because we're
-       constructing progressive frames, and the video FDs of successive frames
-       must in any case match any field repeats in order for field renderers
-       (such as traditional DVD player + CRT TV) to work correctly. Thus the
-       video TFF/BFF flag provides no additional useful information for us
-       on top of checking nb_fields.
+       We don't particularly care which field goes first, because in soft TC
+       we're working with progressive frames. And in any case, the video FDs
+       of successive frames must match any field repeats in order for field
+       renderers (such as traditional DVD player + CRT TV) to work correctly.
+       Thus the video TFF/BFF flag provides no additional useful information
+       for us on top of checking nb_fields.
 
-       Note that the only thing to *do* to soft telecine in an IVTC filter
-       is to even out the outgoing PTS diffs to 2.5 fields each, so that we get
-       a steady 24fps output. Thus, we can do this  processing even if it turns
+       The only thing to *do* to soft telecine in an IVTC filter is to even
+       out the outgoing PTS diffs to 2.5 fields each, so that we get
+       a steady 24fps output. Thus, we can do this processing even if it turns
        out that we saw a lone field repeat (which are also sometimes used,
        such as in the Silent Mobius OP and in Sol Bianca). We can be aggressive
        and don't need to care about false positives - as long as we are equally
@@ -4286,8 +4290,8 @@ static inline void IVTCSoftTelecineDetect( filter_t *p_filter )
 
        Finally, we conclude that the one-frame future buffer is enough for us
        to make soft TC decisions just in time for rendering the frame in the
-       "current" position (the flag patterns below constitute proof of this
-       property).
+       "current" position. The flag patterns given below constitute proof
+       of this property.
 
        Soft telecine is relatively rare at least in anime, but it exists;
        e.g. Angel Links OP, Silent Mobius, and Stellvia of the Universe have
@@ -4339,15 +4343,16 @@ static inline void IVTCSoftTelecineDetect( filter_t *p_filter )
         /* No longer soft telecined, return filter to the mode it had earlier.
            This is needed to fix cases where we came in from hard telecine, and
            should go back, but can't catch a cadence in time before telecined
-           frames slip through. Kickstarting back to hard IVTC fixes the
-           problem. This happens a lot in Stellvia.
+           frames slip through. Kickstarting back to hard IVTC, using the
+           emergency frame composer until the cadence locks on again,
+           fixes the problem. This happens a lot in Stellvia.
         */
         p_ivtc->i_mode = p_ivtc->i_old_mode;
         p_ivtc->i_cadence_pos = 0; /* Wild guess. The film frame reconstruction
                                       will start in emergency mode, and this
                                       will be filled in by the detector ASAP.*/
         /* I suppose video field dominance no longer flipflops. */
-        p_ivtc->i_tfd = p_next->b_top_field_first;
+        p_ivtc->i_tfd = !p_next->b_top_field_first; /* tff  <=>  TFD == 0 */
     }
 }
 
@@ -4467,8 +4472,8 @@ static void IVTCCadenceAnalyze( filter_t *p_filter )
         }
 
         /* See if the sequence is valid. The cadence positions must be
-           successive mod 5.  We can't say anything about TFF/BFF yet,
-           because the progressive-looking position "dea"  may be there.
+           successive mod 5. We can't say anything about TFF/BFF yet,
+           because the progressive-looking position "dea" may be there.
            If the sequence otherwise looks valid, we handle that last
            by voting.
 
@@ -4559,7 +4564,11 @@ static void IVTCCadenceAnalyze( filter_t *p_filter )
             /* If we still think the signal is progressive... */
             if( b_really_all_progressive )
             {
-                /* ...exit film mode immediately. */
+                /* ...exit film mode immediately. This does not break
+                   soft TC handling, because for soft TC at least one
+                   of the frames will not qualify (due to i_nb_fields == 3),
+                   and in that case this analysis will not run.
+                */
                 if( p_ivtc->i_mode == IVTC_MODE_TELECINED_NTSC_HARD )
                     msg_Dbg( p_filter, "IVTC: 3:2 pulldown: progressive "\
                                        "signal detected." );
@@ -4570,9 +4579,14 @@ static void IVTCCadenceAnalyze( filter_t *p_filter )
         }
         /* Final missing "else": no valid NTSC telecine sequence detected.
 
-            Either there is no telecine, or the detector - although it produced
-            results - had trouble finding it. In this case we do nothing,
-            as it's not a good idea to act on unreliable data.
+           Either there is no telecine, or the detector - although it produced
+           results - had trouble finding it. In this case we do nothing,
+           as it's not a good idea to act on unreliable data.
+
+           Note that if we are already in IVTC_MODE_TELECINED_NTSC_HARD, this
+           case means that we have lost the lock-on, but are still (probably)
+           in a hard-telecined stream. This will start the emergency mode
+           for film frame reconstruction. See IVTCOutputOrDropFrame().
         */
     }
 }
@@ -4616,19 +4630,21 @@ static bool IVTCOutputOrDropFrame( filter_t *p_filter, picture_t *p_dst )
        since been lost, and we have not seen a progressive signal after that.
        The latter case usually results from bad cuts, which interrupt
        the cadence.
+
+       Lock-on state is given by p_ivtc->b_sequence_valid.
     */
     int i_result_score = -1;
     int op;
     if( p_ivtc->i_mode == IVTC_MODE_TELECINED_NTSC_HARD )
     {
-        assert( p_ivtc->i_cadence_pos != CADENCE_POS_INVALID );
-        assert( p_ivtc->i_tfd != TFD_INVALID );
-
         /* Decide what to do. The operation table is only enabled
            if the cadence seems reliable. Otherwise we use a backup strategy.
         */
         if( p_ivtc->b_sequence_valid )
         {
+            assert( p_ivtc->i_cadence_pos != CADENCE_POS_INVALID );
+            assert( p_ivtc->i_tfd != TFD_INVALID );
+
             /* Pick correct operation from the operation table. */
             op = pi_reconstruction_ops[p_ivtc->i_tfd][p_ivtc->i_cadence_pos];
 
@@ -4640,8 +4656,7 @@ static bool IVTCOutputOrDropFrame( filter_t *p_filter, picture_t *p_dst )
                 /* Drop frame. We're done. */
                 return false;
             }
-            /* Frame not dropped */
-            else if( p_ivtc->b_sequence_valid )
+            else
             {
                 if( op == IVTC_OP_COPY_N )
                     i_result_score = p_ivtc->pi_scores[FIELD_PAIR_TNBN];
@@ -4737,14 +4752,9 @@ static bool IVTCOutputOrDropFrame( filter_t *p_filter, picture_t *p_dst )
             }
         }
 
-        /* Note that we get to this point only if we didn't drop the frame.
-            Mangle the presentation timestamp to convert 29.97 -> 23.976 fps.
-        */
-        int i_timestamp_delta = pi_timestamp_deltas[p_ivtc->i_cadence_pos];
-        if( p_ivtc->b_sequence_valid )
-            assert( i_timestamp_delta >= 0 );
+        /* Mangle timestamps when locked on.
 
-        /* "Current" is the frame that is being extracted now. Use its original
+           "Current" is the frame that is being extracted now. Use its original
            timestamp as the base.
 
            Note that this way there will be no extra delay compared to the
@@ -4752,6 +4762,12 @@ static bool IVTCOutputOrDropFrame( filter_t *p_filter, picture_t *p_dst )
         */
         if( p_ivtc->b_sequence_valid )
         {
+            /* Convert 29.97 -> 23.976 fps. We get to this point only if we
+               didn't drop the frame, so we always get a valid delta.
+            */
+            int i_timestamp_delta = pi_timestamp_deltas[p_ivtc->i_cadence_pos];
+            assert( i_timestamp_delta >= 0 );
+
             /* FIXME: use field length as measured by Deinterlace()? */
             t_final = p_curr->date
                     + (p_next->date - p_curr->date)*i_timestamp_delta/4;
@@ -4787,12 +4803,12 @@ static bool IVTCOutputOrDropFrame( filter_t *p_filter, picture_t *p_dst )
 
         /* Timestamp mangling for soft telecine: bump "threes" forward by
            0.5 field durations. This is more forgiving for the renderer
-           than bumping the "twos" back (which would  require to render
+           than bumping the "twos" back (which would require to render
            them sooner),
         */
         if( p_curr->i_nb_fields == 3 )
         {
-            /* Approximate field duration from the PTS difference.  */
+            /* Approximate field duration from the PTS difference. */
             /* FIXME: use field length as measured by Deinterlace()? */
             mtime_t i_half_field_dur = ( (p_next->date - p_curr->date)/3 ) / 2;
             t_final = p_curr->date + i_half_field_dur;
@@ -4931,31 +4947,31 @@ static int RenderIVTC( filter_t *p_filter, picture_t *p_dst, picture_t *p_src )
            the only remaining possibility is that: */
         assert( p_curr && !p_prev );
 
-        /* We need three frames for the detector to work, so we drop this one.
-           We will only do some initialization for the detector here. */
+        /* We need three frames for the cadence detector to work, so we just
+           do some init for the detector and pass the frame through.
+           Passthrough for second frame, too, works better than drop
+           for some still-image DVD menus.
 
-        /* These scores will become TCBC, TCBP and TPBC when the filter starts.
-           The score for the current TCBC has already been computed at the
-           first frame, and slid into place at the start of this frame
-           (by IVTCFrameInit()).
+           Now that we have two frames, we can run a full IVTCLowLevelDetect().
+
+           The interlace scores from here will become TCBC, TCBP and TPBC
+           when the filter starts. The score for the current TCBC has already
+           been computed at the first frame, and slid into place at the start
+           of this frame (by IVTCFrameInit()).
         */
-        p_ivtc->pi_scores[FIELD_PAIR_TNBN] =
-                                     CalculateInterlaceScore( p_next, p_next );
-        p_ivtc->pi_scores[FIELD_PAIR_TNBC] =
-                                     CalculateInterlaceScore( p_next, p_curr );
-        p_ivtc->pi_scores[FIELD_PAIR_TCBN] =
-                                     CalculateInterlaceScore( p_curr, p_next );
+        IVTCLowLevelDetect( p_filter );
 
-        /* TNBN is a wild guess, but doesn't really matter */
+        /* Note that the sliding mechanism for output scores only starts
+           when the actual filter does.
+        */
         p_ivtc->pi_final_scores[1] = p_ivtc->pi_scores[FIELD_PAIR_TNBN];
 
         /* At the next frame, the filter starts. The next frame will get
            a custom timestamp. */
         p_sys->i_frame_offset = CUSTOM_PTS;
 
-        /* Not really an error. This is expected, but we must
-           signal the caller not to expect an output frame. */
-        return VLC_EGENERIC;
+        picture_Copy( p_dst, p_next );
+        return VLC_SUCCESS;
     }
 }
 
@@ -4994,10 +5010,9 @@ static void IVTCClearState( filter_t *p_filter )
 
         p_ivtc->pi_v_raw[i]         = VEKTOR_CADENCE_POS_ALL;
 
-        /* the most neutral result considering the "vektor" algorithm */
-        p_ivtc->pi_top_rep[i] = 1;
-        p_ivtc->pi_bot_rep[i] = 1;
-        p_ivtc->pi_motion[i] = -1;
+        p_ivtc->pi_top_rep[i] =  0;
+        p_ivtc->pi_bot_rep[i] =  0;
+        p_ivtc->pi_motion[i]  = -1;
 
         p_ivtc->pb_all_progressives[i] = false;
 
