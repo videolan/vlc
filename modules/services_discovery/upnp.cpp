@@ -856,6 +856,11 @@ void MediaServer::setInputItem( input_item_t* p_input_item )
     _p_input_item = p_input_item;
 }
 
+input_item_t* MediaServer::getInputItem() const
+{
+    return _p_input_item;
+}
+
 bool MediaServer::compareSID( const char* psz_sid )
 {
     return ( strncmp( _subscription_id, psz_sid, sizeof( Upnp_SID ) ) == 0 );
@@ -933,6 +938,8 @@ void MediaServerList::removeServer( const char* psz_udn )
     if ( !p_server ) return;
 
     msg_Dbg( _p_sd, "Removing server '%s'", p_server->getFriendlyName() );
+
+    services_discovery_RemoveItem( _p_sd, p_server->getInputItem() );
 
     std::vector<MediaServer*>::iterator it;
     for ( it = _list.begin(); it != _list.end(); ++it )

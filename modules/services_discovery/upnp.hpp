@@ -63,6 +63,7 @@ public:
     void fetchContents();
 
     void setInputItem( input_item_t* p_input_item );
+    input_item_t* getInputItem() const;
 
     bool compareSID( const char* psz_sid );
 
