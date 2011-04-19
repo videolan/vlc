@@ -776,6 +776,39 @@ bool MediaServer::_fetchContents( Container* p_parent )
     return true;
 }
 
+// TODO: Create a permanent fix for the item duplication bug. The current fix
+// is essentially only a small hack. Although it fixes the problem, it introduces
+// annoying cosmetic issues with the playlist. For example, when the UPnP Server
+// rebroadcasts it's directory structure, the VLC Client deletes the old directory
+// structure, causing the user to go back to the root node of the directory. The
+// directory is then rebuilt, and the user is forced to traverse through the directory
+// to find the item they were looking for. Some servers may not push the directory
+// structure too often, but we cannot rely on this fix.
+//
+// I have thought up another fix, but this would require certain features to
+// be present within the VLC services discovery. Currently, services_discovery_AddItem
+// does not allow the programmer to nest items. It only allows a "2 deep" scope.
+// An example of the limitation is below:
+//
+// Root Directory
+// + Item 1
+// + Item 2
+//
+// services_discovery_AddItem will not let the programmer specify a child-node to
+// insert items into, so we would not be able to do the following:
+//
+// Root Directory
+// + Item 1
+//   + Sub Item 1
+// + Item 2
+//   + Sub Item 1 of Item 2
+//     + Sub-Sub Item 1 of Sub Item 1
+//
+// This creates a HUGE limitation on what we are able to do. If we were able to do
+// the above, we could simply preserve the old directory listing, and compare what items
+// do not exist in the new directory listing, then remove them from the shown listing using
+// services_discovery_RemoveItem. If new files were introduced within an already existing
+// container, we could simply do so with services_discovery_AddItem.
 void MediaServer::_buildPlaylist( Container* p_parent, input_item_node_t *p_input_node )
 {
     bool b_send = p_input_node == NULL;
