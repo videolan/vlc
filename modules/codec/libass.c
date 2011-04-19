@@ -66,33 +66,22 @@ vlc_module_end ()
  *****************************************************************************/
 static subpicture_t *DecodeBlock( decoder_t *, block_t ** );
 
-/* Yes libass sux with threads */
-typedef struct
-{
-    vlc_object_t   *p_libvlc;
-
-    int             i_refcount;
-    ASS_Library     *p_library;
-    ASS_Renderer    *p_renderer;
-    video_format_t  fmt;
-} ass_handle_t;
-static ass_handle_t *AssHandleHold( decoder_t *p_dec );
-static void AssHandleRelease( ass_handle_t * );
-
 /* */
 struct decoder_sys_t
 {
-    mtime_t      i_max_stop;
+    mtime_t        i_max_stop;
 
-    /* decoder_sys_t is shared between decoder and spu units */
-    vlc_mutex_t  lock;
-    int          i_refcount;
-
-    /* */
-    ass_handle_t *p_ass;
+    /* The following fields of decoder_sys_t are shared between decoder and spu units */
+    vlc_mutex_t    lock;
+    int            i_refcount;
 
     /* */
-    ASS_Track    *p_track;
+    ASS_Library    *p_library;
+    ASS_Renderer   *p_renderer;
+    video_format_t fmt;
+
+    /* */
+    ASS_Track      *p_track;
 };
 static void DecSysRelease( decoder_sys_t *p_sys );
 static void DecSysHold( decoder_sys_t *p_sys );
@@ -129,8 +118,6 @@ typedef struct
 static int BuildRegions( rectangle_t *p_region, int i_max_region, ASS_Image *p_img_list, int i_width, int i_height );
 static void RegionDraw( subpicture_region_t *p_region, ASS_Image *p_img );
 
-static vlc_mutex_t libass_lock = VLC_STATIC_MUTEX;
-
 //#define DEBUG_REGION
 
 /*****************************************************************************
@@ -140,7 +127,6 @@ static int Create( vlc_object_t *p_this )
 {
     decoder_t *p_dec = (decoder_t *)p_this;
     decoder_sys_t *p_sys;
-    ASS_Track *p_track;
 
     if( p_dec->fmt_in.i_codec != VLC_CODEC_SSA )
         return VLC_EGENERIC;
@@ -152,27 +138,98 @@ static int Create( vlc_object_t *p_this )
         return VLC_ENOMEM;
 
     /* */
-    p_sys->i_max_stop = VLC_TS_INVALID;
-    p_sys->p_ass = AssHandleHold( p_dec );
-    if( !p_sys->p_ass )
-    {
-        free( p_sys );
-        return VLC_EGENERIC;
-    }
     vlc_mutex_init( &p_sys->lock );
     p_sys->i_refcount = 1;
+    memset( &p_sys->fmt, 0, sizeof(p_sys->fmt) );
+    p_sys->i_max_stop = VLC_TS_INVALID;
+    p_sys->p_library  = NULL;
+    p_sys->p_renderer = NULL;
+    p_sys->p_track    = NULL;
+
+    /* Create libass library */
+    ASS_Library *p_library = p_sys->p_library = ass_library_init();
+    if( !p_library )
+    {
+        msg_Warn( p_dec, "Libass library creation failed" );
+        DecSysRelease( p_sys );
+        return VLC_EGENERIC;
+    }
+
+    /* load attachments */
+    input_attachment_t  **pp_attachments;
+    int                   i_attachments;
+    if( decoder_GetInputAttachments( p_dec, &pp_attachments, &i_attachments ))
+    {
+        i_attachments = 0;
+        pp_attachments = NULL;
+    }
+    for( int k = 0; k < i_attachments; k++ )
+    {
+        input_attachment_t *p_attach = pp_attachments[k];
+
+        if( !strcasecmp( p_attach->psz_mime, "application/x-truetype-font" ) )
+        {
+            msg_Dbg( p_dec, "adding embedded font %s", p_attach->psz_name );
+
+            ass_add_font( p_sys->p_library, p_attach->psz_name, p_attach->p_data, p_attach->i_data );
+        }
+        vlc_input_attachment_Delete( p_attach );
+    }
+    free( pp_attachments );
+
+    ass_set_extract_fonts( p_library, true );
+    ass_set_style_overrides( p_library, NULL );
+
+    /* Create the renderer */
+    ASS_Renderer *p_renderer = p_sys->p_renderer = ass_renderer_init( p_library );
+    if( !p_renderer )
+    {
+        msg_Warn( p_dec, "Libass renderer creation failed" );
+        DecSysRelease( p_sys );
+        return VLC_EGENERIC;
+    }
+
+    ass_set_use_margins( p_renderer, false);
+    //if( false )
+    //    ass_set_margins( p_renderer, int t, int b, int l, int r);
+    ass_set_hinting( p_renderer, ASS_HINTING_LIGHT );
+    ass_set_font_scale( p_renderer, 1.0 );
+    ass_set_line_spacing( p_renderer, 0.0 );
+
+    const char *psz_font = NULL; /* We don't ship a default font with VLC */
+    const char *psz_family = "Arial"; /* Use Arial if we can't find anything more suitable */
+
+#ifdef HAVE_FONTCONFIG
+#if defined(WIN32)
+    dialog_progress_bar_t *p_dialog =
+        dialog_ProgressCreate( p_dec,
+                               _("Building font cache"),
+                               _( "Please wait while your font cache is rebuilt.\n"
+                                  "This should take less than a minute." ), NULL );
+    if( p_dialog )
+        dialog_ProgressSet( p_dialog, NULL, 0.2 );
+#endif
+    ass_set_fonts( p_renderer, psz_font, psz_family, true, NULL, 1 );  // setup default font/family
+#ifdef WIN32
+    if( p_dialog )
+    {
+        dialog_ProgressSet( p_dialog, NULL, 1.0 );
+        dialog_ProgressDestroy( p_dialog );
+    }
+#endif
+#else
+    /* FIXME you HAVE to give him a font if no fontconfig */
+    ass_set_fonts( p_renderer, psz_font, psz_family, false, NULL, 1 );
+#endif
 
     /* Add a track */
-    vlc_mutex_lock( &libass_lock );
-    p_sys->p_track = p_track = ass_new_track( p_sys->p_ass->p_library );
+    ASS_Track *p_track = p_sys->p_track = ass_new_track( p_sys->p_library );
     if( !p_track )
     {
-        vlc_mutex_unlock( &libass_lock );
         DecSysRelease( p_sys );
         return VLC_EGENERIC;
     }
     ass_process_codec_private( p_track, p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra );
-    vlc_mutex_unlock( &libass_lock );
 
     p_dec->fmt_out.i_cat = SPU_ES;
     p_dec->fmt_out.i_codec = VLC_CODEC_RGBA;
@@ -209,12 +266,13 @@ static void DecSysRelease( decoder_sys_t *p_sys )
     vlc_mutex_unlock( &p_sys->lock );
     vlc_mutex_destroy( &p_sys->lock );
 
-    vlc_mutex_lock( &libass_lock );
     if( p_sys->p_track )
         ass_free_track( p_sys->p_track );
-    vlc_mutex_unlock( &libass_lock );
+    if( p_sys->p_renderer )
+        ass_renderer_done( p_sys->p_renderer );
+    if( p_sys->p_library )
+        ass_library_done( p_sys->p_library );
 
-    AssHandleRelease( p_sys->p_ass );
     free( p_sys );
 }
 
@@ -289,13 +347,13 @@ static subpicture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
     p_sys->i_max_stop = p_spu->i_stop;
 
-    vlc_mutex_lock( &libass_lock );
+    vlc_mutex_lock( &p_sys->lock );
     if( p_sys->p_track )
     {
         ass_process_chunk( p_sys->p_track, p_spu_sys->p_subs_data, p_spu_sys->i_subs_len,
                            p_block->i_pts / 1000, p_block->i_length / 1000 );
     }
-    vlc_mutex_unlock( &libass_lock );
+    vlc_mutex_unlock( &p_sys->lock );
 
     DecSysHold( p_sys ); /* Keep a reference for the returned subpicture */
 
@@ -313,9 +371,8 @@ static int SubpictureValidate( subpicture_t *p_subpic,
                                mtime_t i_ts )
 {
     decoder_sys_t *p_sys = p_subpic->updater.p_sys->p_dec_sys;
-    ass_handle_t *p_ass = p_sys->p_ass;
 
-    vlc_mutex_lock( &libass_lock );
+    vlc_mutex_lock( &p_sys->lock );
 
     video_format_t fmt = *p_fmt_dst;
     fmt.i_chroma         = VLC_CODEC_RGBA;
@@ -326,23 +383,23 @@ static int SubpictureValidate( subpicture_t *p_subpic,
     fmt.i_y_offset       = 0;
     if( b_fmt_src || b_fmt_dst )
     {
-        ass_set_frame_size( p_ass->p_renderer, fmt.i_width, fmt.i_height );
+        ass_set_frame_size( p_sys->p_renderer, fmt.i_width, fmt.i_height );
         const double src_ratio = (double)p_fmt_src->i_width / p_fmt_src->i_height;
         const double dst_ratio = (double)p_fmt_dst->i_width / p_fmt_dst->i_height;
-        ass_set_aspect_ratio( p_ass->p_renderer, dst_ratio / src_ratio, 1 );
-        p_ass->fmt = fmt;
+        ass_set_aspect_ratio( p_sys->p_renderer, dst_ratio / src_ratio, 1 );
+        p_sys->fmt = fmt;
     }
 
     /* */
     const mtime_t i_stream_date = p_subpic->updater.p_sys->i_pts + (i_ts - p_subpic->i_start);
     int i_changed;
-    ASS_Image *p_img = ass_render_frame( p_ass->p_renderer, p_sys->p_track,
+    ASS_Image *p_img = ass_render_frame( p_sys->p_renderer, p_sys->p_track,
                                          i_stream_date/1000, &i_changed );
 
     if( !i_changed && !b_fmt_src && !b_fmt_dst &&
         (p_img != NULL) == (p_subpic->p_region != NULL) )
     {
-        vlc_mutex_unlock( &libass_lock );
+        vlc_mutex_unlock( &p_sys->lock );
         return VLC_SUCCESS;
     }
     p_subpic->updater.p_sys->p_img = p_img;
@@ -359,11 +416,9 @@ static void SubpictureUpdate( subpicture_t *p_subpic,
     VLC_UNUSED( p_fmt_src ); VLC_UNUSED( p_fmt_dst ); VLC_UNUSED( i_ts );
 
     decoder_sys_t *p_sys = p_subpic->updater.p_sys->p_dec_sys;
-    ass_handle_t *p_ass = p_sys->p_ass;
 
-    video_format_t fmt = p_ass->fmt;
+    video_format_t fmt = p_sys->fmt;
     ASS_Image *p_img = p_subpic->updater.p_sys->p_img;
-    //vlc_assert_locked( &libass_lock );
 
     /* */
     p_subpic->i_original_picture_height = fmt.i_height;
@@ -381,7 +436,7 @@ static void SubpictureUpdate( subpicture_t *p_subpic,
 
     if( i_region <= 0 )
     {
-        vlc_mutex_unlock( &libass_lock );
+        vlc_mutex_unlock( &p_sys->lock );
         return;
     }
 
@@ -415,7 +470,7 @@ static void SubpictureUpdate( subpicture_t *p_subpic,
         *pp_region_last = r;
         pp_region_last = &r->p_next;
     }
-    vlc_mutex_unlock( &libass_lock );
+    vlc_mutex_unlock( &p_sys->lock );
 
 }
 static void SubpictureDestroy( subpicture_t *p_subpic )
@@ -643,146 +698,3 @@ static void RegionDraw( subpicture_region_t *p_region, ASS_Image *p_img )
 #endif
 }
 
-/* */
-static ass_handle_t *AssHandleHold( decoder_t *p_dec )
-{
-    vlc_mutex_lock( &libass_lock );
-
-    ass_handle_t *p_ass = NULL;
-    ASS_Library *p_library = NULL;
-    ASS_Renderer *p_renderer = NULL;
-    vlc_value_t val;
-
-    var_Create( p_dec->p_libvlc, "libass-handle", VLC_VAR_ADDRESS );
-    if( var_Get( p_dec->p_libvlc, "libass-handle", &val ) )
-        val.p_address = NULL;
-
-    if( val.p_address )
-    {
-        p_ass = val.p_address;
-
-        p_ass->i_refcount++;
-
-        vlc_mutex_unlock( &libass_lock );
-        return p_ass;
-    }
-
-    /* */
-    p_ass = malloc( sizeof(*p_ass) );
-    if( !p_ass )
-        goto error;
-
-    /* */
-    p_ass->p_libvlc = VLC_OBJECT(p_dec->p_libvlc);
-    p_ass->i_refcount = 1;
-
-    /* Create libass library */
-    p_ass->p_library = p_library = ass_library_init();
-    if( !p_library )
-        goto error;
-
-    /* load attachments */
-    input_attachment_t  **pp_attachments;
-    int                   i_attachments;
-
-    if( decoder_GetInputAttachments( p_dec, &pp_attachments, &i_attachments ))
-    {
-        i_attachments = 0;
-        pp_attachments = NULL;
-    }
-    for( int k = 0; k < i_attachments; k++ )
-    {
-        input_attachment_t *p_attach = pp_attachments[k];
-
-        if( !strcasecmp( p_attach->psz_mime, "application/x-truetype-font" ) )
-        {
-            msg_Dbg( p_dec, "adding embedded font %s", p_attach->psz_name );
-
-            ass_add_font( p_ass->p_library, p_attach->psz_name, p_attach->p_data, p_attach->i_data );
-        }
-        vlc_input_attachment_Delete( p_attach );
-    }
-    free( pp_attachments );
-
-    ass_set_extract_fonts( p_library, true );
-    ass_set_style_overrides( p_library, NULL );
-
-    /* Create the renderer */
-    p_ass->p_renderer = p_renderer = ass_renderer_init( p_library );
-    if( !p_renderer )
-        goto error;
-
-    ass_set_use_margins( p_renderer, false);
-    //if( false )
-    //    ass_set_margins( p_renderer, int t, int b, int l, int r);
-    ass_set_hinting( p_renderer, ASS_HINTING_LIGHT );
-    ass_set_font_scale( p_renderer, 1.0 );
-    ass_set_line_spacing( p_renderer, 0.0 );
-
-    const char *psz_font = NULL; /* We don't ship a default font with VLC */
-    const char *psz_family = "Arial"; /* Use Arial if we can't find anything more suitable */
-
-#ifdef HAVE_FONTCONFIG
-#if defined(WIN32)
-    dialog_progress_bar_t *p_dialog = dialog_ProgressCreate( p_dec,
-        _("Building font cache"),
-        _( "Please wait while your font cache is rebuilt.\n"
-        "This should take less than a minute." ), NULL );
-    if( p_dialog )
-        dialog_ProgressSet( p_dialog, NULL, 0.2 );
-#endif
-    ass_set_fonts( p_renderer, psz_font, psz_family, true, NULL, 1 );  // setup default font/family
-#ifdef WIN32
-    if( p_dialog )
-    {
-        dialog_ProgressSet( p_dialog, NULL, 1.0 );
-        dialog_ProgressDestroy( p_dialog );
-        p_dialog = NULL;
-    }
-#endif
-#else
-    /* FIXME you HAVE to give him a font if no fontconfig */
-    ass_set_fonts( p_renderer, psz_font, psz_family, false, NULL, 1 );
-#endif
-    memset( &p_ass->fmt, 0, sizeof(p_ass->fmt) );
-
-    /* */
-    val.p_address = p_ass;
-    var_Set( p_dec->p_libvlc, "libass-handle", val );
-
-    /* */
-    vlc_mutex_unlock( &libass_lock );
-    return p_ass;
-
-error:
-    if( p_renderer )
-        ass_renderer_done( p_renderer );
-    if( p_library )
-        ass_library_done( p_library );
-
-    msg_Warn( p_dec, "Libass creation failed" );
-
-    free( p_ass );
-    vlc_mutex_unlock( &libass_lock );
-    return NULL;
-}
-static void AssHandleRelease( ass_handle_t *p_ass )
-{
-    vlc_mutex_lock( &libass_lock );
-    p_ass->i_refcount--;
-    if( p_ass->i_refcount > 0 )
-    {
-        vlc_mutex_unlock( &libass_lock );
-        return;
-    }
-
-    ass_renderer_done( p_ass->p_renderer );
-    ass_library_done( p_ass->p_library );
-
-    vlc_value_t val;
-    val.p_address = NULL;
-    var_Set( p_ass->p_libvlc, "libass-handle", val );
-
-    vlc_mutex_unlock( &libass_lock );
-    free( p_ass );
-}
