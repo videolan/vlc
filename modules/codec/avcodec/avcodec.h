@@ -276,3 +276,36 @@ int ffmpeg_OpenCodec( decoder_t *p_dec );
  * system) */
 //#define HAVE_AVCODEC_VAAPI 1
 //#define HAVE_AVCODEC_DXVA2 1
+
+/* Ugly ifdefinitions to provide backwards compatibility with older ffmpeg/libav
+ * versions */
+#ifndef AV_CPU_FLAG_FORCE
+#   define AV_CPU_FLAG_FORCE       FF_MM_FORCE
+#   define AV_CPU_FLAG_MMX         FF_MM_MMX
+#   define AV_CPU_FLAG_3DNOW       FF_MM_3DNOW
+#   define AV_CPU_FLAG_MMX2        FF_MM_MMX2
+#   define AV_CPU_FLAG_SSE         FF_MM_SSE
+#   define AV_CPU_FLAG_SSE2        FF_MM_SSE2
+#   define AV_CPU_FLAG_SSE2SLOW    FF_MM_SSE2SLOW
+#   define AV_CPU_FLAG_3DNOWEXT    FF_MM_3DNOWEXT
+#   define AV_CPU_FLAG_SSE3        FF_MM_SSE3
+#   define AV_CPU_FLAG_SSE3SLOW    FF_MM_SSE3SLOW
+#   define AV_CPU_FLAG_SSSE3       FF_MM_SSSE3
+#   define AV_CPU_FLAG_SSE4        FF_MM_SSE4
+#   define AV_CPU_FLAG_SSE42       FF_MM_SSE42
+#   define AV_CPU_FLAG_IWMMXT      FF_MM_IWMMXT
+#   define AV_CPU_FLAG_ALTIVEC     FF_MM_ALTIVEC
+#endif
+
+#if LIBAVCODEC_VERSION_MAJOR < 53
+#   define AVMediaType             CodecType
+#   define AVMEDIA_TYPE_AUDIO      CODEC_TYPE_AUDIO
+#   define AVMEDIA_TYPE_VIDEO      CODEC_TYPE_VIDEO
+#   define AVMEDIA_TYPE_SUBTITLE   CODEC_TYPE_SUBTITLE
+#   define AVMEDIA_TYPE_DATA       CODEC_TYPE_DATA
+#   define AVMEDIA_TYPE_ATTACHMENT CODEC_TYPE_ATTACHMENT
+#endif
+
+#ifndef AV_PKT_FLAG_KEY
+#   define AV_PKT_FLAG_KEY         PKT_FLAG_KEY
+#endif

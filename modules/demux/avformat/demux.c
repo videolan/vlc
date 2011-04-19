@@ -260,7 +260,7 @@ int OpenDemux( vlc_object_t *p_this )
 
         switch( cc->codec_type )
         {
-        case CODEC_TYPE_AUDIO:
+        case AVMEDIA_TYPE_AUDIO:
             es_format_Init( &fmt, AUDIO_ES, fcc );
             fmt.i_bitrate = cc->bit_rate;
             fmt.audio.i_channels = cc->channels;
@@ -270,7 +270,7 @@ int OpenDemux( vlc_object_t *p_this )
             psz_type = "audio";
             break;
 
-        case CODEC_TYPE_VIDEO:
+        case AVMEDIA_TYPE_VIDEO:
             es_format_Init( &fmt, VIDEO_ES, fcc );
 
             /* Special case for raw video data */
@@ -301,7 +301,7 @@ int OpenDemux( vlc_object_t *p_this )
             fmt.video.i_frame_rate_base = cc->time_base.num * __MAX( cc->ticks_per_frame, 1 );
             break;
 
-        case CODEC_TYPE_SUBTITLE:
+        case AVMEDIA_TYPE_SUBTITLE:
             es_format_Init( &fmt, SPU_ES, fcc );
             if( strncmp( p_sys->ic->iformat->name, "matroska", 8 ) == 0 &&
                 cc->codec_id == CODEC_ID_DVD_SUBTITLE &&
@@ -351,33 +351,44 @@ int OpenDemux( vlc_object_t *p_this )
         default:
             es_format_Init( &fmt, UNKNOWN_ES, 0 );
 #ifdef HAVE_FFMPEG_CODEC_ATTACHMENT
-            if( cc->codec_type == CODEC_TYPE_ATTACHMENT )
+            if( cc->codec_type == AVMEDIA_TYPE_ATTACHMENT )
             {
                 input_attachment_t *p_attachment;
+
                 psz_type = "attachment";
                 if( cc->codec_id == CODEC_ID_TTF )
                 {
-                    p_attachment = vlc_input_attachment_New( s->filename, "application/x-truetype-font", NULL,
-                                             cc->extradata, (int)cc->extradata_size );
-                    TAB_APPEND( p_sys->i_attachments, p_sys->attachments, p_attachment );
+                    AVMetadataTag *filename = av_metadata_get( s->metadata, "filename", NULL, 0 );
+                    if( filename && filename->value )
+                    {
+                        p_attachment = vlc_input_attachment_New(
+                                filename->value, "application/x-truetype-font",
+                                NULL, cc->extradata, (int)cc->extradata_size );
+                        TAB_APPEND( p_sys->i_attachments, p_sys->attachments,
+                                p_attachment );
+                    }
                 }
                 else msg_Warn( p_demux, "unsupported attachment type in ffmpeg demux" );
             }
             break;
 #endif
 
-            if( cc->codec_type == CODEC_TYPE_DATA )
+            if( cc->codec_type == AVMEDIA_TYPE_DATA )
                 psz_type = "data";
 
             msg_Warn( p_demux, "unsupported track type in ffmpeg demux" );
             break;
         }
-        fmt.psz_language = strdup( s->language );
+
+        AVMetadataTag *language = av_metadata_get( s->metadata, "language", NULL, 0 );
+        if ( language && language->value )
+            fmt.psz_language = strdup( language->value );
+
         if( s->disposition & AV_DISPOSITION_DEFAULT )
             fmt.i_priority = 1000;
 
 #ifdef HAVE_FFMPEG_CODEC_ATTACHMENT
-        if( cc->codec_type != CODEC_TYPE_ATTACHMENT )
+        if( cc->codec_type != AVMEDIA_TYPE_ATTACHMENT )
 #endif
         {
             const bool    b_ogg = !strcmp( p_sys->fmt->name, "ogg" );
@@ -466,9 +477,10 @@ int OpenDemux( vlc_object_t *p_this )
     {
         seekpoint_t *s = vlc_seekpoint_New();
 
-        if( p_sys->ic->chapters[i]->title )
+        AVMetadataTag *title = av_metadata_get( p_sys->ic->metadata, "title", NULL, 0);
+        if( title && title->value )
         {
-            s->psz_name = strdup( p_sys->ic->chapters[i]->title );
+            s->psz_name = strdup( title->value );
             EnsureUTF8( s->psz_name );
             msg_Dbg( p_demux, "    - chapter %d: %s", i, s->psz_name );
         }
@@ -551,7 +563,7 @@ static int Demux( demux_t *p_demux )
         memcpy( p_frame->p_buffer, pkt.data, pkt.size );
     }
 
-    if( pkt.flags & PKT_FLAG_KEY )
+    if( pkt.flags & AV_PKT_FLAG_KEY )
         p_frame->i_flags |= BLOCK_FLAG_TYPE_I;
 
     i_start_time = ( p_sys->ic->start_time != (int64_t)AV_NOPTS_VALUE ) ?
@@ -571,7 +583,7 @@ static int Demux( demux_t *p_demux )
             p_stream->time_base.den;
 
     if( pkt.dts != AV_NOPTS_VALUE && pkt.dts == pkt.pts &&
-        p_stream->codec->codec_type == CODEC_TYPE_VIDEO )
+        p_stream->codec->codec_type == AVMEDIA_TYPE_VIDEO )
     {
         /* Add here notoriously bugged file formats/samples regarding PTS */
         if( !strcmp( p_sys->fmt->name, "flv" ) )
@@ -752,16 +764,22 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         {
             vlc_meta_t *p_meta = (vlc_meta_t*)va_arg( args, vlc_meta_t* );
 
-            if( p_sys->ic->title[0] )
-                vlc_meta_SetTitle( p_meta, p_sys->ic->title );
-            if( p_sys->ic->author[0] )
-                vlc_meta_SetArtist( p_meta, p_sys->ic->author );
-            if( p_sys->ic->copyright[0] )
-                vlc_meta_SetCopyright( p_meta, p_sys->ic->copyright );
-            if( p_sys->ic->comment[0] )
-                vlc_meta_SetDescription( p_meta, p_sys->ic->comment );
-            if( p_sys->ic->genre[0] )
-                vlc_meta_SetGenre( p_meta, p_sys->ic->genre );
+            AVMetadataTag *title = av_metadata_get( p_sys->ic->metadata, "language", NULL, 0 );
+            AVMetadataTag *author = av_metadata_get( p_sys->ic->metadata, "author", NULL, 0 );
+            AVMetadataTag *copyright = av_metadata_get( p_sys->ic->metadata, "copyright", NULL, 0 );
+            AVMetadataTag *comment = av_metadata_get( p_sys->ic->metadata, "comment", NULL, 0 );
+            AVMetadataTag *genre = av_metadata_get( p_sys->ic->metadata, "genre", NULL, 0 );
+
+            if( title && title->value )
+                vlc_meta_SetTitle( p_meta, title->value );
+            if( author && author->value )
+                vlc_meta_SetArtist( p_meta, author->value );
+            if( copyright && copyright->value )
+                vlc_meta_SetCopyright( p_meta, copyright->value );
+            if( comment && comment->value )
+                vlc_meta_SetDescription( p_meta, comment->value );
+            if( genre && genre->value )
+                vlc_meta_SetGenre( p_meta, genre->value );
             return VLC_SUCCESS;
         }
 

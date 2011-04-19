@@ -263,39 +263,39 @@ static int OpenDecoder( vlc_object_t *p_this )
     p_context->dsp_mask = 0;
     if( !(i_cpu & CPU_CAPABILITY_MMX) )
     {
-        p_context->dsp_mask |= FF_MM_MMX;
+        p_context->dsp_mask |= AV_CPU_FLAG_MMX;
     }
     if( !(i_cpu & CPU_CAPABILITY_MMXEXT) )
     {
-        p_context->dsp_mask |= FF_MM_MMXEXT;
+        p_context->dsp_mask |= AV_CPU_FLAG_MMX2;
     }
     if( !(i_cpu & CPU_CAPABILITY_3DNOW) )
     {
-        p_context->dsp_mask |= FF_MM_3DNOW;
+        p_context->dsp_mask |= AV_CPU_FLAG_3DNOW;
     }
     if( !(i_cpu & CPU_CAPABILITY_SSE) )
     {
-        p_context->dsp_mask |= FF_MM_SSE;
+        p_context->dsp_mask |= AV_CPU_FLAG_SSE;
     }
     if( !(i_cpu & CPU_CAPABILITY_SSE2) )
     {
-        p_context->dsp_mask |= FF_MM_SSE2;
+        p_context->dsp_mask |= AV_CPU_FLAG_SSE2;
     }
-#ifdef FF_MM_SSE3
+#ifdef AV_CPU_FLAG_SSE3
     if( !(i_cpu & CPU_CAPABILITY_SSE3) )
-        p_context->dsp_mask |= FF_MM_SSE3;
+        p_context->dsp_mask |= AV_CPU_FLAG_SSE3;
 #endif
-#ifdef FF_MM_SSSE3
+#ifdef AV_CPU_FLAG_SSSE3
     if( !(i_cpu & CPU_CAPABILITY_SSSE3) )
-        p_context->dsp_mask |= FF_MM_SSSE3;
+        p_context->dsp_mask |= AV_CPU_FLAG_SSSE3;
 #endif
-#ifdef FF_MM_SSE4
+#ifdef AV_CPU_FLAG_SSE4
     if( !(i_cpu & CPU_CAPABILITY_SSE4_1) )
-        p_context->dsp_mask |= FF_MM_SSE4;
+        p_context->dsp_mask |= AV_CPU_FLAG_SSE4;
 #endif
-#ifdef FF_MM_SSE42
+#ifdef AV_CPU_FLAG_SSE42
     if( !(i_cpu & CPU_CAPABILITY_SSE4_2) )
-        p_context->dsp_mask |= FF_MM_SSE42;
+        p_context->dsp_mask |= AV_CPU_FLAG_SSE42;
 #endif
 
     p_dec->b_need_packetized = true;

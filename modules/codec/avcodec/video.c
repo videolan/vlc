@@ -207,8 +207,8 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
     if( ( p_dec->p_sys = p_sys = calloc( 1, sizeof(decoder_sys_t) ) ) == NULL )
         return VLC_ENOMEM;
 
-    p_codec->type = CODEC_TYPE_VIDEO;
-    p_context->codec_type = CODEC_TYPE_VIDEO;
+    p_codec->type = AVMEDIA_TYPE_VIDEO;
+    p_context->codec_type = AVMEDIA_TYPE_VIDEO;
     p_context->codec_id = i_codec_id;
     p_sys->p_context = p_context;
     p_sys->p_codec = p_codec;
@@ -552,6 +552,7 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
     {
         int i_used, b_gotpicture;
         picture_t *p_pic;
+        AVPacket pkt;
 
         /* Set the PTS/DTS in the context reordered_opaque field */
         if( p_block->i_pts > VLC_TS_INVALID  )
@@ -568,9 +569,11 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
 
         post_mt( p_sys );
 
-        i_used = avcodec_decode_video( p_context, p_sys->p_ff_pic,
-                                       &b_gotpicture,
-                                       p_block->i_buffer <= 0 && p_sys->b_flush ? NULL : p_block->p_buffer, p_block->i_buffer );
+        av_init_packet( &pkt );
+        pkt.data = p_block->p_buffer;
+        pkt.size = p_block->i_buffer;
+        i_used = avcodec_decode_video2( p_context, p_sys->p_ff_pic,
+                                       &b_gotpicture, &pkt );
 
         if( b_null_size && !p_sys->b_flush &&
             p_context->width > 0 && p_context->height > 0 )
@@ -579,9 +582,8 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
             b_null_size = false;
             if( p_sys->b_hurry_up )
                 p_context->skip_frame = p_sys->i_skip_frame;
-            i_used = avcodec_decode_video( p_context, p_sys->p_ff_pic,
-                                           &b_gotpicture, p_block->p_buffer,
-                                           p_block->i_buffer );
+            i_used = avcodec_decode_video2( p_context, p_sys->p_ff_pic,
+                                           &b_gotpicture, &pkt );
         }
         wait_mt( p_sys );
 
