@@ -325,24 +325,23 @@ static int SubpictureValidate( subpicture_t *p_subpic,
 
     vlc_mutex_lock( &libass_lock );
 
-    /* FIXME why this mix of src/dst */
     video_format_t fmt = *p_fmt_dst;
     fmt.i_chroma         = VLC_CODEC_RGBA;
     fmt.i_bits_per_pixel = 0;
-    fmt.i_width          =
-    fmt.i_visible_width  = p_fmt_src->i_width;
-    fmt.i_height         =
-    fmt.i_visible_height = p_fmt_src->i_height;
-    fmt.i_x_offset       =
+    fmt.i_visible_width  = fmt.i_width;
+    fmt.i_visible_height = fmt.i_height;
+    fmt.i_x_offset       = 0;
     fmt.i_y_offset       = 0;
-
     if( b_fmt_src || b_fmt_dst )
     {
         ass_set_frame_size( p_ass->p_renderer, fmt.i_width, fmt.i_height );
+        const double src_ratio = (double)p_fmt_src->i_width / p_fmt_src->i_height;
+        const double dst_ratio = (double)p_fmt_dst->i_width / p_fmt_dst->i_height;
+        const double factor    = dst_ratio / src_ratio;
 #if defined( LIBASS_VERSION ) && LIBASS_VERSION >= 0x00907000
-        ass_set_aspect_ratio( p_ass->p_renderer, 1.0, 1.0 ); // TODO ?
+        ass_set_aspect_ratio( p_ass->p_renderer, factor, 1 );
 #else
-        ass_set_aspect_ratio( p_ass->p_renderer, 1.0 ); // TODO ?
+        ass_set_aspect_ratio( p_ass->p_renderer, factor );
 #endif
         p_ass->fmt = fmt;
     }
