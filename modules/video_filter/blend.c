@@ -373,11 +373,13 @@ static void BlendYUVAI420( filter_t *p_filter,
     int i_x, i_y, i_trans = 0;
     bool b_even_scanline = i_y_offset % 2;
 
+    bool b_swap_up = vlc_fourcc_AreUVPlanesSwapped( p_filter->fmt_out.video.i_chroma,
+                                                    VLC_CODEC_I420 );
     p_dst_y = vlc_plane_start( &i_dst_pitch, p_dst, Y_PLANE,
                                i_x_offset, i_y_offset, &p_filter->fmt_out.video, 1 );
-    p_dst_u = vlc_plane_start( NULL, p_dst, U_PLANE,
+    p_dst_u = vlc_plane_start( NULL, p_dst, b_swap_up ? V_PLANE : U_PLANE,
                                i_x_offset, i_y_offset, &p_filter->fmt_out.video, 2 );
-    p_dst_v = vlc_plane_start( NULL, p_dst, V_PLANE,
+    p_dst_v = vlc_plane_start( NULL, p_dst, b_swap_up ? U_PLANE : V_PLANE,
                                i_x_offset, i_y_offset, &p_filter->fmt_out.video, 2 );
 
     p_src_y = vlc_plane_start( &i_src_pitch, p_src, Y_PLANE,
@@ -686,20 +688,23 @@ static void BlendI420I420( filter_t *p_filter,
         return;
     }
 
-
+    bool b_swap_up = vlc_fourcc_AreUVPlanesSwapped( p_filter->fmt_out.video.i_chroma,
+                                                    VLC_CODEC_I420 );
     i_dst_pitch = p_dst->p[Y_PLANE].i_pitch;
     p_dst_y = p_dst->p[Y_PLANE].p_pixels + i_x_offset +
               p_filter->fmt_out.video.i_x_offset +
               p_dst->p[Y_PLANE].i_pitch *
               ( i_y_offset + p_filter->fmt_out.video.i_y_offset );
-    p_dst_u = p_dst->p[U_PLANE].p_pixels + i_x_offset/2 +
+    const int i_u_plane = b_swap_up ? V_PLANE : U_PLANE;
+    p_dst_u = p_dst->p[i_u_plane].p_pixels + i_x_offset/2 +
               p_filter->fmt_out.video.i_x_offset/2 +
               ( i_y_offset + p_filter->fmt_out.video.i_y_offset ) / 2 *
-              p_dst->p[U_PLANE].i_pitch;
-    p_dst_v = p_dst->p[V_PLANE].p_pixels + i_x_offset/2 +
+              p_dst->p[i_u_plane].i_pitch;
+    const int i_v_plane = b_swap_up ? U_PLANE : V_PLANE;
+    p_dst_v = p_dst->p[i_v_plane].p_pixels + i_x_offset/2 +
               p_filter->fmt_out.video.i_x_offset/2 +
               ( i_y_offset + p_filter->fmt_out.video.i_y_offset ) / 2 *
-              p_dst->p[V_PLANE].i_pitch;
+              p_dst->p[i_v_plane].i_pitch;
 
     p_src_y = vlc_plane_start( &i_src_pitch, p_src, Y_PLANE,
                                0, 0, &p_filter->fmt_in.video, 1 );
@@ -754,19 +759,23 @@ static void BlendI420I420_no_alpha( filter_t *p_filter,
     int i_y;
     bool b_even_scanline = i_y_offset % 2;
 
+    bool b_swap_up = vlc_fourcc_AreUVPlanesSwapped( p_filter->fmt_out.video.i_chroma,
+                                                    VLC_CODEC_I420 );
     i_dst_pitch = p_dst->p[Y_PLANE].i_pitch;
     p_dst_y = p_dst->p[Y_PLANE].p_pixels + i_x_offset +
               p_filter->fmt_out.video.i_x_offset +
               p_dst->p[Y_PLANE].i_pitch *
               ( i_y_offset + p_filter->fmt_out.video.i_y_offset );
-    p_dst_u = p_dst->p[U_PLANE].p_pixels + i_x_offset/2 +
+    const int i_u_plane = b_swap_up ? V_PLANE : U_PLANE;
+    p_dst_u = p_dst->p[i_u_plane].p_pixels + i_x_offset/2 +
               p_filter->fmt_out.video.i_x_offset/2 +
               ( i_y_offset + p_filter->fmt_out.video.i_y_offset ) / 2 *
-              p_dst->p[U_PLANE].i_pitch;
-    p_dst_v = p_dst->p[V_PLANE].p_pixels + i_x_offset/2 +
+              p_dst->p[i_u_plane].i_pitch;
+    const int i_v_plane = b_swap_up ? U_PLANE : V_PLANE;
+    p_dst_v = p_dst->p[i_v_plane].p_pixels + i_x_offset/2 +
               p_filter->fmt_out.video.i_x_offset/2 +
               ( i_y_offset + p_filter->fmt_out.video.i_y_offset ) / 2 *
-              p_dst->p[V_PLANE].i_pitch;
+              p_dst->p[i_v_plane].i_pitch;
 
     p_src_y = vlc_plane_start( &i_src_pitch, p_src, Y_PLANE,
                                0, 0, &p_filter->fmt_in.video, 1 );
@@ -976,19 +985,23 @@ static void BlendPalI420( filter_t *p_filter,
     int i_x, i_y, i_trans;
     bool b_even_scanline = i_y_offset % 2;
 
+    bool b_swap_up = vlc_fourcc_AreUVPlanesSwapped( p_filter->fmt_out.video.i_chroma,
+                                                    VLC_CODEC_I420 );
     i_dst_pitch = p_dst->p[Y_PLANE].i_pitch;
     p_dst_y = p_dst->p[Y_PLANE].p_pixels + i_x_offset +
               p_filter->fmt_out.video.i_x_offset +
               p_dst->p[Y_PLANE].i_pitch *
               ( i_y_offset + p_filter->fmt_out.video.i_y_offset );
-    p_dst_u = p_dst->p[U_PLANE].p_pixels + i_x_offset/2 +
+    const int i_u_plane = b_swap_up ? V_PLANE : U_PLANE;
+    p_dst_u = p_dst->p[i_u_plane].p_pixels + i_x_offset/2 +
               p_filter->fmt_out.video.i_x_offset/2 +
               ( i_y_offset + p_filter->fmt_out.video.i_y_offset ) / 2 *
-              p_dst->p[U_PLANE].i_pitch;
-    p_dst_v = p_dst->p[V_PLANE].p_pixels + i_x_offset/2 +
+              p_dst->p[i_u_plane].i_pitch;
+    const int i_v_plane = b_swap_up ? U_PLANE : V_PLANE;
+    p_dst_v = p_dst->p[i_v_plane].p_pixels + i_x_offset/2 +
               p_filter->fmt_out.video.i_x_offset/2 +
               ( i_y_offset + p_filter->fmt_out.video.i_y_offset ) / 2 *
-              p_dst->p[V_PLANE].i_pitch;
+              p_dst->p[i_v_plane].i_pitch;
 
     i_src_pitch = p_src_pic->p->i_pitch;
     p_src = p_src_pic->p->p_pixels + p_filter->fmt_in.video.i_x_offset +
@@ -1179,20 +1192,23 @@ static void BlendRGBAI420( filter_t *p_filter,
     uint8_t y, u, v;
 
     bool b_even_scanline = i_y_offset % 2;
-
+    bool b_swap_up = vlc_fourcc_AreUVPlanesSwapped( p_filter->fmt_out.video.i_chroma,
+                                                    VLC_CODEC_I420 );
     i_dst_pitch = p_dst->p[Y_PLANE].i_pitch;
     p_dst_y = p_dst->p[Y_PLANE].p_pixels + i_x_offset +
               p_filter->fmt_out.video.i_x_offset +
               p_dst->p[Y_PLANE].i_pitch *
               ( i_y_offset + p_filter->fmt_out.video.i_y_offset );
-    p_dst_u = p_dst->p[U_PLANE].p_pixels + i_x_offset/2 +
+    const int i_u_plane = b_swap_up ? V_PLANE : U_PLANE;
+    p_dst_u = p_dst->p[i_u_plane].p_pixels + i_x_offset/2 +
               p_filter->fmt_out.video.i_x_offset/2 +
               ( i_y_offset + p_filter->fmt_out.video.i_y_offset ) / 2 *
-              p_dst->p[U_PLANE].i_pitch;
-    p_dst_v = p_dst->p[V_PLANE].p_pixels + i_x_offset/2 +
+              p_dst->p[i_u_plane].i_pitch;
+    const int i_v_plane = b_swap_up ? U_PLANE : V_PLANE;
+    p_dst_v = p_dst->p[i_v_plane].p_pixels + i_x_offset/2 +
               p_filter->fmt_out.video.i_x_offset/2 +
               ( i_y_offset + p_filter->fmt_out.video.i_y_offset ) / 2 *
-              p_dst->p[V_PLANE].i_pitch;
+              p_dst->p[i_v_plane].i_pitch;
 
     i_src_pix_pitch = p_src_pic->p->i_pixel_pitch;
     i_src_pitch = p_src_pic->p->i_pitch;
