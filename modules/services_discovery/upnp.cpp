@@ -113,7 +113,7 @@ static int Open( vlc_object_t *p_this )
             MEDIA_SERVER_DEVICE_TYPE, p_sd );
     if( i_res != UPNP_E_SUCCESS )
     {
-        msg_Err( p_sd, "Search failed: %s", UpnpGetErrorMessage( i_res ) );
+        msg_Err( p_sd, "Error sending search request: %s", UpnpGetErrorMessage( i_res ) );
         Close( (vlc_object_t*) p_sd );
         return VLC_EGENERIC;
     }
@@ -384,7 +384,10 @@ void MediaServer::parseDeviceDescription( IXML_Document* p_doc,
                         xml_getChildElementValue( p_service_element,
                                                   "serviceType" );
                     if ( !psz_service_type )
+                    {
+                        msg_Warn( p_sd, "No service type found." );
                         continue;
+                    }
 
                     if ( strcmp( CONTENT_DIRECTORY_SERVICE_TYPE,
                                 psz_service_type ) != 0 )
@@ -394,13 +397,19 @@ void MediaServer::parseDeviceDescription( IXML_Document* p_doc,
                         xml_getChildElementValue( p_service_element,
                                                   "eventSubURL" );
                     if ( !psz_event_sub_url )
+                    {
+                        msg_Warn( p_sd, "No event subscription url found." );
                         continue;
+                    }
 
                     const char* psz_control_url =
                         xml_getChildElementValue( p_service_element,
                                                   "controlURL" );
                     if ( !psz_control_url )
+                    {
+                        msg_Warn( p_sd, "No control url found." );
                         continue;
+                    }
 
                     // Try to subscribe to ContentDirectory service
 
@@ -688,6 +697,13 @@ bool MediaServer::_fetchContents( Container* p_parent )
         msg_Err( _p_sd, "browse() response parsing failed" );
         return false;
     }
+#ifndef NDEBUG
+    else
+    {
+        msg_Dbg( _p_sd, "Got DIDL document: %s",
+                ixmlPrintDocument( p_result ) );
+    }
+#endif
 
     IXML_NodeList* containerNodeList =
                 ixmlDocument_getElementsByTagName( p_result, "container" );
