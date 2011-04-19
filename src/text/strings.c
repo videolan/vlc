@@ -891,6 +891,20 @@ char *str_format_meta( vlc_object_t *p_object, const char *string )
                     *(dst+d) = '\n';
                     d++;
                     break;
+                case 'Z':
+                    if( p_item )
+                    {
+                        char *now_playing = input_item_GetNowPlaying( p_item );
+                        if ( now_playing == NULL )
+                        {
+                            INSERT_STRING( input_item_GetTitle( p_item ) );
+                            INSERT_STRING_NO_FREE( " - " );
+                            INSERT_STRING( input_item_GetArtist( p_item ) );
+                        }
+                        else
+                            INSERT_STRING( now_playing );
+                    }
+                    break;
 
                 case ' ':
                     b_empty_if_na = true;
