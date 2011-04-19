@@ -882,16 +882,17 @@ ifdef HAVE_WIN32
 CROSS=$(HOST)-
 endif
 
-VPX_TARGET-$(ENABLED)              = FIXME
-VPX_TARGET-$(HAVE_WIN32)           = x86-win32-gcc
-VPX_TARGET-$(HAVE_DARWIN_OS)       = ppc32-darwin9-gcc
-VPX_TARGET-$(HAVE_MACOSX_ON_INTEL) = x86-darwin9-gcc
-VPX_TARGET-$(HAVE_MACOSX64)        = x86_64-darwin9-gcc
+VPX_TARGET-$(ENABLED)              = --target=FIXME
+VPX_TARGET-$(HAVE_LINUX)           =
+VPX_TARGET-$(HAVE_WIN32)           = --target=x86-win32-gcc
+VPX_TARGET-$(HAVE_DARWIN_OS)       = --target=ppc32-darwin9-gcc
+VPX_TARGET-$(HAVE_MACOSX_ON_INTEL) = --target=x86-darwin9-gcc
+VPX_TARGET-$(HAVE_MACOSX64)        = --target=x86_64-darwin9-gcc
 VPX_DEPS-$(ENABLED)                =
 VPX_DEPS-$(HAVE_MACOSX_ON_INTEL) += .yasm
 
 .libvpx: libvpx $(VPX_DEPS-1)
-	(cd $<; CROSS=$(CROSS) ./configure --target=$(VPX_TARGET-1) --disable-install-bins --disable-install-srcs --disable-install-libs --disable-install-docs --disable-examples --disable-vp8-decoder && make && make install)
+	(cd $<; CROSS=$(CROSS) ./configure $(VPX_TARGET-1) --disable-install-bins --disable-install-srcs --disable-install-libs --disable-install-docs --disable-examples --disable-vp8-decoder && make && make install)
 	(rm -rf $(PREFIX)/include/vpx/ && mkdir -p $(PREFIX)/include/vpx/; cd $< && cp vpx/*.h vpx_ports/*.h $(PREFIX)/include/vpx/) # Of course, why the hell would one expect it to be listed or in make install?
 	rm $(PREFIX)/include/vpx/config.h
 	(cd $<; $(RANLIB) libvpx.a && mkdir -p $(PREFIX)/lib && cp libvpx.a $(PREFIX)/lib/) # Of course, why the hell would one expect it to be listed or in make install?
