@@ -52,7 +52,7 @@ struct services_discovery_sys_t
 // VLC callback prototypes
 static int Open( vlc_object_t* );
 static void Close( vlc_object_t* );
-VLC_SD_PROBE_HELPER("upnp", "Universal Plug'n'Play", SD_CAT_LAN)
+VLC_SD_PROBE_HELPER( "upnp", "Universal Plug'n'Play", SD_CAT_LAN )
 
 // Module descriptor
 
@@ -87,7 +87,7 @@ static int Open( vlc_object_t *p_this )
     services_discovery_sys_t *p_sys  = ( services_discovery_sys_t * )
             calloc( 1, sizeof( services_discovery_sys_t ) );
 
-    if(!(p_sd->p_sys = p_sys))
+    if( !( p_sd->p_sys = p_sys ) )
         return VLC_ENOMEM;
 
     i_res = UpnpInit( 0, 0 );
@@ -169,7 +169,7 @@ const char* xml_getChildElementValue( IXML_Element* p_parent,
 // Extracts the result document from a SOAP response
 IXML_Document* parseBrowseResult( IXML_Document* p_doc )
 {
-    ixmlRelaxParser(1);
+    ixmlRelaxParser( 1 );
 
     if ( !p_doc ) return 0;
 
@@ -236,6 +236,7 @@ static int Callback( Upnp_EventType event_type, void* p_event, void* p_user_data
         struct Upnp_Discovery* p_discovery = ( struct Upnp_Discovery* )p_event;
 
         p_sys->p_server_list->removeServer( p_discovery->DeviceId );
+
     }
     break;
 
@@ -623,8 +624,8 @@ IXML_Document* MediaServer::_browseAction( const char* psz_object_id_,
 
     i_res = UpnpSendAction( _p_sd->p_sys->client_handle,
               psz_url,
-              CONTENT_DIRECTORY_SERVICE_TYPE,
-              0,
+              psz_service_type,
+              0, // ignored in SDK, must be NULL
               p_action,
               &p_response );
 
@@ -862,10 +863,10 @@ void MediaServer::_buildPlaylist( Container* p_parent, input_item_node_t *p_inpu
 
 void MediaServer::setInputItem( input_item_t* p_input_item )
 {
-    if(_p_input_item == p_input_item)
+    if( _p_input_item == p_input_item )
         return;
 
-    if(_p_input_item)
+    if( _p_input_item )
         vlc_gc_decref( _p_input_item );
 
     vlc_gc_incref( p_input_item );
@@ -986,7 +987,7 @@ Item::Item( Container* p_parent, const char* psz_object_id, const char* psz_titl
 
 Item::~Item()
 {
-    if(_p_input_item)
+    if( _p_input_item )
         vlc_gc_decref( _p_input_item );
 }
 
@@ -1007,10 +1008,10 @@ const char* Item::getResource() const
 
 void Item::setInputItem( input_item_t* p_input_item )
 {
-    if(_p_input_item == p_input_item)
+    if( _p_input_item == p_input_item )
         return;
 
-    if(_p_input_item)
+    if( _p_input_item )
         vlc_gc_decref( _p_input_item );
 
     vlc_gc_incref( p_input_item );
@@ -1043,7 +1044,7 @@ Container::~Container()
         delete _items[i];
     }
 
-    if(_p_input_item )
+    if( _p_input_item )
         vlc_gc_decref( _p_input_item );
 }
 
@@ -1096,10 +1097,10 @@ Container* Container::getParent()
 
 void Container::setInputItem( input_item_t* p_input_item )
 {
-    if(_p_input_item == p_input_item)
+    if( _p_input_item == p_input_item )
         return;
 
-    if(_p_input_item)
+    if( _p_input_item )
         vlc_gc_decref( _p_input_item );
 
     vlc_gc_incref( p_input_item );
