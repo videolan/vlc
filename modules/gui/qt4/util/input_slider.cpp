@@ -56,13 +56,9 @@ SeekSlider::SeekSlider( Qt::Orientation q, QWidget *_parent )
     seekLimitTimer = new QTimer( this );
     seekLimitTimer->setSingleShot( true );
 
-    /* Timer used to avoid flickering when the mouse leave the slider
-       and is over the tooltip */
-    hideTooltipTimer = new QTimer( this );
-    hideTooltipTimer->setSingleShot( true );
-
     /* Tooltip bubble */
     mTimeTooltip = new TimeTooltip( this );
+    mTimeTooltip->setMouseTracking( true );
 
     /* Properties */
     setRange( MINIMUM, MAXIMUM );
@@ -78,7 +74,6 @@ SeekSlider::SeekSlider( Qt::Orientation q, QWidget *_parent )
 
     CONNECT( this, sliderMoved( int ), this, startSeekTimer( int ) );
     CONNECT( seekLimitTimer, timeout(), this, updatePos() );
-    CONNECT( hideTooltipTimer, timeout(), mTimeTooltip, hide() );
 
     mTimeTooltip->installEventFilter( this );
 }
@@ -178,29 +173,32 @@ void SeekSlider::wheelEvent( QWheelEvent *event )
 void SeekSlider::enterEvent( QEvent *e )
 {
     /* Don't show the tooltip if the slider is disabled */
-    if ( isEnabled() )
-    {
-        hideTooltipTimer->stop();
+    if( isEnabled() )
         mTimeTooltip->show();
-    }
 }
 
 void SeekSlider::leaveEvent( QEvent *e )
 {
-    /* Wait 100ms before hiding the tooltip */
-    hideTooltipTimer->start( 100 );
+    if( !rect().contains( mapFromGlobal( QCursor::pos() ) ) )
+        mTimeTooltip->hide();
+}
+
+void SeekSlider::hideEvent( QHideEvent * )
+{
+    mTimeTooltip->hide();
 }
 
 bool SeekSlider::eventFilter( QObject *obj, QEvent *event )
 {
-    /* This eventFilter avoids a flicker that occurs if the
-       mouse cursor leaves the SeekSlider for the TimeTooltip. */
-    if ( obj == mTimeTooltip )
+    if( obj == mTimeTooltip )
     {
-        if ( event->type() == QEvent::Enter )
-            hideTooltipTimer->stop();
-        else if ( event->type() == QEvent::Leave )
-            hideTooltipTimer->start( 100 );
+        if( event->type() == QEvent::Leave ||
+            event->type() == QEvent::MouseMove )
+        {
+            QMouseEvent *e = static_cast<QMouseEvent*>( event );
+            if( !rect().contains( mapFromGlobal( e->globalPos() ) ) )
+                mTimeTooltip->hide();
+        }
         return false;
     }
     else

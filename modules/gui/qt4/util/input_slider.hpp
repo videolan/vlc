@@ -34,6 +34,7 @@
 
 class QMouseEvent;
 class QWheelEvent;
+class QHideEvent;
 class QTimer;
 
 /* Input Slider derived from QSlider */
@@ -51,6 +52,7 @@ protected:
     virtual void wheelEvent( QWheelEvent *event );
     virtual void enterEvent( QEvent * );
     virtual void leaveEvent( QEvent * );
+    virtual void hideEvent( QHideEvent * );
 
     virtual void paintEvent( QPaintEvent* event );
     virtual bool eventFilter( QObject *obj, QEvent *event );
@@ -63,7 +65,6 @@ private:
     int inputLength;        /* InputLength that can change */
     char psz_length[MSTRTIME_MAX_SIZE]; /* Used for the ToolTip */
     QTimer *seekLimitTimer;
-    QTimer *hideTooltipTimer;
     TimeTooltip *mTimeTooltip;
 
 public slots:
