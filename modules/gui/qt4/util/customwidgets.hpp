@@ -34,6 +34,8 @@
 #include <QSpinBox>
 #include <QList>
 #include <QTimer>
+#include <QToolButton>
+
 class QPixmap;
 
 class QFramelessButton : public QPushButton
@@ -46,6 +48,19 @@ protected:
     virtual void paintEvent( QPaintEvent * event );
 };
 
+class QToolButtonExt : public QToolButton
+{
+    Q_OBJECT
+public:
+    QToolButtonExt( QWidget *parent = 0, int ms = 1000 );
+private:
+    bool longClick;
+private slots:
+    void releasedSlot();
+signals:
+    void shortClicked();
+    void longClicked();
+};
 
 class QElidingLabel : public QLabel
 {
@@ -166,4 +181,3 @@ int qtWheelEventToVLCKey( QWheelEvent *e );
 QString VLCKeyToString( unsigned val );
 
 #endif
-

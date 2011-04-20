@@ -411,3 +411,25 @@ SpinningIcon::SpinningIcon( QWidget *parent, bool noIdleFrame )
 SpinningIcon::~SpinningIcon()
 {
 }
+
+QToolButtonExt::QToolButtonExt(QWidget *parent, int ms ): longClick( false )
+{
+    setAutoRepeat( true );
+    setAutoRepeatDelay( ms );
+    setAutoRepeatInterval( 100 );
+    connect( this, SIGNAL(released()), this, SLOT(releasedSlot()) );
+}
+
+void QToolButtonExt::releasedSlot()
+{
+    if( isDown() )
+        longClick = true;
+
+    if( longClick )
+        emit longClicked();
+    else
+        emit shortClicked();
+
+    if( !isDown() )
+        longClick = false;
+}
