@@ -266,6 +266,24 @@ QWidget *AbstractController::createWidget( buttonType_e button, int options )
         ENABLE_ON_INPUT( FASTERButton );
         }
         break;
+    case PREV_SLOW_BUTTON:{
+        QToolButtonExt *but = new QToolButtonExt;
+        setupButton( but );
+        BUTTON_SET_BAR( but );
+        CONNECT( but, shortClicked(), THEMIM, prev() );
+        CONNECT( but, longClicked(), THEAM, skipBackward() );
+        widget = but;
+        }
+        break;
+    case NEXT_FAST_BUTTON:{
+        QToolButtonExt *but = new QToolButtonExt;
+        setupButton( but );
+        BUTTON_SET_BAR( but );
+        CONNECT( but, shortClicked(), THEMIM, next() );
+        CONNECT( but, longClicked(), THEAM, skipForward() );
+        widget = but;
+        }
+        break;
     case FRAME_BUTTON: {
         NORMAL_BUTTON( FRAME );
         ENABLE_ON_VIDEO( FRAMEButton );
