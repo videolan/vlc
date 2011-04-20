@@ -765,15 +765,15 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             vlc_meta_t *p_meta = (vlc_meta_t*)va_arg( args, vlc_meta_t* );
 
             AVMetadataTag *title = av_metadata_get( p_sys->ic->metadata, "language", NULL, 0 );
-            AVMetadataTag *author = av_metadata_get( p_sys->ic->metadata, "author", NULL, 0 );
+            AVMetadataTag *artist = av_metadata_get( p_sys->ic->metadata, "artist", NULL, 0 );
             AVMetadataTag *copyright = av_metadata_get( p_sys->ic->metadata, "copyright", NULL, 0 );
             AVMetadataTag *comment = av_metadata_get( p_sys->ic->metadata, "comment", NULL, 0 );
             AVMetadataTag *genre = av_metadata_get( p_sys->ic->metadata, "genre", NULL, 0 );
 
             if( title && title->value )
                 vlc_meta_SetTitle( p_meta, title->value );
-            if( author && author->value )
-                vlc_meta_SetArtist( p_meta, author->value );
+            if( artist && artist->value )
+                vlc_meta_SetArtist( p_meta, artist->value );
             if( copyright && copyright->value )
                 vlc_meta_SetCopyright( p_meta, copyright->value );
             if( comment && comment->value )
