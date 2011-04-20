@@ -96,12 +96,20 @@ int OpenMux( vlc_object_t *p_this )
     psz_mux = var_GetNonEmptyString( p_mux, "ffmpeg-mux" );
     if( psz_mux )
     {
+#if( LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT( 52, 45, 0 ) )
         file_oformat = av_guess_format( psz_mux, NULL, NULL );
+#else
+        file_oformat = guess_format( psz_mux, NULL, NULL );
+#endif
     }
     else
     {
         file_oformat =
-            av_guess_format(NULL, p_mux->p_access->psz_path, NULL);
+#if( LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT( 52, 45, 0 ) )
+            av_guess_format( NULL, p_mux->p_access->psz_path, NULL);
+#else
+            guess_format( NULL, p_mux->p_access->psz_path, NULL);
+#endif
     }
     if (!file_oformat)
     {
