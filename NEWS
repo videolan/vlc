@@ -38,6 +38,7 @@ Core:
  * Playback rate doesn't get resetted to 1 between items anymore
  * Major Video Output and Video Core reworks and rewrites
  * Almost every video filter can now be transcoded
+ * Option --sub-filter was renamed --sub-source
 
 Demuxers:
  * id3tag plugin is now removed (superseded by taglib)
@@ -70,6 +71,7 @@ Video Filter:
  * New sepia filter for creating sepia effect in videos
  * New deinterlacer mode Phosphor, a framerate doubling CRT TV simulator
  * New deinterlacer mode IVTC, to do live inverse telecine for NTSC films
+ * New subsdelay filter to change subtitles delay
 
 Audio Output:
  * New audio output based on AudioQueue API for iOS
