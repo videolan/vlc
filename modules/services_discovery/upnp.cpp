@@ -157,9 +157,7 @@ const char* xml_getChildElementValue( IXML_Element* p_parent,
     if ( !p_parent ) return 0;
     if ( !psz_tag_name_ ) return 0;
 
-    char* psz_tag_name = strdup( psz_tag_name_ );
-    IXML_NodeList* p_node_list = ixmlElement_getElementsByTagName( p_parent, psz_tag_name );
-    free( psz_tag_name );
+    IXML_NodeList* p_node_list = ixmlElement_getElementsByTagName( p_parent, psz_tag_name_ );
     if ( !p_node_list ) return 0;
 
     IXML_Node* p_element = ixmlNodeList_item( p_node_list, 0 );
@@ -212,11 +210,8 @@ IXML_Document* parseBrowseResult( IXML_Document* p_doc )
     if ( !p_text_node ) return 0;
 
     const char* psz_result_string = ixmlNode_getNodeValue( p_text_node );
-    char* psz_result_xml = strdup( psz_result_string );
 
-    IXML_Document* p_browse_doc = ixmlParseBuffer( psz_result_xml );
-
-    free( psz_result_xml );
+    IXML_Document* p_browse_doc = ixmlParseBuffer( psz_result_string );
 
     return p_browse_doc;
 }
@@ -442,18 +437,13 @@ void MediaServer::parseDeviceDescription( IXML_Document* p_doc,
                             strlen( psz_event_sub_url ) + 1 );
                     if ( psz_url )
                     {
-                        char* psz_s1 = strdup( psz_base_url );
-                        char* psz_s2 = strdup( psz_event_sub_url );
-
-                        if ( UpnpResolveURL( psz_s1, psz_s2, psz_url ) ==
+                        if ( UpnpResolveURL( psz_base_url, psz_event_sub_url, psz_url ) ==
                                 UPNP_E_SUCCESS )
                         {
                             p_server->setContentDirectoryEventURL( psz_url );
                             p_server->subscribeToContentDirectory();
                         }
 
-                        free( psz_s1 );
-                        free( psz_s2 );
                         free( psz_url );
                     }
 
@@ -463,18 +453,13 @@ void MediaServer::parseDeviceDescription( IXML_Document* p_doc,
                             strlen( psz_control_url ) + 1 );
                     if ( psz_url )
                     {
-                        char* psz_s1 = strdup( psz_base_url );
-                        char* psz_s2 = strdup( psz_control_url );
-
-                        if ( UpnpResolveURL( psz_s1, psz_s2, psz_url ) ==
+                        if ( UpnpResolveURL( psz_base_url, psz_control_url, psz_url ) ==
                                 UPNP_E_SUCCESS )
                         {
                             p_server->setContentDirectoryControlURL( psz_url );
                             p_server->fetchContents();
                         }
 
-                        free( psz_s1 );
-                        free( psz_s2 );
                         free( psz_url );
                     }
                }
@@ -576,18 +561,12 @@ IXML_Document* MediaServer::_browseAction( const char* psz_object_id_,
         return 0;
     }
 
-    char* psz_object_id = strdup( psz_object_id_ );
-    char* psz_browse_flag = strdup( psz_browser_flag_ );
-    char* psz_filter = strdup( psz_filter_ );
-    char* psz_starting_index = strdup( psz_starting_index_ );
-    char* psz_requested_count = strdup( psz_requested_count_ );
-    char* psz_sort_criteria = strdup( psz_sort_criteria_ );
     char* psz_service_type = strdup( CONTENT_DIRECTORY_SERVICE_TYPE );
 
     int i_res;
 
     i_res = UpnpAddToAction( &p_action, "Browse",
-            psz_service_type, "ObjectID", psz_object_id );
+            psz_service_type, "ObjectID", psz_object_id_ );
 
     if ( i_res != UPNP_E_SUCCESS )
     {
@@ -597,7 +576,7 @@ IXML_Document* MediaServer::_browseAction( const char* psz_object_id_,
     }
 
     i_res = UpnpAddToAction( &p_action, "Browse",
-            psz_service_type, "BrowseFlag", psz_browse_flag );
+            psz_service_type, "BrowseFlag", psz_browser_flag_ );
 
     if ( i_res != UPNP_E_SUCCESS )
     {
@@ -607,7 +586,7 @@ IXML_Document* MediaServer::_browseAction( const char* psz_object_id_,
     }
 
     i_res = UpnpAddToAction( &p_action, "Browse",
-            psz_service_type, "Filter", psz_filter );
+            psz_service_type, "Filter", psz_filter_ );
 
     if ( i_res != UPNP_E_SUCCESS )
     {
@@ -617,7 +596,7 @@ IXML_Document* MediaServer::_browseAction( const char* psz_object_id_,
     }
 
     i_res = UpnpAddToAction( &p_action, "Browse",
-            psz_service_type, "StartingIndex", psz_starting_index );
+            psz_service_type, "StartingIndex", psz_starting_index_ );
 
     if ( i_res != UPNP_E_SUCCESS )
     {
@@ -627,7 +606,7 @@ IXML_Document* MediaServer::_browseAction( const char* psz_object_id_,
     }
 
     i_res = UpnpAddToAction( &p_action, "Browse",
-            psz_service_type, "RequestedCount", psz_requested_count );
+            psz_service_type, "RequestedCount", psz_requested_count_ );
 
     if ( i_res != UPNP_E_SUCCESS )
     {
@@ -637,7 +616,7 @@ IXML_Document* MediaServer::_browseAction( const char* psz_object_id_,
     }
 
     i_res = UpnpAddToAction( &p_action, "Browse",
-            psz_service_type, "SortCriteria", psz_sort_criteria );
+            psz_service_type, "SortCriteria", psz_sort_criteria_ );
 
     if ( i_res != UPNP_E_SUCCESS )
     {
@@ -663,13 +642,6 @@ IXML_Document* MediaServer::_browseAction( const char* psz_object_id_,
     }
 
 browseActionCleanup:
-
-    free( psz_object_id );
-    free( psz_browse_flag );
-    free( psz_filter );
-    free( psz_starting_index );
-    free( psz_requested_count );
-    free( psz_sort_criteria );
 
     free( psz_service_type );
 
