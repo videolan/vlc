@@ -86,6 +86,8 @@ public slots:
     void AudioDown();
     void play();
     void record();
+    void skipForward();
+    void skipBackward();
 protected slots:
     void fullscreen();
     void snapshot();

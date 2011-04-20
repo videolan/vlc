@@ -80,12 +80,10 @@ void ActionsManager::doAction( int id_action )
         case REVERSE_ACTION:
             THEMIM->getIM()->reverse(); break;
         case SKIP_BACK_ACTION:
-            var_SetInteger( p_intf->p_libvlc, "key-action",
-                    ACTIONID_JUMP_BACKWARD_SHORT );
+            skipBackward();
             break;
         case SKIP_FW_ACTION:
-            var_SetInteger( p_intf->p_libvlc, "key-action",
-                    ACTIONID_JUMP_FORWARD_SHORT );
+            skipForward();
             break;
         case QUIT_ACTION:
             THEDP->quit();  break;
@@ -185,5 +183,15 @@ void ActionsManager::AudioUp()
 void ActionsManager::AudioDown()
 {
     aout_VolumeDown( THEPL, 1, NULL );
+}
+
+void ActionsManager::skipForward()
+{
+    var_SetInteger( p_intf->p_libvlc, "key-action", ACTIONID_JUMP_FORWARD_SHORT );
+}
+
+void ActionsManager::skipBackward()
+{
+    var_SetInteger( p_intf->p_libvlc, "key-action", ACTIONID_JUMP_BACKWARD_SHORT );
 }
 
