@@ -119,12 +119,14 @@ public:
     Item( Container*  parent,
           const char* objectID,
           const char* title,
-          const char* resource );
+          const char* resource,
+          mtime_t duration );
     ~Item();
 
     const char* getObjectID() const;
     const char* getTitle() const;
     const char* getResource() const;
+    const mtime_t getDuration() const;
 
     void setInputItem( input_item_t* p_input_item );
 
@@ -136,6 +138,7 @@ private:
     std::string _objectID;
     std::string _title;
     std::string _resource;
+    mtime_t _duration;
 };
 
 

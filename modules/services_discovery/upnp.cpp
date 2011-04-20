@@ -25,6 +25,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#define __STDC_CONSTANT_MACROS 1
+
 #undef PACKAGE_NAME
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -74,6 +76,10 @@ static int Callback( Upnp_EventType event_type, void* p_event, void* p_user_data
 
 const char* xml_getChildElementValue( IXML_Element* p_parent,
                                       const char*   psz_tag_name );
+
+const char* xml_getChildElementAttributeValue( IXML_Element* p_parent,
+                                        const char* psz_tag_name_,
+                                        const char* psz_attribute_ );
 
 IXML_Document* parseBrowseResult( IXML_Document* p_doc );
 
@@ -164,6 +170,24 @@ const char* xml_getChildElementValue( IXML_Element* p_parent,
     if ( !p_text_node ) return 0;
 
     return ixmlNode_getNodeValue( p_text_node );
+}
+
+const char* xml_getChildElementAttributeValue( IXML_Element* p_parent,
+                                        const char* psz_tag_name_,
+                                        const char* psz_attribute_ )
+{
+    if ( !p_parent ) return NULL;
+    if ( !psz_tag_name_ ) return NULL;
+    if ( !psz_attribute_ ) return NULL;
+
+    IXML_NodeList* p_node_list = ixmlElement_getElementsByTagName( p_parent, psz_tag_name_ );
+    if ( !p_node_list ) return NULL;
+
+    IXML_Node* p_element = ixmlNodeList_item( p_node_list, 0 );
+    ixmlNodeList_free( p_node_list );
+    if ( !p_element ) return NULL;
+
+    return ixmlElement_getAttribute( (IXML_Element*) p_element, psz_attribute_ );
 }
 
 // Extracts the result document from a SOAP response
@@ -740,7 +764,7 @@ bool MediaServer::_fetchContents( Container* p_parent )
 
             if ( resource && childCount < 1 )
             {
-                Item* item = new Item( p_parent, objectID, title, resource );
+                Item* item = new Item( p_parent, objectID, title, resource, -1 );
                 p_parent->addItem( item );
             }
 
@@ -783,7 +807,24 @@ bool MediaServer::_fetchContents( Container* p_parent )
             if ( !resource )
                 continue;
 
-            Item* item = new Item( p_parent, objectID, title, resource );
+            const char* psz_duration = xml_getChildElementAttributeValue( itemElement,
+                                                                    "res",
+                                                                    "duration" );
+
+            mtime_t i_duration = -1;
+            int i_hours, i_minutes, i_seconds, i_decis;
+
+            if ( psz_duration )
+            {
+                if( sscanf( psz_duration, "%02d:%02d:%02d.%d",
+                        &i_hours, &i_minutes, &i_seconds, &i_decis ))
+                    i_duration = INT64_C(1000000) * ( i_hours*3600 +
+                                                      i_minutes*60 +
+                                                      i_seconds ) +
+                                 INT64_C(100000) * i_decis;
+            }
+
+            Item* item = new Item( p_parent, objectID, title, resource, i_duration );
             p_parent->addItem( item );
         }
         ixmlNodeList_free( itemNodeList );
@@ -849,9 +890,14 @@ void MediaServer::_buildPlaylist( Container* p_parent, input_item_node_t *p_inpu
     {
         Item* p_item = p_parent->getItem( i );
 
-        input_item_t* p_input_item = input_item_New( _p_sd,
+        input_item_t* p_input_item = input_item_NewExt( _p_sd,
                                                p_item->getResource(),
-                                               p_item->getTitle() );
+                                               p_item->getTitle(),
+                                               0,
+                                               NULL,
+                                               0,
+                                               p_item->getDuration() );
+
         assert( p_input_item );
         input_item_node_AppendItem( p_input_node, p_input_item );
         p_item->setInputItem( p_input_item );
@@ -974,13 +1020,14 @@ void MediaServerList::removeServer( const char* psz_udn )
 // Item...
 
 Item::Item( Container* p_parent, const char* psz_object_id, const char* psz_title,
-           const char* psz_resource )
+           const char* psz_resource, mtime_t i_duration )
 {
     _parent = p_parent;
 
     _objectID = psz_object_id;
     _title = psz_title;
     _resource = psz_resource;
+    _duration = i_duration;
 
     _p_input_item = NULL;
 }
@@ -1004,6 +1051,11 @@ const char* Item::getTitle() const
 const char* Item::getResource() const
 {
     return _resource.c_str();
+}
+
+const mtime_t Item::getDuration() const
+{
+    return _duration;
 }
 
 void Item::setInputItem( input_item_t* p_input_item )
