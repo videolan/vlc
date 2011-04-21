@@ -1195,6 +1195,8 @@ static void EsOutProgramMeta( es_out_t *out, int i_group, const vlc_meta_t *p_me
         return;
     }
     /* Find program */
+    if( !EsOutIsProgramVisible( out, i_group ) )
+        return;
     p_pgrm = EsOutProgramFind( out, i_group );
     if( !p_pgrm )
         return;
@@ -1231,7 +1233,7 @@ static void EsOutProgramMeta( es_out_t *out, int i_group, const vlc_meta_t *p_me
         }
 
         /* ugly but it works */
-        if( EsOutIsProgramVisible( out, i_group ) && psz_text )
+        if( psz_text )
         {
             input_SendEventProgramDel( p_input, i_group );
             input_SendEventProgramAdd( p_input, i_group, psz_text );
@@ -1286,6 +1288,8 @@ static void EsOutProgramEpg( es_out_t *out, int i_group, const vlc_epg_t *p_epg 
     char *psz_cat;
 
     /* Find program */
+    if( !EsOutIsProgramVisible( out, i_group ) )
+        return;
     p_pgrm = EsOutProgramFind( out, i_group );
     if( !p_pgrm )
         return;
