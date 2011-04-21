@@ -335,11 +335,6 @@ ExtraMetaPanel::ExtraMetaPanel( QWidget *parent,
      extraMetaTree->setColumnCount( 2 );
      extraMetaTree->resizeColumnToContents( 0 );
      extraMetaTree->header()->hide();
-/*     QStringList headerList = ( QStringList() << qtr( "Type" )
- *                                             << qtr( "Value" ) );
- * Useless, add this header if you think it would help the user          **
- */
-
      layout->addWidget( extraMetaTree, 1, 0 );
 }
 
@@ -412,10 +407,8 @@ InfoPanel::InfoPanel( QWidget *parent,
 
      InfoTree = new QTreeWidget(this);
      InfoTree->setColumnCount( 1 );
-     InfoTree->setColumnWidth( 0, 20000 );
      InfoTree->header()->hide();
-//     InfoTree->header()->setStretchLastSection(false);
-//     InfoTree->header()->setResizeMode(QHeaderView::ResizeToContents);
+     InfoTree->header()->setResizeMode(QHeaderView::ResizeToContents);
      layout->addWidget(InfoTree, 1, 0 );
 }
 
@@ -450,7 +443,7 @@ void InfoPanel::update( input_item_t *p_item)
 
             current_item->addChild(child_item);
         }
-         InfoTree->setItemExpanded( current_item, true);
+        InfoTree->setItemExpanded( current_item, true);
     }
 }
 
