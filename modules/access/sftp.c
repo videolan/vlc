@@ -108,6 +108,8 @@ static int Open( vlc_object_t* p_this )
     int i_port;
     int i_ret;
     vlc_url_t url;
+    size_t i_len;
+    int i_type;
 
     if( !p_access->psz_location )
         return VLC_EGENERIC;
@@ -162,15 +164,46 @@ static int Open( vlc_object_t* p_this )
         goto error;
     }
 
-    /* Ask for the fingerprint ... */
-    // TODO: check it
+    /* Set the socket in non-blocking mode */
     libssh2_session_set_blocking( p_sys->ssh_session, 1 );
-    const char* fingerprint = libssh2_hostkey_hash( p_sys->ssh_session, LIBSSH2_HOSTKEY_HASH_MD5 );
-    fprintf(stderr, "Fingerprint: ");
-    for( int i = 0; i < 16; i++) {
-        fprintf(stderr, "%02X ", (unsigned char)fingerprint[i]);
+
+    /* List the know hosts */
+    LIBSSH2_KNOWNHOSTS *ssh_knownhosts = libssh2_knownhost_init( p_sys->ssh_session );
+    if( !ssh_knownhosts )
+        goto error;
+
+    char *psz_home = config_GetUserDir( VLC_HOME_DIR );
+    char *psz_knownhosts_file;
+    asprintf( &psz_knownhosts_file, "%s/.ssh/known_hosts", psz_home );
+    libssh2_knownhost_readfile( ssh_knownhosts, psz_knownhosts_file,
+                                LIBSSH2_KNOWNHOST_FILE_OPENSSH );
+    free( psz_knownhosts_file );
+    free( psz_home );
+
+    const char *fingerprint = libssh2_session_hostkey( p_sys->ssh_session, &i_len, &i_type );
+    struct libssh2_knownhost *host;
+    int check = libssh2_knownhost_check( ssh_knownhosts, url.psz_host,
+                                         fingerprint, i_len,
+                                         LIBSSH2_KNOWNHOST_TYPE_PLAIN |
+                                         LIBSSH2_KNOWNHOST_KEYENC_RAW,
+                                         &host );
+
+    libssh2_knownhost_free( ssh_knownhosts );
+
+    /* Check that it does match or at least that the host is unkown */
+    switch(check)
+    {
+    case LIBSSH2_KNOWNHOST_CHECK_FAILURE:
+    case LIBSSH2_KNOWNHOST_CHECK_NOTFOUND:
+        msg_Dbg( p_access, "Unable to check the remote host" );
+        break;
+    case LIBSSH2_KNOWNHOST_CHECK_MATCH:
+        msg_Dbg( p_access, "Succesfuly matched the host" );
+        break;
+    case LIBSSH2_KNOWNHOST_CHECK_MISMATCH:
+        msg_Err( p_access, "The host does not match !! The remote key changed !!" );
+        goto error;
     }
-    fprintf(stderr, "\n");
 
     //TODO: ask for the available auth methods
 
