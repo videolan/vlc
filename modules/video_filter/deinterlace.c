@@ -1629,7 +1629,10 @@ static inline void XDeintBand8x8MMXEXT( uint8_t *dst, int i_dst,
 static void RenderX( picture_t *p_outpic, picture_t *p_pic )
 {
     int i_plane;
+
+#ifdef CAN_COMPILE_MMXEXT
     unsigned u_cpu = vlc_CPU();
+#endif
 
     /* Copy image and skip lines */
     for( i_plane = 0 ; i_plane < p_pic->i_planes ; i_plane++ )
@@ -2095,13 +2098,13 @@ static void DarkenField( picture_t *p_dst, const int i_field,
     assert( i_field == 0 || i_field == 1 );
     assert( i_strength >= 1 && i_strength <= 3 );
 
-    unsigned u_cpu = vlc_CPU();
 
     /* Bitwise ANDing with this clears the i_strength highest bits
        of each byte */
 #ifdef CAN_COMPILE_MMXEXT
     uint64_t i_strength_u64 = i_strength; /* for MMX version (needs to know
                                              number of bits) */
+    unsigned u_cpu = vlc_CPU();
 #endif
     const uint8_t  remove_high_u8 = 0xFF >> i_strength;
     const uint64_t remove_high_u64 = remove_high_u8 *
@@ -3062,13 +3065,13 @@ static int CalculateInterlaceScore( const picture_t* p_pic_top,
     if( p_pic_top->i_planes != p_pic_bot->i_planes )
         return -1;
 
-    unsigned u_cpu = vlc_CPU();
-
     /* Amount of bits must be known for MMX, thus int32_t.
        Doesn't hurt the C implementation. */
     int32_t i_score = 0;
 
 #ifdef CAN_COMPILE_MMXEXT
+    unsigned u_cpu = vlc_CPU();
+
     if( u_cpu & CPU_CAPABILITY_MMXEXT )
         pxor_r2r( mm7, mm7 ); /* we will keep score in mm7 */
 #endif
