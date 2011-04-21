@@ -503,27 +503,6 @@ VLC-release.app: vlc
 	  $(INSTALL) -m 644 $${i} $(top_builddir)/VLC-release.app/Contents/MacOS/share/lua/http/requests/`basename $${i}` ; \
 	done
 	$(INSTALL) -m 644 $(srcdir)/share/lua/http/requests/README.txt $(top_builddir)/VLC-release.app/Contents/MacOS/share/lua/http/requests/README.txt
-	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS/share/http/dialogs
-	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS/share/http/js
-	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS/share/http/images
-	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS/share/http/requests
-	$(INSTALL) -m 644 $(srcdir)/share/http/.hosts $(top_builddir)/VLC-release.app/Contents/MacOS/share/http/.hosts
-	for i in $(srcdir)/share/http/*.* ; do \
-	  $(INSTALL) -m 644 $${i} $(top_builddir)/VLC-release.app/Contents/MacOS/share/http/`basename $${i}` ; \
-	done
-	for i in $(srcdir)/share/http/dialogs/* ; do \
-	  $(INSTALL) -m 644 $${i} $(top_builddir)/VLC-release.app/Contents/MacOS/share/http/dialogs/`basename $${i}` ; \
-	done
-	for i in $(srcdir)/share/http/js/*.* ; do \
-	  $(INSTALL) -m 644 $${i} $(top_builddir)/VLC-release.app/Contents/MacOS/share/http/js/`basename $${i}` ; \
-	done
-	for i in $(srcdir)/share/http/images/*.* ; do \
-	  $(INSTALL) -m 644 $${i} $(top_builddir)/VLC-release.app/Contents/MacOS/share/http/images/`basename $${i}` ; \
-	done
-	for i in $(srcdir)/share/http/requests/*.* ; do \
-	  $(INSTALL) -m 644 $${i} $(top_builddir)/VLC-release.app/Contents/MacOS/share/http/requests/`basename $${i}` ; \
-	done
-	$(INSTALL) -m 644 $(srcdir)/share/http/requests/README.txt $(top_builddir)/VLC-release.app/Contents/MacOS/share/http/requests/README.txt
 	$(INSTALL) -m 644 $(srcdir)/share/vlc512x512.png $(top_builddir)/VLC-release.app/Contents/MacOS/share/vlc512x512.png
 	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS/share/locale
 	cat $(top_srcdir)/po/LINGUAS | while read i; do \
@@ -716,9 +695,6 @@ if BUILD_LUA
 	cp -r $(destdir)/share/vlc/lua/* $(win32_destdir)/lua
 endif
 
-if BUILD_HTTPD
-	cp -r $(destdir)/share/vlc/http $(win32_destdir)
-endif
 if BUILD_SKINS
 	cp -r $(destdir)/share/vlc/skins2 $(win32_destdir)/skins
 endif

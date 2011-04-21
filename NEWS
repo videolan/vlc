@@ -55,6 +55,7 @@ Interfaces
  * Skins2: fullscreen controller support, relative placement support
    and important cleanups and optimisations
  * ncurses: heavy refactor of the complete interface
+ * removal of http interface in favor of luahttp
 
 Video Output:
  * New video output based on Direct2D for Windows 7 and Vista (with Platform Update)

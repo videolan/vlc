@@ -1,4 +1,4 @@
-SUBDIRS = http globalhotkeys dbus
+SUBDIRS = globalhotkeys dbus
 SOURCES_gestures = gestures.c
 SOURCES_netsync = netsync.c
 SOURCES_ntservice = ntservice.c

@@ -30,7 +30,6 @@ EXTRA_DIST = \
 	$(skins2_default_vlt_FILES) \
 	$(DIST_rsrc) \
 	$(DIST_skins2) \
-	$(DIST_http) \
 	$(DIST_http_lua) \
 	$(DIST_lua) \
 	$(DIST_osdmenu_default) \
@@ -41,9 +40,6 @@ nobase_vlcdata_DATA =
 if BUILD_SKINS
 nobase_vlcdata_DATA += skins2/default.vlt
 nobase_vlcdata_DATA += $(DIST_skins2)
-endif
-if BUILD_HTTPD
-nobase_vlcdata_DATA += $(DIST_http)
 endif
 if BUILD_OSDMENU
 nobase_vlcdata_DATA += \
@@ -86,72 +82,6 @@ skins2/default.vlt: $(skins2_default_vlt_FILES)
 		LC_ALL=C sort -z | \
 		tar cvv --exclude .svn --no-recursion --null -T -) | \
 	gzip -n > skins2/default.vlt
-
-DIST_http = \
-	http/.hosts \
-	http/dialogs/.hosts \
-	http/dialogs/browse \
-	http/dialogs/footer \
-	http/dialogs/input \
-	http/dialogs/main \
-	http/dialogs/mosaic \
-	http/dialogs/playlist \
-	http/dialogs/sout \
-	http/dialogs/vlm \
-	http/favicon.ico \
-	http/images/delete.png \
-	http/images/delete_small.png \
-	http/images/eject.png \
-	http/images/empty.png \
-	http/images/fullscreen.png \
-	http/images/help.png \
-	http/images/info.png \
-	http/images/loop.png \
-	http/images/minus.png \
-	http/images/next.png \
-	http/images/pause.png \
-	http/images/play.png \
-	http/images/playlist.png \
-	http/images/playlist_small.png \
-	http/images/plus.png \
-	http/images/prev.png \
-	http/images/refresh.png \
-	http/images/repeat.png \
-	http/images/sd.png \
-	http/images/shuffle.png \
-	http/images/slider_bar.png \
-	http/images/slider_left.png \
-	http/images/slider_point.png \
-	http/images/slider_right.png \
-	http/images/snapshot.png \
-	http/images/slow.png \
-	http/images/sort.png \
-	http/images/sout.png \
-	http/images/speaker.png \
-	http/images/speaker_mute.png \
-	http/images/stop.png \
-	http/images/vlc16x16.png \
-	http/images/volume_down.png \
-	http/images/volume_up.png \
-	http/images/white.png \
-	http/images/white_cross_small.png \
-	http/index.html \
-	http/js/functions.js \
-	http/js/mosaic.js \
-	http/js/vlm.js \
-	http/mosaic.html \
-	http/requests/browse.xml \
-	http/requests/playlist.xml \
-	http/requests/status.xml \
-	http/requests/vlm.xml \
-	http/requests/vlm_cmd.xml \
-	http/requests/README.txt \
-	http/style.css \
-	http/iehacks.css \
-	http/vlm.html \
-	http/vlm_export.html \
-	http/flash.html
-
 DIST_osdmenu_default = \
 	osdmenu/default.cfg \
 	osdmenu/default/unselected.png \

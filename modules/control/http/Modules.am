@@ -1,9 +1,0 @@
-SOURCES_oldhttp = \
-	http.c \
-	http.h \
-	rpn.c \
-	macro.c \
-	macros.h \
-	mvar.c \
-	util.c \
-	$(NULL)

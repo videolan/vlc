@@ -400,13 +400,6 @@ modules/control/gestures.c
 modules/control/globalhotkeys/win32.c
 modules/control/globalhotkeys/xcb.c
 modules/control/hotkeys.c
-modules/control/http/http.c
-modules/control/http/http.h
-modules/control/http/macro.c
-modules/control/http/macros.h
-modules/control/http/mvar.c
-modules/control/http/rpn.c
-modules/control/http/util.c
 modules/control/lirc.c
 modules/control/motion.c
 modules/control/netsync.c
