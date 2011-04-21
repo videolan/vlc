@@ -32,6 +32,7 @@
 
 #include <QFrame>
 #include <QString>
+#include <QSizeGrip>
 
 #define MAIN_TB1_DEFAULT "64;39;64;38;65"
 #define MAIN_TB2_DEFAULT "0-2;64;3;1;4;64;7;9;64;10;20;19;64-4;37;65;35-4"
@@ -204,10 +205,16 @@ public:
     ControlsWidget( intf_thread_t *_p_i, bool b_advControls,
                     QWidget *_parent = 0 );
 
+    void setGripVisible( bool b_visible )
+    { grip->setVisible( b_visible ); }
+
 protected:
     friend class MainInterface;
 
     bool b_advancedVisible;
+
+private:
+    QSizeGrip *grip;
 
 protected slots:
     void toggleAdvanced();

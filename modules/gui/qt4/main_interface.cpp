@@ -132,13 +132,6 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 
     settings->endGroup( );
 
-    /**************
-     * Status Bar *
-     **************/
-    createStatusBar();
-    b_statusbarVisible = getSettings()->value( "status-bar-visible", false ).toBool();
-    statusBar()->setVisible( b_statusbarVisible );
-
     /**************************
      *  UI and Widgets design
      **************************/
@@ -152,6 +145,13 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
              this, destroyPopupMenu() );
 
     createMainWidget( settings );
+
+    /**************
+     * Status Bar *
+     **************/
+    createStatusBar();
+    setStatusBarVisibility( getSettings()->value( "MainWindow/status-bar-visible", false ).toBool() );
+
     /*********************************
      * Create the Systray Management *
      *********************************/
@@ -874,6 +874,7 @@ void MainInterface::setStatusBarVisibility( bool b_visible )
 {
     statusBar()->setVisible( b_visible );
     b_statusbarVisible = b_visible;
+    if( controls ) controls->setGripVisible( !b_statusbarVisible );
 }
 
 #if 0

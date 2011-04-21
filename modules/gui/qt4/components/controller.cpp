@@ -604,7 +604,7 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
 
     setAttribute( Qt::WA_MacBrushedMetal);
     QVBoxLayout *controlLayout = new QVBoxLayout( this );
-    controlLayout->setContentsMargins( 4, 1, 4, 0 );
+    controlLayout->setContentsMargins( 4, 1, 0, 0 );
     controlLayout->setSpacing( 0 );
     QHBoxLayout *controlLayout1 = new QHBoxLayout;
     controlLayout1->setSpacing( 0 ); controlLayout1->setMargin( 0 );
@@ -618,6 +618,9 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
     QString line2 = getSettings()->value( "MainToolbar2", MAIN_TB2_DEFAULT )
                                         .toString();
     parseAndCreate( line2, controlLayout2 );
+
+    grip = new QSizeGrip( this );
+    controlLayout2->addWidget( grip, 0, Qt::AlignBottom|Qt::AlignRight );
 
     if( !b_advancedVisible && advControls ) advControls->hide();
 
