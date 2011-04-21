@@ -333,7 +333,7 @@ static bool GetUpdateFile( update_t *p_update )
         else
         {
             free( p_hash );
-            msg_Err( p_update->p_libvlc, "Key signature invalid !\n" );
+            msg_Err( p_update->p_libvlc, "Key signature invalid !" );
             goto error;
         }
     }

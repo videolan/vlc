@@ -234,7 +234,7 @@ static void Blend( filter_t *p_filter,
     video_format_FixRgb( &p_filter->fmt_in.video );
 
 #if 0
-    msg_Dbg( p_filter, "chroma: %4.4s -> %4.4s\n",
+    msg_Dbg( p_filter, "chroma: %4.4s -> %4.4s",
              (char *)&p_filter->fmt_in.video.i_chroma,
              (char *)&p_filter->fmt_out.video.i_chroma );
 #endif

@@ -422,7 +422,7 @@ static int Open (vlc_object_t *obj)
         goto error;
     }
     if (p_aout->output.output.i_rate != old_rate)
-        msg_Warn (p_aout, "resampling from %d Hz to %d Hz\n", old_rate,
+        msg_Warn (p_aout, "resampling from %d Hz to %d Hz", old_rate,
                   p_aout->output.output.i_rate);
 
     /* Set period size. */
