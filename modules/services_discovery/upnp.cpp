@@ -109,7 +109,7 @@ static int Open( vlc_object_t *p_this )
     i_res = UpnpInit( 0, 0 );
     if( i_res != UPNP_E_SUCCESS )
     {
-        msg_Err( p_sd, "%s", UpnpGetErrorMessage( i_res ) );
+        msg_Err( p_sd, "Initialization failed: %s", UpnpGetErrorMessage( i_res ) );
         free( p_sys );
         return VLC_EGENERIC;
     }
@@ -121,7 +121,7 @@ static int Open( vlc_object_t *p_this )
     i_res = UpnpRegisterClient( Callback, p_sd, &p_sys->client_handle );
     if( i_res != UPNP_E_SUCCESS )
     {
-        msg_Err( p_sd, "%s", UpnpGetErrorMessage( i_res ) );
+        msg_Err( p_sd, "Client registration failed: %s", UpnpGetErrorMessage( i_res ) );
         Close( (vlc_object_t*) p_sd );
         return VLC_EGENERIC;
     }
