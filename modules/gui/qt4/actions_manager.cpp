@@ -187,11 +187,11 @@ void ActionsManager::AudioDown()
 
 void ActionsManager::skipForward()
 {
-    var_SetInteger( p_intf->p_libvlc, "key-action", ACTIONID_JUMP_FORWARD_SHORT );
+    THEMIM->getIM()->jumpFwd();
 }
 
 void ActionsManager::skipBackward()
 {
-    var_SetInteger( p_intf->p_libvlc, "key-action", ACTIONID_JUMP_BACKWARD_SHORT );
+    THEMIM->getIM()->jumpBwd();
 }
 
