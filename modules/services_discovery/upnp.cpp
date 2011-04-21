@@ -154,18 +154,18 @@ static void Close( vlc_object_t *p_this )
 const char* xml_getChildElementValue( IXML_Element* p_parent,
                                       const char*   psz_tag_name_ )
 {
-    if ( !p_parent ) return 0;
-    if ( !psz_tag_name_ ) return 0;
+    if ( !p_parent ) return NULL;
+    if ( !psz_tag_name_ ) return NULL;
 
     IXML_NodeList* p_node_list = ixmlElement_getElementsByTagName( p_parent, psz_tag_name_ );
-    if ( !p_node_list ) return 0;
+    if ( !p_node_list ) return NULL;
 
     IXML_Node* p_element = ixmlNodeList_item( p_node_list, 0 );
     ixmlNodeList_free( p_node_list );
-    if ( !p_element ) return 0;
+    if ( !p_element ) return NULL;
 
     IXML_Node* p_text_node = ixmlNode_getFirstChild( p_element );
-    if ( !p_text_node ) return 0;
+    if ( !p_text_node ) return NULL;
 
     return ixmlNode_getNodeValue( p_text_node );
 }
