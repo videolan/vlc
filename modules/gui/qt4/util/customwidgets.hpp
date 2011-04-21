@@ -52,7 +52,7 @@ class QToolButtonExt : public QToolButton
 {
     Q_OBJECT
 public:
-    QToolButtonExt( QWidget *parent = 0, int ms = 1000 );
+    QToolButtonExt( QWidget *parent = 0, int ms = 0 );
 private:
     bool longClick;
 private slots:

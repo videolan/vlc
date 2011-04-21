@@ -36,6 +36,7 @@
 #include <QKeyEvent>
 #include <QWheelEvent>
 #include <QPixmap>
+#include <QApplication>
 #include <vlc_keys.h>
 
 QFramelessButton::QFramelessButton( QWidget *parent )
@@ -415,7 +416,8 @@ SpinningIcon::~SpinningIcon()
 QToolButtonExt::QToolButtonExt(QWidget *parent, int ms ): longClick( false )
 {
     setAutoRepeat( true );
-    setAutoRepeatDelay( ms );
+    /* default to twice the doubleclick delay */
+    setAutoRepeatDelay( ( ms > 0 )? ms : 2 * QApplication::doubleClickInterval() );
     setAutoRepeatInterval( 100 );
     connect( this, SIGNAL(released()), this, SLOT(releasedSlot()) );
 }
