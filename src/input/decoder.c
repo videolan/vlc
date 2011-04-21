@@ -2234,9 +2234,9 @@ static aout_buffer_t *aout_new_buffer( decoder_t *p_dec, int i_samples )
 
         DecoderFlushBuffering( p_dec );
 
+        aout_DecDelete( p_owner->p_aout, p_aout_input );
         p_owner->p_aout = NULL;
         p_owner->p_aout_input = NULL;
-        aout_DecDelete( p_owner->p_aout, p_aout_input );
 
         vlc_mutex_unlock( &p_owner->lock );
         input_resource_RequestAout( p_owner->p_resource, p_aout );
