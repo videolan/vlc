@@ -64,8 +64,8 @@ typedef enum buttonType_e
     PLAY_BUTTON,
     STOP_BUTTON,
     OPEN_BUTTON,
-    PREVIOUS_BUTTON,
-    NEXT_BUTTON,
+    PREV_SLOW_BUTTON,
+    NEXT_FAST_BUTTON,
     SLOWER_BUTTON,
     FASTER_BUTTON,
     FULLSCREEN_BUTTON,
@@ -83,8 +83,8 @@ typedef enum buttonType_e
     RANDOM_BUTTON,
     LOOP_BUTTON,
     INFO_BUTTON,
-    PREV_SLOW_BUTTON,
-    NEXT_FAST_BUTTON,
+    PREVIOUS_BUTTON,
+    NEXT_BUTTON,
     BUTTON_MAX,
 
     SPLITTER = 0x20,
@@ -104,22 +104,22 @@ typedef enum buttonType_e
 
 
 static const char* const nameL[BUTTON_MAX] = { N_("Play"), N_("Stop"), N_("Open"),
-    N_("Previous"), N_("Next"), N_("Slower"), N_("Faster"), N_("Fullscreen"),
+    N_("Previous/Backward"), N_("Next/Forward"), N_("Slower"), N_("Faster"), N_("Fullscreen"),
    N_("De-Fullscreen"), N_("Extended panel"), N_("Playlist"), N_("Snapshot"),
    N_("Record"), N_("A->B Loop"), N_("Frame By Frame"), N_("Trickplay Reverse"),
    N_("Step backward" ), N_("Step forward"), N_("Quit"), N_("Random"),
    N_("Loop/Repeat mode"), N_("Information"), N_("Previous"), N_("Next") };
 static const char* const tooltipL[BUTTON_MAX] = { I_PLAY_TOOLTIP,
     N_("Stop playback"), N_("Open a medium"),
-    N_("Previous media in the playlist"),
-    N_("Next media in the playlist"), N_("Slower"), N_("Faster"),
+    N_("Previous media in the playlist, skip backward when keep-pressed"),
+    N_("Next media in the playlist, skip forward when keep-pressed"), N_("Slower"), N_("Faster"),
     N_("Toggle the video in fullscreen"), N_("Toggle the video out fullscreen"),
     N_("Show extended settings" ), N_( "Show playlist" ),
     N_( "Take a snapshot" ), N_( "Record" ),
     N_( "Loop from point A to point B continuously." ), N_("Frame by frame"),
     N_("Reverse"), N_("Step backward"), N_("Step forward"), N_("Quit"),
     N_("Random"), N_("Change the loop and repeat modes"), N_("Information"),
-    N_("Previous media or slower"), N_("Next media or faster")};
+    N_("Previous media in the playlist"), N_("Next media in the playlist")};
 static const QString iconL[BUTTON_MAX] ={ ":/toolbar/play_b", ":/toolbar/stop_b",
     ":/toolbar/eject", ":/toolbar/previous_b", ":/toolbar/next_b",
     ":/toolbar/slower", ":/toolbar/faster", ":/toolbar/fullscreen",
