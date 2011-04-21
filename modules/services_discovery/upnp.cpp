@@ -968,6 +968,9 @@ bool MediaServerList::addServer( MediaServer* p_server )
 
     p_input_item = input_item_New( _p_sd, "vlc://nop",
                                   p_server->getFriendlyName() );
+
+    input_item_SetDescription( p_input_item, p_server->getUDN() );
+
     p_server->setInputItem( p_input_item );
 
     services_discovery_AddItem( _p_sd, p_input_item, NULL );
