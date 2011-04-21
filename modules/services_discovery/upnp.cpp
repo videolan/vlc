@@ -39,11 +39,15 @@
 
 #include <assert.h>
 
-// Constants
+/*
+ * Constants
+*/
 const char* MEDIA_SERVER_DEVICE_TYPE = "urn:schemas-upnp-org:device:MediaServer:1";
 const char* CONTENT_DIRECTORY_SERVICE_TYPE = "urn:schemas-upnp-org:service:ContentDirectory:1";
 
-// VLC handle
+/*
+ * VLC handle
+ */
 struct services_discovery_sys_t
 {
     UpnpClient_Handle client_handle;
@@ -51,13 +55,16 @@ struct services_discovery_sys_t
     vlc_mutex_t callback_lock;
 };
 
-// VLC callback prototypes
+/*
+ * VLC callback prototypes
+ */
 static int Open( vlc_object_t* );
 static void Close( vlc_object_t* );
 VLC_SD_PROBE_HELPER( "upnp", "Universal Plug'n'Play", SD_CAT_LAN )
 
-// Module descriptor
-
+/*
+ * Module descriptor
+ */
 vlc_module_begin();
     set_shortname( "UPnP" );
     set_description( N_( "Universal Plug'n'Play" ) );
@@ -69,9 +76,9 @@ vlc_module_begin();
     VLC_SD_PROBE_SUBMODULE
 vlc_module_end();
 
-
-// More prototypes...
-
+/*
+ * Local prototypes
+ */
 static int Callback( Upnp_EventType event_type, void* p_event, void* p_user_data );
 
 const char* xml_getChildElementValue( IXML_Element* p_parent,
@@ -83,9 +90,9 @@ const char* xml_getChildElementAttributeValue( IXML_Element* p_parent,
 
 IXML_Document* parseBrowseResult( IXML_Document* p_doc );
 
-
-// VLC callbacks...
-
+/*
+ * Initializes UPNP instance.
+ */
 static int Open( vlc_object_t *p_this )
 {
     int i_res;
@@ -96,6 +103,9 @@ static int Open( vlc_object_t *p_this )
     if( !( p_sd->p_sys = p_sys ) )
         return VLC_ENOMEM;
 
+    /* Initialize on first IPv4-capable adapter and first open port
+     * TODO: use UpnpInit2() to utilize IPv6.
+     */
     i_res = UpnpInit( 0, 0 );
     if( i_res != UPNP_E_SUCCESS )
     {
@@ -107,6 +117,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->p_server_list = new MediaServerList( p_sd );
     vlc_mutex_init( &p_sys->callback_lock );
 
+    /* Register a control point */
     i_res = UpnpRegisterClient( Callback, p_sd, &p_sys->client_handle );
     if( i_res != UPNP_E_SUCCESS )
     {
@@ -115,6 +126,7 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
+    /* Search for media servers */
     i_res = UpnpSearchAsync( p_sys->client_handle, 5,
             MEDIA_SERVER_DEVICE_TYPE, p_sd );
     if( i_res != UPNP_E_SUCCESS )
@@ -135,6 +147,9 @@ static int Open( vlc_object_t *p_this )
     return VLC_SUCCESS;
 }
 
+/*
+ * Releases resources.
+ */
 static void Close( vlc_object_t *p_this )
 {
     services_discovery_t *p_sd = ( services_discovery_t* )p_this;
@@ -148,9 +163,11 @@ static void Close( vlc_object_t *p_this )
     free( p_sd->p_sys );
 }
 
-// XML utility functions:
+/* XML utility functions */
 
-// Returns the value of a child element, or 0 on error
+/*
+ * Returns the value of a child element, or NULL on error
+ */
 const char* xml_getChildElementValue( IXML_Element* p_parent,
                                       const char*   psz_tag_name_ )
 {
@@ -170,6 +187,9 @@ const char* xml_getChildElementValue( IXML_Element* p_parent,
     return ixmlNode_getNodeValue( p_text_node );
 }
 
+/*
+ * Returns the value of a child element's attribute, or NULL on error
+ */
 const char* xml_getChildElementAttributeValue( IXML_Element* p_parent,
                                         const char* psz_tag_name_,
                                         const char* psz_attribute_ )
@@ -188,7 +208,9 @@ const char* xml_getChildElementAttributeValue( IXML_Element* p_parent,
     return ixmlElement_getAttribute( (IXML_Element*) p_element, psz_attribute_ );
 }
 
-// Extracts the result document from a SOAP response
+/*
+ * Extracts the result document from a SOAP response
+ */
 IXML_Document* parseBrowseResult( IXML_Document* p_doc )
 {
     ixmlRelaxParser( 1 );
@@ -217,7 +239,9 @@ IXML_Document* parseBrowseResult( IXML_Document* p_doc )
 }
 
 
-// Handles all UPnP events
+/*
+ * Handles all UPnP events
+ */
 static int Callback( Upnp_EventType event_type, void* p_event, void* p_user_data )
 {
     services_discovery_t* p_sd = ( services_discovery_t* ) p_user_data;
@@ -271,7 +295,7 @@ static int Callback( Upnp_EventType event_type, void* p_event, void* p_user_data
     case UPNP_EVENT_AUTORENEWAL_FAILED:
     case UPNP_EVENT_SUBSCRIPTION_EXPIRED:
     {
-        // Re-subscribe...
+        /* Re-subscribe. */
 
         Upnp_Event_Subscribe* p_s = ( Upnp_Event_Subscribe* )p_event;
 
@@ -297,9 +321,13 @@ static int Callback( Upnp_EventType event_type, void* p_event, void* p_user_data
 }
 
 
-// Class implementations...
+/*
+ * Local class implementations.
+ */
 
-// MediaServer...
+/*
+ * MediaServer
+ */
 
 void MediaServer::parseDeviceDescription( IXML_Document* p_doc,
                                           const char*    p_location,
@@ -319,7 +347,7 @@ void MediaServer::parseDeviceDescription( IXML_Document* p_doc,
 
     const char* psz_base_url = p_location;
 
-    // Try to extract baseURL
+    /* Try to extract baseURL */
     IXML_NodeList* p_url_list = ixmlDocument_getElementsByTagName( p_doc, "baseURL" );
     if ( p_url_list )
     {
@@ -333,7 +361,7 @@ void MediaServer::parseDeviceDescription( IXML_Document* p_doc,
         ixmlNodeList_free( p_url_list );
     }
 
-    // Get devices
+    /* Get devices */
     IXML_NodeList* p_device_list =
                 ixmlDocument_getElementsByTagName( p_doc, "device" );
 
@@ -362,7 +390,7 @@ void MediaServer::parseDeviceDescription( IXML_Document* p_doc,
                 continue;
             }
 
-            // Check if server is already added
+            /* Check if server is already added */
             if ( p_sd->p_sys->p_server_list->getServer( psz_udn ) != 0 )
             {
                 msg_Warn( p_sd, "Server with uuid '%s' already exists.", psz_udn );
@@ -388,7 +416,7 @@ void MediaServer::parseDeviceDescription( IXML_Document* p_doc,
                 continue;
             }
 
-            // Check for ContentDirectory service...
+            /* Check for ContentDirectory service. */
             IXML_NodeList* p_service_list =
                        ixmlElement_getElementsByTagName( p_device_element,
                                                          "service" );
@@ -431,7 +459,7 @@ void MediaServer::parseDeviceDescription( IXML_Document* p_doc,
                         continue;
                     }
 
-                    // Try to subscribe to ContentDirectory service
+                    /* Try to subscribe to ContentDirectory service */
 
                     char* psz_url = ( char* ) malloc( strlen( psz_base_url ) +
                             strlen( psz_event_sub_url ) + 1 );
@@ -447,7 +475,7 @@ void MediaServer::parseDeviceDescription( IXML_Document* p_doc,
                         free( psz_url );
                     }
 
-                    // Try to browse content directory...
+                    /* Try to browse content directory. */
 
                     psz_url = ( char* ) malloc( strlen( psz_base_url ) +
                             strlen( psz_control_url ) + 1 );
@@ -490,7 +518,7 @@ MediaServer::~MediaServer()
 
 const char* MediaServer::getUDN() const
 {
-  return _UDN.c_str();
+    return _UDN.c_str();
 }
 
 const char* MediaServer::getFriendlyName() const
@@ -518,6 +546,10 @@ const char* MediaServer::getContentDirectoryControlURL() const
     return _content_directory_control_url.c_str();
 }
 
+/**
+ * Subscribes current client handle to Content Directory Service.
+ * CDS exports the server shares to clients.
+ */
 void MediaServer::subscribeToContentDirectory()
 {
     const char* psz_url = getContentDirectoryEventURL();
@@ -543,7 +575,9 @@ void MediaServer::subscribeToContentDirectory()
                 getFriendlyName(), UpnpGetErrorMessage( i_res ) );
     }
 }
-
+/*
+ * Constructs UpnpAction to browse available content.
+ */
 IXML_Document* MediaServer::_browseAction( const char* psz_object_id_,
                                            const char* psz_browser_flag_,
                                            const char* psz_filter_,
@@ -628,7 +662,7 @@ IXML_Document* MediaServer::_browseAction( const char* psz_object_id_,
     i_res = UpnpSendAction( _p_sd->p_sys->client_handle,
               psz_url,
               psz_service_type,
-              0, // ignored in SDK, must be NULL
+              0, /* ignored in SDK, must be NULL */
               p_action,
               &p_response );
 
@@ -651,7 +685,7 @@ browseActionCleanup:
 
 void MediaServer::fetchContents()
 {
-    // Delete previous contents to prevent duplicate entries
+    /* Delete previous contents to prevent duplicate entries */
     if ( _p_contents )
     {
         delete _p_contents;
@@ -669,6 +703,9 @@ void MediaServer::fetchContents()
     _buildPlaylist( _p_contents, NULL );
 }
 
+/*
+ * Fetches and parses the UPNP response
+ */
 bool MediaServer::_fetchContents( Container* p_parent )
 {
     if (!p_parent)
@@ -839,6 +876,10 @@ bool MediaServer::_fetchContents( Container* p_parent )
 // do not exist in the new directory listing, then remove them from the shown listing using
 // services_discovery_RemoveItem. If new files were introduced within an already existing
 // container, we could simply do so with services_discovery_AddItem.
+
+/*
+ * Builds playlist based on available input items.
+ */
 void MediaServer::_buildPlaylist( Container* p_parent, input_item_node_t *p_input_node )
 {
     bool b_send = p_input_node == NULL;
@@ -902,8 +943,9 @@ bool MediaServer::compareSID( const char* psz_sid )
 }
 
 
-// MediaServerList...
-
+/*
+ * MediaServerList class
+ */
 MediaServerList::MediaServerList( services_discovery_t* p_sd )
 {
     _p_sd = p_sd;
@@ -989,8 +1031,9 @@ void MediaServerList::removeServer( const char* psz_udn )
 }
 
 
-// Item...
-
+/*
+ * Item class
+ */
 Item::Item( Container* p_parent, const char* psz_object_id, const char* psz_title,
            const char* psz_resource, mtime_t i_duration )
 {
@@ -1042,8 +1085,9 @@ void Item::setInputItem( input_item_t* p_input_item )
     _p_input_item = p_input_item;
 }
 
-// Container...
-
+/*
+ * Container class
+ */
 Container::Container( Container*  p_parent,
                       const char* psz_object_id,
                       const char* psz_title )
