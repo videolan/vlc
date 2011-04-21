@@ -783,6 +783,12 @@ static const char *const ppsz_clock_descriptions[] =
     "This is the maximum size in bytes of the temporary files " \
     "that will be used to store the timeshifted streams." )
 
+#define INPUT_TITLE_FORMAT_TEXT N_( "Change title according to current media" )
+#define INPUT_TITLE_FORMAT_LONGTEXT N_( "This option allows you to set the title according to what's being played<br>"  \
+    "$a: Artist<br>$b: Album<br>$c: Copyright<br>$t: Title<br>$g: Genre<br>"  \
+    "$n: Track num<br>$p: Now playing<br>$A: Date<br>$D: Duration<br>"  \
+    "$Z: \"Now playing\" (Fall back on Title - Artist)" )
+
 // DEPRECATED
 #define SUB_CAT_LONGTEXT N_( \
     "These options allow you to modify the behavior of the subpictures " \
@@ -1951,6 +1957,8 @@ vlc_module_begin ()
                 INPUT_TIMESHIFT_PATH_LONGTEXT, true )
     add_integer( "input-timeshift-granularity", -1, INPUT_TIMESHIFT_GRANULARITY_TEXT,
                  INPUT_TIMESHIFT_GRANULARITY_LONGTEXT, true )
+
+    add_string( "input-title-format", "$a - $t", INPUT_TITLE_FORMAT_TEXT, INPUT_TITLE_FORMAT_LONGTEXT, false );
 
 /* Decoder options */
     add_category_hint( N_("Decoders"), CODEC_CAT_LONGTEXT , true )
