@@ -32,6 +32,7 @@
 #include "input_manager.hpp"
 #include <vlc_keys.h>
 #include <vlc_url.h>
+#include <vlc_strings.h>
 
 #include <QApplication>
 
@@ -457,35 +458,18 @@ void InputManager::UpdateName()
     /* Update text, name and nowplaying */
     QString text;
 
-    /* Try to get the Title, then the Name */
-    char *psz_name = input_item_GetTitleFbName( input_GetItem( p_input ) );
-
     /* Try to get the nowplaying */
-    char *psz_nowplaying =
-        input_item_GetNowPlaying( input_GetItem( p_input ) );
-    if( !EMPTY_STR( psz_nowplaying ) )
-    {
-        text.sprintf( "%s - %s", psz_nowplaying, psz_name );
-    }
-    else  /* Do it ourself */
-    {
-        char *psz_artist = input_item_GetArtist( input_GetItem( p_input ) );
-
-        if( !EMPTY_STR( psz_artist ) )
-            text.sprintf( "%s - %s", psz_artist, psz_name );
-        else
-            text.sprintf( "%s", psz_name );
-
-        free( psz_artist );
-    }
+    char *format = var_InheritString( p_intf, "input-title-format" );
+    char *formated = str_format_meta( p_input, format );
+    text = formated;
     /* Free everything */
-    free( psz_name );
-    free( psz_nowplaying );
+    free( format );
+    free( formated );
 
     /* If we have Nothing */
     if( text.isEmpty() )
     {
-        psz_name = input_item_GetURI( input_GetItem( p_input ) );
+        char *psz_name = input_item_GetURI( input_GetItem( p_input ) );
         text.sprintf( "%s", psz_name );
         text = text.remove( 0, text.lastIndexOf( DIR_SEP ) + 1 );
         free( psz_name );
