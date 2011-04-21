@@ -153,7 +153,9 @@ static int Open( vlc_object_t* p_this )
     p_sys->i_socket = net_Connect( p_access, url.psz_host, i_port, SOCK_STREAM, 0 );
 
     /* Create the ssh connexion and wait until the server answer */
-    p_sys->ssh_session = libssh2_session_init();
+    if( ( p_sys->ssh_session = libssh2_session_init() ) == NULL )
+        goto error;
+
     while( ( i_ret = libssh2_session_startup( p_sys->ssh_session,
                                               p_sys->i_socket ) )
            == LIBSSH2_ERROR_EAGAIN );
@@ -250,6 +252,8 @@ static int Open( vlc_object_t* p_this )
     return VLC_SUCCESS;
 
 error:
+    if( p_sys->ssh_session )
+        libssh2_session_free( p_sys->ssh_session );
     free( psz_password );
     free( psz_username );
     vlc_UrlClean( &url );
