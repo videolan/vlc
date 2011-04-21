@@ -1106,6 +1106,14 @@ void MainInputManager::prev()
    playlist_Prev( THEPL );
 }
 
+void MainInputManager::prevOrReset()
+{
+    if( !p_input || var_GetTime(  p_input , "time") < 10000 )
+        playlist_Prev( THEPL );
+    else
+        getIM()->sliderUpdate( 0.0 );
+}
+
 void MainInputManager::togglePlayPause()
 {
     /* No input, play */

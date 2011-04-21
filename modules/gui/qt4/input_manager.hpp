@@ -277,6 +277,7 @@ public slots:
     void stop();
     void next();
     void prev();
+    void prevOrReset();
     void activatePlayQuit( bool );
 
     void loopRepeatLoopStatus();
