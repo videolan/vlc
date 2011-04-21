@@ -79,7 +79,7 @@ SoundWidget::SoundWidget( QWidget *_parent, intf_thread_t * _p_intf,
     }
 
     /* And add the label */
-    layout->addWidget( volMuteLabel );
+    layout->addWidget( volMuteLabel, 0, Qt::AlignBottom );
 
     /* Slider creation: shiny or clean */
     if( b_shiny )
