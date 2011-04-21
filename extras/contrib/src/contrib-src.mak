@@ -1280,8 +1280,7 @@ libdvbpsi: libdvbpsi-$(LIBDVBPSI_VERSION).tar.gz
 	$(EXTRACT_GZ)
 
 .dvbpsi: libdvbpsi
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && cd src && make && make install)
-	$(INSTALL_NAME)
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --enable-release && cd src && make && make install)
 	touch $@
 
 CLEAN_FILE += .dvbpsi
