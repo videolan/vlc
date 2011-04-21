@@ -633,6 +633,11 @@ static int TimeCallback( vlc_object_t *p_this, char const *psz_cmd,
 
             val.f_float = (double)newval.i_time/(double)i_length;
             var_Change( p_input, "position", VLC_VAR_SETVALUE, &val, NULL );
+            /*
+             * Notify the intf that a new event has been occurred.
+             * XXX this is a bit hackish but it's the only way to do it now.
+             */
+            var_SetInteger( p_input, "intf-event", INPUT_EVENT_POSITION );
         }
 
         /* */
