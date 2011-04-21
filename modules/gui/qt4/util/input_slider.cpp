@@ -147,10 +147,13 @@ void SeekSlider::mouseMoveEvent( QMouseEvent *event )
     }
 
     /* Tooltip */
-     QPoint p( event->globalX() - mTimeTooltip->width() / 2,
+    int posX = qMax( rect().left(), qMin( rect().right(), event->x() ) );
+
+    QPoint p( event->globalX() - ( event->x() - posX ) - ( mTimeTooltip->width() / 2 ),
                QWidget::mapToGlobal( pos() ).y() - ( mTimeTooltip->height() + 2 ) );
 
-    secstotimestr( psz_length, ( event->x() * inputLength ) / size().width() );
+
+    secstotimestr( psz_length, ( posX * inputLength ) / size().width() );
     mTimeTooltip->setTime( psz_length );
     mTimeTooltip->move( p );
     event->accept();
