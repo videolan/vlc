@@ -62,6 +62,8 @@ private slots:
     void updateFilters();
     void updateFilterOptions();
     void cropChange();
+    void browseLogo();
+    void browseEraseFile();
 };
 
 class ExtV4l2 : public QWidget

@@ -36,11 +36,13 @@
 #include <QSignalMapper>
 #include <QComboBox>
 #include <QTimer>
+#include <QFileDialog>
 
 #include "components/extended_panels.hpp"
 #include "dialogs/preferences.hpp"
 #include "qt4.hpp"
 #include "input_manager.hpp"
+#include "util/qt_dirs.hpp"
 
 #include "../../audio_filter/equalizer_presets.h"
 #include <vlc_aout.h>
@@ -204,6 +206,7 @@ ExtVideo::ExtVideo( intf_thread_t *_p_intf, QTabWidget *_parent ) :
     SETUP_VFILTER_OPTION( eraseMaskText, editingFinished() )
     SETUP_VFILTER_OPTION( eraseYSpin, valueChanged( int ) )
     SETUP_VFILTER_OPTION( eraseXSpin, valueChanged( int ) )
+    BUTTONACT( ui.eraseBrowseBtn, browseEraseFile() );
 
     SETUP_VFILTER( marq )
     SETUP_VFILTER_OPTION( marqMarqueeText, textChanged( const QString& ) )
@@ -214,6 +217,7 @@ ExtVideo::ExtVideo( intf_thread_t *_p_intf, QTabWidget *_parent ) :
     SETUP_VFILTER_OPTION( logoYSpin, valueChanged( int ) )
     SETUP_VFILTER_OPTION( logoXSpin, valueChanged( int ) )
     SETUP_VFILTER_OPTION( logoOpacitySlider, valueChanged( int ) )
+    BUTTONACT( ui.logoBrowseBtn, browseLogo() );
 
     SETUP_VFILTER( gradfun )
     SETUP_VFILTER_OPTION( gradfunRadiusSlider, valueChanged( int ) )
@@ -398,6 +402,20 @@ void ExtVideo::updateFilters()
     ChangeVFiltersString( qtu( module ),
                           checkbox ? checkbox->isChecked()
                                    : groupbox->isChecked() );
+}
+
+void ExtVideo::browseLogo()
+{
+    QString file = QFileDialog::getOpenFileName( NULL, qtr( "Logo filenames" ),
+                   p_intf->p_sys->filepath, "Images (*.png *.jpg);;All (*)" );
+    ui.logoFileText->setText( toNativeSeparators( file ) );
+}
+
+void ExtVideo::browseEraseFile()
+{
+    QString file = QFileDialog::getOpenFileName( NULL, qtr( "Image mask" ),
+                   p_intf->p_sys->filepath, "Images (*.png *.jpg);;All (*)" );
+    ui.eraseMaskText->setText( toNativeSeparators( file ) );
 }
 
 void ExtVideo::initComboBoxItems( QObject *widget )
