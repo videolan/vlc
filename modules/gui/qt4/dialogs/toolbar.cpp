@@ -31,6 +31,9 @@
 #include "util/input_slider.hpp"
 #include "util/customwidgets.hpp"
 #include "components/interface_widgets.hpp"
+#include "util/buttons/DeckButtonsLayout.hpp"
+#include "util/buttons/BrowseButton.hpp"
+#include "util/buttons/RoundButton.hpp"
 
 #include <QScrollArea>
 #include <QGroupBox>
@@ -414,6 +417,18 @@ WidgetListing::WidgetListing( intf_thread_t *p_intf, QWidget *_parent )
                 widget = advControls;
             }
             widgetItem->setText( qtr("Advanced Buttons") );
+            break;
+        case PLAYBACK_BUTTONS:
+            {
+                widget = new QWidget;
+                DeckButtonsLayout *layout = new DeckButtonsLayout( widget );
+                BrowseButton *prev = new BrowseButton( widget, BrowseButton::Backward );
+                BrowseButton *next = new BrowseButton( widget );
+                RoundButton *play = new RoundButton( widget );
+                layout->setBackwardButton( prev );
+                layout->setForwardButton( next );
+                layout->setRoundButton( play );
+            }
             break;
         default:
             msg_Warn( p_intf, "This should not happen %i", i );

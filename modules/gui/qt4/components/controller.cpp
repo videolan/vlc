@@ -32,6 +32,9 @@
 #include "components/controller.hpp"
 #include "components/controller_widget.hpp"
 #include "components/interface_widgets.hpp"
+#include "util/buttons/DeckButtonsLayout.hpp"
+#include "util/buttons/BrowseButton.hpp"
+#include "util/buttons/RoundButton.hpp"
 
 #include "dialogs_provider.hpp"                     /* Opening Dialogs */
 #include "actions_manager.hpp"                             /* *_ACTION */
@@ -132,8 +135,7 @@ void AbstractController::parseAndCreate( const QString& config,
             {
                 msg_Warn( p_intf, "Parsing error 3. Please, report this." );
                 continue;
-            }
-        }
+            }        }
 
         createAndAddWidget( controlLayout, -1, i_type, i_option );
     }
@@ -221,7 +223,6 @@ void AbstractController::createAndAddWidget( QBoxLayout *controlLayout,
 
 QWidget *AbstractController::createWidget( buttonType_e button, int options )
 {
-
     bool b_flat  = options & WIDGET_FLAT;
     bool b_big   = options & WIDGET_BIG;
     bool b_shiny = options & WIDGET_SHINY;
@@ -431,6 +432,20 @@ QWidget *AbstractController::createWidget( buttonType_e button, int options )
         break;
     case INFO_BUTTON: {
         NORMAL_BUTTON( INFO );
+        }
+        break;
+    case PLAYBACK_BUTTONS:{
+        widget = new QWidget;
+        DeckButtonsLayout *layout = new DeckButtonsLayout( widget );
+        BrowseButton *prev = new BrowseButton( widget, BrowseButton::Backward );
+        BrowseButton *next = new BrowseButton( widget );
+        RoundButton *play = new RoundButton( widget );
+        layout->setBackwardButton( prev );
+        layout->setForwardButton( next );
+        layout->setRoundButton( play );
+        CONNECT_MAP_SET( prev, PREVIOUS_ACTION );
+        CONNECT_MAP_SET( next, NEXT_ACTION );
+        CONNECT_MAP_SET( play, PLAY_ACTION );
         }
         break;
     default:

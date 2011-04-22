@@ -96,6 +96,7 @@ typedef enum buttonType_e
     MENU_BUTTONS,
     TELETEXT_BUTTONS,
     ADVANCED_CONTROLLER,
+    PLAYBACK_BUTTONS,
     SPECIAL_MAX,
 
     WIDGET_SPACER = 0x40,
