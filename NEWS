@@ -26,6 +26,7 @@ Access
  * Linear Systems (HD-)SDI cards input support (Linux)
  * RTP: support for dynamic payload types by specifying the payload format
    in an option (no autodetection): only Theora supported for now
+ * Basic HTCPCP implementation for Coffee Pot control
 
 Codecs
  * You can now use ffmpeg-mt in conjunction with vlc
@@ -101,6 +102,7 @@ Stream output:
 
 Services Discovery:
  * Search API to be able to query distant search APIs from the interfaces
+ * Upnp module was ported to Win32
 
 libVLC:
  * New capabilities for libVLC:
