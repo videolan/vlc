@@ -714,8 +714,7 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
             else if( i_action == ACTIONID_RATE_NORMAL )
             {
                 var_SetFloat( p_playlist, "rate", 1. );
-                DisplayMessage( p_vout, SPU_DEFAULT_CHANNEL,
-                                "%s", _("1.00x") );
+                DisplayRate( p_vout, var_GetFloat( p_input, "rate" ) );
             }
             else if( i_action == ACTIONID_FASTER )
             {
