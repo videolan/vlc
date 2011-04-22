@@ -33,10 +33,11 @@
 #include <vlc_plugin.h>
 #include <vlc_interface.h>
 #include <vlc_playlist.h>
-#include <vlc_strings.h>
+#include <vlc_strings.h>                                /* str_format_meta */
 
 #include <dbus/dbus.h>
 
+#define FORMAT_DEFAULT "$a - $t"
 /*****************************************************************************
  * intf_sys_t: description and status of log interface
  *****************************************************************************/
@@ -63,25 +64,13 @@ static int SendToTelepathy( intf_thread_t *, const char * );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define FORMAT_DEFAULT "$a - $t"
-#define FORMAT_TEXT N_("Title format string")
-#define FORMAT_LONGTEXT N_("Format of the string to send to Telepathy." \
-"Defaults to \"Artist - Title\" ($a - $t). " \
-"You can use the following substitutions: " \
-"$a Artist, $b Album, $c Copyright, $d Description, $e Encoder, $g Genre, " \
-"$l Language, $n number, $p Now Playing, $r Rating, $s Subtitles language, " \
-"$t Title, $u URL, $A Date, $B Bitrate, $C Chapter, $D Duration, $F URI, " \
-"$I Video Title, $L Time Remaining, $N Name, $O Audio language, $P Position, " \
-"$R Rate, $S Sample rate, $T Time elapsed, $U Publisher, $V Volume")
-
 vlc_module_begin ()
     set_category( CAT_INTERFACE )
     set_subcategory( SUBCAT_INTERFACE_CONTROL )
     set_shortname( "Telepathy" )
     set_description( N_("Telepathy \"Now Playing\" (MissionControl)") )
 
-    add_string( "telepathy-format", FORMAT_DEFAULT,
-                FORMAT_TEXT, FORMAT_LONGTEXT, false )
+    add_obsolete_string( "telepathy-format")
 
     set_capability( "interface", 0 )
     set_callbacks( Open, Close )
@@ -112,10 +101,9 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    p_intf->p_sys->psz_format = var_InheritString( p_intf, "telepathy-format" );
+    p_intf->p_sys->psz_format = var_InheritString( p_intf, "input-title-format" );
     if( !p_intf->p_sys->psz_format )
     {
-        msg_Dbg( p_intf, "no format provided" );
         p_intf->p_sys->psz_format = strdup( FORMAT_DEFAULT );
     }
     msg_Dbg( p_intf, "using format: %s", p_intf->p_sys->psz_format );
