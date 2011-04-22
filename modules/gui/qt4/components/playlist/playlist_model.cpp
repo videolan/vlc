@@ -929,6 +929,8 @@ bool PLModel::popup( const QModelIndex & index, const QPoint &point, const QMode
         }
         menu.addSeparator();
     }
+    vlc_gc_decref( p_input );
+
     if( canEdit() )
     {
         QIcon addIcon( ":/buttons/playlist/playlist_add" );
@@ -957,8 +959,7 @@ bool PLModel::popup( const QModelIndex & index, const QPoint &point, const QMode
         {
             sortingMenu = new QMenu( qtr( "Sort by" ) );
             sortingMapper = new QSignalMapper( this );
-            int i, j;
-            for( i = 1, j = 1; i < COLUMN_END; i <<= 1, j++ )
+            for( int i = 1, j = 1; i < COLUMN_END; i <<= 1, j++ )
             {
                 if( i == COLUMN_NUMBER ) continue;
                 QMenu *m = sortingMenu->addMenu( qfu( psz_column_title( i ) ) );
@@ -973,7 +974,6 @@ bool PLModel::popup( const QModelIndex & index, const QPoint &point, const QMode
         }
         menu.addMenu( sortingMenu );
     }
-    vlc_gc_decref( p_input );
 
     if( !menu.isEmpty() )
     {
