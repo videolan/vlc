@@ -39,7 +39,7 @@
 #include <libnotify/notify.h>
 
 #ifndef NOTIFY_CHECK_VERSION
-#define NOTIFY_CHECK_VERSION(x,y,z) 0
+# define NOTIFY_CHECK_VERSION(x,y,z) 0
 #endif
 
 /*****************************************************************************
@@ -318,9 +318,9 @@ static int Notify( vlc_object_t *p_this, const char *psz_temp, GdkPixbuf *pix,
     notification = notify_notification_new( _("Now Playing"),
                                             psz_temp, NULL
 #if NOTIFY_CHECK_VERSION (0, 7, 0)
-					    );
+                                          );
 #else
-					    , NULL );
+                                          , NULL );
 #endif
     notify_notification_set_timeout( notification,
                                 var_InheritInteger(p_this, "notify-timeout") );
