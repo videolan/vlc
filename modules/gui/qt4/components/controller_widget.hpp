@@ -50,21 +50,21 @@ class PlayButton : public QToolButton
 {
     Q_OBJECT
 private slots:
-    void updateButton( bool );
+    void updateButtonIcons( bool );
 };
 
 class LoopButton : public QToolButton
 {
     Q_OBJECT
 public slots:
-    void updateIcons( int );
+    void updateButtonIcons( int );
 };
 
 class AtoB_Button : public QToolButton
 {
     Q_OBJECT
 private slots:
-    void setIcons( bool, bool );
+    void updateButtonIcons( bool, bool );
 };
 
 #define VOLUME_MAX 200

@@ -232,14 +232,14 @@ bool SoundWidget::eventFilter( QObject *obj, QEvent *e )
 /**
  * Play Button
  **/
-void PlayButton::updateButton( bool b_playing )
+void PlayButton::updateButtonIcons( bool b_playing )
 {
     setIcon( b_playing ? QIcon( ":/toolbar/pause_b" ) : QIcon( ":/toolbar/play_b" ) );
     setToolTip( b_playing ? qtr( "Pause the playback" )
                           : qtr( I_PLAY_TOOLTIP ) );
 }
 
-void AtoB_Button::setIcons( bool timeA, bool timeB )
+void AtoB_Button::updateButtonIcons( bool timeA, bool timeB )
 {
     if( !timeA && !timeB)
     {
@@ -259,7 +259,7 @@ void AtoB_Button::setIcons( bool timeA, bool timeB )
     }
 }
 
-void LoopButton::updateIcons( int value )
+void LoopButton::updateButtonIcons( int value )
 {
     setChecked( value != NORMAL );
     setIcon( ( value == REPEAT_ONE ) ? QIcon( ":/buttons/playlist/repeat_one" )

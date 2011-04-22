@@ -237,7 +237,7 @@ QWidget *AbstractController::createWidget( buttonType_e button, int options )
         BUTTON_SET_BAR(  playButton );
         CONNECT_MAP_SET( playButton, PLAY_ACTION );
         CONNECT( this, inputPlaying( bool ),
-                 playButton, updateButton( bool ));
+                 playButton, updateButtonIcons( bool ));
         widget = playButton;
         }
         break;
@@ -330,7 +330,7 @@ QWidget *AbstractController::createWidget( buttonType_e button, int options )
         ENABLE_ON_INPUT( ABButton );
         CONNECT_MAP_SET( ABButton, ATOB_ACTION );
         CONNECT( THEMIM->getIM(), AtoBchanged( bool, bool),
-                 ABButton, setIcons( bool, bool ) );
+                 ABButton, updateButtonIcons( bool, bool ) );
         widget = ABButton;
         }
         break;
@@ -424,8 +424,8 @@ QWidget *AbstractController::createWidget( buttonType_e button, int options )
         setupButton( loopButton );
         loopButton->setToolTip( qtr( "Click to toggle between loop one, loop all" ) );
         loopButton->setCheckable( true );
-        loopButton->updateIcons( NORMAL );
-        CONNECT( THEMIM, repeatLoopChanged( int ), loopButton, updateIcons( int ) );
+        loopButton->updateButtonIcons( NORMAL );
+        CONNECT( THEMIM, repeatLoopChanged( int ), loopButton, updateButtonIcons( int ) );
         CONNECT( loopButton, clicked(), THEMIM, loopRepeatLoopStatus() );
         widget = loopButton;
         }
