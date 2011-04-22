@@ -162,43 +162,6 @@ ConfigControl *ConfigControl::createControl( vlc_object_t *p_this,
     return p_control;
 }
 
-void ConfigControl::doApply( intf_thread_t *p_intf )
-{
-    switch( getType() )
-    {
-        case CONFIG_ITEM_INTEGER:
-        case CONFIG_ITEM_BOOL:
-        {
-            VIntConfigControl *vicc = qobject_cast<VIntConfigControl *>(this);
-            assert( vicc );
-            config_PutInt( p_intf, vicc->getName(), vicc->getValue() );
-            break;
-        }
-        case CONFIG_ITEM_FLOAT:
-        {
-            VFloatConfigControl *vfcc =
-                                    qobject_cast<VFloatConfigControl *>(this);
-            assert( vfcc );
-            config_PutFloat( p_intf, vfcc->getName(), vfcc->getValue() );
-            break;
-        }
-        case CONFIG_ITEM_STRING:
-        {
-            VStringConfigControl *vscc =
-                            qobject_cast<VStringConfigControl *>(this);
-            assert( vscc );
-            config_PutPsz( p_intf, vscc->getName(), qtu( vscc->getValue() ) );
-            break;
-        }
-        case CONFIG_ITEM_KEY:
-        {
-            KeySelectorControl *ksc = qobject_cast<KeySelectorControl *>(this);
-            assert( ksc );
-            ksc->doApply();
-        }
-    }
-}
-
 /*******************************************************
  * Simple widgets
  *******************************************************/
@@ -240,6 +203,12 @@ void InterfacePreviewWidget::setPreview( enum_style e_style )
 /**************************************************************************
  * String-based controls
  *************************************************************************/
+
+void
+VStringConfigControl::doApply( intf_thread_t *p_intf )
+{
+    config_PutPsz( p_intf, getName(), qtu( getValue() ) );
+}
 
 /*********** String **************/
 StringConfigControl::StringConfigControl( vlc_object_t *_p_this,
@@ -844,6 +813,12 @@ void ModuleListConfigControl::onUpdate()
  * Integer-based controls
  *************************************************************************/
 
+void
+VIntConfigControl::doApply( intf_thread_t *p_intf )
+{
+    config_PutInt( p_intf, getName(), getValue() );
+}
+
 /*********** Integer **************/
 IntegerConfigControl::IntegerConfigControl( vlc_object_t *_p_this,
                                             module_config_t *_p_item,
@@ -1122,6 +1097,12 @@ int BoolConfigControl::getValue() const
 /**************************************************************************
  * Float-based controls
  *************************************************************************/
+
+void
+VFloatConfigControl::doApply( intf_thread_t *p_intf )
+{
+    config_PutFloat( p_intf, getName(), getValue() );
+}
 
 /*********** Float **************/
 FloatConfigControl::FloatConfigControl( vlc_object_t *_p_this,
@@ -1416,7 +1397,7 @@ void KeySelectorControl::setTheKey()
                                    Qt::UserRole, shortcutValue->getValue() );
 }
 
-void KeySelectorControl::doApply()
+void KeySelectorControl::doApply( intf_thread_t* )
 {
     QTreeWidgetItem *it;
     for( int i = 0; i < table->topLevelItemCount() ; i++ )

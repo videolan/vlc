@@ -101,7 +101,7 @@ public:
     static ConfigControl * createControl( vlc_object_t*,
                                           module_config_t*,QWidget*,
                                           QGridLayout *, int& );
-    void doApply( intf_thread_t *);
+    virtual void doApply( intf_thread_t *) = 0;
 protected:
     vlc_object_t *p_this;
     module_config_t *p_item;
@@ -127,6 +127,7 @@ public:
                 ConfigControl(a,b) {};
     virtual int getValue() const = 0;
     virtual int getType() const { return CONFIG_ITEM_INTEGER; }
+    virtual void doApply( intf_thread_t *);
 };
 
 class IntegerConfigControl : public VIntConfigControl
@@ -223,6 +224,7 @@ public:
                 ConfigControl(a,b) {};
     virtual float getValue() const = 0;
     virtual int getType() const { return CONFIG_ITEM_FLOAT; }
+    virtual void doApply( intf_thread_t *);
 };
 
 class FloatConfigControl : public VFloatConfigControl
@@ -270,6 +272,7 @@ public:
                 ConfigControl(a,b) {};
     virtual QString getValue() const = 0;
     virtual int getType() const { return CONFIG_ITEM_STRING; }
+    virtual void doApply( intf_thread_t *);
 };
 
 class StringConfigControl : public VStringConfigControl
@@ -454,7 +457,7 @@ public:
     virtual int getType() const { return CONFIG_ITEM_KEY; }
     virtual void hide() { table->hide(); if( label ) label->hide(); }
     virtual void show() { table->show(); if( label ) label->show(); }
-    void doApply();
+    virtual void doApply( intf_thread_t *);
 private:
     void finish();
     QLabel *label;
