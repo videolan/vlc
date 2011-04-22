@@ -474,8 +474,6 @@ InputStatsPanel::InputStatsPanel( QWidget *parent,
 {
      QGridLayout *layout = new QGridLayout(this);
 
-     QList<QTreeWidgetItem *> items;
-
      QLabel *topLabel = new QLabel( qtr( "Current"
                  " media / stream " "statistics") );
      topLabel->setWordWrap( true );
@@ -562,33 +560,27 @@ void InputStatsPanel::update( input_item_t *p_item )
 #define UPDATE( widget, format, calc... ) \
     { QString str; widget->setText( 1 , str.sprintf( format, ## calc ) );  }
 
-    UPDATE( read_media_stat, "%"PRId64,
-            (p_item->p_stats->i_read_bytes / 1024 ) );
-    UPDATE( input_bitrate_stat, "%6.0f",
-                    (float)(p_item->p_stats->f_input_bitrate *  8000  ));
-    UPDATE( demuxed_stat, "%"PRId64,
-                    (p_item->p_stats->i_demux_read_bytes / 1024 ) );
-    UPDATE( stream_bitrate_stat, "%6.0f",
-                    (float)(p_item->p_stats->f_demux_bitrate *  8000  ));
-    UPDATE( corrupted_stat, "%"PRId64, p_item->p_stats->i_demux_corrupted );
-    UPDATE( discontinuity_stat, "%"PRId64, p_item->p_stats->i_demux_discontinuity );
+    UPDATE( read_media_stat,     "%"PRIu64, (p_item->p_stats->i_read_bytes / 1024 ) );
+    UPDATE( input_bitrate_stat,  "%6.0f", (float)(p_item->p_stats->f_input_bitrate *  8000  ));
+    UPDATE( demuxed_stat,        "%"PRIu64, (p_item->p_stats->i_demux_read_bytes / 1024 ) );
+    UPDATE( stream_bitrate_stat, "%6.0f", (float)(p_item->p_stats->f_demux_bitrate *  8000  ));
+    UPDATE( corrupted_stat,      "%"PRIu64, p_item->p_stats->i_demux_corrupted );
+    UPDATE( discontinuity_stat,  "%"PRIu64, p_item->p_stats->i_demux_discontinuity );
 
     /* Video */
-    UPDATE( vdecoded_stat, "%"PRId64, p_item->p_stats->i_decoded_video );
-    UPDATE( vdisplayed_stat, "%"PRId64, p_item->p_stats->i_displayed_pictures );
-    UPDATE( vlost_frames_stat, "%"PRId64, p_item->p_stats->i_lost_pictures );
+    UPDATE( vdecoded_stat,     "%"PRIu64, p_item->p_stats->i_decoded_video );
+    UPDATE( vdisplayed_stat,   "%"PRIu64, p_item->p_stats->i_displayed_pictures );
+    UPDATE( vlost_frames_stat, "%"PRIu64, p_item->p_stats->i_lost_pictures );
 
     /* Sout */
-    UPDATE( send_stat, "%"PRId64, p_item->p_stats->i_sent_packets );
-    UPDATE( send_bytes_stat, "%"PRId64,
-            (p_item->p_stats->i_sent_bytes)/ 1024 );
-    UPDATE( send_bitrate_stat, "%6.0f",
-            (float)(p_item->p_stats->f_send_bitrate * 8000 ) );
+    UPDATE( send_stat,        "%"PRIu64, p_item->p_stats->i_sent_packets );
+    UPDATE( send_bytes_stat,  "%"PRIu64, (p_item->p_stats->i_sent_bytes)/ 1024 );
+    UPDATE( send_bitrate_stat, "%6.0f", (float)(p_item->p_stats->f_send_bitrate * 8000 ) );
 
     /* Audio*/
-    UPDATE( adecoded_stat, "%"PRId64, p_item->p_stats->i_decoded_audio );
-    UPDATE( aplayed_stat, "%"PRId64, p_item->p_stats->i_played_abuffers );
-    UPDATE( alost_stat, "%"PRId64, p_item->p_stats->i_lost_abuffers );
+    UPDATE( adecoded_stat, "%"PRIu64, p_item->p_stats->i_decoded_audio );
+    UPDATE( aplayed_stat,  "%"PRIu64, p_item->p_stats->i_played_abuffers );
+    UPDATE( alost_stat,    "%"PRIu64, p_item->p_stats->i_lost_abuffers );
 
 #undef UPDATE
 
