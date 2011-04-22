@@ -1348,11 +1348,7 @@ void CaptureOpenPanel::advancedDialog()
         updateMRL();
         msg_Dbg( p_intf, "%s", qtu( advMRL ) );
     }
-    for( int i = 0; i < controls.size(); i++ )
-    {
-        ConfigControl *control = controls[i];
-        delete control ;
-    }
+    qDeleteAll( controls );
     delete adv;
     module_config_free( p_config );
     module_release (p_module);
