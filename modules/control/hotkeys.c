@@ -75,8 +75,8 @@ static void DisplayRate ( vout_thread_t *, float );
 static float AdjustRateFine( input_thread_t *, const int );
 static void ClearChannels  ( intf_thread_t *, vout_thread_t * );
 
-#define DisplayMessage(vout, fmt, ...) \
-    do { if(vout) vout_OSDMessage(vout, fmt, __VA_ARGS__); } while(0)
+#define DisplayMessage(vout, ch, fmt, ...) \
+    do { if(vout) vout_OSDMessage(vout, ch, fmt, __VA_ARGS__); } while(0)
 #define DisplayIcon(vout, icon) \
     do { if(vout) vout_OSDIcon(vout, SPU_DEFAULT_CHANNEL, icon); } while(0)
 
