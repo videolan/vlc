@@ -26,9 +26,9 @@
 # include "config.h"
 #endif
 
-#include <vlc_vout.h>
-#include <vlc_keys.h>
+#include <vlc_vout.h>                       /* vout_thread_t for FSC */
 
+/* Widgets */
 #include "components/controller.hpp"
 #include "components/controller_widget.hpp"
 #include "components/interface_widgets.hpp"
@@ -736,8 +736,8 @@ FullscreenControllerWidget::FullscreenControllerWidget( intf_thread_t *_p_i, QWi
 
     /* hiding timer */
     p_hideTimer = new QTimer( this );
-    CONNECT( p_hideTimer, timeout(), this, hideFSC() );
     p_hideTimer->setSingleShot( true );
+    CONNECT( p_hideTimer, timeout(), this, hideFSC() );
 
     /* slow hiding timer */
 #if HAVE_TRANSPARENCY

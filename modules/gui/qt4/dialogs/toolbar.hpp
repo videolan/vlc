@@ -1,7 +1,7 @@
 /*****************************************************************************
  * ToolbarEdit.hpp : ToolbarEdit dialogs
  ****************************************************************************
- * Copyright (C) 2008-2009 the VideoLAN team
+ * Copyright (C) 2008-2011 the VideoLAN team
  * $Id$
  *
  * Authors: Jean-Baptiste Kempf <jb (at) videolan.org>
@@ -24,8 +24,8 @@
 #ifndef QVLC_TOOLBAREDIT_DIALOG_H_
 #define QVLC_TOOLBAREDIT_DIALOG_H_ 1
 
-#include "util/qvlcframe.hpp"
-#include "components/controller.hpp"
+#include "util/qvlcframe.hpp"                                 /* QVLCDialog */
+#include "components/controller.hpp"                  /* AbstractController */
 
 #include <QListWidget>
 #include <QCheckBox>
@@ -43,7 +43,6 @@
 
 class ToolbarEditDialog;
 class DroppingController;
-class QCheckBox;
 class QComboBox;
 class QRubberBand;
 
@@ -67,8 +66,8 @@ public:
                         bigBox->isChecked() * WIDGET_BIG +
                         !shinyBox->isChecked() * WIDGET_SHINY; }
     virtual ~ToolbarEditDialog();
-private:
 
+private:
     QCheckBox *flatBox, *bigBox, *shinyBox;
     QComboBox *positionCombo, *profileCombo;
 
@@ -103,7 +102,8 @@ protected:
 
     virtual void doAction( int );
 
-    bool eventFilter( QObject *, QEvent * );
+    virtual bool eventFilter( QObject *, QEvent * );
+
 private:
     struct doubleInt
     {
@@ -112,12 +112,11 @@ private:
     };
     QRubberBand *rubberband;
     QList <doubleInt *> widgetList;
+
     int i_dragIndex;
-
-    int getParentPosInLayout( QPoint point);
-
     bool b_draging;
 
+    int getParentPosInLayout( QPoint point);
 };
 
 #endif
