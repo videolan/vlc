@@ -311,6 +311,7 @@ FunctionEnd
   !insertmacro ${_action} ".avi"
   !insertmacro ${_action} ".divx"
   !insertmacro ${_action} ".dv"
+  !insertmacro ${_action} ".f4v"
   !insertmacro ${_action} ".flv"
   !insertmacro ${_action} ".gxf"
   !insertmacro ${_action} ".m1v"
