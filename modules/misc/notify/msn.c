@@ -32,10 +32,8 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_interface.h>
-#include <vlc_meta.h>
-#include <vlc_playlist.h>
-#include <vlc_strings.h>
-#include <vlc_charset.h>
+#include <vlc_playlist.h>                                      /* playlist_t */
+#include <vlc_charset.h>                                           /* ToWide */
 
 /*****************************************************************************
  * intf_sys_t: description and status of log interface
@@ -96,11 +94,9 @@ static int Open( vlc_object_t *p_this )
 
     p_intf->p_sys->psz_format = var_InheritString( p_intf, "msn-format" );
     if( !p_intf->p_sys->psz_format )
-    {
-        msg_Dbg( p_intf, "no format provided" );
         p_intf->p_sys->psz_format = strdup( FORMAT_DEFAULT );
-    }
-    msg_Dbg( p_intf, "using format: %s", p_intf->p_sys->psz_format );
+
+    msg_Dbg( p_intf, "using MSN format: %s", p_intf->p_sys->psz_format );
 
     p_playlist = pl_Get( p_intf );
     var_AddCallback( p_playlist, "item-change", ItemChange, p_intf );
@@ -154,16 +150,14 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     char *psz_artist = input_item_GetArtist( input_GetItem( p_input ) );
     char *psz_album = input_item_GetAlbum( input_GetItem( p_input ) );
     char *psz_title = input_item_GetTitleFbName( input_GetItem( p_input ) );
-    char *psz_buf = str_format_meta( p_intf, p_intf->p_sys->psz_format );
 
     snprintf( psz_tmp,
               MSN_MAX_LENGTH,
               "\\0Music\\01\\0%s\\0%s\\0%s\\0%s\\0\\0\\0",
-              psz_buf,
+              p_intf->p_sys->psz_format,
               psz_artist ? psz_artist : "",
               psz_title ? psz_title : "",
               psz_album );
-    free( psz_buf );
     free( psz_title );
     free( psz_artist );
     free( psz_album );
