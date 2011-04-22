@@ -72,7 +72,14 @@
         </widget>
        </item>
        <item row="1" column="3">
-        <widget class="QLineEdit" name="vbobjectsEdit"/>
+        <widget class="QLineEdit" name="vbobjectsEdit">
+         <property name="minimumSize">
+          <size>
+           <width>80</width>
+           <height>0</height>
+          </size>
+         </property>
+        </widget>
        </item>
        <item row="1" column="4">
         <widget class="QPushButton" name="saveLogButton">
@@ -95,13 +102,6 @@
            <string notr="true">1</string>
           </property>
          </column>
-        </widget>
-       </item>
-       <item row="1" column="0">
-        <widget class="QPushButton" name="updateButton">
-         <property name="text">
-          <string>&amp;Update</string>
-         </property>
         </widget>
        </item>
       </layout>

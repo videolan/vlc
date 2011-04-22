@@ -58,10 +58,13 @@ private slots:
     void changeVerbosity( int );
     void clear();
     void updateTree();
+    void tabChanged( int );
+
 private:
     void buildTree( QTreeWidgetItem *, vlc_object_t * );
 
     friend class    Singleton<MessagesDialog>;
+    QPushButton *updateButton;
 };
 
 #endif

@@ -26,8 +26,6 @@
 
 #include "dialogs/messages.hpp"
 
-#include <QSpinBox>
-#include <QLabel>
 #include <QTextEdit>
 #include <QTextCursor>
 #include <QFileDialog>
@@ -36,10 +34,8 @@
 #include <QTabWidget>
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
-#include <QHeaderView>
 #include <QMutex>
 #include <QLineEdit>
-#include <QPushButton>
 #include <QScrollBar>
 
 #include <assert.h>
@@ -83,7 +79,7 @@ MessagesDialog::MessagesDialog( intf_thread_t *_p_intf)
     updateTree();
 
     /* Modules tree */
-    ui.modulesTree->header()->hide();
+    ui.modulesTree->setHeaderHidden( true );
 
     /* Buttons and general layout */
     ui.saveLogButton->setToolTip( qtr( "Saves all the displayed logs to a file" ) );
@@ -95,13 +91,20 @@ MessagesDialog::MessagesDialog( intf_thread_t *_p_intf)
                             "--verbose-objects=+printthatobject,-dontprintthatone\n"
                             "(keyword 'all' to applies to all objects)");
 
+    updateButton = new QPushButton( QIcon(":/update"), "" );
+    ui.mainTab->setCornerWidget( updateButton );
+    updateButton->setVisible( false );
+    updateButton->setFlat( true );
+
     BUTTONACT( ui.clearButton, clear() );
-    BUTTONACT( ui.updateButton, updateTree() );
+    BUTTONACT( updateButton, updateTree() );
     BUTTONACT( ui.saveLogButton, save() );
     CONNECT( ui.vbobjectsEdit, editingFinished(), this, updateConfig());
     CONNECT( ui.bottomButtonsBox, rejected(), this, hide() );
     CONNECT( ui.verbosityBox, valueChanged( int ),
              this, changeVerbosity( int ) );
+
+    CONNECT( ui.mainTab, currentChanged( int ), this, tabChanged( int ) );
 
     /* General action */
     readSettings( "Messages", QSize( 600, 450 ) );
@@ -277,6 +280,11 @@ void MessagesDialog::updateTree()
 {
     ui.modulesTree->clear();
     buildTree( NULL, VLC_OBJECT( p_intf->p_libvlc ) );
+}
+
+void MessagesDialog::tabChanged( int i )
+{
+    updateButton->setVisible( i == 1 );
 }
 
 static void MsgCallback( msg_cb_data_t *data, msg_item_t *item, unsigned )
