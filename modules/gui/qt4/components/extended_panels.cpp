@@ -1153,7 +1153,7 @@ Compressor::Compressor( intf_thread_t *_p_intf, QWidget *_parent )
            : QWidget( _parent ) , p_intf( _p_intf )
 {
     QFont smallFont = QApplication::font();
-    smallFont.setPointSize( smallFont.pointSize() - 3 );
+    smallFont.setPointSize( smallFont.pointSize() - 2 );
 
     QGridLayout *layout = new QGridLayout( this );
 
@@ -1307,7 +1307,7 @@ Spatializer::Spatializer( intf_thread_t *_p_intf, QWidget *_parent )
             : QWidget( _parent ) , p_intf( _p_intf )
 {
     QFont smallFont = QApplication::font();
-    smallFont.setPointSize( smallFont.pointSize() - 3 );
+    smallFont.setPointSize( smallFont.pointSize() - 2 );
 
     QGridLayout *layout = new QGridLayout( this );
 
