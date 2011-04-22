@@ -369,6 +369,7 @@ static const entry_t p_list_video[] = {
         E("cdvc", "Canopus DV Video"),
         E("CDVH", "Canopus DV Video"),
         E("cdvh", "Canopus DV Video"),
+        E("CDV5", "Canopus DV Video"),
 
     /* Windows Media Video */
     B(VLC_CODEC_WMV1, "Windows Media Video 7"),
