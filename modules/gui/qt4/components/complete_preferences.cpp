@@ -504,7 +504,7 @@ AdvPrefsPanel::AdvPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 void AdvPrefsPanel::apply()
 {
     foreach ( ConfigControl *cfg, controls )
-        cfg->doApply( p_intf );
+        cfg->doApply();
 }
 
 void AdvPrefsPanel::clean()

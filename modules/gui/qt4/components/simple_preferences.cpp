@@ -768,7 +768,7 @@ void SPrefsPanel::apply()
     for( i = controls.begin() ; i != controls.end() ; ++i )
     {
         ConfigControl *c = qobject_cast<ConfigControl *>(*i);
-        c->doApply( p_intf );
+        c->doApply();
     }
 
     switch( number )

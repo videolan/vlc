@@ -197,9 +197,9 @@ void InterfacePreviewWidget::setPreview( enum_style e_style )
  *************************************************************************/
 
 void
-VStringConfigControl::doApply( intf_thread_t *p_intf )
+VStringConfigControl::doApply()
 {
-    config_PutPsz( p_intf, getName(), qtu( getValue() ) );
+    config_PutPsz( p_this, getName(), qtu( getValue() ) );
 }
 
 /*********** String **************/
@@ -806,9 +806,9 @@ void ModuleListConfigControl::onUpdate()
  *************************************************************************/
 
 void
-VIntConfigControl::doApply( intf_thread_t *p_intf )
+VIntConfigControl::doApply()
 {
-    config_PutInt( p_intf, getName(), getValue() );
+    config_PutInt( p_this, getName(), getValue() );
 }
 
 /*********** Integer **************/
@@ -1091,9 +1091,9 @@ int BoolConfigControl::getValue() const
  *************************************************************************/
 
 void
-VFloatConfigControl::doApply( intf_thread_t *p_intf )
+VFloatConfigControl::doApply()
 {
-    config_PutFloat( p_intf, getName(), getValue() );
+    config_PutFloat( p_this, getName(), getValue() );
 }
 
 /*********** Float **************/
@@ -1389,7 +1389,7 @@ void KeySelectorControl::setTheKey()
                                    Qt::UserRole, shortcutValue->getValue() );
 }
 
-void KeySelectorControl::doApply( intf_thread_t* )
+void KeySelectorControl::doApply()
 {
     QTreeWidgetItem *it;
     for( int i = 0; i < table->topLevelItemCount() ; i++ )
