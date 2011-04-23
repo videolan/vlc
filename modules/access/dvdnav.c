@@ -384,7 +384,6 @@ static void Close( vlc_object_t *p_this )
 {
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys = p_demux->p_sys;
-    int i;
 
     /* Stop vout event handler */
     var_DelCallback( p_sys->p_input, "intf-event", EventIntf, p_demux );
@@ -414,7 +413,7 @@ static void Close( vlc_object_t *p_this )
 
     vlc_object_release( p_sys->p_input );
 
-    for( i = 0; i < PS_TK_COUNT; i++ )
+    for( int i = 0; i < PS_TK_COUNT; i++ )
     {
         ps_track_t *tk = &p_sys->tk[i];
         if( tk->b_seen )
