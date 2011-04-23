@@ -456,29 +456,31 @@ void InputManager::UpdateRate()
 void InputManager::UpdateName()
 {
     /* Update text, name and nowplaying */
-    QString text;
+    QString name;
 
     /* Try to get the nowplaying */
     char *format = var_InheritString( p_intf, "input-title-format" );
     char *formated = str_format_meta( p_input, format );
-    text = formated;
+    name = formated;
     /* Free everything */
     free( format );
     free( formated );
 
     /* If we have Nothing */
-    if( text.isEmpty() )
+    if( name.isEmpty() )
     {
-        char *psz_name = input_item_GetURI( input_GetItem( p_input ) );
-        text.sprintf( "%s", psz_name );
-        text = text.remove( 0, text.lastIndexOf( DIR_SEP ) + 1 );
+        char *psz_name = make_path( input_item_GetURI( input_GetItem( p_input ) ) );
+        name = psz_name;
+        name = name.remove( 0, name.lastIndexOf( DIR_SEP ) + 1 );
         free( psz_name );
     }
 
-    if( oldName != text )
+    name = name.trimmed();
+
+    if( oldName != name )
     {
-        emit nameChanged( text );
-        oldName = text;
+        emit nameChanged( name );
+        oldName = name;
     }
 }
 

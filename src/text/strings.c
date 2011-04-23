@@ -618,11 +618,6 @@ static void format_duration (char *buf, size_t len, int64_t duration)
                         d += len;                                   \
                         free( string );                             \
                     }                                               \
-                    else if( !b_empty_if_na )                       \
-                    {                                               \
-                        *(dst+d) = '-';                             \
-                        d++;                                        \
-                    }                                               \
 
 /* same than INSERT_STRING, except that string won't be freed */
 #define INSERT_STRING_NO_FREE( string )                             \
@@ -730,15 +725,15 @@ char *str_format_meta( vlc_object_t *p_object, const char *string )
                     }
                     break;
                 case 's':
-                {
-                    char *lang = NULL;
-                    if( p_input )
-                        lang = var_GetNonEmptyString( p_input, "sub-language" );
-                    if( lang == NULL )
-                        lang = strdup( b_empty_if_na ? "" : "-" );
-                    INSERT_STRING( lang );
-                    break;
-                }
+                    {
+                        char *lang = NULL;
+                        if( p_input )
+                            lang = var_GetNonEmptyString( p_input, "sub-language" );
+                        if( lang == NULL )
+                            lang = strdup( b_empty_if_na ? "" : "-" );
+                        INSERT_STRING( lang );
+                        break;
+                    }
                 case 't':
                     if( p_item )
                     {
@@ -822,16 +817,16 @@ char *str_format_meta( vlc_object_t *p_object, const char *string )
                     }
                     break;
                 case 'O':
-                {
-                    char *lang = NULL;
-                    if( p_input )
-                        lang = var_GetNonEmptyString( p_input,
-                                                      "audio-language" );
-                    if( lang == NULL )
-                        lang = strdup( b_empty_if_na ? "" : "-" );
-                    INSERT_STRING( lang );
-                    break;
-                }
+                    {
+                        char *lang = NULL;
+                        if( p_input )
+                            lang = var_GetNonEmptyString( p_input,
+                                                          "audio-language" );
+                        if( lang == NULL )
+                            lang = strdup( b_empty_if_na ? "" : "-" );
+                        INSERT_STRING( lang );
+                        break;
+                    }
                 case 'P':
                     if( p_input )
                     {
@@ -871,7 +866,7 @@ char *str_format_meta( vlc_object_t *p_object, const char *string )
                         format_duration( buf, sizeof(buf), i_time );
                     }
                     else
-                        strcpy( buf, b_empty_if_na ? "" :  "--:--:--" );
+                        strcpy( buf, b_empty_if_na ? "" : "--:--:--" );
                     INSERT_STRING_NO_FREE( buf );
                     break;
                 case 'U':
@@ -881,12 +876,12 @@ char *str_format_meta( vlc_object_t *p_object, const char *string )
                     }
                     break;
                 case 'V':
-                {
-                    audio_volume_t volume = aout_VolumeGet( p_object );
-                    snprintf( buf, 10, "%d", volume );
-                    INSERT_STRING_NO_FREE( buf );
-                    break;
-                }
+                    {
+                        audio_volume_t volume = aout_VolumeGet( p_object );
+                        snprintf( buf, 10, "%d", volume );
+                        INSERT_STRING_NO_FREE( buf );
+                        break;
+                    }
                 case '_':
                     *(dst+d) = '\n';
                     d++;
@@ -897,8 +892,12 @@ char *str_format_meta( vlc_object_t *p_object, const char *string )
                         char *now_playing = input_item_GetNowPlaying( p_item );
                         if ( now_playing == NULL )
                         {
-                            INSERT_STRING( input_item_GetTitle( p_item ) );
-                            INSERT_STRING_NO_FREE( " - " );
+                            char *temp = input_item_GetTitle( p_item );
+                            if( !EMPTY_STR( temp ) )
+                            {
+                                INSERT_STRING( temp );
+                                INSERT_STRING_NO_FREE( " - " );
+                            }
                             INSERT_STRING( input_item_GetArtist( p_item ) );
                         }
                         else
