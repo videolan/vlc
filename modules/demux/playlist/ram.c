@@ -287,7 +287,8 @@ static int Demux( demux_t *p_demux )
                         psz_author = decode_URI_duplicate(psz_value);
                         EnsureUTF8( psz_author );
                     }
-                    else if( !strcmp( psz_param, "start" ) )
+                    else if( !strcmp( psz_param, "start" )
+                            && strncmp( psz_mrl, "rtsp", 4 ) /* Our rtsp-real or our real demuxer is wrong */  )
                     {
                         i_start = ParseTime( psz_value, strlen( psz_value ) );
                         char *temp;
