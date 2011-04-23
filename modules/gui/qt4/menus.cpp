@@ -597,7 +597,7 @@ QMenu *QVLCMenu::AudioMenu( intf_thread_t *p_intf, QMenu * current )
 }
 
 /* Subtitles */
-QMenu *QVLCMenu::SubMenu( intf_thread_t *p_intf, QMenu *current )
+QMenu *QVLCMenu::SubtitleMenu( intf_thread_t *p_intf, QMenu *current )
 {
     QAction *action;
     QMenu *submenu = new QMenu( qtr( "&Subtitles Track" ), current );
@@ -624,7 +624,7 @@ QMenu *QVLCMenu::VideoMenu( intf_thread_t *p_intf, QMenu *current, bool b_subtit
     {
         addActionWithSubmenu( current, "video-es", qtr( "Video &Track" ) );
         if( b_subtitle)
-            SubMenu( p_intf, current );
+            SubtitleMenu( p_intf, current );
 
         current->addSeparator();
 
@@ -982,7 +982,9 @@ void QVLCMenu::PopupMenu( intf_thread_t *p_intf, bool show )
         if( action->menu()->isEmpty() )
             action->setEnabled( false );
 
-        SubMenu( p_intf, menu )->setTitle( qtr( "Subti&tle") );
+        submenu = SubtitleMenu( p_intf, menu );
+        submenu->setTitle( qtr( "Subti&tle") );
+        UpdateItem( p_intf, menu, "spu-es", VLC_OBJECT(p_input), true );
 
         /* Playback menu for chapters */
         submenu = new QMenu( menu );
