@@ -19,6 +19,7 @@
 		<dict>
 			<key>CFBundleTypeExtensions</key>
 			<array>
+				<string>f4v</string>
 				<string>flv</string>
 			</array>
 			<key>CFBundleTypeIconFile</key>
