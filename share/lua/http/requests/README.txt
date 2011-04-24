@@ -26,8 +26,14 @@ status.xml:
 > play playlist item <id>. If <id> is omitted, play last active item:
   ?command=pl_play&id=<id>
 
-> toggle pause. If current state was 'stop', play item <id>:
+> toggle pause. If current state was 'stop', play item <id>, if no <id> specified, play current item. If no current item, play 1st item in the playlist:
   ?command=pl_pause&id=<id>
+
+> resume playback if paused, else do nothing
+  ?command=pl_forceresume
+
+> pause playback, do nothing if already paused
+  ?command=pl_forcepause
 
 > stop playback:
   ?command=pl_stop

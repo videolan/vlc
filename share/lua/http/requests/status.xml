@@ -59,7 +59,23 @@ elseif command == "pl_play" then
     vlc.playlist.goto(id)
   end
 elseif command == "pl_pause" then
-  vlc.playlist.pause()
+  if vlc.playlist.status() == "stopped" then
+    if id == -1 then
+      vlc.playlist.play()
+    else
+      vlc.playlist.goto(id)
+    end
+  else
+    vlc.playlist.pause()
+  end
+elseif command == "pl_forcepause" then
+  if vlc.playlist.status() == "playing" then
+    vlc.playlist.pause()
+  end
+elseif command == "pl_forceresume" then
+  if vlc.playlist.status() == "paused" then
+    vlc.playlist.pause()
+  end
 elseif command == "pl_stop" then
   vlc.playlist.stop()
 elseif command == "pl_next" then
