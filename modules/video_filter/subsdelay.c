@@ -929,7 +929,7 @@ static int SubpicValidateWrapper( subpicture_t *p_subpic, bool has_src_changed, 
 {
     subsdelay_heap_entry_t *p_entry;
     mtime_t i_new_ts;
-    int i_result;
+    int i_result = VLC_SUCCESS;
 
     p_entry = p_subpic->updater.p_sys;
     if( !p_entry )
