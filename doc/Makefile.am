@@ -29,8 +29,8 @@ man1_MANS = \
 
 EXTRA_DIST = \
 	$(CHANGELOGS) \
-        $(man1_MANS) \
-        bugreport-howto.txt \
+	$(man1_MANS) \
+	bugreport-howto.txt \
 	fortunes.txt \
 	intf-vcd.txt \
 	release-howto.txt \
