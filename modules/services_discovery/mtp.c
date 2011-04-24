@@ -26,10 +26,9 @@
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
-#include <vlc_interface.h>
 #include <vlc_services_discovery.h>
 
-#include "libmtp.h"
+#include <libmtp.h>
 
 /*****************************************************************************
  * Module descriptor
@@ -119,8 +118,8 @@ static void Close( vlc_object_t *p_this )
     services_discovery_t *p_sd = ( services_discovery_t * )p_this;
 
     free( p_sd->p_sys->psz_name );
-    vlc_cancel (p_sd->p_sys->thread);
-    vlc_join (p_sd->p_sys->thread, NULL);
+    vlc_cancel( p_sd->p_sys->thread );
+    vlc_join( p_sd->p_sys->thread, NULL );
     free( p_sd->p_sys );
 }
 
@@ -274,11 +273,10 @@ static void AddTrack( services_discovery_t *p_sd, LIBMTP_track_t *p_track )
 static void CloseDevice( services_discovery_t *p_sd )
 {
     input_item_t **pp_items = p_sd->p_sys->pp_items;
-    int i_i;
 
     if( pp_items != NULL )
     {
-        for( i_i = 0; i_i < p_sd->p_sys->i_count; i_i++ )
+        for( int i_i = 0; i_i < p_sd->p_sys->i_count; i_i++ )
         {
             if( pp_items[i_i] != NULL )
             {
