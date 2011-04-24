@@ -131,7 +131,7 @@ services_discovery_t *vlc_sd_Create( vlc_object_t *p_super,
 }
 
 /***********************************************************************
- * Stop
+ * Start
  ***********************************************************************/
 bool vlc_sd_Start ( services_discovery_t * p_sd )
 {
