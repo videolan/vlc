@@ -784,7 +784,7 @@ static void GetDevices (vlc_object_t *obj, module_config_t *item)
         if (desc != NULL)
             for (char *lf = strchr(desc, '\n'); lf; lf = strchr(lf, '\n'))
                  *lf = ' ';
-        msg_Dbg(obj, " %s (%s)", (desc != NULL) ? desc : name, name);
+        msg_Dbg(obj, "%s (%s)", (desc != NULL) ? desc : name, name);
 
         if (item != NULL)
         {
