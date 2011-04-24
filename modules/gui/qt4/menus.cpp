@@ -309,7 +309,7 @@ void QVLCMenu::createMenuBar( MainInterface *mi,
        setDesktopAware set to false */
     QMenuBar *bar = mi->menuBar();
 
-    addMenuToMainbar( FileMenu( p_intf, bar ), qtr( "&Media" ), bar );
+    addMenuToMainbar( FileMenu( p_intf, bar, mi ), qtr( "&Media" ), bar );
 
     /* Dynamic menus, rebuilt before being showed */
     BAR_DADD( NavigMenu( p_intf, bar ), qtr( "P&layback" ), 3 );
@@ -329,7 +329,7 @@ void QVLCMenu::createMenuBar( MainInterface *mi,
  * Media ( File ) Menu
  * Opening, streaming and quit
  **/
-QMenu *QVLCMenu::FileMenu( intf_thread_t *p_intf, QWidget *parent )
+QMenu *QVLCMenu::FileMenu( intf_thread_t *p_intf, QWidget *parent, MainInterface *mi )
 {
     QMenu *menu = new QMenu( parent );
     QAction *action;
@@ -378,6 +378,12 @@ QMenu *QVLCMenu::FileMenu( intf_thread_t *p_intf, QWidget *parent )
                                SLOT( activatePlayQuit( bool ) ) );
     action->setCheckable( true );
     action->setChecked( THEMIM->getPlayExitState() );
+
+    if( mi->getSysTray() )
+    {
+        action = menu->addAction( qtr( "Close to systray"), mi,
+                                 SLOT( toggleUpdateSystrayMenu() ) );
+    }
 
     addDPStaticEntry( menu, qtr( "&Quit" ) ,
         ":/menu/quit", SLOT( quit() ), "Ctrl+Q" );

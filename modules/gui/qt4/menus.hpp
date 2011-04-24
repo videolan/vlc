@@ -93,7 +93,7 @@ public:
 
 private:
     /* All main Menus */
-    static QMenu *FileMenu( intf_thread_t *, QWidget * );
+    static QMenu *FileMenu( intf_thread_t *, QWidget *, MainInterface * mi = NULL );
 
     static QMenu *ToolsMenu( QMenu * );
     static QMenu *ToolsMenu( QWidget *parent ) { return ToolsMenu( new QMenu( parent ) ); }

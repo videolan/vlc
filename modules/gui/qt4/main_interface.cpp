@@ -132,6 +132,11 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 
     settings->endGroup( );
 
+    /*********************************
+     * Create the Systray Management *
+     *********************************/
+    initSystray();
+
     /**************************
      *  UI and Widgets design
      **************************/
@@ -151,11 +156,6 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
      **************/
     createStatusBar();
     setStatusBarVisibility( getSettings()->value( "MainWindow/status-bar-visible", false ).toBool() );
-
-    /*********************************
-     * Create the Systray Management *
-     *********************************/
-    initSystray();
 
     /********************
      * Input Manager    *
@@ -971,7 +971,7 @@ void MainInterface::createSystray()
     sysTray->show();
 
     CONNECT( sysTray, activated( QSystemTrayIcon::ActivationReason ),
-            this, handleSystrayClick( QSystemTrayIcon::ActivationReason ) );
+             this, handleSystrayClick( QSystemTrayIcon::ActivationReason ) );
 }
 
 /**
