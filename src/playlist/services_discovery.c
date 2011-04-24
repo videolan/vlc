@@ -103,8 +103,8 @@ static void services_discovery_Destructor ( vlc_object_t *p_obj );
  * That's how the playlist get's Service Discovery information
  */
 
-/***********************************************************************
- * Create
+/*******************************************************************//**
+ * Create a Service discovery
  ***********************************************************************/
 services_discovery_t *vlc_sd_Create( vlc_object_t *p_super,
                                      const char *cfg )
@@ -130,8 +130,8 @@ services_discovery_t *vlc_sd_Create( vlc_object_t *p_super,
     return p_sd;
 }
 
-/***********************************************************************
- * Start
+/*******************************************************************//**
+ * Start a Service Discovery
  ***********************************************************************/
 bool vlc_sd_Start ( services_discovery_t * p_sd )
 {
@@ -152,8 +152,8 @@ bool vlc_sd_Start ( services_discovery_t * p_sd )
     return true;
 }
 
-/***********************************************************************
- * Stop
+/*******************************************************************//**
+ * Stop a Service Discovery
  ***********************************************************************/
 void vlc_sd_Stop ( services_discovery_t * p_sd )
 {
@@ -167,6 +167,9 @@ void vlc_sd_Stop ( services_discovery_t * p_sd )
     p_sd->p_module = NULL;
 }
 
+/*******************************************************************//**
+ * Destroy a Service Discovery
+ ***********************************************************************/
 void vlc_sd_Destroy( services_discovery_t *p_sd )
 {
     config_ChainDestroy( p_sd->p_cfg );
@@ -174,8 +177,8 @@ void vlc_sd_Destroy( services_discovery_t *p_sd )
     vlc_object_release( p_sd );
 }
 
-/***********************************************************************
- * Destructor
+/*******************************************************************//**
+ * Destructor of the Service Discovery
  ***********************************************************************/
 static void services_discovery_Destructor ( vlc_object_t *p_obj )
 {
@@ -184,8 +187,10 @@ static void services_discovery_Destructor ( vlc_object_t *p_obj )
     vlc_event_manager_fini( &p_sd->event_manager );
 }
 
-/***********************************************************************
- * GetLocalizedName
+/*******************************************************************//**
+ * Get the Localized Name
+ *
+ * This is useful for interfaces and libVLC
  ***********************************************************************/
 char *
 services_discovery_GetLocalizedName ( services_discovery_t * p_sd )
@@ -193,8 +198,11 @@ services_discovery_GetLocalizedName ( services_discovery_t * p_sd )
     return strdup( module_get_name( p_sd->p_module, true ) );
 }
 
-/***********************************************************************
- * EventManager
+/*******************************************************************//**
+ * Getter for the EventManager
+ *
+ * You can receive event notification
+ * This is the preferred way to get new items
  ***********************************************************************/
 vlc_event_manager_t *
 services_discovery_EventManager ( services_discovery_t * p_sd )
@@ -202,8 +210,8 @@ services_discovery_EventManager ( services_discovery_t * p_sd )
     return &p_sd->event_manager;
 }
 
-/***********************************************************************
- * AddItem
+/*******************************************************************//**
+ * Add an item to the Service Discovery listing
  ***********************************************************************/
 void
 services_discovery_AddItem ( services_discovery_t * p_sd, input_item_t * p_item,
@@ -217,8 +225,8 @@ services_discovery_AddItem ( services_discovery_t * p_sd, input_item_t * p_item,
     vlc_event_send( &p_sd->event_manager, &event );
 }
 
-/***********************************************************************
- * RemoveItem
+/*******************************************************************//**
+ * Remove an item from the Service Discovery listing
  ***********************************************************************/
 void
 services_discovery_RemoveItem ( services_discovery_t * p_sd, input_item_t * p_item )

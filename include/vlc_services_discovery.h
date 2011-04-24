@@ -37,8 +37,12 @@
 extern "C" {
 # endif
 
-/*
+/**
  * @{
+ */
+
+/**
+ * Main service discovery structure to build a SD module
  */
 struct services_discovery_t
 {
@@ -46,7 +50,7 @@ struct services_discovery_t
     module_t *          p_module;             /**< Loaded module */
 
     /**< Event manager
-    /* You should access it through setters, outside of the core */
+     * You should access it through setters, outside of the core */
     vlc_event_manager_t event_manager;
 
     char *psz_name;                           /**< Main name of the SD */
@@ -62,6 +66,7 @@ struct services_discovery_t
 
 /**
  * Service discovery categories
+ * \see vlc_sd_probe_Add
  */
 enum services_discovery_category_e
 {
@@ -90,6 +95,7 @@ enum services_discovery_capability_e
 
 /**
  * Service discovery descriptor
+ * \see services_discovery_command_e
  */
 typedef struct
 {
@@ -98,6 +104,7 @@ typedef struct
     char *psz_url;              /**< URL for the service */
     int   i_capabilities;       /**< \see services_discovery_capability_e */
 } services_discovery_descriptor_t;
+
 
 /***********************************************************************
  * Service Discovery
