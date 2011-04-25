@@ -164,6 +164,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
 {
     if( o_file_slave_path )
         [o_file_slave_path release];
+    [o_mrl release];
     [super dealloc];
 }
 
@@ -296,6 +297,25 @@ static VLCOpen *_o_sharedMainInstance = nil;
                                              selector: @selector(textFieldWasClicked:)
                                                  name: @"VLCOpenTextFieldWasClicked"
                                                object: nil];
+
+    [self setMRL: @""];
+}
+
+- (void)setMRL:(NSString *)newMRL
+{
+    [o_mrl release];
+    o_mrl = newMRL;
+    [o_mrl retain];
+    [o_mrl_fld setStringValue: newMRL];
+    if ([o_mrl length] > 0)
+        [o_btn_ok setEnabled: YES];
+    else
+        [o_btn_ok setEnabled: NO];
+}
+
+- (NSString *)MRL
+{
+    return o_mrl;
 }
 
 - (void)setSubPanel
@@ -383,7 +403,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
         NSMutableArray *o_options = [NSMutableArray array];
         unsigned int i;
 
-        o_dic = [NSMutableDictionary dictionaryWithObject: [o_mrl stringValue] forKey: @"ITEM_URL"];
+        o_dic = [NSMutableDictionary dictionaryWithObject: [self MRL] forKey: @"ITEM_URL"];
         if( [o_file_sub_ckbox state] == NSOnState )
         {
             module_config_t * p_item;
@@ -556,27 +576,29 @@ static VLCOpen *_o_sharedMainInstance = nil;
 - (void)openFilePathChanged:(NSNotification *)o_notification
 {
     NSString *o_filename = [o_file_path stringValue];
-    bool b_stream = [o_file_stream state];
-    BOOL b_dir = NO;
 
-    [[NSFileManager defaultManager] fileExistsAtPath:o_filename isDirectory:&b_dir];
-
-    char *psz_uri = make_URI([o_filename UTF8String], "file");
-    if( !psz_uri ) return;
-
-    NSMutableString *o_mrl_string = [NSMutableString stringWithUTF8String: psz_uri ];
-    NSRange offile = [o_mrl_string rangeOfString:@"file"];
-    free( psz_uri );
-
-    if( b_dir )
+    if ( o_filename && [o_filename > 0] )
     {
-        [o_mrl_string replaceCharactersInRange:offile withString: @"directory"];
+        bool b_stream = [o_file_stream state];
+        BOOL b_dir = NO;
+
+        [[NSFileManager defaultManager] fileExistsAtPath:o_filename isDirectory:&b_dir];
+
+        char *psz_uri = make_URI([o_filename UTF8String], "file");
+        if( !psz_uri ) return;
+
+        NSMutableString *o_mrl_string = [NSMutableString stringWithUTF8String: psz_uri ];
+        NSRange offile = [o_mrl_string rangeOfString:@"file"];
+        free( psz_uri );
+
+        if( b_dir )
+            [o_mrl_string replaceCharactersInRange:offile withString: @"directory"];
+        else if( b_stream )
+            [o_mrl_string replaceCharactersInRange:offile withString: @"stream"];
+
+        [self setMRL: o_mrl_string];
     }
-    else if( b_stream )
-    {
-        [o_mrl_string replaceCharactersInRange:offile withString: @"stream"];
-    }
-    [o_mrl setStringValue: o_mrl_string];
+    [self setMRL: @""];
 }
 
 - (IBAction)openFileBrowse:(id)sender
@@ -752,15 +774,21 @@ static VLCOpen *_o_sharedMainInstance = nil;
     }
     else /* VIDEO_TS folder */
     {
-        if ( b_no_menus )
-            o_mrl_string = [NSString stringWithFormat: @"dvdread://%@@%i:%i",
-                            o_videots, i_title, i_chapter];
+        if ([o_videots length] > 0)
+        {
+            if ( b_no_menus )
+                o_mrl_string = [NSString stringWithFormat: @"dvdread://%@@%i:%i", o_videots, i_title, i_chapter];
+            else
+                o_mrl_string = [NSString stringWithFormat: @"dvdnav://%@", o_videots];
+        }
         else
-			o_mrl_string = [NSString stringWithFormat: @"dvdnav://%@",
-                            o_videots];            
+            o_mrl_string = @"";
     }
 
-    [o_mrl setStringValue: o_mrl_string];
+    if ([o_device length] > 0)
+        [self setMRL: o_mrl_string];
+    else
+        [self setMRL: @""];
 }
 
 - (IBAction)openDiscMenusChanged:(id)sender
@@ -882,7 +910,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
     {
         o_mrl_string = [o_net_http_url stringValue];
     }
-    [o_mrl setStringValue: o_mrl_string];
+    [self setMRL: o_mrl_string];
 }
 
 - (IBAction)openNetUDPButtonAction:(id)sender
@@ -935,7 +963,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
                 [o_mrl_string stringByAppendingFormat: @":%i", i_port];
             }
         }
-        [o_mrl setStringValue: o_mrl_string];
+        [self setMRL: o_mrl_string];
         [o_net_http_url setStringValue: o_mrl_string];
         [o_net_udp_panel orderOut: sender];
         [NSApp endSheet: o_net_udp_panel];
@@ -1015,12 +1043,12 @@ static VLCOpen *_o_sharedMainInstance = nil;
         }
         else
             [self showCaptureView: o_eyetv_notLaunched_view];
-        [o_mrl setStringValue: @""];
+        [self setMRL: @""];
     } 
     else if( [[[o_capture_mode_pop selectedItem] title] isEqualToString: _NS("Screen")] )
     {
         [self showCaptureView: o_screen_view];
-        [o_mrl setStringValue: @"screen://"];
+        [self setMRL: @"screen://"];
         [o_screen_height_fld setIntValue: config_GetInt( p_intf, "screen-height" )];
         [o_screen_width_fld setIntValue: config_GetInt( p_intf, "screen-width" )];
         [o_screen_fps_fld setFloatValue: config_GetFloat( p_intf, "screen-fps" )];
@@ -1036,7 +1064,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
         [o_capture_long_lbl displayIfNeeded];
         
         [self showCaptureView: o_capture_label_view];
-        [o_mrl setStringValue: @"qtcapture://"];
+        [self setMRL: @"qtcapture://"];
     }
 }
 
@@ -1044,7 +1072,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
 {
     [o_screen_fps_fld setFloatValue: [o_screen_fps_stp floatValue]];
     [o_panel makeFirstResponder: o_screen_fps_fld];
-    [o_mrl setStringValue: @"screen://"];
+    [self setMRL: @"screen://"];
 }
 
 - (void)screenFPSfieldChanged:(NSNotification *)o_notification
@@ -1052,7 +1080,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
     [o_screen_fps_stp setFloatValue: [o_screen_fps_fld floatValue]];
     if( [[o_screen_fps_fld stringValue] isEqualToString: @""] )
         [o_screen_fps_fld setFloatValue: 1.0];
-    [o_mrl setStringValue: @"screen://"];
+    [self setMRL: @"screen://"];
 }
 
 - (IBAction)eyetvSwitchChannel:(id)sender
@@ -1061,19 +1089,19 @@ static VLCOpen *_o_sharedMainInstance = nil;
     {
         int chanNum = [[[VLCMain sharedInstance] eyeTVController] switchChannelUp: YES];
         [o_eyetv_channels_pop selectItemWithTag:chanNum];
-        [o_mrl setStringValue: [NSString stringWithFormat:@"eyetv:// :eyetv-channel=%d", chanNum]];
+        [self setMRL: [NSString stringWithFormat:@"eyetv:// :eyetv-channel=%d", chanNum]];
     }
     else if( sender == o_eyetv_previousProgram_btn )
     {
         int chanNum = [[[VLCMain sharedInstance] eyeTVController] switchChannelUp: NO];
         [o_eyetv_channels_pop selectItemWithTag:chanNum];
-        [o_mrl setStringValue: [NSString stringWithFormat:@"eyetv:// :eyetv-channel=%d", chanNum]];
+        [self setMRL: [NSString stringWithFormat:@"eyetv:// :eyetv-channel=%d", chanNum]];
     }
     else if( sender == o_eyetv_channels_pop )
     {
         int chanNum = [[sender selectedItem] tag];
         [[[VLCMain sharedInstance] eyeTVController] selectChannel:chanNum];
-        [o_mrl setStringValue: [NSString stringWithFormat:@"eyetv:// :eyetv-channel=%d", chanNum]];
+        [self setMRL: [NSString stringWithFormat:@"eyetv:// :eyetv-channel=%d", chanNum]];
     }
     else
         msg_Err( VLCIntf, "eyetvSwitchChannel sent by unknown object" );
@@ -1228,14 +1256,10 @@ static VLCOpen *_o_sharedMainInstance = nil;
 
 - (IBAction)panelOk:(id)sender
 {
-    if( [[o_mrl stringValue] length] )
-    {
+    if( [[self MRL] length] )
         [NSApp stopModalWithCode: 1];
-    }
     else
-    {
         NSBeep();
-    }
 }
 
 @end
