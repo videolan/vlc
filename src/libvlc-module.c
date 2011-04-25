@@ -963,11 +963,6 @@ static const char *const ppsz_clock_descriptions[] =
     "This allows you to select a list of encoders that VLC will use in " \
     "priority.")
 
-#define SYSTEM_CODEC_TEXT N_("Prefer system plugins over VLC")
-#define SYSTEM_CODEC_LONGTEXT N_( \
-    "Indicates whether VLC will prefer native plugins installed " \
-    "on system over VLC owns plugins whenever a choice is available." )
-
 /*****************************************************************************
  * Sout
  ****************************************************************************/
@@ -1978,8 +1973,7 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_INPUT_VCODEC )
     set_subcategory( SUBCAT_INPUT_ACODEC )
     set_subcategory( SUBCAT_INPUT_SCODEC )
-    add_bool( "prefer-system-codecs", false, SYSTEM_CODEC_TEXT,
-                                SYSTEM_CODEC_LONGTEXT, false )
+    add_obsolete_bool( "prefer-system-codecs" )
 
     set_subcategory( SUBCAT_INPUT_STREAM_FILTER )
     add_module_list_cat( "stream-filter", SUBCAT_INPUT_STREAM_FILTER, NULL, NULL,
