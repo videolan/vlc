@@ -681,7 +681,7 @@ void DialogsProvider::loadSubtitlesFile()
     input_item_t *p_item = input_GetItem( p_input );
     if( !p_item ) return;
 
-    char *path = input_item_GetURI( p_item );
+    char *path = make_path( input_item_GetURI( p_item ) );
     if( !path ) path = strdup( "" );
 
     char *sep = strrchr( path, DIR_SEP_CHAR );
