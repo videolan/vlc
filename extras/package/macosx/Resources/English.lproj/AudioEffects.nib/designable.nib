@@ -1890,6 +1890,7 @@ AADzUQABAAAAARbMY3VydgAAAAAAAAABAc0AAA</bytes>
         </object>
         <string key="NSScreenRect">{{0, 0}, {1680, 1028}}</string>
         <string key="NSMaxSize">{1.7976931348623157e+308, 1.7976931348623157e+308}</string>
+        <string key="NSFrameAutosaveName">audioeffects</string>
       </object>
       <object class="NSUserDefaultsController" id="978847006">
         <bool key="NSSharedInstance">YES</bool>
