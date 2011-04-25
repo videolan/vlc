@@ -187,7 +187,7 @@ void MetaPanel::update( input_item_t *p_item )
 #define UPDATE_META( meta, widget ) {                                   \
     psz_meta = input_item_Get##meta( p_item );                          \
     widget->setText( !EMPTY_STR( psz_meta ) ? qfu( psz_meta ) : "" );   \
-    free( psz_meta );
+    free( psz_meta ); }
 
 #define UPDATE_META_INT( meta, widget ) {           \
     psz_meta = input_item_Get##meta( p_item );      \
