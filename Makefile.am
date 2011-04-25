@@ -515,6 +515,7 @@ VLC-release.app: vlc
 	      $(top_builddir)/VLC-release.app/Contents/Resources/$${i}.lproj ; \
 	done
 	printf "APPLVLC#" >| $(top_builddir)/VLC-release.app/Contents/PkgInfo
+	rm -Rf $(top_builddir)/VLC-release.app/Contents/Frameworks/BGHUDAppKit.framework/Resources/
 	find $(top_builddir)/VLC-release.app/Contents/Resources/English.lproj -name designable.nib -delete;
 	find $(top_builddir)/VLC-release.app -type d -exec chmod ugo+rx '{}' \;
 	find $(top_builddir)/VLC-release.app -type f -exec chmod ugo+r '{}' \;
