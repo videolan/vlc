@@ -255,7 +255,7 @@ static NSMutableArray *blackoutWindows = NULL;
     }
 
     invoc = [NSInvocation invocationWithMethodSignature:[super methodSignatureForSelector:@selector(close)]];
-    [invoc setTarget: (id)super];
+    [invoc setTarget: self];
 
     if (![self isVisible] || [self alphaValue] == 0.0)
     {
@@ -269,7 +269,7 @@ static NSMutableArray *blackoutWindows = NULL;
 - (void)orderOut: (id)sender animate: (BOOL)animate
 {
     NSInvocation *invoc = [NSInvocation invocationWithMethodSignature:[super methodSignatureForSelector:@selector(orderOut:)]];
-    [invoc setTarget: (id)super];
+    [invoc setTarget: self];
     [invoc setArgument: sender atIndex: 0];
     [self orderOut: sender animate: animate callback: invoc];
 }

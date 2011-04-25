@@ -415,6 +415,7 @@ static VLCExtended *_o_sharedInstance = nil;
 
     val.f_float = [o_sld_opaque floatValue] / 100;
 
+#if 0
     if( p_vout != NULL )
     {
         p_real_vout = [VLCVoutView realVout: p_vout];
@@ -432,6 +433,7 @@ static VLCExtended *_o_sharedInstance = nil;
         }
         vlc_object_release( p_vout );
     }
+#endif
 
     /* store to prefs */
     config_PutFloat( p_playlist , "macosx-opaqueness" , val.f_float );

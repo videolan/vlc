@@ -111,6 +111,7 @@ struct intf_sys_t
     id o_coredialogs;           /* VLCCoreDialogProvider */
     VLCInformation * o_info;    /* VLCInformation */
     id o_eyetv;                 /* VLCEyeTVController */
+    id o_audioeffects;          /* VLCAudioEffects */
     BOOL nib_main_loaded;       /* main nibfile */
     BOOL nib_open_loaded;       /* open nibfile */
     BOOL nib_about_loaded;      /* about nibfile */
@@ -120,6 +121,7 @@ struct intf_sys_t
     BOOL nib_prefs_loaded;      /* preferences nibfile */
     BOOL nib_info_loaded;       /* information panel nibfile */
     BOOL nib_coredialogs_loaded; /* CoreDialogs nibfile */
+    BOOL nib_audioeffects_loaded; /* audio effects panel */
 
     IBOutlet VLCControllerWindow * o_window;                     /* main window */
     IBOutlet NSView * o_playlist_view;                          /* playlist view  */
@@ -143,7 +145,7 @@ struct intf_sys_t
     IBOutlet NSButton * o_btn_next;     /* btn next       */
     IBOutlet NSButton * o_btn_fullscreen;/* btn fullscreen (embedded vout window) */
     IBOutlet NSButton * o_btn_playlist; /* btn playlist   */
-    IBOutlet NSButton * o_btn_equalizer; /* eq btn */
+    IBOutlet NSButton * o_btn_audioEffects; /* AudioEffects btn */
 
     NSImage * o_img_play;       /* btn play img   */
     NSImage * o_img_pause;      /* btn pause img  */
@@ -278,7 +280,7 @@ struct intf_sys_t
     IBOutlet NSMenuItem * o_mi_close_window;
     IBOutlet NSMenuItem * o_mi_player;
     IBOutlet NSMenuItem * o_mi_controller;
-    IBOutlet NSMenuItem * o_mi_equalizer;
+    IBOutlet NSMenuItem * o_mi_audioeffects;
     IBOutlet NSMenuItem * o_mi_extended;
     IBOutlet NSMenuItem * o_mi_bookmarks;
     IBOutlet NSMenuItem * o_mi_playlist;
@@ -403,6 +405,7 @@ struct intf_sys_t
 
 - (IBAction)showWizard:(id)sender;
 - (IBAction)showExtended:(id)sender;
+- (IBAction)showAudioEffects:(id)sender;
 - (IBAction)showBookmarks:(id)sender;
 
 - (IBAction)viewAbout:(id)sender;

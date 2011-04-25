@@ -50,39 +50,6 @@
         <int key="NSvFlags">256</int>
         <object class="NSMutableArray" key="NSSubviews">
           <bool key="EncodedWithXMLCoder">YES</bool>
-          <object class="NSButton" id="219887951">
-            <reference key="NSNextResponder" ref="797893075"/>
-            <int key="NSvFlags">268</int>
-            <string key="NSFrame">{{249, 19}, {25, 25}}</string>
-            <reference key="NSSuperview" ref="797893075"/>
-            <string key="NSReuseIdentifierKey">_NS:43</string>
-            <bool key="NSEnabled">YES</bool>
-            <object class="BGHUDButtonCell" key="NSCell" id="542178481">
-              <int key="NSCellFlags">67239424</int>
-              <int key="NSCellFlags2">134217728</int>
-              <string key="NSContents"/>
-              <object class="NSFont" key="NSSupport" id="1000471835">
-                <string key="NSName">LucidaGrande</string>
-                <double key="NSSize">13</double>
-                <int key="NSfFlags">1040</int>
-              </object>
-              <string key="NSCellIdentifier">_NS:43</string>
-              <reference key="NSControlView" ref="219887951"/>
-              <int key="NSButtonFlags">-2038284033</int>
-              <int key="NSButtonFlags2">33</int>
-              <object class="NSFont" key="NSAlternateImage" id="480675396">
-                <string key="NSName">LucidaGrande</string>
-                <double key="NSSize">13</double>
-                <int key="NSfFlags">16</int>
-              </object>
-              <string key="NSAlternateContents"/>
-              <string key="NSKeyEquivalent"/>
-              <int key="NSPeriodicDelay">200</int>
-              <int key="NSPeriodicInterval">25</int>
-              <string key="themeKey">gradientTheme</string>
-              <int key="BGButtonType">7</int>
-            </object>
-          </object>
           <object class="NSButton" id="398613381">
             <reference key="NSNextResponder" ref="797893075"/>
             <int key="NSvFlags">268</int>
@@ -336,11 +303,19 @@
               <int key="NSCellFlags">67239424</int>
               <int key="NSCellFlags2">134217728</int>
               <string key="NSContents"/>
-              <reference key="NSSupport" ref="1000471835"/>
+              <object class="NSFont" key="NSSupport" id="1000471835">
+                <string key="NSName">LucidaGrande</string>
+                <double key="NSSize">13</double>
+                <int key="NSfFlags">1040</int>
+              </object>
               <reference key="NSControlView" ref="534234935"/>
               <int key="NSButtonFlags">-2038284033</int>
               <int key="NSButtonFlags2">33</int>
-              <reference key="NSAlternateImage" ref="480675396"/>
+              <object class="NSFont" key="NSAlternateImage">
+                <string key="NSName">LucidaGrande</string>
+                <double key="NSSize">13</double>
+                <int key="NSfFlags">16</int>
+              </object>
               <string key="NSAlternateContents"/>
               <object class="NSMutableString" key="NSKeyEquivalent">
                 <characters key="NS.bytes"/>
@@ -404,7 +379,7 @@
         <string key="NSExtension">NSResponder</string>
       </object>
       <object class="NSCustomView" id="852238455">
-        <reference key="NSNextResponder"/>
+        <nil key="NSNextResponder"/>
         <int key="NSvFlags">256</int>
         <object class="NSMutableArray" key="NSSubviews">
           <bool key="EncodedWithXMLCoder">YES</bool>
@@ -413,7 +388,6 @@
             <int key="NSvFlags">268</int>
             <string key="NSFrame">{{17, 52}, {335, 32}}</string>
             <reference key="NSSuperview" ref="852238455"/>
-            <reference key="NSWindow"/>
             <string key="NSReuseIdentifierKey">_NS:43</string>
             <bool key="NSEnabled">YES</bool>
             <object class="BGHUDButtonCell" key="NSCell" id="251927990">
@@ -440,7 +414,6 @@
             <int key="NSvFlags">268</int>
             <string key="NSFrame">{{17, 32}, {335, 32}}</string>
             <reference key="NSSuperview" ref="852238455"/>
-            <reference key="NSWindow"/>
             <string key="NSReuseIdentifierKey">_NS:43</string>
             <bool key="NSEnabled">YES</bool>
             <object class="BGHUDButtonCell" key="NSCell" id="696402423">
@@ -467,7 +440,6 @@
             <int key="NSvFlags">268</int>
             <string key="NSFrame">{{121, 18}, {229, 15}}</string>
             <reference key="NSSuperview" ref="852238455"/>
-            <reference key="NSWindow"/>
             <string key="NSReuseIdentifierKey">_NS:209</string>
             <bool key="NSEnabled">YES</bool>
             <object class="BGHUDSliderCell" key="NSCell" id="206012777">
@@ -492,7 +464,6 @@
             <int key="NSvFlags">256</int>
             <string key="NSFrame">{{17, 20}, {99, 14}}</string>
             <reference key="NSSuperview" ref="852238455"/>
-            <reference key="NSWindow"/>
             <bool key="NSEnabled">YES</bool>
             <object class="NSTextFieldCell" key="NSCell" id="451552230">
               <int key="NSCellFlags">67239424</int>
@@ -514,8 +485,6 @@
           </object>
         </object>
         <string key="NSFrameSize">{370, 78}</string>
-        <reference key="NSSuperview"/>
-        <reference key="NSWindow"/>
         <object class="NSMutableString" key="NSClassName">
           <characters key="NS.bytes">NSView</characters>
         </object>
@@ -1539,7 +1508,6 @@
               <reference ref="352486184"/>
               <reference ref="195057499"/>
               <reference ref="11170069"/>
-              <reference ref="219887951"/>
             </object>
             <reference key="parent" ref="0"/>
             <string key="objectName">VideoFilters</string>
@@ -1968,20 +1936,6 @@
             <reference key="parent" ref="11170069"/>
           </object>
           <object class="IBObjectRecord">
-            <int key="objectID">312</int>
-            <reference key="object" ref="219887951"/>
-            <object class="NSMutableArray" key="children">
-              <bool key="EncodedWithXMLCoder">YES</bool>
-              <reference ref="542178481"/>
-            </object>
-            <reference key="parent" ref="797893075"/>
-          </object>
-          <object class="IBObjectRecord">
-            <int key="objectID">313</int>
-            <reference key="object" ref="542178481"/>
-            <reference key="parent" ref="219887951"/>
-          </object>
-          <object class="IBObjectRecord">
             <int key="objectID">314</int>
             <reference key="object" ref="194843708"/>
             <object class="NSMutableArray" key="children">
@@ -2193,8 +2147,6 @@
           <string>307.IBPluginDependency</string>
           <string>307.IBViewBoundsToFrameTransform</string>
           <string>308.IBPluginDependency</string>
-          <string>312.IBPluginDependency</string>
-          <string>313.IBPluginDependency</string>
           <string>314.IBPluginDependency</string>
           <string>314.IBViewBoundsToFrameTransform</string>
           <string>315.IBPluginDependency</string>
@@ -2350,8 +2302,6 @@
           <object class="NSAffineTransform">
             <bytes key="NSTransformStruct">P4AAAL+AAABBsAAAwoQAAA</bytes>
           </object>
-          <string>com.binarymethod.BGHUDAppKitPlugin</string>
-          <string>com.binarymethod.BGHUDAppKitPlugin</string>
           <string>com.binarymethod.BGHUDAppKitPlugin</string>
           <string>com.binarymethod.BGHUDAppKitPlugin</string>
           <object class="NSAffineTransform">

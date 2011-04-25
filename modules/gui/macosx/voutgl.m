@@ -43,6 +43,8 @@
 #include <OpenGL/OpenGL.h>
 #include <OpenGL/gl.h>
 
+#if 0
+
 /*****************************************************************************
  * VLCGLView interface
  *****************************************************************************/
@@ -414,3 +416,4 @@ static void Unlock( vout_thread_t * p_vout )
 }
 
 @end
+#endif

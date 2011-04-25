@@ -577,7 +577,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
 {
     NSString *o_filename = [o_file_path stringValue];
 
-    if ( o_filename && [o_filename > 0] )
+    if ( o_filename && [o_filename length] > 0 )
     {
         bool b_stream = [o_file_stream state];
         BOOL b_dir = NO;

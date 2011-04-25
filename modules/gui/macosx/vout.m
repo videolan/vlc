@@ -55,6 +55,8 @@
 #include <vlc_vout_display.h>
 #include <vlc_keys.h>
 
+#if 0
+
 /*****************************************************************************
  * DeviceCallback: Callback triggered when the video-device variable is changed
  *****************************************************************************/
@@ -1145,4 +1147,6 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 }
 
 @end
+
+#endif
 

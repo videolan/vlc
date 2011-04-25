@@ -121,7 +121,7 @@ vlc_module_begin ()
         set_capability( "opengl provider", 100 )
         set_category( CAT_VIDEO)
         set_subcategory( SUBCAT_VIDEO_VOUT )
-        set_callbacks( OpenVideoGL, CloseVideoGL )
+//        set_callbacks( OpenVideoGL, CloseVideoGL )
 
         add_integer( "macosx-vdev", 0, VDEV_TEXT, VDEV_LONGTEXT,
                      false )

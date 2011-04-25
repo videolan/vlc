@@ -117,6 +117,7 @@
 		CC402F440E00ABBB006A4BA4 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC962E2C0CC7992800A56695 /* WebKit.framework */; };
 		CC426FD11020D44F00A32659 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC426FD01020D44F00A32659 /* Sparkle.framework */; };
 		CC426FD71020D47100A32659 /* Sparkle.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = CC426FD01020D44F00A32659 /* Sparkle.framework */; };
+		CC5560281365CE4800D54038 /* AudioEffects.nib in Resources */ = {isa = PBXBuildFile; fileRef = CC5560261365CE4800D54038 /* AudioEffects.nib */; };
 		CC62B8D00FC5787D0077BB8C /* aiff.icns in Resources */ = {isa = PBXBuildFile; fileRef = CC62B8C50FC5787D0077BB8C /* aiff.icns */; };
 		CC62B8D10FC5787D0077BB8C /* audio.icns in Resources */ = {isa = PBXBuildFile; fileRef = CC62B8C60FC5787D0077BB8C /* audio.icns */; };
 		CC62B8D20FC5787D0077BB8C /* flv.icns in Resources */ = {isa = PBXBuildFile; fileRef = CC62B8C70FC5787D0077BB8C /* flv.icns */; };
@@ -275,6 +276,9 @@
 		CC4ED9AD0ABE07C800CA4CC5 /* add_embedded.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = add_embedded.png; path = Resources/add_embedded.png; sourceTree = "<group>"; };
 		CC4ED9AF0ABE07C800CA4CC5 /* repeat_embedded.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = repeat_embedded.png; path = Resources/repeat_embedded.png; sourceTree = "<group>"; };
 		CC4ED9B20ABE07C800CA4CC5 /* shuffle_embedded.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = shuffle_embedded.png; path = Resources/shuffle_embedded.png; sourceTree = "<group>"; };
+		CC5560231365CDC700D54038 /* AudioEffects.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AudioEffects.h; path = ../../../modules/gui/macosx/AudioEffects.h; sourceTree = "<group>"; };
+		CC5560241365CDC800D54038 /* AudioEffects.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AudioEffects.m; path = ../../../modules/gui/macosx/AudioEffects.m; sourceTree = "<group>"; };
+		CC5560271365CE4800D54038 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = Resources/English.lproj/AudioEffects.nib; sourceTree = "<group>"; };
 		CC62B8C50FC5787D0077BB8C /* aiff.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = aiff.icns; path = Resources/aiff.icns; sourceTree = "<group>"; };
 		CC62B8C60FC5787D0077BB8C /* audio.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = audio.icns; path = Resources/audio.icns; sourceTree = "<group>"; };
 		CC62B8C70FC5787D0077BB8C /* flv.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = flv.icns; path = Resources/flv.icns; sourceTree = "<group>"; };
@@ -518,6 +522,8 @@
 				CCF0777A13659A8000AF19FD /* SPInvocationGrabbing.m */,
 				CCF0777B13659A8000AF19FD /* SPMediaKeyTap.h */,
 				CCF0777C13659A8000AF19FD /* SPMediaKeyTap.m */,
+				CC5560231365CDC700D54038 /* AudioEffects.h */,
+				CC5560241365CDC800D54038 /* AudioEffects.m */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
@@ -791,6 +797,7 @@
 				DCFCCDB7085CE18F001E36AF /* Wizard.nib */,
 				DC7F46EB08A183FC0027DB24 /* Extended.nib */,
 				DCE7BD0308A56C8B007B10AE /* Bookmarks.nib */,
+				CC5560261365CE4800D54038 /* AudioEffects.nib */,
 			);
 			name = nibs;
 			sourceTree = "<group>";
@@ -821,6 +828,9 @@
 /* Begin PBXProject section */
 		089C1669FE841209C02AAC07 /* Project object */ = {
 			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0410;
+			};
 			buildConfigurationList = C2F2A6EA09588F1B00018C74 /* Build configuration list for PBXProject "vlc" */;
 			compatibilityVersion = "Xcode 3.1";
 			developmentRegion = English;
@@ -983,6 +993,7 @@
 				CC402F3F0E00ABBB006A4BA4 /* display_right.png in Resources */,
 				CC0FB34C0F8BED1100F057F7 /* CoreDialogs.nib in Resources */,
 				CCF11B540F8BFB520088542D /* ErrorPanel.nib in Resources */,
+				CC5560281365CE4800D54038 /* AudioEffects.nib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -995,6 +1006,14 @@
 				CC0FB34B0F8BED1100F057F7 /* English */,
 			);
 			name = CoreDialogs.nib;
+			sourceTree = "<group>";
+		};
+		CC5560261365CE4800D54038 /* AudioEffects.nib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				CC5560271365CE4800D54038 /* English */,
+			);
+			name = AudioEffects.nib;
 			sourceTree = "<group>";
 		};
 		CCC896B80D9AA9E8005AE59C /* MediaInfo.nib */ = {

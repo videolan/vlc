@@ -54,6 +54,7 @@
 #import "AppleRemote.h"
 #import "eyetv.h"
 #import "simple_prefs.h"
+#import "AudioEffects.h"
 
 #import <AddressBook/AddressBook.h>         /* for crashlog send mechanism */
 #import <Sparkle/Sparkle.h>                 /* we're the update delegate */
@@ -350,7 +351,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     o_wizard = [[VLCWizard alloc] init];
     o_extended = nil;
     o_bookmarks = [[VLCBookmarks alloc] init];
-    o_embedded_list = [[VLCEmbeddedList alloc] init];
+    //o_embedded_list = [[VLCEmbeddedList alloc] init];
     o_coredialogs = [[VLCCoreDialogProvider alloc] init];
     o_info = [[VLCInfo alloc] init];
 
@@ -717,7 +718,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     [o_mi_close_window setTitle: _NS("Close Window")];
     [o_mi_player setTitle: _NS("Player...")];
     [o_mi_controller setTitle: _NS("Controller...")];
-    [o_mi_equalizer setTitle: _NS("Equalizer...")];
+    [o_mi_audioeffects setTitle: _NS("Audio Effects...")];
     [o_mi_extended setTitle: _NS("Extended Controls...")];
     [o_mi_bookmarks setTitle: _NS("Bookmarks...")];
     [o_mi_playlist setTitle: _NS("Playlist...")];
@@ -819,9 +820,7 @@ static VLCMain *_o_sharedMainInstance = nil;
 
     /* save the prefs if they were changed in the extended panel */
     if(o_extended && [o_extended configChanged])
-    {
         [o_extended savePrefs];
-    }
 
     /* unsubscribe from the interactive dialogues */
     dialog_Unregister( p_intf );
@@ -849,9 +848,10 @@ static VLCMain *_o_sharedMainInstance = nil;
         [o_open release];
 
     if( nib_extended_loaded )
-    {
         [o_extended release];
-    }
+
+    if (nib_audioeffects_loaded)
+        [o_audioeffects release];
 
     if( nib_bookmarks_loaded )
         [o_bookmarks release];
@@ -2252,6 +2252,17 @@ end:
         nib_extended_loaded = [NSBundle loadNibNamed:@"Extended" owner: NSApp];
 
     [o_extended showPanel];
+}
+
+- (IBAction)showAudioEffects:(id)sender
+{
+    if (!o_audioeffects)
+        o_audioeffects = [[VLCAudioEffects alloc] init];
+
+    if (!nib_audioeffects_loaded)
+        nib_audioeffects_loaded = [NSBundle loadNibNamed:@"AudioEffects" owner:NSApp];
+
+    [o_audioeffects toggleWindow:sender];
 }
 
 - (IBAction)showBookmarks:(id)sender
