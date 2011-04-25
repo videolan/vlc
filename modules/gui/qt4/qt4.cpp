@@ -558,8 +558,11 @@ static void *Thread( void *obj )
     /* Delete the recentsMRL object before the configuration */
     RecentsMRL::killInstance();
 
-    /* Save the path */
-    getSettings()->setValue( "filedialog-path", p_intf->p_sys->filepath );
+    /* Save the path or delete if recent play are disabled */
+    if( var_InheritBool( p_intf, "qt-recentplay" ) )
+        getSettings()->setValue( "filedialog-path", p_intf->p_sys->filepath );
+    else
+        getSettings()->remove( "filedialog-path" );
 
     /* Delete the configuration. Application has to be deleted after that. */
     delete p_intf->p_sys->mainSettings;
