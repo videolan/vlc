@@ -253,7 +253,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 
     /**** FINAL SIZING and placement of interface */
     settings->beginGroup( "MainWindow" );
-    QVLCTools::restoreWidgetPosition( settings, this, QSize(400, 100) );
+    QVLCTools::restoreWidgetPosition( settings, this, QSize(600, 420) );
     settings->endGroup();
 
     b_interfaceFullScreen = isFullScreen();
@@ -398,7 +398,7 @@ void MainInterface::createMainWidget( QSettings *settings )
     mainLayout->insertWidget( 1, stackCentralW );
 
     settings->beginGroup( "MainWindow" );
-    stackWidgetsSizes[bgWidget] = settings->value( "bgSize", QSize( 400, 0 ) ).toSize();
+    stackWidgetsSizes[bgWidget] = settings->value( "bgSize", QSize( 600, 0 ) ).toSize();
     /* Resize even if no-auto-resize, because we are at creation */
     resizeStack( stackWidgetsSizes[bgWidget].width(), stackWidgetsSizes[bgWidget].height() );
 
@@ -739,7 +739,7 @@ void MainInterface::createPlaylist()
     if( b_plDocked )
     {
         stackCentralW->addWidget( playlistWidget );
-        stackWidgetsSizes[playlistWidget] = settings->value( "playlistSize", QSize( 500, 250 ) ).toSize();
+        stackWidgetsSizes[playlistWidget] = settings->value( "playlistSize", QSize( 600, 300 ) ).toSize();
     }
     else
     {

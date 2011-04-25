@@ -148,6 +148,7 @@ PLSelector::PLSelector( QWidget *p, intf_thread_t *_p_intf )
     palette.setColor( QPalette::Window, QColor(209,215,226) );
     setPalette( palette );
 #endif
+    setMinimumHeight( 120 );
 }
 
 PLSelector::~PLSelector()

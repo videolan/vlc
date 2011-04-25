@@ -90,7 +90,7 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QWidget *_par )
     playlist_item_t *p_root = THEPL->p_playing;
     PL_UNLOCK;
 
-    setMinimumWidth( 350 );
+    setMinimumWidth( 400 );
 
     PLModel *model = new PLModel( p_playlist, p_intf, p_root, this );
     mainView = new StandardPLPanel( this, p_intf, p_root, selector, model );
