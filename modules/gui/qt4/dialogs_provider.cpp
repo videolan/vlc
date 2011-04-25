@@ -553,29 +553,32 @@ void DialogsProvider::saveAPlaylist()
     static const struct
     {
         char filter_name[14];
-        char filter_patterns[7];
+        char filter_patterns[5];
         char module[12];
     } types[] = {
-        { N_("XSPF playlist"), "*.xspf", "export-xspf", },
-        { N_("M3U8 playlist"), "*.m3u8", "export-m3u8", },
-        { N_("M3U playlist"), "*.m3u", "export-m3u", },
-        { N_("HTML playlist"), "*.html", "export-html", },
+        { N_("XSPF playlist"), "xspf", "export-xspf", },
+        { N_("M3U playlist"),  "m3u",  "export-m3u", },
+        { N_("M3U8 playlist"), "m3u8", "export-m3u8", },
+        { N_("HTML playlist"), "html", "export-html", },
     };
-    QString filters, selected;
+
+    QStringList filters;
+    QString ext = getSettings()->value( "last-playlist-ext" ).toString();
 
     for( size_t i = 0; i < sizeof (types) / sizeof (types[0]); i++ )
     {
-        if( !filters.isEmpty() )
-            filters += ";;";
-        filters += qfu( vlc_gettext( types[i].filter_name ) );
-        filters += " (";
-        filters += qfu( types[i].filter_patterns );
-        filters += ")";
+        QString tmp = qfu( vlc_gettext( types[i].filter_name ) ) + " (*." + types[i].filter_patterns + ")";
+        if( ext == qfu( types[i].filter_patterns ) )
+            filters.insert( 0, tmp );
+        else
+            filters.append( tmp );
     }
 
+    QString selected;
     QString file = QFileDialog::getSaveFileName( NULL,
                                   qtr( "Save playlist as..." ),
-                                  p_intf->p_sys->filepath, filters, &selected );
+                                  p_intf->p_sys->filepath, filters.join( ";;" ),
+                                  &selected );
     if( file.isEmpty() )
         return;
 
@@ -584,6 +587,7 @@ void DialogsProvider::saveAPlaylist()
         {
             playlist_Export( THEPL, qtu( toNativeSeparators( file ) ),
                              THEPL->p_playing, types[i].module );
+            getSettings()->setValue( "last-playlist-ext", types[i].filter_patterns );
             break;
         }
 }
