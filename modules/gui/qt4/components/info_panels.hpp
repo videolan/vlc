@@ -49,6 +49,7 @@ class QTreeView;
 class QSpinBox;
 class QLineEdit;
 class CoverArtLabel;
+class QTextEdit;
 
 class MetaPanel: public QWidget
 {
@@ -73,7 +74,7 @@ private:
     QLineEdit *seqnum_text;
     QLineEdit *seqtot_text;
 
-    QLineEdit *description_text;
+    QTextEdit *description_text;
 //    QSpinBox *rating_text;
     QLineEdit *date_text;
 //    QLineEdit *setting_text;

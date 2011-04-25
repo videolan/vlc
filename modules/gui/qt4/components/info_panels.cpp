@@ -46,6 +46,7 @@
 #include <QLineEdit>
 #include <QLabel>
 #include <QSpinBox>
+#include <QTextEdit>
 
 /************************************************************************
  * Single panels
@@ -139,7 +140,14 @@ MetaPanel::MetaPanel( QWidget *parent,
     ADD_META( VLC_META_PUBLISHER, publisher_text, 0, 7 ); line++;
     ADD_META( VLC_META_COPYRIGHT, copyright_text, 0,  7 ); line++;
     ADD_META( VLC_META_ENCODED_BY, encodedby_text, 0, 7 ); line++;
-    ADD_META( N_("Comments"), description_text, 0, 7 ); line++;
+
+    label = new QLabel( qtr( N_("Comments") ) ); label->setFont( smallFont );
+    label->setContentsMargins( 3, 2, 0, 0 );
+    metaLayout->addWidget( label, line++, 0, 1, 7 );
+    description_text = new QTextEdit;
+    metaLayout->addWidget( description_text, line, 0, 1, 7 );
+    CONNECT( description_text, textEdited( QString ), this, enterEditMode() );
+    line++;
 
     /* VLC_META_SETTING: Useless */
     /* ADD_META( TRACKID )  Useless ? */
@@ -266,7 +274,7 @@ void MetaPanel::saveMeta()
 
     input_item_SetCopyright( p_input, qtu( copyright_text->text() ) );
     input_item_SetPublisher( p_input, qtu( publisher_text->text() ) );
-    input_item_SetDescription( p_input, qtu( description_text->text() ) );
+    input_item_SetDescription( p_input, qtu( description_text->toPlainText() ) );
 
     playlist_t *p_playlist = pl_Get( p_intf );
     input_item_WriteMeta( VLC_OBJECT(p_playlist), p_input );
