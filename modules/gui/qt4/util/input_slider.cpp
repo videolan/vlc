@@ -147,15 +147,18 @@ void SeekSlider::mouseMoveEvent( QMouseEvent *event )
     }
 
     /* Tooltip */
-    int posX = qMax( rect().left(), qMin( rect().right(), event->x() ) );
+    if ( inputLength > 0 )
+    {
+        int posX = qMax( rect().left(), qMin( rect().right(), event->x() ) );
 
-    QPoint p( event->globalX() - ( event->x() - posX ) - ( mTimeTooltip->width() / 2 ),
-               QWidget::mapToGlobal( pos() ).y() - ( mTimeTooltip->height() + 2 ) );
+        QPoint p( event->globalX() - ( event->x() - posX ) - ( mTimeTooltip->width() / 2 ),
+                  QWidget::mapToGlobal( pos() ).y() - ( mTimeTooltip->height() + 2 ) );
 
 
-    secstotimestr( psz_length, ( posX * inputLength ) / size().width() );
-    mTimeTooltip->setTime( psz_length );
-    mTimeTooltip->move( p );
+        secstotimestr( psz_length, ( posX * inputLength ) / size().width() );
+        mTimeTooltip->setTime( psz_length );
+        mTimeTooltip->move( p );
+    }
     event->accept();
 }
 
@@ -176,7 +179,7 @@ void SeekSlider::wheelEvent( QWheelEvent *event )
 void SeekSlider::enterEvent( QEvent *e )
 {
     /* Don't show the tooltip if the slider is disabled */
-    if( isEnabled() )
+    if( isEnabled() && inputLength > 0 )
         mTimeTooltip->show();
 }
 
