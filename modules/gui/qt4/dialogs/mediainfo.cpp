@@ -51,15 +51,17 @@ MediaInfoDialog::MediaInfoDialog( intf_thread_t *_p_intf,
     setWindowTitle( qtr( "Media Information" ) );
     setWindowRole( "vlc-media-info" );
 
+    setWindowFlags( Qt::Window | Qt::CustomizeWindowHint | Qt::WindowCloseButtonHint );
+
     /* TabWidgets and Tabs creation */
     infoTabW = new QTabWidget;
 
     MP = new MetaPanel( infoTabW, p_intf );
     infoTabW->addTab( MP, qtr( "&General" ) );
     EMP = new ExtraMetaPanel( infoTabW, p_intf );
-    infoTabW->addTab( EMP, qtr( "&Extra Metadata" ) );
+    infoTabW->addTab( EMP, qtr( "&Metadata" ) );
     IP = new InfoPanel( infoTabW, p_intf );
-    infoTabW->addTab( IP, qtr( "&Codec Details" ) );
+    infoTabW->addTab( IP, qtr( "&Codec" ) );
     if( isMainInputInfo )
     {
         ISP = new InputStatsPanel( infoTabW, p_intf );

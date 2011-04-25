@@ -71,6 +71,8 @@ private:
     QLineEdit *copyright_text;
     QLineEdit *collection_text;
     QLineEdit *seqnum_text;
+    QLineEdit *seqtot_text;
+
     QLineEdit *description_text;
 //    QSpinBox *rating_text;
     QLineEdit *date_text;
@@ -78,7 +80,7 @@ private:
     QLineEdit *language_text;
     QLineEdit *nowplaying_text;
     QLineEdit *publisher_text;
-//    QLineEdit *encodedby_text;
+    QLineEdit *encodedby_text;
     CoverArtLabel *art_cover;
 
 public slots:

@@ -60,100 +60,100 @@ MetaPanel::MetaPanel( QWidget *parent,
                       : QWidget( parent ), p_intf( _p_intf )
 {
     QGridLayout *metaLayout = new QGridLayout( this );
-    metaLayout->setVerticalSpacing( 12 );
+    metaLayout->setVerticalSpacing( 0 );
+
+    QFont smallFont = QApplication::font();
+    smallFont.setPointSize( smallFont.pointSize() - 2 );
+    smallFont.setBold( true );
 
     int line = 0; /* Counter for GridLayout */
     p_input = NULL;
+    QLabel *label;
 
-#define ADD_META( string, widget ) {                                      \
-    metaLayout->addWidget( new QLabel( qtr( string ) + " :" ), line, 0 ); \
+#define ADD_META( string, widget, col, colspan ) {                        \
+    label = new QLabel( qtr( string ) ); label->setFont( smallFont );     \
+    label->setContentsMargins( 3, 2, 0, 0 );                              \
+    metaLayout->addWidget( label, line++, col, 1, colspan );              \
     widget = new QLineEdit;                                               \
-    metaLayout->addWidget( widget, line, 1, 1, 9 );                       \
-    line++;            }
+    metaLayout->addWidget( widget, line, col, 1, colspan );               \
+    CONNECT( widget, textEdited( QString ), this, enterEditMode() );      \
+}
 
     /* Title, artist and album*/
-    ADD_META( VLC_META_TITLE, title_text ); /* OK */
-    ADD_META( VLC_META_ARTIST, artist_text ); /* OK */
-    ADD_META( VLC_META_ALBUM, collection_text ); /* OK */
+    ADD_META( VLC_META_TITLE, title_text, 0, 10 ); line++;
+    ADD_META( VLC_META_ARTIST, artist_text, 0, 10 ); line++;
+    ADD_META( VLC_META_ALBUM, collection_text, 0, 7 );
 
-    /* Genre Name */
-    /* TODO List id3genres.h is not includable yet ? */
-    genre_text = new QLineEdit;
-    metaLayout->addWidget( new QLabel( qtr( VLC_META_GENRE ) + " :" ), line, 0 );
-    metaLayout->addWidget( genre_text, line, 1, 1, 3 );
-
-    /* Number - on the same line */
-    metaLayout->addWidget( new QLabel( qtr( VLC_META_TRACK_NUMBER )  + " :" ),
-                  line, 5, 1, 2  );
-    seqnum_text = new QLineEdit;
-    seqnum_text->setInputMask("0000");
-    seqnum_text->setAlignment( Qt::AlignRight );
-    metaLayout->addWidget( seqnum_text, line, 7, 1, 3 );
-    line++;
+    /* Date */
+    label = new QLabel( qtr( VLC_META_DATE ) );
+    label->setFont( smallFont ); label->setContentsMargins( 3, 2, 0, 0 );
+    metaLayout->addWidget( label, line - 1, 7, 1, 2 );
 
     /* Date (Should be in years) */
     date_text = new QLineEdit;
-    date_text->setInputMask("0000");
     date_text->setAlignment( Qt::AlignRight );
-    metaLayout->addWidget( new QLabel( qtr( VLC_META_DATE ) + " :" ), line, 0 );
-    metaLayout->addWidget( date_text, line, 1, 1, 3 );
+    date_text->setInputMask("0000");
+    date_text->setMaximumWidth( 128 );
+    metaLayout->addWidget( date_text, line, 7, 1, -1 );
+    line++;
+
+    /* Genre Name */
+    /* TODO List id3genres.h is not includable yet ? */
+    ADD_META( VLC_META_GENRE, genre_text, 0, 7 );
+
+    /* Number - on the same line */
+    label = new QLabel( qtr( VLC_META_TRACK_NUMBER ) );
+    label->setFont( smallFont ); label->setContentsMargins( 3, 2, 0, 0 );
+    metaLayout->addWidget( label, line - 1, 7, 1, 3  );
+
+    seqnum_text = new QLineEdit;
+    seqnum_text->setMaximumWidth( 60 );
+    metaLayout->addWidget( seqnum_text, line, 7, 1, 1 );
+
+    label = new QLabel( "/" ); label->setFont( smallFont );
+    metaLayout->addWidget( label, line, 8, 1, 1 );
+
+    seqtot_text = new QLineEdit;
+    seqtot_text->setMaximumWidth( 60 );
+    metaLayout->addWidget( seqtot_text, line, 9, 1, 1 );
+    line++;
 
     /* Rating - on the same line */
     /*
-    metaLayout->addWidget( new QLabel( qtr( VLC_META_RATING ) + " :" ), line, 4, 1, 2 );
+    metaLayout->addWidget( new QLabel( qtr( VLC_META_RATING ) ), line, 4, 1, 2 );
     rating_text = new QSpinBox; setSpinBounds( rating_text );
     metaLayout->addWidget( rating_text, line, 6, 1, 1 );
     */
+
+    /* Now Playing - Useful for live feeds (HTTP, DVB, ETC...) */
+    ADD_META( VLC_META_NOW_PLAYING, nowplaying_text, 0, 7 );
+    nowplaying_text->setReadOnly( true ); line--;
+
     /* Language on the same line */
-    metaLayout->addWidget( new QLabel( qfu( VLC_META_LANGUAGE ) + " :" ), line, 5, 1, 2 );
-    language_text = new QLineEdit;
-    language_text->setReadOnly( true );
-    metaLayout->addWidget( language_text, line,  7, 1, 3 );
-    line++;
+    ADD_META( VLC_META_LANGUAGE, language_text, 7, -1 ); line++;
 
     /* ART_URL */
     art_cover = new CoverArtLabel( this, p_intf );
-    metaLayout->addWidget( art_cover, line, 8, 4, 2, Qt::AlignRight );
+    metaLayout->addWidget( art_cover, line + 1, 7, 6, 3, Qt::AlignLeft );
 
-/* Settings is unused */
-/*    l->addWidget( new QLabel( qtr( VLC_META_SETTING ) + " :" ), line, 5 );
-    setting_text = new QLineEdit;
-    l->addWidget( setting_text, line, 6, 1, 4 ); */
+    ADD_META( VLC_META_PUBLISHER, publisher_text, 0, 7 ); line++;
+    ADD_META( VLC_META_COPYRIGHT, copyright_text, 0,  7 ); line++;
+    ADD_META( VLC_META_ENCODED_BY, encodedby_text, 0, 7 ); line++;
+    ADD_META( N_("Comments"), description_text, 0, 7 ); line++;
 
-/* Less used metadata */
-#define ADD_META_2( string, widget ) {                                    \
-    metaLayout->addWidget( new QLabel( qtr( string ) + " :" ), line, 0 ); \
-    widget = new QLineEdit;                                               \
-    metaLayout->addWidget( widget, line, 1, 1, 7 );                       \
-    line++;            }
+    /* VLC_META_SETTING: Useless */
+    /* ADD_META( TRACKID )  Useless ? */
+    /* ADD_URI - Do not show it, done outside */
 
-    /* Now Playing - Useful for live feeds (HTTP, DVB, ETC...) */
-    ADD_META_2( VLC_META_NOW_PLAYING, nowplaying_text );
-    nowplaying_text->setReadOnly( true );
-    ADD_META_2( VLC_META_PUBLISHER, publisher_text );
-    ADD_META_2( VLC_META_COPYRIGHT, copyright_text );
-    ADD_META_2( N_("Comments"), description_text );
-
-/* useless metadata */
-
-    //ADD_META_2( VLC_META_ENCODED_BY, encodedby_text );
-    /*  ADD_META( TRACKID )  Useless ? */
-    /*  ADD_URI - DO not show it, done outside */
-
-    metaLayout->setColumnStretch( 1, 2 );
+    metaLayout->setColumnStretch( 1, 20 );
     metaLayout->setColumnMinimumWidth ( 1, 80 );
     metaLayout->setRowStretch( line, 10 );
 #undef ADD_META
-#undef ADD_META_2
 
-    CONNECT( title_text, textEdited( QString ), this, enterEditMode() );
-    CONNECT( artist_text, textEdited( QString ), this, enterEditMode() );
-    CONNECT( collection_text, textEdited( QString ), this, enterEditMode() );
-    CONNECT( genre_text, textEdited( QString ), this, enterEditMode() );
     CONNECT( seqnum_text, textEdited( QString ), this, enterEditMode() );
+    CONNECT( seqtot_text, textEdited( QString ), this, enterEditMode() );
 
     CONNECT( date_text, textEdited( QString ), this, enterEditMode() );
-    CONNECT( description_text, textEdited( QString ), this, enterEditMode() );
 /*    CONNECT( rating_text, valueChanged( QString ), this, enterEditMode( QString ) );*/
 
     /* We are not yet in Edit Mode */
@@ -222,12 +222,11 @@ void MetaPanel::update( input_item_t *p_item )
     UPDATE_META( Language, language_text );
     UPDATE_META( NowPlaying, nowplaying_text );
     UPDATE_META( Publisher, publisher_text );
-//    UPDATE_META( Setting, setting_text );
-//FIXME this is wrong if has Publisher and EncodedBy fields
-    UPDATE_META( EncodedBy, publisher_text );
+    UPDATE_META( EncodedBy, encodedby_text );
 
     UPDATE_META( Date, date_text );
     UPDATE_META( TrackNum, seqnum_text );
+//    UPDATE_META( Setting, setting_text );
 //    UPDATE_META_INT( Rating, rating_text );
 
 #undef UPDATE_META_INT
