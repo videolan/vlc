@@ -1,7 +1,7 @@
 /*****************************************************************************
  * misc.m: code not specific to vlc
  *****************************************************************************
- * Copyright (C) 2003-2009 the VideoLAN team
+ * Copyright (C) 2003-2011 the VideoLAN team
  * $Id$
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -255,7 +255,7 @@ static NSMutableArray *blackoutWindows = NULL;
     }
 
     invoc = [NSInvocation invocationWithMethodSignature:[super methodSignatureForSelector:@selector(close)]];
-    [invoc setTarget: self];
+    [invoc setTarget: (id)super];
 
     if (![self isVisible] || [self alphaValue] == 0.0)
     {
@@ -269,7 +269,7 @@ static NSMutableArray *blackoutWindows = NULL;
 - (void)orderOut: (id)sender animate: (BOOL)animate
 {
     NSInvocation *invoc = [NSInvocation invocationWithMethodSignature:[super methodSignatureForSelector:@selector(orderOut:)]];
-    [invoc setTarget: self];
+    [invoc setTarget: (id)super];
     [invoc setArgument: sender atIndex: 0];
     [self orderOut: sender animate: animate callback: invoc];
 }

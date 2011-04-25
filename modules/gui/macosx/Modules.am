@@ -6,6 +6,10 @@ LIBTOOL=@LIBTOOL@ --tag=CC
 SOURCES_macosx = \
 	AppleRemote.h \
 	AppleRemote.m \
+	SPInvocationGrabbing.h \
+	SPInvocationGrabbing.m \
+	SPMediaKeyTap.h \
+	SPMediaKeyTap.m \
 	about.h \
 	about.m \
 	applescript.h \

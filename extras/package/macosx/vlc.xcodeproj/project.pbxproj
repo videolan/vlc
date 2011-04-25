@@ -375,6 +375,10 @@
 		CCD590F110E5B73200D39094 /* dialogProvider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = dialogProvider.m; path = ../../../modules/gui/macosx_dialog_provider/dialogProvider.m; sourceTree = SOURCE_ROOT; };
 		CCD590F210E5B76300D39094 /* VLCLoginPanel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCLoginPanel.h; path = ../../../modules/gui/macosx_dialog_provider/VLCLoginPanel.h; sourceTree = SOURCE_ROOT; };
 		CCD590F310E5B76300D39094 /* VLCLoginPanel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VLCLoginPanel.m; path = ../../../modules/gui/macosx_dialog_provider/VLCLoginPanel.m; sourceTree = SOURCE_ROOT; };
+		CCF0777913659A8000AF19FD /* SPInvocationGrabbing.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SPInvocationGrabbing.h; path = ../../../modules/gui/macosx/SPInvocationGrabbing.h; sourceTree = "<group>"; };
+		CCF0777A13659A8000AF19FD /* SPInvocationGrabbing.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SPInvocationGrabbing.m; path = ../../../modules/gui/macosx/SPInvocationGrabbing.m; sourceTree = "<group>"; };
+		CCF0777B13659A8000AF19FD /* SPMediaKeyTap.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SPMediaKeyTap.h; path = ../../../modules/gui/macosx/SPMediaKeyTap.h; sourceTree = "<group>"; };
+		CCF0777C13659A8000AF19FD /* SPMediaKeyTap.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SPMediaKeyTap.m; path = ../../../modules/gui/macosx/SPMediaKeyTap.m; sourceTree = "<group>"; };
 		CCF11B530F8BFB520088542D /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = Resources/English.lproj/ErrorPanel.nib; sourceTree = "<group>"; };
 		DC769AB7085DF0DB001A838D /* wizard.m */ = {isa = PBXFileReference; fileEncoding = 5; indentWidth = 4; lastKnownFileType = sourcecode.c.objc; name = wizard.m; path = ../../../modules/gui/macosx/wizard.m; sourceTree = SOURCE_ROOT; tabWidth = 4; usesTabs = 0; };
 		DC769AB8085DF0DB001A838D /* wizard.h */ = {isa = PBXFileReference; fileEncoding = 5; lastKnownFileType = sourcecode.c.h; name = wizard.h; path = ../../../modules/gui/macosx/wizard.h; sourceTree = SOURCE_ROOT; };
@@ -510,6 +514,10 @@
 				CC62B9090FC5DB9D0077BB8C /* sidebarview.m */,
 				CC62B90A0FC5DB9D0077BB8C /* sidestatusview.h */,
 				CC62B90B0FC5DB9D0077BB8C /* sidestatusview.m */,
+				CCF0777913659A8000AF19FD /* SPInvocationGrabbing.h */,
+				CCF0777A13659A8000AF19FD /* SPInvocationGrabbing.m */,
+				CCF0777B13659A8000AF19FD /* SPMediaKeyTap.h */,
+				CCF0777C13659A8000AF19FD /* SPMediaKeyTap.m */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
@@ -815,6 +823,7 @@
 			isa = PBXProject;
 			buildConfigurationList = C2F2A6EA09588F1B00018C74 /* Build configuration list for PBXProject "vlc" */;
 			compatibilityVersion = "Xcode 3.1";
+			developmentRegion = English;
 			hasScannedForEncodings = 1;
 			knownRegions = (
 				English,

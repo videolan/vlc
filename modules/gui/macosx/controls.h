@@ -1,7 +1,7 @@
 /*****************************************************************************
  * controls.h: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2002-2009 the VideoLAN team
+ * Copyright (C) 2002-2011 the VideoLAN team
  * $Id$
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -57,8 +57,6 @@
     VLCFSPanel *o_fs_panel;
     BOOL b_lockAspectRatio;
 }
-- (void)controlTintChanged;
-
 - (id)voutView;
 - (BOOL)aspectRatioIsLocked;
 
