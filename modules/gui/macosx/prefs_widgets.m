@@ -858,11 +858,14 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
                         withView: o_parent_view];
         }
         break;
+    /* don't display keys in the advanced settings, since the current controls 
+    are broken by design. The user is required to change hotkeys in the sprefs
+    and can only change really advanced stuff here..
     case CONFIG_ITEM_KEY:
         p_control = [[KeyConfigControl alloc]
                         initWithItem: _p_item
                         withView: o_parent_view];
-        break;
+        break; */
     case CONFIG_ITEM_MODULE_LIST:
     case CONFIG_ITEM_MODULE_LIST_CAT:
         p_control = [[ModuleListConfigControl alloc]
