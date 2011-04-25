@@ -108,6 +108,7 @@ The class is not thread safe
 
     IBOutlet id delegate;
 }
++ (AppleRemote *)sharedInstance;
 
 - (int) remoteId;
 
