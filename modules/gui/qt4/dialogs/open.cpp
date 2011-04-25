@@ -181,7 +181,7 @@ OpenDialog::OpenDialog( QWidget *parent,
 
     setMinimumSize( sizeHint() );
     setMaximumWidth( 900 );
-    resize( getSettings()->value( "opendialog-size", QSize( 500, 490 ) ).toSize() );
+    resize( getSettings()->value( "opendialog-size", QSize( 500, 400 ) ).toSize() );
 }
 
 OpenDialog::~OpenDialog()

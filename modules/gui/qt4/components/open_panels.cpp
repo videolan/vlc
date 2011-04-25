@@ -106,11 +106,6 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     /* Subtitles */
     /* Deactivate the subtitles control by default. */
     ui.subFrame->setEnabled( false );
-    /* Build the subs size combo box */
-    setfillVLCConfigCombo( "freetype-rel-fontsize" , p_intf,
-                            ui.sizeSubComboBox );
-    /* Build the subs align combo box */
-    setfillVLCConfigCombo( "subsdec-align", p_intf, ui.alignSubComboBox );
 
     /* Connects  */
     BUTTONACT( ui.fileBrowseButton, browseFile() );
@@ -121,8 +116,6 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
 
     CONNECT( ui.fileListWidg, itemChanged( QListWidgetItem * ), this, updateMRL() );
     CONNECT( ui.subInput, textChanged( const QString& ), this, updateMRL() );
-    CONNECT( ui.alignSubComboBox, currentIndexChanged( int ), this, updateMRL() );
-    CONNECT( ui.sizeSubComboBox, currentIndexChanged( int ), this, updateMRL() );
     updateButtons();
 }
 
@@ -294,12 +287,6 @@ void FileOpenPanel::updateMRL()
     /* Options */
     if( ui.subCheckBox->isChecked() &&  !ui.subInput->text().isEmpty() ) {
         mrl.append( " :sub-file=" + colon_escape( ui.subInput->text() ) );
-        int align = ui.alignSubComboBox->itemData(
-                    ui.alignSubComboBox->currentIndex() ).toInt();
-        mrl.append( " :subsdec-align=" + QString().setNum( align ) );
-        int size = ui.sizeSubComboBox->itemData(
-                   ui.sizeSubComboBox->currentIndex() ).toInt();
-        mrl.append( " :freetype-rel-fontsize=" + QString().setNum( size ) );
     }
 
     emit mrlUpdated( fileList, mrl );

@@ -7,8 +7,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>566</width>
-    <height>344</height>
+    <width>564</width>
+    <height>258</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -67,20 +67,16 @@
         <property name="text">
          <string>Add...</string>
         </property>
-	<property name="icon">
+        <property name="icon">
          <iconset>
           <normaloff>:/playlist_add</normaloff>:/playlist_add</iconset>
-        </property>	
+        </property>
        </widget>
       </item>
       <item row="2" column="2">
        <widget class="QPushButton" name="removeFileButton">
         <property name="enabled">
          <bool>false</bool>
-        </property>
-	<property name="icon">
-         <iconset>
-          <normaloff>:/playlist_remove</normaloff>:/playlist_remove</iconset>
         </property>
         <property name="sizePolicy">
          <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
@@ -90,6 +86,10 @@
         </property>
         <property name="text">
          <string>Remove</string>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normaloff>:/playlist_remove</normaloff>:/playlist_remove</iconset>
         </property>
        </widget>
       </item>
@@ -140,86 +140,6 @@
            </property>
            <property name="text">
             <string>Browse...</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </widget>
-      </item>
-      <item>
-       <widget class="QWidget" name="widget_2" native="true">
-        <layout class="QGridLayout" name="gridLayout_2">
-         <item row="0" column="0">
-          <widget class="QLabel" name="sizeSubLabel">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="layoutDirection">
-            <enum>Qt::LeftToRight</enum>
-           </property>
-           <property name="text">
-            <string>Font size:</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-           </property>
-           <property name="buddy">
-            <cstring>sizeSubComboBox</cstring>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="0">
-          <widget class="QLabel" name="alignSubLabel">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="text">
-            <string>Text alignment:</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-           </property>
-           <property name="buddy">
-            <cstring>alignSubComboBox</cstring>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="2">
-          <spacer name="horizontalSpacer">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-         <item row="1" column="1">
-          <widget class="QComboBox" name="alignSubComboBox">
-           <property name="minimumSize">
-            <size>
-             <width>100</width>
-             <height>0</height>
-            </size>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1">
-          <widget class="QComboBox" name="sizeSubComboBox">
-           <property name="minimumSize">
-            <size>
-             <width>100</width>
-             <height>0</height>
-            </size>
            </property>
           </widget>
          </item>
