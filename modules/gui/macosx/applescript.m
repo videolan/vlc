@@ -95,7 +95,7 @@
         return nil;
     }
  
-    VLCControls * o_controls = (VLCControls *)[[NSApp delegate] controls];
+    VLCControls * o_controls = [[VLCMain sharedInstance] controls];
  
     if ( o_controls )
     {
@@ -143,12 +143,10 @@
 @implementation NSApplication(ScriptSupport)
 
 - (BOOL) scriptFullscreenMode {    
-    VLCControls * o_controls = (VLCControls *)[[self delegate] controls];
-
-    return [o_controls isFullscreen];
+    return [[[VLCMain sharedInstance] controls] isFullscreen];
 }
 - (void) setScriptFullscreenMode: (BOOL) mode {
-    VLCControls * o_controls = (VLCControls *)[[self delegate] controls];
+    VLCControls * o_controls = [[VLCMain sharedInstance] controls];
     if (mode == [o_controls isFullscreen]) return;
     [o_controls toogleFullscreen: self];
 }
