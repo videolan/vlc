@@ -27,8 +27,8 @@
 # import "config.h"
 #endif
 
-#import "AudioEffects.h"
 #import "intf.h"
+#import "AudioEffects.h"
 #import "../../audio_filter/equalizer_presets.h"
 
 #import <vlc_common.h>
@@ -52,6 +52,7 @@ static VLCAudioEffects *_o_sharedInstance = nil;
     if (_o_sharedInstance) {
         [self dealloc];
     } else {
+        p_intf = VLCIntf;
         _o_sharedInstance = [super init];
     }
     
@@ -71,6 +72,7 @@ static VLCAudioEffects *_o_sharedInstance = nil;
     
     /* Compressor */
     [o_comp_enable_ckb setTitle:_NS("Enable dynamic range compressor")];
+    [o_comp_reset_btn setTitle:_NS("Reset")];
     [o_comp_band1_lbl setStringValue:_NS("RMS/peak")];;
     [o_comp_band2_lbl setStringValue:_NS("Attack")];
     [o_comp_band3_lbl setStringValue:_NS("Release")];
@@ -81,6 +83,7 @@ static VLCAudioEffects *_o_sharedInstance = nil;
     
     /* Spatializer */
     [o_spat_enable_ckb setTitle:_NS("Enable Spatializer")];
+    [o_spat_reset_btn setTitle:_NS("Reset")];
     [o_spat_band1_lbl setStringValue:_NS("Size")];
     [o_spat_band2_lbl setStringValue:_NS("Width")];
     [o_spat_band3_lbl setStringValue:_NS("Wet")];
@@ -101,6 +104,9 @@ static VLCAudioEffects *_o_sharedInstance = nil;
     [o_window setExcludedFromWindowsMenu:YES];
 
     [self setupEqualizer];
+    [self resetCompressor];
+    [self resetSpatializer];
+    [self resetAudioFilters];
 }
 
 - (IBAction)toggleWindow:(id)sender
@@ -111,18 +117,71 @@ static VLCAudioEffects *_o_sharedInstance = nil;
         [o_window makeKeyAndOrderFront:sender];
 }
 
+- (void)setAudioFilter: (char *)psz_name on:(BOOL)b_on
+{
+    char *psz_tmp;
+    aout_instance_t * p_aout = getAout();
+    if( p_aout )
+        psz_tmp = var_GetNonEmptyString( p_aout, "audio-filter" );
+    else
+        psz_tmp = config_GetPsz( p_intf, "audio-filter" );        
+    
+    if( b_on )
+    {
+        if(! psz_tmp)
+            config_PutPsz( p_intf, "audio-filter", psz_name );
+        else if( (NSInteger)strstr( psz_tmp, psz_name ) == NO )
+        {
+            psz_tmp = (char *)[[NSString stringWithFormat: @"%s:%s", psz_tmp, psz_name] UTF8String];
+            config_PutPsz( p_intf, "audio-filter", psz_tmp );
+        }
+    } else {
+        if( psz_tmp )
+        {
+            psz_tmp = (char *)[[[NSString stringWithUTF8String: psz_tmp] stringByTrimmingCharactersInSet: [NSCharacterSet characterSetWithCharactersInString:[NSString stringWithFormat:@":%s",psz_name]]] UTF8String];
+            psz_tmp = (char *)[[[NSString stringWithUTF8String: psz_tmp] stringByTrimmingCharactersInSet: [NSCharacterSet characterSetWithCharactersInString:[NSString stringWithFormat:@"%s:",psz_name]]] UTF8String];
+            psz_tmp = (char *)[[[NSString stringWithUTF8String: psz_tmp] stringByTrimmingCharactersInSet: [NSCharacterSet characterSetWithCharactersInString:[NSString stringWithUTF8String:psz_name]]] UTF8String];
+            config_PutPsz( p_intf, "audio-filter", psz_tmp );
+        }
+    }
+
+    if( p_aout ) {
+        aout_EnableFilter( pl_Get( p_intf ), psz_name, b_on );
+        vlc_object_release( p_aout );
+    }
+}
+
+- (void)savePrefs
+{
+    /* save settings for some of our modules */
+    int returnedValue;
+    NSArray * theModules;
+    theModules = [[NSArray alloc] initWithObjects: @"main", @"headphone", @"normvol", @"headphone_channel_mixer", @"compressor", @"spatializer", nil];
+
+    for( int x = 0; x < [theModules count]; x++ )
+    {
+        returnedValue = config_SaveConfigFile( p_intf, [[theModules objectAtIndex: x] UTF8String] );
+
+        if (returnedValue != 0)
+            msg_Err(p_intf, "unable to save settings for '%s' (%i)", [[theModules objectAtIndex: x] UTF8String], returnedValue);
+    }
+
+    msg_Dbg(p_intf, "AudioFilters: saved certain preferences successfully");
+    [theModules release];
+}
+
 #pragma mark -
 #pragma mark Equalizer
-static bool GetFiltersStatus( intf_thread_t *p_intf,
+static bool GetEqualizerStatus( intf_thread_t *p_custom_intf,
                              char *psz_name )
 {
     char *psz_parser, *psz_string = NULL;
     vlc_object_t *p_object = VLC_OBJECT(getAout());
     if( p_object == NULL )
-        p_object = vlc_object_hold(pl_Get( p_intf ));
+        p_object = vlc_object_hold(pl_Get( p_custom_intf ));
     
-    if( (BOOL)config_GetInt( p_intf, "macosx-eq-keep" ) == YES )
-        psz_string = config_GetPsz( p_intf, "audio-filter" );
+    if( (BOOL)config_GetInt( p_custom_intf, "macosx-eq-keep" ) == YES )
+        psz_string = config_GetPsz( p_custom_intf, "audio-filter" );
     
     if(! psz_string )
         psz_string = var_GetNonEmptyString( p_object, "audio-filter" );
@@ -203,12 +262,11 @@ static bool GetFiltersStatus( intf_thread_t *p_intf,
 
 - (void)equalizerUpdated
 {
-    intf_thread_t *p_intf = VLCIntf;
     float f_preamp, f_band[10];
     char *psz_bands, *psz_bands_init, *p_next;
     bool b_2p;
     int i;
-    bool b_enabled = GetFiltersStatus( p_intf, (char *)"equalizer" );
+    bool b_enabled = GetEqualizerStatus( p_intf, (char *)"equalizer" );
     vlc_object_t *p_object = VLC_OBJECT(getAout());
     
     if( p_object == NULL )
@@ -300,12 +358,11 @@ static bool GetFiltersStatus( intf_thread_t *p_intf,
 
 - (IBAction)eq_enable:(id)sender
 {
-    aout_EnableFilter( pl_Get( VLCIntf ), (char *)"equalizer", [sender state]);
+    [self setAudioFilter: "equalizer" on:[sender state]];
 }
 
 - (IBAction)eq_bandSliderUpdated:(id)sender
 {
-    intf_thread_t *p_intf = VLCIntf;
     vlc_object_t *p_object = VLC_OBJECT(getAout());
     
     if( p_object == NULL )
@@ -339,8 +396,6 @@ static bool GetFiltersStatus( intf_thread_t *p_intf,
 }
 - (IBAction)eq_changePreset:(id)sender
 {
-    intf_thread_t *p_intf = VLCIntf;
-    int i;
     vlc_object_t *p_object= VLC_OBJECT(getAout());
     if( p_object == NULL )
         p_object = vlc_object_hold(pl_Get( p_intf ));
@@ -349,7 +404,7 @@ static bool GetFiltersStatus( intf_thread_t *p_intf,
     
     NSString *preset = @"";
     const char *psz_values;
-    for( i = 0; i < 10; i++ )
+    for( int i = 0; i < 10; i++ )
     {
         preset = [preset stringByAppendingFormat:@"%.1f ", eqz_preset_10b[[sender indexOfSelectedItem]]->f_amp[i] ];
     }
@@ -376,7 +431,6 @@ static bool GetFiltersStatus( intf_thread_t *p_intf,
 }
 - (IBAction)eq_preampSliderUpdated:(id)sender
 {
-    intf_thread_t *p_intf = VLCIntf;
     float f_preamp = [sender floatValue] ;
 
     vlc_object_t *p_object = VLC_OBJECT(getAout());
@@ -398,7 +452,6 @@ static bool GetFiltersStatus( intf_thread_t *p_intf,
 }
 - (IBAction)eq_twopass:(id)sender
 {
-    intf_thread_t *p_intf = VLCIntf;
     bool b_2p = [sender state] ? true : false;
     aout_instance_t *p_aout = getAout();
     vlc_object_t *p_object= VLC_OBJECT(p_aout);
@@ -421,13 +474,225 @@ static bool GetFiltersStatus( intf_thread_t *p_intf,
 
 #pragma mark -
 #pragma mark Compressor
+- (void)resetCompressor
+{
+    char * psz_afilters;
+    psz_afilters = config_GetPsz( p_intf, "audio-filter" );
+    if( psz_afilters ) {
+        [o_comp_enable_ckb setState: (NSInteger)strstr( psz_afilters, "compressor" ) ];
+        free( psz_afilters );
+    } 
+    else
+        [o_comp_enable_ckb setState: NSOffState];
 
+    [o_comp_band1_sld setFloatValue: config_GetFloat( p_intf, "compressor-rms-peak" )];
+    [o_comp_band1_fld setStringValue:[NSString localizedStringWithFormat:@"%1.1f", [o_comp_band1_sld floatValue]]];
+    [o_comp_band2_sld setFloatValue: config_GetFloat( p_intf, "compressor-attack" )];
+    [o_comp_band2_fld setStringValue:[NSString localizedStringWithFormat:@"%2.1f ms", [o_comp_band2_sld floatValue]]];
+    [o_comp_band3_sld setFloatValue: config_GetFloat( p_intf, "compressor-release" )];
+    [o_comp_band3_fld setStringValue:[NSString localizedStringWithFormat:@"%3.1f ms", [o_comp_band3_sld floatValue]]];
+    [o_comp_band4_sld setFloatValue: config_GetFloat( p_intf, "compressor-threshold" )];
+    [o_comp_band4_fld setStringValue:[NSString localizedStringWithFormat:@"%2.1f dB", [o_comp_band4_sld floatValue]]];
+    [o_comp_band5_sld setFloatValue: config_GetFloat( p_intf, "compressor-ratio" )];
+    [o_comp_band5_fld setStringValue:[NSString localizedStringWithFormat:@"%1.1f:1", [o_comp_band5_sld floatValue]]];
+    [o_comp_band6_sld setFloatValue: config_GetFloat( p_intf, "compressor-knee" )];
+    [o_comp_band6_fld setStringValue:[NSString localizedStringWithFormat:@"%1.1f dB", [o_comp_band6_sld floatValue]]];
+    [o_comp_band7_sld setFloatValue: config_GetFloat( p_intf, "compressor-makeup-gain" )];
+    [o_comp_band7_fld setStringValue:[NSString localizedStringWithFormat:@"%1.1f dB", [o_comp_band7_sld floatValue]]];
+}
+
+- (IBAction)resetCompressorValues:(id)sender
+{
+    config_PutFloat( p_intf, "compressor-rms-peak", 0.000000 );
+    config_PutFloat( p_intf, "compressor-attack", 25.000000 );
+    config_PutFloat( p_intf, "compressor-release", 100.000000 );
+    config_PutFloat( p_intf, "compressor-threshold", -11.000000 );
+    config_PutFloat( p_intf, "compressor-ratio", 8.000000 );
+    config_PutFloat( p_intf, "compressor-knee", 2.500000 );
+    config_PutFloat( p_intf, "compressor-makeup-gain", 7.000000 );
+
+    aout_instance_t * p_aout = getAout();
+    if (p_aout) {
+        var_SetFloat( p_aout, "compressor-rms-peak", 0.000000 );
+        var_SetFloat( p_aout, "compressor-attack", 25.000000 );
+        var_SetFloat( p_aout, "compressor-release", 100.000000 );
+        var_SetFloat( p_aout, "compressor-threshold", -11.000000 );
+        var_SetFloat( p_aout, "compressor-ratio", 8.000000 );
+        var_SetFloat( p_aout, "compressor-knee", 2.500000 );
+        var_SetFloat( p_aout, "compressor-makeup-gain", 7.000000 );
+        vlc_object_release( p_aout );
+    }
+    [self resetCompressor];
+}
+
+- (IBAction)comp_enable:(id)sender
+{
+    [self setAudioFilter:"compressor" on:[sender state]];
+}
+
+- (IBAction)comp_sliderUpdated:(id)sender
+{
+    aout_instance_t * p_aout = getAout();
+    char * value;
+    if( sender == o_comp_band1_sld )
+        value = "compressor-rms-peak";
+    else if( sender == o_comp_band2_sld )
+        value = "compressor-attack";
+    else if( sender == o_comp_band3_sld )
+        value = "compressor-release";
+    else if( sender == o_comp_band4_sld )
+        value = "compressor-threshold";
+    else if( sender == o_comp_band5_sld )
+        value = "compressor-ratio";
+    else if( sender == o_comp_band6_sld )
+        value = "compressor-knee";
+    else if( sender == o_comp_band7_sld )
+        value = "compressor-makeup-gain";
+
+    if( p_aout ) {
+        var_SetFloat( p_aout, value, [sender floatValue] );
+        vlc_object_release( p_aout );
+    }
+    config_PutFloat( p_intf, value, [sender floatValue] );
+
+    if( sender == o_comp_band1_sld )
+        [o_comp_band1_fld setStringValue:[NSString localizedStringWithFormat:@"%1.1f", [sender floatValue]]];
+    else if( sender == o_comp_band2_sld )
+        [o_comp_band2_fld setStringValue:[NSString localizedStringWithFormat:@"%2.1f ms", [sender floatValue]]];
+    else if( sender == o_comp_band3_sld )
+        [o_comp_band3_fld setStringValue:[NSString localizedStringWithFormat:@"%3.1f ms", [sender floatValue]]];
+    else if( sender == o_comp_band4_sld )
+        [o_comp_band4_fld setStringValue:[NSString localizedStringWithFormat:@"%2.1f dB", [sender floatValue]]];
+    else if( sender == o_comp_band5_sld )
+        [o_comp_band5_fld setStringValue:[NSString localizedStringWithFormat:@"%1.1f:1", [sender floatValue]]];
+    else if( sender == o_comp_band6_sld )
+        [o_comp_band6_fld setStringValue:[NSString localizedStringWithFormat:@"%1.1f dB", [sender floatValue]]];
+    else if( sender == o_comp_band7_sld )
+        [o_comp_band7_fld setStringValue:[NSString localizedStringWithFormat:@"%1.1f dB", [sender floatValue]]];
+}
 
 #pragma mark -
 #pragma mark Spatializer
+- (void)resetSpatializer
+{
+    char * psz_afilters;
+    psz_afilters = config_GetPsz( p_intf, "audio-filter" );
+    if( psz_afilters ) {
+        [o_spat_enable_ckb setState: (NSInteger)strstr( psz_afilters, "spatializer" ) ];
+        free( psz_afilters );
+    } 
+    else
+        [o_spat_enable_ckb setState: NSOffState];
+    
+    [o_spat_band1_sld setFloatValue: config_GetFloat( p_intf, "spatializer-roomsize" )];
+    [o_spat_band1_fld setStringValue:[NSString localizedStringWithFormat:@"%1.1f", [o_spat_band1_sld floatValue]]];
+    [o_spat_band2_sld setFloatValue: config_GetFloat( p_intf, "spatializer-width" )];
+    [o_spat_band2_fld setStringValue:[NSString localizedStringWithFormat:@"%1.1f", [o_spat_band2_sld floatValue]]];
+    [o_spat_band3_sld setFloatValue: config_GetFloat( p_intf, "spatializer-wet" )];
+    [o_spat_band3_fld setStringValue:[NSString localizedStringWithFormat:@"%1.1f", [o_spat_band3_sld floatValue]]];
+    [o_spat_band4_sld setFloatValue: config_GetFloat( p_intf, "spatializer-dry" )];
+    [o_spat_band4_fld setStringValue:[NSString localizedStringWithFormat:@"%1.1f", [o_spat_band4_sld floatValue]]];
+    [o_spat_band5_sld setFloatValue: config_GetFloat( p_intf, "spatializer-damp" )];
+    [o_spat_band5_fld setStringValue:[NSString localizedStringWithFormat:@"%1.1f", [o_spat_band5_sld floatValue]]];
+}
 
+- (IBAction)resetSpatializerValues:(id)sender
+{
+    config_PutFloat( p_intf, "spatializer-roomsize", 1.050000 );
+    config_PutFloat( p_intf, "spatializer-width", 10.000000 );
+    config_PutFloat( p_intf, "spatializer-wet", 3.000000 );
+    config_PutFloat( p_intf, "spatializer-dry", 2.000000 );
+    config_PutFloat( p_intf, "spatializer-damp", 1.000000 );
+
+    aout_instance_t * p_aout = getAout();
+    if (p_aout) {
+        var_SetFloat( p_aout, "spatializer-roomsize", 1.050000 );
+        var_SetFloat( p_aout, "spatializer-width", 10.000000 );
+        var_SetFloat( p_aout, "spatializer-wet", 3.000000 );
+        var_SetFloat( p_aout, "spatializer-dry", 2.000000 );
+        var_SetFloat( p_aout, "spatializer-damp", 1.000000 );
+        vlc_object_release( p_aout );
+    }
+    [self resetSpatializer];
+}
+
+- (IBAction)spat_enable:(id)sender
+{
+    [self setAudioFilter:"spatializer" on:[sender state]];    
+}
+
+- (IBAction)spat_sliderUpdated:(id)sender
+{
+    aout_instance_t * p_aout = getAout();
+    char * value;
+    if( sender == o_spat_band1_sld )
+        value = "spatializer-roomsize";
+    else if( sender == o_spat_band2_sld )
+        value = "spatializer-width";
+    else if( sender == o_spat_band3_sld )
+        value = "spatializer-wet";
+    else if( sender == o_spat_band4_sld )
+        value = "spatializer-dry";
+    else if( sender == o_spat_band5_sld )
+        value = "spatializer-damp";
+    
+    if( p_aout ) {
+        var_SetFloat( p_aout, value, [sender floatValue] );
+        vlc_object_release( p_aout );
+    }
+    config_PutFloat( p_intf, value, [sender floatValue] );
+    
+    if( sender == o_spat_band1_sld )
+        [o_spat_band1_fld setStringValue:[NSString localizedStringWithFormat:@"%1.1f", [sender floatValue]]];
+    else if( sender == o_spat_band2_sld )
+        [o_spat_band2_fld setStringValue:[NSString localizedStringWithFormat:@"%1.1f", [sender floatValue]]];
+    else if( sender == o_spat_band3_sld )
+        [o_spat_band3_fld setStringValue:[NSString localizedStringWithFormat:@"%1.1f", [sender floatValue]]];
+    else if( sender == o_spat_band4_sld )
+        [o_spat_band4_fld setStringValue:[NSString localizedStringWithFormat:@"%1.1f", [sender floatValue]]];
+    else if( sender == o_spat_band5_sld )
+        [o_spat_band5_fld setStringValue:[NSString localizedStringWithFormat:@"%1.1f", [sender floatValue]]];
+}
 
 #pragma mark -
 #pragma mark Filter
+- (void)resetAudioFilters
+{
+    char * psz_afilters;
+    psz_afilters = config_GetPsz( p_intf, "audio-filter" );
+    if( psz_afilters )
+    {
+        [o_filter_headPhone_ckb setState: (NSInteger)strstr( psz_afilters, "headphone" ) ];
+        [o_filter_normLevel_ckb setState: (NSInteger)strstr( psz_afilters, "normvol" ) ];
+        free( psz_afilters );
+    } else {
+        [o_filter_headPhone_ckb setState: NSOffState];
+        [o_filter_normLevel_ckb setState: NSOffState];
+    }
+    [o_filter_normLevel_sld setFloatValue: config_GetFloat( p_intf, "norm-max-level" )];
+}
+
+- (IBAction)filter_enableHeadPhoneVirt:(id)sender
+{
+    [self setAudioFilter: "headphone" on:[sender state]];
+}
+
+- (IBAction)filter_enableVolumeNorm:(id)sender
+{
+    [self setAudioFilter: "normvol" on:[sender state]];    
+}
+
+- (IBAction)filter_volNormSliderUpdated:(id)sender
+{
+    aout_instance_t * p_aout= getAout();
+
+    if( p_aout )
+    {
+        var_SetFloat( p_aout, "norm-max-level", [o_filter_normLevel_sld floatValue] );
+        vlc_object_release( p_aout );
+    }
+
+    config_PutFloat( p_intf, "norm-max-level", [o_filter_normLevel_sld floatValue] );
+}
 
 @end

@@ -821,6 +821,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     /* save the prefs if they were changed in the extended panel */
     if(o_extended && [o_extended configChanged])
         [o_extended savePrefs];
+    [o_audioeffects savePrefs];
 
     /* unsubscribe from the interactive dialogues */
     dialog_Unregister( p_intf );

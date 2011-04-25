@@ -29,6 +29,7 @@
     /* generic */
     IBOutlet id o_tableView;
     IBOutlet id o_window;
+    intf_thread_t *p_intf;
 
     /* Equalizer */
     IBOutlet id o_eq_enable_ckb;
@@ -49,6 +50,7 @@
 
     /* Compressor */
     IBOutlet id o_comp_enable_ckb;
+    IBOutlet id o_comp_reset_btn;
     IBOutlet id o_comp_band1_sld;
     IBOutlet id o_comp_band1_fld;
     IBOutlet id o_comp_band1_lbl;
@@ -73,6 +75,7 @@
     
     /* Spatializer */
     IBOutlet id o_spat_enable_ckb;
+    IBOutlet id o_spat_reset_btn;
     IBOutlet id o_spat_band1_sld;
     IBOutlet id o_spat_band1_fld;
     IBOutlet id o_spat_band1_lbl;
@@ -99,6 +102,8 @@
 /* generic */
 + (VLCAudioEffects *)sharedInstance;
 - (IBAction)toggleWindow:(id)sender;
+- (void)setAudioFilter: (char *)psz_name on:(BOOL)b_on;
+- (void)savePrefs;
 
 /* Equalizer */
 - (void)setupEqualizer;
@@ -111,5 +116,23 @@
 - (IBAction)eq_enable:(id)sender;
 - (IBAction)eq_preampSliderUpdated:(id)sender;
 - (IBAction)eq_twopass:(id)sender;
+
+/* Compressor */
+- (void)resetCompressor;
+- (IBAction)resetCompressorValues:(id)sender;
+- (IBAction)comp_enable:(id)sender;
+- (IBAction)comp_sliderUpdated:(id)sender;
+
+/* Spatializer */
+- (void)resetSpatializer;
+- (IBAction)resetSpatializerValues:(id)sender;
+- (IBAction)spat_enable:(id)sender;
+- (IBAction)spat_sliderUpdated:(id)sender;
+
+/* Filter */
+- (void)resetAudioFilters;
+- (IBAction)filter_enableHeadPhoneVirt:(id)sender;
+- (IBAction)filter_enableVolumeNorm:(id)sender;
+- (IBAction)filter_volNormSliderUpdated:(id)sender;
 
 @end

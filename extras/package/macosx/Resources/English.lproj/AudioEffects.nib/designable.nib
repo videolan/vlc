@@ -2,10 +2,10 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.10">
   <data>
     <int key="IBDocument.SystemTarget">1060</int>
-    <string key="IBDocument.SystemVersion">11A419</string>
+    <string key="IBDocument.SystemVersion">11A430e</string>
     <string key="IBDocument.InterfaceBuilderVersion">851</string>
-    <string key="IBDocument.AppKitVersion">1115.2</string>
-    <string key="IBDocument.HIToolboxVersion">549.00</string>
+    <string key="IBDocument.AppKitVersion">1117</string>
+    <string key="IBDocument.HIToolboxVersion">552.00</string>
     <object class="NSMutableDictionary" key="IBDocument.PluginVersions">
       <bool key="EncodedWithXMLCoder">YES</bool>
       <object class="NSArray" key="dict.sortedKeys">
@@ -21,7 +21,7 @@
     </object>
     <object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
       <bool key="EncodedWithXMLCoder">YES</bool>
-      <integer value="84"/>
+      <integer value="86"/>
     </object>
     <object class="NSArray" key="IBDocument.PluginDependencies">
       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -69,7 +69,7 @@
                 <object class="BGHUDTabViewItem" id="459886568">
                   <string key="NSIdentifier">equalizer</string>
                   <object class="NSView" key="NSView" id="327218412">
-                    <reference key="NSNextResponder" ref="876119583"/>
+                    <nil key="NSNextResponder"/>
                     <int key="NSvFlags">256</int>
                     <object class="NSMutableArray" key="NSSubviews">
                       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -116,7 +116,7 @@
                         <reference key="NSSuperview" ref="327218412"/>
                         <bool key="NSEnabled">YES</bool>
                         <object class="NSTextFieldCell" key="NSCell" id="954229439">
-                          <int key="NSCellFlags">67239424</int>
+                          <int key="NSCellFlags">67763712</int>
                           <int key="NSCellFlags2">71565312</int>
                           <string key="NSContents">0 dB</string>
                           <reference key="NSSupport" ref="22"/>
@@ -607,7 +607,7 @@
                         <string key="NSReuseIdentifierKey">_NS:191</string>
                         <bool key="NSEnabled">YES</bool>
                         <object class="BGHUDSliderCell" key="NSCell" id="1033603998">
-                          <int key="NSCellFlags">67239424</int>
+                          <int key="NSCellFlags">67501824</int>
                           <int key="NSCellFlags2">131072</int>
                           <string key="NSContents"/>
                           <string key="NSCellIdentifier">_NS:191</string>
@@ -631,7 +631,7 @@
                         <string key="NSReuseIdentifierKey">_NS:191</string>
                         <bool key="NSEnabled">YES</bool>
                         <object class="BGHUDSliderCell" key="NSCell" id="315969382">
-                          <int key="NSCellFlags">67239424</int>
+                          <int key="NSCellFlags">67501824</int>
                           <int key="NSCellFlags2">131072</int>
                           <string key="NSContents"/>
                           <string key="NSCellIdentifier">_NS:191</string>
@@ -655,7 +655,7 @@
                         <string key="NSReuseIdentifierKey">_NS:191</string>
                         <bool key="NSEnabled">YES</bool>
                         <object class="BGHUDSliderCell" key="NSCell" id="952935049">
-                          <int key="NSCellFlags">67239424</int>
+                          <int key="NSCellFlags">67501824</int>
                           <int key="NSCellFlags2">131072</int>
                           <string key="NSContents"/>
                           <string key="NSCellIdentifier">_NS:191</string>
@@ -679,7 +679,7 @@
                         <string key="NSReuseIdentifierKey">_NS:191</string>
                         <bool key="NSEnabled">YES</bool>
                         <object class="BGHUDSliderCell" key="NSCell" id="259517504">
-                          <int key="NSCellFlags">67239424</int>
+                          <int key="NSCellFlags">67501824</int>
                           <int key="NSCellFlags2">131072</int>
                           <string key="NSContents"/>
                           <string key="NSCellIdentifier">_NS:191</string>
@@ -703,7 +703,7 @@
                         <string key="NSReuseIdentifierKey">_NS:191</string>
                         <bool key="NSEnabled">YES</bool>
                         <object class="BGHUDSliderCell" key="NSCell" id="314108466">
-                          <int key="NSCellFlags">67239424</int>
+                          <int key="NSCellFlags">67501824</int>
                           <int key="NSCellFlags2">131072</int>
                           <string key="NSContents"/>
                           <string key="NSCellIdentifier">_NS:191</string>
@@ -727,7 +727,7 @@
                         <string key="NSReuseIdentifierKey">_NS:191</string>
                         <bool key="NSEnabled">YES</bool>
                         <object class="BGHUDSliderCell" key="NSCell" id="57982058">
-                          <int key="NSCellFlags">67239424</int>
+                          <int key="NSCellFlags">67501824</int>
                           <int key="NSCellFlags2">131072</int>
                           <string key="NSContents"/>
                           <string key="NSCellIdentifier">_NS:191</string>
@@ -751,7 +751,7 @@
                         <string key="NSReuseIdentifierKey">_NS:191</string>
                         <bool key="NSEnabled">YES</bool>
                         <object class="BGHUDSliderCell" key="NSCell" id="1023325097">
-                          <int key="NSCellFlags">67239424</int>
+                          <int key="NSCellFlags">67501824</int>
                           <int key="NSCellFlags2">131072</int>
                           <string key="NSContents"/>
                           <string key="NSCellIdentifier">_NS:191</string>
@@ -775,7 +775,7 @@
                         <string key="NSReuseIdentifierKey">_NS:191</string>
                         <bool key="NSEnabled">YES</bool>
                         <object class="BGHUDSliderCell" key="NSCell" id="1061795325">
-                          <int key="NSCellFlags">67239424</int>
+                          <int key="NSCellFlags">67501824</int>
                           <int key="NSCellFlags2">131072</int>
                           <string key="NSContents"/>
                           <string key="NSCellIdentifier">_NS:191</string>
@@ -799,7 +799,7 @@
                         <string key="NSReuseIdentifierKey">_NS:191</string>
                         <bool key="NSEnabled">YES</bool>
                         <object class="BGHUDSliderCell" key="NSCell" id="668690250">
-                          <int key="NSCellFlags">67239424</int>
+                          <int key="NSCellFlags">67501824</int>
                           <int key="NSCellFlags2">131072</int>
                           <string key="NSContents"/>
                           <string key="NSCellIdentifier">_NS:191</string>
@@ -823,7 +823,7 @@
                         <string key="NSReuseIdentifierKey">_NS:191</string>
                         <bool key="NSEnabled">YES</bool>
                         <object class="BGHUDSliderCell" key="NSCell" id="149612815">
-                          <int key="NSCellFlags">67239424</int>
+                          <int key="NSCellFlags">67501824</int>
                           <int key="NSCellFlags2">131072</int>
                           <string key="NSContents"/>
                           <string key="NSCellIdentifier">_NS:191</string>
@@ -847,7 +847,7 @@
                         <string key="NSReuseIdentifierKey">_NS:191</string>
                         <bool key="NSEnabled">YES</bool>
                         <object class="BGHUDSliderCell" key="NSCell" id="1005956915">
-                          <int key="NSCellFlags">67239424</int>
+                          <int key="NSCellFlags">67501824</int>
                           <int key="NSCellFlags2">131072</int>
                           <string key="NSContents"/>
                           <string key="NSCellIdentifier">_NS:191</string>
@@ -865,7 +865,6 @@
                       </object>
                     </object>
                     <string key="NSFrame">{{10, 33}, {404, 178}}</string>
-                    <reference key="NSSuperview" ref="876119583"/>
                     <string key="NSReuseIdentifierKey">_NS:799</string>
                   </object>
                   <string key="NSLabel">Graphic Equalizer</string>
@@ -929,7 +928,7 @@
                         <string key="NSReuseIdentifierKey">_NS:191</string>
                         <bool key="NSEnabled">YES</bool>
                         <object class="BGHUDSliderCell" key="NSCell" id="848483206">
-                          <int key="NSCellFlags">67239424</int>
+                          <int key="NSCellFlags">67501824</int>
                           <int key="NSCellFlags2">131072</int>
                           <string key="NSContents"/>
                           <string key="NSCellIdentifier">_NS:191</string>
@@ -969,7 +968,7 @@
                         <string key="NSReuseIdentifierKey">_NS:191</string>
                         <bool key="NSEnabled">YES</bool>
                         <object class="BGHUDSliderCell" key="NSCell" id="137950649">
-                          <int key="NSCellFlags">67239424</int>
+                          <int key="NSCellFlags">67501824</int>
                           <int key="NSCellFlags2">131072</int>
                           <string key="NSContents"/>
                           <string key="NSCellIdentifier">_NS:191</string>
@@ -1009,7 +1008,7 @@
                         <string key="NSReuseIdentifierKey">_NS:191</string>
                         <bool key="NSEnabled">YES</bool>
                         <object class="BGHUDSliderCell" key="NSCell" id="38419774">
-                          <int key="NSCellFlags">67239424</int>
+                          <int key="NSCellFlags">67501824</int>
                           <int key="NSCellFlags2">131072</int>
                           <string key="NSContents"/>
                           <string key="NSCellIdentifier">_NS:191</string>
@@ -1049,7 +1048,7 @@
                         <string key="NSReuseIdentifierKey">_NS:191</string>
                         <bool key="NSEnabled">YES</bool>
                         <object class="BGHUDSliderCell" key="NSCell" id="610746211">
-                          <int key="NSCellFlags">67239424</int>
+                          <int key="NSCellFlags">67501824</int>
                           <int key="NSCellFlags2">131072</int>
                           <string key="NSContents"/>
                           <string key="NSCellIdentifier">_NS:191</string>
@@ -1089,7 +1088,7 @@
                         <string key="NSReuseIdentifierKey">_NS:191</string>
                         <bool key="NSEnabled">YES</bool>
                         <object class="BGHUDSliderCell" key="NSCell" id="713767167">
-                          <int key="NSCellFlags">67239424</int>
+                          <int key="NSCellFlags">67501824</int>
                           <int key="NSCellFlags2">131072</int>
                           <string key="NSContents"/>
                           <string key="NSCellIdentifier">_NS:191</string>
@@ -1129,7 +1128,7 @@
                         <string key="NSReuseIdentifierKey">_NS:191</string>
                         <bool key="NSEnabled">YES</bool>
                         <object class="BGHUDSliderCell" key="NSCell" id="1060145376">
-                          <int key="NSCellFlags">67239424</int>
+                          <int key="NSCellFlags">67501824</int>
                           <int key="NSCellFlags2">131072</int>
                           <string key="NSContents"/>
                           <string key="NSCellIdentifier">_NS:191</string>
@@ -1281,7 +1280,7 @@
                         <string key="NSReuseIdentifierKey">_NS:191</string>
                         <bool key="NSEnabled">YES</bool>
                         <object class="BGHUDSliderCell" key="NSCell" id="417624963">
-                          <int key="NSCellFlags">67239424</int>
+                          <int key="NSCellFlags">67501824</int>
                           <int key="NSCellFlags2">131072</int>
                           <string key="NSContents"/>
                           <string key="NSCellIdentifier">_NS:191</string>
@@ -1297,6 +1296,76 @@
                           <string key="themeKey">gradientTheme</string>
                         </object>
                       </object>
+                      <object class="NSButton" id="235290804">
+                        <reference key="NSNextResponder" ref="605508444"/>
+                        <int key="NSvFlags">268</int>
+                        <string key="NSFrame">{{341, 157}, {46, 17}}</string>
+                        <reference key="NSSuperview" ref="605508444"/>
+                        <string key="NSReuseIdentifierKey">_NS:43</string>
+                        <bool key="NSEnabled">YES</bool>
+                        <object class="BGHUDButtonCell" key="NSCell" id="846216840">
+                          <int key="NSCellFlags">67239424</int>
+                          <int key="NSCellFlags2">134479872</int>
+                          <string key="NSContents">Reset</string>
+                          <reference key="NSSupport" ref="22"/>
+                          <string key="NSCellIdentifier">_NS:43</string>
+                          <reference key="NSControlView" ref="235290804"/>
+                          <int key="NSButtonFlags">-2030288641</int>
+                          <int key="NSButtonFlags2">36</int>
+                          <object class="NSImage" key="NSNormalImage">
+                            <int key="NSImageFlags">550174720</int>
+                            <string key="NSSize">{1, 1}</string>
+                            <object class="NSMutableArray" key="NSReps">
+                              <bool key="EncodedWithXMLCoder">YES</bool>
+                              <object class="NSArray">
+                                <bool key="EncodedWithXMLCoder">YES</bool>
+                                <integer value="0"/>
+                                <object class="NSBitmapImageRep">
+                                  <object class="NSData" key="NSTIFFRepresentation">
+                                    <bytes key="NS.bytes">TU0AKgAAAAoAAAAOAQAAAwAAAAEAAQAAAQEAAwAAAAEAAQAAAQIAAwAAAAIACAAIAQMAAwAAAAEAAQAA
+AQYAAwAAAAEAAQAAAREABAAAAAEAAAAIARIAAwAAAAEAAQAAARUAAwAAAAEAAgAAARYAAwAAAAEAAQAA
+ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABh3MABwAABXwAAAC4
+AAAAAAAABXxhcHBsAiAAAG1udHJHUkFZWFlaIAfQAAIADgAMAAAAAGFjc3BBUFBMAAAAAG5vbmUAAAAA
+AAAAAAAAAAAAAAAAAAD21gABAAAAANMtYXBwbAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAABWRlc2MAAADAAAAAb2RzY20AAAEwAAAD7mNwcnQAAAUgAAAAOHd0cHQAAAVY
+AAAAFGtUUkMAAAVsAAAADmRlc2MAAAAAAAAAFUdlbmVyaWMgR3JheSBQcm9maWxlAAAAAAAAAAAAAAAV
+R2VuZXJpYyBHcmF5IFByb2ZpbGUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAABtbHVjAAAAAAAAABMAAAAMcHRCUgAAACoAAAD0ZnJGVQAAACoAAAEeemhUVwAAABAAAAFI
+aXRJVAAAAC4AAAFYbmJOTwAAACwAAAGGa29LUgAAABgAAAGyZGVERQAAADoAAAHKc3ZTRQAAAC4AAAIE
+emhDTgAAABAAAAIyamFKUAAAABYAAAJCcHRQTwAAADgAAAJYbmxOTAAAACoAAAKQZXNFUwAAACgAAAK6
+ZmlGSQAAACwAAALicGxQTAAAADYAAAMOcnVSVQAAACYAAANEYXJFRwAAACgAAANqZW5VUwAAACgAAAOS
+ZGFESwAAADQAAAO6AFAAZQByAGYAaQBsACAAQwBpAG4AegBhACAARwBlAG4A6QByAGkAYwBvAFAAcgBv
+AGYAaQBsACAAZwDpAG4A6QByAGkAcQB1AGUAIABnAHIAaQBzkBp1KHBwlo6Ccl9pY8+P8ABQAHIAbwBm
+AGkAbABvACAAZwByAGkAZwBpAG8AIABnAGUAbgBlAHIAaQBjAG8ARwBlAG4AZQByAGkAcwBrACAAZwBy
+AOUAdABvAG4AZQBwAHIAbwBmAGkAbMd8vBgAIABHAHIAYQB5ACDVBLhc0wzHfABBAGwAbABnAGUAbQBl
+AGkAbgBlAHMAIABHAHIAYQB1AHMAdAB1AGYAZQBuAC0AUAByAG8AZgBpAGwARwBlAG4AZQByAGkAcwBr
+ACAAZwByAOUAcwBrAGEAbABlAHAAcgBvAGYAaQBsZm6QGnBwXqZjz4/wZYdO9k4AgiwwsDDsMKQw1zDt
+MNUwoTCkMOsAUABlAHIAZgBpAGwAIABnAGUAbgDpAHIAaQBjAG8AIABkAGUAIABjAGkAbgB6AGUAbgB0
+AG8AcwBBAGwAZwBlAG0AZQBlAG4AIABnAHIAaQBqAHMAcAByAG8AZgBpAGUAbABQAGUAcgBmAGkAbAAg
+AGcAcgBpAHMAIABnAGUAbgDpAHIAaQBjAG8AWQBsAGUAaQBuAGUAbgAgAGgAYQByAG0AYQBhAHAAcgBv
+AGYAaQBpAGwAaQBVAG4AaQB3AGUAcgBzAGEAbABuAHkAIABwAHIAbwBmAGkAbAAgAHMAegBhAHIAbwFb
+AGMAaQQeBDEESQQ4BDkAIARBBDUEQARLBDkAIAQ/BEAEPgREBDgEOwRMBkUGRAZBACAGKgY5BjEGSgZB
+ACAARwByAGEAeQAgBicGRAY5BicGRQBHAGUAbgBlAHIAaQBjACAARwByAGEAeQAgAFAAcgBvAGYAaQBs
+AGUARwBlAG4AZQByAGUAbAAgAGcAcgDlAHQAbwBuAGUAYgBlAHMAawByAGkAdgBlAGwAcwBlAAB0ZXh0
+AAAAAENvcHlyaWdodCAyMDA3IEFwcGxlIEluYy4sIGFsbCByaWdodHMgcmVzZXJ2ZWQuAFhZWiAAAAAA
+AADzUQABAAAAARbMY3VydgAAAAAAAAABAc0AAA</bytes>
+                                  </object>
+                                </object>
+                              </object>
+                            </object>
+                            <object class="NSColor" key="NSColor" id="1050243882">
+                              <int key="NSColorSpace">3</int>
+                              <bytes key="NSWhite">MCAwAA</bytes>
+                            </object>
+                          </object>
+                          <string key="NSAlternateContents"/>
+                          <string key="NSKeyEquivalent"/>
+                          <int key="NSPeriodicDelay">200</int>
+                          <int key="NSPeriodicInterval">25</int>
+                          <string key="themeKey">gradientTheme</string>
+                          <int key="BGButtonType">7</int>
+                        </object>
+                      </object>
                     </object>
                     <string key="NSFrame">{{10, 33}, {404, 178}}</string>
                     <string key="NSReuseIdentifierKey">_NS:809</string>
@@ -1308,7 +1377,7 @@
                 <object class="NSTabViewItem" id="231247297">
                   <string key="NSIdentifier">spatializer</string>
                   <object class="NSView" key="NSView" id="322923036">
-                    <nil key="NSNextResponder"/>
+                    <reference key="NSNextResponder" ref="876119583"/>
                     <int key="NSvFlags">256</int>
                     <object class="NSMutableArray" key="NSSubviews">
                       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -1338,6 +1407,73 @@
                           <int key="BGButtonType">3</int>
                         </object>
                       </object>
+                      <object class="NSButton" id="188755332">
+                        <reference key="NSNextResponder" ref="322923036"/>
+                        <int key="NSvFlags">268</int>
+                        <string key="NSFrame">{{341, 157}, {46, 17}}</string>
+                        <reference key="NSSuperview" ref="322923036"/>
+                        <string key="NSReuseIdentifierKey">_NS:43</string>
+                        <bool key="NSEnabled">YES</bool>
+                        <object class="BGHUDButtonCell" key="NSCell" id="995442362">
+                          <int key="NSCellFlags">67239424</int>
+                          <int key="NSCellFlags2">134479872</int>
+                          <string key="NSContents">Reset</string>
+                          <reference key="NSSupport" ref="22"/>
+                          <string key="NSCellIdentifier">_NS:43</string>
+                          <reference key="NSControlView" ref="188755332"/>
+                          <int key="NSButtonFlags">-2030288641</int>
+                          <int key="NSButtonFlags2">36</int>
+                          <object class="NSImage" key="NSNormalImage">
+                            <int key="NSImageFlags">550174720</int>
+                            <string key="NSSize">{1, 1}</string>
+                            <object class="NSMutableArray" key="NSReps">
+                              <bool key="EncodedWithXMLCoder">YES</bool>
+                              <object class="NSArray">
+                                <bool key="EncodedWithXMLCoder">YES</bool>
+                                <integer value="0"/>
+                                <object class="NSBitmapImageRep">
+                                  <object class="NSData" key="NSTIFFRepresentation">
+                                    <bytes key="NS.bytes">TU0AKgAAAAoAAAAOAQAAAwAAAAEAAQAAAQEAAwAAAAEAAQAAAQIAAwAAAAIACAAIAQMAAwAAAAEAAQAA
+AQYAAwAAAAEAAQAAAREABAAAAAEAAAAIARIAAwAAAAEAAQAAARUAAwAAAAEAAgAAARYAAwAAAAEAAQAA
+ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABh3MABwAABXwAAAC4
+AAAAAAAABXxhcHBsAiAAAG1udHJHUkFZWFlaIAfQAAIADgAMAAAAAGFjc3BBUFBMAAAAAG5vbmUAAAAA
+AAAAAAAAAAAAAAAAAAD21gABAAAAANMtYXBwbAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAABWRlc2MAAADAAAAAb2RzY20AAAEwAAAD7mNwcnQAAAUgAAAAOHd0cHQAAAVY
+AAAAFGtUUkMAAAVsAAAADmRlc2MAAAAAAAAAFUdlbmVyaWMgR3JheSBQcm9maWxlAAAAAAAAAAAAAAAV
+R2VuZXJpYyBHcmF5IFByb2ZpbGUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAABtbHVjAAAAAAAAABMAAAAMcHRCUgAAACoAAAD0ZnJGVQAAACoAAAEeemhUVwAAABAAAAFI
+aXRJVAAAAC4AAAFYbmJOTwAAACwAAAGGa29LUgAAABgAAAGyZGVERQAAADoAAAHKc3ZTRQAAAC4AAAIE
+emhDTgAAABAAAAIyamFKUAAAABYAAAJCcHRQTwAAADgAAAJYbmxOTAAAACoAAAKQZXNFUwAAACgAAAK6
+ZmlGSQAAACwAAALicGxQTAAAADYAAAMOcnVSVQAAACYAAANEYXJFRwAAACgAAANqZW5VUwAAACgAAAOS
+ZGFESwAAADQAAAO6AFAAZQByAGYAaQBsACAAQwBpAG4AegBhACAARwBlAG4A6QByAGkAYwBvAFAAcgBv
+AGYAaQBsACAAZwDpAG4A6QByAGkAcQB1AGUAIABnAHIAaQBzkBp1KHBwlo6Ccl9pY8+P8ABQAHIAbwBm
+AGkAbABvACAAZwByAGkAZwBpAG8AIABnAGUAbgBlAHIAaQBjAG8ARwBlAG4AZQByAGkAcwBrACAAZwBy
+AOUAdABvAG4AZQBwAHIAbwBmAGkAbMd8vBgAIABHAHIAYQB5ACDVBLhc0wzHfABBAGwAbABnAGUAbQBl
+AGkAbgBlAHMAIABHAHIAYQB1AHMAdAB1AGYAZQBuAC0AUAByAG8AZgBpAGwARwBlAG4AZQByAGkAcwBr
+ACAAZwByAOUAcwBrAGEAbABlAHAAcgBvAGYAaQBsZm6QGnBwXqZjz4/wZYdO9k4AgiwwsDDsMKQw1zDt
+MNUwoTCkMOsAUABlAHIAZgBpAGwAIABnAGUAbgDpAHIAaQBjAG8AIABkAGUAIABjAGkAbgB6AGUAbgB0
+AG8AcwBBAGwAZwBlAG0AZQBlAG4AIABnAHIAaQBqAHMAcAByAG8AZgBpAGUAbABQAGUAcgBmAGkAbAAg
+AGcAcgBpAHMAIABnAGUAbgDpAHIAaQBjAG8AWQBsAGUAaQBuAGUAbgAgAGgAYQByAG0AYQBhAHAAcgBv
+AGYAaQBpAGwAaQBVAG4AaQB3AGUAcgBzAGEAbABuAHkAIABwAHIAbwBmAGkAbAAgAHMAegBhAHIAbwFb
+AGMAaQQeBDEESQQ4BDkAIARBBDUEQARLBDkAIAQ/BEAEPgREBDgEOwRMBkUGRAZBACAGKgY5BjEGSgZB
+ACAARwByAGEAeQAgBicGRAY5BicGRQBHAGUAbgBlAHIAaQBjACAARwByAGEAeQAgAFAAcgBvAGYAaQBs
+AGUARwBlAG4AZQByAGUAbAAgAGcAcgDlAHQAbwBuAGUAYgBlAHMAawByAGkAdgBlAGwAcwBlAAB0ZXh0
+AAAAAENvcHlyaWdodCAyMDA3IEFwcGxlIEluYy4sIGFsbCByaWdodHMgcmVzZXJ2ZWQuAFhZWiAAAAAA
+AADzUQABAAAAARbMY3VydgAAAAAAAAABAc0AAA</bytes>
+                                  </object>
+                                </object>
+                              </object>
+                            </object>
+                            <reference key="NSColor" ref="1050243882"/>
+                          </object>
+                          <string key="NSAlternateContents"/>
+                          <string key="NSKeyEquivalent"/>
+                          <int key="NSPeriodicDelay">200</int>
+                          <int key="NSPeriodicInterval">25</int>
+                          <string key="themeKey">gradientTheme</string>
+                          <int key="BGButtonType">7</int>
+                        </object>
+                      </object>
                       <object class="NSTextField" id="276679293">
                         <reference key="NSNextResponder" ref="322923036"/>
                         <int key="NSvFlags">256</int>
@@ -1362,7 +1498,7 @@
                         <string key="NSReuseIdentifierKey">_NS:191</string>
                         <bool key="NSEnabled">YES</bool>
                         <object class="BGHUDSliderCell" key="NSCell" id="75159425">
-                          <int key="NSCellFlags">67239424</int>
+                          <int key="NSCellFlags">67501824</int>
                           <int key="NSCellFlags2">131072</int>
                           <string key="NSContents"/>
                           <string key="NSCellIdentifier">_NS:191</string>
@@ -1402,7 +1538,7 @@
                         <string key="NSReuseIdentifierKey">_NS:191</string>
                         <bool key="NSEnabled">YES</bool>
                         <object class="BGHUDSliderCell" key="NSCell" id="754498492">
-                          <int key="NSCellFlags">67239424</int>
+                          <int key="NSCellFlags">67501824</int>
                           <int key="NSCellFlags2">131072</int>
                           <string key="NSContents"/>
                           <string key="NSCellIdentifier">_NS:191</string>
@@ -1442,7 +1578,7 @@
                         <string key="NSReuseIdentifierKey">_NS:191</string>
                         <bool key="NSEnabled">YES</bool>
                         <object class="BGHUDSliderCell" key="NSCell" id="62457534">
-                          <int key="NSCellFlags">67239424</int>
+                          <int key="NSCellFlags">67501824</int>
                           <int key="NSCellFlags2">131072</int>
                           <string key="NSContents"/>
                           <string key="NSCellIdentifier">_NS:191</string>
@@ -1482,7 +1618,7 @@
                         <string key="NSReuseIdentifierKey">_NS:191</string>
                         <bool key="NSEnabled">YES</bool>
                         <object class="BGHUDSliderCell" key="NSCell" id="647680886">
-                          <int key="NSCellFlags">67239424</int>
+                          <int key="NSCellFlags">67501824</int>
                           <int key="NSCellFlags2">131072</int>
                           <string key="NSContents"/>
                           <string key="NSCellIdentifier">_NS:191</string>
@@ -1522,7 +1658,7 @@
                         <string key="NSReuseIdentifierKey">_NS:191</string>
                         <bool key="NSEnabled">YES</bool>
                         <object class="BGHUDSliderCell" key="NSCell" id="35114134">
-                          <int key="NSCellFlags">67239424</int>
+                          <int key="NSCellFlags">67501824</int>
                           <int key="NSCellFlags2">131072</int>
                           <string key="NSContents"/>
                           <string key="NSCellIdentifier">_NS:191</string>
@@ -1620,6 +1756,7 @@
                       </object>
                     </object>
                     <string key="NSFrame">{{10, 33}, {404, 178}}</string>
+                    <reference key="NSSuperview" ref="876119583"/>
                   </object>
                   <string key="NSLabel">Spatializer</string>
                   <reference key="NSColor" ref="423257821"/>
@@ -1656,7 +1793,7 @@
                         <string key="NSReuseIdentifierKey">_NS:209</string>
                         <bool key="NSEnabled">YES</bool>
                         <object class="BGHUDSliderCell" key="NSCell" id="427048854">
-                          <int key="NSCellFlags">-2080244224</int>
+                          <int key="NSCellFlags">-2079981824</int>
                           <int key="NSCellFlags2">131072</int>
                           <string key="NSContents"/>
                           <string key="NSCellIdentifier">_NS:209</string>
@@ -1732,7 +1869,7 @@
                   <reference key="NSTabView" ref="876119583"/>
                 </object>
               </object>
-              <reference key="NSSelectedTabViewItem" ref="459886568"/>
+              <reference key="NSSelectedTabViewItem" ref="231247297"/>
               <object class="NSFont" key="NSFont">
                 <string key="NSName">LucidaGrande</string>
                 <double key="NSSize">13</double>
@@ -1744,7 +1881,7 @@
               <nil key="themeKey"/>
               <object class="NSMutableArray" key="NSSubviews">
                 <bool key="EncodedWithXMLCoder">YES</bool>
-                <reference ref="327218412"/>
+                <reference ref="322923036"/>
               </object>
             </object>
           </object>
@@ -2348,6 +2485,158 @@
           </object>
           <int key="connectionID">600</int>
         </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">comp_enable:</string>
+            <reference key="source" ref="687991793"/>
+            <reference key="destination" ref="360813730"/>
+          </object>
+          <int key="connectionID">601</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">comp_sliderUpdated:</string>
+            <reference key="source" ref="687991793"/>
+            <reference key="destination" ref="1026127583"/>
+          </object>
+          <int key="connectionID">602</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">comp_sliderUpdated:</string>
+            <reference key="source" ref="687991793"/>
+            <reference key="destination" ref="259964095"/>
+          </object>
+          <int key="connectionID">603</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">comp_sliderUpdated:</string>
+            <reference key="source" ref="687991793"/>
+            <reference key="destination" ref="930805085"/>
+          </object>
+          <int key="connectionID">604</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">comp_sliderUpdated:</string>
+            <reference key="source" ref="687991793"/>
+            <reference key="destination" ref="328850867"/>
+          </object>
+          <int key="connectionID">605</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">comp_sliderUpdated:</string>
+            <reference key="source" ref="687991793"/>
+            <reference key="destination" ref="287960640"/>
+          </object>
+          <int key="connectionID">606</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">comp_sliderUpdated:</string>
+            <reference key="source" ref="687991793"/>
+            <reference key="destination" ref="979247831"/>
+          </object>
+          <int key="connectionID">607</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">comp_sliderUpdated:</string>
+            <reference key="source" ref="687991793"/>
+            <reference key="destination" ref="452050343"/>
+          </object>
+          <int key="connectionID">608</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">spat_enable:</string>
+            <reference key="source" ref="687991793"/>
+            <reference key="destination" ref="1069564620"/>
+          </object>
+          <int key="connectionID">609</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">spat_sliderUpdated:</string>
+            <reference key="source" ref="687991793"/>
+            <reference key="destination" ref="741495357"/>
+          </object>
+          <int key="connectionID">610</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">spat_sliderUpdated:</string>
+            <reference key="source" ref="687991793"/>
+            <reference key="destination" ref="1031346102"/>
+          </object>
+          <int key="connectionID">611</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">spat_sliderUpdated:</string>
+            <reference key="source" ref="687991793"/>
+            <reference key="destination" ref="617363316"/>
+          </object>
+          <int key="connectionID">612</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">spat_sliderUpdated:</string>
+            <reference key="source" ref="687991793"/>
+            <reference key="destination" ref="534023896"/>
+          </object>
+          <int key="connectionID">613</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">spat_sliderUpdated:</string>
+            <reference key="source" ref="687991793"/>
+            <reference key="destination" ref="765211162"/>
+          </object>
+          <int key="connectionID">614</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">filter_enableHeadPhoneVirt:</string>
+            <reference key="source" ref="687991793"/>
+            <reference key="destination" ref="150505351"/>
+          </object>
+          <int key="connectionID">615</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">filter_enableVolumeNorm:</string>
+            <reference key="source" ref="687991793"/>
+            <reference key="destination" ref="743541601"/>
+          </object>
+          <int key="connectionID">616</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">filter_volNormSliderUpdated:</string>
+            <reference key="source" ref="687991793"/>
+            <reference key="destination" ref="955449777"/>
+          </object>
+          <int key="connectionID">617</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">resetCompressorValues:</string>
+            <reference key="source" ref="687991793"/>
+            <reference key="destination" ref="235290804"/>
+          </object>
+          <int key="connectionID">624</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">resetSpatializerValues:</string>
+            <reference key="source" ref="687991793"/>
+            <reference key="destination" ref="188755332"/>
+          </object>
+          <int key="connectionID">625</int>
+        </object>
       </object>
       <object class="IBMutableOrderedSet" key="objectRecords">
         <object class="NSArray" key="orderedObjects">
@@ -2454,6 +2743,7 @@
               <reference ref="735455617"/>
               <reference ref="927121169"/>
               <reference ref="1026127583"/>
+              <reference ref="235290804"/>
             </object>
             <reference key="parent" ref="121148662"/>
           </object>
@@ -2523,6 +2813,7 @@
               <reference ref="1016514058"/>
               <reference ref="251897079"/>
               <reference ref="406416483"/>
+              <reference ref="188755332"/>
             </object>
             <reference key="parent" ref="231247297"/>
           </object>
@@ -3657,6 +3948,34 @@
             <reference key="object" ref="687991793"/>
             <reference key="parent" ref="0"/>
           </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">618</int>
+            <reference key="object" ref="188755332"/>
+            <object class="NSMutableArray" key="children">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <reference ref="995442362"/>
+            </object>
+            <reference key="parent" ref="322923036"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">619</int>
+            <reference key="object" ref="995442362"/>
+            <reference key="parent" ref="188755332"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">621</int>
+            <reference key="object" ref="235290804"/>
+            <object class="NSMutableArray" key="children">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <reference ref="846216840"/>
+            </object>
+            <reference key="parent" ref="605508444"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">622</int>
+            <reference key="object" ref="846216840"/>
+            <reference key="parent" ref="235290804"/>
+          </object>
         </object>
       </object>
       <object class="NSMutableDictionary" key="flattenedProperties">
@@ -3974,6 +4293,12 @@
           <string>347.IBPluginDependency</string>
           <string>348.IBPluginDependency</string>
           <string>353.IBPluginDependency</string>
+          <string>618.IBPluginDependency</string>
+          <string>618.IBViewBoundsToFrameTransform</string>
+          <string>619.IBPluginDependency</string>
+          <string>621.IBPluginDependency</string>
+          <string>621.IBViewBoundsToFrameTransform</string>
+          <string>622.IBPluginDependency</string>
           <string>80.IBAttributePlaceholdersKey</string>
           <string>80.IBPluginDependency</string>
           <string>80.IBViewBoundsToFrameTransform</string>
@@ -4328,7 +4653,7 @@
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.binarymethod.BGHUDAppKitPlugin</string>
           <object class="NSAffineTransform">
-            <bytes key="NSTransformStruct">P4AAAL+AAABDOgAAw2MAAA</bytes>
+            <bytes key="NSTransformStruct">P4AAAL+AAABBYAAAwy0AAA</bytes>
           </object>
           <string>BGHUDLabel</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -4358,7 +4683,7 @@
           <boolean value="YES"/>
           <string>com.binarymethod.BGHUDAppKitPlugin</string>
           <object class="NSAffineTransform">
-            <bytes key="NSTransformStruct">P4AAAL+AAABDtoAAw0sAAA</bytes>
+            <bytes key="NSTransformStruct">P4AAAL+AAABDQQAAwxUAAA</bytes>
           </object>
           <string>BGHUDLabel</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -4449,6 +4774,16 @@
           <string>com.binarymethod.BGHUDAppKitPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+          <string>com.binarymethod.BGHUDAppKitPlugin</string>
+          <object class="NSAffineTransform">
+            <bytes key="NSTransformStruct">P4AAAL+AAABDqoAAwywAAA</bytes>
+          </object>
+          <string>com.binarymethod.BGHUDAppKitPlugin</string>
+          <string>com.binarymethod.BGHUDAppKitPlugin</string>
+          <object class="NSAffineTransform">
+            <bytes key="NSTransformStruct">P4AAAL+AAABDsAAAwxcAAA</bytes>
+          </object>
+          <string>com.binarymethod.BGHUDAppKitPlugin</string>
           <object class="NSMutableDictionary">
             <string key="NS.key.0">InitialTabViewItem</string>
             <object class="IBInitialTabViewItemAttribute" key="NS.object.0">
@@ -4521,7 +4856,7 @@
         </object>
       </object>
       <nil key="sourceID"/>
-      <int key="maxID">600</int>
+      <int key="maxID">625</int>
     </object>
     <object class="IBClassDescriber" key="IBDocument.Classes">
       <object class="NSMutableArray" key="referencedPartialClassDescriptionsV3.1+">
@@ -4533,14 +4868,34 @@
             <bool key="EncodedWithXMLCoder">YES</bool>
             <object class="NSArray" key="dict.sortedKeys">
               <bool key="EncodedWithXMLCoder">YES</bool>
+              <string>comp_enable:</string>
+              <string>comp_sliderUpdated:</string>
               <string>eq_bandSliderUpdated:</string>
               <string>eq_changePreset:</string>
               <string>eq_enable:</string>
               <string>eq_preampSliderUpdated:</string>
               <string>eq_twopass:</string>
+              <string>filter_enableHeadPhoneVirt:</string>
+              <string>filter_enableVolumeNorm:</string>
+              <string>filter_volNormSliderUpdated:</string>
+              <string>resetCompressorValues:</string>
+              <string>resetSpatializerValues:</string>
+              <string>spat_enable:</string>
+              <string>spat_sliderUpdated:</string>
+              <string>toggleWindow:</string>
             </object>
             <object class="NSMutableArray" key="dict.values">
               <bool key="EncodedWithXMLCoder">YES</bool>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
               <string>id</string>
               <string>id</string>
               <string>id</string>
@@ -4552,14 +4907,32 @@
             <bool key="EncodedWithXMLCoder">YES</bool>
             <object class="NSArray" key="dict.sortedKeys">
               <bool key="EncodedWithXMLCoder">YES</bool>
+              <string>comp_enable:</string>
+              <string>comp_sliderUpdated:</string>
               <string>eq_bandSliderUpdated:</string>
               <string>eq_changePreset:</string>
               <string>eq_enable:</string>
               <string>eq_preampSliderUpdated:</string>
               <string>eq_twopass:</string>
+              <string>filter_enableHeadPhoneVirt:</string>
+              <string>filter_enableVolumeNorm:</string>
+              <string>filter_volNormSliderUpdated:</string>
+              <string>resetCompressorValues:</string>
+              <string>resetSpatializerValues:</string>
+              <string>spat_enable:</string>
+              <string>spat_sliderUpdated:</string>
+              <string>toggleWindow:</string>
             </object>
             <object class="NSMutableArray" key="dict.values">
               <bool key="EncodedWithXMLCoder">YES</bool>
+              <object class="IBActionInfo">
+                <string key="name">comp_enable:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">comp_sliderUpdated:</string>
+                <string key="candidateClassName">id</string>
+              </object>
               <object class="IBActionInfo">
                 <string key="name">eq_bandSliderUpdated:</string>
                 <string key="candidateClassName">id</string>
@@ -4578,6 +4951,38 @@
               </object>
               <object class="IBActionInfo">
                 <string key="name">eq_twopass:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">filter_enableHeadPhoneVirt:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">filter_enableVolumeNorm:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">filter_volNormSliderUpdated:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">resetCompressorValues:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">resetSpatializerValues:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">spat_enable:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">spat_sliderUpdated:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">toggleWindow:</string>
                 <string key="candidateClassName">id</string>
               </object>
             </object>
@@ -4648,65 +5053,65 @@
             </object>
             <object class="NSMutableArray" key="dict.values">
               <bool key="EncodedWithXMLCoder">YES</bool>
-              <string>NSTextField</string>
-              <string>NSTextField</string>
-              <string>NSSlider</string>
-              <string>NSTextField</string>
-              <string>NSTextField</string>
-              <string>NSSlider</string>
-              <string>NSTextField</string>
-              <string>NSTextField</string>
-              <string>NSSlider</string>
-              <string>NSTextField</string>
-              <string>NSTextField</string>
-              <string>NSSlider</string>
-              <string>NSTextField</string>
-              <string>NSTextField</string>
-              <string>NSSlider</string>
-              <string>NSTextField</string>
-              <string>NSTextField</string>
-              <string>NSSlider</string>
-              <string>NSTextField</string>
-              <string>NSTextField</string>
-              <string>NSSlider</string>
-              <string>NSButton</string>
-              <string>NSSlider</string>
-              <string>NSSlider</string>
-              <string>NSSlider</string>
-              <string>NSSlider</string>
-              <string>NSSlider</string>
-              <string>NSSlider</string>
-              <string>NSSlider</string>
-              <string>NSSlider</string>
-              <string>NSSlider</string>
-              <string>NSSlider</string>
-              <string>NSButton</string>
-              <string>NSTextField</string>
-              <string>NSSlider</string>
-              <string>NSButton</string>
-              <string>NSButton</string>
-              <string>NSButton</string>
-              <string>NSButton</string>
-              <string>NSTextField</string>
-              <string>NSSlider</string>
-              <string>NSTextField</string>
-              <string>NSTextField</string>
-              <string>NSSlider</string>
-              <string>NSTextField</string>
-              <string>NSTextField</string>
-              <string>NSSlider</string>
-              <string>NSTextField</string>
-              <string>NSTextField</string>
-              <string>NSSlider</string>
-              <string>NSTextField</string>
-              <string>NSTextField</string>
-              <string>NSSlider</string>
-              <string>NSTextField</string>
-              <string>NSTextField</string>
-              <string>NSSlider</string>
-              <string>NSButton</string>
               <string>id</string>
-              <string>NSWindow</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
             </object>
           </object>
           <object class="NSMutableDictionary" key="toOneOutletInfosByName">
@@ -4777,231 +5182,231 @@
               <bool key="EncodedWithXMLCoder">YES</bool>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_comp_band1_fld</string>
-                <string key="candidateClassName">NSTextField</string>
+                <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_comp_band1_lbl</string>
-                <string key="candidateClassName">NSTextField</string>
+                <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_comp_band1_sld</string>
-                <string key="candidateClassName">NSSlider</string>
+                <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_comp_band2_fld</string>
-                <string key="candidateClassName">NSTextField</string>
+                <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_comp_band2_lbl</string>
-                <string key="candidateClassName">NSTextField</string>
+                <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_comp_band2_sld</string>
-                <string key="candidateClassName">NSSlider</string>
+                <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_comp_band3_fld</string>
-                <string key="candidateClassName">NSTextField</string>
+                <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_comp_band3_lbl</string>
-                <string key="candidateClassName">NSTextField</string>
+                <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_comp_band3_sld</string>
-                <string key="candidateClassName">NSSlider</string>
+                <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_comp_band4_fld</string>
-                <string key="candidateClassName">NSTextField</string>
+                <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_comp_band4_lbl</string>
-                <string key="candidateClassName">NSTextField</string>
+                <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_comp_band4_sld</string>
-                <string key="candidateClassName">NSSlider</string>
+                <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_comp_band5_fld</string>
-                <string key="candidateClassName">NSTextField</string>
+                <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_comp_band5_lbl</string>
-                <string key="candidateClassName">NSTextField</string>
+                <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_comp_band5_sld</string>
-                <string key="candidateClassName">NSSlider</string>
+                <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_comp_band6_fld</string>
-                <string key="candidateClassName">NSTextField</string>
+                <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_comp_band6_lbl</string>
-                <string key="candidateClassName">NSTextField</string>
+                <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_comp_band6_sld</string>
-                <string key="candidateClassName">NSSlider</string>
+                <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_comp_band7_fld</string>
-                <string key="candidateClassName">NSTextField</string>
+                <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_comp_band7_lbl</string>
-                <string key="candidateClassName">NSTextField</string>
+                <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_comp_band7_sld</string>
-                <string key="candidateClassName">NSSlider</string>
+                <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_comp_enable_ckb</string>
-                <string key="candidateClassName">NSButton</string>
+                <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_eq_band10_sld</string>
-                <string key="candidateClassName">NSSlider</string>
+                <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_eq_band1_sld</string>
-                <string key="candidateClassName">NSSlider</string>
+                <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_eq_band2_sld</string>
-                <string key="candidateClassName">NSSlider</string>
+                <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_eq_band3_sld</string>
-                <string key="candidateClassName">NSSlider</string>
+                <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_eq_band4_sld</string>
-                <string key="candidateClassName">NSSlider</string>
+                <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_eq_band5_sld</string>
-                <string key="candidateClassName">NSSlider</string>
+                <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_eq_band6_sld</string>
-                <string key="candidateClassName">NSSlider</string>
+                <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_eq_band7_sld</string>
-                <string key="candidateClassName">NSSlider</string>
+                <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_eq_band8_sld</string>
-                <string key="candidateClassName">NSSlider</string>
+                <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_eq_band9_sld</string>
-                <string key="candidateClassName">NSSlider</string>
+                <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_eq_enable_ckb</string>
-                <string key="candidateClassName">NSButton</string>
+                <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_eq_preamp_lbl</string>
-                <string key="candidateClassName">NSTextField</string>
+                <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_eq_preamp_sld</string>
-                <string key="candidateClassName">NSSlider</string>
+                <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_eq_presets_popup</string>
-                <string key="candidateClassName">NSButton</string>
+                <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_eq_twopass_ckb</string>
-                <string key="candidateClassName">NSButton</string>
+                <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_filter_headPhone_ckb</string>
-                <string key="candidateClassName">NSButton</string>
+                <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_filter_normLevel_ckb</string>
-                <string key="candidateClassName">NSButton</string>
+                <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_filter_normLevel_lbl</string>
-                <string key="candidateClassName">NSTextField</string>
+                <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_filter_normLevel_sld</string>
-                <string key="candidateClassName">NSSlider</string>
+                <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_spat_band1_fld</string>
-                <string key="candidateClassName">NSTextField</string>
+                <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_spat_band1_lbl</string>
-                <string key="candidateClassName">NSTextField</string>
+                <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_spat_band1_sld</string>
-                <string key="candidateClassName">NSSlider</string>
+                <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_spat_band2_fld</string>
-                <string key="candidateClassName">NSTextField</string>
+                <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_spat_band2_lbl</string>
-                <string key="candidateClassName">NSTextField</string>
+                <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_spat_band2_sld</string>
-                <string key="candidateClassName">NSSlider</string>
+                <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_spat_band3_fld</string>
-                <string key="candidateClassName">NSTextField</string>
+                <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_spat_band3_lbl</string>
-                <string key="candidateClassName">NSTextField</string>
+                <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_spat_band3_sld</string>
-                <string key="candidateClassName">NSSlider</string>
+                <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_spat_band4_fld</string>
-                <string key="candidateClassName">NSTextField</string>
+                <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_spat_band4_lbl</string>
-                <string key="candidateClassName">NSTextField</string>
+                <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_spat_band4_sld</string>
-                <string key="candidateClassName">NSSlider</string>
+                <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_spat_band5_fld</string>
-                <string key="candidateClassName">NSTextField</string>
+                <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_spat_band5_lbl</string>
-                <string key="candidateClassName">NSTextField</string>
+                <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_spat_band5_sld</string>
-                <string key="candidateClassName">NSSlider</string>
+                <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_spat_enable_ckb</string>
-                <string key="candidateClassName">NSButton</string>
+                <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_tableView</string>
@@ -5009,7 +5414,7 @@
               </object>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_window</string>
-                <string key="candidateClassName">NSWindow</string>
+                <string key="candidateClassName">id</string>
               </object>
             </object>
           </object>
