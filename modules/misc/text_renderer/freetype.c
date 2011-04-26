@@ -551,6 +551,8 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region,
     if( p_region->fmt.i_visible_height > 0 )
         fmt.i_visible_height = p_region->fmt.i_visible_height;
     fmt.i_x_offset = fmt.i_y_offset = 0;
+    fmt.i_sar_num = 1;
+    fmt.i_sar_den = 1;
 
     assert( !p_region->p_picture );
     p_region->p_picture = picture_NewFromFormat( &fmt );
@@ -816,6 +818,8 @@ static int RenderYUVA( filter_t *p_filter, subpicture_region_t *p_region,
     if( p_region->fmt.i_visible_height > 0 )
         fmt.i_visible_height = p_region->fmt.i_visible_height;
     fmt.i_x_offset = fmt.i_y_offset = 0;
+    fmt.i_sar_num = 1;
+    fmt.i_sar_den = 1;
 
     p_region->p_picture = picture_NewFromFormat( &fmt );
     if( !p_region->p_picture )

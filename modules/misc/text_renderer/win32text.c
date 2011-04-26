@@ -226,6 +226,8 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region,
     fmt.i_width = fmt.i_visible_width = i_width + (b_outline ? 4 : 0);
     fmt.i_height = fmt.i_visible_height = i_height + (b_outline ? 4 : 0);
     fmt.i_x_offset = fmt.i_y_offset = 0;
+    fmt.i_sar_num = 1;
+    fmt.i_sar_den = 1;
 
     /* Build palette */
     fmt.p_palette = calloc( 1, sizeof(*fmt.p_palette) );
