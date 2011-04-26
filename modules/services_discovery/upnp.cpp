@@ -755,36 +755,15 @@ bool MediaServer::_fetchContents( Container* p_parent )
             if ( !objectID )
                 continue;
 
-            const char* childCountStr =
-                    ixmlElement_getAttribute( containerElement, "childCount" );
-
-            if ( !childCountStr )
-                continue;
-
-            int childCount = atoi( childCountStr );
             const char* title = xml_getChildElementValue( containerElement,
                                                           "dc:title" );
 
             if ( !title )
                 continue;
 
-            const char* resource = xml_getChildElementValue( containerElement,
-                                                             "res" );
-
-            if ( resource && childCount < 1 )
-            {
-                Item* item = new Item( p_parent, objectID, title, resource, -1 );
-                p_parent->addItem( item );
-            }
-
-            else
-            {
-                Container* container = new Container( p_parent, objectID, title );
-                p_parent->addContainer( container );
-
-                if ( childCount > 0 )
-                    _fetchContents( container );
-            }
+            Container* container = new Container( p_parent, objectID, title );
+            p_parent->addContainer( container );
+            _fetchContents( container );
         }
         ixmlNodeList_free( containerNodeList );
     }
