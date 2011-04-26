@@ -74,6 +74,9 @@ static void DemuxClose( vlc_object_t * );
 static int  AccessOpen ( vlc_object_t * );
 static void AccessClose( vlc_object_t * );
 
+#define DEVICE_TEXT N_( "Device" )
+#define DEVICE_LONGTEXT N_( \
+    "Video device (Default: /dev/video0)." )
 #define STANDARD_TEXT N_( "Standard" )
 #define STANDARD_LONGTEXT N_( \
     "Video standard (Default, SECAM, PAL, or NTSC)." )
@@ -281,6 +284,8 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_INPUT_ACCESS )
 
     set_section( N_( "Video input" ), NULL )
+    add_string( CFG_PREFIX "dev", "/dev/video0", DEVICE_TEXT, DEVICE_LONGTEXT,
+                 false )
     add_integer( CFG_PREFIX "standard", 0, STANDARD_TEXT,
                  STANDARD_LONGTEXT, false )
         change_integer_list( i_standards_list, psz_standards_list_text )
@@ -705,6 +710,8 @@ static int DemuxOpen( vlc_object_t *p_this )
  *****************************************************************************/
 static void GetV4L2Params( demux_sys_t *p_sys, vlc_object_t *p_obj )
 {
+    p_sys->psz_device = var_CreateGetNonEmptyString( p_obj, "v4l2-dev" );
+
     p_sys->i_selected_standard_id =
         i_standards_list[var_CreateGetInteger( p_obj, "v4l2-standard" )];
 
@@ -743,7 +750,6 @@ static void GetV4L2Params( demux_sys_t *p_sys, vlc_object_t *p_obj )
     }
     free( psz_aspect );
 
-    p_sys->psz_device = NULL;
     p_sys->i_fd = -1;
 
     p_sys->p_es = NULL;
@@ -1001,8 +1007,11 @@ static void ParseMRL( demux_sys_t *p_sys, char *psz_path, vlc_object_t *p_obj )
 
     /* Main device */
     if( *psz_dup )
+    {
+        free( p_sys->psz_device );
         p_sys->psz_device = strdup( psz_dup );
-    else
+    }
+    else if( p_sys->psz_device == NULL )
         p_sys->psz_device = strdup( V4L2_DEFAULT );
     free( psz_dup );
 }
