@@ -55,14 +55,18 @@ static void OSDTextUpdate(subpicture_t *subpic,
                           mtime_t ts)
 {
     subpicture_updater_sys_t *sys = subpic->updater.p_sys;
-    VLC_UNUSED(fmt_dst); VLC_UNUSED(ts);
+    VLC_UNUSED(fmt_src); VLC_UNUSED(ts);
 
-    subpic->i_original_picture_width  = fmt_src->i_width;
-    subpic->i_original_picture_height = fmt_src->i_height;
+    if( fmt_dst->i_sar_num <= 0 || fmt_dst->i_sar_den <= 0 )
+        return;
+
+    subpic->b_absolute = false;
+    subpic->i_original_picture_width  = fmt_dst->i_width * fmt_dst->i_sar_num / fmt_dst->i_sar_den;
+    subpic->i_original_picture_height = fmt_dst->i_height;
 
     video_format_t fmt;
     video_format_Init( &fmt, VLC_CODEC_TEXT);
-    fmt.i_sar_num = 0;
+    fmt.i_sar_num = 1;
     fmt.i_sar_den = 1;
 
     subpicture_region_t *r = subpic->p_region = subpicture_region_New(&fmt);
@@ -70,11 +74,23 @@ static void OSDTextUpdate(subpicture_t *subpic,
         return;
 
     r->psz_text = strdup(sys->text);
-    r->i_align  = sys->position;
-    r->i_x      = 30 + fmt_src->i_width
-                     - fmt_src->i_visible_width
-                     - fmt_src->i_x_offset;
-    r->i_y      = 20 + fmt_src->i_y_offset;
+
+    const float margin_ratio = 0.04;
+    const int   margin_h     = margin_ratio * fmt_dst->i_visible_width;
+    const int   margin_v     = margin_ratio * fmt_dst->i_visible_height;
+
+    r->i_align = sys->position;
+    r->i_x = 0;
+    if (r->i_align & SUBPICTURE_ALIGN_LEFT)
+        r->i_x += margin_h + fmt_dst->i_x_offset;
+    else if (r->i_align & SUBPICTURE_ALIGN_RIGHT)
+        r->i_x += margin_h + fmt_dst->i_width - (fmt_dst->i_visible_width + fmt_dst->i_x_offset);
+
+    r->i_y = 0;
+    if (r->i_align & SUBPICTURE_ALIGN_TOP )
+        r->i_y += margin_v + fmt_dst->i_y_offset;
+    else if (r->i_align & SUBPICTURE_ALIGN_BOTTOM )
+        r->i_y += margin_v + fmt_dst->i_height - (fmt_dst->i_visible_height + fmt_dst->i_y_offset);
 }
 
 static void OSDTextDestroy(subpicture_t *subpic)
