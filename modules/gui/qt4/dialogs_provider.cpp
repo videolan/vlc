@@ -681,16 +681,23 @@ void DialogsProvider::loadSubtitlesFile()
     input_item_t *p_item = input_GetItem( p_input );
     if( !p_item ) return;
 
-    char *path = make_path( input_item_GetURI( p_item ) );
-    if( !path ) path = strdup( "" );
-
-    char *sep = strrchr( path, DIR_SEP_CHAR );
-    if( sep ) *sep = '\0';
+    char *path = input_item_GetURI( p_item );
+    char *path2 = NULL;
+    if( path )
+    {
+        path2 = make_path( path );
+        free( path );
+        if( path2 )
+        {
+            char *sep = strrchr( path2, DIR_SEP_CHAR );
+            if( sep ) *sep = '\0';
+        }
+    }
 
     QStringList qsl = showSimpleOpen( qtr( "Open subtitles..." ),
                                       EXT_FILTER_SUBTITLE,
-                                      qfu( path ) );
-    free( path );
+                                      qfu( path2 ) );
+    free( path2 );
     foreach( const QString &qsFile, qsl )
     {
         if( input_AddSubtitle( p_input, qtu( toNativeSeparators( qsFile ) ),
