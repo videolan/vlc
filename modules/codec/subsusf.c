@@ -23,30 +23,23 @@
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
-
-#include "subsdec.h"
-#include <vlc_plugin.h>
-#include <vlc_modules.h>
 #include <assert.h>
 
-/*****************************************************************************
- * Local prototypes
- *****************************************************************************/
-static int  OpenDecoder   ( vlc_object_t * );
-static void CloseDecoder  ( vlc_object_t * );
-
-static subpicture_t *DecodeBlock   ( decoder_t *, block_t ** );
-static char         *CreatePlainText( char * );
-static int           ParseImageAttachments( decoder_t *p_dec );
-
-static subpicture_t        *ParseText     ( decoder_t *, block_t * );
-static void                 ParseUSFHeader( decoder_t * );
-static subpicture_region_t *ParseUSFString( decoder_t *, char * );
-static subpicture_region_t *LoadEmbeddedImage( decoder_t *p_dec, const char *psz_filename, int i_transparent_color );
+#include <vlc_common.h>
+#include <vlc_plugin.h>
+#include <vlc_modules.h>
+#include <vlc_codec.h>
+#include <vlc_input.h>
+#include <vlc_charset.h>
+#include <vlc_image.h>
+#include <vlc_xml.h>
+#include <vlc_stream.h>
 
 /*****************************************************************************
  * Module descriptor.
  *****************************************************************************/
+static int  OpenDecoder   ( vlc_object_t * );
+static void CloseDecoder  ( vlc_object_t * );
 
 vlc_module_begin ()
     set_capability( "decoder", 40 )
@@ -57,6 +50,58 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_INPUT_SCODEC )
     /* We inherit subsdec-align and subsdec-formatted from subsdec.c */
 vlc_module_end ()
+
+
+/*****************************************************************************
+ * Local prototypes
+ *****************************************************************************/
+enum
+{
+    ATTRIBUTE_ALIGNMENT = (1 << 0),
+    ATTRIBUTE_X         = (1 << 1),
+    ATTRIBUTE_X_PERCENT = (1 << 2),
+    ATTRIBUTE_Y         = (1 << 3),
+    ATTRIBUTE_Y_PERCENT = (1 << 4),
+};
+
+typedef struct
+{
+    char       *psz_filename;
+    picture_t  *p_pic;
+} image_attach_t;
+
+typedef struct
+{
+    char *          psz_stylename; /* The name of the style, no comma's allowed */
+    text_style_t    font_style;
+    int             i_align;
+    int             i_margin_h;
+    int             i_margin_v;
+    int             i_margin_percent_h;
+    int             i_margin_percent_v;
+}  ssa_style_t;
+
+struct decoder_sys_t
+{
+    int                 i_original_height;
+    int                 i_original_width;
+    int                 i_align;          /* Subtitles alignment on the vout */
+
+    ssa_style_t         **pp_ssa_styles;
+    int                 i_ssa_styles;
+
+    image_attach_t      **pp_images;
+    int                 i_images;
+};
+
+static subpicture_t *DecodeBlock   ( decoder_t *, block_t ** );
+static char         *CreatePlainText( char * );
+static int           ParseImageAttachments( decoder_t *p_dec );
+
+static subpicture_t        *ParseText     ( decoder_t *, block_t * );
+static void                 ParseUSFHeader( decoder_t * );
+static subpicture_region_t *ParseUSFString( decoder_t *, char * );
+static subpicture_region_t *LoadEmbeddedImage( decoder_t *p_dec, const char *psz_filename, int i_transparent_color );
 
 /*****************************************************************************
  * OpenDecoder: probe the decoder and return score
@@ -79,10 +124,6 @@ static int OpenDecoder( vlc_object_t *p_this )
     p_dec->pf_decode_sub = DecodeBlock;
     p_dec->fmt_out.i_cat = SPU_ES;
     p_dec->fmt_out.i_codec = 0;
-
-    /* Unused fields of p_sys - not needed for USF decoding */
-    p_sys->iconv_handle = (vlc_iconv_t)-1;
-    p_sys->b_autodetect_utf8 = false;
 
     /* init of p_sys */
     p_sys->i_align = 0;

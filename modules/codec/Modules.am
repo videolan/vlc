@@ -33,8 +33,8 @@ SOURCES_kate = kate.c
 SOURCES_schroedinger = schroedinger.c
 SOURCES_libass = libass.c
 SOURCES_aes3 = aes3.c
-SOURCES_subsdec = subsdec.c subsdec.h
-SOURCES_subsusf = subsusf.c subsdec.h
+SOURCES_subsdec = subsdec.c
+SOURCES_subsusf = subsusf.c
 SOURCES_t140 = t140.c
 SOURCES_crystalhd = crystalhd.c
 

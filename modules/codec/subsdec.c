@@ -31,20 +31,10 @@
 # include "config.h"
 #endif
 
-#include "subsdec.h"
+#include <vlc_common.h>
 #include <vlc_plugin.h>
-
-/*****************************************************************************
- * Local prototypes
- *****************************************************************************/
-static int  OpenDecoder   ( vlc_object_t * );
-static void CloseDecoder  ( vlc_object_t * );
-
-static subpicture_t   *DecodeBlock   ( decoder_t *, block_t ** );
-static subpicture_t   *ParseText     ( decoder_t *, block_t * );
-static char           *StripTags      ( char * );
-static char           *CreateHtmlSubtitle( int *pi_align, char * );
-
+#include <vlc_codec.h>
+#include <vlc_charset.h>
 
 /*****************************************************************************
  * Module descriptor.
@@ -178,6 +168,8 @@ static const char *const ppsz_justification_text[] = {
 #define FORMAT_LONGTEXT N_("Some subtitle formats allow for text formatting. " \
  "VLC partly implements this, but you can choose to disable all formatting.")
 
+static int  OpenDecoder   ( vlc_object_t * );
+static void CloseDecoder  ( vlc_object_t * );
 
 vlc_module_begin ()
     set_shortname( N_("Subtitles"))
@@ -198,6 +190,25 @@ vlc_module_begin ()
     add_bool( "subsdec-formatted", true, FORMAT_TEXT, FORMAT_LONGTEXT,
                  false )
 vlc_module_end ()
+
+/*****************************************************************************
+ * Local prototypes
+ *****************************************************************************/
+#define NO_BREAKING_SPACE  "&#160;"
+
+struct decoder_sys_t
+{
+    int                 i_align;          /* Subtitles alignment on the vout */
+
+    vlc_iconv_t         iconv_handle;            /* handle to iconv instance */
+    bool                b_autodetect_utf8;
+};
+
+
+static subpicture_t   *DecodeBlock   ( decoder_t *, block_t ** );
+static subpicture_t   *ParseText     ( decoder_t *, block_t * );
+static char           *StripTags      ( char * );
+static char           *CreateHtmlSubtitle( int *pi_align, char * );
 
 /*****************************************************************************
  * OpenDecoder: probe the decoder and return score
@@ -232,10 +243,6 @@ static int OpenDecoder( vlc_object_t *p_this )
     p_sys->i_align = 0;
     p_sys->iconv_handle = (vlc_iconv_t)-1;
     p_sys->b_autodetect_utf8 = false;
-    p_sys->i_original_height = -1;
-    p_sys->i_original_width = -1;
-    TAB_INIT( p_sys->i_ssa_styles, p_sys->pp_ssa_styles );
-    TAB_INIT( p_sys->i_images, p_sys->pp_images );
 
     char *psz_charset = NULL;
 
@@ -351,37 +358,6 @@ static void CloseDecoder( vlc_object_t *p_this )
 
     if( p_sys->iconv_handle != (vlc_iconv_t)-1 )
         vlc_iconv_close( p_sys->iconv_handle );
-
-    if( p_sys->pp_ssa_styles )
-    {
-        int i;
-        for( i = 0; i < p_sys->i_ssa_styles; i++ )
-        {
-            if( !p_sys->pp_ssa_styles[i] )
-                continue;
-
-            free( p_sys->pp_ssa_styles[i]->psz_stylename );
-            free( p_sys->pp_ssa_styles[i]->font_style.psz_fontname );
-            free( p_sys->pp_ssa_styles[i] );
-        }
-        TAB_CLEAN( p_sys->i_ssa_styles, p_sys->pp_ssa_styles );
-    }
-    if( p_sys->pp_images )
-    {
-        int i;
-        for( i = 0; i < p_sys->i_images; i++ )
-        {
-            if( !p_sys->pp_images[i] )
-                continue;
-
-            if( p_sys->pp_images[i]->p_pic )
-                picture_Release( p_sys->pp_images[i]->p_pic );
-            free( p_sys->pp_images[i]->psz_filename );
-
-            free( p_sys->pp_images[i] );
-        }
-        TAB_CLEAN( p_sys->i_images, p_sys->pp_images );
-    }
 
     free( p_sys );
 }
@@ -515,24 +491,6 @@ static subpicture_t *ParseText( decoder_t *p_dec, block_t *p_block )
     free( psz_subtitle );
 
     return p_spu;
-}
-
-char* GotoNextLine( char *psz_text )
-{
-    char *p_newline = psz_text;
-
-    while( p_newline[0] != '\0' )
-    {
-        if( p_newline[0] == '\n' || p_newline[0] == '\r' )
-        {
-            p_newline++;
-            while( p_newline[0] == '\n' || p_newline[0] == '\r' )
-                p_newline++;
-            break;
-        }
-        else p_newline++;
-    }
-    return p_newline;
 }
 
 /* Function now handles tags with attribute values, and tries
