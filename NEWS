@@ -118,6 +118,7 @@ Removed modules:
  * hal, v4l, gapi, omapfb, hd1000a, hd1000v: obsolete unmaintained modules
  * id3tag: use taglib
  * upnp: use upnp_intel
+ * subsass: use libass
 
 
 Changes between 1.1.8 and 1.1.9:
