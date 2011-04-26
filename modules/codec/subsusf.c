@@ -81,7 +81,6 @@ static int OpenDecoder( vlc_object_t *p_this )
     p_dec->fmt_out.i_codec = 0;
 
     /* Unused fields of p_sys - not needed for USF decoding */
-    p_sys->b_ass = false;
     p_sys->iconv_handle = (vlc_iconv_t)-1;
     p_sys->b_autodetect_utf8 = false;
 

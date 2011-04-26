@@ -162,31 +162,6 @@ static const char *const ppsz_encoding_names[] = {
     N_("Vietnamese (VISCII)"),
     N_("Vietnamese (Windows-1258)"),
 };
-/*
-SSA supports charset selection.
-The following known charsets are used:
-
-0 = Ansi - Western European
-1 = default
-2 = symbol
-3 = invalid
-77 = Mac
-128 = Japanese (Shift JIS)
-129 = Hangul
-130 = Johab
-134 = GB2312 Simplified Chinese
-136 = Big5 Traditional Chinese
-161 = Greek
-162 = Turkish
-163 = Vietnamese
-177 = Hebrew
-178 = Arabic
-186 = Baltic
-204 = Russian (Cyrillic)
-222 = Thai
-238 = Eastern European
-254 = PC 437
-*/
 
 static const int  pi_justification[] = { 0, 1, 2 };
 static const char *const ppsz_justification_text[] = {
@@ -238,7 +213,6 @@ static int OpenDecoder( vlc_object_t *p_this )
     switch( p_dec->fmt_in.i_codec )
     {
         case VLC_CODEC_SUBT:
-        case VLC_CODEC_SSA:
         case VLC_CODEC_ITU_T140:
             break;
         default:
@@ -258,7 +232,6 @@ static int OpenDecoder( vlc_object_t *p_this )
     p_sys->i_align = 0;
     p_sys->iconv_handle = (vlc_iconv_t)-1;
     p_sys->b_autodetect_utf8 = false;
-    p_sys->b_ass = false;
     p_sys->i_original_height = -1;
     p_sys->i_original_width = -1;
     TAB_INIT( p_sys->i_ssa_styles, p_sys->pp_ssa_styles );
@@ -336,13 +309,6 @@ static int OpenDecoder( vlc_object_t *p_this )
     free (psz_charset);
 
     p_sys->i_align = var_InheritInteger( p_dec, "subsdec-align" );
-
-    if( p_dec->fmt_in.i_codec == VLC_CODEC_SSA
-     && var_InheritBool( p_dec, "subsdec-formatted" ) )
-    {
-        if( p_dec->fmt_in.i_extra > 0 )
-            ParseSSAHeader( p_dec );
-    }
 
     return VLC_SUCCESS;
 }
@@ -529,39 +495,23 @@ static subpicture_t *ParseText( decoder_t *p_dec, block_t *p_block )
         return NULL;
     }
 
-    /* Decode and format the subpicture unit */
-    if( p_dec->fmt_in.i_codec != VLC_CODEC_SSA )
+    /* Normal text subs, easy markup */
+    p_spu->p_region->i_align = SUBPICTURE_ALIGN_BOTTOM | p_sys->i_align;
+    p_spu->p_region->i_x = p_sys->i_align ? 20 : 0;
+    p_spu->p_region->i_y = 10;
+
+    /* Remove formatting from string */
+
+    p_spu->p_region->psz_text = StripTags( psz_subtitle );
+    if( var_InheritBool( p_dec, "subsdec-formatted" ) )
     {
-        /* Normal text subs, easy markup */
-        p_spu->p_region->i_align = SUBPICTURE_ALIGN_BOTTOM | p_sys->i_align;
-        p_spu->p_region->i_x = p_sys->i_align ? 20 : 0;
-        p_spu->p_region->i_y = 10;
-
-        /* Remove formatting from string */
-
-        p_spu->p_region->psz_text = StripTags( psz_subtitle );
-        if( var_InheritBool( p_dec, "subsdec-formatted" ) )
-        {
-            p_spu->p_region->psz_html = CreateHtmlSubtitle( &p_spu->p_region->i_align, psz_subtitle );
-        }
-
-        p_spu->i_start = p_block->i_pts;
-        p_spu->i_stop = p_block->i_pts + p_block->i_length;
-        p_spu->b_ephemer = (p_block->i_length == 0);
-        p_spu->b_absolute = false;
+        p_spu->p_region->psz_html = CreateHtmlSubtitle( &p_spu->p_region->i_align, psz_subtitle );
     }
-    else
-    {
-        /* Decode SSA/USF strings */
-        ParseSSAString( p_dec, psz_subtitle, p_spu );
 
-        p_spu->i_start = p_block->i_pts;
-        p_spu->i_stop = p_block->i_pts + p_block->i_length;
-        p_spu->b_ephemer = (p_block->i_length == 0);
-        p_spu->b_absolute = false;
-        p_spu->i_original_picture_width = p_sys->i_original_width;
-        p_spu->i_original_picture_height = p_sys->i_original_height;
-    }
+    p_spu->i_start = p_block->i_pts;
+    p_spu->i_stop = p_block->i_pts + p_block->i_length;
+    p_spu->b_ephemer = (p_block->i_length == 0);
+    p_spu->b_absolute = false;
     free( psz_subtitle );
 
     return p_spu;

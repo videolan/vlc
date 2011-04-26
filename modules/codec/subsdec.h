@@ -74,8 +74,6 @@ typedef struct
  *****************************************************************************/
 struct decoder_sys_t
 {
-    bool                b_ass;                           /* The subs are ASS */
-
     int                 i_original_height;
     int                 i_original_width;
     int                 i_align;          /* Subtitles alignment on the vout */
@@ -92,8 +90,5 @@ struct decoder_sys_t
 
 
 char                *GotoNextLine( char *psz_text );
-
-void                ParseSSAHeader ( decoder_t * );
-void                ParseSSAString ( decoder_t *, char *, subpicture_t * );
 
 #endif
