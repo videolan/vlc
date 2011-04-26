@@ -278,6 +278,7 @@ private:
     QTimer *p_slowHideTimer;
     bool b_slow_hide_begin;
     int  i_slow_hide_timeout;
+    float f_opacity;
 #endif
 
     int i_mouse_last_x, i_mouse_last_y;

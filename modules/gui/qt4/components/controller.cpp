@@ -743,6 +743,7 @@ FullscreenControllerWidget::FullscreenControllerWidget( intf_thread_t *_p_i, QWi
 #if HAVE_TRANSPARENCY
     p_slowHideTimer = new QTimer( this );
     CONNECT( p_slowHideTimer, timeout(), this, slowHideFSC() );
+    f_opacity = var_InheritFloat( p_intf, "qt-fs-opacity" )
 #endif
 
     vlc_mutex_init_recursive( &lock );
@@ -811,7 +812,7 @@ void FullscreenControllerWidget::showFSC()
     }
 
 #if HAVE_TRANSPARENCY
-    setWindowOpacity( var_InheritFloat( p_intf, "qt-fs-opacity" )  );
+    setWindowOpacity( f_opacity );
 #endif
 
 #ifdef Q_WS_X11
@@ -972,7 +973,7 @@ void FullscreenControllerWidget::enterEvent( QEvent *event )
     p_hideTimer->stop();
 #if HAVE_TRANSPARENCY
     p_slowHideTimer->stop();
-    setWindowOpacity( DEFAULT_OPACITY );
+    setWindowOpacity( f_opacity );
 #endif
     event->accept();
 }
