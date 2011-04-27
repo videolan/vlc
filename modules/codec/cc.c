@@ -36,20 +36,13 @@
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
+#include <string.h>
+#include <assert.h>
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_codec.h>
-#include <vlc_input.h>
-
-#include <vlc_filter.h>
-#include <vlc_image.h>
 #include <vlc_charset.h>
-#include <vlc_stream.h>
-#include <vlc_xml.h>
-#include <string.h>
-
-#include <assert.h>
 
 #include "substext.h"
 
