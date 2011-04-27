@@ -17830,11 +17830,11 @@ msgstr "Sorteren op"
 
 #: modules/gui/qt4/components/playlist/playlist_model.cpp:980
 msgid "Ascending"
-msgstr "Aflopend"
+msgstr "Oplopend"
 
 #: modules/gui/qt4/components/playlist/playlist_model.cpp:981
 msgid "Descending"
-msgstr "Oplopend"
+msgstr "Aflopend"
 
 #: modules/gui/qt4/components/playlist/selector.cpp:248
 msgid "Remove this podcast subscription"
