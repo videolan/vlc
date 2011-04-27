@@ -338,7 +338,7 @@ ExtraMetaPanel::ExtraMetaPanel( QWidget *parent,
      extraMetaTree->setAlternatingRowColors( true );
      extraMetaTree->setColumnCount( 2 );
      extraMetaTree->resizeColumnToContents( 0 );
-     extraMetaTree->header()->hide();
+     extraMetaTree->setHeaderHidden( true );
      layout->addWidget( extraMetaTree, 1, 0 );
 }
 
@@ -485,7 +485,7 @@ InputStatsPanel::InputStatsPanel( QWidget *parent,
 
      StatsTree = new QTreeWidget(this);
      StatsTree->setColumnCount( 3 );
-     StatsTree->header()->hide();
+     StatsTree->setHeaderHidden( true );
 
 #define CREATE_TREE_ITEM( itemName, itemText, itemValue, unit ) {              \
     itemName =                                                                 \

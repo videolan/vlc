@@ -50,7 +50,6 @@
 #include <QDateTimeEdit>
 #include <QDateTime>
 #include <QSpinBox>
-#include <QHeaderView>
 #include <QScrollArea>
 #include <QFileDialog>
 

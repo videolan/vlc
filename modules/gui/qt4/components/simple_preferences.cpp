@@ -887,7 +887,6 @@ void SPrefsPanel::changeStyle( QString s_style )
 
 #ifdef WIN32
 #include <QDialogButtonBox>
-#include <QHeaderView>
 #include "util/registry.hpp"
 #include <string>
 

@@ -35,7 +35,6 @@
 #include <QScrollArea>
 #include <QVBoxLayout>
 #include <QGridLayout>
-#include <QHeaderView>
 
 #include "components/complete_preferences.hpp"
 #include "components/preferences_widgets.hpp"
