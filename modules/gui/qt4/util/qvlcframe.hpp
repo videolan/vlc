@@ -188,9 +188,7 @@ protected:
 class QVLCMW : public QMainWindow
 {
 public:
-    QVLCMW( intf_thread_t *_p_intf ) : QMainWindow( NULL ), p_intf( _p_intf )
-    {    }
-    virtual ~QVLCMW() {};
+    QVLCMW( intf_thread_t *_p_intf ) : QMainWindow( NULL ), p_intf( _p_intf ){}
     void toggleVisible()
     {
         if( isVisible() ) hide();

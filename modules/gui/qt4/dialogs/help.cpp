@@ -57,12 +57,14 @@ HelpDialog::HelpDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
     setMinimumSize( 350, 300 );
 
     QVBoxLayout *layout = new QVBoxLayout( this );
+
     QTextBrowser *helpBrowser = new QTextBrowser( this );
     helpBrowser->setOpenExternalLinks( true );
     helpBrowser->setHtml( qtr(I_LONGHELP) );
-    QDialogButtonBox *closeButtonBox = new QDialogButtonBox( Qt::Horizontal, this );
+
+    QDialogButtonBox *closeButtonBox = new QDialogButtonBox( this );
     closeButtonBox->addButton(
-        new QPushButton( qtr("&Close"), this ), QDialogButtonBox::RejectRole );
+        new QPushButton( qtr("&Close") ), QDialogButtonBox::RejectRole );
     closeButtonBox->setFocus();
 
     layout->addWidget( helpBrowser );
@@ -77,11 +79,6 @@ HelpDialog::~HelpDialog()
     writeSettings( "Help" );
 }
 
-void HelpDialog::close()
-{
-    toggleVisible();
-}
-
 AboutDialog::AboutDialog( intf_thread_t *_p_intf)
             : QVLCDialog( (QWidget*)_p_intf->p_sys->p_mi, _p_intf )
 {
@@ -92,8 +89,8 @@ AboutDialog::AboutDialog( intf_thread_t *_p_intf)
 
     setWindowTitle( qtr( "About" ) );
     setWindowRole( "vlc-about" );
-    resize( 600, 500 );
     setMinimumSize( 600, 500 );
+    resize( 600, 500 );
     setWindowModality( Qt::WindowModal );
 
     CONNECT( ui.closeButtonBox, rejected(), this, close() );
@@ -131,15 +128,6 @@ AboutDialog::AboutDialog( intf_thread_t *_p_intf)
 
     /* People who wrote the software */
     ui.authorsEdit->setText( qfu( psz_authors ) );
-}
-
-AboutDialog::~AboutDialog()
-{
-}
-
-void AboutDialog::close()
-{
-    toggleVisible();
 }
 
 #ifdef UPDATE_CHECK
@@ -201,11 +189,6 @@ UpdateDialog::~UpdateDialog()
 {
     update_Delete( p_update );
     writeSettings( "Update" );
-}
-
-void UpdateDialog::close()
-{
-    toggleVisible();
 }
 
 /* Check for updates */
@@ -283,4 +266,3 @@ void UpdateDialog::updateNotify( bool b_result )
 }
 
 #endif
-

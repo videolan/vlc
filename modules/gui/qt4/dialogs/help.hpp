@@ -25,7 +25,7 @@
 #define QVLC_HELP_DIALOG_H_ 1
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+# include "config.h"
 #endif
 
 #include "qt4.hpp"
@@ -35,12 +35,7 @@
 #include "ui/about.h"
 #include "ui/update.h"
 
-class QPushButton;
-class QTextBrowser;
-class QLabel;
 class QEvent;
-class QPushButton;
-class QTextEdit;
 
 class HelpDialog : public QVLCFrame, public Singleton<HelpDialog>
 {
@@ -50,23 +45,20 @@ private:
     virtual ~HelpDialog();
 
 public slots:
-    void close();
+    virtual void close() { toggleVisible(); }
 
     friend class    Singleton<HelpDialog>;
 };
 
-
 class AboutDialog : public QVLCDialog, public Singleton<AboutDialog>
 {
     Q_OBJECT
-
 private:
     AboutDialog( intf_thread_t * );
-    virtual ~AboutDialog();
     Ui::aboutWidget ui;
 
 public slots:
-    void close();
+    virtual void close() { toggleVisible(); }
 
     friend class    Singleton<AboutDialog>;
 };
@@ -92,7 +84,8 @@ private:
     bool b_checked;
 
 private slots:
-    void close();
+    virtual void close() { toggleVisible(); }
+
     void UpdateOrDownload();
 
     friend class    Singleton<UpdateDialog>;
