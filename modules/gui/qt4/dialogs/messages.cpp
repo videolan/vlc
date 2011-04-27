@@ -92,6 +92,7 @@ MessagesDialog::MessagesDialog( intf_thread_t *_p_intf)
                             "(keyword 'all' to applies to all objects)");
 
     updateButton = new QPushButton( QIcon(":/update"), "" );
+    updateButton->setToolTip( qtr("Update the tree") );
     ui.mainTab->setCornerWidget( updateButton );
     updateButton->setVisible( false );
     updateButton->setFlat( true );
