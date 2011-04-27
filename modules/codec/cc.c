@@ -51,6 +51,8 @@
 
 #include <assert.h>
 
+#include "substext.h"
+
 /*****************************************************************************
  * Module descriptor.
  *****************************************************************************/
@@ -312,7 +314,6 @@ static subpicture_t *Subtitle( decoder_t *p_dec, char *psz_subtitle, char *psz_h
 {
     //decoder_sys_t *p_sys = p_dec->p_sys;
     subpicture_t *p_spu = NULL;
-    video_format_t fmt;
 
     /* We cannot display a subpicture with no date */
     if( i_pts <= VLC_TS_INVALID )
@@ -326,43 +327,23 @@ static subpicture_t *Subtitle( decoder_t *p_dec, char *psz_subtitle, char *psz_h
         EnsureUTF8( psz_html );
 
     /* Create the subpicture unit */
-    p_spu = decoder_NewSubpicture( p_dec, NULL );
+    p_spu = decoder_NewSubpictureText( p_dec );
     if( !p_spu )
     {
-        msg_Warn( p_dec, "can't get spu buffer" );
         free( psz_subtitle );
         free( psz_html );
         return NULL;
     }
-
-    /* Create a new subpicture region */
-    memset( &fmt, 0, sizeof(video_format_t) );
-    fmt.i_chroma = VLC_CODEC_TEXT;
-    fmt.i_width = fmt.i_height = 0;
-    fmt.i_x_offset = fmt.i_y_offset = 0;
-    p_spu->p_region = subpicture_region_New( &fmt );
-    if( !p_spu->p_region )
-    {
-        msg_Err( p_dec, "cannot allocate SPU region" );
-        free( psz_subtitle );
-        free( psz_html );
-        decoder_DeleteSubpicture( p_dec, p_spu );
-        return NULL;
-    }
-
-    /* Decode and format the subpicture unit */
-    /* Normal text subs, easy markup */
-    p_spu->p_region->i_align = SUBPICTURE_ALIGN_BOTTOM;// | SUBPICTURE_ALIGN_LEFT;// | p_sys->i_align;
-    p_spu->p_region->i_x = 0; //p_sys->i_align ? 20 : 0;
-    p_spu->p_region->i_y = 10;
-
-    p_spu->p_region->psz_text = psz_subtitle;
-    p_spu->p_region->psz_html = psz_html;
-
-    p_spu->i_start = i_pts;
-    p_spu->i_stop = i_pts + 10000000;   /* 10s max */
-    p_spu->b_ephemer = true;
+    p_spu->i_start    = i_pts;
+    p_spu->i_stop     = i_pts + 10000000;   /* 10s max */
+    p_spu->b_ephemer  = true;
     p_spu->b_absolute = false;
+
+    subpicture_updater_sys_t *p_spu_sys = p_spu->updater.p_sys;
+
+    p_spu_sys->align = SUBPICTURE_ALIGN_BOTTOM;
+    p_spu_sys->text  = psz_subtitle;
+    p_spu_sys->html  = psz_html;
 
     return p_spu;
 }
