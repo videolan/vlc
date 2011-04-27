@@ -69,8 +69,9 @@ SPrefsCatList::SPrefsCatList( intf_thread_t *_p_intf, QWidget *_parent, bool sma
 
 #define ADD_CATEGORY( button, label, icon, numb )                           \
     QToolButton * button = new QToolButton( this );                         \
-    button->setIcon( QIcon( ":/prefsmenu/" #icon ) );                   \
+    button->setIcon( QIcon( ":/prefsmenu/" #icon ) );                       \
     button->setText( label );                                               \
+    button->setToolTip( label + qtr("Preferences") );                       \
     button->setToolButtonStyle( Qt::ToolButtonTextUnderIcon );              \
     button->setIconSize( QSize( icon_height, icon_height ) );               \
     button->resize( icon_height + 6 , icon_height + 6 );                    \

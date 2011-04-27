@@ -152,6 +152,7 @@ ToolbarEditDialog::ToolbarEditDialog( QWidget *_w, intf_thread_t *_p_intf)
 
     QToolButton *newButton = new QToolButton;
     newButton->setIcon( QIcon( ":/new" ) );
+    newButton->setToolTip( qtr("New profile") );
     QToolButton *deleteButton = new QToolButton;
     deleteButton->setIcon( QIcon( ":/toolbar/clear" ) );
     deleteButton->setToolTip( qtr( "Delete the current profile" ) );
@@ -376,14 +377,17 @@ WidgetListing::WidgetListing( intf_thread_t *p_intf, QWidget *_parent )
 
                 QToolButton *prevSectionButton = new QToolButton( discFrame );
                 prevSectionButton->setIcon( QIcon( ":/toolbar/dvd_prev" ) );
+                prevSectionButton->setToolTip( qtr("Previous chapter") );
                 discLayout->addWidget( prevSectionButton );
 
                 QToolButton *menuButton = new QToolButton( discFrame );
                 menuButton->setIcon( QIcon( ":/toolbar/dvd_menu" ) );
+                menuButton->setToolTip( qtr("Go to the DVD menu") );
                 discLayout->addWidget( menuButton );
 
                 QToolButton *nextButton = new QToolButton( discFrame );
                 nextButton->setIcon( QIcon( ":/toolbar/dvd_next" ) );
+                nextButton->setToolTip( qtr("Next chapter") );
                 discLayout->addWidget( nextButton );
 
                 widget = discFrame;
@@ -401,7 +405,8 @@ WidgetListing::WidgetListing( intf_thread_t *p_intf, QWidget *_parent )
                 telexLayout->addWidget( telexOn );
 
                 QToolButton *telexTransparent = new QToolButton;
-                telexOn->setIcon( QIcon( ":/toolbar/tvtelx" ) );
+                telexTransparent->setIcon( QIcon( ":/toolbar/tvtelx" ) );
+                telexTransparent->setToolTip( qtr("Teletext transparency") );
                 telexLayout->addWidget( telexTransparent );
 
                 QSpinBox *telexPage = new QSpinBox;

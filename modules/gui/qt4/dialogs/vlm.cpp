@@ -499,10 +499,12 @@ VLMAWidget::VLMAWidget( const QString& _name, const QString& _input,
 
     QToolButton *modifyButton = new QToolButton;
     modifyButton->setIcon( QIcon( ":/menu/settings" ) );
+    modifyButton->setToolTip( qtr("Change") );
     objLayout->addWidget( modifyButton, 0, 5 );
 
     QToolButton *deleteButton = new QToolButton;
     deleteButton->setIcon( QIcon( ":/menu/quit" ) );
+    deleteButton->setToolTip("Delete");
     objLayout->addWidget( deleteButton, 0, 6 );
 
     BUTTONACT( modifyButton, modify() );
@@ -541,14 +543,17 @@ VLMBroadcast::VLMBroadcast( const QString& _name, const QString& _input,
 
     playButton = new QToolButton;
     playButton->setIcon( QIcon( ":/menu/play" ) );
+    playButton->setToolTip( qtr("Play") );
     objLayout->addWidget( playButton, 1, 0 );
     b_playing = true;
 
     QToolButton *stopButton = new QToolButton;
     stopButton->setIcon( QIcon( ":/toolbar/stop_b" ) );
+    stopButton->setToolTip( qtr("Stop") );
     objLayout->addWidget( stopButton, 1, 1 );
 
     loopButton = new QToolButton;
+    loopButton->setToolTip( qtr("Repeat") );
     objLayout->addWidget( loopButton, 1, 2 );
 
     BUTTONACT( playButton, togglePlayPause() );

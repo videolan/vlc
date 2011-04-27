@@ -67,6 +67,7 @@ SoutDialog::SoutDialog( QWidget *parent, intf_thread_t *_p_intf, const QString& 
     closeTabButton->hide();
     closeTabButton->setAutoRaise( true );
     closeTabButton->setIcon( QIcon( ":/toolbar/clear" ) );
+    closeTabButton->setToolTip( qtr("Clear") );
     BUTTONACT( closeTabButton, closeTab() );
 #endif
     CONNECT( ui.destTab, currentChanged( int ), this, tabChanged( int ) );

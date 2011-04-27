@@ -58,7 +58,7 @@ static void Close( vlc_object_t * );
 #define PAGE_LONGTEXT N_("Open the indicated Teletext page." \
         "Default page is index 100")
 
-#define OPAQUE_TEXT N_("Text is always opaque")
+#define OPAQUE_TEXT N_("Teletext transparency")
 #define OPAQUE_LONGTEXT N_("Setting vbi-opaque to false " \
         "makes the boxed text transparent." )
 
