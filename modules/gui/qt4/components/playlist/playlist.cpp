@@ -87,7 +87,7 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QWidget *_par )
     /* Initialisation of the playlist */
     playlist_t * p_playlist = THEPL;
     PL_LOCK;
-    playlist_item_t *p_root = THEPL->p_playing;
+    playlist_item_t *p_root = p_playlist->p_playing;
     PL_UNLOCK;
 
     setMinimumWidth( 400 );
@@ -148,7 +148,7 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QWidget *_par )
               mainView, setRoot( playlist_item_t * ) );
     mainView->setRoot( p_root );
 
-
+    /* */
     split = new PlaylistSplitter( this );
 
     /* Add the two sides of the QSplitter */
