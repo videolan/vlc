@@ -36,6 +36,8 @@
 #include <vlc_codec.h>
 #include <vlc_charset.h>
 
+#include "substext.h"
+
 /*****************************************************************************
  * Module descriptor.
  *****************************************************************************/
@@ -370,7 +372,6 @@ static subpicture_t *ParseText( decoder_t *p_dec, block_t *p_block )
     decoder_sys_t *p_sys = p_dec->p_sys;
     subpicture_t *p_spu = NULL;
     char *psz_subtitle = NULL;
-    video_format_t fmt;
 
     /* We cannot display a subpicture with no date */
     if( p_block->i_pts <= VLC_TS_INVALID )
@@ -449,45 +450,24 @@ static subpicture_t *ParseText( decoder_t *p_dec, block_t *p_block )
     }
 
     /* Create the subpicture unit */
-    p_spu = decoder_NewSubpicture( p_dec, NULL );
+    p_spu = decoder_NewSubpictureText( p_dec );
     if( !p_spu )
     {
-        msg_Warn( p_dec, "can't get spu buffer" );
         free( psz_subtitle );
         return NULL;
     }
-
-    /* Create a new subpicture region */
-    memset( &fmt, 0, sizeof(video_format_t) );
-    fmt.i_chroma = VLC_CODEC_TEXT;
-    fmt.i_width = fmt.i_height = 0;
-    fmt.i_x_offset = fmt.i_y_offset = 0;
-    p_spu->p_region = subpicture_region_New( &fmt );
-    if( !p_spu->p_region )
-    {
-        msg_Err( p_dec, "cannot allocate SPU region" );
-        free( psz_subtitle );
-        decoder_DeleteSubpicture( p_dec, p_spu );
-        return NULL;
-    }
-
-    /* Normal text subs, easy markup */
-    p_spu->p_region->i_align = SUBPICTURE_ALIGN_BOTTOM | p_sys->i_align;
-    p_spu->p_region->i_x = p_sys->i_align ? 20 : 0;
-    p_spu->p_region->i_y = 10;
-
-    /* Remove formatting from string */
-
-    p_spu->p_region->psz_text = StripTags( psz_subtitle );
-    if( var_InheritBool( p_dec, "subsdec-formatted" ) )
-    {
-        p_spu->p_region->psz_html = CreateHtmlSubtitle( &p_spu->p_region->i_align, psz_subtitle );
-    }
-
-    p_spu->i_start = p_block->i_pts;
-    p_spu->i_stop = p_block->i_pts + p_block->i_length;
-    p_spu->b_ephemer = (p_block->i_length == 0);
+    p_spu->i_start    = p_block->i_pts;
+    p_spu->i_stop     = p_block->i_pts + p_block->i_length;
+    p_spu->b_ephemer  = (p_block->i_length == 0);
     p_spu->b_absolute = false;
+
+    subpicture_updater_sys_t *p_spu_sys = p_spu->updater.p_sys;
+
+    p_spu_sys->align = SUBPICTURE_ALIGN_BOTTOM | p_sys->i_align;
+    p_spu_sys->text  = StripTags( psz_subtitle );
+    if( var_InheritBool( p_dec, "subsdec-formatted" ) )
+        p_spu_sys->html = CreateHtmlSubtitle( &p_spu_sys->align, psz_subtitle );
+
     free( psz_subtitle );
 
     return p_spu;
