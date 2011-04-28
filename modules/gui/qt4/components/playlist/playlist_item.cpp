@@ -1,7 +1,7 @@
 /*****************************************************************************
  * playlist_item.cpp : Manage playlist item
  ****************************************************************************
- * Copyright © 2006-2008 the VideoLAN team
+ * Copyright © 2006-2011 the VideoLAN team
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
@@ -76,12 +76,12 @@ PLItem::~PLItem()
 /* So far signal is always true.
    Using signal false would not call PLModel... Why ?
  */
-inline void PLItem::insertChild( PLItem *item, int i_pos, bool signal )
+void PLItem::insertChild( PLItem *item, int i_pos, bool signal )
 {
     children.insert( i_pos, item );
 }
 
-inline void PLItem::appendChild( PLItem *item, bool signal )
+void PLItem::appendChild( PLItem *item, bool signal )
 {
     children.insert( children.count(), item );
 }

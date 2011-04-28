@@ -1,7 +1,7 @@
 /*****************************************************************************
  * playlist_model.cpp : Manage playlist model
  ****************************************************************************
- * Copyright (C) 2006-2007 the VideoLAN team
+ * Copyright (C) 2006-2011 the VideoLAN team
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
