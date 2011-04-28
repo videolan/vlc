@@ -320,7 +320,7 @@ vlc_module_begin ()
                  LNB_SWITCH_TEXT, LNB_SWITCH_LONGTEXT, true)
         change_integer_range (0, 0x7fffffff)
         add_deprecated_alias ("dvb-lnb-slof")
-#ifdef __linux
+#ifdef __linux__
     add_integer ("dvb-satno", 0, SATNO_TEXT, SATNO_LONGTEXT, true)
         change_integer_list (satno_vlc, satno_user)
     add_integer ("dvb-tone", -1, TONE_TEXT, TONE_LONGTEXT, true)
