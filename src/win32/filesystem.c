@@ -230,7 +230,7 @@ int vlc_rename (const char *oldpath, const char *newpath)
     /* FIXME: errno support */
     return MoveFileW (wold, wnew) ? 0 : -1;
 #else
-    if (_wrename (wold, wnew) && errno == EACCES)
+    if (_wrename (wold, wnew) && (errno == EACCES || errno == EEXIST))
     {   /* Windows does not allow atomic file replacement */
         if (_wremove (wnew))
         {
