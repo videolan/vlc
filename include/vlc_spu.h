@@ -80,7 +80,7 @@ VLC_EXPORT( void, spu_PutSubpicture, ( spu_t *, subpicture_t * ) );
  *
  * The returned value if non NULL must be released by subpicture_Delete().
  */
-VLC_EXPORT( subpicture_t *, spu_Render, ( spu_t *, const vlc_fourcc_t *p_chroma_list, const video_format_t *p_fmt_dst, const video_format_t *p_fmt_src, mtime_t render_subtitle_date, mtime_t render_osd_date, bool b_subtitle_only ) );
+VLC_EXPORT( subpicture_t *, spu_Render, ( spu_t *, const vlc_fourcc_t *p_chroma_list, const video_format_t *p_fmt_dst, const video_format_t *p_fmt_src, mtime_t render_subtitle_date, mtime_t render_osd_date, bool ignore_osd ) );
 
 /**
  * It registers a new SPU channel.

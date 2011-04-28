@@ -31,113 +31,101 @@
 
 #include "postprocessing.h"
 
-static bool PostProcessIsPresent( const char *psz_filter )
+static bool PostProcessIsPresent(const char *filter)
 {
-    const char  *psz_pp = "postproc";
-    const size_t i_pp = strlen(psz_pp);
-    return psz_filter &&
-           !strncmp( psz_filter, psz_pp, strlen(psz_pp) ) &&
-           ( psz_filter[i_pp] == '\0' || psz_filter[i_pp] == ':' );
+    const char  *pp        = "postproc";
+    const size_t pp_length = strlen(pp);
+    return filter &&
+           !strncmp(filter, pp, strlen(pp)) &&
+           (filter[pp_length] == '\0' || filter[pp_length] == ':');
 }
 
-static int PostProcessCallback( vlc_object_t *p_this, char const *psz_cmd,
-                                vlc_value_t oldval, vlc_value_t newval, void *p_data )
+static int PostProcessCallback(vlc_object_t *object, char const *cmd,
+                               vlc_value_t oldval, vlc_value_t newval, void *data)
 {
-    vout_thread_t *p_vout = (vout_thread_t *)p_this;
-    VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval); VLC_UNUSED(p_data);
+    vout_thread_t *vout = (vout_thread_t *)object;
+    VLC_UNUSED(cmd); VLC_UNUSED(oldval); VLC_UNUSED(data);
 
-    static const char *psz_pp = "postproc";
+    static const char *pp = "postproc";
 
-    char *psz_vf2 = var_GetString( p_vout, "video-filter" );
+    char *filters = var_GetString(vout, "video-filter");
 
-    if( newval.i_int <= 0 )
-    {
-        if( PostProcessIsPresent( psz_vf2 ) )
-        {
-            strcpy( psz_vf2, &psz_vf2[strlen(psz_pp)] );
-            if( *psz_vf2 == ':' )
-                strcpy( psz_vf2, &psz_vf2[1] );
+    if (newval.i_int <= 0) {
+        if (PostProcessIsPresent(filters)) {
+            strcpy(filters, &filters[strlen(pp)]);
+            if (*filters == ':')
+                strcpy(filters, &filters[1]);
         }
-    }
-    else
-    {
-        if( !PostProcessIsPresent( psz_vf2 ) )
-        {
-            if( psz_vf2 )
-            {
-                char *psz_tmp = psz_vf2;
-                if( asprintf( &psz_vf2, "%s:%s", psz_pp, psz_tmp ) < 0 )
-                    psz_vf2 = psz_tmp;
+    } else {
+        if (!PostProcessIsPresent(filters)) {
+            if (filters) {
+                char *tmp = filters;
+                if (asprintf(&filters, "%s:%s", pp, tmp) < 0)
+                    filters = tmp;
                 else
-                    free( psz_tmp );
-            }
-            else
-            {
-                psz_vf2 = strdup( psz_pp );
+                    free(tmp);
+            } else {
+                filters = strdup(pp);
             }
         }
     }
-    if( newval.i_int > 0 )
-        var_SetInteger( p_vout, "postproc-q", newval.i_int );
-    if( psz_vf2 )
-    {
-        var_SetString( p_vout, "video-filter", psz_vf2 );
-        free( psz_vf2 );
-    }
-    else if( newval.i_int > 0 )
-    {
-        var_TriggerCallback( p_vout, "video-filter" );
+    if (newval.i_int > 0)
+        var_SetInteger(vout, "postproc-q", newval.i_int);
+    if (filters) {
+        var_SetString(vout, "video-filter", filters);
+        free(filters);
+    } else if (newval.i_int > 0) {
+        var_TriggerCallback(vout, "video-filter");
     }
     return VLC_SUCCESS;
 }
-static void PostProcessEnable( vout_thread_t *p_vout )
+static void PostProcessEnable(vout_thread_t *vout)
 {
     vlc_value_t text;
-    msg_Dbg( p_vout, "Post-processing available" );
-    var_Create( p_vout, "postprocess", VLC_VAR_INTEGER | VLC_VAR_HASCHOICE );
+    msg_Dbg(vout, "Post-processing available");
+    var_Create(vout, "postprocess", VLC_VAR_INTEGER | VLC_VAR_HASCHOICE);
     text.psz_string = _("Post processing");
-    var_Change( p_vout, "postprocess", VLC_VAR_SETTEXT, &text, NULL );
+    var_Change(vout, "postprocess", VLC_VAR_SETTEXT, &text, NULL);
 
-    for( int i = 0; i <= 6; i++ )
-    {
+    for (int i = 0; i <= 6; i++) {
         vlc_value_t val;
         vlc_value_t text;
-        char psz_text[1+1];
+        char tmp[1+1];
 
         val.i_int = i;
-        snprintf( psz_text, sizeof(psz_text), "%d", i );
-        if( i == 0 )
+        snprintf(tmp, sizeof(tmp), "%d", i);
+        if (i == 0)
             text.psz_string = _("Disable");
         else
-            text.psz_string = psz_text;
-        var_Change( p_vout, "postprocess", VLC_VAR_ADDCHOICE, &val, &text );
+            text.psz_string = tmp;
+        var_Change(vout, "postprocess", VLC_VAR_ADDCHOICE, &val, &text);
     }
-    var_AddCallback( p_vout, "postprocess", PostProcessCallback, NULL );
+    var_AddCallback(vout, "postprocess", PostProcessCallback, NULL);
 
     /* */
-    char *psz_filter = var_GetNonEmptyString( p_vout, "video-filter" );
-    int i_postproc_q = 0;
-    if( PostProcessIsPresent( psz_filter ) )
-        i_postproc_q = var_CreateGetInteger( p_vout, "postproc-q" );
+    char *filters = var_GetNonEmptyString(vout, "video-filter");
+    int postproc_q = 0;
+    if (PostProcessIsPresent(filters))
+        postproc_q = var_CreateGetInteger(vout, "postproc-q");
 
-    var_SetInteger( p_vout, "postprocess", i_postproc_q );
+    var_SetInteger(vout, "postprocess", postproc_q);
 
-    free( psz_filter );
+    free(filters);
 }
-static void PostProcessDisable( vout_thread_t *p_vout )
+static void PostProcessDisable(vout_thread_t *vout)
 {
-    msg_Dbg( p_vout, "Post-processing no more available" );
-    var_Destroy( p_vout, "postprocess" );
+    msg_Dbg(vout, "Post-processing no more available");
+    var_Destroy(vout, "postprocess");
 }
 
 void vout_SetPostProcessingState(vout_thread_t *vout, vout_postprocessing_support_t *state, int qtype)
 {
-	const int postproc_change = (qtype != QTYPE_NONE) - (state->qtype != QTYPE_NONE);
-	if (postproc_change == 1)
-		PostProcessEnable(vout);
-	else if (postproc_change == -1)
-		PostProcessDisable(vout);
-	if (postproc_change)
-		state->qtype = qtype;
+    const int postproc_change = (qtype != QTYPE_NONE) - (state->qtype != QTYPE_NONE);
+    if (postproc_change == 1)
+        PostProcessEnable(vout);
+    else if (postproc_change == -1)
+        PostProcessDisable(vout);
+    if (postproc_change)
+        state->qtype = qtype;
 }
 

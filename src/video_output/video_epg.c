@@ -37,285 +37,276 @@
 #define EPG_NAME_SIZE 0.05
 #define EPG_PROGRAM_SIZE 0.03
 
-static subpicture_region_t * vout_OSDEpgSlider( int i_x, int i_y,
-                                                int i_width, int i_height,
-                                                float f_ratio )
+static subpicture_region_t * vout_OSDEpgSlider(int x, int y,
+                                               int width, int height,
+                                               float ratio)
 {
     video_format_t fmt;
-    subpicture_region_t *p_region;
+    subpicture_region_t *region;
 
     /* Create a new subpicture region */
-    video_format_Init( &fmt, VLC_CODEC_YUVA );
-    fmt.i_width = fmt.i_visible_width = i_width;
-    fmt.i_height = fmt.i_visible_height = i_height;
+    video_format_Init(&fmt, VLC_CODEC_YUVA);
+    fmt.i_width  = fmt.i_visible_width  = width;
+    fmt.i_height = fmt.i_visible_height = height;
     fmt.i_sar_num = 0;
     fmt.i_sar_den = 1;
 
-    p_region = subpicture_region_New( &fmt );
-    if( !p_region )
+    region = subpicture_region_New(&fmt);
+    if (!region)
         return NULL;
 
-    p_region->i_x = i_x;
-    p_region->i_y = i_y;
+    region->i_x = x;
+    region->i_y = y;
 
-    picture_t *p_picture = p_region->p_picture;
+    picture_t *picture = region->p_picture;
 
-    f_ratio = __MIN( __MAX( f_ratio, 0 ), 1 );
-    int i_filled_part_width = f_ratio * i_width;
+    ratio = __MIN(__MAX(ratio, 0), 1);
+    int filled_part_width = ratio * width;
 
-    for( int j = 0; j < i_height; j++ )
-    {
-        for( int i = 0; i < i_width; i++ )
-        {
-            #define WRITE_COMP( plane, value ) \
-                p_picture->p[plane].p_pixels[p_picture->p[plane].i_pitch * j + i] = value
+    for (int j = 0; j < height; j++) {
+        for (int i = 0; i < width; i++) {
+            #define WRITE_COMP(plane, value) \
+                picture->p[plane].p_pixels[picture->p[plane].i_pitch * j + i] = value
 
             /* Draw the slider. */
-            bool is_outline = j == 0 || j == i_height - 1
-                              || i == 0 || i == i_width - 1;
-            WRITE_COMP( 0, is_outline ? 0x00 : 0xff );
-            WRITE_COMP( 1, 0x80 );
-            WRITE_COMP( 2, 0x80 );
+            bool is_outline = j == 0 || j == height - 1 ||
+                              i == 0 || i == width  - 1;
+            WRITE_COMP(0, is_outline ? 0x00 : 0xff);
+            WRITE_COMP(1, 0x80);
+            WRITE_COMP(2, 0x80);
 
             /* We can see the video through the part of the slider
                which corresponds to the leaving time. */
-            bool is_border = j < 3 || j > i_height - 4
-                             || i < 3 || i > i_width - 4
-                             || i < i_filled_part_width;
-            WRITE_COMP( 3, is_border ? 0xff : 0x00 );
+            bool is_border = j < 3 || j > height - 4 ||
+                             i < 3 || i > width  - 4 ||
+                             i < filled_part_width;
+            WRITE_COMP(3, is_border ? 0xff : 0x00);
 
             #undef WRITE_COMP
         }
     }
 
-    return p_region;
+    return region;
 }
 
 
-static subpicture_region_t * vout_OSDEpgText( const char *psz_string,
-                                              int i_x, int i_y,
-                                              int i_size, uint32_t i_color )
+static subpicture_region_t * vout_OSDEpgText(const char *text,
+                                             int x, int y,
+                                             int size, uint32_t color)
 {
     video_format_t fmt;
-    subpicture_region_t *p_region;
+    subpicture_region_t *region;
 
-    if( !psz_string )
+    if (!text)
         return NULL;
 
     /* Create a new subpicture region */
-    video_format_Init( &fmt, VLC_CODEC_TEXT );
+    video_format_Init(&fmt, VLC_CODEC_TEXT);
     fmt.i_sar_num = 0;
     fmt.i_sar_den = 1;
 
-    p_region = subpicture_region_New( &fmt );
-    if( !p_region )
+    region = subpicture_region_New(&fmt);
+    if (!region)
         return NULL;
 
     /* Set subpicture parameters */
-    p_region->psz_text = strdup( psz_string );
-    p_region->i_align = 0;
-    p_region->i_x = i_x;
-    p_region->i_y = i_y;
+    region->psz_text = strdup(text);
+    region->i_align  = 0;
+    region->i_x      = x;
+    region->i_y      = y;
 
     /* Set text style */
-    p_region->p_style = text_style_New();
-    if( p_region->p_style )
-    {
-        p_region->p_style->i_font_size = i_size;
-        p_region->p_style->i_font_color = i_color;
-        p_region->p_style->i_font_alpha = 0;
+    region->p_style = text_style_New();
+    if (region->p_style) {
+        region->p_style->i_font_size  = size;
+        region->p_style->i_font_color = color;
+        region->p_style->i_font_alpha = 0;
     }
 
-    return p_region;
+    return region;
 }
 
 
-static subpicture_region_t * vout_BuildOSDEpg( vlc_epg_t *p_epg,
-                                               int i_x, int i_y,
-                                               int i_visible_width,
-                                               int i_visible_height )
+static subpicture_region_t * vout_BuildOSDEpg(vlc_epg_t *epg,
+                                              int x, int y,
+                                              int visible_width,
+                                              int visible_height)
 {
-    subpicture_region_t *p_region_ret;
-    subpicture_region_t **pp_region = &p_region_ret;
+    subpicture_region_t *head;
+    subpicture_region_t **last_ptr = &head;
 
-    time_t i_test = time( NULL );
+    time_t current_time = time(NULL);
 
     /* Display the name of the channel. */
-    *pp_region = vout_OSDEpgText( p_epg->psz_name,
-                                  i_x + i_visible_width * EPG_LEFT,
-                                  i_y + i_visible_height * EPG_TOP,
-                                  i_visible_height * EPG_NAME_SIZE,
-                                  0x00ffffff );
+    *last_ptr = vout_OSDEpgText(epg->psz_name,
+                                x + visible_width  * EPG_LEFT,
+                                y + visible_height * EPG_TOP,
+                                visible_height * EPG_NAME_SIZE,
+                                0x00ffffff);
 
-    if( !*pp_region )
-        return p_region_ret;
+    if (!*last_ptr)
+        return head;
 
     /* Display the name of the current program. */
-    pp_region = &(* pp_region)->p_next;
-    *pp_region = vout_OSDEpgText( p_epg->p_current->psz_name,
-                                  i_x + i_visible_width * ( EPG_LEFT + 0.025 ),
-                                  i_y + i_visible_height * ( EPG_TOP + 0.05 ),
-                                  i_visible_height * EPG_PROGRAM_SIZE,
-                                  0x00ffffff );
+    last_ptr = &(*last_ptr)->p_next;
+    *last_ptr = vout_OSDEpgText(epg->p_current->psz_name,
+                                x + visible_width  * (EPG_LEFT + 0.025),
+                                y + visible_height * (EPG_TOP + 0.05),
+                                visible_height * EPG_PROGRAM_SIZE,
+                                0x00ffffff);
 
-    if( !*pp_region )
-        return p_region_ret;
+    if (!*last_ptr)
+        return head;
 
     /* Display the current program time slider. */
-    pp_region = &(* pp_region)->p_next;
-    *pp_region = vout_OSDEpgSlider( i_x + i_visible_width * EPG_LEFT,
-                                    i_y + i_visible_height * ( EPG_TOP + 0.1 ),
-                                    i_visible_width * ( 1 - 2 * EPG_LEFT ),
-                                    i_visible_height * 0.05,
-                                    ( i_test - p_epg->p_current->i_start )
-                                    / (float)p_epg->p_current->i_duration );
+    last_ptr = &(*last_ptr)->p_next;
+    *last_ptr = vout_OSDEpgSlider(x + visible_width  * EPG_LEFT,
+                                  y + visible_height * (EPG_TOP + 0.1),
+                                  visible_width  * (1 - 2 * EPG_LEFT),
+                                  visible_height * 0.05,
+                                  (current_time - epg->p_current->i_start)
+                                  / (float)epg->p_current->i_duration);
 
-    if( !*pp_region )
-        return p_region_ret;
+    if (!*last_ptr)
+        return head;
 
     /* Format the hours of the beginning and the end of the current program. */
     struct tm tm_start, tm_end;
-    time_t t_start = p_epg->p_current->i_start;
-    time_t t_end = p_epg->p_current->i_start + p_epg->p_current->i_duration;
-    localtime_r( &t_start, &tm_start );
-    localtime_r( &t_end, &tm_end );
-    char psz_start[128];
-    char psz_end[128];
-    snprintf( psz_start, sizeof(psz_start), "%2.2d:%2.2d",
-              tm_start.tm_hour, tm_start.tm_min );
-    snprintf( psz_end, sizeof(psz_end), "%2.2d:%2.2d",
-              tm_end.tm_hour, tm_end.tm_min );
+    time_t t_start = epg->p_current->i_start;
+    time_t t_end = epg->p_current->i_start + epg->p_current->i_duration;
+    localtime_r(&t_start, &tm_start);
+    localtime_r(&t_end, &tm_end);
+    char text_start[128];
+    char text_end[128];
+    snprintf(text_start, sizeof(text_start), "%2.2d:%2.2d",
+             tm_start.tm_hour, tm_start.tm_min);
+    snprintf(text_end, sizeof(text_end), "%2.2d:%2.2d",
+             tm_end.tm_hour, tm_end.tm_min);
 
     /* Display those hours. */
-    pp_region = &(* pp_region)->p_next;
-    *pp_region = vout_OSDEpgText( psz_start,
-                                  i_x + i_visible_width * ( EPG_LEFT + 0.02 ),
-                                  i_y + i_visible_height * ( EPG_TOP + 0.15 ),
-                                  i_visible_height * EPG_PROGRAM_SIZE,
-                                  0x00ffffff );
+    last_ptr = &(*last_ptr)->p_next;
+    *last_ptr = vout_OSDEpgText(text_start,
+                                x + visible_width  * (EPG_LEFT + 0.02),
+                                y + visible_height * (EPG_TOP + 0.15),
+                                visible_height * EPG_PROGRAM_SIZE,
+                                0x00ffffff);
 
-    if( !*pp_region )
-        return p_region_ret;
+    if (!*last_ptr)
+        return head;
 
-    pp_region = &(* pp_region)->p_next;
-    *pp_region = vout_OSDEpgText( psz_end,
-                                  i_x + i_visible_width * ( 1 - EPG_LEFT - 0.085 ),
-                                  i_y + i_visible_height * ( EPG_TOP + 0.15 ),
-                                  i_visible_height * EPG_PROGRAM_SIZE,
-                                  0x00ffffff );
+    last_ptr = &(*last_ptr)->p_next;
+    *last_ptr = vout_OSDEpgText(text_end,
+                                x + visible_width  * (1 - EPG_LEFT - 0.085),
+                                y + visible_height * (EPG_TOP + 0.15),
+                                visible_height * EPG_PROGRAM_SIZE,
+                                0x00ffffff);
 
-    return p_region_ret;
+    return head;
 }
 
 struct subpicture_updater_sys_t
 {
-    vlc_epg_t *p_epg;
+    vlc_epg_t *epg;
 };
 
-static int OSDEpgValidate( subpicture_t *p_subpic,
-                           bool has_src_changed, const video_format_t *p_fmt_src,
-                           bool has_dst_changed, const video_format_t *p_fmt_dst,
-                           mtime_t i_ts )
+static int OSDEpgValidate(subpicture_t *subpic,
+                          bool has_src_changed, const video_format_t *fmt_src,
+                          bool has_dst_changed, const video_format_t *fmt_dst,
+                          mtime_t ts)
 {
-    VLC_UNUSED(p_subpic); VLC_UNUSED(i_ts); VLC_UNUSED(p_fmt_src);
-    VLC_UNUSED(has_dst_changed); VLC_UNUSED(p_fmt_dst);
+    VLC_UNUSED(subpic); VLC_UNUSED(ts); VLC_UNUSED(fmt_src);
+    VLC_UNUSED(has_dst_changed); VLC_UNUSED(fmt_dst);
 
-    if( !has_src_changed && !has_dst_changed)
+    if (!has_src_changed && !has_dst_changed)
         return VLC_SUCCESS;
     return VLC_EGENERIC;
 }
 
-static void OSDEpgUpdate( subpicture_t *p_subpic,
-                          const video_format_t *p_fmt_src,
-                          const video_format_t *p_fmt_dst,
-                          mtime_t i_ts )
+static void OSDEpgUpdate(subpicture_t *subpic,
+                         const video_format_t *fmt_src,
+                         const video_format_t *fmt_dst,
+                         mtime_t ts)
 {
-    subpicture_updater_sys_t *p_sys = p_subpic->updater.p_sys;
-    VLC_UNUSED(p_fmt_dst); VLC_UNUSED(i_ts);
+    subpicture_updater_sys_t *sys = subpic->updater.p_sys;
+    VLC_UNUSED(fmt_dst); VLC_UNUSED(ts);
 
-    p_subpic->i_original_picture_width  = p_fmt_src->i_width;
-    p_subpic->i_original_picture_height = p_fmt_src->i_height;
-    p_subpic->p_region = vout_BuildOSDEpg( p_sys->p_epg,
-                                           p_fmt_src->i_x_offset,
-                                           p_fmt_src->i_y_offset,
-                                           p_fmt_src->i_visible_width,
-                                           p_fmt_src->i_visible_height );
+    subpic->i_original_picture_width  = fmt_src->i_width;
+    subpic->i_original_picture_height = fmt_src->i_height;
+    subpic->p_region = vout_BuildOSDEpg(sys->epg,
+                                        fmt_src->i_x_offset,
+                                        fmt_src->i_y_offset,
+                                        fmt_src->i_visible_width,
+                                        fmt_src->i_visible_height);
 }
 
-static void OSDEpgDestroy( subpicture_t *p_subpic )
+static void OSDEpgDestroy(subpicture_t *subpic)
 {
-    subpicture_updater_sys_t *p_sys = p_subpic->updater.p_sys;
+    subpicture_updater_sys_t *sys = subpic->updater.p_sys;
 
-    vlc_epg_Delete( p_sys->p_epg );
-    free( p_sys );
+    vlc_epg_Delete(sys->epg);
+    free(sys);
 }
 
 /**
  * \brief Show EPG information about the current program of an input item
- * \param p_vout pointer to the vout the information is to be showed on
+ * \param vout pointer to the vout the information is to be showed on
  * \param p_input pointer to the input item the information is to be showed
  */
-int vout_OSDEpg( vout_thread_t *p_vout, input_item_t *p_input )
+int vout_OSDEpg(vout_thread_t *vout, input_item_t *input)
 {
-    subpicture_t *p_spu;
-    mtime_t i_now = mdate();
+    char *now_playing = input_item_GetNowPlaying(input);
+    vlc_epg_t *epg = NULL;
 
-    char *psz_now_playing = input_item_GetNowPlaying( p_input );
-    vlc_epg_t *p_epg = NULL;
-
-    vlc_mutex_lock( &p_input->lock );
+    vlc_mutex_lock(&input->lock);
 
     /* Look for the current program EPG event */
-    for( int i = 0; i < p_input->i_epg; i++ )
-    {
-        vlc_epg_t *p_tmp = p_input->pp_epg[i];
+    for (int i = 0; i < input->i_epg; i++) {
+        vlc_epg_t *tmp = input->pp_epg[i];
 
-        if( p_tmp->p_current && p_tmp->p_current->psz_name
-            && psz_now_playing != NULL
-            && !strcmp( p_tmp->p_current->psz_name, psz_now_playing ) )
-        {
-            p_epg = vlc_epg_New( p_tmp->psz_name );
-            vlc_epg_Merge( p_epg, p_tmp );
+        if (tmp->p_current &&
+            tmp->p_current->psz_name && now_playing != NULL &&
+            !strcmp(tmp->p_current->psz_name, now_playing)) {
+            epg = vlc_epg_New(tmp->psz_name);
+            vlc_epg_Merge(epg, tmp);
             break;
         }
     }
 
-    vlc_mutex_unlock( &p_input->lock );
+    vlc_mutex_unlock(&input->lock);
 
     /* If no EPG event has been found. */
-    if( p_epg == NULL )
+    if (epg == NULL)
         return VLC_EGENERIC;
 
-    subpicture_updater_sys_t *p_sys = malloc( sizeof( *p_sys ) );
-    if( !p_sys )
-    {
-        vlc_epg_Delete( p_epg );
+    subpicture_updater_sys_t *sys = malloc(sizeof(*sys));
+    if (!sys) {
+        vlc_epg_Delete(epg);
         return VLC_EGENERIC;
     }
-    p_sys->p_epg = p_epg;
+    sys->epg = epg;
     subpicture_updater_t updater = {
         .pf_validate = OSDEpgValidate,
         .pf_update   = OSDEpgUpdate,
         .pf_destroy  = OSDEpgDestroy,
-        .p_sys       = p_sys
+        .p_sys       = sys
     };
 
-    p_spu = subpicture_New( &updater );
-    if( !p_spu )
-    {
-        vlc_epg_Delete( p_sys->p_epg );
-        free( p_sys );
+    const mtime_t now = mdate();
+    subpicture_t *subpic = subpicture_New(&updater);
+    if (!subpic) {
+        vlc_epg_Delete(sys->epg);
+        free(sys);
         return VLC_EGENERIC;
     }
 
-    p_spu->i_channel = SPU_DEFAULT_CHANNEL;
-    p_spu->i_start = i_now;
-    p_spu->i_stop = i_now + 3000 * INT64_C(1000);
-    p_spu->b_ephemer = true;
-    p_spu->b_absolute = true;
-    p_spu->b_fade = true;
+    subpic->i_channel  = SPU_DEFAULT_CHANNEL;
+    subpic->i_start    = now;
+    subpic->i_stop     = now + 3000 * INT64_C(1000);
+    subpic->b_ephemer  = true;
+    subpic->b_absolute = true;
+    subpic->b_fade     = true;
 
-    vout_PutSubpicture( p_vout, p_spu );
+    vout_PutSubpicture(vout, subpic);
 
     return VLC_SUCCESS;
 }
