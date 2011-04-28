@@ -35,16 +35,12 @@ class PLItem
     friend class PLModel;
 public:
     PLItem( playlist_item_t *, PLItem *parent );
-    PLItem( playlist_item_t * );
     ~PLItem();
 
     int row() const;
 
-    void insertChild( PLItem *, int p, bool signal = true );
-    void appendChild( PLItem *item, bool signal = true )
-    {
-        children.insert( children.count(), item );
-    };
+    void insertChild( PLItem *, int pos, bool signal = true );
+    void appendChild( PLItem *item, bool signal = true );
     void removeChild( PLItem * );
     void removeChildren();
     void takeChildAt( int );
@@ -59,12 +55,13 @@ public:
 
 protected:
     QList<PLItem*> children;
+    PLItem *parentItem;
     int i_id;
     input_item_t *p_input;
 
 private:
+    PLItem( playlist_item_t * );
     void init( playlist_item_t *, PLItem * );
-    PLItem *parentItem;
 };
 
 #endif

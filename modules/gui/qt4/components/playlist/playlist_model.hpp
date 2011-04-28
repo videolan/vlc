@@ -92,8 +92,7 @@ public:
     void search( const QString& search_text, const QModelIndex & root, bool b_recursive );
     void sort( const int column, Qt::SortOrder order );
     void sort( const int i_root_id, const int column, Qt::SortOrder order );
-    void rebuild();
-    void rebuild( playlist_item_t * );
+    void rebuild( playlist_item_t * p = NULL );
 
     inline PLItem *getItem( QModelIndex index ) const
     {
@@ -174,7 +173,7 @@ class PlMimeData : public QMimeData
     Q_OBJECT
 
 public:
-    PlMimeData();
+    PlMimeData() {}
     ~PlMimeData();
     void appendItem( input_item_t *p_item );
     QList<input_item_t*> inputItems() const;
