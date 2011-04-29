@@ -1278,6 +1278,7 @@ libdvbpsi-$(LIBDVBPSI_VERSION).tar.gz:
 
 libdvbpsi: libdvbpsi-$(LIBDVBPSI_VERSION).tar.gz
 	$(EXTRACT_GZ)
+	patch -p0 < Patches/libdvbpsi_example.patch
 
 .dvbpsi: libdvbpsi
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --enable-release && cd src && make && make install)
