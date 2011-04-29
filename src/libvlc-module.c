@@ -2710,24 +2710,34 @@ vlc_module_begin ()
 
     add_string( "bookmark1", NULL,
              BOOKMARK1_TEXT, BOOKMARK_LONGTEXT, false )
+        change_autosave()
     add_string( "bookmark2", NULL,
              BOOKMARK2_TEXT, BOOKMARK_LONGTEXT, false )
+        change_autosave()
     add_string( "bookmark3", NULL,
              BOOKMARK3_TEXT, BOOKMARK_LONGTEXT, false )
+        change_autosave()
     add_string( "bookmark4", NULL,
              BOOKMARK4_TEXT, BOOKMARK_LONGTEXT, false )
+        change_autosave()
     add_string( "bookmark5", NULL,
              BOOKMARK5_TEXT, BOOKMARK_LONGTEXT, false )
+        change_autosave()
     add_string( "bookmark6", NULL,
              BOOKMARK6_TEXT, BOOKMARK_LONGTEXT, false )
+        change_autosave()
     add_string( "bookmark7", NULL,
              BOOKMARK7_TEXT, BOOKMARK_LONGTEXT, false )
+        change_autosave()
     add_string( "bookmark8", NULL,
              BOOKMARK8_TEXT, BOOKMARK_LONGTEXT, false )
+        change_autosave()
     add_string( "bookmark9", NULL,
              BOOKMARK9_TEXT, BOOKMARK_LONGTEXT, false )
+        change_autosave()
     add_string( "bookmark10", NULL,
               BOOKMARK10_TEXT, BOOKMARK_LONGTEXT, false )
+        change_autosave()
 
 #define HELP_TEXT \
     N_("print help for VLC (can be combined with --advanced and " \
