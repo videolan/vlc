@@ -283,7 +283,7 @@ static void *Run( void * p_obj )
     }
 
     // save config file
-    config_SaveConfigFile( p_intf, NULL );
+    config_SaveConfigFile( p_intf );
 
 end:
     // Destroy "singleton" objects

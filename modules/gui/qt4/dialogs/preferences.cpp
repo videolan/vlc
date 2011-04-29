@@ -295,7 +295,7 @@ void PrefsDialog::save()
     }
 
     /* Save to file */
-    if( config_SaveConfigFile( p_intf, NULL ) != 0 )
+    if( config_SaveConfigFile( p_intf ) != 0 )
     {
         ErrorsDialog::getInstance (p_intf)->addError( qtr( "Cannot save Configuration" ),
             qtr("Preferences file could not be saved") );
@@ -322,7 +322,7 @@ void PrefsDialog::reset()
     if( ret == QMessageBox::Ok )
     {
         config_ResetAll( p_intf );
-        config_SaveConfigFile( p_intf, NULL );
+        config_SaveConfigFile( p_intf );
         getSettings()->clear();
 
         accept();

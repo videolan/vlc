@@ -343,8 +343,6 @@ static int config_PrepareDir (vlc_object_t *obj)
 /*****************************************************************************
  * config_SaveConfigFile: Save a module's config options.
  *****************************************************************************
- * This will save the specified module's config options to the config file.
- * If psz_module_name is NULL then we save all the modules config options.
  * It's no use to save the config options that kept their default values, so
  * we'll try to be a bit clever here.
  *
@@ -359,8 +357,7 @@ static int config_PrepareDir (vlc_object_t *obj)
  * save.
  * Really stupid no ?
  *****************************************************************************/
-static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
-                           bool b_autosave )
+static int SaveConfigFile( vlc_object_t *p_this, bool b_autosave )
 {
     module_t *p_parser;
     char *permanent = NULL, *temporary = NULL;
@@ -415,9 +412,7 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
                 for (int i = 0; (p_parser = list[i]) != NULL; i++)
                 {
                     if (!strncmp (line + 1, p_parser->psz_object_name,
-                                  strlen (p_parser->psz_object_name))
-                     && ((psz_module_name == NULL)
-                      || !strcmp (psz_module_name, p_parser->psz_object_name)))
+                                  strlen (p_parser->psz_object_name)))
                     {
                         backup = false; /* no, we will rewrite it! */
                         break;
@@ -507,16 +502,8 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
     {
         module_config_t *p_item, *p_end;
 
-        if( psz_module_name && strcmp( psz_module_name,
-                                       p_parser->psz_object_name ) )
-            continue;
-
         if( !p_parser->i_config_items )
             continue;
-
-        if( psz_module_name )
-            msg_Dbg( p_this, "saving config for module \"%s\"",
-                     p_parser->psz_object_name );
 
         fprintf( file, "[%s]", p_parser->psz_object_name );
         if( p_parser->psz_longname )
@@ -685,7 +672,7 @@ int config_AutoSaveConfigFile( vlc_object_t *p_this )
 
     if (save)
         /* Note: this will get the read lock recursively. Ok. */
-        ret = SaveConfigFile (p_this, NULL, true);
+        ret = SaveConfigFile (p_this, true);
     vlc_rwlock_unlock (&config_lock);
 
     module_list_free (list);
@@ -693,7 +680,7 @@ int config_AutoSaveConfigFile( vlc_object_t *p_this )
 }
 
 #undef config_SaveConfigFile
-int config_SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name )
+int config_SaveConfigFile( vlc_object_t *p_this )
 {
-    return SaveConfigFile( p_this, psz_module_name, false );
+    return SaveConfigFile( p_this, false );
 }

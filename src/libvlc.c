@@ -467,7 +467,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
         if( var_InheritBool( p_libvlc, "reset-config" ) )
         {
             config_ResetAll( p_libvlc );
-            config_SaveConfigFile( p_libvlc, NULL );
+            config_SaveConfigFile( p_libvlc );
         }
     }
 

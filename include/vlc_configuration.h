@@ -198,8 +198,9 @@ VLC_EXPORT( void,   config_PutFloat, (vlc_object_t *, const char *, float) );
 VLC_EXPORT( char *, config_GetPsz,   (vlc_object_t *, const char *) LIBVLC_USED LIBVLC_MALLOC );
 VLC_EXPORT( void,   config_PutPsz,   (vlc_object_t *, const char *, const char *) );
 
-VLC_EXPORT( int,    config_SaveConfigFile, ( vlc_object_t *, const char * ) );
-#define config_SaveConfigFile(a,b) config_SaveConfigFile(VLC_OBJECT(a),b)
+VLC_EXPORT( int,    config_SaveConfigFile, ( vlc_object_t * ) );
+#define config_SaveConfigFile(a) config_SaveConfigFile(VLC_OBJECT(a))
+
 VLC_EXPORT( void,   config_ResetAll, ( vlc_object_t * ) );
 #define config_ResetAll(a) config_ResetAll(VLC_OBJECT(a))
 
