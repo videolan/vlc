@@ -13,11 +13,20 @@ Important changes for packagers:
  * The NPAPI webplugin has moved to git://git.videolan.org/npapi-vlc.git
  * The ActiveX webplugin has moved to git://git.videolan.org/activex-vlc.git
 
-Access
+
+Core:
+ * Major Video Core and Outputs rework and rewrite:
+   Subtitles, subpictures and OSD can now be sized and blent inside video outputs
+   x11 (Unix) and Direct3D (Windows) are such video outputs.
+ * Almost every video filter can now be transcoded
+ * Playback rate doesn't get resetted to 1 between items anymore
+ * Option --sub-filter was renamed --sub-source
+
+Access:
  * Multiple files are now supported inside RAR files
  * BDA: experimental support for ClearQam devices
- * DVB-S scanning support
- * DVB-C scanning scans correct modulation/symbolrate if needed
+ * DVB-S scanning support on Unix
+ * DVB-C scanning on Unix scans correct modulation/symbolrate if needed
  * DShow: support for freq and video standard selection
  * Support for VDR recordings (http://www.tvdr.de/) folders
  * Blu-Ray Discs integration using libbluray
@@ -28,26 +37,19 @@ Access
    in an option (no autodetection): only Theora supported for now
  * Basic HTCPCP implementation for Coffee Pot control
 
-Codecs
+Codecs:
  * You can now use ffmpeg-mt in conjunction with vlc
  * Important fixes for RealVideo 3.0 and 4.0 playback, notably in MKV
  * Experimental Hardware decoding using Broadcom CrystalHD cards
  * New module for Dirac encoding, using the faster libschroedinger
    The Schroedinger module should be prefered to the Dirac one
 
-Core:
- * Playback rate doesn't get resetted to 1 between items anymore
- * Major Video Output and Video Core reworks and rewrites
- * Almost every video filter can now be transcoded
- * Option --sub-filter was renamed --sub-source
-
 Demuxers:
- * id3tag plugin is now removed (superseded by taglib)
  * new images demuxer supporting jpeg, png, targa, xcf, git, tiff, bmp, pcx, lbm
  * Ogg seeking improvements
  * C64 SID file playback support using sidplay2
 
-Interfaces
+Interfaces:
  * Skins2 / Qt: misc improvements and usability fixes
  * Qt: effects dialogs rework
  * Qt: new CoverFlow-like view of the playlist
@@ -57,8 +59,6 @@ Interfaces
  * ncurses: heavy refactor of the complete interface
  * Mac OS X: new Audio Effects panel adding Compressor and Spatializer filters
  * The rc and telnet lua interfaces were merged into a new "cli" interface
- * removal of old telnet interface in favor of the new lua CLI
- * removal of http interface in favor of luahttp
 
 Video Output:
  * New video output based on Direct2D for Windows 7 and Vista (with Platform Update)
@@ -66,6 +66,9 @@ Video Output:
  * Experimental work in progress on a video output using EGL
  * Adaptation of the OpenGL layer for OpenGL ES 1.1
  * Various vmem improvements
+
+Audio Output:
+ * New audio output based on AudioQueue API for iOS
 
 Video Filter:
  * New gradfun filter for debanding videos using dithering
@@ -76,9 +79,6 @@ Video Filter:
  * New deinterlacer mode Phosphor, a framerate doubling CRT TV simulator
  * New deinterlacer mode IVTC, to do live inverse telecine for NTSC films
  * New subsdelay filter to change subtitles delay
-
-Audio Output:
- * New audio output based on AudioQueue API for iOS
 
 Audio Filter:
  * New Compressor filter, a dynamic range compressor
@@ -114,11 +114,13 @@ libVLC:
 
 Removed modules:
  * asademux: use libass only
+ * subsass: use libass
  * fake, invmem: use the new image demuxers
  * hal, v4l, gapi, omapfb, hd1000a, hd1000v: obsolete unmaintained modules
  * id3tag: use taglib
  * upnp: use upnp_intel
- * subsass: use libass
+ * removal of old telnet interface in favor of the new lua CLI
+ * removal of http interface in favor of luahttp
 
 
 Changes between 1.1.8 and 1.1.9:
