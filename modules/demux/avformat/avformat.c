@@ -34,7 +34,7 @@
 
 vlc_module_begin ()
 #endif /* MERGE_FFMPEG */
-    add_shortcut( "ffmpeg" )
+    add_shortcut( "ffmpeg", "avformat" )
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_DEMUX )
     set_description( N_("FFmpeg demuxer" ) )
@@ -45,7 +45,7 @@ vlc_module_begin ()
 #ifdef ENABLE_SOUT
     /* mux submodule */
     add_submodule ()
-    add_shortcut( "ffmpeg" )
+    add_shortcut( "ffmpeg", "avformat" )
     set_description( N_("FFmpeg muxer" ) )
     set_capability( "sout mux", 2 )
     add_string( "ffmpeg-mux", NULL, MUX_TEXT,
