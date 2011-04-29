@@ -979,7 +979,6 @@ static void SetBookmark( intf_thread_t *p_intf, int i_num )
     {
         config_PutPsz( p_intf, psz_bookmark_name, psz_uri);
         msg_Info( p_intf, "setting playlist bookmark %i to %s", i_num, psz_uri);
-        config_SaveConfigFile( p_intf, "hotkeys" );
     }
 
     free( psz_uri );
