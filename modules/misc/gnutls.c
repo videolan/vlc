@@ -41,6 +41,7 @@
 #endif
 #ifdef WIN32
 # include <io.h>
+# include <wincrypt.h>
 #else
 # include <unistd.h>
 #endif
@@ -439,6 +440,10 @@ static int
 gnutls_Addx509File( vlc_object_t *p_this,
                     gnutls_certificate_credentials_t cred,
                     const char *psz_path, bool b_priv );
+#ifdef WIN32
+static int gnutls_loadOSCAList(vlc_object_t *p_this,
+                               gnutls_certificate_credentials_t cred);
+#endif
 
 static int
 gnutls_Addx509Directory( vlc_object_t *p_this,
@@ -562,6 +567,37 @@ error:
     return VLC_EGENERIC;
 }
 
+#ifdef WIN32
+static int
+gnutls_loadOSCAList( vlc_object_t *p_this,
+                     gnutls_certificate_credentials cred)
+{
+    HCERTSTORE hCertStore = CertOpenSystemStoreA((HCRYPTPROV)NULL, "ROOT");
+    if (!hCertStore)
+    {
+        msg_Warn (p_this, "could not open the Cert SystemStore");
+        return VLC_EGENERIC;
+    }
+
+    PCCERT_CONTEXT pCertContext = CertEnumCertificatesInStore(hCertStore, NULL);
+    while( pCertContext )
+    {
+        gnutls_datum data = {
+            .data = pCertContext->pbCertEncoded,
+            .size = pCertContext->cbCertEncoded,
+        };
+
+        if(!gnutls_certificate_set_x509_trust_mem(cred, &data, GNUTLS_X509_FMT_DER))
+        {
+            msg_Warn (p_this, "cannot add x509 credential");
+            return VLC_EGENERIC;
+        }
+
+        pCertContext = CertEnumCertificatesInStore(hCertStore, pCertContext);
+    }
+    return VLC_SUCCESS;
+}
+#endif
 
 /** TLS client session data */
 typedef struct tls_client_sys_t
@@ -626,8 +662,13 @@ static int OpenClient (vlc_object_t *obj)
         char path[strlen (confdir)
                    + sizeof ("/ssl/certs/ca-certificates.crt")];
         sprintf (path, "%s/ssl/certs/ca-certificates.crt", confdir);
+#ifdef WIN32
+        gnutls_loadOSCAList (VLC_OBJECT (p_session),
+                             p_sys->x509_cred);
+#else
         gnutls_Addx509File (VLC_OBJECT (p_session),
                             p_sys->x509_cred, path, false);
+#endif
     }
     p_session->pf_handshake = gnutls_HandshakeAndValidate;
     /*p_session->pf_handshake = gnutls_ContinueHandshake;*/

@@ -4065,7 +4065,7 @@ AS_IF([test "${enable_gnutls}" != "no"], [
     VLC_ADD_CFLAGS([gnutls], [$GNUTLS_CFLAGS])
     AS_IF([test "${SYS}" = "mingw32"], [
       dnl pkg-config --libs gnutls omits these
-      VLC_ADD_LIBS([gnutls], [-lz ${LTLIBINTL}])
+      VLC_ADD_LIBS([gnutls], [-lz ${LTLIBINTL} -lcrypt32])
     ])
     VLC_ADD_LIBS([gnutls], [${GCRYPT_LIBS}])
     VLC_ADD_CFLAGS([gnutls], [${GCRYPT_CFLAGS}])
