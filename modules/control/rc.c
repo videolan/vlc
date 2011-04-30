@@ -899,6 +899,7 @@ static void Help( intf_thread_t *p_intf, bool b_longhelp)
 static int VolumeChanged( vlc_object_t *p_this, char const *psz_cmd,
     vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
+    (void) p_this;
     VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval); VLC_UNUSED(newval);
     intf_thread_t *p_intf = (intf_thread_t*)p_data;
 
