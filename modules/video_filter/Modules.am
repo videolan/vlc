@@ -10,7 +10,16 @@ SOURCES_crop = crop.c
 SOURCES_motionblur = motionblur.c
 SOURCES_logo = logo.c
 SOURCES_audiobargraph_v = audiobargraph_v.c
-SOURCES_deinterlace = deinterlace.c yadif.h mmx.h
+SOURCES_deinterlace = deinterlace/deinterlace.c \
+	deinterlace/mmx.h deinterlace/common.h \
+	deinterlace/merge.c deinterlace/merge.h \
+	deinterlace/helpers.c deinterlace/helpers.h \
+	deinterlace/algo_basic.c deinterlace/algo_basic.h \
+	deinterlace/algo_x.c deinterlace/algo_x.h \
+	deinterlace/algo_yadif.c deinterlace/algo_yadif.h \
+	deinterlace/yadif.h \
+	deinterlace/algo_phosphor.c deinterlace/algo_phosphor.h \
+	deinterlace/algo_ivtc.c deinterlace/algo_ivtc.h
 SOURCES_blend = blend.c
 SOURCES_scale = scale.c
 SOURCES_marq = marq.c
