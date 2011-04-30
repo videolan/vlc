@@ -904,7 +904,7 @@ static int VolumeChanged( vlc_object_t *p_this, char const *psz_cmd,
     intf_thread_t *p_intf = (intf_thread_t*)p_data;
 
     vlc_mutex_lock( &p_intf->p_sys->status_lock );
-    msg_rc( STATUS_CHANGE "( audio volume: %d )", newval.i_int );
+    msg_rc( STATUS_CHANGE "( audio volume: %"PRId64" )", newval.i_int );
     vlc_mutex_unlock( &p_intf->p_sys->status_lock );
     return VLC_SUCCESS;
 }
