@@ -316,7 +316,6 @@ $Id$
  * svcdsub: SVCD subtitles decoder
  * svg: a svg renderer module
  * swscale: Video scaling filter
- * swscale_omap: Video scaling filter for maemo/omap platform
  * t140: T.140 text encoder
  * taglib: Taglib tags parser and writer
  * telepathy: Telepathy Presence information using MissionControl notification

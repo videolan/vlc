@@ -1105,7 +1105,6 @@ modules/video_filter/scene.c
 modules/video_filter/sepia.c
 modules/video_filter/sharpen.c
 modules/video_filter/swscale.c
-modules/video_filter/swscale_omap.c
 modules/video_filter/transform.c
 modules/video_filter/wall.c
 modules/video_filter/wave.c

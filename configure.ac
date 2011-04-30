@@ -682,7 +682,7 @@ AC_CHECK_LIB(m,sqrt,[
   VLC_ADD_LIBS([compressor headphone_channel_mixer normvol audiobargraph_a speex mono colorthres extract ball],[-lm])
 ])
 AC_CHECK_LIB(m,ceil,[
-  VLC_ADD_LIBS([access_imem hotkeys mosaic swscale_omap],[-lm])
+  VLC_ADD_LIBS([access_imem hotkeys mosaic],[-lm])
 ])
 AC_CHECK_LIB(m,exp,[
   VLC_ADD_LIBS([gaussianblur],[-lm])
