@@ -128,10 +128,8 @@ libdtv_plugin_la_LIBADD = $(AM_LIBADD)
 libdtv_plugin_la_DEPENDENCIES =
 
 if HAVE_LINUX
-if !HAVE_ANDROID
 libdtv_plugin_la_SOURCES += dtv/linux.c
 libvlc_LTLIBRARIES += libdtv_plugin.la
-endif
 endif
 
 if HAVE_WIN32

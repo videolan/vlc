@@ -171,7 +171,6 @@ LDFLAGS_vlc="${LDFLAGS}"
 dnl
 dnl  Check the operating system
 dnl
-HAVE_ANDROID="0"
 HAVE_WIN64="0"
 case "${host_os}" in
   "")
@@ -179,10 +178,6 @@ case "${host_os}" in
     ;;
   linux*)
     SYS=linux
-    AC_TRY_COMPILE([],[#ifndef __ANDROID__
-                       # error "Not compiling for Android"
-                       #endif],
-                   [HAVE_ANDROID="1"])
     ;;
   bsdi*)
     SYS=bsdi
@@ -398,14 +393,13 @@ case "${host_os}" in
     SYS="${host_os}"
     ;;
 esac
-AM_CONDITIONAL(HAVE_ANDROID, test "${HAVE_ANDROID}" = "1")
 AM_CONDITIONAL(HAVE_DARWIN,  test "${SYS}" = "darwin")
 AM_CONDITIONAL(HAVE_LINUX,   test "${SYS}" = "linux")
 AM_CONDITIONAL(HAVE_OS2,     test "${SYS}" = "os2")
-AM_CONDITIONAL(HAVE_SYMBIAN, test "${SYS}" = "symbian")
 AM_CONDITIONAL(HAVE_WIN32,   test "${SYS}" = "mingw32")
 AM_CONDITIONAL(HAVE_WIN64,   test "${HAVE_WIN64}" = "1")
 AM_CONDITIONAL(HAVE_WINCE,   test "${SYS}" = "mingwce")
+AM_CONDITIONAL(HAVE_SYMBIAN, test "${SYS}" = "symbian")
 AM_CONDITIONAL(USE_PEFLAGS,  test "${enable_peflags}" = "yes")
 
 dnl
