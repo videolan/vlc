@@ -461,18 +461,23 @@ void InputManager::UpdateName()
     /* Try to get the nowplaying */
     char *format = var_InheritString( p_intf, "input-title-format" );
     char *formated = str_format_meta( p_input, format );
-    name = formated;
-    /* Free everything */
     free( format );
+    name = qfu(formated);
     free( formated );
 
     /* If we have Nothing */
     if( name.isEmpty() )
     {
-        char *psz_name = make_path( input_item_GetURI( input_GetItem( p_input ) ) );
-        name = psz_name;
-        name = name.remove( 0, name.lastIndexOf( DIR_SEP ) + 1 );
-        free( psz_name );
+        char *uri = input_item_GetURI( input_GetItem( p_input ) );
+        char *file = uri ? strrchr( uri, '/' ) : NULL;
+        if( file != NULL )
+        {
+            decode_URI( ++file );
+            name = qfu(file);
+        }
+        else
+            name = qfu(uri);
+        free( uri );
     }
 
     name = name.trimmed();
