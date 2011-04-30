@@ -368,15 +368,10 @@ static int CacheLoadConfig( module_t *p_module, FILE *file )
             p_module->p_config[i].value.psz =
                     (p_module->p_config[i].orig.psz != NULL)
                         ? strdup (p_module->p_config[i].orig.psz) : NULL;
-            p_module->p_config[i].saved.psz = NULL;
         }
         else
-        {
             memcpy (&p_module->p_config[i].value, &p_module->p_config[i].orig,
                     sizeof (p_module->p_config[i].value));
-            memcpy (&p_module->p_config[i].saved, &p_module->p_config[i].orig,
-                    sizeof (p_module->p_config[i].saved));
-        }
 
         p_module->p_config[i].b_dirty = false;
 

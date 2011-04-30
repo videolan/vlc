@@ -267,13 +267,13 @@ int vlc_plugin_set (module_t *module, module_config_t *item, int propid, ...)
         {
             if (IsConfigIntegerType (item->i_type))
             {
-                item->orig.i = item->saved.i =
+                item->orig.i =
                 item->value.i = va_arg (ap, int64_t);
             }
             else
             if (IsConfigFloatType (item->i_type))
             {
-                item->orig.f = item->saved.f =
+                item->orig.f =
                 item->value.f = va_arg (ap, double);
             }
             else
@@ -282,7 +282,6 @@ int vlc_plugin_set (module_t *module, module_config_t *item, int propid, ...)
                 const char *value = va_arg (ap, const char *);
                 item->value.psz = value ? strdup (value) : NULL;
                 item->orig.psz = value ? strdup (value) : NULL;
-                item->saved.psz = value ? strdup (value) : NULL;
             }
             break;
         }
@@ -311,10 +310,6 @@ int vlc_plugin_set (module_t *module, module_config_t *item, int propid, ...)
 
         case VLC_CONFIG_VOLATILE:
             item->b_unsaveable = true;
-            break;
-
-        case VLC_CONFIG_PERSISTENT:
-            item->b_autosave = true;
             break;
 
         case VLC_CONFIG_RESTART:

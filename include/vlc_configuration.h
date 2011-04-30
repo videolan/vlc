@@ -151,7 +151,6 @@ struct module_config_t
     char        *psz_longtext;   /* Long comment on the configuration option */
     module_value_t value;                                    /* Option value */
     module_value_t orig;
-    module_value_t saved;
     module_value_t min;
     module_value_t max;
 
@@ -180,7 +179,6 @@ struct module_config_t
     bool        b_restart;   /* Flag to indicate the option needs a restart */
                               /* to take effect */
     /* Option values loaded from config file */
-    bool        b_autosave;      /* Config will be auto-saved at exit time */
     bool        b_unsaveable;                /* Config should not be saved */
 
     bool        b_safe;

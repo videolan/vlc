@@ -473,7 +473,6 @@ void config_Free( module_t *p_module )
         {
             free (p_item->value.psz);
             free (p_item->orig.psz);
-            free (p_item->saved.psz);
         }
 
         if( p_item->ppsz_list )

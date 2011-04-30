@@ -228,7 +228,7 @@ int config_LoadConfigFile( vlc_object_t *p_this )
                     msg_Warn (p_this, "Integer value (%s) for %s: %m",
                               psz_option_value, psz_option_name);
                 else
-                    item->saved.i = item->value.i = l;
+                    item->value.i = l;
                 break;
             }
 
@@ -236,14 +236,11 @@ int config_LoadConfigFile( vlc_object_t *p_this )
                 if (!*psz_option_value)
                     break;                    /* ignore empty option */
                 item->value.f = (float)atof (psz_option_value);
-                item->saved.f = item->value.f;
                 break;
 
             default:
                 free ((char *)item->value.psz);
-                free ((char *)item->saved.psz);
                 item->value.psz = convert (psz_option_value);
-                item->saved.psz = strdupnull (item->value.psz);
                 break;
         }
     }
@@ -357,7 +354,7 @@ static int config_PrepareDir (vlc_object_t *obj)
  * save.
  * Really stupid no ?
  *****************************************************************************/
-static int SaveConfigFile( vlc_object_t *p_this, bool b_autosave )
+static int SaveConfigFile (vlc_object_t *p_this)
 {
     module_t *p_parser;
     char *permanent = NULL, *temporary = NULL;
@@ -520,66 +517,37 @@ static int SaveConfigFile( vlc_object_t *p_this, bool b_autosave )
              || p_item->b_unsaveable)          /* ignore volatile option */
                 continue;
 
-            /* Do not save the new value in the configuration file
-             * if doing an autosave, and the item is not an "autosaved" one. */
-            bool b_retain = b_autosave && !p_item->b_autosave;
-
             if (IsConfigIntegerType (p_item->i_type))
             {
-                int64_t val = b_retain ? p_item->saved.i : p_item->value.i;
+                int64_t val = p_item->value.i;
                 config_Write (file, p_item->psz_text,
                               (p_item->i_type == CONFIG_ITEM_BOOL)
                                   ? N_("boolean") : N_("integer"),
                               val == p_item->orig.i,
                               p_item->psz_name, "%"PRId64, val);
-                p_item->saved.i = val;
             }
             else
             if (IsConfigFloatType (p_item->i_type))
             {
-                float val = b_retain ? p_item->saved.f : p_item->value.f;
+                float val = p_item->value.f;
                 config_Write (file, p_item->psz_text, N_("float"),
                               val == p_item->orig.f,
                               p_item->psz_name, "%f", val);
-                p_item->saved.f = val;
             }
             else
             {
-                const char *psz_value = b_retain ? p_item->saved.psz
-                                                 : p_item->value.psz;
+                const char *psz_value = p_item->value.psz;
                 bool modified;
 
                 assert (IsConfigStringType (p_item->i_type));
 
-                if (b_retain && (psz_value == NULL)) /* FIXME: hack */
-                    psz_value = p_item->orig.psz;
-
-                modified =
-                    (psz_value != NULL)
-                        ? ((p_item->orig.psz != NULL)
-                            ? (strcmp (psz_value, p_item->orig.psz) != 0)
-                            : true)
-                        : (p_item->orig.psz != NULL);
-
+                modified = !!strcmp (psz_value ? psz_value : "",
+                                     p_item->orig.psz ? p_item->orig.psz : "");
                 config_Write (file, p_item->psz_text, N_("string"),
                               !modified, p_item->psz_name, "%s",
                               psz_value ? psz_value : "");
-
-                if ( !b_retain )
-                {
-
-                    free ((char *)p_item->saved.psz);
-                    if( (psz_value && p_item->orig.psz &&
-                         strcmp( psz_value, p_item->orig.psz )) ||
-                        !psz_value || !p_item->orig.psz)
-                        p_item->saved.psz = strdupnull (psz_value);
-                    else
-                        p_item->saved.psz = NULL;
-                }
             }
-
-            if (!b_retain)
-                p_item->b_dirty = false;
+            p_item->b_dirty = false;
         }
     }
     vlc_rwlock_unlock (&config_lock);
@@ -666,13 +634,13 @@ int config_AutoSaveConfigFile( vlc_object_t *p_this )
              p_item < p_end && !save;
              p_item++ )
         {
-            save = p_item->b_autosave && p_item->b_dirty;
+            save = p_item->b_dirty;
         }
     }
 
     if (save)
         /* Note: this will get the read lock recursively. Ok. */
-        ret = SaveConfigFile (p_this, true);
+        ret = SaveConfigFile (p_this);
     vlc_rwlock_unlock (&config_lock);
 
     module_list_free (list);
@@ -682,5 +650,5 @@ int config_AutoSaveConfigFile( vlc_object_t *p_this )
 #undef config_SaveConfigFile
 int config_SaveConfigFile( vlc_object_t *p_this )
 {
-    return SaveConfigFile( p_this, false );
+    return SaveConfigFile (p_this);
 }

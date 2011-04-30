@@ -72,8 +72,8 @@ enum vlc_module_properties
     VLC_CONFIG_VOLATILE,
     /* don't write variable to storage (args=none) */
 
-    VLC_CONFIG_PERSISTENT,
-    /* always write variable to storage (args=none) */
+    VLC_CONFIG_PERSISTENT_OBSOLETE,
+    /* unused (ignored) */
 
     VLC_CONFIG_RESTART,
     /* restart required to apply value change (args=none) */
@@ -418,9 +418,6 @@ enum vlc_module_properties
 
 #define change_need_restart() \
     vlc_config_set (p_config, VLC_CONFIG_RESTART);
-
-#define change_autosave() \
-    vlc_config_set (p_config, VLC_CONFIG_PERSISTENT);
 
 /* For options that are saved but hidden from the preferences panel */
 #define change_private() \

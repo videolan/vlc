@@ -482,10 +482,8 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_INTERFACE_MAIN )
     add_loadfile( "skins2-last", "", SKINS2_LAST, SKINS2_LAST_LONG,
                   true )
-        change_autosave ()
     add_string( "skins2-config", "", SKINS2_CONFIG, SKINS2_CONFIG_LONG,
                 true )
-        change_autosave ()
         change_private ()
 #ifdef WIN32
     add_bool( "skins2-systray", true, SKINS2_SYSTRAY,
