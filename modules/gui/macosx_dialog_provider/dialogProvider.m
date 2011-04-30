@@ -477,8 +477,7 @@ bool checkProgressPanel (void *priv)
 
         config_PutPsz(p_intf, "lastfm-username", [lastFMUsername UTF8String]);
         config_PutPsz(p_intf, "lastfm-password", [lastFMPassword UTF8String]);
-        config_SaveConfigFile(p_intf, "main");
-        config_SaveConfigFile(p_intf, "audioscrobbler");
+        config_SaveConfigFile(p_intf);
     }
     else
         msg_Err(p_intf,"Last.FM module not found, no action");
@@ -769,6 +768,16 @@ static void updateControlFromWidget(NSView *control, extension_widget_t *widget,
                 image = [[NSImage alloc] initWithContentsOfURL:[NSURL fileURLWithPath:string]];
             [imageView setImage:image];
             [image release];
+            break;
+        }
+        case EXTENSION_WIDGET_SPIN_ICON:
+        {
+            assert([control isKindOfClass:[NSProgressIndicator class]]);
+            NSProgressIndicator *progressIndicator = (NSProgressIndicator *)control;
+            if( widget->i_spin_loops != 0 )
+                [progressIndicator startAnimation:self];
+            else
+                [progressIndicator stopAnimation:self];
             break;
         }
     }
