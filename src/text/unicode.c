@@ -225,59 +225,74 @@ int utf8_fprintf( FILE *stream, const char *fmt, ... )
  */
 size_t vlc_towc (const char *str, uint32_t *restrict pwc)
 {
-    uint8_t *ptr = (uint8_t *)str;
+    uint8_t *ptr = (uint8_t *)str, c;
+    uint32_t cp;
+
     assert (str != NULL);
 
-    uint8_t c = ptr[0];
-
-    if (unlikely(c == '\0'))
-    {
-        *pwc = 0;
-        return 0;
-    }
-
+    c = *ptr;
     if (unlikely(c > 0xF4))
         return -1;
 
     int charlen = clz8 (c ^ 0xFF);
     switch (charlen)
     {
-        case 0: // 7-bit ASCII character -> OK
+        case 0: // 7-bit ASCII character -> short cut
             *pwc = c;
-            return 1;
+            return c != '\0';
 
         case 1: // continuation byte -> error
             return -1;
+
+        case 2:
+            if (unlikely(c < 0xC2)) // ASCII overlong
+                return -1;
+            cp = (c & 0x1F) << 6;
+            break;
+
+        case 3:
+            cp = (c & 0x0F) << 12;
+            break;
+
+        case 4:
+            cp = (c & 0x07) << 16;
+            break;
+
+        default:
+            assert (0);
     }
 
-    assert (charlen >= 2 && charlen <= 4);
-
-    uint32_t cp = c & ~((0xff >> (7 - charlen)) << (7 - charlen));
-    for (int i = 1; i < charlen; i++)
-    {
-        assert (cp < (1 << 26));
-        c = ptr[i];
-
-        if (unlikely((c >> 6) != 2)) // not a continuation byte
-            return -1;
-
-        cp = (cp << 6) | (ptr[i] & 0x3f);
-    }
-
+    /* Unrolled continuation bytes decoding */
     switch (charlen)
     {
         case 4:
-            if (unlikely(cp > 0x10FFFF)) // beyond Unicode
+            c = *++ptr;
+            if (unlikely((c >> 6) != 2)) // not a continuation byte
                 return -1;
+            cp |= (c & 0x3f) << 12;
+
+            if (unlikely(cp >= 0x110000)) // beyond Unicode range
+                return -1;
+            /* fall through */
         case 3:
+            c = *++ptr;
+            if (unlikely((c >> 6) != 2)) // not a continuation byte
+                return -1;
+            cp |= (c & 0x3f) << 6;
+
             if (unlikely(cp >= 0xD800 && cp < 0xC000)) // UTF-16 surrogate
                 return -1;
+            if (unlikely(cp < (1u << (5 * charlen - 4)))) // non-ASCII overlong
+                return -1;
+            /* fall through */
         case 2:
-            if (unlikely(cp < 128)) // ASCII overlong
+            c = *++ptr;
+            if (unlikely((c >> 6) != 2)) // not a continuation byte
                 return -1;
-            if (unlikely(cp < (1u << (5 * charlen - 3)))) // overlong
-                return -1;
+            cp |= (c & 0x3f);
+            break;
     }
+
     *pwc = cp;
     return charlen;
 }
