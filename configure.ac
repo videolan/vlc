@@ -1856,20 +1856,17 @@ PKG_ENABLE_MODULES_VLC([DC1394], [], [libraw1394 >= 2.0.1 libdc1394-2 >= 2.1.0],
 PKG_ENABLE_MODULES_VLC([DV], [access_dv], [libraw1394 >= 2.0.1 libavc1394 >= 0.5.3], [DV input module], [auto])
 
 AC_ARG_ENABLE(linsys,
-  [  --enable-linsys         Linux Linear Systems Ltd. SDI and HD-SDI input cards (default enabled)])
-case "${SYS}" in
-    linux*)
-if test "${enable_linsys}" != "no" -a "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"; then
+  [AS_HELP_STRING([--enable-linsys],
+    [Linux Linear Systems Ltd. SDI and HD-SDI input cards (default enabled)])])
+if test "$SYS" = "linux" -a "${enable_linsys}" != "no"; then
   VLC_ADD_PLUGIN([linsys_hdsdi])
   PKG_CHECK_MODULES(LINSYS_SDI, zvbi-0.2 >= 0.2.28,
     [ VLC_ADD_LIBS([linsys_sdi],[$LINSYS_SDI_LIBS])
       VLC_ADD_CFLAGS([linsys_sdi],[$LINSYS_SDI_CFLAGS])
       VLC_ADD_PLUGIN([linsys_sdi]) ],
-    [AC_MSG_WARN([Couldn't find zvbi >= 0.2.28, install libzvbi-dev ?])]
+    [AC_MSG_WARN([Could not find zvbi >= 0.2.28, install libzvbi-dev ?])]
   )
 fi
-;;
-esac
 
 dnl
 dnl dvdread module: check for libdvdread
