@@ -5,9 +5,6 @@ exec_prefix="@exec_prefix@"
 exec_prefix_set=no
 datarootdir="@datarootdir@"
 
-debug="@debug@"
-gprof="@gprof@"
-cprof="@cprof@"
 optim="@optim@"
 
 plugins="@PLUGINS@ "
@@ -21,8 +18,6 @@ ldflags=""
 libs=""
 
 cflags_tuning="@CFLAGS_TUNING@"
-cflags_optim_speed="@CFLAGS_OPTIM_SPEED@"
-cflags_optim_nodebug="@CFLAGS_OPTIM_NODEBUG@"
 
 #
 #  Do not touch below this place unless you really know what you are doing
@@ -84,14 +79,9 @@ cppflags="${cppflags} -D_FILE_OFFSET_BITS=64 -D__USE_UNIX98 -D_REENTRANT -D_THRE
 #  Various additional defines
 #
 if [ "${optim}" = speed ]; then
-  cflags="${cflags} ${cflags_optim_speed} ${cflags_tuning}"
-  cxxflags="${cxxflags} ${cflags_optim_speed} ${cflags_tuning}"
-  objcflags="${objcflags} ${cflags_optim_speed} ${cflags_tuning}"
-  if [ "${debug}" != yes -a "${gprof}" != yes -a "${cprof}" != yes ]; then
-    cflags="${cflags} ${cflags_optim_nodebug}"
-    cxxflags="${cxxflags} ${cflags_optim_nodebug}"
-    objcflags="${objcflags} ${cflags_optim_nodebug}"
-  fi
+  cflags="${cflags} ${cflags_tuning}"
+  cxxflags="${cxxflags} ${cflags_tuning}"
+  objcflags="${objcflags} ${cflags_tuning}"
 fi
 
 #

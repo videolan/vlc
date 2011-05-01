@@ -92,15 +92,11 @@ AC_DEFUN([VLC_OUTPUT_VLC_CONFIG_IN], [
 
   rm -f vlc-config.in
   sed -ne '/#@1@#/q;p' < "${srcdir}/vlc-config.in.in" \
-    | sed -e "s/@gprof@/${enable_gprof}/" \
-          -e "s/@cprof@/${enable_cprof}/" \
+    | sed \
           -e "s/@optim@/${enable_optimizations}/" \
-          -e "s/@debug@/${enable_debug}/" \
           -e "s/@PLUGINS@/${PLUGINS}/" \
           -e "s/@BUILTINS@/${BUILTINS}/" \
           -e "s/@CFLAGS_TUNING@/${CFLAGS_TUNING}/" \
-          -e "s/@CFLAGS_OPTIM_SPEED@/${CFLAGS_OPTIM_SPEED}/" \
-          -e "s/@CFLAGS_OPTIM_NODEBUG@/${CFLAGS_OPTIM_NODEBUG}/" \
     > vlc-config.in
 
   dnl  Switch/case loop

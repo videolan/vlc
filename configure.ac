@@ -1050,79 +1050,157 @@ AS_IF([test "${enable_coverage}" != "no"], [
 
 VLC_SAVE_FLAGS
 
+dnl
+dnl  Enable/disable optimizations
+dnl
+AC_ARG_ENABLE(optimizations,
+  [AS_HELP_STRING([--disable-optimizations],
+    [disable compiler optimizations (default enabled)])],,
+  [enable_optimizations="yes"])
+AS_IF([test "${enable_optimizations}" != "no"], [
+  enable_optimizations="speed"
+])
+
 dnl Check for various optimization flags
-AC_CACHE_CHECK([if \$CC accepts -O4],
-    [ac_cv_c_o4],
-    [CFLAGS="${CFLAGS_save} -O4"
-     AC_TRY_COMPILE([],,ac_cv_c_o4=yes, ac_cv_c_o4=no)])
-if test "${ac_cv_c_o4}" != "no" -a "x${enable_debug}" = "xno"; then
-    CFLAGS_OPTIM_SPEED="${CFLAGS_OPTIM_SPEED} -O4"
-else
-    AC_CACHE_CHECK([if \$CC accepts -O3],
-        [ac_cv_c_o3],
-        [CFLAGS="${CFLAGS_save} -O3"
-         AC_TRY_COMPILE([],,ac_cv_c_o3=yes, ac_cv_c_o3=no)])
-    if test "${ac_cv_c_o3}" != "no" -a "x${enable_debug}" = "xno"; then
-        CFLAGS_OPTIM_SPEED="${CFLAGS_OPTIM_SPEED} -O3"
-    else
-        AC_CACHE_CHECK([if \$CC accepts -O2],
-            [ac_cv_c_o2],
-            [CFLAGS="${CFLAGS_save} -O2"
-             AC_TRY_COMPILE([],,ac_cv_c_o2=yes, ac_cv_c_o2=no)])
-        if test "${ac_cv_c_o2}" != "no"; then
-            CFLAGS_OPTIM_SPEED="${CFLAGS_OPTIM_SPEED} -O2"
-        else
-            AC_CACHE_CHECK([if \$CC accepts -O],
-                [ac_cv_c_o],
-                [CFLAGS="${CFLAGS_save} -O"
-                 AC_TRY_COMPILE([],,ac_cv_c_o=yes, ac_cv_c_o=no)])
-            if test "${ac_cv_c_o}" != "no"; then
-                CFLAGS_OPTIM_SPEED="${CFLAGS_OPTIM_SPEED} -O"
-            fi
-        fi
-    fi
-fi
+AS_IF([test "${enable_optimizations}" != "no"], [
 
-dnl Check for -ffast-math
-AC_CACHE_CHECK([if \$CC accepts -ffast-math],
-    [ac_cv_c_fast_math],
-    [CFLAGS="${CFLAGS_save} -ffast-math"
-     AC_TRY_COMPILE([],,ac_cv_c_fast_math=yes, ac_cv_c_fast_math=no)])
-if test "${ac_cv_c_fast_math}" != "no"; then
-    CFLAGS_OPTIM_SPEED="${CFLAGS_OPTIM_SPEED} -ffast-math"
-fi
+  C_O=""
+  dnl -O4 and -O3 only in production builds
+  AS_IF([test "{enable_debug}" = "no"], [
+    AC_CACHE_CHECK([if $CC accepts -O4], [ac_cv_c_o4], [
+      CFLAGS="${CFLAGS_save} -O4"
+      AC_COMPILE_IFELSE([AC_LANG_PROGRAM()], [
+        ac_cv_c_o4=yes
+      ], [
+        ac_cv_c_o4=no
+      ])
+    ])
+    AS_IF([test "${ac_cv_c_o4}" != "no"], [
+      C_O="-O4"
+    ], [
+      AC_CACHE_CHECK([if $CC accepts -O3],  [ac_cv_c_o3], [
+        CFLAGS="${CFLAGS_save} -O3"
+        AC_COMPILE_IFELSE([AC_LANG_PROGRAM()], [
+          ac_cv_c_o3=yes
+        ], [
+          ac_cv_c_o3=no
+        ])
+      ])
+      AS_IF([test "${ac_cv_c_o3}" != "no"], [
+        C_O="-O3"
+      ])
+    ])
+  ])
 
-dnl Check for -funroll-loops
-AC_CACHE_CHECK([if \$CC accepts -funroll-loops],
-    [ac_cv_c_unroll_loops],
-    [CFLAGS="${CFLAGS_save} -funroll-loops"
-     AC_TRY_COMPILE([],,ac_cv_c_unroll_loops=yes, ac_cv_c_unroll_loops=no)])
-if test "${ac_cv_c_unroll_loops}" != "no"; then
-    CFLAGS_OPTIM_SPEED="${CFLAGS_OPTIM_SPEED} -funroll-loops"
-fi
+  dnl -O2 and -O in both production and debug builds
+  AS_IF([test "x$C_O" = "x"], [
+    AC_CACHE_CHECK([if \$CC accepts -O2], [ac_cv_c_o2], [
+      CFLAGS="${CFLAGS_save} -O2"
+      AC_COMPILE_IFELSE([AC_LANG_PROGRAM()], [
+        ac_cv_c_o2=yes
+      ], [
+        ac_cv_c_o2=no
+      ])
+    ])
+    AS_IF([test "${ac_cv_c_o2}" != "no"], [
+      C_O="-O2"
+    ], [
+      AC_CACHE_CHECK([if \$CC accepts -O], [ac_cv_c_o], [
+        CFLAGS="${CFLAGS_save} -O"
+        AC_COMPILE_IFELSE([AC_LANG_PROGRAM()], [
+          ac_cv_c_o=yes
+        ], [
+          ac_cv_c_o=no
+        ])
+      ])
+      AS_IF([test "${ac_cv_c_o}" != "no"], [
+        C_O="-O"
+      ])
+    ])
+  ])
 
-dnl Check for -fomit-frame-pointer
-AC_CACHE_CHECK([if \$CC accepts -fomit-frame-pointer],
-    [ac_cv_c_omit_frame_pointer],
-    [CFLAGS="${CFLAGS_save} -fomit-frame-pointer"
-     AC_TRY_COMPILE([],,ac_cv_c_omit_frame_pointer=yes, ac_cv_c_omit_frame_pointer=no)])
-if test "${ac_cv_c_omit_frame_pointer}" != "no"; then
- if test "${SYS}" != "darwin"; then
-    CFLAGS_OPTIM_NODEBUG="${CFLAGS_OPTIM_NODEBUG} -fomit-frame-pointer"
- else
-    dnl On darwin we explicitely disable it.
-    CFLAGS_OPTIM_NODEBUG="${CFLAGS_OPTIM_NODEBUG} -fno-omit-frame-pointer"
- fi
-fi
+  VLC_RESTORE_FLAGS
+  CFLAGS="${CFLAGS} ${C_O}"
+  CXXFLAGS="${CXXFLAGS} ${C_O}"
+  OBJCFLAGS="${OBJCFLAGS} ${C_O}"
+  VLC_SAVE_FLAGS
+
+  dnl Check for -ffast-math
+  AC_CACHE_CHECK([if $CC accepts -ffast-math], [ac_cv_c_fast_math], [
+    CFLAGS="${CFLAGS_save} -ffast-math"
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM()], [
+      ac_cv_c_fast_math=yes
+    ], [
+      ac_cv_c_fast_math=no
+    ])
+  ])
+  AS_IF([test "${ac_cv_c_fast_math}" != "no"], [
+    VLC_RESTORE_FLAGS
+    CFLAGS="${CFLAGS} -ffast-math"
+    CXXFLAGS="${CXXFLAGS} -ffast-math"
+    OBJCFLAGS="${OBJCFLAGS} -ffast-math"
+    VLC_SAVE_FLAGS
+  ])
+
+  dnl Check for -funroll-loops
+  AC_CACHE_CHECK([if $CC accepts -funroll-loops], [ac_cv_c_unroll_loops], [
+    CFLAGS="${CFLAGS_save} -funroll-loops"
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM()], [
+      ac_cv_c_unroll_loops=yes
+    ], [
+      ac_cv_c_unroll_loops=no
+    ])
+  ])
+  AS_IF([test "${ac_cv_c_unroll_loops}" != "no"], [
+    VLC_RESTORE_FLAGS
+    CFLAGS="${CFLAGS} -funroll-loops"
+    CXXFLAGS="${CXXFLAGS} -funroll-loops"
+    OBJCFLAGS="${OBJCFLAGS} -funroll-loops"
+    VLC_SAVE_FLAGS
+  ])
+
+  AS_IF([test "$enable_debug" = "no"], [
+    dnl Check for -fomit-frame-pointer
+    AC_CACHE_CHECK([if $CC accepts -fomit-frame-pointer],
+      [ac_cv_c_omit_frame_pointer], [
+      CFLAGS="${CFLAGS_save} -fomit-frame-pointer"
+      AC_COMPILE_IFELSE([AC_LANG_PROGRAM()], [
+        ac_cv_c_omit_frame_pointer=yes
+      ], [
+        ac_cv_c_omit_frame_pointer=no
+      ])
+    ])
+    AS_IF([test "${ac_cv_c_omit_frame_pointer}" != "no"], [
+      VLC_RESTORE_FLAGS
+      AS_IF([test "${SYS}" != "darwin"], [
+        CFLAGS="${CFLAGS} -fomit-frame-pointer"
+        CXXFLAGS="${CXXFLAGS} -fomit-frame-pointer"
+      ], [
+        dnl On darwin we explicitely disable it.
+        CFLAGS="${CFLAGS} -fno-omit-frame-pointer"
+        CXXFLAGS="${CXXFLAGS} -fno-omit-frame-pointer"
+        OBJCFLAGS="${OBJCFLAGS} -fno-omit-frame-pointer"
+      ])
+      VLC_SAVE_FLAGS
+    ])
+  ])
+])
 
 dnl Check for Darwin plugin linking flags
-AC_CACHE_CHECK([if \$CC accepts -bundle -undefined error],
-    [ac_cv_ld_darwin],
-    [CFLAGS="${CFLAGS_save} -bundle -undefined error"
-     AC_TRY_COMPILE([],,ac_cv_ld_darwin=yes, ac_cv_ld_darwin=no)])
-if test "${ac_cv_ld_darwin}" != "no"; then
+AS_IF([test "${SYS}" = "darwin"], [
+  AC_CACHE_CHECK([if $CC accepts -bundle -undefined error],
+    [ac_cv_ld_darwin], [
+    CFLAGS="${CFLAGS_save} -bundle -undefined error"
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM()], [
+      ac_cv_ld_darwin=yes
+    ], [
+      ac_cv_ld_darwin=no
+    ])
+  ])
+  AS_IF([test "${ac_cv_ld_darwin}" != "no"], [
     VLC_ADD_LDFLAGS([plugin],[-bundle -undefined error])
-fi
+  ])
+])
 
 dnl Checks for __attribute__(aligned()) directive
 AC_CACHE_CHECK([__attribute__ ((aligned ())) support],
@@ -1568,16 +1646,6 @@ AC_ARG_ENABLE(optimize-memory,
     [optimize memory usage over performance])])
 if test "${enable_optimize_memory}" = "yes"; then
   AC_DEFINE(OPTIMIZE_MEMORY, 1, Define if you want to optimize memory usage over performance)
-fi
-
-dnl
-dnl  Enable/disable optimizations
-dnl
-AC_ARG_ENABLE(optimizations,
-  [AS_HELP_STRING([--disable-optimizations],
-    [disable compiler optimizations (default enabled)])])
-if test "${enable_optimizations}" != "no"; then
-  enable_optimizations="speed"
 fi
 
 dnl
