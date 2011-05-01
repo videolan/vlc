@@ -986,24 +986,6 @@ RDC_PROG_CC_WFLAGS([all extra sign-compare undef pointer-arith bad-function-cast
 RDC_PROG_CC_FLAGS([-pipe])
 
 dnl Check for various optimization flags
-AC_CACHE_CHECK([if \$CC accepts -Os],
-    [ac_cv_c_os],
-    [CFLAGS="${CFLAGS_save} -Os"
-     AC_TRY_COMPILE([],,ac_cv_c_os=yes, ac_cv_c_os=no)])
-if test "${ac_cv_c_os}" != "no"; then
-    CFLAGS_OPTIM_SIZE="${CFLAGS_OPTIM_SIZE} -Os"
-else
-    AC_CACHE_CHECK([if \$CC accepts -O],
-        [ac_cv_c_o],
-        [CFLAGS="${CFLAGS_save} -O"
-         AC_TRY_COMPILE([],,ac_cv_c_o=yes, ac_cv_c_o=no)])
-    if test "${ac_cv_c_o}" != "no"; then
-        if test "${ac_cv_c_o3}" = "no"; then
-            CFLAGS_OPTIM_SIZE="${CFLAGS_OPTIM_SIZE} -O"
-        fi
-    fi
-fi
-
 AC_CACHE_CHECK([if \$CC accepts -O4],
     [ac_cv_c_o4],
     [CFLAGS="${CFLAGS_save} -O4"
@@ -1549,11 +1531,7 @@ AC_ARG_ENABLE(optimizations,
   [AS_HELP_STRING([--disable-optimizations],
     [disable compiler optimizations (default enabled)])])
 if test "${enable_optimizations}" != "no"; then
-   if test "${enable_optimize_memory}" = "yes"; then
-      enable_optimizations="size"
-   else
-      enable_optimizations="speed"
-   fi
+  enable_optimizations="speed"
 fi
 
 dnl

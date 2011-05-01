@@ -21,7 +21,6 @@ ldflags=""
 libs=""
 
 cflags_tuning="@CFLAGS_TUNING@"
-cflags_optim_size="@CFLAGS_OPTIM_SIZE@"
 cflags_optim_speed="@CFLAGS_OPTIM_SPEED@"
 cflags_optim_nodebug="@CFLAGS_OPTIM_NODEBUG@"
 cflags_nooptim="@CFLAGS_NOOPTIM@"
@@ -102,16 +101,7 @@ if [ "${gprof}" = yes ]; then
   objcflags="${objcflags} -pg"
   ldflags="${ldflags} -pg"
 fi
-if [ "${optim}" = size ]; then
-  cflags="${cflags} ${cflags_optim_size} ${cflags_tuning}"
-  cxxflags="${cxxflags} ${cflags_optim_size} ${cflags_tuning}"
-  objcflags="${objcflags} ${cflags_optim_size} ${cflags_tuning}"
-  if [ "${debug}" != yes -a "${gprof}" != yes -a "${cprof}" != yes ]; then
-    cflags="${cflags} ${cflags_optim_nodebug}"
-    cxxflags="${cxxflags} ${cflags_optim_nodebug}"
-    objcflags="${objcflags} ${cflags_optim_nodebug}"
-  fi
-elif [ "${optim}" = speed ]; then
+if [ "${optim}" = speed ]; then
   cflags="${cflags} ${cflags_optim_speed} ${cflags_tuning}"
   cxxflags="${cxxflags} ${cflags_optim_speed} ${cflags_tuning}"
   objcflags="${objcflags} ${cflags_optim_speed} ${cflags_tuning}"
