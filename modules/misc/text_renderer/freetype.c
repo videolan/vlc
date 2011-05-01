@@ -356,14 +356,11 @@ static int Create( vlc_object_t *p_this )
 #ifdef HAVE_STYLES
         psz_fontfamily = strdup( DEFAULT_FAMILY );
 #else
-        psz_fontfamily = (char *)malloc( PATH_MAX + 1 );
-        if( !psz_fontfamily )
-            goto error;
 # ifdef WIN32
-        strcat( psz_fontfamily, p_sys->psz_win_fonts_path );
-        strcat( psz_fontfamily, DEFAULT_FONT );
+        if( asprintf( &psz_fontfamily, "%s%s", p_sys->psz_win_fonts_path, DEFAULT_FONT ) == -1 )
+            goto error;
 # else
-        strcpy( psz_fontfamily, DEFAULT_FONT );
+        psz_fontfamily = strdup( DEFAULT_FONT );
 # endif
         msg_Err( p_filter,"User specified an empty fontfile, using %s", psz_fontfamily );
 #endif
