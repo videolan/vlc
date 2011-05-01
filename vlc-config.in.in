@@ -84,23 +84,6 @@ cppflags="${cppflags} -D_FILE_OFFSET_BITS=64 -D__USE_UNIX98 -D_REENTRANT -D_THRE
 #
 #  Various additional defines
 #
-if [ "${debug}" = yes ]; then
-  cflags="${cflags} -g"
-  cxxflags="${cxxflags} -g"
-  objcflags="${objcflags} -g"
-  ldflags="${ldflags} -g"
-fi
-if [ "${cprof}" = yes ]; then
-  cflags="${cflags} -finstrument-functions"
-  cxxflags="${cxxflags} -finstrument-functions"
-  objcflags="${objcflags} -finstrument-functions"
-fi
-if [ "${gprof}" = yes ]; then
-  cflags="${cflags} -pg"
-  cxxflags="${cxxflags} -pg"
-  objcflags="${objcflags} -pg"
-  ldflags="${ldflags} -pg"
-fi
 if [ "${optim}" = speed ]; then
   cflags="${cflags} ${cflags_optim_speed} ${cflags_tuning}"
   cxxflags="${cxxflags} ${cflags_optim_speed} ${cflags_tuning}"

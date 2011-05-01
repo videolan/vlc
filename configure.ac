@@ -980,10 +980,75 @@ AC_CACHE_CHECK([for ntohl in sys/param.h],
 if test "${ac_cv_c_ntohl_sys_param_h}" != "no"; then
     AC_DEFINE(NTOHL_IN_SYS_PARAM_H, 1, Define if <sys/param.h> defines ntohl.)
 fi
-CFLAGS="${CFLAGS_save}"
+
+EXTEND_HELP_STRING([Optimization options:])
+VLC_RESTORE_FLAGS
+dnl
+dnl  Compiler warnings
+dnl
 
 RDC_PROG_CC_WFLAGS([all extra sign-compare undef pointer-arith bad-function-cast write-strings missing-prototypes volatile-register-var error-implicit-function-declaration])
 RDC_PROG_CC_FLAGS([-pipe])
+
+dnl
+dnl  Debugging mode
+dnl
+AC_ARG_ENABLE(debug,
+  [AS_HELP_STRING([--enable-debug],
+    [build with run-time assertions and debug symbols (default disabled)])],,
+  [enable_debug="no"])
+AH_TEMPLATE(NDEBUG,
+            [Define to 1 if debug code should NOT be compiled])
+AS_IF([test "${enable_debug}" != "no"], [
+  AC_CHECK_HEADERS([valgrind/valgrind.h])
+  CFLAGS="${CFLAGS} -g"
+  CXXFLAGS="${CXXFLAGS} -g"
+  OBJCFLAGS="${OBJCFLAGS} -g"
+  LDFLAGS="${LDFLAGS} -g"
+], [
+  AC_DEFINE(NDEBUG)
+])
+
+dnl
+dnl  Profiling
+dnl
+AC_ARG_ENABLE(gprof,
+  [AS_HELP_STRING([--enable-gprof],[profile with gprof (default disabled)])],,
+  [enable_gprof="no"])
+AS_IF([test "${enable_gprof}" != "no"], [
+  CFLAGS="${CFLAGS} -pg"
+  CXXFLAGS="${CXXFLAGS} -pg"
+  OBJCFLAGS="${OBJCFLAGS} -pg"
+  LDFLAGS="${LDFLAGS} -pg"
+])
+
+AC_ARG_ENABLE(cprof,
+  [AS_HELP_STRING([--enable-cprof],[profile with cprof (default disabled)])],,
+  [enable_cprof="no"])
+AS_IF([test "${enable_gprof}" != "no"], [
+  CFLAGS="${CFLAGS} -finstrument-functions"
+  CXXFLAGS="${CXXFLAGS} -finstrument-functions"
+  OBJCFLAGS="${OBJCFLAGS} -finstrument-functions"
+  LDFLAGS="${LDFLAGS} -finstrument-functions"
+])
+
+dnl
+dnl  Test coverage
+dnl
+AC_ARG_ENABLE(coverage,
+  [AS_HELP_STRING([--enable-coverage],
+    [build for test coverage (default disabled)])],,
+  [enable_coverage="no"])
+AS_IF([test "${enable_coverage}" != "no"], [
+  CFLAGS="-fprofile-arcs -ftest-coverage ${CFLAGS}"
+  CXXFLAGS="-fprofile-arcs -ftest-coverage ${CXXFLAGS}"
+  LDFLAGS="-lgcov ${LDFLAGS}"
+  CFLAGS_save="${CFLAGS}"
+  CXXFLAGS_save="${CXXFLAGS}"
+  LDFLAGS_save="${LDFLAGS}"
+])
+
+VLC_SAVE_FLAGS
 
 dnl Check for various optimization flags
 AC_CACHE_CHECK([if \$CC accepts -O4],
@@ -1110,16 +1175,6 @@ AC_CHECK_HEADERS(execinfo.h)
 AC_CHECK_FUNCS(backtrace)
 
 dnl
-dnl  Enable profiling
-dnl
-AC_ARG_ENABLE(gprof,
-  [AS_HELP_STRING([--enable-gprof],[profile with gprof (default disabled)])])
-AC_ARG_ENABLE(cprof,
-  [AS_HELP_STRING([--enable-cprof],[profile with cprof (default disabled)])])
-test "${enable_gprof}" != "yes" && enable_gprof="no"
-test "${enable_cprof}" != "yes" && enable_cprof="no"
-
-dnl
 dnl  default modules
 dnl
 ALIASES="${ALIASES} cvlc rvlc"
@@ -1140,7 +1195,6 @@ fi
 dnl
 dnl  Accelerated modules
 dnl
-EXTEND_HELP_STRING([Optimization options:])
 
 dnl  Check for fully working MMX intrinsics
 dnl  We need support for -mmmx, we need <mmintrin.h>, and we also need a
@@ -1535,21 +1589,6 @@ if test "${enable_optimizations}" != "no"; then
 fi
 
 dnl
-dnl  Debugging mode
-dnl
-AC_ARG_ENABLE(debug,
-  [AS_HELP_STRING([--enable-debug],
-    [check assertions at run-time (default disabled)])])
-test "${enable_debug}" != "yes" && enable_debug="no"
-AH_TEMPLATE(NDEBUG,
-            [Define to 1 if debug code should NOT be compiled])
-AS_IF([test "x${enable_debug}" = "xno"], [
-  AC_DEFINE(NDEBUG)
-], [
-  AC_CHECK_HEADERS([valgrind/valgrind.h])
-])
-
-dnl
 dnl Allow running as root (useful for people running on embedded platforms)
 dnl
 AC_ARG_ENABLE(run-as-root,
@@ -1558,23 +1597,6 @@ AC_ARG_ENABLE(run-as-root,
 AS_IF([test "${enable_run_as_root}" = "yes"],[
     AC_DEFINE(ALLOW_RUN_AS_ROOT, 1,
               [Define to 1 to allow running VLC as root (uid 0).])
-])
-
-dnl
-dnl  Test coverage
-dnl
-AC_ARG_ENABLE(coverage,
-  [AS_HELP_STRING([--enable-coverage],
-    [build for test coverage (default disabled)])],,
-  [enable_coverage="no"])
-AS_IF([test "${enable_coverage}" != "no"], [
-	CFLAGS="-fprofile-arcs -ftest-coverage ${CFLAGS}"
-	CXXFLAGS="-fprofile-arcs -ftest-coverage ${CXXFLAGS}"
-	LDFLAGS="-lgcov ${LDFLAGS}"
-	dnl ugly...
-	CFLAGS_save="${CFLAGS}"
-	CXXFLAGS_save="${CXXFLAGS}"
-	LDFLAGS_save="${LDFLAGS}"
 ])
 
 dnl
@@ -4376,9 +4398,6 @@ version               : ${VERSION}
 system                : ${SYS}
 architecture          : ${ARCH}
 build flavour         : "
-test "${enable_debug}" = "yes" && printf "debug "
-test "${enable_cprof}" = "yes" && printf "cprof "
-test "${enable_gprof}" = "yes" && printf "gprof "
 test "${enable_optimizations}" != "no" && printf ${enable_optimizations}
 echo ""
 if test "${enable_vlc}" != "no"; then
