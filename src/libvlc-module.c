@@ -27,7 +27,6 @@
 // Pretend we are a builtin module
 #define MODULE_NAME main
 #define MODULE_PATH main
-#define __BUILTIN__
 
 
 #ifdef HAVE_CONFIG_H

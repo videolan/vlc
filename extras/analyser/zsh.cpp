@@ -43,7 +43,6 @@ typedef std::pair<int, std::string> mcpair;
 
 /* evil hack */
 #undef __PLUGIN__
-#undef __BUILTIN__
 #include <../src/modules/modules.h>
 
 void ParseModules( mumap &mods, mcmap &mods2 );

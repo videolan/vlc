@@ -113,7 +113,6 @@ mv -f INSTALL.git INSTALL
 ##  files which need to be regenerated
 ##
 rm -f vlc-config.in vlc-config
-rm -f src/misc/modules_builtin.h
 rm -f stamp-h*
 
 # Shut up

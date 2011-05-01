@@ -8,7 +8,6 @@ datarootdir="@datarootdir@"
 optim="@optim@"
 
 plugins="@PLUGINS@ "
-builtins="@BUILTINS@ "
 
 cppflags=""
 cflags=""
@@ -38,7 +37,6 @@ Options:
 Modules:
         vlc                       the main VLC object
         plugin                    flags for plugin modules
-        builtin                   flags for built-in modules
         MODULE                    any available module (dummy, gtk, avi, etc.)
         libs                      flags for external libs
 BLAH
@@ -159,10 +157,6 @@ while test $# -gt 0; do
       echo_plugin=yes
       cppflags="${cppflags} -D__LIBVLC__ -D__PLUGIN__"
       ;;
-    builtin)
-      echo_builtin=yes
-      cppflags="${cppflags} -D__LIBVLC__ -D__BUILTIN__"
-      ;;
     *)
       module="$tgt"
       ;;
@@ -187,10 +181,6 @@ fi
 if test "${echo_list}" = yes; then
   if test "${echo_plugin}" = yes; then
     echo "${plugins}"
-    printf '\n'
-  fi
-  if test "${echo_builtin}" = yes; then
-    echo "${builtins}"
     printf '\n'
   fi
   exit 0

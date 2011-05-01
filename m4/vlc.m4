@@ -6,10 +6,6 @@ dnl  Macros to add plugins or builtins and handle their flags
 m4_pattern_allow([^PKG_CONFIG(_LIBDIR)?$])
 
 
-AC_DEFUN([VLC_ADD_BUILTINS], [
-  BUILTINS="${BUILTINS} $1"
-])
-
 AC_DEFUN([VLC_ADD_PLUGIN], [
   m4_foreach_w([element], [$1], [
     [PLUGINS="${PLUGINS} ]element["]
