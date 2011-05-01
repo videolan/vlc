@@ -384,7 +384,7 @@ static int Create( vlc_object_t *p_this )
 
     /* If nothing is found, use the default family */
     if( !psz_fontfile )
-        psz_fontfile = psz_fontfamily;
+        psz_fontfile = strdup( psz_fontfamily );
 
 #else /* !HAVE_STYLES */
     /* Use the default file */
@@ -414,6 +414,9 @@ static int Create( vlc_object_t *p_this )
                  psz_fontfile ? psz_fontfile : "(null)" );
         goto error;
     }
+#ifdef HAVE_STYLES
+    free( psz_fontfile );
+#endif
 
     i_error = FT_Select_Charmap( p_sys->p_face, ft_encoding_unicode );
     if( i_error )
@@ -444,6 +447,9 @@ static int Create( vlc_object_t *p_this )
 error:
     if( p_sys->p_face ) FT_Done_Face( p_sys->p_face );
     if( p_sys->p_library ) FT_Done_FreeType( p_sys->p_library );
+#ifdef HAVE_STYLES
+    free( psz_fontfile );
+#endif
     free( psz_fontfamily );
     free( p_sys );
     return VLC_EGENERIC;
@@ -2371,7 +2377,10 @@ static char* FontConfig_Select( FcConfig* config, const char* family,
     {
         char *psz_fontsize;
         if( asprintf( &psz_fontsize, "%d", i_size ) != -1 )
+        {
             FcPatternAddString( pat, FC_SIZE, (const FcChar8 *)psz_fontsize );
+            free( psz_fontsize );
+        }
     }
 
     /* */
