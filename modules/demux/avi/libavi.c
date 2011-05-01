@@ -31,7 +31,9 @@
 
 #include "libavi.h"
 
+#ifndef NDEBUG
 #define AVI_DEBUG 1
+#endif
 
 #define __EVEN( x ) (((x) + 1) & ~1)
 
