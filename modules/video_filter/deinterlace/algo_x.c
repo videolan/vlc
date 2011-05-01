@@ -535,7 +535,9 @@ static inline void XDeintBand8x8MMXEXT( uint8_t *dst, int i_dst,
 void RenderX( picture_t *p_outpic, picture_t *p_pic )
 {
     int i_plane;
+#ifdef CAN_COMPILE_MMXEXT
     unsigned u_cpu = vlc_CPU();
+#endif
 
     /* Copy image and skip lines */
     for( i_plane = 0 ; i_plane < p_pic->i_planes ; i_plane++ )

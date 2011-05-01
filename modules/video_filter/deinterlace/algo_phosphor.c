@@ -75,11 +75,10 @@ static void DarkenField( picture_t *p_dst, const int i_field,
     assert( i_field == 0 || i_field == 1 );
     assert( i_strength >= 1 && i_strength <= 3 );
 
-    unsigned u_cpu = vlc_CPU();
-
     /* Bitwise ANDing with this clears the i_strength highest bits
        of each byte */
 #ifdef CAN_COMPILE_MMXEXT
+    unsigned u_cpu = vlc_CPU();
     uint64_t i_strength_u64 = i_strength; /* for MMX version (needs to know
                                              number of bits) */
 #endif

@@ -467,13 +467,13 @@ int CalculateInterlaceScore( const picture_t* p_pic_top,
     if( p_pic_top->i_planes != p_pic_bot->i_planes )
         return -1;
 
-    unsigned u_cpu = vlc_CPU();
-
     /* Amount of bits must be known for MMX, thus int32_t.
        Doesn't hurt the C implementation. */
     int32_t i_score = 0;
 
 #ifdef CAN_COMPILE_MMXEXT
+    unsigned u_cpu = vlc_CPU();
+
     if( u_cpu & CPU_CAPABILITY_MMXEXT )
         pxor_r2r( mm7, mm7 ); /* we will keep score in mm7 */
 #endif
