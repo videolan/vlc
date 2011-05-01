@@ -54,7 +54,6 @@ SOURCES_cdda = \
         vcd/cdrom_internals.h \
         $(NULL)
 SOURCES_access_jack = jack.c
-SOURCES_access_oss = oss.c
 SOURCES_access_mtp = mtp.c
 SOURCES_access_sftp = sftp.c
 SOURCES_access_imem = imem.c
@@ -92,6 +91,13 @@ libvlc_LTLIBRARIES += \
 	libstream_filter_rar_plugin.la \
 	libaccess_vdr_plugin.la \
 	$(NULL)
+
+libaccess_oss_plugin_la = oss.c
+libaccess_oss_plugin_la_LIBADD = $(AM_LIBADD) $(OSS_LIBS)
+libaccess_oss_plugin_la_DEPENDENCIES =
+if HAVE_OSS
+libvlc_LTLIBRARIES += libaccess_oss_plugin.la
+endif
 
 libaccess_alsa_plugin_la_SOURCES = alsa.c
 libaccess_alsa_plugin_la_CFLAGS = $(AM_CFLAGS) $(ALSA_CFLAGS)

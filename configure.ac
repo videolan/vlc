@@ -3461,22 +3461,6 @@ dnl
 EXTEND_HELP_STRING([Audio plugins:])
 
 dnl
-dnl  OSS /dev/dsp module (enabled by default except on win32)
-dnl
-AC_ARG_ENABLE(oss,
-  [  --enable-oss            Open Sound System OSS support (default enabled)])
-
-if test "${enable_oss}" != "no" &&
-  (test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce" ||
-   test "${enable_oss}" = "yes")
-then
-  AC_CHECK_HEADERS([soundcard.h sys/soundcard.h], [
-    VLC_ADD_PLUGIN([oss access_oss])
-    AC_CHECK_LIB(ossaudio,main,[VLC_ADD_LIBS([oss access_oss],[-lossaudio])])
-  ])
-fi
-
-dnl
 dnl  Pulseaudio module
 dnl
 AC_ARG_ENABLE(pulse,
@@ -3515,6 +3499,29 @@ AS_IF([test "${enable_alsa}" != "no"], [
   ])
 ])
 AM_CONDITIONAL([HAVE_ALSA], [test "${have_alsa}" = "yes"])
+
+dnl
+dnl  Open Sound System module
+dnl
+AC_ARG_ENABLE(oss,
+  [AS_HELP_STRING([--enable-oss],
+    [support the Open Sound System OSS (default enabled on BSD)])],, [
+  AS_IF([test "$SYS" = "mingw32" -o "$SYS" = "mingwce" -o "$SYS" = "linux"], [
+    enable_oss="no"
+  ])
+])
+have_oss="no"
+OSS_LIBS=""
+AS_IF([test "$enable_oss" != "no"], [
+  AC_CHECK_HEADERS([soundcard.h sys/soundcard.h], [
+    have_oss="yes"
+    AC_CHECK_LIB(ossaudio, main, [
+      OSS_LIBS="-lossaudio"
+    ])
+  ])
+])
+AC_SUBST(OSS_LIBS)
+AM_CONDITIONAL([HAVE_OSS], [test "${have_oss}" = "yes"])
 
 dnl
 dnl  Portaudio module

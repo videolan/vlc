@@ -1,6 +1,5 @@
 SOURCES_aout_directx = directx.c windows_audio_common.h
 SOURCES_aout_file = file.c
-SOURCES_oss = oss.c
 SOURCES_aout_sdl = sdl.c
 SOURCES_waveout = waveout.c windows_audio_common.h
 SOURCES_portaudio = portaudio.c
@@ -9,6 +8,13 @@ SOURCES_jack = jack.c
 SOURCES_audioqueue = audioqueue.c
 
 libvlc_LTLIBRARIES += libaout_file_plugin.la
+
+liboss_plugin_la = oss.c
+liboss_plugin_la_LIBADD = $(AM_LIBADD) $(OSS_LIBS)
+liboss_plugin_la_DEPENDENCIES =
+if HAVE_OSS
+libvlc_LTLIBRARIES += liboss_plugin.la
+endif
 
 libalsa_plugin_la_SOURCES = alsa.c
 libalsa_plugin_la_CFLAGS = $(AM_CFLAGS) $(ALSA_CFLAGS)

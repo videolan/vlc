@@ -8,7 +8,9 @@ Important changes for packagers:
    Non-UTF-8 file systems support will be removed in future versions.
  * The VLC plugins path can be overriden with the VLC_PLUGIN_PATH environment
    variable. The --plugin-path command line option was removed.
- * The default tarballs are now .tar.xz
+ * The default tarballs are now compressed with XZ/LZMA: .tar.xz
+ * OSS support is not compiled on Linux by default, pass --enable-oss to the
+   configure script if you use OSSv4 or really want to use OSS emulation.
 
  * The NPAPI webplugin has moved to git://git.videolan.org/npapi-vlc.git
  * The ActiveX webplugin has moved to git://git.videolan.org/activex-vlc.git
