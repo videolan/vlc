@@ -451,32 +451,23 @@ char *config_StringUnescape( char *psz_string )
     return psz_string;
 }
 
-char *config_StringEscape( const char *psz_string )
+char *config_StringEscape( const char *str )
 {
-    char *psz_return;
-    char *psz_dst;
-    int i_escape;
+    size_t length = 0;
 
-    if( !psz_string )
+    if( str == NULL )
         return NULL;
 
-    i_escape = 0;
-    for( const char *p = psz_string; *p; p++ )
+    for( const char *p = str; *p; p++ )
+        length += IsEscapeNeeded( *p ) ? 2 : 1;
+
+    char *ret = xmalloc( length + 1 ), *dst = ret;
+    for( const char *p = str; *p; p++ )
     {
         if( IsEscapeNeeded( *p ) )
-            i_escape++;
+            *dst++ = '\\';
+        *dst++ = *p;
     }
-
-    psz_return = psz_dst = malloc( strlen( psz_string ) + i_escape + 1 );
-    for( const char *p = psz_string; *p; p++ )
-    {
-        if( IsEscapeNeeded( *p ) )
-            *psz_dst++ = '\\';
-        *psz_dst++ = *p;
-    }
-    *psz_dst = '\0';
-
-    return psz_return;
+    *dst = '\0';;
+    return ret;
 }
-
-
