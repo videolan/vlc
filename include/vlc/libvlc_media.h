@@ -494,7 +494,7 @@ VLC_PUBLIC_API void *libvlc_media_get_user_data( libvlc_media_t *p_md );
  * \param tracks address to store an allocated array of Elementary Streams
  * descriptions (must be freed by the caller)
  *
- * return the number of Elementary Streams
+ * \return the number of Elementary Streams
  */
 VLC_PUBLIC_API
 int libvlc_media_get_tracks_info( libvlc_media_t *p_md,
