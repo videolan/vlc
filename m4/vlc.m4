@@ -101,7 +101,6 @@ AC_DEFUN([VLC_OUTPUT_VLC_CONFIG_IN], [
           -e "s/@CFLAGS_TUNING@/${CFLAGS_TUNING}/" \
           -e "s/@CFLAGS_OPTIM_SPEED@/${CFLAGS_OPTIM_SPEED}/" \
           -e "s/@CFLAGS_OPTIM_NODEBUG@/${CFLAGS_OPTIM_NODEBUG}/" \
-          -e "s/@CFLAGS_NOOPTIM@/${CFLAGS_NOOPTIM}/" \
     > vlc-config.in
 
   dnl  Switch/case loop

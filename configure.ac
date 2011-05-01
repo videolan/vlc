@@ -1083,14 +1083,6 @@ else
     fi
 fi
 
-AC_CACHE_CHECK([if \$CC accepts -O0],
-    [ac_cv_c_o0],
-    [CFLAGS="${CFLAGS_save} -O0"
-     AC_TRY_COMPILE([],,ac_cv_c_o0=yes, ac_cv_c_o0=no)])
-if test "${ac_cv_c_o0}" != "no"; then
-    CFLAGS_NOOPTIM="${CFLAGS_NOOPTIM} -O0"
-fi
-
 dnl Check for -ffast-math
 AC_CACHE_CHECK([if \$CC accepts -ffast-math],
     [ac_cv_c_fast_math],

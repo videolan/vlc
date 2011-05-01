@@ -23,7 +23,6 @@ libs=""
 cflags_tuning="@CFLAGS_TUNING@"
 cflags_optim_speed="@CFLAGS_OPTIM_SPEED@"
 cflags_optim_nodebug="@CFLAGS_OPTIM_NODEBUG@"
-cflags_nooptim="@CFLAGS_NOOPTIM@"
 
 #
 #  Do not touch below this place unless you really know what you are doing
@@ -93,10 +92,6 @@ if [ "${optim}" = speed ]; then
     cxxflags="${cxxflags} ${cflags_optim_nodebug}"
     objcflags="${objcflags} ${cflags_optim_nodebug}"
   fi
-else
-  cflags="${cflags} ${cflags_nooptim}"
-  cxxflags="${cxxflags} ${cflags_nooptim}"
-  objcflags="${objcflags} ${cflags_nooptim}"
 fi
 
 #
