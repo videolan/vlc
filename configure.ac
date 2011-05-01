@@ -3479,12 +3479,20 @@ fi
 dnl
 dnl  Pulseaudio module
 dnl
-PKG_ENABLE_MODULES_VLC([PULSE], [], [libpulse >= 0.9.22], [PulseAudio support], [auto])
-
-dnl
-dnl  Portaudio module
-dnl
-PKG_ENABLE_MODULES_VLC([PORTAUDIO], [], [portaudio-2.0], [Portaudio library support], [auto])
+AC_ARG_ENABLE(pulse,
+  [AS_HELP_STRING([--enable-pulse],
+    [use the PulseAudio client library (default auto)])])
+have_pulse="no"
+AS_IF([test "${enable_pulse}" != "no"], [
+  PKG_CHECK_MODULES([PULSE], [libpulse >= 0.9.22], [
+    have_pulse="yes"
+  ], [
+    AS_IF([test "x${enable_pulse}" != "x"], [
+      AC_MSG_ERROR([$PULSE_PKG_ERRORS. PulseAudio 0.9.22 or later required.])
+    ])
+  ])
+])
+AM_CONDITIONAL([HAVE_PULSE], [test "${have_pulse}" = "yes"])
 
 dnl
 dnl  ALSA module
@@ -3502,6 +3510,11 @@ AS_IF([test "${enable_alsa}" != "no"], [
   ])
 ])
 AM_CONDITIONAL([HAVE_ALSA], [test "${have_alsa}" = "yes"])
+
+dnl
+dnl  Portaudio module
+dnl
+PKG_ENABLE_MODULES_VLC([PORTAUDIO], [], [portaudio-2.0], [Portaudio library support], [auto])
 
 dnl
 dnl  win32 waveOut plugin

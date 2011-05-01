@@ -6,7 +6,6 @@ SOURCES_waveout = waveout.c windows_audio_common.h
 SOURCES_portaudio = portaudio.c
 SOURCES_auhal = auhal.c
 SOURCES_jack = jack.c
-SOURCES_pulse = pulse.c
 SOURCES_audioqueue = audioqueue.c
 
 libvlc_LTLIBRARIES += libaout_file_plugin.la
@@ -17,4 +16,12 @@ libalsa_plugin_la_LIBADD = $(AM_LIBADD) $(ALSA_LIBS)
 libalsa_plugin_la_DEPENDENCIES =
 if HAVE_ALSA
 libvlc_LTLIBRARIES += libalsa_plugin.la
+endif
+
+libpulse_plugin_la_SOURCES = pulse.c
+libpulse_plugin_la_CFLAGS = $(AM_CFLAGS) $(PULSE_CFLAGS)
+libpulse_plugin_la_LIBADD = $(AM_LIBADD) $(PULSE_LIBADD)
+libpulse_plugin_la_DEPENDENCIES =
+if HAVE_PULSE
+libvlc_LTLIBRARIES += libpulse_plugin.la
 endif
