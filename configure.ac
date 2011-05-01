@@ -3498,14 +3498,19 @@ dnl
 dnl  ALSA module
 dnl
 AC_ARG_ENABLE(alsa,
-  [  --enable-alsa           Advanced Linux Sound Architecture (default auto)])
+  [AS_HELP_STRING([--enable-alsa],
+    [support the Advanced Linux Sound Architecture (default auto)])],, [
+  AS_IF([test "$SYS" = "linux" -a "${have_pulse}" = "no"], [
+    enable_alsa="yes"
+  ])
+])
 have_alsa="no"
 AS_IF([test "${enable_alsa}" != "no"], [
   PKG_CHECK_MODULES([ALSA], [alsa >= 1.0.16], [
     have_alsa="yes"
   ], [
     AS_IF([test "x${enable_alsa}" != "x"], [
-      AC_MSG_ERROR([alsa-lib version 1.0.16 or later not found])
+      AC_MSG_ERROR([$ALSA_PKG_ERRORS. alsa-lib 1.0.16 or later required.])
     ])
   ])
 ])
