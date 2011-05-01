@@ -249,7 +249,7 @@ error:
  *  - configuration and commandline parsing
  */
 int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
-                         const char *ppsz_argv[], const void **builtins_module )
+                         const char *ppsz_argv[] )
 {
     libvlc_priv_t *priv = libvlc_priv (p_libvlc);
     char *       p_tmp = NULL;
@@ -410,7 +410,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
      * list of configuration options exported by each module and loads their
      * default values.
      */
-    module_LoadPlugins( p_libvlc, builtins_module );
+    module_LoadPlugins( p_libvlc );
     if( p_libvlc->b_die )
     {
         b_exit = true;

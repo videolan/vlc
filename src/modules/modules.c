@@ -201,18 +201,12 @@ void module_EndBank( vlc_object_t *p_this, bool b_plugins )
  * \param p_this vlc object structure
  * \return nothing
  */
-void module_LoadPlugins( vlc_object_t * p_this, const void **builtins )
+void module_LoadPlugins( vlc_object_t * p_this )
 {
     module_bank_t *p_bank = p_module_bank;
 
     assert( p_bank );
     /*vlc_assert_locked( &module_lock ); not for static mutexes :( */
-
-    if (builtins)
-    {
-        for (int i = 0; builtins[i]; i++)
-            AllocateBuiltinModule( p_this, builtins[i] );
-    }
 
 #ifdef HAVE_DYNAMIC_PLUGINS
     if( p_bank->i_usage == 1 )

@@ -94,26 +94,6 @@ AS_IF([test -n "${with_binary_version}"],[
          [Binary specific version])
 ])
 
-dnl Check how we are asked to build
-AS_IF([test "${enable_shared}" = "no" -a "${enable_vlc}" != "no"], [
-  AC_MSG_ERROR([VLC is based on plugins. Shared libraries cannot be disabled.])
-])
-
-AC_ARG_ENABLE(static-modules,
-  [AS_HELP_STRING([--enable-static-modules],
-    [link modules statically - VLC will not work])])
-AS_IF([test "${enable_static_modules}" = yes], [
-   enable_shared="no"
-   enable_static="yes"
-   VLC_DEFAULT_PLUGIN_TYPE="builtin"
-   AS_IF([test "${enable_vlc}" != "no"],
-     [AC_MSG_WARN([Building modules as static. VLC will not work.])])
-], [
-   VLC_DEFAULT_PLUGIN_TYPE="plugin"
-])
-
-AC_SUBST(VLC_DEFAULT_PLUGIN_TYPE)
-
 dnl
 dnl  Check for the contrib directory
 dnl
@@ -443,6 +423,10 @@ m4_undefine([AC_DEPLIBS_CHECK_METHOD])
 m4_defun([AC_DEPLIBS_CHECK_METHOD],[])
 
 lt_cv_deplibs_check_method=pass_all
+
+AS_IF([test "${enable_shared}" = "no"], [
+  AC_MSG_ERROR([VLC is based on plugins. Shared libraries cannot be disabled.])
+])
 
 dnl
 dnl Gettext stuff

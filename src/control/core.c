@@ -38,8 +38,7 @@
 
 static const char nomemstr[] = "Insufficient memory";
 
-libvlc_instance_t * libvlc_new_with_builtins( int argc, const char *const *argv,
-                                             const void ** builtins_module)
+libvlc_instance_t * libvlc_new( int argc, const char *const *argv )
 {
     libvlc_instance_t *p_new = malloc (sizeof (*p_new));
     if (unlikely(p_new == NULL))
@@ -57,7 +56,7 @@ libvlc_instance_t * libvlc_new_with_builtins( int argc, const char *const *argv,
     if (unlikely (p_libvlc_int == NULL))
         goto error;
 
-    if (libvlc_InternalInit( p_libvlc_int, argc + 1, my_argv, builtins_module ))
+    if (libvlc_InternalInit( p_libvlc_int, argc + 1, my_argv ))
     {
         libvlc_InternalDestroy( p_libvlc_int );
         goto error;
@@ -80,12 +79,6 @@ error:
     free (p_new);
     return NULL;
 }
-
-libvlc_instance_t * libvlc_new( int argc, const char *const *argv)
-{
-    return libvlc_new_with_builtins(argc, argv, NULL);
-}
-
 
 void libvlc_retain( libvlc_instance_t *p_instance )
 {
