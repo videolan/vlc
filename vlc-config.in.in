@@ -39,7 +39,6 @@ Modules:
         vlc                       the main VLC object
         plugin                    flags for plugin modules
         builtin                   flags for built-in modules
-        pic                       flags for PIC code
         MODULE                    any available module (dummy, gtk, avi, etc.)
         libs                      flags for external libs
 BLAH
@@ -163,8 +162,6 @@ while test $# -gt 0; do
     builtin)
       echo_builtin=yes
       cppflags="${cppflags} -D__LIBVLC__ -D__BUILTIN__"
-      ;;
-    pic)
       ;;
     *)
       module="$tgt"
