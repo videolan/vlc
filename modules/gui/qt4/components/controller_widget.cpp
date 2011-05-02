@@ -62,6 +62,9 @@ SoundWidget::SoundWidget( QWidget *_parent, intf_thread_t * _p_intf,
     {
         volumeMenu = NULL; subLayout = NULL;
         volumeControlWidget = NULL;
+
+        /* And add the label */
+        layout->addWidget( volMuteLabel, 0, Qt::AlignBottom );
     }
     else
     {
@@ -76,10 +79,10 @@ SoundWidget::SoundWidget( QWidget *_parent, intf_thread_t * _p_intf,
         QWidgetAction *widgetAction = new QWidgetAction( volumeControlWidget );
         widgetAction->setDefaultWidget( volumeControlWidget );
         volumeMenu->addAction( widgetAction );
-    }
 
-    /* And add the label */
-    layout->addWidget( volMuteLabel, 0, Qt::AlignBottom );
+        /* And add the label */
+        layout->addWidget( volMuteLabel );
+    }
 
     /* Slider creation: shiny or clean */
     if( b_shiny )
