@@ -111,15 +111,9 @@ AC_DEFUN([VLC_OUTPUT_VLC_CONFIG_IN], [
     fi
     if test "`eval echo @'$'CXXFLAGS_${x}@`" != "@@"; then
       echo "      cxxflags=\"\${cxxflags} `eval echo '$'CXXFLAGS_${x}`\""
-      if test "${x}" != "plugin" -a "${x}" != "builtin"; then
-        echo "      linkage=\"c++\""
-      fi
     fi
     if test "`eval echo @'$'OBJCFLAGS_${x}@`" != "@@"; then
       echo "      objcflags=\"\${objcflags} `eval echo '$'OBJCFLAGS_${x}`\""
-      if test "${x}" != "plugin" -a "${x}" != "builtin"; then
-        echo "      if test \"\${linkage}\" = \"c\"; then linkage=\"objc\"; fi"
-      fi
     fi
     if test "`eval echo @'$'LDFLAGS_${x}@`" != "@@"; then
       echo "      ldflags=\"\${ldflags} `eval echo '$'LDFLAGS_${x}`\""

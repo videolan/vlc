@@ -30,7 +30,6 @@ Options:
         [--prefix[=DIR]]          set prefix
         [--exec-prefix[=DIR]]     set exec prefix
         [--version]               print version and exit
-        [--linkage]               print linkage mode (c, c++, objc)
         [--list]                  print modules names and exit
         [--libs]                  output linking flags
         [--cflags]                output C compilation flags
@@ -68,7 +67,6 @@ fi
 includes="${includes}"
 cppflags="${includes}"
 module=""
-linkage="c"
 
 #
 #  On Linux and Solaris, activate 64-bit off_t (by default under BSD)
@@ -131,9 +129,6 @@ while test $# -gt 0; do
       echo "@VERSION@"
       exit 0
       ;;
-    --linkage)
-      echo_linkage=yes
-      ;;
     --list)
       echo_list=yes
       ;;
@@ -192,11 +187,6 @@ fi
 #
 #  Output what we were asked
 #
-if test "${echo_linkage}" = yes; then
-  echo "${linkage}"
-  exit 0
-fi
-
 if test "${echo_list}" = yes; then
   if test "${echo_plugin}" = yes; then
     echo "${plugins}"
