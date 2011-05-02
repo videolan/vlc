@@ -270,7 +270,7 @@ void IVTCClearState( filter_t *p_filter );
  * the extra fields inserted in the telecine. With exact duplication, it
  * of course doesn't matter whether Bc or Bd is the extra field, but
  * with "full field blended" material (see below) this will affect how to
- * correctly wxtract film frame 3.
+ * correctly extract film frame 3.
  *
  * See the following web pages for illustrations and discussion:
  * http://neuron2.net/LVG/telecining1.html
