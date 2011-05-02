@@ -13,6 +13,7 @@ CLEANFILES = $(BUILT_SOURCES)
 
 LTLIBVLCCORE = $(top_builddir)/src/libvlccore.la
 
+AM_CPPFLAGS = -D__PLUGIN__
 AM_CFLAGS = `$(VLC_CONFIG) --cflags plugin $@`
 AM_CXXFLAGS = `$(VLC_CONFIG) --cxxflags plugin $@`
 AM_OBJCFLAGS = `$(VLC_CONFIG) --objcflags plugin $@`

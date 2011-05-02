@@ -57,7 +57,11 @@ dnl Check for tools
 dnl
 AC_PROG_CC_C99
 AC_USE_SYSTEM_EXTENSIONS
-AC_DEFINE([_FORTIFY_SOURCE], 2, [Define to '2' to get glibc warnings.])
+AC_DEFINE([_FORTIFY_SOURCE], 2, [Define to 2 to get glibc warnings.])
+AC_DEFINE([_FILE_OFFSET_BITS], 64, [Define to 64 for large files support.])
+AC_DEFINE([_REENTRANT],, [Define to expose reentrant functions.])
+AC_DEFINE([_THREAD_SAFE],, [Same as _REENTANT for some other OSes.])
+AC_DEFINE([__LIBVLC__],, [Define within the LibVLC source code tree.])
 
 AM_PROG_CC_C_O
 AC_PROG_CXX

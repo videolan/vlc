@@ -36,7 +36,6 @@ Options:
         [--objcflags]             output Objective C compilation flags
 Modules:
         vlc                       the main VLC object
-        plugin                    flags for plugin modules
         MODULE                    any available module (dummy, gtk, avi, etc.)
         libs                      flags for external libs
 BLAH
@@ -64,11 +63,6 @@ fi
 includes="${includes}"
 cppflags="${includes}"
 module=""
-
-#
-#  On Linux and Solaris, activate 64-bit off_t (by default under BSD)
-#
-cppflags="${cppflags} -D_FILE_OFFSET_BITS=64 -D__USE_UNIX98 -D_REENTRANT -D_THREAD_SAFE"
 
 #
 #  Various additional defines
@@ -151,11 +145,9 @@ while test $# -gt 0; do
       usage 1 1>&1
       ;;
     libvlccore)
-      cppflags="${cppflags} -D__LIBVLC__ -I${top_builddir}src/misc"
       ;;
     plugin)
       echo_plugin=yes
-      cppflags="${cppflags} -D__LIBVLC__ -D__PLUGIN__"
       ;;
     *)
       module="$tgt"
