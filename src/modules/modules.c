@@ -145,10 +145,6 @@ void module_EndBank( vlc_object_t *p_this, bool b_plugins )
 
     assert (p_bank != NULL);
 
-    /* Save the configuration */
-    if( !var_InheritBool( p_this, "ignore-config" ) )
-        config_AutoSaveConfigFile( p_this );
-
     /* If plugins were _not_ loaded, then the caller still has the bank lock
      * from module_InitBank(). */
     if( b_plugins )

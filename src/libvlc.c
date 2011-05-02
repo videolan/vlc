@@ -461,16 +461,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
         i_ret = VLC_EEXITSUCCESS;
     }
 
-    /* Check for config file options */
-    if( !var_InheritBool( p_libvlc, "ignore-config" ) )
-    {
-        if( var_InheritBool( p_libvlc, "reset-config" ) )
-        {
-            config_ResetAll( p_libvlc );
-            config_SaveConfigFile( p_libvlc );
-        }
-    }
-
     if( module_count <= 1 )
     {
         msg_Err( p_libvlc, "No plugins found! Check your VLC installation.");
@@ -488,7 +478,15 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
      * Override default configuration with config file settings
      */
     if( !var_InheritBool( p_libvlc, "ignore-config" ) )
-        config_LoadConfigFile( p_libvlc );
+    {
+        if( var_InheritBool( p_libvlc, "reset-config" ) )
+        {
+            config_ResetAll( p_libvlc );
+            config_SaveConfigFile( p_libvlc );
+        }
+        else
+            config_LoadConfigFile( p_libvlc );
+    }
 
     /*
      * Override configuration with command line settings
@@ -1031,6 +1029,10 @@ void libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
         module_unneed( p_libvlc, priv->p_memcpy_module );
         priv->p_memcpy_module = NULL;
     }
+
+    /* Save the configuration */
+    if( !var_InheritBool( p_libvlc, "ignore-config" ) )
+        config_AutoSaveConfigFile( VLC_OBJECT(p_libvlc) );
 
     /* Free module bank. It is refcounted, so we call this each time  */
     module_EndBank( p_libvlc, true );
