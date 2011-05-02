@@ -1,5 +1,5 @@
 # Darwin rules
-TOOLS = .libtool .intl .pkgcfg .yasm .automake
+TOOLS = .autoconf .automake .libtool .intl .pkgcfg .yasm
 
 all: .freetype \
     .fribidi .a52 .mpeg2 .mad .ogg .vorbis .vorbisenc .theora \
