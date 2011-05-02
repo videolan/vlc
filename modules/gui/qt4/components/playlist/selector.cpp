@@ -192,6 +192,9 @@ void PLSelector::createItems()
                               THEPL->p_media_library );
     ml->treeItem()->setData( 0, SPECIAL_ROLE, QVariant( IS_ML ) );
 
+    /* SQL ML */
+    QTreeWidgetItem *sql_ml =  addItem( SQL_ML, "SQL Media Library" )->treeItem();
+
     /* SD nodes */
     QTreeWidgetItem *mycomp = addItem( CATEGORY_TYPE, N_("My Computer") )->treeItem();
     QTreeWidgetItem *devices = addItem( CATEGORY_TYPE, N_("Devices") )->treeItem();
@@ -271,11 +274,18 @@ void PLSelector::setSource( QTreeWidgetItem *item )
         if( !sd_loaded )
             playlist_ServicesDiscoveryAdd( THEPL, qtu( qs ) );
     }
+    else if( i_type == SQL_ML )
+    {
+        emit activated( NULL, true );
+        return;
+    }
 
     /* */
     playlist_Lock( THEPL );
     playlist_item_t *pl_item = NULL;
 
+    /* Special case for podcast */
+    // FIXME: simplify
     if( i_type == SD_TYPE )
     {
         /* Find the right item for the SD */
@@ -301,7 +311,7 @@ void PLSelector::setSource( QTreeWidgetItem *item )
 
     /* */
     if( pl_item )
-        emit activated( pl_item );
+        emit activated( pl_item, false );
 }
 
 PLSelItem * PLSelector::addItem (

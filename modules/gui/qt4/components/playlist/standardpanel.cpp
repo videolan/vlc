@@ -86,7 +86,7 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
              this, handleExpansion( const QModelIndex& ) );
     CONNECT( model, rootChanged(), this, handleRootChange() );
 
-    setRoot( p_root );
+    setRoot( p_root, false );
 }
 
 StandardPLPanel::~StandardPLPanel()
@@ -189,8 +189,11 @@ void StandardPLPanel::searchDelayed( const QString& searchText )
 
 /* Set the root of the new Playlist */
 /* This activated by the selector selection */
-void StandardPLPanel::setRoot( playlist_item_t *p_item )
+void StandardPLPanel::setRoot( playlist_item_t *p_item, bool b )
 {
+    if( b ) //SQLML
+        return;
+
     model->rebuild( p_item );
 }
 

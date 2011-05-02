@@ -43,7 +43,8 @@ class QLabel;
 enum SelectorItemType {
     CATEGORY_TYPE,
     SD_TYPE,
-    PL_ITEM_TYPE
+    PL_ITEM_TYPE,
+    SQL_ML
 };
 
 enum SpecialData {
@@ -144,7 +145,7 @@ private slots:
     void podcastRemove( PLSelItem* );
 
 signals:
-    void activated( playlist_item_t * );
+    void activated( playlist_item_t *, bool );
 };
 
 #endif
