@@ -80,7 +80,6 @@
 
     /* global variables */
     NSView * o_currentlyshown_view;
-    BOOL o_config_changed;
 }
 
 - (IBAction)viewSelectorAction:(id)sender;
@@ -95,12 +94,10 @@
 - (IBAction)moreInfoVideoFilters:(id)sender;
 
 + (VLCExtended *)sharedInstance;
-- (BOOL)configChanged;
 
 - (void)showPanel;
 - (void)initStrings;
 - (void)changeVoutFiltersString: (char *)psz_name onOrOff: (bool )b_add;
 - (void)changeVideoFiltersString: (char *)psz_name onOrOff: (bool )b_add;
 - (void)changeAFiltersString: (char *)psz_name onOrOff: (bool )b_add;
-- (void)savePrefs;
 @end

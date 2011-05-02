@@ -701,7 +701,7 @@ static inline char * __config_GetLabel( vlc_object_t *p_this, const char *psz_na
     {
         config_ResetAll( p_intf );
         [self resetControls];
-        config_SaveConfigFile( p_intf, NULL );
+        config_SaveConfigFile( p_intf );
     }
 }
 
@@ -757,7 +757,6 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
 - (void)saveChangedSettings
 {
     char *psz_tmp;
-    int i;
 
 #define SaveIntList( object, name ) save_int_list( p_intf, object, name )
 
@@ -809,19 +808,6 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
         [[NSNotificationCenter defaultCenter] postNotificationName: @"VLCMediaKeySupportSettingChanged"
                                                             object: nil
                                                           userInfo: nil];
-
-        /* okay, let's save our changes to vlcrc */
-        i = config_SaveConfigFile( p_intf, "main" );
-        i = i + config_SaveConfigFile( p_intf, "macosx" );
-
-        if( i != 0 )
-        {
-            msg_Err( p_intf, "An error occurred while saving the Interface settings using SimplePrefs (%i)", i );
-            dialog_Fatal( p_intf, _("Interface Settings not saved"),
-                        _("An error occured while saving your settings via SimplePrefs (%i)."), i );
-            i = 0;
-        }
-
         b_intfSettingChanged = NO;
     }
 
@@ -880,20 +866,6 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
         }
         else
             [o_audio_last_ckb setEnabled: NO];
-
-        /* okay, let's save our changes to vlcrc */
-        i = config_SaveConfigFile( p_intf, "main" );
-        i = i + config_SaveConfigFile( p_intf, "audioscrobbler" );
-        i = i + config_SaveConfigFile( p_intf, "volnorm" );
-
-        if( i != 0 )
-        {
-            msg_Err( p_intf, "An error occurred while saving the Audio settings using SimplePrefs (%i)", i );
-            dialog_Fatal( p_intf, _("Audio Settings not saved"),
-                        _("An error occured while saving your settings via SimplePrefs (%i)."), i );
-
-            i = 0;
-        }
         b_audioSettingChanged = NO;
     }
 
@@ -915,17 +887,6 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
         config_PutPsz( p_intf, "snapshot-prefix", [[o_video_snap_prefix_fld stringValue] UTF8String] );
         config_PutInt( p_intf, "snapshot-sequential", [o_video_snap_seqnum_ckb state] );
         SaveStringList( o_video_snap_format_pop, "snapshot-format" );
-
-        i = config_SaveConfigFile( p_intf, "main" );
-        i = i + config_SaveConfigFile( p_intf, "macosx" );
-
-        if( i != 0 )
-        {
-            msg_Err( p_intf, "An error occurred while saving the Video settings using SimplePrefs (%i)", i );
-            dialog_Fatal( p_intf, _("Video Settings not saved"),
-                        _("An error occured while saving your settings via SimplePrefs (%i)."), i );
-            i = 0;
-        }
         b_videoSettingChanged = NO;
     }
 
@@ -949,48 +910,17 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
         msg_Dbg( p_intf, "Adjusting all cache values to: %i", (int)[[o_input_cachelevel_pop selectedItem] tag] );
         CaC( "udp-caching" );
         if( module_exists ( "dvdread" ) )
-        {
             CaC( "dvdread-caching" );
-            i = i + config_SaveConfigFile( p_intf, "dvdread" );
-        }
         if( module_exists ( "dvdnav" ) )
-        {
             CaC( "dvdnav-caching" );
-            i = i + config_SaveConfigFile( p_intf, "dvdnav" );
-        }
         CaC( "tcp-caching" ); CaC( "vcd-caching" );
         CaC( "cdda-caching" ); CaC( "file-caching" );
         CaC( "screen-caching" );
         CaCi( "rtsp-caching", 4 ); CaCi( "ftp-caching", 2 );
         CaCi( "http-caching", 4 );
         if( module_exists ( "access_realrtsp" ) )
-        {
             CaCi( "realrtsp-caching", 10 );
-            i = i + config_SaveConfigFile( p_intf, "access_realrtsp" );
-        }
         CaCi( "mms-caching", 19 );
-
-        i = config_SaveConfigFile( p_intf, "main" );
-        i = i + config_SaveConfigFile( p_intf, "avcodec" );
-        i = i + config_SaveConfigFile( p_intf, "postproc" );
-        i = i + config_SaveConfigFile( p_intf, "access_http" );
-        i = i + config_SaveConfigFile( p_intf, "access_file" );
-        i = i + config_SaveConfigFile( p_intf, "access_tcp" );
-        i = i + config_SaveConfigFile( p_intf, "cdda" );
-        i = i + config_SaveConfigFile( p_intf, "screen" );
-        i = i + config_SaveConfigFile( p_intf, "vcd" );
-        i = i + config_SaveConfigFile( p_intf, "access_ftp" );
-        i = i + config_SaveConfigFile( p_intf, "access_mms" );
-        i = i + config_SaveConfigFile( p_intf, "live555" );
-        i = i + config_SaveConfigFile( p_intf, "avi" );
-
-        if( i != 0 )
-        {
-            msg_Err( p_intf, "An error occurred while saving the Input settings using SimplePrefs (%i)", i );
-            dialog_Fatal( p_intf, _("Input Settings not saved"),
-                        _("An error occured while saving your settings via SimplePrefs (%i)."), i );
-            i = 0;
-        }
         b_inputSettingChanged = NO;
     }
 
@@ -1021,16 +951,6 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
 			SaveIntList( o_osd_font_color_pop, "freetype-color" );
 			SaveIntList( o_osd_font_size_pop, "freetype-rel-fontsize" );
 		}
-
-        i = config_SaveConfigFile( p_intf, NULL );
-
-        if( i != 0 )
-        {
-            msg_Err( p_intf, "An error occurred while saving the OSD/Subtitle settings using SimplePrefs (%i)", i );
-            dialog_Fatal( p_intf, _("On Screen Display/Subtitle Settings not saved"),
-                        _("An error occured while saving your settings via SimplePrefs (%i)."), i );
-            i = 0;
-        }
         b_osdSettingChanged = NO;
     }
 
@@ -1039,24 +959,13 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
      ********************/
     if( b_hotkeyChanged )
     {
-        i = 0;
-        while( i < [o_hotkeySettings count] )
-        {
+        for( NSUInteger i = 0; i < [o_hotkeySettings count]; i++ )
             config_PutPsz( p_intf, [[o_hotkeyNames objectAtIndex:i] UTF8String], [[o_hotkeySettings objectAtIndex:i]UTF8String] );
-            i++;
-        }
-
-        i = config_SaveConfigFile( p_intf, "main" );
-
-        if( i != 0 )
-        {
-            msg_Err( p_intf, "An error occurred while saving the Hotkey settings using SimplePrefs (%i)", i );
-            dialog_Fatal( p_intf, _("Hotkeys not saved"),
-                        _("An error occured while saving your settings via SimplePrefs (%i)."), i );
-            i = 0;
-        }
         b_hotkeyChanged = NO;
     }
+
+    /* okay, let's save our changes to vlcrc */
+    config_SaveConfigFile( p_intf );
 }
 
 - (void)showSettingsForCategory: (id)o_new_category_view

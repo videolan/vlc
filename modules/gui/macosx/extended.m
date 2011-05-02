@@ -181,11 +181,6 @@ static VLCExtended *_o_sharedInstance = nil;
     [self initStrings];
 }
 
-- (BOOL)configChanged
-{
-    return o_config_changed;
-}
-
 - (void)showPanel
 {
     /* get the correct slider values from the prefs, in case they were changed
@@ -398,8 +393,6 @@ static VLCExtended *_o_sharedInstance = nil;
         vlc_object_release( p_filter );
         vlc_object_release( p_vout );
     }
-
-    o_config_changed = YES;
 }
 
 /* change the opaqueness of the vouts */
@@ -437,8 +430,6 @@ static VLCExtended *_o_sharedInstance = nil;
 
     /* store to prefs */
     config_PutFloat( p_playlist , "macosx-opaqueness" , val.f_float );
-
-    o_config_changed = YES;
 }
 
 - (IBAction)enableHeadphoneVirtualizer:(id)sender
@@ -463,8 +454,6 @@ static VLCExtended *_o_sharedInstance = nil;
     }
 
     config_PutFloat( p_intf, "norm-max-level", [o_sld_maxLevel floatValue] );
-
-    o_config_changed = YES;
 }
 
 - (IBAction)enableVolumeNormalization:(id)sender
@@ -601,10 +590,7 @@ static VLCExtended *_o_sharedInstance = nil;
     }
 
     free( psz_string );
-
-    o_config_changed = YES;
 }
-
 
 - (void)changeVideoFiltersString:(char *)psz_name onOrOff:(bool )b_add
 {
@@ -667,8 +653,6 @@ static VLCExtended *_o_sharedInstance = nil;
     }
 
     free( psz_string );
-
-    o_config_changed = YES;
 }
 
 - (void)changeAFiltersString: (char *)psz_name onOrOff: (bool )b_add;
@@ -738,52 +722,5 @@ static VLCExtended *_o_sharedInstance = nil;
         aout_EnableFilter( pl_Get( p_intf ), psz_string, b_add );
     }
     free( psz_string );
-
-    o_config_changed = YES;
-}
-
-- (void)savePrefs
-{
-    /* save the preferences to make sure that our module-changes will up on
-     * next launch again */
-    playlist_t * p_playlist = pl_Get( VLCIntf );
-    int returnedValue;
-    NSArray * theModules;
-    theModules = [[NSArray alloc] initWithObjects: @"main", 
-        @"headphone",
-        @"transform", 
-        @"adjust", 
-        @"invert", 
-        @"motionblur", 
-        @"distort",
-        @"clone", 
-        @"crop", 
-        @"normvol", 
-        @"headphone_channel_mixer", 
-        @"macosx",
-        nil];
-    unsigned int x = 0;
- 
-    while ( x != [theModules count] )
-    {
-        returnedValue = config_SaveConfigFile( p_playlist, [[theModules
-            objectAtIndex: x] UTF8String] );
-
-        if (returnedValue != 0)
-        {
-            msg_Err(p_playlist, "unable to save the preferences of the "
-            "extended control attribute '%s' (%i)",
-            [[theModules objectAtIndex: x] UTF8String] , returnedValue);
-            [theModules release];
- 
-            return;
-        }
-
-        x = ( x + 1 );
-    }
- 
-    msg_Dbg( VLCIntf, "VLCExtended: saved certain preferences successfully" );
- 
-    [theModules release];
 }
 @end

@@ -151,25 +151,6 @@ static VLCAudioEffects *_o_sharedInstance = nil;
     }
 }
 
-- (void)savePrefs
-{
-    /* save settings for some of our modules */
-    int returnedValue;
-    NSArray * theModules;
-    theModules = [[NSArray alloc] initWithObjects: @"main", @"headphone", @"normvol", @"headphone_channel_mixer", @"compressor", @"spatializer", nil];
-
-    for( int x = 0; x < [theModules count]; x++ )
-    {
-        returnedValue = config_SaveConfigFile( p_intf, [[theModules objectAtIndex: x] UTF8String] );
-
-        if (returnedValue != 0)
-            msg_Err(p_intf, "unable to save settings for '%s' (%i)", [[theModules objectAtIndex: x] UTF8String], returnedValue);
-    }
-
-    msg_Dbg(p_intf, "AudioFilters: saved certain preferences successfully");
-    [theModules release];
-}
-
 #pragma mark -
 #pragma mark Equalizer
 static bool GetEqualizerStatus( intf_thread_t *p_custom_intf,
@@ -387,9 +368,6 @@ static bool GetEqualizerStatus( intf_thread_t *p_custom_intf,
     {
         /* save changed to config */
         config_PutPsz( p_intf, "equalizer-bands", psz_values );
-        
-        /* save to vlcrc */
-        config_SaveConfigFile( p_intf, "equalizer" );
     }
     
     vlc_object_release( p_object );
@@ -422,9 +400,6 @@ static bool GetEqualizerStatus( intf_thread_t *p_custom_intf,
         config_PutPsz( p_intf, "equalizer-bands", psz_values );
         config_PutFloat( p_intf, "equalizer-preamp", eqz_preset_10b[[sender indexOfSelectedItem]]->f_preamp );
         config_PutPsz( p_intf, "equalizer-preset", preset_list[[sender indexOfSelectedItem]] );
-        
-        /* save to vlcrc */
-        config_SaveConfigFile( p_intf, "equalizer" );
     }
     
     vlc_object_release( p_object );
@@ -443,9 +418,6 @@ static bool GetEqualizerStatus( intf_thread_t *p_custom_intf,
     {
         /* save changed to config */
         config_PutFloat( p_intf, "equalizer-preamp", f_preamp );
-
-        /* save to vlcrc */
-        config_SaveConfigFile( p_intf, "equalizer" );
     }
 
     vlc_object_release( p_object );
@@ -464,9 +436,6 @@ static bool GetEqualizerStatus( intf_thread_t *p_custom_intf,
     {
         /* save changed to config */
         config_PutInt( p_intf, "equalizer-2pass", (int)b_2p );
-        
-        /* save to vlcrc */
-        config_SaveConfigFile( p_intf, "equalizer" );
     }
     
     vlc_object_release( p_object );

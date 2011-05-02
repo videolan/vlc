@@ -247,9 +247,6 @@ static bool GetFiltersStatus( intf_thread_t *p_intf,
     {
         /* save changed to config */
         config_PutPsz( p_intf, "equalizer-bands", psz_values );
-
-        /* save to vlcrc */
-        config_SaveConfigFile( p_intf, "equalizer" );
     }
 
     vlc_object_release( p_object );
@@ -285,9 +282,6 @@ static bool GetFiltersStatus( intf_thread_t *p_intf,
         config_PutPsz( p_intf, "equalizer-bands", psz_values );
         config_PutFloat( p_intf, "equalizer-preamp", eqz_preset_10b[[sender indexOfSelectedItem]]->f_preamp );
         config_PutPsz( p_intf, "equalizer-preset", preset_list[[sender indexOfSelectedItem]] );
-
-        /* save to vlcrc */
-        config_SaveConfigFile( p_intf, "equalizer" );
     }
 
     vlc_object_release( p_object );
@@ -315,9 +309,6 @@ static bool GetFiltersStatus( intf_thread_t *p_intf,
     {
         /* save changed to config */
         config_PutFloat( p_intf, "equalizer-preamp", f_preamp );
-
-        /* save to vlcrc */
-        config_SaveConfigFile( p_intf, "equalizer" );
     }
 
     vlc_object_release( p_object );
@@ -352,9 +343,6 @@ static bool GetFiltersStatus( intf_thread_t *p_intf,
     {
         /* save changed to config */
         config_PutInt( p_intf, "equalizer-2pass", (int)b_2p );
-
-        /* save to vlcrc */
-        config_SaveConfigFile( p_intf, "equalizer" );
     }
 
     vlc_object_release( p_object );

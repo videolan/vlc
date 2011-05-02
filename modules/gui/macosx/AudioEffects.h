@@ -103,7 +103,6 @@
 + (VLCAudioEffects *)sharedInstance;
 - (IBAction)toggleWindow:(id)sender;
 - (void)setAudioFilter: (char *)psz_name on:(BOOL)b_on;
-- (void)savePrefs;
 
 /* Equalizer */
 - (void)setupEqualizer;

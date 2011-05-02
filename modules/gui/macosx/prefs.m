@@ -212,7 +212,7 @@ static VLCPrefs *_o_sharedMainInstance = nil;
 {
     /* TODO: call savePrefs on Root item */
     [_rootTreeItem applyChanges];
-    config_SaveConfigFile( p_intf, NULL );
+    config_SaveConfigFile( p_intf );
     [o_prefs_window orderOut:self];
 }
 

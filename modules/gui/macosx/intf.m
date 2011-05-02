@@ -818,11 +818,6 @@ static VLCMain *_o_sharedMainInstance = nil;
     /* make sure that the current volume is saved */
     config_PutInt( p_intf->p_libvlc, "volume", i_lastShownVolume );
 
-    /* save the prefs if they were changed in the extended panel */
-    if(o_extended && [o_extended configChanged])
-        [o_extended savePrefs];
-    [o_audioeffects savePrefs];
-
     /* unsubscribe from the interactive dialogues */
     dialog_Unregister( p_intf );
     var_DelCallback( p_intf, "dialog-error", DialogCallback, self );
