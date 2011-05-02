@@ -5,6 +5,8 @@
  * $Id$
  *
  * Author: Sam Hocevar <sam@zoy.org>
+ *         Damien Lucas <nitrox@videolan.org>  (Bob, Blend)
+ *         Laurent Aimar <fenrir@videolan.org> (Bob, Blend)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

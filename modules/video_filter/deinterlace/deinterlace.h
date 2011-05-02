@@ -5,7 +5,10 @@
  * $Id$
  *
  * Author: Sam Hocevar <sam@zoy.org>
- *         Juha Jeronen <juha.jeronen@jyu.fi> (Phosphor and IVTC modes)
+ *         Christophe Massiot <massiot@via.ecp.fr>
+ *         Laurent Aimar <fenrir@videolan.org>
+ *         Juha Jeronen <juha.jeronen@jyu.fi>
+ *         ...and others
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
