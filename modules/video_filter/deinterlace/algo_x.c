@@ -4,7 +4,7 @@
  * Copyright (C) 2000-2011 the VideoLAN team
  * $Id$
  *
- * Author: Sam Hocevar <sam@zoy.org>
+ * Author: Laurent Aimar <fenrir@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
