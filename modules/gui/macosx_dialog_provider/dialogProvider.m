@@ -477,7 +477,6 @@ bool checkProgressPanel (void *priv)
 
         config_PutPsz(p_intf, "lastfm-username", [lastFMUsername UTF8String]);
         config_PutPsz(p_intf, "lastfm-password", [lastFMPassword UTF8String]);
-        config_SaveConfigFile(p_intf);
     }
     else
         msg_Err(p_intf,"Last.FM module not found, no action");
