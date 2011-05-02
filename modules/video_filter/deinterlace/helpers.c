@@ -469,7 +469,8 @@ int CalculateInterlaceScore( const picture_t* p_pic_top,
 
     /* Amount of bits must be known for MMX, thus int32_t.
        Doesn't hurt the C implementation. */
-    int32_t i_score = 0;
+    int32_t i_score_mmx = 0; /* this must be divided by 255 when finished  */
+    int32_t i_score_c   = 0; /* this counts as-is (used for non-MMX parts) */
 
 #ifdef CAN_COMPILE_MMXEXT
     unsigned u_cpu = vlc_CPU();
@@ -579,7 +580,7 @@ int CalculateInterlaceScore( const picture_t* p_pic_top,
                 */
                 int_fast32_t comb = (P - C) * (N - C);
                 if( comb > T )
-                    ++i_score;
+                    ++i_score_c;
 
                 ++p_c;
                 ++p_p;
@@ -599,12 +600,12 @@ int CalculateInterlaceScore( const picture_t* p_pic_top,
 #ifdef CAN_COMPILE_MMXEXT
     if( u_cpu & CPU_CAPABILITY_MMXEXT )
     {
-        movd_r2m( mm7, i_score );
+        movd_r2m( mm7, i_score_mmx );
         emms();
-        i_score /= 255;
+        i_score_mmx /= 255;
     }
 #endif
 
-    return i_score;
+    return i_score_mmx + i_score_c;
 }
 #undef T
