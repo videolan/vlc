@@ -109,12 +109,14 @@ static void DarkenField( picture_t *p_dst, const int i_field,
     for( ; p_out < p_out_end ; p_out += 2*p_dst->p[i_plane].i_pitch )
     {
         uint64_t *po = (uint64_t *)p_out;
+        int x = 0;
+
 #ifdef CAN_COMPILE_MMXEXT
         if( u_cpu & CPU_CAPABILITY_MMXEXT )
         {
             movq_m2r( i_strength_u64,  mm1 );
             movq_m2r( remove_high_u64, mm2 );
-            for( int x = 0 ; x < w8; x += 8 )
+            for( ; x < w8; x += 8 )
             {
                 movq_m2r( (*po), mm0 );
 
@@ -127,18 +129,16 @@ static void DarkenField( picture_t *p_dst, const int i_field,
         else
         {
 #endif
-            for( int x = 0 ; x < w8; x += 8, ++po )
+            for( ; x < w8; x += 8, ++po )
                 (*po) = ( ((*po) >> i_strength) & remove_high_u64 );
 #ifdef CAN_COMPILE_MMXEXT
         }
 #endif
+
         /* handle the width remainder */
-        if( wm8 )
-        {
-            uint8_t *po_temp = (uint8_t *)po;
-            for( int x = 0 ; x < wm8; ++x, ++po_temp )
-                (*po_temp) = ( ((*po_temp) >> i_strength) & remove_high_u8 );
-        }
+        uint8_t *po_temp = (uint8_t *)po;
+        for( ; x < w; ++x, ++po_temp )
+            (*po_temp) = ( ((*po_temp) >> i_strength) & remove_high_u8 );
     }
 
     /* Process chroma if the field chromas are independent.
@@ -170,6 +170,8 @@ static void DarkenField( picture_t *p_dst, const int i_field,
 
             for( ; p_out < p_out_end ; p_out += 2*p_dst->p[i_plane].i_pitch )
             {
+                int x = 0;
+
 #ifdef CAN_COMPILE_MMXEXT
                 /* See also easy-to-read C version below. */
                 if( u_cpu & CPU_CAPABILITY_MMXEXT )
@@ -180,7 +182,7 @@ static void DarkenField( picture_t *p_dst, const int i_field,
                     movq_m2r( remove_high_u64, mm7 );
 
                     uint64_t *po = (uint64_t *)p_out;
-                    for( int x = 0 ; x < w8; x += 8 )
+                    for( ; x < w8; x += 8 )
                     {
                         movq_m2r( (*po), mm0 );
 
@@ -201,28 +203,14 @@ static void DarkenField( picture_t *p_dst, const int i_field,
 
                         movq_r2m( mm1, (*po++) );
                     }
+                }
+#endif
 
-                    /* handle the width remainder */
-                    if( wm8 )
-                    {
-                        /* The output is closer to 128 than the input;
-                           the result always fits in uint8. */
-                        uint8_t *po8 = (uint8_t *)po;
-                        for( int x = 0 ; x < wm8; ++x, ++po8 )
-                            (*po8) = 128 + ( ((*po8) - 128) /
-                                                  (1 << i_strength) );
-                    }
-                }
-                else
-                {
-#endif
-                    /* 4:2:2 chroma handler, C version */
-                    uint8_t *po = p_out;
-                    for( int x = 0 ; x < w; ++x, ++po )
-                        (*po) = 128 + ( ((*po) - 128) / (1 << i_strength) );
-#ifdef CAN_COMPILE_MMXEXT
-                }
-#endif
+                /* C version - handle the width remainder
+                   (or everything if no MMX) */
+                uint8_t *po = p_out;
+                for( ; x < w; ++x, ++po )
+                    (*po) = 128 + ( ((*po) - 128) / (1 << i_strength) );
             } /* for p_out... */
         } /* for i_plane... */
     } /* if b_i422 */
