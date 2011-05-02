@@ -276,7 +276,7 @@ void PLSelector::setSource( QTreeWidgetItem *item )
     }
     else if( i_type == SQL_ML )
     {
-        emit activated( NULL, true );
+        emit categoryActivated( NULL, true );
         return;
     }
 
@@ -311,7 +311,7 @@ void PLSelector::setSource( QTreeWidgetItem *item )
 
     /* */
     if( pl_item )
-        emit activated( pl_item, false );
+        emit categoryActivated( pl_item, false );
 }
 
 PLSelItem * PLSelector::addItem (

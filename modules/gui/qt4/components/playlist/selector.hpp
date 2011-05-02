@@ -145,7 +145,7 @@ private slots:
     void podcastRemove( PLSelItem* );
 
 signals:
-    void activated( playlist_item_t *, bool );
+    void categoryActivated( playlist_item_t *, bool );
 };
 
 #endif

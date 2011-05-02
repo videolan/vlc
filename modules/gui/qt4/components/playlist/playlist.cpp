@@ -144,7 +144,7 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QWidget *_par )
     layout->setColumnStretch( 3, 3 );
 
     /* Connect the activation of the selector to a redefining of the PL */
-    DCONNECT( selector, activated( playlist_item_t *, bool ),
+    DCONNECT( selector, categoryActivated( playlist_item_t *, bool ),
               mainView, setRoot( playlist_item_t *, bool ) );
     mainView->setRoot( p_root, false );
 
