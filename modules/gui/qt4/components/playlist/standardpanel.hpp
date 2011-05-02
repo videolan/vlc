@@ -37,6 +37,7 @@
 
 class QSignalMapper;
 class PLModel;
+class MLModel;
 class QKeyEvent;
 class QWheelEvent;
 class QStackedLayout;
@@ -58,7 +59,7 @@ class StandardPLPanel: public QWidget
 
 public:
     StandardPLPanel( PlaylistWidget *, intf_thread_t *,
-                     playlist_item_t *, PLSelector *, PLModel * );
+                     playlist_item_t *, PLSelector *, PLModel *, MLModel * );
     virtual ~StandardPLPanel();
 
     enum { ICON_VIEW = 0,
@@ -72,6 +73,7 @@ public:
 protected:
 
     PLModel *model;
+    MLModel *mlmodel;
     virtual void wheelEvent( QWheelEvent *e );
 private:
     intf_thread_t *p_intf;

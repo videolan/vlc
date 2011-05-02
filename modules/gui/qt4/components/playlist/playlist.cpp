@@ -30,6 +30,7 @@
 #include "components/playlist/standardpanel.hpp"  /* MainView */
 #include "components/playlist/selector.hpp"       /* PLSelector */
 #include "components/playlist/playlist_model.hpp" /* PLModel */
+#include "components/playlist/ml_model.hpp"       /* MLModel */
 #include "components/interface_widgets.hpp"       /* CoverArtLabel */
 
 #include "util/searchlineedit.hpp"
@@ -93,7 +94,8 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QWidget *_par )
     setMinimumWidth( 400 );
 
     PLModel *model = new PLModel( p_playlist, p_intf, p_root, this );
-    mainView = new StandardPLPanel( this, p_intf, p_root, selector, model );
+    MLModel *mlmodel = new MLModel( p_intf, this );
+    mainView = new StandardPLPanel( this, p_intf, p_root, selector, model, mlmodel );
 
     /* Location Bar */
     locationBar = new LocationBar( model );

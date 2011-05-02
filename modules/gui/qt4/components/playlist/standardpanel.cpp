@@ -29,6 +29,7 @@
 #include "components/playlist/standardpanel.hpp"
 
 #include "components/playlist/playlist_model.hpp" /* PLModel */
+#include "components/playlist/ml_model.hpp" /* MLModel */
 #include "components/playlist/views.hpp"          /* 3 views */
 #include "components/playlist/selector.hpp"       /* PLSelector */
 #include "menus.hpp"                              /* Popup */
@@ -53,9 +54,11 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
                                   intf_thread_t *_p_intf,
                                   playlist_item_t *p_root,
                                   PLSelector *_p_selector,
-                                  PLModel *_p_model )
+                                  PLModel *_p_model,
+                                  MLModel *_p_plmodel)
                 : QWidget( _parent ), p_intf( _p_intf ),
-                  p_selector( _p_selector ), model( _p_model )
+                  p_selector( _p_selector ), model( _p_model ),
+                  mlmodel( _p_plmodel)
 {
     viewStack = new QStackedLayout( this );
     viewStack->setSpacing( 0 ); viewStack->setMargin( 0 );
@@ -191,10 +194,18 @@ void StandardPLPanel::searchDelayed( const QString& searchText )
 /* This activated by the selector selection */
 void StandardPLPanel::setRoot( playlist_item_t *p_item, bool b )
 {
-    if( b ) //SQLML
-        return;
-
-    model->rebuild( p_item );
+    if( b )
+    {
+        msg_Dbg( p_intf, "Setting the SQL ML" );
+        currentView->setModel( mlmodel );
+    }
+    else
+    {
+        msg_Dbg( p_intf, "Normal PL/ML or SD" );
+        if( currentView->model() != model )
+            currentView->setModel( model );
+        model->rebuild( p_item );
+    }
 }
 
 void StandardPLPanel::browseInto( const QModelIndex &index )
@@ -409,20 +420,23 @@ void StandardPLPanel::cycleViews()
 
 void StandardPLPanel::activate( const QModelIndex &index )
 {
-    /* If we are not a leaf node */
-    if( !index.data( PLModel::IsLeafNodeRole ).toBool() )
+    if( currentView->model() == model )
     {
-        if( currentView != treeView )
-            browseInto( index );
-    }
-    else
-    {
-        playlist_Lock( THEPL );
-        playlist_item_t *p_item = playlist_ItemGetById( THEPL, model->itemId( index ) );
-        p_item->i_flags |= PLAYLIST_SUBITEM_STOP_FLAG;
-        lastActivatedId = p_item->p_input->i_id;
-        playlist_Unlock( THEPL );
-        model->activateItem( index );
+        /* If we are not a leaf node */
+        if( !index.data( PLModel::IsLeafNodeRole ).toBool() )
+        {
+            if( currentView != treeView )
+                browseInto( index );
+        }
+        else
+        {
+            playlist_Lock( THEPL );
+            playlist_item_t *p_item = playlist_ItemGetById( THEPL, model->itemId( index ) );
+            p_item->i_flags |= PLAYLIST_SUBITEM_STOP_FLAG;
+            lastActivatedId = p_item->p_input->i_id;
+            playlist_Unlock( THEPL );
+            model->activateItem( index );
+        }
     }
 }
 
