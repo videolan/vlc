@@ -374,8 +374,6 @@ vlc_module_begin ()
     add_string( CFG_PREFIX "set-ctrls", NULL, S_CTRLS_TEXT,
               S_CTRLS_LONGTEXT, true )
 
-    add_obsolete_string( CFG_PREFIX "dev" )
-
     add_obsolete_string( CFG_PREFIX "adev" )
     add_obsolete_integer( CFG_PREFIX "audio-method" )
     add_obsolete_bool( CFG_PREFIX "stereo" )
