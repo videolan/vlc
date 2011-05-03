@@ -628,7 +628,7 @@ static int MMSOpen( access_t  *p_access, vlc_url_t *p_url, int  i_proto )
 
     /* media file path shouldn't start with / character */
     mediapath = p_url->psz_path;
-    if ( *mediapath == '/' )
+    if ( mediapath && *mediapath == '/' )
     {
         mediapath++;
     }
