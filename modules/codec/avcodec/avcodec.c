@@ -94,16 +94,9 @@ vlc_module_begin ()
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_VCODEC )
     /* decoder main module */
-#if defined(MODULE_NAME_is_ffmpegaltivec) \
-     || (defined(CAN_COMPILE_ALTIVEC) && !defined(NO_ALTIVEC_IN_FFMPEG))
-    set_description( N_("AltiVec FFmpeg audio/video decoder ((MS)MPEG4,SVQ1,H263,WMV,WMA)") )
-    /*add_requirement( ALTIVEC )*/
-    set_capability( "decoder", 71 )
-#else
     set_description( N_("FFmpeg audio/video decoder") )
     set_help( MODULE_DESCRIPTION )
     set_capability( "decoder", 70 )
-#endif
     set_section( N_("Decoding") , NULL )
     set_callbacks( OpenDecoder, CloseDecoder )
 

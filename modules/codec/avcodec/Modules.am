@@ -39,19 +39,3 @@ libvlc_LTLIBRARIES += \
 
 EXTRA_LTLIBRARIES += \
 	libavcodec_plugin.la
-
-# FIXME SOURCES_ffmpegaltivec = \
-# FIXME 	ffmpeg.c \
-# FIXME 	ffmpeg.h \
-# FIXME 	video.c \
-# FIXME 	audio.c \
-# FIXME 	video_filter.c \
-# FIXME 	deinterlace.c \
-# FIXME 	chroma.c \
-# FIXME 	encoder.c \
-# FIXME 	postprocess.c \
-# FIXME 	demux.c \
-# FIXME 	mux.c \
-# FIXME 	scale.c \
-# FIXME 	$(NULL)
-

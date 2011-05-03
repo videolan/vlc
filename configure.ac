@@ -664,7 +664,7 @@ AC_CHECK_LIB(m,cos,[
   VLC_ADD_LIBS([adjust wave ripple psychedelic gradient a52tofloat32 dtstofloat32 x264 goom visual panoramix rotate noise grain scene kate flac lua chorus_flanger],[-lm])
 ])
 AC_CHECK_LIB(m,pow,[
-  VLC_ADD_LIBS([avcodec avformat access_avio swscale postproc ffmpegaltivec i420_rgb faad twolame equalizer spatializer param_eq libvlccore freetype mod mpc dmo quicktime realvideo qt4],[-lm])
+  VLC_ADD_LIBS([avcodec avformat access_avio swscale postproc i420_rgb faad twolame equalizer spatializer param_eq libvlccore freetype mod mpc dmo quicktime realvideo qt4],[-lm])
 ])
 AC_CHECK_LIB(m,sqrt,[
   VLC_ADD_LIBS([compressor headphone_channel_mixer normvol audiobargraph_a speex mono colorthres extract ball],[-lm])
@@ -1503,8 +1503,6 @@ AS_IF([test "${enable_altivec}" = "yes"], [
     AC_DEFINE(CAN_COMPILE_ALTIVEC, 1,
               [Define to 1 if AltiVec inline assembly is available.])
     AS_IF([test "${ac_cv_altivec_inline}" != "yes"], [
-      VLC_ADD_CFLAGS([idctaltivec],[${ac_cv_altivec_inline}])
-      VLC_ADD_CFLAGS([motionaltivec],[${ac_cv_altivec_inline}])
       VLC_ADD_CFLAGS([memcpyaltivec],[${ac_cv_altivec_inline}])
       VLC_ADD_CFLAGS([i420_yuy2_altivec],[${ac_cv_altivec_inline}])
       VLC_ADD_CFLAGS([libvlccore],[${ac_cv_altivec_inline}])
@@ -1569,7 +1567,6 @@ dnl - Others: test should fail
     AC_DEFINE(CAN_COMPILE_C_ALTIVEC, 1,
               [Define to 1 if C AltiVec extensions are available.])
     VLC_ADD_CFLAGS([libvlccore],[${ac_cv_c_altivec}])
-    VLC_ADD_CFLAGS([idctaltivec motionaltivec],[${ac_cv_c_altivec}])
     VLC_ADD_CFLAGS([i420_yuy2_altivec memcpyaltivec deinterlace],[${ac_cv_c_altivec} ${ac_cv_c_altivec_abi}])
     have_altivec="yes"
   ])
@@ -1581,7 +1578,7 @@ dnl - Others: test should fail
      LDFLAGS="${LDFLAGS_save}"
     ])
   AS_IF([test "${ac_cv_ld_altivec}" != "no"], [
-    VLC_ADD_LDFLAGS([libvlccore idctaltivec motionaltivec memcpyaltivec],[-Wl,-framework,vecLib])
+    VLC_ADD_LDFLAGS([libvlccore memcpyaltivec],[-Wl,-framework,vecLib])
   ])
 ])
 AM_CONDITIONAL([HAVE_ALTIVEC], [test "$have_altivec" = "yes"])
