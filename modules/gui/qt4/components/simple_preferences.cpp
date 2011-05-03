@@ -29,6 +29,7 @@
 
 #include "components/simple_preferences.hpp"
 #include "components/preferences_widgets.hpp"
+#include "dialogs/ml_configuration.hpp"
 
 #include <vlc_config_cat.h>
 #include <vlc_configuration.h>
@@ -548,6 +549,8 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             ui.assoButton->hide();
             ui.assocLabel->hide();
 #endif
+            BUTTONACT( ui.sqlMLbtn, configML() );
+
             /* interface */
             char *psz_intf = config_GetPsz( p_intf, "intf" );
             if( psz_intf )
@@ -884,6 +887,13 @@ void SPrefsPanel::changeStyle( QString s_style )
         (*it)->update();
         ++it;
     };
+}
+
+void SPrefsPanel::configML()
+{
+    MLConfDialog *mld = new MLConfDialog( this, p_intf );
+    mld->exec();
+    delete mld;
 }
 
 #ifdef WIN32

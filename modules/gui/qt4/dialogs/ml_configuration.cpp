@@ -244,10 +244,6 @@ MLConfDialog::MLConfDialog( QWidget *parent, intf_thread_t *_p_intf )
     CONNECT( recursivity, toggled( bool ), model, setRecursivity( bool ) );
 }
 
-MLConfDialog::~MLConfDialog()
-{
-}
-
 void MLConfDialog::init()
 {
     bool b_recursive = var_CreateGetBool( p_ml, "ml-recursive-scan" );

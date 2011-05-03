@@ -85,17 +85,10 @@ public slots:
 class MLConfDialog : public QVLCDialog
 {
     Q_OBJECT;
-    public:
-    static MLConfDialog * getInstance( intf_thread_t *p_intf )
-    {
-        if( !instance )
-            instance = new MLConfDialog( (QWidget *)p_intf->p_sys->p_mi, p_intf );
-        return instance;
-    }
-    virtual ~MLConfDialog();
+public:
+    MLConfDialog( QWidget *, intf_thread_t * );
 
 private:
-    MLConfDialog( QWidget *, intf_thread_t * );
     void init();
 
     vlc_array_t *p_monitored_dirs;

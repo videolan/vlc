@@ -137,6 +137,7 @@ private slots:
     void assoDialog();
     void saveAsso();
 #endif
+    void configML();
     void changeStyle( QString );
 };
 
