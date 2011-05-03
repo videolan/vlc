@@ -374,9 +374,7 @@ modules/codec/speex.c
 modules/codec/spudec/parse.c
 modules/codec/spudec/spudec.c
 modules/codec/spudec/spudec.h
-modules/codec/subsass.c
 modules/codec/subsdec.c
-modules/codec/subsdec.h
 modules/codec/subsusf.c
 modules/codec/t140.c
 modules/codec/svcdsub.c
@@ -1060,7 +1058,9 @@ modules/video_filter/clone.c
 modules/video_filter/colorthres.c
 modules/video_filter/crop.c
 modules/video_filter/croppadd.c
-modules/video_filter/deinterlace.c
+modules/video_filter/deinterlace/algo_phosphor.h
+modules/video_filter/deinterlace/deinterlace.c
+modules/video_filter/deinterlace/deinterlace.h
 modules/video_filter/dynamicoverlay/dynamicoverlay.c
 modules/video_filter/dynamicoverlay/dynamicoverlay.h
 modules/video_filter/dynamicoverlay/dynamicoverlay_buffer.c
@@ -1080,7 +1080,6 @@ modules/video_filter/logo.c
 modules/video_filter/magnify.c
 modules/video_filter/marq.c
 modules/video_filter/mirror.c
-modules/video_filter/mmx.h
 modules/video_filter/mosaic.c
 modules/video_filter/mosaic.h
 modules/video_filter/motionblur.c
