@@ -8,6 +8,10 @@
  * $Id$
  */
 
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
 #include "AtmoDynData.h"
 
 #if defined(_ATMO_VLC_PLUGIN_)

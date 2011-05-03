@@ -6,7 +6,11 @@
  * See the README.txt file for copyright information and how to reach the author(s).
  *
  * $Id$
-*/
+ */
+
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
 
 #include "AtmoExternalCaptureInput.h"
 #include "AtmoTools.h"

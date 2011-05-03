@@ -21,6 +21,10 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
 *****************************************************************************/
 
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
 /*****************************************************************************
 * Preamble
 *****************************************************************************/
@@ -29,10 +33,6 @@
 #include <string.h>
 #include <math.h>                                            /* sin(), cos() */
 #include <assert.h>
-
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
 
 // #define __ATMO_DEBUG__
 

@@ -6,6 +6,10 @@
  * $Id$
  */
 
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
 #include "AtmoTools.h"
 #include "AtmoDynData.h"
 #include "AtmoLiveView.h"

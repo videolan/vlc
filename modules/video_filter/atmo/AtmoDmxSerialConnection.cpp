@@ -8,6 +8,11 @@
  *
  * $Id$
  */
+
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
 #include "AtmoDefs.h"
 #include "AtmoDmxSerialConnection.h"
 #include "DmxTools.h"
