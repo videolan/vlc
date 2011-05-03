@@ -287,7 +287,6 @@ PlIconView::PlIconView( PLModel *model, QWidget *parent ) : QListView( parent )
 {
     PlIconViewItemDelegate *delegate = new PlIconViewItemDelegate( this );
 
-    setModel( model );
     setViewMode( QListView::IconMode );
     setMovement( QListView::Static );
     setResizeMode( QListView::Adjust );
@@ -316,7 +315,6 @@ void PlIconView::dragMoveEvent ( QDragMoveEvent * event )
 
 PlListView::PlListView( PLModel *model, QWidget *parent ) : QListView( parent )
 {
-    setModel( model );
     setViewMode( QListView::ListMode );
     setUniformItemSizes( true );
     setSelectionMode( QAbstractItemView::ExtendedSelection );
@@ -383,8 +381,6 @@ PicFlowView::PicFlowView( PLModel *p_model, QWidget *parent ) : QAbstractItemVie
     picFlow->setSlideSize(QSize(128,128));
     layout->addWidget( picFlow );
     setSelectionMode( QAbstractItemView::SingleSelection );
-    setModel( p_model );
-
 }
 
 int PicFlowView::horizontalOffset() const

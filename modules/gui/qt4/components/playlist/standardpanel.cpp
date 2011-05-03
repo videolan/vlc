@@ -28,8 +28,9 @@
 
 #include "components/playlist/standardpanel.hpp"
 
+#include "components/playlist/vlc_model.hpp"      /* VLCModel */
 #include "components/playlist/playlist_model.hpp" /* PLModel */
-#include "components/playlist/ml_model.hpp" /* MLModel */
+#include "components/playlist/ml_model.hpp"       /* MLModel */
 #include "components/playlist/views.hpp"          /* 3 views */
 #include "components/playlist/selector.hpp"       /* PLSelector */
 #include "menus.hpp"                              /* Popup */
@@ -314,7 +315,6 @@ void StandardPLPanel::createTreeView()
     treeView->setContextMenuPolicy( Qt::CustomContextMenu );
 
     /* setModel after setSortingEnabled(true), or the model will sort immediately! */
-    treeView->setModel( model );
 
     getSettings()->beginGroup("Playlist");
 
@@ -352,8 +352,20 @@ void StandardPLPanel::createTreeView()
     viewStack->addWidget( treeView );
 }
 
+void StandardPLPanel::changeModel( bool b_ml )
+{
+    VLCModel *mod;
+    if( b_ml )
+        mod = mlmodel;
+    else
+        mod = model;
+    if( currentView->model() != mod )
+        currentView->setModel( mod );
+}
+
 void StandardPLPanel::showView( int i_view )
 {
+
     switch( i_view )
     {
     case TREE_VIEW:
@@ -386,6 +398,8 @@ void StandardPLPanel::showView( int i_view )
     }
     default: return;
     }
+
+    changeModel( false );
 
     viewStack->setCurrentWidget( currentView );
     browseInto();

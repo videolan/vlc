@@ -70,6 +70,7 @@ public:
 
     const int currentViewIndex();
 
+
 protected:
 
     PLModel *model;
@@ -98,6 +99,7 @@ private:
     void createIconView();
     void createListView();
     void createCoverView();
+    void changeModel ( bool b_ml );
     bool eventFilter ( QObject * watched, QEvent * event );
 
 public slots:
