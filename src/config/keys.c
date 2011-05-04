@@ -230,7 +230,7 @@ found:
 struct action
 {
     char name[MAXACTION];
-    vlc_key_t value;
+    vlc_action_t value;
 };
 
 static const struct action actions[] =
@@ -341,8 +341,8 @@ static const struct action actions[] =
 
 struct mapping
 {
-    uint32_t  key; ///< Key code
-    vlc_key_t action; ///< Action ID
+    uint32_t     key; ///< Key code
+    vlc_action_t action; ///< Action ID
 };
 
 static int keycmp (const void *a, const void *b)
@@ -379,9 +379,14 @@ static int vlc_key_to_action (vlc_object_t *obj, const char *varname,
     return var_SetInteger (obj, "key-action", (*pent)->action);
 }
 
-
+/**
+ * Sets up all key mappings for a given action.
+ * \param map tree (of struct mapping entries) to write mappings to
+ * \param confname VLC configuration item to read mappings from
+ * \param action action ID
+ */
 static void vlc_MapAction (vlc_object_t *obj, void **map,
-                           const char *confname, vlc_key_t action)
+                           const char *confname, vlc_action_t action)
 {
     char *keys = var_InheritString (obj, confname);
     if (keys == NULL)
@@ -496,7 +501,7 @@ static int actcmp(const void *key, const void *ent)
  * Get the action ID from the action name in the configuration subsystem.
  * @return the action ID or ACTIONID_NONE on error.
  */
-vlc_key_t vlc_GetActionId(const char *name)
+vlc_action_t vlc_GetActionId (const char *name)
 {
     const struct action *act;
 

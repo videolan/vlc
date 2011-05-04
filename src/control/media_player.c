@@ -43,9 +43,9 @@
 #include "media_player_internal.h"
 
 /*
- * mapping of libvlc_navigate_mode_t to vlc_key_t
+ * mapping of libvlc_navigate_mode_t to vlc_action_t
  */
-static const vlc_key_t libvlc_navigate_to_action[] =
+static const vlc_action_t libvlc_navigate_to_action[] =
   {
     ACTIONID_NAV_ACTIVATE,
     ACTIONID_NAV_UP,

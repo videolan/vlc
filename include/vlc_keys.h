@@ -89,7 +89,7 @@
 VLC_EXPORT( char *, vlc_keycode2str, (uint_fast32_t i_key) ) LIBVLC_USED;
 VLC_EXPORT( uint_fast32_t, vlc_str2keycode, (const char *str) ) LIBVLC_USED;
 
-typedef enum vlc_key {
+typedef enum vlc_action {
     ACTIONID_NONE = 0,
     ACTIONID_QUIT,
     ACTIONID_PLAY_PAUSE,
@@ -200,9 +200,9 @@ typedef enum vlc_key {
     ACTIONID_RATE_SLOWER_FINE,
     ACTIONID_RATE_FASTER_FINE,
 
-} vlc_key_t;
+} vlc_action_t;
 
-VLC_EXPORT( vlc_key_t, vlc_GetActionId, (const char *psz_key) ) LIBVLC_USED;
+VLC_EXPORT( vlc_action_t, vlc_GetActionId, (const char *psz_key) ) LIBVLC_USED;
 
 struct hotkey
 {
