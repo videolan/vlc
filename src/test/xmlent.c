@@ -76,6 +76,8 @@ int main (void)
 
     encode ("", "");
     encode ("a'àc\"çe&én<ño>ö1:", "a&#39;àc&quot;çe&amp;én&lt;ño&gt;ö1:");
+    encode ("\x01\xC2\x81\xC2\x85", "&#1;&#129;\xC2\x85");
+    encode ("\r\n", "\r\n");
 
     return 0;
 }
