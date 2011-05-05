@@ -84,7 +84,7 @@ typedef struct libvlc_rectangle_t
  */
 typedef enum libvlc_video_marquee_option_t {
     libvlc_marquee_Enable = 0,
-    libvlc_marquee_Text,		/** string argument */
+    libvlc_marquee_Text,                  /** string argument */
     libvlc_marquee_Color,
     libvlc_marquee_Opacity,
     libvlc_marquee_Position,
@@ -665,7 +665,7 @@ LIBVLC_API void libvlc_media_player_next_frame( libvlc_media_player_t *p_mi );
  * \version libVLC 1.2.0 or later
  */
 LIBVLC_API void libvlc_media_player_navigate( libvlc_media_player_t* p_mi,
-						  unsigned navigate );
+                                              unsigned navigate );
 
 /**
  * Release (free) libvlc_track_description_t
