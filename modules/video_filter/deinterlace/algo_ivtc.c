@@ -1251,7 +1251,7 @@ static bool IVTCOutputOrDropFrame( filter_t *p_filter, picture_t *p_dst )
             if( op == IVTC_OP_DROP_FRAME )
             {
                 /* Bump cadence counter into the next expected position */
-                p_ivtc->i_cadence_pos = ++p_ivtc->i_cadence_pos % 5;
+                p_ivtc->i_cadence_pos = (p_ivtc->i_cadence_pos + 1) % 5;
 
                 /* Drop frame. We're done. */
                 return false;
@@ -1385,7 +1385,7 @@ static bool IVTCOutputOrDropFrame( filter_t *p_filter, picture_t *p_dst )
         }
 
         /* Bump cadence counter into the next expected position. */
-        p_ivtc->i_cadence_pos = ++p_ivtc->i_cadence_pos % 5;
+        p_ivtc->i_cadence_pos = (p_ivtc->i_cadence_pos + 1) % 5;
     }
     else if( p_ivtc->i_mode == IVTC_MODE_TELECINED_NTSC_SOFT )
     {
