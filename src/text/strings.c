@@ -47,6 +47,8 @@
 #include <vlc_strings.h>
 #include <vlc_url.h>
 #include <vlc_charset.h>
+#include <libvlc.h>
+#include <errno.h>
 
 /**
  * Decode encoded URI component. See also decode_URI().
@@ -392,41 +394,51 @@ void resolve_xml_special_chars( char *psz_value )
 }
 
 /**
- * Converts '<', '>', '\"', '\'' and '&' to their html entities
- * \param psz_content simple element content that is to be converted
+ * XML-encode an UTF-8 string
+ * \param str nul-terminated UTF-8 byte sequence to XML-encode
+ * \return XML encoded string or NULL on error
+ * (errno is set to ENOMEM or EILSEQ as appropriate)
  */
-char *convert_xml_special_chars( const char *psz_content )
+char *convert_xml_special_chars (const char *str)
 {
-    assert( psz_content );
+    assert (str != NULL);
 
-    const size_t len = strlen( psz_content );
-    char *const psz_temp = malloc( 6 * len + 1 );
-    char *p_to   = psz_temp;
-
-    if( psz_temp == NULL )
+    const size_t len = strlen (str);
+    char *const buf = malloc (6 * len + 1), *ptr = buf;
+    if (unlikely(buf == NULL))
         return NULL;
-    for( size_t i = 0; i < len; i++ )
+
+    size_t n;
+    uint32_t cp;
+
+    while ((n = vlc_towc (str, &cp)) != 0)
     {
-        const char *str;
-        char c = psz_content[i];
-
-        switch ( c )
+        if (unlikely(n == (size_t)-1))
         {
-            case '\"': str = "quot"; break;
-            case '&':  str = "amp";  break;
-            case '\'': str = "#39";  break;
-            case '<':  str = "lt";   break;
-            case '>':  str = "gt";   break;
-            default:
-                *(p_to++) = c;
-                continue;
+            free (buf);
+            errno = EILSEQ;
+            return NULL;
         }
-        p_to += sprintf( p_to, "&%s;", str );
-    }
-    *(p_to++) = '\0';
 
-    p_to = realloc( psz_temp, p_to - psz_temp );
-    return p_to ? p_to : psz_temp; /* cannot fail */
+        if ((cp & ~0x0080) < 32 /* C0/C1 control codes */
+         && strchr ("\x09\x0A\x0D\x85", cp) == NULL)
+            ptr += sprintf (ptr, "&#%"PRIu32";", cp);
+        else
+        switch (cp)
+        {
+            case '\"': strcpy (ptr, "&quot;"); ptr += 6; break;
+            case '&':  strcpy (ptr, "&amp;");  ptr += 5; break;
+            case '\'': strcpy (ptr, "&#39;");  ptr += 5; break;
+            case '<':  strcpy (ptr, "&lt;");   ptr += 4; break;
+            case '>':  strcpy (ptr, "&gt;");   ptr += 4; break;
+            default:   memcpy (ptr, str, n);   ptr += n; break;
+        }
+        str += n;
+    }
+    *(ptr++) = '\0';
+
+    ptr = realloc (buf, ptr - buf);
+    return likely(ptr != NULL) ? ptr : buf; /* cannot fail */
 }
 
 /* Base64 encoding */
