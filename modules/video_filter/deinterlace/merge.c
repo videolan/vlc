@@ -24,6 +24,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#include <stdlib.h>
+
 /* This handles including config.h, because the config
    is already needed in the header. */
 #include "merge.h"
@@ -35,8 +37,6 @@
 #ifdef HAVE_ALTIVEC_H
 #   include <altivec.h>
 #endif
-
-#include <stdint.h>
 
 /*****************************************************************************
  * Merge (line blending) routines
