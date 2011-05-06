@@ -353,8 +353,6 @@ void vlc_cond_broadcast (vlc_cond_t *p_condvar)
  * @param p_mutex mutex which is unlocked while waiting,
  *                then locked again when waking up.
  * @param deadline <b>absolute</b> timeout
- *
- * @return 0 if the condition was signaled, an error code in case of timeout.
  */
 void vlc_cond_wait (vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex)
 {
