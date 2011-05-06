@@ -43,7 +43,7 @@
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
- 
+
 #define I_VALUES_TEXT N_("Value of the audio channels levels")
 #define I_VALUES_LONGTEXT N_("Value of the audio level of each channels between 0 and 1" \
     "Each level should be separated with ':'.")
@@ -135,7 +135,7 @@ struct filter_sys_t
     filter_t *p_blend;
 
     vlc_mutex_t lock;
-    
+
     BarGraph_t p_BarGraph;
 
     int i_pos;
@@ -290,14 +290,14 @@ static void Close( vlc_object_t *p_this )
         filter_DeleteBlend( p_sys->p_blend );
 
     vlc_mutex_destroy( &p_sys->lock );
-    
+
     if( p_BarGraph->p_pic )
     {
         picture_Release( p_BarGraph->p_pic );
         p_BarGraph->p_pic = NULL;
     }
     free( p_BarGraph->i_values );
-    
+
     free( p_sys );
 }
 
@@ -536,31 +536,31 @@ static picture_t *LoadImage( vlc_object_t *p_this, int nbChannels, int* i_values
     int i_width = 0;
     int i_line;
     int moinsTrois, moinsCinq, moinsSept, moinsDix, moinsVingt;
-    
+
     if (nbChannels == 0) {
         i_width = 20;
     } else {
         i_width = 2 * nbChannels * barWidth + 10;
     }
-    
+
     moinsTrois = 0.71*scale + 20;
     moinsCinq = 0.56*scale + 20;
     moinsSept = 0.45*scale + 20;
     moinsDix = 0.32*scale + 20;
     moinsVingt = 0.1*scale + 20;
-    
+
     p_pic = picture_New(VLC_FOURCC('Y','U','V','A'), i_width+20, scale+30, 1, 1);
-    
+
     // blacken the whole picture
     for( i = 0 ; i < p_pic->i_planes ; i++ )
     {
         memset( p_pic->p[i].p_pixels, 0x00,
                 p_pic->p[i].i_visible_lines * p_pic->p[i].i_pitch );
     }
-    
+
     // side bar
     for ( i_line = 20; i_line < scale+20; i_line++ ) {
-    
+
 #define DrawPointsBlack(a,b) {\
         for (i=a; i<b; i++) {\
             *(p_pic->p[0].p_pixels + (scale + 30 - i_line - 1) * p_pic->p[0].i_pitch + i ) = 0x00; \
@@ -576,12 +576,12 @@ static picture_t *LoadImage( vlc_object_t *p_this, int nbChannels, int* i_values
             *(p_pic->p[2].p_pixels + (scale + 30 - i_line - 1) * p_pic->p[2].i_pitch + i ) = 128;\
             *(p_pic->p[3].p_pixels + (scale + 30 - i_line - 1) * p_pic->p[3].i_pitch + i ) = 0xFF; \
         }\
-    }    
-        
+    }
+
         // vertical line
         DrawPointsBlack(20,22);
         DrawPointsWhite(22,24);
-    
+
         // -3dB
         if (i_line == moinsTrois - 2) {
             // 3
@@ -609,7 +609,7 @@ static picture_t *LoadImage( vlc_object_t *p_this, int nbChannels, int* i_values
             // 3
             DrawPointsBlack(16,19);
         }
-        
+
         // -5dB
         if (i_line == moinsCinq - 2) {
             // 5
@@ -637,7 +637,7 @@ static picture_t *LoadImage( vlc_object_t *p_this, int nbChannels, int* i_values
             // 5
             DrawPointsBlack(16,19);
         }
-        
+
         // -7dB
         if (i_line == moinsSept - 2) {
             // 7
@@ -665,8 +665,8 @@ static picture_t *LoadImage( vlc_object_t *p_this, int nbChannels, int* i_values
             // 7
             DrawPointsBlack(16,19);
         }
-        
-        
+
+
         // -10dB
         if (i_line == moinsDix - 2) {
             // 1
@@ -707,7 +707,7 @@ static picture_t *LoadImage( vlc_object_t *p_this, int nbChannels, int* i_values
             // 0
             DrawPointsBlack(16,19);
         }
-        
+
         // -20dB
         if (i_line == moinsVingt - 2) {
             // 2
@@ -748,10 +748,10 @@ static picture_t *LoadImage( vlc_object_t *p_this, int nbChannels, int* i_values
             // 0
             DrawPointsBlack(16,19);
         }
-        
-        
+
+
     }
-    
+
     // draw the bars and channel indicators
     for (i=0; i<nbChannels; i++) {
         for( j = barWidth+20 ; j < 2*barWidth+20; j++)
@@ -834,9 +834,9 @@ static picture_t *LoadImage( vlc_object_t *p_this, int nbChannels, int* i_values
             }
         }
     }
-    
-    
-    
+
+
+
     if (alarm) {// draw the alarm square
         // bottom
         for ( i_line = 0; i_line < 10; i_line++ ) {
@@ -904,7 +904,7 @@ static picture_t *LoadImage( vlc_object_t *p_this, int nbChannels, int* i_values
             }
         }
     }
-    
+
 
     return p_pic;
 }

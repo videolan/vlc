@@ -86,7 +86,7 @@ vlc_module_begin ()
     set_capability( "audio filter", 0 )
     set_category( CAT_AUDIO )
     set_subcategory( SUBCAT_AUDIO_AFILTER )
-    
+
     add_string( CFG_PREFIX "address", "localhost", ADDRESS_TEXT, ADDRESS_LONGTEXT, false )
     add_integer( CFG_PREFIX "port", 12345, PORT_TEXT, PORT_LONGTEXT, false )
     add_integer( CFG_PREFIX "bargraph", 1, BARGRAPH_TEXT, BARGRAPH_LONGTEXT, false )
@@ -96,7 +96,7 @@ vlc_module_begin ()
     add_float( CFG_PREFIX "alarm_threshold", 0.1, ALARM_THRESHOLD_TEXT, ALARM_THRESHOLD_LONGTEXT, false )
     add_integer( CFG_PREFIX "repetition_time", 2000, REPETITION_TIME_TEXT, REPETITION_TIME_LONGTEXT, false )
     add_integer( CFG_PREFIX "connection_reset", 1, CONNECTION_RESET_TEXT, CONNECTION_RESET_LONGTEXT, false )
-    
+
     set_callbacks( Open, Close )
 vlc_module_end ()
 
@@ -153,7 +153,7 @@ static int Open( vlc_object_t *p_this )
     p_sys = p_filter->p_sys = malloc( sizeof( *p_sys ) );
     if( !p_sys )
         return VLC_ENOMEM;
-        
+
     p_sys->bargraph = var_CreateGetIntegerCommand( p_filter, "audiobargraph_a-bargraph" );
     p_sys->bargraph_repetition = var_CreateGetIntegerCommand( p_filter, "audiobargraph_a-bargraph_repetition" );
     p_sys->silence = var_CreateGetIntegerCommand( p_filter, "audiobargraph_a-silence" );
@@ -196,16 +196,16 @@ static block_t *DoWork( filter_t *p_filter, block_t *p_in_buf )
     float sum;
     int count = 0;
     int i_ret;
-    
+
     nbChannels = aout_FormatNbChannels( &p_filter->fmt_in.audio );
     p_sys->nbChannels = nbChannels;
-    
+
     i_value = (float*)malloc(nbChannels * sizeof(float));
-    
+
     for (i=0; i<nbChannels; i++) {
         i_value[i] = 0;
     }
-    
+
     /* 1 - Compute the peack values */
     for ( i = 0 ; i < (int)(p_in_buf->i_nb_samples); i++ )
     {
@@ -218,7 +218,7 @@ static block_t *DoWork( filter_t *p_filter, block_t *p_in_buf )
         }
     }
     max = pow( max, 2 );
-    
+
     if (p_sys->silence) {
         /* 2 - store the new value */
         new = (ValueDate_t*)malloc(sizeof(ValueDate_t));
@@ -232,7 +232,7 @@ static block_t *DoWork( filter_t *p_filter, block_t *p_in_buf )
         if (p_sys->first == NULL) {
             p_sys->first = new;
         }
-        
+
         /* 3 - delete too old values */
         while (p_sys->first->date < (new->date - (p_sys->time_window*1000))) {
             p_sys->started = 1; // we have enough values to compute a valid total
@@ -240,10 +240,10 @@ static block_t *DoWork( filter_t *p_filter, block_t *p_in_buf )
             p_sys->first = p_sys->first->next;
             free(current);
         }
-        
+
         /* If last message was sent enough time ago */
         if ((p_sys->started) && (p_in_buf->i_pts > p_sys->lastAlarm + (p_sys->repetition_time*1000))) {
-            
+
             /* 4 - compute the RMS */
             current = p_sys->first;
             sum = 0.0;
@@ -254,7 +254,7 @@ static block_t *DoWork( filter_t *p_filter, block_t *p_in_buf )
             }
             sum = sum / count;
             sum = sqrt(sum);
-        
+
             /* 5 - compare it to the threshold */
             if (sum < p_sys->alarm_threshold) {
                 i=1;
@@ -262,12 +262,12 @@ static block_t *DoWork( filter_t *p_filter, block_t *p_in_buf )
                 i=0;
             }
             snprintf(message,255,"@audiobargraph_v audiobargraph_v-alarm %d\n",i);
-            
+
             msg_Dbg( p_filter, "message alarm : %s", message );
             //TCPconnection = net_ConnectTCP(p_filter,p_sys->address,p_sys->port);
             net_Write(p_filter, p_sys->TCPconnection, NULL, message, strlen(message));
             //net_Close(TCPconnection);
-            
+
             p_sys->lastAlarm = p_in_buf->i_pts;
         }
     }
@@ -279,7 +279,7 @@ static block_t *DoWork( filter_t *p_filter, block_t *p_in_buf )
         else
             p_sys->value[i] = p_sys->value[i] - 6;
     }*/
-    
+
     if (p_sys->bargraph) {
         /* 6 - sent the message with the values for the BarGraph */
         if ((nbChannels > 0) && (p_sys->counter%(p_sys->bargraph_repetition) == 0)) {
@@ -297,9 +297,9 @@ static block_t *DoWork( filter_t *p_filter, block_t *p_in_buf )
 
         }
     }
-    
+
     free(i_value);
-    
+
     if (p_sys->counter > p_sys->bargraph_repetition*100) {
         if (p_sys->connection_reset) {
             net_Close(p_sys->TCPconnection);
@@ -307,10 +307,10 @@ static block_t *DoWork( filter_t *p_filter, block_t *p_in_buf )
         }
         p_sys->counter = 0;
     }
-    
+
     //free(message);
     p_sys->counter++;
-    
+
     return p_in_buf;
 }
 
@@ -322,7 +322,7 @@ static void Close( vlc_object_t *p_this )
     filter_t * p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
     ValueDate_t* current;
-    
+
     p_sys->last = NULL;
     while (p_sys->first != NULL) {
         current = p_sys->first;
