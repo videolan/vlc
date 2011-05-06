@@ -151,6 +151,7 @@
 		CC62B95F0FC600E90077BB8C /* pause_big.png in Resources */ = {isa = PBXBuildFile; fileRef = CC62B9570FC600E90077BB8C /* pause_big.png */; };
 		CC62B9600FC600E90077BB8C /* play_big_down.png in Resources */ = {isa = PBXBuildFile; fileRef = CC62B9580FC600E90077BB8C /* play_big_down.png */; };
 		CC62B9610FC600E90077BB8C /* play_big.png in Resources */ = {isa = PBXBuildFile; fileRef = CC62B9590FC600E90077BB8C /* play_big.png */; };
+		CC707EC8137474A50003010A /* SyncTracks.nib in Resources */ = {isa = PBXBuildFile; fileRef = CC707EC6137474A50003010A /* SyncTracks.nib */; };
 		CC8062641021F8790021EB9A /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = CC8062631021F8790021EB9A /* dsa_pub.pem */; };
 		CC84FB2D130083BB00816D38 /* BGHUDAppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC84FB2C130083BB00816D38 /* BGHUDAppKit.framework */; };
 		CC84FB481300843200816D38 /* BGHUDAppKit.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = CC84FB2C130083BB00816D38 /* BGHUDAppKit.framework */; };
@@ -333,6 +334,9 @@
 		CC6D8D9D0A878DED006F2BBE /* AppleRemote.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppleRemote.m; path = ../../../modules/gui/macosx/AppleRemote.m; sourceTree = SOURCE_ROOT; };
 		CC6EDD4F0B9CA2140096068A /* eyetv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = eyetv.h; path = ../../../modules/gui/macosx/eyetv.h; sourceTree = SOURCE_ROOT; };
 		CC6EDD500B9CA2140096068A /* eyetv.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = eyetv.m; path = ../../../modules/gui/macosx/eyetv.m; sourceTree = SOURCE_ROOT; };
+		CC707EC3137464CD0003010A /* TrackSynchronization.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TrackSynchronization.h; path = ../../../modules/gui/macosx/TrackSynchronization.h; sourceTree = "<group>"; };
+		CC707EC4137464CD0003010A /* TrackSynchronization.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TrackSynchronization.m; path = ../../../modules/gui/macosx/TrackSynchronization.m; sourceTree = "<group>"; };
+		CC707EC7137474A50003010A /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = Resources/English.lproj/SyncTracks.nib; sourceTree = "<group>"; };
 		CC772DAC10E621C100675C9B /* VLCProgressPanel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCProgressPanel.h; path = ../../../modules/gui/macosx_dialog_provider/VLCProgressPanel.h; sourceTree = SOURCE_ROOT; };
 		CC772DAD10E621C100675C9B /* VLCProgressPanel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VLCProgressPanel.m; path = ../../../modules/gui/macosx_dialog_provider/VLCProgressPanel.m; sourceTree = SOURCE_ROOT; };
 		CC8062631021F8790021EB9A /* dsa_pub.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = dsa_pub.pem; path = Resources/dsa_pub.pem; sourceTree = "<group>"; };
@@ -524,6 +528,8 @@
 				CCF0777C13659A8000AF19FD /* SPMediaKeyTap.m */,
 				CC5560231365CDC700D54038 /* AudioEffects.h */,
 				CC5560241365CDC800D54038 /* AudioEffects.m */,
+				CC707EC3137464CD0003010A /* TrackSynchronization.h */,
+				CC707EC4137464CD0003010A /* TrackSynchronization.m */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
@@ -798,6 +804,7 @@
 				DC7F46EB08A183FC0027DB24 /* Extended.nib */,
 				DCE7BD0308A56C8B007B10AE /* Bookmarks.nib */,
 				CC5560261365CE4800D54038 /* AudioEffects.nib */,
+				CC707EC6137474A50003010A /* SyncTracks.nib */,
 			);
 			name = nibs;
 			sourceTree = "<group>";
@@ -994,6 +1001,7 @@
 				CC0FB34C0F8BED1100F057F7 /* CoreDialogs.nib in Resources */,
 				CCF11B540F8BFB520088542D /* ErrorPanel.nib in Resources */,
 				CC5560281365CE4800D54038 /* AudioEffects.nib in Resources */,
+				CC707EC8137474A50003010A /* SyncTracks.nib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1014,6 +1022,14 @@
 				CC5560271365CE4800D54038 /* English */,
 			);
 			name = AudioEffects.nib;
+			sourceTree = "<group>";
+		};
+		CC707EC6137474A50003010A /* SyncTracks.nib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				CC707EC7137474A50003010A /* English */,
+			);
+			name = SyncTracks.nib;
 			sourceTree = "<group>";
 		};
 		CCC896B80D9AA9E8005AE59C /* MediaInfo.nib */ = {

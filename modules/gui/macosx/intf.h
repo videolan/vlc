@@ -112,6 +112,7 @@ struct intf_sys_t
     VLCInformation * o_info;    /* VLCInformation */
     id o_eyetv;                 /* VLCEyeTVController */
     id o_audioeffects;          /* VLCAudioEffects */
+    id o_trackSynchronization;  /* VLCTrackSynchronization */
     BOOL nib_main_loaded;       /* main nibfile */
     BOOL nib_open_loaded;       /* open nibfile */
     BOOL nib_about_loaded;      /* about nibfile */
@@ -122,6 +123,7 @@ struct intf_sys_t
     BOOL nib_info_loaded;       /* information panel nibfile */
     BOOL nib_coredialogs_loaded; /* CoreDialogs nibfile */
     BOOL nib_audioeffects_loaded; /* audio effects panel */
+    BOOL nib_tracksynchro_loaded; /* track synchro panel */
 
     IBOutlet VLCControllerWindow * o_window;                     /* main window */
     IBOutlet NSView * o_playlist_view;                          /* playlist view  */
@@ -210,6 +212,7 @@ struct intf_sys_t
     IBOutlet NSMenuItem * o_mi_faster;
     IBOutlet NSMenuItem * o_mi_slower;
     IBOutlet NSMenuItem * o_mi_normalSpeed;
+    IBOutlet NSMenuItem * o_mi_trackSynchronization;
     IBOutlet NSMenuItem * o_mi_previous;
     IBOutlet NSMenuItem * o_mi_next;
     IBOutlet NSMenuItem * o_mi_random;
@@ -406,6 +409,7 @@ struct intf_sys_t
 - (IBAction)showWizard:(id)sender;
 - (IBAction)showExtended:(id)sender;
 - (IBAction)showAudioEffects:(id)sender;
+- (IBAction)showTrackSynchronization:(id)sender;
 - (IBAction)showBookmarks:(id)sender;
 
 - (IBAction)viewAbout:(id)sender;

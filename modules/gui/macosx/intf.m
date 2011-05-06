@@ -55,6 +55,7 @@
 #import "eyetv.h"
 #import "simple_prefs.h"
 #import "AudioEffects.h"
+#import "TrackSynchronization.h"
 
 #import <AddressBook/AddressBook.h>         /* for crashlog send mechanism */
 #import <Sparkle/Sparkle.h>                 /* we're the update delegate */
@@ -651,6 +652,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     [o_mi_faster setTitle: _NS("Faster")];
     [o_mi_slower setTitle: _NS("Slower")];
     [o_mi_normalSpeed setTitle: _NS("Normal rate")];
+    [o_mi_trackSynchronization setTitle: _NS("Track Synchronization")];
     [o_mi_previous setTitle: _NS("Previous")];
     [o_mi_next setTitle: _NS("Next")];
     [o_mi_random setTitle: _NS("Random")];
@@ -848,6 +850,9 @@ static VLCMain *_o_sharedMainInstance = nil;
 
     if (nib_audioeffects_loaded)
         [o_audioeffects release];
+
+    if (nib_tracksynchro_loaded)
+        [o_trackSynchronization release];
 
     if( nib_bookmarks_loaded )
         [o_bookmarks release];
@@ -2248,6 +2253,17 @@ end:
         nib_extended_loaded = [NSBundle loadNibNamed:@"Extended" owner: NSApp];
 
     [o_extended showPanel];
+}
+
+- (IBAction)showTrackSynchronization:(id)sender
+{
+    if (!o_trackSynchronization)
+        o_trackSynchronization = [[VLCTrackSynchronization alloc] init];
+
+    if (!nib_tracksynchro_loaded)
+        nib_tracksynchro_loaded = [NSBundle loadNibNamed:@"SyncTracks" owner:NSApp];
+
+    [o_trackSynchronization toggleWindow:sender];
 }
 
 - (IBAction)showAudioEffects:(id)sender
