@@ -778,8 +778,7 @@ static int DrawMeta(intf_thread_t *p_intf)
             continue;
 
         if (p_sys->b_color) color_set(C_CATEGORY, NULL);
-        MainBoxWrite(p_sys, l++, "  [%s]",
-                     vlc_meta_TypeToLocalizedString(i));
+        MainBoxWrite(p_sys, l++, "  [%s]", vlc_meta_TypeToLocalizedString(i));
         if (p_sys->b_color) color_set(C_DEFAULT, NULL);
         MainBoxWrite(p_sys, l++, "      %s", psz_meta);
     }
@@ -1221,7 +1220,9 @@ static void Redraw(intf_thread_t *p_intf)
     {
         FillBox(p_intf);
 
-        if (p_sys->i_box_start > p_sys->i_box_lines_total - 1)
+        if (p_sys->i_box_lines_total == 0)
+            p_sys->i_box_start = 0;
+        else if (p_sys->i_box_start > p_sys->i_box_lines_total - 1)
             p_sys->i_box_start = p_sys->i_box_lines_total - 1;
         y += __MIN(p_sys->i_box_lines_total - p_sys->i_box_start,
                    p_sys->i_box_height);
