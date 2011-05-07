@@ -52,6 +52,7 @@
 #ifdef HAVE_FCNTL_H
 #   include <fcntl.h>
 #endif
+#include <errno.h>
 
 #include <vlc_keys.h>
 #include <vlc_iso_lang.h>
