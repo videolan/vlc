@@ -92,7 +92,7 @@ VLC_API char *vlc_object_get_name( const vlc_object_t * ) LIBVLC_USED;
     vlc_list_children( VLC_OBJECT(a) )
 
 /* Objects and threading */
-VLC_API void vlc_object_kill( vlc_object_t * );
+VLC_API void vlc_object_kill( vlc_object_t * ) LIBVLC_DEPRECATED;
 #define vlc_object_kill(a) \
     vlc_object_kill( VLC_OBJECT(a) )
 
