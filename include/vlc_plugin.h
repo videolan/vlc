@@ -140,12 +140,19 @@ enum vlc_module_properties
 #   define __VLC_SYMBOL( symbol )  CONCATENATE( symbol, MODULE_NAME )
 #endif
 
-#if defined( __PLUGIN__ ) && ( defined( WIN32 ) || defined( UNDER_CE ) )
+#define CDECL_SYMBOL
+#if defined (__PLUGIN__)
+# if defined (WIN32)
 #   define DLL_SYMBOL              __declspec(dllexport)
+#   undef CDECL_SYMBOL
 #   define CDECL_SYMBOL            __cdecl
+# elif defined (__GNUC__) && (__GNUC__ >= 4)
+#   define DLL_SYMBOL              __attribute__((visibility("default")))
+# else
+#  define DLL_SYMBOL
+# endif
 #else
-#   define DLL_SYMBOL
-#   define CDECL_SYMBOL
+# define DLL_SYMBOL
 #endif
 
 #if defined( __cplusplus )

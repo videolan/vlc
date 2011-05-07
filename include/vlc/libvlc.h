@@ -40,6 +40,8 @@
 
 #if defined (WIN32) && defined (DLL_EXPORT)
 # define VLC_PUBLIC_API __declspec(dllexport)
+#elif defined (__GNUC__) && (__GNUC__ >= 4)
+# define VLC_PUBLIC_API __attribute__((visibility("default")))
 #else
 # define VLC_PUBLIC_API
 #endif

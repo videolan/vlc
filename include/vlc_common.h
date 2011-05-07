@@ -115,10 +115,10 @@
 # define LIBVLC_EXTERN
 #endif
 
-#if defined (__GNUC__) && (__GNUC__ >= 4)
-# define LIBVLC_EXPORT __attribute__((visibility("default")))
-#elif defined (WIN32) && defined (DLL_EXPORT)
+#if defined (WIN32) && defined (DLL_EXPORT)
 # define LIBVLC_EXPORT __declspec(dllexport)
+#elif defined (__GNUC__) && (__GNUC__ >= 4)
+# define LIBVLC_EXPORT __attribute__((visibility("default")))
 #else
 # define LIBVLC_EXPORT
 #endif
