@@ -24,11 +24,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#ifdef HAVE_CONFIG_H
+#   include "config.h"
+#endif
+
 #include <stdlib.h>
 #include <stdint.h>
 
-/* This handles including config.h, because the config
-   is already needed in the header. */
 #include "merge.h"
 
 #ifdef CAN_COMPILE_MMXEXT
