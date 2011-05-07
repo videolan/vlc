@@ -25,6 +25,7 @@
  *****************************************************************************/
 
 #include <stdlib.h>
+#include <stdint.h>
 
 /* This handles including config.h, because the config
    is already needed in the header. */
