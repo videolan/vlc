@@ -37,9 +37,9 @@ include ./packages.mak
 
 #ifdef HAVE_DARWIN_OS
 export PATH := $(PREFIX)/bin:$(EXTRA_PATH):/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/X11/bin:
-else
+#else
 export PATH := $(PREFIX)/bin:$(EXTRA_PATH):$(PATH)
-endif
+#endif
 export PKG_CONFIG_PATH
 export PKG_CONFIG_LIBDIR = $(PREFIX)/lib/pkgconfig
 export MACOSX_DEPLOYMENT_TARGET = $(SDK_TARGET)
