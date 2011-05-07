@@ -1,7 +1,7 @@
 /*****************************************************************************
 * qtcapture.m: qtkit (Mac OS X) based capture module
 *****************************************************************************
-* Copyright (C) 2008 the VideoLAN team
+* Copyright (C) 2008-2011 the VideoLAN team
 *
 * Authors: Pierre d'Herbemont <pdherbemont@videolan.org>
 *
@@ -258,8 +258,8 @@ static int Open( vlc_object_t *p_this )
     {
         camera_format = [format_array objectAtIndex: k];
 
-        NSLog( @"%@", [camera_format localizedFormatSummary] );
-        NSLog( @"%@",[[camera_format formatDescriptionAttributes] description] );
+        msg_Dbg(p_demux, "localized Format: %s", [[camera_format localizedFormatSummary] UTF8String] );
+        msg_Dbg(p_demux, "format description: %s", [[[camera_format formatDescriptionAttributes] description] UTF8String] );
     }
     if( [format_array count] )
         camera_format = [format_array objectAtIndex: 0];
@@ -288,9 +288,9 @@ static int Open( vlc_object_t *p_this )
         fmt.video.i_sar_den = encoded_size.width;
     }
 
-    NSLog( @"encoded_size %d %d", (int)encoded_size.width, (int)encoded_size.height );
-    NSLog( @"display_size %d %d", (int)display_size.width, (int)display_size.height );
-    NSLog( @"PAR size %d %d", (int)par_size.width, (int)par_size.height );
+    msg_Dbg(p_demux, "encoded_size %i %i", (int)encoded_size.width, (int)encoded_size.height );
+    msg_Dbg(p_demux, "display_size %i %i", (int)display_size.width, (int)display_size.height );
+    msg_Dbg(p_demux, "PAR size %i %i", (int)par_size.width, (int)par_size.height );
 
     [p_sys->output setPixelBufferAttributes: [NSDictionary dictionaryWithObjectsAndKeys:
         [NSNumber numberWithInt: p_sys->height], kCVPixelBufferHeightKey,

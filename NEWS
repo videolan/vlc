@@ -38,6 +38,7 @@ Access:
  * RTP: support for dynamic payload types by specifying the payload format
    in an option (no autodetection): only Theora supported for now
  * Basic HTCPCP implementation for Coffee Pot control
+ * QTCapture: added support for all QTKit-compatible video input devices
 
 Codecs:
  * You can now use ffmpeg-mt in conjunction with vlc

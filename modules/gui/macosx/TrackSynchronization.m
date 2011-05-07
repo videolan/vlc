@@ -82,7 +82,6 @@ static VLCTrackSynchronization *_o_sharedInstance = nil;
 
     if( p_input )
     {
-
         var_SetTime( p_input, "audio-delay", 0.0 );
         var_SetTime( p_input, "spu-delay", 0.0 );
         var_SetFloat( p_input, "sub-fps", 1.0 );

@@ -159,6 +159,16 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class );
     IBOutlet id o_screen_height_stp;
     IBOutlet id o_screen_follow_mouse_ckb;
 
+    /* QTK support */
+    IBOutlet id o_qtk_view;
+    IBOutlet id o_qtk_lbl;
+    IBOutlet id o_qtk_long_lbl;
+    IBOutlet id o_qtk_device_pop;
+    IBOutlet id o_qtk_label_view;
+
+    NSArray         *qtkvideoDevices;
+    NSString        *qtk_currdevice_uid;
+
     BOOL b_autoplay;
     id o_currentCaptureView;
     NSString *o_file_slave_path;
@@ -170,6 +180,9 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class );
 
 - (void)setMRL:(NSString *)mrl;
 - (NSString *)MRL;
+
+- (NSArray *)qtkvideoDevices;
+- (void)qtkrefreshDevices;
 
 - (void)setSubPanel;
 - (void)openTarget:(int)i_type;
@@ -200,6 +213,7 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class );
 - (void)openCapture;
 - (void)showCaptureView: theView;
 - (IBAction)openCaptureModeChanged:(id)sender;
+- (IBAction)qtkChanged:(id)sender;
 - (IBAction)eyetvSwitchChannel:(id)sender;
 - (IBAction)eyetvLaunch:(id)sender;
 - (IBAction)eyetvGetPlugin:(id)sender;

@@ -38,6 +38,9 @@
 #include <IOKit/storage/IOMedia.h>
 #include <IOKit/storage/IOCDMedia.h>
 #include <IOKit/storage/IODVDMedia.h>
+#import <Cocoa/Cocoa.h>
+#import <QTKit/QTKit.h>
+#import <Foundation/NSobject.h>
 
 #import "intf.h"
 #import "playlist.h"
@@ -47,13 +50,13 @@
 
 #include <vlc_url.h>
 
+NSArray               *qtkvideoDevices;
 #define setEyeTVUnconnected \
-[o_capture_lbl setStringValue: _NS("No device connected")]; \
-[o_capture_long_lbl setStringValue: _NS("VLC could not detect any EyeTV compatible device.\n\nCheck the device's connection, make sure that the latest EyeTV software is installed and try again.")]; \
+[o_capture_lbl setStringValue: _NS("No device is selected")]; \
+[o_capture_long_lbl setStringValue: _NS("Any device is not selected.\n\nChose abailable device in above pull-down menu\n.")]; \
 [o_capture_lbl displayIfNeeded]; \
 [o_capture_long_lbl displayIfNeeded]; \
 [self showCaptureView: o_capture_label_view]
-
 
 /*****************************************************************************
  * GetEjectableMediaOfClass
@@ -239,6 +242,27 @@ static VLCOpen *_o_sharedMainInstance = nil;
     [o_eyetv_noInstanceLong_lbl setStringValue: _NS("VLC could not connect to EyeTV.\nMake sure that you installed VLC's EyeTV plugin.")];
     [o_eyetv_launchEyeTV_btn setTitle: _NS("Launch EyeTV now")];
     [o_eyetv_getPlugin_btn setTitle: _NS("Download Plugin")];
+
+    [self qtkvideoDevices];
+    [o_qtk_device_pop removeAllItems];
+    msg_Dbg( VLCIntf, "Found %lu capture devices", [qtkvideoDevices count] );
+    if([qtkvideoDevices count] == 0){
+        [o_qtk_device_pop addItemWithTitle: _NS("None")];
+        [qtk_currdevice_uid release];
+    }else {
+        if (!qtk_currdevice_uid) {
+            qtk_currdevice_uid = [[[QTCaptureDevice defaultInputDeviceWithMediaType: QTMediaTypeVideo] uniqueID]
+                                                                stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+        }
+        for(int ivideo = 0; ivideo < [qtkvideoDevices count]; ivideo++){
+            QTCaptureDevice *qtk_device;
+            qtk_device = [qtkvideoDevices objectAtIndex:ivideo];
+            [o_qtk_device_pop addItemWithTitle: [qtk_device localizedDisplayName]];
+            if([[[qtk_device uniqueID]stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]] isEqualToString:qtk_currdevice_uid]){
+                [o_qtk_device_pop selectItemAtIndex:ivideo];
+            }
+        }
+    }
 
     [self setSubPanel];
 
@@ -464,6 +488,15 @@ static VLCOpen *_o_sharedMainInstance = nil;
     }
 }
 
+- (IBAction)qtkChanged:(id)sender
+{
+    msg_Dbg( VLCIntf, "Changed UID: old %s", [qtk_currdevice_uid UTF8String] );
+    qtk_currdevice_uid = [[[qtkvideoDevices objectAtIndex:[o_qtk_device_pop indexOfSelectedItem]] uniqueID]
+                          stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+    msg_Dbg( VLCIntf, "Changed UID: new %s", [qtk_currdevice_uid UTF8String] );
+    [self setMRL:[NSString stringWithFormat:@"qtcapture://%@", qtk_currdevice_uid]];
+}
+
 - (void)tabView:(NSTabView *)o_tv didSelectTabViewItem:(NSTabViewItem *)o_tvi
 {
     NSString *o_label = [o_tvi label];
@@ -569,7 +602,6 @@ static VLCOpen *_o_sharedMainInstance = nil;
 - (void)openCapture
 {
     [self openCaptureModeChanged: nil];
-    [self showCaptureView: o_capture_label_view];
     [self openTarget: 3];
 }
 
@@ -662,7 +694,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
             psz_class = kIOCDMediaClass;
             o_disc = o_type;
             b_no_menus = NO; b_title_chapter = YES;
-		}
+        }
         else if ( [o_type isEqualToString: _NS("Audio CD")])
         {
             psz_class = kIOCDMediaClass;
@@ -683,7 +715,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
  
             if ( i_devices )
             {
-				for( int i = 0; i < i_devices; i++ )
+                for( int i = 0; i < i_devices; i++ )
                 {
                     [o_disc_device
                         addItemWithObjectValue: [o_devices objectAtIndex: i]];
@@ -768,7 +800,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
             o_mrl_string = [NSString stringWithFormat: @"dvdread://%@@%i:%i-",
                             o_device, i_title, i_chapter];
         else
-			o_mrl_string = [NSString stringWithFormat: @"dvdnav://%@",
+            o_mrl_string = [NSString stringWithFormat: @"dvdnav://%@",
                             o_device];
             
     }
@@ -1058,13 +1090,20 @@ static VLCOpen *_o_sharedMainInstance = nil;
     }
     else if( [[[o_capture_mode_pop selectedItem] title] isEqualToString: @"iSight"] )
     {
-        [o_capture_lbl setStringValue: _NS("iSight Capture Input")];
-        [o_capture_long_lbl setStringValue: _NS("This facility allows you to process your iSight's input signal.\n\nNo settings are available in this version, so you will be provided a 640px*480px raw video stream.\n\nLive Audio input is not supported.")];
-        [o_capture_lbl displayIfNeeded];
-        [o_capture_long_lbl displayIfNeeded];
-        
-        [self showCaptureView: o_capture_label_view];
-        [self setMRL: @"qtcapture://"];
+        [self showCaptureView: o_qtk_view];
+        [o_qtk_lbl setStringValue: _NS("iSight Capture Input")];
+        [o_qtk_long_lbl setStringValue: _NS("This facility allows you to process your iSight's input signal.\n\nNo settings are available in this version, so you will be provided a 640px*480px raw video stream.\n\nLive Audio input is not supported.")];
+        [o_qtk_lbl displayIfNeeded];
+        [o_qtk_long_lbl displayIfNeeded];
+
+        if(!qtk_currdevice_uid)
+        {
+            [self setMRL: @""];
+        }
+        else
+        {
+            [self setMRL:[NSString stringWithFormat:@"qtcapture://%@", qtk_currdevice_uid]];
+        }
     }
 }
 
@@ -1260,6 +1299,19 @@ static VLCOpen *_o_sharedMainInstance = nil;
         [NSApp stopModalWithCode: 1];
     else
         NSBeep();
+}
+
+- (NSArray *)qtkvideoDevices
+{
+    if (!qtkvideoDevices)
+        [self qtkrefreshDevices];
+    return qtkvideoDevices;
+}
+
+- (void)qtkrefreshDevices
+{
+    [qtkvideoDevices release];
+    qtkvideoDevices = [[[QTCaptureDevice inputDevicesWithMediaType:QTMediaTypeVideo] arrayByAddingObjectsFromArray:[QTCaptureDevice inputDevicesWithMediaType:QTMediaTypeMuxed]] retain];
 }
 
 @end
