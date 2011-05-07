@@ -115,8 +115,8 @@ struct input_item_node_t
     input_item_node_t      *p_parent;
 };
 
-VLC_EXPORT( void, input_item_CopyOptions, ( input_item_t *p_parent, input_item_t *p_child ) );
-VLC_EXPORT( void, input_item_SetName, ( input_item_t *p_item, const char *psz_name ) );
+VLC_API void input_item_CopyOptions( input_item_t *p_parent, input_item_t *p_child );
+VLC_API void input_item_SetName( input_item_t *p_item, const char *psz_name );
 
 /**
  * Add one subitem to this item
@@ -128,29 +128,29 @@ VLC_EXPORT( void, input_item_SetName, ( input_item_t *p_item, const char *psz_na
  *
  * Sends a vlc_InputItemSubItemTreeAdded and a vlc_InputItemSubItemAdded event
  */
-VLC_EXPORT( void, input_item_PostSubItem, ( input_item_t *p_parent, input_item_t *p_child ) );
+VLC_API void input_item_PostSubItem( input_item_t *p_parent, input_item_t *p_child );
 
 /**
  * Start adding multiple subitems.
  *
  * Create a root node to hold a tree of subitems for given item
  */
-VLC_EXPORT( input_item_node_t *, input_item_node_Create, ( input_item_t *p_input ) LIBVLC_USED );
+VLC_API input_item_node_t * input_item_node_Create( input_item_t *p_input ) LIBVLC_USED;
 
 /**
  * Add a new child node to this parent node that will point to this subitem.
  */
-VLC_EXPORT( input_item_node_t *, input_item_node_AppendItem, ( input_item_node_t *p_node, input_item_t *p_item ) );
+VLC_API input_item_node_t * input_item_node_AppendItem( input_item_node_t *p_node, input_item_t *p_item );
 
 /**
  * Add an already created node to children of this parent node.
  */
-VLC_EXPORT( void, input_item_node_AppendNode, ( input_item_node_t *p_parent, input_item_node_t *p_child ) );
+VLC_API void input_item_node_AppendNode( input_item_node_t *p_parent, input_item_node_t *p_child );
 
 /**
  * Delete a node created with input_item_node_Create() and all its children.
  */
-VLC_EXPORT( void, input_item_node_Delete, ( input_item_node_t *p_node ) );
+VLC_API void input_item_node_Delete( input_item_node_t *p_node );
 
 /**
  * End adding multiple subitems.
@@ -163,7 +163,7 @@ VLC_EXPORT( void, input_item_node_Delete, ( input_item_node_t *p_node ) );
  *
  * In the end deletes the node and all its children nodes.
  */
-VLC_EXPORT( void, input_item_node_PostAndDelete, ( input_item_node_t *p_node ) );
+VLC_API void input_item_node_PostAndDelete( input_item_node_t *p_node );
 
 
 /**
@@ -183,21 +183,21 @@ enum input_item_option_e
 /**
  * This function allows to add an option to an existing input_item_t.
  */
-VLC_EXPORT( int,  input_item_AddOption, (input_item_t *, const char *, unsigned i_flags ) );
+VLC_API int input_item_AddOption(input_item_t *, const char *, unsigned i_flags );
 
 /* */
-VLC_EXPORT( bool, input_item_HasErrorWhenReading, ( input_item_t * ) );
-VLC_EXPORT( void, input_item_SetMeta, ( input_item_t *, vlc_meta_type_t meta_type, const char *psz_val ));
-VLC_EXPORT( bool, input_item_MetaMatch, ( input_item_t *p_i, vlc_meta_type_t meta_type, const char *psz ) );
-VLC_EXPORT( char *, input_item_GetMeta, ( input_item_t *p_i, vlc_meta_type_t meta_type ) LIBVLC_USED );
-VLC_EXPORT( char *, input_item_GetName, ( input_item_t * p_i ) LIBVLC_USED );
-VLC_EXPORT( char *, input_item_GetTitleFbName, ( input_item_t * p_i ) LIBVLC_USED );
-VLC_EXPORT( char *, input_item_GetURI, ( input_item_t * p_i ) LIBVLC_USED );
-VLC_EXPORT( void,   input_item_SetURI, ( input_item_t * p_i, const char *psz_uri ) );
-VLC_EXPORT(mtime_t, input_item_GetDuration, ( input_item_t * p_i ) );
-VLC_EXPORT( void,   input_item_SetDuration, ( input_item_t * p_i, mtime_t i_duration ));
-VLC_EXPORT( bool,   input_item_IsPreparsed, ( input_item_t *p_i ));
-VLC_EXPORT( bool,   input_item_IsArtFetched, ( input_item_t *p_i ));
+VLC_API bool input_item_HasErrorWhenReading( input_item_t * );
+VLC_API void input_item_SetMeta( input_item_t *, vlc_meta_type_t meta_type, const char *psz_val );
+VLC_API bool input_item_MetaMatch( input_item_t *p_i, vlc_meta_type_t meta_type, const char *psz );
+VLC_API char * input_item_GetMeta( input_item_t *p_i, vlc_meta_type_t meta_type ) LIBVLC_USED;
+VLC_API char * input_item_GetName( input_item_t * p_i ) LIBVLC_USED;
+VLC_API char * input_item_GetTitleFbName( input_item_t * p_i ) LIBVLC_USED;
+VLC_API char * input_item_GetURI( input_item_t * p_i ) LIBVLC_USED;
+VLC_API void input_item_SetURI( input_item_t * p_i, const char *psz_uri );
+VLC_API mtime_t input_item_GetDuration( input_item_t * p_i );
+VLC_API void input_item_SetDuration( input_item_t * p_i, mtime_t i_duration );
+VLC_API bool input_item_IsPreparsed( input_item_t *p_i );
+VLC_API bool input_item_IsArtFetched( input_item_t *p_i );
 
 #define INPUT_META( name ) \
 static inline \
@@ -234,11 +234,11 @@ INPUT_META(TrackID)
 #define input_item_SetArtURL   input_item_SetArtworkURL
 #define input_item_GetArtURL   input_item_GetArtworkURL
 
-VLC_EXPORT( char *, input_item_GetInfo, ( input_item_t *p_i, const char *psz_cat,const char *psz_name ) LIBVLC_USED );
-VLC_EXPORT( int, input_item_AddInfo, ( input_item_t *p_i, const char *psz_cat, const char *psz_name, const char *psz_format, ... ) LIBVLC_FORMAT( 4, 5 ) );
-VLC_EXPORT( int, input_item_DelInfo, ( input_item_t *p_i, const char *psz_cat, const char *psz_name ) );
-VLC_EXPORT( void, input_item_ReplaceInfos, ( input_item_t *, info_category_t * ) );
-VLC_EXPORT( void, input_item_MergeInfos, ( input_item_t *, info_category_t * ) );
+VLC_API char * input_item_GetInfo( input_item_t *p_i, const char *psz_cat,const char *psz_name ) LIBVLC_USED;
+VLC_API int input_item_AddInfo( input_item_t *p_i, const char *psz_cat, const char *psz_name, const char *psz_format, ... ) LIBVLC_FORMAT( 4, 5 );
+VLC_API int input_item_DelInfo( input_item_t *p_i, const char *psz_cat, const char *psz_name );
+VLC_API void input_item_ReplaceInfos( input_item_t *, info_category_t * );
+VLC_API void input_item_MergeInfos( input_item_t *, info_category_t * );
 
 /**
  * This function creates a new input_item_t with the provided information.
@@ -246,14 +246,14 @@ VLC_EXPORT( void, input_item_MergeInfos, ( input_item_t *, info_category_t * ) )
  * XXX You may also use input_item_New or input_item_NewExt as they need
  * less arguments.
  */
-VLC_EXPORT( input_item_t *, input_item_NewWithType, ( vlc_object_t *, const char *psz_uri, const char *psz_name, int i_options, const char *const *ppsz_options, unsigned i_option_flags, mtime_t i_duration, int i_type ) LIBVLC_USED );
+VLC_API input_item_t * input_item_NewWithType( vlc_object_t *, const char *psz_uri, const char *psz_name, int i_options, const char *const *ppsz_options, unsigned i_option_flags, mtime_t i_duration, int i_type ) LIBVLC_USED;
 
 /**
  * This function creates a new input_item_t with the provided information.
  *
  * Provided for convenience.
  */
-VLC_EXPORT( input_item_t *, input_item_NewExt, (vlc_object_t *, const char *psz_uri, const char *psz_name, int i_options, const char *const *ppsz_options, unsigned i_option_flags, mtime_t i_duration ) LIBVLC_USED );
+VLC_API input_item_t * input_item_NewExt(vlc_object_t *, const char *psz_uri, const char *psz_name, int i_options, const char *const *ppsz_options, unsigned i_option_flags, mtime_t i_duration ) LIBVLC_USED;
 #define input_item_NewExt(a,b,c,d,e,f,g) input_item_NewExt( VLC_OBJECT(a),b,c,d,e,f,g)
 
 /**
@@ -266,7 +266,7 @@ VLC_EXPORT( input_item_t *, input_item_NewExt, (vlc_object_t *, const char *psz_
 /**
  * This function creates a new input_item_t as a copy of another.
  */
-VLC_EXPORT( input_item_t *, input_item_Copy, (vlc_object_t *, input_item_t * ) LIBVLC_USED );
+VLC_API input_item_t * input_item_Copy(vlc_object_t *, input_item_t * ) LIBVLC_USED;
 
 
 /******************

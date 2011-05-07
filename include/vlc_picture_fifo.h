@@ -41,21 +41,21 @@ typedef struct picture_fifo_t picture_fifo_t;
 /**
  * It creates an empty picture_fifo_t.
  */
-VLC_EXPORT( picture_fifo_t *, picture_fifo_New, ( void ) LIBVLC_USED );
+VLC_API picture_fifo_t * picture_fifo_New( void ) LIBVLC_USED;
 
 /**
  * It destroys a fifo created by picture_fifo_New.
  *
  * All pictures inside the fifo will be released by picture_Release.
  */
-VLC_EXPORT( void, picture_fifo_Delete, ( picture_fifo_t * ) );
+VLC_API void picture_fifo_Delete( picture_fifo_t * );
 
 /**
  * It retreives a picture_t from the fifo.
  *
  * If the fifo is empty, it return NULL without waiting.
  */
-VLC_EXPORT( picture_t *, picture_fifo_Pop, ( picture_fifo_t * ) LIBVLC_USED );
+VLC_API picture_t * picture_fifo_Pop( picture_fifo_t * ) LIBVLC_USED;
 
 /**
  * It returns the first picture_t pointer from the fifo but does not
@@ -64,12 +64,12 @@ VLC_EXPORT( picture_t *, picture_fifo_Pop, ( picture_fifo_t * ) LIBVLC_USED );
  *
  * If the fifo is empty, it return NULL without waiting.
  */
-VLC_EXPORT( picture_t *, picture_fifo_Peek, ( picture_fifo_t * ) LIBVLC_USED );
+VLC_API picture_t * picture_fifo_Peek( picture_fifo_t * ) LIBVLC_USED;
 
 /**
  * It saves a picture_t into the fifo.
  */
-VLC_EXPORT( void, picture_fifo_Push, ( picture_fifo_t *, picture_t * ) );
+VLC_API void picture_fifo_Push( picture_fifo_t *, picture_t * );
 
 /**
  * It release all picture inside the fifo that have a lower or equal date
@@ -77,12 +77,12 @@ VLC_EXPORT( void, picture_fifo_Push, ( picture_fifo_t *, picture_t * ) );
  *
  * All pictures inside the fifo will be released by picture_Release.
  */
-VLC_EXPORT( void, picture_fifo_Flush, ( picture_fifo_t *, mtime_t date, bool flush_before ) );
+VLC_API void picture_fifo_Flush( picture_fifo_t *, mtime_t date, bool flush_before );
 
 /**
  * It applies a delta on all the picture timestamp.
  */
-VLC_EXPORT( void, picture_fifo_OffsetDate, ( picture_fifo_t *, mtime_t delta ) );
+VLC_API void picture_fifo_OffsetDate( picture_fifo_t *, mtime_t delta );
 
 
 #endif /* VLC_PICTURE_FIFO_H */

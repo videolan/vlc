@@ -86,8 +86,8 @@
 #define KEY_MOUSEWHEELLEFT   0x00F20000
 #define KEY_MOUSEWHEELRIGHT  0x00F30000
 
-VLC_EXPORT( char *, vlc_keycode2str, (uint_fast32_t i_key) ) LIBVLC_USED;
-VLC_EXPORT( uint_fast32_t, vlc_str2keycode, (const char *str) ) LIBVLC_USED;
+VLC_API char *vlc_keycode2str(uint_fast32_t i_key) LIBVLC_USED;
+VLC_API uint_fast32_t vlc_str2keycode(const char *str) LIBVLC_USED;
 
 typedef enum vlc_action {
     ACTIONID_NONE = 0,
@@ -202,7 +202,7 @@ typedef enum vlc_action {
 
 } vlc_action_t;
 
-VLC_EXPORT( vlc_action_t, vlc_GetActionId, (const char *psz_key) ) LIBVLC_USED;
+VLC_API vlc_action_t vlc_GetActionId(const char *psz_key) LIBVLC_USED;
 
 struct hotkey
 {

@@ -167,46 +167,46 @@ typedef struct vlc_timer *vlc_timer_t;
 /*****************************************************************************
  * Function definitions
  *****************************************************************************/
-VLC_EXPORT( void, vlc_mutex_init,    ( vlc_mutex_t * ) );
-VLC_EXPORT( void, vlc_mutex_init_recursive, ( vlc_mutex_t * ) );
-VLC_EXPORT( void, vlc_mutex_destroy, ( vlc_mutex_t * ) );
-VLC_EXPORT( void, vlc_mutex_lock, ( vlc_mutex_t * ) );
-VLC_EXPORT( int,  vlc_mutex_trylock, ( vlc_mutex_t * ) LIBVLC_USED );
-VLC_EXPORT( void, vlc_mutex_unlock, ( vlc_mutex_t * ) );
-VLC_EXPORT( void, vlc_cond_init,     ( vlc_cond_t * ) );
-VLC_EXPORT( void, vlc_cond_init_daytime, ( vlc_cond_t * ) );
-VLC_EXPORT( void, vlc_cond_destroy,  ( vlc_cond_t * ) );
-VLC_EXPORT( void, vlc_cond_signal, (vlc_cond_t *) );
-VLC_EXPORT( void, vlc_cond_broadcast, (vlc_cond_t *) );
-VLC_EXPORT( void, vlc_cond_wait, (vlc_cond_t *, vlc_mutex_t *) );
-VLC_EXPORT( int,  vlc_cond_timedwait, (vlc_cond_t *, vlc_mutex_t *, mtime_t) );
-VLC_EXPORT( void, vlc_sem_init, (vlc_sem_t *, unsigned) );
-VLC_EXPORT( void, vlc_sem_destroy, (vlc_sem_t *) );
-VLC_EXPORT( int,  vlc_sem_post, (vlc_sem_t *) );
-VLC_EXPORT( void, vlc_sem_wait, (vlc_sem_t *) );
+VLC_API void vlc_mutex_init( vlc_mutex_t * );
+VLC_API void vlc_mutex_init_recursive( vlc_mutex_t * );
+VLC_API void vlc_mutex_destroy( vlc_mutex_t * );
+VLC_API void vlc_mutex_lock( vlc_mutex_t * );
+VLC_API int vlc_mutex_trylock( vlc_mutex_t * ) LIBVLC_USED;
+VLC_API void vlc_mutex_unlock( vlc_mutex_t * );
+VLC_API void vlc_cond_init( vlc_cond_t * );
+VLC_API void vlc_cond_init_daytime( vlc_cond_t * );
+VLC_API void vlc_cond_destroy( vlc_cond_t * );
+VLC_API void vlc_cond_signal(vlc_cond_t *);
+VLC_API void vlc_cond_broadcast(vlc_cond_t *);
+VLC_API void vlc_cond_wait(vlc_cond_t *, vlc_mutex_t *);
+VLC_API int vlc_cond_timedwait(vlc_cond_t *, vlc_mutex_t *, mtime_t);
+VLC_API void vlc_sem_init(vlc_sem_t *, unsigned);
+VLC_API void vlc_sem_destroy(vlc_sem_t *);
+VLC_API int vlc_sem_post(vlc_sem_t *);
+VLC_API void vlc_sem_wait(vlc_sem_t *);
 
-VLC_EXPORT( void, vlc_rwlock_init, (vlc_rwlock_t *) );
-VLC_EXPORT( void, vlc_rwlock_destroy, (vlc_rwlock_t *) );
-VLC_EXPORT( void, vlc_rwlock_rdlock, (vlc_rwlock_t *) );
-VLC_EXPORT( void, vlc_rwlock_wrlock, (vlc_rwlock_t *) );
-VLC_EXPORT( void, vlc_rwlock_unlock, (vlc_rwlock_t *) );
-VLC_EXPORT( int, vlc_threadvar_create, (vlc_threadvar_t * , void (*) (void *) ) );
-VLC_EXPORT( void, vlc_threadvar_delete, (vlc_threadvar_t *) );
-VLC_EXPORT( int, vlc_threadvar_set, (vlc_threadvar_t, void *) );
-VLC_EXPORT( void *, vlc_threadvar_get, (vlc_threadvar_t) );
-VLC_EXPORT( int,  vlc_thread_create, ( vlc_object_t *, void * ( * ) ( vlc_object_t * ), int ) LIBVLC_USED LIBVLC_DEPRECATED );
-VLC_EXPORT( int,  vlc_thread_set_priority, ( vlc_object_t *, int ) LIBVLC_DEPRECATED );
-VLC_EXPORT( void, vlc_thread_join,   ( vlc_object_t * ) LIBVLC_DEPRECATED );
+VLC_API void vlc_rwlock_init(vlc_rwlock_t *);
+VLC_API void vlc_rwlock_destroy(vlc_rwlock_t *);
+VLC_API void vlc_rwlock_rdlock(vlc_rwlock_t *);
+VLC_API void vlc_rwlock_wrlock(vlc_rwlock_t *);
+VLC_API void vlc_rwlock_unlock(vlc_rwlock_t *);
+VLC_API int vlc_threadvar_create(vlc_threadvar_t * , void (*) (void *) );
+VLC_API void vlc_threadvar_delete(vlc_threadvar_t *);
+VLC_API int vlc_threadvar_set(vlc_threadvar_t, void *);
+VLC_API void * vlc_threadvar_get(vlc_threadvar_t);
+VLC_API int vlc_thread_create( vlc_object_t *, void * ( * ) ( vlc_object_t * ), int ) LIBVLC_USED LIBVLC_DEPRECATED;
+VLC_API int vlc_thread_set_priority( vlc_object_t *, int ) LIBVLC_DEPRECATED;
+VLC_API void vlc_thread_join( vlc_object_t * ) LIBVLC_DEPRECATED;
 
-VLC_EXPORT( int, vlc_clone, (vlc_thread_t *, void * (*) (void *), void *, int) LIBVLC_USED );
-VLC_EXPORT( void, vlc_cancel, (vlc_thread_t) );
-VLC_EXPORT( void, vlc_join, (vlc_thread_t, void **) );
-VLC_EXPORT (void, vlc_control_cancel, (int cmd, ...));
+VLC_API int vlc_clone(vlc_thread_t *, void * (*) (void *), void *, int) LIBVLC_USED;
+VLC_API void vlc_cancel(vlc_thread_t);
+VLC_API void vlc_join(vlc_thread_t, void **);
+VLC_API void vlc_control_cancel (int cmd, ...);
 
-VLC_EXPORT( int, vlc_timer_create, (vlc_timer_t *, void (*) (void *), void *) LIBVLC_USED );
-VLC_EXPORT( void, vlc_timer_destroy, (vlc_timer_t) );
-VLC_EXPORT( void, vlc_timer_schedule, (vlc_timer_t, bool, mtime_t, mtime_t) );
-VLC_EXPORT( unsigned, vlc_timer_getoverrun, (vlc_timer_t) LIBVLC_USED );
+VLC_API int vlc_timer_create(vlc_timer_t *, void (*) (void *), void *) LIBVLC_USED;
+VLC_API void vlc_timer_destroy(vlc_timer_t);
+VLC_API void vlc_timer_schedule(vlc_timer_t, bool, mtime_t, mtime_t);
+VLC_API unsigned vlc_timer_getoverrun(vlc_timer_t) LIBVLC_USED;
 
 #ifndef LIBVLC_USE_PTHREAD_CANCEL
 enum {
@@ -215,9 +215,9 @@ enum {
 };
 #endif
 
-VLC_EXPORT( int, vlc_savecancel, (void) );
-VLC_EXPORT( void, vlc_restorecancel, (int state) );
-VLC_EXPORT( void, vlc_testcancel, (void) );
+VLC_API int vlc_savecancel(void);
+VLC_API void vlc_restorecancel(int state);
+VLC_API void vlc_testcancel(void);
 
 #if defined (LIBVLC_USE_PTHREAD_CANCEL)
 /**
@@ -433,7 +433,7 @@ enum {
    VLC_MAX_MUTEX
 };
 
-VLC_EXPORT( void, vlc_global_mutex, ( unsigned, bool ) );
+VLC_API void vlc_global_mutex( unsigned, bool );
 #define vlc_global_lock( n ) vlc_global_mutex( n, true )
 #define vlc_global_unlock( n ) vlc_global_mutex( n, false )
 

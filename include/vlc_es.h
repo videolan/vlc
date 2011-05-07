@@ -170,28 +170,28 @@ static inline void video_format_Clean( video_format_t *p_src )
  * It will fill up a video_format_tvideo_format_t using the given arguments.
  * Becarefull that the video_format_t must already be initialized.
  */
-VLC_EXPORT( void, video_format_Setup, ( video_format_t *, vlc_fourcc_t i_chroma, int i_width, int i_height, int i_sar_num, int i_sar_den ) );
+VLC_API void video_format_Setup( video_format_t *, vlc_fourcc_t i_chroma, int i_width, int i_height, int i_sar_num, int i_sar_den );
 
 /**
  * It will copy the crop properties from a video_format_t to another.
  */
-VLC_EXPORT( void, video_format_CopyCrop, ( video_format_t *, const video_format_t * ) );
+VLC_API void video_format_CopyCrop( video_format_t *, const video_format_t * );
 
 /**
  * It will compute the crop/ar properties when scaling.
  */
-VLC_EXPORT( void, video_format_ScaleCropAr, ( video_format_t *, const video_format_t * ) );
+VLC_API void video_format_ScaleCropAr( video_format_t *, const video_format_t * );
 
 /**
  * This function will check if the first video format is similar
  * to the second one.
  */
-VLC_EXPORT( bool, video_format_IsSimilar, ( const video_format_t *, const video_format_t * ) );
+VLC_API bool video_format_IsSimilar( const video_format_t *, const video_format_t * );
 
 /**
  * It prints details about the given video_format_t
  */
-VLC_EXPORT( void, video_format_Print, ( vlc_object_t *, const char *, const video_format_t * ) );
+VLC_API void video_format_Print( vlc_object_t *, const char *, const video_format_t * );
 
 /**
  * subtitles format description
@@ -292,29 +292,29 @@ enum es_format_category_e
 /**
  * This function will fill all RGB shift from RGB masks.
  */
-VLC_EXPORT( void, video_format_FixRgb, ( video_format_t * ) );
+VLC_API void video_format_FixRgb( video_format_t * );
 
 /**
  * This function will initialize a es_format_t structure.
  */
-VLC_EXPORT( void, es_format_Init, ( es_format_t *, int i_cat, vlc_fourcc_t i_codec ) );
+VLC_API void es_format_Init( es_format_t *, int i_cat, vlc_fourcc_t i_codec );
 
 /**
  * This function will initialize a es_format_t structure from a video_format_t.
  */
-VLC_EXPORT( void, es_format_InitFromVideo, ( es_format_t *, const video_format_t * ) );
+VLC_API void es_format_InitFromVideo( es_format_t *, const video_format_t * );
 
 /**
  * This functions will copy a es_format_t.
  */
-VLC_EXPORT( int, es_format_Copy, ( es_format_t *p_dst, const es_format_t *p_src ) );
+VLC_API int es_format_Copy( es_format_t *p_dst, const es_format_t *p_src );
 
 /**
  * This function will clean up a es_format_t and relasing all associated
  * resources.
  * You can call it multiple times on the same structure.
  */
-VLC_EXPORT( void, es_format_Clean, ( es_format_t *fmt ) );
+VLC_API void es_format_Clean( es_format_t *fmt );
 
 /**
  * This function will check if the first ES format is similar
@@ -322,6 +322,6 @@ VLC_EXPORT( void, es_format_Clean, ( es_format_t *fmt ) );
  *
  * All descriptive fields are ignored.
  */
-VLC_EXPORT( bool, es_format_IsSimilar, ( const es_format_t *, const es_format_t * ) );
+VLC_API bool es_format_IsSimilar( const es_format_t *, const es_format_t * );
 
 #endif

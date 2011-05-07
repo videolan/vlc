@@ -250,7 +250,7 @@ enum pl_locked_state
 #define PL_UNLOCK playlist_Unlock( p_playlist )
 #define PL_ASSERT_LOCKED playlist_AssertLocked( p_playlist )
 
-VLC_EXPORT( playlist_t *, pl_Get, ( vlc_object_t * ) LIBVLC_USED );
+VLC_API playlist_t * pl_Get( vlc_object_t * ) LIBVLC_USED;
 #define pl_Get( a ) pl_Get( VLC_OBJECT(a) )
 
 /* Playlist control */
@@ -261,9 +261,9 @@ VLC_EXPORT( playlist_t *, pl_Get, ( vlc_object_t * ) LIBVLC_USED );
 #define playlist_Prev(p) playlist_Control(p,PLAYLIST_SKIP, pl_Unlocked, -1)
 #define playlist_Skip(p,i) playlist_Control(p,PLAYLIST_SKIP, pl_Unlocked,  (i) )
 
-VLC_EXPORT( void, playlist_Lock, ( playlist_t * ) );
-VLC_EXPORT( void, playlist_Unlock, ( playlist_t * ) );
-VLC_EXPORT( void, playlist_AssertLocked, ( playlist_t * ) );
+VLC_API void playlist_Lock( playlist_t * );
+VLC_API void playlist_Unlock( playlist_t * );
+VLC_API void playlist_AssertLocked( playlist_t * );
 
 /**
  * Do a playlist action.
@@ -275,30 +275,30 @@ VLC_EXPORT( void, playlist_AssertLocked, ( playlist_t * ) );
  * \param variable number of arguments
  * \return VLC_SUCCESS or an error
  */
-VLC_EXPORT( int, playlist_Control, ( playlist_t *p_playlist, int i_query, bool b_locked, ...  ) );
+VLC_API int playlist_Control( playlist_t *p_playlist, int i_query, bool b_locked, ...  );
 
 /** Get current playing input. The object is retained.
  */
-VLC_EXPORT( input_thread_t *, playlist_CurrentInput, ( playlist_t *p_playlist ) LIBVLC_USED );
+VLC_API input_thread_t * playlist_CurrentInput( playlist_t *p_playlist ) LIBVLC_USED;
 
 /** Clear the playlist
  * \param b_locked TRUE if playlist is locked when entering this function
  */
-VLC_EXPORT( void,  playlist_Clear, ( playlist_t *, bool ) );
+VLC_API void playlist_Clear( playlist_t *, bool );
 
 /** Enqueue an input item for preparsing */
-VLC_EXPORT( int, playlist_PreparseEnqueue, (playlist_t *, input_item_t * ) );
+VLC_API int playlist_PreparseEnqueue(playlist_t *, input_item_t * );
 
 /** Request the art for an input item to be fetched */
-VLC_EXPORT( int, playlist_AskForArtEnqueue, (playlist_t *, input_item_t * ) );
+VLC_API int playlist_AskForArtEnqueue(playlist_t *, input_item_t * );
 
 /* Playlist sorting */
-VLC_EXPORT( int,  playlist_TreeMove, ( playlist_t *, playlist_item_t *, playlist_item_t *, int ) );
-VLC_EXPORT( int,  playlist_TreeMoveMany, ( playlist_t *, int, playlist_item_t **, playlist_item_t *, int ) );
-VLC_EXPORT( int,  playlist_RecursiveNodeSort, ( playlist_t *, playlist_item_t *,int, int ) );
+VLC_API int playlist_TreeMove( playlist_t *, playlist_item_t *, playlist_item_t *, int );
+VLC_API int playlist_TreeMoveMany( playlist_t *, int, playlist_item_t **, playlist_item_t *, int );
+VLC_API int playlist_RecursiveNodeSort( playlist_t *, playlist_item_t *,int, int );
 
-VLC_EXPORT( playlist_item_t *,  playlist_CurrentPlayingItem, ( playlist_t * ) LIBVLC_USED );
-VLC_EXPORT( int,   playlist_Status, ( playlist_t * ) );
+VLC_API playlist_item_t * playlist_CurrentPlayingItem( playlist_t * ) LIBVLC_USED;
+VLC_API int playlist_Status( playlist_t * );
 
 /**
  * Export a node of the playlist to a certain type of playlistfile
@@ -308,23 +308,23 @@ VLC_EXPORT( int,   playlist_Status, ( playlist_t * ) );
  * \param psz_type the type of playlist file to create (m3u, pls, ..)
  * \return VLC_SUCCESS on success
  */
-VLC_EXPORT( int,  playlist_Export, ( playlist_t *p_playlist, const char *psz_name, playlist_item_t *p_export_root, const char *psz_type ) );
+VLC_API int playlist_Export( playlist_t *p_playlist, const char *psz_name, playlist_item_t *p_export_root, const char *psz_type );
 
 /**
  * Open a playlist file, add its content to the current playlist
  */
-VLC_EXPORT( int, playlist_Import, ( playlist_t *p_playlist, const char *psz_file ) );
+VLC_API int playlist_Import( playlist_t *p_playlist, const char *psz_file );
 
 /********************** Services discovery ***********************/
 
 /** Add a list of comma-separated service discovery modules */
-VLC_EXPORT( int, playlist_ServicesDiscoveryAdd, (playlist_t *, const char *));
+VLC_API int playlist_ServicesDiscoveryAdd(playlist_t *, const char *);
 /** Remove a services discovery module by name */
-VLC_EXPORT( int, playlist_ServicesDiscoveryRemove, (playlist_t *, const char *));
+VLC_API int playlist_ServicesDiscoveryRemove(playlist_t *, const char *);
 /** Check whether a given SD is loaded */
-VLC_EXPORT( bool, playlist_IsServicesDiscoveryLoaded, ( playlist_t *,const char *));
+VLC_API bool playlist_IsServicesDiscoveryLoaded( playlist_t *,const char *);
 /** Query a services discovery */
-VLC_EXPORT( int, playlist_ServicesDiscoveryControl, ( playlist_t *, const char *, int, ... ) );
+VLC_API int playlist_ServicesDiscoveryControl( playlist_t *, const char *, int, ... );
 
 
 
@@ -333,34 +333,34 @@ VLC_EXPORT( int, playlist_ServicesDiscoveryControl, ( playlist_t *, const char *
  ********************************************************/
 
 /*************************** Item deletion **************************/
-VLC_EXPORT( int,  playlist_DeleteFromInput, ( playlist_t *, input_item_t *, bool ) );
+VLC_API int playlist_DeleteFromInput( playlist_t *, input_item_t *, bool );
 
 /******************** Item addition ********************/
-VLC_EXPORT( int,  playlist_Add,    ( playlist_t *, const char *, const char *, int, int, bool, bool ) );
-VLC_EXPORT( int,  playlist_AddExt, ( playlist_t *, const char *, const char *, int, int, mtime_t, int, const char *const *, unsigned, bool, bool ) );
-VLC_EXPORT( int, playlist_AddInput, ( playlist_t *, input_item_t *, int, int, bool, bool ) );
-VLC_EXPORT( playlist_item_t *, playlist_NodeAddInput, ( playlist_t *, input_item_t *, playlist_item_t *, int, int, bool ) );
-VLC_EXPORT( int, playlist_NodeAddCopy, ( playlist_t *, playlist_item_t *, playlist_item_t *, int ) );
+VLC_API int playlist_Add( playlist_t *, const char *, const char *, int, int, bool, bool );
+VLC_API int playlist_AddExt( playlist_t *, const char *, const char *, int, int, mtime_t, int, const char *const *, unsigned, bool, bool );
+VLC_API int playlist_AddInput( playlist_t *, input_item_t *, int, int, bool, bool );
+VLC_API playlist_item_t * playlist_NodeAddInput( playlist_t *, input_item_t *, playlist_item_t *, int, int, bool );
+VLC_API int playlist_NodeAddCopy( playlist_t *, playlist_item_t *, playlist_item_t *, int );
 
 /********************************** Item search *************************/
-VLC_EXPORT( playlist_item_t *, playlist_ItemGetById, (playlist_t *, int ) LIBVLC_USED );
-VLC_EXPORT( playlist_item_t *, playlist_ItemGetByInput, (playlist_t *,input_item_t * ) LIBVLC_USED );
+VLC_API playlist_item_t * playlist_ItemGetById(playlist_t *, int ) LIBVLC_USED;
+VLC_API playlist_item_t * playlist_ItemGetByInput(playlist_t *,input_item_t * ) LIBVLC_USED;
 
-VLC_EXPORT( int, playlist_LiveSearchUpdate, (playlist_t *, playlist_item_t *, const char *, bool ) );
+VLC_API int playlist_LiveSearchUpdate(playlist_t *, playlist_item_t *, const char *, bool );
 
 /********************************************************
  * Tree management
  ********************************************************/
 /* Node management */
-VLC_EXPORT( playlist_item_t *, playlist_NodeCreate, ( playlist_t *, const char *, playlist_item_t * p_parent, int i_pos, int i_flags, input_item_t * ) );
-VLC_EXPORT( int, playlist_NodeAppend, (playlist_t *,playlist_item_t*,playlist_item_t *) );
-VLC_EXPORT( int, playlist_NodeInsert, (playlist_t *,playlist_item_t*,playlist_item_t *, int) );
-VLC_EXPORT( int, playlist_NodeRemoveItem, (playlist_t *,playlist_item_t*,playlist_item_t *) );
-VLC_EXPORT( playlist_item_t *, playlist_ChildSearchName, (playlist_item_t*, const char* ) LIBVLC_USED );
-VLC_EXPORT( int, playlist_NodeDelete, ( playlist_t *, playlist_item_t *, bool , bool ) );
+VLC_API playlist_item_t * playlist_NodeCreate( playlist_t *, const char *, playlist_item_t * p_parent, int i_pos, int i_flags, input_item_t * );
+VLC_API int playlist_NodeAppend(playlist_t *,playlist_item_t*,playlist_item_t *);
+VLC_API int playlist_NodeInsert(playlist_t *,playlist_item_t*,playlist_item_t *, int);
+VLC_API int playlist_NodeRemoveItem(playlist_t *,playlist_item_t*,playlist_item_t *);
+VLC_API playlist_item_t * playlist_ChildSearchName(playlist_item_t*, const char* ) LIBVLC_USED;
+VLC_API int playlist_NodeDelete( playlist_t *, playlist_item_t *, bool , bool );
 
-VLC_EXPORT( playlist_item_t *, playlist_GetNextLeaf, ( playlist_t *p_playlist, playlist_item_t *p_root, playlist_item_t *p_item, bool b_ena, bool b_unplayed ) LIBVLC_USED );
-VLC_EXPORT( playlist_item_t *, playlist_GetPrevLeaf, ( playlist_t *p_playlist, playlist_item_t *p_root, playlist_item_t *p_item, bool b_ena, bool b_unplayed ) LIBVLC_USED );
+VLC_API playlist_item_t * playlist_GetNextLeaf( playlist_t *p_playlist, playlist_item_t *p_root, playlist_item_t *p_item, bool b_ena, bool b_unplayed ) LIBVLC_USED;
+VLC_API playlist_item_t * playlist_GetPrevLeaf( playlist_t *p_playlist, playlist_item_t *p_root, playlist_item_t *p_item, bool b_ena, bool b_unplayed ) LIBVLC_USED;
 
 /***********************************************************************
  * Inline functions

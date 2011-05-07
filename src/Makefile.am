@@ -553,24 +553,7 @@ stamp-revision:
 # Unit/regression test
 ###############################################################################
 
-dist_check_SCRIPTS = check_symbols check_headers
-TESTS = check_symbols
-
-check_DATA = libvlc-headers.sym libvlc-sorted.sym
-CLEANFILES += $(check_DATA)
-
-libvlc-sorted.sym: libvlccore.sym
-	rm -f libvlc-sorted.sym
-	sort -fdu < "$(srcdir)/libvlccore.sym" > libvlc-sorted.sym
-
-libvlc-headers.sym:
-	rm -f libvlc-headers.sym
-	cat ${srcdir}/../include/vlc_*.h ${srcdir}/control/*.h | \
-	sed -n -e 's/^[ ]*VLC_EXPORT[ ]*([^,]*,\([^,]*\),.*/\1/p' | \
-	sed -e 's/[^a-zA-Z0-9_]*//' | \
-	sort -fdu > libvlc-headers.sym
-
-.PHONY: libvlc-headers.sym
+dist_check_SCRIPTS = check_headers
 
 check-local:
 	for h in `echo $(pkginclude_HEADERS) | sed -e s,\.\./include/,,g`; \

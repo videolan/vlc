@@ -128,36 +128,36 @@ enum {
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-VLC_EXPORT( int, var_Create, ( vlc_object_t *, const char *, int ) );
+VLC_API int var_Create( vlc_object_t *, const char *, int );
 #define var_Create(a,b,c) var_Create( VLC_OBJECT(a), b, c )
 
-VLC_EXPORT( int, var_Destroy, ( vlc_object_t *, const char * ) );
+VLC_API int var_Destroy( vlc_object_t *, const char * );
 #define var_Destroy(a,b) var_Destroy( VLC_OBJECT(a), b )
 
-VLC_EXPORT( int, var_Change, ( vlc_object_t *, const char *, int, vlc_value_t *, vlc_value_t * ) );
+VLC_API int var_Change( vlc_object_t *, const char *, int, vlc_value_t *, vlc_value_t * );
 #define var_Change(a,b,c,d,e) var_Change( VLC_OBJECT(a), b, c, d, e )
 
-VLC_EXPORT( int, var_Type, ( vlc_object_t *, const char * ) LIBVLC_USED );
+VLC_API int var_Type( vlc_object_t *, const char * ) LIBVLC_USED;
 #define var_Type(a,b) var_Type( VLC_OBJECT(a), b )
 
-VLC_EXPORT( int, var_Set, ( vlc_object_t *, const char *, vlc_value_t ) );
+VLC_API int var_Set( vlc_object_t *, const char *, vlc_value_t );
 #define var_Set(a,b,c) var_Set( VLC_OBJECT(a), b, c )
 
-VLC_EXPORT( int, var_Get, ( vlc_object_t *, const char *, vlc_value_t * ) );
+VLC_API int var_Get( vlc_object_t *, const char *, vlc_value_t * );
 #define var_Get(a,b,c) var_Get( VLC_OBJECT(a), b, c )
 
-VLC_EXPORT( int, var_SetChecked, ( vlc_object_t *, const char *, int, vlc_value_t ) );
+VLC_API int var_SetChecked( vlc_object_t *, const char *, int, vlc_value_t );
 #define var_SetChecked(o,n,t,v) var_SetChecked(VLC_OBJECT(o),n,t,v)
-VLC_EXPORT( int, var_GetChecked, ( vlc_object_t *, const char *, int, vlc_value_t * ) );
+VLC_API int var_GetChecked( vlc_object_t *, const char *, int, vlc_value_t * );
 #define var_GetChecked(o,n,t,v) var_GetChecked(VLC_OBJECT(o),n,t,v)
-VLC_EXPORT( int, var_GetAndSet, ( vlc_object_t *, const char *, int, vlc_value_t * ) );
+VLC_API int var_GetAndSet( vlc_object_t *, const char *, int, vlc_value_t * );
 
-VLC_EXPORT( int, var_Inherit, ( vlc_object_t *, const char *, int, vlc_value_t * ) );
+VLC_API int var_Inherit( vlc_object_t *, const char *, int, vlc_value_t * );
 
-VLC_EXPORT( int, var_Command, ( vlc_object_t *, const char *, const char *, const char *, char ** ) );
+VLC_API int var_Command( vlc_object_t *, const char *, const char *, const char *, char ** );
 #define var_Command(a,b,c,d,e) var_Command( VLC_OBJECT( a ), b, c, d, e )
 
-VLC_EXPORT( void, var_FreeList, ( vlc_value_t *, vlc_value_t * ) );
+VLC_API void var_FreeList( vlc_value_t *, vlc_value_t * );
 
 
 /*****************************************************************************
@@ -169,9 +169,9 @@ VLC_EXPORT( void, var_FreeList, ( vlc_value_t *, vlc_value_t * ) );
  *                 vlc_value_t newvalue,
  *                 void *p_data);
  *****************************************************************************/
-VLC_EXPORT( int, var_AddCallback, ( vlc_object_t *, const char *, vlc_callback_t, void * ) );
-VLC_EXPORT( int, var_DelCallback, ( vlc_object_t *, const char *, vlc_callback_t, void * ) );
-VLC_EXPORT( int, var_TriggerCallback, ( vlc_object_t *, const char * ) );
+VLC_API int var_AddCallback( vlc_object_t *, const char *, vlc_callback_t, void * );
+VLC_API int var_DelCallback( vlc_object_t *, const char *, vlc_callback_t, void * );
+VLC_API int var_TriggerCallback( vlc_object_t *, const char * );
 
 #define var_AddCallback(a,b,c,d) var_AddCallback( VLC_OBJECT(a), b, c, d )
 #define var_DelCallback(a,b,c,d) var_DelCallback( VLC_OBJECT(a), b, c, d )
@@ -725,7 +725,7 @@ static inline void *var_InheritAddress( vlc_object_t *obj, const char *name )
 }
 #define var_InheritAddress(o, n) var_InheritAddress(VLC_OBJECT(o), n)
 
-VLC_EXPORT( int, var_InheritURational, ( vlc_object_t *, unsigned *num, unsigned *den, const char *var ) );
+VLC_API int var_InheritURational( vlc_object_t *, unsigned *num, unsigned *den, const char *var );
 #define var_InheritURational(a,b,c,d) var_InheritURational(VLC_OBJECT(a), b, c, d)
 
 #define var_GetInteger(a,b)   var_GetInteger( VLC_OBJECT(a),b)
@@ -736,7 +736,7 @@ VLC_EXPORT( int, var_InheritURational, ( vlc_object_t *, unsigned *num, unsigned
 #define var_GetNonEmptyString(a,b)   var_GetNonEmptyString( VLC_OBJECT(a),b)
 #define var_GetAddress(a,b)  var_GetAddress( VLC_OBJECT(a),b)
 
-VLC_EXPORT( int, var_LocationParse, (vlc_object_t *, const char *mrl, const char *prefix) );
+VLC_API int var_LocationParse(vlc_object_t *, const char *mrl, const char *prefix);
 #define var_LocationParse(o, m, p) var_LocationParse(VLC_OBJECT(o), m, p)
 
 /**

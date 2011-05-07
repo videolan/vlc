@@ -85,7 +85,7 @@ struct subpicture_region_t
  *
  * You must use subpicture_region_Delete to destroy it.
  */
-VLC_EXPORT( subpicture_region_t *, subpicture_region_New, ( const video_format_t *p_fmt ) );
+VLC_API subpicture_region_t * subpicture_region_New( const video_format_t *p_fmt );
 
 /**
  * This function will destroy a subpicture region allocated by
@@ -93,7 +93,7 @@ VLC_EXPORT( subpicture_region_t *, subpicture_region_New, ( const video_format_t
  *
  * You may give it NULL.
  */
-VLC_EXPORT( void, subpicture_region_Delete, ( subpicture_region_t *p_region ) );
+VLC_API void subpicture_region_Delete( subpicture_region_t *p_region );
 
 /**
  * This function will destroy a list of subpicture regions allocated by
@@ -101,7 +101,7 @@ VLC_EXPORT( void, subpicture_region_Delete, ( subpicture_region_t *p_region ) );
  *
  * Provided for convenience.
  */
-VLC_EXPORT( void, subpicture_region_ChainDelete, ( subpicture_region_t *p_head ) );
+VLC_API void subpicture_region_ChainDelete( subpicture_region_t *p_head );
 
 /**
  *
@@ -178,13 +178,13 @@ struct subpicture_t
  *
  * You must use subpicture_Delete to destroy it.
  */
-VLC_EXPORT( subpicture_t *, subpicture_New, ( const subpicture_updater_t * ) );
+VLC_API subpicture_t * subpicture_New( const subpicture_updater_t * );
 
 /**
  * This function delete a subpicture created by subpicture_New.
  * You may give it NULL.
  */
-VLC_EXPORT( void,  subpicture_Delete, ( subpicture_t *p_subpic ) );
+VLC_API void subpicture_Delete( subpicture_t *p_subpic );
 
 /**
  * This function will create a subpicture having one region in the requested
@@ -193,13 +193,13 @@ VLC_EXPORT( void,  subpicture_Delete, ( subpicture_t *p_subpic ) );
  * The picture_t given is not released nor used inside the
  * returned subpicture_t.
  */
-VLC_EXPORT( subpicture_t *, subpicture_NewFromPicture, ( vlc_object_t *, picture_t *, vlc_fourcc_t i_chroma ) );
+VLC_API subpicture_t * subpicture_NewFromPicture( vlc_object_t *, picture_t *, vlc_fourcc_t i_chroma );
 
 /**
  * This function will update the content of a subpicture created with
  * a non NULL subpicture_updater_t.
  */
-VLC_EXPORT( void, subpicture_Update, ( subpicture_t *, const video_format_t *src, const video_format_t *, mtime_t ) );
+VLC_API void subpicture_Update( subpicture_t *, const video_format_t *src, const video_format_t *, mtime_t );
 
 /**@}*/
 

@@ -79,22 +79,22 @@ typedef struct
 /**
  * Create a default text style
  */
-VLC_EXPORT( text_style_t *, text_style_New, ( void ) );
+VLC_API text_style_t * text_style_New( void );
 
 /**
  * Copy a text style into another
  */
-VLC_EXPORT( text_style_t *, text_style_Copy, ( text_style_t *, const text_style_t * ) );
+VLC_API text_style_t * text_style_Copy( text_style_t *, const text_style_t * );
 
 /**
  * Duplicate a text style
  */
-VLC_EXPORT( text_style_t *, text_style_Duplicate, ( const text_style_t * ) );
+VLC_API text_style_t * text_style_Duplicate( const text_style_t * );
 
 /**
  * Delete a text style created by text_style_New or text_style_Duplicate
  */
-VLC_EXPORT( void, text_style_Delete, ( text_style_t * ) );
+VLC_API void text_style_Delete( text_style_t * );
 
 #ifdef __cplusplus
 }

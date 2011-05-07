@@ -221,44 +221,43 @@ typedef void ( *vlc_event_callback_t )( const vlc_event_t *, void * );
 #define vlc_event_manager_init_with_vlc_object(a,b) \
             vlc_event_manager_init( a, b, b )
 
-VLC_EXPORT(int, vlc_event_manager_init, ( vlc_event_manager_t * p_em,
-                                          void * p_obj, vlc_object_t * ));
+VLC_API int vlc_event_manager_init( vlc_event_manager_t * p_em,
+                                    void * p_obj, vlc_object_t * );
 #define vlc_event_manager_init(a,b,c) \
             vlc_event_manager_init(a, b, VLC_OBJECT(c))
 
 /*
  * Destroy
  */
-VLC_EXPORT(void, vlc_event_manager_fini, ( vlc_event_manager_t * p_em ));
+VLC_API void vlc_event_manager_fini( vlc_event_manager_t * p_em );
 
 /*
  * Tells a specific event manager that it will handle event_type object
  */
-VLC_EXPORT(int, vlc_event_manager_register_event_type,
-                ( vlc_event_manager_t * p_em, vlc_event_type_t event_type ));
+VLC_API int vlc_event_manager_register_event_type( vlc_event_manager_t * p_em,
+                                                   vlc_event_type_t );
 
 /*
  * Send an event to the listener attached to this p_em.
  */
-VLC_EXPORT(void, vlc_event_send, ( vlc_event_manager_t * p_em,
-                                   vlc_event_t * p_event ));
+VLC_API void vlc_event_send( vlc_event_manager_t * p_em, vlc_event_t * );
 
 /*
  * Add a callback for an event.
  */
-VLC_EXPORT(int, vlc_event_attach, ( vlc_event_manager_t * p_event_manager,
-                                    vlc_event_type_t event_type,
-                                    vlc_event_callback_t pf_callback,
-                                    void *p_user_data,
-                                    const char * psz_debug_name ));
+VLC_API int vlc_event_attach( vlc_event_manager_t * p_event_manager,
+                              vlc_event_type_t event_type,
+                              vlc_event_callback_t pf_callback,
+                              void *p_user_data,
+                              const char * psz_debug_name );
 #define vlc_event_attach(a, b, c, d) vlc_event_attach(a, b, c, d, #c)
 
 /*
  * Remove a callback for an event.
  */
-VLC_EXPORT(int, vlc_event_detach, ( vlc_event_manager_t *p_event_manager,
-                                    vlc_event_type_t event_type,
-                                    vlc_event_callback_t pf_callback,
-                                    void *p_user_data ));
+VLC_API int vlc_event_detach( vlc_event_manager_t *p_event_manager,
+                              vlc_event_type_t event_type,
+                              vlc_event_callback_t pf_callback,
+                              void *p_user_data );
 
 #endif /* VLC_EVENTS_H */

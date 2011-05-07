@@ -59,9 +59,9 @@ struct image_handler_t
     filter_t  *p_filter;
 };
 
-VLC_EXPORT( image_handler_t *, image_HandlerCreate, ( vlc_object_t * ) LIBVLC_USED );
+VLC_API image_handler_t * image_HandlerCreate( vlc_object_t * ) LIBVLC_USED;
 #define image_HandlerCreate( a ) image_HandlerCreate( VLC_OBJECT(a) )
-VLC_EXPORT( void, image_HandlerDelete, ( image_handler_t * ) );
+VLC_API void image_HandlerDelete( image_handler_t * );
 
 #define image_Read( a, b, c, d ) a->pf_read( a, b, c, d )
 #define image_ReadUrl( a, b, c, d ) a->pf_read_url( a, b, c, d )
@@ -70,9 +70,9 @@ VLC_EXPORT( void, image_HandlerDelete, ( image_handler_t * ) );
 #define image_Convert( a, b, c, d ) a->pf_convert( a, b, c, d )
 #define image_Filter( a, b, c, d ) a->pf_filter( a, b, c, d )
 
-VLC_EXPORT( vlc_fourcc_t, image_Type2Fourcc, ( const char *psz_name ) );
-VLC_EXPORT( vlc_fourcc_t, image_Ext2Fourcc, ( const char *psz_name ) );
-VLC_EXPORT( vlc_fourcc_t, image_Mime2Fourcc, ( const char *psz_mime ) );
+VLC_API vlc_fourcc_t image_Type2Fourcc( const char *psz_name );
+VLC_API vlc_fourcc_t image_Ext2Fourcc( const char *psz_name );
+VLC_API vlc_fourcc_t image_Mime2Fourcc( const char *psz_mime );
 
 # ifdef __cplusplus
 }

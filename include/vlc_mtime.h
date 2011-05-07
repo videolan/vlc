@@ -54,11 +54,11 @@
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-VLC_EXPORT( char *,  mstrtime, ( char *psz_buffer, mtime_t date ) );
-VLC_EXPORT( mtime_t, mdate,    ( void ) );
-VLC_EXPORT( void,    mwait,    ( mtime_t date ) );
-VLC_EXPORT( void,    msleep,   ( mtime_t delay ) );
-VLC_EXPORT( char *,  secstotimestr, ( char *psz_buffer, int32_t secs ) );
+VLC_API char * mstrtime( char *psz_buffer, mtime_t date );
+VLC_API mtime_t mdate( void );
+VLC_API void mwait( mtime_t date );
+VLC_API void msleep( mtime_t delay );
+VLC_API char * secstotimestr( char *psz_buffer, int32_t secs );
 
 # define VLC_HARD_MIN_SLEEP 10000   /* 10 milliseconds = 1 tick at 100Hz */
 
@@ -128,12 +128,12 @@ struct date_t
     uint32_t i_remainder;
 };
 
-VLC_EXPORT( void,    date_Init,      ( date_t *, uint32_t, uint32_t ) );
-VLC_EXPORT( void,    date_Change,    ( date_t *, uint32_t, uint32_t ) );
-VLC_EXPORT( void,    date_Set,       ( date_t *, mtime_t ) );
-VLC_EXPORT( mtime_t, date_Get,       ( const date_t * ) );
-VLC_EXPORT( void,    date_Move,      ( date_t *, mtime_t ) );
-VLC_EXPORT( mtime_t, date_Increment, ( date_t *, uint32_t ) );
-VLC_EXPORT( mtime_t, date_Decrement, ( date_t *, uint32_t ) );
-VLC_EXPORT( uint64_t, NTPtime64,     ( void ) );
+VLC_API void date_Init( date_t *, uint32_t, uint32_t );
+VLC_API void date_Change( date_t *, uint32_t, uint32_t );
+VLC_API void date_Set( date_t *, mtime_t );
+VLC_API mtime_t date_Get( const date_t * );
+VLC_API void date_Move( date_t *, mtime_t );
+VLC_API mtime_t date_Increment( date_t *, uint32_t );
+VLC_API mtime_t date_Decrement( date_t *, uint32_t );
+VLC_API uint64_t NTPtime64( void );
 #endif /* !__VLC_MTIME_ */

@@ -133,8 +133,8 @@ static inline void video_splitter_DeletePicture( video_splitter_t *p_splitter,
 }
 
 /* */
-VLC_EXPORT( video_splitter_t *, video_splitter_New, ( vlc_object_t *, const char *psz_name, const video_format_t * ) );
-VLC_EXPORT( void, video_splitter_Delete, ( video_splitter_t * ) );
+VLC_API video_splitter_t * video_splitter_New( vlc_object_t *, const char *psz_name, const video_format_t * );
+VLC_API void video_splitter_Delete( video_splitter_t * );
 
 static inline int video_splitter_Filter( video_splitter_t *p_splitter,
                                          picture_t *pp_dst[], picture_t *p_src )

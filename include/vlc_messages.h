@@ -87,8 +87,8 @@ typedef struct msg_subscription_t msg_subscription_t;
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-VLC_EXPORT( void, msg_Generic, ( vlc_object_t *, int, const char *, const char *, ... ) LIBVLC_FORMAT( 4, 5 ) );
-VLC_EXPORT( void, msg_GenericVa, ( vlc_object_t *, int, const char *, const char *, va_list args ) );
+VLC_API void msg_Generic( vlc_object_t *, int, const char *, const char *, ... ) LIBVLC_FORMAT( 4, 5 );
+VLC_API void msg_GenericVa( vlc_object_t *, int, const char *, const char *, va_list args );
 #define msg_GenericVa(a, b, c, d, e) msg_GenericVa(VLC_OBJECT(a), b, c, d, e)
 
 #define msg_Info( p_this, ... ) \
@@ -112,14 +112,14 @@ typedef struct msg_cb_data_t msg_cb_data_t;
  */
 typedef void (*msg_callback_t) (msg_cb_data_t *, msg_item_t *, unsigned);
 
-VLC_EXPORT( msg_subscription_t*, msg_Subscribe, ( libvlc_int_t *, msg_callback_t, msg_cb_data_t * ) LIBVLC_USED );
-VLC_EXPORT( void, msg_Unsubscribe, ( msg_subscription_t * ) );
-VLC_EXPORT( void, msg_SubscriptionSetVerbosity, ( msg_subscription_t *, const int) );
+VLC_API msg_subscription_t* msg_Subscribe( libvlc_int_t *, msg_callback_t, msg_cb_data_t * ) LIBVLC_USED;
+VLC_API void msg_Unsubscribe( msg_subscription_t * );
+VLC_API void msg_SubscriptionSetVerbosity( msg_subscription_t *, const int);
 
 /* Enable or disable a certain object debug messages */
-VLC_EXPORT( void, msg_EnableObjectPrinting, ( vlc_object_t *, const char * psz_object ) );
+VLC_API void msg_EnableObjectPrinting( vlc_object_t *, const char * psz_object );
 #define msg_EnableObjectPrinting(a,b) msg_EnableObjectPrinting(VLC_OBJECT(a),b)
-VLC_EXPORT( void, msg_DisableObjectPrinting, ( vlc_object_t *, const char * psz_object ) );
+VLC_API void msg_DisableObjectPrinting( vlc_object_t *, const char * psz_object );
 #define msg_DisableObjectPrinting(a,b) msg_DisableObjectPrinting(VLC_OBJECT(a),b)
 
 
@@ -204,19 +204,19 @@ enum
 /*********
  * Timing
  ********/
-VLC_EXPORT( void, stats_TimerStart, (vlc_object_t*, const char *, unsigned int ) );
-VLC_EXPORT( void, stats_TimerStop, (vlc_object_t*, unsigned int) );
-VLC_EXPORT( void, stats_TimerDump, (vlc_object_t*, unsigned int) );
-VLC_EXPORT( void, stats_TimersDumpAll, (vlc_object_t*) );
+VLC_API void stats_TimerStart(vlc_object_t*, const char *, unsigned int );
+VLC_API void stats_TimerStop(vlc_object_t*, unsigned int);
+VLC_API void stats_TimerDump(vlc_object_t*, unsigned int);
+VLC_API void stats_TimersDumpAll(vlc_object_t*);
 #define stats_TimerStart(a,b,c) stats_TimerStart( VLC_OBJECT(a), b,c )
 #define stats_TimerStop(a,b) stats_TimerStop( VLC_OBJECT(a), b )
 #define stats_TimerDump(a,b) stats_TimerDump( VLC_OBJECT(a), b )
 #define stats_TimersDumpAll(a) stats_TimersDumpAll( VLC_OBJECT(a) )
 
-VLC_EXPORT( void, stats_TimersCleanAll, (vlc_object_t * ) );
+VLC_API void stats_TimersCleanAll(vlc_object_t * );
 #define stats_TimersCleanAll(a) stats_TimersCleanAll( VLC_OBJECT(a) )
 
-VLC_EXPORT( void, stats_TimerClean, (vlc_object_t *, unsigned int ) );
+VLC_API void stats_TimerClean(vlc_object_t *, unsigned int );
 #define stats_TimerClean(a,b) stats_TimerClean( VLC_OBJECT(a), b )
 
 /**

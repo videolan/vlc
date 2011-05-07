@@ -121,14 +121,14 @@ struct vout_window_t {
  / vout_display_NewWindow() and vout_display_DeleteWindow() instead.
  * This enables recycling windows.
  */
-VLC_EXPORT( vout_window_t *, vout_window_New, (vlc_object_t *, const char *module, const vout_window_cfg_t *) );
+VLC_API vout_window_t * vout_window_New(vlc_object_t *, const char *module, const vout_window_cfg_t *);
 
 /**
  * Deletes a window created by vout_window_New().
  *
  * @note See vout_window_New() about window recycling.
  */
-VLC_EXPORT( void, vout_window_Delete, (vout_window_t *) );
+VLC_API void vout_window_Delete(vout_window_t *);
 
 
 /**
@@ -138,7 +138,7 @@ VLC_EXPORT( void, vout_window_Delete, (vout_window_t *) );
  *
  * @warning The caller must own the window, as vout_window_t is not thread safe.
  */
-VLC_EXPORT( int, vout_window_Control, (vout_window_t *, int query, ...) );
+VLC_API int vout_window_Control(vout_window_t *, int query, ...);
 
 /**
  * Configures the window manager state for this window.

@@ -55,13 +55,13 @@ struct update_release_t
 
 typedef struct update_release_t update_release_t;
 
-VLC_EXPORT( update_t *, update_New, ( vlc_object_t * ) );
+VLC_API update_t * update_New( vlc_object_t * );
 #define update_New( a ) update_New( VLC_OBJECT( a ) )
-VLC_EXPORT( void, update_Delete, ( update_t * ) );
-VLC_EXPORT( void, update_Check, ( update_t *, void (*callback)( void*, bool ), void * ) );
-VLC_EXPORT( bool, update_NeedUpgrade, ( update_t * ) );
-VLC_EXPORT( void, update_Download, ( update_t *, const char* ) );
-VLC_EXPORT( update_release_t*, update_GetRelease, ( update_t * ) );
+VLC_API void update_Delete( update_t * );
+VLC_API void update_Check( update_t *, void (*callback)( void*, bool ), void * );
+VLC_API bool update_NeedUpgrade( update_t * );
+VLC_API void update_Download( update_t *, const char* );
+VLC_API update_release_t* update_GetRelease( update_t * );
 
 /**
  * @}

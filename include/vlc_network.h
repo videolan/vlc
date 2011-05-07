@@ -88,7 +88,7 @@ struct msghdr
 int vlc_socket (int, int, int, bool nonblock) LIBVLC_USED;
 
 struct sockaddr;
-VLC_EXPORT( int, vlc_accept, ( int, struct sockaddr *, socklen_t *, bool ) LIBVLC_USED );
+VLC_API int vlc_accept( int, struct sockaddr *, socklen_t *, bool ) LIBVLC_USED;
 
 # ifdef __cplusplus
 extern "C" {
@@ -97,10 +97,10 @@ extern "C" {
 /* Portable networking layer communication */
 int net_Socket (vlc_object_t *obj, int family, int socktype, int proto);
 
-VLC_EXPORT( int, net_Connect, (vlc_object_t *p_this, const char *psz_host, int i_port, int socktype, int protocol) );
+VLC_API int net_Connect(vlc_object_t *p_this, const char *psz_host, int i_port, int socktype, int protocol);
 #define net_Connect(a, b, c, d, e) net_Connect(VLC_OBJECT(a), b, c, d, e)
 
-VLC_EXPORT( int *, net_Listen, (vlc_object_t *p_this, const char *psz_host, int i_port, int socktype, int protocol) );
+VLC_API int * net_Listen(vlc_object_t *p_this, const char *psz_host, int i_port, int socktype, int protocol);
 
 #define net_ListenTCP(a, b, c) net_Listen(VLC_OBJECT(a), b, c, \
                                           SOCK_STREAM, IPPROTO_TCP)
@@ -111,13 +111,13 @@ static inline int net_ConnectTCP (vlc_object_t *obj, const char *host, int port)
 }
 #define net_ConnectTCP(a, b, c) net_ConnectTCP(VLC_OBJECT(a), b, c)
 
-VLC_EXPORT( int, net_AcceptSingle, (vlc_object_t *obj, int lfd) );
+VLC_API int net_AcceptSingle(vlc_object_t *obj, int lfd);
 
-VLC_EXPORT( int, net_Accept, ( vlc_object_t *, int * ) );
+VLC_API int net_Accept( vlc_object_t *, int * );
 #define net_Accept(a, b) \
         net_Accept(VLC_OBJECT(a), b)
 
-VLC_EXPORT( int, net_ConnectDgram, ( vlc_object_t *p_this, const char *psz_host, int i_port, int hlim, int proto ) );
+VLC_API int net_ConnectDgram( vlc_object_t *p_this, const char *psz_host, int i_port, int hlim, int proto );
 #define net_ConnectDgram(a, b, c, d, e ) \
         net_ConnectDgram(VLC_OBJECT(a), b, c, d, e)
 
@@ -126,7 +126,7 @@ static inline int net_ConnectUDP (vlc_object_t *obj, const char *host, int port,
     return net_ConnectDgram (obj, host, port, hlim, IPPROTO_UDP);
 }
 
-VLC_EXPORT( int, net_OpenDgram, ( vlc_object_t *p_this, const char *psz_bind, int i_bind, const char *psz_server, int i_server, int family, int proto ) );
+VLC_API int net_OpenDgram( vlc_object_t *p_this, const char *psz_bind, int i_bind, const char *psz_server, int i_server, int family, int proto );
 #define net_OpenDgram( a, b, c, d, e, g, h ) \
         net_OpenDgram(VLC_OBJECT(a), b, c, d, e, g, h)
 
@@ -135,12 +135,12 @@ static inline int net_ListenUDP1 (vlc_object_t *obj, const char *host, int port)
     return net_OpenDgram (obj, host, port, NULL, 0, 0, IPPROTO_UDP);
 }
 
-VLC_EXPORT( void, net_ListenClose, ( int *fd ) );
+VLC_API void net_ListenClose( int *fd );
 
 int net_Subscribe (vlc_object_t *obj, int fd, const struct sockaddr *addr,
                    socklen_t addrlen);
 
-VLC_EXPORT( int, net_SetCSCov, ( int fd, int sendcov, int recvcov ) );
+VLC_API int net_SetCSCov( int fd, int sendcov, int recvcov );
 
 /* Functions to read from or write to the networking layer */
 struct virtual_socket_t
@@ -150,24 +150,24 @@ struct virtual_socket_t
     int (*pf_send) ( void *, const void *, int );
 };
 
-VLC_EXPORT( ssize_t, net_Read, ( vlc_object_t *p_this, int fd, const v_socket_t *, void *p_data, size_t i_data, bool b_retry ) );
+VLC_API ssize_t net_Read( vlc_object_t *p_this, int fd, const v_socket_t *, void *p_data, size_t i_data, bool b_retry );
 #define net_Read(a,b,c,d,e,f) net_Read(VLC_OBJECT(a),b,c,d,e,f)
-VLC_EXPORT( ssize_t, net_Write, ( vlc_object_t *p_this, int fd, const v_socket_t *, const void *p_data, size_t i_data ) );
+VLC_API ssize_t net_Write( vlc_object_t *p_this, int fd, const v_socket_t *, const void *p_data, size_t i_data );
 #define net_Write(a,b,c,d,e) net_Write(VLC_OBJECT(a),b,c,d,e)
-VLC_EXPORT( char *, net_Gets, ( vlc_object_t *p_this, int fd, const v_socket_t * ) );
+VLC_API char * net_Gets( vlc_object_t *p_this, int fd, const v_socket_t * );
 #define net_Gets(a,b,c) net_Gets(VLC_OBJECT(a),b,c)
 
 
-VLC_EXPORT( ssize_t, net_Printf, ( vlc_object_t *p_this, int fd, const v_socket_t *, const char *psz_fmt, ... ) LIBVLC_FORMAT( 4, 5 ) );
+VLC_API ssize_t net_Printf( vlc_object_t *p_this, int fd, const v_socket_t *, const char *psz_fmt, ... ) LIBVLC_FORMAT( 4, 5 );
 #define net_Printf(o,fd,vs,...) net_Printf(VLC_OBJECT(o),fd,vs, __VA_ARGS__)
-VLC_EXPORT( ssize_t, net_vaPrintf, ( vlc_object_t *p_this, int fd, const v_socket_t *, const char *psz_fmt, va_list args ) );
+VLC_API ssize_t net_vaPrintf( vlc_object_t *p_this, int fd, const v_socket_t *, const char *psz_fmt, va_list args );
 #define net_vaPrintf(a,b,c,d,e) net_vaPrintf(VLC_OBJECT(a),b,c,d,e)
 
-VLC_EXPORT (int, vlc_inet_pton, (int af, const char *src, void *dst) );
-VLC_EXPORT (const char *, vlc_inet_ntop, (int af, const void *src,
-                                          char *dst, socklen_t cnt) );
+VLC_API int vlc_inet_pton(int af, const char *src, void *dst);
+VLC_API const char *vlc_inet_ntop(int af, const void *src,
+                                  char *dst, socklen_t cnt);
 struct pollfd;
-VLC_EXPORT (int, vlc_poll, (struct pollfd *fds, unsigned nfds, int timeout));
+VLC_API int vlc_poll(struct pollfd *fds, unsigned nfds, int timeout);
 
 
 #ifdef WIN32
@@ -234,8 +234,8 @@ VLC_EXPORT (int, vlc_poll, (struct pollfd *fds, unsigned nfds, int timeout));
 # define AI_NUMERICSERV 0
 #endif
 
-VLC_EXPORT( int, vlc_getnameinfo, ( const struct sockaddr *, int, char *, int, int *, int ) );
-VLC_EXPORT( int, vlc_getaddrinfo, ( vlc_object_t *, const char *, int, const struct addrinfo *, struct addrinfo ** ) );
+VLC_API int vlc_getnameinfo( const struct sockaddr *, int, char *, int, int *, int );
+VLC_API int vlc_getaddrinfo( vlc_object_t *, const char *, int, const struct addrinfo *, struct addrinfo ** );
 
 
 static inline bool

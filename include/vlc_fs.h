@@ -31,18 +31,18 @@
 #include <sys/types.h>
 #include <dirent.h>
 
-VLC_EXPORT( int, vlc_open, ( const char *filename, int flags, ... ) LIBVLC_USED );
-VLC_EXPORT( FILE *, vlc_fopen, ( const char *filename, const char *mode ) LIBVLC_USED );
-VLC_EXPORT( int, vlc_openat, ( int fd, const char *filename, int flags, ... ) LIBVLC_USED );
+VLC_API int vlc_open( const char *filename, int flags, ... ) LIBVLC_USED;
+VLC_API FILE * vlc_fopen( const char *filename, const char *mode ) LIBVLC_USED;
+VLC_API int vlc_openat( int fd, const char *filename, int flags, ... ) LIBVLC_USED;
 
-VLC_EXPORT( DIR *, vlc_opendir, ( const char *dirname ) LIBVLC_USED );
-VLC_EXPORT( char *, vlc_readdir, ( DIR *dir ) LIBVLC_USED );
-VLC_EXPORT( int, vlc_loaddir, ( DIR *dir, char ***namelist, int (*select)( const char * ), int (*compar)( const char **, const char ** ) ) );
-VLC_EXPORT( int, vlc_scandir, ( const char *dirname, char ***namelist, int (*select)( const char * ), int (*compar)( const char **, const char ** ) ) );
-VLC_EXPORT( int, vlc_mkdir, ( const char *filename, mode_t mode ) );
+VLC_API DIR * vlc_opendir( const char *dirname ) LIBVLC_USED;
+VLC_API char * vlc_readdir( DIR *dir ) LIBVLC_USED;
+VLC_API int vlc_loaddir( DIR *dir, char ***namelist, int (*select)( const char * ), int (*compar)( const char **, const char ** ) );
+VLC_API int vlc_scandir( const char *dirname, char ***namelist, int (*select)( const char * ), int (*compar)( const char **, const char ** ) );
+VLC_API int vlc_mkdir( const char *filename, mode_t mode );
 
-VLC_EXPORT( int, vlc_unlink, ( const char *filename ) );
-VLC_EXPORT( int, vlc_rename, ( const char *oldpath, const char *newpath ) );
+VLC_API int vlc_unlink( const char *filename );
+VLC_API int vlc_rename( const char *oldpath, const char *newpath );
 
 #if defined( WIN32 )
 # ifndef UNDER_CE
@@ -67,11 +67,11 @@ static inline void vlc_rewinddir( DIR *dir )
 # define rewinddir vlc_rewinddir
 #endif
 
-VLC_EXPORT( int, vlc_stat, ( const char *filename, struct stat *buf ) );
-VLC_EXPORT( int, vlc_lstat, ( const char *filename, struct stat *buf ) );
+VLC_API int vlc_stat( const char *filename, struct stat *buf );
+VLC_API int vlc_lstat( const char *filename, struct stat *buf );
 
-VLC_EXPORT( int, vlc_mkstemp, ( char * ) );
+VLC_API int vlc_mkstemp( char * );
 
-VLC_EXPORT( int, vlc_dup, ( int ) );
-VLC_EXPORT( int, vlc_pipe, ( int[2] ) );
+VLC_API int vlc_dup( int );
+VLC_API int vlc_pipe( int[2] );
 #endif

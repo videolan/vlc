@@ -54,43 +54,43 @@ typedef struct
  *
  * You must call vlc_epg_Clean to release the associated resource.
  */
-VLC_EXPORT(void, vlc_epg_Init, (vlc_epg_t *p_epg, const char *psz_name));
+VLC_API void vlc_epg_Init(vlc_epg_t *p_epg, const char *psz_name);
 
 /**
  * It releases all resources associated to a vlc_epg_t
  */
-VLC_EXPORT(void, vlc_epg_Clean, (vlc_epg_t *p_epg));
+VLC_API void vlc_epg_Clean(vlc_epg_t *p_epg);
 
 /**
  * It creates and appends a new vlc_epg_event_t to a vlc_epg_t.
  *
  * \see vlc_epg_t for the definitions of the parameters.
  */
-VLC_EXPORT(void, vlc_epg_AddEvent, (vlc_epg_t *p_epg, int64_t i_start, int i_duration, const char *psz_name, const char *psz_short_description, const char *psz_description));
+VLC_API void vlc_epg_AddEvent(vlc_epg_t *p_epg, int64_t i_start, int i_duration, const char *psz_name, const char *psz_short_description, const char *psz_description);
 
 /**
  * It creates a new vlc_epg_t*
  *
  * You must call vlc_epg_Delete to release the associated resource.
  */
-VLC_EXPORT(vlc_epg_t *, vlc_epg_New, (const char *psz_name) LIBVLC_USED);
+VLC_API vlc_epg_t * vlc_epg_New(const char *psz_name) LIBVLC_USED;
 
 /**
  * It releases a vlc_epg_t*.
  */
-VLC_EXPORT(void, vlc_epg_Delete, (vlc_epg_t *p_epg));
+VLC_API void vlc_epg_Delete(vlc_epg_t *p_epg);
 
 /**
  * It set the current event of a vlc_epg_t given a start time
  */
-VLC_EXPORT(void, vlc_epg_SetCurrent, (vlc_epg_t *p_epg, int64_t i_start));
+VLC_API void vlc_epg_SetCurrent(vlc_epg_t *p_epg, int64_t i_start);
 
 /**
  * It merges all the event of \p p_src and \p p_dst into \p p_dst.
  *
  * \p p_src is not modified.
  */
-VLC_EXPORT(void, vlc_epg_Merge, (vlc_epg_t *p_dst, const vlc_epg_t *p_src));
+VLC_API void vlc_epg_Merge(vlc_epg_t *p_dst, const vlc_epg_t *p_src);
 
 #endif
 

@@ -39,9 +39,9 @@ struct iso639_lang_t
 #if defined( __cplusplus )
 extern "C" {
 #endif
-VLC_EXPORT( const iso639_lang_t *, GetLang_1, ( const char * ) );
-VLC_EXPORT( const iso639_lang_t *, GetLang_2T, ( const char * ) );
-VLC_EXPORT( const iso639_lang_t *, GetLang_2B, ( const char * ) );
+VLC_API const iso639_lang_t * GetLang_1( const char * );
+VLC_API const iso639_lang_t * GetLang_2T( const char * );
+VLC_API const iso639_lang_t * GetLang_2B( const char * );
 #if defined( __cplusplus )
 }
 #endif

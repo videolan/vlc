@@ -62,14 +62,14 @@ struct vlc_object_t
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-VLC_EXPORT( void *, vlc_object_create, ( vlc_object_t *, size_t ) ) LIBVLC_MALLOC LIBVLC_USED;
-VLC_EXPORT( void, vlc_object_attach, ( vlc_object_t *, vlc_object_t * ) );
-VLC_EXPORT( vlc_object_t *, vlc_object_find_name, ( vlc_object_t *, const char *, int ) ) LIBVLC_USED LIBVLC_DEPRECATED;
-VLC_EXPORT( void *, vlc_object_hold, ( vlc_object_t * ) );
-VLC_EXPORT( void, vlc_object_release, ( vlc_object_t * ) );
-VLC_EXPORT( vlc_list_t *, vlc_list_children, ( vlc_object_t * ) ) LIBVLC_USED;
-VLC_EXPORT( void, vlc_list_release, ( vlc_list_t * ) );
-VLC_EXPORT( char *, vlc_object_get_name, ( const vlc_object_t * ) ) LIBVLC_USED;
+VLC_API void *vlc_object_create( vlc_object_t *, size_t ) LIBVLC_MALLOC LIBVLC_USED;
+VLC_API void vlc_object_attach( vlc_object_t *, vlc_object_t * );
+VLC_API vlc_object_t *vlc_object_find_name( vlc_object_t *, const char *, int ) LIBVLC_USED LIBVLC_DEPRECATED;
+VLC_API void * vlc_object_hold( vlc_object_t * );
+VLC_API void vlc_object_release( vlc_object_t * );
+VLC_API vlc_list_t *vlc_list_children( vlc_object_t * ) LIBVLC_USED;
+VLC_API void vlc_list_release( vlc_list_t * );
+VLC_API char *vlc_object_get_name( const vlc_object_t * ) LIBVLC_USED;
 #define vlc_object_get_name(o) vlc_object_get_name(VLC_OBJECT(o))
 
 /**}@*/
@@ -92,7 +92,7 @@ VLC_EXPORT( char *, vlc_object_get_name, ( const vlc_object_t * ) ) LIBVLC_USED;
     vlc_list_children( VLC_OBJECT(a) )
 
 /* Objects and threading */
-VLC_EXPORT( void, vlc_object_kill, ( vlc_object_t * ) );
+VLC_API void vlc_object_kill( vlc_object_t * );
 #define vlc_object_kill(a) \
     vlc_object_kill( VLC_OBJECT(a) )
 

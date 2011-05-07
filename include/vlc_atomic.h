@@ -28,9 +28,9 @@
 
 /* All functions return the atom value _after_ the operation. */
 
-VLC_EXPORT(uintptr_t, vlc_atomic_get, (const vlc_atomic_t *));
-VLC_EXPORT(uintptr_t, vlc_atomic_set, (vlc_atomic_t *, uintptr_t));
-VLC_EXPORT(uintptr_t, vlc_atomic_add, (vlc_atomic_t *, uintptr_t));
+VLC_API uintptr_t vlc_atomic_get(const vlc_atomic_t *);
+VLC_API uintptr_t vlc_atomic_set(vlc_atomic_t *, uintptr_t);
+VLC_API uintptr_t vlc_atomic_add(vlc_atomic_t *, uintptr_t);
 
 static inline uintptr_t vlc_atomic_sub (vlc_atomic_t *atom, uintptr_t v)
 {
@@ -47,7 +47,7 @@ static inline uintptr_t vlc_atomic_dec (vlc_atomic_t *atom)
     return vlc_atomic_sub (atom, 1);
 }
 
-VLC_EXPORT(uintptr_t, vlc_atomic_swap, (vlc_atomic_t *, uintptr_t));
-VLC_EXPORT(uintptr_t, vlc_atomic_compare_swap, (vlc_atomic_t *, uintptr_t, uintptr_t));
+VLC_API uintptr_t vlc_atomic_swap(vlc_atomic_t *, uintptr_t);
+VLC_API uintptr_t vlc_atomic_compare_swap(vlc_atomic_t *, uintptr_t, uintptr_t);
 
 #endif

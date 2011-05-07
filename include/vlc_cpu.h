@@ -62,8 +62,8 @@
 #  define CPU_CAPABILITY_NEON    (0)
 # endif
 
-VLC_EXPORT( unsigned, vlc_CPU, ( void ) );
-VLC_EXPORT( unsigned, vlc_GetCPUCount, ( void ) );
+VLC_API unsigned vlc_CPU( void );
+VLC_API unsigned vlc_GetCPUCount( void );
 
 /** Are floating point operations fast?
  * If this bit is not set, you should try to use fixed-point instead.
@@ -88,7 +88,7 @@ VLC_EXPORT( unsigned, vlc_GetCPUCount, ( void ) );
 typedef void *(*vlc_memcpy_t) (void *tgt, const void *src, size_t n);
 typedef void *(*vlc_memset_t) (void *tgt, int c, size_t n);
 
-VLC_EXPORT( void, vlc_fastmem_register, (vlc_memcpy_t cpy, vlc_memset_t set) );
+VLC_API void vlc_fastmem_register(vlc_memcpy_t cpy, vlc_memset_t set);
 
 #endif /* !VLC_CPU_H */
 

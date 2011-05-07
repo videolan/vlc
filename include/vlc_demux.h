@@ -161,7 +161,7 @@ enum demux_query_e
     DEMUX_CAN_SEEK,            /* arg1= bool*    can fail (assume false)*/
 };
 
-VLC_EXPORT( int,       demux_vaControlHelper, ( stream_t *, int64_t i_start, int64_t i_end, int64_t i_bitrate, int i_align, int i_query, va_list args ) );
+VLC_API int demux_vaControlHelper( stream_t *, int64_t i_start, int64_t i_end, int64_t i_bitrate, int i_align, int i_query, va_list args );
 
 /*************************************************************************
  * Miscellaneous helpers for demuxers
@@ -194,18 +194,18 @@ static inline bool demux_IsForced( demux_t *p_demux, const char *psz_name )
  * The provided es_format_t will be cleaned on error or by
  * demux_PacketizerDestroy.
  */
-VLC_EXPORT( decoder_t *,demux_PacketizerNew, ( demux_t *p_demux, es_format_t *p_fmt, const char *psz_msg ) LIBVLC_USED );
+VLC_API decoder_t * demux_PacketizerNew( demux_t *p_demux, es_format_t *p_fmt, const char *psz_msg ) LIBVLC_USED;
 
 /**
  * This function will destroy a packetizer create by demux_PacketizerNew.
  */
-VLC_EXPORT( void, demux_PacketizerDestroy, ( decoder_t *p_packetizer ) );
+VLC_API void demux_PacketizerDestroy( decoder_t *p_packetizer );
 
 /**
  * This function will return the parent input of this demux.
  * It is retained. Can return NULL.
  */
-VLC_EXPORT( input_thread_t *, demux_GetParentInput, ( demux_t *p_demux ) LIBVLC_USED );
+VLC_API input_thread_t * demux_GetParentInput( demux_t *p_demux ) LIBVLC_USED;
 
 /* */
 #define DEMUX_INIT_COMMON() do {            \

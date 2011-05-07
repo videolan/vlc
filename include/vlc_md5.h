@@ -43,9 +43,9 @@ struct md5_s
     uint32_t p_data[16];  /* Buffer to cache non-aligned writes */
 };
 
-VLC_EXPORT(void, InitMD5, ( struct md5_s * ) );
-VLC_EXPORT(void, AddMD5, ( struct md5_s *, const void *, size_t ) );
-VLC_EXPORT(void, EndMD5, ( struct md5_s * ) );
+VLC_API void InitMD5( struct md5_s * );
+VLC_API void AddMD5( struct md5_s *, const void *, size_t );
+VLC_API void EndMD5( struct md5_s * );
 
 /**
  * Returns a char representation of the md5 hash, as shown by UNIX md5 or

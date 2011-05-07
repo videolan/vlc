@@ -46,9 +46,9 @@ struct xml_t
                             const char * );
 };
 
-VLC_EXPORT( xml_t *, xml_Create, ( vlc_object_t * ) LIBVLC_USED );
+VLC_API xml_t * xml_Create( vlc_object_t * ) LIBVLC_USED;
 #define xml_Create( a ) xml_Create( VLC_OBJECT(a) )
-VLC_EXPORT( void, xml_Delete, ( xml_t * ) );
+VLC_API void xml_Delete( xml_t * );
 
 static inline void xml_CatalogLoad( xml_t *xml, const char *catalog )
 {
@@ -76,10 +76,10 @@ struct xml_reader_t
     int (*pf_use_dtd) ( xml_reader_t * );
 };
 
-VLC_EXPORT( xml_reader_t *, xml_ReaderCreate, (vlc_object_t *, stream_t *) LIBVLC_USED );
+VLC_API xml_reader_t * xml_ReaderCreate(vlc_object_t *, stream_t *) LIBVLC_USED;
 #define xml_ReaderCreate( a, s ) xml_ReaderCreate(VLC_OBJECT(a), s)
-VLC_EXPORT( void, xml_ReaderDelete, (xml_reader_t *) );
-VLC_EXPORT( xml_reader_t *, xml_ReaderReset, (xml_reader_t *, stream_t *) LIBVLC_USED );
+VLC_API void xml_ReaderDelete(xml_reader_t *);
+VLC_API xml_reader_t * xml_ReaderReset(xml_reader_t *, stream_t *) LIBVLC_USED;
 
 static inline int xml_ReaderNextNode( xml_reader_t *reader, const char **pval )
 {

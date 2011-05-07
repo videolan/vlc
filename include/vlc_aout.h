@@ -256,7 +256,7 @@ static const uint32_t pi_vlc_chan_order_wg4[] =
  * Prototypes
  *****************************************************************************/
 
-VLC_EXPORT( aout_buffer_t *, aout_OutputNextBuffer, ( aout_instance_t *, mtime_t, bool ) LIBVLC_USED );
+VLC_API aout_buffer_t * aout_OutputNextBuffer( aout_instance_t *, mtime_t, bool ) LIBVLC_USED;
 
 /**
  * This function computes the reordering needed to go from pi_chan_order_in to
@@ -264,8 +264,8 @@ VLC_EXPORT( aout_buffer_t *, aout_OutputNextBuffer, ( aout_instance_t *, mtime_t
  * If pi_chan_order_in or pi_chan_order_out is NULL, it will assume that vlc
  * internal (WG4) order is requested.
  */
-VLC_EXPORT( int, aout_CheckChannelReorder, ( const uint32_t *pi_chan_order_in, const uint32_t *pi_chan_order_out, uint32_t i_channel_mask, int i_channels, int *pi_chan_table ) );
-VLC_EXPORT( void, aout_ChannelReorder, ( uint8_t *, int, int, const int *, int ) );
+VLC_API int aout_CheckChannelReorder( const uint32_t *pi_chan_order_in, const uint32_t *pi_chan_order_out, uint32_t i_channel_mask, int i_channels, int *pi_chan_table );
+VLC_API void aout_ChannelReorder( uint8_t *, int, int, const int *, int );
 
 /**
  * This fonction will compute the extraction parameter into pi_selection to go
@@ -283,7 +283,7 @@ VLC_EXPORT( void, aout_ChannelReorder, ( uint8_t *, int, int, const int *, int )
  * by VLC. In this case the channel type pi_order_src[] must be set to 0.
  * XXX It must also be used if multiple channels have the same type.
  */
-VLC_EXPORT( bool, aout_CheckChannelExtraction, ( int *pi_selection, uint32_t *pi_layout, int *pi_channels, const uint32_t pi_order_dst[AOUT_CHAN_MAX], const uint32_t *pi_order_src, int i_channels ) );
+VLC_API bool aout_CheckChannelExtraction( int *pi_selection, uint32_t *pi_layout, int *pi_channels, const uint32_t pi_order_dst[AOUT_CHAN_MAX], const uint32_t *pi_order_src, int i_channels );
 
 /**
  * Do the actual channels extraction using the parameters created by
@@ -292,7 +292,7 @@ VLC_EXPORT( bool, aout_CheckChannelExtraction, ( int *pi_selection, uint32_t *pi
  * XXX this function does not work in place (p_dst and p_src must not overlap).
  * XXX Only 8, 16, 24, 32, 64 bits per sample are supported.
  */
-VLC_EXPORT( void, aout_ChannelExtract, ( void *p_dst, int i_dst_channels, const void *p_src, int i_src_channels, int i_sample_count, const int *pi_selection, int i_bits_per_sample ) );
+VLC_API void aout_ChannelExtract( void *p_dst, int i_dst_channels, const void *p_src, int i_src_channels, int i_sample_count, const int *pi_selection, int i_bits_per_sample );
 
 /* */
 static inline unsigned aout_FormatNbChannels(const audio_sample_format_t *fmt)
@@ -300,37 +300,37 @@ static inline unsigned aout_FormatNbChannels(const audio_sample_format_t *fmt)
     return popcount(fmt->i_physical_channels & AOUT_CHAN_PHYSMASK);
 }
 
-VLC_EXPORT( unsigned int, aout_BitsPerSample, ( vlc_fourcc_t i_format ) LIBVLC_USED );
-VLC_EXPORT( void, aout_FormatPrepare, ( audio_sample_format_t * p_format ) );
-VLC_EXPORT( void, aout_FormatPrint, ( aout_instance_t * p_aout, const char * psz_text, const audio_sample_format_t * p_format ) );
-VLC_EXPORT( const char *, aout_FormatPrintChannels, ( const audio_sample_format_t * ) LIBVLC_USED );
+VLC_API unsigned int aout_BitsPerSample( vlc_fourcc_t i_format ) LIBVLC_USED;
+VLC_API void aout_FormatPrepare( audio_sample_format_t * p_format );
+VLC_API void aout_FormatPrint( aout_instance_t * p_aout, const char * psz_text, const audio_sample_format_t * p_format );
+VLC_API const char * aout_FormatPrintChannels( const audio_sample_format_t * ) LIBVLC_USED;
 
-VLC_EXPORT( mtime_t, aout_FifoFirstDate, ( aout_instance_t *, aout_fifo_t * ) LIBVLC_USED );
-VLC_EXPORT( aout_buffer_t *, aout_FifoPop, ( aout_instance_t * p_aout, aout_fifo_t * p_fifo ) LIBVLC_USED );
+VLC_API mtime_t aout_FifoFirstDate( aout_instance_t *, aout_fifo_t * ) LIBVLC_USED;
+VLC_API aout_buffer_t * aout_FifoPop( aout_instance_t * p_aout, aout_fifo_t * p_fifo ) LIBVLC_USED;
 
 /* From intf.c : */
-VLC_EXPORT( void, aout_VolumeSoftInit, ( aout_instance_t * ) );
-VLC_EXPORT( void, aout_VolumeNoneInit, ( aout_instance_t * ) );
-VLC_EXPORT( audio_volume_t, aout_VolumeGet, ( vlc_object_t * ) );
+VLC_API void aout_VolumeSoftInit( aout_instance_t * );
+VLC_API void aout_VolumeNoneInit( aout_instance_t * );
+VLC_API audio_volume_t aout_VolumeGet( vlc_object_t * );
 #define aout_VolumeGet(a) aout_VolumeGet(VLC_OBJECT(a))
-VLC_EXPORT( int, aout_VolumeSet, ( vlc_object_t *, audio_volume_t ) );
+VLC_API int aout_VolumeSet( vlc_object_t *, audio_volume_t );
 #define aout_VolumeSet(a, b) aout_VolumeSet(VLC_OBJECT(a), b)
-VLC_EXPORT( int, aout_VolumeUp, ( vlc_object_t *, int, audio_volume_t * ) );
+VLC_API int aout_VolumeUp( vlc_object_t *, int, audio_volume_t * );
 #define aout_VolumeUp(a, b, c) aout_VolumeUp(VLC_OBJECT(a), b, c)
-VLC_EXPORT( int, aout_VolumeDown, ( vlc_object_t *, int, audio_volume_t * ) );
+VLC_API int aout_VolumeDown( vlc_object_t *, int, audio_volume_t * );
 #define aout_VolumeDown(a, b, c) aout_VolumeDown(VLC_OBJECT(a), b, c)
-VLC_EXPORT( int, aout_ToggleMute, ( vlc_object_t *, audio_volume_t * ) );
+VLC_API int aout_ToggleMute( vlc_object_t *, audio_volume_t * );
 #define aout_ToggleMute(a, b) aout_ToggleMute(VLC_OBJECT(a), b)
-VLC_EXPORT( int, aout_SetMute, ( vlc_object_t *, audio_volume_t *, bool ) );
-VLC_EXPORT( bool, aout_IsMuted, ( vlc_object_t * ) );
-VLC_EXPORT( int, aout_ChannelsRestart, ( vlc_object_t *, const char *, vlc_value_t, vlc_value_t, void * ) );
+VLC_API int aout_SetMute( vlc_object_t *, audio_volume_t *, bool );
+VLC_API bool aout_IsMuted( vlc_object_t * );
+VLC_API int aout_ChannelsRestart( vlc_object_t *, const char *, vlc_value_t, vlc_value_t, void * );
 
-VLC_EXPORT( void, aout_EnableFilter, (vlc_object_t *, const char *, bool ));
+VLC_API void aout_EnableFilter(vlc_object_t *, const char *, bool );
 #define aout_EnableFilter( o, n, b ) \
         aout_EnableFilter( VLC_OBJECT(o), n, b )
 
 /* */
-VLC_EXPORT( vout_thread_t *, aout_filter_RequestVout, ( filter_t *, vout_thread_t *p_vout, video_format_t *p_fmt ) LIBVLC_USED );
+VLC_API vout_thread_t * aout_filter_RequestVout( filter_t *, vout_thread_t *p_vout, video_format_t *p_fmt ) LIBVLC_USED;
 
 # ifdef __cplusplus
 }

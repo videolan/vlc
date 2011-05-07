@@ -29,7 +29,7 @@
  * This file implements plugin (module) macros used to define a vlc module.
  */
 
-VLC_EXPORT( int, vlc_plugin_set, (module_t *, module_config_t *, int, ...) );
+VLC_API int vlc_plugin_set(module_t *, module_config_t *, int, ...);
 
 #define vlc_module_set( mod, ... ) vlc_plugin_set ((mod), NULL, __VA_ARGS__)
 #define vlc_config_set( cfg, ... ) vlc_plugin_set (NULL, (cfg), __VA_ARGS__)

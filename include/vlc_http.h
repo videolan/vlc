@@ -49,19 +49,19 @@ typedef struct http_auth_t
 } http_auth_t;
 
 
-VLC_EXPORT( void, http_auth_Init, ( http_auth_t * ) );
-VLC_EXPORT( void, http_auth_Reset, ( http_auth_t * ) );
-VLC_EXPORT( void, http_auth_ParseWwwAuthenticateHeader,
+VLC_API void http_auth_Init( http_auth_t * );
+VLC_API void http_auth_Reset( http_auth_t * );
+VLC_API void http_auth_ParseWwwAuthenticateHeader
             ( vlc_object_t *, http_auth_t * ,
-              const char * ) );
-VLC_EXPORT( int, http_auth_ParseAuthenticationInfoHeader,
+              const char * );
+VLC_API int http_auth_ParseAuthenticationInfoHeader
             ( vlc_object_t *, http_auth_t *,
               const char *, const char *,
               const char *, const char *,
-              const char * ) );
-VLC_EXPORT( char *, http_auth_FormatAuthorizationHeader,
+              const char * );
+VLC_API char *http_auth_FormatAuthorizationHeader
             ( vlc_object_t *, http_auth_t *,
               const char *, const char *,
-              const char *, const char * ) LIBVLC_USED );
+              const char *, const char * ) LIBVLC_USED;
 
 #endif /* VLC_HTTP_H */

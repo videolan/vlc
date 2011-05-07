@@ -184,16 +184,16 @@ struct vlm_message_t
 extern "C" {
 #endif
 
-VLC_EXPORT( vlm_t *, vlm_New, ( vlc_object_t * ) );
+VLC_API vlm_t * vlm_New( vlc_object_t * );
 #define vlm_New( a ) vlm_New( VLC_OBJECT(a) )
-VLC_EXPORT( void,      vlm_Delete, ( vlm_t * ) );
-VLC_EXPORT( int,       vlm_ExecuteCommand, ( vlm_t *, const char *, vlm_message_t ** ) );
-VLC_EXPORT( int,       vlm_Control, ( vlm_t *p_vlm, int i_query, ... ) );
+VLC_API void vlm_Delete( vlm_t * );
+VLC_API int vlm_ExecuteCommand( vlm_t *, const char *, vlm_message_t ** );
+VLC_API int vlm_Control( vlm_t *p_vlm, int i_query, ... );
 
-VLC_EXPORT( vlm_message_t *, vlm_MessageSimpleNew, ( const char * ) );
-VLC_EXPORT( vlm_message_t *, vlm_MessageNew, ( const char *, const char *, ... ) LIBVLC_FORMAT( 2, 3 ) );
-VLC_EXPORT( vlm_message_t *, vlm_MessageAdd, ( vlm_message_t *, vlm_message_t * ) );
-VLC_EXPORT( void,            vlm_MessageDelete, ( vlm_message_t * ) );
+VLC_API vlm_message_t * vlm_MessageSimpleNew( const char * );
+VLC_API vlm_message_t * vlm_MessageNew( const char *, const char *, ... ) LIBVLC_FORMAT( 2, 3 );
+VLC_API vlm_message_t * vlm_MessageAdd( vlm_message_t *, vlm_message_t * );
+VLC_API void vlm_MessageDelete( vlm_message_t * );
 
 /* media helpers */
 
@@ -266,11 +266,11 @@ static inline void vlm_media_Clean( vlm_media_t *p_media )
     free( p_media->psz_name );
 
     for( i = 0; i < p_media->i_input; i++ )
-        free( p_media->ppsz_input[i]) ;
+        free( p_media->ppsz_input[i]);
     TAB_CLEAN(p_media->i_input, p_media->ppsz_input );
 
     for( i = 0; i < p_media->i_option; i++ )
-        free( p_media->ppsz_option[i]) ;
+        free( p_media->ppsz_option[i]);
     TAB_CLEAN(p_media->i_option, p_media->ppsz_option );
 
     free( p_media->psz_output );

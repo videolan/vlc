@@ -188,25 +188,25 @@ struct module_config_t
  * Prototypes - these methods are used to get, set or manipulate configuration
  * data.
  *****************************************************************************/
-VLC_EXPORT( int,    config_GetType,  (vlc_object_t *, const char *) LIBVLC_USED );
-VLC_EXPORT( int64_t, config_GetInt,  (vlc_object_t *, const char *) LIBVLC_USED );
-VLC_EXPORT( void,   config_PutInt,   (vlc_object_t *, const char *, int64_t) );
-VLC_EXPORT( float,  config_GetFloat, (vlc_object_t *, const char *) LIBVLC_USED );
-VLC_EXPORT( void,   config_PutFloat, (vlc_object_t *, const char *, float) );
-VLC_EXPORT( char *, config_GetPsz,   (vlc_object_t *, const char *) LIBVLC_USED LIBVLC_MALLOC );
-VLC_EXPORT( void,   config_PutPsz,   (vlc_object_t *, const char *, const char *) );
+VLC_API int config_GetType(vlc_object_t *, const char *) LIBVLC_USED;
+VLC_API int64_t config_GetInt(vlc_object_t *, const char *) LIBVLC_USED;
+VLC_API void config_PutInt(vlc_object_t *, const char *, int64_t);
+VLC_API float config_GetFloat(vlc_object_t *, const char *) LIBVLC_USED;
+VLC_API void config_PutFloat(vlc_object_t *, const char *, float);
+VLC_API char * config_GetPsz(vlc_object_t *, const char *) LIBVLC_USED LIBVLC_MALLOC;
+VLC_API void config_PutPsz(vlc_object_t *, const char *, const char *);
 
-VLC_EXPORT( int,    config_SaveConfigFile, ( vlc_object_t * ) );
+VLC_API int config_SaveConfigFile( vlc_object_t * );
 #define config_SaveConfigFile(a) config_SaveConfigFile(VLC_OBJECT(a))
 
-VLC_EXPORT( void,   config_ResetAll, ( vlc_object_t * ) );
+VLC_API void config_ResetAll( vlc_object_t * );
 #define config_ResetAll(a) config_ResetAll(VLC_OBJECT(a))
 
-VLC_EXPORT( module_config_t *, config_FindConfig,( vlc_object_t *, const char * ) LIBVLC_USED );
-VLC_EXPORT(char *, config_GetDataDir, ( vlc_object_t * ) LIBVLC_USED LIBVLC_MALLOC );
+VLC_API module_config_t * config_FindConfig( vlc_object_t *, const char * ) LIBVLC_USED;
+VLC_API char * config_GetDataDir( vlc_object_t * ) LIBVLC_USED LIBVLC_MALLOC;
 #define config_GetDataDir(a) config_GetDataDir(VLC_OBJECT(a))
-VLC_EXPORT(const char *, config_GetLibDir, ( void ) LIBVLC_USED);
-VLC_EXPORT(const char *, config_GetConfDir, ( void ) LIBVLC_USED);
+VLC_API const char * config_GetLibDir( void ) LIBVLC_USED;
+VLC_API const char * config_GetConfDir( void ) LIBVLC_USED;
 
 typedef enum vlc_userdir
 {
@@ -225,11 +225,11 @@ typedef enum vlc_userdir
     VLC_VIDEOS_DIR,
 } vlc_userdir_t;
 
-VLC_EXPORT(char *, config_GetUserDir, ( vlc_userdir_t ) LIBVLC_USED LIBVLC_MALLOC );
+VLC_API char * config_GetUserDir( vlc_userdir_t ) LIBVLC_USED LIBVLC_MALLOC;
 
-VLC_EXPORT( void, config_AddIntf,    ( vlc_object_t *, const char * ) );
-VLC_EXPORT( void, config_RemoveIntf, ( vlc_object_t *, const char * ) );
-VLC_EXPORT( bool, config_ExistIntf,  ( vlc_object_t *, const char * ) LIBVLC_USED);
+VLC_API void config_AddIntf( vlc_object_t *, const char * );
+VLC_API void config_RemoveIntf( vlc_object_t *, const char * );
+VLC_API bool config_ExistIntf( vlc_object_t *, const char * ) LIBVLC_USED;
 
 #define config_GetType(a,b) config_GetType(VLC_OBJECT(a),b)
 #define config_GetInt(a,b) config_GetInt(VLC_OBJECT(a),b)
@@ -261,7 +261,7 @@ struct config_chain_t
  *
  * The option names will be created by adding the psz_prefix prefix.
  */
-VLC_EXPORT( void, config_ChainParse, ( vlc_object_t *, const char *psz_prefix, const char *const *ppsz_options, config_chain_t * ) );
+VLC_API void config_ChainParse( vlc_object_t *, const char *psz_prefix, const char *const *ppsz_options, config_chain_t * );
 #define config_ChainParse( a, b, c, d ) config_ChainParse( VLC_OBJECT(a), b, c, d )
 
 /**
@@ -275,18 +275,18 @@ VLC_EXPORT( void, config_ChainParse, ( vlc_object_t *, const char *psz_prefix, c
  *
  * The options values are unescaped using config_StringUnescape.
  */
-VLC_EXPORT( char *, config_ChainCreate, ( char **ppsz_name, config_chain_t **pp_cfg, const char *psz_string ) ) LIBVLC_USED LIBVLC_MALLOC;
+VLC_API char *config_ChainCreate( char **ppsz_name, config_chain_t **pp_cfg, const char *psz_string ) LIBVLC_USED LIBVLC_MALLOC;
 
 /**
  * This function will release a linked list of config_chain_t
  * (Including the head)
  */
-VLC_EXPORT( void, config_ChainDestroy, ( config_chain_t * ) );
+VLC_API void config_ChainDestroy( config_chain_t * );
 
 /**
  * This function will duplicate a linked list of config_chain_t
  */
-VLC_EXPORT( config_chain_t *, config_ChainDuplicate, ( const config_chain_t * ) LIBVLC_USED LIBVLC_MALLOC );
+VLC_API config_chain_t * config_ChainDuplicate( const config_chain_t * ) LIBVLC_USED LIBVLC_MALLOC;
 
 /**
  * This function will unescape a string in place and will return a pointer on
@@ -297,7 +297,7 @@ VLC_EXPORT( config_chain_t *, config_ChainDuplicate, ( const config_chain_t * ) 
  * The following sequences will be unescaped (only one time):
  * \\ \' and \"
  */
-VLC_EXPORT( char *, config_StringUnescape, ( char *psz_string ) );
+VLC_API char * config_StringUnescape( char *psz_string );
 
 /**
  * This function will escape a string that can be unescaped by
@@ -308,7 +308,7 @@ VLC_EXPORT( char *, config_StringUnescape, ( char *psz_string ) );
  *
  * The escaped characters are ' " and \
  */
-VLC_EXPORT( char *, config_StringEscape, ( const char *psz_string ) LIBVLC_USED LIBVLC_MALLOC );
+VLC_API char * config_StringEscape( const char *psz_string ) LIBVLC_USED LIBVLC_MALLOC;
 
 # ifdef __cplusplus
 }

@@ -526,22 +526,22 @@ enum input_query_e
  * Prototypes
  *****************************************************************************/
 
-VLC_EXPORT( input_thread_t *, input_Create, ( vlc_object_t *p_parent, input_item_t *, const char *psz_log, input_resource_t * ) LIBVLC_USED );
+VLC_API input_thread_t * input_Create( vlc_object_t *p_parent, input_item_t *, const char *psz_log, input_resource_t * ) LIBVLC_USED;
 #define input_Create(a,b,c,d) input_Create(VLC_OBJECT(a),b,c,d)
 
-VLC_EXPORT( input_thread_t *, input_CreateAndStart, ( vlc_object_t *p_parent, input_item_t *, const char *psz_log ) LIBVLC_USED );
+VLC_API input_thread_t * input_CreateAndStart( vlc_object_t *p_parent, input_item_t *, const char *psz_log ) LIBVLC_USED;
 #define input_CreateAndStart(a,b,c) input_CreateAndStart(VLC_OBJECT(a),b,c)
 
-VLC_EXPORT( int,  input_Start, ( input_thread_t * ) );
+VLC_API int input_Start( input_thread_t * );
 
-VLC_EXPORT( void, input_Stop, ( input_thread_t *, bool b_abort ) );
+VLC_API void input_Stop( input_thread_t *, bool b_abort );
 
-VLC_EXPORT( int, input_Read, ( vlc_object_t *, input_item_t * ) );
+VLC_API int input_Read( vlc_object_t *, input_item_t * );
 #define input_Read(a,b) input_Read(VLC_OBJECT(a),b)
 
-VLC_EXPORT( int, input_vaControl,( input_thread_t *, int i_query, va_list  ) );
+VLC_API int input_vaControl( input_thread_t *, int i_query, va_list  );
 
-VLC_EXPORT( int, input_Control,  ( input_thread_t *, int i_query, ...  ) );
+VLC_API int input_Control( input_thread_t *, int i_query, ...  );
 
 /**
  * Get the input item for an input thread
@@ -549,7 +549,7 @@ VLC_EXPORT( int, input_Control,  ( input_thread_t *, int i_query, ...  ) );
  * You have to keep a reference to the input or to the input_item_t until
  * you do not need it anymore.
  */
-VLC_EXPORT( input_item_t*, input_GetItem, ( input_thread_t * ) LIBVLC_USED );
+VLC_API input_item_t* input_GetItem( input_thread_t * ) LIBVLC_USED;
 
 /**
  * It will return the current state of the input.
@@ -635,9 +635,9 @@ static inline int input_ModifyPcrSystem( input_thread_t *p_input, bool b_absolut
 }
 
 /* */
-VLC_EXPORT( decoder_t *, input_DecoderCreate, ( vlc_object_t *, es_format_t *, input_resource_t * ) LIBVLC_USED );
-VLC_EXPORT( void, input_DecoderDelete, ( decoder_t * ) );
-VLC_EXPORT( void, input_DecoderDecode,( decoder_t *, block_t *, bool b_do_pace ) );
+VLC_API decoder_t * input_DecoderCreate( vlc_object_t *, es_format_t *, input_resource_t * ) LIBVLC_USED;
+VLC_API void input_DecoderDelete( decoder_t * );
+VLC_API void input_DecoderDecode( decoder_t *, block_t *, bool b_do_pace );
 
 /**
  * This function allows to split a MRL into access, demux and path part.
@@ -646,12 +646,12 @@ VLC_EXPORT( void, input_DecoderDecode,( decoder_t *, block_t *, bool b_do_pace )
  * the provided buffer.
  *  The buffer provided by psz_dup will be modified.
  */
-VLC_EXPORT( void, input_SplitMRL, ( const char **ppsz_access, const char **ppsz_demux, char **ppsz_path, char *psz_dup ) );
+VLC_API void input_SplitMRL( const char **ppsz_access, const char **ppsz_demux, char **ppsz_path, char *psz_dup );
 
 /**
  * This function creates a sane filename path.
  */
-VLC_EXPORT( char *, input_CreateFilename, ( vlc_object_t *, const char *psz_path, const char *psz_prefix, const char *psz_extension ) LIBVLC_USED );
+VLC_API char * input_CreateFilename( vlc_object_t *, const char *psz_path, const char *psz_prefix, const char *psz_extension ) LIBVLC_USED;
 
 /**
  * It creates an empty input resource handler.
@@ -659,21 +659,21 @@ VLC_EXPORT( char *, input_CreateFilename, ( vlc_object_t *, const char *psz_path
  * The given object MUST stay alive as long as the input_resource_t is
  * not deleted.
  */
-VLC_EXPORT( input_resource_t *, input_resource_New, ( vlc_object_t * ) LIBVLC_USED );
+VLC_API input_resource_t * input_resource_New( vlc_object_t * ) LIBVLC_USED;
 
 /**
  * It releases an input resource.
  */
-VLC_EXPORT(void, input_resource_Release, ( input_resource_t * ) );
+VLC_API void input_resource_Release( input_resource_t * );
 
 /**
  * Forcefully destroys the video output (e.g. when the playlist is stopped).
  */
-VLC_EXPORT(void, input_resource_TerminateVout, ( input_resource_t * ) );
+VLC_API void input_resource_TerminateVout( input_resource_t * );
 
 /**
  * This function releases all resources (object).
  */
-VLC_EXPORT( void, input_resource_Terminate, ( input_resource_t * ) );
+VLC_API void input_resource_Terminate( input_resource_t * );
 
 #endif

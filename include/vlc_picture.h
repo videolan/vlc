@@ -114,7 +114,7 @@ struct picture_t
  * with picture_Hold and picture_Release. This default management will release
  * p_sys, p_q, p_data_orig fields if non NULL.
  */
-VLC_EXPORT( picture_t *, picture_New, ( vlc_fourcc_t i_chroma, int i_width, int i_height, int i_sar_num, int i_sar_den ) LIBVLC_USED );
+VLC_API picture_t * picture_New( vlc_fourcc_t i_chroma, int i_width, int i_height, int i_sar_num, int i_sar_den ) LIBVLC_USED;
 
 /**
  * This function will create a new picture using the given format.
@@ -122,7 +122,7 @@ VLC_EXPORT( picture_t *, picture_New, ( vlc_fourcc_t i_chroma, int i_width, int 
  * When possible, it is preferred to use this function over picture_New
  * as more information about the format is kept.
  */
-VLC_EXPORT( picture_t *, picture_NewFromFormat, ( const video_format_t *p_fmt ) LIBVLC_USED );
+VLC_API picture_t * picture_NewFromFormat( const video_format_t *p_fmt ) LIBVLC_USED;
 
 /**
  * Resource for a picture.
@@ -148,7 +148,7 @@ typedef struct
  *
  * If the resource is NULL then a plain picture_NewFromFormat is returned.
  */
-VLC_EXPORT( picture_t *, picture_NewFromResource, ( const video_format_t *, const picture_resource_t * ) LIBVLC_USED );
+VLC_API picture_t * picture_NewFromResource( const video_format_t *, const picture_resource_t * ) LIBVLC_USED;
 
 /**
  * This function will force the destruction a picture.
@@ -157,7 +157,7 @@ VLC_EXPORT( picture_t *, picture_NewFromResource, ( const video_format_t *, cons
  * Unless used for reimplementing pf_release, you should not use this
  * function but picture_Release.
  */
-VLC_EXPORT( void, picture_Delete, ( picture_t * ) );
+VLC_API void picture_Delete( picture_t * );
 
 /**
  * This function will increase the picture reference count.
@@ -223,15 +223,15 @@ static inline void picture_CopyProperties( picture_t *p_dst, const picture_t *p_
  * This function will reset a picture information (properties and quantizers).
  * It is sometimes useful for reusing pictures (like from a pool).
  */
-VLC_EXPORT( void, picture_Reset, ( picture_t * ) );
+VLC_API void picture_Reset( picture_t * );
 
 /**
  * This function will copy the picture pixels.
  * You can safely copy between pictures that do not have the same size,
  * only the compatible(smaller) part will be copied.
  */
-VLC_EXPORT( void, picture_CopyPixels, ( picture_t *p_dst, const picture_t *p_src ) );
-VLC_EXPORT( void, plane_CopyPixels, ( plane_t *p_dst, const plane_t *p_src ) );
+VLC_API void picture_CopyPixels( picture_t *p_dst, const picture_t *p_src );
+VLC_API void plane_CopyPixels( plane_t *p_dst, const plane_t *p_src );
 
 /**
  * This function will copy both picture dynamic properties and pixels.
@@ -264,7 +264,7 @@ static inline void picture_Copy( picture_t *p_dst, const picture_t *p_src )
  *  - if strictly higher than 0, it will override the dimension.
  * If at most one of them is > 0 then the picture aspect ratio will be kept.
  */
-VLC_EXPORT( int, picture_Export, ( vlc_object_t *p_obj, block_t **pp_image, video_format_t *p_fmt, picture_t *p_picture, vlc_fourcc_t i_format, int i_override_width, int i_override_height ) );
+VLC_API int picture_Export( vlc_object_t *p_obj, block_t **pp_image, video_format_t *p_fmt, picture_t *p_picture, vlc_fourcc_t i_format, int i_override_width, int i_override_height );
 
 /**
  * This function will setup all fields of a picture_t without allocating any
@@ -277,7 +277,7 @@ VLC_EXPORT( int, picture_Export, ( vlc_object_t *p_obj, block_t **pp_image, vide
  *
  * It can be useful to get the properties of planes.
  */
-VLC_EXPORT( int, picture_Setup, ( picture_t *, vlc_fourcc_t i_chroma, int i_width, int i_height, int i_sar_num, int i_sar_den ) );
+VLC_API int picture_Setup( picture_t *, vlc_fourcc_t i_chroma, int i_width, int i_height, int i_sar_num, int i_sar_den );
 
 
 /**
@@ -289,7 +289,7 @@ VLC_EXPORT( int, picture_Setup, ( picture_t *, vlc_fourcc_t i_chroma, int i_widt
  *  - not have the fade flag.
  *  - contains only picture (no text rendering).
  */
-VLC_EXPORT( void, picture_BlendSubpicture, ( picture_t *, filter_t *p_blend, subpicture_t * ) );
+VLC_API void picture_BlendSubpicture( picture_t *, filter_t *p_blend, subpicture_t * );
 
 
 /*****************************************************************************

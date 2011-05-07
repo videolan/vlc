@@ -397,7 +397,7 @@ struct ml_person_t
  * @return The media library object. NULL if the media library
  * object could not be loaded
  */
-VLC_EXPORT( media_library_t*, ml_Get, ( vlc_object_t* p_this ) );
+VLC_API media_library_t* ml_Get( vlc_object_t* p_this );
 #define ml_Get( a ) ml_Get( VLC_OBJECT(a) )
 
 /**
@@ -406,13 +406,13 @@ VLC_EXPORT( media_library_t*, ml_Get, ( vlc_object_t* p_this ) );
  * @param psz_name Name for the module
  * @return The ML object.
  */
-VLC_EXPORT( media_library_t*, ml_Create, ( vlc_object_t *p_this, char* psz_name ) );
+VLC_API media_library_t* ml_Create( vlc_object_t *p_this, char* psz_name );
 
 /**
  * @brief Destructor for the Media library singleton
  * @param p_this Parent the ML object is attached to
  */
-VLC_EXPORT( void, ml_Destroy, ( vlc_object_t* p_this ) );
+VLC_API void ml_Destroy( vlc_object_t* p_this );
 
 /**
  * @brief Control the Media Library
@@ -681,8 +681,8 @@ static inline void ml_DestroyResultArray( vlc_array_t *p_result_array )
  * @param select Type of object
  * @param reload Whether to reload from database
  */
-VLC_EXPORT( ml_media_t*, media_New, ( media_library_t* p_ml, int id,
-        ml_select_e select, bool reload ) );
+VLC_API ml_media_t *media_New( media_library_t* p_ml, int id,
+        ml_select_e select, bool reload );
 
 
 /* Forward declaration */
@@ -819,8 +819,8 @@ static inline int ml_FtreeHasOp( ml_ftree_t* tree )
  * @return Pointer to new tree
  * @note Use the helpers!
  */
-VLC_EXPORT( ml_ftree_t*, ml_OpConnectChilds, ( ml_op_e op, ml_ftree_t* left,
-        ml_ftree_t* right ) );
+VLC_API ml_ftree_t *ml_OpConnectChilds( ml_op_e op, ml_ftree_t* left,
+        ml_ftree_t* right );
 
 /**
  * @brief Attaches a special node to a tree
@@ -831,10 +831,10 @@ VLC_EXPORT( ml_ftree_t*, ml_OpConnectChilds, ( ml_op_e op, ml_ftree_t* left,
  * @return Pointer to new tree
  * @note Use the helpers
  */
-VLC_EXPORT( ml_ftree_t*, ml_FtreeSpec, ( ml_ftree_t* tree,
+VLC_API ml_ftree_t *ml_FtreeSpec( ml_ftree_t* tree,
                                           ml_select_e crit,
                                           int limit,
-                                          char* sort ) );
+                                          char* sort );
 
 /**
  * @brief This function gives quick sequential adding capability
@@ -1030,10 +1030,10 @@ static inline int ml_Update( media_library_t *p_media_library,
  * @param id The id of the row to update
  * @param ... The update data. [SelectType [RoleType] Value]
  */
-VLC_EXPORT( int, ml_UpdateSimple, ( media_library_t *p_media_library,
+VLC_API int ml_UpdateSimple( media_library_t *p_media_library,
                                      ml_select_e selected_type,
                                      const char* psz_lvalue,
-                                     int id, ... ) );
+                                     int id, ... );
 #define ml_UpdateSimple( ml, sel, lval, id, ... ) \
         ml_UpdateSimple( ml, sel, lval, id, __VA_ARGS__, ML_END )
 
@@ -1151,9 +1151,9 @@ static inline int ml_CopyPersons( ml_person_t** a, ml_person_t* b )
  * @param i_type The person type
  * @note This function is thread safe
  */
-VLC_EXPORT( ml_person_t*, ml_GetPersonsFromMedia, ( media_library_t* p_ml,
+VLC_API ml_person_t *ml_GetPersonsFromMedia( media_library_t* p_ml,
                                                     ml_media_t* p_media,
-                                                    const char *psz_role ) );
+                                                    const char *psz_role );
 
 
 #define ml_GetAlbumArtistsFromMedia( a, b ) ml_GetPersonsFromMedia( a, b, ML_PERSON_ALBUM_ARTIST );
@@ -1167,8 +1167,8 @@ VLC_EXPORT( ml_person_t*, ml_GetPersonsFromMedia, ( media_library_t* p_ml,
  * @param i_type Type of person to delete
  * @note This function is threadsafe
  */
-VLC_EXPORT( void, ml_DeletePersonTypeFromMedia, ( ml_media_t* p_media,
-                                                 const char *psz_role ) );
+VLC_API void ml_DeletePersonTypeFromMedia( ml_media_t* p_media,
+                                                 const char *psz_role );
 
 
 /**
@@ -1177,8 +1177,8 @@ VLC_EXPORT( void, ml_DeletePersonTypeFromMedia, ( ml_media_t* p_media,
  * @param p_tree Find tree to create SELECT
  */
 
-VLC_EXPORT( void, ml_PlaySmartPlaylistBasedOn, ( media_library_t* p_ml,
-                                                ml_ftree_t* p_tree ) );
+VLC_API void ml_PlaySmartPlaylistBasedOn( media_library_t* p_ml,
+                                                ml_ftree_t* p_tree );
 
 
 /**

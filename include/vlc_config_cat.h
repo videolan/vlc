@@ -283,7 +283,7 @@ static const struct config_category_t categories_array[] =
 LIBVLC_USED
 static inline const char *config_CategoryNameGet( int i_value )
 {
-    int i = 0 ;
+    int i = 0;
     while( categories_array[i].psz_name != NULL )
     {
         if( categories_array[i].i_id == i_value )
@@ -298,7 +298,7 @@ static inline const char *config_CategoryNameGet( int i_value )
 LIBVLC_USED
 static inline const char *config_CategoryHelpGet( int i_value )
 {
-    int i = 0 ;
+    int i = 0;
     while( categories_array[i].psz_help != NULL )
     {
         if( categories_array[i].i_id == i_value )

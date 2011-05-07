@@ -150,9 +150,9 @@ struct sql_t
  * @param psz_pass Password for the database
  * @return The VLC SQL object, type sql_t.
  **/
-VLC_EXPORT( sql_t*, sql_Create, ( vlc_object_t *p_this, const char *psz_name,
+VLC_API sql_t *sql_Create( vlc_object_t *p_this, const char *psz_name,
             const char* psz_host, int i_port,
-            const char* psz_user, const char* psz_pass ) );
+            const char* psz_user, const char* psz_pass );
 #define sql_Create( a, b, c, d, e, f ) sql_Create( VLC_OBJECT(a), b, c, d, e, f )
 
 
@@ -161,7 +161,7 @@ VLC_EXPORT( sql_t*, sql_Create, ( vlc_object_t *p_this, const char *psz_name,
  * @param obj This p_sql object
  * @return Nothing
  */
-VLC_EXPORT( void, sql_Destroy, ( vlc_object_t *obj ) );
+VLC_API void sql_Destroy( vlc_object_t *obj );
 #define sql_Destroy( a ) sql_Destroy( VLC_OBJECT( a ) )
 
 

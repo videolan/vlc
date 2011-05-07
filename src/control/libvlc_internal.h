@@ -43,14 +43,14 @@
 /***************************************************************************
  * Internal creation and destruction functions
  ***************************************************************************/
-VLC_EXPORT (libvlc_int_t *, libvlc_InternalCreate, ( void ) );
-VLC_EXPORT (int, libvlc_InternalInit, ( libvlc_int_t *, int, const char *ppsz_argv[] ) );
-VLC_EXPORT (void, libvlc_InternalCleanup, ( libvlc_int_t * ) );
-VLC_EXPORT (void, libvlc_InternalDestroy, ( libvlc_int_t * ) );
+VLC_API libvlc_int_t *libvlc_InternalCreate( void );
+VLC_API int libvlc_InternalInit( libvlc_int_t *, int, const char *ppsz_argv[] );
+VLC_API void libvlc_InternalCleanup( libvlc_int_t * );
+VLC_API void libvlc_InternalDestroy( libvlc_int_t * );
 
-VLC_EXPORT (int, libvlc_InternalAddIntf, ( libvlc_int_t *, const char * ) );
-VLC_EXPORT (void, libvlc_InternalWait, ( libvlc_int_t * ) );
-VLC_EXPORT (void, libvlc_SetExitHandler, ( libvlc_int_t *, void (*) (void *), void * ) );
+VLC_API int libvlc_InternalAddIntf( libvlc_int_t *, const char * );
+VLC_API void libvlc_InternalWait( libvlc_int_t * );
+VLC_API void libvlc_SetExitHandler( libvlc_int_t *, void (*) (void *), void * );
 
 typedef void (*libvlc_vlm_release_func_t)( libvlc_instance_t * ) ;
 

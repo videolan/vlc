@@ -248,25 +248,25 @@ static inline int filter_GetInputAttachments( filter_t *p_filter,
  * Only the chroma properties of the dest format is used (chroma
  * type, rgb masks and shifts)
  */
-VLC_EXPORT( filter_t *, filter_NewBlend, ( vlc_object_t *, const video_format_t *p_dst_chroma ) LIBVLC_USED );
+VLC_API filter_t * filter_NewBlend( vlc_object_t *, const video_format_t *p_dst_chroma ) LIBVLC_USED;
 
 /**
  * It configures blend filter parameters that are allowed to changed
  * after the creation.
  */
-VLC_EXPORT( int, filter_ConfigureBlend, ( filter_t *, int i_dst_width, int i_dst_height, const video_format_t *p_src ) );
+VLC_API int filter_ConfigureBlend( filter_t *, int i_dst_width, int i_dst_height, const video_format_t *p_src );
 
 /**
  * It blends a picture into another one.
  *
  * The input picture is not modified and not released.
  */
-VLC_EXPORT( int, filter_Blend, ( filter_t *, picture_t *p_dst, int i_dst_x, int i_dst_y, const picture_t *p_src, int i_alpha ) );
+VLC_API int filter_Blend( filter_t *, picture_t *p_dst, int i_dst_x, int i_dst_y, const picture_t *p_src, int i_alpha );
 
 /**
  * It destroys a blend filter created by filter_NewBlend.
  */
-VLC_EXPORT( void, filter_DeleteBlend, ( filter_t * ) );
+VLC_API void filter_DeleteBlend( filter_t * );
 
 /**
  * Create a picture_t *(*)( filter_t *, picture_t * ) compatible wrapper
@@ -307,7 +307,7 @@ typedef struct filter_chain_t filter_chain_t;
  * \param p_buffer_allocation_data pointer to private allocation data
  * \return pointer to a filter chain
  */
-VLC_EXPORT( filter_chain_t *, filter_chain_New, ( vlc_object_t *, const char *, bool, int (*)( filter_t *, void * ), void (*)( filter_t * ), void *  ) LIBVLC_USED );
+VLC_API filter_chain_t * filter_chain_New( vlc_object_t *, const char *, bool, int (*)( filter_t *, void * ), void (*)( filter_t * ), void *  ) LIBVLC_USED;
 #define filter_chain_New( a, b, c, d, e, f ) filter_chain_New( VLC_OBJECT( a ), b, c, d, e, f )
 
 /**
@@ -316,7 +316,7 @@ VLC_EXPORT( filter_chain_t *, filter_chain_New, ( vlc_object_t *, const char *, 
  *
  * \param p_chain pointer to filter chain
  */
-VLC_EXPORT( void, filter_chain_Delete, ( filter_chain_t * ) );
+VLC_API void filter_chain_Delete( filter_chain_t * );
 
 /**
  * Reset filter chain will delete all filters in the chain and
@@ -326,7 +326,7 @@ VLC_EXPORT( void, filter_chain_Delete, ( filter_chain_t * ) );
  * \param p_fmt_in new fmt_in params
  * \param p_fmt_out new fmt_out params
  */
-VLC_EXPORT( void, filter_chain_Reset, ( filter_chain_t *, const es_format_t *, const es_format_t * ) );
+VLC_API void filter_chain_Reset( filter_chain_t *, const es_format_t *, const es_format_t * );
 
 /**
  * Append filter to the end of the chain.
@@ -338,7 +338,7 @@ VLC_EXPORT( void, filter_chain_Reset, ( filter_chain_t *, const es_format_t *, c
  * \param p_fmt_out output es_format_t
  * \return pointer to filter chain
  */
-VLC_EXPORT( filter_t *, filter_chain_AppendFilter, ( filter_chain_t *, const char *, config_chain_t *, const es_format_t *, const es_format_t * ) );
+VLC_API filter_t * filter_chain_AppendFilter( filter_chain_t *, const char *, config_chain_t *, const es_format_t *, const es_format_t * );
 
 /**
  * Append new filter to filter chain from string.
@@ -347,7 +347,7 @@ VLC_EXPORT( filter_t *, filter_chain_AppendFilter, ( filter_chain_t *, const cha
  * \param psz_string string of filters
  * \return 0 for success
  */
-VLC_EXPORT( int, filter_chain_AppendFromString, ( filter_chain_t *, const char * ) );
+VLC_API int filter_chain_AppendFromString( filter_chain_t *, const char * );
 
 /**
  * Delete filter from filter chain. This function also releases the filter
@@ -358,7 +358,7 @@ VLC_EXPORT( int, filter_chain_AppendFromString, ( filter_chain_t *, const char *
  * \param p_filter pointer to filter object
  * \return VLC_SUCCESS on succes, else VLC_EGENERIC
  */
-VLC_EXPORT( int, filter_chain_DeleteFilter, ( filter_chain_t *, filter_t * ) );
+VLC_API int filter_chain_DeleteFilter( filter_chain_t *, filter_t * );
 
 /**
  * Get the number of filters in the filter chain.
@@ -366,7 +366,7 @@ VLC_EXPORT( int, filter_chain_DeleteFilter, ( filter_chain_t *, filter_t * ) );
  * \param p_chain pointer to filter chain
  * \return number of filters in this filter chain
  */
-VLC_EXPORT( int, filter_chain_GetLength, ( filter_chain_t * ) );
+VLC_API int filter_chain_GetLength( filter_chain_t * );
 
 /**
  * Get last p_fmt_out in the chain.
@@ -374,7 +374,7 @@ VLC_EXPORT( int, filter_chain_GetLength, ( filter_chain_t * ) );
  * \param p_chain pointer to filter chain
  * \return last p_fmt (es_format_t) of this filter chain
  */
-VLC_EXPORT( const es_format_t *, filter_chain_GetFmtOut, ( filter_chain_t * ) );
+VLC_API const es_format_t * filter_chain_GetFmtOut( filter_chain_t * );
 
 /**
  * Apply the filter chain to a video picture.
@@ -383,12 +383,12 @@ VLC_EXPORT( const es_format_t *, filter_chain_GetFmtOut, ( filter_chain_t * ) );
  * \param p_picture picture to apply filters on
  * \return modified picture after applying all video filters
  */
-VLC_EXPORT( picture_t *, filter_chain_VideoFilter, ( filter_chain_t *, picture_t * ) );
+VLC_API picture_t * filter_chain_VideoFilter( filter_chain_t *, picture_t * );
 
 /**
  * Flush a video filter chain.
  */
-VLC_EXPORT( void, filter_chain_VideoFlush, ( filter_chain_t * ) );
+VLC_API void filter_chain_VideoFlush( filter_chain_t * );
 
 /**
  * Apply the filter chain to a audio block.
@@ -397,7 +397,7 @@ VLC_EXPORT( void, filter_chain_VideoFlush, ( filter_chain_t * ) );
  * \param p_block audio frame to apply filters on
  * \return modified audio frame after applying all audio filters
  */
-VLC_EXPORT( block_t *, filter_chain_AudioFilter, ( filter_chain_t *, block_t * ) );
+VLC_API block_t * filter_chain_AudioFilter( filter_chain_t *, block_t * );
 
 /**
  * Apply filter chain to subpictures.
@@ -405,7 +405,7 @@ VLC_EXPORT( block_t *, filter_chain_AudioFilter, ( filter_chain_t *, block_t * )
  * \param p_chain pointer to filter chain
  * \param display_date of subpictures
  */
-VLC_EXPORT( void, filter_chain_SubSource, ( filter_chain_t *, mtime_t ) );
+VLC_API void filter_chain_SubSource( filter_chain_t *, mtime_t );
 
 /**
  * Apply filter chain to subpictures.
@@ -414,7 +414,7 @@ VLC_EXPORT( void, filter_chain_SubSource, ( filter_chain_t *, mtime_t ) );
  * \param p_subpicture subpicture to apply filters on
  * \return modified subpicture after applying all subpicture filters
  */
-VLC_EXPORT( subpicture_t *, filter_chain_SubFilter, ( filter_chain_t *, subpicture_t * ) );
+VLC_API subpicture_t * filter_chain_SubFilter( filter_chain_t *, subpicture_t * );
 
 /**
  * Apply the filter chain to a mouse state.
@@ -424,14 +424,14 @@ VLC_EXPORT( subpicture_t *, filter_chain_SubFilter, ( filter_chain_t *, subpictu
  *
  * The vlc_mouse_t* pointers may be the same.
  */
-VLC_EXPORT( int, filter_chain_MouseFilter, ( filter_chain_t *, vlc_mouse_t *, const vlc_mouse_t * ) );
+VLC_API int filter_chain_MouseFilter( filter_chain_t *, vlc_mouse_t *, const vlc_mouse_t * );
 
 /**
  * Inform the filter chain of mouse state.
  *
  * It makes sense only for a sub source chain.
  */
-VLC_EXPORT( int, filter_chain_MouseEvent, ( filter_chain_t *, const vlc_mouse_t *, const video_format_t * ) );
+VLC_API int filter_chain_MouseEvent( filter_chain_t *, const vlc_mouse_t *, const video_format_t * );
 
 #endif /* _VLC_FILTER_H */
 

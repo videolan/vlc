@@ -63,30 +63,30 @@ typedef enum vlc_meta_type_t
  */
 struct vlc_meta_t;
 
-VLC_EXPORT(vlc_meta_t *, vlc_meta_New, ( void ) LIBVLC_USED );
-VLC_EXPORT(void,         vlc_meta_Delete, ( vlc_meta_t *m ));
-VLC_EXPORT(void,         vlc_meta_Set, ( vlc_meta_t *p_meta, vlc_meta_type_t meta_type, const char *psz_val ));
-VLC_EXPORT(const char *, vlc_meta_Get, ( const vlc_meta_t *p_meta, vlc_meta_type_t meta_type ));
+VLC_API vlc_meta_t * vlc_meta_New( void ) LIBVLC_USED;
+VLC_API void vlc_meta_Delete( vlc_meta_t *m );
+VLC_API void vlc_meta_Set( vlc_meta_t *p_meta, vlc_meta_type_t meta_type, const char *psz_val );
+VLC_API const char * vlc_meta_Get( const vlc_meta_t *p_meta, vlc_meta_type_t meta_type );
 
-VLC_EXPORT(void,         vlc_meta_AddExtra, ( vlc_meta_t *m, const char *psz_name, const char *psz_value ));
-VLC_EXPORT(const char *, vlc_meta_GetExtra, ( const vlc_meta_t *m, const char *psz_name ));
-VLC_EXPORT(unsigned,     vlc_meta_GetExtraCount, ( const vlc_meta_t *m ));
+VLC_API void vlc_meta_AddExtra( vlc_meta_t *m, const char *psz_name, const char *psz_value );
+VLC_API const char * vlc_meta_GetExtra( const vlc_meta_t *m, const char *psz_name );
+VLC_API unsigned vlc_meta_GetExtraCount( const vlc_meta_t *m );
 
 /**
  * Allocate a copy of all extra meta names and a table with it.
  * Be sure to free both the returned pointers and its name.
  */
-VLC_EXPORT(char **,      vlc_meta_CopyExtraNames, ( const vlc_meta_t *m ) LIBVLC_USED );
+VLC_API char ** vlc_meta_CopyExtraNames( const vlc_meta_t *m ) LIBVLC_USED;
 
-VLC_EXPORT(void,         vlc_meta_Merge, ( vlc_meta_t *dst, const vlc_meta_t *src ));
+VLC_API void vlc_meta_Merge( vlc_meta_t *dst, const vlc_meta_t *src );
 
-VLC_EXPORT(int,  vlc_meta_GetStatus, ( vlc_meta_t *m ));
-VLC_EXPORT(void, vlc_meta_SetStatus, ( vlc_meta_t *m, int status ));
+VLC_API int vlc_meta_GetStatus( vlc_meta_t *m );
+VLC_API void vlc_meta_SetStatus( vlc_meta_t *m, int status );
 
 /**
  * Returns a localizes string describing the meta
  */
-VLC_EXPORT(const char *, vlc_meta_TypeToLocalizedString, ( vlc_meta_type_t meta_type ) );
+VLC_API const char * vlc_meta_TypeToLocalizedString( vlc_meta_type_t meta_type );
 
 enum {
     ALBUM_ART_WHEN_ASKED,
@@ -102,7 +102,7 @@ typedef struct meta_export_t
     const char *psz_file;
 } meta_export_t;
 
-VLC_EXPORT( int, input_item_WriteMeta, (vlc_object_t *, input_item_t *) );
+VLC_API int input_item_WriteMeta(vlc_object_t *, input_item_t *);
 
 /* Setters for meta.
  * Warning: Make sure to use the input_item meta setters (defined in vlc_input.h)

@@ -58,9 +58,9 @@ struct spu_t
     spu_private_t *p;
 };
 
-VLC_EXPORT( spu_t *, spu_Create, ( vlc_object_t * ) );
+VLC_API spu_t * spu_Create( vlc_object_t * );
 #define spu_Create(a) spu_Create(VLC_OBJECT(a))
-VLC_EXPORT( void, spu_Destroy, ( spu_t * ) );
+VLC_API void spu_Destroy( spu_t * );
 
 /**
  * This function sends a subpicture to the spu_t core.
@@ -68,7 +68,7 @@ VLC_EXPORT( void, spu_Destroy, ( spu_t * ) );
  * You cannot use the provided subpicture anymore. The spu_t core
  * will destroy it at its convenience.
  */
-VLC_EXPORT( void, spu_PutSubpicture, ( spu_t *, subpicture_t * ) );
+VLC_API void spu_PutSubpicture( spu_t *, subpicture_t * );
 
 /**
  * This function will return an unique subpicture containing the OSD and
@@ -80,27 +80,27 @@ VLC_EXPORT( void, spu_PutSubpicture, ( spu_t *, subpicture_t * ) );
  *
  * The returned value if non NULL must be released by subpicture_Delete().
  */
-VLC_EXPORT( subpicture_t *, spu_Render, ( spu_t *, const vlc_fourcc_t *p_chroma_list, const video_format_t *p_fmt_dst, const video_format_t *p_fmt_src, mtime_t render_subtitle_date, mtime_t render_osd_date, bool ignore_osd ) );
+VLC_API subpicture_t * spu_Render( spu_t *, const vlc_fourcc_t *p_chroma_list, const video_format_t *p_fmt_dst, const video_format_t *p_fmt_src, mtime_t render_subtitle_date, mtime_t render_osd_date, bool ignore_osd );
 
 /**
  * It registers a new SPU channel.
  */
-VLC_EXPORT( int, spu_RegisterChannel, ( spu_t * ) );
+VLC_API int spu_RegisterChannel( spu_t * );
 
 /**
  * It clears all subpictures associated to a SPU channel.
  */
-VLC_EXPORT( void, spu_ClearChannel, ( spu_t *, int ) );
+VLC_API void spu_ClearChannel( spu_t *, int );
 
 /**
  * It changes the sub sources list
  */
-VLC_EXPORT( void, spu_ChangeSources, ( spu_t *, const char * ) );
+VLC_API void spu_ChangeSources( spu_t *, const char * );
 
 /**
  * It changes the sub filters list
  */
-VLC_EXPORT( void, spu_ChangeFilters, ( spu_t *, const char * ) );
+VLC_API void spu_ChangeFilters( spu_t *, const char * );
 
 /** @}*/
 

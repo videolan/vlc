@@ -103,7 +103,7 @@ struct vout_thread_t {
  * \param cfg the video configuration requested.
  * \return a vout
  */
-VLC_EXPORT( vout_thread_t *, vout_Request, ( vlc_object_t *object, const vout_configuration_t *cfg ) );
+VLC_API vout_thread_t * vout_Request( vlc_object_t *object, const vout_configuration_t *cfg );
 #define vout_Request(a,b) vout_Request(VLC_OBJECT(a),b)
 
 /**
@@ -114,7 +114,7 @@ VLC_EXPORT( vout_thread_t *, vout_Request, ( vlc_object_t *object, const vout_co
  *
  * \param p_vout the vout to close
  */
-VLC_EXPORT( void,            vout_Close,        ( vout_thread_t *p_vout ) );
+VLC_API void vout_Close( vout_thread_t *p_vout );
 
 /**
  * This function will close a vout created by vout_Create
@@ -140,24 +140,24 @@ static inline void vout_CloseAndRelease( vout_thread_t *p_vout )
  * available.
  *
  */
-VLC_EXPORT( int, vout_GetSnapshot, ( vout_thread_t *p_vout,
-                                     block_t **pp_image, picture_t **pp_picture,
-                                     video_format_t *p_fmt,
-                                     const char *psz_format, mtime_t i_timeout ) );
+VLC_API int vout_GetSnapshot( vout_thread_t *p_vout,
+                              block_t **pp_image, picture_t **pp_picture,
+                              video_format_t *p_fmt,
+                              const char *psz_format, mtime_t i_timeout );
 
 /* */
-VLC_EXPORT( picture_t *,     vout_GetPicture,     ( vout_thread_t * ) );
-VLC_EXPORT( void,            vout_PutPicture,     ( vout_thread_t *, picture_t * ) );
+VLC_API picture_t * vout_GetPicture( vout_thread_t * );
+VLC_API void vout_PutPicture( vout_thread_t *, picture_t * );
 
-VLC_EXPORT( void,            vout_HoldPicture,    ( vout_thread_t *, picture_t * ) );
-VLC_EXPORT( void,            vout_ReleasePicture, ( vout_thread_t *, picture_t * ) );
+VLC_API void vout_HoldPicture( vout_thread_t *, picture_t * );
+VLC_API void vout_ReleasePicture( vout_thread_t *, picture_t * );
 
 /* */
-VLC_EXPORT( void, vout_PutSubpicture,             ( vout_thread_t *, subpicture_t * ) );
-VLC_EXPORT( int,  vout_RegisterSubpictureChannel, ( vout_thread_t * ) );
-VLC_EXPORT( void, vout_FlushSubpictureChannel,    ( vout_thread_t *, int ) );
+VLC_API void vout_PutSubpicture( vout_thread_t *, subpicture_t * );
+VLC_API int vout_RegisterSubpictureChannel( vout_thread_t * );
+VLC_API void vout_FlushSubpictureChannel( vout_thread_t *, int );
 
-VLC_EXPORT( void, vout_EnableFilter, ( vout_thread_t *, const char *,bool , bool  ) );
+VLC_API void vout_EnableFilter( vout_thread_t *, const char *,bool , bool  );
 
 /**@}*/
 

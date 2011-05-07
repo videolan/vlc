@@ -62,21 +62,21 @@ typedef struct {
  * as soon as a picture is unused. They are allowed to modify picture_t::p and
  * access picture_t::p_sys.
  */
-VLC_EXPORT( picture_pool_t *, picture_pool_NewExtended, ( const picture_pool_configuration_t * ) LIBVLC_USED );
+VLC_API picture_pool_t * picture_pool_NewExtended( const picture_pool_configuration_t * ) LIBVLC_USED;
 
 /**
  * It creates a picture_pool_t wrapping the given arrays of picture.
  *
  * It is provided as convenience.
  */
-VLC_EXPORT( picture_pool_t *, picture_pool_New, ( int picture_count, picture_t *picture[] ) LIBVLC_USED );
+VLC_API picture_pool_t * picture_pool_New( int picture_count, picture_t *picture[] ) LIBVLC_USED;
 
 /**
  * It creates a picture_pool_t creating images using the given format.
  *
  * Provided for convenience.
  */
-VLC_EXPORT( picture_pool_t *, picture_pool_NewFromFormat, ( const video_format_t *, int picture_count ) LIBVLC_USED );
+VLC_API picture_pool_t * picture_pool_NewFromFormat( const video_format_t *, int picture_count ) LIBVLC_USED;
 
 /**
  * It destroys a pool created by picture_pool_New.
@@ -84,14 +84,14 @@ VLC_EXPORT( picture_pool_t *, picture_pool_NewFromFormat, ( const video_format_t
  * All pictures must already be released to the pool. The pool will then
  * released them.
  */
-VLC_EXPORT( void, picture_pool_Delete, ( picture_pool_t * ) );
+VLC_API void picture_pool_Delete( picture_pool_t * );
 
 /**
  * It retreives a picture_t from a pool.
  *
  * The picture must be release by using picture_Release.
  */
-VLC_EXPORT( picture_t *, picture_pool_Get, ( picture_pool_t * ) LIBVLC_USED );
+VLC_API picture_t * picture_pool_Get( picture_pool_t * ) LIBVLC_USED;
 
 /**
  * It forces the next picture_pool_Get to return a picture even if no
@@ -104,7 +104,7 @@ VLC_EXPORT( picture_t *, picture_pool_Get, ( picture_pool_t * ) LIBVLC_USED );
  * XXX it should be used with great care, the only reason you may need
  * it is to workaround a bug.
  */
-VLC_EXPORT( void, picture_pool_NonEmpty, ( picture_pool_t *, bool reset ) );
+VLC_API void picture_pool_NonEmpty( picture_pool_t *, bool reset );
 
 /**
  * It reserves picture_count pictures from the given pool and returns
@@ -114,12 +114,12 @@ VLC_EXPORT( void, picture_pool_NonEmpty, ( picture_pool_t *, bool reset ) );
  * The returned pool must be deleted before the master pool.
  * When deleted, all pictures return to the master pool.
  */
-VLC_EXPORT( picture_pool_t *, picture_pool_Reserve, (picture_pool_t *, int picture_count) LIBVLC_USED );
+VLC_API picture_pool_t * picture_pool_Reserve(picture_pool_t *, int picture_count) LIBVLC_USED;
 
 /**
  * It returns the size of the given pool.
  */
-VLC_EXPORT( int, picture_pool_GetSize, (picture_pool_t *) );
+VLC_API int picture_pool_GetSize(picture_pool_t *);
 
 
 #endif /* VLC_PICTURE_POOL_H */
