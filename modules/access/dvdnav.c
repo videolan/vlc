@@ -163,7 +163,7 @@ static void ESSubtitleUpdate( demux_t * );
 static void ButtonUpdate( demux_t *, bool );
 
 static void ESNew( demux_t *, int );
-static int ProbeDVD( demux_t *, char * );
+static int ProbeDVD( const char * );
 
 static char *DemuxGetLanguageCode( demux_t *p_demux, const char *psz_var );
 
@@ -216,7 +216,7 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
 
     /* Try some simple probing to avoid going through dvdnav_open too often */
-    if( ProbeDVD( p_demux, psz_file ) != VLC_SUCCESS )
+    if( ProbeDVD( psz_file ) != VLC_SUCCESS )
     {
         free( psz_file );
         return VLC_EGENERIC;
@@ -1446,9 +1446,8 @@ static int EventIntf( vlc_object_t *p_input, char const *psz_var,
 /*****************************************************************************
  * ProbeDVD: very weak probing that avoids going too often into a dvdnav_open()
  *****************************************************************************/
-static int ProbeDVD( demux_t *p_demux, char *psz_name )
+static int ProbeDVD( const char *psz_name )
 {
-    (void)p_demux;
 #ifdef HAVE_SYS_STAT_H
     struct stat stat_info;
     uint8_t pi_anchor[2];
