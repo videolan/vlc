@@ -36,9 +36,13 @@
 #include <vlc_demux.h>
 #include <vlc_interface.h>
 #include <vlc_dialog.h>
+#include <vlc_access.h>
 
 #import <QTKit/QTKit.h>
 #import <CoreAudio/CoreAudio.h>
+
+#define QTC_WIDTH 640
+#define QTC_HEIGHT 480
 
 /*****************************************************************************
 * Local prototypes
@@ -123,6 +127,7 @@ vlc_module_end ()
 {
     CVImageBufferRef imageBuffer;
     mtime_t pts;
+	void * pixels;
 
     if(!currentImageBuffer || currentPts == previousPts )
         return 0;
@@ -130,17 +135,22 @@ vlc_module_end ()
     @synchronized (self)
     {
         imageBuffer = CVBufferRetain(currentImageBuffer);
-        pts = previousPts = currentPts;
-
-        CVPixelBufferLockBaseAddress(imageBuffer, 0);
-        void * pixels = CVPixelBufferGetBaseAddress(imageBuffer);
-        memcpy( buffer, pixels, CVPixelBufferGetBytesPerRow(imageBuffer) * CVPixelBufferGetHeight(imageBuffer) );
-        CVPixelBufferUnlockBaseAddress(imageBuffer, 0);
+        if(imageBuffer){
+            pts = previousPts = currentPts;
+            CVPixelBufferLockBaseAddress(imageBuffer, 0);
+            pixels = CVPixelBufferGetBaseAddress(imageBuffer);
+            if(pixels)
+                memcpy( buffer, pixels, CVPixelBufferGetBytesPerRow(imageBuffer) * CVPixelBufferGetHeight(imageBuffer));
+            CVPixelBufferUnlockBaseAddress(imageBuffer, 0);
+        }
+            
     }
-
     CVBufferRelease(imageBuffer);
 
-    return currentPts;
+	if(pixels)
+		return currentPts;
+	else
+		return 0;
 }
 
 @end
@@ -196,12 +206,18 @@ static int Open( vlc_object_t *p_this )
     int i_width;
     int i_height;
     int result = 0;
+    char *psz_uid = NULL;
 
     /* Only when selected */
     if( *p_demux->psz_access == '\0' )
         return VLC_EGENERIC;
 
     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
+
+    if( p_demux->psz_location && *p_demux->psz_location )
+        psz_uid = strdup(p_demux->psz_location);
+    msg_Dbg( p_demux, "qtcapture uid = %s", psz_uid );
+    NSString *qtk_currdevice_uid = [[NSString alloc] initWithFormat:@"%s", psz_uid];
 
     /* Set up p_demux */
     p_demux->pf_demux = Demux;
@@ -214,12 +230,38 @@ static int Open( vlc_object_t *p_this )
     if( !p_sys )
         return VLC_ENOMEM;
 
+    NSArray *myVideoDevices = [[[QTCaptureDevice inputDevicesWithMediaType:QTMediaTypeVideo] arrayByAddingObjectsFromArray:[QTCaptureDevice inputDevicesWithMediaType:QTMediaTypeMuxed]] retain];
+    if([myVideoDevices count] == 0)
+    {
+        dialog_FatalWait( p_demux, _("No Input device found"),
+                         _("Your Mac does not seem to be equipped with a suitable input device. "
+                           "Please check your connectors and drivers.") );
+        msg_Err( p_demux, "Can't find any Video device" );
+
+        goto error;
+    }
+    int ivideo;
+    for(ivideo = 0; ivideo < [myVideoDevices count]; ivideo++){
+        QTCaptureDevice *qtk_device;
+        qtk_device = [myVideoDevices objectAtIndex:ivideo];
+        msg_Dbg( p_demux, "qtcapture %d/%lu %s %s", ivideo, [myVideoDevices count], [[qtk_device localizedDisplayName] UTF8String], [[qtk_device uniqueID] UTF8String]);
+        if([[[qtk_device uniqueID]stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]] isEqualToString:qtk_currdevice_uid]){
+            break;
+        }
+    }
+
     memset( &fmt, 0, sizeof( es_format_t ) );
 
     QTCaptureDeviceInput * input = nil;
     NSError *o_returnedError;
-
-    p_sys->device = [QTCaptureDevice defaultInputDeviceWithMediaType: QTMediaTypeVideo];
+    if( ivideo < [myVideoDevices count] )
+        p_sys->device = [myVideoDevices objectAtIndex:ivideo];
+    else
+    {
+        /* cannot found designated device, fall back to open default device */
+        msg_Dbg(p_demux, "Cannot find designated uid device as %s, falling back to default.", [qtk_currdevice_uid UTF8String]);
+        p_sys->device = [QTCaptureDevice defaultInputDeviceWithMediaType: QTMediaTypeVideo];
+    }
     if( !p_sys->device )
     {
         dialog_FatalWait( p_demux, _("No Input device found"),
@@ -266,12 +308,7 @@ static int Open( vlc_object_t *p_this )
     else goto error;
 
     int qtchroma = [camera_format formatType];
-    int chroma = qtchroma_to_fourcc( qtchroma );
-    if( !chroma )
-    {
-        msg_Err( p_demux, "Unknown qt chroma %4.4s provided by camera", (char*)&qtchroma );
-        goto error;
-    }
+    int chroma = VLC_CODEC_UYVY;
 
     /* Now we can init */
     es_format_Init( &fmt, VIDEO_ES, chroma );
@@ -280,6 +317,13 @@ static int Open( vlc_object_t *p_this )
     NSSize display_size = [[camera_format attributeForKey:QTFormatDescriptionVideoCleanApertureDisplaySizeAttribute] sizeValue];
     NSSize par_size = [[camera_format attributeForKey:QTFormatDescriptionVideoProductionApertureDisplaySizeAttribute] sizeValue];
 
+    encoded_size.width = QTC_WIDTH;
+    encoded_size.height = QTC_HEIGHT;
+    display_size.width = QTC_WIDTH;
+    display_size.height = QTC_HEIGHT;
+    par_size.width = QTC_WIDTH;
+    par_size.height = QTC_HEIGHT;
+    
     fmt.video.i_width = p_sys->width = encoded_size.width;
     fmt.video.i_height = p_sys->height = encoded_size.height;
     if( par_size.width != encoded_size.width )
@@ -293,6 +337,7 @@ static int Open( vlc_object_t *p_this )
     msg_Dbg(p_demux, "PAR size %i %i", (int)par_size.width, (int)par_size.height );
 
     [p_sys->output setPixelBufferAttributes: [NSDictionary dictionaryWithObjectsAndKeys:
+        [NSNumber numberWithUnsignedInt:kCVPixelFormatType_422YpCbCr8], (id)kCVPixelBufferPixelFormatTypeKey,
         [NSNumber numberWithInt: p_sys->height], kCVPixelBufferHeightKey,
         [NSNumber numberWithInt: p_sys->width], kCVPixelBufferWidthKey,
         [NSNumber numberWithBool:YES], (id)kCVPixelBufferOpenGLCompatibilityKey,
