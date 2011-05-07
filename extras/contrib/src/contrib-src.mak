@@ -1537,14 +1537,22 @@ endif
 ifdef HAVE_WIN32
 	(cd $@; patch -p0 < ../Patches/libcddb-win32.patch )
 endif
+ifdef HAVE_DARWIN_OS
+	(cd $@; patch -p0 < ../Patches/libcddb-darwin.patch )
+endif
 	patch -p0 < Patches/libcddb-getenv-crash.patch
 
 ifdef HAVE_WIN32
 .cddb: libcddb .regex
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-shared --enable-static --without-iconv CFLAGS="$(CFLAGS) -D_BSD_SOCKLEN_T_=int" && make && make install)
 else
+ifdef HAVE_DARWIN_OS
+.cddb: libcddb
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-shared --enable-static --without-iconv CFLAGS="$(CFLAGS) -D_BSD_SOCKLEN_T_=int" LDFLAGS="$(LDFLAGS)" && make && make install)
+else
 .cddb: libcddb
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-shared --enable-static CFLAGS="$(CFLAGS) -D_BSD_SOCKLEN_T_=int" LDFLAGS="$(LDFLAGS) -liconv" && make && make install)
+endif
 endif
 	touch $@
 
