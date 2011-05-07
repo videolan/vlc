@@ -35,7 +35,11 @@ include ./packages.mak
 # Set a clean environment
 # ***************************************************************************
 
+#ifdef HAVE_DARWIN_OS
+export PATH := $(PREFIX)/bin:$(EXTRA_PATH):/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/X11/bin:
+else
 export PATH := $(PREFIX)/bin:$(EXTRA_PATH):$(PATH)
+endif
 export PKG_CONFIG_PATH
 export PKG_CONFIG_LIBDIR = $(PREFIX)/lib/pkgconfig
 export MACOSX_DEPLOYMENT_TARGET = $(SDK_TARGET)
@@ -419,7 +423,7 @@ FONTCONFIG_ENV-$(HAVE_WIN32)      = $(HOSTCC)
 FONTCONFIG_ENV-$(HAVE_CYGWIN)     =
 
 FONTCONFIG_INSTALL-$(ENABLED)     = make install
-FONTCONFIG_INSTALL-$(HAVE_MACOSX) = make install-exec && (cd fontconfig ; make install-data) && cp fontconfig.pc $(PKG_CONFIG_LIBDIR)
+FONTCONFIG_INSTALL-$(HAVE_MACOSX) = make install-exec && (cd fontconfig ; make install-data) && cp fontconfig.pc $(PKG_CONFIG_LIBDIR) && sed -e 's%/usr/lib/libiconv.la%%' -i.orig $(PREFIX)/lib/libfontconfig.la
 
 .fontconfig: fontconfig .xml .freetype
 	(cd $<; $(FONTCONFIG_ENV-1) ./configure $(FONTCONFIG_CONF-1) && make && $(FONTCONFIG_INSTALL-1))
