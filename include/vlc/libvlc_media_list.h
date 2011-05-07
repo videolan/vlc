@@ -47,7 +47,7 @@ typedef struct libvlc_media_list_t libvlc_media_list_t;
  * \param p_instance libvlc instance
  * \return empty media list, or NULL on error
  */
-VLC_PUBLIC_API libvlc_media_list_t *
+LIBVLC_API libvlc_media_list_t *
     libvlc_media_list_new( libvlc_instance_t *p_instance );
 
 /**
@@ -55,7 +55,7 @@ VLC_PUBLIC_API libvlc_media_list_t *
  *
  * \param p_ml a media list created with libvlc_media_list_new()
  */
-VLC_PUBLIC_API void
+LIBVLC_API void
     libvlc_media_list_release( libvlc_media_list_t *p_ml );
 
 /**
@@ -63,10 +63,10 @@ VLC_PUBLIC_API void
  *
  * \param p_ml a media list created with libvlc_media_list_new()
  */
-VLC_PUBLIC_API void
+LIBVLC_API void
     libvlc_media_list_retain( libvlc_media_list_t *p_ml );
 
-VLC_DEPRECATED_API int
+LIBVLC_DEPRECATED int
     libvlc_media_list_add_file_content( libvlc_media_list_t * p_ml,
                                         const char * psz_uri );
 
@@ -78,7 +78,7 @@ VLC_DEPRECATED_API int
  * \param p_ml a media list instance
  * \param p_md media instance to add
  */
-VLC_PUBLIC_API void
+LIBVLC_API void
 libvlc_media_list_set_media( libvlc_media_list_t *p_ml, libvlc_media_t *p_md );
 
 /**
@@ -89,7 +89,7 @@ libvlc_media_list_set_media( libvlc_media_list_t *p_ml, libvlc_media_t *p_md );
  * \param p_ml a media list instance
  * \return media instance
  */
-VLC_PUBLIC_API libvlc_media_t *
+LIBVLC_API libvlc_media_t *
     libvlc_media_list_media( libvlc_media_list_t *p_ml );
 
 /**
@@ -100,7 +100,7 @@ VLC_PUBLIC_API libvlc_media_t *
  * \param p_md a media instance
  * \return 0 on success, -1 if the media list is read-only
  */
-VLC_PUBLIC_API int
+LIBVLC_API int
 libvlc_media_list_add_media( libvlc_media_list_t *p_ml, libvlc_media_t *p_md );
 
 /**
@@ -112,7 +112,7 @@ libvlc_media_list_add_media( libvlc_media_list_t *p_ml, libvlc_media_t *p_md );
  * \param i_pos position in array where to insert
  * \return 0 on success, -1 if the media list si read-only
  */
-VLC_PUBLIC_API int
+LIBVLC_API int
 libvlc_media_list_insert_media( libvlc_media_list_t *p_ml,
                                 libvlc_media_t *p_md, int i_pos );
 
@@ -124,7 +124,7 @@ libvlc_media_list_insert_media( libvlc_media_list_t *p_ml,
  * \param i_pos position in array where to insert
  * \return 0 on success, -1 if the list is read-only or the item was not found
  */
-VLC_PUBLIC_API int
+LIBVLC_API int
 libvlc_media_list_remove_index( libvlc_media_list_t *p_ml, int i_pos );
 
 /**
@@ -134,7 +134,7 @@ libvlc_media_list_remove_index( libvlc_media_list_t *p_ml, int i_pos );
  * \param p_ml a media list instance
  * \return number of items in media list
  */
-VLC_PUBLIC_API int
+LIBVLC_API int
     libvlc_media_list_count( libvlc_media_list_t *p_ml );
 
 /**
@@ -147,7 +147,7 @@ VLC_PUBLIC_API int
  * In case of success, libvlc_media_retain() is called to increase the refcount
  * on the media.
  */
-VLC_PUBLIC_API libvlc_media_t *
+LIBVLC_API libvlc_media_t *
     libvlc_media_list_item_at_index( libvlc_media_list_t *p_ml, int i_pos );
 /**
  * Find index position of List media instance in media list.
@@ -158,7 +158,7 @@ VLC_PUBLIC_API libvlc_media_t *
  * \param p_md media list instance
  * \return position of media instance
  */
-VLC_PUBLIC_API int
+LIBVLC_API int
     libvlc_media_list_index_of_item( libvlc_media_list_t *p_ml,
                                      libvlc_media_t *p_md );
 
@@ -168,7 +168,7 @@ VLC_PUBLIC_API int
  * \param p_ml media list instance
  * \return 0 on readonly, 1 on readwrite
  */
-VLC_PUBLIC_API int
+LIBVLC_API int
     libvlc_media_list_is_readonly( libvlc_media_list_t * p_ml );
 
 /**
@@ -176,7 +176,7 @@ VLC_PUBLIC_API int
  *
  * \param p_ml a media list instance
  */
-VLC_PUBLIC_API void
+LIBVLC_API void
     libvlc_media_list_lock( libvlc_media_list_t *p_ml );
 
 /**
@@ -185,7 +185,7 @@ VLC_PUBLIC_API void
  *
  * \param p_ml a media list instance
  */
-VLC_PUBLIC_API void
+LIBVLC_API void
     libvlc_media_list_unlock( libvlc_media_list_t *p_ml );
 
 /**
@@ -195,7 +195,7 @@ VLC_PUBLIC_API void
  * \param p_ml a media list instance
  * \return libvlc_event_manager
  */
-VLC_PUBLIC_API libvlc_event_manager_t *
+LIBVLC_API libvlc_event_manager_t *
     libvlc_media_list_event_manager( libvlc_media_list_t *p_ml );
 
 /** @} media_list */

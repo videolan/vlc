@@ -54,7 +54,7 @@ typedef struct libvlc_media_discoverer_t libvlc_media_discoverer_t;
  * \param psz_name service name
  * \return media discover object or NULL in case of error
  */
-VLC_PUBLIC_API libvlc_media_discoverer_t *
+LIBVLC_API libvlc_media_discoverer_t *
 libvlc_media_discoverer_new_from_name( libvlc_instance_t * p_inst,
                                        const char * psz_name );
 
@@ -64,7 +64,7 @@ libvlc_media_discoverer_new_from_name( libvlc_instance_t * p_inst,
  *
  * \param p_mdis media service discover object
  */
-VLC_PUBLIC_API void   libvlc_media_discoverer_release( libvlc_media_discoverer_t * p_mdis );
+LIBVLC_API void   libvlc_media_discoverer_release( libvlc_media_discoverer_t * p_mdis );
 
 /**
  * Get media service discover object its localized name.
@@ -72,7 +72,7 @@ VLC_PUBLIC_API void   libvlc_media_discoverer_release( libvlc_media_discoverer_t
  * \param p_mdis media discover object
  * \return localized name
  */
-VLC_PUBLIC_API char * libvlc_media_discoverer_localized_name( libvlc_media_discoverer_t * p_mdis );
+LIBVLC_API char * libvlc_media_discoverer_localized_name( libvlc_media_discoverer_t * p_mdis );
 
 /**
  * Get media service discover media list.
@@ -80,7 +80,7 @@ VLC_PUBLIC_API char * libvlc_media_discoverer_localized_name( libvlc_media_disco
  * \param p_mdis media service discover object
  * \return list of media items
  */
-VLC_PUBLIC_API libvlc_media_list_t * libvlc_media_discoverer_media_list( libvlc_media_discoverer_t * p_mdis );
+LIBVLC_API libvlc_media_list_t * libvlc_media_discoverer_media_list( libvlc_media_discoverer_t * p_mdis );
 
 /**
  * Get event manager from media service discover object.
@@ -88,7 +88,7 @@ VLC_PUBLIC_API libvlc_media_list_t * libvlc_media_discoverer_media_list( libvlc_
  * \param p_mdis media service discover object
  * \return event manager object.
  */
-VLC_PUBLIC_API libvlc_event_manager_t *
+LIBVLC_API libvlc_event_manager_t *
         libvlc_media_discoverer_event_manager( libvlc_media_discoverer_t * p_mdis );
 
 /**
@@ -97,7 +97,7 @@ VLC_PUBLIC_API libvlc_event_manager_t *
  * \param p_mdis media service discover object
  * \return true if running, false if not
  */
-VLC_PUBLIC_API int
+LIBVLC_API int
         libvlc_media_discoverer_is_running( libvlc_media_discoverer_t * p_mdis );
 
 /**@} */
