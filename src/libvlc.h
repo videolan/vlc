@@ -311,8 +311,8 @@ static inline int stats_UpdateFloat( vlc_object_t *p_obj, counter_t *p_co,
 }
 #define stats_UpdateFloat(a,b,c,d) stats_UpdateFloat( VLC_OBJECT(a),b,c,d )
 
-VLC_EXPORT( void, stats_ComputeInputStats, (input_thread_t*, input_stats_t*) );
-VLC_EXPORT( void, stats_ReinitInputStats, (input_stats_t *) );
-VLC_EXPORT( void, stats_DumpInputStats, (input_stats_t *) );
+void stats_ComputeInputStats(input_thread_t*, input_stats_t*);
+void stats_ReinitInputStats(input_stats_t *);
+void stats_DumpInputStats(input_stats_t *);
 
 #endif
