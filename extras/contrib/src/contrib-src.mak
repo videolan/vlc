@@ -1597,7 +1597,11 @@ ifdef HAVE_MACOSX
 endif
 
 .cdio: libcdio
+ifdef HAVE_DARWIN_OS
+	(cd $<; ./configure --prefix=$(PREFIX) --without-vcdinfo --disable-shared && make && make install && sed -e 's%/usr/lib/libiconv.la%%' -i.orig $(PREFIX)/lib/libcdio.la && sed -e 's%/usr/lib/libiconv.la%%' -i.orig $(PREFIX)/lib/libiso9660.la)
+else
 	(cd $<; sed -e 's%@ENABLE_CPP_TRUE@SUBDIRS = C++%@ENABLE_CPP_TRUE@SUBDIRS = %' -i.orig example/Makefile.in && autoreconf -fisv && ./configure --prefix=$(PREFIX) --without-vcdinfo --disable-shared && make && make install)
+endif
 	touch $@
 
 CLEAN_FILE += .cdio
