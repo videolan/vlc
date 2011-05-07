@@ -91,7 +91,7 @@ enum access_out_query_e
     ACCESS_OUT_CONTROLS_PACE, /* arg1=bool *, can fail (assume true) */
 };
 
-VLC_API sout_access_out_t * sout_AccessOutNew( vlc_object_t *, const char *psz_access, const char *psz_name ) LIBVLC_USED;
+VLC_API sout_access_out_t * sout_AccessOutNew( vlc_object_t *, const char *psz_access, const char *psz_name ) VLC_USED;
 #define sout_AccessOutNew( obj, access, name ) \
         sout_AccessOutNew( VLC_OBJECT(obj), access, name )
 VLC_API void sout_AccessOutDelete( sout_access_out_t * );
@@ -162,8 +162,8 @@ struct sout_input_t
 };
 
 
-VLC_API sout_mux_t * sout_MuxNew( sout_instance_t*, const char *, sout_access_out_t * ) LIBVLC_USED;
-VLC_API sout_input_t * sout_MuxAddStream( sout_mux_t *, es_format_t * ) LIBVLC_USED;
+VLC_API sout_mux_t * sout_MuxNew( sout_instance_t*, const char *, sout_access_out_t * ) VLC_USED;
+VLC_API sout_input_t * sout_MuxAddStream( sout_mux_t *, es_format_t * ) VLC_USED;
 VLC_API void sout_MuxDeleteStream( sout_mux_t *, sout_input_t * );
 VLC_API void sout_MuxDelete( sout_mux_t * );
 VLC_API void sout_MuxSendBuffer( sout_mux_t *, sout_input_t  *, block_t * );
@@ -209,7 +209,7 @@ struct sout_stream_t
 
 VLC_API void sout_StreamChainDelete(sout_stream_t *p_first, sout_stream_t *p_last );
 VLC_API sout_stream_t *sout_StreamChainNew(sout_instance_t *p_sout,
-        char *psz_chain, sout_stream_t *p_next, sout_stream_t **p_last) LIBVLC_USED;
+        char *psz_chain, sout_stream_t *p_next, sout_stream_t **p_last) VLC_USED;
 
 static inline sout_stream_id_t *sout_StreamIdAdd( sout_stream_t *s, es_format_t *fmt )
 {
@@ -234,7 +234,7 @@ VLC_API encoder_t * sout_EncoderCreate( vlc_object_t *obj );
 /****************************************************************************
  * Announce handler
  ****************************************************************************/
-VLC_API session_descriptor_t* sout_AnnounceRegisterSDP( vlc_object_t *, const char *, const char * ) LIBVLC_USED;
+VLC_API session_descriptor_t* sout_AnnounceRegisterSDP( vlc_object_t *, const char *, const char * ) VLC_USED;
 VLC_API int sout_AnnounceUnRegister(vlc_object_t *,session_descriptor_t* );
 #define sout_AnnounceRegisterSDP(o, sdp, addr) \
         sout_AnnounceRegisterSDP(VLC_OBJECT (o), sdp, addr)
@@ -245,9 +245,9 @@ VLC_API int sout_AnnounceUnRegister(vlc_object_t *,session_descriptor_t* );
 
 struct sockaddr;
 
-VLC_API char * vlc_sdp_Start( vlc_object_t *obj, const char *cfgpref, const struct sockaddr *src, size_t srclen, const struct sockaddr *addr, size_t addrlen ) LIBVLC_USED;
+VLC_API char * vlc_sdp_Start( vlc_object_t *obj, const char *cfgpref, const struct sockaddr *src, size_t srclen, const struct sockaddr *addr, size_t addrlen ) VLC_USED;
 VLC_API char * sdp_AddMedia(char **sdp, const char *type, const char *protocol, int dport, unsigned pt, bool bw_indep, unsigned bw, const char *ptname, unsigned clockrate, unsigned channels, const char *fmtp);
-VLC_API char * sdp_AddAttribute(char **sdp, const char *name, const char *fmt, ...) LIBVLC_FORMAT( 3, 4 );
+VLC_API char * sdp_AddAttribute(char **sdp, const char *name, const char *fmt, ...) VLC_FORMAT( 3, 4 );
 
 /** Description module */
 typedef struct sout_description_data_t

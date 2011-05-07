@@ -104,7 +104,7 @@ struct es_out_t
     es_out_sys_t    *p_sys;
 };
 
-LIBVLC_USED
+VLC_USED
 static inline es_out_id_t * es_out_Add( es_out_t *out, const es_format_t *fmt )
 {
     return out->pf_add( out, fmt );

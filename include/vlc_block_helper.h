@@ -37,7 +37,7 @@ typedef struct block_bytestream_t
 /*****************************************************************************
  * block_bytestream_t management
  *****************************************************************************/
-LIBVLC_USED
+VLC_USED
 static inline block_bytestream_t block_BytestreamInit( void )
 {
     block_bytestream_t bytestream;
@@ -101,7 +101,7 @@ static inline void block_BytestreamPush( block_bytestream_t *p_bytestream,
     if( !p_bytestream->p_block ) p_bytestream->p_block = p_block;
 }
 
-LIBVLC_USED
+VLC_USED
 static inline block_t *block_BytestreamPop( block_bytestream_t *p_bytestream )
 {
     block_t *p_block;

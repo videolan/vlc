@@ -171,7 +171,7 @@ VLC_API void vlc_mutex_init( vlc_mutex_t * );
 VLC_API void vlc_mutex_init_recursive( vlc_mutex_t * );
 VLC_API void vlc_mutex_destroy( vlc_mutex_t * );
 VLC_API void vlc_mutex_lock( vlc_mutex_t * );
-VLC_API int vlc_mutex_trylock( vlc_mutex_t * ) LIBVLC_USED;
+VLC_API int vlc_mutex_trylock( vlc_mutex_t * ) VLC_USED;
 VLC_API void vlc_mutex_unlock( vlc_mutex_t * );
 VLC_API void vlc_cond_init( vlc_cond_t * );
 VLC_API void vlc_cond_init_daytime( vlc_cond_t * );
@@ -194,19 +194,19 @@ VLC_API int vlc_threadvar_create(vlc_threadvar_t * , void (*) (void *) );
 VLC_API void vlc_threadvar_delete(vlc_threadvar_t *);
 VLC_API int vlc_threadvar_set(vlc_threadvar_t, void *);
 VLC_API void * vlc_threadvar_get(vlc_threadvar_t);
-VLC_API int vlc_thread_create( vlc_object_t *, void * ( * ) ( vlc_object_t * ), int ) LIBVLC_USED LIBVLC_DEPRECATED;
-VLC_API int vlc_thread_set_priority( vlc_object_t *, int ) LIBVLC_DEPRECATED;
-VLC_API void vlc_thread_join( vlc_object_t * ) LIBVLC_DEPRECATED;
+VLC_API int vlc_thread_create( vlc_object_t *, void * ( * ) ( vlc_object_t * ), int ) VLC_USED VLC_DEPRECATED;
+VLC_API int vlc_thread_set_priority( vlc_object_t *, int ) VLC_DEPRECATED;
+VLC_API void vlc_thread_join( vlc_object_t * ) VLC_DEPRECATED;
 
-VLC_API int vlc_clone(vlc_thread_t *, void * (*) (void *), void *, int) LIBVLC_USED;
+VLC_API int vlc_clone(vlc_thread_t *, void * (*) (void *), void *, int) VLC_USED;
 VLC_API void vlc_cancel(vlc_thread_t);
 VLC_API void vlc_join(vlc_thread_t, void **);
 VLC_API void vlc_control_cancel (int cmd, ...);
 
-VLC_API int vlc_timer_create(vlc_timer_t *, void (*) (void *), void *) LIBVLC_USED;
+VLC_API int vlc_timer_create(vlc_timer_t *, void (*) (void *), void *) VLC_USED;
 VLC_API void vlc_timer_destroy(vlc_timer_t);
 VLC_API void vlc_timer_schedule(vlc_timer_t, bool, mtime_t, mtime_t);
-VLC_API unsigned vlc_timer_getoverrun(vlc_timer_t) LIBVLC_USED;
+VLC_API unsigned vlc_timer_getoverrun(vlc_timer_t) VLC_USED;
 
 #ifndef LIBVLC_USE_PTHREAD_CANCEL
 enum {

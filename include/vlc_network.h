@@ -85,10 +85,10 @@ struct msghdr
 #   undef IPV6_JOIN_GROUP
 #endif
 
-int vlc_socket (int, int, int, bool nonblock) LIBVLC_USED;
+int vlc_socket (int, int, int, bool nonblock) VLC_USED;
 
 struct sockaddr;
-VLC_API int vlc_accept( int, struct sockaddr *, socklen_t *, bool ) LIBVLC_USED;
+VLC_API int vlc_accept( int, struct sockaddr *, socklen_t *, bool ) VLC_USED;
 
 # ifdef __cplusplus
 extern "C" {
@@ -158,7 +158,7 @@ VLC_API char * net_Gets( vlc_object_t *p_this, int fd, const v_socket_t * );
 #define net_Gets(a,b,c) net_Gets(VLC_OBJECT(a),b,c)
 
 
-VLC_API ssize_t net_Printf( vlc_object_t *p_this, int fd, const v_socket_t *, const char *psz_fmt, ... ) LIBVLC_FORMAT( 4, 5 );
+VLC_API ssize_t net_Printf( vlc_object_t *p_this, int fd, const v_socket_t *, const char *psz_fmt, ... ) VLC_FORMAT( 4, 5 );
 #define net_Printf(o,fd,vs,...) net_Printf(VLC_OBJECT(o),fd,vs, __VA_ARGS__)
 VLC_API ssize_t net_vaPrintf( vlc_object_t *p_this, int fd, const v_socket_t *, const char *psz_fmt, va_list args );
 #define net_vaPrintf(a,b,c,d,e) net_vaPrintf(VLC_OBJECT(a),b,c,d,e)

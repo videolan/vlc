@@ -39,7 +39,7 @@ typedef struct dialog_fatal_t
 
 VLC_API void dialog_VFatal(vlc_object_t *, bool, const char *, const char *, va_list);
 
-static inline LIBVLC_FORMAT(3, 4)
+static inline VLC_FORMAT(3, 4)
 void dialog_Fatal (vlc_object_t *obj, const char *title, const char *fmt, ...)
 {
      va_list ap;
@@ -51,7 +51,7 @@ void dialog_Fatal (vlc_object_t *obj, const char *title, const char *fmt, ...)
 #define dialog_Fatal(o, t, ...) \
         dialog_Fatal(VLC_OBJECT(o), t, __VA_ARGS__)
 
-static inline LIBVLC_FORMAT(3, 4)
+static inline VLC_FORMAT(3, 4)
 void dialog_FatalWait (vlc_object_t *obj, const char *title,
                        const char *fmt, ...){
      va_list ap;
@@ -74,7 +74,7 @@ typedef struct dialog_login_t
     char **password;
 } dialog_login_t;
 
-VLC_API void dialog_Login(vlc_object_t *, char **, char **, const char *, const char *, ...) LIBVLC_FORMAT (5, 6);
+VLC_API void dialog_Login(vlc_object_t *, char **, char **, const char *, const char *, ...) VLC_FORMAT (5, 6);
 #define dialog_Login(o, u, p, t, ...) \
         dialog_Login(VLC_OBJECT(o), u, p, t, __VA_ARGS__)
 
@@ -107,7 +107,7 @@ typedef struct dialog_progress_bar_t
     void *p_sys;
 } dialog_progress_bar_t;
 
-VLC_API dialog_progress_bar_t * dialog_ProgressCreate(vlc_object_t *, const char *, const char *, const char *) LIBVLC_USED;
+VLC_API dialog_progress_bar_t * dialog_ProgressCreate(vlc_object_t *, const char *, const char *, const char *) VLC_USED;
 #define dialog_ProgressCreate(o, t, m, c) \
         dialog_ProgressCreate(VLC_OBJECT(o), t, m, c)
 VLC_API void dialog_ProgressDestroy(dialog_progress_bar_t *);

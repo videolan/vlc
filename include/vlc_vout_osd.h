@@ -71,7 +71,7 @@ VLC_API void vout_OSDText( vout_thread_t *vout, int channel, int position, mtime
  *
  * Provided for convenience.
  */
-VLC_API void vout_OSDMessage( vout_thread_t *, int, const char *, ... ) LIBVLC_FORMAT( 3, 4 );
+VLC_API void vout_OSDMessage( vout_thread_t *, int, const char *, ... ) VLC_FORMAT( 3, 4 );
 
 /**
  * Display a slider on the video output.

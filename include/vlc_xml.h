@@ -46,7 +46,7 @@ struct xml_t
                             const char * );
 };
 
-VLC_API xml_t * xml_Create( vlc_object_t * ) LIBVLC_USED;
+VLC_API xml_t * xml_Create( vlc_object_t * ) VLC_USED;
 #define xml_Create( a ) xml_Create( VLC_OBJECT(a) )
 VLC_API void xml_Delete( xml_t * );
 
@@ -76,10 +76,10 @@ struct xml_reader_t
     int (*pf_use_dtd) ( xml_reader_t * );
 };
 
-VLC_API xml_reader_t * xml_ReaderCreate(vlc_object_t *, stream_t *) LIBVLC_USED;
+VLC_API xml_reader_t * xml_ReaderCreate(vlc_object_t *, stream_t *) VLC_USED;
 #define xml_ReaderCreate( a, s ) xml_ReaderCreate(VLC_OBJECT(a), s)
 VLC_API void xml_ReaderDelete(xml_reader_t *);
-VLC_API xml_reader_t * xml_ReaderReset(xml_reader_t *, stream_t *) LIBVLC_USED;
+VLC_API xml_reader_t * xml_ReaderReset(xml_reader_t *, stream_t *) VLC_USED;
 
 static inline int xml_ReaderNextNode( xml_reader_t *reader, const char **pval )
 {

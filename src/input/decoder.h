@@ -31,7 +31,7 @@
 #define BLOCK_FLAG_CORE_FLUSH (1 <<BLOCK_FLAG_CORE_PRIVATE_SHIFT)
 
 decoder_t *input_DecoderNew( input_thread_t *, es_format_t *, input_clock_t *,
-                             sout_instance_t * ) LIBVLC_USED;
+                             sout_instance_t * ) VLC_USED;
 
 /**
  * This function changes the pause state.

@@ -127,12 +127,12 @@ static inline int vlc_sd_control( services_discovery_t *p_sd, int i_control, va_
 
 /* Get the services discovery modules names to use in Create(), in a null
  * terminated string array. Array and string must be freed after use. */
-VLC_API char ** vlc_sd_GetNames( vlc_object_t *, char ***, int ** ) LIBVLC_USED;
+VLC_API char ** vlc_sd_GetNames( vlc_object_t *, char ***, int ** ) VLC_USED;
 #define vlc_sd_GetNames(obj, pln, pcat ) \
         vlc_sd_GetNames(VLC_OBJECT(obj), pln, pcat)
 
 /* Creation of a services_discovery object */
-VLC_API services_discovery_t * vlc_sd_Create( vlc_object_t *, const char * ) LIBVLC_USED;
+VLC_API services_discovery_t * vlc_sd_Create( vlc_object_t *, const char * ) VLC_USED;
 VLC_API bool vlc_sd_Start( services_discovery_t * );
 VLC_API void vlc_sd_Stop( services_discovery_t * );
 VLC_API void vlc_sd_Destroy( services_discovery_t * );
@@ -147,10 +147,10 @@ static inline void vlc_sd_StopAndDestroy( services_discovery_t * p_this )
 }
 
 /* Read info from discovery object */
-VLC_API char * services_discovery_GetLocalizedName( services_discovery_t * p_this ) LIBVLC_USED;
+VLC_API char * services_discovery_GetLocalizedName( services_discovery_t * p_this ) VLC_USED;
 
 /* Receive event notification (preferred way to get new items) */
-VLC_API vlc_event_manager_t * services_discovery_EventManager( services_discovery_t * p_this ) LIBVLC_USED;
+VLC_API vlc_event_manager_t * services_discovery_EventManager( services_discovery_t * p_this ) VLC_USED;
 
 /* Used by services_discovery to post update about their items */
     /* About the psz_category, it is a legacy way to add info to the item,

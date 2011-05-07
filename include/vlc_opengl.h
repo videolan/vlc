@@ -56,7 +56,7 @@ enum {
     VLC_OPENGL_ES2,
 };
 
-VLC_API vlc_gl_t *vlc_gl_Create(struct vout_window_t *, unsigned, const char *) LIBVLC_USED;
+VLC_API vlc_gl_t *vlc_gl_Create(struct vout_window_t *, unsigned, const char *) VLC_USED;
 VLC_API void vlc_gl_Destroy(vlc_gl_t *);
 
 static inline int vlc_gl_MakeCurrent(vlc_gl_t *gl)

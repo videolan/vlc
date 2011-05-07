@@ -87,7 +87,7 @@ typedef struct msg_subscription_t msg_subscription_t;
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-VLC_API void msg_Generic( vlc_object_t *, int, const char *, const char *, ... ) LIBVLC_FORMAT( 4, 5 );
+VLC_API void msg_Generic( vlc_object_t *, int, const char *, const char *, ... ) VLC_FORMAT( 4, 5 );
 VLC_API void msg_GenericVa( vlc_object_t *, int, const char *, const char *, va_list args );
 #define msg_GenericVa(a, b, c, d, e) msg_GenericVa(VLC_OBJECT(a), b, c, d, e)
 
@@ -112,7 +112,7 @@ typedef struct msg_cb_data_t msg_cb_data_t;
  */
 typedef void (*msg_callback_t) (msg_cb_data_t *, msg_item_t *, unsigned);
 
-VLC_API msg_subscription_t* msg_Subscribe( libvlc_int_t *, msg_callback_t, msg_cb_data_t * ) LIBVLC_USED;
+VLC_API msg_subscription_t* msg_Subscribe( libvlc_int_t *, msg_callback_t, msg_cb_data_t * ) VLC_USED;
 VLC_API void msg_Unsubscribe( msg_subscription_t * );
 VLC_API void msg_SubscriptionSetVerbosity( msg_subscription_t *, const int);
 

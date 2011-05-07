@@ -180,7 +180,7 @@ struct encoder_t
  * buffer. You have to release it using decoder_DeletePicture or by returning
  * it to the caller as a pf_decode_video return value.
  */
-VLC_API picture_t * decoder_NewPicture( decoder_t * ) LIBVLC_USED;
+VLC_API picture_t * decoder_NewPicture( decoder_t * ) VLC_USED;
 
 /**
  * This function will release a picture create by decoder_NewPicture.
@@ -204,7 +204,7 @@ VLC_API void decoder_UnlinkPicture( decoder_t *, picture_t * );
  * output buffer. You have to release it using decoder_DeleteAudioBuffer
  * or by returning it to the caller as a pf_decode_audio return value.
  */
-VLC_API aout_buffer_t * decoder_NewAudioBuffer( decoder_t *, int i_size ) LIBVLC_USED;
+VLC_API aout_buffer_t * decoder_NewAudioBuffer( decoder_t *, int i_size ) VLC_USED;
 
 /**
  * This function will release a audio buffer created by decoder_NewAudioBuffer.
@@ -216,7 +216,7 @@ VLC_API void decoder_DeleteAudioBuffer( decoder_t *, aout_buffer_t *p_buffer );
  * buffer. You have to release it using decoder_DeleteSubpicture or by returning
  * it to the caller as a pf_decode_sub return value.
  */
-VLC_API subpicture_t * decoder_NewSubpicture( decoder_t *, const subpicture_updater_t * ) LIBVLC_USED;
+VLC_API subpicture_t * decoder_NewSubpicture( decoder_t *, const subpicture_updater_t * ) VLC_USED;
 
 /**
  * This function will release a subpicture created by decoder_NewSubicture.
@@ -235,12 +235,12 @@ VLC_API int decoder_GetInputAttachments( decoder_t *, input_attachment_t ***ppp_
  * to mdate().
  * You MUST use it *only* for gathering statistics about speed.
  */
-VLC_API mtime_t decoder_GetDisplayDate( decoder_t *, mtime_t ) LIBVLC_USED;
+VLC_API mtime_t decoder_GetDisplayDate( decoder_t *, mtime_t ) VLC_USED;
 
 /**
  * This function returns the current input rate.
  * You MUST use it *only* for gathering statistics about speed.
  */
-VLC_API int decoder_GetDisplayRate( decoder_t * ) LIBVLC_USED;
+VLC_API int decoder_GetDisplayRate( decoder_t * ) VLC_USED;
 
 #endif /* _VLC_CODEC_H */

@@ -62,14 +62,14 @@ struct vlc_object_t
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-VLC_API void *vlc_object_create( vlc_object_t *, size_t ) LIBVLC_MALLOC LIBVLC_USED;
+VLC_API void *vlc_object_create( vlc_object_t *, size_t ) VLC_MALLOC VLC_USED;
 VLC_API void vlc_object_attach( vlc_object_t *, vlc_object_t * );
-VLC_API vlc_object_t *vlc_object_find_name( vlc_object_t *, const char *, int ) LIBVLC_USED LIBVLC_DEPRECATED;
+VLC_API vlc_object_t *vlc_object_find_name( vlc_object_t *, const char *, int ) VLC_USED VLC_DEPRECATED;
 VLC_API void * vlc_object_hold( vlc_object_t * );
 VLC_API void vlc_object_release( vlc_object_t * );
-VLC_API vlc_list_t *vlc_list_children( vlc_object_t * ) LIBVLC_USED;
+VLC_API vlc_list_t *vlc_list_children( vlc_object_t * ) VLC_USED;
 VLC_API void vlc_list_release( vlc_list_t * );
-VLC_API char *vlc_object_get_name( const vlc_object_t * ) LIBVLC_USED;
+VLC_API char *vlc_object_get_name( const vlc_object_t * ) VLC_USED;
 #define vlc_object_get_name(o) vlc_object_get_name(VLC_OBJECT(o))
 
 /**}@*/
@@ -92,11 +92,11 @@ VLC_API char *vlc_object_get_name( const vlc_object_t * ) LIBVLC_USED;
     vlc_list_children( VLC_OBJECT(a) )
 
 /* Objects and threading */
-VLC_API void vlc_object_kill( vlc_object_t * ) LIBVLC_DEPRECATED;
+VLC_API void vlc_object_kill( vlc_object_t * ) VLC_DEPRECATED;
 #define vlc_object_kill(a) \
     vlc_object_kill( VLC_OBJECT(a) )
 
-LIBVLC_USED
+VLC_USED
 static inline bool vlc_object_alive (const vlc_object_t *obj)
 {
     barrier ();

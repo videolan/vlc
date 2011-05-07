@@ -137,12 +137,12 @@ struct block_t
  * - block_Duplicate : create a copy of a block.
  ****************************************************************************/
 VLC_API void block_Init( block_t *, void *, size_t );
-VLC_API block_t * block_Alloc( size_t ) LIBVLC_USED;
-VLC_API block_t * block_Realloc( block_t *, ssize_t i_pre, size_t i_body ) LIBVLC_USED;
+VLC_API block_t * block_Alloc( size_t ) VLC_USED;
+VLC_API block_t * block_Realloc( block_t *, ssize_t i_pre, size_t i_body ) VLC_USED;
 
 #define block_New( dummy, size ) block_Alloc(size)
 
-LIBVLC_USED
+VLC_USED
 static inline block_t *block_Duplicate( block_t *p_block )
 {
     block_t *p_dup = block_Alloc( p_block->i_buffer );
@@ -165,9 +165,9 @@ static inline void block_Release( block_t *p_block )
     p_block->pf_release( p_block );
 }
 
-VLC_API block_t * block_heap_Alloc(void *, void *, size_t) LIBVLC_USED;
-VLC_API block_t * block_mmap_Alloc(void *addr, size_t length) LIBVLC_USED;
-VLC_API block_t * block_File(int fd) LIBVLC_USED;
+VLC_API block_t * block_heap_Alloc(void *, void *, size_t) VLC_USED;
+VLC_API block_t * block_mmap_Alloc(void *addr, size_t length) VLC_USED;
+VLC_API block_t * block_File(int fd) VLC_USED;
 
 static inline void block_Cleanup (void *block)
 {
@@ -306,15 +306,15 @@ static inline block_t *block_ChainGather( block_t *p_list )
  * block_FifoGet and block_FifoShow are cancellation points.
  ****************************************************************************/
 
-VLC_API block_fifo_t * block_FifoNew( void ) LIBVLC_USED;
+VLC_API block_fifo_t * block_FifoNew( void ) VLC_USED;
 VLC_API void block_FifoRelease( block_fifo_t * );
 VLC_API void block_FifoPace( block_fifo_t *fifo, size_t max_depth, size_t max_size );
 VLC_API void block_FifoEmpty( block_fifo_t * );
 VLC_API size_t block_FifoPut( block_fifo_t *, block_t * );
 VLC_API void block_FifoWake( block_fifo_t * );
-VLC_API block_t * block_FifoGet( block_fifo_t * ) LIBVLC_USED;
+VLC_API block_t * block_FifoGet( block_fifo_t * ) VLC_USED;
 VLC_API block_t * block_FifoShow( block_fifo_t * );
-size_t block_FifoSize( const block_fifo_t *p_fifo ) LIBVLC_USED;
-VLC_API size_t block_FifoCount( const block_fifo_t *p_fifo ) LIBVLC_USED;
+size_t block_FifoSize( const block_fifo_t *p_fifo ) VLC_USED;
+VLC_API size_t block_FifoCount( const block_fifo_t *p_fifo ) VLC_USED;
 
 #endif /* VLC_BLOCK_H */

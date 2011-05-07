@@ -75,22 +75,22 @@
 /* Format string sanity checks */
 #ifdef __GNUC__
 #   if defined( _WIN32 ) && (__GNUC__ > 4 || ( __GNUC__ == 4 && __GNUC_MINOR__ >= 4 ) )
-#     define LIBVLC_FORMAT(x,y) __attribute__ ((format(gnu_printf,x,y)))
+#     define VLC_FORMAT(x,y) __attribute__ ((format(gnu_printf,x,y)))
 #   else
-#     define LIBVLC_FORMAT(x,y) __attribute__ ((format(printf,x,y)))
+#     define VLC_FORMAT(x,y) __attribute__ ((format(printf,x,y)))
 #   endif
-#   define LIBVLC_FORMAT_ARG(x) __attribute__ ((format_arg(x)))
+#   define VLC_FORMAT_ARG(x) __attribute__ ((format_arg(x)))
 #   if __GNUC__ > 3 || (__GNUC__ == 3 && (__GNUC_MINOR__ >= 4))
-#     define LIBVLC_USED __attribute__ ((warn_unused_result))
+#     define VLC_USED __attribute__ ((warn_unused_result))
 #   else
-#     define LIBVLC_USED
+#     define VLC_USED
 #   endif
-#   define LIBVLC_MALLOC __attribute__ ((malloc))
+#   define VLC_MALLOC __attribute__ ((malloc))
 #else
-#   define LIBVLC_FORMAT(x,y)
-#   define LIBVLC_FORMAT_ARG(x)
-#   define LIBVLC_USED
-#   define LIBVLC_MALLOC
+#   define VLC_FORMAT(x,y)
+#   define VLC_FORMAT_ARG(x)
+#   define VLC_USED
+#   define VLC_MALLOC
 #endif
 
 /* Branch prediction */
@@ -103,27 +103,27 @@
 #endif
 
 #if defined(__GNUC__) && !defined __cplusplus
-# define LIBVLC_DEPRECATED __attribute__((deprecated))
+# define VLC_DEPRECATED __attribute__((deprecated))
 #else
-# define LIBVLC_DEPRECATED
+# define VLC_DEPRECATED
 #endif
 
 /* Linkage */
 #ifdef __cplusplus
-# define LIBVLC_EXTERN extern "C"
+# define VLC_EXTERN extern "C"
 #else
-# define LIBVLC_EXTERN
+# define VLC_EXTERN
 #endif
 
 #if defined (WIN32) && defined (DLL_EXPORT)
-# define LIBVLC_EXPORT __declspec(dllexport)
+# define VLC_EXPORT __declspec(dllexport)
 #elif defined (__GNUC__) && (__GNUC__ >= 4)
-# define LIBVLC_EXPORT __attribute__((visibility("default")))
+# define VLC_EXPORT __attribute__((visibility("default")))
 #else
-# define LIBVLC_EXPORT
+# define VLC_EXPORT
 #endif
 
-#define VLC_API LIBVLC_EXTERN LIBVLC_EXPORT
+#define VLC_API VLC_EXTERN VLC_EXPORT
 
 
 /*****************************************************************************
@@ -582,7 +582,7 @@ VLC_API void vlc_release(gc_object_t *);
 #   define __MIN(a, b)   ( ((a) < (b)) ? (a) : (b) )
 #endif
 
-LIBVLC_USED
+VLC_USED
 static inline int64_t GCD ( int64_t a, int64_t b )
 {
     while( b )
@@ -595,7 +595,7 @@ static inline int64_t GCD ( int64_t a, int64_t b )
 }
 
 /* function imported from libavutil/common.h */
-LIBVLC_USED
+VLC_USED
 static inline uint8_t clip_uint8_vlc( int32_t a )
 {
     if( a&(~255) ) return (-a)>>31;
@@ -603,7 +603,7 @@ static inline uint8_t clip_uint8_vlc( int32_t a )
 }
 
 /* Count leading zeroes */
-LIBVLC_USED
+VLC_USED
 static inline unsigned clz (unsigned x)
 {
 #ifdef __GNUC_
@@ -626,7 +626,7 @@ static inline unsigned clz (unsigned x)
 #define clz32( x ) (clz(x) - ((sizeof(unsigned) - sizeof (uint32_t)) * 8))
 
 /* Bit weight */
-LIBVLC_USED
+VLC_USED
 static inline unsigned popcount (unsigned x)
 {
 #ifdef __GNUC_
@@ -647,20 +647,20 @@ static inline unsigned popcount (unsigned x)
 
 #define EMPTY_STR(str) (!str || !*str)
 
-VLC_API char const * vlc_error( int ) LIBVLC_USED;
+VLC_API char const * vlc_error( int ) VLC_USED;
 
 #include <vlc_arrays.h>
 
 /* MSB (big endian)/LSB (little endian) conversions - network order is always
  * MSB, and should be used for both network communications and files. */
-LIBVLC_USED
+VLC_USED
 static inline uint16_t U16_AT( const void * _p )
 {
     const uint8_t * p = (const uint8_t *)_p;
     return ( ((uint16_t)p[0] << 8) | p[1] );
 }
 
-LIBVLC_USED
+VLC_USED
 static inline uint32_t U32_AT( const void * _p )
 {
     const uint8_t * p = (const uint8_t *)_p;
@@ -668,7 +668,7 @@ static inline uint32_t U32_AT( const void * _p )
               | ((uint32_t)p[2] << 8) | p[3] );
 }
 
-LIBVLC_USED
+VLC_USED
 static inline uint64_t U64_AT( const void * _p )
 {
     const uint8_t * p = (const uint8_t *)_p;
@@ -678,14 +678,14 @@ static inline uint64_t U64_AT( const void * _p )
               | ((uint64_t)p[6] << 8) | p[7] );
 }
 
-LIBVLC_USED
+VLC_USED
 static inline uint16_t GetWLE( const void * _p )
 {
     const uint8_t * p = (const uint8_t *)_p;
     return ( ((uint16_t)p[1] << 8) | p[0] );
 }
 
-LIBVLC_USED
+VLC_USED
 static inline uint32_t GetDWLE( const void * _p )
 {
     const uint8_t * p = (const uint8_t *)_p;
@@ -693,7 +693,7 @@ static inline uint32_t GetDWLE( const void * _p )
               | ((uint32_t)p[1] << 8) | p[0] );
 }
 
-LIBVLC_USED
+VLC_USED
 static inline uint64_t GetQWLE( const void * _p )
 {
     const uint8_t * p = (const uint8_t *)_p;
@@ -756,7 +756,7 @@ static inline void _SetQWBE( uint8_t *p, uint64_t i_qw )
 #define ntoh16(i) ntohs(i)
 #define ntoh32(i) ntohl(i)
 
-LIBVLC_USED
+VLC_USED
 static inline uint64_t ntoh64 (uint64_t ll)
 {
     union { uint64_t qw; uint8_t b[16]; } v = { ll };
@@ -829,10 +829,10 @@ static inline uint64_t ntoh64 (uint64_t ll)
 
 VLC_API bool vlc_ureduce( unsigned *, unsigned *, uint64_t, uint64_t, uint64_t );
 
-VLC_API void * vlc_memalign( void **base, size_t alignment, size_t size ) LIBVLC_USED;
+VLC_API void * vlc_memalign( void **base, size_t alignment, size_t size ) VLC_USED;
 
 /* execve wrapper (defined in src/extras/libc.c) */
-VLC_API int vlc_execve( vlc_object_t *p_object, int i_argc, char *const *pp_argv, char *const *pp_env, const char *psz_cwd, const char *p_in, size_t i_in, char **pp_data, size_t *pi_data ) LIBVLC_USED;
+VLC_API int vlc_execve( vlc_object_t *p_object, int i_argc, char *const *pp_argv, char *const *pp_env, const char *psz_cwd, const char *p_in, size_t i_in, char **pp_data, size_t *pi_data ) VLC_USED;
 #define vlc_execve(a,b,c,d,e,f,g,h,i) vlc_execve(VLC_OBJECT(a),b,c,d,e,f,g,h,i)
 
 VLC_API void vlc_tdestroy( void *, void (*)(void *) );
@@ -844,12 +844,12 @@ VLC_API void * vlc_memset( void *, int, size_t );
 /*****************************************************************************
  * I18n stuff
  *****************************************************************************/
-VLC_API char * vlc_gettext( const char *msgid ) LIBVLC_FORMAT_ARG(1);
+VLC_API char * vlc_gettext( const char *msgid ) VLC_FORMAT_ARG(1);
 
 #define vlc_pgettext( ctx, id ) \
         vlc_pgettext_aux( ctx "\004" id, id )
 
-LIBVLC_FORMAT_ARG(2)
+VLC_FORMAT_ARG(2)
 static inline const char *vlc_pgettext_aux( const char *ctx, const char *id )
 {
     const char *tr = vlc_gettext( ctx );
@@ -878,9 +878,9 @@ static inline void *xrealloc (void *ptr, size_t len)
 /*****************************************************************************
  * libvlc features
  *****************************************************************************/
-VLC_API const char * VLC_CompileBy( void ) LIBVLC_USED;
-VLC_API const char * VLC_CompileHost( void ) LIBVLC_USED;
-VLC_API const char * VLC_Compiler( void ) LIBVLC_USED;
+VLC_API const char * VLC_CompileBy( void ) VLC_USED;
+VLC_API const char * VLC_CompileHost( void ) VLC_USED;
+VLC_API const char * VLC_Compiler( void ) VLC_USED;
 
 /*****************************************************************************
  * Additional vlc stuff

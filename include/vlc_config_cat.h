@@ -280,7 +280,7 @@ static const struct config_category_t categories_array[] =
     { -1, NULL, NULL }
 };
 
-LIBVLC_USED
+VLC_USED
 static inline const char *config_CategoryNameGet( int i_value )
 {
     int i = 0;
@@ -295,7 +295,7 @@ static inline const char *config_CategoryNameGet( int i_value )
     return NULL;
 }
 
-LIBVLC_USED
+VLC_USED
 static inline const char *config_CategoryHelpGet( int i_value )
 {
     int i = 0;

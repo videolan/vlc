@@ -138,7 +138,7 @@ struct intf_sys_t
 
 #define msg_rc( ... ) __msg_rc( p_intf, __VA_ARGS__ )
 
-LIBVLC_FORMAT(2, 3)
+VLC_FORMAT(2, 3)
 static void __msg_rc( intf_thread_t *p_intf, const char *psz_fmt, ... )
 {
     va_list args;

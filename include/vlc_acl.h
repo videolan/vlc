@@ -27,9 +27,9 @@
 
 
 VLC_API int ACL_Check( vlc_acl_t *p_acl, const char *psz_ip );
-VLC_API vlc_acl_t * ACL_Create( vlc_object_t *p_this, bool b_allow ) LIBVLC_USED LIBVLC_MALLOC;
+VLC_API vlc_acl_t * ACL_Create( vlc_object_t *p_this, bool b_allow ) VLC_USED VLC_MALLOC;
 #define ACL_Create(a, b) ACL_Create(VLC_OBJECT(a), b)
-VLC_API vlc_acl_t * ACL_Duplicate( vlc_object_t *p_this, const vlc_acl_t *p_acl ) LIBVLC_USED LIBVLC_MALLOC;
+VLC_API vlc_acl_t * ACL_Duplicate( vlc_object_t *p_this, const vlc_acl_t *p_acl ) VLC_USED VLC_MALLOC;
 #define ACL_Duplicate(a,b) ACL_Duplicate(VLC_OBJECT(a),b)
 VLC_API void ACL_Destroy( vlc_acl_t *p_acl );
 

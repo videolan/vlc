@@ -167,7 +167,7 @@ VLC_API int demux_vaControlHelper( stream_t *, int64_t i_start, int64_t i_end, i
  * Miscellaneous helpers for demuxers
  *************************************************************************/
 
-LIBVLC_USED
+VLC_USED
 static inline bool demux_IsPathExtension( demux_t *p_demux, const char *psz_extension )
 {
     if( !p_demux->psz_file )
@@ -179,7 +179,7 @@ static inline bool demux_IsPathExtension( demux_t *p_demux, const char *psz_exte
     return true;
 }
 
-LIBVLC_USED
+VLC_USED
 static inline bool demux_IsForced( demux_t *p_demux, const char *psz_name )
 {
    if( !p_demux->psz_demux || strcmp( p_demux->psz_demux, psz_name ) )
@@ -194,7 +194,7 @@ static inline bool demux_IsForced( demux_t *p_demux, const char *psz_name )
  * The provided es_format_t will be cleaned on error or by
  * demux_PacketizerDestroy.
  */
-VLC_API decoder_t * demux_PacketizerNew( demux_t *p_demux, es_format_t *p_fmt, const char *psz_msg ) LIBVLC_USED;
+VLC_API decoder_t * demux_PacketizerNew( demux_t *p_demux, es_format_t *p_fmt, const char *psz_msg ) VLC_USED;
 
 /**
  * This function will destroy a packetizer create by demux_PacketizerNew.
@@ -205,7 +205,7 @@ VLC_API void demux_PacketizerDestroy( decoder_t *p_packetizer );
  * This function will return the parent input of this demux.
  * It is retained. Can return NULL.
  */
-VLC_API input_thread_t * demux_GetParentInput( demux_t *p_demux ) LIBVLC_USED;
+VLC_API input_thread_t * demux_GetParentInput( demux_t *p_demux ) VLC_USED;
 
 /* */
 #define DEMUX_INIT_COMMON() do {            \

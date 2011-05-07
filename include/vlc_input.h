@@ -526,10 +526,10 @@ enum input_query_e
  * Prototypes
  *****************************************************************************/
 
-VLC_API input_thread_t * input_Create( vlc_object_t *p_parent, input_item_t *, const char *psz_log, input_resource_t * ) LIBVLC_USED;
+VLC_API input_thread_t * input_Create( vlc_object_t *p_parent, input_item_t *, const char *psz_log, input_resource_t * ) VLC_USED;
 #define input_Create(a,b,c,d) input_Create(VLC_OBJECT(a),b,c,d)
 
-VLC_API input_thread_t * input_CreateAndStart( vlc_object_t *p_parent, input_item_t *, const char *psz_log ) LIBVLC_USED;
+VLC_API input_thread_t * input_CreateAndStart( vlc_object_t *p_parent, input_item_t *, const char *psz_log ) VLC_USED;
 #define input_CreateAndStart(a,b,c) input_CreateAndStart(VLC_OBJECT(a),b,c)
 
 VLC_API int input_Start( input_thread_t * );
@@ -549,7 +549,7 @@ VLC_API int input_Control( input_thread_t *, int i_query, ...  );
  * You have to keep a reference to the input or to the input_item_t until
  * you do not need it anymore.
  */
-VLC_API input_item_t* input_GetItem( input_thread_t * ) LIBVLC_USED;
+VLC_API input_item_t* input_GetItem( input_thread_t * ) VLC_USED;
 
 /**
  * It will return the current state of the input.
@@ -635,7 +635,7 @@ static inline int input_ModifyPcrSystem( input_thread_t *p_input, bool b_absolut
 }
 
 /* */
-VLC_API decoder_t * input_DecoderCreate( vlc_object_t *, es_format_t *, input_resource_t * ) LIBVLC_USED;
+VLC_API decoder_t * input_DecoderCreate( vlc_object_t *, es_format_t *, input_resource_t * ) VLC_USED;
 VLC_API void input_DecoderDelete( decoder_t * );
 VLC_API void input_DecoderDecode( decoder_t *, block_t *, bool b_do_pace );
 
@@ -651,7 +651,7 @@ VLC_API void input_SplitMRL( const char **ppsz_access, const char **ppsz_demux, 
 /**
  * This function creates a sane filename path.
  */
-VLC_API char * input_CreateFilename( vlc_object_t *, const char *psz_path, const char *psz_prefix, const char *psz_extension ) LIBVLC_USED;
+VLC_API char * input_CreateFilename( vlc_object_t *, const char *psz_path, const char *psz_prefix, const char *psz_extension ) VLC_USED;
 
 /**
  * It creates an empty input resource handler.
@@ -659,7 +659,7 @@ VLC_API char * input_CreateFilename( vlc_object_t *, const char *psz_path, const
  * The given object MUST stay alive as long as the input_resource_t is
  * not deleted.
  */
-VLC_API input_resource_t * input_resource_New( vlc_object_t * ) LIBVLC_USED;
+VLC_API input_resource_t * input_resource_New( vlc_object_t * ) VLC_USED;
 
 /**
  * It releases an input resource.

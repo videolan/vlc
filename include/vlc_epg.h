@@ -73,7 +73,7 @@ VLC_API void vlc_epg_AddEvent(vlc_epg_t *p_epg, int64_t i_start, int i_duration,
  *
  * You must call vlc_epg_Delete to release the associated resource.
  */
-VLC_API vlc_epg_t * vlc_epg_New(const char *psz_name) LIBVLC_USED;
+VLC_API vlc_epg_t * vlc_epg_New(const char *psz_name) VLC_USED;
 
 /**
  * It releases a vlc_epg_t*.

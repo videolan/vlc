@@ -250,7 +250,7 @@ enum pl_locked_state
 #define PL_UNLOCK playlist_Unlock( p_playlist )
 #define PL_ASSERT_LOCKED playlist_AssertLocked( p_playlist )
 
-VLC_API playlist_t * pl_Get( vlc_object_t * ) LIBVLC_USED;
+VLC_API playlist_t * pl_Get( vlc_object_t * ) VLC_USED;
 #define pl_Get( a ) pl_Get( VLC_OBJECT(a) )
 
 /* Playlist control */
@@ -279,7 +279,7 @@ VLC_API int playlist_Control( playlist_t *p_playlist, int i_query, bool b_locked
 
 /** Get current playing input. The object is retained.
  */
-VLC_API input_thread_t * playlist_CurrentInput( playlist_t *p_playlist ) LIBVLC_USED;
+VLC_API input_thread_t * playlist_CurrentInput( playlist_t *p_playlist ) VLC_USED;
 
 /** Clear the playlist
  * \param b_locked TRUE if playlist is locked when entering this function
@@ -297,7 +297,7 @@ VLC_API int playlist_TreeMove( playlist_t *, playlist_item_t *, playlist_item_t 
 VLC_API int playlist_TreeMoveMany( playlist_t *, int, playlist_item_t **, playlist_item_t *, int );
 VLC_API int playlist_RecursiveNodeSort( playlist_t *, playlist_item_t *,int, int );
 
-VLC_API playlist_item_t * playlist_CurrentPlayingItem( playlist_t * ) LIBVLC_USED;
+VLC_API playlist_item_t * playlist_CurrentPlayingItem( playlist_t * ) VLC_USED;
 VLC_API int playlist_Status( playlist_t * );
 
 /**
@@ -343,8 +343,8 @@ VLC_API playlist_item_t * playlist_NodeAddInput( playlist_t *, input_item_t *, p
 VLC_API int playlist_NodeAddCopy( playlist_t *, playlist_item_t *, playlist_item_t *, int );
 
 /********************************** Item search *************************/
-VLC_API playlist_item_t * playlist_ItemGetById(playlist_t *, int ) LIBVLC_USED;
-VLC_API playlist_item_t * playlist_ItemGetByInput(playlist_t *,input_item_t * ) LIBVLC_USED;
+VLC_API playlist_item_t * playlist_ItemGetById(playlist_t *, int ) VLC_USED;
+VLC_API playlist_item_t * playlist_ItemGetByInput(playlist_t *,input_item_t * ) VLC_USED;
 
 VLC_API int playlist_LiveSearchUpdate(playlist_t *, playlist_item_t *, const char *, bool );
 
@@ -356,11 +356,11 @@ VLC_API playlist_item_t * playlist_NodeCreate( playlist_t *, const char *, playl
 VLC_API int playlist_NodeAppend(playlist_t *,playlist_item_t*,playlist_item_t *);
 VLC_API int playlist_NodeInsert(playlist_t *,playlist_item_t*,playlist_item_t *, int);
 VLC_API int playlist_NodeRemoveItem(playlist_t *,playlist_item_t*,playlist_item_t *);
-VLC_API playlist_item_t * playlist_ChildSearchName(playlist_item_t*, const char* ) LIBVLC_USED;
+VLC_API playlist_item_t * playlist_ChildSearchName(playlist_item_t*, const char* ) VLC_USED;
 VLC_API int playlist_NodeDelete( playlist_t *, playlist_item_t *, bool , bool );
 
-VLC_API playlist_item_t * playlist_GetNextLeaf( playlist_t *p_playlist, playlist_item_t *p_root, playlist_item_t *p_item, bool b_ena, bool b_unplayed ) LIBVLC_USED;
-VLC_API playlist_item_t * playlist_GetPrevLeaf( playlist_t *p_playlist, playlist_item_t *p_root, playlist_item_t *p_item, bool b_ena, bool b_unplayed ) LIBVLC_USED;
+VLC_API playlist_item_t * playlist_GetNextLeaf( playlist_t *p_playlist, playlist_item_t *p_root, playlist_item_t *p_item, bool b_ena, bool b_unplayed ) VLC_USED;
+VLC_API playlist_item_t * playlist_GetPrevLeaf( playlist_t *p_playlist, playlist_item_t *p_root, playlist_item_t *p_item, bool b_ena, bool b_unplayed ) VLC_USED;
 
 /***********************************************************************
  * Inline functions

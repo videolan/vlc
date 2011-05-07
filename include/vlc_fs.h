@@ -31,12 +31,12 @@
 #include <sys/types.h>
 #include <dirent.h>
 
-VLC_API int vlc_open( const char *filename, int flags, ... ) LIBVLC_USED;
-VLC_API FILE * vlc_fopen( const char *filename, const char *mode ) LIBVLC_USED;
-VLC_API int vlc_openat( int fd, const char *filename, int flags, ... ) LIBVLC_USED;
+VLC_API int vlc_open( const char *filename, int flags, ... ) VLC_USED;
+VLC_API FILE * vlc_fopen( const char *filename, const char *mode ) VLC_USED;
+VLC_API int vlc_openat( int fd, const char *filename, int flags, ... ) VLC_USED;
 
-VLC_API DIR * vlc_opendir( const char *dirname ) LIBVLC_USED;
-VLC_API char * vlc_readdir( DIR *dir ) LIBVLC_USED;
+VLC_API DIR * vlc_opendir( const char *dirname ) VLC_USED;
+VLC_API char * vlc_readdir( DIR *dir ) VLC_USED;
 VLC_API int vlc_loaddir( DIR *dir, char ***namelist, int (*select)( const char * ), int (*compar)( const char **, const char ** ) );
 VLC_API int vlc_scandir( const char *dirname, char ***namelist, int (*select)( const char * ), int (*compar)( const char **, const char ** ) );
 VLC_API int vlc_mkdir( const char *filename, mode_t mode );

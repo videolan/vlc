@@ -41,7 +41,7 @@ typedef struct picture_fifo_t picture_fifo_t;
 /**
  * It creates an empty picture_fifo_t.
  */
-VLC_API picture_fifo_t * picture_fifo_New( void ) LIBVLC_USED;
+VLC_API picture_fifo_t * picture_fifo_New( void ) VLC_USED;
 
 /**
  * It destroys a fifo created by picture_fifo_New.
@@ -55,7 +55,7 @@ VLC_API void picture_fifo_Delete( picture_fifo_t * );
  *
  * If the fifo is empty, it return NULL without waiting.
  */
-VLC_API picture_t * picture_fifo_Pop( picture_fifo_t * ) LIBVLC_USED;
+VLC_API picture_t * picture_fifo_Pop( picture_fifo_t * ) VLC_USED;
 
 /**
  * It returns the first picture_t pointer from the fifo but does not
@@ -64,7 +64,7 @@ VLC_API picture_t * picture_fifo_Pop( picture_fifo_t * ) LIBVLC_USED;
  *
  * If the fifo is empty, it return NULL without waiting.
  */
-VLC_API picture_t * picture_fifo_Peek( picture_fifo_t * ) LIBVLC_USED;
+VLC_API picture_t * picture_fifo_Peek( picture_fifo_t * ) VLC_USED;
 
 /**
  * It saves a picture_t into the fifo.

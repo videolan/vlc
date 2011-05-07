@@ -191,7 +191,7 @@ VLC_API int vlm_ExecuteCommand( vlm_t *, const char *, vlm_message_t ** );
 VLC_API int vlm_Control( vlm_t *p_vlm, int i_query, ... );
 
 VLC_API vlm_message_t * vlm_MessageSimpleNew( const char * );
-VLC_API vlm_message_t * vlm_MessageNew( const char *, const char *, ... ) LIBVLC_FORMAT( 2, 3 );
+VLC_API vlm_message_t * vlm_MessageNew( const char *, const char *, ... ) VLC_FORMAT( 2, 3 );
 VLC_API vlm_message_t * vlm_MessageAdd( vlm_message_t *, vlm_message_t * );
 VLC_API void vlm_MessageDelete( vlm_message_t * );
 
