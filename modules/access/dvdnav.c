@@ -1448,43 +1448,42 @@ static int EventIntf( vlc_object_t *p_input, char const *psz_var,
  *****************************************************************************/
 static int ProbeDVD( const char *psz_name )
 {
-#ifdef HAVE_SYS_STAT_H
-    struct stat stat_info;
-    uint8_t pi_anchor[2];
-    int i_fd, i_ret;
-
     if( !*psz_name )
-    {
         /* Triggers libdvdcss autodetection */
         return VLC_SUCCESS;
-    }
 
-    if( (i_fd = vlc_open( psz_name, O_RDONLY |O_NONBLOCK )) == -1 )
+    int fd = vlc_open( psz_name, O_RDONLY | O_NONBLOCK );
+    if( fd == -1 )
+#ifdef HAVE_FDOPENDIR
+        return VLC_EGENERIC;
+#else
+        return (errno == ENOENT) ? VLC_EGENERIC : VLC_SUCCESS;
+#endif
+
+    int ret = VLC_EGENERIC;
+
+#ifdef HAVE_SYS_STAT_H
+    struct stat stat_info;
+
+    if( fstat( fd, &stat_info ) == -1 )
+         goto bailout;
+
+    if( !S_ISREG( stat_info.st_mode ) )
     {
-        return VLC_SUCCESS; /* Let dvdnav_open() do the probing */
-    }
-
-    i_ret = VLC_EGENERIC;
-
-    if( fstat( i_fd, &stat_info ) || !S_ISREG( stat_info.st_mode ) )
-    {
-        if( !S_ISFIFO( stat_info.st_mode ) )
-            i_ret = VLC_SUCCESS; /* Let dvdnav_open() do the probing */
+        if( S_ISDIR( stat_info.st_mode ) || S_ISBLK( stat_info.st_mode ) )
+            ret = VLC_SUCCESS; /* Let dvdnav_open() do the probing */
         goto bailout;
     }
-
+#endif
     /* Try to find the anchor (2 bytes at LBA 256) */
-    if( lseek( i_fd, 256 * DVD_VIDEO_LB_LEN, SEEK_SET ) != -1
-     && read( i_fd, pi_anchor, 2 ) == 2
-     && GetWLE( pi_anchor ) == 2 )
-        i_ret = VLC_SUCCESS; /* Found a potential anchor */
+    uint16_t anchor;
+
+    if( lseek( fd, 256 * DVD_VIDEO_LB_LEN, SEEK_SET ) != -1
+     && read( fd, &anchor, 2 ) == 2
+     && GetWLE( &anchor ) == 2 )
+        ret = VLC_SUCCESS; /* Found a potential anchor */
 
 bailout:
-    close( i_fd );
-
-    return i_ret;
-#else
-
-    return VLC_SUCCESS;
-#endif
+    close( fd );
+    return ret;
 }
