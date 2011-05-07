@@ -1036,6 +1036,23 @@ AS_IF([test "${enable_coverage}" != "no"], [
   LDFLAGS_save="${LDFLAGS}"
 ])
 
+AS_IF([test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"], [
+  AC_CACHE_CHECK([if $CC accepts -fvisibility=hidden],
+                 [ac_cv_c_visibility_hidden], [
+    CFLAGS="${CFLAGS_save} -ffast-math"
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM()], [
+      ac_cv_c_visibility_hidden=yes
+    ], [
+      ac_cv_c_visibility_hidden=no
+    ])
+  ])
+  AS_IF([test "${ac_cv_c_visibility_hidden}" != "no"], [
+    CFLAGS="${CFLAGS} -fvisibility=hidden"
+    CXXFLAGS="${CXXFLAGS} -fvisibility=hidden"
+    OBJCFLAGS="${OBJCFLAGS} -fvisibility=hidden"
+  ])
+])
+
 VLC_SAVE_FLAGS
 
 dnl
