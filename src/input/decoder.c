@@ -58,7 +58,7 @@ static decoder_t *CreateDecoder( vlc_object_t *, input_thread_t *,
                                  sout_instance_t *p_sout );
 static void       DeleteDecoder( decoder_t * );
 
-static void      *DecoderThread( vlc_object_t * );
+static void      *DecoderThread( void * );
 static void       DecoderProcess( decoder_t *, block_t * );
 static void       DecoderError( decoder_t *p_dec, block_t *p_block );
 static void       DecoderOutputChangePause( decoder_t *, bool b_paused, mtime_t i_date );
@@ -96,6 +96,8 @@ struct decoder_owner_sys_t
     sout_instance_t         *p_sout;
     sout_packetizer_input_t *p_sout_input;
 
+    vlc_thread_t     thread;
+
     /* Some decoders require already packetized data (ie. not truncated) */
     decoder_t *p_packetizer;
     bool b_packetizer;
@@ -125,7 +127,8 @@ struct decoder_owner_sys_t
     vout_thread_t   *p_vout;
 
     /* -- Theses variables need locking on read *and* write -- */
-    /* */
+    bool b_exit;
+
     /* Pause */
     bool b_paused;
     struct
@@ -299,7 +302,7 @@ static decoder_t *decoder_New( vlc_object_t *p_parent, input_thread_t *p_input,
         i_priority = VLC_THREAD_PRIORITY_VIDEO;
 
     /* Spawn the decoder thread */
-    if( vlc_thread_create( p_dec, DecoderThread, i_priority ) )
+    if( vlc_clone( &p_dec->p_owner->thread, DecoderThread, p_dec, i_priority ) )
     {
         msg_Err( p_dec, "cannot spawn decoder thread" );
         module_unneed( p_dec, p_dec->p_module );
@@ -347,18 +350,19 @@ void input_DecoderDelete( decoder_t *p_dec )
 {
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
 
-    vlc_object_kill( p_dec );
+    vlc_cancel( p_owner->thread );
 
-    /* Make sure we aren't paused/buffering/waiting anymore */
+    /* Make sure we aren't paused/buffering/waiting/decoding anymore */
     vlc_mutex_lock( &p_owner->lock );
     const bool b_was_paused = p_owner->b_paused;
     p_owner->b_paused = false;
     p_owner->b_buffering = false;
     p_owner->b_flushing = true;
+    p_owner->b_exit = true;
     vlc_cond_signal( &p_owner->wait_request );
     vlc_mutex_unlock( &p_owner->lock );
 
-    vlc_thread_join( p_dec );
+    vlc_join( p_owner->thread, NULL );
     p_owner->b_paused = b_was_paused;
 
     module_unneed( p_dec, p_dec->p_module );
@@ -493,7 +497,6 @@ int input_DecoderSetCcState( decoder_t *p_dec, bool b_decode, int i_channel )
 
         if( p_cc )
         {
-            vlc_object_kill( p_cc );
             module_unneed( p_cc, p_cc->p_module );
             DeleteDecoder( p_cc );
         }
@@ -876,6 +879,8 @@ static decoder_t * CreateDecoder( vlc_object_t *p_parent,
     es_format_Init( &p_owner->fmt_description, UNKNOWN_ES, 0 );
     p_owner->p_description = NULL;
 
+    p_owner->b_exit = false;
+
     p_owner->b_paused = false;
     p_owner->pause.i_date = VLC_TS_INVALID;
     p_owner->pause.i_ignore = 0;
@@ -915,9 +920,9 @@ static decoder_t * CreateDecoder( vlc_object_t *p_parent,
  *
  * \param p_dec the decoder
  */
-static void *DecoderThread( vlc_object_t *p_this )
+static void *DecoderThread( void *p_data )
 {
-    decoder_t *p_dec = (decoder_t *)p_this;
+    decoder_t *p_dec = (decoder_t *)p_data;
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
 
     /* The decoder's main loop */
@@ -1136,6 +1141,17 @@ static void DecoderFixTs( decoder_t *p_dec, mtime_t *pi_ts0, mtime_t *pi_ts1,
     }
 }
 
+static bool DecoderIsExitRequested( decoder_t *p_dec )
+{
+    decoder_owner_sys_t *p_owner = p_dec->p_owner;
+
+    vlc_mutex_lock( &p_owner->lock );
+    bool b_exit = p_owner->b_exit;
+    vlc_mutex_unlock( &p_owner->lock );
+
+    return b_exit;
+}
+
 /**
  * If *pb_reject, it does nothing, otherwise it waits for the given
  * deadline or a flush request (in which case it set *pi_reject to true.
@@ -1151,7 +1167,7 @@ static void DecoderWaitDate( decoder_t *p_dec,
     for( ;; )
     {
         vlc_mutex_lock( &p_owner->lock );
-        if( p_owner->b_flushing || p_dec->b_die )
+        if( p_owner->b_flushing || p_owner->b_exit )
         {
             *pb_reject = true;
             vlc_mutex_unlock( &p_owner->lock );
@@ -1285,7 +1301,7 @@ static void DecoderDecodeAudio( decoder_t *p_dec, block_t *p_block )
         aout_instance_t *p_aout = p_owner->p_aout;
         aout_input_t    *p_aout_input = p_owner->p_aout_input;
 
-        if( p_dec->b_die )
+        if( DecoderIsExitRequested( p_dec ) )
         {
             /* It prevent freezing VLC in case of broken decoder */
             aout_DecDeleteBuffer( p_aout, p_aout_input, p_aout_buf );
@@ -1510,7 +1526,7 @@ static void DecoderDecodeVideo( decoder_t *p_dec, block_t *p_block )
     while( (p_pic = p_dec->pf_decode_video( p_dec, &p_block )) )
     {
         vout_thread_t  *p_vout = p_owner->p_vout;
-        if( p_dec->b_die )
+        if( DecoderIsExitRequested( p_dec ) )
         {
             /* It prevent freezing VLC in case of broken decoder */
             vout_ReleasePicture( p_vout, p_pic );
@@ -2437,7 +2453,7 @@ static picture_t *vout_new_buffer( decoder_t *p_dec )
      */
     for( ;; )
     {
-        if( p_dec->b_die || p_dec->b_error )
+        if( DecoderIsExitRequested( p_dec ) || p_dec->b_error )
             return NULL;
 
         picture_t *p_picture = vout_GetPicture( p_owner->p_vout );
@@ -2483,7 +2499,7 @@ static subpicture_t *spu_new_buffer( decoder_t *p_dec,
 
     while( i_attempts-- )
     {
-        if( p_dec->b_die || p_dec->b_error )
+        if( DecoderIsExitRequested( p_dec ) || p_dec->b_error )
             break;
 
         p_vout = input_resource_HoldVout( p_owner->p_resource );
