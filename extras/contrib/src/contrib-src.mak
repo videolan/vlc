@@ -1679,10 +1679,10 @@ DISTCLEAN_PKG += zlib-$(ZLIB_VERSION).tar.gz
 # PortAudio
 # ***************************************************************************
 
-pa_snapshot_v$(PORTAUDIO_VERSION).tar.gz:
+pa_snapshot_v$(PORTAUDIO_VERSION).tgz:
 	$(WGET) $(PORTAUDIO_URL)
 
-portaudio: pa_snapshot_v$(PORTAUDIO_VERSION).tar.gz
+portaudio: pa_stable_v$(PORTAUDIO_VERSION).tgz
 	$(EXTRACT_GZ)
 ifneq ($(HOST),$(BUILD))
 	(patch -p0 < Patches/portaudio-cross.patch;cd $@;  autoconf)
@@ -1699,7 +1699,7 @@ endif
 
 CLEAN_FILE += .portaudio
 CLEAN_PKG += portaudio
-DISTCLEAN_PKG += pa_snapshot_v$(PORTAUDIO_VERSION).tar.gz
+DISTCLEAN_PKG += pa_stable_v$(PORTAUDIO_VERSION).tgz
 
 # ***************************************************************************
 # xml
