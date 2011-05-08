@@ -2297,7 +2297,6 @@ pthreads-w32-$(PTHREADS_VERSION)-release.tar.gz:
 pthreads: pthreads-w32-$(PTHREADS_VERSION)-release.tar.gz
 	$(EXTRACT_GZ)
 	(cd $@; patch -p0 < ../Patches/pthreads-detach.patch)
-	patch -p0 < Patches/pthread-config-h.patch
 	sed -i 's/^CROSS.*=/CROSS ?=/' $@/GNUmakefile
 ifdef HAVE_WIN64
 	(patch -p0 < Patches/pthreads-win64.patch)
