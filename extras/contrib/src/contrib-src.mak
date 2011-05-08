@@ -2374,6 +2374,7 @@ orc-$(ORC_VERSION).tar.gz:
 
 orc: orc-$(ORC_VERSION).tar.gz
 	$(EXTRACT_GZ)
+	patch -p0 < Patches/orc-stdint.patch
 
 .orc: orc
 ifdef HAVE_MACOSX
