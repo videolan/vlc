@@ -1481,6 +1481,11 @@ static int ProbeDVD( const char *psz_name )
         goto bailout;
     }
 #endif
+    /* Match extension as the anchor exhibits too many false positives */
+    const size_t len = strlen( psz_name );
+    if( len < 4 || strcasecmp( psz_name + len - 4, ".iso" ) )
+        goto bailout;
+
     /* Try to find the anchor (2 bytes at LBA 256) */
     uint16_t anchor;
 
