@@ -3268,51 +3268,51 @@ dnl
 dnl  freetype module
 dnl
 AC_ARG_ENABLE(freetype,
-  [  --enable-freetype       freetype support (default enabled)])
+  [  --enable-freetype       freetype support   (default auto)])
 AC_ARG_ENABLE(fribidi,
-  [  --enable-fribidi        fribidi support (default enabled)])
+  [  --enable-fribidi        fribidi support    (default auto)])
 AC_ARG_ENABLE(fontconfig,
-  [  --enable-fontconfig     fontconfig support (default enabled)])
+  [  --enable-fontconfig     fontconfig support (default auto)])
+
 if test "${enable_freetype}" != "no"; then
-   PKG_CHECK_MODULES(FREETYPE, freetype2,[
-      VLC_ADD_PLUGIN([freetype])
+   PKG_CHECK_MODULES(FREETYPE, freetype2, [
       have_freetype=yes
+      VLC_ADD_PLUGIN([freetype])
       VLC_ADD_CPPFLAGS([freetype skins2],[${FREETYPE_CFLAGS}])
       if test "${SYS}" = "mingw32"; then
         VLC_ADD_LIBS([freetype],[-liconv -lz])
       fi
       VLC_ADD_LIBS([freetype skins2],[${FREETYPE_LIBS}])
 
+      AC_CHECK_HEADERS(Carbon/Carbon.h,
+                       [VLC_ADD_LDFLAGS([freetype],[-Wl,-framework,Carbon])])
+
+      dnl fontconfig support
       if test "${SYS}" != "mingw32"; then
           if test "${enable_fontconfig}" != "no"; then
-            AC_CHECK_HEADERS(fontconfig/fontconfig.h,
-              [VLC_ADD_CPPFLAGS([freetype],[-DHAVE_FONTCONFIG])
-               VLC_ADD_LIBS([freetype],[-lfontconfig])])
-            AC_CHECK_HEADERS(Carbon/Carbon.h,
-              [VLC_ADD_LDFLAGS([freetype],[-Wl,-framework,Carbon])])
+            AC_CHECK_HEADERS(fontconfig/fontconfig.h, [
+              VLC_ADD_CPPFLAGS([freetype],[-DHAVE_FONTCONFIG])
+              VLC_ADD_LIBS([freetype],[-lfontconfig])
+            ],[AC_MSG_WARN([library fontconfig not found. Styles will be disabled in freetype])])
           fi
       else
           VLC_ADD_LIBS([freetype],[-lgdi32])
       fi
 
       dnl fribidi support
-      if test "${enable_fribidi}" != "no"
-      then
+      if test "${enable_fribidi}" != "no"; then
         PKG_CHECK_MODULES(FRIBIDI, fribidi, [
           VLC_ADD_CPPFLAGS([freetype skins2], [${FRIBIDI_CFLAGS} -DHAVE_FRIBIDI])
           VLC_ADD_LIBS([freetype skins2], [${FRIBIDI_LIBS}])
-        ])
+        ],[AC_MSG_WARN([library fribidi not found. Bidirectional support will be disabled in freetype])])
       fi
 
   ],[
   have_freetype=no
-  AS_IF([ test "${enable_freetype}" =  "yes"],[
-    AC_MSG_ERROR([I couldn't find the freetype package. You can download libfreetype2
-from http://www.freetype.org/, or configure with --disable-freetype. Have a nice day.
-      ])
+  AS_IF([ test "${enable_freetype}" = "yes"],[
+    AC_MSG_ERROR([Freetype2 package cannot be detected. Install Freetype2 development or configure with --disable-freetype.])
     ])
   ])
-
 fi
 
 dnl
