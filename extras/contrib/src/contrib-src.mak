@@ -524,24 +524,6 @@ CLEAN_PKG += libmpeg2
 DISTCLEAN_PKG += libmpeg2-$(LIBMPEG2_VERSION).tar.gz
 
 # ***************************************************************************
-# pcre
-# ***************************************************************************
-
-pcre-$(PCRE_VERSION).tar.bz2:
-	$(WGET) $(PCRE_URL)
-
-pcre: pcre-$(PCRE_VERSION).tar.bz2
-	$(EXTRACT_BZ2)
-
-.pcre: pcre
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-shared && make && make install )
-	touch $@
-
-CLEAN_FILE += .pcre
-CLEAN_PKG += pcre
-DISTCLEAN_PKG += pcre-$(PCRE_VERSION).tar.bz2
-
-# ***************************************************************************
 # lua
 # ***************************************************************************
 
@@ -2758,7 +2740,7 @@ clean-src: clean
 	rm -rf $(DISTCLEAN_PKG)
 
 clean-svn:
-	rm -rf ffmpeg tremor x264 libdca pa_snapshot_v$(PORTAUDIO_VERSION).tar.gz portaudio live555-$(LIVEDOTCOM_VERSION).tar.gz live libass
+	rm -rf ffmpeg tremor x264 libdca pa_stable_v$(PORTAUDIO_VERSION).tar.gz portaudio live555-$(LIVEDOTCOM_VERSION).tar.gz live libass
 
 distclean: clean-src
 
