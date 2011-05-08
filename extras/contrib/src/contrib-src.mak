@@ -1679,7 +1679,7 @@ DISTCLEAN_PKG += zlib-$(ZLIB_VERSION).tar.gz
 # PortAudio
 # ***************************************************************************
 
-pa_snapshot_v$(PORTAUDIO_VERSION).tgz:
+pa_stable_v$(PORTAUDIO_VERSION).tgz:
 	$(WGET) $(PORTAUDIO_URL)
 
 portaudio: pa_stable_v$(PORTAUDIO_VERSION).tgz
