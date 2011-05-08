@@ -190,11 +190,16 @@ static int Open( vlc_object_t *p_this )
     int         i_angle;
     char        *psz_file;
     char        *psz_code;
+    bool forced = false;
+
+    if( p_demux->psz_access != NULL
+     && !strncmp(p_demux->psz_access, "dvd", 3) )
+        forced = true;
 
     if( !p_demux->psz_file || !*p_demux->psz_file )
     {
         /* Only when selected */
-        if( !p_demux->psz_access || !*p_demux->psz_access )
+        if( !forced )
             return VLC_EGENERIC;
 
         psz_file = var_InheritString( p_this, "dvd" );
@@ -217,7 +222,7 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
 
     /* Try some simple probing to avoid going through dvdnav_open too often */
-    if( ProbeDVD( psz_file ) != VLC_SUCCESS )
+    if( !forced && ProbeDVD( psz_file ) != VLC_SUCCESS )
     {
         free( psz_file );
         return VLC_EGENERIC;
