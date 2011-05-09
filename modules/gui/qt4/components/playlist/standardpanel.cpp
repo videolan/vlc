@@ -195,12 +195,14 @@ void StandardPLPanel::searchDelayed( const QString& searchText )
 /* This activated by the selector selection */
 void StandardPLPanel::setRoot( playlist_item_t *p_item, bool b )
 {
+#ifdef MEDIA_LIBRARY
     if( b )
     {
         msg_Dbg( p_intf, "Setting the SQL ML" );
         currentView->setModel( mlmodel );
     }
     else
+#endif
     {
         msg_Dbg( p_intf, "Normal PL/ML or SD" );
         if( currentView->model() != model )
@@ -354,6 +356,7 @@ void StandardPLPanel::createTreeView()
 
 void StandardPLPanel::changeModel( bool b_ml )
 {
+#ifdef MEDIA_LIBRARY
     VLCModel *mod;
     if( b_ml )
         mod = mlmodel;
@@ -361,6 +364,7 @@ void StandardPLPanel::changeModel( bool b_ml )
         mod = model;
     if( currentView->model() != mod )
         currentView->setModel( mod );
+#endif
 }
 
 void StandardPLPanel::showView( int i_view )

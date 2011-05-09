@@ -549,7 +549,9 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             ui.assoButton->hide();
             ui.assocLabel->hide();
 #endif
+#ifdef MEDIA_LIBRARY
             BUTTONACT( ui.sqlMLbtn, configML() );
+#endif
 
             /* interface */
             char *psz_intf = config_GetPsz( p_intf, "intf" );
@@ -891,9 +893,11 @@ void SPrefsPanel::changeStyle( QString s_style )
 
 void SPrefsPanel::configML()
 {
+#ifdef MEDIA_LIBRARY
     MLConfDialog *mld = new MLConfDialog( this, p_intf );
     mld->exec();
     delete mld;
+#endif
 }
 
 #ifdef WIN32
