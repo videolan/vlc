@@ -135,6 +135,7 @@ private:
     intf_thread_t    *p_intf;
     QTreeWidgetItem  *podcastsParent;
     int               podcastsParentId;
+    QTreeWidgetItem  *curItem;
 
 private slots:
     void setSource( QTreeWidgetItem *item );
