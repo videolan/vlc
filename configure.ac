@@ -1347,7 +1347,7 @@ AC_ARG_ENABLE(sse,
   [AS_HELP_STRING([--disable-sse],
     [disable SSE (1-4) optimizations (default auto)])],, [
   case "${host_cpu}" in
-    i686|x86_64)
+    i?86|x86_64)
       enable_sse=yes
       ;;
     *)
