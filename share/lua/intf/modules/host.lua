@@ -133,7 +133,7 @@ function host()
         end
         vlc.msg.err("couldn't find client to remove.")
     end
-    
+
     local function switch_status( client, s )
         if client.status == s then return end
         client.status = s
@@ -204,7 +204,6 @@ function host()
     end
 
     local function _listen_stdio( h )
-        
         if listeners.stdio then
             error("Already listening on stdio")
         end
