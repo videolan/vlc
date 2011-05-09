@@ -309,7 +309,7 @@ ifdef HAVE_MACOSX
 	patch -p0 < Patches/gettext-macosx.patch
 endif
 
-.intl: gettext
+.intl: gettext .iconv
 ifdef HAVE_WIN32
 	( cd $< && $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-relocatable --disable-java --disable-native-java)
 else
