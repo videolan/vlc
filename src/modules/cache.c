@@ -35,7 +35,6 @@
 #include <stdio.h>                                              /* sprintf() */
 #include <string.h>                                              /* strdup() */
 #include <vlc_plugin.h>
-#include <vlc_cpu.h>
 #include <errno.h>
 
 #include <sys/types.h>
@@ -63,10 +62,10 @@ static int    CacheLoadConfig  ( module_t *, FILE * );
 
 /* Format string for the cache filename */
 #define CACHENAME_FORMAT \
-    "plugins-%.2zx%.2zx%.2"PRIx8"-%x.dat"
+    "plugins-%.2zx%.2zx%.2"PRIx8".dat"
 /* Magic for the cache filename */
 #define CACHENAME_VALUES \
-    sizeof(int), sizeof(void *), *(uint8_t *)&(uint16_t){ 0xbe1e }, vlc_CPU()
+    sizeof(int), sizeof(void *), *(uint8_t *)&(uint16_t){ 0xbe1e }
 #define CACHE_STRING "cache "PACKAGE_NAME" "PACKAGE_VERSION
 
 
