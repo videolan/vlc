@@ -43,16 +43,16 @@
 
 /* Default fonts */
 #ifdef __APPLE__
-# define DEFAULT_FONT "/Library/Fonts/Arial Black.ttf"
+# define DEFAULT_FONT_FILE "/Library/Fonts/Arial Black.ttf"
 # define DEFAULT_FAMILY "Arial Black"
 #elif defined( WIN32 )
-# define DEFAULT_FONT "arial.ttf" /* Default path font found at run-time */
+# define DEFAULT_FONT_FILE "arial.ttf" /* Default path font found at run-time */
 # define DEFAULT_FAMILY "Arial"
 #elif defined( HAVE_MAEMO )
-# define DEFAULT_FONT "/usr/share/fonts/nokia/nosnb.ttf"
+# define DEFAULT_FONT_FILE "/usr/share/fonts/nokia/nosnb.ttf"
 # define DEFAULT_FAMILY "Nokia Sans Bold"
 #else
-# define DEFAULT_FONT "/usr/share/fonts/truetype/freefont/FreeSerifBold.ttf"
+# define DEFAULT_FONT_FILE "/usr/share/fonts/truetype/freefont/FreeSerifBold.ttf"
 # define DEFAULT_FAMILY "Serif Bold"
 #endif
 
@@ -155,7 +155,7 @@ vlc_module_begin ()
 #ifdef HAVE_STYLES
     add_font( "freetype-font", DEFAULT_FAMILY, FONT_TEXT, FAMILY_LONGTEXT, false )
 #else
-    add_font( "freetype-font", DEFAULT_FONT, FONT_TEXT, FONT_LONGTEXT, false )
+    add_loadfile( "freetype-font", DEFAULT_FONT_FILE, FONT_TEXT, FONT_LONGTEXT, false )
 #endif
 
     add_integer( "freetype-fontsize", 0, FONTSIZE_TEXT,
@@ -357,10 +357,10 @@ static int Create( vlc_object_t *p_this )
         psz_fontfamily = strdup( DEFAULT_FAMILY );
 #else
 # ifdef WIN32
-        if( asprintf( &psz_fontfamily, "%s%s", p_sys->psz_win_fonts_path, DEFAULT_FONT ) == -1 )
+        if( asprintf( &psz_fontfamily, "%s%s", p_sys->psz_win_fonts_path, DEFAULT_FONT_FILE ) == -1 )
             goto error;
 # else
-        psz_fontfamily = strdup( DEFAULT_FONT );
+        psz_fontfamily = strdup( DEFAULT_FONT_FILE );
 # endif
         msg_Err( p_filter,"User specified an empty fontfile, using %s", psz_fontfamily );
 #endif
