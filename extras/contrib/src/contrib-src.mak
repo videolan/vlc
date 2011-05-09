@@ -2511,6 +2511,7 @@ endif
 ifdef HAVE_MACOSX
 	(cd $@; sed -e 's%-O2%-O2\ $(EXTRA_CFLAGS)\ $(EXTRA_LDFLAGS)%' -e 's%# LDFLAGS 	=%LDFLAGS 	= $(EXTRA_LDFLAGS)%' -e 's%gcc%$(CC)%' -i.orig  Makefile)
 endif
+	(cd $@; sed -i -e 's%-O2%-O2 -fPIC%' Makefile)
 
 .gsm: gsm
 	(cd $<; $(HOSTCC) make && mkdir -p $(PREFIX)/include/gsm && cp inc/gsm.h $(PREFIX)/include/gsm && cp lib/libgsm.a  $(PREFIX)/lib)
