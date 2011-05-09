@@ -1030,7 +1030,7 @@ static module_t * AllocatePlugin( vlc_object_t * p_this, const char *psz_file )
 
     /* Now that we have successfully loaded the module, we can
      * allocate a structure for it */
-    p_module = vlc_module_create( p_this );
+    p_module = vlc_module_create();
     if( p_module == NULL )
     {
         module_Unload( handle );
@@ -1123,7 +1123,7 @@ static int AllocateBuiltinModule( vlc_object_t * p_this,
 
     /* Now that we have successfully loaded the module, we can
      * allocate a structure for it */
-    p_module = vlc_module_create( p_this );
+    p_module = vlc_module_create();
     if( p_module == NULL )
         return -1;
 

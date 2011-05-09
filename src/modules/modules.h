@@ -133,7 +133,7 @@ struct module_t
     char *              domain;                            /* gettext domain */
 };
 
-module_t *vlc_module_create (vlc_object_t *);
+module_t *vlc_module_create (void);
 module_t *vlc_submodule_create (module_t *module);
 
 void  module_InitBank( vlc_object_t * );

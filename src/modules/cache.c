@@ -239,7 +239,7 @@ void CacheLoad( vlc_object_t *p_this, module_bank_t *p_bank, const char *dir )
         LOAD_IMMEDIATE( pp_cache[i]->i_time );
         LOAD_IMMEDIATE( pp_cache[i]->i_size );
 
-        pp_cache[i]->p_module = vlc_module_create( p_this );
+        pp_cache[i]->p_module = vlc_module_create();
 
         /* Load additional infos */
         free( pp_cache[i]->p_module->psz_object_name );

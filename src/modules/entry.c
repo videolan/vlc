@@ -45,7 +45,7 @@ static void vlc_module_destruct (gc_object_t *obj)
 
 static const char default_name[] = "unnamed";
 
-module_t *vlc_module_create (vlc_object_t *obj)
+module_t *vlc_module_create (void)
 {
     module_t *module = malloc (sizeof (*module));
     if (module == NULL)
@@ -77,8 +77,6 @@ module_t *vlc_module_create (vlc_object_t *obj)
     module->domain = NULL;
     module->b_builtin = false;
     module->b_loaded = false;
-
-    (void)obj;
     return module;
 }
 
