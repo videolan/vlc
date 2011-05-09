@@ -44,7 +44,7 @@ enum SelectorItemType {
     CATEGORY_TYPE,
     SD_TYPE,
     PL_ITEM_TYPE,
-    SQL_ML
+    SQL_ML_TYPE,
 };
 
 enum SpecialData {
