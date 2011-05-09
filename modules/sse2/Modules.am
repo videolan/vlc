@@ -1,5 +1,3 @@
-AM_CFLAGS += $(SSE2_CFLAGS)
-
 libi420_rgb_sse2_plugin_la_SOURCES = \
         ../video_chroma/i420_rgb.c \
 	../video_chroma/i420_rgb.h \

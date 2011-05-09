@@ -1311,7 +1311,6 @@ AS_IF([test "${enable_mmx}" != "no"], [
   AS_IF([test "${ac_cv_c_mmx_intrinsics}" != "no"], [
     AC_DEFINE(HAVE_MMX_INTRINSICS, 1,
               [Define to 1 if MMX intrinsics are available.])
-    MMX_CFLAGS="-mmmx"
   ])
 
   AC_CACHE_CHECK([if $CC groks MMX inline assembly],
@@ -1336,7 +1335,6 @@ AS_IF([test "${enable_mmx}" != "no"], [
     have_mmxext="yes"
   ])
 ])
-AC_SUBST(MMX_CFLAGS)
 AM_CONDITIONAL([HAVE_MMX], [test "${have_mmx}" = "yes"])
 AM_CONDITIONAL([HAVE_MMXEXT], [test "${have_mmxext}" = "yes"])
 
@@ -1379,7 +1377,6 @@ AS_IF([test "${enable_sse}" != "no"], [
   AS_IF([test "${ac_cv_c_sse2_intrinsics}" != "no"], [
     AC_DEFINE(HAVE_SSE2_INTRINSICS, 1,
               [Define to 1 if SSE2 intrinsics are available.])
-    SSE2_CFLAGS="-msse2"
   ])
 
   AC_CACHE_CHECK([if $CC groks SSE inline assembly],
@@ -1452,7 +1449,6 @@ AS_IF([test "${enable_sse}" != "no"], [
     AC_DEFINE(CAN_COMPILE_SSE4A, 1,
               [Define to 1 if SSE4A inline assembly is available.]) ])
 ])
-AC_SUBST(SSE2_CFLAGS)
 AM_CONDITIONAL([HAVE_SSE2], [test "$have_sse2" = "yes"])
 
 have_3dnow="no"
