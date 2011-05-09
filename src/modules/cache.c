@@ -60,12 +60,9 @@ static int    CacheLoadConfig  ( module_t *, FILE * );
  * (only used to avoid breakage in dev version when cache structure changes) */
 #define CACHE_SUBVERSION_NUM 12
 
-/* Format string for the cache filename */
-#define CACHENAME_FORMAT \
-    "plugins-%.2zx%.2zx%.2"PRIx8".dat"
+/* Cache filename */
+#define CACHE_NAME "plugins.dat"
 /* Magic for the cache filename */
-#define CACHENAME_VALUES \
-    sizeof(int), sizeof(void *), *(uint8_t *)&(uint16_t){ 0xbe1e }
 #define CACHE_STRING "cache "PACKAGE_NAME" "PACKAGE_VERSION
 
 
@@ -75,8 +72,7 @@ void CacheDelete( vlc_object_t *obj, const char *dir )
 
     assert( dir != NULL );
 
-    if( asprintf( &path, "%s"DIR_SEP CACHENAME_FORMAT,
-                  dir, CACHENAME_VALUES ) == -1 )
+    if( asprintf( &path, "%s"DIR_SEP CACHE_NAME, dir ) == -1 )
         return;
     msg_Dbg( obj, "removing plugins cache file %s", path );
     vlc_unlink( path );
@@ -106,8 +102,7 @@ void CacheLoad( vlc_object_t *p_this, module_bank_t *p_bank, const char *dir )
     if( !p_bank->b_cache )
         return;
 
-    if( asprintf( &psz_filename, "%s"DIR_SEP CACHENAME_FORMAT,
-                  dir, CACHENAME_VALUES ) == -1 )
+    if( asprintf( &psz_filename, "%s"DIR_SEP CACHE_NAME, dir ) == -1 )
         return;
 
     msg_Dbg( p_this, "loading plugins cache file %s", psz_filename );
@@ -444,8 +439,7 @@ void CacheSave (vlc_object_t *p_this, const char *dir,
 {
     char *filename, *tmpname;
 
-    if (asprintf (&filename, "%s"DIR_SEP CACHENAME_FORMAT, dir,
-                  CACHENAME_VALUES ) == -1)
+    if (asprintf (&filename, "%s"DIR_SEP CACHE_NAME, dir ) == -1)
         return;
 
     if (asprintf (&tmpname, "%s.%"PRIu32, filename, (uint32_t)getpid ()) == -1)
