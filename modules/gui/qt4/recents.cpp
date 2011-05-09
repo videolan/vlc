@@ -31,6 +31,7 @@
 #include <QSettings>
 #include <QRegExp>
 #include <QSignalMapper>
+#include <QFontMetrics>
 
 #ifdef WIN32
     #include <shlobj.h>
@@ -42,7 +43,7 @@
         SHARD_APPIDINFOIDLIST   = 0x00000005,
         SHARD_LINK              = 0x00000006,
         SHARD_APPIDINFOLINK     = 0x00000007,
-        SHARD_SHELLITEM         = 0x00000008 
+        SHARD_SHELLITEM         = 0x00000008
     } SHARD; */
     #define SHARD_PATHW 0x00000003
 #endif
@@ -90,8 +91,9 @@ void RecentsMRL::addRecent( const QString &mrl )
     /* Add to the Windows 7 default list in taskbar */
     SHAddToRecentDocs( SHARD_PATHW, qtu( mrl ) );
 #endif
+    QString mrl2 = QApplication::fontMetrics().elidedText( mrl, Qt::ElideLeft, 400 );
 
-    int i_index = stack->indexOf( mrl );
+    int i_index = stack->indexOf( mrl2 );
     if( 0 <= i_index )
     {
         /* move to the front */
@@ -99,7 +101,7 @@ void RecentsMRL::addRecent( const QString &mrl )
     }
     else
     {
-        stack->prepend( mrl );
+        stack->prepend( mrl2 );
         if( stack->size() > RECENTS_LIST_SIZE )
             stack->takeLast();
     }
