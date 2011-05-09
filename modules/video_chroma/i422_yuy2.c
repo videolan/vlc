@@ -33,6 +33,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_filter.h>
+#include <vlc_cpu.h>
 
 #include "i422_yuy2.h"
 
@@ -70,12 +71,15 @@ vlc_module_begin ()
 #if defined (MODULE_NAME_IS_i422_yuy2)
     set_description( N_("Conversions from " SRC_FOURCC " to " DEST_FOURCC) )
     set_capability( "video filter2", 80 )
+# define CPU_CAPABILITY 0
 #elif defined (MODULE_NAME_IS_i422_yuy2_mmx)
     set_description( N_("MMX conversions from " SRC_FOURCC " to " DEST_FOURCC) )
     set_capability( "video filter2", 100 )
+# define CPU_CAPABILITY CPU_CAPABILITY_MMX
 #elif defined (MODULE_NAME_IS_i422_yuy2_sse2)
     set_description( N_("SSE2 conversions from " SRC_FOURCC " to " DEST_FOURCC) )
     set_capability( "video filter2", 120 )
+# define CPU_CAPABILITY CPU_CAPABILITY_SSE2
 #endif
     set_callbacks( Activate, NULL )
 vlc_module_end ()
@@ -89,6 +93,10 @@ static int Activate( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
 
+#if CPU_CAPABILITY
+    if( !(vlc_CPU() & CPU_CAPABILITY) )
+        return VLC_EGENERIC;
+#endif
     if( p_filter->fmt_in.video.i_width & 1
      || p_filter->fmt_in.video.i_height & 1 )
     {

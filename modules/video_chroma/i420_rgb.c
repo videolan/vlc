@@ -35,6 +35,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_filter.h>
+#include <vlc_cpu.h>
 
 #include "i420_rgb.h"
 #if defined (MODULE_NAME_IS_i420_rgb)
@@ -83,14 +84,17 @@ vlc_module_begin ()
     set_description( N_("I420,IYUV,YV12 to "
                        "RGB2,RV15,RV16,RV24,RV32 conversions") )
     set_capability( "video filter2", 80 )
+# define CPU_CAPABILITY 0
 #elif defined (MODULE_NAME_IS_i420_rgb_mmx)
     set_description( N_( "MMX I420,IYUV,YV12 to "
                         "RV15,RV16,RV24,RV32 conversions") )
     set_capability( "video filter2", 100 )
+# define CPU_CAPABILITY CPU_CAPABILITY_MMX
 #elif defined (MODULE_NAME_IS_i420_rgb_sse2)
     set_description( N_( "SSE2 I420,IYUV,YV12 to "
                         "RV15,RV16,RV24,RV32 conversions") )
     set_capability( "video filter2", 120 )
+# define CPU_CAPABILITY CPU_CAPABILITY_SSE2
 #endif
     set_callbacks( Activate, Deactivate )
 vlc_module_end ()
@@ -107,6 +111,10 @@ static int Activate( vlc_object_t *p_this )
     size_t i_tables_size;
 #endif
 
+#if CPU_CAPABILITY
+    if( !(vlc_CPU() & CPU_CAPABILITY) )
+        return VLC_EGENERIC;
+#endif
     if( p_filter->fmt_out.video.i_width & 1
      || p_filter->fmt_out.video.i_height & 1 )
     {
