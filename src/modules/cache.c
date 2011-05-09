@@ -58,7 +58,7 @@ static int    CacheLoadConfig  ( module_t *, FILE * );
 
 /* Sub-version number
  * (only used to avoid breakage in dev version when cache structure changes) */
-#define CACHE_SUBVERSION_NUM 12
+#define CACHE_SUBVERSION_NUM 13
 
 /* Cache filename */
 #define CACHE_NAME "plugins.dat"
@@ -264,7 +264,6 @@ void CacheLoad( vlc_object_t *p_this, module_bank_t *p_bank, const char *dir )
         LOAD_STRING( pp_cache[i]->p_module->psz_capability );
         LOAD_IMMEDIATE( pp_cache[i]->p_module->i_score );
         LOAD_IMMEDIATE( pp_cache[i]->p_module->b_unloadable );
-        LOAD_IMMEDIATE( pp_cache[i]->p_module->b_submodule );
 
         /* Config stuff */
         if( CacheLoadConfig( pp_cache[i]->p_module, file ) != VLC_SUCCESS )
@@ -545,7 +544,6 @@ static int CacheSaveBank (FILE *file, module_cache_t *const *pp_cache,
         SAVE_STRING( pp_cache[i]->p_module->psz_capability );
         SAVE_IMMEDIATE( pp_cache[i]->p_module->i_score );
         SAVE_IMMEDIATE( pp_cache[i]->p_module->b_unloadable );
-        SAVE_IMMEDIATE( pp_cache[i]->p_module->b_submodule );
 
         /* Config stuff */
         if (CacheSaveConfig (file, pp_cache[i]->p_module))
