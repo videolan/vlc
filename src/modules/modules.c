@@ -563,7 +563,7 @@ found_shortcut:
         module_t *p_cand = p_list[i].p_module;
 #ifdef HAVE_DYNAMIC_PLUGINS
         /* Make sure the module is loaded in mem */
-        module_t *p_real = p_cand->b_submodule ? p_cand->parent : p_cand;
+        module_t *p_real = p_cand->parent ? p_cand->parent : p_cand;
 
         if( !p_real->b_builtin && !p_real->b_loaded )
         {

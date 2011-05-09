@@ -66,7 +66,6 @@ module_t *vlc_module_create (vlc_object_t *obj)
     module->psz_capability = (char*)"";
     module->i_score = 1;
     module->b_unloadable = true;
-    module->b_submodule = false;
     module->pf_activate = NULL;
     module->pf_deactivate = NULL;
     module->p_config = NULL;
@@ -117,7 +116,6 @@ module_t *vlc_submodule_create (module_t *module)
     submodule->psz_longname = module->psz_longname;
     submodule->psz_capability = module->psz_capability;
     submodule->i_score = module->i_score;
-    submodule->b_submodule = true;
     submodule->domain = module->domain;
     return submodule;
 }

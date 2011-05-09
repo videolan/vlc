@@ -512,9 +512,6 @@ void config_ResetAll( vlc_object_t *p_this )
 
     vlc_rwlock_wrlock (&config_lock);
     for (size_t j = 0; (p_module = list[j]) != NULL; j++)
-    {
-        if( p_module->b_submodule ) continue;
-
         for (size_t i = 0; i < p_module->confsize; i++ )
         {
             module_config_t *p_config = p_module->p_config + i;
@@ -532,7 +529,6 @@ void config_ResetAll( vlc_object_t *p_this )
                         strdupnull (p_config->orig.psz);
             }
         }
-    }
     vlc_rwlock_unlock (&config_lock);
 
     module_list_free (list);
