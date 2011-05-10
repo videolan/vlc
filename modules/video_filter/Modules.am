@@ -58,6 +58,7 @@ SOURCES_swscale = swscale.c ../codec/avcodec/chroma.c
 SOURCES_scene = scene.c
 SOURCES_sepia = sepia.c
 SOURCES_yuvp = yuvp.c
+SOURCES_antiflicker = antiflicker.c
 SOURCES_atmo = atmo/atmo.cpp \
 	atmo/AtmoDefs.h \
 	atmo/AtmoCalculations.cpp atmo/AtmoCalculations.h \
@@ -127,4 +128,5 @@ libvlc_LTLIBRARIES += \
 	libwall_plugin.la \
 	libwave_plugin.la \
 	libgradfun_plugin.la \
-	libyuvp_plugin.la
+	libyuvp_plugin.la \
+	libantiflicker_plugin.la
