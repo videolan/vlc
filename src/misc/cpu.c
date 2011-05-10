@@ -385,14 +385,11 @@ unsigned vlc_GetCPUCount(void)
 }
 
 static vlc_memcpy_t pf_vlc_memcpy = memcpy;
-static vlc_memset_t pf_vlc_memset = memset;
 
-void vlc_fastmem_register (vlc_memcpy_t cpy, vlc_memset_t set)
+void vlc_fastmem_register (vlc_memcpy_t cpy)
 {
-    if (cpy)
-        pf_vlc_memcpy = cpy;
-    if (set)
-        pf_vlc_memset = set;
+    assert (cpy != NULL);
+    pf_vlc_memcpy = cpy;
 }
 
 /**
@@ -401,14 +398,6 @@ void vlc_fastmem_register (vlc_memcpy_t cpy, vlc_memset_t set)
 void *vlc_memcpy (void *tgt, const void *src, size_t n)
 {
     return pf_vlc_memcpy (tgt, src, n);
-}
-
-/**
- * vlc_memset: fast CPU-dependent memset
- */
-void *vlc_memset (void *tgt, int c, size_t n)
-{
-    return pf_vlc_memset (tgt, c, n);
 }
 
 /**

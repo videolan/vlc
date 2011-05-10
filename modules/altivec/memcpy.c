@@ -53,7 +53,7 @@ static int Activate ( vlc_object_t *p_this )
         return VLC_EGENERIC;
 
     VLC_UNUSED(p_this);
-    vlc_fastmem_register( fast_memcpy, NULL );
+    vlc_fastmem_register( fast_memcpy );
     return VLC_SUCCESS;
 }
 

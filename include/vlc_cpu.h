@@ -86,9 +86,8 @@ VLC_API unsigned vlc_GetCPUCount( void );
 # endif
 
 typedef void *(*vlc_memcpy_t) (void *tgt, const void *src, size_t n);
-typedef void *(*vlc_memset_t) (void *tgt, int c, size_t n);
 
-VLC_API void vlc_fastmem_register(vlc_memcpy_t cpy, vlc_memset_t set);
+VLC_API void vlc_fastmem_register(vlc_memcpy_t cpy);
 
 #endif /* !VLC_CPU_H */
 

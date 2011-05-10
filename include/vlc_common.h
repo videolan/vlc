@@ -839,7 +839,7 @@ VLC_API void vlc_tdestroy( void *, void (*)(void *) );
 
 /* Fast large memory copy and memory set */
 VLC_API void * vlc_memcpy( void *, const void *, size_t );
-VLC_API void * vlc_memset( void *, int, size_t );
+#define vlc_memset memset
 
 /*****************************************************************************
  * I18n stuff
