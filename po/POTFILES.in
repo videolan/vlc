@@ -316,6 +316,7 @@ modules/audio_mixer/float32.c
 modules/audio_mixer/spdif.c
 modules/audio_mixer/trivial.c
 modules/audio_output/alsa.c
+modules/audio_output/amem.c
 modules/audio_output/audioqueue.c
 modules/audio_output/auhal.c
 modules/audio_output/directx.c
