@@ -74,13 +74,7 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
     lastActivatedId     = -1;
 
     /* Saved Settings */
-    getSettings()->beginGroup("Playlist");
-    int i_savedViewMode = getSettings()->value( "view-mode", TREE_VIEW ).toInt();
-    getSettings()->endGroup();
-    /* Limit the saved value to a possible one inside [0, VIEW_COUNT[ */
-    if(i_savedViewMode < 0 || i_savedViewMode >= VIEW_COUNT)
-        i_savedViewMode = 0;
-
+    int i_savedViewMode = getSettings()->value( "Playlist/view-mode", TREE_VIEW ).toInt();
     showView( i_savedViewMode );
 
     DCONNECT( THEMIM, leafBecameParent( input_item_t *),
@@ -88,7 +82,7 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
 
     CONNECT( model, currentChanged( const QModelIndex& ),
              this, handleExpansion( const QModelIndex& ) );
-    CONNECT( model, rootChanged(), this, handleRootChange() );
+    CONNECT( model, rootChanged(), this, browseInto() );
 
     setRoot( p_root, false );
 }
@@ -123,11 +117,6 @@ void StandardPLPanel::handleExpansion( const QModelIndex& index )
     currentView->scrollTo( index );
 }
 
-void StandardPLPanel::handleRootChange()
-{
-    browseInto();
-}
-
 void StandardPLPanel::popupPlView( const QPoint &point )
 {
     QModelIndex index = currentView->indexAt( point );
@@ -145,9 +134,8 @@ void StandardPLPanel::popupSelectColumn( QPoint pos )
     assert( treeView );
 
     /* We do not offer the option to hide index 0 column, or
-    * QTreeView will behave weird */
-    int i, j;
-    for( i = 1 << 1, j = 1; i < COLUMN_END; i <<= 1, j++ )
+     * QTreeView will behave weird */
+    for( int i = 1 << 1, j = 1; i < COLUMN_END; i <<= 1, j++ )
     {
         QAction* option = menu.addAction( qfu( psz_column_title( i ) ) );
         option->setCheckable( true );
@@ -171,7 +159,9 @@ void StandardPLPanel::search( const QString& searchText )
     p_selector->getCurrentSelectedItem( &type, &name );
     if( type != SD_TYPE )
     {
-        bool flat = currentView == iconView || currentView == listView || currentView == picFlowView;
+        bool flat = ( currentView == iconView ||
+                      currentView == listView ||
+                      currentView == picFlowView );
         model->search( searchText,
                        flat ? currentView->rootIndex() : QModelIndex(),
                        !flat );
@@ -187,7 +177,8 @@ void StandardPLPanel::searchDelayed( const QString& searchText )
     if( type == SD_TYPE )
     {
         if( !name.isEmpty() && !searchText.isEmpty() )
-            playlist_ServicesDiscoveryControl( THEPL, qtu( name ), SD_CMD_SEARCH, qtu( searchText ) );
+            playlist_ServicesDiscoveryControl( THEPL, qtu( name ), SD_CMD_SEARCH,
+                                              qtu( searchText ) );
     }
 }
 
@@ -222,11 +213,11 @@ void StandardPLPanel::browseInto( const QModelIndex &index )
     emit viewChanged( index );
 }
 
-void StandardPLPanel::browseInto( )
+void StandardPLPanel::browseInto()
 {
-    browseInto( currentRootIndexId != -1 && currentView != treeView ?
-                model->index( currentRootIndexId, 0 ) :
-                QModelIndex() );
+    browseInto( (currentRootIndexId != -1 && currentView != treeView) ?
+                 model->index( currentRootIndexId, 0 ) :
+                 QModelIndex() );
 }
 
 void StandardPLPanel::wheelEvent( QWheelEvent *e )
@@ -372,13 +363,6 @@ void StandardPLPanel::showView( int i_view )
 
     switch( i_view )
     {
-    case TREE_VIEW:
-    {
-        if( treeView == NULL )
-            createTreeView();
-        currentView = treeView;
-        break;
-    }
     case ICON_VIEW:
     {
         if( iconView == NULL )
@@ -400,7 +384,14 @@ void StandardPLPanel::showView( int i_view )
         currentView = picFlowView;
         break;
     }
-    default: return;
+    default:
+    case TREE_VIEW:
+    {
+        if( treeView == NULL )
+            createTreeView();
+        currentView = treeView;
+        break;
+    }
     }
 
     changeModel( false );

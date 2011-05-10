@@ -109,7 +109,6 @@ public slots:
 private slots:
     void deleteSelection();
     void handleExpansion( const QModelIndex& );
-    void handleRootChange();
     void activate( const QModelIndex & );
 
     void browseInto();
