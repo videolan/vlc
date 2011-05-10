@@ -31,8 +31,6 @@
 #ifndef VLC_LIBVLC_MEDIA_PLAYER_H
 #define VLC_LIBVLC_MEDIA_PLAYER_H 1
 
-# include <stddef.h>
-
 # ifdef __cplusplus
 extern "C" {
 # else
@@ -473,7 +471,7 @@ LIBVLC_API void *libvlc_media_player_get_hwnd ( libvlc_media_player_t *p_mi );
  * \param pts expected play time stamp (see libvlc_delay())
  */
 typedef void (*libvlc_audio_play_cb)(void *data, const void *samples,
-                                     size_t count, int64_t pts);
+                                     unsigned count, int64_t pts);
 
 /**
  * Callback prototype for audio volume change.

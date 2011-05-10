@@ -54,7 +54,7 @@ vlc_module_end ()
 struct aout_sys_t
 {
     void *opaque;
-    void (*play) (void *opaque, const void *data, size_t count, int64_t pts);
+    void (*play) (void *opaque, const void *data, unsigned count, int64_t pts);
     int (*set_volume) (void *opaque, float vol, bool mute);
     void (*cleanup) (void *opaque);
 };
