@@ -238,3 +238,8 @@ libvlc_module_description_t *libvlc_video_filter_list_get( libvlc_instance_t *p_
 {
     return libvlc_module_description_list_get( p_instance, "video filter2" );
 }
+
+int64_t libvlc_clock(void)
+{
+    return mdate();
+}
