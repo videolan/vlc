@@ -458,6 +458,14 @@ libvlc_media_player_new( libvlc_instance_t *instance )
     var_Create (mp, "volume", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT);
     var_Create (mp, "find-input-callback", VLC_VAR_ADDRESS);
     var_SetAddress (mp, "find-input-callback", find_input);
+    var_Create (mp, "amem-data", VLC_VAR_ADDRESS);
+    var_Create (mp, "amem-setup", VLC_VAR_ADDRESS);
+    var_Create (mp, "amem-close", VLC_VAR_ADDRESS);
+    var_Create (mp, "amem-play", VLC_VAR_ADDRESS);
+    var_Create (mp, "amem-set-volume", VLC_VAR_ADDRESS);
+    var_Create (mp, "amem-format", VLC_VAR_STRING | VLC_VAR_DOINHERIT);
+    var_Create (mp, "amem-rate", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT);
+    var_Create (mp, "amem-channels", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT);
 
     mp->p_md = NULL;
     mp->state = libvlc_NothingSpecial;
@@ -932,6 +940,34 @@ void *libvlc_media_player_get_hwnd( libvlc_media_player_t *p_mi )
     return NULL;
 #endif
 }
+
+void libvlc_audio_set_callbacks( libvlc_media_player_t *mp,
+                                 libvlc_audio_play_cb play_cb,
+                                 libvlc_audio_set_volume_cb set_volume_cb,
+                                 void *opaque )
+{
+    var_SetAddress( mp, "amem-play", play_cb );
+    var_SetAddress( mp, "amem-set-volume", set_volume_cb );
+    var_SetAddress( mp, "amem-data", opaque );
+    var_SetString( mp, "aout", "amem" );
+}
+
+void libvlc_audio_set_format_callbacks( libvlc_media_player_t *mp,
+                                        libvlc_audio_setup_cb setup,
+                                        libvlc_audio_cleanup_cb cleanup )
+{
+    var_SetAddress( mp, "amem-setup", setup );
+    var_SetAddress( mp, "amem-cleanup", cleanup );
+}
+
+void libvlc_audio_set_format( libvlc_media_player_t *mp, const char *format,
+                              unsigned rate, unsigned channels )
+{
+    var_SetString( mp, "amem-format", format );
+    var_SetInteger( mp, "amem-rate", rate );
+    var_SetInteger( mp, "amem-channels", channels );
+}
+
 
 /**************************************************************************
  * Getters for stream information

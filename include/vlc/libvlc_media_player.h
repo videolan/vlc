@@ -31,8 +31,12 @@
 #ifndef VLC_LIBVLC_MEDIA_PLAYER_H
 #define VLC_LIBVLC_MEDIA_PLAYER_H 1
 
+# include <stddef.h>
+
 # ifdef __cplusplus
 extern "C" {
+# else
+#  include <stdbool.h>
 # endif
 
 /*****************************************************************************
@@ -461,7 +465,91 @@ LIBVLC_API void libvlc_media_player_set_hwnd ( libvlc_media_player_t *p_mi, void
  */
 LIBVLC_API void *libvlc_media_player_get_hwnd ( libvlc_media_player_t *p_mi );
 
+/**
+ * Callback prototype for audio playback.
+ * \param data data pointer as passed to libvlc_audio_set_callbacks() [IN]
+ * \param samples pointer to the first audio sample to play back [IN]
+ * \param count number of audio samples to play back
+ * \param pts expected play time stamp (see libvlc_delay())
+ */
+typedef void (*libvlc_audio_play_cb)(void *data, const void *samples,
+                                     size_t count, int64_t pts);
 
+/**
+ * Callback prototype for audio volume change.
+ * \param data data pointer as passed to libvlc_audio_set_callbacks() [IN]
+ * \param volume linear volume (1. = nominal, 0. = mute)
+ * \param mute muted flag
+ */
+typedef void (*libvlc_audio_set_volume_cb)(void *data,
+                                           float volume, bool mute);
+
+/**
+ * Set callbacks and private data for decoded audio.
+ * Use libvlc_audio_set_format() or libvlc_audio_set_format_callbacks()
+ * to configure the decoded audio format.
+ *
+ * \param mp the media player
+ * \param play callback to play audio samples (must not be NULL)
+ * \param set_volume callback to set audio volume, or NULL for software volume
+ * \param opaque private pointer for the two callbacks (as first parameter)
+ * \version LibVLC 1.2.0 or later
+ */
+LIBVLC_API
+void libvlc_audio_set_callbacks( libvlc_media_player_t *mp,
+                                 libvlc_audio_play_cb play,
+                                 libvlc_audio_set_volume_cb set_volume,
+                                 void *opaque );
+
+/**
+ * Callback prototype to setup the audio playback.
+ * This is called when the media player needs to create a new audio output.
+ * \param opaque pointer to the data pointer passed to
+ *               libvlc_audio_set_callbacks() [IN/OUT]
+ * \param format 4 bytes sample format [IN/OUT]
+ * \param rate sample rate [IN/OUT]
+ * \param channels channels count [IN/OUT]
+ * \return 0 on success, anything else to skip audio playback
+ */
+typedef int (*libvlc_audio_setup_cb)(void **data, char *format, unsigned *rate,
+                                     unsigned *channels);
+
+/**
+ * Callback prototype for audio playback cleanup.
+ * This is called when the media player no longer needs an audio output.
+ * \param opaque data pointer as passed to libvlc_audio_set_callbacks() [IN]
+ */
+typedef void (*libvlc_audio_cleanup_cb)(void *data);
+
+/**
+ * Set decoded audio format. This only works in combination with
+ * libvlc_audio_set_callbacks().
+ *
+ * \param mp the media player
+ * \param setup callback to select the audio format (cannot be NULL)
+ * \param cleanup callback to release any allocated resources (or NULL)
+ * \version LibVLC 1.2.0 or later
+ */
+LIBVLC_API
+void libvlc_audio_set_format_callbacks( libvlc_media_player_t *mp,
+                                        libvlc_audio_setup_cb setup,
+                                        libvlc_audio_cleanup_cb cleanup );
+
+/**
+ * Set decoded audio format.
+ * This only works in combination with libvlc_audio_set_callbacks(),
+ * and is mutually exclusive with libvlc_audio_set_format_callbacks().
+ *
+ * \param mp the media player
+ * \param fourcc a four-characters string identifying the sample format
+ *               (e.g. "S16N" or "FL32")
+ * \param rate sample rate (expressed in Hz)
+ * \param channels channels count
+ * \version LibVLC 1.2.0 or later
+ */
+LIBVLC_API
+void libvlc_audio_set_format( libvlc_media_player_t *mp, const char *format,
+                              unsigned rate, unsigned channels );
 
 /** \bug This might go away ... to be replaced by a broader system */
 
