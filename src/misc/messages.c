@@ -435,9 +435,8 @@ static void PrintMsg ( vlc_object_t *p_this, const msg_item_t *p_item )
 #   define WHITE   COL(0,1)
 #   define GRAY    "\033[0m"
 
-    static const char ppsz_type[4][9] = { "", " error", " warning", " debug" };
-    static const char ppsz_color[4][8] = { WHITE, RED, YELLOW, GRAY };
-    const char *psz_object;
+    static const char msgtype[4][9] = { "", " error", " warning", " debug" };
+    static const char msgcolor[4][8] = { WHITE, RED, YELLOW, GRAY };
     libvlc_priv_t *priv = libvlc_priv (p_this->p_libvlc);
     msg_bank_t *bank = priv->msg_bank;
     int i_type = p_item->i_type;
@@ -458,7 +457,7 @@ static void PrintMsg ( vlc_object_t *p_this, const msg_item_t *p_item )
             break;
     }
 
-    psz_object = p_item->psz_object_type;
+    const char *objtype = p_item->psz_object_type;
     void * val = vlc_dictionary_value_for_key (&bank->enabled_objects,
                                                p_item->psz_module);
     if( val == kObjectPrintingDisabled )
@@ -468,7 +467,7 @@ static void PrintMsg ( vlc_object_t *p_this, const msg_item_t *p_item )
     else
     {
         val = vlc_dictionary_value_for_key (&bank->enabled_objects,
-                                            psz_object);
+                                            objtype);
         if( val == kObjectPrintingDisabled )
             return;
         if( val == kObjectPrintingEnabled )
@@ -477,22 +476,26 @@ static void PrintMsg ( vlc_object_t *p_this, const msg_item_t *p_item )
             return;
     }
 
-    int canc = vlc_savecancel ();
     /* Send the message to stderr */
-    utf8_fprintf( stderr, "[%s%p%s] %s%s%s %s%s: %s%s%s\n",
-                  priv->b_color ? GREEN : "",
-                  (void *)p_item->i_object_id,
-                  priv->b_color ? GRAY : "",
-                  p_item->psz_header ? p_item->psz_header : "",
-                  p_item->psz_header ? " " : "",
-                  p_item->psz_module, psz_object,
-                  ppsz_type[i_type],
-                  priv->b_color ? ppsz_color[i_type] : "",
-                  p_item->psz_msg,
-                  priv->b_color ? GRAY : "" );
+    FILE *stream = stderr;
+    int canc = vlc_savecancel ();
 
-#if defined( WIN32 ) || defined( __OS2__ )
-    fflush( stderr );
+    flockfile (stream);
+    fprintf (stream, priv->b_color ? "["GREEN"%p"GRAY"] " : "[%p] ",
+            (void *)p_item->i_object_id);
+    if (p_item->psz_header != NULL)
+        utf8_fprintf (stream, "%s ", p_item->psz_header);
+    utf8_fprintf (stream, "%s %s%s: ", p_item->psz_module, objtype,
+                  msgtype[i_type]);
+    if (priv->b_color)
+        fputs (msgcolor[i_type], stream);
+    fputs (p_item->psz_msg, stream);
+    if (priv->b_color)
+        fputs (GRAY, stream);
+    putc_unlocked ('\n', stream);
+#if defined (WIN32) || defined (__OS2__)
+    fflush (stream);
 #endif
+    funlockfile (stream);
     vlc_restorecancel (canc);
 }
