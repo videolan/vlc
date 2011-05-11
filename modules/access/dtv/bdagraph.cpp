@@ -240,6 +240,13 @@ int dvb_set_dvbt (dvb_device_t *d, uint32_t freq, const char *mod,
                               bandwidth, transmission, guard, hierarchy);
 }
 
+int dvb_set_dvbt2 (dvb_device_t *d, uint32_t freq, const char *mod,
+                   uint32_t fec, uint32_t bandwidth, int transmission,
+                   uint32_t guard)
+{
+    return VLC_EGENERIC;
+}
+
 /* ATSC */
 int dvb_set_atsc (dvb_device_t *d, uint32_t freq, const char *mod)
 {

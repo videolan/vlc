@@ -108,26 +108,26 @@ static const char *const code_rate_user[] = { N_("Automatic"),
 
 #define TRANSMISSION_TEXT N_("Transmission mode")
 const int transmission_vlc[] = { -1,
-    2, 4, 8, /*16, 32,*/
+    1, 2, 4, 8, 16, 32,
 };
 static const char *const transmission_user[] = { N_("Automatic"),
-    "2k", "4k", "8k", /*"16k", "32k", */
+    "1k", "2k", "4k", "8k", "16k", "32k",
 };
 
 #define BANDWIDTH_TEXT N_("Bandwidth (MHz)")
 const int bandwidth_vlc[] = { 0,
-    8, 7, 6,
+    8, 7, 6, 5,
 };
 static const char *const bandwidth_user[] = { N_("Automatic"),
-    N_("8 MHz"), N_("7 MHz"), N_("6 MHz"),
+    N_("8 MHz"), N_("7 MHz"), N_("6 MHz"), N_("5 MHz"),
 };
 
 #define GUARD_TEXT N_("Guard interval")
 const char *const guard_vlc[] = { "",
-    /*"1/128",*/ "1/32", "1/16", /*"19/128",*/ "1/8", /*"9/256",*/ "1/4",
+    "1/128", "1/32", "1/16", "19/256", "1/8", "19/128", "1/4",
 };
 static const char *const guard_user[] = { N_("Automatic"),
-    /*"1/128",*/ "1/32", "1/16", /*"19/128",*/ "1/8", /*"9/256",*/ "1/4",
+    "1/128", "1/32", "1/16", "19/256", "1/8", "19/128", "1/4",
 };
 
 #define HIERARCHY_TEXT N_("Hierarchy mode")
@@ -222,7 +222,7 @@ vlc_module_begin ()
     set_callbacks (Open, Close)
     add_shortcut ("dtv", "tv", "dvb", /* "radio", "dab",*/
                   "cable", "dvb-c", "satellite", "dvb-s", "dvb-s2",
-                  "terrestrial", "dvb-t", "atsc", "cqam")
+                  "terrestrial", "dvb-t", "dvb-t2", "atsc", "cqam")
 
     /* All options starting with dvb- can be overridden in the MRL, so they
      * must all be "safe". Nevertheless, we do not mark as safe those that are
@@ -551,6 +551,8 @@ static const delsys_t *GuessSystem (const char *scheme, dvb_device_t *dev)
         return &dvbs2;
     if (!strcasecmp (scheme, "dvb-t"))
         return &dvbt;
+    if (!strcasecmp (scheme, "dvb-t2"))
+        return &dvbt2;
 
     return dvb_guess_system (dev);
 }
@@ -788,4 +790,16 @@ static int dvbt_setup (vlc_object_t *obj, dvb_device_t *dev, unsigned freq)
     return dvb_set_dvbt (dev, freq, mod, fec_hp, fec_lp, bw, tx, guard, h);
 }
 
+static int dvbt2_setup (vlc_object_t *obj, dvb_device_t *dev, unsigned freq)
+{
+    const char *mod = var_InheritModulation (obj);
+    uint32_t fec = var_InheritCodeRate (obj, "dvb-fec");
+    uint32_t guard = var_InheritGuardInterval (obj);
+    uint32_t bw = var_InheritInteger (obj, "dvb-bandwidth");
+    int tx = var_InheritInteger (obj, "dvb-transmission");
+
+    return dvb_set_dvbt2 (dev, freq, mod, fec, bw, tx, guard);
+}
+
 const delsys_t dvbt = { .setup = dvbt_setup };
+const delsys_t dvbt2 = { .setup = dvbt2_setup };

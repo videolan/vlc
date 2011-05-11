@@ -28,7 +28,7 @@ extern "C" {
 
 typedef struct delsys delsys_t;
 
-extern const delsys_t dvbc, dvbs, dvbs2, dvbt, atsc, cqam;
+extern const delsys_t dvbc, dvbs, dvbs2, dvbt, dvbt2, atsc, cqam;
 
 typedef struct dvb_device dvb_device_t;
 
@@ -66,6 +66,9 @@ int dvb_set_sec (dvb_device_t *, uint32_t freq, char pol,
 int dvb_set_dvbt (dvb_device_t *, uint32_t freq, const char *mod,
                   uint32_t fec_hp, uint32_t fec_lp, uint32_t bandwidth,
                   int transmission, uint32_t guard, int hierarchy);
+int dvb_set_dvbt2 (dvb_device_t *, uint32_t freq, const char *mod,
+                   uint32_t fec, uint32_t bandwidth,
+                   int transmission, uint32_t guard);
 
 /* ATSC */
 int dvb_set_atsc (dvb_device_t *, uint32_t freq, const char *mod);
