@@ -261,10 +261,8 @@ void msg_GenericVa (vlc_object_t *p_this, int i_type,
                            const char *psz_module,
                            const char *psz_format, va_list _args)
 {
-    size_t      i_header_size;             /* Size of the additionnal header */
     vlc_object_t *p_obj;
     char *       psz_str = NULL;                 /* formatted message string */
-    char *       psz_header = NULL;
     va_list      args;
 
     assert (p_this);
@@ -366,14 +364,18 @@ void msg_GenericVa (vlc_object_t *p_this, int i_type,
     }
     uselocale (locale);
 
-    msg_item_t * p_item = malloc (sizeof (*p_item));
-    if (p_item == NULL)
-        return; /* Uho! */
+    /* Fill message information fields */
+    msg_item_t msg;
 
-    p_item->psz_module = p_item->psz_msg = p_item->psz_header = NULL;
+    msg.i_type = i_type;
+    msg.i_object_id = (uintptr_t)p_this;
+    msg.psz_object_type = p_this->psz_object_type;
+    msg.psz_module = strdup( psz_module );
+    msg.psz_msg = psz_str;
 
+    char *psz_header = NULL;
+    size_t i_header_size = 0;
 
-    i_header_size = 0;
     p_obj = p_this;
     while( p_obj != NULL )
     {
@@ -399,15 +401,9 @@ void msg_GenericVa (vlc_object_t *p_this, int i_type,
         p_obj = p_obj->p_parent;
     }
 
-    /* Fill message information fields */
-    p_item->i_type =        i_type;
-    p_item->i_object_id =   (uintptr_t)p_this;
-    p_item->psz_object_type = p_this->psz_object_type;
-    p_item->psz_module =    strdup( psz_module );
-    p_item->psz_msg =       psz_str;
-    p_item->psz_header =    psz_header;
+    msg.psz_header = psz_header;
 
-    PrintMsg( p_this, p_item );
+    PrintMsg( p_this, &msg );
 
     vlc_rwlock_rdlock (&bank->lock);
     for (int i = 0; i < bank->i_sub; i++)
@@ -416,17 +412,17 @@ void msg_GenericVa (vlc_object_t *p_this, int i_type,
         libvlc_priv_t *priv = libvlc_priv( sub->instance );
         msg_bank_t *bank = priv->msg_bank;
         void *val = vlc_dictionary_value_for_key( &bank->enabled_objects,
-                                                  p_item->psz_module );
+                                                  msg.psz_module );
         if( val == kObjectPrintingDisabled ) continue;
         if( val != kObjectPrintingEnabled  ) /*if not allowed */
         {
             val = vlc_dictionary_value_for_key( &bank->enabled_objects,
-                                                 p_item->psz_object_type );
+                                                msg.psz_object_type );
             if( val == kObjectPrintingDisabled ) continue;
             if( val == kObjectPrintingEnabled  ); /* Allowed */
             else if( !bank->all_objects_enabled ) continue;
         }
-        switch( p_item->i_type )
+        switch( msg.i_type )
         {
             case VLC_MSG_INFO:
             case VLC_MSG_ERR:
@@ -440,10 +436,12 @@ void msg_GenericVa (vlc_object_t *p_this, int i_type,
                 break;
         }
 
-        sub->func (sub->opaque, p_item, 0);
+        sub->func (sub->opaque, &msg, 0);
     }
     vlc_rwlock_unlock (&bank->lock);
-    msg_Free (p_item);
+    free (msg.psz_module);
+    free (msg.psz_msg);
+    free (msg.psz_header);
 }
 
 /*****************************************************************************
