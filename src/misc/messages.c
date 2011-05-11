@@ -432,30 +432,17 @@ static void PrintMsg ( vlc_object_t *p_this, const msg_item_t *p_item )
 #   define YELLOW  COL(0,33)
 #   define WHITE   COL(0,1)
 #   define GRAY    "\033[0m"
-
     static const char msgtype[4][9] = { "", " error", " warning", " debug" };
     static const char msgcolor[4][8] = { WHITE, RED, YELLOW, GRAY };
-    libvlc_priv_t *priv = libvlc_priv (p_this->p_libvlc);
-    msg_bank_t *bank = priv->msg_bank;
-    int i_type = p_item->i_type;
 
-    switch( i_type )
-    {
-        case VLC_MSG_ERR:
-            if( priv->i_verbose < 0 ) return;
-            break;
-        case VLC_MSG_INFO:
-            if( priv->i_verbose < 0 ) return;
-            break;
-        case VLC_MSG_WARN:
-            if( priv->i_verbose < 1 ) return;
-            break;
-        case VLC_MSG_DBG:
-            if( priv->i_verbose < 2 ) return;
-            break;
-    }
+    libvlc_priv_t *priv = libvlc_priv (p_this->p_libvlc);
+    int type = p_item->i_type;
+
+    if (priv->i_verbose < 0 || priv->i_verbose < (type - VLC_MSG_ERR))
+        return;
 
     const char *objtype = p_item->psz_object_type;
+    msg_bank_t *bank = priv->msg_bank;
     void * val = vlc_dictionary_value_for_key (&bank->enabled_objects,
                                                p_item->psz_module);
     if( val == kObjectPrintingDisabled )
@@ -484,9 +471,9 @@ static void PrintMsg ( vlc_object_t *p_this, const msg_item_t *p_item )
     if (p_item->psz_header != NULL)
         utf8_fprintf (stream, "[%s] ", p_item->psz_header);
     utf8_fprintf (stream, "%s %s%s: ", p_item->psz_module, objtype,
-                  msgtype[i_type]);
+                  msgtype[type]);
     if (priv->b_color)
-        fputs (msgcolor[i_type], stream);
+        fputs (msgcolor[type], stream);
     fputs (p_item->psz_msg, stream);
     if (priv->b_color)
         fputs (GRAY, stream);
