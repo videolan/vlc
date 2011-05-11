@@ -1782,8 +1782,8 @@ static void MsgCallback(msg_cb_data_t *data, msg_item_t *msg, unsigned i)
     vlc_mutex_lock(&p_sys->msg_lock);
 
     if (p_sys->msgs[p_sys->i_msgs])
-        msg_Release(p_sys->msgs[p_sys->i_msgs]);
-    p_sys->msgs[p_sys->i_msgs++] = msg_Hold(msg);
+        msg_Free(p_sys->msgs[p_sys->i_msgs]);
+    p_sys->msgs[p_sys->i_msgs++] = msg_Copy(msg);
 
     if (p_sys->i_msgs == (sizeof p_sys->msgs / sizeof *p_sys->msgs))
         p_sys->i_msgs = 0;
@@ -1915,7 +1915,7 @@ static void Close(vlc_object_t *p_this)
     vlc_mutex_destroy(&p_sys->msg_lock);
     for(unsigned i = 0; i < sizeof p_sys->msgs / sizeof *p_sys->msgs; i++)
         if (p_sys->msgs[i])
-            msg_Release(p_sys->msgs[i]);
+            msg_Free(p_sys->msgs[i]);
 
     free(p_sys);
 }

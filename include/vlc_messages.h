@@ -53,8 +53,6 @@ typedef struct
     char *  psz_module;
     char *  psz_msg;                            /**< the message itself */
     char *  psz_header;                         /**< Additional header */
-
-    gc_object_t vlc_gc_data;
 } msg_item_t;
 
 /* Message types */
@@ -67,15 +65,25 @@ typedef struct
 /** debug messages */
 #define VLC_MSG_DBG   3
 
-static inline msg_item_t *msg_Hold (msg_item_t *msg)
+VLC_MALLOC VLC_USED
+static inline msg_item_t *msg_Copy (const msg_item_t *msg)
 {
-    vlc_hold (&msg->vlc_gc_data);
-    return msg;
+    msg_item_t *copy = (msg_item_t *)xmalloc (sizeof (*copy));
+    copy->i_type = msg->i_type;
+    copy->i_object_id = msg->i_object_id;
+    copy->psz_object_type = msg->psz_object_type;
+    copy->psz_module = strdup (msg->psz_module);
+    copy->psz_msg = strdup (msg->psz_msg);
+    copy->psz_header = strdup (msg->psz_header);
+    return copy;
 }
 
-static inline void msg_Release (msg_item_t *msg)
+static inline void msg_Free (msg_item_t *msg)
 {
-    vlc_release (&msg->vlc_gc_data);
+    free (msg->psz_module);
+    free (msg->psz_msg);
+    free (msg->psz_header);
+    free (msg);
 }
 
 /**

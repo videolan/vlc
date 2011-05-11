@@ -48,13 +48,13 @@ class MsgEvent : public QEvent
 {
 public:
     MsgEvent( msg_item_t *msg )
-        : QEvent( (QEvent::Type)MsgEvent_Type ), msg(msg)
+        : QEvent( (QEvent::Type)MsgEvent_Type )
     {
-        msg_Hold( msg );
+        this->msg = msg_Copy( msg );
     }
-    virtual ~MsgEvent()
+    virtual ~MsgEvent( void )
     {
-        msg_Release( msg );
+        msg_Free( msg );
     }
 
     msg_item_t *msg;

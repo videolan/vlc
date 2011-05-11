@@ -248,19 +248,6 @@ void msg_Generic( vlc_object_t *p_this, int i_type, const char *psz_module,
     va_end( args );
 }
 
-/**
- * Destroys a message.
- */
-static void msg_Free (gc_object_t *gc)
-{
-    msg_item_t *msg = vlc_priv (gc, msg_item_t);
-
-    free (msg->psz_module);
-    free (msg->psz_msg);
-    free (msg->psz_header);
-    free (msg);
-}
-
 #undef msg_GenericVa
 /**
  * Add a message to a queue
@@ -383,9 +370,7 @@ void msg_GenericVa (vlc_object_t *p_this, int i_type,
     if (p_item == NULL)
         return; /* Uho! */
 
-    vlc_gc_init (p_item, msg_Free);
     p_item->psz_module = p_item->psz_msg = p_item->psz_header = NULL;
-
 
 
     i_header_size = 0;
@@ -458,7 +443,7 @@ void msg_GenericVa (vlc_object_t *p_this, int i_type,
         sub->func (sub->opaque, p_item, 0);
     }
     vlc_rwlock_unlock (&bank->lock);
-    msg_Release (p_item);
+    msg_Free (p_item);
 }
 
 /*****************************************************************************
