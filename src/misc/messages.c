@@ -261,7 +261,6 @@ void msg_GenericVa (vlc_object_t *p_this, int i_type,
                            const char *psz_module,
                            const char *psz_format, va_list _args)
 {
-    vlc_object_t *p_obj;
     char *       psz_str = NULL;                 /* formatted message string */
     va_list      args;
 
@@ -372,36 +371,15 @@ void msg_GenericVa (vlc_object_t *p_this, int i_type,
     msg.psz_object_type = p_this->psz_object_type;
     msg.psz_module = psz_module;
     msg.psz_msg = psz_str;
+    msg.psz_header = NULL;
 
-    char *psz_header = NULL;
-    size_t i_header_size = 0;
-
-    p_obj = p_this;
-    while( p_obj != NULL )
-    {
-        char *psz_old = NULL;
-        if( p_obj->psz_header )
+    for (vlc_object_t *o = p_this; o != NULL; o = o->p_parent)
+        if (o->psz_header != NULL)
         {
-            i_header_size += strlen( p_obj->psz_header ) + 4;
-            if( psz_header )
-            {
-                psz_old = strdup( psz_header );
-                psz_header = xrealloc( psz_header, i_header_size );
-                snprintf( psz_header, i_header_size , "[%s] %s",
-                          p_obj->psz_header, psz_old );
-            }
-            else
-            {
-                psz_header = xmalloc( i_header_size );
-                snprintf( psz_header, i_header_size, "[%s]",
-                          p_obj->psz_header );
-            }
+            if (asprintf (&msg.psz_header, "[%s]", o->psz_header) == -1)
+                msg.psz_header = NULL;
+            break;
         }
-        free( psz_old );
-        p_obj = p_obj->p_parent;
-    }
-
-    msg.psz_header = psz_header;
 
     PrintMsg( p_this, &msg );
 
