@@ -54,7 +54,6 @@ typedef struct
     char *  psz_msg;                            /**< the message itself */
     char *  psz_header;                         /**< Additional header */
 
-    mtime_t date;                               /**< Message date */
     gc_object_t vlc_gc_data;
 } msg_item_t;
 
