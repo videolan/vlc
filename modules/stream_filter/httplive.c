@@ -29,6 +29,7 @@
 #endif
 
 #include <limits.h>
+#include <errno.h>
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
@@ -515,7 +516,30 @@ static int parse_SegmentInformation(hls_stream_t *hls, char *p_read, int *durati
     if (token == NULL)
         return VLC_EGENERIC;
 
-    *duration = atoi(token);
+    int value;
+    if (hls->version < 3)
+    {
+       value = strtol(token, NULL, 10);
+       if (errno == ERANGE)
+       {
+           *duration = -1;
+           return VLC_EGENERIC;
+       }
+       *duration = value;
+    }
+    else
+    {
+        double d = strtod(token, (char **) NULL);
+        if (errno == ERANGE)
+        {
+            *duration = -1;
+            return VLC_EGENERIC;
+        }
+        if ((d) - ((int)d) >= 0.5)
+            value = ((int)d) + 1;
+        else
+            value = ((int)d);
+    }
 
     /* Ignore the rest of the line */
 
