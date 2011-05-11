@@ -211,7 +211,7 @@ private:
     QCheckBox *jackPace, *jackConnect;
     QLineEdit *jackPortsSelected;
 #endif
-    QRadioButton *dvbc, *dvbs, *dvbs2, *dvbt, *atsc, *cqam;
+    QRadioButton *dvbc, *dvbs, *dvbs2, *dvbt, *dvbt2, *atsc, *cqam;
     QLabel *dvbBandLabel, *dvbSrateLabel, *dvbModLabel;
     QComboBox *dvbQamBox, *dvbPskBox, *dvbBandBox;
     QSpinBox *dvbCard, *dvbFE, *dvbFreq, *dvbSrate;

@@ -942,17 +942,19 @@ void CaptureOpenPanel::initialize()
     dvbs = new QRadioButton( "DVB-S" );
     dvbs2 = new QRadioButton( "DVB-S2" );
     dvbt = new QRadioButton( "DVB-T" );
+    dvbt2 = new QRadioButton( "DVB-T2" );
     atsc = new QRadioButton( "ATSC" );
     cqam = new QRadioButton( "Clear QAM" );
     dvbt->setChecked( true );
 
     dvbDevLayout->addWidget( dvbTypeLabel, 1, 0, 2, 1 );
-    dvbDevLayout->addWidget( dvbc, 1, 1 );
-    dvbDevLayout->addWidget( dvbs, 1, 2 );
+    dvbDevLayout->addWidget( dvbc,  1, 1 );
+    dvbDevLayout->addWidget( dvbs,  1, 2 );
     dvbDevLayout->addWidget( dvbs2, 2, 2 );
-    dvbDevLayout->addWidget( dvbt, 1, 3 );
-    dvbDevLayout->addWidget( atsc, 1, 4 );
-    dvbDevLayout->addWidget( cqam, 2, 4 );
+    dvbDevLayout->addWidget( dvbt,  1, 3 );
+    dvbDevLayout->addWidget( dvbt2, 2, 3 );
+    dvbDevLayout->addWidget( atsc,  1, 4 );
+    dvbDevLayout->addWidget( cqam,  2, 4 );
 
     /* DVB Props panel */
     QLabel *dvbFreqLabel =
@@ -1027,10 +1029,12 @@ void CaptureOpenPanel::initialize()
     BUTTONACT( dvbs, updateButtons() );
     BUTTONACT( dvbs2, updateButtons() );
     BUTTONACT( dvbt, updateButtons() );
+    BUTTONACT( dvbt2, updateButtons() );
     BUTTONACT( atsc, updateButtons() );
     BUTTONACT( cqam, updateButtons() );
     BUTTONACT( dvbc, updateMRL() );
     BUTTONACT( dvbt, updateMRL() );
+    BUTTONACT( dvbt2, updateMRL() );
     BUTTONACT( dvbs, updateMRL() );
     BUTTONACT( dvbs2, updateMRL() );
     BUTTONACT( atsc, updateMRL() );
@@ -1143,6 +1147,8 @@ void CaptureOpenPanel::updateMRL()
         else
         if( dvbt->isChecked() ) mrl = "dvb-t://";
         else
+        if( dvbt2->isChecked() ) mrl = "dvb-t2://";
+        else
         if( atsc->isChecked() ) mrl = "atsc://";
         else
         if( cqam->isChecked() ) mrl = "cqam://";
@@ -1157,7 +1163,7 @@ void CaptureOpenPanel::updateMRL()
                 + dvbPskBox->itemData( dvbPskBox->currentIndex() ).toString();
         if( dvbc->isChecked() || dvbs->isChecked() || dvbs2->isChecked() )
             mrl += ":srate=" + QString::number( dvbSrate->value() );
-        if( dvbt->isChecked() )
+        if( dvbt->isChecked() || dvbt2->isChecked() )
             mrl += ":bandwidth=" +
                 QString::number( dvbBandBox->itemData(
                     dvbBandBox->currentIndex() ).toInt() );
@@ -1224,7 +1230,7 @@ void CaptureOpenPanel::updateButtons()
             dvbPskBox->show();
             dvbModLabel->show();
         }
-        else if( dvbt->isChecked() )
+        else if( dvbt->isChecked() || dvbt2->isChecked() )
         {
             dvbBandBox->show();
             dvbBandLabel->show();
