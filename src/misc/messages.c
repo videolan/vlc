@@ -74,7 +74,7 @@ static inline msg_bank_t *libvlc_bank (libvlc_int_t *inst)
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static void PrintMsg ( vlc_object_t *, msg_item_t * );
+static void PrintMsg ( vlc_object_t *, const msg_item_t * );
 
 /**
  * Store all data required by messages interfaces.
@@ -451,7 +451,7 @@ void msg_GenericVa (vlc_object_t *p_this, int i_type,
  *****************************************************************************
  * Print a message to stderr, with colour formatting if needed.
  *****************************************************************************/
-static void PrintMsg ( vlc_object_t * p_this, msg_item_t * p_item )
+static void PrintMsg ( vlc_object_t *p_this, const msg_item_t *p_item )
 {
 #   define COL(x,y)  "\033[" #x ";" #y "m"
 #   define RED     COL(31,1)
