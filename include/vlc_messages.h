@@ -117,7 +117,7 @@ typedef struct msg_cb_data_t msg_cb_data_t;
  * Message logging callback signature.
  * Accepts one private data pointer, the message, and an overrun counter.
  */
-typedef void (*msg_callback_t) (msg_cb_data_t *, msg_item_t *, unsigned);
+typedef void (*msg_callback_t) (msg_cb_data_t *, const msg_item_t *);
 
 VLC_API msg_subscription_t* msg_Subscribe( libvlc_int_t *, msg_callback_t, msg_cb_data_t * ) VLC_USED;
 VLC_API void msg_Unsubscribe( msg_subscription_t * );

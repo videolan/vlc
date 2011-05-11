@@ -413,7 +413,7 @@ void msg_GenericVa (vlc_object_t *p_this, int i_type,
                 break;
         }
 
-        sub->func (sub->opaque, &msg, 0);
+        sub->func (sub->opaque, &msg);
     }
     vlc_rwlock_unlock (&bank->lock);
     free (msg.psz_msg);

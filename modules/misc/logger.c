@@ -94,7 +94,7 @@ struct intf_sys_t
 static int  Open    ( vlc_object_t * );
 static void Close   ( vlc_object_t * );
 
-static void Overflow (msg_cb_data_t *p_sys, msg_item_t *p_item, unsigned overruns);
+static void Overflow (msg_cb_data_t *p_sys, const msg_item_t *p_item);
 static void TextPrint         ( const msg_item_t *, FILE * );
 static void HtmlPrint         ( const msg_item_t *, FILE * );
 #ifdef HAVE_SYSLOG_H
@@ -366,9 +366,8 @@ static void Close( vlc_object_t *p_this )
 /**
  * Log a message
  */
-static void Overflow (msg_cb_data_t *p_sys, msg_item_t *p_item, unsigned overruns)
+static void Overflow (msg_cb_data_t *p_sys, const msg_item_t *p_item)
 {
-    VLC_UNUSED(overruns);
     int verbosity = var_InheritInteger( p_sys->p_intf, "log-verbose" );
     if (verbosity == -1)
         verbosity = var_InheritInteger( p_sys->p_intf, "verbose" );

@@ -1773,10 +1773,9 @@ static void HandleKey(intf_thread_t *p_intf)
  *
  */
 
-static void MsgCallback(msg_cb_data_t *data, msg_item_t *msg, unsigned i)
+static void MsgCallback(msg_cb_data_t *data, const msg_item_t *msg)
 {
     intf_sys_t *p_sys = data->p_sys;
-    (void)i; // what is this?
     int canc = vlc_savecancel();
 
     vlc_mutex_lock(&p_sys->msg_lock);

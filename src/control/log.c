@@ -48,7 +48,7 @@ struct msg_cb_data_t
     int         verbosity;
 };
 
-static void handler( msg_cb_data_t *d, msg_item_t *p_item, unsigned i_drop )
+static void handler( msg_cb_data_t *d, const msg_item_t *p_item )
 {
     if (p_item->i_type > d->verbosity)
         return;
@@ -59,7 +59,6 @@ static void handler( msg_cb_data_t *d, msg_item_t *p_item, unsigned i_drop )
     if (d->count < VLC_MSG_QSIZE)
         d->items[d->count++] = msg;
     vlc_spin_unlock (&d->lock);
-    (void)i_drop;
 }
 
 struct libvlc_log_t

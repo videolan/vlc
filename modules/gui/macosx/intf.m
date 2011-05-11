@@ -71,7 +71,7 @@ static void updateProgressPanel (void *, const char *, float);
 static bool checkProgressPanel (void *);
 static void destroyProgressPanel (void *);
 
-static void MsgCallback( msg_cb_data_t *, msg_item_t *, unsigned );
+static void MsgCallback( msg_cb_data_t *, const msg_item_t * );
 
 #pragma mark -
 #pragma mark VLC Interface Object Callbacks
@@ -153,7 +153,7 @@ static void Run( intf_thread_t *p_intf )
  * ready to be displayed. We store everything in a NSArray in our Cocoa part
  * of this file, so we are forwarding everything through notifications.
  *****************************************************************************/
-static void MsgCallback( msg_cb_data_t *data, msg_item_t *item, unsigned int i )
+static void MsgCallback( msg_cb_data_t *data, const msg_item_t *item )
 {
     int canc = vlc_savecancel();
     NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];

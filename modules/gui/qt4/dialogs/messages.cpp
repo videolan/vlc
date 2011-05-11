@@ -73,7 +73,7 @@ struct msg_cb_data_t
     MessagesDialog *self;
 };
 
-static void MsgCallback( msg_cb_data_t *, msg_item_t *, unsigned );
+static void MsgCallback( msg_cb_data_t *, const msg_item_t * );
 
 MessagesDialog::MessagesDialog( intf_thread_t *_p_intf)
                : QVLCFrame( _p_intf )
@@ -296,7 +296,7 @@ void MessagesDialog::tabChanged( int i )
     updateButton->setVisible( i == 1 );
 }
 
-static void MsgCallback( msg_cb_data_t *data, msg_item_t *item, unsigned )
+static void MsgCallback( msg_cb_data_t *data, const msg_item_t *item )
 {
     int canc = vlc_savecancel();
 
@@ -304,4 +304,3 @@ static void MsgCallback( msg_cb_data_t *data, msg_item_t *item, unsigned )
 
     vlc_restorecancel( canc );
 }
-
