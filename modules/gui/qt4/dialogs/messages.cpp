@@ -47,23 +47,32 @@ enum {
 class MsgEvent : public QEvent
 {
 public:
-    MsgEvent( msg_item_t *msg )
-        : QEvent( (QEvent::Type)MsgEvent_Type )
-    {
-        this->msg = msg_Copy( msg );
-    }
-    virtual ~MsgEvent( void )
-    {
-        msg_Free( msg );
-    }
+    MsgEvent( const msg_item_t * );
 
-    msg_item_t *msg;
+    int priority;
+    uintptr_t object_id;
+    QString object_type;
+    QString header;
+    QString module;
+    QString text;
 };
+
+MsgEvent::MsgEvent( const msg_item_t *msg )
+    : QEvent( (QEvent::Type)MsgEvent_Type ),
+      priority( msg->i_type ),
+      object_id( msg->i_object_id ),
+      object_type( qfu(msg->psz_object_type) ),
+      header( qfu(msg->psz_header) ),
+      module( qfu(msg->psz_module) ),
+      text( qfu(msg->psz_msg) )
+{
+}
 
 struct msg_cb_data_t
 {
     MessagesDialog *self;
 };
+
 static void MsgCallback( msg_cb_data_t *, msg_item_t *, unsigned );
 
 MessagesDialog::MessagesDialog( intf_thread_t *_p_intf)
@@ -71,7 +80,6 @@ MessagesDialog::MessagesDialog( intf_thread_t *_p_intf)
 {
     setWindowTitle( qtr( "Messages" ) );
     setWindowRole( "vlc-messages" );
-
     /* Build Ui */
     ui.setupUi( this );
     ui.bottomButtonsBox->addButton( new QPushButton( qtr("&Close"), this ),
@@ -160,7 +168,7 @@ void MessagesDialog::updateConfig()
     }
 }
 
-void MessagesDialog::sinkMessage( msg_item_t *item )
+void MessagesDialog::sinkMessage( MsgEvent *msg )
 {
     QTextEdit *messages = ui.messages;
     /* Only scroll if the viewport is at the end.
@@ -180,9 +188,9 @@ void MessagesDialog::sinkMessage( msg_item_t *item )
 
     messages->setFontItalic( true );
     messages->setTextColor( "darkBlue" );
-    messages->insertPlainText( qfu( item->psz_module ) );
+    messages->insertPlainText( msg->module );
 
-    switch (item->i_type)
+    switch (msg->priority)
     {
         case VLC_MSG_INFO:
             messages->setTextColor( "blue" );
@@ -206,7 +214,7 @@ void MessagesDialog::sinkMessage( msg_item_t *item )
     /* Add message Regular black Font */
     messages->setFontItalic( false );
     messages->setTextColor( "black" );
-    messages->insertPlainText( qfu(item->psz_msg) );
+    messages->insertPlainText( msg->text );
     messages->insertPlainText( "\n" );
     if ( b_autoscroll ) messages->ensureCursorVisible();
 }
@@ -216,7 +224,7 @@ void MessagesDialog::customEvent( QEvent *event )
     MsgEvent *msge = static_cast<MsgEvent *>(event);
 
     assert( msge );
-    sinkMessage( msge->msg );
+    sinkMessage( msge );
 }
 
 void MessagesDialog::clear()

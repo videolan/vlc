@@ -37,6 +37,7 @@ class QTextEdit;
 class QTreeWidget;
 class QTreeWidgetItem;
 class QLineEdit;
+class MsgEvent;
 
 class MessagesDialog : public QVLCFrame, public Singleton<MessagesDialog>
 {
@@ -50,7 +51,7 @@ private:
     msg_cb_data_t *cbData;
     static void sinkMessage( msg_cb_data_t *, msg_item_t *, unsigned );
     void customEvent( QEvent * );
-    void sinkMessage( msg_item_t *item );
+    void sinkMessage( MsgEvent * );
 
 private slots:
     bool save();
