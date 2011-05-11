@@ -707,7 +707,7 @@ static int dvb_parse_transmit_mode (int i)
 {
     static const dvb_int_map_t tab[] = {
         { -1, TRANSMISSION_MODE_AUTO },
-#if 0
+#if DVBv5(3)
         {  1, TRANSMISSION_MODE_1K   },
 #endif
         {  2, TRANSMISSION_MODE_2K   },
@@ -715,7 +715,7 @@ static int dvb_parse_transmit_mode (int i)
         {  4, TRANSMISSION_MODE_4K   },
 #endif
         {  8, TRANSMISSION_MODE_8K   },
-#if 0
+#if DVBv5(3)
         { 16, TRANSMISSION_MODE_16K  },
         { 32, TRANSMISSION_MODE_32K  },
 #endif
@@ -731,7 +731,7 @@ static int dvb_parse_guard (uint32_t guard)
         { VLC_GUARD(1,8),    GUARD_INTERVAL_1_8 },
         { VLC_GUARD(1,16),   GUARD_INTERVAL_1_16 },
         { VLC_GUARD(1,32),   GUARD_INTERVAL_1_32 },
-#if 0
+#if DVBv5(3)
         { VLC_GUARD(1,128),  GUARD_INTERVAL_1_128 },
         { VLC_GUARD(19,128), GUARD_INTERVAL_19_128 },
         { VLC_GUARD(19,256), GUARD_INTERVAL_19_256 },
@@ -780,7 +780,7 @@ int dvb_set_dvbt2 (dvb_device_t *d, uint32_t freq, const char *modstr,
                    uint32_t fec, uint32_t bandwidth,
                    int transmit_mode, uint32_t guard)
 {
-#if 0
+#if DVBv5(3)
     uint32_t mod = dvb_parse_modulation (modstr, QAM_AUTO);
     fec = dvb_parse_fec (fec);
     bandwidth *= 1000000;
@@ -793,6 +793,7 @@ int dvb_set_dvbt2 (dvb_device_t *d, uint32_t freq, const char *modstr,
                           DTV_TRANSMISSION_MODE, transmit_mode,
                           DTV_GUARD_INTERVAL, guard);
 #else
+# warning DVB-T2 needs Linux DVB version 5.3 or later.
     msg_Err (d->obj, "DVB-T2 support not compiled-in");
     (void) freq; (void) modstr; (void) fec; (void) bandwidth;
     (void) transmit_mode; (void) guard;
