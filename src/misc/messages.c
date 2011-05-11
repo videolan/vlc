@@ -376,8 +376,7 @@ void msg_GenericVa (vlc_object_t *p_this, int i_type,
     for (vlc_object_t *o = p_this; o != NULL; o = o->p_parent)
         if (o->psz_header != NULL)
         {
-            if (asprintf (&msg.psz_header, "[%s]", o->psz_header) == -1)
-                msg.psz_header = NULL;
+            msg.psz_header = o->psz_header;
             break;
         }
 
@@ -418,7 +417,6 @@ void msg_GenericVa (vlc_object_t *p_this, int i_type,
     }
     vlc_rwlock_unlock (&bank->lock);
     free (msg.psz_msg);
-    free (msg.psz_header);
 }
 
 /*****************************************************************************
@@ -484,7 +482,7 @@ static void PrintMsg ( vlc_object_t *p_this, const msg_item_t *p_item )
     fprintf (stream, priv->b_color ? "["GREEN"%p"GRAY"] " : "[%p] ",
             (void *)p_item->i_object_id);
     if (p_item->psz_header != NULL)
-        utf8_fprintf (stream, "%s ", p_item->psz_header);
+        utf8_fprintf (stream, "[%s] ", p_item->psz_header);
     utf8_fprintf (stream, "%s %s%s: ", p_item->psz_module, objtype,
                   msgtype[i_type]);
     if (priv->b_color)

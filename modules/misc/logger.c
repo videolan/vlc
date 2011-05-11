@@ -429,11 +429,11 @@ static void SyslogPrint( const msg_item_t *p_msg )
     int i_priority = i_prio[p_msg->i_type];
 
     if( p_msg->psz_header )
-        syslog( i_priority, "%s %s%s%s", p_msg->psz_header, p_msg->psz_module,
-                ppsz_type[p_msg->i_type], p_msg->psz_msg );
+        syslog( i_priority, "[%s] %s%s%s", p_msg->psz_header,
+                p_msg->psz_module, ppsz_type[p_msg->i_type], p_msg->psz_msg );
     else
-        syslog( i_priority, "%s%s%s", p_msg->psz_module, 
-                ppsz_type[p_msg->i_type], p_msg->psz_msg );
+        syslog( i_priority, "%s%s%s",
+                p_msg->psz_module, ppsz_type[p_msg->i_type], p_msg->psz_msg );
  
 }
 #endif
