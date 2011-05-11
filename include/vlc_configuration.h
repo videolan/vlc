@@ -176,8 +176,6 @@ struct module_config_t
     bool        b_dirty;          /* Dirty flag to indicate a config change */
     bool        b_advanced;          /* Flag to indicate an advanced option */
     bool        b_internal;   /* Flag to indicate option is not to be shown */
-    bool        b_restart;   /* Flag to indicate the option needs a restart */
-                              /* to take effect */
     /* Option values loaded from config file */
     bool        b_unsaveable;                /* Config should not be saved */
 

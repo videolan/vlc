@@ -308,10 +308,6 @@ int vlc_plugin_set (module_t *module, module_config_t *item, int propid, ...)
             item->b_unsaveable = true;
             break;
 
-        case VLC_CONFIG_RESTART:
-            item->b_restart = true;
-            break;
-
         case VLC_CONFIG_PRIVATE:
             item->b_internal = true;
             break;

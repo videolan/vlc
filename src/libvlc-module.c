@@ -2035,27 +2035,17 @@ vlc_module_begin ()
     add_obsolete_bool( "fpu" )
 #if defined( __i386__ ) || defined( __x86_64__ )
     add_bool( "mmx", 1, MMX_TEXT, MMX_LONGTEXT, true )
-        change_need_restart ()
     add_bool( "3dn", 1, THREE_DN_TEXT, THREE_DN_LONGTEXT, true )
-        change_need_restart ()
     add_bool( "mmxext", 1, MMXEXT_TEXT, MMXEXT_LONGTEXT, true )
-        change_need_restart ()
     add_bool( "sse", 1, SSE_TEXT, SSE_LONGTEXT, true )
-        change_need_restart ()
     add_bool( "sse2", 1, SSE2_TEXT, SSE2_LONGTEXT, true )
-        change_need_restart ()
     add_bool( "sse3", 1, SSE3_TEXT, SSE3_LONGTEXT, true )
-        change_need_restart ()
     add_bool( "ssse3", 1, SSSE3_TEXT, SSSE3_LONGTEXT, true )
-        change_need_restart ()
     add_bool( "sse41", 1, SSE4_1_TEXT, SSE4_1_LONGTEXT, true )
-        change_need_restart ()
     add_bool( "sse42", 1, SSE4_2_TEXT, SSE4_2_LONGTEXT, true )
-        change_need_restart ()
 #endif
 #if defined( __powerpc__ ) || defined( __ppc__ ) || defined( __ppc64__ )
     add_bool( "altivec", 1, ALTIVEC_TEXT, ALTIVEC_LONGTEXT, true )
-        change_need_restart ()
 #endif
 
 /* Misc options */
@@ -2064,19 +2054,15 @@ vlc_module_begin ()
     add_category_hint( N_("Miscellaneous"), MISC_CAT_LONGTEXT, true )
     add_module( "memcpy", "memcpy", NULL, NULL, MEMCPY_TEXT,
                 MEMCPY_LONGTEXT, true )
-        change_need_restart ()
     add_module( "vod-server", "vod server", NULL, NULL, VOD_SERVER_TEXT,
                 VOD_SERVER_LONGTEXT, true )
-        change_need_restart ()
 
     set_section( N_("Plugins" ), NULL )
     add_bool( "plugins-cache", true, PLUGINS_CACHE_TEXT,
               PLUGINS_CACHE_LONGTEXT, true )
-        change_need_restart ()
     add_obsolete_string( "plugin-path" )
     add_directory( "data-path", NULL, DATA_PATH_TEXT,
                    DATA_PATH_LONGTEXT, true )
-        change_need_restart ()
 
     set_section( N_("Performance options"), NULL )
 
@@ -2084,11 +2070,9 @@ vlc_module_begin ()
 # ifndef __APPLE__
     add_bool( "rt-priority", false, RT_PRIORITY_TEXT,
               RT_PRIORITY_LONGTEXT, true )
-        change_need_restart ()
 # endif
     add_integer( "rt-offset", 0, RT_OFFSET_TEXT,
                  RT_OFFSET_LONGTEXT, true )
-        change_need_restart ()
 #endif
 
 #if defined(HAVE_DBUS)
@@ -2112,7 +2096,6 @@ vlc_module_begin ()
 #if defined(WIN32)
     add_bool( "high-priority", 0, HPRIORITY_TEXT,
               HPRIORITY_LONGTEXT, false )
-        change_need_restart ()
 #endif
 
 /* Playlist options */
@@ -2141,7 +2124,6 @@ vlc_module_begin ()
     add_bool( "playlist-tree", 0, PLTREE_TEXT, PLTREE_LONGTEXT, false )
 
     add_string( "open", "", OPEN_TEXT, OPEN_LONGTEXT, false )
-        change_need_restart ()
 
     add_bool( "auto-preparse", true, PREPARSE_TEXT,
               PREPARSE_LONGTEXT, false )
@@ -2155,7 +2137,6 @@ vlc_module_begin ()
     add_module_list_cat( "services-discovery", SUBCAT_PLAYLIST_SD, NULL,
                           NULL, SD_TEXT, SD_LONGTEXT, false )
         change_short('S')
-        change_need_restart ()
 
 /* Interface options */
     set_category( CAT_INTERFACE )
@@ -2171,54 +2152,44 @@ vlc_module_begin ()
 #if !defined(WIN32)
     add_bool( "daemon", 0, DAEMON_TEXT, DAEMON_LONGTEXT, true )
         change_short('d')
-        change_need_restart ()
 
     add_string( "pidfile", NULL, PIDFILE_TEXT, PIDFILE_LONGTEXT,
                                        false )
-        change_need_restart ()
 #endif
 
     add_bool( "file-logging", false, FILE_LOG_TEXT, FILE_LOG_LONGTEXT,
               true )
-        change_need_restart ()
 #ifdef HAVE_SYSLOG_H
     add_bool ( "syslog", false, SYSLOG_TEXT, SYSLOG_LONGTEXT,
                true )
-        change_need_restart ()
 #endif
 
 #if defined (WIN32) || defined (__APPLE__)
     add_string( "language", "auto", LANGUAGE_TEXT, LANGUAGE_LONGTEXT,
                 false )
         change_string_list( ppsz_language, ppsz_language_text, 0 )
-        change_need_restart ()
 #endif
 
     add_bool( "color", true, COLOR_TEXT, COLOR_LONGTEXT, true )
     add_bool( "advanced", false, ADVANCED_TEXT, ADVANCED_LONGTEXT,
                     false )
-        change_need_restart ()
     add_bool( "interact", true, INTERACTION_TEXT,
               INTERACTION_LONGTEXT, false )
 
     add_bool ( "stats", true, STATS_TEXT, STATS_LONGTEXT, true )
-        change_need_restart ()
 
     set_subcategory( SUBCAT_INTERFACE_MAIN )
     add_module_cat( "intf", SUBCAT_INTERFACE_MAIN, NULL, NULL, INTF_TEXT,
                 INTF_LONGTEXT, false )
         change_short('I')
-        change_need_restart ()
     add_module_list_cat( "extraintf", SUBCAT_INTERFACE_MAIN,
                          NULL, NULL, EXTRAINTF_TEXT,
                          EXTRAINTF_LONGTEXT, false )
-        change_need_restart ()
 
 
     set_subcategory( SUBCAT_INTERFACE_CONTROL )
     add_module_list_cat( "control", SUBCAT_INTERFACE_CONTROL, NULL, NULL,
                          CONTROL_TEXT, CONTROL_LONGTEXT, false )
-        change_need_restart ()
 
 /* Hotkey options*/
     set_subcategory( SUBCAT_INTERFACE_HOTKEYS )

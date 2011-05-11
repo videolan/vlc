@@ -75,9 +75,6 @@ enum vlc_module_properties
     VLC_CONFIG_PERSISTENT_OBSOLETE,
     /* unused (ignored) */
 
-    VLC_CONFIG_RESTART,
-    /* restart required to apply value change (args=none) */
-
     VLC_CONFIG_PRIVATE,
     /* hide from user (args=none) */
 
@@ -351,7 +348,6 @@ enum vlc_module_properties
 #define add_key( name, value, text, longtext, advc ) \
     add_string_inner( CONFIG_ITEM_KEY, "global-" name, text, longtext, advc, \
                    KEY_UNSET ) \
-        change_need_restart() \
     add_string_inner( CONFIG_ITEM_KEY, name, text, longtext, advc, value )
 
 #define add_integer_with_range( name, value, i_min, i_max, p_callback, text, longtext, advc ) \
@@ -422,9 +418,6 @@ enum vlc_module_properties
 #define change_action_add( pf_action, text ) \
     vlc_config_set (p_config, VLC_CONFIG_ADD_ACTION, \
                     (vlc_callback_t)(pf_action), (const char *)(text));
-
-#define change_need_restart() \
-    vlc_config_set (p_config, VLC_CONFIG_RESTART);
 
 /* For options that are saved but hidden from the preferences panel */
 #define change_private() \
