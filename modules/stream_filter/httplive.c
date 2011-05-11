@@ -499,8 +499,10 @@ static char *ConstructUrl(vlc_url_t *url)
     return psz_url;
 }
 
-static int parse_SegmentInformation(stream_t *s, hls_stream_t *hls, char *p_read, const char *uri)
+static int parse_SegmentInformation(stream_t *s, hls_stream_t *hls, char *p_read, int *duration)
 {
+    VLC_UNUSED(s);
+
     assert(hls);
     assert(p_read);
 
@@ -514,9 +516,18 @@ static int parse_SegmentInformation(stream_t *s, hls_stream_t *hls, char *p_read
     token = strtok_r(NULL, ",", &p_next);
     if (token == NULL)
         return VLC_EGENERIC;
-    int duration = atoi(token);
+
+    *duration = atoi(token);
 
     /* Ignore the rest of the line */
+
+    return VLC_SUCCESS;
+}
+
+static int parse_AddSegment(stream_t *s, hls_stream_t *hls, const int duration, const char *uri)
+{
+    assert(hls);
+    assert(uri);
 
     /* Store segment information */
     char *psz_path = NULL;
@@ -878,6 +889,7 @@ static int parse_M3U8(stream_t *s, vlc_array_t *streams, uint8_t *buffer, const 
         assert(hls);
 
         /* */
+        int segment_duration = -1;
         do
         {
             /* Next line */
@@ -887,17 +899,7 @@ static int parse_M3U8(stream_t *s, vlc_array_t *streams, uint8_t *buffer, const 
             p_begin = p_read;
 
             if (strncmp(line, "#EXTINF", 7) == 0)
-            {
-                char *uri = ReadLine(p_begin, &p_read, p_end - p_begin);
-                if (uri == NULL)
-                    err = VLC_EGENERIC;
-                else
-                {
-                    err = parse_SegmentInformation(s, hls, line, uri);
-                    free(uri);
-                }
-                p_begin = p_read;
-            }
+                err = parse_SegmentInformation(s, hls, line, &segment_duration);
             else if (strncmp(line, "#EXT-X-TARGETDURATION", 21) == 0)
                 err = parse_TargetDuration(s, hls, line);
             else if (strncmp(line, "#EXT-X-MEDIA-SEQUENCE", 21) == 0)
@@ -914,6 +916,11 @@ static int parse_M3U8(stream_t *s, vlc_array_t *streams, uint8_t *buffer, const 
                 err = parse_Version(s, hls, line);
             else if (strncmp(line, "#EXT-X-ENDLIST", 14) == 0)
                 err = parse_EndList(s, hls);
+            else if (strncmp(line, "#", 1) != 0)
+            {
+                err = parse_AddSegment(s, hls, segment_duration, line);
+                segment_duration = -1; /* reset duration */
+            }
 
             free(line);
             line = NULL;
