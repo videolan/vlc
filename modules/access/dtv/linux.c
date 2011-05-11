@@ -776,6 +776,30 @@ int dvb_set_dvbt (dvb_device_t *d, uint32_t freq, const char *modstr,
                           DTV_HIERARCHY, hierarchy);
 }
 
+int dvb_set_dvbt2 (dvb_device_t *d, uint32_t freq, const char *modstr,
+                   uint32_t fec, uint32_t bandwidth,
+                   int transmit_mode, uint32_t guard)
+{
+#if 0
+    uint32_t mod = dvb_parse_modulation (modstr, QAM_AUTO);
+    fec = dvb_parse_fec (fec);
+    bandwidth *= 1000000;
+    transmit_mode = dvb_parse_transmit_mode (transmit_mode);
+    guard = dvb_parse_guard (guard);
+
+    return dvb_set_props (d, 8, DTV_CLEAR, 0, DTV_DELIVERY_SYSTEM, SYS_DVBT2,
+                          DTV_FREQUENCY, freq * 1000, DTV_MODULATION, mod,
+                          DTV_INNER_FEC, fec, DTV_BANDWIDTH_HZ, bandwidth,
+                          DTV_TRANSMISSION_MODE, transmit_mode,
+                          DTV_GUARD_INTERVAL, guard);
+#else
+    msg_Err (d->obj, "DVB-T2 support not compiled-in");
+    (void) freq; (void) modstr; (void) fec; (void) bandwidth;
+    (void) transmit_mode; (void) guard;
+    return -1;
+#endif
+}
+
 
 /*** ATSC ***/
 int dvb_set_atsc (dvb_device_t *d, uint32_t freq, const char *modstr)
