@@ -50,13 +50,13 @@
 # include <dvbpsi/demux.h>
 # include <dvbpsi/sdt.h>
 
+#undef ENABLE_HTTPD
 #ifdef ENABLE_HTTPD
 #   include <vlc_httpd.h>
 #endif
 
-#include "dvb.h"
-#include "../../demux/dvb-text.h"
-#include "en50221.h"
+#include "../demux/dvb-text.h"
+#include "dtv/en50221.h"
 
 typedef struct en50221_session_t
 {

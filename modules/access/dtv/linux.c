@@ -37,6 +37,9 @@
 #include <linux/dvb/dmx.h>
 
 #include "dtv/dtv.h"
+#ifdef HAVE_DVBPSI
+# include "dtv/en50221.h"
+#endif
 
 #ifndef O_SEARCH
 # define O_SEARCH O_RDONLY
@@ -179,7 +182,9 @@ struct dvb_device
         uint16_t pid;
     } pids[MAX_PIDS];
 #endif
-    int ca;
+#ifdef HAVE_DVBPSI
+    cam_t *cam;
+#endif
     struct dvb_frontend_info info;
     bool budget;
     //size_t buffer_size;
@@ -209,7 +214,9 @@ dvb_device_t *dvb_open (vlc_object_t *obj, bool tune)
 
     d->obj = obj;
     d->frontend = -1;
-    d->ca = -1;
+#ifdef HAVE_DVBPSI
+    d->cam = NULL;
+#endif
     d->budget = var_InheritBool (obj, "dvb-budget-mode");
 
 #ifndef USE_DMX
@@ -290,10 +297,17 @@ dvb_device_t *dvb_open (vlc_object_t *obj, bool tune)
         msg_Dbg (obj, " (%"PRIu32" tolerance)",
                  d->info.symbol_rate_tolerance);
 
-        d->ca = dvb_open_node (dirfd, device, "ca", O_RDWR);
-        if (d->ca == -1)
+#ifdef HAVE_DVBPSI
+        int ca = dvb_open_node (dirfd, device, "ca", O_RDWR);
+        if (ca != -1)
+        {
+            d->cam = en50221_Init (obj, ca);
+            if (d->cam == NULL)
+                close (ca);
+        }
+        else
             msg_Dbg (obj, "conditional access module not available (%m)");
-
+#endif
     }
     close (dirfd);
     return d;
@@ -315,8 +329,10 @@ void dvb_close (dvb_device_t *d)
                 close (d->pids[i].fd);
     }
 #endif
-    if (d->ca != -1)
-        close (d->ca);
+#ifdef HAVE_DVBPSI
+    if (d->cam != NULL)
+        en50221_End (d->cam);
+#endif
     if (d->frontend != -1)
         close (d->frontend);
     close (d->demux);
@@ -331,6 +347,11 @@ ssize_t dvb_read (dvb_device_t *d, void *buf, size_t len)
 {
     struct pollfd ufd[2];
     int n;
+
+#ifdef HAVE_DVBPSI
+    if (d->cam != NULL)
+        en50221_Poll (d->cam);
+#endif
 
     ufd[0].fd = d->demux;
     ufd[0].events = POLLIN;
@@ -480,6 +501,14 @@ float dvb_get_snr (dvb_device_t *d)
         return 0.;
     return snr / 65535.;
 }
+
+#ifdef HAVE_DVBPSI
+void dvb_set_ca_pmt (dvb_device_t *d, struct dvbpsi_pmt_s *pmt)
+{
+    if (d->cam != NULL)
+        en50221_SetCAPMT (d->cam, pmt);
+}
+#endif
 
 static int dvb_vset_props (dvb_device_t *d, size_t n, va_list ap)
 {

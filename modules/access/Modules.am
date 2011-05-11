@@ -135,6 +135,11 @@ libdtv_plugin_la_DEPENDENCIES =
 
 if HAVE_LINUX
 libdtv_plugin_la_SOURCES += dtv/linux.c
+if HAVE_DVBPSI
+libdtv_plugin_la_SOURCES += dtv/en50221.c dtv/en50221.h
+libdtv_plugin_la_CFLAGS += -DHAVE_DVBPSI $(DVBPSI_CFLAGS)
+libdtv_plugin_la_LIBADD += $(DVBPSI_LIBS)
+endif
 libvlc_LTLIBRARIES += libdtv_plugin.la
 endif
 
