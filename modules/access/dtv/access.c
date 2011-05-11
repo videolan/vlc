@@ -503,8 +503,14 @@ static int Control (access_t *access, int query, va_list args)
         }
 
         case ACCESS_SET_PRIVATE_ID_CA:
-            /* TODO */
-            return VLC_EGENERIC;
+#ifdef HAVE_DVBPSI
+        {
+            struct dvbpsi_pmt_s *pmt = va_arg (args, struct dvbpsi_pmt_s *);
+
+            dvb_set_ca_pmt (dev, pmt);
+            return VLC_SUCCESS;
+        }
+#endif
 
         case ACCESS_GET_PRIVATE_ID_STATE:
             return VLC_EGENERIC;
