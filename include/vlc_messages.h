@@ -50,7 +50,7 @@ typedef struct
     int     i_type;                             /**< message type, see below */
     uintptr_t   i_object_id;
     const char *psz_object_type;
-    char *  psz_module;
+    const char *psz_module;
     char *  psz_msg;                            /**< the message itself */
     char *  psz_header;                         /**< Additional header */
 } msg_item_t;
@@ -80,7 +80,7 @@ static inline msg_item_t *msg_Copy (const msg_item_t *msg)
 
 static inline void msg_Free (msg_item_t *msg)
 {
-    free (msg->psz_module);
+    free ((char *)msg->psz_module);
     free (msg->psz_msg);
     free (msg->psz_header);
     free (msg);

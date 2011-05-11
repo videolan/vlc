@@ -370,7 +370,7 @@ void msg_GenericVa (vlc_object_t *p_this, int i_type,
     msg.i_type = i_type;
     msg.i_object_id = (uintptr_t)p_this;
     msg.psz_object_type = p_this->psz_object_type;
-    msg.psz_module = strdup( psz_module );
+    msg.psz_module = psz_module;
     msg.psz_msg = psz_str;
 
     char *psz_header = NULL;
@@ -439,7 +439,6 @@ void msg_GenericVa (vlc_object_t *p_this, int i_type,
         sub->func (sub->opaque, &msg, 0);
     }
     vlc_rwlock_unlock (&bank->lock);
-    free (msg.psz_module);
     free (msg.psz_msg);
     free (msg.psz_header);
 }
