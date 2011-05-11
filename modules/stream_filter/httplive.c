@@ -499,10 +499,8 @@ static char *ConstructUrl(vlc_url_t *url)
     return psz_url;
 }
 
-static int parse_SegmentInformation(stream_t *s, hls_stream_t *hls, char *p_read, int *duration)
+static int parse_SegmentInformation(hls_stream_t *hls, char *p_read, int *duration)
 {
-    VLC_UNUSED(s);
-
     assert(hls);
     assert(p_read);
 
@@ -899,7 +897,7 @@ static int parse_M3U8(stream_t *s, vlc_array_t *streams, uint8_t *buffer, const 
             p_begin = p_read;
 
             if (strncmp(line, "#EXTINF", 7) == 0)
-                err = parse_SegmentInformation(s, hls, line, &segment_duration);
+                err = parse_SegmentInformation(hls, line, &segment_duration);
             else if (strncmp(line, "#EXT-X-TARGETDURATION", 21) == 0)
                 err = parse_TargetDuration(s, hls, line);
             else if (strncmp(line, "#EXT-X-MEDIA-SEQUENCE", 21) == 0)
