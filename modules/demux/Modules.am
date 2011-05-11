@@ -11,7 +11,6 @@ SOURCES_wav = wav.c
 SOURCES_live555 = live555.cpp ../access/mms/asf.c ../access/mms/buffer.c
 SOURCES_nsv = nsv.c
 SOURCES_real = real.c
-SOURCES_ts = ts.c ../mux/mpeg/csa.c dvb-text.h
 SOURCES_ps = ps.c ps.h
 SOURCES_mod = mod.c dummy.cpp
 SOURCES_pva = pva.c
@@ -62,6 +61,14 @@ libvlc_LTLIBRARIES += \
 	libxa_plugin.la \
 	libimage_plugin.la \
 	$(NULL)
+
+libts_plugin_la_SOURCES = ts.c ../mux/mpeg/csa.c dvb-text.h
+libts_plugin_la_CFLAGS = $(AM_CFLAGS) $(DVBPSI_CFLAGS)
+libts_plugin_la_LIBADD = $(AM_LIBADD) $(DVBPSI_LIBS)
+libts_plugin_la_DEPENDENCIES =
+if HAVE_DVBPSI
+libvlc_LTLIBRARIES += libts_plugin.la
+endif
 
 BUILT_SOURCES += dummy.cpp
 

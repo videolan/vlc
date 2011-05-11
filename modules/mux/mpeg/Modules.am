@@ -3,12 +3,4 @@ SOURCES_mux_ps = ps.c \
                  pes.h \
                  bits.h \
                  $(NULL)
-SOURCES_mux_ts = ts.c \
-                 pes.c \
-                 pes.h \
-                 csa.c \
-                 csa.h \
-                 bits.h \
-                 $(NULL)
-
 libvlc_LTLIBRARIES += libmux_ps_plugin.la
