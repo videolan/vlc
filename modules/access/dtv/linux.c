@@ -707,6 +707,9 @@ static int dvb_parse_transmit_mode (int i)
 {
     static const dvb_int_map_t tab[] = {
         { -1, TRANSMISSION_MODE_AUTO },
+#if 0
+        {  1, TRANSMISSION_MODE_1K   },
+#endif
         {  2, TRANSMISSION_MODE_2K   },
 #if DVBv5(1)
         {  4, TRANSMISSION_MODE_4K   },
@@ -724,13 +727,15 @@ static int dvb_parse_transmit_mode (int i)
 static int dvb_parse_guard (uint32_t guard)
 {
     static const dvb_int_map_t tab[] = {
-      /*{ VLC_GUARD(1,128),  GUARD_INTERVAL_1_128 },*/
-        { VLC_GUARD(1,16),   GUARD_INTERVAL_1_16 },
-        { VLC_GUARD(1,32),   GUARD_INTERVAL_1_32 },
         { VLC_GUARD(1,4),    GUARD_INTERVAL_1_4 },
         { VLC_GUARD(1,8),    GUARD_INTERVAL_1_8 },
-      /*{ VLC_GUARD(19,128), GUARD_INTERVAL_19_128 },*/
-      /*{ VLC_GUARD(9,256),  GUARD_INTERVAL_9_256 },*/
+        { VLC_GUARD(1,16),   GUARD_INTERVAL_1_16 },
+        { VLC_GUARD(1,32),   GUARD_INTERVAL_1_32 },
+#if 0
+        { VLC_GUARD(1,128),  GUARD_INTERVAL_1_128 },
+        { VLC_GUARD(19,128), GUARD_INTERVAL_19_128 },
+        { VLC_GUARD(19,256), GUARD_INTERVAL_19_256 },
+#endif
         { VLC_GUARD_AUTO,    GUARD_INTERVAL_AUTO },
     };
     return dvb_parse_int (guard, tab, sizeof (tab) / sizeof (*tab),
