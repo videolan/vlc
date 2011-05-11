@@ -78,6 +78,16 @@ extern "C" {
 int asprintf (char **, const char *, ...);
 #endif
 
+#ifndef HAVE_FLOCKFILE
+void flockfile (FILE *);
+int ftrylockfile (FILE *);
+void funlockfile (FILE *);
+int getc_unlocked (FILE *);
+int getchar_unlocked (void);
+int putc_unlocked (int, FILE *);
+int putchar_unlocked (int);
+#endif
+
 #ifndef HAVE_GETDELIM
 ssize_t getdelim (char **, size_t *, int, FILE *);
 ssize_t getline (char **, size_t *, FILE *);
