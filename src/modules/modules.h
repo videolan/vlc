@@ -54,9 +54,9 @@ typedef struct module_bank_t
 struct module_cache_t
 {
     /* Mandatory cache entry header */
-    char       *psz_file;
-    int64_t    i_time;
-    int64_t    i_size;
+    char  *path;
+    time_t mtime;
+    off_t  size;
 
     /* Optional extra data */
     module_t *p_module;
@@ -155,6 +155,6 @@ void   CacheMerge (vlc_object_t *, module_t *, module_t *);
 void   CacheDelete(vlc_object_t *, const char *);
 void   CacheLoad  (vlc_object_t *, module_bank_t *, const char *);
 void   CacheSave  (vlc_object_t *, const char *, module_cache_t *const *, size_t);
-module_cache_t * CacheFind (module_bank_t *, const char *, int64_t, int64_t);
+module_cache_t * CacheFind (module_bank_t *, const char *, time_t, off_t);
 
 #endif /* !LIBVLC_MODULES_H */

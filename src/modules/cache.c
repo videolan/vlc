@@ -58,7 +58,7 @@ static int    CacheLoadConfig  ( module_t *, FILE * );
 
 /* Sub-version number
  * (only used to avoid breakage in dev version when cache structure changes) */
-#define CACHE_SUBVERSION_NUM 13
+#define CACHE_SUBVERSION_NUM 14
 
 /* Cache filename */
 #define CACHE_NAME "plugins.dat"
@@ -235,9 +235,9 @@ void CacheLoad( vlc_object_t *p_this, module_bank_t *p_bank, const char *dir )
         pp_cache[i] = xmalloc( sizeof(module_cache_t) );
 
         /* Load common info */
-        LOAD_STRING( pp_cache[i]->psz_file );
-        LOAD_IMMEDIATE( pp_cache[i]->i_time );
-        LOAD_IMMEDIATE( pp_cache[i]->i_size );
+        LOAD_STRING( pp_cache[i]->path );
+        LOAD_IMMEDIATE( pp_cache[i]->mtime );
+        LOAD_IMMEDIATE( pp_cache[i]->size );
 
         pp_cache[i]->p_module = vlc_module_create();
 
@@ -528,9 +528,9 @@ static int CacheSaveBank (FILE *file, module_cache_t *const *pp_cache,
         uint32_t i_submodule;
 
         /* Save common info */
-        SAVE_STRING( pp_cache[i]->psz_file );
-        SAVE_IMMEDIATE( pp_cache[i]->i_time );
-        SAVE_IMMEDIATE( pp_cache[i]->i_size );
+        SAVE_STRING( pp_cache[i]->path );
+        SAVE_IMMEDIATE( pp_cache[i]->mtime );
+        SAVE_IMMEDIATE( pp_cache[i]->size );
 
         /* Save additional infos */
         SAVE_STRING( pp_cache[i]->p_module->psz_object_name );
@@ -678,21 +678,17 @@ void CacheMerge( vlc_object_t *p_this, module_t *p_cache, module_t *p_module )
 /*****************************************************************************
  * CacheFind: finds the cache entry corresponding to a file
  *****************************************************************************/
-module_cache_t *CacheFind( module_bank_t *p_bank, const char *psz_file,
-                           int64_t i_time, int64_t i_size )
+module_cache_t *CacheFind( module_bank_t *p_bank,
+                           const char *path, time_t mtime, off_t size )
 {
-    module_cache_t **pp_cache;
-    int i_cache, i;
+    module_cache_t **cache = p_bank->pp_loaded_cache;
+    size_t n = p_bank->i_loaded_cache;
 
-    pp_cache = p_bank->pp_loaded_cache;
-    i_cache = p_bank->i_loaded_cache;
-
-    for( i = 0; i < i_cache; i++ )
-    {
-        if( !strcmp( pp_cache[i]->psz_file, psz_file ) &&
-            pp_cache[i]->i_time == i_time &&
-            pp_cache[i]->i_size == i_size ) return pp_cache[i];
-    }
+    for( size_t i = 0; i < n; i++ )
+        if( !strcmp( cache[i]->path, path )
+         && cache[i]->mtime == mtime &&
+            cache[i]->size == size )
+            return cache[i];
 
     return NULL;
 }

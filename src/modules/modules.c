@@ -73,7 +73,7 @@ static void AllocatePluginPath( vlc_object_t *, module_bank_t *, const char *,
 static void AllocatePluginDir( vlc_object_t *, module_bank_t *, const char *,
                                unsigned );
 static int  AllocatePluginFile( vlc_object_t *, module_bank_t *, const char *,
-                                int64_t, int64_t );
+                                time_t, off_t );
 static module_t * AllocatePlugin( vlc_object_t *, const char * );
 #endif
 static int  AllocateBuiltinModule( vlc_object_t *, int ( * ) ( module_t * ) );
@@ -170,14 +170,14 @@ void module_EndBank( vlc_object_t *p_this, bool b_plugins )
         {
             DeleteModule( p_bank,
                     p_bank->pp_loaded_cache[p_bank->i_loaded_cache]->p_module );
-            free( p_bank->pp_loaded_cache[p_bank->i_loaded_cache]->psz_file );
+            free( p_bank->pp_loaded_cache[p_bank->i_loaded_cache]->path );
             free( p_bank->pp_loaded_cache[p_bank->i_loaded_cache] );
         }
     }
     free( p_bank->pp_loaded_cache );
     while( p_bank->i_cache-- )
     {
-        free( p_bank->pp_cache[p_bank->i_cache]->psz_file );
+        free( p_bank->pp_cache[p_bank->i_cache]->path );
         free( p_bank->pp_cache[p_bank->i_cache] );
     }
     free( p_bank->pp_cache );
@@ -937,8 +937,7 @@ static void AllocatePluginDir( vlc_object_t *p_this, module_bank_t *p_bank,
  * and module_unneed. It can be removed by DeleteModule.
  *****************************************************************************/
 static int AllocatePluginFile( vlc_object_t * p_this, module_bank_t *p_bank,
-                               const char *psz_file,
-                               int64_t i_file_time, int64_t i_file_size )
+                               const char *path, time_t mtime, off_t size )
 {
     module_t * p_module = NULL;
     module_cache_t *p_cache_entry = NULL;
@@ -946,10 +945,10 @@ static int AllocatePluginFile( vlc_object_t * p_this, module_bank_t *p_bank,
     /*
      * Check our plugins cache first then load plugin if needed
      */
-    p_cache_entry = CacheFind( p_bank, psz_file, i_file_time, i_file_size );
+    p_cache_entry = CacheFind( p_bank, path, mtime, size );
     if( !p_cache_entry )
     {
-        p_module = AllocatePlugin( p_this, psz_file );
+        p_module = AllocatePlugin( p_this, path );
     }
     else
     {
@@ -970,7 +969,7 @@ static int AllocatePluginFile( vlc_object_t * p_this, module_bank_t *p_bank,
         {
             if( p_item->i_action )
             {
-                p_module = AllocatePlugin( p_this, psz_file );
+                p_module = AllocatePlugin( p_this, path );
                 break;
             }
         }
@@ -1004,9 +1003,9 @@ static int AllocatePluginFile( vlc_object_t * p_this, module_bank_t *p_bank,
     pp_cache[p_bank->i_cache] = malloc( sizeof(module_cache_t) );
     if( pp_cache[p_bank->i_cache] == NULL )
         return -1;
-    pp_cache[p_bank->i_cache]->psz_file = strdup( psz_file );
-    pp_cache[p_bank->i_cache]->i_time = i_file_time;
-    pp_cache[p_bank->i_cache]->i_size = i_file_size;
+    pp_cache[p_bank->i_cache]->path = strdup( path );
+    pp_cache[p_bank->i_cache]->mtime = mtime;
+    pp_cache[p_bank->i_cache]->size = size;
     pp_cache[p_bank->i_cache]->p_module = p_module;
     p_bank->pp_cache = pp_cache;
     p_bank->i_cache++;
