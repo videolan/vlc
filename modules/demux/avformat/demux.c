@@ -368,7 +368,7 @@ int OpenDemux( vlc_object_t *p_this )
                                 p_attachment );
                     }
                 }
-                else msg_Warn( p_demux, "unsupported attachment type in ffmpeg demux" );
+                else msg_Warn( p_demux, "unsupported attachment type (%u) in ffmpeg demux", cc->codec_id );
             }
             break;
 #endif
