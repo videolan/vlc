@@ -79,28 +79,28 @@ void CacheDelete( vlc_object_t *obj, const char *dir )
     free( path );
 }
 
-/*****************************************************************************
- * LoadPluginsCache: loads the plugins cache file
- *****************************************************************************
+/**
+ * Loads a plugins cache file.
+ *
  * This function will load the plugin cache if present and valid. This cache
  * will in turn be queried by AllocateAllPlugins() to see if it needs to
  * actually load the dynamically loadable module.
  * This allows us to only fully load plugins when they are actually used.
- *****************************************************************************/
-void CacheLoad( vlc_object_t *p_this, module_bank_t *p_bank, const char *dir )
+ */
+size_t CacheLoad( vlc_object_t *p_this, const char *dir, module_cache_t ***r )
 {
     char *psz_filename;
     FILE *file;
     int i_size, i_read;
     char p_cachestring[sizeof(CACHE_STRING)];
     size_t i_cache;
-    module_cache_t **pp_cache = NULL;
     int32_t i_file_size, i_marker;
 
     assert( dir != NULL );
 
+    *r = NULL;
     if( asprintf( &psz_filename, "%s"DIR_SEP CACHE_NAME, dir ) == -1 )
-        return;
+        return 0;
 
     msg_Dbg( p_this, "loading plugins cache file %s", psz_filename );
 
@@ -110,7 +110,7 @@ void CacheLoad( vlc_object_t *p_this, module_bank_t *p_bank, const char *dir )
         msg_Warn( p_this, "cannot read %s (%m)",
                   psz_filename );
         free( psz_filename );
-        return;
+        return 0;
     }
     free( psz_filename );
 
@@ -121,7 +121,7 @@ void CacheLoad( vlc_object_t *p_this, module_bank_t *p_bank, const char *dir )
         msg_Warn( p_this, "This doesn't look like a valid plugins cache "
                   "(too short)" );
         fclose( file );
-        return;
+        return 0;
     }
 
     fseek( file, 0, SEEK_END );
@@ -130,7 +130,7 @@ void CacheLoad( vlc_object_t *p_this, module_bank_t *p_bank, const char *dir )
         msg_Warn( p_this, "This doesn't look like a valid plugins cache "
                   "(corrupted size)" );
         fclose( file );
-        return;
+        return 0;
     }
     fseek( file, sizeof(i_file_size), SEEK_SET );
 
@@ -142,7 +142,7 @@ void CacheLoad( vlc_object_t *p_this, module_bank_t *p_bank, const char *dir )
     {
         msg_Warn( p_this, "This doesn't look like a valid plugins cache" );
         fclose( file );
-        return;
+        return 0;
     }
 
 #ifdef DISTRO_VERSION
@@ -155,7 +155,7 @@ void CacheLoad( vlc_object_t *p_this, module_bank_t *p_bank, const char *dir )
     {
         msg_Warn( p_this, "This doesn't look like a valid plugins cache" );
         fclose( file );
-        return;
+        return 0;
     }
 #endif
 
@@ -166,7 +166,7 @@ void CacheLoad( vlc_object_t *p_this, module_bank_t *p_bank, const char *dir )
         msg_Warn( p_this, "This doesn't look like a valid plugins cache "
                   "(corrupted header)" );
         fclose( file );
-        return;
+        return 0;
     }
 
     /* Check header marker */
@@ -177,7 +177,7 @@ void CacheLoad( vlc_object_t *p_this, module_bank_t *p_bank, const char *dir )
         msg_Warn( p_this, "This doesn't look like a valid plugins cache "
                   "(corrupted header)" );
         fclose( file );
-        return;
+        return 0;
     }
 
     if (fread( &i_cache, 1, sizeof(i_cache), file ) != sizeof(i_cache) )
@@ -185,22 +185,12 @@ void CacheLoad( vlc_object_t *p_this, module_bank_t *p_bank, const char *dir )
         msg_Warn( p_this, "This doesn't look like a valid plugins cache "
                   "(file too short)" );
         fclose( file );
-        return;
+        return 0;
     }
 
-    if( i_cache )
-    {
-        size_t i_already = p_bank->i_loaded_cache;
-        pp_cache = realloc( p_bank->pp_loaded_cache,
-                            (i_already + i_cache) * sizeof(*pp_cache) );
-        if( unlikely(pp_cache == NULL) )
-            i_cache = 0; /* don't load */
-        else
-        {
-            p_bank->pp_loaded_cache = pp_cache;
-            pp_cache += i_already;
-        }
-   }
+    module_cache_t **pp_cache = malloc( i_cache * sizeof(*pp_cache) );
+    if( pp_cache == NULL )
+        i_cache = 0; /* don't load anything */
 
 #define LOAD_IMMEDIATE(a) \
     if( fread( (void *)&a, sizeof(char), sizeof(a), file ) != sizeof(a) ) goto error
@@ -301,10 +291,10 @@ void CacheLoad( vlc_object_t *p_this, module_bank_t *p_bank, const char *dir )
             LOAD_STRING( p_module->domain );
         }
     }
-    p_bank->i_loaded_cache += i_cache;
-
     fclose( file );
-    return;
+
+    *r = pp_cache;
+    return i_cache;
 
  error:
 
@@ -312,7 +302,7 @@ void CacheLoad( vlc_object_t *p_this, module_bank_t *p_bank, const char *dir )
 
     /* TODO: cleanup */
     fclose( file );
-    return;
+    return 0;
 }
 
 

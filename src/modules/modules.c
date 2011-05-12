@@ -103,8 +103,8 @@ void module_InitBank( vlc_object_t *p_this )
     {
         p_bank = calloc (1, sizeof(*p_bank));
         p_bank->i_usage = 1;
-        p_bank->i_cache = p_bank->i_loaded_cache = 0;
-        p_bank->pp_cache = p_bank->pp_loaded_cache = NULL;
+        p_bank->i_cache = 0;
+        p_bank->pp_cache = NULL;
         p_bank->head = NULL;
 
         /* Everything worked, attach the object */
@@ -164,18 +164,6 @@ void module_EndBank( vlc_object_t *p_this, bool b_plugins )
     vlc_mutex_unlock( &module_lock );
 
 #ifdef HAVE_DYNAMIC_PLUGINS
-    while( p_bank->i_loaded_cache-- )
-    {
-        if( p_bank->pp_loaded_cache[p_bank->i_loaded_cache] )
-        {
-            if( unlikely( p_bank->pp_loaded_cache[p_bank->i_loaded_cache]->p_module != NULL ) )
-                DeleteModule( p_bank,
-                    p_bank->pp_loaded_cache[p_bank->i_loaded_cache]->p_module );
-            free( p_bank->pp_loaded_cache[p_bank->i_loaded_cache]->path );
-            free( p_bank->pp_loaded_cache[p_bank->i_loaded_cache] );
-        }
-    }
-    free( p_bank->pp_loaded_cache );
     while( p_bank->i_cache-- )
     {
         free( p_bank->pp_cache[p_bank->i_cache]->path );
@@ -868,28 +856,48 @@ static void AllocateAllPlugins( vlc_object_t *p_this, module_bank_t *p_bank )
 static void AllocatePluginPath( vlc_object_t *p_this, module_bank_t *p_bank,
                                 const char *path, cache_mode_t mode )
 {
+    module_cache_t **cache;
+    size_t count = 0;
     size_t offset = p_module_bank->i_cache;
 
     switch( mode )
     {
         case CACHE_USE:
-            CacheLoad( p_this, p_module_bank, path );
+            count = CacheLoad( p_this, path, &cache );
             break;
         case CACHE_RESET:
             CacheDelete( p_this, path );
             break;
-        default:
+        case CACHE_IGNORE:
             msg_Dbg( p_this, "ignoring plugins cache file" );
     }
 
     msg_Dbg( p_this, "recursively browsing `%s'", path );
 
+    /* TODO: pass as argument, remove this hack */
+    p_bank->pp_loaded_cache = cache;
+    p_bank->i_loaded_cache = count;
     /* Don't go deeper than 5 subdirectories */
     AllocatePluginDir( p_this, p_bank, path, 5, mode );
 
-    if( mode != CACHE_IGNORE )
-        CacheSave( p_this, path, p_module_bank->pp_cache + offset,
-                   p_module_bank->i_cache - offset );
+    switch( mode )
+    {
+        case CACHE_USE:
+            for( size_t i = 0; i < count; i++ )
+                if( likely(cache[i] != NULL) )
+                {
+                    if( cache[i]->p_module != NULL )
+                       DeleteModule( p_bank, cache[i]->p_module );
+                    free( cache[i]->path );
+                    free( cache[i] );
+                }
+            free( cache );
+        case CACHE_RESET:
+            CacheSave( p_this, path, p_bank->pp_cache + offset,
+                       p_bank->i_cache - offset );
+        case CACHE_IGNORE:
+            break;
+    }
 }
 
 /*****************************************************************************

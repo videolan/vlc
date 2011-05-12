@@ -150,7 +150,7 @@ void module_Unload (module_handle_t);
 /* Plugins cache */
 void   CacheMerge (vlc_object_t *, module_t *, module_t *);
 void   CacheDelete(vlc_object_t *, const char *);
-void   CacheLoad  (vlc_object_t *, module_bank_t *, const char *);
+size_t CacheLoad  (vlc_object_t *, const char *, module_cache_t ***);
 void   CacheSave  (vlc_object_t *, const char *, module_cache_t *const *, size_t);
 module_t * CacheFind (module_bank_t *, const char *, time_t, off_t);
 
