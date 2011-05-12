@@ -1,7 +1,7 @@
 /*****************************************************************************
  * alsa.c : Alsa input module for vlc
  *****************************************************************************
- * Copyright (C) 2002-2009 the VideoLAN team
+ * Copyright (C) 2002-2011 the VideoLAN team
  * $Id$
  *
  * Authors: Benjamin Pracht <bigben at videolan dot org>
@@ -379,7 +379,6 @@ static int Demux( demux_t *p_demux )
     return 1;
 }
 
-
 /*****************************************************************************
  * GrabAudio: Grab an audio frame
  *****************************************************************************/
@@ -395,13 +394,14 @@ static block_t* GrabAudio( demux_t *p_demux )
     if( !p_block )
     {
         msg_Warn( p_demux, "cannot get block" );
-        return 0;
+        return NULL;
     }
 
     p_sys->p_block = p_block;
 
     /* ALSA */
-    i_read = snd_pcm_readi( p_sys->p_alsa_pcm, p_block->p_buffer, p_sys->i_alsa_chunk_size );
+    i_read = snd_pcm_readi( p_sys->p_alsa_pcm, p_block->p_buffer,
+                            p_sys->i_alsa_chunk_size );
     if( i_read == -EAGAIN )
     {
         snd_pcm_wait( p_sys->p_alsa_pcm, 10 ); /* See poll() comment in oss.c */
@@ -421,8 +421,9 @@ static block_t* GrabAudio( demux_t *p_demux )
                 snd_pcm_wait( p_sys->p_alsa_pcm, 10 ); /* See poll() comment in oss.c */
                 return NULL;
             default:
-                msg_Err( p_demux, "Failed to read alsa frame (%s)", snd_strerror( i_read ) );
-                return 0;
+                msg_Err( p_demux, "Failed to read alsa frame (%s)",
+                         snd_strerror( i_read ) );
+                return NULL;
         }
     }
 
@@ -554,7 +555,8 @@ static int OpenAudioDevAlsa( demux_t *p_demux, const char *psz_device )
     }
 
     /* Set Interleaved access */
-    if( ( i_err = snd_pcm_hw_params_set_access( p_sys->p_alsa_pcm, p_hw_params, SND_PCM_ACCESS_RW_INTERLEAVED ) ) < 0 )
+    if( ( i_err = snd_pcm_hw_params_set_access( p_sys->p_alsa_pcm, p_hw_params,
+                                        SND_PCM_ACCESS_RW_INTERLEAVED ) ) < 0 )
     {
         msg_Err( p_demux, "ALSA: cannot set access type (%s)",
                  snd_strerror( i_err ) );
@@ -563,7 +565,8 @@ static int OpenAudioDevAlsa( demux_t *p_demux, const char *psz_device )
 
     /* Set capture format, default is signed 16 bit little endian */
     i_alsa_pcm_format = GetAlsaPCMFormat( p_demux, p_sys->i_format );
-    if( ( i_err = snd_pcm_hw_params_set_format( p_sys->p_alsa_pcm, p_hw_params, i_alsa_pcm_format ) ) < 0 )
+    if( ( i_err = snd_pcm_hw_params_set_format( p_sys->p_alsa_pcm, p_hw_params,
+                                                i_alsa_pcm_format ) ) < 0 )
     {
         msg_Err( p_demux, "ALSA: cannot set sample format (%s)",
                  snd_strerror( i_err ) );
@@ -571,7 +574,8 @@ static int OpenAudioDevAlsa( demux_t *p_demux, const char *psz_device )
     }
 
     /* Set sample rate */
-    i_err = snd_pcm_hw_params_set_rate_near( p_sys->p_alsa_pcm, p_hw_params, &p_sys->i_sample_rate, NULL );
+    i_err = snd_pcm_hw_params_set_rate_near( p_sys->p_alsa_pcm, p_hw_params,
+                                             &p_sys->i_sample_rate, NULL );
     if( i_err < 0 )
     {
         msg_Err( p_demux, "ALSA: cannot set sample rate (%s)",
@@ -581,14 +585,16 @@ static int OpenAudioDevAlsa( demux_t *p_demux, const char *psz_device )
 
     /* Set channels */
     unsigned int channels = p_sys->b_stereo ? 2 : 1;
-    if( ( i_err = snd_pcm_hw_params_set_channels( p_sys->p_alsa_pcm, p_hw_params, channels ) ) < 0 )
+    if( ( i_err = snd_pcm_hw_params_set_channels( p_sys->p_alsa_pcm, p_hw_params,
+                                                  channels ) ) < 0 )
     {
         channels = ( channels==1 ) ? 2 : 1;
         msg_Warn( p_demux, "ALSA: cannot set channel count (%s). "
                   "Trying with channels=%d",
                   snd_strerror( i_err ),
                   channels );
-        if( ( i_err = snd_pcm_hw_params_set_channels( p_sys->p_alsa_pcm, p_hw_params, channels ) ) < 0 )
+        if( ( i_err = snd_pcm_hw_params_set_channels( p_sys->p_alsa_pcm, p_hw_params,
+                                                      channels ) ) < 0 )
         {
             msg_Err( p_demux, "ALSA: cannot set channel count (%s)",
                      snd_strerror( i_err ) );
@@ -609,7 +615,8 @@ static int OpenAudioDevAlsa( demux_t *p_demux, const char *psz_device )
 
     /* Set period time */
     unsigned int period_time = buffer_time / 4;
-    i_err = snd_pcm_hw_params_set_period_time_near( p_sys->p_alsa_pcm, p_hw_params, &period_time, 0 );
+    i_err = snd_pcm_hw_params_set_period_time_near( p_sys->p_alsa_pcm, p_hw_params,
+                                                    &period_time, 0 );
     if( i_err < 0 )
     {
         msg_Err( p_demux, "ALSA: cannot set period time (%s)",
@@ -618,7 +625,8 @@ static int OpenAudioDevAlsa( demux_t *p_demux, const char *psz_device )
     }
 
     /* Set buffer time */
-    i_err = snd_pcm_hw_params_set_buffer_time_near( p_sys->p_alsa_pcm, p_hw_params, &buffer_time, 0 );
+    i_err = snd_pcm_hw_params_set_buffer_time_near( p_sys->p_alsa_pcm, p_hw_params,
+                                                    &buffer_time, 0 );
     if( i_err < 0 )
     {
         msg_Err( p_demux, "ALSA: cannot set buffer time (%s)",
@@ -675,7 +683,6 @@ static int OpenAudioDevAlsa( demux_t *p_demux, const char *psz_device )
     p_sys->p_alsa_pcm = NULL;
 
     return VLC_EGENERIC;
-
 }
 
 static int OpenAudioDev( demux_t *p_demux, const char *psz_device )
