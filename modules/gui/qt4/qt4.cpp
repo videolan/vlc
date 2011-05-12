@@ -285,9 +285,7 @@ vlc_module_begin ()
 
     add_obsolete_bool( "qt-adv-options" ) /* Since 1.2.0 */
 
-#ifdef WIN32
     cannot_unload_broken_library()
-#endif
 
     add_submodule ()
         set_description( "Dialogs provider" )
