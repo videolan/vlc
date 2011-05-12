@@ -970,38 +970,15 @@ static int AllocatePluginFile( vlc_object_t * p_this, module_bank_t *p_bank,
      * Check our plugins cache first then load plugin if needed
      */
     if( mode == CACHE_USE )
-    {
         p_module = CacheFind( p_bank, path, mtime, size );
-        if( p_module != NULL )
-        {
-            /* For now we force loading if the module's config contains
-             * callbacks or actions.
-             * Could be optimized by adding an API call.*/
-            assert( !p_module->b_loaded );
-
-            for( size_t n = p_module->confsize, i = 0; i < n; i++ )
-                if( p_module->p_config[i].i_action )
-                {
-                    DeleteModule( p_bank, p_module );
-                    p_module = AllocatePlugin( p_this, path );
-                    break;
-                }
-        }
-    }
-
     if( p_module == NULL )
-    {
         p_module = AllocatePlugin( p_this, path );
-        if( p_module == NULL )
-            return -1;
-    }
+    if( p_module == NULL )
+        return -1;
 
     /* We have not already scanned and inserted this module */
     assert( p_module->next == NULL );
-
-    /* Everything worked fine !
-     * The module is ready to be added to the list. */
-    p_module->b_builtin = false;
+    assert( !p_module->b_builtin );
 
     /* msg_Dbg( p_this, "plugin \"%s\", %s",
                 p_module->psz_object_name, p_module->psz_longname ); */
@@ -1009,6 +986,27 @@ static int AllocatePluginFile( vlc_object_t * p_this, module_bank_t *p_bank,
     p_bank->head = p_module;
     assert( p_module->next != NULL ); /* Insertion done */
 
+    /* For now we force loading if the module's config contains
+     * callbacks or actions.
+     * Could be optimized by adding an API call.*/
+    for( size_t n = p_module->confsize, i = 0; i < n; i++ )
+         if( p_module->p_config[i].i_action )
+         {
+             if( !p_module->b_loaded )
+             {
+                 DeleteModule( p_bank, p_module );
+                 p_module = AllocatePlugin( p_this, path );
+             }
+             goto keep;
+         }
+
+    /* Unload plugin until we really need it */
+    if( p_module->b_loaded && p_module->b_unloadable )
+    {
+        module_Unload( p_module->handle );
+        p_module->b_loaded = false;
+    }
+keep:
     if( mode == CACHE_IGNORE )
         return 0;
 
