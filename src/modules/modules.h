@@ -36,8 +36,6 @@ typedef struct module_bank_t
     unsigned         i_usage;
 
     /* Plugins cache */
-    bool             b_cache;
-
     int            i_cache;
     module_cache_t **pp_cache;
 

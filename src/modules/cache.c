@@ -99,9 +99,6 @@ void CacheLoad( vlc_object_t *p_this, module_bank_t *p_bank, const char *dir )
 
     assert( dir != NULL );
 
-    if( !p_bank->b_cache )
-        return;
-
     if( asprintf( &psz_filename, "%s"DIR_SEP CACHE_NAME, dir ) == -1 )
         return;
 
