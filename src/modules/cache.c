@@ -675,17 +675,21 @@ void CacheMerge( vlc_object_t *p_this, module_t *p_cache, module_t *p_module )
 /*****************************************************************************
  * CacheFind: finds the cache entry corresponding to a file
  *****************************************************************************/
-module_cache_t *CacheFind( module_bank_t *p_bank,
-                           const char *path, time_t mtime, off_t size )
+module_t *CacheFind( module_bank_t *p_bank,
+                     const char *path, time_t mtime, off_t size )
 {
     module_cache_t **cache = p_bank->pp_loaded_cache;
     size_t n = p_bank->i_loaded_cache;
 
     for( size_t i = 0; i < n; i++ )
         if( !strcmp( cache[i]->path, path )
-         && cache[i]->mtime == mtime &&
-            cache[i]->size == size )
-            return cache[i];
+         && cache[i]->mtime == mtime
+         && cache[i]->size == size )
+       {
+            module_t *module = cache[i]->p_module;
+            cache[i]->p_module = NULL;
+            return module;
+       }
 
     return NULL;
 }

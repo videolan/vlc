@@ -168,7 +168,8 @@ void module_EndBank( vlc_object_t *p_this, bool b_plugins )
     {
         if( p_bank->pp_loaded_cache[p_bank->i_loaded_cache] )
         {
-            DeleteModule( p_bank,
+            if( unlikely( p_bank->pp_loaded_cache[p_bank->i_loaded_cache]->p_module != NULL ) )
+                DeleteModule( p_bank,
                     p_bank->pp_loaded_cache[p_bank->i_loaded_cache]->p_module );
             free( p_bank->pp_loaded_cache[p_bank->i_loaded_cache]->path );
             free( p_bank->pp_loaded_cache[p_bank->i_loaded_cache] );
@@ -956,47 +957,36 @@ static int AllocatePluginFile( vlc_object_t * p_this, module_bank_t *p_bank,
                                cache_mode_t mode )
 {
     module_t * p_module = NULL;
-    module_cache_t *p_cache_entry = NULL;
 
     /*
      * Check our plugins cache first then load plugin if needed
      */
-    //if( mode == CACHE_USE )
-    p_cache_entry = CacheFind( p_bank, path, mtime, size );
-
-    if( p_cache_entry == NULL )
+    if( mode == CACHE_USE )
     {
-        p_module = AllocatePlugin( p_this, path );
-        /* FIXME: VLC_PLUGIN_PATH may contains duplicates or aliases.
-         * This needs to be handled correctly even if caching is disabled. */
-    }
-    else
-    {
-        module_config_t *p_item = NULL, *p_end = NULL;
-
-        p_module = p_cache_entry->p_module;
-        p_module->b_loaded = false;
-
-        /* If VLC_PLUGIN_PATH contains duplicate entries... */
-        if( p_module->next != NULL )
-            return 0; /* already taken care of that one */
-
-        /* For now we force loading if the module's config contains
-         * callbacks or actions.
-         * Could be optimized by adding an API call.*/
-        for( p_item = p_module->p_config, p_end = p_item + p_module->confsize;
-             p_item < p_end; p_item++ )
+        p_module = CacheFind( p_bank, path, mtime, size );
+        if( p_module != NULL )
         {
-            if( p_item->i_action )
-            {
-                p_module = AllocatePlugin( p_this, path );
-                break;
-            }
+            /* For now we force loading if the module's config contains
+             * callbacks or actions.
+             * Could be optimized by adding an API call.*/
+            assert( !p_module->b_loaded );
+
+            for( size_t n = p_module->confsize, i = 0; i < n; i++ )
+                if( p_module->p_config[i].i_action )
+                {
+                    DeleteModule( p_bank, p_module );
+                    p_module = AllocatePlugin( p_this, path );
+                    break;
+                }
         }
     }
 
     if( p_module == NULL )
-        return -1;
+    {
+        p_module = AllocatePlugin( p_this, path );
+        if( p_module == NULL )
+            return -1;
+    }
 
     /* We have not already scanned and inserted this module */
     assert( p_module->next == NULL );
