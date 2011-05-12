@@ -1059,21 +1059,35 @@ static module_t * AllocatePlugin( vlc_object_t * p_this, const char *psz_file )
     p_module->b_loaded = true;
 
     /* Initialize the module: fill p_module, default config */
-    if( module_Call( p_this, p_module ) != 0 )
+    static const char entry[] = "vlc_entry" MODULE_SUFFIX;
+
+    /* Try to resolve the symbol */
+    int (*pf_symbol)(module_t * p_module)
+        = (int (*)(module_t *)) module_Lookup( p_module->handle,entry );
+    if( pf_symbol == NULL )
     {
-        /* We couldn't call module_init() */
-        free( p_module->psz_filename );
-        module_release( p_module );
-        module_Unload( handle );
-        return NULL;
+        msg_Warn( p_this, "cannot find symbol \"%s\" in plugin `%s'",
+                  entry, psz_file );
+        goto error;
+    }
+    else
+    /* We can now try to call the symbol */
+    if( pf_symbol( p_module ) != 0 )
+    {
+        /* With a well-written module we shouldn't have to print an
+         * additional error message here, but just make sure. */
+        msg_Err( p_this, "cannot initialize plugin `%s'", psz_file );
+        goto error;
     }
 
     DupModule( p_module );
-
-    /* Everything worked fine ! The module is ready to be added to the list. */
-    p_module->b_builtin = false;
-
+    assert( !p_module->b_builtin );
     return p_module;
+error:
+    free( p_module->psz_filename );
+    module_release( p_module );
+    module_Unload( handle );
+    return NULL;
 }
 
 /*****************************************************************************

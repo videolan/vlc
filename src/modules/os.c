@@ -66,61 +66,9 @@
  * Local prototypes
  *****************************************************************************/
 #ifdef HAVE_DYNAMIC_PLUGINS
-static void *module_Lookup( module_handle_t, const char * );
-
 #if defined(HAVE_DL_WINDOWS)
 static char * GetWindowsError  ( void );
 #endif
-
-/**
- * module Call
- *
- * Call a symbol given its name and a module structure. The symbol MUST
- * refer to a function returning int and taking a module_t* as an argument.
- * \param p_module the modules
- * \return 0 if it pass and -1 in case of a failure
- */
-int module_Call( vlc_object_t *obj, module_t *p_module )
-{
-    static const char psz_name[] = "vlc_entry" MODULE_SUFFIX;
-    int (* pf_symbol) ( module_t * p_module );
-
-    /* Try to resolve the symbol */
-    pf_symbol = (int (*)(module_t *)) module_Lookup( p_module->handle,
-                                                     psz_name );
-
-    if( pf_symbol == NULL )
-    {
-#if defined(HAVE_DL_WINDOWS)
-        char *psz_error = GetWindowsError();
-        msg_Warn( obj, "cannot find symbol \"%s\" in file `%s' (%s)",
-                  psz_name, p_module->psz_filename, psz_error );
-        free( psz_error );
-#elif defined(HAVE_DL_DLOPEN)
-        msg_Warn( obj, "cannot find symbol \"%s\" in file `%s' (%s)",
-                  psz_name, p_module->psz_filename, dlerror() );
-#elif defined(HAVE_DL_SHL_LOAD)
-        msg_Warn( obj, "cannot find symbol \"%s\" in file `%s' (%m)",
-                  psz_name, p_module->psz_filename );
-#else
-#   error "Something is wrong in modules.c"
-#endif
-        return -1;
-    }
-
-    /* We can now try to call the symbol */
-    if( pf_symbol( p_module ) != 0 )
-    {
-        /* With a well-written module we shouldn't have to print an
-         * additional error message here, but just make sure. */
-        msg_Err( obj, "Failed to call symbol \"%s\" in file `%s'",
-                 psz_name, p_module->psz_filename );
-        return -1;
-    }
-
-    /* Everything worked fine, we can return */
-    return 0;
-}
 
 /**
  * Load a dynamically linked library using a system dependent method.
@@ -235,7 +183,7 @@ void module_Unload( module_handle_t handle )
  * @param psz_function function name
  * @return NULL on error, or the address of the symbol
  */
-static void *module_Lookup( module_handle_t handle, const char *psz_function )
+void *module_Lookup( module_handle_t handle, const char *psz_function )
 {
 #if defined(HAVE_DL_WINDOWS) && defined(UNDER_CE)
     wchar_t wide[strlen( psz_function ) + 1];
