@@ -1425,31 +1425,20 @@ static void* ThreadSend( void *data )
 #endif
                 SendRTCP( id->sinkv[i].rtcp, out );
 
-            if( send( id->sinkv[i].rtp_fd, out->p_buffer, len, 0 ) >= 0 )
-                continue;
-            switch( net_errno )
+            if( send( id->sinkv[i].rtp_fd, out->p_buffer, len, 0 ) == -1
+             && net_errno != EAGAIN && net_errno != EWOULDBLOCK
+             && net_errno != ENOBUFS && net_errno != ENOMEM )
             {
-                /* Soft errors (e.g. ICMP): */
-                case ECONNREFUSED: /* Port unreachable */
-                case ENOPROTOOPT:
-#ifdef EPROTO
-                case EPROTO:       /* Protocol unreachable */
-#endif
-                case EHOSTUNREACH: /* Host unreachable */
-                case ENETUNREACH:  /* Network unreachable */
-                case ENETDOWN:     /* Entire network down */
+                int type;
+                getsockopt( id->sinkv[i].rtp_fd, SOL_SOCKET, SO_TYPE,
+                            &type, &(socklen_t){ sizeof(type) });
+                if( type == SOCK_DGRAM )
+                    /* ICMP soft error: ignore and retry */
                     send( id->sinkv[i].rtp_fd, out->p_buffer, len, 0 );
-                /* Transient congestion: */
-                case ENOMEM: /* out of socket buffers */
-                case ENOBUFS:
-                case EAGAIN:
-#if (EAGAIN != EWOULDBLOCK)
-                case EWOULDBLOCK:
-#endif
-                    continue;
+                else
+                    /* Broken connection */
+                    deadv[deadc++] = id->sinkv[i].rtp_fd;
             }
-
-            deadv[deadc++] = id->sinkv[i].rtp_fd;
         }
         id->i_seq_sent_next = ntohs(((uint16_t *) out->p_buffer)[1]) + 1;
         vlc_mutex_unlock( &id->lock_sink );
