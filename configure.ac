@@ -691,21 +691,6 @@ AC_CHECK_LIB(m,lrintf, [
 dnl Check for dynamic plugins
 ac_cv_have_plugins=no
 
-# HP-UX style
-if test "${ac_cv_have_plugins}" = "no"; then
-  AC_CHECK_HEADERS(dl.h)
-  ac_cv_my_have_shl_load=no
-  AC_CHECK_FUNC(shl_load,
-   [ac_cv_my_have_shl_load=yes,
-    AC_CHECK_LIB(dld, shl_load,
-     [ac_cv_my_have_shl_load=yes
-      VLC_ADD_LIBS([libvlccore],[-ldld])])])
-  if test "${ac_cv_my_have_shl_load}" = "yes"; then
-    AC_DEFINE(HAVE_DL_SHL_LOAD, 1, [Define if you have the shl_load API])
-    ac_cv_have_plugins=yes
-  fi
-fi
-
 # Win32 style
 if test "${ac_cv_have_plugins}" = "no"; then
   if test "${SYS}" = "mingw32" ; then

@@ -278,6 +278,7 @@ SOURCES_libvlc_darwin = \
 	posix/darwin_dirs.c \
 	misc/atomic.c \
 	posix/filesystem.c \
+	posix/plugin.c \
 	posix/thread.c \
 	posix/darwin_specific.c \
 	$(NULL)
@@ -286,6 +287,7 @@ SOURCES_libvlc_linux = \
 	posix/dirs.c \
 	misc/atomic.c \
 	posix/filesystem.c \
+	posix/plugin.c \
 	posix/thread.c \
 	posix/linux_specific.c \
 	$(NULL)
@@ -294,6 +296,7 @@ SOURCES_libvlc_win32 = \
 	win32/dirs.c \
 	win32/atomic.c \
 	win32/filesystem.c \
+	win32/plugin.c \
 	win32/thread.c \
 	win32/specific.c \
 	win32/winsock.c \
@@ -303,12 +306,14 @@ SOURCES_libvlc_symbian = \
 	symbian/path.cpp \
 	symbian/dirs.c \
 	misc/atomic.c \
+	win32/plugin.c \
 	$(NULL)
 
 SOURCES_libvlc_other = \
 	posix/dirs.c \
 	misc/atomic.c \
 	posix/filesystem.c \
+	posix/thread.c \
 	posix/thread.c \
 	posix/specific.c \
 	$(NULL)
@@ -436,7 +441,6 @@ SOURCES_libvlc_common = \
 	modules/modules.c \
 	modules/cache.c \
 	modules/entry.c \
-	modules/os.c \
 	modules/textdomain.c \
 	misc/threads.c \
 	misc/stats.c \

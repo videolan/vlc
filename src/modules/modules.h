@@ -74,8 +74,6 @@ typedef int module_handle_t;
 typedef void * module_handle_t;
 #elif defined(HAVE_DL_DLOPEN)
 typedef void * module_handle_t;
-#elif defined(HAVE_DL_SHL_LOAD)
-typedef shl_t module_handle_t;
 #endif
 
 /**
