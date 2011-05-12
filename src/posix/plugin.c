@@ -48,10 +48,10 @@
  * \return 0 on success as well as the module handle.
  */
 int module_Load( vlc_object_t *p_this, const char *psz_file,
-                 module_handle_t *p_handle )
+                 module_handle_t *p_handle, bool lazy )
 {
 #if defined (RTLD_NOW)
-    const int flags = RTLD_NOW;
+    const int flags = lazy ? RTLD_LAZY : RTLD_NOW;
 #elif defined (DL_LAZY)
     const int flags = DL_LAZY;
 #else

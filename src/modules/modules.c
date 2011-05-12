@@ -75,7 +75,7 @@ static void AllocatePluginDir( vlc_object_t *, module_bank_t *, const char *,
                                unsigned, cache_mode_t );
 static int  AllocatePluginFile( vlc_object_t *, module_bank_t *, const char *,
                                 time_t, off_t, cache_mode_t );
-static module_t * AllocatePlugin( vlc_object_t *, const char * );
+static module_t * AllocatePlugin( vlc_object_t *, const char *, bool );
 #endif
 static int  AllocateBuiltinModule( vlc_object_t *, int ( * ) ( module_t * ) );
 static void DeleteModule ( module_bank_t *, module_t * );
@@ -555,7 +555,7 @@ found_shortcut:
         if( !p_real->b_builtin && !p_real->b_loaded )
         {
             module_t *p_new_module =
-                AllocatePlugin( p_this, p_real->psz_filename );
+                AllocatePlugin( p_this, p_real->psz_filename, false );
             if( p_new_module == NULL )
             {   /* Corrupted module */
                 msg_Err( p_this, "possibly corrupt module cache" );
@@ -972,7 +972,7 @@ static int AllocatePluginFile( vlc_object_t * p_this, module_bank_t *p_bank,
     if( mode == CACHE_USE )
         p_module = CacheFind( p_bank, path, mtime, size );
     if( p_module == NULL )
-        p_module = AllocatePlugin( p_this, path );
+        p_module = AllocatePlugin( p_this, path, true );
     if( p_module == NULL )
         return -1;
 
@@ -986,27 +986,26 @@ static int AllocatePluginFile( vlc_object_t * p_this, module_bank_t *p_bank,
     p_bank->head = p_module;
     assert( p_module->next != NULL ); /* Insertion done */
 
-    /* For now we force loading if the module's config contains
-     * callbacks or actions.
-     * Could be optimized by adding an API call.*/
-    for( size_t n = p_module->confsize, i = 0; i < n; i++ )
-         if( p_module->p_config[i].i_action )
-         {
-             if( !p_module->b_loaded )
-             {
-                 DeleteModule( p_bank, p_module );
-                 p_module = AllocatePlugin( p_this, path );
-             }
-             goto keep;
-         }
-
     /* Unload plugin until we really need it */
     if( p_module->b_loaded && p_module->b_unloadable )
     {
         module_Unload( p_module->handle );
         p_module->b_loaded = false;
     }
-keep:
+
+    /* For now we force loading if the module's config contains
+     * callbacks or actions.
+     * Could be optimized by adding an API call.*/
+    for( size_t n = p_module->confsize, i = 0; i < n; i++ )
+         if( p_module->p_config[i].i_action )
+         {
+             /* !unloadable not allowed for plugins with callbacks */
+             assert( !p_module->b_loaded );
+             DeleteModule( p_bank, p_module );
+             p_module = AllocatePlugin( p_this, path, false );
+             break;
+         }
+
     if( mode == CACHE_IGNORE )
         return 0;
 
@@ -1035,12 +1034,13 @@ keep:
  * for its information data. The module can then be handled by module_need
  * and module_unneed. It can be removed by DeleteModule.
  *****************************************************************************/
-static module_t * AllocatePlugin( vlc_object_t * p_this, const char *psz_file )
+static module_t *AllocatePlugin( vlc_object_t * p_this, const char *psz_file,
+                                 bool fast )
 {
     module_t * p_module = NULL;
     module_handle_t handle;
 
-    if( module_Load( p_this, psz_file, &handle ) )
+    if( module_Load( p_this, psz_file, &handle, fast ) )
         return NULL;
 
     /* Now that we have successfully loaded the module, we can

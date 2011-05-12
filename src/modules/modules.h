@@ -141,7 +141,7 @@ void module_EndBank( vlc_object_t *, bool );
 int vlc_bindtextdomain (const char *);
 
 /* Low-level OS-dependent handler */
-int module_Load (vlc_object_t *, const char *, module_handle_t *);
+int module_Load (vlc_object_t *, const char *, module_handle_t *, bool);
 void *module_Lookup (module_handle_t, const char *);
 void module_Unload (module_handle_t);
 
