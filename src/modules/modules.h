@@ -37,7 +37,6 @@ typedef struct module_bank_t
 
     /* Plugins cache */
     bool             b_cache;
-    bool             b_cache_dirty;
 
     int            i_cache;
     module_cache_t **pp_cache;
