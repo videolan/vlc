@@ -44,6 +44,8 @@
 #include <vlc_access.h>
 #include <vlc_demux.h>
 #include <vlc_input.h>
+#include <vlc_fourcc.h>
+#include <vlc_aout.h>
 
 #include <unistd.h>
 #include <sys/ioctl.h>
@@ -68,6 +70,10 @@ static void DemuxClose( vlc_object_t * );
 #define STEREO_LONGTEXT N_( \
     "Capture the audio stream in stereo." )
 
+#define FORMAT_TEXT N_( "Capture format (default s16l)" )
+#define FORMAT_LONGTEXT N_( \
+    "Capture format of audio stream." )
+
 #define SAMPLERATE_TEXT N_( "Samplerate" )
 #define SAMPLERATE_LONGTEXT N_( \
     "Samplerate of the captured audio stream, in Hz (eg: 11025, 22050, 44100, 48000)" )
@@ -79,6 +85,23 @@ static void DemuxClose( vlc_object_t * );
 
 #define ALSA_DEFAULT "hw"
 #define CFG_PREFIX "alsa-"
+
+static const char *const ppsz_fourcc[] = {
+    "u8", "s8", "gsm", "u16l", "s16l", "u16b", "s16b",
+    "u24l", "s24l", "u24b", "s24b", "u32l", "s32l",
+    "u32b", "s32b", "f32l", "f32b", "f64l", "f64b"
+};
+static const char *const ppsz_fourcc_text[] = {
+    N_("PCM U8"), N_("PCM S8"), N_("GSM Audio"),
+    N_("PCM U16 LE"), N_("PCM S16 LE"),
+    N_("PCM U16 BE"), N_("PCM S16 BE"),
+    N_("PCM U24 LE"), N_("PCM S24 LE"),
+    N_("PCM U24 BE"), N_("PCM S24 BE"),
+    N_("PCM U32 LE"), N_("PCM S32 LE"),
+    N_("PCM U32 BE"), N_("PCM S32 BE"),
+    N_("PCM F32 LE"), N_("PCM F32 BE"),
+    N_("PCM F64 LE"), N_("PCM F64 BE")
+};
 
 vlc_module_begin()
     set_shortname( N_("ALSA") )
@@ -93,6 +116,9 @@ vlc_module_begin()
 
     add_bool( CFG_PREFIX "stereo", true, STEREO_TEXT, STEREO_LONGTEXT,
                 true )
+    add_string( CFG_PREFIX "format", "s16l", FORMAT_TEXT,
+                FORMAT_LONGTEXT, true )
+        change_string_list( ppsz_fourcc, ppsz_fourcc_text, 0 )
     add_integer( CFG_PREFIX "samplerate", 48000, SAMPLERATE_TEXT,
                 SAMPLERATE_LONGTEXT, true )
 vlc_module_end()
@@ -116,6 +142,7 @@ struct demux_sys_t
     /* Audio */
     unsigned int i_sample_rate;
     bool b_stereo;
+    vlc_fourcc_t i_format;
     size_t i_max_frame_size;
     block_t *p_block;
     es_out_id_t *p_es;
@@ -244,6 +271,10 @@ static int DemuxOpen( vlc_object_t *p_this )
     p_sys->p_es = NULL;
     p_sys->p_block = NULL;
     p_sys->i_next_demux_date = -1;
+
+    char *psz_format = var_InheritString( p_demux, CFG_PREFIX "format" );
+    p_sys->i_format = vlc_fourcc_GetCodecFromString( AUDIO_ES, psz_format );
+    free( psz_format );
 
     const char *psz_device = NULL;
     if( p_demux->psz_location && *p_demux->psz_location )
@@ -434,6 +465,46 @@ static block_t* GrabAudio( demux_t *p_demux )
     return p_block;
 }
 
+static snd_pcm_format_t GetAlsaPCMFormat( demux_t *p_demux, const vlc_fourcc_t i_format )
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+
+    switch( i_format )
+    {
+        case VLC_CODEC_U8: return SND_PCM_FORMAT_U8;
+        case VLC_CODEC_S8: return SND_PCM_FORMAT_S8;
+
+        case VLC_CODEC_GSM: return SND_PCM_FORMAT_GSM;
+
+        case VLC_CODEC_U16L: return SND_PCM_FORMAT_U16_LE;
+        case VLC_CODEC_S16L: return SND_PCM_FORMAT_S16_LE;
+        case VLC_CODEC_U16B: return SND_PCM_FORMAT_U16_BE;
+        case VLC_CODEC_S16B: return SND_PCM_FORMAT_S16_BE;
+
+        case VLC_CODEC_U24L: return SND_PCM_FORMAT_U24_3LE;
+        case VLC_CODEC_S24L: return SND_PCM_FORMAT_S24_3LE;
+        case VLC_CODEC_U24B: return SND_PCM_FORMAT_U24_3BE;
+        case VLC_CODEC_S24B: return SND_PCM_FORMAT_S24_3BE;
+
+        case VLC_CODEC_U32L: return SND_PCM_FORMAT_U32_LE;
+        case VLC_CODEC_U32B: return SND_PCM_FORMAT_U32_BE;
+        case VLC_CODEC_S32L: return SND_PCM_FORMAT_S32_LE;
+        case VLC_CODEC_S32B: return SND_PCM_FORMAT_S32_BE;
+        case VLC_CODEC_F32L: return SND_PCM_FORMAT_FLOAT_LE;
+        case VLC_CODEC_F32B: return SND_PCM_FORMAT_FLOAT_BE;
+
+        case VLC_CODEC_F64L: return SND_PCM_FORMAT_FLOAT64_LE;
+        case VLC_CODEC_F64B: return SND_PCM_FORMAT_FLOAT64_BE;
+
+        default:
+            msg_Err( p_demux, "ALSA: unsupported sample format '%s' falling back to 's16l'",
+                              (const char *)&i_format );
+            p_sys->i_format = VLC_CODEC_S16L;
+    }
+
+    return SND_PCM_FORMAT_S16_LE;
+}
+
 /*****************************************************************************
  * OpenAudioDev: open and set up the audio device and probe for capabilities
  *****************************************************************************/
@@ -442,6 +513,7 @@ static int OpenAudioDevAlsa( demux_t *p_demux, const char *psz_device )
     demux_sys_t *p_sys = p_demux->p_sys;
     p_sys->p_alsa_pcm = NULL;
     snd_pcm_hw_params_t *p_hw_params = NULL;
+    snd_pcm_format_t i_alsa_pcm_format;
     snd_pcm_uframes_t buffer_size;
     snd_pcm_uframes_t chunk_size;
 
@@ -489,8 +561,9 @@ static int OpenAudioDevAlsa( demux_t *p_demux, const char *psz_device )
         goto adev_fail;
     }
 
-    /* Set 16 bit little endian */
-    if( ( i_err = snd_pcm_hw_params_set_format( p_sys->p_alsa_pcm, p_hw_params, SND_PCM_FORMAT_S16_LE ) ) < 0 )
+    /* Set capture format, default is signed 16 bit little endian */
+    i_alsa_pcm_format = GetAlsaPCMFormat( p_demux, p_sys->i_format );
+    if( ( i_err = snd_pcm_hw_params_set_format( p_sys->p_alsa_pcm, p_hw_params, i_alsa_pcm_format ) ) < 0 )
     {
         msg_Err( p_demux, "ALSA: cannot set sample format (%s)",
                  snd_strerror( i_err ) );
@@ -572,7 +645,7 @@ static int OpenAudioDevAlsa( demux_t *p_demux, const char *psz_device )
         goto adev_fail;
     }
 
-    int bits_per_sample = snd_pcm_format_physical_width(SND_PCM_FORMAT_S16_LE);
+    int bits_per_sample = snd_pcm_format_physical_width(i_alsa_pcm_format);
     int bits_per_frame = bits_per_sample * channels;
 
     p_sys->i_alsa_chunk_size = chunk_size;
@@ -611,16 +684,17 @@ static int OpenAudioDev( demux_t *p_demux, const char *psz_device )
     if( OpenAudioDevAlsa( p_demux, psz_device ) != VLC_SUCCESS )
         return VLC_EGENERIC;
 
-    msg_Dbg( p_demux, "opened adev=`%s' %s %dHz",
+    msg_Dbg( p_demux, "opened adev=`%s' %s %dHz codec '%s'",
              psz_device, p_sys->b_stereo ? "stereo" : "mono",
-             p_sys->i_sample_rate );
+             p_sys->i_sample_rate,
+             vlc_fourcc_GetDescription( AUDIO_ES, p_sys->i_format ) );
 
     es_format_t fmt;
-    es_format_Init( &fmt, AUDIO_ES, VLC_FOURCC('a','r','a','w') );
+    es_format_Init( &fmt, AUDIO_ES, p_sys->i_format );
 
     fmt.audio.i_channels = p_sys->b_stereo ? 2 : 1;
     fmt.audio.i_rate = p_sys->i_sample_rate;
-    fmt.audio.i_bitspersample = 16;
+    fmt.audio.i_bitspersample = aout_BitsPerSample( p_sys->i_format );
     fmt.audio.i_blockalign = fmt.audio.i_channels * fmt.audio.i_bitspersample / 8;
     fmt.i_bitrate = fmt.audio.i_channels * fmt.audio.i_rate * fmt.audio.i_bitspersample;
 
