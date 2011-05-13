@@ -159,7 +159,7 @@ vlc_module_begin ()
     set_category( CAT_SOUT )
     set_subcategory( SUBCAT_SOUT_STREAM )
     set_section( N_("Video"), NULL )
-    add_module( SOUT_CFG_PREFIX "venc", "encoder", NULL, NULL, VENC_TEXT,
+    add_module( SOUT_CFG_PREFIX "venc", "encoder", NULL, VENC_TEXT,
                 VENC_LONGTEXT, false )
     add_string( SOUT_CFG_PREFIX "vcodec", NULL, VCODEC_TEXT,
                 VCODEC_LONGTEXT, false )
@@ -186,11 +186,10 @@ vlc_module_begin ()
     add_integer( SOUT_CFG_PREFIX "maxheight", 0, MAXHEIGHT_TEXT,
                  MAXHEIGHT_LONGTEXT, true )
     add_module_list( SOUT_CFG_PREFIX "vfilter", "video filter2",
-                     NULL, NULL,
-                     VFILTER_TEXT, VFILTER_LONGTEXT, false )
+                     NULL, VFILTER_TEXT, VFILTER_LONGTEXT, false )
 
     set_section( N_("Audio"), NULL )
-    add_module( SOUT_CFG_PREFIX "aenc", "encoder", NULL, NULL, AENC_TEXT,
+    add_module( SOUT_CFG_PREFIX "aenc", "encoder", NULL, AENC_TEXT,
                 AENC_LONGTEXT, false )
     add_string( SOUT_CFG_PREFIX "acodec", NULL, ACODEC_TEXT,
                 ACODEC_LONGTEXT, false )
@@ -205,19 +204,17 @@ vlc_module_begin ()
     add_bool( SOUT_CFG_PREFIX "audio-sync", false, ASYNC_TEXT,
               ASYNC_LONGTEXT, false )
     add_module_list( SOUT_CFG_PREFIX "afilter",  "audio filter",
-                     NULL, NULL,
-                     AFILTER_TEXT, AFILTER_LONGTEXT, false )
+                     NULL, AFILTER_TEXT, AFILTER_LONGTEXT, false )
 
     set_section( N_("Overlays/Subtitles"), NULL )
-    add_module( SOUT_CFG_PREFIX "senc", "encoder", NULL, NULL, SENC_TEXT,
+    add_module( SOUT_CFG_PREFIX "senc", "encoder", NULL, SENC_TEXT,
                 SENC_LONGTEXT, false )
     add_string( SOUT_CFG_PREFIX "scodec", NULL, SCODEC_TEXT,
                 SCODEC_LONGTEXT, false )
     add_bool( SOUT_CFG_PREFIX "soverlay", false, SCODEC_TEXT,
                SCODEC_LONGTEXT, false )
     add_module_list( SOUT_CFG_PREFIX "sfilter", "video filter",
-                     NULL, NULL,
-                     SFILTER_TEXT, SFILTER_LONGTEXT, false )
+                     NULL, SFILTER_TEXT, SFILTER_LONGTEXT, false )
 
     set_section( N_("On Screen Display"), NULL )
     add_bool( SOUT_CFG_PREFIX "osd", false, OSD_TEXT,

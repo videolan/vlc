@@ -114,10 +114,10 @@ vlc_module_begin ()
                                    AUTOCROP_LONGTEXT, false )
 
 #ifdef BEST_AUTOCROP
-    add_integer_with_range( "autocrop-ratio-max", 2405, 0, RATIO_MAX, NULL,
+    add_integer_with_range( "autocrop-ratio-max", 2405, 0, RATIO_MAX,
                             RATIOMAX_TEXT, RATIOMAX_LONGTEXT, true )
 
-    add_integer_with_range( "crop-ratio", 0, 0, RATIO_MAX, NULL, RATIO_TEXT,
+    add_integer_with_range( "crop-ratio", 0, 0, RATIO_MAX, RATIO_TEXT,
                             RATIO_LONGTEXT, false )
     add_integer( "autocrop-time", 25, TIME_TEXT,
                  TIME_LONGTEXT, true )
@@ -127,10 +127,10 @@ vlc_module_begin ()
     add_integer( "autocrop-non-black-pixels", 3,
                  NBP_TEXT, NBP_LONGTEXT, true )
 
-    add_integer_with_range( "autocrop-skip-percent", 17, 0, 100, NULL,
+    add_integer_with_range( "autocrop-skip-percent", 17, 0, 100,
                             SKIP_TEXT, SKIP_LONGTEXT, true )
 
-    add_integer_with_range( "autocrop-luminance-threshold", 40, 0, 128, NULL,
+    add_integer_with_range( "autocrop-luminance-threshold", 40, 0, 128,
                             LUM_TEXT, LUM_LONGTEXT, true )
 #endif //BEST_AUTOCROP
 

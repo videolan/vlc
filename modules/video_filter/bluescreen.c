@@ -83,14 +83,14 @@ vlc_module_begin ()
     add_shortcut( "bluescreen" )
     set_callbacks( Create, Destroy )
 
-    add_integer_with_range( CFG_PREFIX "u", 120, 0, 255, NULL,
+    add_integer_with_range( CFG_PREFIX "u", 120, 0, 255,
                             BLUESCREENU_TEXT, BLUESCREENU_LONGTEXT, false )
-    add_integer_with_range( CFG_PREFIX "v", 90, 0, 255, NULL,
+    add_integer_with_range( CFG_PREFIX "v", 90, 0, 255,
                             BLUESCREENV_TEXT, BLUESCREENV_LONGTEXT, false )
-    add_integer_with_range( CFG_PREFIX "ut", 17, 0, 255, NULL,
+    add_integer_with_range( CFG_PREFIX "ut", 17, 0, 255,
                             BLUESCREENUTOL_TEXT, BLUESCREENUTOL_LONGTEXT,
                             false )
-    add_integer_with_range( CFG_PREFIX "vt", 17, 0, 255, NULL,
+    add_integer_with_range( CFG_PREFIX "vt", 17, 0, 255,
                             BLUESCREENVTOL_TEXT, BLUESCREENVTOL_LONGTEXT,
                             false )
 vlc_module_end ()

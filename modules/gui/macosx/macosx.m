@@ -127,7 +127,7 @@ vlc_module_begin ()
                      false )
         add_bool( "macosx-stretch", false, STRETCH_TEXT, STRETCH_LONGTEXT,
                   false )
-        add_float_with_range( "macosx-opaqueness", 1, 0, 1, NULL,
+        add_float_with_range( "macosx-opaqueness", 1, 0, 1,
                               OPAQUENESS_TEXT, OPAQUENESS_LONGTEXT, true );
         add_bool( "macosx-black", true, BLACK_TEXT, BLACK_LONGTEXT,
                   false )

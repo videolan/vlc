@@ -190,7 +190,7 @@ vlc_module_begin ()
     add_string( "fbosd-text", NULL, FBOSD_TEXT,
                 FBOSD_LONGTEXT, true )
 
-    add_integer_with_range( "fbosd-alpha", 255, 0, 255, NULL, ALPHA_TEXT,
+    add_integer_with_range( "fbosd-alpha", 255, 0, 255, ALPHA_TEXT,
                             ALPHA_LONGTEXT, true )
 
     set_section( N_("Position"), NULL )
@@ -202,7 +202,7 @@ vlc_module_begin ()
         change_integer_list( pi_pos_values, ppsz_pos_descriptions );
 
     set_section( N_("Font"), NULL )
-    add_integer_with_range( "fbosd-font-opacity", 255, 0, 255, NULL,
+    add_integer_with_range( "fbosd-font-opacity", 255, 0, 255,
         OPACITY_TEXT, OPACITY_LONGTEXT, false )
     add_integer( "fbosd-font-color", 0x00FFFFFF, COLOR_TEXT, COLOR_LONGTEXT,
                  false )

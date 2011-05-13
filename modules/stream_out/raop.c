@@ -170,7 +170,7 @@ vlc_module_begin();
                   PASSWORD_TEXT, PASSWORD_LONGTEXT, false )
     add_loadfile( SOUT_CFG_PREFIX "password-file", NULL,
               PASSWORD_FILE_TEXT, PASSWORD_FILE_LONGTEXT, false )
-    add_integer_with_range( SOUT_CFG_PREFIX "volume", 100, 0, 255, NULL,
+    add_integer_with_range( SOUT_CFG_PREFIX "volume", 100, 0, 255,
                             VOLUME_TEXT, VOLUME_LONGTEXT, false )
     set_callbacks( Open, Close )
 vlc_module_end()

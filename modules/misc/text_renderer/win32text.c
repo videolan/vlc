@@ -99,7 +99,7 @@ vlc_module_begin ()
                  FONTSIZE_LONGTEXT, true )
 
     /* opacity valid on 0..255, with default 255 = fully opaque */
-    add_integer_with_range( "win32-opacity", 255, 0, 255, NULL,
+    add_integer_with_range( "win32-opacity", 255, 0, 255,
         OPACITY_TEXT, OPACITY_LONGTEXT, false )
 
     /* hook to the color values list, with default 0x00ffffff = white */

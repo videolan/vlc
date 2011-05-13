@@ -136,9 +136,9 @@ vlc_module_begin ()
     add_integer( OSD_CFG "timeout", 15, TIMEOUT_TEXT,
         TIMEOUT_LONGTEXT, false )
     add_integer_with_range( OSD_CFG "update", OSD_UPDATE_DEFAULT,
-        OSD_UPDATE_MIN, OSD_UPDATE_MAX, NULL, OSD_UPDATE_TEXT,
+        OSD_UPDATE_MIN, OSD_UPDATE_MAX, OSD_UPDATE_TEXT,
         OSD_UPDATE_LONGTEXT, true )
-    add_integer_with_range( OSD_CFG "alpha", 255, 0, 255, NULL,
+    add_integer_with_range( OSD_CFG "alpha", 255, 0, 255,
         OSD_ALPHA_TEXT, OSD_ALPHA_LONGTEXT, true )
 
 vlc_module_end ()

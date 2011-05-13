@@ -89,7 +89,7 @@ vlc_module_begin ()
                 MODE_TEXT, MODE_LONGTEXT, false )
         change_string_list( mode_list, mode_list_text, 0 )
 
-    add_integer_with_range( FILTER_PREFIX "type", 0, 0, 1, NULL,
+    add_integer_with_range( FILTER_PREFIX "type", 0, 0, 1,
                 GRADIENT_TEXT, GRADIENT_LONGTEXT, false )
     add_bool( FILTER_PREFIX "cartoon", true,
                 CARTOON_TEXT, CARTOON_LONGTEXT, false )

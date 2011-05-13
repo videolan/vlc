@@ -108,7 +108,7 @@ vlc_module_begin ()
         CACHING_TEXT, CACHING_LONGTEXT, true )
     add_integer( "vdr-chapter-offset", 0,
         CHAPTER_OFFSET_TEXT, CHAPTER_OFFSET_LONGTEXT, true )
-    add_float_with_range( "vdr-fps", 25, 1, 1000, NULL,
+    add_float_with_range( "vdr-fps", 25, 1, 1000,
         FPS_TEXT, FPS_LONGTEXT, true )
     set_capability( "access", 60 )
     add_shortcut( "vdr" )

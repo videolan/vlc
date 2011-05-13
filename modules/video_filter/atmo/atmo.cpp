@@ -397,13 +397,13 @@ add_string(CFG_PREFIX "serialdev", "/dev/ttyUSB0",
 set_section( N_("Illuminate the room with this color on pause" ), 0 )
 add_bool(CFG_PREFIX "usepausecolor", false,
          PCOLOR_TEXT, PCOLOR_LONGTEXT, false)
-add_integer_with_range(CFG_PREFIX "pcolor-red",   0, 0, 255, NULL,
+add_integer_with_range(CFG_PREFIX "pcolor-red",   0, 0, 255,
                        PCOLOR_RED_TEXT, PCOLOR_RED_LONGTEXT, false)
-add_integer_with_range(CFG_PREFIX "pcolor-green", 0, 0, 255, NULL,
+add_integer_with_range(CFG_PREFIX "pcolor-green", 0, 0, 255,
                        PCOLOR_GREEN_TEXT, PCOLOR_GREEN_LONGTEXT, false)
-add_integer_with_range(CFG_PREFIX "pcolor-blue",  192, 0, 255, NULL,
+add_integer_with_range(CFG_PREFIX "pcolor-blue",  192, 0, 255,
                        PCOLOR_BLUE_TEXT, PCOLOR_BLUE_LONGTEXT, false)
-add_integer_with_range(CFG_PREFIX "fadesteps", 50, 1, 250, NULL,
+add_integer_with_range(CFG_PREFIX "fadesteps", 50, 1, 250,
                        FADESTEPS_TEXT, FADESTEPS_LONGTEXT, false)
 
 /*
@@ -411,31 +411,31 @@ add_integer_with_range(CFG_PREFIX "fadesteps", 50, 1, 250, NULL,
     used for both buildin / external
 */
 set_section( N_("Illuminate the room with this color on shutdown" ), 0 )
-add_integer_with_range(CFG_PREFIX "ecolor-red",   192, 0, 255, NULL,
+add_integer_with_range(CFG_PREFIX "ecolor-red",   192, 0, 255,
                        ECOLOR_RED_TEXT,   ECOLOR_RED_LONGTEXT,   false)
-add_integer_with_range(CFG_PREFIX "ecolor-green", 192, 0, 255, NULL,
+add_integer_with_range(CFG_PREFIX "ecolor-green", 192, 0, 255,
                        ECOLOR_GREEN_TEXT, ECOLOR_GREEN_LONGTEXT, false)
-add_integer_with_range(CFG_PREFIX "ecolor-blue",  192, 0, 255, NULL,
+add_integer_with_range(CFG_PREFIX "ecolor-blue",  192, 0, 255,
                        ECOLOR_BLUE_TEXT,  ECOLOR_BLUE_LONGTEXT,  false)
-add_integer_with_range(CFG_PREFIX "efadesteps",    50, 1, 250, NULL,
+add_integer_with_range(CFG_PREFIX "efadesteps",    50, 1, 250,
                        EFADESTEPS_TEXT,   EFADESTEPS_LONGTEXT,    false)
 
 
 set_section( N_("DMX options" ), 0 )
-add_integer_with_range(CFG_PREFIX "dmx-channels",   5, 1, 64, NULL,
+add_integer_with_range(CFG_PREFIX "dmx-channels",   5, 1, 64,
                        DMX_CHANNELS_TEXT, DMX_CHANNELS_LONGTEXT, false)
 add_string(CFG_PREFIX "dmx-chbase", "0,3,6,9,12",
                        DMX_CHBASE_TEXT, DMX_CHBASE_LONGTEXT, false )
 
 set_section( N_("MoMoLight options" ), 0 )
-add_integer_with_range(CFG_PREFIX "momo-channels",   3, 3, 4, NULL,
+add_integer_with_range(CFG_PREFIX "momo-channels",   3, 3, 4,
                        MOMO_CHANNELS_TEXT, MOMO_CHANNELS_LONGTEXT, false)
 
 /* 2,2,4 means 2 is the default value, 1 minimum amount,
    4 maximum amount
 */
 set_section( N_("fnordlicht options" ), 0 )
-add_integer_with_range(CFG_PREFIX "fnordlicht-amount",   2, 1, 254, NULL,
+add_integer_with_range(CFG_PREFIX "fnordlicht-amount",   2, 1, 254,
                        FNORDLICHT_AMOUNT_TEXT,
                        FNORDLICHT_AMOUNT_LONGTEXT, false)
 
@@ -477,11 +477,11 @@ add_integer_with_range(CFG_PREFIX "fnordlicht-amount",   2, 1, 254, NULL,
 */
 
 set_section( N_("Zone Layout for the build-in Atmo" ), 0 )
-add_integer_with_range(CFG_PREFIX "zones-top",   1, 0, 16, NULL,
+add_integer_with_range(CFG_PREFIX "zones-top",   1, 0, 16,
                        ZONE_TOP_TEXT, ZONE_TOP_LONGTEXT, false)
-add_integer_with_range(CFG_PREFIX "zones-bottom",   1, 0, 16, NULL,
+add_integer_with_range(CFG_PREFIX "zones-bottom",   1, 0, 16,
                        ZONE_BOTTOM_TEXT, ZONE_BOTTOM_LONGTEXT, false)
-add_integer_with_range(CFG_PREFIX "zones-lr",   1, 0, 16, NULL,
+add_integer_with_range(CFG_PREFIX "zones-lr",   1, 0, 16,
                        ZONE_LR_TEXT, ZONE_LR_LONGTEXT, false)
 add_bool(CFG_PREFIX "zone-summary", false,
          ZONE_SUMMARY_TEXT, ZONE_SUMMARY_LONGTEXT, false)
@@ -494,19 +494,19 @@ add_bool(CFG_PREFIX "zone-summary", false,
 */
 set_section( N_("Settings for the built-in Live Video Processor only" ), 0 )
 
-add_integer_with_range(CFG_PREFIX "edgeweightning",   3, 1, 30, NULL,
+add_integer_with_range(CFG_PREFIX "edgeweightning",   3, 1, 30,
                        EDGE_TEXT, EDGE_LONGTEXT, false)
 
-add_integer_with_range(CFG_PREFIX "brightness",   100, 50, 300, NULL,
+add_integer_with_range(CFG_PREFIX "brightness",   100, 50, 300,
                        BRIGHTNESS_TEXT, BRIGHTNESS_LONGTEXT, false)
 
-add_integer_with_range(CFG_PREFIX "darknesslimit",   3, 0, 10, NULL,
+add_integer_with_range(CFG_PREFIX "darknesslimit",   3, 0, 10,
                        DARKNESS_TEXT, DARKNESS_LONGTEXT, false)
 
-add_integer_with_range(CFG_PREFIX "huewinsize",   3, 0, 5, NULL,
+add_integer_with_range(CFG_PREFIX "huewinsize",   3, 0, 5,
                        HUEWINSIZE_TEXT, HUEWINSIZE_LONGTEXT, false)
 
-add_integer_with_range(CFG_PREFIX "satwinsize",   3, 0, 5, NULL,
+add_integer_with_range(CFG_PREFIX "satwinsize",   3, 0, 5,
                        SATWINSIZE_TEXT, SATWINSIZE_LONGTEXT, false)
 
 add_integer(CFG_PREFIX "filtermode", (int)afmCombined,
@@ -514,16 +514,16 @@ add_integer(CFG_PREFIX "filtermode", (int)afmCombined,
 
 change_integer_list(pi_filtermode_values, ppsz_filtermode_descriptions )
 
-add_integer_with_range(CFG_PREFIX "meanlength",    300, 300, 5000, NULL,
+add_integer_with_range(CFG_PREFIX "meanlength",    300, 300, 5000,
                        MEANLENGTH_TEXT, MEANLENGTH_LONGTEXT, false)
 
-add_integer_with_range(CFG_PREFIX "meanthreshold",  40, 1, 100, NULL,
+add_integer_with_range(CFG_PREFIX "meanthreshold",  40, 1, 100,
                        MEANTHRESHOLD_TEXT, MEANTHRESHOLD_LONGTEXT, false)
 
-add_integer_with_range(CFG_PREFIX "percentnew", 50, 1, 100, NULL,
+add_integer_with_range(CFG_PREFIX "percentnew", 50, 1, 100,
                       MEANPERCENTNEW_TEXT, MEANPERCENTNEW_LONGTEXT, false)
 
-add_integer_with_range(CFG_PREFIX "framedelay", 18, 0, 200, NULL,
+add_integer_with_range(CFG_PREFIX "framedelay", 18, 0, 200,
                        FRAMEDELAY_TEXT, FRAMEDELAY_LONGTEXT, false)
 
 /*
@@ -565,13 +565,13 @@ add_string(CFG_PREFIX "channels", "",
 set_section( N_("Adjust the white light to your LED stripes" ), 0 )
 add_bool(CFG_PREFIX "whiteadj", true,
          USEWHITEADJ_TEXT, USEWHITEADJ_LONGTEXT, false)
-add_integer_with_range(CFG_PREFIX "white-red",   255, 0, 255, NULL,
+add_integer_with_range(CFG_PREFIX "white-red",   255, 0, 255,
                        WHITE_RED_TEXT,   WHITE_RED_LONGTEXT,   false)
 
-add_integer_with_range(CFG_PREFIX "white-green", 255, 0, 255, NULL,
+add_integer_with_range(CFG_PREFIX "white-green", 255, 0, 255,
                        WHITE_GREEN_TEXT, WHITE_GREEN_LONGTEXT, false)
 
-add_integer_with_range(CFG_PREFIX "white-blue",  255, 0, 255, NULL,
+add_integer_with_range(CFG_PREFIX "white-blue",  255, 0, 255,
                        WHITE_BLUE_TEXT,  WHITE_BLUE_LONGTEXT,  false)
 /* end of definition of parameter for the buildin filter ... part 1 */
 
@@ -608,9 +608,9 @@ add_string(CFG_PREFIX "framepath", "",
    may be later if computers gets more power ;-) than now we increase
    the samplesize from which we do the stats for output color calculation
 */
-add_integer_with_range(CFG_PREFIX "width",  64, 64, 512, NULL,
+add_integer_with_range(CFG_PREFIX "width",  64, 64, 512,
                        WIDTH_TEXT,  WIDTH_LONGTEXT, true)
-add_integer_with_range(CFG_PREFIX "height", 48, 48, 384, NULL,
+add_integer_with_range(CFG_PREFIX "height", 48, 48, 384,
                        HEIGHT_TEXT,  HEIGHT_LONGTEXT, true)
 add_bool(CFG_PREFIX "showdots", false,
                    SHOW_DOTS_TEXT, SHOW_DOTS_LONGTEXT, false)

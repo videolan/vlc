@@ -56,25 +56,25 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_AUDIO_AFILTER )
 
     add_float( "param-eq-lowf", 100, N_("Low freq (Hz)"),NULL, false )
-    add_float_with_range( "param-eq-lowgain", 0, -20.0, 20.0, NULL,
+    add_float_with_range( "param-eq-lowgain", 0, -20.0, 20.0,
                           N_("Low freq gain (dB)"), NULL,false )
     add_float( "param-eq-highf", 10000, N_("High freq (Hz)"),NULL, false )
-    add_float_with_range( "param-eq-highgain", 0, -20.0, 20.0, NULL,
+    add_float_with_range( "param-eq-highgain", 0, -20.0, 20.0,
                           N_("High freq gain (dB)"),NULL,false )
     add_float( "param-eq-f1", 300, N_("Freq 1 (Hz)"),NULL, false )
-    add_float_with_range( "param-eq-gain1", 0, -20.0, 20.0, NULL,
+    add_float_with_range( "param-eq-gain1", 0, -20.0, 20.0,
                           N_("Freq 1 gain (dB)"), NULL,false )
-    add_float_with_range( "param-eq-q1", 3, 0.1, 100.0, NULL,
+    add_float_with_range( "param-eq-q1", 3, 0.1, 100.0,
                           N_("Freq 1 Q"), NULL,false )
     add_float( "param-eq-f2", 1000, N_("Freq 2 (Hz)"),NULL, false )
-    add_float_with_range( "param-eq-gain2", 0, -20.0, 20.0, NULL,
+    add_float_with_range( "param-eq-gain2", 0, -20.0, 20.0,
                           N_("Freq 2 gain (dB)"),NULL,false )
-    add_float_with_range( "param-eq-q2", 3, 0.1, 100.0, NULL,
+    add_float_with_range( "param-eq-q2", 3, 0.1, 100.0,
                           N_("Freq 2 Q"),NULL,false )
     add_float( "param-eq-f3", 3000, N_("Freq 3 (Hz)"),NULL, false )
-    add_float_with_range( "param-eq-gain3", 0, -20.0, 20.0, NULL,
+    add_float_with_range( "param-eq-gain3", 0, -20.0, 20.0,
                           N_("Freq 3 gain (dB)"),NULL,false )
-    add_float_with_range( "param-eq-q3", 3, 0.1, 100.0, NULL,
+    add_float_with_range( "param-eq-q3", 3, 0.1, 100.0,
                           N_("Freq 3 Q"),NULL,false )
 
     set_callbacks( Open, Close )

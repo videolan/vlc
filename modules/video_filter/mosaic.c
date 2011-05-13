@@ -181,7 +181,7 @@ vlc_module_begin ()
     set_capability( "sub source", 0 )
     set_callbacks( CreateFilter, DestroyFilter )
 
-    add_integer_with_range( CFG_PREFIX "alpha", 255, 0, 255, NULL,
+    add_integer_with_range( CFG_PREFIX "alpha", 255, 0, 255,
                             ALPHA_TEXT, ALPHA_LONGTEXT, false )
 
     add_integer( CFG_PREFIX "height", 100,

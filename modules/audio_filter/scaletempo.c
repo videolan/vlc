@@ -50,11 +50,11 @@ vlc_module_begin ()
     set_category( CAT_AUDIO )
     set_subcategory( SUBCAT_AUDIO_AFILTER )
 
-    add_integer_with_range( "scaletempo-stride", 30, 1, 2000, NULL,
+    add_integer_with_range( "scaletempo-stride", 30, 1, 2000,
         N_("Stride Length"), N_("Length in milliseconds to output each stride"), true )
-    add_float_with_range( "scaletempo-overlap", .20, 0.0, 1.0, NULL,
+    add_float_with_range( "scaletempo-overlap", .20, 0.0, 1.0,
         N_("Overlap Length"), N_("Percentage of stride to overlap"), true )
-    add_integer_with_range( "scaletempo-search", 14, 0, 200, NULL,
+    add_integer_with_range( "scaletempo-search", 14, 0, 200,
         N_("Search Length"), N_("Length in milliseconds to search for best overlap position"), true )
 
     set_callbacks( Open, Close )

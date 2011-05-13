@@ -162,7 +162,7 @@ vlc_module_begin ()
 
     set_section( N_("Font"), NULL )
     /* 5 sets the default to top [1] left [4] */
-    add_integer_with_range( CFG_PREFIX "opacity", 255, 0, 255, NULL,
+    add_integer_with_range( CFG_PREFIX "opacity", 255, 0, 255,
         OPACITY_TEXT, OPACITY_LONGTEXT, false )
     add_integer( CFG_PREFIX "color", 0xFFFFFF, COLOR_TEXT, COLOR_LONGTEXT,
                  false )

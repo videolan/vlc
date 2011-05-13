@@ -99,7 +99,7 @@ vlc_module_begin ()
     /* default to 1000 ms per image, continuously cycle through them */
     add_integer( CFG_PREFIX "delay", 1000, DELAY_TEXT, DELAY_LONGTEXT, true )
     add_integer( CFG_PREFIX "repeat", -1, REPEAT_TEXT, REPEAT_LONGTEXT, true )
-    add_integer_with_range( CFG_PREFIX "opacity", 255, 0, 255, NULL,
+    add_integer_with_range( CFG_PREFIX "opacity", 255, 0, 255,
         OPACITY_TEXT, OPACITY_LONGTEXT, false )
     add_integer( CFG_PREFIX "position", -1, POS_TEXT, POS_LONGTEXT, false )
         change_integer_list( pi_pos_values, ppsz_pos_descriptions )

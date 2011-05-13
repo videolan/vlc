@@ -79,7 +79,7 @@ vlc_module_begin ()
     add_shortcut( "extract" )
 
     add_integer_with_range( FILTER_PREFIX "component", 0xFF0000, 1, 0xFFFFFF,
-                 NULL, COMPONENT_TEXT, COMPONENT_LONGTEXT, false )
+                            COMPONENT_TEXT, COMPONENT_LONGTEXT, false )
         change_integer_list( pi_component_values, ppsz_component_descriptions )
 
     set_callbacks( Create, Destroy )

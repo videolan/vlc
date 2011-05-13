@@ -80,7 +80,7 @@ vlc_module_begin ()
     set_section( N_("Benchmarking"), NULL )
     add_integer( CFG_PREFIX "loops", 1000, LOOPS_TEXT,
               LOOPS_LONGTEXT, false )
-    add_integer_with_range( CFG_PREFIX "alpha", 128, 0, 255, NULL, ALPHA_TEXT,
+    add_integer_with_range( CFG_PREFIX "alpha", 128, 0, 255, ALPHA_TEXT,
               ALPHA_LONGTEXT, false )
 
     set_section( N_("Base image"), NULL )

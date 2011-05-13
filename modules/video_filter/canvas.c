@@ -111,9 +111,9 @@ vlc_module_begin ()
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VFILTER )
 
-    add_integer_with_range( CFG_PREFIX "width", 0, 0, INT_MAX, NULL,
+    add_integer_with_range( CFG_PREFIX "width", 0, 0, INT_MAX,
                             WIDTH_TEXT, WIDTH_LONGTEXT, false )
-    add_integer_with_range( CFG_PREFIX "height", 0, 0, INT_MAX, NULL,
+    add_integer_with_range( CFG_PREFIX "height", 0, 0, INT_MAX,
                             HEIGHT_TEXT, HEIGHT_LONGTEXT, false )
 
     add_string( CFG_PREFIX "aspect", NULL,

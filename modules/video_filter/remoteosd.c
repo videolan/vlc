@@ -124,12 +124,12 @@ vlc_module_begin ()
 
     add_string( RMTOSD_CFG "host", "myvdr", RMTOSD_HOST_TEXT,
         RMTOSD_HOST_LONGTEXT, false )
-    add_integer_with_range( RMTOSD_CFG "port", 20001, 1, 0xFFFF, NULL,
+    add_integer_with_range( RMTOSD_CFG "port", 20001, 1, 0xFFFF,
         RMTOSD_PORT_TEXT, RMTOSD_PORT_LONGTEXT, false )
     add_password( RMTOSD_CFG "password", "", RMTOSD_PASSWORD_TEXT,
         RMTOSD_PASSWORD_LONGTEXT, false )
     add_integer_with_range( RMTOSD_CFG "update", RMTOSD_UPDATE_DEFAULT,
-        RMTOSD_UPDATE_MIN, RMTOSD_UPDATE_MAX, NULL, RMTOSD_UPDATE_TEXT,
+        RMTOSD_UPDATE_MIN, RMTOSD_UPDATE_MAX, RMTOSD_UPDATE_TEXT,
         RMTOSD_UPDATE_LONGTEXT, true )
     add_bool( RMTOSD_CFG "vnc-polling", false,
               RMTOSD_POLL_TEXT , RMTOSD_POLL_LONGTEXT, false )
@@ -137,7 +137,7 @@ vlc_module_begin ()
               RMTOSD_MOUSE_TEXT , RMTOSD_MOUSE_LONGTEXT, false )
     add_bool( RMTOSD_CFG "key-events", false,
               RMTOSD_KEYS_TEXT , RMTOSD_KEYS_LONGTEXT, false )
-    add_integer_with_range( RMTOSD_CFG "alpha", 255, 0, 255, NULL,
+    add_integer_with_range( RMTOSD_CFG "alpha", 255, 0, 255,
         RMTOSD_ALPHA_TEXT, RMTOSD_ALPHA_LONGTEXT, true )
 
 vlc_module_end ()

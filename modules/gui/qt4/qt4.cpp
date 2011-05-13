@@ -211,9 +211,9 @@ vlc_module_begin ()
     add_bool( "qt-pause-minimized", true, QT_PAUSE_MINIMIZED_TEXT,
               QT_PAUSE_MINIMIZED_LONGTEXT, false )
 
-    add_float_with_range( "qt-opacity", 1., 0.1, 1., NULL, OPACITY_TEXT,
+    add_float_with_range( "qt-opacity", 1., 0.1, 1., OPACITY_TEXT,
                           OPACITY_LONGTEXT, false )
-    add_float_with_range( "qt-fs-opacity", 0.8, 0.1, 1., NULL, OPACITY_FS_TEXT,
+    add_float_with_range( "qt-fs-opacity", 0.8, 0.1, 1., OPACITY_FS_TEXT,
                           OPACITY_FS_LONGTEXT, false )
 
     add_bool( "qt-video-autoresize", true, KEEPSIZE_TEXT,
@@ -240,7 +240,7 @@ vlc_module_begin ()
     add_bool( "qt-autosave-volume", false, SAVEVOL_TEXT,
               SAVEVOL_TEXT, true )
     add_integer_with_range( "qt-startvolume", QT_VOLUME_DEFAULT, 0,
-               QT_VOLUME_MAX, NULL, STARTVOL_TEXT, STARTVOL_TEXT, true )
+               QT_VOLUME_MAX, STARTVOL_TEXT, STARTVOL_TEXT, true )
 
 #ifdef WIN32
     add_bool( "qt-disable-volume-keys"             /* name */,

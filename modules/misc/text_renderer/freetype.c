@@ -163,7 +163,7 @@ vlc_module_begin ()
         change_safe()
 
     /* opacity valid on 0..255, with default 255 = fully opaque */
-    add_integer_with_range( "freetype-opacity", 255, 0, 255, NULL,
+    add_integer_with_range( "freetype-opacity", 255, 0, 255,
         OPACITY_TEXT, OPACITY_LONGTEXT, false )
         change_safe()
 

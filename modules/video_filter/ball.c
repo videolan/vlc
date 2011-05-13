@@ -141,13 +141,13 @@ vlc_module_begin ()
                 BALL_COLOR_TEXT, BALL_COLOR_LONGTEXT, false )
     change_string_list( mode_list, mode_list_text, 0 )
 
-    add_integer_with_range( FILTER_PREFIX "speed", 4, 1, 15, NULL,
+    add_integer_with_range( FILTER_PREFIX "speed", 4, 1, 15,
                             BALL_SPEED_TEXT, BALL_SPEED_LONGTEXT, false )
 
-    add_integer_with_range( FILTER_PREFIX "size", 10, 5, 30, NULL,
+    add_integer_with_range( FILTER_PREFIX "size", 10, 5, 30,
                             BALL_SIZE_TEXT, BALL_SIZE_LONGTEXT, false )
 
-    add_integer_with_range( FILTER_PREFIX "gradient-threshold", 40, 1, 200, NULL,
+    add_integer_with_range( FILTER_PREFIX "gradient-threshold", 40, 1, 200,
                             GRAD_THRESH_TEXT, GRAD_THRESH_LONGTEXT, false )
 
     add_bool( FILTER_PREFIX "edge-visible", true,

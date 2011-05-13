@@ -83,15 +83,15 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_VIDEO_VFILTER )
     set_capability( "video filter2", 0 )
 
-    add_float_with_range( "contrast", 1.0, 0.0, 2.0, NULL,
+    add_float_with_range( "contrast", 1.0, 0.0, 2.0,
                           CONT_TEXT, CONT_LONGTEXT, false )
-    add_float_with_range( "brightness", 1.0, 0.0, 2.0, NULL,
+    add_float_with_range( "brightness", 1.0, 0.0, 2.0,
                            LUM_TEXT, LUM_LONGTEXT, false )
-    add_integer_with_range( "hue", 0, 0, 360, NULL,
+    add_integer_with_range( "hue", 0, 0, 360,
                             HUE_TEXT, HUE_LONGTEXT, false )
-    add_float_with_range( "saturation", 1.0, 0.0, 3.0, NULL,
+    add_float_with_range( "saturation", 1.0, 0.0, 3.0,
                           SAT_TEXT, SAT_LONGTEXT, false )
-    add_float_with_range( "gamma", 1.0, 0.01, 10.0, NULL,
+    add_float_with_range( "gamma", 1.0, 0.01, 10.0,
                           GAMMA_TEXT, GAMMA_LONGTEXT, false )
 
     add_bool( "brightness-threshold", false,

@@ -52,7 +52,7 @@ vlc_module_begin ()
     set_capability ("vout display", /*165*/0)
     set_callbacks (Open, Close)
     add_shortcut ("opengles2", "gles2")
-    add_module ("gles2", "opengl es2", NULL, NULL,
+    add_module ("gles2", "opengl es2", NULL,
                 GLES2_TEXT, PROVIDER_LONGTEXT, true)
 
 #elif USE_OPENGL_ES == 1
@@ -63,7 +63,7 @@ vlc_module_begin ()
     set_capability ("vout display", /*160*/0)
     set_callbacks (Open, Close)
     add_shortcut ("opengles", "gles")
-    add_module ("gles", "opengl es", NULL, NULL,
+    add_module ("gles", "opengl es", NULL,
                 GLES_TEXT, PROVIDER_LONGTEXT, true)
 #else
 # define API VLC_OPENGL
@@ -75,7 +75,7 @@ vlc_module_begin ()
     set_capability ("vout display", /*170*/0)
     set_callbacks (Open, Close)
     add_shortcut ("opengl", "gl")
-    add_module ("gl", "opengl", NULL, NULL,
+    add_module ("gl", "opengl", NULL,
                 GL_TEXT, PROVIDER_LONGTEXT, true)
 #endif
 vlc_module_end ()

@@ -158,9 +158,9 @@ vlc_module_begin ()
                 false )
 
     add_module_list( CFG_PREFIX "vfilter", "video filter2",
-                     NULL, NULL, VFILTER_TEXT, VFILTER_LONGTEXT, false )
+                     NULL, VFILTER_TEXT, VFILTER_LONGTEXT, false )
 
-    add_integer_with_range( CFG_PREFIX "alpha", 255, 0, 255, NULL,
+    add_integer_with_range( CFG_PREFIX "alpha", 255, 0, 255,
                             ALPHA_TEXT, ALPHA_LONGTEXT, false )
     add_integer( CFG_PREFIX "x", -1, X_TEXT, X_LONGTEXT, false )
     add_integer( CFG_PREFIX "y", -1, Y_TEXT, Y_LONGTEXT, false )
