@@ -19,7 +19,7 @@ libvlc_LTLIBRARIES += \
 libmux_ts_plugin_la_SOURCES = \
 	mpeg/pes.c mpeg/pes.h \
 	mpeg/csa.c mpeg/csa.h \
-	mpeg/ts.c bits.h
+	mpeg/ts.c mpeg/bits.h
 libmux_ts_plugin_la_CFLAGS = $(AM_CFLAGS) $(DVBPSI_CFLAGS)
 libmux_ts_plugin_la_LIBADD = $(AM_LIBADD) $(DVBPSI_LIBS)
 libmux_ts_plugin_la_DEPENDENCIES =
