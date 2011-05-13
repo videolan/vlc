@@ -93,7 +93,8 @@ static int Open (vlc_object_t *p_this)
         dialog_Fatal (p_this, _("MIDI synthesis not set up"),
             _("A sound font file (.SF2) is required for MIDI synthesis.\n"
               "Please install a sound font and configure it "
-              "from the VLC preferences (Codecs / Audio / FluidSynth).\n"));
+              "from the VLC preferences "
+              "(Input / Codecs > Audio codecs > FluidSynth).\n"));
         return VLC_EGENERIC;
     }
 
