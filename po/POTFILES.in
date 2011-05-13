@@ -147,7 +147,6 @@ src/modules/cache.c
 src/modules/entry.c
 src/modules/modules.c
 src/modules/modules.h
-src/modules/os.c
 src/network/acl.c
 src/network/getaddrinfo.c
 src/network/httpd.c
