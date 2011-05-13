@@ -146,7 +146,7 @@ MetaPanel::MetaPanel( QWidget *parent,
     metaLayout->addWidget( label, line++, 0, 1, 7 );
     description_text = new QTextEdit;
     metaLayout->addWidget( description_text, line, 0, 1, 7 );
-    CONNECT( description_text, textEdited( QString ), this, enterEditMode() );
+    CONNECT( description_text, textChanged(), this, enterEditMode() );
     line++;
 
     /* VLC_META_SETTING: Useless */
