@@ -167,7 +167,7 @@ void dvb_remove_pid (dvb_device_t *, uint16_t)
 {
 }
 
-const delsys_t *dvb_guess_system (dvb_device_t *d)
+const delsys_t *dvb_guess_system (dvb_device_t *)
 {
     return NULL;
 }
@@ -198,7 +198,7 @@ int dvb_tune (dvb_device_t *d)
 
 /* DVB-C */
 int dvb_set_dvbc (dvb_device_t *d, uint32_t freq, const char *mod,
-                  uint32_t srate, uint32_t fec)
+                  uint32_t srate, uint32_t /*fec*/)
 {
     return d->module->SetDVBC (freq, mod, srate);
 }
@@ -213,8 +213,8 @@ int dvb_set_dvbs (dvb_device_t *d, uint32_t freq, uint32_t srate, uint32_t fec)
                               d->pol, d->lowf, d->highf, d->switchf);
 }
 
-int dvb_set_dvbs2 (dvb_device_t *d, uint32_t freq, const char *mod,
-                   uint32_t srate, uint32_t fec, int pilot, int rolloff)
+int dvb_set_dvbs2 (dvb_device_t *, uint32_t /*freq*/, const char * /*mod*/,
+                   uint32_t /*srate*/, uint32_t /*fec*/, int /*pilot*/, int /*rolloff*/)
 {
     return VLC_EGENERIC;
 }
@@ -232,7 +232,7 @@ int dvb_set_sec (dvb_device_t *d, uint32_t freq, char pol,
 }
 
 /* DVB-T */
-int dvb_set_dvbt (dvb_device_t *d, uint32_t freq, const char *mod,
+int dvb_set_dvbt (dvb_device_t *d, uint32_t freq, const char * /*mod*/,
                   uint32_t fec_hp, uint32_t fec_lp, uint32_t bandwidth,
                   int transmission, uint32_t guard, int hierarchy)
 {
@@ -240,20 +240,20 @@ int dvb_set_dvbt (dvb_device_t *d, uint32_t freq, const char *mod,
                               bandwidth, transmission, guard, hierarchy);
 }
 
-int dvb_set_dvbt2 (dvb_device_t *d, uint32_t freq, const char *mod,
-                   uint32_t fec, uint32_t bandwidth, int transmission,
-                   uint32_t guard)
+int dvb_set_dvbt2 (dvb_device_t *, uint32_t /*freq*/, const char * /*mod*/,
+                   uint32_t /*fec*/, uint32_t /*bandwidth*/, int /*tx_mode*/,
+                   uint32_t /*guard*/)
 {
     return VLC_EGENERIC;
 }
 
 /* ATSC */
-int dvb_set_atsc (dvb_device_t *d, uint32_t freq, const char *mod)
+int dvb_set_atsc (dvb_device_t *d, uint32_t freq, const char * /*mod*/)
 {
     return d->module->SetATSC(freq);
 }
 
-int dvb_set_cqam (dvb_device_t *d, uint32_t freq, const char *mod)
+int dvb_set_cqam (dvb_device_t *d, uint32_t freq, const char * /*mod*/)
 {
     return d->module->SetCQAM(freq);
 }
@@ -752,10 +752,11 @@ int BDAGraph::SetDVBS(long l_frequency, long l_symbolrate, uint32_t fec,
         BSTR bstr_input_range;
         WCHAR* pwsz_input_range;
         int i_range_len;
-        localComPtr(): p_dvbs_tune_request(NULL), p_dvbs_locator(NULL),
-            p_dvbs_tuning_space(NULL), bstr_input_range(NULL),
-            pwsz_input_range(NULL), i_range_len(0), psz_polarisation(NULL),
-            psz_input_range(NULL) {};
+        localComPtr() : p_dvbs_tune_request(NULL), p_dvbs_locator(NULL),
+            p_dvbs_tuning_space(NULL),
+            psz_polarisation(NULL), psz_input_range(NULL),
+            bstr_input_range(NULL), pwsz_input_range(NULL), i_range_len(0)
+        {}
         ~localComPtr()
         {
             if( p_dvbs_tuning_space )
@@ -898,6 +899,7 @@ HRESULT BDAGraph::CreateTuneRequest()
 {
     HRESULT hr = S_OK;
     GUID guid_this_network_type;
+
     class localComPtr
     {
         public:
@@ -911,11 +913,13 @@ HRESULT BDAGraph::CreateTuneRequest()
         char * psz_bstr_name;
         WCHAR * wpsz_create_name;
         int i_name_len;
+
         localComPtr(): p_tuning_space_container(NULL),
             p_tuning_space_enum(NULL), p_this_tuning_space(NULL),
-            p_dvb_tuning_space(NULL),
-            i_name_len(0), psz_network_name(NULL), wpsz_create_name(NULL),
-            psz_create_name(NULL), bstr_name(NULL), psz_bstr_name(NULL) {};
+            p_dvb_tuning_space(NULL), bstr_name(NULL),
+            psz_network_name(NULL), psz_create_name(NULL),
+            psz_bstr_name(NULL), wpsz_create_name(NULL), i_name_len(0)
+        {}
         ~localComPtr()
         {
             if( p_tuning_space_enum )
@@ -1245,7 +1249,7 @@ HRESULT BDAGraph::Build()
             "Cannot Find Tuning Space ID: hr=0x%8lx", hr );
         return hr;
     }
-    msg_Dbg( p_access, "Build: Using Tuning Space ID %d",
+    msg_Dbg( p_access, "Build: Using Tuning Space ID %ld",
         l_tuning_space_id.lVal );
     hr = l.p_tuning_space_container->put_Item( l_tuning_space_id,
         p_tuning_space );
@@ -1318,10 +1322,10 @@ HRESULT BDAGraph::Build()
     if( l_adapter > 0 && l_tuner_used != l_adapter )
     {
          msg_Warn( p_access, "Build: "\
-             "Tuner device %d is not available", l_adapter );
+             "Tuner device %ld is not available", l_adapter );
         return E_FAIL;
     }
-    msg_Dbg( p_access, "BDAGraph: Using adapter %d", l_tuner_used );
+    msg_Dbg( p_access, "BDAGraph: Using adapter %ld", l_tuner_used );
 
 /* VLC 1.0 works reliably up this point then crashes
  * Obvious candidate is FindFilter */
@@ -1831,7 +1835,7 @@ HRESULT BDAGraph::Start()
         return hr;
 
     /* Query the state of the graph - timeout after 100 milliseconds */
-    while( hr = p_media_control->GetState( 100, &i_state ) != S_OK )
+    while( (hr = p_media_control->GetState( 100, &i_state )) != S_OK )
     {
         if( FAILED( hr ) )
         {
@@ -1844,7 +1848,7 @@ HRESULT BDAGraph::Start()
         return hr;
 
     /* The Graph is not running so stop it and return an error */
-    msg_Warn( p_access, "Start: Graph not started: %d", i_state );
+    msg_Warn( p_access, "Start: Graph not started: %d", (int)i_state );
     hr = p_media_control->StopWhenReady(); /* Instead of Stop() */
     if( FAILED( hr ) )
     {
@@ -1866,7 +1870,7 @@ ssize_t BDAGraph::Pop(void *buf, size_t len)
 /******************************************************************************
 * SampleCB - Callback when the Sample Grabber has a sample
 ******************************************************************************/
-STDMETHODIMP BDAGraph::SampleCB( double d_time, IMediaSample *p_sample )
+STDMETHODIMP BDAGraph::SampleCB( double /*date*/, IMediaSample *p_sample )
 {
     if( p_sample->IsDiscontinuity() == S_OK )
         msg_Warn( p_access, "BDA SampleCB: Sample Discontinuity.");
@@ -1888,8 +1892,8 @@ STDMETHODIMP BDAGraph::SampleCB( double d_time, IMediaSample *p_sample )
      return S_OK;
 }
 
-STDMETHODIMP BDAGraph::BufferCB( double d_time, BYTE* p_buffer,
-    long l_buffer_len )
+STDMETHODIMP BDAGraph::BufferCB( double /*date*/, BYTE* /*buffer*/,
+                                 long /*buffer_len*/ )
 {
     return E_FAIL;
 }
@@ -1900,7 +1904,6 @@ STDMETHODIMP BDAGraph::BufferCB( double d_time, BYTE* p_buffer,
 HRESULT BDAGraph::Destroy()
 {
     HRESULT hr = S_OK;
-    ULONG ul_refcount = 0;
 
     if( p_media_control )
         hr = p_media_control->StopWhenReady(); /* Instead of Stop() */

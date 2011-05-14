@@ -92,7 +92,7 @@ private:
     ULONG ul_cbrc;
     STDMETHODIMP_( ULONG ) AddRef( ) { return ++ul_cbrc; }
     STDMETHODIMP_( ULONG ) Release( ) { return --ul_cbrc; }
-    STDMETHODIMP QueryInterface( REFIID riid, void** p_p_object )
+    STDMETHODIMP QueryInterface( REFIID /*riid*/, void** /*p_p_object*/ )
         { return E_NOTIMPL; }
     STDMETHODIMP SampleCB( double d_time, IMediaSample* p_sample );
     STDMETHODIMP BufferCB( double d_time, BYTE* p_buffer, long l_buffer_len );
