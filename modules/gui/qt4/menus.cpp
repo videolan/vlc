@@ -434,6 +434,7 @@ QMenu *QVLCMenu::ToolsMenu( QMenu *menu )
 /**
  * View Menu
  * Interface modification, load other interfaces, activate Extensions
+ * \param current, set to NULL for menu creation, else for menu update
  **/
 QMenu *QVLCMenu::ViewMenu( intf_thread_t *p_intf, QMenu *current, MainInterface *_mi )
 {
