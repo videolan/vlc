@@ -289,8 +289,9 @@ static void ReadMetaFromId3v2( ID3v2::Tag* tag, demux_meta_t* p_demux_meta, vlc_
  */
 static void ReadMetaFromXiph( Ogg::XiphComment* tag, demux_meta_t* p_demux_meta, vlc_meta_t* p_meta )
 {
+    StringList list;
 #define SET( keyName, metaName )                                               \
-    StringList list = tag->fieldListMap()[keyName];                            \
+    list = tag->fieldListMap()[keyName];                                       \
     if( !list.isEmpty() )                                                      \
         vlc_meta_Set##metaName( p_meta, (*list.begin()).toCString( true ) );
 
