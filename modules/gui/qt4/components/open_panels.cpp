@@ -61,7 +61,7 @@
    Combobox will automatically do autocompletion on the edit zone */
 #define POPULATE_WITH_DEVS(ppsz_devlist, targetCombo) \
     QStringList targetCombo ## StringList = QStringList(); \
-    for ( int i = 0; i< sizeof(ppsz_devlist) / sizeof(*ppsz_devlist); i++ ) \
+    for ( size_t i = 0; i< sizeof(ppsz_devlist) / sizeof(*ppsz_devlist); i++ ) \
         targetCombo ## StringList << QString( ppsz_devlist[ i ] ); \
     targetCombo->addItems( QDir( "/dev/" )\
         .entryList( targetCombo ## StringList, QDir::System )\
