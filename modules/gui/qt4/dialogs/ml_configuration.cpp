@@ -148,7 +148,7 @@ bool MLDirModel::setData( const QModelIndex &index, const QVariant &value,
     return QDirModel::setData( index, value, role );
 }
 
-int MLDirModel::columnCount( const QModelIndex &parent ) const
+int MLDirModel::columnCount( const QModelIndex & ) const
 {
     return 1;
 }

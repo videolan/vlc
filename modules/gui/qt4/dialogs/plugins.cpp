@@ -334,7 +334,7 @@ void ExtensionListModel::updateList()
     emit dataChanged( index( 0 ), index( rowCount() - 1 ) );
 }
 
-int ExtensionListModel::rowCount( const QModelIndex& parent ) const
+int ExtensionListModel::rowCount( const QModelIndex& ) const
 {
     int count = 0;
     ExtensionsManager *EM = ExtensionsManager::getInstance( p_intf );
@@ -363,7 +363,7 @@ QVariant ExtensionListModel::data( const QModelIndex& index, int role ) const
 }
 
 QModelIndex ExtensionListModel::index( int row, int column,
-                                       const QModelIndex& parent ) const
+                                       const QModelIndex& ) const
 {
     if( column != 0 )
         return QModelIndex();
