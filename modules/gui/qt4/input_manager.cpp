@@ -603,7 +603,7 @@ void InputManager::UpdateVout()
             emit voutChanged( b_video );
 
         /* Release the vout list */
-        for( int i = 0; i < i_vout; i++ )
+        for( size_t i = 0; i < i_vout; i++ )
             vlc_object_release( (vlc_object_t*)pp_vout[i] );
         free( pp_vout );
     }
