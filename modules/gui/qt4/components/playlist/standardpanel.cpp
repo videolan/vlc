@@ -130,7 +130,7 @@ void StandardPLPanel::popupPlView( const QPoint &point )
         QVLCMenu::PopupMenu( p_intf, true );
 }
 
-void StandardPLPanel::popupSelectColumn( QPoint pos )
+void StandardPLPanel::popupSelectColumn( QPoint )
 {
     QMenu menu;
     assert( treeView );
@@ -228,7 +228,7 @@ void StandardPLPanel::wheelEvent( QWheelEvent *e )
     e->accept();
 }
 
-bool StandardPLPanel::eventFilter ( QObject * watched, QEvent * event )
+bool StandardPLPanel::eventFilter ( QObject *, QEvent * event )
 {
     if (event->type() == QEvent::KeyPress)
     {

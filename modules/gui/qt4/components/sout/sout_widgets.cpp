@@ -232,7 +232,7 @@ MMSHDestBox::MMSHDestBox( QWidget *_parent ) : VirtualDestBox( _parent )
     CT( MMSHEdit );
 }
 
-QString MMSHDestBox::getMRL( const QString& mux )
+QString MMSHDestBox::getMRL( const QString& )
 {
     if( MMSHEdit->text().isEmpty() ) return "";
 
@@ -277,7 +277,7 @@ RTSPDestBox::RTSPDestBox( QWidget *_parent ) : VirtualDestBox( _parent )
     CT( RTSPEdit );
 }
 
-QString RTSPDestBox::getMRL( const QString& mux )
+QString RTSPDestBox::getMRL( const QString& )
 {
     if( RTSPEdit->text().isEmpty() ) return "";
 
@@ -435,7 +435,7 @@ ICEDestBox::ICEDestBox( QWidget *_parent ) : VirtualDestBox( _parent )
 #undef CS
 #undef CT
 
-QString ICEDestBox::getMRL( const QString& mux )
+QString ICEDestBox::getMRL( const QString& )
 {
     if( ICEEdit->text().isEmpty() ) return "";
 

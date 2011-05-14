@@ -356,8 +356,8 @@ QStringList PLSelector::mimeTypes() const
     return types;
 }
 
-bool PLSelector::dropMimeData ( QTreeWidgetItem * parent, int index,
-    const QMimeData * data, Qt::DropAction action )
+bool PLSelector::dropMimeData ( QTreeWidgetItem * parent, int,
+    const QMimeData * data, Qt::DropAction )
 {
     if( !parent ) return false;
 
@@ -464,7 +464,7 @@ void PLSelector::inputItemUpdate( input_item_t *arg )
     }
 }
 
-void PLSelector::podcastAdd( PLSelItem* item )
+void PLSelector::podcastAdd( PLSelItem * )
 {
     bool ok;
     QString url = QInputDialog::getText( this, qtr( "Subscribe" ),

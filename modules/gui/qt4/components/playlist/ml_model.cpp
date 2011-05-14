@@ -106,7 +106,7 @@ QModelIndex MLModel::index( int row, int column,
     }
 }
 
-QModelIndex MLModel::parent(const QModelIndex &index) const
+QModelIndex MLModel::parent(const QModelIndex & ) const
 {
     return QModelIndex();
 }
@@ -215,7 +215,7 @@ QMimeData* MLModel::mimeData( const QModelIndexList &indexes ) const
     return data;
 }
 
-int MLModel::columnCount( const QModelIndex & parent ) const
+int MLModel::columnCount( const QModelIndex & ) const
 {
     return columnFromMeta( COLUMN_END );
 }
@@ -590,6 +590,8 @@ static int mediaAdded( vlc_object_t *p_this, char const *psz_var,
                                   vlc_value_t oldval, vlc_value_t newval,
                                   void *data )
 {
+    VLC_UNUSED( psz_var ); VLC_UNUSED( oldval );
+
     int ret = VLC_SUCCESS;
     media_library_t *p_ml = ( media_library_t* )p_this;
     MLModel* p_model = ( MLModel* )data;
@@ -609,6 +611,8 @@ static int mediaDeleted( vlc_object_t *p_this, char const *psz_var,
                                   vlc_value_t oldval, vlc_value_t newval,
                                   void *data )
 {
+    VLC_UNUSED( p_this ); VLC_UNUSED( psz_var ); VLC_UNUSED( oldval );
+
     MLModel* p_model = ( MLModel* )data;
     QModelIndex remove_idx = QModelIndex();
     for( int i = 0; i < p_model->rowCount( ); i++ )
@@ -630,6 +634,9 @@ static int mediaUpdated( vlc_object_t *p_this, char const *psz_var,
                                   vlc_value_t oldval, vlc_value_t newval,
                                   void *data )
 {
+    VLC_UNUSED( p_this ); VLC_UNUSED( psz_var ); VLC_UNUSED( oldval );
+    VLC_UNUSED( newval ); VLC_UNUSED( data );
+
     return VLC_SUCCESS;
 }
 

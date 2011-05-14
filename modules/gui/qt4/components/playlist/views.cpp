@@ -160,7 +160,7 @@ void PlIconViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewIt
     painter->restore();
 }
 
-QSize PlIconViewItemDelegate::sizeHint ( const QStyleOptionViewItem & option, const QModelIndex & index ) const
+QSize PlIconViewItemDelegate::sizeHint ( const QStyleOptionViewItem &, const QModelIndex & index ) const
 {
     QFont f( index.data( Qt::FontRole ).value<QFont>() );
     f.setBold( true );
@@ -257,7 +257,7 @@ void PlListViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewIt
     painter->restore();
 }
 
-QSize PlListViewItemDelegate::sizeHint ( const QStyleOptionViewItem & option, const QModelIndex & index ) const
+QSize PlListViewItemDelegate::sizeHint ( const QStyleOptionViewItem &, const QModelIndex & ) const
 {
     QFont f;
     f.setBold( true );
@@ -275,7 +275,7 @@ static inline void plViewStartDrag( QAbstractItemView *view, const Qt::DropActio
     drag->exec( supportedActions );
 }
 
-static void plViewDragMoveEvent( QAbstractItemView *view, QDragMoveEvent * event )
+static void plViewDragMoveEvent( QAbstractItemView *, QDragMoveEvent * event )
 {
     if( event->keyboardModifiers() & Qt::ControlModifier &&
         event->possibleActions() & Qt::CopyAction )
@@ -283,7 +283,7 @@ static void plViewDragMoveEvent( QAbstractItemView *view, QDragMoveEvent * event
     else event->acceptProposedAction();
 }
 
-PlIconView::PlIconView( PLModel *model, QWidget *parent ) : QListView( parent )
+PlIconView::PlIconView( PLModel *, QWidget *parent ) : QListView( parent )
 {
     PlIconViewItemDelegate *delegate = new PlIconViewItemDelegate( this );
 
@@ -313,7 +313,7 @@ void PlIconView::dragMoveEvent ( QDragMoveEvent * event )
     QAbstractItemView::dragMoveEvent( event );
 }
 
-PlListView::PlListView( PLModel *model, QWidget *parent ) : QListView( parent )
+PlListView::PlListView( PLModel *, QWidget *parent ) : QListView( parent )
 {
     setViewMode( QListView::ListMode );
     setUniformItemSizes( true );
@@ -393,7 +393,7 @@ int PicFlowView::verticalOffset() const
     return 0;
 }
 
-QRect PicFlowView::visualRect(const QModelIndex &index ) const
+QRect PicFlowView::visualRect(const QModelIndex & ) const
 {
     return QRect( QPoint(0,0), picFlow->slideSize() );
 }
@@ -420,7 +420,7 @@ QModelIndex PicFlowView::indexAt(const QPoint &) const
     // No idea, PictureFlow doesn't provide anything to help this
 }
 
-QModelIndex PicFlowView::moveCursor(QAbstractItemView::CursorAction action, Qt::KeyboardModifiers)
+QModelIndex PicFlowView::moveCursor(QAbstractItemView::CursorAction, Qt::KeyboardModifiers)
 {
     return QModelIndex();
 }

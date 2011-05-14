@@ -135,12 +135,12 @@ void MainInterface::createTaskBarButtons()
 
         HRESULT hr = p_taskbl->vt->ThumbBarSetImageList(p_taskbl, winId(), himl );
         if(S_OK != hr)
-            msg_Err( p_intf, "ThumbBarSetImageList failed with error %08x", hr );
+            msg_Err( p_intf, "ThumbBarSetImageList failed with error %08lx", hr );
         else
         {
             hr = p_taskbl->vt->ThumbBarAddButtons(p_taskbl, winId(), 3, thbButtons);
             if(S_OK != hr)
-                msg_Err( p_intf, "ThumbBarAddButtons failed with error %08x", hr );
+                msg_Err( p_intf, "ThumbBarAddButtons failed with error %08lx", hr );
         }
         CONNECT( THEMIM->getIM(), playingStatusChanged( int ), this, changeThumbbarButtons( int ) );
     }
@@ -288,7 +288,7 @@ void MainInterface::changeThumbbarButtons( int i_status)
     }
     HRESULT hr =  p_taskbl->vt->ThumbBarUpdateButtons(p_taskbl, this->winId(), 3, thbButtons);
     if(S_OK != hr)
-        msg_Err( p_intf, "ThumbBarUpdateButtons failed with error %08x", hr );
+        msg_Err( p_intf, "ThumbBarUpdateButtons failed with error %08lx", hr );
 #endif
 }
 
