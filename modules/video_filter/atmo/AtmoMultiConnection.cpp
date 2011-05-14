@@ -58,7 +58,7 @@ HANDLE CAtmoMultiConnection::OpenDevice(char *devName)
 	    return INVALID_HANDLE_VALUE;
      }
      /* change serial settings (Speed, stopbits etc.) */
-     DCB dcb; // für comport-parameter
+     DCB dcb; // fÃ¼r comport-parameter
      dcb.DCBlength = sizeof(DCB);
      GetCommState (hComport, &dcb); // ger current serialport settings
      dcb.BaudRate  = 38400;        // set speed

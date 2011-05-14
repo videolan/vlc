@@ -1,7 +1,7 @@
 This piece of software is based on the software and descriptions mentioned below -
 
 
-(re)Written by:              Igor / Atmo (aka André Weber)  - WeberAndre@gmx.de
+(re)Written by:              Igor / Atmo (aka AndrÃ© Weber)  - WeberAndre@gmx.de
                              Matthiaz    
                              MacGyver2k
 

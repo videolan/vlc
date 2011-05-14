@@ -61,7 +61,7 @@ ATMO_BOOL CMoMoConnection::OpenConnection() {
 	    return ATMO_FALSE;
      }
      /* change serial settings (Speed, stopbits etc.) */
-     DCB dcb; // für comport-parameter
+     DCB dcb; // fÃ¼r comport-parameter
      dcb.DCBlength = sizeof(DCB);
      GetCommState (m_hComport, &dcb); // ger current serialport settings
      dcb.BaudRate  = 9600;        // set speed
@@ -112,19 +112,6 @@ void CMoMoConnection::CloseConnection() {
 ATMO_BOOL CMoMoConnection::isOpen(void) {
 	 return (m_hComport != INVALID_HANDLE_VALUE);
 }
-
-ATMO_BOOL CMoMoConnection::HardwareWhiteAdjust(int global_gamma,
-                                                     int global_contrast,
-                                                     int contrast_red,
-                                                     int contrast_green,
-                                                     int contrast_blue,
-                                                     int gamma_red,
-                                                     int gamma_green,
-                                                     int gamma_blue,
-                                                     ATMO_BOOL storeToEeprom) {
-    return ATMO_FALSE;
-}
-
 
 ATMO_BOOL CMoMoConnection::SendData(pColorPacket data) {
    if(m_hComport == INVALID_HANDLE_VALUE)

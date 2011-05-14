@@ -44,16 +44,6 @@ class CAtmoDmxSerialConnection : public CAtmoConnection {
 
        virtual ATMO_BOOL SendData(pColorPacket data);
 
-       virtual ATMO_BOOL HardwareWhiteAdjust(int global_gamma,
-                                             int global_contrast,
-                                             int contrast_red,
-                                             int contrast_green,
-                                             int contrast_blue,
-                                             int gamma_red,
-                                             int gamma_green,
-                                             int gamma_blue,
-                                             ATMO_BOOL storeToEeprom);
-
 	   virtual ATMO_BOOL setChannelColor(int channel, tRGBColor color);
 
        virtual ATMO_BOOL setChannelValues(int numValues,unsigned char *channel_values);

@@ -169,7 +169,7 @@ char *CAtmoDynData::getWorkDir()
 void CAtmoDynData::ReloadZoneDefinitionBitmaps()
 {
   int i;
-  // suchlogik für die Bitmaps ...
+  // suchlogik fÃ¼r die Bitmaps ...
   // <WorkDir>\hardware\numchannels\zone..0..n.bmp
   // <WorkDir>\hardware\zone..0..n.bmp
   // <WorkDir>\zone..0..n.bmp

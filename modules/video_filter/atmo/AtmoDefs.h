@@ -78,7 +78,7 @@ typedef struct
 
 
 
-// maximal Anzahl Kan‰le... original 5!
+// maximal Anzahl Kan√§le... original 5!
 #define CAP_MAX_NUM_ZONES  64
 // only for classic to avoid changing too much code!
 // #define ATMO_MAX_NUM_CHANNELS 5
@@ -116,7 +116,7 @@ enum AtmoConnectionType
       actMoMoLight = 6,
       actFnordlicht = 7
 };
-static const char *AtmoDeviceTypes[] = {
+static const char AtmoDeviceTypes[8][16] = {
       "Atmo-Classic",
       "Dummy",
       "DMX",

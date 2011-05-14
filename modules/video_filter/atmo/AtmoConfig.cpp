@@ -386,7 +386,7 @@ void CAtmoConfig::UpdateZoneDefinitionCount()
 {
    if( getZoneCount() != m_AtmoZoneDefCount)
    {
-      // okay zonen anzahl hat sich geändert - wir müssen neu rechnen
+      // okay zonen anzahl hat sich geÃ¤ndert - wir mÃ¼ssen neu rechnen
       // und allokieren!
       if(m_ZoneDefinitions)
       {

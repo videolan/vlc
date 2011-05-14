@@ -75,7 +75,7 @@ CAtmoColorCalculator::~CAtmoColorCalculator(void)
 void CAtmoColorCalculator::UpdateParameters()
 {
   // Zonen Definition neu laden
-  // diverse Vorberechnungen neu ausführen
+  // diverse Vorberechnungen neu ausfÃ¼hren
   // Speicherbuffer neu allokieren!
 }
 

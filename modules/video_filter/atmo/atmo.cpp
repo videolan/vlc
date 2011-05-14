@@ -1558,7 +1558,6 @@ if this fails fallback to the buildin software
 */
 static void Atmo_SetupParameters(filter_t *p_filter)
 {
-    char *psz_path;
     filter_sys_t *p_sys =  p_filter->p_sys;
 
 
@@ -2450,7 +2449,7 @@ static void CheckAndStopFadeThread(filter_t *p_filter)
 * StateCallback: Callback for the inputs variable "State" to get notified
 * about Pause and Continue Playback events.
 *****************************************************************************/
-static int StateCallback( vlc_object_t *p_this, char const *psz_cmd,
+static int StateCallback( vlc_object_t *, char const *,
                          vlc_value_t oldval, vlc_value_t newval,
                          void *p_data )
 {
@@ -2551,7 +2550,7 @@ static void DelStateVariableCallback( filter_t *p_filter )
 * StateCallback: Callback for the inputs variable "State" to get notified
 * about Pause and Continue Playback events.
 *****************************************************************************/
-static int AtmoSettingsCallback( vlc_object_t *p_this, char const *psz_var,
+static int AtmoSettingsCallback( vlc_object_t *, char const *psz_var,
                                  vlc_value_t oldval, vlc_value_t newval,
                                  void *p_data )
 {
