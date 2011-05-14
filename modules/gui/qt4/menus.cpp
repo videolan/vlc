@@ -205,10 +205,6 @@ static QAction * FindActionWithVar( QMenu *menu, const char *psz_var )
 #define PUSH_INPUTVAR( var ) varnames.push_back( var ); \
     objects.push_back( VLC_OBJECT(p_input) );
 
-#define PUSH_SEPARATOR if( objects.size() != i_last_separator ) { \
-    objects.push_back( 0 ); varnames.push_back( "" ); \
-    i_last_separator = objects.size(); }
-
 static int InputAutoMenuBuilder( input_thread_t *p_object,
         vector<vlc_object_t *> &objects,
         vector<const char *> &varnames )
@@ -746,7 +742,6 @@ QMenu *QVLCMenu::HelpMenu( QWidget *parent )
     delete menu; menu = NULL; \
     if( !show ) \
         return; \
-    unsigned int i_last_separator = 0; \
     vector<vlc_object_t *> objects; \
     vector<const char *> varnames; \
     input_thread_t *p_input = THEMIM->getInput();
@@ -755,7 +750,6 @@ QMenu *QVLCMenu::HelpMenu( QWidget *parent )
     menu = new QMenu(); \
     Populate( p_intf, menu, varnames, objects ); \
     menu->popup( QCursor::pos() ); \
-    i_last_separator = 0;
 
 void QVLCMenu::PopupPlayEntries( QMenu *menu,
                                         intf_thread_t *p_intf,
@@ -916,7 +910,7 @@ void QVLCMenu::MiscPopupMenu( intf_thread_t *p_intf, bool show )
     {
         varnames.push_back( "audio-es" );
         InputAutoMenuBuilder( p_input, objects, varnames );
-        PUSH_SEPARATOR;
+        menu->addSeparator();
     }
 
     menu = new QMenu();
@@ -1099,7 +1093,6 @@ void QVLCMenu::updateSystrayMenu( MainInterface *mi,
 
 
 #undef PUSH_VAR
-#undef PUSH_SEPARATOR
 
 /*************************************************************************
  * Builders for automenus
