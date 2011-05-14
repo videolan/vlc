@@ -139,7 +139,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             if( p_config )                                                \
             {                                                             \
                 control =  new BoolConfigControl( VLC_OBJECT(p_intf),     \
-                           p_config, NULL, ui.qcontrol, false );          \
+                           p_config, NULL, ui.qcontrol );          \
                 controls.append( control );                               \
             }                                                             \
             else { ui.qcontrol->setEnabled( false ); }

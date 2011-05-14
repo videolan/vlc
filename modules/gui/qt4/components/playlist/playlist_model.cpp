@@ -186,7 +186,7 @@ QMimeData *PLModel::mimeData( const QModelIndexList &indexes ) const
 
 /* Drop operation */
 bool PLModel::dropMimeData( const QMimeData *data, Qt::DropAction action,
-        int row, int column, const QModelIndex &parent )
+        int row, int, const QModelIndex &parent )
 {
     bool copy = action == Qt::CopyAction;
     if( !copy && action != Qt::MoveAction )
@@ -493,7 +493,7 @@ QModelIndex PLModel::parent( const QModelIndex &index ) const
     return createIndex(parentItem->row(), 0, parentItem);
 }
 
-int PLModel::columnCount( const QModelIndex &i) const
+int PLModel::columnCount( const QModelIndex &) const
 {
     return columnFromMeta( COLUMN_END );
 }

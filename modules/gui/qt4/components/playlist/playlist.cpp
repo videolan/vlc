@@ -387,7 +387,7 @@ LocationButton::LocationButton( const QString &text, bool bold,
 
 #define PADDING 4
 
-void LocationButton::paintEvent ( QPaintEvent * event )
+void LocationButton::paintEvent ( QPaintEvent * )
 {
     QStyleOptionButton option;
     option.initFrom( this );

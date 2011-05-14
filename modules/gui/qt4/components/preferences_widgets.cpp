@@ -101,7 +101,7 @@ ConfigControl *ConfigControl::createControl( vlc_object_t *p_this,
                                                  l, line, false );
         else
             p_control = new StringListConfigControl( p_this, p_item,
-                                            parent, false, l, line );
+                                            parent, l, line );
         break;
     case CONFIG_ITEM_PASSWORD:
         if( !p_item->i_list )
@@ -109,7 +109,7 @@ ConfigControl *ConfigControl::createControl( vlc_object_t *p_this,
                                                  l, line, true );
         else
             p_control = new StringListConfigControl( p_this, p_item,
-                                            parent, true, l, line );
+                                            parent, l, line );
         break;
     case CONFIG_ITEM_INTEGER:
         if( p_item->i_list )
@@ -394,7 +394,7 @@ FontConfigControl::FontConfigControl( vlc_object_t *_p_this,
 
 /********* String / choice list **********/
 StringListConfigControl::StringListConfigControl( vlc_object_t *_p_this,
-               module_config_t *_p_item, QWidget *_parent, bool bycat,
+               module_config_t *_p_item, QWidget *_parent,
                QGridLayout *l, int line) :
                VStringConfigControl( _p_this, _p_item, _parent )
 {
@@ -405,7 +405,7 @@ StringListConfigControl::StringListConfigControl( vlc_object_t *_p_this,
 
     module_config_t *p_module_config = config_FindConfig( p_this, p_item->psz_name );
 
-    finish( p_module_config, bycat );
+    finish( p_module_config );
     if( !l )
     {
         l = new QGridLayout();
@@ -454,23 +454,23 @@ void StringListConfigControl::actionRequested( int i_action )
     if( p_module_config->b_dirty )
     {
         combo->clear();
-        finish( p_module_config, true );
+        finish( p_module_config );
         p_module_config->b_dirty = false;
     }
 }
 StringListConfigControl::StringListConfigControl( vlc_object_t *_p_this,
                 module_config_t *_p_item, QLabel *_label, QComboBox *_combo,
-                bool bycat ) : VStringConfigControl( _p_this, _p_item )
+                bool ) : VStringConfigControl( _p_this, _p_item )
 {
     combo = _combo;
     label = _label;
 
     module_config_t *p_module_config = config_FindConfig( p_this, getName() );
 
-    finish( p_module_config, bycat );
+    finish( p_module_config );
 }
 
-void StringListConfigControl::finish(module_config_t *p_module_config, bool bycat )
+void StringListConfigControl::finish(module_config_t *p_module_config )
 {
     combo->setEditable( false );
 
@@ -922,7 +922,7 @@ int IntegerRangeSliderConfigControl::getValue() const
 
 /********* Integer / choice list **********/
 IntegerListConfigControl::IntegerListConfigControl( vlc_object_t *_p_this,
-               module_config_t *_p_item, QWidget *_parent, bool bycat,
+               module_config_t *_p_item, QWidget *_parent, bool,
                QGridLayout *l, int line) :
                VIntConfigControl( _p_this, _p_item, _parent )
 {
@@ -932,7 +932,7 @@ IntegerListConfigControl::IntegerListConfigControl( vlc_object_t *_p_this,
 
     module_config_t *p_module_config = config_FindConfig( p_this, p_item->psz_name );
 
-    finish( p_module_config, bycat );
+    finish( p_module_config );
     if( !l )
     {
         QHBoxLayout *layout = new QHBoxLayout();
@@ -966,17 +966,17 @@ IntegerListConfigControl::IntegerListConfigControl( vlc_object_t *_p_this,
 }
 IntegerListConfigControl::IntegerListConfigControl( vlc_object_t *_p_this,
                 module_config_t *_p_item, QLabel *_label, QComboBox *_combo,
-                bool bycat ) : VIntConfigControl( _p_this, _p_item )
+                bool ) : VIntConfigControl( _p_this, _p_item )
 {
     combo = _combo;
     label = _label;
 
     module_config_t *p_module_config = config_FindConfig( p_this, getName() );
 
-    finish( p_module_config, bycat );
+    finish( p_module_config );
 }
 
-void IntegerListConfigControl::finish(module_config_t *p_module_config, bool bycat )
+void IntegerListConfigControl::finish(module_config_t *p_module_config )
 {
     combo->setEditable( false );
 
@@ -1030,7 +1030,7 @@ void IntegerListConfigControl::actionRequested( int i_action )
     if( p_module_config->b_dirty )
     {
         combo->clear();
-        finish( p_module_config, true );
+        finish( p_module_config );
         p_module_config->b_dirty = false;
     }
 }
@@ -1065,8 +1065,7 @@ BoolConfigControl::BoolConfigControl( vlc_object_t *_p_this,
 BoolConfigControl::BoolConfigControl( vlc_object_t *_p_this,
                                       module_config_t *_p_item,
                                       QLabel *_label,
-                                      QAbstractButton *_checkbox,
-                                      bool bycat ) :
+                                      QAbstractButton *_checkbox ) :
                    VIntConfigControl( _p_this, _p_item )
 {
     checkbox = _checkbox;
@@ -1320,7 +1319,7 @@ void KeySelectorControl::filter( const QString &qs_search )
     }
 }
 
-void KeySelectorControl::select( QTreeWidgetItem *keyItem, int column )
+void KeySelectorControl::select( QTreeWidgetItem *, int column )
 {
     shortcutValue->setGlobal( column == 2 );
 }

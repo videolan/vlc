@@ -135,7 +135,7 @@ private:
     void addCallbacks( aout_instance_t * );
 
     void updateSliders(float *);
-    void setValues(float *);
+    void setValues();
 
 private slots:
     void enable(bool);
@@ -162,7 +162,7 @@ private:
     void addCallbacks( aout_instance_t * );
     intf_thread_t *p_intf;
 
-    void setValues(float *);
+    void setValues();
 
 private slots:
     void enable(bool);

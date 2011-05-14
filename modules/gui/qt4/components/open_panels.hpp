@@ -104,7 +104,7 @@ public:
     virtual void clear() ;
     virtual void accept() ;
 protected:
-    bool eventFilter(QObject *obj, QEvent *event)
+    bool eventFilter(QObject *, QEvent *event)
     {
         if( event->type() == QEvent::Hide ||
             event->type() == QEvent::HideToParent )

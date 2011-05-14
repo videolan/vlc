@@ -1116,6 +1116,8 @@ void Equalizer::setCorePreset( int i_preset )
 static int PresetCallback( vlc_object_t *p_this, char const *psz_cmd,
                          vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
+    VLC_UNUSED( p_this ); VLC_UNUSED( psz_cmd ); VLC_UNUSED( oldval );
+
     char *psz_preset = newval.psz_string;
     Equalizer *eq = ( Equalizer * )p_data;
     int i_preset = eq->presetsComboBox->findData( QVariant( psz_preset ) );
@@ -1241,7 +1243,7 @@ Compressor::Compressor( intf_thread_t *_p_intf, QWidget *_parent )
     free( psz_af );
     enable( enableCheck->isChecked() );
     updateSliders( controlVars );
-    setValues( controlVars );
+    setValues();
 }
 
 void Compressor::enable()
@@ -1275,10 +1277,10 @@ void Compressor::updateSliders( float * controlVars )
 
 void Compressor::setInitValues()
 {
-    setValues( controlVars );
+    setValues();
 }
 
-void Compressor::setValues( float * controlVars )
+void Compressor::setValues()
 {
     aout_instance_t *p_aout = THEMIM->getAout();
 
@@ -1389,7 +1391,7 @@ Spatializer::Spatializer( intf_thread_t *_p_intf, QWidget *_parent )
         enableCheck->setChecked( true );
     free( psz_af );
     enable( enableCheck->isChecked() );
-    setValues( controlVars );
+    setValues();
 }
 
 void Spatializer::enable()
@@ -1410,10 +1412,10 @@ void Spatializer::enable( bool en )
 }
 void Spatializer::setInitValues()
 {
-    setValues( controlVars );
+    setValues();
 }
 
-void Spatializer::setValues( float *controlVars )
+void Spatializer::setValues()
 {
     aout_instance_t *p_aout = THEMIM->getAout();
 
@@ -1441,12 +1443,14 @@ void Spatializer::setValues( float *controlVars )
 }
 void Spatializer::delCallbacks( aout_instance_t *p_aout )
 {
+    VLC_UNUSED( p_aout );
     //    var_DelCallback( p_aout, "Spatializer-bands", EqzCallback, this );
     //    var_DelCallback( p_aout, "Spatializer-preamp", EqzCallback, this );
 }
 
 void Spatializer::addCallbacks( aout_instance_t *p_aout )
 {
+    VLC_UNUSED( p_aout );
     //    var_AddCallback( p_aout, "Spatializer-bands", EqzCallback, this );
     //    var_AddCallback( p_aout, "Spatializer-preamp", EqzCallback, this );
 }

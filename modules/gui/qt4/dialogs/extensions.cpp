@@ -674,7 +674,7 @@ void ExtensionDialog::DestroyWidget( extension_widget_t *p_widget,
 }
 
 /** Implement closeEvent() in order to intercept the event */
-void ExtensionDialog::closeEvent( QCloseEvent *event )
+void ExtensionDialog::closeEvent( QCloseEvent * )
 {
     assert( p_dialog != NULL );
     msg_Dbg( p_intf, "Dialog '%s' received a closeEvent",
