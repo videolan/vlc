@@ -393,7 +393,6 @@ void ExtensionItemDelegate::paint( QPainter *painter,
     assert( ext != NULL );
 
     int width = option.rect.width();
-    int height = option.rect.height();
 
     // Pixmap: buffer where to draw
     QPixmap pix(option.rect.size());
