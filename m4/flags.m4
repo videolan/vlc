@@ -37,6 +37,35 @@ AC_DEFUN([RDC_PROG_CC_WFLAGS],
   done
 ])
 
+AC_DEFUN([RDC_PROG_CXX_FLAGS_IFELSE],
+[AC_LANG_ASSERT(C++)
+  CXXFLAGS_save="${CXXFLAGS}"
+  as_ac_var=`echo "ac_cv_prog_cxx_flags_$1" | $as_tr_sh`
+  AC_CACHE_CHECK([if $CXX accepts $1], [$as_ac_var], [
+    CXXFLAGS="${CXXFLAGS} $1"
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM()], [
+      eval "$as_ac_var=yes"
+    ],[
+      eval "$as_ac_var=no"
+    ])
+  ])
+
+  ac_res=`eval echo '${'$as_ac_var'}'`
+  CFLAGS="${CFLAGS_save}"
+  AS_IF([test "${ac_res}" != "no"], [$2], [$3])
+])
+
+AC_DEFUN([RDC_PROG_CXX_FLAGS],
+[AC_LANG_ASSERT(C++)
+  RDC_PROG_CXX_FLAGS_IFELSE([$1], [CXXFLAGS="${CXXFLAGS} $1"])
+])
+
+AC_DEFUN([RDC_PROG_CXX_WFLAGS],
+[ for a in $1; do
+    RDC_PROG_CXX_FLAGS([-W$a])
+  done
+])
+
 AC_DEFUN([RDC_PROG_LINK_FLAGS_IFELSE],
 [AC_LANG_ASSERT(C)
   LDFLAGS_save="${LDFLAGS}"
