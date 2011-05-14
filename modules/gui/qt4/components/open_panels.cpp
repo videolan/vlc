@@ -350,7 +350,7 @@ DiscOpenPanel::DiscOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
                 GetVolumeInformationW( drive, psz_name, 511, NULL, NULL, NULL, NULL, 0 );
 
                 QString displayName = FromWide( drive );
-                if( !EMPTY_STR(psz_name) ) {
+                if( !*psz_name ) {
                     displayName = displayName + " - "  + FromWide( psz_name );
                 }
 
