@@ -39,7 +39,7 @@ public:
     void WriteRegistryDouble( const char *path, const char *valueName, double value);
 
     int ReadRegistryInt( const char *path, const char *valueName, int default_value);
-    char * ReadRegistryString( const char *path, const char *valueName, char *default_value);
+    char * ReadRegistryString( const char *path, const char *valueName, const char *default_value);
     double ReadRegistryDouble( const char *path, const char *valueName, double default_value);
 
     bool RegistryKeyExists( const char *path);

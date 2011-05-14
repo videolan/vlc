@@ -128,10 +128,12 @@ int QVLCRegistry::ReadRegistryInt( const char *path, const char *valueName, int 
     return default_value;
 }
 
-char * QVLCRegistry::ReadRegistryString( const char *path, const char *valueName, char *default_value )
+char * QVLCRegistry::ReadRegistryString( const char *path, const char *valueName, const char *default_value )
 {
     HKEY keyHandle;
     char *tempValue = NULL;
+    char *tempValue2 = NULL;
+
     DWORD size1;
     DWORD valueType;
 
@@ -145,20 +147,14 @@ char * QVLCRegistry::ReadRegistryString( const char *path, const char *valueName
                tempValue = ( char * )malloc( size1+1 ); // +1 für NullByte`?
                if( RegQueryValueEx(  keyHandle, valueName, NULL, &valueType, (LPBYTE)tempValue, &size1 ) == ERROR_SUCCESS )
                {
-                  default_value = tempValue;
+                  tempValue2 = tempValue;
                };
            }
         }
         RegCloseKey( keyHandle );
     }
-    if( tempValue == NULL )
-    {
-        // wenn tempValue nicht aus registry gelesen wurde dafür sorgen das ein neuer String mit der Kopie von DefaultValue
-        // geliefert wird - das macht das Handling des Rückgabewertes der Funktion einfacher - immer schön mit free freigeben!
-        default_value = strdup( default_value );
-    }
 
-    return default_value;
+    return tempValue == NULL ? strdup( default_value ) : tempValue2;
 }
 
 double QVLCRegistry::ReadRegistryDouble( const char *path, const char *valueName, double default_value )

@@ -912,7 +912,7 @@ bool SPrefsPanel::addType( const char * psz_ext, QTreeWidgetItem* current,
     const char* psz_VLC = "VLC";
     current = new QTreeWidgetItem( parent, QStringList( psz_ext ) );
 
-    if( strstr( qvReg->ReadRegistryString( psz_ext, "", ""  ), psz_VLC ) )
+    if( strstr( qvReg->ReadRegistryString( psz_ext, "", "" ), psz_VLC ) )
     {
         current->setCheckState( 0, Qt::Checked );
         b_temp = false;
@@ -966,7 +966,7 @@ void SPrefsPanel::assoDialog()
     videoType->setExpanded( true ); videoType->setCheckState( 0, Qt::Unchecked );
     otherType->setExpanded( true ); otherType->setCheckState( 0, Qt::Unchecked );
 
-    QTreeWidgetItem *currentItem;
+    QTreeWidgetItem *currentItem = NULL;
 
     int i_temp = 0;
 #define aTa( name ) i_temp += addType( name, currentItem, audioType, qvReg )
@@ -1066,7 +1066,7 @@ void addAsso( QVLCRegistry *qvReg, const char *psz_ext )
 void delAsso( QVLCRegistry *qvReg, const char *psz_ext )
 {
     char psz_VLC[] = "VLC";
-    char *psz_value = qvReg->ReadRegistryString( psz_ext, "", ""  );
+    char *psz_value = qvReg->ReadRegistryString( psz_ext, "", "" );
 
     if( psz_value && !strcmp( strcat( psz_VLC, psz_ext ), psz_value ) )
     {
@@ -1081,7 +1081,7 @@ void delAsso( QVLCRegistry *qvReg, const char *psz_ext )
 }
 void SPrefsPanel::saveAsso()
 {
-    QVLCRegistry * qvReg;
+    QVLCRegistry * qvReg = NULL;
     for( int i = 0; i < listAsso.size(); i ++ )
     {
         qvReg  = new QVLCRegistry( HKEY_CLASSES_ROOT );
