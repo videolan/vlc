@@ -28,6 +28,6 @@ stamp-activex-configure: stamp-activex-autogen
 
 stamp-activex-build: stamp-activex-configure
 	cd activex-vlc && \
-	$(MAKE) $(MAKEFLAGS) all && \
-	$(MAKE) $(MAKEFLAGS) DESTDIR="$(abs_builddir)/activex-vlc/installed" install
+	$(MAKE) all && \
+	$(MAKE) DESTDIR="$(abs_builddir)/activex-vlc/installed" install
 	touch $@

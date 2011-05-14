@@ -29,6 +29,6 @@ stamp-npapi-configure: stamp-npapi-autogen
 
 stamp-npapi-build: stamp-npapi-configure
 	cd npapi-vlc && \
-	$(MAKE) $(MAKEFLAGS) all && \
-	$(MAKE) $(MAKEFLAGS) DESTDIR="$(abs_builddir)/npapi-vlc/installed" install
+	$(MAKE) all && \
+	$(MAKE) DESTDIR="$(abs_builddir)/npapi-vlc/installed" install
 	touch $@
