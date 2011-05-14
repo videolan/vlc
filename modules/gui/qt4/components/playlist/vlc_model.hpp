@@ -59,39 +59,41 @@ public:
     static QString getMeta( const QModelIndex & index, int meta );
     static QPixmap getArtPixmap( const QModelIndex & index, const QSize & size );
 
+    static int columnToMeta( int _column )
+    {
+        int meta = 1;
+        int column = 0;
+
+        while( column != _column && meta != COLUMN_END )
+        {
+            meta <<= 1;
+            column++;
+        }
+
+        return meta;
+    }
+
+    static int columnFromMeta( int meta_col )
+    {
+        int meta = 1;
+        int column = 0;
+
+        while( meta != meta_col && meta != COLUMN_END )
+        {
+            meta <<= 1;
+            column++;
+        }
+
+        return column;
+    }
+
 public slots:
     virtual void activateItem( const QModelIndex &index ) = 0;
 
 protected:
     intf_thread_t *p_intf;
+
 };
 
-static int columnToMeta( int _column )
-{
-    int meta = 1;
-    int column = 0;
-
-    while( column != _column && meta != COLUMN_END )
-    {
-        meta <<= 1;
-        column++;
-    }
-
-    return meta;
-}
-
-static int columnFromMeta( int meta_col )
-{
-    int meta = 1;
-    int column = 0;
-
-    while( meta != meta_col && meta != COLUMN_END )
-    {
-        meta <<= 1;
-        column++;
-    }
-
-    return column;
-}
 
 #endif
