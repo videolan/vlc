@@ -115,7 +115,7 @@ void EPGWidget::updateEPG( input_item_t *p_input_item )
     m_epgView->cleanup(); /* expire items and flags */
     /* Fixme: input could have dissapeared */
     vlc_mutex_lock(  & p_input_item->lock );
-    int i_nbitems = p_input_item->i_epg;
+
     for ( int i = 0; i < p_input_item->i_epg; ++i )
     {
         vlc_epg_t *p_epg = p_input_item->pp_epg[i];
