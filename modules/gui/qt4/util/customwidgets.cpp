@@ -344,7 +344,7 @@ void AnimatedIcon::play( int loops, int interval )
         interval = 20;
     }
 
-    if( !mIdleFrame && ( mFrames.empty() | loops != 0 ) )
+    if( !mIdleFrame && ( mFrames.empty() | (loops != 0) ) )
     {
 #ifndef NDEBUG
         printf( "AnimatedIcon::play(): no frames to display" );
