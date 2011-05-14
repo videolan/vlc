@@ -1,10 +1,11 @@
 /*****************************************************************************
  * projectm: visualization module based on libprojectM
  *****************************************************************************
- * Copyright (C) 2009 the VideoLAN team
+ * Copyright © 2009-2011 the VideoLAN team
  * $Id$
  *
  * Authors: Rémi Duraffort <ivoire@videolan.org>
+ *          Laurent Aimar
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -38,7 +39,6 @@
 #include <vlc_rand.h>
 
 #include <libprojectM/projectM.hpp>
-
 
 /*****************************************************************************
  * Module descriptor
@@ -90,9 +90,9 @@ vlc_module_begin ()
     add_directory( "projectm-preset-path", "/usr/share/projectM/presets",
 #endif
                   PRESET_PATH_TXT, PRESET_PATH_LONGTXT, true )
-    add_font( "projectm-title-font", "/usr/share/fonts/truetype/ttf-dejavu/DejaVuSans.ttf",
+    add_loadfile( "projectm-title-font", "/usr/share/fonts/truetype/ttf-dejavu/DejaVuSans.ttf",
                   TITLE_FONT_TXT, TITLE_FONT_LONGTXT, true )
-    add_font( "projectm-menu-font", "/usr/share/fonts/truetype/ttf-dejavu/DejaVuSansMono.ttf",
+    add_loadfile( "projectm-menu-font", "/usr/share/fonts/truetype/ttf-dejavu/DejaVuSansMono.ttf",
               MENU_FONT_TXT, MENU_FONT_LONGTXT, true )
 #endif
     add_integer( "projectm-width", 800, WIDTH_TEXT, WIDTH_LONGTEXT,
@@ -174,15 +174,15 @@ static int Open( vlc_object_t * p_this )
 
     /* Create the object for the thread */
     vlc_sem_init( &p_sys->ready, 0 );
-    p_sys->b_error  = false;
-    p_sys->b_quit   = false;
-    p_sys->i_width  = var_InheritInteger( p_filter, "projectm-width" );
-    p_sys->i_height = var_InheritInteger( p_filter, "projectm-height" );
-    p_sys->i_channels = aout_FormatNbChannels( &p_filter->fmt_in.audio );
+    p_sys->b_error       = false;
+    p_sys->b_quit        = false;
+    p_sys->i_width       = var_InheritInteger( p_filter, "projectm-width" );
+    p_sys->i_height      = var_InheritInteger( p_filter, "projectm-height" );
+    p_sys->i_channels    = aout_FormatNbChannels( &p_filter->fmt_in.audio );
     vlc_mutex_init( &p_sys->lock );
-    p_sys->p_buffer = NULL;
+    p_sys->p_buffer      = NULL;
     p_sys->i_buffer_size = 0;
-    p_sys->i_nb_samples = 0;
+    p_sys->i_nb_samples  = 0;
 
     /* Create the thread */
     if( vlc_clone( &p_sys->thread, Thread, p_filter, VLC_THREAD_PRIORITY_LOW ) )
@@ -210,7 +210,7 @@ error:
  */
 static void Close( vlc_object_t *p_this )
 {
-    filter_t     *p_filter = (filter_t *)p_this;
+    filter_t  *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
 
     /* Stop the thread
@@ -267,6 +267,7 @@ static block_t *DoWork( filter_t *p_filter, block_t *p_in_buf )
 static int VoutCallback( vlc_object_t *p_vout, char const *psz_name,
                          vlc_value_t oldv, vlc_value_t newv, void *p_data )
 {
+    VLC_UNUSED( p_vout ); VLC_UNUSED( oldv );
     vout_display_t *p_vd = (vout_display_t*)p_data;
 
     if( !strcmp(psz_name, "fullscreen") )
@@ -282,13 +283,13 @@ static int VoutCallback( vlc_object_t *p_vout, char const *psz_name,
  */
 static void *Thread( void *p_data )
 {
-    filter_t     *p_filter = (filter_t*)p_data;
+    filter_t  *p_filter = (filter_t*)p_data;
     filter_sys_t *p_sys = p_filter->p_sys;
-    int cancel = vlc_savecancel();
+
     video_format_t fmt;
     vlc_gl_t *gl;
-    int i_last_width  = 0;
-    int i_last_height = 0;
+    unsigned int i_last_width  = 0;
+    unsigned int i_last_height = 0;
     locale_t loc;
     locale_t oldloc;
 
@@ -301,6 +302,8 @@ static void *Thread( void *p_data )
     char *psz_menu_font;
     projectM::Settings settings;
 #endif
+
+    vlc_savecancel();
 
     /* Create the openGL provider */
     p_sys->p_vout =
@@ -345,8 +348,10 @@ static void *Thread( void *p_data )
         goto error;
     }
 
+    /* Work-around the projectM locale bug */
     loc = newlocale (LC_NUMERIC_MASK, "C", NULL);
     oldloc = uselocale (loc);
+
     /* Create the projectM object */
 #ifndef HAVE_PROJECTM2
     psz_config = var_InheritString( p_filter, "projectm-config" );
@@ -362,30 +367,33 @@ static void *Thread( void *p_data )
         free( psz_data_path );
     }
 #endif
-    psz_title_font = var_InheritString( p_filter, "projectm-title-font" );
-    psz_menu_font = var_InheritString( p_filter, "projectm-menu-font" );
 
-    settings.meshX = var_InheritInteger( p_filter, "projectm-meshx" );
-    settings.meshY = var_InheritInteger( p_filter, "projectm-meshy" );
-    settings.fps = 35;
-    settings.textureSize = var_InheritInteger( p_filter, "projectm-texture-size" );
-    settings.windowWidth = p_sys->i_width;
-    settings.windowHeight = p_sys->i_height;
-    settings.presetURL = psz_preset_path;
-    settings.titleFontURL = psz_title_font;
-    settings.menuFontURL = psz_menu_font;
+    psz_title_font                = var_InheritString( p_filter, "projectm-title-font" );
+    psz_menu_font                 = var_InheritString( p_filter, "projectm-menu-font" );
+
+    settings.meshX                = var_InheritInteger( p_filter, "projectm-meshx" );
+    settings.meshY                = var_InheritInteger( p_filter, "projectm-meshy" );
+    settings.fps                  = 35;
+    settings.textureSize          = var_InheritInteger( p_filter, "projectm-texture-size" );
+    settings.windowWidth          = p_sys->i_width;
+    settings.windowHeight         = p_sys->i_height;
+    settings.presetURL            = psz_preset_path;
+    settings.titleFontURL         = psz_title_font;
+    settings.menuFontURL          = psz_menu_font;
     settings.smoothPresetDuration = 5;
-    settings.presetDuration = 30;
-    settings.beatSensitivity = 10;
-    settings.aspectCorrection = 1;
-    settings.easterEgg = 1;
-    settings.shuffleEnabled = 1;
+    settings.presetDuration       = 30;
+    settings.beatSensitivity      = 10;
+    settings.aspectCorrection     = 1;
+    settings.easterEgg            = 1;
+    settings.shuffleEnabled       = 1;
+
     p_projectm = new projectM( settings );
 
     free( psz_menu_font );
     free( psz_title_font );
     free( psz_preset_path );
-#endif
+#endif /* HAVE_PROJECTM2 */
+
     p_sys->i_buffer_size = p_projectm->pcm()->maxsamples;
     p_sys->p_buffer = (float*)calloc( p_sys->i_buffer_size,
                                       sizeof( float ) );
