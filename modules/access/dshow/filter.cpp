@@ -330,7 +330,7 @@ STDMETHODIMP_(ULONG) CapturePin::Release()
 };
 
 /* IPin methods */
-STDMETHODIMP CapturePin::Connect( IPin * pReceivePin,
+STDMETHODIMP CapturePin::Connect( IPin *,
                                   const AM_MEDIA_TYPE *pmt )
 {
     if( State_Running == p_filter->state )
@@ -562,7 +562,7 @@ STDMETHODIMP CapturePin::EnumMediaTypes( IEnumMediaTypes **ppEnum )
 
     return NOERROR;
 }
-STDMETHODIMP CapturePin::QueryInternalConnections( IPin* *apPin, ULONG *nPin )
+STDMETHODIMP CapturePin::QueryInternalConnections( IPin**, ULONG * )
 {
 #ifdef DEBUG_DSHOW_L1
     msg_Dbg( p_input, "CapturePin::QueryInternalConnections" );
@@ -602,9 +602,7 @@ STDMETHODIMP CapturePin::EndFlush( void )
 
     return S_OK;
 }
-STDMETHODIMP CapturePin::NewSegment( REFERENCE_TIME tStart,
-                                     REFERENCE_TIME tStop,
-                                     double dRate )
+STDMETHODIMP CapturePin::NewSegment( REFERENCE_TIME, REFERENCE_TIME, double )
 {
 #ifdef DEBUG_DSHOW
     msg_Dbg( p_input, "CapturePin::NewSegment" );
@@ -613,7 +611,7 @@ STDMETHODIMP CapturePin::NewSegment( REFERENCE_TIME tStart,
 }
 
 /* IMemInputPin methods */
-STDMETHODIMP CapturePin::GetAllocator( IMemAllocator **ppAllocator )
+STDMETHODIMP CapturePin::GetAllocator( IMemAllocator ** )
 {
 #ifdef DEBUG_DSHOW
     msg_Dbg( p_input, "CapturePin::GetAllocator" );
@@ -621,8 +619,7 @@ STDMETHODIMP CapturePin::GetAllocator( IMemAllocator **ppAllocator )
 
     return VFW_E_NO_ALLOCATOR;
 }
-STDMETHODIMP CapturePin::NotifyAllocator( IMemAllocator *pAllocator,
-                                          BOOL bReadOnly )
+STDMETHODIMP CapturePin::NotifyAllocator( IMemAllocator *, BOOL )
 {
 #ifdef DEBUG_DSHOW
     msg_Dbg( p_input, "CapturePin::NotifyAllocator" );
@@ -630,7 +627,7 @@ STDMETHODIMP CapturePin::NotifyAllocator( IMemAllocator *pAllocator,
 
     return S_OK;
 }
-STDMETHODIMP CapturePin::GetAllocatorRequirements( ALLOCATOR_PROPERTIES *pProps )
+STDMETHODIMP CapturePin::GetAllocatorRequirements( ALLOCATOR_PROPERTIES * )
 {
 #ifdef DEBUG_DSHOW
     msg_Dbg( p_input, "CapturePin::GetAllocatorRequirements" );
@@ -774,7 +771,7 @@ STDMETHODIMP_(ULONG) CaptureFilter::Release()
 };
 
 /* IPersist method */
-STDMETHODIMP CaptureFilter::GetClassID(CLSID *pClsID)
+STDMETHODIMP CaptureFilter::GetClassID(CLSID *)
 {
 #ifdef DEBUG_DSHOW
     msg_Dbg( p_input, "CaptureFilter::GetClassID" );
@@ -783,7 +780,7 @@ STDMETHODIMP CaptureFilter::GetClassID(CLSID *pClsID)
 };
 
 /* IMediaFilter methods */
-STDMETHODIMP CaptureFilter::GetState(DWORD dwMSecs, FILTER_STATE *State)
+STDMETHODIMP CaptureFilter::GetState(DWORD, FILTER_STATE *State)
 {
 #ifdef DEBUG_DSHOW
     msg_Dbg( p_input, "CaptureFilter::GetState %i", state );
@@ -792,7 +789,7 @@ STDMETHODIMP CaptureFilter::GetState(DWORD dwMSecs, FILTER_STATE *State)
     *State = state;
     return S_OK;
 };
-STDMETHODIMP CaptureFilter::SetSyncSource(IReferenceClock *pClock)
+STDMETHODIMP CaptureFilter::SetSyncSource(IReferenceClock *)
 {
 #ifdef DEBUG_DSHOW
     msg_Dbg( p_input, "CaptureFilter::SetSyncSource" );
@@ -829,7 +826,7 @@ STDMETHODIMP CaptureFilter::Pause()
     state = State_Paused;
     return S_OK;
 };
-STDMETHODIMP CaptureFilter::Run(REFERENCE_TIME tStart)
+STDMETHODIMP CaptureFilter::Run(REFERENCE_TIME)
 {
 #ifdef DEBUG_DSHOW
     msg_Dbg( p_input, "CaptureFilter::Run" );
@@ -850,7 +847,7 @@ STDMETHODIMP CaptureFilter::EnumPins( IEnumPins ** ppEnum )
     *ppEnum = new CaptureEnumPins( p_input, this, NULL );
     return *ppEnum == NULL ? E_OUTOFMEMORY : NOERROR;
 };
-STDMETHODIMP CaptureFilter::FindPin( LPCWSTR Id, IPin ** ppPin )
+STDMETHODIMP CaptureFilter::FindPin( LPCWSTR, IPin ** )
 {
 #ifdef DEBUG_DSHOW
     msg_Dbg( p_input, "CaptureFilter::FindPin" );
@@ -871,7 +868,7 @@ STDMETHODIMP CaptureFilter::QueryFilterInfo( FILTER_INFO * pInfo )
     return NOERROR;
 };
 STDMETHODIMP CaptureFilter::JoinFilterGraph( IFilterGraph * pGraph,
-                                             LPCWSTR pName )
+                                             LPCWSTR )
 {
 #ifdef DEBUG_DSHOW
     msg_Dbg( p_input, "CaptureFilter::JoinFilterGraph" );
@@ -881,7 +878,7 @@ STDMETHODIMP CaptureFilter::JoinFilterGraph( IFilterGraph * pGraph,
 
     return NOERROR;
 };
-STDMETHODIMP CaptureFilter::QueryVendorInfo( LPWSTR* pVendorInfo )
+STDMETHODIMP CaptureFilter::QueryVendorInfo( LPWSTR* )
 {
 #ifdef DEBUG_DSHOW
     msg_Dbg( p_input, "CaptureFilter::QueryVendorInfo" );

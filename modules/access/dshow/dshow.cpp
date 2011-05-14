@@ -2013,7 +2013,7 @@ static int DemuxControl( demux_t *p_demux, int i_query, va_list args )
  * config variable callback
  *****************************************************************************/
 static int FindDevicesCallback( vlc_object_t *p_this, char const *psz_name,
-                               vlc_value_t newval, vlc_value_t oldval, void * )
+                               vlc_value_t, vlc_value_t, void * )
 {
     module_config_t *p_item;
     bool b_audio = false;
@@ -2075,7 +2075,7 @@ static int FindDevicesCallback( vlc_object_t *p_this, char const *psz_name,
 }
 
 static int ConfigDevicesCallback( vlc_object_t *p_this, char const *psz_name,
-                               vlc_value_t newval, vlc_value_t oldval, void * )
+                                  vlc_value_t newval, vlc_value_t, void * )
 {
     module_config_t *p_item;
     bool b_audio = false;
@@ -2285,8 +2285,9 @@ static void ShowTunerProperties( vlc_object_t *p_this,
 static void ConfigTuner( vlc_object_t *p_this, ICaptureGraphBuilder2 *p_graph,
                          IBaseFilter *p_device_filter )
 {
-    int i_channel, i_country, i_input, i_amtuner_mode, i_standard, i_frequency;
+    int i_channel, i_country, i_input, i_amtuner_mode, i_standard;
     long l_modes = 0;
+    unsigned i_frequency;
     IAMTVTuner *p_TV;
     HRESULT hr;
 
@@ -2380,9 +2381,10 @@ static void ConfigTuner( vlc_object_t *p_this, ICaptureGraphBuilder2 *p_graph,
             goto free_on_error;
         }
 
-        msg_Dbg( p_this, "Frequency range supproted from %d to %d.", ModeCaps.MinFrequency, ModeCaps.MaxFrequency);
-        msg_Dbg( p_this, "Video standards supproted by the tuner: ");
-        for(int i = 0 ; i < ARRAY_SIZE(ppsz_standards_list_text); i++) {
+        msg_Dbg( p_this, "Frequency range supported from %ld to %ld.",
+                 ModeCaps.MinFrequency, ModeCaps.MaxFrequency);
+        msg_Dbg( p_this, "Video standards supported by the tuner: ");
+        for(size_t i = 0 ; i < ARRAY_SIZE(ppsz_standards_list_text); i++) {
             if(ModeCaps.StandardsSupported & i_standards_list[i])
                 msg_Dbg( p_this, "%s, ", ppsz_standards_list_text[i]);
         }
