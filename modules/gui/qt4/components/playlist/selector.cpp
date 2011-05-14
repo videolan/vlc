@@ -195,7 +195,7 @@ void PLSelector::createItems()
     ml->treeItem()->setData( 0, SPECIAL_ROLE, QVariant( IS_ML ) );
 
     /* SQL ML */
-    QTreeWidgetItem *sql_ml =  addItem( SQL_ML_TYPE, "SQL Media Library" )->treeItem();
+    addItem( SQL_ML_TYPE, "SQL Media Library" )->treeItem();
 
     /* SD nodes */
     QTreeWidgetItem *mycomp = addItem( CATEGORY_TYPE, N_("My Computer") )->treeItem();

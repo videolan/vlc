@@ -54,7 +54,7 @@ void QFramelessButton::paintEvent( QPaintEvent * )
 }
 
 QElidingLabel::QElidingLabel( const QString &s, Qt::TextElideMode mode, QWidget * parent )
-                 : elideMode( mode ), QLabel( s, parent )
+                 : QLabel( s, parent ), elideMode( mode )
 { }
 
 void QElidingLabel::setElideMode( Qt::TextElideMode mode )

@@ -87,7 +87,7 @@ MLItem::MLItem( const MLModel *p_model,
                             intf_thread_t* _p_intf,
                             ml_media_t *p_media,
                             MLItem *p_parent )
-        : model( p_model ), children(), parentItem( p_parent ), p_intf( _p_intf )
+        : p_intf( _p_intf ), model( p_model ), children(), parentItem( p_parent )
 {
     if( p_media )
         ml_gc_incref( p_media );

@@ -193,8 +193,9 @@ bool MLModel::isEditable( const QModelIndex &index ) const
     case ML_VOTE:
     case ML_YEAR:
         return true;
+    default:
+        return false;
     }
-    return false;
 }
 
 QMimeData* MLModel::mimeData( const QModelIndexList &indexes ) const
@@ -261,6 +262,7 @@ int MLModel::getId( QModelIndex index ) const
 QVariant MLModel::data( const QModelIndex &index, int role ) const
 {
     if( index.isValid() )
+    {
         if( role == Qt::DisplayRole || role == Qt::EditRole )
         {
             MLItem *it = static_cast<MLItem*>( index.internalPointer() );
@@ -272,6 +274,7 @@ QVariant MLModel::data( const QModelIndex &index, int role ) const
             return QVariant( true );
         else if( role == VLCModel::IsCurrentsParentNodeRole )
             return QVariant( false );
+    }
     return QVariant();
 }
 

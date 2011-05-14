@@ -68,14 +68,13 @@ public:
            PICTUREFLOW_VIEW,
            VIEW_COUNT };
 
-    const int currentViewIndex();
-
+    int currentViewIndex() const;
 
 protected:
-
     PLModel *model;
     MLModel *mlmodel;
     virtual void wheelEvent( QWheelEvent *e );
+
 private:
     intf_thread_t *p_intf;
 

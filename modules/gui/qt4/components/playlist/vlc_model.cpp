@@ -24,7 +24,7 @@
 #include "vlc_model.hpp"
 
 VLCModel::VLCModel( intf_thread_t *_p_intf, QObject *parent )
-        : p_intf(_p_intf), QAbstractItemModel( parent )
+        : QAbstractItemModel( parent ), p_intf(_p_intf)
 {
 }
 

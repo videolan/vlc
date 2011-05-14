@@ -377,7 +377,7 @@ QSize LocationBar::sizeHint() const
 
 LocationButton::LocationButton( const QString &text, bool bold,
                                 bool arrow, QWidget * parent )
-  : b_arrow( arrow ), QPushButton( parent )
+  : QPushButton( parent ), b_arrow( arrow )
 {
     QFont font;
     font.setBold( bold );

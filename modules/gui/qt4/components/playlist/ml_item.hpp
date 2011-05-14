@@ -74,10 +74,10 @@ public:
 private:
     ml_media_t* media;
     intf_thread_t* p_intf;
+    const MLModel *model;
     media_library_t* p_ml;
     QList< MLItem* > children;
     MLItem *parentItem;
-    const MLModel *model;
 };
 
 #endif

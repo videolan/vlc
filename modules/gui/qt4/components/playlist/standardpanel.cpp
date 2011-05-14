@@ -57,9 +57,11 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
                                   PLSelector *_p_selector,
                                   PLModel *_p_model,
                                   MLModel *_p_plmodel)
-                : QWidget( _parent ), p_intf( _p_intf ),
-                  p_selector( _p_selector ), model( _p_model ),
-                  mlmodel( _p_plmodel)
+                : QWidget( _parent ),
+                  model( _p_model ),
+                  mlmodel( _p_plmodel),
+                  p_intf( _p_intf ),
+                  p_selector( _p_selector )
 {
     viewStack = new QStackedLayout( this );
     viewStack->setSpacing( 0 ); viewStack->setMargin( 0 );
@@ -401,7 +403,7 @@ void StandardPLPanel::showView( int i_view )
     gotoPlayingItem();
 }
 
-const int StandardPLPanel::currentViewIndex()
+int StandardPLPanel::currentViewIndex() const
 {
     if( currentView == treeView )
         return TREE_VIEW;
