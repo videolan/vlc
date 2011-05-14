@@ -36,8 +36,6 @@
 
 #include "windows_audio_common.h"
 
-#include <dsound.h>
-
 #define FRAME_SIZE ((int)p_aout->output.output.i_rate/20) /* Size in samples */
 
 /*****************************************************************************

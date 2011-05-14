@@ -72,6 +72,8 @@ typedef struct {
 #endif
 
 
+#include <dsound.h>
+
 #ifndef SPEAKER_FRONT_LEFT
 #   define SPEAKER_FRONT_LEFT             0x1
 #   define SPEAKER_FRONT_RIGHT            0x2
