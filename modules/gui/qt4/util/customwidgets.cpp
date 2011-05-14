@@ -302,7 +302,7 @@ QString VLCKeyToString( unsigned val )
 /* Animated Icon implementation */
 
 AnimatedIcon::AnimatedIcon( QWidget *parent )
-    : mTimer( this ), mIdleFrame( NULL )
+    : QLabel( parent ), mTimer( this ), mIdleFrame( NULL )
 {
     mCurrentFrame = mRemainingLoops = 0;
     connect( &mTimer, SIGNAL( timeout() ), this, SLOT( onTimerTick() ) );
@@ -344,7 +344,7 @@ void AnimatedIcon::play( int loops, int interval )
         interval = 20;
     }
 
-    if( !mIdleFrame && ( mFrames.empty() | (loops != 0) ) )
+    if( !mIdleFrame && (mFrames.empty() || loops != 0 ) )
     {
 #ifndef NDEBUG
         printf( "AnimatedIcon::play(): no frames to display" );
