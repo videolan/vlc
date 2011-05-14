@@ -48,6 +48,8 @@ QVLCVariable::~QVLCVariable (void)
 int QVLCVariable::callback (vlc_object_t *object, const char *,
                             vlc_value_t old, vlc_value_t cur, void *data)
 {
+    VLC_UNUSED(object);
+
     QVLCVariable *self = static_cast<QVLCVariable *>(data);
 
     self->trigger (self->object, old, cur);

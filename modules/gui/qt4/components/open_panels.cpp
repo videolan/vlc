@@ -667,7 +667,7 @@ void UrlValidator::fixup( QString& str ) const
     str = str.trimmed();
 }
 
-QValidator::State UrlValidator::validate( QString& str, int& pos ) const
+QValidator::State UrlValidator::validate( QString& str, int& ) const
 {
     if( str.contains( ' ' ) )
         return QValidator::Invalid;

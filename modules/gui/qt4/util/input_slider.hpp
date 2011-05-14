@@ -71,7 +71,7 @@ public slots:
     void setPosition( float, int64_t, int );
 
 private slots:
-    void startSeekTimer( int );
+    void startSeekTimer();
     void updatePos();
 
 signals:

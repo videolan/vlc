@@ -63,7 +63,7 @@ void QElidingLabel::setElideMode( Qt::TextElideMode mode )
     repaint();
 }
 
-void QElidingLabel::paintEvent( QPaintEvent * event )
+void QElidingLabel::paintEvent( QPaintEvent * )
 {
     QPainter p( this );
     int space = frameWidth() + margin();
@@ -409,11 +409,8 @@ SpinningIcon::SpinningIcon( QWidget *parent, bool noIdleFrame )
     setFixedSize( 16, 16 );
 }
 
-SpinningIcon::~SpinningIcon()
-{
-}
-
-QToolButtonExt::QToolButtonExt(QWidget *parent, int ms ): longClick( false )
+QToolButtonExt::QToolButtonExt(QWidget *parent, int ms )
+               :QToolButton( parent ), longClick( false )
 {
     setAutoRepeat( true );
     /* default to twice the doubleclick delay */

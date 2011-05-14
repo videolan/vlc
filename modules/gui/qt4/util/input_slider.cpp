@@ -72,7 +72,7 @@ SeekSlider::SeekSlider( Qt::Orientation q, QWidget *_parent )
     setPosition( -1.0, 0, 0 );
     secstotimestr( psz_length, 0 );
 
-    CONNECT( this, sliderMoved( int ), this, startSeekTimer( int ) );
+    CONNECT( this, sliderMoved( int ), this, startSeekTimer() );
     CONNECT( seekLimitTimer, timeout(), this, updatePos() );
 
     mTimeTooltip->installEventFilter( this );
@@ -101,7 +101,7 @@ void SeekSlider::setPosition( float pos, int64_t time, int length )
     inputLength = length;
 }
 
-void SeekSlider::startSeekTimer( int new_value )
+void SeekSlider::startSeekTimer()
 {
     /* Only fire one update, when sliding, every 150ms */
     if( b_isSliding && !seekLimitTimer->isActive() )
@@ -176,14 +176,14 @@ void SeekSlider::wheelEvent( QWheelEvent *event )
     event->accept();
 }
 
-void SeekSlider::enterEvent( QEvent *e )
+void SeekSlider::enterEvent( QEvent * )
 {
     /* Don't show the tooltip if the slider is disabled */
     if( isEnabled() && inputLength > 0 )
         mTimeTooltip->show();
 }
 
-void SeekSlider::leaveEvent( QEvent *e )
+void SeekSlider::leaveEvent( QEvent * )
 {
     if( !rect().contains( mapFromGlobal( QCursor::pos() ) ) )
         mTimeTooltip->hide();

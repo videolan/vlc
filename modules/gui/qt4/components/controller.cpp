@@ -997,6 +997,8 @@ static int FullscreenControllerWidgetFullscreenChanged( vlc_object_t *vlc_object
                 const char *variable, vlc_value_t old_val,
                 vlc_value_t new_val,  void *data )
 {
+    VLC_UNUSED( variable ); VLC_UNUSED( old_val );
+
     vout_thread_t *p_vout = (vout_thread_t *) vlc_object;
 
     msg_Dbg( p_vout, "Qt4: Fullscreen state changed" );
@@ -1011,6 +1013,8 @@ static int FullscreenControllerWidgetMouseMoved( vlc_object_t *vlc_object, const
                                                  vlc_value_t old_val, vlc_value_t new_val,
                                                  void *data )
 {
+    VLC_UNUSED( variable ); VLC_UNUSED( old_val );
+
     vout_thread_t *p_vout = (vout_thread_t *)vlc_object;
     FullscreenControllerWidget *p_fs = (FullscreenControllerWidget *)data;
 
@@ -1115,7 +1119,7 @@ void FullscreenControllerWidget::fullscreenChanged( vout_thread_t *p_vout,
 /**
  * Mouse change callback (show/hide the controller on mouse movement)
  */
-void FullscreenControllerWidget::mouseChanged( vout_thread_t *p_vout, int i_mousex, int i_mousey )
+void FullscreenControllerWidget::mouseChanged( vout_thread_t *, int i_mousex, int i_mousey )
 {
     bool b_toShow;
 

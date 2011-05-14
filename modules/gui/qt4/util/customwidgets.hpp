@@ -166,7 +166,6 @@ class SpinningIcon : public AnimatedIcon
 
 public:
     SpinningIcon( QWidget *parent, bool noIdleFrame = false );
-    virtual ~SpinningIcon();
 };
 
 /* VLC Key/Wheel hotkeys interactions */
