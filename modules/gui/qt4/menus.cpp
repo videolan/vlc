@@ -320,7 +320,7 @@ void QVLCMenu::createMenuBar( MainInterface *mi,
     addMenuToMainbar( ToolsMenu( bar ), qtr( "&Tools" ), bar );
 
     /* View menu, a bit different */
-    BAR_DADD( ViewMenu( p_intf, _menu, mi ), qtr( "V&iew" ), 4 );
+    BAR_DADD( ViewMenu( p_intf, NULL, mi ), qtr( "V&iew" ), 4 );
 
     addMenuToMainbar( HelpMenu( bar ), qtr( "&Help" ), bar );
 
@@ -1034,7 +1034,7 @@ void QVLCMenu::PopupMenu( intf_thread_t *p_intf, bool show )
         else
         {
             QMenu *bar = menu; // Needed for next macro
-            BAR_DADD( ViewMenu( p_intf, _menu, mi ), qtr( "V&iew" ), 4 );
+            BAR_DADD( ViewMenu( p_intf, NULL, mi ), qtr( "V&iew" ), 4 );
         }
 
         menu->addMenu( submenu );
