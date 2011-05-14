@@ -650,8 +650,6 @@ void PLModel::processItemAppend( int i_item, int i_parent )
 
 void PLModel::rebuild( playlist_item_t *p_root )
 {
-    playlist_item_t* p_item;
-
     /* Invalidate cache */
     i_cached_id = i_cached_input_id = -1;
 
