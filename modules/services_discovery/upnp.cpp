@@ -1071,7 +1071,7 @@ const char* Item::getResource() const
     return _resource.c_str();
 }
 
-const mtime_t Item::getDuration() const
+mtime_t Item::getDuration() const
 {
     return _duration;
 }

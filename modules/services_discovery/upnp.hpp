@@ -126,7 +126,7 @@ public:
     const char* getObjectID() const;
     const char* getTitle() const;
     const char* getResource() const;
-    const mtime_t getDuration() const;
+    mtime_t getDuration() const;
 
     void setInputItem( input_item_t* p_input_item );
 
