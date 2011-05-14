@@ -163,7 +163,7 @@ void VideoWidget::SetSizing( unsigned int w, unsigned int h )
        This cause a small flicker.
        See #3621
      */
-    if( size().width() == w && size().height() == h )
+    if( (unsigned)size().width() == w && (unsigned)size().height() == h )
         updateGeometry();
     sync();
 }
