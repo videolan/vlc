@@ -1011,7 +1011,7 @@ int EventThreadGetWindowStyle( event_thread_t *p_event )
 
 void EventThreadUpdateWindowPosition( event_thread_t *p_event,
                                       bool *pb_moved, bool *pb_resized,
-                                      int x, int y, int w, int h )
+                                      int x, int y, unsigned w, unsigned h )
 {
     vlc_mutex_lock( &p_event->lock );
     *pb_moved   = x != p_event->wnd_cfg.x ||

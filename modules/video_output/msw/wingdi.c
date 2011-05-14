@@ -345,7 +345,7 @@ static int Init(vout_display_t *vd,
     fmt->i_width  = width;
     fmt->i_height = height;
 
-    uint8_t *p_pic_buffer;
+    void *p_pic_buffer;
     int     i_pic_pitch;
 #ifdef MODULE_NAME_IS_wingapi
     GXOpenDisplay(sys->hvideownd, GX_FULLSCREEN);

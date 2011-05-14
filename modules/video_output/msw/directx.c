@@ -602,8 +602,9 @@ static int DirectXOpenDDraw(vout_display_t *vd)
     }
 
     /* Get the IDirectDraw2 interface */
+    void *ptr;
     hr = IDirectDraw_QueryInterface(ddobject, &IID_IDirectDraw2,
-                                    &sys->ddobject);
+                                    &ptr);
     /* Release the unused interface */
     IDirectDraw_Release(ddobject);
 
@@ -612,6 +613,7 @@ static int DirectXOpenDDraw(vout_display_t *vd)
         sys->ddobject = NULL;
         return VLC_EGENERIC;
     }
+    sys->ddobject = ptr;
 
     /* Set DirectDraw Cooperative level, ie what control we want over Windows
      * display */
@@ -783,8 +785,9 @@ static int DirectXOpenDisplay(vout_display_t *vd)
         return VLC_EGENERIC;
     }
 
+    void *ptr;
     hr = IDirectDrawSurface_QueryInterface(display, &IID_IDirectDrawSurface2,
-                                           &sys->display);
+                                           &ptr);
     /* Release the old interface */
     IDirectDrawSurface_Release(display);
 
@@ -793,6 +796,7 @@ static int DirectXOpenDisplay(vout_display_t *vd)
         sys->display = NULL;
         return VLC_EGENERIC;
     }
+    sys->display = ptr;
 
     /* The clipper will be used only in non-overlay mode */
     DirectXCreateClipper(vd);

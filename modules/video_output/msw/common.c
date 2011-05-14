@@ -290,11 +290,12 @@ static void CommonChangeThumbnailClip(vout_display_t *vd, bool show)
 
     CoInitialize(0);
 
-    LPTASKBARLIST3 taskbl;
+    void *ptr;
     if (S_OK == CoCreateInstance(&clsid_ITaskbarList,
                                  NULL, CLSCTX_INPROC_SERVER,
                                  &IID_ITaskbarList3,
-                                 &taskbl)) {
+                                 &ptr)) {
+        LPTASKBARLIST3 taskbl = ptr;
         taskbl->vt->HrInit(taskbl);
 
         HWND hroot = GetAncestor(sys->hwnd,GA_ROOT);
