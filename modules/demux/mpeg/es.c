@@ -54,6 +54,7 @@ vlc_module_begin ()
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_DEMUX )
     set_description( N_("MPEG-I/II/4 / A52 / DTS / MLP audio" ) )
+    set_shortname( N_("Audio ES") )
     set_capability( "demux", 155 )
     set_callbacks( OpenAudio, Close )
 
