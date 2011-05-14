@@ -74,7 +74,7 @@ static inline msg_item_t *msg_Copy (const msg_item_t *msg)
     copy->psz_object_type = msg->psz_object_type;
     copy->psz_module = strdup (msg->psz_module);
     copy->psz_msg = strdup (msg->psz_msg);
-    copy->psz_header = strdup (msg->psz_header);
+    copy->psz_header = msg->psz_header ? strdup (msg->psz_header) : NULL;
     return copy;
 }
 
