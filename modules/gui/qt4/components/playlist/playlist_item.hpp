@@ -39,8 +39,8 @@ public:
 
     int row() const;
 
-    void insertChild( PLItem *, int pos, bool signal = true );
-    void appendChild( PLItem *item, bool signal = true );
+    void insertChild( PLItem *, int pos );
+    void appendChild( PLItem *item );
     void removeChild( PLItem * );
     void removeChildren();
     void takeChildAt( int );

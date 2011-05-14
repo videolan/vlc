@@ -73,15 +73,12 @@ PLItem::~PLItem()
     children.clear();
 }
 
-/* So far signal is always true.
-   Using signal false would not call PLModel... Why ?
- */
-void PLItem::insertChild( PLItem *item, int i_pos, bool signal )
+void PLItem::insertChild( PLItem *item, int i_pos )
 {
     children.insert( i_pos, item );
 }
 
-void PLItem::appendChild( PLItem *item, bool signal )
+void PLItem::appendChild( PLItem *item )
 {
     children.insert( children.count(), item );
 }

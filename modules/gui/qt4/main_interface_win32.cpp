@@ -87,12 +87,12 @@ void MainInterface::createTaskBarButtons()
     {
         p_taskbl->vt->HrInit(p_taskbl);
 
-        if(himl = ImageList_Create( 20, //cx
+        if( (himl = ImageList_Create( 20, //cx
                         20, //cy
                         ILC_COLOR32,//flags
                         4,//initial nb of images
                         0//nb of images that can be added
-                        ))
+                        ) ) != NULL )
         {
             QPixmap img   = QPixmap(":/win7/prev");
             QPixmap img2  = QPixmap(":/win7/pause");
