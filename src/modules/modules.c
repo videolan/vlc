@@ -966,9 +966,9 @@ static int AllocatePluginFile( vlc_object_t * p_this, module_bank_t *p_bank,
 {
     module_t * p_module = NULL;
 
-    /*
-     * Check our plugins cache first then load plugin if needed
-     */
+    /* msg_Dbg( p_this, "plugin \"%s\", %s",
+                p_module->psz_object_name, p_module->psz_longname ); */
+    /* Check our plugins cache first then load plugin if needed */
     if( mode == CACHE_USE )
         p_module = CacheFind( p_bank, path, mtime, size );
     if( p_module == NULL )
@@ -978,15 +978,9 @@ static int AllocatePluginFile( vlc_object_t * p_this, module_bank_t *p_bank,
 
     /* We have not already scanned and inserted this module */
     assert( p_module->next == NULL );
-    assert( !p_module->b_builtin );
-
-    /* msg_Dbg( p_this, "plugin \"%s\", %s",
-                p_module->psz_object_name, p_module->psz_longname ); */
-    p_module->next = p_bank->head;
-    p_bank->head = p_module;
-    assert( p_module->next != NULL ); /* Insertion done */
 
     /* Unload plugin until we really need it */
+    assert( !p_module->b_builtin );
     if( p_module->b_loaded && p_module->b_unloadable )
     {
         module_Unload( p_module->handle );
@@ -1005,6 +999,9 @@ static int AllocatePluginFile( vlc_object_t * p_this, module_bank_t *p_bank,
              p_module = AllocatePlugin( p_this, path, false );
              break;
          }
+
+    p_module->next = p_bank->head;
+    p_bank->head = p_module;
 
     if( mode == CACHE_IGNORE )
         return 0;
