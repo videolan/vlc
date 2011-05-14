@@ -1838,7 +1838,7 @@ static void Atmo_SetupParameters(filter_t *p_filter)
           COM Server for AtmoLight not running ?
           if the exe path is configured try to start the "userspace" driver
         */
-        psz_path = var_CreateGetStringCommand( p_filter,
+        char *psz_path = var_CreateGetStringCommand( p_filter,
                                                CFG_PREFIX "atmowinexe" );
         if(psz_path != NULL)
         {
