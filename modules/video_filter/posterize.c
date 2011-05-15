@@ -279,7 +279,7 @@ static void PlanarYUVPosterize( picture_t *p_pic, picture_t *p_outpic,
  *****************************************************************************/
 static void PackedYUVPosterize( picture_t *p_pic, picture_t *p_outpic, int i_level )
 {
-    uint8_t *p_in, *p_in_end, *p_line_start, *p_line_end, *p_out;
+    uint8_t *p_in, *p_in_end, *p_line_end, *p_out;
     uint8_t y1, y2, u, v;
 
     p_in = p_pic->p[0].p_pixels;
@@ -289,7 +289,6 @@ static void PackedYUVPosterize( picture_t *p_pic, picture_t *p_outpic, int i_lev
 
     while( p_in < p_in_end )
     {
-        p_line_start = p_in;
         p_line_end = p_in + p_pic->p[0].i_visible_pitch;
         while( p_in < p_line_end )
         {
@@ -374,7 +373,7 @@ static void PackedYUVPosterize( picture_t *p_pic, picture_t *p_outpic, int i_lev
 static void RVPosterize( picture_t *p_pic, picture_t *p_outpic,
                                  bool rv32, int level )
 {
-    uint8_t *p_in, *p_in_end, *p_line_start, *p_line_end, *p_out, pixel;
+    uint8_t *p_in, *p_in_end, *p_line_end, *p_out, pixel;
 
     p_in = p_pic->p[0].p_pixels;
     p_in_end = p_in + p_pic->p[0].i_visible_lines
@@ -383,7 +382,6 @@ static void RVPosterize( picture_t *p_pic, picture_t *p_outpic,
 
     while( p_in < p_in_end )
     {
-        p_line_start = p_in;
         p_line_end = p_in + p_pic->p[0].i_visible_pitch;
         while( p_in < p_line_end )
         {

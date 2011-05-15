@@ -441,7 +441,6 @@ static void SubpictureUpdate( subpicture_t *p_subpic,
     }
 
     /* Allocate the regions and draw them */
-    subpicture_region_t *pp_region[i_max_region];
     subpicture_region_t **pp_region_last = &p_subpic->p_region;
 
     for( int i = 0; i < i_region; i++ )
@@ -456,7 +455,7 @@ static void SubpictureUpdate( subpicture_t *p_subpic,
         fmt_region.i_height =
         fmt_region.i_visible_height = region[i].y1 - region[i].y0;
 
-        pp_region[i] = r = subpicture_region_New( &fmt_region );
+        r = subpicture_region_New( &fmt_region );
         if( !r )
             break;
         r->i_x = region[i].x0;
