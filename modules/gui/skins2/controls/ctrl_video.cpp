@@ -36,8 +36,8 @@ CtrlVideo::CtrlVideo( intf_thread_t *pIntf, GenericLayout &rLayout,
                       bool autoResize, const UString &rHelp,
                       VarBool *pVisible ):
     CtrlGeneric( pIntf, rHelp, pVisible ), m_rLayout( rLayout ),
-    m_xShift( 0 ), m_yShift( 0 ), m_bAutoResize( autoResize ),
-    m_pVoutWindow( NULL ), m_bIsUseable( false )
+    m_bAutoResize( autoResize), m_xShift( 0 ), m_yShift( 0 ),
+    m_bIsUseable( false), m_pVoutWindow( NULL )
 {
     VarBool &rFullscreen = VlcProc::instance( getIntf() )->getFullscreenVar();
     rFullscreen.addObserver( this );

@@ -368,9 +368,9 @@ CtrlSliderBg::CtrlSliderBg( intf_thread_t *pIntf,
     CtrlGeneric( pIntf, rHelp, pVisible ), m_pCursor( NULL ),
     m_rVariable( rVariable ), m_thickness( thickness ), m_rCurve( rCurve ),
     m_width( rCurve.getWidth() ), m_height( rCurve.getHeight() ),
-    m_pImgSeq( pBackground ), m_nbHoriz( nbHoriz ), m_nbVert( nbVert ),
-    m_padHoriz( padHoriz ), m_padVert( padVert ), m_bgWidth( 0 ),
-    m_bgHeight( 0 ), m_position( 0 ), m_pScaledBmp( NULL )
+    m_pImgSeq( pBackground ), m_pScaledBmp( NULL ), m_nbHoriz( nbHoriz ),
+    m_nbVert( nbVert ), m_padHoriz( padHoriz ), m_padVert( padVert ),
+    m_bgWidth( 0 ), m_bgHeight( 0 ), m_position( 0 )
 {
     if( m_pImgSeq )
     {

@@ -61,8 +61,8 @@ CtrlTree::CtrlTree( intf_thread_t *pIntf,
     m_pOpenBitmap( pOpenBitmap ), m_pClosedBitmap( pClosedBitmap ),
     m_fgColor( fgColor ), m_playColor( playColor ), m_bgColor1( bgColor1 ),
     m_bgColor2( bgColor2 ), m_selColor( selColor ),
-    m_pLastSelected( NULL ), m_pImage( NULL ), m_dontMove( false ),
-    m_pScaledBitmap( NULL )
+    m_pLastSelected( NULL ), m_pImage( NULL ), m_pScaledBitmap( NULL ),
+    m_dontMove( false )
 {
     // Observe the tree and position variables
     m_rTree.addObserver( this );

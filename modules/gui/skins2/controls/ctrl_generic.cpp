@@ -34,8 +34,8 @@
 
 CtrlGeneric::CtrlGeneric( intf_thread_t *pIntf, const UString &rHelp,
                           VarBool *pVisible):
-    SkinObject( pIntf ), m_pLayout( NULL ), m_pPosition( NULL ),
-    m_help( rHelp ), m_pVisible( pVisible )
+    SkinObject( pIntf ), m_pLayout( NULL ), m_pVisible( pVisible ),
+    m_pPosition( NULL ), m_help( rHelp )
 {
     // Observe the visibility variable
     if( m_pVisible )

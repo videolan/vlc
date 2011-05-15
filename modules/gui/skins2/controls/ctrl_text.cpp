@@ -44,12 +44,12 @@ CtrlText::CtrlText( intf_thread_t *pIntf, VarText &rVariable,
                     const GenericFont &rFont, const UString &rHelp,
                     uint32_t color, VarBool *pVisible, VarBool *pFocus,
                     Scrolling_t scrollMode, Align_t alignment ):
-    CtrlGeneric( pIntf, rHelp, pVisible ), m_pFocus( pFocus), m_fsm( pIntf ),
+    CtrlGeneric( pIntf, rHelp, pVisible ), m_fsm( pIntf ),
     m_rVariable( rVariable ), m_cmdToManual( this ),
     m_cmdManualMoving( this ), m_cmdManualStill( this ),
     m_cmdMove( this ), m_pEvt( NULL ), m_rFont( rFont ),
     m_color( color ), m_scrollMode( scrollMode ), m_alignment( alignment ),
-    m_pImg( NULL ), m_pImgDouble( NULL ),
+    m_pFocus( pFocus), m_pImg( NULL ), m_pImgDouble( NULL ),
     m_pCurrImg( NULL ), m_xPos( 0 ), m_xOffset( 0 ),
     m_cmdUpdateText( this )
 {
