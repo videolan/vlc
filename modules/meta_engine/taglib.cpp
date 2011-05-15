@@ -53,7 +53,9 @@
 #include <id3v2tag.h>
 #include <xiphcomment.h>
 
+#ifdef HAVE_TAGLIB_APEFILE_H
 #include <apefile.h>
+#endif
 #include <flacfile.h>
 #include <mpcfile.h>
 #include <mpegfile.h>
@@ -436,12 +438,15 @@ static int ReadMeta( vlc_object_t* p_this)
 
 
     // Try now to read special tags
+#ifdef HAVE_TAGLIB_APEFILE_H
     if( APE::File* ape = dynamic_cast<APE::File*>(f.file()) )
     {
         if( ape->APETag() )
             ReadMetaFromAPE( ape->APETag(), p_demux_meta, p_meta );
     }
-    else if( FLAC::File* flac = dynamic_cast<FLAC::File*>(f.file()) )
+    else
+#endif
+    if( FLAC::File* flac = dynamic_cast<FLAC::File*>(f.file()) )
     {
         if( flac->ID3v2Tag() )
             ReadMetaFromId3v2( flac->ID3v2Tag(), p_demux_meta, p_meta );
@@ -659,12 +664,15 @@ static int WriteMeta( vlc_object_t *p_this )
 
 
     // Try now to write special tags
+#ifdef HAVE_TAGLIB_APEFILE_H
     if( APE::File* ape = dynamic_cast<APE::File*>(f.file()) )
     {
         if( ape->APETag() )
             WriteMetaToAPE( ape->APETag(), p_item );
     }
-    else if( FLAC::File* flac = dynamic_cast<FLAC::File*>(f.file()) )
+    else
+#endif
+    if( FLAC::File* flac = dynamic_cast<FLAC::File*>(f.file()) )
     {
         if( flac->ID3v2Tag() )
             WriteMetaToId3v2( flac->ID3v2Tag(), p_item );
