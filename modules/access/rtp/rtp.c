@@ -712,7 +712,7 @@ int rtp_autodetect (demux_t *demux, rtp_session_t *session,
         {
             char *dynamic = var_InheritString(demux, "rtp-dynamic-pt");
             if (dynamic == NULL)
-                ;
+                return -1;
             else if (!strcmp(dynamic, "theora"))
             {
                 msg_Dbg (demux, "assuming Theora Encoded Video");
