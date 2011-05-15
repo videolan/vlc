@@ -145,8 +145,9 @@ MetaPanel::MetaPanel( QWidget *parent,
     label->setContentsMargins( 3, 2, 0, 0 );
     metaLayout->addWidget( label, line++, 0, 1, 7 );
     description_text = new QTextEdit;
+    description_text->setAcceptRichText( false );
     metaLayout->addWidget( description_text, line, 0, 1, 7 );
-    CONNECT( description_text, textChanged(), this, enterEditMode() );
+    // CONNECT( description_text, textChanged(), this, enterEditMode() ); //FIXME
     line++;
 
     /* VLC_META_SETTING: Useless */
@@ -250,7 +251,6 @@ void MetaPanel::update( input_item_t *p_item )
     }
 
     art_cover->showArtUpdate( file );
-
 }
 
 /**
@@ -289,7 +289,6 @@ bool MetaPanel::isInEditMode()
 
 void MetaPanel::enterEditMode()
 {
-    msg_Dbg( p_intf, "Entering Edit MetaData Mode" );
     setEditMode( true );
 }
 
