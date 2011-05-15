@@ -450,15 +450,15 @@ int OpenDemux( vlc_object_t *p_this )
                     memcpy( fmt.p_extra, p_extra, i_extra );
                 }
             }
-        }
-        es = es_out_Add( p_demux->out, &fmt );
-        if( s->disposition & AV_DISPOSITION_DEFAULT )
-            es_out_Control( p_demux->out, ES_OUT_SET_ES_DEFAULT, es );
-        es_format_Clean( &fmt );
+            es = es_out_Add( p_demux->out, &fmt );
+            if( s->disposition & AV_DISPOSITION_DEFAULT )
+                es_out_Control( p_demux->out, ES_OUT_SET_ES_DEFAULT, es );
+            es_format_Clean( &fmt );
 
-        msg_Dbg( p_demux, "adding es: %s codec = %4.4s",
-                 psz_type, (char*)&fcc );
-        TAB_APPEND( p_sys->i_tk, p_sys->tk, es );
+            msg_Dbg( p_demux, "adding es: %s codec = %4.4s",
+                     psz_type, (char*)&fcc );
+            TAB_APPEND( p_sys->i_tk, p_sys->tk, es );
+        }
     }
     if( p_sys->ic->start_time != (int64_t)AV_NOPTS_VALUE )
         i_start_time = p_sys->ic->start_time * 1000000 / AV_TIME_BASE;
