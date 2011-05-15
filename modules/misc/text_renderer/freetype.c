@@ -357,7 +357,7 @@ static int Create( vlc_object_t *p_this )
         psz_fontfamily = strdup( DEFAULT_FAMILY );
 #else
 # ifdef WIN32
-        if( asprintf( &psz_fontfamily, "%s%s", p_sys->psz_win_fonts_path, DEFAULT_FONT_FILE ) == -1 )
+        if( asprintf( &psz_fontfamily, "%s"DEFAULT_FONT_FILE, p_sys->psz_win_fonts_path ) == -1 )
             goto error;
 # else
         psz_fontfamily = strdup( DEFAULT_FONT_FILE );
