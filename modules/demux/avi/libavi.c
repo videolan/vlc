@@ -630,7 +630,7 @@ static int AVI_ChunkRead_strz( stream_t *s, avi_chunk_t *p_chk )
 
     if( p_strz->i_chunk_size )
     {
-        memcpy( p_strz->p_str, p_read, i_read );
+        memcpy( p_strz->p_str, p_read, p_strz->i_chunk_size );
     }
     p_strz->p_str[i_read] = 0;
 
