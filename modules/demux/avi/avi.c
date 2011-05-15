@@ -443,8 +443,9 @@ static int Open( vlc_object_t * p_this )
                 fmt.b_packetized            = !tk->i_blocksize;
 
                 msg_Dbg( p_demux,
-                    "stream[%d] audio(0x%x) %d channels %dHz %dbits",
-                    i, p_auds->p_wf->wFormatTag, p_auds->p_wf->nChannels,
+                    "stream[%d] audio(0x%x - %s) %d channels %dHz %dbits",
+                    i, p_auds->p_wf->wFormatTag,vlc_fourcc_GetDescription(AUDIO_ES,tk->i_codec),
+                    p_auds->p_wf->nChannels,
                     p_auds->p_wf->nSamplesPerSec,
                     p_auds->p_wf->wBitsPerSample );
 
