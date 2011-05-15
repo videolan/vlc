@@ -342,10 +342,12 @@ static int AVI_ChunkRead_strf( stream_t *s, avi_chunk_t *p_chk )
             AVI_READ4BYTES( p_chk->strf.auds.p_wf->nAvgBytesPerSec );
             AVI_READ2BYTES( p_chk->strf.auds.p_wf->nBlockAlign );
             AVI_READ2BYTES( p_chk->strf.auds.p_wf->wBitsPerSample );
+
             if( p_chk->strf.auds.p_wf->wFormatTag != WAVE_FORMAT_PCM
                  && p_chk->common.i_chunk_size > sizeof( WAVEFORMATEX ) )
             {
                 AVI_READ2BYTES( p_chk->strf.auds.p_wf->cbSize );
+
                 /* prevent segfault */
                 if( p_chk->strf.auds.p_wf->cbSize >
                         p_chk->common.i_chunk_size - sizeof( WAVEFORMATEX ) )
@@ -353,11 +355,10 @@ static int AVI_ChunkRead_strf( stream_t *s, avi_chunk_t *p_chk )
                     p_chk->strf.auds.p_wf->cbSize =
                         p_chk->common.i_chunk_size - sizeof( WAVEFORMATEX );
                 }
+
                 if( p_chk->strf.auds.p_wf->wFormatTag == WAVE_FORMAT_EXTENSIBLE )
                 {
-                    /* Found an extensible header atm almost nothing uses that. */
-                    msg_Warn( (vlc_object_t*)s, "WAVE_FORMAT_EXTENSIBLE or "
-                              "vorbis audio dectected: not supported" );
+                    msg_Dbg( s, "Extended header found" );
                 }
             }
             else

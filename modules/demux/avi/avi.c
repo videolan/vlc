@@ -401,8 +401,16 @@ static int Open( vlc_object_t * p_this )
         {
             case( AVIFOURCC_auds ):
                 tk->i_cat   = AUDIO_ES;
-                tk->i_codec = AVI_FourccGetCodec( AUDIO_ES,
-                                                  p_auds->p_wf->wFormatTag );
+                if( p_auds->p_wf->wFormatTag == WAVE_FORMAT_EXTENSIBLE &&
+                    p_auds->p_wf->cbSize >= sizeof(WAVEFORMATEXTENSIBLE) - sizeof(WAVEFORMATEX) )
+                {
+                    WAVEFORMATEXTENSIBLE *p_wfe = (WAVEFORMATEXTENSIBLE *)p_auds->p_wf;
+                    tk->i_codec = AVI_FourccGetCodec( AUDIO_ES,
+                                                      p_wfe->SubFormat.Data1 );
+                }
+                else
+                    tk->i_codec = AVI_FourccGetCodec( AUDIO_ES,
+                                                      p_auds->p_wf->wFormatTag );
 
                 tk->i_blocksize = p_auds->p_wf->nBlockAlign;
                 if( tk->i_blocksize == 0 )
