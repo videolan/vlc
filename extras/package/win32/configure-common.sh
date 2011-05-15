@@ -22,8 +22,8 @@
       --enable-shout \
       --enable-goom \
       --enable-caca \
-      --enable-portaudio \
-      --enable-sdl \
+      --disable-portaudio \
+      --disable-sdl \
       --enable-qt4 \
       --enable-sse --enable-mmx \
       --enable-libcddb \
