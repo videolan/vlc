@@ -533,11 +533,13 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
             /* check if VLC is available on the bus
              * if not: D-Bus control is not enabled on the other
              * instance and we can't pass MRLs to it */
-            DBusMessage *p_test_msg = NULL;
+            DBusMessage *p_test_msg   = NULL;
             DBusMessage *p_test_reply = NULL;
+
             p_test_msg =  dbus_message_new_method_call(
-                    "org.mpris.vlc", "/",
-                    "org.freedesktop.MediaPlayer", "Identity" );
+                    "org.mpris.MediaPlayer2.vlc", "/org/mpris/MediaPlayer2",
+                    "org.mpris.MediaPlayer2",     "Identity" );
+
             /* block until a reply arrives */
             p_test_reply = dbus_connection_send_with_reply_and_block(
                     p_conn, p_test_msg, -1, &dbus_error );
@@ -571,14 +573,16 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
 
                     /* We need to resolve relative paths in this instance */
                     char *psz_mrl = make_URI( ppsz_argv[i_input], NULL );
+                    char *psz_after_track = "";
+
                     if( psz_mrl == NULL )
                         continue;
                     msg_Dbg( p_libvlc, "Adds %s to the running Media Player",
                              psz_mrl );
 
                     p_dbus_msg = dbus_message_new_method_call(
-                            "org.mpris.vlc", "/TrackList",
-                            "org.freedesktop.MediaPlayer", "AddTrack" );
+                        "org.mpris.MediaPlayer2.vlc", "/org/mpris/MediaPlayer2",
+                        "org.mpris.MediaPlayer2.TrackList", "AddTrack" );
 
                     if ( NULL == p_dbus_msg )
                     {
@@ -599,9 +603,19 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
                         exit( 1 );
                     }
                     free( psz_mrl );
+
+                    if( !dbus_message_iter_append_basic( &dbus_args,
+                                DBUS_TYPE_OBJECT_PATH, &psz_after_track ) )
+                    {
+                        dbus_message_unref( p_dbus_msg );
+                        system_End( p_libvlc );
+                        exit( 1 );
+                    }
+
                     b_play = TRUE;
                     if( var_InheritBool( p_libvlc, "playlist-enqueue" ) )
                         b_play = FALSE;
+
                     if ( !dbus_message_iter_append_basic( &dbus_args,
                                 DBUS_TYPE_BOOLEAN, &b_play ) )
                     {
