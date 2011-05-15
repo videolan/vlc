@@ -1730,14 +1730,14 @@ dnl
 dnl Growl notification plugin
 dnl
 AC_ARG_ENABLE(growl,
-  [AS_HELP_STRING([--enable-growl],
-    [enable growl notifications (default disabled)])],,
-  [enable_growl="no"])
+  [  --enable-growl          growl notification plugin (default disabled)],,
+  [enable_growl=no])
 AS_IF([test "${enable_growl}" != "no"], [
     VLC_ADD_PLUGIN([growl_udp])
-    AC_CHECK_HEADERS(Growl/GrowlDefines.h, [
+    AC_CHECK_HEADERS(${CONTRIB_DIR}/Growl/Growl.framework/Versions/A/Headers/GrowlDefines.h, [
       VLC_ADD_PLUGIN([growl])
-      VLC_ADD_LDFLAGS([growl], [-Wl,-framework,Growl,-framework,AppKit])
+      VLC_ADD_LDFLAGS([growl], [-F${CONTRIB_DIR}/Growl -Wl,-framework,Growl,-framework,CoreFoundation])
+      VLC_ADD_OBJCFLAGS([growl], [-F${CONTRIB_DIR}/Growl])
       VLC_ADD_OBJCFLAGS([growl], [-fobjc-exceptions] )
     ])
   ]
