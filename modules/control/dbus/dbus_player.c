@@ -38,7 +38,7 @@
 #include "dbus_player.h"
 #include "dbus_common.h"
 
-static int MarshalStatus ( intf_thread_t *, DBusMessageIter * );
+static void MarshalLoopStatus ( intf_thread_t *, DBusMessageIter * );
 
 DBUS_METHOD( Position )
 { /* returns position in microseconds */
@@ -371,6 +371,8 @@ DBUS_METHOD( CanPause )
 
 DBUS_METHOD( CanControl )
 {
+    VLC_UNUSED( p_this );
+
     REPLY_INIT;
     OUT_ARGUMENTS;
 
@@ -464,7 +466,8 @@ static void
 MarshalPlaybackStatus( intf_thread_t *p_intf, DBusMessageIter *container )
 {
     input_thread_t *p_input;
-    char *psz_playback_status;
+    const char *psz_playback_status;
+
     if( ( p_input = playlist_CurrentInput( p_intf->p_sys->p_playlist ) ) )
     {
         switch( var_GetInteger( p_input, "state" ) )
@@ -564,6 +567,8 @@ DBUS_METHOD( RateSet )
 
 DBUS_METHOD( MinimumRate )
 {
+    VLC_UNUSED( p_this );
+
     REPLY_INIT;
     OUT_ARGUMENTS;
 
@@ -584,6 +589,8 @@ DBUS_METHOD( MinimumRate )
 
 DBUS_METHOD( MaximumRate )
 {
+    VLC_UNUSED( p_this );
+
     REPLY_INIT;
     OUT_ARGUMENTS;
 
@@ -605,11 +612,14 @@ DBUS_METHOD( MaximumRate )
 static void
 MarshalLoopStatus( intf_thread_t *p_intf, DBusMessageIter *container )
 {
-    char *psz_loop_status;
+    const char *psz_loop_status;
+
     if( var_GetBool( p_intf->p_sys->p_playlist, "repeat" ) )
         psz_loop_status = LOOP_STATUS_TRACK;
+
     else if( var_GetBool( p_intf->p_sys->p_playlist, "loop" ) )
         psz_loop_status = LOOP_STATUS_PLAYLIST;
+
     else
         psz_loop_status = LOOP_STATUS_NONE;
 

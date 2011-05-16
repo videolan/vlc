@@ -95,7 +95,6 @@ static int  Open    ( vlc_object_t * );
 static void Close   ( vlc_object_t * );
 static void Run     ( intf_thread_t * );
 
-static int StateChange( intf_thread_t * );
 static int TrackChange( intf_thread_t * );
 static int AllCallback( vlc_object_t*, const char*, vlc_value_t, vlc_value_t, void* );
 
@@ -780,7 +779,7 @@ static void DispatchDBusMessages( intf_thread_t *p_intf )
 static DBusHandlerResult
 MPRISEntryPoint ( DBusConnection *p_conn, DBusMessage *p_from, void *p_this )
 {
-    char *psz_target_interface;
+    const char *psz_target_interface;
     const char *psz_interface = dbus_message_get_interface( p_from );
     const char *psz_method    = dbus_message_get_member( p_from );
 
@@ -968,7 +967,7 @@ static int InputIntfEventCallback( intf_thread_t   *p_intf,
     dbus_int32_t i_state = PLAYBACK_STATE_INVALID;
     assert(!p_info->signal);
     mtime_t i_now = mdate(), i_pos, i_projected_pos, i_interval;
-    float f_current_rate, f_computed_rate;
+    float f_current_rate;
 
     switch( i_event )
     {
@@ -1075,8 +1074,9 @@ static int AllCallback( vlc_object_t *p_this, const char *psz_var,
 
     else if( !strcmp( "intf-event", psz_var ) )
     {
-        int i_res;
-        i_res = InputIntfEventCallback( p_intf, p_this, newval.i_int, info );
+        int i_res = InputIntfEventCallback( p_intf,
+                                            (input_thread_t*) p_this,
+                                            newval.i_int, info );
         if( VLC_SUCCESS != i_res )
         {
             vlc_mutex_unlock( &p_intf->p_sys->lock );
@@ -1104,39 +1104,6 @@ static int AllCallback( vlc_object_t *p_this, const char *psz_var,
              "in order to process it", psz_var );
 
     wakeup_main_loop( p_intf );
-
-    return VLC_SUCCESS;
-}
-
-/*****************************************************************************
- * StateChange: callback on input "state"
- *****************************************************************************/
-static int StateChange( intf_thread_t *p_intf )
-{
-    intf_sys_t          *p_sys      = p_intf->p_sys;
-    playlist_t          *p_playlist = p_sys->p_playlist;
-    input_thread_t      *p_input;
-    input_item_t        *p_item;
-
-    if( p_intf->p_sys->b_dead )
-        return VLC_SUCCESS;
-
-    if( !p_sys->b_meta_read && p_sys->i_playing_state == 0)
-    {
-        p_input = playlist_CurrentInput( p_playlist );
-        if( p_input )
-        {
-            p_item = input_GetItem( p_input );
-            if( p_item )
-            {
-                p_sys->b_meta_read = true;
-                TrackChangedEmit( p_intf, p_item );
-            }
-            vlc_object_release( p_input );
-        }
-    }
-
-    PlayerStatusChangedEmit( p_intf );
 
     return VLC_SUCCESS;
 }
