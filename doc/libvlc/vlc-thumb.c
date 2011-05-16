@@ -56,7 +56,8 @@ static void cmdline(int argc, const char **argv, const char **in,
 
     *in  = argv[idx++];
     *out = strdup(argv[idx++]);
-    assert(*out);
+    if (!*out)
+        abort();
 
     len = strlen(*out);
     if (len >= 4 && !strcmp(*out + len - 4, ".png")) {
@@ -69,7 +70,8 @@ static void cmdline(int argc, const char **argv, const char **in,
      * and nautilus doesn't give filenames ending in .png */
 
     *out_with_ext = malloc(len + sizeof ".png");
-    assert(*out_with_ext);
+    if (!*out_with_ext)
+        abort();
     strcpy(*out_with_ext, *out);
     strcat(*out_with_ext, ".png");
 }
@@ -86,7 +88,7 @@ static libvlc_instance_t *create_libvlc(void)
         "--no-inhibit",                     /* we don't want interfaces       */
         "--no-disable-screensaver",         /* we don't want interfaces       */
         "--no-snapshot-preview",            /* no blending in dummy vout      */
-#if 1
+#ifndef NDEBUG
         "--verbose=2",                      /* full log                       */
 #endif
     };
@@ -167,7 +169,7 @@ int main(int argc, const char **argv)
     libvlc_media_t *m;
 
     /* mandatory to support UTF-8 filenames (provided the locale is well set)*/
-    setlocale(LC_ALL, getenv("LANG"));
+    setlocale(LC_ALL, "");
 
     cmdline(argc, argv, &in, &out, &out_with_ext, &width);
 
