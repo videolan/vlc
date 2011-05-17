@@ -40,7 +40,7 @@ mvlc
 nvlc
 wxvlc
 vlc_install_dir/*
-plugins-*.dat
+plugins.dat
 patches/*
 
 # Ignore CMake Stuff

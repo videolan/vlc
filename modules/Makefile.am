@@ -61,7 +61,7 @@ SUBDIRS += .
 
 dist_noinst_SCRIPTS = genmf list.sh
 dist_noinst_DATA = LIST
-MOSTLYCLEANFILES = plugins-*-*.dat
+MOSTLYCLEANFILES = plugins.dat*
 
 .PHONY: stamp-cache
 
