@@ -162,9 +162,9 @@ static int KeyEvent( vlc_object_t *p_this, char const *psz_var,
 
 static void stop_osdvnc ( filter_t *p_filter );
 
-static void* vnc_worker_thread ( vlc_object_t *p_thread_obj );
+static void* vnc_worker_thread ( void * );
 
-static void* update_request_thread( vlc_object_t *p_thread_obj );
+static void* update_request_thread( void * );
 
 static bool open_vnc_connection ( filter_t *p_filter );
 
@@ -234,7 +234,7 @@ struct filter_sys_t
 
     bool          b_continue;
 
-    vlc_object_t* p_worker_thread;
+    vlc_thread_t  worker_thread;
 
     uint8_t       ar_color_table_yuv[256][4];
 };
@@ -315,13 +315,9 @@ static int CreateFilter ( vlc_object_t *p_this )
     vlc_gcrypt_init();
 
     /* create the vnc worker thread */
-    p_sys->p_worker_thread = vlc_object_create( p_this,
-                                                sizeof( vlc_object_t ) );
-    vlc_object_attach( p_sys->p_worker_thread, p_this );
-    if( vlc_thread_create( p_sys->p_worker_thread,
-                           vnc_worker_thread, VLC_THREAD_PRIORITY_LOW ) )
+    if( vlc_clone( &p_sys->worker_thread,
+                   vnc_worker_thread, p_filter, VLC_THREAD_PRIORITY_LOW ) )
     {
-        vlc_object_release( p_sys->p_worker_thread );
         msg_Err( p_filter, "cannot spawn vnc message reader thread" );
         goto error;
     }
@@ -380,14 +376,10 @@ static void stop_osdvnc ( filter_t *p_filter )
     vlc_object_kill( p_filter );
 
     /* */
-    if( p_sys->p_worker_thread )
-    {
-        msg_Dbg( p_filter, "joining worker_thread" );
-        vlc_object_kill( p_sys->p_worker_thread );
-        vlc_thread_join( p_sys->p_worker_thread );
-        vlc_object_release( p_sys->p_worker_thread );
-        msg_Dbg( p_filter, "released worker_thread" );
-    }
+    msg_Dbg( p_filter, "joining worker_thread" );
+    vlc_cancel( p_sys->worker_thread );
+    vlc_join( p_sys->worker_thread, NULL );
+    msg_Dbg( p_filter, "released worker_thread" );
 
     msg_Dbg( p_filter, "osdvnc stopped" );
 }
@@ -645,11 +637,11 @@ static bool handshaking ( filter_t *p_filter )
 
 }
 
-static void* vnc_worker_thread( vlc_object_t *p_thread_obj )
+static void* vnc_worker_thread( void *obj )
 {
-    filter_t* p_filter = (filter_t*)(p_thread_obj->p_parent);
+    filter_t* p_filter = (filter_t*)obj;
     filter_sys_t *p_sys = p_filter->p_sys;
-    vlc_object_t *p_update_request_thread;
+    vlc_thread_t update_request_thread_handle;
     int canc = vlc_savecancel ();
 
     msg_Dbg( p_filter, "VNC worker thread started" );
@@ -683,19 +675,17 @@ static void* vnc_worker_thread( vlc_object_t *p_thread_obj )
     vlc_mutex_unlock( &p_sys->lock );
 
     /* create the update request thread */
-    p_update_request_thread = vlc_object_create( p_filter,
-                                                 sizeof( vlc_object_t ) );
-    vlc_object_attach( p_update_request_thread, p_filter );
-    if( vlc_thread_create( p_update_request_thread,
-                           update_request_thread, VLC_THREAD_PRIORITY_LOW ) )
+    if( vlc_clone( &update_request_thread_handle,
+                   update_request_thread, p_filter,
+                   VLC_THREAD_PRIORITY_LOW ) )
     {
-        vlc_object_release( p_update_request_thread );
         msg_Err( p_filter, "cannot spawn vnc update request thread" );
         goto exit;
     }
 
     /* connection is initialized, now read and handle server messages */
-    while( vlc_object_alive( p_thread_obj ) )
+    vlc_restorecancel (canc);
+    for( ;; )
     {
         rfbServerToClientMsg msg;
         int i_msgSize;
@@ -743,13 +733,16 @@ static void* vnc_worker_thread( vlc_object_t *p_thread_obj )
                 break;
             }
         }
+
+        canc = vlc_savecancel ();
         process_server_message( p_filter, &msg);
+        vlc_restorecancel (canc);
     }
+    canc = vlc_savecancel ();
 
     msg_Dbg( p_filter, "joining update_request_thread" );
-    vlc_object_kill( p_update_request_thread );
-    vlc_thread_join( p_update_request_thread );
-    vlc_object_release( p_update_request_thread );
+    vlc_cancel( update_request_thread_handle );
+    vlc_join( update_request_thread_handle, NULL );
     msg_Dbg( p_filter, "released update_request_thread" );
 
 exit:
@@ -773,11 +766,17 @@ exit:
     return NULL;
 }
 
-static void* update_request_thread( vlc_object_t *p_thread_obj )
+static void update_request_thread_cleanup( void *obj )
 {
-    filter_t* p_filter = (filter_t*)(p_thread_obj->p_parent);
+    filter_t* p_filter = (filter_t*)obj;
+
+    p_filter->p_sys->b_continue = false;
+}
+
+static void* update_request_thread( void *obj )
+{
+    filter_t* p_filter = (filter_t*)obj;
     filter_sys_t *p_sys = p_filter->p_sys;
-    int canc = vlc_savecancel ();
 
     msg_Dbg( p_filter, "VNC update request thread started" );
 
@@ -789,11 +788,16 @@ static void* update_request_thread( vlc_object_t *p_thread_obj )
     udr.w = htons(p_sys->i_vnc_width);
     udr.h = htons(p_sys->i_vnc_height);
 
-    if( !write_exact(p_filter, p_sys->i_socket, (char*)&udr,
-                     sz_rfbFramebufferUpdateRequestMsg) )
+    int w;
+    vlc_cleanup_push( update_request_thread_cleanup, p_filter );
+    w = write_exact(p_filter, p_sys->i_socket, (char*)&udr,
+                    sz_rfbFramebufferUpdateRequestMsg);
+    vlc_cleanup_pop();
+
+    if( !w )
     {
         msg_Err( p_filter, "Could not write rfbFramebufferUpdateRequestMsg." );
-        p_sys->b_continue = false;
+        update_request_thread_cleanup( p_filter );
         return NULL;
     }
 
@@ -802,7 +806,8 @@ static void* update_request_thread( vlc_object_t *p_thread_obj )
 
     if( p_sys->b_vnc_poll)
     {
-        while( vlc_object_alive( p_thread_obj ) )
+        vlc_cleanup_push( update_request_thread_cleanup, p_filter );
+        for( ;; )
         {
             msleep( i_poll_interval_microsec );
             if( !write_exact(p_filter, p_sys->i_socket, (char*)&udr,
@@ -812,7 +817,7 @@ static void* update_request_thread( vlc_object_t *p_thread_obj )
                 break;
             }
         }
-        p_sys->b_continue = false;
+        vlc_cleanup_run();
     }
     else
     {
@@ -820,7 +825,6 @@ static void* update_request_thread( vlc_object_t *p_thread_obj )
     }
 
     msg_Dbg( p_filter, "VNC update request thread ended" );
-    vlc_restorecancel (canc);
     return NULL;
 }
 
