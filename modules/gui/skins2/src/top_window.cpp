@@ -31,6 +31,7 @@
 #include "var_manager.hpp"
 #include "../commands/cmd_on_top.hpp"
 #include "../commands/cmd_dialogs.hpp"
+#include "../commands/cmd_add_item.hpp"
 #include "../controls/ctrl_generic.hpp"
 #include "../events/evt_refresh.hpp"
 #include "../events/evt_enter.hpp"
@@ -42,10 +43,12 @@
 #include "../events/evt_key.hpp"
 #include "../events/evt_special.hpp"
 #include "../events/evt_scroll.hpp"
+#include "../events/evt_dragndrop.hpp"
 #include "../utils/position.hpp"
 #include "../utils/ustring.hpp"
 
 #include <vlc_keys.h>
+#include <list>
 
 
 TopWindow::TopWindow( intf_thread_t *pIntf, int left, int top,
@@ -53,9 +56,11 @@ TopWindow::TopWindow( intf_thread_t *pIntf, int left, int top,
                       bool dragDrop, bool playOnDrop, bool visible,
                       GenericWindow::WindowType_t type ):
     GenericWindow( pIntf, left, top, dragDrop, playOnDrop, NULL, type ),
-    m_initialVisibility( visible ), m_rWindowManager( rWindowManager ),
+    m_initialVisibility( visible ), m_playOnDrop( playOnDrop ),
+    m_rWindowManager( rWindowManager ),
     m_pActiveLayout( NULL ), m_pLastHitControl( NULL ),
-    m_pCapturingControl( NULL ), m_pFocusControl( NULL ), m_currModifier( 0 )
+    m_pCapturingControl( NULL ), m_pFocusControl( NULL ),
+    m_pDragControl( NULL ), m_currModifier( 0 )
 {
     // Register as a moving window
     m_rWindowManager.registerWindow( *this );
@@ -264,6 +269,66 @@ void TopWindow::processEvent( EvtScroll &rEvtScroll )
     }
 }
 
+void TopWindow::processEvent( EvtDragDrop &rEvtDragDrop )
+{
+    // Get the control hit by the mouse
+    int xPos = rEvtDragDrop.getXPos() - getLeft();
+    int yPos = rEvtDragDrop.getYPos() - getTop();
+
+    CtrlGeneric *pHitControl = findHitControl( xPos, yPos );
+    if( pHitControl && pHitControl->getType() == "tree" )
+    {
+        // Send a dragDrop event
+        EvtDragDrop evt( getIntf(), xPos, yPos, rEvtDragDrop.getFiles() );
+        pHitControl->handleEvent( evt );
+    }
+    else
+    {
+        list<string> files = rEvtDragDrop.getFiles();
+        list<string>::const_iterator it = files.begin();
+        for( bool first = true; it != files.end(); ++it, first = false )
+        {
+            bool playOnDrop = m_playOnDrop && first;
+            CmdAddItem( getIntf(), it->c_str(), playOnDrop ).execute();
+        }
+    }
+    m_pDragControl = NULL;
+}
+
+void TopWindow::processEvent( EvtDragOver &rEvtDragOver )
+{
+    // Get the control hit by the mouse
+    int xPos = rEvtDragOver.getXPos() - getLeft();
+    int yPos = rEvtDragOver.getYPos() - getTop();
+
+    CtrlGeneric *pHitControl = findHitControl( xPos, yPos );
+
+    if( m_pDragControl && m_pDragControl != pHitControl )
+    {
+        EvtDragLeave evt( getIntf() );
+        m_pDragControl->handleEvent( evt );
+    }
+
+    m_pDragControl = pHitControl;
+
+    if( m_pDragControl )
+    {
+        // Send a dragOver event
+        EvtDragOver evt( getIntf(), xPos, yPos );
+        m_pDragControl->handleEvent( evt );
+    }
+}
+
+void TopWindow::processEvent( EvtDragLeave &rEvtDragLeave )
+{
+    (void)rEvtDragLeave;
+    if( m_pDragControl )
+    {
+        EvtDragLeave evt( getIntf() );
+        m_pDragControl->handleEvent( evt );
+        m_pDragControl = NULL;
+    }
+}
 
 void TopWindow::forwardEvent( EvtGeneric &rEvt, CtrlGeneric &rCtrl )
 {

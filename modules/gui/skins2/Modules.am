@@ -82,6 +82,7 @@ SOURCES_skins2 = \
 	events/evt_special.hpp \
 	events/evt_scroll.cpp \
 	events/evt_scroll.hpp \
+	events/evt_dragndrop.hpp \
 	\
 	parser/builder.cpp \
 	parser/builder.hpp \

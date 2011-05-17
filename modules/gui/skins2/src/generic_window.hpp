@@ -38,6 +38,10 @@ class EvtMouse;
 class EvtKey;
 class EvtRefresh;
 class EvtScroll;
+class EvtDragEnter;
+class EvtDragLeave;
+class EvtDragOver;
+class EvtDragDrop;
 class WindowManager;
 
 
@@ -72,6 +76,15 @@ public:
     virtual void processEvent( EvtLeave &rEvtLeave ) { (void)rEvtLeave; }
     virtual void processEvent( EvtKey &rEvtKey ) { (void)rEvtKey; }
     virtual void processEvent( EvtScroll &rEvtScroll ) { (void)rEvtScroll; }
+
+    virtual void processEvent( EvtDragEnter &rEvtDragEnter )
+        { (void)rEvtDragEnter; }
+    virtual void processEvent( EvtDragLeave &rEvtDragLeave )
+        { (void)rEvtDragLeave; }
+    virtual void processEvent( EvtDragOver &rEvtDragOver )
+        { (void)rEvtDragOver; }
+    virtual void processEvent( EvtDragDrop &rEvtDragDrop )
+        { (void)rEvtDragDrop; }
 
     virtual void processEvent( EvtRefresh &rEvtRefresh );
 

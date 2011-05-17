@@ -28,12 +28,13 @@
 #include <shellapi.h>
 #include <ole2.h>
 #include "../src/skin_common.hpp"
+#include "../src/generic_window.hpp"
 
 
 class Win32DragDrop: public SkinObject, public IDropTarget
 {
 public:
-   Win32DragDrop( intf_thread_t *pIntf, bool playOnDrop );
+   Win32DragDrop( intf_thread_t *pIntf, bool playOnDrop, GenericWindow* pWin );
    virtual ~Win32DragDrop() { }
 
 protected:
@@ -55,9 +56,11 @@ private:
     unsigned long m_references;
     /// Indicates whether the file(s) must be played immediately
     bool m_playOnDrop;
+    ///
+    GenericWindow* m_pWin;
 
     /// Helper function
-    void HandleDrop( HDROP HDrop );
+    void HandleDrop( HDROP HDrop, int x, int y );
 };
 
 

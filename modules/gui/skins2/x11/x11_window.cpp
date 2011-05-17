@@ -41,7 +41,7 @@ X11Window::X11Window( intf_thread_t *pIntf, GenericWindow &rWindow,
                       X11Display &rDisplay, bool dragDrop, bool playOnDrop,
                       X11Window *pParentWindow, GenericWindow::WindowType_t type ):
     OSWindow( pIntf ), m_rDisplay( rDisplay ), m_pParent( pParentWindow ),
-    m_dragDrop( dragDrop ), m_type ( type )
+    m_dragDrop( dragDrop ), m_pDropTarget( NULL ), m_type ( type )
 {
     XSetWindowAttributes attr;
     unsigned long valuemask;
@@ -150,7 +150,7 @@ X11Window::X11Window( intf_thread_t *pIntf, GenericWindow &rWindow,
     {
         // Create a Dnd object for this window
         m_pDropTarget = new X11DragDrop( getIntf(), m_rDisplay, m_wnd,
-                                         playOnDrop );
+                                         playOnDrop, &rWindow );
 
         // Register the window as a drop target
         Atom xdndAtom = XInternAtom( XDISPLAY, "XdndAware", False );
@@ -229,10 +229,8 @@ X11Window::~X11Window()
     pFactory->m_windowMap[m_wnd] = NULL;
     pFactory->m_dndMap[m_wnd] = NULL;
 
-    if( m_dragDrop )
-    {
-        delete m_pDropTarget;
-    }
+    delete m_pDropTarget;
+
     XDestroyWindow( XDISPLAY, m_wnd );
     XSync( XDISPLAY, False );
 }

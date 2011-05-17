@@ -118,8 +118,8 @@ Win32Window::Win32Window( intf_thread_t *pIntf, GenericWindow &rWindow,
     // Drag & drop
     if( m_dragDrop )
     {
-        m_pDropTarget = (LPDROPTARGET) new Win32DragDrop( getIntf(),
-                                                          playOnDrop );
+        m_pDropTarget = (LPDROPTARGET)
+            new Win32DragDrop( getIntf(), playOnDrop, &rWindow );
         // Register the window as a drop target
         RegisterDragDrop( m_hWnd, m_pDropTarget );
     }
