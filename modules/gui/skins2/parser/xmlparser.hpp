@@ -59,9 +59,9 @@ protected:
     bool m_errors;
 
     /// Callbacks
-    virtual void handleBeginElement( const string &rName,
-                                     AttrList_t &attr ) { }
-    virtual void handleEndElement( const string &rName ) { }
+    virtual void handleBeginElement( const string &rName, AttrList_t &attr )
+        { (void)rName; (void)attr; }
+    virtual void handleEndElement( const string &rName ) { (void)rName; }
 
 private:
     void LoadCatalog();

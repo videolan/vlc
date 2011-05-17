@@ -240,6 +240,7 @@ void CtrlImage::draw( OSGraphics &rImage, int xDest, int yDest, int w, int h )
 
 void CtrlImage::onUpdate( Subject<VarString> &rVariable, void* arg )
 {
+    (void)arg;
     VlcProc *pVlcProc = VlcProc::instance( getIntf() );
 
     if( &rVariable == &pVlcProc->getStreamArtVar() )

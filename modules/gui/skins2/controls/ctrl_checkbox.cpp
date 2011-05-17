@@ -246,12 +246,14 @@ void CtrlCheckbox::CmdHiddenUp::execute()
 
 void CtrlCheckbox::onVarBoolUpdate( VarBool &rVariable )
 {
+    (void)rVariable;
     changeButton();
 }
 
 
 void CtrlCheckbox::onUpdate( Subject<AnimBitmap> &rBitmap, void *arg )
 {
+    (void)rBitmap;(void)arg;
     notifyLayout( m_pImgCurrent->getWidth(), m_pImgCurrent->getHeight() );
 }
 

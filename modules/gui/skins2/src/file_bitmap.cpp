@@ -37,10 +37,11 @@ FileBitmap::FileBitmap( intf_thread_t *pIntf, image_handler_t *pImageHandler,
     GenericBitmap( pIntf, nbFrames, fps, nbLoops ), m_width( 0 ), m_height( 0 ),
     m_pData( NULL )
 {
-    video_format_t fmt_in = {0}, fmt_out = {0};
+    video_format_t fmt_in, fmt_out;
     picture_t *pPic;
 
-    fmt_out.i_chroma = VLC_CODEC_RGBA;
+    video_format_Init( &fmt_in, 0 );
+    video_format_Init( &fmt_out, VLC_CODEC_RGBA );
 
     char* psz_uri = make_URI( fileName.c_str(), NULL );
     pPic = image_ReadUrl( pImageHandler, psz_uri, &fmt_in, &fmt_out );

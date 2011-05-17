@@ -507,6 +507,7 @@ VarBool *Interpreter::getVarBool( const string &rName, Theme *pTheme )
 
 VarPercent *Interpreter::getVarPercent( const string &rName, Theme *pTheme )
 {
+    (void)pTheme;
     VarManager *pVarManager = VarManager::instance( getIntf() );
     return static_cast<VarPercent*>(pVarManager->getVar( rName, "percent" ));
 }
@@ -514,6 +515,7 @@ VarPercent *Interpreter::getVarPercent( const string &rName, Theme *pTheme )
 
 VarList *Interpreter::getVarList( const string &rName, Theme *pTheme )
 {
+    (void)pTheme;
     VarManager *pVarManager = VarManager::instance( getIntf() );
     return static_cast<VarList*>(pVarManager->getVar( rName, "list" ));
 }
@@ -521,6 +523,7 @@ VarList *Interpreter::getVarList( const string &rName, Theme *pTheme )
 
 VarTree *Interpreter::getVarTree( const string &rName, Theme *pTheme )
 {
+    (void)pTheme;
     VarManager *pVarManager = VarManager::instance( getIntf() );
     return static_cast<VarTree*>(pVarManager->getVar( rName, "tree" ));
 }

@@ -71,8 +71,9 @@ void Tooltip::hide()
 }
 
 
-void Tooltip::onUpdate( Subject<VarText> &rVariable , void *arg)
+void Tooltip::onUpdate( Subject<VarText> &rVariable, void *arg )
 {
+    (void)arg;
     // Redisplay the tooltip
     displayText( ((VarText&)rVariable).get() );
 }

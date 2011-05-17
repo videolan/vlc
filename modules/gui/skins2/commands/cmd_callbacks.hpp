@@ -36,7 +36,7 @@ public:
                  void (VlcProc::*func)(vlc_object_t *,vlc_value_t),
                  string label )
         : CmdGeneric( pIntf ), m_pObj( pObj ), m_newVal( newVal ),
-          m_pfExecute( func ), m_label( label )
+          m_label( label ), m_pfExecute( func )
     {
         if( m_pObj )
             vlc_object_hold( m_pObj );

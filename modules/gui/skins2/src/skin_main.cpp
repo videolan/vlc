@@ -404,7 +404,6 @@ static int WindowControl( vout_window_t *pWnd, int query, va_list args )
 {
     vout_window_sys_t* sys = pWnd->sys;
     intf_thread_t *pIntf = sys->pIntf;
-    VoutManager *pVoutManager = VoutManager::instance( pIntf );
     AsyncQueue *pQueue = AsyncQueue::instance( pIntf );
 
     switch( query )

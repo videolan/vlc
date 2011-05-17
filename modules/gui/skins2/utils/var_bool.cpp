@@ -63,6 +63,7 @@ VarBoolAndBool::~VarBoolAndBool()
 
 void VarBoolAndBool::onUpdate( Subject<VarBool> &rVariable, void *arg )
 {
+    (void)rVariable; (void)arg;
     if( m_value != ( m_rVar1.get() && m_rVar2.get() ) )
     {
         m_value = ( m_rVar1.get() && m_rVar2.get() );
@@ -88,8 +89,9 @@ VarBoolOrBool::~VarBoolOrBool()
 }
 
 
-void VarBoolOrBool::onUpdate( Subject<VarBool> &rVariable , void*arg)
+void VarBoolOrBool::onUpdate( Subject<VarBool> &rVariable, void *arg )
 {
+    (void)rVariable; (void)arg;
     if( m_value != ( m_rVar1.get() || m_rVar2.get() ) )
     {
         m_value = ( m_rVar1.get() || m_rVar2.get() );
@@ -111,8 +113,9 @@ VarNotBool::~VarNotBool()
 }
 
 
-void VarNotBool::onUpdate( Subject<VarBool> &rVariable, void*arg )
+void VarNotBool::onUpdate( Subject<VarBool> &rVariable, void *arg )
 {
+    (void)rVariable; (void)arg;
     notify();
 }
 

@@ -47,13 +47,15 @@ public:
     virtual ~CtrlGeneric();
 
     /// Handle an event on the control
-    virtual void handleEvent( EvtGeneric &rEvent ) { }
+    virtual void handleEvent( EvtGeneric &rEvent ) { (void)rEvent; }
 
     /// Check whether coordinates are inside the control
-    virtual bool mouseOver( int x, int y ) const { return false; }
+    virtual bool mouseOver( int x, int y ) const
+        { (void)x; (void)y; return false; }
 
     /// Draw the control on the given graphics
-    virtual void draw( OSGraphics &rImage, int xDest, int yDest, int w, int h ) { }
+    virtual void draw( OSGraphics &rImage, int xDest,
+                       int yDest, int w, int h ) = 0;
 
     /// Set the position and the associated layout of the control
     virtual void setLayout( GenericLayout *pLayout,
@@ -124,7 +126,7 @@ protected:
     virtual void onPositionChange() { }
 
     /// Overload this method to get notified of bool variable changes
-    virtual void onVarBoolUpdate( VarBool &rVar ) { }
+    virtual void onVarBoolUpdate( VarBool &rVar ) { (void)rVar; }
 
     /// Method called when an observed bool variable is changed
     virtual void onUpdate( Subject<VarBool> &rVariable , void* );

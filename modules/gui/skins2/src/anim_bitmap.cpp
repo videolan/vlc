@@ -29,8 +29,8 @@
 
 
 AnimBitmap::AnimBitmap( intf_thread_t *pIntf, const GenericBitmap &rBitmap ):
-    SkinObject( pIntf ), m_pImage( NULL ), m_curFrame( 0 ), m_curLoop( 0 ),
-    m_pTimer( NULL ), m_cmdNextFrame( this ), m_rBitmap( rBitmap )
+    SkinObject( pIntf ), m_rBitmap( rBitmap ), m_pImage( NULL ),
+    m_curFrame( 0 ), m_curLoop( 0 ), m_pTimer( NULL ), m_cmdNextFrame( this )
 {
     // Build the graphics
     OSFactory *pOsFactory = OSFactory::instance( pIntf );

@@ -28,9 +28,9 @@
 const string VarTree::m_type = "tree";
 
 VarTree::VarTree( intf_thread_t *pIntf )
-    : Variable( pIntf ), m_id( 0 ), m_selected( false ), m_playing( false ),
-    m_expanded( false ), m_deleted( false ),
-    m_pData( NULL ), m_pParent( NULL ), m_readonly( false )
+    : Variable( pIntf ), m_pParent( NULL ), m_id( 0 ), m_pData( NULL ),
+      m_readonly( false ), m_selected( false ), m_playing( false ),
+      m_expanded( false ), m_deleted( false )
 {
     // Create the position variable
     m_cPosition = VariablePtr( new VarPercent( pIntf ) );
@@ -40,10 +40,10 @@ VarTree::VarTree( intf_thread_t *pIntf )
 VarTree::VarTree( intf_thread_t *pIntf, VarTree *pParent, int id,
                   const UStringPtr &rcString, bool selected, bool playing,
                   bool expanded, bool readonly, void *pData )
-    : Variable( pIntf ), m_id( id ), m_cString( rcString ),
-    m_selected( selected ), m_playing( playing ), m_expanded( expanded ),
-    m_deleted( false ), m_pData( pData ), m_pParent( pParent ),
-    m_readonly( readonly )
+    : Variable( pIntf ), m_pParent( pParent ),
+      m_id( id ), m_pData( pData ), m_cString( rcString ),
+      m_readonly( readonly ), m_selected( selected ), m_playing( playing ),
+      m_expanded( expanded ), m_deleted( false )
 {
     // Create the position variable
     m_cPosition = VariablePtr( new VarPercent( pIntf ) );

@@ -82,6 +82,8 @@ BitmapFont::BitmapFont( intf_thread_t *pIntf, const GenericBitmap &rBitmap,
 GenericBitmap *BitmapFont::drawString( const UString &rString,
                                        uint32_t color, int maxWidth ) const
 {
+    (void)color; (void)maxWidth;
+
     uint32_t *pString = (uint32_t*)rString.u_str();
     // Compute the text width
     int width = 0;

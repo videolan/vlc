@@ -75,7 +75,7 @@ TopWindow::~TopWindow()
 
 void TopWindow::processEvent( EvtFocus &rEvtFocus )
 {
-//    fprintf(stderr, rEvtFocus.getAsString().c_str());
+    (void)rEvtFocus;
 }
 
 
@@ -130,9 +130,10 @@ void TopWindow::processEvent( EvtMotion &rEvtMotion )
 
 void TopWindow::processEvent( EvtLeave &rEvtLeave )
 {
+    (void)rEvtLeave;
+
     // No more hit control
     setLastHit( NULL );
-
     if( !m_pCapturingControl )
     {
         m_rWindowManager.hideTooltip();

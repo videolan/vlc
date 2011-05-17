@@ -105,9 +105,9 @@ void CtrlRadialSlider::draw( OSGraphics &rImage, int xDest, int yDest, int w, in
 }
 
 
-void CtrlRadialSlider::onUpdate( Subject<VarPercent> &rVariable,
-                                 void *arg  )
+void CtrlRadialSlider::onUpdate( Subject<VarPercent> &rVariable, void *arg )
 {
+    (void)arg;
     if( &rVariable == &m_rVariable )
     {
         int position = (int)( m_rVariable.get() * ( m_numImg - 1 ) );

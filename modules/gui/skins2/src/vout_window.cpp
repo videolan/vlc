@@ -38,7 +38,7 @@ VoutWindow::VoutWindow( intf_thread_t *pIntf, vout_window_t* pWnd,
       GenericWindow( pIntf, 0, 0, false, false, pParent,
                      GenericWindow::VoutWindow ),
       m_pWnd( pWnd ), original_width( width ), original_height( height ),
-      m_pParentWindow( pParent ), m_pCtrlVideo( NULL )
+      m_pCtrlVideo( NULL ), m_pParentWindow( pParent )
 {
     if( m_pWnd )
     {
@@ -51,7 +51,6 @@ VoutWindow::VoutWindow( intf_thread_t *pIntf, vout_window_t* pWnd,
         m_pWnd->handle.hwnd = getOSHandle();
 #endif
     }
-
 }
 
 

@@ -493,6 +493,8 @@ union tar_buffer {
 
 int tar_open( TAR **t, char *pathname, int oflags )
 {
+    (void)oflags;
+
     gzFile f = gzopen( pathname, "rb" );
     if( f == NULL )
     {
@@ -713,6 +715,8 @@ static void * currentGzVp = NULL;
 
 int gzopen_frontend( const char *pathname, int oflags, int mode )
 {
+    (void)mode;
+
     const char *gzflags;
     gzFile gzf;
 

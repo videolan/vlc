@@ -65,13 +65,13 @@ public:
     virtual ~GenericWindow();
 
     /// Methods to process OS events.
-    virtual void processEvent( EvtFocus &rEvtFocus ) { }
-    virtual void processEvent( EvtMenu &rEvtMenu ) { }
-    virtual void processEvent( EvtMotion &rEvtMotion ) { }
-    virtual void processEvent( EvtMouse &rEvtMouse ) { }
-    virtual void processEvent( EvtLeave &rEvtLeave ) { }
-    virtual void processEvent( EvtKey &rEvtKey ) { }
-    virtual void processEvent( EvtScroll &rEvtScroll ) { }
+    virtual void processEvent( EvtFocus &rEvtFocus ) { (void)rEvtFocus; }
+    virtual void processEvent( EvtMenu &rEvtMenu ) { (void)rEvtMenu; }
+    virtual void processEvent( EvtMotion &rEvtMotion ) { (void)rEvtMotion; }
+    virtual void processEvent( EvtMouse &rEvtMouse ) { (void)rEvtMouse; }
+    virtual void processEvent( EvtLeave &rEvtLeave ) { (void)rEvtLeave; }
+    virtual void processEvent( EvtKey &rEvtKey ) { (void)rEvtKey; }
+    virtual void processEvent( EvtScroll &rEvtScroll ) { (void)rEvtScroll; }
 
     virtual void processEvent( EvtRefresh &rEvtRefresh );
 
@@ -79,7 +79,8 @@ public:
     virtual void resize( int width, int height );
 
     /// Refresh an area of the window
-    virtual void refresh( int left, int top, int width, int height ) { }
+    virtual void refresh( int left, int top, int width, int height )
+        { (void)left; (void)top; (void)width; (void)height; }
 
     /// Invalidate an area of the window
     virtual void invalidateRect( int left, int top, int width, int height );

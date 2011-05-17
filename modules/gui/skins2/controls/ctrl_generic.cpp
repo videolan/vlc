@@ -164,6 +164,7 @@ bool CtrlGeneric::isVisible() const
 
 void CtrlGeneric::onUpdate( Subject<VarBool> &rVariable, void *arg  )
 {
+    (void)arg;
     // Is it the visibility variable ?
     if( &rVariable == m_pVisible )
     {

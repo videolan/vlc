@@ -136,6 +136,7 @@ void X11DragDrop::dndPosition( ldata_t data )
 
 void X11DragDrop::dndLeave( ldata_t data )
 {
+    (void)data;
 }
 
 

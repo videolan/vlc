@@ -134,7 +134,8 @@ public:
     virtual void getMousePos( int &rXPos, int &rYPos ) const;
 
     /// Change the cursor
-    virtual void changeCursor( CursorType_t type ) const { /*TODO*/ }
+    virtual void changeCursor( CursorType_t type ) const
+        { /*TODO*/ (void)type; }
 
     /// Delete a directory recursively
     virtual void rmDir( const string &rPath );

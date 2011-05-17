@@ -161,6 +161,7 @@ void CtrlButton::setImage( AnimBitmap *pImg )
 
 void CtrlButton::onUpdate( Subject<AnimBitmap> &rBitmap, void *arg )
 {
+    (void)rBitmap;(void)arg;
     notifyLayout( m_pImg->getWidth(), m_pImg->getHeight() );
 }
 

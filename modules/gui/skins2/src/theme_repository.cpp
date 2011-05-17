@@ -138,7 +138,6 @@ void ThemeRepository::parseDirectory( const string &rDir_locale )
 {
     DIR *pDir;
     char *pszDirContent;
-    vlc_value_t val, text;
     // Path separator
     const string &sep = OSFactory::instance( getIntf() )->getDirSeparator();
 
@@ -167,7 +166,7 @@ void ThemeRepository::parseDirectory( const string &rDir_locale )
         {
             string path = rDir + sep + name;
             string shortname = name.substr( 0, name.size() - 4 );
-            for( int i = 0; i < shortname.size(); i++ )
+            for( string::size_type i = 0; i < shortname.size(); i++ )
                 shortname[i] = ( i == 0 ) ?
                                toupper( shortname[i] ) :
                                tolower( shortname[i] );
@@ -188,6 +187,7 @@ int ThemeRepository::changeSkin( vlc_object_t *pIntf, char const *pVariable,
                                  vlc_value_t oldval, vlc_value_t newval,
                                  void *pData )
 {
+    (void)pIntf; (void)oldval;
     ThemeRepository *pThis = (ThemeRepository*)(pData);
 
     if( !strcmp( pVariable, "intf-skins-interactive" ) )

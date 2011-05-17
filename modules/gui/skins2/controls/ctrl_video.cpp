@@ -57,11 +57,13 @@ CtrlVideo::~CtrlVideo()
 
 void CtrlVideo::handleEvent( EvtGeneric &rEvent )
 {
+    (void)rEvent;
 }
 
 
 bool CtrlVideo::mouseOver( int x, int y ) const
 {
+    (void)x; (void)y;
     return false;
 }
 
@@ -161,6 +163,8 @@ void CtrlVideo::resizeControl( int width, int height )
 
 void CtrlVideo::onUpdate( Subject<VarBool> &rVariable, void *arg  )
 {
+    (void)arg;
+
     // Visibility changed
     if( &rVariable == m_pVisible )
     {

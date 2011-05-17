@@ -1193,7 +1193,7 @@ string Builder::getFilePath( const string &rFileName ) const
         // For skins to be valid on both Linux and Win32,
         // slash should be used as path separator for both OSs.
         msg_Warn( getIntf(), "use of '/' is preferred to '\\' for paths" );
-        int pos;
+        string::size_type pos;
         while( ( pos = file.find( "\\" ) ) != string::npos )
            file[pos] = '/';
     }

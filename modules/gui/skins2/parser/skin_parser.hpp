@@ -98,10 +98,10 @@ private:
     const string uniqueId( const string &id );
 
     /// Management of relative positions
-    const int getRefWidth( bool toScreen );
-    const int getRefHeight( bool toScreen );
-    const int getDimension( string value, int refDimension );
-    const int getPosition( string value );
+    int getRefWidth( bool toScreen );
+    int getRefHeight( bool toScreen );
+    int getDimension( string value, int refDimension );
+    int getPosition( string value );
     void updateWindowPos( int width, int height );
 
     void convertPosition( string position,

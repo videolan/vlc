@@ -83,6 +83,7 @@ VariablePtr EqualizerBands::getBand( int band )
 
 void EqualizerBands::onUpdate( Subject<VarPercent> &rBand, void *arg )
 {
+    (void)rBand; (void)arg;
     aout_instance_t *pAout = NULL;
 
     playlist_t *pPlaylist = getIntf()->p_sys->p_playlist;

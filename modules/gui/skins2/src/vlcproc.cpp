@@ -178,7 +178,6 @@ VlcProc::VlcProc( intf_thread_t *pIntf ): SkinObject( pIntf ),
     // Called when we have an interaction dialog to display
     var_Create( pIntf, "interaction", VLC_VAR_ADDRESS );
     var_AddCallback( pIntf, "interaction", onInteraction, this );
-    interaction_Register( pIntf );
 
     // initialize variables refering to liblvc and playlist objects
     init_variables();
@@ -253,6 +252,7 @@ void VlcProc::CmdManage::execute()
 int VlcProc::onInputNew( vlc_object_t *pObj, const char *pVariable,
                          vlc_value_t oldval, vlc_value_t newval, void *pParam )
 {
+    (void)pObj; (void)pVariable; (void)oldval;
     VlcProc *pThis = (VlcProc*)pParam;
     input_thread_t *pInput = static_cast<input_thread_t*>(newval.p_address);
 
@@ -269,6 +269,7 @@ int VlcProc::onItemChange( vlc_object_t *pObj, const char *pVariable,
                            vlc_value_t oldval, vlc_value_t newval,
                            void *pParam )
 {
+    (void)pObj; (void)pVariable; (void)oldval;
     VlcProc *pThis = (VlcProc*)pParam;
     input_item_t *p_item = static_cast<input_item_t*>(newval.p_address);
 
@@ -287,6 +288,7 @@ int VlcProc::onItemAppend( vlc_object_t *pObj, const char *pVariable,
                            vlc_value_t oldVal, vlc_value_t newVal,
                            void *pParam )
 {
+    (void)pObj; (void)pVariable; (void)oldVal;
     VlcProc *pThis = (VlcProc*)pParam;
 
     playlist_add_t *p_add = static_cast<playlist_add_t*>(newVal.p_address);
@@ -304,6 +306,7 @@ int VlcProc::onItemDelete( vlc_object_t *pObj, const char *pVariable,
                            vlc_value_t oldVal, vlc_value_t newVal,
                            void *pParam )
 {
+    (void)pObj; (void)pVariable; (void)oldVal;
     VlcProc *pThis = (VlcProc*)pParam;
 
     int i_id = newVal.i_int;
@@ -321,6 +324,7 @@ int VlcProc::onInteraction( vlc_object_t *pObj, const char *pVariable,
                             vlc_value_t oldVal, vlc_value_t newVal,
                             void *pParam )
 {
+    (void)pObj; (void)pVariable; (void)oldVal;
     VlcProc *pThis = (VlcProc*)pParam;
     interaction_dialog_t *p_dialog = (interaction_dialog_t *)(newVal.p_address);
 
@@ -334,6 +338,7 @@ int VlcProc::onEqBandsChange( vlc_object_t *pObj, const char *pVariable,
                               vlc_value_t oldVal, vlc_value_t newVal,
                               void *pParam )
 {
+    (void)pObj; (void)pVariable; (void)oldVal;
     VlcProc *pThis = (VlcProc*)pParam;
 
     // Post a set equalizer bands command
@@ -351,6 +356,7 @@ int VlcProc::onEqPreampChange( vlc_object_t *pObj, const char *pVariable,
                                vlc_value_t oldVal, vlc_value_t newVal,
                                void *pParam )
 {
+    (void)pObj; (void)pVariable; (void)oldVal;
     VlcProc *pThis = (VlcProc*)pParam;
     EqualizerPreamp *pVarPreamp = (EqualizerPreamp*)(pThis->m_cVarEqPreamp.get());
 
@@ -368,6 +374,7 @@ int VlcProc::onGenericCallback( vlc_object_t *pObj, const char *pVariable,
                                 vlc_value_t oldVal, vlc_value_t newVal,
                                 void *pParam )
 {
+    (void)oldVal;
     VlcProc *pThis = (VlcProc*)pParam;
     AsyncQueue *pQueue = AsyncQueue::instance( pThis->getIntf() );
 
@@ -412,6 +419,7 @@ int VlcProc::onGenericCallback2( vlc_object_t *pObj, const char *pVariable,
                                  vlc_value_t oldVal, vlc_value_t newVal,
                                  void *pParam )
 {
+    (void)oldVal;
     VlcProc *pThis = (VlcProc*)pParam;
     AsyncQueue *pQueue = AsyncQueue::instance( pThis->getIntf() );
 
@@ -467,6 +475,7 @@ int VlcProc::onGenericCallback2( vlc_object_t *pObj, const char *pVariable,
 
 void VlcProc::on_item_current_changed( vlc_object_t* p_obj, vlc_value_t newVal )
 {
+    (void)p_obj;
     input_item_t *p_item = static_cast<input_item_t*>(newVal.p_address);
 
     // Update short name
@@ -641,6 +650,7 @@ void VlcProc::on_intf_event_changed( vlc_object_t* p_obj, vlc_value_t newVal )
 
 void VlcProc::on_bit_rate_changed( vlc_object_t* p_obj, vlc_value_t newVal )
 {
+    (void)newVal;
     input_thread_t* pInput = (input_thread_t*) p_obj;
 
     assert( getIntf()->p_sys->p_input == NULL || getIntf()->p_sys->p_input == pInput );
@@ -651,6 +661,7 @@ void VlcProc::on_bit_rate_changed( vlc_object_t* p_obj, vlc_value_t newVal )
 
 void VlcProc::on_sample_rate_changed( vlc_object_t* p_obj, vlc_value_t newVal )
 {
+    (void)newVal;
     input_thread_t* pInput = (input_thread_t*) p_obj;
 
     assert( getIntf()->p_sys->p_input == NULL || getIntf()->p_sys->p_input == pInput );
@@ -661,6 +672,7 @@ void VlcProc::on_sample_rate_changed( vlc_object_t* p_obj, vlc_value_t newVal )
 
 void VlcProc::on_can_record_changed( vlc_object_t* p_obj, vlc_value_t newVal )
 {
+    (void)newVal;
     input_thread_t* pInput = (input_thread_t*) p_obj;
 
     assert( getIntf()->p_sys->p_input == NULL || getIntf()->p_sys->p_input == pInput );
@@ -670,6 +682,7 @@ void VlcProc::on_can_record_changed( vlc_object_t* p_obj, vlc_value_t newVal )
 
 void VlcProc::on_random_changed( vlc_object_t* p_obj, vlc_value_t newVal )
 {
+    (void)newVal;
     playlist_t* pPlaylist = (playlist_t*) p_obj;
 
     SET_BOOL( m_cVarRandom, var_GetBool( pPlaylist, "random" ) );
@@ -677,6 +690,7 @@ void VlcProc::on_random_changed( vlc_object_t* p_obj, vlc_value_t newVal )
 
 void VlcProc::on_loop_changed( vlc_object_t* p_obj, vlc_value_t newVal )
 {
+    (void)newVal;
     playlist_t* pPlaylist = (playlist_t*) p_obj;
 
     SET_BOOL( m_cVarLoop, var_GetBool( pPlaylist, "loop" ) );
@@ -684,6 +698,7 @@ void VlcProc::on_loop_changed( vlc_object_t* p_obj, vlc_value_t newVal )
 
 void VlcProc::on_repeat_changed( vlc_object_t* p_obj, vlc_value_t newVal )
 {
+    (void)newVal;
     playlist_t* pPlaylist = (playlist_t*) p_obj;
 
     SET_BOOL( m_cVarRepeat, var_GetBool( pPlaylist, "repeat" ) );
@@ -701,6 +716,7 @@ void VlcProc::on_volume_changed( vlc_object_t* p_obj, vlc_value_t newVal )
 
 void VlcProc::on_audio_filter_changed( vlc_object_t* p_obj, vlc_value_t newVal )
 {
+    (void)newVal;
     aout_instance_t* pAout = (aout_instance_t*) p_obj;
 
     char *pFilters = newVal.psz_string;
@@ -717,7 +733,7 @@ void VlcProc::on_audio_filter_changed( vlc_object_t* p_obj, vlc_value_t newVal )
 
 void VlcProc::on_intf_show_changed( vlc_object_t* p_obj, vlc_value_t newVal )
 {
-    (void)p_obj;
+    (void)p_obj; (void)newVal;
     bool b_fullscreen = getFullscreenVar().get();
 
     if( !b_fullscreen )
@@ -762,6 +778,7 @@ void VlcProc::on_intf_show_changed( vlc_object_t* p_obj, vlc_value_t newVal )
 
 void VlcProc::on_mouse_moved_changed( vlc_object_t* p_obj, vlc_value_t newVal )
 {
+    (void)p_obj; (void)newVal;
     FscWindow* pFscWindow = VoutManager::instance( getIntf() )->getFscWindow();
     if( pFscWindow )
         pFscWindow->onMouseMoved();

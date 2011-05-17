@@ -50,8 +50,8 @@ void VoutManager::destroy( intf_thread_t *pIntf )
 
 
 VoutManager::VoutManager( intf_thread_t *pIntf ): SkinObject( pIntf ),
-     m_pVoutMainWindow( NULL ), m_pFscWindow( NULL ), m_pCtrlVideoVec(),
-     m_pCtrlVideoVecBackup(), m_SavedWndVec()
+     m_pCtrlVideoVec(), m_pCtrlVideoVecBackup(), m_SavedWndVec(),
+     m_pVoutMainWindow( NULL ), m_pFscWindow( NULL )
 {
     m_pVoutMainWindow = new VoutMainWindow( getIntf() );
 
@@ -281,8 +281,9 @@ void VoutManager::setFullscreenWnd( vout_window_t *pWnd, bool b_fullscreen )
 }
 
 
-void VoutManager::onUpdate( Subject<VarBool> &rVariable, void *arg  )
+void VoutManager::onUpdate( Subject<VarBool> &rVariable, void *arg )
 {
+    (void)arg;
     VarBool &rFullscreen = VlcProc::instance( getIntf() )->getFullscreenVar();
     if( &rVariable == &rFullscreen )
     {

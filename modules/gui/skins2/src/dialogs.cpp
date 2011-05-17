@@ -96,6 +96,8 @@ void Dialogs::showPlaylistSaveCB( intf_dialog_args_t *pArg )
 static int PopupMenuCB( vlc_object_t *p_this, const char *psz_variable,
                         vlc_value_t old_val, vlc_value_t new_val, void *param )
 {
+    (void)p_this; (void)psz_variable; (void)old_val;
+
     Dialogs *p_dialogs = (Dialogs *)param;
     p_dialogs->showPopupMenu( new_val.b_bool != 0, INTF_DIALOG_POPUPMENU );
 

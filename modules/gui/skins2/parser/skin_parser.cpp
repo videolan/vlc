@@ -871,7 +871,7 @@ const string SkinParser::uniqueId( const string &id )
     return newId;
 }
 
-const int SkinParser::getRefWidth( bool toScreen )
+int SkinParser::getRefWidth( bool toScreen )
 {
     if( toScreen )
     {
@@ -892,7 +892,7 @@ const int SkinParser::getRefWidth( bool toScreen )
     }
 }
 
-const int SkinParser::getRefHeight( bool toScreen )
+int SkinParser::getRefHeight( bool toScreen )
 {
     if( toScreen )
     {
@@ -914,11 +914,11 @@ const int SkinParser::getRefHeight( bool toScreen )
 }
 
 
-const int SkinParser::getDimension( string value, int refDimension )
+int SkinParser::getDimension( string value, int refDimension )
 {
-    int val;
+    string::size_type leftPos;
 
-    int leftPos = value.find( "%" );
+    leftPos = value.find( "%" );
     if( leftPos != string::npos )
     {
         int val = atoi( value.substr( 0, leftPos ).c_str() );
@@ -928,7 +928,7 @@ const int SkinParser::getDimension( string value, int refDimension )
     leftPos = value.find( "px" );
     if( leftPos != string::npos )
     {
-        int val  = atoi( value.substr( 0, leftPos ).c_str() );
+        int val = atoi( value.substr( 0, leftPos ).c_str() );
         return val;
     }
 
@@ -936,7 +936,7 @@ const int SkinParser::getDimension( string value, int refDimension )
 }
 
 
-const int SkinParser::getPosition( string position )
+int SkinParser::getPosition( string position )
 {
     if( position == "-1" )
         return POS_UNDEF;

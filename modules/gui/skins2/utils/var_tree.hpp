@@ -131,7 +131,7 @@ public:
     void removeChild( Iterator it ) { m_children.erase( it ); }
 
     /// Execute the action associated to this item
-    virtual void action( VarTree *pItem ) { }
+    virtual void action( VarTree *pItem ) { (void)pItem; }
 
     /// Get a reference on the position variable
     VarPercent &getPositionVar() const

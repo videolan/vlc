@@ -85,7 +85,7 @@ public:
     ConstIterator operator[]( int n ) const;
 
     /// Execute the action associated to this item
-    virtual void action( Elem_t *pItem ) { }
+    virtual void action( Elem_t *pItem ) { (void)pItem; }
 
     /// Get a reference on the position variable
     VarPercent &getPositionVar() const
