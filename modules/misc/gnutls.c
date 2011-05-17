@@ -73,6 +73,11 @@ static void CloseClient (vlc_object_t *);
 static int  OpenServer  (vlc_object_t *);
 static void CloseServer (vlc_object_t *);
 
+#define PRIORITIES_TEXT N_("TLS cipher priorities")
+#define PRIORITIES_LONGTEXT N_("Ciphers, key exchange methods, " \
+    "hash functions and compression methods can be selected. " \
+    "Refer to GNU TLS documentation for detailed syntax.")
+
 #define CACHE_TIMEOUT_TEXT N_("Expiration time for resumed TLS sessions")
 #define CACHE_TIMEOUT_LONGTEXT N_( \
     "It is possible to cache the resumed TLS sessions. This is the expiration "\
@@ -84,20 +89,22 @@ static void CloseServer (vlc_object_t *);
     "the cache will hold." )
 
 vlc_module_begin ()
-    set_shortname( "GnuTLS" )
-    set_description( N_("GnuTLS transport layer security") )
+    set_shortname( "GNU TLS" )
+    set_description( N_("GNU TLS transport layer security") )
     set_capability( "tls client", 1 )
     set_callbacks( OpenClient, CloseClient )
     set_category( CAT_ADVANCED )
     set_subcategory( SUBCAT_ADVANCED_MISC )
 
     add_submodule ()
-        set_description( N_("GnuTLS server") )
+        set_description( N_("GNU TLS server") )
         set_capability( "tls server", 1 )
         set_category( CAT_ADVANCED )
         set_subcategory( SUBCAT_ADVANCED_MISC )
         set_callbacks( OpenServer, CloseServer )
 
+        add_string ("gnutls-priorities", "NORMAL", PRIORITIES_TEXT,
+                    PRIORITIES_LONGTEXT, false)
         add_integer( "gnutls-cache-timeout", CACHE_TIMEOUT,
                     CACHE_TIMEOUT_TEXT, CACHE_TIMEOUT_LONGTEXT, true )
         add_integer( "gnutls-cache-size", CACHE_SIZE, CACHE_SIZE_TEXT,
@@ -391,112 +398,25 @@ gnutls_SetFD (tls_session_t *p_session, int fd)
                               (gnutls_transport_ptr_t)(intptr_t)fd);
 }
 
-typedef int (*tls_prio_func) (gnutls_session_t, const int *);
-
-static int
-gnutls_SetPriority (vlc_object_t *restrict obj, const char *restrict name,
-                    tls_prio_func func, gnutls_session_t session,
-                    const int *restrict values)
-{
-    int val = func (session, values);
-    if (val < 0)
-    {
-        msg_Err (obj, "cannot set %s priorities: %s", name,
-                 gnutls_strerror (val));
-        return VLC_EGENERIC;
-    }
-    return VLC_SUCCESS;
-}
-
-
 static int
 gnutls_SessionPrioritize (vlc_object_t *obj, gnutls_session_t session)
 {
-    /* Note that ordering matters (on the client side) */
-    static const int protos[] =
-    {
-        /*GNUTLS_TLS1_2, as of GnuTLS 2.6.5, still not ratified */
-        GNUTLS_TLS1_1,
-        GNUTLS_TLS1_0,
-        GNUTLS_SSL3,
-        0
-    };
-    static const int comps[] =
-    {
-        GNUTLS_COMP_DEFLATE,
-        GNUTLS_COMP_NULL,
-        0
-    };
-    static const int macs[] =
-    {
-        GNUTLS_MAC_SHA512,
-        GNUTLS_MAC_SHA384,
-        GNUTLS_MAC_SHA256,
-        GNUTLS_MAC_SHA1,
-        GNUTLS_MAC_RMD160, // RIPEMD
-        GNUTLS_MAC_MD5,
-        //GNUTLS_MAC_MD2,
-        //GNUTLS_MAC_NULL,
-        0
-    };
-    static const int ciphers[] =
-    {
-        GNUTLS_CIPHER_AES_256_CBC,
-        GNUTLS_CIPHER_AES_128_CBC,
-        GNUTLS_CIPHER_3DES_CBC,
-        GNUTLS_CIPHER_ARCFOUR_128,
-        // TODO? Camellia ciphers?
-        //GNUTLS_CIPHER_DES_CBC,
-        //GNUTLS_CIPHER_ARCFOUR_40,
-        //GNUTLS_CIPHER_RC2_40_CBC,
-        //GNUTLS_CIPHER_NULL,
-        0
-    };
-    static const int kx[] =
-    {
-        GNUTLS_KX_DHE_RSA,
-        GNUTLS_KX_DHE_DSS,
-        GNUTLS_KX_RSA,
-        //GNUTLS_KX_RSA_EXPORT,
-        //GNUTLS_KX_DHE_PSK, TODO
-        //GNUTLS_KX_PSK,     TODO
-        //GNUTLS_KX_SRP_RSA, TODO
-        //GNUTLS_KX_SRP_DSS, TODO
-        //GNUTLS_KX_SRP,     TODO
-        //GNUTLS_KX_ANON_DH,
-        0
-    };
-    static const int cert_types[] =
-    {
-        GNUTLS_CRT_X509,
-        //GNUTLS_CRT_OPENPGP, TODO
-        0
-    };
+    char *priorities = var_InheritString (obj, "gnutls-priorities");
+    if (unlikely(priorities == NULL))
+        return VLC_ENOMEM;
 
-    int val = gnutls_set_default_priority (session);
+    const char *errp;
+    int val = gnutls_priority_set_direct (session, priorities, &errp);
     if (val < 0)
     {
-        msg_Err (obj, "cannot set default TLS priorities: %s",
+        msg_Err (obj, "cannot set TLS priorities \"%s\": %s", errp,
                  gnutls_strerror (val));
-        return VLC_EGENERIC;
+        val = VLC_EGENERIC;
     }
-
-    if (gnutls_SetPriority (obj, "protocols",
-                            gnutls_protocol_set_priority, session, protos)
-     || gnutls_SetPriority (obj, "compression algorithms",
-                            gnutls_compression_set_priority, session, comps)
-     || gnutls_SetPriority (obj, "MAC algorithms",
-                            gnutls_mac_set_priority, session, macs)
-     || gnutls_SetPriority (obj, "ciphers",
-                            gnutls_cipher_set_priority, session, ciphers)
-     || gnutls_SetPriority (obj, "key exchange algorithms",
-                            gnutls_kx_set_priority, session, kx)
-     || gnutls_SetPriority (obj, "certificate types",
-                            gnutls_certificate_type_set_priority, session,
-                            cert_types))
-        return VLC_EGENERIC;
-
-    return VLC_SUCCESS;
+    else
+        val = VLC_SUCCESS;
+    free (priorities);
+    return val;
 }
 
 
