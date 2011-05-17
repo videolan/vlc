@@ -1199,7 +1199,7 @@ string Builder::getFilePath( const string &rFileName ) const
     }
 
 #ifdef WIN32
-    int pos;
+    string::size_type pos;
     while( ( pos = file.find( "/" ) ) != string::npos )
        file.replace( pos, 1, sep );
 #endif

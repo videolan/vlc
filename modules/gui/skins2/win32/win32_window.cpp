@@ -52,6 +52,7 @@ Win32Window::Win32Window( intf_thread_t *pIntf, GenericWindow &rWindow,
     OSWindow( pIntf ), m_dragDrop( dragDrop ), m_isLayered( false ),
     m_pParent( pParentWindow ), m_type ( type )
 {
+    (void)hParentWindow;
     Win32Factory *pFactory = (Win32Factory*)Win32Factory::instance( getIntf() );
 
     const char* vlc_name =  "VlC Media Player";
@@ -202,8 +203,6 @@ void Win32Window::raise() const
 
 void Win32Window::setOpacity( uint8_t value ) const
 {
-    Win32Factory *pFactory = (Win32Factory*)Win32Factory::instance( getIntf() );
-
     if( !m_isLayered )
     {
         // add the WS_EX_LAYERED attribute.

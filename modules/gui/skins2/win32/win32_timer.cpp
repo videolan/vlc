@@ -31,6 +31,7 @@
 void CALLBACK CallbackTimer( HWND hwnd, UINT uMsg,
                              UINT_PTR idEvent, DWORD dwTime )
 {
+    (void)hwnd; (void)uMsg; (void)dwTime;
     Win32Timer *pTimer = (Win32Timer*)idEvent;
     if( pTimer != NULL )
     {
