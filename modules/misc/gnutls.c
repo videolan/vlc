@@ -77,6 +77,20 @@ static void CloseServer (vlc_object_t *);
 #define PRIORITIES_LONGTEXT N_("Ciphers, key exchange methods, " \
     "hash functions and compression methods can be selected. " \
     "Refer to GNU TLS documentation for detailed syntax.")
+static const char *const priorities_values[] = {
+    "PERFORMANCE",
+    "NORMAL",
+    "SECURE128",
+    "SECURE256",
+    "EXPORT",
+};
+static const char *const priorities_text[] = {
+    N_("Performance (prioritize faster ciphers)"),
+    N_("Normal"),
+    N_("Secure 128-bits (exclude 256-bits ciphers)"),
+    N_("Secure 256-bits (prioritize 256-bits ciphers)"),
+    N_("Export (include insecure ciphers)"),
+};
 
 #define CACHE_TIMEOUT_TEXT N_("Expiration time for resumed TLS sessions")
 #define CACHE_TIMEOUT_LONGTEXT N_( \
@@ -105,6 +119,7 @@ vlc_module_begin ()
 
         add_string ("gnutls-priorities", "NORMAL", PRIORITIES_TEXT,
                     PRIORITIES_LONGTEXT, false)
+            change_string_list (priorities_values, priorities_text, NULL)
         add_integer( "gnutls-cache-timeout", CACHE_TIMEOUT,
                     CACHE_TIMEOUT_TEXT, CACHE_TIMEOUT_LONGTEXT, true )
         add_integer( "gnutls-cache-size", CACHE_SIZE, CACHE_SIZE_TEXT,
