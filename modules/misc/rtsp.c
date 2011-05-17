@@ -187,6 +187,7 @@ struct vod_sys_t
     vod_media_t **media;
 
     /* */
+    vlc_thread_t thread;
     block_fifo_t *p_fifo_cmd;
 };
 
@@ -224,7 +225,7 @@ static void         MediaAskDel ( vod_t *, vod_media_t * );
 static int          MediaAddES( vod_t *, vod_media_t *, es_format_t * );
 static void         MediaDelES( vod_t *, vod_media_t *, es_format_t * );
 
-static void* CommandThread( vlc_object_t *p_this );
+static void* CommandThread( void * );
 static void  CommandPush( vod_t *, rtsp_cmd_type_t, vod_media_t *,
                           const char *psz_session, int64_t i_arg,
                           double f_arg, const char *psz_arg );
@@ -301,7 +302,7 @@ static int Open( vlc_object_t *p_this )
     p_vod->pf_media_del = MediaAskDel;
 
     p_sys->p_fifo_cmd = block_FifoNew();
-    if( vlc_thread_create( p_vod, CommandThread, VLC_THREAD_PRIORITY_LOW ) )
+    if( vlc_clone( &p_sys->thread, CommandThread, p_vod, VLC_THREAD_PRIORITY_LOW ) )
     {
         msg_Err( p_vod, "cannot spawn rtsp vod thread" );
         block_FifoRelease( p_sys->p_fifo_cmd );
@@ -332,9 +333,8 @@ static void Close( vlc_object_t * p_this )
     vod_sys_t *p_sys = p_vod->p_sys;
 
     /* Stop command thread */
-    vlc_object_kill( p_vod );
     CommandPush( p_vod, RTSP_CMD_TYPE_NONE, NULL, NULL, 0, 0.0, NULL );
-    vlc_thread_join( p_vod );
+    vlc_join( p_sys->thread, NULL );
 
     while( block_FifoCount( p_sys->p_fifo_cmd ) > 0 )
     {
@@ -777,13 +777,13 @@ static void CommandPush( vod_t *p_vod, rtsp_cmd_type_t i_type, vod_media_t *p_me
     block_FifoPut( p_vod->p_sys->p_fifo_cmd, p_cmd );
 }
 
-static void* CommandThread( vlc_object_t *p_this )
+static void* CommandThread( void *obj )
 {
-    vod_t *p_vod = (vod_t*)p_this;
+    vod_t *p_vod = (vod_t*)obj;
     vod_sys_t *p_sys = p_vod->p_sys;
     int canc = vlc_savecancel ();
 
-    while( vlc_object_alive (p_vod) )
+    for( ;; )
     {
         block_t *p_block_cmd = block_FifoGet( p_sys->p_fifo_cmd );
         rtsp_cmd_t cmd;
