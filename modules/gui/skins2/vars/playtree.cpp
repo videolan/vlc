@@ -6,6 +6,7 @@
  *
  * Authors: Antoine Cellerier <dionoea@videolan.org>
  *          Clément Stenac <zorglub@videolan.org>
+ *          Erwan Tulou    <erwan10@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,133 +31,111 @@
 
 #include "playtree.hpp"
 #include <vlc_playlist.h>
+#include <vlc_url.h>
 #include "../utils/ustring.hpp"
 
-Playtree::Playtree( intf_thread_t *pIntf ): VarTree( pIntf )
+Playtree::Playtree( intf_thread_t *pIntf )
+    : VarTree( pIntf ), m_pPlaylist( pIntf->p_sys->p_playlist )
 {
-    // Get the VLC playlist object
-    m_pPlaylist = pIntf->p_sys->p_playlist;
-
+    getPositionVar().addObserver( this );
     buildTree();
 }
 
 Playtree::~Playtree()
 {
+    getPositionVar().delObserver( this );
 }
 
 void Playtree::delSelected()
 {
-    Iterator it = begin();
-    playlist_Lock( getIntf()->p_sys->p_playlist );
-    for( it = begin(); it != end(); it = getNextItem( it ) )
+    for( Iterator it = m_children.begin(); it != m_children.end(); )
     {
         if( it->isSelected() && !it->isReadonly() )
         {
-            it->cascadeDelete();
-        }
-    }
-    /// \todo Do this better (handle item-deleted)
-    tree_update descr;
-    descr.type = tree_update::DeleteItem;
-    notify( &descr );
-    it = begin();
-    while( it != end() )
-    {
-        if( it->isDeleted() )
-        {
-            VarTree::Iterator it2;
-            playlist_item_t *p_item = (playlist_item_t *)(it->getData());
-            if( p_item->i_children == -1 )
+            playlist_Lock( m_pPlaylist );
+
+            playlist_item_t *pItem =
+                playlist_ItemGetById( m_pPlaylist, it->getId() );
+            if( pItem )
             {
-                playlist_DeleteFromInput( getIntf()->p_sys->p_playlist,
-                                          p_item->p_input, pl_Locked );
-                it2 = getNextItem( it ) ;
+                if( pItem->i_children == -1 )
+                {
+                    playlist_DeleteFromInput( m_pPlaylist, pItem->p_input,
+                                              pl_Locked );
+                }
+                else
+                {
+                    playlist_NodeDelete( m_pPlaylist, pItem, true, false );
+                }
             }
-            else
-            {
-                playlist_NodeDelete( getIntf()->p_sys->p_playlist, p_item,
-                                     true, false );
-                it2 = it->getNextSiblingOrUncle();
-            }
-            it->parent()->removeChild( it );
-            it = it2;
+            playlist_Unlock( m_pPlaylist );
+
+            it = it->getNextSiblingOrUncle();
         }
         else
         {
             it = getNextItem( it );
         }
     }
-    playlist_Unlock( getIntf()->p_sys->p_playlist );
 }
 
-void Playtree::action( VarTree *pItem )
+void Playtree::action( VarTree *pElem )
 {
     playlist_Lock( m_pPlaylist );
-    VarTree::Iterator it;
 
-    playlist_item_t *p_item = (playlist_item_t *)pItem->getData();
-    playlist_item_t *p_parent = p_item;
-    while( p_parent )
+    playlist_item_t *pItem =
+        playlist_ItemGetById( m_pPlaylist, pElem->getId() );
+    if( pItem )
     {
-        if( p_parent == m_pPlaylist->p_root_category )
-            break;
-        p_parent = p_parent->p_parent;
+        playlist_Control( m_pPlaylist, PLAYLIST_VIEWPLAY,
+                          pl_Locked, pItem->p_parent, pItem );
     }
 
-    if( p_parent )
-    {
-        playlist_Control( m_pPlaylist, PLAYLIST_VIEWPLAY, pl_Locked, p_parent, p_item );
-    }
     playlist_Unlock( m_pPlaylist );
 }
 
 void Playtree::onChange()
 {
     buildTree();
-    tree_update descr;
-    descr.type = tree_update::ResetAll;
+    tree_update descr( tree_update::ResetAll, end() );
     notify( &descr );
 }
 
 void Playtree::onUpdateItem( int id )
 {
     Iterator it = findById( id );
-    if( it != end() )
+    if( it != m_children.end() )
     {
         // Update the item
-        playlist_item_t* pNode = (playlist_item_t*)(it->getData());
-        UString *pName = new UString( getIntf(), pNode->p_input->psz_name );
-        it->setString( UStringPtr( pName ) );
+        playlist_Lock( m_pPlaylist );
+        playlist_item_t *pNode =
+            playlist_ItemGetById( m_pPlaylist, it->getId() );
+        if( !pNode )
+        {
+            playlist_Unlock( m_pPlaylist );
+            return;
+        }
 
-        tree_update descr;
-        descr.type = tree_update::UpdateItem;
-        descr.i_id = id;
-        descr.b_active_item = false;
-        notify( &descr );
+        UString *pName = new UString( getIntf(), pNode->p_input->psz_name );
+        playlist_Unlock( m_pPlaylist );
+
+        if( *pName != *(it->getString()) )
+        {
+            it->setString( UStringPtr( pName ) );
+
+            tree_update descr(
+                tree_update::ItemUpdated, IteratorVisible( it, this ) );
+            notify( &descr );
+        }
     }
     else
     {
-        msg_Warn(getIntf(), "cannot find node with id %d", id );
+        msg_Warn( getIntf(), "cannot find node with id %d", id );
     }
 }
 
 void Playtree::onUpdateCurrent( bool b_active )
 {
-    for( VarTree::Iterator it = begin(); it != end(); it = getNextItem( it ) )
-    {
-       if( it->isPlaying() )
-       {
-           it->setPlaying( false );
-
-           tree_update descr;
-           descr.type = tree_update::UpdateItem;
-           descr.i_id = it->getId();
-           descr.b_active_item = false;
-           notify( &descr );
-           break;
-       }
-    }
-
     if( b_active )
     {
         playlist_Lock( m_pPlaylist );
@@ -169,81 +148,107 @@ void Playtree::onUpdateCurrent( bool b_active )
         }
 
         Iterator it = findById( current->i_id );
-        if( it != end() )
+        if( it != m_children.end() )
+        {
             it->setPlaying( true );
 
-        playlist_Unlock( m_pPlaylist );
+            tree_update descr(
+                tree_update::ItemUpdated, IteratorVisible( it, this ) );
+            notify( &descr );
+        }
 
-        tree_update descr;
-        descr.type = tree_update::UpdateItem;
-        descr.i_id = current->i_id;
-        descr.b_active_item = true;
-        notify( &descr );
+        playlist_Unlock( m_pPlaylist );
+    }
+    else
+    {
+        for( Iterator it = m_children.begin(); it != m_children.end();
+             it = getNextItem( it ) )
+        {
+            if( it->isPlaying() )
+            {
+                it->setPlaying( false );
+
+                tree_update descr(
+                    tree_update::ItemUpdated, IteratorVisible( it, this ) );
+                notify( &descr );
+                break;
+            }
+        }
     }
 }
 
 void Playtree::onDelete( int i_id )
 {
-    Iterator item = findById( i_id ) ;
-    if( item != end() )
+    Iterator it = findById( i_id ) ;
+    if( it != m_children.end() )
     {
-        VarTree* parent = item->parent();
-
-        item->setDeleted( true );
-
-        tree_update descr;
-        descr.type = tree_update::DeleteItem;
-        descr.i_id = i_id;
-        notify( &descr );
-
+        VarTree* parent = it->parent();
         if( parent )
-            parent->removeChild( item );
+        {
+            tree_update descr(
+                tree_update::DeletingItem, IteratorVisible( it, this ) );
+            notify( &descr );
+
+            parent->removeChild( it );
+            m_allItems.erase( i_id );
+
+            tree_update descr2(
+                tree_update::ItemDeleted, end() );
+            notify( &descr2 );
+        }
     }
 }
 
 void Playtree::onAppend( playlist_add_t *p_add )
 {
-    Iterator node = findById( p_add->i_node );
-    if( node != end() )
+    Iterator it_node = findById( p_add->i_node );
+    if( it_node != m_children.end() )
     {
         playlist_Lock( m_pPlaylist );
-        playlist_item_t *p_item =
+        playlist_item_t *pItem =
             playlist_ItemGetById( m_pPlaylist, p_add->i_item );
-        if( !p_item )
+        if( !pItem )
         {
             playlist_Unlock( m_pPlaylist );
             return;
         }
 
+        int pos;
+        for( pos = 0; pos < pItem->p_parent->i_children; pos++ )
+            if( pItem->p_parent->pp_children[pos] == pItem ) break;
+
         UString *pName = new UString( getIntf(),
-                                      p_item->p_input->psz_name );
-        node->add( p_add->i_item, UStringPtr( pName ),
-                   false,false, false, p_item->i_flags & PLAYLIST_RO_FLAG,
-                   p_item );
+                                      pItem->p_input->psz_name );
+
+        playlist_item_t* current = playlist_CurrentPlayingItem( m_pPlaylist );
+
+        Iterator it = it_node->add(
+            p_add->i_item, UStringPtr( pName ), false, pItem == current,
+            false, pItem->i_flags & PLAYLIST_RO_FLAG, pos );
+
+        m_allItems[pItem->i_id] = &*it;
+
         playlist_Unlock( m_pPlaylist );
 
-        tree_update descr;
-        descr.type = tree_update::AppendItem;
-        descr.i_id = p_add->i_item;
+        tree_update descr(
+            tree_update::ItemInserted,
+            IteratorVisible( it, this ) );
         notify( &descr );
     }
 }
 
 void Playtree::buildNode( playlist_item_t *pNode, VarTree &rTree )
 {
+    UString *pName = new UString( getIntf(), pNode->p_input->psz_name );
+    Iterator it = rTree.add(
+        pNode->i_id, UStringPtr( pName ), false,
+        playlist_CurrentPlayingItem(m_pPlaylist) == pNode,
+        false, pNode->i_flags & PLAYLIST_RO_FLAG );
+    m_allItems[pNode->i_id] = &*it;
+
     for( int i = 0; i < pNode->i_children; i++ )
     {
-        UString *pName = new UString( getIntf(),
-                                   pNode->pp_children[i]->p_input->psz_name );
-        rTree.add(
-            pNode->pp_children[i]->i_id, UStringPtr( pName ), false,
-            playlist_CurrentPlayingItem(m_pPlaylist) == pNode->pp_children[i],
-            false, pNode->pp_children[i]->i_flags & PLAYLIST_RO_FLAG,
-            pNode->pp_children[i] );
-        if( pNode->pp_children[i]->i_children > 0 )
-        {
-            buildNode( pNode->pp_children[i], rTree.back() );
-        }
+        buildNode( pNode->pp_children[i], *it );
     }
 }
 
@@ -252,17 +257,84 @@ void Playtree::buildTree()
     clear();
     playlist_Lock( m_pPlaylist );
 
-    clear();
-
-    /* TODO: Let user choose view - Stick with category ATM */
-
-    /* Set the root's name */
-    UString *pName = new UString( getIntf(),
-                             m_pPlaylist->p_root_category->p_input->psz_name );
-    setString( UStringPtr( pName ) );
-
-    buildNode( m_pPlaylist->p_root_category, *this );
+    for( int i = 0; i < m_pPlaylist->p_root->i_children; i++ )
+    {
+        buildNode( m_pPlaylist->p_root->pp_children[i], *this );
+    }
 
     playlist_Unlock( m_pPlaylist );
 }
 
+void Playtree::onUpdateSlider()
+{
+    tree_update descr( tree_update::SliderChanged, end() );
+    notify( &descr );
+}
+
+void Playtree::insertItems( VarTree& elem, const list<string>& files, bool start )
+{
+    bool first = true;
+    VarTree* p_elem = &elem;
+    playlist_item_t* p_node = NULL;
+    int i_pos = -1;
+
+    playlist_Lock( m_pPlaylist );
+
+    if( p_elem->getId() == m_pPlaylist->p_local_category->i_id )
+    {
+        p_node = m_pPlaylist->p_local_category;
+        i_pos = 0;
+    }
+    else if( p_elem->getId() == m_pPlaylist->p_ml_category->i_id )
+    {
+        p_node = m_pPlaylist->p_ml_category;
+        i_pos = 0;
+    }
+    else if( p_elem->size() )
+    {
+        p_node = playlist_ItemGetById( m_pPlaylist, p_elem->getId() );
+        i_pos = 0;
+    }
+    else
+    {
+        p_node = playlist_ItemGetById( m_pPlaylist,
+                                       p_elem->parent()->getId() );
+        i_pos = p_elem->getIndex();
+        i_pos++;
+    }
+
+    if( !p_node )
+        goto fin;
+
+    for( list<string>::const_iterator it = files.begin();
+         it != files.end(); ++it, i_pos++, first = false )
+    {
+        char* psz_uri = make_URI( it->c_str(), NULL );
+        if( !psz_uri )
+            continue;
+
+        input_item_t* pItem = input_item_New( m_pPlaylist, psz_uri, NULL );
+        if( pItem )
+        {
+            int i_mode = PLAYLIST_APPEND;
+            if( first && start )
+                i_mode |= PLAYLIST_GO;
+
+            playlist_NodeAddInput( m_pPlaylist, pItem, p_node,
+                                   i_mode, i_pos, pl_Locked );
+        }
+        free( psz_uri );
+    }
+
+fin:
+    playlist_Unlock( m_pPlaylist );
+}
+
+VarTree::Iterator Playtree::findById( int id )
+{
+    map<int,VarTree*>::iterator it = m_allItems.find( id );
+    if( it == m_allItems.end() )
+        return m_children.end();
+    else
+        return it->second->getSelf();
+}

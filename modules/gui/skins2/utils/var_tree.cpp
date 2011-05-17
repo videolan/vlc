@@ -6,6 +6,7 @@
  *
  * Authors: Antoine Cellerier <dionoea@videolan.org>
  *          Clément Stenac <zorglub@videolan.org>
+ *          Erwan   Tulou  <erwan10@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,63 +24,88 @@
  *****************************************************************************/
 
 #include "var_tree.hpp"
-
+#include <math.h>
 
 const string VarTree::m_type = "tree";
 
 VarTree::VarTree( intf_thread_t *pIntf )
-    : Variable( pIntf ), m_pParent( NULL ), m_id( 0 ), m_pData( NULL ),
-      m_readonly( false ), m_selected( false ), m_playing( false ),
-      m_expanded( false ), m_deleted( false )
+    : Variable( pIntf ), m_pParent( NULL ), m_id( 0 ),
+      m_readonly( false ), m_selected( false ),
+      m_playing( false ), m_expanded( false ),
+      m_flat( false ), m_dontMove( false )
 {
     // Create the position variable
     m_cPosition = VariablePtr( new VarPercent( pIntf ) );
     getPositionVar().set( 1.0 );
+
+    getPositionVar().addObserver( this );
 }
 
 VarTree::VarTree( intf_thread_t *pIntf, VarTree *pParent, int id,
                   const UStringPtr &rcString, bool selected, bool playing,
-                  bool expanded, bool readonly, void *pData )
+                  bool expanded, bool readonly )
     : Variable( pIntf ), m_pParent( pParent ),
-      m_id( id ), m_pData( pData ), m_cString( rcString ),
-      m_readonly( readonly ), m_selected( selected ), m_playing( playing ),
-      m_expanded( expanded ), m_deleted( false )
+      m_id( id ), m_cString( rcString ),
+      m_readonly( readonly ), m_selected( selected ),
+      m_playing( playing ), m_expanded( expanded ),
+      m_flat( false ), m_dontMove( false )
 {
     // Create the position variable
     m_cPosition = VariablePtr( new VarPercent( pIntf ) );
     getPositionVar().set( 1.0 );
+
+    getPositionVar().addObserver( this );
+}
+
+VarTree::VarTree( const VarTree& v )
+    : Variable( v.getIntf() ), m_pParent( v.m_pParent ),
+      m_id( v.m_id ), m_cString( v.m_cString ),
+      m_readonly( v.m_readonly ), m_selected( v.m_selected ),
+      m_playing( v.m_playing ), m_expanded( v.m_expanded ),
+      m_flat( false ), m_dontMove( false )
+{
+    // Create the position variable
+    m_cPosition = VariablePtr( new VarPercent( getIntf() ) );
+    getPositionVar().set( 1.0 );
+
+    getPositionVar().addObserver( this );
 }
 
 VarTree::~VarTree()
 {
-/// \todo check that children are deleted
+    getPositionVar().delObserver( this );
 }
 
-void VarTree::add( int id, const UStringPtr &rcString, bool selected,
-                   bool playing, bool expanded, bool readonly, void *pData )
+VarTree::Iterator VarTree::add( int id, const UStringPtr &rcString,
+                  bool selected, bool playing, bool expanded, bool readonly,
+                  int pos )
 {
-    m_children.push_back( VarTree( getIntf(), this, id, rcString, selected,
-                                   playing, expanded, readonly,
-                                   pData ) );
+    Iterator it;
+    if( pos == -1 )
+    {
+        it = m_children.end();
+    }
+    else
+    {
+        it = m_children.begin();
+        for( int i = 0; i < pos && it != m_children.end(); ++it, i++ );
+    }
+
+    return m_children.insert( it,
+                              VarTree( getIntf(), this, id, rcString,
+                                       selected, playing,
+                                       expanded, readonly ) );
 }
 
 void VarTree::delSelected()
 {
-    Iterator it = begin();
-    while( it != end() )
+    for( Iterator it = m_children.begin(); it != m_children.end(); )
     {
-        //dig down the tree
-        if( size() ) it->delSelected();
-        //stay on some level
         if( it->m_selected )
         {
             Iterator oldIt = it;
             ++it;
             m_children.erase( oldIt );
-        }
-        else
-        {
-            ++it;
         }
     }
 }
@@ -89,49 +115,32 @@ void VarTree::clear()
     m_children.clear();
 }
 
-VarTree::Iterator VarTree::operator[]( int n )
-{
-    Iterator it;
-    int i;
-    for( it = begin(), i = 0;
-         i < n && it != end();
-         ++it, i++ );
-    return it;
-}
-
-VarTree::ConstIterator VarTree::operator[]( int n ) const
-{
-    ConstIterator it;
-    int i;
-    for( it = begin(), i = 0;
-         i < n && it != end();
-         ++it, i++ );
-    return it;
-}
-
 VarTree::Iterator VarTree::getNextSiblingOrUncle()
 {
     VarTree *p_parent = parent();
     if( p_parent )
     {
-        Iterator it = p_parent->begin();
-        while( it != p_parent->end() && &(*it) != this ) ++it;
-        if( it != p_parent->end() )
-        {
-            Iterator current = it;
-            ++it;
-            if( it != p_parent->end() )
-                return it;
-            else
-                return current->next_uncle();
-        }
+        Iterator it = ++(getSelf());
+        if( it != p_parent->m_children.end() )
+            return it;
         else
-        {
-            msg_Err( getIntf(), "should never occur" );
-            return end();
-        }
+            return next_uncle();
     }
-    return end();
+    return root()->m_children.end();
+}
+
+VarTree::Iterator VarTree::getPrevSiblingOrUncle()
+{
+    VarTree *p_parent = parent();
+    if( p_parent )
+    {
+        Iterator it = getSelf();
+        if( it != p_parent->m_children.begin() )
+            return --it;
+        else
+            return prev_uncle();
+    }
+    return root()->m_children.end();
 }
 
 /* find iterator to next ancestor
@@ -139,86 +148,60 @@ VarTree::Iterator VarTree::getNextSiblingOrUncle()
 VarTree::Iterator VarTree::next_uncle()
 {
     VarTree *p_parent = parent();
-    if( p_parent != NULL )
+    if( p_parent )
     {
         VarTree *p_grandparent = p_parent->parent();
-        while( p_grandparent != NULL )
+        while( p_grandparent )
         {
-            Iterator it = p_grandparent->begin();
-            while( it != p_grandparent->end() && &(*it) != p_parent ) ++it;
-            if( it != p_grandparent->end() )
-            {
-                ++it;
-                if( it != p_grandparent->end() )
-                {
-                    return it;
-                }
-            }
-            if( p_grandparent->parent() )
-            {
-                p_parent = p_grandparent;
-                p_grandparent = p_parent->parent();
-            }
-            else
-                p_grandparent = NULL;
+            Iterator it = ++(p_parent->getSelf());
+            if( it != p_grandparent->m_children.end() )
+                return it;
+            p_parent = p_grandparent;
+            p_grandparent = p_parent->parent();
         }
     }
 
     /* if we didn't return before, it means that we've reached the end */
-    return root()->end();
+    return root()->m_children.end();
 }
 
 VarTree::Iterator VarTree::prev_uncle()
 {
     VarTree *p_parent = parent();
-    if( p_parent != NULL )
+    if( p_parent )
     {
         VarTree *p_grandparent = p_parent->parent();
-        while( p_grandparent != NULL )
+        while( p_grandparent )
         {
-            Iterator it = p_grandparent->end();
-            while( it != p_grandparent->begin() && &(*it) != p_parent ) --it;
-            if( it != p_grandparent->begin() )
-            {
-                --it;
-                if( it != p_grandparent->begin() )
-                {
-                    return it;
-                }
-            }
-            if( p_grandparent->parent() )
-            {
-                p_parent = p_grandparent;
-                p_grandparent = p_parent->parent();
-            }
-            else
-                p_grandparent = NULL;
+            Iterator it = p_parent->getSelf();
+            if( it != p_grandparent->m_children.begin() )
+                return --it;
+            p_parent = p_grandparent;
+            p_grandparent = p_parent->parent();
         }
     }
 
     /* if we didn't return before, it means that we've reached the end */
-    return root()->begin();
+    return root()->m_children.end();
 }
 
 int VarTree::visibleItems()
 {
     int i_count = size();
-    Iterator it = begin();
-    while( it != end() )
+    for( Iterator it = m_children.begin(); it != m_children.end(); ++it )
     {
         if( it->m_expanded )
         {
             i_count += it->visibleItems();
         }
-        ++it;
     }
     return i_count;
 }
 
 VarTree::Iterator VarTree::getVisibleItem( int n )
 {
-    Iterator it = begin();
-    while( it != end() )
+    Iterator it = m_children.begin();
+    while( it != m_children.end() )
     {
         n--;
         if( n <= 0 )
@@ -232,13 +215,13 @@ VarTree::Iterator VarTree::getVisibleItem( int n )
         }
         ++it;
     }
-    return end();
+    return m_children.end();
 }
 
 VarTree::Iterator VarTree::getLeaf( int n )
 {
-    Iterator it = begin();
-    while( it != end() )
+    Iterator it = m_children.begin();
+    while( it != m_children.end() )
     {
         if( it->size() )
         {
@@ -255,21 +238,21 @@ VarTree::Iterator VarTree::getLeaf( int n )
         }
         ++it;
     }
-    return end();
+    return m_children.end();
 }
 
 VarTree::Iterator VarTree::getNextVisibleItem( Iterator it )
 {
     if( it->m_expanded && it->size() )
     {
-        it = it->begin();
+        it = it->m_children.begin();
     }
     else
     {
         Iterator it_old = it;
         ++it;
         // Was 'it' the last brother? If so, look for uncles
-        if( it_old->parent() && it_old->parent()->end() == it )
+        if( it_old->parent() && it_old->parent()->m_children.end() == it )
         {
             it = it_old->next_uncle();
         }
@@ -279,23 +262,30 @@ VarTree::Iterator VarTree::getNextVisibleItem( Iterator it )
 
 VarTree::Iterator VarTree::getPrevVisibleItem( Iterator it )
 {
-    Iterator it_old = it;
-    if( it == root()->begin() || it == ++(root()->begin()) ) return it;
+    if( it == root()->m_children.begin() )
+        return it;
+
+    if( it == root()->m_children.end() )
+    {
+        --it;
+        while( it->size() && it->m_expanded )
+            it = --(it->m_children.end());
+        return it;
+    }
 
     /* Was it the first child of its parent ? */
-    if( it->parent() && it == it->parent()->begin() )
+    VarTree *p_parent = it->parent();
+    if( it == p_parent->m_children.begin() )
     {
-        /* Yes, get previous uncle */
-        it = it_old->prev_uncle();
+        /* Yes, get its parent's it */
+        it = p_parent->getSelf();
     }
     else
-        --it;
-
-    /* We have found an expanded uncle, take its last child */
-    while( it != root()->begin() && it->size() && it->m_expanded )
     {
-            it = it->end();
-            --it;
+        --it;
+        /* We have found an older brother, take its last visible child */
+        while( it->size() && it->m_expanded )
+            it = --(it->m_children.end());
     }
     return it;
 }
@@ -304,14 +294,14 @@ VarTree::Iterator VarTree::getNextItem( Iterator it )
 {
     if( it->size() )
     {
-        it = it->begin();
+        it = it->m_children.begin();
     }
     else
     {
         Iterator it_old = it;
         ++it;
         // Was 'it' the last brother? If so, look for uncles
-        if( it_old->parent() && it_old->parent()->end() == it )
+        if( it_old->parent() && it_old->parent()->m_children.end() == it )
         {
             it = it_old->next_uncle();
         }
@@ -321,23 +311,29 @@ VarTree::Iterator VarTree::getNextItem( Iterator it )
 
 VarTree::Iterator VarTree::getPrevItem( Iterator it )
 {
-    Iterator it_old = it;
-    if( it == root()->begin() || it == ++(root()->begin()) ) return it;
+    if( it == root()->m_children.begin() )
+        return it;
 
-    /* Was it the first child of its parent ? */
-    if( it->parent() && it == it->parent()->begin() )
+    if( it == root()->m_children.end() )
     {
-        /* Yes, get previous uncle */
-        it = it_old->prev_uncle();
+        --it;
+        while( it->size() )
+            it = --(it->m_children.end());
+        return it;
+    }
+    /* Was it the first child of its parent ? */
+    VarTree *p_parent = it->parent();
+    if( it == p_parent->m_children.begin() )
+    {
+        /* Yes, get its parent's it */
+        it = p_parent->getSelf();
     }
     else
-        --it;
-
-    /* We have found an expanded uncle, take its last child */
-    while( it != root()->begin() && it->size() )
     {
-            it = it->end();
-            --it;
+        --it;
+        /* We have found an older brother, take its last child */
+        while( it->size() )
+            it = --(it->m_children.end());
     }
     return it;
 }
@@ -348,42 +344,35 @@ VarTree::Iterator VarTree::getNextLeaf( Iterator it )
     {
         it = getNextItem( it );
     }
-    while( it != root()->end() && it->size() );
+    while( it != root()->m_children.end() && it->size() );
     return it;
 }
 
 VarTree::Iterator VarTree::getPrevLeaf( Iterator it )
 {
-    do
-    {
-        it = getPrevItem( it );
-    }
-    while( it != root()->begin() && it->size() ); /* FIXME ? */
-    if( it == root()->begin() ) it = firstLeaf();
-    return it;
+    Iterator it_new = it->getPrevSiblingOrUncle();
+    if( it_new == root()->end() )
+        return it_new;
+    while( it_new->size() )
+        it_new = --(it_new->m_children.end());
+    return it_new;
 }
 
-VarTree::Iterator VarTree::findById( int id )
+VarTree::Iterator VarTree::getParent( Iterator it )
 {
-    for (Iterator it = begin(); it != end(); ++it )
+    if( it->parent() )
     {
-        if( it->m_id == id )
-        {
-            return it;
-        }
-        Iterator result = it->findById( id );
-        if( result != it->end() ) return result;
+        return it->parent()->getSelf();
     }
-    return end();
+    return m_children.end();
 }
-
 
 void VarTree::ensureExpanded( const Iterator& it )
 {
     /// Don't expand ourselves, only our parents
     VarTree *current = &(*it);
     current = current->parent();
-    while( current->parent() != NULL )
+    while( current->parent() )
     {
         current->m_expanded = true;
         current = current->parent();
@@ -392,47 +381,91 @@ void VarTree::ensureExpanded( const Iterator& it )
 
 int VarTree::countLeafs()
 {
-    if( size() == 0 ) return 1;
+    if( size() == 0 )
+        return 1;
 
     int i_count = 0;
-    Iterator it = begin();
-    while( it != end() )
+    for( Iterator it = m_children.begin(); it != m_children.end(); ++it )
     {
         i_count += it->countLeafs();
-        ++it;
     }
     return i_count;
 }
 
 VarTree::Iterator VarTree::firstLeaf()
 {
-    Iterator b = root()->begin();
+    Iterator b = root()->m_children.begin();
     if( b->size() ) return getNextLeaf( b );
     return b;
 }
 
-void VarTree::cascadeDelete()
+int VarTree::getIndex( const Iterator& item )
 {
-    m_deleted = true;
-    for( Iterator it = begin(); it != end(); ++it )
-    {
-        it->cascadeDelete();
-    }
-}
-
-int VarTree::getRank( const Iterator& item, bool flat )
-{
-    int index = 1;
+    int index = 0;
     Iterator it;
-    for( it = flat ? firstLeaf() : begin();
-         it != end();
-         it = flat ? getNextLeaf( it ) : getNextVisibleItem( it ) )
+    for( it = m_flat ? firstLeaf() : m_children.begin();
+         it != m_children.end();
+         it = m_flat ? getNextLeaf( it ) : getNextVisibleItem( it ) )
     {
-        if( it->isDeleted() )
-            continue;
         if( it == item )
             break;
         index++;
     }
     return (it == item) ? index : -1;
+}
+
+VarTree::Iterator VarTree::getItemFromSlider()
+{
+    // a simple (int)(...) causes rounding errors !
+#ifdef _MSC_VER
+#       define lrint (int)
+#endif
+    VarPercent &rVarPos = getPositionVar();
+    double percentage = rVarPos.get();
+
+    int indexMax = m_flat ? (countLeafs() - 1)
+                          : (visibleItems() - 1);
+
+    int index = lrint( (1.0 - percentage)*(double)indexMax );
+
+    Iterator it_first = m_flat ? getLeaf( index + 1 )
+                               : getVisibleItem( index + 1 );
+    return it_first;
+}
+
+void VarTree::setSliderFromItem( const Iterator& it )
+{
+    VarPercent &rVarPos = getPositionVar();
+
+    int indexMax = m_flat ? (countLeafs() - 1)
+                          : (visibleItems() - 1);
+
+    int index = getIndex( it );
+    double percentage = (1.0 - (double)index/(double)indexMax);
+
+    m_dontMove = true;
+    rVarPos.set( (float)percentage );
+    m_dontMove = false;
+}
+
+void VarTree::onUpdate( Subject<VarPercent> &rPercent, void* arg )
+{
+    (void)rPercent; (void)arg;
+    onUpdateSlider();
+}
+
+void VarTree::unselectTree()
+{
+    m_selected = false;
+    for( Iterator it = m_children.begin(); it != m_children.end(); ++it )
+        it->unselectTree();
+}
+
+VarTree::IteratorVisible VarTree::getItem( int index )
+{
+   Iterator it =
+        m_flat ? getLeaf( index + 1 )
+               : getVisibleItem( index + 1 );
+
+   return IteratorVisible( it, this );
 }

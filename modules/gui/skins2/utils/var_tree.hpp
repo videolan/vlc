@@ -26,47 +26,41 @@
 #define VAR_TREE_HPP
 
 #include <list>
+#include <assert.h>
 
 #include "variable.hpp"
 #include "observer.hpp"
 #include "ustring.hpp"
 #include "var_percent.hpp"
 
-/// Description of an update to the tree
-typedef struct tree_update
-{
-    enum type_t
-    {
-        UpdateItem,
-        AppendItem,
-        DeleteItem,
-        ResetAll,
-    };
-
-    enum type_t type;
-    int i_id;
-    bool b_active_item;
-
-} tree_update;
+class VarTree;
+struct tree_update;
 
 /// Tree variable
-class VarTree: public Variable, public Subject<VarTree, tree_update>
+class VarTree: public Variable,
+               public Subject<VarTree, tree_update>,
+               public Observer<VarPercent>
 {
 public:
     VarTree( intf_thread_t *pIntf );
 
     VarTree( intf_thread_t *pIntf, VarTree *pParent, int id,
              const UStringPtr &rcString, bool selected, bool playing,
-             bool expanded, bool readonly, void *pData );
+             bool expanded, bool readonly );
+    VarTree( const VarTree& );
 
     virtual ~VarTree();
+
+    /// Iterators
+    typedef list<VarTree>::iterator Iterator;
+    typedef list<VarTree>::const_iterator ConstIterator;
 
     /// Get the variable type
     virtual const string &getType() const { return m_type; }
 
     /// Add a pointer on string in the children's list
-    virtual void add( int id, const UStringPtr &rcString, bool selected,
-                      bool playing, bool expanded, bool readonly, void *pData );
+    virtual Iterator add( int id, const UStringPtr &rcString, bool selected,
+                    bool playing, bool expanded, bool readonly, int pos = -1 );
 
     /// Remove the selected item from the children's list
     virtual void delSelected();
@@ -75,7 +69,6 @@ public:
     virtual void clear();
 
     inline int  getId() { return m_id; }
-    inline void *getData() { return m_pData; }
     inline UString* getString() {return (UString*)m_cString.get(); }
     inline void setString( UStringPtr val ) { m_cString = val; }
 
@@ -83,43 +76,101 @@ public:
     inline bool isSelected() { return m_selected; };
     inline bool isPlaying() { return m_playing; };
     inline bool isExpanded() { return m_expanded; };
-    inline bool isDeleted() { return m_deleted; };
+    inline bool isFlat() { return m_flat; };
 
     inline void setSelected( bool val ) { m_selected = val; }
     inline void setPlaying( bool val ) { m_playing = val; }
     inline void setExpanded( bool val ) { m_expanded = val; }
-    inline void setDeleted( bool val ) { m_deleted = val; }
+    inline void setFlat( bool val ) { m_flat = val; }
 
     inline void toggleSelected() { m_selected = !m_selected; }
-    inline void toggleExpanded() { m_expanded = !m_expanded; }
+    inline void toggleExpanded() { setExpanded( !m_expanded ); }
 
     /// Get the number of children
     int size() const { return m_children.size(); }
 
-    /// Iterators
-    typedef list<VarTree>::iterator Iterator;
-    typedef list<VarTree>::const_iterator ConstIterator;
+    /// iterator over visible items
+    class IteratorVisible : public Iterator
+    {
+        public:
+        IteratorVisible( const VarTree::Iterator& it, VarTree* pRootTree )
+            : VarTree::Iterator( it ), m_pRootTree( pRootTree ) {}
 
-    /// Begining of the children's list
-    Iterator begin() { return m_children.begin(); }
-    ConstIterator begin() const { return m_children.begin(); }
+        IteratorVisible& operator++()
+        {
+            Iterator& it = *this;
+            assert( it != end() );
+            it = isFlat() ? m_pRootTree->getNextLeaf( it ) :
+                            m_pRootTree->getNextVisibleItem( it );
+            return *this;
+        }
+
+        IteratorVisible& operator--()
+        {
+            Iterator& it = *this;
+            it = isFlat() ? m_pRootTree->getPrevLeaf( it ) :
+                            m_pRootTree->getPrevVisibleItem( it );
+            return *this;
+        }
+
+        IteratorVisible getParent()
+        {
+            IteratorVisible& it = *this;
+            if( it->parent() && it->parent() != m_pRootTree )
+            {
+                return IteratorVisible( it->parent()->getSelf(), m_pRootTree );
+            }
+            return end();
+        }
+
+        private:
+        inline IteratorVisible begin() { return m_pRootTree->begin(); }
+        inline IteratorVisible end()   { return m_pRootTree->end(); }
+        inline bool isFlat()           { return m_pRootTree->m_flat; }
+        VarTree* m_pRootTree;
+    };
+
+    /// Beginning of the children's list
+    IteratorVisible begin()
+    {
+        return IteratorVisible(
+               m_flat ? firstLeaf() : m_children.begin(), this );
+    }
 
     /// End of children's list
-    Iterator end() { return m_children.end(); }
-    ConstIterator end() const { return m_children.end(); }
+    IteratorVisible end() { return IteratorVisible( m_children.end(), this ); }
 
     /// Back of children's list
     VarTree &back() { return m_children.back(); }
-
-    /// Return an iterator on the n'th element of the children's list
-    Iterator operator[]( int n );
-    ConstIterator operator[]( int n ) const;
 
     /// Parent node
     VarTree *parent() { return m_pParent; }
 
     /// Get next sibling
     Iterator getNextSiblingOrUncle();
+    Iterator getPrevSiblingOrUncle();
+
+    Iterator getSelf()
+    {
+        assert( m_pParent );
+        Iterator it = m_pParent->m_children.begin();
+        for( ; &*it != this && it != m_pParent->m_children.end(); ++it );
+        assert( it != m_pParent->m_children.end() );
+        return it;
+    }
+
+    int getIndex()
+    {
+        if( m_pParent )
+        {
+            int i_pos = 0;
+            for( Iterator it = m_pParent->m_children.begin();
+                 it != m_pParent->m_children.end(); ++it, i_pos++ )
+                if( &(*it) == this )
+                    return i_pos;
+        }
+        return -1;
+    }
 
     Iterator next_uncle();
     Iterator prev_uncle();
@@ -131,7 +182,7 @@ public:
     void removeChild( Iterator it ) { m_children.erase( it ); }
 
     /// Execute the action associated to this item
-    virtual void action( VarTree *pItem ) { (void)pItem; }
+    virtual void action( VarTree *pItem ) { VLC_UNUSED(pItem); }
 
     /// Get a reference on the position variable
     VarPercent &getPositionVar() const
@@ -171,17 +222,21 @@ public:
     /// Given an iterator to an item, return the previous leaf
     Iterator getPrevLeaf( Iterator it );
 
-    /// return rank of visible item starting from 1
-    int getRank( const Iterator& it, bool flat );
+    /// Given an iterator to an item, return the parent item
+    Iterator getParent( Iterator it );
 
-    /// Find a children node with the given id
-    Iterator findById( int id );
+    /// return index of visible item (starting from 0)
+    int getIndex( const Iterator& it );
 
     /// Ensure an item is expanded
     void ensureExpanded( const Iterator& it );
 
-    /// flag a whole subtree for deletion
-    void cascadeDelete();
+    ///
+    Iterator getItemFromSlider();
+    void setSliderFromItem( const Iterator& it );
+
+    ///
+    void onUpdate( Subject<VarPercent> &rPercent, void* arg);
 
     /// Get depth (root depth is 0)
     int depth()
@@ -192,6 +247,17 @@ public:
             depth++;
         return depth;
     }
+
+    virtual void onUpdateSlider() {}
+
+    void unselectTree();
+
+    VarTree::IteratorVisible getItem( int index );
+
+protected:
+
+    /// List of children
+    list<VarTree> m_children;
 
 private:
 
@@ -204,14 +270,10 @@ private:
         return parent;
     }
 
-    /// List of children
-    list<VarTree> m_children;
-
     /// Pointer to parent node
     VarTree *m_pParent;
 
     int m_id;
-    void *m_pData;
     UStringPtr m_cString;
 
     /// indicators
@@ -219,7 +281,8 @@ private:
     bool m_selected;
     bool m_playing;
     bool m_expanded;
-    bool m_deleted;
+    bool m_flat;
+    bool m_dontMove;
 
     /// Variable type
     static const string m_type;
@@ -227,5 +290,24 @@ private:
     /// Position variable
     VariablePtr m_cPosition;
 };
+
+/// Description of an update to the tree
+typedef struct tree_update
+{
+    enum type_t
+    {
+        ItemUpdated,
+        ItemInserted,
+        ItemDeleted,
+        DeletingItem,
+        ResetAll,
+        SliderChanged,
+    };
+    enum type_t type;
+    VarTree::IteratorVisible it;
+
+    tree_update( enum type_t t, VarTree::IteratorVisible item ) :
+        type( t ), it( item ) {}
+} tree_update;
 
 #endif
