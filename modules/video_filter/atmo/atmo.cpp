@@ -43,6 +43,7 @@
 
 #include <vlc_playlist.h>
 #include <vlc_filter.h>
+#include <vlc_atomic.h>
 
 #include "filter_picture.h"
 
@@ -699,8 +700,10 @@ static const char *const ppsz_filter_options[] = {
 */
 typedef struct
 {
-    VLC_COMMON_MEMBERS
-        filter_t *p_filter;
+    filter_t *p_filter;
+    vlc_thread_t thread;
+    vlc_atomic_t abort;
+
     /* tell the thread which color should be the target of fading */
     uint8_t ui_red;
     uint8_t ui_green;
@@ -710,7 +713,7 @@ typedef struct
 
 } fadethread_t;
 
-static void *FadeToColorThread(vlc_object_t *);
+static void *FadeToColorThread(void *);
 
 
 /*****************************************************************************
@@ -1105,9 +1108,7 @@ static void Atmo_Shutdown(filter_t *p_filter)
         p_sys->b_pause_live = true;
 
 
-        p_sys->p_fadethread = (fadethread_t *)vlc_object_create( p_filter,
-                                                    sizeof(fadethread_t) );
-
+        p_sys->p_fadethread = (fadethread_t *)calloc( 1, sizeof(fadethread_t) );
         p_sys->p_fadethread->p_filter = p_filter;
         p_sys->p_fadethread->ui_red   = p_sys->ui_endcolor_red;
         p_sys->p_fadethread->ui_green = p_sys->ui_endcolor_green;
@@ -1116,13 +1117,15 @@ static void Atmo_Shutdown(filter_t *p_filter)
           p_sys->p_fadethread->i_steps  = 1;
         else
           p_sys->p_fadethread->i_steps  = p_sys->i_endfadesteps;
+        vlc_atomic_set(&p_sys->p_fadethread->abort, 0);
 
-        if( vlc_thread_create( p_sys->p_fadethread,
-            FadeToColorThread,
-            VLC_THREAD_PRIORITY_LOW ) )
+        if( vlc_clone( &p_sys->p_fadethread->thread,
+                       FadeToColorThread,
+                       p_sys->p_fadethread,
+                       VLC_THREAD_PRIORITY_LOW ) )
         {
             msg_Err( p_filter, "cannot create FadeToColorThread" );
-            vlc_object_release( p_sys->p_fadethread );
+            free( p_sys->p_fadethread );
             p_sys->p_fadethread = NULL;
             vlc_mutex_unlock( &p_sys->filter_lock );
 
@@ -1131,9 +1134,9 @@ static void Atmo_Shutdown(filter_t *p_filter)
             vlc_mutex_unlock( &p_sys->filter_lock );
 
             /* wait for the thread... */
-            vlc_thread_join(p_sys->p_fadethread);
+            vlc_join(p_sys->p_fadethread->thread, NULL);
 
-            vlc_object_release(p_sys->p_fadethread);
+            free(p_sys->p_fadethread);
 
             p_sys->p_fadethread = NULL;
         }
@@ -2323,7 +2326,7 @@ static picture_t * Filter( filter_t *p_filter, picture_t *p_pic )
 * to a target color defined in p_fadethread struct
 * use for: Fade to Pause Color,  and Fade to End Color
 *****************************************************************************/
-static void *FadeToColorThread(vlc_object_t *obj)
+static void *FadeToColorThread(void *obj)
 {
     fadethread_t *p_fadethread = (fadethread_t *)obj;
     filter_sys_t *p_sys = (filter_sys_t *)p_fadethread->p_filter->p_sys;
@@ -2366,7 +2369,7 @@ static void *FadeToColorThread(vlc_object_t *obj)
             /* send the same pixel data again... to unlock the buffer! */
             AtmoSendPixelData( p_fadethread->p_filter );
 
-            while( (vlc_object_alive (p_fadethread)) &&
+            while( (!vlc_atomic_get (&p_fadethread->abort)) &&
                 (i_steps_done < p_fadethread->i_steps))
             {
                 p_transfer = AtmoLockTransferBuffer( p_fadethread->p_filter );
@@ -2379,7 +2382,7 @@ static void *FadeToColorThread(vlc_object_t *obj)
                 thread improvements wellcome!
                 */
                 for(i_index = 0;
-                    (i_index < i_size) && (vlc_object_alive (p_fadethread));
+                    (i_index < i_size) && (!vlc_atomic_get (&p_fadethread->abort));
                     i_index+=4)
                 {
                     i_src_blue  = p_source[i_index+0];
@@ -2435,11 +2438,10 @@ static void CheckAndStopFadeThread(filter_t *p_filter)
     {
         msg_Dbg(p_filter, "kill still running fadeing thread...");
 
-        p_sys->p_fadethread->b_die = true;
+        vlc_atomic_set(&p_sys->p_fadethread->abort, 1);
 
-        vlc_thread_join(p_sys->p_fadethread);
-
-        vlc_object_release(p_sys->p_fadethread);
+        vlc_join(p_sys->p_fadethread->thread, NULL);
+        free(p_sys->p_fadethread);
         p_sys->p_fadethread = NULL;
     }
     vlc_mutex_unlock( &p_sys->filter_lock );
@@ -2478,22 +2480,21 @@ static int StateCallback( vlc_object_t *, char const *,
             */
             if(p_sys->p_fadethread == NULL)
             {
-                p_sys->p_fadethread = (fadethread_t *)vlc_object_create(
-                     p_filter,
-                     sizeof(fadethread_t) );
-
+                p_sys->p_fadethread = (fadethread_t *)calloc( 1, sizeof(fadethread_t) );
                 p_sys->p_fadethread->p_filter = p_filter;
                 p_sys->p_fadethread->ui_red   = p_sys->ui_pausecolor_red;
                 p_sys->p_fadethread->ui_green = p_sys->ui_pausecolor_green;
                 p_sys->p_fadethread->ui_blue  = p_sys->ui_pausecolor_blue;
                 p_sys->p_fadethread->i_steps  = p_sys->i_fadesteps;
+                vlc_atomic_set(&p_sys->p_fadethread->abort, 0);
 
-                if( vlc_thread_create( p_sys->p_fadethread,
-                    FadeToColorThread,
-                    VLC_THREAD_PRIORITY_LOW ) )
+                if( vlc_clone( &p_sys->p_fadethread->thread,
+                               FadeToColorThread,
+                               p_sys->p_fadethread,
+                               VLC_THREAD_PRIORITY_LOW ) )
                 {
                     msg_Err( p_filter, "cannot create FadeToColorThread" );
-                    vlc_object_release( p_sys->p_fadethread );
+                    free( p_sys->p_fadethread );
                     p_sys->p_fadethread = NULL;
                 }
             }

@@ -29,6 +29,7 @@ CAtmoExternalCaptureInput::CAtmoExternalCaptureInput(CAtmoDynData *pAtmoDynData)
     vlc_cond_init( &m_WakeupCond );
     vlc_mutex_init( &m_WakeupLock );
     m_pCurrentFramePixels = NULL;
+    m_pLog = pAtmoDynData->getAtmoFilter();
 }
 
 #else
@@ -97,7 +98,7 @@ void CAtmoExternalCaptureInput::DeliverNewSourceDataPaket(BITMAPINFOHEADER *bmpI
        the test needs and malloc needs...
     */
 #if defined(_ATMO_VLC_PLUGIN_)
-//    msg_Dbg( m_pAtmoThread, "DeliverNewSourceDataPaket start...");
+//    msg_Dbg( m_pLog, "DeliverNewSourceDataPaket start...");
     vlc_mutex_lock( &m_WakeupLock );
 #else
     EnterCriticalSection( &m_BufferLock );
@@ -119,7 +120,7 @@ void CAtmoExternalCaptureInput::DeliverNewSourceDataPaket(BITMAPINFOHEADER *bmpI
 #if defined(_ATMO_VLC_PLUGIN_)
     vlc_cond_signal( &m_WakeupCond );
     vlc_mutex_unlock( &m_WakeupLock );
-    // msg_Dbg( m_pAtmoThread, "DeliverNewSourceDataPaket done.");
+    // msg_Dbg( m_pLog, "DeliverNewSourceDataPaket done.");
 #else
     SetEvent(m_hWakeupEvent);
     LeaveCriticalSection( &m_BufferLock );
@@ -136,7 +137,7 @@ void CAtmoExternalCaptureInput::DeliverNewSourceDataPaket(BITMAPINFOHEADER *bmpI
 
 DWORD CAtmoExternalCaptureInput::Execute(void)
 {
-    while ((this->m_bTerminated == ATMO_FALSE) && !this->m_pAtmoThread->b_die) {
+    while ((this->m_bTerminated == ATMO_FALSE)) {
           vlc_mutex_lock( &m_WakeupLock );
           vlc_cond_timedwait(&m_WakeupCond, &m_WakeupLock, mdate() + 75000 );
 
@@ -146,7 +147,7 @@ DWORD CAtmoExternalCaptureInput::Execute(void)
           vlc_mutex_unlock( &m_WakeupLock );
     }
 
-    msg_Dbg( m_pAtmoThread, "DWORD CAtmoExternalCaptureInput::Execute(void) bailed out?");
+    msg_Dbg( m_pLog, "DWORD CAtmoExternalCaptureInput::Execute(void) bailed out?");
 
     return 0;
 }
@@ -185,7 +186,7 @@ void CAtmoExternalCaptureInput::CalcColors()
     int srcIndex,index = 0;
     memset(&HSV_Img,0,sizeof(HSV_Img));
 
-    // msg_Dbg( m_pAtmoThread, "CalcColors start...");
+    // msg_Dbg( m_pLog, "CalcColors start...");
 
     if((m_CurrentFrameHeader.biWidth == CAP_WIDTH) && (m_CurrentFrameHeader.biHeight == CAP_HEIGHT))
     {
@@ -271,8 +272,8 @@ void CAtmoExternalCaptureInput::CalcColors()
         (sorry I don't know how it exactly works because the formulas
         are done by some one else...)
     */
-    //msg_Dbg( m_pAtmoThread, "CalcColors ende AddPacket...");
+    //msg_Dbg( m_pLog, "CalcColors ende AddPacket...");
     m_pAtmoDynData->getLivePacketQueue()->AddPacket( m_pAtmoColorCalculator->AnalyzeHSV( HSV_Img ) );
-    //msg_Dbg( m_pAtmoThread, "CalcColors ende AddPacket...done.");
+    //msg_Dbg( m_pLog, "CalcColors ende AddPacket...done.");
 }
 

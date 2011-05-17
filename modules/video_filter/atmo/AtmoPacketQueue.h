@@ -87,8 +87,8 @@ public:
 
     // timecode = GetTickCount() - framedelay;
 #if defined(_ATMO_VLC_PLUGIN_)
-    void ShowQueueStatus(atmo_thread_t *p_this);
-    pColorPacket GetNextPacket(mtime_t timecode, ATMO_BOOL withWait, atmo_thread_t *p_this, mtime_t &packet_time );
+    void ShowQueueStatus(vlc_object_t *p_this);
+    pColorPacket GetNextPacket(mtime_t timecode, ATMO_BOOL withWait, vlc_object_t *p_this, mtime_t &packet_time );
 #else
     pColorPacket GetNextPacket(DWORD timecode, ATMO_BOOL withWait, DWORD &packet_time );
 #endif

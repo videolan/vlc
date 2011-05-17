@@ -30,6 +30,7 @@ protected:
 #if defined(_ATMO_VLC_PLUGIN_)
     vlc_cond_t   m_WakeupCond;
     vlc_mutex_t  m_WakeupLock;
+    vlc_object_t *m_pLog;
 #else
     HANDLE m_hWakeupEvent;
     CRITICAL_SECTION m_BufferLock;

@@ -181,7 +181,7 @@ pColorPacket CAtmoPacketQueue::GetNextPacket()
 }
 
 #if defined(_ATMO_VLC_PLUGIN_)
-void CAtmoPacketQueue::ShowQueueStatus(atmo_thread_t *p_this)
+void CAtmoPacketQueue::ShowQueueStatus(vlc_object_t *p_this)
 {
     /*
      show some statistics for the whole time...
@@ -198,7 +198,7 @@ void CAtmoPacketQueue::ShowQueueStatus(atmo_thread_t *p_this)
 #endif
 
 #if defined(_ATMO_VLC_PLUGIN_)
-pColorPacket CAtmoPacketQueue::GetNextPacket(mtime_t timecode, ATMO_BOOL withWait, atmo_thread_t *p_this, mtime_t &packet_time)
+pColorPacket CAtmoPacketQueue::GetNextPacket(mtime_t timecode, ATMO_BOOL withWait, vlc_object_t *p_this, mtime_t &packet_time)
 #else
 pColorPacket CAtmoPacketQueue::GetNextPacket(DWORD timecode, ATMO_BOOL withWait, DWORD &packet_time)
 #endif

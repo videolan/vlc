@@ -53,6 +53,7 @@ CAtmoLiveView::~CAtmoLiveView(void)
 DWORD CAtmoLiveView::Execute(void)
 {
 #if defined(_ATMO_VLC_PLUGIN_)
+    vlc_object_t *m_pLog = m_pAtmoDynData->getAtmoFilter();
     mtime_t ticks;
     mtime_t t;
     mtime_t packet_time;
@@ -97,7 +98,7 @@ DWORD CAtmoLiveView::Execute(void)
         if( frameDelay > 0 )
             do_sleep( frameDelay );
 #if defined(_ATMO_VLC_PLUGIN_)
-        msg_Dbg( m_pAtmoThread, "First Packet got %"PRId64" ms", (get_time - t) / 1000  );
+        msg_Dbg( m_pLog, "First Packet got %"PRId64" ms", (get_time - t) / 1000  );
 #endif
     }
 
@@ -108,7 +109,7 @@ DWORD CAtmoLiveView::Execute(void)
 
         /* grab current Packet from InputQueue (working as FIFO)! */
 #if defined(_ATMO_VLC_PLUGIN_)
-        ColorPacket = pPacketQueue->GetNextPacket(get_time - frameDelay, (i_frame_counter == 0), m_pAtmoThread, packet_time);
+        ColorPacket = pPacketQueue->GetNextPacket(get_time - frameDelay, (i_frame_counter == 0), m_pLog, packet_time);
 #else
         ColorPacket = pPacketQueue->GetNextPacket(get_time - frameDelay, (i_frame_counter == 0), packet_time);
 #endif
@@ -130,7 +131,7 @@ DWORD CAtmoLiveView::Execute(void)
             if(i_frame_counter == 0)
             {
 #if defined(_ATMO_VLC_PLUGIN_)
-                msg_Dbg( m_pAtmoThread, "wait for delayed packet..." );
+                msg_Dbg( m_pLog, "wait for delayed packet..." );
 #endif
                 t = get_time;
                 if( pPacketQueue->WaitForNextPacket(200) )
@@ -138,7 +139,7 @@ DWORD CAtmoLiveView::Execute(void)
                     if( frameDelay > 0 )
                         do_sleep( frameDelay );
 #if defined(_ATMO_VLC_PLUGIN_)
-                    msg_Dbg( m_pAtmoThread, "got delayed packet %"PRId64" ms", (mdate() - t) / 1000  );
+                    msg_Dbg( m_pLog, "got delayed packet %"PRId64" ms", (mdate() - t) / 1000  );
 #endif
                     continue;
                 }
@@ -191,8 +192,8 @@ DWORD CAtmoLiveView::Execute(void)
     }
 
 #if defined(_ATMO_VLC_PLUGIN_)
-    msg_Dbg( m_pAtmoThread, "DWORD CAtmoLiveView::Execute(void) terminates");
-    pPacketQueue->ShowQueueStatus( m_pAtmoThread );
+    msg_Dbg( m_pLog, "DWORD CAtmoLiveView::Execute(void) terminates");
+    pPacketQueue->ShowQueueStatus( m_pLog );
 #endif
 
     delete (char *)PreviousPacket;
