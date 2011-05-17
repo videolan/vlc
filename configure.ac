@@ -4011,7 +4011,7 @@ dnl
 dnl TLS/SSL
 dnl
 AC_ARG_ENABLE(gnutls,
-  [  --enable-gnutls         gnutls TLS/SSL support (default enabled)])
+  [  --enable-gnutls         GNU TLS TLS/SSL support (default enabled)])
 
 AS_IF([test "${have_libgcrypt}" != "yes"], [
   AS_IF([test "${enable_gnutls}" = "yes"], [
@@ -4020,7 +4020,7 @@ AS_IF([test "${have_libgcrypt}" != "yes"], [
   enable_gnutls="no"
 ])
 AS_IF([test "${enable_gnutls}" != "no"], [
-  PKG_CHECK_MODULES(GNUTLS, [gnutls >= 1.7.4], [
+  PKG_CHECK_MODULES(GNUTLS, [gnutls >= 2.0.0], [
     VLC_ADD_PLUGIN([gnutls])
     VLC_ADD_CFLAGS([gnutls], [$GNUTLS_CFLAGS])
     AS_IF([test "${SYS}" = "mingw32"], [
@@ -4032,7 +4032,7 @@ AS_IF([test "${enable_gnutls}" != "no"], [
     VLC_ADD_LIBS([gnutls], [$GNUTLS_LIBS])
   ], [
     AS_IF([test "${enable_gnutls}" = "yes"], [
-      AC_MSG_ERROR([gnutls not present or too old (version 1.7.4 required)])
+      AC_MSG_ERROR([GNU TLS not present or too old (version 2.0.0 required)])
     ])
   ])
 ])
