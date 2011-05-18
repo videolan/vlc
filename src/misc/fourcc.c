@@ -674,6 +674,8 @@ static const entry_t p_list_video[] = {
         A("AV16"),
     B(VLC_CODEC_RGB15, "15 bits RGB"),
         A("RV15"),
+    B(VLC_CODEC_RGBT, "16 bits RGBT"),
+        A("RGBT"),
     B(VLC_CODEC_RGB16, "16 bits RGB"),
         A("RV16"),
     B(VLC_CODEC_RGB24, "24 bits RGB"),
@@ -1619,7 +1621,7 @@ bool vlc_fourcc_IsYUV(vlc_fourcc_t fcc)
 
 static const struct
 {
-    vlc_fourcc_t             p_fourcc[5];
+    vlc_fourcc_t             p_fourcc[6];
     vlc_chroma_description_t description;
 } p_list_chroma_description[] = {
     { { VLC_CODEC_I411, 0 },                   PLANAR(3, 4, 1) },
@@ -1633,7 +1635,7 @@ static const struct
     { { VLC_CODEC_YUV_PACKED, 0 },             PACKED_FMT(2) },
     { { VLC_CODEC_RGB8, VLC_CODEC_GREY,
         VLC_CODEC_YUVP, VLC_CODEC_RGBP, 0 },   PACKED_FMT(1) },
-    { { VLC_CODEC_RGB16, VLC_CODEC_RGB15,
+    { { VLC_CODEC_RGB16, VLC_CODEC_RGB15, VLC_CODEC_RGBT,
         VLC_CODEC_RGB12, VLC_CODEC_RGBA16, 0 },PACKED_FMT(2) },
     { { VLC_CODEC_RGB24, 0 },                  PACKED_FMT(3) },
     { { VLC_CODEC_RGB32, VLC_CODEC_RGBA, 0 },  PACKED_FMT(4) },
