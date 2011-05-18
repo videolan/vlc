@@ -158,6 +158,8 @@ static vlc_fourcc_t ParseFormat (vout_display_t *vd,
                     return VLC_CODEC_RGB16;
                 break;
               case 15:
+                if (f->bpp == 16 && f->depth == 16)
+                    return VLC_CODEC_RGBT;
                 if (f->bpp == 16 && f->depth == 15)
                     return VLC_CODEC_RGB15;
                 break;
