@@ -135,8 +135,8 @@ struct filter_sys_t
     vlc_mutex_t lock;
     bool  b_quit;
     float *p_buffer;
-    int   i_buffer_size;
-    int   i_nb_samples;
+    unsigned i_buffer_size;
+    unsigned i_nb_samples;
 };
 
 
@@ -248,7 +248,7 @@ static block_t *DoWork( filter_t *p_filter, block_t *p_in_buf )
                                      p_in_buf->i_nb_samples );
 
         const float *p_src = (float*)p_in_buf->p_buffer;
-        for( int i = 0; i < p_sys->i_nb_samples; i++ )
+        for( unsigned i = 0; i < p_sys->i_nb_samples; i++ )
         {
             float v = 0;
             for( int j = 0; j < p_sys->i_channels; j++ )
