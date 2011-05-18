@@ -132,7 +132,7 @@ static void* EncoderThread( vlc_object_t* p_this )
     picture_t *p_pic;
     int canc = vlc_savecancel ();
 
-    while( vlc_object_alive (p_sys) && !p_sys->b_error )
+    while( vlc_object_alive (p_sys) )
     {
         block_t *p_block;
 
@@ -140,9 +140,9 @@ static void* EncoderThread( vlc_object_t* p_this )
         while( p_sys->i_last_pic == p_sys->i_first_pic )
         {
             vlc_cond_wait( &p_sys->cond, &p_sys->lock_out );
-            if( !vlc_object_alive (p_sys) || p_sys->b_error ) break;
+            if( !vlc_object_alive (p_sys) ) break;
         }
-        if( !vlc_object_alive (p_sys) || p_sys->b_error )
+        if( !vlc_object_alive (p_sys) )
         {
             vlc_mutex_unlock( &p_sys->lock_out );
             break;
@@ -274,7 +274,7 @@ int transcode_video_new( sout_stream_t *p_stream, sout_stream_id_t *id )
         p_sys->i_first_pic = 0;
         p_sys->i_last_pic = 0;
         p_sys->p_buffers = NULL;
-        p_sys->b_die = p_sys->b_error = 0;
+        p_sys->b_die = 0;
         if( vlc_thread_create( p_sys, EncoderThread, i_priority ) )
         {
             msg_Err( p_stream, "cannot spawn encoder thread" );
