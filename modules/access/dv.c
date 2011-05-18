@@ -75,8 +75,7 @@ vlc_module_end ()
 
 typedef struct
 {
-    VLC_COMMON_MEMBERS
-
+    vlc_thread_t    thread;
     access_t        *p_access;
     vlc_mutex_t     lock;
     block_t         *p_frame;
@@ -84,7 +83,7 @@ typedef struct
 
 } event_thread_t;
 
-static void* Raw1394EventThread( vlc_object_t * );
+static void* Raw1394EventThread( void * );
 static enum raw1394_iso_disposition
 Raw1394Handler(raw1394handle_t, unsigned char *,
         unsigned int, unsigned char,
@@ -214,7 +213,7 @@ static int Open( vlc_object_t *p_this )
     var_Create( p_access, "dv-caching", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
 
     /* Now create our event thread catcher */
-    p_sys->p_ev = vlc_object_create( p_access, sizeof( event_thread_t ) );
+    p_sys->p_ev = calloc( 1, sizeof( *p_sys->p_ev ) );
     if( !p_sys->p_ev )
     {
         msg_Err( p_access, "failed to create event thread" );
@@ -226,8 +225,8 @@ static int Open( vlc_object_t *p_this )
     p_sys->p_ev->pp_last = &p_sys->p_ev->p_frame;
     p_sys->p_ev->p_access = p_access;
     vlc_mutex_init( &p_sys->p_ev->lock );
-    vlc_thread_create( p_sys->p_ev,
-                       Raw1394EventThread, VLC_THREAD_PRIORITY_OUTPUT );
+    vlc_clone( &p_sys->p_ev->thread, Raw1394EventThread,
+               p_sys->p_ev, VLC_THREAD_PRIORITY_OUTPUT );
 
     return VLC_SUCCESS;
 }
@@ -243,12 +242,12 @@ static void Close( vlc_object_t *p_this )
     if( p_sys->p_ev )
     {
         /* stop the event handler */
-        vlc_object_kill( p_sys->p_ev );
+        vlc_cancel( p_sys->p_ev->thread );
 
         if( p_sys->p_raw1394 )
             raw1394_iso_shutdown( p_sys->p_raw1394 );
 
-        vlc_thread_join( p_sys->p_ev );
+        vlc_join( p_sys->p_ev->thread, NULL );
         vlc_mutex_destroy( &p_sys->p_ev->lock );
 
         /* Cleanup frame data */
@@ -258,7 +257,7 @@ static void Close( vlc_object_t *p_this )
             p_sys->p_ev->p_frame = NULL;
             p_sys->p_ev->pp_last = &p_sys->p_frame;
         }
-        vlc_object_release( p_sys->p_ev );
+        free( p_sys->p_ev );
     }
 
     if( p_sys->p_frame )
@@ -329,32 +328,43 @@ static block_t *Block( access_t *p_access )
     return p_block;
 }
 
-static void* Raw1394EventThread( vlc_object_t *p_this )
+static void Raw1394EventThreadCleanup( void *obj )
 {
-    event_thread_t *p_ev = (event_thread_t *) p_this;
+    event_thread_t *p_ev = (event_thread_t *)obj;
+
+    AVCStop( p_ev->p_access, p_ev->p_access->p_sys->i_node );
+}
+
+static void* Raw1394EventThread( void *obj )
+{
+    event_thread_t *p_ev = (event_thread_t *)obj;
     access_t *p_access = (access_t *) p_ev->p_access;
     access_sys_t *p_sys = (access_sys_t *) p_access->p_sys;
     int result = 0;
-    int canc = vlc_savecancel ();
+    int canc = vlc_savecancel();
 
     AVCPlay( p_access, p_sys->i_node );
+    vlc_cleanup_push( Raw1394EventThreadCleanup, p_ev );
+    vlc_restorecancel( canc );
 
-    while( vlc_object_alive (p_sys->p_ev) )
+    for( ;; )
     {
-        while( ( result = poll( &(p_sys->raw1394_poll), 1, 200 ) ) < 0 )
+        while( ( result = poll( &p_sys->raw1394_poll, 1, -1 ) ) < 0 )
         {
             if( errno != EINTR )
                 msg_Err( p_access, "poll error: %m" );
         }
-        if( !vlc_object_alive (p_sys->p_ev) )
-                break;
+
         if( result > 0 && ( ( p_sys->raw1394_poll.revents & POLLIN )
-                || ( p_sys->raw1394_poll.revents & POLLPRI ) ) )
+                         || ( p_sys->raw1394_poll.revents & POLLPRI ) ) )
+        {
+            canc = vlc_savecancel();
             result = raw1394_loop_iterate( p_sys->p_raw1394 );
+            vlc_restorecancel( canc );
+        }
     }
 
-    AVCStop( p_access, p_sys->i_node );
-    vlc_restorecancel (canc);
+    vlc_cleanup_run();
     return NULL;
 }
 
