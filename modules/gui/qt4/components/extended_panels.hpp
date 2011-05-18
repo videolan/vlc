@@ -53,10 +53,8 @@ private:
     Ui::ExtVideoWidget ui;
     QSignalMapper* filterMapper;
     intf_thread_t *p_intf;
-    vout_thread_t *p_vout;
     void initComboBoxItems( QObject* );
     void setWidgetValue( QObject* );
-    void ChangeVFiltersString( const char *psz_name, bool b_add );
     void clean();
 private slots:
     void updateFilters();
@@ -176,22 +174,28 @@ class SyncControls : public QWidget
     friend class ExtendedDialog;
 public:
     SyncControls( intf_thread_t *, QWidget * );
-    virtual ~SyncControls() {};
+    virtual ~SyncControls();
 private:
     intf_thread_t *p_intf;
     QDoubleSpinBox *AVSpin;
     QDoubleSpinBox *subsSpin;
     QDoubleSpinBox *subSpeedSpin;
+    QDoubleSpinBox *subDurationSpin;
 
     bool b_userAction;
 
     void clean();
+
+    void updateSubsDuration();
+    void subsdelayClean();
+    void subsdelaySetFactor( double );
 public slots:
     void update();
 private slots:
     void advanceAudio( double );
     void advanceSubs( double );
     void adjustSubsSpeed( double );
+    void adjustSubsDuration( double );
 };
 
 #endif
