@@ -253,15 +253,12 @@ static int Open( vlc_object_t *p_this )
     sout_stream_sys_t *p_sys;
     char              *psz_string;
 
-    p_sys = vlc_object_create( p_this, sizeof( sout_stream_sys_t ) );
-
     if( !p_stream->p_next )
     {
         msg_Err( p_stream, "cannot create chain" );
-        vlc_object_release( p_sys );
         return VLC_EGENERIC;
     }
-
+    p_sys = calloc( 1, sizeof( *p_sys ) );
     p_sys->i_master_drift = 0;
 
     config_ChainParse( p_stream, SOUT_CFG_PREFIX, ppsz_sout_options,
@@ -507,7 +504,7 @@ static void Close( vlc_object_t * p_this )
     config_ChainDestroy( p_sys->p_osd_cfg );
     free( p_sys->psz_osdenc );
 
-    vlc_object_release( p_sys );
+    free( p_sys );
 }
 
 static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
