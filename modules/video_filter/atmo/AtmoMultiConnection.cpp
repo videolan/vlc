@@ -381,9 +381,9 @@ ATMO_BOOL CAtmoMultiConnection::setChannelValues(int numValues,unsigned char *ch
 
 
   Lock();
-  int Index = 0;
+  size_t Index = 0;
   for (int i = 0; i < numValues; i+=2) {
-       Index = (int)channel_values[i];
+       Index = (size_t)channel_values[i];
        if(Index < sizeof(m_output))
           m_output[Index] = channel_values[i + 1];
   }

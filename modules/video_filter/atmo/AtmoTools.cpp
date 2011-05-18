@@ -128,6 +128,8 @@ EffectMode CAtmoTools::SwitchEffect(CAtmoDynData *pDynData, EffectMode newEffect
         // neuen EffectThread nur mit aktiver Connection starten...
 
         switch(newEffectMode) {
+            case emUndefined: // do nothing also in that case (avoid compiler warning)
+                break;
             case emDisabled:
                 break;
 
@@ -223,6 +225,8 @@ LivePictureSource CAtmoTools::SwitchLiveSource(CAtmoDynData *pDynData, LivePictu
         }
 
         switch(pDynData->getLivePictureSource()) {
+               case lpsDisabled: // do nothing in that case - avoid compiler warning
+               break;
 #if !defined(_ATMO_VLC_PLUGIN_)
                case lpsScreenCapture:
                     input = new CAtmoGdiDisplayCaptureInput( pDynData );

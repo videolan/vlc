@@ -735,6 +735,8 @@ struct filter_sys_t
     bool b_show_dots;
     int32_t i_device_type;
 
+    bool b_swap_uv;
+
     int32_t i_atmo_width;
     int32_t i_atmo_height;
     /* used to disable fadeout if less than 50 frames are processed
@@ -1736,8 +1738,12 @@ static void Atmo_SetupParameters(filter_t *p_filter)
     switch( p_filter->fmt_in.video.i_chroma )
     {
     case VLC_CODEC_I420:
+        p_sys->pf_extract_mini_image = ExtractMiniImage_YUV;
+        p_sys->b_swap_uv = false;
+        break;
     case VLC_CODEC_YV12:
         p_sys->pf_extract_mini_image = ExtractMiniImage_YUV;
+        p_sys->b_swap_uv = true;
         break;
     default:
         msg_Warn( p_filter, "InitFilter-unsupported chroma: %4.4s",
@@ -2105,6 +2111,16 @@ static void ExtractMiniImage_YUV(filter_sys_t *p_sys,
         p_src_v = p_inpic->p[V_PLANE].p_pixels +
             p_inpic->p[V_PLANE].i_pitch * i_v_row;
 
+        if(p_sys->b_swap_uv)
+        {
+          /*
+           swap u and v plane for YV12 images
+          */
+          uint8_t *p_temp_plane = p_src_u;
+          p_src_u = p_src_v;
+          p_src_v = p_temp_plane;
+        }
+
         for(i_col = 1; i_col < i_col_count; i_col++)
         {
             i_pixel_col = (i_col * p_sys->i_crop_width) / i_col_count +
@@ -2292,7 +2308,7 @@ static picture_t * Filter( filter_t *p_filter, picture_t *p_pic )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
     if( !p_pic ) return NULL;
-    
+
     picture_t *p_outpic = filter_NewPicture( p_filter );
     if( !p_outpic )
     {
@@ -2300,7 +2316,7 @@ static picture_t * Filter( filter_t *p_filter, picture_t *p_pic )
         return NULL;
     }
     picture_CopyPixels( p_outpic, p_pic );
-    
+
     vlc_mutex_lock( &p_sys->filter_lock );
 
     if(p_sys->b_enabled && p_sys->pf_extract_mini_image &&
