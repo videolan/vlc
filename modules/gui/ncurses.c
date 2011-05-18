@@ -1095,10 +1095,14 @@ static int DrawStatus(intf_thread_t *p_intf)
     if (p_input && !p_input->b_dead)
     {
         vlc_value_t val;
+        char *psz_path, *psz_uri;
 
-        char *psz_uri = input_item_GetURI(input_GetItem(p_input));
-        mvnprintw(y++, 0, COLS, _(" Source   : %s"), psz_uri);
+        psz_uri = input_item_GetURI(input_GetItem(p_input));
+        psz_path = make_path(psz_uri);
+
+        mvnprintw(y++, 0, COLS, _(" Source   : %s"), psz_path?psz_path:psz_uri);
         free(psz_uri);
+        free(psz_path);
 
         var_Get(p_input, "state", &val);
         switch(val.i_int)
