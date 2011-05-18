@@ -41,8 +41,10 @@
 #import <QTKit/QTKit.h>
 #import <CoreAudio/CoreAudio.h>
 
-#define QTC_WIDTH 640
-#define QTC_HEIGHT 480
+#define QTKIT_WIDTH_TEXT N_("Video Capture width")
+#define QTKIT_WIDTH_LONGTEXT N_("Video Capture width in pixel")
+#define QTKIT_HEIGHT_TEXT N_("Video Capture height")
+#define QTKIT_HEIGHT_LONGTEXT N_("Video Capture height in pixel")
 
 /*****************************************************************************
 * Local prototypes
@@ -63,6 +65,10 @@ vlc_module_begin ()
    add_shortcut( "qtcapture" )
    set_capability( "access_demux", 10 )
    set_callbacks( Open, Close )
+   add_integer("qtcapture-width", 640, QTKIT_WIDTH_TEXT, QTKIT_WIDTH_LONGTEXT, true)
+      change_integer_range (80, 1280)
+   add_integer("qtcapture-height", 480, QTKIT_HEIGHT_TEXT, QTKIT_HEIGHT_LONGTEXT, true)
+      change_integer_range (60, 480)
 vlc_module_end ()
 
 
@@ -317,13 +323,11 @@ static int Open( vlc_object_t *p_this )
     NSSize display_size = [[camera_format attributeForKey:QTFormatDescriptionVideoCleanApertureDisplaySizeAttribute] sizeValue];
     NSSize par_size = [[camera_format attributeForKey:QTFormatDescriptionVideoProductionApertureDisplaySizeAttribute] sizeValue];
 
-    encoded_size.width = QTC_WIDTH;
-    encoded_size.height = QTC_HEIGHT;
-    display_size.width = QTC_WIDTH;
-    display_size.height = QTC_HEIGHT;
-    par_size.width = QTC_WIDTH;
-    par_size.height = QTC_HEIGHT;
-    
+    par_size.width = display_size.width = encoded_size.width
+        = var_CreateGetInteger (p_this, "qtcapture-width");
+    par_size.height = display_size.height = encoded_size.height
+        = var_CreateGetInteger (p_this, "qtcapture-height");
+
     fmt.video.i_width = p_sys->width = encoded_size.width;
     fmt.video.i_height = p_sys->height = encoded_size.height;
     if( par_size.width != encoded_size.width )
