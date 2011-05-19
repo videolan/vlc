@@ -324,9 +324,9 @@ static int Open( vlc_object_t *p_this )
     NSSize par_size = [[camera_format attributeForKey:QTFormatDescriptionVideoProductionApertureDisplaySizeAttribute] sizeValue];
 
     par_size.width = display_size.width = encoded_size.width
-        = var_CreateGetInteger (p_this, "qtcapture-width");
+        = var_InheritInteger (p_this, "qtcapture-width");
     par_size.height = display_size.height = encoded_size.height
-        = var_CreateGetInteger (p_this, "qtcapture-height");
+        = var_InheritInteger (p_this, "qtcapture-height");
 
     fmt.video.i_width = p_sys->width = encoded_size.width;
     fmt.video.i_height = p_sys->height = encoded_size.height;
