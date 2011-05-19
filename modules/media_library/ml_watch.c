@@ -29,7 +29,6 @@
 #include "item_list.h"
 #include <vlc_events.h>
 
-static void* watch_Thread( vlc_object_t *p_this );
 static void watch_ItemChange( const vlc_event_t *, void * );
 static int watch_PlaylistItemCurrent( vlc_object_t *p_this, char const *psz_var,
                                   vlc_value_t oldval, vlc_value_t newval,
@@ -49,19 +48,17 @@ static void watch_ProcessAppendQueue( media_library_t* p_ml );
 /**
  * @brief Watching thread
  */
-static void* watch_Thread( vlc_object_t *p_this )
+static void* watch_Thread( void *obj )
 {
-    watch_thread_t *p_watch = ( watch_thread_t* ) p_this;
+    watch_thread_t *p_watch = ( watch_thread_t* )obj;
     media_library_t *p_ml = p_watch->p_ml;
     int i_ret = 0;
 
     vlc_mutex_lock( &p_watch->lock );
     vlc_cleanup_push( watch_Thread_Cleanup, p_ml );
-    while( vlc_object_alive( p_watch ) )
+    for( ;; )
     {
         watch_loop( p_ml, !i_ret );
-        if( !vlc_object_alive( p_watch ) )
-            break;
         i_ret = vlc_cond_timedwait( &p_watch->cond, &p_watch->lock,
                                 mdate() + 1000000 * THREAD_SLEEP_DELAY );
     }
@@ -85,7 +82,7 @@ static void watch_Thread_Cleanup( void* p_object )
 int watch_Init( media_library_t *p_ml )
 {
     /* init and launch watching thread */
-    p_ml->p_sys->p_watch = vlc_object_create( p_ml, sizeof(watch_thread_t) );
+    p_ml->p_sys->p_watch = calloc( 1, sizeof(*p_ml->p_sys->p_watch) );
     if( !p_ml->p_sys->p_watch )
         return VLC_ENOMEM;
 
@@ -93,15 +90,13 @@ int watch_Init( media_library_t *p_ml )
     vlc_mutex_init( &p_wt->list_mutex );
     p_wt->p_ml = p_ml;
 
-    vlc_object_attach( p_wt, p_ml );
-
     vlc_cond_init( &p_wt->cond );
     vlc_mutex_init( &p_wt->lock );
 
-    if( vlc_thread_create( p_wt, watch_Thread, VLC_THREAD_PRIORITY_LOW ) )
+    if( vlc_clone( &p_wt->thread, watch_Thread, p_wt, VLC_THREAD_PRIORITY_LOW ) )
     {
         msg_Dbg( p_ml, "unable to launch the auto-updating thread" );
-        vlc_object_release( p_wt );
+        free( p_wt );
         return VLC_EGENERIC;
     }
 
@@ -186,14 +181,14 @@ void watch_Close( media_library_t *p_ml )
     item_list_destroy( p_ml->p_sys->p_watch );
 
     /* Stop the watch thread and join in */
-    vlc_object_kill( p_ml->p_sys->p_watch );
-    vlc_thread_join( p_ml->p_sys->p_watch );
+    vlc_cancel( p_ml->p_sys->p_watch->thread );
+    vlc_join( p_ml->p_sys->p_watch->thread, NULL );
 
     /* Clear up other stuff */
     vlc_mutex_destroy( &p_ml->p_sys->p_watch->lock );
     vlc_cond_destroy( &p_ml->p_sys->p_watch->cond );
     vlc_mutex_destroy( &p_ml->p_sys->p_watch->list_mutex );
-    vlc_object_release( p_ml->p_sys->p_watch );
+    free( p_ml->p_sys->p_watch );
 
     free( p_ml->p_sys->p_watch->item_append_queue );
     vlc_mutex_destroy( &p_ml->p_sys->p_watch->item_append_queue_lock );

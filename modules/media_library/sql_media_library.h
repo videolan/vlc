@@ -118,8 +118,8 @@ struct monitoring_thread_t
 /* Media status Watching thread */
 struct watch_thread_t
 {
-    VLC_COMMON_MEMBERS;
     media_library_t *p_ml;
+    vlc_thread_t thread;
     vlc_cond_t cond;
     vlc_mutex_t lock;
 
