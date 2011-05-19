@@ -1,7 +1,7 @@
 /*****************************************************************************
- * winvlc.c: the Windows VLC player
+ * winvlc.c: the Windows VLC media player
  *****************************************************************************
- * Copyright (C) 1998-2008 the VideoLAN team
+ * Copyright (C) 1998-2011 the VideoLAN team
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -30,23 +30,19 @@
 
 #define UNICODE
 #include <vlc/vlc.h>
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include <windows.h>
 
 #if !defined(UNDER_CE)
 # ifndef _WIN32_IE
 #   define  _WIN32_IE 0x501
 # endif
-#   include <shlobj.h>
-#   include <tlhelp32.h>
-#   include <wininet.h>
+# include <shlobj.h>
+# include <wininet.h>
+# define HeapEnableTerminationOnCorruption (HEAP_INFORMATION_CLASS)1
 # ifndef _WIN64
 static void check_crashdump(void);
 LONG WINAPI vlc_exception_filter(struct _EXCEPTION_POINTERS *lpExceptionInfo);
 # endif
-#define HeapEnableTerminationOnCorruption (HEAP_INFORMATION_CLASS)1
 #endif
 
 #ifndef UNDER_CE
@@ -122,6 +118,7 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
 #ifndef UNDER_CE
     HeapSetInformation(NULL, HeapEnableTerminationOnCorruption, NULL, 0);
 
+    /* SetProcessDEPPolicy */
     HINSTANCE h_Kernel32 = LoadLibraryW(L"kernel32.dll");
     if(h_Kernel32)
     {
@@ -135,6 +132,7 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
         FreeLibrary(h_Kernel32);
     }
 
+    /* Args */
     wchar_t **wargv = CommandLineToArgvW (GetCommandLine (), &argc);
     if (wargv == NULL)
         return 1;
@@ -161,14 +159,15 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
     LocalFree (wargv);
 
 # ifndef _WIN64
+    /* We don't know how to manage crashes on Win64 yet */
     if(crash_handling)
     {
         check_crashdump();
         SetUnhandledExceptionFilter(vlc_exception_filter);
     }
-# endif /* WIN64 */
+# endif
 
-#else
+#else /* UNDER_CE */
     char **argv, psz_cmdline[wcslen(lpCmdLine) * 4];
 
     WideCharToMultiByte( CP_UTF8, 0, lpCmdLine, -1,
@@ -197,7 +196,7 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
 }
 
 #if !defined( UNDER_CE ) && !defined( _WIN64 )
-
+/* Crashdumps handling */
 static void get_crashdump_path(wchar_t * wdir)
 {
     if( S_OK != SHGetFolderPathW( NULL,
@@ -258,7 +257,7 @@ static void check_crashdump()
             {
                   MessageBox( NULL, L"There was an error while connecting to Internet. "\
                                     "Thanks a lot for the help anyway.",
-                                    L"Reporting sending failed", MB_OK);
+                                    L"Report sending failed", MB_OK);
             }
         }
 
