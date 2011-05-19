@@ -64,7 +64,7 @@ DBUS_METHOD( CanQuit )
     const dbus_bool_t b_ret = TRUE;
 
     DBusMessageIter v;
-    dbus_message_iter_open_container( &args, DBUS_TYPE_VARIANT, "s", &v );
+    dbus_message_iter_open_container( &args, DBUS_TYPE_VARIANT, "b", &v );
     dbus_message_iter_append_basic( &v, DBUS_TYPE_BOOLEAN, &b_ret );
 
     if( !dbus_message_iter_close_container( &args, &v ) )
@@ -82,7 +82,7 @@ DBUS_METHOD( CanRaise )
     const dbus_bool_t b_ret = FALSE;
 
     DBusMessageIter v;
-    dbus_message_iter_open_container( &args, DBUS_TYPE_VARIANT, "s", &v );
+    dbus_message_iter_open_container( &args, DBUS_TYPE_VARIANT, "b", &v );
     dbus_message_iter_append_basic( &v, DBUS_TYPE_BOOLEAN, &b_ret );
 
     if( !dbus_message_iter_close_container( &args, &v ) )
@@ -100,7 +100,7 @@ DBUS_METHOD( HasTrackList )
     const dbus_bool_t b_ret = FALSE;
 
     DBusMessageIter v;
-    dbus_message_iter_open_container( &args, DBUS_TYPE_VARIANT, "s", &v );
+    dbus_message_iter_open_container( &args, DBUS_TYPE_VARIANT, "b", &v );
     dbus_message_iter_append_basic( &v, DBUS_TYPE_BOOLEAN, &b_ret );
 
     if( !dbus_message_iter_close_container( &args, &v ) )

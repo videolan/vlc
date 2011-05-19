@@ -39,16 +39,16 @@
 DBUS_METHOD( AddTrack )
 { /* add the string to the playlist, and play it if the boolean is true */
     REPLY_INIT;
-    OUT_ARGUMENTS;
 
     DBusError error;
     dbus_error_init( &error );
 
-    char *psz_mrl;
+    char *psz_mrl, *psz_aftertrack;
     dbus_bool_t b_play;
 
     dbus_message_get_args( p_from, &error,
             DBUS_TYPE_STRING, &psz_mrl,
+            DBUS_TYPE_OBJECT_PATH, &psz_aftertrack,
             DBUS_TYPE_BOOLEAN, &b_play,
             DBUS_TYPE_INVALID );
 
@@ -60,12 +60,10 @@ DBUS_METHOD( AddTrack )
         return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
     }
 
+#warning psz_aftertrack is not used
     playlist_Add( PL, psz_mrl, NULL, PLAYLIST_APPEND |
             ( ( b_play == TRUE ) ? PLAYLIST_GO : 0 ) ,
             PLAYLIST_END, true, false );
-
-    dbus_int32_t i_success = 0;
-    ADD_INT32( &i_success );
 
     REPLY_SEND;
 }

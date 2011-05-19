@@ -31,8 +31,8 @@
 #include <vlc_interface.h>
 #include "dbus_common.h"
 
-#define DBUS_MPRIS_TRACKLIST_INTERFACE    "org.mpris.MediaPlayer.TrackList"
-#define DBUS_MPRIS_TRACKLIST_PATH         "/org/mpris/MediaPlayer/TrackList"
+#define DBUS_MPRIS_TRACKLIST_INTERFACE    "org.mpris.MediaPlayer2.TrackList"
+#define DBUS_MPRIS_TRACKLIST_PATH         "/org/mpris/MediaPlayer2/TrackList"
 
 /* Handle incoming dbus messages */
 DBusHandlerResult handle_tracklist ( DBusConnection *p_conn,
