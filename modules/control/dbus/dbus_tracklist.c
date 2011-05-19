@@ -1,9 +1,9 @@
 /*****************************************************************************
- * dbus-tracklist.c : dbus control module (mpris v1.0) - /TrackList object
+ * dbus-tracklist.c : dbus control module (mpris v2.1) - TrackList interface
  *****************************************************************************
  * Copyright © 2006-2011 Rafaël Carré
  * Copyright © 2007-2011 Mirsal Ennaime
- * Copyright © 2009-2010 The VideoLAN team
+ * Copyright © 2009-2011 The VideoLAN team
  * $Id$
  *
  * Authors:    Mirsal Ennaime <mirsal at mirsal fr>
@@ -68,21 +68,6 @@ DBUS_METHOD( AddTrack )
     REPLY_SEND;
 }
 
-DBUS_METHOD( GetCurrentTrack )
-{
-    REPLY_INIT;
-    OUT_ARGUMENTS;
-
-    playlist_t *p_playlist = PL;
-
-    PL_LOCK;
-    dbus_int32_t i_position = PL->i_current_index;
-    PL_UNLOCK;
-
-    ADD_INT32( &i_position );
-    REPLY_SEND;
-}
-
 DBUS_METHOD( GetTracksMetadata )
 {
     REPLY_INIT;
@@ -95,7 +80,6 @@ DBUS_METHOD( GetTracksMetadata )
     input_item_t *p_input = NULL;
 
     DBusMessageIter in_args, track_ids, meta;
-
     dbus_message_iter_init( p_from, &in_args );
 
     if( DBUS_TYPE_ARRAY != dbus_message_iter_get_arg_type( &in_args ) )
@@ -139,17 +123,49 @@ DBUS_METHOD( GetTracksMetadata )
     REPLY_SEND;
 }
 
-DBUS_METHOD( GetLength )
+DBUS_METHOD( GoTo )
 {
     REPLY_INIT;
-    OUT_ARGUMENTS;
+
+    int i_track_id = -1;
+    const char *psz_track_id = NULL;
     playlist_t *p_playlist = PL;
 
-    PL_LOCK;
-    dbus_int32_t i_elements = PL->current.i_size;
-    PL_UNLOCK;
+    DBusError error;
+    dbus_error_init( &error );
 
-    ADD_INT32( &i_elements );
+    dbus_message_get_args( p_from, &error,
+            DBUS_TYPE_OBJECT_PATH, &psz_track_id,
+            DBUS_TYPE_INVALID );
+
+    if( dbus_error_is_set( &error ) )
+    {
+        msg_Err( (vlc_object_t*) p_this, "D-Bus message reading : %s",
+                error.message );
+        dbus_error_free( &error );
+        return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
+    }
+
+    if( 1 != sscanf( psz_track_id, MPRIS_TRACKID_FORMAT, &i_track_id ) )
+    {
+        msg_Err( (vlc_object_t*) p_this, "Invalid track id %s", psz_track_id );
+        return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
+    }
+
+    PL_LOCK;
+
+    for( int i = 0; i < playlist_CurrentSize( p_playlist ); i++ )
+    {
+        if( i_track_id == p_playlist->current.p_elems[i]->p_input->i_id )
+        {
+            playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, true,
+                              p_playlist->current.p_elems[i]->p_parent,
+                              p_playlist->current.p_elems[i] );
+            break;
+        }
+    }
+
+    PL_UNLOCK;
     REPLY_SEND;
 }
 
@@ -200,58 +216,6 @@ DBUS_METHOD( RemoveTrack )
     REPLY_SEND;
 }
 
-DBUS_METHOD( SetLoop )
-{
-    REPLY_INIT;
-    OUT_ARGUMENTS;
-
-    DBusError error;
-    dbus_bool_t b_loop;
-
-    dbus_error_init( &error );
-    dbus_message_get_args( p_from, &error,
-            DBUS_TYPE_BOOLEAN, &b_loop,
-            DBUS_TYPE_INVALID );
-
-    if( dbus_error_is_set( &error ) )
-    {
-        msg_Err( (vlc_object_t*) p_this, "D-Bus message reading : %s",
-                error.message );
-        dbus_error_free( &error );
-        return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
-    }
-
-    var_SetBool( PL, "loop", ( b_loop == TRUE ) );
-
-    REPLY_SEND;
-}
-
-DBUS_METHOD( SetRandom )
-{
-    REPLY_INIT;
-    OUT_ARGUMENTS;
-
-    DBusError error;
-    dbus_bool_t b_random;
-
-    dbus_error_init( &error );
-    dbus_message_get_args( p_from, &error,
-            DBUS_TYPE_BOOLEAN, &b_random,
-            DBUS_TYPE_INVALID );
-
-    if( dbus_error_is_set( &error ) )
-    {
-        msg_Err( (vlc_object_t*) p_this, "D-Bus message reading : %s",
-                error.message );
-        dbus_error_free( &error );
-        return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
-    }
-
-    var_SetBool( PL, "random", ( b_random == TRUE ) );
-
-    REPLY_SEND;
-}
-
 /******************************************************************************
  * TrackListChange: tracklist order / length change signal
  *****************************************************************************/
@@ -288,12 +252,9 @@ handle_tracklist ( DBusConnection *p_conn, DBusMessage *p_from, void *p_this )
     /* here D-Bus method names are associated to an handler */
 
     METHOD_FUNC( DBUS_MPRIS_TRACKLIST_INTERFACE, "GetTracksMetadata", GetTracksMetadata );
-    METHOD_FUNC( DBUS_MPRIS_TRACKLIST_INTERFACE, "GetCurrentTrack", GetCurrentTrack );
-    METHOD_FUNC( DBUS_MPRIS_TRACKLIST_INTERFACE, "GetLength",       GetLength );
     METHOD_FUNC( DBUS_MPRIS_TRACKLIST_INTERFACE, "AddTrack",        AddTrack );
     METHOD_FUNC( DBUS_MPRIS_TRACKLIST_INTERFACE, "RemoveTrack",     RemoveTrack );
-    METHOD_FUNC( DBUS_MPRIS_TRACKLIST_INTERFACE, "SetLoop",         SetLoop );
-    METHOD_FUNC( DBUS_MPRIS_TRACKLIST_INTERFACE, "SetRandom",       SetRandom );
+    METHOD_FUNC( DBUS_MPRIS_TRACKLIST_INTERFACE, "GoTo",            GoTo );
 
     return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
 }
