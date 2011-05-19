@@ -240,20 +240,25 @@ static void check_crashdump()
                         MessageBox( NULL, L"Report sent correctly. Thanks a lot for the help.",
                                     L"Report sent", MB_OK);
                     else
-                        MessageBox( NULL, L"There was an issue while transferring to the FTP server. "\
+                        MessageBox( NULL, L"There was an error while transferring to the FTP server. "\
                                     "Thanks a lot for the help anyway.",
-                                    L"Report sent", MB_OK);
+                                    L"Report sending failed", MB_OK);
                     InternetCloseHandle(ftp);
                 }
                 else
+                {
+                    MessageBox( NULL, L"There was an error while connecting to the FTP server. "\
+                                    "Thanks a lot for the help anyway.",
+                                    L"Report sending failed", MB_OK);
                     fprintf(stderr,"Can't connect to FTP server%d\n",GetLastError());
+                }
                 InternetCloseHandle(Hint);
             }
             else
             {
-                  MessageBox( NULL, L"There was an issue while connecting to Internet. "\
+                  MessageBox( NULL, L"There was an error while connecting to Internet. "\
                                     "Thanks a lot for the help anyway.",
-                                    L"Report sent", MB_OK);
+                                    L"Reporting sending failed", MB_OK);
             }
         }
 
