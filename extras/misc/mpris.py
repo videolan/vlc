@@ -37,7 +37,6 @@ import dbus.glib
 
 # core interface stuff
 import gtk
-import gtk.glade
 
 # timer
 import gobject
@@ -287,34 +286,35 @@ def GetPlayStatus(widget):
     bt_loop.set_active( loop )
     repeat = status[3] == 1
     bt_repeat.set_active( repeat )
-# loads glade file from the directory where the script is,
+# loads UI file from the directory where the script is,
 # so we can use /path/to/mpris.py to execute it.
 import sys
-xml = gtk.glade.XML(os.path.join(os.path.dirname(sys.argv[0]) , 'mpris.glade'))
+xml = gtk.Builder()
+gtk.Builder.add_from_file(xml, os.path.join(os.path.dirname(sys.argv[0]) , 'mpris.xml'))
 
 # ui setup
-bt_close    = xml.get_widget('close')
-bt_quit     = xml.get_widget('quit')
-bt_file     = xml.get_widget('ChooseFile')
-bt_next     = xml.get_widget('next')
-bt_prev     = xml.get_widget('prev')
-bt_stop     = xml.get_widget('stop')
-bt_toggle   = xml.get_widget('toggle')
-bt_mrl      = xml.get_widget('AddMRL')
-bt_shuffle  = xml.get_widget('shuffle')
-bt_repeat   = xml.get_widget('repeat')
-bt_loop     = xml.get_widget('loop')
-l_artist    = xml.get_widget('l_artist')
-l_title     = xml.get_widget('l_title')
-e_mrl       = xml.get_widget('mrl')
-window      = xml.get_widget('window1')
-img_bt_toggle=xml.get_widget('image6')
-exp         = xml.get_widget('expander2')
-expvbox     = xml.get_widget('expandvbox')
-audioicon   = xml.get_widget('eventicon')
-vol         = xml.get_widget('vol')
-time_s      = xml.get_widget('time_s')
-time_l      = xml.get_widget('time_l')
+bt_close    = xml.get_object('close')
+bt_quit     = xml.get_object('quit')
+bt_file     = xml.get_object('ChooseFile')
+bt_next     = xml.get_object('next')
+bt_prev     = xml.get_object('prev')
+bt_stop     = xml.get_object('stop')
+bt_toggle   = xml.get_object('toggle')
+bt_mrl      = xml.get_object('AddMRL')
+bt_shuffle  = xml.get_object('shuffle')
+bt_repeat   = xml.get_object('repeat')
+bt_loop     = xml.get_object('loop')
+l_artist    = xml.get_object('l_artist')
+l_title     = xml.get_object('l_title')
+e_mrl       = xml.get_object('mrl')
+window      = xml.get_object('window1')
+img_bt_toggle=xml.get_object('image6')
+exp         = xml.get_object('expander2')
+expvbox     = xml.get_object('expandvbox')
+audioicon   = xml.get_object('eventicon')
+vol         = xml.get_object('vol')
+time_s      = xml.get_object('time_s')
+time_l      = xml.get_object('time_l')
 
 # connect to the different callbacks
 
