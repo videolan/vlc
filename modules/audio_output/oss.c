@@ -73,6 +73,7 @@ struct aout_sys_t
     int i_fd;
     int i_fragstotal;
     mtime_t max_buffer_duration;
+    vlc_thread_t thread;
 };
 
 /* This must be a power of 2. */
@@ -86,7 +87,7 @@ static int  Open         ( vlc_object_t * );
 static void Close        ( vlc_object_t * );
 
 static void Play         ( aout_instance_t * );
-static void* OSSThread   ( vlc_object_t * );
+static void* OSSThread   ( void * );
 
 static mtime_t BufferDuration( aout_instance_t * p_aout );
 
@@ -502,8 +503,8 @@ static int Open( vlc_object_t *p_this )
     }
 
     /* Create OSS thread and wait for its readiness. */
-    if( vlc_thread_create( p_aout, OSSThread,
-                           VLC_THREAD_PRIORITY_OUTPUT ) )
+    if( vlc_clone( &p_sys->thread, OSSThread, p_aout,
+                   VLC_THREAD_PRIORITY_OUTPUT ) )
     {
         msg_Err( p_aout, "cannot create OSS thread (%m)" );
         close( p_sys->i_fd );
@@ -530,8 +531,8 @@ static void Close( vlc_object_t * p_this )
     aout_instance_t *p_aout = (aout_instance_t *)p_this;
     struct aout_sys_t * p_sys = p_aout->output.p_sys;
 
-    vlc_object_kill( p_aout );
-    vlc_thread_join( p_aout );
+    vlc_cancel( p_sys->thread );
+    vlc_join( p_sys->thread, NULL );
     p_aout->b_die = false;
 
     ioctl( p_sys->i_fd, SNDCTL_DSP_RESET, NULL );
@@ -568,22 +569,35 @@ static mtime_t BufferDuration( aout_instance_t * p_aout )
             * p_aout->output.output.i_frame_length;
 }
 
+typedef struct
+{
+    aout_buffer_t *p_buffer;
+    void          *p_bytes;
+} oss_thread_ctx_t;
+
+static void OSSThreadCleanup( void *data )
+{
+    oss_thread_ctx_t *p_ctx = data;
+    if( p_ctx->p_buffer )
+        aout_BufferFree( p_ctx->p_buffer );
+    else
+        free( p_ctx->p_bytes );
+}
+
 /*****************************************************************************
  * OSSThread: asynchronous thread used to DMA the data to the device
  *****************************************************************************/
-static void* OSSThread( vlc_object_t *p_this )
+static void* OSSThread( void *obj )
 {
-    aout_instance_t * p_aout = (aout_instance_t*)p_this;
+    aout_instance_t * p_aout = (aout_instance_t*)obj;
     struct aout_sys_t * p_sys = p_aout->output.p_sys;
     mtime_t next_date = 0;
-    int canc = vlc_savecancel ();
 
-    while ( vlc_object_alive (p_aout) )
+    for( ;; )
     {
         aout_buffer_t * p_buffer = NULL;
-        int i_tmp, i_size;
-        uint8_t * p_bytes;
 
+        int canc = vlc_savecancel ();
         if ( p_aout->output.output.i_format != VLC_CODEC_SPDIFL )
         {
             mtime_t buffered = BufferDuration( p_aout );
@@ -596,6 +610,7 @@ static void* OSSThread( vlc_object_t *p_this )
                 buffered > ( p_aout->output.p_sys->max_buffer_duration
                              / p_aout->output.p_sys->i_fragstotal ) )
             {
+                vlc_restorecancel (canc);
                 /* If we have at least a fragment full, then we can wait a
                  * little and retry to get a new audio buffer instead of
                  * playing a blank sample */
@@ -606,6 +621,8 @@ static void* OSSThread( vlc_object_t *p_this )
         }
         else
         {
+            vlc_restorecancel (canc);
+
             /* emu10k1 driver does not report Buffer Duration correctly in
              * passthrough mode so we have to cheat */
             if( !next_date )
@@ -621,14 +638,21 @@ static void* OSSThread( vlc_object_t *p_this )
                 }
             }
 
-            while( vlc_object_alive (p_aout) && ! ( p_buffer =
-                aout_OutputNextBuffer( p_aout, next_date, true ) ) )
+            for( ;; )
             {
+                canc = vlc_savecancel ();
+                p_buffer = aout_OutputNextBuffer( p_aout, next_date, true );
+                if ( p_buffer )
+                    break;
+                vlc_restorecancel (canc);
+
                 msleep( VLC_HARD_MIN_SLEEP );
                 next_date = mdate();
             }
         }
 
+        uint8_t * p_bytes;
+        int i_size;
         if ( p_buffer != NULL )
         {
             p_bytes = p_buffer->p_buffer;
@@ -646,23 +670,22 @@ static void* OSSThread( vlc_object_t *p_this )
             next_date = 0;
         }
 
-        i_tmp = write( p_sys->i_fd, p_bytes, i_size );
+        oss_thread_ctx_t ctx = {
+            .p_buffer = p_buffer,
+            .p_bytes  = p_bytes,
+        };
+
+        vlc_cleanup_push( OSSThreadCleanup, &ctx );
+        vlc_restorecancel( canc );
+
+        int i_tmp = write( p_sys->i_fd, p_bytes, i_size );
 
         if( i_tmp < 0 )
         {
             msg_Err( p_aout, "write failed (%m)" );
         }
-
-        if ( p_buffer != NULL )
-        {
-            aout_BufferFree( p_buffer );
-        }
-        else
-        {
-            free( p_bytes );
-        }
+        vlc_cleanup_run();
     }
 
-    vlc_restorecancel (canc);
     return NULL;
 }
