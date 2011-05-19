@@ -46,18 +46,11 @@
 /*****************************************************************************
  * Structures
  *****************************************************************************/
-typedef struct poll_thread_t
-{
-    VLC_COMMON_MEMBERS
-
-    AvahiSimplePoll     *simple_poll;
-} poll_thread_t;
-
 typedef struct bonjour_t
 {
     vlc_object_t        *p_log;
 
-    poll_thread_t       *poll_thread;
+    vlc_thread_t        thread;
     AvahiSimplePoll     *simple_poll;
     AvahiEntryGroup     *group;
     AvahiClient         *client;
@@ -172,16 +165,19 @@ static void client_callback( AvahiClient *c,
 /*****************************************************************************
  * poll_iterate_thread
  *****************************************************************************/
-static void* poll_iterate_thread( vlc_object_t *p_this )
+static void *poll_iterate_thread( void *data )
 {
-    poll_thread_t *p_pt = (poll_thread_t*)p_this;
-    int canc = vlc_savecancel ();
+    AvahiSimplePoll *simple_poll = data;
 
-    while( vlc_object_alive (p_pt) )
-        if( avahi_simple_poll_iterate( p_pt->simple_poll, 100 ) != 0 )
+    for( ;; )
+    {
+        vlc_testcancel();
+        int canc = vlc_savecancel();
+        int ret = avahi_simple_poll_iterate( p_pt->simple_poll, 100 );
+        vlc_restorecancel( canc );
+        if (ret)
             break;
-
-    vlc_restorecancel (canc);
+    }
     return NULL;
 }
 
@@ -228,15 +224,9 @@ void *bonjour_start_service( vlc_object_t *p_log, const char *psz_stype,
         goto error;
     }
 
-    p_sys->poll_thread = vlc_object_create( p_sys->p_log,
-                                            sizeof(poll_thread_t) );
-    if( p_sys->poll_thread == NULL )
-        goto error;
-    p_sys->poll_thread->simple_poll = p_sys->simple_poll;
-
-    if( vlc_thread_create( p_sys->poll_thread,
-                           poll_iterate_thread,
-                           VLC_THREAD_PRIORITY_HIGHEST ) )
+    if( vlc_clone( &p_sys->thread,
+                   poll_iterate_thread, p_sys->simple_poll,
+                   VLC_THREAD_PRIORITY_HIGHEST ) )
     {
         msg_Err( p_sys->p_log, "failed to create poll iterate thread" );
         goto error;
@@ -245,8 +235,6 @@ void *bonjour_start_service( vlc_object_t *p_log, const char *psz_stype,
     return (void *)p_sys;
 
 error:
-    if( p_sys->poll_thread != NULL )
-        vlc_object_release( p_sys->poll_thread );
     if( p_sys->client != NULL )
         avahi_client_free( p_sys->client );
     if( p_sys->simple_poll != NULL )
@@ -270,9 +258,8 @@ void bonjour_stop_service( void *_p_sys )
 {
     bonjour_t *p_sys = (bonjour_t *)_p_sys;
 
-    vlc_object_kill( p_sys->poll_thread );
-    vlc_thread_join( p_sys->poll_thread );
-    vlc_object_release( p_sys->poll_thread );
+    vlc_cancel( p_sys->thread );
+    vlc_join( p_sys->thread, NULL );
 
     if( p_sys->group != NULL )
         avahi_entry_group_free( p_sys->group );
