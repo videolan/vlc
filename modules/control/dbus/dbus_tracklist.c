@@ -83,35 +83,59 @@ DBUS_METHOD( GetCurrentTrack )
     REPLY_SEND;
 }
 
-DBUS_METHOD( GetMetadata )
+DBUS_METHOD( GetTracksMetadata )
 {
     REPLY_INIT;
     OUT_ARGUMENTS;
-    DBusError error;
-    dbus_error_init( &error );
 
-    dbus_int32_t i_position;
-    playlist_t *p_playlist = PL;
+    int i_track_id = -1;
+    const char *psz_track_id = NULL;
 
-    dbus_message_get_args( p_from, &error,
-           DBUS_TYPE_INT32, &i_position,
-           DBUS_TYPE_INVALID );
+    playlist_t   *p_playlist = PL;
+    input_item_t *p_input = NULL;
 
-    if( dbus_error_is_set( &error ) )
+    DBusMessageIter in_args, track_ids, meta;
+
+    dbus_message_iter_init( p_from, &in_args );
+
+    if( DBUS_TYPE_ARRAY != dbus_message_iter_get_arg_type( &in_args ) )
     {
-        msg_Err( (vlc_object_t*) p_this, "D-Bus message reading : %s",
-                error.message );
-        dbus_error_free( &error );
+        msg_Err( (vlc_object_t*) p_this, "Invalid arguments" );
         return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
     }
 
-    PL_LOCK;
-    if( i_position < p_playlist->current.i_size )
+    dbus_message_iter_recurse( &in_args, &track_ids );
+    dbus_message_iter_open_container( &args, DBUS_TYPE_ARRAY, "a{sv}", &meta );
+
+    while( DBUS_TYPE_OBJECT_PATH ==
+           dbus_message_iter_get_arg_type( &track_ids ) )
     {
-        GetInputMeta( p_playlist->current.p_elems[i_position]->p_input, &args );
+        dbus_message_iter_get_basic( &track_ids, &psz_track_id );
+
+        if( 1 != sscanf( psz_track_id, MPRIS_TRACKID_FORMAT, &i_track_id ) )
+        {
+            msg_Err( (vlc_object_t*) p_this, "Invalid track id: %s",
+                                             psz_track_id );
+            continue;
+        }
+
+        PL_LOCK;
+        for( int i = 0; i < playlist_CurrentSize( p_playlist ); i++ )
+        {
+            p_input = p_playlist->current.p_elems[i]->p_input;
+
+            if( i_track_id == p_input->i_id )
+            {
+                GetInputMeta( p_input, &meta );
+                break;
+            }
+        }
+        PL_UNLOCK;
+
+        dbus_message_iter_next( &track_ids );
     }
 
-    PL_UNLOCK;
+    dbus_message_iter_close_container( &args, &meta );
     REPLY_SEND;
 }
 
@@ -263,7 +287,7 @@ handle_tracklist ( DBusConnection *p_conn, DBusMessage *p_from, void *p_this )
 
     /* here D-Bus method names are associated to an handler */
 
-    METHOD_FUNC( DBUS_MPRIS_TRACKLIST_INTERFACE, "GetMetadata",     GetMetadata );
+    METHOD_FUNC( DBUS_MPRIS_TRACKLIST_INTERFACE, "GetTracksMetadata", GetTracksMetadata );
     METHOD_FUNC( DBUS_MPRIS_TRACKLIST_INTERFACE, "GetCurrentTrack", GetCurrentTrack );
     METHOD_FUNC( DBUS_MPRIS_TRACKLIST_INTERFACE, "GetLength",       GetLength );
     METHOD_FUNC( DBUS_MPRIS_TRACKLIST_INTERFACE, "AddTrack",        AddTrack );
