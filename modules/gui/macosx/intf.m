@@ -547,16 +547,6 @@ static VLCMain *_o_sharedMainInstance = nil;
     [o_remote setClickCountEnabledButtons: kRemoteButtonPlay];
     [o_remote setDelegate: _o_sharedMainInstance];
 
-    /* init media key support */
-    o_mediaKeyController = [[SPMediaKeyTap alloc] initWithDelegate:self];
-    b_mediaKeySupport = config_GetInt( VLCIntf, "macosx-mediakeys" );
-    [o_mediaKeyController startWatchingMediaKeys];
-    [o_mediaKeyController setShouldInterceptMediaKeyEvents:b_mediaKeySupport];
-    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(coreChangedMediaKeySupportSetting:) name: @"VLCMediaKeySupportSettingChanged" object: nil];
-    [[NSUserDefaults standardUserDefaults] registerDefaults:[NSDictionary dictionaryWithObjectsAndKeys:
-                                                             [SPMediaKeyTap defaultMediaKeyUserBundleIdentifiers], kMediaKeyUsingBundleIdentifiersDefaultsKey,
-                                                             nil]];
-
     /* yeah, we are done */
     nib_main_loaded = TRUE;
 }
@@ -582,6 +572,16 @@ static VLCMain *_o_sharedMainInstance = nil;
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
     if( !p_intf ) return;
+
+    /* init media key support */
+    o_mediaKeyController = [[SPMediaKeyTap alloc] initWithDelegate:self];
+    b_mediaKeySupport = config_GetInt( VLCIntf, "macosx-mediakeys" );
+    [o_mediaKeyController startWatchingMediaKeys];
+    [o_mediaKeyController setShouldInterceptMediaKeyEvents:b_mediaKeySupport];
+    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(coreChangedMediaKeySupportSetting:) name: @"VLCMediaKeySupportSettingChanged" object: nil];
+    [[NSUserDefaults standardUserDefaults] registerDefaults:[NSDictionary dictionaryWithObjectsAndKeys:
+                                                             [SPMediaKeyTap defaultMediaKeyUserBundleIdentifiers], kMediaKeyUsingBundleIdentifiersDefaultsKey,
+                                                             nil]];
 
     [self _removeOldPreferences];
 
