@@ -560,32 +560,36 @@ void InputStatsPanel::update( input_item_t *p_item )
     assert( p_item );
     vlc_mutex_lock( &p_item->p_stats->lock );
 
-#define UPDATE( widget, format, calc... ) \
+#define UPDATE_INT( widget, calc... ) \
+    { widget->setText( 1, QString::number( (qulonglong)calc ) ); }
+
+#define UPDATE_FLOAT( widget, format, calc... ) \
     { QString str; widget->setText( 1 , str.sprintf( format, ## calc ) );  }
 
-    UPDATE( read_media_stat,     "%"PRIu64, (p_item->p_stats->i_read_bytes / 1024 ) );
-    UPDATE( input_bitrate_stat,  "%6.0f", (float)(p_item->p_stats->f_input_bitrate *  8000  ));
-    UPDATE( demuxed_stat,        "%"PRIu64, (p_item->p_stats->i_demux_read_bytes / 1024 ) );
-    UPDATE( stream_bitrate_stat, "%6.0f", (float)(p_item->p_stats->f_demux_bitrate *  8000  ));
-    UPDATE( corrupted_stat,      "%"PRIu64, p_item->p_stats->i_demux_corrupted );
-    UPDATE( discontinuity_stat,  "%"PRIu64, p_item->p_stats->i_demux_discontinuity );
+    UPDATE_INT( read_media_stat, (p_item->p_stats->i_read_bytes / 1024 ) );
+    UPDATE_FLOAT( input_bitrate_stat,  "%6.0f", (float)(p_item->p_stats->f_input_bitrate *  8000  ));
+    UPDATE_INT( demuxed_stat,    (p_item->p_stats->i_demux_read_bytes / 1024 ) );
+    UPDATE_FLOAT( stream_bitrate_stat, "%6.0f", (float)(p_item->p_stats->f_demux_bitrate *  8000  ));
+    UPDATE_INT( corrupted_stat,      p_item->p_stats->i_demux_corrupted );
+    UPDATE_INT( discontinuity_stat,  p_item->p_stats->i_demux_discontinuity );
 
     /* Video */
-    UPDATE( vdecoded_stat,     "%"PRIu64, p_item->p_stats->i_decoded_video );
-    UPDATE( vdisplayed_stat,   "%"PRIu64, p_item->p_stats->i_displayed_pictures );
-    UPDATE( vlost_frames_stat, "%"PRIu64, p_item->p_stats->i_lost_pictures );
+    UPDATE_INT( vdecoded_stat,     p_item->p_stats->i_decoded_video );
+    UPDATE_INT( vdisplayed_stat,   p_item->p_stats->i_displayed_pictures );
+    UPDATE_INT( vlost_frames_stat, p_item->p_stats->i_lost_pictures );
 
     /* Sout */
-    UPDATE( send_stat,        "%"PRIu64, p_item->p_stats->i_sent_packets );
-    UPDATE( send_bytes_stat,  "%"PRIu64, (p_item->p_stats->i_sent_bytes)/ 1024 );
-    UPDATE( send_bitrate_stat, "%6.0f", (float)(p_item->p_stats->f_send_bitrate * 8000 ) );
+    UPDATE_INT( send_stat,        p_item->p_stats->i_sent_packets );
+    UPDATE_INT( send_bytes_stat,  (p_item->p_stats->i_sent_bytes)/ 1024 );
+    UPDATE_FLOAT( send_bitrate_stat, "%6.0f", (float)(p_item->p_stats->f_send_bitrate * 8000 ) );
 
     /* Audio*/
-    UPDATE( adecoded_stat, "%"PRIu64, p_item->p_stats->i_decoded_audio );
-    UPDATE( aplayed_stat,  "%"PRIu64, p_item->p_stats->i_played_abuffers );
-    UPDATE( alost_stat,    "%"PRIu64, p_item->p_stats->i_lost_abuffers );
+    UPDATE_INT( adecoded_stat, p_item->p_stats->i_decoded_audio );
+    UPDATE_INT( aplayed_stat,  p_item->p_stats->i_played_abuffers );
+    UPDATE_INT( alost_stat,    p_item->p_stats->i_lost_abuffers );
 
-#undef UPDATE
+#undef UPDATE_INT
+#undef UPDATE_FLOAT
 
     vlc_mutex_unlock(& p_item->p_stats->lock );
 }

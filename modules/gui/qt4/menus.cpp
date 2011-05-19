@@ -1370,7 +1370,7 @@ int QVLCMenu::CreateChoicesMenu( QMenu *submenu, const char *psz_var,
             case VLC_VAR_INTEGER:
                 var_Get( p_object, psz_var, &val );
                 if( CURTEXT ) menutext = qfu( CURTEXT );
-                else menutext.sprintf( "%"PRId64, CURVAL.i_int );
+                else menutext = QString::number( CURVAL.i_int );
                 CreateAndConnect( submenu, psz_var, menutext, "", RADIO_OR_COMMAND,
                         p_object, CURVAL, i_type,
                         ( CURVAL.i_int == val.i_int )
