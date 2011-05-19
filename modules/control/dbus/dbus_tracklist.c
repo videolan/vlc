@@ -1,8 +1,8 @@
 /*****************************************************************************
  * dbus-tracklist.c : dbus control module (mpris v1.0) - /TrackList object
  *****************************************************************************
- * Copyright © 2006-2008 Rafaël Carré
- * Copyright © 2007-2010 Mirsal Ennaime
+ * Copyright © 2006-2011 Rafaël Carré
+ * Copyright © 2007-2011 Mirsal Ennaime
  * Copyright © 2009-2010 The VideoLAN team
  * $Id$
  *
@@ -129,18 +129,20 @@ DBUS_METHOD( GetLength )
     REPLY_SEND;
 }
 
-DBUS_METHOD( DelTrack )
+DBUS_METHOD( RemoveTrack )
 {
     REPLY_INIT;
 
     DBusError error;
     dbus_error_init( &error );
 
-    dbus_int32_t i_position;
+    int   i_id = -1, i;
+    char *psz_id = NULL;
     playlist_t *p_playlist = PL;
+    input_item_t *p_input  = NULL;
 
     dbus_message_get_args( p_from, &error,
-            DBUS_TYPE_INT32, &i_position,
+            DBUS_TYPE_OBJECT_PATH, &psz_id,
             DBUS_TYPE_INVALID );
 
     if( dbus_error_is_set( &error ) )
@@ -151,15 +153,26 @@ DBUS_METHOD( DelTrack )
         return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
     }
 
-    PL_LOCK;
-    if( i_position < p_playlist->current.i_size )
+    if( 1 != sscanf( psz_id, MPRIS_TRACKID_FORMAT, &i_id ) )
     {
-        playlist_DeleteFromInput( p_playlist,
-            p_playlist->current.p_elems[i_position]->p_input,
-            pl_Locked );
+        msg_Err( (vlc_object_t*) p_this, "Invalid track id: %s", psz_id );
+        return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
     }
-    PL_UNLOCK;
 
+    PL_LOCK;
+
+    for( i = 0; i < playlist_CurrentSize( p_playlist ); i++ )
+    {
+        p_input = p_playlist->current.p_elems[i]->p_input;
+
+        if( i_id == p_input->i_id )
+        {
+            playlist_DeleteFromInput( p_playlist, p_input, true );
+            break;
+        }
+    }
+
+    PL_UNLOCK;
     REPLY_SEND;
 }
 
@@ -254,7 +267,7 @@ handle_tracklist ( DBusConnection *p_conn, DBusMessage *p_from, void *p_this )
     METHOD_FUNC( DBUS_MPRIS_TRACKLIST_INTERFACE, "GetCurrentTrack", GetCurrentTrack );
     METHOD_FUNC( DBUS_MPRIS_TRACKLIST_INTERFACE, "GetLength",       GetLength );
     METHOD_FUNC( DBUS_MPRIS_TRACKLIST_INTERFACE, "AddTrack",        AddTrack );
-    METHOD_FUNC( DBUS_MPRIS_TRACKLIST_INTERFACE, "DelTrack",        DelTrack );
+    METHOD_FUNC( DBUS_MPRIS_TRACKLIST_INTERFACE, "RemoveTrack",     RemoveTrack );
     METHOD_FUNC( DBUS_MPRIS_TRACKLIST_INTERFACE, "SetLoop",         SetLoop );
     METHOD_FUNC( DBUS_MPRIS_TRACKLIST_INTERFACE, "SetRandom",       SetRandom );
 
