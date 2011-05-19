@@ -135,6 +135,10 @@
                                      view_rect.size.width,
                                      view_rect.size.height )];
     }
+
+    /* we don't want this window to be restored on relaunch */
+    if ([self respondsToSelector:@selector(setRestorable:)])
+        [self setRestorable:NO];
 }
 
 - (void)controlTintChanged
