@@ -114,6 +114,7 @@ DBUS_METHOD( SetPosition )
                 position.i_time = (mtime_t) i_pos;
                 var_Set( p_input, "time", position );
             }
+            free( psz_trackid );
         }
 
         vlc_object_release( p_input );
