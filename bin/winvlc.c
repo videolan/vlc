@@ -236,12 +236,24 @@ static void check_crashdump()
                     swprintf( remote_file, L"/crashs/%04d%02d%02d%02d%02d%02d",now.wYear,
                             now.wMonth, now.wDay, now.wHour, now.wMinute, now.wSecond  );
 
-                    FtpPutFile( ftp, wdir, remote_file, FTP_TRANSFER_TYPE_BINARY, 0);
+                    if( FtpPutFile( ftp, wdir, remote_file, FTP_TRANSFER_TYPE_BINARY, 0) )
+                        MessageBox( NULL, L"Report sent correctly. Thanks a lot for the help.",
+                                    L"Report sent", MB_OK);
+                    else
+                        MessageBox( NULL, L"There was an issue while transferring to the FTP server. "\
+                                    "Thanks a lot for the help anyway.",
+                                    L"Report sent", MB_OK);
                     InternetCloseHandle(ftp);
                 }
                 else
                     fprintf(stderr,"Can't connect to FTP server%d\n",GetLastError());
                 InternetCloseHandle(Hint);
+            }
+            else
+            {
+                  MessageBox( NULL, L"There was an issue while connecting to Internet. "\
+                                    "Thanks a lot for the help anyway.",
+                                    L"Report sent", MB_OK);
             }
         }
 
