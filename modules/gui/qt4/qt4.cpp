@@ -32,7 +32,7 @@
 
 #include "qt4.hpp"
 
-#include "input_manager.hpp"    /* THEMIM creation */
+#include "input_manager.hpp"    /* THEMIM destruction */
 #include "dialogs_provider.hpp" /* THEDP creation */
 #include "main_interface.hpp"   /* MainInterface creation */
 #include "dialogs/help.hpp"     /* Launch Update */

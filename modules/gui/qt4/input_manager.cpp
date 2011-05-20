@@ -958,19 +958,6 @@ MainInputManager::MainInputManager( intf_thread_t *_p_intf )
     DCONNECT( this, inputChanged( input_thread_t * ),
               im, setInput( input_thread_t * ) );
 
-    /* emit check if playlist has already started playing */
-    input_thread_t *p_input = playlist_CurrentInput( THEPL );
-    if( p_input )
-    {
-        input_item_t *p_item = input_GetItem( p_input );
-        if( p_item )
-        {
-            IMEvent *event = new IMEvent( ItemChanged_Type, p_item );
-            customEvent( event );
-            delete event;
-        }
-        vlc_object_release( p_input );
-    }
 }
 
 MainInputManager::~MainInputManager()
@@ -1042,6 +1029,7 @@ void MainInputManager::customEvent( QEvent *event )
     case LeafToParent_Type:
         imEv = static_cast<IMEvent*>( event );
         emit leafBecameParent( imEv->p_item );
+        return;
     default:
         if( type != ItemChanged_Type ) return;
     }
