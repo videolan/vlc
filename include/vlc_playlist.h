@@ -135,23 +135,26 @@ typedef struct playlist_export_t
 struct playlist_item_t
 {
     input_item_t           *p_input;    /**< Linked input item */
-    /** Number of children, -1 if not a node */
+
     playlist_item_t      **pp_children; /**< Children nodes/items */
     playlist_item_t       *p_parent;    /**< Item parent */
-    int                    i_children;
+    int                    i_children;  /**< Number of children, -1 if not a node */
 
     int                    i_id;        /**< Playlist item specific id */
-    uint8_t                i_flags;     /**< Flags */
+    uint8_t                i_flags;     /**< Flags \see playlist_item_flags_e */
+
     playlist_t            *p_playlist;  /**< Parent playlist */
 };
 
-#define PLAYLIST_SAVE_FLAG      0x0001    /**< Must it be saved */
-#define PLAYLIST_SKIP_FLAG      0x0002    /**< Must playlist skip after it ? */
-#define PLAYLIST_DBL_FLAG       0x0004    /**< Is it disabled ? */
-#define PLAYLIST_RO_FLAG        0x0008    /**< Write-enabled ? */
-#define PLAYLIST_REMOVE_FLAG    0x0010    /**< Remove this item at the end */
-#define PLAYLIST_EXPANDED_FLAG  0x0020    /**< Expanded node */
-#define PLAYLIST_SUBITEM_STOP_FLAG 0x0040 /**< Must playlist stop if the item gets subitems ?*/
+typedef enum {
+    PLAYLIST_SAVE_FLAG         = 0x0001,  /**< Must it be saved */
+    PLAYLIST_SKIP_FLAG         = 0x0002,  /**< Must playlist skip after it ? */
+    PLAYLIST_DBL_FLAG          = 0x0004,  /**< Is it disabled ? */
+    PLAYLIST_RO_FLAG           = 0x0008,  /**< Write-enabled ? */
+    PLAYLIST_REMOVE_FLAG       = 0x0010,  /**< Remove this item at the end */
+    PLAYLIST_EXPANDED_FLAG     = 0x0020,  /**< Expanded node */
+    PLAYLIST_SUBITEM_STOP_FLAG = 0x0040,  /**< Must playlist stop if the item gets subitems ?*/
+} playlist_item_flags_e;
 
 /** Playlist status */
 typedef enum
