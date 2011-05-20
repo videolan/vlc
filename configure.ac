@@ -4131,7 +4131,7 @@ dnl
 dnl media library
 dnl
 AC_ARG_ENABLE(media-library, [--enable-media-library media library (default disabled)])
-if test "${enable_media_library}" == "yes"; then
+if test "${enable_media_library}" = "yes"; then
     if test "${enable_sqlite}" != "yes"; then
        AC_MSG_ERROR([SQLite module is required for the media library])
     else
