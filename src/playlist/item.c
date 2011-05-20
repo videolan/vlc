@@ -126,7 +126,7 @@ static void input_item_add_subitem_tree ( const vlc_event_t * p_event,
                                                  pos,
                                                  b_flat );
 
-    if( !b_flat ) var_SetAddress( p_playlist, "leaf-to-parent", p_input );
+    if( !b_flat ) var_SetAddress( p_playlist, "leaf-to-parent", p_item->i_id );
 
     //control playback only if it was the current playing item that got subitems
     if( b_current )

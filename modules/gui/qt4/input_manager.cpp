@@ -1027,8 +1027,8 @@ void MainInputManager::customEvent( QEvent *event )
         notifyRepeatLoop();
         return;
     case LeafToParent_Type:
-        imEv = static_cast<IMEvent*>( event );
-        emit leafBecameParent( imEv->p_item );
+        plEv = static_cast<PLEvent*>( event );
+        emit leafBecameParent( plEv->i_item );
         return;
     default:
         if( type != ItemChanged_Type ) return;
@@ -1186,8 +1186,8 @@ static int LeafToParent( vlc_object_t *p_this, const char *psz_var,
     VLC_UNUSED( p_this ); VLC_UNUSED( psz_var ); VLC_UNUSED( oldval );
     MainInputManager *mim = (MainInputManager*)param;
 
-    IMEvent *event = new IMEvent( LeafToParent_Type,
-                                  static_cast<input_item_t*>( newval.p_address ) );
+    PLEvent *event = new PLEvent( LeafToParent_Type, newval.i_int );
+
     QApplication::postEvent( mim, event );
     return VLC_SUCCESS;
 }

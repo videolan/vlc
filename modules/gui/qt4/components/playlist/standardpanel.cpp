@@ -79,8 +79,8 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
     int i_savedViewMode = getSettings()->value( "Playlist/view-mode", TREE_VIEW ).toInt();
     showView( i_savedViewMode );
 
-    DCONNECT( THEMIM, leafBecameParent( input_item_t *),
-              this, browseInto( input_item_t * ) );
+    DCONNECT( THEMIM, leafBecameParent( int ),
+              this, browseInto( int ) );
 
     CONNECT( model, currentChanged( const QModelIndex& ),
              this, handleExpansion( const QModelIndex& ) );
@@ -451,20 +451,11 @@ void StandardPLPanel::activate( const QModelIndex &index )
     }
 }
 
-void StandardPLPanel::browseInto( input_item_t *p_input )
+void StandardPLPanel::browseInto( int i_id )
 {
-    if( p_input->i_id != lastActivatedId ) return;
+    if( i_id != lastActivatedId ) return;
 
-    playlist_Lock( THEPL );
-
-    playlist_item_t *p_item = playlist_ItemGetByInput( THEPL, p_input );
-    if( !p_item )
-    {
-        playlist_Unlock( THEPL );
-        return;
-    }
-
-    QModelIndex index = model->index( p_item->i_id, 0 );
+    QModelIndex index = model->index( i_id, 0 );
     playlist_Unlock( THEPL );
 
     if( currentView == treeView )

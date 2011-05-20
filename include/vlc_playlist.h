@@ -109,9 +109,8 @@ TYPEDEF_ARRAY(playlist_item_t*, playlist_item_array_t)
  * - "playlist-item-deleted": It will contain the playlist_item_t->i_id of a
  * deleted playlist_item_t.
  *
- * - "leaf-to-parent": Set when an item gets subitems and is transformed to a
- * node. It will contain a pointer to the input_item_t bound to the transformed
- * playlist item.
+ * - "leaf-to-parent": It will contain the playlist_item_t->i_id of an item that is transformed
+ *   into a node.
  *
  * The playlist contains rate-variable which is propagated to current input if available
  * also rate-slower/rate-faster is in use

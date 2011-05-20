@@ -111,7 +111,7 @@ private slots:
     void activate( const QModelIndex & );
 
     void browseInto();
-    void browseInto( input_item_t * );
+    void browseInto( int );
 
     void gotoPlayingItem();
 

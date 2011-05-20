@@ -107,9 +107,13 @@ enum PLEventTypes
 class PLEvent : public QEvent
 {
 public:
-    PLEvent( PLEventTypes t, int i, int p )
-        : QEvent( (QEvent::Type)t ), i_item(i), i_parent(p) {}
+    PLEvent( int t, int i, int p = 0 )
+        : QEvent( (QEvent::Type)(t) ), i_item(i), i_parent(p) {}
+
+    /* Needed for "playlist-item*" and "leaf-to-parent" callbacks
+     * !! Can be a input_item_t->i_id or a playlist_item_t->i_id */
     int i_item;
+    // Needed for "playlist-item-append" callback, notably
     int i_parent;
 };
 
@@ -290,7 +294,7 @@ signals:
     void playlistItemRemoved( int itemId );
     void randomChanged( bool );
     void repeatLoopChanged( int );
-    void leafBecameParent( input_item_t * );
+    void leafBecameParent( int );
 };
 
 #endif
