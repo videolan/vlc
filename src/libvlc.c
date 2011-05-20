@@ -538,7 +538,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
 
             p_test_msg =  dbus_message_new_method_call(
                     "org.mpris.MediaPlayer2.vlc", "/org/mpris/MediaPlayer2",
-                    "org.mpris.MediaPlayer2",     "Identity" );
+                    "org.freedesktop.DBus.Introspectable", "Introspect" );
 
             /* block until a reply arrives */
             p_test_reply = dbus_connection_send_with_reply_and_block(
@@ -573,7 +573,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
 
                     /* We need to resolve relative paths in this instance */
                     char *psz_mrl = make_URI( ppsz_argv[i_input], NULL );
-                    char *psz_after_track = "";
+                    char *psz_after_track = "/";
 
                     if( psz_mrl == NULL )
                         continue;
