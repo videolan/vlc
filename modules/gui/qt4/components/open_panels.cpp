@@ -384,6 +384,7 @@ DiscOpenPanel::DiscOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
             eject() );
 
     CONNECT( ui.deviceCombo, editTextChanged( QString ), this, updateMRL());
+    CONNECT( ui.deviceCombo, currentIndexChanged( QString ), this, updateMRL());
     CONNECT( ui.titleSpin, valueChanged( int ), this, updateMRL());
     CONNECT( ui.chapterSpin, valueChanged( int ), this, updateMRL());
     CONNECT( ui.audioSpin, valueChanged( int ), this, updateMRL());
