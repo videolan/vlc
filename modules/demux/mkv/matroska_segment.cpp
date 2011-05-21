@@ -41,7 +41,43 @@ static vlc_fourcc_t __GetFOURCC( uint8_t *p )
     return VLC_FOURCC( p[0], p[1], p[2], p[3] );
 }
 
-/* Destructor */
+matroska_segment_c::matroska_segment_c( demux_sys_t & demuxer, EbmlStream & estream )
+    :segment(NULL)
+    ,es(estream)
+    ,i_timescale(MKVD_TIMECODESCALE)
+    ,i_duration(-1)
+    ,i_start_time(0)
+    ,i_seekhead_count(0)
+    ,i_seekhead_position(-1)
+    ,i_cues_position(-1)
+    ,i_tracks_position(-1)
+    ,i_info_position(-1)
+    ,i_chapters_position(-1)
+    ,i_tags_position(-1)
+    ,i_attachments_position(-1)
+    ,cluster(NULL)
+    ,i_block_pos(0)
+    ,i_cluster_pos(0)
+    ,i_start_pos(0)
+    ,p_segment_uid(NULL)
+    ,p_prev_segment_uid(NULL)
+    ,p_next_segment_uid(NULL)
+    ,b_cues(false)
+    ,i_index(0)
+    ,i_index_max(1024)
+    ,psz_muxing_application(NULL)
+    ,psz_writing_application(NULL)
+    ,psz_segment_filename(NULL)
+    ,psz_title(NULL)
+    ,psz_date_utc(NULL)
+    ,i_default_edition(0)
+    ,sys(demuxer)
+    ,ep(NULL)
+    ,b_preloaded(false)
+{
+    p_indexes = (mkv_index_t*)malloc( sizeof( mkv_index_t ) * i_index_max );
+}
+
 matroska_segment_c::~matroska_segment_c()
 {
     for( size_t i_track = 0; i_track < tracks.size(); i_track++ )

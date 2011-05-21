@@ -37,43 +37,7 @@ class chapter_item_c;
 class matroska_segment_c
 {
 public:
-    matroska_segment_c( demux_sys_t & demuxer, EbmlStream & estream )
-        :segment(NULL)
-        ,es(estream)
-        ,i_timescale(MKVD_TIMECODESCALE)
-        ,i_duration(-1)
-        ,i_start_time(0)
-        ,i_seekhead_count(0)
-        ,i_seekhead_position(-1)
-        ,i_cues_position(-1)
-        ,i_tracks_position(-1)
-        ,i_info_position(-1)
-        ,i_chapters_position(-1)
-        ,i_tags_position(-1)
-        ,i_attachments_position(-1)
-        ,cluster(NULL)
-        ,i_block_pos(0)
-        ,i_cluster_pos(0)
-        ,i_start_pos(0)
-        ,p_segment_uid(NULL)
-        ,p_prev_segment_uid(NULL)
-        ,p_next_segment_uid(NULL)
-        ,b_cues(false)
-        ,i_index(0)
-        ,i_index_max(1024)
-        ,psz_muxing_application(NULL)
-        ,psz_writing_application(NULL)
-        ,psz_segment_filename(NULL)
-        ,psz_title(NULL)
-        ,psz_date_utc(NULL)
-        ,i_default_edition(0)
-        ,sys(demuxer)
-        ,ep(NULL)
-        ,b_preloaded(false)
-    {
-        p_indexes = (mkv_index_t*)malloc( sizeof( mkv_index_t ) * i_index_max );
-    }
-
+    matroska_segment_c( demux_sys_t & demuxer, EbmlStream & estream );
     virtual ~matroska_segment_c();
 
     KaxSegment              *segment;
@@ -127,14 +91,29 @@ public:
 
     std::vector<chapter_translation_c*> translations;
     std::vector<KaxSegmentFamily*>  families;
- 
+
     demux_sys_t                    & sys;
     EbmlParser                     *ep;
     bool                           b_preloaded;
 
     bool Preload( );
-    bool LoadSeekHeadItem( const EbmlCallbacks & ClassInfos, int64_t i_element_position );
     bool PreloadFamily( const matroska_segment_c & segment );
+    void InformationCreate();
+    void Seek( mtime_t i_date, mtime_t i_time_offset, int64_t i_global_position );
+    int BlockGet( KaxBlock * &, KaxSimpleBlock * &, bool *, bool *, int64_t *);
+
+    int BlockFindTrackIndex( size_t *pi_track,
+                             const KaxBlock *, const KaxSimpleBlock * );
+
+    bool Select( mtime_t i_start_time );
+    void UnSelect();
+
+    static bool CompareSegmentUIDs( const matroska_segment_c * item_a, const matroska_segment_c * item_b );
+
+private:
+    void LoadCues( KaxCues *cues );
+    void LoadTags( KaxTags *tags );
+    bool LoadSeekHeadItem( const EbmlCallbacks & ClassInfos, int64_t i_element_position );
     void ParseInfo( KaxInfo *info );
     void ParseAttachments( KaxAttachments *attachments );
     void ParseChapters( KaxChapters *chapters );
@@ -143,22 +122,8 @@ public:
     void ParseChapterAtom( int i_level, KaxChapterAtom *ca, chapter_item_c & chapters );
     void ParseTrackEntry( KaxTrackEntry *m );
     void ParseCluster( );
-    void IndexAppendCluster( KaxCluster *cluster );
-    void LoadCues( KaxCues *cues );
-    void LoadTags( KaxTags *tags );
     void ParseSimpleTags( KaxTagSimple *tag );
-    void InformationCreate( );
-    void Seek( mtime_t i_date, mtime_t i_time_offset, int64_t i_global_position );
-    int BlockGet( KaxBlock * &, KaxSimpleBlock * &, bool *, bool *, int64_t *);
-
-    int BlockFindTrackIndex( size_t *pi_track,
-                             const KaxBlock *, const KaxSimpleBlock * );
-
-
-    bool Select( mtime_t i_start_time );
-    void UnSelect( );
-
-    static bool CompareSegmentUIDs( const matroska_segment_c * item_a, const matroska_segment_c * item_b );
+    void IndexAppendCluster( KaxCluster *cluster );
 };
 
 
