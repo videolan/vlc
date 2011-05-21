@@ -587,12 +587,12 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
 
 
 
-bool dvd_command_interpretor_c::MatchIsDomain( const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size )
+bool dvd_command_interpretor_c::MatchIsDomain( const chapter_codec_cmds_c &data, const void *, size_t )
 {
     return ( data.p_private_data != NULL && data.p_private_data->GetBuffer()[0] == MATROSKA_DVD_LEVEL_SS );
 }
 
-bool dvd_command_interpretor_c::MatchIsVMG( const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size )
+bool dvd_command_interpretor_c::MatchIsVMG( const chapter_codec_cmds_c &data, const void *, size_t )
 {
     if ( data.p_private_data == NULL || data.p_private_data->GetSize() < 2 )
         return false;

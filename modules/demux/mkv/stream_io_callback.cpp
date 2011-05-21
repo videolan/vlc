@@ -82,3 +82,8 @@ uint64 vlc_stream_io_callback::getFilePointer( void )
     return stream_Tell( s );
 }
 
+size_t vlc_stream_io_callback::write(const void *, size_t )
+{
+    return 0;
+}
+

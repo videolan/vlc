@@ -87,6 +87,7 @@ void event_thread_t::ResetPci()
 int event_thread_t::EventMouse( vlc_object_t *p_this, char const *psz_var,
                                 vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
+    VLC_UNUSED( oldval ); VLC_UNUSED( newval );
     event_thread_t *p_ev = (event_thread_t *) p_data;
     vlc_mutex_lock( &p_ev->lock );
     if( psz_var[6] == 'c' )
@@ -118,6 +119,7 @@ int event_thread_t::EventKey( vlc_object_t *p_this, char const *,
 int event_thread_t::EventInput( vlc_object_t *p_this, char const *,
                                 vlc_value_t, vlc_value_t newval, void *p_data )
 {
+    VLC_UNUSED( p_this );
     event_thread_t *p_ev = (event_thread_t *) p_data;
     vlc_mutex_lock( &p_ev->lock );
     if( newval.i_int == INPUT_EVENT_VOUT )
@@ -129,7 +131,6 @@ int event_thread_t::EventInput( vlc_object_t *p_this, char const *,
 
     return VLC_SUCCESS;
 }
-
 
 void event_thread_t::EventThread()
 {
@@ -159,8 +160,6 @@ void event_thread_t::EventThread()
             vlc_mutex_unlock( &lock );
             break;
         }
-
-        bool b_activated = false;
 
         /* KEY part */
         if( i_key_action )
@@ -266,8 +265,6 @@ void event_thread_t::EventThread()
                 }
                 break;
             case ACTIONID_NAV_ACTIVATE:
-                b_activated = true;
- 
                 if ( i_curr_button > 0 && i_curr_button <= pci->hli.hl_gi.btn_ns )
                 {
                     btni_t button_ptr = pci->hli.btnit[i_curr_button-1];
@@ -304,7 +301,6 @@ void event_thread_t::EventThread()
 
                 msg_Dbg( p_demux, "Handle Mouse Event: Mouse clicked x(%d)*y(%d)", x, y);
 
-                b_activated = true;
                 // get current button
                 best = 0;
                 dist = 0x08000000; /* >> than  (720*720)+(567*567); */
@@ -435,6 +431,7 @@ void event_thread_t::EventThread()
 
     vlc_restorecancel (canc);
 }
+
 void *event_thread_t::EventThread(void *data)
 {
     static_cast<event_thread_t*>(data)->EventThread();
@@ -642,7 +639,7 @@ void demux_sys_t::PreloadLinked( matroska_segment_c *p_segment )
     virtual_segment_c *p_seg;
 
     p_current_segment = VirtualFromSegments( p_segment );
- 
+
     used_segments.push_back( p_current_segment );
 
     // create all the other virtual segments of the family
@@ -771,7 +768,7 @@ void demux_sys_t::JumpTo( virtual_segment_c & vsegment, chapter_item_c * p_chapt
             vsegment.Seek( demuxer, p_chapter->i_user_start_time, -1, p_chapter, -1 );
         }
     }
- 
+
 }
 
 matroska_segment_c *demux_sys_t::FindSegment( const EbmlBinary & uid ) const

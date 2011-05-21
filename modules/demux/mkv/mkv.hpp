@@ -179,7 +179,7 @@ typedef struct
     bool         b_enabled;
     unsigned int i_number;
 
-    int          i_extra_data;
+    unsigned int i_extra_data;
     uint8_t      *p_extra_data;
 
     char         *psz_codec;

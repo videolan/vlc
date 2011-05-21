@@ -1125,12 +1125,8 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
             p_fmt->audio.i_rate = 8000;
             p_fmt->audio.i_blockalign = 0x14;
         }
-        /* disabled due to the potential "S_KATE" namespace issue */
         else if( !strcmp( p_tk->psz_codec, "S_KATE" ) )
         {
-            int i, i_offset = 1, i_extra, num_headers, size_so_far;
-            uint8_t *p_extra;
-
             p_tk->fmt.i_codec = VLC_CODEC_KATE;
             p_tk->fmt.subs.psz_encoding = strdup( "UTF-8" );
 

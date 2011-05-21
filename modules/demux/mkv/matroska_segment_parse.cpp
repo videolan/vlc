@@ -549,7 +549,7 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
 
                     i_display_unit = uint8( vdmode );
                     msg_Dbg( &sys.demuxer, "|   |   |   |   + Track Video Display Unit=%s",
-                             uint8( vdmode ) == 0 ? "pixels" : ( uint8( vdmode ) == 1 ? "centimeters": "inches" ) );
+                             i_display_unit == 0 ? "pixels" : ( i_display_unit == 1 ? "centimeters": "inches" ) );
                 }
                 else if( MKV_IS_ID( l, KaxVideoAspectRatio ) ) // UNUSED
                 {
