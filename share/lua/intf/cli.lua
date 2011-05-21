@@ -562,6 +562,8 @@ commands_ordered = {
     { "vratio"; { func = skip(listvalue("vout","aspect-ratio")); args = "[X]"; help = "set/get video aspect ratio" } };
     { "vcrop"; { func = skip(listvalue("vout","crop")); args = "[X]"; help = "set/get video crop"; aliases = { "crop" } } };
     { "vzoom"; { func = skip(listvalue("vout","zoom")); args = "[X]"; help = "set/get video zoom"; aliases = { "zoom" } } };
+    { "vdeinterlace"; { func = skip(listvalue("vout","deinterlace")); args = "[X]"; help = "set/get video deintelace" } };
+    { "vdeinterlace_mode"; { func = skip(listvalue("vout","deinterlace-mode")); args = "[X]"; help = "set/get video deintelace mode" } };
     { "snapshot"; { func = common.snapshot; help = "take video snapshot" } };
     { "strack"; { func = skip(listvalue("input","spu-es")); args = "[X]"; help = "set/get subtitles track" } };
     { "hotkey"; { func = hotkey; args = "[hotkey name]"; help = "simulate hotkey press"; adv = true; aliases = { "key" } } };
