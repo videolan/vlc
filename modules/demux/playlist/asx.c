@@ -439,11 +439,15 @@ static int Demux( demux_t *p_demux )
                     }
                     else continue;
                 }
-                if( ( psz_parse = strcasestr( psz_parse, "/>" ) ) )
-                    psz_parse += 2;
-                else if( ( psz_parse = strcasestr( psz_parse, "</MoreInfo>") ) )
-                    psz_parse += 11;
-                else continue;
+                if( ( psz_backup = strcasestr( psz_parse, "/>" ) ) )
+                    psz_parse = psz_backup + 2;
+                else if( ( psz_backup = strcasestr( psz_parse, "</MoreInfo>") ) )
+                    psz_parse = psz_backup + 11;
+                else
+                {
+                    psz_parse = NULL;
+                    continue;
+                }
             }
             else if( !strncasecmp( psz_parse, "<ABSTRACT>", 10 ) )
             {
@@ -483,7 +487,6 @@ static int Demux( demux_t *p_demux )
                 }
                 if( ( psz_parse = strcasestr( psz_parse, "/>" ) ) )
                     psz_parse += 2;
-                else continue;
             }
             else if( !strncasecmp( psz_parse, "</Entry>", 8 ) )
             {
