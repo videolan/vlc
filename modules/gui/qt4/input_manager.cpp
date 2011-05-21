@@ -1000,7 +1000,6 @@ void MainInputManager::customEvent( QEvent *event )
     int type = event->type();
 
     PLEvent *plEv;
-    IMEvent *imEv;
 
     // msg_Dbg( p_intf, "New MainIM Event of type: %i", type );
     switch( type )
