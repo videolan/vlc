@@ -245,7 +245,7 @@ static int Open( vlc_object_t * p_this )
         goto error;
     }
 
-    p_sys->StartUiThread();
+    p_sys->InitUi();
  
     return VLC_SUCCESS;
 
@@ -565,15 +565,8 @@ void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock
         if ( tk->fmt.i_cat == NAV_ES )
         {
             // TODO handle the start/stop times of this packet
-            if ( p_sys->b_ui_hooked )
-            {
-                vlc_mutex_lock( &p_sys->p_ev->lock );
-                memcpy( &p_sys->pci_packet, &p_block->p_buffer[1], sizeof(pci_t) );
-                p_sys->SwapButtons();
-                p_sys->b_pci_packet_set = true;
-                vlc_mutex_unlock( &p_sys->p_ev->lock );
-                block_Release( p_block );
-            }
+            p_sys->p_ev->SetPci( (const pci_t *)&p_block->p_buffer[1]);
+            block_Release( p_block );
             return;
         }
         // correct timestamping when B frames are used

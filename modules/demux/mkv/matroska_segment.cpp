@@ -807,7 +807,6 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
 {
     /* add all es */
     msg_Dbg( &sys.demuxer, "found %d es", (int)tracks.size() );
-    sys.b_pci_packet_set = false;
 
     for( size_t i_track = 0; i_track < tracks.size(); i_track++ )
     {
@@ -1253,6 +1252,7 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
 
 void matroska_segment_c::UnSelect( )
 {
+    sys.p_ev->ResetPci();
     for( size_t i_track = 0; i_track < tracks.size(); i_track++ )
     {
         if ( tracks[i_track]->p_es != NULL )

@@ -295,18 +295,37 @@ typedef struct {
 class virtual_segment_c;
 class chapter_item_c;
 
-typedef struct
+class event_thread_t
 {
-    VLC_COMMON_MEMBERS
+public:
+    event_thread_t(demux_t *);
+    virtual ~event_thread_t();
 
-    demux_t        *p_demux;
-    vlc_mutex_t     lock;
+    void SetPci(const pci_t *data);
+    void ResetPci();
 
-    bool            b_moved;
-    bool            b_clicked;
-    int             i_key_action;
+private:
+    void EventThread();
+    static void *EventThread(void *);
 
-} event_thread_t;
+    static int EventMouse( vlc_object_t *, char const *, vlc_value_t, vlc_value_t, void * );
+    static int EventKey( vlc_object_t *, char const *, vlc_value_t, vlc_value_t, void * );
+    static int EventInput( vlc_object_t *, char const *, vlc_value_t, vlc_value_t, void * );
+
+    demux_t      *p_demux;
+
+    bool         is_running;
+    vlc_thread_t thread;
+
+    vlc_mutex_t  lock;
+    vlc_cond_t   wait;
+    bool         b_abort;
+    bool         b_moved;
+    bool         b_clicked;
+    int          i_key_action;
+    bool         b_vout;
+    pci_t        pci_packet;
+};
 
 
 class demux_sys_t
@@ -322,9 +341,7 @@ public:
         ,p_current_segment(NULL)
         ,dvd_interpretor( *this )
         ,f_duration(-1.0)
-        ,b_ui_hooked(false)
         ,p_input(NULL)
-        ,b_pci_packet_set(false)
         ,p_ev(NULL)
     {
         vlc_mutex_init( &lock_demuxer );
@@ -369,27 +386,16 @@ public:
     matroska_stream_c *AnalyseAllSegmentsFound( demux_t *p_demux, EbmlStream *p_estream, bool b_initial = false );
     void JumpTo( virtual_segment_c & p_segment, chapter_item_c * p_chapter );
 
-    void StartUiThread();
-    void StopUiThread();
-    bool b_ui_hooked;
-    void SwapButtons();
+    void InitUi();
+    void CleanUi();
 
     /* for spu variables */
     input_thread_t *p_input;
-    pci_t          pci_packet;
-    bool           b_pci_packet_set;
     uint8_t        palette[4][4];
     vlc_mutex_t    lock_demuxer;
 
     /* event */
     event_thread_t *p_ev;
-    static void * EventThread( vlc_object_t *p_this );
-    static int EventMouse( vlc_object_t *p_this, char const *psz_var,
-                       vlc_value_t oldval, vlc_value_t newval, void *p_data );
-    static int EventKey( vlc_object_t *p_this, char const *psz_var,
-                     vlc_value_t oldval, vlc_value_t newval, void *p_data );
-
-
 
 protected:
     virtual_segment_c *VirtualFromSegments( matroska_segment_c *p_segment ) const;
