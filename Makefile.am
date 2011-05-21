@@ -300,7 +300,7 @@ EXTRA_DIST += \
 	extras/analyser/valgrind.suppressions \
 	extras/buildsystem/make.pl \
 	extras/misc/mpris.py \
-	extras/misc/mpris.glade
+	extras/misc/mpris.xml
 
 ###############################################################################
 # Building libvlc
