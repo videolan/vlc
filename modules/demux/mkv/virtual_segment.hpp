@@ -36,11 +36,11 @@ class virtual_segment_c
 {
 public:
     virtual_segment_c( matroska_segment_c *p_segment )
-        :p_editions(NULL)
-        ,i_sys_title(0)
+        :i_sys_title(0)
         ,i_current_segment(0)
         ,i_current_edition(-1)
-        ,psz_current_chapter(NULL)
+        ,p_current_chapter(NULL)
+        ,p_editions(NULL)
     {
         linked_segments.push_back( p_segment );
 
@@ -49,11 +49,11 @@ public:
         AppendUID( p_segment->p_next_segment_uid );
     }
 
-    void Sort();
-    size_t AddSegment( matroska_segment_c *p_segment );
-    void PreloadLinked( );
-    mtime_t Duration( ) const;
+    void AddSegments( std::vector<matroska_segment_c*> segments );
+
     void Seek( demux_t & demuxer, mtime_t i_date, mtime_t i_time_offset, chapter_item_c *psz_chapter, int64_t i_global_position );
+
+    mtime_t Duration() const;
 
     inline chapter_edition_c *Edition()
     {
@@ -61,6 +61,7 @@ public:
             return (*p_editions)[i_current_edition];
         return NULL;
     }
+    std::vector<chapter_edition_c*>*  Editions() const { return p_editions; };
 
     matroska_segment_c * Segment() const
     {
@@ -69,9 +70,7 @@ public:
         return linked_segments[i_current_segment];
     }
 
-    inline chapter_item_c *CurrentChapter() {
-        return psz_current_chapter;
-    }
+    chapter_item_c *CurrentChapter() { return p_current_chapter; }
 
     bool SelectNext()
     {
@@ -93,16 +92,15 @@ public:
         return false;
     }
 
+    chapter_item_c *FindChapter( int64_t i_find_uid );
+
     bool UpdateCurrentToChapter( demux_t & demux );
-    void PrepareChapters( );
 
     chapter_item_c *BrowseCodecPrivate( unsigned int codec_id,
                                         bool (*match)(const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size ),
                                         const void *p_cookie,
                                         size_t i_cookie_size );
-    chapter_item_c *FindChapter( int64_t i_find_uid );
 
-    std::vector<chapter_edition_c*>  *p_editions;
     int                              i_sys_title;
 
 protected:
@@ -111,9 +109,17 @@ protected:
     size_t                           i_current_segment;
 
     int                              i_current_edition;
-    chapter_item_c                   *psz_current_chapter;
+    chapter_item_c                   *p_current_chapter;
+
+    std::vector<chapter_edition_c*>  *p_editions;
 
     void                             AppendUID( const EbmlBinary * UID );
+
+private:
+    void Sort();
+    size_t AddSegment( matroska_segment_c *p_segment );
+    void PreloadLinked( );
+    void PrepareChapters( );
 };
 
 #endif

@@ -660,23 +660,23 @@ void demux_sys_t::PreloadLinked( matroska_segment_c *p_segment )
     for ( i=0; i< used_segments.size(); i++ )
     {
         p_seg = used_segments[i];
-        if ( p_seg->p_editions != NULL )
+        if ( p_seg->Editions() != NULL )
         {
             input_title_t *p_title = vlc_input_title_New();
             p_seg->i_sys_title = i;
             int i_chapters;
 
             // TODO use a name for each edition, let the TITLE deal with a codec name
-            for ( j=0; j<p_seg->p_editions->size(); j++ )
+            for ( j=0; j<p_seg->Editions()->size(); j++ )
             {
                 if ( p_title->psz_name == NULL )
                 {
-                    const char* psz_tmp = (*p_seg->p_editions)[j]->GetMainName().c_str();
+                    const char* psz_tmp = (*p_seg->Editions())[j]->GetMainName().c_str();
                     if( *psz_tmp != '\0' )
                         p_title->psz_name = strdup( psz_tmp );
                 }
 
-                chapter_edition_c *p_edition = (*p_seg->p_editions)[j];
+                chapter_edition_c *p_edition = (*p_seg->Editions())[j];
 
                 i_chapters = 0;
                 p_edition->PublishChapters( *p_title, i_chapters, 0 );
@@ -708,24 +708,8 @@ bool demux_sys_t::IsUsedSegment( matroska_segment_c &segment ) const
 
 virtual_segment_c *demux_sys_t::VirtualFromSegments( matroska_segment_c *p_segment ) const
 {
-    size_t i_preloaded, i;
-
     virtual_segment_c *p_result = new virtual_segment_c( p_segment );
-
-    // fill our current virtual segment with all hard linked segments
-    do {
-        i_preloaded = 0;
-        for ( i=0; i< opened_segments.size(); i++ )
-        {
-            i_preloaded += p_result->AddSegment( opened_segments[i] );
-        }
-    } while ( i_preloaded ); // worst case: will stop when all segments are found as linked
-
-    p_result->Sort( );
-
-    p_result->PreloadLinked( );
-
-    p_result->PrepareChapters( );
+    p_result->AddSegments( opened_segments );
 
     return p_result;
 }
