@@ -481,8 +481,7 @@ static int LoopInput( playlist_t *p_playlist )
         PL_LOCK;
 
         p_sys->p_input = NULL;
-        vlc_thread_join( p_input );
-        vlc_object_release( p_input );
+        input_Close( p_input );
 
         UpdateActivity( p_playlist, -DEFAULT_INPUT_ACTIVITY );
 

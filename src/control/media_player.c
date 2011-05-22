@@ -129,6 +129,7 @@ static void release_input_thread( libvlc_media_player_t *p_mi, bool b_input_abor
     input_thread_t *p_input_thread = p_mi->input.p_thread;
     if( !p_input_thread )
         return;
+    p_mi->input.p_thread = NULL;
 
     var_DelCallback( p_input_thread, "can-seek",
                      input_seekable_changed, p_mi );
@@ -139,13 +140,7 @@ static void release_input_thread( libvlc_media_player_t *p_mi, bool b_input_abor
 
     /* We owned this one */
     input_Stop( p_input_thread, b_input_abort );
-
-    vlc_thread_join( p_input_thread );
-
-    assert( p_input_thread->b_dead );
-
-    p_mi->input.p_thread = NULL;
-    vlc_object_release( p_input_thread );
+    input_Close( p_input_thread );
 }
 
 /*
