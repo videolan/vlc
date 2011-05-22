@@ -96,7 +96,7 @@ public:
     EbmlParser                     *ep;
     bool                           b_preloaded;
 
-    bool Preload( );
+    bool Preload();
     bool PreloadFamily( const matroska_segment_c & segment );
     void InformationCreate();
     void Seek( mtime_t i_date, mtime_t i_time_offset, int64_t i_global_position );

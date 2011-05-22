@@ -203,30 +203,30 @@ void virtual_segment_c::AppendUID( const EbmlBinary * p_UID )
     linked_uids.push_back( *(KaxSegmentUID*)(p_UID) );
 }
 
-void virtual_segment_c::Seek( demux_t & demuxer, mtime_t i_date, mtime_t i_time_offset, chapter_item_c *psz_chapter, int64_t i_global_position )
+void virtual_segment_c::Seek( demux_t & demuxer, mtime_t i_date, mtime_t i_time_offset, chapter_item_c *p_chapter, int64_t i_global_position )
 {
     demux_sys_t *p_sys = demuxer.p_sys;
     size_t i;
 
     // find the actual time for an ordered edition
-    if ( psz_chapter == NULL )
+    if ( p_chapter == NULL )
     {
         if ( CurrentEdition() && CurrentEdition()->b_ordered )
         {
             /* 1st, we need to know in which chapter we are */
-            psz_chapter = (*p_editions)[i_current_edition]->FindTimecode( i_date, p_current_chapter );
+            p_chapter = (*p_editions)[i_current_edition]->FindTimecode( i_date, p_current_chapter );
         }
     }
 
-    if ( psz_chapter != NULL )
+    if ( p_chapter != NULL )
     {
-        p_current_chapter = psz_chapter;
-        p_sys->i_chapter_time = i_time_offset = psz_chapter->i_user_start_time - psz_chapter->i_start_time;
-        if ( psz_chapter->i_seekpoint_num > 0 )
+        p_current_chapter = p_chapter;
+        p_sys->i_chapter_time = i_time_offset = p_chapter->i_user_start_time - p_chapter->i_start_time;
+        if ( p_chapter->i_seekpoint_num > 0 )
         {
             demuxer.info.i_update |= INPUT_UPDATE_TITLE | INPUT_UPDATE_SEEKPOINT;
             demuxer.info.i_title = p_sys->i_current_title = i_sys_title;
-            demuxer.info.i_seekpoint = psz_chapter->i_seekpoint_num - 1;
+            demuxer.info.i_seekpoint = p_chapter->i_seekpoint_num - 1;
         }
     }
 

@@ -501,7 +501,7 @@ matroska_stream_c *demux_sys_t::AnalyseAllSegmentsFound( demux_t *p_demux, EbmlS
         return NULL;
     }
 
-    matroska_stream_c *p_stream1 = new matroska_stream_c( *this );
+    matroska_stream_c *p_stream1 = new matroska_stream_c();
 
     while (p_l0 != 0)
     {

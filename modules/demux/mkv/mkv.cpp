@@ -76,7 +76,7 @@ class demux_sys_t;
 
 static int  Demux  ( demux_t * );
 static int  Control( demux_t *, int, va_list );
-static void Seek   ( demux_t *, mtime_t i_date, double f_percent, chapter_item_c *psz_chapter );
+static void Seek   ( demux_t *, mtime_t i_date, double f_percent, chapter_item_c *p_chapter );
 
 /*****************************************************************************
  * Open: initializes matroska demux structures
@@ -123,8 +123,8 @@ static int Open( vlc_object_t * p_this )
     }
     p_sys->streams.push_back( p_stream );
 
-    p_stream->p_in = p_io_callback;
-    p_stream->p_es = p_io_stream;
+    p_stream->p_io_callback = p_io_callback;
+    p_stream->p_estream = p_io_stream;
 
     for (size_t i=0; i<p_stream->segments.size(); i++)
     {
@@ -214,8 +214,8 @@ static int Open( vlc_object_t * p_this )
                                 }
                                 else
                                 {
-                                    p_stream->p_in = p_file_io;
-                                    p_stream->p_es = p_estream;
+                                    p_stream->p_io_callback = p_file_io;
+                                    p_stream->p_estream = p_estream;
                                     p_sys->streams.push_back( p_stream );
                                 }
                             }
@@ -297,8 +297,8 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             for( size_t i = 0; i < p_sys->stored_attachments.size(); i++ )
             {
                 attachment_c *a = p_sys->stored_attachments[i];
-                (*ppp_attach)[i] = vlc_input_attachment_New( a->psz_file_name.c_str(), a->psz_mime_type.c_str(), NULL,
-                                                             a->p_data, a->i_size );
+                (*ppp_attach)[i] = vlc_input_attachment_New( a->fileName(), a->mimeType(), NULL,
+                                                             a->p_data, a->size() );
             }
             return VLC_SUCCESS;
 
@@ -397,7 +397,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 }
 
 /* Seek */
-static void Seek( demux_t *p_demux, mtime_t i_date, double f_percent, chapter_item_c *psz_chapter )
+static void Seek( demux_t *p_demux, mtime_t i_date, double f_percent, chapter_item_c *p_chapter )
 {
     demux_sys_t        *p_sys = p_demux->p_sys;
     virtual_segment_c  *p_vsegment = p_sys->p_current_segment;
@@ -453,7 +453,7 @@ static void Seek( demux_t *p_demux, mtime_t i_date, double f_percent, chapter_it
         }
     }
 
-    p_vsegment->Seek( *p_demux, i_date, i_time_offset, psz_chapter, i_global_position );
+    p_vsegment->Seek( *p_demux, i_date, i_time_offset, p_chapter, i_global_position );
 }
 
 /* Utility function for BlockDecode */

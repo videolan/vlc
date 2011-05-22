@@ -316,7 +316,7 @@ bool chapter_item_c::EnterAndLeave( chapter_item_c *p_item, bool b_final_enter )
     {
         if ( !p_common_parent->b_is_leaving && p_common_parent->Leave( false ) )
             return true;
-        p_common_parent = p_common_parent->psz_parent;
+        p_common_parent = p_common_parent->p_parent;
     }
 
     // enter from the parent to <this>
