@@ -50,6 +50,7 @@ class QSpinBox;
 class QLineEdit;
 class CoverArtLabel;
 class QTextEdit;
+class QLabel;
 
 class MetaPanel: public QWidget
 {
@@ -83,6 +84,9 @@ private:
     QLineEdit *publisher_text;
     QLineEdit *encodedby_text;
     CoverArtLabel *art_cover;
+
+    QLabel   *lblURL;
+    char     *currentURL;
 
 public slots:
     void update( input_item_t * );

@@ -132,13 +132,19 @@ MetaPanel::MetaPanel( QWidget *parent,
 
     /* Language on the same line */
     ADD_META( VLC_META_LANGUAGE, language_text, 7, -1 ); line++;
+    ADD_META( VLC_META_PUBLISHER, publisher_text, 0, 7 ); line++;
+
+    lblURL = new QLabel;
+    lblURL->setOpenExternalLinks( true );
+    lblURL->setTextFormat( Qt::RichText );
+    metaLayout->addWidget( lblURL, line -1, 7, 1, -1 );
+
+    ADD_META( VLC_META_COPYRIGHT, copyright_text, 0,  7 ); line++;
 
     /* ART_URL */
     art_cover = new CoverArtLabel( this, p_intf );
-    metaLayout->addWidget( art_cover, line + 1, 7, 6, 3, Qt::AlignLeft );
+    metaLayout->addWidget( art_cover, line, 7, 6, 3, Qt::AlignLeft );
 
-    ADD_META( VLC_META_PUBLISHER, publisher_text, 0, 7 ); line++;
-    ADD_META( VLC_META_COPYRIGHT, copyright_text, 0,  7 ); line++;
     ADD_META( VLC_META_ENCODED_BY, encodedby_text, 0, 7 ); line++;
 
     label = new QLabel( qtr( N_("Comments") ) ); label->setFont( smallFont );
@@ -207,16 +213,9 @@ void MetaPanel::update( input_item_t *p_item )
         title_text->setText( "" );
 
     /* URL / URI */
-    psz_meta = input_item_GetURL( p_item );
+    psz_meta = input_item_GetURI( p_item );
     if( !EMPTY_STR( psz_meta ) )
-        emit uriSet( qfu( psz_meta ) );
-    else
-    {
-        free( psz_meta );
-        psz_meta = input_item_GetURI( p_item );
-        if( !EMPTY_STR( psz_meta ) )
-            emit uriSet( qfu( psz_meta ) );
-    }
+         emit uriSet( qfu( psz_meta ) );
     free( psz_meta );
 
     /* Other classic though */
@@ -235,6 +234,16 @@ void MetaPanel::update( input_item_t *p_item )
 //    UPDATE_META( Setting, setting_text );
 //    UPDATE_META_INT( Rating, rating_text );
 
+    /* URL */
+    psz_meta = input_item_GetURL( p_item );
+    if( !EMPTY_STR( psz_meta ) && strcmp( psz_meta, currentURL ) )
+    {
+        free( currentURL ); currentURL = strdup( psz_meta );
+
+        lblURL->setText( "<a href='" + qfu( psz_meta ) + "'>" +
+                        qfu( psz_meta ).remove( QRegExp( ".*://") ) + "</a>" );
+        free( psz_meta );
+    }
 #undef UPDATE_META_INT
 #undef UPDATE_META
 
