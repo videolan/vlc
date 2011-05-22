@@ -34,6 +34,7 @@
 #include <vlc_plugin.h>
 #include <vlc_aout.h>
 #include <vlc_charset.h>                        /* FromLocaleDup, LocaleFree */
+#include <vlc_atomic.h>
 
 #include "windows_audio_common.h"
 
@@ -49,13 +50,6 @@ static void Play         ( aout_instance_t * );
 /*****************************************************************************
  * notification_thread_t: waveOut event thread
  *****************************************************************************/
-typedef struct notification_thread_t
-{
-    VLC_COMMON_MEMBERS
-    aout_instance_t *p_aout;
-
-} notification_thread_t;
-
 /* local functions */
 static void Probe        ( aout_instance_t * );
 static int OpenWaveOut   ( aout_instance_t *, uint32_t,
@@ -66,7 +60,7 @@ static int PlayWaveOut   ( aout_instance_t *, HWAVEOUT, WAVEHDR *,
                            aout_buffer_t *, bool );
 
 static void CALLBACK WaveOutCallback ( HWAVEOUT, UINT, DWORD, DWORD, DWORD );
-static void* WaveOutThread( vlc_object_t * );
+static void* WaveOutThread( void * );
 
 static int VolumeSet( aout_instance_t *, audio_volume_t, bool );
 
@@ -124,7 +118,8 @@ struct aout_sys_t
 
     WAVEHDR waveheader[FRAMES_NUM];
 
-    notification_thread_t *p_notif;                      /* WaveOutThread id */
+    vlc_thread_t thread;
+    vlc_atomic_t abort;
     HANDLE event;
     HANDLE new_buffer_event;
 
@@ -325,9 +320,6 @@ static int Open( vlc_object_t *p_this )
             p_aout->output.p_sys->i_buffer_size );
 
     /* Now we need to setup our waveOut play notification structure */
-    p_aout->output.p_sys->p_notif =
-        vlc_object_create( p_aout, sizeof(notification_thread_t) );
-    p_aout->output.p_sys->p_notif->p_aout = p_aout;
     p_aout->output.p_sys->event = CreateEvent( NULL, FALSE, FALSE, NULL );
     p_aout->output.p_sys->new_buffer_event = CreateEvent( NULL, FALSE, FALSE, NULL );
 
@@ -338,8 +330,9 @@ static int Open( vlc_object_t *p_this )
 
 
     /* Then launch the notification thread */
-    if( vlc_thread_create( p_aout->output.p_sys->p_notif,
-                           WaveOutThread, VLC_THREAD_PRIORITY_OUTPUT ) )
+    vlc_atomic_set( &p_aout->output.p_sys->abort, 0);
+    if( vlc_clone( &p_aout->output.p_sys->thread,
+                   WaveOutThread, p_aout, VLC_THREAD_PRIORITY_OUTPUT ) )
     {
         msg_Err( p_aout, "cannot create WaveOutThread" );
     }
@@ -507,14 +500,13 @@ static void Close( vlc_object_t *p_this )
     aout_sys_t *p_sys = p_aout->output.p_sys;
 
     /* Before calling waveOutClose we must reset the device */
-    vlc_object_kill( p_aout );
+    vlc_atomic_set( &p_sys->abort, 1);
 
     /* wake up the audio thread, to recognize that p_aout died */
     SetEvent( p_sys->event );
     SetEvent( p_sys->new_buffer_event );
 
-    vlc_thread_join( p_sys->p_notif );
-    vlc_object_release( p_sys->p_notif );
+    vlc_join( p_sys->thread, NULL );
 
     /*
       kill the real output then - when the feed thread
@@ -813,7 +805,7 @@ static void CALLBACK WaveOutCallback( HWAVEOUT h_waveout, UINT uMsg,
 
     if( uMsg != WOM_DONE ) return;
 
-    if( !vlc_object_alive (p_aout) ) return;
+    if( vlc_atomic_get(&p_aout->output.p_sys->abort) ) return;
 
     /* Find out the current latency */
     for( int i = 0; i < FRAMES_NUM; i++ )
@@ -874,10 +866,9 @@ static int WaveOutClearDoneBuffers(aout_sys_t *p_sys)
  * we are not authorized to use waveOutWrite() directly in the waveout
  * callback.
  *****************************************************************************/
-static void* WaveOutThread( vlc_object_t *p_this )
+static void* WaveOutThread( void *data )
 {
-    notification_thread_t *p_notif = (notification_thread_t*)p_this;
-    aout_instance_t *p_aout = p_notif->p_aout;
+    aout_instance_t *p_aout = data;
     aout_sys_t *p_sys = p_aout->output.p_sys;
     aout_buffer_t *p_buffer = NULL;
     WAVEHDR *p_waveheader = p_sys->waveheader;
@@ -891,9 +882,9 @@ static void* WaveOutThread( vlc_object_t *p_this )
     b_sleek = p_aout->output.output.i_format == VLC_CODEC_SPDIFL;
 
     // wait for first call to "play()"
-    while( !p_sys->start_date && vlc_object_alive (p_aout) )
+    while( !p_sys->start_date && !vlc_atomic_get(&p_aout->output.p_sys->abort) )
            WaitForSingleObject( p_sys->event, INFINITE );
-    if( !vlc_object_alive (p_aout) )
+    if( vlc_atomic_get(&p_aout->output.p_sys->abort) )
         return NULL;
 
     msg_Dbg( p_aout, "will start to play in %"PRId64" us",
@@ -910,12 +901,12 @@ static void* WaveOutThread( vlc_object_t *p_this )
                            p_aout->output.b_starving, msg);
     next_date = mdate();
 
-    while( vlc_object_alive (p_aout) )
+    while( !vlc_atomic_get(&p_aout->output.p_sys->abort) )
     {
         /* Cleanup and find out the current latency */
         i_queued_frames = WaveOutClearDoneBuffers( p_sys );
 
-        if( !vlc_object_alive (p_aout) ) return NULL;
+        if( vlc_atomic_get(&p_aout->output.p_sys->abort) ) return NULL;
 
         /* Try to fill in as many frame buffers as possible */
         for( i = 0; i < FRAMES_NUM; i++ )
@@ -990,7 +981,7 @@ static void* WaveOutThread( vlc_object_t *p_this )
             }
         }
 
-        if( !vlc_object_alive (p_aout) ) return NULL;
+        if( vlc_atomic_get(&p_aout->output.p_sys->abort) ) return NULL;
 
         /*
           deal with the case that the loop didn't fillup the buffer to the
