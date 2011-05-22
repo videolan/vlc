@@ -530,3 +530,9 @@ void PLSelector::getCurrentSelectedItem( int* type, QString *string)
     *type = currentItem()->data( 0, TYPE_ROLE ).toInt();
     *string = currentItem()->data( 0, NAME_ROLE ).toString();
 }
+
+void PLSelector::wheelEvent( QWheelEvent *e )
+{
+    // Accept this event in order to prevent unwanted volume up/down changes
+    e->accept();
+}

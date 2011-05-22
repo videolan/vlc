@@ -123,6 +123,7 @@ protected:
     virtual void dragMoveEvent ( QDragMoveEvent * event );
     virtual bool dropMimeData ( QTreeWidgetItem *, int, const QMimeData *, Qt::DropAction );
     virtual QStringList mimeTypes () const;
+    virtual void wheelEvent(QWheelEvent *e);
 
 private:
     void createItems();
