@@ -626,13 +626,13 @@ static int AVI_ChunkRead_strz( stream_t *s, avi_chunk_t *p_chk )
         }
     }
     p_strz->p_type = strdup( AVI_strz_type[i_index].psz_type );
-    p_strz->p_str = malloc( i_read + 1);
+    p_strz->p_str = malloc( p_strz->i_chunk_size + 1);
 
     if( p_strz->i_chunk_size )
     {
         memcpy( p_strz->p_str, p_read, p_strz->i_chunk_size );
     }
-    p_strz->p_str[i_read] = 0;
+    p_strz->p_str[p_strz->i_chunk_size] = 0;
 
 #ifdef AVI_DEBUG
     msg_Dbg( (vlc_object_t*)s, "%4.4s: %s : %s",
