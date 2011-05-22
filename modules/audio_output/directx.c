@@ -33,6 +33,7 @@
 #include <vlc_plugin.h>
 #include <vlc_aout.h>
 #include <vlc_charset.h>
+#include <vlc_atomic.h>
 
 #include "windows_audio_common.h"
 
@@ -43,14 +44,15 @@
  *****************************************************************************/
 typedef struct notification_thread_t
 {
-    VLC_COMMON_MEMBERS
-
     aout_instance_t *p_aout;
     int i_frame_size;                          /* size in bytes of one frame */
     int i_write_slot;       /* current write position in our circular buffer */
 
     mtime_t start_date;
     HANDLE event;
+
+    vlc_thread_t thread;
+    vlc_atomic_t abort;
 
 } notification_thread_t;
 
@@ -100,7 +102,7 @@ static int  InitDirectSound   ( aout_instance_t * );
 static int  CreateDSBuffer    ( aout_instance_t *, int, int, int, int, int, bool );
 static int  CreateDSBufferPCM ( aout_instance_t *, vlc_fourcc_t*, int, int, int, bool );
 static void DestroyDSBuffer   ( aout_instance_t * );
-static void* DirectSoundThread( vlc_object_t * );
+static void* DirectSoundThread( void * );
 static int  FillBuffer        ( aout_instance_t *, int, aout_buffer_t * );
 
 static int ReloadDirectXDevices( vlc_object_t *, char const *,
@@ -300,28 +302,26 @@ static int OpenAudio( vlc_object_t *p_this )
     }
 
     /* Now we need to setup our DirectSound play notification structure */
-    p_aout->output.p_sys->p_notif =
-        vlc_object_create( p_aout, sizeof(notification_thread_t) );
+    p_aout->output.p_sys->p_notif = calloc( 1, sizeof( *p_aout->output.p_sys->p_notif ) );
     p_aout->output.p_sys->p_notif->p_aout = p_aout;
 
+    vlc_atomic_set(&p_aout->output.p_sys->p_notif->abort, 0);
     p_aout->output.p_sys->p_notif->event = CreateEvent( 0, FALSE, FALSE, 0 );
     p_aout->output.p_sys->p_notif->i_frame_size =
         p_aout->output.p_sys->i_frame_size;
 
     /* then launch the notification thread */
     msg_Dbg( p_aout, "creating DirectSoundThread" );
-    if( vlc_thread_create( p_aout->output.p_sys->p_notif,
-                           DirectSoundThread,
-                           VLC_THREAD_PRIORITY_HIGHEST ) )
+    if( vlc_clone( &p_aout->output.p_sys->p_notif->thread,
+                   DirectSoundThread, p_aout->output.p_sys->p_notif,
+                   VLC_THREAD_PRIORITY_HIGHEST ) )
     {
         msg_Err( p_aout, "cannot create DirectSoundThread" );
         CloseHandle( p_aout->output.p_sys->p_notif->event );
-        vlc_object_release( p_aout->output.p_sys->p_notif );
+        free( p_aout->output.p_sys->p_notif );
         p_aout->output.p_sys->p_notif = NULL;
         goto error;
     }
-
-    vlc_object_attach( p_aout->output.p_sys->p_notif, p_aout );
 
     return VLC_SUCCESS;
 
@@ -607,12 +607,12 @@ static void CloseAudio( vlc_object_t *p_this )
     /* kill the position notification thread, if any */
     if( p_sys->p_notif )
     {
-        vlc_object_kill( p_sys->p_notif );
+        vlc_atomic_set(&p_aout->output.p_sys->p_notif->abort, 1);
         /* wake up the audio thread if needed */
         if( !p_sys->b_playing ) SetEvent( p_sys->p_notif->event );
 
-        vlc_thread_join( p_sys->p_notif );
-        vlc_object_release( p_sys->p_notif );
+        vlc_join( p_sys->p_notif->thread, NULL );
+        free( p_sys->p_notif );
     }
 
     /* release the secondary buffer */
@@ -972,7 +972,7 @@ static int FillBuffer( aout_instance_t *p_aout, int i_frame,
     }
     if( dsresult != DS_OK )
     {
-        msg_Warn( p_notif, "cannot lock buffer" );
+        msg_Warn( p_aout, "cannot lock buffer" );
         if( p_buffer ) aout_BufferFree( p_buffer );
         return VLC_EGENERIC;
     }
@@ -1009,9 +1009,9 @@ static int FillBuffer( aout_instance_t *p_aout, int i_frame,
  * We use this thread to emulate a callback mechanism. The thread probes for
  * event notification and fills up the DS secondary buffer when needed.
  *****************************************************************************/
-static void* DirectSoundThread( vlc_object_t *p_this )
+static void* DirectSoundThread( void *data )
 {
-    notification_thread_t *p_notif = (notification_thread_t*)p_this;
+    notification_thread_t *p_notif = (notification_thread_t*)data;
     aout_instance_t *p_aout = p_notif->p_aout;
     mtime_t last_time;
     int canc = vlc_savecancel ();
@@ -1019,12 +1019,12 @@ static void* DirectSoundThread( vlc_object_t *p_this )
     /* We don't want any resampling when using S/PDIF output */
     bool b_sleek = (p_aout->output.output.i_format == VLC_CODEC_SPDIFL);
 
-    msg_Dbg( p_notif, "DirectSoundThread ready" );
+    msg_Dbg( p_aout, "DirectSoundThread ready" );
 
     /* Wait here until Play() is called */
     WaitForSingleObject( p_notif->event, INFINITE );
 
-    if( vlc_object_alive (p_notif) )
+    if( !vlc_atomic_get( &p_notif->abort) )
     {
         HRESULT dsresult;
         mwait( p_notif->start_date - AOUT_PTS_TOLERANCE / 2 );
@@ -1050,7 +1050,7 @@ static void* DirectSoundThread( vlc_object_t *p_this )
     }
     last_time = mdate();
 
-    while( vlc_object_alive (p_notif) )
+    while( !vlc_atomic_get( &p_notif->abort ) )
     {
         DWORD l_read;
         int l_queued = 0, l_free_slots;
@@ -1111,7 +1111,7 @@ static void* DirectSoundThread( vlc_object_t *p_this )
     CloseHandle( p_notif->event );
 
     vlc_restorecancel (canc);
-    msg_Dbg( p_notif, "DirectSoundThread exiting" );
+    msg_Dbg( p_aout, "DirectSoundThread exiting" );
     return NULL;
 }
 
