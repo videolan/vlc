@@ -629,7 +629,7 @@ static void format_duration (char *buf, size_t len, int64_t duration)
                         memcpy( (dst+d), string, len );             \
                         d += len;                                   \
                         free( string );                             \
-                    }                                               \
+                    }
 
 /* same than INSERT_STRING, except that string won't be freed */
 #define INSERT_STRING_NO_FREE( string )                             \
@@ -904,7 +904,7 @@ char *str_format_meta( vlc_object_t *p_object, const char *string )
                         char *now_playing = input_item_GetNowPlaying( p_item );
                         if ( now_playing == NULL )
                         {
-                            char *temp = input_item_GetTitle( p_item );
+                            char *temp = input_item_GetTitleFbName( p_item );
                             if( !EMPTY_STR( temp ) )
                             {
                                 INSERT_STRING( temp );
