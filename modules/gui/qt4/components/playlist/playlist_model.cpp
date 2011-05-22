@@ -944,6 +944,8 @@ bool PLModel::popup( const QModelIndex & index, const QPoint &point, const QMode
     }
     if( i_popup_item > -1 )
     {
+        if( rootItem->id() != THEPL->p_playing->i_id )
+            menu.addAction( qtr( "Add to playlist"), this, SLOT( popupAddToPlaylist() ) );
         menu.addAction( QIcon( ":/buttons/playlist/playlist_remove" ),
                         qtr(I_POP_DEL), this, SLOT( popupDel() ) );
         menu.addSeparator();
@@ -990,6 +992,22 @@ void PLModel::popupPlay()
     PL_UNLOCK;
 }
 
+void PLModel::popupAddToPlaylist()
+{
+    playlist_Lock( THEPL );
+
+    foreach( QModelIndex currentIndex, current_selection )
+    {
+        playlist_item_t *p_item = playlist_ItemGetById( THEPL, getId( currentIndex ) );
+        if( !p_item ) continue;
+
+        playlist_NodeAddCopy( THEPL, p_item,
+                              THEPL->p_playing,
+                              PLAYLIST_END );
+    }
+    playlist_Unlock( THEPL );
+}
+
 void PLModel::popupInfo()
 {
     PL_LOCK;
@@ -1014,7 +1032,6 @@ void PLModel::popupStream()
     QStringList mrls = selectedURIs();
     if( !mrls.isEmpty() )
         THEDP->streamingDialog( NULL, mrls[0], false );
-
 }
 
 void PLModel::popupSave()
@@ -1027,8 +1044,7 @@ void PLModel::popupSave()
 void PLModel::popupExplore()
 {
     PL_LOCK;
-    playlist_item_t *p_item = playlist_ItemGetById( p_playlist,
-            i_popup_item );
+    playlist_item_t *p_item = playlist_ItemGetById( p_playlist, i_popup_item );
     if( p_item )
     {
         input_item_t *p_input = p_item->p_input;

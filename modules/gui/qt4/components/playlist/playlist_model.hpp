@@ -161,6 +161,7 @@ private slots:
     void popupSave();
     void popupExplore();
     void popupAddNode();
+    void popupAddToPlaylist();
     void popupSort( int column );
     void processInputItemUpdate( input_item_t *);
     void processInputItemUpdate( input_thread_t* p_input );
