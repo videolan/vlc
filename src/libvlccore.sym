@@ -226,6 +226,7 @@ input_SplitMRL
 input_Start
 input_Stop
 input_vaControl
+input_Close
 intf_Create
 intf_Eject
 IsUTF8

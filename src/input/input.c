@@ -251,6 +251,17 @@ void input_Stop( input_thread_t *p_input, bool b_abort )
 }
 
 /**
+ * Close an input
+ *
+ * It does not call input_Stop itself.
+ */
+int input_Close( input_thread_t *p_input )
+{
+    vlc_thread_join( p_input );
+    vlc_object_release( p_input );
+}
+
+/**
  * Get the item from an input thread
  * FIXME it does not increase ref count of the item.
  * if it is used after p_input is destroyed nothing prevent it from
