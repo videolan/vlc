@@ -1,11 +1,11 @@
 /*****************************************************************************
 * eyetv.m: small class to control the notification parts of the EyeTV plugin
 *****************************************************************************
-* Copyright (C) 2006-2007 the VideoLAN team
+* Copyright (C) 2006-2011 the VideoLAN team
 * $Id$
 *
 * Authors: Felix Kühne <fkuehne at videolan dot org>
-*                Damien Fouilleul <damienf at videolan dot org>
+*          Damien Fouilleul <damienf at videolan dot org>
 *
 * This program is free software; you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -57,8 +57,7 @@ static VLCEyeTVController *_o_sharedInstance = nil;
 
 - (void)globalNotificationReceived: (NSNotification *)theNotification
 {
-    msg_Dbg( VLCIntf, "notification received in VLC with name %s and object %s",
-             [[theNotification name] UTF8String], [[theNotification object] UTF8String] );
+    NSLog( @"notification received in VLC with name %@ and object %@", [theNotification name], [theNotification object] );
 
     /* update our info on the used device */
     if( [[theNotification name] isEqualToString: @"DeviceAdded"] )
@@ -95,7 +94,7 @@ static VLCEyeTVController *_o_sharedInstance = nil;
     if( nil == descriptor ) 
     {
         NSString *errorString = [errorDict objectForKey:NSAppleScriptErrorMessage];
-        msg_Err( VLCIntf, "opening EyeTV failed with error status '%s'", [errorString UTF8String] );
+        NSLog( @"opening EyeTV failed with error status '%@'", errorString );
     }
     [script release];
 }
@@ -110,7 +109,7 @@ static VLCEyeTVController *_o_sharedInstance = nil;
     if( nil == descriptor ) 
     {
         NSString *errorString = [errorDict objectForKey:NSAppleScriptErrorMessage];
-        msg_Err( VLCIntf, "EyeTV channel inventory failed with error status '%s'", [errorString UTF8String] );
+        NSLog( @"EyeTV channel inventory failed with error status '%@'", errorString );
     }
     else
     {
@@ -134,7 +133,7 @@ static VLCEyeTVController *_o_sharedInstance = nil;
                        "channel_up\n"
                        "get current channel\n"
                      "end tell"];
-        msg_Dbg( VLCIntf, "telling eyetv to switch 1 channel up" );
+        NSLog( @"telling eyetv to switch 1 channel up" );
     }
     else
     {
@@ -143,14 +142,14 @@ static VLCEyeTVController *_o_sharedInstance = nil;
                        "channel_down\n"
                        "get current channel\n"
                      "end tell"];
-        msg_Dbg( VLCIntf, "telling eyetv to switch 1 channel down" );
+        NSLog( @"telling eyetv to switch 1 channel down" );
     }
     
     descriptor = [script executeAndReturnError:&errorDict];
     if( nil == descriptor ) 
     {
         NSString *errorString = [errorDict objectForKey:NSAppleScriptErrorMessage];
-        msg_Err( VLCIntf, "EyeTV channel change failed with error status '%s'", [errorString UTF8String] );
+        NSLog( @"EyeTV channel change failed with error status '%@'", errorString );
     }
     else
     {
@@ -203,7 +202,7 @@ static VLCEyeTVController *_o_sharedInstance = nil;
     if( nil == descriptor ) 
     {
         NSString *errorString = [errorDict objectForKey:NSAppleScriptErrorMessage];
-        msg_Err( VLCIntf, "EyeTV source change failed with error status '%s'", [errorString UTF8String] );
+        NSLog( @"EyeTV source change failed with error status '%@'", errorString );
     }
     [script release];
 }
@@ -218,7 +217,7 @@ static VLCEyeTVController *_o_sharedInstance = nil;
     if( nil == descriptor ) 
     {
         NSString *errorString = [errorDict objectForKey:NSAppleScriptErrorMessage];
-        msg_Err( VLCIntf, "EyeTV channel inventory failed with error status '%s'", [errorString UTF8String] );
+        NSLog( @"EyeTV channel inventory failed with error status '%@'", errorString );
     }
     else
     {
