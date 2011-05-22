@@ -211,7 +211,7 @@ void virtual_segment_c::Seek( demux_t & demuxer, mtime_t i_date, mtime_t i_time_
     // find the actual time for an ordered edition
     if ( psz_chapter == NULL )
     {
-        if ( Edition() && Edition()->b_ordered )
+        if ( CurrentEdition() && CurrentEdition()->b_ordered )
         {
             /* 1st, we need to know in which chapter we are */
             psz_chapter = (*p_editions)[i_current_edition]->FindTimecode( i_date, p_current_chapter );

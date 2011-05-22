@@ -718,20 +718,20 @@ bool demux_sys_t::PreparePlayback( virtual_segment_c *p_new_segment )
 {
     if ( p_new_segment != NULL && p_new_segment != p_current_segment )
     {
-        if ( p_current_segment != NULL && p_current_segment->Segment() != NULL )
-            p_current_segment->Segment()->UnSelect();
+        if ( p_current_segment != NULL && p_current_segment->CurrentSegment() != NULL )
+            p_current_segment->CurrentSegment()->UnSelect();
 
         p_current_segment = p_new_segment;
         i_current_title = p_new_segment->i_sys_title;
     }
-    if( !p_current_segment->Segment()->b_cues )
-        msg_Warn( &p_current_segment->Segment()->sys.demuxer, "no cues/empty cues found->seek won't be precise" );
+    if( !p_current_segment->CurrentSegment()->b_cues )
+        msg_Warn( &p_current_segment->CurrentSegment()->sys.demuxer, "no cues/empty cues found->seek won't be precise" );
 
     f_duration = p_current_segment->Duration();
 
     /* add information */
-    p_current_segment->Segment()->InformationCreate( );
-    p_current_segment->Segment()->Select( 0 );
+    p_current_segment->CurrentSegment()->InformationCreate( );
+    p_current_segment->CurrentSegment()->Select( 0 );
 
     return true;
 }

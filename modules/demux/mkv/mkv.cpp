@@ -246,7 +246,7 @@ static int Open( vlc_object_t * p_this )
     }
 
     p_sys->InitUi();
- 
+
     return VLC_SUCCESS;
 
 error:
@@ -375,9 +375,9 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         case DEMUX_GET_FPS:
             pf = (double *)va_arg( args, double * );
             *pf = 0.0;
-            if( p_sys->p_current_segment && p_sys->p_current_segment->Segment() )
+            if( p_sys->p_current_segment && p_sys->p_current_segment->CurrentSegment() )
             {
-                const matroska_segment_c *p_segment = p_sys->p_current_segment->Segment();
+                const matroska_segment_c *p_segment = p_sys->p_current_segment->CurrentSegment();
                 for( size_t i = 0; i < p_segment->tracks.size(); i++ )
                 {
                     mkv_track_t *tk = p_segment->tracks[i];
@@ -401,7 +401,7 @@ static void Seek( demux_t *p_demux, mtime_t i_date, double f_percent, chapter_it
 {
     demux_sys_t        *p_sys = p_demux->p_sys;
     virtual_segment_c  *p_vsegment = p_sys->p_current_segment;
-    matroska_segment_c *p_segment = p_vsegment->Segment();
+    matroska_segment_c *p_segment = p_vsegment->CurrentSegment();
     mtime_t            i_time_offset = 0;
     int64_t            i_global_position = -1;
 
@@ -471,7 +471,7 @@ void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock
                          mtime_t i_pts, mtime_t i_duration, bool f_mandatory )
 {
     demux_sys_t        *p_sys = p_demux->p_sys;
-    matroska_segment_c *p_segment = p_sys->p_current_segment->Segment();
+    matroska_segment_c *p_segment = p_sys->p_current_segment->CurrentSegment();
 
     if( !p_segment ) return;
 
@@ -630,7 +630,7 @@ static int Demux( demux_t *p_demux)
     vlc_mutex_lock( &p_sys->lock_demuxer );
 
     virtual_segment_c  *p_vsegment = p_sys->p_current_segment;
-    matroska_segment_c *p_segment = p_vsegment->Segment();
+    matroska_segment_c *p_segment = p_vsegment->CurrentSegment();
     if ( p_segment == NULL ) return 0;
     int                i_block_count = 0;
     int                i_return = 0;
@@ -646,18 +646,18 @@ static int Demux( demux_t *p_demux)
                 i_return = 1;
                 break;
             }
- 
-        if ( p_vsegment->Edition() && p_vsegment->Edition()->b_ordered && p_vsegment->CurrentChapter() == NULL )
+
+        if ( p_vsegment->CurrentEdition() && p_vsegment->CurrentEdition()->b_ordered && p_vsegment->CurrentChapter() == NULL )
         {
             /* nothing left to read in this ordered edition */
             if ( !p_vsegment->SelectNext() )
                 break;
             p_segment->UnSelect( );
- 
+
             es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
 
             /* switch to the next segment */
-            p_segment = p_vsegment->Segment();
+            p_segment = p_vsegment->CurrentSegment();
             if ( !p_segment->Select( 0 ) )
             {
                 msg_Err( p_demux, "Failed to select new segment" );
@@ -673,7 +673,7 @@ static int Demux( demux_t *p_demux)
         bool b_discardable_picture;
         if( p_segment->BlockGet( block, simpleblock, &b_key_picture, &b_discardable_picture, &i_block_duration ) )
         {
-            if ( p_vsegment->Edition() && p_vsegment->Edition()->b_ordered )
+            if ( p_vsegment->CurrentEdition() && p_vsegment->CurrentEdition()->b_ordered )
             {
                 const chapter_item_c *p_chap = p_vsegment->CurrentChapter();
                 // check if there are more chapters to read
@@ -695,14 +695,14 @@ static int Demux( demux_t *p_demux)
             {
                 msg_Warn( p_demux, "cannot get block EOF?" );
                 p_segment->UnSelect( );
- 
+
                 es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
 
                 /* switch to the next segment */
                 if ( !p_vsegment->SelectNext() )
                     // no more segments in this stream
                     break;
-                p_segment = p_vsegment->Segment();
+                p_segment = p_vsegment->CurrentSegment();
                 if ( !p_segment->Select( 0 ) )
                 {
                     msg_Err( p_demux, "Failed to select new segment" );
@@ -730,8 +730,8 @@ static int Demux( demux_t *p_demux)
                 break;
             }
         }
- 
-        if ( p_vsegment->Edition() && p_vsegment->Edition()->b_ordered && p_vsegment->CurrentChapter() == NULL )
+
+        if ( p_vsegment->CurrentEdition() && p_vsegment->CurrentEdition()->b_ordered && p_vsegment->CurrentChapter() == NULL )
         {
             /* nothing left to read in this ordered edition */
             if ( !p_vsegment->SelectNext() )
@@ -740,11 +740,11 @@ static int Demux( demux_t *p_demux)
                 break;
             }
             p_segment->UnSelect( );
- 
+
             es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
 
             /* switch to the next segment */
-            p_segment = p_vsegment->Segment();
+            p_segment = p_vsegment->CurrentSegment();
             if ( !p_segment->Select( 0 ) )
             {
                 msg_Err( p_demux, "Failed to select new segment" );

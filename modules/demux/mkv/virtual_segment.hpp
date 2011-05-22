@@ -55,7 +55,7 @@ public:
 
     mtime_t Duration() const;
 
-    inline chapter_edition_c *Edition()
+    inline chapter_edition_c *CurrentEdition()
     {
         if ( i_current_edition >= 0 && size_t(i_current_edition) < p_editions->size() )
             return (*p_editions)[i_current_edition];
@@ -63,7 +63,7 @@ public:
     }
     std::vector<chapter_edition_c*>*  Editions() const { return p_editions; };
 
-    matroska_segment_c * Segment() const
+    matroska_segment_c * CurrentSegment() const
     {
         if ( linked_segments.size() == 0 || i_current_segment >= linked_segments.size() )
             return NULL;
