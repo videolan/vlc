@@ -194,9 +194,8 @@ VLC_API int vlc_threadvar_create(vlc_threadvar_t * , void (*) (void *) );
 VLC_API void vlc_threadvar_delete(vlc_threadvar_t *);
 VLC_API int vlc_threadvar_set(vlc_threadvar_t, void *);
 VLC_API void * vlc_threadvar_get(vlc_threadvar_t);
-VLC_API int vlc_thread_create( vlc_object_t *, void * ( * ) ( vlc_object_t * ), int ) VLC_USED VLC_DEPRECATED;
+
 VLC_API int vlc_thread_set_priority( vlc_object_t *, int ) VLC_DEPRECATED;
-VLC_API void vlc_thread_join( vlc_object_t * ) VLC_DEPRECATED;
 
 VLC_API int vlc_clone(vlc_thread_t *, void * (*) (void *), void *, int) VLC_USED;
 VLC_API void vlc_cancel(vlc_thread_t);
@@ -393,14 +392,8 @@ static inline void barrier (void)
 #endif
 }
 
-#define vlc_thread_create( P_THIS, FUNC, PRIORITY ) \
-    vlc_thread_create( VLC_OBJECT(P_THIS), FUNC, PRIORITY )
-
 #define vlc_thread_set_priority( P_THIS, PRIORITY )                         \
     vlc_thread_set_priority( VLC_OBJECT(P_THIS), PRIORITY )
-
-#define vlc_thread_join( P_THIS )                                           \
-    vlc_thread_join( VLC_OBJECT(P_THIS) )
 
 #ifdef __cplusplus
 /**
