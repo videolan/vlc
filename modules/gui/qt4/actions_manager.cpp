@@ -91,6 +91,8 @@ void ActionsManager::doAction( int id_action )
             THEMIM->toggleRandom(); break;
         case INFO_ACTION:
             THEDP->mediaInfoDialog(); break;
+        case OPEN_SUB_ACTION:
+            THEDP->loadSubtitlesFile(); break;
         default:
             msg_Dbg( p_intf, "Action: %i", id_action );
             break;

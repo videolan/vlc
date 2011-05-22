@@ -249,6 +249,10 @@ QWidget *AbstractController::createWidget( buttonType_e button, int options )
         NORMAL_BUTTON( OPEN );
         }
         break;
+    case OPEN_SUB_BUTTON:{
+        NORMAL_BUTTON( OPEN_SUB );
+        }
+        break;
     case PREVIOUS_BUTTON:{
         NORMAL_BUTTON( PREVIOUS );
         }

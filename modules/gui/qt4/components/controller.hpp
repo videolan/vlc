@@ -86,6 +86,7 @@ typedef enum buttonType_e
     INFO_BUTTON,
     PREVIOUS_BUTTON,
     NEXT_BUTTON,
+    OPEN_SUB_BUTTON,
     BUTTON_MAX,
 
     SPLITTER = 0x20,
@@ -110,7 +111,8 @@ static const char* const nameL[BUTTON_MAX] = { N_("Play"), N_("Stop"), N_("Open"
    N_("De-Fullscreen"), N_("Extended panel"), N_("Playlist"), N_("Snapshot"),
    N_("Record"), N_("A->B Loop"), N_("Frame By Frame"), N_("Trickplay Reverse"),
    N_("Step backward" ), N_("Step forward"), N_("Quit"), N_("Random"),
-   N_("Loop/Repeat mode"), N_("Information"), N_("Previous"), N_("Next") };
+   N_("Loop/Repeat mode"), N_("Information"), N_("Previous"), N_("Next"),
+   N_("Open subtitles file")};
 static const char* const tooltipL[BUTTON_MAX] = { I_PLAY_TOOLTIP,
     N_("Stop playback"), N_("Open a medium"),
     N_("Previous media in the playlist, skip backward when keep-pressed"),
@@ -121,7 +123,8 @@ static const char* const tooltipL[BUTTON_MAX] = { I_PLAY_TOOLTIP,
     N_( "Loop from point A to point B continuously." ), N_("Frame by frame"),
     N_("Reverse"), N_("Step backward"), N_("Step forward"), N_("Quit"),
     N_("Random"), N_("Change the loop and repeat modes"), N_("Information"),
-    N_("Previous media in the playlist"), N_("Next media in the playlist")};
+    N_("Previous media in the playlist"), N_("Next media in the playlist"),
+    N_("Open subtitles file")};
 static const QString iconL[BUTTON_MAX] ={ ":/toolbar/play_b", ":/toolbar/stop_b",
     ":/toolbar/eject", ":/toolbar/previous_b", ":/toolbar/next_b",
     ":/toolbar/slower", ":/toolbar/faster", ":/toolbar/fullscreen",
@@ -130,7 +133,7 @@ static const QString iconL[BUTTON_MAX] ={ ":/toolbar/play_b", ":/toolbar/stop_b"
     ":/toolbar/frame", ":/toolbar/reverse", ":/toolbar/skip_back",
     ":/toolbar/skip_fw", ":/toolbar/clear", ":/buttons/playlist/shuffle_on",
     ":/buttons/playlist/repeat_all", ":/menu/info",
-    ":/toolbar/previous_b", ":/toolbar/next_b", };
+    ":/toolbar/previous_b", ":/toolbar/next_b", "" };
 
 enum
 {
