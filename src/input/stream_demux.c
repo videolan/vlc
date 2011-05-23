@@ -46,13 +46,14 @@ struct stream_sys_t
     es_out_t    *out;
     demux_t     *p_demux;
 
+    vlc_thread_t thread;
 };
 
 static int  DStreamRead   ( stream_t *, void *p_read, unsigned int i_read );
 static int  DStreamPeek   ( stream_t *, const uint8_t **pp_peek, unsigned int i_peek );
 static int  DStreamControl( stream_t *, int i_query, va_list );
 static void DStreamDelete ( stream_t * );
-static void* DStreamThread ( vlc_object_t * );
+static void* DStreamThread ( void * );
 
 
 stream_t *stream_DemuxNew( demux_t *p_demux, const char *psz_demux, es_out_t *out )
@@ -96,7 +97,7 @@ stream_t *stream_DemuxNew( demux_t *p_demux, const char *psz_demux, es_out_t *ou
 
     vlc_object_attach( s, p_obj );
 
-    if( vlc_thread_create( s, DStreamThread, VLC_THREAD_PRIORITY_INPUT ) )
+    if( vlc_clone( &p_sys->thread, DStreamThread, s, VLC_THREAD_PRIORITY_INPUT ) )
     {
         stream_CommonDelete( s );
         free( p_sys->psz_name );
@@ -124,7 +125,7 @@ static void DStreamDelete( stream_t *s )
         vlc_object_kill( p_sys->p_demux );
     p_empty = block_New( s, 1 ); p_empty->i_buffer = 0;
     block_FifoPut( p_sys->p_fifo, p_empty );
-    vlc_thread_join( s );
+    vlc_join( p_sys->thread, NULL );
 
     if( p_sys->p_demux )
         demux_Delete( p_sys->p_demux );
@@ -146,7 +147,7 @@ static int DStreamRead( stream_t *s, void *p_read, unsigned int i_read )
 
     //msg_Dbg( s, "DStreamRead: wanted %d bytes", i_read );
 
-    while( !s->b_die && !s->b_error && i_read )
+    while( vlc_object_alive( s ) && !s->b_error && i_read )
     {
         block_t *p_block = p_sys->p_block;
         int i_copy;
@@ -189,7 +190,7 @@ static int DStreamPeek( stream_t *s, const uint8_t **pp_peek, unsigned int i_pee
 
     //msg_Dbg( s, "DStreamPeek: wanted %d bytes", i_peek );
 
-    while( !s->b_die && !s->b_error && i_peek )
+    while( vlc_object_alive( s ) && !s->b_error && i_peek )
     {
         int i_copy;
 
@@ -274,9 +275,9 @@ static int DStreamControl( stream_t *s, int i_query, va_list args )
     }
 }
 
-static void* DStreamThread( vlc_object_t* p_this )
+static void* DStreamThread( void *obj )
 {
-    stream_t *s = (stream_t *)p_this;
+    stream_t *s = (stream_t *)obj;
     stream_sys_t *p_sys = s->p_sys;
     demux_t *p_demux;
     int canc = vlc_savecancel();
@@ -294,7 +295,7 @@ static void* DStreamThread( vlc_object_t* p_this )
     p_sys->p_demux = p_demux;
 
     /* Main loop */
-    while( !s->b_die && !p_demux->b_die )
+    while( vlc_object_alive( s ) && vlc_object_alive( p_demux ) )
     {
         if( demux_Demux( p_demux ) <= 0 ) break;
     }
