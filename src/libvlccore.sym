@@ -608,7 +608,6 @@ vlc_sd_Start
 vlc_sd_Stop
 vlc_tdestroy
 vlc_testcancel
-vlc_thread_set_priority
 vlc_threadvar_create
 vlc_threadvar_delete
 vlc_threadvar_get
