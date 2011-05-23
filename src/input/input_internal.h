@@ -164,6 +164,8 @@ struct input_thread_private_t
     input_control_t control[INPUT_CONTROL_FIFO_SIZE];
 
     bool b_abort;
+    bool is_running;
+    vlc_thread_t thread;
 };
 
 /***************************************************************************
