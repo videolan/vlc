@@ -28,8 +28,7 @@ CXX="${GCC_PREFIX}g++" \
 NM="${GCC_PREFIX}nm" \
 STRIP="${GCC_PREFIX}strip" \
 PKG_CONFIG_LIBDIR="$VLC_SOURCEDIR/extras/contrib/hosts/arm-eabi/lib/pkgconfig" \
-sh ../configure --host=arm-eabi-linux --build=x86_64-unknown-linux \
-                --enable-static-modules \
+sh "$VLC_SOURCEDIR"/configure --host=arm-eabi-linux --build=x86_64-unknown-linux \
                 --enable-debug \
                 --disable-qt4 \
                 --disable-skins2 \
