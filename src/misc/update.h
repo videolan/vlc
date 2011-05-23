@@ -150,6 +150,8 @@ typedef struct public_key_t public_key_t;
 typedef struct
 {
     VLC_COMMON_MEMBERS
+
+    vlc_thread_t thread;
     update_t *p_update;
     char *psz_destdir;
 } update_download_thread_t;
@@ -159,7 +161,8 @@ typedef struct
  */
 typedef struct
 {
-    VLC_COMMON_MEMBERS
+    vlc_thread_t thread;
+
     update_t *p_update;
     void (*pf_callback)( void *, bool );
     void *p_data;
