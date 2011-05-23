@@ -634,9 +634,10 @@ static int vlc_clone_attr (vlc_thread_t *p_handle, bool detached,
     if (p_handle != NULL)
         *p_handle = th;
 
-    ResumeThread (hThread);
     if (priority)
         SetThreadPriority (hThread, priority);
+
+    ResumeThread (hThread);
 
     return 0;
 }
@@ -671,6 +672,13 @@ int vlc_clone_detach (vlc_thread_t *p_handle, void *(*entry) (void *),
         p_handle = &th;
 
     return vlc_clone_attr (p_handle, true, entry, data, priority);
+}
+
+int vlc_set_priority (vlc_thread_t th, int priority)
+{
+    if (!SetThreadPriority (th->id, priority))
+        return VLC_EGENERIC;
+    return VLC_SUCCESS;
 }
 
 /*** Thread cancellation ***/

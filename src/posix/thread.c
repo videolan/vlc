@@ -755,6 +755,30 @@ int vlc_clone_detach (vlc_thread_t *th, void *(*entry) (void *), void *data,
     return vlc_clone_attr (th, &attr, entry, data, priority);
 }
 
+int vlc_set_priority (vlc_thread_t th, int priority)
+{
+#if defined (_POSIX_PRIORITY_SCHEDULING) && (_POSIX_PRIORITY_SCHEDULING >= 0) \
+ && defined (_POSIX_THREAD_PRIORITY_SCHEDULING) \
+ && (_POSIX_THREAD_PRIORITY_SCHEDULING >= 0)
+    if (rt_priorities)
+    {
+        struct sched_param sp = { .sched_priority = priority + rt_offset, };
+        int policy;
+
+        if (sp.sched_priority <= 0)
+            sp.sched_priority += sched_get_priority_max (policy = SCHED_OTHER);
+        else
+            sp.sched_priority += sched_get_priority_min (policy = SCHED_RR);
+
+        if (pthread_setschedparam (th, policy, &sp))
+            return VLC_EGENERIC;
+    }
+#else
+    (void) priority;
+#endif
+    return VLC_SUCCESS;
+}
+
 /**
  * Marks a thread as cancelled. Next time the target thread reaches a
  * cancellation point (while not having disabled cancellation), it will

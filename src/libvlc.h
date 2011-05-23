@@ -62,6 +62,8 @@ int vlc_thread_set_priority( vlc_object_t *, int ) VLC_DEPRECATED;
 void vlc_thread_cancel (vlc_object_t *);
 int vlc_object_waitpipe (vlc_object_t *obj);
 
+int vlc_set_priority( vlc_thread_t, int );
+
 void vlc_threads_setup (libvlc_int_t *);
 
 void vlc_trace (const char *fn, const char *file, unsigned line);
