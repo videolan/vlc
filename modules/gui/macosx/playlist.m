@@ -1520,7 +1520,6 @@
 - (IBAction)addNode:(id)sender
 {
     playlist_t * p_playlist = pl_Get( VLCIntf );
-    vlc_thread_set_priority( p_playlist, VLC_THREAD_PRIORITY_LOW );
 
     PL_LOCK;
     playlist_NodeCreate( p_playlist, _("Empty Folder"),

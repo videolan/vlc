@@ -125,11 +125,6 @@ static void Run( intf_thread_t *p_intf )
 {
     sigset_t set;
 
-    /* Do it again - for some unknown reason, vlc_thread_create() often
-     * fails to go to real-time priority with the first launched thread
-     * (???) --Meuuh */
-    vlc_thread_set_priority( p_intf, VLC_THREAD_PRIORITY_LOW );
-
     /* Make sure the "force quit" menu item does quit instantly.
      * VLC overrides SIGTERM which is sent by the "force quit"
      * menu item to make sure deamon mode quits gracefully, so

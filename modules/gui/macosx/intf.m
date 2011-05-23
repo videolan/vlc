@@ -117,11 +117,6 @@ static void Run( intf_thread_t *p_intf )
 {
     sigset_t set;
 
-    /* Do it again - for some unknown reason, vlc_thread_create() often
-     * fails to go to real-time priority with the first launched thread
-     * (???) --Meuuh */
-    vlc_thread_set_priority( p_intf, VLC_THREAD_PRIORITY_LOW );
-
     /* Make sure the "force quit" menu item does quit instantly.
      * VLC overrides SIGTERM which is sent by the "force quit"
      * menu item to make sure deamon mode quits gracefully, so
@@ -565,8 +560,6 @@ static VLCMain *_o_sharedMainInstance = nil;
 
     [o_controls setupVarMenuItem: o_mi_add_intf target: (vlc_object_t *)p_intf
         var: "intf-add" selector: @selector(toggleVar:)];
-
-    vlc_thread_set_priority( p_intf, VLC_THREAD_PRIORITY_LOW );
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
@@ -1612,8 +1605,6 @@ static void manage_cleanup( void * args )
     input_thread_t * p_input = NULL;
 
     /* new thread requires a new pool */
-
-    vlc_thread_set_priority( p_intf, VLC_THREAD_PRIORITY_LOW );
 
     p_playlist = pl_Get( p_intf );
 
