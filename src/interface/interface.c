@@ -132,8 +132,8 @@ int intf_Create( vlc_object_t *p_this, const char *psz_module )
      * (it needs access to the main thread) */
     if( p_intf->b_should_run_on_first_thread )
     {
-        if( vlc_thread_create( p_intf, MonitorLibVLCDeath,
-                               VLC_THREAD_PRIORITY_LOW ) )
+        if( vlc_clone( &p_intf->thread,
+                       MonitorLibVLCDeath, p_intf, VLC_THREAD_PRIORITY_LOW ) )
         {
             msg_Err( p_intf, "cannot spawn libvlc death monitoring thread" );
             vlc_mutex_unlock( &lock );
@@ -144,13 +144,15 @@ int intf_Create( vlc_object_t *p_this, const char *psz_module )
 
         /* It is monitoring libvlc, not the p_intf */
         vlc_object_kill( p_intf->p_libvlc );
+
+        vlc_join( p_intf->thread, NULL );
     }
     else
 #endif
     /* Run the interface in a separate thread */
     if( p_intf->pf_run
-     && vlc_thread_create( p_intf, RunInterface,
-                           VLC_THREAD_PRIORITY_LOW ) )
+     && vlc_clone( &p_intf->thread,
+                   RunInterface, p_intf, VLC_THREAD_PRIORITY_LOW ) )
     {
         msg_Err( p_intf, "cannot spawn interface thread" );
         vlc_mutex_unlock( &lock );
@@ -198,7 +200,7 @@ void intf_DestroyAll( libvlc_int_t *p_libvlc )
         intf_thread_t *p_next = p_intf->p_next;
 
         if( p_intf->pf_run )
-            vlc_thread_join( p_intf );
+            vlc_join( p_intf->thread, NULL );
         module_unneed( p_intf, p_intf->p_module );
         free( p_intf->psz_intf );
         config_ChainDestroy( p_intf->p_cfg );
