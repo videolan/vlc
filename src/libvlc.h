@@ -51,13 +51,10 @@ int vlc_clone_detach (vlc_thread_t *, void *(*)(void *), void *, int);
 /* Hopefully, no need to export this. There is a new thread API instead. */
 int vlc_thread_create( vlc_object_t *, void * ( * ) ( vlc_object_t * ), int ) VLC_USED VLC_DEPRECATED;
 void vlc_thread_join( vlc_object_t * ) VLC_DEPRECATED;
-int vlc_thread_set_priority( vlc_object_t *, int ) VLC_DEPRECATED;
 #define vlc_thread_create( P_THIS, FUNC, PRIORITY ) \
     vlc_thread_create( VLC_OBJECT(P_THIS), FUNC, PRIORITY )
 #define vlc_thread_join( P_THIS )                                           \
     vlc_thread_join( VLC_OBJECT(P_THIS) )
-#define vlc_thread_set_priority( P_THIS, PRIORITY )                         \
-    vlc_thread_set_priority( VLC_OBJECT(P_THIS), PRIORITY )
 
 void vlc_thread_cancel (vlc_object_t *);
 int vlc_object_waitpipe (vlc_object_t *obj);

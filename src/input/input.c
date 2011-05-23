@@ -1292,7 +1292,7 @@ static int Init( input_thread_t * p_input )
         {
             /* We don't want a high input priority here or we'll
              * end-up sucking up all the CPU time */
-            vlc_thread_set_priority( p_input, VLC_THREAD_PRIORITY_LOW );
+            vlc_set_priority( p_input->p->thread, VLC_THREAD_PRIORITY_LOW );
         }
 
         msg_Dbg( p_input, "starting in %s mode",

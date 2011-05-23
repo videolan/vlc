@@ -96,65 +96,6 @@ int vlc_thread_create( vlc_object_t *p_this, void *(*func) ( vlc_object_t * ),
     return i_ret;
 }
 
-#undef vlc_thread_set_priority
-/*****************************************************************************
- * vlc_thread_set_priority: set the priority of the current thread when we
- * couldn't set it in vlc_thread_create (for instance for the main thread)
- *****************************************************************************/
-int vlc_thread_set_priority( vlc_object_t *p_this, int i_priority )
-{
-    vlc_object_internals_t *p_priv = vlc_internals( p_this );
-
-    if( !p_priv->b_thread )
-    {
-        msg_Err( p_this, "couldn't set priority of non-existent thread" );
-        return ESRCH;
-    }
-
-#if defined( LIBVLC_USE_PTHREAD )
-# ifndef __APPLE__
-    if( var_InheritBool( p_this, "rt-priority" ) )
-# endif
-    {
-        int i_error, i_policy;
-        struct sched_param param;
-
-        memset( &param, 0, sizeof(struct sched_param) );
-        if( config_GetType( p_this, "rt-offset" ) )
-            i_priority += var_InheritInteger( p_this, "rt-offset" );
-        if( i_priority <= 0 )
-        {
-            param.sched_priority = (-1) * i_priority;
-            i_policy = SCHED_OTHER;
-        }
-        else
-        {
-            param.sched_priority = i_priority;
-            i_policy = SCHED_RR;
-        }
-        if( (i_error = pthread_setschedparam( p_priv->thread_id,
-                                              i_policy, &param )) )
-        {
-            errno = i_error;
-            msg_Warn( p_this, "cannot set thread priority (%m)" );
-            i_priority = 0;
-        }
-    }
-
-#elif defined( WIN32 ) || defined( UNDER_CE )
-
-#warning vlc_thread_set_priority() is BROKEN
-    if( true /*!SetThreadPriority(p_priv->thread_id->id, i_priority)*/ )
-    {
-        msg_Warn( p_this, "couldn't set a faster priority" );
-        return 1;
-    }
-
-#endif
-
-    return 0;
-}
-
 #undef vlc_thread_join
 /*****************************************************************************
  * vlc_thread_join: wait until a thread exits, inner version
