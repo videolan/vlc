@@ -48,7 +48,7 @@ static subpicture_region_t * vout_OSDEpgSlider(int x, int y,
     video_format_Init(&fmt, VLC_CODEC_YUVA);
     fmt.i_width  = fmt.i_visible_width  = width;
     fmt.i_height = fmt.i_visible_height = height;
-    fmt.i_sar_num = 0;
+    fmt.i_sar_num = 1;
     fmt.i_sar_den = 1;
 
     region = subpicture_region_New(&fmt);
@@ -102,7 +102,7 @@ static subpicture_region_t * vout_OSDEpgText(const char *text,
 
     /* Create a new subpicture region */
     video_format_Init(&fmt, VLC_CODEC_TEXT);
-    fmt.i_sar_num = 0;
+    fmt.i_sar_num = 1;
     fmt.i_sar_den = 1;
 
     region = subpicture_region_New(&fmt);
@@ -228,15 +228,20 @@ static void OSDEpgUpdate(subpicture_t *subpic,
                          mtime_t ts)
 {
     subpicture_updater_sys_t *sys = subpic->updater.p_sys;
-    VLC_UNUSED(fmt_dst); VLC_UNUSED(ts);
+    VLC_UNUSED(fmt_src); VLC_UNUSED(ts);
 
-    subpic->i_original_picture_width  = fmt_src->i_width;
-    subpic->i_original_picture_height = fmt_src->i_height;
+    video_format_t fmt = *fmt_dst;
+    fmt.i_width         = fmt.i_width         * fmt.i_sar_num / fmt.i_sar_den;
+    fmt.i_visible_width = fmt.i_visible_width * fmt.i_sar_num / fmt.i_sar_den;
+    fmt.i_x_offset      = fmt.i_x_offset      * fmt.i_sar_num / fmt.i_sar_den;
+
+    subpic->i_original_picture_width  = fmt.i_width;
+    subpic->i_original_picture_height = fmt.i_height;
     subpic->p_region = vout_BuildOSDEpg(sys->epg,
-                                        fmt_src->i_x_offset,
-                                        fmt_src->i_y_offset,
-                                        fmt_src->i_visible_width,
-                                        fmt_src->i_visible_height);
+                                        fmt.i_x_offset,
+                                        fmt.i_y_offset,
+                                        fmt.i_visible_width,
+                                        fmt.i_visible_height);
 }
 
 static void OSDEpgDestroy(subpicture_t *subpic)
