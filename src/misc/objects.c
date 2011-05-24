@@ -158,7 +158,6 @@ void *vlc_custom_create( vlc_object_t *p_this, size_t i_size,
     vlc_spin_init( &p_priv->ref_spin );
     p_priv->i_refcount = 1;
     p_priv->pf_destructor = NULL;
-    p_priv->b_thread = false;
     p_new->p_parent = NULL;
     p_priv->first = NULL;
 
@@ -263,9 +262,6 @@ static void vlc_object_destroy( vlc_object_t *p_this )
     /* Call the custom "subclass" destructor */
     if( p_priv->pf_destructor )
         p_priv->pf_destructor( p_this );
-
-    /* Any thread must have been cleaned up at this point. */
-    assert( !p_priv->b_thread );
 
     /* Destroy the associated variables. */
     var_DestroyAll( p_this );
@@ -390,7 +386,6 @@ void vlc_object_kill( vlc_object_t *p_this )
     vlc_object_internals_t *priv = vlc_internals( p_this );
     int fd = -1;
 
-    vlc_thread_cancel( p_this );
     vlc_mutex_lock( &pipe_lock );
     if( !p_this->b_die )
     {
@@ -797,7 +792,7 @@ static vlc_object_t *FindChildName (vlc_object_internals_t *priv,
 static void PrintObject( vlc_object_internals_t *priv,
                          const char *psz_prefix )
 {
-    char psz_refcount[20], psz_thread[30], psz_name[50], psz_parent[20];
+    char psz_refcount[20], psz_name[50], psz_parent[20];
 
     int canc = vlc_savecancel ();
     memset( &psz_name, 0, sizeof(psz_name) );
@@ -815,20 +810,15 @@ static void PrintObject( vlc_object_internals_t *priv,
     if( priv->i_refcount > 0 )
         snprintf( psz_refcount, 19, ", %u refs", priv->i_refcount );
 
-    psz_thread[0] = '\0';
-    if( priv->b_thread )
-        snprintf( psz_thread, 29, " (thread %lu)",
-                  (unsigned long)priv->thread_id );
-
     psz_parent[0] = '\0';
     /* FIXME: need structure lock!!! */
     if( vlc_externals(priv)->p_parent )
         snprintf( psz_parent, 19, ", parent %p",
                   vlc_externals(priv)->p_parent );
 
-    printf( " %so %p %s%s%s%s%s\n", psz_prefix,
+    printf( " %so %p %s%s%s%s\n", psz_prefix,
             vlc_externals(priv), vlc_externals(priv)->psz_object_type,
-            psz_name, psz_thread, psz_refcount, psz_parent );
+            psz_name, psz_refcount, psz_parent );
     vlc_restorecancel (canc);
 }
 
