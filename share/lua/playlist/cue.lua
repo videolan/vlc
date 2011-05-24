@@ -60,7 +60,7 @@ function cue_track( global, track )
 	end
 
 	t = {}
-	t.path = cue_path( track.file or global.file )
+	t.path = vlc.strings.make_uri(cue_path( track.file or global.file ))
 	t.title = track.title
 	t.album = global.title
 	t.artist = track.performer or global.performer
