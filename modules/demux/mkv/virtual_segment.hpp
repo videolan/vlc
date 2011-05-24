@@ -49,7 +49,7 @@ public:
         AppendUID( p_segment->p_next_segment_uid );
     }
 
-    void AddSegments( std::vector<matroska_segment_c*> segments );
+    void AddSegments( const std::vector<matroska_segment_c*> &segments );
 
     void Seek( demux_t & demuxer, mtime_t i_date, mtime_t i_time_offset, chapter_item_c *p_chapter, int64_t i_global_position );
 

@@ -263,7 +263,7 @@ chapter_item_c *virtual_segment_c::FindChapter( int64_t i_find_uid )
     return NULL;
 }
 
-void virtual_segment_c::AddSegments(std::vector<matroska_segment_c *> segments)
+void virtual_segment_c::AddSegments( const std::vector<matroska_segment_c *> &segments)
 {
     // fill our current virtual segment with all hard linked segments
     size_t i_preloaded;
