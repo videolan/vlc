@@ -252,6 +252,17 @@ void input_Stop( input_thread_t *p_input, bool b_abort )
     input_ControlPush( p_input, INPUT_CONTROL_SET_DIE, NULL );
 }
 
+void input_Join( input_thread_t *p_input )
+{
+    if( p_input->p->is_running )
+        vlc_join( p_input->p->thread, NULL );
+}
+
+void input_Release( input_thread_t *p_input )
+{
+    vlc_object_release( p_input );
+}
+
 /**
  * Close an input
  *
@@ -259,9 +270,8 @@ void input_Stop( input_thread_t *p_input, bool b_abort )
  */
 void input_Close( input_thread_t *p_input )
 {
-    if( p_input->p->is_running )
-        vlc_join( p_input->p->thread, NULL );
-    vlc_object_release( p_input );
+    input_Join( p_input );
+    input_Release( p_input );
 }
 
 /**
