@@ -97,11 +97,6 @@ static void Close( vlc_object_t * );
 #define FORWARD_COOKIES_TEXT N_("Forward Cookies")
 #define FORWARD_COOKIES_LONGTEXT N_("Forward Cookies across http redirections.")
 
-#define USE_IE_PROXY_TEXT N_("Use Internet Explorer entered HTTP proxy server")
-#define USE_IE_PROXY_LONGTEXT N_("Use Internet Explorer entered HTTP proxy " \
-    "server for all URL. Don't take into account bypasses settings and auto " \
-    "configuration scripts.")
-
 #define REFERER_TEXT N_("HTTP referer value")
 #define REFERER_LONGTEXT N_("Customize the HTTP referer, simulating a previous document")
 
@@ -134,10 +129,6 @@ vlc_module_begin ()
         change_safe()
     add_bool( "http-forward-cookies", true, FORWARD_COOKIES_TEXT,
               FORWARD_COOKIES_LONGTEXT, true )
-#ifdef WIN32
-    add_bool( "http-use-IE-proxy", false, USE_IE_PROXY_TEXT,
-              USE_IE_PROXY_LONGTEXT, true )
-#endif
     /* 'itpc' = iTunes Podcast */
     add_shortcut( "http", "https", "unsv", "itpc", "icyx" )
     set_callbacks( Open, Close )
@@ -396,62 +387,51 @@ static int OpenWithCookies( vlc_object_t *p_this, const char *psz_access,
 #elif defined( WIN32 )
     else
     {
-        if( var_InheritBool( p_access, "http-use-IE-proxy" ) )
+        /* Try to get the proxy server address from Windows internet settings using registry. */
+        HKEY h_key;
+        /* Open the key */
+        if( RegOpenKeyEx( HKEY_CURRENT_USER, "Software\\Microsoft"
+                          "\\Windows\\CurrentVersion\\Internet Settings",
+                          0, KEY_READ, &h_key ) == ERROR_SUCCESS )
         {
-            /* Try to get the proxy server address from Windows internet settings using registry. */
-            HKEY h_key;
-            /* Open the key */
-            if( RegOpenKeyEx( HKEY_CURRENT_USER, "Software\\Microsoft" \
-                              "\\Windows\\CurrentVersion\\Internet Settings",
-                              0, KEY_READ, &h_key ) == ERROR_SUCCESS )
+            DWORD len = sizeof( DWORD );
+            BYTE proxyEnable;
+
+            /* Get the proxy enable value */
+            if( RegQueryValueEx( h_key, "ProxyEnable", NULL, NULL,
+                                 &proxyEnable, &len ) == ERROR_SUCCESS
+             && proxyEnable )
             {
-                DWORD i_dataReadSize = 4; /* sizeof( DWORD ); */
-                BYTE proxyEnable = 0;
-                /* Get the proxy enable value */
-                if( RegQueryValueEx( h_key, "ProxyEnable", NULL, NULL,
-                                     &proxyEnable, &i_dataReadSize )
-                                     == ERROR_SUCCESS )
+                /* Proxy is enabled */
+                /* Get the proxy URL :
+                   Proxy server value in the registry can be something like "address:port"
+                   or "ftp=address1:port1;http=address2:port2 ..." depending of the
+                   confirguration. */
+                unsigned char key[256];
+
+                len = sizeof( key );
+                if( RegQueryValueEx( h_key, "ProxyServer", NULL, NULL,
+                                     key, &len ) == ERROR_SUCCESS )
                 {
-                    if( proxyEnable )
+                    /* FIXME: This is lame. The string should be tokenized. */
+#warning FIXME.
+                    char *psz_proxy = strstr( (char *)key, "http=" );
+                    if( psz_proxy != NULL )
                     {
-                        /* Proxy is enable */
-                        char psz_key[256];
-                        i_dataReadSize = 256;
-                        if( RegQueryValueEx( h_key, "ProxyServer",
-                                             NULL, NULL, (unsigned char *)psz_key,
-                                             &i_dataReadSize )
-                                             == ERROR_SUCCESS )
-                        {
-                            /* Get the proxy URL :
-                            Proxy server value in the registry can be something like "address:port"
-                            or "ftp=address1:port1;http=address2:port2 ..." depending of the
-                            confirguration. */
-                            char *psz_proxy;
-                            psz_proxy = strstr( psz_key, "http=" );
-                            if( psz_proxy != NULL )
-                            {
-                                psz_proxy += strlen( "http=" );
-                                char *psz_endUrl = strchr( psz_proxy, ';' );
-                                if( psz_endUrl != NULL )
-                                    *psz_endUrl = '\0';
-                            }
-                            else
-                                psz_proxy = psz_key;
-                            /* Set proxy enable for this connection. */
-                            p_sys->b_proxy = true;
-                            vlc_UrlParse( &p_sys->proxy, psz_proxy, 0 );
-                        }
-                        msg_Warn( p_access, "Couldn't read in registry " \
-                                  "the proxy server address." );
+                        psz_proxy += 5;
+                        char *end = strchr( psz_proxy, ';' );
+                        if( end != NULL )
+                            *end = '\0';
                     }
+                    else
+                        psz_proxy = (char *)key;
+                    /* Set proxy enable for this connection. */
+                    p_sys->b_proxy = true;
+                    vlc_UrlParse( &p_sys->proxy, psz_proxy, 0 );
                 }
-                else
-                    msg_Warn( p_access, "Couldn't read in registry if the " \
-                              "proxy is enable or not." );
             }
             else
-                msg_Warn( p_access, "Couldn't open internet settings key " \
-                          "in registry." );
+                msg_Dbg( p_access, "HTTP proxy disabled (MSIE)" );
         }
     }
 #else
