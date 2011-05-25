@@ -89,8 +89,7 @@ static int vlc_object_search_mode_from_string( const char *psz_name )
         int i_mode;
         const char *psz_name;
     } pp_modes[] =
-        { { FIND_PARENT, "parent" },
-          { FIND_CHILD, "child" },
+        { { FIND_CHILD, "child" },
           { FIND_ANYWHERE, "anywhere" },
           { 0, "" } };
     int i;
@@ -114,6 +113,7 @@ static int vlclua_object_find_name( lua_State *L )
     const char *psz_mode = luaL_checkstring( L, 3 );
 
     vlc_object_t *p_this;
+
     int i_mode = vlc_object_search_mode_from_string( psz_mode );
     vlc_object_t *p_result;
 

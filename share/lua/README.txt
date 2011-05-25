@@ -223,10 +223,9 @@ object.playlist(): Get the playlist object.
 object.libvlc(): Get the libvlc object.
 
 object.find( object, type, mode ): Find an object of given type. mode can
-  be any of "parent", "child" and "anywhere". If set to "parent", it will
-  look in "object"'s parent objects. If set to "child" it will look in
-  "object"'s children. If set to "anywhere", it will look in all the
-  objects. If object is unset, the current module's object will be used.
+  be "child" and "anywhere". If set to "child" it will look in "object"'s
+  children. If set to "anywhere", it will look in all the objects. If
+  object is unset, the current module's object will be used.
   Type can be: "libvlc", "playlist", "input", "decoder",
   "vout", "aout", "packetizer", "generic".
   This function is deprecated and slow and should be avoided.

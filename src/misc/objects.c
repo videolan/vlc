@@ -85,7 +85,6 @@
 static int  DumpCommand( vlc_object_t *, char const *,
                          vlc_value_t, vlc_value_t, void * );
 
-static vlc_object_t * FindParentName( vlc_object_t *, const char * );
 static vlc_object_t * FindChildName ( vlc_object_internals_t *, const char * );
 static void PrintObject( vlc_object_internals_t *, const char * );
 static void DumpStructure( vlc_object_internals_t *, unsigned, char * );
@@ -243,15 +242,10 @@ char *vlc_object_get_name(const vlc_object_t *obj)
 }
 
 /**
- ****************************************************************************
- * Destroy a vlc object (Internal)
- *
- * This function destroys an object that has been previously allocated with
- * vlc_object_create. The object's refcount must be zero and it must not be
- * attached to other objects in any way.
+ * Destroys a VLC object once it has no more references.
  *
  * This function must be called with cancellation disabled (currently).
- *****************************************************************************/
+ */
 static void vlc_object_destroy( vlc_object_t *p_this )
 {
     vlc_object_internals_t *p_priv = vlc_internals( p_this );
@@ -455,19 +449,10 @@ vlc_object_t *vlc_object_find_name( vlc_object_t *p_this,
         return vlc_object_find_name (VLC_OBJECT(p_this->p_libvlc), psz_name,
                                      FIND_CHILD);
 
+    assert (i_mode == FIND_CHILD);
     libvlc_lock (p_this->p_libvlc);
     vlc_mutex_lock (&name_lock);
-    switch (i_mode)
-    {
-        case FIND_PARENT:
-            p_found = FindParentName (p_this, psz_name);
-            break;
-        case FIND_CHILD:
-            p_found = FindChildName (vlc_internals (p_this), psz_name);
-            break;
-        default:
-            assert (0);
-    }
+    p_found = FindChildName (vlc_internals (p_this), psz_name);
     vlc_mutex_unlock (&name_lock);
     libvlc_unlock (p_this->p_libvlc);
     return p_found;
@@ -491,10 +476,10 @@ void * vlc_object_hold( vlc_object_t *p_this )
 }
 
 #undef vlc_object_release
-/*****************************************************************************
- * Decrement an object refcount
- * And destroy the object if its refcount reach zero.
- *****************************************************************************/
+/**
+ * Drops a reference to an object (decrements the reference count).
+ * If the count reaches zero, the object is destroyed.
+ */
 void vlc_object_release( vlc_object_t *p_this )
 {
     vlc_object_internals_t *internals = vlc_internals( p_this );
@@ -557,12 +542,11 @@ void vlc_object_release( vlc_object_t *p_this )
 
 #undef vlc_object_attach
 /**
- ****************************************************************************
- * attach object to a parent object
- *****************************************************************************
- * This function sets p_this as a child of p_parent, and p_parent as a parent
- * of p_this.
- *****************************************************************************/
+ * Exposes a VLC object in the hierarchy by attaching it to another object.
+ * @note Before variables can be inherited, an object must be attached.
+ * @param p_this object to expose
+ * @param p_parent parent object in the hierarchy
+ */
 void vlc_object_attach( vlc_object_t *p_this, vlc_object_t *p_parent )
 {
     if( !p_this ) return;
@@ -760,19 +744,6 @@ void vlc_list_release( vlc_list_t *p_list )
 }
 
 /* Following functions are local */
-
-static vlc_object_t *FindParentName (vlc_object_t *p_this, const char *name)
-{
-    for (vlc_object_t *parent = p_this->p_parent;
-         parent != NULL;
-         parent = parent->p_parent)
-    {
-        const char *objname = vlc_internals (parent)->psz_name;
-        if (objname && !strcmp (objname, name))
-            return vlc_object_hold (parent);
-    }
-    return NULL;
-}
 
 static vlc_object_t *FindChildName (vlc_object_internals_t *priv,
                                     const char *name)

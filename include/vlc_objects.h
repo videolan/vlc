@@ -41,7 +41,6 @@
 #define VLC_OBJECT_GENERIC     (-666)
 
 /* Object search mode */
-#define FIND_PARENT         0x0001
 #define FIND_CHILD          0x0002
 #define FIND_ANYWHERE       0x0003
 
