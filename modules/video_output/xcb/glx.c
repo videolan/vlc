@@ -362,6 +362,7 @@ static int Open (vlc_object_t *obj)
     sys->gl.lock = NULL;
     sys->gl.unlock = NULL;
     sys->gl.swap = SwapBuffers;
+    sys->gl.getProcAddress = NULL;
     sys->gl.sys = sys;
 
     if (vout_display_opengl_Init (&sys->vgl, &vd->fmt, &sys->gl))

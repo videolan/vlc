@@ -195,6 +195,7 @@ static int Open (vlc_object_t *obj, const struct gl_api *api)
     gl->swap = SwapBuffers;
     gl->lock = NULL;
     gl->unlock = NULL;
+    gl->getProcAddress = NULL;
     return VLC_SUCCESS;
 
 error:

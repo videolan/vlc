@@ -111,6 +111,7 @@ static int Open(vlc_object_t *object)
     sys->gl.lock = NULL;
     sys->gl.unlock = NULL;
     sys->gl.swap = Swap;
+    sys->gl.getProcAddress = NULL;
     sys->gl.sys = vd;
 
     video_format_t fmt = vd->fmt;

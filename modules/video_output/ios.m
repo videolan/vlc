@@ -148,6 +148,7 @@ static int Open(vlc_object_t *this)
     sys->gl.lock = OpenglClean; // We don't do locking, but sometimes we need to cleanup the framebuffer
     sys->gl.unlock = NULL;
     sys->gl.swap = OpenglSwap;
+	sys->gl.getProcAddress = NULL;
     sys->gl.sys = sys;
 
     if (vout_display_opengl_Init(&sys->vgl, &vd->fmt, &sys->gl))

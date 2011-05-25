@@ -48,6 +48,7 @@ struct vlc_gl_t
     void (*swap)(vlc_gl_t *);
     int  (*lock)(vlc_gl_t *);
     void (*unlock)(vlc_gl_t *);
+    void*(*getProcAddress)(vlc_gl_t *, const char *);
 };
 
 enum {
@@ -78,6 +79,11 @@ static inline void vlc_gl_Unlock(vlc_gl_t *gl)
 static inline void vlc_gl_Swap(vlc_gl_t *gl)
 {
     gl->swap(gl);
+}
+
+static inline void *vlc_gl_GetProcAddress(vlc_gl_t *gl, const char *name)
+{
+    return (gl->getProcAddress != NULL) ? gl->getProcAddress(gl, name) : NULL;
 }
 
 #endif /* VLC_GL_H */
