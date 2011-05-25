@@ -51,12 +51,6 @@
 # endif
 #endif
 
-#ifndef YCBCR_MESA
-# define YCBCR_MESA 0x8757
-#endif
-#ifndef UNSIGNED_SHORT_8_8_MESA
-# define UNSIGNED_SHORT_8_8_MESA 0x85BA
-#endif
 /* RV16 */
 #ifndef GL_UNSIGNED_SHORT_5_6_5
 # define GL_UNSIGNED_SHORT_5_6_5 0x8363
@@ -69,12 +63,9 @@
 #if USE_OPENGL_ES
 # define VLCGL_TARGET GL_TEXTURE_2D
 
-# define VLCGL_RGB_FORMAT GL_RGB
-# define VLCGL_RGB_TYPE   GL_UNSIGNED_SHORT_5_6_5
-
 // Use RGB with OpenGLES
-# define VLCGL_FORMAT VLCGL_RGB_FORMAT
-# define VLCGL_TYPE   VLCGL_RGB_TYPE
+# define VLCGL_FORMAT GL_RGB
+# define VLCGL_TYPE   GL_UNSIGNED_SHORT_5_6_5
 
 # define VLCGL_TEXTURE_COUNT 1
 
@@ -94,17 +85,9 @@
 
 # define VLCGL_TARGET GL_TEXTURE_2D
 
-/* RV32 */
-# define VLCGL_RGB_FORMAT GL_RGBA
-# define VLCGL_RGB_TYPE GL_UNSIGNED_BYTE
-
-/* YUY2 */
-# define VLCGL_YUV_FORMAT YCBCR_MESA
-# define VLCGL_YUV_TYPE UNSIGNED_SHORT_8_8_MESA
-
 /* Use RGB on Win32/GLX */
-# define VLCGL_FORMAT VLCGL_RGB_FORMAT
-# define VLCGL_TYPE   VLCGL_RGB_TYPE
+# define VLCGL_FORMAT GL_RGBA
+# define VLCGL_TYPE   GL_UNSIGNED_BYTE
 
 # define VLCGL_TEXTURE_COUNT 1
 #endif
@@ -142,7 +125,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
 
     /* Find the chroma we will use and update fmt */
     /* TODO: We use YCbCr on Mac which is Y422, but on OSX it seems to == YUY2. Verify */
-#if (defined(WORDS_BIGENDIAN) && VLCGL_FORMAT == GL_YCBCR_422_APPLE) || (VLCGL_FORMAT == YCBCR_MESA)
+#if defined(WORDS_BIGENDIAN) && VLCGL_FORMAT == GL_YCBCR_422_APPLE
     fmt->i_chroma = VLC_CODEC_YUYV;
     vgl->tex_pixel_size = 2;
 #elif defined(GL_YCBCR_422_APPLE) && (VLCGL_FORMAT == GL_YCBCR_422_APPLE)
