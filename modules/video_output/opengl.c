@@ -122,6 +122,14 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
         return NULL;
 
     vgl->gl = gl;
+    if (vlc_gl_Lock(vgl->gl)) {
+        free(vgl);
+        return NULL;
+    }
+
+    const char *extensions = (const char *)glGetString(GL_EXTENSIONS);
+    if (!extensions)
+        extensions = "";
 
     /* Find the chroma we will use and update fmt */
     vgl->fmt = *fmt;
@@ -185,15 +193,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
 #endif
 
 #if defined(__APPLE__) && USE_OPENGL_ES == 1
-    if (!vlc_gl_Lock(vgl->gl)) {
-        const char* extensions = (char*) glGetString(GL_EXTENSIONS);
-        if (extensions) {
-            bool npot = strstr(extensions, "GL_APPLE_texture_2D_limited_npot") != 0;
-            if (npot)
-                supports_npot = true;
-        }
-        vlc_gl_Unlock(vgl->gl);
-    }
+    supports_npot |= strstr(extensions, "GL_APPLE_texture_2D_limited_npot") != NULL;
 #endif
 
     /* Texture size */
@@ -207,19 +207,15 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
         vgl->tex_height = GetAlignedSize(fmt->i_height);
     }
 
-
     /* */
-    if (!vlc_gl_Lock(vgl->gl)) {
+    glDisable(GL_BLEND);
+    glDisable(GL_DEPTH_TEST);
+    glDepthMask(GL_FALSE);
+    glDisable(GL_CULL_FACE);
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
 
-        glDisable(GL_BLEND);
-        glDisable(GL_DEPTH_TEST);
-        glDepthMask(GL_FALSE);
-        glDisable(GL_CULL_FACE);
-        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
-
-        vlc_gl_Unlock(vgl->gl);
-    }
+    vlc_gl_Unlock(vgl->gl);
     return vgl;
 }
 
