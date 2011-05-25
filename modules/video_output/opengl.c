@@ -176,14 +176,6 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
 #endif
 
     vgl->chroma = vlc_fourcc_GetChromaDescription(vgl->fmt.i_chroma);
-    *fmt = vgl->fmt;
-
-    /* */
-    for (int i = 0; i < VLCGL_TEXTURE_COUNT; i++) {
-        vgl->texture[i] = 0;
-        vgl->buffer[i]  = NULL;
-    }
-    vgl->pool = NULL;
 
     bool supports_npot = false;
 #if USE_OPENGL_ES == 2
@@ -197,13 +189,13 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
 
     /* Texture size */
     if (supports_npot) {
-        vgl->tex_width  = fmt->i_width;
-        vgl->tex_height = fmt->i_height;
+        vgl->tex_width  = vgl->fmt.i_width;
+        vgl->tex_height = vgl->fmt.i_height;
     }
     else {
         /* A texture must have a size aligned on a power of 2 */
-        vgl->tex_width  = GetAlignedSize(fmt->i_width);
-        vgl->tex_height = GetAlignedSize(fmt->i_height);
+        vgl->tex_width  = GetAlignedSize(vgl->fmt.i_width);
+        vgl->tex_height = GetAlignedSize(vgl->fmt.i_height);
     }
 
     /* */
@@ -215,6 +207,15 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     glClear(GL_COLOR_BUFFER_BIT);
 
     vlc_gl_Unlock(vgl->gl);
+
+    /* */
+    for (int i = 0; i < VLCGL_TEXTURE_COUNT; i++) {
+        vgl->texture[i] = 0;
+        vgl->buffer[i]  = NULL;
+    }
+    vgl->pool = NULL;
+
+    *fmt = vgl->fmt;
     return vgl;
 }
 
