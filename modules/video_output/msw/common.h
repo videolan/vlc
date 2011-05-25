@@ -152,7 +152,7 @@ struct vout_display_sys_t
     HDC                   hGLDC;
     HGLRC                 hGLRC;
     vlc_gl_t              gl;
-    vout_display_opengl_t vgl;
+    vout_display_opengl_t *vgl;
 #endif
 
 #ifdef MODULE_NAME_IS_direct2d

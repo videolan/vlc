@@ -103,6 +103,21 @@
 # define VLCGL_TYPE   VLCGL_RGB_TYPE
 #endif
 
+struct vout_display_opengl_t {
+    vlc_gl_t   *gl;
+
+    video_format_t fmt;
+
+    int        tex_pixel_size;
+    int        tex_width;
+    int        tex_height;
+
+    GLuint     texture[VLCGL_TEXTURE_COUNT];
+    uint8_t    *buffer[VLCGL_TEXTURE_COUNT];
+
+    picture_pool_t *pool;
+};
+
 static inline int GetAlignedSize(unsigned size)
 {
     /* Return the smallest larger or equal power of 2 */
@@ -110,10 +125,13 @@ static inline int GetAlignedSize(unsigned size)
     return ((align >> 1) == size) ? size : align;
 }
 
-int vout_display_opengl_Init(vout_display_opengl_t *vgl,
-                             video_format_t *fmt,
-                             vlc_gl_t *gl)
+vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
+                                               vlc_gl_t *gl)
 {
+    vout_display_opengl_t *vgl = malloc(sizeof(*vgl));
+    if (!vgl)
+        return NULL;
+
     vgl->gl = gl;
 
     /* Find the chroma we will use and update fmt */
@@ -216,10 +234,10 @@ int vout_display_opengl_Init(vout_display_opengl_t *vgl,
 
         vlc_gl_Unlock(vgl->gl);
     }
-    return VLC_SUCCESS;
+    return vgl;
 }
 
-void vout_display_opengl_Clean(vout_display_opengl_t *vgl)
+void vout_display_opengl_Delete(vout_display_opengl_t *vgl)
 {
     /* */
     if (!vlc_gl_Lock(vgl->gl)) {
@@ -235,6 +253,7 @@ void vout_display_opengl_Clean(vout_display_opengl_t *vgl)
         for (int i = 0; i < VLCGL_TEXTURE_COUNT; i++)
             free(vgl->buffer[i]);
     }
+    free(vgl);
 }
 
 int vout_display_opengl_ResetTextures(vout_display_opengl_t *vgl)

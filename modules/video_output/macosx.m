@@ -100,7 +100,7 @@ struct vout_display_sys_t
 
     vout_window_t *embed;
     vlc_gl_t gl;
-    vout_display_opengl_t vgl;
+    vout_display_opengl_t *vgl;
 
     picture_pool_t *pool;
     picture_t *current;
@@ -190,7 +190,8 @@ static int Open(vlc_object_t *this)
     sys->gl.getProcAddress = NULL;
     sys->gl.sys = sys;
 
-    if (vout_display_opengl_Init(&sys->vgl, &vd->fmt, &sys->gl))
+	sys->vgl = vout_display_opengl_New(&vd->fmt, &sys->gl);
+	if (!sys->vgl)
     {
         sys->gl.sys = NULL;
         goto error;
@@ -240,7 +241,7 @@ void Close(vlc_object_t *this)
     [sys->glView release];
 
     if (sys->gl.sys != NULL)
-        vout_display_opengl_Clean(&sys->vgl);
+        vout_display_opengl_Delete(sys->vgl);
 
     if (sys->embed)
         vout_display_DeleteWindow(vd, sys->embed);
@@ -257,7 +258,7 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned requested_count)
     VLC_UNUSED(requested_count);
 
     if (!sys->pool)
-        sys->pool = vout_display_opengl_GetPool (&sys->vgl);
+        sys->pool = vout_display_opengl_GetPool (sys->vgl);
     assert(sys->pool);
     return sys->pool;
 }
@@ -267,7 +268,7 @@ static void PictureRender(vout_display_t *vd, picture_t *pic, subpicture_t *subp
 
     vout_display_sys_t *sys = vd->sys;
 
-    vout_display_opengl_Prepare( &sys->vgl, pic );
+    vout_display_opengl_Prepare( sys->vgl, pic );
 	(void)subpicture;
 }
 
@@ -275,7 +276,7 @@ static void PictureDisplay(vout_display_t *vd, picture_t *pic, subpicture_t *sub
 {
     vout_display_sys_t *sys = vd->sys;
     [sys->glView setVoutFlushing:YES];
-    vout_display_opengl_Display(&sys->vgl, &vd->fmt );
+    vout_display_opengl_Display(sys->vgl, &vd->fmt );
     [sys->glView setVoutFlushing:NO];
     picture_Release (pic);
     sys->has_first_frame = true;
@@ -489,7 +490,7 @@ static void OpenglSwap(vlc_gl_t *gl)
 
     if (hasFirstFrame) {
         // This will lock gl.
-        vout_display_opengl_Display( &vd->sys->vgl, &vd->source );
+        vout_display_opengl_Display( vd->sys->vgl, &vd->source );
     }
     else
         glClear(GL_COLOR_BUFFER_BIT);

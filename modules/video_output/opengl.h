@@ -57,24 +57,10 @@
 # endif
 #endif
 
-typedef struct {
-    vlc_gl_t   *gl;
+typedef struct vout_display_opengl_t vout_display_opengl_t;
 
-    video_format_t fmt;
-
-    int        tex_pixel_size;
-    int        tex_width;
-    int        tex_height;
-
-    GLuint     texture[VLCGL_TEXTURE_COUNT];
-    uint8_t    *buffer[VLCGL_TEXTURE_COUNT];
-
-    picture_pool_t *pool;
-} vout_display_opengl_t;
-
-int vout_display_opengl_Init(vout_display_opengl_t *vgl,
-                             video_format_t *fmt, vlc_gl_t *gl);
-void vout_display_opengl_Clean(vout_display_opengl_t *vgl);
+vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt, vlc_gl_t *gl);
+void vout_display_opengl_Delete(vout_display_opengl_t *vgl);
 
 int vout_display_opengl_ResetTextures(vout_display_opengl_t *vgl);
 picture_pool_t *vout_display_opengl_GetPool(vout_display_opengl_t *vgl);

@@ -116,7 +116,8 @@ static int Open(vlc_object_t *object)
     sys->gl.sys = vd;
 
     video_format_t fmt = vd->fmt;
-    if (vout_display_opengl_Init(&sys->vgl, &fmt, &sys->gl))
+    sys->vgl = vout_display_opengl_New(&fmt, &sys->gl);
+    if (!sys->vgl)
         goto error;
 
     vout_display_info_t info = vd->info;
@@ -150,8 +151,8 @@ static void Close(vlc_object_t *object)
     vout_display_t *vd = (vout_display_t *)object;
     vout_display_sys_t *sys = vd->sys;
 
-    if (sys->vgl.gl)
-        vout_display_opengl_Clean(&sys->vgl);
+    if (sys->vgl)
+        vout_display_opengl_Delete(sys->vgl);
 
     if (sys->hGLDC && sys->hGLRC)
         wglMakeCurrent(NULL, NULL);
@@ -172,7 +173,7 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned count)
     VLC_UNUSED(count);
 
     if (!sys->pool)
-        sys->pool = vout_display_opengl_GetPool(&sys->vgl);
+        sys->pool = vout_display_opengl_GetPool(sys->vgl);
     return sys->pool;
 }
 
@@ -180,7 +181,7 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
 {
     vout_display_sys_t *sys = vd->sys;
 
-    vout_display_opengl_Prepare(&sys->vgl, picture);
+    vout_display_opengl_Prepare(sys->vgl, picture);
     VLC_UNUSED(subpicture);
 }
 
@@ -188,7 +189,7 @@ static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
 {
     vout_display_sys_t *sys = vd->sys;
 
-    vout_display_opengl_Display(&sys->vgl, &vd->source);
+    vout_display_opengl_Display(sys->vgl, &vd->source);
 
     picture_Release(picture);
     VLC_UNUSED(subpicture);

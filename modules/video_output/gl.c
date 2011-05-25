@@ -82,7 +82,7 @@ vlc_module_end ()
 
 struct vout_display_sys_t
 {
-    vout_display_opengl_t vgl;
+    vout_display_opengl_t *vgl;
 
     vout_window_t *window;
     vlc_gl_t *gl;
@@ -137,7 +137,8 @@ static int Open (vlc_object_t *obj)
         goto error;
 
     /* Initialize video display */
-    if (vout_display_opengl_Init (&sys->vgl, &vd->fmt, sys->gl))
+    sys->vgl = vout_display_opengl_New (&vd->fmt, sys->gl);
+    if (!sys->vgl)
         goto error;
 
     vd->sys = sys;
@@ -167,7 +168,7 @@ static void Close (vlc_object_t *obj)
     vout_display_t *vd = (vout_display_t *)obj;
     vout_display_sys_t *sys = vd->sys;
 
-    vout_display_opengl_Clean (&sys->vgl);
+    vout_display_opengl_Delete (sys->vgl);
     vlc_gl_Destroy (sys->gl);
     vout_display_DeleteWindow (vd, sys->window);
     free (sys);
@@ -181,7 +182,7 @@ static picture_pool_t *Pool (vout_display_t *vd, unsigned count)
     vout_display_sys_t *sys = vd->sys;
 
     if (!sys->pool)
-        sys->pool = vout_display_opengl_GetPool (&sys->vgl);
+        sys->pool = vout_display_opengl_GetPool (sys->vgl);
     (void) count;
     return sys->pool;
 }
@@ -190,7 +191,7 @@ static void PictureRender (vout_display_t *vd, picture_t *pic, subpicture_t *sub
 {
     vout_display_sys_t *sys = vd->sys;
 
-    vout_display_opengl_Prepare (&sys->vgl, pic);
+    vout_display_opengl_Prepare (sys->vgl, pic);
     (void)subpicture;
 }
 
@@ -198,7 +199,7 @@ static void PictureDisplay (vout_display_t *vd, picture_t *pic, subpicture_t *su
 {
     vout_display_sys_t *sys = vd->sys;
 
-    vout_display_opengl_Display (&sys->vgl, &vd->source);
+    vout_display_opengl_Display (sys->vgl, &vd->source);
     picture_Release (pic);
     (void)subpicture;
 }
