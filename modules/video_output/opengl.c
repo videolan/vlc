@@ -96,8 +96,8 @@ struct vout_display_opengl_t {
     vlc_gl_t   *gl;
 
     video_format_t fmt;
+    const vlc_chroma_description_t *chroma;
 
-    int        tex_pixel_size;
     int        tex_width;
     int        tex_height;
 
@@ -127,10 +127,8 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     /* TODO: We use YCbCr on Mac which is Y422, but on OSX it seems to == YUY2. Verify */
 #if defined(WORDS_BIGENDIAN) && VLCGL_FORMAT == GL_YCBCR_422_APPLE
     fmt->i_chroma = VLC_CODEC_YUYV;
-    vgl->tex_pixel_size = 2;
 #elif defined(GL_YCBCR_422_APPLE) && (VLCGL_FORMAT == GL_YCBCR_422_APPLE)
     fmt->i_chroma = VLC_CODEC_UYVY;
-    vgl->tex_pixel_size = 2;
 #elif VLCGL_FORMAT == GL_RGB
 #   if VLCGL_TYPE == GL_UNSIGNED_BYTE
     fmt->i_chroma = VLC_CODEC_RGB24;
@@ -143,7 +141,6 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     fmt->i_gmask = 0x0000ff00;
     fmt->i_bmask = 0x00ff0000;
 #       endif
-    vgl->tex_pixel_size = 3;
 #   else
     fmt->i_chroma = VLC_CODEC_RGB16;
 #       if defined(WORDS_BIGENDIAN)
@@ -155,7 +152,6 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     fmt->i_gmask = 0x07e0;
     fmt->i_bmask = 0x001f;
 #       endif
-    vgl->tex_pixel_size = 2;
 #   endif
 #else
     fmt->i_chroma = VLC_CODEC_RGB32;
@@ -168,10 +164,10 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     fmt->i_gmask = 0x0000ff00;
     fmt->i_bmask = 0x00ff0000;
 #       endif
-    vgl->tex_pixel_size = 4;
 #endif
 
     vgl->fmt = *fmt;
+    vgl->chroma = vlc_fourcc_GetChromaDescription(vgl->fmt.i_chroma);
 
     /* */
     for (int i = 0; i < VLCGL_TEXTURE_COUNT; i++) {
@@ -340,7 +336,7 @@ picture_pool_t *vout_display_opengl_GetPool(vout_display_opengl_t *vgl)
     for (i = 0; i < VLCGL_TEXTURE_COUNT; i++) {
 
         /* TODO memalign would be way better */
-        vgl->buffer[i] = malloc(vgl->tex_width * vgl->tex_height * vgl->tex_pixel_size);
+        vgl->buffer[i] = malloc(vgl->tex_width * vgl->tex_height * vgl->chroma->pixel_size);
         if (!vgl->buffer[i])
             break;
 
@@ -355,7 +351,7 @@ picture_pool_t *vout_display_opengl_GetPool(vout_display_opengl_t *vgl)
         }
 #endif
         rsc.p[0].p_pixels = vgl->buffer[i];
-        rsc.p[0].i_pitch  = vgl->fmt.i_width * vgl->tex_pixel_size;
+        rsc.p[0].i_pitch  = vgl->fmt.i_width * vgl->chroma->pixel_size;
         rsc.p[0].i_lines  = vgl->fmt.i_height;
 
         picture[i] = picture_NewFromResource(&vgl->fmt, &rsc);
