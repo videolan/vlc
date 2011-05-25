@@ -62,13 +62,13 @@ static int dvb_open_adapter (uint8_t adapter)
 }
 
 /** Opens the DVB device node of the specified type */
-static int dvb_open_node (int dirfd, uint8_t dev, const char *type, int flags)
+static int dvb_open_node (int dir, const char *type, unsigned dev, int flags)
 {
     int fd;
     char path[strlen (type) + 4];
 
     snprintf (path, sizeof (path), "%s%"PRIu8, type, dev);
-    fd = openat (dirfd, path, flags|O_CLOEXEC);
+    fd = openat (dir, path, flags|O_CLOEXEC);
     if (fd != -1)
         fcntl (fd, F_SETFL, fcntl (fd, F_GETFL) | O_NONBLOCK);
     return fd;
@@ -170,12 +170,11 @@ static int dvb_parse_fec (uint32_t fec)
 struct dvb_device
 {
     vlc_object_t *obj;
-    int frontend;
+    int dir;
     int demux;
+    int frontend;
 #ifndef USE_DMX
 # define MAX_PIDS 256
-    int dir;
-    uint8_t dev_id;
     struct
     {
         int fd;
@@ -195,24 +194,22 @@ struct dvb_device
  */
 dvb_device_t *dvb_open (vlc_object_t *obj, bool tune)
 {
+    dvb_device_t *d = malloc (sizeof (*d));
+    if (unlikely(d == NULL))
+        return NULL;
+
+    d->obj = obj;
+
     uint8_t adapter = var_InheritInteger (obj, "dvb-adapter");
     uint8_t device  = var_InheritInteger (obj, "dvb-device");
 
-    int dirfd = dvb_open_adapter (adapter);
-    if (dirfd == -1)
+    d->dir = dvb_open_adapter (adapter);
+    if (d->dir == -1)
     {
         msg_Err (obj, "cannot access adapter %"PRIu8": %m", adapter);
+        free (d);
         return NULL;
     }
-
-    dvb_device_t *d = malloc (sizeof (*d));
-    if (unlikely(d == NULL))
-    {
-        close (dirfd);
-        return NULL;
-    }
-
-    d->obj = obj;
     d->frontend = -1;
 #ifdef HAVE_DVBPSI
     d->cam = NULL;
@@ -223,12 +220,12 @@ dvb_device_t *dvb_open (vlc_object_t *obj, bool tune)
     if (d->budget)
 #endif
     {
-       d->demux = dvb_open_node (dirfd, device, "demux", O_RDONLY);
+       d->demux = dvb_open_node (d->dir, "demux", 0, O_RDONLY);
        if (d->demux == -1)
        {
            msg_Err (obj, "cannot access demultiplexer: %m");
+           close (d->dir);
            free (d);
-           close (dirfd);
            return NULL;
        }
 
@@ -253,17 +250,14 @@ dvb_device_t *dvb_open (vlc_object_t *obj, bool tune)
     }
     else
     {
-        d->dir = fcntl (dirfd, F_DUPFD_CLOEXEC);
-        d->dev_id = device;
-
         for (size_t i = 0; i < MAX_PIDS; i++)
             d->pids[i].pid = d->pids[i].fd = -1;
-        d->demux = dvb_open_node (d->dir, device, "dvr", O_RDONLY);
+        d->demux = dvb_open_node (d->dir, "dvr", 0, O_RDONLY);
         if (d->demux == -1)
         {
             msg_Err (obj, "cannot access DVR: %m");
+            close (d->dir);
             free (d);
-            close (dirfd);
             return NULL;
         }
 #endif
@@ -271,7 +265,7 @@ dvb_device_t *dvb_open (vlc_object_t *obj, bool tune)
 
     if (tune)
     {
-        d->frontend = dvb_open_node (dirfd, device, "frontend", O_RDWR);
+        d->frontend = dvb_open_node (d->dir, "frontend", device, O_RDWR);
         if (d->frontend == -1)
         {
             msg_Err (obj, "cannot access frontend %"PRIu8
@@ -298,7 +292,7 @@ dvb_device_t *dvb_open (vlc_object_t *obj, bool tune)
                  d->info.symbol_rate_tolerance);
 
 #ifdef HAVE_DVBPSI
-        int ca = dvb_open_node (dirfd, device, "ca", O_RDWR);
+        int ca = dvb_open_node (d->dir, "ca", 0, O_RDWR);
         if (ca != -1)
         {
             d->cam = en50221_Init (obj, ca);
@@ -309,11 +303,9 @@ dvb_device_t *dvb_open (vlc_object_t *obj, bool tune)
             msg_Dbg (obj, "conditional access module not available (%m)");
 #endif
     }
-    close (dirfd);
     return d;
 
 error:
-    close (dirfd);
     dvb_close (d);
     return NULL;
 }
@@ -323,7 +315,6 @@ void dvb_close (dvb_device_t *d)
 #ifndef USE_DMX
     if (!d->budget)
     {
-        close (d->dir);
         for (size_t i = 0; i < MAX_PIDS; i++)
             if (d->pids[i].fd != -1)
                 close (d->pids[i].fd);
@@ -336,6 +327,7 @@ void dvb_close (dvb_device_t *d)
     if (d->frontend != -1)
         close (d->frontend);
     close (d->demux);
+    close (d->dir);
     free (d);
 }
 
@@ -419,7 +411,7 @@ int dvb_add_pid (dvb_device_t *d, uint16_t pid)
         if (d->pids[i].fd != -1)
             continue;
 
-        int fd = dvb_open_node (d->dir, d->dev_id, "demux", O_RDONLY);
+        int fd = dvb_open_node (d->dir, "demux", 0, O_RDONLY);
         if (fd == -1)
             goto error;
 
