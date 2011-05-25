@@ -107,12 +107,9 @@ static void libvlc_unlock (libvlc_int_t *p_libvlc)
 }
 
 #undef vlc_custom_create
-void *vlc_custom_create( vlc_object_t *p_this, size_t i_size,
-                         int i_type, const char *psz_type )
+void *vlc_custom_create (vlc_object_t *parent, size_t length,
+                         int type, const char *typename)
 {
-    vlc_object_t *p_new;
-    vlc_object_internals_t *p_priv;
-
     /* NOTE:
      * VLC objects are laid out as follow:
      * - first the LibVLC-private per-object data,
@@ -122,60 +119,53 @@ void *vlc_custom_create( vlc_object_t *p_this, size_t i_size,
      * This function initializes the LibVLC and common data,
      * and zeroes the rest.
      */
-    p_priv = calloc( 1, sizeof( *p_priv ) + i_size );
-    if( p_priv == NULL )
+    assert (length >= sizeof (vlc_object_t));
+
+    vlc_object_internals_t *priv = malloc (sizeof (*priv) + length);
+    if (unlikely(priv == NULL))
         return NULL;
+    priv->i_object_type = type;
+    priv->psz_name = NULL;
+    priv->var_root = NULL;
+    vlc_mutex_init (&priv->var_lock);
+    vlc_cond_init (&priv->var_wait);
+    priv->pipes[0] = priv->pipes[1] = -1;
+    vlc_spin_init (&priv->ref_spin);
+    priv->i_refcount = 1;
+    priv->pf_destructor = NULL;
+    priv->prev = priv->next = priv->first = NULL;
 
-    assert (i_size >= sizeof (vlc_object_t));
-    p_new = (vlc_object_t *)(p_priv + 1);
+    vlc_object_t *obj = (vlc_object_t *)(priv + 1);
+    obj->psz_object_type = typename;
+    obj->psz_header = NULL;
+    obj->b_die = false;
+    obj->b_force = false;
 
-    p_priv->i_object_type = i_type;
-    p_new->psz_object_type = psz_type;
-    p_priv->psz_name = NULL;
-
-    p_new->b_die = false;
-    p_new->b_force = false;
-
-    p_new->psz_header = NULL;
-
-    if (p_this)
-        p_new->i_flags = p_this->i_flags
-            & (OBJECT_FLAGS_NODBG|OBJECT_FLAGS_QUIET|OBJECT_FLAGS_NOINTERACT);
-
-    p_priv->var_root = NULL;
-
-    if( p_this == NULL )
+    if (likely(parent != NULL))
     {
-        libvlc_int_t *self = (libvlc_int_t*)p_new;
-        p_new->p_libvlc = self;
-        vlc_mutex_init (&(libvlc_priv (self)->structure_lock));
-        p_this = p_new;
+        obj->i_flags = parent->i_flags;
+        obj->p_libvlc = parent->p_libvlc;
     }
     else
-        p_new->p_libvlc = p_this->p_libvlc;
+    {
+        libvlc_int_t *self = (libvlc_int_t *)obj;
 
-    vlc_spin_init( &p_priv->ref_spin );
-    p_priv->i_refcount = 1;
-    p_priv->pf_destructor = NULL;
-    p_new->p_parent = NULL;
-    p_priv->first = NULL;
+        obj->i_flags = 0;
+        obj->p_libvlc = self;
+        vlc_mutex_init (&(libvlc_priv (self)->structure_lock));
 
-    /* Initialize mutexes and condvars */
-    vlc_mutex_init( &p_priv->var_lock );
-    vlc_cond_init( &p_priv->var_wait );
-    p_priv->pipes[0] = p_priv->pipes[1] = -1;
-
-    if (p_new == VLC_OBJECT(p_new->p_libvlc))
-    {   /* TODO: should be in src/libvlc.c */
+        /* TODO: should be in src/libvlc.c */
         int canc = vlc_savecancel ();
-        var_Create( p_new, "tree", VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
-        var_AddCallback( p_new, "tree", DumpCommand, NULL );
-        var_Create( p_new, "vars", VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
-        var_AddCallback( p_new, "vars", DumpCommand, NULL );
+        var_Create (obj, "tree", VLC_VAR_STRING | VLC_VAR_ISCOMMAND);
+        var_AddCallback (obj, "tree", DumpCommand, NULL);
+        var_Create (obj, "vars", VLC_VAR_STRING | VLC_VAR_ISCOMMAND);
+        var_AddCallback (obj, "vars", DumpCommand, NULL);
         vlc_restorecancel (canc);
     }
+    obj->p_parent = NULL;
 
-    return p_new;
+    memset (obj + 1, 0, length - sizeof (*obj));
+    return obj;
 }
 
 #undef vlc_object_create
