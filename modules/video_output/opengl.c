@@ -238,57 +238,6 @@ void vout_display_opengl_Delete(vout_display_opengl_t *vgl)
     free(vgl);
 }
 
-int vout_display_opengl_ResetTextures(vout_display_opengl_t *vgl)
-{
-    if (vlc_gl_Lock(vgl->gl))
-        return VLC_EGENERIC;
-
-    glDeleteTextures(VLCGL_TEXTURE_COUNT, vgl->texture);
-
-    glGenTextures(VLCGL_TEXTURE_COUNT, vgl->texture);
-    for (int i = 0; i < VLCGL_TEXTURE_COUNT; i++) {
-        glBindTexture(VLCGL_TARGET, vgl->texture[i]);
-
-#if !USE_OPENGL_ES
-        /* Set the texture parameters */
-        glTexParameterf(VLCGL_TARGET, GL_TEXTURE_PRIORITY, 1.0);
-        glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-#endif
-
-        glTexParameteri(VLCGL_TARGET, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(VLCGL_TARGET, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(VLCGL_TARGET, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(VLCGL_TARGET, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-#ifdef MACOS_OPENGL
-        /* Tell the driver not to make a copy of the texture but to use
-           our buffer */
-        glEnable(GL_UNPACK_CLIENT_STORAGE_APPLE);
-        glPixelStorei(GL_UNPACK_CLIENT_STORAGE_APPLE, GL_TRUE);
-
-#if 0
-        /* Use VRAM texturing */
-        glTexParameteri(VLCGL_TARGET, GL_TEXTURE_STORAGE_HINT_APPLE,
-                         GL_STORAGE_CACHED_APPLE);
-#else
-        /* Use AGP texturing */
-        glTexParameteri(VLCGL_TARGET, GL_TEXTURE_STORAGE_HINT_APPLE,
-                         GL_STORAGE_SHARED_APPLE);
-#endif
-#endif
-
-        /* Call glTexImage2D only once, and use glTexSubImage2D later */
-        if (vgl->buffer[i]) {
-            glTexImage2D(VLCGL_TARGET, 0, VLCGL_FORMAT, vgl->tex_width,
-                         vgl->tex_height, 0, VLCGL_FORMAT, VLCGL_TYPE,
-                         vgl->buffer[i]);
-        }
-    }
-
-    vlc_gl_Unlock(vgl->gl);
-    return VLC_SUCCESS;
-}
-
 #ifdef MACOS_OPENGL
 /* XXX See comment vout_display_opengl_Prepare */
 struct picture_sys_t {
@@ -327,6 +276,9 @@ static void PictureUnlock(picture_t *picture)
 
 picture_pool_t *vout_display_opengl_GetPool(vout_display_opengl_t *vgl)
 {
+    if (vgl->pool)
+        return vgl->pool;
+
     picture_t *picture[VLCGL_TEXTURE_COUNT];
 
     int i;
@@ -374,7 +326,50 @@ picture_pool_t *vout_display_opengl_GetPool(vout_display_opengl_t *vgl)
     if (!vgl->pool)
         goto error;
 
-    vout_display_opengl_ResetTextures(vgl);
+    if (vlc_gl_Lock(vgl->gl))
+        return vgl->pool;
+
+    glGenTextures(VLCGL_TEXTURE_COUNT, vgl->texture);
+    for (int i = 0; i < VLCGL_TEXTURE_COUNT; i++) {
+        glBindTexture(VLCGL_TARGET, vgl->texture[i]);
+
+#if !USE_OPENGL_ES
+        /* Set the texture parameters */
+        glTexParameterf(VLCGL_TARGET, GL_TEXTURE_PRIORITY, 1.0);
+        glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+#endif
+
+        glTexParameteri(VLCGL_TARGET, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(VLCGL_TARGET, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(VLCGL_TARGET, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(VLCGL_TARGET, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+#ifdef MACOS_OPENGL
+        /* Tell the driver not to make a copy of the texture but to use
+           our buffer */
+        glEnable(GL_UNPACK_CLIENT_STORAGE_APPLE);
+        glPixelStorei(GL_UNPACK_CLIENT_STORAGE_APPLE, GL_TRUE);
+
+#if 0
+        /* Use VRAM texturing */
+        glTexParameteri(VLCGL_TARGET, GL_TEXTURE_STORAGE_HINT_APPLE,
+                         GL_STORAGE_CACHED_APPLE);
+#else
+        /* Use AGP texturing */
+        glTexParameteri(VLCGL_TARGET, GL_TEXTURE_STORAGE_HINT_APPLE,
+                         GL_STORAGE_SHARED_APPLE);
+#endif
+#endif
+
+        /* Call glTexImage2D only once, and use glTexSubImage2D later */
+        if (vgl->buffer[i]) {
+            glTexImage2D(VLCGL_TARGET, 0, VLCGL_FORMAT, vgl->tex_width,
+                         vgl->tex_height, 0, VLCGL_FORMAT, VLCGL_TYPE,
+                         vgl->buffer[i]);
+        }
+    }
+
+    vlc_gl_Unlock(vgl->gl);
 
     return vgl->pool;
 

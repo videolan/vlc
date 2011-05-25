@@ -58,7 +58,6 @@ typedef struct vout_display_opengl_t vout_display_opengl_t;
 vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt, vlc_gl_t *gl);
 void vout_display_opengl_Delete(vout_display_opengl_t *vgl);
 
-int vout_display_opengl_ResetTextures(vout_display_opengl_t *vgl);
 picture_pool_t *vout_display_opengl_GetPool(vout_display_opengl_t *vgl);
 
 int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
