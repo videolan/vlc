@@ -82,6 +82,7 @@ static int Control (vout_display_t *, int, va_list);
 static void Manage (vout_display_t *);
 
 static void SwapBuffers (vlc_gl_t *gl);
+static void *GetProcAddress (vlc_gl_t *gl, const char *);
 
 static vout_window_t *MakeWindow (vout_display_t *vd)
 {
@@ -362,7 +363,7 @@ static int Open (vlc_object_t *obj)
     sys->gl.lock = NULL;
     sys->gl.unlock = NULL;
     sys->gl.swap = SwapBuffers;
-    sys->gl.getProcAddress = NULL;
+    sys->gl.getProcAddress = GetProcAddress;
     sys->gl.sys = sys;
 
     if (vout_display_opengl_Init (&sys->vgl, &vd->fmt, &sys->gl))
@@ -442,6 +443,12 @@ static void SwapBuffers (vlc_gl_t *gl)
     vout_display_sys_t *sys = gl->sys;
 
     glXSwapBuffers (sys->display, sys->glwin);
+}
+
+static void *GetProcAddress (vlc_gl_t *gl, const char *name)
+{
+    (void)gl;
+    return glXGetProcAddress ((const GLubyte *)name);
 }
 
 /**
