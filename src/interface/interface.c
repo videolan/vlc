@@ -50,8 +50,8 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static void* RunInterface( vlc_object_t *p_this );
-#if defined( __APPLE__ )
+static void* RunInterface( void * );
+#if defined( __APPLE__)
 static void * MonitorLibVLCDeath( vlc_object_t *p_this );
 #endif
 static int AddIntfCallback( vlc_object_t *, char const *,
@@ -217,9 +217,9 @@ void intf_DestroyAll( libvlc_int_t *p_libvlc )
  *
  * @param p_this: interface object
  */
-static void* RunInterface( vlc_object_t *p_this )
+static void* RunInterface( void *p_this )
 {
-    intf_thread_t *p_intf = (intf_thread_t *)p_this;
+    intf_thread_t *p_intf = p_this;
 
     p_intf->pf_run( p_intf );
     return NULL;
