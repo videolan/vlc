@@ -76,6 +76,8 @@
 # define VLCGL_FORMAT VLCGL_RGB_FORMAT
 # define VLCGL_TYPE   VLCGL_RGB_TYPE
 
+# define VLCGL_TEXTURE_COUNT 1
+
 #elif defined(MACOS_OPENGL)
 
 /* On OS X, use GL_TEXTURE_RECTANGLE_EXT instead of GL_TEXTURE_2D.
@@ -85,6 +87,8 @@
 /* OS X OpenGL supports YUV. Hehe. */
 # define VLCGL_FORMAT GL_YCBCR_422_APPLE
 # define VLCGL_TYPE   GL_UNSIGNED_SHORT_8_8_APPLE
+
+# define VLCGL_TEXTURE_COUNT 2
 
 #else
 
@@ -101,6 +105,8 @@
 /* Use RGB on Win32/GLX */
 # define VLCGL_FORMAT VLCGL_RGB_FORMAT
 # define VLCGL_TYPE   VLCGL_RGB_TYPE
+
+# define VLCGL_TEXTURE_COUNT 1
 #endif
 
 struct vout_display_opengl_t {

@@ -34,8 +34,6 @@
 # define USE_OPENGL_ES 0
 #endif
 
-#define VLCGL_TEXTURE_COUNT 1
-
 #if !defined (__APPLE__)
 # if USE_OPENGL_ES == 2
 #  include <GLES2/gl2.h>
@@ -52,8 +50,6 @@
 # else
 #  define MACOS_OPENGL
 #  include <OpenGL/gl.h>
-#  undef VLCGL_TEXTURE_COUNT
-#  define VLCGL_TEXTURE_COUNT 2
 # endif
 #endif
 
