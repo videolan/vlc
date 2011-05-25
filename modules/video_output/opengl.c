@@ -262,7 +262,8 @@ static int PictureLock(picture_t *picture)
     if (!vlc_gl_Lock(vgl->gl)) {
         glBindTexture(VLCGL_TARGET, get_texture(picture));
         glTexSubImage2D(VLCGL_TARGET, 0, 0, 0,
-                        vgl->fmt.i_width, vgl->fmt.i_height,
+                        picture->p[0].i_pitch / vgl->chroma->pixel_size,
+                        picture->p[0].i_lines,
                         VLCGL_FORMAT, VLCGL_TYPE, picture->p[0].p_pixels);
 
         vlc_gl_Unlock(vgl->gl);
@@ -410,7 +411,8 @@ int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
 #else
     /* Update the texture */
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0,
-                    vgl->fmt.i_width, vgl->fmt.i_height,
+                    picture->p[0].i_pitch / vgl->chroma->pixel_size,
+                    picture->p[0].i_lines,
                     VLCGL_FORMAT, VLCGL_TYPE, picture->p[0].p_pixels);
 #endif
 
