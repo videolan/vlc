@@ -1760,7 +1760,7 @@ static sout_access_out_t *GrabberCreate( sout_stream_t *p_stream )
 {
     sout_access_out_t *p_grab;
 
-    p_grab = vlc_object_create( p_stream->p_sout, sizeof( *p_grab ) );
+    p_grab = vlc_object_create( p_stream, sizeof( *p_grab ) );
     if( p_grab == NULL )
         return NULL;
 

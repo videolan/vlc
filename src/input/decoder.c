@@ -828,7 +828,7 @@ static decoder_t * CreateDecoder( vlc_object_t *p_parent,
         p_dec->b_need_packetized && !p_dec->fmt_in.b_packetized )
     {
         p_owner->p_packetizer =
-            vlc_custom_create( p_dec, sizeof( decoder_t ),
+            vlc_custom_create( p_parent, sizeof( decoder_t ),
                                VLC_OBJECT_DECODER, "packetizer" );
         if( p_owner->p_packetizer )
         {
