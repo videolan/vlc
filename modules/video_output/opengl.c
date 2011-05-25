@@ -103,6 +103,7 @@ struct vout_display_opengl_t {
 
     GLuint     texture[VLCGL_TEXTURE_COUNT];
     uint8_t    *buffer[VLCGL_TEXTURE_COUNT];
+    void       *buffer_base[VLCGL_TEXTURE_COUNT];
 
     picture_pool_t *pool;
 };
@@ -212,6 +213,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     for (int i = 0; i < VLCGL_TEXTURE_COUNT; i++) {
         vgl->texture[i] = 0;
         vgl->buffer[i]  = NULL;
+        vgl->buffer_base[i]  = NULL;
     }
     vgl->pool = NULL;
 
@@ -233,7 +235,7 @@ void vout_display_opengl_Delete(vout_display_opengl_t *vgl)
     if (vgl->pool) {
         picture_pool_Delete(vgl->pool);
         for (int i = 0; i < VLCGL_TEXTURE_COUNT; i++)
-            free(vgl->buffer[i]);
+            free(vgl->buffer_base[i]);
     }
     free(vgl);
 }
@@ -283,9 +285,8 @@ picture_pool_t *vout_display_opengl_GetPool(vout_display_opengl_t *vgl)
 
     int i;
     for (i = 0; i < VLCGL_TEXTURE_COUNT; i++) {
-
-        /* TODO memalign would be way better */
-        vgl->buffer[i] = malloc(vgl->tex_width * vgl->tex_height * vgl->chroma->pixel_size);
+        vgl->buffer[i] = vlc_memalign(&vgl->buffer_base[i], 16,
+                                      vgl->tex_width * vgl->tex_height * vgl->chroma->pixel_size);
         if (!vgl->buffer[i])
             break;
 
