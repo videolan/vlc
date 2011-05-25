@@ -124,50 +124,51 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     vgl->gl = gl;
 
     /* Find the chroma we will use and update fmt */
+    vgl->fmt = *fmt;
     /* TODO: We use YCbCr on Mac which is Y422, but on OSX it seems to == YUY2. Verify */
 #if defined(WORDS_BIGENDIAN) && VLCGL_FORMAT == GL_YCBCR_422_APPLE
-    fmt->i_chroma = VLC_CODEC_YUYV;
+    vgl->fmt.i_chroma = VLC_CODEC_YUYV;
 #elif defined(GL_YCBCR_422_APPLE) && (VLCGL_FORMAT == GL_YCBCR_422_APPLE)
-    fmt->i_chroma = VLC_CODEC_UYVY;
+    vgl->fmt.i_chroma = VLC_CODEC_UYVY;
 #elif VLCGL_FORMAT == GL_RGB
 #   if VLCGL_TYPE == GL_UNSIGNED_BYTE
-    fmt->i_chroma = VLC_CODEC_RGB24;
+    vgl->fmt.i_chroma = VLC_CODEC_RGB24;
 #       if defined(WORDS_BIGENDIAN)
-    fmt->i_rmask = 0x00ff0000;
-    fmt->i_gmask = 0x0000ff00;
-    fmt->i_bmask = 0x000000ff;
+    vgl->fmt.i_rmask = 0x00ff0000;
+    vgl->fmt.i_gmask = 0x0000ff00;
+    vgl->fmt.i_bmask = 0x000000ff;
 #       else
-    fmt->i_rmask = 0x000000ff;
-    fmt->i_gmask = 0x0000ff00;
-    fmt->i_bmask = 0x00ff0000;
+    vgl->fmt.i_rmask = 0x000000ff;
+    vgl->fmt.i_gmask = 0x0000ff00;
+    vgl->fmt.i_bmask = 0x00ff0000;
 #       endif
 #   else
-    fmt->i_chroma = VLC_CODEC_RGB16;
+    vgl->fmt.i_chroma = VLC_CODEC_RGB16;
 #       if defined(WORDS_BIGENDIAN)
-    fmt->i_rmask = 0x001f;
-    fmt->i_gmask = 0x07e0;
-    fmt->i_bmask = 0xf800;
+    vgl->fmt.i_rmask = 0x001f;
+    vgl->fmt.i_gmask = 0x07e0;
+    vgl->fmt.i_bmask = 0xf800;
 #       else
-    fmt->i_rmask = 0xf800;
-    fmt->i_gmask = 0x07e0;
-    fmt->i_bmask = 0x001f;
+    vgl->fmt.i_rmask = 0xf800;
+    vgl->fmt.i_gmask = 0x07e0;
+    vgl->fmt.i_bmask = 0x001f;
 #       endif
 #   endif
 #else
-    fmt->i_chroma = VLC_CODEC_RGB32;
+    vgl->fmt.i_chroma = VLC_CODEC_RGB32;
 #       if defined(WORDS_BIGENDIAN)
-    fmt->i_rmask = 0xff000000;
-    fmt->i_gmask = 0x00ff0000;
-    fmt->i_bmask = 0x0000ff00;
+    vgl->fmt.i_rmask = 0xff000000;
+    vgl->fmt.i_gmask = 0x00ff0000;
+    vgl->fmt.i_bmask = 0x0000ff00;
 #       else
-    fmt->i_rmask = 0x000000ff;
-    fmt->i_gmask = 0x0000ff00;
-    fmt->i_bmask = 0x00ff0000;
+    vgl->fmt.i_rmask = 0x000000ff;
+    vgl->fmt.i_gmask = 0x0000ff00;
+    vgl->fmt.i_bmask = 0x00ff0000;
 #       endif
 #endif
 
-    vgl->fmt = *fmt;
     vgl->chroma = vlc_fourcc_GetChromaDescription(vgl->fmt.i_chroma);
+    *fmt = vgl->fmt;
 
     /* */
     for (int i = 0; i < VLCGL_TEXTURE_COUNT; i++) {
