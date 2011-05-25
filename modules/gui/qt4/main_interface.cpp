@@ -684,8 +684,8 @@ void MainInterface::setVideoOnTop( bool on_top )
         newflags = oldflags | Qt::WindowStaysOnTopHint;
     else
         newflags = oldflags & ~Qt::WindowStaysOnTopHint;
+    if( newflags != oldflags && !b_videoFullScreen )
 
-    if( newflags != oldflags )
     {
         setWindowFlags( newflags );
         show(); /* necessary to apply window flags */
