@@ -97,9 +97,6 @@ static void Close( vlc_object_t * );
 #define FORWARD_COOKIES_TEXT N_("Forward Cookies")
 #define FORWARD_COOKIES_LONGTEXT N_("Forward Cookies across http redirections.")
 
-#define MAX_REDIRECT_TEXT N_("Max number of redirection")
-#define MAX_REDIRECT_LONGTEXT N_("Limit the number of redirection to follow.")
-
 #define USE_IE_PROXY_TEXT N_("Use Internet Explorer entered HTTP proxy server")
 #define USE_IE_PROXY_LONGTEXT N_("Use Internet Explorer entered HTTP proxy " \
     "server for all URL. Don't take into account bypasses settings and auto " \
@@ -137,8 +134,6 @@ vlc_module_begin ()
         change_safe()
     add_bool( "http-forward-cookies", true, FORWARD_COOKIES_TEXT,
               FORWARD_COOKIES_LONGTEXT, true )
-    add_integer( "http-max-redirect", 5, MAX_REDIRECT_TEXT,
-                 MAX_REDIRECT_LONGTEXT, true )
 #ifdef WIN32
     add_bool( "http-use-IE-proxy", false, USE_IE_PROXY_TEXT,
               USE_IE_PROXY_LONGTEXT, true )
@@ -245,8 +240,7 @@ static int AuthCheckReply( access_t *p_access, const char *psz_header,
 static int Open( vlc_object_t *p_this )
 {
     access_t *p_access = (access_t*)p_this;
-    return OpenWithCookies( p_this, p_access->psz_access,
-                var_InheritInteger( p_access, "http-max-redirect" ), NULL );
+    return OpenWithCookies( p_this, p_access->psz_access, 5, NULL );
 }
 
 /**
