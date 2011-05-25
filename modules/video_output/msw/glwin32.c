@@ -67,7 +67,7 @@ static int            Control(vout_display_t *, int, va_list);
 static void           Manage (vout_display_t *);
 
 static void           Swap   (vlc_gl_t *);
-static void          *GetProcAddress(vlc_gl_t *, const char *);
+static void          *OurGetProcAddress(vlc_gl_t *, const char *);
 
 /**
  * It creates an OpenGL vout display.
@@ -112,7 +112,7 @@ static int Open(vlc_object_t *object)
     sys->gl.lock = NULL;
     sys->gl.unlock = NULL;
     sys->gl.swap = Swap;
-    sys->gl.getProcAddress = GetProcAddress;
+    sys->gl.getProcAddress = OurGetProcAddress;
     sys->gl.sys = vd;
 
     video_format_t fmt = vd->fmt;
@@ -230,7 +230,7 @@ static void Swap(vlc_gl_t *gl)
     SwapBuffers(vd->sys->hGLDC);
 }
 
-static void *GetProcAddress(vlc_gl_t *gl, const char *name)
+static void *OurGetProcAddress(vlc_gl_t *gl, const char *name)
 {
     return wglGetProcAddress(name);
 }
