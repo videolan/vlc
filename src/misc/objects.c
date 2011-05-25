@@ -133,7 +133,8 @@ void *vlc_custom_create (vlc_object_t *parent, size_t length,
     vlc_spin_init (&priv->ref_spin);
     priv->i_refcount = 1;
     priv->pf_destructor = NULL;
-    priv->prev = priv->next = priv->first = NULL;
+    priv->prev = NULL;
+    priv->first = NULL;
 
     vlc_object_t *obj = (vlc_object_t *)(priv + 1);
     obj->psz_object_type = typename;
@@ -143,8 +144,21 @@ void *vlc_custom_create (vlc_object_t *parent, size_t length,
 
     if (likely(parent != NULL))
     {
+        vlc_object_internals_t *papriv = vlc_internals (parent);
+
         obj->i_flags = parent->i_flags;
         obj->p_libvlc = parent->p_libvlc;
+
+        /* Attach the child to its parent (no lock needed) */
+        obj->p_parent = vlc_object_hold (parent);
+
+        /* Attach the parent to its child (structure lock needed) */
+        libvlc_lock (obj->p_libvlc);
+        priv->next = papriv->first;
+        if (priv->next != NULL)
+            priv->next->prev = priv;
+        papriv->first = priv;
+        libvlc_unlock (obj->p_libvlc);
     }
     else
     {
@@ -152,6 +166,8 @@ void *vlc_custom_create (vlc_object_t *parent, size_t length,
 
         obj->i_flags = 0;
         obj->p_libvlc = self;
+        obj->p_parent = NULL;
+        priv->next = NULL;
         vlc_mutex_init (&(libvlc_priv (self)->structure_lock));
 
         /* TODO: should be in src/libvlc.c */
@@ -162,7 +178,6 @@ void *vlc_custom_create (vlc_object_t *parent, size_t length,
         var_AddCallback (obj, "vars", DumpCommand, NULL);
         vlc_restorecancel (canc);
     }
-    obj->p_parent = NULL;
 
     memset (obj + 1, 0, length - sizeof (*obj));
     return obj;
@@ -540,26 +555,14 @@ void vlc_object_release( vlc_object_t *p_this )
 void vlc_object_attach( vlc_object_t *p_this, vlc_object_t *p_parent )
 {
     if( !p_this ) return;
+    if( likely(p_this->p_parent == p_parent) )
+        return;
 
-    vlc_object_internals_t *pap = vlc_internals (p_parent);
-    vlc_object_internals_t *priv = vlc_internals (p_this);
-
-    priv->prev = NULL;
-    vlc_object_hold (p_parent);
-    libvlc_lock (p_this->p_libvlc);
-
-    /* Attach the parent to its child */
-    assert (p_this->p_parent == NULL);
-    p_this->p_parent = p_parent;
-
-    /* Attach the child to its parent */
-    priv->next = pap->first;
-    if (priv->next != NULL)
-        priv->next->prev = priv;
-    pap->first = priv;
-    libvlc_unlock (p_this->p_libvlc);
+    msg_Err( p_this, "object hierarchy bug:" );
+    msg_Err( p_this->p_parent, "created by this object but..." );
+    msg_Err( p_parent, "...attached to this object" );
+    abort();
 }
-
 
 #undef vlc_list_children
 /**
