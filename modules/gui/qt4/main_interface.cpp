@@ -209,7 +209,6 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 
     /* VideoWidget connects for asynchronous calls */
     b_videoFullScreen = false;
-    b_videoOnTop = false;
     connect( this, SIGNAL(askGetVideo(WId*,int*,int*,unsigned*,unsigned *)),
              this, SLOT(getVideoSlot(WId*,int*,int*,unsigned*,unsigned*)),
              Qt::BlockingQueuedConnection );
@@ -676,11 +675,9 @@ void MainInterface::setVideoFullScreen( bool fs )
  * Emit askVideoOnTop() to invoke this from other thread. */
 void MainInterface::setVideoOnTop( bool on_top )
 {
-    b_videoOnTop = on_top;
-
     Qt::WindowFlags oldflags = windowFlags(), newflags;
 
-    if( b_videoOnTop )
+    if( on_top )
         newflags = oldflags | Qt::WindowStaysOnTopHint;
     else
         newflags = oldflags & ~Qt::WindowStaysOnTopHint;

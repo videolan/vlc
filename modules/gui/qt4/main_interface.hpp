@@ -158,7 +158,6 @@ private:
     bool                 b_autoresize;          ///< persistent resizable window
     bool                 b_videoEmbedded;       ///< Want an external Video Window
     bool                 b_videoFullScreen;     ///< --fullscreen
-    bool                 b_videoOnTop;          ///< --video-on-top
     bool                 b_hideAfterCreation;
     bool                 b_minimalView;         ///< Minimal video
     bool                 b_interfaceFullScreen;
