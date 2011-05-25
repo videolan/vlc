@@ -672,8 +672,6 @@ static decoder_t *CreateDecoder( vlc_object_t *p_this, video_format_t *fmt )
     p_dec->pf_picture_link    = video_link_picture;
     p_dec->pf_picture_unlink  = video_unlink_picture;
 
-    vlc_object_attach( p_dec, p_this );
-
     /* Find a suitable decoder module */
     p_dec->p_module = module_need( p_dec, "decoder", "$codec", false );
     if( !p_dec->p_module )
@@ -752,8 +750,6 @@ static encoder_t *CreateEncoder( vlc_object_t *p_this, video_format_t *fmt_in,
     p_enc->fmt_out.video.i_width = p_enc->fmt_in.video.i_width;
     p_enc->fmt_out.video.i_height = p_enc->fmt_in.video.i_height;
 
-    vlc_object_attach( p_enc, p_this );
-
     /* Find a suitable decoder module */
     p_enc->p_module = module_need( p_enc, "encoder", NULL, false );
     if( !p_enc->p_module )
@@ -790,8 +786,6 @@ static filter_t *CreateFilter( vlc_object_t *p_this, es_format_t *p_fmt_in,
 
     p_filter = vlc_custom_create( p_this, sizeof(filter_t),
                                   VLC_OBJECT_GENERIC, typename );
-    vlc_object_attach( p_filter, p_this );
-
     p_filter->pf_video_buffer_new =
         (picture_t *(*)(filter_t *))video_new_buffer;
     p_filter->pf_video_buffer_del =

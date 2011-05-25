@@ -115,9 +115,6 @@ sout_instance_t *sout_NewInstance( vlc_object_t *p_parent, const char *psz_dest 
     vlc_mutex_init( &p_sout->lock );
     p_sout->p_stream = NULL;
 
-    /* attach it for inherit */
-    vlc_object_attach( p_sout, p_parent );
-
     var_Create( p_sout, "sout-mux-caching", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
 
     p_sout->p_stream = sout_StreamChainNew( p_sout, psz_chain, NULL, NULL );
@@ -276,8 +273,6 @@ sout_access_out_t *sout_AccessOutNew( vlc_object_t *p_sout,
     p_access->i_writes = 0;
     p_access->i_sent_bytes = 0;
 
-    vlc_object_attach( p_access, p_sout );
-
     p_access->p_module   =
         module_need( p_access, "sout access", p_access->psz_access, true );
 
@@ -384,8 +379,6 @@ sout_mux_t * sout_MuxNew( sout_instance_t *p_sout, const char *psz_mux,
     p_mux->b_add_stream_any_time = false;
     p_mux->b_waiting_stream = true;
     p_mux->i_add_stream_start = -1;
-
-    vlc_object_attach( p_mux, p_sout );
 
     p_mux->p_module =
         module_need( p_mux, "sout mux", p_mux->psz_mux, true );
@@ -795,8 +788,6 @@ static sout_stream_t *sout_StreamNew( sout_instance_t *p_sout, char *psz_name,
     p_stream->p_next   = p_next;
 
     msg_Dbg( p_sout, "stream=`%s'", p_stream->psz_name );
-
-    vlc_object_attach( p_stream, p_sout );
 
     p_stream->p_module =
         module_need( p_stream, "sout stream", p_stream->psz_name, true );

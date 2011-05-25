@@ -85,7 +85,6 @@ media_library_t *ml_Create( vlc_object_t *p_this, char *psz_name )
         msg_Err( p_this, "unable to create media library object" );
         return NULL;
     }
-    vlc_object_attach( p_ml, p_this );
 
     p_ml->p_module = module_need( p_ml, "media-library", psz_name, false );
     if( !p_ml->p_module )

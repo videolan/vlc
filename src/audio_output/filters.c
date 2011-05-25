@@ -59,7 +59,6 @@ static filter_t * FindFilter( aout_instance_t * p_aout,
                                   VLC_OBJECT_GENERIC, typename );
 
     if ( p_filter == NULL ) return NULL;
-    vlc_object_attach( p_filter, p_aout );
 
     memcpy( &p_filter->fmt_in.audio, p_input_format,
             sizeof(audio_sample_format_t) );

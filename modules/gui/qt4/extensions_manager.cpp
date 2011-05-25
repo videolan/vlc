@@ -78,7 +78,6 @@ bool ExtensionsManager::loadExtensions()
             emit extensionsUpdated();
             return false;
         }
-        vlc_object_attach( p_extensions_manager, p_intf );
 
         p_extensions_manager->p_module =
                 module_need( p_extensions_manager, "extension", NULL, false );

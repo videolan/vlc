@@ -319,8 +319,6 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     if( p_input == NULL )
         return NULL;
 
-    vlc_object_attach( p_input, p_parent );
-
     /* Construct a nice name for the input timer */
     char psz_timer_name[255];
     char * psz_name = input_item_GetName( p_item );
@@ -2739,7 +2737,6 @@ static void InputSourceMeta( input_thread_t *p_input,
                            VLC_OBJECT_GENERIC, "demux meta" );
     if( !p_demux_meta )
         return;
-    vlc_object_attach( p_demux_meta, p_demux );
     p_demux_meta->p_demux = p_demux;
     p_demux_meta->p_item = p_input->p->p_item;
 

@@ -144,9 +144,6 @@ static vout_thread_t *VoutCreate(vlc_object_t *object,
     vlc_mutex_init(&vout->p->filter.lock);
     vlc_mutex_init(&vout->p->spu_lock);
 
-    /* Attach the new object now so we can use var inheritance below */
-    vlc_object_attach(vout, object);
-
     /* Initialize subpicture unit */
     vout->p->spu = spu_Create(vout);
 

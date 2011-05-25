@@ -45,7 +45,6 @@ sql_t *sql_Create( vlc_object_t *p_this, const char *psz_name,
         msg_Err( p_this, "unable to create sql object" );
         return NULL;
     }
-    vlc_object_attach( p_sql, p_this );
 
     p_sql->psz_host = strdup( psz_host );
     p_sql->psz_user = strdup( psz_user );

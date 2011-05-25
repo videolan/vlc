@@ -47,7 +47,6 @@ vlc_inhibit_t *vlc_inhibit_Create (vlc_object_t *parent, int_fast32_t wid)
     ih->p_sys = NULL;
     ih->inhibit = NULL;
 
-    vlc_object_attach (ih, parent);
     priv->module = module_need (ih, "inhibit", NULL, false);
     if (priv->module == NULL)
     {

@@ -530,7 +530,6 @@ static int OpenBlending( intf_thread_t *p_intf )
 
     p_intf->p_sys->p_blend =
             vlc_object_create( p_intf, sizeof(filter_t) );
-    vlc_object_attach( p_intf->p_sys->p_blend, p_intf );
     p_intf->p_sys->p_blend->fmt_out.video.i_x_offset =
         p_intf->p_sys->p_blend->fmt_out.video.i_y_offset = 0;
     p_intf->p_sys->p_blend->fmt_out.video.i_sar_num =
@@ -576,7 +575,6 @@ static int OpenTextRenderer( intf_thread_t *p_intf )
 
     p_intf->p_sys->p_text =
             vlc_object_create( p_intf, sizeof(filter_t) );
-    vlc_object_attach( p_intf->p_sys->p_text, p_intf );
 
     p_intf->p_sys->p_text->fmt_out.video.i_width =
         p_intf->p_sys->p_text->fmt_out.video.i_visible_width =

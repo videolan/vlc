@@ -218,7 +218,6 @@ static filter_t *SpuRenderCreateAndLoadText(spu_t *spu)
 
     text->pf_get_attachments = spu_get_attachments;
 
-    vlc_object_attach(text, spu);
     text->p_module = module_need(text, "text renderer", "$text-renderer", false);
 
     /* Create a few variables used for enhanced text rendering */
@@ -252,7 +251,6 @@ static filter_t *SpuRenderCreateAndLoadScale(vlc_object_t *object,
     scale->pf_video_buffer_new = spu_new_video_buffer;
     scale->pf_video_buffer_del = spu_del_video_buffer;
 
-    vlc_object_attach(scale, object);
     scale->p_module = module_need(scale, "video filter2", NULL, false);
 
     return scale;
@@ -1212,7 +1210,6 @@ spu_t *spu_Create(vlc_object_t *object)
                                    VLC_OBJECT_GENERIC, "subpicture");
     if (!spu)
         return NULL;
-    vlc_object_attach(spu, object);
 
     /* Initialize spu fields */
     spu_private_t *sys = spu->p = (spu_private_t*)&spu[1];

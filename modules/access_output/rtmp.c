@@ -100,7 +100,6 @@ static int Open( vlc_object_t *p_this )
         free( p_sys );
         return VLC_ENOMEM;
     }
-    vlc_object_attach( p_sys->p_thread, p_access );
 
     /* Parse URI - remove spaces */
     p = psz = strdup( p_access->psz_path );

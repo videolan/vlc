@@ -58,9 +58,6 @@ filter_t *filter_NewBlend( vlc_object_t *p_this,
     * input format */
     p_blend->p_module = NULL;
 
-    /* */
-    vlc_object_attach( p_blend, p_this );
-
     return p_blend;
 }
 
@@ -130,8 +127,6 @@ video_splitter_t *video_splitter_New( vlc_object_t *p_this,
     video_format_Copy( &p_splitter->fmt, p_fmt );
 
     /* */
-    vlc_object_attach( p_splitter, p_this );
-
     p_splitter->p_module = module_need( p_splitter, "video splitter", psz_name, true );
     if( ! p_splitter->p_module )
     {

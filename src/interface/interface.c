@@ -105,7 +105,6 @@ int intf_Create( vlc_object_t *p_this, const char *psz_module )
     var_AddCallback( p_intf, "intf-add", AddIntfCallback, NULL );
 
     /* Attach interface to LibVLC */
-    vlc_object_attach( p_intf, p_libvlc );
 #if defined( __APPLE__ )
     p_intf->b_should_run_on_first_thread = false;
 #endif

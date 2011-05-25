@@ -379,7 +379,6 @@ libvlc_media_player_new( libvlc_instance_t *instance )
         libvlc_printerr("Not enough memory");
         return NULL;
     }
-    vlc_object_attach (mp, mp->p_libvlc);
 
     /* Input */
     var_Create (mp, "rate", VLC_VAR_FLOAT|VLC_VAR_DOINHERIT);

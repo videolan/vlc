@@ -63,8 +63,6 @@ vout_window_t *vout_window_New(vlc_object_t *obj,
     window->control = NULL;
     window->sys = NULL;
 
-    vlc_object_attach(window, obj);
-
     const char *type;
     switch (cfg->type) {
 #ifdef WIN32

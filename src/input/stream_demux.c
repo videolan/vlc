@@ -95,8 +95,6 @@ stream_t *stream_DemuxNew( demux_t *p_demux, const char *psz_demux, es_out_t *ou
         return NULL;
     }
 
-    vlc_object_attach( s, p_obj );
-
     if( vlc_clone( &p_sys->thread, DStreamThread, s, VLC_THREAD_PRIORITY_INPUT ) )
     {
         stream_CommonDelete( s );

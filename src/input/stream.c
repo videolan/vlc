@@ -296,9 +296,6 @@ stream_t *stream_AccessNew( access_t *p_access, char **ppsz_list )
         return NULL;
     }
 
-    /* Attach it now, needed for b_die */
-    vlc_object_attach( s, p_access );
-
     s->pf_read   = NULL;    /* Set up later */
     s->pf_peek   = NULL;
     s->pf_control = AStreamControl;

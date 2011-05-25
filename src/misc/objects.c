@@ -545,25 +545,6 @@ void vlc_object_release( vlc_object_t *p_this )
     }
 }
 
-#undef vlc_object_attach
-/**
- * Exposes a VLC object in the hierarchy by attaching it to another object.
- * @note Before variables can be inherited, an object must be attached.
- * @param p_this object to expose
- * @param p_parent parent object in the hierarchy
- */
-void vlc_object_attach( vlc_object_t *p_this, vlc_object_t *p_parent )
-{
-    if( !p_this ) return;
-    if( likely(p_this->p_parent == p_parent) )
-        return;
-
-    msg_Err( p_this, "object hierarchy bug:" );
-    msg_Err( p_this->p_parent, "created by this object but..." );
-    msg_Err( p_parent, "...attached to this object" );
-    abort();
-}
-
 #undef vlc_list_children
 /**
  * Gets the list of children of an objects, and increment their reference

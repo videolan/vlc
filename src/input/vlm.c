@@ -163,7 +163,6 @@ vlm_t *vlm_New ( vlc_object_t *p_this )
     TAB_INIT( p_vlm->i_schedule, p_vlm->schedule );
     p_vlm->p_vod = NULL;
     var_Create( p_vlm, "intf-event", VLC_VAR_ADDRESS );
-    vlc_object_attach( p_vlm, p_this->p_libvlc );
 
     if( vlc_clone( &p_vlm->thread, Manage, p_vlm, VLC_THREAD_PRIORITY_LOW ) )
     {
@@ -761,7 +760,6 @@ static int vlm_ControlMediaAdd( vlm_t *p_vlm, vlm_media_t *p_cfg, int64_t *p_id 
     {
         p_vlm->p_vod = vlc_custom_create( VLC_OBJECT(p_vlm), sizeof( vod_t ),
                                           VLC_OBJECT_GENERIC, "vod server" );
-        vlc_object_attach( p_vlm->p_vod, p_vlm );
         p_vlm->p_vod->p_module = module_need( p_vlm->p_vod, "vod server", "$vod-server", false );
         if( !p_vlm->p_vod->p_module )
         {
@@ -903,7 +901,6 @@ static vlm_media_instance_sys_t *vlm_MediaInstanceNew( vlm_t *p_vlm, const char 
     p_instance->i_index = 0;
     p_instance->b_sout_keep = false;
     p_instance->p_parent = vlc_object_create( p_vlm, sizeof (vlc_object_t) );
-    vlc_object_attach( p_instance->p_parent, p_vlm );
     p_instance->p_input = NULL;
     p_instance->p_input_resource = NULL;
 

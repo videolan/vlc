@@ -125,8 +125,6 @@ services_discovery_t *vlc_sd_Create( vlc_object_t *p_super,
     vlc_event_manager_register_event_type(em, vlc_ServicesDiscoveryEnded);
 
     vlc_object_set_destructor( p_sd, services_discovery_Destructor );
-    vlc_object_attach( p_sd, p_super );
-
     return p_sd;
 }
 

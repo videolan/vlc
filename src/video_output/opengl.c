@@ -63,7 +63,6 @@ vlc_gl_t *vlc_gl_Create(struct vout_window_t *wnd, unsigned flags,
     gl = vlc_custom_create(parent, sizeof (*gl), VLC_OBJECT_GENERIC, "gl");
     if (unlikely(gl == NULL))
         return NULL;
-    vlc_object_attach(gl, parent);
 
     gl->surface = wnd;
     gl->module = module_need(gl, type, name, true);

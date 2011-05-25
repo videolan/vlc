@@ -195,7 +195,6 @@ void system_Configure( libvlc_int_t *p_this, int i_argc, const char *const ppsz_
                 vlc_object_release (p_helper);
                 p_helper = NULL;
             }
-            vlc_object_attach (p_helper, p_this);
             CloseHandle( hIPCHelperReady );
 
             /* Initialization done.

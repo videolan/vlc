@@ -815,8 +815,6 @@ static decoder_t * CreateDecoder( vlc_object_t *p_parent,
     p_dec->pf_get_display_date = DecoderGetDisplayDate;
     p_dec->pf_get_display_rate = DecoderGetDisplayRate;
 
-    vlc_object_attach( p_dec, p_parent );
-
     /* Find a suitable decoder/packetizer module */
     if( !b_packetizer )
         p_dec->p_module = module_need( p_dec, "decoder", "$codec", false );
@@ -837,8 +835,6 @@ static decoder_t * CreateDecoder( vlc_object_t *p_parent,
 
             es_format_Copy( &p_owner->p_packetizer->fmt_out,
                             &null_es_format );
-
-            vlc_object_attach( p_owner->p_packetizer, p_parent );
 
             p_owner->p_packetizer->p_module =
                 module_need( p_owner->p_packetizer,

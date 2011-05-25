@@ -38,7 +38,6 @@ void *vlc_probe (vlc_object_t *obj,
         *pcount = 0;
         return NULL;
     }
-    vlc_object_attach (probe, obj);
     probe->list = NULL;
     probe->count = 0;
 

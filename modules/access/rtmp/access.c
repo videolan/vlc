@@ -103,7 +103,6 @@ static int Open( vlc_object_t *p_this )
         vlc_object_create( p_access, sizeof( rtmp_control_thread_t ) );
     if( !p_sys->p_thread )
         return VLC_ENOMEM;
-    vlc_object_attach( p_sys->p_thread, p_access );
 
     /* Parse URI - remove spaces */
     p = psz = strdup( p_access->psz_location );

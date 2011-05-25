@@ -57,8 +57,6 @@ int aout_MixerNew( aout_instance_t * p_aout )
     p_mixer->mix = NULL;
     p_mixer->sys = NULL;
 
-    vlc_object_attach( p_mixer, p_aout );
-
     p_mixer->module = module_need( p_mixer, "audio mixer", NULL, false );
     if( !p_mixer->module )
     {

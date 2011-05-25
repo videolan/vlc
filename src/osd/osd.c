@@ -166,7 +166,6 @@ osd_menu_t *osd_MenuCreate( vlc_object_t *p_this, const char *psz_file )
             return NULL;
 
         p_osd->p_parser = NULL;
-        vlc_object_attach( p_osd, p_this->p_libvlc );
 
         /* Parse configuration file */
         if ( !osd_ParserLoad( p_osd, psz_file ) )

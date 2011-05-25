@@ -326,7 +326,6 @@ static int Init( vout_thread_t *p_vout )
     /* Load the internal opencv filter */
     /* We don't need to set up video formats for this filter as it not actually using a picture_t */
     p_sys->p_opencv = vlc_object_create( p_vout, sizeof(filter_t) );
-    vlc_object_attach( p_sys->p_opencv, p_vout );
 
     if (p_vout->p_sys->psz_inner_name)
         p_sys->p_opencv->p_module =

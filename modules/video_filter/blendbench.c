@@ -225,7 +225,6 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         picture_Release( p_pic );
         return NULL;
     }
-    vlc_object_attach( p_blend, p_filter );
     p_blend->fmt_out.video = p_sys->p_base_image->format;
     p_blend->fmt_in.video = p_sys->p_blend_image->format;
     p_blend->p_module = module_need( p_blend, "video blending", NULL, false );

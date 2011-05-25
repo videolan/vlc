@@ -524,7 +524,6 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     id->p_decoder = vlc_object_create( p_stream, sizeof( decoder_t ) );
     if( !id->p_decoder )
         goto error;
-    vlc_object_attach( id->p_decoder, p_stream );
     id->p_decoder->p_module = NULL;
     id->p_decoder->fmt_in = *p_fmt;
     id->p_decoder->b_pace_control = true;
@@ -533,7 +532,6 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     id->p_encoder = sout_EncoderCreate( p_stream );
     if( !id->p_encoder )
         goto error;
-    vlc_object_attach( id->p_encoder, p_stream );
     id->p_encoder->p_module = NULL;
 
     /* Create destination format */

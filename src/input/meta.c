@@ -267,7 +267,6 @@ int input_item_WriteMeta( vlc_object_t *obj, input_item_t *p_item )
                            "meta writer" );
     if( p_export == NULL )
         return VLC_ENOMEM;
-    vlc_object_attach( p_export, obj );
     p_export->p_item = p_item;
 
     int type;

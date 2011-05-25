@@ -78,7 +78,6 @@ stream_t *stream_MemoryNew( vlc_object_t *p_this, uint8_t *p_buffer,
     s->pf_destroy = Delete;
     s->p_input = NULL;
 
-    vlc_object_attach( s, p_this );
     return s;
 }
 

@@ -161,9 +161,6 @@ bool Dialogs::init()
     if( m_pProvider == NULL )
         return false;
 
-    // Attach the dialogs provider to its parent interface
-    vlc_object_attach( m_pProvider, getIntf() );
-
     m_pModule = module_need( m_pProvider, "dialogs provider", NULL, false );
     if( m_pModule == NULL )
     {

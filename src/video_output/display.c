@@ -127,8 +127,6 @@ static vout_display_t *vout_display_New(vlc_object_t *obj,
 
     vd->owner = *owner;
 
-    vlc_object_attach(vd, obj);
-
     if (load_module) {
         vd->module = module_need(vd, "vout display", module, module && *module != '\0');
         if (!vd->module) {

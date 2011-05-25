@@ -48,7 +48,6 @@ int playlist_Export( playlist_t * p_playlist, const char *psz_filename,
     if( !p_export )
         return VLC_ENOMEM;
 
-    vlc_object_attach( p_export, p_playlist );
     msg_Dbg( p_export, "saving %s to file %s",
              p_export_root->p_input->psz_name, psz_filename );
 

@@ -42,7 +42,6 @@ xml_t *xml_Create( vlc_object_t *p_this )
 
     p_xml = vlc_custom_create( p_this, sizeof( *p_xml ), VLC_OBJECT_GENERIC,
                                "xml" );
-    vlc_object_attach( p_xml, p_this );
 
     p_xml->p_module = module_need( p_xml, "xml", NULL, false );
     if( !p_xml->p_module )
@@ -78,7 +77,6 @@ xml_reader_t *xml_ReaderCreate(vlc_object_t *obj, stream_t *stream)
 
     reader = vlc_custom_create(obj, sizeof(*reader), VLC_OBJECT_GENERIC,
                                "xml reader");
-    vlc_object_attach(reader, obj);
 
     reader->p_stream = stream;
     reader->p_module = module_need(reader, "xml reader", NULL, false);

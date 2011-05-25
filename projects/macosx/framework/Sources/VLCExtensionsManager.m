@@ -77,7 +77,6 @@ static VLCExtensionsManager *sharedManager = nil;
             vlc_object_release(libvlc);
             return nil;
         }
-        vlc_object_attach(_instance, libvlc);
 
         _instance->p_module = module_need(_instance, "extension", NULL, false);
         NSAssert(_instance->p_module, @"Unable to load extensions module");

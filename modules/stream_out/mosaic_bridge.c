@@ -306,7 +306,6 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     p_sys->p_decoder = vlc_object_create( p_stream, sizeof( decoder_t ) );
     if( !p_sys->p_decoder )
         return NULL;
-    vlc_object_attach( p_sys->p_decoder, p_stream );
     p_sys->p_decoder->p_module = NULL;
     p_sys->p_decoder->fmt_in = *p_fmt;
     p_sys->p_decoder->b_pace_control = false;

@@ -278,8 +278,6 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input, const aout_
                 continue;
             }
 
-            vlc_object_attach( p_filter , p_aout );
-
             p_filter->p_owner = malloc( sizeof(*p_filter->p_owner) );
             p_filter->p_owner->p_aout  = p_aout;
             p_filter->p_owner->p_input = p_input;

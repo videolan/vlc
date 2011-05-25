@@ -70,7 +70,6 @@ tls_ServerCreate (vlc_object_t *obj, const char *cert_path,
         var_SetString (srv, "tls-x509-key", key_path);
     }
 
-    vlc_object_attach (srv, obj);
     srv->p_module = module_need (srv, "tls server", NULL, false );
     if (srv->p_module == NULL)
     {
@@ -120,14 +119,7 @@ int tls_ServerAddCRL (tls_server_t *srv, const char *path)
 
 tls_session_t *tls_ServerSessionPrepare (tls_server_t *srv)
 {
-    tls_session_t *ses;
-
-    ses = srv->pf_open (srv);
-    if (ses == NULL)
-        return NULL;
-
-    vlc_object_attach (ses, srv);
-    return ses;
+    return srv->pf_open (srv);
 }
 
 
@@ -185,7 +177,6 @@ tls_ClientCreate (vlc_object_t *obj, int fd, const char *psz_hostname)
     else
         msg_Dbg (cl, "requested anonymous server");
 
-    vlc_object_attach (cl, obj);
     cl->p_module = module_need (cl, "tls client", NULL, false );
     if (cl->p_module == NULL)
     {
