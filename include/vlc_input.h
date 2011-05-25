@@ -543,7 +543,7 @@ VLC_API int input_vaControl( input_thread_t *, int i_query, va_list  );
 
 VLC_API int input_Control( input_thread_t *, int i_query, ...  );
 
-VLC_API int input_Close( input_thread_t * );
+VLC_API void input_Close( input_thread_t * );
 
 /**
  * Get the input item for an input thread

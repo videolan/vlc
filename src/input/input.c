@@ -257,7 +257,7 @@ void input_Stop( input_thread_t *p_input, bool b_abort )
  *
  * It does not call input_Stop itself.
  */
-int input_Close( input_thread_t *p_input )
+void input_Close( input_thread_t *p_input )
 {
     if( p_input->p->is_running )
         vlc_join( p_input->p->thread, NULL );
