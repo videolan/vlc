@@ -192,7 +192,7 @@ struct dvb_device
 /**
  * Opens the DVB tuner
  */
-dvb_device_t *dvb_open (vlc_object_t *obj, bool tune)
+dvb_device_t *dvb_open (vlc_object_t *obj)
 {
     dvb_device_t *d = malloc (sizeof (*d));
     if (unlikely(d == NULL))

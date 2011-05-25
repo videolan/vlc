@@ -361,9 +361,8 @@ static int Open (vlc_object_t *obj)
         return VLC_ENOMEM;
 
     var_LocationParse (obj, access->psz_location, "dvb-");
-    unsigned freq = var_InheritFrequency (obj);
 
-    dvb_device_t *dev = dvb_open (obj, freq != 0);
+    dvb_device_t *dev = dvb_open (obj);
     if (dev == NULL)
     {
         free (sys);
@@ -373,6 +372,7 @@ static int Open (vlc_object_t *obj)
     sys->dev = dev;
     access->p_sys = sys;
 
+    unsigned freq = var_InheritFrequency (obj);
     if (freq != 0)
     {
         const delsys_t *delsys = GuessSystem (access->psz_access, dev);

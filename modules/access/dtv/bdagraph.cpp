@@ -130,11 +130,8 @@ struct dvb_device
     uint32_t lowf, highf, switchf;
 };
 
-dvb_device_t *dvb_open (vlc_object_t *obj, bool tune)
+dvb_device_t *dvb_open (vlc_object_t *obj)
 {
-    if (!tune)
-        return NULL; /* not implemented (yet?) */
-
     dvb_device_t *d = new dvb_device_t;
 
     d->module = new BDAGraph (obj);

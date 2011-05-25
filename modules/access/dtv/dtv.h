@@ -32,7 +32,7 @@ extern const delsys_t dvbc, dvbs, dvbs2, dvbt, dvbt2, atsc, cqam;
 
 typedef struct dvb_device dvb_device_t;
 
-dvb_device_t *dvb_open (vlc_object_t *obj, bool tune);
+dvb_device_t *dvb_open (vlc_object_t *obj);
 void dvb_close (dvb_device_t *);
 ssize_t dvb_read (dvb_device_t *, void *, size_t);
 
