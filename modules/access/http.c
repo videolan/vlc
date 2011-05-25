@@ -214,8 +214,7 @@ struct access_sys_t
 
 /* */
 static int OpenWithCookies( vlc_object_t *p_this, const char *psz_access,
-                            int i_nb_redirect, int i_max_redirect,
-                            vlc_array_t *cookies );
+                            unsigned i_redirect, vlc_array_t *cookies );
 
 /* */
 static ssize_t Read( access_t *, uint8_t *, size_t );
@@ -246,7 +245,7 @@ static int AuthCheckReply( access_t *p_access, const char *psz_header,
 static int Open( vlc_object_t *p_this )
 {
     access_t *p_access = (access_t*)p_this;
-    return OpenWithCookies( p_this, p_access->psz_access, 0,
+    return OpenWithCookies( p_this, p_access->psz_access,
                 var_InheritInteger( p_access, "http-max-redirect" ), NULL );
 }
 
@@ -255,14 +254,12 @@ static int Open( vlc_object_t *p_this )
  * @param p_this: the vlc object
  * @psz_access: the acces to use (http, https, ...) (this value must be used
  *              instead of p_access->psz_access)
- * @i_nb_redirect: the number of redirection already done
- * @i_max_redirect: limit to the number of redirection to follow
+ * @i_redirect: number of redirections remaining
  * @cookies: the available cookies
  * @return vlc error codes
  */
 static int OpenWithCookies( vlc_object_t *p_this, const char *psz_access,
-                            int i_nb_redirect, int i_max_redirect,
-                            vlc_array_t *cookies )
+                            unsigned i_redirect, vlc_array_t *cookies )
 {
     access_t     *p_access = (access_t*)p_this;
     access_sys_t *p_sys;
@@ -576,7 +573,7 @@ connect:
         msg_Dbg( p_access, "redirection to %s", p_sys->psz_location );
 
         /* Check the number of redirection already done */
-        if( i_nb_redirect >= i_max_redirect )
+        if( i_redirect == 0 )
         {
             msg_Err( p_access, "Too many redirection: break potential infinite"
                      "loop" );
@@ -617,8 +614,8 @@ connect:
         free( p_sys );
 
         /* Do new Open() run with new data */
-        return OpenWithCookies( p_this, psz_protocol, i_nb_redirect + 1,
-                                i_max_redirect, cookies );
+        return OpenWithCookies( p_this, psz_protocol, i_redirect - 1,
+                                cookies );
     }
 
     if( p_sys->b_mms )
