@@ -592,6 +592,10 @@ WId MainInterface::getVideo( int *pi_x, int *pi_y,
 void MainInterface::getVideoSlot( WId *p_id, int *pi_x, int *pi_y,
                                   unsigned *pi_width, unsigned *pi_height )
 {
+    /* Hidden or minimized, activate */
+    if( isHidden() || isMinimized() )
+        toggleUpdateSystrayMenu();
+
     /* Request the videoWidget */
     WId ret = videoWidget->request( pi_x, pi_y,
                                     pi_width, pi_height, !b_autoresize );
