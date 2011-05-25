@@ -190,10 +190,9 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     supports_npot = true;
 #elif defined(MACOS_OPENGL)
     supports_npot = true;
-#endif
-
-#if defined(__APPLE__) && USE_OPENGL_ES == 1
-    supports_npot |= strstr(extensions, "GL_APPLE_texture_2D_limited_npot") != NULL;
+#else
+    supports_npot |= strstr(extensions, "GL_APPLE_texture_2D_limited_npot") != NULL ||
+                     strstr(extensions, "GL_ARB_texture_non_power_of_two");
 #endif
 
     /* Texture size */
