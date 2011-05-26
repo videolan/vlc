@@ -400,10 +400,7 @@ static void Demux (void *data)
         xcb_get_image (conn, XCB_IMAGE_FORMAT_Z_PIXMAP, drawable,
                        x, y, w, h, ~0), NULL);
     if (img == NULL)
-    {
-        msg_Err (demux, "NO IMAGE");
         return;
-    }
 
     block_t *block = block_heap_Alloc (img, xcb_get_image_data (img),
                                        xcb_get_image_data_length (img));
