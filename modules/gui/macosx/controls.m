@@ -480,10 +480,9 @@
 
 - (IBAction)telxTransparent:(id)sender
 {
-    intf_thread_t * p_intf = VLCIntf;
     vlc_object_t *p_vbi;
-    p_vbi = (vlc_object_t *) vlc_object_find_name( p_intf,
-                    "zvbi", FIND_ANYWHERE );
+    p_vbi = (vlc_object_t *) vlc_object_find_name( pl_Get( VLCIntf ),
+                    "zvbi", FIND_CHILD );
     if( p_vbi )
     {
         var_SetBool( p_vbi, "vbi-opaque", [sender state] );
@@ -510,8 +509,8 @@
         i_page = 'b' << 16;
     if( i_page == 0 ) return;
 
-    p_vbi = (vlc_object_t *) vlc_object_find_name( p_intf,
-                "zvbi", FIND_ANYWHERE );
+    p_vbi = (vlc_object_t *) vlc_object_find_name( pl_Get( VLCIntf ),
+                "zvbi", FIND_CHILD );
     if( p_vbi )
     {
         var_SetInteger( p_vbi, "vbi-page", i_page );

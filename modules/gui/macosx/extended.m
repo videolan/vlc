@@ -352,7 +352,7 @@ static VLCExtended *_o_sharedInstance = nil;
     else
     {
         msg_Dbg( p_intf, "we found a vout to adjust, let's look for the filter" );
-        p_filter = vlc_object_find_name( p_intf, "adjust", FIND_ANYWHERE );
+        p_filter = vlc_object_find_name( pl_Get(p_intf), "adjust", FIND_CHILD );
 
         if(! p_filter )
         {
