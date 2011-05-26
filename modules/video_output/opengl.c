@@ -62,37 +62,12 @@
 # define GL_CLAMP_TO_EDGE 0x812F
 #endif
 
-
 #if USE_OPENGL_ES
-# define VLCGL_TARGET GL_TEXTURE_2D
-
-// Use RGB with OpenGLES
-# define VLCGL_FORMAT GL_RGB
-# define VLCGL_TYPE   GL_UNSIGNED_SHORT_5_6_5
-
-# define VLCGL_TEXTURE_COUNT 1
-
+#   define VLCGL_TEXTURE_COUNT 1
 #elif defined(MACOS_OPENGL)
-
-/* On OS X, use GL_TEXTURE_RECTANGLE_EXT instead of GL_TEXTURE_2D.
-   This allows sizes which are not powers of 2 */
-# define VLCGL_TARGET GL_TEXTURE_RECTANGLE_EXT
-
-/* OS X OpenGL supports YUV. Hehe. */
-# define VLCGL_FORMAT GL_YCBCR_422_APPLE
-# define VLCGL_TYPE   GL_UNSIGNED_SHORT_8_8_APPLE
-
-# define VLCGL_TEXTURE_COUNT 2
-
+#   define VLCGL_TEXTURE_COUNT 2
 #else
-
-# define VLCGL_TARGET GL_TEXTURE_2D
-
-/* Use RGB on Win32/GLX */
-# define VLCGL_FORMAT GL_RGBA
-# define VLCGL_TYPE   GL_UNSIGNED_BYTE
-
-# define VLCGL_TEXTURE_COUNT 1
+#   define VLCGL_TEXTURE_COUNT 1
 #endif
 
 struct vout_display_opengl_t {
@@ -101,6 +76,9 @@ struct vout_display_opengl_t {
     video_format_t fmt;
     const vlc_chroma_description_t *chroma;
 
+    int        tex_target;
+    int        tex_format;
+    int        tex_type;
     int        tex_width;
     int        tex_height;
 
@@ -159,46 +137,43 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
 
     /* Find the chroma we will use and update fmt */
     vgl->fmt = *fmt;
-    /* TODO: We use YCbCr on Mac which is Y422, but on OSX it seems to == YUY2. Verify */
-#if defined(WORDS_BIGENDIAN) && VLCGL_FORMAT == GL_YCBCR_422_APPLE
-    vgl->fmt.i_chroma = VLC_CODEC_YUYV;
-#elif defined(GL_YCBCR_422_APPLE) && (VLCGL_FORMAT == GL_YCBCR_422_APPLE)
-    vgl->fmt.i_chroma = VLC_CODEC_UYVY;
-#elif VLCGL_FORMAT == GL_RGB
-#   if VLCGL_TYPE == GL_UNSIGNED_BYTE
-    vgl->fmt.i_chroma = VLC_CODEC_RGB24;
-#       if defined(WORDS_BIGENDIAN)
-    vgl->fmt.i_rmask = 0x00ff0000;
-    vgl->fmt.i_gmask = 0x0000ff00;
-    vgl->fmt.i_bmask = 0x000000ff;
-#       else
-    vgl->fmt.i_rmask = 0x000000ff;
-    vgl->fmt.i_gmask = 0x0000ff00;
-    vgl->fmt.i_bmask = 0x00ff0000;
-#       endif
-#   else
+#if USE_OPENGL_ES
     vgl->fmt.i_chroma = VLC_CODEC_RGB16;
-#       if defined(WORDS_BIGENDIAN)
-    vgl->fmt.i_rmask = 0x001f;
-    vgl->fmt.i_gmask = 0x07e0;
-    vgl->fmt.i_bmask = 0xf800;
-#       else
-    vgl->fmt.i_rmask = 0xf800;
-    vgl->fmt.i_gmask = 0x07e0;
-    vgl->fmt.i_bmask = 0x001f;
-#       endif
+#   if defined(WORDS_BIGENDIAN)
+    vgl->fmt.i_rmask  = 0x001f;
+    vgl->fmt.i_gmask  = 0x07e0;
+    vgl->fmt.i_bmask  = 0xf800;
+#   else
+    vgl->fmt.i_rmask  = 0xf800;
+    vgl->fmt.i_gmask  = 0x07e0;
+    vgl->fmt.i_bmask  = 0x001f;
 #   endif
+    vgl->tex_target   = GL_TEXTURE_2D;
+    vgl->tex_format   = GL_RGB;
+    vgl->tex_type     = GL_UNSIGNED_SHORT_5_6_5;
+#elif defined(MACOS_OPENGL)
+#   if defined(WORDS_BIGENDIAN)
+    vgl->fmt.i_chroma = VLC_CODEC_YUYV;
+#   else
+    vgl->fmt.i_chroma = VLC_CODEC_UYVY;
+#   endif
+    vgl->tex_target   = GL_TEXTURE_RECTANGLE_EXT;
+    vgl->tex_format   = GL_YCBCR_422_APPLE;
+    vgl->tex_type     = GL_UNSIGNED_SHORT_8_8_APPLE;
 #else
     vgl->fmt.i_chroma = VLC_CODEC_RGB32;
-#       if defined(WORDS_BIGENDIAN)
-    vgl->fmt.i_rmask = 0xff000000;
-    vgl->fmt.i_gmask = 0x00ff0000;
-    vgl->fmt.i_bmask = 0x0000ff00;
-#       else
-    vgl->fmt.i_rmask = 0x000000ff;
-    vgl->fmt.i_gmask = 0x0000ff00;
-    vgl->fmt.i_bmask = 0x00ff0000;
-#       endif
+#   if defined(WORDS_BIGENDIAN)
+    vgl->fmt.i_rmask  = 0xff000000;
+    vgl->fmt.i_gmask  = 0x00ff0000;
+    vgl->fmt.i_bmask  = 0x0000ff00;
+#   else
+    vgl->fmt.i_rmask  = 0x000000ff;
+    vgl->fmt.i_gmask  = 0x0000ff00;
+    vgl->fmt.i_bmask  = 0x00ff0000;
+#   endif
+    vgl->tex_target   = GL_TEXTURE_2D;
+    vgl->tex_format   = GL_RGBA;
+    vgl->tex_type     = GL_UNSIGNED_BYTE;
 #endif
 
     vgl->chroma = vlc_fourcc_GetChromaDescription(vgl->fmt.i_chroma);
@@ -314,11 +289,11 @@ static int PictureLock(picture_t *picture)
 
     vout_display_opengl_t *vgl = picture->p_sys->vgl;
     if (!vlc_gl_Lock(vgl->gl)) {
-        glBindTexture(VLCGL_TARGET, get_texture(picture));
-        glTexSubImage2D(VLCGL_TARGET, 0, 0, 0,
+        glBindTexture(vgl->tex_target, get_texture(picture));
+        glTexSubImage2D(vgl->tex_target, 0, 0, 0,
                         picture->p[0].i_pitch / vgl->chroma->pixel_size,
                         picture->p[0].i_lines,
-                        VLCGL_FORMAT, VLCGL_TYPE, picture->p[0].p_pixels);
+                        vgl->tex_format, vgl->tex_type, picture->p[0].p_pixels);
 
         vlc_gl_Unlock(vgl->gl);
     }
@@ -387,18 +362,18 @@ picture_pool_t *vout_display_opengl_GetPool(vout_display_opengl_t *vgl)
 
     glGenTextures(VLCGL_TEXTURE_COUNT, vgl->texture);
     for (int i = 0; i < VLCGL_TEXTURE_COUNT; i++) {
-        glBindTexture(VLCGL_TARGET, vgl->texture[i]);
+        glBindTexture(vgl->tex_target, vgl->texture[i]);
 
 #if !USE_OPENGL_ES
         /* Set the texture parameters */
-        glTexParameterf(VLCGL_TARGET, GL_TEXTURE_PRIORITY, 1.0);
+        glTexParameterf(vgl->tex_target, GL_TEXTURE_PRIORITY, 1.0);
         glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 #endif
 
-        glTexParameteri(VLCGL_TARGET, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(VLCGL_TARGET, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(VLCGL_TARGET, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(VLCGL_TARGET, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexParameteri(vgl->tex_target, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(vgl->tex_target, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(vgl->tex_target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(vgl->tex_target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
 #ifdef MACOS_OPENGL
         /* Tell the driver not to make a copy of the texture but to use
@@ -408,19 +383,19 @@ picture_pool_t *vout_display_opengl_GetPool(vout_display_opengl_t *vgl)
 
 #if 0
         /* Use VRAM texturing */
-        glTexParameteri(VLCGL_TARGET, GL_TEXTURE_STORAGE_HINT_APPLE,
+        glTexParameteri(vgl->tex_target, GL_TEXTURE_STORAGE_HINT_APPLE,
                          GL_STORAGE_CACHED_APPLE);
 #else
         /* Use AGP texturing */
-        glTexParameteri(VLCGL_TARGET, GL_TEXTURE_STORAGE_HINT_APPLE,
+        glTexParameteri(vgl->tex_target, GL_TEXTURE_STORAGE_HINT_APPLE,
                          GL_STORAGE_SHARED_APPLE);
 #endif
 #endif
 
         /* Call glTexImage2D only once, and use glTexSubImage2D later */
         if (vgl->buffer[i]) {
-            glTexImage2D(VLCGL_TARGET, 0, VLCGL_FORMAT, vgl->tex_width,
-                         vgl->tex_height, 0, VLCGL_FORMAT, VLCGL_TYPE,
+            glTexImage2D(vgl->tex_target, 0, vgl->tex_format, vgl->tex_width,
+                         vgl->tex_height, 0, vgl->tex_format, vgl->tex_type,
                          vgl->buffer[i]);
         }
     }
@@ -461,13 +436,13 @@ int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
 
 #ifdef MACOS_OPENGL
     /* Bind to the texture for drawing */
-    glBindTexture(VLCGL_TARGET, get_texture(picture));
+    glBindTexture(vgl->tex_target, get_texture(picture));
 #else
     /* Update the texture */
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0,
                     picture->p[0].i_pitch / vgl->chroma->pixel_size,
                     picture->p[0].i_lines,
-                    VLCGL_FORMAT, VLCGL_TYPE, picture->p[0].p_pixels);
+                    vgl->tex_format, vgl->tex_type, picture->p[0].p_pixels);
 #endif
 
     vlc_gl_Unlock(vgl->gl);
@@ -482,16 +457,15 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
 
     /* glTexCoord works differently with GL_TEXTURE_2D and
        GL_TEXTURE_RECTANGLE_EXT */
-#if VLCGL_TARGET == GL_TEXTURE_2D
-    const float f_normw = vgl->tex_width;
-    const float f_normh = vgl->tex_height;
-#elif defined (GL_TEXTURE_RECTANGLE_EXT) \
-   && (VLCGL_TARGET == GL_TEXTURE_RECTANGLE_EXT)
-    const float f_normw = 1.0;
-    const float f_normh = 1.0;
-#else
-# error Unknown texture type!
-#endif
+    float f_normw, f_normh;
+
+    if (vgl->tex_target == GL_TEXTURE_2D) {
+        f_normw = vgl->tex_width;
+        f_normh = vgl->tex_height;
+    } else {
+        f_normw = 1.0;
+        f_normh = 1.0;
+    }
 
     float f_x      = (source->i_x_offset +                       0 ) / f_normw;
     float f_y      = (source->i_y_offset +                       0 ) / f_normh;
@@ -507,7 +481,7 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
     if (vgl->program)
         glEnable(GL_FRAGMENT_PROGRAM_ARB);
     else
-        glEnable(VLCGL_TARGET);
+        glEnable(vgl->tex_target);
 
 #if USE_OPENGL_ES
     static const GLfloat vertexCoord[] = {
@@ -542,7 +516,7 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
     if (vgl->program)
         glDisable(GL_FRAGMENT_PROGRAM_ARB);
     else
-        glDisable(VLCGL_TARGET);
+        glDisable(vgl->tex_target);
 
     vlc_gl_Swap(vgl->gl);
 
