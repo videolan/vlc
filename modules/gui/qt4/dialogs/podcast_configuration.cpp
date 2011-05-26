@@ -72,8 +72,7 @@ void PodcastConfigDialog::accept()
     }
     config_PutPsz( p_intf, "podcast-urls", qtu( urls ) );
     vlc_object_t *p_obj = (vlc_object_t*)
-                          vlc_object_find_name( p_intf->p_libvlc,
-                                                "podcast", FIND_CHILD );
+                          vlc_object_find_name( p_intf->p_libvlc, "podcast" );
     if( p_obj )
     {
         var_SetString( p_obj, "podcast-urls", qtu( urls ) );

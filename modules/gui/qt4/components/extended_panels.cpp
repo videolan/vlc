@@ -109,8 +109,7 @@ ExtVideo::ExtVideo( intf_thread_t *_p_intf, QTabWidget *_parent ) :
     { \
         vlc_object_t *p_obj = ( vlc_object_t * ) \
             vlc_object_find_name( p_intf->p_libvlc, \
-                                  #widget, \
-                                  FIND_CHILD ); \
+                                  #widget ); \
         QCheckBox *checkbox = qobject_cast<QCheckBox*>( ui.widget##Enable ); \
         QGroupBox *groupbox = qobject_cast<QGroupBox*>( ui.widget##Enable ); \
         if( p_obj ) \
@@ -456,9 +455,7 @@ void ExtVideo::setWidgetValue( QObject *widget )
     //std::cout << "Option name: " << option.toStdString() << std::endl;
 
     vlc_object_t *p_obj = ( vlc_object_t * )
-        vlc_object_find_name( p_intf->p_libvlc,
-                              qtu( module ),
-                              FIND_CHILD );
+        vlc_object_find_name( p_intf->p_libvlc, qtu( module ) );
     int i_type;
     vlc_value_t val;
 
@@ -549,9 +546,7 @@ void ExtVideo::updateFilterOptions()
     //std::cout << "Option name: " << option.toStdString() << std::endl;
 
     vlc_object_t *p_obj = ( vlc_object_t * )
-        vlc_object_find_name( p_intf->p_libvlc,
-                              qtu( module ),
-                              FIND_CHILD );
+        vlc_object_find_name( p_intf->p_libvlc, qtu( module ) );
     int i_type;
     bool b_is_command;
     if( !p_obj )
@@ -686,7 +681,7 @@ void ExtV4l2::showEvent( QShowEvent *event )
 
 void ExtV4l2::Refresh( void )
 {
-    vlc_object_t *p_obj = (vlc_object_t*)vlc_object_find_name( pl_Get(p_intf), "v4l2", FIND_CHILD );
+    vlc_object_t *p_obj = (vlc_object_t*)vlc_object_find_name( pl_Get(p_intf), "v4l2" );
     help->hide();
     if( box )
     {
@@ -830,7 +825,7 @@ void ExtV4l2::ValueChange( bool value )
 void ExtV4l2::ValueChange( int value )
 {
     QObject *s = sender();
-    vlc_object_t *p_obj = (vlc_object_t*)vlc_object_find_name( pl_Get(p_intf), "v4l2", FIND_CHILD );
+    vlc_object_t *p_obj = (vlc_object_t*)vlc_object_find_name( pl_Get(p_intf), "v4l2" );
     if( p_obj )
     {
         char *psz_var = strdup( qtu( s->objectName() ) );
@@ -1734,7 +1729,7 @@ void SyncControls::subsdelaySetFactor( double f_factor )
     config_PutFloat( p_intf, SUBSDELAY_CFG_FACTOR, f_factor );
 
     /* Try to find an instance of subsdelay, and set its factor */
-    vlc_object_t *p_obj = ( vlc_object_t * ) vlc_object_find_name( p_intf->p_libvlc, "subsdelay", FIND_CHILD );
+    vlc_object_t *p_obj = ( vlc_object_t * ) vlc_object_find_name( p_intf->p_libvlc, "subsdelay" );
     if( p_obj )
     {
         var_SetFloat( p_obj, SUBSDELAY_CFG_FACTOR, f_factor );

@@ -1373,7 +1373,7 @@ int var_Command( vlc_object_t *p_this, const char *psz_name,
                  const char *psz_cmd, const char *psz_arg, char **psz_msg )
 {
     vlc_object_t *p_obj = vlc_object_find_name( p_this->p_libvlc,
-                                                psz_name, FIND_CHILD );
+                                                psz_name );
     int i_type, i_ret;
 
     if( !p_obj )

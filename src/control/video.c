@@ -609,7 +609,7 @@ static vlc_object_t *get_object( libvlc_media_player_t * p_mi,
 
     if( vout )
     {
-        object = vlc_object_find_name( vout, name, FIND_CHILD );
+        object = vlc_object_find_name( vout, name );
         vlc_object_release(vout);
     }
     else

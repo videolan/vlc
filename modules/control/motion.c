@@ -206,7 +206,7 @@ static void RunIntf( intf_thread_t *p_intf )
             {
                 /* TODO: cache object pointer */
                 vlc_object_t *p_obj =
-                vlc_object_find_name( p_intf->p_libvlc, "rotate", FIND_CHILD );
+                vlc_object_find_name( p_intf->p_libvlc, "rotate" );
                 if( p_obj )
                 {
                     var_SetInteger( p_obj, "rotate-deciangle",

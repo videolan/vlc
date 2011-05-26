@@ -40,10 +40,6 @@
 /* Please do not add new object types anyway */
 #define VLC_OBJECT_GENERIC     (-666)
 
-/* Object search mode */
-#define FIND_CHILD          0x0002
-#define FIND_ANYWHERE       0x0003
-
 /* Object flags */
 #define OBJECT_FLAGS_NODBG       0x0001
 #define OBJECT_FLAGS_QUIET       0x0002
@@ -62,7 +58,7 @@ struct vlc_object_t
  * Prototypes
  *****************************************************************************/
 VLC_API void *vlc_object_create( vlc_object_t *, size_t ) VLC_MALLOC VLC_USED;
-VLC_API vlc_object_t *vlc_object_find_name( vlc_object_t *, const char *, int ) VLC_USED VLC_DEPRECATED;
+VLC_API vlc_object_t *vlc_object_find_name( vlc_object_t *, const char * ) VLC_USED VLC_DEPRECATED;
 VLC_API void * vlc_object_hold( vlc_object_t * );
 VLC_API void vlc_object_release( vlc_object_t * );
 VLC_API vlc_list_t *vlc_list_children( vlc_object_t * ) VLC_USED;
@@ -74,8 +70,8 @@ VLC_API char *vlc_object_get_name( const vlc_object_t * ) VLC_USED;
 
 #define vlc_object_create(a,b) vlc_object_create( VLC_OBJECT(a), b )
 
-#define vlc_object_find_name(a,b,c) \
-    vlc_object_find_name( VLC_OBJECT(a),b,c)
+#define vlc_object_find_name(a,b) \
+    vlc_object_find_name( VLC_OBJECT(a),b)
 
 #define vlc_object_hold(a) \
     vlc_object_hold( VLC_OBJECT(a) )

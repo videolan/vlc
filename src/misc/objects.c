@@ -85,7 +85,7 @@
 static int  DumpCommand( vlc_object_t *, char const *,
                          vlc_value_t, vlc_value_t, void * );
 
-static vlc_object_t * FindChildName ( vlc_object_internals_t *, const char * );
+static vlc_object_t * FindName ( vlc_object_internals_t *, const char * );
 static void PrintObject( vlc_object_internals_t *, const char * );
 static void DumpStructure( vlc_object_internals_t *, unsigned, char * );
 
@@ -426,35 +426,21 @@ static int objnamecmp(const vlc_object_t *obj, const char *name)
  *
  * @param p_this object to search from
  * @param psz_name name of the object to search for
- * @param i_mode search direction: FIND_PARENT, FIND_CHILD or FIND_ANYWHERE.
  *
  * @return a matching object (must be released by the caller),
  * or NULL on error.
  */
-vlc_object_t *vlc_object_find_name( vlc_object_t *p_this,
-                                    const char *psz_name, int i_mode )
+vlc_object_t *vlc_object_find_name( vlc_object_t *p_this, const char *psz_name )
 {
     vlc_object_t *p_found;
 
     /* Reading psz_object_name from a separate inhibits thread-safety.
      * Use a libvlc address variable instead for that sort of things! */
-    msg_Warn( p_this, "%s(%s) is not safe!", __func__, psz_name );
-    /* If have the requested name ourselves, don't look further */
-    if( !objnamecmp(p_this, psz_name) )
-    {
-        vlc_object_hold( p_this );
-        return p_this;
-    }
+    msg_Err( p_this, "%s(\"%s\") is not safe!", __func__, psz_name );
 
-    /* Otherwise, recursively look for the object */
-    if (i_mode == FIND_ANYWHERE)
-        return vlc_object_find_name (VLC_OBJECT(p_this->p_libvlc), psz_name,
-                                     FIND_CHILD);
-
-    assert (i_mode == FIND_CHILD);
     libvlc_lock (p_this->p_libvlc);
     vlc_mutex_lock (&name_lock);
-    p_found = FindChildName (vlc_internals (p_this), psz_name);
+    p_found = FindName (vlc_internals (p_this), psz_name);
     vlc_mutex_unlock (&name_lock);
     libvlc_unlock (p_this->p_libvlc);
     return p_found;
@@ -512,7 +498,7 @@ void vlc_object_release( vlc_object_t *p_this )
 
     if( b_should_destroy )
     {
-        /* Detach from parent to protect against FIND_CHILDREN */
+        /* Detach from parent to protect against vlc_object_find_name() */
         parent = p_this->p_parent;
         if (likely(parent))
         {
@@ -654,7 +640,7 @@ static int DumpCommand( vlc_object_t *p_this, char const *psz_cmd,
     if( *newval.psz_string )
     {
         /* try using the object's name to find it */
-        p_object = vlc_object_find_name( p_data, newval.psz_string, FIND_CHILD );
+        p_object = vlc_object_find_name( p_data, newval.psz_string );
         if( !p_object )
             return VLC_ENOOBJ;
     }
@@ -713,15 +699,14 @@ void vlc_list_release( vlc_list_t *p_list )
 
 /* Following functions are local */
 
-static vlc_object_t *FindChildName (vlc_object_internals_t *priv,
-                                    const char *name)
+static vlc_object_t *FindName (vlc_object_internals_t *priv, const char *name)
 {
+    if (priv->psz_name != NULL && !strcmp (priv->psz_name, name))
+        return vlc_object_hold (vlc_externals (priv));
+
     for (priv = priv->first; priv != NULL; priv = priv->next)
     {
-        if (priv->psz_name && !strcmp (priv->psz_name, name))
-            return vlc_object_hold (vlc_externals (priv));
-
-        vlc_object_t *found = FindChildName (priv, name);
+        vlc_object_t *found = FindName (priv, name);
         if (found != NULL)
             return found;
     }
