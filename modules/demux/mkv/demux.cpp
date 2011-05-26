@@ -592,14 +592,17 @@ void demux_sys_t::InitUi()
     /* FIXME hack hack hack hack FIXME */
     /* Get p_input and create variable */
     p_input = demux_GetParentInput( &demuxer );
-    var_Create( p_input, "x-start", VLC_VAR_INTEGER );
-    var_Create( p_input, "y-start", VLC_VAR_INTEGER );
-    var_Create( p_input, "x-end", VLC_VAR_INTEGER );
-    var_Create( p_input, "y-end", VLC_VAR_INTEGER );
-    var_Create( p_input, "color", VLC_VAR_ADDRESS );
-    var_Create( p_input, "menu-palette", VLC_VAR_ADDRESS );
-    var_Create( p_input, "highlight", VLC_VAR_BOOL );
-    var_Create( p_input, "highlight-mutex", VLC_VAR_MUTEX );
+    if( p_input )
+    {
+        var_Create( p_input, "x-start", VLC_VAR_INTEGER );
+        var_Create( p_input, "y-start", VLC_VAR_INTEGER );
+        var_Create( p_input, "x-end", VLC_VAR_INTEGER );
+        var_Create( p_input, "y-end", VLC_VAR_INTEGER );
+        var_Create( p_input, "color", VLC_VAR_ADDRESS );
+        var_Create( p_input, "menu-palette", VLC_VAR_ADDRESS );
+        var_Create( p_input, "highlight", VLC_VAR_BOOL );
+        var_Create( p_input, "highlight-mutex", VLC_VAR_MUTEX );
+    }
 
     /* Now create our event thread catcher */
     p_ev = new event_thread_t(&demuxer);
@@ -610,16 +613,19 @@ void demux_sys_t::CleanUi()
     delete p_ev;
     p_ev = NULL;
 
-    var_Destroy( p_input, "highlight-mutex" );
-    var_Destroy( p_input, "highlight" );
-    var_Destroy( p_input, "x-start" );
-    var_Destroy( p_input, "x-end" );
-    var_Destroy( p_input, "y-start" );
-    var_Destroy( p_input, "y-end" );
-    var_Destroy( p_input, "color" );
-    var_Destroy( p_input, "menu-palette" );
+    if( p_input )
+    {
+        var_Destroy( p_input, "highlight-mutex" );
+        var_Destroy( p_input, "highlight" );
+        var_Destroy( p_input, "x-start" );
+        var_Destroy( p_input, "x-end" );
+        var_Destroy( p_input, "y-start" );
+        var_Destroy( p_input, "y-end" );
+        var_Destroy( p_input, "color" );
+        var_Destroy( p_input, "menu-palette" );
 
-    vlc_object_release( p_input );
+        vlc_object_release( p_input );
+    }
 
     msg_Dbg( &demuxer, "Stopping the UI Hook" );
 }
