@@ -173,9 +173,9 @@ void *vlc_custom_create (vlc_object_t *parent, size_t length,
         /* TODO: should be in src/libvlc.c */
         int canc = vlc_savecancel ();
         var_Create (obj, "tree", VLC_VAR_STRING | VLC_VAR_ISCOMMAND);
-        var_AddCallback (obj, "tree", DumpCommand, NULL);
+        var_AddCallback (obj, "tree", DumpCommand, obj);
         var_Create (obj, "vars", VLC_VAR_STRING | VLC_VAR_ISCOMMAND);
-        var_AddCallback (obj, "vars", DumpCommand, NULL);
+        var_AddCallback (obj, "vars", DumpCommand, obj);
         vlc_restorecancel (canc);
     }
 
@@ -648,18 +648,15 @@ static void DumpVariable (const void *data, const VISIT which, const int depth)
 static int DumpCommand( vlc_object_t *p_this, char const *psz_cmd,
                         vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
-    (void)oldval; (void)p_data;
+    (void)oldval;
     vlc_object_t *p_object = NULL;
 
     if( *newval.psz_string )
     {
         /* try using the object's name to find it */
-        p_object = vlc_object_find_name( p_this, newval.psz_string,
-                                         FIND_ANYWHERE );
+        p_object = vlc_object_find_name( p_data, newval.psz_string, FIND_CHILD );
         if( !p_object )
-        {
             return VLC_ENOOBJ;
-        }
     }
 
     libvlc_lock (p_this->p_libvlc);
