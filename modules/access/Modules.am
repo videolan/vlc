@@ -115,9 +115,9 @@ libvlc_LTLIBRARIES += $(LTLIBaccess_shm)
 
 libxcb_screen_plugin_la_SOURCES = screen/xcb.c
 libxcb_screen_plugin_la_CFLAGS = $(AM_CFLAGS) \
-	$(XCB_CFLAGS)
+	$(XCB_CFLAGS) $(XCB_COMPOSITE_CFLAGS)
 libxcb_screen_plugin_la_LIBADD = $(AM_LIBADD) \
-	$(XCB_LIBS)
+	$(XCB_LIBS) $(XCB_COMPOSITE_LIBS)
 libxcb_screen_plugin_la_DEPENDENCIES =
 if HAVE_XCB
 libvlc_LTLIBRARIES += libxcb_screen_plugin.la

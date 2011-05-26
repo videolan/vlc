@@ -26,6 +26,7 @@
 #include <stdarg.h>
 #include <assert.h>
 #include <xcb/xcb.h>
+#include <xcb/composite.h>
 #include <vlc_common.h>
 #include <vlc_demux.h>
 #include <vlc_plugin.h>
@@ -110,6 +111,7 @@ struct demux_sys_t
     mtime_t           pts, interval;
     float             rate;
     xcb_window_t      window;
+    xcb_pixmap_t      pixmap;
     int16_t           x, y;
     uint16_t          w, h;
     uint16_t          cur_w, cur_h;
@@ -176,11 +178,28 @@ static int Open (vlc_object_t *obj)
             goto error;
         }
         p_sys->window = ul;
+
+        xcb_composite_query_version_reply_t *r =
+            xcb_composite_query_version_reply (conn,
+                xcb_composite_query_version (conn, 0, 4), NULL);
+        if (r == NULL || r->minor_version < 2)
+        {
+            msg_Err (obj, "X Composite extension not available");
+            free (r);
+            goto error;
+        }
+        msg_Dbg (obj, "using Composite extension v%"PRIu32".%"PRIu32,
+                 r->major_version, r->minor_version);
+        free (r);
+
+        xcb_composite_redirect_window (conn, p_sys->window,
+                                       XCB_COMPOSITE_REDIRECT_AUTOMATIC);
     }
     else
         goto error;
 
     /* Window properties */
+    p_sys->pixmap = xcb_generate_id (conn);
     p_sys->x = var_InheritInteger (obj, "screen-left");
     p_sys->y = var_InheritInteger (obj, "screen-top");
     p_sys->w = var_InheritInteger (obj, "screen-width");
@@ -291,55 +310,38 @@ static int Control (demux_t *demux, int query, va_list args)
 static void Demux (void *data)
 {
     demux_t *demux = data;
-    demux_sys_t *p_sys = demux->p_sys;
-    xcb_connection_t *conn = p_sys->conn;
+    demux_sys_t *sys = demux->p_sys;
+    xcb_connection_t *conn = sys->conn;
 
-    /* Update capture region (if needed) */
+    /* Determine capture region */
+    xcb_get_geometry_cookie_t gc;
+    xcb_query_pointer_cookie_t qc;
 
-    xcb_get_geometry_reply_t *geo =
-        xcb_get_geometry_reply (conn,
-            xcb_get_geometry (conn, p_sys->window), NULL);
+    gc = xcb_get_geometry (conn, sys->window);
+    if (sys->follow_mouse)
+        qc = xcb_query_pointer (conn, sys->window);
+
+    xcb_get_geometry_reply_t *geo = xcb_get_geometry_reply (conn, gc, NULL);
     if (geo == NULL)
     {
-        msg_Err (demux, "bad X11 drawable 0x%08"PRIx32, p_sys->window);
+        msg_Err (demux, "bad X11 drawable 0x%08"PRIx32, sys->window);
+        if (sys->follow_mouse)
+            xcb_discard_reply (conn, gc.sequence);
         return;
     }
 
-    xcb_window_t root = geo->root;
-    int16_t x = p_sys->x, y = p_sys->y;
-    xcb_translate_coordinates_cookie_t tc;
-    xcb_query_pointer_cookie_t qc;
+    /* FIXME: review for signed overflow */
+    int16_t x = sys->x, y = sys->y;
+    uint16_t w = sys->w, h = sys->h;
 
-    if (p_sys->window != root)
-        tc = xcb_translate_coordinates (conn, p_sys->window, root,
-                                        x, y);
-    if (p_sys->follow_mouse)
-        qc = xcb_query_pointer (conn, p_sys->window);
-
-    uint16_t ow = geo->width - x;
-    uint16_t oh = geo->height - y;
-    uint16_t w = p_sys->w;
-    uint16_t h = p_sys->h;
+    uint16_t ow = geo->width - sys->x;
+    uint16_t oh = geo->height - sys->y;
     if (w == 0 || w > ow)
         w = ow;
     if (h == 0 || h > oh)
         h = oh;
-    uint8_t depth = geo->depth;
-    free (geo);
 
-    if (p_sys->window != root)
-    {
-        xcb_translate_coordinates_reply_t *coords =
-             xcb_translate_coordinates_reply (conn, tc, NULL);
-        if (coords != NULL)
-        {
-            x = coords->dst_x;
-            y = coords->dst_y;
-            free (coords);
-        }
-    }
-
-    if (p_sys->follow_mouse)
+    if (sys->follow_mouse)
     {
         xcb_query_pointer_reply_t *ptr =
             xcb_query_pointer_reply (conn, qc, NULL);
@@ -365,42 +367,59 @@ static void Demux (void *data)
         }
     }
 
+    /* Update elementary stream format (if needed) */
+    if (w != sys->cur_w || h != sys->cur_h)
+    {
+        if (sys->es != NULL)
+            es_out_Del (demux->out, sys->es);
+
+        /* Update composite pixmap */
+        if (sys->window != geo->root)
+        {
+            xcb_free_pixmap (conn, sys->pixmap); /* no-op first time */
+            xcb_composite_name_window_pixmap (conn, sys->window, sys->pixmap);
+            xcb_create_pixmap (conn, geo->depth, sys->pixmap,
+                               geo->root, geo->width, geo->height);
+        }
+
+        sys->es = InitES (demux, w, h, geo->depth);
+        if (sys->es != NULL)
+        {
+            sys->cur_w = w;
+            sys->cur_h = h;
+        }
+    }
+
     /* Capture screen */
+    xcb_drawable_t drawable =
+        (sys->window != geo->root) ? sys->pixmap : sys->window;
+    free (geo);
+
     xcb_get_image_reply_t *img;
     img = xcb_get_image_reply (conn,
-        xcb_get_image (conn, XCB_IMAGE_FORMAT_Z_PIXMAP, root,
+        xcb_get_image (conn, XCB_IMAGE_FORMAT_Z_PIXMAP, drawable,
                        x, y, w, h, ~0), NULL);
     if (img == NULL)
+    {
+        msg_Err (demux, "NO IMAGE");
         return;
+    }
 
     block_t *block = block_heap_Alloc (img, xcb_get_image_data (img),
                                        xcb_get_image_data_length (img));
     if (block == NULL)
         return;
 
-    /* Update elementary stream format (if needed) */
-    if (w != p_sys->cur_w || h != p_sys->cur_h)
-    {
-        if (p_sys->es != NULL)
-            es_out_Del (demux->out, p_sys->es);
-        p_sys->es = InitES (demux, w, h, depth);
-        if (p_sys->es != NULL)
-        {
-            p_sys->cur_w = w;
-            p_sys->cur_h = h;
-        }
-    }
-
     /* Send block - zero copy */
-    if (p_sys->es != NULL)
+    if (sys->es != NULL)
     {
-        if (p_sys->pts == VLC_TS_INVALID)
-            p_sys->pts = mdate ();
-        block->i_pts = block->i_dts = p_sys->pts;
+        if (sys->pts == VLC_TS_INVALID)
+            sys->pts = mdate ();
+        block->i_pts = block->i_dts = sys->pts;
 
-        es_out_Control (demux->out, ES_OUT_SET_PCR, p_sys->pts);
-        es_out_Send (demux->out, p_sys->es, block);
-        p_sys->pts += p_sys->interval;
+        es_out_Control (demux->out, ES_OUT_SET_PCR, sys->pts);
+        es_out_Send (demux->out, sys->es, block);
+        sys->pts += sys->interval;
     }
 }
 
