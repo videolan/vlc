@@ -149,7 +149,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
                                 vgl->MultiTexCoord2fARB;
     }
 
-    /* Find the chroma we will use and update fmt */
+    /* Initialize with default chroma */
     vgl->fmt = *fmt;
 #if USE_OPENGL_ES
     vgl->fmt.i_chroma = VLC_CODEC_RGB16;
@@ -189,6 +189,24 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     vgl->tex_format   = GL_RGBA;
     vgl->tex_type     = GL_UNSIGNED_BYTE;
 #endif
+    /* Use YUV if possible and needed */
+    bool need_fs_yuv = false;
+    if (supports_fp && supports_multitexture &&
+        vlc_fourcc_IsYUV(fmt->i_chroma) && !vlc_fourcc_IsYUV(vgl->fmt.i_chroma)) {
+        const vlc_fourcc_t *list = vlc_fourcc_GetYUVFallback(fmt->i_chroma);
+        while (*list) {
+            const vlc_chroma_description_t *dsc = vlc_fourcc_GetChromaDescription(*list);
+            if (dsc && dsc->plane_count == 3 && dsc->pixel_size == 1) {
+                need_fs_yuv       = true;
+                vgl->fmt          = *fmt;
+                vgl->fmt.i_chroma = *list;
+                vgl->tex_format   = GL_LUMINANCE;
+                vgl->tex_type     = GL_UNSIGNED_BYTE;
+                break;
+            }
+            list++;
+        }
+    }
 
     vgl->chroma = vlc_fourcc_GetChromaDescription(vgl->fmt.i_chroma);
 
@@ -224,6 +242,56 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     vgl->program = 0;
     if (supports_fp) {
         char *code = NULL;
+
+        if (need_fs_yuv) {
+            /* [R/G/B][Y U V O] from TV range to full range
+             * XXX we could also do hue/brightness/constrast/gamma
+             * by simply changing the coefficients
+             */
+            const float matrix_bt601_tv2full[3][4] = {
+                { 1.1640,  0.0000,  1.4030, -0.7773 },
+                { 1.1640, -0.3440, -0.7140,  0.4580 },
+                { 1.1640,  1.7730,  0.0000, -0.9630 },
+            };
+            const float matrix_bt709_tv2full[3][4] = {
+                { 1.1640,  0.0000,  1.5701, -0.8612 },
+                { 1.1640, -0.1870, -0.4664,  0.2549 },
+                { 1.1640,  1.8556,  0.0000, -1.0045 },
+            };
+            const float (*matrix)[4] = fmt->i_height > 576 ? matrix_bt709_tv2full
+                                                           : matrix_bt601_tv2full;
+
+            /* Basic linear YUV -> RGB conversion using bilinear interpolation */
+            const char *template_yuv =
+                "!!ARBfp1.0"
+                "OPTION ARB_precision_hint_fastest;"
+
+                "TEMP src;"
+                "TEX src.x,  fragment.texcoord[0], texture[0], 2D;"
+                "TEX src.%c, fragment.texcoord[1], texture[1], 2D;"
+                "TEX src.%c, fragment.texcoord[2], texture[2], 2D;"
+
+                "PARAM muly   = { %f, %f, %f };"
+                "PARAM mulu   = { %f, %f, %f };"
+                "PARAM mulv   = { %f, %f, %f };"
+                "PARAM offset = { %f, %f, %f };"
+
+                "TEMP tmp;"
+                "MAD  tmp.rgb,          src.xxxx, muly, offset;"
+                "MAD  tmp.rgb,          src.yyyy, mulu, tmp;"
+                "MAD  result.color.rgb, src.zzzz, mulv, tmp;"
+                "END";
+            bool swap_uv = vgl->fmt.i_chroma == VLC_CODEC_YV12 ||
+                           vgl->fmt.i_chroma == VLC_CODEC_YV9;
+            if (asprintf(&code, template_yuv,
+                         swap_uv ? 'z' : 'y',
+                         swap_uv ? 'y' : 'z',
+                         matrix[0][0], matrix[1][0], matrix[2][0],
+                         matrix[0][1], matrix[1][1], matrix[2][1],
+                         matrix[0][2], matrix[1][2], matrix[2][2],
+                         matrix[0][3], matrix[1][3], matrix[2][3]) < 0)
+                code = NULL;
+        }
         if (code) {
             vgl->GenProgramsARB(1, &vgl->program);
             vgl->BindProgramARB(GL_FRAGMENT_PROGRAM_ARB, vgl->program);
@@ -232,7 +300,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
                                   strlen(code), (const GLbyte*)code);
             if (glGetError() == GL_INVALID_OPERATION) {
                 /* FIXME if the program was needed for YUV, the video will be broken */
-#if 1
+#if 0
                 GLint position;
                 glGetIntegerv(GL_PROGRAM_ERROR_POSITION_ARB, &position);
 
