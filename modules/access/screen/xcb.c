@@ -104,6 +104,7 @@ static es_out_id_t *InitES (demux_t *, uint_fast16_t, uint_fast16_t,
 
 struct demux_sys_t
 {
+    /* All owned by timer thread while timer is armed: */
     xcb_connection_t *conn;
     es_out_id_t      *es;
     mtime_t           pts, interval;
@@ -113,8 +114,6 @@ struct demux_sys_t
     uint16_t          w, h;
     uint16_t          cur_w, cur_h;
     bool              follow_mouse;
-    /* fmt, es and pts are protected by the lock. The rest is read-only. */
-    vlc_mutex_t       lock;
     /* Timer does not use this, only input thread: */
     vlc_timer_t       timer;
 };
@@ -201,7 +200,6 @@ static int Open (vlc_object_t *obj)
     p_sys->cur_h = 0;
     p_sys->es = NULL;
     p_sys->pts = VLC_TS_INVALID;
-    vlc_mutex_init (&p_sys->lock);
     if (vlc_timer_create (&p_sys->timer, Demux, demux))
         goto error;
     vlc_timer_schedule (p_sys->timer, false, 1, p_sys->interval);
@@ -227,7 +225,6 @@ static void Close (vlc_object_t *obj)
     demux_sys_t *p_sys = demux->p_sys;
 
     vlc_timer_destroy (p_sys->timer);
-    vlc_mutex_destroy (&p_sys->lock);
     xcb_disconnect (p_sys->conn);
     free (p_sys);
 }
@@ -238,8 +235,6 @@ static void Close (vlc_object_t *obj)
  */
 static int Control (demux_t *demux, int query, va_list args)
 {
-    demux_sys_t *p_sys = demux->p_sys;
-
     switch (query)
     {
         case DEMUX_GET_POSITION:
@@ -266,29 +261,13 @@ static int Control (demux_t *demux, int query, va_list args)
             return VLC_SUCCESS;
         }
 
-        case DEMUX_CAN_PAUSE:
         {
             bool *v = (bool*)va_arg( args, bool * );
-            *v = true;
+            *v = false;
             return VLC_SUCCESS;
         }
 
-        case DEMUX_SET_PAUSE_STATE:
-        {
-            bool pausing = va_arg (args, int);
-
-            if (!pausing)
-            {
-                vlc_mutex_lock (&p_sys->lock);
-                p_sys->pts = VLC_TS_INVALID;
-                es_out_Control (demux->out, ES_OUT_RESET_PCR);
-                vlc_mutex_unlock (&p_sys->lock);
-            }
-            vlc_timer_schedule (p_sys->timer, false,
-                                pausing ? 0 : 1, p_sys->interval);
-            return VLC_SUCCESS;
-        }
-
+        case DEMUX_CAN_PAUSE:
         case DEMUX_CAN_CONTROL_PACE:
         case DEMUX_CAN_CONTROL_RATE:
         case DEMUX_CAN_SEEK:
@@ -297,6 +276,9 @@ static int Control (demux_t *demux, int query, va_list args)
             *v = false;
             return VLC_SUCCESS;
         }
+
+        case DEMUX_SET_PAUSE_STATE:
+            return VLC_SUCCESS; /* should not happen */
     }
 
     return VLC_EGENERIC;
@@ -396,7 +378,6 @@ static void Demux (void *data)
         return;
 
     /* Update elementary stream format (if needed) */
-    vlc_mutex_lock (&p_sys->lock);
     if (w != p_sys->cur_w || h != p_sys->cur_h)
     {
         if (p_sys->es != NULL)
@@ -420,7 +401,6 @@ static void Demux (void *data)
         es_out_Send (demux->out, p_sys->es, block);
         p_sys->pts += p_sys->interval;
     }
-    vlc_mutex_unlock (&p_sys->lock);
 }
 
 static es_out_id_t *InitES (demux_t *demux, uint_fast16_t width,
