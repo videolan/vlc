@@ -361,6 +361,7 @@ static void Demux (void *data)
                 y += oh - h;
             else if (ptr->root_y > min_y)
                 y += ptr->root_y - min_y;
+            free (ptr);
         }
     }
 
