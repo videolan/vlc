@@ -222,16 +222,7 @@ object.input(): Get the current input object.
 object.playlist(): Get the playlist object.
 object.libvlc(): Get the libvlc object.
 
-object.find( object, type, mode ): Find an object of given type. mode can
-  be "child" and "anywhere". If set to "child" it will look in "object"'s
-  children. If set to "anywhere", it will look in all the objects. If
-  object is unset, the current module's object will be used.
-  Type can be: "libvlc", "playlist", "input", "decoder",
-  "vout", "aout", "packetizer", "generic".
-  This function is deprecated and slow and should be avoided.
-object.find_name( object, name, mode ): Same as above except that it matches
-  on the object's name and not type. This function is also slow and should
-  be avoided if possible.
+object.find( object, type, mode ): Return nil. DO NOT USE.
 
 OSD
 ---
