@@ -330,7 +330,7 @@ static void PictureUnlock(picture_t *picture)
 }
 #endif
 
-picture_pool_t *vout_display_opengl_GetPool(vout_display_opengl_t *vgl)
+picture_pool_t *vout_display_opengl_GetPool(vout_display_opengl_t *vgl, unsigned requested_count)
 {
     if (vgl->pool)
         return vgl->pool;

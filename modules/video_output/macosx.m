@@ -255,10 +255,9 @@ void Close(vlc_object_t *this)
 static picture_pool_t *Pool(vout_display_t *vd, unsigned requested_count)
 {
     vout_display_sys_t *sys = vd->sys;
-    VLC_UNUSED(requested_count);
 
     if (!sys->pool)
-        sys->pool = vout_display_opengl_GetPool (sys->vgl);
+        sys->pool = vout_display_opengl_GetPool (sys->vgl, requested_count);
     assert(sys->pool);
     return sys->pool;
 }
