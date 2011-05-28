@@ -573,7 +573,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
 
                     /* We need to resolve relative paths in this instance */
                     char *psz_mrl = make_URI( ppsz_argv[i_input], NULL );
-                    char *psz_after_track = "/";
+                    const char *psz_after_track = "/";
 
                     if( psz_mrl == NULL )
                         continue;
