@@ -1245,8 +1245,8 @@ static const char *const ppsz_albumart_descriptions[] =
 
 #define SD_TEXT N_( "Services discovery modules")
 #define SD_LONGTEXT N_( \
-     "Specifies the services discovery modules to load, separated by " \
-     "colons. Typical values are sap, hal, ..." )
+     "Specifies the services discovery modules to preload, separated by " \
+     "colons. Typical value is \"sap\"." )
 
 #define RANDOM_TEXT N_("Play files randomly forever")
 #define RANDOM_LONGTEXT N_( \
@@ -2118,8 +2118,7 @@ vlc_module_begin ()
                              ppsz_albumart_descriptions )
 
     set_subcategory( SUBCAT_PLAYLIST_SD )
-    add_module_list_cat( "services-discovery", SUBCAT_PLAYLIST_SD, NULL,
-                         SD_TEXT, SD_LONGTEXT, false )
+    add_string( "services-discovery", "", SD_TEXT, SD_LONGTEXT, true )
         change_short('S')
 
 /* Interface options */
