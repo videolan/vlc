@@ -109,6 +109,14 @@ struct vout_display_opengl_t {
     void       *buffer_base[VLCGL_TEXTURE_COUNT];
 
     picture_pool_t *pool;
+
+    GLuint     program;
+
+    /* fragment_program */
+    void (*GenProgramsARB)(GLuint, GLuint *);
+    void (*BindProgramARB)(GLuint, GLuint);
+    void (*ProgramStringARB)(GLuint, GLuint, GLint, const GLbyte *);
+    void (*DeleteProgramsARB)(GLuint, GLuint *);
 };
 
 static inline int GetAlignedSize(unsigned size)
@@ -121,7 +129,7 @@ static inline int GetAlignedSize(unsigned size)
 vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
                                                vlc_gl_t *gl)
 {
-    vout_display_opengl_t *vgl = malloc(sizeof(*vgl));
+    vout_display_opengl_t *vgl = calloc(1, sizeof(*vgl));
     if (!vgl)
         return NULL;
 
@@ -134,6 +142,20 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     const char *extensions = (const char *)glGetString(GL_EXTENSIONS);
     if (!extensions)
         extensions = "";
+
+    /* Load extensions */
+    bool supports_fp = false;
+    if (strstr(extensions, "GL_ARB_fragment_program")) {
+        vgl->GenProgramsARB    = (void (*)(GLuint, GLuint *))vlc_gl_GetProcAddress(vgl->gl, "glGenProgramsARB");
+        vgl->BindProgramARB    = (void (*)(GLuint, GLuint))vlc_gl_GetProcAddress(vgl->gl, "glBindProgramARB");
+        vgl->ProgramStringARB  = (void (*)(GLuint, GLuint, GLint, const GLbyte *))vlc_gl_GetProcAddress(vgl->gl, "glProgramStringARB");
+        vgl->DeleteProgramsARB = (void (*)(GLuint, GLuint *))vlc_gl_GetProcAddress(vgl->gl, "glDeleteProgramsARB");
+
+        supports_fp = vgl->GenProgramsARB &&
+                      vgl->BindProgramARB &&
+                      vgl->ProgramStringARB &&
+                      vgl->DeleteProgramsARB;
+    }
 
     /* Find the chroma we will use and update fmt */
     vgl->fmt = *fmt;
@@ -202,6 +224,32 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
         vgl->tex_height = GetAlignedSize(vgl->fmt.i_height);
     }
 
+    /* Build fragment program if needed */
+    vgl->program = 0;
+    if (supports_fp) {
+        char *code = NULL;
+        if (code) {
+            vgl->GenProgramsARB(1, &vgl->program);
+            vgl->BindProgramARB(GL_FRAGMENT_PROGRAM_ARB, vgl->program);
+            vgl->ProgramStringARB(GL_FRAGMENT_PROGRAM_ARB,
+                                  GL_PROGRAM_FORMAT_ASCII_ARB,
+                                  strlen(code), (const GLbyte*)code);
+            if (glGetError() == GL_INVALID_OPERATION) {
+                /* FIXME if the program was needed for YUV, the video will be broken */
+#if 1
+                GLint position;
+                glGetIntegerv(GL_PROGRAM_ERROR_POSITION_ARB, &position);
+
+                const char *msg = (const char *)glGetString(GL_PROGRAM_ERROR_STRING_ARB);
+                fprintf(stderr, "GL_INVALID_OPERATION: error at %d: %s\n", position, msg);
+#endif
+                vgl->DeleteProgramsARB(1, &vgl->program);
+                vgl->program = 0;
+            }
+            free(code);
+        }
+    }
+
     /* */
     glDisable(GL_BLEND);
     glDisable(GL_DEPTH_TEST);
@@ -232,6 +280,9 @@ void vout_display_opengl_Delete(vout_display_opengl_t *vgl)
         glFinish();
         glFlush();
         glDeleteTextures(VLCGL_TEXTURE_COUNT, vgl->texture);
+
+        if (vgl->program)
+            vgl->DeleteProgramsARB(1, &vgl->program);
 
         vlc_gl_Unlock(vgl->gl);
     }
@@ -453,7 +504,10 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
 
     glClear(GL_COLOR_BUFFER_BIT);
 
-    glEnable(VLCGL_TARGET);
+    if (vgl->program)
+        glEnable(GL_FRAGMENT_PROGRAM_ARB);
+    else
+        glEnable(VLCGL_TARGET);
 
 #if USE_OPENGL_ES
     static const GLfloat vertexCoord[] = {
@@ -485,7 +539,10 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
     glEnd();
 #endif
 
-    glDisable(VLCGL_TARGET);
+    if (vgl->program)
+        glDisable(GL_FRAGMENT_PROGRAM_ARB);
+    else
+        glDisable(VLCGL_TARGET);
 
     vlc_gl_Swap(vgl->gl);
 
