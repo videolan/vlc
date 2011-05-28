@@ -280,12 +280,6 @@ static int Control (demux_t *demux, int query, va_list args)
             return VLC_SUCCESS;
         }
 
-        {
-            bool *v = (bool*)va_arg( args, bool * );
-            *v = false;
-            return VLC_SUCCESS;
-        }
-
         case DEMUX_CAN_PAUSE:
         case DEMUX_CAN_CONTROL_PACE:
         case DEMUX_CAN_CONTROL_RATE:
