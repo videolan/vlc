@@ -64,10 +64,13 @@
 
 #if USE_OPENGL_ES
 #   define VLCGL_TEXTURE_COUNT 1
+#   define VLCGL_PICTURE_MAX 1
 #elif defined(MACOS_OPENGL)
 #   define VLCGL_TEXTURE_COUNT 2
+#   define VLCGL_PICTURE_MAX 2
 #else
 #   define VLCGL_TEXTURE_COUNT 1
+#   define VLCGL_PICTURE_MAX 128
 #endif
 
 struct vout_display_opengl_t {
@@ -84,8 +87,6 @@ struct vout_display_opengl_t {
     int        tex_height[PICTURE_PLANE_MAX];
 
     GLuint     texture[VLCGL_TEXTURE_COUNT][PICTURE_PLANE_MAX];
-    uint8_t    *buffer[VLCGL_TEXTURE_COUNT][PICTURE_PLANE_MAX];
-    void       *buffer_base[VLCGL_TEXTURE_COUNT][PICTURE_PLANE_MAX];
 
     picture_pool_t *pool;
 
@@ -257,11 +258,8 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
 
     /* */
     for (int i = 0; i < VLCGL_TEXTURE_COUNT; i++) {
-        for (int j = 0; j < PICTURE_PLANE_MAX; j++) {
-            vgl->texture[i][j]     = 0;
-            vgl->buffer[i][j]      = NULL;
-            vgl->buffer_base[i][j] = NULL;
-        }
+        for (int j = 0; j < PICTURE_PLANE_MAX; j++)
+            vgl->texture[i][j] = 0;
     }
     vgl->pool = NULL;
 
@@ -284,13 +282,8 @@ void vout_display_opengl_Delete(vout_display_opengl_t *vgl)
 
         vlc_gl_Unlock(vgl->gl);
     }
-    if (vgl->pool) {
+    if (vgl->pool)
         picture_pool_Delete(vgl->pool);
-        for (int i = 0; i < VLCGL_TEXTURE_COUNT; i++) {
-            for (int j = 0; j < PICTURE_PLANE_MAX; j++)
-                free(vgl->buffer_base[i][j]);
-        }
-    }
     free(vgl);
 }
 
@@ -314,9 +307,8 @@ static int PictureLock(picture_t *picture)
     vout_display_opengl_t *vgl = picture->p_sys->vgl;
     if (!vlc_gl_Lock(vgl->gl)) {
         glBindTexture(vgl->tex_target, PictureGetTexture(picture));
-        glTexSubImage2D(vgl->tex_target, 0, 0, 0,
-                        picture->p[0].i_pitch / vgl->chroma->pixel_size,
-                        picture->p[0].i_lines,
+        glTexSubImage2D(vgl->tex_target, 0,
+                        0, 0, vgl->fmt.i_width, vgl->fmt.i_height,
                         vgl->tex_format, vgl->tex_type, picture->p[0].p_pixels);
 
         vlc_gl_Unlock(vgl->gl);
@@ -335,53 +327,40 @@ picture_pool_t *vout_display_opengl_GetPool(vout_display_opengl_t *vgl, unsigned
     if (vgl->pool)
         return vgl->pool;
 
-    picture_t *picture[VLCGL_TEXTURE_COUNT] = {NULL, };
+    /* Allocate our pictures */
+    picture_t *picture[VLCGL_PICTURE_MAX] = {NULL, };
+    unsigned count = 0;
 
-    for (int i = 0; i < VLCGL_TEXTURE_COUNT; i++) {
-        picture_resource_t rsc;
-        memset(&rsc, 0, sizeof(rsc));
+    for (count = 0; count < __MIN(VLCGL_PICTURE_MAX, requested_count); count++) {
+        picture[count] = picture_NewFromFormat(&vgl->fmt);
+        if (!picture[count])
+            break;
+
 #ifdef MACOS_OPENGL
-        rsc.p_sys = malloc(sizeof(*rsc.p_sys));
-        if (rsc.p_sys)
-        {
-            rsc.p_sys->vgl = vgl;
-            rsc.p_sys->texture = vgl->texture[i];
+        picture_sys_t *sys = picture[count]->p_sys = malloc(sizeof(*sys));
+        if (sys) {
+            sys->vgl = vgl;
+            sys->texture = vgl->texture[count];
         }
 #endif
-
-        unsigned j;
-        for (j = 0; j < vgl->chroma->plane_count; j++) {
-            vgl->buffer[i][j] = vlc_memalign(&vgl->buffer_base[i][j], 16,
-                                             vgl->tex_width[j] *
-                                             vgl->tex_height[j] *
-                                             vgl->chroma->pixel_size);
-            if (!vgl->buffer[i][j])
-                break;
-
-            rsc.p[j].p_pixels = vgl->buffer[i][j];
-            rsc.p[j].i_pitch  = vgl->tex_width[j] * vgl->chroma->pixel_size;
-            rsc.p[j].i_lines  = vgl->tex_height[j];
-        }
-        if (j < vgl->chroma->plane_count)
-            goto error;
-        picture[i] = picture_NewFromResource(&vgl->fmt, &rsc);
-        if (!picture[i])
-            goto error;
     }
+    if (count <= 0)
+        return NULL;
 
-    /* */
+    /* Wrap the pictures into a pool */
     picture_pool_configuration_t cfg;
     memset(&cfg, 0, sizeof(cfg));
-    cfg.picture_count = VLCGL_TEXTURE_COUNT;
-    cfg.picture = picture;
+    cfg.picture_count = count;
+    cfg.picture       = picture;
 #ifdef MACOS_OPENGL
-    cfg.lock = PictureLock;
-    cfg.unlock = PictureUnlock;
+    cfg.lock          = PictureLock;
+    cfg.unlock        = PictureUnlock;
 #endif
     vgl->pool = picture_pool_NewExtended(&cfg);
     if (!vgl->pool)
         goto error;
 
+    /* Allocates our textures */
     if (vlc_gl_Lock(vgl->gl))
         return vgl->pool;
 
@@ -421,11 +400,9 @@ picture_pool_t *vout_display_opengl_GetPool(vout_display_opengl_t *vgl, unsigned
 #endif
 
             /* Call glTexImage2D only once, and use glTexSubImage2D later */
-            if (vgl->buffer[i][j]) {
-                glTexImage2D(vgl->tex_target, 0,
-                             vgl->tex_format, vgl->tex_width[j], vgl->tex_height[j],
-                             0, vgl->tex_format, vgl->tex_type, vgl->buffer[i][j]);
-            }
+            glTexImage2D(vgl->tex_target, 0,
+                         vgl->tex_format, vgl->tex_width[j], vgl->tex_height[j],
+                         0, vgl->tex_format, vgl->tex_type, NULL);
         }
     }
 
@@ -434,10 +411,8 @@ picture_pool_t *vout_display_opengl_GetPool(vout_display_opengl_t *vgl, unsigned
     return vgl->pool;
 
 error:
-    for (int i = 0; i < VLCGL_TEXTURE_COUNT; i++) {
-        if (picture[i])
-            picture_Delete(picture[i]);
-    }
+    for (unsigned i = 0; i < count; i++)
+        picture_Delete(picture[i]);
     return NULL;
 }
 
@@ -471,9 +446,11 @@ int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
     for (unsigned j = 0; j < vgl->chroma->plane_count; j++) {
         if (vgl->chroma->plane_count > 1)
             vgl->ActiveTextureARB(GL_TEXTURE0_ARB + j);
-        glTexSubImage2D(vgl->tex_target, 0, 0, 0,
-                        picture->p[j].i_pitch / vgl->chroma->pixel_size,
-                        picture->p[j].i_lines,
+        glPixelStorei(GL_UNPACK_ROW_LENGTH, picture->p[j].i_pitch / picture->p[j].i_pixel_pitch);
+        glTexSubImage2D(vgl->tex_target, 0,
+                        0, 0,
+                        vgl->fmt.i_width  * vgl->chroma->p[j].w.num / vgl->chroma->p[j].w.den,
+                        vgl->fmt.i_height * vgl->chroma->p[j].h.num / vgl->chroma->p[j].h.den,
                         vgl->tex_format, vgl->tex_type, picture->p[j].p_pixels);
     }
 #endif
