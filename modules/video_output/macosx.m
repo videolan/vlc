@@ -267,8 +267,7 @@ static void PictureRender(vout_display_t *vd, picture_t *pic, subpicture_t *subp
 
     vout_display_sys_t *sys = vd->sys;
 
-    vout_display_opengl_Prepare( sys->vgl, pic );
-	(void)subpicture;
+    vout_display_opengl_Prepare( sys->vgl, pic, subpicture );
 }
 
 static void PictureDisplay(vout_display_t *vd, picture_t *pic, subpicture_t *subpicture)

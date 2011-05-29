@@ -485,7 +485,7 @@ error:
 }
 
 int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
-                                picture_t *picture)
+                                picture_t *picture, subpicture_t *subpicture)
 {
     /* On Win32/GLX, we do this the usual way:
        + Fill the buffer with new content,
@@ -524,6 +524,7 @@ int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
 #endif
 
     vlc_gl_Unlock(vgl->gl);
+    VLC_UNUSED(subpicture);
     return VLC_SUCCESS;
 }
 

@@ -180,8 +180,7 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
 {
     vout_display_sys_t *sys = vd->sys;
 
-    vout_display_opengl_Prepare(sys->vgl, picture);
-    VLC_UNUSED(subpicture);
+    vout_display_opengl_Prepare(sys->vgl, picture, subpicture);
 }
 
 static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpicture)
