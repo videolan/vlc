@@ -535,6 +535,7 @@ static int Control (vout_display_t *vd, int query, va_list ap)
     case VOUT_DISPLAY_HIDE_MOUSE:
         xcb_change_window_attributes (sys->conn, sys->embed->handle.xid,
                                   XCB_CW_CURSOR, &(uint32_t){ sys->cursor });
+        xcb_flush (sys->conn);
         return VLC_SUCCESS;
 
     default:

@@ -553,10 +553,14 @@ static int Control (vout_display_t *vd, int query, va_list ap)
     /* Hide the mouse. It will be send when
      * vout_display_t::info.b_hide_mouse is false */
     case VOUT_DISPLAY_HIDE_MOUSE:
-        xcb_change_window_attributes (XGetXCBConnection (sys->display),
-                                      sys->embed->handle.xid,
+    {
+        xcb_connection_t *conn = XGetXCBConnection (sys->display);
+
+        xcb_change_window_attributes (conn, sys->embed->handle.xid,
                                     XCB_CW_CURSOR, &(uint32_t){ sys->cursor });
+        xcb_flush (conn);
         return VLC_SUCCESS;
+    }
 
     case VOUT_DISPLAY_GET_OPENGL:
     {

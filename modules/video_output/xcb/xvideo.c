@@ -797,6 +797,7 @@ static int Control (vout_display_t *vd, int query, va_list ap)
     case VOUT_DISPLAY_HIDE_MOUSE:
         xcb_change_window_attributes (p_sys->conn, p_sys->embed->handle.xid,
                                   XCB_CW_CURSOR, &(uint32_t){ p_sys->cursor });
+        xcb_flush (p_sys->conn);
         return VLC_SUCCESS;
     case VOUT_DISPLAY_RESET_PICTURES:
         assert(0);

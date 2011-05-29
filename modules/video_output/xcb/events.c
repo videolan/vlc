@@ -135,6 +135,7 @@ static void HandleMotionNotify (vout_display_t *vd, xcb_connection_t *conn,
     /* show the default cursor */
     xcb_change_window_attributes (conn, ev->event, XCB_CW_CURSOR,
                                   &(uint32_t) { XCB_CURSOR_NONE });
+    xcb_flush (conn);
 
     /* TODO it could be saved */
     vout_display_PlacePicture (&place, &vd->source, vd->cfg, false);
