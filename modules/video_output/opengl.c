@@ -95,12 +95,15 @@ struct vout_display_opengl_t {
     picture_pool_t *pool;
 
     GLuint     program;
+    int        local_count;
+    GLfloat    local_value[16][4];
 
     /* fragment_program */
     void (*GenProgramsARB)(GLsizei, GLuint *);
     void (*BindProgramARB)(GLenum, GLuint);
     void (*ProgramStringARB)(GLenum, GLenum, GLsizei, const GLvoid *);
     void (*DeleteProgramsARB)(GLsizei, const GLuint *);
+    void (*ProgramLocalParameter4fvARB)(GLenum, GLuint, const GLfloat *);
 
     /* multitexture */
     void (*ActiveTextureARB)(GLenum);
@@ -138,11 +141,13 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
         vgl->BindProgramARB    = (void (*)(GLenum, GLuint))vlc_gl_GetProcAddress(vgl->gl, "glBindProgramARB");
         vgl->ProgramStringARB  = (void (*)(GLenum, GLenum, GLsizei, const GLvoid *))vlc_gl_GetProcAddress(vgl->gl, "glProgramStringARB");
         vgl->DeleteProgramsARB = (void (*)(GLsizei, const GLuint *))vlc_gl_GetProcAddress(vgl->gl, "glDeleteProgramsARB");
+        vgl->ProgramLocalParameter4fvARB = (void (*)(GLenum, GLuint, const GLfloat *))vlc_gl_GetProcAddress(vgl->gl, "glProgramLocalParameter4fvARB");
 
         supports_fp = vgl->GenProgramsARB &&
                       vgl->BindProgramARB &&
                       vgl->ProgramStringARB &&
-                      vgl->DeleteProgramsARB;
+                      vgl->DeleteProgramsARB &&
+                      vgl->ProgramLocalParameter4fvARB;
     }
     bool supports_multitexture = false;
     if (strstr(extensions, "GL_ARB_multitexture")) {
@@ -244,6 +249,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
 
     /* Build fragment program if needed */
     vgl->program = 0;
+    vgl->local_count = 0;
     if (supports_fp) {
         char *code = NULL;
 
@@ -275,26 +281,24 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
                 "TEX src.%c, fragment.texcoord[1], texture[1], 2D;"
                 "TEX src.%c, fragment.texcoord[2], texture[2], 2D;"
 
-                "PARAM muly   = { %f, %f, %f };"
-                "PARAM mulu   = { %f, %f, %f };"
-                "PARAM mulv   = { %f, %f, %f };"
-                "PARAM offset = { %f, %f, %f };"
+                "PARAM coefficient[4] = { program.local[0..3] };"
 
                 "TEMP tmp;"
-                "MAD  tmp.rgb,          src.xxxx, muly, offset;"
-                "MAD  tmp.rgb,          src.yyyy, mulu, tmp;"
-                "MAD  result.color.rgb, src.zzzz, mulv, tmp;"
+                "MAD  tmp.rgb,          src.xxxx, coefficient[0], coefficient[3];"
+                "MAD  tmp.rgb,          src.yyyy, coefficient[1], tmp;"
+                "MAD  result.color.rgb, src.zzzz, coefficient[2], tmp;"
                 "END";
             bool swap_uv = vgl->fmt.i_chroma == VLC_CODEC_YV12 ||
                            vgl->fmt.i_chroma == VLC_CODEC_YV9;
             if (asprintf(&code, template_yuv,
                          swap_uv ? 'z' : 'y',
-                         swap_uv ? 'y' : 'z',
-                         matrix[0][0], matrix[1][0], matrix[2][0],
-                         matrix[0][1], matrix[1][1], matrix[2][1],
-                         matrix[0][2], matrix[1][2], matrix[2][2],
-                         matrix[0][3], matrix[1][3], matrix[2][3]) < 0)
+                         swap_uv ? 'y' : 'z') < 0)
                 code = NULL;
+
+            for (int i = 0; i < 4; i++)
+                for (int j = 0; j < 4; j++)
+                    vgl->local_value[vgl->local_count + i][j] = j < 3 ? matrix[j][i] : 0.0;
+            vgl->local_count += 4;
         }
         if (code) {
             vgl->GenProgramsARB(1, &vgl->program);
@@ -567,10 +571,13 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
 
     glClear(GL_COLOR_BUFFER_BIT);
 
-    if (vgl->program)
+    if (vgl->program) {
         glEnable(GL_FRAGMENT_PROGRAM_ARB);
-    else
+        for (int i = 0; i < vgl->local_count; i++)
+            vgl->ProgramLocalParameter4fvARB(GL_FRAGMENT_PROGRAM_ARB, i, vgl->local_value[i]);
+    } else {
         glEnable(vgl->tex_target);
+    }
 
 #if USE_OPENGL_ES
     static const GLfloat vertexCoord[] = {
