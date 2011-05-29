@@ -3151,7 +3151,7 @@ AC_ARG_ENABLE(xvideo,
 have_xcb="no"
 AS_IF([test "${enable_xcb}" != "no"], [
   dnl libxcb
-  PKG_CHECK_MODULES(XCB, [xcb])
+  PKG_CHECK_MODULES(XCB, [xcb >= 1.6])
   have_xcb="yes"
   PKG_CHECK_MODULES(XCB_SHM, [xcb-shm])
   PKG_CHECK_MODULES(XCB_COMPOSITE, [xcb-composite])
