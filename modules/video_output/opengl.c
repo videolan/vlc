@@ -97,13 +97,13 @@ struct vout_display_opengl_t {
     GLuint     program;
 
     /* fragment_program */
-    void (*GenProgramsARB)(GLuint, GLuint *);
-    void (*BindProgramARB)(GLuint, GLuint);
-    void (*ProgramStringARB)(GLuint, GLuint, GLint, const GLbyte *);
-    void (*DeleteProgramsARB)(GLuint, GLuint *);
+    void (*GenProgramsARB)(GLsizei, GLuint *);
+    void (*BindProgramARB)(GLenum, GLuint);
+    void (*ProgramStringARB)(GLenum, GLenum, GLsizei, const GLvoid *);
+    void (*DeleteProgramsARB)(GLsizei, const GLuint *);
 
     /* multitexture */
-    void (*ActiveTextureARB)(GLuint);
+    void (*ActiveTextureARB)(GLenum);
     void (*MultiTexCoord2fARB)(GLenum, GLfloat, GLfloat);
 };
 
@@ -134,10 +134,10 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     /* Load extensions */
     bool supports_fp = false;
     if (strstr(extensions, "GL_ARB_fragment_program")) {
-        vgl->GenProgramsARB    = (void (*)(GLuint, GLuint *))vlc_gl_GetProcAddress(vgl->gl, "glGenProgramsARB");
-        vgl->BindProgramARB    = (void (*)(GLuint, GLuint))vlc_gl_GetProcAddress(vgl->gl, "glBindProgramARB");
-        vgl->ProgramStringARB  = (void (*)(GLuint, GLuint, GLint, const GLbyte *))vlc_gl_GetProcAddress(vgl->gl, "glProgramStringARB");
-        vgl->DeleteProgramsARB = (void (*)(GLuint, GLuint *))vlc_gl_GetProcAddress(vgl->gl, "glDeleteProgramsARB");
+        vgl->GenProgramsARB    = (void (*)(GLsizei, GLuint *))vlc_gl_GetProcAddress(vgl->gl, "glGenProgramsARB");
+        vgl->BindProgramARB    = (void (*)(GLenum, GLuint))vlc_gl_GetProcAddress(vgl->gl, "glBindProgramARB");
+        vgl->ProgramStringARB  = (void (*)(GLenum, GLenum, GLsizei, const GLvoid *))vlc_gl_GetProcAddress(vgl->gl, "glProgramStringARB");
+        vgl->DeleteProgramsARB = (void (*)(GLsizei, const GLuint *))vlc_gl_GetProcAddress(vgl->gl, "glDeleteProgramsARB");
 
         supports_fp = vgl->GenProgramsARB &&
                       vgl->BindProgramARB &&
@@ -146,7 +146,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     }
     bool supports_multitexture = false;
     if (strstr(extensions, "GL_ARB_multitexture")) {
-        vgl->ActiveTextureARB   = (void (*)(GLuint))vlc_gl_GetProcAddress(vgl->gl, "glActiveTextureARB");
+        vgl->ActiveTextureARB   = (void (*)(GLenum))vlc_gl_GetProcAddress(vgl->gl, "glActiveTextureARB");
         vgl->MultiTexCoord2fARB = (void (*)(GLenum, GLfloat, GLfloat))vlc_gl_GetProcAddress(vgl->gl, "glMultiTexCoord2fARB");
 
         supports_multitexture = vgl->ActiveTextureARB &&
