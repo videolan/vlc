@@ -40,7 +40,7 @@
  *****************************************************************************/
 static int  Create    ( vlc_object_t * );
 
-static void DoWork    ( aout_mixer_t *, aout_buffer_t * );
+static aout_buffer_t *DoWork( aout_mixer_t *, unsigned samples );
 
 /*****************************************************************************
  * Module descriptor
@@ -62,29 +62,28 @@ static int Create( vlc_object_t *p_this )
 
     if ( p_mixer->fmt.i_format != VLC_CODEC_FL32
           && p_mixer->fmt.i_format != VLC_CODEC_FI32 )
-    {
         return -1;
-    }
 
     p_mixer->mix = DoWork;
-
     return 0;
 }
 
 /*****************************************************************************
  * DoWork: mix a new output buffer
  *****************************************************************************/
-static void DoWork( aout_mixer_t *p_mixer, aout_buffer_t * p_buffer )
+static aout_buffer_t *DoWork( aout_mixer_t *p_mixer, unsigned samples )
 {
     aout_mixer_input_t *p_input = p_mixer->input;
     int i_nb_channels = aout_FormatNbChannels( &p_mixer->fmt );
-    int i_buffer = p_buffer->i_nb_samples * sizeof(int32_t)
-                      * i_nb_channels;
-    uint8_t * p_in;
-    uint8_t * p_out;
+    ssize_t i_buffer = samples * i_nb_channels * sizeof(int32_t);
+    aout_buffer_t *p_buffer = block_Alloc( i_buffer );
 
-    p_in = p_input->begin;
-    p_out = p_buffer->p_buffer;
+    if( unlikely(p_buffer == NULL) )
+        return NULL;
+    p_buffer->i_nb_samples = samples;
+
+    uint8_t * p_in = p_input->begin;
+    uint8_t * p_out = p_buffer->p_buffer;
 
     for ( ; ; )
     {
@@ -108,7 +107,7 @@ static void DoWork( aout_mixer_t *p_mixer, aout_buffer_t * p_buffer )
             if ( p_input->fifo.p_first == NULL )
             {
                 msg_Err( p_mixer, "internal amix error" );
-                return;
+                break;
             }
             p_in = p_input->fifo.p_first->p_buffer;
         }
@@ -119,4 +118,5 @@ static void DoWork( aout_mixer_t *p_mixer, aout_buffer_t * p_buffer )
             break;
         }
     }
+    return p_buffer;
 }

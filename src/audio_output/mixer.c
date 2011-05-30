@@ -51,7 +51,6 @@ int aout_MixerNew( aout_instance_t * p_aout )
         return VLC_EGENERIC;
 
     p_mixer->fmt = p_aout->mixer_format;
-    p_mixer->b_alloc = true;
     p_mixer->multiplier = p_aout->mixer_multiplier;
     p_mixer->input = &p_aout->pp_inputs[0]->mixer;
     p_mixer->mix = NULL;
@@ -322,31 +321,16 @@ static int MixBuffer( aout_instance_t * p_aout )
 
     /* Run the mixer. */
     aout_buffer_t * p_outbuf;
-
-    if( p_aout->p_mixer->b_alloc )
-    {
-        p_outbuf = block_Alloc( p_aout->output.i_nb_samples
-                              * p_aout->p_mixer->fmt.i_bytes_per_frame
-                              / p_aout->p_mixer->fmt.i_frame_length );
-        if( likely(p_outbuf != NULL) )
-            p_outbuf->i_nb_samples = p_aout->output.i_nb_samples;
-    }
-    else
-        p_outbuf = p_aout->pp_inputs[i_first_input]->mixer.fifo.p_first;
-    if ( p_outbuf == NULL )
-    {
-        aout_unlock_input_fifos( p_aout );
-        return -1;
-    }
-    p_outbuf->i_pts = start_date;
-    p_outbuf->i_length = end_date - start_date;
-
-    p_aout->p_mixer->mix( p_aout->p_mixer, p_outbuf );
-
+    p_outbuf = p_aout->p_mixer->mix( p_aout->p_mixer,
+                                     p_aout->output.i_nb_samples );
     aout_unlock_input_fifos( p_aout );
 
-    aout_OutputPlay( p_aout, p_outbuf );
+    if( unlikely(p_outbuf == NULL) )
+        return -1;
 
+    p_outbuf->i_pts = start_date;
+    p_outbuf->i_length = end_date - start_date;
+    aout_OutputPlay( p_aout, p_outbuf );
     return 0;
 }
 

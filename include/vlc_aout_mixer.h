@@ -72,12 +72,6 @@ struct aout_mixer_t {
      */
     audio_sample_format_t fmt;
 
-    /* Mixer output buffer allocation method.
-     *
-     * You can override it in the open function only.
-     */
-    bool b_alloc;
-
     /* Multiplier used to raise or lower the volume of the sound in
      * software.
      */
@@ -86,8 +80,8 @@ struct aout_mixer_t {
     /* Array of mixer inputs */
     aout_mixer_input_t    *input;
 
-    /* Mix input into the given buffer (mandatory) */
-    void (*mix)(aout_mixer_t *, aout_buffer_t *);
+    /* Mix requested number of samples (mandatory) */
+    aout_buffer_t *(*mix)(aout_mixer_t *, unsigned);
 
     /* Private place holder for the aout_mixer_t module (optional)
      *

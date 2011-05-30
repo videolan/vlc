@@ -39,8 +39,7 @@
  * Local prototypes
  *****************************************************************************/
 static int  Create    ( vlc_object_t * );
-
-static void DoWork    ( aout_mixer_t *, aout_buffer_t * );
+static aout_buffer_t *DoWork( aout_mixer_t *, unsigned );
 
 /*****************************************************************************
  * Module descriptor
@@ -89,13 +88,17 @@ static void ScaleWords( float * p_out, const float * p_in, size_t i_nb_words,
  * Terminology : in this function a word designates a single float32, eg.
  * a stereo sample is consituted of two words.
  *****************************************************************************/
-static void DoWork( aout_mixer_t * p_mixer, aout_buffer_t * p_buffer )
+static aout_buffer_t *DoWork( aout_mixer_t * p_mixer, unsigned samples )
 {
-    const int i_nb_channels = aout_FormatNbChannels( &p_mixer->fmt );
-
-    int i_nb_words = p_buffer->i_nb_samples * i_nb_channels;
     aout_mixer_input_t * p_input = p_mixer->input;
     float f_multiplier = p_mixer->multiplier * p_input->multiplier;
+    const int i_nb_channels = aout_FormatNbChannels( &p_mixer->fmt );
+    int i_nb_words = samples * i_nb_channels;
+
+    block_t *p_buffer = block_Alloc( i_nb_words * sizeof(float) );
+    if( unlikely( p_buffer == NULL ) )
+        return NULL;
+    p_buffer->i_nb_samples = samples;
 
     float * p_out = (float *)p_buffer->p_buffer;
     float * p_in = (float *)p_input->begin;
@@ -121,7 +124,7 @@ static void DoWork( aout_mixer_t * p_mixer, aout_buffer_t * p_buffer )
             if( p_input->fifo.p_first == NULL )
             {
                 msg_Err( p_mixer, "internal amix error" );
-                return;
+                break;
             }
             p_in = (float *)p_input->fifo.p_first->p_buffer;
         }
@@ -132,5 +135,5 @@ static void DoWork( aout_mixer_t * p_mixer, aout_buffer_t * p_buffer )
             break;
         }
     }
+    return p_buffer;
 }
-
