@@ -63,10 +63,6 @@ static int Create( vlc_object_t *p_this )
     if ( p_mixer->fmt.i_format != VLC_CODEC_FL32 )
         return -1;
 
-    /* Use the trivial mixer when we can */
-    if( p_mixer->multiplier == 1.0 && p_mixer->input->multiplier == 1.0 )
-        return -1;
-
     p_mixer->mix = DoWork;
     return 0;
 }
@@ -77,6 +73,12 @@ static int Create( vlc_object_t *p_this )
 static void ScaleWords( float * p_out, const float * p_in, size_t i_nb_words,
                         float f_multiplier )
 {
+    if( f_multiplier == 1.0 )
+    {
+        vlc_memcpy( p_out, p_in, i_nb_words * sizeof(float) );
+        return;
+    }
+
     for( size_t i = 0; i < i_nb_words; i++ )
         *p_out++ = *p_in++ * f_multiplier;
 }
@@ -89,12 +91,11 @@ static void ScaleWords( float * p_out, const float * p_in, size_t i_nb_words,
  *****************************************************************************/
 static void DoWork( aout_mixer_t * p_mixer, aout_buffer_t * p_buffer )
 {
-    const float f_multiplier_global = p_mixer->multiplier;
     const int i_nb_channels = aout_FormatNbChannels( &p_mixer->fmt );
 
     int i_nb_words = p_buffer->i_nb_samples * i_nb_channels;
     aout_mixer_input_t * p_input = p_mixer->input;
-    float f_multiplier = f_multiplier_global * p_input->multiplier;
+    float f_multiplier = p_mixer->multiplier * p_input->multiplier;
 
     float * p_out = (float *)p_buffer->p_buffer;
     float * p_in = (float *)p_input->begin;
