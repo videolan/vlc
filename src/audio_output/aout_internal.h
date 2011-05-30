@@ -26,9 +26,6 @@
 
 # include <vlc_aout_mixer.h>
 
-aout_buffer_t *aout_BufferAlloc(aout_alloc_t *allocation, mtime_t microseconds,
-        aout_buffer_t *old_buffer);
-
 typedef struct
 {
     struct vout_thread_t  *(*pf_request_vout)( void *, struct vout_thread_t *,

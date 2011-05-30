@@ -97,7 +97,6 @@ void aout_MixerDelete( aout_instance_t * p_aout )
 static int MixBuffer( aout_instance_t * p_aout )
 {
     int             i, i_first_input = 0;
-    aout_buffer_t * p_output_buffer;
     mtime_t start_date, end_date;
     date_t  exact_start_date;
 
@@ -323,33 +322,31 @@ static int MixBuffer( aout_instance_t * p_aout )
     }
 
     /* Run the mixer. */
-    p_output_buffer = aout_BufferAlloc( &p_aout->p_mixer->allocation,
-                          ((uint64_t)p_aout->output.i_nb_samples * 1000000)
-                            / p_aout->output.output.i_rate,
-                          /* This is a bit kludgy, but is actually only used
-                           * for the S/PDIF dummy mixer : */
-                          p_aout->pp_inputs[i_first_input]->mixer.fifo.p_first);
-    if ( p_output_buffer == NULL )
+    aout_buffer_t * p_outbuf;
+
+    if( p_aout->p_mixer->allocation.b_alloc )
+    {
+        p_outbuf = block_Alloc( p_aout->output.i_nb_samples
+                              * p_aout->p_mixer->fmt.i_bytes_per_frame
+                              / p_aout->p_mixer->fmt.i_frame_length );
+        if( likely(p_outbuf != NULL) )
+            p_outbuf->i_nb_samples = p_aout->output.i_nb_samples;
+    }
+    else
+        p_outbuf = p_aout->pp_inputs[i_first_input]->mixer.fifo.p_first;
+    if ( p_outbuf == NULL )
     {
         aout_unlock_input_fifos( p_aout );
         return -1;
     }
-    /* This is again a bit kludgy - for the S/PDIF mixer. */
-    if ( p_aout->p_mixer->allocation.b_alloc )
-    {
-        p_output_buffer->i_nb_samples = p_aout->output.i_nb_samples;
-        p_output_buffer->i_buffer = p_aout->output.i_nb_samples
-                              * p_aout->p_mixer->fmt.i_bytes_per_frame
-                              / p_aout->p_mixer->fmt.i_frame_length;
-    }
-    p_output_buffer->i_pts = start_date;
-    p_output_buffer->i_length = end_date - start_date;
+    p_outbuf->i_pts = start_date;
+    p_outbuf->i_length = end_date - start_date;
 
-    p_aout->p_mixer->mix( p_aout->p_mixer, p_output_buffer );
+    p_aout->p_mixer->mix( p_aout->p_mixer, p_outbuf );
 
     aout_unlock_input_fifos( p_aout );
 
-    aout_OutputPlay( p_aout, p_output_buffer );
+    aout_OutputPlay( p_aout, p_outbuf );
 
     return 0;
 }

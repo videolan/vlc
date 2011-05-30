@@ -736,24 +736,6 @@ bool aout_CheckChannelExtraction( int *pi_selection,
     return i_out == i_channels;
 }
 
-/*****************************************************************************
- * aout_BufferAlloc:
- *****************************************************************************/
-
-aout_buffer_t *aout_BufferAlloc(aout_alloc_t *allocation, mtime_t microseconds,
-        aout_buffer_t *old_buffer)
-{
-    if ( !allocation->b_alloc )
-    {
-        return old_buffer;
-    }
-
-    size_t i_alloc_size = (int)( (uint64_t)allocation->i_bytes_per_sec
-                                        * (microseconds) / 1000000 + 1 );
-
-    return block_Alloc( i_alloc_size );
-}
-
 /* Return the order in which filters should be inserted */
 static int FilterOrder( const char *psz_name )
 {
