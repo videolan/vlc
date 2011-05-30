@@ -127,6 +127,7 @@ struct vout_display_opengl_t {
     void (*ProgramLocalParameter4fvARB)(GLenum, GLuint, const GLfloat *);
 
     /* multitexture */
+    bool use_multitexture;
     void (*ActiveTextureARB)(GLenum);
     void (*MultiTexCoord2fARB)(GLenum, GLfloat, GLfloat);
 };
@@ -240,6 +241,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     }
 
     vgl->chroma = vlc_fourcc_GetChromaDescription(vgl->fmt.i_chroma);
+    vgl->use_multitexture = vgl->chroma->plane_count > 1;
 
     bool supports_npot = false;
 #if USE_OPENGL_ES == 2
@@ -471,7 +473,7 @@ picture_pool_t *vout_display_opengl_GetPool(vout_display_opengl_t *vgl, unsigned
     for (int i = 0; i < VLCGL_TEXTURE_COUNT; i++) {
         glGenTextures(vgl->chroma->plane_count, vgl->texture[i]);
         for (unsigned j = 0; j < vgl->chroma->plane_count; j++) {
-            if (vgl->chroma->plane_count > 1)
+            if (vgl->use_multitexture)
                 vgl->ActiveTextureARB(GL_TEXTURE0_ARB + j);
             glBindTexture(vgl->tex_target, vgl->texture[i][j]);
 
@@ -542,7 +544,7 @@ int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
 #else
     /* Update the texture */
     for (unsigned j = 0; j < vgl->chroma->plane_count; j++) {
-        if (vgl->chroma->plane_count > 1)
+        if (vgl->use_multitexture)
             vgl->ActiveTextureARB(GL_TEXTURE0_ARB + j);
         glBindTexture(vgl->tex_target, vgl->texture[0][j]);
         glPixelStorei(GL_UNPACK_ROW_LENGTH, picture->p[j].i_pitch / picture->p[j].i_pixel_pitch);
@@ -569,7 +571,7 @@ int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
         vgl->region_count = count;
         vgl->region       = calloc(count, sizeof(*vgl->region));
 
-        if (vgl->chroma->plane_count > 1)
+        if (vgl->use_multitexture)
             vgl->ActiveTextureARB(GL_TEXTURE0_ARB + 0);
         int i = 0;
         for (subpicture_region_t *r = subpicture->p_region; r; r = r->p_next, i++) {
@@ -700,7 +702,7 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
 #else
 #if !defined(MACOS_OPENGL)
     for (unsigned j = 0; j < vgl->chroma->plane_count; j++) {
-        if (vgl->chroma->plane_count > 1)
+        if (vgl->use_multitexture)
             vgl->ActiveTextureARB(GL_TEXTURE0_ARB + j);
         glBindTexture(vgl->tex_target, vgl->texture[0][j]);
     }
@@ -736,7 +738,7 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
         glDisable(vgl->tex_target);
 
 #if !USE_OPENGL_ES
-    if (vgl->chroma->plane_count > 1)
+    if (vgl->use_multitexture)
         vgl->ActiveTextureARB(GL_TEXTURE0_ARB + 0);
     glEnable(GL_TEXTURE_2D);
     glEnable(GL_BLEND);
