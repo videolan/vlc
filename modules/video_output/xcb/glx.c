@@ -366,7 +366,8 @@ static int Open (vlc_object_t *obj)
     sys->gl.getProcAddress = GetProcAddress;
     sys->gl.sys = sys;
 
-    sys->vgl = vout_display_opengl_New (&vd->fmt, &sys->gl);
+    const vlc_fourcc_t *subpicture_chromas;
+    sys->vgl = vout_display_opengl_New (&vd->fmt, &subpicture_chromas, &sys->gl);
     if (!sys->vgl)
     {
         sys->gl.sys = NULL;
@@ -380,6 +381,7 @@ static int Open (vlc_object_t *obj)
     vout_display_info_t info = vd->info;
     info.has_pictures_invalid = false;
     info.has_event_thread = true;
+    info.subpicture_chromas = subpicture_chromas;
 
     /* Setup vout_display_t once everything is fine */
     vd->info = info;
@@ -477,7 +479,8 @@ static void PictureDisplay (vout_display_t *vd, picture_t *pic, subpicture_t *su
 
     vout_display_opengl_Display (sys->vgl, &vd->source);
     picture_Release (pic);
-    (void)subpicture;
+    if (subpicture)
+        subpicture_Delete(subpicture);
 }
 
 static int Control (vout_display_t *vd, int query, va_list ap)

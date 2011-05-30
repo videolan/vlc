@@ -114,6 +114,7 @@ static inline int GetAlignedSize(unsigned size)
 }
 
 vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
+                                               const vlc_fourcc_t **subpicture_chromas,
                                                vlc_gl_t *gl)
 {
     vout_display_opengl_t *vgl = calloc(1, sizeof(*vgl));
@@ -336,6 +337,9 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     vgl->pool = NULL;
 
     *fmt = vgl->fmt;
+    if (subpicture_chromas) {
+        *subpicture_chromas = NULL;
+    }
     return vgl;
 }
 

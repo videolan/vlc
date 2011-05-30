@@ -137,7 +137,7 @@ static int Open (vlc_object_t *obj)
         goto error;
 
     /* Initialize video display */
-    sys->vgl = vout_display_opengl_New (&vd->fmt, sys->gl);
+    sys->vgl = vout_display_opengl_New (&vd->fmt, NULL, sys->gl);
     if (!sys->vgl)
         goto error;
 

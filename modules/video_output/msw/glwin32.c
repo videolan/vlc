@@ -116,7 +116,8 @@ static int Open(vlc_object_t *object)
     sys->gl.sys = vd;
 
     video_format_t fmt = vd->fmt;
-    sys->vgl = vout_display_opengl_New(&fmt, &sys->gl);
+    const vlc_fourcc_t *subpicture_chromas;
+    sys->vgl = vout_display_opengl_New(&fmt, &subpicture_chromas, &sys->gl);
     if (!sys->vgl)
         goto error;
 
@@ -125,6 +126,7 @@ static int Open(vlc_object_t *object)
     info.has_hide_mouse = false;
     info.has_pictures_invalid = true;
     info.has_event_thread = true;
+    info.subpicture_chromas = subpicture_chromas;
 
    /* Setup vout_display now that everything is fine */
     vd->fmt  = fmt;

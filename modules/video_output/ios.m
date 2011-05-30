@@ -151,7 +151,7 @@ static int Open(vlc_object_t *this)
 	sys->gl.getProcAddress = NULL;
     sys->gl.sys = sys;
 
-	sys->vgl = vout_display_opengl_New(&vd->fmt, &sys->gl);
+	sys->vgl = vout_display_opengl_New(&vd->fmt, NULL, &sys->gl);
 	if (!sys->vgl)
     {
         sys->gl.sys = NULL;
