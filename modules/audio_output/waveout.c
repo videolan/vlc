@@ -895,10 +895,9 @@ static void* WaveOutThread( void *data )
 
 #define waveout_warn(msg) msg_Warn( p_aout, "aout_OutputNextBuffer no buffer "\
                            "got next_date=%d ms, "\
-                           "%d frames to play, "\
-                           "starving? %d, %s",(int)(next_date/(mtime_t)1000), \
-                           i_queued_frames, \
-                           p_aout->output.b_starving, msg);
+                           "%d frames to play, %s",\
+                           (int)(next_date/(mtime_t)1000), \
+                           i_queued_frames, msg);
     next_date = mdate();
 
     while( !vlc_atomic_get(&p_aout->output.p_sys->abort) )
@@ -930,25 +929,19 @@ static void* WaveOutThread( void *data )
                 if(!p_buffer)
                 {
 #if 0
-                    msg_Dbg( p_aout, "aout_OutputNextBuffer no buffer "\
-                                      "got next_date=%d ms, "\
-                                      "%d frames to play, "\
-                                      "starving? %d",(int)(next_date/(mtime_t)1000),
-                                                     i_queued_frames,
-                                                     p_aout->output.b_starving);
+                    msg_Dbg( p_aout, "aout_OutputNextBuffer no buffer "
+                                      "got next_date=%d ms, "
+                                      "%d frames to play",
+                                      (int)(next_date/(mtime_t)1000),
+                                      i_queued_frames);
 #endif
-                    if(p_aout->output.b_starving)
-                    {
-                        // means we are too early to request a new buffer?
-                        waveout_warn("waiting...")
-                        next_date = aout_FifoFirstDate( p_aout, &p_aout->output.fifo );
-                        mwait( next_date - AOUT_PTS_TOLERANCE/4 );
-                        next_date = mdate();
-                        p_buffer = aout_OutputNextBuffer( p_aout,
-                                     next_date,
-                                     b_sleek
-                                   );
-                    }
+                    // means we are too early to request a new buffer?
+                    waveout_warn("waiting...")
+                    next_date = aout_FifoFirstDate( p_aout, &p_aout->output.fifo );
+                    mwait( next_date - AOUT_PTS_TOLERANCE/4 );
+                    next_date = mdate();
+                    p_buffer = aout_OutputNextBuffer( p_aout, next_date,
+                                                      b_sleek );
                 }
 
                 if( !p_buffer && i_queued_frames )
