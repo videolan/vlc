@@ -77,7 +77,7 @@ static int Create( vlc_object_t *p_this )
 static void ScaleWords( float * p_out, const float * p_in, size_t i_nb_words,
                         float f_multiplier )
 {
-    for( size_t i = i_nb_words; i--; )
+    for( size_t i = 0; i < i_nb_words; i++ )
         *p_out++ = *p_in++ * f_multiplier;
 }
 
@@ -110,9 +110,7 @@ static void DoWork( aout_mixer_t * p_mixer, aout_buffer_t * p_buffer )
         {
             aout_buffer_t * p_old_buffer;
 
-            if( i_available_words > 0 )
-                ScaleWords( p_out, p_in, i_available_words, f_multiplier );
-
+            ScaleWords( p_out, p_in, i_available_words, f_multiplier );
             i_nb_words -= i_available_words;
             p_out += i_available_words;
 
@@ -128,8 +126,7 @@ static void DoWork( aout_mixer_t * p_mixer, aout_buffer_t * p_buffer )
         }
         else
         {
-            if( i_nb_words > 0 )
-                ScaleWords( p_out, p_in, i_nb_words, f_multiplier );
+            ScaleWords( p_out, p_in, i_nb_words, f_multiplier );
             p_input->begin = (void *)(p_in + i_nb_words);
             break;
         }
