@@ -196,9 +196,6 @@ int aout_OutputNew( aout_instance_t * p_aout,
         p_aout->output.p_module = NULL;
         return -1;
     }
-
-    /* Prepare hints for the buffer allocator. */
-    p_aout->mixer_allocation.b_alloc = true;
     return 0;
 }
 

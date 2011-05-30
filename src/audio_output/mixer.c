@@ -51,7 +51,7 @@ int aout_MixerNew( aout_instance_t * p_aout )
         return VLC_EGENERIC;
 
     p_mixer->fmt = p_aout->mixer_format;
-    p_mixer->allocation = p_aout->mixer_allocation;
+    p_mixer->b_alloc = true;
     p_mixer->multiplier = p_aout->mixer_multiplier;
     p_mixer->input = &p_aout->pp_inputs[0]->mixer;
     p_mixer->mix = NULL;
@@ -323,7 +323,7 @@ static int MixBuffer( aout_instance_t * p_aout )
     /* Run the mixer. */
     aout_buffer_t * p_outbuf;
 
-    if( p_aout->p_mixer->allocation.b_alloc )
+    if( p_aout->p_mixer->b_alloc )
     {
         p_outbuf = block_Alloc( p_aout->output.i_nb_samples
                               * p_aout->p_mixer->fmt.i_bytes_per_frame

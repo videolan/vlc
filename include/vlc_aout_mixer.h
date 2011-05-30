@@ -76,7 +76,7 @@ struct aout_mixer_t {
      *
      * You can override it in the open function only.
      */
-    aout_alloc_t          allocation;
+    bool b_alloc;
 
     /* Multiplier used to raise or lower the volume of the sound in
      * software.

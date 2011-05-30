@@ -134,12 +134,6 @@ typedef int32_t vlc_fixed_t;
 /* Max input rate factor (1/4 -> 4) */
 #define AOUT_MAX_INPUT_RATE (4)
 
-/** allocation of memory in the audio output */
-typedef struct aout_alloc_t
-{
-    bool                    b_alloc;
-} aout_alloc_t;
-
 /** audio output buffer FIFO */
 struct aout_fifo_t
 {
@@ -206,7 +200,6 @@ struct aout_instance_t
 
     /* Mixer */
     audio_sample_format_t   mixer_format;
-    aout_alloc_t            mixer_allocation;
     float                   mixer_multiplier;
     struct aout_mixer_t    *p_mixer;
 
