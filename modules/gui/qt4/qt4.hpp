@@ -32,7 +32,6 @@
 #include <vlc_common.h>    /* VLC_COMMON_MEMBERS for vlc_interface.h */
 #include <vlc_interface.h> /* intf_thread_t */
 #include <vlc_playlist.h>  /* playlist_t */
-#include <vlc_aout.h>      /* AOUT_VOLUME_ */
 
 #define QT_NO_CAST_TO_ASCII
 #include <QString>

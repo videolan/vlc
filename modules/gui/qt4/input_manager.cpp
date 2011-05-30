@@ -33,6 +33,7 @@
 #include <vlc_keys.h>
 #include <vlc_url.h>
 #include <vlc_strings.h>
+#include <vlc_aout.h>
 
 #include <QApplication>
 
