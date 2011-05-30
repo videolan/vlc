@@ -30,6 +30,7 @@
 
 #include <vlc_common.h>
 #include <vlc_picture_pool.h>
+#include <vlc_subpicture.h>
 #include <vlc_opengl.h>
 
 #include "opengl.h"
@@ -73,6 +74,26 @@
 #   define VLCGL_PICTURE_MAX 128
 #endif
 
+static const vlc_fourcc_t gl_subpicture_chromas[] = {
+    VLC_CODEC_RGBA,
+    0
+};
+
+typedef struct {
+    GLuint   texture;
+    unsigned format;
+    unsigned type;
+    unsigned width;
+    unsigned height;
+
+    float    alpha;
+
+    float    top;
+    float    left;
+    float    bottom;
+    float    right;
+} gl_region_t;
+
 struct vout_display_opengl_t {
     vlc_gl_t   *gl;
 
@@ -87,6 +108,10 @@ struct vout_display_opengl_t {
     int        tex_height[PICTURE_PLANE_MAX];
 
     GLuint     texture[VLCGL_TEXTURE_COUNT][PICTURE_PLANE_MAX];
+
+    int         region_count;
+    gl_region_t *region;
+
 
     picture_pool_t *pool;
 
@@ -334,11 +359,17 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
         for (int j = 0; j < PICTURE_PLANE_MAX; j++)
             vgl->texture[i][j] = 0;
     }
+    vgl->region_count = 0;
+    vgl->region = NULL;
     vgl->pool = NULL;
 
     *fmt = vgl->fmt;
     if (subpicture_chromas) {
         *subpicture_chromas = NULL;
+#if !defined(MACOS_OPENGL) && !USE_OPENGL_ES
+        if (supports_npot)
+            *subpicture_chromas = gl_subpicture_chromas;
+#endif
     }
     return vgl;
 }
@@ -532,6 +563,54 @@ int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
     }
 #endif
 
+    for (int i = 0; i < vgl->region_count; i++) {
+        glDeleteTextures(1, &vgl->region[i].texture);
+    }
+    free(vgl->region);
+    vgl->region_count = 0;
+    vgl->region       = NULL;
+
+    if (subpicture) {
+
+        int count = 0;
+        for (subpicture_region_t *r = subpicture->p_region; r; r = r->p_next)
+            count++;
+
+        vgl->region_count = count;
+        vgl->region       = calloc(count, sizeof(*vgl->region));
+
+        if (vgl->chroma->plane_count > 1)
+            vgl->ActiveTextureARB(GL_TEXTURE0_ARB + 0);
+        int i = 0;
+        for (subpicture_region_t *r = subpicture->p_region; r; r = r->p_next, i++) {
+            gl_region_t *glr = &vgl->region[i];
+
+            glr->format = GL_RGBA;
+            glr->type   = GL_UNSIGNED_BYTE;
+            glr->width  = r->fmt.i_visible_width;
+            glr->height = r->fmt.i_visible_height;
+            glr->alpha  = (float)subpicture->i_alpha * r->i_alpha / 255 / 255;
+            glr->left   =  2.0 * (r->i_x                          ) / subpicture->i_original_picture_width  - 1.0;
+            glr->top    = -2.0 * (r->i_y                          ) / subpicture->i_original_picture_height + 1.0;
+            glr->right  =  2.0 * (r->i_x + r->fmt.i_visible_width ) / subpicture->i_original_picture_width  - 1.0;
+            glr->bottom = -2.0 * (r->i_y + r->fmt.i_visible_height) / subpicture->i_original_picture_height + 1.0;
+
+            glGenTextures(1, &glr->texture);
+            glBindTexture(GL_TEXTURE_2D, glr->texture);
+            glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_PRIORITY, 1.0);
+            glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+            /* TODO set GL_UNPACK_ALIGNMENT */
+            glPixelStorei(GL_UNPACK_ROW_LENGTH, r->p_picture->p->i_pitch / r->p_picture->p->i_pixel_pitch);
+            glTexImage2D(GL_TEXTURE_2D, 0, glr->format,
+                         glr->width, glr->height, 0, glr->format, glr->type,
+                         r->p_picture->p->p_pixels);
+        }
+    }
+
     vlc_gl_Unlock(vgl->gl);
     VLC_UNUSED(subpicture);
     return VLC_SUCCESS;
@@ -638,6 +717,39 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
         glDisable(GL_FRAGMENT_PROGRAM_ARB);
     else
         glDisable(vgl->tex_target);
+
+#if !USE_OPENGL_ES
+    if (vgl->chroma->plane_count > 1)
+        vgl->ActiveTextureARB(GL_TEXTURE0_ARB + 0);
+    glEnable(GL_TEXTURE_2D);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    for (int i = 0; i < vgl->region_count; i++) {
+        gl_region_t *glr = &vgl->region[i];
+
+        glBindTexture(GL_TEXTURE_2D, glr->texture);
+
+        glBegin(GL_POLYGON);
+
+        glColor4f(1.0, 1.0, 1.0, glr->alpha);
+
+        glTexCoord2f(0.0, 0.0);
+        glVertex2f(glr->left, glr->top);
+
+        glTexCoord2f(1.0, 0.0);
+        glVertex2f(glr->right, glr->top);
+
+        glTexCoord2f(1.0, 1.0);
+        glVertex2f(glr->right, glr->bottom);
+
+        glTexCoord2f(0.0, 1.0);
+        glVertex2f(glr->left, glr->bottom);
+
+        glEnd();
+    }
+    glDisable(GL_BLEND);
+    glDisable(GL_TEXTURE_2D);
+#endif
 
     vlc_gl_Swap(vgl->gl);
 
