@@ -251,10 +251,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
                      strstr(extensions, "GL_ARB_texture_non_power_of_two");
 #endif
 
-    /* Texture size
-     * TODO calculate the size such that the pictures can be used as
-     * direct buffers
-     */
+    /* Texture size */
     for (unsigned j = 0; j < vgl->chroma->plane_count; j++) {
         int w = vgl->fmt.i_width  * vgl->chroma->p[j].w.num / vgl->chroma->p[j].w.den;
         int h = vgl->fmt.i_height * vgl->chroma->p[j].h.num / vgl->chroma->p[j].h.den;
@@ -495,15 +492,9 @@ picture_pool_t *vout_display_opengl_GetPool(vout_display_opengl_t *vgl, unsigned
             glEnable(GL_UNPACK_CLIENT_STORAGE_APPLE);
             glPixelStorei(GL_UNPACK_CLIENT_STORAGE_APPLE, GL_TRUE);
 
-#if 0
-            /* Use VRAM texturing */
-            glTexParameteri(vgl->tex_target, GL_TEXTURE_STORAGE_HINT_APPLE,
-                             GL_STORAGE_CACHED_APPLE);
-#else
             /* Use AGP texturing */
             glTexParameteri(vgl->tex_target, GL_TEXTURE_STORAGE_HINT_APPLE,
                              GL_STORAGE_SHARED_APPLE);
-#endif
 #endif
 
             /* Call glTexImage2D only once, and use glTexSubImage2D later */
