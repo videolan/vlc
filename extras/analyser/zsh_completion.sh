@@ -61,7 +61,7 @@ fi
 
 [ -z "$CXX" ] && CXX=g++
 
-ZSH_BUILD="$CXX $CXXFLAGS -D__LIBVLC__ -DHAVE_CONFIG_H -I$BUILDDIR -I$BUILDDIR/include -I../../include zsh.cpp $LIBVLC $LIBVLCCORE -o zsh_gen"
+ZSH_BUILD="$CXX $CXXFLAGS -DHAVE_CONFIG_H -I$BUILDDIR -I$BUILDDIR/include -I../../include zsh.cpp $LIBVLC $LIBVLCCORE -o zsh_gen"
 
 echo $ZSH_BUILD
 echo

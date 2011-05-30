@@ -123,7 +123,7 @@ void ParseModules( mumap &mods, mcmap &mods2 )
 
         /* Exclude empty plugins (submodules don't have config options, they
          * are stored in the parent module) */
-        if( p_module->b_submodule )
+        if( p_module->parent )
               continue;
 //            p_item = ((module_t *)p_module->p_parent)->p_config;
         else
@@ -186,7 +186,7 @@ void PrintModuleList( mumap &mods, mcmap &mods2 )
                                           p_module->psz_object_name ) );
                 }
             } while( i_items++ < p_module->i_config_items && p_config++ );
-            if( p_module->b_submodule )
+            if( p_module->parent )
                 continue;
             printf( "%s ", p_module->psz_object_name );
         }
@@ -415,11 +415,13 @@ void PrintOption( char *psz_option, char i_short, char *psz_exclusive,
     {
         while( (foo = strchr( psz_text, ':' ))) *foo=';';
         while( (foo = strchr( psz_text, '"' ))) *foo='\'';
+        while( (foo = strchr( psz_text, '`' ))) *foo='\'';
     }
     if( psz_longtext )
     {
         while( (foo = strchr( psz_longtext, ':' ))) *foo=';';
         while( (foo = strchr( psz_longtext, '"' ))) *foo='\'';
+        while( (foo = strchr( psz_longtext, '`' ))) *foo='\'';
     }
     if( !psz_longtext ||
         strchr( psz_longtext, '\n' ) ||
