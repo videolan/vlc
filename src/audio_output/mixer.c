@@ -366,25 +366,9 @@ void aout_MixerRun( aout_instance_t * p_aout )
  * Please note that we assume that you own the mixer lock when entering this
  * function. This function returns -1 on error.
  *****************************************************************************/
-int aout_MixerMultiplierSet( aout_instance_t * p_aout, float f_multiplier )
+void aout_MixerMultiplierSet( aout_instance_t * p_aout, float f_multiplier )
 {
-    float f_old = p_aout->mixer_multiplier;
-    bool b_new_mixer = false;
-
-    if ( p_aout->p_mixer )
-    {
-        aout_MixerDelete( p_aout );
-        b_new_mixer = true;
-    }
-
     p_aout->mixer_multiplier = f_multiplier;
-
-    if ( b_new_mixer && aout_MixerNew( p_aout ) )
-    {
-        p_aout->mixer_multiplier = f_old;
-        aout_MixerNew( p_aout );
-        return -1;
-    }
-
-    return 0;
+    if( p_aout->p_mixer )
+        p_aout->p_mixer->multiplier = f_multiplier;
 }

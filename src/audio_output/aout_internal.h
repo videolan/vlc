@@ -111,7 +111,7 @@ void  aout_FiltersPlay ( filter_t ** pp_filters, unsigned i_nb_filters, aout_buf
 int aout_MixerNew( aout_instance_t * p_aout );
 void aout_MixerDelete( aout_instance_t * p_aout );
 void aout_MixerRun( aout_instance_t * p_aout );
-int aout_MixerMultiplierSet( aout_instance_t * p_aout, float f_multiplier );
+void aout_MixerMultiplierSet( aout_instance_t * p_aout, float f_multiplier );
 
 /* From output.c : */
 int aout_OutputNew( aout_instance_t * p_aout,
