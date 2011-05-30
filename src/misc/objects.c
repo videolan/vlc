@@ -141,6 +141,7 @@ void *vlc_custom_create (vlc_object_t *parent, size_t length,
     obj->psz_header = NULL;
     obj->b_die = false;
     obj->b_force = false;
+    memset (obj + 1, 0, length - sizeof (*obj)); /* type-specific stuff */
 
     if (likely(parent != NULL))
     {
@@ -179,7 +180,6 @@ void *vlc_custom_create (vlc_object_t *parent, size_t length,
         vlc_restorecancel (canc);
     }
 
-    memset (obj + 1, 0, length - sizeof (*obj));
     return obj;
 }
 
