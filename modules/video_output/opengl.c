@@ -563,10 +563,9 @@ int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
     }
 #endif
 
-    for (int i = 0; i < vgl->region_count; i++) {
-        glDeleteTextures(1, &vgl->region[i].texture);
-    }
-    free(vgl->region);
+    int         last_count = vgl->region_count;
+    gl_region_t *last = vgl->region;
+
     vgl->region_count = 0;
     vgl->region       = NULL;
 
@@ -595,21 +594,48 @@ int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
             glr->right  =  2.0 * (r->i_x + r->fmt.i_visible_width ) / subpicture->i_original_picture_width  - 1.0;
             glr->bottom = -2.0 * (r->i_y + r->fmt.i_visible_height) / subpicture->i_original_picture_height + 1.0;
 
-            glGenTextures(1, &glr->texture);
-            glBindTexture(GL_TEXTURE_2D, glr->texture);
-            glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_PRIORITY, 1.0);
-            glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-            /* TODO set GL_UNPACK_ALIGNMENT */
-            glPixelStorei(GL_UNPACK_ROW_LENGTH, r->p_picture->p->i_pitch / r->p_picture->p->i_pixel_pitch);
-            glTexImage2D(GL_TEXTURE_2D, 0, glr->format,
-                         glr->width, glr->height, 0, glr->format, glr->type,
-                         r->p_picture->p->p_pixels);
+            glr->texture = 0;
+            for (int j = 0; j < last_count; j++) {
+                if (last[i].texture &&
+                    last[i].width  == glr->width &&
+                    last[i].height == glr->height &&
+                    last[i].format == glr->format &&
+                    last[i].type   == glr->type) {
+                    glr->texture = last[i].texture;
+                    memset(&last[i], 0, sizeof(last[i]));
+                    break;
+                }
+            }
+
+            if (glr->texture) {
+                glBindTexture(GL_TEXTURE_2D, glr->texture);
+                /* TODO set GL_UNPACK_ALIGNMENT */
+                glPixelStorei(GL_UNPACK_ROW_LENGTH, r->p_picture->p->i_pitch / r->p_picture->p->i_pixel_pitch);
+                glTexSubImage2D(GL_TEXTURE_2D, 0,
+                                0, 0, glr->width, glr->height,
+                                glr->format, glr->type, r->p_picture->p->p_pixels);
+            } else {
+                glGenTextures(1, &glr->texture);
+                glBindTexture(GL_TEXTURE_2D, glr->texture);
+                glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_PRIORITY, 1.0);
+                glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+                /* TODO set GL_UNPACK_ALIGNMENT */
+                glPixelStorei(GL_UNPACK_ROW_LENGTH, r->p_picture->p->i_pitch / r->p_picture->p->i_pixel_pitch);
+                glTexImage2D(GL_TEXTURE_2D, 0, glr->format,
+                             glr->width, glr->height, 0, glr->format, glr->type,
+                             r->p_picture->p->p_pixels);
+            }
         }
     }
+    for (int i = 0; i < last_count; i++) {
+        if (last[i].texture)
+            glDeleteTextures(1, &last[i].texture);
+    }
+    free(last);
 
     vlc_gl_Unlock(vgl->gl);
     VLC_UNUSED(subpicture);
