@@ -210,7 +210,7 @@ int aout_OutputNew( aout_instance_t * p_aout,
 void aout_OutputDelete( aout_instance_t * p_aout )
 {
     if( p_aout->output.p_module == NULL )
-
+        return;
     module_unneed( p_aout, p_aout->output.p_module );
     p_aout->output.p_module = NULL;
 
