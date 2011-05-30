@@ -419,7 +419,7 @@ static int FilterCallback( vlc_object_t *p_this, char const *psz_cmd,
     VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval);
     VLC_UNUSED(p_data); VLC_UNUSED(newval);
 
-    aout_filter_t     *p_filter = (aout_filter_t *)p_this;
+    filter_t     *p_filter = (filter_t *)p_this;
     /* restart this baby */
     msg_Dbg( p_filter, "we should restart the visual filter" );
     return VLC_SUCCESS;
