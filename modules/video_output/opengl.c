@@ -518,6 +518,7 @@ int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
     for (unsigned j = 0; j < vgl->chroma->plane_count; j++) {
         if (vgl->chroma->plane_count > 1)
             vgl->ActiveTextureARB(GL_TEXTURE0_ARB + j);
+        glBindTexture(vgl->tex_target, vgl->texture[0][j]);
         glPixelStorei(GL_UNPACK_ROW_LENGTH, picture->p[j].i_pitch / picture->p[j].i_pixel_pitch);
         glTexSubImage2D(vgl->tex_target, 0,
                         0, 0,
@@ -597,6 +598,13 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 #else
+#if !defined(MACOS_OPENGL)
+    for (unsigned j = 0; j < vgl->chroma->plane_count; j++) {
+        if (vgl->chroma->plane_count > 1)
+            vgl->ActiveTextureARB(GL_TEXTURE0_ARB + j);
+        glBindTexture(vgl->tex_target, vgl->texture[0][j]);
+    }
+#endif
     glBegin(GL_POLYGON);
 
     glTexCoord2f(left[0],  top[0]);
