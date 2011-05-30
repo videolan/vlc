@@ -267,7 +267,6 @@ typedef struct aout_fifo_t aout_fifo_t;
 typedef struct aout_input_t aout_input_t;
 typedef struct block_t aout_buffer_t;
 typedef audio_format_t audio_sample_format_t;
-typedef struct aout_filter_t aout_filter_t;
 
 /* Video */
 typedef struct vout_thread_t vout_thread_t;

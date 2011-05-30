@@ -151,26 +151,6 @@ struct aout_fifo_t
 /* FIXME to remove once aout.h is cleaned a bit more */
 #include <vlc_block.h>
 
-/** audio output filter */
-typedef struct aout_filter_owner_sys_t aout_filter_owner_sys_t;
-typedef struct aout_filter_sys_t aout_filter_sys_t;
-struct aout_filter_t
-{
-    VLC_COMMON_MEMBERS
-
-    module_t *              p_module;
-    aout_filter_sys_t       *p_sys;
-
-    es_format_t             fmt_in;
-    es_format_t             fmt_out;
-
-    void                    (*pf_do_work)( aout_instance_t *, aout_filter_t *,
-                                           aout_buffer_t *, aout_buffer_t * );
-
-    /* Private structure for the owner of the filter */
-    aout_filter_owner_sys_t *p_owner;
-};
-
 #define AOUT_RESAMPLING_NONE     0
 #define AOUT_RESAMPLING_UP       1
 #define AOUT_RESAMPLING_DOWN     2
