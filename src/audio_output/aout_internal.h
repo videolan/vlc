@@ -24,6 +24,8 @@
 #ifndef LIBVLC_AOUT_INTERNAL_H
 # define LIBVLC_AOUT_INTERNAL_H 1
 
+# include <vlc_aout_mixer.h>
+
 aout_buffer_t *aout_BufferAlloc(aout_alloc_t *allocation, mtime_t microseconds,
         aout_buffer_t *old_buffer);
 

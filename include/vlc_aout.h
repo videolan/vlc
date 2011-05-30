@@ -150,7 +150,6 @@ struct aout_fifo_t
 };
 
 /* FIXME to remove once aout.h is cleaned a bit more */
-#include <vlc_aout_mixer.h>
 #include <vlc_block.h>
 
 /** audio output filter */
@@ -205,6 +204,8 @@ typedef struct aout_output_t
     bool              b_error;
 } aout_output_t;
 
+struct aout_mixer_t;
+
 /** audio output thread descriptor */
 struct aout_instance_t
 {
@@ -235,7 +236,7 @@ struct aout_instance_t
     audio_sample_format_t   mixer_format;
     aout_alloc_t            mixer_allocation;
     float                   mixer_multiplier;
-    aout_mixer_t            *p_mixer;
+    struct aout_mixer_t    *p_mixer;
 
     /* Output plug-in */
     aout_output_t           output;
