@@ -41,11 +41,7 @@
 # elif USE_OPENGL_ES == 1
 #  include <GLES/glext.h>
 # else
-# if defined(WIN32)
-#   include <GL/glew.h>
-# else
 #   include <GL/glext.h>
-# endif
 # endif
 #else
 # if USE_OPENGL_ES == 2
