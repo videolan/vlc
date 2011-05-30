@@ -193,6 +193,7 @@ int aout_OutputNew( aout_instance_t * p_aout,
     {
         msg_Err( p_aout, "couldn't create audio output pipeline" );
         module_unneed( p_aout, p_aout->output.p_module );
+        p_aout->output.p_module = NULL;
         return -1;
     }
 
@@ -206,8 +207,6 @@ int aout_OutputNew( aout_instance_t * p_aout,
     aout_FiltersHintBuffers( p_aout, p_aout->output.pp_filters,
                              p_aout->output.i_nb_filters,
                              &p_aout->mixer_allocation );
-
-    p_aout->output.b_error = 0;
     return 0;
 }
 
@@ -218,12 +217,10 @@ int aout_OutputNew( aout_instance_t * p_aout,
  *****************************************************************************/
 void aout_OutputDelete( aout_instance_t * p_aout )
 {
-    if ( p_aout->output.b_error )
-    {
-        return;
-    }
+    if( p_aout->output.p_module == NULL )
 
     module_unneed( p_aout, p_aout->output.p_module );
+    p_aout->output.p_module = NULL;
 
     aout_FiltersDestroyPipeline( p_aout, p_aout->output.pp_filters,
                                  p_aout->output.i_nb_filters );
@@ -231,8 +228,6 @@ void aout_OutputDelete( aout_instance_t * p_aout )
     aout_lock_output_fifo( p_aout );
     aout_FifoDestroy( p_aout, &p_aout->output.fifo );
     aout_unlock_output_fifo( p_aout );
-
-    p_aout->output.b_error = true;
 }
 
 /*****************************************************************************

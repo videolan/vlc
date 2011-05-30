@@ -199,9 +199,6 @@ typedef struct aout_output_t
     void                 (* pf_play)( aout_instance_t * );
     int                  (* pf_volume_set )( aout_instance_t *, audio_volume_t, bool );
     int                     i_nb_samples;
-
-    /* If b_error == 1, there is no audio output pipeline. */
-    bool              b_error;
 } aout_output_t;
 
 struct aout_mixer_t;
