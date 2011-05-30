@@ -138,7 +138,6 @@ typedef int32_t vlc_fixed_t;
 typedef struct aout_alloc_t
 {
     bool                    b_alloc;
-    int                     i_bytes_per_sec;
 } aout_alloc_t;
 
 /** audio output buffer FIFO */

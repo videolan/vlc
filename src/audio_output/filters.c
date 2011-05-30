@@ -294,36 +294,6 @@ void aout_FiltersDestroyPipeline( aout_instance_t * p_aout,
 }
 
 /*****************************************************************************
- * aout_FiltersHintBuffers: fill in aout_alloc_t structures to optimize
- *                          buffer allocations
- *****************************************************************************/
-void aout_FiltersHintBuffers( aout_instance_t * p_aout,
-                              filter_t ** pp_filters,
-                              int i_nb_filters, aout_alloc_t * p_first_alloc )
-{
-    int i;
-
-    (void)p_aout; /* unused */
-
-    for ( i = i_nb_filters - 1; i >= 0; i-- )
-    {
-        filter_t * p_filter = pp_filters[i];
-
-        int i_output_size = p_filter->fmt_out.audio.i_bytes_per_frame
-                         * p_filter->fmt_out.audio.i_rate * AOUT_MAX_INPUT_RATE
-                         / p_filter->fmt_out.audio.i_frame_length;
-        int i_input_size = p_filter->fmt_in.audio.i_bytes_per_frame
-                         * p_filter->fmt_in.audio.i_rate * AOUT_MAX_INPUT_RATE
-                         / p_filter->fmt_in.audio.i_frame_length;
-
-        if( i_output_size > p_first_alloc->i_bytes_per_sec )
-            p_first_alloc->i_bytes_per_sec = i_output_size;
-        if( i_input_size > p_first_alloc->i_bytes_per_sec )
-            p_first_alloc->i_bytes_per_sec = i_input_size;
-    }
-}
-
-/*****************************************************************************
  * aout_FiltersPlay: play a buffer
  *****************************************************************************/
 void aout_FiltersPlay( filter_t ** pp_filters,

@@ -106,7 +106,6 @@ bool aout_InputIsEmpty( aout_instance_t * p_aout, aout_input_t * p_input );
 int aout_FiltersCreatePipeline ( aout_instance_t * p_aout, filter_t ** pp_filters, int * pi_nb_filters, const audio_sample_format_t * p_input_format, const audio_sample_format_t * p_output_format );
 void aout_FiltersDestroyPipeline ( aout_instance_t * p_aout, filter_t ** pp_filters, int i_nb_filters );
 void  aout_FiltersPlay ( filter_t ** pp_filters, unsigned i_nb_filters, aout_buffer_t ** pp_input_buffer );
-void aout_FiltersHintBuffers( aout_instance_t * p_aout, filter_t ** pp_filters, int i_nb_filters, aout_alloc_t * p_first_alloc );
 
 /* From mixer.c : */
 int aout_MixerNew( aout_instance_t * p_aout );
