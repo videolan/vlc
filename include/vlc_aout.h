@@ -164,10 +164,6 @@ struct aout_filter_t
     es_format_t             fmt_in;
     es_format_t             fmt_out;
 
-    aout_alloc_t            output_alloc;
-
-    bool                    b_in_place;
-
     void                    (*pf_do_work)( aout_instance_t *, aout_filter_t *,
                                            aout_buffer_t *, aout_buffer_t * );
 
