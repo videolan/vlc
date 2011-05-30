@@ -49,10 +49,10 @@ static void CloseFilter   ( vlc_object_t * );
 
 static block_t *Convert( filter_t *p_filter, block_t *p_block );
 
-static unsigned int stereo_to_mono( aout_filter_t *, aout_buffer_t *,
+static unsigned int stereo_to_mono( filter_t *, aout_buffer_t *,
                                     aout_buffer_t * );
-static unsigned int mono( aout_filter_t *, aout_buffer_t *, aout_buffer_t * );
-static void stereo2mono_downmix( aout_filter_t *, aout_buffer_t *,
+static unsigned int mono( filter_t *, aout_buffer_t *, aout_buffer_t * );
+static void stereo2mono_downmix( filter_t *, aout_buffer_t *,
                                  aout_buffer_t * );
 
 /*****************************************************************************
@@ -453,7 +453,6 @@ static void CloseFilter( vlc_object_t *p_this)
  *****************************************************************************/
 static block_t *Convert( filter_t *p_filter, block_t *p_block )
 {
-    aout_filter_t aout_filter;
     aout_buffer_t in_buf, out_buf;
     block_t *p_out = NULL;
     unsigned int i_samples;
@@ -483,12 +482,6 @@ static block_t *Convert( filter_t *p_filter, block_t *p_block )
     p_out->i_pts = p_block->i_pts;
     p_out->i_length = p_block->i_length;
 
-    aout_filter.p_sys = (struct aout_filter_sys_t *)p_filter->p_sys;
-    aout_filter.fmt_in.audio = p_filter->fmt_in.audio;
-    aout_filter.fmt_in.audio.i_format = p_filter->fmt_in.i_codec;
-    aout_filter.fmt_out.audio = p_filter->fmt_out.audio;
-    aout_filter.fmt_out.audio.i_format = p_filter->fmt_out.i_codec;
-
     in_buf.p_buffer = p_block->p_buffer;
     in_buf.i_buffer = p_block->i_buffer;
     in_buf.i_nb_samples = p_block->i_nb_samples;
@@ -510,12 +503,12 @@ static block_t *Convert( filter_t *p_filter, block_t *p_block )
     memset( p_out->p_buffer, 0, i_out_size );
     if( p_filter->p_sys->b_downmix )
     {
-        stereo2mono_downmix( &aout_filter, &in_buf, &out_buf );
-        i_samples = mono( &aout_filter, &out_buf, &in_buf );
+        stereo2mono_downmix( p_filter, &in_buf, &out_buf );
+        i_samples = mono( p_filter, &out_buf, &in_buf );
     }
     else
     {
-        i_samples = stereo_to_mono( &aout_filter, &out_buf, &in_buf );
+        i_samples = stereo_to_mono( p_filter, &out_buf, &in_buf );
     }
 
     p_out->i_buffer = out_buf.i_buffer;
@@ -530,7 +523,7 @@ static block_t *Convert( filter_t *p_filter, block_t *p_block )
  * converted from float into int16_t based downmix
  * Written by Boris Dorès <babal@via.ecp.fr>
  */
-static void stereo2mono_downmix( aout_filter_t * p_filter,
+static void stereo2mono_downmix( filter_t * p_filter,
                             aout_buffer_t * p_in_buf, aout_buffer_t * p_out_buf )
 {
     filter_sys_t *p_sys = (filter_sys_t *)p_filter->p_sys;
@@ -633,7 +626,7 @@ static void stereo2mono_downmix( aout_filter_t * p_filter,
 }
 
 /* Simple stereo to mono mixing. */
-static unsigned int mono( aout_filter_t *p_filter,
+static unsigned int mono( filter_t *p_filter,
                           aout_buffer_t *p_output, aout_buffer_t *p_input )
 {
     filter_sys_t *p_sys = (filter_sys_t *)p_filter->p_sys;
@@ -653,7 +646,7 @@ static unsigned int mono( aout_filter_t *p_filter,
 }
 
 /* Simple stereo to mono mixing. */
-static unsigned int stereo_to_mono( aout_filter_t *p_filter,
+static unsigned int stereo_to_mono( filter_t *p_filter,
                                     aout_buffer_t *p_output, aout_buffer_t *p_input )
 {
     filter_sys_t *p_sys = (filter_sys_t *)p_filter->p_sys;
