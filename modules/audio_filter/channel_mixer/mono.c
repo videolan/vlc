@@ -453,9 +453,7 @@ static void CloseFilter( vlc_object_t *p_this)
  *****************************************************************************/
 static block_t *Convert( filter_t *p_filter, block_t *p_block )
 {
-    aout_buffer_t in_buf, out_buf;
-    block_t *p_out = NULL;
-    unsigned int i_samples;
+    block_t *p_out;
     int i_out_size;
 
     if( !p_block || !p_block->i_nb_samples )
@@ -478,13 +476,6 @@ static block_t *Convert( filter_t *p_filter, block_t *p_block )
     p_out->i_nb_samples =
                   (p_block->i_nb_samples / p_filter->p_sys->i_nb_channels) *
                        aout_FormatNbChannels( &(p_filter->fmt_out.audio) );
-    p_out->i_dts = p_block->i_dts;
-    p_out->i_pts = p_block->i_pts;
-    p_out->i_length = p_block->i_length;
-
-    in_buf.p_buffer = p_block->p_buffer;
-    in_buf.i_buffer = p_block->i_buffer;
-    in_buf.i_nb_samples = p_block->i_nb_samples;
 
 #if 0
     unsigned int i_in_size = in_buf.i_nb_samples  * (p_filter->p_sys->i_bitspersample/8) *
@@ -496,23 +487,16 @@ static block_t *Convert( filter_t *p_filter, block_t *p_block )
     }
 #endif
 
-    out_buf.p_buffer = p_out->p_buffer;
-    out_buf.i_buffer = p_out->i_buffer;
-    out_buf.i_nb_samples = p_out->i_nb_samples;
-
     memset( p_out->p_buffer, 0, i_out_size );
     if( p_filter->p_sys->b_downmix )
     {
-        stereo2mono_downmix( p_filter, &in_buf, &out_buf );
-        i_samples = mono( p_filter, &out_buf, &in_buf );
+        stereo2mono_downmix( p_filter, p_block, p_out );
+        mono( p_filter, p_out, p_block );
     }
     else
     {
-        i_samples = stereo_to_mono( p_filter, &out_buf, &in_buf );
+        stereo_to_mono( p_filter, p_out, p_block );
     }
-
-    p_out->i_buffer = out_buf.i_buffer;
-    p_out->i_nb_samples = out_buf.i_nb_samples;
 
     block_Release( p_block );
     return p_out;
