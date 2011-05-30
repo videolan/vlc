@@ -39,6 +39,7 @@ Access:
    in an option (no autodetection): only Theora supported for now
  * Basic HTCPCP implementation for Coffee Pot control
  * QTCapture: added support for all QTKit-compatible video input devices
+ * X11 Screen: support for capturing partially hidden windows
 
 Codecs:
  * You can now use ffmpeg-mt in conjunction with vlc
@@ -72,6 +73,8 @@ Video Output:
  * Experimental work in progress on a video output using EGL
  * Adaptation of the OpenGL layer for OpenGL ES 1.1
  * Various vmem improvements
+ * OpenGL video output now accepts YUV as input and uses fragment programs for
+   chroma conversion
 
 Audio Output:
  * New audio output based on AudioQueue API for iOS
