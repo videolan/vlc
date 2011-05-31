@@ -254,7 +254,7 @@ static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
         HRESULT hr = ID2D1HwndRenderTarget_EndDraw(sys->d2_render_target,
                                                    NULL,
                                                    NULL);
-        if (hr ==  D2DERR_RECREATE_TARGET) {
+        if (hr == D2DERR_RECREATE_TARGET) {
             D2D_DestroyRenderTarget(vd);
             D2D_CreateRenderTarget(vd);
         }

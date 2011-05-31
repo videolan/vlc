@@ -231,6 +231,7 @@ static void Swap(vlc_gl_t *gl)
 
 static void *OurGetProcAddress(vlc_gl_t *gl, const char *name)
 {
+    VLC_UNUSED(gl);
     return wglGetProcAddress(name);
 }
 
