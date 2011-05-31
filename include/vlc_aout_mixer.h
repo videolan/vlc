@@ -41,9 +41,6 @@ typedef struct aout_mixer_sys_t aout_mixer_sys_t;
 typedef struct aout_mixer_t aout_mixer_t;
 
 typedef struct {
-    /* Is the input to be ignored while mixing */
-    bool        is_invalid;
-
     /* */
     aout_fifo_t fifo;
 
