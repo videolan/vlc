@@ -93,39 +93,25 @@ void aout_MixerDelete( aout_instance_t * p_aout )
  *****************************************************************************/
 static int MixBuffer( aout_instance_t * p_aout, float volume )
 {
-    int             i, i_first_input = 0;
-    mtime_t start_date, end_date;
-    date_t  exact_start_date;
+    aout_mixer_t *p_mixer = p_aout->p_mixer;
 
-    if( !p_aout->p_mixer )
-    {
-        /* Free all incoming buffers. */
-        aout_lock_input_fifos( p_aout );
-        for ( i = 0; i < p_aout->i_nb_inputs; i++ )
-        {
-            aout_input_t * p_input = p_aout->pp_inputs[i];
-            aout_buffer_t * p_buffer = p_input->mixer.fifo.p_first;
-            if ( p_input->b_error ) continue;
-            while ( p_buffer != NULL )
-            {
-                aout_buffer_t * p_next = p_buffer->p_next;
-                aout_BufferFree( p_buffer );
-                p_buffer = p_next;
-            }
-        }
-        aout_unlock_input_fifos( p_aout );
+    assert( p_aout->i_nb_inputs == 1 );
+
+    aout_input_t *p_input = p_aout->pp_inputs[0];
+    if( p_input->b_paused )
         return -1;
-    }
 
+    aout_fifo_t * p_fifo = &p_input->mixer.fifo;
+    mtime_t now = mdate();
 
     aout_lock_input_fifos( p_aout );
     aout_lock_output_fifo( p_aout );
 
     /* Retrieve the date of the next buffer. */
-    exact_start_date = p_aout->output.fifo.end_date;
-    start_date = date_Get( &exact_start_date );
+    date_t exact_start_date = p_aout->output.fifo.end_date;
+    mtime_t start_date = date_Get( &exact_start_date );
 
-    if ( start_date != 0 && start_date < mdate() )
+    if( start_date != 0 && start_date < now )
     {
         /* The output is _very_ late. This can only happen if the user
          * pauses the stream (or if the decoder is buggy, which cannot
@@ -144,193 +130,124 @@ static int MixBuffer( aout_instance_t * p_aout, float volume )
     if ( !start_date )
     {
         /* Find the latest start date available. */
-        for ( i = 0; i < p_aout->i_nb_inputs; i++ )
+        aout_buffer_t *p_buffer;
+        for( ;; )
         {
-            aout_input_t * p_input = p_aout->pp_inputs[i];
-            aout_fifo_t * p_fifo = &p_input->mixer.fifo;
-            aout_buffer_t * p_buffer;
-
-            if ( p_input->b_error || p_input->b_paused )
-                continue;
-
             p_buffer = p_fifo->p_first;
-            while ( p_buffer != NULL && p_buffer->i_pts < mdate() )
-            {
-                msg_Warn( p_aout, "input PTS is out of range (%"PRId64"), "
-                          "trashing", mdate() - p_buffer->i_pts );
-                p_buffer = aout_FifoPop( p_aout, p_fifo );
-                aout_BufferFree( p_buffer );
-                p_buffer = p_fifo->p_first;
-                p_input->mixer.begin = NULL;
-            }
-
-            if ( p_buffer == NULL )
-            {
+            if( p_buffer == NULL )
+                goto giveup;
+            if( p_buffer->i_pts >= now )
                 break;
-            }
 
-            if ( !start_date || start_date < p_buffer->i_pts )
-            {
-                date_Set( &exact_start_date, p_buffer->i_pts );
-                start_date = p_buffer->i_pts;
-            }
-        }
-
-        if ( i < p_aout->i_nb_inputs )
-        {
-            /* Interrupted before the end... We can't run. */
-            aout_unlock_input_fifos( p_aout );
-            return -1;
-        }
-    }
-    date_Increment( &exact_start_date, p_aout->output.i_nb_samples );
-    end_date = date_Get( &exact_start_date );
-
-    /* Check that start_date and end_date are available for all input
-     * streams. */
-    for ( i = 0; i < p_aout->i_nb_inputs; i++ )
-    {
-        aout_input_t * p_input = p_aout->pp_inputs[i];
-        aout_fifo_t * p_fifo = &p_input->mixer.fifo;
-        aout_buffer_t * p_buffer;
-        mtime_t prev_date;
-        bool b_drop_buffers;
-
-        p_input->mixer.is_invalid = p_input->b_error || p_input->b_paused;
-        if ( p_input->mixer.is_invalid )
-        {
-            if ( i_first_input == i ) i_first_input++;
-            continue;
-        }
-
-        p_buffer = p_fifo->p_first;
-        if ( p_buffer == NULL )
-        {
-            break;
-        }
-
-        /* Check for the continuity of start_date */
-        while ( p_buffer != NULL
-             && p_buffer->i_pts + p_buffer->i_length < start_date - 1 )
-        {
-            /* We authorize a +-1 because rounding errors get compensated
-             * regularly. */
-            aout_buffer_t * p_next = p_buffer->p_next;
-            msg_Warn( p_aout, "the mixer got a packet in the past (%"PRId64")",
-                      start_date - (p_buffer->i_pts + p_buffer->i_length) );
-            aout_BufferFree( p_buffer );
-            p_fifo->p_first = p_buffer = p_next;
+            msg_Warn( p_aout, "input PTS is out of range (%"PRId64"), "
+                      "trashing", now - p_buffer->i_pts );
+            aout_BufferFree( aout_FifoPop( p_aout, p_fifo ) );
             p_input->mixer.begin = NULL;
         }
-        if ( p_buffer == NULL )
-        {
-            p_fifo->pp_last = &p_fifo->p_first;
-            break;
-        }
 
-        /* Check that we have enough samples. */
-        for ( ; ; )
-        {
-            p_buffer = p_fifo->p_first;
-            if ( p_buffer == NULL ) break;
-            if ( p_buffer->i_pts + p_buffer->i_length >= end_date ) break;
-
-            /* Check that all buffers are contiguous. */
-            prev_date = p_fifo->p_first->i_pts + p_fifo->p_first->i_length;
-            p_buffer = p_buffer->p_next;
-            b_drop_buffers = 0;
-            for ( ; p_buffer != NULL; p_buffer = p_buffer->p_next )
-            {
-                if ( prev_date != p_buffer->i_pts )
-                {
-                    msg_Warn( p_aout,
-                              "buffer hole, dropping packets (%"PRId64")",
-                              p_buffer->i_pts - prev_date );
-                    b_drop_buffers = 1;
-                    break;
-                }
-                if ( p_buffer->i_pts + p_buffer->i_length >= end_date ) break;
-                prev_date = p_buffer->i_pts + p_buffer->i_length;
-            }
-            if ( b_drop_buffers )
-            {
-                aout_buffer_t * p_deleted = p_fifo->p_first;
-                while ( p_deleted != NULL && p_deleted != p_buffer )
-                {
-                    aout_buffer_t * p_next = p_deleted->p_next;
-                    aout_BufferFree( p_deleted );
-                    p_deleted = p_next;
-                }
-                p_fifo->p_first = p_deleted; /* == p_buffer */
-            }
-            else break;
-        }
-        if ( p_buffer == NULL ) break;
-
-        p_buffer = p_fifo->p_first;
-        if ( !AOUT_FMT_NON_LINEAR( &p_aout->p_mixer->fmt ) )
-        {
-            /* Additionally check that p_first_byte_to_mix is well
-             * located. */
-            mtime_t i_buffer = (start_date - p_buffer->i_pts)
-                            * p_aout->p_mixer->fmt.i_bytes_per_frame
-                            * p_aout->p_mixer->fmt.i_rate
-                            / p_aout->p_mixer->fmt.i_frame_length
-                            / 1000000;
-            ptrdiff_t mixer_nb_bytes;
-
-            if ( p_input->mixer.begin == NULL )
-            {
-                p_input->mixer.begin = p_buffer->p_buffer;
-            }
-            mixer_nb_bytes = p_input->mixer.begin - p_buffer->p_buffer;
-
-            if ( !((i_buffer + p_aout->p_mixer->fmt.i_bytes_per_frame
-                     > mixer_nb_bytes) &&
-                   (i_buffer < p_aout->p_mixer->fmt.i_bytes_per_frame
-                     + mixer_nb_bytes)) )
-            {
-                msg_Warn( p_aout, "mixer start isn't output start (%"PRId64")",
-                          i_buffer - mixer_nb_bytes );
-
-                /* Round to the nearest multiple */
-                i_buffer /= p_aout->p_mixer->fmt.i_bytes_per_frame;
-                i_buffer *= p_aout->p_mixer->fmt.i_bytes_per_frame;
-                if( i_buffer < 0 )
-                {
-                    /* Is it really the best way to do it ? */
-                    aout_lock_output_fifo( p_aout );
-                    aout_FifoSet( p_aout, &p_aout->output.fifo, 0 );
-                    date_Set( &exact_start_date, 0 );
-                    aout_unlock_output_fifo( p_aout );
-                    break;
-                }
-
-                p_input->mixer.begin = p_buffer->p_buffer + i_buffer;
-            }
-        }
+        date_Set( &exact_start_date, p_buffer->i_pts );
+        start_date = p_buffer->i_pts;
     }
 
-    if ( i < p_aout->i_nb_inputs || i_first_input == p_aout->i_nb_inputs )
+    date_Increment( &exact_start_date, p_aout->output.i_nb_samples );
+    mtime_t end_date = date_Get( &exact_start_date );
+
+    /* Check that start_date is available. */
+    aout_buffer_t *p_buffer = p_fifo->p_first;
+    mtime_t prev_date;
+
+    for( ;; )
     {
-        /* Interrupted before the end... We can't run. */
-        aout_unlock_input_fifos( p_aout );
-        return -1;
+        if( p_buffer == NULL )
+            goto giveup;
+
+        /* Check for the continuity of start_date */
+        prev_date = p_buffer->i_pts + p_buffer->i_length;
+        if( prev_date >= start_date - 1 )
+            break;
+        /* We authorize a +-1 because rounding errors get compensated
+         * regularly. */
+        msg_Warn( p_aout, "the mixer got a packet in the past (%"PRId64")",
+                  start_date - prev_date );
+        aout_BufferFree( aout_FifoPop( p_aout, p_fifo ) );
+        p_input->mixer.begin = NULL;
+        p_buffer = p_fifo->p_first;
+    }
+
+    /* Check that we have enough samples. */
+    while( prev_date < end_date )
+    {
+        p_buffer = p_buffer->p_next;
+        if( p_buffer == NULL )
+            goto giveup;
+
+        /* Check that all buffers are contiguous. */
+        if( prev_date != p_buffer->i_pts )
+        {
+            msg_Warn( p_aout,
+                      "buffer hole, dropping packets (%"PRId64")",
+                      p_buffer->i_pts - prev_date );
+
+            aout_buffer_t *p_deleted;
+            while( (p_deleted = p_fifo->p_first) != p_buffer )
+                aout_BufferFree( aout_FifoPop( p_aout, p_fifo ) );
+        }
+
+        prev_date = p_buffer->i_pts + p_buffer->i_length;
+    }
+
+    p_buffer = p_fifo->p_first;
+    if( !AOUT_FMT_NON_LINEAR( &p_mixer->fmt ) )
+    {
+        /* Additionally check that p_first_byte_to_mix is well located. */
+        mtime_t i_buffer = (start_date - p_buffer->i_pts)
+                         * p_mixer->fmt.i_bytes_per_frame
+                         * p_mixer->fmt.i_rate
+                         / p_mixer->fmt.i_frame_length
+                         / CLOCK_FREQ;
+        if( p_input->mixer.begin == NULL )
+            p_input->mixer.begin = p_buffer->p_buffer;
+
+        ptrdiff_t bytes = p_input->mixer.begin - p_buffer->p_buffer;
+        if( !((i_buffer + p_mixer->fmt.i_bytes_per_frame > bytes)
+         && (i_buffer < p_mixer->fmt.i_bytes_per_frame + bytes)) )
+        {
+            msg_Warn( p_aout, "mixer start is not output start (%"PRId64")",
+                      i_buffer - bytes );
+
+            /* Round to the nearest multiple */
+            i_buffer /= p_mixer->fmt.i_bytes_per_frame;
+            i_buffer *= p_mixer->fmt.i_bytes_per_frame;
+            if( i_buffer < 0 )
+            {
+                /* Is it really the best way to do it ? */
+                aout_lock_output_fifo( p_aout );
+                aout_FifoSet( p_aout, &p_aout->output.fifo, 0 );
+                date_Set( &exact_start_date, 0 );
+                aout_unlock_output_fifo( p_aout );
+                goto giveup;
+            }
+            p_input->mixer.begin = p_buffer->p_buffer + i_buffer;
+        }
     }
 
     /* Run the mixer. */
-    aout_buffer_t * p_outbuf;
-    p_outbuf = p_aout->p_mixer->mix( p_aout->p_mixer,
-                                     p_aout->output.i_nb_samples, volume );
+    p_buffer = p_mixer->mix( p_aout->p_mixer, p_aout->output.i_nb_samples,
+                             volume );
     aout_unlock_input_fifos( p_aout );
 
-    if( unlikely(p_outbuf == NULL) )
+    if( unlikely(p_buffer == NULL) )
         return -1;
 
-    p_outbuf->i_pts = start_date;
-    p_outbuf->i_length = end_date - start_date;
-    aout_OutputPlay( p_aout, p_outbuf );
+    p_buffer->i_pts = start_date;
+    p_buffer->i_length = end_date - start_date;
+    aout_OutputPlay( p_aout, p_buffer );
     return 0;
+
+giveup:
+    /* Interrupted before the end... We can't run. */
+    aout_unlock_input_fifos( p_aout );
+    return -1;
 }
 
 /*****************************************************************************

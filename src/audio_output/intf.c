@@ -318,6 +318,8 @@ static int aout_Restart( aout_instance_t * p_aout )
     /* Re-open the output plug-in. */
     aout_OutputDelete( p_aout );
 
+    /* FIXME: This function is notoriously dangerous/unsafe.
+     * By the way, if OutputNew or MixerNew fails, we are totally screwed. */
     if ( aout_OutputNew( p_aout, &p_aout->pp_inputs[0]->input ) == -1 )
     {
         /* Release all locks and report the error. */
