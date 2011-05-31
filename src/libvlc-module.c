@@ -277,7 +277,7 @@ static const char *const ppsz_snap_formats[] =
 #define AOUT_RATE_TEXT N_("Audio output frequency (Hz)")
 #define AOUT_RATE_LONGTEXT N_( \
     "You can force the audio output frequency here. Common values are " \
-    "-1 (default), 48000, 44100, 32000, 22050, 16000, 11025, 8000.")
+    "0 (undefined), 48000, 44100, 32000, 22050, 16000, 11025, 8000.")
 
 #if !defined( __APPLE__ )
 #define AOUT_RESAMP_TEXT N_("High quality audio resampling")
@@ -1600,7 +1600,7 @@ vlc_module_begin ()
     add_integer_with_range( "volume-step", AOUT_VOLUME_STEP, AOUT_VOLUME_MIN,
                             AOUT_VOLUME_MAX, VOLUME_STEP_TEXT,
                             VOLUME_STEP_LONGTEXT, true )
-    add_integer( "aout-rate", -1, AOUT_RATE_TEXT,
+    add_integer( "aout-rate", 0, AOUT_RATE_TEXT,
                  AOUT_RATE_LONGTEXT, true )
 #if HAVE_FPU && !defined( __APPLE__ )
     add_bool( "hq-resampling", 1, AOUT_RESAMP_TEXT,

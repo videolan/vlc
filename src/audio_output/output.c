@@ -43,14 +43,11 @@
 int aout_OutputNew( aout_instance_t * p_aout,
                     audio_sample_format_t * p_format )
 {
+    p_aout->output.output = *p_format;
+
     /* Retrieve user defaults. */
     int i_rate = var_InheritInteger( p_aout, "aout-rate" );
-    vlc_value_t val, text;
-    /* kludge to avoid a fpu error when rate is 0... */
-    if( i_rate == 0 ) i_rate = -1;
-
-    memcpy( &p_aout->output.output, p_format, sizeof(audio_sample_format_t) );
-    if ( i_rate != -1 )
+    if ( i_rate != 0 )
         p_aout->output.output.i_rate = i_rate;
     aout_FormatPrepare( &p_aout->output.output );
 
@@ -66,36 +63,34 @@ int aout_OutputNew( aout_instance_t * p_aout,
              (VLC_VAR_INTEGER | VLC_VAR_HASCHOICE) )
     {
         /* The user may have selected a different channels configuration. */
-        var_Get( p_aout, "audio-channels", &val );
-
-        if ( val.i_int == AOUT_VAR_CHAN_RSTEREO )
+        switch( var_InheritInteger( p_aout, "audio-channels" ) )
         {
-            p_aout->output.output.i_original_channels |=
-                                        AOUT_CHAN_REVERSESTEREO;
-        }
-        else if ( val.i_int == AOUT_VAR_CHAN_STEREO )
-        {
-            p_aout->output.output.i_original_channels =
-                AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
-        }
-        else if ( val.i_int == AOUT_VAR_CHAN_LEFT )
-        {
-            p_aout->output.output.i_original_channels = AOUT_CHAN_LEFT;
-        }
-        else if ( val.i_int == AOUT_VAR_CHAN_RIGHT )
-        {
-            p_aout->output.output.i_original_channels = AOUT_CHAN_RIGHT;
-        }
-        else if ( val.i_int == AOUT_VAR_CHAN_DOLBYS )
-        {
-            p_aout->output.output.i_original_channels
-                = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_DOLBYSTEREO;
+            case AOUT_VAR_CHAN_RSTEREO:
+                p_aout->output.output.i_original_channels |=
+                                                       AOUT_CHAN_REVERSESTEREO;
+                break;
+            case AOUT_VAR_CHAN_STEREO:
+                p_aout->output.output.i_original_channels =
+                                              AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
+                break;
+            case AOUT_VAR_CHAN_LEFT:
+                p_aout->output.output.i_original_channels = AOUT_CHAN_LEFT;
+                break;
+            case AOUT_VAR_CHAN_RIGHT:
+                p_aout->output.output.i_original_channels = AOUT_CHAN_RIGHT;
+                break;
+            case AOUT_VAR_CHAN_DOLBYS:
+                p_aout->output.output.i_original_channels =
+                      AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_DOLBYSTEREO;
+                break;
         }
     }
     else if ( p_aout->output.output.i_physical_channels == AOUT_CHAN_CENTER
               && (p_aout->output.output.i_original_channels
                    & AOUT_CHAN_PHYSMASK) == (AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT) )
     {
+        vlc_value_t val, text;
+
         /* Mono - create the audio-channels variable. */
         var_Create( p_aout, "audio-channels",
                     VLC_VAR_INTEGER | VLC_VAR_HASCHOICE );
@@ -122,6 +117,8 @@ int aout_OutputNew( aout_instance_t * p_aout,
                 && (p_aout->output.output.i_original_channels &
                      (AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT)) )
     {
+        vlc_value_t val, text;
+
         /* Stereo - create the audio-channels variable. */
         var_Create( p_aout, "audio-channels",
                     VLC_VAR_INTEGER | VLC_VAR_HASCHOICE );
