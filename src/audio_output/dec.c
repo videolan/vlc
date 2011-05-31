@@ -293,9 +293,7 @@ int aout_DecPlay( aout_instance_t * p_aout, aout_input_t * p_input,
 
     /* Run the mixer if it is able to run. */
     aout_lock_mixer( p_aout );
-
-    aout_MixerRun( p_aout );
-
+    aout_MixerRun( p_aout, p_aout->mixer_multiplier );
     aout_unlock_mixer( p_aout );
 
     return 0;

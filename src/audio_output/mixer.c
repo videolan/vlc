@@ -51,7 +51,6 @@ int aout_MixerNew( aout_instance_t * p_aout )
         return VLC_EGENERIC;
 
     p_mixer->fmt = p_aout->mixer_format;
-    p_mixer->multiplier = p_aout->mixer_multiplier;
     p_mixer->input = &p_aout->pp_inputs[0]->mixer;
     p_mixer->mix = NULL;
     p_mixer->sys = NULL;
@@ -92,7 +91,7 @@ void aout_MixerDelete( aout_instance_t * p_aout )
  *****************************************************************************
  * Please note that you must hold the mixer lock.
  *****************************************************************************/
-static int MixBuffer( aout_instance_t * p_aout )
+static int MixBuffer( aout_instance_t * p_aout, float volume )
 {
     int             i, i_first_input = 0;
     mtime_t start_date, end_date;
@@ -322,7 +321,7 @@ static int MixBuffer( aout_instance_t * p_aout )
     /* Run the mixer. */
     aout_buffer_t * p_outbuf;
     p_outbuf = p_aout->p_mixer->mix( p_aout->p_mixer,
-                                     p_aout->output.i_nb_samples );
+                                     p_aout->output.i_nb_samples, volume );
     aout_unlock_input_fifos( p_aout );
 
     if( unlikely(p_outbuf == NULL) )
@@ -339,20 +338,7 @@ static int MixBuffer( aout_instance_t * p_aout )
  *****************************************************************************
  * Please note that you must hold the mixer lock.
  *****************************************************************************/
-void aout_MixerRun( aout_instance_t * p_aout )
+void aout_MixerRun( aout_instance_t * p_aout, float volume )
 {
-    while( MixBuffer( p_aout ) != -1 );
-}
-
-/*****************************************************************************
- * aout_MixerMultiplierSet: set p_aout->mixer.f_multiplier
- *****************************************************************************
- * Please note that we assume that you own the mixer lock when entering this
- * function. This function returns -1 on error.
- *****************************************************************************/
-void aout_MixerMultiplierSet( aout_instance_t * p_aout, float f_multiplier )
-{
-    p_aout->mixer_multiplier = f_multiplier;
-    if( p_aout->p_mixer )
-        p_aout->p_mixer->multiplier = f_multiplier;
+    while( MixBuffer( p_aout, volume ) != -1 );
 }

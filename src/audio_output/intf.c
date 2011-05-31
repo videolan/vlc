@@ -245,7 +245,7 @@ static int aout_VolumeSoftSet (aout_instance_t *aout, audio_volume_t volume,
                                bool mute)
 {
     float f = mute ? 0. : (volume / (float)AOUT_VOLUME_DEFAULT);
-    aout_MixerMultiplierSet (aout, f);
+    aout->mixer_multiplier = f;
     return 0;
 }
 

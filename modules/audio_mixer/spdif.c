@@ -41,7 +41,7 @@
  *****************************************************************************/
 static int  Create    ( vlc_object_t * );
 
-static aout_buffer_t *DoWork( aout_mixer_t *, unsigned );
+static aout_buffer_t *DoWork( aout_mixer_t *, unsigned, float );
 
 /*****************************************************************************
  * Module descriptor
@@ -71,11 +71,12 @@ static int Create( vlc_object_t *p_this )
 /*****************************************************************************
  * DoWork: mix a new output buffer - this does nothing, indeed
  *****************************************************************************/
-static aout_buffer_t *DoWork( aout_mixer_t * p_mixer, unsigned samples )
+static aout_buffer_t *DoWork( aout_mixer_t * p_mixer, unsigned samples,
+                              float multiplier )
 {
     aout_mixer_input_t * p_input = p_mixer->input;
     aout_buffer_t * p_old_buffer = aout_FifoPop( NULL, &p_input->fifo );
 
-    (void) samples;
+    (void) samples; (void) multiplier;
     return p_old_buffer;
 }

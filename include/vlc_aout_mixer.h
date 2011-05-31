@@ -72,16 +72,11 @@ struct aout_mixer_t {
      */
     audio_sample_format_t fmt;
 
-    /* Multiplier used to raise or lower the volume of the sound in
-     * software.
-     */
-    float                 multiplier;
-
     /* Array of mixer inputs */
     aout_mixer_input_t    *input;
 
     /* Mix requested number of samples (mandatory) */
-    aout_buffer_t *(*mix)(aout_mixer_t *, unsigned);
+    aout_buffer_t *(*mix)(aout_mixer_t *, unsigned, float);
 
     /* Private place holder for the aout_mixer_t module (optional)
      *

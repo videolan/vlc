@@ -40,7 +40,7 @@
  *****************************************************************************/
 static int  Create    ( vlc_object_t * );
 
-static aout_buffer_t *DoWork( aout_mixer_t *, unsigned samples );
+static aout_buffer_t *DoWork( aout_mixer_t *, unsigned samples, float );
 
 /*****************************************************************************
  * Module descriptor
@@ -71,7 +71,8 @@ static int Create( vlc_object_t *p_this )
 /*****************************************************************************
  * DoWork: mix a new output buffer
  *****************************************************************************/
-static aout_buffer_t *DoWork( aout_mixer_t *p_mixer, unsigned samples )
+static aout_buffer_t *DoWork( aout_mixer_t *p_mixer, unsigned samples,
+                              float multiplier )
 {
     aout_mixer_input_t *p_input = p_mixer->input;
     int i_nb_channels = aout_FormatNbChannels( &p_mixer->fmt );
@@ -118,5 +119,6 @@ static aout_buffer_t *DoWork( aout_mixer_t *p_mixer, unsigned samples )
             break;
         }
     }
+    (void) multiplier;
     return p_buffer;
 }

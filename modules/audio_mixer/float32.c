@@ -39,7 +39,7 @@
  * Local prototypes
  *****************************************************************************/
 static int  Create    ( vlc_object_t * );
-static aout_buffer_t *DoWork( aout_mixer_t *, unsigned );
+static aout_buffer_t *DoWork( aout_mixer_t *, unsigned, float );
 
 /*****************************************************************************
  * Module descriptor
@@ -88,10 +88,10 @@ static void ScaleWords( float * p_out, const float * p_in, size_t i_nb_words,
  * Terminology : in this function a word designates a single float32, eg.
  * a stereo sample is consituted of two words.
  *****************************************************************************/
-static aout_buffer_t *DoWork( aout_mixer_t * p_mixer, unsigned samples )
+static aout_buffer_t *DoWork( aout_mixer_t * p_mixer, unsigned samples,
+                              float f_multiplier )
 {
     aout_mixer_input_t * p_input = p_mixer->input;
-    float f_multiplier = p_mixer->multiplier * p_input->multiplier;
     const int i_nb_channels = aout_FormatNbChannels( &p_mixer->fmt );
     int i_nb_words = samples * i_nb_channels;
 
@@ -102,6 +102,8 @@ static aout_buffer_t *DoWork( aout_mixer_t * p_mixer, unsigned samples )
 
     float * p_out = (float *)p_buffer->p_buffer;
     float * p_in = (float *)p_input->begin;
+
+    f_multiplier *= p_input->multiplier;
 
     for( ; ; )
     {
