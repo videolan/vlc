@@ -211,7 +211,7 @@ void aout_OutputDelete( aout_instance_t * p_aout )
     module_unneed( p_aout, p_aout->output.p_module );
     p_aout->output.p_module = NULL;
 
-    aout_FiltersDestroyPipeline( p_aout, p_aout->output.pp_filters,
+    aout_FiltersDestroyPipeline( p_aout->output.pp_filters,
                                  p_aout->output.i_nb_filters );
 
     aout_lock_output_fifo( p_aout );

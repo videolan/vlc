@@ -451,10 +451,9 @@ int aout_InputDelete( aout_instance_t * p_aout, aout_input_t * p_input )
     p_input->b_recycle_vout = psz_visual && *psz_visual;
     free( psz_visual );
 
-    aout_FiltersDestroyPipeline( p_aout, p_input->pp_filters,
-                                 p_input->i_nb_filters );
+    aout_FiltersDestroyPipeline( p_input->pp_filters, p_input->i_nb_filters );
     p_input->i_nb_filters = 0;
-    aout_FiltersDestroyPipeline( p_aout, p_input->pp_resamplers,
+    aout_FiltersDestroyPipeline( p_input->pp_resamplers,
                                  p_input->i_nb_resamplers );
     p_input->i_nb_resamplers = 0;
     aout_FifoDestroy( p_aout, &p_input->mixer.fifo );
@@ -753,9 +752,8 @@ static void inputFailure( aout_instance_t * p_aout, aout_input_t * p_input,
     msg_Err( p_aout, "%s", psz_error_message );
 
     /* clean up */
-    aout_FiltersDestroyPipeline( p_aout, p_input->pp_filters,
-                                 p_input->i_nb_filters );
-    aout_FiltersDestroyPipeline( p_aout, p_input->pp_resamplers,
+    aout_FiltersDestroyPipeline( p_input->pp_filters, p_input->i_nb_filters );
+    aout_FiltersDestroyPipeline( p_input->pp_resamplers,
                                  p_input->i_nb_resamplers );
     aout_FifoDestroy( p_aout, &p_input->mixer.fifo );
     var_Destroy( p_aout, "visual" );

@@ -273,19 +273,14 @@ int aout_FiltersCreatePipeline( aout_instance_t * p_aout,
     return 0;
 }
 
-/*****************************************************************************
- * aout_FiltersDestroyPipeline: deallocate a filters pipeline
- *****************************************************************************/
-void aout_FiltersDestroyPipeline( aout_instance_t * p_aout,
-                                  filter_t ** pp_filters,
-                                  int i_nb_filters )
+/**
+ * Destroys a chain of audio filters.
+ */
+void aout_FiltersDestroyPipeline( filter_t *const *filters, unsigned n )
 {
-    int i;
-    (void)p_aout;
-
-    for ( i = 0; i < i_nb_filters; i++ )
+    for( unsigned i = 0; i < n; i++ )
     {
-        filter_t *p_filter = pp_filters[i];
+        filter_t *p_filter = filters[i];
 
         module_unneed( p_filter, p_filter->p_module );
         free( p_filter->p_owner );
@@ -293,10 +288,10 @@ void aout_FiltersDestroyPipeline( aout_instance_t * p_aout,
     }
 }
 
-/*****************************************************************************
- * aout_FiltersPlay: play a buffer
- *****************************************************************************/
-void aout_FiltersPlay( filter_t ** pp_filters,
+/**
+ * Filters an audio buffer through a chain of filters.
+ */
+void aout_FiltersPlay( filter_t *const *pp_filters,
                        unsigned i_nb_filters, block_t ** pp_block )
 {
     block_t *p_block = *pp_block;
@@ -312,4 +307,3 @@ void aout_FiltersPlay( filter_t ** pp_filters,
     }
     *pp_block = p_block;
 }
-
