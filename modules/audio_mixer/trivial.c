@@ -60,8 +60,7 @@ static int Create( vlc_object_t *p_this )
 {
     aout_mixer_t *p_mixer = (aout_mixer_t *)p_this;
 
-    if ( p_mixer->fmt.i_format != VLC_CODEC_FL32
-          && p_mixer->fmt.i_format != VLC_CODEC_FI32 )
+    if( AOUT_FMT_NON_LINEAR( &p_mixer->fmt ) )
         return -1;
 
     p_mixer->mix = DoWork;
@@ -75,9 +74,10 @@ static aout_buffer_t *DoWork( aout_mixer_t *p_mixer, unsigned samples,
                               float multiplier )
 {
     aout_mixer_input_t *p_input = p_mixer->input;
-    int i_nb_channels = aout_FormatNbChannels( &p_mixer->fmt );
-    ssize_t i_buffer = samples * i_nb_channels * sizeof(int32_t);
-    aout_buffer_t *p_buffer = block_Alloc( i_buffer );
+    unsigned framesize = aout_FormatNbChannels( &p_mixer->fmt )
+                   * (p_mixer->fmt.i_bitspersample / 8);
+    size_t needed = samples * framesize;
+    aout_buffer_t *p_buffer = block_Alloc( needed );
 
     if( unlikely(p_buffer == NULL) )
         return NULL;
@@ -88,22 +88,17 @@ static aout_buffer_t *DoWork( aout_mixer_t *p_mixer, unsigned samples,
 
     for ( ; ; )
     {
-        ptrdiff_t i_available_bytes = (p_input->fifo.p_first->p_buffer
-                                        - p_in)
-                                        + p_input->fifo.p_first->i_nb_samples
-                                           * sizeof(int32_t)
-                                           * i_nb_channels;
+        size_t avail = p_input->fifo.p_first->i_nb_samples * framesize
+                     - (p_in - p_input->fifo.p_first->p_buffer);
 
-        if ( i_available_bytes < i_buffer )
+        if ( avail < needed )
         {
-            aout_buffer_t * p_old_buffer;
-
-            vlc_memcpy( p_out, p_in, i_available_bytes );
-            i_buffer -= i_available_bytes;
-            p_out += i_available_bytes;
+            vlc_memcpy( p_out, p_in, avail );
+            needed -= avail;
+            p_out += avail;
 
             /* Next buffer */
-            p_old_buffer = aout_FifoPop( NULL, &p_input->fifo );
+            aout_buffer_t *p_old_buffer = aout_FifoPop( NULL, &p_input->fifo );
             aout_BufferFree( p_old_buffer );
             if ( p_input->fifo.p_first == NULL )
             {
@@ -114,8 +109,8 @@ static aout_buffer_t *DoWork( aout_mixer_t *p_mixer, unsigned samples,
         }
         else
         {
-            vlc_memcpy( p_out, p_in, i_buffer );
-            p_input->begin = p_in + i_buffer;
+            vlc_memcpy( p_out, p_in, needed );
+            p_input->begin = p_in + needed;
             break;
         }
     }
