@@ -103,7 +103,8 @@ void aout_InputCheckAndRestart( aout_instance_t * p_aout, aout_input_t * p_input
 bool aout_InputIsEmpty( aout_instance_t * p_aout, aout_input_t * p_input );
 
 /* From filters.c : */
-int aout_FiltersCreatePipeline ( aout_instance_t * p_aout, filter_t ** pp_filters, int * pi_nb_filters, const audio_sample_format_t * p_input_format, const audio_sample_format_t * p_output_format );
+int aout_FiltersCreatePipeline( aout_instance_t *, filter_t **, int *,
+    const audio_sample_format_t *, const audio_sample_format_t * );
 void aout_FiltersDestroyPipeline( filter_t *const *, unsigned );
 void aout_FiltersPlay( filter_t *const *, unsigned, aout_buffer_t ** );
 
