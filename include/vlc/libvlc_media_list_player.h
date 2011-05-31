@@ -68,12 +68,25 @@ LIBVLC_API libvlc_media_list_player_t *
     libvlc_media_list_player_new( libvlc_instance_t * p_instance );
 
 /**
- * Release media_list_player.
+ * Release a media_list_player after use
+ * Decrement the reference count of a media player object. If the
+ * reference count is 0, then libvlc_media_list_player_release() will
+ * release the media player object. If the media player object
+ * has been released, then it should not be used again.
  *
  * \param p_mlp media list player instance
  */
 LIBVLC_API void
     libvlc_media_list_player_release( libvlc_media_list_player_t * p_mlp );
+
+/**
+ * Retain a reference to a media player list object. Use
+ * libvlc_media_list_player_release() to decrement reference count.
+ *
+ * \param p_mlp media player list object
+ */
+LIBVLC_API void
+    libvlc_media_list_player_retain( libvlc_media_list_player_t *p_mlp );
 
 /**
  * Return the event manager of this media_list_player.

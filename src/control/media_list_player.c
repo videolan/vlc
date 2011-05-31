@@ -520,6 +520,19 @@ void libvlc_media_list_player_release(libvlc_media_list_player_t * p_mlp)
 }
 
 /**************************************************************************
+ *        retain (Public)
+ **************************************************************************/
+void libvlc_media_list_player_retain(libvlc_media_list_player_t * p_mlp)
+{
+    if (!p_mlp)
+        return;
+
+    lock(p_mlp);
+    p_mlp->i_refcount++;
+    unlock(p_mlp);
+}
+
+/**************************************************************************
  *        event_manager (Public)
  **************************************************************************/
 libvlc_event_manager_t *
