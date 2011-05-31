@@ -901,10 +901,6 @@ static int ReplayGainCallback( vlc_object_t *p_this, char const *psz_cmd,
     aout_lock_mixer( p_aout );
     for( i = 0; i < p_aout->i_nb_inputs; i++ )
         ReplayGainSelect( p_aout, p_aout->pp_inputs[i] );
-
-    /* Restart the mixer (a trivial mixer may be in use) */
-    if( p_aout->p_mixer )
-        aout_MixerMultiplierSet( p_aout, p_aout->mixer_multiplier );
     aout_unlock_mixer( p_aout );
 
     return VLC_SUCCESS;
@@ -961,4 +957,3 @@ static void ReplayGainSelect( aout_instance_t *p_aout, aout_input_t *p_input )
 
     free( psz_replay_gain );
 }
-
