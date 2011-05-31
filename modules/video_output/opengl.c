@@ -172,13 +172,17 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
                       vgl->DeleteProgramsARB &&
                       vgl->ProgramLocalParameter4fvARB;
     }
+
     bool supports_multitexture = false;
+    GLint max_texture_units = 0;
     if (strstr(extensions, "GL_ARB_multitexture")) {
         vgl->ActiveTextureARB   = (void (*)(GLenum))vlc_gl_GetProcAddress(vgl->gl, "glActiveTextureARB");
         vgl->MultiTexCoord2fARB = (void (*)(GLenum, GLfloat, GLfloat))vlc_gl_GetProcAddress(vgl->gl, "glMultiTexCoord2fARB");
 
         supports_multitexture = vgl->ActiveTextureARB &&
                                 vgl->MultiTexCoord2fARB;
+        if (supports_multitexture)
+            glGetIntegerv(GL_MAX_TEXTURE_UNITS_ARB, &max_texture_units);
     }
 
     /* Initialize with default chroma */
@@ -223,7 +227,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
 #endif
     /* Use YUV if possible and needed */
     bool need_fs_yuv = false;
-    if (supports_fp && supports_multitexture &&
+    if (supports_fp && supports_multitexture && max_texture_units >= 3 &&
         vlc_fourcc_IsYUV(fmt->i_chroma) && !vlc_fourcc_IsYUV(vgl->fmt.i_chroma)) {
         const vlc_fourcc_t *list = vlc_fourcc_GetYUVFallback(fmt->i_chroma);
         while (*list) {
