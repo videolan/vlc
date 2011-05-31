@@ -344,24 +344,20 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input, const aout_
             }
 
             /* complete the filter chain if necessary */
-            if ( !AOUT_FMTS_IDENTICAL( &chain_input_format,
-                                       &p_filter->fmt_in.audio ) )
+            if ( aout_FiltersCreatePipeline( p_aout, p_input->pp_filters,
+                                             &p_input->i_nb_filters,
+                                             &chain_input_format,
+                                             &p_filter->fmt_in.audio ) < 0 )
             {
-                if ( aout_FiltersCreatePipeline( p_aout, p_input->pp_filters,
-                                                 &p_input->i_nb_filters,
-                                                 &chain_input_format,
-                                                 &p_filter->fmt_in.audio ) < 0 )
-                {
-                    msg_Err( p_aout, "cannot add user filter %s (skipped)",
-                             psz_parser );
+                msg_Err( p_aout, "cannot add user filter %s (skipped)",
+                         psz_parser );
 
-                    module_unneed( p_filter, p_filter->p_module );
-                    free( p_filter->p_owner );
-                    vlc_object_release( p_filter );
+                module_unneed( p_filter, p_filter->p_module );
+                free( p_filter->p_owner );
+                vlc_object_release( p_filter );
 
-                    psz_parser = psz_next;
-                    continue;
-                }
+                psz_parser = psz_next;
+                continue;
             }
 
             /* success */
@@ -381,16 +377,13 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input, const aout_
     free( psz_scaletempo );
 
     /* complete the filter chain if necessary */
-    if ( !AOUT_FMTS_IDENTICAL( &chain_input_format, &chain_output_format ) )
+    if ( aout_FiltersCreatePipeline( p_aout, p_input->pp_filters,
+                                     &p_input->i_nb_filters,
+                                     &chain_input_format,
+                                     &chain_output_format ) < 0 )
     {
-        if ( aout_FiltersCreatePipeline( p_aout, p_input->pp_filters,
-                                         &p_input->i_nb_filters,
-                                         &chain_input_format,
-                                         &chain_output_format ) < 0 )
-        {
-            inputFailure( p_aout, p_input, "couldn't set an input pipeline" );
-            return -1;
-        }
+        inputFailure( p_aout, p_input, "couldn't set an input pipeline" );
+        return -1;
     }
 
     /* Create resamplers. */
