@@ -195,8 +195,7 @@ struct aout_instance_t
     vlc_mutex_t             volume_vars_lock;
 
     /* Input streams & pre-filters */
-    aout_input_t *          pp_inputs[1];
-    int                     i_nb_inputs;
+    aout_input_t *          p_input;
 
     /* Mixer */
     audio_sample_format_t   mixer_format;

@@ -337,7 +337,7 @@ aout_buffer_t * aout_OutputNextBuffer( aout_instance_t * p_aout,
             aout_unlock_output_fifo( p_aout );
 
             aout_lock_input_fifos( p_aout );
-            aout_fifo_t *p_fifo = &p_aout->pp_inputs[0]->mixer.fifo;
+            aout_fifo_t *p_fifo = &p_aout->p_input->mixer.fifo;
             aout_FifoMoveDates( p_aout, p_fifo, difference );
             aout_unlock_input_fifos( p_aout );
             return p_buffer;

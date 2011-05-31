@@ -51,7 +51,7 @@ int aout_MixerNew( aout_instance_t * p_aout )
         return VLC_EGENERIC;
 
     p_mixer->fmt = p_aout->mixer_format;
-    p_mixer->input = &p_aout->pp_inputs[0]->mixer;
+    p_mixer->input = &p_aout->p_input->mixer;
     p_mixer->mix = NULL;
     p_mixer->sys = NULL;
 
@@ -95,9 +95,9 @@ static int MixBuffer( aout_instance_t * p_aout, float volume )
 {
     aout_mixer_t *p_mixer = p_aout->p_mixer;
 
-    assert( p_aout->i_nb_inputs == 1 );
+    assert( p_aout->p_input != NULL );
 
-    aout_input_t *p_input = p_aout->pp_inputs[0];
+    aout_input_t *p_input = p_aout->p_input;
     if( p_input->b_paused )
         return -1;
 

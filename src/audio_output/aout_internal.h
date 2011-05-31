@@ -239,10 +239,9 @@ static inline void aout_unlock_volume( aout_instance_t *p_aout )
  * possible to take configuration changes into account */
 static inline void AoutInputsMarkToRestart( aout_instance_t *p_aout )
 {
-    int i;
     aout_lock_mixer( p_aout );
-    for( i = 0; i < p_aout->i_nb_inputs; i++ )
-        p_aout->pp_inputs[i]->b_restart = true;
+    if( p_aout->p_input != NULL )
+        p_aout->p_input->b_restart = true;
     aout_unlock_mixer( p_aout );
 }
 

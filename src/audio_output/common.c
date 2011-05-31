@@ -50,19 +50,11 @@ static inline void aout_assert_fifo_locked( aout_instance_t * p_aout, aout_fifo_
     if( p_fifo == &p_aout->output.fifo )
         vlc_assert_locked( &p_aout->output_fifo_lock );
     else
-    {
-        int i;
-        for( i = 0; i < p_aout->i_nb_inputs; i++ )
-        {
-            if( p_fifo == &p_aout->pp_inputs[i]->mixer.fifo)
-            {
-                vlc_assert_locked( &p_aout->input_fifos_lock );
-                break;
-            }
-        }
-        if( i == p_aout->i_nb_inputs )
-            vlc_assert_locked( &p_aout->mixer_lock );
-    }
+    if( p_aout->p_input != NULL
+     && p_fifo == &p_aout->p_input->mixer.fifo )
+        vlc_assert_locked( &p_aout->input_fifos_lock );
+    else
+        vlc_assert_locked( &p_aout->mixer_lock );
 #else
     (void)p_aout;
     (void)p_fifo;
@@ -92,7 +84,7 @@ aout_instance_t * __aout_New( vlc_object_t * p_parent )
     vlc_mutex_init( &p_aout->mixer_lock );
     vlc_mutex_init( &p_aout->volume_vars_lock );
     vlc_mutex_init( &p_aout->output_fifo_lock );
-    p_aout->i_nb_inputs = 0;
+    p_aout->p_input = NULL;
     p_aout->mixer_multiplier = 1.0;
     p_aout->p_mixer = NULL;
     p_aout->output.b_starving = 1;

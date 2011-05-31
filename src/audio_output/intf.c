@@ -291,25 +291,21 @@ void aout_VolumeNoneInit( aout_instance_t * p_aout )
  *****************************************************************************/
 static int aout_Restart( aout_instance_t * p_aout )
 {
-    int i;
     bool b_error = 0;
 
     aout_lock_mixer( p_aout );
 
-    if ( p_aout->i_nb_inputs == 0 )
+    if( p_aout->p_input == NULL )
     {
         aout_unlock_mixer( p_aout );
         msg_Err( p_aout, "no decoder thread" );
         return -1;
     }
 
-    for ( i = 0; i < p_aout->i_nb_inputs; i++ )
-    {
-        aout_lock_input( p_aout, p_aout->pp_inputs[i] );
-        aout_lock_input_fifos( p_aout );
-        aout_InputDelete( p_aout, p_aout->pp_inputs[i] );
-        aout_unlock_input_fifos( p_aout );
-    }
+    aout_lock_input( p_aout, p_aout->p_input );
+    aout_lock_input_fifos( p_aout );
+    aout_InputDelete( p_aout, p_aout->p_input );
+    aout_unlock_input_fifos( p_aout );
 
     /* Lock all inputs. */
     aout_lock_input_fifos( p_aout );
@@ -320,13 +316,10 @@ static int aout_Restart( aout_instance_t * p_aout )
 
     /* FIXME: This function is notoriously dangerous/unsafe.
      * By the way, if OutputNew or MixerNew fails, we are totally screwed. */
-    if ( aout_OutputNew( p_aout, &p_aout->pp_inputs[0]->input ) == -1 )
+    if ( aout_OutputNew( p_aout, &p_aout->p_input->input ) == -1 )
     {
         /* Release all locks and report the error. */
-        for ( i = 0; i < p_aout->i_nb_inputs; i++ )
-        {
-            vlc_mutex_unlock( &p_aout->pp_inputs[i]->lock );
-        }
+        vlc_mutex_unlock( &p_aout->p_input->lock );
         aout_unlock_input_fifos( p_aout );
         aout_unlock_mixer( p_aout );
         return -1;
@@ -335,22 +328,16 @@ static int aout_Restart( aout_instance_t * p_aout )
     if ( aout_MixerNew( p_aout ) == -1 )
     {
         aout_OutputDelete( p_aout );
-        for ( i = 0; i < p_aout->i_nb_inputs; i++ )
-        {
-            vlc_mutex_unlock( &p_aout->pp_inputs[i]->lock );
-        }
+        vlc_mutex_unlock( &p_aout->p_input->lock );
         aout_unlock_input_fifos( p_aout );
         aout_unlock_mixer( p_aout );
         return -1;
     }
 
-    /* Re-open all inputs. */
-    for ( i = 0; i < p_aout->i_nb_inputs; i++ )
-    {
-        aout_input_t * p_input = p_aout->pp_inputs[i];
-        b_error |= aout_InputNew( p_aout, p_input, &p_input->request_vout );
-        aout_unlock_input( p_aout, p_input );
-    }
+    /* Re-open the input. */
+    aout_input_t * p_input = p_aout->p_input;
+    b_error |= aout_InputNew( p_aout, p_input, &p_input->request_vout );
+    aout_unlock_input( p_aout, p_input );
 
     aout_unlock_input_fifos( p_aout );
     aout_unlock_mixer( p_aout );

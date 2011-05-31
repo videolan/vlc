@@ -46,8 +46,6 @@ aout_input_t *aout_DecNew( aout_instance_t *p_aout,
                            const audio_replay_gain_t *p_replay_gain,
                            const aout_request_vout_t *p_request_vout )
 {
-    aout_input_t * p_input;
-
     /* Sanitize audio format */
     if( p_format->i_channels > 32 )
     {
@@ -79,17 +77,11 @@ aout_input_t *aout_DecNew( aout_instance_t *p_aout,
         return NULL;
     }
 
-    /* We can only be called by the decoder, so no need to lock
-     * p_input->lock. */
-    aout_lock_mixer( p_aout );
-    assert( p_aout->i_nb_inputs == 0 );
-
-    p_input = calloc( 1, sizeof(aout_input_t));
+    aout_input_t *p_input = calloc( 1, sizeof(aout_input_t));
     if( !p_input )
-        goto error;
+        return NULL;
 
     vlc_mutex_init( &p_input->lock );
-
     p_input->b_error = true;
     p_input->b_paused = false;
     p_input->i_pause_date = 0;
@@ -101,64 +93,35 @@ aout_input_t *aout_DecNew( aout_instance_t *p_aout,
     if( p_replay_gain )
         p_input->replay_gain = *p_replay_gain;
 
+    /* We can only be called by the decoder, so no need to lock
+     * p_input->lock. */
+    aout_lock_mixer( p_aout );
     aout_lock_input_fifos( p_aout );
-    p_aout->pp_inputs[p_aout->i_nb_inputs] = p_input;
-    p_aout->i_nb_inputs++;
+    assert( p_aout->p_input == NULL );
+    p_aout->p_input = p_input;
 
-    if ( !p_aout->p_mixer )
-    {
-        int i;
+    var_Destroy( p_aout, "audio-device" );
+    var_Destroy( p_aout, "audio-channels" );
 
-        var_Destroy( p_aout, "audio-device" );
-        var_Destroy( p_aout, "audio-channels" );
+    /* Recreate the output using the new format. */
+    if( aout_OutputNew( p_aout, p_format ) < 0 )
+#warning Input without output and mixer = bad idea.
+        goto out;
 
-        /* Recreate the output using the new format. */
-        if ( aout_OutputNew( p_aout, p_format ) < 0 )
-        {
-            for ( i = 0; i < p_aout->i_nb_inputs - 1; i++ )
-            {
-                aout_lock_input( p_aout, p_aout->pp_inputs[i] );
-                aout_InputDelete( p_aout, p_aout->pp_inputs[i] );
-                aout_unlock_input( p_aout, p_aout->pp_inputs[i] );
-            }
-            aout_unlock_input_fifos( p_aout );
-            aout_unlock_mixer( p_aout );
-            return p_input;
-        }
-
-        /* Create other input streams. */
-        for ( i = 0; i < p_aout->i_nb_inputs - 1; i++ )
-        {
-            aout_input_t *p_input = p_aout->pp_inputs[i];
-
-            aout_lock_input( p_aout, p_input );
-            aout_InputDelete( p_aout, p_input );
-            aout_InputNew( p_aout, p_input, &p_input->request_vout );
-            aout_unlock_input( p_aout, p_input );
-        }
-    }
-    else
-    {
-        aout_MixerDelete( p_aout );
-    }
-
-    if ( aout_MixerNew( p_aout ) == -1 )
+    assert( p_aout->p_mixer == NULL );
+    if( aout_MixerNew( p_aout ) == -1 )
     {
         aout_OutputDelete( p_aout );
-        aout_unlock_input_fifos( p_aout );
-        goto error;
+#warning Memory leak.
+        p_input = NULL;
+        goto out;
     }
 
     aout_InputNew( p_aout, p_input, p_request_vout );
+out:
     aout_unlock_input_fifos( p_aout );
-
     aout_unlock_mixer( p_aout );
-
     return p_input;
-
-error:
-    aout_unlock_mixer( p_aout );
-    return NULL;
 }
 
 /*****************************************************************************
@@ -166,46 +129,30 @@ error:
  *****************************************************************************/
 int aout_DecDelete( aout_instance_t * p_aout, aout_input_t * p_input )
 {
-    int i_input;
-
     /* This function can only be called by the decoder itself, so no need
      * to lock p_input->lock. */
     aout_lock_mixer( p_aout );
 
-    for ( i_input = 0; i_input < p_aout->i_nb_inputs; i_input++ )
-    {
-        if ( p_aout->pp_inputs[i_input] == p_input )
-        {
-            break;
-        }
-    }
-
-    if ( i_input == p_aout->i_nb_inputs )
+    if( p_input != p_aout->p_input )
     {
         msg_Err( p_aout, "cannot find an input to delete" );
         aout_unlock_mixer( p_aout );
         return -1;
     }
 
-    /* Remove the input from the list. */
-    p_aout->i_nb_inputs--;
-    assert( p_aout->i_nb_inputs == 0 );
-
+    /* Remove the input. */
+    p_aout->p_input = NULL;
     aout_InputDelete( p_aout, p_input );
 
-    vlc_mutex_destroy( &p_input->lock );
-    free( p_input );
-
-    if ( !p_aout->i_nb_inputs )
-    {
-        aout_OutputDelete( p_aout );
-        aout_MixerDelete( p_aout );
-        var_Destroy( p_aout, "audio-device" );
-        var_Destroy( p_aout, "audio-channels" );
-    }
+    aout_OutputDelete( p_aout );
+    aout_MixerDelete( p_aout );
+    var_Destroy( p_aout, "audio-device" );
+    var_Destroy( p_aout, "audio-channels" );
 
     aout_unlock_mixer( p_aout );
 
+    vlc_mutex_destroy( &p_input->lock );
+    free( p_input );
     return 0;
 }
 

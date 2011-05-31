@@ -896,11 +896,10 @@ static int ReplayGainCallback( vlc_object_t *p_this, char const *psz_cmd,
     VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval);
     VLC_UNUSED(newval); VLC_UNUSED(p_data);
     aout_instance_t *p_aout = (aout_instance_t *)p_this;
-    int i;
 
     aout_lock_mixer( p_aout );
-    for( i = 0; i < p_aout->i_nb_inputs; i++ )
-        ReplayGainSelect( p_aout, p_aout->pp_inputs[i] );
+    if( p_aout->p_input != NULL )
+        ReplayGainSelect( p_aout, p_aout->p_input );
     aout_unlock_mixer( p_aout );
 
     return VLC_SUCCESS;
