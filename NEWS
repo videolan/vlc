@@ -19,7 +19,7 @@ Important changes for packagers:
 Core:
  * Major Video Core and Outputs rework and rewrite:
    Subtitles, subpictures and OSD can now be sized and blent inside video outputs
-   x11 (Unix) and Direct3D (Windows) are such video outputs.
+   x11 (Unix), OpenGL (Unix) and Direct3D (Windows) are such video outputs.
  * Almost every video filter can now be transcoded
  * Playback rate doesn't get resetted to 1 between items anymore
  * Option --sub-filter was renamed --sub-source
@@ -79,6 +79,7 @@ Video Output:
 Audio Output:
  * New audio output based on AudioQueue API for iOS
  * New audio output in memory (amem)
+ * Important simplification and improvements in the core audio output
 
 Video Filter:
  * New gradfun filter for debanding videos using dithering
