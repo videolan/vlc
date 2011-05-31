@@ -199,7 +199,10 @@ void intf_DestroyAll( libvlc_int_t *p_libvlc )
         intf_thread_t *p_next = p_intf->p_next;
 
         if( p_intf->pf_run )
+        {
+            vlc_cancel( p_intf->thread );
             vlc_join( p_intf->thread, NULL );
+        }
         module_unneed( p_intf, p_intf->p_module );
         free( p_intf->psz_intf );
         config_ChainDestroy( p_intf->p_cfg );
