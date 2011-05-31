@@ -156,17 +156,19 @@ vlc_module_end ()
  *****************************************************************************/
 
 static int Open( vlc_object_t *p_this )
-{ /* initialisation of the connection */
+{
     intf_thread_t   *p_intf = (intf_thread_t*)p_this;
-    intf_sys_t      *p_sys  = malloc( sizeof( intf_sys_t ) );
-    playlist_t      *p_playlist;
-    DBusConnection  *p_conn;
-    DBusError       error;
-    char            *psz_service_name = NULL;
 
-    if( !p_sys || !dbus_threads_init_default())
+    /* initialisation of the connection */
+    if( !dbus_threads_init_default() )
+        return VLC_EGENERIC;
+
+    intf_sys_t *p_sys  = malloc( sizeof( intf_sys_t ) );
+    if( unlikely(!p_sys) )
         return VLC_ENOMEM;
 
+    playlist_t      *p_playlist;
+    DBusConnection  *p_conn;
     p_sys->b_meta_read     = false;
     p_sys->b_dead          = false;
     p_sys->p_input         = NULL;
@@ -180,21 +182,15 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
+    char psz_service_name[sizeof(DBUS_MPRIS_BUS_NAME) + 12];
     p_sys->b_unique = var_CreateGetBool( p_intf, "dbus-unique-service-id" );
     if( p_sys->b_unique )
-    {
-        if( asprintf( &psz_service_name, "%s-%d",
-            DBUS_MPRIS_BUS_NAME, getpid() ) < 0 )
-        {
-            free( p_sys );
-            return VLC_ENOMEM;
-        }
-    }
+        snprintf( psz_service_name, sizeof( psz_service_name ),
+                  DBUS_MPRIS_BUS_NAME"-%d", getpid() );
     else
-    {
-        psz_service_name = strdup(DBUS_MPRIS_BUS_NAME);
-    }
+        strcpy( psz_service_name, DBUS_MPRIS_BUS_NAME );
 
+    DBusError error;
     dbus_error_init( &error );
 
     /* connect privately to the session bus
@@ -206,7 +202,6 @@ static int Open( vlc_object_t *p_this )
         msg_Err( p_this, "Failed to connect to the D-Bus session daemon: %s",
                 error.message );
         dbus_error_free( &error );
-        free( psz_service_name );
         free( p_sys );
         return VLC_EGENERIC;
     }
@@ -220,12 +215,10 @@ static int Open( vlc_object_t *p_this )
         msg_Err( p_this, "Error requesting service %s: %s",
                  psz_service_name, error.message );
         dbus_error_free( &error );
-        free( psz_service_name );
         free( p_sys );
         return VLC_EGENERIC;
     }
     msg_Info( p_intf, "listening on dbus as: %s", psz_service_name );
-    free( psz_service_name );
 
     /* Register the entry point object path */
     dbus_connection_register_object_path( p_conn, DBUS_MPRIS_OBJECT_PATH,
@@ -265,7 +258,6 @@ static int Open( vlc_object_t *p_this )
                                                 p_intf, NULL ) )
     {
         dbus_connection_unref( p_conn );
-        free( psz_service_name );
         free( p_sys );
         return VLC_ENOMEM;
     }
@@ -277,7 +269,6 @@ static int Open( vlc_object_t *p_this )
                                               p_intf, NULL ) )
     {
         dbus_connection_unref( p_conn );
-        free( psz_service_name );
         free( p_sys );
         return VLC_ENOMEM;
     }
