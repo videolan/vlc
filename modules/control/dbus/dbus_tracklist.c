@@ -229,7 +229,7 @@ DBUS_METHOD( Tracks )
     input_item_t *p_input      = NULL;
 
     dbus_message_iter_open_container( &args, DBUS_TYPE_VARIANT, "ao", &v );
-    dbus_message_iter_open_container( &v,    DBUS_TYPE_ARRAY,   "o",  &tracks );
+    dbus_message_iter_open_container( &v,    DBUS_TYPE_ARRAY, "o", &tracks );
 
     PL_LOCK;
 
@@ -405,3 +405,57 @@ int TrackListChangeEmit( intf_thread_t *p_intf, int signal, int i_node )
 }
 
 #undef METHOD_FUNC
+
+/**
+ * PropertiesChangedSignal: synthetizes and sends the
+ * org.freedesktop.DBus.Properties.PropertiesChanged signal
+ */
+static DBusHandlerResult
+PropertiesChangedSignal( intf_thread_t    *p_intf,
+                         vlc_dictionary_t *p_changed_properties )
+{
+    DBusConnection  *p_conn = p_intf->p_sys->p_conn;
+    DBusMessageIter changed_properties, invalidated_properties, entry, variant;
+    const char *psz_interface_name = DBUS_MPRIS_TRACKLIST_INTERFACE;
+    char **ppsz_properties = NULL;
+    int i_properties = 0;
+
+    SIGNAL_INIT( DBUS_INTERFACE_PROPERTIES,
+                 DBUS_MPRIS_OBJECT_PATH,
+                 "PropertiesChanged" );
+
+    OUT_ARGUMENTS;
+    ADD_STRING( &psz_interface_name );
+    dbus_message_iter_open_container( &args, DBUS_TYPE_ARRAY, "{sv}",
+                                      &changed_properties );
+
+    dbus_message_iter_close_container( &args, &changed_properties );
+
+    dbus_message_iter_open_container( &args, DBUS_TYPE_ARRAY, "s",
+                                      &invalidated_properties );
+
+    i_properties    = vlc_dictionary_keys_count( p_changed_properties );
+    ppsz_properties = vlc_dictionary_all_keys( p_changed_properties );
+
+    for( int i = 0; i < i_properties; i++ )
+        if( !strcmp( ppsz_properties[i], "Tracks" ) )
+            dbus_message_iter_append_basic( &entry, DBUS_TYPE_STRING,
+                                            &ppsz_properties[i] );
+
+    dbus_message_iter_close_container( &args, &invalidated_properties );
+    SIGNAL_SEND;
+}
+
+/**
+ * TrackListPropertiesChangedEmit: Emits the
+ * org.freedesktop.DBus.Properties.PropertiesChanged signal
+ */
+int TrackListPropertiesChangedEmit( intf_thread_t    * p_intf,
+                                    vlc_dictionary_t * p_changed_properties )
+{
+    if( p_intf->p_sys->b_dead )
+        return VLC_SUCCESS;
+
+    PropertiesChangedSignal( p_intf, p_changed_properties );
+    return VLC_SUCCESS;
+}

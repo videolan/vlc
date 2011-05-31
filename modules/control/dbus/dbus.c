@@ -545,8 +545,9 @@ static void ProcessEvents( intf_thread_t *p_intf,
     playlist_t *p_playlist = p_intf->p_sys->p_playlist;
     bool        b_can_play = p_intf->p_sys->b_can_play;
 
-    vlc_dictionary_t player_properties;
-    vlc_dictionary_init( &player_properties, 0 );
+    vlc_dictionary_t player_properties, tracklist_properties;
+    vlc_dictionary_init( &player_properties,    0 );
+    vlc_dictionary_init( &tracklist_properties, 0 );
 
     for( int i = 0; i < i_events; i++ )
     {
@@ -562,11 +563,14 @@ static void ProcessEvents( intf_thread_t *p_intf,
             PL_LOCK;
             b_can_play = playlist_CurrentSize( p_playlist ) > 0;
             PL_UNLOCK;
+
             if( b_can_play != p_intf->p_sys->b_can_play )
             {
                 p_intf->p_sys->b_can_play = b_can_play;
                 vlc_dictionary_insert( &player_properties, "CanPlay", NULL );
             }
+
+            vlc_dictionary_insert( &tracklist_properties, "Tracks", NULL );
             break;
         case SIGNAL_VOLUME_MUTED:
         case SIGNAL_VOLUME_CHANGE:
@@ -630,7 +634,11 @@ static void ProcessEvents( intf_thread_t *p_intf,
     if( vlc_dictionary_keys_count( &player_properties ) )
         PlayerPropertiesChangedEmit( p_intf, &player_properties );
 
-    vlc_dictionary_clear( &player_properties, NULL, NULL );
+    if( vlc_dictionary_keys_count( &tracklist_properties ) )
+        TrackListPropertiesChangedEmit( p_intf, &player_properties );
+
+    vlc_dictionary_clear( &player_properties,    NULL, NULL );
+    vlc_dictionary_clear( &tracklist_properties, NULL, NULL );
 }
 
 /**
