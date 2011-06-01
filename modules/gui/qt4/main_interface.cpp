@@ -87,6 +87,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     b_hideAfterCreation  = false; // --qt-start-minimized
     playlistVisible      = false;
     input_name           = "";
+    b_interfaceFullScreen= false;
 
 
     /* Ask for Privacy */
