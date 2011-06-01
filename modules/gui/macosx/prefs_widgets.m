@@ -1124,11 +1124,14 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
 
 - (char *)stringValue
 {
-    if( [o_combo indexOfSelectedItem] >= 0 )
-        return strdup( p_item->ppsz_list[[o_combo indexOfSelectedItem]] );
-    else
-        return strdup( [[VLCMain sharedInstance]
-                            delocalizeString: [o_combo stringValue]] );
+    if( [o_combo indexOfSelectedItem] >= 0 ) {
+        if( p_item->ppsz_list[[o_combo indexOfSelectedItem]] != NULL )
+            return strdup( p_item->ppsz_list[[o_combo indexOfSelectedItem]] );
+    } else {
+        if( [[VLCMain sharedInstance] delocalizeString: [o_combo stringValue]] != NULL )
+            return strdup( [[VLCMain sharedInstance] delocalizeString: [o_combo stringValue]] );
+    }
+    return NULL;
 }
 
 - (void)resetValues
