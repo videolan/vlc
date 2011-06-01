@@ -70,7 +70,7 @@ typedef struct vlc_gl_sys_t
 /* OpenGL callbacks */
 static int MakeCurrent (vlc_gl_t *);
 static void SwapBuffers (vlc_gl_t *);
-static void *GetProcAddress(vlc_gl_t *, const char *);
+static void *GetSymbol(vlc_gl_t *, const char *);
 
 static bool CheckAPI (EGLDisplay dpy, const char *api)
 {
@@ -194,7 +194,7 @@ static int Open (vlc_object_t *obj, const struct gl_api *api)
     gl->sys = sys;
     gl->makeCurrent = MakeCurrent;
     gl->swap = SwapBuffers;
-    gl->getProcAddress = GetProcAddress;
+    gl->getProcAddress = GetSymbol;
     gl->lock = NULL;
     gl->unlock = NULL;
     return VLC_SUCCESS;
@@ -257,7 +257,7 @@ static void SwapBuffers (vlc_gl_t *gl)
     eglSwapBuffers (sys->display, sys->surface);
 }
 
-static void *GetProcAddress(vlc_gl_t *gl, const char *procname)
+static void *GetSymbol(vlc_gl_t *gl, const char *procname)
 {
     (void) gl;
     return (void *)eglGetProcAddress (procname);
