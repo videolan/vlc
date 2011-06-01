@@ -5,7 +5,7 @@ all: .zlib \
      .flac .speex .faad .lame .ffmpeg \
      .twolame \
      .png .dvbpsi \
-     .dca .kate
+     .dca .kate .live
 
 
 ANDROID_INCLUDE=$(ANDROID_NDK)/platforms/android-9/arch-arm/usr/include
