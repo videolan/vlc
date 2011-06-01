@@ -545,9 +545,9 @@ struct demux_sys_t
 
     struct v4l2_capability dev_cap;
 
-    int i_input;
+    unsigned i_input;
     struct v4l2_input *p_inputs;
-    int i_selected_input;
+    unsigned i_selected_input;
 
     int i_standard;
     struct v4l2_standard *p_standards;
@@ -561,7 +561,7 @@ struct demux_sys_t
     int i_tuner;
     struct v4l2_tuner *p_tuners;
 
-    int i_codec;
+    unsigned i_codec;
     struct v4l2_fmtdesc *p_codecs;
 
     struct buffer_t *p_buffers;
@@ -1636,7 +1636,7 @@ static bool IsPixelFormatSupported( demux_t *p_demux, unsigned int i_pixelformat
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    for( int i_index = 0; i_index < p_sys->i_codec; i_index++ )
+    for( unsigned i_index = 0; i_index < p_sys->i_codec; i_index++ )
     {
         if( p_sys->p_codecs[i_index].pixelformat == i_pixelformat )
             return true;
@@ -2398,7 +2398,6 @@ open_failed:
 static bool ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
                                  const char *psz_device )
 {
-    int i_index;
     int i_standard;
 
     int i_fd;
@@ -2501,7 +2500,7 @@ static bool ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
         p_sys->p_inputs = calloc( 1, p_sys->i_input * sizeof( struct v4l2_input ) );
         if( !p_sys->p_inputs ) goto open_failed;
 
-        for( i_index = 0; i_index < p_sys->i_input; i_index++ )
+        for( unsigned i_index = 0; i_index < p_sys->i_input; i_index++ )
         {
             p_sys->p_inputs[i_index].index = i_index;
 
@@ -2556,7 +2555,7 @@ static bool ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
     }
 
     /* initialize the structures for the ioctls */
-    for( i_index = 0; i_index < 32; i_index++ )
+    for( unsigned i_index = 0; i_index < 32; i_index++ )
     {
         p_sys->p_audios[i_index].index = i_index;
     }
@@ -2607,7 +2606,7 @@ static bool ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
         p_sys->p_tuners = calloc( 1, p_sys->i_tuner * sizeof( struct v4l2_tuner ) );
         if( !p_sys->p_tuners ) goto open_failed;
 
-        for( i_index = 0; i_index < p_sys->i_tuner; i_index++ )
+        for( int i_index = 0; i_index < p_sys->i_tuner; i_index++ )
         {
             p_sys->p_tuners[i_index].index = i_index;
 
@@ -2654,7 +2653,7 @@ static bool ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
     {
         struct v4l2_fmtdesc codec;
 
-        i_index = 0;
+        unsigned i_index = 0;
         memset( &codec, 0, sizeof(codec) );
         codec.index = i_index;
         codec.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
