@@ -712,8 +712,7 @@ static void GetV4L2Params( demux_sys_t *p_sys, vlc_object_t *p_obj )
     p_sys->psz_device = var_CreateGetNonEmptyString( p_obj, "v4l2-dev" );
 
     p_sys->i_selected_standard_id =
-        i_standards_list[var_CreateGetInteger( p_obj, "v4l2-standard" )];
-
+        var_CreateGetInteger( p_obj, "v4l2-standard" );
     p_sys->i_selected_input = var_CreateGetInteger( p_obj, "v4l2-input" );
     p_sys->i_selected_audio_input =
         var_CreateGetInteger( p_obj, "v4l2-audio-input" );
