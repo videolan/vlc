@@ -252,12 +252,13 @@ static const int i_iomethod_list[] =
 static const char *const psz_iomethod_list_text[] =
     { N_("AUTO"), N_("READ"), N_("MMAP"),  N_("USERPTR") };
 
-static const int i_tuner_audio_modes_list[] =
-    { V4L2_TUNER_MODE_MONO, V4L2_TUNER_MODE_STEREO,
+static const int i_tuner_audio_modes_list[] = {
+      -1, V4L2_TUNER_MODE_MONO, V4L2_TUNER_MODE_STEREO,
       V4L2_TUNER_MODE_LANG1, V4L2_TUNER_MODE_LANG2,
       V4L2_TUNER_MODE_SAP, V4L2_TUNER_MODE_LANG1_LANG2 };
-static const char *const psz_tuner_audio_modes_list_text[] =
-    { N_( "Mono" ),
+static const char *const psz_tuner_audio_modes_list_text[] = {
+      N_("Unspecified"),
+      N_( "Mono" ),
       N_( "Stereo" ),
       N_( "Primary language (Analog TV tuners only)" ),
       N_( "Secondary language (Analog TV tuners only)" ),
