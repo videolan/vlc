@@ -386,6 +386,11 @@ void vout_display_opengl_Delete(vout_display_opengl_t *vgl)
         glFlush();
         for (int i = 0; i < VLCGL_TEXTURE_COUNT; i++)
             glDeleteTextures(vgl->chroma->plane_count, vgl->texture[i]);
+        for (int i = 0; i < vgl->region_count; i++) {
+            if (vgl->region[i].texture)
+                glDeleteTextures(1, &vgl->region[i].texture);
+        }
+        free(vgl->region);
 
         if (vgl->program)
             vgl->DeleteProgramsARB(1, &vgl->program);
