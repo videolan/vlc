@@ -1019,15 +1019,14 @@ AS_IF([test "${enable_coverage}" != "no"], [
   CFLAGS="-fprofile-arcs -ftest-coverage ${CFLAGS}"
   CXXFLAGS="-fprofile-arcs -ftest-coverage ${CXXFLAGS}"
   LDFLAGS="-lgcov ${LDFLAGS}"
-  CFLAGS_save="${CFLAGS}"
-  CXXFLAGS_save="${CXXFLAGS}"
-  LDFLAGS_save="${LDFLAGS}"
 ])
+
+VLC_SAVE_FLAGS
 
 AS_IF([test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"], [
   AC_CACHE_CHECK([if $CC accepts -fvisibility=hidden],
                  [ac_cv_c_visibility_hidden], [
-    CFLAGS="${CFLAGS_save} -ffast-math"
+    CFLAGS="${CFLAGS_save} -fvisibility=hidden"
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM()], [
       ac_cv_c_visibility_hidden=yes
     ], [
@@ -1035,13 +1034,14 @@ AS_IF([test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"], [
     ])
   ])
   AS_IF([test "${ac_cv_c_visibility_hidden}" != "no"], [
+    VLC_RESTORE_FLAGS
     CFLAGS="${CFLAGS} -fvisibility=hidden"
     CXXFLAGS="${CXXFLAGS} -fvisibility=hidden"
     OBJCFLAGS="${OBJCFLAGS} -fvisibility=hidden"
+    VLC_SAVE_FLAGS
   ])
 ])
 
-VLC_SAVE_FLAGS
 
 dnl
 dnl  Enable/disable optimizations
