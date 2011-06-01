@@ -46,22 +46,22 @@
 static void DrawRect(subpicture_region_t *r, int fill,
                      int x1, int y1, int x2, int y2)
 {
-    uint8_t *a    = r->p_picture->A_PIXELS;
-    int     pitch = r->p_picture->A_PITCH;
+    uint8_t *p    = r->p_picture->p->p_pixels;
+    int     pitch = r->p_picture->p->i_pitch;
 
     if (fill == STYLE_FILLED) {
         for (int y = y1; y <= y2; y++) {
             for (int x = x1; x <= x2; x++)
-                a[x + pitch * y] = 0xff;
+                p[x + pitch * y] = 1;
         }
     } else {
         for (int y = y1; y <= y2; y++) {
-            a[x1 + pitch * y] = 0xff;
-            a[x2 + pitch * y] = 0xff;
+            p[x1 + pitch * y] = 1;
+            p[x2 + pitch * y] = 1;
         }
         for (int x = x1; x <= x2; x++) {
-            a[x + pitch * y1] = 0xff;
-            a[x + pitch * y2] = 0xff;
+            p[x + pitch * y1] = 1;
+            p[x + pitch * y2] = 1;
         }
     }
 }
@@ -73,8 +73,8 @@ static void DrawRect(subpicture_region_t *r, int fill,
 static void DrawTriangle(subpicture_region_t *r, int fill,
                          int x1, int y1, int x2, int y2)
 {
-    uint8_t *a    = r->p_picture->A_PIXELS;
-    int     pitch = r->p_picture->A_PITCH;
+    uint8_t *p    = r->p_picture->p->p_pixels;
+    int     pitch = r->p_picture->p->i_pitch;
     const int mid = y1 + (y2 - y1) / 2;
 
     /* TODO factorize it */
@@ -83,17 +83,17 @@ static void DrawTriangle(subpicture_region_t *r, int fill,
             for (int y = y1; y <= mid; y++) {
                 int h = y - y1;
                 for (int x = x1; x <= x1 + h && x <= x2; x++) {
-                    a[x + pitch * y         ] = 0xff;
-                    a[x + pitch * (y2 - h)] = 0xff;
+                    p[x + pitch * y         ] = 1;
+                    p[x + pitch * (y2 - h)] = 1;
                 }
             }
         } else {
             for (int y = y1; y <= mid; y++) {
                 int h = y - y1;
-                a[x1 +     pitch * y         ] = 0xff;
-                a[x1 + h + pitch * y         ] = 0xff;
-                a[x1 +     pitch * (y2 - h)] = 0xff;
-                a[x1 + h + pitch * (y2 - h)] = 0xff;
+                p[x1 +     pitch * y         ] = 1;
+                p[x1 + h + pitch * y         ] = 1;
+                p[x1 +     pitch * (y2 - h)] = 1;
+                p[x1 + h + pitch * (y2 - h)] = 1;
             }
         }
     } else {
@@ -101,17 +101,17 @@ static void DrawTriangle(subpicture_region_t *r, int fill,
             for (int y = y1; y <= mid; y++) {
                 int h = y - y1;
                 for (int x = x1; x >= x1 - h && x >= x2; x--) {
-                    a[x + pitch * y       ] = 0xff;
-                    a[x + pitch * (y2 - h)] = 0xff;
+                    p[x + pitch * y       ] = 1;
+                    p[x + pitch * (y2 - h)] = 1;
                 }
             }
         } else {
             for (int y = y1; y <= mid; y++) {
                 int h = y - y1;
-                a[ x1 +     pitch * y       ] = 0xff;
-                a[ x1 - h + pitch * y       ] = 0xff;
-                a[ x1 +     pitch * (y2 - h)] = 0xff;
-                a[ x1 - h + pitch * (y2 - h)] = 0xff;
+                p[ x1 +     pitch * y       ] = 1;
+                p[ x1 - h + pitch * y       ] = 1;
+                p[ x1 +     pitch * (y2 - h)] = 1;
+                p[ x1 - h + pitch * (y2 - h)] = 1;
             }
         }
     }
@@ -122,28 +122,31 @@ static void DrawTriangle(subpicture_region_t *r, int fill,
  */
 static subpicture_region_t *OSDRegion(int x, int y, int width, int height)
 {
+    video_palette_t palette = {
+        .i_entries = 2,
+        .palette = {
+            [0] = { 0xff, 0x80, 0x80, 0x00 },
+            [1] = { 0xff, 0x80, 0x80, 0xff },
+        },
+    };
+
     video_format_t fmt;
-    video_format_Init(&fmt, VLC_CODEC_YUVA);
+    video_format_Init(&fmt, VLC_CODEC_YUVP);
     fmt.i_width          =
     fmt.i_visible_width  = width;
     fmt.i_height         =
     fmt.i_visible_height = height;
     fmt.i_sar_num        = 1;
     fmt.i_sar_den        = 1;
+    fmt.p_palette        = &palette;
 
     subpicture_region_t *r = subpicture_region_New(&fmt);
     if (!r)
         return NULL;
     r->i_x = x;
     r->i_y = y;
+    memset(r->p_picture->p->p_pixels, 0, r->p_picture->p->i_pitch * height);
 
-    for (int i = 0; i < r->p_picture->i_planes; i++) {
-        plane_t *p = &r->p_picture->p[i];
-        int colors[PICTURE_PLANE_MAX] = {
-            0xff, 0x80, 0x80, 0x00
-        };
-        memset(p->p_pixels, colors[i], p->i_pitch * height);
-    }
     return r;
 }
 
