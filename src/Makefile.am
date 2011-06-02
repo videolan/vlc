@@ -314,7 +314,6 @@ SOURCES_libvlc_other = \
 	misc/atomic.c \
 	posix/filesystem.c \
 	posix/thread.c \
-	posix/thread.c \
 	posix/specific.c \
 	$(NULL)
 
