@@ -100,7 +100,8 @@ static vout_display_t *vout_display_New(vlc_object_t *obj,
                                         vout_display_owner_t *owner)
 {
     /* */
-    vout_display_t *vd = vlc_object_create(obj, sizeof(*vd));
+    vout_display_t *vd = vlc_custom_create(obj, sizeof(*vd),
+                                           VLC_OBJECT_GENERIC, "vout display");
 
     /* */
     video_format_Copy(&vd->source, fmt);
