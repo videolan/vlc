@@ -56,6 +56,19 @@
 # endif
 #endif
 
+static inline bool HasExtension(const char *apis, const char *api)
+{
+    size_t apilen = strlen(api);
+    while (apis) {
+        while (*apis == ' ')
+            apis++;
+        if (!strncmp(apis, api, apilen) && memchr(" ", apis[apilen], 2))
+            return true;
+        apis = strchr(apis, ' ');
+    }
+    return false;
+}
+
 typedef struct vout_display_opengl_t vout_display_opengl_t;
 
 vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
