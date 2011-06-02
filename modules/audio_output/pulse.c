@@ -252,7 +252,7 @@ static void Play(aout_instance_t *aout)
      * will take place, and sooner or later a deadlock. */
     pa_threaded_mainloop_lock(sys->mainloop);
 
-    if (pa_stream_is_corked(sys->stream) > 0) {
+    if (pa_stream_is_corked(s) > 0) {
         pa_operation *op = pa_stream_cork(s, 0, NULL, NULL);
         if (op != NULL)
             pa_operation_unref(op);
@@ -312,6 +312,25 @@ static void Play(aout_instance_t *aout)
             block_Release(block);
         }
     }
+
+    pa_threaded_mainloop_unlock(sys->mainloop);
+}
+
+static void Pause(aout_instance_t *aout, bool b_paused, mtime_t i_date)
+{
+    aout_sys_t *sys = aout->output.p_sys;
+    pa_stream *s = sys->stream;
+
+    /* Note: The core already holds the output FIFO lock at this point.
+     * Therefore we must not under any circumstances (try to) acquire the
+     * output FIFO lock while the PulseAudio threaded main loop lock is held
+     * (including from PulseAudio stream callbacks). Otherwise lock inversion
+     * will take place, and sooner or later a deadlock. */
+    pa_threaded_mainloop_lock(sys->mainloop);
+
+    pa_operation *op = pa_stream_cork(s, b_paused ? 1 : 0, NULL, NULL);
+    if (op != NULL)
+        pa_operation_unref(op);
 
     pa_threaded_mainloop_unlock(sys->mainloop);
 }
@@ -581,7 +600,7 @@ static int Open(vlc_object_t *obj)
     pa_threaded_mainloop_unlock(mainloop);
 
     aout->output.pf_play = Play;
-    aout->output.pf_pause = NULL;
+    aout->output.pf_pause = Pause;
     aout->output.pf_volume_set = VolumeSet;
     return VLC_SUCCESS;
 
