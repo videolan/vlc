@@ -364,14 +364,14 @@ static int Open (vlc_object_t *obj)
 
     bool is_swap_interval_set = false;
 #ifdef GLX_SGI_swap_control
-    if (strstr (glx_extensions, "GLX_SGI_swap_control")) {
+    if (HasExtension (glx_extensions, "GLX_SGI_swap_control")) {
         PFNGLXSWAPINTERVALSGIPROC SwapIntervalSGI = (PFNGLXSWAPINTERVALSGIPROC)GetProcAddress (NULL, "glXSwapIntervalSGI");
         if (!is_swap_interval_set && SwapIntervalSGI)
             is_swap_interval_set = !SwapIntervalSGI (1);
     }
 #endif
 #ifdef GLX_EXT_swap_control
-    if (strstr (glx_extensions, "GLX_EXT_swap_control")) {
+    if (HasExtension (glx_extensions, "GLX_EXT_swap_control")) {
         PFNGLXSWAPINTERVALEXTPROC SwapIntervalEXT = (PFNGLXSWAPINTERVALEXTPROC)GetProcAddress (NULL, "glXSwapIntervalEXT");
         if (!is_swap_interval_set && SwapIntervalEXT)
             is_swap_interval_set = !SwapIntervalEXT (dpy, sys->glwin, 1);

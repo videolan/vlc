@@ -154,12 +154,10 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     }
 
     const char *extensions = (const char *)glGetString(GL_EXTENSIONS);
-    if (!extensions)
-        extensions = "";
 
     /* Load extensions */
     bool supports_fp = false;
-    if (strstr(extensions, "GL_ARB_fragment_program")) {
+    if (HasExtension(extensions, "GL_ARB_fragment_program")) {
         vgl->GenProgramsARB    = (PFNGLGENPROGRAMSARBPROC)vlc_gl_GetProcAddress(vgl->gl, "glGenProgramsARB");
         vgl->BindProgramARB    = (PFNGLBINDPROGRAMARBPROC)vlc_gl_GetProcAddress(vgl->gl, "glBindProgramARB");
         vgl->ProgramStringARB  = (PFNGLPROGRAMSTRINGARBPROC)vlc_gl_GetProcAddress(vgl->gl, "glProgramStringARB");
@@ -175,7 +173,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
 
     bool supports_multitexture = false;
     GLint max_texture_units = 0;
-    if (strstr(extensions, "GL_ARB_multitexture")) {
+    if (HasExtension(extensions, "GL_ARB_multitexture")) {
         vgl->ActiveTextureARB   = (PFNGLACTIVETEXTUREARBPROC)vlc_gl_GetProcAddress(vgl->gl, "glActiveTextureARB");
         vgl->MultiTexCoord2fARB = (PFNGLMULTITEXCOORD2FARBPROC)vlc_gl_GetProcAddress(vgl->gl, "glMultiTexCoord2fARB");
 
@@ -253,8 +251,8 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
 #elif defined(MACOS_OPENGL)
     supports_npot = true;
 #else
-    supports_npot |= strstr(extensions, "GL_APPLE_texture_2D_limited_npot") != NULL ||
-                     strstr(extensions, "GL_ARB_texture_non_power_of_two");
+    supports_npot |= HasExtension(extensions, "GL_APPLE_texture_2D_limited_npot") ||
+                     HasExtension(extensions, "GL_ARB_texture_non_power_of_two");
 #endif
 
     /* Texture size */
