@@ -251,10 +251,11 @@ static int OSDWidgetValidate(subpicture_t *subpic,
                            bool has_dst_changed, const video_format_t *fmt_dst,
                            mtime_t ts)
 {
-    VLC_UNUSED(subpic); VLC_UNUSED(ts); VLC_UNUSED(fmt_src);
-    VLC_UNUSED(has_dst_changed); VLC_UNUSED(fmt_dst);
+    VLC_UNUSED(subpic); VLC_UNUSED(ts);
+    VLC_UNUSED(fmt_src); VLC_UNUSED(has_src_changed);
+    VLC_UNUSED(fmt_dst);
 
-    if (!has_src_changed && !has_dst_changed)
+    if (!has_dst_changed)
         return VLC_SUCCESS;
     return VLC_EGENERIC;
 }
@@ -265,7 +266,7 @@ static void OSDWidgetUpdate(subpicture_t *subpic,
                           mtime_t ts)
 {
     subpicture_updater_sys_t *sys = subpic->updater.p_sys;
-    VLC_UNUSED(fmt_dst); VLC_UNUSED(ts);
+    VLC_UNUSED(fmt_src); VLC_UNUSED(ts);
 
     video_format_t fmt = *fmt_dst;
     fmt.i_width         = fmt.i_width         * fmt.i_sar_num / fmt.i_sar_den;
