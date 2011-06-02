@@ -80,6 +80,8 @@ static bool CheckAPI (EGLDisplay dpy, const char *api)
     /* Cannot use strtok_r() on constant string... */
     do
     {
+        while (*apis == ' ')
+            apis++;
         if (!strncmp (apis, api, apilen)
           && (memchr (" ", apis[apilen], 2) != NULL))
             return true;
