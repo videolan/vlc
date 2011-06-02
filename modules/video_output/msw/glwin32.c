@@ -39,6 +39,7 @@
 #endif
 
 #include "../opengl.h"
+#include <GL/wglew.h>
 #include "common.h"
 
 /*****************************************************************************
@@ -107,6 +108,15 @@ static int Open(vlc_object_t *object)
     /* Create and enable the render context */
     sys->hGLRC = wglCreateContext(sys->hGLDC);
     wglMakeCurrent(sys->hGLDC, sys->hGLRC);
+
+    const char *extensions = (const char*)glGetString(GL_EXTENSIONS);
+#ifdef WGL_EXT_swap_control
+    if (HasExtension(extensions, "WGL_EXT_swap_control")) {
+        PFNWGLSWAPINTERVALEXTPROC SwapIntervalEXT = (PFNWGLSWAPINTERVALEXTPROC)wglGetProcAddress("wglSwapIntervalEXT");
+        if (SwapIntervalEXT)
+            SwapIntervalEXT(1);
+    }
+#endif
 
     /* */
     sys->gl.lock = NULL;
