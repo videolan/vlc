@@ -77,7 +77,11 @@
 #if defined( UNDER_CE )
 #   define UPDATE_VLC_STATUS_URL "http://update.videolan.org/vlc/status-ce"
 #elif defined( WIN32 )
-#   define UPDATE_VLC_STATUS_URL "http://update.videolan.org/vlc/status-win-x86"
+#  ifndef NDEBUG
+#    define UPDATE_VLC_STATUS_URL "http://update-test.videolan.org/vlc/status-win-x86"
+#  else
+#    define UPDATE_VLC_STATUS_URL "http://update.videolan.org/vlc/status-win-x86"
+#  endif
 #else
 #   define UPDATE_VLC_STATUS_URL "http://update.videolan.org/vlc/status"
 #endif
