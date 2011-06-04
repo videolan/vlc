@@ -45,6 +45,12 @@
 
 
 // Taglib headers
+#include <taglib.h>
+#define VERSION_INT(a, b, c) ((a)<<16 | (b)<<8 | (c))
+#define TAGLIB_VERSION VERSION_INT(TAGLIB_MAJOR_VERSION, \
+                                   TAGLIB_MINOR_VERSION, \
+                                   TAGLIB_PATCH_VERSION)
+
 #include <fileref.h>
 #include <tag.h>
 #include <tbytevector.h>
@@ -53,8 +59,9 @@
 #include <id3v2tag.h>
 #include <xiphcomment.h>
 
-#ifdef HAVE_TAGLIB_APEFILE_H
-#include <apefile.h>
+#if TAGLIB_VERSION >= VERSION_INT(1,7,0)
+# define TAGLIB_HAVE_APEFILE_H
+# include <apefile.h>
 #endif
 #include <flacfile.h>
 #include <mpcfile.h>
@@ -438,7 +445,7 @@ static int ReadMeta( vlc_object_t* p_this)
 
 
     // Try now to read special tags
-#ifdef HAVE_TAGLIB_APEFILE_H
+#ifdef TAGLIB_HAVE_APEFILE_H
     if( APE::File* ape = dynamic_cast<APE::File*>(f.file()) )
     {
         if( ape->APETag() )
@@ -664,7 +671,7 @@ static int WriteMeta( vlc_object_t *p_this )
 
 
     // Try now to write special tags
-#ifdef HAVE_TAGLIB_APEFILE_H
+#ifdef TAGLIB_HAVE_APEFILE_H
     if( APE::File* ape = dynamic_cast<APE::File*>(f.file()) )
     {
         if( ape->APETag() )

@@ -1778,7 +1778,6 @@ AS_IF([test "${enable_taglib}" != "no"], [
     VLC_ADD_CXXFLAGS([taglib],[$TAGLIB_CFLAGS])
     AC_LANG_PUSH(C++)
     AC_CHECK_HEADERS(taglib/mp4coverart.h)
-    AC_CHECK_HEADERS(taglib/apefile.h)
     AC_LANG_POP(C++)
   ], [
     AC_MSG_WARN(TagLib library not found)])
