@@ -65,8 +65,6 @@
 # ifdef TAGLIB_WITH_ASF                     // ASF pictures comes with v1.7.0
 #  define TAGLIB_HAVE_ASFPICTURE_H
 #  include <asffile.h>
-#  include <asftag.h>
-#  include <asfattribute.h>
 # endif
 #endif
 
@@ -82,7 +80,8 @@
 # include <wavfile.h>
 #endif
 
-#ifdef TAGLIB_WITH_MP4
+#if TAGLIB_VERSION >= VERSION_INT(1,6,1) && defined(TAGLIB_WITH_MP4)
+# define TAGLIB_HAVE_MP4COVERTART_H
 # include <mp4file.h>
 #endif
 
@@ -399,7 +398,7 @@ static void ReadMetaFromXiph( Ogg::XiphComment* tag, demux_meta_t* p_demux_meta,
 }
 
 
-#if defined(TAGLIB_WITH_MP4) && defined(HAVE_TAGLIB_MP4COVERART_H)
+#ifdef TAGLIB_HAVE_MP4COVERTART_H
 /**
  * Read the meta information from mp4 specific tags
  * @param tag: the mp4 tag
@@ -531,7 +530,7 @@ static int ReadMeta( vlc_object_t* p_this)
         else if( flac->xiphComment() )
             ReadMetaFromXiph( flac->xiphComment(), p_demux_meta, p_meta );
     }
-#if defined(TAGLIB_WITH_MP4) && defined(HAVE_TAGLIB_MP4COVERART_H)
+#ifdef TAGLIB_HAVE_MP4COVERTART_H
     else if( MP4::File *mp4 = dynamic_cast<MP4::File*>(f.file()) )
     {
         if( mp4->tag() )
