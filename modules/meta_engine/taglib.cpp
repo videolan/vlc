@@ -33,8 +33,6 @@
 #include <vlc_demux.h>
 #include <vlc_strings.h>
 #include <vlc_charset.h>
-#include <vlc_url.h>
-#include <vlc_input_item.h>
 #include <vlc_input.h> /* for attachment_new */
 
 #ifdef WIN32
@@ -55,13 +53,10 @@
 #include <tag.h>
 #include <tbytevector.h>
 
-#include <apetag.h>
-#include <id3v2tag.h>
-#include <xiphcomment.h>
-
 #if TAGLIB_VERSION >= VERSION_INT(1,7,0)
 # define TAGLIB_HAVE_APEFILE_H
 # include <apefile.h>
+# include <apetag.h>
 # ifdef TAGLIB_WITH_ASF                     // ASF pictures comes with v1.7.0
 #  define TAGLIB_HAVE_ASFPICTURE_H
 #  include <asffile.h>
@@ -90,7 +85,6 @@
 #include <vorbisfile.h>
 #include <wavpackfile.h>
 
-#include <attachedpictureframe.h>
 #include <textidentificationframe.h>
 #include <uniquefileidentifierframe.h>
 
