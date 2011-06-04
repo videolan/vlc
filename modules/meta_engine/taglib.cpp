@@ -1,7 +1,7 @@
 /*****************************************************************************
  * taglib.cpp: Taglib tag parser/writer
  *****************************************************************************
- * Copyright (C) 2003-2009 the VideoLAN team
+ * Copyright (C) 2003-2011 the VideoLAN team
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
@@ -125,7 +125,6 @@ static void ReadMetaFromAPE( APE::Tag* tag, demux_meta_t*, vlc_meta_t* p_meta )
 
 #undef SET
 }
-
 
 
 /**
@@ -291,7 +290,6 @@ static void ReadMetaFromId3v2( ID3v2::Tag* tag, demux_meta_t* p_demux_meta, vlc_
 }
 
 
-
 /**
  * Read the meta information from XiphComments
  * @param tag: the Xiph Comment
@@ -344,7 +342,14 @@ static void ReadMetaFromXiph( Ogg::XiphComment* tag, demux_meta_t* p_demux_meta,
     vlc_meta_SetArtURL( p_meta, "attachment://cover" );
 }
 
+
 #if defined(TAGLIB_WITH_MP4) && defined(HAVE_TAGLIB_MP4COVERART_H)
+/**
+ * Read the meta information from mp4 specific tags
+ * @param tag: the mp4 tag
+ * @param p_demux_meta: the demuxer meta
+ * @param p_meta: the meta
+ */
 static void ReadMetaFromMP4( MP4::Tag* tag, demux_meta_t *p_demux_meta, vlc_meta_t* p_meta )
 {
     if( tag->itemListMap().contains("covr") )
@@ -366,6 +371,7 @@ static void ReadMetaFromMP4( MP4::Tag* tag, demux_meta_t *p_demux_meta, vlc_meta
     }
 }
 #endif
+
 
 /**
  * Get the tags from the file using TagLib
@@ -513,7 +519,6 @@ static int ReadMeta( vlc_object_t* p_this)
 }
 
 
-
 /**
  * Write meta information to APE tags
  * @param tag: the APE tag
@@ -538,7 +543,6 @@ static void WriteMetaToAPE( APE::Tag* tag, input_item_t* p_item )
 
 #undef WRITE
 }
-
 
 
 /**
@@ -571,7 +575,6 @@ static void WriteMetaToId3v2( ID3v2::Tag* tag, input_item_t* p_item )
 }
 
 
-
 /**
  * Write the meta information to XiphComments
  * @param tag: the Xiph Comment
@@ -594,7 +597,6 @@ static void WriteMetaToXiph( Ogg::XiphComment* tag, input_item_t* p_item )
 
 #undef WRITE
 }
-
 
 
 /**
