@@ -111,6 +111,18 @@ elseif command == "seek" then
   common.seek(val)
 elseif command == "key" then
   common.hotkey("key-"..val)
+elseif command == "audiodelay" then
+  if vlc.object.input() and val then
+   vlc.var.set(vlc.object.input(),"audio-delay",val)
+  end
+elseif command == "rate" then
+  if vlc.object.input() and tonumber(val) >= 0 then
+   vlc.var.set(vlc.object.input(),"rate",val)
+  end
+elseif command == "subdelay" then
+  if vlc.object.input() then
+   vlc.var.set(vlc.object.input(),"spu-delay",val)
+  end
 end
 
 local input = nil
@@ -125,6 +137,9 @@ local vout = input and vlc.object.find(input,'vout','child')
 ?>
 <root>
   <volume><?vlc print(vlc.volume.get()) ?></volume>
+  <audiodelay><?vlc if input then print(vlc.var.get(input,"audio-delay")) else print (0) end ?></audiodelay>
+  <rate><?vlc if input then print(vlc.var.get(input,"rate")) else print (1) end ?></rate>
+  <subtitledelay><?vlc if input then print(vlc.var.get(input,"spu-delay")) else print (0) end ?></subtitledelay>
   <length><?vlc if input then print(math.floor(vlc.var.get(input,"length"))) else print(0) end?></length>
   <time><?vlc if input then print(math.floor(vlc.var.get(input,"time"))) else print(0) end?></time>
   <state><?vlc print(vlc.playlist.status()) ?></state>

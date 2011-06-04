@@ -416,6 +416,48 @@ function reset_search()
         update_playlist_search('')
     }
 }
+function audiodelay_down()
+{
+    var curdel = parseFloat(req.responseXML.documentElement.getElementsByTagName( 'audiodelay' )[0].firstChild.data);
+    var curdelnew = curdel - 0.05;
+    curdelnew=curdelnew.toFixed(2);
+    loadXMLDoc( 'requests/status.xml?command=audiodelay&val='+encodeURIComponent(curdelnew), parse_status );
+}
+function audiodelay_up()
+{
+    var curdel = parseFloat(req.responseXML.documentElement.getElementsByTagName( 'audiodelay' )[0].firstChild.data);
+    var curdelnew = curdel + 0.05;
+    curdelnew=curdelnew.toFixed(2);
+    loadXMLDoc( 'requests/status.xml?command=audiodelay&val='+encodeURIComponent(curdelnew), parse_status );
+}
+function playrate_down()
+{
+    var currate = parseFloat(req.responseXML.documentElement.getElementsByTagName( 'rate' )[0].firstChild.data);
+    var curratenew = currate - 0.05;
+    curratenew=curratenew.toFixed(2);
+    loadXMLDoc( 'requests/status.xml?command=rate&val='+encodeURIComponent(curratenew), parse_status );
+}
+function playrate_up()
+{
+    var currate = parseFloat(req.responseXML.documentElement.getElementsByTagName( 'rate' )[0].firstChild.data);
+    var curratenew = currate + 0.05;
+    curratenew=curratenew.toFixed(2);
+    loadXMLDoc( 'requests/status.xml?command=rate&val='+encodeURIComponent(curratenew), parse_status );
+}
+function subdel_down()
+{
+    var curdel = parseFloat(req.responseXML.documentElement.getElementsByTagName( 'subtitledelay' )[0].firstChild.data);
+    var curdelnew = curdel - 0.05;
+    curdelnew=curdelnew.toFixed(2);
+    loadXMLDoc( 'requests/status.xml?command=subdelay&val='+encodeURIComponent(curdelnew), parse_status );
+}
+function subdel_up()
+{
+    var curdel = parseFloat(req.responseXML.documentElement.getElementsByTagName( 'subtitledelay' )[0].firstChild.data);
+    var curdelnew = curdel + 0.05;
+    curdelnew=curdelnew.toFixed(2);
+    loadXMLDoc( 'requests/status.xml?command=subdelay&val='+encodeURIComponent(curdelnew), parse_status );
+}
 
 /**********************************************************************
  * Parse xml replies to XMLHttpRequests
@@ -467,6 +509,12 @@ function parse_status()
             old_time = new_time;
             set_text( 'time', format_time( new_time ) );
             set_text( 'length', format_time( length ) );
+            var audio_delay = (parseFloat(req.responseXML.documentElement.getElementsByTagName( 'audiodelay' )[0].firstChild.data).toFixed(2))*1000;
+            set_text( 'a_del', audio_delay ); 
+            var play_rate = (parseFloat(req.responseXML.documentElement.getElementsByTagName( 'rate' )[0].firstChild.data).toFixed(2));
+            set_text( 'p_rate', play_rate ); 
+            var subs_delay = (parseFloat(req.responseXML.documentElement.getElementsByTagName( 'subtitledelay' )[0].firstChild.data).toFixed(2))*1000;
+            set_text( 's_del', subs_delay ); 
             if( status.getElementsByTagName( 'volume' ).length != 0 )
                 set_text( 'volume', Math.floor(status.getElementsByTagName( 'volume' )[0].firstChild.data/5.12)+'%' );
             var statetag = status.getElementsByTagName( 'state' );
