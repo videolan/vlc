@@ -445,6 +445,13 @@ static bool parse_track_node COMPLEX_INTERFACE
                         while( p_sys->i_track_id >= p_sys->i_tracklist_entries )
                             pp[p_sys->i_tracklist_entries++] = NULL;
                     }
+                    else if( p_sys->pp_tracklist[p_sys->i_track_id] != NULL )
+                    {
+                        msg_Err( p_demux, "track ID %d collision",
+                                 p_sys->i_track_id );
+                        vlc_gc_decref( p_new_input );
+                        return false;
+                    }
 
                     p_sys->pp_tracklist[ p_sys->i_track_id ] = p_new_input;
                     return true;
