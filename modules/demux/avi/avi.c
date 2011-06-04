@@ -557,7 +557,7 @@ static int Open( vlc_object_t * p_this )
                 {
                     /* The palette is not always included in biSize */
                     fmt.i_extra = p_vids->i_chunk_size - sizeof(BITMAPINFOHEADER);
-                    if( fmt.i_extra > 0 )
+                    if( fmt.i_extra > 0 && fmt.p_extra )
                     {
                         const uint8_t *p_pal = fmt.p_extra;
 
