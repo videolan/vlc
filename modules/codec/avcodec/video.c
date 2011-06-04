@@ -343,13 +343,18 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
 
 #ifdef HAVE_AVCODEC_VA
     const bool b_use_hw = var_CreateGetBool( p_dec, "ffmpeg-hw" );
-    if( b_use_hw )
+    if( b_use_hw &&
+        (i_codec_id == CODEC_ID_MPEG1VIDEO || i_codec_id == CODEC_ID_MPEG2VIDEO ||
+         i_codec_id == CODEC_ID_MPEG4 ||
+         i_codec_id == CODEC_ID_H264 ||
+         i_codec_id == CODEC_ID_VC1 || i_codec_id == CODEC_ID_WMV3) )
     {
-#ifdef HAVE_AVCODEC_MT
-        msg_Err( p_dec, "ffmpeg-hw is not compatible with ffmpeg-mt" );
-#else
+        if( p_sys->p_context->thread_type & FF_THREAD_FRAME )
+        {
+            msg_Warn( p_dec, "threaded frame decoding is not compatible with ffmpeg-hw, disabled" );
+            p_sys->p_context->thread_type &= ~FF_THREAD_FRAME;
+        }
         p_sys->p_context->get_format = ffmpeg_GetFormat;
-#endif
     }
 #endif
 
