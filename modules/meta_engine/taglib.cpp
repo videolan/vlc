@@ -62,12 +62,12 @@
 #if TAGLIB_VERSION >= VERSION_INT(1,7,0)
 # define TAGLIB_HAVE_APEFILE_H
 # include <apefile.h>
-#endif
-
-#ifdef TAGLIB_WITH_ASF
-# include <asffile.h>
-# include <asftag.h>
-# include <asfattribute.h>
+# ifdef TAGLIB_WITH_ASF                     // ASF pictures comes with v1.7.0
+#  define TAGLIB_HAVE_ASFPICTURE_H
+#  include <asffile.h>
+#  include <asftag.h>
+#  include <asfattribute.h>
+# endif
 #endif
 
 #include <flacfile.h>
@@ -134,7 +134,7 @@ static void ReadMetaFromAPE( APE::Tag* tag, demux_meta_t*, vlc_meta_t* p_meta )
 }
 
 
-#ifdef TAGLIB_WITH_ASF
+#ifdef TAGLIB_HAVE_ASFPICTURE_H
 /**
  * Read meta information from APE tags
  * @param tag: the APE tag
@@ -516,7 +516,7 @@ static int ReadMeta( vlc_object_t* p_this)
     }
     else
 #endif
-#ifdef TAGLIB_WITH_ASF
+#ifdef TAGLIB_HAVE_ASFPICTURE_H
     if( ASF::File* asf = dynamic_cast<ASF::File*>(f.file()) )
     {
         if( asf->tag() )
