@@ -64,13 +64,13 @@ struct services_discovery_sys_t
     xcb_atom_t        net_client_list;
     xcb_atom_t        net_wm_name;
     xcb_window_t      root_window;
-    void             *nodes;
+    void             *apps;
 };
 
 static void *Run (void *);
-static void Update (services_discovery_t *);
-static void DelItem (void *);
-static void AddDesktopItem(services_discovery_t *);
+static void UpdateApps (services_discovery_t *);
+static void DelApp (void *);
+static void AddDesktop(services_discovery_t *);
 
 static int vlc_sd_probe_Open (vlc_object_t *obj)
 {
@@ -130,7 +130,7 @@ static int Open (vlc_object_t *obj)
     }
 
     /* Add a permanent item for the entire desktop */
-    AddDesktopItem (sd);
+    AddDesktop (sd);
 
     p_sys->root_window = scr->root;
     xcb_change_window_attributes (conn, scr->root, XCB_CW_EVENT_MASK,
@@ -161,8 +161,8 @@ static int Open (vlc_object_t *obj)
         free (r);
     }
 
-    p_sys->nodes = NULL;
-    Update (sd);
+    p_sys->apps = NULL;
+    UpdateApps (sd);
 
     if (vlc_clone (&p_sys->thread, Run, sd, VLC_THREAD_PRIORITY_LOW))
         goto error;
@@ -186,7 +186,7 @@ static void Close (vlc_object_t *obj)
     vlc_cancel (p_sys->thread);
     vlc_join (p_sys->thread, NULL);
     xcb_disconnect (p_sys->conn);
-    tdestroy (p_sys->nodes, DelItem);
+    tdestroy (p_sys->apps, DelApp);
     free (p_sys);
 }
 
@@ -214,7 +214,7 @@ static void *Run (void *data)
                  const xcb_property_notify_event_t *pn =
                      (xcb_property_notify_event_t *)ev;
                  if (pn->atom == p_sys->net_client_list)
-                     Update (sd);
+                     UpdateApps (sd);
             }
             free (ev);
         }
@@ -223,6 +223,7 @@ static void *Run (void *data)
     return NULL;
 }
 
+/*** Application windows ***/
 struct app
 {
     xcb_window_t          xid; /* must be first for cmpapp */
@@ -230,7 +231,7 @@ struct app
     services_discovery_t *owner;
 };
 
-static struct app *AddItem (services_discovery_t *sd, xcb_window_t xid)
+static struct app *AddApp (services_discovery_t *sd, xcb_window_t xid)
 {
     services_discovery_sys_t *p_sys = sd->p_sys;
     char *mrl, *name;
@@ -276,7 +277,7 @@ static struct app *AddItem (services_discovery_t *sd, xcb_window_t xid)
     return app;
 }
 
-static void DelItem (void *data)
+static void DelApp (void *data)
 {
     struct app *app = data;
 
@@ -297,7 +298,7 @@ static int cmpapp (const void *a, const void *b)
     return 0;
 } 
 
-static void Update (services_discovery_t *sd)
+static void UpdateApps (services_discovery_t *sd)
 {
     services_discovery_sys_t *p_sys = sd->p_sys;
     xcb_connection_t *conn = p_sys->conn;
@@ -312,7 +313,7 @@ static void Update (services_discovery_t *sd)
 
     xcb_window_t *ent = xcb_get_property_value (r);
     int n = xcb_get_property_value_length (r) / 4;
-    void *newnodes = NULL, *oldnodes = p_sys->nodes;
+    void *newnodes = NULL, *oldnodes = p_sys->apps;
 
     for (int i = 0; i < n; i++)
     {
@@ -327,23 +328,24 @@ static void Update (services_discovery_t *sd)
         }
         else /* new entry */
         {
-            app = AddItem (sd, id);
+            app = AddApp (sd, id);
             if (app == NULL)
                 continue;
         }
 
         pa = tsearch (app, &newnodes, cmpapp);
         if (pa == NULL /* OOM */ || *pa != app /* buggy window manager */)
-            DelItem (app);
+            DelApp (app);
     }
     free (r);
 
     /* Remove old nodes */
-    tdestroy (oldnodes, DelItem);
-    p_sys->nodes = newnodes;
+    tdestroy (oldnodes, DelApp);
+    p_sys->apps = newnodes;
 }
 
-static void AddDesktopItem(services_discovery_t *sd)
+/*** Whole desktop ***/
+static void AddDesktop(services_discovery_t *sd)
 {
     input_item_t *item;
 
