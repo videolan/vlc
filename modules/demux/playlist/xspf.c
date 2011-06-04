@@ -440,7 +440,10 @@ static bool parse_track_node COMPLEX_INTERFACE
                         pp = realloc( p_sys->pp_tracklist,
                             (p_sys->i_track_id + 1) * sizeof(*pp) );
                         if( !pp )
+                        {
+                            vlc_gc_decref( p_new_input );
                             return false;
+                        }
                         p_sys->pp_tracklist = pp;
                         while( p_sys->i_track_id >= p_sys->i_tracklist_entries )
                             pp[p_sys->i_tracklist_entries++] = NULL;
