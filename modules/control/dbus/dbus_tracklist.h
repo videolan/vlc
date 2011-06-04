@@ -39,12 +39,6 @@ DBusHandlerResult handle_tracklist ( DBusConnection *p_conn,
                                      DBusMessage *p_from,
                                      void *p_this );
 
-static const DBusObjectPathVTable dbus_mpris_tracklist_vtable = {
-        NULL, handle_tracklist, /* handler function */
-        NULL, NULL, NULL, NULL
-};
-
-int TrackListChangeEmit( intf_thread_t *, int, int );
 int TrackListPropertiesChangedEmit( intf_thread_t *, vlc_dictionary_t * );
 
 #endif //dbus_tracklist.h

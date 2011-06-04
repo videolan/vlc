@@ -289,26 +289,6 @@ DBUS_METHOD( CanEditTracks )
     REPLY_SEND;
 }
 
-/******************************************************************************
- * TrackListChange: tracklist order / length change signal
- *****************************************************************************/
-DBUS_SIGNAL( TrackListChangeSignal )
-{ /* emit the new tracklist lengh */
-    SIGNAL_INIT( DBUS_MPRIS_TRACKLIST_INTERFACE,
-                 DBUS_MPRIS_TRACKLIST_PATH,
-                 "TrackListChange");
-
-    OUT_ARGUMENTS;
-
-    playlist_t *p_playlist = ((intf_thread_t*)p_data)->p_sys->p_playlist;
-    PL_LOCK;
-    dbus_int32_t i_elements = p_playlist->current.i_size;
-    PL_UNLOCK;
-
-    ADD_INT32( &i_elements );
-    SIGNAL_SEND;
-}
-
 #define PROPERTY_MAPPING_BEGIN if( 0 ) {}
 #define PROPERTY_FUNC( interface, property, function ) \
     else if( !strcmp( psz_interface_name, interface ) && \
@@ -371,37 +351,6 @@ handle_tracklist ( DBusConnection *p_conn, DBusMessage *p_from, void *p_this )
                                                   GetTracksMetadata );
 
     return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
-}
-
-/*****************************************************************************
- * TrackListChangeEmit: Emits the TrackListChange signal
- *****************************************************************************/
-/* FIXME: It is not called on tracklist reordering */
-int TrackListChangeEmit( intf_thread_t *p_intf, int signal, int i_node )
-{
-    // "playlist-item-append"
-    if( signal == SIGNAL_PLAYLIST_ITEM_APPEND )
-    {
-        /* don't signal when items are added/removed in p_category */
-        playlist_t *p_playlist = p_intf->p_sys->p_playlist;
-        PL_LOCK;
-        playlist_item_t *p_item = playlist_ItemGetById( p_playlist, i_node );
-        assert( p_item );
-        while( p_item->p_parent )
-            p_item = p_item->p_parent;
-        if( p_item == p_playlist->p_root_category )
-        {
-            PL_UNLOCK;
-            return VLC_SUCCESS;
-        }
-        PL_UNLOCK;
-    }
-
-    if( p_intf->p_sys->b_dead )
-        return VLC_SUCCESS;
-
-    TrackListChangeSignal( p_intf->p_sys->p_conn, p_intf );
-    return VLC_SUCCESS;
 }
 
 #undef METHOD_FUNC
