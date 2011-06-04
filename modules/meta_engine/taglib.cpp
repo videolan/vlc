@@ -69,7 +69,8 @@
 #include <oggfile.h>
 #include <oggflacfile.h>
 
-#ifdef TAGLIB_WITH_ASF
+#if TAGLIB_VERSION >= VERSION_INT(1,6,0)
+# define TAGLIB_HAVE_RIFF_WAV_H
 # include <aifffile.h>
 # include <wavfile.h>
 #endif
@@ -488,7 +489,7 @@ static int ReadMeta( vlc_object_t* p_this)
         else if( Ogg::Vorbis::File* ogg_vorbis = dynamic_cast<Ogg::Vorbis::File*>(f.file()) )
             ReadMetaFromXiph( ogg_vorbis->tag(), p_demux_meta, p_meta );
     }
-#ifdef TAGLIB_WITH_ASF
+#ifdef TAGLIB_HAVE_RIFF_WAV_H
     else if( dynamic_cast<RIFF::File*>(f.file()) )
     {
         if( RIFF::AIFF::File* riff_aiff = dynamic_cast<RIFF::AIFF::File*>(f.file()) )
@@ -707,7 +708,7 @@ static int WriteMeta( vlc_object_t *p_this )
         else if( Ogg::Vorbis::File* ogg_vorbis = dynamic_cast<Ogg::Vorbis::File*>(f.file()) )
             WriteMetaToXiph( ogg_vorbis->tag(), p_item );
     }
-#ifdef TAGLIB_WITH_ASF
+#ifdef TAGLIB_HAVE_RIFF_WAV_H
     else if( dynamic_cast<RIFF::File*>(f.file()) )
     {
         if( RIFF::AIFF::File* riff_aiff = dynamic_cast<RIFF::AIFF::File*>(f.file()) )
