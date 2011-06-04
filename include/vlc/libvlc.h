@@ -409,8 +409,6 @@ typedef struct libvlc_module_description_t
     struct libvlc_module_description_t *p_next;
 } libvlc_module_description_t;
 
-libvlc_module_description_t *libvlc_module_description_list_get( libvlc_instance_t *p_instance, const char *capability );
-
 /**
  * Release a list of module descriptions.
  *
