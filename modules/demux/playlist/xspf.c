@@ -427,7 +427,8 @@ static bool parse_track_node COMPLEX_INTERFACE
                     else
                         free( psz_uri );
 
-                    if( p_sys->i_track_id < 0 )
+                    if( p_sys->i_track_id < 0
+                     || p_sys->i_track_id >= (SIZE_MAX / sizeof(p_new_input)) )
                     {
                         input_item_node_AppendNode( p_input_node, p_new_node );
                         vlc_gc_decref( p_new_input );
