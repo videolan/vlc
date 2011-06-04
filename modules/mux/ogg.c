@@ -416,7 +416,9 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
             memcpy( p_stream->p_oggds_header->stream_type, "audio", 5 );
 
             memset( p_stream->p_oggds_header->sub_type, 0, 4 );
-            sprintf( p_stream->p_oggds_header->sub_type, "%-x", i_tag );
+            char buf[5];
+            snprintf( buf, sizeof(buf), "%"PRIx16, i_tag );
+            strncpy( p_stream->p_oggds_header->sub_type, buf, 4 );
 
             SetQWLE( &p_stream->p_oggds_header->i_time_unit, INT64_C(10000000) );
             SetDWLE( &p_stream->p_oggds_header->i_default_len, 1 );
