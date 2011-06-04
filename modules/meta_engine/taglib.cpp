@@ -63,6 +63,13 @@
 # define TAGLIB_HAVE_APEFILE_H
 # include <apefile.h>
 #endif
+
+#ifdef TAGLIB_WITH_ASF
+# include <asffile.h>
+# include <asftag.h>
+# include <asfattribute.h>
+#endif
+
 #include <flacfile.h>
 #include <mpcfile.h>
 #include <mpegfile.h>
@@ -70,7 +77,7 @@
 #include <oggflacfile.h>
 
 #if TAGLIB_VERSION >= VERSION_INT(1,6,0)
-# define TAGLIB_HAVE_RIFF_WAV_H
+# define TAGLIB_HAVE_AIFF_WAV_H
 # include <aifffile.h>
 # include <wavfile.h>
 #endif
@@ -125,6 +132,55 @@ static void ReadMetaFromAPE( APE::Tag* tag, demux_meta_t*, vlc_meta_t* p_meta )
 
 #undef SET
 }
+
+
+#ifdef TAGLIB_WITH_ASF
+/**
+ * Read meta information from APE tags
+ * @param tag: the APE tag
+ * @param p_demux_meta: the demuxer meta
+ * @param p_meta: the meta
+ */
+static void ReadMetaFromASF( ASF::Tag* tag, demux_meta_t* p_demux_meta, vlc_meta_t* p_meta )
+{
+    // List the pictures
+    ASF::AttributeList list = tag->attributeListMap()["WM/Picture"];
+    ASF::AttributeList::Iterator iter;
+    for( iter = list.begin(); iter != list.end(); iter++ )
+    {
+        const ASF::Picture asfPicture = (*iter).toPicture();
+        const ByteVector picture = asfPicture.picture();
+        const char *psz_mime = asfPicture.mimeType().toCString();
+        const char *p_data = picture.data();
+        const unsigned i_data = picture.size();
+        char *psz_name;
+        input_attachment_t *p_attachment;
+
+        if( asfPicture.description().size() > 0 )
+            psz_name = strdup( asfPicture.description().toCString( true ) );
+        else
+        {
+            if( asprintf( &psz_name, "%i", asfPicture.type() ) == -1 )
+                continue;
+        }
+
+        p_attachment = vlc_input_attachment_New( psz_name, psz_mime,
+                                psz_name, p_data, i_data );
+        if( p_attachment )
+            TAB_APPEND_CAST( (input_attachment_t**),
+                             p_demux_meta->i_attachments, p_demux_meta->attachments,
+                             p_attachment );
+        free( psz_name );
+
+        char *psz_url;
+        if( asprintf( &psz_url, "attachment://%s",
+                      p_attachment->psz_name ) == -1 )
+            continue;
+        vlc_meta_SetArtURL( p_meta, psz_url );
+        free( psz_url );
+    }
+}
+#endif
 
 
 /**
@@ -460,6 +516,14 @@ static int ReadMeta( vlc_object_t* p_this)
     }
     else
 #endif
+#ifdef TAGLIB_WITH_ASF
+    if( ASF::File* asf = dynamic_cast<ASF::File*>(f.file()) )
+    {
+        if( asf->tag() )
+            ReadMetaFromASF( asf->tag(), p_demux_meta, p_meta );
+    }
+    else
+#endif
     if( FLAC::File* flac = dynamic_cast<FLAC::File*>(f.file()) )
     {
         if( flac->ID3v2Tag() )
@@ -495,7 +559,7 @@ static int ReadMeta( vlc_object_t* p_this)
         else if( Ogg::Vorbis::File* ogg_vorbis = dynamic_cast<Ogg::Vorbis::File*>(f.file()) )
             ReadMetaFromXiph( ogg_vorbis->tag(), p_demux_meta, p_meta );
     }
-#ifdef TAGLIB_HAVE_RIFF_WAV_H
+#ifdef TAGLIB_HAVE_AIFF_WAV_H
     else if( dynamic_cast<RIFF::File*>(f.file()) )
     {
         if( RIFF::AIFF::File* riff_aiff = dynamic_cast<RIFF::AIFF::File*>(f.file()) )
@@ -710,7 +774,7 @@ static int WriteMeta( vlc_object_t *p_this )
         else if( Ogg::Vorbis::File* ogg_vorbis = dynamic_cast<Ogg::Vorbis::File*>(f.file()) )
             WriteMetaToXiph( ogg_vorbis->tag(), p_item );
     }
-#ifdef TAGLIB_HAVE_RIFF_WAV_H
+#ifdef TAGLIB_HAVE_AIFF_WAV_H
     else if( dynamic_cast<RIFF::File*>(f.file()) )
     {
         if( RIFF::AIFF::File* riff_aiff = dynamic_cast<RIFF::AIFF::File*>(f.file()) )
