@@ -1170,7 +1170,7 @@ static NSString * VLCToolbarMediaControl     = @"VLCToolbarMediaControl";
 
     if( psz != NULL )
     {
-        o_str = [[[NSString alloc] initWithUTF8String: psz] autorelease];
+        o_str = [[[NSString alloc] initWithFormat:@"%s", psz] autorelease];
 
         if( o_str == NULL )
         {
