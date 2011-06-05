@@ -925,7 +925,7 @@ static void SpuRenderRegion(spu_t *spu,
         dst->p_picture = picture_Hold(region_picture);
         int fade_alpha = 255;
         if (subpic->b_fade) {
-            mtime_t fade_start = (subpic->i_stop + subpic->i_start) / 2;
+            mtime_t fade_start = subpic->i_start + 3 * (subpic->i_stop - subpic->i_start) / 4;
 
             if (fade_start <= render_date && fade_start < subpic->i_stop)
                 fade_alpha = 255 * (subpic->i_stop - render_date) /
