@@ -83,7 +83,6 @@ static char *ParseText(uint8_t *data, int size)
         else if (code == 0x8a)
             snprintf(tmp, sizeof(tmp), "\n");
         else {
-            fprintf(stderr, "--> %2.2x\n", code);
             t = NULL;
         }
 
