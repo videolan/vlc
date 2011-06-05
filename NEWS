@@ -50,8 +50,10 @@ Codecs:
 
 Demuxers:
  * new images demuxer supporting jpeg, png, targa, xcf, git, tiff, bmp, pcx, lbm
- * Ogg seeking improvements
  * C64 SID file playback support using sidplay2
+ * Ogg seeking improvements
+ * Support for images/cover art in wma/wmv/asf files
+ * Improvements in .ape files metadata reading and writing
 
 Interfaces:
  * Skins2 / Qt: misc improvements and usability fixes
