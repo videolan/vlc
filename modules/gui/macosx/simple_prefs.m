@@ -453,7 +453,7 @@ static inline char * __config_GetLabel( vlc_object_t *p_this, const char *psz_na
     psz_tmp = config_GetPsz( p_intf, "audio-filter" );
     if( psz_tmp )
     {
-        [o_audio_norm_ckb setState: (NSInteger)strstr( psz_tmp, "volnorm" )];
+        [o_audio_norm_ckb setState: (NSInteger)strstr( psz_tmp, "normvol" )];
         [o_audio_norm_fld setEnabled: [o_audio_norm_ckb state]];
         [o_audio_norm_stepper setEnabled: [o_audio_norm_ckb state]];
         free( psz_tmp );
@@ -756,13 +756,16 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
 
 - (void)saveChangedSettings
 {
-    char *psz_tmp;
+    NSString *tmpString;
+    NSRange tmpRange;
 
 #define SaveIntList( object, name ) save_int_list( p_intf, object, name )
 
 #define SaveStringList( object, name ) save_string_list( p_intf, object, name )
 
 #define SaveModuleList( object, name ) save_module_list( p_intf, object, name )
+
+#define getString( name ) [NSString stringWithFormat:@"%s", config_GetPsz( p_intf, name )]
 
     /**********************
      * interface settings *
@@ -778,25 +781,25 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
 		config_PutInt( p_intf, "macosx-mediakeys", [o_intf_mediakeys_ckb state] );
         if( [o_intf_enableGrowl_ckb state] == NSOnState )
         {
-            psz_tmp = config_GetPsz( p_intf, "control" );
-            if(! psz_tmp)
-                config_PutPsz( p_intf, "control", "growl" );
-            else if( (NSInteger)strstr( psz_tmp, "control" ) == NO )
+            tmpString = getString( "control" );
+            tmpRange = [tmpString rangeOfString:@"growl"];
+            if( [tmpString length] > 0 && tmpRange.location == NSNotFound )
             {
-                psz_tmp = (char *)[[NSString stringWithFormat: @"%s:growl", psz_tmp] UTF8String];
-                config_PutPsz( p_intf, "control", psz_tmp );
-                free( psz_tmp );
+                tmpString = [tmpString stringByAppendingString: @":growl"];
+                config_PutPsz( p_intf, "control", [tmpString UTF8String] );
             }
+            else
+                config_PutPsz( p_intf, "control", "growl" );
         }
         else
         {
-            psz_tmp = config_GetPsz( p_intf, "control" );
-            if( psz_tmp )
+            tmpString = getString( "control" );
+            if(! [tmpString isEqualToString:@""] )
             {
-                psz_tmp = (char *)[[[NSString stringWithUTF8String: psz_tmp] stringByTrimmingCharactersInSet: [NSCharacterSet characterSetWithCharactersInString:@":growl"]] UTF8String];
-                psz_tmp = (char *)[[[NSString stringWithUTF8String: psz_tmp] stringByTrimmingCharactersInSet: [NSCharacterSet characterSetWithCharactersInString:@"growl:"]] UTF8String];
-                psz_tmp = (char *)[[[NSString stringWithUTF8String: psz_tmp] stringByTrimmingCharactersInSet: [NSCharacterSet characterSetWithCharactersInString:@"growl"]] UTF8String];
-                config_PutPsz( p_intf, "control", psz_tmp );
+                tmpString = [tmpString stringByTrimmingCharactersInSet: [NSCharacterSet characterSetWithCharactersInString:@":growl"]];
+                tmpString = [tmpString stringByTrimmingCharactersInSet: [NSCharacterSet characterSetWithCharactersInString:@"growl:"]];
+                tmpString = [tmpString stringByTrimmingCharactersInSet: [NSCharacterSet characterSetWithCharactersInString:@"growl"]];
+                config_PutPsz( p_intf, "control", [tmpString UTF8String] );
             }
         }
 
@@ -827,25 +830,25 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
 
         if( [o_audio_norm_ckb state] == NSOnState )
         {
-            psz_tmp = config_GetPsz( p_intf, "audio-filter" );
-            if(! psz_tmp)
-                config_PutPsz( p_intf, "audio-filter", "volnorm" );
-            else if( (NSInteger)strstr( psz_tmp, "normvol" ) == NO )
+            tmpString = getString( "audio-filter" );
+            tmpRange = [tmpString rangeOfString:@"normvol"];
+            if( [tmpString length] > 0 && tmpRange.location == NSNotFound )
             {
-                psz_tmp = (char *)[[NSString stringWithFormat: @"%s:volnorm", psz_tmp] UTF8String];
-                config_PutPsz( p_intf, "audio-filter", psz_tmp );
-                free( psz_tmp );
+                tmpString = [tmpString stringByAppendingString: @":normvol"];
+                config_PutPsz( p_intf, "audio-filter", [tmpString UTF8String] );
             }
+            else
+                config_PutPsz( p_intf, "audio-filter", "normvol" );
         }
         else
         {
-            psz_tmp = config_GetPsz( p_intf, "audio-filter" );
-            if( psz_tmp )
+            tmpString = getString( "audio-filter" );
+            if(! [tmpString isEqualToString:@""] )
             {
-                psz_tmp = (char *)[[[NSString stringWithUTF8String: psz_tmp] stringByTrimmingCharactersInSet: [NSCharacterSet characterSetWithCharactersInString:@":volnorm"]] UTF8String];
-                psz_tmp = (char *)[[[NSString stringWithUTF8String: psz_tmp] stringByTrimmingCharactersInSet: [NSCharacterSet characterSetWithCharactersInString:@"volnorm:"]] UTF8String];
-                psz_tmp = (char *)[[[NSString stringWithUTF8String: psz_tmp] stringByTrimmingCharactersInSet: [NSCharacterSet characterSetWithCharactersInString:@"volnorm"]] UTF8String];
-                config_PutPsz( p_intf, "audio-filter", psz_tmp );
+                tmpString = [tmpString stringByTrimmingCharactersInSet: [NSCharacterSet characterSetWithCharactersInString:@":normvol"]];
+                tmpString = [tmpString stringByTrimmingCharactersInSet: [NSCharacterSet characterSetWithCharactersInString:@"normvol:"]];
+                tmpString = [tmpString stringByTrimmingCharactersInSet: [NSCharacterSet characterSetWithCharactersInString:@"normvol"]];
+                config_PutPsz( p_intf, "audio-filter", [tmpString UTF8String] );
             }
         }
         config_PutFloat( p_intf, "norm-max-level", [o_audio_norm_fld floatValue] );
