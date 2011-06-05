@@ -87,6 +87,7 @@ $Id$
  * decomp: Decompression module
  * deinterlace: naive deinterlacing filter
  * demux_cdg: Demuxer for CD-G files (Karaoke)
+ * demux_stl: EBU STL subtitles demuxer
  * demuxdump: Pseudo-demuxer that dumps the stream
  * dirac: BBC Dirac codec
  * direct2d: video output module using the Direct2D API
@@ -288,6 +289,7 @@ $Id$
  * spudec: RLE DVD subtitles decoder
  * sqlite: manage an SQLite database
  * stats: Stats encoder function
+ * stl: EBU STL decoder
  * stream_filter_httplive: HTTP Live streaming for playback
  * stream_filter_rar: Stream filter to read inside Rar files
  * stream_filter_record: record any stream instantly

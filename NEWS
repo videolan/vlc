@@ -47,13 +47,15 @@ Codecs:
  * Experimental Hardware decoding using Broadcom CrystalHD cards
  * New module for Dirac encoding, using the faster libschroedinger
    The Schroedinger module should be prefered to the Dirac one
+ * New module for decoding EBU subtitles (.stl)
 
 Demuxers:
- * new images demuxer supporting jpeg, png, targa, xcf, git, tiff, bmp, pcx, lbm
+ * New images demuxer supporting jpeg, png, targa, xcf, git, tiff, bmp, pcx, lbm
  * C64 SID file playback support using sidplay2
  * Ogg seeking improvements
  * Support for images/cover art in wma/wmv/asf files
  * Improvements in .ape files metadata reading and writing
+ * New demuxer module for EBU subtitles (.stl)
 
 Interfaces:
  * Skins2 / Qt: misc improvements and usability fixes

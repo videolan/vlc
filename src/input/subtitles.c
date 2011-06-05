@@ -60,7 +60,7 @@ static const char const sub_exts[][6] = {
     "rt",   "aqt", "txt",
     "usf", "jss",  "cdg",
     "psb", "mpsub","mpl2",
-    "pjs", "dks",
+    "pjs", "dks", "stl",
     ""
 };
 
