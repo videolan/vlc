@@ -200,11 +200,17 @@ static int Open (vlc_object_t *obj)
 
     /* Window properties */
     p_sys->pixmap = xcb_generate_id (conn);
-    p_sys->x = var_InheritInteger (obj, "screen-left");
-    p_sys->y = var_InheritInteger (obj, "screen-top");
     p_sys->w = var_InheritInteger (obj, "screen-width");
     p_sys->h = var_InheritInteger (obj, "screen-height");
-    p_sys->follow_mouse = var_InheritBool (obj, "screen-follow-mouse");
+    if (p_sys->w != 0 || p_sys->h != 0)
+        p_sys->follow_mouse = var_InheritBool (obj, "screen-follow-mouse");
+    else /* Following mouse is meaningless if width&height are dynamic. */
+        p_sys->follow_mouse = false;
+    if (!p_sys->follow_mouse) /* X and Y are meaningless if following mouse */
+    {
+        p_sys->x = var_InheritInteger (obj, "screen-left");
+        p_sys->y = var_InheritInteger (obj, "screen-top");
+    }
 
     /* Initializes format */
     p_sys->rate = var_InheritFloat (obj, "screen-fps");
@@ -319,46 +325,63 @@ static void Demux (void *data)
     if (geo == NULL)
     {
         msg_Err (demux, "bad X11 drawable 0x%08"PRIx32, sys->window);
+discard:
         if (sys->follow_mouse)
             xcb_discard_reply (conn, gc.sequence);
         return;
     }
 
-    /* FIXME: review for signed overflow */
-    int16_t x = sys->x, y = sys->y;
-    uint16_t w = sys->w, h = sys->h;
-
-    uint16_t ow = geo->width - sys->x;
-    uint16_t oh = geo->height - sys->y;
-    if (w == 0 || w > ow)
-        w = ow;
-    if (h == 0 || h > oh)
-        h = oh;
+    int w = sys->w;
+    int h = sys->h;
+    int x, y;
 
     if (sys->follow_mouse)
     {
         xcb_query_pointer_reply_t *ptr =
             xcb_query_pointer_reply (conn, qc, NULL);
-        if (ptr != NULL)
+        if (ptr == NULL)
         {
-            int16_t min_x = x + (w / 2);
-            int16_t min_y = y + (h / 2);
-            int16_t max_x = x + ow - ((w + 1) / 2);
-            int16_t max_y = y + oh - ((h + 1) / 2);
-
-            assert (max_x >= min_x); /* max_x - min_x = ow - w >= 0 */
-            if (ptr->root_x > max_x)
-                x += ow - w;
-            else if (ptr->root_x > min_x)
-                x += ptr->root_x - min_x;
-
-            assert (max_y >= min_y);
-            if (ptr->root_y > max_y)
-                y += oh - h;
-            else if (ptr->root_y > min_y)
-                y += ptr->root_y - min_y;
-            free (ptr);
+            free (geo);
+            return;
         }
+
+        if (w == 0 || w > geo->width)
+            w = geo->width;
+        x = ptr->win_x;
+        if (x < w / 2)
+            x = 0;
+        else if (x >= (int)geo->width - (w / 2))
+            x = geo->width - w;
+        else
+            x -= w / 2;
+
+        if (h == 0 || h > geo->height)
+            h = geo->height;
+        y = ptr->win_y;
+        if (y < h / 2)
+            y = 0;
+        else if (y >= (int)geo->height - (h / 2))
+            y = geo->height - h;
+        else
+            y -= h / 2;
+    }
+    else
+    {
+        int max;
+
+        x = sys->x;
+        max = (int)geo->width - x;
+        if (max <= 0)
+            goto discard;
+        if (w == 0 || w > max)
+            w = max;
+
+        y = sys->y;
+        max = (int)geo->height - y;
+        if (max <= 0)
+            goto discard;
+        if (h == 0 || h > max)
+            h = max;
     }
 
     /* Update elementary stream format (if needed) */
