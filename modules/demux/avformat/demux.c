@@ -223,6 +223,9 @@ int OpenDemux( vlc_object_t *p_this )
        */
        p_sys->url.is_streamed = 1;
        p_sys->io.is_streamed = 1;
+#if defined(AVIO_SEEKABLE_NORMAL)
+       p_sys->io.seekable = 0;
+#endif
     }
 
 
