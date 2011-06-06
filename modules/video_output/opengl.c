@@ -53,6 +53,13 @@
 #  define MACOS_OPENGL
 #  include <OpenGL/glext.h>
 # endif
+# define PFNGLGENPROGRAMSARBPROC              typeof(glGenProgramsARB)*
+# define PFNGLBINDPROGRAMARBPROC              typeof(glBindProgramARB)*
+# define PFNGLPROGRAMSTRINGARBPROC            typeof(glProgramStringARB)*
+# define PFNGLDELETEPROGRAMSARBPROC           typeof(glDeleteProgramsARB)*
+# define PFNGLPROGRAMLOCALPARAMETER4FVARBPROC typeof(glProgramLocalParameter4fvARB)*
+# define PFNGLACTIVETEXTUREARBPROC            typeof(glActiveTextureARB)*
+# define PFNGLMULTITEXCOORD2FARBPROC          typeof(glMultiTexCoord2fARB)*
 #endif
 
 /* RV16 */
