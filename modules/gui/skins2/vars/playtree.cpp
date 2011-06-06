@@ -290,7 +290,7 @@ void Playtree::insertItems( VarTree& elem, const list<string>& files, bool start
         p_node = m_pPlaylist->p_ml_category;
         i_pos = 0;
     }
-    else if( p_elem->size() )
+    else if( p_elem->size() && p_elem->isExpanded() )
     {
         p_node = playlist_ItemGetById( m_pPlaylist, p_elem->getId() );
         i_pos = 0;

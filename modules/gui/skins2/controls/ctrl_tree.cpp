@@ -504,8 +504,6 @@ void CtrlTree::handleEvent( EvtGeneric &rEvent )
         Iterator it = findItemAtPos( yPos );
         if( it != m_itOver )
         {
-            if( it != m_rTree.end() )
-                it->setExpanded( true );
             m_itOver = it;
             needRefresh = true;
         }
