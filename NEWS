@@ -141,6 +141,40 @@ Removed modules:
  * removal of http interface in favor of luahttp
 
 
+Changes between 1.1.9 and 1.1.10:
+---------------------------------
+
+Windows and Mac OS X:
+ * Update of external library modplug, to address multiple security issues
+
+Mac OS X Interface:
+ * Improved Media Key handling based upon SPMediaKeyTap by Spotify AB
+ * Fix for various crashes and small issues
+
+Demuxer:
+ * Fix heap corruption / integer overflow in XSPF playlist parser
+
+Audio output:
+ * PulseAudio output re-written due to unstability of the current one
+
+Win32 port:
+ * Remove the fontconfig dependency from the freetype module
+
+Miscellaneous fixes in:
+ * Windows 7 taskbar buttons
+ * Qt interface
+ * asx, live555, dvdnav demuxer
+ * RTP output and XML export
+ * Subtitles colours when using GPU decoding on Windows
+ * v4l2 access
+
+Translations:
+ * Update of Norwegian Bokmål, Slovak, Afrikaans, Luganda,
+   Brazillian Portuguese, Irish, Thai, Estonian, Chinese, Polish,
+   Dutch, German, Galician, Bulgarian, Lithuanian and Japanese translations
+ * Initial Basque, Zulu, Peul, Amharic, Acoli, Chiga translations
+
+
 Changes between 1.1.8 and 1.1.9:
 --------------------------------
 
