@@ -283,10 +283,7 @@ void aout_DecChangePause( aout_instance_t *p_aout, aout_input_t *p_input, bool b
 void aout_DecFlush( aout_instance_t *p_aout, aout_input_t *p_input )
 {
     aout_lock_input_fifos( p_aout );
-
     aout_FifoSet( &p_input->mixer.fifo, 0 );
-    p_input->mixer.begin = NULL;
-
     aout_unlock_input_fifos( p_aout );
 }
 

@@ -44,12 +44,6 @@ typedef struct {
     /* */
     aout_fifo_t fifo;
 
-    /* Pointer on the first byte of data to mix.
-     *
-     * It points in the first buffer of fifo
-     */
-    uint8_t     *begin;
-
     /* Software multiplier */
     float       multiplier;
 } aout_mixer_input_t;

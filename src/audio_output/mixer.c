@@ -136,7 +136,6 @@ static int MixBuffer( aout_instance_t * p_aout, float volume )
             msg_Warn( p_mixer, "input PTS is out of range (%"PRId64"), "
                       "trashing", now - p_buffer->i_pts );
             aout_BufferFree( aout_FifoPop( p_fifo ) );
-            p_input->begin = NULL;
         }
 
         date_Set( &exact_start_date, p_buffer->i_pts );
@@ -164,7 +163,6 @@ static int MixBuffer( aout_instance_t * p_aout, float volume )
         msg_Warn( p_mixer, "the mixer got a packet in the past (%"PRId64")",
                   start_date - prev_date );
         aout_BufferFree( aout_FifoPop( p_fifo ) );
-        p_input->begin = NULL;
         p_buffer = p_fifo->p_first;
     }
 
@@ -198,15 +196,11 @@ static int MixBuffer( aout_instance_t * p_aout, float volume )
         const unsigned framesize = p_mixer->fmt.i_bytes_per_frame;
         mtime_t i_buffer = (start_date - p_buffer->i_pts)
                          * framesize * p_mixer->fmt.i_rate / CLOCK_FREQ;
-        if( p_input->begin == NULL )
-            p_input->begin = p_buffer->p_buffer;
 
-        ptrdiff_t bytes = p_input->begin - p_buffer->p_buffer;
-        if( !((i_buffer + p_mixer->fmt.i_bytes_per_frame > bytes)
-         && (i_buffer < p_mixer->fmt.i_bytes_per_frame + bytes)) )
+        if( !((i_buffer + framesize > 0) && (i_buffer < framesize)) )
         {
             msg_Warn( p_mixer, "mixer start is not output start (%"PRId64")",
-                      i_buffer - bytes );
+                      i_buffer );
 
             /* Round to the nearest multiple */
             i_buffer /= p_mixer->fmt.i_bytes_per_frame;
@@ -220,7 +214,12 @@ static int MixBuffer( aout_instance_t * p_aout, float volume )
                 aout_unlock_output_fifo( p_aout );
                 goto giveup;
             }
-            p_input->begin = p_buffer->p_buffer + i_buffer;
+            p_buffer->p_buffer += i_buffer;
+            p_buffer->i_buffer -= i_buffer;
+            i_buffer /= framesize;
+            p_buffer->i_nb_samples -= i_buffer;
+            p_buffer->i_pts += i_buffer * CLOCK_FREQ / p_mixer->fmt.i_rate;
+            p_buffer->i_length -= i_buffer * CLOCK_FREQ / p_mixer->fmt.i_rate;
         }
 
         /* Build packet with adequate number of samples */
@@ -232,13 +231,10 @@ static int MixBuffer( aout_instance_t * p_aout, float volume )
             goto giveup;
         p_buffer->i_nb_samples = samples;
 
-        uint8_t *p_in = p_input->begin;
-        uint8_t *p_out = p_buffer->p_buffer;
-
-        for( ;; )
+        for( uint8_t *p_out = p_buffer->p_buffer;; )
         {
-            size_t avail = p_fifo->p_first->i_nb_samples * framesize
-                         - (p_in - p_fifo->p_first->p_buffer);
+            uint8_t *p_in = p_fifo->p_first->p_buffer;
+            size_t avail = p_fifo->p_first->i_nb_samples * framesize;
 
             if( avail < needed )
             {
@@ -259,7 +255,12 @@ static int MixBuffer( aout_instance_t * p_aout, float volume )
             else
             {
                 vlc_memcpy( p_out, p_in, needed );
-                p_input->begin = p_in + needed;
+                p_fifo->p_first->p_buffer += needed;
+                p_fifo->p_first->i_buffer -= needed;
+                needed /= framesize;
+                p_fifo->p_first->i_nb_samples -= needed;
+                p_fifo->p_first->i_pts += needed * CLOCK_FREQ / p_mixer->fmt.i_rate;
+                p_fifo->p_first->i_length -= needed * CLOCK_FREQ / p_mixer->fmt.i_rate;
                 break;
             }
         }

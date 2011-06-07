@@ -83,7 +83,6 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input, const aout_
 
     /* Prepare FIFO. */
     aout_FifoInit( p_aout, &p_input->mixer.fifo, p_aout->mixer_format.i_rate );
-    p_input->mixer.begin = NULL;
 
     /* */
     if( p_request_vout )
@@ -471,7 +470,6 @@ void aout_InputCheckAndRestart( aout_instance_t * p_aout, aout_input_t * p_input
 
     /* A little trick to avoid loosing our input fifo and properties */
 
-    uint8_t *p_first_byte_to_mix = p_input->mixer.begin;
     aout_fifo_t fifo = p_input->mixer.fifo;
     bool b_paused = p_input->b_paused;
     mtime_t i_pause_date = p_input->i_pause_date;
@@ -481,7 +479,6 @@ void aout_InputCheckAndRestart( aout_instance_t * p_aout, aout_input_t * p_input
     aout_InputDelete( p_aout, p_input );
 
     aout_InputNew( p_aout, p_input, &p_input->request_vout );
-    p_input->mixer.begin = p_first_byte_to_mix;
     p_input->mixer.fifo = fifo;
     p_input->b_paused = b_paused;
     p_input->i_pause_date = i_pause_date;
@@ -561,7 +558,6 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
                   "clearing out", mdate() - start_date );
         aout_lock_input_fifos( p_aout );
         aout_FifoSet( &p_input->mixer.fifo, 0 );
-        p_input->mixer.begin = NULL;
         aout_unlock_input_fifos( p_aout );
         if ( p_input->i_resampling_type != AOUT_RESAMPLING_NONE )
             msg_Warn( p_aout, "timing screwed, stopping resampling" );
@@ -592,7 +588,6 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
                   start_date - p_buffer->i_pts );
         aout_lock_input_fifos( p_aout );
         aout_FifoSet( &p_input->mixer.fifo, 0 );
-        p_input->mixer.begin = NULL;
         aout_unlock_input_fifos( p_aout );
         if ( p_input->i_resampling_type != AOUT_RESAMPLING_NONE )
             msg_Warn( p_aout, "timing screwed, stopping resampling" );
