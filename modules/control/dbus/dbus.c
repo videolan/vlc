@@ -163,17 +163,14 @@ static int Open( vlc_object_t *p_this )
     if( !dbus_threads_init_default() )
         return VLC_EGENERIC;
 
-    intf_sys_t *p_sys  = malloc( sizeof( intf_sys_t ) );
+    intf_sys_t *p_sys  = calloc( 1, sizeof( intf_sys_t ) );
     if( unlikely(!p_sys) )
         return VLC_ENOMEM;
 
     playlist_t      *p_playlist;
     DBusConnection  *p_conn;
-    p_sys->b_meta_read     = false;
-    p_sys->b_dead          = false;
-    p_sys->p_input         = NULL;
     p_sys->i_player_caps   = PLAYER_CAPS_NONE;
-    p_sys->i_playing_state = -1;
+    p_sys->i_playing_state = PLAYBACK_STATE_INVALID;
 
     if( vlc_pipe( p_sys->p_pipe_fds ) )
     {
