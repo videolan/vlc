@@ -632,7 +632,7 @@ static void ProcessEvents( intf_thread_t *p_intf,
         PlayerPropertiesChangedEmit( p_intf, &player_properties );
 
     if( vlc_dictionary_keys_count( &tracklist_properties ) )
-        TrackListPropertiesChangedEmit( p_intf, &player_properties );
+        TrackListPropertiesChangedEmit( p_intf, &tracklist_properties );
 
     vlc_dictionary_clear( &player_properties,    NULL, NULL );
     vlc_dictionary_clear( &tracklist_properties, NULL, NULL );
