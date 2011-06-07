@@ -364,7 +364,7 @@ PropertiesChangedSignal( intf_thread_t    *p_intf,
                          vlc_dictionary_t *p_changed_properties )
 {
     DBusConnection  *p_conn = p_intf->p_sys->p_conn;
-    DBusMessageIter changed_properties, invalidated_properties, entry, variant;
+    DBusMessageIter changed_properties, invalidated_properties;
     const char *psz_interface_name = DBUS_MPRIS_TRACKLIST_INTERFACE;
     char **ppsz_properties = NULL;
     int i_properties = 0;

@@ -1259,6 +1259,8 @@ int GetInputMeta( input_item_t* p_input,
     ADD_VLC_META_STRING( 24, Setting );
     ADD_VLC_META_STRING( 25, URL );
 
+    free( psz_trackid );
+
     vlc_mutex_lock( &p_input->lock );
     if( p_input->p_meta )
     {
