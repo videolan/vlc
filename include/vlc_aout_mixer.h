@@ -72,8 +72,8 @@ struct aout_mixer_t {
     /* Array of mixer inputs */
     aout_mixer_input_t    *input;
 
-    /* Mix requested number of samples (mandatory) */
-    aout_buffer_t *(*mix)(aout_mixer_t *, unsigned, float);
+    /* Mix buffer (mandatory) */
+    void (*mix)(aout_mixer_t *, aout_buffer_t *, float);
 
     /* Private place holder for the aout_mixer_t module (optional)
      *

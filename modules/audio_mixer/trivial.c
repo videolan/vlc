@@ -29,7 +29,6 @@
 # include "config.h"
 #endif
 
-#include <stddef.h>
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_aout.h>
@@ -38,9 +37,8 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  Create    ( vlc_object_t * );
-
-static aout_buffer_t *DoWork( aout_mixer_t *, unsigned samples, float );
+static int Create( vlc_object_t * );
+static void DoNothing( aout_mixer_t *, aout_buffer_t *p_buffer, float );
 
 /*****************************************************************************
  * Module descriptor
@@ -48,7 +46,7 @@ static aout_buffer_t *DoWork( aout_mixer_t *, unsigned samples, float );
 vlc_module_begin ()
     set_category( CAT_AUDIO )
     set_subcategory( SUBCAT_AUDIO_MISC )
-    set_description( N_("Trivial audio mixer") )
+    set_description( N_("Dummy audio mixer") )
     set_capability( "audio mixer", 1 )
     set_callbacks( Create, NULL )
 vlc_module_end ()
@@ -60,60 +58,14 @@ static int Create( vlc_object_t *p_this )
 {
     aout_mixer_t *p_mixer = (aout_mixer_t *)p_this;
 
-    if( AOUT_FMT_NON_LINEAR( &p_mixer->fmt ) )
-        return -1;
-
-    p_mixer->mix = DoWork;
+    p_mixer->mix = DoNothing;
     return 0;
 }
 
-/*****************************************************************************
- * DoWork: mix a new output buffer
- *****************************************************************************/
-static aout_buffer_t *DoWork( aout_mixer_t *p_mixer, unsigned samples,
-                              float multiplier )
+static void DoNothing( aout_mixer_t *p_mixer, aout_buffer_t *p_buffer,
+                       float multiplier )
 {
-    aout_mixer_input_t *p_input = p_mixer->input;
-    unsigned framesize = aout_FormatNbChannels( &p_mixer->fmt )
-                   * (p_mixer->fmt.i_bitspersample / 8);
-    size_t needed = samples * framesize;
-    aout_buffer_t *p_buffer = block_Alloc( needed );
-
-    if( unlikely(p_buffer == NULL) )
-        return NULL;
-    p_buffer->i_nb_samples = samples;
-
-    uint8_t * p_in = p_input->begin;
-    uint8_t * p_out = p_buffer->p_buffer;
-
-    for ( ; ; )
-    {
-        size_t avail = p_input->fifo.p_first->i_nb_samples * framesize
-                     - (p_in - p_input->fifo.p_first->p_buffer);
-
-        if ( avail < needed )
-        {
-            vlc_memcpy( p_out, p_in, avail );
-            needed -= avail;
-            p_out += avail;
-
-            /* Next buffer */
-            aout_buffer_t *p_old_buffer = aout_FifoPop( &p_input->fifo );
-            aout_BufferFree( p_old_buffer );
-            if ( p_input->fifo.p_first == NULL )
-            {
-                msg_Err( p_mixer, "internal amix error" );
-                break;
-            }
-            p_in = p_input->fifo.p_first->p_buffer;
-        }
-        else
-        {
-            vlc_memcpy( p_out, p_in, needed );
-            p_input->begin = p_in + needed;
-            break;
-        }
-    }
+    (void) p_mixer;
+    (void) p_buffer;
     (void) multiplier;
-    return p_buffer;
 }

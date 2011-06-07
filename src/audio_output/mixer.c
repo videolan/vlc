@@ -190,15 +190,14 @@ static int MixBuffer( aout_instance_t * p_aout, float volume )
         prev_date = p_buffer->i_pts + p_buffer->i_length;
     }
 
-    p_buffer = p_fifo->p_first;
     if( !AOUT_FMT_NON_LINEAR( &p_mixer->fmt ) )
     {
+        p_buffer = p_fifo->p_first;
+
         /* Additionally check that p_first_byte_to_mix is well located. */
+        const unsigned framesize = p_mixer->fmt.i_bytes_per_frame;
         mtime_t i_buffer = (start_date - p_buffer->i_pts)
-                         * p_mixer->fmt.i_bytes_per_frame
-                         * p_mixer->fmt.i_rate
-                         / p_mixer->fmt.i_frame_length
-                         / CLOCK_FREQ;
+                         * framesize * p_mixer->fmt.i_rate / CLOCK_FREQ;
         if( p_input->begin == NULL )
             p_input->begin = p_buffer->p_buffer;
 
@@ -223,17 +222,57 @@ static int MixBuffer( aout_instance_t * p_aout, float volume )
             }
             p_input->begin = p_buffer->p_buffer + i_buffer;
         }
+
+        /* Build packet with adequate number of samples */
+        const unsigned samples = p_aout->output.i_nb_samples;
+        unsigned needed = samples * framesize;
+        p_buffer = block_Alloc( needed );
+        if( unlikely(p_buffer == NULL) )
+            /* XXX: should free input buffers */
+            goto giveup;
+        p_buffer->i_nb_samples = samples;
+
+        uint8_t *p_in = p_input->begin;
+        uint8_t *p_out = p_buffer->p_buffer;
+
+        for( ;; )
+        {
+            size_t avail = p_fifo->p_first->i_nb_samples * framesize
+                         - (p_in - p_fifo->p_first->p_buffer);
+
+            if( avail < needed )
+            {
+                vlc_memcpy( p_out, p_in, avail );
+                needed -= avail;
+                p_out += avail;
+
+                /* Next buffer */
+                aout_BufferFree( aout_FifoPop( p_fifo ) );
+                if( p_input->fifo.p_first == NULL )
+                {
+                    msg_Err( p_mixer, "internal amix error" );
+                    vlc_memset( p_out, 0, needed );
+                    break;
+                }
+                p_in = p_fifo->p_first->p_buffer;
+            }
+            else
+            {
+                vlc_memcpy( p_out, p_in, needed );
+                p_input->begin = p_in + needed;
+                break;
+            }
+        }
     }
-
-    /* Run the mixer. */
-    p_buffer = p_mixer->mix( p_mixer, p_aout->output.i_nb_samples, volume );
-    aout_unlock_input_fifos( p_aout );
-
-    if( unlikely(p_buffer == NULL) )
-        return -1;
+    else
+        p_buffer = aout_FifoPop( p_fifo );
 
     p_buffer->i_pts = start_date;
     p_buffer->i_length = end_date - start_date;
+
+    /* Run the mixer. */
+    p_mixer->mix( p_mixer, p_buffer, volume );
+    aout_unlock_input_fifos( p_aout );
     aout_OutputPlay( p_aout, p_buffer );
     return 0;
 
