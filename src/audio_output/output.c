@@ -158,8 +158,7 @@ int aout_OutputNew( aout_instance_t * p_aout,
     aout_lock_output_fifo( p_aout );
 
     /* Prepare FIFO. */
-    aout_FifoInit( p_aout, &p_aout->output.fifo,
-                   p_aout->output.output.i_rate );
+    aout_FifoInit( p_aout, &p_aout->output.fifo, p_aout->output.output.i_rate );
 
     aout_unlock_output_fifo( p_aout );
 
@@ -212,7 +211,7 @@ void aout_OutputDelete( aout_instance_t * p_aout )
                                  p_aout->output.i_nb_filters );
 
     aout_lock_output_fifo( p_aout );
-    aout_FifoDestroy( p_aout, &p_aout->output.fifo );
+    aout_FifoDestroy( &p_aout->output.fifo );
     aout_unlock_output_fifo( p_aout );
 }
 
@@ -235,7 +234,7 @@ void aout_OutputPlay( aout_instance_t * p_aout, aout_buffer_t * p_buffer )
     }
 
     aout_lock_output_fifo( p_aout );
-    aout_FifoPush( p_aout, &p_aout->output.fifo, p_buffer );
+    aout_FifoPush( &p_aout->output.fifo, p_buffer );
     p_aout->output.pf_play( p_aout );
     aout_unlock_output_fifo( p_aout );
 }
@@ -282,7 +281,7 @@ aout_buffer_t * aout_OutputNextBuffer( aout_instance_t * p_aout,
        * to deal with this kind of starvation. */
 
         /* Set date to 0, to allow the mixer to send a new buffer ASAP */
-        aout_FifoSet( p_aout, &p_aout->output.fifo, 0 );
+        aout_FifoSet( &p_aout->output.fifo, 0 );
         if ( !p_aout->output.b_starving )
             msg_Dbg( p_aout,
                  "audio output is starving (no input), playing silence" );
@@ -333,12 +332,12 @@ aout_buffer_t * aout_OutputNextBuffer( aout_instance_t * p_aout,
             msg_Warn( p_aout, "output date isn't PTS date, requesting "
                       "resampling (%"PRId64")", difference );
 
-            aout_FifoMoveDates( p_aout, &p_aout->output.fifo, difference );
+            aout_FifoMoveDates( &p_aout->output.fifo, difference );
             aout_unlock_output_fifo( p_aout );
 
             aout_lock_input_fifos( p_aout );
             aout_fifo_t *p_fifo = &p_aout->p_input->mixer.fifo;
-            aout_FifoMoveDates( p_aout, p_fifo, difference );
+            aout_FifoMoveDates( p_fifo, difference );
             aout_unlock_input_fifos( p_aout );
             return p_buffer;
         }

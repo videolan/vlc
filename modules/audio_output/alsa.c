@@ -531,8 +531,7 @@ static void Play( aout_instance_t *p_aout )
     p_aout->output.pf_play = PlayIgnore;
 
     /* get the playing date of the first aout buffer */
-    p_aout->output.p_sys->start_date =
-        aout_FifoFirstDate( p_aout, &p_aout->output.fifo );
+    p_aout->output.p_sys->start_date = aout_FifoFirstDate( &p_aout->output.fifo );
 
     /* wake up the audio output thread */
     sem_post( &p_aout->output.p_sys->wait );

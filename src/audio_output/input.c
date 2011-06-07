@@ -449,7 +449,7 @@ int aout_InputDelete( aout_instance_t * p_aout, aout_input_t * p_input )
     aout_FiltersDestroyPipeline( p_input->pp_resamplers,
                                  p_input->i_nb_resamplers );
     p_input->i_nb_resamplers = 0;
-    aout_FifoDestroy( p_aout, &p_input->mixer.fifo );
+    aout_FifoDestroy( &p_input->mixer.fifo );
 
     return 0;
 }
@@ -549,7 +549,7 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
      * this. We'll deal with that when pushing the buffer, and compensate
      * with the next incoming buffer. */
     aout_lock_input_fifos( p_aout );
-    start_date = aout_FifoNextStart( p_aout, &p_input->mixer.fifo );
+    start_date = aout_FifoNextStart( &p_input->mixer.fifo );
     aout_unlock_input_fifos( p_aout );
 
     if ( start_date != 0 && start_date < mdate() )
@@ -560,7 +560,7 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
         msg_Warn( p_aout, "computed PTS is out of range (%"PRId64"), "
                   "clearing out", mdate() - start_date );
         aout_lock_input_fifos( p_aout );
-        aout_FifoSet( p_aout, &p_input->mixer.fifo, 0 );
+        aout_FifoSet( &p_input->mixer.fifo, 0 );
         p_input->mixer.begin = NULL;
         aout_unlock_input_fifos( p_aout );
         if ( p_input->i_resampling_type != AOUT_RESAMPLING_NONE )
@@ -591,7 +591,7 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
         msg_Warn( p_aout, "audio drift is too big (%"PRId64"), clearing out",
                   start_date - p_buffer->i_pts );
         aout_lock_input_fifos( p_aout );
-        aout_FifoSet( p_aout, &p_input->mixer.fifo, 0 );
+        aout_FifoSet( &p_input->mixer.fifo, 0 );
         p_input->mixer.begin = NULL;
         aout_unlock_input_fifos( p_aout );
         if ( p_input->i_resampling_type != AOUT_RESAMPLING_NONE )
@@ -721,7 +721,7 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
     p_buffer->i_pts = start_date;
 
     aout_lock_input_fifos( p_aout );
-    aout_FifoPush( p_aout, &p_input->mixer.fifo, p_buffer );
+    aout_FifoPush( &p_input->mixer.fifo, p_buffer );
     aout_unlock_input_fifos( p_aout );
     return 0;
 }
@@ -748,7 +748,7 @@ static void inputFailure( aout_instance_t * p_aout, aout_input_t * p_input,
     aout_FiltersDestroyPipeline( p_input->pp_filters, p_input->i_nb_filters );
     aout_FiltersDestroyPipeline( p_input->pp_resamplers,
                                  p_input->i_nb_resamplers );
-    aout_FifoDestroy( p_aout, &p_input->mixer.fifo );
+    aout_FifoDestroy( &p_input->mixer.fifo );
     var_Destroy( p_aout, "visual" );
     var_Destroy( p_aout, "equalizer" );
     var_Destroy( p_aout, "audio-filter" );

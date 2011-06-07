@@ -76,7 +76,7 @@ int OpenAudio ( vlc_object_t * p_this )
  *****************************************************************************/
 static void Play( aout_instance_t * p_aout )
 {
-    aout_buffer_t * p_buffer = aout_FifoPop( p_aout, &p_aout->output.fifo );
+    aout_buffer_t * p_buffer = aout_FifoPop( &p_aout->output.fifo );
     aout_BufferFree( p_buffer );
 }
 

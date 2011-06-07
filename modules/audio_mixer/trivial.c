@@ -98,7 +98,7 @@ static aout_buffer_t *DoWork( aout_mixer_t *p_mixer, unsigned samples,
             p_out += avail;
 
             /* Next buffer */
-            aout_buffer_t *p_old_buffer = aout_FifoPop( NULL, &p_input->fifo );
+            aout_buffer_t *p_old_buffer = aout_FifoPop( &p_input->fifo );
             aout_BufferFree( p_old_buffer );
             if ( p_input->fifo.p_first == NULL )
             {

@@ -125,12 +125,13 @@ void aout_OutputDelete( aout_instance_t * p_aout );
 /* Release with vlc_object_release() */
 aout_instance_t * __aout_New ( vlc_object_t * );
 
-void aout_FifoInit( aout_instance_t *, aout_fifo_t *, uint32_t );
-mtime_t aout_FifoNextStart( aout_instance_t *, aout_fifo_t * );
-void aout_FifoPush( aout_instance_t *, aout_fifo_t *, aout_buffer_t * );
-void aout_FifoSet( aout_instance_t *, aout_fifo_t *, mtime_t );
-void aout_FifoMoveDates( aout_instance_t *, aout_fifo_t *, mtime_t );
-void aout_FifoDestroy( aout_instance_t * p_aout, aout_fifo_t * p_fifo );
+void aout_FifoInit( vlc_object_t *, aout_fifo_t *, uint32_t );
+#define aout_FifoInit(o, f, r) aout_FifoInit(VLC_OBJECT(o), f, r)
+mtime_t aout_FifoNextStart( const aout_fifo_t * ) VLC_USED;
+void aout_FifoPush( aout_fifo_t *, aout_buffer_t * );
+void aout_FifoSet( aout_fifo_t *, mtime_t );
+void aout_FifoMoveDates( aout_fifo_t *, mtime_t );
+void aout_FifoDestroy( aout_fifo_t * p_fifo );
 void aout_FormatsPrint( aout_instance_t * p_aout, const char * psz_text, const audio_sample_format_t * p_format1, const audio_sample_format_t * p_format2 );
 bool aout_ChangeFilterString( vlc_object_t *, aout_instance_t *, const char *psz_variable, const char *psz_name, bool b_add );
 

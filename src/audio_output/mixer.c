@@ -112,7 +112,7 @@ static int MixBuffer( aout_instance_t * p_aout, float volume )
          * happen :). */
         msg_Warn( p_mixer, "output PTS is out of range (%"PRId64"), clearing out",
                   mdate() - start_date );
-        aout_FifoSet( p_aout, &p_aout->output.fifo, 0 );
+        aout_FifoSet( &p_aout->output.fifo, 0 );
         date_Set( &exact_start_date, 0 );
         start_date = 0;
     }
@@ -135,7 +135,7 @@ static int MixBuffer( aout_instance_t * p_aout, float volume )
 
             msg_Warn( p_mixer, "input PTS is out of range (%"PRId64"), "
                       "trashing", now - p_buffer->i_pts );
-            aout_BufferFree( aout_FifoPop( p_aout, p_fifo ) );
+            aout_BufferFree( aout_FifoPop( p_fifo ) );
             p_input->begin = NULL;
         }
 
@@ -163,7 +163,7 @@ static int MixBuffer( aout_instance_t * p_aout, float volume )
          * regularly. */
         msg_Warn( p_mixer, "the mixer got a packet in the past (%"PRId64")",
                   start_date - prev_date );
-        aout_BufferFree( aout_FifoPop( p_aout, p_fifo ) );
+        aout_BufferFree( aout_FifoPop( p_fifo ) );
         p_input->begin = NULL;
         p_buffer = p_fifo->p_first;
     }
@@ -184,7 +184,7 @@ static int MixBuffer( aout_instance_t * p_aout, float volume )
 
             aout_buffer_t *p_deleted;
             while( (p_deleted = p_fifo->p_first) != p_buffer )
-                aout_BufferFree( aout_FifoPop( p_aout, p_fifo ) );
+                aout_BufferFree( aout_FifoPop( p_fifo ) );
         }
 
         prev_date = p_buffer->i_pts + p_buffer->i_length;
@@ -216,7 +216,7 @@ static int MixBuffer( aout_instance_t * p_aout, float volume )
             {
                 /* Is it really the best way to do it ? */
                 aout_lock_output_fifo( p_aout );
-                aout_FifoSet( p_aout, &p_aout->output.fifo, 0 );
+                aout_FifoSet( &p_aout->output.fifo, 0 );
                 date_Set( &exact_start_date, 0 );
                 aout_unlock_output_fifo( p_aout );
                 goto giveup;

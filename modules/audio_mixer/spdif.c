@@ -75,7 +75,7 @@ static aout_buffer_t *DoWork( aout_mixer_t * p_mixer, unsigned samples,
                               float multiplier )
 {
     aout_mixer_input_t * p_input = p_mixer->input;
-    aout_buffer_t * p_old_buffer = aout_FifoPop( NULL, &p_input->fifo );
+    aout_buffer_t * p_old_buffer = aout_FifoPop( &p_input->fifo );
 
     (void) samples; (void) multiplier;
     return p_old_buffer;

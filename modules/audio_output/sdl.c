@@ -251,7 +251,7 @@ static void SDLCallback( void * _p_aout, uint8_t * p_stream, int i_len )
      * it at SDL's face. Nah. */
 
     vlc_mutex_lock( &p_aout->output_fifo_lock );
-    p_buffer = aout_FifoPop( p_aout, &p_aout->output.fifo );
+    p_buffer = aout_FifoPop( &p_aout->output.fifo );
     vlc_mutex_unlock( &p_aout->output_fifo_lock );
 
     if ( p_buffer != NULL )

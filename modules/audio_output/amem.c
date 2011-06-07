@@ -64,7 +64,7 @@ static void Play (aout_instance_t *aout)
     aout_sys_t *sys = aout->output.p_sys;
     block_t *block;
 
-    while ((block = aout_FifoPop(aout, &aout->output.fifo)) != NULL)
+    while ((block = aout_FifoPop(&aout->output.fifo)) != NULL)
     {
         sys->play (sys->opaque, block->p_buffer, block->i_nb_samples,
                    block->i_pts);

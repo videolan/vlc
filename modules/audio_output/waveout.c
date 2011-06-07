@@ -480,7 +480,7 @@ static void Play( aout_instance_t *_p_aout )
 
         /* get the playing date of the first aout buffer */
         _p_aout->output.p_sys->start_date =
-            aout_FifoFirstDate( _p_aout, &_p_aout->output.fifo );
+            aout_FifoFirstDate( &_p_aout->output.fifo );
 
         msg_Dbg( _p_aout, "Wakeup sleeping output thread.");
 
@@ -937,7 +937,7 @@ static void* WaveOutThread( void *data )
 #endif
                     // means we are too early to request a new buffer?
                     waveout_warn("waiting...")
-                    next_date = aout_FifoFirstDate( p_aout, &p_aout->output.fifo );
+                    next_date = aout_FifoFirstDate( &p_aout->output.fifo );
                     mwait( next_date - AOUT_PTS_TOLERANCE/4 );
                     next_date = mdate();
                     p_buffer = aout_OutputNextBuffer( p_aout, next_date,

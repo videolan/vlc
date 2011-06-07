@@ -579,12 +579,12 @@ static void Play( aout_instance_t *p_aout )
 
         /* get the playing date of the first aout buffer */
         p_aout->output.p_sys->p_notif->start_date =
-            aout_FifoFirstDate( p_aout, &p_aout->output.fifo );
+            aout_FifoFirstDate( &p_aout->output.fifo );
 
         /* fill in the first samples */
         for( int i = 0; i < FRAMES_NUM; i++ )
         {
-            p_buffer = aout_FifoPop( p_aout, &p_aout->output.fifo );
+            p_buffer = aout_FifoPop( &p_aout->output.fifo );
             if( !p_buffer ) break;
             FillBuffer( p_aout, i, p_buffer );
         }

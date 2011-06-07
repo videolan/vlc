@@ -273,7 +273,7 @@ static void Play(aout_instance_t *aout)
         if (pa_context_errno(sys->context) != PA_ERR_NODATA)
             error(aout, "cannot determine latency", sys->context);
     } else {
-        mtime_t gap = aout_FifoFirstDate(aout, &aout->output.fifo) - mdate()
+        mtime_t gap = aout_FifoFirstDate(&aout->output.fifo) - mdate()
                 - latency;
 
         if (gap > AOUT_PTS_TOLERANCE)
@@ -295,7 +295,7 @@ static void Play(aout_instance_t *aout)
      * If this function is changed to not always dequeue blocks, be sure to
      * limit the queue size to a reasonable limit to avoid huge leaks. */
     for (;;) {
-        block_t *block = aout_FifoPop(aout, &aout->output.fifo);
+        block_t *block = aout_FifoPop(&aout->output.fifo);
         if (block == NULL)
             break;
 

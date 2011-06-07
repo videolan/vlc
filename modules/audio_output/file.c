@@ -318,7 +318,7 @@ static void Play( aout_instance_t * p_aout )
 {
     aout_buffer_t * p_buffer;
 
-    p_buffer = aout_FifoPop( p_aout, &p_aout->output.fifo );
+    p_buffer = aout_FifoPop( &p_aout->output.fifo );
 
     if( fwrite( p_buffer->p_buffer, p_buffer->i_buffer, 1,
                 p_aout->output.p_sys->p_file ) != 1 )
