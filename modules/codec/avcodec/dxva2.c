@@ -74,6 +74,9 @@ static const GUID DXVA2_ModeMPEG2_VLD = {
 static const GUID DXVA2_ModeMPEG2and1_VLD = {
     0x86695f12, 0x340e,0x4f04, {0x9f,0xd3,0x92,0x53,0xdd,0x32,0x74,0x60}
 };
+static const GUID DXVA2_ModeMPEG1_VLD = {
+    0x6f3ec719, 0x3735,0x42cc, {0x80,0x63,0x65,0xcc,0x3c,0xb3,0x66,0x16}
+};
 
 static const GUID DXVA2_ModeH264_A = {
     0x1b81be64, 0xa0c7,0x11d3, {0xb9,0x84,0x00,0xc0,0x4f,0x2e,0x73,0xc5}
@@ -130,6 +133,10 @@ static const GUID DXVA2_ModeVC1_C = {
 static const GUID DXVA2_ModeVC1_D = {
     0x1b81beA3, 0xa0c7,0x11d3, {0xb9,0x84,0x00,0xc0,0x4f,0x2e,0x73,0xc5}
 };
+/* Conformity to the August 2010 update of the specification, ModeVC1_VLD2010 */
+static const GUID DXVA2_ModeVC1_D2010 = {
+    0x1b81beA4, 0xa0c7,0x11d3, {0xb9,0x84,0x00,0xc0,0x4f,0x2e,0x73,0xc5}
+};
 
 static const GUID DXVA_NoEncrypt = {
     0x1b81bed0, 0xa0c7,0x11d3, {0xb9,0x84,0x00,0xc0,0x4f,0x2e,0x73,0xc5}
@@ -156,6 +163,8 @@ static const dxva2_mode_t dxva2_modes[] = {
     { "MPEG-2 motion compensation",                &DXVA2_ModeMPEG2_MoComp,  0 },
     { "MPEG-2 inverse discrete cosine transform",  &DXVA2_ModeMPEG2_IDCT,    0 },
 
+    { "MPEG-1 variable-length decoder",            &DXVA2_ModeMPEG1_VLD,     0 },
+
     { "H.264 variable-length decoder, film grain technology",                      &DXVA2_ModeH264_F,         CODEC_ID_H264 },
     { "H.264 variable-length decoder, no film grain technology",                   &DXVA2_ModeH264_E,         CODEC_ID_H264 },
     { "H.264 variable-length decoder, no film grain technology (Intel ClearVideo)",&DXVADDI_Intel_ModeH264_E, CODEC_ID_H264 },
@@ -175,6 +184,8 @@ static const dxva2_mode_t dxva2_modes[] = {
 
     { "VC-1 variable-length decoder",              &DXVA2_ModeVC1_D, CODEC_ID_VC1 },
     { "VC-1 variable-length decoder",              &DXVA2_ModeVC1_D, CODEC_ID_WMV3 },
+    { "VC-1 variable-length decoder",              &DXVA2_ModeVC1_D2010, CODEC_ID_VC1 },
+    { "VC-1 variable-length decoder",              &DXVA2_ModeVC1_D2010, CODEC_ID_WMV3 },
     { "VC-1 inverse discrete cosine transform",    &DXVA2_ModeVC1_C, 0 },
     { "VC-1 motion compensation",                  &DXVA2_ModeVC1_B, 0 },
     { "VC-1 post processing",                      &DXVA2_ModeVC1_A, 0 },
