@@ -118,6 +118,7 @@ $Id$
  * fb: video output module for the Linux framebuffer
  * fbosd: framebuffer osd plugin
  * filesystem: Filesystem access module
+ * fixed32_mixer: Fixed-point audio mixer
  * flac: Flac decoder using libflac
  * flacsys: FLAC demuxer
  * float32_mixer: Precise float32 audio mixer
