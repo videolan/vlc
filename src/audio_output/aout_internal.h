@@ -115,7 +115,7 @@ void aout_MixerRun( aout_instance_t * p_aout, float );
 
 /* From output.c : */
 int aout_OutputNew( aout_instance_t * p_aout,
-                    audio_sample_format_t * p_format );
+                    const audio_sample_format_t * p_format );
 void aout_OutputPlay( aout_instance_t * p_aout, aout_buffer_t * p_buffer );
 void aout_OutputDelete( aout_instance_t * p_aout );
 

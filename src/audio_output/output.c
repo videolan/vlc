@@ -41,7 +41,7 @@
  * This function is entered with the mixer lock.
  *****************************************************************************/
 int aout_OutputNew( aout_instance_t * p_aout,
-                    audio_sample_format_t * p_format )
+                    const audio_sample_format_t * p_format )
 {
     p_aout->output.output = *p_format;
 
