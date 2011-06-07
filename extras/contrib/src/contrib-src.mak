@@ -1441,7 +1441,7 @@ ifdef HAVE_LINUX
 X264CONF += --enable-pic
 endif
 
-X264CONF += --disable-avs --disable-lavf --disable-ffms
+X264CONF += --disable-avs --disable-lavf --disable-ffms --enable-static
 
 x264-$(X264_VERSION).tar.gz:
 	$(WGET) $(X264_URL)
@@ -1460,12 +1460,8 @@ x264:
 endif
 
 ifdef HAVE_WIN32
-.x264: x264 .pthreads
-  ifdef HAVE_CYGWIN
-	(cd $<; $(HOSTCC) RANLIB="ranlib" AR="ar" STRIP="strip" ./configure $(X264CONF) --prefix="$(PREFIX)" --extra-cflags="-I$(PREFIX)/include" --extra-ldflags="-L$(PREFIX)/lib" && make && make install)
-  else
-	(cd $<; $(HOSTCC) ./configure $(X264CONF) --prefix="$(PREFIX)" && make && make install)
-  endif
+.x264: x264
+	(cd $<; $(HOSTCC) ./configure $(X264CONF) --prefix="$(PREFIX)" --enable-win32thread && make && make install)
 else
 ifdef HAVE_MACOSX_ON_INTEL
   .x264: x264 .yasm
