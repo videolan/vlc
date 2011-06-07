@@ -259,7 +259,7 @@ typedef struct
     char       *psz_fontname;
 } ft_style_t;
 
-static int Render( filter_t *, subpicture_region_t *, line_desc_t *, int, int);
+static int RenderYUVP( filter_t *, subpicture_region_t *, line_desc_t *, int, int);
 static void FreeLines( line_desc_t * );
 static void FreeLine( line_desc_t * );
 
@@ -525,12 +525,12 @@ static int LoadFontsFromAttachments( filter_t *p_filter )
 }
 
 /*****************************************************************************
- * Render: place string in picture
+ * RenderYUVP: place string in picture
  *****************************************************************************
  * This function merges the previously rendered freetype glyphs into a picture
  *****************************************************************************/
-static int Render( filter_t *p_filter, subpicture_region_t *p_region,
-                   line_desc_t *p_line, int i_width, int i_height )
+static int RenderYUVP( filter_t *p_filter, subpicture_region_t *p_region,
+                       line_desc_t *p_line, int i_width, int i_height )
 {
     VLC_UNUSED(p_filter);
     static const uint8_t pi_gamma[16] =
@@ -795,7 +795,7 @@ static void DrawBlack( line_desc_t *p_line, int i_width, subpicture_region_t *p_
 }
 
 /*****************************************************************************
- * Render: place string in picture
+ * RenderYUVA: place string in picture
  *****************************************************************************
  * This function merges the previously rendered freetype glyphs into a picture
  *****************************************************************************/
@@ -1251,7 +1251,7 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
     p_region_out->i_y = p_region_in->i_y;
 
     if( var_InheritBool( p_filter, "freetype-yuvp" ) )
-        Render( p_filter, p_region_out, p_lines, result.x, result.y );
+        RenderYUVP( p_filter, p_region_out, p_lines, result.x, result.y );
     else
         RenderYUVA( p_filter, p_region_out, p_lines, result.x, result.y );
 
@@ -2218,8 +2218,8 @@ static int RenderHtml( filter_t *p_filter, subpicture_region_t *p_region_out,
             if(( rv == VLC_SUCCESS ) && ( i_len > 0 ))
             {
                 if( var_InheritBool( p_filter, "freetype-yuvp" ) )
-                    Render( p_filter, p_region_out, p_lines,
-                            result.x, result.y );
+                    RenderYUVP( p_filter, p_region_out, p_lines,
+                                result.x, result.y );
                 else
                     RenderYUVA( p_filter, p_region_out, p_lines,
                                 result.x, result.y );
