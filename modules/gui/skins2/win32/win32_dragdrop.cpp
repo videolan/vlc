@@ -72,6 +72,7 @@ STDMETHODIMP_(ULONG) Win32DragDrop::Release()
 STDMETHODIMP Win32DragDrop::DragEnter( LPDATAOBJECT pDataObj,
     DWORD grfKeyState, POINTL pt, DWORD *pdwEffect )
 {
+    (void)grfKeyState; (void)pt;
     FORMATETC fmtetc;
 
     fmtetc.cfFormat = CF_HDROP;
@@ -102,6 +103,7 @@ STDMETHODIMP Win32DragDrop::DragEnter( LPDATAOBJECT pDataObj,
 STDMETHODIMP Win32DragDrop::DragOver( DWORD grfKeyState, POINTL pt,
                                       DWORD *pdwEffect )
 {
+    (void)grfKeyState; (void)pdwEffect;
     // transmit DragOver event
     EvtDragOver evt( getIntf(), pt.x, pt.y );
     m_pWin->processEvent( evt );
@@ -124,6 +126,7 @@ STDMETHODIMP Win32DragDrop::DragLeave()
 STDMETHODIMP Win32DragDrop::Drop( LPDATAOBJECT pDataObj, DWORD grfKeyState,
     POINTL pt, DWORD *pdwEffect )
 {
+    (void)grfKeyState;
     // User has dropped on us -- get the CF_HDROP data from drag source
     FORMATETC fmtetc;
     fmtetc.cfFormat = CF_HDROP;
