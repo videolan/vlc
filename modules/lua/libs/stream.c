@@ -108,8 +108,12 @@ static int vlclua_stream_read( lua_State *L )
     int n = luaL_checkint( L, 2 );
     uint8_t *p_read = malloc( n );
     if( !p_read ) return vlclua_error( L );
+
     i_read = stream_Read( *pp_stream, p_read, n );
-    lua_pushlstring( L, (const char *)p_read, i_read );
+    if( i_read > 0 )
+        lua_pushlstring( L, (const char *)p_read, i_read );
+    else
+        lua_pushnil( L );
     free( p_read );
     return 1;
 }
