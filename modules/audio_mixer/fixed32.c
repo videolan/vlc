@@ -69,7 +69,7 @@ static void FilterFI32 (aout_mixer_t *mixer, block_t *block, float volume)
 
     for (size_t n = block->i_buffer / sizeof (*p); n > 0; n--)
     {
-        *p = (*p * mult) >> 33; // FIXED32_FRACBITS;
+        *p = (*p * mult) >> FIXED32_FRACBITS;
         p++;
     }
 }
