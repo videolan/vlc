@@ -387,12 +387,18 @@ PropertiesChangedSignal( intf_thread_t    *p_intf,
     ppsz_properties = vlc_dictionary_all_keys( p_changed_properties );
 
     for( int i = 0; i < i_properties; i++ )
+    {
         if( !strcmp( ppsz_properties[i], "Tracks" ) )
             dbus_message_iter_append_basic( &invalidated_properties,
                                             DBUS_TYPE_STRING,
                                             &ppsz_properties[i] );
 
+        free( ppsz_properties[i] );
+    }
+
     dbus_message_iter_close_container( &args, &invalidated_properties );
+    free( ppsz_properties );
+
     SIGNAL_SEND;
 }
 

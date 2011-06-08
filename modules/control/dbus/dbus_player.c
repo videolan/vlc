@@ -971,12 +971,14 @@ PropertiesChangedSignal( intf_thread_t    *p_intf,
             dbus_message_iter_close_container( &entry, &variant );
         }
         dbus_message_iter_close_container( &changed_properties, &entry );
+        free( ppsz_properties[i] );
     }
 
     dbus_message_iter_close_container( &args, &changed_properties );
     dbus_message_iter_open_container( &args, DBUS_TYPE_ARRAY, "s",
                                       &invalidated_properties );
     dbus_message_iter_close_container( &args, &invalidated_properties );
+    free( ppsz_properties );
 
     SIGNAL_SEND;
 }
