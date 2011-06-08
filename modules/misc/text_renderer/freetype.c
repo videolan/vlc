@@ -73,7 +73,6 @@
 
 /* Win32 GDI */
 #ifdef WIN32
-# define _WIN32_IE 0x0500
 # include <windows.h>
 # include <shlobj.h>
 # define HAVE_STYLES

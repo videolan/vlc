@@ -27,9 +27,6 @@
 
 #include <vlc_common.h>
 
-#ifndef _WIN32_IE
-# define _WIN32_IE 0x0501
-#endif
 #include <w32api.h>
 #ifndef UNDER_CE
 # include <direct.h>
