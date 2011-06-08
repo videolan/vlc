@@ -40,10 +40,6 @@
     IBOutlet id o_btn_repeat;
     IBOutlet id o_btn_repeat_embed;
     IBOutlet id o_btn_shuffle_embed;
-    
-    NSImage * o_repeat_single;
-    NSImage * o_repeat_all;
-    NSImage * o_repeat_off;
 
     IBOutlet id o_specificTime_cancel_btn;
     IBOutlet id o_specificTime_enter_fld;
@@ -132,9 +128,9 @@
     int i_type;
 }
 
-- (id)initWithVariableName: (const char *)name 
+- (id)initWithVariableName: (const char *)name
                   ofObject: (vlc_object_t *)object
-                  andValue: (vlc_value_t)value 
+                  andValue: (vlc_value_t)value
                     ofType: (int)type;
 - (const char *)name;
 - (vlc_value_t)value;

@@ -1,7 +1,7 @@
 /*****************************************************************************
  * controls.m: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2002-2009 the VideoLAN team
+ * Copyright (C) 2002-2011 the VideoLAN team
  * $Id$
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -61,9 +61,6 @@
     [o_specificTime_ok_btn setTitle: _NS("OK")];
     [o_specificTime_sec_lbl setStringValue: _NS("sec.")];
     [o_specificTime_goTo_lbl setStringValue: _NS("Jump to time")];
-
-    o_repeat_off = [NSImage imageNamed:@"repeat_embedded"];
-
 }
 
 
@@ -72,9 +69,6 @@
     [[NSNotificationCenter defaultCenter] removeObserver: self];
 
     [o_fs_panel release];
-    [o_repeat_single release];
-    [o_repeat_all release];
-    [o_repeat_off release];
 
     [super dealloc];
 }
@@ -188,21 +182,18 @@
 /* three little ugly helpers */
 - (void)repeatOne
 {
-    [o_btn_repeat setImage: o_repeat_single];
-    [o_btn_repeat setAlternateImage: o_repeat_all];
-    [o_btn_repeat_embed setImage: [NSImage imageNamed:@"sidebarRepeatOneOn"]];
+    [o_btn_repeat setImage: [NSImage imageNamed:@"repeat_single_embedded_graphite"]];
+    [o_btn_repeat setAlternateImage: [NSImage imageNamed:@"repeat_embedded_graphite"]];
 }
 - (void)repeatAll
 {
-    [o_btn_repeat setImage: o_repeat_all];
-    [o_btn_repeat setAlternateImage: o_repeat_off];
-    [o_btn_repeat_embed setImage: [NSImage imageNamed:@"sidebarRepeatOn"]];
+    [o_btn_repeat setImage: [NSImage imageNamed:@"repeat_embedded_graphite"]];
+    [o_btn_repeat setAlternateImage: [NSImage imageNamed:@"repeat_embedded"]];
 }
 - (void)repeatOff
 {
-    [o_btn_repeat setImage: o_repeat_off];
-    [o_btn_repeat setAlternateImage: o_repeat_single];
-    [o_btn_repeat_embed setImage: [NSImage imageNamed:@"sidebarRepeat"]];
+    [o_btn_repeat setImage: [NSImage imageNamed:@"repeat_embedded"]];
+    [o_btn_repeat setAlternateImage: [NSImage imageNamed:@"repeat_embedded_graphite"]];
 }
 - (void)shuffle
 {
@@ -211,9 +202,9 @@
     var_Get( p_playlist, "random", &val );
     [o_btn_shuffle setState: val.b_bool];
 	if(val.b_bool)
-        [o_btn_shuffle_embed setImage: [NSImage imageNamed:@"sidebarShuffleOn"]];
+        [o_btn_shuffle_embed setImage: [NSImage imageNamed:@"shuffle_embedded_graphite"]];
 	else
-        [o_btn_shuffle_embed setImage: [NSImage imageNamed:@"sidebarShuffle"]];
+        [o_btn_shuffle_embed setImage: [NSImage imageNamed:@"shuffle_embedded"]];
 }
 
 - (IBAction)repeatButtonAction:(id)sender
