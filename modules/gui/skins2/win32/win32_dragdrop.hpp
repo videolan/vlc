@@ -25,6 +25,11 @@
 #ifndef WIN32_DRAGDROP_HPP
 #define WIN32_DRAGDROP_HPP
 
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
+#include <windows.h>
 #include <shellapi.h>
 #include <ole2.h>
 #include "../src/skin_common.hpp"

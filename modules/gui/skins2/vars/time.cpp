@@ -22,8 +22,8 @@
  * 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#include <vlc_input.h>
 #include "time.hpp"
+#include <vlc_input.h>
 
 
 inline bool StreamTime::havePosition() const {

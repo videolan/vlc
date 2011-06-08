@@ -24,6 +24,10 @@
 
 #ifdef WIN32_SKINS
 
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
 #include <windows.h>
 #include <winuser.h>
 #include <wingdi.h>
