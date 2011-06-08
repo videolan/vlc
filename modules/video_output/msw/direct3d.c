@@ -50,8 +50,7 @@
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-static int  OpenVideoXP(vlc_object_t *);
-static int  OpenVideoVista(vlc_object_t *);
+static int  Open(vlc_object_t *);
 static void Close(vlc_object_t *);
 
 #define DESKTOP_TEXT N_("Enable desktop mode ")
@@ -76,13 +75,7 @@ vlc_module_begin ()
 
     set_capability("vout display", 240)
     add_shortcut("direct3d")
-    set_callbacks(OpenVideoVista, Close)
-
-    add_submodule()
-        set_description(N_("Direct3D video output (XP)"))
-        set_capability("vout display", 220)
-        add_shortcut("direct3d_xp")
-        set_callbacks(OpenVideoXP, Close)
+    set_callbacks(Open, Close)
 
 vlc_module_end ()
 
@@ -232,25 +225,6 @@ error:
     Direct3DDestroy(vd);
     free(vd->sys);
     return VLC_EGENERIC;
-}
-
-static bool IsVistaOrAbove(void)
-{
-    OSVERSIONINFO winVer;
-    winVer.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-    return GetVersionEx(&winVer) && winVer.dwMajorVersion > 5;
-}
-
-static int OpenVideoXP(vlc_object_t *obj)
-{
-    /* Windows XP or lower, make sure this module isn't the default */
-    return IsVistaOrAbove() ? VLC_EGENERIC : Open(obj);
-}
-
-static int OpenVideoVista(vlc_object_t *obj)
-{
-    /* Windows Vista or above, make this module the default */
-    return IsVistaOrAbove() ? Open(obj) : VLC_EGENERIC;
 }
 
 /**
