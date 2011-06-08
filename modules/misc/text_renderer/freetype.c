@@ -540,8 +540,7 @@ static int RenderYUVP( filter_t *p_filter, subpicture_region_t *p_region,
     uint8_t *p_dst;
     video_format_t fmt;
     int i, x, y, i_pitch;
-    uint8_t i_y; /* YUV values, derived from incoming RGB */
-    int8_t i_u, i_v;
+    uint8_t i_y, i_u, i_v; /* YUV values, derived from incoming RGB */
 
     /* Create a new subpicture region */
     memset( &fmt, 0, sizeof(video_format_t) );
@@ -564,12 +563,10 @@ static int RenderYUVP( filter_t *p_filter, subpicture_region_t *p_region,
     p_region->fmt = fmt;
 
     /* Calculate text color components */
-    i_y = (uint8_t)(( 66 * p_line->i_red  + 129 * p_line->i_green +
-                      25 * p_line->i_blue + 128) >> 8) +  16;
-    i_u = (int8_t)(( -38 * p_line->i_red  -  74 * p_line->i_green +
-                     112 * p_line->i_blue + 128) >> 8) + 128;
-    i_v = (int8_t)(( 112 * p_line->i_red  -  94 * p_line->i_green -
-                      18 * p_line->i_blue + 128) >> 8) + 128;
+    YUVFromRGB( (p_line->i_red   << 16) |
+                (p_line->i_green <<  8) |
+                (p_line->i_blue       ),
+                &i_y, &i_u, &i_v);
 
     /* Build palette */
     fmt.p_palette->i_entries = 16;
@@ -986,30 +983,30 @@ static ft_style_t *CreateStyle( char *psz_fontname, int i_font_size,
         uint32_t i_font_color, uint32_t i_karaoke_bg_color, bool b_bold,
         bool b_italic, bool b_uline, bool b_through )
 {
-    ft_style_t  *p_style = malloc( sizeof( ft_style_t ));
+    ft_style_t *p_style = malloc( sizeof( *p_style ));
+    if( !p_style )
+        return NULL;
 
-    if( p_style )
-    {
-        p_style->i_font_size        = i_font_size;
-        p_style->i_font_color       = i_font_color;
-        p_style->i_karaoke_bg_color = i_karaoke_bg_color;
-        p_style->b_italic           = b_italic;
-        p_style->b_bold             = b_bold;
-        p_style->b_underline        = b_uline;
-        p_style->b_through          = b_through;
+    p_style->i_font_size        = i_font_size;
+    p_style->i_font_color       = i_font_color;
+    p_style->i_karaoke_bg_color = i_karaoke_bg_color;
+    p_style->b_italic           = b_italic;
+    p_style->b_bold             = b_bold;
+    p_style->b_underline        = b_uline;
+    p_style->b_through          = b_through;
 
-        p_style->psz_fontname = strdup( psz_fontname );
-    }
+    p_style->psz_fontname = strdup( psz_fontname );
+
     return p_style;
 }
 
 static void DeleteStyle( ft_style_t *p_style )
 {
-    if( p_style )
-    {
-        free( p_style->psz_fontname );
-        free( p_style );
-    }
+    if( !p_style )
+        return;
+
+    free( p_style->psz_fontname );
+    free( p_style );
 }
 
 static bool StyleEquals( ft_style_t *s1, ft_style_t *s2 )
@@ -1033,10 +1030,10 @@ static bool StyleEquals( ft_style_t *s1, ft_style_t *s2 )
 }
 
 static void IconvText( filter_t *p_filter, const char *psz_string,
-                       size_t *i_string_length, uint32_t **ppsz_unicode )
+                       size_t *i_string_length, uint32_t *psz_unicode )
 {
     *i_string_length = 0;
-    if( *ppsz_unicode == NULL )
+    if( psz_unicode == NULL )
         return;
 
     size_t i_length;
@@ -1051,30 +1048,28 @@ static void IconvText( filter_t *p_filter, const char *psz_string,
         msg_Warn( p_filter, "failed to convert string to unicode (%m)" );
         return;
     }
-    memcpy( *ppsz_unicode, psz_tmp, i_length );
+    memcpy( psz_unicode, psz_tmp, i_length );
     *i_string_length = i_length / 4;
 
     free( psz_tmp );
 }
 
 static ft_style_t *GetStyleFromFontStack( filter_sys_t *p_sys,
-        font_stack_t **p_fonts, bool b_bold, bool b_italic,
-        bool b_uline, bool b_through )
+                                          font_stack_t **p_fonts,
+                                          bool b_bold, bool b_italic,
+                                          bool b_uline, bool b_through )
 {
-    ft_style_t   *p_style = NULL;
-
     char       *psz_fontname = NULL;
     uint32_t    i_font_color = p_sys->i_font_color & 0x00ffffff;
     uint32_t    i_karaoke_bg_color = i_font_color;
     int         i_font_size  = p_sys->i_font_size;
 
-    if( VLC_SUCCESS == PeekFont( p_fonts, &psz_fontname, &i_font_size,
-                                 &i_font_color, &i_karaoke_bg_color ))
-    {
-        p_style = CreateStyle( psz_fontname, i_font_size, i_font_color,
-                i_karaoke_bg_color, b_bold, b_italic, b_uline, b_through );
-    }
-    return p_style;
+    if( PeekFont( p_fonts, &psz_fontname, &i_font_size,
+                  &i_font_color, &i_karaoke_bg_color ) )
+        return NULL;
+
+    return CreateStyle( psz_fontname, i_font_size, i_font_color,
+                        i_karaoke_bg_color, b_bold, b_italic, b_uline, b_through );
 }
 
 static int RenderTag( filter_t *p_filter, FT_Face p_face, int i_font_color,
@@ -1280,14 +1275,14 @@ static int RenderTag( filter_t *p_filter, FT_Face p_face, int i_font_color,
 }
 
 static void SetupLine( filter_t *p_filter, const char *psz_text_in,
-                       uint32_t **psz_text_out, uint32_t *pi_runs,
+                       uint32_t **ppsz_text_out, uint32_t *pi_runs,
                        uint32_t **ppi_run_lengths, ft_style_t ***ppp_styles,
                        ft_style_t *p_style )
 {
     size_t i_string_length;
 
-    IconvText( p_filter, psz_text_in, &i_string_length, psz_text_out );
-    *psz_text_out += i_string_length;
+    IconvText( p_filter, psz_text_in, &i_string_length, *ppsz_text_out );
+    *ppsz_text_out += i_string_length;
 
     if( ppp_styles && ppi_run_lengths )
     {
@@ -1335,7 +1330,7 @@ static void SetupLine( filter_t *p_filter, const char *psz_text_in,
     /* If we couldn't use the p_style argument due to memory allocation
      * problems above, release it here.
      */
-    if( p_style ) DeleteStyle( p_style );
+    DeleteStyle( p_style );
 }
 
 static int CheckForEmbeddedFont( filter_sys_t *p_sys, FT_Face *pp_face, ft_style_t *p_style )
@@ -1949,7 +1944,7 @@ static int RenderCommon( filter_t *p_filter, subpicture_region_t *p_region_out,
     {
 
         size_t i_iconv_length;
-        IconvText( p_filter, p_region_in->psz_text, &i_iconv_length, &psz_text );
+        IconvText( p_filter, p_region_in->psz_text, &i_iconv_length, psz_text );
         i_text_length = i_iconv_length;
 
         int i_scale = 1000;
