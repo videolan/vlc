@@ -1,7 +1,7 @@
 /*****************************************************************************
  * fixed32.c : fixed-point software volume
  *****************************************************************************
- * Copyright (C) 2011 Rémi Denis-Courmnot
+ * Copyright (C) 2011 Rémi Denis-Courmont
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
