@@ -281,8 +281,8 @@ struct filter_sys_t
 
     int            i_default_font_size;
     int            i_display_height;
-#ifdef HAVE_STYLES
     char*          psz_fontfamily;
+#ifdef HAVE_STYLES
     xml_reader_t  *p_xml;
 #ifdef WIN32
     char*          psz_win_fonts_path;
@@ -317,8 +317,8 @@ static int Create( vlc_object_t *p_this )
     if( !p_sys )
         return VLC_ENOMEM;
 
-#ifdef HAVE_STYLES
     p_sys->psz_fontfamily   = NULL;
+#ifdef HAVE_STYLES
     p_sys->p_xml            = NULL;
 #endif
     p_sys->p_face           = 0;
@@ -366,8 +366,8 @@ static int Create( vlc_object_t *p_this )
     }
 
     /* Set the current font file */
-#ifdef HAVE_STYLES
     p_sys->psz_fontfamily = psz_fontfamily;
+#ifdef HAVE_STYLES
 #ifdef HAVE_FONTCONFIG
     FontConfig_BuildCache( p_filter );
 
@@ -474,8 +474,8 @@ static void Destroy( vlc_object_t *p_this )
 
 #ifdef HAVE_STYLES
     if( p_sys->p_xml ) xml_ReaderDelete( p_sys->p_xml );
-    free( p_sys->psz_fontfamily );
 #endif
+    free( p_sys->psz_fontfamily );
 
     /* FcFini asserts calling the subfunction FcCacheFini()
      * even if no other library functions have been made since FcInit(),
@@ -982,290 +982,6 @@ static int RenderYUVA( filter_t *p_filter, subpicture_region_t *p_region,
     return VLC_SUCCESS;
 }
 
-/**
- * This function renders a text subpicture region into another one.
- * It also calculates the size needed for this string, and renders the
- * needed glyphs into memory. It is used as pf_add_string callback in
- * the vout method by this module
- */
-static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
-                       subpicture_region_t *p_region_in )
-{
-    filter_sys_t *p_sys = p_filter->p_sys;
-    line_desc_t  *p_lines = NULL, *p_line = NULL, *p_next = NULL, *p_prev = NULL;
-    int i, i_pen_y, i_pen_x, i_error, i_glyph_index, i_previous;
-    uint32_t *psz_unicode, *psz_unicode_orig = NULL, i_char, *psz_line_start;
-    size_t i_string_length;
-    char *psz_string;
-    int i_font_color, i_font_alpha, i_font_size, i_red, i_green, i_blue;
-    vlc_value_t val;
-    int i_scale = 1000;
-
-    FT_BBox line;
-    FT_BBox glyph_size;
-    FT_Vector result;
-    FT_Glyph tmp_glyph;
-
-    /* Sanity check */
-    if( !p_region_in || !p_region_out ) return VLC_EGENERIC;
-    psz_string = p_region_in->psz_text;
-    if( !psz_string || !*psz_string ) return VLC_EGENERIC;
-
-    if( VLC_SUCCESS == var_Get( p_filter, "scale", &val ))
-        i_scale = val.i_int;
-
-    if( p_region_in->p_style )
-    {
-        i_font_color = __MAX( __MIN( p_region_in->p_style->i_font_color, 0xFFFFFF ), 0 );
-        i_font_alpha = __MAX( __MIN( p_region_in->p_style->i_font_alpha, 255 ), 0 );
-        i_font_size  = __MAX( __MIN( p_region_in->p_style->i_font_size, 255 ), 0 ) * i_scale / 1000;
-    }
-    else
-    {
-        i_font_color = p_sys->i_font_color;
-        i_font_alpha = 255 - p_sys->i_font_opacity;
-        i_font_size  = p_sys->i_default_font_size * i_scale / 1000;
-    }
-
-    if( i_font_color == 0xFFFFFF ) i_font_color = p_sys->i_font_color;
-    if( !i_font_alpha ) i_font_alpha = 255 - p_sys->i_font_opacity;
-    SetFontSize( p_filter, i_font_size );
-
-    i_red   = ( i_font_color & 0x00FF0000 ) >> 16;
-    i_green = ( i_font_color & 0x0000FF00 ) >>  8;
-    i_blue  =   i_font_color & 0x000000FF;
-
-    result.x =  result.y = 0;
-    line.xMin = line.xMax = line.yMin = line.yMax = 0;
-
-#if defined(WORDS_BIGENDIAN)
-    psz_unicode = ToCharset( "UCS-4BE", psz_string, &i_string_length );
-#else
-    psz_unicode = ToCharset( "UCS-4LE", psz_string, &i_string_length );
-#endif
-    if( psz_unicode == NULL )
-        goto error;
-    psz_unicode_orig = psz_unicode;
-    i_string_length /= 4;
-
-#if defined(HAVE_FRIBIDI)
-    {
-        uint32_t *p_fribidi_string;
-        size_t start_pos;
-        size_t pos = 0;
-
-        p_fribidi_string = malloc( (i_string_length + 1) * sizeof(uint32_t) );
-        if( !p_fribidi_string )
-            goto error;
-
-        /* Do bidi conversion line-by-line */
-        while( pos < i_string_length )
-        {
-            while( pos < i_string_length )
-            {
-                i_char = psz_unicode[pos];
-                if (i_char != '\r' && i_char != '\n')
-                    break;
-                p_fribidi_string[pos] = i_char;
-                ++pos;
-            }
-            start_pos = pos;
-            while( pos < i_string_length )
-            {
-                i_char = psz_unicode[pos];
-                if (i_char == '\r' || i_char == '\n')
-                    break;
-                ++pos;
-            }
-            if (pos > start_pos)
-            {
-#if (FRIBIDI_MINOR_VERSION < 19) && (FRIBIDI_MAJOR_VERSION == 0)
-                FriBidiCharType base_dir = FRIBIDI_TYPE_LTR;
-#else
-                FriBidiParType base_dir = FRIBIDI_PAR_LTR;
-#endif
-                fribidi_log2vis((FriBidiChar*)psz_unicode + start_pos,
-                                pos - start_pos,
-                                &base_dir,
-                                (FriBidiChar*)p_fribidi_string + start_pos,
-                                0, 0, 0);
-            }
-        }
-
-        free( psz_unicode_orig );
-        psz_unicode = psz_unicode_orig = p_fribidi_string;
-        p_fribidi_string[ i_string_length ] = 0;
-    }
-#endif
-
-    /* Calculate relative glyph positions and a bounding box for the
-     * entire string */
-    if( !(p_line = NewLine( strlen( psz_string ))) )
-        goto error;
-    p_lines = p_line;
-    i_pen_x = i_pen_y = 0;
-    i_previous = i = 0;
-    psz_line_start = psz_unicode;
-
-#define face p_sys->p_face
-#define glyph face->glyph
-
-    while( *psz_unicode )
-    {
-        i_char = *psz_unicode++;
-        if( i_char == '\r' ) /* ignore CR chars wherever they may be */
-        {
-            continue;
-        }
-
-        if( i_char == '\n' )
-        {
-            psz_line_start = psz_unicode;
-            if( !(p_next = NewLine( strlen( psz_string ))) )
-                goto error;
-            p_line->p_next = p_next;
-            p_line->i_width = line.xMax;
-            p_line->i_height = face->size->metrics.height >> 6;
-            p_line->pp_glyphs[ i ] = NULL;
-            p_line->i_alpha = i_font_alpha;
-            p_line->i_red = i_red;
-            p_line->i_green = i_green;
-            p_line->i_blue = i_blue;
-            p_prev = p_line;
-            p_line = p_next;
-            result.x = __MAX( result.x, line.xMax );
-            result.y += face->size->metrics.height >> 6;
-            i_pen_x = 0;
-            i_previous = i = 0;
-            line.xMin = line.xMax = line.yMin = line.yMax = 0;
-            i_pen_y += face->size->metrics.height >> 6;
-#if 0
-            msg_Dbg( p_filter, "Creating new line, i is %d", i );
-#endif
-            continue;
-        }
-
-        i_glyph_index = FT_Get_Char_Index( face, i_char );
-        if( p_sys->i_use_kerning && i_glyph_index
-            && i_previous )
-        {
-            FT_Vector delta;
-            FT_Get_Kerning( face, i_previous, i_glyph_index,
-                            ft_kerning_default, &delta );
-            i_pen_x += delta.x >> 6;
-
-        }
-        p_line->p_glyph_pos[ i ].x = i_pen_x;
-        p_line->p_glyph_pos[ i ].y = i_pen_y;
-        i_error = FT_Load_Glyph( face, i_glyph_index, FT_LOAD_NO_BITMAP | FT_LOAD_DEFAULT );
-        if( i_error )
-        {
-            i_error = FT_Load_Glyph( face, i_glyph_index, FT_LOAD_DEFAULT );
-            if( i_error )
-            {
-                msg_Err( p_filter, "unable to render text FT_Load_Glyph returned"
-                                   " %d", i_error );
-                goto error;
-            }
-        }
-        i_error = FT_Get_Glyph( glyph, &tmp_glyph );
-        if( i_error )
-        {
-            msg_Err( p_filter, "unable to render text FT_Get_Glyph returned "
-                               "%d", i_error );
-            goto error;
-        }
-        FT_Glyph_Get_CBox( tmp_glyph, ft_glyph_bbox_pixels, &glyph_size );
-        i_error = FT_Glyph_To_Bitmap( &tmp_glyph, ft_render_mode_normal, 0, 1);
-        if( i_error )
-        {
-            FT_Done_Glyph( tmp_glyph );
-            continue;
-        }
-        p_line->pp_glyphs[ i ] = (FT_BitmapGlyph)tmp_glyph;
-
-        /* Do rest */
-        line.xMax = p_line->p_glyph_pos[i].x + glyph_size.xMax -
-            glyph_size.xMin + ((FT_BitmapGlyph)tmp_glyph)->left;
-        if( line.xMax > (int)p_filter->fmt_out.video.i_visible_width - 20 )
-        {
-            FT_Done_Glyph( (FT_Glyph)p_line->pp_glyphs[ i ] );
-            p_line->pp_glyphs[ i ] = NULL;
-            FreeLine( p_line );
-            p_line = NewLine( strlen( psz_string ));
-            if( p_prev ) p_prev->p_next = p_line;
-            else p_lines = p_line;
-
-            uint32_t *psz_unicode_saved = psz_unicode;
-            while( psz_unicode > psz_line_start && *psz_unicode != ' ' )
-            {
-                psz_unicode--;
-            }
-            if( psz_unicode == psz_line_start )
-            {   /* try harder to break that line */
-                psz_unicode = psz_unicode_saved;
-                while( psz_unicode > psz_line_start &&
-                    *psz_unicode != '_'  && *psz_unicode != '/' &&
-                    *psz_unicode != '\\' && *psz_unicode != '.' )
-                {
-                    psz_unicode--;
-                }
-            }
-            if( psz_unicode == psz_line_start )
-            {
-                msg_Warn( p_filter, "unbreakable string" );
-                goto error;
-            }
-            else
-            {
-                *psz_unicode = '\n';
-            }
-            psz_unicode = psz_line_start;
-            i_pen_x = 0;
-            i_previous = i = 0;
-            line.xMin = line.xMax = line.yMin = line.yMax = 0;
-            continue;
-        }
-        line.yMax = __MAX( line.yMax, glyph_size.yMax );
-        line.yMin = __MIN( line.yMin, glyph_size.yMin );
-
-        i_previous = i_glyph_index;
-        i_pen_x += glyph->advance.x >> 6;
-        i++;
-    }
-
-    p_line->i_width = line.xMax;
-    p_line->i_height = face->size->metrics.height >> 6;
-    p_line->pp_glyphs[ i ] = NULL;
-    p_line->i_alpha = i_font_alpha;
-    p_line->i_red = i_red;
-    p_line->i_green = i_green;
-    p_line->i_blue = i_blue;
-    result.x = __MAX( result.x, line.xMax );
-    result.y += line.yMax - line.yMin;
-
-#undef face
-#undef glyph
-
-    p_region_out->i_x = p_region_in->i_x;
-    p_region_out->i_y = p_region_in->i_y;
-
-    if( var_InheritBool( p_filter, "freetype-yuvp" ) )
-        RenderYUVP( p_filter, p_region_out, p_lines, result.x, result.y );
-    else
-        RenderYUVA( p_filter, p_region_out, p_lines, result.x, result.y );
-
-    free( psz_unicode_orig );
-    FreeLines( p_lines );
-    return VLC_SUCCESS;
-
- error:
-    free( psz_unicode_orig );
-    FreeLines( p_lines );
-    return VLC_EGENERIC;
-}
-
-#ifdef HAVE_STYLES
 static ft_style_t *CreateStyle( char *psz_fontname, int i_font_size,
         uint32_t i_font_color, uint32_t i_karaoke_bg_color, bool b_bold,
         bool b_italic, bool b_uline, bool b_through )
@@ -1886,7 +1602,7 @@ static int ProcessLines( filter_t *p_filter,
 
             if( ! p_face )
             {
-                char *psz_fontfile = NULL;
+                char *psz_fontfile;
 
 #ifdef HAVE_FONTCONFIG
                 psz_fontfile = FontConfig_Select( NULL,
@@ -1903,7 +1619,7 @@ static int ProcessLines( filter_t *p_filter,
                                             -1,
                                             &i_idx );
 #else
-# error FIXME
+                psz_fontfile = NULL;
 #endif
                 if( psz_fontfile && ! *psz_fontfile )
                 {
@@ -2105,131 +1821,201 @@ static int ProcessLines( filter_t *p_filter,
     return VLC_SUCCESS;
 }
 
-static int RenderHtml( filter_t *p_filter, subpicture_region_t *p_region_out,
-                       subpicture_region_t *p_region_in )
+/**
+ * This function renders a text subpicture region into another one.
+ * It also calculates the size needed for this string, and renders the
+ * needed glyphs into memory. It is used as pf_add_string callback in
+ * the vout method by this module
+ */
+static int RenderCommon( filter_t *p_filter, subpicture_region_t *p_region_out,
+                         subpicture_region_t *p_region_in, bool b_html )
 {
-    int          rv = VLC_SUCCESS;
-    stream_t     *p_sub = NULL;
+    filter_sys_t *p_sys = p_filter->p_sys;
 
-    if( !p_region_in || !p_region_in->psz_html )
+    if( !p_region_in )
         return VLC_EGENERIC;
+    if( b_html && !p_region_in->psz_html )
+        return VLC_EGENERIC;
+    if( !b_html && !p_region_in->psz_text )
+        return VLC_EGENERIC;
+
+    uint32_t *psz_text = calloc( strlen( b_html ? p_region_in->psz_html
+                                                : p_region_in->psz_text ),
+                                 sizeof( *psz_text ) );
+    if( !psz_text )
+        return VLC_EGENERIC;
+
 
     /* Reset the default fontsize in case screen metrics have changed */
     p_filter->p_sys->i_font_size = GetFontSize( p_filter );
 
-    p_sub = stream_MemoryNew( VLC_OBJECT(p_filter),
-                              (uint8_t *) p_region_in->psz_html,
-                              strlen( p_region_in->psz_html ),
-                              true );
-    if( unlikely(p_sub == NULL) )
-        return VLC_SUCCESS;
+    /* */
+    int rv = VLC_SUCCESS;
+    int i_text_length = 0;
+    FT_Vector result = {0, 0};
+    line_desc_t *p_lines = NULL;
 
-    xml_reader_t *p_xml_reader = p_filter->p_sys->p_xml;
-    bool b_karaoke = false;
-
-    if( !p_xml_reader )
-        p_xml_reader = xml_ReaderCreate( p_filter, p_sub );
-    else
-        p_xml_reader = xml_ReaderReset( p_xml_reader, p_sub );
-
-    p_filter->p_sys->p_xml = p_xml_reader;
-    if( p_xml_reader )
+#ifdef HAVE_STYLES
+    if( b_html )
     {
-        /* Look for Root Node */
-        const char *node;
+        stream_t *p_sub = stream_MemoryNew( VLC_OBJECT(p_filter),
+                                            (uint8_t *) p_region_in->psz_html,
+                                            strlen( p_region_in->psz_html ),
+                                            true );
+        if( unlikely(p_sub == NULL) )
+            return VLC_SUCCESS;
 
-        if( xml_ReaderNextNode( p_xml_reader, &node ) == XML_READER_STARTELEM )
+        xml_reader_t *p_xml_reader = p_filter->p_sys->p_xml;
+        if( !p_xml_reader )
+            p_xml_reader = xml_ReaderCreate( p_filter, p_sub );
+        else
+            p_xml_reader = xml_ReaderReset( p_xml_reader, p_sub );
+        p_filter->p_sys->p_xml = p_xml_reader;
+
+        if( !p_xml_reader )
+            rv = VLC_EGENERIC;
+
+        bool b_karaoke = false;
+        if( !rv )
         {
-            if( !strcasecmp( "karaoke", node ) )
+            /* Look for Root Node */
+            const char *node;
+
+            if( xml_ReaderNextNode( p_xml_reader, &node ) == XML_READER_STARTELEM )
             {
-                /* We're going to have to render the text a number
-                 * of times to show the progress marker on the text.
-                 */
-                var_SetBool( p_filter, "text-rerender", true );
-                b_karaoke = true;
-            }
-            else if( !strcasecmp( "text", node ) )
-            {
-                b_karaoke = false;
+                if( !strcasecmp( "karaoke", node ) )
+                {
+                    /* We're going to have to render the text a number
+                     * of times to show the progress marker on the text.
+                     */
+                    var_SetBool( p_filter, "text-rerender", true );
+                    b_karaoke = true;
+                }
+                else if( !strcasecmp( "text", node ) )
+                {
+                    b_karaoke = false;
+                }
+                else
+                {
+                    /* Only text and karaoke tags are supported */
+                    msg_Dbg( p_filter, "Unsupported top-level tag <%s> ignored.",
+                             node );
+                    rv = VLC_EGENERIC;
+                }
             }
             else
             {
-                /* Only text and karaoke tags are supported */
-                msg_Dbg( p_filter, "Unsupported top-level tag <%s> ignored.",
-                         node );
+                msg_Err( p_filter, "Malformed HTML subtitle" );
                 rv = VLC_EGENERIC;
             }
         }
-        else
+        if( !rv )
         {
-            msg_Err( p_filter, "Malformed HTML subtitle" );
-            rv = VLC_EGENERIC;
-        }
+            uint32_t    i_runs           = 0;
+            uint32_t    i_k_runs         = 0;
+            uint32_t   *pi_run_lengths   = NULL;
+            uint32_t   *pi_k_run_lengths = NULL;
+            uint32_t   *pi_k_durations   = NULL;
+            ft_style_t  **pp_styles      = NULL;
 
-        if( rv != VLC_SUCCESS )
-        {
-            p_filter->p_sys->p_xml = xml_ReaderReset( p_xml_reader, NULL );
-            p_xml_reader = NULL;
-        }
-    }
-
-    if( p_xml_reader )
-    {
-        uint32_t   *psz_text;
-        int         i_len            = 0;
-        uint32_t    i_runs           = 0;
-        uint32_t    i_k_runs         = 0;
-        uint32_t   *pi_run_lengths   = NULL;
-        uint32_t   *pi_k_run_lengths = NULL;
-        uint32_t   *pi_k_durations   = NULL;
-        ft_style_t  **pp_styles      = NULL;
-        FT_Vector    result          = {0, 0};
-        line_desc_t  *p_lines        = NULL;
-
-        psz_text = (uint32_t *)malloc( strlen( p_region_in->psz_html ) *
-                                       sizeof( uint32_t ) );
-        if( psz_text )
-        {
             rv = ProcessNodes( p_filter, p_xml_reader,
-                               p_region_in->p_style, psz_text, &i_len,
+                               p_region_in->p_style, psz_text, &i_text_length,
                                &i_runs, &pi_run_lengths, &pp_styles,
                                b_karaoke, &i_k_runs, &pi_k_run_lengths,
                                &pi_k_durations );
 
-            p_region_out->i_x = p_region_in->i_x;
-            p_region_out->i_y = p_region_in->i_y;
-
-            if(( rv == VLC_SUCCESS ) && ( i_len > 0 ))
+            if( !rv && i_text_length > 0 )
             {
-                rv = ProcessLines( p_filter, psz_text, i_len, i_runs,
+                rv = ProcessLines( p_filter, psz_text, i_text_length, i_runs,
                                    pi_run_lengths, pp_styles, &p_lines,
                                    &result, b_karaoke, i_k_runs,
                                    pi_k_run_lengths, pi_k_durations );
             }
 
-            for( uint_fast32_t k=0; k<i_runs; k++)
+            for( uint32_t k = 0; k < i_runs; k++ )
                  DeleteStyle( pp_styles[k] );
             free( pp_styles );
             free( pi_run_lengths );
-            free( psz_text );
 
-            /* Don't attempt to render text that couldn't be layed out
-             * properly. */
-            if(( rv == VLC_SUCCESS ) && ( i_len > 0 ))
-            {
-                if( var_InheritBool( p_filter, "freetype-yuvp" ) )
-                    RenderYUVP( p_filter, p_region_out, p_lines,
-                                result.x, result.y );
-                else
-                    RenderYUVA( p_filter, p_region_out, p_lines,
-                                result.x, result.y );
-            }
         }
-        p_filter->p_sys->p_xml = xml_ReaderReset( p_xml_reader, NULL );
-        FreeLines( p_lines );
+
+        if( p_xml_reader )
+            p_filter->p_sys->p_xml = xml_ReaderReset( p_xml_reader, NULL );
+
+        stream_Delete( p_sub );
     }
-    stream_Delete( p_sub );
+    else
+#endif
+    {
+
+        size_t i_iconv_length;
+        IconvText( p_filter, p_region_in->psz_text, &i_iconv_length, &psz_text );
+        i_text_length = i_iconv_length;
+
+        int i_scale = 1000;
+        vlc_value_t val;
+        if( VLC_SUCCESS == var_Get( p_filter, "scale", &val ) )
+            i_scale = val.i_int;
+
+        ft_style_t *p_style;
+        if( p_region_in->p_style )
+            p_style = CreateStyle( p_region_in->p_style->psz_fontname,
+                                   p_region_in->p_style->i_font_size * i_scale / 1000,
+                                   (p_region_in->p_style->i_font_color & 0xffffff) |
+                                   ((p_region_in->p_style->i_font_alpha & 0xff) << 24),
+                                   0x00ffffff,
+                                   p_region_in->p_style->i_style_flags & STYLE_BOLD,
+                                   p_region_in->p_style->i_style_flags & STYLE_ITALIC,
+                                   p_region_in->p_style->i_style_flags & STYLE_UNDERLINE,
+                                   p_region_in->p_style->i_style_flags & STYLE_STRIKEOUT);
+        else
+            p_style = CreateStyle( p_sys->psz_fontfamily,
+                                   p_sys->i_font_size * i_scale / 1000,
+                                   (p_sys->i_font_color & 0xffffff) |
+                                   (((255-p_sys->i_font_opacity) & 0xff) << 24),
+                                   0x00ffffff,
+                                   false, false, false, false );
+        uint32_t i_run_length = i_text_length;
+
+        rv = ProcessLines( p_filter, psz_text, i_text_length,
+                           1, &i_run_length, &p_style,
+                           &p_lines, &result,
+                           false, 0, NULL, NULL );
+        DeleteStyle( p_style );
+    }
+    free( psz_text );
+
+    p_region_out->i_x = p_region_in->i_x;
+    p_region_out->i_y = p_region_in->i_y;
+
+    /* Don't attempt to render text that couldn't be layed out
+     * properly. */
+    if( !rv && i_text_length > 0 )
+    {
+        if( var_InheritBool( p_filter, "freetype-yuvp" ) )
+            RenderYUVP( p_filter, p_region_out, p_lines,
+                        result.x, result.y );
+        else
+            RenderYUVA( p_filter, p_region_out, p_lines,
+                        result.x, result.y );
+    }
+
+    FreeLines( p_lines );
     return rv;
+}
+
+static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
+                       subpicture_region_t *p_region_in )
+{
+    return RenderCommon( p_filter, p_region_out, p_region_in, false );
+}
+
+#ifdef HAVE_STYLES
+
+static int RenderHtml( filter_t *p_filter, subpicture_region_t *p_region_out,
+                       subpicture_region_t *p_region_in )
+{
+    return RenderCommon( p_filter, p_region_out, p_region_in, true );
 }
 
 #ifdef WIN32
@@ -2428,34 +2214,6 @@ static char* FontConfig_Select( FcConfig* config, const char* family,
     return strdup( (const char*)val_s );
 }
 #endif
-#else /* from now no styles */
-
-static void SetupLine( filter_t *p_filter, const char *psz_text_in,
-                       uint32_t **psz_text_out, uint32_t *pi_runs,
-                       uint32_t **ppi_run_lengths, ft_style_t ***ppp_styles,
-                       ft_style_t *p_style )
-{
-        VLC_UNUSED(p_filter);
-        VLC_UNUSED(psz_text_in);
-        VLC_UNUSED(psz_text_out);
-        VLC_UNUSED(pi_runs);
-        VLC_UNUSED(ppi_run_lengths);
-        VLC_UNUSED(ppp_styles);
-        VLC_UNUSED(p_style);
-}
-
-static ft_style_t *GetStyleFromFontStack( filter_sys_t *p_sys,
-        font_stack_t **p_fonts, bool b_bold, bool b_italic,
-        bool b_uline, bool b_through )
-{
-        VLC_UNUSED(p_sys);
-        VLC_UNUSED(p_fonts);
-        VLC_UNUSED(b_bold);
-        VLC_UNUSED(b_italic);
-        VLC_UNUSED(b_uline);
-        VLC_UNUSED(b_through);
-        return NULL;
-}
 #endif
 
 static void FreeLine( line_desc_t *p_line )
