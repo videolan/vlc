@@ -11,6 +11,8 @@ Important changes for packagers:
  * The default tarballs are now compressed with XZ/LZMA: .tar.xz
  * OSS support is not compiled on Linux by default, pass --enable-oss to the
    configure script if you use OSSv4 or really want to use OSS emulation.
+ * The Windows version will only work with Windows XP SP2 or later.
+   Windows 2000 SP4, Windows XP < SP2, Windows 2003 SP0 are now unsupported.
 
  * The NPAPI webplugin has moved to git://git.videolan.org/npapi-vlc.git
  * The ActiveX webplugin has moved to git://git.videolan.org/activex-vlc.git
