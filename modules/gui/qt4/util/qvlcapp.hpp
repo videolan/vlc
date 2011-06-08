@@ -29,10 +29,8 @@
 #include <QEvent>
 
 #if defined(Q_WS_WIN)
-#   include <windows.h>
-#   include <vlc_common.h>
-#   include <vlc_interface.h>
 #   include "qt4.hpp"
+#   include <windows.h>
 #   include "input_manager.hpp"
 #endif
 
