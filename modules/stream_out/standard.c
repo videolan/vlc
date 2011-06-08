@@ -28,10 +28,6 @@
 # include "config.h"
 #endif
 
-#ifndef _WIN32_WINNT
-# define _WIN32_WINNT 0x0500
-#endif
-
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_sout.h>

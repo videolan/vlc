@@ -294,21 +294,19 @@ case "${host_os}" in
   *mingw32* | *cygwin* | *wince* | *mingwce*)
     AC_CHECK_TOOL(WINDRES, windres, :)
     AC_CHECK_TOOL(OBJCOPY, objcopy, :)
+    AC_DEFINE([_WIN32_WINNT], 0x0501, [Define to '0x0501' for Windows XP APIs.])
 
     case "${host_os}" in
       *wince* | *mingwce* | *mingw32ce*)
         SYS=mingwce
         dnl Sadly CeGCC still needs non-wince macros
-        AC_DEFINE([_WIN32_WINNT], 0x0501, [Define to '0x0500' for Windows 2000 APIs.])
         ;;
       *mingw32*)
         SYS=mingw32
-        AC_DEFINE([_WIN32_WINNT], 0x0501, [Define to '0x0500' for Windows XP APIs.])
         ;;
       *cygwin*)
         dnl Check if we are using the mno-cygwin mode in which case we are
         dnl actually dealing with a mingw32 compiler.
-        AC_DEFINE([_WIN32_WINNT], 0x0501, [Define to '0x0501' for Windows XP APIs.])
         AC_EGREP_CPP(yes,
             [#ifdef WIN32
              yes
