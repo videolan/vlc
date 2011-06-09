@@ -581,12 +581,17 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
 
     /* If the audio drift is too big then it's not worth trying to resample
      * the audio. */
-    mtime_t i_pts_tolerance = 3 * AOUT_PTS_TOLERANCE * i_input_rate / INPUT_RATE_DEFAULT;
-    if ( start_date != 0 &&
-         ( start_date < p_buffer->i_pts - i_pts_tolerance ) )
+    if( !start_date )
+        start_date = p_buffer->i_pts;
+
+    mtime_t tolerance = 3 * AOUT_PTS_TOLERANCE
+                          * i_input_rate / INPUT_RATE_DEFAULT;
+    mtime_t drift = start_date - p_buffer->i_pts;
+
+    if( drift < -tolerance )
     {
-        msg_Warn( p_aout, "audio drift is too big (%"PRId64"), clearing out",
-                  start_date - p_buffer->i_pts );
+        msg_Warn( p_aout, "buffer way too early (%"PRId64"), clearing queue",
+                  drift );
         aout_lock_input_fifos( p_aout );
         aout_FifoSet( &p_input->mixer.fifo, 0 );
         aout_unlock_input_fifos( p_aout );
@@ -594,18 +599,15 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
             msg_Warn( p_aout, "timing screwed, stopping resampling" );
         inputResamplingStop( p_input );
         p_buffer->i_flags |= BLOCK_FLAG_DISCONTINUITY;
-        start_date = 0;
+        start_date = p_buffer->i_pts;
     }
-    else if ( start_date != 0 &&
-              ( start_date > p_buffer->i_pts + i_pts_tolerance) )
+    else if( drift > +tolerance )
     {
-        msg_Warn( p_aout, "audio drift is too big (%"PRId64"), dropping buffer",
-                  start_date - p_buffer->i_pts );
+        msg_Warn( p_aout, "buffer way too late (%"PRId64"), dropping buffer",
+                  drift );
         inputDrop( p_input, p_buffer );
         return 0;
     }
-
-    if ( start_date == 0 ) start_date = p_buffer->i_pts;
 
 #ifndef AOUT_PROCESS_BEFORE_CHEKS
     /* Run pre-filters. */
@@ -617,8 +619,7 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
     /* Run the resampler if needed.
      * We first need to calculate the output rate of this resampler. */
     if ( ( p_input->i_resampling_type == AOUT_RESAMPLING_NONE ) &&
-         ( start_date < p_buffer->i_pts - AOUT_PTS_TOLERANCE
-           || start_date > p_buffer->i_pts + AOUT_PTS_TOLERANCE ) &&
+         ( drift < -AOUT_PTS_TOLERANCE || drift > +AOUT_PTS_TOLERANCE ) &&
          p_input->i_nb_resamplers > 0 )
     {
         /* Can happen in several circumstances :
@@ -628,20 +629,13 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
          *    synchronization
          * Solution : resample the buffer to avoid a scratch.
          */
-        mtime_t drift = p_buffer->i_pts - start_date;
-
         p_input->i_resamp_start_date = now;
-        p_input->i_resamp_start_drift = (int)drift;
-
-        if ( drift > 0 )
-            p_input->i_resampling_type = AOUT_RESAMPLING_DOWN;
-        else
-            p_input->i_resampling_type = AOUT_RESAMPLING_UP;
-
-        msg_Warn( p_aout, "buffer is %"PRId64" %s, triggering %ssampling",
-                          drift > 0 ? drift : -drift,
-                          drift > 0 ? "in advance" : "late",
-                          drift > 0 ? "down" : "up");
+        p_input->i_resamp_start_drift = (int)-drift;
+        p_input->i_resampling_type = (drift < 0) ? AOUT_RESAMPLING_DOWN
+                                                 : AOUT_RESAMPLING_UP;
+        msg_Warn( p_aout, (drift < 0)
+                  ? "buffer too early (%"PRId64"), down-sampling"
+                  : "buffer too late  (%"PRId64"), up-sampling", drift );
     }
 
     if ( p_input->i_resampling_type != AOUT_RESAMPLING_NONE )
@@ -651,13 +645,9 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
          * it isn't too audible to the listener. */
 
         if( p_input->i_resampling_type == AOUT_RESAMPLING_UP )
-        {
             p_input->pp_resamplers[0]->fmt_in.audio.i_rate += 2; /* Hz */
-        }
         else
-        {
             p_input->pp_resamplers[0]->fmt_in.audio.i_rate -= 2; /* Hz */
-        }
 
         /* Check if everything is back to normal, in which case we can stop the
          * resampling */
