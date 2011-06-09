@@ -120,6 +120,7 @@ static int Activate( vlc_object_t *p_this )
                     p_filter->pf_video_filter = I422_UYVY_Filter;
                     break;
 
+                case VLC_FOURCC('I','U','Y','V'):
                     p_filter->pf_video_filter = I422_IUYV_Filter;
                     break;
 
