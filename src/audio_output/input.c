@@ -542,14 +542,14 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
         p_input->i_last_input_rate = i_input_rate;
     }
 
+    mtime_t now = mdate();
+
     /* We don't care if someone changes the start date behind our back after
      * this. We'll deal with that when pushing the buffer, and compensate
      * with the next incoming buffer. */
     aout_lock_input_fifos( p_aout );
     start_date = aout_FifoNextStart( &p_input->mixer.fifo );
-    aout_unlock_input_fifos( p_aout );
 
-    mtime_t now = mdate();
     if ( start_date != 0 && start_date < now )
     {
         /* The decoder is _very_ late. This can only happen if the user
@@ -573,10 +573,9 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
          * can't present it anyway, so drop the buffer. */
         msg_Warn( p_aout, "PTS is out of range (%"PRId64"), dropping buffer",
                   now - p_buffer->i_pts );
-
         inputDrop( p_input, p_buffer );
         inputResamplingStop( p_input );
-        return 0;
+        goto out;
     }
 
     /* If the audio drift is too big then it's not worth trying to resample
@@ -592,9 +591,7 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
     {
         msg_Warn( p_aout, "buffer way too early (%"PRId64"), clearing queue",
                   drift );
-        aout_lock_input_fifos( p_aout );
         aout_FifoSet( &p_input->mixer.fifo, 0 );
-        aout_unlock_input_fifos( p_aout );
         if ( p_input->i_resampling_type != AOUT_RESAMPLING_NONE )
             msg_Warn( p_aout, "timing screwed, stopping resampling" );
         inputResamplingStop( p_input );
@@ -607,14 +604,14 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
         msg_Warn( p_aout, "buffer way too late (%"PRId64"), dropping buffer",
                   drift );
         inputDrop( p_input, p_buffer );
-        return 0;
+        goto out;
     }
 
 #ifndef AOUT_PROCESS_BEFORE_CHEKS
     /* Run pre-filters. */
     aout_FiltersPlay( p_input->pp_filters, p_input->i_nb_filters, &p_buffer );
     if( !p_buffer )
-        return 0;
+        goto out;
 #endif
 
     /* Run the resampler if needed.
@@ -696,19 +693,18 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
     }
 
     if( !p_buffer )
-        return 0;
+        goto out;
     if( p_buffer->i_nb_samples <= 0 )
     {
         block_Release( p_buffer );
-        return 0;
+        goto out;
     }
 #endif
 
     /* Adding the start date will be managed by aout_FifoPush(). */
     p_buffer->i_pts = start_date;
-
-    aout_lock_input_fifos( p_aout );
     aout_FifoPush( &p_input->mixer.fifo, p_buffer );
+out:
     aout_unlock_input_fifos( p_aout );
     return 0;
 }
