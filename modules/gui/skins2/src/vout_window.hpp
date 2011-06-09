@@ -47,6 +47,7 @@ public:
     using GenericWindow::move;
     using GenericWindow::resize;
     using GenericWindow::getOSHandle;
+    using GenericWindow::getMonitorInfo;
     //@}
 
     /// get the parent  window

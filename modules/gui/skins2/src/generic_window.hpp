@@ -103,6 +103,7 @@ public:
     int getTop() const { return m_top; }
     int getWidth() const { return m_width; }
     int getHeight() const { return m_height; }
+    void getMonitorInfo( int* x, int* y, int* width, int* height ) const;
 
     /// Give access to the visibility variable
     VarBool &getVisibleVar() { return *m_pVarVisible; }

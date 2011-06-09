@@ -120,6 +120,15 @@ public:
     virtual int getScreenWidth() const = 0;
     virtual int getScreenHeight() const = 0;
 
+    /// Get Monitor Information for a given Window
+    virtual void getMonitorInfo( const GenericWindow &rWindow,
+                                 int* x, int* y,
+                                 int* width, int* height ) const = 0;
+
+    /// Get Monitor Information (screens numbered from 0 upwards.)
+    virtual void getMonitorInfo( int num, int* x, int* y,
+                                 int* width, int* height ) const = 0;
+
     /// Get the work area (screen area without taskbars)
     virtual SkinsRect getWorkArea() const = 0;
 

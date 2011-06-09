@@ -127,6 +127,16 @@ LRESULT CALLBACK Win32Factory::Win32Proc( HWND hwnd, UINT uMsg,
 }
 
 
+BOOL CALLBACK Win32Factory::MonitorEnumProc( HMONITOR hMonitor, HDC hdcMonitor,
+                                             LPRECT lprcMonitor, LPARAM dwData )
+{
+    (void)hdcMonitor; (void)lprcMonitor;
+    list<HMONITOR>* pList = (list<HMONITOR>*)dwData;
+    pList->push_back( hMonitor );
+
+    return TRUE;
+}
+
 Win32Factory::Win32Factory( intf_thread_t *pIntf ):
     OSFactory( pIntf ), m_hParentWindow( NULL ),
     m_dirSep( "\\" )
@@ -230,6 +240,24 @@ bool Win32Factory::init()
     m_resourcePath.push_back( (string)datadir + "\\share\\skins" );
     m_resourcePath.push_back( (string)datadir + "\\share\\skins2" );
     free( datadir );
+
+    // Enumerate all monitors available
+    EnumDisplayMonitors( NULL, NULL, MonitorEnumProc, (LPARAM)&m_monitorList );
+    int num = 0;
+    for( list<HMONITOR>::iterator it = m_monitorList.begin();
+         it != m_monitorList.end(); ++it, num++ )
+    {
+        MONITORINFO mi;
+        mi.cbSize = sizeof( MONITORINFO );
+        if( GetMonitorInfo( *it, &mi ) )
+        {
+            msg_Dbg( getIntf(), "monitor #%i, %ldx%ld at +%ld+%ld", num,
+                        mi.rcMonitor.right - mi.rcMonitor.left,
+                        mi.rcMonitor.bottom - mi.rcMonitor.top,
+                        mi.rcMonitor.left,
+                        mi.rcMonitor.top );
+        }
+    }
 
     // All went well
     return true;
@@ -351,6 +379,63 @@ int Win32Factory::getScreenWidth() const
 int Win32Factory::getScreenHeight() const
 {
     return GetSystemMetrics(SM_CYSCREEN);
+}
+
+
+void Win32Factory::getMonitorInfo( const GenericWindow &rWindow,
+                                   int* p_x, int* p_y,
+                                   int* p_width, int* p_height ) const
+{
+    HWND wnd = (HWND)rWindow.getOSHandle();
+    HMONITOR hmon = MonitorFromWindow( wnd, MONITOR_DEFAULTTONEAREST );
+    MONITORINFO mi;
+    mi.cbSize = sizeof( MONITORINFO );
+    if( hmon && GetMonitorInfo( hmon, &mi ) )
+    {
+        *p_x = mi.rcMonitor.left;
+        *p_y = mi.rcMonitor.top;
+        *p_width = mi.rcMonitor.right - mi.rcMonitor.left;
+        *p_height = mi.rcMonitor.bottom - mi.rcMonitor.top;
+    }
+    else
+    {
+        *p_x = 0;
+        *p_y = 0;
+        *p_width = getScreenWidth();
+        *p_height = getScreenHeight();
+    }
+}
+
+
+void Win32Factory::getMonitorInfo( int numScreen, int* p_x, int* p_y,
+                                   int* p_width, int* p_height ) const
+{
+    HMONITOR hmon = NULL;
+    list<HMONITOR>::const_iterator it = m_monitorList.begin();
+    for( int i = 0; it != m_monitorList.end(); ++it, i++ )
+    {
+        if( i == numScreen )
+        {
+            hmon = *it;
+            break;
+        }
+    }
+    MONITORINFO mi;
+    mi.cbSize = sizeof( MONITORINFO );
+    if( hmon && GetMonitorInfo( hmon, &mi ) )
+    {
+        *p_x = mi.rcMonitor.left;
+        *p_y = mi.rcMonitor.top;
+        *p_width = mi.rcMonitor.right - mi.rcMonitor.left;
+        *p_height = mi.rcMonitor.bottom - mi.rcMonitor.top;
+    }
+    else
+    {
+        *p_x = 0;
+        *p_y = 0;
+        *p_width = getScreenWidth();
+        *p_height = getScreenHeight();
+    }
 }
 
 

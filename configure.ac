@@ -3678,10 +3678,11 @@ AS_IF([test "${enable_skins2}" = "yes"], [
 
   ], [
     PKG_CHECK_MODULES([XPM], [xpm])
+    PKG_CHECK_MODULES([XINERAMA], [xinerama])
     PKG_CHECK_MODULES([XEXT], [xext])
     VLC_ADD_CPPFLAGS([skins2],[-Imodules/gui/skins2 ${X_CFLAGS} ${XEXT_CFLAGS} ${XPM_CFLAGS} -DX11_SKINS])
     VLC_ADD_CXXFLAGS([skins2],[-O2 -fno-rtti])
-    VLC_ADD_LIBS([skins2],[${X_LIBS} ${X_PRE_LIBS} ${XEXT_LIBS} ${XPM_LIBS} -lX11])
+    VLC_ADD_LIBS([skins2],[${X_LIBS} ${X_PRE_LIBS} ${XEXT_LIBS} ${XPM_LIBS} ${XINERAMA_LIBS} -lX11])
 
   ])
   VLC_ADD_PLUGIN([skins2])

@@ -169,6 +169,16 @@ void FscWindow::innerHide()
 }
 
 
+void FscWindow::moveTo( int x, int y, int width, int height )
+{
+    // relocate the fs controller
+    // (centered horizontally and lowered vertically with a 3% margin)
+    int x_fsc = x + ( width - getWidth() ) / 2;
+    int y_fsc = y + height - getHeight() - height * 3 / 100;
+    move( x_fsc, y_fsc );
+}
+
+
 void FscWindow::CmdFscHide::execute()
 {
     m_pParent->onTimerExpired();

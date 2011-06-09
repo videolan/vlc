@@ -199,3 +199,10 @@ void GenericWindow::invalidateRect( int left, int top, int width, int height )
             refresh( left, top, width, height );
     }
 }
+
+
+void GenericWindow::getMonitorInfo( int* x, int* y, int* width, int* height ) const
+{
+    OSFactory *pOsFactory = OSFactory::instance( getIntf() );
+    pOsFactory->getMonitorInfo( *this, x, y, width, height );
+}

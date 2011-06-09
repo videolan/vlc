@@ -28,6 +28,7 @@
 #include <dirent.h>
 #include <sys/stat.h>
 #include <X11/Xlib.h>
+#include <X11/extensions/Xinerama.h>
 
 #include "x11_factory.hpp"
 #include "x11_display.hpp"
@@ -89,6 +90,9 @@ bool X11Factory::init()
     datadir = config_GetDataDir( getIntf() );
     m_resourcePath.push_back( (string)datadir + "/skins2" );
     free( datadir );
+
+    // Determine the monitor geometry
+    getDefaultGeometry( &m_screenWidth, &m_screenHeight );
 
     return true;
 }
@@ -171,17 +175,130 @@ OSPopup *X11Factory::createOSPopup()
 
 int X11Factory::getScreenWidth() const
 {
-    Display *pDisplay = m_pDisplay->getDisplay();
-    int screen = DefaultScreen( pDisplay );
-    return DisplayWidth( pDisplay, screen );
+    return m_screenWidth;
 }
 
 
 int X11Factory::getScreenHeight() const
 {
+    return m_screenHeight;
+}
+
+
+void X11Factory::getMonitorInfo( const GenericWindow &rWindow,
+                                 int* p_x, int* p_y,
+                                 int* p_width, int* p_height ) const
+{
+    // initialize to default geometry
+    *p_x = 0;
+    *p_y = 0;
+    *p_width = getScreenWidth();
+    *p_height = getScreenHeight();
+
+    // Use Xinerama to determine the monitor where the video
+    // mostly resides (biggest surface)
     Display *pDisplay = m_pDisplay->getDisplay();
+    Window wnd = (Window)rWindow.getOSHandle();
+    Window root = DefaultRootWindow( pDisplay );
+    Window child_wnd;
+
+    int x, y;
+    unsigned int w, h, border, depth;
+    XGetGeometry( pDisplay, wnd, &root, &x, &y, &w, &h, &border, &depth );
+    XTranslateCoordinates( pDisplay, wnd, root, 0, 0, &x, &y, &child_wnd );
+
+    int num;
+    XineramaScreenInfo* info = XineramaQueryScreens( pDisplay, &num );
+    if( info )
+    {
+        unsigned int surface = 0;
+        for( int i = 0; i < num; i++ )
+        {
+            Region reg1 = XCreateRegion();
+            XRectangle rect1 = { info[i].x_org, info[i].y_org,
+                                 info[i].width, info[i].height };
+            XUnionRectWithRegion( &rect1, reg1, reg1 );
+
+            Region reg2 = XCreateRegion();
+            XRectangle rect2 = { x, y, w, h };
+            XUnionRectWithRegion( &rect2, reg2, reg2 );
+
+            Region reg = XCreateRegion();
+            XIntersectRegion( reg1, reg2, reg );
+            XRectangle rect;
+            XClipBox( reg, &rect );
+            unsigned int surf = rect.width * rect.height;
+            if( surf > surface )
+            {
+               surface = surf;
+               *p_x = info[i].x_org;
+               *p_y = info[i].y_org;
+               *p_width = info[i].width;
+               *p_height = info[i].height;
+            }
+        }
+        XFree( info );
+    }
+}
+
+
+void X11Factory::getMonitorInfo( int numScreen,
+                                 int* p_x, int* p_y,
+                                 int* p_width, int* p_height ) const
+{
+    // initialize to default geometry
+    *p_x = 0;
+    *p_y = 0;
+    *p_width = getScreenWidth();
+    *p_height = getScreenHeight();
+
+    // try to detect the requested screen via Xinerama
+    if( numScreen >= 0 )
+    {
+        int num;
+        Display *pDisplay = m_pDisplay->getDisplay();
+        XineramaScreenInfo* info = XineramaQueryScreens( pDisplay, &num );
+        if( info )
+        {
+            if( numScreen < num )
+            {
+                *p_x = info[numScreen].x_org;
+                *p_y = info[numScreen].y_org;
+                *p_width = info[numScreen].width;
+                *p_height = info[numScreen].height;
+            }
+            XFree( info );
+        }
+    }
+}
+
+
+void X11Factory::getDefaultGeometry( int* p_width, int* p_height ) const
+{
+    Display *pDisplay = m_pDisplay->getDisplay();
+
+    // Initialize to defaults
     int screen = DefaultScreen( pDisplay );
-    return DisplayHeight( pDisplay, screen );
+    *p_width = DisplayWidth( pDisplay, screen );
+    *p_height = DisplayHeight( pDisplay, screen );
+
+    // Use Xinerama to restrain to the first monitor instead of the full
+    // virtual screen
+    int num;
+    XineramaScreenInfo* info = XineramaQueryScreens( pDisplay, &num );
+    if( info )
+    {
+        for( int i = 0; i < num; i++ )
+        {
+            if( info[i].x_org == 0 && info[i].y_org == 0 )
+            {
+                *p_width = info[i].width;
+                *p_height = info[i].height;
+                break;
+            }
+        }
+        XFree( info );
+    }
 }
 
 
@@ -243,6 +360,5 @@ void X11Factory::rmDir( const string &rPath )
     // And delete it
     rmdir( rPath.c_str() );
 }
-
 
 #endif

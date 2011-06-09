@@ -57,6 +57,9 @@ public:
     /// Action for each transition of fading out
     virtual void onTimerExpired();
 
+    /// Relocate fsc into new area
+    virtual void moveTo( int x, int y, int width, int height );
+
 private:
     /// Timer for fsc fading-out
     OSTimer *m_pTimer;

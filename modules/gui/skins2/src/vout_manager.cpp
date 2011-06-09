@@ -277,6 +277,22 @@ void VoutManager::setFullscreenWnd( vout_window_t *pWnd, bool b_fullscreen )
     msg_Dbg( pWnd, "setFullscreen (%i) received from vout thread",
                    b_fullscreen );
 
+    // reconfigure the fullscreen window (multiple screens)
+    if( b_fullscreen )
+    {
+        vector<SavedWnd>::iterator it;
+        for( it = m_SavedWndVec.begin(); it != m_SavedWndVec.end(); ++it )
+        {
+            if( (*it).pWnd == pWnd )
+            {
+                VoutWindow* pVoutWindow = it->pVoutWindow;
+                configureFullscreen( *pVoutWindow );
+            }
+            break;
+        }
+    }
+
+    // set fullscreen
     VlcProc::instance( getIntf() )->setFullscreenVar( b_fullscreen );
 }
 
@@ -294,3 +310,36 @@ void VoutManager::onUpdate( Subject<VarBool> &rVariable, void *arg )
     }
 }
 
+
+void VoutManager::configureFullscreen( VoutWindow& rWindow )
+{
+    int numScr = var_InheritInteger( getIntf(), "qt-fullscreen-screennumber" );
+    int x0 = m_pVoutMainWindow->getTop();
+    int y0 = m_pVoutMainWindow->getLeft();
+
+    int x, y, w, h;
+    if( numScr >= 0 )
+    {
+        // select screen requested by user
+        OSFactory *pOsFactory = OSFactory::instance( getIntf() );
+        pOsFactory->getMonitorInfo( numScr, &x, &y, &w, &h );
+    }
+    else
+    {
+        // select screen where display is already occurring
+        rWindow.getMonitorInfo( &x, &y, &w, &h );
+    }
+
+    if( x != x0 || y != y0 )
+    {
+        // move and resize fullscreen
+        m_pVoutMainWindow->move( x, y );
+        m_pVoutMainWindow->resize( w, h );
+
+        // ensure the fs controller is also moved
+        if( m_pFscWindow )
+        {
+            m_pFscWindow->moveTo( x, y, w, h );
+        }
+    }
+}

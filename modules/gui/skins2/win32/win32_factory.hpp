@@ -101,6 +101,14 @@ public:
     virtual int getScreenWidth() const;
     virtual int getScreenHeight() const;
 
+    /// Get Monitor Information
+    virtual void getMonitorInfo( const GenericWindow &rWindow,
+                                 int* x, int* y,
+                                 int* width, int* height ) const;
+    virtual void getMonitorInfo( int numScreen,
+                                 int* x, int* y,
+                                 int* width, int* height ) const;
+
     /// Get the work area (screen area without taskbars)
     virtual SkinsRect getWorkArea() const;
 
@@ -122,6 +130,9 @@ public:
     static LRESULT CALLBACK Win32Proc( HWND hwnd, UINT uMsg,
                                        WPARAM wParam, LPARAM lParam );
 
+    /// Callback (enumerate multiple screens)
+    static BOOL CALLBACK MonitorEnumProc( HMONITOR hMonitor, HDC hdcMonitor,
+                                          LPRECT lprcMonitor, LPARAM dwData );
 private:
     /// Handle of the instance
     HINSTANCE m_hInst;
@@ -137,6 +148,8 @@ private:
     const string m_dirSep;
     /// Resource path
     list<string> m_resourcePath;
+    /// Monitors detected
+    list<HMONITOR> m_monitorList;
 };
 
 

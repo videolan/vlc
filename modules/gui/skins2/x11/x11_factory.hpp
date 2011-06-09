@@ -127,6 +127,16 @@ public:
     virtual int getScreenWidth() const;
     virtual int getScreenHeight() const;
 
+    /// Get Monitor Information
+    virtual void getMonitorInfo( const GenericWindow &rWindow,
+                                 int* x, int* y,
+                                 int* width, int* height ) const;
+    virtual void getMonitorInfo( int numScreen,
+                                 int* x, int* y,
+                                 int* width, int* height ) const;
+
+    virtual void getDefaultGeometry( int* width, int* height ) const;
+
     /// Get the work area (screen area without taskbars)
     virtual SkinsRect getWorkArea() const;
 
@@ -152,6 +162,8 @@ private:
     const string m_dirSep;
     /// Resource path
     list<string> m_resourcePath;
+    /// Monitor geometry
+    int m_screenWidth, m_screenHeight;
 };
 
 #endif

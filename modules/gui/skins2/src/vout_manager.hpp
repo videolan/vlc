@@ -34,6 +34,7 @@
 #include "../controls/ctrl_video.hpp"
 #include "../events/evt_key.hpp"
 #include "../events/evt_scroll.hpp"
+#include "../src/fsc_window.hpp"
 
 class VarBool;
 class GenericWindow;
@@ -146,6 +147,9 @@ public:
 
     /// called when fullscreen variable changed
     virtual void onUpdate( Subject<VarBool> &rVariable , void* );
+
+    /// reconfigure fullscreen (multiple screens)
+    virtual void configureFullscreen( VoutWindow& rWindow );
 
 protected:
     // Protected because it is a singleton
