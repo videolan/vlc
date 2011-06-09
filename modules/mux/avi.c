@@ -307,9 +307,11 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
             {
                 case VLC_CODEC_A52:
                     p_wf->wFormatTag = WAVE_FORMAT_A52;
+                    p_wf->nBlockAlign= 1;
                     break;
                 case VLC_CODEC_MPGA:
                     p_wf->wFormatTag = WAVE_FORMAT_MPEGLAYER3;
+                    p_wf->nBlockAlign= 1;
                     break;
                 case VLC_CODEC_WMA1:
                     p_wf->wFormatTag = WAVE_FORMAT_WMA1;
@@ -328,21 +330,29 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
                     p_wf->wFormatTag = WAVE_FORMAT_PCM;
                     p_wf->nBlockAlign= p_wf->nChannels;
                     p_wf->wBitsPerSample = 8;
+                    p_wf->nAvgBytesPerSec = (p_wf->wBitsPerSample/8) *
+                                      p_wf->nSamplesPerSec * p_wf->nChannels;
                     break;
                 case VLC_CODEC_S16L:
                     p_wf->wFormatTag = WAVE_FORMAT_PCM;
                     p_wf->nBlockAlign= 2 * p_wf->nChannels;
                     p_wf->wBitsPerSample = 16;
+                    p_wf->nAvgBytesPerSec = (p_wf->wBitsPerSample/8) *
+                                      p_wf->nSamplesPerSec * p_wf->nChannels;
                     break;
                 case VLC_CODEC_S24L:
                     p_wf->wFormatTag = WAVE_FORMAT_PCM;
                     p_wf->nBlockAlign= 3 * p_wf->nChannels;
                     p_wf->wBitsPerSample = 24;
+                    p_wf->nAvgBytesPerSec = (p_wf->wBitsPerSample/8) *
+                                      p_wf->nSamplesPerSec * p_wf->nChannels;
                     break;
                 case VLC_CODEC_S32L:
                     p_wf->wFormatTag = WAVE_FORMAT_PCM;
                     p_wf->nBlockAlign= 4 * p_wf->nChannels;
                     p_wf->wBitsPerSample = 32;
+                    p_wf->nAvgBytesPerSec = (p_wf->wBitsPerSample/8) *
+                                      p_wf->nSamplesPerSec * p_wf->nChannels;
                     break;
                 default:
                     return VLC_EGENERIC;
@@ -457,6 +467,24 @@ static int Mux      ( sout_mux_t *p_mux )
             {
                 block_t *p_next = block_FifoShow( p_fifo );
                 p_data->i_length = p_next->i_dts - p_data->i_dts;
+            }
+
+
+            if( p_stream->i_frames == 0 &&p_stream->i_cat == VIDEO_ES )
+            {
+               /* Add header present at the end of BITMAP info header
+                  to first frame in case of XVID */
+               if( p_stream->p_bih->biCompression
+                               == VLC_FOURCC( 'X', 'V', 'I', 'D' ) )
+               {
+                   int i_header_length =
+                       p_stream->p_bih->biSize - sizeof(BITMAPINFOHEADER);
+                   p_data = block_Realloc( p_data,
+                                   i_header_length, p_data->i_buffer );
+                   if( !p_data)
+                       return VLC_ENOMEM;
+                   memcpy(p_data->p_buffer,&p_stream->p_bih[1], i_header_length);
+               }
             }
 
             p_stream->i_frames++;
@@ -819,7 +847,12 @@ static block_t *avi_HeaderCreateRIFF( sout_mux_t *p_mux )
     bo_AddFCC( &bo, "AVI " );
 
     bo_AddFCC( &bo, "LIST" );
-    bo_AddDWordLE( &bo, HDR_SIZE - 8);
+    /* HDRL List size should exclude following data in HDR buffer
+     *  -12 (RIFF, RIFF size, 'AVI ' tag),
+     *  - 8 (hdr1 LIST tag and its size)
+     *  - 12 (movi LIST tag, size, 'movi' listType )
+     */
+    bo_AddDWordLE( &bo, HDR_SIZE - 12 - 8 - 12);
     bo_AddFCC( &bo, "hdrl" );
 
     avi_HeaderAdd_avih( p_mux, &bo );
@@ -843,21 +876,20 @@ static block_t *avi_HeaderCreateRIFF( sout_mux_t *p_mux )
 static block_t * avi_HeaderCreateidx1( sout_mux_t *p_mux )
 {
     sout_mux_sys_t      *p_sys = p_mux->p_sys;
-    block_t       *p_idx1;
+    block_t             *p_idx1;
     uint32_t            i_idx1_size;
-    unsigned int        i;
     buffer_out_t        bo;
 
-    i_idx1_size = 16 * p_sys->idx1.i_entry_count;
+    i_idx1_size = 16 * p_sys->idx1.i_entry_count + 8;
 
-    p_idx1 = block_New( p_mux, i_idx1_size + 8 );
-    memset( p_idx1->p_buffer, 0, i_idx1_size );
+    p_idx1 = block_New( p_mux, i_idx1_size);
+    memset( p_idx1->p_buffer, 0, i_idx1_size);
 
     bo_Init( &bo, i_idx1_size, p_idx1->p_buffer );
     bo_AddFCC( &bo, "idx1" );
-    bo_AddDWordLE( &bo, i_idx1_size );
+    bo_AddDWordLE( &bo, i_idx1_size - 8);
 
-    for( i = 0; i < p_sys->idx1.i_entry_count; i++ )
+    for( unsigned i = 0; i < p_sys->idx1.i_entry_count; i++ )
     {
         bo_AddFCC( &bo, p_sys->idx1.entry[i].fcc );
         bo_AddDWordLE( &bo, p_sys->idx1.entry[i].i_flags );
