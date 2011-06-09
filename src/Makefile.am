@@ -229,8 +229,8 @@ libvlc_la_LDFLAGS = $(AM_LDFLAGS) `$(VLC_CONFIG) --ldflags libvlc` \
 	-export-symbols $(srcdir)/libvlc.sym
 libvlc_la_DEPENDENCIES = libvlc.sym libvlccore.la
 if HAVE_WIN32
-libvlc_la_DEPENDENCIES += $(DATA_win32_rc_lib)
-libvlc_la_LDFLAGS += -Wl,$(DATA_win32_rc_lib)
+libvlc_la_DEPENDENCIES += libvlc_win32_rc.$(OBJEXT)
+libvlc_la_LDFLAGS += -Wl,libvlc_win32_rc.$(OBJEXT)
 endif
 
 
