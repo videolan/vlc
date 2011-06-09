@@ -92,7 +92,7 @@ sh $VLC_SOURCEDIR/configure --host=arm-eabi-linux --build=x86_64-unknown-linux $
                 --disable-sqlite \
                 --disable-udev \
                 --disable-libxml2 \
-                --enable-android-vout \
+                --enable-android-surface \
                 --disable-caca \
                 --disable-glx \
                 --disable-egl \

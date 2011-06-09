@@ -3319,6 +3319,19 @@ dnl
 PKG_ENABLE_MODULES_VLC([SVG], [], [librsvg-2.0 >= 2.9.0], [SVG rendering library],[auto])
 
 dnl
+dnl  android surface module
+dnl
+AC_ARG_ENABLE(android-surface,
+  [  --enable-android-surface   Android Surface video output module (default disabled)])
+if test "${enable_android_surface}" = "yes"; then
+  if test "${HAVE_ANDROID}" = "1"; then
+     VLC_ADD_PLUGIN([android_surface])
+     VLC_ADD_LDFLAGS([android_surface], [-ldl])
+  fi
+fi
+
+
+dnl
 dnl  iOS vout module
 dnl
 AC_ARG_ENABLE(ios-vout,

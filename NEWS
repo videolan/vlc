@@ -79,6 +79,7 @@ Video Output:
  * Various vmem improvements
  * OpenGL video output now accepts YUV as input and uses fragment programs for
    chroma conversion
+ * New video output for Android platform, based on Surface
 
 Audio Output:
  * New audio output based on AudioQueue API for iOS
