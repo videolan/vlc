@@ -211,16 +211,16 @@ void X11Factory::getMonitorInfo( const GenericWindow &rWindow,
     XineramaScreenInfo* info = XineramaQueryScreens( pDisplay, &num );
     if( info )
     {
+        Region reg1 = XCreateRegion();
+        XRectangle rect1 = { x, y, w, h };
+        XUnionRectWithRegion( &rect1, reg1, reg1 );
+
         unsigned int surface = 0;
         for( int i = 0; i < num; i++ )
         {
-            Region reg1 = XCreateRegion();
-            XRectangle rect1 = { info[i].x_org, info[i].y_org,
-                                 info[i].width, info[i].height };
-            XUnionRectWithRegion( &rect1, reg1, reg1 );
-
             Region reg2 = XCreateRegion();
-            XRectangle rect2 = { x, y, w, h };
+            XRectangle rect2 = { info[i].x_org, info[i].y_org,
+                                 info[i].width, info[i].height };
             XUnionRectWithRegion( &rect2, reg2, reg2 );
 
             Region reg = XCreateRegion();
@@ -236,7 +236,10 @@ void X11Factory::getMonitorInfo( const GenericWindow &rWindow,
                *p_width = info[i].width;
                *p_height = info[i].height;
             }
+            XDestroyRegion( reg );
+            XDestroyRegion( reg2 );
         }
+        XDestroyRegion( reg1 );
         XFree( info );
     }
 }
