@@ -100,7 +100,6 @@ int aout_InputDelete( aout_instance_t * p_aout, aout_input_t * p_input );
 int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
                     aout_buffer_t * p_buffer, int i_input_rate );
 void aout_InputCheckAndRestart( aout_instance_t * p_aout, aout_input_t * p_input );
-bool aout_InputIsEmpty( aout_instance_t * p_aout, aout_input_t * p_input );
 
 /* From filters.c : */
 int aout_FiltersCreatePipeline( aout_instance_t *, filter_t **, int *,
@@ -145,6 +144,7 @@ int aout_DecPlay( aout_instance_t *, aout_input_t *, aout_buffer_t *, int i_inpu
 int aout_DecGetResetLost( aout_instance_t *, aout_input_t * );
 void aout_DecChangePause( aout_instance_t *, aout_input_t *, bool b_paused, mtime_t i_date );
 void aout_DecFlush( aout_instance_t *, aout_input_t * );
+bool aout_DecIsEmpty( aout_instance_t * p_aout, aout_input_t * p_input );
 
 /* Audio output locking */
 

@@ -287,3 +287,12 @@ void aout_DecFlush( aout_instance_t *p_aout, aout_input_t *p_input )
     aout_unlock_input_fifos( p_aout );
 }
 
+bool aout_DecIsEmpty( aout_instance_t * p_aout, aout_input_t * p_input )
+{
+    mtime_t end_date;
+
+    aout_lock_input_fifos( p_aout );
+    end_date = aout_FifoNextStart( &p_input->mixer.fifo );
+    aout_unlock_input_fifos( p_aout );
+    return end_date <= mdate();
+}
