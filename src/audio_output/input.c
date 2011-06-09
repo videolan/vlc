@@ -549,13 +549,14 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
     start_date = aout_FifoNextStart( &p_input->mixer.fifo );
     aout_unlock_input_fifos( p_aout );
 
-    if ( start_date != 0 && start_date < mdate() )
+    mtime_t now = mdate();
+    if ( start_date != 0 && start_date < now )
     {
         /* The decoder is _very_ late. This can only happen if the user
          * pauses the stream (or if the decoder is buggy, which cannot
          * happen :). */
         msg_Warn( p_aout, "computed PTS is out of range (%"PRId64"), "
-                  "clearing out", mdate() - start_date );
+                  "clearing out", now - start_date );
         aout_lock_input_fifos( p_aout );
         aout_FifoSet( &p_input->mixer.fifo, 0 );
         aout_unlock_input_fifos( p_aout );
@@ -566,12 +567,12 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
         start_date = 0;
     }
 
-    if ( p_buffer->i_pts < mdate() + AOUT_MIN_PREPARE_TIME )
+    if ( p_buffer->i_pts < now + AOUT_MIN_PREPARE_TIME )
     {
         /* The decoder gives us f*cked up PTS. It's its business, but we
          * can't present it anyway, so drop the buffer. */
         msg_Warn( p_aout, "PTS is out of range (%"PRId64"), dropping buffer",
-                  mdate() - p_buffer->i_pts );
+                  now - p_buffer->i_pts );
 
         inputDrop( p_input, p_buffer );
         inputResamplingStop( p_input );
@@ -629,7 +630,7 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
          */
         mtime_t drift = p_buffer->i_pts - start_date;
 
-        p_input->i_resamp_start_date = mdate();
+        p_input->i_resamp_start_date = now;
         p_input->i_resamp_start_drift = (int)drift;
 
         if ( drift > 0 )
@@ -669,7 +670,7 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
             p_input->i_resampling_type = AOUT_RESAMPLING_NONE;
             msg_Warn( p_aout, "resampling stopped after %"PRIi64" usec "
                       "(drift: %"PRIi64")",
-                      mdate() - p_input->i_resamp_start_date,
+                      now - p_input->i_resamp_start_date,
                       p_buffer->i_pts - start_date);
         }
         else if( abs( (int)(p_buffer->i_pts - start_date) ) <
