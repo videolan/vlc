@@ -97,6 +97,7 @@ static int MixBuffer( aout_instance_t * p_aout, float volume )
     aout_mixer_input_t *p_input = p_mixer->input;
     aout_fifo_t *p_fifo = &p_input->fifo;
     mtime_t now = mdate();
+    const unsigned samples = p_aout->output.i_nb_samples;
 
     aout_lock_input_fifos( p_aout );
     aout_lock_output_fifo( p_aout );
@@ -119,41 +120,24 @@ static int MixBuffer( aout_instance_t * p_aout, float volume )
 
     aout_unlock_output_fifo( p_aout );
 
-    /* See if we have enough data to prepare a new buffer for the audio
-     * output. First : start date. */
+    /* See if we have enough data to prepare a new buffer for the audio output. */
+    aout_buffer_t *p_buffer = p_fifo->p_first;
+    if( p_buffer == NULL )
+        goto giveup;
+
+    /* Find the earliest start date available. */
     if ( !start_date )
     {
-        /* Find the latest start date available. */
-        aout_buffer_t *p_buffer;
-        for( ;; )
-        {
-            p_buffer = p_fifo->p_first;
-            if( p_buffer == NULL )
-                goto giveup;
-            if( p_buffer->i_pts >= now )
-                break;
-
-            msg_Warn( p_mixer, "input PTS is out of range (%"PRId64"), "
-                      "trashing", now - p_buffer->i_pts );
-            aout_BufferFree( aout_FifoPop( p_fifo ) );
-        }
-
-        date_Set( &exact_start_date, p_buffer->i_pts );
         start_date = p_buffer->i_pts;
+        date_Set( &exact_start_date, start_date );
     }
-
-    date_Increment( &exact_start_date, p_aout->output.i_nb_samples );
-    mtime_t end_date = date_Get( &exact_start_date );
+    /* Compute the end date for the new buffer. */
+    mtime_t end_date = date_Increment( &exact_start_date, samples );
 
     /* Check that start_date is available. */
-    aout_buffer_t *p_buffer = p_fifo->p_first;
     mtime_t prev_date;
-
     for( ;; )
     {
-        if( p_buffer == NULL )
-            goto giveup;
-
         /* Check for the continuity of start_date */
         prev_date = p_buffer->i_pts + p_buffer->i_length;
         if( prev_date >= start_date - 1 )
@@ -163,7 +147,10 @@ static int MixBuffer( aout_instance_t * p_aout, float volume )
         msg_Warn( p_mixer, "the mixer got a packet in the past (%"PRId64")",
                   start_date - prev_date );
         aout_BufferFree( aout_FifoPop( p_fifo ) );
+
         p_buffer = p_fifo->p_first;
+        if( p_buffer == NULL )
+            goto giveup;
     }
 
     /* Check that we have enough samples. */
@@ -218,7 +205,6 @@ static int MixBuffer( aout_instance_t * p_aout, float volume )
         }
 
         /* Build packet with adequate number of samples */
-        const unsigned samples = p_aout->output.i_nb_samples;
         unsigned needed = samples * framesize;
         p_buffer = block_Alloc( needed );
         if( unlikely(p_buffer == NULL) )
