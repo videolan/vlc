@@ -600,6 +600,7 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
         inputResamplingStop( p_input );
         p_buffer->i_flags |= BLOCK_FLAG_DISCONTINUITY;
         start_date = p_buffer->i_pts;
+        drift = 0;
     }
     else if( drift > +tolerance )
     {
