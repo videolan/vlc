@@ -62,3 +62,8 @@ vlc_cache_gen_LDADD = \
 	$(GNUGETOPT_LIBS) \
 	../compat/libcompat.la \
 	../src/libvlc.la ../src/libvlccore.la
+if HAVE_WIN32
+vlc_cache_gen_LDADD += vlc_win32_rc.$(OBJEXT)
+vlc_cache_gen_DEPENDENCIES = vlc_win32_rc.$(OBJEXT)
+endif
+
