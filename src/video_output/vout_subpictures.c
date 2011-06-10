@@ -223,7 +223,6 @@ static filter_t *SpuRenderCreateAndLoadText(spu_t *spu)
     /* Create a few variables used for enhanced text rendering */
     var_Create(text, "spu-elapsed",   VLC_VAR_TIME);
     var_Create(text, "text-rerender", VLC_VAR_BOOL);
-    var_Create(text, "scale",         VLC_VAR_INTEGER);
 
     return text;
 }
@@ -1031,8 +1030,6 @@ static subpicture_t *SpuRenderSubpictures(spu_t *spu,
 
             sys->text->fmt_out.video.i_height         =
             sys->text->fmt_out.video.i_visible_height = subpic->i_original_picture_height;
-
-            var_SetInteger(sys->text, "scale", SCALE_UNIT);
         }
 
         /* Render all regions

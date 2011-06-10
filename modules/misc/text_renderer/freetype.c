@@ -324,18 +324,15 @@ static int LoadFontsFromAttachments( filter_t *p_filter )
 static int GetFontSize( filter_t *p_filter )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
-    vlc_value_t   val;
     int           i_size = 0;
 
     if( p_sys->i_default_font_size )
     {
-        if( VLC_SUCCESS == var_Get( p_filter, "scale", &val ))
-            i_size = p_sys->i_default_font_size * val.i_int / 1000;
-        else
-            i_size = p_sys->i_default_font_size;
+        i_size = p_sys->i_default_font_size;
     }
     else
     {
+        vlc_value_t val;
         var_Get( p_filter, "freetype-rel-fontsize", &val );
         if( val.i_int  > 0 )
         {
@@ -347,10 +344,7 @@ static int GetFontSize( filter_t *p_filter )
     if( i_size <= 0 )
     {
         msg_Warn( p_filter, "invalid fontsize, using 12" );
-        if( VLC_SUCCESS == var_Get( p_filter, "scale", &val ))
-            i_size = 12 * val.i_int / 1000;
-        else
-            i_size = 12;
+        i_size = 12;
     }
     return i_size;
 }
@@ -1361,7 +1355,7 @@ static const struct {
 };
 
 static int HandleFontAttributes( xml_reader_t *p_xml_reader,
-                                  font_stack_t **p_fonts, int i_scale )
+                                 font_stack_t **p_fonts )
 {
     int        rv;
     char      *psz_fontname = NULL;
@@ -1380,7 +1374,7 @@ static int HandleFontAttributes( xml_reader_t *p_xml_reader,
                                  &i_karaoke_bg_color ))
     {
         psz_fontname = strdup( psz_fontname );
-        i_font_size = i_font_size * 1000 / i_scale;
+        i_font_size = i_font_size;
     }
     i_font_alpha = (i_font_color >> 24) & 0xff;
     i_font_color &= 0x00ffffff;
@@ -1436,7 +1430,7 @@ static int HandleFontAttributes( xml_reader_t *p_xml_reader,
     }
     rv = PushFont( p_fonts,
                    psz_fontname,
-                   i_font_size * i_scale / 1000,
+                   i_font_size,
                    (i_font_color & 0xffffff) | ((i_font_alpha & 0xff) << 24),
                    i_karaoke_bg_color );
 
@@ -1878,22 +1872,17 @@ static int ProcessNodes( filter_t *p_filter,
     filter_sys_t *p_sys          = p_filter->p_sys;
     uint32_t        *psz_text_orig  = psz_text;
     font_stack_t *p_fonts        = NULL;
-    vlc_value_t   val;
-    int           i_scale        = 1000;
 
     bool b_italic = false;
     bool b_bold   = false;
     bool b_uline  = false;
     bool b_through = false;
 
-    if( VLC_SUCCESS == var_Get( p_filter, "scale", &val ))
-        i_scale = val.i_int;
-
     if( p_font_style )
     {
         rv = PushFont( &p_fonts,
                p_font_style->psz_fontname,
-               p_font_style->i_font_size * i_scale / 1000,
+               p_font_style->i_font_size,
                (p_font_style->i_font_color & 0xffffff) |
                    ((p_font_style->i_font_alpha & 0xff) << 24),
                (p_font_style->i_karaoke_background_color & 0xffffff) |
@@ -1945,7 +1934,7 @@ static int ProcessNodes( filter_t *p_filter,
 
             case XML_READER_STARTELEM:
                 if( !strcasecmp( "font", node ) )
-                    rv = HandleFontAttributes( p_xml_reader, &p_fonts, i_scale );
+                    rv = HandleFontAttributes( p_xml_reader, &p_fonts );
                 else if( !strcasecmp( "b", node ) )
                     b_bold = true;
                 else if( !strcasecmp( "i", node ) )
@@ -2589,15 +2578,10 @@ static int RenderCommon( filter_t *p_filter, subpicture_region_t *p_region_out,
         IconvText( p_filter, p_region_in->psz_text, &i_iconv_length, psz_text );
         i_text_length = i_iconv_length;
 
-        int i_scale = 1000;
-        vlc_value_t val;
-        if( VLC_SUCCESS == var_Get( p_filter, "scale", &val ) )
-            i_scale = val.i_int;
-
         text_style_t *p_style;
         if( p_region_in->p_style )
             p_style = CreateStyle( p_region_in->p_style->psz_fontname,
-                                   p_region_in->p_style->i_font_size * i_scale / 1000,
+                                   p_region_in->p_style->i_font_size,
                                    (p_region_in->p_style->i_font_color & 0xffffff) |
                                    ((p_region_in->p_style->i_font_alpha & 0xff) << 24),
                                    0x00ffffff,
@@ -2607,7 +2591,7 @@ static int RenderCommon( filter_t *p_filter, subpicture_region_t *p_region_out,
                                    p_region_in->p_style->i_style_flags & STYLE_STRIKEOUT);
         else
             p_style = CreateStyle( p_sys->psz_fontfamily,
-                                   p_sys->i_font_size * i_scale / 1000,
+                                   p_sys->i_font_size,
                                    (p_sys->i_font_color & 0xffffff) |
                                    (((255-p_sys->i_font_opacity) & 0xff) << 24),
                                    0x00ffffff,

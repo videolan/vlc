@@ -316,7 +316,6 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
     uint32_t      i_font_color;
     bool          b_bold, b_uline, b_italic;
     vlc_value_t val;
-    int i_scale = 1000;
     b_bold = b_uline = b_italic = FALSE;
 
     p_sys->i_font_size    = GetFontSize( p_filter );
@@ -326,14 +325,11 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
     psz_string = p_region_in->psz_text;
     if( !psz_string || !*psz_string ) return VLC_EGENERIC;
 
-    if( VLC_SUCCESS == var_Get( p_filter, "scale", &val ))
-        i_scale = val.i_int;
-
     if( p_region_in->p_style )
     {
         i_font_color = __MAX( __MIN( p_region_in->p_style->i_font_color, 0xFFFFFF ), 0 );
         i_font_alpha = __MAX( __MIN( p_region_in->p_style->i_font_alpha, 255 ), 0 );
-        i_font_size  = __MAX( __MIN( p_region_in->p_style->i_font_size, 255 ), 0 ) * i_scale / 1000;
+        i_font_size  = __MAX( __MIN( p_region_in->p_style->i_font_size, 255 ), 0 );
         if( p_region_in->p_style->i_style_flags )
         {
             if( p_region_in->p_style->i_style_flags & STYLE_BOLD )
@@ -476,7 +472,7 @@ static int PeekFont( font_stack_t **p_font, char **psz_name, int *i_size,
 }
 
 static int HandleFontAttributes( xml_reader_t *p_xml_reader,
-                                  font_stack_t **p_fonts, int i_scale )
+                                  font_stack_t **p_fonts )
 {
     int        rv;
     char      *psz_fontname = NULL;
@@ -493,7 +489,7 @@ static int HandleFontAttributes( xml_reader_t *p_xml_reader,
                                  &i_font_color ))
     {
         psz_fontname = strdup( psz_fontname );
-        i_font_size = i_font_size * 1000 / i_scale;
+        i_font_size = i_font_size;
     }
     i_font_alpha = (i_font_color >> 24) & 0xff;
     i_font_color &= 0x00ffffff;
@@ -534,7 +530,7 @@ static int HandleFontAttributes( xml_reader_t *p_xml_reader,
     }
     rv = PushFont( p_fonts,
                    psz_fontname,
-                   i_font_size * i_scale / 1000,
+                   i_font_size,
                    (i_font_color & 0xffffff) | ((i_font_alpha & 0xff) << 24) );
 
     free( psz_fontname );
@@ -650,8 +646,6 @@ static int ProcessNodes( filter_t *p_filter,
     int           rv             = VLC_SUCCESS;
     filter_sys_t *p_sys          = p_filter->p_sys;
     font_stack_t *p_fonts        = NULL;
-    vlc_value_t   val;
-    int           i_scale        = 1000;
 
     int type;
     const char *node;
@@ -660,14 +654,11 @@ static int ProcessNodes( filter_t *p_filter,
     bool b_bold   = false;
     bool b_uline  = false;
 
-    if( VLC_SUCCESS == var_Get( p_filter, "scale", &val ))
-        i_scale = val.i_int;
-
     if( p_font_style )
     {
         rv = PushFont( &p_fonts,
                p_font_style->psz_fontname,
-               p_font_style->i_font_size * i_scale / 1000,
+               p_font_style->i_font_size,
                (p_font_style->i_font_color & 0xffffff) |
                    ((p_font_style->i_font_alpha & 0xff) << 24) );
 
@@ -705,7 +696,7 @@ static int ProcessNodes( filter_t *p_filter,
                 break;
             case XML_READER_STARTELEM:
                 if( !strcasecmp( "font", node ) )
-                    rv = HandleFontAttributes( p_xml_reader, &p_fonts, i_scale );
+                    rv = HandleFontAttributes( p_xml_reader, &p_fonts );
                 else if( !strcasecmp( "b", node ) )
                     b_bold = true;
                 else if( !strcasecmp( "i", node ) )
