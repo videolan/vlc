@@ -218,8 +218,6 @@ struct line_desc_t
 
     line_desc_t    *p_next;
 };
-static line_desc_t *NewLine( int );
-static void FreeLines( line_desc_t * );
 
 typedef struct font_stack_t font_stack_t;
 struct font_stack_t
@@ -1992,6 +1990,75 @@ static int ProcessNodes( filter_t *p_filter,
     return rv;
 }
 
+static void FreeLine( line_desc_t *p_line )
+{
+    unsigned int i;
+    for( i = 0; p_line->pp_glyphs[ i ] != NULL; i++ )
+    {
+        FT_Done_Glyph( (FT_Glyph)p_line->pp_glyphs[ i ] );
+    }
+    free( p_line->pp_glyphs );
+    free( p_line->p_glyph_pos );
+    free( p_line->p_fg_rgb );
+    free( p_line->p_bg_rgb );
+    free( p_line->p_fg_bg_ratio );
+    free( p_line->pi_underline_offset );
+    free( p_line->pi_underline_thickness );
+    free( p_line );
+}
+
+static void FreeLines( line_desc_t *p_lines )
+{
+    line_desc_t *p_line, *p_next;
+
+    if( !p_lines ) return;
+
+    for( p_line = p_lines; p_line != NULL; p_line = p_next )
+    {
+        p_next = p_line->p_next;
+        FreeLine( p_line );
+    }
+}
+
+static line_desc_t *NewLine( int i_count )
+{
+    line_desc_t *p_line = malloc( sizeof(line_desc_t) );
+
+    if( !p_line ) return NULL;
+    p_line->i_height = 0;
+    p_line->i_width = 0;
+    p_line->p_next = NULL;
+
+    p_line->pp_glyphs = malloc( sizeof(FT_BitmapGlyph) * ( i_count + 1 ) );
+    p_line->p_glyph_pos = malloc( sizeof( FT_Vector ) * ( i_count + 1 ) );
+    p_line->p_fg_rgb = malloc( sizeof( uint32_t ) * ( i_count + 1 ) );
+    p_line->p_bg_rgb = malloc( sizeof( uint32_t ) * ( i_count + 1 ) );
+    p_line->p_fg_bg_ratio = calloc( i_count + 1, sizeof( uint8_t ) );
+    p_line->pi_underline_offset = calloc( i_count + 1, sizeof( int ) );
+    p_line->pi_underline_thickness = calloc( i_count + 1, sizeof( uint16_t ) );
+    if( ( p_line->pp_glyphs == NULL ) ||
+        ( p_line->p_glyph_pos == NULL ) ||
+        ( p_line->p_fg_rgb == NULL ) ||
+        ( p_line->p_bg_rgb == NULL ) ||
+        ( p_line->p_fg_bg_ratio == NULL ) ||
+        ( p_line->pi_underline_offset == NULL ) ||
+        ( p_line->pi_underline_thickness == NULL ) )
+    {
+        free( p_line->pi_underline_thickness );
+        free( p_line->pi_underline_offset );
+        free( p_line->p_fg_rgb );
+        free( p_line->p_bg_rgb );
+        free( p_line->p_fg_bg_ratio );
+        free( p_line->p_glyph_pos );
+        free( p_line->pp_glyphs );
+        free( p_line );
+        return NULL;
+    }
+    p_line->pp_glyphs[0] = NULL;
+
+    return p_line;
+}
+
 
 static int ProcessLines( filter_t *p_filter,
                          uint32_t *psz_text,
@@ -2616,75 +2683,6 @@ static int RenderHtml( filter_t *p_filter, subpicture_region_t *p_region_out,
 }
 
 #endif
-
-static void FreeLine( line_desc_t *p_line )
-{
-    unsigned int i;
-    for( i = 0; p_line->pp_glyphs[ i ] != NULL; i++ )
-    {
-        FT_Done_Glyph( (FT_Glyph)p_line->pp_glyphs[ i ] );
-    }
-    free( p_line->pp_glyphs );
-    free( p_line->p_glyph_pos );
-    free( p_line->p_fg_rgb );
-    free( p_line->p_bg_rgb );
-    free( p_line->p_fg_bg_ratio );
-    free( p_line->pi_underline_offset );
-    free( p_line->pi_underline_thickness );
-    free( p_line );
-}
-
-static void FreeLines( line_desc_t *p_lines )
-{
-    line_desc_t *p_line, *p_next;
-
-    if( !p_lines ) return;
-
-    for( p_line = p_lines; p_line != NULL; p_line = p_next )
-    {
-        p_next = p_line->p_next;
-        FreeLine( p_line );
-    }
-}
-
-static line_desc_t *NewLine( int i_count )
-{
-    line_desc_t *p_line = malloc( sizeof(line_desc_t) );
-
-    if( !p_line ) return NULL;
-    p_line->i_height = 0;
-    p_line->i_width = 0;
-    p_line->p_next = NULL;
-
-    p_line->pp_glyphs = malloc( sizeof(FT_BitmapGlyph) * ( i_count + 1 ) );
-    p_line->p_glyph_pos = malloc( sizeof( FT_Vector ) * ( i_count + 1 ) );
-    p_line->p_fg_rgb = malloc( sizeof( uint32_t ) * ( i_count + 1 ) );
-    p_line->p_bg_rgb = malloc( sizeof( uint32_t ) * ( i_count + 1 ) );
-    p_line->p_fg_bg_ratio = calloc( i_count + 1, sizeof( uint8_t ) );
-    p_line->pi_underline_offset = calloc( i_count + 1, sizeof( int ) );
-    p_line->pi_underline_thickness = calloc( i_count + 1, sizeof( uint16_t ) );
-    if( ( p_line->pp_glyphs == NULL ) ||
-        ( p_line->p_glyph_pos == NULL ) ||
-        ( p_line->p_fg_rgb == NULL ) ||
-        ( p_line->p_bg_rgb == NULL ) ||
-        ( p_line->p_fg_bg_ratio == NULL ) ||
-        ( p_line->pi_underline_offset == NULL ) ||
-        ( p_line->pi_underline_thickness == NULL ) )
-    {
-        free( p_line->pi_underline_thickness );
-        free( p_line->pi_underline_offset );
-        free( p_line->p_fg_rgb );
-        free( p_line->p_bg_rgb );
-        free( p_line->p_fg_bg_ratio );
-        free( p_line->p_glyph_pos );
-        free( p_line->pp_glyphs );
-        free( p_line );
-        return NULL;
-    }
-    p_line->pp_glyphs[0] = NULL;
-
-    return p_line;
-}
 
 /*****************************************************************************
  * Create: allocates osd-text video thread output method
