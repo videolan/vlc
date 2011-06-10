@@ -156,6 +156,7 @@
 		CC84FB2D130083BB00816D38 /* BGHUDAppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC84FB2C130083BB00816D38 /* BGHUDAppKit.framework */; };
 		CC84FB481300843200816D38 /* BGHUDAppKit.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = CC84FB2C130083BB00816D38 /* BGHUDAppKit.framework */; };
 		CCBE999F0F922C51000705F8 /* CoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CCBE999E0F922C51000705F8 /* CoreServices.framework */; };
+		CCC0C2AA13A285F700AC92B3 /* VideoEffects.nib in Resources */ = {isa = PBXBuildFile; fileRef = CCC0C2A813A285F700AC92B3 /* VideoEffects.nib */; };
 		CCF11B540F8BFB520088542D /* ErrorPanel.nib in Resources */ = {isa = PBXBuildFile; fileRef = CCF11B520F8BFB520088542D /* ErrorPanel.nib */; };
 /* End PBXBuildFile section */
 
@@ -348,6 +349,7 @@
 		CCB24D5D0D54BBAE004D780C /* simple_prefs.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = simple_prefs.m; path = ../../../modules/gui/macosx/simple_prefs.m; sourceTree = SOURCE_ROOT; };
 		CCB24D5E0D54BBAE004D780C /* simple_prefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = simple_prefs.h; path = ../../../modules/gui/macosx/simple_prefs.h; sourceTree = SOURCE_ROOT; };
 		CCBE999E0F922C51000705F8 /* CoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreServices.framework; path = /System/Library/Frameworks/CoreServices.framework; sourceTree = "<absolute>"; };
+		CCC0C2A913A285F700AC92B3 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = Resources/English.lproj/VideoEffects.nib; sourceTree = "<group>"; };
 		CCC593780AB4A9FB0004FF52 /* embeddedwindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = embeddedwindow.h; path = ../../../modules/gui/macosx/embeddedwindow.h; sourceTree = SOURCE_ROOT; };
 		CCC593790AB4A9FB0004FF52 /* embeddedwindow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = embeddedwindow.m; path = ../../../modules/gui/macosx/embeddedwindow.m; sourceTree = SOURCE_ROOT; };
 		CCC895830D9A8A82005AE59C /* eyetv.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = eyetv.m; path = ../../../modules/access/eyetv.m; sourceTree = SOURCE_ROOT; };
@@ -379,6 +381,8 @@
 		CCCB86D80ACFDFB300CF1E10 /* fs_stop_highlight.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = fs_stop_highlight.png; path = Resources/fs_stop_highlight.png; sourceTree = "<group>"; };
 		CCCB86D90ACFDFB300CF1E10 /* fs_stop.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = fs_stop.png; path = Resources/fs_stop.png; sourceTree = "<group>"; };
 		CCCB86DA0ACFDFB300CF1E10 /* fs_background.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = fs_background.png; path = Resources/fs_background.png; sourceTree = "<group>"; };
+		CCCE366D13817E4500694F2A /* VideoEffects.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = VideoEffects.h; path = ../../../modules/gui/macosx/VideoEffects.h; sourceTree = "<group>"; };
+		CCCE366E13817E4500694F2A /* VideoEffects.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = VideoEffects.m; path = ../../../modules/gui/macosx/VideoEffects.m; sourceTree = "<group>"; };
 		CCD590F010E5B73200D39094 /* dialogProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dialogProvider.h; path = ../../../modules/gui/macosx_dialog_provider/dialogProvider.h; sourceTree = SOURCE_ROOT; };
 		CCD590F110E5B73200D39094 /* dialogProvider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = dialogProvider.m; path = ../../../modules/gui/macosx_dialog_provider/dialogProvider.m; sourceTree = SOURCE_ROOT; };
 		CCD590F210E5B76300D39094 /* VLCLoginPanel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCLoginPanel.h; path = ../../../modules/gui/macosx_dialog_provider/VLCLoginPanel.h; sourceTree = SOURCE_ROOT; };
@@ -530,6 +534,8 @@
 				CC5560241365CDC800D54038 /* AudioEffects.m */,
 				CC707EC3137464CD0003010A /* TrackSynchronization.h */,
 				CC707EC4137464CD0003010A /* TrackSynchronization.m */,
+				CCCE366D13817E4500694F2A /* VideoEffects.h */,
+				CCCE366E13817E4500694F2A /* VideoEffects.m */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
@@ -805,6 +811,7 @@
 				DCE7BD0308A56C8B007B10AE /* Bookmarks.nib */,
 				CC5560261365CE4800D54038 /* AudioEffects.nib */,
 				CC707EC6137474A50003010A /* SyncTracks.nib */,
+				CCC0C2A813A285F700AC92B3 /* VideoEffects.nib */,
 			);
 			name = nibs;
 			sourceTree = "<group>";
@@ -840,6 +847,7 @@
 			};
 			buildConfigurationList = C2F2A6EA09588F1B00018C74 /* Build configuration list for PBXProject "vlc" */;
 			compatibilityVersion = "Xcode 3.1";
+			developmentRegion = English;
 			hasScannedForEncodings = 1;
 			knownRegions = (
 				English,
@@ -1001,6 +1009,7 @@
 				CCF11B540F8BFB520088542D /* ErrorPanel.nib in Resources */,
 				CC5560281365CE4800D54038 /* AudioEffects.nib in Resources */,
 				CC707EC8137474A50003010A /* SyncTracks.nib in Resources */,
+				CCC0C2AA13A285F700AC92B3 /* VideoEffects.nib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1029,6 +1038,14 @@
 				CC707EC7137474A50003010A /* English */,
 			);
 			name = SyncTracks.nib;
+			sourceTree = "<group>";
+		};
+		CCC0C2A813A285F700AC92B3 /* VideoEffects.nib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				CCC0C2A913A285F700AC92B3 /* English */,
+			);
+			name = VideoEffects.nib;
 			sourceTree = "<group>";
 		};
 		CCC896B80D9AA9E8005AE59C /* MediaInfo.nib */ = {

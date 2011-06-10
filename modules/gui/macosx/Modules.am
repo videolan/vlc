@@ -47,6 +47,8 @@ SOURCES_macosx = \
 	AudioEffects.m \
 	TrackSynchronization.h \
 	TrackSynchronization.m \
+	VideoEffects.h \
+	VideoEffects.m \
 	bookmarks.h \
 	bookmarks.m \
 	embeddedwindow.h \

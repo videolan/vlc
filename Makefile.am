@@ -141,6 +141,8 @@ EXTRA_DIST += \
 	extras/package/macosx/Resources/English.lproj/AudioEffects.nib/keyedobjects.nib \
 	extras/package/macosx/Resources/English.lproj/SyncTracks.nib/designable.nib \
 	extras/package/macosx/Resources/English.lproj/SyncTracks.nib/keyedobjects.nib \
+	extras/package/macosx/Resources/English.lproj/VideoEffects.nib/designable.nib \
+	extras/package/macosx/Resources/English.lproj/VideoEffects.nib/keyedobjects.nib \
 	extras/package/macosx/Resources/English.lproj/InfoPlist.strings.in \
 	extras/package/macosx/Resources/dsa_pub.pem \
 	extras/package/macosx/Resources/aiff.icns \
