@@ -332,13 +332,11 @@ static int GetFontSize( filter_t *p_filter )
     }
     else
     {
-        vlc_value_t val;
-        var_Get( p_filter, "freetype-rel-fontsize", &val );
-        if( val.i_int  > 0 )
+        int i_ratio = var_GetInteger( p_filter, "freetype-rel-fontsize" );
+        if( i_ratio > 0 )
         {
-            i_size = (int)p_filter->fmt_out.video.i_height / val.i_int;
-            p_filter->p_sys->i_display_height =
-                p_filter->fmt_out.video.i_height;
+            i_size = (int)p_filter->fmt_out.video.i_height / i_ratio;
+            p_filter->p_sys->i_display_height = p_filter->fmt_out.video.i_height;
         }
     }
     if( i_size <= 0 )
