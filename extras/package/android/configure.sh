@@ -22,8 +22,10 @@ EXTRA_LDFLAGS=""
 if [ -z "$NO_NEON" ]; then
 	EXTRA_CFLAGS="$EXTRA_CFLAGS -mfpu=neon -mtune=cortex-a8 -ftree-vectorize -mvectorize-with-neon-quad"
 	EXTRA_LDFLAGS="-Wl,--fix-cortex-a8"
+	EXTRA_PARAMS=""
 else
 	EXTRA_CFLAGS="$EXTRA_CFLAGS -march=armv6j -mtune=arm1136j-s -msoft-float"
+	EXTRA_PARAMS=" --disable-neon"
 fi
 
 PATH="$ANDROID_BIN:$PATH" \
@@ -39,50 +41,62 @@ STRIP="${GCC_PREFIX}strip" \
 RANLIB="${GCC_PREFIX}ranlib" \
 AR="${GCC_PREFIX}ar" \
 PKG_CONFIG_LIBDIR="$VLC_SOURCEDIR/extras/contrib/hosts/arm-eabi/lib/pkgconfig" \
-sh $VLC_SOURCEDIR/configure --host=arm-eabi-linux --build=x86_64-unknown-linux \
+sh $VLC_SOURCEDIR/configure --host=arm-eabi-linux --build=x86_64-unknown-linux $EXTRA_PARAMS \
                 --enable-static-modules \
                 --disable-vlc \
                 --enable-debug \
                 --disable-vlm --disable-sout \
-                --enable-swscale \
-                --enable-avcodec \
-                --enable-avformat \
-                --enable-android-vout \
+                --disable-dbus \
+                --disable-lua \
+                --disable-libgcrypt \
                 --enable-live555 --enable-realrtsp \
-                --disable-libva \
-                --disable-jack \
-                --disable-pulse \
-                --disable-alsa \
-                --disable-sdl \
-                --enable-opensles \
-                --disable-schroedinger \
-                --disable-x264 \
-                --disable-mad \
-                --disable-mkv \
-                --disable-dv \
                 --disable-vcd \
                 --disable-v4l2 \
                 --disable-gnomevfs \
                 --disable-dvdread \
                 --disable-dvdnav \
+                --disable-bluray \
                 --disable-linsys \
+                --disable-decklink \
+                --enable-avformat \
+                --enable-swscale \
+                --enable-avcodec \
+                --disable-libva \
+                --disable-mkv \
+                --disable-dv \
+                --disable-mod \
+                --disable-sid \
+                --disable-mad \
+                --disable-x264 \
+                --disable-mad \
+                --disable-schroedinger --disable-dirac \
+                --disable-sdl-image \
+                --disable-zvbi \
+                --disable-fluidsynth \
+                --enable-opensles \
+                --disable-jack \
+                --disable-pulse \
+                --disable-alsa \
+                --disable-portaudio \
+                --disable-sdl \
                 --disable-xcb \
-                --disable-dbus \
                 --disable-atmo \
                 --disable-qt4 \
                 --disable-skins2 \
-                --disable-libgcrypt \
-                --disable-lua \
                 --disable-mtp \
-                --disable-sdl-image \
                 --disable-taglib \
                 --disable-notify \
                 --disable-freetype \
+                --disable-libass \
+                --disable-svg \
                 --disable-sqlite \
                 --disable-udev \
+                --disable-libxml2 \
+                --enable-android-vout \
                 --disable-caca \
                 --disable-glx \
                 --disable-egl \
                 --disable-gl \
-                --disable-libxml2 \
-                --disable-svg
+                --disable-gles1 --disable-gles2 \
+                --disable-goom \
+                --disable-projectm
