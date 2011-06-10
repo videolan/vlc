@@ -212,8 +212,9 @@ struct line_desc_t
     int            *pi_underline_offset;
     uint16_t       *pi_underline_thickness;
 
-    int             i_height;
     int             i_width;
+    int             i_height;
+
     int             i_alpha;
 
     line_desc_t    *p_next;
@@ -290,7 +291,7 @@ static int LoadFontsFromAttachments( filter_t *p_filter )
         return VLC_EGENERIC;
 
     p_sys->i_font_attachments = 0;
-    p_sys->pp_font_attachments = malloc( i_attachments_cnt * sizeof( input_attachment_t * ));
+    p_sys->pp_font_attachments = malloc( i_attachments_cnt * sizeof(*p_sys->pp_font_attachments));
     if( !p_sys->pp_font_attachments )
         return VLC_ENOMEM;
 
@@ -871,20 +872,15 @@ static int RenderYUVA( filter_t *p_filter, subpicture_region_t *p_region,
     i_pitch = p_region->p_picture->A_PITCH;
 
     /* Initialize the region pixels */
+    memset( p_dst_y, 0x00, i_pitch * p_region->fmt.i_height );
+    memset( p_dst_u, 0x80, i_pitch * p_region->fmt.i_height );
+    memset( p_dst_v, 0x80, i_pitch * p_region->fmt.i_height );
+
     if( p_filter->p_sys->i_effect != EFFECT_BACKGROUND )
-    {
-        memset( p_dst_y, 0x00, i_pitch * p_region->fmt.i_height );
-        memset( p_dst_u, 0x80, i_pitch * p_region->fmt.i_height );
-        memset( p_dst_v, 0x80, i_pitch * p_region->fmt.i_height );
-        memset( p_dst_a, 0, i_pitch * p_region->fmt.i_height );
-    }
+        memset( p_dst_a, 0x00, i_pitch * p_region->fmt.i_height );
     else
-    {
-        memset( p_dst_y, 0x0, i_pitch * p_region->fmt.i_height );
-        memset( p_dst_u, 0x80, i_pitch * p_region->fmt.i_height );
-        memset( p_dst_v, 0x80, i_pitch * p_region->fmt.i_height );
         memset( p_dst_a, 0x80, i_pitch * p_region->fmt.i_height );
-    }
+
     if( p_filter->p_sys->i_effect == EFFECT_OUTLINE ||
         p_filter->p_sys->i_effect == EFFECT_OUTLINE_FAT )
     {
@@ -1011,7 +1007,7 @@ static int RenderYUVA( filter_t *p_filter, subpicture_region_t *p_region,
 
 static text_style_t *CreateStyle( char *psz_fontname, int i_font_size,
                                   uint32_t i_font_color, uint32_t i_karaoke_bg_color,
-                                  bool b_bold, bool b_italic, bool b_uline, bool b_through )
+                                  int i_style_flags )
 {
     text_style_t *p_style = text_style_New();
     if( !p_style )
@@ -1023,15 +1019,7 @@ static text_style_t *CreateStyle( char *psz_fontname, int i_font_size,
     p_style->i_font_alpha = (i_font_color & 0xff000000) >> 24;
     p_style->i_karaoke_background_color = (i_karaoke_bg_color & 0x00ffffff) >>  0;
     p_style->i_karaoke_background_alpha = (i_karaoke_bg_color & 0xff000000) >> 24;
-    if( b_bold )
-        p_style->i_style_flags |= STYLE_BOLD;
-    if( b_italic )
-        p_style->i_style_flags |= STYLE_ITALIC;
-    if( b_uline )
-        p_style->i_style_flags |= STYLE_UNDERLINE;
-    if( b_through )
-        p_style->i_style_flags |= STYLE_STRIKEOUT;
-
+    p_style->i_style_flags |= i_style_flags;
     return p_style;
 }
 
@@ -1077,13 +1065,11 @@ static void IconvText( filter_t *p_filter, const char *psz_string,
 static int PushFont( font_stack_t **p_font, const char *psz_name, int i_size,
                      uint32_t i_color, uint32_t i_karaoke_bg_color )
 {
-    font_stack_t *p_new;
-
     if( !p_font )
         return VLC_EGENERIC;
 
-    p_new = malloc( sizeof( font_stack_t ) );
-    if( ! p_new )
+    font_stack_t *p_new = malloc( sizeof(*p_new) );
+    if( !p_new )
         return VLC_ENOMEM;
 
     p_new->p_next = NULL;
@@ -1465,23 +1451,21 @@ static void SetupKaraoke( xml_reader_t *p_xml_reader, uint32_t *pi_k_runs,
                 if( *ppi_k_durations )
                 {
                     *ppi_k_durations = realloc_or_free( *ppi_k_durations,
-                                 *pi_k_runs * sizeof( uint32_t ) );
+                                                        *pi_k_runs * sizeof(**ppi_k_durations) );
                 }
                 else if( *pi_k_runs == 1 )
                 {
-                    *ppi_k_durations = (uint32_t *)
-                        malloc( *pi_k_runs * sizeof( uint32_t ) );
+                    *ppi_k_durations = malloc( *pi_k_runs * sizeof(**ppi_k_durations) );
                 }
 
                 if( *ppi_k_run_lengths )
                 {
                     *ppi_k_run_lengths = realloc_or_free( *ppi_k_run_lengths,
-                                 *pi_k_runs * sizeof( uint32_t ) );
+                                                          *pi_k_runs * sizeof(**ppi_k_run_lengths) );
                 }
                 else if( *pi_k_runs == 1 )
                 {
-                    *ppi_k_run_lengths = (uint32_t *)
-                        malloc( *pi_k_runs * sizeof( uint32_t ) );
+                    *ppi_k_run_lengths = malloc( *pi_k_runs * sizeof(**ppi_k_run_lengths) );
                 }
                 if( *ppi_k_durations )
                     (*ppi_k_durations)[ *pi_k_runs - 1 ] = atoi( value );
@@ -1514,8 +1498,7 @@ static void HandleWhiteSpace( char *psz_node )
 
 static text_style_t *GetStyleFromFontStack( filter_sys_t *p_sys,
                                             font_stack_t **p_fonts,
-                                            bool b_bold, bool b_italic,
-                                            bool b_uline, bool b_through )
+                                            int i_style_flags )
 {
     char       *psz_fontname = NULL;
     uint32_t    i_font_color = p_sys->i_font_color & 0x00ffffff;
@@ -1527,7 +1510,8 @@ static text_style_t *GetStyleFromFontStack( filter_sys_t *p_sys,
         return NULL;
 
     return CreateStyle( psz_fontname, i_font_size, i_font_color,
-                        i_karaoke_bg_color, b_bold, b_italic, b_uline, b_through );
+                        i_karaoke_bg_color,
+                        i_style_flags );
 }
 
 static int RenderTag( filter_t *p_filter, FT_Face p_face,
@@ -1752,11 +1736,11 @@ static void SetupLine( filter_t *p_filter, const char *psz_text_in,
         if( *ppp_styles )
         {
             *ppp_styles = realloc_or_free( *ppp_styles,
-                                           *pi_runs * sizeof( text_style_t * ) );
+                                           *pi_runs * sizeof(**ppp_styles) );
         }
         else if( *pi_runs == 1 )
         {
-            *ppp_styles = malloc( *pi_runs * sizeof( text_style_t * ) );
+            *ppp_styles = malloc( *pi_runs * sizeof(**ppp_styles) );
         }
 
         /* We have just malloc'ed this memory successfully -
@@ -1772,12 +1756,11 @@ static void SetupLine( filter_t *p_filter, const char *psz_text_in,
         if( *ppi_run_lengths )
         {
             *ppi_run_lengths = realloc_or_free( *ppi_run_lengths,
-                                              *pi_runs * sizeof( uint32_t ) );
+                                                *pi_runs * sizeof(**ppi_run_lengths) );
         }
         else if( *pi_runs == 1 )
         {
-            *ppi_run_lengths = (uint32_t *)
-                malloc( *pi_runs * sizeof( uint32_t ) );
+            *ppi_run_lengths = malloc( *pi_runs * sizeof(**ppi_run_lengths) );
         }
 
         /* same remarks here */
@@ -1808,25 +1791,14 @@ static int CheckForEmbeddedFont( filter_sys_t *p_sys, FT_Face *pp_face, text_sty
         {
             if( p_face )
             {
-                bool match = !strcasecmp( p_face->family_name,
-                                                p_style->psz_fontname );
-
-                if( p_face->style_flags & FT_STYLE_FLAG_BOLD )
-                    match &= (p_style->i_style_flags & STYLE_BOLD) != 0;
-                else
-                    match &= (p_style->i_style_flags & STYLE_BOLD) == 0;
-
-                if( p_face->style_flags & FT_STYLE_FLAG_ITALIC )
-                    match &= (p_style->i_style_flags & STYLE_ITALIC) != 0;
-                else
-                    match &= (p_style->i_style_flags & STYLE_ITALIC) == 0;
-
-                if(  match )
+                int i_style_received = ((p_face->style_flags & FT_STYLE_FLAG_BOLD)    ? STYLE_BOLD   : 0) |
+                                       ((p_face->style_flags & FT_STYLE_FLAG_ITALIC ) ? STYLE_ITALIC : 0);
+                if( !strcasecmp( p_face->family_name, p_style->psz_fontname ) &&
+                    (p_style->i_style_flags & (STYLE_BOLD | STYLE_BOLD)) == i_style_received )
                 {
                     *pp_face = p_face;
                     return VLC_SUCCESS;
                 }
-
                 FT_Done_Face( p_face );
             }
             i_font_idx++;
@@ -1855,10 +1827,7 @@ static int ProcessNodes( filter_t *p_filter,
     uint32_t        *psz_text_orig  = psz_text;
     font_stack_t *p_fonts        = NULL;
 
-    bool b_italic = false;
-    bool b_bold   = false;
-    bool b_uline  = false;
-    bool b_through = false;
+    int i_style_flags = 0;
 
     if( p_font_style )
     {
@@ -1870,14 +1839,10 @@ static int ProcessNodes( filter_t *p_filter,
                (p_font_style->i_karaoke_background_color & 0xffffff) |
                    ((p_font_style->i_karaoke_background_alpha & 0xff) << 24));
 
-        if( p_font_style->i_style_flags & STYLE_BOLD )
-            b_bold = true;
-        if( p_font_style->i_style_flags & STYLE_ITALIC )
-            b_italic = true;
-        if( p_font_style->i_style_flags & STYLE_UNDERLINE )
-            b_uline = true;
-        if( p_font_style->i_style_flags & STYLE_STRIKEOUT )
-            b_through = true;
+        i_style_flags = p_font_style->i_style_flags & (STYLE_BOLD |
+                                                       STYLE_ITALIC |
+                                                       STYLE_UNDERLINE |
+                                                       STYLE_STRIKEOUT);
     }
 #ifdef HAVE_STYLES
     else
@@ -1905,36 +1870,33 @@ static int ProcessNodes( filter_t *p_filter,
                 if( !strcasecmp( "font", node ) )
                     PopFont( &p_fonts );
                 else if( !strcasecmp( "b", node ) )
-                    b_bold   = false;
+                    i_style_flags &= ~STYLE_BOLD;
                else if( !strcasecmp( "i", node ) )
-                    b_italic = false;
+                    i_style_flags &= ~STYLE_ITALIC;
                 else if( !strcasecmp( "u", node ) )
-                    b_uline  = false;
+                    i_style_flags &= ~STYLE_UNDERLINE;
                 else if( !strcasecmp( "s", node ) )
-                    b_through = false;
+                    i_style_flags &= ~STYLE_STRIKEOUT;
                 break;
 
             case XML_READER_STARTELEM:
                 if( !strcasecmp( "font", node ) )
                     rv = HandleFontAttributes( p_xml_reader, &p_fonts );
                 else if( !strcasecmp( "b", node ) )
-                    b_bold = true;
+                    i_style_flags |= STYLE_BOLD;
                 else if( !strcasecmp( "i", node ) )
-                    b_italic = true;
+                    i_style_flags |= STYLE_ITALIC;
                 else if( !strcasecmp( "u", node ) )
-                    b_uline = true;
+                    i_style_flags |= STYLE_UNDERLINE;
                 else if( !strcasecmp( "s", node ) )
-                    b_through = true;
+                    i_style_flags |= STYLE_STRIKEOUT;
                 else if( !strcasecmp( "br", node ) )
                 {
                     SetupLine( p_filter, "\n", &psz_text,
                                pi_runs, ppi_run_lengths, ppp_styles,
                                GetStyleFromFontStack( p_sys,
                                                       &p_fonts,
-                                                      b_bold,
-                                                      b_italic,
-                                                      b_uline,
-                                                      b_through) );
+                                                      i_style_flags ) );
                 }
                 else if( !strcasecmp( "k", node ) )
                 {
@@ -1963,10 +1925,7 @@ static int ProcessNodes( filter_t *p_filter,
                            pi_runs, ppi_run_lengths, ppp_styles,
                            GetStyleFromFontStack( p_sys,
                                                   &p_fonts,
-                                                  b_bold,
-                                                  b_italic,
-                                                  b_uline,
-                                                  b_through) );
+                                                  i_style_flags ) );
                 free( psz_node );
                 break;
             }
@@ -1992,11 +1951,9 @@ static int ProcessNodes( filter_t *p_filter,
 
 static void FreeLine( line_desc_t *p_line )
 {
-    unsigned int i;
-    for( i = 0; p_line->pp_glyphs[ i ] != NULL; i++ )
-    {
-        FT_Done_Glyph( (FT_Glyph)p_line->pp_glyphs[ i ] );
-    }
+    for( int i = 0; p_line->pp_glyphs && p_line->pp_glyphs[i] != NULL; i++ )
+        FT_Done_Glyph( (FT_Glyph)p_line->pp_glyphs[i] );
+
     free( p_line->pp_glyphs );
     free( p_line->p_glyph_pos );
     free( p_line->p_fg_rgb );
@@ -2009,53 +1966,43 @@ static void FreeLine( line_desc_t *p_line )
 
 static void FreeLines( line_desc_t *p_lines )
 {
-    line_desc_t *p_line, *p_next;
-
-    if( !p_lines ) return;
-
-    for( p_line = p_lines; p_line != NULL; p_line = p_next )
+    for( line_desc_t *p_line = p_lines; p_line != NULL; )
     {
-        p_next = p_line->p_next;
+        line_desc_t *p_next = p_line->p_next;
         FreeLine( p_line );
+        p_line = p_next;
     }
 }
 
 static line_desc_t *NewLine( int i_count )
 {
-    line_desc_t *p_line = malloc( sizeof(line_desc_t) );
+    line_desc_t *p_line = malloc( sizeof(*p_line) );
 
-    if( !p_line ) return NULL;
-    p_line->i_height = 0;
+    if( !p_line )
+        return NULL;
+
     p_line->i_width = 0;
+    p_line->i_height = 0;
+    p_line->i_alpha = 0xff;
+
     p_line->p_next = NULL;
 
-    p_line->pp_glyphs = malloc( sizeof(FT_BitmapGlyph) * ( i_count + 1 ) );
-    p_line->p_glyph_pos = malloc( sizeof( FT_Vector ) * ( i_count + 1 ) );
-    p_line->p_fg_rgb = malloc( sizeof( uint32_t ) * ( i_count + 1 ) );
-    p_line->p_bg_rgb = malloc( sizeof( uint32_t ) * ( i_count + 1 ) );
-    p_line->p_fg_bg_ratio = calloc( i_count + 1, sizeof( uint8_t ) );
-    p_line->pi_underline_offset = calloc( i_count + 1, sizeof( int ) );
-    p_line->pi_underline_thickness = calloc( i_count + 1, sizeof( uint16_t ) );
-    if( ( p_line->pp_glyphs == NULL ) ||
-        ( p_line->p_glyph_pos == NULL ) ||
-        ( p_line->p_fg_rgb == NULL ) ||
-        ( p_line->p_bg_rgb == NULL ) ||
-        ( p_line->p_fg_bg_ratio == NULL ) ||
-        ( p_line->pi_underline_offset == NULL ) ||
-        ( p_line->pi_underline_thickness == NULL ) )
+    p_line->pp_glyphs              = calloc( i_count + 1, sizeof(*p_line->pp_glyphs) );
+    p_line->p_glyph_pos            = calloc( i_count + 1, sizeof(*p_line->p_glyph_pos) );
+    p_line->p_fg_rgb               = calloc( i_count + 1, sizeof(*p_line->p_fg_rgb) );
+    p_line->p_bg_rgb               = calloc( i_count + 1, sizeof(*p_line->p_bg_rgb) );
+    p_line->p_fg_bg_ratio          = calloc( i_count + 1, sizeof(*p_line->p_fg_bg_ratio) );
+    p_line->pi_underline_offset    = calloc( i_count + 1, sizeof(*p_line->pi_underline_offset) );
+    p_line->pi_underline_thickness = calloc( i_count + 1, sizeof(*p_line->pi_underline_thickness) );
+
+    if( !p_line->pp_glyphs || !p_line->p_glyph_pos ||
+        !p_line->p_fg_rgb || !p_line->p_bg_rgb || !p_line->p_fg_bg_ratio ||
+        !p_line->pi_underline_offset || !p_line->pi_underline_thickness )
     {
-        free( p_line->pi_underline_thickness );
-        free( p_line->pi_underline_offset );
-        free( p_line->p_fg_rgb );
-        free( p_line->p_bg_rgb );
-        free( p_line->p_fg_bg_ratio );
-        free( p_line->p_glyph_pos );
-        free( p_line->pp_glyphs );
-        free( p_line );
+        FreeLine( p_line );
         return NULL;
     }
     p_line->pp_glyphs[0] = NULL;
-
     return p_line;
 }
 
@@ -2088,13 +2035,13 @@ static int ProcessLines( filter_t *p_filter,
      * after the characters have been shuffled around by Fribidi, we can re-apply
      * the styles, and to simplify the calculation of runs within a line.
      */
-    pp_char_styles = (text_style_t **) malloc( i_len * sizeof( text_style_t * ));
+    pp_char_styles = malloc( i_len * sizeof(*pp_char_styles));
     if( !pp_char_styles )
         return VLC_ENOMEM;
 
     if( b_karaoke )
     {
-        pi_karaoke_bar = (uint8_t *) malloc( i_len * sizeof( uint8_t ));
+        pi_karaoke_bar = malloc( i_len * sizeof(*pi_karaoke_bar));
         /* If we can't allocate sufficient memory for karaoke, continue anyway -
          * we just won't be able to display the progress bar; at least we'll
          * get the text.
@@ -2113,16 +2060,12 @@ static int ProcessLines( filter_t *p_filter,
         uint32_t    *p_fribidi_string;
         int start_pos, pos = 0;
 
-        pp_char_styles_new  = (text_style_t **)malloc( i_len * sizeof( text_style_t * ));
+        pp_char_styles_new = malloc( i_len * sizeof(*pp_char_styles_new));
 
-        p_fribidi_string = (uint32_t *)
-            malloc( (i_len + 1) * sizeof(uint32_t) );
-        p_old_positions = (int *)
-            malloc( (i_len + 1) * sizeof( int ) );
-        p_new_positions = (int *)
-            malloc( (i_len + 1) * sizeof( int ) );
-        p_levels = (int8_t *)
-            malloc( (i_len + 1) * sizeof( int8_t ) );
+        p_fribidi_string   = malloc( (i_len + 1) * sizeof(*p_fribidi_string) );
+        p_old_positions    = malloc( (i_len + 1) * sizeof(*p_old_positions) );
+        p_new_positions    = malloc( (i_len + 1) * sizeof(*p_new_positions) );
+        p_levels           = malloc( (i_len + 1) * sizeof(*p_levels) );
 
         if( ! pp_char_styles_new ||
             ! p_fribidi_string ||
@@ -2354,8 +2297,7 @@ static int ProcessLines( filter_t *p_filter,
                         FT_HAS_KERNING( ( p_face  ? p_face : p_sys->p_face ) );
 
 
-            uint32_t *psz_unicode = (uint32_t *)
-                              malloc( (k - i_prev + 1) * sizeof( uint32_t ));
+            uint32_t *psz_unicode = malloc( (k - i_prev + 1) * sizeof(*psz_unicode) );
             if( !psz_unicode )
             {
                 if( p_face ) FT_Done_Face( p_face );
@@ -2386,7 +2328,6 @@ static int ProcessLines( filter_t *p_filter,
                         return VLC_ENOMEM;
                     }
                     p_line->i_alpha = p_style->i_font_alpha & 0xff;
-                    p_line->p_next = NULL;
                     i_pen_x = 0;
                     i_pen_y += tmp_result.y;
                     tmp_result.x = 0;
@@ -2628,17 +2569,16 @@ static int RenderCommon( filter_t *p_filter, subpicture_region_t *p_region_out,
                                    (p_region_in->p_style->i_font_color & 0xffffff) |
                                    ((p_region_in->p_style->i_font_alpha & 0xff) << 24),
                                    0x00ffffff,
-                                   p_region_in->p_style->i_style_flags & STYLE_BOLD,
-                                   p_region_in->p_style->i_style_flags & STYLE_ITALIC,
-                                   p_region_in->p_style->i_style_flags & STYLE_UNDERLINE,
-                                   p_region_in->p_style->i_style_flags & STYLE_STRIKEOUT);
+                                   p_region_in->p_style->i_style_flags & (STYLE_BOLD |
+                                                                          STYLE_ITALIC |
+                                                                          STYLE_UNDERLINE |
+                                                                          STYLE_STRIKEOUT) );
         else
             p_style = CreateStyle( p_sys->psz_fontfamily,
                                    p_sys->i_font_size,
                                    (p_sys->i_font_color & 0xffffff) |
                                    (((255-p_sys->i_font_opacity) & 0xff) << 24),
-                                   0x00ffffff,
-                                   false, false, false, false );
+                                   0x00ffffff, 0);
         uint32_t i_run_length = i_text_length;
 
         rv = ProcessLines( p_filter, psz_text, i_text_length,
@@ -2698,7 +2638,7 @@ static int Create( vlc_object_t *p_this )
     int            i_error = 0, fontindex = 0;
 
     /* Allocate structure */
-    p_filter->p_sys = p_sys = malloc( sizeof( filter_sys_t ) );
+    p_filter->p_sys = p_sys = malloc( sizeof(*p_sys) );
     if( !p_sys )
         return VLC_ENOMEM;
 
