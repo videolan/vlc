@@ -84,6 +84,7 @@ Audio Output:
  * New audio output based on AudioQueue API for iOS
  * New audio output in memory (amem)
  * Important simplification and improvements in the core audio output
+ * New audio output based on OpenSL ES API for Android
 
 Video Filter:
  * New gradfun filter for debanding videos using dithering

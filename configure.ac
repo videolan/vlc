@@ -3629,6 +3629,19 @@ dnl
 PKG_ENABLE_MODULES_VLC([JACK], [jack access_jack], [jack], [JACK audio I/O modules],[auto])
 
 dnl
+dnl  OpenSLES Android
+dnl
+AC_ARG_ENABLE(opensles,
+  [  --enable-opensles       Android OpenSL ES audio module (default disabled)])
+if test "${HAVE_ANDROID}" = "1"; then
+  if test "${enable_opensles}" = "yes"; then
+      AC_CHECK_HEADERS(SLES/OpenSLES.h,
+        [ VLC_ADD_PLUGIN([opensles_android]) ],
+        [ AC_MSG_ERROR([cannot find OpenSLES headers])] )
+  fi
+fi
+
+dnl
 dnl UPnP Plugin (Intel SDK)
 dnl
 PKG_ENABLE_MODULES_VLC([UPNP], [upnp], [libupnp], [Intel UPnp SDK],[auto])
