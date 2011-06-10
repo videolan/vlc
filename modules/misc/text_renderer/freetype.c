@@ -204,21 +204,16 @@ struct line_desc_t
     FT_BitmapGlyph *pp_glyphs;
     /** list of relative positions for the glyphs */
     FT_Vector      *p_glyph_pos;
-    /** list of RGB information for styled text
-     * -- if the rendering mode supports it (RenderYUVA) and
-     *  b_new_color_mode is set, then it becomes possible to
-     *  have multicoloured text within the subtitles. */
+    /** list of RGB information for styled text */
     uint32_t       *p_fg_rgb;
     uint32_t       *p_bg_rgb;
     uint8_t        *p_fg_bg_ratio; /* 0x00=100% FG --> 0x7F=100% BG */
-    bool            b_new_color_mode;
     /** underline information -- only supplied if text should be underlined */
     int            *pi_underline_offset;
     uint16_t       *pi_underline_thickness;
 
     int             i_height;
     int             i_width;
-    int             i_red, i_green, i_blue;
     int             i_alpha;
 
     line_desc_t    *p_next;
@@ -608,11 +603,9 @@ static int RenderYUVP( filter_t *p_filter, subpicture_region_t *p_region,
     fmt.p_palette = p_region->fmt.p_palette ? p_region->fmt.p_palette : malloc(sizeof(*fmt.p_palette));
     p_region->fmt = fmt;
 
-    /* Calculate text color components */
-    YUVFromRGB( (p_line->i_red   << 16) |
-                (p_line->i_green <<  8) |
-                (p_line->i_blue       ),
-                &i_y, &i_u, &i_v);
+    /* Calculate text color components
+     * Only use the first color */
+    YUVFromRGB( p_line->p_fg_rgb[ 0 ], &i_y, &i_u, &i_v );
 
     /* Build palette */
     fmt.p_palette->i_entries = 16;
@@ -848,7 +841,6 @@ static int RenderYUVA( filter_t *p_filter, subpicture_region_t *p_region,
     uint8_t *p_dst_y,*p_dst_u,*p_dst_v,*p_dst_a;
     video_format_t fmt;
     int i, y, i_pitch, i_alpha;
-    uint8_t i_y, i_u, i_v; /* YUV values, derived from incoming RGB */
 
     if( i_width == 0 || i_height == 0 )
         return VLC_SUCCESS;
@@ -871,11 +863,7 @@ static int RenderYUVA( filter_t *p_filter, subpicture_region_t *p_region,
         return VLC_EGENERIC;
     p_region->fmt = fmt;
 
-    /* Calculate text color components */
-    YUVFromRGB( (p_line->i_red   << 16) |
-                (p_line->i_green <<  8) |
-                (p_line->i_blue       ),
-                &i_y, &i_u, &i_v);
+    /* Save the alpha value */
     i_alpha = p_line->i_alpha;
 
     p_dst_y = p_region->p_picture->Y_PIXELS;
@@ -963,11 +951,9 @@ static int RenderYUVA( filter_t *p_filter, subpicture_region_t *p_region,
                 i_pitch + p_line->p_glyph_pos[ i ].x + p_glyph->left + 3 +
                 i_align_offset;
 
-            if( p_line->b_new_color_mode )
-            {
-                /* Every glyph can (and in fact must) have its own color */
-                YUVFromRGB( p_line->p_fg_rgb[ i ], &i_y, &i_u, &i_v );
-            }
+            /* Every glyph can (and in fact must) have its own color */
+            uint8_t i_y, i_u, i_v;
+            YUVFromRGB( p_line->p_fg_rgb[ i ], &i_y, &i_u, &i_v );
 
             for( y = 0, i_bitmap_offset = 0; y < p_glyph->bitmap.rows; y++ )
             {
@@ -2332,15 +2318,7 @@ static int ProcessLines( filter_t *p_filter,
                         free( pi_karaoke_bar );
                         return VLC_ENOMEM;
                     }
-                    /* New Color mode only works in YUVA rendering mode --
-                     * (RGB mode has palette constraints on it). We therefore
-                     * need to populate the legacy colour fields also.
-                     */
-                    p_line->b_new_color_mode = true;
-                    p_line->i_alpha = ( p_style->i_font_alpha & 0x000000ff ) >>  0;
-                    p_line->i_red   = ( p_style->i_font_color & 0x00ff0000 ) >> 16;
-                    p_line->i_green = ( p_style->i_font_color & 0x0000ff00 ) >>  8;
-                    p_line->i_blue  = ( p_style->i_font_color & 0x000000ff ) >>  0;
+                    p_line->i_alpha = p_style->i_font_alpha & 0xff;
                     p_line->p_next = NULL;
                     i_pen_x = 0;
                     i_pen_y += tmp_result.y;
@@ -2704,7 +2682,6 @@ static line_desc_t *NewLine( int i_count )
         return NULL;
     }
     p_line->pp_glyphs[0] = NULL;
-    p_line->b_new_color_mode = false;
 
     return p_line;
 }
