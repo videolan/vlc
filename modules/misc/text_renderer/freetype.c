@@ -1515,9 +1515,7 @@ static text_style_t *GetStyleFromFontStack( filter_sys_t *p_sys,
 }
 
 static int RenderTag( filter_t *p_filter, FT_Face p_face,
-                      int i_font_color,
-                      int i_style_flags,
-                      int i_karaoke_bgcolor,
+                      const text_style_t *p_style,
                       line_desc_t *p_line, uint32_t *psz_unicode,
                       int *pi_pen_x, int i_pen_y, int *pi_start,
                       FT_Vector *p_result )
@@ -1588,9 +1586,9 @@ static int RenderTag( filter_t *p_filter, FT_Face p_face,
          * ie. if the font we have loaded is NOT already in the
          * style that the tags want, then switch it on; if they
          * are then don't. */
-        if ((i_style_flags & STYLE_BOLD) && !(p_face->style_flags & FT_STYLE_FLAG_BOLD))
+        if ((p_style->i_style_flags & STYLE_BOLD) && !(p_face->style_flags & FT_STYLE_FLAG_BOLD))
             FT_GlyphSlot_Embolden( p_face->glyph );
-        if ((i_style_flags & STYLE_ITALIC) && !(p_face->style_flags & FT_STYLE_FLAG_ITALIC))
+        if ((p_style->i_style_flags & STYLE_ITALIC) && !(p_face->style_flags & FT_STYLE_FLAG_ITALIC))
             FT_GlyphSlot_Oblique( p_face->glyph );
 
         i_error = FT_Get_Glyph( p_face->glyph, &tmp_glyph );
@@ -1608,7 +1606,7 @@ static int RenderTag( filter_t *p_filter, FT_Face p_face,
             FT_Done_Glyph( tmp_glyph );
             continue;
         }
-        if( i_style_flags & (STYLE_UNDERLINE | STYLE_STRIKEOUT) )
+        if( p_style->i_style_flags & (STYLE_UNDERLINE | STYLE_STRIKEOUT) )
         {
             float aOffset = FT_FLOOR(FT_MulFix(p_face->underline_position,
                                                p_face->size->metrics.y_scale));
@@ -1619,7 +1617,7 @@ static int RenderTag( filter_t *p_filter, FT_Face p_face,
                                        ( aOffset < 0 ) ? -aOffset : aOffset;
             p_line->pi_underline_thickness[ i ] =
                                        ( aSize < 0 ) ? -aSize   : aSize;
-            if (i_style_flags & STYLE_STRIKEOUT)
+            if( p_style->i_style_flags & STYLE_STRIKEOUT )
             {
                 /* Move the baseline to make it strikethrough instead of
                  * underline. That means that strikethrough takes precedence
@@ -1633,8 +1631,8 @@ static int RenderTag( filter_t *p_filter, FT_Face p_face,
         }
 
         p_line->pp_glyphs[ i ] = (FT_BitmapGlyph)tmp_glyph;
-        p_line->p_fg_rgb[ i ] = i_font_color;
-        p_line->p_bg_rgb[ i ] = i_karaoke_bgcolor;
+        p_line->p_fg_rgb[ i ] = p_style->i_font_color;
+        p_line->p_bg_rgb[ i ] = p_style->i_karaoke_background_color;
         p_line->p_fg_bg_ratio[ i ] = 0x00;
 
         line.xMax = p_line->p_glyph_pos[i].x + glyph_size.xMax -
@@ -2338,9 +2336,7 @@ static int ProcessLines( filter_t *p_filter,
                 }
 
                 if( RenderTag( p_filter, p_face ? p_face : p_sys->p_face,
-                               p_style->i_font_color,
-                               p_style->i_style_flags,
-                               p_style->i_karaoke_background_color,
+                               p_style,
                                p_line, psz_unicode, &i_pen_x, i_pen_y, &i_posn,
                                &tmp_result ) != VLC_SUCCESS )
                 {
