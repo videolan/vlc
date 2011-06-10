@@ -47,7 +47,6 @@
 #include <vlc_url.h>
 #include <vlc_strings.h>
 
-#include <iostream>
 #include <limits.h>
 #include <assert.h>
 
