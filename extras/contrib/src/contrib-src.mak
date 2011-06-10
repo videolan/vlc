@@ -743,21 +743,16 @@ endif
 ifdef HAVE_MACOSX
 	( cd $@; sed -e 's%-dynamiclib%-dynamiclib -arch $(ARCH)%' -i.orig  configure )
 endif
+	patch -p0 < Patches/libFLAC-pc.patch
 
 FLAC_DISABLE_FLAGS = --disable-oggtest --disable-xmms-plugin --disable-cpplibs
 
 .flac: flac .ogg
 ifdef HAVE_MACOSX_ON_INTEL
-	cd $< && \
-	$(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-asm-optimizations $(FLAC_DISABLE_FLAGS)
-else
-	cd $< && \
-	$(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX)  $(FLAC_DISABLE_FLAGS)
+FLAC_DISABLE_FLAGS += --disable-asm-optimizations
 endif
-	cd $</src && \
-	make -C libFLAC && \
-	echo 'Requires.private: ogg' >> libFLAC/flac.pc && \
-	make -C libFLAC install
+	cd $< && $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) $(FLAC_DISABLE_FLAGS)
+	cd $</src && make -C libFLAC && make -C libFLAC install
 	cd $< && make -C include install
 	$(INSTALL_NAME)
 	touch $@
