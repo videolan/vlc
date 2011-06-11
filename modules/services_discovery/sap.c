@@ -80,12 +80,6 @@
 #define SAP_ADDR_LONGTEXT N_( "The SAP module normally chooses itself the " \
                               "right addresses to listen to. However, you " \
                               "can specify a specific address." )
-#define SAP_IPV4_TEXT N_( "IPv4 SAP" )
-#define SAP_IPV4_LONGTEXT N_( \
-      "Listen to IPv4 announcements on the standard addresses." )
-#define SAP_IPV6_TEXT N_( "IPv6 SAP" )
-#define SAP_IPV6_LONGTEXT N_( \
-      "Listen to IPv6 announcements on the standard addresses." )
 #define SAP_SCOPE_TEXT N_( "IPv6 SAP scope" )
 #define SAP_SCOPE_LONGTEXT N_( \
        "Scope for IPv6 announcements (default is 8)." )
@@ -124,10 +118,8 @@ vlc_module_begin ()
 
     add_string( "sap-addr", NULL,
                 SAP_ADDR_TEXT, SAP_ADDR_LONGTEXT, true )
-    add_bool( "sap-ipv4", true,
-               SAP_IPV4_TEXT,SAP_IPV4_LONGTEXT, true )
-    add_bool( "sap-ipv6", true,
-              SAP_IPV6_TEXT, SAP_IPV6_LONGTEXT, true )
+    add_obsolete_bool( "sap-ipv4" ) /* since 1.2.0 */
+    add_obsolete_bool( "sap-ipv6" ) /* since 1.2.0 */
     add_integer( "sap-timeout", 1800,
                  SAP_TIMEOUT_TEXT, SAP_TIMEOUT_LONGTEXT, true )
     add_bool( "sap-parse", true,
@@ -495,29 +487,24 @@ static void *Run( void *data )
      * Winsock 1.1 from Windows 95, if not Windows 3.1.
      * Anyway, to avoid a 30 seconds delay for failed IPv6 socket creation,
      * we have to open sockets in Run() rather than Open(). */
-    if( var_CreateGetBool( p_sd, "sap-ipv4" ) )
-    {
-        InitSocket( p_sd, SAP_V4_GLOBAL_ADDRESS, SAP_PORT );
-        InitSocket( p_sd, SAP_V4_ORG_ADDRESS, SAP_PORT );
-        InitSocket( p_sd, SAP_V4_LOCAL_ADDRESS, SAP_PORT );
-        InitSocket( p_sd, SAP_V4_LINK_ADDRESS, SAP_PORT );
-    }
-    if( var_CreateGetBool( p_sd, "sap-ipv6" ) )
-    {
-        char psz_address[NI_MAXNUMERICHOST] = "ff02::2:7ffe%";
+    InitSocket( p_sd, SAP_V4_GLOBAL_ADDRESS, SAP_PORT );
+    InitSocket( p_sd, SAP_V4_ORG_ADDRESS, SAP_PORT );
+    InitSocket( p_sd, SAP_V4_LOCAL_ADDRESS, SAP_PORT );
+    InitSocket( p_sd, SAP_V4_LINK_ADDRESS, SAP_PORT );
 
+    char psz_address[NI_MAXNUMERICHOST] = "ff02::2:7ffe%";
 #ifndef WIN32
-        struct if_nameindex *l = if_nameindex ();
-        if (l != NULL)
+    struct if_nameindex *l = if_nameindex ();
+    if (l != NULL)
+    {
+        char *ptr = strchr (psz_address, '%') + 1;
+        for (unsigned i = 0; l[i].if_index; i++)
         {
-            char *ptr = strchr (psz_address, '%') + 1;
-            for (unsigned i = 0; l[i].if_index; i++)
-            {
-                strcpy (ptr, l[i].if_name);
-                InitSocket (p_sd, psz_address, SAP_PORT);
-            }
-            if_freenameindex (l);
+            strcpy (ptr, l[i].if_name);
+            InitSocket (p_sd, psz_address, SAP_PORT);
         }
+        if_freenameindex (l);
+    }
 #else
         /* this is the Winsock2 equivalant of SIOCGIFCONF on BSD stacks,
            which if_nameindex uses internally anyway */
@@ -542,14 +529,13 @@ static void *Run( void *data )
             closesocket(s);
         }
 #endif
-        *strchr (psz_address, '%') = '\0';
+    *strchr (psz_address, '%') = '\0';
 
-        static const char ipv6_scopes[] = "1456789ABCDE";
-        for (const char *c_scope = ipv6_scopes; *c_scope; c_scope++)
-        {
-            psz_address[3] = *c_scope;
-            InitSocket( p_sd, psz_address, SAP_PORT );
-        }
+    static const char ipv6_scopes[] = "1456789ABCDE";
+    for (const char *c_scope = ipv6_scopes; *c_scope; c_scope++)
+    {
+        psz_address[3] = *c_scope;
+        InitSocket( p_sd, psz_address, SAP_PORT );
     }
 
     psz_addr = var_CreateGetString( p_sd, "sap-addr" );

@@ -134,17 +134,6 @@ int vlc_getaddrinfo( vlc_object_t *p_this, const char *node,
     /* We only ever use port *numbers* */
     hints.ai_flags |= AI_NUMERICSERV;
 
-    if( hints.ai_family == AF_UNSPEC )
-    {
-#ifdef AF_INET6
-        if (var_InheritBool (p_this, "ipv6"))
-            hints.ai_family = AF_INET6;
-        else
-#endif
-        if (var_InheritBool (p_this, "ipv4"))
-            hints.ai_family = AF_INET;
-    }
-
     /*
      * VLC extensions :
      * - accept "" as NULL

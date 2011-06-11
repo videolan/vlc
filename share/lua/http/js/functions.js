@@ -806,8 +806,6 @@ function update_input_net()
     if( type == "udp" )
     {
         mrl.value += "udp://";
-        if( checked( 'input_net_udp_forceipv6' ) )
-            mrl.value += "[::]";
         if( value( 'input_net_udp_port' ) )
             mrl.value += ":"+value( 'input_net_udp_port' );
     }

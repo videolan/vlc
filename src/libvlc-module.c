@@ -887,14 +887,6 @@ static const char *const ppsz_clock_descriptions[] =
 #define VCD_DEVICE       CD_DEVICE
 #define CDAUDIO_DEVICE   CD_DEVICE
 
-#define IPV6_TEXT N_("Force IPv6")
-#define IPV6_LONGTEXT N_( \
-    "IPv6 will be used by default for all connections.")
-
-#define IPV4_TEXT N_("Force IPv4")
-#define IPV4_LONGTEXT N_( \
-    "IPv4 will be used by default for all connections.")
-
 #define TIMEOUT_TEXT N_("TCP connection timeout")
 #define TIMEOUT_LONGTEXT N_( \
     "Default TCP connection timeout (in milliseconds). " )
@@ -1884,10 +1876,8 @@ vlc_module_begin ()
     add_integer( "server-port", 1234,
                  SERVER_PORT_TEXT, SERVER_PORT_LONGTEXT, false )
     add_integer( "mtu", MTU_DEFAULT, MTU_TEXT, MTU_LONGTEXT, true )
-    add_bool( "ipv6", 0, IPV6_TEXT, IPV6_LONGTEXT, false )
-        change_short('6')
-    add_bool( "ipv4", 0, IPV4_TEXT, IPV4_LONGTEXT, false )
-        change_short('4')
+    add_obsolete_bool( "ipv6" ) /* since 1.2.0 */
+    add_obsolete_bool( "ipv4" ) /* since 1.2.0 */
     add_integer( "ipv4-timeout", 5 * 1000, TIMEOUT_TEXT,
                  TIMEOUT_LONGTEXT, true )
 

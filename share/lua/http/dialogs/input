@@ -170,8 +170,6 @@ This dialog needs the following dialogs to be fully functional: browse
           <td>
             <label for="input_net_udp_port">Port</label>
             <input type="text" id="input_net_udp_port" size="6" onchange="update_input_net();" />
-            <input type="checkbox" id="input_net_udp_forceipv6" onchange="update_input_net();" />
-            <label for="input_net_udp_forceipv6">Force IPv6</label>
           </td>
         </tr>
         <tr>

@@ -107,10 +107,6 @@ static int Open( vlc_object_t *p_this )
 {
     access_t *p_access = (access_t*)p_this;
 
-    /* First set ipv4/ipv6 */
-    var_Create( p_access, "ipv4", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
-    var_Create( p_access, "ipv6", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
-
     /* mms-caching */
     var_Create( p_access, "mms-caching", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
 
