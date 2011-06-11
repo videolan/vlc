@@ -560,8 +560,8 @@ bool matroska_segment_c::Preload( )
         else if( MKV_IS_ID( el, KaxTag ) )
         {
             msg_Dbg( &sys.demuxer, "|   + Tags" );
-            if( i_tags_position < 0) // FIXME
-                ;//LoadTags( static_cast<KaxTags*>( el ) );
+            /*FIXME if( i_tags_position < 0)
+                LoadTags( static_cast<KaxTags*>( el ) );*/
             i_tags_position = (int64_t) es.I_O().getFilePointer();
         }
         else if( MKV_IS_ID( el, EbmlVoid ) )
