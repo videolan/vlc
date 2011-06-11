@@ -51,7 +51,7 @@
  *        distinguish from the fake dts case.)
  *
  *  DIRAC_NON_DATED is used to show a block should not have a time stamp
- *  associated (ie, don't interpolate a counter).  At the ouput, these
+ *  associated (ie, don't interpolate a counter).  At the output, these
  *  blocks get dated with the last used timestamp (or are merged with
  *  another encapsulation unit).
  */
@@ -1258,7 +1258,7 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
     block_t *p_output = NULL;
     block_t **pp_output = &p_output;
 
-    /* extract all the dated packets from the head of the ouput queue */
+    /* extract all the dated packets from the head of the output queue */
     /* explicitly nondated packets repeat the previous timestamps to
      * stop vlc discarding them */
     while( (p_block = p_sys->p_outqueue) )

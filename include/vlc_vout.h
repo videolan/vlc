@@ -59,7 +59,7 @@ typedef struct {
 } vout_configuration_t;
 
 /**
- * Video ouput thread private structure
+ * Video output thread private structure
  */
 typedef struct vout_thread_sys_t vout_thread_sys_t;
 

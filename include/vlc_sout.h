@@ -30,7 +30,7 @@
 
 /**
  * \file
- * This file defines structures and functions for stream ouput in vlc
+ * This file defines structures and functions for stream output in vlc
  */
 
 #ifdef __cplusplus
