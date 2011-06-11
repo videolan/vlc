@@ -557,9 +557,7 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
          * happen :). */
         msg_Warn( p_aout, "computed PTS is out of range (%"PRId64"), "
                   "clearing out", now - start_date );
-        aout_lock_input_fifos( p_aout );
         aout_FifoSet( &p_input->mixer.fifo, 0 );
-        aout_unlock_input_fifos( p_aout );
         if ( p_input->i_resampling_type != AOUT_RESAMPLING_NONE )
             msg_Warn( p_aout, "timing screwed, stopping resampling" );
         inputResamplingStop( p_input );
