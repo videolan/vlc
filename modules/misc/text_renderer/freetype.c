@@ -2235,8 +2235,8 @@ static int ProcessLines( filter_t *p_filter,
 #elif defined( WIN32 )
                 psz_fontfile = Win32_Select( p_filter,
                                             p_style->psz_fontname,
-                                            p_style->b_bold,
-                                            p_style->b_italic,
+                                            (p_style->i_style_flags & STYLE_BOLD) != 0,
+                                            (p_style->i_style_flags & STYLE_ITALIC) != 0,
                                             -1,
                                             &i_idx );
 #else
