@@ -457,12 +457,14 @@ static void Seek( demux_t *p_demux, mtime_t i_date, double f_percent, chapter_it
 }
 
 /* Utility function for BlockDecode */
-static block_t *MemToBlock( demux_t *p_demux, uint8_t *p_mem, size_t i_mem, size_t offset)
+static block_t *MemToBlock( uint8_t *p_mem, size_t i_mem, size_t offset)
 {
-    block_t *p_block;
-    if( !(p_block = block_New( p_demux, i_mem + offset ) ) ) return NULL;
-    memcpy( p_block->p_buffer + offset, p_mem, i_mem );
-    //p_block->i_rate = p_input->stream.control.i_rate;
+    block_t *p_block = block_New( p_demux, i_mem + offset );
+    if( likely(p_block != NULL) )
+    {
+        memcpy( p_block->p_buffer + offset, p_mem, i_mem );
+        //p_block->i_rate = p_input->stream.control.i_rate;
+    }
     return p_block;
 }
 
@@ -513,7 +515,7 @@ void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock
         block_t *p_init;
 
         msg_Dbg( p_demux, "sending header (%d bytes)", tk->i_data_init );
-        p_init = MemToBlock( p_demux, tk->p_data_init, tk->i_data_init, 0 );
+        p_init = MemToBlock( tk->p_data_init, tk->i_data_init, 0 );
         if( p_init ) es_out_Send( p_demux->out, tk->p_es, p_init );
     }
     tk->b_inited = true;
@@ -539,9 +541,9 @@ void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock
             break;
 
         if( tk->i_compression_type == MATROSKA_COMPRESSION_HEADER && tk->p_compression_data != NULL )
-            p_block = MemToBlock( p_demux, data->Buffer(), data->Size(), tk->p_compression_data->GetSize() );
+            p_block = MemToBlock( data->Buffer(), data->Size(), tk->p_compression_data->GetSize() );
         else
-            p_block = MemToBlock( p_demux, data->Buffer(), data->Size(), 0 );
+            p_block = MemToBlock( data->Buffer(), data->Size(), 0 );
 
         if( p_block == NULL )
         {
