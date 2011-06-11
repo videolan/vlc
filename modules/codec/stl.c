@@ -33,6 +33,7 @@
 #include <vlc_plugin.h>
 #include <vlc_codec.h>
 #include <vlc_memory.h>
+#include <vlc_charset.h>
 
 /*****************************************************************************
  * Module descriptor
@@ -51,11 +52,33 @@ vlc_module_end()
 /*****************************************************************************
  * Local definitions/prototypes
  *****************************************************************************/
+#define GSI_BLOCK_SIZE 1024
+
+typedef enum {
+    CCT_ISO_6937_2 = 0x3030, CCT_BEGIN = CCT_ISO_6937_2,
+    CCT_ISO_8859_5 = 0x3031,
+    CCT_ISO_8859_6 = 0x3032,
+    CCT_ISO_8859_7 = 0x3033,
+    CCT_ISO_8859_8 = 0x3034, CCT_END = CCT_ISO_8859_8
+} cct_number_value_t;
+
+typedef struct {
+    cct_number_value_t value;
+    const char *str;
+} cct_number_t;
+
 struct decoder_sys_t {
-    int dummy;
+    cct_number_value_t cct;
 };
 
-static char *ParseText(uint8_t *data, int size)
+static cct_number_t cct_nums[] = { {CCT_ISO_6937_2, "ISO_6937-2"},
+                                   {CCT_ISO_8859_5, "ISO_8859-5"},
+                                   {CCT_ISO_8859_6, "ISO_8859-6"},
+                                   {CCT_ISO_8859_7, "ISO_8859-7"},
+                                   {CCT_ISO_8859_8, "ISO_8859-8"} };
+
+
+static char *ParseText(uint8_t *data, int size, const char *charset)
 {
     char *text = strdup("");
     int  text_size = 0;
@@ -68,7 +91,8 @@ static char *ParseText(uint8_t *data, int size)
 
         char tmp[16] = "";
         char *t = tmp;
-        if (code >= 0x20 && code <= 0x7f)
+        if ((code >= 0x20 && code <= 0x7e) ||
+            (code >= 0xa0 && code <= 0xff) )
             snprintf(tmp, sizeof(tmp), "%c", code);
 #if 0
         else if (code == 0x80)
@@ -79,9 +103,9 @@ static char *ParseText(uint8_t *data, int size)
             snprintf(tmp, sizeof(tmp), "<u>");
         else if (code == 0x83)
             snprintf(tmp, sizeof(tmp), "</u>");
-#endif
         else if (code == 0x8a)
             snprintf(tmp, sizeof(tmp), "\n");
+#endif
         else {
             t = NULL;
         }
@@ -96,7 +120,7 @@ static char *ParseText(uint8_t *data, int size)
         text_size += t_size;
         text[text_size]   = '\0';
     }
-    return text;
+    return FromCharset(charset, text, text_size);
 }
 
 static subpicture_t *Decode(decoder_t *dec, block_t **block)
@@ -137,7 +161,9 @@ static subpicture_t *Decode(decoder_t *dec, block_t **block)
     video_format_Clean(&fmt);
 
     if (sub->p_region) {
-        sub->p_region->psz_text = ParseText(payload, payload_size);
+        sub->p_region->psz_text = ParseText(payload,
+                                            payload_size,
+                                            cct_nums[dec->p_sys->cct - CCT_BEGIN].str);
         sub->p_region->psz_html = NULL;
     }
 
@@ -148,6 +174,30 @@ exit:
     return sub;
 }
 
+static int ExtractCCT(const decoder_t *dec, cct_number_value_t *cct_number)
+{
+    uint8_t *header = dec->fmt_in.p_extra;
+    if (!header) {
+        msg_Err(dec, "NULL EBU header (GSI block)\n");
+        return VLC_EGENERIC;
+    }
+
+    if (GSI_BLOCK_SIZE != dec->fmt_in.i_extra) {
+        msg_Err(dec, "EBU header is not in expected size (%d)\n", dec->fmt_in.i_extra);
+        return VLC_EGENERIC;
+    }
+
+    int cct = (header[12] << 8) | header[13];
+    if (CCT_BEGIN > cct || CCT_END < cct) {
+        msg_Err(dec, "EBU header contains illegal CCT (0x%x)\n", cct);
+        return VLC_EGENERIC;
+    }
+
+    *cct_number = cct;
+
+    return VLC_SUCCESS;
+}
+
 static int Open(vlc_object_t *object)
 {
     decoder_t *dec = (decoder_t*)object;
@@ -155,7 +205,18 @@ static int Open(vlc_object_t *object)
     if (dec->fmt_in.i_codec != VLC_CODEC_EBU_STL)
         return VLC_EGENERIC;
 
+    cct_number_value_t cct;
+    int rc = ExtractCCT(dec, &cct);
+    if (VLC_SUCCESS != rc)
+        return rc;
+
+    msg_Dbg(dec, "CCT=0x%x", cct);
+
     decoder_sys_t *sys = malloc(sizeof(*sys));
+    if (!sys)
+        return VLC_ENOMEM;
+
+    sys->cct = cct;
 
     dec->p_sys = sys;
     dec->pf_decode_sub = Decode;
@@ -171,4 +232,3 @@ static void Close(vlc_object_t *object)
 
     free(sys);
 }
-
