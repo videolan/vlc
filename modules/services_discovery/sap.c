@@ -80,9 +80,6 @@
 #define SAP_ADDR_LONGTEXT N_( "The SAP module normally chooses itself the " \
                               "right addresses to listen to. However, you " \
                               "can specify a specific address." )
-#define SAP_SCOPE_TEXT N_( "IPv6 SAP scope" )
-#define SAP_SCOPE_LONGTEXT N_( \
-       "Scope for IPv6 announcements (default is 8)." )
 #define SAP_TIMEOUT_TEXT N_( "SAP timeout (seconds)" )
 #define SAP_TIMEOUT_LONGTEXT N_( \
        "Delay after which SAP items get deleted if no new announcement " \
@@ -96,11 +93,6 @@
 #define SAP_STRICT_LONGTEXT N_( \
        "When this is set, the SAP parser will discard some non-compliant " \
        "announcements." )
-#define SAP_CACHE_TEXT N_("Use SAP cache")
-#define SAP_CACHE_LONGTEXT N_( \
-       "This enables a SAP caching mechanism. " \
-       "This will result in lower SAP startup time, but you could end up " \
-       "with items corresponding to legacy streams." )
 
 /* Callbacks */
     static int  Open ( vlc_object_t * );
@@ -126,10 +118,6 @@ vlc_module_begin ()
                SAP_PARSE_TEXT,SAP_PARSE_LONGTEXT, true )
     add_bool( "sap-strict", false,
                SAP_STRICT_TEXT,SAP_STRICT_LONGTEXT, true )
-#if 0
-    add_bool( "sap-cache", false,
-               SAP_CACHE_TEXT,SAP_CACHE_LONGTEXT, true )
-#endif
     add_obsolete_bool( "sap-timeshift" ) /* Redumdant since 1.0.0 */
 
     set_capability( "services_discovery", 0 )
@@ -314,13 +302,6 @@ static int Open( vlc_object_t *p_this )
     p_sys->b_strict = var_CreateGetBool( p_sd, "sap-strict");
     p_sys->b_parse = var_CreateGetBool( p_sd, "sap-parse" );
 
-#if 0
-    if( var_CreateGetBool( p_sd, "sap-cache" ) )
-    {
-        CacheLoad( p_sd );
-    }
-#endif
-
     p_sys->i_announces = 0;
     p_sys->pp_announces = NULL;
     /* TODO: create sockets here, and fix racy sockets table */
@@ -437,13 +418,6 @@ static void Close( vlc_object_t *p_this )
         net_Close( p_sys->pi_fd[i] );
     }
     FREENULL( p_sys->pi_fd );
-
-#if 0
-    if( var_InheritBool( p_sd, "sap-cache" ) )
-    {
-        CacheSave( p_sd );
-    }
-#endif
 
     for( i = p_sys->i_announces  - 1;  i>= 0; i-- )
     {
