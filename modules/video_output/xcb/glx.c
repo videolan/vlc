@@ -470,7 +470,7 @@ static void SwapBuffers (vlc_gl_t *gl)
 static void *GetProcAddress (vlc_gl_t *gl, const char *name)
 {
     (void)gl;
-#ifdef GLX_ARB_get_proc_address
+#if defined(GLX_ARB_get_proc_address) && defined(GLX_GLXEXT_PROTOTYPES)
     return glXGetProcAddressARB ((const GLubyte *)name);
 #else
     return NULL;
