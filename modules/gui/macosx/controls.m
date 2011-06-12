@@ -882,7 +882,7 @@
         input_thread_t * p_input = pl_CurrentInput( VLCIntf );
         if( p_input )
         {
-            unsigned int timeInSec = 0;
+            int64_t timeInSec = 0;
             NSString * fieldContent = [o_specificTime_enter_fld stringValue];
             if( [[fieldContent componentsSeparatedByString: @":"] count] > 1 &&
                 [[fieldContent componentsSeparatedByString: @":"] count] <= 3 )
