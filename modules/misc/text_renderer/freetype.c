@@ -1037,31 +1037,6 @@ static bool StyleEquals( text_style_t *s1, text_style_t *s2 )
            !strcmp( s1->psz_fontname, s2->psz_fontname );
 }
 
-static void IconvText( filter_t *p_filter, const char *psz_string,
-                       size_t *i_string_length, uint32_t *psz_unicode )
-{
-    *i_string_length = 0;
-    if( psz_unicode == NULL )
-        return;
-
-    size_t i_length;
-    uint32_t *psz_tmp =
-#if defined(WORDS_BIGENDIAN)
-            ToCharset( "UCS-4BE", psz_string, &i_length );
-#else
-            ToCharset( "UCS-4LE", psz_string, &i_length );
-#endif
-    if( !psz_tmp )
-    {
-        msg_Warn( p_filter, "failed to convert string to unicode (%m)" );
-        return;
-    }
-    memcpy( psz_unicode, psz_tmp, i_length );
-    *i_string_length = i_length / 4;
-
-    free( psz_tmp );
-}
-
 static int PushFont( font_stack_t **p_font, const char *psz_name, int i_size,
                      uint32_t i_color, uint32_t i_karaoke_bg_color )
 {
@@ -1715,17 +1690,36 @@ static int RenderTag( filter_t *p_filter, FT_Face p_face,
     return VLC_SUCCESS;
 }
 
-static void SetupLine( filter_t *p_filter, const char *psz_text_in,
-                       uint32_t **ppsz_text_out, uint32_t *pi_runs,
-                       uint32_t **ppi_run_lengths, text_style_t ***ppp_styles,
-                       text_style_t *p_style )
+static unsigned SetupText( filter_t *p_filter,
+                           uint32_t *psz_text_out,
+                           uint32_t *pi_runs,
+                           uint32_t **ppi_run_lengths,
+                           text_style_t ***ppp_styles,
+
+                           const char *psz_text_in,
+                           text_style_t *p_style )
 {
     size_t i_string_length;
 
-    IconvText( p_filter, psz_text_in, &i_string_length, *ppsz_text_out );
-    *ppsz_text_out += i_string_length;
+    size_t i_string_bytes;
+#if defined(WORDS_BIGENDIAN)
+    uint32_t *psz_tmp = ToCharset( "UCS-4BE", psz_text_in, &i_string_bytes );
+#else
+    uint32_t *psz_tmp = ToCharset( "UCS-4LE", psz_text_in, &i_string_bytes );
+#endif
+    if( psz_tmp )
+    {
+        memcpy( psz_text_out, psz_tmp, i_string_bytes );
+        i_string_length = i_string_bytes / 4;
+        free( psz_tmp );
+    }
+    else
+    {
+        msg_Warn( p_filter, "failed to convert string to unicode (%m)" );
+        i_string_length = 0;
+    }
 
-    if( ppp_styles && ppi_run_lengths )
+    if( i_string_length > 0 && ppp_styles && ppi_run_lengths )
     {
         (*pi_runs)++;
 
@@ -1771,6 +1765,7 @@ static void SetupLine( filter_t *p_filter, const char *psz_text_in,
      * problems above, release it here.
      */
     text_style_Delete( p_style );
+    return i_string_length;
 }
 
 static int CheckForEmbeddedFont( filter_sys_t *p_sys, FT_Face *pp_face, text_style_t *p_style )
@@ -1820,10 +1815,10 @@ static int ProcessNodes( filter_t *p_filter,
                          uint32_t **ppi_k_run_lengths,
                          uint32_t **ppi_k_durations )
 {
-    int           rv             = VLC_SUCCESS;
-    filter_sys_t *p_sys          = p_filter->p_sys;
-    uint32_t        *psz_text_orig  = psz_text;
-    font_stack_t *p_fonts        = NULL;
+    int           rv      = VLC_SUCCESS;
+    filter_sys_t *p_sys   = p_filter->p_sys;
+    int i_text_length     = 0;
+    font_stack_t *p_fonts = NULL;
 
     int i_style_flags = 0;
 
@@ -1890,11 +1885,13 @@ static int ProcessNodes( filter_t *p_filter,
                     i_style_flags |= STYLE_STRIKEOUT;
                 else if( !strcasecmp( "br", node ) )
                 {
-                    SetupLine( p_filter, "\n", &psz_text,
-                               pi_runs, ppi_run_lengths, ppp_styles,
-                               GetStyleFromFontStack( p_sys,
-                                                      &p_fonts,
-                                                      i_style_flags ) );
+                    i_text_length += SetupText( p_filter,
+                                                &psz_text[i_text_length],
+                                                pi_runs, ppi_run_lengths, ppp_styles,
+                                                "\n",
+                                                GetStyleFromFontStack( p_sys,
+                                                                       &p_fonts,
+                                                                       i_style_flags ) );
                 }
                 else if( !strcasecmp( "k", node ) )
                 {
@@ -1919,18 +1916,20 @@ static int ProcessNodes( filter_t *p_filter,
                 HandleWhiteSpace( psz_node );
                 resolve_xml_special_chars( psz_node );
 
-                SetupLine( p_filter, psz_node, &psz_text,
-                           pi_runs, ppi_run_lengths, ppp_styles,
-                           GetStyleFromFontStack( p_sys,
-                                                  &p_fonts,
-                                                  i_style_flags ) );
+                i_text_length += SetupText( p_filter,
+                                            &psz_text[i_text_length],
+                                            pi_runs, ppi_run_lengths, ppp_styles,
+                                            psz_node,
+                                            GetStyleFromFontStack( p_sys,
+                                                                   &p_fonts,
+                                                                   i_style_flags ) );
                 free( psz_node );
                 break;
             }
         }
         if( rv != VLC_SUCCESS )
         {
-            psz_text = psz_text_orig;
+            i_text_length = 0;
             break;
         }
     }
@@ -1940,7 +1939,7 @@ static int ProcessNodes( filter_t *p_filter,
                        *pi_k_runs, *ppi_k_run_lengths );
     }
 
-    *pi_len = psz_text - psz_text_orig;
+    *pi_len = i_text_length;
 
     while( VLC_SUCCESS == PopFont( &p_fonts ) );
 
@@ -2461,6 +2460,14 @@ static int RenderCommon( filter_t *p_filter, subpicture_region_t *p_region_out,
     FT_Vector result = {0, 0};
     line_desc_t *p_lines = NULL;
 
+    uint32_t i_runs            = 0;
+    uint32_t i_k_runs          = 0;
+    uint32_t *pi_run_lengths   = NULL;
+    uint32_t *pi_k_run_lengths = NULL;
+    uint32_t *pi_k_durations   = NULL;
+    text_style_t **pp_styles   = NULL;
+    bool b_karaoke = false;
+
 #ifdef HAVE_STYLES
     if( b_html )
     {
@@ -2481,7 +2488,6 @@ static int RenderCommon( filter_t *p_filter, subpicture_region_t *p_region_out,
         if( !p_xml_reader )
             rv = VLC_EGENERIC;
 
-        bool b_karaoke = false;
         if( !rv )
         {
             /* Look for Root Node */
@@ -2491,10 +2497,6 @@ static int RenderCommon( filter_t *p_filter, subpicture_region_t *p_region_out,
             {
                 if( !strcasecmp( "karaoke", node ) )
                 {
-                    /* We're going to have to render the text a number
-                     * of times to show the progress marker on the text.
-                     */
-                    var_SetBool( p_filter, "text-rerender", true );
                     b_karaoke = true;
                 }
                 else if( !strcasecmp( "text", node ) )
@@ -2517,32 +2519,11 @@ static int RenderCommon( filter_t *p_filter, subpicture_region_t *p_region_out,
         }
         if( !rv )
         {
-            uint32_t    i_runs           = 0;
-            uint32_t    i_k_runs         = 0;
-            uint32_t   *pi_run_lengths   = NULL;
-            uint32_t   *pi_k_run_lengths = NULL;
-            uint32_t   *pi_k_durations   = NULL;
-            text_style_t **pp_styles     = NULL;
-
             rv = ProcessNodes( p_filter, p_xml_reader,
                                p_region_in->p_style, psz_text, &i_text_length,
                                &i_runs, &pi_run_lengths, &pp_styles,
                                b_karaoke, &i_k_runs, &pi_k_run_lengths,
                                &pi_k_durations );
-
-            if( !rv && i_text_length > 0 )
-            {
-                rv = ProcessLines( p_filter, psz_text, i_text_length, i_runs,
-                                   pi_run_lengths, pp_styles, &p_lines,
-                                   &result, b_karaoke, i_k_runs,
-                                   pi_k_run_lengths, pi_k_durations );
-            }
-
-            for( uint32_t k = 0; k < i_runs; k++ )
-                 text_style_Delete( pp_styles[k] );
-            free( pp_styles );
-            free( pi_run_lengths );
-
         }
 
         if( p_xml_reader )
@@ -2553,11 +2534,6 @@ static int RenderCommon( filter_t *p_filter, subpicture_region_t *p_region_out,
     else
 #endif
     {
-
-        size_t i_iconv_length;
-        IconvText( p_filter, p_region_in->psz_text, &i_iconv_length, psz_text );
-        i_text_length = i_iconv_length;
-
         text_style_t *p_style;
         if( p_region_in->p_style )
             p_style = CreateStyle( p_region_in->p_style->psz_fontname,
@@ -2575,15 +2551,30 @@ static int RenderCommon( filter_t *p_filter, subpicture_region_t *p_region_out,
                                    (p_sys->i_font_color & 0xffffff) |
                                    (((255-p_sys->i_font_opacity) & 0xff) << 24),
                                    0x00ffffff, 0);
-        uint32_t i_run_length = i_text_length;
 
-        rv = ProcessLines( p_filter, psz_text, i_text_length,
-                           1, &i_run_length, &p_style,
-                           &p_lines, &result,
-                           false, 0, NULL, NULL );
-        text_style_Delete( p_style );
+        i_text_length = SetupText( p_filter,
+                                   psz_text,
+                                   &i_runs, &pi_run_lengths, &pp_styles,
+                                   p_region_in->psz_text, p_style );
     }
+
+    if( !rv && i_text_length > 0 )
+    {
+        rv = ProcessLines( p_filter, psz_text, i_text_length, i_runs,
+                           pi_run_lengths, pp_styles, &p_lines,
+                           &result, b_karaoke, i_k_runs,
+                           pi_k_run_lengths, pi_k_durations );
+    }
+
     free( psz_text );
+
+    for( uint32_t k = 0; k < i_runs; k++ )
+         text_style_Delete( pp_styles[k] );
+    free( pp_styles );
+    free( pi_run_lengths );
+    free( pi_k_run_lengths );
+    free( pi_k_durations );
+
 
     p_region_out->i_x = p_region_in->i_x;
     p_region_out->i_y = p_region_in->i_y;
@@ -2598,6 +2589,13 @@ static int RenderCommon( filter_t *p_filter, subpicture_region_t *p_region_out,
         else
             RenderYUVA( p_filter, p_region_out, p_lines,
                         result.x, result.y );
+
+
+        /* With karaoke, we're going to have to render the text a number
+         * of times to show the progress marker on the text.
+         */
+        if( b_karaoke )
+            var_SetBool( p_filter, "text-rerender", true );
     }
 
     FreeLines( p_lines );
