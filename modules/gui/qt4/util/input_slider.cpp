@@ -51,6 +51,7 @@ SeekSlider::SeekSlider( Qt::Orientation q, QWidget *_parent )
           : QSlider( q, _parent )
 {
     b_isSliding = false;
+    f_buffering = 1.0;
 
     /* Timer used to fire intermediate updatePos() when sliding */
     seekLimitTimer = new QTimer( this );
@@ -74,7 +75,6 @@ SeekSlider::SeekSlider( Qt::Orientation q, QWidget *_parent )
 
     CONNECT( this, sliderMoved( int ), this, startSeekTimer() );
     CONNECT( seekLimitTimer, timeout(), this, updatePos() );
-
     mTimeTooltip->installEventFilter( this );
 }
 
@@ -112,6 +112,12 @@ void SeekSlider::updatePos()
 {
     float f_pos = (float)( value() ) / 1000.0;
     emit sliderDragged( f_pos ); /* Send new position to VLC's core */
+}
+
+void SeekSlider::updateBuffering( float f_buffering_ )
+{
+    f_buffering = f_buffering_;
+    repaint();
 }
 
 void SeekSlider::mouseReleaseEvent( QMouseEvent *event )
@@ -310,6 +316,17 @@ void SeekSlider::paintEvent( QPaintEvent *event )
         painter.setPen( Qt::NoPen );
         painter.setBrush( foregroundGradient );
         painter.drawRoundedRect( valueRect, barCorner, barCorner );
+    }
+
+    // draw buffering overlay
+    if ( f_buffering < 1.0 )
+    {
+        QRect innerRect = barRect.adjusted( 1, 1,
+                            barRect.width() * ( -1.0 + f_buffering ) - 1, 0 );
+        QColor overlayColor = QColor( "Orange" );
+        overlayColor.setAlpha( 128 );
+        painter.setBrush( overlayColor );
+        painter.drawRoundedRect( innerRect, barCorner, barCorner );
     }
 
     // draw handle

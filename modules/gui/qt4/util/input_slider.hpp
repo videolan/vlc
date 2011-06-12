@@ -66,9 +66,11 @@ private:
     char psz_length[MSTRTIME_MAX_SIZE]; /* Used for the ToolTip */
     QTimer *seekLimitTimer;
     TimeTooltip *mTimeTooltip;
+    float f_buffering;
 
 public slots:
     void setPosition( float, int64_t, int );
+    void updateBuffering( float );
 
 private slots:
     void startSeekTimer();
