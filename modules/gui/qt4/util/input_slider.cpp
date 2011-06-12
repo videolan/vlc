@@ -87,6 +87,7 @@ SeekSlider::SeekSlider( Qt::Orientation q, QWidget *_parent )
  ***/
 void SeekSlider::setPosition( float pos, int64_t time, int length )
 {
+    VLC_UNUSED(time);
     if( pos == -1.0 )
     {
         setEnabled( false );
