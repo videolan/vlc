@@ -2386,11 +2386,11 @@ DISTCLEAN_PKG += schroedinger-$(SCHROED_VERSION).tar.gz
 # libass
 # ***************************************************************************
 
-libass-$(ASS_VERSION).tar.bz2:
+libass-$(ASS_VERSION).tar.gz:
 	$(WGET) $(ASS_URL)
 
-libass: libass-$(ASS_VERSION).tar.bz2
-	$(EXTRACT_BZ2)
+libass: libass-$(ASS_VERSION).tar.gz
+	$(EXTRACT_GZ)
 	(cd $@; autoreconf -ivf)
 
 .libass: libass .freetype
@@ -2399,7 +2399,7 @@ libass: libass-$(ASS_VERSION).tar.bz2
 
 CLEAN_FILE += .libass
 CLEAN_PKG += libass
-DISTCLEAN_PKG += libass-$(ASS_VERSION).tar.bz2
+DISTCLEAN_PKG += libass-$(ASS_VERSION).tar.gz
 
 # ***************************************************************************
 # Sparkle
