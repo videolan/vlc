@@ -28,6 +28,7 @@
     /* generic */
     intf_thread_t *p_intf;
     IBOutlet id o_window;
+    IBOutlet id o_tableView;
 
     /* basic */
     IBOutlet id o_adjust_ckb;
@@ -140,6 +141,8 @@
 
 /* generic */
 + (VLCVideoEffects *)sharedInstance;
+- (void)resetValues;
+- (void)setVideoFilter: (char *)psz_name on:(BOOL)b_on;
 
 /* basic */
 - (IBAction)enableAdjust:(id)sender;
