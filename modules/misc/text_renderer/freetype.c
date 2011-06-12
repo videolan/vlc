@@ -42,7 +42,6 @@
 #include <vlc_dialog.h>                        /* FcCache dialog */
 #include <vlc_filter.h>                                      /* filter_sys_t */
 #include <vlc_text_style.h>                                   /* text_style_t*/
-#include <vlc_memory.h>                                   /* realloc_or_free */
 
 /* Default fonts */
 #ifdef __APPLE__
@@ -1382,76 +1381,6 @@ static int HandleFontAttributes( xml_reader_t *p_xml_reader,
     return rv;
 }
 
-static void SetKaraokeLen( uint32_t i_runs, uint32_t *pi_run_lengths,
-                           uint32_t i_k_runs, uint32_t *pi_k_run_lengths )
-{
-    /* Karaoke tags _PRECEDE_ the text they specify a duration
-     * for, therefore we are working out the length for the
-     * previous tag, and first time through we have nothing
-     */
-    if( pi_k_run_lengths )
-    {
-        int i_chars = 0;
-        uint32_t i;
-
-        /* Work out how many characters are presently in the string
-         */
-        for( i = 0; i < i_runs; i++ )
-            i_chars += pi_run_lengths[ i ];
-
-        /* Subtract away those we've already allocated to other
-         * karaoke tags
-         */
-        for( i = 0; i < i_k_runs; i++ )
-            i_chars -= pi_k_run_lengths[ i ];
-
-        pi_k_run_lengths[ i_k_runs - 1 ] = i_chars;
-    }
-}
-
-static void SetupKaraoke( xml_reader_t *p_xml_reader, uint32_t *pi_k_runs,
-                          uint32_t **ppi_k_run_lengths,
-                          uint32_t **ppi_k_durations )
-{
-    const char *name, *value;
-
-    while( (name = xml_ReaderNextAttr( p_xml_reader, &value )) != NULL )
-    {
-        if( !strcasecmp( "t", name ) )
-        {
-            if( ppi_k_durations && ppi_k_run_lengths )
-            {
-                (*pi_k_runs)++;
-
-                if( *ppi_k_durations )
-                {
-                    *ppi_k_durations = realloc_or_free( *ppi_k_durations,
-                                                        *pi_k_runs * sizeof(**ppi_k_durations) );
-                }
-                else if( *pi_k_runs == 1 )
-                {
-                    *ppi_k_durations = malloc( *pi_k_runs * sizeof(**ppi_k_durations) );
-                }
-
-                if( *ppi_k_run_lengths )
-                {
-                    *ppi_k_run_lengths = realloc_or_free( *ppi_k_run_lengths,
-                                                          *pi_k_runs * sizeof(**ppi_k_run_lengths) );
-                }
-                else if( *pi_k_runs == 1 )
-                {
-                    *ppi_k_run_lengths = malloc( *pi_k_runs * sizeof(**ppi_k_run_lengths) );
-                }
-                if( *ppi_k_durations )
-                    (*ppi_k_durations)[ *pi_k_runs - 1 ] = atoi( value );
-
-                if( *ppi_k_run_lengths )
-                    (*ppi_k_run_lengths)[ *pi_k_runs - 1 ] = 0;
-            }
-        }
-    }
-}
-
 /* Turn any multiple-whitespaces into single spaces */
 static void HandleWhiteSpace( char *psz_node )
 {
@@ -1692,12 +1621,12 @@ static int RenderTag( filter_t *p_filter, FT_Face p_face,
 
 static unsigned SetupText( filter_t *p_filter,
                            uint32_t *psz_text_out,
-                           uint32_t *pi_runs,
-                           uint32_t **ppi_run_lengths,
-                           text_style_t ***ppp_styles,
+                           text_style_t **pp_styles,
+                           uint32_t *pi_k_dates,
 
                            const char *psz_text_in,
-                           text_style_t *p_style )
+                           text_style_t *p_style,
+                           uint32_t i_k_date )
 {
     size_t i_string_length;
 
@@ -1719,52 +1648,20 @@ static unsigned SetupText( filter_t *p_filter,
         i_string_length = 0;
     }
 
-    if( i_string_length > 0 && ppp_styles && ppi_run_lengths )
+    if( i_string_length > 0 )
     {
-        (*pi_runs)++;
-
-        /* XXX this logic looks somewhat broken */
-
-        if( *ppp_styles )
-        {
-            *ppp_styles = realloc_or_free( *ppp_styles,
-                                           *pi_runs * sizeof(**ppp_styles) );
-        }
-        else if( *pi_runs == 1 )
-        {
-            *ppp_styles = malloc( *pi_runs * sizeof(**ppp_styles) );
-        }
-
-        /* We have just malloc'ed this memory successfully -
-         * *pi_runs HAS to be within the memory area of *ppp_styles */
-        if( *ppp_styles )
-        {
-            (*ppp_styles)[ *pi_runs - 1 ] = p_style;
-            p_style = NULL;
-        }
-
-        /* XXX more iffy logic */
-
-        if( *ppi_run_lengths )
-        {
-            *ppi_run_lengths = realloc_or_free( *ppi_run_lengths,
-                                                *pi_runs * sizeof(**ppi_run_lengths) );
-        }
-        else if( *pi_runs == 1 )
-        {
-            *ppi_run_lengths = malloc( *pi_runs * sizeof(**ppi_run_lengths) );
-        }
-
-        /* same remarks here */
-        if( *ppi_run_lengths )
-        {
-            (*ppi_run_lengths)[ *pi_runs - 1 ] = i_string_length;
-        }
+        for( unsigned i = 0; i < i_string_length; i++ )
+            pp_styles[i] = p_style;
     }
-    /* If we couldn't use the p_style argument due to memory allocation
-     * problems above, release it here.
-     */
-    text_style_Delete( p_style );
+    else
+    {
+        text_style_Delete( p_style );
+    }
+    if( i_string_length > 0 && pi_k_dates )
+    {
+        for( unsigned i = 0; i < i_string_length; i++ )
+            pi_k_dates[i] = i_k_date;
+    }
     return i_string_length;
 }
 
@@ -1801,24 +1698,18 @@ static int CheckForEmbeddedFont( filter_sys_t *p_sys, FT_Face *pp_face, text_sty
 }
 
 static int ProcessNodes( filter_t *p_filter,
-                         xml_reader_t *p_xml_reader,
-                         text_style_t *p_font_style,
                          uint32_t *psz_text,
+                         text_style_t **pp_styles,
+                         uint32_t *pi_k_dates,
                          int *pi_len,
-
-                         uint32_t *pi_runs,
-                         uint32_t **ppi_run_lengths,
-                         text_style_t * **ppp_styles,
-
-                         bool b_karaoke,
-                         uint32_t *pi_k_runs,
-                         uint32_t **ppi_k_run_lengths,
-                         uint32_t **ppi_k_durations )
+                         xml_reader_t *p_xml_reader,
+                         text_style_t *p_font_style )
 {
     int           rv      = VLC_SUCCESS;
     filter_sys_t *p_sys   = p_filter->p_sys;
     int i_text_length     = 0;
     font_stack_t *p_fonts = NULL;
+    uint32_t i_k_date     = 0;
 
     int i_style_flags = 0;
 
@@ -1874,7 +1765,7 @@ static int ProcessNodes( filter_t *p_filter,
 
             case XML_READER_STARTELEM:
                 if( !strcasecmp( "font", node ) )
-                    rv = HandleFontAttributes( p_xml_reader, &p_fonts );
+                    HandleFontAttributes( p_xml_reader, &p_fonts );
                 else if( !strcasecmp( "b", node ) )
                     i_style_flags |= STYLE_BOLD;
                 else if( !strcasecmp( "i", node ) )
@@ -1887,22 +1778,22 @@ static int ProcessNodes( filter_t *p_filter,
                 {
                     i_text_length += SetupText( p_filter,
                                                 &psz_text[i_text_length],
-                                                pi_runs, ppi_run_lengths, ppp_styles,
+                                                &pp_styles[i_text_length],
+                                                pi_k_dates ? &pi_k_dates[i_text_length] : NULL,
                                                 "\n",
                                                 GetStyleFromFontStack( p_sys,
                                                                        &p_fonts,
-                                                                       i_style_flags ) );
+                                                                       i_style_flags ),
+                                                i_k_date );
                 }
                 else if( !strcasecmp( "k", node ) )
                 {
-                    /* Only valid in karaoke */
-                    if( b_karaoke )
+                    /* Karaoke tags */
+                    const char *name, *value;
+                    while( (name = xml_ReaderNextAttr( p_xml_reader, &value )) != NULL )
                     {
-                        if( *pi_k_runs > 0 )
-                            SetKaraokeLen( *pi_runs, *ppi_run_lengths,
-                                           *pi_k_runs, *ppi_k_run_lengths );
-                        SetupKaraoke( p_xml_reader, pi_k_runs,
-                                      ppi_k_run_lengths, ppi_k_durations );
+                        if( !strcasecmp( "t", name ) && value )
+                            i_k_date += atoi( value );
                     }
                 }
                 break;
@@ -1918,32 +1809,24 @@ static int ProcessNodes( filter_t *p_filter,
 
                 i_text_length += SetupText( p_filter,
                                             &psz_text[i_text_length],
-                                            pi_runs, ppi_run_lengths, ppp_styles,
+                                            &pp_styles[i_text_length],
+                                            pi_k_dates ? &pi_k_dates[i_text_length] : NULL,
                                             psz_node,
                                             GetStyleFromFontStack( p_sys,
                                                                    &p_fonts,
-                                                                   i_style_flags ) );
+                                                                   i_style_flags ),
+                                            i_k_date );
                 free( psz_node );
                 break;
             }
         }
-        if( rv != VLC_SUCCESS )
-        {
-            i_text_length = 0;
-            break;
-        }
-    }
-    if( b_karaoke )
-    {
-        SetKaraokeLen( *pi_runs, *ppi_run_lengths,
-                       *pi_k_runs, *ppi_k_run_lengths );
     }
 
     *pi_len = i_text_length;
 
     while( VLC_SUCCESS == PopFont( &p_fonts ) );
 
-    return rv;
+    return VLC_SUCCESS;
 }
 
 static void FreeLine( line_desc_t *p_line )
@@ -2005,38 +1888,22 @@ static line_desc_t *NewLine( int i_count )
 
 
 static int ProcessLines( filter_t *p_filter,
-                         uint32_t *psz_text,
-                         int i_len,
-
-                         uint32_t i_runs,
-                         uint32_t *pi_run_lengths,
-                         text_style_t **pp_styles,
                          line_desc_t **pp_lines,
+                         FT_Vector   *p_result,
 
-                         FT_Vector *p_result,
-
-                         bool b_karaoke,
-                         uint32_t i_k_runs,
-                         uint32_t *pi_k_run_lengths,
-                         uint32_t *pi_k_durations )
+                         uint32_t *psz_text,
+                         text_style_t **pp_styles,
+                         uint32_t *pi_k_dates,
+                         int i_len )
 {
     filter_sys_t   *p_sys = p_filter->p_sys;
-    text_style_t   **pp_char_styles;
+    uint32_t       *p_fribidi_string = NULL;
+    text_style_t   **pp_fribidi_styles = NULL;
     int            *p_new_positions = NULL;
-    int8_t         *p_levels = NULL;
     uint8_t        *pi_karaoke_bar = NULL;
-    uint32_t        i, j, k;
     int             i_prev;
 
-    /* Assign each character in the text string its style explicitly, so that
-     * after the characters have been shuffled around by Fribidi, we can re-apply
-     * the styles, and to simplify the calculation of runs within a line.
-     */
-    pp_char_styles = malloc( i_len * sizeof(*pp_char_styles));
-    if( !pp_char_styles )
-        return VLC_ENOMEM;
-
-    if( b_karaoke )
+    if( pi_k_dates )
     {
         pi_karaoke_bar = malloc( i_len * sizeof(*pi_karaoke_bar));
         /* If we can't allocate sufficient memory for karaoke, continue anyway -
@@ -2045,26 +1912,20 @@ static int ProcessLines( filter_t *p_filter,
          */
     }
 
-    i = 0;
-    for( j = 0; j < i_runs; j++ )
-        for( k = 0; k < pi_run_lengths[ j ]; k++ )
-            pp_char_styles[ i++ ] = pp_styles[ j ];
-
 #if defined(HAVE_FRIBIDI)
     {
-        text_style_t **pp_char_styles_new;
-        int         *p_old_positions;
-        uint32_t    *p_fribidi_string;
+        int    *p_old_positions;
+        int8_t *p_levels;
         int start_pos, pos = 0;
 
-        pp_char_styles_new = malloc( i_len * sizeof(*pp_char_styles_new));
+        pp_fribidi_styles = calloc( i_len, sizeof(*pp_fribidi_styles) );
 
-        p_fribidi_string   = malloc( (i_len + 1) * sizeof(*p_fribidi_string) );
-        p_old_positions    = malloc( (i_len + 1) * sizeof(*p_old_positions) );
-        p_new_positions    = malloc( (i_len + 1) * sizeof(*p_new_positions) );
-        p_levels           = malloc( (i_len + 1) * sizeof(*p_levels) );
+        p_fribidi_string  = malloc( (i_len + 1) * sizeof(*p_fribidi_string) );
+        p_old_positions   = malloc( (i_len + 1) * sizeof(*p_old_positions) );
+        p_new_positions   = malloc( (i_len + 1) * sizeof(*p_new_positions) );
+        p_levels          = malloc( (i_len + 1) * sizeof(*p_levels) );
 
-        if( ! pp_char_styles_new ||
+        if( ! pp_fribidi_styles ||
             ! p_fribidi_string ||
             ! p_old_positions ||
             ! p_new_positions ||
@@ -2074,10 +1935,8 @@ static int ProcessLines( filter_t *p_filter,
             free( p_old_positions );
             free( p_new_positions );
             free( p_fribidi_string );
-            free( pp_char_styles_new );
+            free( pp_fribidi_styles );
             free( pi_karaoke_bar );
-
-            free( pp_char_styles );
             return VLC_ENOMEM;
         }
 
@@ -2088,7 +1947,7 @@ static int ProcessLines( filter_t *p_filter,
                 if (psz_text[pos] != '\n')
                     break;
                 p_fribidi_string[pos] = psz_text[pos];
-                pp_char_styles_new[pos] = pp_char_styles[pos];
+                pp_fribidi_styles[pos] = pp_styles[pos];
                 p_new_positions[pos] = pos;
                 p_levels[pos] = 0;
                 ++pos;
@@ -2112,82 +1971,34 @@ static int ProcessLines( filter_t *p_filter,
                         p_new_positions + start_pos,
                         p_old_positions,
                         p_levels + start_pos );
-                for( j = (uint32_t) start_pos; j < (uint32_t) pos; j++ )
+                for( int j = start_pos; j < pos; j++ )
                 {
-                    pp_char_styles_new[ j ] = pp_char_styles[ start_pos +
-                                                p_old_positions[ j - start_pos ] ];
+                    pp_fribidi_styles[ j ] = pp_styles[ start_pos + p_old_positions[j - start_pos] ];
                     p_new_positions[ j ] += start_pos;
                 }
             }
         }
-        free( p_old_positions );
-        free( pp_char_styles );
-        pp_char_styles = pp_char_styles_new;
-        psz_text = p_fribidi_string;
         p_fribidi_string[ i_len ] = 0;
+        free( p_old_positions );
+        free( p_levels );
+
+        pp_styles = pp_fribidi_styles;
+        psz_text = p_fribidi_string;
     }
 #endif
     /* Work out the karaoke */
     if( pi_karaoke_bar )
     {
-        int64_t i_last_duration = 0;
-        int64_t i_duration = 0;
-        int64_t i_start_pos = 0;
         int64_t i_elapsed  = var_GetTime( p_filter, "spu-elapsed" ) / 1000;
-
-        for( k = 0; k< i_k_runs; k++ )
+        for( int i = 0; i < i_len; i++ )
         {
-             double fraction = 0.0;
-
-             i_duration += pi_k_durations[ k ];
-
-             if( i_duration < i_elapsed )
-             {
-                 /* Completely finished this run-length -
-                  * let it render normally */
-
-                 fraction = 1.0;
-             }
-             else if( i_elapsed < i_last_duration )
-             {
-                 /* Haven't got up to this segment yet -
-                  * render it completely in karaoke BG mode */
-
-                 fraction = 0.0;
-             }
-             else
-             {
-                 /* Partway through this run */
-
-                 fraction = (double)(i_elapsed - i_last_duration) /
-                            (double)pi_k_durations[ k ];
-             }
-             for( i = 0; i < pi_k_run_lengths[ k ]; i++ )
-             {
-                 double shade = pi_k_run_lengths[ k ] * fraction;
-
-                 if( p_new_positions )
-                     j = p_new_positions[ i_start_pos + i ];
-                 else
-                     j = i_start_pos + i;
-
-                 if( i < (uint32_t)shade )
-                     pi_karaoke_bar[ j ] = 0xff;
-                 else if( (double)i > shade )
-                     pi_karaoke_bar[ j ] = 0x00;
-                 else
-                 {
-                     shade -= (int)shade;
-                     pi_karaoke_bar[ j ] = ((int)(shade * 128.0) & 0x7f) |
-                                   ((p_levels ? (p_levels[ j ] % 2) : 0 ) << 7);
-                 }
-             }
-
-             i_last_duration = i_duration;
-             i_start_pos += pi_k_run_lengths[ k ];
+            unsigned i_bar = p_new_positions ? p_new_positions[i] : i;
+            if( pi_k_dates[i] < i_elapsed )
+                pi_karaoke_bar[i_bar] = 0x7f;
+            else
+                pi_karaoke_bar[i_bar] = 0x00;
         }
     }
-    free( p_levels );
     free( p_new_positions );
 
     FT_Vector tmp_result;
@@ -2203,13 +2014,13 @@ static int ProcessLines( filter_t *p_filter,
     tmp_result.x = tmp_result.y = 0;
 
     i_prev = 0;
-    for( k = 0; k <= (uint32_t) i_len; k++ )
+    for( uint32_t k = 0; k <= (uint32_t) i_len; k++ )
     {
         if( ( k == (uint32_t) i_len ) ||
           ( ( k > 0 ) &&
-            !StyleEquals( pp_char_styles[ k ], pp_char_styles[ k - 1] ) ) )
+            !StyleEquals( pp_styles[ k ], pp_styles[ k - 1] ) ) )
         {
-            text_style_t *p_style = pp_char_styles[ k - 1 ];
+            text_style_t *p_style = pp_styles[ k - 1 ];
 
             /* End of the current style run */
             FT_Face p_face = NULL;
@@ -2257,10 +2068,8 @@ static int ProcessLines( filter_t *p_filter,
                                 psz_fontfile, i_idx, &p_face ) )
                     {
                         free( psz_fontfile );
-                        free( pp_char_styles );
-#if defined(HAVE_FRIBIDI)
-                        free( psz_text );
-#endif
+                        free( pp_fribidi_styles );
+                        free( p_fribidi_string );
                         free( pi_karaoke_bar );
                         return VLC_EGENERIC;
                     }
@@ -2283,10 +2092,8 @@ static int ProcessLines( filter_t *p_filter,
                     p_style->i_font_size ) )
             {
                 if( p_face ) FT_Done_Face( p_face );
-                free( pp_char_styles );
-#if defined(HAVE_FRIBIDI)
-                free( psz_text );
-#endif
+                free( pp_fribidi_styles );
+                free( p_fribidi_string );
                 free( pi_karaoke_bar );
                 return VLC_EGENERIC;
             }
@@ -2298,11 +2105,9 @@ static int ProcessLines( filter_t *p_filter,
             if( !psz_unicode )
             {
                 if( p_face ) FT_Done_Face( p_face );
-                free( pp_char_styles );
+                free( pp_fribidi_styles );
                 free( psz_unicode );
-#if defined(HAVE_FRIBIDI)
-                free( psz_text );
-#endif
+                free( p_fribidi_string );
                 free( pi_karaoke_bar );
                 return VLC_ENOMEM;
             }
@@ -2316,11 +2121,9 @@ static int ProcessLines( filter_t *p_filter,
                     if( !(p_line = NewLine( i_len - i_prev)) )
                     {
                         if( p_face ) FT_Done_Face( p_face );
-                        free( pp_char_styles );
+                        free( pp_fribidi_styles );
                         free( psz_unicode );
-#if defined(HAVE_FRIBIDI)
-                        free( psz_text );
-#endif
+                        free( p_fribidi_string );
                         free( pi_karaoke_bar );
                         return VLC_ENOMEM;
                     }
@@ -2340,11 +2143,9 @@ static int ProcessLines( filter_t *p_filter,
                                &tmp_result ) != VLC_SUCCESS )
                 {
                     if( p_face ) FT_Done_Face( p_face );
-                    free( pp_char_styles );
+                    free( pp_fribidi_styles );
                     free( psz_unicode );
-#if defined(HAVE_FRIBIDI)
-                    free( psz_text );
-#endif
+                    free( p_fribidi_string );
                     free( pi_karaoke_bar );
                     return VLC_EGENERIC;
                 }
@@ -2373,10 +2174,9 @@ static int ProcessLines( filter_t *p_filter,
             i_prev = k;
         }
     }
-    free( pp_char_styles );
-#if defined(HAVE_FRIBIDI)
-    free( psz_text );
-#endif
+    free( pp_fribidi_styles );
+    free( p_fribidi_string );
+
     if( p_line )
     {
         p_result->x = __MAX( p_result->x, tmp_result.x );
@@ -2388,7 +2188,7 @@ static int ProcessLines( filter_t *p_filter,
         int i = 0;
         for( p_line = *pp_lines; p_line; p_line=p_line->p_next )
         {
-            for( k = 0; p_line->pp_glyphs[ k ]; k++, i++ )
+            for( uint32_t k = 0; p_line->pp_glyphs[ k ]; k++, i++ )
             {
                 if( (pi_karaoke_bar[ i ] & 0x7f) == 0x7f)
                 {
@@ -2444,12 +2244,17 @@ static int RenderCommon( filter_t *p_filter, subpicture_region_t *p_region_out,
     if( !b_html && !p_region_in->psz_text )
         return VLC_EGENERIC;
 
-    uint32_t *psz_text = calloc( strlen( b_html ? p_region_in->psz_html
-                                                : p_region_in->psz_text ),
-                                 sizeof( *psz_text ) );
-    if( !psz_text )
-        return VLC_EGENERIC;
+    const size_t i_text_max = strlen( b_html ? p_region_in->psz_html
+                                             : p_region_in->psz_text );
 
+    uint32_t *psz_text = calloc( i_text_max, sizeof( *psz_text ) );
+    text_style_t **pp_styles = calloc( i_text_max, sizeof( *pp_styles ) );
+    if( !psz_text || !pp_styles )
+    {
+        free( psz_text );
+        free( pp_styles );
+        return VLC_EGENERIC;
+    }
 
     /* Reset the default fontsize in case screen metrics have changed */
     p_filter->p_sys->i_font_size = GetFontSize( p_filter );
@@ -2460,13 +2265,7 @@ static int RenderCommon( filter_t *p_filter, subpicture_region_t *p_region_out,
     FT_Vector result = {0, 0};
     line_desc_t *p_lines = NULL;
 
-    uint32_t i_runs            = 0;
-    uint32_t i_k_runs          = 0;
-    uint32_t *pi_run_lengths   = NULL;
-    uint32_t *pi_k_run_lengths = NULL;
     uint32_t *pi_k_durations   = NULL;
-    text_style_t **pp_styles   = NULL;
-    bool b_karaoke = false;
 
 #ifdef HAVE_STYLES
     if( b_html )
@@ -2495,15 +2294,11 @@ static int RenderCommon( filter_t *p_filter, subpicture_region_t *p_region_out,
 
             if( xml_ReaderNextNode( p_xml_reader, &node ) == XML_READER_STARTELEM )
             {
-                if( !strcasecmp( "karaoke", node ) )
+                if( strcasecmp( "karaoke", node ) == 0 )
                 {
-                    b_karaoke = true;
+                    pi_k_durations = calloc( i_text_max, sizeof( *pi_k_durations ) );
                 }
-                else if( !strcasecmp( "text", node ) )
-                {
-                    b_karaoke = false;
-                }
-                else
+                else if( strcasecmp( "text", node ) != 0 )
                 {
                     /* Only text and karaoke tags are supported */
                     msg_Dbg( p_filter, "Unsupported top-level tag <%s> ignored.",
@@ -2519,11 +2314,9 @@ static int RenderCommon( filter_t *p_filter, subpicture_region_t *p_region_out,
         }
         if( !rv )
         {
-            rv = ProcessNodes( p_filter, p_xml_reader,
-                               p_region_in->p_style, psz_text, &i_text_length,
-                               &i_runs, &pi_run_lengths, &pp_styles,
-                               b_karaoke, &i_k_runs, &pi_k_run_lengths,
-                               &pi_k_durations );
+            rv = ProcessNodes( p_filter,
+                               psz_text, pp_styles, pi_k_durations, &i_text_length,
+                               p_xml_reader, p_region_in->p_style );
         }
 
         if( p_xml_reader )
@@ -2554,27 +2347,17 @@ static int RenderCommon( filter_t *p_filter, subpicture_region_t *p_region_out,
 
         i_text_length = SetupText( p_filter,
                                    psz_text,
-                                   &i_runs, &pi_run_lengths, &pp_styles,
-                                   p_region_in->psz_text, p_style );
+                                   pp_styles,
+                                   NULL,
+                                   p_region_in->psz_text, p_style, 0 );
     }
 
     if( !rv && i_text_length > 0 )
     {
-        rv = ProcessLines( p_filter, psz_text, i_text_length, i_runs,
-                           pi_run_lengths, pp_styles, &p_lines,
-                           &result, b_karaoke, i_k_runs,
-                           pi_k_run_lengths, pi_k_durations );
+        rv = ProcessLines( p_filter,
+                           &p_lines, &result,
+                           psz_text, pp_styles, pi_k_durations, i_text_length );
     }
-
-    free( psz_text );
-
-    for( uint32_t k = 0; k < i_runs; k++ )
-         text_style_Delete( pp_styles[k] );
-    free( pp_styles );
-    free( pi_run_lengths );
-    free( pi_k_run_lengths );
-    free( pi_k_durations );
-
 
     p_region_out->i_x = p_region_in->i_x;
     p_region_out->i_y = p_region_in->i_y;
@@ -2594,11 +2377,21 @@ static int RenderCommon( filter_t *p_filter, subpicture_region_t *p_region_out,
         /* With karaoke, we're going to have to render the text a number
          * of times to show the progress marker on the text.
          */
-        if( b_karaoke )
+        if( pi_k_durations )
             var_SetBool( p_filter, "text-rerender", true );
     }
 
     FreeLines( p_lines );
+
+    free( psz_text );
+    for( int i = 0; i < i_text_length; i++ )
+    {
+        if( pp_styles[i] && ( i + 1 == i_text_length || pp_styles[i] != pp_styles[i + 1] ) )
+            text_style_Delete( pp_styles[i] );
+    }
+    free( pp_styles );
+    free( pi_k_durations );
+
     return rv;
 }
 
