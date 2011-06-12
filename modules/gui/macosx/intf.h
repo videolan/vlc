@@ -105,7 +105,7 @@ struct intf_sys_t
     id o_about;                 /* VLAboutBox     */
     id o_open;                  /* VLCOpen        */
     id o_wizard;                /* VLCWizard      */
-    id o_extended;              /* VLCExtended    */
+    id o_videoeffects;          /* VLCVideoEffects */
     id o_bookmarks;             /* VLCBookmarks   */
     id o_embedded_list;         /* VLCEmbeddedList*/
     id o_coredialogs;           /* VLCCoreDialogProvider */
@@ -117,13 +117,13 @@ struct intf_sys_t
     BOOL nib_open_loaded;       /* open nibfile */
     BOOL nib_about_loaded;      /* about nibfile */
     BOOL nib_wizard_loaded;     /* wizard nibfile */
-    BOOL nib_extended_loaded;   /* extended nibfile */
     BOOL nib_bookmarks_loaded;  /* bookmarks nibfile */
     BOOL nib_prefs_loaded;      /* preferences nibfile */
     BOOL nib_info_loaded;       /* information panel nibfile */
     BOOL nib_coredialogs_loaded; /* CoreDialogs nibfile */
     BOOL nib_audioeffects_loaded; /* audio effects panel */
     BOOL nib_tracksynchro_loaded; /* track synchro panel */
+    BOOL nib_videoeffects_loaded;   /* video effects panel */
 
     IBOutlet VLCControllerWindow * o_window;                     /* main window */
     IBOutlet NSView * o_playlist_view;                          /* playlist view  */
@@ -284,7 +284,7 @@ struct intf_sys_t
     IBOutlet NSMenuItem * o_mi_player;
     IBOutlet NSMenuItem * o_mi_controller;
     IBOutlet NSMenuItem * o_mi_audioeffects;
-    IBOutlet NSMenuItem * o_mi_extended;
+    IBOutlet NSMenuItem * o_mi_videoeffects;
     IBOutlet NSMenuItem * o_mi_bookmarks;
     IBOutlet NSMenuItem * o_mi_playlist;
     IBOutlet NSMenuItem * o_mi_info;
@@ -407,7 +407,7 @@ struct intf_sys_t
 - (IBAction)intfOpenCapture:(id)sender;
 
 - (IBAction)showWizard:(id)sender;
-- (IBAction)showExtended:(id)sender;
+- (IBAction)showVideoEffects:(id)sender;
 - (IBAction)showAudioEffects:(id)sender;
 - (IBAction)showTrackSynchronization:(id)sender;
 - (IBAction)showBookmarks:(id)sender;

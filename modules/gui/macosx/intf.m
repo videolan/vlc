@@ -47,7 +47,6 @@
 #import "about.h"
 #import "open.h"
 #import "wizard.h"
-#import "extended.h"
 #import "bookmarks.h"
 #import "coredialogs.h"
 #import "embeddedwindow.h"
@@ -55,6 +54,7 @@
 #import "eyetv.h"
 #import "simple_prefs.h"
 #import "AudioEffects.h"
+#import "VideoEffects.h"
 #import "TrackSynchronization.h"
 
 #import <AddressBook/AddressBook.h>         /* for crashlog send mechanism */
@@ -345,7 +345,6 @@ static VLCMain *_o_sharedMainInstance = nil;
     o_prefs = nil;
     o_open = [[VLCOpen alloc] init];
     o_wizard = [[VLCWizard alloc] init];
-    o_extended = nil;
     o_bookmarks = [[VLCBookmarks alloc] init];
     //o_embedded_list = [[VLCEmbeddedList alloc] init];
     o_coredialogs = [[VLCCoreDialogProvider alloc] init];
@@ -714,7 +713,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     [o_mi_player setTitle: _NS("Player...")];
     [o_mi_controller setTitle: _NS("Controller...")];
     [o_mi_audioeffects setTitle: _NS("Audio Effects...")];
-    [o_mi_extended setTitle: _NS("Extended Controls...")];
+    [o_mi_videoeffects setTitle: _NS("Video Filters...")];
     [o_mi_bookmarks setTitle: _NS("Bookmarks...")];
     [o_mi_playlist setTitle: _NS("Playlist...")];
     [o_mi_info setTitle: _NS("Media Information...")];
@@ -838,8 +837,8 @@ static VLCMain *_o_sharedMainInstance = nil;
     if( nib_open_loaded )
         [o_open release];
 
-    if( nib_extended_loaded )
-        [o_extended release];
+    if( nib_videoeffects_loaded )
+        [o_videoeffects release];
 
     if (nib_audioeffects_loaded)
         [o_audioeffects release];
@@ -2235,15 +2234,15 @@ end:
     }
 }
 
-- (IBAction)showExtended:(id)sender
+- (IBAction)showVideoEffects:(id)sender
 {
-    if( o_extended == nil )
-        o_extended = [[VLCExtended alloc] init];
+    if( o_videoeffects == nil )
+        o_videoeffects = [[VLCVideoEffects alloc] init];
 
-    if( !nib_extended_loaded )
-        nib_extended_loaded = [NSBundle loadNibNamed:@"Extended" owner: NSApp];
+    if( !nib_videoeffects_loaded )
+        nib_videoeffects_loaded = [NSBundle loadNibNamed:@"VideoEffects" owner: NSApp];
 
-    [o_extended showPanel];
+    [o_videoeffects toggleWindow:sender];
 }
 
 - (IBAction)showTrackSynchronization:(id)sender

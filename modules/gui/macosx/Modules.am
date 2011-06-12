@@ -41,8 +41,6 @@ SOURCES_macosx = \
 	output.m \
 	wizard.h \
 	wizard.m \
-	extended.h \
-	extended.m \
 	AudioEffects.h \
 	AudioEffects.m \
 	TrackSynchronization.h \

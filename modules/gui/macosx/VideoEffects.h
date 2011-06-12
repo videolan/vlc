@@ -141,6 +141,7 @@
 
 /* generic */
 + (VLCVideoEffects *)sharedInstance;
+- (IBAction)toggleWindow:(id)sender;
 - (void)resetValues;
 - (void)setVideoFilter: (char *)psz_name on:(BOOL)b_on;
 

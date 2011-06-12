@@ -44,7 +44,6 @@
 		CC402EEE0E00ABBB006A4BA4 /* Preferences.nib in Resources */ = {isa = PBXBuildFile; fileRef = DCF358B9077F10BA007DB450 /* Preferences.nib */; };
 		CC402EEF0E00ABBB006A4BA4 /* Open.nib in Resources */ = {isa = PBXBuildFile; fileRef = DCA693C10789DF8700139EC6 /* Open.nib */; };
 		CC402EF00E00ABBB006A4BA4 /* Wizard.nib in Resources */ = {isa = PBXBuildFile; fileRef = DCFCCDB7085CE18F001E36AF /* Wizard.nib */; };
-		CC402EF10E00ABBB006A4BA4 /* Extended.nib in Resources */ = {isa = PBXBuildFile; fileRef = DC7F46EB08A183FC0027DB24 /* Extended.nib */; };
 		CC402EF20E00ABBB006A4BA4 /* Bookmarks.nib in Resources */ = {isa = PBXBuildFile; fileRef = DCE7BD0308A56C8B007B10AE /* Bookmarks.nib */; };
 		CC402EF30E00ABBB006A4BA4 /* about_bg.png in Resources */ = {isa = PBXBuildFile; fileRef = DCDA5E6408F94518009D93A8 /* about_bg.png */; };
 		CC402EF50E00ABBB006A4BA4 /* skip_forward_active_embedded.png in Resources */ = {isa = PBXBuildFile; fileRef = C2F2A6FA0958A6E600018C74 /* skip_forward_active_embedded.png */; };
@@ -394,9 +393,6 @@
 		CCF11B530F8BFB520088542D /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = Resources/English.lproj/ErrorPanel.nib; sourceTree = "<group>"; };
 		DC769AB7085DF0DB001A838D /* wizard.m */ = {isa = PBXFileReference; fileEncoding = 5; indentWidth = 4; lastKnownFileType = sourcecode.c.objc; name = wizard.m; path = ../../../modules/gui/macosx/wizard.m; sourceTree = SOURCE_ROOT; tabWidth = 4; usesTabs = 0; };
 		DC769AB8085DF0DB001A838D /* wizard.h */ = {isa = PBXFileReference; fileEncoding = 5; lastKnownFileType = sourcecode.c.h; name = wizard.h; path = ../../../modules/gui/macosx/wizard.h; sourceTree = SOURCE_ROOT; };
-		DC7F46EC08A183FC0027DB24 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = Resources/English.lproj/Extended.nib; sourceTree = "<group>"; };
-		DC7F46F008A187F60027DB24 /* extended.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.objc; fileEncoding = 5; name = extended.h; path = ../../../modules/gui/macosx/extended.h; sourceTree = SOURCE_ROOT; usesTabs = 0; };
-		DC7F46F108A187F60027DB24 /* extended.m */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.objc; fileEncoding = 4; includeInIndex = 0; name = extended.m; path = ../../../modules/gui/macosx/extended.m; sourceTree = SOURCE_ROOT; };
 		DCA00AA8075F948800E6BF46 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = Resources/English.lproj/About.nib; sourceTree = "<group>"; };
 		DCA693C20789DF8700139EC6 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = Resources/English.lproj/Open.nib; sourceTree = "<group>"; };
 		DCDA5E6408F94518009D93A8 /* about_bg.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = about_bg.png; path = Resources/about_bg.png; sourceTree = "<group>"; };
@@ -508,8 +504,6 @@
 				8E9CA1A506D7DEE800B7186C /* voutgl.m */,
 				DC769AB8085DF0DB001A838D /* wizard.h */,
 				DC769AB7085DF0DB001A838D /* wizard.m */,
-				DC7F46F008A187F60027DB24 /* extended.h */,
-				DC7F46F108A187F60027DB24 /* extended.m */,
 				DCE7BD0708A5724D007B10AE /* bookmarks.h */,
 				DCE7BD0608A5724D007B10AE /* bookmarks.m */,
 				CC6D8D9C0A878DED006F2BBE /* AppleRemote.h */,
@@ -807,7 +801,6 @@
 				DCF358B9077F10BA007DB450 /* Preferences.nib */,
 				DCA693C10789DF8700139EC6 /* Open.nib */,
 				DCFCCDB7085CE18F001E36AF /* Wizard.nib */,
-				DC7F46EB08A183FC0027DB24 /* Extended.nib */,
 				DCE7BD0308A56C8B007B10AE /* Bookmarks.nib */,
 				CC5560261365CE4800D54038 /* AudioEffects.nib */,
 				CC707EC6137474A50003010A /* SyncTracks.nib */,
@@ -938,7 +931,6 @@
 				CC402EEE0E00ABBB006A4BA4 /* Preferences.nib in Resources */,
 				CC402EEF0E00ABBB006A4BA4 /* Open.nib in Resources */,
 				CC402EF00E00ABBB006A4BA4 /* Wizard.nib in Resources */,
-				CC402EF10E00ABBB006A4BA4 /* Extended.nib in Resources */,
 				CC402EF20E00ABBB006A4BA4 /* Bookmarks.nib in Resources */,
 				CC402EF30E00ABBB006A4BA4 /* about_bg.png in Resources */,
 				CC402EF50E00ABBB006A4BA4 /* skip_forward_active_embedded.png in Resources */,
@@ -1062,14 +1054,6 @@
 				CCF11B530F8BFB520088542D /* English */,
 			);
 			name = ErrorPanel.nib;
-			sourceTree = "<group>";
-		};
-		DC7F46EB08A183FC0027DB24 /* Extended.nib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				DC7F46EC08A183FC0027DB24 /* English */,
-			);
-			name = Extended.nib;
 			sourceTree = "<group>";
 		};
 		DCA00AA7075F948800E6BF46 /* About.nib */ = {

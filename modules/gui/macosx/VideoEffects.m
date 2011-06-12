@@ -48,6 +48,14 @@ static VLCVideoEffects *_o_sharedInstance = nil;
     return _o_sharedInstance;
 }
 
+- (IBAction)toggleWindow:(id)sender
+{
+    if( [o_window isVisible] )
+        [o_window orderOut:sender];
+    else
+        [o_window makeKeyAndOrderFront:sender];
+}
+
 - (void)awakeFromNib
 {
     [o_window setTitle: _NS("Video Effects")];
@@ -216,7 +224,7 @@ static VLCVideoEffects *_o_sharedInstance = nil;
     [o_banding_sld setIntValue: config_GetInt( p_intf, "gradfun-radius" )];
     [o_banding_sld setEnabled: [o_banding_ckb state]];
     [o_grain_sld setFloatValue: config_GetFloat( p_intf, "grain-variance" )];
-    [o_grain_sld setEnabled: [o_grain_sld state]];
+    [o_grain_sld setEnabled: [o_grain_ckb state]];
 
     [o_crop_top_fld setIntValue: 0];
     [o_crop_left_fld setIntValue: 0];

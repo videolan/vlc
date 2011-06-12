@@ -2,19 +2,19 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.10">
   <data>
     <int key="IBDocument.SystemTarget">1040</int>
-    <string key="IBDocument.SystemVersion">11A444d</string>
+    <string key="IBDocument.SystemVersion">11A480b</string>
     <string key="IBDocument.InterfaceBuilderVersion">851</string>
-    <string key="IBDocument.AppKitVersion">1119.1</string>
-    <string key="IBDocument.HIToolboxVersion">555.00</string>
+    <string key="IBDocument.AppKitVersion">1127</string>
+    <string key="IBDocument.HIToolboxVersion">561.00</string>
     <object class="NSMutableDictionary" key="IBDocument.PluginVersions">
       <string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
       <string key="NS.object.0">851</string>
     </object>
     <object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
       <bool key="EncodedWithXMLCoder">YES</bool>
-      <integer value="3568"/>
-      <integer value="24"/>
       <integer value="3654"/>
+      <integer value="24"/>
+      <integer value="3568"/>
       <integer value="2197"/>
       <integer value="2417"/>
     </object>
@@ -1506,7 +1506,7 @@
                 </object>
                 <object class="NSMenuItem" id="96198661">
                   <reference key="NSMenu" ref="1016637396"/>
-                  <string key="NSTitle">Extended Controls...</string>
+                  <string key="NSTitle">Video Effects...</string>
                   <string key="NSKeyEquiv">e</string>
                   <int key="NSKeyEquivModMask">1048576</int>
                   <int key="NSMnemonicLoc">2147483647</int>
@@ -5608,14 +5608,6 @@ LCAuLi4</string>
         </object>
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
-            <string key="label">o_mi_extended</string>
-            <reference key="source" ref="199714555"/>
-            <reference key="destination" ref="96198661"/>
-          </object>
-          <int key="connectionID">2391</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBOutletConnection" key="connection">
             <string key="label">o_mi_bookmarks</string>
             <reference key="source" ref="199714555"/>
             <reference key="destination" ref="876119308"/>
@@ -5661,14 +5653,6 @@ LCAuLi4</string>
             <reference key="destination" ref="943477411"/>
           </object>
           <int key="connectionID">2406</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBActionConnection" key="connection">
-            <string key="label">showExtended:</string>
-            <reference key="source" ref="199714555"/>
-            <reference key="destination" ref="96198661"/>
-          </object>
-          <int key="connectionID">2413</int>
         </object>
         <object class="IBConnectionRecord">
           <object class="IBActionConnection" key="connection">
@@ -6957,6 +6941,22 @@ LCAuLi4</string>
             <reference key="destination" ref="803013150"/>
           </object>
           <int key="connectionID">4414</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">showVideoEffects:</string>
+            <reference key="source" ref="199714555"/>
+            <reference key="destination" ref="96198661"/>
+          </object>
+          <int key="connectionID">4415</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_mi_videoeffects</string>
+            <reference key="source" ref="199714555"/>
+            <reference key="destination" ref="96198661"/>
+          </object>
+          <int key="connectionID">4416</int>
         </object>
       </object>
       <object class="IBMutableOrderedSet" key="objectRecords">
@@ -10978,7 +10978,7 @@ LCAuLi4</string>
         </object>
       </object>
       <nil key="sourceID"/>
-      <int key="maxID">4414</int>
+      <int key="maxID">4416</int>
     </object>
     <object class="IBClassDescriber" key="IBDocument.Classes">
       <object class="NSMutableArray" key="referencedPartialClassDescriptionsV3.1+">
@@ -11015,11 +11015,11 @@ LCAuLi4</string>
               <string>saveDebugLog:</string>
               <string>showAudioEffects:</string>
               <string>showBookmarks:</string>
-              <string>showExtended:</string>
               <string>showInformationPanel:</string>
               <string>showLicense:</string>
               <string>showMessagesPanel:</string>
               <string>showTrackSynchronization:</string>
+              <string>showVideoEffects:</string>
               <string>showWizard:</string>
               <string>timeFieldWasClicked:</string>
               <string>timesliderUpdate:</string>
@@ -11084,11 +11084,11 @@ LCAuLi4</string>
               <string>saveDebugLog:</string>
               <string>showAudioEffects:</string>
               <string>showBookmarks:</string>
-              <string>showExtended:</string>
               <string>showInformationPanel:</string>
               <string>showLicense:</string>
               <string>showMessagesPanel:</string>
               <string>showTrackSynchronization:</string>
+              <string>showVideoEffects:</string>
               <string>showWizard:</string>
               <string>timeFieldWasClicked:</string>
               <string>timesliderUpdate:</string>
@@ -11169,10 +11169,6 @@ LCAuLi4</string>
                 <string key="candidateClassName">id</string>
               </object>
               <object class="IBActionInfo">
-                <string key="name">showExtended:</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBActionInfo">
                 <string key="name">showInformationPanel:</string>
                 <string key="candidateClassName">id</string>
               </object>
@@ -11186,6 +11182,10 @@ LCAuLi4</string>
               </object>
               <object class="IBActionInfo">
                 <string key="name">showTrackSynchronization:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">showVideoEffects:</string>
                 <string key="candidateClassName">id</string>
               </object>
               <object class="IBActionInfo">
@@ -11255,7 +11255,6 @@ LCAuLi4</string>
               <string>o_dmi_stop</string>
               <string>o_embedded_list</string>
               <string>o_embedded_window</string>
-              <string>o_extended</string>
               <string>o_eyetv</string>
               <string>o_main_pgbar</string>
               <string>o_messages</string>
@@ -11286,7 +11285,6 @@ LCAuLi4</string>
               <string>o_mi_donation</string>
               <string>o_mi_double_window</string>
               <string>o_mi_errorsAndWarnings</string>
-              <string>o_mi_extended</string>
               <string>o_mi_faster</string>
               <string>o_mi_ffmpeg_pp</string>
               <string>o_mi_fittoscreen</string>
@@ -11347,6 +11345,7 @@ LCAuLi4</string>
               <string>o_mi_teletext_yellow</string>
               <string>o_mi_title</string>
               <string>o_mi_trackSynchronization</string>
+              <string>o_mi_videoeffects</string>
               <string>o_mi_videotrack</string>
               <string>o_mi_visual</string>
               <string>o_mi_vol_down</string>
@@ -11387,6 +11386,7 @@ LCAuLi4</string>
               <string>o_timefield</string>
               <string>o_timeslider</string>
               <string>o_trackSynchronization</string>
+              <string>o_videoeffects</string>
               <string>o_vmi_fullscreen</string>
               <string>o_vmi_mute</string>
               <string>o_vmi_next</string>
@@ -11433,7 +11433,6 @@ LCAuLi4</string>
               <string>NSMenuItem</string>
               <string>id</string>
               <string>VLCEmbeddedWindow</string>
-              <string>id</string>
               <string>id</string>
               <string>NSProgressIndicator</string>
               <string>NSTextView</string>
@@ -11565,6 +11564,7 @@ LCAuLi4</string>
               <string>NSTextField</string>
               <string>NSSlider</string>
               <string>id</string>
+              <string>id</string>
               <string>NSMenuItem</string>
               <string>NSMenuItem</string>
               <string>NSMenuItem</string>
@@ -11614,7 +11614,6 @@ LCAuLi4</string>
               <string>o_dmi_stop</string>
               <string>o_embedded_list</string>
               <string>o_embedded_window</string>
-              <string>o_extended</string>
               <string>o_eyetv</string>
               <string>o_main_pgbar</string>
               <string>o_messages</string>
@@ -11645,7 +11644,6 @@ LCAuLi4</string>
               <string>o_mi_donation</string>
               <string>o_mi_double_window</string>
               <string>o_mi_errorsAndWarnings</string>
-              <string>o_mi_extended</string>
               <string>o_mi_faster</string>
               <string>o_mi_ffmpeg_pp</string>
               <string>o_mi_fittoscreen</string>
@@ -11706,6 +11704,7 @@ LCAuLi4</string>
               <string>o_mi_teletext_yellow</string>
               <string>o_mi_title</string>
               <string>o_mi_trackSynchronization</string>
+              <string>o_mi_videoeffects</string>
               <string>o_mi_videotrack</string>
               <string>o_mi_visual</string>
               <string>o_mi_vol_down</string>
@@ -11746,6 +11745,7 @@ LCAuLi4</string>
               <string>o_timefield</string>
               <string>o_timeslider</string>
               <string>o_trackSynchronization</string>
+              <string>o_videoeffects</string>
               <string>o_vmi_fullscreen</string>
               <string>o_vmi_mute</string>
               <string>o_vmi_next</string>
@@ -11880,10 +11880,6 @@ LCAuLi4</string>
                 <string key="candidateClassName">VLCEmbeddedWindow</string>
               </object>
               <object class="IBToOneOutletInfo">
-                <string key="name">o_extended</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
                 <string key="name">o_eyetv</string>
                 <string key="candidateClassName">id</string>
               </object>
@@ -12001,10 +11997,6 @@ LCAuLi4</string>
               </object>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_mi_errorsAndWarnings</string>
-                <string key="candidateClassName">NSMenuItem</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_mi_extended</string>
                 <string key="candidateClassName">NSMenuItem</string>
               </object>
               <object class="IBToOneOutletInfo">
@@ -12248,6 +12240,10 @@ LCAuLi4</string>
                 <string key="candidateClassName">NSMenuItem</string>
               </object>
               <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_videoeffects</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
                 <string key="name">o_mi_videotrack</string>
                 <string key="candidateClassName">NSMenuItem</string>
               </object>
@@ -12405,6 +12401,10 @@ LCAuLi4</string>
               </object>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_trackSynchronization</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_videoeffects</string>
                 <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">

@@ -21,7 +21,7 @@
     </object>
     <object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
       <bool key="EncodedWithXMLCoder">YES</bool>
-      <integer value="3"/>
+      <integer value="2"/>
     </object>
     <object class="NSArray" key="IBDocument.PluginDependencies">
       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -91,14 +91,14 @@
                                 <string key="NSReuseIdentifierKey">_NS:209</string>
                                 <bool key="NSEnabled">YES</bool>
                                 <object class="BGHUDSliderCell" key="NSCell" id="1048958433">
-                                  <int key="NSCellFlags">-2080244224</int>
+                                  <int key="NSCellFlags">-2079981824</int>
                                   <int key="NSCellFlags2">131072</int>
                                   <string key="NSContents"/>
                                   <string key="NSCellIdentifier">_NS:209</string>
                                   <reference key="NSControlView" ref="665985520"/>
-                                  <double key="NSMaxValue">100</double>
+                                  <double key="NSMaxValue">3</double>
                                   <double key="NSMinValue">0.0</double>
-                                  <double key="NSValue">50</double>
+                                  <double key="NSValue">1</double>
                                   <double key="NSAltIncValue">0.0</double>
                                   <int key="NSNumberOfTickMarks">0</int>
                                   <int key="NSTickMarkPosition">1</int>
@@ -115,14 +115,14 @@
                                 <string key="NSReuseIdentifierKey">_NS:209</string>
                                 <bool key="NSEnabled">YES</bool>
                                 <object class="BGHUDSliderCell" key="NSCell" id="880862519">
-                                  <int key="NSCellFlags">-2080244224</int>
+                                  <int key="NSCellFlags">-2079981824</int>
                                   <int key="NSCellFlags2">131072</int>
                                   <string key="NSContents"/>
                                   <string key="NSCellIdentifier">_NS:209</string>
                                   <reference key="NSControlView" ref="714538558"/>
-                                  <double key="NSMaxValue">100</double>
+                                  <double key="NSMaxValue">2</double>
                                   <double key="NSMinValue">0.0</double>
-                                  <double key="NSValue">50</double>
+                                  <double key="NSValue">1</double>
                                   <double key="NSAltIncValue">0.0</double>
                                   <int key="NSNumberOfTickMarks">0</int>
                                   <int key="NSTickMarkPosition">1</int>
@@ -270,14 +270,14 @@
                                 <string key="NSReuseIdentifierKey">_NS:209</string>
                                 <bool key="NSEnabled">YES</bool>
                                 <object class="BGHUDSliderCell" key="NSCell" id="631341256">
-                                  <int key="NSCellFlags">-2080244224</int>
+                                  <int key="NSCellFlags">-2079981824</int>
                                   <int key="NSCellFlags2">131072</int>
                                   <string key="NSContents"/>
                                   <string key="NSCellIdentifier">_NS:209</string>
                                   <reference key="NSControlView" ref="248577800"/>
-                                  <double key="NSMaxValue">100</double>
+                                  <double key="NSMaxValue">1</double>
                                   <double key="NSMinValue">0.0</double>
-                                  <double key="NSValue">50</double>
+                                  <double key="NSValue">1</double>
                                   <double key="NSAltIncValue">0.0</double>
                                   <int key="NSNumberOfTickMarks">0</int>
                                   <int key="NSTickMarkPosition">1</int>
@@ -294,14 +294,14 @@
                                 <string key="NSReuseIdentifierKey">_NS:209</string>
                                 <bool key="NSEnabled">YES</bool>
                                 <object class="BGHUDSliderCell" key="NSCell" id="1043425917">
-                                  <int key="NSCellFlags">-2080244224</int>
+                                  <int key="NSCellFlags">-2079981824</int>
                                   <int key="NSCellFlags2">131072</int>
                                   <string key="NSContents"/>
                                   <string key="NSCellIdentifier">_NS:209</string>
                                   <reference key="NSControlView" ref="1033837370"/>
-                                  <double key="NSMaxValue">100</double>
+                                  <double key="NSMaxValue">360</double>
                                   <double key="NSMinValue">0.0</double>
-                                  <double key="NSValue">50</double>
+                                  <double key="NSValue">0.0</double>
                                   <double key="NSAltIncValue">0.0</double>
                                   <int key="NSNumberOfTickMarks">0</int>
                                   <int key="NSTickMarkPosition">1</int>
@@ -318,14 +318,14 @@
                                 <string key="NSReuseIdentifierKey">_NS:209</string>
                                 <bool key="NSEnabled">YES</bool>
                                 <object class="BGHUDSliderCell" key="NSCell" id="733566762">
-                                  <int key="NSCellFlags">-2080244224</int>
+                                  <int key="NSCellFlags">-2079981824</int>
                                   <int key="NSCellFlags2">131072</int>
                                   <string key="NSContents"/>
                                   <string key="NSCellIdentifier">_NS:209</string>
                                   <reference key="NSControlView" ref="376722054"/>
-                                  <double key="NSMaxValue">100</double>
+                                  <double key="NSMaxValue">2</double>
                                   <double key="NSMinValue">0.0</double>
-                                  <double key="NSValue">50</double>
+                                  <double key="NSValue">1</double>
                                   <double key="NSAltIncValue">0.0</double>
                                   <int key="NSNumberOfTickMarks">0</int>
                                   <int key="NSTickMarkPosition">1</int>
@@ -342,14 +342,14 @@
                                 <string key="NSReuseIdentifierKey">_NS:209</string>
                                 <bool key="NSEnabled">YES</bool>
                                 <object class="BGHUDSliderCell" key="NSCell" id="920103185">
-                                  <int key="NSCellFlags">-2080244224</int>
+                                  <int key="NSCellFlags">-2079981824</int>
                                   <int key="NSCellFlags2">131072</int>
                                   <string key="NSContents"/>
                                   <string key="NSCellIdentifier">_NS:209</string>
                                   <reference key="NSControlView" ref="760066178"/>
-                                  <double key="NSMaxValue">100</double>
+                                  <double key="NSMaxValue">10</double>
                                   <double key="NSMinValue">0.0</double>
-                                  <double key="NSValue">50</double>
+                                  <double key="NSValue">1</double>
                                   <double key="NSAltIncValue">0.0</double>
                                   <int key="NSNumberOfTickMarks">0</int>
                                   <int key="NSTickMarkPosition">1</int>
@@ -495,14 +495,14 @@
                                 <string key="NSReuseIdentifierKey">_NS:209</string>
                                 <bool key="NSEnabled">YES</bool>
                                 <object class="BGHUDSliderCell" key="NSCell" id="33387376">
-                                  <int key="NSCellFlags">-2080244224</int>
+                                  <int key="NSCellFlags">-2079981824</int>
                                   <int key="NSCellFlags2">131072</int>
                                   <string key="NSContents"/>
                                   <string key="NSCellIdentifier">_NS:209</string>
                                   <reference key="NSControlView" ref="75681829"/>
-                                  <double key="NSMaxValue">100</double>
+                                  <double key="NSMaxValue">2</double>
                                   <double key="NSMinValue">0.0</double>
-                                  <double key="NSValue">50</double>
+                                  <double key="NSValue">0.050000000000000003</double>
                                   <double key="NSAltIncValue">0.0</double>
                                   <int key="NSNumberOfTickMarks">0</int>
                                   <int key="NSTickMarkPosition">1</int>
@@ -593,23 +593,23 @@
                               <object class="NSSlider" id="484297776">
                                 <reference key="NSNextResponder" ref="832363197"/>
                                 <int key="NSvFlags">268</int>
-                                <string key="NSFrame">{{119, 13}, {171, 15}}</string>
+                                <string key="NSFrame">{{119, 10}, {171, 18}}</string>
                                 <reference key="NSSuperview" ref="832363197"/>
                                 <string key="NSReuseIdentifierKey">_NS:209</string>
                                 <bool key="NSEnabled">YES</bool>
                                 <object class="BGHUDSliderCell" key="NSCell" id="122431818">
-                                  <int key="NSCellFlags">-2080244224</int>
+                                  <int key="NSCellFlags">-2079981824</int>
                                   <int key="NSCellFlags2">131072</int>
                                   <string key="NSContents"/>
                                   <string key="NSCellIdentifier">_NS:209</string>
                                   <reference key="NSControlView" ref="484297776"/>
-                                  <double key="NSMaxValue">100</double>
-                                  <double key="NSMinValue">0.0</double>
-                                  <double key="NSValue">50</double>
+                                  <double key="NSMaxValue">32</double>
+                                  <double key="NSMinValue">4</double>
+                                  <double key="NSValue">16</double>
                                   <double key="NSAltIncValue">0.0</double>
-                                  <int key="NSNumberOfTickMarks">0</int>
-                                  <int key="NSTickMarkPosition">1</int>
-                                  <bool key="NSAllowsTickMarkValuesOnly">NO</bool>
+                                  <int key="NSNumberOfTickMarks">8</int>
+                                  <int key="NSTickMarkPosition">0</int>
+                                  <bool key="NSAllowsTickMarkValuesOnly">YES</bool>
                                   <bool key="NSVertical">NO</bool>
                                   <string key="themeKey">gradientTheme</string>
                                 </object>
@@ -701,14 +701,14 @@
                                 <string key="NSReuseIdentifierKey">_NS:209</string>
                                 <bool key="NSEnabled">YES</bool>
                                 <object class="BGHUDSliderCell" key="NSCell" id="273680894">
-                                  <int key="NSCellFlags">-2080244224</int>
+                                  <int key="NSCellFlags">-2079981824</int>
                                   <int key="NSCellFlags2">131072</int>
                                   <string key="NSContents"/>
                                   <string key="NSCellIdentifier">_NS:209</string>
                                   <reference key="NSControlView" ref="288762928"/>
-                                  <double key="NSMaxValue">100</double>
+                                  <double key="NSMaxValue">40</double>
                                   <double key="NSMinValue">0.0</double>
-                                  <double key="NSValue">50</double>
+                                  <double key="NSValue">2</double>
                                   <double key="NSAltIncValue">0.0</double>
                                   <int key="NSNumberOfTickMarks">0</int>
                                   <int key="NSTickMarkPosition">1</int>
@@ -1295,7 +1295,7 @@
                 <object class="NSTabViewItem" id="160045531">
                   <string key="NSIdentifier">geometry</string>
                   <object class="NSView" key="NSView" id="934925915">
-                    <reference key="NSNextResponder" ref="898819366"/>
+                    <nil key="NSNextResponder"/>
                     <int key="NSvFlags">256</int>
                     <object class="NSMutableArray" key="NSSubviews">
                       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -1783,7 +1783,6 @@
                       </object>
                     </object>
                     <string key="NSFrame">{{10, 33}, {638, 197}}</string>
-                    <reference key="NSSuperview" ref="898819366"/>
                   </object>
                   <string key="NSLabel">Geometry</string>
                   <reference key="NSColor" ref="279270326"/>
@@ -1792,7 +1791,7 @@
                 <object class="NSTabViewItem" id="133975353">
                   <string key="NSIdentifier">color</string>
                   <object class="NSView" key="NSView" id="10628740">
-                    <nil key="NSNextResponder"/>
+                    <reference key="NSNextResponder" ref="898819366"/>
                     <int key="NSvFlags">256</int>
                     <object class="NSMutableArray" key="NSSubviews">
                       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -2389,7 +2388,10 @@
                                         <string>allowsFloats</string>
                                         <string>formatterBehavior</string>
                                         <string>locale</string>
+                                        <string>maximum</string>
+                                        <string>maximumIntegerDigits</string>
                                         <string>minimum</string>
+                                        <string>minimumIntegerDigits</string>
                                         <string>negativeFormat</string>
                                         <string>negativeInfinitySymbol</string>
                                         <string>nilSymbol</string>
@@ -2403,7 +2405,10 @@
                                         <boolean value="NO"/>
                                         <integer value="1040"/>
                                         <reference ref="1015810800"/>
-                                        <real value="1"/>
+                                        <real value="255"/>
+                                        <integer value="255"/>
+                                        <real value="0.0"/>
+                                        <integer value="0"/>
                                         <string>0</string>
                                         <string>-∞</string>
                                         <string/>
@@ -2425,8 +2430,8 @@
                                       <string key="NSString">NaN</string>
                                       <reference key="NSAttributes" ref="639313226"/>
                                     </object>
-                                    <real value="1" key="NS.min"/>
-                                    <reference key="NS.max" ref="1005529056"/>
+                                    <real value="0.0" key="NS.min"/>
+                                    <real value="255" key="NS.max"/>
                                     <object class="NSDecimalNumberHandler" key="NS.rounding">
                                       <int key="NS.roundingmode">1</int>
                                       <bool key="NS.raise.overflow">YES</bool>
@@ -2459,10 +2464,10 @@
                                   <reference key="NSSupport" ref="26"/>
                                   <string key="NSCellIdentifier">_NS:775</string>
                                   <reference key="NSControlView" ref="614130362"/>
-                                  <double key="NSValue">30</double>
-                                  <double key="NSMinValue">1</double>
-                                  <double key="NSMaxValue">100</double>
+                                  <double key="NSValue">100</double>
+                                  <double key="NSMaxValue">255</double>
                                   <double key="NSIncrement">1</double>
+                                  <bool key="NSValueWraps">YES</bool>
                                   <bool key="NSAutorepeat">YES</bool>
                                 </object>
                               </object>
@@ -2657,14 +2662,14 @@
                                 <string key="NSReuseIdentifierKey">_NS:209</string>
                                 <bool key="NSEnabled">YES</bool>
                                 <object class="BGHUDSliderCell" key="NSCell" id="243147203">
-                                  <int key="NSCellFlags">-2080244224</int>
+                                  <int key="NSCellFlags">-2079981824</int>
                                   <int key="NSCellFlags2">131072</int>
                                   <string key="NSContents"/>
                                   <string key="NSCellIdentifier">_NS:209</string>
                                   <reference key="NSControlView" ref="148511149"/>
-                                  <double key="NSMaxValue">100</double>
-                                  <double key="NSMinValue">0.0</double>
-                                  <double key="NSValue">50</double>
+                                  <double key="NSMaxValue">127</double>
+                                  <double key="NSMinValue">1</double>
+                                  <double key="NSValue">80</double>
                                   <double key="NSAltIncValue">0.0</double>
                                   <int key="NSNumberOfTickMarks">0</int>
                                   <int key="NSTickMarkPosition">1</int>
@@ -2763,14 +2768,14 @@
                                 <string key="NSReuseIdentifierKey">_NS:209</string>
                                 <bool key="NSEnabled">YES</bool>
                                 <object class="BGHUDSliderCell" key="NSCell" id="1016611155">
-                                  <int key="NSCellFlags">-2080244224</int>
+                                  <int key="NSCellFlags">67501824</int>
                                   <int key="NSCellFlags2">131072</int>
                                   <string key="NSContents"/>
                                   <string key="NSCellIdentifier">_NS:209</string>
                                   <reference key="NSControlView" ref="540871009"/>
                                   <double key="NSMaxValue">100</double>
                                   <double key="NSMinValue">0.0</double>
-                                  <double key="NSValue">50</double>
+                                  <double key="NSValue">20</double>
                                   <double key="NSAltIncValue">0.0</double>
                                   <int key="NSNumberOfTickMarks">0</int>
                                   <int key="NSTickMarkPosition">1</int>
@@ -2806,14 +2811,14 @@
                                 <string key="NSReuseIdentifierKey">_NS:209</string>
                                 <bool key="NSEnabled">YES</bool>
                                 <object class="BGHUDSliderCell" key="NSCell" id="92806680">
-                                  <int key="NSCellFlags">-2080244224</int>
+                                  <int key="NSCellFlags">-2079981824</int>
                                   <int key="NSCellFlags2">131072</int>
                                   <string key="NSContents"/>
                                   <string key="NSCellIdentifier">_NS:209</string>
                                   <reference key="NSControlView" ref="538371352"/>
                                   <double key="NSMaxValue">100</double>
                                   <double key="NSMinValue">0.0</double>
-                                  <double key="NSValue">50</double>
+                                  <double key="NSValue">15</double>
                                   <double key="NSAltIncValue">0.0</double>
                                   <int key="NSNumberOfTickMarks">0</int>
                                   <int key="NSTickMarkPosition">1</int>
@@ -2870,7 +2875,6 @@
                                 <object class="BGHUDTextFieldCell" key="NSCell" id="580154870">
                                   <int key="NSCellFlags">-1804468671</int>
                                   <int key="NSCellFlags2">138544128</int>
-                                  <string key="NSContents">FF0000</string>
                                   <reference key="NSSupport" ref="26"/>
                                   <string key="NSCellIdentifier">_NS:76</string>
                                   <reference key="NSControlView" ref="1069462988"/>
@@ -2908,6 +2912,7 @@
                       </object>
                     </object>
                     <string key="NSFrame">{{10, 33}, {638, 197}}</string>
+                    <reference key="NSSuperview" ref="898819366"/>
                   </object>
                   <string key="NSLabel">Color</string>
                   <reference key="NSColor" ref="279270326"/>
@@ -3630,14 +3635,14 @@
                                 <string key="NSReuseIdentifierKey">_NS:209</string>
                                 <bool key="NSEnabled">YES</bool>
                                 <object class="BGHUDSliderCell" key="NSCell" id="972356555">
-                                  <int key="NSCellFlags">-2080244224</int>
+                                  <int key="NSCellFlags">-2079981824</int>
                                   <int key="NSCellFlags2">131072</int>
                                   <string key="NSContents"/>
                                   <string key="NSCellIdentifier">_NS:209</string>
                                   <reference key="NSControlView" ref="974397022"/>
-                                  <double key="NSMaxValue">100</double>
+                                  <double key="NSMaxValue">255</double>
                                   <double key="NSMinValue">0.0</double>
-                                  <double key="NSValue">50</double>
+                                  <double key="NSValue">255</double>
                                   <double key="NSAltIncValue">0.0</double>
                                   <int key="NSNumberOfTickMarks">0</int>
                                   <int key="NSTickMarkPosition">1</int>
@@ -4010,7 +4015,7 @@
                   <reference key="NSTabView" ref="898819366"/>
                 </object>
               </object>
-              <reference key="NSSelectedTabViewItem" ref="160045531"/>
+              <reference key="NSSelectedTabViewItem" ref="133975353"/>
               <object class="NSFont" key="NSFont">
                 <string key="NSName">LucidaGrande</string>
                 <double key="NSSize">13</double>
@@ -4022,7 +4027,7 @@
               <nil key="themeKey"/>
               <object class="NSMutableArray" key="NSSubviews">
                 <bool key="EncodedWithXMLCoder">YES</bool>
-                <reference ref="934925915"/>
+                <reference ref="10628740"/>
               </object>
             </object>
           </object>
@@ -4034,7 +4039,7 @@
         <string key="NSFrameAutosaveName">videoeffects</string>
         <bool key="NSWindowIsRestorable">YES</bool>
       </object>
-      <object class="NSCustomObject" id="443700460">
+      <object class="NSCustomObject" id="707254443">
         <string key="NSClassName">VLCVideoEffects</string>
       </object>
     </object>
@@ -4148,7 +4153,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_window</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="1005"/>
           </object>
           <int key="connectionID">473</int>
@@ -4156,7 +4161,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_addlogo_ckb</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="851614399"/>
           </object>
           <int key="connectionID">474</int>
@@ -4164,7 +4169,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_addlogo_left_fld</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="273610993"/>
           </object>
           <int key="connectionID">475</int>
@@ -4172,7 +4177,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_addlogo_left_lbl</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="843751743"/>
           </object>
           <int key="connectionID">476</int>
@@ -4180,7 +4185,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_addlogo_logo_fld</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="515591962"/>
           </object>
           <int key="connectionID">477</int>
@@ -4188,7 +4193,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_addlogo_logo_lbl</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="439386103"/>
           </object>
           <int key="connectionID">478</int>
@@ -4196,7 +4201,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_addlogo_top_fld</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="281324922"/>
           </object>
           <int key="connectionID">479</int>
@@ -4204,7 +4209,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_addlogo_top_lbl</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="967386141"/>
           </object>
           <int key="connectionID">480</int>
@@ -4212,7 +4217,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_addlogo_transparency_lbl</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="275224178"/>
           </object>
           <int key="connectionID">481</int>
@@ -4220,7 +4225,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_addlogo_transparency_sld</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="974397022"/>
           </object>
           <int key="connectionID">482</int>
@@ -4228,7 +4233,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_addtext_ckb</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="830324038"/>
           </object>
           <int key="connectionID">483</int>
@@ -4236,7 +4241,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_addtext_pos_lbl</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="509844824"/>
           </object>
           <int key="connectionID">484</int>
@@ -4244,7 +4249,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_addtext_pos_pop</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="135717749"/>
           </object>
           <int key="connectionID">485</int>
@@ -4252,7 +4257,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_addtext_text_fld</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="341775592"/>
           </object>
           <int key="connectionID">486</int>
@@ -4260,7 +4265,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_addtext_text_lbl</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="724529696"/>
           </object>
           <int key="connectionID">487</int>
@@ -4268,7 +4273,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_adjust_brightness_ckb</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="372967191"/>
           </object>
           <int key="connectionID">488</int>
@@ -4276,7 +4281,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_adjust_brightness_lbl</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="1023605254"/>
           </object>
           <int key="connectionID">489</int>
@@ -4284,7 +4289,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_adjust_brightness_sld</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="376722054"/>
           </object>
           <int key="connectionID">490</int>
@@ -4292,7 +4297,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_adjust_ckb</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="702049168"/>
           </object>
           <int key="connectionID">491</int>
@@ -4300,7 +4305,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_adjust_contrast_lbl</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="279446133"/>
           </object>
           <int key="connectionID">492</int>
@@ -4308,7 +4313,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_adjust_contrast_sld</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="714538558"/>
           </object>
           <int key="connectionID">493</int>
@@ -4316,7 +4321,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_adjust_gamma_lbl</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="685913676"/>
           </object>
           <int key="connectionID">494</int>
@@ -4324,7 +4329,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_adjust_gamma_sld</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="760066178"/>
           </object>
           <int key="connectionID">495</int>
@@ -4332,7 +4337,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_adjust_hue_lbl</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="396951138"/>
           </object>
           <int key="connectionID">496</int>
@@ -4340,7 +4345,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_adjust_hue_sld</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="1033837370"/>
           </object>
           <int key="connectionID">497</int>
@@ -4348,7 +4353,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_adjust_opaque_lbl</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="502307597"/>
           </object>
           <int key="connectionID">498</int>
@@ -4356,7 +4361,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_adjust_opaque_sld</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="248577800"/>
           </object>
           <int key="connectionID">499</int>
@@ -4364,7 +4369,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_adjust_saturation_lbl</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="1769326"/>
           </object>
           <int key="connectionID">500</int>
@@ -4372,7 +4377,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_adjust_saturation_sld</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="665985520"/>
           </object>
           <int key="connectionID">501</int>
@@ -4380,7 +4385,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_banding_ckb</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="618355475"/>
           </object>
           <int key="connectionID">502</int>
@@ -4388,7 +4393,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_banding_lbl</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="339419071"/>
           </object>
           <int key="connectionID">503</int>
@@ -4396,7 +4401,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_banding_sld</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="484297776"/>
           </object>
           <int key="connectionID">504</int>
@@ -4404,7 +4409,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_blur_ckb</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="232141445"/>
           </object>
           <int key="connectionID">505</int>
@@ -4412,7 +4417,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_blur_lbl</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="51109381"/>
           </object>
           <int key="connectionID">506</int>
@@ -4420,7 +4425,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_blur_sld</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="148511149"/>
           </object>
           <int key="connectionID">507</int>
@@ -4428,7 +4433,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_clone_ckb</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="635659192"/>
           </object>
           <int key="connectionID">508</int>
@@ -4436,7 +4441,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_clone_fld</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="772228563"/>
           </object>
           <int key="connectionID">509</int>
@@ -4444,7 +4449,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_clone_lbl</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="293125052"/>
           </object>
           <int key="connectionID">510</int>
@@ -4452,7 +4457,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_crop_bottom_fld</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="190644777"/>
           </object>
           <int key="connectionID">511</int>
@@ -4460,7 +4465,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_crop_bottom_lbl</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="647574939"/>
           </object>
           <int key="connectionID">512</int>
@@ -4468,7 +4473,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_crop_left_fld</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="785525140"/>
           </object>
           <int key="connectionID">513</int>
@@ -4476,7 +4481,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_crop_left_lbl</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="299779593"/>
           </object>
           <int key="connectionID">514</int>
@@ -4484,7 +4489,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_crop_right_fld</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="950709956"/>
           </object>
           <int key="connectionID">515</int>
@@ -4492,7 +4497,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_crop_right_lbl</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="76138714"/>
           </object>
           <int key="connectionID">516</int>
@@ -4500,7 +4505,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_crop_sync_left_right_ckb</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="447321799"/>
           </object>
           <int key="connectionID">517</int>
@@ -4508,7 +4513,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_crop_sync_top_bottom_ckb</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="973277604"/>
           </object>
           <int key="connectionID">518</int>
@@ -4516,7 +4521,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_crop_top_fld</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="411363183"/>
           </object>
           <int key="connectionID">519</int>
@@ -4524,7 +4529,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_crop_top_lbl</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="290531254"/>
           </object>
           <int key="connectionID">520</int>
@@ -4532,7 +4537,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_eraselogo_ckb</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="659004942"/>
           </object>
           <int key="connectionID">521</int>
@@ -4540,7 +4545,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_eraselogo_left_fld</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="15696892"/>
           </object>
           <int key="connectionID">522</int>
@@ -4548,7 +4553,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_eraselogo_left_lbl</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="354728705"/>
           </object>
           <int key="connectionID">523</int>
@@ -4556,7 +4561,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_eraselogo_mask_fld</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="381763111"/>
           </object>
           <int key="connectionID">524</int>
@@ -4564,7 +4569,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_eraselogo_mask_lbl</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="730977237"/>
           </object>
           <int key="connectionID">525</int>
@@ -4572,7 +4577,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_eraselogo_top_fld</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="349672090"/>
           </object>
           <int key="connectionID">526</int>
@@ -4580,7 +4585,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_eraselogo_top_lbl</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="579595891"/>
           </object>
           <int key="connectionID">527</int>
@@ -4588,7 +4593,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_extract_ckb</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="866370700"/>
           </object>
           <int key="connectionID">528</int>
@@ -4596,7 +4601,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_extract_fld</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="79386836"/>
           </object>
           <int key="connectionID">529</int>
@@ -4604,7 +4609,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_extract_lbl</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="158723583"/>
           </object>
           <int key="connectionID">530</int>
@@ -4612,7 +4617,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_gradient_ckb</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="726246058"/>
           </object>
           <int key="connectionID">531</int>
@@ -4620,7 +4625,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_gradient_cartoon_ckb</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="121731822"/>
           </object>
           <int key="connectionID">532</int>
@@ -4628,7 +4633,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_gradient_color_ckb</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="275724926"/>
           </object>
           <int key="connectionID">533</int>
@@ -4636,7 +4641,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_gradient_mode_lbl</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="239172455"/>
           </object>
           <int key="connectionID">534</int>
@@ -4644,7 +4649,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_gradient_mode_pop</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="856105297"/>
           </object>
           <int key="connectionID">535</int>
@@ -4652,7 +4657,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_grain_ckb</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="787792998"/>
           </object>
           <int key="connectionID">536</int>
@@ -4660,7 +4665,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_grain_lbl</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="380036693"/>
           </object>
           <int key="connectionID">537</int>
@@ -4668,7 +4673,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_grain_sld</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="288762928"/>
           </object>
           <int key="connectionID">538</int>
@@ -4676,7 +4681,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_invert_ckb</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="699678759"/>
           </object>
           <int key="connectionID">539</int>
@@ -4684,7 +4689,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_motiondetect_ckb</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="679961475"/>
           </object>
           <int key="connectionID">540</int>
@@ -4692,7 +4697,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_noise_ckb</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="531092636"/>
           </object>
           <int key="connectionID">541</int>
@@ -4700,7 +4705,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_posterize_ckb</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="677375378"/>
           </object>
           <int key="connectionID">542</int>
@@ -4708,7 +4713,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_posterize_fld</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="967949481"/>
           </object>
           <int key="connectionID">543</int>
@@ -4716,7 +4721,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_posterize_lbl</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="292300172"/>
           </object>
           <int key="connectionID">544</int>
@@ -4724,7 +4729,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_psychedelic_ckb</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="158304666"/>
           </object>
           <int key="connectionID">545</int>
@@ -4732,7 +4737,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_puzzle_blackslot_ckb</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="268273719"/>
           </object>
           <int key="connectionID">546</int>
@@ -4740,7 +4745,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_puzzle_ckb</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="36160666"/>
           </object>
           <int key="connectionID">547</int>
@@ -4748,7 +4753,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_puzzle_columns_fld</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="227755793"/>
           </object>
           <int key="connectionID">548</int>
@@ -4756,7 +4761,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_puzzle_columns_lbl</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="56743507"/>
           </object>
           <int key="connectionID">549</int>
@@ -4764,7 +4769,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_puzzle_rows_fld</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="357710165"/>
           </object>
           <int key="connectionID">550</int>
@@ -4772,7 +4777,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_puzzle_rows_lbl</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="422916449"/>
           </object>
           <int key="connectionID">551</int>
@@ -4780,7 +4785,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_sepia_ckb</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="317124105"/>
           </object>
           <int key="connectionID">552</int>
@@ -4788,7 +4793,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_sepia_fld</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="373866613"/>
           </object>
           <int key="connectionID">553</int>
@@ -4796,7 +4801,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_sepia_lbl</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="1042139911"/>
           </object>
           <int key="connectionID">554</int>
@@ -4804,7 +4809,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_sharpen_ckb</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="828169901"/>
           </object>
           <int key="connectionID">555</int>
@@ -4812,7 +4817,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_sharpen_lbl</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="408106628"/>
           </object>
           <int key="connectionID">556</int>
@@ -4820,7 +4825,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_sharpen_sld</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="75681829"/>
           </object>
           <int key="connectionID">557</int>
@@ -4828,7 +4833,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_threshold_ckb</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="937239453"/>
           </object>
           <int key="connectionID">558</int>
@@ -4836,7 +4841,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_threshold_color_fld</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="1069462988"/>
           </object>
           <int key="connectionID">559</int>
@@ -4844,7 +4849,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_threshold_color_lbl</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="152203922"/>
           </object>
           <int key="connectionID">560</int>
@@ -4852,7 +4857,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_threshold_saturation_lbl</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="1067643079"/>
           </object>
           <int key="connectionID">561</int>
@@ -4860,7 +4865,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_threshold_saturation_sld</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="540871009"/>
           </object>
           <int key="connectionID">562</int>
@@ -4868,7 +4873,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_threshold_similarity_lbl</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="130646279"/>
           </object>
           <int key="connectionID">563</int>
@@ -4876,7 +4881,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_threshold_similarity_sld</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="538371352"/>
           </object>
           <int key="connectionID">564</int>
@@ -4884,7 +4889,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_transform_ckb</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="351076845"/>
           </object>
           <int key="connectionID">565</int>
@@ -4892,7 +4897,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_transform_pop</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="401651452"/>
           </object>
           <int key="connectionID">566</int>
@@ -4900,7 +4905,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_watereffect_ckb</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="834758738"/>
           </object>
           <int key="connectionID">567</int>
@@ -4908,7 +4913,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_waves_ckb</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="663519093"/>
           </object>
           <int key="connectionID">568</int>
@@ -4916,7 +4921,7 @@
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_zoom_ckb</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="767337060"/>
           </object>
           <int key="connectionID">569</int>
@@ -4924,7 +4929,7 @@
         <object class="IBConnectionRecord">
           <object class="IBActionConnection" key="connection">
             <string key="label">addLogoModifierChanged:</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="515591962"/>
           </object>
           <int key="connectionID">571</int>
@@ -4932,7 +4937,7 @@
         <object class="IBConnectionRecord">
           <object class="IBActionConnection" key="connection">
             <string key="label">addLogoModifierChanged:</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="281324922"/>
           </object>
           <int key="connectionID">572</int>
@@ -4940,7 +4945,7 @@
         <object class="IBConnectionRecord">
           <object class="IBActionConnection" key="connection">
             <string key="label">addLogoModifierChanged:</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="273610993"/>
           </object>
           <int key="connectionID">573</int>
@@ -4948,7 +4953,7 @@
         <object class="IBConnectionRecord">
           <object class="IBActionConnection" key="connection">
             <string key="label">addLogoModifierChanged:</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="974397022"/>
           </object>
           <int key="connectionID">574</int>
@@ -4956,7 +4961,7 @@
         <object class="IBConnectionRecord">
           <object class="IBActionConnection" key="connection">
             <string key="label">addTextModifierChanged:</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="341775592"/>
           </object>
           <int key="connectionID">575</int>
@@ -4964,7 +4969,7 @@
         <object class="IBConnectionRecord">
           <object class="IBActionConnection" key="connection">
             <string key="label">addTextModifierChanged:</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="135717749"/>
           </object>
           <int key="connectionID">576</int>
@@ -4972,7 +4977,7 @@
         <object class="IBConnectionRecord">
           <object class="IBActionConnection" key="connection">
             <string key="label">adjustSliderChanged:</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="1033837370"/>
           </object>
           <int key="connectionID">577</int>
@@ -4980,7 +4985,7 @@
         <object class="IBConnectionRecord">
           <object class="IBActionConnection" key="connection">
             <string key="label">adjustSliderChanged:</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="714538558"/>
           </object>
           <int key="connectionID">578</int>
@@ -4988,7 +4993,7 @@
         <object class="IBConnectionRecord">
           <object class="IBActionConnection" key="connection">
             <string key="label">adjustSliderChanged:</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="376722054"/>
           </object>
           <int key="connectionID">579</int>
@@ -4996,7 +5001,7 @@
         <object class="IBConnectionRecord">
           <object class="IBActionConnection" key="connection">
             <string key="label">adjustSliderChanged:</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="665985520"/>
           </object>
           <int key="connectionID">580</int>
@@ -5004,7 +5009,7 @@
         <object class="IBConnectionRecord">
           <object class="IBActionConnection" key="connection">
             <string key="label">adjustSliderChanged:</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="760066178"/>
           </object>
           <int key="connectionID">581</int>
@@ -5012,7 +5017,7 @@
         <object class="IBConnectionRecord">
           <object class="IBActionConnection" key="connection">
             <string key="label">adjustSliderChanged:</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="248577800"/>
           </object>
           <int key="connectionID">582</int>
@@ -5020,7 +5025,7 @@
         <object class="IBConnectionRecord">
           <object class="IBActionConnection" key="connection">
             <string key="label">bandingSliderChanged:</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="484297776"/>
           </object>
           <int key="connectionID">583</int>
@@ -5028,7 +5033,7 @@
         <object class="IBConnectionRecord">
           <object class="IBActionConnection" key="connection">
             <string key="label">blurModifierChanged:</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="148511149"/>
           </object>
           <int key="connectionID">584</int>
@@ -5036,7 +5041,7 @@
         <object class="IBConnectionRecord">
           <object class="IBActionConnection" key="connection">
             <string key="label">cloneModifierChanged:</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="772228563"/>
           </object>
           <int key="connectionID">585</int>
@@ -5044,7 +5049,7 @@
         <object class="IBConnectionRecord">
           <object class="IBActionConnection" key="connection">
             <string key="label">cropFieldChanged:</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="411363183"/>
           </object>
           <int key="connectionID">586</int>
@@ -5052,7 +5057,7 @@
         <object class="IBConnectionRecord">
           <object class="IBActionConnection" key="connection">
             <string key="label">cropFieldChanged:</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="950709956"/>
           </object>
           <int key="connectionID">587</int>
@@ -5060,7 +5065,7 @@
         <object class="IBConnectionRecord">
           <object class="IBActionConnection" key="connection">
             <string key="label">cropFieldChanged:</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="190644777"/>
           </object>
           <int key="connectionID">588</int>
@@ -5068,7 +5073,7 @@
         <object class="IBConnectionRecord">
           <object class="IBActionConnection" key="connection">
             <string key="label">cropFieldChanged:</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="785525140"/>
           </object>
           <int key="connectionID">589</int>
@@ -5076,7 +5081,7 @@
         <object class="IBConnectionRecord">
           <object class="IBActionConnection" key="connection">
             <string key="label">enableAddLogo:</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="851614399"/>
           </object>
           <int key="connectionID">590</int>
@@ -5084,7 +5089,7 @@
         <object class="IBConnectionRecord">
           <object class="IBActionConnection" key="connection">
             <string key="label">enableEraseLogo:</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="659004942"/>
           </object>
           <int key="connectionID">591</int>
@@ -5092,7 +5097,7 @@
         <object class="IBConnectionRecord">
           <object class="IBActionConnection" key="connection">
             <string key="label">enableAddText:</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="830324038"/>
           </object>
           <int key="connectionID">592</int>
@@ -5100,7 +5105,7 @@
         <object class="IBConnectionRecord">
           <object class="IBActionConnection" key="connection">
             <string key="label">enableClone:</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="635659192"/>
           </object>
           <int key="connectionID">593</int>
@@ -5108,7 +5113,7 @@
         <object class="IBConnectionRecord">
           <object class="IBActionConnection" key="connection">
             <string key="label">enableAdjust:</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="702049168"/>
           </object>
           <int key="connectionID">594</int>
@@ -5116,7 +5121,7 @@
         <object class="IBConnectionRecord">
           <object class="IBActionConnection" key="connection">
             <string key="label">enableAdjustBrightnessThreshold:</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="372967191"/>
           </object>
           <int key="connectionID">595</int>
@@ -5124,7 +5129,7 @@
         <object class="IBConnectionRecord">
           <object class="IBActionConnection" key="connection">
             <string key="label">enableBanding:</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="618355475"/>
           </object>
           <int key="connectionID">596</int>
@@ -5132,7 +5137,7 @@
         <object class="IBConnectionRecord">
           <object class="IBActionConnection" key="connection">
             <string key="label">enableBlur:</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="232141445"/>
           </object>
           <int key="connectionID">597</int>
@@ -5140,7 +5145,7 @@
         <object class="IBConnectionRecord">
           <object class="IBActionConnection" key="connection">
             <string key="label">enableCropModifier:</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="973277604"/>
           </object>
           <int key="connectionID">598</int>
@@ -5148,7 +5153,7 @@
         <object class="IBConnectionRecord">
           <object class="IBActionConnection" key="connection">
             <string key="label">enableCropModifier:</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="447321799"/>
           </object>
           <int key="connectionID">599</int>
@@ -5156,7 +5161,7 @@
         <object class="IBConnectionRecord">
           <object class="IBActionConnection" key="connection">
             <string key="label">enableExtract:</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="866370700"/>
           </object>
           <int key="connectionID">600</int>
@@ -5164,7 +5169,7 @@
         <object class="IBConnectionRecord">
           <object class="IBActionConnection" key="connection">
             <string key="label">enableGradient:</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="726246058"/>
           </object>
           <int key="connectionID">601</int>
@@ -5172,7 +5177,7 @@
         <object class="IBConnectionRecord">
           <object class="IBActionConnection" key="connection">
             <string key="label">enableGrain:</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="787792998"/>
           </object>
           <int key="connectionID">602</int>
@@ -5180,7 +5185,7 @@
         <object class="IBConnectionRecord">
           <object class="IBActionConnection" key="connection">
             <string key="label">enableInvert:</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="699678759"/>
           </object>
           <int key="connectionID">603</int>
@@ -5188,7 +5193,7 @@
         <object class="IBConnectionRecord">
           <object class="IBActionConnection" key="connection">
             <string key="label">enableMotionDetect:</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="679961475"/>
           </object>
           <int key="connectionID">604</int>
@@ -5196,7 +5201,7 @@
         <object class="IBConnectionRecord">
           <object class="IBActionConnection" key="connection">
             <string key="label">enableNoise:</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="531092636"/>
           </object>
           <int key="connectionID">605</int>
@@ -5204,7 +5209,7 @@
         <object class="IBConnectionRecord">
           <object class="IBActionConnection" key="connection">
             <string key="label">enablePosterize:</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="677375378"/>
           </object>
           <int key="connectionID">606</int>
@@ -5212,7 +5217,7 @@
         <object class="IBConnectionRecord">
           <object class="IBActionConnection" key="connection">
             <string key="label">enablePsychedelic:</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="158304666"/>
           </object>
           <int key="connectionID">607</int>
@@ -5220,7 +5225,7 @@
         <object class="IBConnectionRecord">
           <object class="IBActionConnection" key="connection">
             <string key="label">enablePuzzle:</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="36160666"/>
           </object>
           <int key="connectionID">608</int>
@@ -5228,7 +5233,7 @@
         <object class="IBConnectionRecord">
           <object class="IBActionConnection" key="connection">
             <string key="label">enableSepia:</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="317124105"/>
           </object>
           <int key="connectionID">609</int>
@@ -5236,7 +5241,7 @@
         <object class="IBConnectionRecord">
           <object class="IBActionConnection" key="connection">
             <string key="label">enableSharpen:</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="828169901"/>
           </object>
           <int key="connectionID">610</int>
@@ -5244,7 +5249,7 @@
         <object class="IBConnectionRecord">
           <object class="IBActionConnection" key="connection">
             <string key="label">enableTransform:</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="351076845"/>
           </object>
           <int key="connectionID">611</int>
@@ -5252,7 +5257,7 @@
         <object class="IBConnectionRecord">
           <object class="IBActionConnection" key="connection">
             <string key="label">enableThreshold:</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="937239453"/>
           </object>
           <int key="connectionID">612</int>
@@ -5260,7 +5265,7 @@
         <object class="IBConnectionRecord">
           <object class="IBActionConnection" key="connection">
             <string key="label">enableWaterEffect:</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="834758738"/>
           </object>
           <int key="connectionID">613</int>
@@ -5268,7 +5273,7 @@
         <object class="IBConnectionRecord">
           <object class="IBActionConnection" key="connection">
             <string key="label">enableWaves:</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="663519093"/>
           </object>
           <int key="connectionID">614</int>
@@ -5276,7 +5281,7 @@
         <object class="IBConnectionRecord">
           <object class="IBActionConnection" key="connection">
             <string key="label">enableZoom:</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="767337060"/>
           </object>
           <int key="connectionID">615</int>
@@ -5284,7 +5289,7 @@
         <object class="IBConnectionRecord">
           <object class="IBActionConnection" key="connection">
             <string key="label">eraseLogoModifierChanged:</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="381763111"/>
           </object>
           <int key="connectionID">616</int>
@@ -5292,7 +5297,7 @@
         <object class="IBConnectionRecord">
           <object class="IBActionConnection" key="connection">
             <string key="label">eraseLogoModifierChanged:</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="349672090"/>
           </object>
           <int key="connectionID">618</int>
@@ -5300,7 +5305,7 @@
         <object class="IBConnectionRecord">
           <object class="IBActionConnection" key="connection">
             <string key="label">eraseLogoModifierChanged:</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="15696892"/>
           </object>
           <int key="connectionID">619</int>
@@ -5308,7 +5313,7 @@
         <object class="IBConnectionRecord">
           <object class="IBActionConnection" key="connection">
             <string key="label">extractModifierChanged:</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="79386836"/>
           </object>
           <int key="connectionID">620</int>
@@ -5316,7 +5321,7 @@
         <object class="IBConnectionRecord">
           <object class="IBActionConnection" key="connection">
             <string key="label">gradientModifierChanged:</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="856105297"/>
           </object>
           <int key="connectionID">621</int>
@@ -5324,7 +5329,7 @@
         <object class="IBConnectionRecord">
           <object class="IBActionConnection" key="connection">
             <string key="label">gradientModifierChanged:</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="275724926"/>
           </object>
           <int key="connectionID">622</int>
@@ -5332,7 +5337,7 @@
         <object class="IBConnectionRecord">
           <object class="IBActionConnection" key="connection">
             <string key="label">gradientModifierChanged:</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="121731822"/>
           </object>
           <int key="connectionID">623</int>
@@ -5340,7 +5345,7 @@
         <object class="IBConnectionRecord">
           <object class="IBActionConnection" key="connection">
             <string key="label">grainSliderChanged:</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="288762928"/>
           </object>
           <int key="connectionID">624</int>
@@ -5348,7 +5353,7 @@
         <object class="IBConnectionRecord">
           <object class="IBActionConnection" key="connection">
             <string key="label">posterizeModifierChanged:</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="967949481"/>
           </object>
           <int key="connectionID">625</int>
@@ -5356,7 +5361,7 @@
         <object class="IBConnectionRecord">
           <object class="IBActionConnection" key="connection">
             <string key="label">puzzleModifierChanged:</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="357710165"/>
           </object>
           <int key="connectionID">626</int>
@@ -5364,7 +5369,7 @@
         <object class="IBConnectionRecord">
           <object class="IBActionConnection" key="connection">
             <string key="label">puzzleModifierChanged:</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="227755793"/>
           </object>
           <int key="connectionID">627</int>
@@ -5372,7 +5377,7 @@
         <object class="IBConnectionRecord">
           <object class="IBActionConnection" key="connection">
             <string key="label">puzzleModifierChanged:</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="268273719"/>
           </object>
           <int key="connectionID">628</int>
@@ -5380,7 +5385,7 @@
         <object class="IBConnectionRecord">
           <object class="IBActionConnection" key="connection">
             <string key="label">sepiaModifierChanged:</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="373866613"/>
           </object>
           <int key="connectionID">629</int>
@@ -5388,7 +5393,7 @@
         <object class="IBConnectionRecord">
           <object class="IBActionConnection" key="connection">
             <string key="label">sharpenSliderChanged:</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="75681829"/>
           </object>
           <int key="connectionID">630</int>
@@ -5396,7 +5401,7 @@
         <object class="IBConnectionRecord">
           <object class="IBActionConnection" key="connection">
             <string key="label">thresholdModifierChanged:</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="1069462988"/>
           </object>
           <int key="connectionID">631</int>
@@ -5404,7 +5409,7 @@
         <object class="IBConnectionRecord">
           <object class="IBActionConnection" key="connection">
             <string key="label">thresholdModifierChanged:</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="540871009"/>
           </object>
           <int key="connectionID">632</int>
@@ -5412,7 +5417,7 @@
         <object class="IBConnectionRecord">
           <object class="IBActionConnection" key="connection">
             <string key="label">thresholdModifierChanged:</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="538371352"/>
           </object>
           <int key="connectionID">633</int>
@@ -5420,10 +5425,18 @@
         <object class="IBConnectionRecord">
           <object class="IBActionConnection" key="connection">
             <string key="label">transformModifierChanged:</string>
-            <reference key="source" ref="443700460"/>
+            <reference key="source" ref="707254443"/>
             <reference key="destination" ref="401651452"/>
           </object>
           <int key="connectionID">634</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_tableView</string>
+            <reference key="source" ref="707254443"/>
+            <reference key="destination" ref="898819366"/>
+          </object>
+          <int key="connectionID">635</int>
         </object>
       </object>
       <object class="IBMutableOrderedSet" key="objectRecords">
@@ -6986,6 +6999,9 @@
           <object class="IBObjectRecord">
             <int key="objectID">294</int>
             <reference key="object" ref="580154870"/>
+            <object class="NSMutableArray" key="children">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+            </object>
             <reference key="parent" ref="1069462988"/>
           </object>
           <object class="IBObjectRecord">
@@ -7575,7 +7591,7 @@
           </object>
           <object class="IBObjectRecord">
             <int key="objectID">472</int>
-            <reference key="object" ref="443700460"/>
+            <reference key="object" ref="707254443"/>
             <reference key="parent" ref="0"/>
           </object>
         </object>
@@ -8343,7 +8359,7 @@
           </object>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <object class="NSAffineTransform">
-            <bytes key="NSTransformStruct">AUEAAABCqgAAA</bytes>
+            <bytes key="NSTransformStruct">AUEAAABCtAAAA</bytes>
           </object>
           <string>com.binarymethod.BGHUDAppKitPlugin</string>
           <object class="NSAffineTransform">
@@ -8621,7 +8637,7 @@
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <object class="NSAffineTransform">
-            <bytes key="NSTransformStruct">AUDAAABDHgAAA</bytes>
+            <bytes key="NSTransformStruct">AUEAAABBUAAAA</bytes>
           </object>
           <string>com.binarymethod.BGHUDAppKitPlugin</string>
           <object class="NSAffineTransform">
@@ -8769,7 +8785,7 @@
         </object>
       </object>
       <nil key="sourceID"/>
-      <int key="maxID">634</int>
+      <int key="maxID">636</int>
     </object>
     <object class="IBClassDescriber" key="IBDocument.Classes">
       <object class="NSMutableArray" key="referencedPartialClassDescriptionsV3.1+">
@@ -9177,6 +9193,7 @@
               <string>o_sharpen_ckb</string>
               <string>o_sharpen_lbl</string>
               <string>o_sharpen_sld</string>
+              <string>o_tableView</string>
               <string>o_threshold_ckb</string>
               <string>o_threshold_color_fld</string>
               <string>o_threshold_color_lbl</string>
@@ -9193,6 +9210,7 @@
             </object>
             <object class="NSMutableArray" key="dict.values">
               <bool key="EncodedWithXMLCoder">YES</bool>
+              <string>id</string>
               <string>id</string>
               <string>id</string>
               <string>id</string>
@@ -9380,6 +9398,7 @@
               <string>o_sharpen_ckb</string>
               <string>o_sharpen_lbl</string>
               <string>o_sharpen_sld</string>
+              <string>o_tableView</string>
               <string>o_threshold_ckb</string>
               <string>o_threshold_color_fld</string>
               <string>o_threshold_color_lbl</string>
@@ -9730,6 +9749,10 @@
               </object>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_sharpen_sld</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_tableView</string>
                 <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">

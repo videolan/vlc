@@ -131,8 +131,6 @@ EXTRA_DIST += \
 	extras/package/macosx/Resources/English.lproj/Wizard.nib/keyedobjects.nib \
 	extras/package/macosx/Resources/English.lproj/Bookmarks.nib/designable.nib \
 	extras/package/macosx/Resources/English.lproj/Bookmarks.nib/keyedobjects.nib \
-	extras/package/macosx/Resources/English.lproj/Extended.nib/designable.nib \
-	extras/package/macosx/Resources/English.lproj/Extended.nib/keyedobjects.nib \
 	extras/package/macosx/Resources/English.lproj/CoreDialogs.nib/designable.nib \
 	extras/package/macosx/Resources/English.lproj/CoreDialogs.nib/keyedobjects.nib \
 	extras/package/macosx/Resources/English.lproj/ErrorPanel.nib/designable.nib \
@@ -447,8 +445,6 @@ VLC-release.app: vlc
 	    voutgl.m \
 	    wizard.h \
 	    wizard.m \
-	    extended.h \
-	    extended.m \
 	    bookmarks.h \
 	    bookmarks.m \
 	    coredialogs.h \
@@ -585,8 +581,6 @@ VLC.app: vlc $(top_builddir)/src/.libs/libvlccore.dylib $(top_builddir)/src/.lib
 	    voutgl.m \
 	    wizard.h \
 	    wizard.m \
-	    extended.h \
-	    extended.m \
 	    bookmarks.h \
 	    bookmarks.m \
 	    coredialogs.h \
