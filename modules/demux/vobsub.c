@@ -156,10 +156,7 @@ static int Open ( vlc_object_t *p_this )
     p_sys->i_tracks = 0;
     p_sys->track = malloc( sizeof( vobsub_track_t ) );
     if( unlikely( !p_sys->track ) )
-    {
-        free( p_sys );
-        return VLC_ENOMEM;
-    }
+        goto error;
     p_sys->i_original_frame_width = -1;
     p_sys->i_original_frame_height = -1;
     p_sys->b_palette = false;
@@ -190,10 +187,8 @@ static int Open ( vlc_object_t *p_this )
 
     if( asprintf( &psz_vobname, "%s://%s", p_demux->psz_access,
                   p_demux->psz_location ) == -1 )
-    {
-        free( p_sys );
-        return VLC_EGENERIC;
-    }
+        goto error;
+
     i_len = strlen( psz_vobname );
     if( i_len >= 4 ) memcpy( psz_vobname + i_len - 4, ".sub", 4 );
 
@@ -204,12 +199,20 @@ static int Open ( vlc_object_t *p_this )
         msg_Err( p_demux, "couldn't open .sub Vobsub file: %s",
                  psz_vobname );
         free( psz_vobname );
-        free( p_sys );
-        return VLC_EGENERIC;
+        goto error;
     }
     free( psz_vobname );
 
     return VLC_SUCCESS;
+
+error:
+    /* Clean all subs from all tracks */
+    for( int i = 0; i < p_sys->i_tracks; i++ )
+        free( p_sys->track[i].p_subtitles );
+    free( p_sys->track );
+    free( p_sys );
+
+    return VLC_EGENERIC;
 }
 
 /*****************************************************************************
