@@ -70,6 +70,9 @@
         <property name="maximum">
          <number>65535</number>
         </property>
+        <property name="singleStep">
+         <number>100</number>
+        </property>
        </widget>
       </item>
       <item row="0" column="3">
