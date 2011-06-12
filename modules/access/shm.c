@@ -26,8 +26,10 @@
 
 #include <stdarg.h>
 #include <fcntl.h>
-#include <sys/ipc.h>
-#include <sys/shm.h>
+#ifdef HAVE_SYS_SHM_H
+# include <sys/ipc.h>
+# include <sys/shm.h>
+#endif
 #include <sys/mman.h>
 
 #include <vlc_common.h>
@@ -105,16 +107,19 @@ vlc_module_begin ()
      * memory location via an unsafe variable rather than the URL. */
     add_string ("shm-file", NULL, FILE_TEXT, FILE_LONGTEXT, false)
         change_volatile ()
+#ifdef HAVE_SYS_SHM_H
     add_integer ("shm-id", (int64_t)IPC_PRIVATE, ID_TEXT, ID_LONGTEXT, false)
         change_volatile ()
-
+#endif
     add_shortcut ("shm")
 vlc_module_end ()
 
 static void Demux (void *);
 static int Control (demux_t *, int, va_list);
 static void map_detach (demux_sys_t *);
+#ifdef HAVE_SYS_SHM_H
 static void sysv_detach (demux_sys_t *);
+#endif
 static void no_detach (demux_sys_t *);
 
 struct demux_sys_t
@@ -198,6 +203,7 @@ static int Open (vlc_object_t *obj)
     }
     else
     {
+#ifdef HAVE_SYS_SHM_H
         int id = var_InheritInteger (demux, "shm-id");
         if (id == IPC_PRIVATE)
             goto error;
@@ -210,6 +216,9 @@ static int Open (vlc_object_t *obj)
         }
         sys->addr = mem;
         sys->detach = sysv_detach;
+#else
+        goto error;
+#endif
     }
 
     /* Initializes format */
@@ -274,11 +283,12 @@ static void map_detach (demux_sys_t *sys)
     munmap ((void *)sys->addr, sys->length);
 }
 
-
+#ifdef HAVE_SYS_SHM_H
 static void sysv_detach (demux_sys_t *sys)
 {
     shmdt (sys->addr);
 }
+#endif
 
 static void no_detach (demux_sys_t *sys)
 {
