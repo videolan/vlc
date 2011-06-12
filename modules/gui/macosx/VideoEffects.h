@@ -144,6 +144,10 @@
 - (IBAction)toggleWindow:(id)sender;
 - (void)resetValues;
 - (void)setVideoFilter: (char *)psz_name on:(BOOL)b_on;
+- (void)setVideoFilterProperty: (char *)psz_name forFilter: (char*)psz_filter integer: (int)i_value;
+- (void)setVideoFilterProperty: (char *)psz_name forFilter: (char*)psz_filter float: (float)f_value;
+- (void)setVideoFilterProperty: (char *)psz_name forFilter: (char *)psz_filter string: (char *)psz_value;
+- (void)setVideoFilterProperty: (char *)psz_name forFilter: (char *)psz_filter boolean: (BOOL)b_value;
 
 /* basic */
 - (IBAction)enableAdjust:(id)sender;
@@ -157,8 +161,7 @@
 - (IBAction)grainSliderChanged:(id)sender;
 
 /* crop */
-- (IBAction)cropFieldChanged:(id)sender;
-- (IBAction)enableCropModifier:(id)sender;
+- (IBAction)cropObjectChanged:(id)sender;
 
 /* geometry */
 - (IBAction)enableTransform:(id)sender;

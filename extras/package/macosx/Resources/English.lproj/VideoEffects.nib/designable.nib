@@ -21,7 +21,7 @@
     </object>
     <object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
       <bool key="EncodedWithXMLCoder">YES</bool>
-      <integer value="2"/>
+      <integer value="6"/>
     </object>
     <object class="NSArray" key="IBDocument.PluginDependencies">
       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -47,7 +47,7 @@
         <int key="NSWindowStyleMask">8211</int>
         <int key="NSWindowBacking">2</int>
         <string key="NSWindowRect">{{196, 270}, {642, 240}}</string>
-        <int key="NSWTFlags">1886912512</int>
+        <int key="NSWTFlags">-260571136</int>
         <string key="NSWindowTitle">Video Effects</string>
         <string key="NSWindowClass">NSPanel</string>
         <nil key="NSViewClass"/>
@@ -755,7 +755,7 @@
                 <object class="BGHUDTabViewItem" id="52756061">
                   <string key="NSIdentifier">crop</string>
                   <object class="NSView" key="NSView" id="838226260">
-                    <nil key="NSNextResponder"/>
+                    <reference key="NSNextResponder" ref="898819366"/>
                     <int key="NSvFlags">256</int>
                     <object class="NSMutableArray" key="NSSubviews">
                       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -768,7 +768,7 @@
                         <bool key="NSEnabled">YES</bool>
                         <object class="BGHUDTextFieldCell" key="NSCell" id="474337841">
                           <int key="NSCellFlags">-1804468671</int>
-                          <int key="NSCellFlags2">71435264</int>
+                          <int key="NSCellFlags2">71435328</int>
                           <integer value="0" key="NSContents"/>
                           <reference key="NSSupport" ref="26"/>
                           <object class="NSNumberFormatter" key="NSFormatter" id="210492527">
@@ -899,7 +899,7 @@
                         <bool key="NSEnabled">YES</bool>
                         <object class="BGHUDTextFieldCell" key="NSCell" id="975473061">
                           <int key="NSCellFlags">-1804468671</int>
-                          <int key="NSCellFlags2">71435264</int>
+                          <int key="NSCellFlags2">71435328</int>
                           <integer value="0" key="NSContents"/>
                           <reference key="NSSupport" ref="26"/>
                           <object class="NSNumberFormatter" key="NSFormatter" id="1075575">
@@ -1013,7 +1013,7 @@
                         <bool key="NSEnabled">YES</bool>
                         <object class="BGHUDTextFieldCell" key="NSCell" id="659672481">
                           <int key="NSCellFlags">-1804468671</int>
-                          <int key="NSCellFlags2">71435264</int>
+                          <int key="NSCellFlags2">71435328</int>
                           <integer value="0" key="NSContents"/>
                           <reference key="NSSupport" ref="26"/>
                           <object class="NSNumberFormatter" key="NSFormatter" id="106661807">
@@ -1127,7 +1127,7 @@
                         <bool key="NSEnabled">YES</bool>
                         <object class="BGHUDTextFieldCell" key="NSCell" id="594295999">
                           <int key="NSCellFlags">-1804468671</int>
-                          <int key="NSCellFlags2">71435264</int>
+                          <int key="NSCellFlags2">71435328</int>
                           <integer value="0" key="NSContents"/>
                           <reference key="NSSupport" ref="26"/>
                           <object class="NSNumberFormatter" key="NSFormatter" id="947826067">
@@ -1286,6 +1286,7 @@
                       </object>
                     </object>
                     <string key="NSFrame">{{10, 33}, {638, 197}}</string>
+                    <reference key="NSSuperview" ref="898819366"/>
                     <string key="NSReuseIdentifierKey">_NS:809</string>
                   </object>
                   <string key="NSLabel">Crop</string>
@@ -1791,7 +1792,7 @@
                 <object class="NSTabViewItem" id="133975353">
                   <string key="NSIdentifier">color</string>
                   <object class="NSView" key="NSView" id="10628740">
-                    <reference key="NSNextResponder" ref="898819366"/>
+                    <nil key="NSNextResponder"/>
                     <int key="NSvFlags">256</int>
                     <object class="NSMutableArray" key="NSSubviews">
                       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -2912,7 +2913,6 @@
                       </object>
                     </object>
                     <string key="NSFrame">{{10, 33}, {638, 197}}</string>
-                    <reference key="NSSuperview" ref="898819366"/>
                   </object>
                   <string key="NSLabel">Color</string>
                   <reference key="NSColor" ref="279270326"/>
@@ -4015,7 +4015,7 @@
                   <reference key="NSTabView" ref="898819366"/>
                 </object>
               </object>
-              <reference key="NSSelectedTabViewItem" ref="133975353"/>
+              <reference key="NSSelectedTabViewItem" ref="52756061"/>
               <object class="NSFont" key="NSFont">
                 <string key="NSName">LucidaGrande</string>
                 <double key="NSSize">13</double>
@@ -4027,7 +4027,7 @@
               <nil key="themeKey"/>
               <object class="NSMutableArray" key="NSSubviews">
                 <bool key="EncodedWithXMLCoder">YES</bool>
-                <reference ref="10628740"/>
+                <reference ref="838226260"/>
               </object>
             </object>
           </object>
@@ -5048,38 +5048,6 @@
         </object>
         <object class="IBConnectionRecord">
           <object class="IBActionConnection" key="connection">
-            <string key="label">cropFieldChanged:</string>
-            <reference key="source" ref="707254443"/>
-            <reference key="destination" ref="411363183"/>
-          </object>
-          <int key="connectionID">586</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBActionConnection" key="connection">
-            <string key="label">cropFieldChanged:</string>
-            <reference key="source" ref="707254443"/>
-            <reference key="destination" ref="950709956"/>
-          </object>
-          <int key="connectionID">587</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBActionConnection" key="connection">
-            <string key="label">cropFieldChanged:</string>
-            <reference key="source" ref="707254443"/>
-            <reference key="destination" ref="190644777"/>
-          </object>
-          <int key="connectionID">588</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBActionConnection" key="connection">
-            <string key="label">cropFieldChanged:</string>
-            <reference key="source" ref="707254443"/>
-            <reference key="destination" ref="785525140"/>
-          </object>
-          <int key="connectionID">589</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBActionConnection" key="connection">
             <string key="label">enableAddLogo:</string>
             <reference key="source" ref="707254443"/>
             <reference key="destination" ref="851614399"/>
@@ -5141,22 +5109,6 @@
             <reference key="destination" ref="232141445"/>
           </object>
           <int key="connectionID">597</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBActionConnection" key="connection">
-            <string key="label">enableCropModifier:</string>
-            <reference key="source" ref="707254443"/>
-            <reference key="destination" ref="973277604"/>
-          </object>
-          <int key="connectionID">598</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBActionConnection" key="connection">
-            <string key="label">enableCropModifier:</string>
-            <reference key="source" ref="707254443"/>
-            <reference key="destination" ref="447321799"/>
-          </object>
-          <int key="connectionID">599</int>
         </object>
         <object class="IBConnectionRecord">
           <object class="IBActionConnection" key="connection">
@@ -5437,6 +5389,54 @@
             <reference key="destination" ref="898819366"/>
           </object>
           <int key="connectionID">635</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">cropObjectChanged:</string>
+            <reference key="source" ref="707254443"/>
+            <reference key="destination" ref="950709956"/>
+          </object>
+          <int key="connectionID">637</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">cropObjectChanged:</string>
+            <reference key="source" ref="707254443"/>
+            <reference key="destination" ref="190644777"/>
+          </object>
+          <int key="connectionID">638</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">cropObjectChanged:</string>
+            <reference key="source" ref="707254443"/>
+            <reference key="destination" ref="411363183"/>
+          </object>
+          <int key="connectionID">639</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">cropObjectChanged:</string>
+            <reference key="source" ref="707254443"/>
+            <reference key="destination" ref="785525140"/>
+          </object>
+          <int key="connectionID">640</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">cropObjectChanged:</string>
+            <reference key="source" ref="707254443"/>
+            <reference key="destination" ref="973277604"/>
+          </object>
+          <int key="connectionID">641</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">cropObjectChanged:</string>
+            <reference key="source" ref="707254443"/>
+            <reference key="destination" ref="447321799"/>
+          </object>
+          <int key="connectionID">642</int>
         </object>
       </object>
       <object class="IBMutableOrderedSet" key="objectRecords">
@@ -8785,7 +8785,7 @@
         </object>
       </object>
       <nil key="sourceID"/>
-      <int key="maxID">636</int>
+      <int key="maxID">642</int>
     </object>
     <object class="IBClassDescriber" key="IBDocument.Classes">
       <object class="NSMutableArray" key="referencedPartialClassDescriptionsV3.1+">
@@ -8803,7 +8803,7 @@
               <string>bandingSliderChanged:</string>
               <string>blurModifierChanged:</string>
               <string>cloneModifierChanged:</string>
-              <string>cropFieldChanged:</string>
+              <string>cropObjectChanged:</string>
               <string>enableAddLogo:</string>
               <string>enableAddText:</string>
               <string>enableAdjust:</string>
@@ -8811,7 +8811,6 @@
               <string>enableBanding:</string>
               <string>enableBlur:</string>
               <string>enableClone:</string>
-              <string>enableCropModifier:</string>
               <string>enableEraseLogo:</string>
               <string>enableExtract:</string>
               <string>enableGradient:</string>
@@ -8838,6 +8837,7 @@
               <string>sepiaModifierChanged:</string>
               <string>sharpenSliderChanged:</string>
               <string>thresholdModifierChanged:</string>
+              <string>toggleWindow:</string>
               <string>transformModifierChanged:</string>
             </object>
             <object class="NSMutableArray" key="dict.values">
@@ -8896,7 +8896,7 @@
               <string>bandingSliderChanged:</string>
               <string>blurModifierChanged:</string>
               <string>cloneModifierChanged:</string>
-              <string>cropFieldChanged:</string>
+              <string>cropObjectChanged:</string>
               <string>enableAddLogo:</string>
               <string>enableAddText:</string>
               <string>enableAdjust:</string>
@@ -8904,7 +8904,6 @@
               <string>enableBanding:</string>
               <string>enableBlur:</string>
               <string>enableClone:</string>
-              <string>enableCropModifier:</string>
               <string>enableEraseLogo:</string>
               <string>enableExtract:</string>
               <string>enableGradient:</string>
@@ -8931,6 +8930,7 @@
               <string>sepiaModifierChanged:</string>
               <string>sharpenSliderChanged:</string>
               <string>thresholdModifierChanged:</string>
+              <string>toggleWindow:</string>
               <string>transformModifierChanged:</string>
             </object>
             <object class="NSMutableArray" key="dict.values">
@@ -8960,7 +8960,7 @@
                 <string key="candidateClassName">id</string>
               </object>
               <object class="IBActionInfo">
-                <string key="name">cropFieldChanged:</string>
+                <string key="name">cropObjectChanged:</string>
                 <string key="candidateClassName">id</string>
               </object>
               <object class="IBActionInfo">
@@ -8989,10 +8989,6 @@
               </object>
               <object class="IBActionInfo">
                 <string key="name">enableClone:</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBActionInfo">
-                <string key="name">enableCropModifier:</string>
                 <string key="candidateClassName">id</string>
               </object>
               <object class="IBActionInfo">
@@ -9097,6 +9093,10 @@
               </object>
               <object class="IBActionInfo">
                 <string key="name">thresholdModifierChanged:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">toggleWindow:</string>
                 <string key="candidateClassName">id</string>
               </object>
               <object class="IBActionInfo">
