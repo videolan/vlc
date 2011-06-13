@@ -279,6 +279,7 @@ int vlc_poll (struct pollfd *, unsigned, int);
 #endif
 
 #ifndef HAVE_IF_NAMEINDEX
+#include <errno.h>
 struct if_nameindex
 {
     unsigned if_index;
