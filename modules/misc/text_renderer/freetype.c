@@ -240,7 +240,6 @@ struct filter_sys_t
 {
     FT_Library     p_library;   /* handle to library     */
     FT_Face        p_face;      /* handle to face object */
-    bool           i_use_kerning;
     uint8_t        i_font_opacity;
     int            i_font_color;
     int            i_font_size;
@@ -2097,9 +2096,6 @@ static int ProcessLines( filter_t *p_filter,
                 free( pi_karaoke_bar );
                 return VLC_EGENERIC;
             }
-            p_sys->i_use_kerning =
-                        FT_HAS_KERNING( ( p_face  ? p_face : p_sys->p_face ) );
-
 
             uint32_t *psz_unicode = malloc( (k - i_prev + 1) * sizeof(*psz_unicode) );
             if( !psz_unicode )
@@ -2535,8 +2531,6 @@ static int Create( vlc_object_t *p_this )
         msg_Err( p_filter, "font has no unicode translation table" );
         goto error;
     }
-
-    p_sys->i_use_kerning = FT_HAS_KERNING( p_sys->p_face );
 
     if( SetFontSize( p_filter, 0 ) != VLC_SUCCESS ) goto error;
 
