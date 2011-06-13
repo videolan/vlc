@@ -1463,38 +1463,6 @@ static unsigned SetupText( filter_t *p_filter,
     return i_string_length;
 }
 
-static int CheckForEmbeddedFont( filter_sys_t *p_sys, FT_Face *pp_face, text_style_t *p_style )
-{
-    for( int k = 0; k < p_sys->i_font_attachments; k++ )
-    {
-        input_attachment_t *p_attach   = p_sys->pp_font_attachments[k];
-        int                 i_font_idx = 0;
-        FT_Face             p_face = NULL;
-
-        while( 0 == FT_New_Memory_Face( p_sys->p_library,
-                                        p_attach->p_data,
-                                        p_attach->i_data,
-                                        i_font_idx,
-                                        &p_face ))
-        {
-            if( p_face )
-            {
-                int i_style_received = ((p_face->style_flags & FT_STYLE_FLAG_BOLD)    ? STYLE_BOLD   : 0) |
-                                       ((p_face->style_flags & FT_STYLE_FLAG_ITALIC ) ? STYLE_ITALIC : 0);
-                if( !strcasecmp( p_face->family_name, p_style->psz_fontname ) &&
-                    (p_style->i_style_flags & (STYLE_BOLD | STYLE_BOLD)) == i_style_received )
-                {
-                    *pp_face = p_face;
-                    return VLC_SUCCESS;
-                }
-                FT_Done_Face( p_face );
-            }
-            i_font_idx++;
-        }
-    }
-    return VLC_EGENERIC;
-}
-
 static int ProcessNodes( filter_t *p_filter,
                          uint32_t *psz_text,
                          text_style_t **pp_styles,
@@ -1885,6 +1853,99 @@ static int RenderTag( filter_t *p_filter, FT_Face p_face,
     return VLC_SUCCESS;
 }
 
+static FT_Face LoadEmbeddedFace( filter_sys_t *p_sys, const text_style_t *p_style )
+{
+    for( int k = 0; k < p_sys->i_font_attachments; k++ )
+    {
+        input_attachment_t *p_attach   = p_sys->pp_font_attachments[k];
+        int                 i_font_idx = 0;
+        FT_Face             p_face = NULL;
+
+        while( 0 == FT_New_Memory_Face( p_sys->p_library,
+                                        p_attach->p_data,
+                                        p_attach->i_data,
+                                        i_font_idx,
+                                        &p_face ))
+        {
+            if( p_face )
+            {
+                int i_style_received = ((p_face->style_flags & FT_STYLE_FLAG_BOLD)    ? STYLE_BOLD   : 0) |
+                                       ((p_face->style_flags & FT_STYLE_FLAG_ITALIC ) ? STYLE_ITALIC : 0);
+                if( !strcasecmp( p_face->family_name, p_style->psz_fontname ) &&
+                    (p_style->i_style_flags & (STYLE_BOLD | STYLE_BOLD)) == i_style_received )
+                    return p_face;
+
+                FT_Done_Face( p_face );
+            }
+            i_font_idx++;
+        }
+    }
+    return NULL;
+}
+
+static FT_Face LoadFace( filter_t *p_filter,
+                         const text_style_t *p_style )
+{
+    filter_sys_t *p_sys = p_filter->p_sys;
+
+    /* Look for a match amongst our attachments first */
+    FT_Face p_face = LoadEmbeddedFace( p_sys, p_style );
+
+    /* Load system wide font otheriwse */
+    if( !p_face )
+    {
+        int  i_idx = 0;
+        char *psz_fontfile;
+#ifdef HAVE_FONTCONFIG
+        psz_fontfile = FontConfig_Select( NULL,
+                                          p_style->psz_fontname,
+                                          (p_style->i_style_flags & STYLE_BOLD) != 0,
+                                          (p_style->i_style_flags & STYLE_ITALIC) != 0,
+                                          -1,
+                                          &i_idx );
+#elif defined( WIN32 )
+        psz_fontfile = Win32_Select( p_filter,
+                                    p_style->psz_fontname,
+                                    (p_style->i_style_flags & STYLE_BOLD) != 0,
+                                    (p_style->i_style_flags & STYLE_ITALIC) != 0,
+                                    -1,
+                                    &i_idx );
+#else
+        psz_fontfile = NULL;
+#endif
+        if( !psz_fontfile )
+            return NULL;
+
+        if( *psz_fontfile == '\0' )
+        {
+            msg_Warn( p_filter,
+                      "We were not able to find a matching font: \"%s\" (%s %s),"
+                      " so using default font",
+                      p_style->psz_fontname,
+                      (p_style->i_style_flags & STYLE_BOLD)   ? "Bold" : "",
+                      (p_style->i_style_flags & STYLE_ITALIC) ? "Italic" : "" );
+            p_face = NULL;
+        }
+        else
+        {
+            if( FT_New_Face( p_sys->p_library, psz_fontfile, i_idx, &p_face ) )
+                p_face = NULL;
+        }
+        free( psz_fontfile );
+    }
+    if( !p_face )
+        return NULL;
+
+    if( FT_Select_Charmap( p_face, ft_encoding_unicode ) )
+    {
+        /* We've loaded a font face which is unhelpful for actually
+         * rendering text - fallback to the default one.
+         */
+        FT_Done_Face( p_face );
+        return NULL;
+    }
+    return p_face;
+}
 
 static int ProcessLines( filter_t *p_filter,
                          line_desc_t **pp_lines,
@@ -2021,74 +2082,9 @@ static int ProcessLines( filter_t *p_filter,
         {
             text_style_t *p_style = pp_styles[ k - 1 ];
 
-            /* End of the current style run */
-            FT_Face p_face = NULL;
-            int      i_idx = 0;
-
-            /* Look for a match amongst our attachments first */
-            CheckForEmbeddedFont( p_sys, &p_face, p_style );
-
-            if( ! p_face )
-            {
-                char *psz_fontfile;
-
-#ifdef HAVE_FONTCONFIG
-                psz_fontfile = FontConfig_Select( NULL,
-                                                  p_style->psz_fontname,
-                                                  (p_style->i_style_flags & STYLE_BOLD) != 0,
-                                                  (p_style->i_style_flags & STYLE_ITALIC) != 0,
-                                                  -1,
-                                                  &i_idx );
-#elif defined( WIN32 )
-                psz_fontfile = Win32_Select( p_filter,
-                                            p_style->psz_fontname,
-                                            (p_style->i_style_flags & STYLE_BOLD) != 0,
-                                            (p_style->i_style_flags & STYLE_ITALIC) != 0,
-                                            -1,
-                                            &i_idx );
-#else
-                psz_fontfile = NULL;
-#endif
-                if( psz_fontfile && ! *psz_fontfile )
-                {
-                    msg_Warn( p_filter,
-                              "We were not able to find a matching font: \"%s\" (%s %s),"
-                              " so using default font",
-                              p_style->psz_fontname,
-                              (p_style->i_style_flags & STYLE_BOLD)   ? "Bold" : "",
-                              (p_style->i_style_flags & STYLE_ITALIC) ? "Italic" : "" );
-                    free( psz_fontfile );
-                    psz_fontfile = NULL;
-                }
-
-                if( psz_fontfile )
-                {
-                    if( FT_New_Face( p_sys->p_library,
-                                psz_fontfile, i_idx, &p_face ) )
-                    {
-                        free( psz_fontfile );
-                        free( pp_fribidi_styles );
-                        free( p_fribidi_string );
-                        free( pi_karaoke_bar );
-                        return VLC_EGENERIC;
-                    }
-                    free( psz_fontfile );
-                }
-            }
-            if( p_face &&
-                FT_Select_Charmap( p_face, ft_encoding_unicode ) )
-            {
-                /* We've loaded a font face which is unhelpful for actually
-                 * rendering text - fallback to the default one.
-                 */
-                 FT_Done_Face( p_face );
-                 p_face = NULL;
-            }
-
-            if( FT_Select_Charmap( p_face ? p_face : p_sys->p_face,
-                        ft_encoding_unicode ) ||
-                FT_Set_Pixel_Sizes( p_face ? p_face : p_sys->p_face, 0,
-                    p_style->i_font_size ) )
+            FT_Face p_face = LoadFace( p_filter, p_style );
+            if( FT_Set_Pixel_Sizes( p_face ? p_face : p_sys->p_face,
+                                    0, p_style->i_font_size ) )
             {
                 if( p_face ) FT_Done_Face( p_face );
                 free( pp_fribidi_styles );
