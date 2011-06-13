@@ -101,7 +101,7 @@ static aout_buffer_t *DecodeBlock( decoder_t *, block_t ** );
 
 static FLAC__StreamDecoderReadStatus
 DecoderReadCallback( const FLAC__StreamDecoder *decoder,
-                     FLAC__byte buffer[], unsigned *bytes, void *client_data );
+                     FLAC__byte buffer[], size_t *bytes, void *client_data );
 
 static FLAC__StreamDecoderWriteStatus
 DecoderWriteCallback( const FLAC__StreamDecoder *decoder,
@@ -308,7 +308,7 @@ static aout_buffer_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
  *****************************************************************************/
 static FLAC__StreamDecoderReadStatus
 DecoderReadCallback( const FLAC__StreamDecoder *decoder, FLAC__byte buffer[],
-                     unsigned *bytes, void *client_data )
+                     size_t *bytes, void *client_data )
 {
     VLC_UNUSED(decoder);
     decoder_t *p_dec = (decoder_t *)client_data;
@@ -316,7 +316,7 @@ DecoderReadCallback( const FLAC__StreamDecoder *decoder, FLAC__byte buffer[],
 
     if( p_sys->p_block && p_sys->p_block->i_buffer )
     {
-        *bytes = __MIN(*bytes, (unsigned)p_sys->p_block->i_buffer);
+        *bytes = __MIN(*bytes, p_sys->p_block->i_buffer);
         memcpy( buffer, p_sys->p_block->p_buffer, *bytes );
         p_sys->p_block->i_buffer -= *bytes;
         p_sys->p_block->p_buffer += *bytes;
@@ -633,7 +633,7 @@ static block_t *Encode( encoder_t *, aout_buffer_t * );
 static FLAC__StreamEncoderWriteStatus
 EncoderWriteCallback( const FLAC__StreamEncoder *encoder,
                       const FLAC__byte buffer[],
-                      unsigned bytes, unsigned samples,
+                      size_t bytes, unsigned samples,
                       unsigned current_frame, void *client_data );
 
 static void EncoderMetadataCallback( const FLAC__StreamEncoder *encoder,
@@ -785,7 +785,7 @@ static void EncoderMetadataCallback( const FLAC__StreamEncoder *encoder,
 static FLAC__StreamEncoderWriteStatus
 EncoderWriteCallback( const FLAC__StreamEncoder *encoder,
                       const FLAC__byte buffer[],
-                      unsigned bytes, unsigned samples,
+                      size_t bytes, unsigned samples,
                       unsigned current_frame, void *client_data )
 {
     VLC_UNUSED(encoder); VLC_UNUSED(current_frame);
@@ -797,7 +797,7 @@ EncoderWriteCallback( const FLAC__StreamEncoder *encoder,
     {
         if( p_sys->i_headers == 1 )
         {
-            msg_Dbg( p_enc, "Writing STREAMINFO: %i", bytes );
+            msg_Dbg( p_enc, "Writing STREAMINFO: %zu", bytes );
 
             /* Backup the STREAMINFO metadata block */
             p_enc->fmt_out.i_extra = STREAMINFO_SIZE + 4;
