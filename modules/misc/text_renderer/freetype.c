@@ -1418,207 +1418,6 @@ static text_style_t *GetStyleFromFontStack( filter_sys_t *p_sys,
                         i_style_flags );
 }
 
-static int RenderTag( filter_t *p_filter, FT_Face p_face,
-                      const text_style_t *p_style,
-                      line_desc_t *p_line, uint32_t *psz_unicode,
-                      int *pi_pen_x, int i_pen_y, int *pi_start,
-                      FT_Vector *p_result )
-{
-    FT_BBox      line;
-    int          i_yMin, i_yMax;
-    int          i;
-    bool   b_first_on_line = true;
-
-    int          i_previous = 0;
-    int          i_pen_x_start = *pi_pen_x;
-
-    uint32_t *psz_unicode_start = psz_unicode;
-
-    line.xMin = line.xMax = line.yMin = line.yMax = 0;
-
-    /* Account for part of line already in position */
-    for( i = 0; i<*pi_start; i++ )
-    {
-        FT_BBox glyph_size;
-
-        FT_Glyph_Get_CBox( (FT_Glyph) p_line->pp_glyphs[ i ],
-                            ft_glyph_bbox_pixels, &glyph_size );
-
-        line.xMax = p_line->p_glyph_pos[ i ].x + glyph_size.xMax -
-            glyph_size.xMin + p_line->pp_glyphs[ i ]->left;
-        line.yMax = __MAX( line.yMax, glyph_size.yMax );
-        line.yMin = __MIN( line.yMin, glyph_size.yMin );
-    }
-    i_yMin = line.yMin;
-    i_yMax = line.yMax;
-
-    if( line.xMax > 0 )
-        b_first_on_line = false;
-
-    while( *psz_unicode && ( *psz_unicode != '\n' ) )
-    {
-        FT_BBox glyph_size;
-        FT_Glyph tmp_glyph;
-        int i_error;
-
-        int i_glyph_index = FT_Get_Char_Index( p_face, *psz_unicode++ );
-        if( FT_HAS_KERNING( p_face ) && i_glyph_index
-            && i_previous )
-        {
-            FT_Vector delta;
-            FT_Get_Kerning( p_face, i_previous, i_glyph_index,
-                            ft_kerning_default, &delta );
-            *pi_pen_x += delta.x >> 6;
-        }
-        p_line->p_glyph_pos[ i ].x = *pi_pen_x;
-        p_line->p_glyph_pos[ i ].y = i_pen_y;
-
-        i_error = FT_Load_Glyph( p_face, i_glyph_index, FT_LOAD_NO_BITMAP | FT_LOAD_DEFAULT );
-        if( i_error )
-        {
-            i_error = FT_Load_Glyph( p_face, i_glyph_index, FT_LOAD_DEFAULT );
-            if( i_error )
-            {
-                msg_Err( p_filter,
-                       "unable to render text FT_Load_Glyph returned %d", i_error );
-                p_line->pp_glyphs[ i ] = NULL;
-                return VLC_EGENERIC;
-            }
-        }
-
-        /* Do synthetic styling now that Freetype supports it;
-         * ie. if the font we have loaded is NOT already in the
-         * style that the tags want, then switch it on; if they
-         * are then don't. */
-        if ((p_style->i_style_flags & STYLE_BOLD) && !(p_face->style_flags & FT_STYLE_FLAG_BOLD))
-            FT_GlyphSlot_Embolden( p_face->glyph );
-        if ((p_style->i_style_flags & STYLE_ITALIC) && !(p_face->style_flags & FT_STYLE_FLAG_ITALIC))
-            FT_GlyphSlot_Oblique( p_face->glyph );
-
-        i_error = FT_Get_Glyph( p_face->glyph, &tmp_glyph );
-        if( i_error )
-        {
-            msg_Err( p_filter,
-                    "unable to render text FT_Get_Glyph returned %d", i_error );
-            p_line->pp_glyphs[ i ] = NULL;
-            return VLC_EGENERIC;
-        }
-        FT_Glyph_Get_CBox( tmp_glyph, ft_glyph_bbox_pixels, &glyph_size );
-        i_error = FT_Glyph_To_Bitmap( &tmp_glyph, FT_RENDER_MODE_NORMAL, 0, 1);
-        if( i_error )
-        {
-            FT_Done_Glyph( tmp_glyph );
-            continue;
-        }
-        if( p_style->i_style_flags & (STYLE_UNDERLINE | STYLE_STRIKEOUT) )
-        {
-            float aOffset = FT_FLOOR(FT_MulFix(p_face->underline_position,
-                                               p_face->size->metrics.y_scale));
-            float aSize = FT_CEIL(FT_MulFix(p_face->underline_thickness,
-                                            p_face->size->metrics.y_scale));
-
-            p_line->pi_underline_offset[ i ]  =
-                                       ( aOffset < 0 ) ? -aOffset : aOffset;
-            p_line->pi_underline_thickness[ i ] =
-                                       ( aSize < 0 ) ? -aSize   : aSize;
-            if( p_style->i_style_flags & STYLE_STRIKEOUT )
-            {
-                /* Move the baseline to make it strikethrough instead of
-                 * underline. That means that strikethrough takes precedence
-                 */
-                float aDescent = FT_FLOOR(FT_MulFix(p_face->descender*2,
-                                                    p_face->size->metrics.y_scale));
-
-                p_line->pi_underline_offset[ i ]  -=
-                                       ( aDescent < 0 ) ? -aDescent : aDescent;
-            }
-        }
-
-        p_line->pp_glyphs[ i ] = (FT_BitmapGlyph)tmp_glyph;
-        p_line->p_fg_rgb[ i ] = p_style->i_font_color;
-        p_line->p_bg_rgb[ i ] = p_style->i_karaoke_background_color;
-        p_line->p_fg_bg_ratio[ i ] = 0x00;
-
-        line.xMax = p_line->p_glyph_pos[i].x + glyph_size.xMax -
-                    glyph_size.xMin + ((FT_BitmapGlyph)tmp_glyph)->left;
-        if( line.xMax > (int)p_filter->fmt_out.video.i_visible_width - 20 )
-        {
-            for( ; i >= *pi_start; i-- )
-                FT_Done_Glyph( (FT_Glyph)p_line->pp_glyphs[ i ] );
-            i = *pi_start;
-
-            while( psz_unicode > psz_unicode_start && *psz_unicode != ' ' )
-            {
-                psz_unicode--;
-            }
-            if( psz_unicode == psz_unicode_start )
-            {
-                if( b_first_on_line )
-                {
-                    msg_Warn( p_filter, "unbreakable string" );
-                    p_line->pp_glyphs[ i ] = NULL;
-                    return VLC_EGENERIC;
-                }
-                *pi_pen_x = i_pen_x_start;
-
-                p_line->i_width = line.xMax;
-                p_line->i_height = __MAX( p_line->i_height,
-                                          p_face->size->metrics.height >> 6 );
-                p_line->pp_glyphs[ i ] = NULL;
-
-                p_result->x = __MAX( p_result->x, line.xMax );
-                p_result->y = __MAX( p_result->y, __MAX( p_line->i_height,
-                                                         i_yMax - i_yMin ) );
-                return VLC_SUCCESS;
-            }
-            else
-            {
-                *psz_unicode = '\n';
-            }
-            psz_unicode = psz_unicode_start;
-            *pi_pen_x = i_pen_x_start;
-            i_previous = 0;
-
-            line.yMax = i_yMax;
-            line.yMin = i_yMin;
-
-            continue;
-        }
-        line.yMax = __MAX( line.yMax, glyph_size.yMax );
-        line.yMin = __MIN( line.yMin, glyph_size.yMin );
-
-        i_previous = i_glyph_index;
-        *pi_pen_x += p_face->glyph->advance.x >> 6;
-        i++;
-    }
-    p_line->i_width = line.xMax;
-    p_line->i_height = __MAX( p_line->i_height,
-                              p_face->size->metrics.height >> 6 );
-    p_line->pp_glyphs[ i ] = NULL;
-
-    p_result->x = __MAX( p_result->x, line.xMax );
-    p_result->y = __MAX( p_result->y, __MAX( p_line->i_height,
-                         line.yMax - line.yMin ) );
-
-    *pi_start = i;
-
-    /* Get rid of any text processed - if necessary repositioning
-     * at the start of a new line of text
-     */
-    if( !*psz_unicode )
-    {
-        *psz_unicode_start = '\0';
-    }
-    else if( psz_unicode > psz_unicode_start )
-    {
-        for( i=0; psz_unicode[ i ]; i++ )
-            psz_unicode_start[ i ] = psz_unicode[ i ];
-        psz_unicode_start[ i ] = '\0';
-    }
-
-    return VLC_SUCCESS;
-}
-
 static unsigned SetupText( filter_t *p_filter,
                            uint32_t *psz_text_out,
                            text_style_t **pp_styles,
@@ -1884,6 +1683,207 @@ static line_desc_t *NewLine( int i_count )
     }
     p_line->pp_glyphs[0] = NULL;
     return p_line;
+}
+
+static int RenderTag( filter_t *p_filter, FT_Face p_face,
+                      const text_style_t *p_style,
+                      line_desc_t *p_line, uint32_t *psz_unicode,
+                      int *pi_pen_x, int i_pen_y, int *pi_start,
+                      FT_Vector *p_result )
+{
+    FT_BBox      line;
+    int          i_yMin, i_yMax;
+    int          i;
+    bool   b_first_on_line = true;
+
+    int          i_previous = 0;
+    int          i_pen_x_start = *pi_pen_x;
+
+    uint32_t *psz_unicode_start = psz_unicode;
+
+    line.xMin = line.xMax = line.yMin = line.yMax = 0;
+
+    /* Account for part of line already in position */
+    for( i = 0; i<*pi_start; i++ )
+    {
+        FT_BBox glyph_size;
+
+        FT_Glyph_Get_CBox( (FT_Glyph) p_line->pp_glyphs[ i ],
+                            ft_glyph_bbox_pixels, &glyph_size );
+
+        line.xMax = p_line->p_glyph_pos[ i ].x + glyph_size.xMax -
+            glyph_size.xMin + p_line->pp_glyphs[ i ]->left;
+        line.yMax = __MAX( line.yMax, glyph_size.yMax );
+        line.yMin = __MIN( line.yMin, glyph_size.yMin );
+    }
+    i_yMin = line.yMin;
+    i_yMax = line.yMax;
+
+    if( line.xMax > 0 )
+        b_first_on_line = false;
+
+    while( *psz_unicode && ( *psz_unicode != '\n' ) )
+    {
+        FT_BBox glyph_size;
+        FT_Glyph tmp_glyph;
+        int i_error;
+
+        int i_glyph_index = FT_Get_Char_Index( p_face, *psz_unicode++ );
+        if( FT_HAS_KERNING( p_face ) && i_glyph_index
+            && i_previous )
+        {
+            FT_Vector delta;
+            FT_Get_Kerning( p_face, i_previous, i_glyph_index,
+                            ft_kerning_default, &delta );
+            *pi_pen_x += delta.x >> 6;
+        }
+        p_line->p_glyph_pos[ i ].x = *pi_pen_x;
+        p_line->p_glyph_pos[ i ].y = i_pen_y;
+
+        i_error = FT_Load_Glyph( p_face, i_glyph_index, FT_LOAD_NO_BITMAP | FT_LOAD_DEFAULT );
+        if( i_error )
+        {
+            i_error = FT_Load_Glyph( p_face, i_glyph_index, FT_LOAD_DEFAULT );
+            if( i_error )
+            {
+                msg_Err( p_filter,
+                       "unable to render text FT_Load_Glyph returned %d", i_error );
+                p_line->pp_glyphs[ i ] = NULL;
+                return VLC_EGENERIC;
+            }
+        }
+
+        /* Do synthetic styling now that Freetype supports it;
+         * ie. if the font we have loaded is NOT already in the
+         * style that the tags want, then switch it on; if they
+         * are then don't. */
+        if ((p_style->i_style_flags & STYLE_BOLD) && !(p_face->style_flags & FT_STYLE_FLAG_BOLD))
+            FT_GlyphSlot_Embolden( p_face->glyph );
+        if ((p_style->i_style_flags & STYLE_ITALIC) && !(p_face->style_flags & FT_STYLE_FLAG_ITALIC))
+            FT_GlyphSlot_Oblique( p_face->glyph );
+
+        i_error = FT_Get_Glyph( p_face->glyph, &tmp_glyph );
+        if( i_error )
+        {
+            msg_Err( p_filter,
+                    "unable to render text FT_Get_Glyph returned %d", i_error );
+            p_line->pp_glyphs[ i ] = NULL;
+            return VLC_EGENERIC;
+        }
+        FT_Glyph_Get_CBox( tmp_glyph, ft_glyph_bbox_pixels, &glyph_size );
+        i_error = FT_Glyph_To_Bitmap( &tmp_glyph, FT_RENDER_MODE_NORMAL, 0, 1);
+        if( i_error )
+        {
+            FT_Done_Glyph( tmp_glyph );
+            continue;
+        }
+        if( p_style->i_style_flags & (STYLE_UNDERLINE | STYLE_STRIKEOUT) )
+        {
+            float aOffset = FT_FLOOR(FT_MulFix(p_face->underline_position,
+                                               p_face->size->metrics.y_scale));
+            float aSize = FT_CEIL(FT_MulFix(p_face->underline_thickness,
+                                            p_face->size->metrics.y_scale));
+
+            p_line->pi_underline_offset[ i ]  =
+                                       ( aOffset < 0 ) ? -aOffset : aOffset;
+            p_line->pi_underline_thickness[ i ] =
+                                       ( aSize < 0 ) ? -aSize   : aSize;
+            if( p_style->i_style_flags & STYLE_STRIKEOUT )
+            {
+                /* Move the baseline to make it strikethrough instead of
+                 * underline. That means that strikethrough takes precedence
+                 */
+                float aDescent = FT_FLOOR(FT_MulFix(p_face->descender*2,
+                                                    p_face->size->metrics.y_scale));
+
+                p_line->pi_underline_offset[ i ]  -=
+                                       ( aDescent < 0 ) ? -aDescent : aDescent;
+            }
+        }
+
+        p_line->pp_glyphs[ i ] = (FT_BitmapGlyph)tmp_glyph;
+        p_line->p_fg_rgb[ i ] = p_style->i_font_color;
+        p_line->p_bg_rgb[ i ] = p_style->i_karaoke_background_color;
+        p_line->p_fg_bg_ratio[ i ] = 0x00;
+
+        line.xMax = p_line->p_glyph_pos[i].x + glyph_size.xMax -
+                    glyph_size.xMin + ((FT_BitmapGlyph)tmp_glyph)->left;
+        if( line.xMax > (int)p_filter->fmt_out.video.i_visible_width - 20 )
+        {
+            for( ; i >= *pi_start; i-- )
+                FT_Done_Glyph( (FT_Glyph)p_line->pp_glyphs[ i ] );
+            i = *pi_start;
+
+            while( psz_unicode > psz_unicode_start && *psz_unicode != ' ' )
+            {
+                psz_unicode--;
+            }
+            if( psz_unicode == psz_unicode_start )
+            {
+                if( b_first_on_line )
+                {
+                    msg_Warn( p_filter, "unbreakable string" );
+                    p_line->pp_glyphs[ i ] = NULL;
+                    return VLC_EGENERIC;
+                }
+                *pi_pen_x = i_pen_x_start;
+
+                p_line->i_width = line.xMax;
+                p_line->i_height = __MAX( p_line->i_height,
+                                          p_face->size->metrics.height >> 6 );
+                p_line->pp_glyphs[ i ] = NULL;
+
+                p_result->x = __MAX( p_result->x, line.xMax );
+                p_result->y = __MAX( p_result->y, __MAX( p_line->i_height,
+                                                         i_yMax - i_yMin ) );
+                return VLC_SUCCESS;
+            }
+            else
+            {
+                *psz_unicode = '\n';
+            }
+            psz_unicode = psz_unicode_start;
+            *pi_pen_x = i_pen_x_start;
+            i_previous = 0;
+
+            line.yMax = i_yMax;
+            line.yMin = i_yMin;
+
+            continue;
+        }
+        line.yMax = __MAX( line.yMax, glyph_size.yMax );
+        line.yMin = __MIN( line.yMin, glyph_size.yMin );
+
+        i_previous = i_glyph_index;
+        *pi_pen_x += p_face->glyph->advance.x >> 6;
+        i++;
+    }
+    p_line->i_width = line.xMax;
+    p_line->i_height = __MAX( p_line->i_height,
+                              p_face->size->metrics.height >> 6 );
+    p_line->pp_glyphs[ i ] = NULL;
+
+    p_result->x = __MAX( p_result->x, line.xMax );
+    p_result->y = __MAX( p_result->y, __MAX( p_line->i_height,
+                         line.yMax - line.yMin ) );
+
+    *pi_start = i;
+
+    /* Get rid of any text processed - if necessary repositioning
+     * at the start of a new line of text
+     */
+    if( !*psz_unicode )
+    {
+        *psz_unicode_start = '\0';
+    }
+    else if( psz_unicode > psz_unicode_start )
+    {
+        for( i=0; psz_unicode[ i ]; i++ )
+            psz_unicode_start[ i ] = psz_unicode[ i ];
+        psz_unicode_start[ i ] = '\0';
+    }
+
+    return VLC_SUCCESS;
 }
 
 
