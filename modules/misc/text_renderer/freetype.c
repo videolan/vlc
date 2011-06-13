@@ -204,9 +204,7 @@ struct line_desc_t
     /** list of relative positions for the glyphs */
     FT_Vector      *p_glyph_pos;
     /** list of RGB information for styled text */
-    uint32_t       *p_fg_rgb;
-    uint32_t       *p_bg_rgb;
-    uint8_t        *p_fg_bg_ratio; /* 0x00=100% FG --> 0x7F=100% BG */
+    uint32_t       *pi_color;
     /** underline information -- only supplied if text should be underlined */
     int            *pi_underline_offset;
     uint16_t       *pi_underline_thickness;
@@ -602,7 +600,7 @@ static int RenderYUVP( filter_t *p_filter, subpicture_region_t *p_region,
 
     /* Calculate text color components
      * Only use the first color */
-    YUVFromRGB( p_line->p_fg_rgb[ 0 ], &i_y, &i_u, &i_v );
+    YUVFromRGB( p_line->pi_color[ 0 ], &i_y, &i_u, &i_v );
 
     /* Build palette */
     fmt.p_palette->i_entries = 16;
@@ -945,28 +943,12 @@ static int RenderYUVA( filter_t *p_filter, subpicture_region_t *p_region,
 
             /* Every glyph can (and in fact must) have its own color */
             uint8_t i_y, i_u, i_v;
-            YUVFromRGB( p_line->p_fg_rgb[ i ], &i_y, &i_u, &i_v );
+            YUVFromRGB( p_line->pi_color[ i ], &i_y, &i_u, &i_v );
 
             for( y = 0, i_bitmap_offset = 0; y < p_glyph->bitmap.rows; y++ )
             {
                 for( int x = 0; x < p_glyph->bitmap.width; x++, i_bitmap_offset++ )
                 {
-                    uint8_t i_y_local = i_y;
-                    uint8_t i_u_local = i_u;
-                    uint8_t i_v_local = i_v;
-
-                    if( p_line->p_fg_bg_ratio != 0x00 )
-                    {
-                        int i_split = p_glyph->bitmap.width *
-                                      p_line->p_fg_bg_ratio[ i ] / 0x7f;
-
-                        if( x > i_split )
-                        {
-                            YUVFromRGB( p_line->p_bg_rgb[ i ],
-                                        &i_y_local, &i_u_local, &i_v_local );
-                        }
-                    }
-
                     if( p_glyph->bitmap.buffer[i_bitmap_offset] )
                     {
                         p_dst_y[i_offset+x] = ((p_dst_y[i_offset+x] *(255-(int)p_glyph->bitmap.buffer[i_bitmap_offset])) +
@@ -1602,9 +1584,7 @@ static void FreeLine( line_desc_t *p_line )
 
     free( p_line->pp_glyphs );
     free( p_line->p_glyph_pos );
-    free( p_line->p_fg_rgb );
-    free( p_line->p_bg_rgb );
-    free( p_line->p_fg_bg_ratio );
+    free( p_line->pi_color );
     free( p_line->pi_underline_offset );
     free( p_line->pi_underline_thickness );
     free( p_line );
@@ -1635,14 +1615,12 @@ static line_desc_t *NewLine( int i_count )
 
     p_line->pp_glyphs              = calloc( i_count + 1, sizeof(*p_line->pp_glyphs) );
     p_line->p_glyph_pos            = calloc( i_count + 1, sizeof(*p_line->p_glyph_pos) );
-    p_line->p_fg_rgb               = calloc( i_count + 1, sizeof(*p_line->p_fg_rgb) );
-    p_line->p_bg_rgb               = calloc( i_count + 1, sizeof(*p_line->p_bg_rgb) );
-    p_line->p_fg_bg_ratio          = calloc( i_count + 1, sizeof(*p_line->p_fg_bg_ratio) );
+    p_line->pi_color               = calloc( i_count + 1, sizeof(*p_line->pi_color) );
     p_line->pi_underline_offset    = calloc( i_count + 1, sizeof(*p_line->pi_underline_offset) );
     p_line->pi_underline_thickness = calloc( i_count + 1, sizeof(*p_line->pi_underline_thickness) );
 
     if( !p_line->pp_glyphs || !p_line->p_glyph_pos ||
-        !p_line->p_fg_rgb || !p_line->p_bg_rgb || !p_line->p_fg_bg_ratio ||
+        !p_line->pi_color ||
         !p_line->pi_underline_offset || !p_line->pi_underline_thickness )
     {
         FreeLine( p_line );
@@ -1654,7 +1632,8 @@ static line_desc_t *NewLine( int i_count )
 
 static int RenderTag( filter_t *p_filter, FT_Face p_face,
                       const text_style_t *p_style,
-                      line_desc_t *p_line, uint32_t *psz_unicode,
+                      line_desc_t *p_line,
+                      uint32_t *psz_unicode, uint8_t *pi_karaoke_bar,
                       int *pi_pen_x, int i_pen_y, int *pi_start,
                       FT_Vector *p_result )
 {
@@ -1667,6 +1646,7 @@ static int RenderTag( filter_t *p_filter, FT_Face p_face,
     int          i_pen_x_start = *pi_pen_x;
 
     uint32_t *psz_unicode_start = psz_unicode;
+    uint8_t *pi_karaoke_bar_start = pi_karaoke_bar;
 
     line.xMin = line.xMax = line.yMin = line.yMax = 0;
 
@@ -1696,6 +1676,8 @@ static int RenderTag( filter_t *p_filter, FT_Face p_face,
         int i_error;
 
         int i_glyph_index = FT_Get_Char_Index( p_face, *psz_unicode++ );
+        int i_karaoke_bar = pi_karaoke_bar ? *pi_karaoke_bar++ : 0;
+
         if( FT_HAS_KERNING( p_face ) && i_glyph_index
             && i_previous )
         {
@@ -1769,9 +1751,8 @@ static int RenderTag( filter_t *p_filter, FT_Face p_face,
         }
 
         p_line->pp_glyphs[ i ] = (FT_BitmapGlyph)tmp_glyph;
-        p_line->p_fg_rgb[ i ] = p_style->i_font_color;
-        p_line->p_bg_rgb[ i ] = p_style->i_karaoke_background_color;
-        p_line->p_fg_bg_ratio[ i ] = 0x00;
+        p_line->pi_color[ i ] = i_karaoke_bar == 0 ? p_style->i_font_color
+                                                   : p_style->i_karaoke_background_color;
 
         line.xMax = p_line->p_glyph_pos[i].x + glyph_size.xMax -
                     glyph_size.xMin + ((FT_BitmapGlyph)tmp_glyph)->left;
@@ -1784,6 +1765,8 @@ static int RenderTag( filter_t *p_filter, FT_Face p_face,
             while( psz_unicode > psz_unicode_start && *psz_unicode != ' ' )
             {
                 psz_unicode--;
+                if( pi_karaoke_bar )
+                    pi_karaoke_bar--;
             }
             if( psz_unicode == psz_unicode_start )
             {
@@ -1810,6 +1793,7 @@ static int RenderTag( filter_t *p_filter, FT_Face p_face,
                 *psz_unicode = '\n';
             }
             psz_unicode = psz_unicode_start;
+            pi_karaoke_bar = pi_karaoke_bar_start;
             *pi_pen_x = i_pen_x_start;
             i_previous = 0;
 
@@ -1960,22 +1944,11 @@ static int ProcessLines( filter_t *p_filter,
     uint32_t       *p_fribidi_string = NULL;
     text_style_t   **pp_fribidi_styles = NULL;
     int            *p_new_positions = NULL;
-    uint8_t        *pi_karaoke_bar = NULL;
     int             i_prev;
-
-    if( pi_k_dates )
-    {
-        pi_karaoke_bar = malloc( i_len * sizeof(*pi_karaoke_bar));
-        /* If we can't allocate sufficient memory for karaoke, continue anyway -
-         * we just won't be able to display the progress bar; at least we'll
-         * get the text.
-         */
-    }
 
 #if defined(HAVE_FRIBIDI)
     {
         int    *p_old_positions;
-        int8_t *p_levels;
         int start_pos, pos = 0;
 
         pp_fribidi_styles = calloc( i_len, sizeof(*pp_fribidi_styles) );
@@ -1983,20 +1956,16 @@ static int ProcessLines( filter_t *p_filter,
         p_fribidi_string  = malloc( (i_len + 1) * sizeof(*p_fribidi_string) );
         p_old_positions   = malloc( (i_len + 1) * sizeof(*p_old_positions) );
         p_new_positions   = malloc( (i_len + 1) * sizeof(*p_new_positions) );
-        p_levels          = malloc( (i_len + 1) * sizeof(*p_levels) );
 
         if( ! pp_fribidi_styles ||
             ! p_fribidi_string ||
             ! p_old_positions ||
-            ! p_new_positions ||
-            ! p_levels )
+            ! p_new_positions )
         {
-            free( p_levels );
             free( p_old_positions );
             free( p_new_positions );
             free( p_fribidi_string );
             free( pp_fribidi_styles );
-            free( pi_karaoke_bar );
             return VLC_ENOMEM;
         }
 
@@ -2009,7 +1978,6 @@ static int ProcessLines( filter_t *p_filter,
                 p_fribidi_string[pos] = psz_text[pos];
                 pp_fribidi_styles[pos] = pp_styles[pos];
                 p_new_positions[pos] = pos;
-                p_levels[pos] = 0;
                 ++pos;
             }
             start_pos = pos;
@@ -2030,7 +1998,7 @@ static int ProcessLines( filter_t *p_filter,
                         (FriBidiChar*)p_fribidi_string + start_pos,
                         p_new_positions + start_pos,
                         p_old_positions,
-                        p_levels + start_pos );
+                        NULL );
                 for( int j = start_pos; j < pos; j++ )
                 {
                     pp_fribidi_styles[ j ] = pp_styles[ start_pos + p_old_positions[j - start_pos] ];
@@ -2040,23 +2008,24 @@ static int ProcessLines( filter_t *p_filter,
         }
         p_fribidi_string[ i_len ] = 0;
         free( p_old_positions );
-        free( p_levels );
 
         pp_styles = pp_fribidi_styles;
         psz_text = p_fribidi_string;
     }
 #endif
     /* Work out the karaoke */
-    if( pi_karaoke_bar )
+    uint8_t *pi_karaoke_bar = NULL;
+    if( pi_k_dates )
     {
-        int64_t i_elapsed  = var_GetTime( p_filter, "spu-elapsed" ) / 1000;
-        for( int i = 0; i < i_len; i++ )
+        pi_karaoke_bar = malloc( i_len * sizeof(*pi_karaoke_bar));
+        if( pi_karaoke_bar )
         {
-            unsigned i_bar = p_new_positions ? p_new_positions[i] : i;
-            if( pi_k_dates[i] < i_elapsed )
-                pi_karaoke_bar[i_bar] = 0x7f;
-            else
-                pi_karaoke_bar[i_bar] = 0x00;
+            int64_t i_elapsed  = var_GetTime( p_filter, "spu-elapsed" ) / 1000;
+            for( int i = 0; i < i_len; i++ )
+            {
+                unsigned i_bar = p_new_positions ? p_new_positions[i] : i;
+                pi_karaoke_bar[i_bar] = pi_k_dates[i] >= i_elapsed;
+            }
         }
     }
     free( p_new_positions );
@@ -2131,7 +2100,8 @@ static int ProcessLines( filter_t *p_filter,
 
                 if( RenderTag( p_filter, p_face ? p_face : p_sys->p_face,
                                p_style,
-                               p_line, psz_unicode, &i_pen_x, i_pen_y, &i_posn,
+                               p_line, psz_unicode, pi_karaoke_bar ? &pi_karaoke_bar[i_prev] : NULL,
+                               &i_pen_x, i_pen_y, &i_posn,
                                &tmp_result ) != VLC_SUCCESS )
                 {
                     if( p_face ) FT_Done_Face( p_face );
@@ -2168,51 +2138,12 @@ static int ProcessLines( filter_t *p_filter,
     }
     free( pp_fribidi_styles );
     free( p_fribidi_string );
+    free( pi_karaoke_bar );
 
     if( p_line )
     {
         p_result->x = __MAX( p_result->x, tmp_result.x );
         p_result->y += tmp_result.y;
-    }
-
-    if( pi_karaoke_bar )
-    {
-        int i = 0;
-        for( p_line = *pp_lines; p_line; p_line=p_line->p_next )
-        {
-            for( uint32_t k = 0; p_line->pp_glyphs[ k ]; k++, i++ )
-            {
-                if( (pi_karaoke_bar[ i ] & 0x7f) == 0x7f)
-                {
-                    /* do nothing */
-                }
-                else if( (pi_karaoke_bar[ i ] & 0x7f) == 0x00)
-                {
-                    /* 100% BG colour will render faster if we
-                     * instead make it 100% FG colour, so leave
-                     * the ratio alone and copy the value across
-                     */
-                    p_line->p_fg_rgb[ k ] = p_line->p_bg_rgb[ k ];
-                }
-                else
-                {
-                    if( pi_karaoke_bar[ i ] & 0x80 )
-                    {
-                        /* Swap Left and Right sides over for Right aligned
-                         * language text (eg. Arabic, Hebrew)
-                         */
-                        uint32_t i_tmp = p_line->p_fg_rgb[ k ];
-
-                        p_line->p_fg_rgb[ k ] = p_line->p_bg_rgb[ k ];
-                        p_line->p_bg_rgb[ k ] = i_tmp;
-                    }
-                    p_line->p_fg_bg_ratio[ k ] = (pi_karaoke_bar[ i ] & 0x7f);
-                }
-            }
-            /* Jump over the '\n' at the line-end */
-            i++;
-        }
-        free( pi_karaoke_bar );
     }
 
     return VLC_SUCCESS;
