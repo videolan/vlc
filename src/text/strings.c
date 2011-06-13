@@ -905,12 +905,14 @@ char *str_format_meta( vlc_object_t *p_object, const char *string )
                         if ( now_playing == NULL )
                         {
                             char *temp = input_item_GetTitleFbName( p_item );
+                            char *psz_artist = input_item_GetArtist( p_item );
                             if( !EMPTY_STR( temp ) )
                             {
                                 INSERT_STRING( temp );
-                                INSERT_STRING_NO_FREE( " - " );
+                                if ( !EMPTY_STR( psz_artist ) )
+                                    INSERT_STRING_NO_FREE( " - " );
                             }
-                            INSERT_STRING( input_item_GetArtist( p_item ) );
+                            INSERT_STRING( psz_artist );
                         }
                         else
                             INSERT_STRING( now_playing );
