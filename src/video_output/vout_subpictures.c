@@ -257,7 +257,7 @@ static filter_t *SpuRenderCreateAndLoadScale(vlc_object_t *object,
 
 static void SpuRenderText(spu_t *spu, bool *rerender_text,
                           subpicture_region_t *region,
-                          mtime_t render_date)
+                          mtime_t elapsed_time)
 {
     filter_t *text = spu->p->text;
 
@@ -285,7 +285,7 @@ static void SpuRenderText(spu_t *spu, bool *rerender_text,
      * least show up on screen, but the effect won't change
      * the text over time.
      */
-    var_SetTime(text, "spu-elapsed", render_date);
+    var_SetTime(text, "spu-elapsed", elapsed_time);
     var_SetBool(text, "text-rerender", false);
 
     if (text->pf_render_html && region->psz_html)
@@ -691,7 +691,7 @@ static void SpuRenderRegion(spu_t *spu,
     /* Render text region */
     if (region->fmt.i_chroma == VLC_CODEC_TEXT) {
         SpuRenderText(spu, &restore_text, region,
-                      render_date);
+                      render_date - subpic->i_start);
 
         /* Check if the rendering has failed ... */
         if (region->fmt.i_chroma == VLC_CODEC_TEXT)
