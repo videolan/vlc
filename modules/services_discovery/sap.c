@@ -488,7 +488,7 @@ static void *Run( void *data )
         if( s != INVALID_SOCKET )
         {
             INTERFACE_INFO ifaces[10]; // Assume there will be no more than 10 IP interfaces
-            size_t len = sizeof(ifaces);
+            DWORD len = sizeof(ifaces);
 
             if( SOCKET_ERROR != WSAIoctl(s, SIO_GET_INTERFACE_LIST, NULL, 0, &ifaces, len, &len, NULL, NULL) )
             {
