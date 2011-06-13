@@ -549,16 +549,16 @@ struct demux_sys_t
     struct v4l2_input *p_inputs;
     unsigned i_selected_input;
 
-    int i_standard;
+    unsigned i_standard;
     struct v4l2_standard *p_standards;
     v4l2_std_id i_selected_standard_id;
 
-    int i_audio;
+    unsigned i_audio;
     /* V4L2 devices cannot have more than 32 audio inputs */
     struct v4l2_audio p_audios[32];
     int i_selected_audio_input;
 
-    int i_tuner;
+    unsigned i_tuner;
     struct v4l2_tuner *p_tuners;
 
     unsigned i_codec;
@@ -1872,9 +1872,8 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
             msg_Err( p_obj, "cannot get standard (%m). This should never happen!" );
             goto open_failed;
         }
-        msg_Dbg( p_obj, "Set standard to (0x%"PRIx64"):", p_sys->i_selected_standard_id );
-        int i_standard;
-        for( i_standard = 0; i_standard<p_sys->i_standard; i_standard++)
+        msg_Dbg( p_obj, "Set standard to (0x%"PRIx64"):", (int64_t)p_sys->i_selected_standard_id );
+        for(unsigned i_standard = 0; i_standard<p_sys->i_standard; i_standard++)
         {
             if( p_sys->p_standards[i_standard].id & p_sys->i_selected_standard_id )
             {
@@ -1887,7 +1886,7 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
     /* Tune the tuner */
     if( p_sys->i_frequency >= 0 )
     {
-        if( p_sys->i_cur_tuner < 0 || p_sys->i_cur_tuner >= p_sys->i_tuner )
+        if( p_sys->i_cur_tuner < 0 || (unsigned)p_sys->i_cur_tuner >= p_sys->i_tuner )
         {
             msg_Err( p_obj, "invalid tuner %d.", p_sys->i_cur_tuner );
             goto open_failed;
@@ -1908,7 +1907,7 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
     /* Set the tuner's audio mode */
     if( p_sys->i_audio_mode >= 0 )
     {
-        if( p_sys->i_cur_tuner < 0 || p_sys->i_cur_tuner >= p_sys->i_tuner )
+        if( p_sys->i_cur_tuner < 0 || (unsigned)p_sys->i_cur_tuner >= p_sys->i_tuner )
         {
             msg_Err( p_obj, "invalid tuner %d.", p_sys->i_cur_tuner );
             goto open_failed;
@@ -1944,7 +1943,7 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
     if( p_sys->i_audio > 0 )
     {
         if( p_sys->i_selected_audio_input < 0
-         || p_sys->i_selected_audio_input >= p_sys->i_audio )
+         || (unsigned)p_sys->i_selected_audio_input >= p_sys->i_audio )
         {
             msg_Warn( p_obj, "invalid audio input. Using the default one" );
             p_sys->i_selected_audio_input = 0;
@@ -2397,8 +2396,6 @@ open_failed:
 static bool ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
                                  const char *psz_device )
 {
-    int i_standard;
-
     int i_fd;
 
     if( ( i_fd = v4l2_open( psz_device, O_RDWR ) ) < 0 )
@@ -2508,7 +2505,7 @@ static bool ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
                 msg_Err( p_obj, "cannot get video input characteristics (%m)" );
                 goto open_failed;
             }
-            msg_Dbg( p_obj, "video input %i (%s) has type: %s %c",
+            msg_Dbg( p_obj, "video input %u (%s) has type: %s %c",
                                 i_index,
                                 p_sys->p_inputs[i_index].name,
                                 p_sys->p_inputs[i_index].type
@@ -2537,7 +2534,7 @@ static bool ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
         p_sys->p_standards = calloc( 1, p_sys->i_standard * sizeof( struct v4l2_standard ) );
         if( !p_sys->p_standards ) goto open_failed;
 
-        for( i_standard = 0; i_standard < p_sys->i_standard; i_standard++ )
+        for( unsigned i_standard = 0; i_standard < p_sys->i_standard; i_standard++ )
         {
             p_sys->p_standards[i_standard].index = i_standard;
 
@@ -2546,7 +2543,7 @@ static bool ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
                 msg_Err( p_obj, "cannot get video input standards (%m)" );
                 goto open_failed;
             }
-            msg_Dbg( p_obj, "video standard %i is: %s %c",
+            msg_Dbg( p_obj, "video standard %u is: %s %c",
                                 i_standard,
                                 p_sys->p_standards[i_standard].name,
                                 (p_sys->p_standards[i_standard].id & p_sys->i_selected_standard_id) ? '*' : ' ' );
@@ -2571,7 +2568,7 @@ static bool ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
                 goto open_failed;
             }
 
-            msg_Dbg( p_obj, "audio input %i (%s) is %s %s %c",
+            msg_Dbg( p_obj, "audio input %u (%s) is %s %s %c",
                                 p_sys->i_audio,
                                 p_sys->p_audios[p_sys->i_audio].name,
                                 p_sys->p_audios[p_sys->i_audio].capability &
@@ -2580,7 +2577,7 @@ static bool ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
                                 p_sys->p_audios[p_sys->i_audio].capability &
                                                     V4L2_AUDCAP_AVL ?
                                     "(Automatic Volume Level supported)" : "",
-                                p_sys->i_audio == p_sys->i_selected_audio_input ? '*' : ' ' );
+                                p_sys->i_audio == (unsigned)p_sys->i_selected_audio_input ? '*' : ' ' );
 
             p_sys->i_audio++;
         }
@@ -2605,7 +2602,7 @@ static bool ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
         p_sys->p_tuners = calloc( 1, p_sys->i_tuner * sizeof( struct v4l2_tuner ) );
         if( !p_sys->p_tuners ) goto open_failed;
 
-        for( int i_index = 0; i_index < p_sys->i_tuner; i_index++ )
+        for( unsigned i_index = 0; i_index < p_sys->i_tuner; i_index++ )
         {
             p_sys->p_tuners[i_index].index = i_index;
 
@@ -2614,7 +2611,7 @@ static bool ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
                 msg_Err( p_obj, "cannot get tuner characteristics (%m)" );
                 goto open_failed;
             }
-            msg_Dbg( p_obj, "tuner %i (%s) has type: %s, "
+            msg_Dbg( p_obj, "tuner %u (%s) has type: %s, "
                               "frequency range: %.1f %s -> %.1f %s",
                                 i_index,
                                 p_sys->p_tuners[i_index].name,
@@ -2637,7 +2634,7 @@ static bool ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
                 msg_Err( p_obj, "cannot get tuner frequency (%m)" );
                 goto open_failed;
             }
-            msg_Dbg( p_obj, "tuner %i (%s) frequency: %.1f %s",
+            msg_Dbg( p_obj, "tuner %u (%s) frequency: %.1f %s",
                      i_index,
                      p_sys->p_tuners[i_index].name,
                      frequency.frequency * 62.5,
