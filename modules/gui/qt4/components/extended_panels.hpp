@@ -186,7 +186,7 @@ private:
 
     void clean();
 
-    void updateSubsDuration();
+    void initSubsDuration();
     void subsdelayClean();
     void subsdelaySetFactor( double );
 public slots:

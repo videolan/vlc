@@ -1617,9 +1617,10 @@ SyncControls::SyncControls( intf_thread_t *_p_intf, QWidget *_parent ) :
     BUTTON_SET_ACT_I( updateButton, "", update,
             qtr( "Force update of this dialog's values" ), update() );
 
+    initSubsDuration();
+
     /* Set it */
     update();
-    updateSubsDuration();
 }
 
 SyncControls::~SyncControls()
@@ -1634,7 +1635,6 @@ void SyncControls::clean()
     subsSpin->setValue( 0.0 );
     subSpeedSpin->setValue( 1.0 );
     subsdelayClean();
-    updateSubsDuration();
     b_userAction = true;
 }
 
@@ -1650,6 +1650,7 @@ void SyncControls::update()
         i_delay = var_GetTime( THEMIM->getInput(), "spu-delay" );
         subsSpin->setValue( ( (double)i_delay ) / 1000000 );
         subSpeedSpin->setValue( var_GetFloat( THEMIM->getInput(), "sub-fps" ) );
+        subDurationSpin->setValue( var_InheritFloat( p_intf, SUBSDELAY_CFG_FACTOR ) );
     }
     b_userAction = true;
 }
@@ -1689,7 +1690,7 @@ void SyncControls::adjustSubsDuration( double f_factor )
     }
 }
 
-void SyncControls::updateSubsDuration()
+void SyncControls::initSubsDuration()
 {
     int i_mode = var_InheritInteger( p_intf, SUBSDELAY_CFG_MODE );
 
@@ -1713,8 +1714,6 @@ void SyncControls::updateSubsDuration()
         subDurationSpin->setSuffix( "" );
         break;
     }
-
-    subDurationSpin->setValue( var_InheritFloat( p_intf, SUBSDELAY_CFG_FACTOR ) );
 }
 
 void SyncControls::subsdelayClean()
