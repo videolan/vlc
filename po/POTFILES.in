@@ -497,8 +497,11 @@ modules/demux/voc.c
 modules/demux/wav.c
 modules/demux/xa.c
 modules/gui/fbosd.c
+modules/gui/macosx/AudioEffects.m
 modules/gui/macosx/AppleRemote.h
 modules/gui/macosx/AppleRemote.m
+modules/gui/macosx/TrackSynchronization.m
+modules/gui/macosx/VideoEffects.m
 modules/gui/macosx/about.h
 modules/gui/macosx/about.m
 modules/gui/macosx/applescript.h
@@ -513,8 +516,6 @@ modules/gui/macosx/embeddedwindow.h
 modules/gui/macosx/embeddedwindow.m
 modules/gui/macosx/equalizer.h
 modules/gui/macosx/equalizer.m
-modules/gui/macosx/extended.h
-modules/gui/macosx/extended.m
 modules/gui/macosx/eyetv.h
 modules/gui/macosx/eyetv.m
 modules/gui/macosx/fspanel.h
@@ -538,6 +539,7 @@ modules/gui/macosx/prefs_widgets.h
 modules/gui/macosx/prefs_widgets.m
 modules/gui/macosx/simple_prefs.h
 modules/gui/macosx/simple_prefs.m
+modules/gui/macosx/vout.m
 modules/gui/macosx/wizard.h
 modules/gui/macosx/wizard.m
 modules/gui/macosx_dialog_provider/VLCLoginPanel.h
