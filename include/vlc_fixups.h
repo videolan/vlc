@@ -285,7 +285,9 @@ struct if_nameindex
     unsigned if_index;
     char    *if_name;
 };
-# define if_nametoindex(name)   atoi(name)
+# ifndef HAVE_IF_NAMETOINDEX
+#  define if_nametoindex(name)   atoi(name)
+# endif
 # define if_nameindex()         (errno = ENOBUFS, NULL)
 # define if_freenameindex(list) (void)0
 #endif
