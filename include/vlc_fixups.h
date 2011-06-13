@@ -278,6 +278,17 @@ struct pollfd
 int vlc_poll (struct pollfd *, unsigned, int);
 #endif
 
+#ifndef HAVE_IF_NAMEINDEX
+struct if_nameindex
+{
+    unsigned if_index;
+    char    *if_name;
+};
+# define if_nametoindex(name)   atoi(name)
+# define if_nameindex()         (errno = ENOBUFS, NULL)
+# define if_freenameindex(list) (void)0
+#endif
+
 /* search.h */
 #ifndef HAVE_SEARCH_H
 typedef struct entry {

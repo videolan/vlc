@@ -45,16 +45,11 @@
 #       define IP_ADD_MEMBERSHIP 5
 #   endif
 #   define EAFNOSUPPORT WSAEAFNOSUPPORT
-#   define if_nametoindex( str ) atoi( str )
 #else
 #   include <unistd.h>
 #   ifdef HAVE_NET_IF_H
 #       include <net/if.h>
 #   endif
-#endif
-
-#ifdef __OS2__
-#   define if_nametoindex( str ) atoi( str )
 #endif
 
 #ifdef HAVE_LINUX_DCCP_H
