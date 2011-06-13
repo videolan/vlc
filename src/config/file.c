@@ -578,7 +578,7 @@ static int SaveConfigFile (vlc_object_t *p_this)
         goto error;
     }
 #if !defined( WIN32 ) && !defined( __OS2__ )
-#ifdef __APPLE__
+#if defined(__APPLE__) || defined(__ANDROID__)
     fsync (fd); /* Flush from OS */
 #else
     fdatasync (fd); /* Flush from OS */
