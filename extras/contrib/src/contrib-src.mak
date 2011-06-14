@@ -2393,7 +2393,7 @@ libass: libass-$(ASS_VERSION).tar.gz
 	$(EXTRACT_GZ)
 	(cd $@; autoreconf -ivf)
 
-.libass: libass .freetype
+.libass: libass .freetype .fontconfig
 	(cd $<; $(HOSTCC) ./configure --disable-png --disable-shared $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS) -O3" && make && make install)
 	touch $@
 
