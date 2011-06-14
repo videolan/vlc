@@ -100,33 +100,33 @@ sout and playlist .
     </button>
     <br />
     Audio Delay:
-    <button id="btn_delay_down" onclick="audiodelay_down();" onmouseover="button_over(this);" onmouseout="button_out(this);" title="Decrease Audio Delay by 50ms" >
+    <button id="btn_audiodelay_down" onclick="audiodelay_down();" onmouseover="button_over(this);" onmouseout="button_out(this);" title="Decrease Audio Delay by 50ms" >
       <img src="images/minus.png" alt="Decrease Audio Delay" />
       <span class="btn_text">Decrease Audio Delay</span>
     </button>
-    <button id="btn_delay_up" onclick="audiodelay_up();" onmouseover="button_over(this);" onmouseout="button_out(this);" title="Increase Audio Delay by 50ms" >
+    <button id="btn_audiodelay_up" onclick="audiodelay_up();" onmouseover="button_over(this);" onmouseout="button_out(this);" title="Increase Audio Delay by 50ms" >
       <img src="images/plus.png" alt="Increase Audio Delay" />
       <span class="btn_text">Increase Audio Delay</span>
     </button>
     <span id="a_del">(?)</span> ms
  <br />
     Playback Speed:
-    <button id="btn_delay_down" onclick="playrate_down();" onmouseover="button_over(this);" onmouseout="button_out(this);" title="Decrease playback rate by 0.05x" >
+    <button id="btn_playrate_down" onclick="playrate_down();" onmouseover="button_over(this);" onmouseout="button_out(this);" title="Decrease playback rate by 0.05x" >
       <img src="images/minus.png" alt="Decrease Playback Rate" />
       <span class="btn_text">Decrease Playback Rate</span>
     </button>
-    <button id="btn_delay_up" onclick="playrate_up();" onmouseover="button_over(this);" onmouseout="button_out(this);" title="Increase playback rate by 0.05x" >
+    <button id="btn_playrate_up" onclick="playrate_up();" onmouseover="button_over(this);" onmouseout="button_out(this);" title="Increase playback rate by 0.05x" >
       <img src="images/plus.png" alt="Increase Playback Rate" />
       <span class="btn_text">Increase Playback Rate</span>
     </button>
     <span id="p_rate">(?)</span>x
   <br/>
   Advance of subtitles over video:
-    <button id="btn_delay_down" onclick="subdel_down();" onmouseover="button_over(this);" onmouseout="button_out(this);" title="Decrease subtitle delay by 50ms" >
+    <button id="btn_subdel_down" onclick="subdel_down();" onmouseover="button_over(this);" onmouseout="button_out(this);" title="Decrease subtitle delay by 50ms" >
       <img src="images/minus.png" alt="Decrease Subtitle delay" />
       <span class="btn_text">Decrease Subtitle delay</span>
     </button>
-    <button id="btn_delay_up" onclick="subdel_up();" onmouseover="button_over(this);" onmouseout="button_out(this);" title="Increase subtitle delay by 50ms" >
+    <button id="btn_subdel_up" onclick="subdel_up();" onmouseover="button_over(this);" onmouseout="button_out(this);" title="Increase subtitle delay by 50ms" >
       <img src="images/plus.png" alt="Increase Subtitle delay" />
       <span class="btn_text">Increase Subtitle delay</span>
     </button>
