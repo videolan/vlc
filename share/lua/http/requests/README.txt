@@ -124,3 +124,8 @@ vlm_cmd.xml:
 < execute VLM command <cmd>
   ?command=<cmd>
 > get the error message from <cmd>
+
+equalizer.xml:
+=============
+>command=preamp&val=<val in dB> 
+ sets the preamp value, must be >=-20 and <=20

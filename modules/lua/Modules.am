@@ -11,6 +11,7 @@ SOURCES_lua = \
 	libs.h \
 	libs/acl.c \
 	libs/configuration.c \
+	libs/equalizer.c \
 	libs/gettext.c \
 	libs/dialog.c \
 	libs/httpd.c \
