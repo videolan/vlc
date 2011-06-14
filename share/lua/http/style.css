@@ -236,19 +236,22 @@ div.menu {
 	display: none;
 }
 
+/* FIXME: still some div.menu > button around ? */
 div.menu div,
 div.menu button {
     background: transparent;
+    cursor: pointer;
+    white-space: nowrap;
 }
 
-div.menu div.menuout,
 div.menu button.menuout {
 	border: 1px solid transparent;
 }
 
 div.menu div.menuover,
 div.menu button.menuover {
-        border: 1px solid #000;
+    background: #000;
+    color: #fff;
 }
 
 div.popup img.close {
