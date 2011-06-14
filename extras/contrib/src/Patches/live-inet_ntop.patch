@@ -177,9 +177,9 @@ diff -ru live.orig/liveMedia/RTSPServer.cpp live/liveMedia/RTSPServer.cpp
    increaseSendBufferTo(envir(), clientSocket, 50*1024);
  
  #ifdef DEBUG
--  envir() << "accept()ed connection from " << our_inet_ntoa(clientAddr.sin_addr) << '\n';
+-  envir() << "accept()ed connection from " << our_inet_ntoa(clientAddr.sin_addr) << "\n";
 +  char buf[16];
-+  envir() << "accept()ed connection from " << our_inet_ntoa(clientAddr.sin_addr, buf) << '\n';
++  envir() << "accept()ed connection from " << our_inet_ntoa(clientAddr.sin_addr, buf) << "\n";
  #endif
  
    // Create a new object for this RTSP session.
