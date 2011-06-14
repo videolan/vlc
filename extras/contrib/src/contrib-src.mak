@@ -746,11 +746,11 @@ endif
 	patch -p0 < Patches/libFLAC-pc.patch
 
 FLAC_DISABLE_FLAGS = --disable-oggtest --disable-xmms-plugin --disable-cpplibs
-
-.flac: flac .ogg
 ifdef HAVE_MACOSX_ON_INTEL
 FLAC_DISABLE_FLAGS += --disable-asm-optimizations
 endif
+
+.flac: flac .ogg
 	cd $< && $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) $(FLAC_DISABLE_FLAGS)
 	cd $</src && make -C libFLAC && make -C libFLAC install
 	cd $< && make -C include install
