@@ -959,6 +959,7 @@ FFMPEGCONF = --disable-doc \
 	--disable-network
 
 FFMPEGCONFSMALL = --disable-encoders --disable-muxers
+FFMPEGCONFNEON = --cpu=cortex-a8 --disable-runtime-cpudetect --enable-neon
 
 #Cross-Compilation
 ifdef HAVE_CROSS_COMPILE
@@ -1023,7 +1024,7 @@ endif
 ifdef HAVE_IOS
 FFMPEGCONF += --sysroot=${IOS_SDK_ROOT}
 ifeq ($(ARCH),arm)
-FFMPEGCONF += --disable-runtime-cpudetect --enable-neon --cpu=cortex-a8
+FFMPEGCONF += $(FFMPEGCONFNEON)
 else
 FFMPEGCONF += --disable-mmx
 endif
@@ -1036,12 +1037,15 @@ endif
 
 ifdef HAVE_MAEMO
 ifneq ($(filter -m%=cortex-a8, $(EXTRA_CFLAGS)),)
-FFMPEGCONF += --disable-runtime-cpudetect --enable-neon --cpu=cortex-a8
+FFMPEGCONF += $(FFMPEGCONFNEON)
 endif
 endif
 
 ifdef HAVE_ANDROID
-FFMPEGCONF+= --disable-encoders --disable-muxers
+ifdef HAVE_NEON
+FFMPEGCONF += $(FFMPEGCONFNEON)
+FFMPEG_CFLAGS +=-mfloat-abi=softfp -mfpu=neon
+endif
 endif
 
 ifdef HAVE_UCLIBC
