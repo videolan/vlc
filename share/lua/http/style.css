@@ -236,12 +236,17 @@ div.menu {
 	display: none;
 }
 
+div.menu div,
 div.menu button {
-	background: transparent;
+    background: transparent;
 }
+
+div.menu div.menuout,
 div.menu button.menuout {
 	border: 1px solid transparent;
 }
+
+div.menu div.menuover,
 div.menu button.menuover {
         border: 1px solid #000;
 }
