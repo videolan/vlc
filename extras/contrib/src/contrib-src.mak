@@ -940,50 +940,52 @@ CLEAN_PKG += libamrwb
 DISTCLEAN_PKG += amrwb-$(LIBAMR_WB_VERSION).tar.bz2
 
 # ***************************************************************************
-
 # ffmpeg
 # ***************************************************************************
 
-FFMPEGCONF=--disable-doc --disable-decoder=libvpx
+#Common configuration
+FFMPEGCONF = --disable-doc \
+	--disable-decoder=libvpx \
+	--disable-debug \
+	--enable-gpl \
+	--enable-postproc \
+	--disable-ffprobe \
+	--disable-ffserver \
+	--disable-ffmpeg \
+	--disable-ffplay \
+	--disable-devices \
+	--disable-protocols \
+	--disable-avfilter \
+	--disable-network
 
+FFMPEGCONFSMALL = --disable-encoders --disable-muxers
+
+#Cross-Compilation
 ifdef HAVE_CROSS_COMPILE
 FFMPEGCONF += --enable-cross-compile
 endif
+
 ifdef HAVE_CROSS_COMPILE_NEEDS_CROSS_PREFIX
 ifndef HAVE_ANDROID
 ifndef HAVE_SYMBIAN
 FFMPEGCONF += --cross-prefix=$(HOST)-
 else
-FFMPEGCONF += --cross-prefix=arm-none-symbianelf- --arch=armv6 --disable-asm
+FFMPEGCONF += --cross-prefix=arm-none-symbianelf- --arch=armv6 --disable-asm --target-os=none
+FFMPEGCONF += $(FFMPEGCONFSMALL)
 endif
 else
 FFMPEGCONF += --cross-prefix=arm-linux-androideabi- --arch=armv4l
+FFMPEGCONF += $(FFMPEGCONFSMALL)
 endif
+endif
+
+ifdef CC
+FFMPEGCONF += --cc="$(CC)"
 endif
 
 #
 # Special target-dependant options
 #
-
-ifdef HAVE_WINCE
-FFMPEGCONF+= --target-os=mingw32ce --arch=armv4l --cpu=armv4t \
-             --disable-encoders --disable-muxers --disable-mpegaudio-hp \
-			 --disable-decoder=snow --disable-decoder=vc9 \
-			 --disable-decoder=wmv3 --disable-decoder=vorbis \
-			 --disable-decoder=dvdsub --disable-decoder=dvbsub \
-			 --disable-protocols
-endif
-
-ifdef HAVE_UCLIBC
-ifdef HAVE_BIGENDIAN
-FFMPEGCONF+= --arch=armeb --enable-armv5te --enable-iwmmxt
-else
-FFMPEGCONF+= --arch=armv4l
-endif
-FFMPEGCONF+= --enable-small --disable-mpegaudio-hp
-FFMPEG_CFLAGS += -DHAVE_LRINTF --std=c99
-endif
-
 ifndef HAVE_UCLIBC
 ifndef HAVE_WINCE
 ifndef HAVE_IOS
@@ -994,10 +996,7 @@ endif
 endif
 endif
 
-ifdef CC
-FFMPEGCONF += --cc="$(CC)"
-endif
-
+# MacOS X
 ifdef HAVE_MACOSX_ON_INTEL
 FFMPEGCONF += --enable-memalign-hack
 endif
@@ -1030,17 +1029,9 @@ FFMPEGCONF += --disable-mmx
 endif
 endif #IOS
 
-ifdef HAVE_AMR
-FFMPEGCONF+= --enable-libamr-nb --enable-libamr-wb --enable-nonfree
-endif
-
+# Linux
 ifdef HAVE_LINUX
-FFMPEGCONF += --target-os=linux
-FFMPEGCONF += --enable-pic
-endif
-
-ifdef HAVE_SYMBIAN
-FFMPEGCONF += --target-os=none
+FFMPEGCONF += --target-os=linux --enable-pic
 endif
 
 ifdef HAVE_MAEMO
@@ -1049,11 +1040,25 @@ FFMPEGCONF += --disable-runtime-cpudetect --enable-neon --cpu=cortex-a8
 endif
 endif
 
+ifdef HAVE_ANDROID
+FFMPEGCONF+= --disable-encoders --disable-muxers
+endif
+
+ifdef HAVE_UCLIBC
+ifdef HAVE_BIGENDIAN
+FFMPEGCONF+= --arch=armeb --enable-armv5te --enable-iwmmxt
+else
+FFMPEGCONF+= --arch=armv4l
+endif
+FFMPEGCONF+= --enable-small --disable-mpegaudio-hp
+FFMPEG_CFLAGS += -DHAVE_LRINTF --std=c99
+endif
+
+# Win32
 ifdef HAVE_WIN32
 FFMPEGCONF+= --target-os=mingw32 --arch=x86 --enable-memalign-hack
-
 FFMPEGCONF += --disable-bzlib --disable-decoder=dca --disable-encoder=vorbis \
-		      --enable-libmp3lame --enable-w32threads --disable-bsfs
+			--enable-libmp3lame --enable-w32threads --disable-bsfs
 ifdef HAVE_WIN64
 FFMPEGCONF += --disable-dxva2
 FFMPEGCONF+= --cpu=athlon64 --arch=x86_64
@@ -1061,6 +1066,15 @@ else # !WIN64
 FFMPEGCONF += --enable-dxva2 --enable-libvpx
 FFMPEGCONF+= --cpu=i686
 endif
+endif
+
+# WinCE
+ifdef HAVE_WINCE
+FFMPEGCONF+= --target-os=mingw32ce --arch=armv4l --cpu=armv4t \
+			 --disable-decoder=snow --disable-decoder=vc9 \
+			 --disable-decoder=wmv3 --disable-decoder=vorbis \
+			 --disable-decoder=dvdsub --disable-decoder=dvbsub
+FFMPEGCONF += $(FFMPEGCONFSMALL)
 endif
 
 ifndef HAVE_WIN32
@@ -1097,19 +1111,6 @@ ffmpeg-$(FFMPEG_VERSION).tar.gz:
 ffmpeg/.untar: ffmpeg-$(FFMPEG_VERSION).tar.gz
 	$(EXTRACT_GZ)
 	touch $@
-
-FFMPEGCONF += \
-	--disable-debug \
-	--enable-gpl \
-	--enable-postproc \
-	--disable-ffprobe \
-	--disable-ffserver \
-	--disable-ffmpeg \
-	--disable-ffplay \
-	--disable-devices \
-	--disable-protocols \
-	--disable-avfilter \
-	--disable-network
 
 ifeq ($(ARCH),armel)
 HAVE_ARMELF=1

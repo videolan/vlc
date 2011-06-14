@@ -373,6 +373,9 @@ case "$DISTRO" in
     add_makefile_cfg "ANDROID_NDK = ${ANDROID_NDK}"
     add_makefile_cfg "PATH = ${ANDROID_NDK}/toolchains/arm-linux-androideabi-4.4.3/prebuilt/linux-x86/bin/:${PATH}"
     add_enabled_makefile_cfg "HAVE_LINUX"
+    if test -z "$NO_NEON"; then
+        add_enabled_makefile_cfg "HAVE_NEON"
+    fi
 esac
 
 # Save passed flags
