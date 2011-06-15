@@ -203,15 +203,13 @@ struct line_desc_t
     FT_BitmapGlyph *pp_glyphs;
     /** list of relative positions for the glyphs */
     FT_Vector      *p_glyph_pos;
-    /** list of RGB information for styled text */
+    /** list of ARGB information for styled text */
     uint32_t       *pi_color;
     /** underline information -- only supplied if text should be underlined */
     int            *pi_underline_offset;
     uint16_t       *pi_underline_thickness;
 
     int             i_width;
-
-    int             i_alpha;
 
     line_desc_t    *p_next;
 };
@@ -599,6 +597,7 @@ static int RenderYUVP( filter_t *p_filter, subpicture_region_t *p_region,
 
     /* Calculate text color components
      * Only use the first color */
+    int i_alpha = 0xff - ((p_line->pi_color[ 0 ] >> 24) & 0xff);
     YUVFromRGB( p_line->pi_color[ 0 ], &i_y, &i_u, &i_v );
 
     /* Build palette */
@@ -610,7 +609,7 @@ static int RenderYUVP( filter_t *p_filter, subpicture_region_t *p_region,
         fmt.p_palette->palette[i][2] = 0x80;
         fmt.p_palette->palette[i][3] = pi_gamma[i];
         fmt.p_palette->palette[i][3] =
-            (int)fmt.p_palette->palette[i][3] * (255 - p_line->i_alpha) / 255;
+            (int)fmt.p_palette->palette[i][3] * i_alpha / 255;
     }
     for( i = 8; i < fmt.p_palette->i_entries; i++ )
     {
@@ -619,7 +618,7 @@ static int RenderYUVP( filter_t *p_filter, subpicture_region_t *p_region,
         fmt.p_palette->palette[i][2] = i_v;
         fmt.p_palette->palette[i][3] = pi_gamma[i];
         fmt.p_palette->palette[i][3] =
-            (int)fmt.p_palette->palette[i][3] * (255 - p_line->i_alpha) / 255;
+            (int)fmt.p_palette->palette[i][3] * i_alpha / 255;
     }
 
     p_dst = p_region->p_picture->Y_PIXELS;
@@ -864,7 +863,7 @@ static int RenderYUVA( filter_t *p_filter,
             FT_BitmapGlyph p_glyph = p_line->pp_glyphs[i];
 
             uint32_t i_color = p_line->pi_color[i];
-            i_a = 0xff; /* FIXME */
+            i_a = 0xff - ((i_color >> 24) & 0xff);
             YUVFromRGB( i_color, &i_y, &i_u, &i_v );
 
             int i_picture_y = p_line->p_glyph_pos[i].y + i_align_top;
@@ -1498,7 +1497,6 @@ static line_desc_t *NewLine( int i_count )
         return NULL;
 
     p_line->i_width = 0;
-    p_line->i_alpha = 0xff;
 
     p_line->p_next = NULL;
 
@@ -1877,8 +1875,10 @@ static int ProcessLines( filter_t *p_filter,
                     .y = pen.y
                 };
                 bool     b_karaoke = pi_karaoke_bar && pi_karaoke_bar[i_index] != 0;
-                uint32_t i_color = b_karaoke ? p_glyph_style->i_karaoke_background_color
-                                             : p_glyph_style->i_font_color;
+                uint32_t i_color = b_karaoke ? (p_glyph_style->i_karaoke_background_color |
+                                                (p_glyph_style->i_karaoke_background_alpha << 24))
+                                             : (p_glyph_style->i_font_color |
+                                                (p_glyph_style->i_font_alpha << 24));
                 int i_ul_offset    = 0;
                 int i_ul_thickness = 0;
                 if( p_glyph_style->i_style_flags & (STYLE_UNDERLINE | STYLE_STRIKEOUT) )
@@ -1943,7 +1943,7 @@ static int ProcessLines( filter_t *p_filter,
                 int i_line_index = i_index - i_start;
                 p_line->pp_glyphs[i_line_index] = (FT_BitmapGlyph)glyph;
                 p_line->p_glyph_pos[i_line_index] = glyph_pos;
-                p_line->pi_color[i_line_index] = i_color; /* FIXME alpha per glyph */
+                p_line->pi_color[i_line_index] = i_color;
                 p_line->pi_underline_offset[i_line_index] = i_ul_offset;
                 p_line->pi_underline_thickness[i_line_index] = i_ul_thickness;
 
@@ -1971,7 +1971,6 @@ static int ProcessLines( filter_t *p_filter,
         /* Terminate and append the line */
         if( p_line )
         {
-            p_line->i_alpha  = 0x00;
             p_line->i_width  = line_bbox.xMax - line_bbox.xMin;
             *pp_line_next = p_line;
             pp_line_next = &p_line->p_next;
