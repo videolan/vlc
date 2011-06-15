@@ -135,6 +135,7 @@ function browse(dir){
 				$('#window_browse').dialog('close');
 			});
 			$('[selectable]').selectable();
+			
 		},
 		error: function(jqXHR,status,error){
 			setTimeout('browse("'+dir+'")',1041);

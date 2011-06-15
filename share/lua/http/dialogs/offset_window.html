@@ -1,0 +1,78 @@
+<script language="javascript" type="text/javascript">
+	$(function(){
+		$('#window_offset').dialog({
+			autoOpen: false,
+			minWidth: 400,
+			position: ['left','top'],
+			buttons:{
+				"Close":function(){
+					$(this).dialog("close");
+				}
+			}
+		});
+		$( "#rateSlider" ).slider({
+			range: "min",
+			value: 1,
+			min: 1,
+			max: 10,
+			step: 0.25,
+			stop: function( event, ui ) {
+				sendCommand({
+					'command':'rate',
+					'val':(ui.value)
+				})
+			},
+			slide: function(event,ui){
+				$('#currentRate').empty();
+				$('#currentRate').append(ui.value+'x');
+			}
+		});
+		$( "#audioSlider" ).slider({
+			range: "min",
+			value: 0,
+			min: -10,
+			max: 10,
+			step: 0.25,
+			stop: function( event, ui ) {
+				sendCommand({
+					'command':'audiodelay',
+					'val':(ui.value)
+				})
+			},
+			slide: function(event,ui){
+				$('#currentAudioDelay').empty();
+				$('#currentAudioDelay').append(ui.value+'s');
+			}
+		});
+		$( "#subtitleSlider" ).slider({
+			range: "min",
+			value: 0,
+			min: -10,
+			max: 10,
+			step: 0.25,
+			stop: function( event, ui ) {
+				sendCommand({
+					'command':'subdelay',
+					'val':(ui.value)
+				})
+			},
+			slide: function(event,ui){
+				$('#currentSubtitleDelay').empty();
+				$('#currentSubtitleDelay').append(ui.value+'s');
+			}
+		});
+	});
+</script>
+<div id="window_offset" title="Offset Configuration">
+	<div>Playback Rate</div>
+	<div id="rateSlider" title="Playback Rate"></div>
+	<div id="currentRate" class="dynamic">1x</div>
+	<br/>
+	<div>Audio Delay</div>
+	<div id="audioSlider" title="Audio Delay"></div>
+	<div id="currentAudioDelay" class="dynamic">0s</div>
+	<br/>
+	<div>Subtitle Delay</div>
+	<div id="subtitleSlider" title="Subtitle Delay"></div>
+	<div id="currentSubtitleDelay" class="dynamic">0s</div>
+</div>
