@@ -348,7 +348,7 @@ static void CheckIdx(intf_sys_t *p_sys)
     }
 
     /* Fix box start (1st line of the box displayed) */
-    if (p_sys->i_box_idx < p_sys->i_box_start || 
+    if (p_sys->i_box_idx < p_sys->i_box_start ||
         p_sys->i_box_idx > height + p_sys->i_box_start + 1)
     {
         p_sys->i_box_start = p_sys->i_box_idx - height/2;
@@ -776,7 +776,7 @@ static int SubDrawObject(intf_sys_t *p_sys, int l, vlc_object_t *p_obj, int i_le
     return l;
 }
 
-static int DrawObjects(intf_thread_t *p_intf) 
+static int DrawObjects(intf_thread_t *p_intf)
 {
     return SubDrawObject(p_intf->p_sys, 0, VLC_OBJECT(p_intf->p_libvlc), 0, "");
 }
@@ -1918,12 +1918,12 @@ static int Open(vlc_object_t *p_this)
     if (p_sys->b_color)
         start_color_and_pairs(p_intf);
 
-    keypad(stdscr, TRUE);   /* Don't do NL -> CR/NL */
-    nonl();                 /* Take input chars one at a time */
-    cbreak();               /* Don't echo */
-    noecho();               /* Invisible cursor */
-    curs_set(0);            /* Non blocking getch() */
-    timeout(1000);
+    keypad(stdscr, TRUE);
+    nonl();                 /* Don't do NL -> CR/NL */
+    cbreak();               /* Take input chars one at a time */
+    noecho();               /* Don't echo */
+    curs_set(0);            /* Invisible cursor */
+    timeout(1000);          /* blocking getch() */
     clear();
 
     /* Stop printing errors to the console */
