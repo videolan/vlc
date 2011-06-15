@@ -236,8 +236,8 @@ static int Open( vlc_object_t *p_this )
 
     var_AddCallback( p_playlist, "item-current", AllCallback, p_intf );
     var_AddCallback( p_playlist, "intf-change", AllCallback, p_intf );
-    var_AddCallback( p_playlist, "volume-change", AllCallback, p_intf );
-    var_AddCallback( p_playlist, "volume-muted", AllCallback, p_intf );
+    var_AddCallback( p_playlist, "volume", AllCallback, p_intf );
+    var_AddCallback( p_playlist, "mute", AllCallback, p_intf );
     var_AddCallback( p_playlist, "playlist-item-append", AllCallback, p_intf );
     var_AddCallback( p_playlist, "playlist-item-deleted", AllCallback, p_intf );
     var_AddCallback( p_playlist, "random", AllCallback, p_intf );
@@ -289,8 +289,8 @@ static void Close   ( vlc_object_t *p_this )
 
     var_DelCallback( p_playlist, "item-current", AllCallback, p_intf );
     var_DelCallback( p_playlist, "intf-change", AllCallback, p_intf );
-    var_DelCallback( p_playlist, "volume-change", AllCallback, p_intf );
-    var_DelCallback( p_playlist, "volume-muted", AllCallback, p_intf );
+    var_DelCallback( p_playlist, "volume", AllCallback, p_intf );
+    var_DelCallback( p_playlist, "mute", AllCallback, p_intf );
     var_DelCallback( p_playlist, "playlist-item-append", AllCallback, p_intf );
     var_DelCallback( p_playlist, "playlist-item-deleted", AllCallback, p_intf );
     var_DelCallback( p_playlist, "random", AllCallback, p_intf );
@@ -1042,10 +1042,10 @@ static int AllCallback( vlc_object_t *p_this, const char *psz_var,
     if( !strcmp( "item-current", psz_var ) )
         info->signal = SIGNAL_ITEM_CURRENT;
 
-    else if( !strcmp( "volume-change", psz_var ) )
+    else if( !strcmp( "volume", psz_var ) )
         info->signal = SIGNAL_VOLUME_CHANGE;
 
-    else if( !strcmp( "volume-muted", psz_var ) )
+    else if( !strcmp( "mute", psz_var ) )
         info->signal = SIGNAL_VOLUME_MUTED;
 
     else if( !strcmp( "intf-change", psz_var ) )
