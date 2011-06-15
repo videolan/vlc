@@ -699,284 +699,192 @@ static int RenderYUVP( filter_t *p_filter, subpicture_region_t *p_region,
     return VLC_SUCCESS;
 }
 
-static void UnderlineGlyphYUVA( int i_line_thickness, int i_line_offset, bool b_ul_next_char,
-                                FT_BitmapGlyph  p_this_glyph, FT_Vector *p_this_glyph_pos,
-                                FT_BitmapGlyph  p_next_glyph, FT_Vector *p_next_glyph_pos,
-                                int i_glyph_tmax, int i_align_offset,
-                                uint8_t i_y, uint8_t i_u, uint8_t i_v,
-                                subpicture_region_t *p_region)
-{
-    int i_pitch;
-    uint8_t *p_dst_y,*p_dst_u,*p_dst_v,*p_dst_a;
-
-    p_dst_y = p_region->p_picture->Y_PIXELS;
-    p_dst_u = p_region->p_picture->U_PIXELS;
-    p_dst_v = p_region->p_picture->V_PIXELS;
-    p_dst_a = p_region->p_picture->A_PIXELS;
-    i_pitch = p_region->p_picture->A_PITCH;
-
-    int i_offset = ( p_this_glyph_pos->y + i_glyph_tmax + i_line_offset + 3 ) * i_pitch +
-                     p_this_glyph_pos->x + p_this_glyph->left + 3 + i_align_offset;
-
-    for( int y = 0; y < i_line_thickness; y++ )
-    {
-        int i_extra = p_this_glyph->bitmap.width;
-
-        if( b_ul_next_char )
-        {
-            i_extra = (p_next_glyph_pos->x + p_next_glyph->left) -
-                      (p_this_glyph_pos->x + p_this_glyph->left);
-        }
-        for( int x = 0; x < i_extra; x++ )
-        {
-            bool b_ok = true;
-
-            /* break the underline around the tails of any glyphs which cross it */
-            /* Strikethrough doesn't get broken */
-            for( int z = x - i_line_thickness;
-                 z < x + i_line_thickness && b_ok && (i_line_offset >= 0);
-                 z++ )
-            {
-                if( p_next_glyph && ( z >= i_extra ) )
-                {
-                    int i_row = i_line_offset + p_next_glyph->top + y;
-
-                    if( ( p_next_glyph->bitmap.rows > i_row ) &&
-                        p_next_glyph->bitmap.buffer[p_next_glyph->bitmap.width * i_row + z-i_extra] )
-                    {
-                        b_ok = false;
-                    }
-                }
-                else if ((z > 0 ) && (z < p_this_glyph->bitmap.width))
-                {
-                    int i_row = i_line_offset + p_this_glyph->top + y;
-
-                    if( ( p_this_glyph->bitmap.rows > i_row ) &&
-                        p_this_glyph->bitmap.buffer[p_this_glyph->bitmap.width * i_row + z] )
-                    {
-                        b_ok = false;
-                    }
-                }
-            }
-
-            if( b_ok )
-            {
-                p_dst_y[i_offset+x] = (i_y * 255) >> 8;
-                p_dst_u[i_offset+x] = i_u;
-                p_dst_v[i_offset+x] = i_v;
-                p_dst_a[i_offset+x] = 255;
-            }
-        }
-        i_offset += i_pitch;
-    }
-}
-
-static void DrawBlack( line_desc_t *p_line, int i_width, subpicture_region_t *p_region, int xoffset, int yoffset )
-{
-    uint8_t *p_dst = p_region->p_picture->A_PIXELS;
-    int i_pitch = p_region->p_picture->A_PITCH;
-    int y;
-
-    for( ; p_line != NULL; p_line = p_line->p_next )
-    {
-        int i_glyph_tmax=0, i = 0;
-        int i_bitmap_offset, i_offset, i_align_offset = 0;
-        for( i = 0; p_line->pp_glyphs[i] != NULL; i++ )
-        {
-            FT_BitmapGlyph p_glyph = p_line->pp_glyphs[ i ];
-            i_glyph_tmax = __MAX( i_glyph_tmax, p_glyph->top );
-        }
-
-        if( p_line->i_width < i_width )
-        {
-            if( (p_region->i_align & 0x3) == SUBPICTURE_ALIGN_RIGHT )
-            {
-                i_align_offset = i_width - p_line->i_width;
-            }
-            else if( (p_region->i_align & 0x3) != SUBPICTURE_ALIGN_LEFT )
-            {
-                i_align_offset = ( i_width - p_line->i_width ) / 2;
-            }
-        }
-
-        for( i = 0; p_line->pp_glyphs[i] != NULL; i++ )
-        {
-            FT_BitmapGlyph p_glyph = p_line->pp_glyphs[ i ];
-
-            i_offset = ( p_line->p_glyph_pos[ i ].y +
-                i_glyph_tmax - p_glyph->top + 3 + yoffset ) *
-                i_pitch + p_line->p_glyph_pos[ i ].x + p_glyph->left + 3 +
-                i_align_offset +xoffset;
-
-            for( y = 0, i_bitmap_offset = 0; y < p_glyph->bitmap.rows; y++ )
-            {
-                for( int x = 0; x < p_glyph->bitmap.width; x++, i_bitmap_offset++ )
-                {
-                    if( p_glyph->bitmap.buffer[i_bitmap_offset] )
-                        if( p_dst[i_offset+x] <
-                            ((int)p_glyph->bitmap.buffer[i_bitmap_offset]) )
-                            p_dst[i_offset+x] =
-                                ((int)p_glyph->bitmap.buffer[i_bitmap_offset]);
-                }
-                i_offset += i_pitch;
-            }
-        }
-    }
-}
-
 /*****************************************************************************
  * RenderYUVA: place string in picture
  *****************************************************************************
  * This function merges the previously rendered freetype glyphs into a picture
  *****************************************************************************/
-static int RenderYUVA( filter_t *p_filter, subpicture_region_t *p_region,
-                   line_desc_t *p_line, int i_width, int i_height )
+static inline void BlendYUVAPixel( picture_t *p_picture,
+                                   int i_picture_x, int i_picture_y,
+                                   int i_a, int i_y, int i_u, int i_v,
+                                   int i_alpha )
 {
-    uint8_t *p_dst_y,*p_dst_u,*p_dst_v,*p_dst_a;
-    video_format_t fmt;
-    int i, y, i_pitch, i_alpha;
+    int i_an = i_a * i_alpha / 255;
+
+    uint8_t *p_y = &p_picture->p[0].p_pixels[i_picture_y * p_picture->p[0].i_pitch + i_picture_x];
+    uint8_t *p_u = &p_picture->p[1].p_pixels[i_picture_y * p_picture->p[1].i_pitch + i_picture_x];
+    uint8_t *p_v = &p_picture->p[2].p_pixels[i_picture_y * p_picture->p[2].i_pitch + i_picture_x];
+    uint8_t *p_a = &p_picture->p[3].p_pixels[i_picture_y * p_picture->p[3].i_pitch + i_picture_x];
+
+    int i_ao = *p_a;
+    if( i_ao == 0 )
+    {
+        *p_y = i_y;
+        *p_u = i_u;
+        *p_v = i_v;
+        *p_a = i_an;
+    }
+    else
+    {
+        *p_a = 255 - (255 - *p_a) * (255 - i_an) / 255;
+        if( *p_a != 0 )
+        {
+            *p_y = ( *p_y * i_ao * (255 - i_an) / 255 + i_y * i_an ) / *p_a;
+            *p_u = ( *p_u * i_ao * (255 - i_an) / 255 + i_u * i_an ) / *p_a;
+            *p_v = ( *p_v * i_ao * (255 - i_an) / 255 + i_v * i_an ) / *p_a;
+        }
+    }
+}
+
+static inline void BlendYUVAGlyph( picture_t *p_picture,
+                                   int i_picture_x, int i_picture_y,
+                                   int i_a, int i_y, int i_u, int i_v,
+                                   FT_BitmapGlyph p_glyph )
+{
+    for( int dy = 0; dy < p_glyph->bitmap.rows; dy++ )
+    {
+        for( int dx = 0; dx < p_glyph->bitmap.width; dx++ )
+            BlendYUVAPixel( p_picture, i_picture_x + dx, i_picture_y + dy,
+                            i_a, i_y, i_u, i_v,
+                            p_glyph->bitmap.buffer[dy * p_glyph->bitmap.width + dx] );
+    }
+}
+
+static inline void BlendYUVALine( picture_t *p_picture,
+                                  int i_picture_x, int i_picture_y,
+                                  int i_a, int i_y, int i_u, int i_v,
+                                  FT_BitmapGlyph p_glyph_current,
+                                  FT_BitmapGlyph p_glyph_next,
+                                  FT_Vector      *p_pos_current,
+                                  FT_Vector      *p_pos_next,
+                                  int i_line_thickness,
+                                  int i_line_offset,
+                                  bool is_next )
+{
+    int i_line_width = p_glyph_current->bitmap.width;
+    if( is_next )
+        i_line_width = (p_pos_next->x    + p_glyph_next->left) -
+                       (p_pos_current->x + p_glyph_current->left);
+
+    for( int dx = 0; dx < i_line_width; dx++ )
+    {
+        /* break the underline around the tails of any glyphs which cross it
+           Strikethrough doesn't get broken */
+        bool b_ok = true;
+        for( int z = dx - i_line_thickness; z < dx + i_line_thickness && b_ok && i_line_offset >= 0; z++ )
+        {
+            FT_BitmapGlyph p_glyph_check = NULL;
+            int i_column;
+            if( p_glyph_next && z >= i_line_width )
+            {
+                i_column      = z - i_line_width;
+                p_glyph_check = p_glyph_next;
+            }
+            else if( z >= 0 && z < p_glyph_current->bitmap.width )
+            {
+                i_column      = z;
+                p_glyph_check = p_glyph_current;
+            }
+            if( p_glyph_check )
+            {
+                const FT_Bitmap *p_bitmap = &p_glyph_check->bitmap;
+                for( int dy = 0; dy < i_line_thickness && b_ok; dy++ )
+                {
+                    int i_row = i_line_offset + p_glyph_check->top + dy;
+                    b_ok = i_row >= p_bitmap->rows ||
+                           p_bitmap->buffer[p_bitmap->width * i_row + i_column] == 0;
+                }
+            }
+        }
+
+        for( int dy = 0; dy < i_line_thickness && b_ok; dy++ )
+            BlendYUVAPixel( p_picture, i_picture_x + dx, i_picture_y + i_line_offset + dy,
+                            i_a, i_y, i_u, i_v, 0xff );
+    }
+}
+
+static int RenderYUVA( filter_t *p_filter,
+                       subpicture_region_t *p_region,
+                       line_desc_t *p_line_head,
+                       int i_width, int i_height )
+{
+    filter_sys_t *p_sys = p_filter->p_sys;
 
     /* Create a new subpicture region */
-    memset( &fmt, 0, sizeof(video_format_t) );
-    fmt.i_chroma = VLC_CODEC_YUVA;
-    fmt.i_width = fmt.i_visible_width = i_width + 6;
-    fmt.i_height = fmt.i_visible_height = i_height + 6;
-    if( p_region->fmt.i_visible_width > 0 )
-        fmt.i_visible_width = p_region->fmt.i_visible_width;
-    if( p_region->fmt.i_visible_height > 0 )
-        fmt.i_visible_height = p_region->fmt.i_visible_height;
-    fmt.i_x_offset = fmt.i_y_offset = 0;
-    fmt.i_sar_num = 1;
-    fmt.i_sar_den = 1;
+    video_format_t fmt;
+    video_format_Init( &fmt, VLC_CODEC_YUVA );
+    fmt.i_width          =
+    fmt.i_visible_width  = i_width;
+    fmt.i_height         =
+    fmt.i_visible_height = i_height;
 
-    p_region->p_picture = picture_NewFromFormat( &fmt );
+    picture_t *p_picture = p_region->p_picture = picture_NewFromFormat( &fmt );
     if( !p_region->p_picture )
         return VLC_EGENERIC;
     p_region->fmt = fmt;
 
-    /* Save the alpha value */
-    i_alpha = p_line->i_alpha;
+    /* Initialize the picture background */
+    uint32_t i_background = p_sys->i_effect == EFFECT_BACKGROUND ? 0x80000000 :
+                                                                   0xff000000;
+    uint8_t i_a = 0xff - ((i_background >> 24) & 0xff);
+    uint8_t i_y, i_u, i_v;
+    YUVFromRGB( i_background, &i_y, &i_u, &i_v );
 
-    p_dst_y = p_region->p_picture->Y_PIXELS;
-    p_dst_u = p_region->p_picture->U_PIXELS;
-    p_dst_v = p_region->p_picture->V_PIXELS;
-    p_dst_a = p_region->p_picture->A_PIXELS;
-    i_pitch = p_region->p_picture->A_PITCH;
+    memset( p_picture->p[0].p_pixels, i_y,
+            p_picture->p[0].i_pitch * p_picture->p[0].i_lines );
+    memset( p_picture->p[1].p_pixels, i_u,
+            p_picture->p[1].i_pitch * p_picture->p[1].i_lines );
+    memset( p_picture->p[2].p_pixels, i_v,
+            p_picture->p[2].i_pitch * p_picture->p[2].i_lines );
+    memset( p_picture->p[3].p_pixels, i_a,
+            p_picture->p[3].i_pitch * p_picture->p[3].i_lines );
 
-    /* Initialize the region pixels */
-    memset( p_dst_y, 0x00, i_pitch * p_region->fmt.i_height );
-    memset( p_dst_u, 0x80, i_pitch * p_region->fmt.i_height );
-    memset( p_dst_v, 0x80, i_pitch * p_region->fmt.i_height );
-
-    if( p_filter->p_sys->i_effect != EFFECT_BACKGROUND )
-        memset( p_dst_a, 0x00, i_pitch * p_region->fmt.i_height );
-    else
-        memset( p_dst_a, 0x80, i_pitch * p_region->fmt.i_height );
-
-    if( p_filter->p_sys->i_effect == EFFECT_OUTLINE ||
-        p_filter->p_sys->i_effect == EFFECT_OUTLINE_FAT )
+    /* Render all lines */
+    for( line_desc_t *p_line = p_line_head; p_line != NULL; p_line = p_line->p_next )
     {
-        DrawBlack( p_line, i_width, p_region,  0,  0);
-        DrawBlack( p_line, i_width, p_region, -1,  0);
-        DrawBlack( p_line, i_width, p_region,  0, -1);
-        DrawBlack( p_line, i_width, p_region,  1,  0);
-        DrawBlack( p_line, i_width, p_region,  0,  1);
-    }
-
-    if( p_filter->p_sys->i_effect == EFFECT_OUTLINE_FAT )
-    {
-        DrawBlack( p_line, i_width, p_region, -1, -1);
-        DrawBlack( p_line, i_width, p_region, -1,  1);
-        DrawBlack( p_line, i_width, p_region,  1, -1);
-        DrawBlack( p_line, i_width, p_region,  1,  1);
-
-        DrawBlack( p_line, i_width, p_region, -2,  0);
-        DrawBlack( p_line, i_width, p_region,  0, -2);
-        DrawBlack( p_line, i_width, p_region,  2,  0);
-        DrawBlack( p_line, i_width, p_region,  0,  2);
-
-        DrawBlack( p_line, i_width, p_region, -2, -2);
-        DrawBlack( p_line, i_width, p_region, -2,  2);
-        DrawBlack( p_line, i_width, p_region,  2, -2);
-        DrawBlack( p_line, i_width, p_region,  2,  2);
-
-        DrawBlack( p_line, i_width, p_region, -3,  0);
-        DrawBlack( p_line, i_width, p_region,  0, -3);
-        DrawBlack( p_line, i_width, p_region,  3,  0);
-        DrawBlack( p_line, i_width, p_region,  0,  3);
-    }
-
-    for( ; p_line != NULL; p_line = p_line->p_next )
-    {
-        int i_glyph_tmax = 0;
-        int i_bitmap_offset, i_offset, i_align_offset = 0;
-        for( i = 0; p_line->pp_glyphs[i] != NULL; i++ )
-        {
-            FT_BitmapGlyph p_glyph = p_line->pp_glyphs[ i ];
-            i_glyph_tmax = __MAX( i_glyph_tmax, p_glyph->top );
-        }
-
+        /* Left offset to take into account alignment */
+        int i_align_left = 0;
         if( p_line->i_width < i_width )
         {
             if( (p_region->i_align & 0x3) == SUBPICTURE_ALIGN_RIGHT )
-            {
-                i_align_offset = i_width - p_line->i_width;
-            }
+                i_align_left = i_width - p_line->i_width;
             else if( (p_region->i_align & 0x3) != SUBPICTURE_ALIGN_LEFT )
-            {
-                i_align_offset = ( i_width - p_line->i_width ) / 2;
-            }
+                i_align_left = ( i_width - p_line->i_width ) / 2;
         }
 
-        for( i = 0; p_line->pp_glyphs[i] != NULL; i++ )
+        /* Compute the top alignment
+         * FIXME seems bad (it seems that the glyphs are aligned too high) */
+        int i_align_top = 0;
+        for( int i = 0; p_line->pp_glyphs[i]; i++ )
+            i_align_top = __MAX( i_align_top, p_line->pp_glyphs[i]->top );
+
+        /* Render all glyphs and underline/strikethrough */
+        for( int i = 0; p_line->pp_glyphs[i]; i++ )
         {
-            FT_BitmapGlyph p_glyph = p_line->pp_glyphs[ i ];
+            FT_BitmapGlyph p_glyph = p_line->pp_glyphs[i];
 
-            i_offset = ( p_line->p_glyph_pos[ i ].y +
-                i_glyph_tmax - p_glyph->top + 3 ) *
-                i_pitch + p_line->p_glyph_pos[ i ].x + p_glyph->left + 3 +
-                i_align_offset;
+            uint32_t i_color = p_line->pi_color[i];
+            i_a = 0xff; /* FIXME */
+            YUVFromRGB( i_color, &i_y, &i_u, &i_v );
 
-            /* Every glyph can (and in fact must) have its own color */
-            uint8_t i_y, i_u, i_v;
-            YUVFromRGB( p_line->pi_color[ i ], &i_y, &i_u, &i_v );
+            int i_picture_y = p_line->p_glyph_pos[i].y + i_align_top;
+            int i_picture_x = p_line->p_glyph_pos[i].x + i_align_left + p_glyph->left;
 
-            for( y = 0, i_bitmap_offset = 0; y < p_glyph->bitmap.rows; y++ )
-            {
-                for( int x = 0; x < p_glyph->bitmap.width; x++, i_bitmap_offset++ )
-                {
-                    if( p_glyph->bitmap.buffer[i_bitmap_offset] )
-                    {
-                        p_dst_y[i_offset+x] = ((p_dst_y[i_offset+x] *(255-(int)p_glyph->bitmap.buffer[i_bitmap_offset])) +
-                                              i_y * ((int)p_glyph->bitmap.buffer[i_bitmap_offset])) >> 8;
+            BlendYUVAGlyph( p_picture, i_picture_x, i_picture_y - p_glyph->top,
+                            i_a, i_y, i_u, i_v,
+                            p_glyph );
 
-                        p_dst_u[i_offset+x] = i_u;
-                        p_dst_v[i_offset+x] = i_v;
-
-                        if( p_filter->p_sys->i_effect == EFFECT_BACKGROUND )
-                            p_dst_a[i_offset+x] = 0xff;
-                    }
-                }
-                i_offset += i_pitch;
-            }
-
-            if( p_line->pi_underline_thickness[ i ] )
-            {
-                UnderlineGlyphYUVA( p_line->pi_underline_thickness[ i ],
-                                    p_line->pi_underline_offset[ i ],
-                                   (p_line->pp_glyphs[i+1] && (p_line->pi_underline_thickness[ i + 1] > 0)),
-                                    p_line->pp_glyphs[i], &(p_line->p_glyph_pos[i]),
-                                    p_line->pp_glyphs[i+1], &(p_line->p_glyph_pos[i+1]),
-                                    i_glyph_tmax, i_align_offset,
-                                    i_y, i_u, i_v,
-                                    p_region);
-            }
+            const int i_line_thickness = p_line->pi_underline_thickness[i];
+            const int i_line_offset    = p_line->pi_underline_offset[i];
+            if( i_line_thickness > 0 )
+                BlendYUVALine( p_picture, i_picture_x, i_picture_y,
+                               i_a, i_y, i_u, i_v,
+                               p_glyph, p_line->pp_glyphs[i + 1],
+                               &p_line->p_glyph_pos[i], &p_line->p_glyph_pos[i + 1],
+                               i_line_thickness, i_line_offset,
+                               p_line->pp_glyphs[i + 1] && p_line->pi_underline_thickness[i + 1] > 0 );
         }
     }
-
-    /* Apply the alpha setting */
-    for( i = 0; i < (int)fmt.i_height * i_pitch; i++ )
-        p_dst_a[i] = p_dst_a[i] * (255 - i_alpha) / 255;
 
     return VLC_SUCCESS;
 }
