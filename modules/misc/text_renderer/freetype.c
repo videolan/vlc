@@ -205,9 +205,9 @@ struct line_desc_t
     FT_Vector      *p_glyph_pos;
     /** list of ARGB information for styled text */
     uint32_t       *pi_color;
-    /** underline information -- only supplied if text should be underlined */
-    int            *pi_underline_offset;
-    uint16_t       *pi_underline_thickness;
+    /** underline/strikethrough information */
+    int            *pi_line_offset;
+    uint16_t       *pi_line_thickness;
 
     int             i_width;
 
@@ -873,15 +873,15 @@ static int RenderYUVA( filter_t *p_filter,
                             i_a, i_y, i_u, i_v,
                             p_glyph );
 
-            const int i_line_thickness = p_line->pi_underline_thickness[i];
-            const int i_line_offset    = p_line->pi_underline_offset[i];
+            const int i_line_thickness = p_line->pi_line_thickness[i];
+            const int i_line_offset    = p_line->pi_line_offset[i];
             if( i_line_thickness > 0 )
                 BlendYUVALine( p_picture, i_picture_x, i_picture_y,
                                i_a, i_y, i_u, i_v,
                                p_glyph, p_line->pp_glyphs[i + 1],
                                &p_line->p_glyph_pos[i], &p_line->p_glyph_pos[i + 1],
                                i_line_thickness, i_line_offset,
-                               p_line->pp_glyphs[i + 1] && p_line->pi_underline_thickness[i + 1] > 0 );
+                               p_line->pp_glyphs[i + 1] && p_line->pi_line_thickness[i + 1] > 0 );
         }
     }
 
@@ -1474,8 +1474,8 @@ static void FreeLine( line_desc_t *p_line )
     free( p_line->pp_glyphs );
     free( p_line->p_glyph_pos );
     free( p_line->pi_color );
-    free( p_line->pi_underline_offset );
-    free( p_line->pi_underline_thickness );
+    free( p_line->pi_line_offset );
+    free( p_line->pi_line_thickness );
     free( p_line );
 }
 
@@ -1500,15 +1500,15 @@ static line_desc_t *NewLine( int i_count )
 
     p_line->p_next = NULL;
 
-    p_line->pp_glyphs              = calloc( i_count + 1, sizeof(*p_line->pp_glyphs) );
-    p_line->p_glyph_pos            = calloc( i_count + 1, sizeof(*p_line->p_glyph_pos) );
-    p_line->pi_color               = calloc( i_count + 1, sizeof(*p_line->pi_color) );
-    p_line->pi_underline_offset    = calloc( i_count + 1, sizeof(*p_line->pi_underline_offset) );
-    p_line->pi_underline_thickness = calloc( i_count + 1, sizeof(*p_line->pi_underline_thickness) );
+    p_line->pp_glyphs         = calloc( i_count + 1, sizeof(*p_line->pp_glyphs) );
+    p_line->p_glyph_pos       = calloc( i_count + 1, sizeof(*p_line->p_glyph_pos) );
+    p_line->pi_color          = calloc( i_count + 1, sizeof(*p_line->pi_color) );
+    p_line->pi_line_offset    = calloc( i_count + 1, sizeof(*p_line->pi_line_offset) );
+    p_line->pi_line_thickness = calloc( i_count + 1, sizeof(*p_line->pi_line_thickness) );
 
     if( !p_line->pp_glyphs || !p_line->p_glyph_pos ||
         !p_line->pi_color ||
-        !p_line->pi_underline_offset || !p_line->pi_underline_thickness )
+        !p_line->pi_line_offset || !p_line->pi_line_thickness )
     {
         FreeLine( p_line );
         return NULL;
@@ -1944,8 +1944,8 @@ static int ProcessLines( filter_t *p_filter,
                 p_line->pp_glyphs[i_line_index] = (FT_BitmapGlyph)glyph;
                 p_line->p_glyph_pos[i_line_index] = glyph_pos;
                 p_line->pi_color[i_line_index] = i_color;
-                p_line->pi_underline_offset[i_line_index] = i_ul_offset;
-                p_line->pi_underline_thickness[i_line_index] = i_ul_thickness;
+                p_line->pi_line_offset[i_line_index] = i_ul_offset;
+                p_line->pi_line_thickness[i_line_index] = i_ul_thickness;
 
                 pen.x += FT_CEIL(kerning.x) + FT_CEIL(p_current_face->glyph->advance.x);
                 line_bbox = line_bbox_new;
