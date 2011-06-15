@@ -25,14 +25,3 @@ or INSTALL.win32 for more details on that.
 
 Happy hacking.
 --Meuuh 2003-11-15
-
-Appendix: 
- I) BUILDING AMR SUPPORT IN FFMPEG
-
-To build ffmpeg with AMR support add HAVE_AMR=1 to config.mak or do:
-
-echo "HAVE_AMR=1" >> config.mak
-
-and add .libamrwb .libamrnb (before .ffmpeg) to your distro.mak. Then rebuild the contrib with: 
-
-make src
