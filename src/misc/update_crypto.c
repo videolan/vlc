@@ -73,6 +73,16 @@ static inline int scalar_number( uint8_t *p, int header_len )
 /* number of data bytes in a MPI */
 #define mpi_len( mpi ) ( ( scalar_number( mpi, 2 ) + 7 ) / 8 )
 
+#define READ_MPI(n, bits) do { \
+    if( i_read + 2 > i_packet_len ) \
+        goto error; \
+    int len = mpi_len( p_buf ); \
+    if( len > (bits)/8 || i_read + 2 + len > i_packet_len ) \
+        goto error; \
+    len += 2; \
+    memcpy( n, p_buf, len ); \
+    p_buf += len; i_read += len; \
+    } while(0)
 
 /*
  * fill a public_key_packet_t structure from public key packet data
@@ -98,59 +108,18 @@ static int parse_public_key_packet( public_key_packet_t *p_key, uint8_t *p_buf,
     if( p_key->algo != PUBLIC_KEY_ALGO_DSA )
         return VLC_EGENERIC;
 
-    /* read p */
-    if( i_read + 2 > i_packet_len )
-        return VLC_EGENERIC;
-
-    int i_p_len = mpi_len( p_buf );
-
-    if( i_p_len > 128 || i_read + 2 + i_p_len > i_packet_len )
-        return VLC_EGENERIC;
-
-    memcpy( p_key->p, p_buf, 2+i_p_len );
-    p_buf += 2+i_p_len; i_read += 2+i_p_len;
-
-    /* read q */
-    if( i_read + 2 > i_packet_len )
-        return VLC_EGENERIC;
-
-    int i_q_len = mpi_len( p_buf );
-
-    if( i_q_len > 20 || i_read+2+i_q_len > i_packet_len )
-        return VLC_EGENERIC;
-
-    memcpy( p_key->q, p_buf, 2+i_q_len );
-    p_buf += 2+i_q_len; i_read += 2+i_q_len;
-
-    /* read g */
-    if( i_read + 2 > i_packet_len )
-        return VLC_EGENERIC;
-
-    int i_g_len = mpi_len( p_buf );
-
-    if( i_g_len > 128 || i_read+2+i_g_len > i_packet_len )
-        return VLC_EGENERIC;
-
-    memcpy( p_key->g, p_buf, 2+i_g_len );
-    p_buf += 2+i_g_len; i_read += 2+i_g_len;
-
-    /* read y */
-    if( i_read + 2 > i_packet_len )
-        return VLC_EGENERIC;
-
-    int i_y_len = mpi_len( p_buf );
-
-
-    if( i_y_len > 128 || i_read+2+i_y_len > i_packet_len )
-        return VLC_EGENERIC;
-
-    memcpy( p_key->y, p_buf, 2+i_y_len );
-    i_read += 2+i_y_len;
+    READ_MPI(p_key->p, 1024);
+    READ_MPI(p_key->q, 160);
+    READ_MPI(p_key->g, 1024);
+    READ_MPI(p_key->y, 1024);
 
     if( i_read != i_packet_len ) /* some extra data eh ? */
         return VLC_EGENERIC;
 
     return VLC_SUCCESS;
+
+error:
+    return VLC_EGENERIC;
 }
 
 
@@ -288,9 +257,9 @@ static size_t parse_signature_v4_packet( signature_packet_t *p_sig,
 
 
 static int parse_signature_packet( signature_packet_t *p_sig,
-                                   uint8_t *p_buf, size_t i_sig_len )
+                                   uint8_t *p_buf, size_t i_packet_len )
 {
-    if( !i_sig_len ) /* 1st sanity check, we need at least the version */
+    if( !i_packet_len ) /* 1st sanity check, we need at least the version */
         return VLC_EGENERIC;
 
     p_sig->version = *p_buf++;
@@ -299,12 +268,12 @@ static int parse_signature_packet( signature_packet_t *p_sig,
     switch( p_sig->version )
     {
         case 3:
-            i_read = parse_signature_v3_packet( p_sig, p_buf, i_sig_len );
+            i_read = parse_signature_v3_packet( p_sig, p_buf, i_packet_len );
             break;
         case 4:
             p_sig->specific.v4.hashed_data = NULL;
             p_sig->specific.v4.unhashed_data = NULL;
-            i_read = parse_signature_v4_packet( p_sig, p_buf, i_sig_len );
+            i_read = parse_signature_v4_packet( p_sig, p_buf, i_packet_len );
             break;
         default:
             return VLC_EGENERIC;
@@ -335,30 +304,11 @@ static int parse_signature_packet( signature_packet_t *p_sig,
     p_buf--; /* rewind to the version byte */
     p_buf += i_read;
 
-    if( i_read + 2 > i_sig_len )
-        goto error;
+    READ_MPI(p_sig->r, 160);
+    READ_MPI(p_sig->s, 160);
 
-    size_t i_r_len = mpi_len( p_buf ); i_read += 2;
-    if( i_read + i_r_len > i_sig_len || i_r_len > 20 )
-        goto error;
-
-    memcpy( p_sig->r, p_buf, 2 + i_r_len );
-    p_buf += 2 + i_r_len;
-    i_read += i_r_len;
-
-    if( i_read + 2 > i_sig_len )
-        goto error;
-
-    size_t i_s_len = mpi_len( p_buf ); i_read += 2;
-    if( i_read + i_s_len > i_sig_len || i_s_len > 20 )
-        goto error;
-
-    memcpy( p_sig->s, p_buf, 2 + i_s_len );
-    p_buf += 2 + i_s_len;
-    i_read += i_s_len;
-
-    assert( i_read == i_sig_len );
-    if( i_read < i_sig_len ) /* some extra data, hm ? */
+    assert( i_read == i_packet_len );
+    if( i_read < i_packet_len ) /* some extra data, hm ? */
         goto error;
 
     return VLC_SUCCESS;
@@ -834,6 +784,7 @@ uint8_t *hash_sha1_from_public_key( public_key_t *p_pkey )
         p_hash[0] != p_pkey->sig.hash_verification[0] ||
         p_hash[1] != p_pkey->sig.hash_verification[1] )
     {
+        free(p_hash);
         return NULL;
     }
 
