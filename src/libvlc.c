@@ -268,7 +268,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
 #endif
 
     /* System specific initialization code */
-    system_Init( p_libvlc, &i_argc, ppsz_argv );
+    system_Init();
 
     /*
      * Support for gettext

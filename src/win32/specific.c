@@ -44,9 +44,8 @@
 /*****************************************************************************
  * system_Init: initialize winsock and misc other things.
  *****************************************************************************/
-void system_Init( libvlc_int_t *p_this, int *pi_argc, const char *ppsz_argv[] )
+void system_Init( void )
 {
-    VLC_UNUSED( p_this ); VLC_UNUSED( pi_argc ); VLC_UNUSED( ppsz_argv );
     WSADATA Data;
     MEMORY_BASIC_INFORMATION mbi;
 

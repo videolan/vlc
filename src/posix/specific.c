@@ -31,12 +31,11 @@ static void set_libvlc_path (void)
     psz_vlcpath = (char *)PKGLIBDIR;
 }
 
-void system_Init (libvlc_int_t *libvlc, int *argc, const char *argv[])
+void system_Init (void)
 {
     pthread_once_t once = PTHREAD_ONCE_INIT;
 
     pthread_once (&once, set_libvlc_path);
-    (void)libvlc; (void)argc; (void)argv;
 }
 
 void system_Configure (libvlc_int_t *libvlc,

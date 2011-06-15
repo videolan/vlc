@@ -88,7 +88,7 @@ static struct
 # include <stdlib.h>
 #endif
 
-void system_Init (libvlc_int_t *libvlc, int *argc, const char *argv[])
+void system_Init (void)
 {
 #ifdef __GLIBC__
     const char *glcv = gnu_get_libc_version ();
@@ -111,8 +111,6 @@ void system_Init (libvlc_int_t *libvlc, int *argc, const char *argv[])
     if (once.refs++ == 0)
         set_libvlc_path ();
     vlc_mutex_unlock (&once.lock);
-
-    (void)libvlc; (void)argc; (void)argv;
 }
 
 void system_Configure (libvlc_int_t *libvlc,
