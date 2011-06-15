@@ -3,7 +3,7 @@
 /* Copyright © 2007-2011 Rafaël Carré <funman@videolanorg> */
 
 /* Works with : libvlc 1.2.0
-   gcc -pedantic -Wall -Werror -Wextra `pkg-config --cflags --libs libvlc`
+   gcc -pedantic -Wall -Werror -Wextra `pkg-config --cflags --libs libvlc` -lpthread
 
   # to register the thumbnailer:
   list=`grep ^Mime vlc.desktop|cut -d= -f2-|sed -e s/";"/\\\n/g -e s,/,@,g`
@@ -22,6 +22,17 @@
 #include <string.h>
 #include <unistd.h>
 #include <locale.h>
+#include <pthread.h>
+#include <errno.h>
+#include <time.h>
+
+#if !defined (_POSIX_CLOCK_SELECTION)
+#  define _POSIX_CLOCK_SELECTION (-1)
+#endif
+
+#if (_POSIX_CLOCK_SELECTION < 0)
+#   error Clock selection is not available!
+#endif
 
 #include <vlc/vlc.h>
 
@@ -96,67 +107,75 @@ static libvlc_instance_t *create_libvlc(void)
     return libvlc_new(sizeof args / sizeof *args, args);
 }
 
+static pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
+static pthread_cond_t  wait;
+static bool done;
+
 static void callback(const libvlc_event_t *ev, void *param)
 {
-    float new_position = ev->u.media_player_position_changed.new_position;
+    float new_position;
+    (void)param;
 
+    pthread_mutex_lock(&lock);
     switch (ev->type) {
-
     case libvlc_MediaPlayerPositionChanged:
-        if (new_position >= VLC_THUMBNAIL_POSITION * .9) { /* 90% margin */
-            *(int*)param = 1;
-        }
-        break;
+        new_position = ev->u.media_player_position_changed.new_position;
+        if (new_position < VLC_THUMBNAIL_POSITION * .9 /* 90% margin */)
+            break;
     case libvlc_MediaPlayerSnapshotTaken:
-        *(int*)param = 1;
+        done = true;
+        pthread_cond_signal(&wait);
         break;
 
     default:
         assert(0);
     }
+    pthread_mutex_unlock(&lock);
 }
 
-/* FIXME: should use pthread notification */
-static void event_wait(const char *error, int *f)
+static void event_wait(const char *error)
 {
+    int ret;
+    struct timespec ts;
 #define VLC_THUMBNAIL_TIMEOUT   5.0 /* 5 secs */
-#define VLC_THUMBNAIL_LOOP_STEP 0.2 /* 200 ms */
 
-    float max = VLC_THUMBNAIL_TIMEOUT;
-    while ((max -= VLC_THUMBNAIL_LOOP_STEP) > 0.) {
-        if (*f)
-            return;
+    clock_gettime(CLOCK_MONOTONIC, &ts);
+    ts.tv_sec += VLC_THUMBNAIL_TIMEOUT;
+    pthread_mutex_lock(&lock);
+    ret = done ? 0 : pthread_cond_timedwait(&wait, &lock, &ts);
+    pthread_mutex_unlock(&lock);
 
-        usleep(VLC_THUMBNAIL_LOOP_STEP * 1000000);
+    assert(!ret || ret == ETIMEDOUT);
+
+    if (ret) {
+        fprintf(stderr,
+                "%s (timeout after %.2f secs!\n", error, VLC_THUMBNAIL_TIMEOUT);
+        exit(1);
     }
-
-    fprintf(stderr,
-            "%s (timeout after %.2f secs!\n", error, VLC_THUMBNAIL_TIMEOUT);
-    exit(1);
 }
 
 static void set_position(libvlc_media_player_t *mp)
 {
-    int f = 0;
     libvlc_event_manager_t *em = libvlc_media_player_event_manager(mp);
     assert(em);
 
-    libvlc_event_attach(em, libvlc_MediaPlayerPositionChanged, callback, &f);
+    libvlc_event_attach(em, libvlc_MediaPlayerPositionChanged, callback, NULL);
+    done = false;
     libvlc_media_player_set_position(mp, VLC_THUMBNAIL_POSITION);
-    event_wait("Couldn't set position", &f);
-    libvlc_event_detach(em, libvlc_MediaPlayerPositionChanged, callback, &f);
+    event_wait("Couldn't set position");
+    libvlc_event_detach(em, libvlc_MediaPlayerPositionChanged, callback, NULL);
 }
 
 static void snapshot(libvlc_media_player_t *mp, int width, char *out_with_ext)
 {
-    int f = 0;
     libvlc_event_manager_t *em = libvlc_media_player_event_manager(mp);
     assert(em);
 
-    libvlc_event_attach(em, libvlc_MediaPlayerSnapshotTaken, callback, &f);
+    libvlc_event_attach(em, libvlc_MediaPlayerSnapshotTaken, callback, NULL);
+    done = false;
     libvlc_video_take_snapshot(mp, 0, out_with_ext, width, 0);
-    event_wait("Snapshot has not been written", &f);
-    libvlc_event_detach(em, libvlc_MediaPlayerSnapshotTaken, callback, &f);
+    event_wait("Snapshot has not been written");
+    libvlc_event_detach(em, libvlc_MediaPlayerSnapshotTaken, callback, NULL);
 }
 
 int main(int argc, const char **argv)
@@ -164,6 +183,7 @@ int main(int argc, const char **argv)
     const char *in;
     char *out, *out_with_ext;
     int width;
+    pthread_condattr_t attr;
     libvlc_instance_t *libvlc;
     libvlc_media_player_t *mp;
     libvlc_media_t *m;
@@ -172,6 +192,11 @@ int main(int argc, const char **argv)
     setlocale(LC_ALL, "");
 
     cmdline(argc, argv, &in, &out, &out_with_ext, &width);
+
+    pthread_condattr_init(&attr);
+    pthread_condattr_setclock(&attr, CLOCK_MONOTONIC);
+    pthread_cond_init(&wait, &attr);
+    pthread_condattr_destroy(&attr);
 
     /* starts vlc */
     libvlc = create_libvlc();
@@ -201,6 +226,8 @@ int main(int argc, const char **argv)
     libvlc_media_player_release(mp);
     libvlc_media_release(m);
     libvlc_release(libvlc);
+
+    pthread_cond_destroy(&wait);
 
     return 0;
 }
