@@ -24,20 +24,19 @@ Building VLC from the source code
 If you want to build VLC from sources, you can do it in several ways:
 
 - On GNU/Linux, using the mingw32 cross-compiler.
-  This method is preferred over all the others.
+  This is the preferred method, as this is the one used by VideoLAN to
+  build the official Windows binaries.
 
 - natively on Windows, using MSYS+MINGW (www.mingw.org)
   (MSYS is a minimal build environment to compile Unixish projects under
   windows. It provides all the common Unix tools like sh, gmake...)
 
-UNSUPPORTED METHODS
--------------------
-- natively on Windows, using cygwin (www.cygwin.com) with or without the
-  POSIX emulation layer. This is the preferred way to compile vlc if you want
-  to do it on Windows.
-  Read http://wiki.videolan.org/Win32CompileCygwinNew to have a complete HOWTO
+UNSUPPORTED METHOD
+------------------
 
-- natively on Windows, using Microsoft Visual Studio. This will not work.
+- natively on Windows, using cygwin (www.cygwin.com) with or without the
+  POSIX emulation layer.
+  Read http://wiki.videolan.org/Win32CompileCygwinNew to have a complete HOWTO
 
 
 Getting the right compiler tools
