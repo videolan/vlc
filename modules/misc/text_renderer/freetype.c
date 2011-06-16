@@ -193,22 +193,24 @@ vlc_module_end ()
  * Local prototypes
  *****************************************************************************/
 
+typedef struct
+{
+    FT_BitmapGlyph p_glyph;
+    FT_Vector      pos;                 /* Relative position */
+    uint32_t       i_color;             /* ARGB color */
+    int            i_line_offset;       /* underline/strikethrough offset */
+    uint16_t       i_line_thickness;    /* underline/strikethrough thickness */
+} line_character_t;
+
 typedef struct line_desc_t line_desc_t;
 struct line_desc_t
 {
-    /** NULL-terminated list of glyphs making the string */
-    FT_BitmapGlyph *pp_glyphs;
-    /** list of relative positions for the glyphs */
-    FT_Vector      *p_glyph_pos;
-    /** list of ARGB information for styled text */
-    uint32_t       *pi_color;
-    /** underline/strikethrough information */
-    int            *pi_line_offset;
-    uint16_t       *pi_line_thickness;
-
-    int             i_width;
-
     line_desc_t    *p_next;
+
+    int              i_width;
+
+    int              i_character_count;
+    line_character_t *p_character;
 };
 
 typedef struct font_stack_t font_stack_t;
@@ -596,8 +598,8 @@ static int RenderYUVP( filter_t *p_filter, subpicture_region_t *p_region,
 
     /* Calculate text color components
      * Only use the first color */
-    int i_alpha = 0xff - ((p_line->pi_color[ 0 ] >> 24) & 0xff);
-    YUVFromRGB( p_line->pi_color[ 0 ], &i_y, &i_u, &i_v );
+    int i_alpha = 0xff - ((p_line->p_character[0].i_color >> 24) & 0xff);
+    YUVFromRGB( p_line->p_character[0].i_color, &i_y, &i_u, &i_v );
 
     /* Build palette */
     fmt.p_palette->i_entries = 16;
@@ -630,9 +632,9 @@ static int RenderYUVP( filter_t *p_filter, subpicture_region_t *p_region,
     {
         int i_glyph_tmax = 0;
         int i_bitmap_offset, i_offset, i_align_offset = 0;
-        for( i = 0; p_line->pp_glyphs[i] != NULL; i++ )
+        for( i = 0; i < p_line->i_character_count; i++ )
         {
-            FT_BitmapGlyph p_glyph = p_line->pp_glyphs[ i ];
+            FT_BitmapGlyph p_glyph = p_line->p_character[i].p_glyph;
             i_glyph_tmax = __MAX( i_glyph_tmax, p_glyph->top );
         }
 
@@ -648,13 +650,14 @@ static int RenderYUVP( filter_t *p_filter, subpicture_region_t *p_region,
             }
         }
 
-        for( i = 0; p_line->pp_glyphs[i] != NULL; i++ )
+        for( i = 0; i < p_line->i_character_count; i++ )
         {
-            FT_BitmapGlyph p_glyph = p_line->pp_glyphs[ i ];
+            const line_character_t *ch = &p_line->p_character[i];
+            FT_BitmapGlyph p_glyph = ch->p_glyph;
 
-            i_offset = ( p_line->p_glyph_pos[ i ].y +
+            i_offset = ( ch->pos.y +
                 i_glyph_tmax - p_glyph->top + 2 ) *
-                i_pitch + p_line->p_glyph_pos[ i ].x + p_glyph->left + 2 +
+                i_pitch + ch->pos.x + p_glyph->left + 2 +
                 i_align_offset;
 
             for( y = 0, i_bitmap_offset = 0; y < p_glyph->bitmap.rows; y++ )
@@ -751,52 +754,51 @@ static inline void BlendYUVAGlyph( picture_t *p_picture,
 static inline void BlendYUVALine( picture_t *p_picture,
                                   int i_picture_x, int i_picture_y,
                                   int i_a, int i_y, int i_u, int i_v,
-                                  FT_BitmapGlyph p_glyph_current,
-                                  FT_BitmapGlyph p_glyph_next,
-                                  FT_Vector      *p_pos_current,
-                                  FT_Vector      *p_pos_next,
-                                  int i_line_thickness,
-                                  int i_line_offset,
-                                  bool is_next )
+                                  const line_character_t *p_current,
+                                  const line_character_t *p_next )
 {
-    int i_line_width = p_glyph_current->bitmap.width;
-    if( is_next )
-        i_line_width = (p_pos_next->x    + p_glyph_next->left) -
-                       (p_pos_current->x + p_glyph_current->left);
+    int i_line_width = p_current->p_glyph->bitmap.width;
+    if( p_next && p_next->i_line_thickness > 0 )
+        i_line_width = (p_next->pos.x    + p_next->p_glyph->left) -
+                       (p_current->pos.x + p_current->p_glyph->left);
 
     for( int dx = 0; dx < i_line_width; dx++ )
     {
         /* break the underline around the tails of any glyphs which cross it
            Strikethrough doesn't get broken */
         bool b_ok = true;
-        for( int z = dx - i_line_thickness; z < dx + i_line_thickness && b_ok && i_line_offset >= 0; z++ )
+        for( int z = dx - p_current->i_line_thickness;
+             z < dx + p_current->i_line_thickness && b_ok && p_current->i_line_offset >= 0;
+             z++ )
         {
             FT_BitmapGlyph p_glyph_check = NULL;
             int i_column;
-            if( p_glyph_next && z >= i_line_width )
+            if( p_next && z >= i_line_width )
             {
                 i_column      = z - i_line_width;
-                p_glyph_check = p_glyph_next;
+                p_glyph_check = p_next->p_glyph;
             }
-            else if( z >= 0 && z < p_glyph_current->bitmap.width )
+            else if( z >= 0 && z < p_current->p_glyph->bitmap.width )
             {
                 i_column      = z;
-                p_glyph_check = p_glyph_current;
+                p_glyph_check = p_current->p_glyph;
             }
             if( p_glyph_check )
             {
                 const FT_Bitmap *p_bitmap = &p_glyph_check->bitmap;
-                for( int dy = 0; dy < i_line_thickness && b_ok; dy++ )
+                for( int dy = 0; dy < p_current->i_line_thickness && b_ok; dy++ )
                 {
-                    int i_row = i_line_offset + p_glyph_check->top + dy;
+                    int i_row = p_current->i_line_offset + p_glyph_check->top + dy;
                     b_ok = i_row >= p_bitmap->rows ||
                            p_bitmap->buffer[p_bitmap->width * i_row + i_column] == 0;
                 }
             }
         }
 
-        for( int dy = 0; dy < i_line_thickness && b_ok; dy++ )
-            BlendYUVAPixel( p_picture, i_picture_x + dx, i_picture_y + i_line_offset + dy,
+        for( int dy = 0; dy < p_current->i_line_thickness && b_ok; dy++ )
+            BlendYUVAPixel( p_picture,
+                            i_picture_x + dx,
+                            i_picture_y + p_current->i_line_offset + dy,
                             i_a, i_y, i_u, i_v, 0xff );
     }
 }
@@ -851,34 +853,30 @@ static int RenderYUVA( filter_t *p_filter,
         /* Compute the top alignment
          * FIXME seems bad (it seems that the glyphs are aligned too high) */
         int i_align_top = 0;
-        for( int i = 0; p_line->pp_glyphs[i]; i++ )
-            i_align_top = __MAX( i_align_top, p_line->pp_glyphs[i]->top );
+        for( int i = 0; i < p_line->i_character_count; i++ )
+            i_align_top = __MAX( i_align_top, p_line->p_character[i].p_glyph->top );
 
         /* Render all glyphs and underline/strikethrough */
-        for( int i = 0; p_line->pp_glyphs[i]; i++ )
+        for( int i = 0; i < p_line->i_character_count; i++ )
         {
-            FT_BitmapGlyph p_glyph = p_line->pp_glyphs[i];
+            const line_character_t *ch = &p_line->p_character[i];
+            FT_BitmapGlyph p_glyph = ch->p_glyph;
 
-            uint32_t i_color = p_line->pi_color[i];
-            i_a = 0xff - ((i_color >> 24) & 0xff);
-            YUVFromRGB( i_color, &i_y, &i_u, &i_v );
+            i_a = 0xff - ((ch->i_color >> 24) & 0xff);
+            YUVFromRGB( ch->i_color, &i_y, &i_u, &i_v );
 
-            int i_picture_y = p_line->p_glyph_pos[i].y + i_align_top;
-            int i_picture_x = p_line->p_glyph_pos[i].x + i_align_left + p_glyph->left;
+            int i_picture_y = ch->pos.y + i_align_top;
+            int i_picture_x = ch->pos.x + i_align_left + p_glyph->left;
 
             BlendYUVAGlyph( p_picture, i_picture_x, i_picture_y - p_glyph->top,
                             i_a, i_y, i_u, i_v,
                             p_glyph );
 
-            const int i_line_thickness = p_line->pi_line_thickness[i];
-            const int i_line_offset    = p_line->pi_line_offset[i];
-            if( i_line_thickness > 0 )
+            if( ch->i_line_thickness > 0 )
                 BlendYUVALine( p_picture, i_picture_x, i_picture_y,
                                i_a, i_y, i_u, i_v,
-                               p_glyph, p_line->pp_glyphs[i + 1],
-                               &p_line->p_glyph_pos[i], &p_line->p_glyph_pos[i + 1],
-                               i_line_thickness, i_line_offset,
-                               p_line->pp_glyphs[i + 1] && p_line->pi_line_thickness[i + 1] > 0 );
+                               &ch[0],
+                               i + 1 < p_line->i_character_count ? &ch[1] : NULL );
         }
     }
 
@@ -1465,14 +1463,10 @@ static int ProcessNodes( filter_t *p_filter,
 
 static void FreeLine( line_desc_t *p_line )
 {
-    for( int i = 0; p_line->pp_glyphs && p_line->pp_glyphs[i] != NULL; i++ )
-        FT_Done_Glyph( (FT_Glyph)p_line->pp_glyphs[i] );
+    for( int i = 0; i < p_line->i_character_count; i++ )
+        FT_Done_Glyph( (FT_Glyph)p_line->p_character[i].p_glyph );
 
-    free( p_line->pp_glyphs );
-    free( p_line->p_glyph_pos );
-    free( p_line->pi_color );
-    free( p_line->pi_line_offset );
-    free( p_line->pi_line_thickness );
+    free( p_line->p_character );
     free( p_line );
 }
 
@@ -1493,24 +1487,16 @@ static line_desc_t *NewLine( int i_count )
     if( !p_line )
         return NULL;
 
-    p_line->i_width = 0;
-
     p_line->p_next = NULL;
+    p_line->i_width = 0;
+    p_line->i_character_count = 0;
 
-    p_line->pp_glyphs         = calloc( i_count + 1, sizeof(*p_line->pp_glyphs) );
-    p_line->p_glyph_pos       = calloc( i_count + 1, sizeof(*p_line->p_glyph_pos) );
-    p_line->pi_color          = calloc( i_count + 1, sizeof(*p_line->pi_color) );
-    p_line->pi_line_offset    = calloc( i_count + 1, sizeof(*p_line->pi_line_offset) );
-    p_line->pi_line_thickness = calloc( i_count + 1, sizeof(*p_line->pi_line_thickness) );
-
-    if( !p_line->pp_glyphs || !p_line->p_glyph_pos ||
-        !p_line->pi_color ||
-        !p_line->pi_line_offset || !p_line->pi_line_thickness )
+    p_line->p_character = calloc( i_count, sizeof(*p_line->p_character) );
+    if( !p_line->p_character )
     {
-        FreeLine( p_line );
+        free( p_line );
         return NULL;
     }
-    p_line->pp_glyphs[0] = NULL;
     return p_line;
 }
 
@@ -1921,10 +1907,9 @@ static int ProcessLines( filter_t *p_filter,
                     {
                         msg_Dbg( p_filter, "Breaking line");
                         for( int i = p_bp->i_index; i < i_index; i++ )
-                        {
-                            FT_Done_Glyph( (FT_Glyph)p_line->pp_glyphs[i - i_start] );
-                            p_line->pp_glyphs[i - i_start] = NULL;
-                        }
+                            FT_Done_Glyph( (FT_Glyph)p_line->p_character[i - i_start].p_glyph );
+                        p_line->i_character_count = p_bp->i_index - i_start;
+
                         i_index = p_bp->i_index;
                         pen = p_bp->pen;
                         line_bbox = p_bp->line_bbox;
@@ -1937,12 +1922,14 @@ static int ProcessLines( filter_t *p_filter,
                     break;
                 }
 
-                int i_line_index = i_index - i_start;
-                p_line->pp_glyphs[i_line_index] = (FT_BitmapGlyph)glyph;
-                p_line->p_glyph_pos[i_line_index] = glyph_pos;
-                p_line->pi_color[i_line_index] = i_color;
-                p_line->pi_line_offset[i_line_index] = i_ul_offset;
-                p_line->pi_line_thickness[i_line_index] = i_ul_thickness;
+                assert( p_line->i_character_count == i_index - i_start);
+                p_line->p_character[p_line->i_character_count++] = (line_character_t){
+                    .p_glyph = (FT_BitmapGlyph)glyph,
+                    .pos     = glyph_pos,
+                    .i_color = i_color,
+                    .i_line_offset = i_ul_offset,
+                    .i_line_thickness = i_ul_thickness,
+                };
 
                 pen.x += FT_CEIL(kerning.x) + FT_CEIL(p_current_face->glyph->advance.x);
                 line_bbox = line_bbox_new;
