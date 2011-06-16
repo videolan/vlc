@@ -119,6 +119,9 @@ static void Destroy( vlc_object_t * );
     "fonts that will be rendered on the video. If absolute font size is set, "\
     "relative size will be overridden." )
 
+#define BG_OPACITY_TEXT N_("Background opacity")
+#define BG_COLOR_TEXT N_("Background color")
+
 static const int pi_sizes[] = { 20, 18, 16, 12, 6 };
 static const char *const ppsz_sizes_text[] = {
     N_("Smaller"), N_("Small"), N_("Normal"), N_("Large"), N_("Larger") };
@@ -160,6 +163,14 @@ vlc_module_begin ()
     /* hook to the color values list, with default 0x00ffffff = white */
     add_integer( "freetype-color", 0x00FFFFFF, COLOR_TEXT,
                  COLOR_LONGTEXT, false )
+        change_integer_list( pi_color_values, ppsz_color_descriptions )
+        change_safe()
+
+    add_integer_with_range( "freetype-background-opacity", 0, 0, 255,
+                            BG_OPACITY_TEXT, "", false )
+        change_safe()
+    add_integer( "freetype-background-color", 0x00000000, BG_COLOR_TEXT,
+                 "", false )
         change_integer_list( pi_color_values, ppsz_color_descriptions )
         change_safe()
 
@@ -224,6 +235,9 @@ struct filter_sys_t
     uint8_t        i_font_opacity;
     int            i_font_color;
     int            i_font_size;
+
+    uint8_t        i_background_opacity;
+    int            i_background_color;
 
     int            i_default_font_size;
     int            i_display_height;
@@ -808,10 +822,9 @@ static int RenderYUVA( filter_t *p_filter,
     p_region->fmt = fmt;
 
     /* Initialize the picture background */
-    uint32_t i_background = 0 ? 0x80000000 : 0xff000000;
-    uint8_t i_a = 0xff - ((i_background >> 24) & 0xff);
+    uint8_t i_a = p_sys->i_background_opacity;
     uint8_t i_y, i_u, i_v;
-    YUVFromRGB( i_background, &i_y, &i_u, &i_v );
+    YUVFromRGB( p_sys->i_background_color, &i_y, &i_u, &i_v );
 
     memset( p_picture->p[0].p_pixels, i_y,
             p_picture->p[0].i_pitch * p_picture->p[0].i_lines );
@@ -2204,6 +2217,11 @@ static int Create( vlc_object_t *p_this )
     p_sys->i_font_opacity = __MAX( __MIN( p_sys->i_font_opacity, 255 ), 0 );
     p_sys->i_font_color = var_InheritInteger( p_filter, "freetype-color" );
     p_sys->i_font_color = __MAX( __MIN( p_sys->i_font_color , 0xFFFFFF ), 0 );
+
+    p_sys->i_background_opacity = var_InheritInteger( p_filter,"freetype-background-opacity" );;
+    p_sys->i_background_opacity = __MAX( __MIN( p_sys->i_background_opacity, 255 ), 0 );
+    p_sys->i_background_color = var_InheritInteger( p_filter, "freetype-background-color" );
+    p_sys->i_background_color = __MAX( __MIN( p_sys->i_background_color, 0xFFFFFF ), 0 );
 
 #ifdef WIN32
     /* Get Windows Font folder */
