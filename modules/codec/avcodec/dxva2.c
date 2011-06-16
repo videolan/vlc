@@ -96,6 +96,9 @@ static const GUID DXVA2_ModeH264_E = {
 static const GUID DXVA2_ModeH264_F = {
     0x1b81be69, 0xa0c7,0x11d3, {0xb9,0x84,0x00,0xc0,0x4f,0x2e,0x73,0xc5}
 };
+static const GUID DXVA_ModeH264_VLD_WithFMOASO_NoFGT = {
+    0xd5f04ff9, 0x3418,0x45d8, {0x95,0x61,0x32,0xa7,0x6a,0xae,0x2d,0xdd}
+};
 static const GUID DXVADDI_Intel_ModeH264_A = {
     0x604F8E64, 0x4951,0x4c54, {0x88,0xFE,0xAB,0xD2,0x5C,0x15,0xB3,0xD6}
 };
@@ -165,15 +168,16 @@ static const dxva2_mode_t dxva2_modes[] = {
 
     { "MPEG-1 variable-length decoder",            &DXVA2_ModeMPEG1_VLD,     0 },
 
-    { "H.264 variable-length decoder, film grain technology",                      &DXVA2_ModeH264_F,         CODEC_ID_H264 },
-    { "H.264 variable-length decoder, no film grain technology",                   &DXVA2_ModeH264_E,         CODEC_ID_H264 },
-    { "H.264 variable-length decoder, no film grain technology (Intel ClearVideo)",&DXVADDI_Intel_ModeH264_E, CODEC_ID_H264 },
-    { "H.264 inverse discrete cosine transform, film grain technology",            &DXVA2_ModeH264_D,         0             },
-    { "H.264 inverse discrete cosine transform, no film grain technology",         &DXVA2_ModeH264_C,         0             },
-    { "H.264 inverse discrete cosine transform, no film grain technology (Intel)", &DXVADDI_Intel_ModeH264_C, 0             },
-    { "H.264 motion compensation, film grain technology",                          &DXVA2_ModeH264_B,         0             },
-    { "H.264 motion compensation, no film grain technology",                       &DXVA2_ModeH264_A,         0             },
-    { "H.264 motion compensation, no film grain technology (Intel)",               &DXVADDI_Intel_ModeH264_A, 0             },
+    { "H.264 variable-length decoder, film grain technology",                      &DXVA2_ModeH264_F,                   CODEC_ID_H264 },
+    { "H.264 variable-length decoder, no film grain technology",                   &DXVA2_ModeH264_E,                   CODEC_ID_H264 },
+    { "H.264 variable-length decoder, no film grain technology (Intel ClearVideo)",&DXVADDI_Intel_ModeH264_E,           CODEC_ID_H264 },
+    { "H.264 variable-length decoder, no film grain technology, FMO/ASO",          &DXVA_ModeH264_VLD_WithFMOASO_NoFGT, CODEC_ID_H264 },
+    { "H.264 inverse discrete cosine transform, film grain technology",            &DXVA2_ModeH264_D,                   0             },
+    { "H.264 inverse discrete cosine transform, no film grain technology",         &DXVA2_ModeH264_C,                   0             },
+    { "H.264 inverse discrete cosine transform, no film grain technology (Intel)", &DXVADDI_Intel_ModeH264_C,           0             },
+    { "H.264 motion compensation, film grain technology",                          &DXVA2_ModeH264_B,                   0             },
+    { "H.264 motion compensation, no film grain technology",                       &DXVA2_ModeH264_A,                   0             },
+    { "H.264 motion compensation, no film grain technology (Intel)",               &DXVADDI_Intel_ModeH264_A,           0             },
 
     { "Windows Media Video 8 motion compensation", &DXVA2_ModeWMV8_B, 0 },
     { "Windows Media Video 8 post processing",     &DXVA2_ModeWMV8_A, 0 },
