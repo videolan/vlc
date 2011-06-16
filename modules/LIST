@@ -74,6 +74,7 @@ $Id$
  * cdg: CD-G decoder
  * chain: Video filtering using a chain of video filter modules
  * chorus_flanger: variable delay audio filter
+ * chroma_omx: OMX Development Layer chroma conversions
  * clone: Clone video filter
  * colorthres:  Theshold color based on similarity to reference color Video filter
  * compressor: Dynamic range compressor
