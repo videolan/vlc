@@ -49,6 +49,19 @@ static void I420_YUYV (filter_t *filter, picture_t *src, picture_t *dst)
 
     i420_yuyv_neon (out, yuv, i_pitch, s_offset, height);
 }
+VIDEO_FILTER_WRAPPER (I420_YUYV)
+
+static void YV12_YUYV (filter_t *filter, picture_t *src, picture_t *dst)
+{
+    uint8_t *out = dst->p->p_pixels;
+    const uint8_t *yuv[3] = { src->Y_PIXELS, src->V_PIXELS, src->U_PIXELS, };
+    size_t height = filter->fmt_in.video.i_height;
+    int i_pitch = (dst->p->i_pitch >> 1) & ~0xF;
+    int s_offset = src->p->i_pitch - i_pitch;
+
+    i420_yuyv_neon (out, yuv, i_pitch, s_offset, height);
+}
+VIDEO_FILTER_WRAPPER (YV12_YUYV)
 
 void i420_uyvy_neon (uint8_t *out, const uint8_t **in,
                      uintptr_t pitch, uintptr_t s_off, uintptr_t height);
@@ -63,9 +76,19 @@ static void I420_UYVY (filter_t *filter, picture_t *src, picture_t *dst)
 
     i420_uyvy_neon (out, yuv, i_pitch, s_offset, height);
 }
-
-VIDEO_FILTER_WRAPPER (I420_YUYV)
 VIDEO_FILTER_WRAPPER (I420_UYVY)
+
+static void YV12_UYVY (filter_t *filter, picture_t *src, picture_t *dst)
+{
+    uint8_t *out = dst->p->p_pixels;
+    const uint8_t *yuv[3] = { src->Y_PIXELS, src->V_PIXELS, src->U_PIXELS, };
+    size_t height = filter->fmt_in.video.i_height;
+    int i_pitch = (dst->p->i_pitch >> 1) & ~0xF;
+    int s_offset = src->p->i_pitch - i_pitch;
+
+    i420_uyvy_neon (out, yuv, i_pitch, s_offset, height);
+}
+VIDEO_FILTER_WRAPPER (YV12_UYVY)
 
 static int Open (vlc_object_t *obj)
 {
@@ -78,7 +101,6 @@ static int Open (vlc_object_t *obj)
 
     switch (filter->fmt_in.video.i_chroma)
     {
-        case VLC_CODEC_YV12:
         case VLC_CODEC_I420:
             switch (filter->fmt_out.video.i_chroma)
             {
@@ -87,6 +109,20 @@ static int Open (vlc_object_t *obj)
                     break;
                 case VLC_CODEC_UYVY:
                     filter->pf_video_filter = I420_UYVY_Filter;
+                    break;
+                default:
+                    return VLC_EGENERIC;
+            }
+            break;
+
+        case VLC_CODEC_YV12:
+            switch (filter->fmt_out.video.i_chroma)
+            {
+                case VLC_CODEC_YUYV:
+                    filter->pf_video_filter = YV12_YUYV_Filter;
+                    break;
+                case VLC_CODEC_UYVY:
+                    filter->pf_video_filter = YV12_UYVY_Filter;
                     break;
                 default:
                     return VLC_EGENERIC;
