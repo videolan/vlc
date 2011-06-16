@@ -97,6 +97,7 @@ Video Filter:
  * New deinterlacer mode IVTC, to do live inverse telecine for NTSC films
  * New subsdelay filter to change subtitles delay
  * New anti-flickering filter
+ * New OpenMAX DL IPCS filter for color space conversion and resizing
 
 Audio Filter:
  * New Compressor filter, a dynamic range compressor
