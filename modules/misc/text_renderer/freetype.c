@@ -125,17 +125,6 @@ static const char *const ppsz_sizes_text[] = {
 #define YUVP_TEXT N_("Use YUVP renderer")
 #define YUVP_LONGTEXT N_("This renders the font using \"paletized YUV\". " \
   "This option is only needed if you want to encode into DVB subtitles" )
-#define EFFECT_TEXT N_("Font Effect")
-#define EFFECT_LONGTEXT N_("It is possible to apply effects to the rendered " \
-"text to improve its readability." )
-
-enum { EFFECT_BACKGROUND  = 1,
-       EFFECT_OUTLINE     = 2,
-       EFFECT_OUTLINE_FAT = 3,
-};
-static int const pi_effects[] = { EFFECT_BACKGROUND, EFFECT_OUTLINE, EFFECT_OUTLINE_FAT };
-static const char *const ppsz_effects_text[] = {
-    N_("Background"),N_("Outline"), N_("Fat Outline") };
 
 static const int pi_color_values[] = {
   0x00000000, 0x00808080, 0x00C0C0C0, 0x00FFFFFF, 0x00800000,
@@ -179,10 +168,7 @@ vlc_module_begin ()
         change_integer_list( pi_sizes, ppsz_sizes_text )
         change_safe()
 
-    add_integer( "freetype-effect", 2, EFFECT_TEXT,
-                 EFFECT_LONGTEXT, false )
-        change_integer_list( pi_effects, ppsz_effects_text )
-        change_safe()
+    add_obsolete_integer( "freetype-effect" );
 
     add_bool( "freetype-yuvp", false, YUVP_TEXT,
               YUVP_LONGTEXT, true )
@@ -238,7 +224,6 @@ struct filter_sys_t
     uint8_t        i_font_opacity;
     int            i_font_color;
     int            i_font_size;
-    int            i_effect;
 
     int            i_default_font_size;
     int            i_display_height;
@@ -823,8 +808,7 @@ static int RenderYUVA( filter_t *p_filter,
     p_region->fmt = fmt;
 
     /* Initialize the picture background */
-    uint32_t i_background = p_sys->i_effect == EFFECT_BACKGROUND ? 0x80000000 :
-                                                                   0xff000000;
+    uint32_t i_background = 0 ? 0x80000000 : 0xff000000;
     uint8_t i_a = 0xff - ((i_background >> 24) & 0xff);
     uint8_t i_y, i_u, i_v;
     YUVFromRGB( i_background, &i_y, &i_u, &i_v );
@@ -2216,7 +2200,6 @@ static int Create( vlc_object_t *p_this )
 
     psz_fontfamily = var_InheritString( p_filter, "freetype-font" );
     p_sys->i_default_font_size = var_InheritInteger( p_filter, "freetype-fontsize" );
-    p_sys->i_effect = var_InheritInteger( p_filter, "freetype-effect" );
     p_sys->i_font_opacity = var_InheritInteger( p_filter,"freetype-opacity" );
     p_sys->i_font_opacity = __MAX( __MIN( p_sys->i_font_opacity, 255 ), 0 );
     p_sys->i_font_color = var_InheritInteger( p_filter, "freetype-color" );
