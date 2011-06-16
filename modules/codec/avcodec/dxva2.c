@@ -152,6 +152,15 @@ static const GUID DXVA_Intel_VC1_ClearVideo = {
 static const GUID DXVA_nVidia_MPEG4_ASP = {
     0x9947EC6F, 0x689B,0x11DC, {0xA3,0x20,0x00,0x19,0xDB,0xBC,0x41,0x84}
 };
+static const GUID DXVA_ModeMPEG4pt2_VLD_Simple = {
+    0xefd64d74, 0xc9e8,0x41d7, {0xa5,0xe9,0xe9,0xb0,0xe3,0x9f,0xa3,0x19}
+};
+static const GUID DXVA_ModeMPEG4pt2_VLD_AdvSimple_NoGMC = {
+    0xed418a9f, 0x10d,0x4eda,  {0x9a,0xe3,0x9a,0x65,0x35,0x8d,0x8d,0x2e}
+};
+static const GUID DXVA_ModeMPEG4pt2_VLD_AdvSimple_GMC = {
+    0xab998b5b, 0x4258,0x44a9, {0x9f,0xeb,0x94,0xe5,0x97,0xa6,0xba,0xae}
+};
 
 /* */
 typedef struct {
@@ -196,7 +205,10 @@ static const dxva2_mode_t dxva2_modes[] = {
 
     { "VC-1 variable-length decoder (Intel)",      &DXVA_Intel_VC1_ClearVideo, 0 },
 
-    { "MPEG-4 ASP nVidia bitstream decoder",       &DXVA_nVidia_MPEG4_ASP, 0 },
+    { "MPEG-4 Part 2 nVidia bitstream decoder",                                                         &DXVA_nVidia_MPEG4_ASP,                 0 },
+    { "MPEG-4 Part 2 variable-length decoder, Simple Profile",                                          &DXVA_ModeMPEG4pt2_VLD_Simple,          0 },
+    { "MPEG-4 Part 2 variable-length decoder, Simple&Advanced Profile, no global motion compensation",  &DXVA_ModeMPEG4pt2_VLD_AdvSimple_NoGMC, 0 },
+    { "MPEG-4 Part 2 variable-length decoder, Simple&Advanced Profile, global motion compensation",     &DXVA_ModeMPEG4pt2_VLD_AdvSimple_GMC,   0 },
 
     { NULL, NULL, 0 }
 };
