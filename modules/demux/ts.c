@@ -102,8 +102,9 @@ static void Close ( vlc_object_t * );
 #define MTUOUT_TEXT N_("MTU for out mode")
 #define MTUOUT_LONGTEXT N_("MTU for out mode.")
 
-#define CSA_TEXT N_("CSA ck")
-#define CSA_LONGTEXT N_("Control word for the CSA encryption algorithm")
+#define CSA_TEXT N_("CSA Key")
+#define CSA_LONGTEXT N_("CSA encryption key. This must be a " \
+  "16 char string (8 hexadecimal bytes).")
 
 #define CSA2_TEXT N_("Second CSA Key")
 #define CSA2_LONGTEXT N_("The even CSA encryption key. This must be a " \
@@ -151,7 +152,7 @@ vlc_module_begin ()
     add_integer( "ts-out-mtu", 1400, MTUOUT_TEXT,
                  MTUOUT_LONGTEXT, true )
     add_string( "ts-csa-ck", NULL, CSA_TEXT, CSA_LONGTEXT, true )
-    add_string( "ts-csa2-ck", NULL, CSA_TEXT, CSA_LONGTEXT, true )
+    add_string( "ts-csa2-ck", NULL, CSA2_TEXT, CSA2_LONGTEXT, true )
     add_integer( "ts-csa-pkt", 188, CPKT_TEXT, CPKT_LONGTEXT, true )
     add_bool( "ts-silent", false, SILENT_TEXT, SILENT_LONGTEXT, true )
 
