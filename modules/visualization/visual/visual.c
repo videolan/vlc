@@ -53,35 +53,25 @@
 #define HEIGHT_LONGTEXT N_( \
       "The height of the effects video window, in pixels." )
 
-#define NBBANDS_TEXT N_( "More bands : 80 / 20" )
-#define NBBANDS_LONGTEXT N_( \
-      "More bands for the spectrum analyzer : 80 if enabled else 20." )
+#define NBBANDS_TEXT N_( "Show 80 bands instead of 20" )
 #define SPNBBANDS_LONGTEXT N_( \
       "More bands for the spectrometer : 80 if enabled else 20." )
 
-#define SEPAR_TEXT N_( "Band separator" )
-#define SEPAR_LONGTEXT N_( \
-        "Number of blank pixels between bands.")
+#define SEPAR_TEXT N_( "Number of blank pixels between bands.")
 
 #define AMP_TEXT N_( "Amplification" )
 #define AMP_LONGTEXT N_( \
         "This is a coefficient that modifies the height of the bands.")
 
-#define PEAKS_TEXT N_( "Enable peaks" )
-#define PEAKS_LONGTEXT N_( \
-        "Draw \"peaks\" in the spectrum analyzer." )
+#define PEAKS_TEXT N_( "Draw peaks in the analyzer" )
 
 #define ORIG_TEXT N_( "Enable original graphic spectrum" )
 #define ORIG_LONGTEXT N_( \
         "Enable the \"flat\" spectrum analyzer in the spectrometer." )
 
-#define BANDS_TEXT N_( "Enable bands" )
-#define BANDS_LONGTEXT N_( \
-        "Draw bands in the spectrometer." )
+#define BANDS_TEXT N_( "Draw bands in the spectrometer" )
 
-#define BASE_TEXT N_( "Enable base" )
-#define BASE_LONGTEXT N_( \
-        "Defines whether to draw the base of the bands." )
+#define BASE_TEXT N_( "Draw the base of the bands" )
 
 #define RADIUS_TEXT N_( "Base pixel radius" )
 #define RADIUS_LONGTEXT N_( \
@@ -121,16 +111,16 @@ vlc_module_begin ()
     set_section( N_("Spectrum analyser") , NULL )
     add_obsolete_integer( "visual-nbbands" ) /* Since 1.0.0 */
     add_bool("visual-80-bands", true,
-             NBBANDS_TEXT, NBBANDS_LONGTEXT, true );
+             NBBANDS_TEXT, NBBANDS_TEXT, true );
     add_obsolete_integer( "visual-separ" ) /* Since 1.0.0 */
     add_obsolete_integer( "visual-amp" ) /* Since 1.0.0 */
     add_bool("visual-peaks", true,
-             PEAKS_TEXT, PEAKS_LONGTEXT, true )
+             PEAKS_TEXT, PEAKS_TEXT, true )
     set_section( N_("Spectrometer") , NULL )
     add_bool("spect-show-original", false,
              ORIG_TEXT, ORIG_LONGTEXT, true )
     add_bool("spect-show-base", true,
-             BASE_TEXT, BASE_LONGTEXT, true )
+             BASE_TEXT, BASE_TEXT, true )
     add_integer("spect-radius", 42,
              RADIUS_TEXT, RADIUS_LONGTEXT, true )
     add_integer("spect-sections", 3,
@@ -138,16 +128,16 @@ vlc_module_begin ()
     add_integer("spect-color", 80,
              COLOR1_TEXT, COLOR1_LONGTEXT, true )
     add_bool("spect-show-bands", true,
-             BANDS_TEXT, BANDS_LONGTEXT, true );
+             BANDS_TEXT, BANDS_TEXT, true );
     add_obsolete_integer( "spect-nbbands" ) /* Since 1.0.0 */
     add_bool("spect-80-bands", true,
-             NBBANDS_TEXT, SPNBBANDS_LONGTEXT, true )
+             NBBANDS_TEXT, NBBANDS_TEXT, true )
     add_integer("spect-separ", 1,
-             SEPAR_TEXT, SEPAR_LONGTEXT, true )
+             SEPAR_TEXT, SEPAR_TEXT, true )
     add_integer("spect-amp", 8,
              AMP_TEXT, AMP_LONGTEXT, true )
     add_bool("spect-show-peaks", true,
-             PEAKS_TEXT, PEAKS_LONGTEXT, true )
+             PEAKS_TEXT, PEAKS_TEXT, true )
     add_integer("spect-peak-width", 61,
              PEAK_WIDTH_TEXT, PEAK_WIDTH_LONGTEXT, true )
     add_integer("spect-peak-height", 1,
