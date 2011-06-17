@@ -43,13 +43,6 @@ static int  DecoderOpen   ( vlc_object_t * );
 static int  PacketizerOpen( vlc_object_t * );
 static void DecoderClose  ( vlc_object_t * );
 
-#define DEBUG_TEXT N_("Enable debug")
-
-#define DEBUG_LONGTEXT  \
-    N_("This integer when viewed in binary is a debugging mask\n" \
-    "calls                 1\n" \
-    "packet assembly info  2\n" )
-
 vlc_module_begin ()
     set_description( N_("Philips OGT (SVCD subtitle) decoder") )
     set_shortname( N_("SVCD subtitles") )
@@ -58,8 +51,7 @@ vlc_module_begin ()
     set_capability( "decoder", 50 )
     set_callbacks( DecoderOpen, DecoderClose )
 
-    add_integer ( MODULE_STRING "-debug", 0,
-                  DEBUG_TEXT, DEBUG_LONGTEXT, true )
+    add_obsolete_integer ( MODULE_STRING "-debug" )
 
     add_submodule ()
     set_description( N_("Philips OGT (SVCD subtitle) packetizer") )
@@ -77,9 +69,6 @@ static void ParseHeader( decoder_t *, block_t * );
 static subpicture_t *DecodePacket( decoder_t *, block_t * );
 static void SVCDSubRenderImage( decoder_t *, block_t *, subpicture_region_t * );
 
-#define DECODE_DBG_CALL        1 /* calls */
-#define DECODE_DBG_PACKET      2 /* packet assembly info */
-
 #define GETINT16(p) ( (p[0] <<  8) +   p[1] )  ; p +=2;
 
 #define GETINT32(p) ( (p[0] << 24) +  (p[1] << 16) +    \
@@ -91,21 +80,15 @@ typedef enum  {
   SUBTITLE_BLOCK_COMPLETE = 2
 } packet_state_t;
 
-#ifndef DECODE_DEBUG
-#define DECODE_DEBUG 1
-#endif
-#if DECODE_DEBUG
-#define dbg_print(mask, s, args...) \
-   if (p_sys && p_sys->i_debug & mask) \
+#ifndef NDEBUG
+# define dbg_print( s, args...) \
      msg_Dbg(p_dec, "%s: "s, __func__ , ##args)
 #else
-#define dbg_print(mask, s, args...)
+# define dbg_print( s, args...)
 #endif
 
 struct decoder_sys_t
 {
-  int      i_debug;       /* debugging mask */
-
   packet_state_t i_state; /* data-gathering state for this subtitle */
 
   block_t  *p_spu;        /* Bytes of the packet. */
@@ -148,7 +131,6 @@ static int DecoderOpen( vlc_object_t *p_this )
     if( p_sys == NULL )
         return VLC_ENOMEM;
 
-    p_sys->i_debug = var_InheritInteger( p_this, MODULE_STRING "-debug" );
 
     p_sys->i_image = -1;
 
@@ -160,7 +142,6 @@ static int DecoderOpen( vlc_object_t *p_this )
     p_dec->pf_decode_sub = Decode;
     p_dec->pf_packetize  = Packetize;
 
-    dbg_print( (DECODE_DBG_CALL) , "");
     return VLC_SUCCESS;
 }
 
@@ -192,9 +173,8 @@ void DecoderClose( vlc_object_t *p_this )
 static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
 {
     block_t *p_block, *p_spu;
-    decoder_sys_t *p_sys = p_dec->p_sys;
 
-    dbg_print( (DECODE_DBG_CALL) , "");
+    dbg_print( "" );
 
     if( pp_block == NULL || *pp_block == NULL ) return NULL;
 
@@ -334,8 +314,7 @@ static block_t *Reassemble( decoder_t *p_dec, block_t *p_block )
                       p_spu->i_buffer, p_sys->i_spu_size );
         }
 
-    dbg_print( (DECODE_DBG_PACKET),
-                 "subtitle packet complete, size=%zu", p_spu->i_buffer );
+        dbg_print( "subtitle packet complete, size=%zu", p_spu->i_buffer );
 
         p_sys->i_state = SUBTITLE_BLOCK_EMPTY;
         p_sys->p_spu = 0;
@@ -414,22 +393,23 @@ static void ParseHeader( decoder_t *p_dec, block_t *p_block )
     p_sys->i_image_length  = p_sys->i_spu_size - p_sys->i_image_offset;
     p_sys->metadata_length = p_sys->i_image_offset;
 
-  if( p_sys->i_debug & DECODE_DBG_PACKET )
-  {
-      msg_Dbg( p_dec, "x-start: %d, y-start: %d, width: %d, height %d, "
-           "spu size: %zu, duration: %"PRIu64" (d:%zu p:%"PRIu16")",
-           p_sys->i_x_start, p_sys->i_y_start,
-           p_sys->i_width, p_sys->i_height,
-           p_sys->i_spu_size, p_sys->i_duration,
-           p_sys->i_image_length, p_sys->i_image_offset);
+#ifndef NDEBUG
+    {
+        msg_Dbg( p_dec, "x-start: %d, y-start: %d, width: %d, height %d, "
+                "spu size: %zu, duration: %"PRIu64" (d:%zu p:%"PRIu16")",
+                p_sys->i_x_start, p_sys->i_y_start,
+                p_sys->i_width, p_sys->i_height,
+                p_sys->i_spu_size, p_sys->i_duration,
+                p_sys->i_image_length, p_sys->i_image_offset);
 
-      for( i = 0; i < 4; i++ )
-      {
-          msg_Dbg( p_dec, "palette[%d]= T: %2x, Y: %2x, u: %2x, v: %2x", i,
-           p_sys->p_palette[i][3], p_sys->p_palette[i][0],
-           p_sys->p_palette[i][1], p_sys->p_palette[i][2] );
-      }
-  }
+        for( i = 0; i < 4; i++ )
+        {
+            msg_Dbg( p_dec, "palette[%d]= T: %2x, Y: %2x, u: %2x, v: %2x", i,
+                    p_sys->p_palette[i][3], p_sys->p_palette[i][0],
+                    p_sys->p_palette[i][1], p_sys->p_palette[i][2] );
+        }
+    }
+#endif
 }
 
 /*****************************************************************************
