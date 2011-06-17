@@ -114,12 +114,13 @@ static int vlclua_sd_add_node( lua_State *L )
         lua_getfield( L, -1, "title" );
         if( lua_isstring( L, -1 ) )
         {
-            char *name = strdup( lua_tostring( L, -1 ) );
-            lua_pop( L, 1 );
+            const char *psz_name = lua_tostring( L, -1 );
             input_item_t *p_input = input_item_NewWithType( VLC_OBJECT( p_sd ),
                                                             "vlc://nop",
-                                                            name, 0, NULL, 0,
+                                                            psz_name, 0, NULL, 0,
                                                             -1, ITEM_TYPE_NODE );
+            lua_pop( L, 1 );
+
             if( p_input )
             {
                 lua_getfield( L, -1, "arturl" );
@@ -144,7 +145,6 @@ static int vlclua_sd_add_node( lua_State *L )
                 }
                 lua_setmetatable( L, -2 );
             }
-            free( name );
         }
         else
             msg_Err( p_sd, "vlc.sd.add_node: the \"title\" parameter can't be empty" );
@@ -164,13 +164,14 @@ static int vlclua_sd_add_item( lua_State *L )
         {
             char **ppsz_options = NULL;
             int i_options = 0;
-            char *psz_path = strdup( lua_tostring( L, -1 ) );
-            lua_pop( L, 1 );
+            const char *psz_path = lua_tostring( L, -1 );
             vlclua_read_options( p_sd, L, &i_options, &ppsz_options );
             input_item_t *p_input = input_item_NewExt( p_sd, psz_path, psz_path,
                                                        i_options,
                                                        (const char **)ppsz_options,
                                                        VLC_INPUT_OPTION_TRUSTED, -1 );
+            lua_pop( L, 1 );
+
             if( p_input )
             {
                 vlclua_read_meta_data( p_sd, L, p_input );
@@ -195,7 +196,6 @@ static int vlclua_sd_add_item( lua_State *L )
                 lua_setmetatable( L, -2 );
                 vlc_gc_decref( p_input );
             }
-            free( psz_path );
             while( i_options > 0 )
                 free( ppsz_options[--i_options] );
             free( ppsz_options );
@@ -235,14 +235,15 @@ static int vlclua_node_add_subitem( lua_State *L )
             {
                 char **ppsz_options = NULL;
                 int i_options = 0;
-                char *psz_path = strdup( lua_tostring( L, -1 ) );
-                lua_pop( L, 1 );
+                const char *psz_path = lua_tostring( L, -1 );
                 vlclua_read_options( p_sd, L, &i_options, &ppsz_options );
                 input_item_node_t *p_input_node = input_item_node_Create( *pp_node );
                 input_item_t *p_input = input_item_NewExt( p_sd, psz_path,
                                                            psz_path, i_options,
                                                            (const char **)ppsz_options,
                                                            VLC_INPUT_OPTION_TRUSTED, -1 );
+                lua_pop( L, 1 );
+
                 if( p_input )
                 {
                     vlclua_read_meta_data( p_sd, L, p_input );
@@ -267,7 +268,6 @@ static int vlclua_node_add_subitem( lua_State *L )
                     lua_setmetatable( L, -2 );
                     vlc_gc_decref( p_input );
                 }
-                free( psz_path );
                 while( i_options > 0 )
                     free( ppsz_options[--i_options] );
                 free( ppsz_options );
@@ -292,13 +292,14 @@ static int vlclua_node_add_node( lua_State *L )
             lua_getfield( L, -1, "title" );
             if( lua_isstring( L, -1 ) )
             {
-                char *name = strdup( lua_tostring( L, -1 ) );
-                lua_pop( L, 1 );
+                const char *psz_name = lua_tostring( L, -1 );
                 input_item_node_t *p_input_node = input_item_node_Create( *pp_node );
                 input_item_t *p_input = input_item_NewWithType( VLC_OBJECT( p_sd ),
                                                                 "vlc://nop",
-                                                                name, 0, NULL, 0,
+                                                                psz_name, 0, NULL, 0,
                                                                 -1, ITEM_TYPE_NODE );
+                lua_pop( L, 1 );
+
                 if( p_input )
                 {
                     lua_getfield( L, -1, "arturl" );
@@ -323,7 +324,6 @@ static int vlclua_node_add_node( lua_State *L )
                     }
                     lua_setmetatable( L, -2 );
                 }
-                free( name );
             }
             else
                 msg_Err( p_sd, "node:add_node: the \"title\" parameter can't be empty" );
