@@ -577,11 +577,15 @@ static int SaveConfigFile (vlc_object_t *p_this)
         clearerr (file);
         goto error;
     }
-#if !defined( WIN32 ) && !defined( __OS2__ )
 #if defined(__APPLE__) || defined(__ANDROID__)
     fsync (fd); /* Flush from OS */
 #else
     fdatasync (fd); /* Flush from OS */
+#endif
+#if defined (WIN32) || defined (__OS2__)
+    /* Windows cannot (re)move open files nor overwrite existing ones */
+    fclose (file);
+    vlc_unlink (permanent);
 #endif
     /* Atomically replace the file... */
     if (vlc_rename (temporary, permanent))
@@ -589,14 +593,8 @@ static int SaveConfigFile (vlc_object_t *p_this)
     /* (...then synchronize the directory, err, TODO...) */
     /* ...and finally close the file */
     vlc_mutex_unlock (&lock);
-#endif
+#if !defined (WIN32) && !defined (__OS2__)
     fclose (file);
-#if defined( WIN32 ) || defined( __OS2__ )
-    /* Windows cannot remove open files nor overwrite existing ones */
-    vlc_unlink (permanent);
-    if (vlc_rename (temporary, permanent))
-        vlc_unlink (temporary);
-    vlc_mutex_unlock (&lock);
 #endif
 
     free (temporary);
