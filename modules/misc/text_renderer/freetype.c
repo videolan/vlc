@@ -755,17 +755,20 @@ static inline void BlendYUVALine( picture_t *p_picture,
 static int RenderYUVA( filter_t *p_filter,
                        subpicture_region_t *p_region,
                        line_desc_t *p_line_head,
-                       FT_BBox *p_bbox )
+                       FT_BBox *p_bbox,
+                       int i_margin )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
 
     /* Create a new subpicture region */
+    const int i_text_width  = p_bbox->xMax - p_bbox->xMin;
+    const int i_text_height = p_bbox->yMax - p_bbox->yMin;
     video_format_t fmt;
     video_format_Init( &fmt, VLC_CODEC_YUVA );
     fmt.i_width          =
-    fmt.i_visible_width  = p_bbox->xMax - p_bbox->xMin;
+    fmt.i_visible_width  = i_text_width  + 2 * i_margin;
     fmt.i_height         =
-    fmt.i_visible_height = p_bbox->yMax - p_bbox->yMin;
+    fmt.i_visible_height = i_text_height + 2 * i_margin;
 
     picture_t *p_picture = p_region->p_picture = picture_NewFromFormat( &fmt );
     if( !p_region->p_picture )
@@ -789,16 +792,16 @@ static int RenderYUVA( filter_t *p_filter,
     /* Render all lines */
     for( line_desc_t *p_line = p_line_head; p_line != NULL; p_line = p_line->p_next )
     {
-        /* Left offset to take into account alignment */
-        int i_align_left = 0;
-        if( p_line->i_width < fmt.i_visible_width )
+        int i_align_left = i_margin;
+        if( p_line->i_width < i_text_width )
         {
+            /* Left offset to take into account alignment */
             if( (p_region->i_align & 0x3) == SUBPICTURE_ALIGN_RIGHT )
-                i_align_left = ( fmt.i_visible_width - p_line->i_width );
+                i_align_left += ( i_text_width - p_line->i_width );
             else if( (p_region->i_align & 0x3) != SUBPICTURE_ALIGN_LEFT )
-                i_align_left = ( fmt.i_visible_width - p_line->i_width ) / 2;
+                i_align_left += ( i_text_width - p_line->i_width ) / 2;
         }
-        int i_align_top = 0;
+        int i_align_top = i_margin;
 
         /* Render all glyphs and underline/strikethrough */
         for( int i = 0; i < p_line->i_character_count; i++ )
@@ -1610,7 +1613,8 @@ static void BBoxEnlarge( FT_BBox *p_max, const FT_BBox *p )
 
 static int ProcessLines( filter_t *p_filter,
                          line_desc_t **pp_lines,
-                         FT_BBox   *p_bbox,
+                         FT_BBox     *p_bbox,
+                         int         *pi_max_face_height,
 
                          uint32_t *psz_text,
                          text_style_t **pp_styles,
@@ -1706,6 +1710,7 @@ static int ProcessLines( filter_t *p_filter,
     }
     free( p_new_positions );
 
+    *pi_max_face_height = 0;
     *pp_lines = NULL;
     line_desc_t **pp_line_next = pp_lines;
 
@@ -1967,6 +1972,8 @@ static int ProcessLines( filter_t *p_filter,
             pp_line_next = &p_line->p_next;
         }
 
+        *pi_max_face_height = __MAX( *pi_max_face_height, i_face_height );
+
         /* Skip what we have rendered and the line delimitor if present */
         i_start = i_index;
         if( i_start < i_len && psz_text[i_start] == '\n' )
@@ -2026,6 +2033,7 @@ static int RenderCommon( filter_t *p_filter, subpicture_region_t *p_region_out,
     int rv = VLC_SUCCESS;
     int i_text_length = 0;
     FT_BBox bbox;
+    int i_max_face_height;
     line_desc_t *p_lines = NULL;
 
     uint32_t *pi_k_durations   = NULL;
@@ -2118,7 +2126,7 @@ static int RenderCommon( filter_t *p_filter, subpicture_region_t *p_region_out,
     if( !rv && i_text_length > 0 )
     {
         rv = ProcessLines( p_filter,
-                           &p_lines, &bbox,
+                           &p_lines, &bbox, &i_max_face_height,
                            psz_text, pp_styles, pi_k_durations, i_text_length );
     }
 
@@ -2132,7 +2140,10 @@ static int RenderCommon( filter_t *p_filter, subpicture_region_t *p_region_out,
         if( var_InheritBool( p_filter, "freetype-yuvp" ) )
             RenderYUVP( p_filter, p_region_out, p_lines, &bbox );
         else
-            RenderYUVA( p_filter, p_region_out, p_lines, &bbox );
+            RenderYUVA( p_filter, p_region_out,
+                        p_lines,
+                        &bbox,
+                        p_sys->i_background_opacity > 0 ? i_max_face_height / 4 : 0 );
 
         /* With karaoke, we're going to have to render the text a number
          * of times to show the progress marker on the text.
