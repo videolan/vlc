@@ -404,6 +404,12 @@ void __vlclua_read_meta_data( vlc_object_t *p_this, lua_State *L,
 void __vlclua_read_custom_meta_data( vlc_object_t *p_this, lua_State *L,
                                      input_item_t *p_input )
 {
+    /* Lock the input item and create the meta table if needed */
+    vlc_mutex_lock( &p_input->lock );
+
+    if( !p_input->p_meta )
+        p_input->p_meta = vlc_meta_New();
+
     /* ... item */
     lua_getfield( L, -1, "meta" );
     /* ... item meta */
@@ -414,60 +420,26 @@ void __vlclua_read_custom_meta_data( vlc_object_t *p_this, lua_State *L,
         while( lua_next( L, -2 ) )
         {
             /* ... item meta key value */
-            if( !lua_isstring( L, -2 ) )
+            printf("%s => %s\n", lua_typename(L, lua_type(L, -2)),
+                   lua_typename(L, lua_type(L, -1)));
+            if( !lua_isstring( L, -2 ) || !lua_isstring( L, -1 ) )
             {
-                msg_Warn( p_this, "Custom meta data category name must be "
-                                   "a string" );
+                msg_Err( p_this, "'meta' keys and values must be strings");
+                lua_pop( L, 1 ); /* pop "value" */
+                continue;
             }
-            else if( !lua_istable( L, -1 ) )
-            {
-                msg_Warn( p_this, "Custom meta data category contents "
-                                   "must be a table" );
-            }
-            else
-            {
-                const char *psz_meta_category = lua_tostring( L, -2 );
-                msg_Dbg( p_this, "Found custom meta data category: %s",
-                         psz_meta_category );
-                lua_pushnil( L );
-                /* ... item meta key value nil */
-                while( lua_next( L, -2 ) )
-                {
-                    /* ... item meta key value key2 value2 */
-                    if( !lua_isstring( L, -2 ) )
-                    {
-                        msg_Warn( p_this, "Custom meta category item name "
-                                           "must be a string." );
-                    }
-                    else if( !lua_isstring( L, -1 ) )
-                    {
-                        msg_Warn( p_this, "Custom meta category item value "
-                                           "must be a string." );
-                    }
-                    else
-                    {
-                        const char *psz_meta_name =
-                            lua_tostring( L, -2 );
-                        const char *psz_meta_value =
-                            lua_tostring( L, -1 );
-                        msg_Dbg( p_this, "Custom meta %s, %s: %s",
-                                 psz_meta_category, psz_meta_name,
-                                 psz_meta_value );
-                        input_item_AddInfo( p_input, psz_meta_category,
-                                           psz_meta_name, "%s", psz_meta_value );
-                    }
-                    lua_pop( L, 1 ); /* pop item */
-                    /* ... item meta key value key2 */
-                }
-                /* ... item meta key value */
-            }
-            lua_pop( L, 1 ); /* pop category */
-            /* ... item meta key */
+            const char *psz_key = lua_tostring( L, -2 );
+            const char *psz_value = lua_tostring( L, -1 );
+
+            vlc_meta_AddExtra( p_input->p_meta, psz_key, psz_value );
+
+            lua_pop( L, 1 ); /* pop "value" */
         }
-        /* ... item meta */
     }
     lua_pop( L, 1 ); /* pop "meta" */
     /* ... item -> back to original stack */
+
+    vlc_mutex_unlock( &p_input->lock );
 }
 
 /*****************************************************************************
