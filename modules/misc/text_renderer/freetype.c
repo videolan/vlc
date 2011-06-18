@@ -198,7 +198,7 @@ typedef struct
     FT_BitmapGlyph p_glyph;
     uint32_t       i_color;             /* ARGB color */
     int            i_line_offset;       /* underline/strikethrough offset */
-    uint16_t       i_line_thickness;    /* underline/strikethrough thickness */
+    int            i_line_thickness;    /* underline/strikethrough thickness */
 } line_character_t;
 
 typedef struct line_desc_t line_desc_t;
@@ -1740,11 +1740,15 @@ static int ProcessLines( filter_t *p_filter,
             .xMax = INT_MIN,
             .yMax = INT_MIN,
         };
+        int i_ul_offset = 0;
+        int i_ul_thickness = 0;
         typedef struct {
             int       i_index;
             FT_Vector pen;
             FT_BBox   line_bbox;
             int i_face_height;
+            int i_ul_offset;
+            int i_ul_thickness;
         } break_point_t;
         break_point_t break_point;
         break_point_t break_point_fallback;
@@ -1754,6 +1758,8 @@ static int ProcessLines( filter_t *p_filter,
         dst.pen = pen; \
         dst.line_bbox = line_bbox; \
         dst.i_face_height = i_face_height; \
+        dst.i_ul_offset = i_ul_offset; \
+        dst.i_ul_thickness = i_ul_thickness; \
     } while(0)
 
         SAVE_BP( break_point );
@@ -1837,25 +1843,34 @@ static int ProcessLines( filter_t *p_filter,
                                                 (p_glyph_style->i_karaoke_background_alpha << 24))
                                              : (p_glyph_style->i_font_color |
                                                 (p_glyph_style->i_font_alpha << 24));
-                int i_ul_offset    = 0;
-                int i_ul_thickness = 0;
+                int i_line_offset    = 0;
+                int i_line_thickness = 0;
                 if( p_glyph_style->i_style_flags & (STYLE_UNDERLINE | STYLE_STRIKEOUT) )
                 {
-                    i_ul_offset = abs( FT_FLOOR(FT_MulFix(p_current_face->underline_position,
-                                                          p_current_face->size->metrics.y_scale)) );
-
-                    i_ul_thickness = abs( FT_CEIL(FT_MulFix(p_current_face->underline_thickness,
+                    i_line_offset = abs( FT_FLOOR(FT_MulFix(p_current_face->underline_position,
                                                             p_current_face->size->metrics.y_scale)) );
+
+                    i_line_thickness = abs( FT_CEIL(FT_MulFix(p_current_face->underline_thickness,
+                                                              p_current_face->size->metrics.y_scale)) );
 
                     if( p_glyph_style->i_style_flags & STYLE_STRIKEOUT )
                     {
                         /* Move the baseline to make it strikethrough instead of
                          * underline. That means that strikethrough takes precedence
                          */
-                        i_ul_offset -= abs( FT_FLOOR(FT_MulFix(p_current_face->descender*2,
-                                                               p_current_face->size->metrics.y_scale)) );
+                        i_line_offset -= abs( FT_FLOOR(FT_MulFix(p_current_face->descender*2,
+                                                                 p_current_face->size->metrics.y_scale)) );
                     }
-                    glyph_bbox.yMin = __MIN( glyph_bbox.yMin, - i_ul_offset - i_ul_thickness );
+                    else if( i_line_thickness > 0 )
+                    {
+                        glyph_bbox.yMin = __MIN( glyph_bbox.yMin, - i_line_offset - i_line_thickness );
+
+                        /* The real underline thickness and position are
+                         * updated once the whole line has been parsed */
+                        i_ul_offset = __MAX( i_ul_offset, i_line_offset );
+                        i_ul_thickness = __MAX( i_ul_thickness, i_line_thickness );
+                        i_line_thickness = -1;
+                    }
                 }
                 FT_BBox line_bbox_new = line_bbox;
                 BBoxEnlarge( &line_bbox_new, &glyph_bbox );
@@ -1883,6 +1898,8 @@ static int ProcessLines( filter_t *p_filter,
                         pen = p_bp->pen;
                         line_bbox = p_bp->line_bbox;
                         i_face_height = p_bp->i_face_height;
+                        i_ul_offset = p_bp->i_ul_offset;
+                        i_ul_thickness = p_bp->i_ul_thickness;
                     }
                     else
                     {
@@ -1895,8 +1912,8 @@ static int ProcessLines( filter_t *p_filter,
                 p_line->p_character[p_line->i_character_count++] = (line_character_t){
                     .p_glyph = (FT_BitmapGlyph)glyph,
                     .i_color = i_color,
-                    .i_line_offset = i_ul_offset,
-                    .i_line_thickness = i_ul_thickness,
+                    .i_line_offset = i_line_offset,
+                    .i_line_thickness = i_line_thickness,
                 };
 
                 pen.x = pen_new.x + p_current_face->glyph->advance.x;
@@ -1933,6 +1950,18 @@ static int ProcessLines( filter_t *p_filter,
         {
             p_line->i_width  = __MAX(line_bbox.xMax - line_bbox.xMin, 0);
             p_line->i_base_line = i_base_line;
+            if( i_ul_thickness > 0 )
+            {
+                for( int i = 0; i < p_line->i_character_count; i++ )
+                {
+                    line_character_t *ch = &p_line->p_character[i];
+                    if( ch->i_line_thickness < 0 )
+                    {
+                        ch->i_line_offset    = i_ul_offset;
+                        ch->i_line_thickness = i_ul_thickness;
+                    }
+                }
+            }
 
             *pp_line_next = p_line;
             pp_line_next = &p_line->p_next;
