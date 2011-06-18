@@ -196,7 +196,6 @@ vlc_module_end ()
 typedef struct
 {
     FT_BitmapGlyph p_glyph;
-    FT_Vector      pos;                 /* Relative position */
     uint32_t       i_color;             /* ARGB color */
     int            i_line_offset;       /* underline/strikethrough offset */
     uint16_t       i_line_thickness;    /* underline/strikethrough thickness */
@@ -208,7 +207,7 @@ struct line_desc_t
     line_desc_t    *p_next;
 
     int              i_width;
-
+    int              i_base_line;
     int              i_character_count;
     line_character_t *p_character;
 };
@@ -564,7 +563,8 @@ static char* Win32_Select( filter_t *p_filter, const char* family,
  * This function merges the previously rendered freetype glyphs into a picture
  *****************************************************************************/
 static int RenderYUVP( filter_t *p_filter, subpicture_region_t *p_region,
-                       line_desc_t *p_line, int i_width, int i_height )
+                       line_desc_t *p_line,
+                       FT_BBox *p_bbox )
 {
     VLC_UNUSED(p_filter);
     static const uint8_t pi_gamma[16] =
@@ -577,17 +577,11 @@ static int RenderYUVP( filter_t *p_filter, subpicture_region_t *p_region,
     uint8_t i_y, i_u, i_v; /* YUV values, derived from incoming RGB */
 
     /* Create a new subpicture region */
-    memset( &fmt, 0, sizeof(video_format_t) );
-    fmt.i_chroma = VLC_CODEC_YUVP;
-    fmt.i_width = fmt.i_visible_width = i_width + 4;
-    fmt.i_height = fmt.i_visible_height = i_height + 4;
-    if( p_region->fmt.i_visible_width > 0 )
-        fmt.i_visible_width = p_region->fmt.i_visible_width;
-    if( p_region->fmt.i_visible_height > 0 )
-        fmt.i_visible_height = p_region->fmt.i_visible_height;
-    fmt.i_x_offset = fmt.i_y_offset = 0;
-    fmt.i_sar_num = 1;
-    fmt.i_sar_den = 1;
+    video_format_Init( &fmt, VLC_CODEC_YUVP );
+    fmt.i_width          =
+    fmt.i_visible_width  = p_bbox->xMax - p_bbox->xMin + 4;
+    fmt.i_height         =
+    fmt.i_visible_height = p_bbox->yMax - p_bbox->yMin + 4;
 
     assert( !p_region->p_picture );
     p_region->p_picture = picture_NewFromFormat( &fmt );
@@ -630,45 +624,32 @@ static int RenderYUVP( filter_t *p_filter, subpicture_region_t *p_region,
 
     for( ; p_line != NULL; p_line = p_line->p_next )
     {
-        int i_glyph_tmax = 0;
-        int i_bitmap_offset, i_offset, i_align_offset = 0;
-        for( i = 0; i < p_line->i_character_count; i++ )
-        {
-            FT_BitmapGlyph p_glyph = p_line->p_character[i].p_glyph;
-            i_glyph_tmax = __MAX( i_glyph_tmax, p_glyph->top );
-        }
-
-        if( p_line->i_width < i_width )
+        int i_align_left = 0;
+        if( p_line->i_width < fmt.i_visible_width )
         {
             if( (p_region->i_align & 0x3) == SUBPICTURE_ALIGN_RIGHT )
-            {
-                i_align_offset = i_width - p_line->i_width;
-            }
+                i_align_left = ( fmt.i_visible_width - p_line->i_width );
             else if( (p_region->i_align & 0x3) != SUBPICTURE_ALIGN_LEFT )
-            {
-                i_align_offset = ( i_width - p_line->i_width ) / 2;
-            }
+                i_align_left = ( fmt.i_visible_width - p_line->i_width ) / 2;
         }
+        int i_align_top = 0;
 
         for( i = 0; i < p_line->i_character_count; i++ )
         {
             const line_character_t *ch = &p_line->p_character[i];
             FT_BitmapGlyph p_glyph = ch->p_glyph;
 
-            i_offset = ( ch->pos.y +
-                i_glyph_tmax - p_glyph->top + 2 ) *
-                i_pitch + ch->pos.x + p_glyph->left + 2 +
-                i_align_offset;
+            int i_glyph_y = i_align_top  - p_glyph->top  + p_bbox->yMax + p_line->i_base_line;
+            int i_glyph_x = i_align_left + p_glyph->left - p_bbox->xMin;
 
-            for( y = 0, i_bitmap_offset = 0; y < p_glyph->bitmap.rows; y++ )
+            for( y = 0; y < p_glyph->bitmap.rows; y++ )
             {
-                for( x = 0; x < p_glyph->bitmap.width; x++, i_bitmap_offset++ )
+                for( x = 0; x < p_glyph->bitmap.width; x++ )
                 {
-                    if( p_glyph->bitmap.buffer[i_bitmap_offset] )
-                        p_dst[i_offset+x] =
-                         ((int)p_glyph->bitmap.buffer[i_bitmap_offset] + 8)/16;
+                    if( p_glyph->bitmap.buffer[y * p_glyph->bitmap.width + x] )
+                        p_dst[(i_glyph_y + y) * i_pitch + (i_glyph_x + x)] =
+                            (p_glyph->bitmap.buffer[y * p_glyph->bitmap.width + x] + 8)/16;
                 }
-                i_offset += i_pitch;
             }
         }
     }
@@ -758,44 +739,12 @@ static inline void BlendYUVALine( picture_t *p_picture,
                                   const line_character_t *p_next )
 {
     int i_line_width = p_current->p_glyph->bitmap.width;
-    if( p_next && p_next->i_line_thickness > 0 )
-        i_line_width = (p_next->pos.x    + p_next->p_glyph->left) -
-                       (p_current->pos.x + p_current->p_glyph->left);
+    if( p_next )
+        i_line_width = p_next->p_glyph->left - p_current->p_glyph->left;
 
     for( int dx = 0; dx < i_line_width; dx++ )
     {
-        /* break the underline around the tails of any glyphs which cross it
-           Strikethrough doesn't get broken */
-        bool b_ok = true;
-        for( int z = dx - p_current->i_line_thickness;
-             z < dx + p_current->i_line_thickness && b_ok && p_current->i_line_offset >= 0;
-             z++ )
-        {
-            FT_BitmapGlyph p_glyph_check = NULL;
-            int i_column;
-            if( p_next && z >= i_line_width )
-            {
-                i_column      = z - i_line_width;
-                p_glyph_check = p_next->p_glyph;
-            }
-            else if( z >= 0 && z < p_current->p_glyph->bitmap.width )
-            {
-                i_column      = z;
-                p_glyph_check = p_current->p_glyph;
-            }
-            if( p_glyph_check )
-            {
-                const FT_Bitmap *p_bitmap = &p_glyph_check->bitmap;
-                for( int dy = 0; dy < p_current->i_line_thickness && b_ok; dy++ )
-                {
-                    int i_row = p_current->i_line_offset + p_glyph_check->top + dy;
-                    b_ok = i_row >= p_bitmap->rows ||
-                           p_bitmap->buffer[p_bitmap->width * i_row + i_column] == 0;
-                }
-            }
-        }
-
-        for( int dy = 0; dy < p_current->i_line_thickness && b_ok; dy++ )
+        for( int dy = 0; dy < p_current->i_line_thickness; dy++ )
             BlendYUVAPixel( p_picture,
                             i_picture_x + dx,
                             i_picture_y + p_current->i_line_offset + dy,
@@ -806,7 +755,7 @@ static inline void BlendYUVALine( picture_t *p_picture,
 static int RenderYUVA( filter_t *p_filter,
                        subpicture_region_t *p_region,
                        line_desc_t *p_line_head,
-                       int i_width, int i_height )
+                       FT_BBox *p_bbox )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
 
@@ -814,9 +763,9 @@ static int RenderYUVA( filter_t *p_filter,
     video_format_t fmt;
     video_format_Init( &fmt, VLC_CODEC_YUVA );
     fmt.i_width          =
-    fmt.i_visible_width  = i_width;
+    fmt.i_visible_width  = p_bbox->xMax - p_bbox->xMin;
     fmt.i_height         =
-    fmt.i_visible_height = i_height;
+    fmt.i_visible_height = p_bbox->yMax - p_bbox->yMin;
 
     picture_t *p_picture = p_region->p_picture = picture_NewFromFormat( &fmt );
     if( !p_region->p_picture )
@@ -842,19 +791,14 @@ static int RenderYUVA( filter_t *p_filter,
     {
         /* Left offset to take into account alignment */
         int i_align_left = 0;
-        if( p_line->i_width < i_width )
+        if( p_line->i_width < fmt.i_visible_width )
         {
             if( (p_region->i_align & 0x3) == SUBPICTURE_ALIGN_RIGHT )
-                i_align_left = i_width - p_line->i_width;
+                i_align_left = ( fmt.i_visible_width - p_line->i_width );
             else if( (p_region->i_align & 0x3) != SUBPICTURE_ALIGN_LEFT )
-                i_align_left = ( i_width - p_line->i_width ) / 2;
+                i_align_left = ( fmt.i_visible_width - p_line->i_width ) / 2;
         }
-
-        /* Compute the top alignment
-         * FIXME seems bad (it seems that the glyphs are aligned too high) */
         int i_align_top = 0;
-        for( int i = 0; i < p_line->i_character_count; i++ )
-            i_align_top = __MAX( i_align_top, p_line->p_character[i].p_glyph->top );
 
         /* Render all glyphs and underline/strikethrough */
         for( int i = 0; i < p_line->i_character_count; i++ )
@@ -865,15 +809,17 @@ static int RenderYUVA( filter_t *p_filter,
             i_a = 0xff - ((ch->i_color >> 24) & 0xff);
             YUVFromRGB( ch->i_color, &i_y, &i_u, &i_v );
 
-            int i_picture_y = ch->pos.y + i_align_top;
-            int i_picture_x = ch->pos.x + i_align_left + p_glyph->left;
+            int i_glyph_y = i_align_top  - p_glyph->top  + p_bbox->yMax + p_line->i_base_line;
+            int i_glyph_x = i_align_left + p_glyph->left - p_bbox->xMin;
 
-            BlendYUVAGlyph( p_picture, i_picture_x, i_picture_y - p_glyph->top,
+            BlendYUVAGlyph( p_picture,
+                            i_glyph_x, i_glyph_y,
                             i_a, i_y, i_u, i_v,
                             p_glyph );
 
             if( ch->i_line_thickness > 0 )
-                BlendYUVALine( p_picture, i_picture_x, i_picture_y,
+                BlendYUVALine( p_picture,
+                               i_glyph_x, i_glyph_y + p_glyph->top,
                                i_a, i_y, i_u, i_v,
                                &ch[0],
                                i + 1 < p_line->i_character_count ? &ch[1] : NULL );
@@ -1489,6 +1435,7 @@ static line_desc_t *NewLine( int i_count )
 
     p_line->p_next = NULL;
     p_line->i_width = 0;
+    p_line->i_base_line = 0;
     p_line->i_character_count = 0;
 
     p_line->p_character = calloc( i_count, sizeof(*p_line->p_character) );
@@ -1613,7 +1560,8 @@ static int GetGlyph( filter_t *p_filter,
 
                      FT_Face  p_face,
                      int i_glyph_index,
-                     int i_style_flags )
+                     int i_style_flags,
+                     FT_Vector *p_pen )
 {
     if( FT_Load_Glyph( p_face, i_glyph_index, FT_LOAD_NO_BITMAP | FT_LOAD_DEFAULT ) &&
         FT_Load_Glyph( p_face, i_glyph_index, FT_LOAD_DEFAULT ) )
@@ -1638,23 +1586,31 @@ static int GetGlyph( filter_t *p_filter,
         return VLC_EGENERIC;
     }
 
-    FT_BBox bbox;
-    FT_Glyph_Get_CBox( glyph, ft_glyph_bbox_pixels, &bbox );
-
-    if( FT_Glyph_To_Bitmap( &glyph, FT_RENDER_MODE_NORMAL, 0, 1) )
+    if( FT_Glyph_To_Bitmap( &glyph, FT_RENDER_MODE_NORMAL, p_pen, 1) )
     {
         FT_Done_Glyph( glyph );
         return VLC_EGENERIC;
     }
+
+    FT_BBox bbox;
+    FT_Glyph_Get_CBox( glyph, ft_glyph_bbox_pixels, &bbox );
 
     *pp_glyph = glyph;
     *p_bbox   = bbox;
     return VLC_SUCCESS;
 }
 
+static void BBoxEnlarge( FT_BBox *p_max, const FT_BBox *p )
+{
+    p_max->xMin = __MIN(p_max->xMin, p->xMin);
+    p_max->yMin = __MIN(p_max->yMin, p->yMin);
+    p_max->xMax = __MAX(p_max->xMax, p->xMax);
+    p_max->yMax = __MAX(p_max->yMax, p->yMax);
+}
+
 static int ProcessLines( filter_t *p_filter,
                          line_desc_t **pp_lines,
-                         FT_Vector   *p_size,
+                         FT_BBox   *p_bbox,
 
                          uint32_t *psz_text,
                          text_style_t **pp_styles,
@@ -1754,12 +1710,13 @@ static int ProcessLines( filter_t *p_filter,
     line_desc_t **pp_line_next = pp_lines;
 
     FT_BBox bbox = {
-        .xMin = 0,
-        .yMin = 0,
-        .xMax = 0,
-        .yMax = 0,
+        .xMin = INT_MAX,
+        .yMin = INT_MAX,
+        .xMax = INT_MIN,
+        .yMax = INT_MIN,
     };
-    FT_Vector pen = { .x = 0, .y = 0 };
+    int i_face_height_previous = 0;
+    int i_base_line = 0;
     const text_style_t *p_previous_style = NULL;
     FT_Face p_face = NULL;
     for( int i_start = 0; i_start < i_len; )
@@ -1772,13 +1729,16 @@ static int ProcessLines( filter_t *p_filter,
         /* Render the text line (or the begining if too long) into 0 or 1 glyph line */
         line_desc_t *p_line = i_length > 0 ? NewLine( i_length ) : NULL;
         int i_index = i_start;
-        pen.x = 0;
+        FT_Vector pen = {
+            .x = 0,
+            .y = 0,
+        };
         int i_face_height = 0;
         FT_BBox line_bbox = {
-            .xMin = 0,
-            .yMin = 0,
-            .xMax = 0,
-            .yMax = 0,
+            .xMin = INT_MAX,
+            .yMin = INT_MAX,
+            .xMax = INT_MIN,
+            .yMax = INT_MIN,
         };
         typedef struct {
             int       i_index;
@@ -1830,7 +1790,8 @@ static int ProcessLines( filter_t *p_filter,
             }
             p_previous_style = p_current_style;
 
-            i_face_height = __MAX(i_face_height, FT_CEIL(p_current_face->size->metrics.height));
+            i_face_height = __MAX(i_face_height, FT_CEIL(FT_MulFix(p_current_face->height,
+                                                                   p_current_face->size->metrics.y_scale)));
 
             /* Render the part */
             bool b_break_line = false;
@@ -1847,16 +1808,30 @@ static int ProcessLines( filter_t *p_filter,
                     FT_Get_Kerning( p_current_face, i_glyph_last, i_glyph_index, ft_kerning_default, &kerning );
 
                 /* Get the glyph bitmap and its bounding box and all the associated properties */
+                FT_Vector pen_new = {
+                    .x = pen.x + kerning.x,
+                    .y = pen.y + kerning.y,
+                };
                 FT_Glyph glyph;
                 FT_BBox  glyph_bbox;
                 if( GetGlyph( p_filter, &glyph, &glyph_bbox,
-                              p_current_face, i_glyph_index, p_glyph_style->i_style_flags ) )
+                              p_current_face, i_glyph_index, p_glyph_style->i_style_flags, &pen_new ) )
                     goto next;
 
-                FT_Vector glyph_pos = {
-                    .x = pen.x + FT_CEIL(kerning.x),
-                    .y = pen.y
-                };
+                FT_BitmapGlyph glyph_bmp = (FT_BitmapGlyph)glyph;
+                if( glyph_bbox.xMin >= glyph_bbox.xMax )
+                {
+                    glyph_bbox.xMin = FT_CEIL(pen_new.x);
+                    glyph_bbox.xMax = FT_CEIL(pen_new.x + p_current_face->glyph->advance.x);
+                    glyph_bmp->left = glyph_bbox.xMin;
+                }
+                if( glyph_bbox.yMin >= glyph_bbox.yMax )
+                {
+                    glyph_bbox.yMax = FT_CEIL(pen_new.y);
+                    glyph_bbox.yMin = FT_CEIL(pen_new.y + p_current_face->glyph->advance.y);
+                    glyph_bmp->top  = glyph_bbox.yMax;
+                }
+
                 bool     b_karaoke = pi_karaoke_bar && pi_karaoke_bar[i_index] != 0;
                 uint32_t i_color = b_karaoke ? (p_glyph_style->i_karaoke_background_color |
                                                 (p_glyph_style->i_karaoke_background_alpha << 24))
@@ -1880,19 +1855,13 @@ static int ProcessLines( filter_t *p_filter,
                         i_ul_offset -= abs( FT_FLOOR(FT_MulFix(p_current_face->descender*2,
                                                                p_current_face->size->metrics.y_scale)) );
                     }
+                    glyph_bbox.yMin = __MIN( glyph_bbox.yMin, - i_ul_offset - i_ul_thickness );
                 }
-                FT_BitmapGlyph glyph_bmp = (FT_BitmapGlyph)glyph;
-                FT_BBox line_bbox_new = {
-                    .xMin = 0,
-                    .xMax = __MAX( line_bbox.xMax,
-                                   glyph_pos.x + glyph_bbox.xMax - glyph_bbox.xMin + glyph_bmp->left ),
-                    .yMin = 0,
-                    .yMax = __MAX( line_bbox.yMax,
-                                   glyph_pos.y + glyph_bbox.yMax - glyph_bbox.yMin + glyph_bmp->top ),
-                };
+                FT_BBox line_bbox_new = line_bbox;
+                BBoxEnlarge( &line_bbox_new, &glyph_bbox );
 
                 b_break_line = i_index > i_start &&
-                               line_bbox_new.xMax >= p_filter->fmt_out.video.i_visible_width;
+                               line_bbox_new.xMax - line_bbox_new.xMin >= p_filter->fmt_out.video.i_visible_width;
                 if( b_break_line )
                 {
                     FT_Done_Glyph( glyph );
@@ -1925,13 +1894,13 @@ static int ProcessLines( filter_t *p_filter,
                 assert( p_line->i_character_count == i_index - i_start);
                 p_line->p_character[p_line->i_character_count++] = (line_character_t){
                     .p_glyph = (FT_BitmapGlyph)glyph,
-                    .pos     = glyph_pos,
                     .i_color = i_color,
                     .i_line_offset = i_ul_offset,
                     .i_line_thickness = i_ul_thickness,
                 };
 
-                pen.x += FT_CEIL(kerning.x) + FT_CEIL(p_current_face->glyph->advance.x);
+                pen.x = pen_new.x + p_current_face->glyph->advance.x;
+                pen.y = pen_new.y + p_current_face->glyph->advance.y;
                 line_bbox = line_bbox_new;
             next:
                 i_glyph_last = i_glyph_index;
@@ -1947,15 +1916,24 @@ static int ProcessLines( filter_t *p_filter,
                 break;
         }
 #undef SAVE_BP
-        bbox.xMax = __MAX(bbox.xMax, line_bbox.xMax);
-        bbox.yMax = __MAX(bbox.yMax, line_bbox.yMax);
+        /* Update our baseline */
+        if( i_face_height_previous > 0 )
+            i_base_line += __MAX(i_face_height, i_face_height_previous);
+        i_face_height_previous = i_face_height;
 
-        pen.y += i_face_height;
+        /* Update the line bbox with the actual base line */
+        if (line_bbox.yMax > line_bbox.yMin) {
+            line_bbox.yMin -= i_base_line;
+            line_bbox.yMax -= i_base_line;
+        }
+        BBoxEnlarge( &bbox, &line_bbox );
 
         /* Terminate and append the line */
         if( p_line )
         {
-            p_line->i_width  = line_bbox.xMax - line_bbox.xMin;
+            p_line->i_width  = __MAX(line_bbox.xMax - line_bbox.xMin, 0);
+            p_line->i_base_line = i_base_line;
+
             *pp_line_next = p_line;
             pp_line_next = &p_line->p_next;
         }
@@ -1965,7 +1943,7 @@ static int ProcessLines( filter_t *p_filter,
         if( i_start < i_len && psz_text[i_start] == '\n' )
             i_start++;
 
-        if( bbox.yMax >= p_filter->fmt_out.video.i_visible_height )
+        if( bbox.yMax - bbox.yMin >= p_filter->fmt_out.video.i_visible_height )
         {
             msg_Err( p_filter, "Truncated too high subtitle" );
             break;
@@ -1978,8 +1956,7 @@ static int ProcessLines( filter_t *p_filter,
     free( p_fribidi_string );
     free( pi_karaoke_bar );
 
-    p_size->x = bbox.xMax - bbox.xMin;
-    p_size->y = bbox.yMax - bbox.yMin;
+    *p_bbox = bbox;
     return VLC_SUCCESS;
 }
 
@@ -2019,7 +1996,7 @@ static int RenderCommon( filter_t *p_filter, subpicture_region_t *p_region_out,
     /* */
     int rv = VLC_SUCCESS;
     int i_text_length = 0;
-    FT_Vector result = {0, 0};
+    FT_BBox bbox;
     line_desc_t *p_lines = NULL;
 
     uint32_t *pi_k_durations   = NULL;
@@ -2112,7 +2089,7 @@ static int RenderCommon( filter_t *p_filter, subpicture_region_t *p_region_out,
     if( !rv && i_text_length > 0 )
     {
         rv = ProcessLines( p_filter,
-                           &p_lines, &result,
+                           &p_lines, &bbox,
                            psz_text, pp_styles, pi_k_durations, i_text_length );
     }
 
@@ -2121,15 +2098,12 @@ static int RenderCommon( filter_t *p_filter, subpicture_region_t *p_region_out,
 
     /* Don't attempt to render text that couldn't be layed out
      * properly. */
-    if( !rv && i_text_length > 0 && result.x > 0 && result.y > 0)
+    if( !rv && i_text_length > 0 && bbox.xMin < bbox.xMax && bbox.yMin < bbox.yMax )
     {
         if( var_InheritBool( p_filter, "freetype-yuvp" ) )
-            RenderYUVP( p_filter, p_region_out, p_lines,
-                        result.x, result.y );
+            RenderYUVP( p_filter, p_region_out, p_lines, &bbox );
         else
-            RenderYUVA( p_filter, p_region_out, p_lines,
-                        result.x, result.y );
-
+            RenderYUVA( p_filter, p_region_out, p_lines, &bbox );
 
         /* With karaoke, we're going to have to render the text a number
          * of times to show the progress marker on the text.
