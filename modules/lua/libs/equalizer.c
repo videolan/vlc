@@ -35,10 +35,13 @@
 #include <vlc_common.h>
 #include <vlc_aout.h>
 #include <vlc_input.h>
+
 #include <lua.h>        /* Low level lua C API */
 #include <lauxlib.h>    /* Higher level C API */
-#include <lualib.h>     /* Lua libs */
+
 #include "input.h"
+#include "../libs.h"
+
 /*****************************************************************************
 * Get the preamp level
 *****************************************************************************/
