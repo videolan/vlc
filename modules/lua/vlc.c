@@ -420,8 +420,6 @@ void __vlclua_read_custom_meta_data( vlc_object_t *p_this, lua_State *L,
         while( lua_next( L, -2 ) )
         {
             /* ... item meta key value */
-            printf("%s => %s\n", lua_typename(L, lua_type(L, -2)),
-                   lua_typename(L, lua_type(L, -1)));
             if( !lua_isstring( L, -2 ) || !lua_isstring( L, -1 ) )
             {
                 msg_Err( p_this, "'meta' keys and values must be strings");
