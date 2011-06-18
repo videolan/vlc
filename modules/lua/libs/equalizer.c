@@ -50,6 +50,9 @@ static int vlclua_preamp_get( lua_State *L )
         aout_instance_t *p_aout = input_GetAout( p_input );
         float preamp = var_GetFloat( p_aout, "equalizer-preamp");
         lua_pushnumber( L, preamp );
+
+        vlc_object_release( p_aout );
+        vlc_object_release( p_input );
         return 1;
     }
     return 0;
@@ -67,6 +70,9 @@ static int vlclua_preamp_set( lua_State *L )
         float preamp = luaL_checknumber( L, 1 );
         var_SetFloat( p_aout, "equalizer-preamp",preamp);
         lua_pushnumber( L, preamp );
+
+        vlc_object_release( p_aout );
+        vlc_object_release( p_input );
         return 1;
     }
     return 0;
