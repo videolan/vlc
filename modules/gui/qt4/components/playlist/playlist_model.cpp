@@ -854,9 +854,8 @@ void PLModel::search( const QString& search_text, const QModelIndex & idx, bool 
         playlist_item_t *p_root = playlist_ItemGetById( p_playlist,
                                                         itemId( idx ) );
         assert( p_root );
-        const char *psz_name = qtu( search_text );
-        playlist_LiveSearchUpdate( p_playlist , p_root, psz_name, b_recursive );
-
+        playlist_LiveSearchUpdate( p_playlist , p_root, qtu( search_text ),
+                                   b_recursive );
         if( idx.isValid() )
         {
             PLItem *searchRoot = getItem( idx );
