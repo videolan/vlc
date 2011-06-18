@@ -181,6 +181,10 @@ char *getcwd (char *buf, size_t size);
 pid_t getpid (void);
 #endif
 
+#ifndef HAVE_FSYNC
+int fsync (int fd);
+#endif
+
 /* dirent.h */
 #ifndef HAVE_DIRFD
 #ifdef __APPLE__
