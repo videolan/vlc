@@ -726,12 +726,10 @@ void DialogsProvider::menuUpdateAction( QObject *data )
 
 void DialogsProvider::SDMenuAction( const QString& data )
 {
-    char *psz_sd = strdup( qtu( data ) );
-    if( !playlist_IsServicesDiscoveryLoaded( THEPL, psz_sd ) )
-        playlist_ServicesDiscoveryAdd( THEPL, psz_sd );
+    if( !playlist_IsServicesDiscoveryLoaded( THEPL, qtu( data ) ) )
+        playlist_ServicesDiscoveryAdd( THEPL, qtu( data ) );
     else
-        playlist_ServicesDiscoveryRemove( THEPL, psz_sd );
-    free( psz_sd );
+        playlist_ServicesDiscoveryRemove( THEPL, qtu( data ) );
 }
 
 /**

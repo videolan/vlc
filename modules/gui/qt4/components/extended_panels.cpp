@@ -615,15 +615,16 @@ void ExtVideo::updateFilterOptions()
     }
     else if( i_type == VLC_VAR_STRING )
     {
-        char *psz_string = NULL;
-        if( lineedit ) psz_string = strdup( qtu( lineedit->text() ) );
-        else if( combobox ) psz_string = strdup( qtu( combobox->itemData(
-                                       combobox->currentIndex() ).toString() ) );
-        else msg_Warn( p_intf, "Oops %s %s %d", __FILE__, __func__, __LINE__ );
-        config_PutPsz( p_intf, qtu( option ), psz_string );
+        QString val;
+        if( lineedit )
+            val = lineedit->text();
+        else if( combobox )
+            val = combobox->itemData( combobox->currentIndex() ).toString();
+        else
+            msg_Warn( p_intf, "Oops %s %s %d", __FILE__, __func__, __LINE__ );
+        config_PutPsz( p_intf, qtu( option ), qtu( val ) );
         if( b_is_command )
-            var_SetString( p_obj, qtu( option ), psz_string );
-        free( psz_string );
+            var_SetString( p_obj, qtu( option ), qtu( val ) );
     }
     else
         msg_Err( p_intf,
@@ -828,8 +829,8 @@ void ExtV4l2::ValueChange( int value )
     vlc_object_t *p_obj = (vlc_object_t*)vlc_object_find_name( pl_Get(p_intf), "v4l2" );
     if( p_obj )
     {
-        char *psz_var = strdup( qtu( s->objectName() ) );
-        int i_type = var_Type( p_obj, psz_var );
+        QString var = s->objectName();
+        int i_type = var_Type( p_obj, qtu( var ) );
         switch( i_type & VLC_VAR_TYPE )
         {
             case VLC_VAR_INTEGER:
@@ -838,16 +839,15 @@ void ExtV4l2::ValueChange( int value )
                     QComboBox *combobox = qobject_cast<QComboBox*>( s );
                     value = combobox->itemData( value ).toInt();
                 }
-                var_SetInteger( p_obj, psz_var, value );
+                var_SetInteger( p_obj, qtu( var ), value );
                 break;
             case VLC_VAR_BOOL:
-                var_SetBool( p_obj, psz_var, value );
+                var_SetBool( p_obj, qtu( var ), value );
                 break;
             case VLC_VAR_VOID:
-                var_TriggerCallback( p_obj, psz_var );
+                var_TriggerCallback( p_obj, qtu( var ) );
                 break;
         }
-        free( psz_var );
         vlc_object_release( p_obj );
     }
     else
