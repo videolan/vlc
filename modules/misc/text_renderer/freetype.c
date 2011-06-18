@@ -62,6 +62,8 @@
 #include <freetype/ftsynth.h>
 #include FT_FREETYPE_H
 #include FT_GLYPH_H
+#include FT_STROKER_H
+
 #define FT_FLOOR(X)     ((X & -64) >> 6)
 #define FT_CEIL(X)      (((X + 63) & -64) >> 6)
 #ifndef FT_MulFix
@@ -122,6 +124,10 @@ static void Destroy( vlc_object_t * );
 #define BG_OPACITY_TEXT N_("Background opacity")
 #define BG_COLOR_TEXT N_("Background color")
 
+#define OUTLINE_OPACITY_TEXT N_("Outline opacity")
+#define OUTLINE_COLOR_TEXT N_("Outline color")
+#define OUTLINE_THICKNESS_TEXT N_("Outline thickness")
+
 static const int pi_sizes[] = { 20, 18, 16, 12, 6 };
 static const char *const ppsz_sizes_text[] = {
     N_("Smaller"), N_("Small"), N_("Normal"), N_("Large"), N_("Larger") };
@@ -138,6 +144,13 @@ static const char *const ppsz_color_descriptions[] = {
   N_("Black"), N_("Gray"), N_("Silver"), N_("White"), N_("Maroon"),
   N_("Red"), N_("Fuchsia"), N_("Yellow"), N_("Olive"), N_("Green"), N_("Teal"),
   N_("Lime"), N_("Purple"), N_("Navy"), N_("Blue"), N_("Aqua") };
+
+static const int pi_outline_thickness[] = {
+    0, 2, 4, 6,
+};
+static const char *const ppsz_outline_thickness[] = {
+    N_("None"), N_("Thin"), N_("Normal"), N_("Thick"),
+};
 
 vlc_module_begin ()
     set_shortname( N_("Text renderer"))
@@ -174,6 +187,18 @@ vlc_module_begin ()
         change_integer_list( pi_color_values, ppsz_color_descriptions )
         change_safe()
 
+    add_integer_with_range( "freetype-outline-opacity", 255, 0, 255,
+                            OUTLINE_OPACITY_TEXT, "", false )
+        change_safe()
+    add_integer( "freetype-outline-color", 0x00000000, OUTLINE_COLOR_TEXT,
+                 "", false )
+        change_integer_list( pi_color_values, ppsz_color_descriptions )
+        change_safe()
+    add_integer_with_range( "freetype-outline-thickness", 4, 0, 50, OUTLINE_THICKNESS_TEXT,
+                 "", false )
+        change_integer_list( pi_outline_thickness, ppsz_outline_thickness )
+        change_safe()
+
     add_integer( "freetype-rel-fontsize", 16, FONTSIZER_TEXT,
                  FONTSIZER_LONGTEXT, false )
         change_integer_list( pi_sizes, ppsz_sizes_text )
@@ -196,6 +221,7 @@ vlc_module_end ()
 typedef struct
 {
     FT_BitmapGlyph p_glyph;
+    FT_BitmapGlyph p_outline;
     uint32_t       i_color;             /* ARGB color */
     int            i_line_offset;       /* underline/strikethrough offset */
     int            i_line_thickness;    /* underline/strikethrough thickness */
@@ -233,12 +259,17 @@ struct filter_sys_t
 {
     FT_Library     p_library;   /* handle to library     */
     FT_Face        p_face;      /* handle to face object */
+    FT_Stroker     p_stroker;
     uint8_t        i_font_opacity;
     int            i_font_color;
     int            i_font_size;
 
     uint8_t        i_background_opacity;
     int            i_background_color;
+
+    double         f_outline_thickness;
+    uint8_t        i_outline_opacity;
+    int            i_outline_color;
 
     int            i_default_font_size;
     int            i_display_height;
@@ -789,43 +820,56 @@ static int RenderYUVA( filter_t *p_filter,
     memset( p_picture->p[3].p_pixels, i_a,
             p_picture->p[3].i_pitch * p_picture->p[3].i_lines );
 
-    /* Render all lines */
-    for( line_desc_t *p_line = p_line_head; p_line != NULL; p_line = p_line->p_next )
+    /* Render outline glyphs in the first pass, and then the normal glyphs */
+    for( int g = 0; g < 2; g++ )
     {
-        int i_align_left = i_margin;
-        if( p_line->i_width < i_text_width )
+        /* Render all lines */
+        for( line_desc_t *p_line = p_line_head; p_line != NULL; p_line = p_line->p_next )
         {
-            /* Left offset to take into account alignment */
-            if( (p_region->i_align & 0x3) == SUBPICTURE_ALIGN_RIGHT )
-                i_align_left += ( i_text_width - p_line->i_width );
-            else if( (p_region->i_align & 0x3) != SUBPICTURE_ALIGN_LEFT )
-                i_align_left += ( i_text_width - p_line->i_width ) / 2;
-        }
-        int i_align_top = i_margin;
+            int i_align_left = i_margin;
+            if( p_line->i_width < i_text_width )
+            {
+                /* Left offset to take into account alignment */
+                if( (p_region->i_align & 0x3) == SUBPICTURE_ALIGN_RIGHT )
+                    i_align_left += ( i_text_width - p_line->i_width );
+                else if( (p_region->i_align & 0x3) != SUBPICTURE_ALIGN_LEFT )
+                    i_align_left += ( i_text_width - p_line->i_width ) / 2;
+            }
+            int i_align_top = i_margin;
 
-        /* Render all glyphs and underline/strikethrough */
-        for( int i = 0; i < p_line->i_character_count; i++ )
-        {
-            const line_character_t *ch = &p_line->p_character[i];
-            FT_BitmapGlyph p_glyph = ch->p_glyph;
+            /* Render all glyphs and underline/strikethrough */
+            for( int i = 0; i < p_line->i_character_count; i++ )
+            {
+                const line_character_t *ch = &p_line->p_character[i];
+                FT_BitmapGlyph p_glyph = g == 0 ? ch->p_outline : ch->p_glyph;
+                if( !p_glyph )
+                    continue;
 
-            i_a = 0xff - ((ch->i_color >> 24) & 0xff);
-            YUVFromRGB( ch->i_color, &i_y, &i_u, &i_v );
+                uint32_t i_color = ch->i_color;
+                i_a = 0xff - ((i_color >> 24) & 0xff);
+                if( g == 0 )
+                {
+                    i_a = i_a * p_sys->i_outline_opacity / 255;
+                    i_color = p_sys->i_outline_color;
+                }
+                YUVFromRGB( i_color, &i_y, &i_u, &i_v );
 
-            int i_glyph_y = i_align_top  - p_glyph->top  + p_bbox->yMax + p_line->i_base_line;
-            int i_glyph_x = i_align_left + p_glyph->left - p_bbox->xMin;
+                int i_glyph_y = i_align_top  - p_glyph->top  + p_bbox->yMax + p_line->i_base_line;
+                int i_glyph_x = i_align_left + p_glyph->left - p_bbox->xMin;
 
-            BlendYUVAGlyph( p_picture,
-                            i_glyph_x, i_glyph_y,
-                            i_a, i_y, i_u, i_v,
-                            p_glyph );
+                BlendYUVAGlyph( p_picture,
+                                i_glyph_x, i_glyph_y,
+                                i_a, i_y, i_u, i_v,
+                                p_glyph );
 
-            if( ch->i_line_thickness > 0 )
-                BlendYUVALine( p_picture,
-                               i_glyph_x, i_glyph_y + p_glyph->top,
-                               i_a, i_y, i_u, i_v,
-                               &ch[0],
-                               i + 1 < p_line->i_character_count ? &ch[1] : NULL );
+                /* underline/strikethrough are only rendered for the normal glyph */
+                if( g == 1 && ch->i_line_thickness > 0 )
+                    BlendYUVALine( p_picture,
+                                   i_glyph_x, i_glyph_y + p_glyph->top,
+                                   i_a, i_y, i_u, i_v,
+                                   &ch[0],
+                                   i + 1 < p_line->i_character_count ? &ch[1] : NULL );
+            }
         }
     }
 
@@ -1413,7 +1457,12 @@ static int ProcessNodes( filter_t *p_filter,
 static void FreeLine( line_desc_t *p_line )
 {
     for( int i = 0; i < p_line->i_character_count; i++ )
-        FT_Done_Glyph( (FT_Glyph)p_line->p_character[i].p_glyph );
+    {
+        line_character_t *ch = &p_line->p_character[i];
+        FT_Done_Glyph( (FT_Glyph)ch->p_glyph );
+        if( ch->p_outline )
+            FT_Done_Glyph( (FT_Glyph)ch->p_outline );
+    }
 
     free( p_line->p_character );
     free( p_line );
@@ -1558,8 +1607,8 @@ static bool FaceStyleEquals( const text_style_t *p_style1,
 }
 
 static int GetGlyph( filter_t *p_filter,
-                     FT_Glyph *pp_glyph,
-                     FT_BBox  *p_bbox,
+                     FT_Glyph *pp_glyph,   FT_BBox *p_glyph_bbox,
+                     FT_Glyph *pp_outline, FT_BBox *p_outline_bbox,
 
                      FT_Face  p_face,
                      int i_glyph_index,
@@ -1589,18 +1638,44 @@ static int GetGlyph( filter_t *p_filter,
         return VLC_EGENERIC;
     }
 
+    FT_Glyph outline = NULL;
+    if( p_filter->p_sys->p_stroker )
+    {
+        outline = glyph;
+        FT_Glyph_StrokeBorder( &outline, p_filter->p_sys->p_stroker, 0, 0 );
+        FT_Glyph_To_Bitmap( &outline, FT_RENDER_MODE_NORMAL, p_pen, 1 );
+
+        FT_Glyph_Get_CBox( outline, ft_glyph_bbox_pixels, p_outline_bbox );
+    }
+    *pp_outline = outline;
+
     if( FT_Glyph_To_Bitmap( &glyph, FT_RENDER_MODE_NORMAL, p_pen, 1) )
     {
         FT_Done_Glyph( glyph );
         return VLC_EGENERIC;
     }
 
-    FT_BBox bbox;
-    FT_Glyph_Get_CBox( glyph, ft_glyph_bbox_pixels, &bbox );
-
+    FT_Glyph_Get_CBox( glyph, ft_glyph_bbox_pixels, p_glyph_bbox );
     *pp_glyph = glyph;
-    *p_bbox   = bbox;
+
     return VLC_SUCCESS;
+}
+
+static void FixGlyph( FT_Glyph glyph, FT_BBox *p_bbox, FT_Face face, const FT_Vector *p_pen )
+{
+    FT_BitmapGlyph glyph_bmp = (FT_BitmapGlyph)glyph;
+    if( p_bbox->xMin >= p_bbox->xMax )
+    {
+        p_bbox->xMin = FT_CEIL(p_pen->x);
+        p_bbox->xMax = FT_CEIL(p_pen->x + face->glyph->advance.x);
+        glyph_bmp->left = p_bbox->xMin;
+    }
+    if( p_bbox->yMin >= p_bbox->yMax )
+    {
+        p_bbox->yMax = FT_CEIL(p_pen->y);
+        p_bbox->yMin = FT_CEIL(p_pen->y + face->glyph->advance.y);
+        glyph_bmp->top  = p_bbox->yMax;
+    }
 }
 
 static void BBoxEnlarge( FT_BBox *p_max, const FT_BBox *p )
@@ -1798,6 +1873,14 @@ static int ProcessLines( filter_t *p_filter,
             {
                 if( FT_Set_Pixel_Sizes( p_current_face, 0, p_current_style->i_font_size ) )
                     msg_Err( p_filter, "Failed to set font size to %d", p_current_style->i_font_size );
+                if( p_sys->p_stroker )
+                {
+                    int i_radius = (p_current_style->i_font_size << 6) * p_sys->f_outline_thickness;
+                    FT_Stroker_Set( p_sys->p_stroker,
+                                    i_radius,
+                                    FT_STROKER_LINECAP_ROUND,
+                                    FT_STROKER_LINEJOIN_ROUND, 0 );
+                }
             }
             p_previous_style = p_current_style;
 
@@ -1825,23 +1908,18 @@ static int ProcessLines( filter_t *p_filter,
                 };
                 FT_Glyph glyph;
                 FT_BBox  glyph_bbox;
-                if( GetGlyph( p_filter, &glyph, &glyph_bbox,
+                FT_Glyph outline;
+                FT_BBox  outline_bbox;
+                if( GetGlyph( p_filter,
+                              &glyph, &glyph_bbox,
+                              &outline, &outline_bbox,
                               p_current_face, i_glyph_index, p_glyph_style->i_style_flags, &pen_new ) )
                     goto next;
 
-                FT_BitmapGlyph glyph_bmp = (FT_BitmapGlyph)glyph;
-                if( glyph_bbox.xMin >= glyph_bbox.xMax )
-                {
-                    glyph_bbox.xMin = FT_CEIL(pen_new.x);
-                    glyph_bbox.xMax = FT_CEIL(pen_new.x + p_current_face->glyph->advance.x);
-                    glyph_bmp->left = glyph_bbox.xMin;
-                }
-                if( glyph_bbox.yMin >= glyph_bbox.yMax )
-                {
-                    glyph_bbox.yMax = FT_CEIL(pen_new.y);
-                    glyph_bbox.yMin = FT_CEIL(pen_new.y + p_current_face->glyph->advance.y);
-                    glyph_bmp->top  = glyph_bbox.yMax;
-                }
+                FixGlyph( glyph, &glyph_bbox, p_current_face, &pen_new );
+                if( outline )
+                    FixGlyph( outline, &outline_bbox, p_current_face, &pen_new );
+                /* FIXME and what about outline */
 
                 bool     b_karaoke = pi_karaoke_bar && pi_karaoke_bar[i_index] != 0;
                 uint32_t i_color = b_karaoke ? (p_glyph_style->i_karaoke_background_color |
@@ -1879,12 +1957,16 @@ static int ProcessLines( filter_t *p_filter,
                 }
                 FT_BBox line_bbox_new = line_bbox;
                 BBoxEnlarge( &line_bbox_new, &glyph_bbox );
+                if( outline )
+                    BBoxEnlarge( &line_bbox_new, &outline_bbox );
 
                 b_break_line = i_index > i_start &&
                                line_bbox_new.xMax - line_bbox_new.xMin >= p_filter->fmt_out.video.i_visible_width;
                 if( b_break_line )
                 {
                     FT_Done_Glyph( glyph );
+                    if( outline )
+                        FT_Done_Glyph( outline );
 
                     break_point_t *p_bp = NULL;
                     if( break_point.i_index > i_start )
@@ -1896,7 +1978,12 @@ static int ProcessLines( filter_t *p_filter,
                     {
                         msg_Dbg( p_filter, "Breaking line");
                         for( int i = p_bp->i_index; i < i_index; i++ )
-                            FT_Done_Glyph( (FT_Glyph)p_line->p_character[i - i_start].p_glyph );
+                        {
+                            line_character_t *ch = &p_line->p_character[i - i_start];
+                            FT_Done_Glyph( (FT_Glyph)ch->p_glyph );
+                            if( ch->p_outline )
+                                FT_Done_Glyph( (FT_Glyph)ch->p_outline );
+                        }
                         p_line->i_character_count = p_bp->i_index - i_start;
 
                         i_index = p_bp->i_index;
@@ -1916,6 +2003,7 @@ static int ProcessLines( filter_t *p_filter,
                 assert( p_line->i_character_count == i_index - i_start);
                 p_line->p_character[p_line->i_character_count++] = (line_character_t){
                     .p_glyph = (FT_BitmapGlyph)glyph,
+                    .p_outline = (FT_BitmapGlyph)outline,
                     .i_color = i_color,
                     .i_line_offset = i_line_offset,
                     .i_line_thickness = i_line_thickness,
@@ -2224,6 +2312,13 @@ static int Create( vlc_object_t *p_this )
     p_sys->i_background_color = var_InheritInteger( p_filter, "freetype-background-color" );
     p_sys->i_background_color = __MAX( __MIN( p_sys->i_background_color, 0xFFFFFF ), 0 );
 
+    p_sys->f_outline_thickness = var_InheritInteger( p_filter, "freetype-outline-thickness" ) / 100.0;
+    p_sys->f_outline_thickness = __MAX( __MIN( p_sys->f_outline_thickness, 0.5 ), 0.0 );
+    p_sys->i_outline_opacity = var_InheritInteger( p_filter, "freetype-outline-opacity" );
+    p_sys->i_outline_opacity = __MAX( __MIN( p_sys->i_outline_opacity, 255 ), 0 );
+    p_sys->i_outline_color = var_InheritInteger( p_filter, "freetype-outline-color" );
+    p_sys->i_outline_color = __MAX( __MIN( p_sys->i_outline_color, 0xFFFFFF ), 0 );
+
 #ifdef WIN32
     /* Get Windows Font folder */
     wchar_t wdir[MAX_PATH];
@@ -2313,6 +2408,13 @@ static int Create( vlc_object_t *p_this )
 
     if( SetFontSize( p_filter, 0 ) != VLC_SUCCESS ) goto error;
 
+    p_sys->p_stroker = NULL;
+    if( p_sys->f_outline_thickness > 0.001 )
+    {
+        i_error = FT_Stroker_New( p_sys->p_library, &p_sys->p_stroker );
+        if( i_error )
+            msg_Err( p_filter, "Failed to create stroker for outlining" );
+    }
 
     p_sys->pp_font_attachments = NULL;
     p_sys->i_font_attachments = 0;
@@ -2366,6 +2468,8 @@ static void Destroy( vlc_object_t *p_this )
      * even if no other library functions have been made since FcInit(),
      * so don't call it. */
 
+    if( p_sys->p_stroker )
+        FT_Stroker_Done( p_sys->p_stroker );
     FT_Done_Face( p_sys->p_face );
     FT_Done_FreeType( p_sys->p_library );
     free( p_sys );
