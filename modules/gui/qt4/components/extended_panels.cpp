@@ -1058,7 +1058,7 @@ char * Equalizer::createValuesFromPreset( int i_preset )
 
     /* Create the QString in Qt */
     for( int i = 0 ; i< BANDS ;i++ )
-        values += QString( " %1" ).arg( eqz_preset_10b[i_preset]->f_amp[i] );
+        values += QString( " %1" ).arg( eqz_preset_10b[i_preset]->f_amp[i], 5, 'f', 1 );
 
     /* Convert it to char * */
     return strdup( values.toAscii().constData() );
