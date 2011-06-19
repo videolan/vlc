@@ -787,7 +787,7 @@ while not vlc.misc.should_die() do
     for _, client in pairs(read) do
         local input = client:recv(1000)
 
-        if input == nil or input == "" -- the telnet client program has left
+        if input == nil -- the telnet client program has left
             or ((client.type == host.client_type.net
                  or client.type == host.client_type.telnet)
                 and input == "\004") then

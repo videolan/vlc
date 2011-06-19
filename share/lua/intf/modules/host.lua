@@ -52,6 +52,7 @@ Example use:
         -- handle clients in read mode
         for _, client in pairs(read) do
             local str = client:recv(1000)
+            if not str then break end
             str = string.gsub(str,"\r?\n$","")
             client.buffer = "Got `"..str.."'.\r\n"
             client:switch_status( host.status.write )
