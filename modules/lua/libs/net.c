@@ -190,7 +190,10 @@ static int vlclua_net_recv( lua_State *L )
     size_t i_len = luaL_optint( L, 2, 1 );
     char psz_buffer[i_len];
     ssize_t i_ret = recv( i_fd, psz_buffer, i_len, 0 );
-    lua_pushlstring( L, psz_buffer, (i_ret >= 0) ? i_ret : 0 );
+    if( i_ret > 0 )
+        lua_pushlstring( L, psz_buffer, i_ret );
+    else
+        lua_pushnil( L );
     return 1;
 }
 
