@@ -406,24 +406,11 @@ static void Close( vlc_object_t *p_this )
 static char *TitleGet( vlc_object_t *p_this )
 {
     input_thread_t *p_input = playlist_CurrentInput( pl_Get( p_this ) );
-    if( !p_input )
-        return NULL;
-
-    char *psz_title = input_item_GetTitle( input_GetItem( p_input ) );
-    if( EMPTY_STR( psz_title ) )
+    if( p_input )
     {
-        free( psz_title );
-
-        char *psz_uri = input_item_GetURI( input_GetItem( p_input ) );
-        const char *psz = strrchr( psz_uri, '/' );
-        if( psz )
-        {
-            psz_title = strdup( psz + 1 );
-            free( psz_uri );
-        }
-        else
-            psz_title = psz_uri;
+        char *psz_title = input_item_GetTitleFbName( input_GetItem( p_input ) );
+        vlc_object_release( p_input );
+        return psz_title;
     }
-    vlc_object_release( p_input );
-    return psz_title;
+    return NULL;
 }
