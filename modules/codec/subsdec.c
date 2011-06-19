@@ -684,8 +684,6 @@ static char *CreateHtmlSubtitle( int *pi_align, char *psz_subtitle )
                                 i_len = strcspn( psz_subtitle, " \t>" );
                             }
                             HtmlPut( &psz_html, "\"" );
-                            if( !strcmp( psz_attribs[ k ], "color=" ) && *psz_subtitle >= '0' && *psz_subtitle <= '9' )
-                                HtmlPut( &psz_html, "#" );
                             HtmlNPut( &psz_html, psz_subtitle, i_len );
                             HtmlPut( &psz_html, "\"" );
 
