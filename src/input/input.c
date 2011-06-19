@@ -2185,7 +2185,7 @@ static bool Control( input_thread_t *p_input,
                      p_input->p->input.p_stream )
             {
                 const uint64_t i_size = stream_Size( p_input->p->input.p_stream );
-                if( i_size > 0 && bookmark.i_byte_offset <= i_size )
+                if( i_size > 0 && (uint64_t)bookmark.i_byte_offset <= i_size )
                 {
                     val.f_float = (double)bookmark.i_byte_offset / i_size;
                     b_force_update = Control( p_input, INPUT_CONTROL_SET_POSITION, val );

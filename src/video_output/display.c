@@ -539,6 +539,9 @@ static void VoutDisplayEventMouse(vout_display_t *vd, int event, va_list args)
     vlc_mutex_unlock(&osys->lock);
 }
 
+#ifdef __GNUC__
+static void *VoutDisplayEventKeyDispatch(void *data) __attribute__((noreturn));
+#endif
 static void *VoutDisplayEventKeyDispatch(void *data)
 {
     vout_display_owner_sys_t *osys = data;
@@ -1470,6 +1473,7 @@ static void SplitterDisplay(vout_display_t *vd,
 }
 static int SplitterControl(vout_display_t *vd, int query, va_list args)
 {
+    (void)vd; (void)query; (void)args;
     return VLC_EGENERIC;
 }
 static void SplitterManage(vout_display_t *vd)
