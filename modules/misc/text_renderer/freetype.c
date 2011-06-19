@@ -168,6 +168,11 @@ vlc_module_begin ()
                  FONTSIZE_LONGTEXT, true )
         change_safe()
 
+    add_integer( "freetype-rel-fontsize", 16, FONTSIZER_TEXT,
+                 FONTSIZER_LONGTEXT, false )
+        change_integer_list( pi_sizes, ppsz_sizes_text )
+        change_safe()
+
     /* opacity valid on 0..255, with default 255 = fully opaque */
     add_integer_with_range( "freetype-opacity", 255, 0, 255,
         OPACITY_TEXT, OPACITY_LONGTEXT, false )
@@ -197,11 +202,6 @@ vlc_module_begin ()
     add_integer_with_range( "freetype-outline-thickness", 4, 0, 50, OUTLINE_THICKNESS_TEXT,
                  "", false )
         change_integer_list( pi_outline_thickness, ppsz_outline_thickness )
-        change_safe()
-
-    add_integer( "freetype-rel-fontsize", 16, FONTSIZER_TEXT,
-                 FONTSIZER_LONGTEXT, false )
-        change_integer_list( pi_sizes, ppsz_sizes_text )
         change_safe()
 
     add_obsolete_integer( "freetype-effect" );
