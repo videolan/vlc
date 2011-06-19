@@ -623,7 +623,7 @@ static int RenderYUVP( filter_t *p_filter, subpicture_region_t *p_region,
 
     /* Calculate text color components
      * Only use the first color */
-    int i_alpha = 0xff - ((p_line->p_character[0].i_color >> 24) & 0xff);
+    int i_alpha = (p_line->p_character[0].i_color >> 24) & 0xff;
     YUVFromRGB( p_line->p_character[0].i_color, &i_y, &i_u, &i_v );
 
     /* Build palette */
@@ -846,7 +846,7 @@ static int RenderYUVA( filter_t *p_filter,
                     continue;
 
                 uint32_t i_color = ch->i_color;
-                i_a = 0xff - ((i_color >> 24) & 0xff);
+                i_a = (i_color >> 24) & 0xff;
                 if( g == 0 )
                 {
                     i_a = i_a * p_sys->i_outline_opacity / 255;
@@ -1160,7 +1160,7 @@ static int HandleFontAttributes( xml_reader_t *p_xml_reader,
     int        rv;
     char      *psz_fontname = NULL;
     uint32_t   i_font_color = 0xffffff;
-    int        i_font_alpha = 0;
+    int        i_font_alpha = 255;
     uint32_t   i_karaoke_bg_color = 0x00ffffff;
     int        i_font_size  = 24;
 
@@ -1365,7 +1365,7 @@ static int ProcessNodes( filter_t *p_filter,
                        p_sys->psz_fontfamily,
                        p_sys->i_font_size,
                        (p_sys->i_font_color & 0xffffff) |
-                          (((255-p_sys->i_font_opacity) & 0xff) << 24),
+                          ((p_sys->i_font_opacity & 0xff) << 24),
                        0x00ffffff );
     }
 #endif
@@ -2206,7 +2206,7 @@ static int RenderCommon( filter_t *p_filter, subpicture_region_t *p_region_out,
             p_style = CreateStyle( p_sys->psz_fontfamily,
                                    p_sys->i_font_size,
                                    (p_sys->i_font_color & 0xffffff) |
-                                   (((255-p_sys->i_font_opacity) & 0xff) << 24),
+                                   ((p_sys->i_font_opacity & 0xff) << 24),
                                    0x00ffffff, 0);
 
         i_text_length = SetupText( p_filter,
