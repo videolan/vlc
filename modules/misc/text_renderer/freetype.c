@@ -1212,6 +1212,11 @@ static int HandleFontAttributes( xml_reader_t *p_xml_reader,
             }
             else
             {
+                char *end;
+                uint32_t i_value = strtol( value, &end, 16 );
+                if( *end == '\0' || *end == ' ' )
+                    i_font_color = i_value & 0x00ffffff;
+
                 for( int i = 0; p_html_colors[i].psz_name != NULL; i++ )
                 {
                     if( !strncasecmp( value, p_html_colors[i].psz_name, strlen(p_html_colors[i].psz_name) ) )
