@@ -145,7 +145,7 @@ void *vlc_hold (gc_object_t * p_gc)
  */
 void vlc_release (gc_object_t *p_gc)
 {
-    unsigned refs;
+    uintptr_t refs;
 
     assert( p_gc );
     refs = vlc_atomic_dec (&p_gc->refs);
