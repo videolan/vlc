@@ -207,23 +207,23 @@ static int Open( vlc_object_t *p_this )
     settings.mFrequency = 44100;
     settings.mResamplingMode = MODPLUG_RESAMPLE_FIR;
 
-    if( var_CreateGetBool( p_demux, "mod-noisereduction" ) )
+    if( var_InheritBool( p_demux, "mod-noisereduction" ) )
         settings.mFlags |= MODPLUG_ENABLE_NOISE_REDUCTION;
 
-    if( var_CreateGetBool( p_demux, "mod-reverb" ) )
+    if( var_InheritBool( p_demux, "mod-reverb" ) )
         settings.mFlags |= MODPLUG_ENABLE_REVERB;
-    settings.mReverbDepth = var_CreateGetInteger( p_demux, "mod-reverb-level" );
-    settings.mReverbDelay = var_CreateGetInteger( p_demux, "mod-reverb-delay" );
+    settings.mReverbDepth = var_InheritInteger( p_demux, "mod-reverb-level" );
+    settings.mReverbDelay = var_InheritInteger( p_demux, "mod-reverb-delay" );
 
-    if( var_CreateGetBool( p_demux, "mod-megabass" ) )
+    if( var_InheritBool( p_demux, "mod-megabass" ) )
         settings.mFlags |= MODPLUG_ENABLE_MEGABASS;
-    settings.mBassAmount = var_CreateGetInteger( p_demux, "mod-megabass-level" );
-    settings.mBassRange = var_CreateGetInteger( p_demux, "mod-megabass-range" );
+    settings.mBassAmount = var_InheritInteger( p_demux, "mod-megabass-level" );
+    settings.mBassRange = var_InheritInteger( p_demux, "mod-megabass-range" );
 
-    if( var_CreateGetBool( p_demux, "mod-surround" ) )
+    if( var_InheritBool( p_demux, "mod-surround" ) )
         settings.mFlags |= MODPLUG_ENABLE_SURROUND;
-    settings.mSurroundDepth = var_CreateGetInteger( p_demux, "mod-surround-level" );
-    settings.mSurroundDelay = var_CreateGetInteger( p_demux, "mod-surround-delay" );
+    settings.mSurroundDepth = var_InheritInteger( p_demux, "mod-surround-level" );
+    settings.mSurroundDelay = var_InheritInteger( p_demux, "mod-surround-delay" );
 
     ModPlug_SetSettings( &settings );
 
