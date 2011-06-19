@@ -222,7 +222,7 @@ static int blurayInitTitles(access_t *p_access )
     access_sys_t *p_sys = p_access->p_sys;
 
     /* get and set the titles */
-    unsigned i_title = bd_get_titles(p_sys->bluray, TITLES_RELEVANT);
+    unsigned i_title = bd_get_titles(p_sys->bluray, TITLES_RELEVANT, 0);
     int64_t duration = 0;
 
     for (unsigned int i = 0; i < i_title; i++) {
@@ -230,7 +230,7 @@ static int blurayInitTitles(access_t *p_access )
         if (!t)
             break;
 
-        BLURAY_TITLE_INFO *title_info = bd_get_title_info(p_sys->bluray,i);
+        BLURAY_TITLE_INFO *title_info = bd_get_title_info(p_sys->bluray, i, 0);
         if (!title_info)
             break;
         t->i_length = title_info->duration * CLOCK_FREQ / INT64_C(90000);
