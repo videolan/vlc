@@ -176,6 +176,7 @@ static void init_rand48 (void)
     if (!rand48.init)
     {
         vlc_rand_bytes (rand48.subi, sizeof (rand48.subi));
+        rand48.init = true;
 #if 0 // short would be more than 16-bits ?
         for (unsigned i = 0; i < 3; i++)
             subi[i] &= 0xffff;
