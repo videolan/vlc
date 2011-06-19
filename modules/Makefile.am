@@ -74,7 +74,9 @@ stamp-cache:
 
 install-exec-hook:
 	if test -z "$(DESTDIR)" -a "$(build)" = "$(host)"; then \
-		../bin/vlc-cache-gen$(EXEEXT) "$(vlclibdir)/plugins" ; \
+		LD_LIBRARY_PATH="$(libdir)" \
+		"$(vlclibdir)/vlc-cache-gen$(EXEEXT)" \
+			 "$(vlclibdir)/plugins" ; \
 	else \
 		echo "Staged installation: cache generation skipped!" ; \
 	fi
