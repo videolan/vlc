@@ -64,7 +64,7 @@ static void input_item_add_subitem_tree ( const vlc_event_t * p_event,
     assert( p_item != NULL );
 
     bool b_current = get_current_status_item( p_playlist ) == p_item;
-    bool b_autostart = var_CreateGetBool( p_playlist, "playlist-autostart" );
+    bool b_autostart = var_GetBool( p_playlist, "playlist-autostart" );
     bool b_stop = p_item->i_flags & PLAYLIST_SUBITEM_STOP_FLAG;
     bool b_flat = false;
 
