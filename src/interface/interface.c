@@ -85,10 +85,12 @@ int intf_Create( vlc_object_t *p_this, const char *psz_module )
                 VLC_VAR_HASCHOICE | VLC_VAR_ISCOMMAND );
     text.psz_string = _("Add Interface");
     var_Change( p_intf, "intf-add", VLC_VAR_SETTEXT, &text, NULL );
-
-    val.psz_string = (char *)"rc";
-    text.psz_string = (char *)_("Console");
-    var_Change( p_intf, "intf-add", VLC_VAR_ADDCHOICE, &val, &text );
+    if( isatty( 0 ) )
+    {
+        val.psz_string = (char *)"rc";
+        text.psz_string = (char *)_("Console");
+        var_Change( p_intf, "intf-add", VLC_VAR_ADDCHOICE, &val, &text );
+    }
     val.psz_string = (char *)"telnet";
     text.psz_string = (char *)_("Telnet");
     var_Change( p_intf, "intf-add", VLC_VAR_ADDCHOICE, &val, &text );
