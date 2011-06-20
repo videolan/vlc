@@ -152,9 +152,9 @@ OPENCDK_VERSION=0.6.6
 OPENCDK_URL=http://www.gnu.org/software/gnutls/releases/opencdk/opencdk-$(OPENCDK_VERSION).tar.bz2
 DAAP_VERSION=0.4.0
 DAAP_URL=http://craz.net/programs/itunes/files/libopendaap-$(DAAP_VERSION).tar.bz2
-NPAPI_HEADERS_SVN_URL=http://npapi-headers.googlecode.com/svn/trunk/
+NPAPI_HEADERS_SVN_URL=http://npapi-sdk.googlecode.com/svn/trunk/
 # NPAPI_HEADERS_SVN_REVISION can be a revision number, or just HEAD for the latest
-NPAPI_HEADERS_SVN_REVISION=3
+NPAPI_HEADERS_SVN_REVISION=HEAD
 TWOLAME_VERSION=0.3.13
 TWOLAME_URL=$(SF)/twolame/twolame-$(TWOLAME_VERSION).tar.gz
 X264_VERSION=20050609
