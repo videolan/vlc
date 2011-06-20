@@ -45,7 +45,8 @@ void libvlc_playlist_play( libvlc_instance_t *p_instance, int i_id,
     VLC_UNUSED(i_id); VLC_UNUSED(i_options); VLC_UNUSED(ppsz_options);
 
     assert( pl );
-    if( pl->items.i_size == 0 )
+    if( !var_GetBool( pl, "playlist-autostart" )
+     || pl->items.i_size == 0 )
         return;
     playlist_Control( pl, PLAYLIST_PLAY, false );
 }
