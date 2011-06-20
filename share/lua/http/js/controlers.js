@@ -57,7 +57,7 @@ function updateStatus(){
 					currentArt	=	$('[name="artwork_url"]',data).text();
 					$('#albumArt').css({
 						'visibility':'visible',
-						'display':'none'
+						'display':'block'
 					});
 				}else if($('[name="artwork_url"]',data).text()==""){
 					$('#albumArt').css({
@@ -88,13 +88,21 @@ function sendCommand(params){
 			}
 		});
 	}else{
-		$.ajax({
-			url: 'requests/status.xml',
-			data: params,
-			success:function(data,status,jqXHR){
-				updatePlayList();
-			}
-		});
+		if(params.plreload===false){
+			$.ajax({
+				url: 'requests/status.xml',
+				data: params
+			});
+		}else{
+			$.ajax({
+				url: 'requests/status.xml',
+				data: params,
+				success:function(data,status,jqXHR){
+					updatePlayList();
+				}
+			});
+		}
+		
 	}
 	
 }

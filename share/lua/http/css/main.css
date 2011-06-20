@@ -8,22 +8,19 @@ body{
 	width: 800px;
 }
 #controlContainer{
-	float: left;
 	width: 800px;
 }
 #libraryContainer{
-	width: 300px;
-	float: left;
+	width: 800px;
 }
 #libraryTree{
-	height: 477px;
+	height: 300px;
 	overflow:scroll;
 	white-space: nowrap;
 	text-align: left;
 }
 #viewContainer{
-	width: 500px;
-	float: left;
+	width: 800px;
 }
 #mediaViewer{
 	min-height: 500px;
@@ -42,7 +39,7 @@ body{
 }
 #currentVolume{
 	display: inline-block;
-	margin-left: -70px;
+	margin-left: -110px;
 }
 #mediaTitle{
 	text-align: left;

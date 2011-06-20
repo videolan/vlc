@@ -13,7 +13,7 @@
 		$( "#rateSlider" ).slider({
 			range: "min",
 			value: 1,
-			min: 1,
+			min: 0.25,
 			max: 10,
 			step: 0.25,
 			stop: function( event, ui ) {
@@ -63,7 +63,7 @@
 		});
 	});
 </script>
-<div id="window_offset" title="Offset Configuration">
+<div id="window_offset" title="Track Synchronisation">
 	<div>Playback Rate</div>
 	<div id="rateSlider" title="Playback Rate"></div>
 	<div id="currentRate" class="dynamic">1x</div>

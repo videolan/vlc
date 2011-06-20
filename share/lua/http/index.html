@@ -56,16 +56,8 @@
 				
 				$('#buttonPlayList').click(function(){
 					$('#libraryContainer').animate({
-						width: 'toggle'
+						height: 'toggle'
 					});
-					var nw	=	$('#libraryContainer').css('width')=='300px' ? '800' : '500';
-					var spd	=	$('#libraryContainer').css('width')=='300px' ? 'slow' : 'fast';
-					$('#viewContainer').animate({
-						width: nw
-					},spd)
-					$('#player').animate({
-						width: nw
-					},spd)
 					return false;
 				});
 				$('#buttonViewer').click(function(){
@@ -119,12 +111,30 @@
 					}
 					return false;
 				});
-				$('#buttonPrev').click(function(){
-					sendCommand({'command':'pl_previous'});
+				$('#buttonPrev').mousedown(function(){
+					intv	=	1;
+					ccmd	=	'prev';
+					setIntv();
 					return false;
 				});
-				$('#buttonNext').click(function(){
-					sendCommand({'command':'pl_next'});
+				$('#buttonPrev').mouseup(function(){
+					if(intv<=5){
+						sendCommand({'command':'pl_previous'});
+					}
+					intv	=	0;
+					return false;
+				});
+				$('#buttonNext').mousedown(function(){
+					intv	=	1;
+					ccmd	=	'next';
+					setIntv();
+					return false;
+				});
+				$('#buttonNext').mouseup(function(){
+					if(intv<=5){
+						sendCommand({'command':'pl_next'});
+					}
+					intv	=	0;
 					return false;
 				});
 				$('#buttonFull').click(function(){
@@ -206,6 +216,7 @@
 						}
 					}
 				});
+				$('#viewContainer').animate({height: 'toggle'});
 			});
 		</script>
 	</head>
@@ -214,42 +225,45 @@
 		<div align="center">
 		<div id="mainContainer" align="center">
 			<div id="controlContainer" class="ui-widget">
+				<div class="ui-widget-header" style="text-align: left;">
+					<img src="images/vlc16x16.png" alt="VLC" width="16" height="16"/> Controls
+				</div>
 				<table width="100%" border="0" cellspacing="0" id="controlTable" class="ui-widget-content">
 					<tr>
-						<td colspan="3" class="ui-widget-header">Main Controls</td>
-					</tr>
-					<tr>
-						<td id="controlButtons">
+						<td id="controlButtons" width="380px">
+							<div id="buttonPrev" class="button48  ui-corner-all" title="Previous"></div>
+							<div id="buttonPlay" class="button48  ui-corner-all" title="Play"></div>
+							<div id="buttonNext" class="button48  ui-corner-all" title="Next"></div>
 							<div id="buttonOpen" class="button48  ui-corner-all" title="Open Media"></div>
 							<div id="buttonStop" class="button48  ui-corner-all" title="Stop"></div>
-							<div id="buttonPlay" class="button48  ui-corner-all" title="Play"></div>
-							<div id="buttonPrev" class="button48  ui-corner-all" title="Previous"></div>
-							<div id="buttonNext" class="button48  ui-corner-all" title="Next"></div>
 							<div id="buttonFull" class="button48  ui-corner-all" title="Full Screen"></div>
 							<div id="buttonSout" class="button48  ui-corner-all" title="Easy Stream"></div>
-							<div id="volumeSlider" title="Volume"><img src="images/speaker-32.png" class="ui-slider-handle"/></div>
-							<div id="currentVolume" class="dynamic">50%</div>
 						</td>
-						
+						<td valign="top" width="42px">
+							<div id="buttonPlayList" class="button ui-widget ui-state-default ui-corner-all" title="Hide / Show Library" style="float: left;"><span class="ui-icon ui-icon-note"></span></div>
+							<div id="buttonViewer" class="button ui-widget ui-state-default ui-corner-all" title="Hide / Show Viewer" style="float: left;"><span class="ui-icon ui-icon-video"></span></div>
+							<div id="buttonStreams" class="button ui-widget ui-state-default ui-corner-all" title="Manage Streams" style="float: left;"><span class="ui-icon ui-icon-script"></span></div>
+							<div id="buttonOffsets" class="button ui-widget ui-state-default ui-corner-all" title="Track Synchronisation" style="float: left;"><span class="ui-icon ui-icon-transfer-e-w"></span></div>
+						</td>
 						<td>
-							<div id="buttonPlayList" class="button ui-widget ui-state-default ui-corner-all" title="Hide / Show Library"><span class="ui-icon ui-icon-note"></span></div>
-							<div id="buttonViewer" class="button ui-widget ui-state-default ui-corner-all" title="Hide / Show Viewer"><span class="ui-icon ui-icon-video"></span></div>
-							<div id="buttonStreams" class="button ui-widget ui-state-default ui-corner-all" title="Manage Streams"><span class="ui-icon ui-icon-script"></span></div>
-							<div id="buttonOffsets" class="button ui-widget ui-state-default ui-corner-all" title="Configure Offsets"><span class="ui-icon ui-icon-transfer-e-w"></span></div>
+							<div style="margin-left:20px;">
+								<div id="volumeSlider" title="Volume" style="width:200px"><img src="images/speaker-32.png" class="ui-slider-handle" alt="volume"/></div>
+								<div id="currentVolume" class="dynamic">50%</div>
+							</div>
 						</td>
-						<td rowspan="3">
-							<img id="albumArt" src="/art" width="141px" height="130px"/>
+						<td rowspan="3" valign="top" width="141px">
+							<img id="albumArt" src="/art" width="141px" height="130px" alt="Album Art"/>
 						</td>
 					</tr>
 					<tr>
-						<td colspan="2">
+						<td colspan="3">
 							<div id="mediaTitle" class="dynamic"></div>
 						</td>
 					</tr>
 					<tr>
-						<td id="seekContainer" valign="bottom" colspan="2">
-							<div id="seekSlider" title="Seek Time"></div>
-							<table width="90%">
+						<td id="seekContainer" valign="bottom" colspan="3">
+							<div id="seekSlider" title="Seek Time" style="width:98%; margin-left:10px;"></div>
+							<table width="100%">
 								<tr>
 									<td>
 										<div id="currentTime" class="dynamic">00:00:00</div>
@@ -264,14 +278,20 @@
 
 				</table>
 			</div>
+			<div id="viewContainer" class="ui-widget">
+				<div class="ui-widget-header" style="text-align: left;"><img src="images/vlc16x16.png" alt="VLC" width="16" height="16"/> Viewer</div>
+				<div id="mediaViewer" class="ui-widget-content">
+					<div href="http://localhost:8081/stream.flv" style="display:block; width:100%" id="player"></div>
+				</div>
+			</div>
 			<div id="libraryContainer" class="ui-widget">
-				<div class="ui-widget-header">
-					Library
+				<div class="ui-widget-header" style="text-align: left;">
+					<img src="images/vlc16x16.png" alt="VLC" width="16" height="16"/> Library
 				</div>
 				<div align="left" class="ui-widget-content" style="overflow:hidden; white-space: nowrap;">
 					<div id="buttonShuffle" class="button ui-widget ui-state-default ui-corner-all" title="Shuffle"><span class="ui-icon ui-icon-shuffle"></span></div>
 					<div id="buttonLoop" class="button ui-widget ui-state-default ui-corner-all" title="Loop"><span class="ui-icon ui-icon-refresh"></span></div>
-					<div id="buttonRepeat" class="button ui-widget ui-state-default ui-corner-all" title="Repeat"><span class="ui-icon ui-icon-arrowrefresh-1-s"></span></div>
+					<div id="buttonRepeat" class="button ui-widget ui-state-default ui-corner-all" title="Repeat"><span class="ui-icon ui-icon-arrowreturnthick-1-w"></span></div>
 					<div id="buttonPlEmpty" class="button ui-widget ui-state-default ui-corner-all" title="Empty Playlist"><span class="ui-icon ui-icon-trash"></span></div>
 					<div id="buttonPlAdd" class="button ui-widget ui-state-default ui-corner-all" title="Queue Selected"><span class="ui-icon ui-icon-plus"></span></div>
 					<div id="buttonPlPlay" class="button ui-widget ui-state-default ui-corner-all" title="Play Selected"><span class="ui-icon ui-icon-play"></span></div>
@@ -279,14 +299,9 @@
 				</div>
 				<div id="libraryTree" class="ui-widget-content"></div>
 			</div>
-			<div id="viewContainer" class="ui-widget">
-				<div class="ui-widget-header">Media Viewer</div>
-				<div id="mediaViewer" class="ui-widget-content">
-					<div href="http://localhost:8081/stream.flv" style="display:block;" id="player"></div>
-				</div>
-			</div>
+			
 			<div class="footer">
-				<?vlc print(vlc.misc.version() .. " - Lua Web Interface - " .. vlc.misc.copyright()) ?>
+				VLC <?vlc print(vlc.misc.version() .. " - Lua Web Interface - " .. vlc.misc.copyright()) ?>
 			</div>
 		</div>
 		</div>
