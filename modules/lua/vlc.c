@@ -94,38 +94,57 @@
 static int vlc_sd_probe_Open( vlc_object_t * );
 
 vlc_module_begin ()
-        set_shortname( N_("Lua Interface Module") )
-        set_description( N_("Interfaces implemented using lua scripts") )
-        add_shortcut( "luaintf" )
-        add_shortcut( "luahttp" )
-        add_shortcut( "http" )
-        add_shortcut( "luatelnet" )
-        add_shortcut( "telnet" )
-        add_shortcut( "luahotkeys" )
-        /* add_shortcut( "hotkeys" ) */
-        set_capability( "interface", 0 )
+        set_shortname( N_("Lua") )
+        set_description( N_("Lua interpreter") )
         set_category( CAT_INTERFACE )
         set_subcategory( SUBCAT_INTERFACE_CONTROL )
         add_string( "lua-intf", "dummy",
                     INTF_TEXT, INTF_LONGTEXT, false )
         add_string( "lua-config", "",
                     CONFIG_TEXT, CONFIG_LONGTEXT, false )
+        set_capability( "interface", 0 )
+        set_callbacks( Open_LuaIntf, Close_LuaIntf )
+        add_shortcut( "luaintf" )
+
+    add_submodule ()
         set_section( N_("Lua HTTP"), 0 )
             add_string ( "http-host", NULL, HOST_TEXT, HOST_LONGTEXT, true )
             add_string ( "http-src",  NULL, SRC_TEXT,  SRC_LONGTEXT,  true )
             add_bool   ( "http-index", false, INDEX_TEXT, INDEX_LONGTEXT, true )
+        set_capability( "interface", 0 )
+        set_callbacks( Open_LuaHTTP, Close_LuaIntf )
+        add_shortcut( "luahttp" )
+        add_shortcut( "http" )
+
+    add_submodule ()
         set_section( N_("Lua CLI"), 0 )
             add_string( "rc-host", NULL, RCHOST_TEXT, RCHOST_LONGTEXT, true )
             add_string( "cli-host", NULL, CLIHOST_TEXT, CLIHOST_LONGTEXT, true )
+        set_capability( "interface", 25 )
+        set_callbacks( Open_LuaCLI, Close_LuaIntf )
+        add_shortcut( "luacli" )
+        add_shortcut( "luarc" )
+#ifndef WIN32
+        add_shortcut( "cli" )
+        add_shortcut( "rc" )
+#endif
+
+    add_submodule ()
         set_section( N_("Lua Telnet"), 0 )
             add_string( "telnet-host", "localhost", TELNETHOST_TEXT,
                         TELNETHOST_LONGTEXT, true )
             add_integer( "telnet-port", TELNETPORT_DEFAULT, TELNETPORT_TEXT,
                          TELNETPORT_LONGTEXT, true )
             add_password( "telnet-password", TELNETPWD_DEFAULT, TELNETPWD_TEXT,
-                          TELNETPWD_LONGTEXT, true )
 
-        set_callbacks( Open_LuaIntf, Close_LuaIntf )
+                          TELNETPWD_LONGTEXT, true )
+        set_capability( "interface", 0 )
+        set_callbacks( Open_LuaTelnet, Close_LuaIntf )
+        add_shortcut( "luatelnet" )
+        add_shortcut( "telnet" )
+
+        /* add_shortcut( "luahotkeys" ) */
+        /* add_shortcut( "hotkeys" ) */
 
     add_submodule ()
         set_shortname( N_( "Lua Meta Fetcher" ) )
@@ -145,17 +164,6 @@ vlc_module_begin ()
         set_description( N_("Lua Playlist Parser Interface") )
         set_capability( "demux", 2 )
         set_callbacks( Import_LuaPlaylist, Close_LuaPlaylist )
-
-    add_submodule ()
-        set_description( N_("Lua Interface Module (shortcuts)") )
-        add_shortcut( "luacli" )
-        add_shortcut( "luarc" )
-#ifndef WIN32
-        add_shortcut( "cli" )
-        add_shortcut( "rc" )
-#endif
-        set_capability( "interface", 25 )
-        set_callbacks( Open_LuaIntf, Close_LuaIntf )
 
     add_submodule ()
         set_shortname( N_( "Lua Art" ) )

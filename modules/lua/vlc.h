@@ -53,6 +53,10 @@ void Close_LuaPlaylist( vlc_object_t * );
 #define TELNETPORT_DEFAULT 4212
 int Open_LuaIntf( vlc_object_t * );
 void Close_LuaIntf( vlc_object_t * );
+int Open_LuaHTTP( vlc_object_t * );
+int Open_LuaCLI( vlc_object_t * );
+int Open_LuaTelnet( vlc_object_t * );
+
 
 int Open_Extension( vlc_object_t * );
 void Close_Extension( vlc_object_t * );
