@@ -340,7 +340,7 @@ DIST_http_lua = \
 	lua/http/images/white_cross_small.png \
 	lua/http/index.html \
 	lua/http/js/common.js \
-	lua/http/js/controller.js \
+	lua/http/js/controlers.js \
 	lua/http/js/functions.js \
 	lua/http/js/jquery-1.5.1.min.js \
 	lua/http/js/jquery.jstree.js \
@@ -359,7 +359,7 @@ DIST_http_lua = \
 	lua/http/iehacks.css \
 	lua/http/view.html \
 	lua/http/vlm.html \
-	lua/http/vlm_export.html \
+	lua/http/vlm_export.html
 
 DIST_maemo = \
 	maemo/vlc_intf.rc \
