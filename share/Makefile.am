@@ -249,27 +249,66 @@ EXTRA_DIST += \
 
 DIST_http_lua = \
 	lua/http/.hosts \
+	lua/http/css/main.css \
+	lua/http/css/ui-lightness/jquery-ui-1.8.13.custom.css \
+	lua/http/css/ui-lightness/images/ui-bg_diagonals-thick_18_b81900_40x40.png \
+	lua/http/css/ui-lightness/images/ui-bg_diagonals-thick_20_666666_40x40.png \
+	lua/http/css/ui-lightness/images/ui-bg_flat_10_000000_40x100.png \
+	lua/http/css/ui-lightness/images/ui-bg_glass_100_f6f6f6_1x400.png \
+	lua/http/css/ui-lightness/images/ui-bg_glass_100_fdf5ce_1x400.png \
+	lua/http/css/ui-lightness/images/ui-bg_glass_65_ffffff_1x400.png \
+	lua/http/css/ui-lightness/images/ui-bg_gloss-wave_35_f6a828_500x100.png \
+	lua/http/css/ui-lightness/images/ui-bg_highlight-soft_100_eeeeee_1x100.png \
+	lua/http/css/ui-lightness/images/ui-bg_highlight-soft_75_ffe45c_1x100.png \
+	lua/http/css/ui-lightness/images/ui-icons_222222_256x240.png \
+	lua/http/css/ui-lightness/images/ui-icons_228ef1_256x240.png \
+	lua/http/css/ui-lightness/images/ui-icons_ef8c08_256x240.png \
+	lua/http/css/ui-lightness/images/ui-icons_ffd27a_256x240.png \
+	lua/http/css/ui-lightness/images/ui-icons_ffffff_256x240.png \
 	lua/http/custom.lua \
 	lua/http/dialogs/.hosts \
 	lua/http/dialogs/browse \
+	lua/http/dialogs/browse_window.html \
+	lua/http/dialogs/create_stream.html \
 	lua/http/dialogs/footer \
 	lua/http/dialogs/input \
 	lua/http/dialogs/main \
 	lua/http/dialogs/mosaic \
+	lua/http/dialogs/mosaic_window.html \
+	lua/http/dialogs/offset_window.html \
 	lua/http/dialogs/playlist \
 	lua/http/dialogs/sout \
+	lua/http/dialogs/stream_window.html \
 	lua/http/dialogs/vlm \
 	lua/http/favicon.ico \
+	lua/http/flash.html
+	lua/http/images/Audio-48.png \
+	lua/http/images/Back-48.png \
+	lua/http/images/button_eject-48.png \
+	lua/http/images/button_ffw-48.png \
+	lua/http/images/button_first-48.png \
+	lua/http/images/button_full-48.png \
+	lua/http/images/button_help-48.png \
+	lua/http/images/button_last-48.png \
+	lua/http/images/button_pause-48.png \
+	lua/http/images/button_play-48.png \
+	lua/http/images/button_rec-48.png \
+	lua/http/images/button_repeat-48.png \
+	lua/http/images/button_rew-48.png \
+	lua/http/images/button_stop-48.png \
+	lua/http/images/button_stream-48.png \
 	lua/http/images/delete.png \
 	lua/http/images/delete_small.png \
 	lua/http/images/eject.png \
 	lua/http/images/empty.png \
+	lua/http/images/Folder-48.png \
 	lua/http/images/fullscreen.png \
 	lua/http/images/help.png \
 	lua/http/images/info.png \
 	lua/http/images/loop.png \
 	lua/http/images/minus.png \
 	lua/http/images/next.png \
+	lua/http/images/Other-48.png \
 	lua/http/images/pause.png \
 	lua/http/images/play.png \
 	lua/http/images/playlist.png \
@@ -289,20 +328,28 @@ DIST_http_lua = \
 	lua/http/images/slow.png \
 	lua/http/images/sort.png \
 	lua/http/images/sout.png \
+	lua/http/images/speaker-32.png \
 	lua/http/images/speaker.png \
 	lua/http/images/speaker_mute.png \
 	lua/http/images/stop.png \
+	lua/http/images/Video-48.png \
 	lua/http/images/vlc16x16.png \
 	lua/http/images/volume_down.png \
 	lua/http/images/volume_up.png \
 	lua/http/images/white.png \
 	lua/http/images/white_cross_small.png \
 	lua/http/index.html \
+	lua/http/js/common.js \
+	lua/http/js/controller.js \
 	lua/http/js/functions.js \
+	lua/http/js/jquery-1.5.1.min.js \
+	lua/http/js/jquery.jstree.js \
+	lua/http/js/jquery-ui-1.8.13.custom.min.js \
 	lua/http/js/mosaic.js \
 	lua/http/js/vlm.js \
 	lua/http/mosaic.html \
 	lua/http/requests/browse.xml \
+	lua/http/requests/equalizer.xml \
 	lua/http/requests/playlist.xml \
 	lua/http/requests/status.xml \
 	lua/http/requests/vlm.xml \
@@ -310,9 +357,9 @@ DIST_http_lua = \
 	lua/http/requests/README.txt \
 	lua/http/style.css \
 	lua/http/iehacks.css \
+	lua/http/view.html \
 	lua/http/vlm.html \
 	lua/http/vlm_export.html \
-	lua/http/flash.html
 
 DIST_maemo = \
 	maemo/vlc_intf.rc \
