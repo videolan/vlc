@@ -87,7 +87,7 @@ int intf_Create( vlc_object_t *p_this, const char *chain )
     var_Change( p_intf, "intf-add", VLC_VAR_SETTEXT, &text, NULL );
     if( isatty( 0 ) )
     {
-        val.psz_string = (char *)"cli";
+        val.psz_string = (char *)"rc";
         text.psz_string = (char *)_("Console");
         var_Change( p_intf, "intf-add", VLC_VAR_ADDCHOICE, &val, &text );
     }
