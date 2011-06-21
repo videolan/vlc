@@ -60,7 +60,6 @@ typedef struct intf_thread_t
 
     /* Specific interfaces */
     intf_sys_t *        p_sys;                          /** system interface */
-    char *              psz_intf;                    /** intf name specified */
 
     /** Interface module */
     module_t *   p_module;

@@ -64,10 +64,10 @@ static vlc_mutex_t lock = VLC_STATIC_MUTEX;
  * Create and start an interface.
  *
  * @param p_this the calling vlc_object_t
- * @param psz_module a preferred interface module
+ * @param chain configuration chain string
  * @return VLC_SUCCESS or an error code
  */
-int intf_Create( vlc_object_t *p_this, const char *psz_module )
+int intf_Create( vlc_object_t *p_this, const char *chain )
 {
     libvlc_int_t *p_libvlc = p_this->p_libvlc;
     intf_thread_t * p_intf;
@@ -113,14 +113,15 @@ int intf_Create( vlc_object_t *p_this, const char *psz_module )
 
     /* Choose the best module */
     p_intf->p_cfg = NULL;
-    char *psz_parser = *psz_module == '$'
-                     ? var_CreateGetString(p_intf,psz_module+1)
-                     : strdup( psz_module );
-    char *psz_tmp = config_ChainCreate( &p_intf->psz_intf, &p_intf->p_cfg,
+    char *psz_parser = *chain == '$'
+                     ? var_CreateGetString(p_intf, chain+1)
+                     : strdup( chain );
+    char *module;
+    char *psz_tmp = config_ChainCreate( &module, &p_intf->p_cfg,
                                         psz_parser );
     free( psz_tmp );
     free( psz_parser );
-    p_intf->p_module = module_need( p_intf, "interface", p_intf->psz_intf, true );
+    p_intf->p_module = module_need( p_intf, "interface", module, true );
     if( p_intf->p_module == NULL )
     {
         msg_Err( p_intf, "no suitable interface module" );
@@ -170,7 +171,6 @@ error:
     if( p_intf->p_module )
         module_unneed( p_intf, p_intf->p_module );
     config_ChainDestroy( p_intf->p_cfg );
-    free( p_intf->psz_intf );
     vlc_object_release( p_intf );
     return VLC_EGENERIC;
 }
@@ -206,7 +206,6 @@ void intf_DestroyAll( libvlc_int_t *p_libvlc )
             vlc_join( p_intf->thread, NULL );
         }
         module_unneed( p_intf, p_intf->p_module );
-        free( p_intf->psz_intf );
         config_ChainDestroy( p_intf->p_cfg );
         vlc_object_release( p_intf );
 
