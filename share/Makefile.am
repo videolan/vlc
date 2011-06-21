@@ -281,7 +281,7 @@ DIST_http_lua = \
 	lua/http/dialogs/stream_window.html \
 	lua/http/dialogs/vlm \
 	lua/http/favicon.ico \
-	lua/http/flash.html
+	lua/http/flash.html \
 	lua/http/images/Audio-48.png \
 	lua/http/images/Back-48.png \
 	lua/http/images/button_eject-48.png \
