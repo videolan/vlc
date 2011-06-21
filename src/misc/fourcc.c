@@ -898,6 +898,7 @@ static const entry_t p_list_audio[] = {
     /* DTS Audio */
     B(VLC_CODEC_DTS, "DTS Audio"),
         A("dts "),
+        A("DTS "),
         A("dtsb"),
         A("ms\x20\x01"),
 
