@@ -269,6 +269,53 @@ EXTRA_DIST += \
 	extras/package/macosx/Resources/spref_cone_Interface_64.png \
 	extras/package/macosx/Resources/spref_cone_Subtitles_64.png \
 	extras/package/macosx/Resources/spref_cone_Video_64.png \
+	extras/package/macosx/Resources/back-pressed.png \
+	extras/package/macosx/Resources/back.png \
+	extras/package/macosx/Resources/bottom-bar-mini.png \
+	extras/package/macosx/Resources/effects-double-buttons-blue.png \
+	extras/package/macosx/Resources/effects-double-buttons-pressed.png \
+	extras/package/macosx/Resources/effects-double-buttons.png \
+	extras/package/macosx/Resources/effects-one-button-blue.png \
+	extras/package/macosx/Resources/effects-one-button.png \
+	extras/package/macosx/Resources/forward-pressed.png \
+	extras/package/macosx/Resources/forward.png \
+	extras/package/macosx/Resources/fullscreen-double-buttons-pressed.png \
+	extras/package/macosx/Resources/fullscreen-double-buttons.png \
+	extras/package/macosx/Resources/mainwindow_dark/ \
+	extras/package/macosx/Resources/mini-progressbar-fill-left.png \
+	extras/package/macosx/Resources/mini-progressbar-fill-middle.png \
+	extras/package/macosx/Resources/mini-progressbar-fill-right.png \
+	extras/package/macosx/Resources/mini-progressbar-knob.png \
+	extras/package/macosx/Resources/mini-progressbar-wrapper-left.png \
+	extras/package/macosx/Resources/mini-progressbar-wrapper-middle.png \
+	extras/package/macosx/Resources/mini-progressbar-wrapper-right.png \
+	extras/package/macosx/Resources/pause-pressed.png \
+	extras/package/macosx/Resources/play-pressed.png \
+	extras/package/macosx/Resources/playlist-blue.png \
+	extras/package/macosx/Resources/playlist-pressed.png \
+	extras/package/macosx/Resources/playlist.png \
+	extras/package/macosx/Resources/progression-fill-left.png \
+	extras/package/macosx/Resources/progression-fill-middle.png \
+	extras/package/macosx/Resources/progression-fill-right.png \
+	extras/package/macosx/Resources/progression-knob.png \
+	extras/package/macosx/Resources/progression-track-wrapper-left.png \
+	extras/package/macosx/Resources/progression-track-wrapper-middle.png \
+	extras/package/macosx/Resources/progression-track-wrapper-right.png \
+	extras/package/macosx/Resources/repeat-all-pressed.png \
+	extras/package/macosx/Resources/repeat-all.png \
+	extras/package/macosx/Resources/repeat-one-pressed.png \
+	extras/package/macosx/Resources/repeat-one.png \
+	extras/package/macosx/Resources/repeat-pressed.png \
+	extras/package/macosx/Resources/repeat.png \
+	extras/package/macosx/Resources/shuffle-blue-pressed.png \
+	extras/package/macosx/Resources/shuffle-on.png \
+	extras/package/macosx/Resources/shuffle-pressed.png \
+	extras/package/macosx/Resources/shuffle.png \
+	extras/package/macosx/Resources/stop-pressed.png \
+	extras/package/macosx/Resources/volume-high.png \
+	extras/package/macosx/Resources/volume-low.png \
+	extras/package/macosx/Resources/volume-slider-knob.png \
+	extras/package/macosx/Resources/volume-slider-track.png \
 	extras/package/macosx/fullscreen_panel.svg \
 	extras/package/macosx/ub.sh \
 	extras/package/macosx/vlc.xcodeproj/project.pbxproj \
