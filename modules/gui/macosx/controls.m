@@ -182,18 +182,18 @@
 /* three little ugly helpers */
 - (void)repeatOne
 {
-    [o_btn_repeat setImage: [NSImage imageNamed:@"repeat_single_embedded_graphite"]];
-    [o_btn_repeat setAlternateImage: [NSImage imageNamed:@"repeat_embedded_graphite"]];
+    [o_btn_repeat setImage: [NSImage imageNamed:@"repeat-one"]];
+    [o_btn_repeat setAlternateImage: [NSImage imageNamed:@"repeat-one-pressed"]];
 }
 - (void)repeatAll
 {
-    [o_btn_repeat setImage: [NSImage imageNamed:@"repeat_embedded_graphite"]];
-    [o_btn_repeat setAlternateImage: [NSImage imageNamed:@"repeat_embedded"]];
+    [o_btn_repeat setImage: [NSImage imageNamed:@"repeat-all"]];
+    [o_btn_repeat setAlternateImage: [NSImage imageNamed:@"repeat-all-pressed"]];
 }
 - (void)repeatOff
 {
-    [o_btn_repeat setImage: [NSImage imageNamed:@"repeat_embedded"]];
-    [o_btn_repeat setAlternateImage: [NSImage imageNamed:@"repeat_embedded_graphite"]];
+    [o_btn_repeat setImage: [NSImage imageNamed:@"repeat"]];
+    [o_btn_repeat setAlternateImage: [NSImage imageNamed:@"repeat-pressed"]];
 }
 - (void)shuffle
 {
@@ -201,10 +201,16 @@
     playlist_t *p_playlist = pl_Get( VLCIntf );
     var_Get( p_playlist, "random", &val );
     [o_btn_shuffle setState: val.b_bool];
-	if(val.b_bool)
-        [o_btn_shuffle_embed setImage: [NSImage imageNamed:@"shuffle_embedded_graphite"]];
-	else
-        [o_btn_shuffle_embed setImage: [NSImage imageNamed:@"shuffle_embedded"]];
+	if(val.b_bool) {
+        [o_btn_shuffle_embed setImage: [NSImage imageNamed:@"shuffle-on"]];
+        [o_btn_shuffle_embed setAlternativeImage: [NSImage imageNamed:@"shuffle-blue-pressed"]];
+    }
+    else
+    {
+        [o_btn_shuffle_embed setImage: [NSImage imageNamed:@"shuffle"]];
+        [o_btn_shuffle_embed setImage: [NSImage imageNamed:@"shuffle-pressed"]];
+    }
+
 }
 
 - (IBAction)repeatButtonAction:(id)sender

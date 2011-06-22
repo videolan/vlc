@@ -138,17 +138,7 @@
 {
 }
 
-@end
-
-/*****************************************************************************
- * ITSliderCell
- *****************************************************************************/
-
-@interface ITSliderCell : NSSliderCell
-{
-    NSImage *_knobOff;
-    NSImage *_knobOn;
-    BOOL b_mouse_down;
-}
+- (void)drawRect:(NSRect)rect;
+- (void)drawKnobInRect:(NSRect)knobRect;
 
 @end

@@ -136,8 +136,6 @@ struct intf_sys_t
     float f_slider_old;                                         /* old slider val */
     IBOutlet NSSlider * o_volumeslider;                         /* volume slider */
 
-    IBOutlet NSView * toolbarMediaControl;   /* view with the controls */
-
     IBOutlet NSProgressIndicator * o_main_pgbar;   /* playlist window progress bar */
     IBOutlet NSButton * o_btn_prev;     /* btn previous   */
     IBOutlet NSButton * o_btn_rewind;   /* btn rewind     */
@@ -320,14 +318,7 @@ struct intf_sys_t
     IBOutlet NSMenuItem * o_vmi_fullscreen;
     IBOutlet NSMenuItem * o_vmi_snapshot;
 
-    bool b_small_window;
-
-    bool b_restore_size;
-    NSRect o_restore_rect;
-
     mtime_t i_end_scroll;
-
-    NSSize o_size_with_playlist;
 
     int     i_lastShownVolume;
 

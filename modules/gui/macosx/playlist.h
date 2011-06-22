@@ -77,8 +77,6 @@
     IBOutlet id o_btn_playlist;
     IBOutlet id o_playlist_view;
     IBOutlet id o_sidebar;
-    IBOutlet id o_status_field;
-    IBOutlet id o_status_field_embed;
     IBOutlet id o_search_field;
     IBOutlet id o_search_field_other;
     IBOutlet id o_mi_save_playlist;
@@ -118,10 +116,6 @@
     BOOL b_selected_item_met;
     BOOL b_isSortDescending;
     id o_tc_sortColumn;
-
-    /* "add node" button and menu entry */
-    IBOutlet id o_mi_addNode;
-    IBOutlet id o_btn_addNode;
 }
 
 - (void)searchfieldChanged:(NSNotification *)o_notification;
@@ -147,8 +141,6 @@
 - (IBAction)sortNodeByName:(id)sender;
 - (IBAction)sortNodeByAuthor:(id)sender;
 - (IBAction)recursiveExpandNode:(id)sender;
-
-- (IBAction)addNode:(id)sender;
 
 - (void)playSidebarItem:(id)item;
 - (id)playingItem;

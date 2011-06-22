@@ -222,7 +222,7 @@
     if( o_value == nil )
     {
         /* FIXME: Why is there a warning if that happens all the time and seems
-         * to be normal? Add an assert and fix it. 
+         * to be normal? Add an assert and fix it.
          * msg_Warn( VLCIntf, "playlist item misses pointer value, adding one" ); */
         o_value = [[NSValue valueWithPointer: p_return] retain];
     }
@@ -275,7 +275,7 @@
         }
         return @"error" ;
     }
- 
+
     p_item = (playlist_item_t *)[item pointerValue];
     if( !p_item || !p_item->p_input )
     {
@@ -288,7 +288,7 @@
         }
         return @"error";
     }
- 
+
     attempted_reload = NO;
 
     if( [[o_tc identifier] isEqualToString:@"name"] )
@@ -418,7 +418,7 @@
     char ** ppsz_services = vlc_sd_GetNames( VLCIntf, &ppsz_name, NULL );
     if( !ppsz_services )
         return;
-    
+
     for( i = 0; ppsz_services[i]; i++ )
     {
         bool  b_enabled;
@@ -477,12 +477,9 @@
     [o_mi_sort_author setTitle: _NS("Sort Node by Author")];
     [o_mi_services setTitle: _NS("Services discovery")];
     [o_mm_mi_services setTitle: _NS("Services discovery")];
-    [o_status_field setStringValue: _NS("No items in the playlist")];
-    [o_status_field_embed setStringValue: _NS("No items in the playlist")];
 
     [o_search_field setToolTip: _NS("Search in Playlist")];
     [o_search_field_other setToolTip: _NS("Search in Playlist")];
-    [o_mi_addNode setTitle: _NS("Add Folder to Playlist")];
 
     [o_save_accessory_text setStringValue: _NS("File Format:")];
     [[o_save_accessory_popup itemAtIndex:0] setTitle: _NS("Extended M3U")];
@@ -519,33 +516,6 @@
     [o_sidebar updateSidebar:[self playingItem]];
     [[[[VLCMain sharedInstance] wizard] playlistWizard] reloadOutlineView];
     [[[[VLCMain sharedInstance] bookmarks] dataTable] reloadData];
-
-    playlist_t *p_playlist = pl_Get( VLCIntf );
-
-    PL_LOCK;
-    if( playlist_CurrentSize( p_playlist ) >= 2 )
-    {
-        [o_status_field setStringValue: [NSString stringWithFormat:
-                    _NS("%i items"),
-                playlist_CurrentSize( p_playlist )]];
-        [o_status_field_embed setStringValue: [NSString stringWithFormat:
-                                               _NS("%i items"),
-                                               playlist_CurrentSize( p_playlist )]];        
-    }
-    else
-    {
-        if( playlist_IsEmpty( p_playlist ) )
-        {
-            [o_status_field setStringValue: _NS("No items in the playlist")];
-            [o_status_field_embed setStringValue: _NS("No items in the playlist")];
-        }
-        else
-        {
-            [o_status_field setStringValue: _NS("1 item")];
-            [o_status_field_embed setStringValue: _NS("1 item")];
-        }
-    }
-    PL_UNLOCK;
 
     [self outlineViewSelectionDidChange: nil];
 }
@@ -854,18 +824,18 @@
 {
     intf_thread_t * p_intf = VLCIntf;
     playlist_t * p_playlist = pl_Get( p_intf );
-    
+
     playlist_item_t *p_item;
     playlist_item_t *p_node = NULL;
-    
+
     p_item = [item pointerValue];
-    
+
     if( p_item )
     {
         if( p_item->i_children == -1 )
         {
             p_node = p_item->p_parent;
-            
+
         }
         else
         {
@@ -890,7 +860,7 @@
 
     if(! p_item || !p_item->p_input )
         return;
-    
+
     char *psz_uri = decode_URI( input_item_GetURI( p_item->p_input ) );
     if( psz_uri )
         o_mrl = [NSMutableString stringWithUTF8String: psz_uri];
@@ -899,10 +869,10 @@
     NSRange prefix_range = [o_mrl rangeOfString: @"file:"];
     if( prefix_range.location != NSNotFound )
         [o_mrl deleteCharactersInRange: prefix_range];
-    
+
     if( [o_mrl characterAtIndex:0] == '/' )
         [[NSWorkspace sharedWorkspace] selectFile: o_mrl inFileViewerRootedAtPath: o_mrl];
-}    
+}
 
 /* When called retrieves the selected outlineview row and plays that node or item */
 - (IBAction)preparseItem:(id)sender
@@ -911,7 +881,7 @@
     NSMutableArray *o_to_preparse;
     intf_thread_t * p_intf = VLCIntf;
     playlist_t * p_playlist = pl_Get( p_intf );
- 
+
     o_to_preparse = [NSMutableArray arrayWithArray:[[o_outline_view selectedRowEnumerator] allObjects]];
     i_count = [o_to_preparse count];
 
@@ -1018,7 +988,7 @@
         PL_LOCK;
         playlist_item_t *p_item = [o_item pointerValue];
 #ifndef NDEBUG
-        msg_Dbg( p_intf, "deleting item %i (of %i) with id \"%i\", pointerValue \"%p\" and %i children", i+1, i_count, 
+        msg_Dbg( p_intf, "deleting item %i (of %i) with id \"%i\", pointerValue \"%p\" and %i children", i+1, i_count,
                 p_item->p_input->i_id, [o_item pointerValue], p_item->i_children +1 );
 #endif
         [o_to_delete removeObject: o_number];
@@ -1032,7 +1002,7 @@
                         checkItemExistence: NO locked:YES] == YES )
                 // if current item is in selected node and is playing then stop playlist
                 playlist_Control(p_playlist, PLAYLIST_STOP, pl_Locked );
-    
+
             playlist_NodeDelete( p_playlist, p_item, true, false );
         }
         else
@@ -1191,7 +1161,7 @@
 
         /* Add the item */
         /* FIXME: playlist_AddInput() can fail */
-        
+
         playlist_AddInput( p_playlist, p_input, PLAYLIST_INSERT,
              i_position == -1 ? PLAYLIST_END : i_position + i_item, true,
          pl_Locked );
@@ -1506,7 +1476,7 @@
 - (id)playingItem
 {
     playlist_t *p_playlist = pl_Get( VLCIntf );
-    
+
     id o_playing_item;
 
     PL_LOCK;
@@ -1516,18 +1486,6 @@
 
     return o_playing_item;
 }
-
-- (IBAction)addNode:(id)sender
-{
-    playlist_t * p_playlist = pl_Get( VLCIntf );
-
-    PL_LOCK;
-    playlist_NodeCreate( p_playlist, _("Empty Folder"),
-                                      p_playlist->p_local_category, PLAYLIST_END, 0, NULL );
-    PL_UNLOCK;
-
-    [self playlistUpdated];
-}
 @end
 
 @implementation VLCPlaylist (NSOutlineViewDataSource)
@@ -1535,32 +1493,6 @@
 - (id)outlineView:(NSOutlineView *)outlineView child:(NSInteger)index ofItem:(id)item
 {
     id o_value = [super outlineView: outlineView child: index ofItem: item];
-    playlist_t *p_playlist = pl_Get( VLCIntf );
-
-    PL_LOCK;
-    if( playlist_CurrentSize( p_playlist )  >= 2 )
-    {
-        [o_status_field setStringValue: [NSString stringWithFormat:
-                    _NS("%i items"),
-             playlist_CurrentSize( p_playlist )]];
-        [o_status_field_embed setStringValue: [NSString stringWithFormat:
-                                               _NS("%i items"),
-                                               playlist_CurrentSize( p_playlist )]];
-    }
-    else
-    {
-        if( playlist_IsEmpty( p_playlist ) )
-        {
-            [o_status_field setStringValue: _NS("No items in the playlist")];
-            [o_status_field_embed setStringValue: _NS("No items in the playlist")];
-        }
-        else
-        {
-            [o_status_field setStringValue: _NS("1 item")];
-            [o_status_field_embed setStringValue: _NS("1 item")];
-        }
-    }
-    PL_UNLOCK;
 
     [o_outline_dict setObject:o_value forKey:[NSString stringWithFormat:@"%p",
                                                     [o_value pointerValue]]];
@@ -1640,7 +1572,7 @@
     /* We refuse to drop an item in anything else than a child of the General
        Node. We still accept items that would be root nodes of the outlineview
        however, to allow drop in an empty playlist. */
-    if( !( ([self isItem: [item pointerValue] inNode: p_playlist->p_local_category checkItemExistence: NO] || 
+    if( !( ([self isItem: [item pointerValue] inNode: p_playlist->p_local_category checkItemExistence: NO] ||
         ( var_CreateGetBool( p_playlist, "media-library" ) && [self isItem: [item pointerValue] inNode: p_playlist->p_ml_category checkItemExistence: NO] ) ) || item == nil ) )
     {
         return NSDragOperationNone;

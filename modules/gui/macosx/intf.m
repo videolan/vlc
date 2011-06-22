@@ -388,15 +388,6 @@ static VLCMain *_o_sharedMainInstance = nil;
     [o_msgs_panel setExcludedFromWindowsMenu: YES];
     [o_msgs_panel setDelegate: self];
 
-    /* In code and not in Nib for 10.4 compat */
-    NSToolbar * toolbar = [[[NSToolbar alloc] initWithIdentifier:@"mainControllerToolbar"] autorelease];
-    [toolbar setDelegate:self];
-    [toolbar setShowsBaselineSeparator:NO];
-    [toolbar setAllowsUserCustomization:NO];
-    [toolbar setDisplayMode:NSToolbarDisplayModeIconOnly];
-    [toolbar setAutosavesConfiguration:YES];
-    [o_window setToolbar:toolbar];
-
     o_key = [NSString stringWithFormat:@"%s", config_GetPsz( p_intf, "key-quit" )];
     [o_mi_quit setKeyEquivalent: [self VLCKeyToString: o_key]];
     [o_mi_quit setKeyEquivalentModifierMask: [self VLCModifiersToCocoa:o_key]];
@@ -466,7 +457,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     o_key = [NSString stringWithFormat:@"%s", config_GetPsz( p_intf, "key-zoom-double" )];
     [o_mi_double_window setKeyEquivalent: [self VLCKeyToString: o_key]];
     [o_mi_double_window setKeyEquivalentModifierMask: [self VLCModifiersToCocoa:o_key]];
-    
+
     var_Create( p_intf, "intf-change", VLC_VAR_BOOL );
 
     [self setSubmenusEnabled: FALSE];
@@ -474,32 +465,8 @@ static VLCMain *_o_sharedMainInstance = nil;
     [self manageVolumeSlider];
     [o_window setDelegate: self];
 
-    b_restore_size = false;
-
     // Set that here as IB seems to be buggy
-    [o_window setContentMinSize:NSMakeSize(338., 30.)];
-
-    if( [o_window contentRectForFrameRect:[o_window frame]].size.height <= 169. )
-    {
-        b_small_window = YES;
-        [o_window setFrame: NSMakeRect( [o_window frame].origin.x,
-            [o_window frame].origin.y, [o_window frame].size.width,
-            [o_window minSize].height ) display: YES animate:YES];
-        [o_playlist_view setAutoresizesSubviews: NO];
-    }
-    else
-    {
-        b_small_window = NO;
-        NSRect contentRect = [o_window contentRectForFrameRect:[o_window frame]];
-        [o_playlist_view setFrame: NSMakeRect( 0, 0, contentRect.size.width, contentRect.size.height - [o_window contentMinSize].height )];
-        [o_playlist_view setNeedsDisplay:YES];
-        [o_playlist_view setAutoresizesSubviews: YES];
-        [[o_window contentView] addSubview: o_playlist_view];
-    }
-
-    [self updateTogglePlaylistState];
-
-    o_size_with_playlist = [o_window contentRectForFrameRect:[o_window frame]].size;
+    [o_window setContentMinSize:NSMakeSize(500., 200.)];
 
     p_playlist = pl_Get( p_intf );
 
@@ -907,66 +874,6 @@ static VLCMain *_o_sharedMainInstance = nil;
 }
 
 #pragma mark -
-#pragma mark Toolbar delegate
-
-/* Our item identifiers */
-static NSString * VLCToolbarMediaControl     = @"VLCToolbarMediaControl";
-
-- (NSArray *)toolbarAllowedItemIdentifiers:(NSToolbar *)toolbar
-{
-    return [NSArray arrayWithObjects:
-//                        NSToolbarCustomizeToolbarItemIdentifier,
-//                        NSToolbarFlexibleSpaceItemIdentifier,
-//                        NSToolbarSpaceItemIdentifier,
-//                        NSToolbarSeparatorItemIdentifier,
-                        VLCToolbarMediaControl,
-                        nil ];
-}
-
-- (NSArray *) toolbarDefaultItemIdentifiers: (NSToolbar *) toolbar
-{
-    return [NSArray arrayWithObjects:
-                        VLCToolbarMediaControl,
-                        nil ];
-}
-
-- (NSToolbarItem *) toolbar:(NSToolbar *)toolbar itemForItemIdentifier:(NSString *)itemIdentifier willBeInsertedIntoToolbar:(BOOL)flag
-{
-    NSToolbarItem *toolbarItem = [[[NSToolbarItem alloc] initWithItemIdentifier: itemIdentifier] autorelease];
-
-    if( [itemIdentifier isEqual: VLCToolbarMediaControl] )
-    {
-        [toolbarItem setLabel:@"Media Controls"];
-        [toolbarItem setPaletteLabel:@"Media Controls"];
-
-        NSSize size = toolbarMediaControl.frame.size;
-        [toolbarItem setView:toolbarMediaControl];
-        [toolbarItem setMinSize:size];
-        size.width += 1000.;
-        [toolbarItem setMaxSize:size];
-
-        // Hack: For some reason we need to make sure
-        // that the those element are on top
-        // Add them again will put them frontmost
-        [toolbarMediaControl addSubview:o_scrollfield];
-        [toolbarMediaControl addSubview:o_timeslider];
-        [toolbarMediaControl addSubview:o_timefield];
-        [toolbarMediaControl addSubview:o_main_pgbar];
-
-        /* TODO: setup a menu */
-    }
-    else
-    {
-        /* itemIdentifier referred to a toolbar item that is not
-         * provided or supported by us or Cocoa
-         * Returning nil will inform the toolbar
-         * that this kind of item is not supported */
-        toolbarItem = nil;
-    }
-    return toolbarItem;
-}
-
-#pragma mark -
 #pragma mark Media Key support
 
 -(void)mediaKeyTap:(SPMediaKeyTap*)keyTap receivedMediaKeyEvent:(NSEvent*)event
@@ -1353,7 +1260,7 @@ unsigned int CocoaKeyToVLC( unichar i_key )
     int i;
     NSMutableString *tempString = [[[NSMutableString alloc] init] autorelease];
     NSMutableString *tempStringPlus = [[[NSMutableString alloc] init] autorelease];
-    
+
     val.i_int = 0;
     p_hotkeys = p_intf->p_libvlc->p_hotkeys;
 
@@ -1379,10 +1286,10 @@ unsigned int CocoaKeyToVLC( unichar i_key )
         [tempString appendString:@"Command-"];
         [tempStringPlus appendString:@"Command+"];
     }
-    
+
     [tempString appendString:[[o_event charactersIgnoringModifiers] lowercaseString]];
     [tempStringPlus appendString:[[o_event charactersIgnoringModifiers] lowercaseString]];
-    
+
     key = [[o_event charactersIgnoringModifiers] characterAtIndex: 0];
 
     switch( key )
@@ -1419,13 +1326,13 @@ unsigned int CocoaKeyToVLC( unichar i_key )
     assert( p_main );
     unsigned confsize;
     module_config_t *p_config;
-    
+
     p_config = module_config_get (p_main, &confsize);
-    
+
     for (size_t i = 0; i < confsize; i++)
     {
         module_config_t *p_item = p_config + i;
-        
+
         if( (p_item->i_type & CONFIG_ITEM) && p_item->psz_name != NULL
            && !strncmp( p_item->psz_name , "key-", 4 )
            && !EMPTY_STR( p_item->psz_text ) )
@@ -1436,7 +1343,7 @@ unsigned int CocoaKeyToVLC( unichar i_key )
     }
     module_config_free (p_config);
     module_release (p_main);
-    o_usedHotkeys = [[NSArray alloc] initWithArray: o_usedHotkeys copyItems: YES];    
+    o_usedHotkeys = [[NSArray alloc] initWithArray: o_usedHotkeys copyItems: YES];
 }
 
 
@@ -2676,128 +2583,12 @@ end:
 
 - (IBAction)togglePlaylist:(id)sender
 {
-    NSRect contentRect = [o_window contentRectForFrameRect:[o_window frame]];
-    NSRect o_rect = [o_window contentRectForFrameRect:[o_window frame]];
-    /*First, check if the playlist is visible*/
-    if( contentRect.size.height <= 169. )
-    {
-        o_restore_rect = contentRect;
-        b_restore_size = true;
-        b_small_window = YES; /* we know we are small, make sure this is actually set (see case below) */
-
-        /* make large */
-        if( o_size_with_playlist.height > 169. )
-            o_rect.size.height = o_size_with_playlist.height;
-        else
-            o_rect.size.height = 500.;
-
-        if( o_size_with_playlist.width >= [o_window contentMinSize].width )
-            o_rect.size.width = o_size_with_playlist.width;
-        else
-            o_rect.size.width = [o_window contentMinSize].width;
-
-        o_rect.origin.x = contentRect.origin.x;
-        o_rect.origin.y = contentRect.origin.y - o_rect.size.height +
-            [o_window contentMinSize].height;
-
-        o_rect = [o_window frameRectForContentRect:o_rect];
-
-        NSRect screenRect = [[o_window screen] visibleFrame];
-        if( !NSContainsRect( screenRect, o_rect ) ) {
-            if( NSMaxX(o_rect) > NSMaxX(screenRect) )
-                o_rect.origin.x = ( NSMaxX(screenRect) - o_rect.size.width );
-            if( NSMinY(o_rect) < NSMinY(screenRect) )
-                o_rect.origin.y = ( NSMinY(screenRect) );
-        }
-
-        [o_btn_playlist setState: YES];
-    }
-    else
-    {
-        NSSize curSize = o_rect.size;
-        if( b_restore_size )
-        {
-            o_rect = o_restore_rect;
-            if( o_rect.size.height < [o_window contentMinSize].height )
-                o_rect.size.height = [o_window contentMinSize].height;
-            if( o_rect.size.width < [o_window contentMinSize].width )
-                o_rect.size.width = [o_window contentMinSize].width;
-        }
-        else
-        {
-            NSRect contentRect = [o_window contentRectForFrameRect:[o_window frame]];
-            /* make small */
-            o_rect.size.height = [o_window contentMinSize].height;
-            o_rect.size.width = [o_window contentMinSize].width;
-            o_rect.origin.x = contentRect.origin.x;
-            /* Calculate the position of the lower right corner after resize */
-            o_rect.origin.y = contentRect.origin.y +
-                contentRect.size.height - [o_window contentMinSize].height;
-        }
-
-        [o_playlist_view setAutoresizesSubviews: NO];
-        [o_playlist_view removeFromSuperview];
-        [o_btn_playlist setState: NO];
-        b_small_window = NO; /* we aren't small here just yet. we are doing an animated resize after this */
-        o_rect = [o_window frameRectForContentRect:o_rect];
-    }
-
-    [o_window setFrame: o_rect display:YES animate: YES];
+    NSLog( @"needs to be re-implemented" );
 }
 
 - (void)updateTogglePlaylistState
 {
-    if( [o_window contentRectForFrameRect:[o_window frame]].size.height <= 169. )
-        [o_btn_playlist setState: NO];
-    else
-        [o_btn_playlist setState: YES];
-
     [[self playlist] outlineViewSelectionDidChange: NULL];
-}
-
-- (NSSize)windowWillResize:(NSWindow *)sender toSize:(NSSize)proposedFrameSize
-{
-
-    /* Not triggered on a window resize or maxification of the window. only by window mouse dragging resize */
-
-   /*Stores the size the controller one resize, to be able to restore it when
-     toggling the playlist*/
-    o_size_with_playlist = proposedFrameSize;
-
-    NSRect rect;
-    rect.size = proposedFrameSize;
-    if( [o_window contentRectForFrameRect:rect].size.height <= 169. )
-    {
-        if( b_small_window == NO )
-        {
-            /* if large and going to small then hide */
-            b_small_window = YES;
-            [o_playlist_view setAutoresizesSubviews: NO];
-            [o_playlist_view removeFromSuperview];
-        }
-        return NSMakeSize( proposedFrameSize.width, [o_window minSize].height);
-    }
-    return proposedFrameSize;
-}
-
-- (void)windowDidMove:(NSNotification *)notif
-{
-    b_restore_size = false;
-}
-
-- (void)windowDidResize:(NSNotification *)notif
-{
-    if( [o_window contentRectForFrameRect:[o_window frame]].size.height > 169. && b_small_window )
-    {
-        /* If large and coming from small then show */
-        [o_playlist_view setAutoresizesSubviews: YES];
-        NSRect contentRect = [o_window contentRectForFrameRect:[o_window frame]];
-        [o_playlist_view setFrame: NSMakeRect( 0, 0, contentRect.size.width, contentRect.size.height - [o_window contentMinSize].height )];
-        [o_playlist_view setNeedsDisplay:YES];
-        [[o_window contentView] addSubview: o_playlist_view];
-        b_small_window = NO;
-    }
-    [self updateTogglePlaylistState];
 }
 
 #pragma mark -
@@ -2912,7 +2703,7 @@ end:
 // but we need to send a stop: to properly exits libvlc.
 // However, we are not able to change the action-method sent by this standard menu item.
 // thus we override terminat: to send a stop:
-// see [af97f24d528acab89969d6541d83f17ce1ecd580] that introduced the removal of setjmp() and longjmp() 
+// see [af97f24d528acab89969d6541d83f17ce1ecd580] that introduced the removal of setjmp() and longjmp()
 - (void)terminate:(id)sender
 {
     [self activateIgnoringOtherApps:YES];
