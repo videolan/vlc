@@ -12,10 +12,10 @@
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="2"/>
-			<integer value="24"/>
 			<integer value="2197"/>
+			<integer value="2"/>
 			<integer value="2417"/>
+			<integer value="24"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -37,10 +37,10 @@
 				<string key="NSClassName">NSApplication</string>
 			</object>
 			<object class="NSWindowTemplate" id="498338108">
-				<int key="NSWindowStyleMask">4111</int>
+				<int key="NSWindowStyleMask">15</int>
 				<int key="NSWindowBacking">2</int>
 				<string key="NSWindowRect">{{53, 419}, {604, 310}}</string>
-				<int key="NSWTFlags">1881669632</int>
+				<int key="NSWTFlags">1881670656</int>
 				<string key="NSWindowTitle">VLC media player</string>
 				<string key="NSWindowClass">VLCControllerWindow</string>
 				<nil key="NSViewClass"/>
@@ -51,6 +51,38 @@
 					<int key="NSvFlags">256</int>
 					<object class="NSMutableArray" key="NSSubviews">
 						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSImageView" id="1041205852">
+							<reference key="NSNextResponder" ref="429932428"/>
+							<int key="NSvFlags">290</int>
+							<object class="NSMutableSet" key="NSDragTypes">
+								<bool key="EncodedWithXMLCoder">YES</bool>
+								<object class="NSArray" key="set.sortedObjects">
+									<bool key="EncodedWithXMLCoder">YES</bool>
+									<string>Apple PDF pasteboard type</string>
+									<string>Apple PICT pasteboard type</string>
+									<string>Apple PNG pasteboard type</string>
+									<string>NSFilenamesPboardType</string>
+									<string>NeXT Encapsulated PostScript v1.2 pasteboard type</string>
+									<string>NeXT TIFF v4.0 pasteboard type</string>
+								</object>
+							</object>
+							<string key="NSFrame">{{-1, 0}, {605, 36}}</string>
+							<reference key="NSSuperview" ref="429932428"/>
+							<bool key="NSEnabled">YES</bool>
+							<object class="NSImageCell" key="NSCell" id="360339763">
+								<int key="NSCellFlags">130560</int>
+								<int key="NSCellFlags2">33554432</int>
+								<object class="NSCustomResource" key="NSContents">
+									<string key="NSClassName">NSImage</string>
+									<string key="NSResourceName">bottom-background</string>
+								</object>
+								<int key="NSAlign">0</int>
+								<int key="NSScale">1</int>
+								<int key="NSStyle">0</int>
+								<bool key="NSAnimates">NO</bool>
+							</object>
+							<bool key="NSEditable">YES</bool>
+						</object>
 						<object class="NSImageView" id="784705424">
 							<reference key="NSNextResponder" ref="429932428"/>
 							<int key="NSvFlags">289</int>
@@ -6778,6 +6810,7 @@ LCAuLi4</string>
 							<reference ref="915491793"/>
 							<reference ref="704525034"/>
 							<reference ref="664576649"/>
+							<reference ref="1041205852"/>
 						</object>
 						<reference key="parent" ref="498338108"/>
 					</object>
@@ -9219,6 +9252,20 @@ LCAuLi4</string>
 						<reference key="object" ref="664576649"/>
 						<reference key="parent" ref="429932428"/>
 					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">4432</int>
+						<reference key="object" ref="1041205852"/>
+						<object class="NSMutableArray" key="children">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<reference ref="360339763"/>
+						</object>
+						<reference key="parent" ref="429932428"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">4433</int>
+						<reference key="object" ref="360339763"/>
+						<reference key="parent" ref="1041205852"/>
+					</object>
 				</object>
 			</object>
 			<object class="NSMutableDictionary" key="flattenedProperties">
@@ -9876,6 +9923,9 @@ LCAuLi4</string>
 					<string>4423.ImportedFromIB2</string>
 					<string>4424.IBPluginDependency</string>
 					<string>4425.IBPluginDependency</string>
+					<string>4432.IBPluginDependency</string>
+					<string>4432.IBViewBoundsToFrameTransform</string>
+					<string>4433.IBPluginDependency</string>
 					<string>446.IBPluginDependency</string>
 					<string>446.ImportedFromIB2</string>
 					<string>5.IBPluginDependency</string>
@@ -10621,6 +10671,11 @@ LCAuLi4</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<object class="NSAffineTransform">
+						<bytes key="NSTransformStruct">AUOvgABBqAAAA</bytes>
+					</object>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
@@ -10686,7 +10741,7 @@ LCAuLi4</string>
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">4431</int>
+			<int key="maxID">4433</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -14403,6 +14458,7 @@ LCAuLi4</string>
 				<string>NSMenuMixedState</string>
 				<string>back</string>
 				<string>back-pressed</string>
+				<string>bottom-background</string>
 				<string>display_left</string>
 				<string>display_middle</string>
 				<string>display_right</string>
@@ -14452,6 +14508,7 @@ LCAuLi4</string>
 				<string>{7, 2}</string>
 				<string>{35, 23}</string>
 				<string>{35, 23}</string>
+				<string>{1.44005, 8.64029}</string>
 				<string>{8, 36}</string>
 				<string>{8, 36}</string>
 				<string>{8, 36}</string>
@@ -14478,7 +14535,7 @@ LCAuLi4</string>
 				<string>{33, 20}</string>
 				<string>{29, 30}</string>
 				<string>{39, 39}</string>
-				<string>{28, 23}</string>
+				<string>{512, 512}</string>
 				<string>{28, 23}</string>
 				<string>{28, 23}</string>
 				<string>{28, 23}</string>

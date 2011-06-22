@@ -194,6 +194,8 @@
 		CC8062641021F8790021EB9A /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = CC8062631021F8790021EB9A /* dsa_pub.pem */; };
 		CC84FB2D130083BB00816D38 /* BGHUDAppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC84FB2C130083BB00816D38 /* BGHUDAppKit.framework */; };
 		CC84FB481300843200816D38 /* BGHUDAppKit.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = CC84FB2C130083BB00816D38 /* BGHUDAppKit.framework */; };
+		CC9B43AF13B29C79000205AE /* bottom-background.png in Resources */ = {isa = PBXBuildFile; fileRef = CC9B43AE13B29C79000205AE /* bottom-background.png */; };
+		CC9B43B113B29FCF000205AE /* bottom-background_dark.png in Resources */ = {isa = PBXBuildFile; fileRef = CC9B43B013B29FCF000205AE /* bottom-background_dark.png */; };
 		CCBE999F0F922C51000705F8 /* CoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CCBE999E0F922C51000705F8 /* CoreServices.framework */; };
 		CCC0C2AA13A285F700AC92B3 /* VideoEffects.nib in Resources */ = {isa = PBXBuildFile; fileRef = CCC0C2A813A285F700AC92B3 /* VideoEffects.nib */; };
 		CCF11B540F8BFB520088542D /* ErrorPanel.nib in Resources */ = {isa = PBXBuildFile; fileRef = CCF11B520F8BFB520088542D /* ErrorPanel.nib */; };
@@ -455,6 +457,8 @@
 		CC8062631021F8790021EB9A /* dsa_pub.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = dsa_pub.pem; path = Resources/dsa_pub.pem; sourceTree = "<group>"; };
 		CC84FB2C130083BB00816D38 /* BGHUDAppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = BGHUDAppKit.framework; path = ../../contrib/BGHUDAppKit/BGHUDAppKit.framework; sourceTree = SOURCE_ROOT; };
 		CC962E2C0CC7992800A56695 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = /System/Library/Frameworks/WebKit.framework; sourceTree = "<absolute>"; };
+		CC9B43AE13B29C79000205AE /* bottom-background.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "bottom-background.png"; path = "Resources/mainwindow/bottom-background.png"; sourceTree = "<group>"; };
+		CC9B43B013B29FCF000205AE /* bottom-background_dark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "bottom-background_dark.png"; path = "Resources/mainwindow_dark/bottom-background_dark.png"; sourceTree = "<group>"; };
 		CCB24D5D0D54BBAE004D780C /* simple_prefs.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = simple_prefs.m; path = ../../../modules/gui/macosx/simple_prefs.m; sourceTree = SOURCE_ROOT; };
 		CCB24D5E0D54BBAE004D780C /* simple_prefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = simple_prefs.h; path = ../../../modules/gui/macosx/simple_prefs.h; sourceTree = SOURCE_ROOT; };
 		CCBE999E0F922C51000705F8 /* CoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreServices.framework; path = /System/Library/Frameworks/CoreServices.framework; sourceTree = "<absolute>"; };
@@ -689,6 +693,7 @@
 			children = (
 				CC04321113B246DF00D7D52E /* back_dark.png */,
 				CC04321213B246DF00D7D52E /* back-pressed_dark.png */,
+				CC9B43B013B29FCF000205AE /* bottom-background_dark.png */,
 				CC04321313B246DF00D7D52E /* effects-double-buttons_dark.png */,
 				CC04321413B246DF00D7D52E /* effects-double-buttons-blue_dark.png */,
 				CC04321513B246DF00D7D52E /* effects-double-buttons-pressed_dark.png */,
@@ -739,6 +744,7 @@
 				CC04332B13B28B8200D7D52E /* back-pressed.png */,
 				CC04332C13B28B8200D7D52E /* back.png */,
 				CC04332D13B28B8200D7D52E /* bottom-bar-mini.png */,
+				CC9B43AE13B29C79000205AE /* bottom-background.png */,
 				CC04332E13B28B8200D7D52E /* effects-double-buttons-blue.png */,
 				CC04332F13B28B8200D7D52E /* effects-double-buttons-pressed.png */,
 				CC04333013B28B8200D7D52E /* effects-double-buttons.png */,
@@ -1154,6 +1160,8 @@
 				CC0433D213B28C8C00D7D52E /* spref_cone_Interface_64.png in Resources */,
 				CC0433D313B28C8C00D7D52E /* spref_cone_Subtitles_64.png in Resources */,
 				CC0433D413B28C8C00D7D52E /* spref_cone_Video_64.png in Resources */,
+				CC9B43AF13B29C79000205AE /* bottom-background.png in Resources */,
+				CC9B43B113B29FCF000205AE /* bottom-background_dark.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
