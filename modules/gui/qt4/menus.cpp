@@ -281,11 +281,13 @@ static inline void addAction( QMenu *_menu, QVariant val, QString title ) {
 }
 
 // Add an action with a submenu
-static inline void addActionWithSubmenu( QMenu *_menu, QVariant val, QString title ) {
+static inline QMenu *addActionWithSubmenu( QMenu *_menu, QVariant val, QString title ) {
     QAction *_action = new QAction( title, _menu );
+    QMenu *_submenu = new QMenu( _menu );
     _action->setData( val );
-    _action->setMenu( new QMenu( _menu ) );
+    _action->setMenu( _submenu );
     _menu->addAction( _action );
+    return _submenu;
 }
 
 // Add an action that is a checkbox
@@ -671,14 +673,17 @@ QMenu *QVLCMenu::VideoMenu( intf_thread_t *p_intf, QMenu *current, bool b_subtit
 QMenu *QVLCMenu::NavigMenu( intf_thread_t *p_intf, QMenu *menu )
 {
     QAction *action;
+    QMenu *submenu;
 
     addActionWithSubmenu( menu, "title", qtr( "T&itle" ) );
     addActionWithSubmenu( menu, "chapter", qtr( "&Chapter" ) );
-    addActionWithSubmenu( menu, "navigation", qtr( "&Navigation" ) );
+    submenu = addActionWithSubmenu( menu, "navigation", qtr( "&Navigation" ) );
+    submenu->setTearOffEnabled( true );
     addActionWithSubmenu( menu, "program", qtr( "&Program" ) );
 
     /* FixMe: sync I_MENU_BOOKMARK string */
-    QMenu *submenu = new QMenu( qtr( "Custom &Bookmarks" ), menu );
+    submenu = new QMenu( qtr( "Custom &Bookmarks" ), menu );
+    submenu->setTearOffEnabled( true );
     addDPStaticEntry( submenu, qtr( "&Manage" ), "",
                       SLOT( bookmarksDialog() ), "Ctrl+B" );
     submenu->addSeparator();
