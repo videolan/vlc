@@ -174,6 +174,7 @@
         //vout_OSDMessage( p_intf, SPU_DEFAULT_CHANNEL, "%s", _( "Random Off" ) );
         config_PutInt( p_playlist, "random", 0 );
     }
+    [self shuffle];
 
     p_intf->p_sys->b_playmode_update = true;
     p_intf->p_sys->b_intf_update = true;
@@ -200,17 +201,15 @@
     vlc_value_t val;
     playlist_t *p_playlist = pl_Get( VLCIntf );
     var_Get( p_playlist, "random", &val );
-    [o_btn_shuffle setState: val.b_bool];
 	if(val.b_bool) {
-        [o_btn_shuffle_embed setImage: [NSImage imageNamed:@"shuffle-on"]];
-        [o_btn_shuffle_embed setAlternativeImage: [NSImage imageNamed:@"shuffle-blue-pressed"]];
+        [o_btn_shuffle setImage: [NSImage imageNamed:@"shuffle-on"]];
+        [o_btn_shuffle setAlternateImage: [NSImage imageNamed:@"shuffle-blue-pressed"]];
     }
     else
     {
-        [o_btn_shuffle_embed setImage: [NSImage imageNamed:@"shuffle"]];
-        [o_btn_shuffle_embed setImage: [NSImage imageNamed:@"shuffle-pressed"]];
+        [o_btn_shuffle setImage: [NSImage imageNamed:@"shuffle"]];
+        [o_btn_shuffle setAlternateImage: [NSImage imageNamed:@"shuffle-pressed"]];
     }
-
 }
 
 - (IBAction)repeatButtonAction:(id)sender

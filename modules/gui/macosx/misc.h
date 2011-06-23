@@ -1,10 +1,11 @@
 /*****************************************************************************
  * misc.h: code not specific to vlc
  *****************************************************************************
- * Copyright (C) 2003-2007 the VideoLAN team
+ * Copyright (C) 2003-2011 the VideoLAN team
  * $Id$
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
+ *          Felix Paul Kühne <fkuehne at videolan dot org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -127,6 +128,19 @@
 @interface MPSlider : NSSlider
 {
 }
+
+@end
+
+/*****************************************************************************
+ * TimeLineSlider
+ *****************************************************************************/
+
+@interface TimeLineSlider : NSSlider
+{
+}
+
+- (void)drawRect:(NSRect)rect;
+- (void)drawKnobInRect:(NSRect)knobRect;
 
 @end
 

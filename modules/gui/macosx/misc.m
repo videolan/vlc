@@ -434,6 +434,9 @@ static NSMutableArray *blackoutWindows = NULL;
     }
     */
 
+    /* we want to be moveable regardless of our style */
+    [self setMovableByWindowBackground: YES];
+
     /* we don't want this window to be restored on relaunch */
     if ([self respondsToSelector:@selector(setRestorable:)])
         [self setRestorable:NO];
@@ -688,6 +691,40 @@ void _drawFrameInRect(NSRect frameRect)
 
 @end
 
+/*****************************************************************************
+ * TimeLineSlider
+ *****************************************************************************/
+
+@implementation TimeLineSlider
+
+- (void)drawKnobInRect:(NSRect)knobRect
+{
+    NSRect image_rect;
+    NSImage *img = [NSImage imageNamed:@"progression-knob"];
+    image_rect.size = [img size];
+    image_rect.origin.x = 0;
+    image_rect.origin.y = 0;
+    knobRect.origin.x += (knobRect.size.width - image_rect.size.width) / 2;
+    knobRect.size.width = image_rect.size.width;
+    knobRect.size.height = image_rect.size.height;
+    [img drawInRect:knobRect fromRect:image_rect operation:NSCompositeSourceOver fraction:1];
+}
+
+- (void)drawRect:(NSRect)rect
+{
+    /* Draw default to make sure the slider behaves correctly */
+    [[NSGraphicsContext currentContext] saveGraphicsState];
+    NSRectClip(NSZeroRect);
+    [super drawRect:rect];
+    [[NSGraphicsContext currentContext] restoreGraphicsState];
+
+    NSRect knobRect = [[self cell] knobRectFlipped:NO];
+    knobRect.origin.y+=1;
+    //    [[[NSColor blackColor] colorWithAlphaComponent:0.6] set];
+    [self drawKnobInRect: knobRect];
+}
+
+@end
 
 /*****************************************************************************
  * ITSlider

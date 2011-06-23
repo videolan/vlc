@@ -35,11 +35,8 @@
 
     IBOutlet id o_volumeslider;
 
-    IBOutlet id o_btn_shuffle;
-    IBOutlet id o_btn_addNode;
     IBOutlet id o_btn_repeat;
-    IBOutlet id o_btn_repeat_embed;
-    IBOutlet id o_btn_shuffle_embed;
+    IBOutlet id o_btn_shuffle;
 
     IBOutlet id o_specificTime_cancel_btn;
     IBOutlet id o_specificTime_enter_fld;

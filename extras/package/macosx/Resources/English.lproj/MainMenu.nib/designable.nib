@@ -12,10 +12,9 @@
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="2197"/>
+			<integer value="24"/>
 			<integer value="2"/>
 			<integer value="2417"/>
-			<integer value="24"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -37,7 +36,7 @@
 				<string key="NSClassName">NSApplication</string>
 			</object>
 			<object class="NSWindowTemplate" id="498338108">
-				<int key="NSWindowStyleMask">15</int>
+				<int key="NSWindowStyleMask">4111</int>
 				<int key="NSWindowBacking">2</int>
 				<string key="NSWindowRect">{{53, 419}, {604, 310}}</string>
 				<int key="NSWTFlags">1881670656</int>
@@ -75,6 +74,38 @@
 								<object class="NSCustomResource" key="NSContents">
 									<string key="NSClassName">NSImage</string>
 									<string key="NSResourceName">bottom-background</string>
+								</object>
+								<int key="NSAlign">0</int>
+								<int key="NSScale">1</int>
+								<int key="NSStyle">0</int>
+								<bool key="NSAnimates">NO</bool>
+							</object>
+							<bool key="NSEditable">YES</bool>
+						</object>
+						<object class="NSImageView" id="21901908">
+							<reference key="NSNextResponder" ref="429932428"/>
+							<int key="NSvFlags">290</int>
+							<object class="NSMutableSet" key="NSDragTypes">
+								<bool key="EncodedWithXMLCoder">YES</bool>
+								<object class="NSArray" key="set.sortedObjects">
+									<bool key="EncodedWithXMLCoder">YES</bool>
+									<string>Apple PDF pasteboard type</string>
+									<string>Apple PICT pasteboard type</string>
+									<string>Apple PNG pasteboard type</string>
+									<string>NSFilenamesPboardType</string>
+									<string>NeXT Encapsulated PostScript v1.2 pasteboard type</string>
+									<string>NeXT TIFF v4.0 pasteboard type</string>
+								</object>
+							</object>
+							<string key="NSFrame">{{223, 10}, {153, 14}}</string>
+							<reference key="NSSuperview" ref="429932428"/>
+							<bool key="NSEnabled">YES</bool>
+							<object class="NSImageCell" key="NSCell" id="586405807">
+								<int key="NSCellFlags">130560</int>
+								<int key="NSCellFlags2">33554432</int>
+								<object class="NSCustomResource" key="NSContents">
+									<string key="NSClassName">NSImage</string>
+									<string key="NSResourceName">progression-track-wrapper-middle</string>
 								</object>
 								<int key="NSAlign">0</int>
 								<int key="NSScale">1</int>
@@ -142,7 +173,7 @@
 								</object>
 								<object class="NSCustomResource" key="NSAlternateImage">
 									<string key="NSClassName">NSImage</string>
-									<string key="NSResourceName">stop_graphite</string>
+									<string key="NSResourceName">stop-pressed</string>
 								</object>
 								<string key="NSAlternateContents"/>
 								<object class="NSMutableString" key="NSKeyEquivalent">
@@ -337,7 +368,7 @@
 								<string key="NSContents"/>
 								<reference key="NSSupport" ref="188716167"/>
 								<reference key="NSControlView" ref="38046606"/>
-								<int key="NSButtonFlags">-931921665</int>
+								<int key="NSButtonFlags">141820159</int>
 								<int key="NSButtonFlags2">2</int>
 								<object class="NSCustomResource" key="NSNormalImage">
 									<string key="NSClassName">NSImage</string>
@@ -345,7 +376,7 @@
 								</object>
 								<object class="NSCustomResource" key="NSAlternateImage">
 									<string key="NSClassName">NSImage</string>
-									<string key="NSResourceName">equalizerdrawer_graphite</string>
+									<string key="NSResourceName">effects-double-buttons-pressed</string>
 								</object>
 								<string key="NSAlternateContents"/>
 								<object class="NSMutableString" key="NSKeyEquivalent">
@@ -379,7 +410,7 @@
 								</object>
 								<object class="NSCustomResource" key="NSAlternateImage">
 									<string key="NSClassName">NSImage</string>
-									<string key="NSResourceName">play_graphite</string>
+									<string key="NSResourceName">play-pressed</string>
 								</object>
 								<string key="NSAlternateContents"/>
 								<string key="NSKeyEquivalent"/>
@@ -403,7 +434,7 @@
 									<int key="NSfFlags">1044</int>
 								</object>
 								<reference key="NSControlView" ref="291209196"/>
-								<int key="NSButtonFlags">-935051009</int>
+								<int key="NSButtonFlags">138690815</int>
 								<int key="NSButtonFlags2">2</int>
 								<object class="NSCustomResource" key="NSNormalImage">
 									<string key="NSClassName">NSImage</string>
@@ -461,11 +492,11 @@
 								<reference key="NSControlView" ref="714984330"/>
 								<int key="NSButtonFlags">-931921665</int>
 								<int key="NSButtonFlags2">2</int>
-								<object class="NSCustomResource" key="NSNormalImage">
+								<object class="NSCustomResource" key="NSNormalImage" id="560932515">
 									<string key="NSClassName">NSImage</string>
 									<string key="NSResourceName">fullscreen-double-buttons</string>
 								</object>
-								<object class="NSCustomResource" key="NSAlternateImage">
+								<object class="NSCustomResource" key="NSAlternateImage" id="115283638">
 									<string key="NSClassName">NSImage</string>
 									<string key="NSResourceName">fullscreen-double-buttons-pressed</string>
 								</object>
@@ -484,7 +515,7 @@
 							<reference key="NSSuperview" ref="429932428"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSSliderCell" key="NSCell" id="276068486">
-								<int key="NSCellFlags">67501824</int>
+								<int key="NSCellFlags">-2079981824</int>
 								<int key="NSCellFlags2">131072</int>
 								<object class="NSMutableString" key="NSContents">
 									<characters key="NS.bytes"/>
@@ -846,12 +877,76 @@
 						</object>
 						<object class="NSProgressIndicator" id="664576649">
 							<reference key="NSNextResponder" ref="429932428"/>
-							<int key="NSvFlags">-2147482358</int>
+							<int key="NSvFlags">-2147482334</int>
 							<object class="NSPSMatrix" key="NSDrawMatrix"/>
-							<string key="NSFrame">{{219, 12}, {159, 12}}</string>
+							<string key="NSFrame">{{222, 11}, {155, 12}}</string>
 							<reference key="NSSuperview" ref="429932428"/>
 							<int key="NSpiFlags">16650</int>
 							<double key="NSMaxValue">100</double>
+						</object>
+						<object class="NSImageView" id="354459361">
+							<reference key="NSNextResponder" ref="429932428"/>
+							<int key="NSvFlags">292</int>
+							<object class="NSMutableSet" key="NSDragTypes">
+								<bool key="EncodedWithXMLCoder">YES</bool>
+								<object class="NSArray" key="set.sortedObjects">
+									<bool key="EncodedWithXMLCoder">YES</bool>
+									<string>Apple PDF pasteboard type</string>
+									<string>Apple PICT pasteboard type</string>
+									<string>Apple PNG pasteboard type</string>
+									<string>NSFilenamesPboardType</string>
+									<string>NeXT Encapsulated PostScript v1.2 pasteboard type</string>
+									<string>NeXT TIFF v4.0 pasteboard type</string>
+								</object>
+							</object>
+							<string key="NSFrame">{{220, 10}, {3, 14}}</string>
+							<reference key="NSSuperview" ref="429932428"/>
+							<bool key="NSEnabled">YES</bool>
+							<object class="NSImageCell" key="NSCell" id="187033403">
+								<int key="NSCellFlags">130560</int>
+								<int key="NSCellFlags2">33554432</int>
+								<object class="NSCustomResource" key="NSContents">
+									<string key="NSClassName">NSImage</string>
+									<string key="NSResourceName">progression-track-wrapper-left</string>
+								</object>
+								<int key="NSAlign">0</int>
+								<int key="NSScale">2</int>
+								<int key="NSStyle">0</int>
+								<bool key="NSAnimates">NO</bool>
+							</object>
+							<bool key="NSEditable">YES</bool>
+						</object>
+						<object class="NSImageView" id="828712633">
+							<reference key="NSNextResponder" ref="429932428"/>
+							<int key="NSvFlags">289</int>
+							<object class="NSMutableSet" key="NSDragTypes">
+								<bool key="EncodedWithXMLCoder">YES</bool>
+								<object class="NSArray" key="set.sortedObjects">
+									<bool key="EncodedWithXMLCoder">YES</bool>
+									<string>Apple PDF pasteboard type</string>
+									<string>Apple PICT pasteboard type</string>
+									<string>Apple PNG pasteboard type</string>
+									<string>NSFilenamesPboardType</string>
+									<string>NeXT Encapsulated PostScript v1.2 pasteboard type</string>
+									<string>NeXT TIFF v4.0 pasteboard type</string>
+								</object>
+							</object>
+							<string key="NSFrame">{{376, 10}, {3, 14}}</string>
+							<reference key="NSSuperview" ref="429932428"/>
+							<bool key="NSEnabled">YES</bool>
+							<object class="NSImageCell" key="NSCell" id="41671586">
+								<int key="NSCellFlags">130560</int>
+								<int key="NSCellFlags2">33554432</int>
+								<object class="NSCustomResource" key="NSContents">
+									<string key="NSClassName">NSImage</string>
+									<string key="NSResourceName">progression-track-wrapper-right</string>
+								</object>
+								<int key="NSAlign">0</int>
+								<int key="NSScale">2</int>
+								<int key="NSStyle">0</int>
+								<bool key="NSAnimates">NO</bool>
+							</object>
+							<bool key="NSEditable">YES</bool>
 						</object>
 					</object>
 					<string key="NSFrameSize">{604, 310}</string>
@@ -860,7 +955,7 @@
 				<string key="NSScreenRect">{{0, 0}, {1280, 778}}</string>
 				<string key="NSMinSize">{400, 222}</string>
 				<string key="NSMaxSize">{1.79769e+308, 1.79769e+308}</string>
-				<string key="NSFrameAutosaveName">vlc</string>
+				<string key="NSFrameAutosaveName">vlc-10thanniversary</string>
 			</object>
 			<object class="NSMenu" id="782168084">
 				<string key="NSTitle">MainMenu</string>
@@ -2711,14 +2806,6 @@
 				</object>
 				<string key="NSName"/>
 			</object>
-			<object class="NSCustomView" id="593327595">
-				<reference key="NSNextResponder"/>
-				<int key="NSvFlags">274</int>
-				<string key="NSFrameSize">{576, 81}</string>
-				<reference key="NSSuperview"/>
-				<string key="NSClassName">VLBrushedMetalImageView</string>
-				<string key="NSExtension">NSImageView</string>
-			</object>
 			<object class="NSWindowTemplate" id="284663135">
 				<int key="NSWindowStyleMask">271</int>
 				<int key="NSWindowBacking">2</int>
@@ -2846,7 +2933,7 @@
 								<int key="NSCellFlags2">33554432</int>
 								<object class="NSCustomResource" key="NSContents">
 									<string key="NSClassName">NSImage</string>
-									<string key="NSResourceName">display_middle</string>
+									<string key="NSResourceName">mini-progressbar-wrapper-middle</string>
 								</object>
 								<int key="NSAlign">0</int>
 								<int key="NSScale">1</int>
@@ -2893,14 +2980,8 @@
 								<reference key="NSControlView" ref="750753776"/>
 								<int key="NSButtonFlags">-931921665</int>
 								<int key="NSButtonFlags2">2</int>
-								<object class="NSCustomResource" key="NSNormalImage">
-									<string key="NSClassName">NSImage</string>
-									<string key="NSResourceName">fullscreen_active</string>
-								</object>
-								<object class="NSCustomResource" key="NSAlternateImage">
-									<string key="NSClassName">NSImage</string>
-									<string key="NSResourceName">fullscreen_graphite</string>
-								</object>
+								<reference key="NSNormalImage" ref="560932515"/>
+								<reference key="NSAlternateImage" ref="115283638"/>
 								<string key="NSAlternateContents"/>
 								<object class="NSMutableString" key="NSKeyEquivalent">
 									<characters key="NS.bytes"/>
@@ -2932,10 +3013,10 @@
 								<int key="NSCellFlags2">33554432</int>
 								<object class="NSCustomResource" key="NSContents">
 									<string key="NSClassName">NSImage</string>
-									<string key="NSResourceName">display_left</string>
+									<string key="NSResourceName">mini-progressbar-wrapper-left</string>
 								</object>
 								<int key="NSAlign">0</int>
-								<int key="NSScale">0</int>
+								<int key="NSScale">1</int>
 								<int key="NSStyle">0</int>
 								<bool key="NSAnimates">NO</bool>
 							</object>
@@ -2964,10 +3045,10 @@
 								<int key="NSCellFlags2">33554432</int>
 								<object class="NSCustomResource" key="NSContents">
 									<string key="NSClassName">NSImage</string>
-									<string key="NSResourceName">display_right</string>
+									<string key="NSResourceName">mini-progressbar-wrapper-right</string>
 								</object>
 								<int key="NSAlign">0</int>
-								<int key="NSScale">0</int>
+								<int key="NSScale">1</int>
 								<int key="NSStyle">0</int>
 								<bool key="NSAnimates">NO</bool>
 							</object>
@@ -5179,14 +5260,6 @@ LCAuLi4</string>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_random_ckb</string>
-						<reference key="source" ref="998338913"/>
-						<reference key="destination" ref="291209196"/>
-					</object>
-					<int key="connectionID">2223</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
 						<string key="label">o_mi_save_playlist</string>
 						<reference key="source" ref="998338913"/>
 						<reference key="destination" ref="47280649"/>
@@ -5376,22 +5449,6 @@ LCAuLi4</string>
 						<reference key="destination" ref="132244936"/>
 					</object>
 					<int key="connectionID">2283</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_playlist_view</string>
-						<reference key="source" ref="199714555"/>
-						<reference key="destination" ref="593327595"/>
-					</object>
-					<int key="connectionID">2289</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_playlist_view</string>
-						<reference key="source" ref="998338913"/>
-						<reference key="destination" ref="593327595"/>
-					</object>
-					<int key="connectionID">2290</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
@@ -6227,14 +6284,6 @@ LCAuLi4</string>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_btn_equalizer</string>
-						<reference key="source" ref="199714555"/>
-						<reference key="destination" ref="38046606"/>
-					</object>
-					<int key="connectionID">3697</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
 						<string key="label">o_main_pgbar</string>
 						<reference key="source" ref="199714555"/>
 						<reference key="destination" ref="664576649"/>
@@ -6809,8 +6858,11 @@ LCAuLi4</string>
 							<reference ref="596740638"/>
 							<reference ref="915491793"/>
 							<reference ref="704525034"/>
-							<reference ref="664576649"/>
 							<reference ref="1041205852"/>
+							<reference ref="828712633"/>
+							<reference ref="354459361"/>
+							<reference ref="21901908"/>
+							<reference ref="664576649"/>
 						</object>
 						<reference key="parent" ref="498338108"/>
 					</object>
@@ -8141,15 +8193,6 @@ LCAuLi4</string>
 						<reference key="parent" ref="47559826"/>
 					</object>
 					<object class="IBObjectRecord">
-						<int key="objectID">2197</int>
-						<reference key="object" ref="593327595"/>
-						<object class="NSMutableArray" key="children">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-						</object>
-						<reference key="parent" ref="0"/>
-						<string key="objectName">Playlist</string>
-					</object>
-					<object class="IBObjectRecord">
 						<int key="objectID">2416</int>
 						<reference key="object" ref="284663135"/>
 						<object class="NSMutableArray" key="children">
@@ -8167,13 +8210,13 @@ LCAuLi4</string>
 							<reference ref="975829996"/>
 							<reference ref="545549073"/>
 							<reference ref="802390514"/>
-							<reference ref="266027916"/>
 							<reference ref="262403346"/>
 							<reference ref="400811827"/>
 							<reference ref="750753776"/>
 							<reference ref="627102071"/>
 							<reference ref="528539871"/>
 							<reference ref="645169405"/>
+							<reference ref="266027916"/>
 						</object>
 						<reference key="parent" ref="284663135"/>
 					</object>
@@ -9266,6 +9309,48 @@ LCAuLi4</string>
 						<reference key="object" ref="360339763"/>
 						<reference key="parent" ref="1041205852"/>
 					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">4434</int>
+						<reference key="object" ref="354459361"/>
+						<object class="NSMutableArray" key="children">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<reference ref="187033403"/>
+						</object>
+						<reference key="parent" ref="429932428"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">4435</int>
+						<reference key="object" ref="187033403"/>
+						<reference key="parent" ref="354459361"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">4436</int>
+						<reference key="object" ref="828712633"/>
+						<object class="NSMutableArray" key="children">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<reference ref="41671586"/>
+						</object>
+						<reference key="parent" ref="429932428"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">4437</int>
+						<reference key="object" ref="41671586"/>
+						<reference key="parent" ref="828712633"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">4438</int>
+						<reference key="object" ref="21901908"/>
+						<object class="NSMutableArray" key="children">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<reference ref="586405807"/>
+						</object>
+						<reference key="parent" ref="429932428"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">4439</int>
+						<reference key="object" ref="586405807"/>
+						<reference key="parent" ref="21901908"/>
+					</object>
 				</object>
 			</object>
 			<object class="NSMutableDictionary" key="flattenedProperties">
@@ -9462,9 +9547,6 @@ LCAuLi4</string>
 					<string>2133.ImportedFromIB2</string>
 					<string>217.IBPluginDependency</string>
 					<string>217.ImportedFromIB2</string>
-					<string>2197.IBEditorWindowLastContentRect</string>
-					<string>2197.IBPluginDependency</string>
-					<string>2197.ImportedFromIB2</string>
 					<string>2208.IBPluginDependency</string>
 					<string>2208.IBViewBoundsToFrameTransform</string>
 					<string>2208.ImportedFromIB2</string>
@@ -9542,6 +9624,7 @@ LCAuLi4</string>
 					<string>2420.ImportedFromIB2</string>
 					<string>2421.CustomClassName</string>
 					<string>2421.IBPluginDependency</string>
+					<string>2421.IBViewBoundsToFrameTransform</string>
 					<string>2421.ImportedFromIB2</string>
 					<string>2422.CustomClassName</string>
 					<string>2422.IBPluginDependency</string>
@@ -9923,9 +10006,19 @@ LCAuLi4</string>
 					<string>4423.ImportedFromIB2</string>
 					<string>4424.IBPluginDependency</string>
 					<string>4425.IBPluginDependency</string>
+					<string>4432.CustomClassName</string>
 					<string>4432.IBPluginDependency</string>
 					<string>4432.IBViewBoundsToFrameTransform</string>
 					<string>4433.IBPluginDependency</string>
+					<string>4434.IBPluginDependency</string>
+					<string>4434.IBViewBoundsToFrameTransform</string>
+					<string>4435.IBPluginDependency</string>
+					<string>4436.IBPluginDependency</string>
+					<string>4436.IBViewBoundsToFrameTransform</string>
+					<string>4437.IBPluginDependency</string>
+					<string>4438.IBPluginDependency</string>
+					<string>4438.IBViewBoundsToFrameTransform</string>
+					<string>4439.IBPluginDependency</string>
 					<string>446.IBPluginDependency</string>
 					<string>446.ImportedFromIB2</string>
 					<string>5.IBPluginDependency</string>
@@ -10167,9 +10260,6 @@ LCAuLi4</string>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
-					<string>{{400, 389}, {576, 81}}</string>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<object class="NSAffineTransform">
 						<bytes key="NSTransformStruct">P4AAAL+AAABDagAAwiwAAA</bytes>
@@ -10249,6 +10339,9 @@ LCAuLi4</string>
 					<boolean value="YES"/>
 					<string>VLBrushedMetalImageView</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<object class="NSAffineTransform">
+						<bytes key="NSTransformStruct">AUMeAABAgAAAA</bytes>
+					</object>
 					<boolean value="YES"/>
 					<string>VLCTimeField</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -10315,7 +10408,7 @@ LCAuLi4</string>
 					<string>{{756, 528}, {64, 6}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
-					<string>{{84, 613}, {488, 40}}</string>
+					<string>{{340, 613}, {488, 40}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -10430,7 +10523,7 @@ LCAuLi4</string>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<object class="NSAffineTransform">
-						<bytes key="NSTransformStruct">P4AAAL+AAABDWwAAwiAAAA</bytes>
+						<bytes key="NSTransformStruct">P4AAAL+AAABDYAAAwggAAA</bytes>
 					</object>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -10604,7 +10697,7 @@ LCAuLi4</string>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<object class="NSAffineTransform">
-						<bytes key="NSTransformStruct">P4AAAL+AAABBAAAAwv4AAA</bytes>
+						<bytes key="NSTransformStruct">P4AAAL+AAAC/gAAAw42AAA</bytes>
 					</object>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -10656,7 +10749,7 @@ LCAuLi4</string>
 					</object>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>MPSlider</string>
+					<string>TimeLineSlider</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<object class="NSAffineTransform">
 						<bytes key="NSTransformStruct">P4AAAL+AAABDXAAAwbgAAA</bytes>
@@ -10670,9 +10763,25 @@ LCAuLi4</string>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>VLBrushedMetalImageView</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<object class="NSAffineTransform">
 						<bytes key="NSTransformStruct">AUOvgABBqAAAA</bytes>
+					</object>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<object class="NSAffineTransform">
+						<bytes key="NSTransformStruct">AUNNAABDkAAAA</bytes>
+					</object>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<object class="NSAffineTransform">
+						<bytes key="NSTransformStruct">AUOKgABDkAAAA</bytes>
+					</object>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<object class="NSAffineTransform">
+						<bytes key="NSTransformStruct">AUNiAABCMAAAA</bytes>
 					</object>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -10741,7 +10850,7 @@ LCAuLi4</string>
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">4433</int>
+			<int key="maxID">4439</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -10786,6 +10895,11 @@ LCAuLi4</string>
 						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">../../../modules/gui/macosx/SPMediaKeyTap.h</string>
 					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">TimeLineSlider</string>
+					<string key="superclassName">NSSlider</string>
+					<reference key="sourceIdentifier" ref="634186652"/>
 				</object>
 				<object class="IBPartialClassDescription">
 					<string key="className">VLBrushedMetalImageView</string>
@@ -11236,11 +11350,8 @@ LCAuLi4</string>
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>o_btn_addNode</string>
 							<string>o_btn_repeat</string>
-							<string>o_btn_repeat_embed</string>
 							<string>o_btn_shuffle</string>
-							<string>o_btn_shuffle_embed</string>
 							<string>o_main</string>
 							<string>o_specificTime_cancel_btn</string>
 							<string>o_specificTime_enter_fld</string>
@@ -11254,9 +11365,6 @@ LCAuLi4</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
 							<string>id</string>
 							<string>id</string>
 							<string>id</string>
@@ -11275,11 +11383,8 @@ LCAuLi4</string>
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>o_btn_addNode</string>
 							<string>o_btn_repeat</string>
-							<string>o_btn_repeat_embed</string>
 							<string>o_btn_shuffle</string>
-							<string>o_btn_shuffle_embed</string>
 							<string>o_main</string>
 							<string>o_specificTime_cancel_btn</string>
 							<string>o_specificTime_enter_fld</string>
@@ -11294,23 +11399,11 @@ LCAuLi4</string>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<object class="IBToOneOutletInfo">
-								<string key="name">o_btn_addNode</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBToOneOutletInfo">
 								<string key="name">o_btn_repeat</string>
 								<string key="candidateClassName">id</string>
 							</object>
 							<object class="IBToOneOutletInfo">
-								<string key="name">o_btn_repeat_embed</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBToOneOutletInfo">
 								<string key="name">o_btn_shuffle</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">o_btn_shuffle_embed</string>
 								<string key="candidateClassName">id</string>
 							</object>
 							<object class="IBToOneOutletInfo">
@@ -14459,11 +14552,8 @@ LCAuLi4</string>
 				<string>back</string>
 				<string>back-pressed</string>
 				<string>bottom-background</string>
-				<string>display_left</string>
-				<string>display_middle</string>
-				<string>display_right</string>
 				<string>effects-double-buttons</string>
-				<string>equalizerdrawer_graphite</string>
+				<string>effects-double-buttons-pressed</string>
 				<string>forward</string>
 				<string>forward-pressed</string>
 				<string>fs_background</string>
@@ -14479,14 +14569,18 @@ LCAuLi4</string>
 				<string>fs_volume_slider_bar</string>
 				<string>fullscreen-double-buttons</string>
 				<string>fullscreen-double-buttons-pressed</string>
-				<string>fullscreen_active</string>
-				<string>fullscreen_graphite</string>
+				<string>mini-progressbar-wrapper-left</string>
+				<string>mini-progressbar-wrapper-middle</string>
+				<string>mini-progressbar-wrapper-right</string>
 				<string>pause_embedded</string>
 				<string>pause_embedded_graphite</string>
 				<string>play</string>
-				<string>play_graphite</string>
+				<string>play-pressed</string>
 				<string>playlist</string>
 				<string>playlist-blue</string>
+				<string>progression-track-wrapper-left</string>
+				<string>progression-track-wrapper-middle</string>
+				<string>progression-track-wrapper-right</string>
 				<string>repeat</string>
 				<string>repeat-pressed</string>
 				<string>shuffle</string>
@@ -14496,7 +14590,7 @@ LCAuLi4</string>
 				<string>skip_previous_active_embedded</string>
 				<string>skip_previous_embedded_graphite</string>
 				<string>stop</string>
-				<string>stop_graphite</string>
+				<string>stop-pressed</string>
 				<string>volume-high</string>
 				<string>volume-low</string>
 				<string>volumetrack</string>
@@ -14508,12 +14602,9 @@ LCAuLi4</string>
 				<string>{7, 2}</string>
 				<string>{35, 23}</string>
 				<string>{35, 23}</string>
-				<string>{1.44005, 8.64029}</string>
-				<string>{8, 36}</string>
-				<string>{8, 36}</string>
-				<string>{8, 36}</string>
+				<string>{1.44005, 8.40028}</string>
 				<string>{29, 23}</string>
-				<string>{33, 20}</string>
+				<string>{29, 23}</string>
 				<string>{35, 23}</string>
 				<string>{35, 23}</string>
 				<string>{549, 87}</string>
@@ -14529,14 +14620,18 @@ LCAuLi4</string>
 				<string>{95, 2}</string>
 				<string>{29, 23}</string>
 				<string>{29, 23}</string>
-				<string>{33, 20}</string>
-				<string>{33, 20}</string>
+				<string>{3, 14}</string>
+				<string>{3, 14}</string>
+				<string>{3, 14}</string>
 				<string>{33, 20}</string>
 				<string>{33, 20}</string>
 				<string>{29, 30}</string>
-				<string>{39, 39}</string>
+				<string>{29, 30}</string>
 				<string>{512, 512}</string>
 				<string>{28, 23}</string>
+				<string>{3, 14}</string>
+				<string>{3, 14}</string>
+				<string>{3, 14}</string>
 				<string>{28, 23}</string>
 				<string>{28, 23}</string>
 				<string>{29, 23}</string>
@@ -14546,7 +14641,7 @@ LCAuLi4</string>
 				<string>{33, 20}</string>
 				<string>{33, 20}</string>
 				<string>{29, 23}</string>
-				<string>{33, 20}</string>
+				<string>{29, 23}</string>
 				<string>{10, 9}</string>
 				<string>{8, 9}</string>
 				<string>{75, 4}</string>
