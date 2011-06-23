@@ -2228,7 +2228,7 @@ libtiger: libtiger-$(TIGER_VERSION).tar.gz
 	$(EXTRACT_GZ)
 
 .tiger: libtiger .kate
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install)
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-valgrind --disable-doc && make && make install)
 	$(INSTALL_NAME)
 	touch $@
 
