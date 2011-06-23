@@ -630,7 +630,8 @@ static VLCOpen *_o_sharedMainInstance = nil;
 
         [self setMRL: o_mrl_string];
     }
-    [self setMRL: @""];
+    else
+        [self setMRL: @""];
 }
 
 - (IBAction)openFileBrowse:(id)sender
