@@ -248,7 +248,7 @@ EXTRA_DIST += \
 	extras/package/macosx/Resources/mainwindow/volumetrack.png \
 	extras/package/macosx/Resources/mainwindow_dark/back-pressed_dark.png \
 	extras/package/macosx/Resources/mainwindow_dark/back_dark.png \
-	extras/package/macosx/Resources/mainwindow/bottom-background_dark.png \
+	extras/package/macosx/Resources/mainwindow_dark/bottom-background_dark.png \
 	extras/package/macosx/Resources/mainwindow_dark/effects-double-buttons-blue_dark.png \
 	extras/package/macosx/Resources/mainwindow_dark/effects-double-buttons-pressed_dark.png \
 	extras/package/macosx/Resources/mainwindow_dark/effects-double-buttons_dark.png \
