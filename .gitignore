@@ -5,7 +5,6 @@
 *.lo
 *.lo?
 *.la
-*.mak
 *.moc.cpp
 *.o
 *.so
