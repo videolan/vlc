@@ -176,6 +176,7 @@ install: $(PKGS:%=.%)
 
 mostlyclean:
 	-$(RM) $(ALL_PKGS:%=.%) $(ALL_PKGS:%=.sum-%)
+	-$(RM) toolchain.cmake
 	-$(RM) -R "$(PREFIX)"
 	-find -maxdepth 1 -type d '!' -name . -exec $(RM) -R '{}' ';'
 
@@ -189,5 +190,25 @@ distclean: clean
 package: install
 	(cd $(PREFIX)/.. && \
 	tar cvJ $(notdir $(PREFIX))/) > ../vlc-contrib-$(HOST)-$(DATE).tar.xz
+
+# CMake toolchain
+toolchain.cmake:
+	$(RM) $@
+ifdef HAVE_WIN32
+	echo "set(CMAKE_SYSTEM_NAME Windows)" >> $@
+	echo "set(CMAKE_RC_COMPILER $(HOST)-windres)" >> $@
+endif
+ifdef HAVE_MACOSX
+	echo "set(CMAKE_SYSTEM_NAME Darwin)" >> $@
+	echo "set(CMAKE_C_FLAGS $(CFLAGS))" >> $@
+	echo "set(CMAKE_CXX_FLAGS $(CFLAGS)" >> $@
+	echo "set(CMAKE_LD_FLAGS $(LDFLAGS))" >> $@
+endif
+	echo "set(CMAKE_C_COMPILER $(CC))" >> $@
+	echo "set(CMAKE_CXX_COMPILER $(CXX))" >> $@
+	echo "set(CMAKE_FIND_ROOT_PATH $(PREFIX))" >> $@
+	echo "set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)" >> $@
+	echo "set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)" >> $@
+	echo "set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)" >> $@
 
 .DELETE_ON_ERROR:
