@@ -109,6 +109,7 @@ struct vout_display_opengl_t {
 
     int        tex_target;
     int        tex_format;
+    int        tex_internal;
     int        tex_type;
 
     int        tex_width[PICTURE_PLANE_MAX];
@@ -205,6 +206,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
 #   endif
     vgl->tex_target   = GL_TEXTURE_2D;
     vgl->tex_format   = GL_RGB;
+    vgl->tex_internal = GL_RGB;
     vgl->tex_type     = GL_UNSIGNED_SHORT_5_6_5;
 #elif defined(MACOS_OPENGL)
 #   if defined(WORDS_BIGENDIAN)
@@ -214,6 +216,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
 #   endif
     vgl->tex_target   = GL_TEXTURE_RECTANGLE_EXT;
     vgl->tex_format   = GL_YCBCR_422_APPLE;
+    vgl->tex_internal = GL_YCBCR_422_APPLE;
     vgl->tex_type     = GL_UNSIGNED_SHORT_8_8_APPLE;
 #else
     vgl->fmt.i_chroma = VLC_CODEC_RGB32;
@@ -228,6 +231,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
 #   endif
     vgl->tex_target   = GL_TEXTURE_2D;
     vgl->tex_format   = GL_RGBA;
+    vgl->tex_internal = GL_RGBA;
     vgl->tex_type     = GL_UNSIGNED_BYTE;
 #endif
     /* Use YUV if possible and needed */
@@ -242,6 +246,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
                 vgl->fmt          = *fmt;
                 vgl->fmt.i_chroma = *list;
                 vgl->tex_format   = GL_LUMINANCE;
+                vgl->tex_internal = GL_LUMINANCE;
                 vgl->tex_type     = GL_UNSIGNED_BYTE;
                 break;
             }
@@ -515,7 +520,7 @@ picture_pool_t *vout_display_opengl_GetPool(vout_display_opengl_t *vgl, unsigned
 
             /* Call glTexImage2D only once, and use glTexSubImage2D later */
             glTexImage2D(vgl->tex_target, 0,
-                         vgl->tex_format, vgl->tex_width[j], vgl->tex_height[j],
+                         vgl->tex_internal, vgl->tex_width[j], vgl->tex_height[j],
                          0, vgl->tex_format, vgl->tex_type, NULL);
         }
     }
