@@ -147,6 +147,22 @@ static inline int GetAlignedSize(unsigned size)
     return ((align >> 1) == size) ? size : align;
 }
 
+static bool IsLuminance16Supported(int target)
+{
+    GLuint texture;
+
+    glGenTextures(1, &texture);
+    glBindTexture(target, texture);
+    glTexImage2D(target, 0, GL_LUMINANCE16,
+                 64, 64, 0, GL_LUMINANCE, GL_UNSIGNED_SHORT, NULL);
+    GLint size = 0;
+    glGetTexLevelParameteriv(target, 0, GL_TEXTURE_LUMINANCE_SIZE, &size);
+
+    glDeleteTextures(1, &texture);
+
+    return size == 16;
+}
+
 vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
                                                const vlc_fourcc_t **subpicture_chromas,
                                                vlc_gl_t *gl)
@@ -236,6 +252,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
 #endif
     /* Use YUV if possible and needed */
     bool need_fs_yuv = false;
+    float yuv_range_correction = 1.0;
     if (supports_fp && supports_multitexture && max_texture_units >= 3 &&
         vlc_fourcc_IsYUV(fmt->i_chroma) && !vlc_fourcc_IsYUV(vgl->fmt.i_chroma)) {
         const vlc_fourcc_t *list = vlc_fourcc_GetYUVFallback(fmt->i_chroma);
@@ -248,6 +265,17 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
                 vgl->tex_format   = GL_LUMINANCE;
                 vgl->tex_internal = GL_LUMINANCE;
                 vgl->tex_type     = GL_UNSIGNED_BYTE;
+                yuv_range_correction = 1.0;
+                break;
+            } else if (dsc && dsc->plane_count == 3 && dsc->pixel_size == 2 &&
+                       IsLuminance16Supported(vgl->tex_target)) {
+                need_fs_yuv       = true;
+                vgl->fmt          = *fmt;
+                vgl->fmt.i_chroma = *list;
+                vgl->tex_format   = GL_LUMINANCE;
+                vgl->tex_internal = GL_LUMINANCE16;
+                vgl->tex_type     = GL_UNSIGNED_SHORT;
+                yuv_range_correction = (float)((1 << 16) - 1) / ((1 << dsc->pixel_bits) - 1);
                 break;
             }
             list++;
@@ -330,9 +358,12 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
                          swap_uv ? 'y' : 'z') < 0)
                 code = NULL;
 
-            for (int i = 0; i < 4; i++)
-                for (int j = 0; j < 4; j++)
-                    vgl->local_value[vgl->local_count + i][j] = j < 3 ? matrix[j][i] : 0.0;
+            for (int i = 0; i < 4; i++) {
+                float correction = i < 3 ? yuv_range_correction : 1.0;
+                for (int j = 0; j < 4; j++) {
+                    vgl->local_value[vgl->local_count + i][j] = j < 3 ? correction * matrix[j][i] : 0.0;
+                }
+            }
             vgl->local_count += 4;
         }
         if (code) {
