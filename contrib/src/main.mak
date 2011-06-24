@@ -99,8 +99,31 @@ endif
 PKG_CONFIG_PATH += :$(PREFIX)/lib/pkgconfig
 export PKG_CONFIG_PATH
 
-SVN ?= svn
-WGET ?= wget
+ifndef GIT
+ifeq ($(shell git --version >/dev/null 2>&1 || echo FAIL),)
+GIT = git
+endif
+endif
+GIT ?= $(error git not found!)
+
+ifndef SVN
+ifeq ($(shell svn --version >/dev/null 2>&1 || echo FAIL),)
+SVN = svn
+endif
+endif
+SVN ?= $(error subversion client (svn) not found!)
+
+ifndef WGET
+ifeq ($(shell wget --version >/dev/null 2>&1 || echo FAIL),)
+WGET = wget --passive -c
+endif
+endif
+ifndef WGET
+ifeq ($(shell curl --version >/dev/null 2>&1 || echo FAIL),)
+WGET = curl -L -O
+endif
+endif
+WGET ?= $(error Neither wget not curl found!)
 
 #
 # Common helpers
