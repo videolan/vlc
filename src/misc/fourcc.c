@@ -1710,21 +1710,23 @@ bool vlc_fourcc_IsYUV(vlc_fourcc_t fcc)
     return false;
 }
 
-#define PLANAR(n, w_den, h_den, size) \
+#define PLANAR(n, w_den, h_den, size, bits) \
     { .plane_count = n, \
       .p = { {.w = {1,    1}, .h = {1,    1}}, \
              {.w = {1,w_den}, .h = {1,h_den}}, \
              {.w = {1,w_den}, .h = {1,h_den}}, \
              {.w = {1,    1}, .h = {1,    1}} }, \
-      .pixel_size = size }
+      .pixel_size = size, \
+      .pixel_bits = bits }
 
-#define PLANAR_8(n, w_den, h_den)  PLANAR(n, w_den, h_den, 1)
-#define PLANAR_16(n, w_den, h_den) PLANAR(n, w_den, h_den, 2)
+#define PLANAR_8(n, w_den, h_den)        PLANAR(n, w_den, h_den, 1, 8)
+#define PLANAR_16(n, w_den, h_den, bits) PLANAR(n, w_den, h_den, 2, bits)
 
-#define PACKED_FMT(size) \
+#define PACKED_FMT(size, bits) \
     { .plane_count = 1, \
       .p = { {.w = {1,1}, .h = {1,1}} }, \
-      .pixel_size = size }
+      .pixel_size = size, \
+      .pixel_bits = bits }
 
 static const struct
 {
@@ -1740,29 +1742,33 @@ static const struct
     { { VLC_CODEC_YUVA, 0 },                   PLANAR_8(4, 1, 1) },
 
     { { VLC_CODEC_I420_10L,
-        VLC_CODEC_I420_10B, 0 },               PLANAR_16(3, 2, 2) },
+        VLC_CODEC_I420_10B, 0 },               PLANAR_16(3, 2, 2, 10) },
     { { VLC_CODEC_I420_9L,
-        VLC_CODEC_I420_9B, 0 },                PLANAR_16(3, 2, 2) },
+        VLC_CODEC_I420_9B, 0 },                PLANAR_16(3, 2, 2,  9) },
     { { VLC_CODEC_I422_10L,
-        VLC_CODEC_I422_10B, 0 },               PLANAR_16(3, 2, 1) },
+        VLC_CODEC_I422_10B, 0 },               PLANAR_16(3, 2, 1, 10) },
     { { VLC_CODEC_I422_9L,
-        VLC_CODEC_I422_9B, 0 },                PLANAR_16(3, 2, 1) },
+        VLC_CODEC_I422_9B, 0 },                PLANAR_16(3, 2, 1,  9) },
     { { VLC_CODEC_I444_10L,
-        VLC_CODEC_I444_10B, 0 },               PLANAR_16(3, 1, 1) },
+        VLC_CODEC_I444_10B, 0 },               PLANAR_16(3, 1, 1, 10) },
     { { VLC_CODEC_I444_9L,
-        VLC_CODEC_I444_9B, 0 },                PLANAR_16(3, 1, 1) },
+        VLC_CODEC_I444_9B, 0 },                PLANAR_16(3, 1, 1,  9) },
 
-    { { VLC_CODEC_YUV_PACKED, 0 },             PACKED_FMT(2) },
+    { { VLC_CODEC_YUV_PACKED, 0 },             PACKED_FMT(2, 16) },
     { { VLC_CODEC_RGB8, VLC_CODEC_GREY,
-        VLC_CODEC_YUVP, VLC_CODEC_RGBP, 0 },   PACKED_FMT(1) },
-    { { VLC_CODEC_RGB16, VLC_CODEC_RGB15, VLC_CODEC_RGBT,
-        VLC_CODEC_RGB12, VLC_CODEC_RGBA16, 0 },PACKED_FMT(2) },
-    { { VLC_CODEC_RGB24, 0 },                  PACKED_FMT(3) },
-    { { VLC_CODEC_RGB32, VLC_CODEC_RGBA, 0 },  PACKED_FMT(4) },
+        VLC_CODEC_YUVP, VLC_CODEC_RGBP, 0 },   PACKED_FMT(1, 8) },
 
-    { { VLC_CODEC_Y211, 0 },                   { 1, { {{1,4}, {1,1}} }, 4 } },
+    { { VLC_CODEC_RGB15, 0 },                  PACKED_FMT(2, 15) },
+    { { VLC_CODEC_RGB12, 0 },                  PACKED_FMT(2, 12) },
+    { { VLC_CODEC_RGB16, VLC_CODEC_RGBT,
+        VLC_CODEC_RGBA16, 0 },                 PACKED_FMT(2, 16) },
+    { { VLC_CODEC_RGB24, 0 },                  PACKED_FMT(3, 24) },
+    { { VLC_CODEC_RGB32, 0 },                  PACKED_FMT(4, 24) },
+    { { VLC_CODEC_RGBA,  0 },                  PACKED_FMT(4, 32) },
 
-    { {0}, { 0, {}, 0 } }
+    { { VLC_CODEC_Y211, 0 },                   { 1, { {{1,4}, {1,1}} }, 4, 32 } },
+
+    { {0}, { 0, {}, 0, 0 } }
 };
 
 #undef PACKED_FMT

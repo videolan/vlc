@@ -448,7 +448,8 @@ typedef struct {
             unsigned den;
         } h;
     } p[4];
-    unsigned pixel_size;
+    unsigned pixel_size;        /* Number of bytes per pixel for a plane */
+    unsigned pixel_bits;        /* Number of bits actually used bits per pixel for a plane */
 } vlc_chroma_description_t;
 
 /**
