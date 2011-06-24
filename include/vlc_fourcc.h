@@ -126,14 +126,32 @@
 #define VLC_CODEC_I410      VLC_FOURCC('I','4','1','0')
 /* Planar YUV 4:1:1 Y:U:V */
 #define VLC_CODEC_I411      VLC_FOURCC('I','4','1','1')
-/* Planar YUV 4:2:0 Y:U:V */
+/* Planar YUV 4:2:0 Y:U:V 8-bit */
 #define VLC_CODEC_I420      VLC_FOURCC('I','4','2','0')
-/* Planar YUV 4:2:2 Y:U:V */
+/* Planar YUV 4:2:0 Y:U:V  9-bit stored on 16 bits */
+#define VLC_CODEC_I420_9L   VLC_FOURCC('I','0','9','L')
+#define VLC_CODEC_I420_9B   VLC_FOURCC('I','0','9','B')
+/* Planar YUV 4:2:0 Y:U:V 10-bit stored on 16 bits */
+#define VLC_CODEC_I420_10L  VLC_FOURCC('I','0','A','L')
+#define VLC_CODEC_I420_10B  VLC_FOURCC('I','0','A','B')
+/* Planar YUV 4:2:2 Y:U:V 8-bit */
 #define VLC_CODEC_I422      VLC_FOURCC('I','4','2','2')
+/* Planar YUV 4:2:2 Y:U:V  9-bit stored on 16 bits */
+#define VLC_CODEC_I422_9L   VLC_FOURCC('I','2','9','L')
+#define VLC_CODEC_I422_9B   VLC_FOURCC('I','2','9','B')
+/* Planar YUV 4:2:2 Y:U:V 10-bit stored on 16 bits */
+#define VLC_CODEC_I422_10L  VLC_FOURCC('I','2','A','L')
+#define VLC_CODEC_I422_10B  VLC_FOURCC('I','2','A','B')
 /* Planar YUV 4:4:0 Y:U:V */
 #define VLC_CODEC_I440      VLC_FOURCC('I','4','4','0')
-/* Planar YUV 4:4:4 Y:U:V */
+/* Planar YUV 4:4:4 Y:U:V 8-bit */
 #define VLC_CODEC_I444      VLC_FOURCC('I','4','4','4')
+/* Planar YUV 4:2:2 Y:U:V  9-bit stored on 16 bits */
+#define VLC_CODEC_I444_9L   VLC_FOURCC('I','4','9','L')
+#define VLC_CODEC_I444_9B   VLC_FOURCC('I','4','9','B')
+/* Planar YUV 4:2:2 Y:U:V 10-bit stored on 16 bits */
+#define VLC_CODEC_I444_10L  VLC_FOURCC('I','4','A','L')
+#define VLC_CODEC_I444_10B  VLC_FOURCC('I','4','A','B')
 /* Planar YUV 4:2:0 Y:U:V full scale */
 #define VLC_CODEC_J420      VLC_FOURCC('J','4','2','0')
 /* Planar YUV 4:2:2 Y:U:V full scale */
@@ -328,6 +346,7 @@
 #   define VLC_CODEC_U16I VLC_CODEC_U16L
 #   define VLC_CODEC_S24I VLC_CODEC_S24L
 #   define VLC_CODEC_S32I VLC_CODEC_S32L
+
 #else
 #   define VLC_CODEC_S16N VLC_CODEC_S16L
 #   define VLC_CODEC_U16N VLC_CODEC_U16L
