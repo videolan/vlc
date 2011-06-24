@@ -976,13 +976,12 @@ static int ffmpeg_GetFrameBuf( struct AVCodecContext *p_context,
     }
 
     wait_mt( p_sys );
-
     /* Some codecs set pix_fmt only after the 1st frame has been decoded,
      * so we need to check for direct rendering again. */
 
-    int i_width = p_sys->p_context->width;
-    int i_height = p_sys->p_context->height;
-    avcodec_align_dimensions( p_sys->p_context, &i_width, &i_height );
+    int i_width = p_context->width;
+    int i_height = p_context->height;
+    avcodec_align_dimensions( p_context, &i_width, &i_height );
 
     if( GetVlcChroma( &p_dec->fmt_out.video, p_context->pix_fmt ) != VLC_SUCCESS ||
         p_context->pix_fmt == PIX_FMT_PAL8 )
@@ -991,7 +990,7 @@ static int ffmpeg_GetFrameBuf( struct AVCodecContext *p_context,
     p_dec->fmt_out.i_codec = p_dec->fmt_out.video.i_chroma;
 
     /* Get a new picture */
-    p_pic = ffmpeg_NewPictBuf( p_dec, p_sys->p_context );
+    p_pic = ffmpeg_NewPictBuf( p_dec, p_context );
     if( !p_pic )
         goto no_dr;
     bool b_compatible = true;
@@ -1037,7 +1036,7 @@ static int ffmpeg_GetFrameBuf( struct AVCodecContext *p_context,
         p_sys->i_direct_rendering_used = 1;
     }
 
-    p_sys->p_context->draw_horiz_band = NULL;
+    p_context->draw_horiz_band = NULL;
 
     p_ff_pic->opaque = (void*)p_pic;
     p_ff_pic->type = FF_BUFFER_TYPE_USER;
