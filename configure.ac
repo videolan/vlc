@@ -4488,16 +4488,6 @@ echo "vlc aliases           :${ALIASES}"
 else
 echo "build vlc executable  : no"
 fi
-echo "plugins/bindings      :${PLUGINS_BINDINGS}
-
+echo "
 You can tune the compiler flags in vlc-config.
-To build vlc and its plugins, type \`./compile' or \`$USE_MAKE_OR_GMAKE'.
-"
-if test "x$ac_ld_does_not_support_text_reloc" = "xyes"; then
-   echo ""
-   echo "Warning: Due to a bug in ld, mmx/sse support has been"
-   echo "         turned off."
-   echo "         FFmpeg will be REALLY slow."
-   echo "         VLC WILL NOT PERFORM AS EXPECTED."
-   echo ""
-fi
+To build vlc and its plugins, type \`./compile' or \`$USE_MAKE_OR_GMAKE'."
