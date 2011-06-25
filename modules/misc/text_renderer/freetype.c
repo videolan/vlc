@@ -121,6 +121,7 @@ static void Destroy( vlc_object_t * );
 #define FONTSIZER_LONGTEXT N_("This is the relative default size of the " \
     "fonts that will be rendered on the video. If absolute font size is set, "\
     "relative size will be overridden." )
+#define BOLD_TEXT N_("Force bold")
 
 #define BG_OPACITY_TEXT N_("Background opacity")
 #define BG_COLOR_TEXT N_("Background color")
@@ -189,6 +190,9 @@ vlc_module_begin ()
     add_integer( "freetype-color", 0x00FFFFFF, COLOR_TEXT,
                  COLOR_LONGTEXT, false )
         change_integer_list( pi_color_values, ppsz_color_descriptions )
+        change_safe()
+
+    add_bool( "freetype-bold", false, BOLD_TEXT, "", false )
         change_safe()
 
     add_integer_with_range( "freetype-background-opacity", 0, 0, 255,
@@ -285,6 +289,7 @@ struct filter_sys_t
     uint8_t        i_font_opacity;
     int            i_font_color;
     int            i_font_size;
+    bool           b_font_bold;
 
     uint8_t        i_background_opacity;
     int            i_background_color;
@@ -1470,6 +1475,8 @@ static int ProcessNodes( filter_t *p_filter,
                        0x00ffffff );
     }
 #endif
+    if( p_sys->b_font_bold )
+        i_style_flags |= STYLE_BOLD;
 
     if( rv != VLC_SUCCESS )
         return rv;
@@ -2348,6 +2355,8 @@ static int RenderCommon( filter_t *p_filter, subpicture_region_t *p_region_out,
                                    (p_sys->i_font_color & 0xffffff) |
                                    ((p_sys->i_font_opacity & 0xff) << 24),
                                    0x00ffffff, 0);
+        if( p_sys->b_font_bold )
+            p_style->i_style_flags |= STYLE_BOLD;
 
         i_text_length = SetupText( p_filter,
                                    psz_text,
@@ -2475,6 +2484,7 @@ static int Create( vlc_object_t *p_this )
     p_sys->i_font_opacity = __MAX( __MIN( p_sys->i_font_opacity, 255 ), 0 );
     p_sys->i_font_color = var_InheritInteger( p_filter, "freetype-color" );
     p_sys->i_font_color = __MAX( __MIN( p_sys->i_font_color , 0xFFFFFF ), 0 );
+    p_sys->b_font_bold = var_InheritBool( p_filter, "freetype-bold" );
 
     p_sys->i_background_opacity = var_InheritInteger( p_filter,"freetype-background-opacity" );;
     p_sys->i_background_opacity = __MAX( __MIN( p_sys->i_background_opacity, 255 ), 0 );
