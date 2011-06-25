@@ -10,6 +10,8 @@ SOURCES_macosx = \
 	SPInvocationGrabbing.m \
 	SPMediaKeyTap.h \
 	SPMediaKeyTap.m \
+	MainMenu.h \
+	MainMenu.m \
 	about.h \
 	about.m \
 	applescript.h \

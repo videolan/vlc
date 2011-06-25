@@ -100,36 +100,29 @@ struct intf_sys_t
 @interface VLCMain : NSObject
 {
     intf_thread_t *p_intf;      /* The main intf object */
+    id o_mainmenu;              /* VLCMainMenu */
     id o_prefs;                 /* VLCPrefs       */
     id o_sprefs;                /* VLCSimplePrefs */
-    id o_about;                 /* VLAboutBox     */
     id o_open;                  /* VLCOpen        */
     id o_wizard;                /* VLCWizard      */
-    id o_videoeffects;          /* VLCVideoEffects */
-    id o_bookmarks;             /* VLCBookmarks   */
     id o_embedded_list;         /* VLCEmbeddedList*/
     id o_coredialogs;           /* VLCCoreDialogProvider */
     VLCInformation * o_info;    /* VLCInformation */
     id o_eyetv;                 /* VLCEyeTVController */
-    id o_audioeffects;          /* VLCAudioEffects */
-    id o_trackSynchronization;  /* VLCTrackSynchronization */
+    id o_bookmarks;             /* VLCBookmarks */
     BOOL nib_main_loaded;       /* main nibfile */
     BOOL nib_open_loaded;       /* open nibfile */
     BOOL nib_about_loaded;      /* about nibfile */
     BOOL nib_wizard_loaded;     /* wizard nibfile */
-    BOOL nib_bookmarks_loaded;  /* bookmarks nibfile */
     BOOL nib_prefs_loaded;      /* preferences nibfile */
     BOOL nib_info_loaded;       /* information panel nibfile */
     BOOL nib_coredialogs_loaded; /* CoreDialogs nibfile */
-    BOOL nib_audioeffects_loaded; /* audio effects panel */
-    BOOL nib_tracksynchro_loaded; /* track synchro panel */
-    BOOL nib_videoeffects_loaded;   /* video effects panel */
+    BOOL nib_bookmarks_loaded;   /* Bookmarks nibfile */
 
     IBOutlet VLCControllerWindow * o_window;                     /* main window */
-    IBOutlet NSView * o_playlist_view;                          /* playlist view  */
     IBOutlet id o_scrollfield;                                  /* info field */
     IBOutlet NSTextField * o_timefield;                         /* time field */
-    IBOutlet NSSlider * o_timeslider;                           /* time slider */
+    IBOutlet NSSlider * o_timeslider;                                 /* time slider */
     BOOL b_time_remaining;                                      /* show remaining time or playtime ? */
     IBOutlet VLCEmbeddedWindow * o_embedded_window;             /* Embedded Vout Window */
     float f_slider;                                             /* slider value */
@@ -173,151 +166,6 @@ struct intf_sys_t
     IBOutlet NSButton * o_crashrep_includeEmail_ckb;
     IBOutlet NSTextField * o_crashrep_includeEmail_txt;
 
-    /* main menu */
-
-    IBOutlet NSMenuItem * o_mi_about;
-    IBOutlet NSMenuItem * o_mi_prefs;
-    IBOutlet NSMenuItem * o_mi_sprefs;
-    IBOutlet NSMenuItem * o_mi_checkForUpdate;
-    IBOutlet NSMenuItem * o_mi_add_intf;
-    IBOutlet NSMenu * o_mu_add_intf;
-    IBOutlet NSMenuItem * o_mi_services;
-    IBOutlet NSMenuItem * o_mi_hide;
-    IBOutlet NSMenuItem * o_mi_hide_others;
-    IBOutlet NSMenuItem * o_mi_show_all;
-    IBOutlet NSMenuItem * o_mi_quit;
-
-    IBOutlet NSMenu * o_mu_file;
-    IBOutlet NSMenuItem * o_mi_open_file;
-    IBOutlet NSMenuItem * o_mi_open_generic;
-    IBOutlet NSMenuItem * o_mi_open_disc;
-    IBOutlet NSMenuItem * o_mi_open_net;
-    IBOutlet NSMenuItem * o_mi_open_capture;
-    IBOutlet NSMenuItem * o_mi_open_recent;
-    IBOutlet NSMenuItem * o_mi_open_recent_cm;
-    IBOutlet NSMenuItem * o_mi_open_wizard;
-
-    IBOutlet NSMenu * o_mu_edit;
-    IBOutlet NSMenuItem * o_mi_cut;
-    IBOutlet NSMenuItem * o_mi_copy;
-    IBOutlet NSMenuItem * o_mi_paste;
-    IBOutlet NSMenuItem * o_mi_clear;
-    IBOutlet NSMenuItem * o_mi_select_all;
-
-    IBOutlet NSMenu * o_mu_controls;
-    IBOutlet NSMenuItem * o_mi_play;
-    IBOutlet NSMenuItem * o_mi_stop;
-    IBOutlet NSMenuItem * o_mi_faster;
-    IBOutlet NSMenuItem * o_mi_slower;
-    IBOutlet NSMenuItem * o_mi_normalSpeed;
-    IBOutlet NSMenuItem * o_mi_trackSynchronization;
-    IBOutlet NSMenuItem * o_mi_previous;
-    IBOutlet NSMenuItem * o_mi_next;
-    IBOutlet NSMenuItem * o_mi_random;
-    IBOutlet NSMenuItem * o_mi_repeat;
-    IBOutlet NSMenuItem * o_mi_loop;
-    IBOutlet NSMenuItem * o_mi_quitAfterPB;
-    IBOutlet NSMenuItem * o_mi_fwd;
-    IBOutlet NSMenuItem * o_mi_bwd;
-    IBOutlet NSMenuItem * o_mi_fwd1m;
-    IBOutlet NSMenuItem * o_mi_bwd1m;
-    IBOutlet NSMenuItem * o_mi_fwd5m;
-    IBOutlet NSMenuItem * o_mi_bwd5m;
-    IBOutlet NSMenuItem * o_mi_program;
-    IBOutlet NSMenu * o_mu_program;
-    IBOutlet NSMenuItem * o_mi_title;
-    IBOutlet NSMenu * o_mu_title;
-    IBOutlet NSMenuItem * o_mi_chapter;
-    IBOutlet NSMenu * o_mu_chapter;
-
-    IBOutlet NSMenu * o_mu_audio;
-    IBOutlet NSMenuItem * o_mi_vol_up;
-    IBOutlet NSMenuItem * o_mi_vol_down;
-    IBOutlet NSMenuItem * o_mi_mute;
-    IBOutlet NSMenuItem * o_mi_audiotrack;
-    IBOutlet NSMenu * o_mu_audiotrack;
-    IBOutlet NSMenuItem * o_mi_channels;
-    IBOutlet NSMenu * o_mu_channels;
-    IBOutlet NSMenuItem * o_mi_device;
-    IBOutlet NSMenu * o_mu_device;
-    IBOutlet NSMenuItem * o_mi_visual;
-    IBOutlet NSMenu * o_mu_visual;
-
-    IBOutlet NSMenu * o_mu_video;
-    IBOutlet NSMenuItem * o_mi_half_window;
-    IBOutlet NSMenuItem * o_mi_normal_window;
-    IBOutlet NSMenuItem * o_mi_double_window;
-    IBOutlet NSMenuItem * o_mi_fittoscreen;
-    IBOutlet NSMenuItem * o_mi_fullscreen;
-    IBOutlet NSMenuItem * o_mi_floatontop;
-    IBOutlet NSMenuItem * o_mi_snapshot;
-    IBOutlet NSMenuItem * o_mi_videotrack;
-    IBOutlet NSMenu * o_mu_videotrack;
-    IBOutlet NSMenuItem * o_mi_screen;
-    IBOutlet NSMenu * o_mu_screen;
-    IBOutlet NSMenuItem * o_mi_aspect_ratio;
-    IBOutlet NSMenu * o_mu_aspect_ratio;
-    IBOutlet NSMenuItem * o_mi_crop;
-    IBOutlet NSMenu * o_mu_crop;
-    IBOutlet NSMenuItem * o_mi_subtitle;
-    IBOutlet NSMenu * o_mu_subtitle;
-    IBOutlet NSMenuItem * o_mi_addSub;
-    IBOutlet NSMenuItem * o_mi_deinterlace;
-    IBOutlet NSMenu * o_mu_deinterlace;
-    IBOutlet NSMenuItem * o_mi_deinterlace_mode;
-    IBOutlet NSMenu * o_mu_deinterlace_mode;
-    IBOutlet NSMenuItem * o_mi_ffmpeg_pp;
-    IBOutlet NSMenu * o_mu_ffmpeg_pp;
-    IBOutlet NSMenuItem * o_mi_teletext;
-    IBOutlet NSMenuItem * o_mi_teletext_transparent;
-    IBOutlet NSMenuItem * o_mi_teletext_index;
-    IBOutlet NSMenuItem * o_mi_teletext_red;
-    IBOutlet NSMenuItem * o_mi_teletext_green;
-    IBOutlet NSMenuItem * o_mi_teletext_yellow;
-    IBOutlet NSMenuItem * o_mi_teletext_blue;
-
-    IBOutlet NSMenu * o_mu_window;
-    IBOutlet NSMenuItem * o_mi_minimize;
-    IBOutlet NSMenuItem * o_mi_close_window;
-    IBOutlet NSMenuItem * o_mi_player;
-    IBOutlet NSMenuItem * o_mi_controller;
-    IBOutlet NSMenuItem * o_mi_audioeffects;
-    IBOutlet NSMenuItem * o_mi_videoeffects;
-    IBOutlet NSMenuItem * o_mi_bookmarks;
-    IBOutlet NSMenuItem * o_mi_playlist;
-    IBOutlet NSMenuItem * o_mi_info;
-    IBOutlet NSMenuItem * o_mi_messages;
-    IBOutlet NSMenuItem * o_mi_bring_atf;
-
-    IBOutlet NSMenu * o_mu_help;
-    IBOutlet NSMenuItem * o_mi_help;
-    IBOutlet NSMenuItem * o_mi_readme;
-    IBOutlet NSMenuItem * o_mi_documentation;
-    IBOutlet NSMenuItem * o_mi_license;
-    IBOutlet NSMenuItem * o_mi_website;
-    IBOutlet NSMenuItem * o_mi_donation;
-    IBOutlet NSMenuItem * o_mi_forum;
-    IBOutlet NSMenuItem * o_mi_errorsAndWarnings;
-
-    /* dock menu */
-    IBOutlet NSMenuItem * o_dmi_play;
-    IBOutlet NSMenuItem * o_dmi_stop;
-    IBOutlet NSMenuItem * o_dmi_next;
-    IBOutlet NSMenuItem * o_dmi_previous;
-    IBOutlet NSMenuItem * o_dmi_mute;
-
-    /* vout menu */
-    IBOutlet NSMenu * o_vout_menu;
-    IBOutlet NSMenuItem * o_vmi_play;
-    IBOutlet NSMenuItem * o_vmi_stop;
-    IBOutlet NSMenuItem * o_vmi_prev;
-    IBOutlet NSMenuItem * o_vmi_next;
-    IBOutlet NSMenuItem * o_vmi_volup;
-    IBOutlet NSMenuItem * o_vmi_voldown;
-    IBOutlet NSMenuItem * o_vmi_mute;
-    IBOutlet NSMenuItem * o_vmi_fullscreen;
-    IBOutlet NSMenuItem * o_vmi_snapshot;
-
     mtime_t i_end_scroll;
 
     int     i_lastShownVolume;
@@ -348,19 +196,20 @@ struct intf_sys_t
 - (intf_thread_t *)intf;
 - (void)setIntf:(intf_thread_t *)p_mainintf;
 
+- (id)mainMenu;
 - (id)controls;
+- (id)bookmarks;
+- (id)open;
 - (id)simplePreferences;
 - (id)preferences;
 - (id)playlist;
 - (BOOL)isPlaylistCollapsed;
 - (id)info;
 - (id)wizard;
-- (id)bookmarks;
 - (id)embeddedList;
 - (id)coreDialogProvider;
 - (id)mainIntfPgbar;
 - (id)controllerWindow;
-- (id)voutMenu;
 - (id)eyeTVController;
 - (id)appleRemoteController;
 - (void)applicationWillTerminate:(NSNotification *)notification;
@@ -373,52 +222,25 @@ struct intf_sys_t
 - (void)updateCurrentlyUsedHotkeys;
 
 - (void)initStrings;
+- (BOOL)application:(NSApplication *)o_app openFile:(NSString *)o_filename;
 
 - (void)manage;
 - (void)manageIntf:(NSTimer *)o_timer;
-- (void)setupMenus;
-- (void)refreshVoutDeviceMenu:(NSNotification *)o_notification;
+
 - (void)setScrollField:(NSString *)o_string stopAfter:(int )timeout;
 - (void)resetScrollField;
 
 - (void)updateMessageDisplay;
 - (void)playStatusUpdated:(int) i_status;
-- (void)setSubmenusEnabled:(BOOL)b_enabled;
 - (void)manageVolumeSlider;
 - (IBAction)timesliderUpdate:(id)sender;
 - (IBAction)timeFieldWasClicked:(id)sender;
-
-- (IBAction)clearRecentItems:(id)sender;
-- (void)openRecentItem:(id)sender;
-
-- (IBAction)intfOpenFile:(id)sender;
-- (IBAction)intfOpenFileGeneric:(id)sender;
-- (IBAction)intfOpenDisc:(id)sender;
-- (IBAction)intfOpenNet:(id)sender;
-- (IBAction)intfOpenCapture:(id)sender;
-
-- (IBAction)showWizard:(id)sender;
-- (IBAction)showVideoEffects:(id)sender;
-- (IBAction)showAudioEffects:(id)sender;
-- (IBAction)showTrackSynchronization:(id)sender;
-- (IBAction)showBookmarks:(id)sender;
-
-- (IBAction)viewAbout:(id)sender;
-- (IBAction)showLicense:(id)sender;
-- (IBAction)viewPreferences:(id)sender;
-- (IBAction)viewHelp:(id)sender;
-- (IBAction)openReadMe:(id)sender;
-- (IBAction)openDocumentation:(id)sender;
-- (IBAction)openWebsite:(id)sender;
-- (IBAction)openForum:(id)sender;
-- (IBAction)openDonate:(id)sender;
-- (IBAction)openCrashLog:(id)sender;
-- (IBAction)viewErrorsAndWarnings:(id)sender;
-- (IBAction)showMessagesPanel:(id)sender;
-- (IBAction)showInformationPanel:(id)sender;
+- (IBAction)showController:(id)sender;
 
 - (IBAction)crashReporterAction:(id)sender;
+- (IBAction)openCrashLog:(id)sender;
 - (IBAction)saveDebugLog:(id)sender;
+- (IBAction)showMessagesPanel:(id)sender;
 
 - (IBAction)togglePlaylist:(id)sender;
 - (void)updateTogglePlaylistState;
