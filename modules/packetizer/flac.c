@@ -237,7 +237,7 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
             while( block_PeekBytes( &p_sys->bytestream, p_header, 2 )
                    == VLC_SUCCESS )
             {
-                if( p_header[0] == 0xFF && p_header[1] == 0xF8 )
+                if( p_header[0] == 0xFF && (p_header[1] & 0xFE) == 0xF8 )
                 {
                     p_sys->i_state = STATE_SYNC;
                     break;
@@ -304,7 +304,7 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
                                           MAX_FLAC_HEADER_SIZE )
                    == VLC_SUCCESS )
             {
-                if( p_header[0] == 0xFF && p_header[1] == 0xF8 )
+                if( p_header[0] == 0xFF && (p_header[1] & 0xFE) == 0xF8 )
                 {
                     /* Check if frame is valid and get frame info */
                     int i_frame_length =
@@ -379,11 +379,8 @@ static int SyncInfo( decoder_t *p_dec, uint8_t *p_buf,
     unsigned i_blocksize = 0;
     int i_blocksize_hint = 0, i_sample_rate_hint = 0;
 
-    bool b_fixed_blocksize = ( p_sys->b_stream_info &&
-        p_sys->stream_info.min_blocksize == p_sys->stream_info.max_blocksize );
-
     /* Check syncword */
-    if( p_buf[0] != 0xFF || p_buf[1] != 0xF8 ) return 0;
+    if( p_buf[0] != 0xFF || (p_buf[1] & 0xFE) != 0xF8 ) return 0;
 
     /* Check there is no emulated sync code in the rest of the header */
     if( p_buf[2] == 0xff || p_buf[3] == 0xFF ) return 0;
@@ -392,7 +389,8 @@ static int SyncInfo( decoder_t *p_dec, uint8_t *p_buf,
     switch( i_temp = p_buf[2] >> 4 )
     {
     case 0:
-        if( b_fixed_blocksize )
+        if( p_sys->b_stream_info &&
+            p_sys->stream_info.min_blocksize == p_sys->stream_info.max_blocksize )
             i_blocksize = p_sys->stream_info.min_blocksize;
         else return 0; /* We can't do anything with this */
         break;
