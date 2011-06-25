@@ -1760,7 +1760,68 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
             p_track->fmt.i_codec = p_enda && p_enda->data.p_enda->i_little_endian == 1 ?
                                     VLC_CODEC_F64L : VLC_CODEC_F64B;
             break;
+        case VLC_FOURCC( 'l', 'p', 'c', 'm' ):
+        {
+            MP4_Box_data_sample_soun_t *p_soun = p_sample->data.p_sample_soun;
+            if( p_soun->i_qt_version == 2 &&
+                p_soun->i_qt_description > 20 + 28 )
+            {
+                /* Flags:
+                 *  0x01: IsFloat
+                 *  0x02: IsBigEndian
+                 *  0x04: IsSigned
+                 */
+                static const struct {
+                    unsigned     i_flags;
+                    unsigned     i_mask;
+                    unsigned     i_bits;
+                    vlc_fourcc_t i_codec;
+                } p_formats[] = {
+                    { 0x01,           0x03, 32, VLC_CODEC_F32L },
+                    { 0x01,           0x03, 64, VLC_CODEC_F64L },
+                    { 0x01|0x02,      0x03, 32, VLC_CODEC_F32B },
+                    { 0x01|0x02,      0x03, 64, VLC_CODEC_F64B },
 
+                    { 0x00,           0x05,  8, VLC_CODEC_U8 },
+                    { 0x00|     0x04, 0x05,  8, VLC_CODEC_S8 },
+
+                    { 0x00,           0x07, 16, VLC_CODEC_U16L },
+                    { 0x00|0x02,      0x07, 16, VLC_CODEC_U16B },
+                    { 0x00     |0x04, 0x07, 16, VLC_CODEC_S16L },
+                    { 0x00|0x02|0x04, 0x07, 16, VLC_CODEC_S16B },
+
+                    { 0x00,           0x07, 24, VLC_CODEC_U24L },
+                    { 0x00|0x02,      0x07, 24, VLC_CODEC_U24B },
+                    { 0x00     |0x04, 0x07, 24, VLC_CODEC_S24L },
+                    { 0x00|0x02|0x04, 0x07, 24, VLC_CODEC_S24B },
+
+                    { 0x00,           0x07, 32, VLC_CODEC_U32L },
+                    { 0x00|0x02,      0x07, 32, VLC_CODEC_U32B },
+                    { 0x00     |0x04, 0x07, 32, VLC_CODEC_S32L },
+                    { 0x00|0x02|0x04, 0x07, 32, VLC_CODEC_S32B },
+
+                    {0, 0, 0, 0}
+                };
+                uint32_t i_bits  = GetDWBE(&p_soun->p_qt_description[20 + 20]);
+                uint32_t i_flags = GetDWBE(&p_soun->p_qt_description[20 + 24]);
+
+                for( int i = 0; p_formats[i].i_codec; i++ )
+                {
+                    if( p_formats[i].i_bits == i_bits &&
+                        (i_flags & p_formats[i].i_mask) == p_formats[i].i_flags )
+                    {
+                        p_track->fmt.i_codec = p_formats[i].i_codec;
+                        p_track->fmt.audio.i_bitspersample = i_bits;
+                        p_track->fmt.audio.i_blockalign = p_soun->i_channelcount * i_bits / 8;
+                        p_track->i_sample_size = p_track->fmt.audio.i_blockalign;
+
+                        p_soun->i_qt_version = 0;
+                        break;
+                    }
+                }
+            }
+            break;
+        }
         default:
             p_track->fmt.i_codec = p_sample->i_type;
             break;
