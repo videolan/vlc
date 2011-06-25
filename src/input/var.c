@@ -137,8 +137,6 @@ void input_ControlVarInit ( input_thread_t *p_input )
 
     /* Rate */
     var_Create( p_input, "rate", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );
-    val.f_float = (float)INPUT_RATE_DEFAULT / (float)p_input->p->i_rate;
-    var_Change( p_input, "rate", VLC_VAR_SETVALUE, &val, NULL );
 
     var_Create( p_input, "frame-next", VLC_VAR_VOID );
 

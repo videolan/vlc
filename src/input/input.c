@@ -370,13 +370,7 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     p_input->p->title = NULL;
     p_input->p->i_title_offset = p_input->p->i_seekpoint_offset = 0;
     p_input->p->i_state = INIT_S;
-    double f_rate = var_InheritFloat( p_input, "rate" );
-    if( f_rate <= 0. )
-    {
-        msg_Warn( p_input, "Negative or zero rate values are forbidden" );
-        f_rate = 1.;
-    }
-    p_input->p->i_rate = INPUT_RATE_DEFAULT / f_rate;
+    p_input->p->i_rate = INPUT_RATE_DEFAULT;
     p_input->p->b_recording = false;
     memset( &p_input->p->bookmark, 0, sizeof(p_input->p->bookmark) );
     TAB_INIT( p_input->p->i_bookmark, p_input->p->pp_bookmark );
@@ -1290,6 +1284,13 @@ static int Init( input_thread_t * p_input )
         LoadSubtitles( p_input );
         LoadSlaves( p_input );
         InitPrograms( p_input );
+
+        double f_rate = var_InheritFloat( p_input, "rate" );
+        if( f_rate != 0.0 && f_rate != 1.0 )
+        {
+            vlc_value_t val = { .i_int = INPUT_RATE_DEFAULT / f_rate };
+            input_ControlPush( p_input, INPUT_CONTROL_SET_RATE, &val );
+        }
     }
 
     if( !p_input->b_preparsing && p_input->p->p_sout )
