@@ -378,10 +378,7 @@ static int SyncInfo( decoder_t *p_dec, uint8_t *p_buf,
     int i_header, i_temp, i_read;
     unsigned i_blocksize = 0;
     int i_blocksize_hint = 0, i_sample_rate_hint = 0;
-    uint64_t i_sample_number = 0;
 
-    bool b_variable_blocksize = ( p_sys->b_stream_info &&
-        p_sys->stream_info.min_blocksize != p_sys->stream_info.max_blocksize );
     bool b_fixed_blocksize = ( p_sys->b_stream_info &&
         p_sys->stream_info.min_blocksize == p_sys->stream_info.max_blocksize );
 
@@ -546,20 +543,9 @@ static int SyncInfo( decoder_t *p_dec, uint8_t *p_buf,
     /* End of fixed size header */
     i_header = 4;
 
-    /* Find Sample/Frame number */
-    if( i_blocksize_hint && b_variable_blocksize )
-    {
-        i_sample_number = read_utf8( &p_buf[i_header++], &i_read );
-        if( i_sample_number == INT64_C(0xffffffffffffffff) ) return 0;
-    }
-    else
-    {
-        i_sample_number = read_utf8( &p_buf[i_header++], &i_read );
-        if( i_sample_number == INT64_C(0xffffffffffffffff) ) return 0;
-
-        if( p_sys->b_stream_info )
-            i_sample_number *= p_sys->stream_info.min_blocksize;
-    }
+    /* Check Sample/Frame number */
+    if( read_utf8( &p_buf[i_header++], &i_read ) == INT64_C(0xffffffffffffffff) )
+        return 0;
 
     i_header += i_read;
 
