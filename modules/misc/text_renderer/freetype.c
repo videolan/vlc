@@ -327,7 +327,13 @@ static void YUVFromRGB( uint32_t i_argb,
     *pi_v = (uint8_t)__MIN(abs( 3598 * i_red + -3013 * i_green +
                       -585 * i_blue + 4096 + 1048576) >> 13, 240);
 }
-
+static void RGBFromRGB( uint32_t i_argb,
+                        uint8_t *pi_r, uint8_t *pi_g, uint8_t *pi_b )
+{
+    *pi_r = ( i_argb & 0x00ff0000 ) >> 16;
+    *pi_g = ( i_argb & 0x0000ff00 ) >>  8;
+    *pi_b = ( i_argb & 0x000000ff );
+}
 /*****************************************************************************
  * Make any TTF/OTF fonts present in the attachments of the media file
  * and store them for later use by the FreeType Engine
@@ -744,6 +750,19 @@ static int RenderYUVP( filter_t *p_filter, subpicture_region_t *p_region,
  *****************************************************************************
  * This function merges the previously rendered freetype glyphs into a picture
  *****************************************************************************/
+static void FillYUVAPicture( picture_t *p_picture,
+                             int i_a, int i_y, int i_u, int i_v )
+{
+    memset( p_picture->p[0].p_pixels, i_y,
+            p_picture->p[0].i_pitch * p_picture->p[0].i_lines );
+    memset( p_picture->p[1].p_pixels, i_u,
+            p_picture->p[1].i_pitch * p_picture->p[1].i_lines );
+    memset( p_picture->p[2].p_pixels, i_v,
+            p_picture->p[2].i_pitch * p_picture->p[2].i_lines );
+    memset( p_picture->p[3].p_pixels, i_a,
+            p_picture->p[3].i_pitch * p_picture->p[3].i_lines );
+}
+
 static inline void BlendYUVAPixel( picture_t *p_picture,
                                    int i_picture_x, int i_picture_y,
                                    int i_a, int i_y, int i_u, int i_v,
@@ -776,25 +795,73 @@ static inline void BlendYUVAPixel( picture_t *p_picture,
     }
 }
 
-static inline void BlendYUVAGlyph( picture_t *p_picture,
+static void FillRGBAPicture( picture_t *p_picture,
+                             int i_a, int i_r, int i_g, int i_b )
+{
+    for( int dy = 0; dy < p_picture->p[0].i_visible_lines; dy++ )
+    {
+        for( int dx = 0; dx < p_picture->p[0].i_visible_pitch; dx += 4 )
+        {
+            uint8_t *p_rgba = &p_picture->p->p_pixels[dy * p_picture->p->i_pitch + dx];
+            p_rgba[0] = i_r;
+            p_rgba[1] = i_g;
+            p_rgba[2] = i_b;
+            p_rgba[3] = i_a;
+        }
+    }
+}
+
+static inline void BlendRGBAPixel( picture_t *p_picture,
                                    int i_picture_x, int i_picture_y,
-                                   int i_a, int i_y, int i_u, int i_v,
-                                   FT_BitmapGlyph p_glyph )
+                                   int i_a, int i_r, int i_g, int i_b,
+                                   int i_alpha )
+{
+    int i_an = i_a * i_alpha / 255;
+
+    uint8_t *p_rgba = &p_picture->p->p_pixels[i_picture_y * p_picture->p->i_pitch + 4 * i_picture_x];
+
+    int i_ao = p_rgba[3];
+    if( i_ao == 0 )
+    {
+        p_rgba[0] = i_r;
+        p_rgba[1] = i_g;
+        p_rgba[2] = i_b;
+        p_rgba[3] = i_an;
+    }
+    else
+    {
+        p_rgba[3] = 255 - (255 - p_rgba[3]) * (255 - i_an) / 255;
+        if( p_rgba[3] != 0 )
+        {
+            p_rgba[0] = ( p_rgba[0] * i_ao * (255 - i_an) / 255 + i_r * i_an ) / p_rgba[3];
+            p_rgba[1] = ( p_rgba[1] * i_ao * (255 - i_an) / 255 + i_g * i_an ) / p_rgba[3];
+            p_rgba[2] = ( p_rgba[2] * i_ao * (255 - i_an) / 255 + i_b * i_an ) / p_rgba[3];
+        }
+    }
+}
+
+static inline void BlendAXYZGlyph( picture_t *p_picture,
+                                   int i_picture_x, int i_picture_y,
+                                   int i_a, int i_x, int i_y, int i_z,
+                                   FT_BitmapGlyph p_glyph,
+                                   void (*BlendPixel)(picture_t *, int, int, int, int, int, int, int) )
+
 {
     for( int dy = 0; dy < p_glyph->bitmap.rows; dy++ )
     {
         for( int dx = 0; dx < p_glyph->bitmap.width; dx++ )
-            BlendYUVAPixel( p_picture, i_picture_x + dx, i_picture_y + dy,
-                            i_a, i_y, i_u, i_v,
-                            p_glyph->bitmap.buffer[dy * p_glyph->bitmap.width + dx] );
+            BlendPixel( p_picture, i_picture_x + dx, i_picture_y + dy,
+                        i_a, i_x, i_y, i_z,
+                        p_glyph->bitmap.buffer[dy * p_glyph->bitmap.width + dx] );
     }
 }
 
-static inline void BlendYUVALine( picture_t *p_picture,
+static inline void BlendAXYZLine( picture_t *p_picture,
                                   int i_picture_x, int i_picture_y,
-                                  int i_a, int i_y, int i_u, int i_v,
+                                  int i_a, int i_x, int i_y, int i_z,
                                   const line_character_t *p_current,
-                                  const line_character_t *p_next )
+                                  const line_character_t *p_next,
+                                  void (*BlendPixel)(picture_t *, int, int, int, int, int, int, int) )
 {
     int i_line_width = p_current->p_glyph->bitmap.width;
     if( p_next )
@@ -803,18 +870,22 @@ static inline void BlendYUVALine( picture_t *p_picture,
     for( int dx = 0; dx < i_line_width; dx++ )
     {
         for( int dy = 0; dy < p_current->i_line_thickness; dy++ )
-            BlendYUVAPixel( p_picture,
-                            i_picture_x + dx,
-                            i_picture_y + p_current->i_line_offset + dy,
-                            i_a, i_y, i_u, i_v, 0xff );
+            BlendPixel( p_picture,
+                        i_picture_x + dx,
+                        i_picture_y + p_current->i_line_offset + dy,
+                        i_a, i_x, i_y, i_z, 0xff );
     }
 }
 
-static int RenderYUVA( filter_t *p_filter,
-                       subpicture_region_t *p_region,
-                       line_desc_t *p_line_head,
-                       FT_BBox *p_bbox,
-                       int i_margin )
+static inline int RenderAXYZ( filter_t *p_filter,
+                              subpicture_region_t *p_region,
+                              line_desc_t *p_line_head,
+                              FT_BBox *p_bbox,
+                              int i_margin,
+                              vlc_fourcc_t i_chroma,
+                              void (*ExtractComponents)( uint32_t, uint8_t *, uint8_t *, uint8_t * ),
+                              void (*FillPicture)( picture_t *p_picture, int, int, int, int ),
+                              void (*BlendPixel)(picture_t *, int, int, int, int, int, int, int) )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
 
@@ -822,7 +893,7 @@ static int RenderYUVA( filter_t *p_filter,
     const int i_text_width  = p_bbox->xMax - p_bbox->xMin;
     const int i_text_height = p_bbox->yMax - p_bbox->yMin;
     video_format_t fmt;
-    video_format_Init( &fmt, VLC_CODEC_YUVA );
+    video_format_Init( &fmt, i_chroma );
     fmt.i_width          =
     fmt.i_visible_width  = i_text_width  + 2 * i_margin;
     fmt.i_height         =
@@ -835,17 +906,10 @@ static int RenderYUVA( filter_t *p_filter,
 
     /* Initialize the picture background */
     uint8_t i_a = p_sys->i_background_opacity;
-    uint8_t i_y, i_u, i_v;
-    YUVFromRGB( p_sys->i_background_color, &i_y, &i_u, &i_v );
+    uint8_t i_x, i_y, i_z;
+    ExtractComponents( p_sys->i_background_color, &i_x, &i_y, &i_z );
 
-    memset( p_picture->p[0].p_pixels, i_y,
-            p_picture->p[0].i_pitch * p_picture->p[0].i_lines );
-    memset( p_picture->p[1].p_pixels, i_u,
-            p_picture->p[1].i_pitch * p_picture->p[1].i_lines );
-    memset( p_picture->p[2].p_pixels, i_v,
-            p_picture->p[2].i_pitch * p_picture->p[2].i_lines );
-    memset( p_picture->p[3].p_pixels, i_a,
-            p_picture->p[3].i_pitch * p_picture->p[3].i_lines );
+    FillPicture( p_picture, i_a, i_x, i_y, i_z );
 
     /* Render shadow then outline and then normal glyphs */
     for( int g = 0; g < 3; g++ )
@@ -887,23 +951,25 @@ static int RenderYUVA( filter_t *p_filter,
                     i_color = ch->i_color;
                     break;
                 }
-                YUVFromRGB( i_color, &i_y, &i_u, &i_v );
+                ExtractComponents( i_color, &i_x, &i_y, &i_z );
 
                 int i_glyph_y = i_align_top  - p_glyph->top  + p_bbox->yMax + p_line->i_base_line;
                 int i_glyph_x = i_align_left + p_glyph->left - p_bbox->xMin;
 
-                BlendYUVAGlyph( p_picture,
+                BlendAXYZGlyph( p_picture,
                                 i_glyph_x, i_glyph_y,
-                                i_a, i_y, i_u, i_v,
-                                p_glyph );
+                                i_a, i_x, i_y, i_z,
+                                p_glyph,
+                                BlendPixel );
 
                 /* underline/strikethrough are only rendered for the normal glyph */
                 if( g == 2 && ch->i_line_thickness > 0 )
-                    BlendYUVALine( p_picture,
+                    BlendAXYZLine( p_picture,
                                    i_glyph_x, i_glyph_y + p_glyph->top,
-                                   i_a, i_y, i_u, i_v,
+                                   i_a, i_x, i_y, i_z,
                                    &ch[0],
-                                   i + 1 < p_line->i_character_count ? &ch[1] : NULL );
+                                   i + 1 < p_line->i_character_count ? &ch[1] : NULL,
+                                   BlendPixel );
             }
         }
     }
@@ -2169,7 +2235,8 @@ static int ProcessLines( filter_t *p_filter,
  * the vout method by this module
  */
 static int RenderCommon( filter_t *p_filter, subpicture_region_t *p_region_out,
-                         subpicture_region_t *p_region_in, bool b_html )
+                         subpicture_region_t *p_region_in, bool b_html,
+                         const vlc_fourcc_t *p_chroma_list )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
 
@@ -2303,13 +2370,35 @@ static int RenderCommon( filter_t *p_filter, subpicture_region_t *p_region_out,
      * properly. */
     if( !rv && i_text_length > 0 && bbox.xMin < bbox.xMax && bbox.yMin < bbox.yMax )
     {
+        const vlc_fourcc_t p_chroma_list_yuvp[] = { VLC_CODEC_YUVP, 0 };
+        const vlc_fourcc_t p_chroma_list_rgba[] = { VLC_CODEC_RGBA, 0 };
+
         if( var_InheritBool( p_filter, "freetype-yuvp" ) )
-            RenderYUVP( p_filter, p_region_out, p_lines, &bbox );
-        else
-            RenderYUVA( p_filter, p_region_out,
-                        p_lines,
-                        &bbox,
-                        p_sys->i_background_opacity > 0 ? i_max_face_height / 4 : 0 );
+            p_chroma_list = p_chroma_list_yuvp;
+        else if( !p_chroma_list || *p_chroma_list == 0 )
+            p_chroma_list = p_chroma_list_rgba;
+
+        const int i_margin = p_sys->i_background_opacity > 0 ? i_max_face_height / 4 : 0;
+        for( const vlc_fourcc_t *p_chroma = p_chroma_list; *p_chroma != 0; p_chroma++ )
+        {
+            rv = VLC_EGENERIC;
+            if( *p_chroma == VLC_CODEC_YUVP )
+                rv = RenderYUVP( p_filter, p_region_out, p_lines, &bbox );
+            else if( *p_chroma == VLC_CODEC_YUVA )
+                rv = RenderAXYZ( p_filter, p_region_out, p_lines, &bbox, i_margin,
+                                 VLC_CODEC_YUVA,
+                                 YUVFromRGB,
+                                 FillYUVAPicture,
+                                 BlendYUVAPixel );
+            else if( *p_chroma == VLC_CODEC_RGBA )
+                rv = RenderAXYZ( p_filter, p_region_out, p_lines, &bbox, i_margin,
+                                 VLC_CODEC_RGBA,
+                                 RGBFromRGB,
+                                 FillRGBAPicture,
+                                 BlendRGBAPixel );
+            if( !rv )
+                break;
+        }
 
         /* With karaoke, we're going to have to render the text a number
          * of times to show the progress marker on the text.
@@ -2334,20 +2423,18 @@ static int RenderCommon( filter_t *p_filter, subpicture_region_t *p_region_out,
 
 static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
                        subpicture_region_t *p_region_in,
-                       const video_format_t *p_chroma_list )
+                       const vlc_fourcc_t *p_chroma_list )
 {
-    VLC_UNUSED( p_chroma_list );
-    return RenderCommon( p_filter, p_region_out, p_region_in, false );
+    return RenderCommon( p_filter, p_region_out, p_region_in, false, p_chroma_list );
 }
 
 #ifdef HAVE_STYLES
 
 static int RenderHtml( filter_t *p_filter, subpicture_region_t *p_region_out,
                        subpicture_region_t *p_region_in,
-                       const video_format_t *p_chroma_list )
+                       const vlc_fourcc_t *p_chroma_list )
 {
-    VLC_UNUSED( p_chroma_list );
-    return RenderCommon( p_filter, p_region_out, p_region_in, true );
+    return RenderCommon( p_filter, p_region_out, p_region_in, true, p_chroma_list );
 }
 
 #endif
