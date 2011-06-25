@@ -27,6 +27,7 @@ PREFIX := $(abspath $(PREFIX))
 ifneq ($(HOST),$(BUILD))
 HAVE_CROSS_COMPILE = 1
 endif
+ARCH := $(shell $(SRC)/get-arch.sh $(HOST))
 
 ifdef HAVE_CROSS_COMPILE
 need_pkg = 1
