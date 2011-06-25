@@ -29,6 +29,7 @@
 #include "qt4.hpp"
 
 #include "util/input_slider.hpp"
+#include "adapters/seekpoints.hpp"
 
 #include <QPaintEvent>
 #include <QPainter>
@@ -52,6 +53,7 @@ SeekSlider::SeekSlider( Qt::Orientation q, QWidget *_parent )
 {
     b_isSliding = false;
     f_buffering = 1.0;
+    chapters = NULL;
 
     /* Timer used to fire intermediate updatePos() when sliding */
     seekLimitTimer = new QTimer( this );
@@ -76,6 +78,23 @@ SeekSlider::SeekSlider( Qt::Orientation q, QWidget *_parent )
     CONNECT( this, sliderMoved( int ), this, startSeekTimer() );
     CONNECT( seekLimitTimer, timeout(), this, updatePos() );
     mTimeTooltip->installEventFilter( this );
+}
+
+SeekSlider::~SeekSlider()
+{
+    delete chapters;
+}
+
+/***
+ * \brief Sets the chapters seekpoints adapter
+ *
+ * \params SeekPoints initilized with current intf thread
+***/
+void SeekSlider::setChapters( SeekPoints *chapters_ )
+{
+    delete chapters;
+    chapters = chapters_;
+    chapters->setParent( this );
 }
 
 /***
@@ -330,9 +349,26 @@ void SeekSlider::paintEvent( QPaintEvent *event )
         painter.drawRoundedRect( innerRect, barCorner, barCorner );
     }
 
-    // draw handle
     if ( option.state & QStyle::State_MouseOver )
     {
+        /* draw chapters tickpoints */
+        if ( chapters && inputLength && size().width() )
+        {
+            if ( orientation() == Qt::Horizontal ) /* TODO: vertical */
+            {
+                QList<SeekPoint> points = chapters->getPoints();
+                foreach( SeekPoint point, points )
+                {
+                    int x = point.time / 1000000.0 / inputLength * size().width();
+                    painter.setPen( QColor( 80, 80, 80 ) );
+                    painter.setBrush( Qt::NoBrush );
+                    painter.drawLine( x, 0, x, 3 );
+                    painter.drawLine( x, height(), x, height() - 3 );
+                }
+            }
+        }
+
+        // draw handle
         if ( sliderPos != -1 )
         {
             const int margin = 0;

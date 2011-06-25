@@ -36,6 +36,7 @@ class QMouseEvent;
 class QWheelEvent;
 class QHideEvent;
 class QTimer;
+class SeekPoints;
 
 /* Input Slider derived from QSlider */
 class SeekSlider : public QSlider
@@ -44,6 +45,8 @@ class SeekSlider : public QSlider
 public:
     SeekSlider( QWidget *_parent );
     SeekSlider( Qt::Orientation q, QWidget *_parent );
+    ~SeekSlider();
+    void setChapters( SeekPoints * );
 
 protected:
     virtual void mouseMoveEvent( QMouseEvent *event );
@@ -67,6 +70,7 @@ private:
     QTimer *seekLimitTimer;
     TimeTooltip *mTimeTooltip;
     float f_buffering;
+    SeekPoints* chapters;
 
 public slots:
     void setPosition( float, int64_t, int );

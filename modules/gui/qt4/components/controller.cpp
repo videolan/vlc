@@ -42,6 +42,8 @@
 #include "util/input_slider.hpp"                         /* SeekSlider */
 #include "util/customwidgets.hpp"                       /* qEventToKey */
 
+#include "adapters/seekpoints.hpp"
+
 #include <QToolButton>
 #include <QHBoxLayout>
 #include <QRegion>
@@ -340,6 +342,9 @@ QWidget *AbstractController::createWidget( buttonType_e button, int options )
         break;
     case INPUT_SLIDER: {
         SeekSlider *slider = new SeekSlider( Qt::Horizontal, NULL );
+        SeekPoints *chapters = new SeekPoints( this, p_intf );
+        CONNECT( THEMIM->getIM(), titleChanged( bool ), chapters, update() );
+        slider->setChapters( chapters );
 
         /* Update the position when the IM has changed */
         CONNECT( THEMIM->getIM(), positionUpdated( float, int64_t, int ),
