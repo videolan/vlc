@@ -8,6 +8,7 @@ all: install
 ALL_PKGS := $(patsubst ../src/%/rules.mak,%,$(wildcard ../src/*/rules.mak))
 SRC := ../src
 TARBALLS := ../tarballs
+DATE := $(shell date +%Y%m%d)
 
 # Common download locations
 GNU := http://ftp.gnu.org/gnu
@@ -21,7 +22,8 @@ include config.mak
 #
 # Machine-dependent variables
 #
-PREFIX := $(abspath $(BIN)/$(HOST))
+PREFIX ?= ../hosts/$(HOST)
+PREFIX := $(abspath $(PREFIX))
 ifneq ($(HOST),$(BUILD))
 HAVE_CROSS_COMPILE = 1
 endif
@@ -160,5 +162,9 @@ clean: mostlyclean
 distclean: clean
 	$(RM) config.mak
 	unlink Makefile
+
+package: install
+	(cd $(PREFIX)/.. && \
+	tar cvJ $(notdir $(PREFIX))/) > ../vlc-contrib-$(HOST)-$(DATE).tar.xz
 
 .DELETE_ON_ERROR:
