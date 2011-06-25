@@ -31,6 +31,7 @@
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
+#include <math.h>
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
@@ -128,6 +129,12 @@ static void Destroy( vlc_object_t * );
 #define OUTLINE_COLOR_TEXT N_("Outline color")
 #define OUTLINE_THICKNESS_TEXT N_("Outline thickness")
 
+#define SHADOW_OPACITY_TEXT N_("Shadow opacity")
+#define SHADOW_COLOR_TEXT N_("Shadow color")
+#define SHADOW_ANGLE_TEXT N_("Shadow angle")
+#define SHADOW_DISTANCE_TEXT N_("Shadow distance")
+
+
 static const int pi_sizes[] = { 20, 18, 16, 12, 6 };
 static const char *const ppsz_sizes_text[] = {
     N_("Smaller"), N_("Small"), N_("Normal"), N_("Large"), N_("Larger") };
@@ -204,6 +211,20 @@ vlc_module_begin ()
         change_integer_list( pi_outline_thickness, ppsz_outline_thickness )
         change_safe()
 
+    add_integer_with_range( "freetype-shadow-opacity", 128, 0, 255,
+                            SHADOW_OPACITY_TEXT, "", false )
+        change_safe()
+    add_integer( "freetype-shadow-color", 0x00000000, SHADOW_COLOR_TEXT,
+                 "", false )
+        change_integer_list( pi_color_values, ppsz_color_descriptions )
+        change_safe()
+    add_float_with_range( "freetype-shadow-angle", -45, -360, 360,
+                          SHADOW_ANGLE_TEXT, "", false )
+        change_safe()
+    add_float_with_range( "freetype-shadow-distance", 0.06, 0.0, 1.0,
+                          SHADOW_DISTANCE_TEXT, "", false )
+        change_safe()
+
     add_obsolete_integer( "freetype-effect" );
 
     add_bool( "freetype-yuvp", false, YUVP_TEXT,
@@ -222,6 +243,7 @@ typedef struct
 {
     FT_BitmapGlyph p_glyph;
     FT_BitmapGlyph p_outline;
+    FT_BitmapGlyph p_shadow;
     uint32_t       i_color;             /* ARGB color */
     int            i_line_offset;       /* underline/strikethrough offset */
     int            i_line_thickness;    /* underline/strikethrough thickness */
@@ -270,6 +292,11 @@ struct filter_sys_t
     double         f_outline_thickness;
     uint8_t        i_outline_opacity;
     int            i_outline_color;
+
+    float          f_shadow_vector_x;
+    float          f_shadow_vector_y;
+    uint8_t        i_shadow_opacity;
+    int            i_shadow_color;
 
     int            i_default_font_size;
     int            i_display_height;
@@ -820,8 +847,8 @@ static int RenderYUVA( filter_t *p_filter,
     memset( p_picture->p[3].p_pixels, i_a,
             p_picture->p[3].i_pitch * p_picture->p[3].i_lines );
 
-    /* Render outline glyphs in the first pass, and then the normal glyphs */
-    for( int g = 0; g < 2; g++ )
+    /* Render shadow then outline and then normal glyphs */
+    for( int g = 0; g < 3; g++ )
     {
         /* Render all lines */
         for( line_desc_t *p_line = p_line_head; p_line != NULL; p_line = p_line->p_next )
@@ -841,16 +868,24 @@ static int RenderYUVA( filter_t *p_filter,
             for( int i = 0; i < p_line->i_character_count; i++ )
             {
                 const line_character_t *ch = &p_line->p_character[i];
-                FT_BitmapGlyph p_glyph = g == 0 ? ch->p_outline : ch->p_glyph;
+                FT_BitmapGlyph p_glyph = g == 0 ? ch->p_shadow : g == 1 ? ch->p_outline : ch->p_glyph;
                 if( !p_glyph )
                     continue;
 
-                uint32_t i_color = ch->i_color;
-                i_a = (i_color >> 24) & 0xff;
-                if( g == 0 )
-                {
-                    i_a = i_a * p_sys->i_outline_opacity / 255;
+                i_a = (ch->i_color >> 24) & 0xff;
+                uint32_t i_color;
+                switch (g) {
+                case 0:
+                    i_a     = i_a * p_sys->i_shadow_opacity / 255;
+                    i_color = p_sys->i_shadow_color;
+                    break;
+                case 1:
+                    i_a     = i_a * p_sys->i_outline_opacity / 255;
                     i_color = p_sys->i_outline_color;
+                    break;
+                default:
+                    i_color = ch->i_color;
+                    break;
                 }
                 YUVFromRGB( i_color, &i_y, &i_u, &i_v );
 
@@ -863,7 +898,7 @@ static int RenderYUVA( filter_t *p_filter,
                                 p_glyph );
 
                 /* underline/strikethrough are only rendered for the normal glyph */
-                if( g == 1 && ch->i_line_thickness > 0 )
+                if( g == 2 && ch->i_line_thickness > 0 )
                     BlendYUVALine( p_picture,
                                    i_glyph_x, i_glyph_y + p_glyph->top,
                                    i_a, i_y, i_u, i_v,
@@ -1467,6 +1502,8 @@ static void FreeLine( line_desc_t *p_line )
         FT_Done_Glyph( (FT_Glyph)ch->p_glyph );
         if( ch->p_outline )
             FT_Done_Glyph( (FT_Glyph)ch->p_outline );
+        if( ch->p_shadow )
+            FT_Done_Glyph( (FT_Glyph)ch->p_shadow );
     }
 
     free( p_line->p_character );
@@ -1614,11 +1651,13 @@ static bool FaceStyleEquals( const text_style_t *p_style1,
 static int GetGlyph( filter_t *p_filter,
                      FT_Glyph *pp_glyph,   FT_BBox *p_glyph_bbox,
                      FT_Glyph *pp_outline, FT_BBox *p_outline_bbox,
+                     FT_Glyph *pp_shadow,  FT_BBox *p_shadow_bbox,
 
                      FT_Face  p_face,
                      int i_glyph_index,
                      int i_style_flags,
-                     FT_Vector *p_pen )
+                     FT_Vector *p_pen,
+                     FT_Vector *p_pen_shadow )
 {
     if( FT_Load_Glyph( p_face, i_glyph_index, FT_LOAD_NO_BITMAP | FT_LOAD_DEFAULT ) &&
         FT_Load_Glyph( p_face, i_glyph_index, FT_LOAD_DEFAULT ) )
@@ -1648,20 +1687,35 @@ static int GetGlyph( filter_t *p_filter,
     {
         outline = glyph;
         FT_Glyph_StrokeBorder( &outline, p_filter->p_sys->p_stroker, 0, 0 );
-        FT_Glyph_To_Bitmap( &outline, FT_RENDER_MODE_NORMAL, p_pen, 1 );
-
-        FT_Glyph_Get_CBox( outline, ft_glyph_bbox_pixels, p_outline_bbox );
     }
-    *pp_outline = outline;
+
+    FT_Glyph shadow = NULL;
+    if( p_filter->p_sys->i_shadow_opacity > 0 )
+    {
+        shadow = outline ? outline : glyph;
+        FT_Glyph_To_Bitmap( &shadow, FT_RENDER_MODE_NORMAL, p_pen_shadow, 0 );
+        FT_Glyph_Get_CBox( shadow, ft_glyph_bbox_pixels, p_shadow_bbox );
+    }
+    *pp_shadow = shadow;
 
     if( FT_Glyph_To_Bitmap( &glyph, FT_RENDER_MODE_NORMAL, p_pen, 1) )
     {
         FT_Done_Glyph( glyph );
+        if( outline )
+            FT_Done_Glyph( outline );
+        if( shadow )
+            FT_Done_Glyph( shadow );
         return VLC_EGENERIC;
     }
-
     FT_Glyph_Get_CBox( glyph, ft_glyph_bbox_pixels, p_glyph_bbox );
     *pp_glyph = glyph;
+
+    if( outline )
+    {
+        FT_Glyph_To_Bitmap( &outline, FT_RENDER_MODE_NORMAL, p_pen, 1 );
+        FT_Glyph_Get_CBox( outline, ft_glyph_bbox_pixels, p_outline_bbox );
+    }
+    *pp_outline = outline;
 
     return VLC_SUCCESS;
 }
@@ -1911,19 +1965,31 @@ static int ProcessLines( filter_t *p_filter,
                     .x = pen.x + kerning.x,
                     .y = pen.y + kerning.y,
                 };
+                FT_Vector pen_shadow_new = {
+                    .x = pen_new.x + p_sys->f_shadow_vector_x * (p_current_style->i_font_size << 6),
+                    .y = pen_new.y + p_sys->f_shadow_vector_y * (p_current_style->i_font_size << 6),
+                };
                 FT_Glyph glyph;
                 FT_BBox  glyph_bbox;
                 FT_Glyph outline;
                 FT_BBox  outline_bbox;
+                FT_Glyph shadow;
+                FT_BBox  shadow_bbox;
+
                 if( GetGlyph( p_filter,
                               &glyph, &glyph_bbox,
                               &outline, &outline_bbox,
-                              p_current_face, i_glyph_index, p_glyph_style->i_style_flags, &pen_new ) )
+                              &shadow, &shadow_bbox,
+                              p_current_face, i_glyph_index, p_glyph_style->i_style_flags,
+                              &pen_new, &pen_shadow_new ) )
                     goto next;
 
                 FixGlyph( glyph, &glyph_bbox, p_current_face, &pen_new );
                 if( outline )
                     FixGlyph( outline, &outline_bbox, p_current_face, &pen_new );
+                if( shadow )
+                    FixGlyph( shadow, &shadow_bbox, p_current_face, &pen_shadow_new );
+
                 /* FIXME and what about outline */
 
                 bool     b_karaoke = pi_karaoke_bar && pi_karaoke_bar[i_index] != 0;
@@ -1964,6 +2030,8 @@ static int ProcessLines( filter_t *p_filter,
                 BBoxEnlarge( &line_bbox_new, &glyph_bbox );
                 if( outline )
                     BBoxEnlarge( &line_bbox_new, &outline_bbox );
+                if( shadow )
+                    BBoxEnlarge( &line_bbox_new, &shadow_bbox );
 
                 b_break_line = i_index > i_start &&
                                line_bbox_new.xMax - line_bbox_new.xMin >= p_filter->fmt_out.video.i_visible_width;
@@ -1972,6 +2040,8 @@ static int ProcessLines( filter_t *p_filter,
                     FT_Done_Glyph( glyph );
                     if( outline )
                         FT_Done_Glyph( outline );
+                    if( shadow )
+                        FT_Done_Glyph( shadow );
 
                     break_point_t *p_bp = NULL;
                     if( break_point.i_index > i_start )
@@ -1988,6 +2058,8 @@ static int ProcessLines( filter_t *p_filter,
                             FT_Done_Glyph( (FT_Glyph)ch->p_glyph );
                             if( ch->p_outline )
                                 FT_Done_Glyph( (FT_Glyph)ch->p_outline );
+                            if( ch->p_shadow )
+                                FT_Done_Glyph( (FT_Glyph)ch->p_shadow );
                         }
                         p_line->i_character_count = p_bp->i_index - i_start;
 
@@ -2009,6 +2081,7 @@ static int ProcessLines( filter_t *p_filter,
                 p_line->p_character[p_line->i_character_count++] = (line_character_t){
                     .p_glyph = (FT_BitmapGlyph)glyph,
                     .p_outline = (FT_BitmapGlyph)outline,
+                    .p_shadow = (FT_BitmapGlyph)shadow,
                     .i_color = i_color,
                     .i_line_offset = i_line_offset,
                     .i_line_thickness = i_line_thickness,
@@ -2323,6 +2396,16 @@ static int Create( vlc_object_t *p_this )
     p_sys->i_outline_opacity = __MAX( __MIN( p_sys->i_outline_opacity, 255 ), 0 );
     p_sys->i_outline_color = var_InheritInteger( p_filter, "freetype-outline-color" );
     p_sys->i_outline_color = __MAX( __MIN( p_sys->i_outline_color, 0xFFFFFF ), 0 );
+
+    p_sys->i_shadow_opacity = var_InheritInteger( p_filter, "freetype-shadow-opacity" );
+    p_sys->i_shadow_opacity = __MAX( __MIN( p_sys->i_shadow_opacity, 255 ), 0 );
+    p_sys->i_shadow_color = var_InheritInteger( p_filter, "freetype-shadow-color" );
+    p_sys->i_shadow_color = __MAX( __MIN( p_sys->i_shadow_color, 0xFFFFFF ), 0 );
+    float f_shadow_angle = var_InheritFloat( p_filter, "freetype-shadow-angle" );
+    float f_shadow_distance = var_InheritFloat( p_filter, "freetype-shadow-distance" );
+    f_shadow_distance = __MAX( __MIN( f_shadow_distance, 1 ), 0 );
+    p_sys->f_shadow_vector_x = f_shadow_distance * cos(2 * M_PI * f_shadow_angle / 360);
+    p_sys->f_shadow_vector_y = f_shadow_distance * sin(2 * M_PI * f_shadow_angle / 360);
 
 #ifdef WIN32
     /* Get Windows Font folder */
