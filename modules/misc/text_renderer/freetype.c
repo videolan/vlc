@@ -836,9 +836,6 @@ static int RenderYUVA( filter_t *p_filter, subpicture_region_t *p_region,
     video_format_t fmt;
     int i, y, i_pitch, i_alpha;
 
-    if( i_width == 0 || i_height == 0 )
-        return VLC_SUCCESS;
-
     /* Create a new subpicture region */
     memset( &fmt, 0, sizeof(video_format_t) );
     fmt.i_chroma = VLC_CODEC_YUVA;
@@ -2233,7 +2230,7 @@ static int RenderCommon( filter_t *p_filter, subpicture_region_t *p_region_out,
 
     /* Don't attempt to render text that couldn't be layed out
      * properly. */
-    if( !rv && i_text_length > 0 )
+    if( !rv && i_text_length > 0 && result.x > 0 && result.y > 0)
     {
         if( var_InheritBool( p_filter, "freetype-yuvp" ) )
             RenderYUVP( p_filter, p_region_out, p_lines,
