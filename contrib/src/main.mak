@@ -28,6 +28,10 @@ ifneq ($(HOST),$(BUILD))
 HAVE_CROSS_COMPILE = 1
 endif
 ARCH := $(shell $(SRC)/get-arch.sh $(HOST))
+ifneq ($(findstring $(ARCH),i386 sparc sparc64 ppc ppc64 x86_64),)
+# This should be consistent with include/vlc_cpu.h
+HAVE_FPU = 1
+endif
 
 ifdef HAVE_CROSS_COMPILE
 need_pkg = 1

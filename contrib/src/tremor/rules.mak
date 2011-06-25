@@ -1,5 +1,9 @@
 # tremor (fixed-point Vorbis)
 
+ifndef HAVE_FPU
+PKGS += tremor
+endif
+
 $(TARBALLS)/tremor-svn.tar.xz:
 	rm -Rf tremor-svn
 	$(SVN) export http://svn.xiph.org/trunk/Tremor tremor-svn
