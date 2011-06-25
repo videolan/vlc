@@ -935,6 +935,7 @@ static void InitTitle( input_thread_t * p_input )
     if( p_input->b_preparsing )
         return;
 
+    vlc_mutex_lock( &p_input->p->p_item->lock );
     /* Create global title (from master) */
     p_input->p->i_title = p_master->i_title;
     p_input->p->title   = p_master->title;
@@ -951,6 +952,7 @@ static void InitTitle( input_thread_t * p_input )
     p_input->p->b_can_pace_control    = p_master->b_can_pace_control;
     p_input->p->b_can_pause        = p_master->b_can_pause;
     p_input->p->b_can_rate_control = p_master->b_can_rate_control;
+    vlc_mutex_unlock( &p_input->p->p_item->lock );
 }
 
 static void StartTitle( input_thread_t * p_input )

@@ -325,6 +325,30 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
             vlc_mutex_unlock( &p_input->p->p_item->lock );
             return VLC_SUCCESS;
 
+        case INPUT_GET_TITLE_INFO:
+        {
+            input_title_t **p_title = (input_title_t **)va_arg( args, input_title_t ** );
+            int *pi_req_title_offset = (int *) va_arg( args, int * );
+
+            vlc_mutex_lock( &p_input->p->p_item->lock );
+
+            /* current title if -1 */
+            if ( *pi_req_title_offset < 0 )
+                *pi_req_title_offset = p_input->p->i_title_offset;
+
+            if( p_input->p->i_title && p_input->p->i_title > *pi_req_title_offset )
+            {
+                *p_title = vlc_input_title_Duplicate( p_input->p->title[*pi_req_title_offset] );
+                vlc_mutex_unlock( &p_input->p->p_item->lock );
+                return VLC_SUCCESS;
+            }
+            else
+            {
+                vlc_mutex_unlock( &p_input->p->p_item->lock );
+                return VLC_EGENERIC;
+            }
+        }
+
         case INPUT_ADD_OPTION:
         {
             const char *psz_option = va_arg( args, const char * );

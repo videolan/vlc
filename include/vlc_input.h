@@ -494,6 +494,9 @@ enum input_query_e
     INPUT_DEL_BOOKMARK,    /* arg1= seekpoint_t *  res=can fail   */
     INPUT_SET_BOOKMARK,    /* arg1= int  res=can fail    */
 
+    /* titles */
+    INPUT_GET_TITLE_INFO,     /* arg1=input_title_t** arg2= int * res=can fail */
+
     /* Attachments */
     INPUT_GET_ATTACHMENTS, /* arg1=input_attachment_t***, arg2=int*  res=can fail */
     INPUT_GET_ATTACHMENT,  /* arg1=input_attachment_t**, arg2=char*  res=can fail */
