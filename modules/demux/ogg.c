@@ -1139,7 +1139,7 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                     }
                 }
                 else if( (*oggpacket.packet & PACKET_TYPE_BITS ) == PACKET_TYPE_HEADER &&
-                         oggpacket.bytes >= 56+1 )
+                         oggpacket.bytes >= 44+1 )
                 {
                     stream_header_t tmp;
                     stream_header_t *st = &tmp;
@@ -1154,7 +1154,8 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                     st->bits_per_sample = GetWLE( &oggpacket.packet[1+40] ); // (padding 2)
 
                     /* Check for video header (new format) */
-                    if( !strncmp( st->streamtype, "video", 5 ) )
+                    if( !strncmp( st->streamtype, "video", 5 ) &&
+                        oggpacket.bytes >= 52+1 )
                     {
                         st->sh.video.width = GetDWLE( &oggpacket.packet[1+44] );
                         st->sh.video.height = GetDWLE( &oggpacket.packet[1+48] );
@@ -1187,7 +1188,8 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                                  p_stream->fmt.video.i_bits_per_pixel );
                     }
                     /* Check for audio header (new format) */
-                    else if( !strncmp( st->streamtype, "audio", 5 ) )
+                    else if( !strncmp( st->streamtype, "audio", 5 ) &&
+                             oggpacket.bytes >= 56+1 )
                     {
                         char p_buffer[5];
                         int i_extra_size;
