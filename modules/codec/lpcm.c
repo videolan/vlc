@@ -180,10 +180,12 @@ static int AobHeader( unsigned *pi_rate,
 static void AobExtract( aout_buffer_t *, block_t *, unsigned i_bits, aob_group_t p_group[2] );
 /* */
 static int BdHeader( unsigned *pi_rate,
-                     unsigned *pi_channels, unsigned *pi_original_channels,
+                     unsigned *pi_channels,
+                     unsigned *pi_channels_padding,
+                     unsigned *pi_original_channels,
                      unsigned *pi_bits,
                      const uint8_t *p_header );
-static void BdExtract( aout_buffer_t *, block_t * );
+static void BdExtract( aout_buffer_t *, block_t *, unsigned, unsigned, unsigned, unsigned );
 
 
 /*****************************************************************************
@@ -319,6 +321,7 @@ static void *DecodeFrame( decoder_t *p_dec, block_t **pp_block )
     }
 
     int i_ret;
+    unsigned i_channels_padding = 0;
     unsigned i_padding = 0;
     aob_group_t p_aob_group[2];
     switch( p_sys->i_type )
@@ -333,7 +336,7 @@ static void *DecodeFrame( decoder_t *p_dec, block_t **pp_block )
                            p_block->p_buffer );
         break;
     case LPCM_BD:
-        i_ret = BdHeader( &i_rate, &i_channels, &i_original_channels, &i_bits,
+        i_ret = BdHeader( &i_rate, &i_channels, &i_channels_padding, &i_original_channels, &i_bits,
                           p_block->p_buffer );
         break;
     default:
@@ -358,7 +361,8 @@ static void *DecodeFrame( decoder_t *p_dec, block_t **pp_block )
     p_dec->fmt_out.audio.i_original_channels = i_original_channels;
     p_dec->fmt_out.audio.i_physical_channels = i_original_channels & AOUT_CHAN_PHYSMASK;
 
-    i_frame_length = (p_block->i_buffer - p_sys->i_header_size - i_padding) / i_channels * 8 / i_bits;
+    i_frame_length = (p_block->i_buffer - p_sys->i_header_size - i_padding) /
+                     (i_channels + i_channels_padding) * 8 / i_bits;
 
     if( p_sys->b_packetizer )
     {
@@ -409,7 +413,7 @@ static void *DecodeFrame( decoder_t *p_dec, block_t **pp_block )
         default:
             assert(0);
         case LPCM_BD:
-            BdExtract( p_aout_buffer, p_block );
+            BdExtract( p_aout_buffer, p_block, i_frame_length, i_channels, i_channels_padding, i_bits );
             break;
         }
 
@@ -815,7 +819,9 @@ static int AobHeader( unsigned *pi_rate,
 }
 
 static int BdHeader( unsigned *pi_rate,
-                     unsigned *pi_channels, unsigned *pi_original_channels,
+                     unsigned *pi_channels,
+                     unsigned *pi_channels_padding,
+                     unsigned *pi_original_channels,
                      unsigned *pi_bits,
                      const uint8_t *p_header )
 {
@@ -876,6 +882,8 @@ static int BdHeader( unsigned *pi_rate,
     default:
         return -1;
     }
+    *pi_channels_padding = *pi_channels & 1;
+
     switch( (h >> 6) & 0x03 )
     {
     case 1:
@@ -1027,8 +1035,26 @@ static void AobExtract( aout_buffer_t *p_aout_buffer,
 
     }
 }
-static void BdExtract( aout_buffer_t *p_aout_buffer, block_t *p_block )
+static void BdExtract( aout_buffer_t *p_aout_buffer, block_t *p_block,
+                       unsigned i_frame_length,
+                       unsigned i_channels, unsigned i_channels_padding,
+                       unsigned i_bits )
 {
-    memcpy( p_aout_buffer->p_buffer, p_block->p_buffer, p_block->i_buffer );
+    if( i_channels_padding > 0 )
+    {
+        uint8_t *p_src = p_block->p_buffer;
+        uint8_t *p_dst = p_aout_buffer->p_buffer;
+        while( i_frame_length > 0 )
+        {
+            memcpy( p_dst, p_src, i_channels * i_bits / 8 );
+            p_src += (i_channels + i_channels_padding) * i_bits / 8;
+            p_dst += (i_channels +                  0) * i_bits / 8;
+            i_frame_length--;
+        }
+    }
+    else
+    {
+        memcpy( p_aout_buffer->p_buffer, p_block->p_buffer, p_block->i_buffer );
+    }
 }
 
