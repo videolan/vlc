@@ -500,6 +500,7 @@ modules/gui/fbosd.c
 modules/gui/macosx/AudioEffects.m
 modules/gui/macosx/AppleRemote.h
 modules/gui/macosx/AppleRemote.m
+modules/gui/macosx/MainMenu.m
 modules/gui/macosx/TrackSynchronization.m
 modules/gui/macosx/VideoEffects.m
 modules/gui/macosx/about.h
