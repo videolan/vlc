@@ -22,6 +22,7 @@ nodist_SOURCES_qt4 = \
 		actions_manager.moc.cpp \
 		extensions_manager.moc.cpp \
 		recents.moc.cpp \
+		adapters/seekpoints.moc.cpp \
 		variables.moc.cpp \
 		dialogs/playlist.moc.cpp \
 		dialogs/bookmarks.moc.cpp \
@@ -251,6 +252,7 @@ SOURCES_qt4 = 	qt4.cpp \
 		actions_manager.cpp \
 		extensions_manager.cpp \
 		recents.cpp \
+		adapters/seekpoints.cpp \
 		variables.cpp \
 		dialogs/playlist.cpp \
 		dialogs/bookmarks.cpp \
@@ -327,6 +329,7 @@ noinst_HEADERS = \
 	actions_manager.hpp \
 	extensions_manager.hpp \
 	recents.hpp \
+	adapters/seekpoints.hpp \
 	variables.hpp \
 	dialogs/playlist.hpp \
 	dialogs/bookmarks.hpp \
