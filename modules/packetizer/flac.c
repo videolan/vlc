@@ -422,6 +422,10 @@ static int SyncInfo( decoder_t *p_dec, uint8_t *p_buf,
         i_blocksize = 256 << (i_temp - 8);
         break;
     }
+    if( p_sys->b_stream_info &&
+        ( i_blocksize < p_sys->stream_info.min_blocksize ||
+          i_blocksize > p_sys->stream_info.max_blocksize ) )
+        return 0;
 
     /* Find samplerate */
     switch( i_temp = p_buf[2] & 0x0f )
