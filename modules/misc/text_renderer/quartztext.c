@@ -66,9 +66,11 @@ static void Destroy( vlc_object_t * );
 static int LoadFontsFromAttachments( filter_t *p_filter );
 
 static int RenderText( filter_t *, subpicture_region_t *,
-                       subpicture_region_t * );
+                       subpicture_region_t *,
+                       const vlc_fourcc_t * );
 static int RenderHtml( filter_t *, subpicture_region_t *,
-                       subpicture_region_t * );
+                       subpicture_region_t *,
+                       const vlc_fourcc_t * );
 
 static int GetFontSize( filter_t *p_filter );
 static int RenderYUVA( filter_t *p_filter, subpicture_region_t *p_region,
@@ -308,7 +310,8 @@ static char *EliminateCRLF( char *psz_string )
 // Renders a text subpicture region into another one.
 // It is used as pf_add_string callback in the vout method by this module
 static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
-                       subpicture_region_t *p_region_in )
+                       subpicture_region_t *p_region_in,
+                       const vlc_fourcc_t *p_chroma_list )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
     char         *psz_string;
@@ -768,7 +771,8 @@ static int ProcessNodes( filter_t *p_filter,
 }
 
 static int RenderHtml( filter_t *p_filter, subpicture_region_t *p_region_out,
-                       subpicture_region_t *p_region_in )
+                       subpicture_region_t *p_region_in,
+                       const vlc_fourcc_t *p_chroma_list )
 {
     int          rv = VLC_SUCCESS;
     stream_t     *p_sub = NULL;

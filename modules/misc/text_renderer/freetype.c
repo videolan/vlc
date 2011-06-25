@@ -2333,16 +2333,20 @@ static int RenderCommon( filter_t *p_filter, subpicture_region_t *p_region_out,
 }
 
 static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
-                       subpicture_region_t *p_region_in )
+                       subpicture_region_t *p_region_in,
+                       const video_format_t *p_chroma_list )
 {
+    VLC_UNUSED( p_chroma_list );
     return RenderCommon( p_filter, p_region_out, p_region_in, false );
 }
 
 #ifdef HAVE_STYLES
 
 static int RenderHtml( filter_t *p_filter, subpicture_region_t *p_region_out,
-                       subpicture_region_t *p_region_in )
+                       subpicture_region_t *p_region_in,
+                       const video_format_t *p_chroma_list )
 {
+    VLC_UNUSED( p_chroma_list );
     return RenderCommon( p_filter, p_region_out, p_region_in, true );
 }
 

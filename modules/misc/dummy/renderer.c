@@ -31,8 +31,14 @@
 
 #include "dummy.h"
 
-static int RenderText( filter_t *, subpicture_region_t *,
-                       subpicture_region_t * );
+static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
+                       subpicture_region_t *p_region_in,
+                       const vlc_fourcc_t *p_chroma_list )
+{
+    VLC_UNUSED(p_filter); VLC_UNUSED(p_region_out); VLC_UNUSED(p_region_in);
+    VLC_UNUSED(p_chroma_list);
+    return VLC_EGENERIC;
+}
 
 int OpenRenderer( vlc_object_t *p_this )
 {
@@ -42,9 +48,3 @@ int OpenRenderer( vlc_object_t *p_this )
     return VLC_SUCCESS;
 }
 
-static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
-                       subpicture_region_t *p_region_in )
-{
-    VLC_UNUSED(p_filter); VLC_UNUSED(p_region_out); VLC_UNUSED(p_region_in);
-    return VLC_EGENERIC;
-}

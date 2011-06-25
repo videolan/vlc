@@ -47,7 +47,8 @@ static void Destroy( vlc_object_t * );
 
 /* The RenderText call maps to pf_render_string, defined in vlc_filter.h */
 static int RenderText( filter_t *, subpicture_region_t *,
-                       subpicture_region_t * );
+                       subpicture_region_t *,
+                       const vlc_fourcc_t * );
 
 static int Render( filter_t *, subpicture_region_t *, uint8_t *, int, int);
 static int SetFont( filter_t *, int );
@@ -296,7 +297,8 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region,
 }
 
 static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
-                       subpicture_region_t *p_region_in )
+                       subpicture_region_t *p_region_in,
+                       const vlc_fourcc_t *p_chroma_list )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
     int i_font_color, i_font_alpha, i_font_size;

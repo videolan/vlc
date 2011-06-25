@@ -257,6 +257,7 @@ static filter_t *SpuRenderCreateAndLoadScale(vlc_object_t *object,
 
 static void SpuRenderText(spu_t *spu, bool *rerender_text,
                           subpicture_region_t *region,
+                          const vlc_fourcc_t *chroma_list,
                           mtime_t elapsed_time)
 {
     filter_t *text = spu->p->text;
@@ -289,9 +290,9 @@ static void SpuRenderText(spu_t *spu, bool *rerender_text,
     var_SetBool(text, "text-rerender", false);
 
     if (text->pf_render_html && region->psz_html)
-        text->pf_render_html(text, region, region);
+        text->pf_render_html(text, region, region, chroma_list);
     else if (text->pf_render_text)
-        text->pf_render_text(text, region, region);
+        text->pf_render_text(text, region, region, chroma_list);
     *rerender_text = var_GetBool(text, "text-rerender");
 }
 
@@ -691,6 +692,7 @@ static void SpuRenderRegion(spu_t *spu,
     /* Render text region */
     if (region->fmt.i_chroma == VLC_CODEC_TEXT) {
         SpuRenderText(spu, &restore_text, region,
+                      chroma_list,
                       render_date - subpic->i_start);
 
         /* Check if the rendering has failed ... */
