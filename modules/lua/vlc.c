@@ -113,8 +113,7 @@ vlc_module_begin ()
             add_bool   ( "http-index", false, INDEX_TEXT, INDEX_LONGTEXT, true )
         set_capability( "interface", 0 )
         set_callbacks( Open_LuaHTTP, Close_LuaIntf )
-        add_shortcut( "luahttp" )
-        add_shortcut( "http" )
+        add_shortcut( "luahttp", "http" )
 
     add_submodule ()
         set_section( N_("Lua CLI"), 0 )
@@ -122,11 +121,10 @@ vlc_module_begin ()
             add_string( "cli-host", NULL, CLIHOST_TEXT, CLIHOST_LONGTEXT, true )
         set_capability( "interface", 25 )
         set_callbacks( Open_LuaCLI, Close_LuaIntf )
-        add_shortcut( "luacli" )
-        add_shortcut( "luarc" )
 #ifndef WIN32
-        add_shortcut( "cli" )
-        add_shortcut( "rc" )
+        add_shortcut( "luacli", "luarc", "cli", "rc" )
+#else
+        add_shortcut( "luacli", "luarc" )
 #endif
 
     add_submodule ()
@@ -140,8 +138,7 @@ vlc_module_begin ()
                           TELNETPWD_LONGTEXT, true )
         set_capability( "interface", 0 )
         set_callbacks( Open_LuaTelnet, Close_LuaIntf )
-        add_shortcut( "luatelnet" )
-        add_shortcut( "telnet" )
+        add_shortcut( "luatelnet", "telnet" )
 
         /* add_shortcut( "luahotkeys" ) */
         /* add_shortcut( "hotkeys" ) */
