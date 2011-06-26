@@ -291,7 +291,7 @@ static int Open( vlc_object_t * p_this )
             p_sys->fmt.i_extra = 0;
             goto error;
         }
-        memcpy( p_sys->fmt.p_extra, ((uint8_t *)p_wf) + i_extended,
+        memcpy( p_sys->fmt.p_extra, (uint8_t *)p_wf + sizeof( WAVEFORMATEX ) + i_extended,
                 p_sys->fmt.i_extra );
     }
 
