@@ -89,7 +89,7 @@ static OMX_ERRORTYPE OmxFillBufferDone( OMX_HANDLETYPE, OMX_PTR,
 vlc_module_begin ()
     set_description( N_("Audio/Video decoder (using OpenMAX IL)") )
     set_category( CAT_INPUT )
-    set_subcategory( SUBCAT_INPUT_SCODEC )
+    set_subcategory( SUBCAT_INPUT_VCODEC )
     set_section( N_("Decoding") , NULL )
 #ifdef HAVE_MAEMO
     set_capability( "decoder", 80 )
