@@ -1900,10 +1900,8 @@ STDMETHODIMP BDAGraph::BufferCB( double /*date*/, BYTE* /*buffer*/,
 ******************************************************************************/
 HRESULT BDAGraph::Destroy()
 {
-    HRESULT hr = S_OK;
-
     if( p_media_control )
-        hr = p_media_control->StopWhenReady(); /* Instead of Stop() */
+        p_media_control->StopWhenReady(); /* Instead of Stop() */
 
     if( d_graph_register )
     {
