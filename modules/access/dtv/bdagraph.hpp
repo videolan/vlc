@@ -37,7 +37,9 @@ using namespace std;
 #   define AM_NOVTABLE
 #   define _OBJBASE_H_
 #   undef _X86_
-#   define _I64_MAX LONG_LONG_MAX
+#   ifndef _I64_MAX
+#      define _I64_MAX 0x7FFFFFFFFFFFFFFFLL
+#   endif
 #   define LONGLONG long long
 /* Work-around a bug in w32api-2.5 */
 /* #   define QACONTAINERFLAGS QACONTAINERFLAGS_SOMETHINGELSE */
