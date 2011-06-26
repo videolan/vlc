@@ -1,4 +1,4 @@
-List of vlc plugins (366)
+List of vlc plugins (379)
 $Id$
  * a52: A/52 basic parser/packetizer
  * a52tofloat32: A/52 audio converter & decoder plugin, using liba52
@@ -288,7 +288,6 @@ $Id$
  * skins2: Skinnable interface, new generation
  * smf: Standard MIDI file demuxer
  * spatializer: A spatializer audio filter
- * spdif_mixer: dummy audio mixer for the S/PDIF output
  * speex: a speex audio decoder/packetizer using the libspeex library
  * spudec: RLE DVD subtitles decoder
  * sqlite: manage an SQLite database
