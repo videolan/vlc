@@ -197,29 +197,29 @@ int dvb_tune (dvb_device_t *d)
 int dvb_set_dvbc (dvb_device_t *d, uint32_t freq, const char *mod,
                   uint32_t srate, uint32_t /*fec*/)
 {
-    return d->module->SetDVBC (freq, mod, srate);
+    return d->module->SetDVBC (freq / 1000, mod, srate);
 }
 
 /* DVB-S */
-int dvb_set_dvbs (dvb_device_t *d, uint32_t freq, uint32_t srate, uint32_t fec)
+int dvb_set_dvbs (dvb_device_t *d, uint64_t freq, uint32_t srate, uint32_t fec)
 {
-    d->frequency = freq;
+    d->frequency = freq / 1000;
     d->srate = srate;
     d->fec = fec;
     return d->module->SetDVBS(d->frequency, d->srate, d->fec, d->inversion,
                               d->pol, d->lowf, d->highf, d->switchf);
 }
 
-int dvb_set_dvbs2 (dvb_device_t *, uint32_t /*freq*/, const char * /*mod*/,
+int dvb_set_dvbs2 (dvb_device_t *, uint64_t /*freq*/, const char * /*mod*/,
                    uint32_t /*srate*/, uint32_t /*fec*/, int /*pilot*/, int /*rolloff*/)
 {
     return VLC_EGENERIC;
 }
 
-int dvb_set_sec (dvb_device_t *d, uint32_t freq, char pol,
+int dvb_set_sec (dvb_device_t *d, uint64_t freq, char pol,
                  uint32_t lowf, uint32_t highf, uint32_t switchf)
 {
-    d->frequency = freq;
+    d->frequency = freq / 1000;
     d->pol = pol;
     d->lowf = lowf;
     d->highf = highf;
@@ -233,7 +233,7 @@ int dvb_set_dvbt (dvb_device_t *d, uint32_t freq, const char * /*mod*/,
                   uint32_t fec_hp, uint32_t fec_lp, uint32_t bandwidth,
                   int transmission, uint32_t guard, int hierarchy)
 {
-    return d->module->SetDVBT(freq, fec_hp, fec_lp,
+    return d->module->SetDVBT(freq / 1000, fec_hp, fec_lp,
                               bandwidth, transmission, guard, hierarchy);
 }
 
@@ -247,12 +247,12 @@ int dvb_set_dvbt2 (dvb_device_t *, uint32_t /*freq*/, const char * /*mod*/,
 /* ATSC */
 int dvb_set_atsc (dvb_device_t *d, uint32_t freq, const char * /*mod*/)
 {
-    return d->module->SetATSC(freq);
+    return d->module->SetATSC(freq / 1000);
 }
 
 int dvb_set_cqam (dvb_device_t *d, uint32_t freq, const char * /*mod*/)
 {
-    return d->module->SetCQAM(freq);
+    return d->module->SetCQAM(freq / 1000);
 }
 
 

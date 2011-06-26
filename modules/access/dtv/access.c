@@ -52,7 +52,7 @@
 #define CREATE_TEXT N_("Network name to create")
 #define CREATE_LONGTEXT N_("Create unique name in the System Tuning Spaces")
 
-#define FREQ_TEXT N_("Frequency (kHz)")
+#define FREQ_TEXT N_("Frequency (Hz)")
 #define FREQ_LONGTEXT N_( \
     "TV channels are grouped by transponder (a.k.a. multiplex) " \
     "on a given frequency. This is required to tune the receiver.")
@@ -350,8 +350,8 @@ struct delsys
 static block_t *Read (access_t *);
 static int Control (access_t *, int, va_list);
 static const delsys_t *GuessSystem (const char *, dvb_device_t *);
-static int Tune (vlc_object_t *, dvb_device_t *, const delsys_t *, unsigned);
-static unsigned var_InheritFrequency (vlc_object_t *);
+static int Tune (vlc_object_t *, dvb_device_t *, const delsys_t *, uint64_t);
+static uint64_t var_InheritFrequency (vlc_object_t *);
 
 static int Open (vlc_object_t *obj)
 {
@@ -372,13 +372,13 @@ static int Open (vlc_object_t *obj)
     sys->dev = dev;
     access->p_sys = sys;
 
-    unsigned freq = var_InheritFrequency (obj);
+    uint64_t freq = var_InheritFrequency (obj);
     if (freq != 0)
     {
         const delsys_t *delsys = GuessSystem (access->psz_access, dev);
         if (delsys == NULL || Tune (obj, dev, delsys, freq))
         {
-            msg_Err (obj, "tuning to %u kHz failed", freq);
+            msg_Err (obj, "tuning to %"PRIu64" Hz failed", freq);
             dialog_Fatal (obj, N_("Digital broadcasting"),
                           N_("The selected digital tuner does not support "
                              "the specified parameters.\n"
@@ -559,7 +559,7 @@ static const delsys_t *GuessSystem (const char *scheme, dvb_device_t *dev)
 
 /** Set parameters and tune the device */
 static int Tune (vlc_object_t *obj, dvb_device_t *dev, const delsys_t *delsys,
-                 unsigned freq)
+                 uint64_t freq)
 {
     if (delsys->setup (obj, dev, freq)
      || dvb_set_inversion (dev, var_InheritInteger (obj, "dvb-inversion"))
@@ -568,14 +568,14 @@ static int Tune (vlc_object_t *obj, dvb_device_t *dev, const delsys_t *delsys,
     return VLC_SUCCESS;
 }
 
-static unsigned var_InheritFrequency (vlc_object_t *obj)
+static uint64_t var_InheritFrequency (vlc_object_t *obj)
 {
-    unsigned freq = var_InheritInteger (obj, "dvb-frequency");
-    if (freq >= 108000000)
+    uint64_t freq = var_InheritInteger (obj, "dvb-frequency");
+    if (freq <= 108000000)
     {
-        msg_Err (obj, "%u kHz frequency is too high.", freq);
-        freq /= 1000;
-        msg_Info (obj, "Assuming %u kHz carrier frequency instead.", freq);
+        msg_Err (obj, "%"PRIu64" Hz carrier frequency is too low.", freq);
+        freq *= 1000;
+        msg_Info (obj, "Assuming %"PRIu64" Hz frequency instead.", freq);
     }
     return freq;
 }

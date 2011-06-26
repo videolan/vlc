@@ -615,7 +615,7 @@ int dvb_set_dvbc (dvb_device_t *d, uint32_t freq, const char *modstr,
         return -1;
     return dvb_set_props (d, 6, DTV_CLEAR, 0,
                           DTV_DELIVERY_SYSTEM, SYS_DVBC_ANNEX_AC,
-                          DTV_FREQUENCY, freq * 1000, DTV_MODULATION, mod,
+                          DTV_FREQUENCY, freq, DTV_MODULATION, mod,
                           DTV_SYMBOL_RATE, srate, DTV_INNER_FEC, fec);
 }
 
@@ -633,9 +633,11 @@ static unsigned dvb_parse_polarization (char pol)
     return dvb_parse_int (pol, tab, 5, SEC_VOLTAGE_OFF);
 }
 
-int dvb_set_sec (dvb_device_t *d, uint32_t freq, char pol,
+int dvb_set_sec (dvb_device_t *d, uint64_t freq_Hz, char pol,
                  uint32_t lowf, uint32_t highf, uint32_t switchf)
 {
+    uint32_t freq = freq_Hz / 1000;
+
     /* Always try to configure high voltage, but only warn on enable failure */
     int val = var_InheritBool (d->obj, "dvb-high-voltage");
     if (ioctl (d->frontend, FE_ENABLE_HIGH_LNB_VOLTAGE, &val) < 0 && val)
@@ -656,10 +658,10 @@ int dvb_set_sec (dvb_device_t *d, uint32_t freq, char pol,
              {  2500,  2700,  3650,     0 }, /* S band */
              {   950,  2150,     0,     0 }, /* adjusted IF (L band) */
         };
-        uint_fast16_t mhz = freq / 1000;
+        uint_fast16_t mHz = freq / 1000;
 
         for (size_t i = 0; i < sizeof (tab) / sizeof (tab[0]); i++)
-             if (mhz >= tab[i].min && mhz <= tab[i].max)
+             if (mHz >= tab[i].min && mHz <= tab[i].max)
              {
                  lowf = tab[i].low * 1000;
                  highf = tab[i].high * 1000;
@@ -732,8 +734,10 @@ known:
     return dvb_set_props (d, 2, DTV_FREQUENCY, freq, DTV_TONE, tone);
 }
 
-int dvb_set_dvbs (dvb_device_t *d, uint32_t freq, uint32_t srate, uint32_t fec)
+int dvb_set_dvbs (dvb_device_t *d, uint64_t freq_Hz,
+                  uint32_t srate, uint32_t fec)
 {
+    uint32_t freq = freq_Hz / 1000;
     fec = dvb_parse_fec (fec);
 
     if (dvb_find_frontend (d, FE_QPSK, FE_IS_STUPID))
@@ -743,9 +747,10 @@ int dvb_set_dvbs (dvb_device_t *d, uint32_t freq, uint32_t srate, uint32_t fec)
                           DTV_INNER_FEC, fec);
 }
 
-int dvb_set_dvbs2 (dvb_device_t *d, uint32_t freq, const char *modstr,
+int dvb_set_dvbs2 (dvb_device_t *d, uint64_t freq_Hz, const char *modstr,
                    uint32_t srate, uint32_t fec, int pilot, int rolloff)
 {
+    uint32_t freq = freq_Hz / 1000;
     unsigned mod = dvb_parse_modulation (modstr, QPSK);
     fec = dvb_parse_fec (fec);
 
