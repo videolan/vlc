@@ -1151,7 +1151,7 @@ void CaptureOpenPanel::updateMRL()
         else
         if( cqam->isChecked() ) mrl = "cqam://";
 
-        mrl += "frequency=" + QString::number( dvbFreq->value() );
+        mrl += "frequency=" + QString::number( dvbFreq->value() ) + "000";
 
         if( dvbc->isChecked() || cqam->isChecked() )
             mrl += ":modulation="
