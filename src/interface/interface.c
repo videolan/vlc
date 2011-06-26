@@ -124,6 +124,7 @@ int intf_Create( vlc_object_t *p_this, const char *chain )
     free( psz_tmp );
     free( psz_parser );
     p_intf->p_module = module_need( p_intf, "interface", module, true );
+    free(module);
     if( p_intf->p_module == NULL )
     {
         msg_Err( p_intf, "no suitable interface module" );
