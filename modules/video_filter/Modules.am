@@ -39,7 +39,6 @@ SOURCES_panoramix = panoramix.c
 SOURCES_opencv_wrapper = opencv_wrapper.c
 SOURCES_opencv_example = opencv_example.c filter_event_info.h
 SOURCES_rotate = rotate.c
-SOURCES_noise = noise.c
 SOURCES_puzzle = puzzle.c
 SOURCES_colorthres = colorthres.c
 SOURCES_extract = extract.c
@@ -111,7 +110,6 @@ libvlc_LTLIBRARIES += \
 	libmosaic_plugin.la \
 	libmotionblur_plugin.la \
 	libmotiondetect_plugin.la \
-	libnoise_plugin.la \
 	libposterize_plugin.la \
 	libpsychedelic_plugin.la \
 	libpuzzle_plugin.la \
