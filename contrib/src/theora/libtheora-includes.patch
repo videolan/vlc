@@ -1,0 +1,16 @@
+--- libtheora/tests/comment.c	2008-04-16 22:25:49.000000000 +0200
++++ libtheora.old/tests/comment.c	2008-05-14 19:25:34.000000000 +0200
+@@ -15,11 +15,11 @@
+ 
+  ********************************************************************/
+ 
+-#include <theora/theoradec.h>
+-
+ #include <string.h>
+ #include "tests.h"
+ 
++#include <theora/theoradec.h>
++
+ #define ARTIST1 "Bug-eyed Fish"
+ #define ARTIST2 "VJ Fugu"
+ #define COPYRIGHT "Copyright (C) 2005. Some Rights Reserved."
