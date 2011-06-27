@@ -146,7 +146,7 @@ case "${OS}" in
 		add_make_enabled "HAVE_WINCE"
 		;;
 esac
-
+add_make_enabled "BUILD_ENCODERS"
 
 #
 # Results output
