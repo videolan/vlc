@@ -215,7 +215,6 @@ $Id$
  * mux_wav: a WAV muxer
  * ncurses: interface module using the ncurses library
  * netsync: synchronizes the clock of remote VLCs with a server for synchronous playback
- * noise: Noise adding video filter
  * normvol: a audio filter for volume normalization
  * notify: notifications using libnotify
  * nsc: decoder for Microsoft proprietary NSC descriptors

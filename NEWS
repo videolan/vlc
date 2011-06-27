@@ -48,6 +48,7 @@ Codecs:
  * Important fixes for RealVideo 3.0 and 4.0 playback, notably in MKV
  * Experimental Hardware decoding using Broadcom CrystalHD cards
  * New module for decoding EBU subtitles (.stl)
+ * Support for 9bits and 10bits H.264/AVC decoding
 
 Demuxers:
  * New images demuxer supporting jpeg, png, targa, xcf, git, tiff, bmp, pcx, lbm
@@ -81,6 +82,7 @@ Video Output:
  * OpenGL video output now accepts YUV as input and uses fragment programs for
    chroma conversion
  * New video output for Android platform, based on Surface
+ * Support for 9/10bits output in the OpenGL output
 
 Audio Output:
  * New audio output based on AudioQueue API for iOS
@@ -99,6 +101,8 @@ Video Filter:
  * New subsdelay filter to change subtitles delay
  * New anti-flickering filter
  * New OpenMAX DL IPCS filter for color space conversion and resizing
+ * Major improvements in the freetype text-rendering module, notably supporting
+   blackbox and customizable shadow
 
 Audio Filter:
  * New Compressor filter, a dynamic range compressor
@@ -143,6 +147,7 @@ Removed modules:
  * upnp: use upnp_intel
  * removal of old telnet interface in favor of the new lua CLI
  * removal of http interface in favor of luahttp
+ * remove of the noise filter
 
 
 Changes between 1.1.9 and 1.1.10:
