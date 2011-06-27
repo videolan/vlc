@@ -1,0 +1,115 @@
+Copyright (C) 2008 Rémi Denis-Courmont, adaptation by Felix Kühne (C) 2009.
+Licensed under GNU General Public License version 2 or higher.
+diff -urN live.orig/liveMedia/include/Locale.hh live/liveMedia/include/Locale.hh
+--- live.orig/liveMedia/include/Locale.hh	2009-03-23 01:26:16 +0300
++++ live/liveMedia/include/Locale.hh	2009-03-26 19:17:43 +0300
+@@ -27,23 +27,26 @@
+ 
+ #ifndef LOCALE_NOT_USED
+ #include <locale.h>
++#ifdef __APPLE__
++#include <xlocale.h>
++#endif
+ #else
+-#ifndef LC_ALL
+-#define LC_ALL 0
++#ifndef LC_ALL_MASK
++#define LC_ALL_MASK 0
+ #endif
+-#ifndef LC_NUMERIC
+-#define LC_NUMERIC 4
++#ifndef LC_NUMERIC_MASK
++#define LC_NUMERIC_MASK 0
+ #endif
++typedef int locale_t;
+ #endif
+ 
+ class Locale {
+ public:
+-  Locale(char const* newLocale, int category = LC_ALL);
++  Locale(char const* newLocale, int category = LC_ALL_MASK);
+   virtual ~Locale();
+ 
+ private:
+-  int fCategory;
+-  char* fPrevLocale;
++  locale_t fLocale, fPrevLocale;
+ };
+ 
+ #endif
+diff -urN live.orig/liveMedia/Locale.cpp live/liveMedia/Locale.cpp
+--- live.orig/liveMedia/Locale.cpp	2009-03-23 01:26:16 +0300
++++ live/liveMedia/Locale.cpp	2009-03-26 19:17:43 +0300
+@@ -22,19 +22,18 @@
+ #include "Locale.hh"
+ #include <strDup.hh>
+ 
+-Locale::Locale(char const* newLocale, int category)
+-  : fCategory(category) {
++Locale::Locale(char const* newLocale, int category) {
+ #ifndef LOCALE_NOT_USED
+-  fPrevLocale = strDup(setlocale(category, NULL));
+-  setlocale(category, newLocale);
++  fLocale = newlocale(category, newLocale, NULL);
++  fPrevLocale = uselocale(fLocale);
+ #endif
+ }
+ 
+ Locale::~Locale() {
+ #ifndef LOCALE_NOT_USED
+-  if (fPrevLocale != NULL) {
+-    setlocale(fCategory, fPrevLocale);
+-    delete[] fPrevLocale;
++  if (fLocale != (locale_t)0) {
++    uselocale(fPrevLocale);
++    freelocale(fLocale);
+   }
+ #endif
+ }
+--- live.orig/liveMedia/RTSPClient.cpp	2010-03-16 03:09:46.000000000 +0100
++++ live/liveMedia/RTSPClient.cpp	2010-08-24 15:04:31.000000000 +0200
+@@ -1019,7 +1019,7 @@
+     // This is the default value; we don't need a "Scale:" header:
+     buf[0] = '\0';
+   } else {
+-    Locale l("C", LC_NUMERIC);
++    Locale l("C", LC_NUMERIC_MASK);
+     sprintf(buf, "Scale: %f\r\n", scale);
+   }
+ 
+@@ -1033,11 +1033,11 @@
+     buf[0] = '\0';
+   } else if (end < 0) {
+     // There's no end time:
+-    Locale l("C", LC_NUMERIC);
++    Locale l("C", LC_NUMERIC_MASK);
+     sprintf(buf, "Range: npt=%.3f-\r\n", start);
+   } else {
+     // There's both a start and an end time; include them both in the "Range:" hdr
+-    Locale l("C", LC_NUMERIC);
++    Locale l("C", LC_NUMERIC_MASK);
+     sprintf(buf, "Range: npt=%.3f-%.3f\r\n", start, end);
+   }
+ 
+--- live/liveMedia/RTSPClient.cpp	2010-08-24 17:05:46.000000000 +0200
++++ live.new/liveMedia/RTSPClient.cpp	2010-08-24 17:04:50.000000000 +0200
+@@ -935,7 +935,7 @@
+ }
+ 
+ Boolean RTSPClient::parseScaleParam(char const* paramStr, float& scale) {
+-  Locale l("C", LC_NUMERIC);
++  Locale l("C", LC_NUMERIC_MASK);
+   return sscanf(paramStr, "%f", &scale) == 1;
+ }
+ 
+--- live/liveMedia/RTSPCommon.cpp.orig	2011-01-06 01:26:50.000000000 +0100
++++ live/liveMedia/RTSPCommon.cpp	2011-01-09 16:32:24.142645155 +0100
+@@ -137,7 +137,7 @@
+ Boolean parseRangeParam(char const* paramStr, double& rangeStart, double& rangeEnd) {
+   double start, end;
+   int numCharsMatched = 0;
+-  Locale l("C", LC_NUMERIC);
++  Locale l("C", LC_NUMERIC_MASK);
+   if (sscanf(paramStr, "npt = %lf - %lf", &start, &end) == 2) {
+     rangeStart = start;
+     rangeEnd = end;

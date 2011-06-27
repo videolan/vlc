@@ -1,0 +1,152 @@
+Copyright (C) 2010 Rémi Denis-Courmont.
+Licensed under GNU General Public License version 2 or higher.
+diff -ru live.orig//groupsock/GroupsockHelper.cpp live//groupsock/GroupsockHelper.cpp
+--- live.orig//groupsock/GroupsockHelper.cpp	2010-04-09 22:27:39.000000000 +0300
++++ live//groupsock/GroupsockHelper.cpp	2010-04-17 20:18:11.000000000 +0300
+@@ -625,25 +625,29 @@
+ #include <hostLib.h>
+       if (ERROR == (ourAddress = hostGetByName( hostname ))) break;
+ #else
+-      struct hostent* hstent
+-	= (struct hostent*)gethostbyname(hostname);
+-      if (hstent == NULL || hstent->h_length != 4) {
+-	env.setResultErrMsg("initial gethostbyname() failed");
++      struct addrinfo hints, *res;
++      memset(&hints, 0, sizeof(hints));
++      hints.ai_family = AF_INET;
++      hints.ai_socktype = SOCK_DGRAM;
++      hints.ai_protocol = IPPROTO_UDP;
++      if (getaddrinfo(hostname, NULL, &hints, &res)) {
++	env.setResultErrMsg("initial getaddrinfo() failed");
+ 	break;
+       }
+       // Take the first address that's not bad
+       // (This code, like many others, won't handle IPv6)
+       netAddressBits addr = 0;
+-      for (unsigned i = 0; ; ++i) {
+-	char* addrPtr = hstent->h_addr_list[i];
+-	if (addrPtr == NULL) break;
++      for (const struct addrinfo *p = res; p; p = p->ai_next) {
++        const struct in_addr in =
++          ((const struct sockaddr_in *)p->ai_addr)->sin_addr;
+ 
+-	netAddressBits a = *(netAddressBits*)addrPtr;
++	netAddressBits a = in.s_addr;
+ 	if (!badAddress(a)) {
+ 	  addr = a;
+ 	  break;
+ 	}
+       }
++      freeaddrinfo(res);
+       if (addr != 0) {
+ 	fromAddr.sin_addr.s_addr = addr;
+       } else {
+diff -ru live.orig//groupsock/inet.c live//groupsock/inet.c
+--- live.orig//groupsock/inet.c	2010-04-09 22:27:39.000000000 +0300
++++ live//groupsock/inet.c	2010-04-17 20:14:07.000000000 +0300
+@@ -83,16 +83,6 @@
+ #define NULL 0
+ #endif
+ 
+-#if !defined(VXWORKS)
+-struct hostent* our_gethostbyname(name)
+-     char* name;
+-{
+-	if (!initializeWinsockIfNecessary()) return NULL;
+-
+-	return (struct hostent*) gethostbyname(name);
+-}
+-#endif
+-
+ #ifndef USE_OUR_RANDOM
+ /* Use the system-supplied "random()" and "srandom()" functions */
+ #include <stdlib.h>
+diff -ru live.orig//groupsock/NetAddress.cpp live//groupsock/NetAddress.cpp
+--- live.orig//groupsock/NetAddress.cpp	2010-04-09 22:27:39.000000000 +0300
++++ live//groupsock/NetAddress.cpp	2010-04-17 20:13:29.000000000 +0300
+@@ -83,15 +83,12 @@
+ 
+ NetAddressList::NetAddressList(char const* hostname)
+   : fNumAddresses(0), fAddressArray(NULL) {
+-    struct hostent* host;
++
++    struct addrinfo *res;
+ 
+     // Check first whether "hostname" is an IP address string:
+     netAddressBits addr = our_inet_addr((char*)hostname);
+     if (addr != INADDR_NONE) { // yes it was an IP address string
+-      //##### host = gethostbyaddr((char*)&addr, sizeof (netAddressBits), AF_INET);
+-      host = NULL; // don't bother calling gethostbyaddr(); we only want 1 addr
+-
+-      if (host == NULL) {
+ 	// For some unknown reason, gethostbyaddr() failed, so just
+ 	// return a 1-element list with the address we were given:
+ 	fNumAddresses = 1;
+@@ -101,41 +98,40 @@
+ 	fAddressArray[0] = new NetAddress((u_int8_t*)&addr,
+ 					  sizeof (netAddressBits));
+ 	return;
+-      }
+     } else { // Try resolving "hostname" as a real host name
+ 
+-#if defined(VXWORKS)
+-      char hostentBuf[512];
+-      host = (struct hostent*)resolvGetHostByName((char*)hostname,(char*)&hostentBuf,sizeof hostentBuf);
+-#else
+-      host = our_gethostbyname((char*)hostname);
+-#endif
++      struct addrinfo hints;
++      memset(&hints, 0, sizeof(hints));
++      hints.ai_family = AF_INET;
++      hints.ai_socktype = SOCK_DGRAM; /* be sure to not get dups! */
++      hints.ai_protocol = IPPROTO_UDP;
+ 
+-      if (host == NULL) {
++      if (getaddrinfo(hostname, NULL, &hints, &res))
+ 	// It was a host name, and we couldn't resolve it.  We're SOL.
+ 	return;
+-      }
+     }
+ 
+-    u_int8_t const** const hAddrPtr
+-      = (u_int8_t const**)host->h_addr_list;
+-    if (hAddrPtr != NULL) {
+-      // First, count the number of addresses:
+-      u_int8_t const** hAddrPtr1 = hAddrPtr;
+-      while (*hAddrPtr1 != NULL) {
+-	++fNumAddresses;
+-	++hAddrPtr1;
+-      }
+-
+-      // Next, set up the list:
+-      fAddressArray = new NetAddress*[fNumAddresses];
+-      if (fAddressArray == NULL) return;
+-
+-      for (unsigned i = 0; i < fNumAddresses; ++i) {
+-	fAddressArray[i]
+-	  = new NetAddress(hAddrPtr[i], host->h_length);
+-      }
++    // First, count the number of addresses:
++    for (const struct addrinfo *p = res; p; p = p->ai_next)
++      fNumAddresses++;
++
++    // Next, set up the list:
++    fAddressArray = new NetAddress*[fNumAddresses];
++
++    unsigned i = 0;
++    for (const struct addrinfo *p = res; p; p = p->ai_next) {
++      union
++      {
++	struct in_addr ip4;
++	uint8_t b[4];
++      } buf;
++      const struct sockaddr_in *sin =
++        (const struct sockaddr_in *)p->ai_addr;
++
++      buf.ip4 = sin->sin_addr;
++      fAddressArray[i++] = new NetAddress(buf.b, 4);
+     }
++    freeaddrinfo(res);
+ }
+ 
+ NetAddressList::NetAddressList(NetAddressList const& orig) {
