@@ -1,0 +1,19 @@
+Index: os.h
+===================================================================
+--- os.h	(révision 17483)
++++ os.h	(copie de travail)
+@@ -20,6 +20,14 @@
+ #include <math.h>
+ #include <ogg/os_types.h>
+ 
++#ifdef _LOW_ACCURACY_
++#  define X(n) (((((n)>>22)+1)>>1) - ((((n)>>22)+1)>>9))
++#  define LOOKUP_T const unsigned char
++#else
++#  define X(n) (n)
++#  define LOOKUP_T const ogg_int32_t
++#endif
++
+ #ifndef _V_IFDEFJAIL_H_
+ #  define _V_IFDEFJAIL_H_
+ 

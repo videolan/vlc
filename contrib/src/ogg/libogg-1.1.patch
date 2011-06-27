@@ -1,0 +1,56 @@
+--- libogg/configure.in	2010-11-01 21:13:42.000000000 +0100
++++ libogg.new/configure.in	2010-11-03 23:59:54.267733114 +0100
+@@ -28,17 +28,17 @@
+         case $host in 
+         *-*-irix*)
+                 DEBUG="-g -signed" 
+-                CFLAGS="-O2 -w -signed"
++                EXTRA_CFLAGS="-O2 -w -signed"
+                 PROFILE="-p -g3 -O2 -signed"
+ 		;;
+         sparc-sun-solaris*)
+                 DEBUG="-v -g"
+-                CFLAGS="-xO4 -fast -w -fsimple -native -xcg92"
++                EXTRA_CFLAGS="-xO4 -fast -w -fsimple -native -xcg92"
+                 PROFILE="-v -xpg -g -xO4 -fast -native -fsimple -xcg92 -Dsuncc"
+ 		;;
+         *)
+                 DEBUG="-g"
+-                CFLAGS="-O"
++                EXTRA_CFLAGS="-O"
+                 PROFILE="-g -p" 
+ 		;;
+         esac
+@@ -46,27 +46,27 @@
+         case $host in 
+         *-*-linux*)
+                 DEBUG="-g -Wall -fsigned-char"
+-                CFLAGS="-O20 -Wall -ffast-math -fsigned-char"
++                EXTRA_CFLAGS="-O20 -Wall -ffast-math -fsigned-char"
+                 PROFILE="-Wall -W -pg -g -O20 -ffast-math -fsigned-char"
+ 		;;
+         sparc-sun-*)
+                 DEBUG="-g -Wall -fsigned-char"
+-                CFLAGS="-O20 -ffast-math -fsigned-char"
++                EXTRA_CFLAGS="-O20 -ffast-math -fsigned-char"
+                 PROFILE="-pg -g -O20 -fsigned-char" 
+ 		;;
+ 	*-*-darwin*)
+ 		DEBUG="-fno-common -g -Wall -fsigned-char"
+-		CFLAGS="-fno-common -O4 -Wall -fsigned-char -ffast-math"
++		EXTRA_CFLAGS="-fno-common -O4 -Wall -fsigned-char -ffast-math"
+ 		PROFILE="-fno-common -O4 -Wall -pg -g -fsigned-char -ffast-math"
+ 		;;
+         *)
+                 DEBUG="-g -Wall -fsigned-char"
+-                CFLAGS="-O20 -fsigned-char"
++                EXTRA_CFLAGS="-O20 -fsigned-char"
+                 PROFILE="-O20 -g -pg -fsigned-char" 
+ 		;;
+         esac
+ fi
+-CFLAGS="$CFLAGS $cflags_save"
++CFLAGS="$EXTRA_CFLAGS $cflags_save"
+ DEBUG="$DEBUG $cflags_save"
+ PROFILE="$PROFILE $cflags_save"
+ 

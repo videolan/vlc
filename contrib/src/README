@@ -1,0 +1,88 @@
+Writing rules
+==============
+
+At the bare minimum, a package in contrib must provide two Makefile
+targets in src/foo/rules.mak:
+ - .foo to build and install the package, and
+ - .sum-foo to fetch or create a source tarball and verify it,
+where foo the package name.
+
+
+Tarball
+--------
+
+.sum-foo typically depends on a separate target that fetches the source
+code. In that case, .sum-foo needs only verify that the tarball
+is correct, e.g.:
+
+
+	$(TARBALLS)/libfoo-$(FOO_VERSION).tar.bz2:
+		$(WGET) $(FOO_URL)
+
+	.sum-foo: $(TARBALLS)/libfoo-$(FOO_VERSION).tar.bz2
+		$(CHECKSUM) $(SRC)/foo/SHA512SUMS
+		touch $@
+
+NOTE: contrary to the previous VLC contribs, this system always uses
+a source tarball, even if the source code is downloaded from a VCS.
+This serves two purposes:
+ - offline builds (or behind a firewall),
+ - source code requirements compliance.
+
+
+Compilation
+------------
+
+Similarly, .foo typically depends on the source code directory. In this
+case, care must be taken that the directory name only exists if the
+source code is fully ready. Otherwise Makefile dependencies will break
+(this is not an issue for files, only directories).
+
+	libfoo: $(TARBALLS)/libfoo-$(FOO_VERSION).tar.bz2 .sum-foo
+		$(EXTRACT_BZ2) # to libfoo-$(FOO_VERSION)
+		### apply patches here ###
+		# last command: make the target directory
+		mv libfoo-$(FOO_VERSION) libfoo
+
+	.foo: libfoo
+		cd $< && $(HOSTVARS) ./configure $(HOSTCONF)
+		cd $< && $(MAKE) install
+		touch $@
+
+
+Dependencies
+-------------
+
+If package bar depends on package foo, a Makefile dependency can ensure
+that bar will be built after foo. It will also ensure that foo will be
+built even if it was not selected explicitly in the $(PKGS) variable:
+
+	.bar: libbar .foo
+		cd $< && $(HOSTVARS) ./configure $(HOSTCONF)
+		cd $< && $(MAKE) install
+		touch $@
+
+
+Conditional builds
+-------------------
+
+Some packages may be provided by the target system. This is especially
+common when building natively on Linux or BSD. A dummy build rule can
+be used conditionally.
+
+	NEED_FOO := $(call need_pkg,'foo >= 1.2.3')
+
+	ifeq ($(NEED_FOO),)
+	.foo:
+	else
+	.foo: libfoo
+		### foo compilation rules here ###
+	endif
+		touch $@
+
+If pkg-config finds foo.pc with version 1.2.3 or larger, this will be
+equivalent to:
+
+	.foo: ; touch .foo
+
+Note: The need_pkg function always return 1 during cross-compilation.

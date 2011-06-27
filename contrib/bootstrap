@@ -1,0 +1,168 @@
+#! /bin/sh
+# Copyright (C) 2003-2011 the VideoLAN team
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+
+#
+# Command line handling
+#
+usage()
+{
+	echo "Usage: $0 [--build=BUILD] [--host=HOST] [--prefix=PREFIX]"
+	echo "  --build=BUILD    configure for building on BUILD"
+	echo "  --host=HOST      cross-compile to build to run on HOST"
+	echo "  --prefix=PREFIX  install files in PREFIX"
+}
+
+BUILD=
+HOST=
+PREFIX=
+
+if test ! -f "../src/main.mak"
+then
+	echo "$0 must be run from a subdirectory"
+	exit 1
+fi
+
+while test -n "$1"
+do
+	case "$1" in
+		--build=*)
+			BUILD="${1#--build=}"
+			;;
+		--help|-h)
+			usage
+			exit 0
+			;;
+		--host=*)
+			HOST="${1#--host=}"
+			;;
+		--prefix=*)
+			PREFIX="${1#--prefix=}"
+			;;
+		*)
+			echo "Unrecognized options $1"
+			usage
+			exit 1
+			;;
+	esac
+	shift
+done
+
+if test -z "$BUILD"
+then
+	echo -n "Guessing build system... "
+	BUILD="`cc -dumpmachine`"
+	if test -z "$BUILD"; then
+		echo "FAIL!"
+		exit 1
+	fi
+	echo "$BUILD"
+fi
+
+if test -z "$HOST"
+then
+	echo -n "Guessing host system...  "
+	HOST="$BUILD"
+	echo "$HOST"
+fi
+
+if test "$PREFIX"
+then
+	# strip trailing slash
+	PREFIX="${PREFIX%/}"
+else
+	PREFIX="../hosts/$HOST"
+fi
+
+#
+# Prepare files
+#
+echo "Creating prefix... $PREFIX"
+mkdir -p -- "$PREFIX" || exit $?
+mkdir -p -- "$PREFIX/share/aclocal" || exit $?
+
+echo "Creating configuration file... config.mak"
+exec 3>config.mak
+cat >&3 << EOF
+# This file was automatically generated.
+# Any change will be overwritten if ../bootstrap is run again.
+BUILD := $BUILD
+HOST := $HOST
+PREFIX := $PREFIX
+EOF
+
+add_make()
+{
+	while test -n "$1"
+	do
+		echo "$1" >&3
+		shift
+	done
+}
+
+add_make_enabled()
+{
+	while test -n "$1"
+	do
+		add_make "$1 := 1"
+		shift
+	done
+}
+
+#
+# Checks
+#
+OS="${HOST#*-}" # strip architecture
+case "${OS}" in
+	*darwin*)
+		add_make_enabled "HAVE_DARWIN_OS" "HAVE_BSD"
+		;;
+	*bsd*)
+		add_make_enabled "HAVE_BSD"
+		;;
+	*linux*)
+		add_make_enabled "HAVE_LINUX"
+		;;
+	*mingw*)
+		add_make_enabled "HAVE_WIN32"
+		;;
+	*wince*)
+		add_make_enabled "HAVE_WINCE"
+		;;
+esac
+
+
+#
+# Results output
+#
+test -e Makefile && unlink Makefile
+ln -sf ../src/main.mak Makefile
+cat << EOF
+Bootstrap completed.
+
+The following packages were selected:
+$PKGS
+
+Run "make" to start compilation.
+
+Other targets:
+ * make install      same as "make"
+ * make fetch        fetch required source tarballs
+ * make fetch-all    fetch all source tarballs
+ * make distclean    clean everything and undo bootstrap
+ * make clean        clean everything
+ * make mostlyclean  clean everything except source tarballs
+EOF
