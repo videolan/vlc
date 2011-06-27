@@ -127,6 +127,9 @@ add_make_enabled()
 #
 OS="${HOST#*-}" # strip architecture
 case "${OS}" in
+	apple-darwin*)
+		add_make_enabled "HAVE_MACOSX" "HAVE_DARWIN_OS" "HAVE_BSD"
+		;;
 	*darwin*)
 		add_make_enabled "HAVE_DARWIN_OS" "HAVE_BSD"
 		;;
