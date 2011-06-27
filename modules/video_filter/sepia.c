@@ -47,8 +47,7 @@ static void RVSepia( picture_t *, picture_t *, int );
 static void PlanarI420Sepia( picture_t *, picture_t *, int);
 static void PackedYUVSepia( picture_t *, picture_t *, int);
 static picture_t *Filter( filter_t *, picture_t * );
-inline void Sepia8ySSE41( uint8_t *, const uint8_t *, volatile uint8_t * );
-inline void Memcpy8BMMX( uint8_t *, const uint8_t * );
+inline void Sepia8ySSE2( uint8_t *, const uint8_t *, int );
 static const char *const ppsz_filter_options[] = {
     "intensity", NULL
 };
@@ -68,7 +67,7 @@ vlc_module_begin ()
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VFILTER )
     set_capability( "video filter2", 0 )
-    add_integer_with_range( CFG_PREFIX "intensity", 100, 0, 255,
+    add_integer_with_range( CFG_PREFIX "intensity", 120, 0, 255,
                            SEPIA_INTENSITY_TEXT, SEPIA_INTENSITY_LONGTEXT,
                            false )
     set_callbacks( Create, Destroy )
@@ -215,22 +214,15 @@ static void PlanarI420Sepia( picture_t *p_pic, picture_t *p_outpic,
     const uint8_t filling_const_8u = 128 - i_intensity / 6;
     const uint8_t filling_const_8v = 128 + i_intensity / 14;
 
-    #if defined(CAN_COMPILE_SSE4_1) && 1
-    if (vlc_CPU() & CPU_CAPABILITY_SSE4_1)
+#if defined(CAN_COMPILE_SSE2)
+    if (vlc_CPU() & CPU_CAPABILITY_SSE2)
     {
-        /*prepare array of values to copy with mmx, compute only once
-          to improve speed */
-        volatile uint8_t intensity_array[8] = { i_intensity, i_intensity,
-            i_intensity, i_intensity, i_intensity, i_intensity,
-            i_intensity, i_intensity };
-        const uint8_t filling_array_8u[8] =
-            { filling_const_8u, filling_const_8u, filling_const_8u,
-            filling_const_8u, filling_const_8u, filling_const_8u,
-            filling_const_8u, filling_const_8u };
-        const uint8_t filling_array_8v[8] =
-            { filling_const_8v, filling_const_8v, filling_const_8v,
-            filling_const_8v, filling_const_8v, filling_const_8v,
-            filling_const_8v, filling_const_8v };
+        /* prepared value for faster broadcasting in xmm register */
+        int i_intensity_spread = 0x10001 * (uint8_t) i_intensity;
+
+        __asm__ volatile(
+            "pxor      %%xmm7, %%xmm7\n"
+        ::);
 
         /* iterate for every two visible line in the frame */
         for (int y = 0; y < p_pic->p[Y_PLANE].i_visible_lines - 1; y += 2)
@@ -244,35 +236,36 @@ static void PlanarI420Sepia( picture_t *p_pic, picture_t *p_outpic,
             (y / 2) * p_outpic->p[V_PLANE].i_pitch;
             int x = 0;
             /* iterate for every visible line in the frame (eight values at once) */
-            for (; x < p_pic->p[Y_PLANE].i_visible_pitch - 15; x += 16)
+            for ( ; x < p_pic->p[Y_PLANE].i_visible_pitch - 15; x += 16 )
             {
                 /* Compute yellow channel values with asm function */
-                Sepia8ySSE41(
-                          &p_outpic->p[Y_PLANE].p_pixels[i_dy_line1_start + x],
-                          &p_pic->p[Y_PLANE].p_pixels[i_dy_line1_start + x],
-                          intensity_array );
-                Sepia8ySSE41(
-                          &p_outpic->p[Y_PLANE].p_pixels[i_dy_line2_start + x],
-                          &p_pic->p[Y_PLANE].p_pixels[i_dy_line2_start + x],
-                          intensity_array );
-                Sepia8ySSE41(
-                          &p_outpic->p[Y_PLANE].p_pixels[i_dy_line1_start + x + 8],
-                          &p_pic->p[Y_PLANE].p_pixels[i_dy_line1_start + x + 8],
-                          intensity_array );
-                Sepia8ySSE41(
-                          &p_outpic->p[Y_PLANE].p_pixels[i_dy_line2_start + x + 8],
-                          &p_pic->p[Y_PLANE].p_pixels[i_dy_line2_start + x + 8],
-                          intensity_array );
-                /* Copy precomputed values to destination image memory location */
-                Memcpy8BMMX(
-                          &p_outpic->p[U_PLANE].p_pixels[i_du_line_start + (x / 2)],
-                          filling_array_8u );
-                Memcpy8BMMX(&p_outpic->p[V_PLANE].p_pixels[i_dv_line_start + (x / 2)],
-                          filling_array_8v );
+                Sepia8ySSE2(
+                    &p_outpic->p[Y_PLANE].p_pixels[i_dy_line1_start + x],
+                    &p_pic->p[Y_PLANE].p_pixels[i_dy_line1_start + x],
+                    i_intensity_spread );
+                Sepia8ySSE2(
+                    &p_outpic->p[Y_PLANE].p_pixels[i_dy_line2_start + x],
+                    &p_pic->p[Y_PLANE].p_pixels[i_dy_line2_start + x],
+                    i_intensity_spread );
+                Sepia8ySSE2(
+                    &p_outpic->p[Y_PLANE].p_pixels[i_dy_line1_start + x + 8],
+                    &p_pic->p[Y_PLANE].p_pixels[i_dy_line1_start + x + 8],
+                    i_intensity_spread );
+                Sepia8ySSE2(
+                    &p_outpic->p[Y_PLANE].p_pixels[i_dy_line2_start + x + 8],
+                    &p_pic->p[Y_PLANE].p_pixels[i_dy_line2_start + x + 8],
+                    i_intensity_spread );
+                /* Copy precomputed values to destination memory location */
+                vlc_memset(
+                    &p_outpic->p[U_PLANE].p_pixels[i_du_line_start + (x / 2)],
+                    filling_const_8u, 8 );
+                vlc_memset(
+                    &p_outpic->p[V_PLANE].p_pixels[i_dv_line_start + (x / 2)],
+                    filling_const_8v, 8 );
             }
             /* Completing the job, the cycle above takes really big chunks, so
               this makes sure the job will be done completely */
-            for (; x < p_pic->p[Y_PLANE].i_visible_pitch - 1; x += 2)
+            for ( ; x < p_pic->p[Y_PLANE].i_visible_pitch - 1; x += 2 )
             {
                 // y = y - y/4 {to prevent overflow} + intensity / 4
                 p_outpic->p[Y_PLANE].p_pixels[i_dy_line1_start + x] =
@@ -299,7 +292,8 @@ static void PlanarI420Sepia( picture_t *p_pic, picture_t *p_outpic,
                     filling_const_8v;
             }
         }
-    } else
+    }
+    else
 #endif
     {
         /* iterate for every two visible line in the frame */
@@ -369,68 +363,7 @@ static void PackedYUVSepia( picture_t *p_pic, picture_t *p_outpic,
     p_in_end = p_in + p_pic->p[0].i_visible_lines
         * p_pic->p[0].i_pitch;
     p_out = p_outpic->p[0].p_pixels;
-#if defined(CAN_COMPILE_SSE4_1)
-    if (vlc_CPU() & CPU_CAPABILITY_SSE4_1)
-    {
-        /*prepare array of values to copy with mmx, compute only once
-          to improve speed */
-        volatile uint8_t intensity_array[8] = { i_intensity, i_intensity,
-            i_intensity, i_intensity, i_intensity, i_intensity,
-            i_intensity,
-            i_intensity
-        };
-        const uint8_t filling_array_8u[8] =
-            { filling_const_8u, filling_const_8u,
-            filling_const_8u, filling_const_8u, filling_const_8u,
-            filling_const_8u,
-            filling_const_8u, filling_const_8u
-        };
-        const uint8_t filling_array_8v[8] =
-            { filling_const_8v, filling_const_8v,
-            filling_const_8v, filling_const_8v, filling_const_8v,
-            filling_const_8v,
-            filling_const_8v, filling_const_8v
-        };
 
-        /* iterate for every two visible line in the frame */
-        while (p_in < p_in_end)
-        {
-            p_line_end = p_in + p_pic->p[0].i_visible_pitch;
-            while (p_in < p_line_end)
-            {
-                Sepia8ySSE41(&p_out[i_yindex], &p_in[i_yindex],
-                          intensity_array);
-                Sepia8ySSE41(&p_out[i_yindex + 8], &p_in[i_yindex + 8],
-                          intensity_array);
-                Sepia8ySSE41(&p_out[i_yindex + 16], &p_in[i_yindex + 16],
-                          intensity_array);
-                Sepia8ySSE41(&p_out[i_yindex + 24], &p_in[i_yindex + 24],
-                          intensity_array);
-                Memcpy8BMMX(&p_out[i_uindex], filling_array_8u);
-                Memcpy8BMMX(&p_out[i_vindex], filling_array_8v);
-
-                p_in += 32;
-                p_out += 32;
-            }
-            while (p_in < p_line_end)
-            {
-                p_out[i_yindex] =
-                    p_in[i_yindex] - (p_in[i_yindex] >> 2) +
-                    (i_intensity >> 2);
-                p_out[i_yindex + 2] =
-                    p_in[i_yindex + 2] - (p_in[i_yindex + 2] >> 2) +
-                    (i_intensity >> 2);
-                p_out[i_uindex] = filling_const_8u;
-                p_out[i_vindex] = filling_const_8v;
-                p_in += 4;
-                p_out += 4;
-            }
-            p_in += p_pic->p[0].i_pitch - p_pic->p[0].i_visible_pitch;
-            p_out += p_outpic->p[0].i_pitch
-            - p_outpic->p[0].i_visible_pitch;
-        }
-    } else
-#endif
     {
         while( p_in < p_in_end )
         {
@@ -526,46 +459,33 @@ static void RVSepia( picture_t *p_pic, picture_t *p_outpic, int i_intensity )
 }
 
 /*****************************************************************************
- * Sepia8ySSE41
+ * Sepia8ySSE2
  *****************************************************************************
  * This function applies sepia effect to eight bytes of yellow using SSE4.1
  * instructions. It copies those 8 bytes to 128b register and fills the gaps
  * with zeroes and following operations are made with word-operating instructs.
  *****************************************************************************/
-inline void Sepia8ySSE41(uint8_t * dst, const uint8_t * src,
-               volatile uint8_t * i_intensity)
+inline void Sepia8ySSE2(uint8_t * dst, const uint8_t * src,
+                         int i_intensity_spread)
 {
-#if defined(CAN_COMPILE_SSE4_1) && 1
+#if defined(CAN_COMPILE_SSE2)
     __asm__ volatile (
-              "pmovzxbw      (%1),   %%xmm1\n"    // y = y - y / 4 + i_intensity / 4
-              "pmovzxbw      (%1),   %%xmm2\n"    // store bytes as words with 0s in between
-              "pmovzxbw      (%2),   %%xmm3\n"
-              "psrlw          $2,    %%xmm2\n"    // rotate right 2
-              "psubusb       %%xmm1, %%xmm2\n"    // subtract
-              "psrlw          $2,    %%xmm3\n"
-              "paddsb        %%xmm1, %%xmm3\n"    // add
-              "packuswb      %%xmm2, %%xmm1\n"    // pack back to bytes
-              "movq          %%xmm1, (%0)  \n"    // load to dest
-              :
-              :"r" (dst), "r"(src), "r"(i_intensity)
-              :"memory");
-#endif
-}
-
-/*****************************************************************************
- * Memcpy8BMMX: Copies 8 bytes of memory in two instructions
- *****************************************************************************
- * Not quite clean, but it should be fast.
- *****************************************************************************/
-inline void Memcpy8BMMX(uint8_t * dst, const uint8_t * src)
-{
-#if defined(CAN_COMPILE_MMX) && 1
-    __asm__ volatile (
-              "movq       (%1), %%xmm0\n"
-              "movq       %%xmm0, (%0)\n"
-              :
-              :"r" (dst), "r"(src)
-              :"memory");
+        // y = y - y / 4 + i_intensity / 4
+        "movq            (%1), %%xmm1\n"
+        "punpcklbw     %%xmm7, %%xmm1\n"
+        "movq            (%1), %%xmm2\n" // store bytes as words with 0s in between
+        "punpcklbw     %%xmm7, %%xmm2\n"
+        "movd              %2, %%xmm3\n"
+        "pshufd    $0, %%xmm3, %%xmm3\n"
+        "psrlw             $2, %%xmm2\n"    // rotate right 2
+        "psubusb       %%xmm1, %%xmm2\n"    // subtract
+        "psrlw             $2, %%xmm3\n"
+        "paddsb        %%xmm1, %%xmm3\n"    // add
+        "packuswb      %%xmm2, %%xmm1\n"    // pack back to bytes
+        "movq          %%xmm1, (%0)  \n"    // load to dest
+        :
+        :"r" (dst), "r"(src), "r"(i_intensity_spread)
+        :"memory");
 #endif
 }
 
