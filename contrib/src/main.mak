@@ -175,6 +175,11 @@ include ../src/*/rules.mak
 #
 # Targets
 #
+ifneq ($(filter $(PKGS_DISABLE),$(PKGS_ENABLE)),)
+$(error Same package(s) disabled and enabled at the same time)
+endif
+PKGS := $(filter-out $(PKGS_DISABLE),$(PKGS)) $(PKGS_ENABLE)
+
 fetch: $(PKGS:%=.sum-%)
 fetch-all: $(ALL_PKGS:%=.sum-%)
 install: $(PKGS:%=.%)

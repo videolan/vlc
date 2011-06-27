@@ -24,11 +24,15 @@ usage()
 	echo "  --build=BUILD    configure for building on BUILD"
 	echo "  --host=HOST      cross-compile to build to run on HOST"
 	echo "  --prefix=PREFIX  install files in PREFIX"
+	echo "  --disable-FOO    configure to not build package FOO"
+	echo "  --enable-FOO     configure to build package FOO"
 }
 
 BUILD=
 HOST=
 PREFIX=
+PKGS_ENABLE=
+PKGS_DISABLE=
 
 if test ! -f "../src/main.mak"
 then
@@ -51,6 +55,12 @@ do
 			;;
 		--prefix=*)
 			PREFIX="${1#--prefix=}"
+			;;
+		--disable-*)
+			PKGS_DISABLE="${PKGS_DISABLE} ${1#--disable-}"
+			;;
+		--enable-*)
+			PKGS_ENABLE="${PKGS_ENABLE} ${1#--enable-}"
 			;;
 		*)
 			echo "Unrecognized options $1"
@@ -102,6 +112,8 @@ cat >&3 << EOF
 BUILD := $BUILD
 HOST := $HOST
 PREFIX := $PREFIX
+PKGS_DISABLE := $PKGS_DISABLE
+PKGS_ENABLE := $PKGS_ENABLE
 EOF
 
 add_make()
