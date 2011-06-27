@@ -1,0 +1,351 @@
+diff -ruN flac/include/share/alloc.h flac.new/include/share/alloc.h
+--- flac/include/share/alloc.h	2007-09-12 07:32:21.000000000 +0200
++++ flac.new/include/share/alloc.h	2009-08-23 12:33:30.000000000 +0200
+@@ -28,7 +28,7 @@
+  */
+ 
+ #include <limits.h> /* for SIZE_MAX */
+-#if !defined _MSC_VER && !defined __MINGW32__ && !defined __EMX__
++#if !defined _MSC_VER && !defined __EMX__
+ #include <stdint.h> /* for SIZE_MAX in case limits.h didn't get it */
+ #endif
+ #include <stdlib.h> /* for size_t, malloc(), etc */
+diff -ruN flac/src/flac/analyze.c flac.new/src/flac/analyze.c
+--- flac/src/flac/analyze.c	2007-05-25 21:34:48.000000000 +0200
++++ flac.new/src/flac/analyze.c	2009-08-23 12:33:09.000000000 +0200
+@@ -66,7 +66,7 @@
+ 	unsigned i, channel, partitions;
+ 
+ 	/* do the human-readable part first */
+-#ifdef _MSC_VER
++#ifdef __MSVCRT__
+ 	fprintf(fout, "frame=%u\toffset=%I64u\tbits=%u\tblocksize=%u\tsample_rate=%u\tchannels=%u\tchannel_assignment=%s\n", frame_number, frame_offset, frame_bytes*8, frame->header.blocksize, frame->header.sample_rate, channels, FLAC__ChannelAssignmentString[frame->header.channel_assignment]);
+ #else
+ 	fprintf(fout, "frame=%u\toffset=%llu\tbits=%u\tblocksize=%u\tsample_rate=%u\tchannels=%u\tchannel_assignment=%s\n", frame_number, (unsigned long long)frame_offset, frame_bytes*8, frame->header.blocksize, frame->header.sample_rate, channels, FLAC__ChannelAssignmentString[frame->header.channel_assignment]);
+diff -ruN flac/src/libFLAC/lpc.c flac.new/src/libFLAC/lpc.c
+--- flac/src/libFLAC/lpc.c	2007-09-04 20:15:03.000000000 +0200
++++ flac.new/src/libFLAC/lpc.c	2009-08-23 12:33:09.000000000 +0200
+@@ -285,7 +285,7 @@
+ 		for(j = 0; j < order; j++) {
+ 			sum += qlp_coeff[j] * (*(--history));
+ 			sumo += (FLAC__int64)qlp_coeff[j] * (FLAC__int64)(*history);
+-#if defined _MSC_VER
++#if defined __MSVCRT__
+ 			if(sumo > 2147483647I64 || sumo < -2147483648I64)
+ 				fprintf(stderr,"FLAC__lpc_compute_residual_from_qlp_coefficients: OVERFLOW, i=%u, j=%u, c=%d, d=%d, sumo=%I64d\n",i,j,qlp_coeff[j],*history,sumo);
+ #else
+@@ -549,7 +549,7 @@
+ 		for(j = 0; j < order; j++)
+ 			sum += (FLAC__int64)qlp_coeff[j] * (FLAC__int64)(*(--history));
+ 		if(FLAC__bitmath_silog2_wide(sum >> lp_quantization) > 32) {
+-#if defined _MSC_VER
++#if defined __MSVCRT__
+ 			fprintf(stderr,"FLAC__lpc_compute_residual_from_qlp_coefficients_wide: OVERFLOW, i=%u, sum=%I64d\n", i, sum >> lp_quantization);
+ #else
+ 			fprintf(stderr,"FLAC__lpc_compute_residual_from_qlp_coefficients_wide: OVERFLOW, i=%u, sum=%lld\n", i, (long long)(sum >> lp_quantization));
+@@ -557,7 +557,7 @@
+ 			break;
+ 		}
+ 		if(FLAC__bitmath_silog2_wide((FLAC__int64)(*data) - (sum >> lp_quantization)) > 32) {
+-#if defined _MSC_VER
++#if defined __MSVCRT__
+ 			fprintf(stderr,"FLAC__lpc_compute_residual_from_qlp_coefficients_wide: OVERFLOW, i=%u, data=%d, sum=%I64d, residual=%I64d\n", i, *data, sum >> lp_quantization, (FLAC__int64)(*data) - (sum >> lp_quantization));
+ #else
+ 			fprintf(stderr,"FLAC__lpc_compute_residual_from_qlp_coefficients_wide: OVERFLOW, i=%u, data=%d, sum=%lld, residual=%lld\n", i, *data, (long long)(sum >> lp_quantization), (long long)((FLAC__int64)(*data) - (sum >> lp_quantization)));
+@@ -815,7 +815,7 @@
+ 		for(j = 0; j < order; j++) {
+ 			sum += qlp_coeff[j] * (*(--history));
+ 			sumo += (FLAC__int64)qlp_coeff[j] * (FLAC__int64)(*history);
+-#if defined _MSC_VER
++#if defined __MSVCRT__
+ 			if(sumo > 2147483647I64 || sumo < -2147483648I64)
+ 				fprintf(stderr,"FLAC__lpc_restore_signal: OVERFLOW, i=%u, j=%u, c=%d, d=%d, sumo=%I64d\n",i,j,qlp_coeff[j],*history,sumo);
+ #else
+@@ -1079,7 +1079,7 @@
+ 		for(j = 0; j < order; j++)
+ 			sum += (FLAC__int64)qlp_coeff[j] * (FLAC__int64)(*(--history));
+ 		if(FLAC__bitmath_silog2_wide(sum >> lp_quantization) > 32) {
+-#ifdef _MSC_VER
++#ifdef __MSVCRT__
+ 			fprintf(stderr,"FLAC__lpc_restore_signal_wide: OVERFLOW, i=%u, sum=%I64d\n", i, sum >> lp_quantization);
+ #else
+ 			fprintf(stderr,"FLAC__lpc_restore_signal_wide: OVERFLOW, i=%u, sum=%lld\n", i, (long long)(sum >> lp_quantization));
+@@ -1087,7 +1087,7 @@
+ 			break;
+ 		}
+ 		if(FLAC__bitmath_silog2_wide((FLAC__int64)(*r) + (sum >> lp_quantization)) > 32) {
+-#ifdef _MSC_VER
++#ifdef __MSVCRT__
+ 			fprintf(stderr,"FLAC__lpc_restore_signal_wide: OVERFLOW, i=%u, residual=%d, sum=%I64d, data=%I64d\n", i, *r, sum >> lp_quantization, (FLAC__int64)(*r) + (sum >> lp_quantization));
+ #else
+ 			fprintf(stderr,"FLAC__lpc_restore_signal_wide: OVERFLOW, i=%u, residual=%d, sum=%lld, data=%lld\n", i, *r, (long long)(sum >> lp_quantization), (long long)((FLAC__int64)(*r) + (sum >> lp_quantization)));
+diff -ruN flac/src/metaflac/operations.c flac.new/src/metaflac/operations.c
+--- flac/src/metaflac/operations.c	2007-09-11 06:23:29.000000000 +0200
++++ flac.new/src/metaflac/operations.c	2009-08-23 12:33:09.000000000 +0200
+@@ -565,7 +565,7 @@
+ 			PPR; printf("  sample_rate: %u Hz\n", block->data.stream_info.sample_rate);
+ 			PPR; printf("  channels: %u\n", block->data.stream_info.channels);
+ 			PPR; printf("  bits-per-sample: %u\n", block->data.stream_info.bits_per_sample);
+-#ifdef _MSC_VER
++#ifdef __MSVCRT__
+ 			PPR; printf("  total samples: %I64u\n", block->data.stream_info.total_samples);
+ #else
+ 			PPR; printf("  total samples: %llu\n", (unsigned long long)block->data.stream_info.total_samples);
+@@ -596,7 +596,7 @@
+ 			PPR; printf("  seek points: %u\n", block->data.seek_table.num_points);
+ 			for(i = 0; i < block->data.seek_table.num_points; i++) {
+ 				if(block->data.seek_table.points[i].sample_number != FLAC__STREAM_METADATA_SEEKPOINT_PLACEHOLDER) {
+-#ifdef _MSC_VER
++#ifdef __MSVCRT__
+ 					PPR; printf("    point %u: sample_number=%I64u, stream_offset=%I64u, frame_samples=%u\n", i, block->data.seek_table.points[i].sample_number, block->data.seek_table.points[i].stream_offset, block->data.seek_table.points[i].frame_samples);
+ #else
+ 					PPR; printf("    point %u: sample_number=%llu, stream_offset=%llu, frame_samples=%u\n", i, (unsigned long long)block->data.seek_table.points[i].sample_number, (unsigned long long)block->data.seek_table.points[i].stream_offset, block->data.seek_table.points[i].frame_samples);
+@@ -618,7 +618,7 @@
+ 			break;
+ 		case FLAC__METADATA_TYPE_CUESHEET:
+ 			PPR; printf("  media catalog number: %s\n", block->data.cue_sheet.media_catalog_number);
+-#ifdef _MSC_VER
++#ifdef __MSVCRT__
+ 			PPR; printf("  lead-in: %I64u\n", block->data.cue_sheet.lead_in);
+ #else
+ 			PPR; printf("  lead-in: %llu\n", (unsigned long long)block->data.cue_sheet.lead_in);
+@@ -630,7 +630,7 @@
+ 				const FLAC__bool is_last = (i == block->data.cue_sheet.num_tracks-1);
+ 				const FLAC__bool is_leadout = is_last && track->num_indices == 0;
+ 				PPR; printf("    track[%u]\n", i);
+-#ifdef _MSC_VER
++#ifdef __MSVCRT__
+ 				PPR; printf("      offset: %I64u\n", track->offset);
+ #else
+ 				PPR; printf("      offset: %llu\n", (unsigned long long)track->offset);
+@@ -649,7 +649,7 @@
+ 					for(j = 0; j < track->num_indices; j++) {
+ 						const FLAC__StreamMetadata_CueSheet_Index *index = track->indices+j;
+ 						PPR; printf("        index[%u]\n", j);
+-#ifdef _MSC_VER
++#ifdef __MSVCRT__
+ 						PPR; printf("          offset: %I64u\n", index->offset);
+ #else
+ 						PPR; printf("          offset: %llu\n", (unsigned long long)index->offset);
+diff -ruN flac/src/metaflac/operations_shorthand_cuesheet.c flac.new/src/metaflac/operations_shorthand_cuesheet.c
+--- flac/src/metaflac/operations_shorthand_cuesheet.c	2007-07-25 04:36:59.000000000 +0200
++++ flac.new/src/metaflac/operations_shorthand_cuesheet.c	2009-08-23 12:33:09.000000000 +0200
+@@ -160,7 +160,7 @@
+ 		for(track = 0; track < cs->num_tracks; track++) {
+ 			const FLAC__StreamMetadata_CueSheet_Track *tr = cs->tracks+track;
+ 			for(index = 0; index < tr->num_indices; index++) {
+-#ifdef _MSC_VER
++#ifdef __MSVCRT__
+ 				sprintf(spec, "%I64u;", tr->offset + tr->indices[index].offset);
+ #else
+ 				sprintf(spec, "%llu;", (unsigned long long)(tr->offset + tr->indices[index].offset));
+@@ -200,7 +200,7 @@
+ 		return false;
+ 	}
+ 
+-#if defined _MSC_VER || defined __MINGW32__
++#if defined __MSVCRT__
+ 	_snprintf(ref, reflen, "\"%s\" FLAC", filename);
+ #else
+ 	snprintf(ref, reflen, "\"%s\" FLAC", filename);
+diff -ruN flac/src/metaflac/operations_shorthand_streaminfo.c flac.new/src/metaflac/operations_shorthand_streaminfo.c
+--- flac/src/metaflac/operations_shorthand_streaminfo.c	2007-07-25 04:36:59.000000000 +0200
++++ flac.new/src/metaflac/operations_shorthand_streaminfo.c	2009-08-23 12:33:09.000000000 +0200
+@@ -75,7 +75,7 @@
+ 			printf("%u\n", block->data.stream_info.bits_per_sample);
+ 			break;
+ 		case OP__SHOW_TOTAL_SAMPLES:
+-#ifdef _MSC_VER
++#ifdef __MSVCRT__
+ 			printf("%I64u\n", block->data.stream_info.total_samples);
+ #else
+ 			printf("%llu\n", (unsigned long long)block->data.stream_info.total_samples);
+diff -ruN flac/src/share/grabbag/cuesheet.c flac.new/src/share/grabbag/cuesheet.c
+--- flac/src/share/grabbag/cuesheet.c	2007-07-31 00:29:24.000000000 +0200
++++ flac.new/src/share/grabbag/cuesheet.c	2009-08-23 12:33:09.000000000 +0200
+@@ -200,7 +200,7 @@
+ 
+ static FLAC__bool local__cuesheet_parse_(FILE *file, const char **error_message, unsigned *last_line_read, FLAC__StreamMetadata *cuesheet, FLAC__bool is_cdda, FLAC__uint64 lead_out_offset)
+ {
+-#if defined _MSC_VER || defined __MINGW32__ || defined __EMX__
++#if defined __MSVCRT__ || defined __EMX__
+ #define FLAC__STRCASECMP stricmp
+ #else
+ #define FLAC__STRCASECMP strcasecmp
+@@ -593,7 +593,7 @@
+ 				fprintf(file, "%02u:%02u:%02u\n", m, s, f);
+ 			}
+ 			else
+-#ifdef _MSC_VER
++#ifdef __MSVCRT__
+ 				fprintf(file, "%I64u\n", track->offset + index->offset);
+ #else
+ 				fprintf(file, "%llu\n", (unsigned long long)(track->offset + index->offset));
+@@ -601,7 +601,7 @@
+ 		}
+ 	}
+ 
+-#ifdef _MSC_VER
++#ifdef __MSVCRT__
+ 	fprintf(file, "REM FLAC__lead-in %I64u\n", cs->lead_in);
+ 	fprintf(file, "REM FLAC__lead-out %u %I64u\n", (unsigned)cs->tracks[track_num].number, cs->tracks[track_num].offset);
+ #else
+diff -ruN flac/src/test_libFLAC/encoders.c flac.new/src/test_libFLAC/encoders.c
+--- flac/src/test_libFLAC/encoders.c	2007-08-01 00:39:39.000000000 +0200
++++ flac.new/src/test_libFLAC/encoders.c	2009-08-23 12:33:09.000000000 +0200
+@@ -449,7 +449,7 @@
+ 
+ 	printf("testing FLAC__stream_encoder_get_total_samples_estimate()... ");
+ 	if(FLAC__stream_encoder_get_total_samples_estimate(encoder) != streaminfo_.data.stream_info.total_samples) {
+-#ifdef _MSC_VER
++#ifdef __MSVCRT__
+ 		printf("FAILED, expected %I64u, got %I64u\n", streaminfo_.data.stream_info.total_samples, FLAC__stream_encoder_get_total_samples_estimate(encoder));
+ #else
+ 		printf("FAILED, expected %llu, got %llu\n", (unsigned long long)streaminfo_.data.stream_info.total_samples, (unsigned long long)FLAC__stream_encoder_get_total_samples_estimate(encoder));
+diff -ruN flac/src/test_libFLAC/metadata_object.c flac.new/src/test_libFLAC/metadata_object.c
+--- flac/src/test_libFLAC/metadata_object.c	2007-09-11 06:48:59.000000000 +0200
++++ flac.new/src/test_libFLAC/metadata_object.c	2009-08-23 12:33:09.000000000 +0200
+@@ -47,7 +47,7 @@
+ 	unsigned i;
+ 
+ 	if(from->offset != to->offset) {
+-#ifdef _MSC_VER
++#ifdef __MSVCRT__
+ 		printf("FAILED, track offset mismatch, expected %I64u, got %I64u\n", to->offset, from->offset);
+ #else
+ 		printf("FAILED, track offset mismatch, expected %llu, got %llu\n", (unsigned long long)to->offset, (unsigned long long)from->offset);
+@@ -83,7 +83,7 @@
+ 	else {
+ 		for(i = 0; i < to->num_indices; i++) {
+ 			if(from->indices[i].offset != to->indices[i].offset) {
+-#ifdef _MSC_VER
++#ifdef __MSVCRT__
+ 				printf("FAILED, track indices[%u].offset mismatch, expected %I64u, got %I64u\n", i, to->indices[i].offset, from->indices[i].offset);
+ #else
+ 				printf("FAILED, track indices[%u].offset mismatch, expected %llu, got %llu\n", i, (unsigned long long)to->indices[i].offset, (unsigned long long)from->indices[i].offset);
+@@ -109,7 +109,7 @@
+ 
+ 	for(i = 0; i < n; i++) {
+ 		if(from[i].sample_number != to[i].sample_number) {
+-#ifdef _MSC_VER
++#ifdef __MSVCRT__
+ 			printf("FAILED, point[%u].sample_number mismatch, expected %I64u, got %I64u\n", i, to[i].sample_number, from[i].sample_number);
+ #else
+ 			printf("FAILED, point[%u].sample_number mismatch, expected %llu, got %llu\n", i, (unsigned long long)to[i].sample_number, (unsigned long long)from[i].sample_number);
+@@ -117,7 +117,7 @@
+ 			return false;
+ 		}
+ 		if(from[i].stream_offset != to[i].stream_offset) {
+-#ifdef _MSC_VER
++#ifdef __MSVCRT__
+ 			printf("FAILED, point[%u].stream_offset mismatch, expected %I64u, got %I64u\n", i, to[i].stream_offset, from[i].stream_offset);
+ #else
+ 			printf("FAILED, point[%u].stream_offset mismatch, expected %llu, got %llu\n", i, (unsigned long long)to[i].stream_offset, (unsigned long long)from[i].stream_offset);
+diff -ruN flac/src/test_libFLAC++/encoders.cpp flac.new/src/test_libFLAC++/encoders.cpp
+--- flac/src/test_libFLAC++/encoders.cpp	2007-08-01 00:41:55.000000000 +0200
++++ flac.new/src/test_libFLAC++/encoders.cpp	2009-08-23 12:33:09.000000000 +0200
+@@ -478,7 +478,7 @@
+ 
+ 	printf("testing get_total_samples_estimate()... ");
+ 	if(encoder->get_total_samples_estimate() != streaminfo_.data.stream_info.total_samples) {
+-#ifdef _MSC_VER
++#ifdef __MSVCRT__
+ 		printf("FAILED, expected %I64u, got %I64u\n", streaminfo_.data.stream_info.total_samples, encoder->get_total_samples_estimate());
+ #else
+ 		printf("FAILED, expected %llu, got %llu\n", (unsigned long long)streaminfo_.data.stream_info.total_samples, (unsigned long long)encoder->get_total_samples_estimate());
+diff -ruN flac/src/test_libs_common/metadata_utils.c flac.new/src/test_libs_common/metadata_utils.c
+--- flac/src/test_libs_common/metadata_utils.c	2007-02-02 07:27:17.000000000 +0100
++++ flac.new/src/test_libs_common/metadata_utils.c	2009-08-23 12:33:09.000000000 +0200
+@@ -61,7 +61,7 @@
+ 		return false;
+ 	}
+ 	if(blockcopy->total_samples != block->total_samples) {
+-#ifdef _MSC_VER
++#ifdef __MSVCRT__
+ 		printf("FAILED, total_samples mismatch, expected %I64u, got %I64u\n", block->total_samples, blockcopy->total_samples);
+ #else
+ 		printf("FAILED, total_samples mismatch, expected %llu, got %llu\n", (unsigned long long)block->total_samples, (unsigned long long)blockcopy->total_samples);
+@@ -166,7 +166,7 @@
+ 	}
+ 	for(i = 0; i < block->num_points; i++) {
+ 		if(blockcopy->points[i].sample_number != block->points[i].sample_number) {
+-#ifdef _MSC_VER
++#ifdef __MSVCRT__
+ 			printf("FAILED, points[%u].sample_number mismatch, expected %I64u, got %I64u\n", i, block->points[i].sample_number, blockcopy->points[i].sample_number);
+ #else
+ 			printf("FAILED, points[%u].sample_number mismatch, expected %llu, got %llu\n", i, (unsigned long long)block->points[i].sample_number, (unsigned long long)blockcopy->points[i].sample_number);
+@@ -174,7 +174,7 @@
+ 			return false;
+ 		}
+ 		if(blockcopy->points[i].stream_offset != block->points[i].stream_offset) {
+-#ifdef _MSC_VER
++#ifdef __MSVCRT__
+ 			printf("FAILED, points[%u].stream_offset mismatch, expected %I64u, got %I64u\n", i, block->points[i].stream_offset, blockcopy->points[i].stream_offset);
+ #else
+ 			printf("FAILED, points[%u].stream_offset mismatch, expected %llu, got %llu\n", i, (unsigned long long)block->points[i].stream_offset, (unsigned long long)blockcopy->points[i].stream_offset);
+@@ -240,7 +240,7 @@
+ 		return false;
+ 	}
+ 	if(blockcopy->lead_in != block->lead_in) {
+-#ifdef _MSC_VER
++#ifdef __MSVCRT__
+ 		printf("FAILED, lead_in mismatch, expected %I64u, got %I64u\n", block->lead_in, blockcopy->lead_in);
+ #else
+ 		printf("FAILED, lead_in mismatch, expected %llu, got %llu\n", (unsigned long long)block->lead_in, (unsigned long long)blockcopy->lead_in);
+@@ -257,7 +257,7 @@
+ 	}
+ 	for(i = 0; i < block->num_tracks; i++) {
+ 		if(blockcopy->tracks[i].offset != block->tracks[i].offset) {
+-#ifdef _MSC_VER
++#ifdef __MSVCRT__
+ 			printf("FAILED, tracks[%u].offset mismatch, expected %I64u, got %I64u\n", i, block->tracks[i].offset, blockcopy->tracks[i].offset);
+ #else
+ 			printf("FAILED, tracks[%u].offset mismatch, expected %llu, got %llu\n", i, (unsigned long long)block->tracks[i].offset, (unsigned long long)blockcopy->tracks[i].offset);
+@@ -295,7 +295,7 @@
+ 			else {
+ 				for(j = 0; j < block->tracks[i].num_indices; j++) {
+ 					if(blockcopy->tracks[i].indices[j].offset != block->tracks[i].indices[j].offset) {
+-#ifdef _MSC_VER
++#ifdef __MSVCRT__
+ 						printf("FAILED, tracks[%u].indices[%u].offset mismatch, expected %I64u, got %I64u\n", i, j, block->tracks[i].indices[j].offset, blockcopy->tracks[i].indices[j].offset);
+ #else
+ 						printf("FAILED, tracks[%u].indices[%u].offset mismatch, expected %llu, got %llu\n", i, j, (unsigned long long)block->tracks[i].indices[j].offset, (unsigned long long)blockcopy->tracks[i].indices[j].offset);
+diff -ruN flac/src/test_seeking/main.c flac.new/src/test_seeking/main.c
+--- flac/src/test_seeking/main.c	2007-09-11 09:32:03.000000000 +0200
++++ flac.new/src/test_seeking/main.c	2009-08-23 12:33:09.000000000 +0200
+@@ -24,7 +24,7 @@
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
+-#if defined _MSC_VER || defined __MINGW32__
++#if defined __MSVCRT__
+ #include <time.h>
+ #else
+ #include <sys/time.h>
+@@ -200,7 +200,7 @@
+ 
+ 	FLAC__ASSERT(frame->header.number_type == FLAC__FRAME_NUMBER_TYPE_SAMPLE_NUMBER); /* decoder guarantees this */
+ 	if (!dcd->quiet)
+-#ifdef _MSC_VER
++#ifdef __MSVCRT__
+ 		printf("frame@%I64u(%u)... ", frame->header.number.sample_number, frame->header.blocksize);
+ #else
+ 		printf("frame@%llu(%u)... ", (unsigned long long)frame->header.number.sample_number, frame->header.blocksize);
+@@ -309,7 +309,7 @@
+ 			return die_s_("expected FLAC__STREAM_DECODER_END_OF_STREAM", decoder);
+ 	}
+ 
+-#ifdef _MSC_VER
++#ifdef __MSVCRT__
+ 	printf("file's total_samples is %I64u\n", decoder_client_data.total_samples);
+ #else
+ 	printf("file's total_samples is %llu\n", (unsigned long long)decoder_client_data.total_samples);
+@@ -347,7 +347,7 @@
+ 			pos = (FLAC__uint64)(local_rand_() % n);
+ 		}
+ 
+-#ifdef _MSC_VER
++#ifdef __MSVCRT__
+ 		printf("#%u:seek(%I64u)... ", i, pos);
+ #else
+ 		printf("#%u:seek(%llu)... ", i, (unsigned long long)pos);
