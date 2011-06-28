@@ -25,7 +25,6 @@ tremor: tremor-svn.tar.xz .sum-tremor
 .tremor: tremor .ogg
 	# Stuff that depends on libogg
 	cd $< && \
-	$(HOSTVARS) ./autogen.sh $(HOSTCONF) \
-		--prefix="$(PREFIX)" --disable-shared CFLAGS="$(NOTHUMB)"
+	$(HOSTVARS) CFLAGS="$(CFLAGS) $(NOTHUMB)" ./autogen.sh $(HOSTCONF)
 	cd $< && $(MAKE) install
 	touch $@
