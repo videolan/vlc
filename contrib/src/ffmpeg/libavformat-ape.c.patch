@@ -1,0 +1,17 @@
+X-Git-Url: http://git.videolan.org/?p=ffmpeg.git;a=blobdiff_plain;f=libavformat%2Fape.c;h=187c9865a4fce398c7a4b4b19aad0a59b281a469;hp=2de47ef483245372a9a3c56656cd48a30a383856;hb=1c31b26bdf66879a46a7a3e340da815c1b2125a8;hpb=6947b0c42e0649f0c8355442d1732d642e467902
+
+diff --git a/libavformat/ape.c b/libavformat/ape.c
+index 2de47ef..187c986 100644
+--- a/libavformat/ape.c
++++ b/libavformat/ape.c
+@@ -242,6 +242,10 @@ static int ape_read_header(AVFormatContext * s, AVFormatParameters * ap)
+             avio_seek(pb, ape->wavheaderlength, SEEK_CUR);
+     }
+ 
++    if(!ape->totalframes){
++        av_log(s, AV_LOG_ERROR, "No frames in the file!\n");
++        return AVERROR(EINVAL);
++    }
+     if(ape->totalframes > UINT_MAX / sizeof(APEFrame)){
+         av_log(s, AV_LOG_ERROR, "Too many frames: %d\n", ape->totalframes);
+         return -1;
