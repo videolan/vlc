@@ -11,7 +11,7 @@ $(TARBALLS)/flac-$(FLAC_VERSION).tar.gz:
 .sum-flac: flac-$(FLAC_VERSION).tar.gz
 
 flac: flac-$(FLAC_VERSION).tar.gz .sum-flac
-	$(UNPACK_GZ)
+	$(UNPACK)
 	(cd $@-$(FLAC_VERSION) && patch -p1) < $(SRC)/flac/flac-win32.patch
 	(cd $@-$(FLAC_VERSION) && patch -p1) < $(SRC)/flac/libFLAC-pc.patch
 ifdef HAVE_MACOSX

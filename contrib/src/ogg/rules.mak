@@ -14,7 +14,7 @@ $(TARBALLS)/libogg-$(OGG_VERSION).tar.xz:
 .sum-ogg: libogg-$(OGG_VERSION).tar.xz
 
 libogg: libogg-$(OGG_VERSION).tar.xz .sum-ogg
-	$(UNPACK_XZ)
+	$(UNPACK)
 	(cd $@-$(OGG_VERSION) && patch -p1) < $(SRC)/ogg/libogg-1.1.patch
 ifdef HAVE_WINCE
 	(cd $@-$(OGG_VERSION) && patch -p1) < $(SRC)/ogg/libogg-wince.patch

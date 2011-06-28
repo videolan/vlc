@@ -10,7 +10,7 @@ $(TARBALLS)/libebml-$(EBML_VERSION).tar.bz2:
 .sum-ebml: libebml-$(EBML_VERSION).tar.bz2
 
 libebml: libebml-$(EBML_VERSION).tar.bz2 .sum-ebml
-	$(UNPACK_BZ2)
+	$(UNPACK)
 	mv $@-$(EBML_VERSION) $@
 	touch $@
 

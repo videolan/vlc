@@ -12,7 +12,7 @@ $(TARBALLS)/libmatroska-$(MATROSKA_VERSION).tar.bz2:
 .sum-matroska: libmatroska-$(MATROSKA_VERSION).tar.bz2
 
 libmatroska: libmatroska-$(MATROSKA_VERSION).tar.bz2 .sum-matroska
-	$(UNPACK_BZ2)
+	$(UNPACK)
 	mv $@-$(MATROSKA_VERSION) $@
 	touch $@
 

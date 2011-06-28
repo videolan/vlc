@@ -10,7 +10,7 @@ $(TARBALLS)/live555-latest.tar.gz:
 .sum-live555: live555-latest.tar.gz
 
 live555: live555-latest.tar.gz .sum-live555
-	$(UNPACK_GZ)
+	$(UNPACK)
 	patch -p0 < $(SRC)/live555/live-uselocale.patch
 	patch -p0 < $(SRC)/live555/live-inet_ntop.patch
 ifdef HAVE_WIN64

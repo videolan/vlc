@@ -11,7 +11,7 @@ $(TARBALLS)/speex-$(SPEEX_VERSION).tar.gz:
 .sum-speex: speex-$(SPEEX_VERSION).tar.gz
 
 speex: speex-$(SPEEX_VERSION).tar.gz .sum-speex
-	$(UNPACK_GZ)
+	$(UNPACK)
 	mv $@-$(SPEEX_VERSION) $@
 	touch $@
 

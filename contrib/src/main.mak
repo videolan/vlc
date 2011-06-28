@@ -162,11 +162,11 @@ checksum = (cd $(TARBALLS) && $(1)sum -c -) < \
 		$(SRC)/$(patsubst .sum-%,%,$@)/$(2)SUMS
 CHECK_SHA256 = $(call checksum,sha512,SHA512)
 CHECK_SHA512 = $(call checksum,sha512,SHA512)
-untar = $(RM) -R $@; tar xv$(1)f $<
-UNPACK_GZ = $(call untar,z)
-UNPACK_BZ2 = $(call untar,j)
-UNPACK_XZ = $(call untar,J)
-UNPACK_ZIP = $(RM) -R $@; unzip $<
+UNPACK = $(RM) -R $@ \
+	$(foreach f,$(filter %.tar.gz %.tgz,$^), && tar xvzf $(f)) \
+	$(foreach f,$(filter %.tar.bz2,$^), && tar xvjf $(f)) \
+	$(foreach f,$(filter %.tar.xz,$^), && tar xvJf $(f)) \
+	$(foreach f,$(filter %.zip,$^), && unzip $(f))
 
 #
 # Per-package build rules

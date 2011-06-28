@@ -27,7 +27,7 @@ $(TARBALLS)/lua-$(LUA_VERSION).tar.gz:
 .sum-lua: lua-$(LUA_VERSION).tar.gz
 
 lua: lua-$(LUA_VERSION).tar.gz .sum-lua
-	$(UNPACK_GZ)
+	$(UNPACK)
 	(cd $@-$(LUA_VERSION) && patch -p1) < $(SRC)/lua/lua-noreadline.patch
 ifdef HAVE_MACOSX
 	(cd $@-$(LUA_VERSION) && \

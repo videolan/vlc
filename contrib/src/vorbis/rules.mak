@@ -17,7 +17,7 @@ $(TARBALLS)/libvorbis-$(VORBIS_VERSION).tar.xz:
 .sum-vorbis: libvorbis-$(VORBIS_VERSION).tar.xz
 
 libvorbis: libvorbis-$(VORBIS_VERSION).tar.xz .sum-vorbis
-	$(UNPACK_XZ)
+	$(UNPACK)
 	mv $@-$(VORBIS_VERSION) $@
 	touch $@
 
