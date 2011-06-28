@@ -6,7 +6,7 @@ FAAD2_URL := $(SF)/faac/faad2-$(FAAD2_VERSION).tar.gz
 PKGS += faad2
 
 $(TARBALLS)/faad2-$(FAAD2_VERSION).tar.gz:
-	$(call download,$($(FAAD2_URL))
+	$(call download,$(FAAD2_URL))
 
 .sum-faad2: faad2-$(FAAD2_VERSION).tar.gz
 
