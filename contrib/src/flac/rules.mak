@@ -9,8 +9,6 @@ $(TARBALLS)/flac-$(FLAC_VERSION).tar.gz:
 	$(DOWNLOAD) $(FLAC_URL)
 
 .sum-flac: flac-$(FLAC_VERSION).tar.gz
-	$(CHECK_SHA512)
-	touch $@
 
 flac: flac-$(FLAC_VERSION).tar.gz .sum-flac
 	$(UNPACK_GZ)

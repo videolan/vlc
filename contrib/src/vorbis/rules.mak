@@ -15,8 +15,6 @@ $(TARBALLS)/libvorbis-$(VORBIS_VERSION).tar.xz:
 	$(DOWNLOAD) $(VORBIS_URL)
 
 .sum-vorbis: libvorbis-$(VORBIS_VERSION).tar.xz
-	$(CHECK_SHA512)
-	touch $@
 
 libvorbis: libvorbis-$(VORBIS_VERSION).tar.xz .sum-vorbis
 	$(UNPACK_XZ)

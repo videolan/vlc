@@ -8,8 +8,6 @@ $(TARBALLS)/libebml-$(EBML_VERSION).tar.bz2:
 	$(DOWNLOAD) $(EBML_URL)
 
 .sum-ebml: libebml-$(EBML_VERSION).tar.bz2
-	$(CHECK_SHA512)
-	touch $@
 
 libebml: libebml-$(EBML_VERSION).tar.bz2 .sum-ebml
 	$(UNPACK_BZ2)

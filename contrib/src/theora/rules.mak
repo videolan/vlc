@@ -10,8 +10,6 @@ $(TARBALLS)/libtheora-$(THEORA_VERSION).tar.xz:
 	$(DOWNLOAD) $(THEORA_URL)
 
 .sum-theora: libtheora-$(THEORA_VERSION).tar.xz
-	$(CHECK_SHA512)
-	touch $@
 
 libtheora: libtheora-$(THEORA_VERSION).tar.xz .sum-theora
 	$(UNPACK_XZ)

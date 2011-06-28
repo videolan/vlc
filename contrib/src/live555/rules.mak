@@ -8,8 +8,6 @@ $(TARBALLS)/live555-latest.tar.gz:
 	$(DOWNLOAD) $(LIVEDOTCOM_URL)
 
 .sum-live555: live555-latest.tar.gz
-	$(CHECK_SHA512)
-	touch $@
 
 live555: live555-latest.tar.gz .sum-live555
 	$(UNPACK_GZ)

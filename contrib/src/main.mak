@@ -222,4 +222,11 @@ endif
 	echo "set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)" >> $@
 	echo "set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)" >> $@
 
+#.SECONDEXPANSION:
+
+# Default pattern rules
+.sum-%: $(SRC)/%/SHA512SUMS
+	$(CHECK_SHA512)
+	touch $@
+
 .DELETE_ON_ERROR:

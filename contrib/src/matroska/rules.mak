@@ -10,8 +10,6 @@ $(TARBALLS)/libmatroska-$(MATROSKA_VERSION).tar.bz2:
 	$(DOWNLOAD) $(MATROSKA_URL)
 
 .sum-matroska: libmatroska-$(MATROSKA_VERSION).tar.bz2
-	$(CHECK_SHA512)
-	touch $@
 
 libmatroska: libmatroska-$(MATROSKA_VERSION).tar.bz2 .sum-matroska
 	$(UNPACK_BZ2)

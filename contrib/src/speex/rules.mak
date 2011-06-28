@@ -9,8 +9,6 @@ $(TARBALLS)/speex-$(SPEEX_VERSION).tar.gz:
 	$(DOWNLOAD) $(SPEEX_URL)
 
 .sum-speex: speex-$(SPEEX_VERSION).tar.gz
-	$(CHECK_SHA512)
-	touch $@
 
 speex: speex-$(SPEEX_VERSION).tar.gz .sum-speex
 	$(UNPACK_GZ)

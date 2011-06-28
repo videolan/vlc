@@ -12,8 +12,6 @@ $(TARBALLS)/libogg-$(OGG_VERSION).tar.xz:
 	$(DOWNLOAD) $(OGG_URL)
 
 .sum-ogg: libogg-$(OGG_VERSION).tar.xz
-	$(CHECK_SHA512)
-	touch $@
 
 libogg: libogg-$(OGG_VERSION).tar.xz .sum-ogg
 	$(UNPACK_XZ)
