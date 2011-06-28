@@ -1,0 +1,24 @@
+diff -u libshout/include/shout/shout.h.in libshout-new/include/shout/shout.h.in
+--- libshout/include/shout/shout.h.in	2004-10-30 02:23:15.000000000 +0100
++++ libshout-new/include/shout/shout.h.in	2006-03-12 21:06:13.000000000 +0000
+@@ -22,9 +22,6 @@
+ #define __LIBSHOUT_SHOUT_H__
+ 
+ #include <sys/types.h>
+-#ifdef WIN32
+-#include <os.h>
+-#endif
+ 
+ #define SHOUTERR_SUCCESS	(0)
+ #define SHOUTERR_INSANE		(-1)
+--- libshout/Makefile.in	2009-06-15 02:28:13.000000000 +0200
++++ libshout/Makefile.in	2009-06-15 02:29:10.000000000 +0200
+@@ -246,7 +246,7 @@
+ target_alias = @target_alias@
+ AUTOMAKE_OPTIONS = 1.6 foreign
+ ACLOCAL_AMFLAGS = -I m4
+-SUBDIRS = include src examples debian doc win32
++SUBDIRS = include src doc win32
+ EXTRA_DIST = INSTALL m4/shout.m4 m4/ac_config_libconfig_in.m4 m4/acx_pthread.m4 \
+ 	m4/ogg.m4 m4/vorbis.m4 m4/xiph_compiler.m4 m4/xiph_net.m4 \
+ 	m4/xiph_types.m4
