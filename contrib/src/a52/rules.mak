@@ -6,7 +6,7 @@ A52DEC_URL := $(CONTRIB_VIDEOLAN)/a52dec-$(A52DEC_VERSION).tar.gz
 PKGS += a52
 
 $(TARBALLS)/a52dec-$(A52DEC_VERSION).tar.gz:
-	$(DOWNLOAD) $(A52DEC_URL)
+	$(call download,$(A52DEC_URL))
 
 .sum-a52: a52dec-$(A52DEC_VERSION).tar.gz
 

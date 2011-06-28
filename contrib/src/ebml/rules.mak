@@ -5,7 +5,7 @@ EBML_URL := http://dl.matroska.org/downloads/libebml/libebml-$(EBML_VERSION).tar
 #EBML_URL := $(CONTRIB_VIDEOLAN)/libebml-$(EBML_VERSION).tar.bz2
 
 $(TARBALLS)/libebml-$(EBML_VERSION).tar.bz2:
-	$(DOWNLOAD) $(EBML_URL)
+	$(call download,$(EBML_URL))
 
 .sum-ebml: libebml-$(EBML_VERSION).tar.bz2
 

@@ -12,7 +12,7 @@ PKGS += vorbisenc
 endif
 
 $(TARBALLS)/libvorbis-$(VORBIS_VERSION).tar.xz:
-	$(DOWNLOAD) $(VORBIS_URL)
+	$(call download,$(VORBIS_URL))
 
 .sum-vorbis: libvorbis-$(VORBIS_VERSION).tar.xz
 

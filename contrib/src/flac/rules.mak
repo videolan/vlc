@@ -6,7 +6,7 @@ FLAC_URL := $(SF)/flac/flac-$(FLAC_VERSION).tar.gz
 PKGS += flac
 
 $(TARBALLS)/flac-$(FLAC_VERSION).tar.gz:
-	$(DOWNLOAD) $(FLAC_URL)
+	$(call download,$(FLAC_URL))
 
 .sum-flac: flac-$(FLAC_VERSION).tar.gz
 

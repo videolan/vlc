@@ -7,7 +7,7 @@ PKGS += directx
 endif
 
 $(TARBALLS)/directx-oss.tar.bz2:
-	$(DOWNLOAD) $(DX_HEADERS_URL)
+	$(call download,$(DX_HEADERS_URL))
 
 .sum-directx: directx-oss.tar.bz2
 

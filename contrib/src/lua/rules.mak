@@ -22,7 +22,7 @@ endif
 PKGS += lua
 
 $(TARBALLS)/lua-$(LUA_VERSION).tar.gz:
-	$(DOWNLOAD) $(LUA_URL)
+	$(call download,$(LUA_URL))
 
 .sum-lua: lua-$(LUA_VERSION).tar.gz
 

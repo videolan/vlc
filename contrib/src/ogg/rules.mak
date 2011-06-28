@@ -9,7 +9,7 @@ OGG_CVSROOT := :pserver:anoncvs@xiph.org:/usr/local/cvsroot
 NEED_OGG = $(call need_pkg,"ogg >= 1.0")
 
 $(TARBALLS)/libogg-$(OGG_VERSION).tar.xz:
-	$(DOWNLOAD) $(OGG_URL)
+	$(call download,$(OGG_URL))
 
 .sum-ogg: libogg-$(OGG_VERSION).tar.xz
 

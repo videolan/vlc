@@ -7,7 +7,7 @@ MATROSKA_URL := http://dl.matroska.org/downloads/libmatroska/libmatroska-$(MATRO
 PKGS += matroska
 
 $(TARBALLS)/libmatroska-$(MATROSKA_VERSION).tar.bz2:
-	$(DOWNLOAD) $(MATROSKA_URL)
+	$(call download,$(MATROSKA_URL))
 
 .sum-matroska: libmatroska-$(MATROSKA_VERSION).tar.bz2
 

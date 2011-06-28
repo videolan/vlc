@@ -6,7 +6,7 @@ SHOUT_URL := http://downloads.us.xiph.org/releases/libshout/libshout-$(SHOUT_VER
 PKGS += shout
 
 $(TARBALLS)/libshout-$(SHOUT_VERSION).tar.gz:
-	$(DOWNLOAD) $(SHOUT_URL)
+	$(call download,$(SHOUT_URL))
 
 .sum-shout: libshout-$(SHOUT_VERSION).tar.gz
 

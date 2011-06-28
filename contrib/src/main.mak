@@ -157,7 +157,10 @@ else
 HOSTCONF += --with-pic
 endif
 
-DOWNLOAD = cd $(TARBALLS) && $(WGET) -nc
+download = rm -f $@.tmp && \
+		$(WGET) -p -O $@.tmp $(1) && \
+		touch $@.tmp && \
+		mv $@.tmp $@
 checksum = (cd $(TARBALLS) && $(1)sum -c -) < \
 		$(SRC)/$(patsubst .sum-%,%,$@)/$(2)SUMS
 CHECK_SHA256 = $(call checksum,sha512,SHA512)

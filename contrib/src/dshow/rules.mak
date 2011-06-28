@@ -11,13 +11,13 @@ PKGS += dshow
 endif
 
 $(TARBALLS)/dshow-headers-oss.tar.bz2:
-	$(DOWNLOAD) $(DSHOW_HEADERS_URL)
+	$(call download,$(DSHOW_HEADERS_URL))
 
 $(TARBALLS)/dxva2api.h:
-	$(DOWNLOAD) $(DXVA2_URL)
+	$(call download,$(DXVA2_URL))
 
 $(TARBALLS)/d2d_headers.tar.gz:
-	$(DOWNLOAD) $(D2D_URL) -O $@
+	$(call download,$(D2D_URL) -O $@)
 
 DSHOW_SOURCES := dshow-headers-oss.tar.bz2 dxva2api.h d2d_headers.tar.gz
 

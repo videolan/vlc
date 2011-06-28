@@ -5,7 +5,7 @@ LIVEDOTCOM_URL := http://live555.com/liveMedia/public/live555-latest.tar.gz
 PKGS += live555
 
 $(TARBALLS)/live555-latest.tar.gz:
-	$(DOWNLOAD) $(LIVEDOTCOM_URL)
+	$(call download,$(LIVEDOTCOM_URL))
 
 .sum-live555: live555-latest.tar.gz
 

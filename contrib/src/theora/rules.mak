@@ -7,7 +7,7 @@ THEORA_URL := http://downloads.xiph.org/releases/theora/libtheora-$(THEORA_VERSI
 PKGS += theora
 
 $(TARBALLS)/libtheora-$(THEORA_VERSION).tar.xz:
-	$(DOWNLOAD) $(THEORA_URL)
+	$(call download,$(THEORA_URL))
 
 .sum-theora: libtheora-$(THEORA_VERSION).tar.xz
 

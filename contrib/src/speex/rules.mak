@@ -6,7 +6,7 @@ SPEEX_URL := http://downloads.us.xiph.org/releases/speex/speex-$(SPEEX_VERSION).
 PKGS += speex
 
 $(TARBALLS)/speex-$(SPEEX_VERSION).tar.gz:
-	$(DOWNLOAD) $(SPEEX_URL)
+	$(call download,$(SPEEX_URL))
 
 .sum-speex: speex-$(SPEEX_VERSION).tar.gz
 
