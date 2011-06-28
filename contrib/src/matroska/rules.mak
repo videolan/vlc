@@ -9,11 +9,11 @@ PKGS += matroska
 $(TARBALLS)/libmatroska-$(MATROSKA_VERSION).tar.bz2:
 	$(DOWNLOAD) $(MATROSKA_URL)
 
-.sum-matroska: $(TARBALLS/libmatroska-$(MATROSKA_VERSION).tar.bz2
+.sum-matroska: libmatroska-$(MATROSKA_VERSION).tar.bz2
 	$(CHECK_SHA512)
 	touch $@
 
-libmatroska: $(TARBALLS)/libmatroska-$(MATROSKA_VERSION).tar.bz2 .sum-matroska
+libmatroska: libmatroska-$(MATROSKA_VERSION).tar.bz2 .sum-matroska
 	$(UNPACK_BZ2)
 	mv $@-$(MATROSKA_VERSION) $@
 	touch $@

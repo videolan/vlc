@@ -9,11 +9,11 @@ endif
 $(TARBALLS)/directx-oss.tar.bz2:
 	$(DOWNLOAD) $(DX_HEADERS_URL)
 
-.sum-directx: $(TARBALLS)/directx-oss.tar.bz2
+.sum-directx: directx-oss.tar.bz2
 	$(CHECK_SHA512)
 	touch $@
 
-.directx: $(TARBALLS)/directx-oss.tar.bz2 .sum-directx
+.directx: directx-oss.tar.bz2 .sum-directx
 	mkdir -p -- "$(PREFIX)/include"
 	tar xvjf $< -C "$(PREFIX)/include"
 	touch $@

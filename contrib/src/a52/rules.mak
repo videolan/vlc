@@ -8,11 +8,11 @@ PKGS += a52
 $(TARBALLS)/a52dec-$(A52DEC_VERSION).tar.gz:
 	$(DOWNLOAD) $(A52DEC_URL)
 
-.sum-a52: $(TARBALLS)/a52dec-$(A52DEC_VERSION).tar.gz
+.sum-a52: a52dec-$(A52DEC_VERSION).tar.gz
 	$(CHECK_SHA512)
 	touch $@
 
-a52dec: $(TARBALLS)/a52dec-$(A52DEC_VERSION).tar.gz .sum-a52
+a52dec: a52dec-$(A52DEC_VERSION).tar.gz .sum-a52
 	$(UNPACK_GZ)
 ifndef HAVE_FPU
 	(cd $@-$(A52DEC_VERSION) && patch -p0) < $(SRC)/a52/liba52-fixed.diff

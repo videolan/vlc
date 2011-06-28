@@ -21,11 +21,11 @@ $(TARBALLS)/d2d_headers.tar.gz:
 
 DSHOW_SOURCES := dshow-headers-oss.tar.bz2 dxva2api.h d2d_headers.tar.gz
 
-.sum-dshow: $(DSHOW_SOURCES:%=$(TARBALLS)/%)
+.sum-dshow: $(DSHOW_SOURCES)
 	$(CHECK_SHA512)
 	touch $@
 
-.dshow: $(DSHOW_SOURCES:%=$(TARBALLS)/%) .sum-dshow
+.dshow: $(DSHOW_SOURCES) .sum-dshow
 	mkdir -p -- "$(PREFIX)/include"
 	tar xjf $< -C "$(PREFIX)/include" \
 		--wildcards --no-anchored '*.h' --strip-components=1

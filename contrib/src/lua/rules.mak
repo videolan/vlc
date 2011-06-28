@@ -24,11 +24,11 @@ PKGS += lua
 $(TARBALLS)/lua-$(LUA_VERSION).tar.gz:
 	$(DOWNLOAD) $(LUA_URL)
 
-.sum-lua: $(TARBALLS)/lua-$(LUA_VERSION).tar.gz
+.sum-lua: lua-$(LUA_VERSION).tar.gz
 	$(CHECK_SHA512)
 	touch $@
 
-lua: $(TARBALLS)/lua-$(LUA_VERSION).tar.gz .sum-lua
+lua: lua-$(LUA_VERSION).tar.gz .sum-lua
 	$(UNPACK_GZ)
 	(cd $@-$(LUA_VERSION) && patch -p1) < $(SRC)/lua/lua-noreadline.patch
 ifdef HAVE_MACOSX

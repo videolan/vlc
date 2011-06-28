@@ -8,11 +8,11 @@ PKGS += flac
 $(TARBALLS)/flac-$(FLAC_VERSION).tar.gz:
 	$(DOWNLOAD) $(FLAC_URL)
 
-.sum-flac: $(TARBALLS)/flac-$(FLAC_VERSION).tar.gz
+.sum-flac: flac-$(FLAC_VERSION).tar.gz
 	$(CHECK_SHA512)
 	touch $@
 
-flac: $(TARBALLS)/flac-$(FLAC_VERSION).tar.gz .sum-flac
+flac: flac-$(FLAC_VERSION).tar.gz .sum-flac
 	$(UNPACK_GZ)
 	(cd $@-$(FLAC_VERSION) && patch -p1) < $(SRC)/flac/flac-win32.patch
 	(cd $@-$(FLAC_VERSION) && patch -p1) < $(SRC)/flac/libFLAC-pc.patch

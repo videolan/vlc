@@ -9,11 +9,11 @@ $(TARBALLS)/tremor-svn.tar.xz:
 	$(SVN) export http://svn.xiph.org/trunk/Tremor tremor-svn
 	tar cv tremor-svn | xz > $@
 
-.sum-tremor: $(TARBALLS)/tremor-svn.tar.xz
+.sum-tremor: tremor-svn.tar.xz
 	$(warning Integrity check skipped.)
 	touch $@
 
-tremor: $(TARBALLS)/tremor-svn.tar.xz .sum-tremor
+tremor: tremor-svn.tar.xz .sum-tremor
 	# Stuff that does not depend on libogg
 	$(UNPACK_XZ)
 	(cd tremor-svn && patch -p0) < $(SRC)/tremor/tremor.patch

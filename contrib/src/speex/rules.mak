@@ -8,11 +8,11 @@ PKGS += speex
 $(TARBALLS)/speex-$(SPEEX_VERSION).tar.gz:
 	$(DOWNLOAD) $(SPEEX_URL)
 
-.sum-speex: $(TARBALLS)/speex-$(SPEEX_VERSION).tar.gz
+.sum-speex: speex-$(SPEEX_VERSION).tar.gz
 	$(CHECK_SHA512)
 	touch $@
 
-speex: $(TARBALLS)/speex-$(SPEEX_VERSION).tar.gz .sum-speex
+speex: speex-$(SPEEX_VERSION).tar.gz .sum-speex
 	$(UNPACK_GZ)
 	mv $@-$(SPEEX_VERSION) $@
 	touch $@

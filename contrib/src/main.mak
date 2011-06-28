@@ -9,6 +9,7 @@ ALL_PKGS := $(patsubst ../src/%/rules.mak,%,$(wildcard ../src/*/rules.mak))
 SRC := ../src
 TARBALLS := ../tarballs
 DATE := $(shell date +%Y%m%d)
+VPATH := $(TARBALLS)
 
 # Common download locations
 GNU := http://ftp.gnu.org/gnu

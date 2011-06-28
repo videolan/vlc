@@ -7,11 +7,11 @@ EBML_URL := http://dl.matroska.org/downloads/libebml/libebml-$(EBML_VERSION).tar
 $(TARBALLS)/libebml-$(EBML_VERSION).tar.bz2:
 	$(DOWNLOAD) $(EBML_URL)
 
-.sum-ebml: $(TARBALLS)/libebml-$(EBML_VERSION).tar.bz2
+.sum-ebml: libebml-$(EBML_VERSION).tar.bz2
 	$(CHECK_SHA512)
 	touch $@
 
-libebml: $(TARBALLS)/libebml-$(EBML_VERSION).tar.bz2 .sum-ebml
+libebml: libebml-$(EBML_VERSION).tar.bz2 .sum-ebml
 	$(UNPACK_BZ2)
 	mv $@-$(EBML_VERSION) $@
 	touch $@

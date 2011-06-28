@@ -7,11 +7,11 @@ PKGS += live555
 $(TARBALLS)/live555-latest.tar.gz:
 	$(DOWNLOAD) $(LIVEDOTCOM_URL)
 
-.sum-live555: $(TARBALLS)/live555-latest.tar.gz
+.sum-live555: live555-latest.tar.gz
 	$(CHECK_SHA512)
 	touch $@
 
-live555: $(TARBALLS)/live555-latest.tar.gz .sum-live555
+live555: live555-latest.tar.gz .sum-live555
 	$(UNPACK_GZ)
 	patch -p0 < $(SRC)/live555/live-uselocale.patch
 	patch -p0 < $(SRC)/live555/live-inet_ntop.patch
