@@ -1,6 +1,6 @@
 # ebml
 
-EBML_VERSION := 1.2.0
+EBML_VERSION := 1.2.1
 EBML_URL := http://dl.matroska.org/downloads/libebml/libebml-$(EBML_VERSION).tar.bz2
 #EBML_URL := $(CONTRIB_VIDEOLAN)/libebml-$(EBML_VERSION).tar.bz2
 
