@@ -26,28 +26,28 @@ ifdef BUILD_ENCODERS
 # TODO:
 #FFMPEGCONF+= --enable-libmp3lame
 #.ffmpeg: .lame
+#PKGS += lame
 else
 FFMPEGCONF += --disable-encoders --disable-muxers
 # XXX: REVISIT --enable-small ?
 endif
 
-ifdef HAVE_CROSS_COMPILE
-FFMPEGCONF += --enable-cross-compile --cross-prefix=$(HOST)-
-endif
-# XXX: REVISIT: gsm and vpx not used by VLC so should in PKGS?
-ifneq ($(filter gsm,$(PKGS)),)
 #FFMPEGCONF+= --enable-libgsm
 #.ffmpeg: .gsm
-endif
-ifneq ($(filter vpx,$(PKGS)),)
+#PKGS += gsm
+
 #FFMPEGCONF += --enable-libvpx
 #.ffmpeg: .vpx
-endif
+#PKGS += vpx
 
 # XXX: REVISIT
 #ifndef HAVE_FPU
 #FFMPEGCONF+= --disable-mpegaudio-hp
 #endif
+
+ifdef HAVE_CROSS_COMPILE
+FFMPEGCONF += --enable-cross-compile --cross-prefix=$(HOST)-
+endif
 
 # ARM stuff
 ifeq ($(ARCH),arm)
@@ -73,6 +73,7 @@ ifeq ($(ARCH),x86_64)
 FFMPEGCONF += --cpu=core2
 endif
 .ffmpeg: .yasm
+PKGS += yasm
 endif
 
 # Linux
@@ -86,12 +87,16 @@ FFMPEGCONF += --target-os=mingw32 --enable-memalign-hack
 FFMPEGCONF += --enable-w32threads \
 	--disable-bzlib --disable-bsfs \
 	--disable-decoder=dca --disable-encoder=vorbis
+
 ifdef HAVE_WIN64
 FFMPEGCONF += --disable-dxva2
+
 FFMPEGCONF += --cpu=athlon64 --arch=x86_64
 else # !WIN64
 FFMPEGCONF += --enable-dxva2
 .ffmpeg: .directx
+PKGS += directx
+
 FFMPEGCONF+= --cpu=i686 --arch=x86
 endif
 else
@@ -109,7 +114,7 @@ FFMPEG_CFLAGS += --std=gnu99
 
 # Build
 
-PKGS += libav
+PKGS += ffmpeg
 
 ffmpeg-$(FFMPEG_VERSION).tar.gz:
 	$(error FFmpeg snapshot is too old, VCS must be used!)
