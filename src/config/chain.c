@@ -361,8 +361,6 @@ void config_ChainParse( vlc_object_t *p_this, const char *psz_prefix,
             continue;
         }
 
-        i_type &= CONFIG_ITEM;
-
         if( i_type != VLC_VAR_BOOL && cfg->psz_value == NULL )
         {
             msg_Warn( p_this, "missing value for option %s", cfg->psz_name );
