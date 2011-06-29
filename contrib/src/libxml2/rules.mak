@@ -3,7 +3,7 @@
 LIBXML2_VERSION := 2.7.8
 LIBXML2_URL := http://xmlsoft.org/sources/libxml2-$(LIBXML2_VERSION).tar.gz
 
-PKGS += libxml2
+NEED_XML2 := $(call need_pkg,"libxml-2.0")
 
 $(TARBALLS)/libxml2-$(LIBXML2_VERSION).tar.gz:
 	$(call download,$(LIBXML2_URL))
@@ -17,9 +17,15 @@ libxml2: libxml2-$(LIBXML2_VERSION).tar.gz .sum-libxml2
 	mv $@-$(LIBXML2_VERSION) $@
 	touch $@
 
+ifeq ($(NEED_XML2),)
+.libxml2:
+else
+PKGS += libxml2
+
 .libxml2: libxml2
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) CFLAGS="-DLIBXML_STATIC" $(XMLCONF)
 ifndef HAVE_MACOSX
 	cd $< && $(MAKE) install
+endif
 endif
 	touch $@
