@@ -45,23 +45,6 @@
 
 #include "libvlc.h"
 
-#if defined(__APPLE__)
-#include <sys/sysctl.h>
-#endif
-
-#if defined(__OpenBSD__)
-#include <sys/param.h>
-#include <sys/sysctl.h>
-#include <machine/cpu.h>
-#endif
-
-#if defined(__SunOS)
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/processor.h>
-#include <sys/pset.h>
-#endif
-
 #if defined( __i386__ ) || defined( __x86_64__ ) || defined( __powerpc__ ) \
  || defined( __ppc__ ) || defined( __ppc64__ ) || defined( __powerpc64__ )
 # ifndef WIN32
@@ -317,73 +300,6 @@ unsigned vlc_CPU (void)
     return cpu_flags;
 }
 
-/**
- * Return the number of available logical CPU.
- */
-unsigned vlc_GetCPUCount(void)
-{
-#if defined(WIN32) && !defined(UNDER_CE)
-    DWORD process_mask;
-    DWORD system_mask;
-    if (!GetProcessAffinityMask(GetCurrentProcess(), &process_mask, &system_mask))
-        return 1;
-
-    unsigned count = 0;
-    while (system_mask) {
-        count++;
-        system_mask >>= 1;
-    }
-    return count;
-#elif defined(__SYMBIAN32__)
-    return 1;
-#elif defined(HAVE_SCHED_GETAFFINITY)
-    cpu_set_t cpu;
-    CPU_ZERO(&cpu);
-    if (sched_getaffinity(getpid(), sizeof(cpu), &cpu) < 0)
-        return 1;
-    unsigned count = 0;
-    for (unsigned i = 0; i < CPU_SETSIZE; i++)
-        count += CPU_ISSET(i, &cpu) != 0;
-    return count;
-#elif defined(__APPLE__)
-    int count;
-    size_t size = sizeof(count) ;
-    if (sysctlbyname("hw.ncpu", &count, &size, NULL, 0))
-        return 1; /* Failure */
-    return count;
-#elif defined(__OpenBSD__)
-    int selectors[2] = { CTL_HW, HW_NCPU };
-    int count;
-    size_t size = sizeof(count) ;
-    if (sysctl(selectors, 2, &count, &size, NULL, 0))
-        return 1; /* Failure */
-    return count;
-#elif defined(__SunOS)
-    unsigned count = 0;
-    int type;
-    u_int numcpus;
-    processorid_t *cpulist;
-    processor_info_t cpuinfo;
-    cpulist = malloc(sizeof(processorid_t) * sysconf(_SC_NPROCESSORS_MAX));
-    if (!cpulist) return 1;
-    if (pset_info(PS_MYID, &type, &numcpus, cpulist)==0)
-    {
-        for (u_int i = 0; i < numcpus; i++)
-        {
-            if (!processor_info(cpulist[i], &cpuinfo))
-                count += (cpuinfo.pi_state == P_ONLINE)?1:0;
-        }
-    } else {
-        count = sysconf(_SC_NPROCESSORS_ONLN);
-    }
-    free(cpulist);
-    return (count>0)?count:1;
-#else
-#   warning "vlc_GetCPUCount is not implemented for your platform"
-    return 1;
-#endif
-}
-
 static vlc_memcpy_t pf_vlc_memcpy = memcpy;
 
 void vlc_fastmem_register (vlc_memcpy_t cpy)
@@ -427,4 +343,3 @@ void *vlc_memalign(void **base, size_t alignment, size_t size)
     return (void*)((uintptr_t)(p + alignment - 1) & ~(alignment - 1));
 #endif
 }
-

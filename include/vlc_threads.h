@@ -205,6 +205,8 @@ VLC_API void vlc_timer_destroy(vlc_timer_t);
 VLC_API void vlc_timer_schedule(vlc_timer_t, bool, mtime_t, mtime_t);
 VLC_API unsigned vlc_timer_getoverrun(vlc_timer_t) VLC_USED;
 
+VLC_API unsigned vlc_GetCPUCount(void);
+
 #ifndef LIBVLC_USE_PTHREAD_CANCEL
 enum {
     VLC_CLEANUP_PUSH,

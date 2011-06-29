@@ -50,7 +50,22 @@
 #ifdef __APPLE__
 # include <sys/time.h> /* gettimeofday in vlc_cond_timedwait */
 # include <mach/mach_init.h> /* mach_task_self in semaphores */
+# include <sys/sysctl.h>
 #endif
+
+#if defined(__OpenBSD__)
+# include <sys/param.h>
+# include <sys/sysctl.h>
+# include <machine/cpu.h>
+#endif
+
+#if defined(__SunOS)
+# include <unistd.h>
+# include <sys/types.h>
+# include <sys/processor.h>
+# include <sys/pset.h>
+#endif
+
 
 /**
  * Print a backtrace to the standard error for debugging purpose.
@@ -1007,4 +1022,67 @@ void vlc_timer_schedule (vlc_timer_t timer, bool absolute,
 unsigned vlc_timer_getoverrun (vlc_timer_t timer)
 {
     return vlc_atomic_swap (&timer->overruns, 0);
+}
+
+
+/**
+ * Count CPUs.
+ * @return number of available (logical) CPUs.
+ */
+unsigned vlc_GetCPUCount(void)
+{
+#if defined(HAVE_SCHED_GETAFFINITY)
+    cpu_set_t cpu;
+
+    CPU_ZERO(&cpu);
+    if (sched_getaffinity (getpid(), sizeof (cpu), &cpu) < 0)
+        return 1;
+
+    unsigned count = 0;
+    for (unsigned i = 0; i < CPU_SETSIZE; i++)
+        count += CPU_ISSET(i, &cpu) != 0;
+    return count;
+
+#elif defined(__APPLE__)
+    int count;
+    size_t size = sizeof(count) ;
+
+    if (sysctlbyname ("hw.ncpu", &count, &size, NULL, 0))
+        return 1; /* Failure */
+    return count;
+
+#elif defined(__OpenBSD__)
+    int selectors[2] = { CTL_HW, HW_NCPU };
+    int count;
+    size_t size = sizeof(count);
+
+    if (sysctl (selectors, 2, &count, &size, NULL, 0))
+        return 1; /* Failure */
+    return count;
+
+#elif defined(__SunOS)
+    unsigned count = 0;
+    int type;
+    u_int numcpus;
+    processor_info_t cpuinfo;
+
+    processorid_t *cpulist = malloc (sizeof (*cpulist) * sysconf(_SC_NPROCESSORS_MAX));
+    if (unlikely(cpulist == NULL))
+        return 1;
+
+    if (pset_info(PS_MYID, &type, &numcpus, cpulist) == 0)
+    {
+        for (u_int i = 0; i < numcpus; i++)
+            if (processor_info (cpulist[i], &cpuinfo) == 0)
+                count += (cpuinfo.pi_state == P_ONLINE);
+    }
+    else
+        count = sysconf (_SC_NPROCESSORS_ONLN);
+    free (cpulist);
+    return count ? count : 1;
+
+#else
+#   warning "vlc_GetCPUCount is not implemented for your platform"
+    return 1;
+#endif
 }

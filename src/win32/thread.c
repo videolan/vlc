@@ -906,3 +906,25 @@ unsigned vlc_timer_getoverrun (vlc_timer_t timer)
     (void)timer;
     return 0;
 }
+
+
+/*** CPU ***/
+unsigned vlc_GetCPUCount (void)
+{
+#ifndef UNDER_CE
+    DWORD process;
+    DWORD system;
+
+    if (GetProcessAffinityMask (GetCurrentProcess(), &process, &system))
+    {
+        unsigned count = 0;
+        while (system)
+        {
+            count++;
+            system >>= 1;
+        }
+        return count;
+     }
+#endif
+     return 1;
+}
