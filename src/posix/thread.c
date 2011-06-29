@@ -1038,10 +1038,7 @@ unsigned vlc_GetCPUCount(void)
     if (sched_getaffinity (getpid(), sizeof (cpu), &cpu) < 0)
         return 1;
 
-    unsigned count = 0;
-    for (unsigned i = 0; i < CPU_SETSIZE; i++)
-        count += CPU_ISSET(i, &cpu) != 0;
-    return count;
+    return CPU_COUNT (&cpu);
 
 #elif defined(__APPLE__)
     int count;

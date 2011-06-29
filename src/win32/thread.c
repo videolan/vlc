@@ -916,15 +916,7 @@ unsigned vlc_GetCPUCount (void)
     DWORD system;
 
     if (GetProcessAffinityMask (GetCurrentProcess(), &process, &system))
-    {
-        unsigned count = 0;
-        while (system)
-        {
-            count++;
-            system >>= 1;
-        }
-        return count;
-     }
+        return popcount (system);
 #endif
      return 1;
 }
