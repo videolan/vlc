@@ -43,31 +43,31 @@ extern "C" {
 /* Configuration hint types */
 
 
-#define CONFIG_HINT_CATEGORY                0x0002  /* Start of new category */
-#define CONFIG_HINT_SUBCATEGORY             0x0003  /* Start of sub-category */
-#define CONFIG_HINT_SUBCATEGORY_END         0x0004  /* End of sub-category */
-#define CONFIG_HINT_USAGE                   0x0005  /* Usage information */
+#define CONFIG_HINT_CATEGORY                0x02  /* Start of new category */
+#define CONFIG_HINT_SUBCATEGORY             0x03  /* Start of sub-category */
+#define CONFIG_HINT_SUBCATEGORY_END         0x04  /* End of sub-category */
+#define CONFIG_HINT_USAGE                   0x05  /* Usage information */
 
-#define CONFIG_CATEGORY                     0x0006 /* Set category */
-#define CONFIG_SUBCATEGORY                  0x0007 /* Set subcategory */
-#define CONFIG_SECTION                      0x0008 /* Start of new section */
+#define CONFIG_CATEGORY                     0x06 /* Set category */
+#define CONFIG_SUBCATEGORY                  0x07 /* Set subcategory */
+#define CONFIG_SECTION                      0x08 /* Start of new section */
 
 /* Configuration item types */
-#define CONFIG_ITEM_STRING                  0x0010  /* String option */
+#define CONFIG_ITEM_STRING                  0x10  /* String option */
 /* unused 0x0020 */
-#define CONFIG_ITEM_MODULE                  0x0030  /* Module option */
-#define CONFIG_ITEM_INTEGER                 0x0040  /* Integer option */
-#define CONFIG_ITEM_BOOL                    0x0050  /* Bool option */
-#define CONFIG_ITEM_FLOAT                   0x0060  /* Float option */
-#define CONFIG_ITEM_DIRECTORY               0x0070  /* Directory option */
-#define CONFIG_ITEM_KEY                     0x0080  /* Hot key option */
-#define CONFIG_ITEM_MODULE_CAT              0x0090  /* Module option */
-#define CONFIG_ITEM_MODULE_LIST             0x00A0  /* Module option */
-#define CONFIG_ITEM_MODULE_LIST_CAT         0x00B0  /* Module option */
-#define CONFIG_ITEM_FONT                    0x00C0  /* Font option */
-#define CONFIG_ITEM_PASSWORD                0x00D0  /* Password option (*) */
-#define CONFIG_ITEM_LOADFILE                0x00E0  /* Read file option */
-#define CONFIG_ITEM_SAVEFILE                0x00F0  /* Written file option */
+#define CONFIG_ITEM_MODULE                  0x30  /* Module option */
+#define CONFIG_ITEM_INTEGER                 0x40  /* Integer option */
+#define CONFIG_ITEM_BOOL                    0x50  /* Bool option */
+#define CONFIG_ITEM_FLOAT                   0x60  /* Float option */
+#define CONFIG_ITEM_DIRECTORY               0x70  /* Directory option */
+#define CONFIG_ITEM_KEY                     0x80  /* Hot key option */
+#define CONFIG_ITEM_MODULE_CAT              0x90  /* Module option */
+#define CONFIG_ITEM_MODULE_LIST             0xA0  /* Module option */
+#define CONFIG_ITEM_MODULE_LIST_CAT         0xB0  /* Module option */
+#define CONFIG_ITEM_FONT                    0xC0  /* Font option */
+#define CONFIG_ITEM_PASSWORD                0xD0  /* Password option (*) */
+#define CONFIG_ITEM_LOADFILE                0xE0  /* Read file option */
+#define CONFIG_ITEM_SAVEFILE                0xF0  /* Written file option */
 
 #define CONFIG_ITEM(x) (((x) & 0xF0) != 0)
 
