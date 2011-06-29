@@ -232,4 +232,7 @@ endif
 	$(CHECK_SHA512)
 	touch $@
 
+.sum-%:
+	$(error Download and check target not defined for $*)
+
 .DELETE_ON_ERROR:
