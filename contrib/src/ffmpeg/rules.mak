@@ -52,12 +52,6 @@ endif
 # ARM stuff
 ifeq ($(ARCH),arm)
 FFMPEGCONF += --disable-runtime-cpudetect
-# TODO: define HAVE_ARM_NEON or something
-ifdef HAVE_ARM_NEON
-# XXX: REVISIT choice of CPU?
-FFMPEGCONF += --cpu=cortex-a8 --enable-neon
-endif
-# TODO: --enable-iwmmxt if anyone still cares
 endif
 
 # Darwin
