@@ -1545,6 +1545,7 @@ static void Usage( libvlc_int_t *p_this, char const *psz_search )
                 }
                 break;
             case CONFIG_ITEM_INTEGER:
+            case CONFIG_ITEM_RGB:
                 print_help_section( p_parser, p_section, b_color,
                                     b_description );
                 p_section = NULL;

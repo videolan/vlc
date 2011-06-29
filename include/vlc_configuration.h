@@ -53,6 +53,7 @@ extern "C" {
 /* Configuration item types */
 #define CONFIG_ITEM_FLOAT                   0x20  /* Float option */
 #define CONFIG_ITEM_INTEGER                 0x40  /* Integer option */
+#define CONFIG_ITEM_RGB                     0x41  /* RGB color option */
 #define CONFIG_ITEM_BOOL                    0x60  /* Bool option */
 #define CONFIG_ITEM_STRING                  0x80  /* String option */
 #define CONFIG_ITEM_PASSWORD                0x81  /* Password option (*) */

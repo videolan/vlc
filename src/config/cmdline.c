@@ -258,6 +258,7 @@ int config_LoadCmdLine( vlc_object_t *p_this, int i_argc,
                         var_SetString( p_this, psz_name, state.arg );
                         break;
                     case CONFIG_ITEM_INTEGER:
+                    case CONFIG_ITEM_RGB:
                         var_Create( p_this, psz_name, VLC_VAR_INTEGER );
                         var_SetInteger( p_this, psz_name,
                                         strtoll(state.arg, NULL, 0));
