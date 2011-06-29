@@ -7,7 +7,7 @@ endif
 $(TARBALLS)/tremor-svn.tar.xz:
 	rm -Rf tremor-svn
 	$(SVN) export http://svn.xiph.org/trunk/Tremor tremor-svn
-	tar cv tremor-svn | xz > $@
+	tar cvJ tremor-svn > $@
 
 .sum-tremor: tremor-svn.tar.xz
 	$(warning Integrity check skipped.)

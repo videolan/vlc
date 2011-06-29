@@ -122,7 +122,7 @@ ffmpeg-$(FFMPEG_VERSION).tar.gz:
 
 $(TARBALLS)/ffmpeg-svn.tar.gz:
 	$(SVN) export $(FFMPEG_SVN) ffmpeg-svn
-	tar cv ffmpeg-svn | gzip > $@
+	tar cvz ffmpeg-svn > $@
 
 FFMPEG_VERSION := svn
 
