@@ -6,19 +6,19 @@ vim:syntax=lua
 < - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - >
 <  Copyright (C) 2011 the VideoLAN team
 <  $Id$
-< 
+<
 <  Authors: Akash Mehrotra < mehrotra <dot> akash <at> gmail <dot> com >
-< 
+<
 <  This program is free software; you can redistribute it and/or modify
 <  it under the terms of the GNU General Public License as published by
 <  the Free Software Foundation; either version 2 of the License, or
 <  (at your option) any later version.
-< 
+<
 <  This program is distributed in the hope that it will be useful,
 <  but WITHOUT ANY WARRANTY; without even the implied warranty of
 <  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 <  GNU General Public License for more details.
-< 
+<
 <  You should have received a copy of the GNU General Public License
 <  along with this program; if not, write to the Free Software
 <  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
@@ -28,11 +28,19 @@ vim:syntax=lua
 
 local command = _GET['command']
 local val = _GET['val']
+local band = _GET['band']
 function round(what, precision)
-   return math.floor(what*math.pow(10,precision)+0.5) / math.pow(10,precision)
+if what then return math.floor(what*math.pow(10,precision)+0.5) / math.pow(10,precision) else return "" end
 end
-if command == "preamp" then vlc.equalizer.preampset(val) end
+if command == "preamp" then vlc.equalizer.preampset(val)
+elseif command == "equalizer" then vlc.equalizer.equalizerset(band,val)
+end
+freq = { 60 , 170 , 310 , 600 , 1000 , 3000 , 6000 , 12000 , 14000 , 16000 }
 ?>
 <root>
   <preamp><?vlc print(round(vlc.equalizer.preampget(),2)) ?></preamp>
+  <equalizer>
+    <?vlc for i = 0,9
+    do print("<band id='"..i.."' freqency = '"..freq[i+1].."'>"..round(vlc.equalizer.equalizerget(i),1).."</band>") end ?>
+  </equalizer>
 </root>
