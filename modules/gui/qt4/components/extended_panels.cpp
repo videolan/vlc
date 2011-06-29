@@ -428,7 +428,7 @@ void ExtVideo::initComboBoxItems( QObject *widget )
                                                  qtu( option ) );
     if( p_item )
     {
-        int i_type = p_item->i_type & CONFIG_ITEM;
+        int i_type = p_item->i_type;
         for( int i_index = 0; i_index < p_item->i_list; i_index++ )
         {
             if( i_type == CONFIG_ITEM_INTEGER

@@ -456,7 +456,7 @@ AdvPrefsPanel::AdvPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             boxlayout = new QGridLayout();
         }
         /* Only one hotkey control */
-        if( (p_item->i_type & CONFIG_ITEM) == CONFIG_ITEM_KEY )
+        if( p_item->i_type == CONFIG_ITEM_KEY )
         {
             if( has_hotkey )
                 continue;
