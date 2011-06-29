@@ -408,7 +408,7 @@ int config_SortConfig (void)
              item < end;
              item++)
         {
-            if (item->i_type & CONFIG_HINT)
+            if (!CONFIG_ITEM(item->i_type))
                 continue; /* ignore hints */
             clist[nconf++] = item;
         }

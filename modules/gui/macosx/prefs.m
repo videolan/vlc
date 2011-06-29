@@ -385,7 +385,7 @@ static VLCPrefs *_o_sharedMainInstance = nil;
                 }
             }
             
-            if( module_is_main( p_module) && (configType & CONFIG_ITEM) )
+            if( module_is_main( p_module) && CONFIG_ITEM(configType) )
             {
                 if( categoryItem && [self isSubCategoryGeneral:lastsubcat] )
                 {
@@ -396,7 +396,7 @@ static VLCPrefs *_o_sharedMainInstance = nil;
                     [[subCategoryItem options] addObject:[[VLCTreeLeafItem alloc] initWithConfigItem:&p_configs[j]]];
                 }
             }
-            else if( !module_is_main( p_module) && (configType & CONFIG_ITEM))
+            else if( !module_is_main( p_module) && CONFIG_ITEM(configType))
             {
                 if( ![[subCategoryItem children] containsObject: pluginItem] )
                 {

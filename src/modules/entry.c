@@ -140,7 +140,7 @@ static module_config_t *vlc_config_create (module_t *module, int type)
     }
     tab[confsize].i_type = type;
 
-    if (type & CONFIG_ITEM)
+    if (CONFIG_ITEM(type))
     {
         module->i_config_items++;
         if (type == CONFIG_ITEM_BOOL)

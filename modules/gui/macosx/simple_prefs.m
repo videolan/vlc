@@ -628,7 +628,7 @@ static inline char * __config_GetLabel( vlc_object_t *p_this, const char *psz_na
     {
         module_config_t *p_item = p_config + i;
 
-        if( (p_item->i_type & CONFIG_ITEM) && p_item->psz_name != NULL
+        if( CONFIG_ITEM(p_item->i_type) && p_item->psz_name != NULL
            && !strncmp( p_item->psz_name , "key-", 4 )
            && !EMPTY_STR( p_item->psz_text ) )
         {

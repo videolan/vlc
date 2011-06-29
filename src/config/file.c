@@ -512,7 +512,7 @@ static int SaveConfigFile (vlc_object_t *p_this)
              p_item < p_end;
              p_item++ )
         {
-            if ((p_item->i_type & CONFIG_HINT) /* ignore hint */
+            if (!CONFIG_ITEM(p_item->i_type)   /* ignore hint */
              || p_item->b_removed              /* ignore deprecated option */
              || p_item->b_unsaveable)          /* ignore volatile option */
                 continue;

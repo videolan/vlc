@@ -213,7 +213,7 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
             else if( p_item->i_type == CONFIG_SUBCATEGORY )
                 i_subcategory = p_item->value.i;
 
-            if( p_item->i_type & CONFIG_ITEM )
+            if( CONFIG_ITEM(p_item->i_type) )
                 b_options = true;
 
             if( b_options && i_category && i_subcategory )

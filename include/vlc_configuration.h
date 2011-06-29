@@ -52,8 +52,6 @@ extern "C" {
 #define CONFIG_SUBCATEGORY                  0x0007 /* Set subcategory */
 #define CONFIG_SECTION                      0x0008 /* Start of new section */
 
-#define CONFIG_HINT                         0x000F
-
 /* Configuration item types */
 #define CONFIG_ITEM_STRING                  0x0010  /* String option */
 /* unused 0x0020 */
@@ -71,7 +69,7 @@ extern "C" {
 #define CONFIG_ITEM_LOADFILE                0x00E0  /* Read file option */
 #define CONFIG_ITEM_SAVEFILE                0x00F0  /* Written file option */
 
-#define CONFIG_ITEM                         0x00F0
+#define CONFIG_ITEM(x) (((x) & 0xF0) != 0)
 
 /*******************************************************************
  * All predefined categories and subcategories

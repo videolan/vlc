@@ -133,7 +133,7 @@ int config_LoadCmdLine( vlc_object_t *p_this, int i_argc,
              p_item++ )
         {
             /* Ignore hints */
-            if( p_item->i_type & CONFIG_HINT )
+            if( !CONFIG_ITEM(p_item->i_type) )
                 continue;
 
             /* Add item to long options */
