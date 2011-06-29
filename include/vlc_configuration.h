@@ -159,9 +159,16 @@ struct module_config_t
     int         *pi_list;                              /* Idem for integers */
     char       **ppsz_list_text;          /* Friendly names for list values */
     int          i_list;                               /* Options list size */
-    int          i_type;                               /* Configuration type */
-    vlc_callback_t pf_update_list; /*callback to initialize dropdownlists */
-    char         i_short;                      /* Optional short option name */
+    vlc_callback_t pf_update_list; /* Callback to initialize dropdown lists */
+    uint8_t      i_type;                              /* Configuration type */
+    char         i_short;                     /* Optional short option name */
+
+    /* Misc */
+    unsigned    b_dirty:1;        /* Dirty flag to indicate a config change */
+    unsigned    b_advanced:1;        /* Flag to indicate an advanced option */
+    unsigned    b_internal:1; /* Flag to indicate option is not to be shown */
+    unsigned    b_unsaveable:1;               /* Config should not be saved */
+    unsigned    b_safe:1;       /* Safe to use in web plugins and playlists */
 
     /* Actions list */
     int            i_action;                           /* actions list size */
@@ -171,15 +178,6 @@ struct module_config_t
     /* Deprecated */
     char        *psz_oldname;                          /* Old option name */
     bool        b_removed;
-
-    /* Misc */
-    bool        b_dirty;          /* Dirty flag to indicate a config change */
-    bool        b_advanced;          /* Flag to indicate an advanced option */
-    bool        b_internal;   /* Flag to indicate option is not to be shown */
-    /* Option values loaded from config file */
-    bool        b_unsaveable;                /* Config should not be saved */
-
-    bool        b_safe;
 };
 
 /*****************************************************************************
