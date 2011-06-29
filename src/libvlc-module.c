@@ -1272,6 +1272,10 @@ static const char *const ppsz_albumart_descriptions[] =
 #define PAP_LONGTEXT N_( \
     "Pause each item in the playlist on the last frame." )
 
+#define AUTOSTART_TEXT N_( "Auto start" )
+#define AUTOSTART_LONGTEXT N_( "Automatically start playing the playlist " \
+                "content once it's loaded." )
+
 #define ML_TEXT N_("Use media library")
 #define ML_LONGTEXT N_( \
     "The media library is automatically saved and reloaded each time you " \
@@ -2100,6 +2104,8 @@ vlc_module_begin ()
         change_safe()
     add_bool( "play-and-pause", 0, PAP_TEXT, PAP_LONGTEXT, true )
         change_safe()
+    add_bool( "playlist-autostart", true,
+              AUTOSTART_TEXT, AUTOSTART_LONGTEXT, false )
     add_bool( "media-library", 0, ML_TEXT, ML_LONGTEXT, false )
 #if defined( MEDIA_LIBRARY )
     add_bool( "load-media-library-on-startup", 1, LOAD_ML_TEXT,

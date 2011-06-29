@@ -42,10 +42,6 @@
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define AUTOSTART_TEXT N_( "Auto start" )
-#define AUTOSTART_LONGTEXT N_( "Automatically start playing the playlist " \
-                "content once it's loaded." )
-
 #define SHOW_ADULT_TEXT N_( "Show shoutcast adult content" )
 #define SHOW_ADULT_LONGTEXT N_( "Show NC17 rated video streams when " \
                 "using shoutcast video playlists." )
@@ -58,9 +54,6 @@ vlc_module_begin ()
     add_shortcut( "playlist" )
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_DEMUX )
-
-    add_bool( "playlist-autostart", true,
-              AUTOSTART_TEXT, AUTOSTART_LONGTEXT, false )
 
     add_obsolete_integer( "parent-item" ) /* removed since 1.1.0 */
 
