@@ -161,6 +161,13 @@ download = rm -f $@.tmp && \
 		$(WGET) -p -O $@.tmp $(1) && \
 		touch $@.tmp && \
 		mv $@.tmp $@
+download_git = \
+	rm -Rf $(@:.tar.xz=) && \
+	$(GIT) clone $(2:%=--branch %) $(1) $(@:.tar.xz=) && \
+	rm -Rf $(@:%.tar.xz=%)/.git && \
+	(cd $(dir $@) && \
+	 tar cvJ $(notdir $(@:.tar.xz=))) > $@ && \
+	rm -Rf $(@:.tar.xz=)
 checksum = (cd $(TARBALLS) && $(1)sum -c -) < \
 		$(SRC)/$(patsubst .sum-%,%,$@)/$(2)SUMS
 CHECK_SHA256 = $(call checksum,sha512,SHA512)
