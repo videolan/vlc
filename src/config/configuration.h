@@ -42,9 +42,17 @@ void config_UnsortConfig (void);
 
 char *config_GetDataDirDefault( void );
 
-int IsConfigStringType( int type );
-int IsConfigIntegerType (int type);
-static inline int IsConfigFloatType (int type)
+static inline bool IsConfigStringType(unsigned type)
+{
+    return (type & CONFIG_ITEM_STRING) != 0;
+}
+
+static inline bool IsConfigIntegerType (int type)
+{
+    return (type & CONFIG_ITEM_INTEGER) != 0;
+}
+
+static inline bool IsConfigFloatType (int type)
 {
     return type == CONFIG_ITEM_FLOAT;
 }

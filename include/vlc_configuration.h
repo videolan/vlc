@@ -41,8 +41,6 @@ extern "C" {
  *****************************************************************************/
 
 /* Configuration hint types */
-
-
 #define CONFIG_HINT_CATEGORY                0x02  /* Start of new category */
 #define CONFIG_HINT_SUBCATEGORY             0x03  /* Start of sub-category */
 #define CONFIG_HINT_SUBCATEGORY_END         0x04  /* End of sub-category */
@@ -53,23 +51,22 @@ extern "C" {
 #define CONFIG_SECTION                      0x08 /* Start of new section */
 
 /* Configuration item types */
-#define CONFIG_ITEM_STRING                  0x10  /* String option */
-/* unused 0x0020 */
-#define CONFIG_ITEM_MODULE                  0x30  /* Module option */
+#define CONFIG_ITEM_FLOAT                   0x20  /* Float option */
 #define CONFIG_ITEM_INTEGER                 0x40  /* Integer option */
-#define CONFIG_ITEM_BOOL                    0x50  /* Bool option */
-#define CONFIG_ITEM_FLOAT                   0x60  /* Float option */
-#define CONFIG_ITEM_DIRECTORY               0x70  /* Directory option */
-#define CONFIG_ITEM_KEY                     0x80  /* Hot key option */
-#define CONFIG_ITEM_MODULE_CAT              0x90  /* Module option */
-#define CONFIG_ITEM_MODULE_LIST             0xA0  /* Module option */
-#define CONFIG_ITEM_MODULE_LIST_CAT         0xB0  /* Module option */
-#define CONFIG_ITEM_FONT                    0xC0  /* Font option */
-#define CONFIG_ITEM_PASSWORD                0xD0  /* Password option (*) */
-#define CONFIG_ITEM_LOADFILE                0xE0  /* Read file option */
-#define CONFIG_ITEM_SAVEFILE                0xF0  /* Written file option */
+#define CONFIG_ITEM_BOOL                    0x60  /* Bool option */
+#define CONFIG_ITEM_STRING                  0x80  /* String option */
+#define CONFIG_ITEM_PASSWORD                0x81  /* Password option (*) */
+#define CONFIG_ITEM_KEY                     0x82  /* Hot key option */
+#define CONFIG_ITEM_MODULE                  0x84  /* Module option */
+#define CONFIG_ITEM_MODULE_CAT              0x85  /* Module option */
+#define CONFIG_ITEM_MODULE_LIST             0x86  /* Module option */
+#define CONFIG_ITEM_MODULE_LIST_CAT         0x87  /* Module option */
+#define CONFIG_ITEM_LOADFILE                0x8C  /* Read file option */
+#define CONFIG_ITEM_SAVEFILE                0x8D  /* Written file option */
+#define CONFIG_ITEM_DIRECTORY               0x8E  /* Directory option */
+#define CONFIG_ITEM_FONT                    0x8F  /* Font option */
 
-#define CONFIG_ITEM(x) (((x) & 0xF0) != 0)
+#define CONFIG_ITEM(x) (((x) & ~0xF) != 0)
 
 /*******************************************************************
  * All predefined categories and subcategories

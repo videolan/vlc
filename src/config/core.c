@@ -43,33 +43,6 @@ static inline char *strdupnull (const char *src)
     return src ? strdup (src) : NULL;
 }
 
-/* Item types that use a string value (i.e. serialized in the module cache) */
-int IsConfigStringType (int type)
-{
-    static const unsigned char config_types[] =
-    {
-        CONFIG_ITEM_STRING, CONFIG_ITEM_MODULE, CONFIG_ITEM_DIRECTORY,
-        CONFIG_ITEM_KEY, CONFIG_ITEM_MODULE_CAT, CONFIG_ITEM_PASSWORD,
-        CONFIG_ITEM_MODULE_LIST, CONFIG_ITEM_MODULE_LIST_CAT,
-        CONFIG_ITEM_FONT, CONFIG_ITEM_LOADFILE, CONFIG_ITEM_SAVEFILE,
-    };
-
-    /* NOTE: this needs to be changed if we ever get more than 255 types */
-    return memchr (config_types, type, sizeof (config_types)) != NULL;
-}
-
-
-int IsConfigIntegerType (int type)
-{
-    static const unsigned char config_types[] =
-    {
-        CONFIG_ITEM_INTEGER, CONFIG_ITEM_BOOL,
-        CONFIG_CATEGORY, CONFIG_SUBCATEGORY
-    };
-
-    return memchr (config_types, type, sizeof (config_types)) != NULL;
-}
-
 #undef config_GetType
 /*****************************************************************************
  * config_GetType: get the type of a variable (bool, int, float, string)
@@ -90,30 +63,21 @@ int config_GetType( vlc_object_t *p_this, const char *psz_name )
         return 0;
     }
 
-    switch( p_config->i_type )
+    switch( p_config->i_type & ~0x1F )
     {
-    case CONFIG_ITEM_BOOL:
-        i_type = VLC_VAR_BOOL;
+    case CONFIG_ITEM_FLOAT:
+        i_type = VLC_VAR_FLOAT;
         break;
 
     case CONFIG_ITEM_INTEGER:
         i_type = VLC_VAR_INTEGER;
         break;
 
-    case CONFIG_ITEM_FLOAT:
-        i_type = VLC_VAR_FLOAT;
+    case CONFIG_ITEM_BOOL:
+        i_type = VLC_VAR_BOOL;
         break;
 
-    case CONFIG_ITEM_MODULE:
-    case CONFIG_ITEM_MODULE_CAT:
-    case CONFIG_ITEM_MODULE_LIST:
-    case CONFIG_ITEM_MODULE_LIST_CAT:
     case CONFIG_ITEM_STRING:
-    case CONFIG_ITEM_PASSWORD:
-    case CONFIG_ITEM_LOADFILE:
-    case CONFIG_ITEM_SAVEFILE:
-    case CONFIG_ITEM_DIRECTORY:
-    case CONFIG_ITEM_KEY:
         i_type = VLC_VAR_STRING;
         break;
 
