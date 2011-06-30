@@ -110,6 +110,7 @@ struct intf_sys_t
     VLCInformation * o_info;    /* VLCInformation */
     id o_eyetv;                 /* VLCEyeTVController */
     id o_bookmarks;             /* VLCBookmarks */
+    id o_coreinteraction;       /* VLCCoreInteraction */
     BOOL nib_main_loaded;       /* main nibfile */
     BOOL nib_open_loaded;       /* open nibfile */
     BOOL nib_about_loaded;      /* about nibfile */

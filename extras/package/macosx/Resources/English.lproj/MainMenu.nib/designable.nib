@@ -12,12 +12,12 @@
     </object>
     <object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
       <bool key="EncodedWithXMLCoder">YES</bool>
-      <integer value="283"/>
       <integer value="24"/>
-      <integer value="915"/>
-      <integer value="2417"/>
       <integer value="2730"/>
       <integer value="2"/>
+      <integer value="283"/>
+      <integer value="2417"/>
+      <integer value="915"/>
     </object>
     <object class="NSArray" key="IBDocument.PluginDependencies">
       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -828,6 +828,7 @@
                   </object>
                   <string key="NSFrame">{{1, 17}, {604, 231}}</string>
                   <reference key="NSSuperview" ref="915491793"/>
+                  <reference key="NSNextKeyView" ref="23448837"/>
                   <reference key="NSDocView" ref="23448837"/>
                   <reference key="NSBGColor" ref="885475112"/>
                   <int key="NScvFlags">4</int>
@@ -860,6 +861,7 @@
                   </object>
                   <string key="NSFrame">{{1, 0}, {604, 17}}</string>
                   <reference key="NSSuperview" ref="915491793"/>
+                  <reference key="NSNextKeyView" ref="823165105"/>
                   <reference key="NSDocView" ref="823165105"/>
                   <reference key="NSBGColor" ref="885475112"/>
                   <int key="NScvFlags">4</int>
@@ -867,6 +869,7 @@
               </object>
               <string key="NSFrame">{{-1, 36}, {606, 249}}</string>
               <reference key="NSSuperview" ref="429932428"/>
+              <reference key="NSNextKeyView" ref="343242432"/>
               <int key="NSsFlags">133682</int>
               <reference key="NSVScroller" ref="573737110"/>
               <reference key="NSHScroller" ref="297523533"/>
@@ -5020,14 +5023,6 @@ LCAuLi4</string>
         </object>
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
-            <string key="label">o_fs_panel</string>
-            <reference key="source" ref="113811151"/>
-            <reference key="destination" ref="662599125"/>
-          </object>
-          <int key="connectionID">2786</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBOutletConnection" key="connection">
             <string key="label">o_btn_shuffle</string>
             <reference key="source" ref="113811151"/>
             <reference key="destination" ref="291209196"/>
@@ -6801,6 +6796,14 @@ LCAuLi4</string>
             <reference key="destination" ref="355945594"/>
           </object>
           <int key="connectionID">4594</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_fs_panel</string>
+            <reference key="source" ref="113811151"/>
+            <reference key="destination" ref="662599125"/>
+          </object>
+          <int key="connectionID">4595</int>
         </object>
       </object>
       <object class="IBMutableOrderedSet" key="objectRecords">
@@ -10273,9 +10276,9 @@ LCAuLi4</string>
           <string>{{473, 633}, {137, 103}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
-          <string>{{71, 176}, {604, 310}}</string>
+          <string>{{329, 176}, {604, 310}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-          <string>{{71, 176}, {604, 310}}</string>
+          <string>{{329, 176}, {604, 310}}</string>
           <boolean value="YES"/>
           <boolean value="YES"/>
           <boolean value="YES"/>
@@ -10885,7 +10888,7 @@ LCAuLi4</string>
         </object>
       </object>
       <nil key="sourceID"/>
-      <int key="maxID">4594</int>
+      <int key="maxID">4595</int>
     </object>
     <object class="IBClassDescriber" key="IBDocument.Classes">
       <object class="NSMutableArray" key="referencedPartialClassDescriptionsV3.1+">
@@ -11174,6 +11177,7 @@ LCAuLi4</string>
               <bool key="EncodedWithXMLCoder">YES</bool>
               <string>o_btn_repeat</string>
               <string>o_btn_shuffle</string>
+              <string>o_fs_panel</string>
               <string>o_main</string>
               <string>o_specificTime_cancel_btn</string>
               <string>o_specificTime_enter_fld</string>
@@ -11189,6 +11193,7 @@ LCAuLi4</string>
               <bool key="EncodedWithXMLCoder">YES</bool>
               <string>id</string>
               <string>id</string>
+              <string>VLCFSPanel</string>
               <string>id</string>
               <string>id</string>
               <string>id</string>
@@ -11207,6 +11212,7 @@ LCAuLi4</string>
               <bool key="EncodedWithXMLCoder">YES</bool>
               <string>o_btn_repeat</string>
               <string>o_btn_shuffle</string>
+              <string>o_fs_panel</string>
               <string>o_main</string>
               <string>o_specificTime_cancel_btn</string>
               <string>o_specificTime_enter_fld</string>
@@ -11227,6 +11233,10 @@ LCAuLi4</string>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_btn_shuffle</string>
                 <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_fs_panel</string>
+                <string key="candidateClassName">VLCFSPanel</string>
               </object>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_main</string>
@@ -11270,9 +11280,17 @@ LCAuLi4</string>
               </object>
             </object>
           </object>
-          <object class="IBClassDescriptionSource" key="sourceIdentifier" id="361672446">
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
             <string key="majorKey">IBDocumentRelativeSource</string>
             <string key="minorKey">../../../../../modules/gui/macosx/controls.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">VLCFSPanel</string>
+          <string key="superclassName">NSWindow</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBDocumentRelativeSource</string>
+            <string key="minorKey">../../../../../modules/gui/macosx/fspanel.h</string>
           </object>
         </object>
         <object class="IBPartialClassDescription">
@@ -11368,6 +11386,7 @@ LCAuLi4</string>
               <string>o_btn_stop</string>
               <string>o_controls</string>
               <string>o_coredialogs</string>
+              <string>o_coreinteraction</string>
               <string>o_crashrep_desc_txt</string>
               <string>o_crashrep_dontSend_btn</string>
               <string>o_crashrep_fld</string>
@@ -11409,6 +11428,7 @@ LCAuLi4</string>
               <string>NSButton</string>
               <string>NSButton</string>
               <string>VLCControls</string>
+              <string>id</string>
               <string>id</string>
               <string>NSTextField</string>
               <string>NSButton</string>
@@ -11455,6 +11475,7 @@ LCAuLi4</string>
               <string>o_btn_stop</string>
               <string>o_controls</string>
               <string>o_coredialogs</string>
+              <string>o_coreinteraction</string>
               <string>o_crashrep_desc_txt</string>
               <string>o_crashrep_dontSend_btn</string>
               <string>o_crashrep_fld</string>
@@ -11531,6 +11552,10 @@ LCAuLi4</string>
               </object>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_coredialogs</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_coreinteraction</string>
                 <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
@@ -13178,7 +13203,7 @@ LCAuLi4</string>
         <object class="IBPartialClassDescription">
           <string key="className">VLCTimeField</string>
           <string key="superclassName">NSTextField</string>
-          <reference key="sourceIdentifier" ref="361672446"/>
+          <reference key="sourceIdentifier" ref="690328904"/>
         </object>
       </object>
     </object>

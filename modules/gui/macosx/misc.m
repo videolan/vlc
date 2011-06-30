@@ -720,7 +720,6 @@ void _drawFrameInRect(NSRect frameRect)
 
     NSRect knobRect = [[self cell] knobRectFlipped:NO];
     knobRect.origin.y+=1;
-    //    [[[NSColor blackColor] colorWithAlphaComponent:0.6] set];
     [self drawKnobInRect: knobRect];
 }
 
@@ -755,9 +754,23 @@ void _drawFrameInRect(NSRect frameRect)
 
     NSRect knobRect = [[self cell] knobRectFlipped:NO];
     knobRect.origin.y+=2;
-//    [[[NSColor blackColor] colorWithAlphaComponent:0.6] set];
     [self drawKnobInRect: knobRect];
 }
 
 @end
 
+/*****************************************************************************
+ * VLCTimeField implementation
+ *****************************************************************************
+ * we need this to catch our click-event in the controller window
+ *****************************************************************************/
+
+@implementation VLCTimeField
+- (void)mouseDown: (NSEvent *)ourEvent
+{
+    if( [ourEvent clickCount] > 1 )
+        [[[VLCMain sharedInstance] controls] goToSpecificTime: nil];
+    else
+        [[VLCMain sharedInstance] timeFieldWasClicked: self];
+}
+@end

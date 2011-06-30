@@ -156,3 +156,14 @@
 - (void)drawKnobInRect:(NSRect)knobRect;
 
 @end
+
+/*****************************************************************************
+ * VLCTimeField interface
+ *****************************************************************************
+ * we need the implementation to catch our click-event in the controller window
+ *****************************************************************************/
+
+@interface VLCTimeField : NSTextField
+{
+}
+@end

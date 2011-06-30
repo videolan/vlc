@@ -53,6 +53,7 @@
 #import "AppleRemote.h"
 #import "eyetv.h"
 #import "simple_prefs.h"
+#import "CoreInteraction.h"
 
 #import <AddressBook/AddressBook.h>         /* for crashlog send mechanism */
 #import <Sparkle/Sparkle.h>                 /* we're the update delegate */
@@ -343,6 +344,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     o_coredialogs = [[VLCCoreDialogProvider alloc] init];
     o_info = [[VLCInfo alloc] init];
     o_mainmenu = [[VLCMainMenu alloc] init];
+    o_coreinteraction = [[VLCCoreInteraction alloc] init];
 
     i_lastShownVolume = -1;
 
@@ -605,7 +607,7 @@ static VLCMain *_o_sharedMainInstance = nil;
 
     /* Close the window directly, because we do know that there
      * won't be anymore video. It's currently waiting a bit. */
-    [[[o_controls voutView] window] orderOut:self];
+    [[[o_coreinteraction voutView] window] orderOut:self];
 }
 
 #pragma mark -
@@ -1457,7 +1459,7 @@ static void manage_cleanup( void * args )
 
     if( p_intf->p_sys->b_intf_show )
     {
-        if( [[o_controls voutView] isFullscreen] && config_GetInt( VLCIntf, "macosx-fspanel" ) )
+        if( [[o_coreinteraction voutView] isFullscreen] && config_GetInt( VLCIntf, "macosx-fspanel" ) )
             [[o_controls fspanel] fadeIn];
         else
             [o_window makeKeyAndOrderFront: self];
@@ -1486,7 +1488,7 @@ static void manage_cleanup( void * args )
             [self setScrollField: aString stopAfter:-1];
             [[[self controls] fspanel] setStreamTitle: aString];
 
-            [[o_controls voutView] updateTitle];
+            [[o_coreinteraction voutView] updateTitle];
 
             [o_playlist updateRowSelection];
 
@@ -1623,6 +1625,7 @@ end:
     else
     {
         [[[self controls] fspanel] setPlay];
+        [[self mainMenu] setPlay];
         [o_btn_play setImage: o_img_play];
         [o_btn_play setAlternateImage: o_img_play_pressed];
         [o_btn_play setToolTip: _NS("Play")];

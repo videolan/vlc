@@ -420,6 +420,10 @@
 		CC426FD01020D44F00A32659 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sparkle.framework; path = ../../contrib/Sparkle/Sparkle.framework; sourceTree = SOURCE_ROOT; };
 		CC448A5A13B61D49009F72E0 /* MainMenu.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MainMenu.h; path = ../../../modules/gui/macosx/MainMenu.h; sourceTree = "<group>"; };
 		CC448A5B13B61D49009F72E0 /* MainMenu.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = MainMenu.m; path = ../../../modules/gui/macosx/MainMenu.m; sourceTree = "<group>"; };
+		CC448A6013B68A0B009F72E0 /* CoreInteraction.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CoreInteraction.h; path = ../../../modules/gui/macosx/CoreInteraction.h; sourceTree = "<group>"; };
+		CC448A6113B68A0B009F72E0 /* CoreInteraction.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = CoreInteraction.m; path = ../../../modules/gui/macosx/CoreInteraction.m; sourceTree = "<group>"; };
+		CC448A6213B68A0B009F72E0 /* MainWindow.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MainWindow.h; path = ../../../modules/gui/macosx/MainWindow.h; sourceTree = "<group>"; };
+		CC448A6313B68A0B009F72E0 /* MainWindow.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = MainWindow.m; path = ../../../modules/gui/macosx/MainWindow.m; sourceTree = "<group>"; };
 		CC4A33210F8CB017000FC4A7 /* coredialogs.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = coredialogs.m; path = ../../../modules/gui/macosx/coredialogs.m; sourceTree = SOURCE_ROOT; };
 		CC4A33220F8CB017000FC4A7 /* coredialogs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = coredialogs.h; path = ../../../modules/gui/macosx/coredialogs.h; sourceTree = SOURCE_ROOT; };
 		CC4D67F51348F587003FCC5B /* quartztext.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = quartztext.c; path = ../../../modules/misc/text_renderer/quartztext.c; sourceTree = "<group>"; };
@@ -564,6 +568,10 @@
 				8ED6C27D03E2EB1C0059A3A7 /* intf.m */,
 				CC448A5A13B61D49009F72E0 /* MainMenu.h */,
 				CC448A5B13B61D49009F72E0 /* MainMenu.m */,
+				CC448A6013B68A0B009F72E0 /* CoreInteraction.h */,
+				CC448A6113B68A0B009F72E0 /* CoreInteraction.m */,
+				CC448A6213B68A0B009F72E0 /* MainWindow.h */,
+				CC448A6313B68A0B009F72E0 /* MainWindow.m */,
 				CC4A33220F8CB017000FC4A7 /* coredialogs.h */,
 				CC4A33210F8CB017000FC4A7 /* coredialogs.m */,
 				8E6BC6FA041684EC0059A3A7 /* controls.h */,

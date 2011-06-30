@@ -31,6 +31,7 @@
 #import "vout.h"
 #import "embeddedwindow.h"
 #import "fspanel.h"
+#import "CoreInteraction.h"
 #import "playlist.h"
 #import <vlc_url.h>
 
@@ -279,7 +280,7 @@
     if( videoRatio.height == 0. || videoRatio.width == 0. )
         return proposedFrameSize;
 
-    if( [[[VLCMain sharedInstance] controls] aspectRatioIsLocked] )
+    if( [[VLCCoreInteraction sharedInstance] aspectRatioIsLocked] )
     {
         NSRect viewRect = [o_view convertRect:[o_view bounds] toView: nil];
         NSRect contentRect = [self contentRectForFrameRect:[self frame]];

@@ -12,6 +12,10 @@ SOURCES_macosx = \
 	SPMediaKeyTap.m \
 	MainMenu.h \
 	MainMenu.m \
+	MainWindow.h \
+	MainWindow.m \
+	CoreInteraction.h \
+	CoreInteraction.m \
 	about.h \
 	about.m \
 	applescript.h \

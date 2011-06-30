@@ -38,6 +38,7 @@
 #import "controls.h"
 #import "playlistinfo.h"
 #import "vout.h"
+#import "CoreInteraction.h"
 
 @implementation VLCMainMenu
 static VLCMainMenu *_o_sharedInstance = nil;
@@ -789,7 +790,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
         o_lmi_tmp2 = [o_menu addItemWithTitle: _NS("Lock Aspect Ratio") action: @selector(lockVideosAspectRatio:) keyEquivalent: @""];
         [o_lmi_tmp2 setTarget: self];
         [o_lmi_tmp2 setEnabled: YES];
-        [o_lmi_tmp2 setState: [[[VLCMain sharedInstance] controls] aspectRatioIsLocked]];
+        [o_lmi_tmp2 setState: [[VLCCoreInteraction sharedInstance] aspectRatioIsLocked]];
         [o_parent setEnabled: YES];
         [o_menu addItem: [NSMenuItem separatorItem]];
     }

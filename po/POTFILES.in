@@ -501,6 +501,7 @@ modules/gui/macosx/AudioEffects.m
 modules/gui/macosx/AppleRemote.h
 modules/gui/macosx/AppleRemote.m
 modules/gui/macosx/MainMenu.m
+modules/gui/macosx/MainWindow.m
 modules/gui/macosx/TrackSynchronization.m
 modules/gui/macosx/VideoEffects.m
 modules/gui/macosx/about.h
@@ -513,6 +514,7 @@ modules/gui/macosx/controls.h
 modules/gui/macosx/controls.m
 modules/gui/macosx/coredialogs.h
 modules/gui/macosx/coredialogs.m
+modules/gui/macosx/CoreInteraction.m
 modules/gui/macosx/embeddedwindow.h
 modules/gui/macosx/embeddedwindow.m
 modules/gui/macosx/equalizer.h

@@ -26,7 +26,7 @@
  * Preamble
  *****************************************************************************/
 #import "intf.h"
-#import "controls.h"
+#import "CoreInteraction.h"
 #import "vout.h"
 #import "misc.h"
 #import "fspanel.h"
@@ -178,9 +178,9 @@
 
 - (void)setActive:(id)noData
 {
-    if( [[[VLCMain sharedInstance] controls] voutView] != nil )
+    if( [[VLCCoreInteraction sharedInstance] voutView] != nil )
     {
-        if( [[[[VLCMain sharedInstance] controls] voutView] isFullscreen] )
+        if( [[[VLCCoreInteraction sharedInstance] voutView] isFullscreen] )
         {
             b_nonActive = NO;
             [self fadeIn];
@@ -247,8 +247,8 @@
 - (void)mouseExited:(NSEvent *)theEvent
 {
     /* give up our focus, so the vout may show us again without letting the user clicking it */
-    if( [[[[VLCMain sharedInstance] controls] voutView] isFullscreen] )
-        [[[[[VLCMain sharedInstance] controls] voutView] window] makeKeyWindow];
+    if( [[[VLCCoreInteraction sharedInstance] voutView] isFullscreen] )
+        [[[[VLCCoreInteraction sharedInstance] voutView] window] makeKeyWindow];
 }
 
 - (void)hideMouse
@@ -559,7 +559,7 @@
 
 - (IBAction)fsVolumeSliderUpdate:(id)sender
 {
-    [[[VLCMain sharedInstance] controls] volumeSliderUpdated: sender];
+    [[VLCCoreInteraction sharedInstance] setVolume: [sender intValue]];
 }
 
 #define addImage(image, _x, _y, mode, _width)                                               \

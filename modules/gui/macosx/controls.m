@@ -37,8 +37,8 @@
 #import "open.h"
 #import "controls.h"
 #import "playlist.h"
-#include <vlc_osd.h>
-#include <vlc_keys.h>
+#import "CoreInteraction.h"
+#import <vlc_keys.h>
 
 #pragma mark -
 /*****************************************************************************
@@ -50,7 +50,6 @@
 {
     [super init];
     o_fs_panel = [[VLCFSPanel alloc] init];
-    b_lockAspectRatio = YES;
     return self;
 }
 
@@ -68,136 +67,48 @@
 {
     [[NSNotificationCenter defaultCenter] removeObserver: self];
 
-    [o_fs_panel release];
-
     [super dealloc];
 }
 
 - (IBAction)play:(id)sender
 {
-    intf_thread_t * p_intf = VLCIntf;
-    playlist_t * p_playlist = pl_Get( p_intf );
-    bool empty;
-
-    PL_LOCK;
-    empty = playlist_IsEmpty( p_playlist );
-    PL_UNLOCK;
-
-    if( empty )
-        [[VLCOpen sharedInstance] openFileGeneric];
-
-    var_SetInteger( p_intf->p_libvlc, "key-action", ACTIONID_PLAY_PAUSE );
-}
-
-- (id)voutView
-{
-    id o_window;
-    id o_voutView = nil;
-    id o_embeddedViewList = [[VLCMain sharedInstance] embeddedList];
-    NSEnumerator *o_enumerator = [[NSApp orderedWindows] objectEnumerator];
-    while( !o_voutView && ( o_window = [o_enumerator nextObject] ) )
-    {
-        /* We have an embedded vout */
-        if( [o_embeddedViewList windowContainsEmbedded: o_window] )
-        {
-            o_voutView = [o_embeddedViewList viewForWindow: o_window];
-        }
-        /* We have a detached vout */
-        else if( [[o_window className] isEqualToString: @"VLCVoutWindow"] )
-        {
-            o_voutView = [o_window voutView];
-        }
-    }
-    return [[o_voutView retain] autorelease];
-}
-
-- (BOOL)aspectRatioIsLocked
-{
-    return b_lockAspectRatio;
+    [[VLCCoreInteraction sharedInstance] play];
 }
 
 - (IBAction)stop:(id)sender
 {
-    intf_thread_t * p_intf = VLCIntf;
-    var_SetInteger( p_intf->p_libvlc, "key-action", ACTIONID_STOP );
-    /* Close the window directly, because we do know that there
-     * won't be anymore video. It's currently waiting a bit. */
-    [[[self voutView] window] orderOut:self];
+    [[VLCCoreInteraction sharedInstance] stop];
 }
 
 - (IBAction)faster:(id)sender
 {
-    intf_thread_t * p_intf = VLCIntf;
-    var_SetInteger( p_intf->p_libvlc, "key-action", ACTIONID_FASTER );
+    [[VLCCoreInteraction sharedInstance] faster];
 }
 
 - (IBAction)slower:(id)sender
 {
-    intf_thread_t * p_intf = VLCIntf;
-    var_SetInteger( p_intf->p_libvlc, "key-action", ACTIONID_SLOWER );
+    [[VLCCoreInteraction sharedInstance] slower];
 }
 
 - (IBAction)normalSpeed:(id)sender
 {
-    intf_thread_t * p_intf = VLCIntf;
-    var_SetInteger( p_intf->p_libvlc, "key-action", ACTIONID_RATE_NORMAL );
+    [[VLCCoreInteraction sharedInstance] normalSpeed];
 }
 
 - (IBAction)prev:(id)sender
 {
-    intf_thread_t * p_intf = VLCIntf;
-    var_SetInteger( p_intf->p_libvlc, "key-action", ACTIONID_PREV );
+    [[VLCCoreInteraction sharedInstance] previous];
 }
 
 - (IBAction)next:(id)sender
 {
-    intf_thread_t * p_intf = VLCIntf;
-    var_SetInteger( p_intf->p_libvlc, "key-action", ACTIONID_NEXT );
+    [[VLCCoreInteraction sharedInstance] next];
 }
 
 - (IBAction)random:(id)sender
 {
-    vlc_value_t val;
-    intf_thread_t * p_intf = VLCIntf;
-    playlist_t * p_playlist = pl_Get( p_intf );
+    [[VLCCoreInteraction sharedInstance] shuffle];
 
-    var_Get( p_playlist, "random", &val );
-    val.b_bool = !val.b_bool;
-    var_Set( p_playlist, "random", val );
-    if( val.b_bool )
-    {
-        //vout_OSDMessage( p_intf, SPU_DEFAULT_CHANNEL, "%s", _( "Random On" ) );
-        config_PutInt( p_playlist, "random", 1 );
-    }
-    else
-    {
-        //vout_OSDMessage( p_intf, SPU_DEFAULT_CHANNEL, "%s", _( "Random Off" ) );
-        config_PutInt( p_playlist, "random", 0 );
-    }
-    [self shuffle];
-
-    p_intf->p_sys->b_playmode_update = true;
-    p_intf->p_sys->b_intf_update = true;
-}
-
-/* three little ugly helpers */
-- (void)repeatOne
-{
-    [o_btn_repeat setImage: [NSImage imageNamed:@"repeat-one"]];
-    [o_btn_repeat setAlternateImage: [NSImage imageNamed:@"repeat-one-pressed"]];
-}
-- (void)repeatAll
-{
-    [o_btn_repeat setImage: [NSImage imageNamed:@"repeat-all"]];
-    [o_btn_repeat setAlternateImage: [NSImage imageNamed:@"repeat-all-pressed"]];
-}
-- (void)repeatOff
-{
-    [o_btn_repeat setImage: [NSImage imageNamed:@"repeat"]];
-    [o_btn_repeat setAlternateImage: [NSImage imageNamed:@"repeat-pressed"]];
-}
-- (void)shuffle
-{
     vlc_value_t val;
     playlist_t *p_playlist = pl_Get( VLCIntf );
     var_Get( p_playlist, "random", &val );
@@ -224,57 +135,27 @@
     if( !repeating.b_bool && !looping.b_bool )
     {
         /* was: no repeating at all, switching to Repeat One */
+        [[VLCCoreInteraction sharedInstance] repeatOne];
 
-        /* set our button's look */
-        [self repeatOne];
-
-        /* prepare core communication */
-        repeating.b_bool = true;
-        looping.b_bool = false;
-        config_PutInt( p_playlist, "repeat", 1 );
-        config_PutInt( p_playlist, "loop", 0 );
-
-        /* show the change */
-        //vout_OSDMessage( p_intf, SPU_DEFAULT_CHANNEL, "%s", _( "Repeat One" ) );
+        [o_btn_repeat setImage: [NSImage imageNamed:@"repeat-one"]];
+        [o_btn_repeat setAlternateImage: [NSImage imageNamed:@"repeat-one-pressed"]];
     }
     else if( repeating.b_bool && !looping.b_bool )
     {
         /* was: Repeat One, switching to Repeat All */
+        [[VLCCoreInteraction sharedInstance] repeatAll];
 
-        /* set our button's look */
-        [self repeatAll];
-
-        /* prepare core communication */
-        repeating.b_bool = false;
-        looping.b_bool = true;
-        config_PutInt( p_playlist, "repeat", 0 );
-        config_PutInt( p_playlist, "loop", 1 );
-
-        /* show the change */
-        //vout_OSDMessage( p_intf, SPU_DEFAULT_CHANNEL, "%s", _( "Repeat All" ) );
+        [o_btn_repeat setImage: [NSImage imageNamed:@"repeat-all"]];
+        [o_btn_repeat setAlternateImage: [NSImage imageNamed:@"repeat-all-pressed"]];
     }
     else
     {
         /* was: Repeat All or bug in VLC, switching to Repeat Off */
+        [[VLCCoreInteraction sharedInstance] repeatOff];
 
-        /* set our button's look */
-        [self repeatOff];
-
-        /* prepare core communication */
-        repeating.b_bool = false;
-        looping.b_bool = false;
-        config_PutInt( p_playlist, "repeat", 0 );
-        config_PutInt( p_playlist, "loop", 0 );
-
-        /* show the change */
-        //vout_OSDMessage( p_intf, SPU_DEFAULT_CHANNEL, "%s", _( "Repeat Off" ) );
+        [o_btn_repeat setImage: [NSImage imageNamed:@"repeat"]];
+        [o_btn_repeat setAlternateImage: [NSImage imageNamed:@"repeat-pressed"]];
     }
-
-    /* communicate with core and the main intf loop */
-    var_Set( p_playlist, "repeat", repeating );
-    var_Set( p_playlist, "loop", looping );
-    p_intf->p_sys->b_playmode_update = true;
-    p_intf->p_sys->b_intf_update = true;
 }
 
 
@@ -285,25 +166,10 @@
     playlist_t * p_playlist = pl_Get( p_intf );
 
     var_Get( p_playlist, "repeat", &val );
-    if (!val.b_bool)
-    {
-        var_Set( p_playlist, "loop", val );
-    }
-    val.b_bool = !val.b_bool;
-    var_Set( p_playlist, "repeat", val );
-    if( val.b_bool )
-    {
-        //vout_OSDMessage( p_intf, SPU_DEFAULT_CHANNEL, "%s", _( "Repeat One" ) );
-        config_PutInt( p_playlist, "repeat", 1 );
-    }
+    if(! val.b_bool )
+        [[VLCCoreInteraction sharedInstance] repeatOne];
     else
-    {
-        //vout_OSDMessage( p_intf, SPU_DEFAULT_CHANNEL, "%s", _( "Repeat Off" ) );
-        config_PutInt( p_playlist, "repeat", 0 );
-    }
-
-    p_intf->p_sys->b_playmode_update = true;
-    p_intf->p_sys->b_intf_update = true;
+        [[VLCCoreInteraction sharedInstance] repeatOff];
 }
 
 - (IBAction)loop:(id)sender
@@ -313,25 +179,10 @@
     playlist_t * p_playlist = pl_Get( p_intf );
 
     var_Get( p_playlist, "loop", &val );
-    if (!val.b_bool)
-    {
-        var_Set( p_playlist, "repeat", val );
-    }
-    val.b_bool = !val.b_bool;
-    var_Set( p_playlist, "loop", val );
-    if( val.b_bool )
-    {
-        //vout_OSDMessage( p_intf, SPU_DEFAULT_CHANNEL, "%s", _( "Repeat All" ) );
-        config_PutInt( p_playlist, "loop", 1 );
-    }
+    if(! val.b_bool )
+        [[VLCCoreInteraction sharedInstance] repeatAll];
     else
-    {
-        //vout_OSDMessage( p_intf, SPU_DEFAULT_CHANNEL, "%s", _( "Repeat Off" ) );
-        config_PutInt( p_playlist, "loop", 0 );
-    }
-
-    p_intf->p_sys->b_playmode_update = true;
-    p_intf->p_sys->b_intf_update = true;
+        [[VLCCoreInteraction sharedInstance] repeatOff];
 }
 
 - (IBAction)quitAfterPlayback:(id)sender
@@ -343,53 +194,33 @@
 
 - (IBAction)forward:(id)sender
 {
-    intf_thread_t * p_intf = VLCIntf;
-    var_SetInteger( p_intf->p_libvlc, "key-action", ACTIONID_JUMP_FORWARD_SHORT );
+    [[VLCCoreInteraction sharedInstance] forward];
 }
 
 - (IBAction)backward:(id)sender
 {
-    vlc_value_t val;
-    intf_thread_t * p_intf = VLCIntf;
-    var_SetInteger( p_intf->p_libvlc, "key-action", ACTIONID_JUMP_BACKWARD_SHORT );
+    [[VLCCoreInteraction sharedInstance] backward];
 }
 
 
 - (IBAction)volumeUp:(id)sender
 {
-    intf_thread_t * p_intf = VLCIntf;
-    var_SetInteger( p_intf->p_libvlc, "key-action", ACTIONID_VOL_UP );
-    /* Manage volume status */
-    [o_main manageVolumeSlider];
+    [[VLCCoreInteraction sharedInstance] volumeUp];
 }
 
 - (IBAction)volumeDown:(id)sender
 {
-    intf_thread_t * p_intf = VLCIntf;
-    var_SetInteger( p_intf->p_libvlc, "key-action", ACTIONID_VOL_DOWN );
-    /* Manage volume status */
-    [o_main manageVolumeSlider];
+    [[VLCCoreInteraction sharedInstance] volumeDown];
 }
 
 - (IBAction)mute:(id)sender
 {
-    intf_thread_t * p_intf = VLCIntf;
-    var_SetInteger( p_intf->p_libvlc, "key-action", ACTIONID_VOL_MUTE );
-    /* Manage volume status */
-    [o_main manageVolumeSlider];
+    [[VLCCoreInteraction sharedInstance] mute];
 }
 
 - (IBAction)volumeSliderUpdated:(id)sender
 {
-    intf_thread_t * p_intf = VLCIntf;
-    playlist_t * p_playlist = pl_Get( p_intf );
-    audio_volume_t i_volume = (audio_volume_t)[sender intValue];
-    int i_volume_step;
-
-    i_volume_step = config_GetInt( p_intf->p_libvlc, "volume-step" );
-    aout_VolumeSet( p_playlist, i_volume * i_volume_step );
-    /* Manage volume status */
-    [o_main manageVolumeSlider];
+    [[VLCCoreInteraction sharedInstance] setVolume: [sender intValue]];
 }
 
 - (IBAction)showPosition: (id)sender
@@ -408,12 +239,11 @@
 }
 
 - (IBAction)toogleFullscreen:(id)sender {
-    NSMenuItem *o_mi = [[NSMenuItem alloc] initWithTitle: _NS("Fullscreen") action: nil keyEquivalent:@""];
-    [self windowAction: [o_mi autorelease]];
+    [[VLCCoreInteraction sharedInstance] toggleFullscreen];
 }
 
 - (BOOL) isFullscreen {
-    id o_vout_view = [self voutView];
+    id o_vout_view = [[VLCCoreInteraction sharedInstance] voutView];
     if( o_vout_view )
     {
         return [o_vout_view isFullscreen];
@@ -431,7 +261,7 @@
         vout_thread_t *p_vout = input_GetVout( p_input );
         if( p_vout != NULL )
         {
-            id o_vout_view = [self voutView];
+            id o_vout_view = [[VLCCoreInteraction sharedInstance] voutView];
             if( o_vout_view )
             {
                 if( [o_title isEqualToString: _NS("Half Size") ] )
@@ -454,21 +284,14 @@
                 }
                 else
                 {
-                    /* Fullscreen state for next time will be saved here too */
-                    [o_vout_view toggleFullscreen];
+                    [[VLCCoreInteraction sharedInstance] toggleFullscreen];
                 }
             }
             vlc_object_release( (vlc_object_t *)p_vout );
         }
         else
         {
-            playlist_t * p_playlist = pl_Get( VLCIntf );
-
-            if( [o_title isEqualToString: _NS("Fullscreen")] ||
-                [sender isKindOfClass:[NSButton class]] )
-            {
-                var_ToggleBool( p_playlist, "fullscreen" );
-            }
+            [[VLCCoreInteraction sharedInstance] toggleFullscreen];
         }
         vlc_object_release( p_input );
     }
@@ -514,12 +337,8 @@
 
 - (IBAction)lockVideosAspectRatio:(id)sender
 {
-    if( [sender state] == NSOffState )
-        [sender setState: NSOnState];
-    else
-        [sender setState: NSOffState];
-
-    b_lockAspectRatio = !b_lockAspectRatio;
+    [[VLCCoreInteraction sharedInstance] setAspectRatioLocked: [sender state]];
+    [sender setState: [[VLCCoreInteraction sharedInstance] aspectRatioIsLocked]];
 }
 
 - (IBAction)addSubtitleFile:(id)sender
@@ -557,6 +376,17 @@
                 msg_Warn( VLCIntf, "unable to load subtitles from '%s'",
                          [[[[openPanel URLs] objectAtIndex: i] path] UTF8String] );
         }
+    }
+}
+
+- (id)fspanel
+{
+    if( o_fs_panel )
+        return o_fs_panel;
+    else
+    {
+        msg_Err( VLCIntf, "FSPanel is nil" );
+        return NULL;
     }
 }
 
@@ -606,7 +436,7 @@
                 /* Escape */
                 if( key == (unichar) 0x1b )
                 {
-                    id o_vout_view = [self voutView];
+                    id o_vout_view = [[VLCCoreInteraction sharedInstance] voutView];
                     if( o_vout_view && [o_vout_view isFullscreen] )
                     {
                         [o_vout_view toggleFullscreen];
@@ -689,31 +519,4 @@
     }
 }
 
-- (id)fspanel
-{
-    if( o_fs_panel )
-        return o_fs_panel;
-    else
-    {
-        msg_Err( VLCIntf, "FSPanel is nil" );
-        return NULL;
-    }
-}
-
-@end
-
-/*****************************************************************************
- * VLCTimeField implementation
- *****************************************************************************
- * we need this to catch our click-event in the controller window
- *****************************************************************************/
-
-@implementation VLCTimeField
-- (void)mouseDown: (NSEvent *)ourEvent
-{
-    if( [ourEvent clickCount] > 1 )
-        [[[VLCMain sharedInstance] controls] goToSpecificTime: nil];
-    else
-        [[VLCMain sharedInstance] timeFieldWasClicked: self];
-}
 @end

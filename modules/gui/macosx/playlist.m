@@ -522,6 +522,9 @@
 
 - (void)playModeUpdated
 {
+    //FIXME this is broken, re-write with VLCMainWindow!
+    NSLog( @"playModeUpdated is broken, re-write with VLCMainWindow!" );
+    /*
     playlist_t *p_playlist = pl_Get( VLCIntf );
 
     bool loop = var_GetBool( p_playlist, "loop" );
@@ -533,7 +536,7 @@
     else
         [[[VLCMain sharedInstance] controls] repeatOff];
 
-    [[[VLCMain sharedInstance] controls] shuffle];
+    [[[VLCMain sharedInstance] controls] shuffle];*/
 }
 
 - (void)outlineViewSelectionDidChange:(NSNotification *)notification
