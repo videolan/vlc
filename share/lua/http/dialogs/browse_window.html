@@ -1,20 +1,11 @@
 <script language="javascript" type="text/javascript">
-	var video_types			=	new Array('avi','mp4','wmv','mov','swf','vob','mkv','mpg');
-	var audio_types			=	new Array('mp3','wav');
 	var browse_target		=	'default';
-	function createElementLi(name,type,dir,ext){
-		var icon	=	type=="dir" && name=='..' ? 'Back-48.png' : (type=='dir' ? "Folder-48.png" : ($.inArray(ext,video_types)!=-1 ? "Video-48.png" : ($.inArray(ext,audio_types)!=-1 ? "Audio-48.png" : "Other-48.png")));
-		var open	=	type=="dir" ? "opendir='"+dir+"'" : (type=="file" ? "openfile='"+dir+"'" : "opendev='"+dir+"'");
-		var str		=	"<li class='system_icon ui-widget-content' "+open+" ><img src='images/"+icon+"' width='48px' height='48px' title='"+name+"' alt='"+name+"' style='border: none;background:none;'/><div style='font-size:10px;border:none;background:none;'>"+name+"</div></li>";
-		return str;
-	}
 	$(function(){
 		$('#window_browse').dialog({
 			autoOpen: false,
 			width: 600,
 			height: 650,
 			modal: true,
-			position: ['left','top'],
 			resizable: false,
 			buttons: {
 				"Open":function(){

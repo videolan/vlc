@@ -1,16 +1,39 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!--  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - >
+<  view.html: VLC media player web interface - VLM
+< - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - >
+<  Copyright (C) 2005-2006 the VideoLAN team
+<  $Id$
+<
+<  Authors: Brandon Brooks <bwbrooks -at- archmageinc -dot- com>
+<
+<  This program is free software; you can redistribute it and/or modify
+<  it under the terms of the GNU General Public License as published by
+<  the Free Software Foundation; either version 2 of the License, or
+<  (at your option) any later version.
+<
+<  This program is distributed in the hope that it will be useful,
+<  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<  GNU General Public License for more details.
+<
+<  You should have received a copy of the GNU General Public License
+<  along with this program; if not, write to the Free Software
+<  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
+< - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
 <html xmlns="http://www.w3.org/1999/xhtml">
 
 <head>
 	<title>VLC media player - Flash Viewer</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<link href="favicon.ico" type="image/x-icon" rel="shortcut icon"/>
 	<link type="text/css" href="css/ui-lightness/jquery-ui-1.8.13.custom.css" rel="stylesheet" />
 	<link type="text/css" href="css/main.css" rel="stylesheet" />
+	<script type="text/javascript" src="js/common.js"></script>
 	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
-		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.13/jquery-ui.min.js"></script>
-		<script type="text/javascript" src="http://static.flowplayer.org/js/flowplayer-3.2.6.min.js"></script>
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.13/jquery-ui.min.js"></script>
+	<script type="text/javascript" src="http://static.flowplayer.org/js/flowplayer-3.2.6.min.js"></script>
 	<script language="javascript" type="text/javascript">
-	var stream_server		=	window.location.hostname;
+	
 	$(function(){
 		$('#window_stream').resizable({
 			minHeight: 300,
@@ -22,27 +45,9 @@
 				})
 			}
 		});
-		$('#window_stream_config').dialog({
-			autoOpen: false,
-			width:400,
-			position: ['left','top'],
-			modal: true,
-			buttons:{
-				"Okay":function(){
-					$('#player').empty();
-					$('#player').attr('href',$('#stream_protocol').val()+'://'+$('#stream_host').val()+':'+$('#stream_port').val()+'/'+$('#stream_file').val());
-					flowplayer("player", "http://releases.flowplayer.org/swf/flowplayer-3.2.7.swf");
-					$(this).dialog('close');
-				},
-				"Cancel":function(){
-					$(this).dialog('close');
-				}
-			}
-		});
 		$('#button_stream_config').click(function(){
 			$('#window_stream_config').dialog('open');
 		});
-		$('#stream_host').val(stream_server);
 		$('#player').empty();
 		$('#player').attr('href',$('#stream_protocol').val()+'://'+$('#stream_host').val()+':'+$('#stream_port').val()+'/'+$('#stream_file').val());
 		flowplayer("player", "http://releases.flowplayer.org/swf/flowplayer-3.2.7.swf");
@@ -68,25 +73,9 @@
 			<?vlc print(vlc.misc.version() .. " - Lua Web Interface - " .. vlc.misc.copyright()) ?>
 		</div>
 	</div>
-	<div id="window_stream_config" title="Stream Input Configuration">
-		<table>
-			<tr>
-				<td>Protocol</td>
-				<td><input type="text" name="stream_protocol" id="stream_protocol" value="http" /></td>
-			</tr>
-			<tr>
-				<td>Host</td>
-				<td><input type="text" name="stream_host" id="stream_host" value="" /></td>
-			</tr>
-			<tr>
-				<td>Port</td>
-				<td><input type="text" name="stream_port" id="stream_port" value="8081" /></td>
-			</tr>
-			<tr>
-				<td>File</td>
-				<td><input type="text" name="stream_file" id="stream_file" value="stream.flv" /></td>
-			</tr>
-		</table>
-	</div>
+	<?vlc
+
+	dialogs("stream_config_window.html");
+	?>
 </body>
 </html>

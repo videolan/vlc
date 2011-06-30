@@ -6,25 +6,25 @@ vim:syntax=lua
 < - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - >
 <  Copyright (C) 2005-2006 the VideoLAN team
 <  $Id$
-<
+< 
 <  Authors: Antoine Cellerier <dionoea -at- videolan -dot- org>
-<
+< 
 <  This program is free software; you can redistribute it and/or modify
 <  it under the terms of the GNU General Public License as published by
 <  the Free Software Foundation; either version 2 of the License, or
 <  (at your option) any later version.
-<
+< 
 <  This program is distributed in the hope that it will be useful,
 <  but WITHOUT ANY WARRANTY; without even the implied warranty of
 <  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 <  GNU General Public License for more details.
-<
+< 
 <  You should have received a copy of the GNU General Public License
 <  along with this program; if not, write to the Free Software
 <  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
 < - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
 ]] ?>
-
+<root>
 <?vlc
 --[[
 function a(t,pre)
@@ -42,11 +42,17 @@ function print_playlist(item)
     if item.flags.disabled then return end
     if(item.children) then
         local name = vlc.strings.convert_xml_special_chars(item.name or "")
-        print('<node id="' ..tostring(item.id).. '" name="' ..tostring(name).. '" ro="' ..(item.flags.ro and "ro" or "rw").. '">')
-        for _, child in ipairs(item.children) do
-            print_playlist(child)
-        end
-        print('</node>')
+        if(name ~= "Undefined") then
+			print('<item id="plid_' ..tostring(item.id).. '" name="' ..tostring(name).. '" ro="' ..(item.flags.ro and "ro" or "rw").. '"><content><name>' ..name.. '</name></content>')
+			for _, child in ipairs(item.children) do
+				print_playlist(child)
+			end
+			print('</item>')
+		else
+			for _, child in ipairs(item.children) do
+				print_playlist(child)
+			end
+		end
     else
         local name, path = vlc.strings.convert_xml_special_chars(item.name or "", item.path or "")
         local current_item = vlc.input.item()
@@ -57,7 +63,7 @@ function print_playlist(item)
                 current = 'current="current"'
             end
         end
-        print('<leaf id="' ..tostring(item.id).. '" uri="' ..tostring(path).. '" name="' ..name.. '" ro="' ..(item.flags.ro and "ro" or "rw").. '" duration ="' ..math.floor(item.duration).. '" ' ..current.. ' />')
+        print('<item id="plid_' ..tostring(item.id).. '" uri="' ..tostring(path).. '" name="' ..name.. '" ro="' ..(item.flags.ro and "ro" or "rw").. '" duration ="' ..math.floor(item.duration).. '" ' ..current.. ' ><content><name>' ..name.. '</name></content></item>')
     end
 end
 
@@ -76,3 +82,4 @@ end
 --a(p) --Uncomment to debug
 print_playlist(p)
 ?>
+</root>

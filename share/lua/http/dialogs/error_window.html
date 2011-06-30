@@ -1,0 +1,19 @@
+<script type="text/javascript">
+	$(function(){
+		$('#window_error').dialog({
+			autoOpen: false,
+			width:400,
+			modal: true,
+			buttons:{
+				"Close":function(){
+					$('#error_container').empty();
+					$(this).dialog('close');
+				}
+			}
+			});
+	})
+</script>
+<div id="window_error" title="Error!">
+	<div class="ui-state-error"><div class="ui-icon ui-icon-alert"></div></div>
+	<div id="error_container" class="ui-state-error"></div>
+</div>

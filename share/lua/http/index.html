@@ -1,59 +1,52 @@
+<!--  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - >
+<  index.html: VLC media player web interface - VLM
+< - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - >
+<  Copyright (C) 2005-2006 the VideoLAN team
+<  $Id$
+<
+<  Authors: Brandon Brooks <bwbrooks -at- archmageinc -dot- com>
+<
+<  This program is free software; you can redistribute it and/or modify
+<  it under the terms of the GNU General Public License as published by
+<  the Free Software Foundation; either version 2 of the License, or
+<  (at your option) any later version.
+<
+<  This program is distributed in the hope that it will be useful,
+<  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<  GNU General Public License for more details.
+<
+<  You should have received a copy of the GNU General Public License
+<  along with this program; if not, write to the Free Software
+<  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
+< - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
 <html>
-
 	<head>
 		<title>VLC media player - Web Interface</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<link href="favicon.ico" type="image/x-icon" rel="shortcut icon" />
+		<script type="text/javascript" src="js/common.js"></script>
+		<script type="text/javascript">
+			if(isMobile()){
+				window.location='mobile.html';
+			}
+		</script>
 		<link type="text/css" href="css/ui-lightness/jquery-ui-1.8.13.custom.css" rel="stylesheet" />
 		<link type="text/css" href="css/main.css" rel="stylesheet" />
 		<script type="text/javascript" src="js/jquery-1.5.1.min.js"></script>
 		<script type="text/javascript" src="js/jquery-ui-1.8.13.custom.min.js"></script>
 		<script type="text/javascript" src="js/jquery.jstree.js"></script>
 		<script type="text/javascript" src="http://static.flowplayer.org/js/flowplayer-3.2.6.min.js"></script>
-		<script type="text/javascript" src="js/common.js"></script>
+		<script type="text/javascript" src="js/ui.js"></script>
 		<script type="text/javascript" src="js/controlers.js"></script>
-		
 		<script type="text/javascript">
+			var pollStatus	=	true;
 			$(function(){
 				$('.button').hover(function(){$(this).addClass('ui-state-hover')},function(){$(this).removeClass('ui-state-hover')});
 				$('.button48').hover(
 					function(){$(this).css({'filter':'alpha(opacity=50)','-moz-opacity':'0.5','-khtml-opacity': '0.5'})},
 					function(){$(this).css({'filter':'alpha(opacity=100)','-moz-opacity':'1','-khtml-opacity': '1'})}
 				);
-
-				$( "#seekSlider" ).slider({
-					range: "min",
-					value: 0,
-					min: 0,
-					max: 100,
-					stop: function( event, ui ) {
-						$( "#currentTime" ).empty();
-						$( "#currentTime" ).append( format_time(Math.round((ui.value/100)*$('#seekSlider').attr('totalLength'))) );
-						switch(current_que){
-							case 'main':
-								sendCommand({'command':'seek','val':Math.round((ui.value/100)*$('#seekSlider').attr('totalLength'))});
-								break;
-							case 'stream':
-								sendVLMCmd('control Current seek '+ui.value);
-								break;
-						}
-						
-					}
-				});
-				$( "#volumeSlider" ).slider({
-					range: "min",
-					value: 50,
-					min: 0,
-					max: 100,
-					stop: function( event, ui ) {
-						$( "#currentVolume" ).empty();
-						$( "#currentVolume" ).append( ui.value+"%" );
-						sendCommand({
-							'command':'volume',
-							'val':Math.round(ui.value*5.12)
-						})
-					}
-				});
-				
 				$('#buttonPlayList').click(function(){
 					$('#libraryContainer').animate({
 						height: 'toggle'
@@ -66,49 +59,23 @@
 					})
 					return false;
 				});
+				$('#buttonEqualizer').click(function(){
+					updateEQ();
+					$('#window_equalizer').dialog('open');
+					return false;
+				})
 				$('#buttonOffsets').click(function(){
 					$('#window_offset').dialog('open');
-				})
+					return false;
+				});
+				$('#buttonBatch').click(function(){
+					$('#window_batch').dialog('open');
+					return false;
+				});
 				$('#buttonOpen').click(function(){
 					browse_target	=	'default';
 					browse();
 					$('#window_browse').dialog('open');
-				});
-				$('#buttonStop').click(function(){
-					switch(current_que){
-						case 'main':
-							sendCommand({'command' : 'pl_stop'})
-							break;
-						case 'stream':
-							sendVLMCmd('control Current stop');
-							break;
-					}
-					
-					return false;
-				});
-				$('#buttonPlay').click(function(){
-					if($(this).attr('state')=='stopped'){
-						switch(current_que){
-							case 'main':
-								var id	=	$('.jstree-clicked','#libraryTree').length>0 ?  $('.jstree-clicked','#libraryTree').first().parents().first().attr('id').substr(5) : current_id;
-								sendCommand({'command':'pl_play','id':id});
-								break;
-							case 'stream':
-								sendVLMCmd('control Current play');
-								flowplayer("player", "http://releases.flowplayer.org/swf/flowplayer-3.2.7.swf");
-								break;
-						}
-						
-					}else{
-						switch(current_que){
-							case 'main':
-								sendCommand({'command':'pl_pause'});
-								break;
-							case 'stream':
-								sendVLMCmd('control Current pause');
-								break;
-						}
-					}
 					return false;
 				});
 				$('#buttonPrev').mousedown(function(){
@@ -135,10 +102,6 @@
 						sendCommand({'command':'pl_next'});
 					}
 					intv	=	0;
-					return false;
-				});
-				$('#buttonFull').click(function(){
-					sendCommand({'command':'fullscreen'});
 					return false;
 				});
 				$('#buttonPlEmpty').click(function(){
@@ -179,6 +142,7 @@
 					return false;
 				});
 				$('#buttonStreams, #buttonStreams2').click(function(){
+					updateStreams();
 					$('#window_streams').dialog('open');
 				});
 				$('#buttonSout').click(function(){
@@ -195,12 +159,14 @@
 				$('#windowStreamConfirm').dialog({
 					autoOpen: false,
 					width:600,
-					position: ['left','top'],
 					modal: true,
 					buttons:{
 						"Yes":function(){
 							var file			=	$('[current="current"]','#libraryTree').length>0 ? decodeURIComponent($('[current="current"]','#libraryTree').first().attr('uri').substr(7)) : ($('.jstree-clicked','#libraryTree').length>0 ? decodeURIComponent($('.jstree-clicked','#libraryTree').first().parents().first().attr('uri').substr(7)) : ($('#plid_'+current_id).attr('uri') ? decodeURIComponent($('#plid_'+current_id).attr('uri').substr(7)) : false));
 							if(file){
+								if($('#viewContainer').css('display')=='none'){
+									$('#buttonViewer').click();
+								}
 								var defaultStream	=	'new Current broadcast enabled input "'+file+'" output #transcode{vcodec=FLV1,vb=4096,fps=25,scale=1,acodec=mp3,ab=512,samplerate=44100,channels=2}:std{access='+$('#stream_protocol').val()+',mux=ffmpeg{{mux=flv}},dst=0.0.0.0:'+$('#stream_port').val()+'/'+$('#stream_file').val()+'}';
 								sendVLMCmd('del Current;'+defaultStream+';control Current play');
 								$('#player').empty();
@@ -220,7 +186,6 @@
 			});
 		</script>
 	</head>
-
 	<body>
 		<div align="center">
 		<div id="mainContainer" align="center">
@@ -244,6 +209,8 @@
 							<div id="buttonViewer" class="button ui-widget ui-state-default ui-corner-all" title="Hide / Show Viewer" style="float: left;"><span class="ui-icon ui-icon-video"></span></div>
 							<div id="buttonStreams" class="button ui-widget ui-state-default ui-corner-all" title="Manage Streams" style="float: left;"><span class="ui-icon ui-icon-script"></span></div>
 							<div id="buttonOffsets" class="button ui-widget ui-state-default ui-corner-all" title="Track Synchronisation" style="float: left;"><span class="ui-icon ui-icon-transfer-e-w"></span></div>
+							<div id="buttonEqualizer" class="button ui-widget ui-state-default ui-corner-all" title="Equalizer" style="float: left;"><span class="ui-icon ui-icon-signal"></span></div>
+							<div id="buttonBatch" class="button ui-widget ui-state-default ui-corner-all" title="VLM Batch Commands" style="float: left;"><span class="ui-icon ui-icon-suitcase"></span></div>
 						</td>
 						<td>
 							<div style="margin-left:20px;">
@@ -330,8 +297,7 @@
 		<?vlc
 		current_page = "index"
 
-		dialogs("browse_window.html","stream_window.html","create_stream.html","offset_window.html","mosaic_window.html");
+		dialogs("browse_window.html","stream_window.html","create_stream.html","offset_window.html","mosaic_window.html","equalizer_window.html","batch_window.html","error_window.html");
 		?>
-		
 	</body>
 </html>

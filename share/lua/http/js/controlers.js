@@ -21,6 +21,7 @@ function updateStatus(){
 				$('#currentSubtitleDelay').append(Math.round($('subtitledelay',data).text()*100)/100+'s');
 				$('#seekSlider').attr('totalLength',$('length',data).text());
 				$('#buttonPlay').attr('state',$('state',data).text());
+				$('#buttonPlay').attr('mrl',$('[name="filename"]',data).text());
 				if($('state',data).text()=='playing'){
 					$('#buttonPlay').css({
 						'background-image':'url("images/button_pause-48.png")'
@@ -60,29 +61,64 @@ function updateStatus(){
 						'display':'block'
 					});
 				}else if($('[name="artwork_url"]',data).text()==""){
-					$('#albumArt').css({
-						'visibility':'hidden',
-						'display':'none'
-					});
+					$('#albumArt').attr('src','images/vlc-48.png');
 				}
-				setTimeout( updateStatus, 1000 );
+				if(pollStatus){
+					setTimeout( updateStatus, 1000 );
+				}
+				
 			}
+			$('band',data).each(function(){
+				var id		=	$(this).attr('id');
+				var freq	=	convertHz($(this).attr('freqency'));
+				var value	=	$(this).text() ? $(this).text() : 0;
+				if(!$('#eq_container'+id).length){
+					$('#window_equalizer').append('<div style="float:left;width:44px;" align="center" id="eq_container'+id+'"><div id="eq'+id+'_txt">'+value+'dB</div><div class="eqBand" id="eq'+id+'" style="font-size: 18px;"></div><div>'+freq+'</div></div>');
+					$('#eq'+id).slider({
+						min: -20,
+						max: 20,
+						step: 0.1,
+						range: "min",
+						value: value,
+						animate: true,
+						orientation: "vertical",
+						stop: function(event,ui){
+							$('#'+$(this).attr('id')+'_txt').empty().append(ui.value+'dB');
+							sendCommad({
+								command:'equalizer',
+								val: ui.value,
+								band: $(this).attr('id').substr(2)
+							})
+						},
+						slide: function(event,ui){
+							$('#'+$(this).attr('id')+'_txt').empty().append(ui.value+'dB');
+						}
+					});
+				}else{
+					$('#eq'+id).slider({value:value});
+					$('#eq'+id+'_txt').empty().append(Math.round(value*100)/100+'dB');
+				}
+			});
+			$('#preamp').slider('value',$('preamp',data).text());
+			$('#preamp_txt').empty().append(Math.round($('preamp',data).text()*100)/100+'dB');
 		},
 		error: function(jqXHR,status,error){
 			setTimeout( updateStatus, 500 );
 		}
 	});
 }
-
 function updatePlayList(){
 	$('#libraryTree').jstree('refresh',-1);
 }
-function sendCommand(params){
+function sendCommand(params,append){
 	if(current_que=='stream'){
 		$.ajax({
 			url: 'requests/status.xml',
 			data: params,
 			success:function(data,status,jqXHR){
+				if(append!=undefined){
+					eval(append);
+				}
 				updateStatus();
 				updatePlayList();
 			}
@@ -91,20 +127,26 @@ function sendCommand(params){
 		if(params.plreload===false){
 			$.ajax({
 				url: 'requests/status.xml',
-				data: params
+				data: params,
+				success:function(data,status,jqXHR){
+					if(append!=undefined){
+						eval(append);
+					}
+				}
 			});
 		}else{
 			$.ajax({
 				url: 'requests/status.xml',
 				data: params,
 				success:function(data,status,jqXHR){
+					if(append!=undefined){
+						eval(append);
+					}
 					updatePlayList();
 				}
 			});
-		}
-		
+		}	
 	}
-	
 }
 function browse(dir){
 	dir	=	dir==undefined ? '~' : dir;
@@ -112,6 +154,7 @@ function browse(dir){
 		url: 'requests/browse.xml',
 		data:'dir='+encodeURIComponent(dir),
 		success: function(data,status,jqXHR){
+			var tgt	=	browse_target.indexOf('__')==-1 ? browse_target : browse_target.substr(0,browse_target.indexOf('__'));
 			$('#browse_elements').empty();
             $('element',data).each(function(){
 				if($(this).attr('type')=='dir' || $.inArray($(this).attr('name').substr(-3),video_types)!=-1 || $.inArray($(this).attr('name').substr(-3),audio_types)!=-1){
@@ -122,7 +165,6 @@ function browse(dir){
 				browse($(this).attr('opendir'));
 			});
 			$('[openfile]').dblclick(function(){
-				var tgt	=	browse_target.indexOf('__')==-1 ? browse_target : browse_target.substr(0,browse_target.indexOf('__'));
 				switch(tgt){
 					case '#stream_input':
 						$(browse_target).val($(this).attr('openfile'));
@@ -136,14 +178,39 @@ function browse(dir){
 							'float' : 'left'
 						});
 						break;
+					case '#mobile':
+						break;
 					default:
 						sendCommand('command=in_play&input=file://'+encodeURIComponent($(this).attr('openfile')));
 						break;
 				}
 				$('#window_browse').dialog('close');
 			});
-			$('[selectable]').selectable();
-			
+			$('[opendir]').click(function(){
+				switch(tgt){
+					case '#mobile':
+						browse($(this).attr('opendir'));
+						break;
+					default:
+						break;
+				}
+			});
+			$('[openfile]').click(function(){
+				switch(tgt){
+					case '#mobile':
+						sendCommand('command=in_play&input=file://'+encodeURIComponent($(this).attr('openfile')),"window.location='mobile.html'");
+						break;
+					default:
+						break;
+				}
+			});
+			switch(tgt){
+				case '#mobile':
+					break;
+				default:
+					$('[selectable]').selectable();
+					break;
+			}
 		},
 		error: function(jqXHR,status,error){
 			setTimeout('browse("'+dir+'")',1041);
@@ -256,47 +323,113 @@ function updateStreams(){
 				}
 				setTimeout( updateStreams, 1000 );
 			}
-			
 		}
 	});
 }
-function sendVLMCmd(command){
+function updateEQ(){
+	$.ajax({
+		url: 'requests/equalizer.xml',
+		success: function(data,status,jqXHR){
+			$('band',data).each(function(){
+				var id		=	$(this).attr('id');
+				var freq	=	convertHz($(this).attr('freqency'));
+				var value	=	$(this).text() ? $(this).text() : 0;
+				if(!$('#eq_container'+id).length){
+					$('#window_equalizer').append('<div style="float:left;width:44px;" align="center" id="eq_container'+id+'"><div id="eq'+id+'_txt">'+value+'dB</div><div class="eqBand" id="eq'+id+'" style="font-size: 18px;"></div><div>'+freq+'</div></div>');
+					$('#eq'+id).slider({
+						min: -20,
+						max: 20,
+						step: 0.1,
+						range: "min",
+						value: value,
+						animate: true,
+						orientation: "vertical",
+						stop: function(event,ui){
+							$('#'+$(this).attr('id')+'_txt').empty().append(ui.value+'dB');
+							sendEQCmd({
+								command:'equalizer',
+								val: ui.value,
+								band: $(this).attr('id').substr(2)
+							})
+						},
+						slide: function(event,ui){
+							$('#'+$(this).attr('id')+'_txt').empty().append(ui.value+'dB');
+						}
+					});
+				}else{
+					$('#eq'+id).slider({value:value});
+					$('#eq'+id+'_txt').empty().append(Math.round(value*100)/100+'dB');
+				}
+			});
+			$('#preamp').slider('value',$('preamp',data).text());
+			$('#preamp_txt').empty().append(Math.round($('preamp',data).text()*100)/100+'dB');
+		}
+	})
+}
+function sendVLMCmd(command,append){
 	var commands	=	command.split(';');
 	if(commands.length>1){
-		sendBatchVLMCmd(command);
+		sendBatchVLMCmd(command,append);
 	}else{
 		if(current_que=='main'){
 			$.ajax({
 				url: 'requests/vlm_cmd.xml',
 				data: 'command='+encodeURIComponent(command),
 				success: function(data,status,jqXHR){
+					if($('error',data).text()){
+						$('#error_container').append('<div>'+$('error',data).text()+'</div>');
+						$('#window_error').dialog('open');
+					}
+					if(append!=undefined){
+						eval(append);
+					}
 					updateStreams();
 				}
 			});
 		}else{
 			$.ajax({
 				url: 'requests/vlm_cmd.xml',
-				data: 'command='+encodeURIComponent(command)
+				data: 'command='+encodeURIComponent(command),
+				success: function(data,status,jqXHR){
+					if($('error',data).text()){
+						$('#error_container').append('<div>'+$('error',data).text()+'</div>');
+						$('#window_error').dialog('open');
+					}
+					updateStreams();
+				}
 			});
 		}
-		
 	}
 }
-function sendBatchVLMCmd(command){
+function sendBatchVLMCmd(command,append){
 	var commands	=	command.split(';');
 	$.ajax({
 		url: 'requests/vlm_cmd.xml',
 		data: 'command='+encodeURIComponent(commands.shift()),
 		success:function(data,status,jqXHR){
-			sendVLMCmd(commands.join(';'));
+			if($('error',data).text()){
+				$('#error_container').append('<div>'+$('error',data).text()+'</div>');
+				$('#window_error').dialog('open');
+			}
+			sendVLMCmd(commands.join(';'),append);
 		}
 	});
 }
+function sendEQCmd(params){
+	$.ajax({
+		url: 'requests/equalizer.xml',
+		data: params,
+		success: function(data,status,jqXHR){
+			updateEQ();
+		}
+	});
+}
+
 $(function(){
 	$('#libraryTree').jstree({
 		"xml_data":{
 			"ajax":{
-				"url" : "requests/playlist.xml"
+				"url" : "requests/playlist_jstree.xml"
 			},
 			"xsl" : "nest"
 		},
@@ -317,4 +450,5 @@ $(function(){
 	});
 	updateStatus();
 	updateStreams();
+	updateEQ();
 });

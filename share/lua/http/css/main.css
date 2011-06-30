@@ -90,6 +90,9 @@ body{
 #buttonSout{
 	background-image: url("../images/button_stream-48.png") ;
 }
+#buttonEQ{
+	background-image: url("../images/button-equalizer-48.png") ;
+}
 #window_browse ol{
 	list-style-type: none;
 }
@@ -113,6 +116,18 @@ body{
 }
 #window_create_stream table tr td{
 	font-size: 11px;
+}
+
+#window_equalizer div div{
+	text-align: center;
+	font-size: 11px;
+	padding: 0px;
+}
+.eqBand{
+	margin-bottom: 10px;
+	margin-top: 10px;
+	height: 400px;
+	font-size: 1.5em;
 }
 .footer{
 	text-align: center;

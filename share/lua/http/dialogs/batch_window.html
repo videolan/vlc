@@ -1,0 +1,29 @@
+<script type="text/javascript">
+	$(function(){
+		$('#window_batch').dialog({
+			autoOpen: false,
+			width: 600,
+			modal: true,
+			buttons:{
+				"Send":function(){
+					var cmds	=	$('#batchCommand').val().split("\n");
+					for(var i=0;i<cmds.length;i++){
+						cmds[i]	=	cmds[i].replace(/^#.*$/,'\n');
+					}
+					cmds	=	cmds.join(";").replace(/\n/g,';').replace(/;+/g,';').replace(/^;/,'');
+					sendVLMCmd(cmds);
+					$(this).dialog('close');
+				},
+				"Cancel":function(){
+					$(this).dialog('close');
+				}
+			}
+		});
+	})
+</script>
+<div id="window_batch" title="VLM Batch Commands">
+<textarea id="batchCommand" cols="50" rows="16">
+#paste your VLM commands here
+#separate commands with a new line or a semi-colon
+</textarea>
+</div>

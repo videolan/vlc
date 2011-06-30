@@ -1,0 +1,122 @@
+<!--  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - >
+<  mobile.html: VLC media player web interface - VLM
+< - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - >
+<  Copyright (C) 2005-2006 the VideoLAN team
+<  $Id$
+<
+<  Authors: Brandon Brooks <bwbrooks -at- archmageinc -dot- com>
+<
+<  This program is free software; you can redistribute it and/or modify
+<  it under the terms of the GNU General Public License as published by
+<  the Free Software Foundation; either version 2 of the License, or
+<  (at your option) any later version.
+<
+<  This program is distributed in the hope that it will be useful,
+<  but WITHOUT ANY WARRANTY; without even the implied warranty of
+<  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<  GNU General Public License for more details.
+<
+<  You should have received a copy of the GNU General Public License
+<  along with this program; if not, write to the Free Software
+<  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
+< - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<html>
+	<head>
+		<title>VLC media player - Web Interface</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<meta name="viewport" content="width=device-width; user-scalable=no" />
+		<link href="favicon.ico" type="image/x-icon" rel="shortcut icon" />
+		<script type="text/javascript" src="js/common.js"></script>
+		<link type="text/css" href="css/ui-lightness/jquery-ui-1.8.13.custom.css" rel="stylesheet" />
+		<link type="text/css" href="css/main.css" rel="stylesheet" />
+		<script type="text/javascript" src="js/jquery-1.5.1.min.js"></script>
+		<script type="text/javascript" src="js/jquery-ui-1.8.13.custom.min.js"></script>
+		<script type="text/javascript" src="js/jquery.jstree.js"></script>
+		<script type="text/javascript" src="http://static.flowplayer.org/js/flowplayer-3.2.6.min.js"></script>
+		<script type="text/javascript" src="js/ui.js"></script>
+		<script type="text/javascript" src="js/controlers.js"></script>
+		<script type="text/javascript">
+			var pollStatus	=	true;
+			$(function(){
+				$('#buttonPrev').click(function(){
+					sendCommand({'command':'pl_previous'});
+					return false;
+				});
+				$('#buttonNext').click(function(){
+					sendCommand({'command':'pl_next'});
+					return false;
+				});
+				$('#buttonOpen').click(function(){
+					window.location='mobile_browse.html';
+				});
+				$('#buttonEQ').click(function(){
+					window.location='mobile_equalizer.html';
+				});
+				$('#buttonSout').click(function(){
+					var file			=	  decodeURIComponent($('#buttonPlay').attr('mrl'));
+					if(file){
+						var defaultStream	=	'new Current broadcast enabled input "'+file+'" output #transcode{vcodec=FLV1,vb=4096,fps=25,scale=1,acodec=mp3,ab=512,samplerate=44100,channels=2}:std{access='+$('#stream_protocol').val()+',mux=ffmpeg{{mux=flv}},dst=0.0.0.0:'+$('#stream_port').val()+'/'+$('#stream_file').val()+'}';
+						sendVLMCmd('del Current;'+defaultStream+';control Current play','window.location="mobile_view.html"');
+					}
+					return false;
+				});
+			})
+		</script>
+	</head>
+	<body>
+		<div id="main">
+			<table width="100%" cellpadding="0" cellspacing="0" style="height:100%" border="0">
+
+				<tr>
+					<td valign="top" height="130px">
+						<img id="albumArt" src="/art" width="141px" height="130px" alt="Album Art" style="border:2px solid #000000;"/>
+					</td>
+					<td valign="top" width="125px"  class="ui-widget-content" rowspan="2">
+						<div id="buttonOpen" class="button48  ui-corner-all" title="Open Media"></div>
+						<div id="buttonFull" class="button48  ui-corner-all" title="Full Screen"></div>
+						<div id="buttonEQ" class="button48 ui-corner-all" title="Equalizer"></div>
+						<div id="buttonSout" class="button48  ui-corner-all" title="Easy Stream"></div
+					</td>
+				</tr>
+				<tr>
+					<td>&nbsp;</td>
+				</tr>
+				<tr>
+					<td colspan="2" valign="bottom" height="60px">
+						<div id="volumeSlider" title="Volume" style="width:98%; margin-left:10px; font-size:30px;"><img src="images/speaker-32.png" class="ui-slider-handle" alt="volume"/></div>
+					</td>
+				</tr>
+				<tr>
+					<td colspan="2" valign="bottom" height="20px">
+						<div id="mediaTitle" class="dynamic"></div>
+					</td>
+				</tr>
+				<tr>
+					<td id="controlButtons" colspan="2" valign="bottom" height="108px;" class="ui-widget-content">
+						<div align="center">
+							<div id="buttonPrev" class="button48  ui-corner-all" title="Previous"></div>
+							<div id="buttonPlay" class="button48  ui-corner-all" title="Play"></div>
+							<div id="buttonNext" class="button48  ui-corner-all" title="Next"></div>
+							<div id="buttonStop" class="button48  ui-corner-all" title="Stop"></div>
+						</div>
+						<div id="seekSlider" title="Seek Time" style="width:98%; margin-left:10px;font-size:30px;"></div>
+						<table width="100%">
+							<tr>
+								<td>
+									<div id="currentTime" class="dynamic">00:00:00</div>
+								</td>
+								<td>
+									<div id="totalTime" class="dynamic">00:00:00</div>
+								</td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+			</table>
+		</div>
+		<?vlc
+
+	dialogs("stream_config_window.html");
+	?>
+	</body>
+</html>
