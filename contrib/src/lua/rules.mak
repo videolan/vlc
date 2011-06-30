@@ -28,23 +28,22 @@ $(TARBALLS)/lua-$(LUA_VERSION).tar.gz:
 
 lua: lua-$(LUA_VERSION).tar.gz .sum-lua
 	$(UNPACK)
-	(cd $@-$(LUA_VERSION) && patch -p1) < $(SRC)/lua/lua-noreadline.patch
+	$(APPLY) $(SRC)/lua/lua-noreadline.patch
 ifdef HAVE_MACOSX
-	(cd $@-$(LUA_VERSION) && \
+	(cd $(UNPACK_DIR) && \
 	sed -e 's%gcc%$(CC)%' \
 		-e 's%LDFLAGS=%LDFLAGS=$(EXTRA_CFLAGS) $(EXTRA_LDFLAGS)%' \
 		-i.orig src/Makefile)
 endif
 ifdef HAVE_WIN32
-	cd $@-$(LUA_VERSION) && sed -i.orig -e 's/lua luac/lua.exe/' Makefile
+	cd $(UNPACK_DIR) && sed -i.orig -e 's/lua luac/lua.exe/' Makefile
 endif
-	cd $@-$(LUA_VERSION)/src && sed -i.orig \
+	cd $(UNPACK_DIR)/src && sed -i.orig \
 		-e 's/CC=/#CC=/' \
 		-e 's/= *strip/=$(STRIP)/' \
 		-e 's/= *ranlib/= $(RANLIB)/' \
 		Makefile
-	mv $@-$(LUA_VERSION) $@
-	touch $@
+	$(MOVE)
 
 .lua: lua
 	cd $< && $(HOSTVARS) $(MAKE) $(LUA_TARGET)

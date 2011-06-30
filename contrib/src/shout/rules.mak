@@ -13,9 +13,8 @@ $(TARBALLS)/libshout-$(SHOUT_VERSION).tar.gz:
 # TODO: fix socket stuff on POSIX and Linux
 libshout: libshout-$(SHOUT_VERSION).tar.gz .sum-shout
 	$(UNPACK)
-	(cd $@-$(SHOUT_VERSION) && patch -p1) < $(SRC)/shout/libshout-win32.patch
-	mv libshout-$(SHOUT_VERSION) $@
-	touch $@
+	$(APPLY) $(SRC)/shout/libshout-win32.patch
+	$(MOVE)
 
 ifdef HAVE_FPU
 .shout: .vorbis

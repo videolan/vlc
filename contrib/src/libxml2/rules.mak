@@ -14,8 +14,7 @@ XMLCONF = --with-minimal --with-catalog --with-reader --with-tree --with-push --
 
 libxml2: libxml2-$(LIBXML2_VERSION).tar.gz .sum-libxml2
 	$(UNPACK)
-	mv $@-$(LIBXML2_VERSION) $@
-	touch $@
+	$(MOVE)
 
 ifeq ($(NEED_XML2),)
 .libxml2:

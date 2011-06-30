@@ -12,8 +12,7 @@ $(TARBALLS)/speex-$(SPEEX_VERSION).tar.gz:
 
 speex: speex-$(SPEEX_VERSION).tar.gz .sum-speex
 	$(UNPACK)
-	mv $@-$(SPEEX_VERSION) $@
-	touch $@
+	$(MOVE)
 
 # TODO: fixed point and ASM opts
 

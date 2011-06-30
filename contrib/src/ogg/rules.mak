@@ -15,12 +15,11 @@ $(TARBALLS)/libogg-$(OGG_VERSION).tar.xz:
 
 libogg: libogg-$(OGG_VERSION).tar.xz .sum-ogg
 	$(UNPACK)
-	(cd $@-$(OGG_VERSION) && patch -p1) < $(SRC)/ogg/libogg-1.1.patch
+	$(APPLY) $(SRC)/ogg/libogg-1.1.patch
 ifdef HAVE_WINCE
-	(cd $@-$(OGG_VERSION) && patch -p1) < $(SRC)/ogg/libogg-wince.patch
+	$(APPLY) $(SRC)/ogg/libogg-wince.patch
 endif
-	mv $@-$(OGG_VERSION) $@
-	touch $@
+	$(MOVE)
 
 ifeq ($(NEED_OGG),)
 .ogg:

@@ -13,8 +13,7 @@ $(TARBALLS)/libmatroska-$(MATROSKA_VERSION).tar.bz2:
 
 libmatroska: libmatroska-$(MATROSKA_VERSION).tar.bz2 .sum-matroska
 	$(UNPACK)
-	mv $@-$(MATROSKA_VERSION) $@
-	touch $@
+	$(MOVE)
 
 .matroska: libmatroska .ebml
 ifdef HAVE_WIN32

@@ -13,10 +13,9 @@ $(TARBALLS)/a52dec-$(A52DEC_VERSION).tar.gz:
 a52dec: a52dec-$(A52DEC_VERSION).tar.gz .sum-a52
 	$(UNPACK)
 ifndef HAVE_FPU
-	(cd $@-$(A52DEC_VERSION) && patch -p0) < $(SRC)/a52/liba52-fixed.diff
+	$(APPLY) $(SRC)/a52/liba52-fixed.diff
 endif
-	mv $@-$(A52DEC_VERSION) $@
-	touch $@
+	$(MOVE)
 
 .a52: a52dec
 ifdef HAVE_WIN64

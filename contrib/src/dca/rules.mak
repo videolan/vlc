@@ -14,9 +14,8 @@ $(TARBALLS)/libdca-$(DCA_VERSION).tar.bz2:
 
 libdca: libdca-$(DCA_VERSION).tar.bz2 .sum-dca
 	$(UNPACK)
-	#(cd $@-$(DCA_VERSION) && patch -p1) < $(SRC)/dca/libdca-llvm-gcc.patch
-	mv $@-$(DCA_VERSION) $@
-	touch $@
+	#$(APPLY) $(SRC)/dca/libdca-llvm-gcc.patch
+	$(MOVE)
 
 .dca: libdca
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF)

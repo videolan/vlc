@@ -16,11 +16,11 @@ $(TARBALLS)/tremor-svn.tar.xz:
 tremor: tremor-svn.tar.xz .sum-tremor
 	# Stuff that does not depend on libogg
 	$(UNPACK)
-	(cd tremor-svn && patch -p0) < $(SRC)/tremor/tremor.patch
+	$(APPLY) $(SRC)/tremor/tremor.patch
 	rm -f tremor-svn/ogg.h tremor-svn/os_types.h
 	echo '#include <ogg/ogg.h>' > tremor-svn/ogg.h
 	echo '#include <ogg/os_types.h>' > tremor-svn/os_types.h
-	mv tremor-svn tremor
+	$(MOVE)
 
 .tremor: tremor .ogg
 	# Stuff that depends on libogg

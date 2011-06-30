@@ -12,8 +12,7 @@ $(TARBALLS)/freetype-$(FREETYPE2_VERSION).tar.gz:
 
 freetype: freetype-$(FREETYPE2_VERSION).tar.gz .sum-freetype2
 	$(UNPACK)
-	mv $@-$(FREETYPE2_VERSION) $@
-	touch $@
+	$(MOVE)
 
 ifeq ($(NEED_FREETYPE2),)
 .freetype2:

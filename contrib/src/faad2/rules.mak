@@ -16,11 +16,10 @@ $(TARBALLS)/faad2-$(FAAD2_VERSION).tar.gz:
 faad2: faad2-$(FAAD2_VERSION).tar.gz .sum-faad2
 	$(UNPACK)
 ifndef HAVE_FPU
-	(cd $@-$(FAAD2_VERSION) && patch -p1) < $(SRC)/faad2/faad2-fixed.patch
+	$(APPLY) $(SRC)/faad2/faad2-fixed.patch
 endif
-	(cd $@-$(FAAD2_VERSION) && $(CC) -iquote . -E - </dev/null || sed -i 's/-iquote /-I/' libfaad/Makefile.am)
-	mv $@-$(FAAD2_VERSION) $@
-	touch $@
+	cd $(UNPACK_DIR) && $(CC) -iquote . -E - </dev/null || sed -i 's/-iquote /-I/' libfaad/Makefile.am
+	$(MOVE)
 
 .faad2: faad2
 	cd $< && autoreconf -fiv

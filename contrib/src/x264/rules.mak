@@ -41,10 +41,9 @@ X264_VERSION := git
 x264: x264-$(X264_VERSION).tar.xz .sum-x264
 	$(UNPACK)
 ifdef HAVE_WIN64
-	(cd $@-$(X264_VERSION) && patch -p1) < $(SRC)/x264/x264-svn-win64.patch
+	$(APPLY) < $(SRC)/x264/x264-svn-win64.patch
 endif
-	mv $@-$(X264_VERSION) $@
-	touch $@
+	$(MOVE)
 
 .x264: x264
 	cd $< && $(HOSTVARS) ./configure $(X264CONF)

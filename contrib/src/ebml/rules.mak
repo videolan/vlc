@@ -11,8 +11,7 @@ $(TARBALLS)/libebml-$(EBML_VERSION).tar.bz2:
 
 libebml: libebml-$(EBML_VERSION).tar.bz2 .sum-ebml
 	$(UNPACK)
-	mv $@-$(EBML_VERSION) $@
-	touch $@
+	$(MOVE)
 
 .ebml: libebml
 ifdef HAVE_WIN32

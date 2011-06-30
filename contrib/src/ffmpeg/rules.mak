@@ -127,14 +127,13 @@ FFMPEG_VERSION := svn
 ffmpeg: ffmpeg-$(FFMPEG_VERSION).tar.gz .sum-ffmpeg
 	$(UNPACK)
 ifdef HAVE_WIN64
-	(cd $@-$(FFMPEG_VERSION)/libswscale && patch -p0) < $(SRC)/ffmpeg/ffmpeg-win64.patch
+	$(APPLY) $(SRC)/ffmpeg/ffmpeg-win64.patch
 endif
 ifdef HAVE_WIN32
 	sed -i "s/std=c99/std=gnu99/" $@-$(FFMPEG_VERSION)/configure
 endif
-	(cd $@-$(FFMPEG_VERSION) && patch -p1) < $(SRC)/ffmpeg/libavformat-ape.c.patch
-	mv $@-$(FFMPEG_VERSION) $@
-	touch $@
+	$(APPLY) $(SRC)/ffmpeg/libavformat-ape.c.patch
+	$(MOVE)
 
 .ffmpeg: ffmpeg
 	# TODO: .zlib

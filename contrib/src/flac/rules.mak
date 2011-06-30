@@ -12,13 +12,12 @@ $(TARBALLS)/flac-$(FLAC_VERSION).tar.gz:
 
 flac: flac-$(FLAC_VERSION).tar.gz .sum-flac
 	$(UNPACK)
-	(cd $@-$(FLAC_VERSION) && patch -p1) < $(SRC)/flac/flac-win32.patch
-	(cd $@-$(FLAC_VERSION) && patch -p1) < $(SRC)/flac/libFLAC-pc.patch
+	$(APPLY) $(SRC)/flac/flac-win32.patch
+	$(APPLY) $(SRC)/flac/libFLAC-pc.patch
 ifdef HAVE_MACOSX
-	cd $<-$(FLAC_VERSION) && sed -e 's,-dynamiclib,-dynamiclib -arch $(ARCH),' -i.orig configure
+	cd $(UNPACK_DIR) && sed -e 's,-dynamiclib,-dynamiclib -arch $(ARCH),' -i.orig configure
 endif
-	mv $@-$(FLAC_VERSION) $@
-	touch $@
+	$(MOVE)
 
 FLACCONF := $(HOSTCONF) \
 	--disable--thorough-tests \

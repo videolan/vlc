@@ -20,8 +20,7 @@ twolame: twolame-$(TWOLAME_VERSION).tar.gz twolame-winutil.h .sum-twolame
 ifdef HAVE_WIN32
 	cp -f $(filter %winutil.h,$^) $@-$(TWOLAME_VERSION)/win32/winutil.h
 endif
-	mv $@-$(TWOLAME_VERSION) $@
-	touch $@
+	$(MOVE)
 
 .twolame: twolame
 	cd $< && $(HOSTVARS) CFLAGS="${CFLAGS} -DLIBTWOLAME_STATIC" ./configure $(HOSTCONF)

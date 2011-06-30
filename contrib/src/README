@@ -41,7 +41,7 @@ source code is fully ready. Otherwise Makefile dependencies will break
 		$(UNPACK) # to libfoo-$(FOO_VERSION)
 		### apply patches here ###
 		# last command: make the target directory
-		mv libfoo-$(FOO_VERSION) libfoo
+		$(MOVE)
 
 	.foo: libfoo
 		cd $< && $(HOSTVARS) ./configure $(HOSTCONF)

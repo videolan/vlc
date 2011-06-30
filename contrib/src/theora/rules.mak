@@ -13,12 +13,11 @@ $(TARBALLS)/libtheora-$(THEORA_VERSION).tar.xz:
 
 libtheora: libtheora-$(THEORA_VERSION).tar.xz .sum-theora
 	$(UNPACK)
-	(cd $@-$(THEORA_VERSION) && patch -p1) < $(SRC)/theora/libtheora-includes.patch
+	$(APPLY) $(SRC)/theora/libtheora-includes.patch
 ifdef HAVE_WIN64
-	cd $@ && autoreconf -fi -I m4
+	cd $(UNPACK_DIR) && autoreconf -fi -I m4
 endif
-	mv $@-$(THEORA_VERSION) $@
-	touch $@
+	$(MOVE)
 
 THEORACONF := $(HOSTCONF) \
 	--disable-spec \

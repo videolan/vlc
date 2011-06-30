@@ -12,9 +12,8 @@ $(TARBALLS)/libdvbpsi-$(DVBPSI_VERSION).tar.bz2:
 
 libdvbpsi: libdvbpsi-$(DVBPSI_VERSION).tar.bz2 .sum-dvbpsi
 	$(UNPACK)
-	(cd $@-$(DVBPSI_VERSION) && patch -p1) < $(SRC)/dvbpsi/libdvbpsi-example.patch
-	mv $@-$(DVBPSI_VERSION) $@
-	touch $@
+	$(APPLY) $(SRC)/dvbpsi/libdvbpsi-example.patch
+	$(MOVE)
 
 .dvbpsi: libdvbpsi
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) --enable-release

@@ -12,8 +12,7 @@ $(TARBALLS)/libmodplug-$(MODPLUG_VERSION).tar.gz:
 
 libmodplug: libmodplug-$(MODPLUG_VERSION).tar.gz .sum-modplug
 	$(UNPACK)
-	mv $@-$(MODPLUG_VERSION) $@
-	touch $@
+	$(MOVE)
 
 .modplug: libmodplug
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF)

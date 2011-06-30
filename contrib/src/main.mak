@@ -177,6 +177,9 @@ UNPACK = $(RM) -R $@ \
 	$(foreach f,$(filter %.tar.bz2,$^), && tar xvjf $(f)) \
 	$(foreach f,$(filter %.tar.xz,$^), && tar xvJf $(f)) \
 	$(foreach f,$(filter %.zip,$^), && unzip $(f))
+UNPACK_DIR = $(basename $(basename $(notdir $<)))
+APPLY = (cd $(UNPACK_DIR) && patch -p1) <
+MOVE = mv $(UNPACK_DIR) $@ && touch $@
 
 #
 # Per-package build rules

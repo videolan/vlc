@@ -18,8 +18,7 @@ ifdef HAVE_MACOSX
 		-e 's%-dynamiclib%-dynamiclib -arch $(ARCH)%' \
 		-i.orig configure
 endif
-	mv $@-$(MAD_VERSION) $@
-	touch $@
+	$(MOVE)
 
 .mad: libmad
 	cd $< && $(HOSTVARS) CFLAGS="$(CFLAGS) -O3 $(NOTHUMB)" ./configure $(HOSTCONF)

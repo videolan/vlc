@@ -18,8 +18,7 @@ $(TARBALLS)/libvorbis-$(VORBIS_VERSION).tar.xz:
 
 libvorbis: libvorbis-$(VORBIS_VERSION).tar.xz .sum-vorbis
 	$(UNPACK)
-	mv $@-$(VORBIS_VERSION) $@
-	touch $@
+	$(MOVE)
 
 .vorbis: libvorbis .ogg
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) --disable-docs --disable-examples --disable-oggtest
