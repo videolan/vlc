@@ -193,7 +193,7 @@ ${VLCROOT}/configure \
     --disable-macosx-qtcapture \
     --disable-macosx-eyetv \
     --disable-macosx-vlc-app \
-    --with-macosx-sdk=${IO_SDK_ROOT} \
+    --with-macosx-sdk=${IOS_SDK_ROOT} \
     --enable-audioqueue \
     --enable-ios-vout \
     --enable-avcodec \
