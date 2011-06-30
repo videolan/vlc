@@ -38,10 +38,8 @@ endif
 	touch $@
 
 .mpcdec: musepack toolchain.cmake
-	cd $< && cmake . \
-		-DCMAKE_TOOLCHAIN_FILE=../toolchain.cmake \
-		-DCMAKE_INSTALL_PREFIX="$(PREFIX)"
-	cd $< && make
+	cd $< && $(CMAKE) .
+	cd $< && $(MAKE)
 	mkdir -p -- "$(PREFIX)/lib"
 ifdef HAVE_WIN32
 	cd $< && cp libmpcdec/libmpcdec_static.a "$(PREFIX)/lib/libmpcdec.a"

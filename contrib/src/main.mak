@@ -181,6 +181,9 @@ UNPACK_DIR = $(basename $(basename $(notdir $<)))
 APPLY = (cd $(UNPACK_DIR) && patch -p1) <
 MOVE = mv $(UNPACK_DIR) $@ && touch $@
 
+CMAKE = cmake . -DCMAKE_TOOLCHAIN_FILE=$(abspath toolchain.cmake) \
+		-DCMAKE_INSTALL_PREFIX=$(PREFIX)
+
 #
 # Per-package build rules
 #
