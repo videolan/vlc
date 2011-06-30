@@ -58,7 +58,7 @@ static int    CacheLoadConfig  ( module_t *, FILE * );
 
 /* Sub-version number
  * (only used to avoid breakage in dev version when cache structure changes) */
-#define CACHE_SUBVERSION_NUM 14
+#define CACHE_SUBVERSION_NUM 15
 
 /* Cache filename */
 #define CACHE_NAME "plugins.dat"
