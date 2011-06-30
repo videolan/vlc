@@ -340,7 +340,6 @@ static int CacheLoadConfig( module_t *p_module, FILE *file )
         LOAD_STRING( p_module->p_config[i].psz_text );
         LOAD_STRING( p_module->p_config[i].psz_longtext );
         LOAD_STRING( p_module->p_config[i].psz_oldname );
-        LOAD_IMMEDIATE( p_module->p_config[i].b_removed );
 
         if (IsConfigStringType (p_module->p_config[i].i_type))
         {
@@ -600,7 +599,6 @@ static int CacheSaveConfig (FILE *file, const module_t *p_module)
         SAVE_STRING( p_module->p_config[i].psz_text );
         SAVE_STRING( p_module->p_config[i].psz_longtext );
         SAVE_STRING( p_module->p_config[i].psz_oldname );
-        SAVE_IMMEDIATE( p_module->p_config[i].b_removed );
 
         if (IsConfigStringType (p_module->p_config[i].i_type))
             SAVE_STRING( p_module->p_config[i].orig.psz );
