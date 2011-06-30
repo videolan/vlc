@@ -1,7 +1,7 @@
 /*****************************************************************************
  * playlist.c
  *****************************************************************************
- * Copyright (C) 2007-2008 the VideoLAN team
+ * Copyright (C) 2007-2011 the VideoLAN team
  * $Id$
  *
  * Authors: Antoine Cellerier <dionoea at videolan tod org>
@@ -134,6 +134,16 @@ static int vlclua_playlist_goto( lua_State * L )
     int i_ret = playlist_Control( p_playlist, PLAYLIST_VIEWPLAY,
                                   true, NULL,
                                   playlist_ItemGetById( p_playlist, i_id ) );
+    PL_UNLOCK;
+    return vlclua_push_ret( L, i_ret );
+}
+
+static int vlclua_playlist_delete( lua_State * L )
+{
+    int i_id = luaL_checkint( L, 1 );
+    playlist_t *p_playlist = vlclua_get_playlist_internal( L );
+    PL_LOCK;
+    int i_ret = playlist_DeleteFromInput(p_playlist, playlist_ItemGetById( p_playlist, i_id ) -> p_input, true );
     PL_UNLOCK;
     return vlclua_push_ret( L, i_ret );
 }
@@ -378,6 +388,7 @@ static const luaL_Reg vlclua_playlist_reg[] = {
     { "current", vlclua_playlist_current },
     { "sort", vlclua_playlist_sort },
     { "status", vlclua_playlist_status },
+    { "delete", vlclua_playlist_delete },
     { NULL, NULL }
 };
 

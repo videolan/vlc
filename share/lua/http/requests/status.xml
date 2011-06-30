@@ -83,8 +83,7 @@ elseif command == "pl_next" then
 elseif command == "pl_previous" then
   vlc.playlist.prev()
 elseif command == "pl_delete" then
-  vlc.msg.err("FIXME: pl_delete unimplemented")
-  --vlc.playlist.delete(id)
+  vlc.playlist.delete(id)
 elseif command == "pl_empty" then
   vlc.playlist.clear()
 elseif command == "pl_sort" then
