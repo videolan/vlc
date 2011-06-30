@@ -3,7 +3,10 @@
 FAAD2_VERSION := 2.7
 FAAD2_URL := $(SF)/faac/faad2-$(FAAD2_VERSION).tar.gz
 
+ifeq ($(findstring $(ARCH),arm),)
+# FAAD is a lot slower than lavc on ARM. Skip it.
 PKGS += faad2
+endif
 
 $(TARBALLS)/faad2-$(FAAD2_VERSION).tar.gz:
 	$(call download,$(FAAD2_URL))
