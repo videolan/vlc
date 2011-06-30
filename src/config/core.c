@@ -63,7 +63,7 @@ int config_GetType( vlc_object_t *p_this, const char *psz_name )
         return 0;
     }
 
-    switch( p_config->i_type & ~0x1F )
+    switch( CONFIG_CLASS(p_config->i_type) )
     {
     case CONFIG_ITEM_FLOAT:
         i_type = VLC_VAR_FLOAT;

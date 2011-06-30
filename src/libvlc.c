@@ -1482,48 +1482,43 @@ static void Usage( libvlc_int_t *p_this, char const *psz_search )
                 continue;
             }
 
-            switch( p_item->i_type )
+            switch( CONFIG_CLASS(p_item->i_type) )
             {
-            case CONFIG_HINT_CATEGORY:
-            case CONFIG_HINT_USAGE:
-                if( !strcmp( "main", p_parser->psz_object_name ) )
+            case 0: // hint class
+                switch( p_item->i_type )
                 {
-                    if( b_color )
-                        utf8_fprintf( stdout, GREEN "\n %s\n" GRAY,
-                                      module_gettext( p_parser, p_item->psz_text ) );
-                    else
-                        utf8_fprintf( stdout, "\n %s\n",
-                                      module_gettext( p_parser, p_item->psz_text ) );
-                }
-                if( b_description && p_item->psz_longtext )
-                {
-                    if( b_color )
-                        utf8_fprintf( stdout, CYAN " %s\n" GRAY,
-                                      module_gettext( p_parser, p_item->psz_longtext ) );
-                    else
-                        utf8_fprintf( stdout, " %s\n",
-                                      module_gettext( p_parser, p_item->psz_longtext ) );
+                case CONFIG_HINT_CATEGORY:
+                case CONFIG_HINT_USAGE:
+                    if( !strcmp( "main", p_parser->psz_object_name ) )
+                    {
+                        if( b_color )
+                            utf8_fprintf( stdout, GREEN "\n %s\n" GRAY,
+                                          module_gettext( p_parser, p_item->psz_text ) );
+                        else
+                            utf8_fprintf( stdout, "\n %s\n",
+                                          module_gettext( p_parser, p_item->psz_text ) );
+                    }
+                    if( b_description && p_item->psz_longtext )
+                    {
+                        if( b_color )
+                            utf8_fprintf( stdout, CYAN " %s\n" GRAY,
+                                          module_gettext( p_parser, p_item->psz_longtext ) );
+                        else
+                            utf8_fprintf( stdout, " %s\n",
+                                          module_gettext( p_parser, p_item->psz_longtext ) );
                 }
                 break;
 
-            case CONFIG_HINT_SUBCATEGORY:
-                if( strcmp( "main", p_parser->psz_object_name ) )
+                case CONFIG_HINT_SUBCATEGORY:
+                    if( strcmp( "main", p_parser->psz_object_name ) )
+                        break;
+                case CONFIG_SECTION:
+                    p_section = p_item;
                     break;
-            case CONFIG_SECTION:
-                p_section = p_item;
+                }
                 break;
 
             case CONFIG_ITEM_STRING:
-            case CONFIG_ITEM_LOADFILE:
-            case CONFIG_ITEM_SAVEFILE:
-            case CONFIG_ITEM_DIRECTORY:
-            case CONFIG_ITEM_KEY:
-            case CONFIG_ITEM_MODULE: /* We could also have "=<" here */
-            case CONFIG_ITEM_MODULE_CAT:
-            case CONFIG_ITEM_MODULE_LIST:
-            case CONFIG_ITEM_MODULE_LIST_CAT:
-            case CONFIG_ITEM_FONT:
-            case CONFIG_ITEM_PASSWORD:
                 print_help_section( p_parser, p_section, b_color,
                                     b_description );
                 p_section = NULL;
@@ -1545,7 +1540,6 @@ static void Usage( libvlc_int_t *p_this, char const *psz_search )
                 }
                 break;
             case CONFIG_ITEM_INTEGER:
-            case CONFIG_ITEM_RGB:
                 print_help_section( p_parser, p_section, b_color,
                                     b_description );
                 p_section = NULL;
@@ -1621,7 +1615,8 @@ static void Usage( libvlc_int_t *p_this, char const *psz_search )
                  - strlen( psz_bra ) - strlen( psz_type )
                  - strlen( psz_ket ) - 1;
 
-            if( p_item->i_type == CONFIG_ITEM_BOOL && !b_help_module )
+            if( CONFIG_CLASS(p_item->i_type) == CONFIG_ITEM_BOOL
+             && !b_help_module )
             {
                 psz_prefix =  ", --no-";
                 i -= strlen( p_item->psz_name ) + strlen( psz_prefix );
@@ -1637,7 +1632,8 @@ static void Usage( libvlc_int_t *p_this, char const *psz_search )
                 psz_spaces[i] = '\0';
             }
 
-            if( p_item->i_type == CONFIG_ITEM_BOOL && !b_help_module )
+            if( CONFIG_CLASS(p_item->i_type) == CONFIG_ITEM_BOOL
+             && !b_help_module )
             {
                 utf8_fprintf( stdout, psz_format_bool, psz_short,
                               p_item->psz_name, psz_prefix, p_item->psz_name,

@@ -213,7 +213,7 @@ int config_LoadConfigFile( vlc_object_t *p_this )
             continue;
 
         const char *psz_option_value = ptr + 1;
-        switch (item->i_type)
+        switch (CONFIG_CLASS(item->i_type))
         {
             case CONFIG_ITEM_BOOL:
             case CONFIG_ITEM_INTEGER:
@@ -521,7 +521,7 @@ static int SaveConfigFile (vlc_object_t *p_this)
             {
                 int64_t val = p_item->value.i;
                 config_Write (file, p_item->psz_text,
-                              (p_item->i_type == CONFIG_ITEM_BOOL)
+                             (CONFIG_CLASS(p_item->i_type) == CONFIG_ITEM_BOOL)
                                   ? N_("boolean") : N_("integer"),
                               val == p_item->orig.i,
                               p_item->psz_name, "%"PRId64, val);

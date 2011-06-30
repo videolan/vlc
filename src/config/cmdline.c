@@ -139,38 +139,35 @@ int config_LoadCmdLine( vlc_object_t *p_this, int i_argc,
             /* Add item to long options */
             p_longopts[i_index].name = strdup( p_item->psz_name );
             if( p_longopts[i_index].name == NULL ) continue;
-            p_longopts[i_index].has_arg =
-                (p_item->i_type != CONFIG_ITEM_BOOL);
             p_longopts[i_index].flag = &flag;
             p_longopts[i_index].val = 0;
-            i_index++;
 
-            /* When dealing with bools we also need to add the --no-foo
-             * option */
-            if( p_item->i_type == CONFIG_ITEM_BOOL )
+            if( CONFIG_CLASS(p_item->i_type) != CONFIG_ITEM_BOOL )
+                p_longopts[i_index].has_arg = true;
+            else
+            /* Booleans also need --no-foo and --nofoo options */
             {
-                char *psz_name = malloc( strlen(p_item->psz_name) + 3 );
-                if( psz_name == NULL ) continue;
-                strcpy( psz_name, "no" );
-                strcat( psz_name, p_item->psz_name );
+                char *psz_name;
 
+                p_longopts[i_index].has_arg = false;
+                i_index++;
+
+                if( asprintf( &psz_name, "no%s", p_item->psz_name ) == -1 )
+                    continue;
                 p_longopts[i_index].name = psz_name;
                 p_longopts[i_index].has_arg = false;
                 p_longopts[i_index].flag = &flag;
                 p_longopts[i_index].val = 1;
                 i_index++;
 
-                psz_name = malloc( strlen(p_item->psz_name) + 4 );
-                if( psz_name == NULL ) continue;
-                strcpy( psz_name, "no-" );
-                strcat( psz_name, p_item->psz_name );
-
+                if( asprintf( &psz_name, "no-%s", p_item->psz_name ) == -1 )
+                    continue;
                 p_longopts[i_index].name = psz_name;
                 p_longopts[i_index].has_arg = false;
                 p_longopts[i_index].flag = &flag;
                 p_longopts[i_index].val = 1;
-                i_index++;
             }
+            i_index++;
 
             /* If item also has a short option, add it */
             if( p_item->i_short )
@@ -242,23 +239,13 @@ int config_LoadCmdLine( vlc_object_t *p_this, int i_argc,
                     psz_name = p_conf->psz_name;
                 }
 
-                switch( p_conf->i_type )
+                switch( CONFIG_CLASS(p_conf->i_type) )
                 {
                     case CONFIG_ITEM_STRING:
-                    case CONFIG_ITEM_PASSWORD:
-                    case CONFIG_ITEM_LOADFILE:
-                    case CONFIG_ITEM_SAVEFILE:
-                    case CONFIG_ITEM_DIRECTORY:
-                    case CONFIG_ITEM_KEY:
-                    case CONFIG_ITEM_MODULE:
-                    case CONFIG_ITEM_MODULE_LIST:
-                    case CONFIG_ITEM_MODULE_LIST_CAT:
-                    case CONFIG_ITEM_MODULE_CAT:
                         var_Create( p_this, psz_name, VLC_VAR_STRING );
                         var_SetString( p_this, psz_name, state.arg );
                         break;
                     case CONFIG_ITEM_INTEGER:
-                    case CONFIG_ITEM_RGB:
                         var_Create( p_this, psz_name, VLC_VAR_INTEGER );
                         var_SetInteger( p_this, psz_name,
                                         strtoll(state.arg, NULL, 0));
@@ -280,17 +267,9 @@ int config_LoadCmdLine( vlc_object_t *p_this, int i_argc,
         if( pp_shortopts[i_cmd] != NULL )
         {
             const char *name = pp_shortopts[i_cmd]->psz_name;
-            switch( pp_shortopts[i_cmd]->i_type )
+            switch( CONFIG_CLASS(pp_shortopts[i_cmd]->i_type) )
             {
                 case CONFIG_ITEM_STRING:
-                case CONFIG_ITEM_PASSWORD:
-                case CONFIG_ITEM_LOADFILE:
-                case CONFIG_ITEM_SAVEFILE:
-                case CONFIG_ITEM_DIRECTORY:
-                case CONFIG_ITEM_MODULE:
-                case CONFIG_ITEM_MODULE_CAT:
-                case CONFIG_ITEM_MODULE_LIST:
-                case CONFIG_ITEM_MODULE_LIST_CAT:
                     var_Create( p_this, name, VLC_VAR_STRING );
                     var_SetString( p_this, name, state.arg );
                     break;

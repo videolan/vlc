@@ -42,6 +42,8 @@ void config_UnsortConfig (void);
 
 char *config_GetDataDirDefault( void );
 
+#define CONFIG_CLASS(x) ((x) & ~0x1F)
+
 static inline bool IsConfigStringType(unsigned type)
 {
     return (type & CONFIG_ITEM_STRING) != 0;
