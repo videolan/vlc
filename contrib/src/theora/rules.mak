@@ -15,7 +15,7 @@ libtheora: libtheora-$(THEORA_VERSION).tar.xz .sum-theora
 	$(UNPACK)
 	$(APPLY) $(SRC)/theora/libtheora-includes.patch
 ifdef HAVE_WIN64
-	cd $(UNPACK_DIR) && autoreconf -fi -I m4
+	cd $(UNPACK_DIR) && autoreconf -fi -I m4 $(ACLOCAL_AMFLAGS)
 endif
 	$(MOVE)
 

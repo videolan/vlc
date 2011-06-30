@@ -27,7 +27,7 @@ else
 PKGS += ogg
 
 .ogg: libogg
-	#cd $< && autoreconf
+	#cd $< && autoreconf -fiv $(ACLOCAL_AMFLAGS)
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF)
 	cd $< && $(MAKE) install
 endif

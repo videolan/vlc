@@ -19,7 +19,7 @@ endif
 
 .a52: a52dec
 ifdef HAVE_WIN64
-	cd $< && autoreconf -fi
+	cd $< && autoreconf -fiv $(ACLOCAL_AMFLAGS)
 endif
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF)
 	cd $</liba52 && $(MAKE) install
