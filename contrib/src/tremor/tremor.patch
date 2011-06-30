@@ -1,7 +1,7 @@
-Index: os.h
+Index: tremor-svn/os.h
 ===================================================================
---- os.h	(révision 17483)
-+++ os.h	(copie de travail)
+--- tremor-svn.orig/os.h	(révision 17483)
++++ tremor-svn/os.h	(copie de travail)
 @@ -20,6 +20,14 @@
  #include <math.h>
  #include <ogg/os_types.h>
