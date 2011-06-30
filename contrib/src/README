@@ -19,9 +19,8 @@ is correct, e.g.:
 	$(TARBALLS)/libfoo-$(FOO_VERSION).tar.bz2:
 		$(WGET) $(FOO_URL)
 
-	.sum-foo: $(TARBALLS)/libfoo-$(FOO_VERSION).tar.bz2
-		$(CHECKSUM) $(SRC)/foo/SHA512SUMS
-		touch $@
+	# This will use the default rule: check SHA-512
+	.sum-foo: libfoo-$(FOO_VERSION).tar.bz2
 
 NOTE: contrary to the previous VLC contribs, this system always uses
 a source tarball, even if the source code is downloaded from a VCS.
@@ -38,8 +37,8 @@ case, care must be taken that the directory name only exists if the
 source code is fully ready. Otherwise Makefile dependencies will break
 (this is not an issue for files, only directories).
 
-	libfoo: $(TARBALLS)/libfoo-$(FOO_VERSION).tar.bz2 .sum-foo
-		$(EXTRACT_BZ2) # to libfoo-$(FOO_VERSION)
+	libfoo: libfoo-$(FOO_VERSION).tar.bz2 .sum-foo
+		$(UNPACK) # to libfoo-$(FOO_VERSION)
 		### apply patches here ###
 		# last command: make the target directory
 		mv libfoo-$(FOO_VERSION) libfoo
