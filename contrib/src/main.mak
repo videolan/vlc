@@ -33,6 +33,9 @@ ifneq ($(findstring $(ARCH),i386 sparc sparc64 ppc ppc64 x86_64),)
 # This should be consistent with include/vlc_cpu.h
 HAVE_FPU = 1
 endif
+ifeq ($(ARCH)-$(HAVE_WIN32),x86_64-1)
+HAVE_WIN64 := 1
+endif
 
 ifdef HAVE_CROSS_COMPILE
 need_pkg = 1
