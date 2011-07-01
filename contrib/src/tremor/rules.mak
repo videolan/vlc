@@ -24,7 +24,7 @@ tremor: tremor-svn.tar.xz .sum-tremor
 
 .tremor: tremor .ogg
 	# Stuff that depends on libogg
-	cd $< && autoreconf -fiv $(ACLOCAL_AMFLAGS)
+	$(RECONF)
 	cd $< && \
 	$(HOSTVARS) CFLAGS="$(CFLAGS) $(NOTHUMB)" ./configure $(HOSTCONF)
 	cd $< && $(MAKE) install

@@ -18,7 +18,7 @@ libtiger: libtiger-$(TIGER_VERSION).tar.gz .sum-tiger
 	$(MOVE)
 
 .tiger: libtiger .kate
-	cd $< && autoreconf -fiv $(ACLOCAL_AMFLAGS)
+	$(RECONF)
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) --disable-doc
 	cd $< && $(MAKE) install
 	touch $@

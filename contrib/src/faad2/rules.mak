@@ -22,7 +22,7 @@ endif
 	$(MOVE)
 
 .faad2: faad2
-	cd $< && autoreconf -fiv $(ACLOCAL_AMFLAGS)
+	$(RECONF)
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) CFLAGS="$(NOTHUMB)"
 	cd $< && sed -i.orig "s/shrext_cmds/shrext/g" libtool
 	cd $</libfaad && $(MAKE) install

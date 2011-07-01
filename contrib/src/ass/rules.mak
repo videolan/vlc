@@ -16,7 +16,7 @@ libass: libass-$(ASS_VERSION).tar.gz .sum-ass
 #TODO .fontconfig
 
 .ass: libass .freetype2
-	#cd $< && autoreconf -fiv $(ACLOCAL_AMFLAGS)
+	#$(RECONF)
 	cd $< && $(HOSTVARS) CFLAGS="$(CFLAGS) -O3" ./configure $(HOSTCONF) --disable-png --disable-enca
 	cd $< && $(MAKE) install
 	touch $@
