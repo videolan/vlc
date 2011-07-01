@@ -41,7 +41,7 @@ X264_VERSION := git
 x264: x264-$(X264_VERSION).tar.xz .sum-x264
 	$(UNPACK)
 ifdef HAVE_WIN64
-	$(APPLY) < $(SRC)/x264/x264-svn-win64.patch
+	$(APPLY) $(SRC)/x264/x264-svn-win64.patch
 endif
 	$(MOVE)
 
