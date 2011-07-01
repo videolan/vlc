@@ -945,7 +945,7 @@ static int ffmpeg_GetFrameBuf( struct AVCodecContext *p_context,
     if( p_sys->p_va )
     {
 #ifdef HAVE_AVCODEC_VA
-        /* hwaccel_context is not present in old fffmpeg version */
+        /* hwaccel_context is not present in old ffmpeg version */
         if( vlc_va_Setup( p_sys->p_va,
                           &p_sys->p_context->hwaccel_context, &p_dec->fmt_out.video.i_chroma,
                           p_sys->p_context->width, p_sys->p_context->height ) )
