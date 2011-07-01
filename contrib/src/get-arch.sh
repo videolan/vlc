@@ -7,6 +7,9 @@ if test -z "$HOST"; then
 fi
 
 case "$HOST" in
+	amd64-*)
+		ARCH="x86_64"
+		;;
 	i[3456]86-*)
 		ARCH="i386"
 		;;
