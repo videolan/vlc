@@ -1,7 +1,7 @@
-Index: swscale_template.c
+Index: ffmpeg-svn/libswscale/swscale_template.c
 ===================================================================
---- swscale_template.c	(revision 31036)
-+++ swscale_template.c	(working copy)
+--- ffmpeg-svn/libswscale/swscale_template.c	(revision 31036)
++++ ffmpeg-svn/libswscale/swscale_template.c	(working copy)
 @@ -2466,6 +2466,7 @@
          }
      } else {
