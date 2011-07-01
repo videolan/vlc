@@ -13,7 +13,7 @@ $(TARBALLS)/dshow-headers-oss.tar.bz2:
 	$(call download,$(DSHOW_HEADERS_URL))
 
 $(TARBALLS)/d2d_headers.tar.gz:
-	$(call download,$(D2D_URL) -O $@)
+	$(call download,$(D2D_URL))
 
 DSHOW_SOURCES := dshow-headers-oss.tar.bz2 d2d_headers.tar.gz
 
