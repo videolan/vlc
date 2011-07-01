@@ -88,32 +88,28 @@ diff -ruN live/liveMedia/MP3StreamState.cpp live.new/liveMedia/MP3StreamState.cp
 -      long fid_long = (long)fFid;
 -      closeSocket((int)fid_long);
 +      intptr_t fid_long = (intptr_t)fFid;
-+      closeSocket((int)(intptr_t)fid_long);
++      closeSocket(fid_long);
      } else {
        fclose(fFid);
      }
-@@ -201,8 +202,8 @@
+@@ -201,7 +202,7 @@
    char const* const getCmdFmt = "GET %s HTTP/1.1\r\nHost: %s:%d\r\n\r\n";
  
    if (fFidIsReallyASocket) {
 -    long fid_long = (long)fFid;
--    int sock = (int)fid_long;
 +    intptr_t fid_long = (intptr_t)fFid;
-+    int sock = (int)(intptr_t)fid_long;
+     int sock = (int)fid_long;
      char writeBuf[100];
  #if defined(IRIX) || defined(ALPHA) || defined(_QNX4) || defined(IMN_PIM) || defined(CRIS)
-     /* snprintf() isn't defined, so just use sprintf() */
-@@ -412,8 +413,8 @@
+@@ -412,7 +413,7 @@
  					unsigned numChars) {
    // Hack for doing socket I/O instead of file I/O (e.g., on Windows)
    if (fFidIsReallyASocket) {
 -    long fid_long = (long)fFid;
--    int sock = (int)fid_long;
 +    intptr_t fid_long = (intptr_t)fFid;
-+    int sock = (int)(intptr_t)fid_long;
+     int sock = (int)fid_long;
      unsigned totBytesRead = 0;
      do {
-       waitUntilSocketIsReadable(fEnv, sock);
 diff -ruN live/liveMedia/RTCP.cpp live.new/liveMedia/RTCP.cpp
 --- live/liveMedia/RTCP.cpp	2009-07-28 03:05:14.000000000 +0200
 +++ live.new/liveMedia/RTCP.cpp	2009-08-19 00:57:01.000000000 +0200
@@ -164,21 +160,3 @@ diff -ruN live/liveMedia/RTCP.cpp live.new/liveMedia/RTCP.cpp
      return (((i*1103515245) >> fDownShift) & fMask);
    }
  
-diff -ruN live/groupsock/include/NetCommon.h live.new/groupsock/include/NetCommon.h
---- live/groupsock/include/NetCommon.h	2009-07-28 03:05:14.000000000 +0200
-+++ live.new/groupsock/include/NetCommon.h	2009-08-19 19:00:59.000000000 +0200
-@@ -37,8 +37,12 @@
- #define closeSocket closesocket
- #define EWOULDBLOCK WSAEWOULDBLOCK
- #define EINPROGRESS WSAEWOULDBLOCK
--#define EAGAIN WSAEWOULDBLOCK
--#define EINTR WSAEINTR
-+#ifndef EAGAIN
-+ #define EAGAIN WSAEWOULDBLOCK
-+#endif
-+#ifndef EINTR
-+ #define EINTR WSAEINTR
-+#endif
- 
- #if defined(_WIN32_WCE)
- #define NO_STRSTREAM 1

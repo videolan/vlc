@@ -13,9 +13,7 @@ live555: live555-latest.tar.gz .sum-live555
 	$(UNPACK)
 	patch -p0 < $(SRC)/live555/live-uselocale.patch
 	patch -p0 < $(SRC)/live555/live-inet_ntop.patch
-ifdef HAVE_WIN64
-	patch -p0 < $(SRC)/live555/live-win64.patch
-endif
+	patch -p0 < $(SRC)/live555/live-intptr.patch
 ifndef HAVE_WIN32
 ifndef HAVE_WINCE
 	patch -p0 < $(SRC)/live555/live-getaddrinfo.patch
