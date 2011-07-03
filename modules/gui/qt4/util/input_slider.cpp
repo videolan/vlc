@@ -31,6 +31,8 @@
 #include "util/input_slider.hpp"
 #include "adapters/seekpoints.hpp"
 
+#include <stdlib.h>
+
 #include <QPaintEvent>
 #include <QPainter>
 #include <QBitmap>
@@ -42,6 +44,7 @@
 
 #define MINIMUM 0
 #define MAXIMUM 1000
+#define CHAPTERSSPOTSIZE 3
 
 SeekSlider::SeekSlider( QWidget *_parent ) : QSlider( _parent )
 {
@@ -145,6 +148,11 @@ void SeekSlider::mouseReleaseEvent( QMouseEvent *event )
     event->accept();
     b_isSliding = false;
     seekLimitTimer->stop(); /* We're not sliding anymore: only last seek on release */
+    if ( b_is_jumping )
+    {
+        b_is_jumping = false;
+        return;
+    }
     QSlider::mouseReleaseEvent( event );
     updatePos();
 }
@@ -157,6 +165,41 @@ void SeekSlider::mousePressEvent( QMouseEvent* event )
     {
         QSlider::mousePressEvent( event );
         return;
+    }
+
+    b_is_jumping = false;
+    /* handle chapter clicks */
+    int i_width = size().width();
+    if ( chapters && inputLength && i_width)
+    {
+        if ( orientation() == Qt::Horizontal ) /* TODO: vertical */
+        {
+             /* only on chapters zone */
+            if ( event->y() < CHAPTERSSPOTSIZE ||
+                 event->y() > ( size().height() - CHAPTERSSPOTSIZE ) )
+            {
+                QList<SeekPoint> points = chapters->getPoints();
+                int i_selected = -1;
+                int i_min_diff = i_width + 1;
+                for( int i = 0 ; i < points.count() ; i++ )
+                {
+                    int x = points.at(i).time / 1000000.0 / inputLength * i_width;
+                    int diff_x = abs( x - event->x() );
+                    if ( diff_x < i_min_diff )
+                    {
+                        i_min_diff = diff_x;
+                        i_selected = i;
+                    } else break;
+                }
+                if ( i_selected && i_min_diff < 4 ) // max 4px around mark
+                {
+                    chapters->jumpTo( i_selected );
+                    event->accept();
+                    b_is_jumping = true;
+                    return;
+                }
+            }
+        }
     }
 
     b_isSliding = true ;
@@ -362,8 +405,8 @@ void SeekSlider::paintEvent( QPaintEvent *event )
                     int x = point.time / 1000000.0 / inputLength * size().width();
                     painter.setPen( QColor( 80, 80, 80 ) );
                     painter.setBrush( Qt::NoBrush );
-                    painter.drawLine( x, 0, x, 3 );
-                    painter.drawLine( x, height(), x, height() - 3 );
+                    painter.drawLine( x, 0, x, CHAPTERSSPOTSIZE );
+                    painter.drawLine( x, height(), x, height() - CHAPTERSSPOTSIZE );
                 }
             }
         }
