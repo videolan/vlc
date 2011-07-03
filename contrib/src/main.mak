@@ -184,7 +184,8 @@ UNPACK_DIR = $(basename $(basename $(notdir $<)))
 APPLY = (cd $(UNPACK_DIR) && patch -p1) <
 MOVE = mv $(UNPACK_DIR) $@ && touch $@
 
-RECONF = cd $< && autoreconf -fiv $(ACLOCAL_AMFLAGS)
+RECONF = mkdir -p -- $(PREFIX)/share/aclocal && \
+	cd $< && autoreconf -fiv $(ACLOCAL_AMFLAGS)
 CMAKE = cmake . -DCMAKE_TOOLCHAIN_FILE=$(abspath toolchain.cmake) \
 		-DCMAKE_INSTALL_PREFIX=$(PREFIX)
 
