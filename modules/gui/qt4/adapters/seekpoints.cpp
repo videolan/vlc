@@ -71,3 +71,13 @@ QList<SeekPoint> const SeekPoints::getPoints()
     return copy;
 }
 
+bool SeekPoints::jumpTo( int i_chapterindex )
+{
+    vlc_value_t val;
+    val.i_int = i_chapterindex;
+    input_thread_t *p_input_thread = playlist_CurrentInput( THEPL );
+    if( !p_input_thread ) return false;
+    bool b_succ = var_Set( p_input_thread, "chapter", val );
+    vlc_object_release( p_input_thread );
+    return ( b_succ == VLC_SUCCESS );
+}

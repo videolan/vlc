@@ -50,6 +50,7 @@ public:
     QList<SeekPoint> const getPoints();
     bool access() { return listMutex.tryLock( 100 ); }
     void release() { listMutex.unlock(); }
+    bool jumpTo( int );
 
 public slots:
     void update();
