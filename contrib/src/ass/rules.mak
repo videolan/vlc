@@ -13,9 +13,7 @@ libass: libass-$(ASS_VERSION).tar.gz .sum-ass
 	$(UNPACK)
 	$(MOVE)
 
-#TODO .fontconfig
-
-.ass: libass .freetype2
+.ass: libass .freetype2 .fontconfig
 	#$(RECONF)
 	cd $< && $(HOSTVARS) CFLAGS="$(CFLAGS) -O3" ./configure $(HOSTCONF) --disable-png --disable-enca
 	cd $< && $(MAKE) install

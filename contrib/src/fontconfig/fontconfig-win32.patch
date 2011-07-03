@@ -1,0 +1,43 @@
+diff -ruN fontconfig/src/fcint.h fontconfig.good/src/fcint.h
+--- fontconfig/src/Makefile.in	2009-06-24 21:05:27.000000000 +0200
++++ fontconfig.good/src/Makefile.in	2009-07-03 00:13:38.000000000 +0200
+@@ -664,7 +664,6 @@
+ # gcc import library install/uninstall
+ 
+ @OS_WIN32_TRUE@install-libtool-import-lib: 
+-@OS_WIN32_TRUE@	$(INSTALL) .libs/libfontconfig.dll.a $(DESTDIR)$(libdir)
+ @OS_WIN32_TRUE@	$(INSTALL) fontconfig.def $(DESTDIR)$(libdir)/fontconfig.def
+ 
+ @OS_WIN32_TRUE@uninstall-libtool-import-lib:
+--- fontconfig/src/Makefile.am	2009-03-18 22:02:22.000000000 +0100
++++ fontconfig.good/src/Makefile.am	2009-07-03 00:12:50.000000000 +0200
+@@ -30,7 +30,6 @@
+ # gcc import library install/uninstall
+ 
+ install-libtool-import-lib: 
+-	$(INSTALL) .libs/libfontconfig.dll.a $(DESTDIR)$(libdir)
+ 	$(INSTALL) fontconfig.def $(DESTDIR)$(libdir)/fontconfig.def
+ 
+ uninstall-libtool-import-lib:
+--- fontconfig/src/fcinit.c	2009-06-06 00:59:27.000000000 +0200
++++ fontconfig.good/src/fcinit.c	2009-07-13 14:58:37.000000000 +0200
+@@ -24,6 +24,7 @@
+ 
+ #include "fcint.h"
+ #include <stdlib.h>
++# include <shlobj.h>
+ 
+ static FcConfig *
+ FcInitFallbackConfig (void)
+@@ -35,7 +36,10 @@
+ 	goto bail0;
+     if (!FcConfigAddDir (config, (FcChar8 *) FC_DEFAULT_FONTS))
+ 	goto bail1;
+-    if (!FcConfigAddCacheDir (config, (FcChar8 *) FC_CACHEDIR))
++    char dir[MAX_PATH+5];
++    SHGetFolderPath( NULL, CSIDL_APPDATA, NULL, 0, dir );
++    strncat( dir, "\\vlc", 4 );
++    if (!FcConfigAddCacheDir (config, (FcChar8 *)dir))
+ 	goto bail1;
+     return config;
+ 
