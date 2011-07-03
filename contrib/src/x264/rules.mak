@@ -12,6 +12,7 @@ X264CONF = --prefix="$(PREFIX)" --host="$(HOST)" \
 	--enable-static \
 	--disable-avs \
 	--disable-lavf \
+	--disable-cli \
 	--disable-ffms
 ifndef HAVE_WIN32
 X264CONF += --enable-pic
@@ -40,9 +41,6 @@ X264_VERSION := git
 
 x264: x264-$(X264_VERSION).tar.xz .sum-x264
 	$(UNPACK)
-ifdef HAVE_WIN64
-	$(APPLY) $(SRC)/x264/x264-svn-win64.patch
-endif
 	$(MOVE)
 
 .x264: x264

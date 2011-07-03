@@ -1441,7 +1441,7 @@ ifdef HAVE_LINUX
 X264CONF += --enable-pic
 endif
 
-X264CONF += --disable-avs --disable-lavf --disable-ffms --enable-static
+X264CONF += --disable-avs --disable-lavf --disable-ffms --enable-static --disable-cli
 
 x264-$(X264_VERSION).tar.gz:
 	$(WGET) $(X264_URL)
@@ -1449,9 +1449,6 @@ x264-$(X264_VERSION).tar.gz:
 ifdef GIT
 x264:
 	$(GIT) clone git://git.videolan.org/x264.git
-ifdef HAVE_WIN64
-	(cd x264; patch -p0 < ../Patches/x264-svn-win64.patch )
-endif
 else
 x264:
 	echo "x264 snapshot is too old, you MUST use Git !"
