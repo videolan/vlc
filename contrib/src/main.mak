@@ -105,7 +105,7 @@ PKG_CONFIG_PATH :=
 PKG_CONFIG_LIBDIR := /dev/null
 export PKG_CONFIG_LIBDIR
 endif
-PKG_CONFIG_PATH += :$(PREFIX)/lib/pkgconfig
+PKG_CONFIG_PATH := $(PKG_CONFIG_PATH):$(PREFIX)/lib/pkgconfig
 export PKG_CONFIG_PATH
 
 ifndef GIT
