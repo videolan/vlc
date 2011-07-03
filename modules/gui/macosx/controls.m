@@ -393,19 +393,41 @@
 - (void)scrollWheel:(NSEvent *)theEvent
 {
     intf_thread_t * p_intf = VLCIntf;
+    BOOL b_invertedEventFromDevice = NO;
+    if ([theEvent respondsToSelector:@selector(isDirectionInvertedFromDevice)])
+    {
+        if ([theEvent isDirectionInvertedFromDevice])
+            b_invertedEventFromDevice = YES;
+    }
+
     float f_yabsvalue = [theEvent deltaY] > 0.0f ? [theEvent deltaY] : -[theEvent deltaY];
     float f_xabsvalue = [theEvent deltaX] > 0.0f ? [theEvent deltaX] : -[theEvent deltaX];
     int i, i_yvlckey, i_xvlckey;
 
-    if ([theEvent deltaY] < 0.0f)
-        i_yvlckey = KEY_MOUSEWHEELDOWN;
-    else
-        i_yvlckey = KEY_MOUSEWHEELUP;
+    if (b_invertedEventFromDevice)
+    {
+        if ([theEvent deltaY] > 0.0f)
+            i_yvlckey = KEY_MOUSEWHEELDOWN;
+        else
+            i_yvlckey = KEY_MOUSEWHEELUP;
 
-    if ([theEvent deltaX] < 0.0f)
-        i_xvlckey = KEY_MOUSEWHEELRIGHT;
+        if ([theEvent deltaX] > 0.0f)
+            i_xvlckey = KEY_MOUSEWHEELRIGHT;
+        else
+            i_xvlckey = KEY_MOUSEWHEELLEFT;
+    }
     else
-        i_xvlckey = KEY_MOUSEWHEELLEFT;
+    {
+        if ([theEvent deltaY] < 0.0f)
+            i_yvlckey = KEY_MOUSEWHEELDOWN;
+        else
+            i_yvlckey = KEY_MOUSEWHEELUP;
+
+        if ([theEvent deltaX] < 0.0f)
+            i_xvlckey = KEY_MOUSEWHEELRIGHT;
+        else
+            i_xvlckey = KEY_MOUSEWHEELLEFT;
+    }
 
     /* Send multiple key event, depending on the intensity of the event */
     for (i = 0; i < (int)(f_yabsvalue/4.+1.) && f_yabsvalue > 0.05 ; i++)
