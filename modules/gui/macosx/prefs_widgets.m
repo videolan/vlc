@@ -469,7 +469,7 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
         case CONFIG_ITEM_BOOL:
             i_margin = 7;
             break;
-        case CONFIG_ITEM_KEY_AFTER_10_3:
+        case CONFIG_ITEM_KEY:
             i_margin = 6;
             break;
         case CONFIG_ITEM_MODULE_LIST:
@@ -506,7 +506,7 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
         case CONFIG_ITEM_BOOL:
             i_margin = 7;
             break;
-        case CONFIG_ITEM_KEY_AFTER_10_3:
+        case CONFIG_ITEM_KEY:
             i_margin = 6;
             break;
         case CONFIG_ITEM_MODULE_LIST:
@@ -544,7 +544,7 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
         case CONFIG_ITEM_BOOL:
             i_margin = 10;
             break;
-        case CONFIG_ITEM_KEY_AFTER_10_3:
+        case CONFIG_ITEM_KEY:
             i_margin = 9;
             break;
         case CONFIG_ITEM_MODULE_LIST:
@@ -581,7 +581,7 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
         case CONFIG_ITEM_BOOL:
             i_margin = 8;
             break;
-        case CONFIG_ITEM_KEY_AFTER_10_3:
+        case CONFIG_ITEM_KEY:
             i_margin = 7;
             break;
         case CONFIG_ITEM_MODULE_LIST:
@@ -618,7 +618,7 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
         case CONFIG_ITEM_BOOL:
             i_margin = 7;
             break;
-        case CONFIG_ITEM_KEY_AFTER_10_3:
+        case CONFIG_ITEM_KEY:
             i_margin = 6;
             break;
         case CONFIG_ITEM_MODULE_LIST:
@@ -655,7 +655,7 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
         case CONFIG_ITEM_BOOL:
             i_margin = 7;
             break;
-        case CONFIG_ITEM_KEY_AFTER_10_3:
+        case CONFIG_ITEM_KEY:
             i_margin = 6;
             break;
         case CONFIG_ITEM_MODULE_LIST:
@@ -692,7 +692,7 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
         case CONFIG_ITEM_BOOL:
             i_margin = 7;
             break;
-        case CONFIG_ITEM_KEY_AFTER_10_3:
+        case CONFIG_ITEM_KEY:
             i_margin = 5;
             break;
         case CONFIG_ITEM_MODULE_LIST:
@@ -703,7 +703,7 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
             break;
         }
         break;
-    case CONFIG_ITEM_KEY_AFTER_10_3:
+    case CONFIG_ITEM_KEY:
         switch( i_lastItem )
         {
         case CONFIG_ITEM_STRING:
@@ -729,7 +729,7 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
         case CONFIG_ITEM_BOOL:
             i_margin = 7;
             break;
-        case CONFIG_ITEM_KEY_AFTER_10_3:
+        case CONFIG_ITEM_KEY:
             i_margin = 8;
             break;
         case CONFIG_ITEM_MODULE_LIST:
@@ -766,7 +766,7 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
         case CONFIG_ITEM_BOOL:
             i_margin = 7;
             break;
-        case CONFIG_ITEM_KEY_AFTER_10_3:
+        case CONFIG_ITEM_KEY:
             i_margin = 5;
             break;
         case CONFIG_ITEM_MODULE_LIST:
@@ -826,7 +826,7 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
                         initWithItem: _p_item
                         withView: o_parent_view];
         }
-        else if( _p_item->min.i != 0 || _p_item->max.i != 0 )
+        else if( (_p_item->min.i != 0 || _p_item->max.i != 0) && (_p_item->min.i != INT_MIN || _p_item->max.i != INT_MAX) )
         {
             p_control = [[RangedIntegerConfigControl alloc]
                         initWithItem: _p_item
@@ -845,7 +845,7 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
                     withView: o_parent_view];
         break;
     case CONFIG_ITEM_FLOAT:
-        if( _p_item->min.f != 0 || _p_item->max.f != 0 )
+        if( (_p_item->min.i != 0 || _p_item->max.i != 0) && (_p_item->min.i != INT_MIN || _p_item->max.i != INT_MAX) )
         {
             p_control = [[RangedFloatConfigControl alloc]
                         initWithItem: _p_item
@@ -2073,7 +2073,7 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
 
     if( [super initWithFrame: mainFrame item: _p_item] != nil )
     {
-        i_view_type = CONFIG_ITEM_KEY_AFTER_10_3;
+        i_view_type = CONFIG_ITEM_KEY;
 
         o_tooltip = [[VLCMain sharedInstance] wrapString:
                      [[VLCMain sharedInstance]

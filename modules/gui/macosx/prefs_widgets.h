@@ -21,9 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#define CONFIG_ITEM_STRING_LIST (CONFIG_ITEM_STRING + 1)
-#define CONFIG_ITEM_RANGED_INTEGER (CONFIG_ITEM_INTEGER + 1)
-#define CONFIG_ITEM_KEY_AFTER_10_3 (CONFIG_ITEM_KEY + 2)
+#define CONFIG_ITEM_STRING_LIST (CONFIG_ITEM_STRING + 10)
+#define CONFIG_ITEM_RANGED_INTEGER (CONFIG_ITEM_INTEGER + 10)
 #define LEFTMARGIN  18
 #define RIGHTMARGIN 18
 
@@ -208,5 +207,4 @@ static NSMenu   *o_keys_menu = nil;
 
 //#undef CONFIG_ITEM_LIST_STRING
 //#undef CONFIG_ITEM_RANGED_INTEGER
-//#undef CONFIG_ITEM_KEY_AFTER_10_3
 
