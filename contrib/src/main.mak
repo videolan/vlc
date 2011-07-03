@@ -101,8 +101,8 @@ PKG_CONFIG ?= pkg-config
 ifdef HAVE_CROSS_COMPILE
 # This inhibits .pc file from within the cross-compilation toolchain sysroot.
 # Hopefully, nobody ever needs that.
-PKG_CONFIG_PATH :=
-PKG_CONFIG_LIBDIR := /dev/null
+PKG_CONFIG_PATH := /usr/share/pkgconfig
+PKG_CONFIG_LIBDIR := /usr/$(HOST)/lib/pkgconfig
 export PKG_CONFIG_LIBDIR
 endif
 PKG_CONFIG_PATH := $(PKG_CONFIG_PATH):$(PREFIX)/lib/pkgconfig
