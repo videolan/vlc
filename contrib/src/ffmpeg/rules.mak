@@ -5,9 +5,11 @@ FFMPEG_URL=$(SF)/ffmpeg/ffmpeg-$(FFMPEG_VERSION).tar.gz
 FFMPEG_SVN=svn://svn.ffmpeg.org/ffmpeg/trunk
 FFMPEG_SVN_REV=26400
 
-FFMPEGCONF = --cc="$(CC)" \
+FFMPEGCONF = \
+	--cc="$(CC)" \
 	--disable-doc \
 	--disable-decoder=libvpx \
+	--enable-gsm \
 	--disable-debug \
 	--enable-gpl \
 	--enable-postproc \
@@ -19,7 +21,7 @@ FFMPEGCONF = --cc="$(CC)" \
 	--disable-protocols \
 	--disable-avfilter \
 	--disable-network
-DEPS_ffmpeg = zlib
+DEPS_ffmpeg = zlib gsm
 
 # Optional dependencies
 ifdef BUILD_ENCODERS
@@ -30,9 +32,6 @@ else
 FFMPEGCONF += --disable-encoders --disable-muxers
 # XXX: REVISIT --enable-small ?
 endif
-
-#FFMPEGCONF += --enable-libgsm
-#DEPS_ffmpeg += gsm $(DEPS_gsm)
 
 #FFMPEGCONF += --enable-libvpx
 #DEPS_ffmpeg += vpx $(DEPS_vpx)

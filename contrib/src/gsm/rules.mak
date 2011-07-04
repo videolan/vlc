@@ -2,8 +2,6 @@
 GSM_VERSION := 1.0.12
 GSM_URL := $(CONTRIB_VIDEOLAN)/gsm-$(GSM_VERSION).tar.gz
 
-PKGS += gsm
-
 $(TARBALLS)/gsm-$(GSM_VERSION).tar.gz:
 	$(call download,$(GSM_URL))
 
