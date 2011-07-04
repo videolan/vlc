@@ -1,0 +1,11 @@
+--- zlib/Makefile.in	2010-04-20 06:12:21.000000000 +0200
++++ zlib.new/Makefile.in	2010-06-08 14:02:43.000000000 +0200
+@@ -168,7 +168,7 @@
+ 	-@if [ ! -d $(DESTDIR)$(man3dir)      ]; then mkdir -p $(DESTDIR)$(man3dir); fi
+ 	-@if [ ! -d $(DESTDIR)$(pkgconfigdir) ]; then mkdir -p $(DESTDIR)$(pkgconfigdir); fi
+ 	cp $(STATICLIB) $(DESTDIR)$(libdir)
+-	cp $(SHAREDLIBV) $(DESTDIR)$(sharedlibdir)
++	cp $(SHAREDLIBV) $(DESTDIR)$(sharedlibdir) || true >/dev/null 2>&1
+ 	cd $(DESTDIR)$(libdir); chmod u=rw,go=r $(STATICLIB)
+ 	-@(cd $(DESTDIR)$(libdir); $(RANLIB) libz.a || true) >/dev/null 2>&1
+ 	-@cd $(DESTDIR)$(sharedlibdir); if test "$(SHAREDLIBV)" -a -f $(SHAREDLIBV); then \
