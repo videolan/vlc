@@ -13,3 +13,19 @@ diff -ru taglib-1.5/taglib/taglib_export.h taglib/taglib/taglib_export.h
  #endif
  #elif defined(__GNUC__) && (__GNUC__ > 4 || __GNUC__ == 4 && __GNUC_MINOR__ >= 1)
  #define TAGLIB_EXPORT __attribute__ ((visibility("default")))
+diff -ru taglib.orig/bindings/c/CMakeLists.txt taglib/bindings/c/CMakeLists.txt
+--- taglib.orig/bindings/c/CMakeLists.txt	2011-07-04 23:25:15.000000000 +0300
++++ taglib/bindings/c/CMakeLists.txt	2011-07-04 23:27:43.000000000 +0300
+@@ -19,9 +19,11 @@
+ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/taglib_c.pc.cmake ${CMAKE_CURRENT_BINARY_DIR}/taglib_c.pc )
+ ########### next target ###############
+ 
+-ADD_LIBRARY(tag_c SHARED tag_c.cpp)
+ if(ENABLE_STATIC)
++    add_LIBRARY(tag_c STATIC tag_c.cpp)
+     set_target_properties(tag_c PROPERTIES COMPILE_DEFINITIONS TAGLIB_STATIC)
++else(ENABLE_STATIC)
++    add_LIBRARY(tag_c SHARED tag_c.cpp)
+ endif(ENABLE_STATIC)
+ 
+ TARGET_LINK_LIBRARIES(tag_c  tag )
