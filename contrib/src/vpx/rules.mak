@@ -24,7 +24,7 @@ VPX_CROSS :=
 endif
 
 ifeq ($(ARCH),arm)
-VPX_ARCH := armv7$(warning ARM architecture version 7 assumed)
+VPX_ARCH := armv7
 else ifeq ($(ARCH),i386)
 VPX_ARCH := x86
 #DEPS_vpx += yasm $(DEPS_yasm)
@@ -67,6 +67,7 @@ endif
 .vpx: libvpx
 	env
 	cd $< && CROSS=$(VPX_CROSS) ./configure --target=$(VPX_TARGET) \
+		--enable-runtime-cpu-detect \
 		--disable-install-bins \
 		--disable-install-srcs \
 		--disable-install-libs \
