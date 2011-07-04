@@ -35,12 +35,12 @@
 #include <vlc_input.h>
 #include <vlc_strings.h>
 #include <vlc_url.h>
-#include "xspf.h"
 
 #include <assert.h>
 
 static void xspf_export_item( playlist_item_t *, FILE *, int * );
 static void xspf_extension_item( playlist_item_t *, FILE *, int * );
+int xspf_export_playlist( vlc_object_t *p_this );
 
 /**
  * \brief Prints the XSPF header to file, writes each item by xspf_export_item()
