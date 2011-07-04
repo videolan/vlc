@@ -9,7 +9,7 @@ FFMPEGCONF = \
 	--cc="$(CC)" \
 	--disable-doc \
 	--disable-decoder=libvpx \
-	--enable-gsm \
+	--enable-libgsm \
 	--disable-debug \
 	--enable-gpl \
 	--enable-postproc \

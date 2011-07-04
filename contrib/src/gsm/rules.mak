@@ -19,6 +19,7 @@ endif
 
 .gsm: gsm
 	cd $< && $(HOSTVARS) $(MAKE)
-	cd $< && mkdir -p $(PREFIX)/include/gsm && cp inc/gsm.h $(PREFIX)/include/gsm
-	cd $< && cp lib/libgsm.a $(PREFIX)/lib
+	mkdir -p "$(PREFIX)/include/gsm" "$(PREFIX)/lib"
+	cp $</inc/gsm.h "$(PREFIX)/include/gsm"
+	cp $</lib/libgsm.a "$(PREFIX)/lib"
 	touch $@
