@@ -48,40 +48,74 @@ source code is fully ready. Otherwise Makefile dependencies will break
 		cd $< && $(MAKE) install
 		touch $@
 
+Conditional builds
+-------------------
+
+As far as possible, build rules should determine automatically whether
+a package is useful (for VLC media player) or not. Useful packages
+should be listed in the PKGS special variable. See some examples:
+
+	# FFmpeg is always useful
+	PKGS += ffmpeg
+
+	# DirectX headers are useful only on Windows
+	ifdef HAVE_WIN32
+	PKGS += directx
+	endif
+
+	# x264 is only useful when stream output is enabled
+	ifdef BUILD_ENCODERS
+	PKGS += x264
+	endif
+
+Some packages may be provided by the target system. This is especially
+common when building natively on Linux or BSD. When this situation is
+detected, the package name should be added to the PKGS_FOUND special
+variable. The build system will then skip building this package:
+
+	# Asks pkg-config if foo version 1.2.3 or later is present:
+	ifeq ($(call need_pkg,'foo >= 1.2.3'),)
+	PKGS_FOUND += foo
+	endif
+
+Note: The need_pkg function always return 1 during cross-compilation.
+This is a bug.
+
 
 Dependencies
 -------------
 
-If package bar depends on package foo, a Makefile dependency can ensure
-that bar will be built after foo. It will also ensure that foo will be
-built even if it was not selected explicitly in the $(PKGS) variable:
+If package bar depends on package foo, the special DEPS_bar variable
+should be defined as follow:
 
-	.bar: libbar .foo
-		cd $< && $(HOSTVARS) ./configure $(HOSTCONF)
-		cd $< && $(MAKE) install
-		touch $@
+	DEPS_bar = foo $(DEPS_foo)
 
+Note that dependency resolution is unfortunately _not_ recursive.
+Therefore $(DEPS_foo) really should be specified explicitly as shown
+above. (In practice, this will not make any difference insofar as there
+are no pure second-level nested dependencies. For instance, libass
+depends on FontConfig, which depends on FreeType, but libass depends
+directly on FreeType anyway.)
 
-Conditional builds
--------------------
+Also note that DEPS_bar is set "recursively" with =, rather than
+"immediately" with :=. This is so that $(DEPS_foo) is expanded
+correctly, even if DEPS_foo it is defined after DEPS_bar.
 
-Some packages may be provided by the target system. This is especially
-common when building natively on Linux or BSD. A dummy build rule can
-be used conditionally.
+Implementation note:
 
-	NEED_FOO := $(call need_pkg,'foo >= 1.2.3')
+	If you must know, the main.mak build hackery will automatically
+	emit a dependency from .bar onto .dep-foo:
 
-	ifeq ($(NEED_FOO),)
-	.foo:
-	else
-	.foo: libfoo
-		### foo compilation rules here ###
-	endif
-		touch $@
+		.bar: .dep-foo
 
-If pkg-config finds foo.pc with version 1.2.3 or larger, this will be
-equivalent to:
+	...whereby .dep-foo will depend on .foo:
 
-	.foo: ; touch .foo
+		.dep-foo: .foo
+			touch $@
 
-Note: The need_pkg function always return 1 during cross-compilation.
+	...unless foo was detected in the target distribution:
+
+		.dep-foo:
+			touch $@
+
+	So you really only need to set DEPS_bar.
