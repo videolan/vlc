@@ -164,11 +164,11 @@ case "${OS}" in
 	*linux*)
 		add_make_enabled "HAVE_LINUX"
 		;;
-	*mingw*)
-		add_make_enabled "HAVE_WIN32"
-		;;
 	*wince*)
 		add_make_enabled "HAVE_WINCE"
+		;;
+	*mingw*)
+		add_make_enabled "HAVE_WIN32"
 		;;
 esac
 
