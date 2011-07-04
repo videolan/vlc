@@ -258,7 +258,7 @@ static void xspf_extension_item( playlist_item_t *p_item, FILE *p_file,
 
 
     /* print leaf and increase the counter */
-    fprintf( p_file, "\t\t\t<vlc:item tid=\"%i\" />\n", *p_i_count );
+    fprintf( p_file, "\t\t\t<vlc:item tid=\"%i\"/>\n", *p_i_count );
     ( *p_i_count )++;
 
     return;
