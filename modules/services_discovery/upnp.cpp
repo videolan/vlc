@@ -136,7 +136,7 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    i_res = UpnpSetMaxContentLength( 262144 );
+    i_res = UpnpSetMaxContentLength( 0 );
     if( i_res != UPNP_E_SUCCESS )
     {
         msg_Err( p_sd, "Failed to set maximum content length: %s", UpnpGetErrorMessage( i_res ) );
