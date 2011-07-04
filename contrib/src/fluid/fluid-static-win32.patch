@@ -1,0 +1,9 @@
+--- fluidsynth/fluidsynth.pc.in	2007-08-18 23:55:32.000000000 +0200
++++ fluidsynth.new/fluidsynth.pc.in	2009-07-28 23:41:05.000000000 +0200
+@@ -6,5 +6,5 @@
+ Name: FluidSynth
+ Description: Software SoundFont synth
+ Version: @VERSION@
+-Libs: -L${libdir} -lfluidsynth
++Libs: -L${libdir} -lfluidsynth -ldsound -lwinmm
+ Cflags: -I${includedir}
