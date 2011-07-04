@@ -3,6 +3,9 @@ ASS_VERSION := 0.9.12
 ASS_URL := http://libass.googlecode.com/files/libass-$(ASS_VERSION).tar.gz
 
 PKGS += ass
+ifeq ($(call need_pkg,"libass"),)
+PKGS_FOUND += ass
+endif
 
 $(TARBALLS)/libass-$(ASS_VERSION).tar.gz:
 	$(call download,$(ASS_URL))

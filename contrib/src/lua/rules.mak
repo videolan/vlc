@@ -20,6 +20,9 @@ endif
 
 # Feel free to add autodetection if you need to...
 PKGS += lua
+ifeq ($(call need_pkg,"lua5.1"),)
+PKGS_FOUND += lua
+endif
 
 $(TARBALLS)/lua-$(LUA_VERSION).tar.gz:
 	$(call download,$(LUA_URL))

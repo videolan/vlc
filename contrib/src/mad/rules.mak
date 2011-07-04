@@ -4,6 +4,9 @@ MAD_VERSION := 0.15.1b
 MAD_URL := $(CONTRIB_VIDEOLAN)/libmad-$(MAD_VERSION).tar.gz
 
 PKGS += mad
+ifeq ($(call need_pkg,"mad"),)
+PKGS_FOUND += mad
+endif
 
 $(TARBALLS)/libmad-$(MAD_VERSION).tar.gz:
 	$(call download,$(MAD_URL))

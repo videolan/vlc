@@ -7,6 +7,9 @@ ifeq ($(call need_pkg,"pangocairo >= 0.16"),)
 # only available if the system has pangocairo
 PKGS += tiger
 endif
+ifeq ($(call need_pkg,"tiger >= 0.3.1"),)
+PKGS_FOUND += tiger
+endif
 
 $(TARBALLS)/libtiger-$(TIGER_VERSION).tar.gz:
 	$(call download,$(TIGER_URL))

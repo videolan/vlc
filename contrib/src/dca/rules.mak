@@ -6,6 +6,9 @@ DCA_URL := $(VIDEOLAN)/libdca/$(DCA_VERSION)/libdca-$(DCA_VERSION).tar.bz2
 ifdef HAVE_FPU
 PKGS += dca
 endif
+ifeq ($(call need_pkg,"libdca"),)
+PKGS_FOUND += dca
+endif
 
 $(TARBALLS)/libdca-$(DCA_VERSION).tar.bz2:
 	$(call download,$(DCA_URL))

@@ -4,6 +4,9 @@ SHOUT_VERSION := 2.2.2
 SHOUT_URL := http://downloads.us.xiph.org/releases/libshout/libshout-$(SHOUT_VERSION).tar.gz
 
 PKGS += shout
+ifeq ($(call need_pkg,"shout >= 2.1"),)
+PKGS_FOUND += shout
+endif
 
 $(TARBALLS)/libshout-$(SHOUT_VERSION).tar.gz:
 	$(call download,$(SHOUT_URL))

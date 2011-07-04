@@ -7,6 +7,9 @@ X264_GITURL := git://git.videolan.org/x264.git
 ifdef BUILD_ENCODERS
 PKGS += x264
 endif
+ifeq ($(call need_pkg,"x264 >= 0.86"),)
+PKGS_FOUND += x264
+endif
 DEPS_x264 =
 
 X264CONF = --prefix="$(PREFIX)" --host="$(HOST)" \

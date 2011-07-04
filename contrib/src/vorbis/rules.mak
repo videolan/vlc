@@ -7,9 +7,15 @@ VORBIS_URL := http://downloads.xiph.org/releases/vorbis/libvorbis-$(VORBIS_VERSI
 ifndef HAVE_FPU
 PKGS += vorbis
 endif
+ifeq ($(call need_pkg,"vorbis >= 1.1"),)
+PKGS_FOUND += vorbis
+endif
 PKGS_ALL += vorbisenc
 ifdef BUILD_ENCODERS
 PKGS += vorbisenc
+endif
+ifeq ($(call need_pkg,"vorbisenc >= 1.1"),)
+PKGS_FOUND += vorbisenc
 endif
 
 $(TARBALLS)/libvorbis-$(VORBIS_VERSION).tar.xz:

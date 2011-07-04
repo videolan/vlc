@@ -104,6 +104,9 @@ FFMPEG_CFLAGS += --std=gnu99
 # Build
 
 PKGS += ffmpeg
+ifeq ($(call need_pkg,"libavcodec libavformat libswscale"),)
+PKGS_FOUND += ffmpeg
+endif
 
 ffmpeg-$(FFMPEG_VERSION).tar.gz:
 	$(error FFmpeg snapshot is too old, VCS must be used!)

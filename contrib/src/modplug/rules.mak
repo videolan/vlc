@@ -4,6 +4,9 @@ MODPLUG_VERSION := 0.8.8.3
 MODPLUG_URL := $(SF)/modplug-xmms/libmodplug-$(MODPLUG_VERSION).tar.gz
 
 PKGS += modplug
+ifeq ($(call need_pkg,"libmodplug >= 0.8.4 libmodplug != 0.8.8"),)
+PKGS_FOUND += modplug
+endif
 
 $(TARBALLS)/libmodplug-$(MODPLUG_VERSION).tar.gz:
 	$(call download,$(MODPLUG_URL))

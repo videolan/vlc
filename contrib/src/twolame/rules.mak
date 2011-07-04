@@ -6,6 +6,9 @@ TWOLAME_URL := $(SF)/twolame/twolame-$(TWOLAME_VERSION).tar.gz
 ifdef BUILD_ENCODERS
 PKGS += twolame
 endif
+ifeq ($(call need_pkg,"twolame"),)
+PKGS_FOUND += twolame
+endif
 
 $(TARBALLS)/twolame-$(TWOLAME_VERSION).tar.gz:
 	$(call download,$(TWOLAME_URL))

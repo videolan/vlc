@@ -4,6 +4,9 @@ KATE_VERSION := 0.3.8
 KATE_URL := http://libkate.googlecode.com/files/libkate-$(KATE_VERSION).tar.gz
 
 PKGS += kate
+ifeq ($(call need_pkg,"kate >= 0.1.5"),)
+PKGS_FOUND += kate
+endif
 
 $(TARBALLS)/libkate-$(KATE_VERSION).tar.gz:
 	$(call download,$(KATE_URL))
