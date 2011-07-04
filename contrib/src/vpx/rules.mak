@@ -78,7 +78,7 @@ endif
 	rm -Rf -- "$(PREFIX)/include/vpx/"
 	mkdir -p -- "$(PREFIX)/include/vpx/"
 	# Of course! Why the hell would it be listed or in make install?
-	cp $</vpx/*.h $</vpx_ports/*.h "$(PREFIX)/include/vpx"
+	cp $</vpx/*.h $</vpx_ports/*.h "$(PREFIX)/include/vpx/"
 	rm -f -- "$(PREFIX)/include/vpx/config.h"
 	$(RANLIB) $</libvpx.a
 	# Of course! Why the hell would it be listed or in make install?

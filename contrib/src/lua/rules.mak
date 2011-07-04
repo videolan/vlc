@@ -57,6 +57,6 @@ endif
 ifdef HAVE_WIN32
 	cd $< && $(RANLIB) "$(PREFIX)/lib/liblua.a"
 	mkdir -p -- "$(PREFIX)/lib/pkgconfig"
-	cp $</etc/lua.pc "$(PREFIX)/lib/pkgconfig"
+	cp $</etc/lua.pc "$(PREFIX)/lib/pkgconfig/"
 endif
 	touch $@

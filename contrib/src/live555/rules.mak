@@ -54,12 +54,12 @@ endif
 		$</liveMedia/libliveMedia.a \
 		$</UsageEnvironment/libUsageEnvironment.a \
 		$</BasicUsageEnvironment/libBasicUsageEnvironment.a \
-		"$(PREFIX)/lib"
+		"$(PREFIX)/lib/"
 	cp \
 		$</groupsock/include/*.hh \
 		$</groupsock/include/*.h \
 		$</liveMedia/include/*.hh \
         	$</UsageEnvironment/include/*.hh \
         	$</BasicUsageEnvironment/include/*.hh \
-		"$(PREFIX)/include"
+		"$(PREFIX)/include/"
 	touch $@
