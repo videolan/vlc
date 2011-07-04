@@ -1,0 +1,14 @@
+diff -Nru libvpx.orig/build/make/configure.sh libvpx/build/make/configure.sh
+--- libvpx.orig/build/make/configure.sh	2011-07-04 19:21:14.000000000 +0300
++++ libvpx/build/make/configure.sh	2011-07-04 19:22:10.000000000 +0300
+@@ -659,8 +659,8 @@
+                 check_add_asflags -mcpu=${tgt_isa}
+             elif enabled armv7
+             then
+-                check_add_cflags -march=armv7-a -mcpu=cortex-a8 -mfpu=neon -mfloat-abi=softfp  #-ftree-vectorize
+-                check_add_asflags -mcpu=cortex-a8 -mfpu=neon -mfloat-abi=softfp  #-march=armv7-a
++                check_add_cflags -march=armv7-a -mcpu=cortex-a8 -mfpu=neon  #-ftree-vectorize
++                check_add_asflags -mcpu=cortex-a8 -mfpu=neon  #-march=armv7-a
+             else
+                 check_add_cflags -march=${tgt_isa}
+                 check_add_asflags -march=${tgt_isa}

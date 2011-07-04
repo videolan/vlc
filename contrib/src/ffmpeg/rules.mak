@@ -10,6 +10,7 @@ FFMPEGCONF = \
 	--disable-doc \
 	--disable-decoder=libvpx \
 	--enable-libgsm \
+	--enable-libvpx \
 	--disable-debug \
 	--enable-gpl \
 	--enable-postproc \
@@ -21,7 +22,7 @@ FFMPEGCONF = \
 	--disable-protocols \
 	--disable-avfilter \
 	--disable-network
-DEPS_ffmpeg = zlib gsm
+DEPS_ffmpeg = zlib gsm vpx $(DEPS_vpx)
 
 # Optional dependencies
 ifdef BUILD_ENCODERS
@@ -32,9 +33,6 @@ else
 FFMPEGCONF += --disable-encoders --disable-muxers
 # XXX: REVISIT --enable-small ?
 endif
-
-#FFMPEGCONF += --enable-libvpx
-#DEPS_ffmpeg += vpx $(DEPS_vpx)
 
 # XXX: REVISIT
 #ifndef HAVE_FPU

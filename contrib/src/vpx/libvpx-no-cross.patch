@@ -1,0 +1,34 @@
+diff -Nru libvpx.orig/build/make/configure.sh libvpx/build/make/configure.sh
+--- libvpx.orig/build/make/configure.sh	2011-07-04 19:18:07.000000000 +0300
++++ libvpx/build/make/configure.sh	2011-07-04 19:19:08.000000000 +0300
+@@ -648,14 +648,6 @@
+ 
+         case ${tgt_cc} in
+         gcc)
+-        if enabled iwmmxt || enabled iwmmxt2
+-            then
+-                CROSS=${CROSS:-arm-iwmmxt-linux-gnueabi-}
+-            elif enabled symbian; then
+-                CROSS=${CROSS:-arm-none-symbianelf-}
+-            else
+-                CROSS=${CROSS:-arm-none-linux-gnueabi-}
+-            fi
+             link_with_cc=gcc
+             setup_gnu_toolchain
+             arch_int=${tgt_isa##armv}
+@@ -806,7 +798,6 @@
+         esac
+     ;;
+     mips*)
+-        CROSS=${CROSS:-mipsel-linux-uclibc-}
+         link_with_cc=gcc
+         setup_gnu_toolchain
+         tune_cflags="-mtune="
+@@ -855,7 +846,6 @@
+             solaris*)
+                 CC=${CC:-${CROSS}gcc}
+                 LD=${LD:-${CROSS}gcc}
+-                CROSS=${CROSS:-g}
+                 ;;
+         esac
+ 
