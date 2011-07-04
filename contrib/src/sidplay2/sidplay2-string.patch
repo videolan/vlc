@@ -1,0 +1,35 @@
+diff -ruN sidplay-2.1.1/builders/resid-builder/src/resid-builder.cpp sidplay-2.1.1.new/builders/resid-builder/src/resid-builder.cpp
+--- sidplay-2.1.1/builders/resid-builder/src/resid-builder.cpp	2004-06-14 22:07:58.000000000 +0200
++++ sidplay-2.1.1.new/builders/resid-builder/src/resid-builder.cpp	2011-01-15 16:49:24.909660710 +0100
+@@ -46,6 +46,8 @@
+ #include "resid.h"
+ #include "resid-emu.h"
+ 
++#include <string.h>
++
+ // Error String(s)
+ const char *ReSIDBuilder::ERR_FILTER_DEFINITION = "RESID ERROR: Filter definition is not valid (see docs).";
+ 
+Les fichiers binaires sidplay-2.1.1/builders/resid-builder/src/resid-builder.o et sidplay-2.1.1.new/builders/resid-builder/src/resid-builder.o sont différents.
+diff -ruN sidplay-2.1.1/builders/resid-builder/src/resid.cpp sidplay-2.1.1.new/builders/resid-builder/src/resid.cpp
+--- sidplay-2.1.1/builders/resid-builder/src/resid.cpp	2004-06-14 22:07:58.000000000 +0200
++++ sidplay-2.1.1.new/builders/resid-builder/src/resid.cpp	2011-01-15 16:49:05.441652832 +0100
+@@ -25,6 +25,7 @@
+ #include "resid.h"
+ #include "resid-emu.h"
+ 
++#include <string.h>
+ 
+ char ReSID::m_credit[];
+ 
+diff -ru sidplay-libs.orig//builders/hardsid-builder/src/hardsid-builder.cpp sidplay-libs/builders/hardsid-builder/src/hardsid-builder.cpp
+--- sidplay-libs.orig//builders/hardsid-builder/src/hardsid-builder.cpp	2011-07-04 23:51:26.000000000 +0300
++++ sidplay-libs/builders/hardsid-builder/src/hardsid-builder.cpp	2011-07-04 23:51:47.000000000 +0300
+@@ -47,6 +47,7 @@
+  ***************************************************************************/
+ 
+ #include <stdio.h>
++#include <string.h>
+ #include "config.h"
+ 
+ #ifdef HAVE_EXCEPTIONS
