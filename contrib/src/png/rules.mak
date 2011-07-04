@@ -3,6 +3,9 @@ PNG_VERSION := 1.4.7
 PNG_URL := $(SF)/libpng/libpng-$(PNG_VERSION).tar.bz2
 
 PKGS += png
+ifeq ($(call need_pkg,"libpng"),)
+PKGS_FOUND += png
+endif
 
 $(TARBALLS)/libpng-$(PNG_VERSION).tar.bz2:
 	$(call download,$(PNG_URL))
