@@ -3,6 +3,8 @@
 GME_VERSION := 0.5.5
 GME_URL := http://game-music-emu.googlecode.com/files/game-music-emu-$(GME_VERSION).tbz2
 
+PKGS += gme
+
 $(TARBALLS)/game-music-emu-$(GME_VERSION).tar.bz2:
 	$(call download,$(GME_URL))
 
