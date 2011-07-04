@@ -4,6 +4,9 @@ FLAC_VERSION := 1.2.1
 FLAC_URL := $(SF)/flac/flac-$(FLAC_VERSION).tar.gz
 
 PKGS += flac
+ifeq ($(call need_pkg,"flac"),)
+PKGS_FOUND += flac
+endif
 
 $(TARBALLS)/flac-$(FLAC_VERSION).tar.gz:
 	$(call download,$(FLAC_URL))
