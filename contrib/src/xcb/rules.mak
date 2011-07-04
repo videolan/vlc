@@ -42,6 +42,8 @@ XCBCONF := \
 	--disable-xvmc \
 	$(HOSTCONF)
 
+DEPS_xcb = xau $(DEPS_xau)
+
 .xcb: libxcb
 	cd $< && $(HOSTVARS) ./configure $(XCBCONF)
 	cd $< && $(MAKE) install
