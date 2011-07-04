@@ -189,12 +189,10 @@ create_toolbar_item( NSString * o_itemIdent, NSString * o_name, NSString * o_des
     [o_audio_effects_box setTitle: _NS("Effects")];
     [o_audio_enable_ckb setTitle: _NS("Enable Audio")];
     [o_audio_general_box setTitle: _NS("General Audio")];
-    [o_audio_headphone_ckb setTitle: _NS("Headphone surround effect")];
     [o_audio_lang_txt setStringValue: _NS("Preferred Audio language")];
     [o_audio_last_ckb setTitle: _NS("Enable Last.fm submissions")];
     [o_audio_lastpwd_txt setStringValue: _NS("Password")];
     [o_audio_lastuser_txt setStringValue: _NS("User name")];
-    [o_audio_norm_ckb setTitle: _NS("Volume normalizer")];
     [o_audio_spdif_ckb setTitle: _NS("Use S/PDIF when available")];
     [o_audio_visual_txt setStringValue: _NS("Visualization")];
     [o_audio_vol_txt setStringValue: _NS("Default Volume")];
@@ -447,19 +445,6 @@ static inline char * __config_GetLabel( vlc_object_t *p_this, const char *psz_na
 
     [self setupButton: o_audio_dolby_pop forIntList: "force-dolby-surround"];
     [self setupField: o_audio_lang_fld forOption: "audio-language"];
-
-    [self setupButton: o_audio_headphone_ckb forBoolValue: "headphone-dolby"];
-
-    psz_tmp = config_GetPsz( p_intf, "audio-filter" );
-    if( psz_tmp )
-    {
-        [o_audio_norm_ckb setState: (NSInteger)strstr( psz_tmp, "normvol" )];
-        [o_audio_norm_fld setEnabled: [o_audio_norm_ckb state]];
-        [o_audio_norm_stepper setEnabled: [o_audio_norm_ckb state]];
-        free( psz_tmp );
-    }
-    [o_audio_norm_fld setFloatValue: config_GetFloat( p_intf, "norm-max-level" )];
-    [o_audio_norm_fld setToolTip: [NSString stringWithUTF8String: config_GetLabel( p_intf, "norm-max-level")]];
 
     [self setupButton: o_audio_visual_pop forModuleList: "audio-visual"];
 
@@ -826,32 +811,6 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
         SaveIntList( o_audio_dolby_pop, "force-dolby-surround" );
 
         config_PutPsz( p_intf, "audio-language", [[o_audio_lang_fld stringValue] UTF8String] );
-        config_PutInt( p_intf, "headphone-dolby", [o_audio_headphone_ckb state] );
-
-        if( [o_audio_norm_ckb state] == NSOnState )
-        {
-            tmpString = getString( "audio-filter" );
-            tmpRange = [tmpString rangeOfString:@"normvol"];
-            if( [tmpString length] > 0 && tmpRange.location == NSNotFound )
-            {
-                tmpString = [tmpString stringByAppendingString: @":normvol"];
-                config_PutPsz( p_intf, "audio-filter", [tmpString UTF8String] );
-            }
-            else
-                config_PutPsz( p_intf, "audio-filter", "normvol" );
-        }
-        else
-        {
-            tmpString = getString( "audio-filter" );
-            if(! [tmpString isEqualToString:@""] )
-            {
-                tmpString = [tmpString stringByTrimmingCharactersInSet: [NSCharacterSet characterSetWithCharactersInString:@":normvol"]];
-                tmpString = [tmpString stringByTrimmingCharactersInSet: [NSCharacterSet characterSetWithCharactersInString:@"normvol:"]];
-                tmpString = [tmpString stringByTrimmingCharactersInSet: [NSCharacterSet characterSetWithCharactersInString:@"normvol"]];
-                config_PutPsz( p_intf, "audio-filter", [tmpString UTF8String] );
-            }
-        }
-        config_PutFloat( p_intf, "norm-max-level", [o_audio_norm_fld floatValue] );
 
         SaveModuleList( o_audio_visual_pop, "audio-visual" );
 
@@ -1024,12 +983,6 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
 
     if( sender == o_audio_vol_fld )
         [o_audio_vol_sld setIntValue: [o_audio_vol_fld intValue]];
-
-    if( sender == o_audio_norm_ckb )
-    {
-        [o_audio_norm_stepper setEnabled: [o_audio_norm_ckb state]];
-        [o_audio_norm_fld setEnabled: [o_audio_norm_ckb state]];
-    }
 
     if( sender == o_audio_last_ckb )
     {

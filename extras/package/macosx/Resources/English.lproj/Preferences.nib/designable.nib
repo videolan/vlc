@@ -2,21 +2,22 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.10">
   <data>
     <int key="IBDocument.SystemTarget">1050</int>
-    <string key="IBDocument.SystemVersion">11A430e</string>
+    <string key="IBDocument.SystemVersion">11A511</string>
     <string key="IBDocument.InterfaceBuilderVersion">851</string>
-    <string key="IBDocument.AppKitVersion">1117</string>
-    <string key="IBDocument.HIToolboxVersion">552.00</string>
+    <string key="IBDocument.AppKitVersion">1138</string>
+    <string key="IBDocument.HIToolboxVersion">566.00</string>
     <object class="NSMutableDictionary" key="IBDocument.PluginVersions">
       <string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
       <string key="NS.object.0">851</string>
     </object>
     <object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
       <bool key="EncodedWithXMLCoder">YES</bool>
-      <integer value="2466"/>
-      <integer value="2265"/>
-      <integer value="2311"/>
-      <integer value="1538"/>
       <integer value="2562"/>
+      <integer value="1538"/>
+      <integer value="2330"/>
+      <integer value="2466"/>
+      <integer value="2311"/>
+      <integer value="2265"/>
     </object>
     <object class="NSArray" key="IBDocument.PluginDependencies">
       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -524,6 +525,7 @@ eHQAAAAAQ29weXJpZ2h0IEFwcGxlLCBJbmMuLCAyMDA4AA</bytes>
         <string key="NSScreenRect">{{0, 0}, {1280, 778}}</string>
         <string key="NSMaxSize">{1.7976931348623157e+308, 1.7976931348623157e+308}</string>
         <string key="NSFrameAutosaveName">prefs</string>
+        <bool key="NSWindowIsRestorable">YES</bool>
       </object>
       <object class="NSCustomObject" id="990163127">
         <string key="NSClassName">VLCPrefs</string>
@@ -895,6 +897,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
         <string key="NSScreenRect">{{0, 0}, {1280, 778}}</string>
         <string key="NSMaxSize">{1.7976931348623157e+308, 1.7976931348623157e+308}</string>
         <string key="NSFrameAutosaveName">sprefs</string>
+        <bool key="NSWindowIsRestorable">YES</bool>
       </object>
       <object class="NSCustomView" id="1006472879">
         <reference key="NSNextResponder"/>
@@ -1288,14 +1291,14 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
         <string key="NSExtension">NSResponder</string>
       </object>
       <object class="NSCustomView" id="1030708865">
-        <nil key="NSNextResponder"/>
+        <reference key="NSNextResponder"/>
         <int key="NSvFlags">256</int>
         <object class="NSMutableArray" key="NSSubviews">
           <bool key="EncodedWithXMLCoder">YES</bool>
           <object class="NSButton" id="456891994">
             <reference key="NSNextResponder" ref="1030708865"/>
             <int key="NSvFlags">256</int>
-            <string key="NSFrame">{{18, 424}, {246, 18}}</string>
+            <string key="NSFrame">{{18, 366}, {246, 18}}</string>
             <reference key="NSSuperview" ref="1030708865"/>
             <bool key="NSEnabled">YES</bool>
             <object class="NSButtonCell" key="NSCell" id="771203121">
@@ -1417,9 +1420,9 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
                                 </object>
                               </object>
                             </object>
-                            <string>.</string>
-                            <integer value="1000"/>
                             <string>,</string>
+                            <integer value="1000"/>
+                            <string>.</string>
                             <object class="NSDecimalNumberPlaceholder" id="806607793">
                               <int key="NS.exponent">2</int>
                               <int key="NS.length">1</int>
@@ -1456,8 +1459,8 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
                         <reference key="NS.min" ref="367276341"/>
                         <reference key="NS.max" ref="806607793"/>
                         <nil key="NS.rounding"/>
-                        <string key="NS.decimal">.</string>
-                        <string key="NS.thousand">,</string>
+                        <string key="NS.decimal">,</string>
+                        <string key="NS.thousand">.</string>
                         <bool key="NS.hasthousands">NO</bool>
                         <bool key="NS.localized">YES</bool>
                         <bool key="NS.allowsfloats">YES</bool>
@@ -1619,7 +1622,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
                 <reference key="NSSuperview" ref="426339738"/>
               </object>
             </object>
-            <string key="NSFrame">{{17, 263}, {535, 155}}</string>
+            <string key="NSFrame">{{17, 205}, {535, 155}}</string>
             <reference key="NSSuperview" ref="1030708865"/>
             <string key="NSOffsets">{0, 0}</string>
             <object class="NSTextFieldCell" key="NSTitleCell">
@@ -1649,160 +1652,6 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
                 <int key="NSvFlags">274</int>
                 <object class="NSMutableArray" key="NSSubviews">
                   <bool key="EncodedWithXMLCoder">YES</bool>
-                  <object class="NSButton" id="139000903">
-                    <reference key="NSNextResponder" ref="1026306433"/>
-                    <int key="NSvFlags">256</int>
-                    <string key="NSFrame">{{10, 72}, {446, 18}}</string>
-                    <reference key="NSSuperview" ref="1026306433"/>
-                    <bool key="NSEnabled">YES</bool>
-                    <object class="NSButtonCell" key="NSCell" id="324129110">
-                      <int key="NSCellFlags">67239424</int>
-                      <int key="NSCellFlags2">0</int>
-                      <string key="NSContents">Headphone surround effect</string>
-                      <reference key="NSSupport" ref="96267115"/>
-                      <reference key="NSControlView" ref="139000903"/>
-                      <int key="NSButtonFlags">1211912703</int>
-                      <int key="NSButtonFlags2">2</int>
-                      <reference key="NSNormalImage" ref="487998105"/>
-                      <reference key="NSAlternateImage" ref="606027538"/>
-                      <string key="NSAlternateContents"/>
-                      <string key="NSKeyEquivalent"/>
-                      <int key="NSPeriodicDelay">200</int>
-                      <int key="NSPeriodicInterval">25</int>
-                    </object>
-                  </object>
-                  <object class="NSButton" id="150178037">
-                    <reference key="NSNextResponder" ref="1026306433"/>
-                    <int key="NSvFlags">256</int>
-                    <string key="NSFrame">{{10, 42}, {238, 18}}</string>
-                    <reference key="NSSuperview" ref="1026306433"/>
-                    <bool key="NSEnabled">YES</bool>
-                    <object class="NSButtonCell" key="NSCell" id="675769290">
-                      <int key="NSCellFlags">67239424</int>
-                      <int key="NSCellFlags2">0</int>
-                      <string key="NSContents">Volume normalizer</string>
-                      <reference key="NSSupport" ref="96267115"/>
-                      <reference key="NSControlView" ref="150178037"/>
-                      <int key="NSButtonFlags">1211912703</int>
-                      <int key="NSButtonFlags2">2</int>
-                      <reference key="NSNormalImage" ref="487998105"/>
-                      <reference key="NSAlternateImage" ref="606027538"/>
-                      <string key="NSAlternateContents"/>
-                      <string key="NSKeyEquivalent"/>
-                      <int key="NSPeriodicDelay">200</int>
-                      <int key="NSPeriodicInterval">25</int>
-                    </object>
-                  </object>
-                  <object class="NSTextField" id="839542369">
-                    <reference key="NSNextResponder" ref="1026306433"/>
-                    <int key="NSvFlags">256</int>
-                    <string key="NSFrame">{{252, 40}, {46, 22}}</string>
-                    <reference key="NSSuperview" ref="1026306433"/>
-                    <bool key="NSEnabled">YES</bool>
-                    <object class="NSTextFieldCell" key="NSCell" id="722142134">
-                      <int key="NSCellFlags">-1267597759</int>
-                      <int key="NSCellFlags2">71304192</int>
-                      <object class="NSDecimalNumberPlaceholder" key="NSContents">
-                        <int key="NS.exponent">-1</int>
-                        <int key="NS.length">1</int>
-                        <bool key="NS.negative">NO</bool>
-                        <bool key="NS.compact">YES</bool>
-                        <int key="NS.mantissa.bo">1</int>
-                        <bytes key="NS.mantissa">BQAAAAAAAAAAAAAAAAAAAA</bytes>
-                      </object>
-                      <reference key="NSSupport" ref="96267115"/>
-                      <object class="NSNumberFormatter" key="NSFormatter" id="140686537">
-                        <object class="NSMutableDictionary" key="NS.attributes">
-                          <bool key="EncodedWithXMLCoder">YES</bool>
-                          <object class="NSArray" key="dict.sortedKeys">
-                            <bool key="EncodedWithXMLCoder">YES</bool>
-                            <string>allowsFloats</string>
-                            <string>attributedStringForZero</string>
-                            <string>decimalSeparator</string>
-                            <string>formatterBehavior</string>
-                            <string>groupingSeparator</string>
-                            <string>locale</string>
-                            <string>minimum</string>
-                            <string>negativeFormat</string>
-                            <string>positiveFormat</string>
-                            <string>usesGroupingSeparator</string>
-                          </object>
-                          <object class="NSMutableArray" key="dict.values">
-                            <bool key="EncodedWithXMLCoder">YES</bool>
-                            <boolean value="YES"/>
-                            <object class="NSAttributedString" id="1034563444">
-                              <string key="NSString">0</string>
-                              <reference key="NSAttributes" ref="226083992"/>
-                            </object>
-                            <string>.</string>
-                            <integer value="1000"/>
-                            <string>,</string>
-                            <object class="NSLocale">
-                              <string key="NS.identifier">de_DE</string>
-                            </object>
-                            <object class="NSDecimalNumberPlaceholder" id="756204575">
-                              <int key="NS.exponent">0</int>
-                              <int key="NS.length">0</int>
-                              <bool key="NS.negative">NO</bool>
-                              <bool key="NS.compact">NO</bool>
-                              <int key="NS.mantissa.bo">1</int>
-                              <bytes key="NS.mantissa">AAAAAAAAAAAAAAAAAAAAAA</bytes>
-                            </object>
-                            <string/>
-                            <string>0.#</string>
-                            <boolean value="NO"/>
-                          </object>
-                        </object>
-                        <string key="NS.positiveformat">0.#</string>
-                        <string key="NS.negativeformat"/>
-                        <nil key="NS.positiveattrs"/>
-                        <nil key="NS.negativeattrs"/>
-                        <reference key="NS.zero" ref="1034563444"/>
-                        <object class="NSAttributedString" key="NS.nil">
-                          <string key="NSString"/>
-                        </object>
-                        <object class="NSAttributedString" key="NS.nan">
-                          <string key="NSString">NaN</string>
-                          <reference key="NSAttributes" ref="226083992"/>
-                        </object>
-                        <reference key="NS.min" ref="756204575"/>
-                        <object class="NSDecimalNumberPlaceholder" key="NS.max">
-                          <int key="NS.exponent">0</int>
-                          <int key="NS.length">0</int>
-                          <bool key="NS.negative">YES</bool>
-                          <bool key="NS.compact">NO</bool>
-                          <int key="NS.mantissa.bo">1</int>
-                          <bytes key="NS.mantissa">AAAAAAAAAAAAAAAAAAAAAA</bytes>
-                        </object>
-                        <nil key="NS.rounding"/>
-                        <string key="NS.decimal">.</string>
-                        <string key="NS.thousand">,</string>
-                        <bool key="NS.hasthousands">NO</bool>
-                        <bool key="NS.localized">YES</bool>
-                        <bool key="NS.allowsfloats">YES</bool>
-                      </object>
-                      <reference key="NSControlView" ref="839542369"/>
-                      <bool key="NSDrawsBackground">YES</bool>
-                      <reference key="NSBackgroundColor" ref="122952243"/>
-                      <reference key="NSTextColor" ref="292380699"/>
-                    </object>
-                  </object>
-                  <object class="NSStepper" id="427031835">
-                    <reference key="NSNextResponder" ref="1026306433"/>
-                    <int key="NSvFlags">256</int>
-                    <string key="NSFrame">{{303, 37}, {19, 27}}</string>
-                    <reference key="NSSuperview" ref="1026306433"/>
-                    <bool key="NSEnabled">YES</bool>
-                    <object class="NSStepperCell" key="NSCell" id="379675009">
-                      <int key="NSCellFlags">537787936</int>
-                      <int key="NSCellFlags2">0</int>
-                      <reference key="NSControlView" ref="427031835"/>
-                      <double key="NSMaxValue">59</double>
-                      <double key="NSIncrement">1</double>
-                      <bool key="NSValueWraps">YES</bool>
-                      <bool key="NSAutorepeat">YES</bool>
-                    </object>
-                  </object>
                   <object class="NSTextField" id="16403501">
                     <reference key="NSNextResponder" ref="1026306433"/>
                     <int key="NSvFlags">256</int>
@@ -1890,11 +1739,11 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
                     </object>
                   </object>
                 </object>
-                <string key="NSFrame">{{2, 2}, {531, 100}}</string>
+                <string key="NSFrame">{{2, 2}, {531, 43}}</string>
                 <reference key="NSSuperview" ref="376706301"/>
               </object>
             </object>
-            <string key="NSFrame">{{17, 142}, {535, 117}}</string>
+            <string key="NSFrame">{{17, 141}, {535, 60}}</string>
             <reference key="NSSuperview" ref="1030708865"/>
             <string key="NSOffsets">{0, 0}</string>
             <object class="NSTextFieldCell" key="NSTitleCell">
@@ -2017,7 +1866,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
                 <reference key="NSSuperview" ref="141205708"/>
               </object>
             </object>
-            <string key="NSFrame">{{17, 16}, {535, 122}}</string>
+            <string key="NSFrame">{{17, 15}, {535, 122}}</string>
             <reference key="NSSuperview" ref="1030708865"/>
             <string key="NSOffsets">{0, 0}</string>
             <object class="NSTextFieldCell" key="NSTitleCell">
@@ -2038,7 +1887,8 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
             <bool key="NSTransparent">NO</bool>
           </object>
         </object>
-        <string key="NSFrameSize">{570, 460}</string>
+        <string key="NSFrameSize">{569, 402}</string>
+        <reference key="NSSuperview"/>
         <string key="NSClassName">NSView</string>
         <string key="NSExtension">NSResponder</string>
       </object>
@@ -4183,6 +4033,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
         </object>
         <string key="NSScreenRect">{{0, 0}, {1280, 778}}</string>
         <string key="NSMaxSize">{1.7976931348623157e+308, 1.7976931348623157e+308}</string>
+        <bool key="NSWindowIsRestorable">YES</bool>
       </object>
       <object class="NSCustomObject" id="761483302">
         <string key="NSClassName">SUUpdater</string>
@@ -4288,14 +4139,6 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
           <int key="connectionID">2262</int>
         </object>
         <object class="IBConnectionRecord">
-          <object class="IBActionConnection" key="connection">
-            <string key="label">takeFloatValueFrom:</string>
-            <reference key="source" ref="839542369"/>
-            <reference key="destination" ref="427031835"/>
-          </object>
-          <int key="connectionID">2355</int>
-        </object>
-        <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_audio_view</string>
             <reference key="source" ref="150917409"/>
@@ -4385,14 +4228,6 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
         </object>
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
-            <string key="label">o_audio_headphone_ckb</string>
-            <reference key="source" ref="150917409"/>
-            <reference key="destination" ref="139000903"/>
-          </object>
-          <int key="connectionID">2382</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBOutletConnection" key="connection">
             <string key="label">o_audio_lang_txt</string>
             <reference key="source" ref="150917409"/>
             <reference key="destination" ref="927175184"/>
@@ -4446,22 +4281,6 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
             <reference key="destination" ref="710479511"/>
           </object>
           <int key="connectionID">2390</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBOutletConnection" key="connection">
-            <string key="label">o_audio_norm_ckb</string>
-            <reference key="source" ref="150917409"/>
-            <reference key="destination" ref="150178037"/>
-          </object>
-          <int key="connectionID">2391</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBOutletConnection" key="connection">
-            <string key="label">o_audio_norm_fld</string>
-            <reference key="source" ref="150917409"/>
-            <reference key="destination" ref="839542369"/>
-          </object>
-          <int key="connectionID">2392</int>
         </object>
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
@@ -4654,30 +4473,6 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
             <reference key="destination" ref="430352128"/>
           </object>
           <int key="connectionID">2429</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBActionConnection" key="connection">
-            <string key="label">audioSettingChanged:</string>
-            <reference key="source" ref="150917409"/>
-            <reference key="destination" ref="139000903"/>
-          </object>
-          <int key="connectionID">2430</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBActionConnection" key="connection">
-            <string key="label">audioSettingChanged:</string>
-            <reference key="source" ref="150917409"/>
-            <reference key="destination" ref="150178037"/>
-          </object>
-          <int key="connectionID">2431</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBActionConnection" key="connection">
-            <string key="label">audioSettingChanged:</string>
-            <reference key="source" ref="150917409"/>
-            <reference key="destination" ref="839542369"/>
-          </object>
-          <int key="connectionID">2432</int>
         </object>
         <object class="IBConnectionRecord">
           <object class="IBActionConnection" key="connection">
@@ -5561,14 +5356,6 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
         </object>
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
-            <string key="label">o_audio_norm_stepper</string>
-            <reference key="source" ref="150917409"/>
-            <reference key="destination" ref="427031835"/>
-          </object>
-          <int key="connectionID">3419</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBOutletConnection" key="connection">
             <string key="label">nextKeyView</string>
             <reference key="source" ref="955218271"/>
             <reference key="destination" ref="1031566139"/>
@@ -5606,22 +5393,6 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
             <reference key="destination" ref="430352128"/>
           </object>
           <int key="connectionID">3424</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBOutletConnection" key="connection">
-            <string key="label">nextKeyView</string>
-            <reference key="source" ref="430352128"/>
-            <reference key="destination" ref="839542369"/>
-          </object>
-          <int key="connectionID">3425</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBOutletConnection" key="connection">
-            <string key="label">nextKeyView</string>
-            <reference key="source" ref="839542369"/>
-            <reference key="destination" ref="977613543"/>
-          </object>
-          <int key="connectionID">3426</int>
         </object>
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
@@ -5758,6 +5529,14 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
             <reference key="destination" ref="739265565"/>
           </object>
           <int key="connectionID">3566</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_intf_enableGrowl_ckb</string>
+            <reference key="source" ref="150917409"/>
+            <reference key="destination" ref="739265565"/>
+          </object>
+          <int key="connectionID">3567</int>
         </object>
       </object>
       <object class="IBMutableOrderedSet" key="objectRecords">
@@ -6039,10 +5818,6 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
             <reference key="object" ref="376706301"/>
             <object class="NSMutableArray" key="children">
               <bool key="EncodedWithXMLCoder">YES</bool>
-              <reference ref="139000903"/>
-              <reference ref="150178037"/>
-              <reference ref="839542369"/>
-              <reference ref="427031835"/>
               <reference ref="16403501"/>
               <reference ref="1043716973"/>
             </object>
@@ -6847,71 +6622,6 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
             <int key="objectID">3465</int>
             <reference key="object" ref="879009110"/>
             <reference key="parent" ref="430352128"/>
-          </object>
-          <object class="IBObjectRecord">
-            <int key="objectID">2350</int>
-            <reference key="object" ref="139000903"/>
-            <object class="NSMutableArray" key="children">
-              <bool key="EncodedWithXMLCoder">YES</bool>
-              <reference ref="324129110"/>
-            </object>
-            <reference key="parent" ref="376706301"/>
-          </object>
-          <object class="IBObjectRecord">
-            <int key="objectID">3466</int>
-            <reference key="object" ref="324129110"/>
-            <reference key="parent" ref="139000903"/>
-          </object>
-          <object class="IBObjectRecord">
-            <int key="objectID">2351</int>
-            <reference key="object" ref="150178037"/>
-            <object class="NSMutableArray" key="children">
-              <bool key="EncodedWithXMLCoder">YES</bool>
-              <reference ref="675769290"/>
-            </object>
-            <reference key="parent" ref="376706301"/>
-          </object>
-          <object class="IBObjectRecord">
-            <int key="objectID">3467</int>
-            <reference key="object" ref="675769290"/>
-            <reference key="parent" ref="150178037"/>
-          </object>
-          <object class="IBObjectRecord">
-            <int key="objectID">2352</int>
-            <reference key="object" ref="839542369"/>
-            <object class="NSMutableArray" key="children">
-              <bool key="EncodedWithXMLCoder">YES</bool>
-              <reference ref="722142134"/>
-            </object>
-            <reference key="parent" ref="376706301"/>
-          </object>
-          <object class="IBObjectRecord">
-            <int key="objectID">3468</int>
-            <reference key="object" ref="722142134"/>
-            <object class="NSMutableArray" key="children">
-              <bool key="EncodedWithXMLCoder">YES</bool>
-              <reference ref="140686537"/>
-            </object>
-            <reference key="parent" ref="839542369"/>
-          </object>
-          <object class="IBObjectRecord">
-            <int key="objectID">2354</int>
-            <reference key="object" ref="140686537"/>
-            <reference key="parent" ref="722142134"/>
-          </object>
-          <object class="IBObjectRecord">
-            <int key="objectID">2353</int>
-            <reference key="object" ref="427031835"/>
-            <object class="NSMutableArray" key="children">
-              <bool key="EncodedWithXMLCoder">YES</bool>
-              <reference ref="379675009"/>
-            </object>
-            <reference key="parent" ref="376706301"/>
-          </object>
-          <object class="IBObjectRecord">
-            <int key="objectID">3469</int>
-            <reference key="object" ref="379675009"/>
-            <reference key="parent" ref="427031835"/>
           </object>
           <object class="IBObjectRecord">
             <int key="objectID">2357</int>
@@ -8133,6 +7843,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
           <string>2325.ImportedFromIB2</string>
           <string>2327.IBPluginDependency</string>
           <string>2327.ImportedFromIB2</string>
+          <string>2330.IBEditorWindowLastContentRect</string>
           <string>2330.IBPluginDependency</string>
           <string>2330.ImportedFromIB2</string>
           <string>2331.IBPluginDependency</string>
@@ -8167,19 +7878,11 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
           <string>2346.ImportedFromIB2</string>
           <string>2347.IBPluginDependency</string>
           <string>2347.ImportedFromIB2</string>
-          <string>2350.IBPluginDependency</string>
-          <string>2350.ImportedFromIB2</string>
-          <string>2351.IBPluginDependency</string>
-          <string>2351.ImportedFromIB2</string>
-          <string>2352.IBPluginDependency</string>
-          <string>2352.ImportedFromIB2</string>
-          <string>2353.IBPluginDependency</string>
-          <string>2353.ImportedFromIB2</string>
-          <string>2354.IBPluginDependency</string>
-          <string>2354.ImportedFromIB2</string>
           <string>2357.IBPluginDependency</string>
+          <string>2357.IBViewBoundsToFrameTransform</string>
           <string>2357.ImportedFromIB2</string>
           <string>2358.IBPluginDependency</string>
+          <string>2358.IBViewBoundsToFrameTransform</string>
           <string>2358.ImportedFromIB2</string>
           <string>2359.IBPluginDependency</string>
           <string>2359.ImportedFromIB2</string>
@@ -8190,6 +7893,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
           <string>2362.IBPluginDependency</string>
           <string>2362.ImportedFromIB2</string>
           <string>2363.IBPluginDependency</string>
+          <string>2363.IBViewBoundsToFrameTransform</string>
           <string>2363.ImportedFromIB2</string>
           <string>2365.IBPluginDependency</string>
           <string>2365.ImportedFromIB2</string>
@@ -8463,10 +8167,6 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
           <string>3463.IBPluginDependency</string>
           <string>3464.IBPluginDependency</string>
           <string>3465.IBPluginDependency</string>
-          <string>3466.IBPluginDependency</string>
-          <string>3467.IBPluginDependency</string>
-          <string>3468.IBPluginDependency</string>
-          <string>3469.IBPluginDependency</string>
           <string>3470.IBPluginDependency</string>
           <string>3471.IBPluginDependency</string>
           <string>3472.IBPluginDependency</string>
@@ -8646,6 +8346,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
           <boolean value="YES"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
+          <string>{{329, 320}, {569, 402}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -8681,6 +8382,14 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+          <object class="NSAffineTransform">
+            <bytes key="NSTransformStruct">P4AAAL+AAABBEAAAwegAAA</bytes>
+          </object>
+          <boolean value="YES"/>
+          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+          <object class="NSAffineTransform">
+            <bytes key="NSTransformStruct">P4AAAL+AAABDeQAAwgQAAA</bytes>
+          </object>
           <boolean value="YES"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
@@ -8691,18 +8400,9 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-          <boolean value="YES"/>
-          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-          <boolean value="YES"/>
-          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-          <boolean value="YES"/>
-          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-          <boolean value="YES"/>
-          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-          <boolean value="YES"/>
-          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-          <boolean value="YES"/>
-          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+          <object class="NSAffineTransform">
+            <bytes key="NSTransformStruct">AUGIAABBgAAAA</bytes>
+          </object>
           <boolean value="YES"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
@@ -9041,10 +8741,6 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
@@ -9100,7 +8796,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
         </object>
       </object>
       <nil key="sourceID"/>
-      <int key="maxID">3566</int>
+      <int key="maxID">3567</int>
     </object>
     <object class="IBClassDescriber" key="IBDocument.Classes">
       <object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -10218,6 +9914,882 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
             <string key="majorKey">IBUserSource</string>
             <string key="minorKey"/>
           </object>
+        </object>
+      </object>
+      <object class="NSMutableArray" key="referencedPartialClassDescriptionsV3.1+">
+        <bool key="EncodedWithXMLCoder">YES</bool>
+        <object class="IBPartialClassDescription">
+          <string key="className">VLCHotkeyChangeWindow</string>
+          <string key="superclassName">NSWindow</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier" id="569970938">
+            <string key="majorKey">IBDocumentRelativeSource</string>
+            <string key="minorKey">../../../../../modules/gui/macosx/simple_prefs.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">VLCSimplePrefs</string>
+          <string key="superclassName">NSObject</string>
+          <object class="NSMutableDictionary" key="actions">
+            <bool key="EncodedWithXMLCoder">YES</bool>
+            <object class="NSArray" key="dict.sortedKeys">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <string>audioSettingChanged:</string>
+              <string>buttonAction:</string>
+              <string>changeFont:</string>
+              <string>hotkeySettingChanged:</string>
+              <string>inputSettingChanged:</string>
+              <string>interfaceSettingChanged:</string>
+              <string>osdSettingChanged:</string>
+              <string>showFontPicker:</string>
+              <string>videoSettingChanged:</string>
+            </object>
+            <object class="NSMutableArray" key="dict.values">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+            </object>
+          </object>
+          <object class="NSMutableDictionary" key="actionInfosByName">
+            <bool key="EncodedWithXMLCoder">YES</bool>
+            <object class="NSArray" key="dict.sortedKeys">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <string>audioSettingChanged:</string>
+              <string>buttonAction:</string>
+              <string>changeFont:</string>
+              <string>hotkeySettingChanged:</string>
+              <string>inputSettingChanged:</string>
+              <string>interfaceSettingChanged:</string>
+              <string>osdSettingChanged:</string>
+              <string>showFontPicker:</string>
+              <string>videoSettingChanged:</string>
+            </object>
+            <object class="NSMutableArray" key="dict.values">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <object class="IBActionInfo">
+                <string key="name">audioSettingChanged:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">buttonAction:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">changeFont:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">hotkeySettingChanged:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">inputSettingChanged:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">interfaceSettingChanged:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">osdSettingChanged:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">showFontPicker:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">videoSettingChanged:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+            </object>
+          </object>
+          <object class="NSMutableDictionary" key="outlets">
+            <bool key="EncodedWithXMLCoder">YES</bool>
+            <object class="NSArray" key="dict.sortedKeys">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <string>o_audio_dolby_pop</string>
+              <string>o_audio_dolby_txt</string>
+              <string>o_audio_effects_box</string>
+              <string>o_audio_enable_ckb</string>
+              <string>o_audio_general_box</string>
+              <string>o_audio_lang_fld</string>
+              <string>o_audio_lang_txt</string>
+              <string>o_audio_last_box</string>
+              <string>o_audio_last_ckb</string>
+              <string>o_audio_lastpwd_sfld</string>
+              <string>o_audio_lastpwd_txt</string>
+              <string>o_audio_lastuser_fld</string>
+              <string>o_audio_lastuser_txt</string>
+              <string>o_audio_spdif_ckb</string>
+              <string>o_audio_view</string>
+              <string>o_audio_visual_pop</string>
+              <string>o_audio_visual_txt</string>
+              <string>o_audio_vol_fld</string>
+              <string>o_audio_vol_sld</string>
+              <string>o_audio_vol_txt</string>
+              <string>o_currentlyShownCategoryView</string>
+              <string>o_hotkeys_change_btn</string>
+              <string>o_hotkeys_change_cancel_btn</string>
+              <string>o_hotkeys_change_keys_lbl</string>
+              <string>o_hotkeys_change_lbl</string>
+              <string>o_hotkeys_change_ok_btn</string>
+              <string>o_hotkeys_change_taken_lbl</string>
+              <string>o_hotkeys_change_win</string>
+              <string>o_hotkeys_clear_btn</string>
+              <string>o_hotkeys_lbl</string>
+              <string>o_hotkeys_listbox</string>
+              <string>o_hotkeys_view</string>
+              <string>o_input_avi_pop</string>
+              <string>o_input_avi_txt</string>
+              <string>o_input_cachelevel_custom_txt</string>
+              <string>o_input_cachelevel_pop</string>
+              <string>o_input_cachelevel_txt</string>
+              <string>o_input_caching_box</string>
+              <string>o_input_httpproxy_fld</string>
+              <string>o_input_httpproxy_txt</string>
+              <string>o_input_httpproxypwd_sfld</string>
+              <string>o_input_httpproxypwd_txt</string>
+              <string>o_input_mux_box</string>
+              <string>o_input_net_box</string>
+              <string>o_input_postproc_fld</string>
+              <string>o_input_postproc_txt</string>
+              <string>o_input_rtsp_ckb</string>
+              <string>o_input_serverport_fld</string>
+              <string>o_input_serverport_txt</string>
+              <string>o_input_skipLoop_pop</string>
+              <string>o_input_skipLoop_txt</string>
+              <string>o_input_view</string>
+              <string>o_intf_appleremote_ckb</string>
+              <string>o_intf_art_pop</string>
+              <string>o_intf_art_txt</string>
+              <string>o_intf_embedded_ckb</string>
+              <string>o_intf_enableGrowl_ckb</string>
+              <string>o_intf_fspanel_ckb</string>
+              <string>o_intf_lang_pop</string>
+              <string>o_intf_lang_txt</string>
+              <string>o_intf_last_update_lbl</string>
+              <string>o_intf_mediakeys_ckb</string>
+              <string>o_intf_network_box</string>
+              <string>o_intf_update_ckb</string>
+              <string>o_intf_view</string>
+              <string>o_osd_encoding_pop</string>
+              <string>o_osd_encoding_txt</string>
+              <string>o_osd_font_box</string>
+              <string>o_osd_font_btn</string>
+              <string>o_osd_font_color_pop</string>
+              <string>o_osd_font_color_txt</string>
+              <string>o_osd_font_fld</string>
+              <string>o_osd_font_size_pop</string>
+              <string>o_osd_font_size_txt</string>
+              <string>o_osd_font_txt</string>
+              <string>o_osd_lang_box</string>
+              <string>o_osd_lang_fld</string>
+              <string>o_osd_lang_txt</string>
+              <string>o_osd_osd_box</string>
+              <string>o_osd_osd_ckb</string>
+              <string>o_osd_view</string>
+              <string>o_sprefs_basicFull_matrix</string>
+              <string>o_sprefs_basic_box</string>
+              <string>o_sprefs_cancel_btn</string>
+              <string>o_sprefs_controls_box</string>
+              <string>o_sprefs_reset_btn</string>
+              <string>o_sprefs_save_btn</string>
+              <string>o_sprefs_win</string>
+              <string>o_video_black_ckb</string>
+              <string>o_video_device_pop</string>
+              <string>o_video_device_txt</string>
+              <string>o_video_display_box</string>
+              <string>o_video_enable_ckb</string>
+              <string>o_video_fullscreen_ckb</string>
+              <string>o_video_onTop_ckb</string>
+              <string>o_video_output_pop</string>
+              <string>o_video_output_txt</string>
+              <string>o_video_skipFrames_ckb</string>
+              <string>o_video_snap_box</string>
+              <string>o_video_snap_folder_btn</string>
+              <string>o_video_snap_folder_fld</string>
+              <string>o_video_snap_folder_txt</string>
+              <string>o_video_snap_format_pop</string>
+              <string>o_video_snap_format_txt</string>
+              <string>o_video_snap_prefix_fld</string>
+              <string>o_video_snap_prefix_txt</string>
+              <string>o_video_snap_seqnum_ckb</string>
+              <string>o_video_view</string>
+            </object>
+            <object class="NSMutableArray" key="dict.values">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+            </object>
+          </object>
+          <object class="NSMutableDictionary" key="toOneOutletInfosByName">
+            <bool key="EncodedWithXMLCoder">YES</bool>
+            <object class="NSArray" key="dict.sortedKeys">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <string>o_audio_dolby_pop</string>
+              <string>o_audio_dolby_txt</string>
+              <string>o_audio_effects_box</string>
+              <string>o_audio_enable_ckb</string>
+              <string>o_audio_general_box</string>
+              <string>o_audio_lang_fld</string>
+              <string>o_audio_lang_txt</string>
+              <string>o_audio_last_box</string>
+              <string>o_audio_last_ckb</string>
+              <string>o_audio_lastpwd_sfld</string>
+              <string>o_audio_lastpwd_txt</string>
+              <string>o_audio_lastuser_fld</string>
+              <string>o_audio_lastuser_txt</string>
+              <string>o_audio_spdif_ckb</string>
+              <string>o_audio_view</string>
+              <string>o_audio_visual_pop</string>
+              <string>o_audio_visual_txt</string>
+              <string>o_audio_vol_fld</string>
+              <string>o_audio_vol_sld</string>
+              <string>o_audio_vol_txt</string>
+              <string>o_currentlyShownCategoryView</string>
+              <string>o_hotkeys_change_btn</string>
+              <string>o_hotkeys_change_cancel_btn</string>
+              <string>o_hotkeys_change_keys_lbl</string>
+              <string>o_hotkeys_change_lbl</string>
+              <string>o_hotkeys_change_ok_btn</string>
+              <string>o_hotkeys_change_taken_lbl</string>
+              <string>o_hotkeys_change_win</string>
+              <string>o_hotkeys_clear_btn</string>
+              <string>o_hotkeys_lbl</string>
+              <string>o_hotkeys_listbox</string>
+              <string>o_hotkeys_view</string>
+              <string>o_input_avi_pop</string>
+              <string>o_input_avi_txt</string>
+              <string>o_input_cachelevel_custom_txt</string>
+              <string>o_input_cachelevel_pop</string>
+              <string>o_input_cachelevel_txt</string>
+              <string>o_input_caching_box</string>
+              <string>o_input_httpproxy_fld</string>
+              <string>o_input_httpproxy_txt</string>
+              <string>o_input_httpproxypwd_sfld</string>
+              <string>o_input_httpproxypwd_txt</string>
+              <string>o_input_mux_box</string>
+              <string>o_input_net_box</string>
+              <string>o_input_postproc_fld</string>
+              <string>o_input_postproc_txt</string>
+              <string>o_input_rtsp_ckb</string>
+              <string>o_input_serverport_fld</string>
+              <string>o_input_serverport_txt</string>
+              <string>o_input_skipLoop_pop</string>
+              <string>o_input_skipLoop_txt</string>
+              <string>o_input_view</string>
+              <string>o_intf_appleremote_ckb</string>
+              <string>o_intf_art_pop</string>
+              <string>o_intf_art_txt</string>
+              <string>o_intf_embedded_ckb</string>
+              <string>o_intf_enableGrowl_ckb</string>
+              <string>o_intf_fspanel_ckb</string>
+              <string>o_intf_lang_pop</string>
+              <string>o_intf_lang_txt</string>
+              <string>o_intf_last_update_lbl</string>
+              <string>o_intf_mediakeys_ckb</string>
+              <string>o_intf_network_box</string>
+              <string>o_intf_update_ckb</string>
+              <string>o_intf_view</string>
+              <string>o_osd_encoding_pop</string>
+              <string>o_osd_encoding_txt</string>
+              <string>o_osd_font_box</string>
+              <string>o_osd_font_btn</string>
+              <string>o_osd_font_color_pop</string>
+              <string>o_osd_font_color_txt</string>
+              <string>o_osd_font_fld</string>
+              <string>o_osd_font_size_pop</string>
+              <string>o_osd_font_size_txt</string>
+              <string>o_osd_font_txt</string>
+              <string>o_osd_lang_box</string>
+              <string>o_osd_lang_fld</string>
+              <string>o_osd_lang_txt</string>
+              <string>o_osd_osd_box</string>
+              <string>o_osd_osd_ckb</string>
+              <string>o_osd_view</string>
+              <string>o_sprefs_basicFull_matrix</string>
+              <string>o_sprefs_basic_box</string>
+              <string>o_sprefs_cancel_btn</string>
+              <string>o_sprefs_controls_box</string>
+              <string>o_sprefs_reset_btn</string>
+              <string>o_sprefs_save_btn</string>
+              <string>o_sprefs_win</string>
+              <string>o_video_black_ckb</string>
+              <string>o_video_device_pop</string>
+              <string>o_video_device_txt</string>
+              <string>o_video_display_box</string>
+              <string>o_video_enable_ckb</string>
+              <string>o_video_fullscreen_ckb</string>
+              <string>o_video_onTop_ckb</string>
+              <string>o_video_output_pop</string>
+              <string>o_video_output_txt</string>
+              <string>o_video_skipFrames_ckb</string>
+              <string>o_video_snap_box</string>
+              <string>o_video_snap_folder_btn</string>
+              <string>o_video_snap_folder_fld</string>
+              <string>o_video_snap_folder_txt</string>
+              <string>o_video_snap_format_pop</string>
+              <string>o_video_snap_format_txt</string>
+              <string>o_video_snap_prefix_fld</string>
+              <string>o_video_snap_prefix_txt</string>
+              <string>o_video_snap_seqnum_ckb</string>
+              <string>o_video_view</string>
+            </object>
+            <object class="NSMutableArray" key="dict.values">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_audio_dolby_pop</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_audio_dolby_txt</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_audio_effects_box</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_audio_enable_ckb</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_audio_general_box</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_audio_lang_fld</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_audio_lang_txt</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_audio_last_box</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_audio_last_ckb</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_audio_lastpwd_sfld</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_audio_lastpwd_txt</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_audio_lastuser_fld</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_audio_lastuser_txt</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_audio_spdif_ckb</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_audio_view</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_audio_visual_pop</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_audio_visual_txt</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_audio_vol_fld</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_audio_vol_sld</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_audio_vol_txt</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_currentlyShownCategoryView</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_hotkeys_change_btn</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_hotkeys_change_cancel_btn</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_hotkeys_change_keys_lbl</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_hotkeys_change_lbl</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_hotkeys_change_ok_btn</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_hotkeys_change_taken_lbl</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_hotkeys_change_win</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_hotkeys_clear_btn</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_hotkeys_lbl</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_hotkeys_listbox</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_hotkeys_view</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_input_avi_pop</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_input_avi_txt</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_input_cachelevel_custom_txt</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_input_cachelevel_pop</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_input_cachelevel_txt</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_input_caching_box</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_input_httpproxy_fld</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_input_httpproxy_txt</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_input_httpproxypwd_sfld</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_input_httpproxypwd_txt</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_input_mux_box</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_input_net_box</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_input_postproc_fld</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_input_postproc_txt</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_input_rtsp_ckb</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_input_serverport_fld</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_input_serverport_txt</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_input_skipLoop_pop</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_input_skipLoop_txt</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_input_view</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_intf_appleremote_ckb</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_intf_art_pop</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_intf_art_txt</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_intf_embedded_ckb</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_intf_enableGrowl_ckb</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_intf_fspanel_ckb</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_intf_lang_pop</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_intf_lang_txt</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_intf_last_update_lbl</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_intf_mediakeys_ckb</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_intf_network_box</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_intf_update_ckb</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_intf_view</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_osd_encoding_pop</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_osd_encoding_txt</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_osd_font_box</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_osd_font_btn</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_osd_font_color_pop</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_osd_font_color_txt</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_osd_font_fld</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_osd_font_size_pop</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_osd_font_size_txt</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_osd_font_txt</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_osd_lang_box</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_osd_lang_fld</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_osd_lang_txt</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_osd_osd_box</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_osd_osd_ckb</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_osd_view</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_sprefs_basicFull_matrix</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_sprefs_basic_box</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_sprefs_cancel_btn</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_sprefs_controls_box</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_sprefs_reset_btn</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_sprefs_save_btn</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_sprefs_win</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_video_black_ckb</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_video_device_pop</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_video_device_txt</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_video_display_box</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_video_enable_ckb</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_video_fullscreen_ckb</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_video_onTop_ckb</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_video_output_pop</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_video_output_txt</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_video_skipFrames_ckb</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_video_snap_box</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_video_snap_folder_btn</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_video_snap_folder_fld</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_video_snap_folder_txt</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_video_snap_format_pop</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_video_snap_format_txt</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_video_snap_prefix_fld</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_video_snap_prefix_txt</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_video_snap_seqnum_ckb</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_video_view</string>
+                <string key="candidateClassName">id</string>
+              </object>
+            </object>
+          </object>
+          <reference key="sourceIdentifier" ref="569970938"/>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">VLCSimplePrefsWindow</string>
+          <string key="superclassName">NSWindow</string>
+          <reference key="sourceIdentifier" ref="569970938"/>
         </object>
       </object>
     </object>
