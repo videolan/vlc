@@ -230,6 +230,24 @@ package: install
 	(cd $(PREFIX)/.. && \
 	tar cvJ $(notdir $(PREFIX))/) > ../vlc-contrib-$(HOST)-$(DATE).tar.xz
 
+list:
+	@echo All packages:
+	@echo '  $(PKGS_ALL)' | fmt
+	@echo Distribution-provided packages:
+	@echo '  $(PKGS_FOUND)' | fmt
+	@echo Automatically selected packages:
+	@echo '  $(PKGS_AUTOMATIC)' | fmt
+	@echo Manually deselected packages:
+	@echo '  $(PKGS_DISABLE)' | fmt
+	@echo Manually selected packages:
+	@echo '  $(PKGS_ENABLE)' | fmt
+	@echo Depended-on packages:
+	@echo '  $(PKGS_DEPS)' | fmt
+	@echo To-be-built packages:
+	@echo '  $(PKGS)' | fmt
+
+.PHONY: all fetch fetch-all install mostlyclean clean distclean package list
+
 # CMake toolchain
 toolchain.cmake:
 	$(RM) $@

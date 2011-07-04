@@ -190,6 +190,7 @@ Other targets:
  * make fetch        fetch required source tarballs
  * make fetch-all    fetch all source tarballs
  * make distclean    clean everything and undo bootstrap
- * make clean        clean everything
  * make mostlyclean  clean everything except source tarballs
+ * make clean        clean everything
+ * make list         list packages
 EOF
