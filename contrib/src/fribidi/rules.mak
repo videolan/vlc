@@ -3,6 +3,9 @@ FRIBIDI_VERSION := 0.19.2
 FRIBIDI_URL := http://fribidi.org/download/fribidi-$(FRIBIDI_VERSION).tar.gz
 
 PKGS += fribidi
+ifeq ($(call need_pkg,"fribidi"),)
+PKGS_FOUND += fribidi
+endif
 
 $(TARBALLS)/fribidi-$(FRIBIDI_VERSION).tar.gz:
 	$(call download,$(FRIBIDI_URL))
