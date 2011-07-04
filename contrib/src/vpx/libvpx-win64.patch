@@ -1,0 +1,11 @@
+diff -ru libvpx.orig/configure libvpx/configure
+--- libvpx.orig/configure	2011-07-04 19:54:18.000000000 +0300
++++ libvpx/configure	2011-07-04 19:56:19.000000000 +0300
+@@ -117,6 +117,7 @@
+ all_platforms="${all_platforms} x86_64-linux-gcc"
+ all_platforms="${all_platforms} x86_64-linux-icc"
+ all_platforms="${all_platforms} x86_64-solaris-gcc"
++all_platforms="${all_platforms} x86_64-win64-gcc"
+ all_platforms="${all_platforms} x86_64-win64-vs8"
+ all_platforms="${all_platforms} x86_64-win64-vs9"
+ all_platforms="${all_platforms} universal-darwin8-gcc"

@@ -12,6 +12,7 @@ libvpx: libvpx-$(VPX_VERSION).tar.bz2 .sum-vpx
 	$(UNPACK)
 	$(APPLY) $(SRC)/vpx/libvpx-no-cross.patch
 	$(APPLY) $(SRC)/vpx/libvpx-no-abi.patch
+	$(APPLY) $(SRC)/vpx/libvpx-win64.patch
 	$(MOVE)
 
 DEPS_vpx =
