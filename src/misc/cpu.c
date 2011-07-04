@@ -247,10 +247,42 @@ uint32_t CPUCapabilities( void )
     }
 out:
 
-#elif defined( __arm__ )
-#   if defined( __ARM_NEON__ )
+#elif defined (__arm__)
+
+# if defined (__ARM_NEON__)
     i_capabilities |= CPU_CAPABILITY_NEON;
+# elif defined (CAN_COMPILE_NEON)
+#  define NEED_RUNTIME_CPU_CHECK 1
+# endif
+
+# ifdef NEED_RUNTIME_CPU_CHECK
+#  if defined (__linux__)
+    FILE *info = fopen ("/proc/cpuinfo", "rt");
+    if (info != NULL)
+    {
+        char *line = NULL;
+        size_t linelen = 0;
+
+        while (getline (&line, &linelen, info) != -1)
+        {
+             const char *cap;
+
+             if (strncmp (line, "Features\t:", 10))
+                 continue;
+#   if defined (CAN_COMPILE_NEON) && !defined (__ARM_NEON__)
+             cap = strstr (line + 10, " neon");
+             if (cap != NULL && (cap[5] == '\0' || cap[5] == ' '))
+                 i_capabilities |= CPU_CAPABILITY_NEON;
 #   endif
+             break;
+        }
+        fclose (info);
+        free (line);
+    }
+#  else
+#   warning Run-time CPU detection missing: optimizations disabled!
+#  endif
+# endif
 
 #elif defined( __powerpc__ ) || defined( __ppc__ ) || defined( __powerpc64__ ) \
     || defined( __ppc64__ )

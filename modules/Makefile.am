@@ -51,7 +51,7 @@ endif
 if HAVE_ALTIVEC
 SUBDIRS += altivec
 endif
-if HAVE_ARM_NEON
+if HAVE_NEON
 SUBDIRS += arm_neon
 endif
 if BUILD_LUA

@@ -1489,12 +1489,16 @@ asm volatile("ssat r0, #1, r0":::"r0"); /* assume ARMv6 */
     ])
     CFLAGS="${CFLAGS_save}"
   ])
-  ARM_NEON_CFLAGS="$ac_cv_neon_inline"
+  AS_IF([test "$ac_cv_neon_inline" != "no"], [
+    NEON_CFLAGS="$ac_cv_neon_inline"
+    AC_DEFINE([CAN_COMPILE_NEON], 1,
+      [Define to 1 if NEON (and ARMv6) assembly is available with NEON_CFLAGS.])
+  ])
 ], [
   ac_cv_neon_inline="no"
 ])
-AC_SUBST(ARM_NEON_CFLAGS)
-AM_CONDITIONAL(HAVE_ARM_NEON, [test "${ac_cv_neon_inline}" != "no"])
+AC_SUBST(NEON_CFLAGS)
+AM_CONDITIONAL(HAVE_NEON, [test "${ac_cv_neon_inline}" != "no"])
 
 
 AC_ARG_ENABLE(altivec,

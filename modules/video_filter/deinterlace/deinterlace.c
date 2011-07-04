@@ -682,7 +682,7 @@ int Open( vlc_object_t *p_this )
     }
     else
 #endif
-#if defined __ARM_NEON__
+#if defined __ARM_NEON__ // FIXME: runtime detect support
     if( vlc_CPU() & CPU_CAPABILITY_NEON )
     {
         p_sys->pf_merge = MergeNEON;

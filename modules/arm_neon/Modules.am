@@ -2,7 +2,7 @@
 # without this. (This is the case with iOS).
 LIBTOOL=@LIBTOOL@ --tag=CC
 
-AM_CFLAGS += $(ARM_NEON_CFLAGS)
+AM_CFLAGS += $(NEON_CFLAGS)
 
 libaudio_format_neon_plugin_la_SOURCES = \
 	s32_s16.S \
