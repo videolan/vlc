@@ -1,0 +1,11 @@
+--- libgcrypt/Makefile.am.orig	2008-08-19 17:20:08.000000000 +0200
++++ libgcrypt/Makefile.am	2008-10-21 09:57:33.000000000 +0200
+@@ -23,7 +23,7 @@
+   --enable-ciphers=arcfour:blowfish:cast5:des:aes:twofish:serpent:rfc2268:seed:camellia
+ 
+ DIST_SUBDIRS = m4 mpi cipher random src doc tests
+-SUBDIRS = mpi cipher random src doc tests
++SUBDIRS = mpi cipher random src
+ EXTRA_DIST = autogen.sh README.SVN
+ DISTCLEANFILES = 
+ 
