@@ -13,7 +13,7 @@ png: libpng-$(PNG_VERSION).tar.bz2 .sum-png
 	$(UNPACK)
 	$(MOVE)
 
-.png: png
+.png: png .zlib
 	$(RECONF)
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF)
 	cd $< && $(MAKE) install
