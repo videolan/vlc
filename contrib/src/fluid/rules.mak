@@ -1,16 +1,29 @@
 # fluid
 
- # DO NOT update, this will require glib
-FLUID_VERSION := 1.0.9
-#FLUID_URL := http://download.savannah.gnu.org/releases/fluid/fluidsynth-$(FLUID_VERSION).tar.gz
-FLUID_URL := $(SF)/fluidsynth/older%20releases/fluidsynth-$(FLUID_VERSION).tar.gz
+FLUID_VERSION := 1.1.3
+FLUID_URL := $(SF)/fluidsynth/fluidsynth-$(FLUID_VERSION)/fluidsynth-$(FLUID_VERSION).tar.bz2
+FLUID_OLDURL := $(SF)/fluidsynth/older%20releases/fluidsynth-1.0.9.tar.gz
 
-$(TARBALLS)/fluidsynth-$(FLUID_VERSION).tar.gz:
+PKGS += fluid
+ifeq ($(call need_pkg,"fluidsynth"),)
+PKGS_FOUND += fluid
+endif
+
+$(TARBALLS)/fluidsynth-$(FLUID_VERSION).tar.bz2:
 	$(call download,$(FLUID_URL))
 
-.sum-fluid: fluidsynth-$(FLUID_VERSION).tar.gz
+$(TARBALLS)/fluidsynth-1.0.9.tar.gz:
+	$(call download,$(FLUID_OLDURL))
 
-fluidsynth: fluidsynth-$(FLUID_VERSION).tar.gz .sum-fluid
+.sum-fluid: fluidsynth-$(FLUID_VERSION).tar.bz2 fluidsynth-1.0.9.tar.gz
+
+ifeq ($(call need_pkg,"glib-2.0"),)
+FLUID_TARBALL := fluidsynth-$(FLUID_VERSION).tar.bz2
+else
+FLUID_TARBALL := fluidsynth-1.0.9.tar.gz
+endif
+
+fluidsynth: $(FLUID_TARBALL) .sum-fluid
 	$(UNPACK)
 	$(APPLY) $(SRC)/fluid/fluid-no-bin.patch
 ifdef HAVE_WIN32
@@ -20,12 +33,15 @@ endif
 
 FLUIDCONF := $(HOSTCONF) \
 	--disable-alsa-support \
+	--disable-aufile-support \
 	--disable-coreaudio \
 	--disable-coremidi \
 	--disable-dart \
+	--disable-dbus-support \
 	--disable-jack-support \
 	--disable-ladcca \
 	--disable-lash \
+	--disable-libsndfile-support \
 	--disable-midishare \
 	--disable-oss-support \
   	--disable-portaudio-support \
