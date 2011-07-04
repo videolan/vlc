@@ -32,7 +32,9 @@ FLAC_DISABLE_FLAGS += --disable-asm-optimizations
 endif
 endif
 
-.flac: flac .ogg
+DEPS_flac = ogg $(DEPS_ogg)
+
+.flac: flac
 	cd $< && $(HOSTVARS) ./configure $(FLACCONF)
 	cd $</src && $(MAKE) -C libFLAC install
 	cd $< && $(MAKE) -C include install

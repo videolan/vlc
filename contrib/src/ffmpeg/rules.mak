@@ -5,7 +5,6 @@ FFMPEG_URL=$(SF)/ffmpeg/ffmpeg-$(FFMPEG_VERSION).tar.gz
 FFMPEG_SVN=svn://svn.ffmpeg.org/ffmpeg/trunk
 FFMPEG_SVN_REV=26400
 
-
 FFMPEGCONF = --cc="$(CC)" \
 	--disable-doc \
 	--disable-decoder=libvpx \
@@ -20,29 +19,27 @@ FFMPEGCONF = --cc="$(CC)" \
 	--disable-protocols \
 	--disable-avfilter \
 	--disable-network
+DEPS_ffmpeg = zlib
 
 # Optional dependencies
 ifdef BUILD_ENCODERS
 # TODO:
-#FFMPEGCONF+= --enable-libmp3lame
-#.ffmpeg: .lame
-#PKGS += lame
+#FFMPEGCONF += --enable-libmp3lame
+#DEPS_ffmpeg += lame $(DEPS_lame)
 else
 FFMPEGCONF += --disable-encoders --disable-muxers
 # XXX: REVISIT --enable-small ?
 endif
 
-#FFMPEGCONF+= --enable-libgsm
-#.ffmpeg: .gsm
-#PKGS += gsm
+#FFMPEGCONF += --enable-libgsm
+#DEPS_ffmpeg += gsm $(DEPS_gsm)
 
 #FFMPEGCONF += --enable-libvpx
-#.ffmpeg: .vpx
-#PKGS += vpx
+#DEPS_ffmpeg += vpx $(DEPS_vpx)
 
 # XXX: REVISIT
 #ifndef HAVE_FPU
-#FFMPEGCONF+= --disable-mpegaudio-hp
+#FFMPEGCONF += --disable-mpegaudio-hp
 #endif
 
 ifdef HAVE_CROSS_COMPILE
@@ -66,8 +63,7 @@ endif
 ifeq ($(ARCH),x86_64)
 FFMPEGCONF += --cpu=core2
 endif
-.ffmpeg: .yasm
-PKGS += yasm
+DEPS_ffmpeg += yasm $(DEPS_yasm)
 endif
 
 # Linux
@@ -88,8 +84,7 @@ FFMPEGCONF += --disable-dxva2
 FFMPEGCONF += --cpu=athlon64 --arch=x86_64
 else # !WIN64
 FFMPEGCONF += --enable-dxva2
-.ffmpeg: .directx
-PKGS += directx
+DEPS_ffmpeg += directx
 
 FFMPEGCONF+= --cpu=i686 --arch=x86
 endif
@@ -136,7 +131,6 @@ endif
 	$(MOVE)
 
 .ffmpeg: ffmpeg
-	# TODO: .zlib
 	cd $< && $(HOSTVARS) ./configure \
 		--extra-cflags="$(FFMPEG_CFLAGS) -DHAVE_STDINT_H"  \
 		--extra-ldflags="$(LDFLAGS)" $(FFMPEGCONF) \

@@ -13,7 +13,9 @@ png: libpng-$(PNG_VERSION).tar.bz2 .sum-png
 	$(UNPACK)
 	$(MOVE)
 
-.png: png .zlib
+DEPS_png = zlib $(DEPS_zlib)
+
+.png: png
 	$(RECONF)
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF)
 	cd $< && $(MAKE) install

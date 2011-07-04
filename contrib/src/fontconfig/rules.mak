@@ -37,7 +37,9 @@ FONTCONFIG_ENV-$(ENABLED)         = $(HOSTCC) LIBXML2_CFLAGS=`$(PREFIX)/bin/xml2
 FONTCONFIG_ENV-$(HAVE_MACOSX)     = $(HOSTCC) LIBXML2_CFLAGS=`xml2-config --cflags` LIBXML2_LIBS=`xml2-config --libs`
 FONTCONFIG_ENV-$(HAVE_WIN32)      = $(HOSTCC)
 
-.fontconfig: fontconfig .freetype2 .libxml2
+DEPS_fontconfig = freetype2 $(DEPS_freetype2) libxml2 $(DEPS_libxml2)
+
+.fontconfig: fontconfig
 ifdef HAVE_WIN32
 	$(RECONF)
 endif

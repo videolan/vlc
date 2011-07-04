@@ -7,6 +7,7 @@ X264_GITURL := git://git.videolan.org/x264.git
 ifdef BUILD_ENCODERS
 PKGS += x264
 endif
+DEPS_x264 =
 
 X264CONF = --prefix="$(PREFIX)" --host="$(HOST)" \
 	--enable-static \
@@ -22,8 +23,7 @@ endif
 
 ifdef HAVE_MACOSX
 ifneq ($(findstring $(ARCH),i386 x86_64),)
-PKGS += yasm
-.x264: .yasm
+DEPS_x264 += yasm
 endif
 endif
 

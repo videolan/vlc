@@ -5,7 +5,7 @@
 
 all: install
 
-ALL_PKGS := $(patsubst ../src/%/rules.mak,%,$(wildcard ../src/*/rules.mak))
+PKGS_ALL := $(patsubst ../src/%/rules.mak,%,$(wildcard ../src/*/rules.mak))
 SRC := ../src
 TARBALLS := ../tarballs
 DATE := $(shell date +%Y%m%d)
@@ -192,6 +192,7 @@ CMAKE = cmake . -DCMAKE_TOOLCHAIN_FILE=$(abspath toolchain.cmake) \
 #
 # Per-package build rules
 #
+PKGS_FOUND :=
 include ../src/*/rules.mak
 
 #
@@ -200,14 +201,20 @@ include ../src/*/rules.mak
 ifneq ($(filter $(PKGS_DISABLE),$(PKGS_ENABLE)),)
 $(error Same package(s) disabled and enabled at the same time)
 endif
-PKGS := $(filter-out $(PKGS_DISABLE),$(PKGS)) $(PKGS_ENABLE)
+# Apply automatic selection (= remove distro packages):
+PKGS_AUTOMATIC := $(filter-out $(PKGS_FOUND),$(PKGS))
+# Apply manual selection (from bootstrap):
+PKGS_MANUAL := $(sort $(PKGS_ENABLE) $(filter-out $(PKGS_DISABLE),$(PKGS_AUTOMATIC)))
+# Resolve dependencies:
+PKGS_DEPS := $(filter-out $(PKGS_FOUND) $(PKGS_MANUAL),$(sort $(foreach p,$(PKGS_MANUAL),$(DEPS_$(p)))))
+PKGS := $(sort $(PKGS_MANUAL) $(PKGS_DEPS))
 
 fetch: $(PKGS:%=.sum-%)
-fetch-all: $(ALL_PKGS:%=.sum-%)
+fetch-all: $(PKGS_ALL:%=.sum-%)
 install: $(PKGS:%=.%)
 
 mostlyclean:
-	-$(RM) $(ALL_PKGS:%=.%) $(ALL_PKGS:%=.sum-%)
+	-$(RM) $(foreach p,$(PKGS_ALL),.$(p) .sum-$(p) .dep-$(p))
 	-$(RM) toolchain.cmake
 	-$(RM) -R "$(PREFIX)"
 	-find -maxdepth 1 -type d '!' -name . -exec $(RM) -R '{}' ';'
@@ -243,8 +250,6 @@ endif
 	echo "set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)" >> $@
 	echo "set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)" >> $@
 
-#.SECONDEXPANSION:
-
 # Default pattern rules
 .sum-%: $(SRC)/%/SHA512SUMS
 	$(CHECK_SHA512)
@@ -252,5 +257,18 @@ endif
 
 .sum-%:
 	$(error Download and check target not defined for $*)
+
+# Dummy dependency on found packages
+$(patsubst %,.dep-%,$(PKGS_FOUND)): .dep-%:
+	touch $@
+
+# Real dependency on missing packages
+$(patsubst %,.dep-%,$(filter-out $(PKGS_FOUND),$(PKGS_ALL))): .dep-%: .%
+	touch -r $< $@
+
+.SECONDEXPANSION:
+
+# Dependency propagation (convert 'DEPS_foo = bar' to '.foo: .bar')
+$(foreach p,$(PKGS_ALL),.$(p)): .%: $$(foreach d,$$(DEPS_$$*),.dep-$$(d))
 
 .DELETE_ON_ERROR:

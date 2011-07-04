@@ -14,7 +14,7 @@ fribidi: fribidi-$(FRIBIDI_VERSION).tar.gz .sum-fribidi
 	$(APPLY) $(SRC)/fribidi/fribidi.patch
 	$(MOVE)
 
-# fixme .iconv
+# FIXME: DEPS_fribidi = iconv $(DEPS_iconv)
 .fribidi: fribidi
 	cd $< && rm -f configure && ./bootstrap
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF)

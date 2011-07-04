@@ -17,7 +17,9 @@ libtiger: libtiger-$(TIGER_VERSION).tar.gz .sum-tiger
 	$(UNPACK)
 	$(MOVE)
 
-.tiger: libtiger .kate
+DEPS_tiger = kate $(DEPS_kate)
+
+.tiger: libtiger
 	$(RECONF)
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) --disable-doc
 	cd $< && $(MAKE) install

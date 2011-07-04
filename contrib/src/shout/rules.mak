@@ -16,13 +16,14 @@ libshout: libshout-$(SHOUT_VERSION).tar.gz .sum-shout
 	$(APPLY) $(SRC)/shout/libshout-win32.patch
 	$(MOVE)
 
+DEPS_shout = ogg $(DEPS_ogg) theora $(DEPS_theora) speex $(DEPS_speex)
 ifdef HAVE_FPU
-.shout: .vorbis
+DEPS_shout += vorbis $(DEPS_vorbis)
 else
-.shout: .tremor
+DEPS_shout += tremor $(DEPS_tremor)
 endif
 
-.shout: libshout .theora .ogg .speex
+.shout: libshout
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF)
 	cd $< && $(MAKE) install
 	touch $@

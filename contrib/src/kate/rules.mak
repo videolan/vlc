@@ -14,7 +14,9 @@ libkate: libkate-$(KATE_VERSION).tar.gz .sum-kate
 	$(UNPACK)
 	$(MOVE)
 
-.kate: libkate .ogg
+DEPS_kate = ogg $(DEPS_ogg)
+
+.kate: libkate
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) \
 		--disable-valgrind \
 		--disable-doc

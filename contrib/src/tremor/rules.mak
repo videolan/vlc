@@ -22,7 +22,9 @@ tremor: tremor-svn.tar.xz .sum-tremor
 	echo '#include <ogg/os_types.h>' > tremor-svn/os_types.h
 	$(MOVE)
 
-.tremor: tremor .ogg
+DEPS_tremor = ogg $(DEPS_ogg)
+
+.tremor: tremor
 	# Stuff that depends on libogg
 	$(RECONF)
 	cd $< && \
