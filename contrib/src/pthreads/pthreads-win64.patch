@@ -1,0 +1,23 @@
+--- pthreads/pthread.h	2006-01-24 14:59:57.000000000 +0100
++++ pthreads.new/pthread.h	2010-04-14 15:49:39.000000000 +0200
+@@ -302,7 +302,7 @@
+ #endif
+ #endif
+ 
+-#ifndef HAVE_STRUCT_TIMESPEC
++#if !defined( HAVE_STRUCT_TIMESPEC ) && !defined( _TIMESPEC_DEFINED )
+ #define HAVE_STRUCT_TIMESPEC 1
+ struct timespec {
+         long tv_sec;
+diff -urN pthreads/GNUmakefile pthreads.new/GNUmakefile
+--- pthreads/GNUmakefile	2010-10-08 22:30:43.029264998 +0200
++++ pthreads.new/GNUmakefile	2010-10-08 22:30:55.989265032 +0200
+@@ -63,7 +63,7 @@
+ XOPT	=
+ 
+ RCFLAGS		= --include-dir=.
+-LFLAGS		= -lwsock32
++LFLAGS		= -lws2_32
+ 
+ # ----------------------------------------------------------------------
+ # The library can be built with some alternative behaviour to
