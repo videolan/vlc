@@ -26,6 +26,7 @@
 #include <vlc_plugin.h>
 #include <vlc_aout.h>
 #include <vlc_filter.h>
+#include <vlc_cpu.h>
 
 #include <assert.h>
 
@@ -37,18 +38,21 @@ vlc_module_begin ()
     set_callbacks (Open, NULL)
 vlc_module_end ()
 
-static block_t *Do_F32_S32 (filter_t *, block_t *);
+//static block_t *Do_F32_S32 (filter_t *, block_t *);
 static block_t *Do_S32_S16 (filter_t *, block_t *);
 
 static int Open (vlc_object_t *obj)
 {
     filter_t *filter = (filter_t *)obj;
 
+    if (!(vlc_CPU() & CPU_CAPABILITY_NEON))
+        return VLC_EGENERIC;
     if (!AOUT_FMTS_SIMILAR (&filter->fmt_in.audio, &filter->fmt_out.audio))
         return VLC_EGENERIC;
 
     switch (filter->fmt_in.audio.i_format)
     {
+#if 0
         case VLC_CODEC_FL32:
             switch (filter->fmt_out.audio.i_format)
             {
@@ -59,7 +63,7 @@ static int Open (vlc_object_t *obj)
                     return VLC_EGENERIC;
             }
             break;
-
+#endif
         case VLC_CODEC_FI32:
             switch (filter->fmt_out.audio.i_format)
             {
@@ -76,6 +80,7 @@ static int Open (vlc_object_t *obj)
     return VLC_SUCCESS;
 }
 
+#if 0
 /**
  * Single-precision floating point to signed fixed point conversion.
  */
@@ -128,6 +133,7 @@ static block_t *Do_F32_S32 (filter_t *filter, block_t *inbuf)
 
     return inbuf;
 }
+#endif
 
 void s32_s16_neon_unaligned (int16_t *out, const int32_t *in, unsigned nb);
 void s32_s16_neon (int16_t *out, const int32_t *in, unsigned nb);
