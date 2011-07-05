@@ -2956,7 +2956,7 @@ if test "${enable_png}" != "no"; then
 AC_CHECK_HEADERS(png.h, [
   LDFLAGS="${LDFLAGS_save} -lz"
   AC_CHECK_LIB(png, png_set_rows, [
-    VLC_ADD_LIBS([png],[-lpng -lz])
+    VLC_ADD_LIBS([png],[-lpng -lz -lm])
     VLC_ADD_PLUGIN([png osdmenu osd_parser])],
     [],[-lz])
     LDFLAGS="${LDFLAGS_save}"
