@@ -30,6 +30,7 @@
 #include <vlc_codec.h>
 
 #include <libavutil/avutil.h>
+#include <libavutil/pixfmt.h>
 #include "chroma.h"
 
 /*****************************************************************************
