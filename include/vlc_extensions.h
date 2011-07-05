@@ -248,7 +248,7 @@ static inline int extension_DialogCommand( extension_dialog_t* p_dialog,
 /// Widget types
 typedef enum
 {
-    EXTENSION_WIDGET_LABEL,      ///< Non editable text label
+    EXTENSION_WIDGET_LABEL,      ///< Text label
     EXTENSION_WIDGET_BUTTON,     ///< Clickable button
     EXTENSION_WIDGET_IMAGE,      ///< Image label (psz_text is local URI)
     EXTENSION_WIDGET_HTML,       ///< HTML or rich text area (non editable)
