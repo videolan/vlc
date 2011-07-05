@@ -19,27 +19,29 @@ VLC_SOURCEDIR="`dirname $0`/../../.."
 
 EXTRA_CFLAGS="-mlong-calls -fstrict-aliasing -fprefetch-loop-arrays -ffast-math"
 EXTRA_LDFLAGS=""
+EXTRA_PARAMS=""
 if [ -z "$NO_NEON" ]; then
 	EXTRA_CFLAGS="$EXTRA_CFLAGS -mfpu=neon -mtune=cortex-a8 -ftree-vectorize -mvectorize-with-neon-quad"
 	EXTRA_LDFLAGS="-Wl,--fix-cortex-a8"
-	EXTRA_PARAMS=""
 else
 	EXTRA_CFLAGS="$EXTRA_CFLAGS -march=armv6j -mtune=arm1136j-s -msoft-float"
 	EXTRA_PARAMS=" --disable-neon"
 fi
 
 PATH="$ANDROID_BIN:$PATH" \
-CPPFLAGS="-I$ANDROID_INCLUDE" \
-LDFLAGS="-Wl,-rpath-link=$ANDROID_LIB,-Bdynamic,-dynamic-linker=/system/bin/linker -Wl,--no-undefined -Wl,-shared -L$ANDROID_LIB $EXTRA_LDFLAGS" \
-CFLAGS="-nostdlib $EXTRA_CFLAGS -O2" \
-CXXFLAGS="-nostdlib $EXTRA_CFLAGS -O2" \
-LIBS="-lc -ldl -lgcc" \
 CC="${GCC_PREFIX}gcc" \
 CXX="${GCC_PREFIX}g++" \
 NM="${GCC_PREFIX}nm" \
 STRIP="${GCC_PREFIX}strip" \
 RANLIB="${GCC_PREFIX}ranlib" \
 AR="${GCC_PREFIX}ar" \
+CPPFLAGS="-I$ANDROID_INCLUDE -I$VLC_SOURCEDIR/extras/contrib/hosts/arm-eabi/include \
+        -I${ANDROID_NDK}/sources/cxx-stl/gnu-libstdc++/include \
+        -I${ANDROID_NDK}/sources/cxx-stl/gnu-libstdc++/libs/armeabi-v7a/include/" \
+LDFLAGS="-Wl,-rpath-link=$ANDROID_LIB,-Bdynamic,-dynamic-linker=/system/bin/linker -Wl,--no-undefined -Wl,-shared -L$ANDROID_LIB $EXTRA_LDFLAGS" \
+CFLAGS="-nostdlib $EXTRA_CFLAGS -O2" \
+CXXFLAGS="-nostdlib $EXTRA_CFLAGS -O2 -D__STDC_VERSION__=199901L -D__STDC_CONSTANT_MACROS" \
+LIBS="-lc -ldl -lgcc" \
 PKG_CONFIG_LIBDIR="$VLC_SOURCEDIR/extras/contrib/hosts/arm-eabi/lib/pkgconfig" \
 sh $VLC_SOURCEDIR/configure --host=arm-eabi-linux --build=x86_64-unknown-linux $EXTRA_PARAMS \
                 --enable-static-modules \
