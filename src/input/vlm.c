@@ -51,6 +51,7 @@
 #if defined (WIN32) && !defined (UNDER_CE)
 #include <sys/timeb.h>                                            /* ftime() */
 #endif
+#include <limits.h>
 
 #include <vlc_input.h>
 #include <vlc_stream.h>
@@ -66,7 +67,6 @@
  * Local prototypes.
  *****************************************************************************/
 
-static void vlm_Destructor( vlm_t *p_vlm );
 static void* Manage( void * );
 static int vlm_MediaVodControl( void *, vod_media_t *, const char *, int, va_list );
 
@@ -139,7 +139,10 @@ vlm_t *vlm_New ( vlc_object_t *p_this )
     p_vlm = *pp_vlm;
     if( p_vlm )
     {   /* VLM already exists */
-        vlc_object_hold( p_vlm );
+        if( likely( p_vlm->users < UINT_MAX ) )
+            p_vlm->users++;
+        else
+            p_vlm = NULL;
         vlc_mutex_unlock( &vlm_mutex );
         return p_vlm;
     }
@@ -157,6 +160,7 @@ vlm_t *vlm_New ( vlc_object_t *p_this )
     vlc_mutex_init( &p_vlm->lock );
     vlc_mutex_init( &p_vlm->lock_manage );
     vlc_cond_init_daytime( &p_vlm->wait_manage );
+    p_vlm->users = 1;
     p_vlm->input_state_changed = false;
     p_vlm->i_id = 1;
     TAB_INIT( p_vlm->i_media, p_vlm->media );
@@ -196,7 +200,6 @@ vlm_t *vlm_New ( vlc_object_t *p_this )
     }
     free( psz_vlmconf );
 
-    vlc_object_set_destructor( p_vlm, (vlc_destructor_t)vlm_Destructor );
     vlc_mutex_unlock( &vlm_mutex );
 
     return p_vlm;
@@ -208,18 +211,22 @@ vlm_t *vlm_New ( vlc_object_t *p_this )
 void vlm_Delete( vlm_t *p_vlm )
 {
     /* vlm_Delete() is serialized against itself, and against vlm_New().
-     * This way, vlm_Destructor () (called from vlc_objet_release() above)
-     * is serialized against setting libvlc_priv->p_vlm from vlm_New(). */
+     * This mutex protects libvlc_priv->p_vlm and p_vlm->users. */
     vlc_mutex_lock( &vlm_mutex );
-    vlc_object_release( p_vlm );
+    assert( p_vlm->users > 0 );
+    if( --p_vlm->users == 0 )
+    {
+        assert( libvlc_priv(p_vlm->p_libvlc)->p_vlm = p_vlm );
+        libvlc_priv(p_vlm->p_libvlc)->p_vlm = NULL;
+    }
+    else
+        p_vlm = NULL;
     vlc_mutex_unlock( &vlm_mutex );
-}
 
-/*****************************************************************************
- * vlm_Destructor:
- *****************************************************************************/
-static void vlm_Destructor( vlm_t *p_vlm )
-{
+    if( p_vlm == NULL )
+        return;
+
+    /* Destroy and release VLM */
     vlc_mutex_lock( &p_vlm->lock );
     vlm_ControlInternal( p_vlm, VLM_CLEAR_MEDIAS );
     TAB_CLEAN( p_vlm->i_media, p_vlm->media );
@@ -228,7 +235,6 @@ static void vlm_Destructor( vlm_t *p_vlm )
     TAB_CLEAN( p_vlm->i_schedule, p_vlm->schedule );
     vlc_mutex_unlock( &p_vlm->lock );
 
-    libvlc_priv(p_vlm->p_libvlc)->p_vlm = NULL;
     vlc_object_kill( p_vlm );
 
     if( p_vlm->p_vod )
@@ -248,6 +254,7 @@ static void vlm_Destructor( vlm_t *p_vlm )
     vlc_cond_destroy( &p_vlm->wait_manage );
     vlc_mutex_destroy( &p_vlm->lock );
     vlc_mutex_destroy( &p_vlm->lock_manage );
+    vlc_object_release( p_vlm );
 }
 
 /*****************************************************************************
