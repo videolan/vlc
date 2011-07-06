@@ -122,17 +122,16 @@ endif
 endif
 SVN ?= $(error subversion client (svn) not found!)
 
-ifndef WGET
-ifeq ($(shell wget --version >/dev/null 2>&1 || echo FAIL),)
-WGET = wget --passive -c
-endif
-endif
-ifndef WGET
 ifeq ($(shell curl --version >/dev/null 2>&1 || echo FAIL),)
-WGET = curl -L -O
+download = curl -f -L -- "$(1)" > "$@"
+else ifeq ($(shell wget --version >/dev/null 2>&1 || echo FAIL),)
+download = rm -f $@.tmp && \
+	wget --passive -c -p -O $@.tmp $(1) && \
+	touch $@.tmp && \
+	mv $@.tmp $@
+else
+download = $(error Neither curl nor wget found!)
 endif
-endif
-WGET ?= $(error Neither wget not curl found!)
 
 #
 # Common helpers
@@ -160,10 +159,6 @@ else
 HOSTCONF += --with-pic
 endif
 
-download = rm -f $@.tmp && \
-		$(WGET) -p -O $@.tmp $(1) && \
-		touch $@.tmp && \
-		mv $@.tmp $@
 download_git = \
 	rm -Rf $(@:.tar.xz=) && \
 	$(GIT) clone $(2:%=--branch %) $(1) $(@:.tar.xz=) && \
