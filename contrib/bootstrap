@@ -103,17 +103,11 @@ if test "$PREFIX"
 then
 	# strip trailing slash
 	PREFIX="${PREFIX%/}"
-else
-	PREFIX="../hosts/$HOST"
 fi
 
 #
 # Prepare files
 #
-echo "Creating prefix... $PREFIX"
-mkdir -p -- "$PREFIX" || exit $?
-mkdir -p -- "$PREFIX/share/aclocal" || exit $?
-
 echo "Creating configuration file... config.mak"
 exec 3>config.mak
 cat >&3 << EOF
@@ -121,7 +115,6 @@ cat >&3 << EOF
 # Any change will be overwritten if ../bootstrap is run again.
 BUILD := $BUILD
 HOST := $HOST
-PREFIX := $PREFIX
 PKGS_DISABLE := $PKGS_DISABLE
 PKGS_ENABLE := $PKGS_ENABLE
 EOF
@@ -144,6 +137,7 @@ add_make_enabled()
 	done
 }
 
+test -z "$PREFIX" || add_make "PREFIX := $PREFIX"
 test -z "$BUILD_DISCS" || add_make_enabled "BUILD_DISCS"
 test -z "$BUILD_ENCODERS" || add_make_enabled "BUILD_ENCODERS"
 
