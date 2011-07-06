@@ -94,14 +94,7 @@ StandardPLPanel::~StandardPLPanel()
     getSettings()->beginGroup("Playlist");
     if( treeView )
         getSettings()->setValue( "headerStateV2", treeView->header()->saveState() );
-    if( currentView == treeView )
-        getSettings()->setValue( "view-mode", TREE_VIEW );
-    else if( currentView == listView )
-        getSettings()->setValue( "view-mode", LIST_VIEW );
-    else if( currentView == iconView )
-        getSettings()->setValue( "view-mode", ICON_VIEW );
-    else if( currentView == picFlowView )
-        getSettings()->setValue( "view-mode", PICTUREFLOW_VIEW );
+    getSettings()->setValue( "view-mode", currentViewIndex() );
     getSettings()->endGroup();
 }
 
