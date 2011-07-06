@@ -223,8 +223,8 @@ int xspf_export_playlist( vlc_object_t *p_this )
     fprintf( p_export->p_file, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" );
     fprintf( p_export->p_file,
              "<playlist xmlns=\"http://xspf.org/ns/0/\" " \
-              "xmlns:vlc=\"http://www.videolan.org/vlc/playlist/ns/0/\"> " \
-              "version=\"1\"\n" );
+              "xmlns:vlc=\"http://www.videolan.org/vlc/playlist/ns/0/\" " \
+              "version=\"1\">\n" );
 
     if( !p_node ) return VLC_SUCCESS;
 
