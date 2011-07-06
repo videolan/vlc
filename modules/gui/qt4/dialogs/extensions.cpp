@@ -528,6 +528,8 @@ void ExtensionDialog::UpdateWidgets()
                 widget->resize( p_widget->i_width, p_widget->i_height );
             p_widget->p_sys_intf = widget;
             this->resize( sizeHint() );
+            /* If an update was required, cancel it as we just created the widget */
+            p_widget->b_update = false;
         }
         else if( p_widget->p_sys_intf && !p_widget->b_kill
                  && p_widget->b_update )
