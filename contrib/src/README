@@ -17,7 +17,7 @@ is correct, e.g.:
 
 
 	$(TARBALLS)/libfoo-$(FOO_VERSION).tar.bz2:
-		$(WGET) $(FOO_URL)
+		$(call download,$(FOO_URL))
 
 	# This will use the default rule: check SHA-512
 	.sum-foo: libfoo-$(FOO_VERSION).tar.bz2
