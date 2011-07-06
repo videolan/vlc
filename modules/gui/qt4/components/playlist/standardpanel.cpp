@@ -350,6 +350,9 @@ void StandardPLPanel::changeModel( bool b_ml )
         mod = model;
     if( currentView->model() != mod )
         currentView->setModel( mod );
+#else
+    if( currentView->model() != model )
+        currentView->setModel( model );
 #endif
 }
 
