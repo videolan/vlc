@@ -5,9 +5,15 @@
 
 all: install
 
-PKGS_ALL := $(patsubst ../src/%/rules.mak,%,$(wildcard ../src/*/rules.mak))
-SRC := ../src
-TARBALLS := ../tarballs
+# bootstrap configuration
+include config.mak
+
+TOPSRC ?= ../../contrib
+TOPDST ?= ..
+SRC := $(TOPSRC)/src
+TARBALLS := $(TOPSRC)/tarballs
+
+PKGS_ALL := $(patsubst $(SRC)/%/rules.mak,%,$(wildcard $(SRC)/*/rules.mak))
 DATE := $(shell date +%Y%m%d)
 VPATH := $(TARBALLS)
 
@@ -17,13 +23,10 @@ SF := http://heanet.dl.sourceforge.net/sourceforge
 VIDEOLAN := http://downloads.videolan.org/pub/videolan
 CONTRIB_VIDEOLAN := $(VIDEOLAN)/testing/contrib
 
-# bootstrap configuration
-include config.mak
-
 #
 # Machine-dependent variables
 #
-PREFIX ?= ../hosts/$(HOST)
+PREFIX ?= $(TOPDST)/$(HOST)
 PREFIX := $(abspath $(PREFIX))
 ifneq ($(HOST),$(BUILD))
 HAVE_CROSS_COMPILE = 1
@@ -188,7 +191,7 @@ CMAKE = cmake . -DCMAKE_TOOLCHAIN_FILE=$(abspath toolchain.cmake) \
 # Per-package build rules
 #
 PKGS_FOUND :=
-include ../src/*/rules.mak
+include $(SRC)/*/rules.mak
 
 #
 # Targets

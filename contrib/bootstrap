@@ -38,7 +38,7 @@ PKGS_DISABLE=
 BUILD_ENCODERS="1"
 BUILD_DISCS="1"
 
-if test ! -f "../src/main.mak"
+if test ! -f "../../contrib/src/main.mak"
 then
 	echo "$0 must be run from a subdirectory"
 	exit 1
@@ -170,7 +170,7 @@ esac
 # Results output
 #
 test -e Makefile && unlink Makefile
-ln -sf ../src/main.mak Makefile
+ln -sf ../../contrib/src/main.mak Makefile
 cat << EOF
 Bootstrap completed.
 
