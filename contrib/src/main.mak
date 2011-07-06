@@ -136,6 +136,14 @@ else
 download = $(error Neither curl nor wget found!)
 endif
 
+ifeq ($(shell sha512sum --version >/dev/null 2>&1 || echo FAIL),)
+SHA512SUM = sha512sum
+else ifeq ($(shell shasum --version >/dev/null 2>&1 || echo FAIL),)
+SHA512SUM = shasum -a 512
+else
+SHA512SUM = $(error SHA-512 checksumming not found!)
+endif
+
 #
 # Common helpers
 #
@@ -169,10 +177,9 @@ download_git = \
 	(cd $(dir $@) && \
 	 tar cvJ $(notdir $(@:.tar.xz=))) > $@ && \
 	rm -Rf $(@:.tar.xz=)
-checksum = (cd $(TARBALLS) && $(1)sum -c -) < \
+checksum = (cd $(TARBALLS) && $(1) --check -) < \
 		$(SRC)/$(patsubst .sum-%,%,$@)/$(2)SUMS
-CHECK_SHA256 = $(call checksum,sha512,SHA512)
-CHECK_SHA512 = $(call checksum,sha512,SHA512)
+CHECK_SHA512 = $(call checksum,$(SHA512SUM),SHA512)
 UNPACK = $(RM) -R $@ \
 	$(foreach f,$(filter %.tar.gz %.tgz,$^), && tar xvzf $(f)) \
 	$(foreach f,$(filter %.tar.bz2,$^), && tar xvjf $(f)) \
