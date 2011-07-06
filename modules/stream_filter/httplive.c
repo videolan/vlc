@@ -938,7 +938,7 @@ static int parse_M3U8(stream_t *s, vlc_array_t *streams, uint8_t *buffer, const 
                 err = parse_Version(s, hls, line);
             else if (strncmp(line, "#EXT-X-ENDLIST", 14) == 0)
                 err = parse_EndList(s, hls);
-            else if (strncmp(line, "#", 1) != 0)
+            else if ((strncmp(line, "#", 1) != 0) && (*line != '\0') )
             {
                 err = parse_AddSegment(s, hls, segment_duration, line);
                 segment_duration = -1; /* reset duration */
