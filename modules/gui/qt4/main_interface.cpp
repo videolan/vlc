@@ -1246,9 +1246,10 @@ void MainInterface::wheelEvent( QWheelEvent *e )
 
 void MainInterface::closeEvent( QCloseEvent *e )
 {
-    e->ignore();      /* Do not quit */
 //  hide();
     emit askToQuit(); /* ask THEDP to quit, so we have a unique method */
+    /* Accept session quit. Otherwise we break the desktop mamager. */
+    e->accept();
 }
 
 void MainInterface::setInterfaceFullScreen( bool fs )
