@@ -201,7 +201,6 @@ static int SkipFile(stream_t *s, int *count, rar_file_t ***file, const rar_block
 
     if (current &&
         (current->is_complete ||
-          current->size != file_size ||
           strcmp(current->name, name) ||
           (hdr->flags & RAR_BLOCK_FILE_HAS_PREVIOUS) == 0))
         current = NULL;
