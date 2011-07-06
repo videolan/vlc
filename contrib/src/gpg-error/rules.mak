@@ -2,8 +2,6 @@
 GPGERROR_VERSION := 1.7
 GPGERROR_URL := ftp://ftp.gnupg.org/gcrypt/libgpg-error/libgpg-error-$(GPGERROR_VERSION).tar.bz2
 
-PKGS += gpg-error
-
 $(TARBALLS)/libgpg-error-$(GPGERROR_VERSION).tar.bz2:
 	$(call download,$(GPGERROR_URL))
 

@@ -14,7 +14,9 @@ libgcrypt: libgcrypt-$(GCRYPT_VERSION).tar.bz2 .sum-gcrypt
 	$(APPLY) $(SRC)/gcrypt/gcrypt-nodocs.patch
 	$(MOVE)
 
-.gcrypt: libgcrypt .gpg-error
+DEPS_gcrypt = gpg-error
+
+.gcrypt: libgcrypt
 	#$(RECONF)
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) --enable-ciphers=aes,des,rfc2268,arcfour --enable-digests=sha1,md5,rmd160 --enable-pubkey-ciphers=dsa
 	cd $< && $(MAKE) install
