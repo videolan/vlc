@@ -830,10 +830,6 @@ VLC_API bool vlc_ureduce( unsigned *, unsigned *, uint64_t, uint64_t, uint64_t )
 
 VLC_API void * vlc_memalign( void **base, size_t alignment, size_t size ) VLC_USED;
 
-/* execve wrapper (defined in src/extras/libc.c) */
-VLC_API int vlc_execve( vlc_object_t *p_object, int i_argc, char *const *pp_argv, char *const *pp_env, const char *psz_cwd, const char *p_in, size_t i_in, char **pp_data, size_t *pi_data ) VLC_USED;
-#define vlc_execve(a,b,c,d,e,f,g,h,i) vlc_execve(VLC_OBJECT(a),b,c,d,e,f,g,h,i)
-
 VLC_API void vlc_tdestroy( void *, void (*)(void *) );
 
 /* Fast large memory copy and memory set */

@@ -532,7 +532,6 @@ vlc_event_manager_fini
 vlc_event_manager_init
 vlc_event_manager_register_event_type
 vlc_event_send
-vlc_execve
 vlc_fastmem_register
 vlc_fourcc_GetCodec
 vlc_fourcc_GetCodecAudio
