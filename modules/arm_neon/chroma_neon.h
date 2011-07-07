@@ -46,3 +46,13 @@ void i420_yuyv_neon (struct yuv_pack *const out,
 void i420_uyvy_neon (struct yuv_pack *const out,
                      const struct yuv_planes *const in,
                      int width, int height);
+
+/* I422 to YUYV conversion. */
+void i422_yuyv_neon (struct yuv_pack *const out,
+                     const struct yuv_planes *const in,
+                     int width, int height);
+
+/* I422 to UYVY conversion. */
+void i422_uyvy_neon (struct yuv_pack *const out,
+                     const struct yuv_planes *const in,
+                     int width, int height);

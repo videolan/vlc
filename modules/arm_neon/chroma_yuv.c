@@ -45,6 +45,7 @@ vlc_module_end ()
     struct yuv_planes planes = { \
         (pict)->Y_PIXELS, (pict)->V_PIXELS, (pict)->U_PIXELS, (pict)->Y_PITCH }
 
+/* Planar YUV420 to packed YUV422 */
 static void I420_YUYV (filter_t *filter, picture_t *src, picture_t *dst)
 {
     DEFINE_PACK(out, dst);
@@ -81,14 +82,52 @@ static void I420_VYUY (filter_t *filter, picture_t *src, picture_t *dst)
 }
 VIDEO_FILTER_WRAPPER (I420_VYUY)
 
+
+/* Planar YUV422 to packed YUV422 */
+static void I422_YUYV (filter_t *filter, picture_t *src, picture_t *dst)
+{
+    DEFINE_PACK(out, dst);
+    DEFINE_PLANES(in, src);
+    i422_yuyv_neon (&out, &in, filter->fmt_in.video.i_width,
+                    filter->fmt_in.video.i_height);
+}
+VIDEO_FILTER_WRAPPER (I422_YUYV)
+
+static void I422_YVYU (filter_t *filter, picture_t *src, picture_t *dst)
+{
+    DEFINE_PACK(out, dst);
+    DEFINE_PLANES_SWAP(in, src);
+    i422_yuyv_neon (&out, &in, filter->fmt_in.video.i_width,
+                    filter->fmt_in.video.i_height);
+}
+VIDEO_FILTER_WRAPPER (I422_YVYU)
+
+static void I422_UYVY (filter_t *filter, picture_t *src, picture_t *dst)
+{
+    DEFINE_PACK(out, dst);
+    DEFINE_PLANES(in, src);
+    i422_uyvy_neon (&out, &in, filter->fmt_in.video.i_width,
+                    filter->fmt_in.video.i_height);
+}
+VIDEO_FILTER_WRAPPER (I422_UYVY)
+
+static void I422_VYUY (filter_t *filter, picture_t *src, picture_t *dst)
+{
+    DEFINE_PACK(out, dst);
+    DEFINE_PLANES_SWAP(in, src);
+    i422_uyvy_neon (&out, &in, filter->fmt_in.video.i_width,
+                    filter->fmt_in.video.i_height);
+}
+VIDEO_FILTER_WRAPPER (I422_VYUY)
+
+
 static int Open (vlc_object_t *obj)
 {
     filter_t *filter = (filter_t *)obj;
 
     if (!(vlc_CPU() & CPU_CAPABILITY_NEON))
         return VLC_EGENERIC;
-    if (((filter->fmt_in.video.i_width | filter->fmt_in.video.i_height) & 1)
-     || (filter->fmt_in.video.i_width != filter->fmt_out.video.i_width)
+    if ((filter->fmt_in.video.i_width != filter->fmt_out.video.i_width)
      || (filter->fmt_in.video.i_height != filter->fmt_out.video.i_height))
         return VLC_EGENERIC;
 
@@ -128,6 +167,26 @@ static int Open (vlc_object_t *obj)
                     break;
                 case VLC_CODEC_VYUY:
                     filter->pf_video_filter = I420_UYVY_Filter;
+                    break;
+                default:
+                    return VLC_EGENERIC;
+            }
+            break;
+
+        case VLC_CODEC_I422:
+            switch (filter->fmt_out.video.i_chroma)
+            {
+                case VLC_CODEC_YUYV:
+                    filter->pf_video_filter = I422_YUYV_Filter;
+                    break;
+                case VLC_CODEC_UYVY:
+                    filter->pf_video_filter = I422_UYVY_Filter;
+                    break;
+                case VLC_CODEC_YVYU:
+                    filter->pf_video_filter = I422_YVYU_Filter;
+                    break;
+                case VLC_CODEC_VYUY:
+                    filter->pf_video_filter = I422_VYUY_Filter;
                     break;
                 default:
                     return VLC_EGENERIC;
