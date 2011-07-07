@@ -41,6 +41,7 @@ close_tag = "?>"
 -- TODO: use internal VLC mime lookup function for mimes not included here
 local mimes = {
     txt = "text/plain",
+    json = "text/plain",
     html = "text/html",
     xml = "text/xml",
     js = "text/javascript",

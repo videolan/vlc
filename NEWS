@@ -76,6 +76,7 @@ Interfaces:
  * dbus: Rewrite of the main loop to use a more efficient poll-based model
  * dbus: Upgrade to an mpris2 compliant interface, see http://www.mpris.org
  * webUI/http: Rewrite of the web interface, using jQuery
+ * webUI/http: some requests are now supported in JSON in addition to XML
 
 Video Output:
  * New video output based on Direct2D for Windows 7 and Vista (with Platform Update)

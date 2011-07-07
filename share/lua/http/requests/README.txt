@@ -13,9 +13,10 @@ Examples:
  space -> +
  ...
 
-status.xml:
+status.xml or status.json
 ===========
 < Get VLC status information, current item info and meta.
+< Get VLC version, and http api version
 
 > add <mrl> to playlist and start playback:
   ?command=in_play&input=<mrl>

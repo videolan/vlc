@@ -8,6 +8,7 @@ vim:syntax=lua
 <  $Id$
 < 
 <  Authors: Antoine Cellerier <dionoea -at- videolan -dot- org>
+<  			Rob Jonson <rob -at- hobbyistsoftware -dot- com>
 < 
 <  This program is free software; you can redistribute it and/or modify
 <  it under the terms of the GNU General Public License as published by
@@ -24,130 +25,25 @@ vim:syntax=lua
 <  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
 < - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
 ]]?>
+
 <?vlc
 
-local input = _GET['input']
-local command = _GET['command']
-local id = tonumber(_GET['id'] or -1)
-local val = _GET['val']
-local options = _GET['option']
-if type(options) ~= "table" then -- Deal with the 0 or 1 option case
-  options = { options }
-end
+--package.loaded.httprequests = nil --uncomment to debug changes
+require "httprequests"
 
----[[]] vlc.msg.err("requests/status.xml got:","input: "..tostring(input),"command: "..tostring(command),"id: "..tostring(id),"val: "..tostring(val))
+httprequests.processcommands()
 
-local function stripslashes(s)
-  return string.gsub(s,"\\(.)","%1")
-end
+local statusTable=httprequests.getstatus(false)
 
-if command == "in_play" then
-  --[[
-  vlc.msg.err( "<options>" )
-  for a,b in ipairs(options) do
-    vlc.msg.err(b)
-  end
-  vlc.msg.err( "</options>" )
-  --]]
-  vlc.playlist.add({{path=stripslashes(input),options=options}})
-elseif command == "in_enqueue" then
-  vlc.playlist.enqueue({{path=stripslashes(input),options=options}})
-elseif command == "pl_play" then
-  if id == -1 then
-    vlc.playlist.play()
-  else
-    vlc.playlist.goto(id)
-  end
-elseif command == "pl_pause" then
-  if vlc.playlist.status() == "stopped" then
-    if id == -1 then
-      vlc.playlist.play()
-    else
-      vlc.playlist.goto(id)
-    end
-  else
-    vlc.playlist.pause()
-  end
-elseif command == "pl_forcepause" then
-  if vlc.playlist.status() == "playing" then
-    vlc.playlist.pause()
-  end
-elseif command == "pl_forceresume" then
-  if vlc.playlist.status() == "paused" then
-    vlc.playlist.pause()
-  end
-elseif command == "pl_stop" then
-  vlc.playlist.stop()
-elseif command == "pl_next" then
-  vlc.playlist.next()
-elseif command == "pl_previous" then
-  vlc.playlist.prev()
-elseif command == "pl_delete" then
-  vlc.playlist.delete(id)
-elseif command == "pl_empty" then
-  vlc.playlist.clear()
-elseif command == "pl_sort" then
-  vlc.playlist.sort( val, id > 0 )
-elseif command == "pl_random" then
-  vlc.playlist.random()
-elseif command == "pl_loop" then
-  vlc.playlist.loop()
-elseif command == "pl_repeat" then
-  vlc.playlist.repeat_()
-elseif command == "pl_sd" then
-  if vlc.sd.is_loaded(val) then
-    vlc.sd.remove(val)
-  else
-    vlc.sd.add(val)
-  end
-elseif command == "fullscreen" then
-  vlc.video.fullscreen()
-elseif command == "snapshot" then
-  common.snapshot()
-elseif command == "volume" then
-  common.volume(val)
-elseif command == "seek" then
-  common.seek(val)
-elseif command == "key" then
-  common.hotkey("key-"..val)
-elseif command == "audiodelay" then
-  if vlc.object.input() and val then
-   vlc.var.set(vlc.object.input(),"audio-delay",val)
-  end
-elseif command == "rate" then
-  if vlc.object.input() and tonumber(val) >= 0 then
-   vlc.var.set(vlc.object.input(),"rate",val)
-  end
-elseif command == "subdelay" then
-  if vlc.object.input() then
-   vlc.var.set(vlc.object.input(),"spu-delay",val)
-  end
-end
+print('<root>\n')
+httprequests.printTableAsXml(statusTable,0)
 
-local input = nil
-local command = nil
-local id = nil
-local val = nil
-
-local input = vlc.object.input()
 local item = vlc.input.item()
-local playlist = vlc.object.playlist()
-local vout = input and vlc.object.find(input,'vout','child')
+
+--data in the information section is presented in a non-standard way to keep compatibility.
+
 ?>
-<root>
-  <volume><?vlc print(vlc.volume.get()) ?></volume>
-  <audiodelay><?vlc if input then print(vlc.var.get(input,"audio-delay")) else print (0) end ?></audiodelay>
-  <rate><?vlc if input then print(vlc.var.get(input,"rate")) else print (1) end ?></rate>
-  <subtitledelay><?vlc if input then print(vlc.var.get(input,"spu-delay")) else print (0) end ?></subtitledelay>
-  <length><?vlc if input then print(math.floor(vlc.var.get(input,"length"))) else print(0) end?></length>
-  <time><?vlc if input then print(math.floor(vlc.var.get(input,"time"))) else print(0) end?></time>
-  <state><?vlc print(vlc.playlist.status()) ?></state>
-  <position><?vlc if input then print(vlc.var.get(input,"position")) else print(0) end?></position>
-  <fullscreen><?vlc if vout then vlc.var.get(vout,"fullscreen") else print(0) end?></fullscreen>
-  <random><?vlc print(vlc.var.get(playlist,"random")) ?></random>
-  <loop><?vlc print(vlc.var.get(playlist,"loop")) ?></loop>
-  <repeat><?vlc print(vlc.var.get(playlist,"repeat")) ?></repeat>
-  <information>
+<information>
     <category name="meta">
     <?vlc
       if item then

@@ -184,6 +184,7 @@ nobase_vlclib_DATA = \
 if BUILD_HTTPD
 nobase_vlclib_DATA += \
 	lua/intf/http.luac \
+	lua/intf/modules/httprequests.luac \
 	$(NULL)
 nobase_vlcdata_DATA += $(DIST_http_lua)
 endif
@@ -203,6 +204,7 @@ EXTRA_DIST += \
 	lua/intf/luac.lua \
 	lua/intf/modules/common.lua \
 	lua/intf/modules/host.lua \
+	lua/intf/modules/httprequests.lua \
 	lua/intf/telnet.lua \
 	lua/meta/art/README.txt \
 	lua/meta/art/04_musicbrainz.lua \
@@ -335,6 +337,7 @@ DIST_http_lua = \
 	lua/http/requests/browse.xml \
 	lua/http/requests/vlm_cmd.xml \
 	lua/http/requests/status.xml \
+	lua/http/requests/status.json \
 	lua/http/requests/vlm.xml \
 	lua/http/index.html \
 	lua/http/css/ui-lightness/jquery-ui-1.8.13.custom.css \
