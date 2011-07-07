@@ -40,6 +40,7 @@
 
 #include <QMenu>
 #include <QSignalMapper>
+#include <QSlider>
 
 /**********************************************************************
  * Playlist Widget. The embedded playlist
@@ -178,6 +179,16 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QWidget *_par )
     getSettings()->endGroup();
 
     layout->addWidget( split, 1, 0, 1, -1 );
+
+    /* Zoom */
+    QSlider *zoomSlider = new QSlider( Qt::Horizontal, this );
+    zoomSlider->setRange( -10, 10);
+    zoomSlider->setPageStep( 3 );
+    zoomSlider->setValue( model->getZoom() );
+    CONNECT( zoomSlider, valueChanged( int ), model, changeZoom( int ) );
+
+    layout->addWidget( zoomSlider, 1, 3, ( Qt::AlignBottom | Qt::AlignRight ) );
+
     setAcceptDrops( true );
     setWindowTitle( qtr( "Playlist" ) );
     setWindowRole( "vlc-playlist" );
