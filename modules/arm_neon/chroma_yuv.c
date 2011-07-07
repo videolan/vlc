@@ -54,14 +54,14 @@ static void I420_YUYV (filter_t *filter, picture_t *src, picture_t *dst)
 }
 VIDEO_FILTER_WRAPPER (I420_YUYV)
 
-static void YV12_YUYV (filter_t *filter, picture_t *src, picture_t *dst)
+static void I420_YVYU (filter_t *filter, picture_t *src, picture_t *dst)
 {
     DEFINE_PACK(out, dst);
     DEFINE_PLANES_SWAP(in, src);
     i420_yuyv_neon (&out, &in, filter->fmt_in.video.i_width,
                     filter->fmt_in.video.i_height);
 }
-VIDEO_FILTER_WRAPPER (YV12_YUYV)
+VIDEO_FILTER_WRAPPER (I420_YVYU)
 
 static void I420_UYVY (filter_t *filter, picture_t *src, picture_t *dst)
 {
@@ -72,14 +72,14 @@ static void I420_UYVY (filter_t *filter, picture_t *src, picture_t *dst)
 }
 VIDEO_FILTER_WRAPPER (I420_UYVY)
 
-static void YV12_UYVY (filter_t *filter, picture_t *src, picture_t *dst)
+static void I420_VYUY (filter_t *filter, picture_t *src, picture_t *dst)
 {
     DEFINE_PACK(out, dst);
     DEFINE_PLANES_SWAP(in, src);
     i420_uyvy_neon (&out, &in, filter->fmt_in.video.i_width,
                     filter->fmt_in.video.i_height);
 }
-VIDEO_FILTER_WRAPPER (YV12_UYVY)
+VIDEO_FILTER_WRAPPER (I420_VYUY)
 
 static int Open (vlc_object_t *obj)
 {
@@ -103,6 +103,12 @@ static int Open (vlc_object_t *obj)
                 case VLC_CODEC_UYVY:
                     filter->pf_video_filter = I420_UYVY_Filter;
                     break;
+                case VLC_CODEC_YVYU:
+                    filter->pf_video_filter = I420_YVYU_Filter;
+                    break;
+                case VLC_CODEC_VYUY:
+                    filter->pf_video_filter = I420_VYUY_Filter;
+                    break;
                 default:
                     return VLC_EGENERIC;
             }
@@ -112,10 +118,16 @@ static int Open (vlc_object_t *obj)
             switch (filter->fmt_out.video.i_chroma)
             {
                 case VLC_CODEC_YUYV:
-                    filter->pf_video_filter = YV12_YUYV_Filter;
+                    filter->pf_video_filter = I420_YVYU_Filter;
                     break;
                 case VLC_CODEC_UYVY:
-                    filter->pf_video_filter = YV12_UYVY_Filter;
+                    filter->pf_video_filter = I420_VYUY_Filter;
+                    break;
+                case VLC_CODEC_YVYU:
+                    filter->pf_video_filter = I420_YUYV_Filter;
+                    break;
+                case VLC_CODEC_VYUY:
+                    filter->pf_video_filter = I420_UYVY_Filter;
                     break;
                 default:
                     return VLC_EGENERIC;
