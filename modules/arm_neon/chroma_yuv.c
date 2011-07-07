@@ -121,6 +121,43 @@ static void I422_VYUY (filter_t *filter, picture_t *src, picture_t *dst)
 VIDEO_FILTER_WRAPPER (I422_VYUY)
 
 
+/* Packedr YUV422 to planar YUV422 */
+static void YUYV_I422 (filter_t *filter, picture_t *src, picture_t *dst)
+{
+    DEFINE_PLANES(out, dst);
+    DEFINE_PACK(in, src);
+    yuyv_i422_neon (&out, &in, filter->fmt_in.video.i_width,
+                    filter->fmt_in.video.i_height);
+}
+VIDEO_FILTER_WRAPPER (YUYV_I422)
+
+static void YVYU_I422 (filter_t *filter, picture_t *src, picture_t *dst)
+{
+    DEFINE_PLANES_SWAP(out, dst);
+    DEFINE_PACK(in, src);
+    yuyv_i422_neon (&out, &in, filter->fmt_in.video.i_width,
+                    filter->fmt_in.video.i_height);
+}
+VIDEO_FILTER_WRAPPER (YVYU_I422)
+
+static void UYVY_I422 (filter_t *filter, picture_t *src, picture_t *dst)
+{
+    DEFINE_PLANES(out, dst);
+    DEFINE_PACK(in, src);
+    uyvy_i422_neon (&out, &in, filter->fmt_in.video.i_width,
+                    filter->fmt_in.video.i_height);
+}
+VIDEO_FILTER_WRAPPER (UYVY_I422)
+
+static void VYUY_I422 (filter_t *filter, picture_t *src, picture_t *dst)
+{
+    DEFINE_PLANES_SWAP(out, dst);
+    DEFINE_PACK(in, src);
+    uyvy_i422_neon (&out, &in, filter->fmt_in.video.i_width,
+                    filter->fmt_in.video.i_height);
+}
+VIDEO_FILTER_WRAPPER (VYUY_I422)
+
 static int Open (vlc_object_t *obj)
 {
     filter_t *filter = (filter_t *)obj;
@@ -133,6 +170,7 @@ static int Open (vlc_object_t *obj)
 
     switch (filter->fmt_in.video.i_chroma)
     {
+        /* Planar to packed */
         case VLC_CODEC_I420:
             switch (filter->fmt_out.video.i_chroma)
             {
@@ -192,6 +230,48 @@ static int Open (vlc_object_t *obj)
                     return VLC_EGENERIC;
             }
             break;
+
+        /* Packed to planar */
+        case VLC_CODEC_YUYV:
+            switch (filter->fmt_out.video.i_chroma)
+            {
+                case VLC_CODEC_I422:
+                    filter->pf_video_filter = YUYV_I422_Filter;
+                    break;
+                default:
+                    return VLC_EGENERIC;
+            }
+
+        case VLC_CODEC_UYVY:
+            switch (filter->fmt_out.video.i_chroma)
+            {
+                case VLC_CODEC_I422:
+                    filter->pf_video_filter = UYVY_I422_Filter;
+                    break;
+                default:
+                    return VLC_EGENERIC;
+            }
+
+        case VLC_CODEC_YVYU:
+            switch (filter->fmt_out.video.i_chroma)
+            {
+                case VLC_CODEC_I422:
+                    filter->pf_video_filter = YVYU_I422_Filter;
+                    break;
+                default:
+                    return VLC_EGENERIC;
+            }
+
+
+        case VLC_CODEC_VYUY:
+            switch (filter->fmt_out.video.i_chroma)
+            {
+                case VLC_CODEC_I422:
+                    filter->pf_video_filter = VYUY_I422_Filter;
+                    break;
+                default:
+                    return VLC_EGENERIC;
+            }
 
         default:
             return VLC_EGENERIC;
