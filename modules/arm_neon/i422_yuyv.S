@@ -54,6 +54,7 @@ i422_yuyv_neon:
 	subs		COUNT,	COUNT,	#16
 	vld1.u8		{q0},		[Y,:128]!
 	vzip.u8		q0,	q1
+	@ TODO: unroll (1 cycle stall)
 	vst1.u8		{q0-q1},	[O,:128]!
 	bgt		2b
 
