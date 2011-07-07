@@ -26,6 +26,7 @@
 #include <vlc_plugin.h>
 #include <vlc_filter.h>
 #include <vlc_cpu.h>
+#include "chroma_neon.h"
 
 static int Open (vlc_object_t *);
 
@@ -35,58 +36,48 @@ vlc_module_begin ()
     set_callbacks (Open, NULL)
 vlc_module_end ()
 
-void i420_yuyv_neon (uint8_t *out, const uint8_t **in,
-                     unsigned int pitch, unsigned int s_off,
-                     unsigned int height);
+#define DEFINE_PACK(pack, pict) \
+    struct yuv_pack pack = { (pict)->Y_PIXELS, (pict)->Y_PITCH }
+#define DEFINE_PLANES(planes, pict) \
+    struct yuv_planes planes = { \
+        (pict)->Y_PIXELS, (pict)->U_PIXELS, (pict)->V_PIXELS, (pict)->Y_PITCH }
+#define DEFINE_PLANES_SWAP(planes, pict) \
+    struct yuv_planes planes = { \
+        (pict)->Y_PIXELS, (pict)->V_PIXELS, (pict)->U_PIXELS, (pict)->Y_PITCH }
 
 static void I420_YUYV (filter_t *filter, picture_t *src, picture_t *dst)
 {
-    uint8_t *out = dst->p->p_pixels;
-    const uint8_t *yuv[3] = { src->Y_PIXELS, src->U_PIXELS, src->V_PIXELS, };
-    size_t height = filter->fmt_in.video.i_height;
-    int i_pitch = (dst->p->i_pitch >> 1) & ~0xF;
-    int s_offset = src->p->i_pitch - i_pitch;
-
-    i420_yuyv_neon (out, yuv, i_pitch, s_offset, height);
+    DEFINE_PACK(out, dst);
+    DEFINE_PLANES(in, src);
+    i420_yuyv_neon (&out, &in, filter->fmt_in.video.i_width,
+                    filter->fmt_in.video.i_height);
 }
 VIDEO_FILTER_WRAPPER (I420_YUYV)
 
 static void YV12_YUYV (filter_t *filter, picture_t *src, picture_t *dst)
 {
-    uint8_t *out = dst->p->p_pixels;
-    const uint8_t *yuv[3] = { src->Y_PIXELS, src->V_PIXELS, src->U_PIXELS, };
-    size_t height = filter->fmt_in.video.i_height;
-    int i_pitch = (dst->p->i_pitch >> 1) & ~0xF;
-    int s_offset = src->p->i_pitch - i_pitch;
-
-    i420_yuyv_neon (out, yuv, i_pitch, s_offset, height);
+    DEFINE_PACK(out, dst);
+    DEFINE_PLANES_SWAP(in, src);
+    i420_yuyv_neon (&out, &in, filter->fmt_in.video.i_width,
+                    filter->fmt_in.video.i_height);
 }
 VIDEO_FILTER_WRAPPER (YV12_YUYV)
 
-void i420_uyvy_neon (uint8_t *out, const uint8_t **in,
-                     uintptr_t pitch, uintptr_t s_off, uintptr_t height);
-
 static void I420_UYVY (filter_t *filter, picture_t *src, picture_t *dst)
 {
-    uint8_t *out = dst->p->p_pixels;
-    const uint8_t *yuv[3] = { src->Y_PIXELS, src->U_PIXELS, src->V_PIXELS, };
-    size_t height = filter->fmt_in.video.i_height;
-    int i_pitch = (dst->p->i_pitch >> 1) & ~0xF;
-    int s_offset = src->p->i_pitch - i_pitch;
-
-    i420_uyvy_neon (out, yuv, i_pitch, s_offset, height);
+    DEFINE_PACK(out, dst);
+    DEFINE_PLANES(in, src);
+    i420_uyvy_neon (&out, &in, filter->fmt_in.video.i_width,
+                    filter->fmt_in.video.i_height);
 }
 VIDEO_FILTER_WRAPPER (I420_UYVY)
 
 static void YV12_UYVY (filter_t *filter, picture_t *src, picture_t *dst)
 {
-    uint8_t *out = dst->p->p_pixels;
-    const uint8_t *yuv[3] = { src->Y_PIXELS, src->V_PIXELS, src->U_PIXELS, };
-    size_t height = filter->fmt_in.video.i_height;
-    int i_pitch = (dst->p->i_pitch >> 1) & ~0xF;
-    int s_offset = src->p->i_pitch - i_pitch;
-
-    i420_uyvy_neon (out, yuv, i_pitch, s_offset, height);
+    DEFINE_PACK(out, dst);
+    DEFINE_PLANES_SWAP(in, src);
+    i420_uyvy_neon (&out, &in, filter->fmt_in.video.i_width,
+                    filter->fmt_in.video.i_height);
 }
 VIDEO_FILTER_WRAPPER (YV12_UYVY)
 
