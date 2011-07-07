@@ -619,19 +619,19 @@ QWidget* ExtensionDialog::UpdateWidget( extension_widget_t *p_widget )
 
         case EXTENSION_WIDGET_DROPDOWN:
             comboBox = static_cast< QComboBox* >( p_widget->p_sys_intf );
-            comboBox->clear();
+            // method widget:clear()
+            if ( p_widget->p_values == NULL )
+            {
+                comboBox->clear();
+                return comboBox;
+            }
+            // method widget:addvalue()
             for( p_value = p_widget->p_values;
                  p_value != NULL;
                  p_value = p_value->p_next )
             {
-                comboBox->addItem( qfu( p_value->psz_text ), p_value->i_id );
-            }
-            /* Set current item */
-            if( p_widget->psz_text )
-            {
-                int idx = comboBox->findText( qfu( p_widget->psz_text ) );
-                if( idx >= 0 )
-                    comboBox->setCurrentIndex( idx );
+                if ( comboBox->findText( qfu( p_value->psz_text ) ) < 0 )
+                    comboBox->addItem( qfu( p_value->psz_text ), p_value->i_id );
             }
             return comboBox;
 
