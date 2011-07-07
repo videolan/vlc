@@ -6,7 +6,7 @@ AUTOMAKE_OPTIONS = subdir-objects
 SUBDIRS = . test
 
 NULL =
-EXTRA_DIST = extras/COPYING \
+EXTRA_DIST = \
 	libvlc.pc.in \
 	vlc-plugin.pc.in \
 	libvlc.sym \
