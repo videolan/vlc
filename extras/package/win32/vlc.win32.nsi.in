@@ -334,6 +334,7 @@ FunctionEnd
   !insertmacro ${_action} ".mpg"
   !insertmacro ${_action} ".mpv2"
   !insertmacro ${_action} ".mts"
+  !insertmacro ${_action} ".mtv"
   !insertmacro ${_action} ".mxf"
   !insertmacro ${_action} ".nsv"
   !insertmacro ${_action} ".nuv"

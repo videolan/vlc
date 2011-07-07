@@ -986,7 +986,7 @@ void SPrefsPanel::assoDialog()
     aTv( ".gxf" ); aTv( ".m1v" ); aTv( ".m2v" ); aTv( ".m2ts" ); aTv( ".m4v" );
     aTv( ".mkv" ); aTv( ".mov" ); aTv( ".mp2" ); aTv( ".mp4" ); aTv( ".mpeg" );
     aTv( ".mpeg1" ); aTv( ".mpeg2" ); aTv( ".mpeg4" ); aTv( ".mpg" );
-    aTv( ".mts" ); aTv( ".mxf" );
+    aTv( ".mts" ); aTv( ".mtv" ); aTv( ".mxf" );
     aTv( ".ogg" ); aTv( ".ogm" ); aTv( ".ogx" ); aTv( ".ogv" );  aTv( ".ts" );
     aTv( ".vob" ); aTv( ".vro" ); aTv( ".wmv" );
     videoType->setCheckState( 0, ( i_temp > 0 ) ?
