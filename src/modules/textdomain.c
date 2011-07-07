@@ -91,3 +91,17 @@ int vlc_bindtextdomain (const char *domain)
 
     return 0;
 }
+
+/**
+ * In-tree plugins share their gettext domain with LibVLC.
+ */
+char *vlc_gettext (const char *msgid)
+{
+#ifdef ENABLE_NLS
+    if (unlikely(!*msgid))
+        return (char *)"";
+    return dgettext (PACKAGE_NAME, msgid);
+#else
+    return (char *)msgid;
+#endif
+}

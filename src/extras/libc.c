@@ -61,24 +61,6 @@
 
 
 
-#ifdef ENABLE_NLS
-# include <libintl.h>
-#endif
-
-/**
- * In-tree plugins share their gettext domain with LibVLC.
- */
-char *vlc_gettext( const char *msgid )
-{
-#ifdef ENABLE_NLS
-    if( unlikely(!*msgid))
-        return (char *)"";
-    return dgettext( PACKAGE_NAME, msgid );
-#else
-    return (char *)msgid;
-#endif
-}
-
 /*****************************************************************************
  * Local conversion routine from ISO_6937 to UTF-8 charset. Support for this
  * is still missing in libiconv, hence multiple operating systems lack it.
