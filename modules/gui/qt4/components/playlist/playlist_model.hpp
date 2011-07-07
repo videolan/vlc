@@ -104,6 +104,10 @@ public:
     {
         return getItem( index )->id();
     }
+    inline int getZoom() const
+    {
+        return i_zoom;
+    }
 
 signals:
     void currentChanged( const QModelIndex& );
@@ -112,6 +116,11 @@ signals:
 public slots:
     virtual void activateItem( const QModelIndex &index );
     void activateItem( playlist_item_t *p_item );
+    inline void changeZoom( const int zoom )
+    {
+        i_zoom = zoom;
+        emit layoutChanged();
+    }
 
 private:
     /* General */
@@ -152,6 +161,9 @@ private:
     PLItem *p_cached_item_bi;
     int i_cached_id;
     int i_cached_input_id;
+
+    /* Zoom factor for font-size */
+    int i_zoom;
 
 private slots:
     void popupPlay();
