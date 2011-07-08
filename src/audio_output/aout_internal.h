@@ -97,8 +97,8 @@ struct aout_input_t
 /* From input.c : */
 int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input, const aout_request_vout_t * );
 int aout_InputDelete( aout_instance_t * p_aout, aout_input_t * p_input );
-int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
-                    aout_buffer_t * p_buffer, int i_input_rate );
+void aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
+                     aout_buffer_t * p_buffer, int i_input_rate );
 void aout_InputCheckAndRestart( aout_instance_t * p_aout, aout_input_t * p_input );
 
 /* From filters.c : */
@@ -138,7 +138,7 @@ bool aout_ChangeFilterString( vlc_object_t *, aout_instance_t *, const char *psz
 /* From dec.c */
 aout_input_t *aout_DecNew( aout_instance_t *, audio_sample_format_t *,
                    const audio_replay_gain_t *, const aout_request_vout_t * );
-int aout_DecDelete ( aout_instance_t *, aout_input_t * );
+void aout_DecDelete ( aout_instance_t *, aout_input_t * );
 aout_buffer_t * aout_DecNewBuffer( aout_input_t *, size_t );
 void aout_DecDeleteBuffer( aout_instance_t *, aout_input_t *, aout_buffer_t * );
 int aout_DecPlay( aout_instance_t *, aout_input_t *, aout_buffer_t *, int i_input_rate );
@@ -157,81 +157,40 @@ bool aout_DecIsEmpty( aout_instance_t * p_aout, aout_input_t * p_input );
 #ifdef AOUT_DEBUG
 enum
 {
-    MIXER_LOCK=1,
-    INPUT_LOCK=2,
-    INPUT_FIFO_LOCK=4,
-    OUTPUT_FIFO_LOCK=8,
-    VOLUME_VARS_LOCK=16
+    OUTPUT_LOCK=1,
+    VOLUME_LOCK=2,
 };
 
-void aout_lock (unsigned);
-void aout_unlock (unsigned);
+void aout_lock_check (unsigned);
+void aout_unlock_check (unsigned);
 
 #else
-# define aout_lock( i )   (void)0
-# define aout_unlock( i ) (void)0
+# define aout_lock_check( i )   (void)0
+# define aout_unlock_check( i ) (void)0
 #endif
 
-static inline void aout_lock_mixer( aout_instance_t *p_aout )
+static inline void aout_lock( aout_instance_t *p_aout )
 {
-    aout_lock( MIXER_LOCK );
-    vlc_mutex_lock( &p_aout->mixer_lock );
+    aout_lock_check( OUTPUT_LOCK );
+    vlc_mutex_lock( &p_aout->lock );
 }
 
-static inline void aout_unlock_mixer( aout_instance_t *p_aout )
+static inline void aout_unlock( aout_instance_t *p_aout )
 {
-    aout_unlock( MIXER_LOCK );
-    vlc_mutex_unlock( &p_aout->mixer_lock );
-}
-
-static inline void aout_lock_input_fifos( aout_instance_t *p_aout )
-{
-    aout_lock( INPUT_FIFO_LOCK );
-    vlc_mutex_lock( &p_aout->input_fifos_lock );
-}
-
-static inline void aout_unlock_input_fifos( aout_instance_t *p_aout )
-{
-    aout_unlock( INPUT_FIFO_LOCK );
-    vlc_mutex_unlock( &p_aout->input_fifos_lock );
-}
-
-static inline void aout_lock_output_fifo( aout_instance_t *p_aout )
-{
-    aout_lock( OUTPUT_FIFO_LOCK );
-    vlc_mutex_lock( &p_aout->output_fifo_lock );
-}
-
-static inline void aout_unlock_output_fifo( aout_instance_t *p_aout )
-{
-    aout_unlock( OUTPUT_FIFO_LOCK );
-    vlc_mutex_unlock( &p_aout->output_fifo_lock );
-}
-
-static inline void aout_lock_input( aout_instance_t *p_aout, aout_input_t * p_input )
-{
-    (void)p_aout;
-    aout_lock( INPUT_LOCK );
-    vlc_mutex_lock( &p_input->lock );
-}
-
-static inline void aout_unlock_input( aout_instance_t *p_aout, aout_input_t * p_input )
-{
-    (void)p_aout;
-    aout_unlock( INPUT_LOCK );
-    vlc_mutex_unlock( &p_input->lock );
+    aout_unlock_check( OUTPUT_LOCK );
+    vlc_mutex_unlock( &p_aout->lock );
 }
 
 static inline void aout_lock_volume( aout_instance_t *p_aout )
 {
-    aout_lock( VOLUME_VARS_LOCK );
-    vlc_mutex_lock( &p_aout->volume_vars_lock );
+    aout_lock_check( VOLUME_LOCK );
+    vlc_mutex_lock( &p_aout->volume_lock );
 }
 
 static inline void aout_unlock_volume( aout_instance_t *p_aout )
 {
-    aout_unlock( VOLUME_VARS_LOCK );
-    vlc_mutex_unlock( &p_aout->volume_vars_lock );
+    aout_unlock_check( VOLUME_LOCK );
+    vlc_mutex_unlock( &p_aout->volume_lock );
 }
 
 /* Helpers */
@@ -241,10 +200,10 @@ static inline void aout_unlock_volume( aout_instance_t *p_aout )
  * possible to take configuration changes into account */
 static inline void AoutInputsMarkToRestart( aout_instance_t *p_aout )
 {
-    aout_lock_mixer( p_aout );
+    aout_lock( p_aout );
     if( p_aout->p_input != NULL )
         p_aout->p_input->b_restart = true;
-    aout_unlock_mixer( p_aout );
+    aout_unlock( p_aout );
 }
 
 #endif /* !LIBVLC_AOUT_INTERNAL_H */

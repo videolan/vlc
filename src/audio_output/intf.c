@@ -85,12 +85,11 @@ static int commitVolume (vlc_object_t *obj, aout_instance_t *aout,
 
     if (aout != NULL)
     {
-        aout_lock_mixer (aout);
-        aout_lock_input_fifos (aout);
+        aout_lock (aout);
+#warning FIXME: wrong test. Need to check that aout_output is ready.
         if (aout->p_mixer != NULL)
             ret = aout->output.pf_volume_set (aout, volume, mute);
-        aout_unlock_input_fifos (aout);
-        aout_unlock_mixer (aout);
+        aout_unlock (aout);
 
         if (ret == 0)
             var_TriggerCallback (aout, "intf-change");
@@ -291,58 +290,46 @@ void aout_VolumeNoneInit( aout_instance_t * p_aout )
  *****************************************************************************/
 static int aout_Restart( aout_instance_t * p_aout )
 {
-    bool b_error = 0;
+    aout_input_t *p_input;
 
-    aout_lock_mixer( p_aout );
-
-    if( p_aout->p_input == NULL )
+    aout_lock( p_aout );
+    p_input = p_aout->p_input;
+    if( p_input == NULL )
     {
-        aout_unlock_mixer( p_aout );
+        aout_unlock( p_aout );
         msg_Err( p_aout, "no decoder thread" );
         return -1;
     }
 
-    aout_lock_input( p_aout, p_aout->p_input );
-    aout_lock_input_fifos( p_aout );
-    aout_InputDelete( p_aout, p_aout->p_input );
-    aout_unlock_input_fifos( p_aout );
-
-    /* Lock all inputs. */
-    aout_lock_input_fifos( p_aout );
+    /* Reinitializes the output */
+    aout_InputDelete( p_aout, p_input );
     aout_MixerDelete( p_aout );
-
-    /* Re-open the output plug-in. */
     aout_OutputDelete( p_aout );
 
     /* FIXME: This function is notoriously dangerous/unsafe.
      * By the way, if OutputNew or MixerNew fails, we are totally screwed. */
-    if ( aout_OutputNew( p_aout, &p_aout->p_input->input ) == -1 )
+    if ( aout_OutputNew( p_aout, &p_input->input ) == -1 )
     {
         /* Release all locks and report the error. */
-        vlc_mutex_unlock( &p_aout->p_input->lock );
-        aout_unlock_input_fifos( p_aout );
-        aout_unlock_mixer( p_aout );
+        aout_unlock( p_aout );
         return -1;
     }
 
     if ( aout_MixerNew( p_aout ) == -1 )
     {
         aout_OutputDelete( p_aout );
-        vlc_mutex_unlock( &p_aout->p_input->lock );
-        aout_unlock_input_fifos( p_aout );
-        aout_unlock_mixer( p_aout );
+        aout_unlock( p_aout );
         return -1;
     }
 
-    /* Re-open the input. */
-    aout_input_t * p_input = p_aout->p_input;
-    b_error |= aout_InputNew( p_aout, p_input, &p_input->request_vout );
-    aout_unlock_input( p_aout, p_input );
-
-    aout_unlock_input_fifos( p_aout );
-    aout_unlock_mixer( p_aout );
-
-    return b_error;
+    if( aout_InputNew( p_aout, p_input, &p_input->request_vout ) )
+    {
+#warning FIXME: deal with errors
+        aout_unlock( p_aout );
+        return -1;
+    }
+    aout_unlock( p_aout );
+    return 0;
 }
 
 /*****************************************************************************

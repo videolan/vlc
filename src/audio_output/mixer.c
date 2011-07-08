@@ -44,7 +44,7 @@
 int aout_MixerNew( aout_instance_t * p_aout )
 {
     assert( !p_aout->p_mixer );
-    vlc_assert_locked( &p_aout->input_fifos_lock );
+    vlc_assert_locked( &p_aout->lock );
 
     aout_mixer_t *p_mixer = vlc_object_create( p_aout, sizeof(*p_mixer) );
     if( !p_mixer )
@@ -75,14 +75,13 @@ int aout_MixerNew( aout_instance_t * p_aout )
  *****************************************************************************/
 void aout_MixerDelete( aout_instance_t * p_aout )
 {
+    vlc_assert_locked( &p_aout->lock );
+
     if( !p_aout->p_mixer )
         return;
 
     module_unneed( p_aout->p_mixer, p_aout->p_mixer->module );
-
     vlc_object_release( p_aout->p_mixer );
-
-    /* */
     p_aout->p_mixer = NULL;
 }
 
@@ -102,8 +101,7 @@ static int MixBuffer( aout_instance_t * p_aout, float volume )
      * "smart" audio outputs. */
     assert( samples > 0 );
 
-    aout_lock_input_fifos( p_aout );
-    aout_lock_output_fifo( p_aout );
+    vlc_assert_locked( &p_aout->lock );
 
     /* Retrieve the date of the next buffer. */
     date_t exact_start_date = p_aout->output.fifo.end_date;
@@ -121,12 +119,10 @@ static int MixBuffer( aout_instance_t * p_aout, float volume )
         start_date = 0;
     }
 
-    aout_unlock_output_fifo( p_aout );
-
     /* See if we have enough data to prepare a new buffer for the audio output. */
     aout_buffer_t *p_buffer = p_fifo->p_first;
     if( p_buffer == NULL )
-        goto giveup;
+        return -1;
 
     /* Find the earliest start date available. */
     if ( !start_date )
@@ -153,7 +149,7 @@ static int MixBuffer( aout_instance_t * p_aout, float volume )
 
         p_buffer = p_fifo->p_first;
         if( p_buffer == NULL )
-            goto giveup;
+            return -1;
     }
 
     /* Check that we have enough samples. */
@@ -161,7 +157,7 @@ static int MixBuffer( aout_instance_t * p_aout, float volume )
     {
         p_buffer = p_buffer->p_next;
         if( p_buffer == NULL )
-            goto giveup;
+            return -1;
 
         /* Check that all buffers are contiguous. */
         if( prev_date != p_buffer->i_pts )
@@ -191,11 +187,9 @@ static int MixBuffer( aout_instance_t * p_aout, float volume )
         if( delta < 0 )
         {
             /* Is it really the best way to do it ? */
-            aout_lock_output_fifo( p_aout );
             aout_FifoSet( &p_aout->output.fifo, 0 );
             date_Set( &exact_start_date, 0 );
-            aout_unlock_output_fifo( p_aout );
-            goto giveup;
+            return -1;
         }
         if( delta > 0 )
         {
@@ -212,7 +206,7 @@ static int MixBuffer( aout_instance_t * p_aout, float volume )
         p_buffer = block_Alloc( needed );
         if( unlikely(p_buffer == NULL) )
             /* XXX: should free input buffers */
-            goto giveup;
+            return -1;
         p_buffer->i_nb_samples = samples;
 
         for( uint8_t *p_out = p_buffer->p_buffer; needed > 0; )
@@ -254,14 +248,8 @@ static int MixBuffer( aout_instance_t * p_aout, float volume )
 
     /* Run the mixer. */
     p_mixer->mix( p_mixer, p_buffer, volume );
-    aout_unlock_input_fifos( p_aout );
     aout_OutputPlay( p_aout, p_buffer );
     return 0;
-
-giveup:
-    /* Interrupted before the end... We can't run. */
-    aout_unlock_input_fifos( p_aout );
-    return -1;
 }
 
 /*****************************************************************************

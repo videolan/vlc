@@ -178,22 +178,9 @@ struct aout_instance_t
 {
     VLC_COMMON_MEMBERS
 
-    /* Locks : please note that if you need several of these locks, it is
-     * mandatory (to avoid deadlocks) to take them in the following order :
-     * mixer_lock, p_input->lock, output_fifo_lock, input_fifos_lock.
-     * --Meuuh */
-    /* When input_fifos_lock is taken, none of the p_input->fifo structures
-     * can be read or modified by a third-party thread. */
-    vlc_mutex_t             input_fifos_lock;
-    /* When mixer_lock is taken, all decoder threads willing to mix a
-     * buffer must wait until it is released. The output pipeline cannot
-     * be modified. No input stream can be added or removed. */
-    vlc_mutex_t             mixer_lock;
-    /* When output_fifo_lock is taken, the p_aout->output.fifo structure
-     * cannot be read or written  by a third-party thread. */
-    vlc_mutex_t             output_fifo_lock;
-    /* volume_vars_lock is taken */
-    vlc_mutex_t             volume_vars_lock;
+    /* Lock for volume variables (FIXME: should be in input manager) */
+    vlc_mutex_t             volume_lock;
+    vlc_mutex_t             lock;
 
     /* Input streams & pre-filters */
     aout_input_t *          p_input;

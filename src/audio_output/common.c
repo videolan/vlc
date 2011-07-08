@@ -59,10 +59,8 @@ aout_instance_t * __aout_New( vlc_object_t * p_parent )
     }
 
     /* Initialize members. */
-    vlc_mutex_init( &p_aout->input_fifos_lock );
-    vlc_mutex_init( &p_aout->mixer_lock );
-    vlc_mutex_init( &p_aout->volume_vars_lock );
-    vlc_mutex_init( &p_aout->output_fifo_lock );
+    vlc_mutex_init( &p_aout->volume_lock );
+    vlc_mutex_init( &p_aout->lock );
     p_aout->p_input = NULL;
     p_aout->mixer_multiplier = 1.0;
     p_aout->p_mixer = NULL;
@@ -82,45 +80,24 @@ aout_instance_t * __aout_New( vlc_object_t * p_parent )
 static void aout_Destructor( vlc_object_t * p_this )
 {
     aout_instance_t * p_aout = (aout_instance_t *)p_this;
-    vlc_mutex_destroy( &p_aout->input_fifos_lock );
-    vlc_mutex_destroy( &p_aout->mixer_lock );
-    vlc_mutex_destroy( &p_aout->volume_vars_lock );
-    vlc_mutex_destroy( &p_aout->output_fifo_lock );
+    vlc_mutex_destroy( &p_aout->volume_lock );
+    vlc_mutex_destroy( &p_aout->lock );
 }
 
-/* Lock ordering rules:
- *
- *            Vars Mixer Input IFIFO OFIFO (< Inner lock)
- * Vars        No!   Yes   Yes   Yes   Yes
- * Mixer       No!   No!   Yes   Yes   Yes
- * Input       No!   No!   No!   Yes   Yes
- * In FIFOs    No!   No!   No!   No!   Yes
- * Out FIFOs   No!   No!   No!   No!   No!
- * (^ Outer lock)
- */
 #ifdef AOUT_DEBUG
 /* Lock debugging */
 static __thread unsigned aout_locks = 0;
 
-void aout_lock (unsigned i)
+void aout_lock_check (unsigned i)
 {
     unsigned allowed;
     switch (i)
     {
-        case VOLUME_VARS_LOCK:
+        case VOLUME_LOCK:
             allowed = 0;
             break;
-        case MIXER_LOCK:
-            allowed = VOLUME_VARS_LOCK;
-            break;
-        case INPUT_LOCK:
-            allowed = VOLUME_VARS_LOCK|MIXER_LOCK;
-            break;
-        case INPUT_FIFO_LOCK:
-            allowed = VOLUME_VARS_LOCK|MIXER_LOCK|INPUT_LOCK;
-            break;
-        case OUTPUT_FIFO_LOCK:
-            allowed = VOLUME_VARS_LOCK|MIXER_LOCK|INPUT_LOCK|INPUT_FIFO_LOCK;
+        case OUTPUT_LOCK:
+            allowed = VOLUME_LOCK;
             break;
         default:
             abort ();
@@ -136,7 +113,7 @@ void aout_lock (unsigned i)
     aout_locks |= i;
 }
 
-void aout_unlock (unsigned i)
+void aout_unlock_check (unsigned i)
 {
     assert (aout_locks & i);
     aout_locks &= ~i;

@@ -81,7 +81,6 @@ aout_input_t *aout_DecNew( aout_instance_t *p_aout,
     if( !p_input )
         return NULL;
 
-    vlc_mutex_init( &p_input->lock );
     p_input->b_error = true;
     p_input->b_paused = false;
     p_input->i_pause_date = 0;
@@ -95,8 +94,7 @@ aout_input_t *aout_DecNew( aout_instance_t *p_aout,
 
     /* We can only be called by the decoder, so no need to lock
      * p_input->lock. */
-    aout_lock_mixer( p_aout );
-    aout_lock_input_fifos( p_aout );
+    aout_lock( p_aout );
     assert( p_aout->p_input == NULL );
     p_aout->p_input = p_input;
 
@@ -119,28 +117,18 @@ aout_input_t *aout_DecNew( aout_instance_t *p_aout,
 
     aout_InputNew( p_aout, p_input, p_request_vout );
 out:
-    aout_unlock_input_fifos( p_aout );
-    aout_unlock_mixer( p_aout );
+    aout_unlock( p_aout );
     return p_input;
 }
 
 /*****************************************************************************
  * aout_DecDelete : delete a decoder
  *****************************************************************************/
-int aout_DecDelete( aout_instance_t * p_aout, aout_input_t * p_input )
+void aout_DecDelete( aout_instance_t * p_aout, aout_input_t * p_input )
 {
-    /* This function can only be called by the decoder itself, so no need
-     * to lock p_input->lock. */
-    aout_lock_mixer( p_aout );
-
-    if( p_input != p_aout->p_input )
-    {
-        msg_Err( p_aout, "cannot find an input to delete" );
-        aout_unlock_mixer( p_aout );
-        return -1;
-    }
-
+    aout_lock( p_aout );
     /* Remove the input. */
+    assert( p_input == p_aout->p_input ); /* buggy decoder? */
     p_aout->p_input = NULL;
     aout_InputDelete( p_aout, p_input );
 
@@ -149,11 +137,8 @@ int aout_DecDelete( aout_instance_t * p_aout, aout_input_t * p_input )
     var_Destroy( p_aout, "audio-device" );
     var_Destroy( p_aout, "audio-channels" );
 
-    aout_unlock_mixer( p_aout );
-
-    vlc_mutex_destroy( &p_input->lock );
+    aout_unlock( p_aout );
     free( p_input );
-    return 0;
 }
 
 
@@ -167,23 +152,9 @@ int aout_DecDelete( aout_instance_t * p_aout, aout_input_t * p_input )
 aout_buffer_t * aout_DecNewBuffer( aout_input_t * p_input,
                                    size_t i_nb_samples )
 {
-    block_t *block;
-    size_t length;
-
-    aout_lock_input( NULL, p_input );
-
-    if ( p_input->b_error )
-    {
-        aout_unlock_input( NULL, p_input );
-        return NULL;
-    }
-
-    length = i_nb_samples * p_input->input.i_bytes_per_frame
-                          / p_input->input.i_frame_length;
-    block = block_Alloc( length );
-
-    aout_unlock_input( NULL, p_input );
-
+    size_t length = i_nb_samples * p_input->input.i_bytes_per_frame
+                                 / p_input->input.i_frame_length;
+    block_t *block = block_Alloc( length );
     if( likely(block != NULL) )
     {
         block->i_nb_samples = i_nb_samples;
@@ -216,50 +187,40 @@ int aout_DecPlay( aout_instance_t * p_aout, aout_input_t * p_input,
     p_buffer->i_length = (mtime_t)p_buffer->i_nb_samples * 1000000
                                 / p_input->input.i_rate;
 
-    aout_lock_mixer( p_aout );
-    aout_lock_input( p_aout, p_input );
-
+    aout_lock( p_aout );
     if( p_input->b_error )
     {
-        aout_unlock_input( p_aout, p_input );
-        aout_unlock_mixer( p_aout );
-
+        aout_unlock( p_aout );
         aout_BufferFree( p_buffer );
         return -1;
     }
 
     aout_InputCheckAndRestart( p_aout, p_input );
-    aout_unlock_mixer( p_aout );
-
-    int i_ret = aout_InputPlay( p_aout, p_input, p_buffer, i_input_rate );
-
-    aout_unlock_input( p_aout, p_input );
-
-    if( i_ret == -1 )
-        return -1;
-
+    aout_InputPlay( p_aout, p_input, p_buffer, i_input_rate );
     /* Run the mixer if it is able to run. */
-    aout_lock_mixer( p_aout );
     aout_MixerRun( p_aout, p_aout->mixer_multiplier );
-    aout_unlock_mixer( p_aout );
-
+    aout_unlock( p_aout );
     return 0;
 }
 
 int aout_DecGetResetLost( aout_instance_t *p_aout, aout_input_t *p_input )
 {
-    aout_lock_input( p_aout, p_input );
-    int i_value = p_input->i_buffer_lost;
-    p_input->i_buffer_lost = 0;
-    aout_unlock_input( p_aout, p_input );
+    int val;
 
-    return i_value;
+    aout_lock( p_aout );
+    val = p_input->i_buffer_lost;
+    p_input->i_buffer_lost = 0;
+    aout_unlock( p_aout );
+
+    return val;
 }
 
 void aout_DecChangePause( aout_instance_t *p_aout, aout_input_t *p_input, bool b_paused, mtime_t i_date )
 {
     mtime_t i_duration = 0;
-    aout_lock_input( p_aout, p_input );
+
+    aout_lock( p_aout );
+    assert( p_aout->p_input == p_input );
     assert( !p_input->b_paused || !b_paused );
     if( p_input->b_paused )
     {
@@ -267,33 +228,31 @@ void aout_DecChangePause( aout_instance_t *p_aout, aout_input_t *p_input, bool b
     }
     p_input->b_paused = b_paused;
     p_input->i_pause_date = i_date;
-    aout_unlock_input( p_aout, p_input );
 
     if( i_duration != 0 )
     {
-        aout_lock_mixer( p_aout );
         for( aout_buffer_t *p = p_input->mixer.fifo.p_first; p != NULL; p = p->p_next )
         {
             p->i_pts += i_duration;
         }
-        aout_unlock_mixer( p_aout );
     }
     aout_OutputPause( p_aout, b_paused, i_date );
+    aout_unlock( p_aout );
 }
 
 void aout_DecFlush( aout_instance_t *p_aout, aout_input_t *p_input )
 {
-    aout_lock_input_fifos( p_aout );
+    aout_lock( p_aout );
     aout_FifoSet( &p_input->mixer.fifo, 0 );
-    aout_unlock_input_fifos( p_aout );
+    aout_unlock( p_aout );
 }
 
 bool aout_DecIsEmpty( aout_instance_t * p_aout, aout_input_t * p_input )
 {
     mtime_t end_date;
 
-    aout_lock_input_fifos( p_aout );
+    aout_lock( p_aout );
     end_date = aout_FifoNextStart( &p_input->mixer.fifo );
-    aout_unlock_input_fifos( p_aout );
+    aout_unlock( p_aout );
     return end_date <= mdate();
 }
