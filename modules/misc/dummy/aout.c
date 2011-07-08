@@ -57,13 +57,13 @@ int OpenAudio ( vlc_object_t * p_this )
      && var_InheritBool( p_this, "spdif" ) )
     {
         p_aout->output.output.i_format = VLC_CODEC_SPDIFL;
-        p_aout->output.i_nb_samples = A52_FRAME_NB;
         p_aout->output.output.i_bytes_per_frame = AOUT_SPDIF_SIZE;
         p_aout->output.output.i_frame_length = A52_FRAME_NB;
     }
     else
         p_aout->output.output.i_format =
             HAVE_FPU ? VLC_CODEC_FL32 : VLC_CODEC_S16N;
+    p_aout->output.i_nb_samples = A52_FRAME_NB;
 
     /* Create the variable for the audio-device */
     var_Create( p_aout, "audio-device", VLC_VAR_INTEGER | VLC_VAR_HASCHOICE );

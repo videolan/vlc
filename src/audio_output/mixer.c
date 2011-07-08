@@ -98,6 +98,9 @@ static int MixBuffer( aout_instance_t * p_aout, float volume )
     aout_fifo_t *p_fifo = &p_input->fifo;
     mtime_t now = mdate();
     const unsigned samples = p_aout->output.i_nb_samples;
+    /* FIXME: Remove this silly constraint. Just pass buffers as they come to
+     * "smart" audio outputs. */
+    assert( samples > 0 );
 
     aout_lock_input_fifos( p_aout );
     aout_lock_output_fifo( p_aout );
