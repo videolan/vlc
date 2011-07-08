@@ -80,6 +80,7 @@ private slots:
     void triggerMenu( int id );
     void inputChanged( input_thread_t *p_input );
     void playingChanged( int );
+    void metaChanged( input_item_t *p_input );
 
 private:
     static ExtensionsManager* instance;

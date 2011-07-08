@@ -622,6 +622,13 @@ static int Control( extensions_manager_t *p_mgr, int i_control, va_list args )
             }
             break;
         }
+        case EXTENSION_META_CHANGED:
+        {
+            extension_t *p_ext;
+            p_ext = ( extension_t* ) va_arg( args, extension_t* );
+            PushCommand( p_ext, CMD_UPDATE_META );
+            break;
+        }
         default:
             msg_Warn( p_mgr, "Control '%d' not yet implemented in Extension",
                       i_control );

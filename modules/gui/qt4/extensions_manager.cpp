@@ -51,6 +51,8 @@ ExtensionsManager::ExtensionsManager( intf_thread_t *_p_intf, QObject *parent )
     CONNECT( THEMIM->getIM(), playingStatusChanged( int ), this, playingChanged( int ) );
     DCONNECT( THEMIM, inputChanged( input_thread_t* ),
               this, inputChanged( input_thread_t* ) );
+    CONNECT( THEMIM->getIM(), metaChanged( input_item_t* ),
+             this, metaChanged( input_item_t* ) );
     b_unloading = false;
     b_failed = false;
 }
@@ -295,5 +297,23 @@ void ExtensionsManager::playingChanged( int state )
     }
     FOREACH_END()
 
+    vlc_mutex_unlock( &p_extensions_manager->lock );
+}
+
+void ExtensionsManager::metaChanged( input_item_t* )
+{
+    //This is unlikely, but can happen if no extension modules can be loaded.
+    if ( p_extensions_manager == NULL )
+        return ;
+    vlc_mutex_lock( &p_extensions_manager->lock );
+    extension_t *p_ext;
+    FOREACH_ARRAY( p_ext, p_extensions_manager->extensions )
+    {
+        if( extension_IsActivated( p_extensions_manager, p_ext ) )
+        {
+            extension_MetaChanged( p_extensions_manager, p_ext );
+        }
+    }
+    FOREACH_END()
     vlc_mutex_unlock( &p_extensions_manager->lock );
 }
