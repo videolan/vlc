@@ -174,6 +174,7 @@ static int OpenAudio( vlc_object_t *p_this )
     p_aout->output.p_sys->b_playing = 0;
 
     p_aout->output.pf_play = Play;
+    p_aout->output.pf_pause = NULL;
     aout_VolumeSoftInit( p_aout );
 
     /* Retrieve config values */

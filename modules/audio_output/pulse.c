@@ -581,6 +581,7 @@ static int Open(vlc_object_t *obj)
     pa_threaded_mainloop_unlock(mainloop);
 
     aout->output.pf_play = Play;
+    aout->output.pf_pause = NULL;
     aout->output.pf_volume_set = VolumeSet;
     return VLC_SUCCESS;
 

@@ -366,6 +366,7 @@ static int Open (vlc_object_t *obj)
     }
 
     p_aout->output.pf_play = Play;
+    p_aout->output.pf_pause = NULL;
 
     snd_pcm_hw_params_t *p_hw;
     snd_pcm_sw_params_t *p_sw;

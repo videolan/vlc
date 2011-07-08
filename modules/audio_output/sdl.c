@@ -215,6 +215,7 @@ static int Open ( vlc_object_t *p_this )
     p_aout->output.output.i_rate = obtained.freq;
     p_aout->output.i_nb_samples = obtained.samples;
     p_aout->output.pf_play = Play;
+    p_aout->output.pf_pause = NULL;
 
     return VLC_SUCCESS;
 }

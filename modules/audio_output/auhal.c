@@ -188,6 +188,7 @@ static int Open( vlc_object_t * p_this )
     memset( p_sys->p_remainder_buffer, 0, sizeof(uint8_t) * BUFSIZE );
 
     p_aout->output.pf_play = Play;
+    p_aout->output.pf_pause = NULL;
 
     aout_FormatPrint( p_aout, "VLC is looking for:", (audio_sample_format_t *)&p_aout->output.output );
 

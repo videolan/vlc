@@ -154,8 +154,7 @@ static int Open( vlc_object_t *p_this )
         return VLC_ENOMEM;
 
     p_aout->output.pf_play = Play;
-    p_aout->b_die = false;
-
+    p_aout->output.pf_pause = NULL;
 
     /*
      initialize/update Device selection List

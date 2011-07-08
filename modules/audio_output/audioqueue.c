@@ -123,6 +123,7 @@ static int Open ( vlc_object_t *p_this )
     p_aout->output.output.i_rate = 44100;
     p_aout->output.i_nb_samples = FRAME_SIZE;
     p_aout->output.pf_play = Play;
+    p_aout->output.pf_pause = NULL;
 
     msg_Dbg(p_aout, "Starting AudioQueue (status = %i)", status);
     status = AudioQueueStart(p_sys->audioQueue, NULL);

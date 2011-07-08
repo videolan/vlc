@@ -278,6 +278,7 @@ void aout_DecChangePause( aout_instance_t *p_aout, aout_input_t *p_input, bool b
         }
         aout_unlock_mixer( p_aout );
     }
+    aout_OutputPause( p_aout, b_paused, i_date );
 }
 
 void aout_DecFlush( aout_instance_t *p_aout, aout_input_t *p_input )

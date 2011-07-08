@@ -134,6 +134,7 @@ static int Open( vlc_object_t *p_this )
     jack_set_graph_order_callback ( p_sys->p_jack_client, GraphChange, p_aout );
 
     p_aout->output.pf_play = Play;
+    p_aout->output.pf_pause = NULL;
     aout_VolumeSoftInit( p_aout );
 
     /* JACK only supports fl32 format */

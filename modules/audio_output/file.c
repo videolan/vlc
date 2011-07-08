@@ -163,6 +163,7 @@ static int Open( vlc_object_t * p_this )
     }
 
     p_aout->output.pf_play = Play;
+    p_aout->output.pf_pause = NULL;
 
     /* Audio format */
     psz_format = var_CreateGetString( p_this, "audiofile-format" );

@@ -299,6 +299,7 @@ static int Open( vlc_object_t *p_this )
     free( psz_device );
 
     p_aout->output.pf_play = Play;
+    p_aout->output.pf_pause = NULL;
 
     if ( var_Type( p_aout, "audio-device" ) == 0 )
     {

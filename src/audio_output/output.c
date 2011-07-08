@@ -239,6 +239,19 @@ void aout_OutputPlay( aout_instance_t * p_aout, aout_buffer_t * p_buffer )
     aout_unlock_output_fifo( p_aout );
 }
 
+/**
+ * Notifies the audio output (if any) of pause/resume events.
+ * This enables the output to expedite pause, instead of waiting for its
+ * buffers to drain.
+ */
+void aout_OutputPause( aout_instance_t *aout, bool pause, mtime_t date )
+{
+    aout_lock_output_fifo( aout );
+    if( aout->output.pf_pause != NULL )
+        aout->output.pf_pause( aout, pause, date );
+    aout_unlock_output_fifo( aout );
+}
+
 /*****************************************************************************
  * aout_OutputNextBuffer : give the audio output plug-in the right buffer
  *****************************************************************************

@@ -165,8 +165,9 @@ typedef struct aout_output_t
 
     struct module_t *       p_module;
     struct aout_sys_t *     p_sys;
-    void                 (* pf_play)( aout_instance_t * );
-    int                  (* pf_volume_set )( aout_instance_t *, audio_volume_t, bool );
+    void (*pf_play)( aout_instance_t * );
+    void (* pf_pause)( aout_instance_t *, bool, mtime_t );
+    int (* pf_volume_set )( aout_instance_t *, audio_volume_t, bool );
     int                     i_nb_samples;
 } aout_output_t;
 

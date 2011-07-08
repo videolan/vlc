@@ -51,6 +51,7 @@ int OpenAudio ( vlc_object_t * p_this )
     aout_instance_t * p_aout = (aout_instance_t *)p_this;
 
     p_aout->output.pf_play = Play;
+    p_aout->output.pf_pause = NULL;
     aout_VolumeSoftInit( p_aout );
 
     if( AOUT_FMT_NON_LINEAR( &p_aout->output.output )
