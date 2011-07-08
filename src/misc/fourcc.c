@@ -835,6 +835,9 @@ static const entry_t p_list_video[] = {
         A("MJP2"),
         A("MJ2C"),
 
+    B(VLC_CODEC_LAGARITH, "Lagarith Lossless"),
+        A("LAGS"),
+
     B(0, "")
 };
 static const entry_t p_list_audio[] = {
