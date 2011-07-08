@@ -161,20 +161,26 @@ int aout_OutputNew( aout_instance_t * p_aout,
     aout_FifoInit( p_aout, &p_aout->output.fifo, p_aout->output.output.i_rate );
     aout_FormatPrint( p_aout, "output", &p_aout->output.output );
 
-    /* Calculate the resulting mixer output format. */
+    /* Choose the mixer format. */
     p_aout->mixer_format = p_aout->output.output;
-    if ( !AOUT_FMT_NON_LINEAR(&p_aout->output.output) )
-    {
-        /* Non-S/PDIF mixer only deals with float32 or fixed32. */
-        p_aout->mixer_format.i_format
-                     = HAVE_FPU ? VLC_CODEC_FL32 : VLC_CODEC_FI32;
-        aout_FormatPrepare( &p_aout->mixer_format );
-    }
-    else
-    {
+    if ( AOUT_FMT_NON_LINEAR(&p_aout->output.output) )
         p_aout->mixer_format.i_format = p_format->i_format;
-    }
+    else
+    /* Most audio filters can only deal with single-precision,
+     * so lets always use that when hardware supports floating point. */
+    if( HAVE_FPU )
+        p_aout->mixer_format.i_format = VLC_CODEC_FL32;
+    else
+    /* Otherwise, audio filters will not work. Use fixed-point if the input has
+     * more than 16-bits depth. */
+    if( p_format->i_bitspersample > 16 )
+        p_aout->mixer_format.i_format = VLC_CODEC_FI32;
+    else
+    /* Fallback to 16-bits. This avoids pointless conversion to and from
+     * 32-bits samples for the sole purpose of software mixing. */
+        p_aout->mixer_format.i_format = VLC_CODEC_S16N;
 
+    aout_FormatPrepare( &p_aout->mixer_format );
     aout_FormatPrint( p_aout, "mixer", &p_aout->mixer_format );
 
     /* Create filters. */
