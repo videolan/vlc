@@ -251,9 +251,9 @@ static void SDLCallback( void * _p_aout, uint8_t * p_stream, int i_len )
      * hardware latency, or the buffer state. So we just pop data and throw
      * it at SDL's face. Nah. */
 
-    vlc_mutex_lock( &p_aout->output_fifo_lock );
+    vlc_mutex_lock( &p_aout->lock );
     p_buffer = aout_FifoPop( &p_aout->output.fifo );
-    vlc_mutex_unlock( &p_aout->output_fifo_lock );
+    vlc_mutex_unlock( &p_aout->lock );
 
     if ( p_buffer != NULL )
     {

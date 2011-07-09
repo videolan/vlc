@@ -159,9 +159,9 @@ void AudioQueueCallback(void * inUserData, AudioQueueRef inAQ, AudioQueueBufferR
     aout_buffer_t *   p_buffer = NULL;
 
     if (p_aout) {
-        vlc_mutex_lock( &p_aout->output_fifo_lock );
+        vlc_mutex_lock( &p_aout->lock );
         p_buffer = aout_FifoPop( &p_aout->output.fifo );
-        vlc_mutex_unlock( &p_aout->output_fifo_lock );
+        vlc_mutex_unlock( &p_aout->lock );
     }
 
     if ( p_buffer != NULL ) {
