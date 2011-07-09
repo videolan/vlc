@@ -1,7 +1,7 @@
 /*****************************************************************************
  * flac.c : FLAC demux module for vlc
  *****************************************************************************
- * Copyright (C) 2001-2007 the VideoLAN team
+ * Copyright (C) 2001-2008 the VideoLAN team
  * $Id$
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
@@ -32,12 +32,13 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_demux.h>
-#include <vlc_meta.h>
-#include <vlc_input.h>
-#include <vlc_codec.h>
+#include <vlc_meta.h>                 /* vlc_meta_* */
+#include <vlc_input.h>                /* vlc_input_attachment, vlc_seekpoint */
+#include <vlc_codec.h>                /* decoder_t */
+#include <vlc_charset.h>              /* EnsureUTF8 */
+
 #include <assert.h>
-#include <vlc_charset.h>
-#include "vorbis.h"
+#include "vorbis.h"                   /* vorbis comments */
 
 /*****************************************************************************
  * Module descriptor
@@ -621,7 +622,7 @@ static void ParsePicture( demux_t *p_demux, const uint8_t *p_data, int i_data )
     if( i_len < 0 || i_len > i_data )
         goto error;
 
-    msg_Dbg( p_demux, "FLAC: Picture type=%d mime=%s description='%s' file length=%d",
+    msg_Dbg( p_demux, "Picture type=%d mime=%s description='%s' file length=%d",
              i_type, psz_mime, psz_description, i_len );
 
     snprintf( psz_name, sizeof(psz_name), "picture%d", p_sys->i_attachments );
