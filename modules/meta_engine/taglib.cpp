@@ -158,6 +158,9 @@ static void ReadMetaFromASF( ASF::Tag* tag, demux_meta_t* p_demux_meta, vlc_meta
                 continue;
         }
 
+        msg_Dbg( p_demux_meta, "Found embedded art: %s (%s) is %u bytes",
+                 psz_name, psz_mime, i_data );
+
         p_attachment = vlc_input_attachment_New( psz_name, psz_mime,
                                 psz_name, p_data, i_data );
         if( p_attachment )
