@@ -29,11 +29,10 @@
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
-#include <vlc_meta.h>
-#include <vlc_demux.h>
-#include <vlc_strings.h>
-#include <vlc_charset.h>
-#include <vlc_input.h> /* for attachment_new */
+#include <vlc_demux.h>              /* demux_meta_t */
+#include <vlc_strings.h>            /* vlc_b64_decode_binary */
+#include <vlc_charset.h>            /* ToLocale, LocaleFree */
+#include <vlc_input.h>              /* for attachment_new */
 
 #ifdef WIN32
 # include <io.h>
