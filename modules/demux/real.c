@@ -840,7 +840,8 @@ static void DemuxAudioSipr( demux_t *p_demux, real_track_t *tk, mtime_t i_pts )
     demux_sys_t *p_sys = p_demux->p_sys;
     block_t *p_block = tk->p_sipr_packet;
 
-    if( p_sys->i_buffer < tk->i_frame_size )
+    if( p_sys->i_buffer < tk->i_frame_size
+     || tk->i_sipr_subpacket_count >= tk->i_subpacket_h )
         return;
 
     if( !p_block )
@@ -850,7 +851,6 @@ static void DemuxAudioSipr( demux_t *p_demux, real_track_t *tk, mtime_t i_pts )
             return;
         tk->p_sipr_packet = p_block;
     }
-
     memcpy( p_block->p_buffer + tk->i_sipr_subpacket_count * tk->i_frame_size,
             p_sys->buffer, tk->i_frame_size );
     if (!tk->i_sipr_subpacket_count)
