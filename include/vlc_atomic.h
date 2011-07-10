@@ -26,6 +26,9 @@
  * Atomic operations do not require locking, but they are not very powerful.
  */
 
+/** Static initializer for \ref vlc_atomic_t */
+# define VLC_ATOMIC_INIT(val) { (val) }
+
 /* All functions return the atom value _after_ the operation. */
 
 VLC_API uintptr_t vlc_atomic_get(const vlc_atomic_t *);
