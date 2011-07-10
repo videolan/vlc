@@ -214,9 +214,9 @@ static int Open( vlc_object_t * p_this )
     p_sys->i_selected_dev = val.i_int & ~AOUT_VAR_SPDIF_FLAG; /* remove SPDIF flag to get the true DeviceID */
     p_sys->b_supports_digital = ( val.i_int & AOUT_VAR_SPDIF_FLAG ) ? true : false;
     if( p_sys->b_supports_digital )
-        msg_Dbg( p_aout, "audio-device supports digital output" );
+        msg_Dbg( p_aout, "audio device supports digital output" );
     else
-        msg_Dbg( p_aout, "audio-device does not support digital output" );
+        msg_Dbg( p_aout, "audio device does not support digital output" );
 
     /* Check if the desired device is alive and usable */
     /* TODO: add a callback to the device to alert us if the device dies */
@@ -238,8 +238,6 @@ static int Open( vlc_object_t * p_this )
         msg_Warn( p_aout, "selected audio device is not alive, switching to default device" );
         p_sys->i_selected_dev = p_sys->i_default_dev;
     }
-    else
-        msg_Dbg( p_aout, "selected audio device is alive" );
 
     AudioObjectPropertyAddress audioDeviceHogModeAddress = { kAudioDevicePropertyHogMode,
                                   kAudioDevicePropertyScopeOutput,
@@ -262,8 +260,6 @@ static int Open( vlc_object_t * p_this )
                           "use by another program.") );
         goto error;
     }
-    else
-        msg_Dbg( p_aout, "device is free for us to use" );
 
     /* Check for Digital mode or Analog output mode */
     if( AOUT_FMT_NON_LINEAR( &p_aout->output.output ) && p_sys->b_supports_digital )
@@ -298,7 +294,7 @@ static int OpenAnalog( aout_instance_t *p_aout )
 {
     struct aout_sys_t           *p_sys = p_aout->output.p_sys;
     OSStatus                    err = noErr;
-    UInt32                      i_param_size = 0, i = 0;
+    UInt32                      i_param_size = 0;
     int                         i_original;
     ComponentDescription        desc;
     AudioStreamBasicDescription DeviceFormat;
@@ -410,7 +406,7 @@ static int OpenAnalog( aout_instance_t *p_aout )
         else
         {
             /* We want more than stereo and we can do that */
-            for( i = 0; i < layout->mNumberChannelDescriptions; i++ )
+            for( unsigned int i = 0; i < layout->mNumberChannelDescriptions; i++ )
             {
                 msg_Dbg( p_aout, "this is channel: %d", (int)layout->mChannelDescriptions[i].mChannelLabel );
 
@@ -617,7 +613,7 @@ static int OpenSPDIF( aout_instance_t * p_aout )
     UInt32                  i_param_size = 0, b_mix = 0;
     Boolean                 b_writeable = false;
     AudioStreamID           *p_streams = NULL;
-    int                     i = 0, i_streams = 0;
+    int                     i_streams = 0;
 
     /* Start doing the SPDIF setup proces */
     p_sys->b_digital = true;
@@ -677,12 +673,12 @@ static int OpenSPDIF( aout_instance_t * p_aout )
         return false;
     }
 
-    AudioObjectPropertyAddress physicalFormatsAddress = { kAudioStreamPropertyPhysicalFormats, kAudioDevicePropertyScopeOutput, kAudioObjectPropertyElementMaster };
-    for( i = 0; i < i_streams && p_sys->i_stream_index < 0 ; i++ )
+    AudioObjectPropertyAddress physicalFormatsAddress = { kAudioStreamPropertyAvailablePhysicalFormats, kAudioObjectPropertyScopeGlobal, 0 };
+    for( int i = 0; i < i_streams && p_sys->i_stream_index < 0 ; i++ )
     {
         /* Find a stream with a cac3 stream */
         AudioStreamBasicDescription *p_format_list = NULL;
-        int                         i_formats = 0, j = 0;
+        int                         i_formats = 0;
         bool                  b_digital = false;
 
         /* Retrieve all the stream formats supported by each output stream */
@@ -707,7 +703,7 @@ static int OpenSPDIF( aout_instance_t * p_aout )
         }
 
         /* Check if one of the supported formats is a digital format */
-        for( j = 0; j < i_formats; j++ )
+        for( int j = 0; j < i_formats; j++ )
         {
             if( p_format_list[j].mFormatID == 'IAC3' ||
                   p_format_list[j].mFormatID == kAudioFormat60958AC3 )
@@ -740,7 +736,7 @@ static int OpenSPDIF( aout_instance_t * p_aout )
                 p_sys->b_revert = true;
             }
 
-            for( j = 0; j < i_formats; j++ )
+            for( int j = 0; j < i_formats; j++ )
             {
                 if( p_format_list[j].mFormatID == 'IAC3' ||
                       p_format_list[j].mFormatID == kAudioFormat60958AC3 )
@@ -925,7 +921,7 @@ static void Play( aout_instance_t * p_aout )
 static void Probe( aout_instance_t * p_aout )
 {
     OSStatus            err = noErr;
-    UInt32              i = 0, i_param_size = 0;
+    UInt32              i_param_size = 0;
     AudioDeviceID       devid_def = 0;
     AudioDeviceID       *p_devices = NULL;
     vlc_value_t         val, text;
@@ -948,8 +944,7 @@ static void Probe( aout_instance_t * p_aout )
         msg_Err( p_aout, "No audio output devices were found." );
         goto error;
     }
-
-    msg_Dbg( p_aout, "system has [%u] device(s)", p_sys->i_devices );
+    msg_Dbg( p_aout, "found %u audio device(s)", p_sys->i_devices );
 
     /* Allocate DeviceID array */
     p_devices = (AudioDeviceID*)malloc( sizeof(AudioDeviceID) * p_sys->i_devices );
@@ -981,7 +976,7 @@ static void Probe( aout_instance_t * p_aout )
 
     AudioObjectPropertyAddress deviceNameAddress = { kAudioDevicePropertyDeviceName, kAudioDevicePropertyScopeOutput, kAudioObjectPropertyElementMaster };
 
-    for( i = 0; i < p_sys->i_devices; i++ )
+    for( unsigned int i = 0; i < p_sys->i_devices; i++ )
     {
         char *psz_name;
         i_param_size = 0;
@@ -1084,13 +1079,12 @@ static int AudioDeviceSupportsDigital( aout_instance_t *p_aout, AudioDeviceID i_
     OSStatus                    err = noErr;
     UInt32                      i_param_size = 0;
     AudioStreamID               *p_streams = NULL;
-    int                         i = 0, i_streams = 0;
+    int                         i_streams = 0;
     bool                  b_return = false;
 
     /* Retrieve all the output streams */
     AudioObjectPropertyAddress streamsAddress = { kAudioDevicePropertyStreams, kAudioObjectPropertyScopeGlobal, kAudioObjectPropertyElementMaster };
     err = AudioObjectGetPropertyDataSize( i_dev_id, &streamsAddress, 0, NULL, &i_param_size );
-
     if( err != noErr )
     {
         msg_Err( p_aout, "could not get number of streams: [%s] (%i)", (char *)&err, err );
@@ -1103,14 +1097,13 @@ static int AudioDeviceSupportsDigital( aout_instance_t *p_aout, AudioDeviceID i_
         return VLC_ENOMEM;
 
     err = AudioObjectGetPropertyData( i_dev_id, &streamsAddress, 0, NULL, &i_param_size, p_streams );
-
     if( err != noErr )
     {
         msg_Err( p_aout, "could not get list of streams: [%s]", (char *)&err );
         return false;
     }
 
-    for( i = 0; i < i_streams; i++ )
+    for( int i = 0; i < i_streams; i++ )
     {
         if( AudioStreamSupportsDigital( p_aout, p_streams[i] ) )
             b_return = true;
@@ -1127,26 +1120,23 @@ static int AudioStreamSupportsDigital( aout_instance_t *p_aout, AudioStreamID i_
 {
     OSStatus                    err = noErr;
     UInt32                      i_param_size = 0;
-    AudioStreamBasicDescription *p_format_list = NULL;
-    int                         i = 0, i_formats = 0;
-    bool                  b_return = false;
+    AudioStreamRangedDescription *p_format_list = NULL;
+    int                         i_formats = 0;
+    bool                        b_return = false;
 
     /* Retrieve all the stream formats supported by each output stream */
-    AudioObjectPropertyAddress physicalFormatsAddress = { kAudioStreamPropertyAvailablePhysicalFormats, kAudioDevicePropertyScopeOutput, kAudioObjectPropertyElementMaster };
+    AudioObjectPropertyAddress physicalFormatsAddress = { kAudioStreamPropertyAvailablePhysicalFormats, kAudioObjectPropertyScopeGlobal, 0 };
     err = AudioObjectGetPropertyDataSize( i_stream_id, &physicalFormatsAddress, 0, NULL, &i_param_size );
-    if( err == kAudioHardwareUnknownPropertyError )
+    if( err != noErr )
     {
-        msg_Err( p_aout, "audio stream doesn't support query kAudioStreamPropertyAvailablePhysicalFormats" );
-        return false;
-    }
-    else if( err != noErr )
-    {
-        msg_Err( p_aout, "AudioStreamSupportsDigital: could not get number of streamformats: [%s] (%i)", (char *)&err, err );
+        msg_Err( p_aout, "could not get number of streamformats: [%s] (%i)", (char *)&err, err );
         return false;
     }
 
-    i_formats = i_param_size / sizeof( AudioStreamBasicDescription );
-    p_format_list = (AudioStreamBasicDescription *)malloc( i_param_size );
+    i_formats = i_param_size / sizeof( AudioStreamRangedDescription );
+    msg_Dbg( p_aout, "found %i stream formats", i_formats );
+
+    p_format_list = (AudioStreamRangedDescription *)malloc( i_param_size );
     if( p_format_list == NULL )
         return false;
 
@@ -1159,12 +1149,12 @@ static int AudioStreamSupportsDigital( aout_instance_t *p_aout, AudioStreamID i_
         return false;
     }
 
-    for( i = 0; i < i_formats; i++ )
+    for( int i = 0; i < i_formats; i++ )
     {
-        msg_Dbg( p_aout, STREAM_FORMAT_MSG( "supported format: ", p_format_list[i] ) );
+        msg_Dbg( p_aout, STREAM_FORMAT_MSG( "supported format: ", p_format_list[i].mFormat ) );
 
-        if( p_format_list[i].mFormatID == 'IAC3' ||
-                  p_format_list[i].mFormatID == kAudioFormat60958AC3 )
+        if( p_format_list[i].mFormat.mFormatID == 'IAC3' ||
+                  p_format_list[i].mFormat.mFormatID == kAudioFormat60958AC3 )
         {
             b_return = true;
         }
@@ -1181,7 +1171,6 @@ static int AudioStreamChangeFormat( aout_instance_t *p_aout, AudioStreamID i_str
 {
     OSStatus            err = noErr;
     UInt32              i_param_size = 0;
-    int i;
 
     AudioObjectPropertyAddress physicalFormatAddress = { kAudioStreamPropertyPhysicalFormat, kAudioDevicePropertyScopeOutput, kAudioObjectPropertyElementMaster };
 
@@ -1215,7 +1204,7 @@ static int AudioStreamChangeFormat( aout_instance_t *p_aout, AudioStreamID i_str
      * it is also not atomic in its behaviour.
      * Therefore we check 5 times before we really give up.
      * FIXME: failing isn't actually implemented yet. */
-    for( i = 0; i < 5; i++ )
+    for( int i = 0; i < 5; i++ )
     {
         AudioStreamBasicDescription actual_format;
         mtime_t timeout = mdate() + 500000;
