@@ -384,7 +384,8 @@ static int AVI_ChunkRead_strf( stream_t *s, avi_chunk_t *p_chk )
         case( AVIFOURCC_vids ):
             p_strh->strh.i_samplesize = 0; /* XXX for ffmpeg avi file */
             p_chk->strf.vids.i_cat = VIDEO_ES;
-            p_chk->strf.vids.p_bih = malloc( p_chk->common.i_chunk_size );
+            p_chk->strf.vids.p_bih = malloc( __MAX( p_chk->common.i_chunk_size,
+                                         sizeof( *p_chk->strf.vids.p_bih ) ) );
             AVI_READ4BYTES( p_chk->strf.vids.p_bih->biSize );
             AVI_READ4BYTES( p_chk->strf.vids.p_bih->biWidth );
             AVI_READ4BYTES( p_chk->strf.vids.p_bih->biHeight );
@@ -400,7 +401,7 @@ static int AVI_ChunkRead_strf( stream_t *s, avi_chunk_t *p_chk )
             {
                 p_chk->strf.vids.p_bih->biSize = p_chk->common.i_chunk_size;
             }
-            if( p_chk->common.i_chunk_size - sizeof(BITMAPINFOHEADER) > 0 )
+            if( p_chk->common.i_chunk_size > sizeof(BITMAPINFOHEADER) )
             {
                 memcpy( &p_chk->strf.vids.p_bih[1],
                         p_buff + 8 + sizeof(BITMAPINFOHEADER), /* 8=fourrc+size */
