@@ -227,21 +227,6 @@ static void uninstall_input_item_observer( libvlc_media_t *p_md )
 }
 
 /**************************************************************************
- * Preparse if not already done (Private)
- **************************************************************************/
-static void preparse_if_needed( libvlc_media_t *p_md )
-{
-    /* XXX: need some locking here */
-    if (!p_md->has_asked_preparse)
-    {
-        playlist_PreparseEnqueue(
-                libvlc_priv (p_md->p_libvlc_instance->p_libvlc_int)->p_playlist,
-                p_md->p_input_item );
-        p_md->has_asked_preparse = true;
-    }
-}
-
-/**************************************************************************
  * Create a new media descriptor object from an input_item
  * (libvlc internal)
  * That's the generic constructor
@@ -467,24 +452,8 @@ libvlc_media_get_mrl( libvlc_media_t * p_md )
 
 char *libvlc_media_get_meta( libvlc_media_t *p_md, libvlc_meta_t e_meta )
 {
-    char * psz_meta;
-
-    assert( p_md );
-    /* XXX: locking */
-
-    preparse_if_needed( p_md );
-
-    psz_meta = input_item_GetMeta( p_md->p_input_item,
-                                   libvlc_to_vlc_meta[e_meta] );
-
-    if( e_meta == libvlc_meta_ArtworkURL && !psz_meta && !p_md->has_asked_art )
-    {
-        p_md->has_asked_art = true;
-        playlist_AskForArtEnqueue(
-                libvlc_priv(p_md->p_libvlc_instance->p_libvlc_int)->p_playlist,
-                p_md->p_input_item );
-    }
-
+    char *psz_meta = input_item_GetMeta( p_md->p_input_item,
+                                         libvlc_to_vlc_meta[e_meta] );
     /* Should be integrated in core */
     if( psz_meta == NULL && e_meta == libvlc_meta_Title
      && p_md->p_input_item->psz_name != NULL )
@@ -614,49 +583,75 @@ libvlc_media_get_duration( libvlc_media_t * p_md )
         return -1;
     }
 
-    preparse_if_needed( p_md );
-
     if (!input_item_IsPreparsed( p_md->p_input_item ))
         return -1;
 
     return from_mtime(input_item_GetDuration( p_md->p_input_item ));
 }
 
+static int media_parse(libvlc_media_t *media)
+{
+    /* TODO: fetcher and parser independent of playlist */
+    playlist_t *playlist =
+        libvlc_priv (media->p_libvlc_instance->p_libvlc_int)->p_playlist;
+
+    /* TODO: Fetch art on need basis. But how not to break compatibility? */
+    playlist_AskForArtEnqueue(playlist, media->p_input_item );
+    return playlist_PreparseEnqueue(playlist, media->p_input_item);
+}
+
 /**************************************************************************
- * Parse the media.
+ * Parse the media and wait.
  **************************************************************************/
 void
 libvlc_media_parse(libvlc_media_t *media)
 {
-    preparse_if_needed(media);
-
     vlc_mutex_lock(&media->parsed_lock);
+    if (!media->has_asked_preparse)
+    {
+        media->has_asked_preparse = true;
+        vlc_mutex_unlock(&media->parsed_lock);
+
+        if (media_parse(media))
+            /* Parse failed: do not wait! */
+            return;
+        vlc_mutex_lock(&media->parsed_lock);
+    }
+
     while (!media->is_parsed)
         vlc_cond_wait(&media->parsed_cond, &media->parsed_lock);
     vlc_mutex_unlock(&media->parsed_lock);
 }
 
 /**************************************************************************
- * Parse the media.
+ * Parse the media but do not wait.
  **************************************************************************/
 void
 libvlc_media_parse_async(libvlc_media_t *media)
 {
-    preparse_if_needed(media);
+    bool needed;
+
+    vlc_mutex_lock(&media->parsed_lock);
+    needed = media->has_asked_preparse;
+    media->has_asked_preparse = true;
+    vlc_mutex_unlock(&media->parsed_lock);
+
+    if (needed)
+        media_parse(media);
 }
 
 /**************************************************************************
  * Get parsed status for media object.
  **************************************************************************/
 int
-libvlc_media_is_parsed( libvlc_media_t * p_md )
+libvlc_media_is_parsed(libvlc_media_t *media)
 {
-    assert( p_md );
+    bool parsed;
 
-    if( !p_md->p_input_item )
-        return false;
-
-    return input_item_IsPreparsed( p_md->p_input_item );
+    vlc_mutex_lock(&media->parsed_lock);
+    parsed = media->is_parsed;
+    vlc_mutex_unlock(&media->parsed_lock);
+    return parsed;
 }
 
 /**************************************************************************

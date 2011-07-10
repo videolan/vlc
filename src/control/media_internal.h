@@ -46,7 +46,6 @@ struct libvlc_media_t
 
     bool is_parsed;
     bool has_asked_preparse;
-    bool has_asked_art;
 };
 
 /* Media Descriptor */
