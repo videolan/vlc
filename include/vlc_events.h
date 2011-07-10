@@ -105,12 +105,10 @@ typedef struct vlc_event_manager_t
     void * p_obj;
     vlc_mutex_t object_lock;
     vlc_mutex_t event_sending_lock;
-    vlc_object_t *p_parent_object;
     DECL_ARRAY(struct vlc_event_listeners_group_t *) listeners_groups;
 } vlc_event_manager_t;
 
 /* List of event */
-/* Be sure to keep sync-ed with misc/events.c debug name table */
 typedef enum vlc_event_type_t {
     /* Input (thread) events */
     vlc_InputStateChanged,
@@ -216,15 +214,8 @@ typedef void ( *vlc_event_callback_t )( const vlc_event_t *, void * );
 /*
  * p_obj points to the object that owns the event manager, and from
  * which events are sent
- * p_obj is here to give us a libvlc instance
  */
-#define vlc_event_manager_init_with_vlc_object(a,b) \
-            vlc_event_manager_init( a, b, b )
-
-VLC_API int vlc_event_manager_init( vlc_event_manager_t * p_em,
-                                    void * p_obj, vlc_object_t * );
-#define vlc_event_manager_init(a,b,c) \
-            vlc_event_manager_init(a, b, VLC_OBJECT(c))
+VLC_API int vlc_event_manager_init( vlc_event_manager_t * p_em, void * p_obj );
 
 /*
  * Destroy
@@ -248,16 +239,14 @@ VLC_API void vlc_event_send( vlc_event_manager_t * p_em, vlc_event_t * );
 VLC_API int vlc_event_attach( vlc_event_manager_t * p_event_manager,
                               vlc_event_type_t event_type,
                               vlc_event_callback_t pf_callback,
-                              void *p_user_data,
-                              const char * psz_debug_name );
-#define vlc_event_attach(a, b, c, d) vlc_event_attach(a, b, c, d, #c)
+                              void *p_user_data );
 
 /*
  * Remove a callback for an event.
  */
-VLC_API int vlc_event_detach( vlc_event_manager_t *p_event_manager,
-                              vlc_event_type_t event_type,
-                              vlc_event_callback_t pf_callback,
-                              void *p_user_data );
+VLC_API void vlc_event_detach( vlc_event_manager_t *p_event_manager,
+                               vlc_event_type_t event_type,
+                               vlc_event_callback_t pf_callback,
+                               void *p_user_data );
 
 #endif /* VLC_EVENTS_H */

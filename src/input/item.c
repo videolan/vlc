@@ -60,7 +60,7 @@ static inline void input_item_Init( vlc_object_t *p_o, input_item_t *p_i )
 
     vlc_mutex_init( &p_i->lock );
     vlc_event_manager_t * p_em = &p_i->event_manager;
-    vlc_event_manager_init( p_em, p_i, p_o );
+    vlc_event_manager_init( p_em, p_i );
     vlc_event_manager_register_event_type( p_em, vlc_InputItemMetaChanged );
     vlc_event_manager_register_event_type( p_em, vlc_InputItemSubItemAdded );
     vlc_event_manager_register_event_type( p_em, vlc_InputItemSubItemTreeAdded );
