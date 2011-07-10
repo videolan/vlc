@@ -26,8 +26,6 @@
 #import <vlc_interface.h>
 
 @interface VLCCoreInteraction : NSObject {
-    intf_thread_t * p_intf;
-
     BOOL b_lockAspectRatio;
 }
 + (VLCCoreInteraction *)sharedInstance;

@@ -71,17 +71,12 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
                                                object: nil];
 }
 
-- (void)applicationWillFinishLaunching:(NSNotification *)o_notification
-{
-    p_intf = VLCIntf;
-}
-
 #pragma mark -
 #pragma mark Playback Controls
 
 - (void)play
 {
-    playlist_t * p_playlist = pl_Get( p_intf );
+    playlist_t * p_playlist = pl_Get( VLCIntf );
     bool empty;
     
     PL_LOCK;
@@ -91,12 +86,12 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
     if( empty )
         [[[VLCMain sharedInstance] open] openFileGeneric];
     
-    var_SetInteger( p_intf->p_libvlc, "key-action", ACTIONID_PLAY_PAUSE );
+    var_SetInteger( VLCIntf->p_libvlc, "key-action", ACTIONID_PLAY_PAUSE );
 }
 
 - (void)stop
 {
-    var_SetInteger( p_intf->p_libvlc, "key-action", ACTIONID_STOP );
+    var_SetInteger( VLCIntf->p_libvlc, "key-action", ACTIONID_STOP );
     /* Close the window directly, because we do know that there
      * won't be anymore video. It's currently waiting a bit. */
     [[[self voutView] window] orderOut:self];
@@ -104,129 +99,133 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
 
 - (void)faster
 {
-    var_SetInteger( p_intf->p_libvlc, "key-action", ACTIONID_FASTER );
+    var_SetInteger( VLCIntf->p_libvlc, "key-action", ACTIONID_FASTER );
 }
 
 - (void)slower
 {
-    var_SetInteger( p_intf->p_libvlc, "key-action", ACTIONID_SLOWER );
+    var_SetInteger( VLCIntf->p_libvlc, "key-action", ACTIONID_SLOWER );
 }
 
 - (void)normalSpeed
 {
-    var_SetInteger( p_intf->p_libvlc, "key-action", ACTIONID_RATE_NORMAL );
+    var_SetInteger( VLCIntf->p_libvlc, "key-action", ACTIONID_RATE_NORMAL );
 }
 
 - (void)previous
 {
-    var_SetInteger( p_intf->p_libvlc, "key-action", ACTIONID_PREV );
+    var_SetInteger( VLCIntf->p_libvlc, "key-action", ACTIONID_PREV );
 }
 
 - (void)next
 {
-    var_SetInteger( p_intf->p_libvlc, "key-action", ACTIONID_NEXT );
+    var_SetInteger( VLCIntf->p_libvlc, "key-action", ACTIONID_NEXT );
 }
 
 - (void)forward
 {
-    var_SetInteger( p_intf->p_libvlc, "key-action", ACTIONID_JUMP_FORWARD_SHORT );
+    var_SetInteger( VLCIntf->p_libvlc, "key-action", ACTIONID_JUMP_FORWARD_SHORT );
 }
 
 - (void)backward
 {
-    var_SetInteger( p_intf->p_libvlc, "key-action", ACTIONID_JUMP_BACKWARD_SHORT );
+    var_SetInteger( VLCIntf->p_libvlc, "key-action", ACTIONID_JUMP_BACKWARD_SHORT );
 }
 
 - (void)shuffle
 {
     vlc_value_t val;
-    playlist_t * p_playlist = pl_Get( p_intf );
+    playlist_t * p_playlist = pl_Get( VLCIntf );
     
     var_Get( p_playlist, "random", &val );
     val.b_bool = !val.b_bool;
     var_Set( p_playlist, "random", val );
     if( val.b_bool )
     {
-        //vout_OSDMessage( p_intf, SPU_DEFAULT_CHANNEL, "%s", _( "Random On" ) );
+        //vout_OSDMessage( VLCIntf, SPU_DEFAULT_CHANNEL, "%s", _( "Random On" ) );
         config_PutInt( p_playlist, "random", 1 );
     }
     else
     {
-        //vout_OSDMessage( p_intf, SPU_DEFAULT_CHANNEL, "%s", _( "Random Off" ) );
+        //vout_OSDMessage( VLCIntf, SPU_DEFAULT_CHANNEL, "%s", _( "Random Off" ) );
         config_PutInt( p_playlist, "random", 0 );
     }
     
-    p_intf->p_sys->b_playmode_update = true;
-    p_intf->p_sys->b_intf_update = true;
+    VLCIntf->p_sys->b_playmode_update = true;
+    VLCIntf->p_sys->b_intf_update = true;
 }
 
 - (void)repeatAll
 {
-    playlist_t * p_playlist = pl_Get( p_intf );
+    playlist_t * p_playlist = pl_Get( VLCIntf );
 
     var_SetBool( p_playlist, "repeat", NO );
     var_SetBool( p_playlist, "loop", YES );
     config_PutInt( p_playlist, "repeat", NO );
     config_PutInt( p_playlist, "loop", YES );
 
-    //vout_OSDMessage( p_intf, SPU_DEFAULT_CHANNEL, "%s", _( "Repeat All" ) );
+    //vout_OSDMessage( VLCIntf, SPU_DEFAULT_CHANNEL, "%s", _( "Repeat All" ) );
 
-    p_intf->p_sys->b_playmode_update = true;
-    p_intf->p_sys->b_intf_update = true;
+    VLCIntf->p_sys->b_playmode_update = true;
+    VLCIntf->p_sys->b_intf_update = true;
 }
 
 - (void)repeatOne
 {
-    playlist_t * p_playlist = pl_Get( p_intf );
+    playlist_t * p_playlist = pl_Get( VLCIntf );
 
     var_SetBool( p_playlist, "repeat", YES );
     var_SetBool( p_playlist, "loop", NO );
     config_PutInt( p_playlist, "repeat", YES );
     config_PutInt( p_playlist, "loop", NO );
 
-    //vout_OSDMessage( p_intf, SPU_DEFAULT_CHANNEL, "%s", _( "Repeat One" ) );
+    //vout_OSDMessage( VLCIntf, SPU_DEFAULT_CHANNEL, "%s", _( "Repeat One" ) );
 
-    p_intf->p_sys->b_playmode_update = true;
-    p_intf->p_sys->b_intf_update = true;
+    VLCIntf->p_sys->b_playmode_update = true;
+    VLCIntf->p_sys->b_intf_update = true;
 }
 
 - (void)repeatOff
 {
-    playlist_t * p_playlist = pl_Get( p_intf );
+    playlist_t * p_playlist = pl_Get( VLCIntf );
 
     var_SetBool( p_playlist, "repeat", NO );
     var_SetBool( p_playlist, "loop", NO );
     config_PutInt( p_playlist, "repeat", NO );
     config_PutInt( p_playlist, "loop", NO );
 
-    //vout_OSDMessage( p_intf, SPU_DEFAULT_CHANNEL, "%s", _( "Repeat Off" ) );
+    //vout_OSDMessage( VLCIntf, SPU_DEFAULT_CHANNEL, "%s", _( "Repeat Off" ) );
 
-    p_intf->p_sys->b_playmode_update = true;
-    p_intf->p_sys->b_intf_update = true;    
+    VLCIntf->p_sys->b_playmode_update = true;
+    VLCIntf->p_sys->b_intf_update = true;
 }
 
 // CAVE: [o_main manageVolumeSlider]
 
 - (void)volumeUp
 {
-    var_SetInteger( p_intf->p_libvlc, "key-action", ACTIONID_VOL_UP );
+    var_SetInteger( VLCIntf->p_libvlc, "key-action", ACTIONID_VOL_UP );
 }
 
 - (void)volumeDown
 {
-    var_SetInteger( p_intf->p_libvlc, "key-action", ACTIONID_VOL_DOWN );
+    var_SetInteger( VLCIntf->p_libvlc, "key-action", ACTIONID_VOL_DOWN );
 }
 
 - (void)mute
 {
-    var_SetInteger( p_intf->p_libvlc, "key-action", ACTIONID_VOL_MUTE );
+    var_SetInteger( VLCIntf->p_libvlc, "key-action", ACTIONID_VOL_MUTE );
 }
 
 - (void)setVolume: (int)i_value
 {
-    playlist_t * p_playlist = pl_Get( p_intf );
-    int i_volume_step = config_GetInt( p_intf->p_libvlc, "volume-step" );
-    aout_VolumeSet( p_playlist, i_value * i_volume_step );
+    intf_thread_t * p_intf = VLCIntf;
+    playlist_t * p_playlist = pl_Get( VLCIntf );
+    audio_volume_t i_volume = (audio_volume_t)i_value;
+    int i_volume_step;
+
+    i_volume_step = config_GetInt( VLCIntf->p_libvlc, "volume-step" );
+    aout_VolumeSet( p_playlist, i_volume * i_volume_step );
 }
 
 #pragma mark -
