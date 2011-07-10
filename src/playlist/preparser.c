@@ -126,7 +126,10 @@ static void Preparse( playlist_t *p_playlist, input_item_t *p_item )
     vlc_mutex_unlock( &p_item->lock );
 
     if( i_type != ITEM_TYPE_FILE )
+    {
+        input_item_SetPreparsed( p_item, true );
         return;
+    }
 
     stats_TimerStart( p_playlist, "Preparse run", STATS_TIMER_PREPARSE );
 
