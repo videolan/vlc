@@ -770,8 +770,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     priv->i_timers = 0;
     priv->pp_timers = NULL;
 
-    priv->i_last_input_id = 0; /* Not very safe, should be removed */
-
     /*
      * Initialize hotkey handling
      */

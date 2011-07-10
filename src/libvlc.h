@@ -182,7 +182,6 @@ typedef struct libvlc_priv_t
 {
     libvlc_int_t       public_data;
 
-    int                i_last_input_id ; ///< Last id of input item
     bool               playlist_active;
 
     /* Messages */
