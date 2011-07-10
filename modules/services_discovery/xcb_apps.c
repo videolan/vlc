@@ -255,8 +255,7 @@ static struct app *AddApp (services_discovery_t *sd, xcb_window_t xid)
     else
         name = NULL;
 
-    input_item_t *item = input_item_NewWithType (VLC_OBJECT (sd), mrl,
-                                                 name ? name : mrl,
+    input_item_t *item = input_item_NewWithType (mrl, name ? name : mrl,
                                                  0, NULL, 0, -1,
                                                  ITEM_TYPE_CARD /* FIXME */);
     free (mrl);
@@ -349,7 +348,7 @@ static void AddDesktop(services_discovery_t *sd)
 {
     input_item_t *item;
 
-    item = input_item_NewWithType (VLC_OBJECT (sd), "screen://", _("Desktop"),
+    item = input_item_NewWithType ("screen://", _("Desktop"),
                                    0, NULL, 0, -1, ITEM_TYPE_CARD);
     if (item == NULL)
         return;

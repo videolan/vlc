@@ -192,7 +192,7 @@ static void *Run( void *data )
 
         char* psz_uri = make_URI( psz_dir, "file" );
 
-        input_item_t* p_root = input_item_New( p_sd, psz_uri, NULL );
+        input_item_t* p_root = input_item_New( psz_uri, NULL );
         if( p_sys->i_type == Picture )
             input_item_AddOption( p_root, "ignore-filetypes=ini,db,lnk,txt",
                                   VLC_INPUT_OPTION_TRUSTED );
@@ -269,7 +269,7 @@ static int onNewFileAdded( vlc_object_t *p_this, char const *psz_var,
         return VLC_EGENERIC;
 
     char* psz_uri = make_URI( psz_file, "file" );
-    input_item_t* p_item = input_item_New( p_sd, psz_uri, NULL );
+    input_item_t* p_item = input_item_New( psz_uri, NULL );
 
     if( p_sys->i_type == Picture )
     {

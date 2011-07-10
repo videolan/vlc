@@ -242,8 +242,7 @@ static void AddTrack( services_discovery_t *p_sd, LIBMTP_track_t *p_track )
         msg_Err( p_sd, "Error adding %s, skipping it", p_track->filename );
         return;
     }
-    if( ( p_input = input_item_New( p_sd, psz_string,
-                                    p_track->title ) ) == NULL )
+    if( ( p_input = input_item_New( psz_string, p_track->title ) ) == NULL )
     {
         msg_Err( p_sd, "Error adding %s, skipping it", p_track->filename );
         free( psz_string );

@@ -38,39 +38,6 @@
 
 static int GuessType( const input_item_t *p_item );
 
-/** Stuff moved out of vlc_input.h -- FIXME: should probably not be inline
- * anyway. */
-static inline void input_item_Init( vlc_object_t *p_o, input_item_t *p_i )
-{
-    memset( p_i, 0, sizeof(input_item_t) );
-
-    p_i->psz_name = NULL;
-    p_i->psz_uri = NULL;
-    TAB_INIT( p_i->i_es, p_i->es );
-    TAB_INIT( p_i->i_options, p_i->ppsz_options );
-    p_i->optflagv = NULL, p_i->optflagc = 0;
-    TAB_INIT( p_i->i_categories, p_i->pp_categories );
-    TAB_INIT( p_i->i_epg, p_i->pp_epg );
-
-    p_i->i_type = ITEM_TYPE_UNKNOWN;
-    p_i->b_fixed_name = true;
-
-    p_i->p_stats = NULL;
-    p_i->p_meta = NULL;
-
-    vlc_mutex_init( &p_i->lock );
-    vlc_event_manager_t * p_em = &p_i->event_manager;
-    vlc_event_manager_init( p_em, p_i );
-    vlc_event_manager_register_event_type( p_em, vlc_InputItemMetaChanged );
-    vlc_event_manager_register_event_type( p_em, vlc_InputItemSubItemAdded );
-    vlc_event_manager_register_event_type( p_em, vlc_InputItemSubItemTreeAdded );
-    vlc_event_manager_register_event_type( p_em, vlc_InputItemDurationChanged );
-    vlc_event_manager_register_event_type( p_em, vlc_InputItemPreparsedChanged );
-    vlc_event_manager_register_event_type( p_em, vlc_InputItemNameChanged );
-    vlc_event_manager_register_event_type( p_em, vlc_InputItemInfoChanged );
-    vlc_event_manager_register_event_type( p_em, vlc_InputItemErrorWhenReadingChanged );
-}
-
 static inline void input_item_Clean( input_item_t *p_i )
 {
     int i;
@@ -823,66 +790,82 @@ void input_item_SetEpgOffline( input_item_t *p_item )
     vlc_event_send( &p_item->event_manager, &event );
 }
 
-#undef input_item_NewExt
-input_item_t *input_item_NewExt( vlc_object_t *p_obj, const char *psz_uri,
+input_item_t *input_item_NewExt( const char *psz_uri,
                                  const char *psz_name,
                                  int i_options,
                                  const char *const *ppsz_options,
                                  unsigned i_option_flags,
                                  mtime_t i_duration )
 {
-    return input_item_NewWithType( p_obj, psz_uri, psz_name,
+    return input_item_NewWithType( psz_uri, psz_name,
                                   i_options, ppsz_options, i_option_flags,
                                   i_duration, ITEM_TYPE_UNKNOWN );
 }
 
 
-input_item_t *input_item_NewWithType( vlc_object_t *p_obj, const char *psz_uri,
-                                const char *psz_name,
-                                int i_options,
-                                const char *const *ppsz_options,
-                                unsigned i_option_flags,
-                                mtime_t i_duration,
-                                int i_type )
+input_item_t *
+input_item_NewWithType( const char *psz_uri, const char *psz_name,
+                        int i_options, const char *const *ppsz_options,
+                        unsigned flags, mtime_t duration, int type )
 {
     static vlc_atomic_t last_input_id = VLC_ATOMIC_INIT(0);
 
-    input_item_t* p_input = malloc( sizeof(input_item_t ) );
+    input_item_t* p_input = calloc( sizeof( *p_input ), 1 );
     if( !p_input )
         return NULL;
-
-    input_item_Init( p_obj, p_input );
-    vlc_gc_init( p_input, input_item_Destroy );
+    vlc_event_manager_t * p_em = &p_input->event_manager;
 
     p_input->i_id = vlc_atomic_inc(&last_input_id);
+    vlc_gc_init( p_input, input_item_Destroy );
 
-    p_input->b_fixed_name = false;
-
-    p_input->i_type = i_type;
-
-    if( psz_uri )
-        input_item_SetURI( p_input, psz_uri );
-
-    if( i_type != ITEM_TYPE_UNKNOWN )
-        p_input->i_type = i_type;
-
+    p_input->psz_name = NULL;
     if( psz_name )
         input_item_SetName( p_input, psz_name );
 
-    p_input->i_duration = i_duration;
+    p_input->psz_uri = NULL;
+    if( psz_uri )
+        input_item_SetURI( p_input, psz_uri );
+    else
+        p_input->i_type = ITEM_TYPE_UNKNOWN;
 
+    TAB_INIT( p_input->i_options, p_input->ppsz_options );
+    p_input->optflagc = 0;
+    p_input->optflagv = NULL;
     for( int i = 0; i < i_options; i++ )
-        input_item_AddOption( p_input, ppsz_options[i], i_option_flags );
+        input_item_AddOption( p_input, ppsz_options[i], flags );
+
+    p_input->i_duration = duration;
+    TAB_INIT( p_input->i_categories, p_input->pp_categories );
+    TAB_INIT( p_input->i_es, p_input->es );
+    p_input->p_stats = NULL;
+    p_input->i_nb_played = 0;
+    p_input->p_meta = NULL;
+    TAB_INIT( p_input->i_epg, p_input->pp_epg );
+
+    vlc_event_manager_init( p_em, p_input );
+    vlc_event_manager_register_event_type( p_em, vlc_InputItemMetaChanged );
+    vlc_event_manager_register_event_type( p_em, vlc_InputItemSubItemAdded );
+    vlc_event_manager_register_event_type( p_em, vlc_InputItemSubItemTreeAdded );
+    vlc_event_manager_register_event_type( p_em, vlc_InputItemDurationChanged );
+    vlc_event_manager_register_event_type( p_em, vlc_InputItemPreparsedChanged );
+    vlc_event_manager_register_event_type( p_em, vlc_InputItemNameChanged );
+    vlc_event_manager_register_event_type( p_em, vlc_InputItemInfoChanged );
+    vlc_event_manager_register_event_type( p_em, vlc_InputItemErrorWhenReadingChanged );
+
+    vlc_mutex_init( &p_input->lock );
+    if( type != ITEM_TYPE_UNKNOWN )
+        p_input->i_type = type;
+    p_input->b_fixed_name = false;
+    p_input->b_error_when_reading = false;
     return p_input;
 }
 
-input_item_t *input_item_Copy( vlc_object_t *p_obj, input_item_t *p_input )
+input_item_t *input_item_Copy( input_item_t *p_input )
 {
     vlc_mutex_lock( &p_input->lock );
 
     input_item_t *p_new_input =
-        input_item_NewWithType( p_obj,
-                                p_input->psz_uri, p_input->psz_name,
+        input_item_NewWithType( p_input->psz_uri, p_input->psz_name,
                                 0, NULL, 0, p_input->i_duration,
                                 p_input->i_type );
 

@@ -547,8 +547,7 @@ int __vlclua_playlist_add_internal( vlc_object_t *p_this, lua_State *L,
                     vlclua_read_options( p_this, L, &i_options, &ppsz_options );
 
                     /* Create input item */
-                    p_input = input_item_NewExt( p_playlist, psz_path,
-                                                psz_name, i_options,
+                    p_input = input_item_NewExt( psz_path, psz_name, i_options,
                                                 (const char **)ppsz_options,
                                                 VLC_INPUT_OPTION_TRUSTED,
                                                 i_duration );

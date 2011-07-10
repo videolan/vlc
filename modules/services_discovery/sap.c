@@ -827,10 +827,9 @@ sap_announce_t *CreateAnnounce( services_discovery_t *p_sd, uint16_t i_hash,
     p_sap->p_sdp = p_sdp;
 
     /* Released in RemoveAnnounce */
-    p_input = input_item_NewWithType( VLC_OBJECT(p_sd),
-                                     p_sap->p_sdp->psz_uri,
-                                     p_sdp->psz_sessionname,
-                                     0, NULL, 0, -1, ITEM_TYPE_NET );
+    p_input = input_item_NewWithType( p_sap->p_sdp->psz_uri,
+                                      p_sdp->psz_sessionname,
+                                      0, NULL, 0, -1, ITEM_TYPE_NET );
     p_sap->p_item = p_input;
     if( !p_input )
     {

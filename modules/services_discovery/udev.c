@@ -162,8 +162,7 @@ static int AddDevice (services_discovery_t *sd, struct udev_device *dev)
     if (mrl == NULL)
         return 0; /* don't know if it was an error... */
     char *name = p_sys->subsys->get_name (dev);
-    input_item_t *item = input_item_NewWithType (VLC_OBJECT (sd), mrl,
-                                                 name ? name : mrl,
+    input_item_t *item = input_item_NewWithType (mrl, name ? name : mrl,
                                                  0, NULL, 0, -1,
                                                  p_sys->subsys->item_type);
     msg_Dbg (sd, "adding %s (%s)", mrl, name);

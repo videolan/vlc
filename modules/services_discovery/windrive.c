@@ -74,7 +74,7 @@ static int Open (vlc_object_t *obj)
             continue;
 
         mrl[8] = name[0] = letter;
-        item = input_item_NewWithType (VLC_OBJECT (sd), mrl, name,
+        item = input_item_NewWithType (mrl, name,
                                        0, NULL, 0, -1, ITEM_TYPE_DISC);
         msg_Dbg (sd, "adding %s (%s)", mrl, name);
         if (item == NULL)

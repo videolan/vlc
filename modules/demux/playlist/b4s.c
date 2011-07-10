@@ -199,7 +199,7 @@ static int Demux( demux_t *p_demux )
                 // Read the element name
                 if( !strcmp( node, "entry" ) )
                 {
-                    p_input = input_item_New( p_demux, psz_mrl, psz_title );
+                    p_input = input_item_New( psz_mrl, psz_title );
                     if( psz_now )
                         input_item_SetNowPlaying( p_input, psz_now );
                     if( psz_genre )

@@ -243,7 +243,7 @@ static int Demux( demux_t *p_demux )
                         goto error;
                     }
 
-                    p_input = input_item_New( p_demux, psz_item_mrl, psz_item_name );
+                    p_input = input_item_New( psz_item_mrl, psz_item_name );
                     FREENULL( psz_item_mrl );
                     FREENULL( psz_item_name );
 

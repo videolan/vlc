@@ -422,7 +422,7 @@ int playlist_AddExt( playlist_t *p_playlist, const char * psz_uri,
     int i_ret;
     input_item_t *p_input;
 
-    p_input = input_item_NewExt( p_playlist, psz_uri, psz_name,
+    p_input = input_item_NewExt( psz_uri, psz_name,
                                  i_options, ppsz_options, i_option_flags,
                                  i_duration );
     if( p_input == NULL )
@@ -910,8 +910,7 @@ static int RecursiveInsertCopy (
 
     if( !(p_item->i_children != -1 && b_flat) )
     {
-        input_item_t *p_new_input = input_item_Copy( VLC_OBJECT(p_playlist),
-                                                     p_input );
+        input_item_t *p_new_input = input_item_Copy( p_input );
         if( !p_new_input ) return i_pos;
 
         playlist_item_t *p_new_item = NULL;

@@ -176,7 +176,7 @@ static void resolve_callback(
 
         if( psz_uri != NULL )
         {
-            p_input = input_item_New( p_sd, psz_uri, name );
+            p_input = input_item_New( psz_uri, name );
             free( psz_uri );
         }
         if( p_input != NULL )

@@ -313,7 +313,7 @@ void Playtree::insertItems( VarTree& elem, const list<string>& files, bool start
         if( !psz_uri )
             continue;
 
-        input_item_t* pItem = input_item_New( m_pPlaylist, psz_uri, NULL );
+        input_item_t* pItem = input_item_New( psz_uri, NULL );
         if( pItem )
         {
             int i_mode = PLAYLIST_APPEND;

@@ -294,7 +294,7 @@ libvlc_media_t *libvlc_media_new_location( libvlc_instance_t *p_instance,
     input_item_t * p_input_item;
     libvlc_media_t * p_md;
 
-    p_input_item = input_item_New( p_instance->p_libvlc_int, psz_mrl, NULL );
+    p_input_item = input_item_New( psz_mrl, NULL );
 
     if (!p_input_item)
     {
@@ -342,7 +342,7 @@ libvlc_media_t * libvlc_media_new_as_node( libvlc_instance_t *p_instance,
     input_item_t * p_input_item;
     libvlc_media_t * p_md;
 
-    p_input_item = input_item_New( p_instance->p_libvlc_int, "vlc://nop", psz_name );
+    p_input_item = input_item_New( "vlc://nop", psz_name );
 
     if (!p_input_item)
     {

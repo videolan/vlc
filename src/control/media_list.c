@@ -250,8 +250,7 @@ libvlc_media_list_add_file_content( libvlc_media_list_t * p_mlist,
     input_item_t * p_input_item;
     libvlc_media_t * p_md;
 
-    p_input_item = input_item_NewExt(
-                           p_mlist->p_libvlc_instance->p_libvlc_int, psz_uri,
+    p_input_item = input_item_NewExt( psz_uri,
                                          _("Media Library"), 0, NULL, 0, -1 );
 
     if( !p_input_item )

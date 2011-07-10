@@ -1359,9 +1359,7 @@ static int CreateInputItemFromMedia( media_library_t *p_ml,
                               ml_media_t *p_media )
 {
     playlist_t *p_pl = pl_Get( p_ml );
-    *pp_item = input_item_New( VLC_OBJECT( p_pl ),
-                               p_media->psz_uri,
-                               p_media->psz_title );
+    *pp_item = input_item_New( p_media->psz_uri, p_media->psz_title );
                                /* ITEM_TYPE_FILE ); */
     if( !*pp_item )
         return VLC_EGENERIC;

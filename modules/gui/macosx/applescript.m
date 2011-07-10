@@ -52,8 +52,7 @@
             NSURL * o_url;
             input_item_t *p_input;
 
-            p_input = input_item_New( p_playlist,
-                                    [o_urlString fileSystemRepresentation],
+            p_input = input_item_New( [o_urlString fileSystemRepresentation],
                                     [[[NSFileManager defaultManager]
                                     displayNameAtPath: o_urlString] UTF8String] );
             /* FIXME: playlist_AddInput() can fail */

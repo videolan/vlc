@@ -480,8 +480,7 @@ static void ScanFiles( monitoring_thread_t *p_mon, int i_dir_id,
                 if( b_skip )
                     continue;
 
-                p_input = input_item_New( VLC_OBJECT(p_mon), psz_encoded_uri,
-                                          psz_entry );
+                p_input = input_item_New( psz_encoded_uri, psz_entry );
 
                 playlist_t* p_pl = pl_Get( p_mon );
                 preparsed_item_t* p_itemobject;

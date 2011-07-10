@@ -162,7 +162,7 @@ int MMSHOpen( access_t *p_access )
             goto error;
         }
         /** \bug we do not autodelete here */
-        p_new_loc = input_item_New( p_access, psz_location, psz_location );
+        p_new_loc = input_item_New( psz_location, psz_location );
         input_item_t *p_item = input_GetItem( p_input );
         input_item_PostSubItem( p_item, p_new_loc );
 

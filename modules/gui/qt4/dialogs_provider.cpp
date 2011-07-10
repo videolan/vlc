@@ -508,7 +508,7 @@ static void openDirectory( intf_thread_t *p_intf, bool pl, bool go )
 
     RecentsMRL::getInstance( p_intf )->addRecent( qfu(uri) );
 
-    input_item_t *p_input = input_item_New( THEPL, uri, NULL );
+    input_item_t *p_input = input_item_New( uri, NULL );
     free( uri );
     if( unlikely( p_input == NULL ) )
         return;
@@ -637,7 +637,7 @@ void DialogsProvider::streamingDialog( QWidget *parent,
 
         /* Create Input */
         input_item_t *p_input;
-        p_input = input_item_New( p_intf, qtu( mrl ), _("Streaming") );
+        p_input = input_item_New( qtu( mrl ), _("Streaming") );
 
         /* Add normal Options */
         for( int j = 0; j < options.size(); j++ )

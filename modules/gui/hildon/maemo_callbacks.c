@@ -135,7 +135,7 @@ void pl_row_activated_cb( GtkTreeView *tree_view , GtkTreePath *path,
     gtk_tree_model_get_iter( model, &iter, path );
     gtk_tree_model_get( model, &iter, 0, &filename, -1 );
 
-    p_input = input_item_New( p_intf, filename, NULL );
+    p_input = input_item_New( filename, NULL );
     playlist_AddInput( p_intf->p_sys->p_playlist, p_input,
                        PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END, true, false );
     vlc_gc_decref( p_input );
@@ -172,7 +172,7 @@ void open_cb( GtkMenuItem *menuitem, gpointer user_data )
 
     gtk_widget_destroy( dialog );
 
-    p_input = input_item_New( p_intf, psz_filename, NULL );
+    p_input = input_item_New( psz_filename, NULL );
     playlist_AddInput( p_intf->p_sys->p_playlist, p_input,
                        PLAYLIST_APPEND | PLAYLIST_GO,
                        PLAYLIST_END, true, false );
@@ -207,8 +207,7 @@ void open_address_cb( GtkMenuItem *menuitem, gpointer user_data )
         return;
     }
 
-    p_input = input_item_New( p_intf,
-                              gtk_entry_get_text( GTK_ENTRY( entry ) ),
+    p_input = input_item_New( gtk_entry_get_text( GTK_ENTRY( entry ) ),
                               NULL );
     playlist_AddInput( p_intf->p_sys->p_playlist, p_input,
                        PLAYLIST_APPEND | PLAYLIST_GO,
@@ -224,7 +223,7 @@ void open_webcam_cb( GtkMenuItem *menuitem, gpointer user_data )
     intf_thread_t *p_intf = (intf_thread_t *)user_data;
     input_item_t *p_input;
 
-    p_input = input_item_New( p_intf, "v4l2://", NULL );
+    p_input = input_item_New( "v4l2://", NULL );
     playlist_AddInput( p_intf->p_sys->p_playlist, p_input,
                        PLAYLIST_APPEND | PLAYLIST_GO,
                        PLAYLIST_END, true, false );

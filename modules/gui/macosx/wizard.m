@@ -1244,7 +1244,7 @@ static VLCWizard *_o_sharedInstance = nil;
             NSString *tempString = [NSString stringWithFormat:
                 @"%@ (%i/%i)", _NS("Streaming/Transcoding Wizard"),
                 ( x + 1 ), y];
-            input_item_t *p_input = input_item_New( p_playlist,
+            input_item_t *p_input = input_item_New(
                 [[[o_userSelections objectForKey:@"pathToStrm"]
                 objectAtIndex:x] UTF8String],
                 [tempString UTF8String] );

@@ -357,7 +357,7 @@ static bool parse_track_node COMPLEX_INTERFACE
           {NULL,           UNKNOWN_CONTENT, {NULL} }
         };
 
-    input_item_t *p_new_input = input_item_New( p_demux, NULL, NULL );
+    input_item_t *p_new_input = input_item_New( NULL, NULL );
     input_item_node_t *p_new_node = input_item_node_Create( p_new_input );
 
     if( !p_new_input )
@@ -624,9 +624,9 @@ static bool parse_extension_node COMPLEX_INTERFACE
             msg_Warn( p_demux, "<vlc:node> requires \"title\" attribute" );
             return false;
         }
-        p_new_input = input_item_NewWithType( VLC_OBJECT( p_demux ),
-                          "vlc://nop", psz_title, 0, NULL, 0, -1,
-                          ITEM_TYPE_DIRECTORY );
+        p_new_input = input_item_NewWithType( "vlc://nop", psz_title,
+                                              0, NULL, 0, -1,
+                                              ITEM_TYPE_DIRECTORY );
         if( p_new_input )
         {
             p_input_node =

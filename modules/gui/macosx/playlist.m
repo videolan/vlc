@@ -1120,7 +1120,7 @@
         o_uri = o_temp;
     }
 
-    p_input = input_item_New( p_playlist, [o_uri fileSystemRepresentation], o_name ? [o_name UTF8String] : NULL );
+    p_input = input_item_New( [o_uri fileSystemRepresentation], o_name ? [o_name UTF8String] : NULL );
     if( !p_input )
         return NULL;
 

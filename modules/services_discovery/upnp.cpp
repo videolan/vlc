@@ -890,7 +890,7 @@ void MediaServer::_buildPlaylist( Container* p_parent, input_item_node_t *p_inpu
     {
         Container* p_container = p_parent->getContainer( i );
 
-        input_item_t* p_input_item = input_item_New( _p_sd, "vlc://nop",
+        input_item_t* p_input_item = input_item_New( "vlc://nop",
                                                     p_container->getTitle() );
         input_item_node_t *p_new_node =
             input_item_node_AppendItem( p_input_node, p_input_item );
@@ -903,8 +903,7 @@ void MediaServer::_buildPlaylist( Container* p_parent, input_item_node_t *p_inpu
     {
         Item* p_item = p_parent->getItem( i );
 
-        input_item_t* p_input_item = input_item_NewExt( _p_sd,
-                                               p_item->getResource(),
+        input_item_t* p_input_item = input_item_NewExt( p_item->getResource(),
                                                p_item->getTitle(),
                                                0,
                                                NULL,
@@ -966,8 +965,7 @@ bool MediaServerList::addServer( MediaServer* p_server )
 
     msg_Dbg( _p_sd, "Adding server '%s' with uuid '%s'", p_server->getFriendlyName(), p_server->getUDN() );
 
-    p_input_item = input_item_New( _p_sd, "vlc://nop",
-                                  p_server->getFriendlyName() );
+    p_input_item = input_item_New( "vlc://nop", p_server->getFriendlyName() );
 
     input_item_SetDescription( p_input_item, p_server->getUDN() );
 

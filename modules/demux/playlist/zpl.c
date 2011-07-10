@@ -165,7 +165,7 @@ static int Demux( demux_t *p_demux )
         else if( !strncasecmp( psz_parse, "BR!", strlen( "BR!" ) ) )
         {
             /* create the input item */
-            input_item_t *p_input = input_item_NewExt( p_demux, psz_mrl,
+            input_item_t *p_input = input_item_NewExt( psz_mrl,
                                         psz_title, 0, NULL, 0, i_duration );
             input_item_node_AppendItem( p_subitems, p_input );
             FREENULL( psz_mrl );

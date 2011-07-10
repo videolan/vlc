@@ -628,8 +628,7 @@ static int vlm_OnMediaUpdate( vlm_t *p_vlm, vlm_media_sys_t *p_media )
             vlc_gc_decref( p_media->vod.p_item );
 
             char *psz_uri = make_URI( p_cfg->ppsz_input[0], NULL );
-            p_media->vod.p_item = input_item_New( p_vlm, psz_uri,
-                p_cfg->psz_name );
+            p_media->vod.p_item = input_item_New( psz_uri, p_cfg->psz_name );
             free( psz_uri );
 
             if( p_cfg->psz_output )
@@ -788,7 +787,7 @@ static int vlm_ControlMediaAdd( vlm_t *p_vlm, vlm_media_t *p_cfg, int64_t *p_id 
     p_media->cfg.id = p_vlm->i_id++;
     /* FIXME do we do something here if enabled is true ? */
 
-    p_media->vod.p_item = input_item_New( p_vlm, NULL, NULL );
+    p_media->vod.p_item = input_item_New( NULL, NULL );
 
     p_media->vod.p_media = NULL;
     TAB_INIT( p_media->i_instance, p_media->instance );
@@ -903,7 +902,7 @@ static vlm_media_instance_sys_t *vlm_MediaInstanceNew( vlm_t *p_vlm, const char 
     if( psz_name )
         p_instance->psz_name = strdup( psz_name );
 
-    p_instance->p_item = input_item_New( p_vlm, NULL, NULL );
+    p_instance->p_item = input_item_New( NULL, NULL );
 
     p_instance->i_index = 0;
     p_instance->b_sout_keep = false;
