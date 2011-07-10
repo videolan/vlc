@@ -870,6 +870,14 @@ static inline void *xrealloc (void *ptr, size_t len)
     return nptr;
 }
 
+static inline void *xcalloc (size_t n, size_t size)
+{
+    void *ptr = calloc (n, size);
+    if (unlikely (ptr == NULL))
+        abort ();
+    return ptr;
+}
+
 /*****************************************************************************
  * libvlc features
  *****************************************************************************/
