@@ -486,11 +486,9 @@ char *libvlc_media_get_meta( libvlc_media_t *p_md, libvlc_meta_t e_meta )
     }
 
     /* Should be integrated in core */
-    if( !psz_meta && e_meta == libvlc_meta_Title && p_md->p_input_item->psz_name )
-    {
-        free( psz_meta );
-        return strdup( p_md->p_input_item->psz_name );
-    }
+    if( psz_meta == NULL && e_meta == libvlc_meta_Title
+     && p_md->p_input_item->psz_name != NULL )
+        psz_meta = strdup( p_md->p_input_item->psz_name );
 
     return psz_meta;
 }
