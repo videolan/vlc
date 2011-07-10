@@ -133,9 +133,13 @@ void libvlc_audio_output_list_release( libvlc_audio_output_t *p_list )
  ***********************/
 int libvlc_audio_output_set( libvlc_media_player_t *mp, const char *psz_name )
 {
-    if( !module_exists( psz_name ) )
+    char *value;
+
+    if( !module_exists( psz_name )
+     || asprintf( &value, "%s,none", psz_name ) == -1 )
         return -1;
-    var_SetString( mp, "aout", psz_name );
+    var_SetString( mp, "aout", value );
+    free( value );
     return 0;
 }
 
