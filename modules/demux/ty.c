@@ -1892,7 +1892,7 @@ static int get_chunk_header(demux_t *p_demux)
     stream_Read( p_demux->s, NULL, 4 );
 
     /* read the record headers into a temp buffer */
-    p_hdr_buf = malloc(i_num_recs * 16);
+    p_hdr_buf = xmalloc(i_num_recs * 16);
     if (stream_Read(p_demux->s, p_hdr_buf, i_num_recs * 16) < i_num_recs * 16) {
         free( p_hdr_buf );
         p_sys->eof = true;
@@ -1919,7 +1919,7 @@ static ty_rec_hdr_t *parse_chunk_headers( const uint8_t *p_buf,
     ty_rec_hdr_t *p_hdrs, *p_rec_hdr;
 
     *pi_payload_size = 0;
-    p_hdrs = malloc(i_num_recs * sizeof(ty_rec_hdr_t));
+    p_hdrs = xmalloc(i_num_recs * sizeof(ty_rec_hdr_t));
 
     for (i = 0; i < i_num_recs; i++)
     {

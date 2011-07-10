@@ -503,10 +503,10 @@ static int Open( vlc_object_t *p_this )
          * http://www.i-topfield.com/data/product/firmware/Structure%20of%20Recorded%20File%20in%20TF5000PVR%20(Feb%2021%202004).doc
          * but after the filename the offsets seem to be incorrect.  - DJ */
         int i_duration, i_name;
-        char *psz_name = malloc(25);
+        char *psz_name = xmalloc(25);
         char *psz_event_name;
-        char *psz_event_text = malloc(130);
-        char *psz_ext_text = malloc(1025);
+        char *psz_event_text = xmalloc(130);
+        char *psz_ext_text = xmalloc(1025);
 
         // 2 bytes version Uimsbf (4,5)
         // 2 bytes reserved (6,7)
@@ -541,7 +541,7 @@ static int Open( vlc_object_t *p_this )
         // 1 byte event name length Uimsbf (89)
         i_name = (int)(p_peek[89]&~0x81);
         msg_Dbg( p_demux, "event name length = %d", i_name);
-        psz_event_name = malloc( i_name+1 );
+        psz_event_name = xmalloc( i_name+1 );
         // 1 byte parental rating (90)
         // 129 bytes of event text
         memcpy( psz_event_name, &p_peek[91], i_name );
@@ -727,7 +727,7 @@ static int Open( vlc_object_t *p_this )
             {
                 p_sys->i_ts_read = 1500 / p_sys->i_packet_size;
             }
-            p_sys->buffer = malloc( p_sys->i_packet_size * p_sys->i_ts_read );
+            p_sys->buffer = xmalloc( p_sys->i_packet_size * p_sys->i_ts_read );
         }
     }
     free( psz_string );
@@ -1829,6 +1829,8 @@ static void ParsePES( demux_t *p_demux, ts_pid_t *pid )
             }
             /* Append a \0 */
             p_block = block_Realloc( p_block, 0, p_block->i_buffer + 1 );
+            if( !p_block )
+                abort();
             p_block->p_buffer[p_block->i_buffer -1] = '\0';
         }
 
@@ -2405,7 +2407,7 @@ static iod_descriptor_t *IODNew( int i_data, uint8_t *p_data )
                     if( dec_descr.i_decoder_specific_info_len > 0 )
                     {
                         dec_descr.p_decoder_specific_info =
-                            malloc( dec_descr.i_decoder_specific_info_len );
+                            xmalloc( dec_descr.i_decoder_specific_info_len );
                     }
                     for( i = 0; i < dec_descr.i_decoder_specific_info_len; i++ )
                     {

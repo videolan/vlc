@@ -78,7 +78,7 @@ static demux_index_entry_t *index_entry_delete( demux_index_entry_t *idx )
 
 static demux_index_entry_t *index_entry_new( void )
 {
-    demux_index_entry_t *idx = (demux_index_entry_t *)malloc( sizeof( demux_index_entry_t ) );
+    demux_index_entry_t *idx = xmalloc( sizeof( demux_index_entry_t ) );
     idx->p_next = idx->p_prev = NULL;
     idx->i_pagepos_end = -1;
     return idx;

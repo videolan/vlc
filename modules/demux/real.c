@@ -963,7 +963,7 @@ static char *StreamReadString2( stream_t *s )
     if( i_length <= 0 )
         return NULL;
 
-    char *psz_string = calloc( 1, i_length + 1 );
+    char *psz_string = xcalloc( 1, i_length + 1 );
 
     stream_Read( s, psz_string, i_length ); /* Valid even if !psz_string */
 
@@ -1661,18 +1661,18 @@ static int CodecAudioParse( demux_t *p_demux, int i_tk_id, const uint8_t *p_data
         tk->i_subpackets =
             i_subpacket_h * i_frame_size / tk->i_subpacket_size;
         tk->p_subpackets =
-            calloc( tk->i_subpackets, sizeof(block_t *) );
+            xcalloc( tk->i_subpackets, sizeof(block_t *) );
         tk->p_subpackets_timecode =
-            calloc( tk->i_subpackets , sizeof( int64_t ) );
+            xcalloc( tk->i_subpackets , sizeof( int64_t ) );
     }
     else if( fmt.i_codec == VLC_CODEC_RA_288 )
     {
         tk->i_subpackets =
             i_subpacket_h * i_frame_size / tk->i_coded_frame_size;
         tk->p_subpackets =
-            calloc( tk->i_subpackets, sizeof(block_t *) );
+            xcalloc( tk->i_subpackets, sizeof(block_t *) );
         tk->p_subpackets_timecode =
-            calloc( tk->i_subpackets , sizeof( int64_t ) );
+            xcalloc( tk->i_subpackets , sizeof( int64_t ) );
     }
 
     /* Check if the calloc went correctly */

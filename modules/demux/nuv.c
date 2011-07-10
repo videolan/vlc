@@ -418,6 +418,8 @@ static int Demux( demux_t *p_demux )
         {
             /* for rtjpeg data, the header is also needed */
             p_data = block_Realloc( p_data, NUV_FH_SIZE, fh.i_length );
+            if( unlikely(!p_data) )
+                abort();
             memcpy( p_data->p_buffer, p_sys->fh_buffer, NUV_FH_SIZE );
         }
         /* 0,1,2,3 -> rtjpeg, >=4 mpeg4 */
