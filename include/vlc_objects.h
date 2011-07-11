@@ -35,7 +35,6 @@
 #define VLC_OBJECT_INPUT       (-7)
 #define VLC_OBJECT_DECODER     (-8)
 #define VLC_OBJECT_VOUT        (-9)
-#define VLC_OBJECT_AOUT        (-10)
 /* Please add new object types below -34 */
 /* Please do not add new object types anyway */
 #define VLC_OBJECT_GENERIC     (-666)
