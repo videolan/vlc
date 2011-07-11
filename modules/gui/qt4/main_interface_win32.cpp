@@ -27,9 +27,8 @@
 #include "input_manager.hpp"
 #include "actions_manager.hpp"
 
-#ifdef WIN32
- #include <QBitmap>
- #include <vlc_windows_interfaces.h>
+#include <QBitmap>
+#include <vlc_windows_interfaces.h>
 
 #define WM_APPCOMMAND 0x0319
 
@@ -237,12 +236,9 @@ bool MainInterface::winEvent ( MSG * msg, long * result )
     }
     return false;
 }
-#endif
 
-//moc doesn't know about #ifdef, so we have to build this method for every platform
 void MainInterface::changeThumbbarButtons( int i_status)
 {
-#ifdef WIN32
     // Define an array of three buttons. These buttons provide images through an
     // image list and also provide tooltips.
     DWORD dwMask = THB_BITMAP | THB_FLAGS;
@@ -289,7 +285,4 @@ void MainInterface::changeThumbbarButtons( int i_status)
     HRESULT hr =  p_taskbl->vt->ThumbBarUpdateButtons(p_taskbl, this->winId(), 3, thbButtons);
     if(S_OK != hr)
         msg_Err( p_intf, "ThumbBarUpdateButtons failed with error %08lx", hr );
-#endif
 }
-
-

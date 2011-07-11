@@ -246,7 +246,6 @@ endif
 SOURCES_qt4 = 	qt4.cpp \
 		menus.cpp \
 		main_interface.cpp \
-		main_interface_win32.cpp \
 		dialogs_provider.cpp \
 		input_manager.cpp \
 		actions_manager.cpp \
@@ -313,6 +312,10 @@ SOURCES_qt4 = 	qt4.cpp \
 
 if HAVE_DARWIN
 SOURCES_qt4 +=  util/searchlineedit_mac.mm
+endif
+
+if HAVE_WIN32
+SOURCES_qt4 += main_interface_win32.cpp
 endif
 
 noinst_HEADERS = \

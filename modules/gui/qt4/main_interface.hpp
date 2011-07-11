@@ -194,7 +194,9 @@ public slots:
     void setStatusBarVisibility(bool b_visible);
 
     void popupMenu( const QPoint& );
+#ifdef WIN32
     void changeThumbbarButtons( int );
+#endif
 
     /* Manage the Video Functions from the vout threads */
     void getVideoSlot( WId *p_id, int *pi_x, int *pi_y,
