@@ -75,6 +75,7 @@ $Id$
  * chain: Video filtering using a chain of video filter modules
  * chorus_flanger: variable delay audio filter
  * chroma_omx: OMX Development Layer chroma conversions
+ * chroma_yuv_neon: ARM NEON video chroma conversion
  * clone: Clone video filter
  * colorthres:  Theshold color based on similarity to reference color Video filter
  * compressor: Dynamic range compressor
@@ -154,7 +155,6 @@ $Id$
  * i420_yuy2: planar 4:2:0 YUV to packed YUV conversion functions
  * i420_yuy2_altivec: AltiVec accelerated version of i420_yuy2
  * i420_yuy2_mmx: MMX accelerated version of i420_yuy2
- * i420_yuy2_neon: ARM NEONv1 chroma conversion of i420_yuy2
  * i420_yuy2_sse2: sse2 accelerated version of i420_yuy2
  * i422_i420: 4:2:2 to 4:2:0 conversion functions
  * i422_yuy2: planar 4:2:2 YUV to packed YUV conversion functions
