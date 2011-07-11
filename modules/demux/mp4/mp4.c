@@ -335,7 +335,19 @@ static int Open( vlc_object_t * p_this )
                          p_ftyp->data.p_ftyp->i_minor_version );
                 break;
             case( FOURCC_3gp4 ):
-                msg_Dbg( p_demux, "3gp Media file version 4" );
+            case( VLC_FOURCC( '3', 'g', 'p', '5' ) ):
+            case( VLC_FOURCC( '3', 'g', 'p', '6' ) ):
+            case( VLC_FOURCC( '3', 'g', 'p', '7' ) ):
+                msg_Dbg( p_demux, "3GPP Media file Release: %c",
+#ifdef WORDS_BIGENDIAN
+                        p_ftyp->data.p_ftyp->i_major_brand
+#else
+                        p_ftyp->data.p_ftyp->i_major_brand >> 24
+#endif
+                        );
+                break;
+            case( VLC_FOURCC( 'q', 't', ' ', ' ') ):
+                msg_Dbg( p_demux, "Apple QuickTime file" );
                 break;
             default:
                 msg_Dbg( p_demux,
