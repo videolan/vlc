@@ -409,13 +409,13 @@ static bool is_v4l_legacy (struct udev_device *dev)
 static char *v4l_get_mrl (struct udev_device *dev)
 {
     /* Determine media location */
-    const char *scheme = "v4l2";
     if (is_v4l_legacy (dev))
-        scheme = "v4l";
+        return NULL;
+
     const char *node = udev_device_get_devnode (dev);
     char *mrl;
 
-    if (asprintf (&mrl, "%s://%s", scheme, node) == -1)
+    if (asprintf (&mrl, "v4l2://%s", node) == -1)
         mrl = NULL;
     return mrl;
 }
