@@ -793,9 +793,6 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
 			[[[VLCMain sharedInstance] appleRemoteController] startListening: [VLCMain sharedInstance]];
 		else
 			[[[VLCMain sharedInstance] appleRemoteController] stopListening: [VLCMain sharedInstance]];
-        [[NSNotificationCenter defaultCenter] postNotificationName: @"VLCMediaKeySupportSettingChanged"
-                                                            object: nil
-                                                          userInfo: nil];
         b_intfSettingChanged = NO;
     }
 
@@ -1151,6 +1148,10 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
         [o_hotkeys_listbox reloadData];
         b_hotkeyChanged = YES;
     }
+
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"VLCMediaKeySupportSettingChanged"
+                                                        object: nil
+                                                      userInfo: nil];
 }
 
 - (void)showHotkeySettings

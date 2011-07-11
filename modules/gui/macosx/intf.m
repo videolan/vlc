@@ -439,14 +439,16 @@ static VLCMain *_o_sharedMainInstance = nil;
     if( !p_intf ) return;
 
     /* init media key support */
-    o_mediaKeyController = [[SPMediaKeyTap alloc] initWithDelegate:self];
     b_mediaKeySupport = config_GetInt( VLCIntf, "macosx-mediakeys" );
-    [o_mediaKeyController startWatchingMediaKeys];
-    [o_mediaKeyController setShouldInterceptMediaKeyEvents:b_mediaKeySupport];
+    if( b_mediaKeySupport )
+    {
+        o_mediaKeyController = [[SPMediaKeyTap alloc] initWithDelegate:self];
+        [o_mediaKeyController startWatchingMediaKeys];
+        [[NSUserDefaults standardUserDefaults] registerDefaults:[NSDictionary dictionaryWithObjectsAndKeys:
+                                                                 [SPMediaKeyTap defaultMediaKeyUserBundleIdentifiers], kMediaKeyUsingBundleIdentifiersDefaultsKey,
+                                                                 nil]];
+    }
     [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(coreChangedMediaKeySupportSetting:) name: @"VLCMediaKeySupportSettingChanged" object: nil];
-    [[NSUserDefaults standardUserDefaults] registerDefaults:[NSDictionary dictionaryWithObjectsAndKeys:
-                                                             [SPMediaKeyTap defaultMediaKeyUserBundleIdentifiers], kMediaKeyUsingBundleIdentifiersDefaultsKey,
-                                                             nil]];
 
     [self _removeOldPreferences];
 
@@ -2030,7 +2032,30 @@ end:
 - (void)coreChangedMediaKeySupportSetting: (NSNotification *)o_notification
 {
     b_mediaKeySupport = config_GetInt( VLCIntf, "macosx-mediakeys" );
-    [o_mediaKeyController setShouldInterceptMediaKeyEvents:b_mediaKeySupport];
+    if (b_mediaKeySupport) {
+        if (!o_mediaKeyController)
+            o_mediaKeyController = [[SPMediaKeyTap alloc] initWithDelegate:self];
+        [o_mediaKeyController startWatchingMediaKeys];
+    }
+    else if (!b_mediaKeySupport && o_mediaKeyController)
+    {
+        int returnedValue = NSRunInformationalAlertPanel(_NS("Relaunch required"),
+                                               _NS("To make sure that VLC no longer listens to your media key events, it needs to be restarted."),
+                                               _NS("Relaunch VLC"), _NS("Ignore"), nil, nil);
+        if( returnedValue == NSOKButton )
+        {
+            /* Relaunch now */
+            const char * path = [[[NSBundle mainBundle] executablePath] UTF8String];
+
+            /* For some reason we need to fork(), not just execl(), which reports a ENOTSUP then. */
+            if(fork() != 0)
+            {
+                exit(0);
+                return;
+            }
+            execl(path, path, NULL);
+        }
+    }
 }
 
 @end
