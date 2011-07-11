@@ -318,12 +318,16 @@ static int Open(vlc_object_t *p_this)
     /* at this point, we assume we have a valid TY stream */
     msg_Dbg( p_demux, "valid TY stream detected" );
 
+    p_sys = malloc(sizeof(demux_sys_t));
+    if( unlikely(p_sys == NULL) )
+        return VLC_ENOMEM;
+
     /* Set exported functions */
     p_demux->pf_demux = Demux;
     p_demux->pf_control = Control;
 
     /* create our structure that will hold all data */
-    p_demux->p_sys = p_sys = malloc(sizeof(demux_sys_t));
+    p_demux->p_sys = p_sys;
     memset(p_sys, 0, sizeof(demux_sys_t));
 
     /* set up our struct (most were zero'd out with the memset above) */

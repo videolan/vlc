@@ -100,9 +100,13 @@ static int Open( vlc_object_t * p_this )
      || ( GetWLE( &p_xa.wBitsPerSample ) != 16) )
         return VLC_EGENERIC;
 
+    p_sys = malloc( sizeof( demux_sys_t ) );
+    if( unlikely( p_sys == NULL ) )
+        return VLC_ENOMEM;
+
     p_demux->pf_demux   = Demux;
     p_demux->pf_control = Control;
-    p_demux->p_sys      = p_sys = malloc( sizeof( demux_sys_t ) );
+    p_demux->p_sys      = p_sys;
     p_sys->p_es         = NULL;
 
     /* skip XA header -- cannot fail */

@@ -303,8 +303,12 @@ static int Open( vlc_object_t * p_this )
     bool        b_matched = false;
     float       f_fps;
 
+    p_sys = malloc( sizeof( demux_sys_t ) );
+    if( unlikely(p_sys == NULL) )
+        return VLC_ENOMEM;
+
     p_demux->pf_control = Control;
-    p_demux->p_sys      = p_sys = malloc( sizeof( demux_sys_t ) );
+    p_demux->p_sys      = p_sys;
     p_sys->p_es         = NULL;
     p_sys->i_time       = 0;
     p_sys->i_level      = 0;

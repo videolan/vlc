@@ -92,10 +92,14 @@ static int Open( vlc_object_t *p_this )
             return VLC_EGENERIC;
     }
 
+    p_sys = malloc( sizeof( demux_sys_t ) );
+    if( unlikely(p_sys == NULL) )
+        return VLC_ENOMEM;
+
     /* Fill p_demux field */
     p_demux->pf_demux = Demux;
     p_demux->pf_control = Control;
-    p_demux->p_sys = p_sys = malloc( sizeof( demux_sys_t ) );
+    p_demux->p_sys = p_sys;
 
     /* Register one audio and one video stream */
     es_format_Init( &fmt, AUDIO_ES, VLC_CODEC_MPGA );

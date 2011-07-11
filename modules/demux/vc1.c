@@ -96,9 +96,13 @@ static int Open( vlc_object_t * p_this )
                  "continuing anyway" );
     }
 
+    p_sys = malloc( sizeof( demux_sys_t ) );
+    if( unlikely(p_sys == NULL) )
+        return VLC_ENOMEM;
+
     p_demux->pf_demux  = Demux;
     p_demux->pf_control= Control;
-    p_demux->p_sys     = p_sys = malloc( sizeof( demux_sys_t ) );
+    p_demux->p_sys     = p_sys;
     p_sys->p_es        = NULL;
     p_sys->i_dts       = 0;
     p_sys->f_fps = var_CreateGetFloat( p_demux, "vc1-fps" );
