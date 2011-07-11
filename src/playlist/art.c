@@ -35,8 +35,6 @@
 #include <vlc_url.h>
 #include <vlc_md5.h>
 
-#include <limits.h>                                             /* PATH_MAX */
-
 #ifdef HAVE_SYS_STAT_H
 #   include <sys/stat.h>
 #endif
