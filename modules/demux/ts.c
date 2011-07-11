@@ -151,9 +151,14 @@ vlc_module_begin ()
     add_string( "ts-out", NULL, TSOUT_TEXT, TSOUT_LONGTEXT, true )
     add_integer( "ts-out-mtu", 1400, MTUOUT_TEXT,
                  MTUOUT_LONGTEXT, true )
+
     add_string( "ts-csa-ck", NULL, CSA_TEXT, CSA_LONGTEXT, true )
+        change_safe()
     add_string( "ts-csa2-ck", NULL, CSA2_TEXT, CSA2_LONGTEXT, true )
+        change_safe()
     add_integer( "ts-csa-pkt", 188, CPKT_TEXT, CPKT_LONGTEXT, true )
+        change_safe()
+
     add_bool( "ts-silent", false, SILENT_TEXT, SILENT_LONGTEXT, true )
 
     add_savefile( "ts-dump-file", NULL, TSDUMP_TEXT, TSDUMP_LONGTEXT, false )
