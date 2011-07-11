@@ -229,7 +229,7 @@ OSD
 osd.icon( type, [id] ): Display an icon on the given OSD channel. Uses the
   default channel is none is given. Icon types are: "pause", "play",
   "speaker" and "mute".
-osd.message( string, [id], [position], [duration]: Display the text message on
+osd.message( string, [id], [position], [duration] ): Display the text message on
   the given OSD channel. Position types are: "center", "left", "right", "top",
   "bottom", "top-left", "top-right", "bottom-left" or "bottom-right". The
   duration is set in microseconds.
