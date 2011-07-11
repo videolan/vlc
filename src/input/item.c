@@ -810,7 +810,7 @@ input_item_NewWithType( const char *psz_uri, const char *psz_name,
 {
     static vlc_atomic_t last_input_id = VLC_ATOMIC_INIT(0);
 
-    input_item_t* p_input = calloc( sizeof( *p_input ), 1 );
+    input_item_t* p_input = calloc( 1, sizeof( *p_input ) );
     if( !p_input )
         return NULL;
     vlc_event_manager_t * p_em = &p_input->event_manager;
