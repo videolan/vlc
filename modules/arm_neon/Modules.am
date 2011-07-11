@@ -12,6 +12,7 @@ libaudio_format_neon_plugin_la_DEPENDENCIES =
 libchroma_yuv_neon_plugin_la_SOURCES = \
 	i420_yuyv.S \
 	i422_yuyv.S \
+	yuyv_i422.S \
 	chroma_yuv.c chroma_neon.h
 libchroma_yuv_neon_plugin_la_CFLAGS = $(AM_CFLAGS)
 libchroma_yuv_neon_plugin_la_LIBADD = $(AM_LIBADD)

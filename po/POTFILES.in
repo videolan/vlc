@@ -279,7 +279,7 @@ modules/access_output/shout.c
 modules/access_output/udp.c
 modules/altivec/memcpy.c
 modules/arm_neon/audio_format.c
-modules/arm_neon/i420_yuy2.c
+modules/arm_neon/chroma_yuv.c
 modules/audio_filter/audiobargraph_a.c
 modules/audio_filter/channel_mixer/dolby.c
 modules/audio_filter/channel_mixer/headphone.c
