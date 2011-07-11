@@ -750,7 +750,7 @@ static decoder_t * CreateDecoder( vlc_object_t *p_parent,
     decoder_owner_sys_t *p_owner;
     es_format_t null_es_format;
 
-    p_dec = vlc_custom_create( p_parent, sizeof( *p_dec ), VLC_OBJECT_DECODER,
+    p_dec = vlc_custom_create( p_parent, sizeof( *p_dec ), VLC_OBJECT_GENERIC,
                                "decoder" );
     if( p_dec == NULL )
         return NULL;
@@ -827,7 +827,7 @@ static decoder_t * CreateDecoder( vlc_object_t *p_parent,
     {
         p_owner->p_packetizer =
             vlc_custom_create( p_parent, sizeof( decoder_t ),
-                               VLC_OBJECT_DECODER, "packetizer" );
+                               VLC_OBJECT_GENERIC, "packetizer" );
         if( p_owner->p_packetizer )
         {
             es_format_Copy( &p_owner->p_packetizer->fmt_in,
