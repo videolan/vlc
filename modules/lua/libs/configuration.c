@@ -46,8 +46,7 @@
 static int vlclua_config_get( lua_State *L )
 {
     vlc_object_t * p_this = vlclua_get_this( L );
-    const char *psz_name;
-    psz_name = luaL_checkstring( L, 1 );
+    const char *psz_name = luaL_checkstring( L, 1 );
     switch( config_GetType( p_this, psz_name ) )
     {
         case VLC_VAR_STRING:
@@ -80,8 +79,7 @@ static int vlclua_config_get( lua_State *L )
 static int vlclua_config_set( lua_State *L )
 {
     vlc_object_t *p_this = vlclua_get_this( L );
-    const char *psz_name;
-    psz_name = luaL_checkstring( L, 1 );
+    const char *psz_name = luaL_checkstring( L, 1 );
     switch( config_GetType( p_this, psz_name ) )
     {
         case VLC_VAR_STRING:
