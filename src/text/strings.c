@@ -47,6 +47,7 @@
 #include <vlc_strings.h>
 #include <vlc_url.h>
 #include <vlc_charset.h>
+#include <vlc_fs.h>
 #include <libvlc.h>
 #include <errno.h>
 
@@ -1129,13 +1130,15 @@ char *make_URI (const char *path, const char *scheme)
     else
     if (path[0] != DIR_SEP_CHAR)
     {   /* Relative path: prepend the current working directory */
-        char cwd[PATH_MAX];
+        char *cwd, *ret;
 
-        if (getcwd (cwd, sizeof (cwd)) == NULL) /* FIXME: UTF8? */
+        if ((cwd = vlc_getcwd ()) == NULL)
             return NULL;
-        if (asprintf (&buf, "%s/%s", cwd, path) == -1)
-            return NULL;
-        char *ret = make_URI (buf, scheme);
+        if (asprintf (&buf, "%s"DIR_SEP"%s", cwd, path) == -1)
+            buf = NULL;
+
+        free (cwd);
+        ret = (buf != NULL) ? make_URI (buf, scheme) : NULL;
         free (buf);
         return ret;
     }
