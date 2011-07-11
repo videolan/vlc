@@ -52,15 +52,15 @@ static char *get_path(const char *location)
     return path;
 }
 
-
+#undef demux_New
 /*****************************************************************************
  * demux_New:
  *  if s is NULL then load a access_demux
  *****************************************************************************/
-demux_t *__demux_New( vlc_object_t *p_obj, input_thread_t *p_parent_input,
-                       const char *psz_access, const char *psz_demux,
-                       const char *psz_location,
-                       stream_t *s, es_out_t *out, bool b_quick )
+demux_t *demux_New( vlc_object_t *p_obj, input_thread_t *p_parent_input,
+                    const char *psz_access, const char *psz_demux,
+                    const char *psz_location,
+                    stream_t *s, es_out_t *out, bool b_quick )
 {
     demux_t *p_demux = vlc_custom_create( p_obj, sizeof( *p_demux ), "demux" );
     const char *psz_module;

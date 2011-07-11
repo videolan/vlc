@@ -43,10 +43,11 @@
 /* Local functions */
 static void aout_Destructor( vlc_object_t * p_this );
 
+#undef aout_New
 /*****************************************************************************
  * aout_New: initialize aout structure
  *****************************************************************************/
-aout_instance_t * __aout_New( vlc_object_t * p_parent )
+aout_instance_t *aout_New( vlc_object_t * p_parent )
 {
     aout_instance_t * p_aout;
 

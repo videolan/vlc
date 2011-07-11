@@ -121,9 +121,9 @@ void aout_OutputDelete( aout_instance_t * p_aout );
 
 
 /* From common.c : */
-#define aout_New(a) __aout_New(VLC_OBJECT(a))
 /* Release with vlc_object_release() */
-aout_instance_t * __aout_New ( vlc_object_t * );
+aout_instance_t *aout_New ( vlc_object_t * );
+#define aout_New(a) aout_New(VLC_OBJECT(a))
 
 void aout_FifoInit( vlc_object_t *, aout_fifo_t *, uint32_t );
 #define aout_FifoInit(o, f, r) aout_FifoInit(VLC_OBJECT(o), f, r)

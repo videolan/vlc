@@ -46,12 +46,13 @@ static char *get_path(const char *location)
     return path;
 }
 
+#undef access_New
 /*****************************************************************************
  * access_New:
  *****************************************************************************/
-access_t *__access_New( vlc_object_t *p_obj, input_thread_t *p_parent_input,
-                        const char *psz_access, const char *psz_demux,
-                        const char *psz_location )
+access_t *access_New( vlc_object_t *p_obj, input_thread_t *p_parent_input,
+                      const char *psz_access, const char *psz_demux,
+                      const char *psz_location )
 {
     access_t *p_access = vlc_custom_create( p_obj, sizeof (*p_access),
                                             "access" );
