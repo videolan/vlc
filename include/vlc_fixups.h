@@ -50,8 +50,7 @@ typedef struct
 
 #if !defined (HAVE_STRLCPY) || \
     !defined (HAVE_STRNDUP) || \
-    !defined (HAVE_STRNLEN) || \
-    !defined (HAVE_GETCWD)
+    !defined (HAVE_STRNLEN)
 # include <stddef.h> /* size_t */
 #endif
 
@@ -173,10 +172,6 @@ struct tm *localtime_r (const time_t *, struct tm *);
 #endif
 
 /* unistd.h */
-#ifndef HAVE_GETCWD
-char *getcwd (char *buf, size_t size);
-#endif
-
 #ifndef HAVE_GETPID
 pid_t getpid (void);
 #endif
