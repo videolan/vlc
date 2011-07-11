@@ -61,23 +61,24 @@
 static int vlclua_preamp_get( lua_State *L )
 {
     input_thread_t *p_input = vlclua_get_input_internal( L );
-    if( p_input )
+    if( !p_input )
+        return 0;
+
+    aout_instance_t *p_aout = input_GetAout( p_input );
+    vlc_object_release( p_input );
+
+    char *psz_af = var_GetNonEmptyString( p_aout, "audio-filter" );
+    if( strstr ( psz_af, "equalizer" ) == NULL )
     {
-        aout_instance_t *p_aout = input_GetAout( p_input );
-        vlc_object_release( p_input );
-        char *psz_af = var_GetNonEmptyString( p_aout, "audio-filter" );
-        if ( strstr ( psz_af, "equalizer" ) == NULL )
-        {
-            vlc_object_release( p_aout );
-            return 0;
-        }
-        float preamp = var_GetFloat( p_aout, "equalizer-preamp");
-        lua_pushnumber( L, preamp );
         vlc_object_release( p_aout );
-        return 1;
+        return 0;
     }
-    return 0;
+
+    lua_pushnumber( L, var_GetFloat( p_aout, "equalizer-preamp") );
+    vlc_object_release( p_aout );
+    return 1;
 }
+
 
 /*****************************************************************************
 * Set the preamp level
@@ -85,28 +86,26 @@ static int vlclua_preamp_get( lua_State *L )
 static int vlclua_preamp_set( lua_State *L )
 {
     input_thread_t *p_input = vlclua_get_input_internal( L );
-    if( p_input )
+    if( !p_input )
+        return 0;
+
+    aout_instance_t *p_aout = input_GetAout( p_input );
+    vlc_object_release( p_input );
+    if( !p_aout )
+        return 0;
+
+    char *psz_af = var_GetNonEmptyString( p_aout, "audio-filter" );
+    if( strstr ( psz_af, "equalizer" ) == NULL )
     {
-        aout_instance_t *p_aout = input_GetAout( p_input );
-        vlc_object_release( p_input );
-        if ( !p_aout )
-        {
-            return 0;
-        }
-        char *psz_af = var_GetNonEmptyString( p_aout, "audio-filter" );
-        if ( strstr ( psz_af, "equalizer" ) == NULL )
-        {
-            vlc_object_release( p_aout );
-            return 0;
-        }
-        float preamp = luaL_checknumber( L, 1 );
-        var_SetFloat( p_aout, "equalizer-preamp",preamp);
-        lua_pushnumber( L, preamp );
         vlc_object_release( p_aout );
-        return 1;
+        return 0;
     }
-    return 0;
+
+    var_SetFloat( p_aout, "equalizer-preamp", luaL_checknumber( L, 1 ) );
+    vlc_object_release( p_aout );
+    return 1;
 }
+
 
 /*****************************************************************************
 Bands:
@@ -127,92 +126,96 @@ Band 9: 16 kHz
 static int vlclua_equalizer_get( lua_State *L )
 {
     input_thread_t *p_input = vlclua_get_input_internal( L );
-    if( p_input )
-    {
-        float level = 0 ;
-        aout_instance_t *p_aout = input_GetAout( p_input );
-        vlc_object_release( p_input );
-        if ( !p_aout )
-        {
-            return 0;
-        }
-        char *psz_af = var_GetNonEmptyString( p_aout, "audio-filter" );
-        if ( strstr ( psz_af, "equalizer" ) == NULL )
-        {
-            vlc_object_release( p_aout );
-            return 0;
-        }
+    if( !p_input )
+        return 0;
 
-        int bandid = luaL_checknumber( L, 1 );
-        char *bands = var_GetNonEmptyString( p_aout, "equalizer-bands" );
-        locale_t loc = newlocale (LC_NUMERIC_MASK, "C", NULL);
-        locale_t oldloc = uselocale (loc);
-        while( bandid >= 0 )
-        {
-            level = strtof( bands, &bands);
-            bandid--;
-        }
-        if (loc != (locale_t)0)
-        {
-            uselocale (oldloc);
-            freelocale (loc);
-        }
-        if ( bandid != -1 )
-        {
-            vlc_object_release( p_aout );
-            return 0;
-         }
-        lua_pushnumber( L, level );
+    aout_instance_t *p_aout = input_GetAout( p_input );
+    vlc_object_release( p_input );
+    if( !p_aout )
+        return 0;
+
+    float level = 0 ;
+    char *psz_af = var_GetNonEmptyString( p_aout, "audio-filter" );
+    if( strstr ( psz_af, "equalizer" ) == NULL )
+    {
         vlc_object_release( p_aout );
+        return 0;
+    }
+
+    int bandid = luaL_checknumber( L, 1 );
+    char *bands = var_GetNonEmptyString( p_aout, "equalizer-bands" );
+    locale_t loc = newlocale (LC_NUMERIC_MASK, "C", NULL);
+    locale_t oldloc = uselocale (loc);
+    while( bandid >= 0 )
+    {
+        level = strtof( bands, &bands);
+        bandid--;
+    }
+    if (loc != (locale_t)0)
+    {
+        uselocale (oldloc);
+        freelocale (loc);
+    }
+
+
+    vlc_object_release( p_aout );
+    if( bandid == -1 )
+    {
+        lua_pushnumber( L, level );
         return 1;
     }
-    return 0;
+    else
+        return 0;
 }
+
+
 /*****************************************************************************
 * Set the equalizer level for the specified band
 *****************************************************************************/
 static int vlclua_equalizer_set( lua_State *L )
 {
     input_thread_t *p_input = vlclua_get_input_internal( L );
-    if( p_input )
+    if( !p_input )
+        return 0;
+
+    int i_pos = 0 , j = 0;
+    aout_instance_t *p_aout = input_GetAout( p_input );
+    vlc_object_release( p_input );
+    if( !p_aout )
+        return 0;
+
+    char *psz_af = var_GetNonEmptyString( p_aout, "audio-filter" );
+    if( strstr ( psz_af, "equalizer" ) == NULL )
     {
-        int i_pos = 0 , j = 0;
-        aout_instance_t *p_aout = input_GetAout( p_input );
-        vlc_object_release( p_input );
-        if ( !p_aout )
-        {
-            return 0;
-        }
-        char *psz_af = var_GetNonEmptyString( p_aout, "audio-filter" );
-        if ( strstr ( psz_af, "equalizer" ) == NULL )
-        {
-            vlc_object_release( p_aout );
-            return 0;
-        }
-        int bandid = luaL_checknumber( L, 1 );
-        float level = luaL_checknumber( L, 2 );
-        char *bands = var_GetString( p_aout, "equalizer-bands" );
-        char newstr[7];
-        while( j != bandid )
-        {
-            i_pos++;
-            if( bands[i_pos] == '.' )
-            {
-                i_pos++;
-                j++;
-            }
-        }
-        if( bandid != 0 )
-            i_pos++;
-        snprintf( newstr, sizeof ( newstr ) , "%6.1f", level);
-        for( int i = 0 ; i < 6 ; i++ )
-            bands[i_pos+i] = newstr[i];
-        var_SetString( p_aout, "equalizer-bands",bands );
         vlc_object_release( p_aout );
-        return 1;
+        return 0;
     }
-    return 0;
+
+    int bandid = luaL_checknumber( L, 1 );
+    float level = luaL_checknumber( L, 2 );
+    char *bands = var_GetString( p_aout, "equalizer-bands" );
+    char newstr[7];
+    while( j != bandid )
+    {
+        i_pos++;
+        if( bands[i_pos] == '.' )
+        {
+            i_pos++;
+            j++;
+        }
+    }
+    if( bandid != 0 )
+        i_pos++;
+    snprintf( newstr, sizeof ( newstr ) , "%6.1f", level);
+    for( int i = 0 ; i < 6 ; i++ )
+        bands[i_pos+i] = newstr[i];
+    var_SetString( p_aout, "equalizer-bands", bands );
+
+    vlc_object_release( p_aout );
+    return 1;
 }
+
+
 static const luaL_Reg vlclua_equalizer_reg[] = {
     { "preampget", vlclua_preamp_get },
     { "preampset", vlclua_preamp_set },
@@ -220,6 +223,7 @@ static const luaL_Reg vlclua_equalizer_reg[] = {
     { "equalizerset", vlclua_equalizer_set },
     { NULL, NULL }
 };
+
 
 void luaopen_equalizer( lua_State *L )
 {
