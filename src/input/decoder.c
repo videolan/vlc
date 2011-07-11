@@ -598,7 +598,7 @@ void input_DecoderWaitBuffering( decoder_t *p_dec )
 
     vlc_mutex_lock( &p_owner->lock );
 
-    while( vlc_object_alive( p_dec ) && p_owner->b_buffering && !p_owner->buffer.b_full )
+    while( p_owner->b_buffering && !p_owner->buffer.b_full )
     {
         block_FifoWake( p_owner->p_fifo );
         vlc_cond_wait( &p_owner->wait_acknowledge, &p_owner->lock );
@@ -979,7 +979,7 @@ static void DecoderFlush( decoder_t *p_dec )
     input_DecoderDecode( p_dec, p_null, false );
 
     /* */
-    while( vlc_object_alive( p_dec ) && p_owner->b_flushing )
+    while( p_owner->b_flushing )
         vlc_cond_wait( &p_owner->wait_acknowledge, &p_owner->lock );
 }
 
