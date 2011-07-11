@@ -38,8 +38,7 @@ sql_t *sql_Create( vlc_object_t *p_this, const char *psz_name,
 {
     sql_t *p_sql;
 
-    p_sql = ( sql_t * ) vlc_custom_create( p_this, sizeof( sql_t ),
-                                           VLC_OBJECT_GENERIC, "sql" );
+    p_sql = ( sql_t * ) vlc_custom_create( p_this, sizeof( sql_t ), "sql" );
     if( !p_sql )
     {
         msg_Err( p_this, "unable to create sql object" );

@@ -198,7 +198,7 @@ libvlc_int_t * libvlc_InternalCreate( void )
 
     /* Allocate a libvlc instance object */
     p_libvlc = vlc_custom_create( (vlc_object_t *)NULL, sizeof (*priv),
-                                  VLC_OBJECT_GENERIC, "libvlc" );
+                                  "libvlc" );
     if( p_libvlc != NULL )
         i_instances++;
     vlc_mutex_unlock( &global_lock );

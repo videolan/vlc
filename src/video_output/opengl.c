@@ -60,7 +60,7 @@ vlc_gl_t *vlc_gl_Create(struct vout_window_t *wnd, unsigned flags,
             return NULL;
     }
 
-    gl = vlc_custom_create(parent, sizeof (*gl), VLC_OBJECT_GENERIC, "gl");
+    gl = vlc_custom_create(parent, sizeof (*gl), "gl");
     if (unlikely(gl == NULL))
         return NULL;
 

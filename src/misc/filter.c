@@ -33,8 +33,7 @@
 filter_t *filter_NewBlend( vlc_object_t *p_this,
                            const video_format_t *p_dst_chroma )
 {
-    filter_t *p_blend = vlc_custom_create( p_this, sizeof(*p_blend),
-                                           VLC_OBJECT_GENERIC, "blend" );
+    filter_t *p_blend = vlc_custom_create( p_this, sizeof(*p_blend), "blend" );
     if( !p_blend )
         return NULL;
 
@@ -119,8 +118,8 @@ video_splitter_t *video_splitter_New( vlc_object_t *p_this,
                                       const char *psz_name,
                                       const video_format_t *p_fmt )
 {
-    video_splitter_t *p_splitter = vlc_custom_create( p_this, sizeof(*p_splitter),
-                                           VLC_OBJECT_GENERIC, "video splitter" );
+    video_splitter_t *p_splitter = vlc_custom_create( p_this,
+                                       sizeof(*p_splitter), "video splitter" );
     if( !p_splitter )
         return NULL;
 

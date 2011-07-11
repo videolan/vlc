@@ -158,10 +158,8 @@ osd_menu_t *osd_MenuCreate( vlc_object_t *p_this, const char *psz_file )
     var_Get( p_this->p_libvlc, "osd-object", &val );
     if( val.p_address == NULL )
     {
-        static const char osdmenu_name[] = "osd menu";
-
         p_osd = vlc_custom_create( p_this->p_libvlc, sizeof( *p_osd ),
-                                   VLC_OBJECT_GENERIC, osdmenu_name );
+                                   "osd menu" );
         if( !p_osd )
             return NULL;
 

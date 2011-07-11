@@ -43,8 +43,7 @@ int playlist_Export( playlist_t * p_playlist, const char *psz_filename,
     if( p_export_root == NULL ) return VLC_EGENERIC;
 
     playlist_export_t *p_export =
-        vlc_custom_create( p_playlist, sizeof( *p_export ), VLC_OBJECT_GENERIC,
-                           "playlist export" );
+        vlc_custom_create( p_playlist, sizeof( *p_export ), "playlist export" );
     if( !p_export )
         return VLC_ENOMEM;
 

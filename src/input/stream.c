@@ -208,8 +208,7 @@ static int  ASeek( stream_t *s, uint64_t i_pos );
  ****************************************************************************/
 stream_t *stream_CommonNew( vlc_object_t *p_obj )
 {
-    stream_t *s = (stream_t *)vlc_custom_create( p_obj, sizeof(*s),
-                                                 VLC_OBJECT_GENERIC, "stream" );
+    stream_t *s = (stream_t *)vlc_custom_create( p_obj, sizeof(*s), "stream" );
 
     if( !s )
         return NULL;

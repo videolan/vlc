@@ -111,8 +111,7 @@ services_discovery_t *vlc_sd_Create( vlc_object_t *p_super,
 {
     services_discovery_t *p_sd;
 
-    p_sd = vlc_custom_create( p_super, sizeof( *p_sd ), VLC_OBJECT_GENERIC,
-                              "services discovery" );
+    p_sd = vlc_custom_create( p_super, sizeof( *p_sd ), "services discovery" );
     if( !p_sd )
         return NULL;
     free(config_ChainCreate( &p_sd->psz_name, &p_sd->p_cfg, cfg ));

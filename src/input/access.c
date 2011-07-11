@@ -54,7 +54,7 @@ access_t *__access_New( vlc_object_t *p_obj, input_thread_t *p_parent_input,
                         const char *psz_location )
 {
     access_t *p_access = vlc_custom_create( p_obj, sizeof (*p_access),
-                                            VLC_OBJECT_GENERIC, "access" );
+                                            "access" );
 
     if( p_access == NULL )
         return NULL;

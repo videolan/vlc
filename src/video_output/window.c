@@ -55,8 +55,7 @@ vout_window_t *vout_window_New(vlc_object_t *obj,
                                const char *module,
                                const vout_window_cfg_t *cfg)
 {
-    static char const name[] = "window";
-    window_t *w = vlc_custom_create(obj, sizeof(*w), VLC_OBJECT_GENERIC, name);
+    window_t *w = vlc_custom_create(obj, sizeof(*w), "window");
     vout_window_t *window = &w->wnd;
 
     memset(&window->handle, 0, sizeof(window->handle));

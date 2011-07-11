@@ -51,8 +51,7 @@ aout_instance_t * __aout_New( vlc_object_t * p_parent )
     aout_instance_t * p_aout;
 
     /* Allocate descriptor. */
-    p_aout = vlc_custom_create( p_parent, sizeof( *p_aout ),
-                                VLC_OBJECT_GENERIC, "audio output" );
+    p_aout = vlc_custom_create( p_parent, sizeof( *p_aout ), "audio output" );
     if( p_aout == NULL )
     {
         return NULL;

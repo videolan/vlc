@@ -62,9 +62,7 @@ demux_t *__demux_New( vlc_object_t *p_obj, input_thread_t *p_parent_input,
                        const char *psz_location,
                        stream_t *s, es_out_t *out, bool b_quick )
 {
-    static const char typename[] = "demux";
-    demux_t *p_demux = vlc_custom_create( p_obj, sizeof( *p_demux ),
-                                          VLC_OBJECT_GENERIC, typename );
+    demux_t *p_demux = vlc_custom_create( p_obj, sizeof( *p_demux ), "demux" );
     const char *psz_module;
 
     if( p_demux == NULL ) return NULL;
@@ -334,7 +332,7 @@ decoder_t *demux_PacketizerNew( demux_t *p_demux, es_format_t *p_fmt, const char
 {
     decoder_t *p_packetizer;
     p_packetizer = vlc_custom_create( p_demux, sizeof( *p_packetizer ),
-                                      VLC_OBJECT_GENERIC, "demux packetizer" );
+                                      "demux packetizer" );
     if( !p_packetizer )
     {
         es_format_Clean( p_fmt );

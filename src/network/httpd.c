@@ -973,7 +973,6 @@ httpd_host_t *httpd_HostNew( vlc_object_t *p_this, const char *psz_host,
                            );
 }
 
-static const char psz_object_type[] = "http server";
 static vlc_mutex_t httpd_mutex = VLC_STATIC_MUTEX;
 
 httpd_host_t *httpd_TLSHostNew( vlc_object_t *p_this, const char *psz_hostname,
@@ -1002,8 +1001,7 @@ httpd_host_t *httpd_TLSHostNew( vlc_object_t *p_this, const char *psz_hostname,
     {
         msg_Info( p_this, "creating httpd" );
         httpd = (httpd_t *)vlc_custom_create( p_this, sizeof (*httpd),
-                                              VLC_OBJECT_GENERIC,
-                                              psz_object_type );
+                                              "http server" );
         if( httpd == NULL )
         {
             vlc_mutex_unlock( &httpd_mutex );
@@ -1069,8 +1067,7 @@ httpd_host_t *httpd_TLSHostNew( vlc_object_t *p_this, const char *psz_hostname,
 
     /* create the new host */
     host = (httpd_host_t *)vlc_custom_create( p_this, sizeof (*host),
-                                              VLC_OBJECT_GENERIC,
-                                              psz_object_type );
+                                              "http host" );
     if (host == NULL)
         goto error;
 

@@ -509,7 +509,7 @@ void update_Download( update_t *p_update, const char *psz_destdir )
 
     update_download_thread_t *p_udt =
         vlc_custom_create( p_update->p_libvlc, sizeof( *p_udt ),
-                           VLC_OBJECT_GENERIC, "update download" );
+                           "update download" );
     if( !p_udt )
         return;
 

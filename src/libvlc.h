@@ -106,15 +106,13 @@ void vlc_ExitDestroy( vlc_exit_t * );
  *
  * @param p_this an existing VLC object
  * @param i_size byte size of the object structure
- * @param i_type object type, usually VLC_OBJECT_CUSTOM
  * @param psz_type object type name
  * @return the created object, or NULL.
  */
 extern void *
-vlc_custom_create (vlc_object_t *p_this, size_t i_size, int i_type,
-                     const char *psz_type);
-#define vlc_custom_create(o, s, t, n) \
-        vlc_custom_create(VLC_OBJECT(o), s, t, n)
+vlc_custom_create (vlc_object_t *p_this, size_t i_size, const char *psz_type);
+#define vlc_custom_create(o, s, n) \
+        vlc_custom_create(VLC_OBJECT(o), s, n)
 
 /**
  * Assign a name to an object for vlc_object_find_name().
@@ -142,7 +140,6 @@ typedef struct vlc_object_internals vlc_object_internals_t;
 
 struct vlc_object_internals
 {
-    int             i_object_type; /* Object type, deprecated */
     char           *psz_name; /* given name */
 
     /* Object variables */

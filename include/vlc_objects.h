@@ -31,11 +31,6 @@
  * @{
  */
 
-/* Object types */
-/* Please add new object types below -34 */
-/* Please do not add new object types anyway */
-#define VLC_OBJECT_GENERIC     (-666)
-
 /* Object flags */
 #define OBJECT_FLAGS_NODBG       0x0001
 #define OBJECT_FLAGS_QUIET       0x0002

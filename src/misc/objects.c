@@ -108,7 +108,7 @@ static void libvlc_unlock (libvlc_int_t *p_libvlc)
 
 #undef vlc_custom_create
 void *vlc_custom_create (vlc_object_t *parent, size_t length,
-                         int type, const char *typename)
+                         const char *typename)
 {
     /* NOTE:
      * VLC objects are laid out as follow:
@@ -124,7 +124,6 @@ void *vlc_custom_create (vlc_object_t *parent, size_t length,
     vlc_object_internals_t *priv = malloc (sizeof (*priv) + length);
     if (unlikely(priv == NULL))
         return NULL;
-    priv->i_object_type = type;
     priv->psz_name = NULL;
     priv->var_root = NULL;
     vlc_mutex_init (&priv->var_lock);
@@ -193,7 +192,7 @@ void *vlc_custom_create (vlc_object_t *parent, size_t length,
  */
 void *vlc_object_create( vlc_object_t *p_this, size_t i_size )
 {
-    return vlc_custom_create( p_this, i_size, VLC_OBJECT_GENERIC, "generic" );
+    return vlc_custom_create( p_this, i_size, "generic" );
 }
 
 #undef vlc_object_set_destructor

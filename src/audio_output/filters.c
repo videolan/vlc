@@ -55,8 +55,7 @@ static filter_t * FindFilter( aout_instance_t * p_aout,
     static const char typename[] = "audio filter";
     filter_t * p_filter;
 
-    p_filter = vlc_custom_create( p_aout, sizeof(*p_filter),
-                                  VLC_OBJECT_GENERIC, typename );
+    p_filter = vlc_custom_create( p_aout, sizeof(*p_filter), typename );
 
     if ( p_filter == NULL ) return NULL;
 

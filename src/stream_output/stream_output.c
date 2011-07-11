@@ -82,7 +82,6 @@ static void mrl_Clean( mrl_t *p_mrl );
  *****************************************************************************/
 sout_instance_t *sout_NewInstance( vlc_object_t *p_parent, const char *psz_dest )
 {
-    static const char typename[] = "stream output";
     sout_instance_t *p_sout;
 
     char *psz_chain;
@@ -99,8 +98,7 @@ sout_instance_t *sout_NewInstance( vlc_object_t *p_parent, const char *psz_dest 
         return NULL;
 
     /* *** Allocate descriptor *** */
-    p_sout = vlc_custom_create( p_parent, sizeof( *p_sout ),
-                                VLC_OBJECT_GENERIC, typename );
+    p_sout = vlc_custom_create( p_parent, sizeof( *p_sout ), "stream output" );
     if( p_sout == NULL )
         return NULL;
 
@@ -250,12 +248,10 @@ int sout_InputSendBuffer( sout_packetizer_input_t *p_input,
 sout_access_out_t *sout_AccessOutNew( vlc_object_t *p_sout,
                                       const char *psz_access, const char *psz_name )
 {
-    static const char typename[] = "access out";
     sout_access_out_t *p_access;
     char              *psz_next;
 
-    p_access = vlc_custom_create( p_sout, sizeof( *p_access ),
-                                  VLC_OBJECT_GENERIC, typename );
+    p_access = vlc_custom_create( p_sout, sizeof( *p_access ), "access out" );
     if( !p_access )
         return NULL;
 
@@ -352,12 +348,10 @@ int sout_AccessOutControl (sout_access_out_t *access, int query, ...)
 sout_mux_t * sout_MuxNew( sout_instance_t *p_sout, const char *psz_mux,
                           sout_access_out_t *p_access )
 {
-    static const char typename[] = "mux";
     sout_mux_t *p_mux;
     char       *psz_next;
 
-    p_mux = vlc_custom_create( p_sout, sizeof( *p_mux ), VLC_OBJECT_GENERIC,
-                               typename);
+    p_mux = vlc_custom_create( p_sout, sizeof( *p_mux ), "mux" );
     if( p_mux == NULL )
         return NULL;
 
@@ -771,13 +765,11 @@ void sout_StreamChainDelete(sout_stream_t *p_first, sout_stream_t *p_last)
 static sout_stream_t *sout_StreamNew( sout_instance_t *p_sout, char *psz_name,
                                config_chain_t *p_cfg, sout_stream_t *p_next)
 {
-    static const char typename[] = "stream out";
     sout_stream_t *p_stream;
 
     assert(psz_name);
 
-    p_stream = vlc_custom_create( p_sout, sizeof( *p_stream ),
-                                  VLC_OBJECT_GENERIC, typename );
+    p_stream = vlc_custom_create( p_sout, sizeof( *p_stream ), "stream out" );
     if( !p_stream )
         return NULL;
 
@@ -955,7 +947,5 @@ rtp:
 #undef sout_EncoderCreate
 encoder_t *sout_EncoderCreate( vlc_object_t *p_this )
 {
-    static const char type[] = "encoder";
-    return vlc_custom_create( p_this, sizeof( encoder_t ), VLC_OBJECT_GENERIC,
-                              type );
+    return vlc_custom_create( p_this, sizeof( encoder_t ), "encoder" );
 }

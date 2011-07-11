@@ -52,9 +52,7 @@ tls_ServerCreate (vlc_object_t *obj, const char *cert_path,
 {
     tls_server_t *srv;
 
-    srv = (tls_server_t *)vlc_custom_create (obj, sizeof (*srv),
-                                             VLC_OBJECT_GENERIC,
-                                             "tls server");
+    srv = (tls_server_t *)vlc_custom_create (obj, sizeof (*srv), "tls server");
     if (srv == NULL)
         return NULL;
 
@@ -162,9 +160,7 @@ tls_ClientCreate (vlc_object_t *obj, int fd, const char *psz_hostname)
     tls_session_t *cl;
     int val;
 
-    cl = (tls_session_t *)vlc_custom_create (obj, sizeof (*cl),
-                                             VLC_OBJECT_GENERIC,
-                                             "tls client");
+    cl = (tls_session_t *)vlc_custom_create (obj, sizeof (*cl), "tls client");
     if (cl == NULL)
         return NULL;
 

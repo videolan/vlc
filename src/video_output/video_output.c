@@ -120,7 +120,7 @@ static vout_thread_t *VoutCreate(vlc_object_t *object,
     /* Allocate descriptor */
     vout_thread_t *vout = vlc_custom_create(object,
                                             sizeof(*vout) + sizeof(*vout->p),
-                                            VLC_OBJECT_GENERIC, "video output");
+                                            "video output");
     if (!vout) {
         video_format_Clean(&original);
         return NULL;

@@ -656,8 +656,7 @@ static decoder_t *CreateDecoder( vlc_object_t *p_this, video_format_t *fmt )
 {
     decoder_t *p_dec;
 
-    p_dec = vlc_custom_create( p_this, sizeof( *p_dec ), VLC_OBJECT_GENERIC,
-                               "image decoder" );
+    p_dec = vlc_custom_create( p_this, sizeof( *p_dec ), "image decoder" );
     if( p_dec == NULL )
         return NULL;
 
@@ -781,11 +780,9 @@ static filter_t *CreateFilter( vlc_object_t *p_this, es_format_t *p_fmt_in,
                                video_format_t *p_fmt_out,
                                const char *psz_module )
 {
-    static const char typename[] = "filter";
     filter_t *p_filter;
 
-    p_filter = vlc_custom_create( p_this, sizeof(filter_t),
-                                  VLC_OBJECT_GENERIC, typename );
+    p_filter = vlc_custom_create( p_this, sizeof(filter_t), "filter" );
     p_filter->pf_video_buffer_new =
         (picture_t *(*)(filter_t *))video_new_buffer;
     p_filter->pf_video_buffer_del =

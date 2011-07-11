@@ -218,8 +218,7 @@ static int FindArt( playlist_fetcher_t *p_fetcher, input_item_t *p_item )
 
     vlc_object_t *p_parent = VLC_OBJECT(p_fetcher->p_playlist);
     art_finder_t *p_finder =
-        vlc_custom_create( p_parent, sizeof( *p_finder ), VLC_OBJECT_GENERIC,
-                           "art finder" );
+        vlc_custom_create( p_parent, sizeof( *p_finder ), "art finder" );
     if( p_finder != NULL)
     {
         module_t *p_module;
@@ -333,8 +332,7 @@ error:
 static void FetchMeta( playlist_fetcher_t *p_fetcher, input_item_t *p_item )
 {
     demux_meta_t *p_demux_meta = vlc_custom_create(p_fetcher->p_playlist,
-                                       sizeof(*p_demux_meta),
-                                       VLC_OBJECT_GENERIC, "demux meta" );
+                                         sizeof(*p_demux_meta), "demux meta" );
     if( !p_demux_meta )
         return;
 

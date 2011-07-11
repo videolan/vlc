@@ -36,9 +36,7 @@ typedef struct
 
 vlc_inhibit_t *vlc_inhibit_Create (vlc_object_t *parent, int_fast32_t wid)
 {
-    static char const typename[] = "inhibit";
-    inhibit_t *priv = vlc_custom_create (parent, sizeof (*priv),
-                                         VLC_OBJECT_GENERIC, typename);
+    inhibit_t *priv = vlc_custom_create (parent, sizeof (*priv), "inhibit" );
     if (priv == NULL)
         return NULL;
 

@@ -200,8 +200,7 @@ static int spu_get_attachments(filter_t *filter,
 
 static filter_t *SpuRenderCreateAndLoadText(spu_t *spu)
 {
-    filter_t *text = vlc_custom_create(spu, sizeof(*text),
-                                       VLC_OBJECT_GENERIC, "spu text");
+    filter_t *text = vlc_custom_create(spu, sizeof(*text), "spu text");
     if (!text)
         return NULL;
 
@@ -232,8 +231,7 @@ static filter_t *SpuRenderCreateAndLoadScale(vlc_object_t *object,
                                              vlc_fourcc_t dst_chroma,
                                              bool require_resize)
 {
-    filter_t *scale = vlc_custom_create(object, sizeof(*scale),
-                                        VLC_OBJECT_GENERIC, "scale");
+    filter_t *scale = vlc_custom_create(object, sizeof(*scale), "scale");
     if (!scale)
         return NULL;
 
@@ -1205,8 +1203,9 @@ static void SubSourceAllocationClean(filter_t *filter)
  */
 spu_t *spu_Create(vlc_object_t *object)
 {
-    spu_t *spu = vlc_custom_create(object, sizeof(spu_t) + sizeof(spu_private_t),
-                                   VLC_OBJECT_GENERIC, "subpicture");
+    spu_t *spu = vlc_custom_create(object,
+                                   sizeof(spu_t) + sizeof(spu_private_t),
+                                   "subpicture");
     if (!spu)
         return NULL;
 

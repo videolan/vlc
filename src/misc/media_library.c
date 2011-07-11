@@ -79,7 +79,7 @@ media_library_t *ml_Create( vlc_object_t *p_this, char *psz_name )
 
     p_ml = ( media_library_t * ) vlc_custom_create(
                                 p_this, sizeof( media_library_t ),
-                                VLC_OBJECT_GENERIC, "media-library" );
+                                "media-library" );
     if( !p_ml )
     {
         msg_Err( p_this, "unable to create media library object" );

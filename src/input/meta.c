@@ -263,8 +263,7 @@ exit:
 int input_item_WriteMeta( vlc_object_t *obj, input_item_t *p_item )
 {
     meta_export_t *p_export =
-        vlc_custom_create( obj, sizeof( *p_export ), VLC_OBJECT_GENERIC,
-                           "meta writer" );
+        vlc_custom_create( obj, sizeof( *p_export ), "meta writer" );
     if( p_export == NULL )
         return VLC_ENOMEM;
     p_export->p_item = p_item;

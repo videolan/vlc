@@ -31,8 +31,7 @@
 void *vlc_probe (vlc_object_t *obj,
                  const char *capability, size_t *restrict pcount)
 {
-    vlc_probe_t *probe = vlc_custom_create (obj, sizeof(*probe),
-                                            VLC_OBJECT_GENERIC, "probe");
+    vlc_probe_t *probe = vlc_custom_create (obj, sizeof(*probe), "probe");
     if (unlikely(probe == NULL))
     {
         *pcount = 0;

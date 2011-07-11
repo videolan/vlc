@@ -152,13 +152,11 @@ static int VideoSplitterCallback( vlc_object_t *p_this, char const *psz_cmd,
  */
 playlist_t * playlist_Create( vlc_object_t *p_parent )
 {
-    static const char playlist_name[] = "playlist";
     playlist_t *p_playlist;
     playlist_private_t *p;
 
     /* Allocate structure */
-    p = vlc_custom_create( p_parent, sizeof( *p ),
-                           VLC_OBJECT_GENERIC, playlist_name );
+    p = vlc_custom_create( p_parent, sizeof( *p ), "playlist" );
     if( !p )
         return NULL;
 

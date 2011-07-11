@@ -131,7 +131,6 @@ vlm_t *vlm_New ( vlc_object_t *p_this )
 {
     vlm_t *p_vlm = NULL, **pp_vlm = &(libvlc_priv (p_this->p_libvlc)->p_vlm);
     char *psz_vlmconf;
-    static const char vlm_object_name[] = "vlm daemon";
 
     /* Avoid multiple creation */
     vlc_mutex_lock( &vlm_mutex );
@@ -150,7 +149,7 @@ vlm_t *vlm_New ( vlc_object_t *p_this )
     msg_Dbg( p_this, "creating VLM" );
 
     p_vlm = vlc_custom_create( p_this->p_libvlc, sizeof( *p_vlm ),
-                               VLC_OBJECT_GENERIC, vlm_object_name );
+                               "vlm daemon" );
     if( !p_vlm )
     {
         vlc_mutex_unlock( &vlm_mutex );
@@ -765,7 +764,7 @@ static int vlm_ControlMediaAdd( vlm_t *p_vlm, vlm_media_t *p_cfg, int64_t *p_id 
     if( p_cfg->b_vod && !p_vlm->p_vod )
     {
         p_vlm->p_vod = vlc_custom_create( VLC_OBJECT(p_vlm), sizeof( vod_t ),
-                                          VLC_OBJECT_GENERIC, "vod server" );
+                                          "vod server" );
         p_vlm->p_vod->p_module = module_need( p_vlm->p_vod, "vod server", "$vod-server", false );
         if( !p_vlm->p_vod->p_module )
         {

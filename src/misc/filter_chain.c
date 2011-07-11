@@ -373,8 +373,7 @@ static filter_t *filter_chain_AppendFilterInternal( filter_chain_t *p_chain,
                                                     const es_format_t *p_fmt_out )
 {
     chained_filter_t *p_chained =
-        vlc_custom_create( p_chain->p_this, sizeof(*p_chained),
-                           VLC_OBJECT_GENERIC, "filter" );
+        vlc_custom_create( p_chain->p_this, sizeof(*p_chained), "filter" );
     filter_t *p_filter = &p_chained->filter;
     if( !p_filter )
         return NULL;
