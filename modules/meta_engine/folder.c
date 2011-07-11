@@ -79,10 +79,6 @@ static int FindMeta( vlc_object_t *p_this )
     input_item_t *p_item = p_finder->p_item;
     bool b_have_art = false;
 
-    int i;
-    struct stat a;
-    char psz_filename[MAX_PATH];
-
     if( !p_item )
         return VLC_EGENERIC;
 
@@ -101,22 +97,34 @@ static int FindMeta( vlc_object_t *p_this )
     else
         *psz_path = '\0'; /* relative path */
 
-    for( i = -1; !b_have_art && i < i_covers; i++ )
+    for( int i = -1; !b_have_art && i < i_covers; i++ )
     {
+        const char *filename;
+        char *filebuf, *filepath;
+
         if( i == -1 ) /* higher priority : configured filename */
         {
-            char *psz_userfile = var_InheritString( p_this, "album-art-filename" );
-            if( !psz_userfile )
+            filebuf = var_InheritString( p_this, "album-art-filename" );
+            if( filebuf == NULL )
                 continue;
-            snprintf( psz_filename, MAX_PATH, "%s%s", psz_path, psz_userfile );
-            free( psz_userfile );
+            filename = filebuf;
         }
         else
-            snprintf( psz_filename, MAX_PATH, "%s%s", psz_path, cover_files[i] );
-
-        if( vlc_stat( psz_filename, &a ) != -1 )
         {
-            char *psz_uri = make_URI( psz_filename, "file" );
+            filename = cover_files[i];
+            filebuf = NULL;
+        }
+
+        if( asprintf( &filepath, "%s%s", psz_path, filename ) == -1 )
+            filepath = NULL;
+        free( filebuf );
+        if( unlikely(filepath != NULL) )
+            continue;
+
+        struct stat dummy;
+        if( vlc_stat( filepath, &dummy ) == 0 )
+        {
+            char *psz_uri = make_URI( filepath, "file" );
             if( psz_uri )
             {
                 input_item_SetArtURL( p_item, psz_uri );
@@ -124,6 +132,7 @@ static int FindMeta( vlc_object_t *p_this )
                 b_have_art = true;
             }
         }
+        free( filepath );
     }
     free( psz_path );
 
