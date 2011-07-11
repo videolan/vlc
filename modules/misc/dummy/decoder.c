@@ -32,28 +32,8 @@
 #include <vlc_codec.h>
 #include <vlc_fs.h>
 
-#include <sys/types.h>
-#ifdef HAVE_UNISTD_H
-#   include <unistd.h> /* write(), close() */
-#elif defined( WIN32 ) && !defined( UNDER_CE )
-#   include <io.h>
-#endif
-#ifdef HAVE_FCNTL_H
-#   include <fcntl.h>
-#endif
-
-#include <limits.h> /* PATH_MAX */
-
 
 #include "dummy.h"
-
-/*****************************************************************************
- * decoder_sys_t : theora decoder descriptor
- *****************************************************************************/
-struct decoder_sys_t
-{
-    int i_fd;
-};
 
 /*****************************************************************************
  * Local prototypes
@@ -66,41 +46,25 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block );
 static int OpenDecoderCommon( vlc_object_t *p_this, bool b_force_dump )
 {
     decoder_t *p_dec = (decoder_t*)p_this;
-    decoder_sys_t *p_sys;
-    char psz_file[ PATH_MAX ];
-
-    /* Allocate the memory needed to store the decoder's structure */
-    if( ( p_dec->p_sys = p_sys =
-          (decoder_sys_t *)malloc(sizeof(decoder_sys_t)) ) == NULL )
-    {
-        return VLC_ENOMEM;
-    }
+    char psz_file[10 + 3 * sizeof (p_dec)];
 
     snprintf( psz_file, sizeof( psz_file), "stream.%p", p_dec );
 
-#ifndef UNDER_CE
     if( !b_force_dump )
-    {
         b_force_dump = var_InheritBool( p_dec, "dummy-save-es" );
-    }
     if( b_force_dump )
     {
-        p_sys->i_fd = vlc_open( psz_file, O_WRONLY | O_CREAT | O_TRUNC, 00644 );
-
-        if( p_sys->i_fd == -1 )
+        FILE *stream = vlc_fopen( psz_file, "wb" );
+        if( stream == NULL )
         {
             msg_Err( p_dec, "cannot create `%s'", psz_file );
-            free( p_sys );
             return VLC_EGENERIC;
         }
-
         msg_Dbg( p_dec, "dumping stream to file `%s'", psz_file );
+        p_dec->p_sys = (void *)stream;
     }
     else
-#endif
-    {
-        p_sys->i_fd = -1;
-    }
+        p_dec->p_sys = NULL;
 
     /* Set callbacks */
     p_dec->pf_decode_video = (picture_t *(*)(decoder_t *, block_t **))
@@ -119,6 +83,7 @@ int OpenDecoder( vlc_object_t *p_this )
 {
     return OpenDecoderCommon( p_this, false );
 }
+
 int  OpenDecoderDump( vlc_object_t *p_this )
 {
     return OpenDecoderCommon( p_this, true );
@@ -131,24 +96,21 @@ int  OpenDecoderDump( vlc_object_t *p_this )
  ****************************************************************************/
 static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 {
-    decoder_sys_t *p_sys = p_dec->p_sys;
+    FILE *stream = (void *)p_dec->p_sys;
     block_t *p_block;
 
     if( !pp_block || !*pp_block ) return NULL;
     p_block = *pp_block;
 
-    if( p_sys->i_fd >= 0 &&
-        p_block->i_buffer > 0 &&
-        (p_block->i_flags & (BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED) ) == 0 )
+    if( stream != NULL
+     && p_block->i_buffer > 0
+     && !(p_block->i_flags & (BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED)) )
     {
-#ifndef UNDER_CE
-        write( p_sys->i_fd, p_block->p_buffer, p_block->i_buffer );
-#endif
-
+        fwrite( p_block->p_buffer, 1, p_block->i_buffer, stream );
         msg_Dbg( p_dec, "dumped %zu bytes", p_block->i_buffer );
     }
-
     block_Release( p_block );
+
     return NULL;
 }
 
@@ -158,13 +120,9 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 void CloseDecoder ( vlc_object_t *p_this )
 {
     decoder_t *p_dec = (decoder_t *)p_this;
-    decoder_sys_t *p_sys = p_dec->p_sys;
+    FILE *stream = (void *)p_dec->p_sys;
 
-#ifndef UNDER_CE
-    if( p_sys->i_fd >= 0 )
-        close( p_sys->i_fd );
-#endif
-
-    free( p_sys );
+    if( stream != NULL )
+        fclose( stream );
 }
 
