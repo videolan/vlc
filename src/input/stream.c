@@ -1680,13 +1680,9 @@ static int AReadStream( stream_t *s, void *p_read, unsigned int i_read )
 {
     stream_sys_t *p_sys = s->p_sys;
     access_t *p_access = p_sys->p_access;
-    input_thread_t *p_input = NULL;
+    input_thread_t *p_input = s->p_input;
     int i_read_orig = i_read;
     int i_total = 0;
-
-    if( s->p_parent && s->p_parent->p_parent &&
-        vlc_internals( s->p_parent->p_parent )->i_object_type == VLC_OBJECT_INPUT )
-        p_input = (input_thread_t *)s->p_parent->p_parent;
 
     if( !p_sys->i_list )
     {
@@ -1749,14 +1745,10 @@ static block_t *AReadBlock( stream_t *s, bool *pb_eof )
 {
     stream_sys_t *p_sys = s->p_sys;
     access_t *p_access = p_sys->p_access;
-    input_thread_t *p_input = NULL;
+    input_thread_t *p_input = s->p_input;
     block_t *p_block;
     bool b_eof;
     int i_total = 0;
-
-    if( s->p_parent && s->p_parent->p_parent &&
-        vlc_internals( s->p_parent->p_parent )->i_object_type == VLC_OBJECT_INPUT )
-        p_input = (input_thread_t *)s->p_parent->p_parent;
 
     if( !p_sys->i_list )
     {
