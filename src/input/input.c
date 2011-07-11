@@ -323,7 +323,7 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
 
     /* Allocate descriptor */
     p_input = vlc_custom_create( p_parent, sizeof( *p_input ),
-                                 VLC_OBJECT_INPUT, input_name );
+                                 VLC_OBJECT_GENERIC, input_name );
     if( p_input == NULL )
         return NULL;
 
