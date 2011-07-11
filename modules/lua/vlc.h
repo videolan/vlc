@@ -135,19 +135,19 @@ int vlclua_dofile( vlc_object_t *p_this, lua_State *L, const char *url );
 /*****************************************************************************
  * Playlist and meta data internal utilities.
  *****************************************************************************/
-void __vlclua_read_options( vlc_object_t *, lua_State *, int *, char *** );
-#define vlclua_read_options(a,b,c,d) __vlclua_read_options(VLC_OBJECT(a),b,c,d)
-void __vlclua_read_meta_data( vlc_object_t *, lua_State *, input_item_t * );
-#define vlclua_read_meta_data(a,b,c) __vlclua_read_meta_data(VLC_OBJECT(a),b,c)
-void __vlclua_read_custom_meta_data( vlc_object_t *, lua_State *,
-                                     input_item_t *);
-#define vlclua_read_custom_meta_data(a,b,c) __vlclua_read_custom_meta_data(VLC_OBJECT(a),b,c)
-int __vlclua_playlist_add_internal( vlc_object_t *, lua_State *, playlist_t *,
-                                    input_item_t *, bool );
-#define vlclua_playlist_add_internal(a,b,c,d,e) __vlclua_playlist_add_internal(VLC_OBJECT(a),b,c,d,e)
+void vlclua_read_options( vlc_object_t *, lua_State *, int *, char *** );
+#define vlclua_read_options( a, b, c, d ) vlclua_read_options( VLC_OBJECT( a ), b, c, d )
+void vlclua_read_meta_data( vlc_object_t *, lua_State *, input_item_t * );
+#define vlclua_read_meta_data( a, b, c ) vlclua_read_meta_data( VLC_OBJECT( a ), b, c )
+void vlclua_read_custom_meta_data( vlc_object_t *, lua_State *,
+                                   input_item_t *);
+#define vlclua_read_custom_meta_data( a, b, c ) vlclua_read_custom_meta_data( VLC_OBJECT( a ), b, c )
+int vlclua_playlist_add_internal( vlc_object_t *, lua_State *, playlist_t *,
+                                  input_item_t *, bool );
+#define vlclua_playlist_add_internal( a, b, c, d, e ) vlclua_playlist_add_internal( VLC_OBJECT( a ), b, c, d, e )
 
-int __vlclua_add_modules_path( vlc_object_t *, lua_State *, const char *psz_filename );
-#define vlclua_add_modules_path( a, b, c ) __vlclua_add_modules_path(VLC_OBJECT(a), b, c)
+int vlclua_add_modules_path( vlc_object_t *, lua_State *, const char *psz_filename );
+#define vlclua_add_modules_path( a, b, c ) vlclua_add_modules_path( VLC_OBJECT( a ), b, c )
 
 /**
  * Per-interface private state

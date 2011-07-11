@@ -263,8 +263,9 @@ static int vlclua_libvlc_command( lua_State *L )
     return vlclua_push_ret( L, i_ret );
 }
 
-int __vlclua_var_toggle_or_set( lua_State *L, vlc_object_t *p_obj,
-                                const char *psz_name )
+#undef vlclua_var_toggle_or_set
+int vlclua_var_toggle_or_set( lua_State *L, vlc_object_t *p_obj,
+                              const char *psz_name )
 {
     bool b_bool;
     if( lua_gettop( L ) > 1 ) return vlclua_error( L );

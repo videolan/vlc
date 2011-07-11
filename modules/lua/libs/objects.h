@@ -25,10 +25,10 @@
 #ifndef VLC_LUA_OBJECTS_H
 #define VLC_LUA_OBJECTS_H
 
-int __vlclua_push_vlc_object( lua_State *L, vlc_object_t *p_obj,
+int vlclua_push_vlc_object( lua_State *L, vlc_object_t *p_obj,
                               lua_CFunction pf_gc );
 #define vlclua_push_vlc_object( a, b, c ) \
-        __vlclua_push_vlc_object( a, VLC_OBJECT( b ), c )
+        vlclua_push_vlc_object( a, VLC_OBJECT( b ), c )
 int vlclua_gc_release( lua_State *L );
 
 #endif

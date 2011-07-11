@@ -372,8 +372,9 @@ char *vlclua_find_file( vlc_object_t *p_this, const char *psz_luadirname, const 
  * Meta data setters utility.
  * Playlist item table should be on top of the stack when these are called
  *****************************************************************************/
-void __vlclua_read_meta_data( vlc_object_t *p_this, lua_State *L,
-                              input_item_t *p_input )
+#undef vlclua_read_meta_data
+void vlclua_read_meta_data( vlc_object_t *p_this, lua_State *L,
+                            input_item_t *p_input )
 {
 #define TRY_META( a, b )                                        \
     lua_getfield( L, -1, a );                                   \
@@ -406,7 +407,8 @@ void __vlclua_read_meta_data( vlc_object_t *p_this, lua_State *L,
     TRY_META( "trackid", TrackID );
 }
 
-void __vlclua_read_custom_meta_data( vlc_object_t *p_this, lua_State *L,
+#undef vlclua_read_custom_meta_data
+void vlclua_read_custom_meta_data( vlc_object_t *p_this, lua_State *L,
                                      input_item_t *p_input )
 {
     /* Lock the input item and create the meta table if needed */
@@ -451,7 +453,8 @@ void __vlclua_read_custom_meta_data( vlc_object_t *p_this, lua_State *L,
 /**
  * Playlist item table should be on top of the stack when this is called
  */
-void __vlclua_read_options( vlc_object_t *p_this, lua_State *L,
+#undef vlclua_read_options
+void vlclua_read_options( vlc_object_t *p_this, lua_State *L,
                             int *pi_options, char ***pppsz_options )
 {
     lua_getfield( L, -1, "options" );
@@ -477,7 +480,8 @@ void __vlclua_read_options( vlc_object_t *p_this, lua_State *L,
     lua_pop( L, 1 ); /* pop "options" */
 }
 
-int __vlclua_playlist_add_internal( vlc_object_t *p_this, lua_State *L,
+#undef vlclua_playlist_add_internal
+int vlclua_playlist_add_internal( vlc_object_t *p_this, lua_State *L,
                                     playlist_t *p_playlist,
                                     input_item_t *p_parent, bool b_play )
 {
@@ -750,7 +754,8 @@ static int vlclua_add_modules_path_inner( lua_State *L, const char *psz_path )
     return count;
 }
 
-int __vlclua_add_modules_path( vlc_object_t *obj, lua_State *L, const char *psz_filename )
+#undef vlclua_add_modules_path
+int vlclua_add_modules_path( vlc_object_t *obj, lua_State *L, const char *psz_filename )
 {
     /* Setup the module search path:
      *   * "The script's directory"/modules

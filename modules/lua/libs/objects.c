@@ -51,29 +51,6 @@ typedef struct
 /*****************************************************************************
  * Generic vlc_object_t wrapper creation
  *****************************************************************************/
-int __vlclua_push_vlc_object( lua_State *L, vlc_object_t *p_obj,
-                              lua_CFunction pf_gc )
-{
-    vlc_object_t **udata = (vlc_object_t **)
-        lua_newuserdata( L, sizeof( vlc_object_t * ) );
-    *udata = p_obj;
-
-    if( luaL_newmetatable( L, "vlc_object" ) )
-    {
-        /* Hide the metatable */
-        lua_pushliteral( L, "none of your business" );
-        lua_setfield( L, -2, "__metatable" );
-        if( pf_gc ) /* FIXME */
-        {
-            /* Set the garbage collector if needed */
-            lua_pushcfunction( L, pf_gc );
-            lua_setfield( L, -2, "__gc" );
-        }
-    }
-    lua_setmetatable( L, -2 );
-    return 1;
-}
-
 int vlclua_gc_release( lua_State *L )
 {
     vlc_object_t **p_obj = (vlc_object_t **)luaL_checkudata( L, 1, "vlc_object" );
@@ -115,6 +92,30 @@ static int vlclua_get_input( lua_State *L )
         vlclua_push_vlc_object( L, p_input, vlclua_gc_release );
     }
     else lua_pushnil( L );
+    return 1;
+}
+
+#undef vlclua_push_vlc_object
+int vlclua_push_vlc_object( lua_State *L, vlc_object_t *p_obj,
+                              lua_CFunction pf_gc )
+{
+    vlc_object_t **udata = (vlc_object_t **)
+        lua_newuserdata( L, sizeof( vlc_object_t * ) );
+    *udata = p_obj;
+
+    if( luaL_newmetatable( L, "vlc_object" ) )
+    {
+        /* Hide the metatable */
+        lua_pushliteral( L, "none of your business" );
+        lua_setfield( L, -2, "__metatable" );
+        if( pf_gc ) /* FIXME */
+        {
+            /* Set the garbage collector if needed */
+            lua_pushcfunction( L, pf_gc );
+            lua_setfield( L, -2, "__gc" );
+        }
+    }
+    lua_setmetatable( L, -2 );
     return 1;
 }
 
