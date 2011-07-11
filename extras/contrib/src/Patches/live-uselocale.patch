@@ -68,7 +68,7 @@ diff -urN live.orig/liveMedia/Locale.cpp live/liveMedia/Locale.cpp
  }
 --- live.orig/liveMedia/RTSPClient.cpp	2010-03-16 03:09:46.000000000 +0100
 +++ live/liveMedia/RTSPClient.cpp	2010-08-24 15:04:31.000000000 +0200
-@@ -1019,7 +1019,7 @@
+@@ -469,7 +469,7 @@
      // This is the default value; we don't need a "Scale:" header:
      buf[0] = '\0';
    } else {
@@ -77,7 +77,7 @@ diff -urN live.orig/liveMedia/Locale.cpp live/liveMedia/Locale.cpp
      sprintf(buf, "Scale: %f\r\n", scale);
    }
  
-@@ -1033,11 +1033,11 @@
+@@ -483,11 +483,11 @@
      buf[0] = '\0';
    } else if (end < 0) {
      // There's no end time:
@@ -91,8 +91,6 @@ diff -urN live.orig/liveMedia/Locale.cpp live/liveMedia/Locale.cpp
      sprintf(buf, "Range: npt=%.3f-%.3f\r\n", start, end);
    }
  
---- live/liveMedia/RTSPClient.cpp	2010-08-24 17:05:46.000000000 +0200
-+++ live.new/liveMedia/RTSPClient.cpp	2010-08-24 17:04:50.000000000 +0200
 @@ -935,7 +935,7 @@
  }
  
