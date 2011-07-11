@@ -43,6 +43,7 @@ VLC_API int vlc_mkdir( const char *filename, mode_t mode );
 
 VLC_API int vlc_unlink( const char *filename );
 VLC_API int vlc_rename( const char *oldpath, const char *newpath );
+VLC_API char *vlc_getcwd( void ) VLC_USED;
 
 #if defined( WIN32 )
 # ifndef UNDER_CE

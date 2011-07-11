@@ -467,6 +467,7 @@ vlc_stat
 vlc_strcasestr
 vlc_unlink
 vlc_rename
+vlc_getcwd
 vlc_dup
 vlc_pipe
 vlc_accept

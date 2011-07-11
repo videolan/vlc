@@ -307,6 +307,53 @@ error:
 }
 
 /**
+ * Determines the current working directory.
+ *
+ * @return the current working directory (must be free()'d)
+ *         or NULL on error
+ */
+char *vlc_getcwd (void)
+{
+    /* Try $PWD */
+    const char *pwd = getenv ("PWD");
+    if (pwd != NULL)
+    {
+        struct stat s1, s2;
+        /* Make sure $PWD is correct */
+        if (stat (pwd, &s1) == 0 && stat (".", &s2) == 0
+         && s1.st_dev == s2.st_dev && s1.st_ino == s2.st_ino)
+            return ToLocaleDup (pwd);
+    }
+
+    /* Otherwise iterate getcwd() until the buffer is big enough */
+    long path_max = pathconf (".", _PC_PATH_MAX);
+    size_t size = (path_max == -1 || path_max > 4096) ? 4096 : path_max;
+
+    for (;; size *= 2)
+    {
+        char *buf = malloc (size);
+        if (unlikely(buf == NULL))
+            break;
+
+        if (getcwd (buf, size) != NULL)
+#ifdef ASSUME_UTF8
+            return buf;
+#else
+        {
+            char *ret = ToLocaleDup (buf);
+            free (buf);
+            return ret; /* success */
+        }
+#endif
+        free (buf);
+
+        if (errno != ERANGE)
+            break;
+    }
+    return NULL;
+}
+
+/**
  * Duplicates a file descriptor. The new file descriptor has the close-on-exec
  * descriptor flag set.
  * @return a new file descriptor or -1

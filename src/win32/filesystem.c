@@ -108,6 +108,17 @@ int vlc_mkdir( const char *dirname, mode_t mode )
 #endif
 }
 
+char *vlc_getcwd (void)
+{
+    wchar_t *wdir = _wgetcwd (NULL, 0);
+    if (wdir == NULL)
+        return NULL;
+
+    char *dir = FromWide (wdir);
+    free (wdir);
+    return dir;
+}
+
 /* Under Windows, these wrappers return the list of drive letters
  * when called with an empty argument or just '\'. */
 typedef struct vlc_DIR
