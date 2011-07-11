@@ -96,6 +96,7 @@
 #define FOURCC_rtp  VLC_FOURCC( 'r', 't', 'p', ' ' )
 
 #define FOURCC_isom VLC_FOURCC( 'i', 's', 'o', 'm' )
+#define FOURCC_3gp4 VLC_FOURCC( '3', 'g', 'p', '4' )
 #define FOURCC_esds VLC_FOURCC( 'e', 's', 'd', 's' )
 
 #define FOURCC__mp3 VLC_FOURCC( '.', 'm', 'p', '3' )

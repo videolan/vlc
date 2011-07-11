@@ -334,6 +334,9 @@ static int Open( vlc_object_t * p_this )
                          "ISO Media file (isom) version %d.",
                          p_ftyp->data.p_ftyp->i_minor_version );
                 break;
+            case( FOURCC_3gp4 ):
+                msg_Dbg( p_demux, "3gp Media file version 4" );
+                break;
             default:
                 msg_Dbg( p_demux,
                          "unrecognized major file specification (%4.4s).",
