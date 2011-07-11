@@ -70,9 +70,11 @@ static int vlclua_preamp_get( lua_State *L )
     char *psz_af = var_GetNonEmptyString( p_aout, "audio-filter" );
     if( strstr ( psz_af, "equalizer" ) == NULL )
     {
+        free( psz_af );
         vlc_object_release( p_aout );
         return 0;
     }
+    free( psz_af );
 
     lua_pushnumber( L, var_GetFloat( p_aout, "equalizer-preamp") );
     vlc_object_release( p_aout );
@@ -97,9 +99,11 @@ static int vlclua_preamp_set( lua_State *L )
     char *psz_af = var_GetNonEmptyString( p_aout, "audio-filter" );
     if( strstr ( psz_af, "equalizer" ) == NULL )
     {
+        free( psz_af );
         vlc_object_release( p_aout );
         return 0;
     }
+    free( psz_af );
 
     var_SetFloat( p_aout, "equalizer-preamp", luaL_checknumber( L, 1 ) );
     vlc_object_release( p_aout );
@@ -138,25 +142,28 @@ static int vlclua_equalizer_get( lua_State *L )
     char *psz_af = var_GetNonEmptyString( p_aout, "audio-filter" );
     if( strstr ( psz_af, "equalizer" ) == NULL )
     {
+        free( psz_af );
         vlc_object_release( p_aout );
         return 0;
     }
+    free( psz_af );
 
     int bandid = luaL_checknumber( L, 1 );
-    char *bands = var_GetNonEmptyString( p_aout, "equalizer-bands" );
+    char *psz_bands_origin, *psz_bands;
+    psz_bands_origin = psz_bands = var_GetNonEmptyString( p_aout, "equalizer-bands" );
     locale_t loc = newlocale (LC_NUMERIC_MASK, "C", NULL);
     locale_t oldloc = uselocale (loc);
     while( bandid >= 0 )
     {
-        level = strtof( bands, &bands);
+        level = strtof( psz_bands, &psz_bands);
         bandid--;
     }
+    free( psz_bands_origin );
     if (loc != (locale_t)0)
     {
         uselocale (oldloc);
         freelocale (loc);
     }
-
 
     vlc_object_release( p_aout );
     if( bandid == -1 )
@@ -187,9 +194,11 @@ static int vlclua_equalizer_set( lua_State *L )
     char *psz_af = var_GetNonEmptyString( p_aout, "audio-filter" );
     if( strstr ( psz_af, "equalizer" ) == NULL )
     {
+        free( psz_af );
         vlc_object_release( p_aout );
         return 0;
     }
+    free( psz_af );
 
     int bandid = luaL_checknumber( L, 1 );
     float level = luaL_checknumber( L, 2 );
