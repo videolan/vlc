@@ -94,22 +94,9 @@
          <string>Start Time</string>
         </property>
         <property name="buddy">
-         <cstring>startTimeDoubleSpinBox</cstring>
+         <cstring>startTimeTimeEdit</cstring>
         </property>
        </widget>
-      </item>
-      <item row="0" column="7">
-       <spacer>
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
       </item>
       <item row="1" column="2" colspan="6">
        <widget class="Line" name="line"/>
@@ -178,19 +165,22 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="5" colspan="2">
-       <widget class="QDoubleSpinBox" name="startTimeDoubleSpinBox">
+      <item row="0" column="5" colspan="3">
+       <widget class="QTimeEdit" name="startTimeTimeEdit">
         <property name="toolTip">
          <string>Change the start time for the media</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignRight</set>
         </property>
-        <property name="suffix">
-         <string>s</string>
+        <property name="currentSection">
+         <enum>QDateTimeEdit::SecondSection</enum>
         </property>
-        <property name="decimals">
-         <number>1</number>
+        <property name="displayFormat">
+         <string>HH'H':mm'm':ss's'.zzz</string>
+        </property>
+        <property name="timeSpec">
+         <enum>Qt::LocalTime</enum>
         </property>
        </widget>
       </item>
@@ -251,7 +241,7 @@
   <tabstop>Tab</tabstop>
   <tabstop>advancedCheckBox</tabstop>
   <tabstop>cacheSpinBox</tabstop>
-  <tabstop>startTimeDoubleSpinBox</tabstop>
+  <tabstop>startTimeTimeEdit</tabstop>
   <tabstop>slaveCheckbox</tabstop>
   <tabstop>slaveText</tabstop>
   <tabstop>slaveBrowseButton</tabstop>
