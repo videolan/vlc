@@ -632,7 +632,7 @@ libvlc_media_parse_async(libvlc_media_t *media)
     bool needed;
 
     vlc_mutex_lock(&media->parsed_lock);
-    needed = media->has_asked_preparse;
+    needed = !media->has_asked_preparse;
     media->has_asked_preparse = true;
     vlc_mutex_unlock(&media->parsed_lock);
 
