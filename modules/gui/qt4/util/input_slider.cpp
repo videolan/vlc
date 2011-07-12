@@ -507,8 +507,8 @@ SoundSlider::SoundSlider( QWidget *_parent, int _i_step, bool b_hard,
 
     QColor * foo;
     add_colors( gradient, gradient2, 0.0, 0, 1, 2 );
-    add_colors( gradient, gradient2, 0.22, 3, 4, 5 );
-    add_colors( gradient, gradient2, 0.5, 6, 7, 8 );
+    add_colors( gradient, gradient2, 0.45, 3, 4, 5 );
+    add_colors( gradient, gradient2, 0.55, 6, 7, 8 );
     add_colors( gradient, gradient2, 1.0, 9, 10, 11 );
 
     QPainter painter( &pixGradient );

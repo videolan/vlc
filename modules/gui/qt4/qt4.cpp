@@ -259,7 +259,7 @@ vlc_module_begin ()
     add_bool( "qt-error-dialogs", true, ERROR_TEXT,
               ERROR_TEXT, false )
 
-    add_string( "qt-slider-colours", "255;255;255;20;210;20;255;199;15;245;39;29",
+    add_string( "qt-slider-colours", "153;210;153;20;210;20;255;199;15;245;39;29",
                 SLIDERCOL_TEXT, SLIDERCOL_LONGTEXT, false )
 
     add_bool( "qt-privacy-ask", true, PRIVACY_TEXT, PRIVACY_TEXT,
