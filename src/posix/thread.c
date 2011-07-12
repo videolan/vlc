@@ -405,17 +405,14 @@ int vlc_cond_timedwait (vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex,
     struct timespec ts = { d.quot, d.rem * (1000000000 / CLOCK_FREQ) };
 
     int val = pthread_cond_timedwait_relative_np(p_condvar, p_mutex, &ts);
-    if (val != ETIMEDOUT)
-        VLC_THREAD_ASSERT ("timed-waiting on condition");
-    return val;
 #else
     lldiv_t d = lldiv( deadline, CLOCK_FREQ );
     struct timespec ts = { d.quot, d.rem * (1000000000 / CLOCK_FREQ) };
     int val = pthread_cond_timedwait (p_condvar, p_mutex, &ts);
+#endif
     if (val != ETIMEDOUT)
         VLC_THREAD_ASSERT ("timed-waiting on condition");
     return val;
-#endif
 }
 
 /**
