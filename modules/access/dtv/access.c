@@ -554,7 +554,16 @@ static const delsys_t *GuessSystem (const char *scheme, dvb_device_t *dev)
     if (!strcasecmp (scheme, "dvb-t2"))
         return &dvbt2;
 
-    return dvb_guess_system (dev);
+    unsigned systems = dvb_enum_systems (dev);
+    if (systems & ATSC)
+        return &atsc;
+    if (systems & DVB_C)
+        return &dvbc;
+    if (systems & DVB_S)
+        return &dvbc;
+    if (systems & DVB_T)
+        return &dvbt;
+    return NULL;
 }
 
 /** Set parameters and tune the device */
