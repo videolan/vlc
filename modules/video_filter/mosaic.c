@@ -240,9 +240,7 @@ static const char *const ppsz_filter_options[] = {
  * parse the "--mosaic-offsets x1,y1,x2,y2,x3,y3" parameter
  * and set the corresponding struct filter_sys_t entries.
  *****************************************************************************/
-#define mosaic_ParseSetOffsets( a, b, c ) \
-      __mosaic_ParseSetOffsets( VLC_OBJECT( a ), b, c )
-static void __mosaic_ParseSetOffsets( vlc_object_t *p_this,
+static void mosaic_ParseSetOffsets( vlc_object_t *p_this,
                                       filter_sys_t *p_sys,
                                       char *psz_offsets )
 {
@@ -274,6 +272,8 @@ static void __mosaic_ParseSetOffsets( vlc_object_t *p_this,
         p_sys->i_offsets_length = i_index;
     }
 }
+#define mosaic_ParseSetOffsets( a, b, c ) \
+            mosaic_ParseSetOffsets( VLC_OBJECT( a ), b, c )
 
 /*****************************************************************************
  * CreateFiler: allocate mosaic video filter

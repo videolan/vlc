@@ -136,10 +136,8 @@ struct intf_sys_t
 #endif
 };
 
-#define msg_rc( ... ) __msg_rc( p_intf, __VA_ARGS__ )
-
 VLC_FORMAT(2, 3)
-static void __msg_rc( intf_thread_t *p_intf, const char *psz_fmt, ... )
+static void msg_rc( intf_thread_t *p_intf, const char *psz_fmt, ... )
 {
     va_list args;
     char fmt_eol[strlen (psz_fmt) + 3];
@@ -153,6 +151,7 @@ static void __msg_rc( intf_thread_t *p_intf, const char *psz_fmt, ... )
         net_vaPrintf( p_intf, p_intf->p_sys->i_socket, NULL, fmt_eol, args );
     va_end( args );
 }
+#define msg_rc( ... ) msg_rc( p_intf, __VA_ARGS__ )
 
 /*****************************************************************************
  * Module descriptor
