@@ -402,17 +402,6 @@ void vlc_object_kill( vlc_object_t *p_this )
     }
 }
 
-static int objnamecmp(const vlc_object_t *obj, const char *name)
-{
-    char *objname = vlc_object_get_name(obj);
-    if (objname == NULL)
-        return INT_MIN;
-
-    int ret = strcmp (objname, name);
-    free (objname);
-    return ret;
-}
-
 #undef vlc_object_find_name
 /**
  * Finds a named object and increment its reference count.
