@@ -479,9 +479,6 @@ enum input_query_e
     INPUT_DEL_INFO,   /* arg1= char* arg2= char*              res=can fail */
     INPUT_SET_NAME,   /* arg1= char* res=can fail    */
 
-    /* Input config options */
-    INPUT_ADD_OPTION,      /* arg1= char * arg2= char *  res=can fail*/
-
     /* Input properties */
     INPUT_GET_VIDEO_FPS,         /* arg1= double *        res=can fail */
 

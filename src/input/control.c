@@ -349,22 +349,6 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
             }
         }
 
-        case INPUT_ADD_OPTION:
-        {
-            const char *psz_option = va_arg( args, const char * );
-            const char *psz_value = va_arg( args, const char * );
-            char *str;
-            int i;
-
-            if( asprintf( &str, "%s=%s", psz_option, psz_value ) == -1 )
-                return VLC_ENOMEM;
-
-            i = input_item_AddOption( p_input->p->p_item, str,
-                                      VLC_INPUT_OPTION_UNIQUE );
-            free( str );
-            return i;
-        }
-
         case INPUT_GET_VIDEO_FPS:
             pf = (double*)va_arg( args, double * );
 
