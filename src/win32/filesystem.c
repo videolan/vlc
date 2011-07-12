@@ -48,20 +48,25 @@
 # include <tchar.h>
 #endif
 
-static int convert_path (const char *restrict path, wchar_t *restrict wpath)
+static wchar_t *widen_path (const char *path)
 {
-    if (!MultiByteToWideChar (CP_UTF8, 0, path, -1, wpath, MAX_PATH))
+    wchar_t *wpath;
+
+    errno = 0;
+    wpath = ToWide (path);
+    if (wpath == NULL)
     {
-        errno = ENOENT;
-        return -1;
+        if (errno == 0)
+            errno = ENOENT;
+        return NULL;
     }
-    wpath[MAX_PATH] = L'\0';
-    return 0;
+    return wpath;
 }
+
 #define CONVERT_PATH(path, wpath, err) \
-  wchar_t wpath[MAX_PATH+1]; \
-  if (convert_path (path, wpath)) \
-      return (err)
+    wchar_t *wpath = wide_path(path); \
+    if (wpath == NULL) return (err)
+
 
 int vlc_open (const char *filename, int flags, ...)
 {
@@ -81,9 +86,13 @@ int vlc_open (const char *filename, int flags, ...)
      * open() cannot open files with non-“ANSI” characters on Windows.
      * We use _wopen() instead. Same thing for mkdir() and stat().
      */
-    CONVERT_PATH(filename, wpath, -1);
-    return _wopen (wpath, flags, mode);
+    wchar_t *wpath = widen_path (filename);
+    if (wpath == NULL)
+        return -1;
 
+    int fd = _wopen (wpath, flags, mode);
+    free (wpath);
+    return fd;
 #endif
 }
 
@@ -101,10 +110,14 @@ int vlc_mkdir( const char *dirname, mode_t mode )
     /* mkdir converts internally to wchar */
     return _mkdir(dirname);
 #else
-    (void) mode;
-    CONVERT_PATH (dirname, wpath, -1);
-    return _wmkdir (wpath);
+    wchar_t *wpath = widen_path (dirname);
+    if (wpath == NULL)
+        return -1;
 
+    int ret = _wmkdir (wpath);
+    free (wpath);
+    (void) mode;
+    return ret;
 #endif
 }
 
@@ -134,15 +147,20 @@ typedef struct vlc_DIR
 
 DIR *vlc_opendir (const char *dirname)
 {
-    CONVERT_PATH (dirname, wpath, NULL);
+    wchar_t *wpath = widen_path (dirname);
+    if (wpath == NULL)
+        return NULL;
 
     vlc_DIR *p_dir = malloc (sizeof (*p_dir));
     if (unlikely(p_dir == NULL))
-        return NULL;
-
-    if (wpath == NULL || wpath[0] == '\0'
-     || (wcscmp (wpath, L"\\") == 0))
     {
+        free(wpath);
+        return NULL;
+    }
+
+    if (wpath[0] == L'\0' || (wcscmp (wpath, L"\\") == 0))
+    {
+        free (wpath);
         /* Special mode to list drive letters */
         p_dir->wdir = NULL;
 #ifdef UNDER_CE
@@ -153,16 +171,17 @@ DIR *vlc_opendir (const char *dirname)
         return (void *)p_dir;
     }
 
+    assert (wpath[0]); // wpath[1] is defined
+    p_dir->u.insert_dot_dot = !wcscmp (wpath + 1, L":\\");
+
     _WDIR *wdir = _wopendir (wpath);
+    free (wpath);
     if (wdir == NULL)
     {
         free (p_dir);
         return NULL;
     }
-
     p_dir->wdir = wdir;
-    assert (wpath[0]); // wpath[1] is defined
-    p_dir->u.insert_dot_dot = !wcscmp (wpath + 1, L":\\");
     return (void *)p_dir;
 }
 
@@ -212,8 +231,13 @@ int vlc_stat (const char *filename, struct stat *buf)
     /* _stat translates to wchar internally on WinCE */
     return _stat (filename, buf);
 #else
-    CONVERT_PATH (filename, wpath, -1);
-    return _wstati64 (wpath, buf);
+    wchar_t *wpath = widen_path (filename);
+    if (wpath == NULL)
+        return -1;
+
+    int ret = _wstati64 (wpath, buf);
+    free (wpath);
+    return ret;
 #endif
 }
 
@@ -228,31 +252,45 @@ int vlc_unlink (const char *filename)
     /*_open translates to wchar internally on WinCE*/
     return _unlink( filename );
 #else
-    CONVERT_PATH (filename, wpath, -1);
-    return _wunlink (wpath);
+    wchar_t *wpath = widen_path (filename);
+    if (wpath == NULL)
+        return -1;
+
+    int ret = _wunlink (wpath);
+    free (wpath);
+    return ret;
 #endif
 }
 
 int vlc_rename (const char *oldpath, const char *newpath)
 {
-    CONVERT_PATH (oldpath, wold, -1);
-    CONVERT_PATH (newpath, wnew, -1);
+    int ret = -1;
+
+    wchar_t *wold = widen_path (oldpath), *wnew = widen_path (newpath);
+    if (wold == NULL || wnew == NULL)
+        goto out;
+
 # ifdef UNDER_CE
     /* FIXME: errno support */
-    return MoveFileW (wold, wnew) ? 0 : -1;
+    if (MoveFileW (wold, wnew))
+        ret = 0;
 #else
     if (_wrename (wold, wnew) && (errno == EACCES || errno == EEXIST))
     {   /* Windows does not allow atomic file replacement */
         if (_wremove (wnew))
         {
             errno = EACCES; /* restore errno */
-            return -1;
+            goto out;
         }
         if (_wrename (wold, wnew))
-            return -1;
+            goto out;
     }
-    return 0;
+    ret = 0;
 #endif
+out:
+    free (wnew);
+    free (wold);
+    return ret;
 }
 
 int vlc_dup (int oldfd)

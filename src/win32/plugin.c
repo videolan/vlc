@@ -53,23 +53,23 @@ static char *GetWindowsError( void )
 int module_Load( vlc_object_t *p_this, const char *psz_file,
                  module_handle_t *p_handle, bool lazy )
 {
+    wchar_t *wfile = ToWide (psz_file);
+    if (wfile == NULL)
+        return -1;
+
     module_handle_t handle;
-
-    wchar_t psz_wfile[MAX_PATH];
-    MultiByteToWideChar( CP_UTF8, 0, psz_file, -1, psz_wfile, MAX_PATH );
-
-    (void) lazy;
 #ifndef UNDER_CE
     /* FIXME: this is not thread-safe -- Courmisch */
     UINT mode = SetErrorMode (SEM_FAILCRITICALERRORS);
     SetErrorMode (mode|SEM_FAILCRITICALERRORS);
 #endif
 
-    handle = LoadLibraryW( psz_wfile );
+    handle = LoadLibraryW (wfile);
 
 #ifndef UNDER_CE
     SetErrorMode (mode);
 #endif
+    free (wfile);
 
     if( handle == NULL )
     {
@@ -80,6 +80,7 @@ int module_Load( vlc_object_t *p_this, const char *psz_file,
     }
 
     *p_handle = handle;
+    (void) lazy;
     return 0;
 }
 
