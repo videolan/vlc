@@ -270,6 +270,7 @@ FunctionEnd
   !insertmacro ${_action} ".amr"
   !insertmacro ${_action} ".aob"
   !insertmacro ${_action} ".ape"
+  !insertmacro ${_action} ".caf"
   !insertmacro ${_action} ".cda"
   !insertmacro ${_action} ".dts"
   !insertmacro ${_action} ".flac"

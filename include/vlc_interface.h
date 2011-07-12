@@ -123,7 +123,7 @@ VLC_API void libvlc_Quit( libvlc_int_t * );
          } \
          msg_Info( p_intf, "VLC media player - %s", VERSION_MESSAGE ); \
          msg_Info( p_intf, "%s", COPYRIGHT_MESSAGE ); \
-         msg_Info( p_intf, _("\nWarning: if you can't access the GUI " \
+         msg_Info( p_intf, _("\nWarning: if you cannot access the GUI " \
                              "anymore, open a command-line window, go to the " \
                              "directory where you installed VLC and run " \
                              "\"vlc -I qt\"\n") )
@@ -193,6 +193,7 @@ typedef enum vlc_dialog {
     "*.aob;" \
     "*.ape;" \
     "*.awb;" \
+    "*.caf;" \
     "*.cda;" \
     "*.dts;" \
     "*.flac;"\
