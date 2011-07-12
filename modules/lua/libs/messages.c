@@ -54,7 +54,7 @@ static int vlclua_msg_dbg( lua_State *L )
     vlc_object_t *p_this = vlclua_get_this( L );
     int i;
     for( i = 1; i <= i_top; i++ )
-        msg_Dbg( p_this, "%s", luaL_checkstring( L, 1 ) );
+        msg_Dbg( p_this, "%s", luaL_checkstring( L, i ) );
     return 0;
 }
 
