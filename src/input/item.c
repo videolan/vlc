@@ -817,6 +817,7 @@ input_item_NewWithType( const char *psz_uri, const char *psz_name,
 
     p_input->i_id = vlc_atomic_inc(&last_input_id);
     vlc_gc_init( p_input, input_item_Destroy );
+    vlc_mutex_init( &p_input->lock );
 
     p_input->psz_name = NULL;
     if( psz_name )
@@ -852,7 +853,6 @@ input_item_NewWithType( const char *psz_uri, const char *psz_name,
     vlc_event_manager_register_event_type( p_em, vlc_InputItemInfoChanged );
     vlc_event_manager_register_event_type( p_em, vlc_InputItemErrorWhenReadingChanged );
 
-    vlc_mutex_init( &p_input->lock );
     if( type != ITEM_TYPE_UNKNOWN )
         p_input->i_type = type;
     p_input->b_fixed_name = false;
