@@ -37,6 +37,7 @@
 #include <unistd.h> /* fsync() */
 #include <signal.h>
 #include <errno.h>
+#include <time.h>
 
 #include <sched.h>
 #ifdef __linux__
@@ -66,6 +67,74 @@
 # include <sys/pset.h>
 #endif
 
+#if !defined (_POSIX_TIMERS)
+# define _POSIX_TIMERS (-1)
+#endif
+#if !defined (_POSIX_CLOCK_SELECTION)
+/* Clock selection was defined in 2001 and became mandatory in 2008. */
+# define _POSIX_CLOCK_SELECTION (-1)
+#endif
+#if !defined (_POSIX_MONOTONIC_CLOCK)
+# define _POSIX_MONOTONIC_CLOCK (-1)
+#endif
+
+#if (_POSIX_TIMERS > 0)
+static unsigned vlc_clock_prec;
+
+# if (_POSIX_CLOCK_SELECTION > 0)
+/* POSIX clock selection is needed so that vlc_cond_timewait() is consistent
+ * with mdate() and mwait(). Otherwise, the monotonic clock cannot be used.
+ * Fortunately, clock selection has become mandatory as of 2008 so that really
+ * only broken old systems still lack it. */
+
+#  if (_POSIX_MONOTONIC_CLOCK > 0)
+/* Compile-time POSIX monotonic clock support */
+#   define vlc_clock_id (CLOCK_MONOTONIC)
+
+#  elif (_POSIX_MONOTONIC_CLOCK == 0)
+/* Run-time POSIX monotonic clock support (see clock_setup() below) */
+static clockid_t vlc_clock_id;
+
+#  else
+/* No POSIX monotonic clock support */
+#   define vlc_clock_id (CLOCK_REALTIME)
+#   warning Monotonic clock not available. Expect timing issues.
+
+#  endif /* _POSIX_MONOTONIC_CLOKC */
+# else
+/* No POSIX clock selection. */
+#  define pthread_condattr_setclock(attr, clock) (attr, clock, 0)
+#  warning Clock selection not available. Expect timing issues.
+
+# endif /* _POSIX_CLOCK_SELECTION */
+
+static void vlc_clock_setup_once (void)
+{
+# if (_POSIX_MONOTONIC_CLOCK == 0)
+    long val = sysconf (_SC_MONOTONIC_CLOCK);
+    assert (val != 0);
+    vlc_clock_id = (val < 0) ? CLOCK_REALTIME : CLOCK_MONOTONIC;
+# endif
+
+    struct timespec res;
+    if (unlikely(clock_getres (vlc_clock_id, &res) != 0 || res.tv_sec != 0))
+        abort ();
+    vlc_clock_prec = (res.tv_nsec + 500) / 1000;
+}
+
+static pthread_once_t vlc_clock_once = PTHREAD_ONCE_INIT;
+
+# define vlc_clock_setup() \
+    pthread_once(&vlc_clock_once, vlc_clock_setup_once)
+
+#else /* _POSIX_TIMERS */
+
+# include <sys/time.h> /* gettimeofday() */
+# if defined (HAVE_DECL_NANOSLEEP) && !HAVE_DECL_NANOSLEEP
+int nanosleep (struct timespec *, struct timespec *);
+# endif
+
+#endif /* _POSIX_TIMERS */
 
 /**
  * Print a backtrace to the standard error for debugging purpose.
@@ -280,16 +349,10 @@ void vlc_cond_init (vlc_cond_t *p_condvar)
 {
     pthread_condattr_t attr;
 
+    vlc_clock_setup ();
     if (unlikely(pthread_condattr_init (&attr)))
         abort ();
-#if !defined (_POSIX_CLOCK_SELECTION)
-   /* Fairly outdated POSIX support (that was defined in 2001) */
-# define _POSIX_CLOCK_SELECTION (-1)
-#endif
-#if (_POSIX_CLOCK_SELECTION >= 0)
-    /* NOTE: This must be the same clock as the one in mtime.c */
-    pthread_condattr_setclock (&attr, CLOCK_MONOTONIC);
-#endif
+    pthread_condattr_setclock (&attr, vlc_clock_id);
 
     if (unlikely(pthread_cond_init (p_condvar, &attr)))
         abort ();
@@ -861,6 +924,89 @@ void vlc_control_cancel (int cmd, ...)
 {
     (void) cmd;
     assert (0);
+}
+
+/**
+ * Precision monotonic clock.
+ *
+ * In principles, the clock has a precision of 1 MHz. But the actual resolution
+ * may be much lower, especially when it comes to sleeping with mwait() or
+ * msleep(). Most general-purpose operating systems provide a resolution of
+ * only 100 to 1000 Hz.
+ *
+ * @warning The origin date (time value "zero") is not specified. It is
+ * typically the time the kernel started, but this is platform-dependent.
+ * If you need wall clock time, use gettimeofday() instead.
+ *
+ * @return a timestamp in microseconds.
+ */
+mtime_t mdate (void)
+{
+#if (_POSIX_TIMERS > 0)
+    struct timespec ts;
+
+    vlc_clock_setup ();
+    if (unlikely(clock_gettime (vlc_clock_id, &ts) != 0))
+        abort ();
+
+    return (INT64_C(1000000) * ts.tv_sec) + (ts.tv_nsec / 1000);
+
+#else
+    struct timeval tv;
+
+    if (unlikely(gettimeofday (&tv, NULL) != 0))
+        abort ();
+    return (INT64_C(1000000) * tv.tv_sec) + tv.tv_nsec;
+
+#endif
+}
+
+#undef mwait
+/**
+ * Waits until a deadline (possibly later due to OS scheduling).
+ * @param deadline timestamp to wait for (see mdate())
+ */
+void mwait (mtime_t deadline)
+{
+#if (_POSIX_TIMERS > 0)
+    vlc_clock_setup ();
+    /* If the deadline is already elapsed, or within the clock precision,
+     * do not even bother the system timer. */
+    deadline -= vlc_clock_prec;
+
+    lldiv_t d = lldiv (deadline, 1000000);
+    struct timespec ts = { d.quot, d.rem * 1000 };
+
+    while (clock_nanosleep (vlc_clock_id, TIMER_ABSTIME, &ts, NULL) == EINTR);
+
+#else
+    deadline -= mdate ();
+    if (deadline > 0)
+        msleep (deadline);
+
+#endif
+}
+
+#undef msleep
+/**
+ * Waits for an interval of time.
+ * @param delay how long to wait (in microseconds)
+ */
+void msleep (mtime_t delay)
+{
+    vlc_clock_setup ();
+
+    lldiv_t d = lldiv (delay, 1000000);
+    struct timespec ts = { d.quot, d.rem * 1000 };
+
+#if (_POSIX_TIMERS > 0)
+    while (clock_nanosleep (vlc_clock_id, 0, &ts, &ts) == EINTR);
+
+#else
+    while (nanosleep (&ts, &ts) == -1)
+        assert (errno == EINTR);
+
+#endif
 }
 
 

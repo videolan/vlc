@@ -55,67 +55,7 @@
  * Prototypes
  *****************************************************************************/
 VLC_API char * mstrtime( char *psz_buffer, mtime_t date );
-VLC_API mtime_t mdate( void );
-VLC_API void mwait( mtime_t date );
-VLC_API void msleep( mtime_t delay );
 VLC_API char * secstotimestr( char *psz_buffer, int32_t secs );
-
-# define VLC_HARD_MIN_SLEEP 10000   /* 10 milliseconds = 1 tick at 100Hz */
-
-#if defined (__GNUC__) \
- && ((__GNUC__ > 4) || (__GNUC__ == 4 && __GNUC_MINOR__ >= 3))
-/* Linux has 100, 250, 300 or 1000Hz
- *
- * HZ=100 by default on FreeBSD, but some architectures use a 1000Hz timer
- */
-# define VLC_SOFT_MIN_SLEEP 9000000 /* 9 seconds */
-
-static
-__attribute__((unused))
-__attribute__((noinline))
-__attribute__((error("sorry, cannot sleep for such short a time")))
-mtime_t impossible_delay( mtime_t delay )
-{
-    (void) delay;
-    return VLC_HARD_MIN_SLEEP;
-}
-
-static
-__attribute__((unused))
-__attribute__((noinline))
-__attribute__((warning("use proper event handling instead of short delay")))
-mtime_t harmful_delay( mtime_t delay )
-{
-    return delay;
-}
-
-# define check_delay( d ) \
-    ((__builtin_constant_p(d < VLC_HARD_MIN_SLEEP) \
-   && (d < VLC_HARD_MIN_SLEEP)) \
-       ? impossible_delay(d) \
-       : ((__builtin_constant_p(d < VLC_SOFT_MIN_SLEEP) \
-       && (d < VLC_SOFT_MIN_SLEEP)) \
-           ? harmful_delay(d) \
-           : d))
-
-static
-__attribute__((unused))
-__attribute__((noinline))
-__attribute__((error("deadlines can not be constant")))
-mtime_t impossible_deadline( mtime_t deadline )
-{
-    return deadline;
-}
-
-# define check_deadline( d ) \
-    (__builtin_constant_p(d) ? impossible_deadline(d) : d)
-#else
-# define check_delay(d) (d)
-# define check_deadline(d) (d)
-#endif
-
-#define msleep(d) msleep(check_delay(d))
-#define mwait(d) mwait(check_deadline(d))
 
 /*****************************************************************************
  * date_t: date incrementation without long-term rounding errors

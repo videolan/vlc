@@ -778,6 +778,45 @@ void vlc_control_cancel (int cmd, ...)
 }
 
 
+/*** Clock ***/
+mtime_t mdate (void)
+{
+    /* We don't need the real date, just the value of a high precision timer */
+    LARGE_INTEGER counter, freq;
+    if (!QueryPerformanceCounter (&counter)
+     || !QueryPerformanceFrequency (&freq))
+        abort();
+
+    /* Convert to from (1/freq) to microsecond resolution */
+    /* We need to split the division to avoid 63-bits overflow */
+    lldiv_t d = lldiv (counter.QuadPart, freq.QuadPart);
+
+    return (d.quot * 1000000) + ((d.rem * 1000000) / freq.QuadPart);
+}
+
+#undef mwait
+void mwait (mtime_t deadline)
+{
+    mtime_t delay;
+
+    vlc_testcancel();
+    while ((delay = (deadline - mdate())) > 0)
+    {
+        delay /= 1000;
+        if (unlikely(delay > 0x7fffffff))
+            delay = 0x7fffffff;
+        SleepEx (delay, TRUE);
+        vlc_testcancel();
+    }
+}
+
+#undef msleep
+void msleep (mtime_t delay)
+{
+    mwait (mdate () + delay);
+}
+
+
 /*** Timers ***/
 struct vlc_timer
 {

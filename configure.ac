@@ -566,6 +566,7 @@ dnl Check for system libs needed
 need_libc=false
 
 dnl Check for usual libc functions
+AC_CHECK_DECLS([nanosleep],,,[#include <time.h>])
 AC_CHECK_FUNCS([daemon fcntl fdopendir fstatvfs fork getenv getpwuid_r gettimeofday if_nameindex if_nametoindex isatty lstat memalign mmap openat pread posix_fadvise posix_madvise posix_memalign setlocale stricmp strnicmp uselocale])
 AC_REPLACE_FUNCS([asprintf atof atoll dirfd flockfile fsync getdelim getpid gmtime_r lldiv localtime_r nrand48 rewind setenv strcasecmp strcasestr strdup strlcpy strncasecmp strndup strnlen strsep strtof strtok_r strtoll swab tdestroy vasprintf])
 AC_CHECK_FUNCS(fdatasync,,
@@ -772,23 +773,19 @@ if test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"; then
 
   AC_CHECK_LIB(rt, clock_nanosleep, [
     VLC_ADD_LIBS([libvlccore],[-lrt])
-    AC_DEFINE(HAVE_CLOCK_NANOSLEEP, 1, [Define to 1 if you have clock_nanosleep.])
   ], [
+    AC_CHECK_FUNC(nanosleep,,[
+      AC_CHECK_LIB(rt,nanosleep, [
+        VLC_ADD_LIBS([libvlccore],[-lrt])
+      ], [
+        AC_CHECK_LIB(posix4,nanosleep, [
+          VLC_ADD_LIBS([libvlccore],[-lposix4])
+        ])
+      ])
+    ])
     dnl HP/UX port
     AC_CHECK_LIB(rt,sem_init, [VLC_ADD_LIBS([libvlccore],[-lrt])])
   ])
-
-  have_nanosleep=false
-  AC_CHECK_FUNCS(nanosleep,have_nanosleep=:,[
-    AC_CHECK_LIB(rt,nanosleep,
-      [VLC_ADD_LIBS([libvlccore],[-lrt]) have_nanosleep=:],
-      [AC_CHECK_LIB(posix4,nanosleep,
-          [VLC_ADD_LIBS([libvlccore],[-lposix4]) have_nanosleep=:])]
-    )
-  ])
-  if ${have_nanosleep}; then
-    AC_DEFINE(HAVE_NANOSLEEP, 1, [Define if nanosleep is available.])
-  fi
 fi # end "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"
 
 dnl Check for misc headers
@@ -832,28 +829,6 @@ if test ${SYS} != "mingw32" -a ${SYS} != "mingwce"
 then
     AC_MSG_WARN([Your platform does not support poll(). VLC has it's own poll() implementation, but it is only intended to be used on Windows. VLC might crash or be insecure when you see this message. Either switch to an OS with a proper poll() implementation, or implement one for your OS in VLC])
 fi
-])
-
-dnl Mac OS X and other OSes don't have declaration for nanosleep
-if test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"; then
-  AC_MSG_CHECKING(for nanosleep in time.h)
-  AC_EGREP_HEADER(nanosleep,time.h,[
-    AC_MSG_RESULT(yes)
-    AC_DEFINE(HAVE_DECL_NANOSLEEP, 1,
-              Define if <time.h> defines nanosleep.)
-  ],[
-    AC_MSG_RESULT(no)
-  ])
-fi # end "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"
-
-dnl Make sure we have timespecs
-AC_MSG_CHECKING(for timespec in sys/time.h)
-AC_EGREP_HEADER(timespec,sys/time.h,[
-  AC_MSG_RESULT(yes)
-  AC_DEFINE(HAVE_STRUCT_TIMESPEC, 1,
-            Define if <sys/time.h> defines struct timespec.)
-],[
-  AC_MSG_RESULT(no)
 ])
 
 dnl Check for threads library
