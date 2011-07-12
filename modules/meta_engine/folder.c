@@ -40,10 +40,6 @@
 #   include <sys/stat.h>
 #endif
 
-#ifndef MAX_PATH
-#   define MAX_PATH 250
-#endif
-
 static const char* cover_files[] = {
     "Folder.jpg",           /* Windows */
     "AlbumArtSmall.jpg",    /* Windows */
