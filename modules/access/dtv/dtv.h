@@ -26,6 +26,17 @@
 extern "C" {
 # endif
 
+enum {
+    ATSC   = 0x00000001,
+
+    DVB_C  = 0x00000010,
+    DVB_C2 = 0x00000020,
+    DVB_S  = 0x00000040,
+    DVB_S2 = 0x00000080,
+    DVB_T  = 0x00000100,
+    DVB_T2 = 0x00000200,
+};
+
 typedef struct delsys delsys_t;
 
 extern const delsys_t dvbc, dvbs, dvbs2, dvbt, dvbt2, atsc, cqam;
@@ -39,6 +50,7 @@ ssize_t dvb_read (dvb_device_t *, void *, size_t);
 int dvb_add_pid (dvb_device_t *, uint16_t);
 void dvb_remove_pid (dvb_device_t *, uint16_t);
 
+unsigned dvb_enum_systems (dvb_device_t *);
 const delsys_t *dvb_guess_system (dvb_device_t *);
 float dvb_get_signal_strength (dvb_device_t *);
 float dvb_get_snr (dvb_device_t *);

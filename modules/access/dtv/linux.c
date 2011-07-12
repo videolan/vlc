@@ -489,6 +489,56 @@ static int dvb_find_frontend (dvb_device_t *d, fe_type_t type, fe_caps_t caps)
     return -1;
 }
 
+/**
+ * Detects supported delivery systems.
+ * @return a bit mask of supported systems (zero on failure)
+ */
+unsigned dvb_enum_systems (dvb_device_t *d)
+{
+    unsigned systems = 0;
+
+    for (unsigned n = 0; n < 256; n++)
+    {
+        int fd = dvb_open_node (d->dir, "frontend", n, O_RDWR);
+        if (fd == -1)
+        {
+            if (errno == ENOENT)
+                break; /* all frontends already enumerated */
+            msg_Err (d->obj, "cannot access frontend %u; %m", n);
+            continue;
+        }
+
+        struct dvb_frontend_info info;
+        if (ioctl (fd, FE_GET_INFO, &info) < 0)
+        {
+            msg_Err (d->obj, "cannot get frontend %u info: %m", n);
+            close (fd);
+            continue;
+        }
+        close (fd);
+
+        /* Linux DVB lacks detection for non-DVB/non-ATSC demods */
+        static const unsigned types[] = {
+            [FE_QPSK] = DVB_S,
+            [FE_QAM] = DVB_C,
+            [FE_OFDM] = DVB_T,
+            [FE_ATSC] = ATSC,
+        };
+
+        if (((unsigned)info.type) >= sizeof (types) / sizeof (types[0]))
+        {
+            msg_Err (d->obj, "unknown frontend type %u", info.type);
+            continue;
+        }
+
+        unsigned sys = types[info.type];
+        if (info.caps & FE_CAN_2G_MODULATION)
+            sys |= sys << 1; /* DVB_foo -> DVB_foo|DVB_foo2 */
+        systems |= sys;
+    }
+    return systems;
+}
+
 const delsys_t *dvb_guess_system (dvb_device_t *d)
 {
     if (d->frontend == -1)

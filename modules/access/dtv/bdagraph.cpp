@@ -164,6 +164,11 @@ void dvb_remove_pid (dvb_device_t *, uint16_t)
 {
 }
 
+unsigned dvb_enum_systems (dvb_device_t *)
+{
+#warning TODO
+}
+
 const delsys_t *dvb_guess_system (dvb_device_t *)
 {
     return NULL;
