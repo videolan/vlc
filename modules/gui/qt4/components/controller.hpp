@@ -266,6 +266,8 @@ protected:
     virtual void leaveEvent( QEvent *event );
     virtual void keyPressEvent( QKeyEvent *event );
 
+    virtual void customEvent( QEvent *event );
+
 private slots:
     void showFSC();
     void planHideFSC();
@@ -274,8 +276,6 @@ private slots:
     void centerFSC( int );
 
 private:
-    virtual void customEvent( QEvent *event );
-
     QTimer *p_hideTimer;
 #if HAVE_TRANSPARENCY
     QTimer *p_slowHideTimer;
