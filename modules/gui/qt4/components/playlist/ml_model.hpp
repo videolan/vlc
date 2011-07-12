@@ -62,7 +62,7 @@ public:
     }
     virtual int getId( QModelIndex index ) const;
 
-    QVariant data( const QModelIndex &idx, int role = Qt::DisplayRole ) const;
+    QVariant data( const QModelIndex &idx, const int role = Qt::DisplayRole ) const;
     bool setData( const QModelIndex &idx, const QVariant &value,
                   int role = Qt::EditRole );
     ml_select_e columnType( int column ) const;

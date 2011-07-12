@@ -259,7 +259,7 @@ int MLModel::getId( QModelIndex index ) const
     return getItem( index )->id();
 }
 
-QVariant MLModel::data( const QModelIndex &index, int role ) const
+QVariant MLModel::data( const QModelIndex &index, const int role ) const
 {
     if( index.isValid() )
     {
