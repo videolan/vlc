@@ -52,9 +52,8 @@ static const char* ppsz_VideoExtensions[] = { EXTENSIONS_VIDEO_CSV, NULL };
 static int load( vlc_object_t* );
 static void unload( vlc_object_t* );
 
-static int CreateInputItemFromMedia( media_library_t *p_ml,
-                              input_item_t **pp_item,
-                              ml_media_t *p_media );
+static int CreateInputItemFromMedia( input_item_t **pp_item,
+                                     ml_media_t *p_media );
 
 
 struct ml_table_elt
@@ -1176,7 +1175,7 @@ input_item_t* GetInputItemFromMedia( media_library_t *p_ml, int i_media )
         ml_media_t* p_media = media_New( p_ml, i_media, ML_MEDIA, true );
         if( p_media == NULL )
             return NULL;
-        CreateInputItemFromMedia( p_ml, &p_item, p_media );
+        CreateInputItemFromMedia( &p_item, p_media );
         watch_add_Item( p_ml, p_item, p_media );
         ml_gc_decref( p_media );
     }
@@ -1349,16 +1348,13 @@ void CopyMediaToInputItem( input_item_t *p_item, ml_media_t *p_media )
 
 /**
  * @brief Copy a ml_media_t to an input_item_t
- * @param p_ml The Media Library object
  * @param pp_item A pointer to a new input_item (return value)
  * @param p_media The media to copy as an input item
  * @note This function is threadsafe
  */
-static int CreateInputItemFromMedia( media_library_t *p_ml,
-                              input_item_t **pp_item,
-                              ml_media_t *p_media )
+static int CreateInputItemFromMedia( input_item_t **pp_item,
+                                     ml_media_t *p_media )
 {
-    playlist_t *p_pl = pl_Get( p_ml );
     *pp_item = input_item_New( p_media->psz_uri, p_media->psz_title );
                                /* ITEM_TYPE_FILE ); */
     if( !*pp_item )
