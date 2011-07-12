@@ -58,6 +58,7 @@
 #   include <io.h>
 #   include <ctype.h>
 #   include <shlwapi.h>
+#   include <vlc_charset.h>
 #elif defined( __OS2__ )
 #   include <ctype.h>
 #else
@@ -175,11 +176,10 @@ int Open( vlc_object_t *p_this )
         }
 
 #ifdef WIN32
-        wchar_t wpath[MAX_PATH+1];
-        if (MultiByteToWideChar (CP_UTF8, 0, path, -1,
-                                 wpath, MAX_PATH)
-         && PathIsNetworkPathW (wpath))
+        wchar_t *wpath = ToWide (path);
+        if (wpath != NULL && PathIsNetworkPathW (wpath))
             is_remote = true;
+        free (wpath);
 # define IsRemote( fd ) ((void)fd, is_remote)
 #endif
     }
