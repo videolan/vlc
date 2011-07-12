@@ -244,6 +244,9 @@ create_toolbar_item( NSString * o_itemIdent, NSString * o_name, NSString * o_des
     [o_osd_lang_txt setStringValue: _NS("Preferred Subtitle Language")];
     [o_osd_osd_box setTitle: _NS("On Screen Display")];
     [o_osd_osd_ckb setTitle: _NS("Enable OSD")];
+    [o_osd_opacity_txt setStringValue: _NS("Opacity")];
+    [o_osd_forcebold_ckb setTitle: _NS("Force Bold")];
+    [o_osd_moreoptions_txt setStringValue: _NS("More options on background, shadow and outline are available in the advanced preferences.")];
 
     /* video */
     [o_video_black_ckb setTitle: _NS("Black screens in Fullscreen mode")];
@@ -575,22 +578,15 @@ static inline char * __config_GetLabel( vlc_object_t *p_this, const char *psz_na
     [self setupButton: o_osd_encoding_pop forStringList: "subsdec-encoding"];
     [self setupField: o_osd_lang_fld forOption: "sub-language" ];
 
-	if( module_exists( "quartztext" ) )
-	{
-		[self setupField: o_osd_font_fld forOption: "quartztext-font"];
-		[self setupButton: o_osd_font_color_pop forIntList: "quartztext-color"];
-		[self setupButton: o_osd_font_size_pop forIntList: "quartztext-rel-fontsize"];
-	}
-	else
-	{
-        /* fallback on freetype */
-		[self setupField: o_osd_font_fld forOption: "freetype-font"];
-		[self setupButton: o_osd_font_color_pop forIntList: "freetype-color"];
-		[self setupButton: o_osd_font_size_pop forIntList: "freetype-rel-fontsize"];
-		/* selector button is useless in this case */
-		[o_osd_font_btn setEnabled: NO];
-	}
-
+    [self setupField: o_osd_font_fld forOption: "freetype-font"];
+    [self setupButton: o_osd_font_color_pop forIntList: "freetype-color"];
+    [self setupButton: o_osd_font_size_pop forIntList: "freetype-rel-fontsize"];
+    i = config_GetInt( p_intf, "freetype-opacity" );
+    [o_osd_opacity_fld setIntValue: i];
+    [o_osd_opacity_sld setIntValue: i];
+    [o_osd_opacity_sld setToolTip: [NSString stringWithUTF8String: config_GetLabel( p_intf, "freetype-opacity")]];
+    [o_osd_opacity_fld setToolTip: [o_osd_opacity_sld toolTip]];
+    [self setupButton: o_osd_forcebold_ckb forBoolValue: "freetype-bold"];
 
     /********************
      * hotkeys settings *
@@ -897,19 +893,11 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
 
         config_PutPsz( p_intf, "sub-language", [[o_osd_lang_fld stringValue] UTF8String] );
 
-		if( module_exists( "quartztext" ) )
-		{
-			config_PutPsz( p_intf, "quartztext-font", [[o_osd_font_fld stringValue] UTF8String] );
-			SaveIntList( o_osd_font_color_pop, "quartztext-color" );
-			SaveIntList( o_osd_font_size_pop, "quartztext-rel-fontsize" );
-		}
-		else
-		{
-            /* fallback on freetype */
-			config_PutPsz( p_intf, "freetype-font", [[o_osd_font_fld stringValue] UTF8String] );
-			SaveIntList( o_osd_font_color_pop, "freetype-color" );
-			SaveIntList( o_osd_font_size_pop, "freetype-rel-fontsize" );
-		}
+        config_PutPsz( p_intf, "freetype-font", [[o_osd_font_fld stringValue] UTF8String] );
+        SaveIntList( o_osd_font_color_pop, "freetype-color" );
+        SaveIntList( o_osd_font_size_pop, "freetype-rel-fontsize" );
+        config_PutInt( p_intf, "freetype-opacity", [o_osd_opacity_sld intValue] );
+        config_PutInt( p_intf, "freetype-bold", [o_osd_forcebold_ckb state] );
         b_osdSettingChanged = NO;
     }
 
@@ -1045,6 +1033,12 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
 
 - (IBAction)osdSettingChanged:(id)sender
 {
+    if( sender == o_osd_opacity_fld )
+        [o_osd_opacity_sld setIntValue: [o_osd_opacity_fld intValue]];
+
+    if( sender == o_osd_opacity_sld )
+        [o_osd_opacity_fld setIntValue: [o_osd_opacity_sld intValue]];
+
     b_osdSettingChanged = YES;
 }
 
@@ -1055,20 +1049,17 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
 
 - (IBAction)showFontPicker:(id)sender
 {
-	if( module_exists( "quartztext" ) )
-	{
-		char * font = config_GetPsz( p_intf, "quartztext-font" );
-		NSString * fontFamilyName = font ? [NSString stringWithUTF8String: font] : nil;
-		free(font);
-		if( fontFamilyName )
-		{
-			NSFontDescriptor * fd = [NSFontDescriptor fontDescriptorWithFontAttributes:nil];
-			NSFont * font = [NSFont fontWithDescriptor:[fd fontDescriptorWithFamily:fontFamilyName] textTransform:nil];
-			[[NSFontManager sharedFontManager] setSelectedFont:font isMultiple:NO];
-		}
-		[[NSFontManager sharedFontManager] setTarget: self];
-		[[NSFontPanel sharedFontPanel] orderFront:self];
-	}
+    char * font = config_GetPsz( p_intf, "freetype-font" );
+    NSString * fontFamilyName = font ? [NSString stringWithUTF8String: font] : nil;
+    free(font);
+    if( fontFamilyName )
+    {
+        NSFontDescriptor * fd = [NSFontDescriptor fontDescriptorWithFontAttributes:nil];
+        NSFont * font = [NSFont fontWithDescriptor:[fd fontDescriptorWithFamily:fontFamilyName] textTransform:nil];
+        [[NSFontManager sharedFontManager] setSelectedFont:font isMultiple:NO];
+    }
+    [[NSFontManager sharedFontManager] setTarget: self];
+    [[NSFontPanel sharedFontPanel] orderFront:self];
 }
 
 - (void)changeFont:(id)sender

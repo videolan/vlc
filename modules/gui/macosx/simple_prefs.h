@@ -108,6 +108,11 @@
     IBOutlet id o_osd_lang_box;
     IBOutlet id o_osd_lang_fld;
     IBOutlet id o_osd_lang_txt;
+    IBOutlet id o_osd_opacity_txt;
+    IBOutlet id o_osd_opacity_fld;
+    IBOutlet id o_osd_opacity_sld;
+    IBOutlet id o_osd_forcebold_ckb;
+    IBOutlet id o_osd_moreoptions_txt;
     IBOutlet id o_osd_osd_box;
     IBOutlet id o_osd_osd_ckb;
     IBOutlet id o_osd_view;
