@@ -51,7 +51,6 @@ int dvb_add_pid (dvb_device_t *, uint16_t);
 void dvb_remove_pid (dvb_device_t *, uint16_t);
 
 unsigned dvb_enum_systems (dvb_device_t *);
-const delsys_t *dvb_guess_system (dvb_device_t *);
 float dvb_get_signal_strength (dvb_device_t *);
 float dvb_get_snr (dvb_device_t *);
 

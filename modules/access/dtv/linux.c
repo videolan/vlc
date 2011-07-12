@@ -539,37 +539,6 @@ unsigned dvb_enum_systems (dvb_device_t *d)
     return systems;
 }
 
-const delsys_t *dvb_guess_system (dvb_device_t *d)
-{
-    if (d->frontend == -1)
-    {
-        d->frontend = dvb_open_node (d->dir, "frontend", 0, O_RDWR);
-        if (d->frontend == -1)
-        {
-            msg_Err (d->obj, "cannot access frontend %u; %m", 0);
-            return NULL;
-        }
-
-        if (ioctl (d->frontend, FE_GET_INFO, &d->info) < 0)
-        {
-            msg_Err (d->obj, "cannot get frontend %u info: %m", 0);
-            close (d->frontend);
-            d->frontend = -1;
-            return NULL;
-        }
-    }
-
-    //bool v2 = d->info.caps & FE_CAN_2G_MODULATION;
-    switch (d->info.type)
-    {
-        case FE_QPSK: return /*v2 ? &dvbs2 :*/ &dvbs;
-        case FE_QAM:  return &dvbc;
-        case FE_OFDM: return /*v2 ? &dvbt2 :*/ &dvbt;
-        case FE_ATSC: return &atsc;
-    }
-    return NULL;
-}
-
 float dvb_get_signal_strength (dvb_device_t *d)
 {
     uint16_t strength;

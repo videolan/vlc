@@ -169,11 +169,6 @@ unsigned dvb_enum_systems (dvb_device_t *)
 #warning TODO
 }
 
-const delsys_t *dvb_guess_system (dvb_device_t *)
-{
-    return NULL;
-}
-
 float dvb_get_signal_strength (dvb_device_t *)
 {
     return 0.;
