@@ -1034,16 +1034,12 @@ void var_OptionParse( vlc_object_t *p_obj, const char *psz_option,
         ( !psz_value || !*psz_value ) ) goto cleanup; /* Invalid value */
 
     /* check if option is unsafe */
-    if( !trusted )
+    if( !trusted && !config_IsSafe( psz_name ) )
     {
-        module_config_t *p_config = config_FindConfig( p_obj, psz_name );
-        if( !p_config || !p_config->b_safe )
-        {
-            msg_Err( p_obj, "unsafe option \"%s\" has been ignored for "
-                            "security reasons", psz_name );
-            free( psz_name );
-            return;
-        }
+        msg_Err( p_obj, "unsafe option \"%s\" has been ignored for "
+                        "security reasons", psz_name );
+        free( psz_name );
+        return;
     }
 
     /* Create the variable in the input object.

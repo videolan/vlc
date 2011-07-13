@@ -89,6 +89,12 @@ int config_GetType( vlc_object_t *p_this, const char *psz_name )
     return i_type;
 }
 
+bool config_IsSafe( const char *name )
+{
+    module_config_t *p_config = config_FindConfig( NULL, name );
+    return p_config != NULL && p_config->b_safe;
+}
+
 #undef config_GetInt
 /*****************************************************************************
  * config_GetInt: get the value of an int variable
