@@ -619,7 +619,12 @@ void SoundSlider::paintEvent( QPaintEvent *e )
     const QRectF boundsO( 0, 0, pixOutside.width(), pixOutside.height() );
     painter.drawPixmap( boundsO, pixOutside, boundsO );
 
-    painter.setPen( palette().color( QPalette::Active, QPalette::Mid ) );
+    QColor background = palette().color( QPalette::Active, QPalette::Background );
+    QColor foreground = palette().color( QPalette::Active, QPalette::WindowText );
+    foreground.setHsv( foreground.hue(),
+                    ( background.saturation() + foreground.saturation() ) / 2,
+                    ( background.value() + foreground.value() ) / 2 );
+    painter.setPen( foreground );
     QFont font; font.setPixelSize( 9 );
     painter.setFont( font );
     const QRect rect( 0, 0, 34, 15 );
