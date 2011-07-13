@@ -49,10 +49,10 @@ src: using-src
 
 ifdef HAVE_DARWIN_OS
 
-CONTRIBREV=49
+CONTRIBREV=50
 
 contrib-macosx-$(ARCH)-$(CONTRIBREV).tar.bz2:
-	$(WGET) http://downloads.videolan.org/pub/videolan/testing/contrib/$@
+	$(WGET) http://downloads.videolan.org/pub/videolan/testing/contrib/macosx/$@
 
 .$(CONTRIBREV): contrib-macosx-$(ARCH)-$(CONTRIBREV).tar.bz2
 	@if test -d tmp; then \
