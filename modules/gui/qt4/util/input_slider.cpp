@@ -397,13 +397,18 @@ void SeekSlider::paintEvent( QPaintEvent *event )
         /* draw chapters tickpoints */
         if ( chapters && inputLength && size().width() )
         {
+            QColor background = palette().color( QPalette::Active, QPalette::Background );
+            QColor foreground = palette().color( QPalette::Active, QPalette::WindowText );
+            foreground.setHsv( foreground.hue(),
+                            ( background.saturation() + foreground.saturation() ) / 2,
+                            ( background.value() + foreground.value() ) / 2 );
             if ( orientation() == Qt::Horizontal ) /* TODO: vertical */
             {
                 QList<SeekPoint> points = chapters->getPoints();
                 foreach( SeekPoint point, points )
                 {
                     int x = point.time / 1000000.0 / inputLength * size().width();
-                    painter.setPen( QColor( 80, 80, 80 ) );
+                    painter.setPen( foreground );
                     painter.setBrush( Qt::NoBrush );
                     painter.drawLine( x, 0, x, CHAPTERSSPOTSIZE );
                     painter.drawLine( x, height(), x, height() - CHAPTERSSPOTSIZE );
