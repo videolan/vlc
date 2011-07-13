@@ -1,15 +1,17 @@
 # live555
 
-LIVEDOTCOM_URL := http://live555.com/liveMedia/public/live555-latest.tar.gz
+#LIVEDOTCOM_URL := http://live555.com/liveMedia/public/live555-latest.tar.gz
+LIVE555_FILE := live.2011.07.08.tar.gz
+LIVEDOTCOM_URL := http://live555sourcecontrol.googlecode.com/files/$(LIVE555_FILE)
 
 PKGS += live555
 
-$(TARBALLS)/live555-latest.tar.gz:
+$(TARBALLS)/$(LIVE555_FILE):
 	$(call download,$(LIVEDOTCOM_URL))
 
-.sum-live555: live555-latest.tar.gz
+.sum-live555: $(LIVE555_FILE)
 
-live555: live555-latest.tar.gz .sum-live555
+live555: $(LIVE555_FILE) .sum-live555
 	$(UNPACK)
 	patch -p0 < $(SRC)/live555/live-uselocale.patch
 	patch -p0 < $(SRC)/live555/live-inet_ntop.patch
