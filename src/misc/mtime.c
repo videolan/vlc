@@ -42,6 +42,8 @@
 #if !defined (_POSIX_TIMERS)
 # define _POSIX_TIMERS (-1)
 # include <sys/time.h>
+#elif defined __APPLE__
+# include <sys/time.h>
 #else
 # include <time.h> /* clock_gettime() */
 #endif
