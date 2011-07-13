@@ -1,0 +1,82 @@
+--- libupnp/configure.ac.orig	2011-02-09 00:55:44.000000000 +0100
++++ libupnp/configure.ac	2011-02-10 23:39:44.154929678 +0100
+@@ -397,7 +397,6 @@
+ AC_PROG_MAKE_SET
+ AC_PROG_EGREP
+ 
+-#
+ # Default compilation flags
+ #
+ echo "--------------------- Default compilation flags -------------------------------"
+@@ -531,39 +530,46 @@
+ # Checks for POSIX Threads
+ #
+ echo "--------------------------- pthread stuff -------------------------------------"
+-ACX_PTHREAD(
+-	[],
+-	[AC_MSG_ERROR([POSIX threads are required to build this program])])
++#ACX_PTHREAD(
++#	[],
++#	[AC_MSG_ERROR([POSIX threads are required to build this program])])
+ #
++PTHREAD_LIBS=" -lpthreadGC2 -lws2_32"
++PTHREAD_CFLAGS=" -DPTW32_STATIC_LIB -DUPNP_STATIC_LIB"
+ # Update environment variables for pthreads
+ #
+-CC="$PTHREAD_CC"
++#CC="$PTHREAD_CC"
+ CFLAGS="$PTHREAD_CFLAGS $CFLAGS"
+ LIBS="$PTHREAD_LIBS $LIBS"
++
++AC_SUBST(PTHREAD_LIBS)
++AC_SUBST(PTHREAD_CFLAGS)
++AC_SUBST(PTHREAD_CC)
++
+ #
+ # Determine if pthread_rwlock_t is available
+ #
+-echo "----------------------- pthread_rwlock_t stuff --------------------------------"
+-AC_MSG_CHECKING([if pthread_rwlock_t is available])
+-AC_LANG([C])
+-AC_COMPILE_IFELSE(
+-	[AC_LANG_PROGRAM(
+-		[#include <pthread.h>],
+-		[pthread_rwlock_t *x;])],
+-	[AC_DEFINE([UPNP_USE_RWLOCK], [1], [Use pthread_rwlock_t])
+-		AC_MSG_RESULT([yes, supported without any options])],
+-	[AC_COMPILE_IFELSE(
+-		[AC_LANG_PROGRAM(
+-			[#define _GNU_SOURCE
+-			#include <pthread.h>],
+-			[pthread_rwlock_t *x;])],
+-		[AC_DEFINE([UPNP_USE_RWLOCK], [1], [Use pthread_rwlock_t])
+-			CPPFLAGS="$CPPFLAGS -D_GNU_SOURCE"
+-			AC_MSG_RESULT([yes, definition of _GNU_SOURCE required])],
+-		[AC_DEFINE([UPNP_USE_RWLOCK], [0], [Do not use pthread_rwlock_t])
+-			AC_MSG_RESULT([no, needs to fallback to pthread_mutex])
+-			AC_MSG_ERROR([pthread_rwlock_t not available])])])
+-echo "-------------------------------------------------------------------------------"
++#echo "----------------------- pthread_rwlock_t stuff --------------------------------"
++#AC_MSG_CHECKING([if pthread_rwlock_t is available])
++#AC_LANG([C])
++#AC_COMPILE_IFELSE(
++#	[AC_LANG_PROGRAM(
++#		[#include <pthread.h>],
++#		[pthread_rwlock_t *x;])],
++#	[AC_DEFINE([UPNP_USE_RWLOCK], [1], [Use pthread_rwlock_t])
++#		AC_MSG_RESULT([yes, supported without any options])],
++#	[AC_COMPILE_IFELSE(
++#		[AC_LANG_PROGRAM(
++#			[#define _GNU_SOURCE
++#			#include <pthread.h>],
++#			[pthread_rwlock_t *x;])],
++#		[AC_DEFINE([UPNP_USE_RWLOCK], [1], [Use pthread_rwlock_t])
++#			CPPFLAGS="$CPPFLAGS -D_GNU_SOURCE"
++#			AC_MSG_RESULT([yes, definition of _GNU_SOURCE required])],
++#		[AC_DEFINE([UPNP_USE_RWLOCK], [0], [Do not use pthread_rwlock_t])
++#			AC_MSG_RESULT([no, needs to fallback to pthread_mutex])
++#			AC_MSG_ERROR([pthread_rwlock_t not available])])])
++#echo "-------------------------------------------------------------------------------"
+ 
+ 
+ AC_CONFIG_FILES([
