@@ -25,7 +25,6 @@ SOURCES_scale = scale.c
 SOURCES_marq = marq.c
 SOURCES_rss = rss.c
 SOURCES_motiondetect = motiondetect.c
-SOURCES_rv32 = rv32.c
 SOURCES_osdmenu = osdmenu.c
 SOURCES_remoteosd = remoteosd.c remoteosd_rfbproto.h
 SOURCES_magnify = magnify.c
@@ -116,7 +115,6 @@ libvlc_LTLIBRARIES += \
 	libripple_plugin.la \
 	librotate_plugin.la \
 	librss_plugin.la \
-	librv32_plugin.la \
 	libscale_plugin.la \
 	libscene_plugin.la \
 	libsepia_plugin.la \
