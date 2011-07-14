@@ -39,9 +39,8 @@ function parse()
         if string.match( line, "image_src" ) then
             _,_,arturl = string.find( line, "image_src\" href=\"(.*)\" />" )
         end
-
-        if string.match( line, "filmID" ) then
-            _,_,video = string.find( line, "var filmID = \'(.*)\';")
+        if string.match( line, "video_src" ) then
+            _,_,video = string.find( line, "href=\"http://video\.mpora\.com/ep/(.*).swf\" />" )
         end
 
     end
@@ -68,7 +67,7 @@ function parse()
         hd = vlc.stream("http://api.mpora.com/tv/player/playlist/vid/"..video.."/hd/true/")
         page = hd:read( 65653 )
         hdurl = string.match( page, "url=\"(.*)\" />")
-        table.insert( p, { path = hdurl; name = name.." (HD)"; arturl = arturl } )
+        table.insert( p, { path = hdurl; name = name.." (HD)"; arturl = arturl; } )
     end
 
     return p
