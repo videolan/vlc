@@ -137,6 +137,14 @@ int nanosleep (struct timespec *, struct timespec *);
 # define vlc_clock_setup() (void)0
 #endif /* _POSIX_TIMERS */
 
+static struct timespec mtime_to_ts (mtime_t date)
+{
+    lldiv_t d = lldiv (date, CLOCK_FREQ);
+    struct timespec ts = { d.quot, d.rem * (1000000000 / CLOCK_FREQ) };
+
+    return ts;
+}
+
 /**
  * Print a backtrace to the standard error for debugging purpose.
  */
@@ -466,13 +474,11 @@ int vlc_cond_timedwait (vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex,
     deadline -= base;
     if (deadline < 0)
         deadline = 0;
-    lldiv_t d = lldiv( deadline, CLOCK_FREQ );
-    struct timespec ts = { d.quot, d.rem * (1000000000 / CLOCK_FREQ) };
 
+    struct timespec ts = mtime_to_ts (deadline);
     int val = pthread_cond_timedwait_relative_np(p_condvar, p_mutex, &ts);
 #else
-    lldiv_t d = lldiv( deadline, CLOCK_FREQ );
-    struct timespec ts = { d.quot, d.rem * (1000000000 / CLOCK_FREQ) };
+    struct timespec ts = mtime_to_ts (deadline);
     int val = pthread_cond_timedwait (p_condvar, p_mutex, &ts);
 #endif
     if (val != ETIMEDOUT)
@@ -976,8 +982,7 @@ void mwait (mtime_t deadline)
      * do not even bother the system timer. */
     deadline -= vlc_clock_prec;
 
-    lldiv_t d = lldiv (deadline, 1000000);
-    struct timespec ts = { d.quot, d.rem * 1000 };
+    struct timespec ts = mtime_to_ts (deadline);
 
     while (clock_nanosleep (vlc_clock_id, TIMER_ABSTIME, &ts, NULL) == EINTR);
 
@@ -996,11 +1001,9 @@ void mwait (mtime_t deadline)
  */
 void msleep (mtime_t delay)
 {
+    struct timespec ts = mtime_to_ts (delay);
+
     vlc_clock_setup ();
-
-    lldiv_t d = lldiv (delay, 1000000);
-    struct timespec ts = { d.quot, d.rem * 1000 };
-
 #if (_POSIX_TIMERS > 0)
     while (clock_nanosleep (vlc_clock_id, 0, &ts, &ts) == EINTR);
 
