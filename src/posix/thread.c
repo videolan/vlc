@@ -134,6 +134,7 @@ static pthread_once_t vlc_clock_once = PTHREAD_ONCE_INIT;
 int nanosleep (struct timespec *, struct timespec *);
 # endif
 
+# define vlc_clock_setup() (void)0
 #endif /* _POSIX_TIMERS */
 
 /**
@@ -352,8 +353,9 @@ void vlc_cond_init (vlc_cond_t *p_condvar)
     vlc_clock_setup ();
     if (unlikely(pthread_condattr_init (&attr)))
         abort ();
+#if (_POSIX_CLOCK_SELECTION > 0)
     pthread_condattr_setclock (&attr, vlc_clock_id);
-
+#endif
     if (unlikely(pthread_cond_init (p_condvar, &attr)))
         abort ();
     pthread_condattr_destroy (&attr);
@@ -956,7 +958,7 @@ mtime_t mdate (void)
 
     if (unlikely(gettimeofday (&tv, NULL) != 0))
         abort ();
-    return (INT64_C(1000000) * tv.tv_sec) + tv.tv_nsec;
+    return (INT64_C(1000000) * tv.tv_sec) + tv.tv_usec;
 
 #endif
 }
