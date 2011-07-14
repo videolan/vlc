@@ -39,7 +39,10 @@
 #include <errno.h>
 #include <time.h>
 
+#include <pthread.h>
 #include <sched.h>
+#include <sys/time.h> /* gettimeofday() */
+
 #ifdef __linux__
 # include <sys/syscall.h> /* SYS_gettid */
 #endif
@@ -49,7 +52,6 @@
 #endif
 
 #ifdef __APPLE__
-# include <sys/time.h> /* gettimeofday in vlc_cond_timedwait */
 # include <mach/mach_init.h> /* mach_task_self in semaphores */
 # include <sys/sysctl.h>
 #endif
@@ -81,32 +83,20 @@
 #if (_POSIX_TIMERS > 0)
 static unsigned vlc_clock_prec;
 
-# if (_POSIX_CLOCK_SELECTION > 0)
-/* POSIX clock selection is needed so that vlc_cond_timewait() is consistent
- * with mdate() and mwait(). Otherwise, the monotonic clock cannot be used.
- * Fortunately, clock selection has become mandatory as of 2008 so that really
- * only broken old systems still lack it. */
-
-#  if (_POSIX_MONOTONIC_CLOCK > 0)
+# if (_POSIX_MONOTONIC_CLOCK > 0)
 /* Compile-time POSIX monotonic clock support */
-#   define vlc_clock_id (CLOCK_MONOTONIC)
+#  define vlc_clock_id (CLOCK_MONOTONIC)
 
-#  elif (_POSIX_MONOTONIC_CLOCK == 0)
+# elif (_POSIX_MONOTONIC_CLOCK == 0)
 /* Run-time POSIX monotonic clock support (see clock_setup() below) */
 static clockid_t vlc_clock_id;
 
-#  else
+# else
 /* No POSIX monotonic clock support */
 #   define vlc_clock_id (CLOCK_REALTIME)
 #   warning Monotonic clock not available. Expect timing issues.
 
-#  endif /* _POSIX_MONOTONIC_CLOKC */
-# else
-/* No POSIX clock selection. */
-#  define pthread_condattr_setclock(attr, clock) (attr, clock, 0)
-#  warning Clock selection not available. Expect timing issues.
-
-# endif /* _POSIX_CLOCK_SELECTION */
+# endif /* _POSIX_MONOTONIC_CLOKC */
 
 static void vlc_clock_setup_once (void)
 {
@@ -135,6 +125,7 @@ int nanosleep (struct timespec *, struct timespec *);
 # endif
 
 # define vlc_clock_setup() (void)0
+# warning Monotonic clock not available. Expect timing issues.
 #endif /* _POSIX_TIMERS */
 
 static struct timespec mtime_to_ts (mtime_t date)
@@ -466,21 +457,22 @@ void vlc_cond_wait (vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex)
 int vlc_cond_timedwait (vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex,
                         mtime_t deadline)
 {
-#if defined(__APPLE__) && !defined(__powerpc__) && !defined( __ppc__ ) && !defined( __ppc64__ )
-    /* mdate() is the monotonic clock, timedwait origin is gettimeofday() which
-     * isn't monotonic. Use imedwait_relative_np() instead
-    */
-    mtime_t base = mdate();
-    deadline -= base;
-    if (deadline < 0)
-        deadline = 0;
+#if (_POSIX_MONOTONIC_CLOCK > 0) && (_POSIX_CLOCK_SELECTION < 0)
+    /* Without clock selection, the real-time clock is used for the absolute
+     * timeout in pthread_cond_timedwait(). We may need to adjust. */
+# error FIXME: breaks vlc_cond_init_daytime()
+    if (vlc_clock_id != CLOCK_REALTIME)
+    {
+        struct timeval tv;
+
+        deadline -= mdate ();
+        gettimeofday (&tv, NULL);
+        deadline += tv.tv_sec * UINT64_C(1000000) + tv.tv_usec;
+    }
+#endif
 
     struct timespec ts = mtime_to_ts (deadline);
-    int val = pthread_cond_timedwait_relative_np(p_condvar, p_mutex, &ts);
-#else
-    struct timespec ts = mtime_to_ts (deadline);
     int val = pthread_cond_timedwait (p_condvar, p_mutex, &ts);
-#endif
     if (val != ETIMEDOUT)
         VLC_THREAD_ASSERT ("timed-waiting on condition");
     return val;
