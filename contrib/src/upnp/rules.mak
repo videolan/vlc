@@ -8,9 +8,8 @@ $(TARBALLS)/libupnp-$(UPNP_VERSION).tar.bz2:
 .sum-upnp: libupnp-$(UPNP_VERSION).tar.bz2
 
 ifdef HAVE_WIN32
-	PKGS += .pthreads
-	DEPS_upnp += pthreads $(DEPS_pthreads)
-	LIBUPNP_ECFLAGS = -DPTW32_STATIC_LIB
+DEPS_upnp += pthreads $(DEPS_pthreads)
+LIBUPNP_ECFLAGS = -DPTW32_STATIC_LIB
 endif
 
 upnp: libupnp-$(UPNP_VERSION).tar.bz2 .sum-upnp
