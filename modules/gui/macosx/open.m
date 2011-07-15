@@ -28,19 +28,17 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <stdlib.h>                                      /* malloc(), free() */
-#include <sys/param.h>                                    /* for MAXPATHLEN */
-#include <string.h>
+#import <stdlib.h>                                      /* malloc(), free() */
+#import <sys/param.h>                                    /* for MAXPATHLEN */
 
-#include <paths.h>
-#include <IOKit/IOKitLib.h>
-#include <IOKit/IOBSD.h>
-#include <IOKit/storage/IOMedia.h>
-#include <IOKit/storage/IOCDMedia.h>
-#include <IOKit/storage/IODVDMedia.h>
+#import <paths.h>
+#import <IOKit/IOBSD.h>
+#import <IOKit/storage/IOMedia.h>
+#import <IOKit/storage/IOCDMedia.h>
+#import <IOKit/storage/IODVDMedia.h>
+#import <IOKit/storage/IOBDMedia.h>
 #import <Cocoa/Cocoa.h>
 #import <QTKit/QTKit.h>
-#import <Foundation/NSobject.h>
 
 #import "intf.h"
 #import "playlist.h"
@@ -48,7 +46,7 @@
 #import "output.h"
 #import "eyetv.h"
 
-#include <vlc_url.h>
+#import <vlc_url.h>
 
 NSArray               *qtkvideoDevices;
 #define setEyeTVUnconnected \
@@ -58,86 +56,15 @@ NSArray               *qtkvideoDevices;
 [o_capture_long_lbl displayIfNeeded]; \
 [self showCaptureView: o_capture_label_view]
 
-/*****************************************************************************
- * GetEjectableMediaOfClass
- *****************************************************************************/
-NSArray *GetEjectableMediaOfClass( const char *psz_class )
-{
-    io_object_t next_media;
-    mach_port_t master_port;
-    kern_return_t kern_result;
-    NSArray *o_devices = nil;
-    NSMutableArray *p_list = nil;
-    io_iterator_t media_iterator;
-    CFMutableDictionaryRef classes_to_match;
+#define kVLCMediaAudioCD "AudioCD"
+#define kVLCMediaDVD "DVD"
+#define kVLCMediaVCD "VCD"
+#define kVLCMediaSVCD "SVCD"
+#define kVLCMediaBD "Bluray"
+#define kVLCMediaVideoTSFolder "VIDEO_TS"
+#define kVLCMediaBDMVFolder "BDMV"
+#define kVLCMediaUnknown "Unknown"
 
-    kern_result = IOMasterPort( MACH_PORT_NULL, &master_port );
-    if( kern_result != KERN_SUCCESS )
-    {
-        return( nil );
-    }
- 
-    classes_to_match = IOServiceMatching( psz_class );
-    if( classes_to_match == NULL )
-    {
-        return( nil );
-    }
- 
-    CFDictionarySetValue( classes_to_match, CFSTR( kIOMediaEjectableKey ),
-                          kCFBooleanTrue );
- 
-    kern_result = IOServiceGetMatchingServices( master_port, classes_to_match,
-                                                &media_iterator );
-    if( kern_result != KERN_SUCCESS )
-    {
-        return( nil );
-    }
-
-    p_list = [NSMutableArray arrayWithCapacity: 1];
- 
-    next_media = IOIteratorNext( media_iterator );
-    if( next_media )
-    {
-        char psz_buf[0x32];
-        size_t dev_path_length;
-        CFTypeRef str_bsd_path;
- 
-        do
-        {
-            str_bsd_path = IORegistryEntryCreateCFProperty( next_media,
-                                                            CFSTR( kIOBSDNameKey ),
-                                                            kCFAllocatorDefault,
-                                                            0 );
-            if( str_bsd_path == NULL )
-            {
-                IOObjectRelease( next_media );
-                continue;
-            }
- 
-            snprintf( psz_buf, sizeof(psz_buf), "%s%c", _PATH_DEV, 'r' );
-            dev_path_length = strlen( psz_buf );
- 
-            if( CFStringGetCString( str_bsd_path,
-                                    (char*)&psz_buf + dev_path_length,
-                                    sizeof(psz_buf) - dev_path_length,
-                                    kCFStringEncodingASCII ) )
-            {
-                [p_list addObject: [NSString stringWithUTF8String: psz_buf]];
-            }
- 
-            CFRelease( str_bsd_path );
- 
-            IOObjectRelease( next_media );
- 
-        } while( ( next_media = IOIteratorNext( media_iterator ) ) );
-    }
- 
-    IOObjectRelease( media_iterator );
-
-    o_devices = [NSArray arrayWithArray: p_list];
-
-    return( o_devices );
-}
 
 /*****************************************************************************
  * VLCOpen implementation
@@ -165,6 +92,8 @@ static VLCOpen *_o_sharedMainInstance = nil;
 
 - (void)dealloc
 {
+    [o_specialMediaFolders release];
+    [o_opticalDevices release];
     if( o_file_slave_path )
         [o_file_slave_path release];
     [o_mrl release];
@@ -190,16 +119,33 @@ static VLCOpen *_o_sharedMainInstance = nil;
     [o_file_slave_select_btn setTitle: _NS("Choose...")];
     [o_file_slave_filename_txt setStringValue: @""];
 
-    [o_disc_device_lbl setStringValue: _NS("Device name")];
-    [o_disc_title_lbl setStringValue: _NS("Title")];
-    [o_disc_chapter_lbl setStringValue: _NS("Chapter")];
-    [o_disc_videots_btn_browse setTitle: _NS("Browse...")];
-    [o_disc_dvd_menus setTitle: _NS("No DVD menus")];
-
-    [[o_disc_type cellAtRow:0 column:0] setTitle: _NS("VIDEO_TS folder")];
-    [[o_disc_type cellAtRow:1 column:0] setTitle: _NS("DVD")];
-    [[o_disc_type cellAtRow:2 column:0] setTitle: _NS("VCD")];
-    [[o_disc_type cellAtRow:3 column:0] setTitle: _NS("Audio CD")];
+    [o_disc_selector_pop removeAllItems];
+    [o_disc_selector_pop setHidden: NO];
+    NSString *o_videots = _NS("Open VIDEO_TS folder");
+    NSString *o_bdmv = _NS("Open BDMV folder");
+    [o_disc_nodisc_lbl setStringValue: _NS("Insert Disc")];
+    [o_disc_nodisc_videots_btn setTitle: o_videots];
+    [o_disc_nodisc_bdmv_btn setTitle: o_bdmv];
+    [o_disc_audiocd_lbl setStringValue: _NS("Audio CD")];
+    [o_disc_audiocd_trackcount_lbl setStringValue: @""];
+    [o_disc_audiocd_videots_btn setTitle: o_videots];
+    [o_disc_audiocd_bdmv_btn setTitle: o_bdmv];
+    [o_disc_dvd_lbl setStringValue: @""];
+    [o_disc_dvd_disablemenus_btn setTitle: _NS("Disable DVD menus")];
+    [o_disc_dvd_videots_btn setTitle: o_videots];
+    [o_disc_dvd_bdmv_btn setTitle: o_bdmv];
+    [o_disc_dvdwomenus_lbl setStringValue: @""];
+    [o_disc_dvdwomenus_enablemenus_btn setTitle: _NS("Enable DVD menus")];
+    [o_disc_dvdwomenus_videots_btn setTitle: o_videots];
+    [o_disc_dvdwomenus_bdmv_btn setTitle: o_bdmv];
+    [o_disc_dvdwomenus_title_lbl setStringValue: _NS("Title")];
+    [o_disc_dvdwomenus_chapter_lbl setStringValue: _NS("Chapter")];
+    [o_disc_vcd_title_lbl setStringValue: _NS("Title")];
+    [o_disc_vcd_chapter_lbl setStringValue: _NS("Chapter")];
+    [o_disc_vcd_videots_btn setTitle: o_videots];
+    [o_disc_vcd_bdmv_btn setTitle: o_bdmv];
+    [o_disc_bd_videots_btn setTitle: o_videots];
+    [o_disc_bd_bdmv_btn setTitle: o_bdmv];
 
     [o_net_udp_port_lbl setStringValue: _NS("Port")];
     [o_net_udpm_addr_lbl setStringValue: _NS("IP Address")];
@@ -272,23 +218,6 @@ static VLCOpen *_o_sharedMainInstance = nil;
         object: o_file_path];
 
     [[NSNotificationCenter defaultCenter] addObserver: self
-        selector: @selector(openDiscInfoChanged:)
-        name: NSControlTextDidChangeNotification
-        object: o_disc_device];
-    [[NSNotificationCenter defaultCenter] addObserver: self
-        selector: @selector(openDiscInfoChanged:)
-        name: NSControlTextDidChangeNotification
-        object: o_disc_title];
-    [[NSNotificationCenter defaultCenter] addObserver: self
-        selector: @selector(openDiscInfoChanged:)
-        name: NSControlTextDidChangeNotification
-        object: o_disc_chapter];
-    [[NSNotificationCenter defaultCenter] addObserver: self
-        selector: @selector(openDiscInfoChanged:)
-        name: NSControlTextDidChangeNotification
-        object: o_disc_videots_folder];
-
-    [[NSNotificationCenter defaultCenter] addObserver: self
         selector: @selector(openNetInfoChanged:)
         name: NSControlTextDidChangeNotification
         object: o_net_udp_port];
@@ -321,6 +250,15 @@ static VLCOpen *_o_sharedMainInstance = nil;
                                              selector: @selector(textFieldWasClicked:)
                                                  name: @"VLCOpenTextFieldWasClicked"
                                                object: nil];
+
+    /* we want to be notified about removed or added media */
+    o_specialMediaFolders = [[NSMutableArray alloc] init];
+    o_opticalDevices = [[NSMutableArray alloc] init];
+    NSWorkspace *sharedWorkspace = [NSWorkspace sharedWorkspace];
+	[[sharedWorkspace notificationCenter] addObserver:self selector:@selector(scanOpticalMedia:) name:NSWorkspaceDidMountNotification object:nil];
+	[[sharedWorkspace notificationCenter] addObserver:self selector:@selector(scanOpticalMedia:) name:NSWorkspaceDidUnmountNotification object:nil];
+	[[sharedWorkspace notificationCenter] addObserver:self selector:@selector(scanOpticalMedia:) name:NSWorkspaceDidRenameVolumeNotification object:nil];
+    [self scanOpticalMedia:nil];
 
     [self setMRL: @""];
 }
@@ -507,7 +445,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
     }
     else if( [o_label isEqualToString: _NS("Disc")] )
     {
-        [self openDiscTypeChanged: nil];
+        [self scanOpticalMedia: nil];
     }
     else if( [o_label isEqualToString: _NS("Network")] )
     {
@@ -589,7 +527,9 @@ static VLCOpen *_o_sharedMainInstance = nil;
 
 - (void)openDisc
 {
-    [self openDiscTypeChanged: nil];
+    [o_specialMediaFolders removeAllObjects];
+    [o_opticalDevices removeAllObjects];
+    [self scanOpticalMedia: nil];
     [self openTarget: 1];
 }
 
@@ -669,183 +609,284 @@ static VLCOpen *_o_sharedMainInstance = nil;
     [self openFilePathChanged: nil];
 }
 
-- (IBAction)openDiscTypeChanged:(id)sender
+- (void)showOpticalMediaView: theView
 {
-    NSString *o_type;
-    BOOL b_device, b_no_menus, b_title_chapter;
- 
-    [o_disc_device removeAllItems];
-    b_title_chapter = ![o_disc_dvd_menus state];
- 
-    o_type = [[o_disc_type selectedCell] title];
-
-    if ( [o_type isEqualToString: _NS("VIDEO_TS folder")] )
+    NSRect o_view_rect;
+    o_view_rect = [theView frame];
+    if( o_currentOpticalMediaView )
     {
-        b_device = NO; b_no_menus = YES;
+        [o_currentOpticalMediaView removeFromSuperviewWithoutNeedingDisplay];
+        [o_currentOpticalMediaView release];
     }
-    else
-    {
-        NSArray *o_devices;
-        NSString *o_disc;
-        const char *psz_class = NULL;
-        b_device = YES;
+    [theView setFrame: NSMakeRect( 233, 0, o_view_rect.size.width, o_view_rect.size.height)];
+    [theView setNeedsDisplay: YES];
+    [theView setAutoresizesSubviews: YES];
+    [[[o_tabview tabViewItemAtIndex: [o_tabview indexOfTabViewItemWithIdentifier:@"optical"]] view] addSubview: theView];
+    [theView displayIfNeeded];
+    o_currentOpticalMediaView = theView;
+    [o_currentOpticalMediaView retain];
+}
 
-        if ( [o_type isEqualToString: _NS("VCD")] )
-        {
-            psz_class = kIOCDMediaClass;
-            o_disc = o_type;
-            b_no_menus = NO; b_title_chapter = YES;
+- (NSString *) getBSDNodeFromMountPath:(NSString *)mountPath
+{
+    OSStatus err;
+    FSRef ref;
+    FSVolumeRefNum actualVolume;
+    err = FSPathMakeRef ( (const UInt8 *) [mountPath fileSystemRepresentation], &ref, NULL );
+
+    // get a FSVolumeRefNum from mountPath
+    if ( noErr == err ) {
+        FSCatalogInfo   catalogInfo;
+        err = FSGetCatalogInfo ( &ref,
+                                kFSCatInfoVolume,
+                                &catalogInfo,
+                                NULL,
+                                NULL,
+                                NULL
+                                );
+        if ( noErr == err ) {
+            actualVolume = catalogInfo.volume;
         }
-        else if ( [o_type isEqualToString: _NS("Audio CD")])
-        {
-            psz_class = kIOCDMediaClass;
-            o_disc = o_type;
-            b_no_menus = NO; b_title_chapter = NO;
+    }
+
+    GetVolParmsInfoBuffer volumeParms;
+    err = FSGetVolumeParms( actualVolume, &volumeParms, sizeof(volumeParms) );
+    if ( noErr != err ) {
+        msg_Err( p_intf, "error retrieving volume params, bailing out" );
+        return @"";
+    }
+
+    NSString *bsdName = [NSString stringWithUTF8String:(char *)volumeParms.vMDeviceID];
+    return [NSString stringWithFormat:@"/dev/r%@", bsdName];
+}
+
+- (char *)getVolumeTypeFromMountPath:(NSString *)mountPath
+{
+    OSStatus err;
+    FSRef ref;
+    FSVolumeRefNum actualVolume;
+    err = FSPathMakeRef ( (const UInt8 *) [mountPath fileSystemRepresentation], &ref, NULL );
+
+    // get a FSVolumeRefNum from mountPath
+    if ( noErr == err ) {
+        FSCatalogInfo   catalogInfo;
+        err = FSGetCatalogInfo ( &ref,
+                                kFSCatInfoVolume,
+                                &catalogInfo,
+                                NULL,
+                                NULL,
+                                NULL
+                                );
+        if ( noErr == err ) {
+            actualVolume = catalogInfo.volume;
         }
+    }
+
+    GetVolParmsInfoBuffer volumeParms;
+    err = FSGetVolumeParms( actualVolume, &volumeParms, sizeof(volumeParms) );
+
+    CFMutableDictionaryRef	matchingDict;
+    io_service_t			service;
+
+    matchingDict = IOBSDNameMatching(kIOMasterPortDefault, 0, volumeParms.vMDeviceID);
+    service = IOServiceGetMatchingService(kIOMasterPortDefault, matchingDict);
+
+    char *returnValue;
+    if (IO_OBJECT_NULL != service) {
+        if (IOObjectConformsTo(service, kIOCDMediaClass)) {
+            returnValue = kVLCMediaAudioCD;
+        }
+        else if(IOObjectConformsTo(service, kIODVDMediaClass))
+            returnValue = kVLCMediaDVD;
+        else if(IOObjectConformsTo(service, kIOBDMediaClass))
+            returnValue = kVLCMediaBD;
         else
         {
-            psz_class = kIODVDMediaClass;
-            o_disc = o_type;
-            b_no_menus = YES;
-        }
- 
-        o_devices = GetEjectableMediaOfClass( psz_class );
-        if ( o_devices != nil )
-        {
-            int i_devices = [o_devices count];
- 
-            if ( i_devices )
+            if ([mountPath rangeOfString:@"VIDEO_TS"].location != NSNotFound)
+                returnValue = kVLCMediaVideoTSFolder;
+            else if ([mountPath rangeOfString:@"BDMV"].location != NSNotFound)
+                returnValue = kVLCMediaBDMVFolder;
+            else
             {
-                for( int i = 0; i < i_devices; i++ )
-                {
-                    [o_disc_device
-                        addItemWithObjectValue: [o_devices objectAtIndex: i]];
+                NSArray * topLevelItems;
+                topLevelItems = [[NSFileManager defaultManager] subpathsOfDirectoryAtPath: mountPath error: NULL];
+                for (int i = 0; i < [topLevelItems count]; i++) {
+                    if([[topLevelItems objectAtIndex:i] rangeOfString:@"SVCD"].location != NSNotFound) {
+                        returnValue = kVLCMediaSVCD;
+                        break;
+                    }
+                    if([[topLevelItems objectAtIndex:i] rangeOfString:@"VCD"].location != NSNotFound) {
+                        returnValue = kVLCMediaVCD;
+                        break;
+                    }
                 }
-
-                [o_disc_device selectItemAtIndex: 0];
-            }
-            else
-            {
-                [o_disc_device setStringValue:
-                    [NSString stringWithFormat: _NS("No %@s found"), o_disc]];
+                if(!returnValue)
+                    returnValue = kVLCMediaUnknown;
             }
         }
+
+        IOObjectRelease(service);
     }
-
-    [o_disc_device setEnabled: b_device];
-    [o_disc_title setEnabled: b_title_chapter];
-    [o_disc_title_stp setEnabled: b_title_chapter];
-    [o_disc_chapter setEnabled: b_title_chapter];
-    [o_disc_chapter_stp setEnabled: b_title_chapter];
-    [o_disc_videots_folder setEnabled: !b_device];
-    [o_disc_videots_btn_browse setEnabled: !b_device];
-    [o_disc_dvd_menus setEnabled: b_no_menus];
-
-    [self openDiscInfoChanged: nil];
+    return returnValue;
 }
 
-- (IBAction)openDiscStepperChanged:(id)sender
+- (void)showOpticalAtIndex: (NSNumber *)n_index
 {
-    int i_tag = [sender tag];
+    NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
 
-    if( i_tag == 0 )
-    {
-        [o_disc_title setIntValue: [o_disc_title_stp intValue]];
-    }
-    else if( i_tag == 1 )
-    {
-        [o_disc_chapter setIntValue: [o_disc_chapter_stp intValue]];
-    }
+    unsigned int index = [n_index intValue];
+    char *diskType = [self getVolumeTypeFromMountPath:[o_opticalDevices objectAtIndex: index]];
 
-    [self openDiscInfoChanged: nil];
-}
-
-- (void)openDiscInfoChanged:(NSNotification *)o_notification
-{
-    NSString *o_type;
-    NSString *o_device;
-    NSString *o_videots;
-    NSString *o_mrl_string;
-    int i_title, i_chapter;
-    BOOL b_no_menus;
-
-    o_type = [[o_disc_type selectedCell] title];
-    o_device = [o_disc_device stringValue];
-    i_title = [o_disc_title intValue];
-    i_chapter = [o_disc_chapter intValue];
-    o_videots = [o_disc_videots_folder stringValue];
-    b_no_menus = [o_disc_dvd_menus state];
-
-    if ( [o_type isEqualToString: _NS("VCD")] )
+    if (diskType == kVLCMediaDVD || diskType == kVLCMediaVideoTSFolder)
     {
-        if ( [o_device isEqualToString:
-                [NSString stringWithFormat: _NS("No %@s found"), o_type]] )
-            o_device = @"";
-        o_mrl_string = [NSString stringWithFormat: @"vcd://%@@%i:%i",
-                        o_device, i_title, i_chapter];
-    }
-    else if ( [o_type isEqualToString: _NS("Audio CD")] )
-    {
-        if ( [o_device isEqualToString:
-                [NSString stringWithFormat: _NS("No %@s found"), o_type]] )
-            o_device = @"";
-        o_mrl_string = [NSString stringWithFormat: @"cdda://%@",
-                        o_device];
-    }
-    else if ( [o_type isEqualToString: _NS("DVD")] )
-    {
-        if ( [o_device isEqualToString:
-                [NSString stringWithFormat: _NS("No %@s found"), o_type]] )
-            o_device = @"";
-        if ( b_no_menus )
-            o_mrl_string = [NSString stringWithFormat: @"dvdread://%@@%i:%i-",
-                            o_device, i_title, i_chapter];
+        [o_disc_dvd_lbl setStringValue: [[NSFileManager defaultManager] displayNameAtPath:[o_opticalDevices objectAtIndex: index]]];
+        [o_disc_dvdwomenus_lbl setStringValue: [o_disc_dvd_lbl stringValue]];
+        [o_disc_icon_well setImage: [[NSWorkspace sharedWorkspace] iconForFile: [o_opticalDevices objectAtIndex: index]]];
+        NSString *pathToOpen;
+        if (diskType == kVLCMediaVideoTSFolder)
+            pathToOpen = [o_opticalDevices objectAtIndex: index];
         else
-            o_mrl_string = [NSString stringWithFormat: @"dvdnav://%@",
-                            o_device];
-            
-    }
-    else /* VIDEO_TS folder */
-    {
-        if ([o_videots length] > 0)
-        {
-            if ( b_no_menus )
-                o_mrl_string = [NSString stringWithFormat: @"dvdread://%@@%i:%i", o_videots, i_title, i_chapter];
-            else
-                o_mrl_string = [NSString stringWithFormat: @"dvdnav://%@", o_videots];
+            pathToOpen = [self getBSDNodeFromMountPath:[o_opticalDevices objectAtIndex: index]];
+        if (!b_nodvdmenus) {
+            [self setMRL: [NSString stringWithFormat: @"dvdnav://%@", pathToOpen]];
+            [self showOpticalMediaView: o_disc_dvd_view];
+        } else {
+            [self setMRL: [NSString stringWithFormat: @"dvdread://%@@%i:%i-", pathToOpen, [o_disc_dvdwomenus_title intValue], [o_disc_dvdwomenus_chapter intValue]]];
+            [self showOpticalMediaView: o_disc_dvdwomenus_view];
         }
-        else
-            o_mrl_string = @"";
     }
-
-    if ([o_device length] > 0)
-        [self setMRL: o_mrl_string];
+    else if (diskType == kVLCMediaAudioCD)
+    {
+        [o_disc_audiocd_lbl setStringValue: [[NSFileManager defaultManager] displayNameAtPath:[o_opticalDevices objectAtIndex: index]]];
+        [o_disc_audiocd_trackcount_lbl setStringValue: [NSString stringWithFormat:_NS("%i tracks"), [[[NSFileManager defaultManager] subpathsOfDirectoryAtPath: [o_opticalDevices objectAtIndex: index] error:NULL] count] - 1]]; // minus .TOC.plist
+        [self showOpticalMediaView: o_disc_audiocd_view];
+        [o_disc_icon_well setImage: [[NSWorkspace sharedWorkspace] iconForFile: [o_opticalDevices objectAtIndex: index]]];
+        [self setMRL: [NSString stringWithFormat: @"cdda://%@", [self getBSDNodeFromMountPath:[o_opticalDevices objectAtIndex: index]]]];
+    }
+    else if (diskType == kVLCMediaVCD || diskType == kVLCMediaSVCD)
+    {
+        [o_disc_vcd_lbl setStringValue: [[NSFileManager defaultManager] displayNameAtPath:[o_opticalDevices objectAtIndex: index]]];
+        [self showOpticalMediaView: o_disc_vcd_view];
+        [o_disc_icon_well setImage: [[NSWorkspace sharedWorkspace] iconForFile: [o_opticalDevices objectAtIndex: index]]];
+        [self setMRL: [NSString stringWithFormat: @"vcd://%@@%i:%i", [self getBSDNodeFromMountPath:[o_opticalDevices objectAtIndex: index]], [o_disc_vcd_title intValue], [o_disc_vcd_chapter intValue]]];
+    }
+    else if (diskType == kVLCMediaBD || diskType == kVLCMediaBDMVFolder)
+    {
+        [o_disc_bd_lbl setStringValue: [[NSFileManager defaultManager] displayNameAtPath:[o_opticalDevices objectAtIndex: index]]];
+        [self showOpticalMediaView: o_disc_bd_view];
+        [o_disc_icon_well setImage: [[NSWorkspace sharedWorkspace] iconForFile: [o_opticalDevices objectAtIndex: index]]];
+        if (diskType == kVLCMediaBD)
+            [self setMRL: [NSString stringWithFormat: @"bluray://%@", [self getBSDNodeFromMountPath:[o_opticalDevices objectAtIndex: index]]]];
+        else
+            [self setMRL: [NSString stringWithFormat: @"bluray://%@", [o_opticalDevices objectAtIndex: index]]];
+    }
     else
-        [self setMRL: @""];
+    {
+        msg_Warn( VLCIntf, "unknown disk type, no idea what to display" );
+        [o_disc_icon_well setImage: [NSImage imageNamed:@"NSApplicationIcon"]];
+        [self showOpticalMediaView: o_disc_nodisc_view];
+    }
+
+    [[o_disc_icon_well image] setSize: NSMakeSize(128,128)];
+    [o_pool release];
 }
 
-- (IBAction)openDiscMenusChanged:(id)sender
+- (void)scanOpticalMedia:(NSNotification *)o_notification
 {
-    [self openDiscInfoChanged: nil];
-    [self openDiscTypeChanged: nil];
+    [o_opticalDevices removeAllObjects];
+    [o_disc_selector_pop removeAllItems];
+    [o_opticalDevices addObjectsFromArray: [[NSWorkspace sharedWorkspace] mountedRemovableMedia]];
+    if ([o_specialMediaFolders count] > 0)
+        [o_opticalDevices addObjectsFromArray: o_specialMediaFolders];
+    if ([o_opticalDevices count] > 0) {
+        for (int i = 0; i < [o_opticalDevices count] ; i++)
+            [o_disc_selector_pop addItemWithTitle: [o_opticalDevices objectAtIndex: i]];
+
+        if ([o_disc_selector_pop numberOfItems] <= 1)
+            [o_disc_selector_pop setHidden: YES];
+        else
+            [o_disc_selector_pop setHidden: NO];
+
+        [NSThread detachNewThreadSelector:@selector(showOpticalAtIndex:) toTarget:self withObject:[NSNumber numberWithInt:[o_disc_selector_pop indexOfSelectedItem]]];
+    }
+    else
+    {
+        msg_Dbg( VLCIntf, "no optical media found" );
+        [o_disc_selector_pop setHidden: YES];
+        [o_disc_icon_well setImage: [NSImage imageNamed: @"NSApplicationIcon"]];
+        [self showOpticalMediaView: o_disc_nodisc_view];
+    }
 }
 
-- (IBAction)openVTSBrowse:(id)sender
+- (IBAction)discSelectorChanged:(id)sender
 {
+    [NSThread detachNewThreadSelector:@selector(showOpticalAtIndex:) toTarget:self withObject:[NSNumber numberWithInt:[o_disc_selector_pop indexOfSelectedItem]]];
+}
+
+- (IBAction)openSpecialMediaFolder:(id)sender
+{
+    /* this is currently for VIDEO_TS and BDMV folders */
     NSOpenPanel *o_open_panel = [NSOpenPanel openPanel];
 
     [o_open_panel setAllowsMultipleSelection: NO];
     [o_open_panel setCanChooseFiles: NO];
     [o_open_panel setCanChooseDirectories: YES];
-    [o_open_panel setTitle: _NS("Open VIDEO_TS Directory")];
+    [o_open_panel setTitle: [sender title]];
     [o_open_panel setPrompt: _NS("Open")];
 
-    if( [o_open_panel runModal] == NSOKButton )
+    if ([o_open_panel runModal] == NSOKButton)
     {
-        NSString *o_dirname = [[[o_open_panel URLs] objectAtIndex: 0] path];
-        [o_disc_videots_folder setStringValue: o_dirname];
-        [self openDiscInfoChanged: nil];
+        NSString *o_path = [[[o_open_panel URLs] objectAtIndex: 0] path];
+        if ([o_path length] > 0 )
+        {
+            if ([o_path rangeOfString:@"VIDEO_TS"].location != NSNotFound || [o_path rangeOfString:@"BDMV"].location != NSNotFound)
+            {
+                [o_specialMediaFolders addObject: o_path];
+                [self scanOpticalMedia: nil];
+            }
+            else
+                msg_Dbg( VLCIntf, "chosen directory is no suitable special media folder" );
+        }
     }
+}
+
+- (IBAction)dvdreadOptionChanged:(id)sender
+{
+    if (sender == o_disc_dvdwomenus_enablemenus_btn) {
+        b_nodvdmenus = NO;
+        [self setMRL: [NSString stringWithFormat: @"dvdnav://%@", [self getBSDNodeFromMountPath:[o_opticalDevices objectAtIndex: [o_disc_selector_pop indexOfSelectedItem]]]]];
+        [self showOpticalMediaView: o_disc_dvd_view];
+        return;
+    }
+    if (sender == o_disc_dvd_disablemenus_btn) {
+        b_nodvdmenus = YES;
+        [self showOpticalMediaView: o_disc_dvdwomenus_view];
+    }
+
+    if (sender == o_disc_dvdwomenus_title)
+        [o_disc_dvdwomenus_title_stp setIntValue: [o_disc_dvdwomenus_title intValue]];
+    if (sender == o_disc_dvdwomenus_title_stp)
+        [o_disc_dvdwomenus_title setIntValue: [o_disc_dvdwomenus_title_stp intValue]];
+    if (sender == o_disc_dvdwomenus_chapter)
+        [o_disc_dvdwomenus_chapter_stp setIntValue: [o_disc_dvdwomenus_chapter intValue]];
+    if (sender == o_disc_dvdwomenus_chapter_stp)
+        [o_disc_dvdwomenus_chapter setIntValue: [o_disc_dvdwomenus_chapter_stp intValue]];
+
+    [self setMRL: [NSString stringWithFormat: @"dvdread://%@@%i:%i-", [self getBSDNodeFromMountPath:[o_opticalDevices objectAtIndex: [o_disc_selector_pop indexOfSelectedItem]]], [o_disc_dvdwomenus_title intValue], [o_disc_dvdwomenus_chapter intValue]]];
+}
+
+- (IBAction)vcdOptionChanged:(id)sender
+{
+    if (sender == o_disc_vcd_title)
+        [o_disc_vcd_title_stp setIntValue: [o_disc_vcd_title intValue]];
+    if (sender == o_disc_vcd_title_stp)
+        [o_disc_vcd_title setIntValue: [o_disc_vcd_title_stp intValue]];
+    if (sender == o_disc_vcd_chapter)
+        [o_disc_vcd_chapter_stp setIntValue: [o_disc_vcd_chapter intValue]];
+    if (sender == o_disc_vcd_chapter_stp)
+        [o_disc_vcd_chapter setIntValue: [o_disc_vcd_chapter_stp intValue]];
+
+    [self setMRL: [NSString stringWithFormat: @"vcd://%@@%i:%i", [self getBSDNodeFromMountPath:[o_opticalDevices objectAtIndex: [o_disc_selector_pop indexOfSelectedItem]]], [o_disc_vcd_title intValue], [o_disc_vcd_chapter intValue]]];
 }
 
 - (void)textFieldWasClicked:(NSNotification *)o_notification
