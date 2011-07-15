@@ -69,6 +69,8 @@ Interfaces:
  * ncurses: heavy refactor of the complete interface
  * Mac OS X: new Audio Effects panel adding Compressor and Spatializer filters
  * Mac OS X: new Track Synchronization panel
+ * Mac OS X: new Video Effects panel for color and geometry adjustments
+ * Mac OS X: re-written Open Disc functionality with automatic media detection
  * The rc and telnet lua interfaces were merged into a new "cli" interface
  * dbus: Rewrite of the main loop to use a more efficient poll-based model
  * dbus: Upgrade to an mpris2 compliant interface, see http://www.mpris.org
@@ -149,6 +151,45 @@ Removed modules:
  * removal of old telnet interface in favor of the new lua CLI
  * removal of http interface in favor of luahttp
  * remove of the noise filter
+
+
+Changes between 1.1.10 and 1.1.11:
+----------------------------------
+
+Security:
+ * Fix buffer overflows in the RealMedia demuxer (CVE-2011-2587)
+   and the AVI one (CVE-2011-2588).
+
+Mac OS X:
+ * Fixed scrolling direction if the input device's signal is inverted
+ * Update Auhal audio output to the latest API
+ * Fix images disappearing issue on the interface
+ * Reduced installation size by up to 30 MB
+ * Resolved conflict between iTunes and VLC wrt Media Key handling
+
+Mozilla/ActiveX webplugin:
+ * Fullscreen mode is fixed on Win32
+ * Very simple fullscreen controller is visible on Win32
+
+Demuxers/Meta Readers:
+ * Better support for cover art embedded in mp4, wma
+
+Muxers/Output:
+ * Fix AVI muxer so the generated files are readable on other players
+
+Extensions:
+ * Multiple fixes for crashes and malfunctionning issues
+
+Qt Interface:
+ * Fix quitting on Linux
+ * Fix opening of VIDEO_TS folders through the open disc dialog on Windows
+ * Miscellaneous
+
+Win32 port:
+ * Update of codecs, fixing the mpeg-2 decoder crash
+
+Translations:
+ * Update of Slovak, Lithunanian, Russian, Brazillian Portuguese, Serbian
 
 
 Changes between 1.1.9 and 1.1.10:
