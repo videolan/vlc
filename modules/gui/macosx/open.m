@@ -113,11 +113,18 @@ static VLCOpen *_o_sharedMainInstance = nil;
     [[o_tabview tabViewItemAtIndex: 2] setLabel: _NS("Network")];
     [[o_tabview tabViewItemAtIndex: 3] setLabel: _NS("Capture")];
 
+    [o_file_name setStringValue: @""];
+    [o_file_name_stub setStringValue: _NS("Choose a file")];
+    [o_file_icon_well setImage: [NSImage imageNamed:@"generic"]];
     [o_file_btn_browse setTitle: _NS("Browse...")];
     [o_file_stream setTitle: _NS("Treat as a pipe rather than as a file")];
+    [o_file_stream setHidden: NO];
     [o_file_slave_ckbox setTitle: _NS("Play another media synchronously")];
     [o_file_slave_select_btn setTitle: _NS("Choose...")];
-    [o_file_slave_filename_txt setStringValue: @""];
+    [o_file_slave_filename_lbl setStringValue: @""];
+    [o_file_slave_icon_well setImage: NULL];
+    [o_file_subtitles_filename_lbl setStringValue: @""];
+    [o_file_subtitles_icon_well setImage: NULL];
 
     [o_disc_selector_pop removeAllItems];
     [o_disc_selector_pop setHidden: NO];
@@ -211,11 +218,6 @@ static VLCOpen *_o_sharedMainInstance = nil;
     }
 
     [self setSubPanel];
-
-    [[NSNotificationCenter defaultCenter] addObserver: self
-        selector: @selector(openFilePathChanged:)
-        name: NSControlTextDidChangeNotification
-        object: o_file_path];
 
     [[NSNotificationCenter defaultCenter] addObserver: self
         selector: @selector(openNetInfoChanged:)
@@ -507,15 +509,16 @@ static VLCOpen *_o_sharedMainInstance = nil;
             o_file_slave_path = [[[o_open_panel URLs] objectAtIndex: 0] path];
             [o_file_slave_path retain];
         }
-        else
-            [o_file_slave_filename_txt setStringValue: @""];
     }
-    if( o_file_slave_path )
+    if( o_file_slave_path && [o_file_slave_ckbox state] == NSOnState)
     {
-        NSFileWrapper *o_file_wrapper;
-        o_file_wrapper = [[NSFileWrapper alloc] initWithPath: o_file_slave_path];
-        [o_file_slave_filename_txt setStringValue: [NSString stringWithFormat: @"\"%@\"", [o_file_wrapper preferredFilename]]];
-        [o_file_wrapper release];
+        [o_file_slave_filename_lbl setStringValue: [[NSFileManager defaultManager] displayNameAtPath:o_file_slave_path]];
+        [o_file_slave_icon_well setImage: [[NSWorkspace sharedWorkspace] iconForFile: o_file_slave_path]];
+    }
+    else
+    {
+        [o_file_slave_filename_lbl setStringValue: @""];
+        [o_file_slave_icon_well setImage: NULL];
     }
 }
 
@@ -547,16 +550,14 @@ static VLCOpen *_o_sharedMainInstance = nil;
 
 - (void)openFilePathChanged:(NSNotification *)o_notification
 {
-    NSString *o_filename = [o_file_path stringValue];
-
-    if ( o_filename && [o_filename length] > 0 )
+    if ( o_file_path && [o_file_path length] > 0 )
     {
         bool b_stream = [o_file_stream state];
         BOOL b_dir = NO;
 
-        [[NSFileManager defaultManager] fileExistsAtPath:o_filename isDirectory:&b_dir];
+        [[NSFileManager defaultManager] fileExistsAtPath:o_file_path isDirectory:&b_dir];
 
-        char *psz_uri = make_URI([o_filename UTF8String], "file");
+        char *psz_uri = make_URI([o_file_path UTF8String], "file");
         if( !psz_uri ) return;
 
         NSMutableString *o_mrl_string = [NSMutableString stringWithUTF8String: psz_uri ];
@@ -568,10 +569,21 @@ static VLCOpen *_o_sharedMainInstance = nil;
         else if( b_stream )
             [o_mrl_string replaceCharactersInRange:offile withString: @"stream"];
 
+        [o_file_name setStringValue: [[NSFileManager defaultManager] displayNameAtPath:o_file_path]];
+        [o_file_name_stub setHidden: YES];
+        [o_file_stream setHidden: NO];
+        [o_file_icon_well setImage: [[NSWorkspace sharedWorkspace] iconForFile: o_file_path]];
+        [o_file_icon_well setHidden: NO];
         [self setMRL: o_mrl_string];
     }
     else
+    {
+        [o_file_name setStringValue: @""];
+        [o_file_name_stub setHidden: NO];
+        [o_file_stream setHidden: YES];
+        [o_file_icon_well setImage: [NSImage imageNamed:@"generic"]];
         [self setMRL: @""];
+    }
 }
 
 - (IBAction)openFileBrowse:(id)sender
@@ -598,8 +610,10 @@ static VLCOpen *_o_sharedMainInstance = nil;
 {
     if (returnCode == NSFileHandlingPanelOKButton)
     {
-        NSString *o_filename = [[[sheet URLs] objectAtIndex: 0] path];
-        [o_file_path setStringValue: o_filename];
+        if( o_file_path )
+            [o_file_path release];
+        o_file_path = [[[sheet URLs] objectAtIndex: 0] path];
+        [o_file_path retain];
         [self openFilePathChanged: nil];
     }
 }
@@ -800,7 +814,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
         [o_opticalDevices addObjectsFromArray: o_specialMediaFolders];
     if ([o_opticalDevices count] > 0) {
         for (int i = 0; i < [o_opticalDevices count] ; i++)
-            [o_disc_selector_pop addItemWithTitle: [o_opticalDevices objectAtIndex: i]];
+            [o_disc_selector_pop addItemWithTitle: [[NSFileManager defaultManager] displayNameAtPath:[o_opticalDevices objectAtIndex: i]]];
 
         if ([o_disc_selector_pop numberOfItems] <= 1)
             [o_disc_selector_pop setHidden: YES];
@@ -1274,10 +1288,16 @@ static VLCOpen *_o_sharedMainInstance = nil;
     if ([o_file_sub_ckbox state] == NSOnState)
     {
         [o_file_sub_btn_settings setEnabled:YES];
+        if ([[o_file_sub_path stringValue] length] > 0) {
+            [o_file_subtitles_filename_lbl setStringValue: [[NSFileManager defaultManager] displayNameAtPath:[o_file_sub_path stringValue]]];
+            [o_file_subtitles_icon_well setImage: [[NSWorkspace sharedWorkspace] iconForFile: [o_file_sub_path stringValue]]];
+        }
     }
     else
     {
         [o_file_sub_btn_settings setEnabled:NO];
+        [o_file_subtitles_filename_lbl setStringValue: @""];
+        [o_file_subtitles_icon_well setImage: NULL];
     }
 }
 
@@ -1292,6 +1312,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
 
 - (IBAction)subCloseSheet:(id)sender
 {
+    [self subsChanged: nil];
     [o_file_sub_sheet orderOut:sender];
     [NSApp endSheet: o_file_sub_sheet];
 }
@@ -1308,6 +1329,8 @@ static VLCOpen *_o_sharedMainInstance = nil;
     {
         NSString *o_filename = [[[o_open_panel URLs] objectAtIndex: 0] path];
         [o_file_sub_path setStringValue: o_filename];
+        [o_file_subtitles_filename_lbl setStringValue: [[NSFileManager defaultManager] displayNameAtPath:o_filename]];
+        [o_file_subtitles_icon_well setImage: [[NSWorkspace sharedWorkspace] iconForFile: o_filename]];
     }
 }
 

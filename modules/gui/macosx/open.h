@@ -47,12 +47,17 @@
     IBOutlet id o_sout_options;
 
     /* open file */
-    IBOutlet id o_file_path;
+    IBOutlet id o_file_name;
+    IBOutlet id o_file_name_stub;
+    IBOutlet id o_file_icon_well;
     IBOutlet id o_file_btn_browse;
     IBOutlet id o_file_stream;
     IBOutlet id o_file_slave_ckbox;
     IBOutlet id o_file_slave_select_btn;
-    IBOutlet id o_file_slave_filename_txt;
+    IBOutlet id o_file_slave_filename_lbl;
+    IBOutlet id o_file_slave_icon_well;
+    IBOutlet id o_file_subtitles_filename_lbl;
+    IBOutlet id o_file_subtitles_icon_well;
 
     /* open disc */
     IBOutlet id o_disc_icon_well;
@@ -207,6 +212,7 @@
     id o_currentOpticalMediaView;
     NSMutableArray *o_opticalDevices;
     NSMutableArray *o_specialMediaFolders;
+    NSString *o_file_path;
     id o_currentCaptureView;
     NSString *o_file_slave_path;
     NSString *o_mrl;
