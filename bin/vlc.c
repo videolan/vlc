@@ -121,11 +121,11 @@ int main( int i_argc, const char *ppsz_argv[] )
 
     setlocale (LC_ALL, "");
 
-#ifndef __APPLE__
-    /* This clutters OSX GUI error logs */
-    fprintf( stderr, "VLC media player %s (revision %s)\n",
-             libvlc_get_version(), libvlc_get_changeset() );
-#endif
+    if (isatty (STDERR_FILENO))
+        /* This message clutters error logs. It is print it only on a TTY.
+         * Forunately, LibVLC prints version infos with -vv anyhow. */
+        fprintf (stderr, "VLC media player %s (revision %s)\n",
+                 libvlc_get_version(), libvlc_get_changeset());
 
     sigset_t set;
 
