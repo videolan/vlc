@@ -539,7 +539,7 @@ void libvlc_audio_set_format_callbacks( libvlc_media_player_t *mp,
  * and is mutually exclusive with libvlc_audio_set_format_callbacks().
  *
  * \param mp the media player
- * \param fourcc a four-characters string identifying the sample format
+ * \param format a four-characters string identifying the sample format
  *               (e.g. "S16N" or "FL32")
  * \param rate sample rate (expressed in Hz)
  * \param channels channels count
