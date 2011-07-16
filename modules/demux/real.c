@@ -1574,7 +1574,7 @@ static int CodecAudioParse( demux_t *p_demux, int i_tk_id, const uint8_t *p_data
         }
         break;
 
-    case VLC_FOURCC( 's','i','p','r' ):
+    case VLC_CODEC_SIPR:
         fmt.i_codec = VLC_CODEC_SIPR;
         if( i_flavor > 3 )
         {
@@ -1590,8 +1590,8 @@ static int CodecAudioParse( demux_t *p_demux, int i_tk_id, const uint8_t *p_data
         fmt.i_bitrate = fmt.audio.i_rate;
         msg_Dbg( p_demux, "    - sipr flavor=%i", i_flavor );
 
-    case VLC_FOURCC( 'c','o','o','k' ):
-    case VLC_FOURCC( 'a','t','r','c' ):
+    case VLC_CODEC_COOK:
+    case VLC_CODEC_ATRAC3:
         if( i_subpacket_size <= 0 || i_frame_size / i_subpacket_size <= 0 )
         {
             es_format_Clean( &fmt );
@@ -1601,11 +1601,6 @@ static int CodecAudioParse( demux_t *p_demux, int i_tk_id, const uint8_t *p_data
             fmt.audio.i_blockalign = i_subpacket_size;
         else
             fmt.audio.i_blockalign = i_coded_frame_size;
-
-        if( fmt.i_codec == VLC_FOURCC( 'c','o','o','k' ) )
-            fmt.i_codec = VLC_CODEC_COOK;
-        else if( fmt.i_codec == VLC_FOURCC( 'a','t','r','c' ) )
-            fmt.i_codec = VLC_CODEC_ATRAC3;
 
         if( i_extra_codec > 0 )
         {
