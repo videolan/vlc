@@ -25,7 +25,6 @@
 #define VLC_FOURCC_H 1
 
 #include <vlc_common.h>
-#include <vlc_es.h>
 
 /* Video codec */
 #define VLC_CODEC_MPGV      VLC_FOURCC('m','p','g','v')
