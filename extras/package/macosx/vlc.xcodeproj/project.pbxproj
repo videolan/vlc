@@ -465,6 +465,7 @@
 		CC962E2C0CC7992800A56695 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = /System/Library/Frameworks/WebKit.framework; sourceTree = "<absolute>"; };
 		CC9B43AE13B29C79000205AE /* bottom-background.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "bottom-background.png"; path = "Resources/mainwindow/bottom-background.png"; sourceTree = "<group>"; };
 		CC9B43B013B29FCF000205AE /* bottom-background_dark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "bottom-background_dark.png"; path = "Resources/mainwindow_dark/bottom-background_dark.png"; sourceTree = "<group>"; };
+		CC9E3E7913D1CFCF00429A71 /* qtcapture.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = qtcapture.m; path = ../../../modules/access/qtcapture.m; sourceTree = "<group>"; };
 		CCB24D5D0D54BBAE004D780C /* simple_prefs.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = simple_prefs.m; path = ../../../modules/gui/macosx/simple_prefs.m; sourceTree = SOURCE_ROOT; };
 		CCB24D5E0D54BBAE004D780C /* simple_prefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = simple_prefs.h; path = ../../../modules/gui/macosx/simple_prefs.h; sourceTree = SOURCE_ROOT; };
 		CCBE999E0F922C51000705F8 /* CoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreServices.framework; path = /System/Library/Frameworks/CoreServices.framework; sourceTree = "<absolute>"; };
@@ -869,6 +870,7 @@
 				CC4D67F71348F601003FCC5B /* darwin_specific.c */,
 				CC6C01BA0DDF3EEC00C7D754 /* auhal.c */,
 				CCC895830D9A8A82005AE59C /* eyetv.m */,
+				CC9E3E7913D1CFCF00429A71 /* qtcapture.m */,
 			);
 			name = "OSX-specific source files";
 			sourceTree = "<group>";

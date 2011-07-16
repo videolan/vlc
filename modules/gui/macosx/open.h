@@ -178,7 +178,6 @@
 
     /* screen support */
     IBOutlet id o_screen_view;
-    IBOutlet id o_screen_lbl;
     IBOutlet id o_screen_long_lbl;
     IBOutlet id o_screen_fps_fld;
     IBOutlet id o_screen_fps_lbl;
@@ -199,10 +198,15 @@
 
     /* QTK support */
     IBOutlet id o_qtk_view;
-    IBOutlet id o_qtk_lbl;
     IBOutlet id o_qtk_long_lbl;
     IBOutlet id o_qtk_device_pop;
     IBOutlet id o_qtk_label_view;
+    IBOutlet id o_capture_width_lbl;
+    IBOutlet id o_capture_width_fld;
+    IBOutlet id o_capture_width_stp;
+    IBOutlet id o_capture_height_lbl;
+    IBOutlet id o_capture_height_fld;
+    IBOutlet id o_capture_height_stp;
 
     NSArray         *qtkvideoDevices;
     NSString        *qtk_currdevice_uid;

@@ -176,11 +176,10 @@ static VLCOpen *_o_sharedMainInstance = nil;
     [o_eyetv_chn_bgbar setUsesThreadedAnimation: YES];
 
     [o_capture_mode_pop removeAllItems];
-    [o_capture_mode_pop addItemWithTitle: @"iSight"];
+    [o_capture_mode_pop addItemWithTitle: _NS("Capture Device")];
     [o_capture_mode_pop addItemWithTitle: _NS("Screen")];
     [o_capture_mode_pop addItemWithTitle: @"EyeTV"];
-    [o_screen_lbl setStringValue: _NS("Screen Capture Input")];
-    [o_screen_long_lbl setStringValue: _NS("This facility allows you to process your screen's output.")];
+    [o_screen_long_lbl setStringValue: _NS("This input allows you to save, stream or display your current screen contents.")];
     [o_screen_fps_lbl setStringValue: _NS("Frames per Second:")];
     [o_screen_left_lbl setStringValue: _NS("Subscreen left:")];
     [o_screen_top_lbl setStringValue: _NS("Subscreen top:")];
@@ -195,6 +194,9 @@ static VLCOpen *_o_sharedMainInstance = nil;
     [o_eyetv_noInstanceLong_lbl setStringValue: _NS("VLC could not connect to EyeTV.\nMake sure that you installed VLC's EyeTV plugin.")];
     [o_eyetv_launchEyeTV_btn setTitle: _NS("Launch EyeTV now")];
     [o_eyetv_getPlugin_btn setTitle: _NS("Download Plugin")];
+    [o_qtk_long_lbl setStringValue: _NS("This input allows you to process input signals from QuickTime-compatible video devices.\nLive Audio input is not supported.")];
+    [o_capture_width_lbl setStringValue: _NS("Image width:")];
+    [o_capture_height_lbl setStringValue: _NS("Image height:")];
 
     [self qtkvideoDevices];
     [o_qtk_device_pop removeAllItems];
@@ -408,6 +410,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
         if( [[[o_tabview selectedTabViewItem] label] isEqualToString: _NS("Capture")] )
         {
             if( [[[o_capture_mode_pop selectedItem] title] isEqualToString: _NS("Screen")] )
+            {
                 [o_options addObject: [NSString stringWithFormat: @"screen-fps=%f", [o_screen_fps_fld floatValue]]];
                 [o_options addObject: [NSString stringWithFormat: @"screen-left=%i", [o_screen_left_fld intValue]]];
                 [o_options addObject: [NSString stringWithFormat: @"screen-top=%i", [o_screen_top_fld intValue]]];
@@ -417,6 +420,12 @@ static VLCOpen *_o_sharedMainInstance = nil;
                     [o_options addObject: @"screen-follow-mouse"];
                 else
                     [o_options addObject: @"no-screen-follow-mouse"];
+            }
+            else if( [[[o_capture_mode_pop selectedItem] title] isEqualToString: _NS("Capture Device")] )
+            {
+                [o_options addObject: [NSString stringWithFormat: @"qtcapture-width=%i", [o_capture_width_fld intValue]]];
+                [o_options addObject: [NSString stringWithFormat: @"qtcapture-height=%i", [o_capture_height_fld intValue]]];
+            }
         }
 
         /* apply the options to our item(s) */
@@ -430,10 +439,14 @@ static VLCOpen *_o_sharedMainInstance = nil;
 
 - (IBAction)qtkChanged:(id)sender
 {
-    msg_Dbg( VLCIntf, "Changed UID: old %s", [qtk_currdevice_uid UTF8String] );
+    NSValue *sizes = [[[[qtkvideoDevices objectAtIndex:[o_qtk_device_pop indexOfSelectedItem]] formatDescriptions] objectAtIndex: 0] attributeForKey: QTFormatDescriptionVideoEncodedPixelsSizeAttribute];
+
+    [o_capture_width_fld setIntValue: [sizes sizeValue].width];
+    [o_capture_height_fld setIntValue: [sizes sizeValue].height];
+    [o_capture_width_stp setIntValue: [o_capture_width_fld intValue]];
+    [o_capture_height_stp setIntValue: [o_capture_height_fld intValue]];
     qtk_currdevice_uid = [[[qtkvideoDevices objectAtIndex:[o_qtk_device_pop indexOfSelectedItem]] uniqueID]
                           stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
-    msg_Dbg( VLCIntf, "Changed UID: new %s", [qtk_currdevice_uid UTF8String] );
     [self setMRL:[NSString stringWithFormat:@"qtcapture://%@", qtk_currdevice_uid]];
 }
 
@@ -1144,22 +1157,16 @@ static VLCOpen *_o_sharedMainInstance = nil;
         [o_screen_top_fld setIntValue: config_GetInt( p_intf, "screen-top" )];
         [o_screen_follow_mouse_ckb setIntValue: config_GetInt( p_intf, "screen-follow-mouse" )];
     }
-    else if( [[[o_capture_mode_pop selectedItem] title] isEqualToString: @"iSight"] )
+    else if( [[[o_capture_mode_pop selectedItem] title] isEqualToString: _NS("Capture Device")] )
     {
         [self showCaptureView: o_qtk_view];
-        [o_qtk_lbl setStringValue: _NS("iSight Capture Input")];
-        [o_qtk_long_lbl setStringValue: _NS("This facility allows you to process your iSight's input signal.\n\nNo settings are available in this version, so you will be provided a 640px*480px raw video stream.\n\nLive Audio input is not supported.")];
-        [o_qtk_lbl displayIfNeeded];
-        [o_qtk_long_lbl displayIfNeeded];
+        if ([o_capture_width_fld intValue] <= 0)
+            [self qtkChanged:nil];
 
         if(!qtk_currdevice_uid)
-        {
             [self setMRL: @""];
-        }
         else
-        {
             [self setMRL:[NSString stringWithFormat:@"qtcapture://%@", qtk_currdevice_uid]];
-        }
     }
 }
 
