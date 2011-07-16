@@ -1377,12 +1377,12 @@ static int CodecVideoParse( demux_t *p_demux, int i_tk_id, const uint8_t *p_data
     fmt.video.i_frame_rate = (GetWBE( &p_data[22] ) << 16) | GetWBE( &p_data[24] );
     fmt.video.i_frame_rate_base = 1 << 16;
 
-    fmt.i_extra = 8;
-    fmt.p_extra = malloc( 8 );
+    fmt.i_extra = i_data - 26;
+    fmt.p_extra = malloc( fmt.i_extra );
     if( !fmt.p_extra )
         return VLC_ENOMEM;
 
-    memcpy( fmt.p_extra, &p_data[26], 8 );
+    memcpy( fmt.p_extra, &p_data[26], fmt.i_extra );
 
     //msg_Dbg( p_demux, "    - video 0x%08x 0x%08x", dw0, dw1 );
 
