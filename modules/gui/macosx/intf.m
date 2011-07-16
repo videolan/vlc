@@ -134,7 +134,7 @@ static void Run( intf_thread_t *p_intf )
 
     [NSApp run];
     [[VLCMain sharedInstance] applicationWillTerminate:nil];
-
+    [o_appLock release];
     [o_pool release];
 }
 
@@ -544,8 +544,6 @@ static VLCMain *_o_sharedMainInstance = nil;
 
     /* release some other objects here, because it isn't sure whether dealloc
      * will be called later on */
-    [o_mainmenu release];
-
     if( o_sprefs )
         [o_sprefs release];
 
@@ -589,6 +587,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     /* Make sure the Menu doesn't have any references to vlc objects anymore */
     //FIXME: this should be moved to VLCMainMenu
     [o_mainmenu releaseRepresentedObjects:[NSApp mainMenu]];
+    [o_mainmenu release];
 
     /* Kill the playlist, so that it doesn't accept new request
      * such as the play request from vlc.c (we are a blocking interface). */
