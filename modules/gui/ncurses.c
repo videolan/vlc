@@ -44,7 +44,7 @@
 
 #include <vlc_interface.h>
 #include <vlc_vout.h>
-#include <vlc_aout.h>
+#include <vlc_aout_intf.h>
 #include <vlc_charset.h>
 #include <vlc_input.h>
 #include <vlc_es.h>

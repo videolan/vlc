@@ -42,7 +42,7 @@
 #include <vlc_input.h>
 #include <vlc_meta.h>
 #include <vlc_playlist.h>
-#include <vlc_aout.h>
+#include <vlc_aout_intf.h>
 
 #include <vlc_strings.h>
 #include <vlc_url.h>

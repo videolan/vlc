@@ -31,7 +31,7 @@
 #include "input_manager.hpp"         /* Get notification of Volume Change */
 #include "util/input_slider.hpp"     /* SoundSlider */
 
-#include <vlc_aout.h>                /* Volume functions */
+#include <vlc_aout_intf.h>           /* Volume functions */
 
 #include <QLabel>
 #include <QHBoxLayout>

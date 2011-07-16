@@ -38,6 +38,7 @@
 #include "dialogs/help.hpp"     /* Launch Update */
 #include "recents.hpp"          /* Recents Item destruction */
 #include "util/qvlcapp.hpp"     /* QVLCApplication definition */
+#include <vlc_aout_intf.h>
 
 #ifdef Q_WS_X11
  #include <vlc_xlib.h>

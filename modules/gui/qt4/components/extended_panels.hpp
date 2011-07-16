@@ -98,8 +98,8 @@ private:
     QSlider *bands[BANDS];
     QLabel *band_texts[BANDS];
 
-    void delCallbacks( aout_instance_t * );
-    void addCallbacks( aout_instance_t * );
+    void delCallbacks( vlc_object_t * );
+    void addCallbacks( vlc_object_t * );
 
     intf_thread_t *p_intf;
     void clean() { enable(); }
@@ -129,8 +129,8 @@ private:
 
     intf_thread_t *p_intf;
 
-    void delCallbacks( aout_instance_t * );
-    void addCallbacks( aout_instance_t * );
+    void delCallbacks( vlc_object_t * );
+    void addCallbacks( vlc_object_t * );
 
     void updateSliders(float *);
     void setValues();
@@ -156,8 +156,8 @@ private:
 
     QCheckBox *enableCheck;
 
-    void delCallbacks( aout_instance_t * );
-    void addCallbacks( aout_instance_t * );
+    void delCallbacks( vlc_object_t * );
+    void addCallbacks( vlc_object_t * );
     intf_thread_t *p_intf;
 
     void setValues();

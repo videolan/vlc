@@ -27,7 +27,7 @@
 #endif
 
 #include <vlc_common.h>
-#include <vlc_aout.h>
+#include <vlc_aout_intf.h>
 #include <vlc_playlist.h>
 #include "volume.hpp"
 

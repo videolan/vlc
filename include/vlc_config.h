@@ -79,39 +79,6 @@
 #define DEFAULT_PTS_DELAY               (3*CLOCK_FREQ/10)
 
 /*****************************************************************************
- * Audio configuration
- *****************************************************************************/
-
-/* Volume */
-/* If you are coding an interface, please see src/audio_output/intf.c */
-#define AOUT_VOLUME_DEFAULT             256
-#define AOUT_VOLUME_STEP                32
-#define AOUT_VOLUME_MAX                 1024
-#define AOUT_VOLUME_MIN                 0
-
-/* Max number of pre-filters per input, and max number of post-filters */
-#define AOUT_MAX_FILTERS                10
-
-/* Buffers which arrive in advance of more than AOUT_MAX_ADVANCE_TIME
- * will be considered as bogus and be trashed */
-#define AOUT_MAX_ADVANCE_TIME           (DEFAULT_PTS_DELAY * 5)
-
-/* Buffers which arrive in advance of more than AOUT_MAX_PREPARE_TIME
- * will cause the calling thread to sleep */
-#define AOUT_MAX_PREPARE_TIME           (CLOCK_FREQ/2)
-
-/* Buffers which arrive after pts - AOUT_MIN_PREPARE_TIME will be trashed
- * to avoid too heavy resampling */
-#define AOUT_MIN_PREPARE_TIME           (CLOCK_FREQ/25)
-
-/* Max acceptable delay between the coded PTS and the actual presentation
- * time, without resampling */
-#define AOUT_PTS_TOLERANCE              (CLOCK_FREQ/25)
-
-/* Max acceptable resampling (in %) */
-#define AOUT_MAX_RESAMPLING             10
-
-/*****************************************************************************
  * SPU configuration
  *****************************************************************************/
 

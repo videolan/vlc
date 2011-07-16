@@ -27,7 +27,7 @@
 #endif
 
 #include <vlc_vout.h>
-#include <vlc_aout.h>
+#include <vlc_aout_intf.h>
 #include <vlc_keys.h>
 
 #include "actions_manager.hpp"

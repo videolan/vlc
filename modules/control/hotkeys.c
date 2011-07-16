@@ -35,7 +35,7 @@
 #include <vlc_interface.h>
 #include <vlc_input.h>
 #include <vlc_vout.h>
-#include <vlc_aout.h>
+#include <vlc_aout_intf.h>
 #include <vlc_osd.h>
 #include <vlc_playlist.h>
 #include <vlc_keys.h>
@@ -162,7 +162,7 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
     vout_thread_t *p_vout = p_input ? input_GetVout( p_input ) : NULL;
 
     /* Update the aout */
-    aout_instance_t *p_aout = p_input ? input_GetAout( p_input ) : NULL;
+    vlc_object_t *p_aout = p_input ? (vlc_object_t *)input_GetAout( p_input ) : NULL;
 
     /* Register OSD channels */
     /* FIXME: this check can fail if the new vout is reallocated at the same

@@ -29,7 +29,6 @@
 
 #include <vlc_common.h>
 #include <vlc_interface.h>
-#include <vlc_aout.h>
 #include <dbus/dbus.h>
 
 #define DBUS_MPRIS_OBJECT_PATH "/org/mpris/MediaPlayer2"

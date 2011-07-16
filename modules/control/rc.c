@@ -38,7 +38,7 @@
 #include <assert.h>
 
 #include <vlc_interface.h>
-#include <vlc_aout.h>
+#include <vlc_aout_intf.h>
 #include <vlc_vout.h>
 #include <vlc_osd.h>
 #include <vlc_playlist.h>
@@ -1704,7 +1704,6 @@ static int AudioConfig( vlc_object_t *p_this, char const *psz_cmd,
     intf_thread_t *p_intf = (intf_thread_t*)p_this;
     input_thread_t *p_input =
         playlist_CurrentInput( p_intf->p_sys->p_playlist );
-    aout_instance_t * p_aout;
     const char * psz_variable;
     vlc_value_t val_name;
     int i_error;
@@ -1719,7 +1718,7 @@ static int AudioConfig( vlc_object_t *p_this, char const *psz_cmd,
         return VLC_EGENERIC;
     }
 
-    p_aout = input_GetAout( p_input );
+    vlc_object_t * p_aout = (vlc_object_t *)input_GetAout( p_input );
     vlc_object_release( p_input );
     if ( p_aout == NULL )
          return VLC_ENOOBJ;

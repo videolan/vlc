@@ -36,7 +36,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_meta.h>
-#include <vlc_aout.h>
+#include <vlc_aout_intf.h>
 
 #include <lua.h>        /* Low level lua C API */
 #include <lauxlib.h>    /* Higher level C API */

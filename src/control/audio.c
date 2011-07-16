@@ -34,6 +34,7 @@
 
 #include <vlc_common.h>
 #include <vlc_input.h>
+#include <vlc_aout_intf.h>
 #include <vlc_aout.h>
 #include <vlc_modules.h>
 

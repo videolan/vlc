@@ -30,6 +30,7 @@
 #endif
 
 #include <vlc_common.h>
+#include <vlc_aout_intf.h>
 
 #include <stdio.h>
 #include <stdlib.h>                            /* calloc(), malloc(), free() */

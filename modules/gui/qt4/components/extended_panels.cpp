@@ -45,7 +45,7 @@
 #include "util/qt_dirs.hpp"
 
 #include "../../audio_filter/equalizer_presets.h"
-#include <vlc_aout.h>
+#include <vlc_aout_intf.h>
 #include <vlc_intf_strings.h>
 #include <vlc_vout.h>
 #include <vlc_osd.h>
@@ -920,7 +920,7 @@ void Equalizer::updateUIFromCore()
     float f_preamp;
     int i_preset;
 
-    aout_instance_t *p_aout = THEMIM->getAout();
+    vlc_object_t *p_aout = (vlc_object_t *)THEMIM->getAout();
     if( p_aout )
     {
         psz_af = var_GetNonEmptyString( p_aout, "audio-filter" );
@@ -999,7 +999,7 @@ void Equalizer::enable( bool en )
 /* Function called when the set2Pass button is activated */
 void Equalizer::set2Pass()
 {
-    aout_instance_t *p_aout= THEMIM->getAout();
+    vlc_object_t *p_aout= (vlc_object_t *)THEMIM->getAout();
     bool b_2p = ui.eq2PassCheck->isChecked();
 
     if( p_aout )
@@ -1014,7 +1014,7 @@ void Equalizer::set2Pass()
 void Equalizer::setPreamp()
 {
     const float f = ( float )(  ui.preampSlider->value() ) /10 - 20;
-    aout_instance_t *p_aout = THEMIM->getAout();
+    vlc_object_t *p_aout = (vlc_object_t *)THEMIM->getAout();
 
     ui.preampLabel->setText( qtr( "Preamp\n" ) + QString::number( f, 'f', 1 )
                                                + qtr( "dB" ) );
@@ -1042,7 +1042,7 @@ void Equalizer::setCoreBands()
         values += " " + val;
     }
 
-    aout_instance_t *p_aout = THEMIM->getAout();
+    vlc_object_t *p_aout = (vlc_object_t *)THEMIM->getAout();
     if( p_aout )
     {
         //delCallbacks( p_aout );
@@ -1091,7 +1091,7 @@ void Equalizer::setCorePreset( int i_preset )
     }
 
     /* Apply presets to audio output */
-    aout_instance_t *p_aout= THEMIM->getAout();
+    vlc_object_t *p_aout = (vlc_object_t *)THEMIM->getAout();
     if( p_aout )
     {
         var_SetString( p_aout , "equalizer-preset" , preset_list[i_preset] );
@@ -1120,14 +1120,14 @@ static int PresetCallback( vlc_object_t *p_this, char const *psz_cmd,
     return VLC_SUCCESS;
 }
 
-void Equalizer::delCallbacks( aout_instance_t *p_aout )
+void Equalizer::delCallbacks( vlc_object_t *p_aout )
 {
     //var_DelCallback( p_aout, "equalizer-bands", EqzCallback, this );
     //var_DelCallback( p_aout, "equalizer-preamp", EqzCallback, this );
     var_DelCallback( p_aout, "equalizer-preset", PresetCallback, this );
 }
 
-void Equalizer::addCallbacks( aout_instance_t *p_aout )
+void Equalizer::addCallbacks( vlc_object_t *p_aout )
 {
     //var_AddCallback( p_aout, "equalizer-bands", EqzCallback, this );
     //var_AddCallback( p_aout, "equalizer-preamp", EqzCallback, this );
@@ -1209,7 +1209,7 @@ Compressor::Compressor( intf_thread_t *_p_intf, QWidget *_parent )
     BUTTONACT( enableCheck, enable() );
 
     /* Write down initial values */
-    aout_instance_t *p_aout = THEMIM->getAout();
+    vlc_object_t *p_aout = (vlc_object_t *)THEMIM->getAout();
     char *psz_af;
 
     if( p_aout )
@@ -1277,7 +1277,7 @@ void Compressor::setInitValues()
 
 void Compressor::setValues()
 {
-    aout_instance_t *p_aout = THEMIM->getAout();
+    vlc_object_t *p_aout = (vlc_object_t *)THEMIM->getAout();
 
     for( int i = 0 ; i < NUM_CP_CTRL ; i++ )
     {
@@ -1362,7 +1362,7 @@ Spatializer::Spatializer( intf_thread_t *_p_intf, QWidget *_parent )
     BUTTONACT( enableCheck, enable() );
 
     /* Write down initial values */
-    aout_instance_t *p_aout = THEMIM->getAout();
+    vlc_object_t *p_aout = (vlc_object_t *)THEMIM->getAout();
     char *psz_af;
 
     if( p_aout )
@@ -1412,7 +1412,7 @@ void Spatializer::setInitValues()
 
 void Spatializer::setValues()
 {
-    aout_instance_t *p_aout = THEMIM->getAout();
+    vlc_object_t *p_aout = (vlc_object_t *)THEMIM->getAout();
 
     for( int i = 0 ; i < NUM_SP_CTRL ; i++ )
     {
@@ -1436,14 +1436,14 @@ void Spatializer::setValues()
     }
 
 }
-void Spatializer::delCallbacks( aout_instance_t *p_aout )
+void Spatializer::delCallbacks( vlc_object_t *p_aout )
 {
     VLC_UNUSED( p_aout );
     //    var_DelCallback( p_aout, "Spatializer-bands", EqzCallback, this );
     //    var_DelCallback( p_aout, "Spatializer-preamp", EqzCallback, this );
 }
 
-void Spatializer::addCallbacks( aout_instance_t *p_aout )
+void Spatializer::addCallbacks( vlc_object_t *p_aout )
 {
     VLC_UNUSED( p_aout );
     //    var_AddCallback( p_aout, "Spatializer-bands", EqzCallback, this );

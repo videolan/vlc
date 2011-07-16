@@ -35,6 +35,7 @@
 #include <vlc_dialog.h>
 #include <vlc_url.h>
 #include <vlc_modules.h>
+#include <vlc_aout_intf.h>
 #include <unistd.h> /* execl() */
 
 #import "intf.h"

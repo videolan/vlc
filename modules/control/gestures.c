@@ -33,7 +33,7 @@
 #include <vlc_plugin.h>
 #include <vlc_interface.h>
 #include <vlc_vout.h>
-#include <vlc_aout.h>
+#include <vlc_aout_intf.h>
 #include <vlc_playlist.h>
 
 #ifdef HAVE_UNISTD_H
