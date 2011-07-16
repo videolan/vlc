@@ -505,15 +505,13 @@ static int Open(vlc_object_t *obj)
     /* Stream parameters */
     const pa_stream_flags_t flags = PA_STREAM_INTERPOLATE_TIMING
                                   | PA_STREAM_AUTO_TIMING_UPDATE
-                                  | PA_STREAM_ADJUST_LATENCY
                                   | PA_STREAM_START_CORKED;
 
     const uint32_t byterate = pa_bytes_per_second(&ss);
     struct pa_buffer_attr attr;
-    /* no point in larger buffers on PA side than VLC */
     attr.maxlength = -1;
-    attr.tlength = byterate * AOUT_MAX_ADVANCE_TIME / CLOCK_FREQ;
-    attr.prebuf = byterate * AOUT_MAX_PREPARE_TIME / CLOCK_FREQ;
+    attr.tlength = byterate * AOUT_MAX_PREPARE_TIME / CLOCK_FREQ;
+    attr.prebuf = -1;
     attr.minreq = -1;
     attr.fragsize = 0; /* not used for output */
 
