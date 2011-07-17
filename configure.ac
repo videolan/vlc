@@ -3,10 +3,12 @@ dnl Autoconf settings for vlc
 AC_COPYRIGHT([Copyright 2002-2011 the VideoLAN team])
 
 AC_INIT(vlc, 1.2.0-git)
-VERSION_MAJOR="1"
-VERSION_MINOR="2"
-VERSION_REVISION="0"
-VERSION_EXTRA="-git"
+VERSION_MAJOR=1
+VERSION_MINOR=2
+VERSION_REVISION=0
+VERSION_EXTRA=0
+VERSION_DEV=git
+
 PKGDIR="vlc"
 AC_SUBST(PKGDIR)
 
@@ -4262,10 +4264,11 @@ AC_DEFINE_UNQUOTED(VERSION_MESSAGE, "${VERSION_MESSAGE}", [Simple version string
 AC_DEFINE_UNQUOTED(COPYRIGHT_MESSAGE, "${COPYRIGHT_MESSAGE}", [Copyright string])
 AC_DEFINE_UNQUOTED(COPYRIGHT_YEARS, "${COPYRIGHT_YEARS}", [The copyright years])
 AC_DEFINE_UNQUOTED(CONFIGURE_LINE, "${CONFIGURE_LINE}", [The ./configure command line])
-AC_DEFINE_UNQUOTED(PACKAGE_VERSION_MAJOR,"${VERSION_MAJOR}", [version major number])
-AC_DEFINE_UNQUOTED(PACKAGE_VERSION_MINOR,"${VERSION_MINOR}", [version minor number])
-AC_DEFINE_UNQUOTED(PACKAGE_VERSION_REVISION,"${VERSION_REVISION}", [version minor number])
-AC_DEFINE_UNQUOTED(PACKAGE_VERSION_EXTRA,"${VERSION_EXTRA}", [version minor number])
+AC_DEFINE_UNQUOTED(PACKAGE_VERSION_MAJOR,${VERSION_MAJOR}, [version major number])
+AC_DEFINE_UNQUOTED(PACKAGE_VERSION_MINOR,${VERSION_MINOR}, [version minor number])
+AC_DEFINE_UNQUOTED(PACKAGE_VERSION_REVISION,${VERSION_REVISION}, [version revision number])
+AC_DEFINE_UNQUOTED(PACKAGE_VERSION_EXTRA,${VERSION_EXTRA}, [version extra number])
+AC_DEFINE_UNQUOTED(PACKAGE_VERSION_DEV,"${VERSION_DEV}", [version development string])
 AC_SUBST(COPYRIGHT_MESSAGE)
 AC_SUBST(VERSION_MESSAGE)
 AC_SUBST(VERSION_MAJOR)
@@ -4276,13 +4279,6 @@ AC_SUBST(COPYRIGHT_YEARS)
 AC_DEFINE_UNQUOTED(VLC_COMPILE_BY, "`whoami`", [user who ran configure])
 AC_DEFINE_UNQUOTED(VLC_COMPILE_HOST, "`hostname -f 2>/dev/null || hostname`", [host which ran configure])
 AC_DEFINE_UNQUOTED(VLC_COMPILER, "`$CC -v 2>&1 | tail -n 1`", [compiler])
-dnl Win32 need s a numerical version_extra.
-case $( echo ${VERSION_EXTRA}|wc -m ) in
-       "1") VERSION_EXTRA_RC="0";;
-       "2") VERSION_EXTRA_RC=$( echo ${VERSION_EXTRA}|tr "abcdefghi" "123456789") ;;
-       *) VERSION_EXTRA_RC="99"
-esac
-AC_SUBST(VERSION_EXTRA_RC)
 dnl
 dnl  Handle substvars that use $(top_srcdir)
 dnl

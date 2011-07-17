@@ -46,7 +46,7 @@ struct update_release_t
     int i_major;        ///< Version major
     int i_minor;        ///< Version minor
     int i_revision;     ///< Version revision
-    unsigned char extra;///< Version extra
+    int i_extra;        ///< Version extra
     char* psz_url;      ///< Download URL
     char* psz_desc;     ///< Release description
 };

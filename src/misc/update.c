@@ -64,12 +64,12 @@
 
 /*
  * Here is the format of these "status files" :
- * First line is the last version: "X.Y.Ze" where:
+ * First line is the last version: "X.Y.Z.E" where:
  *      * X is the major number
  *      * Y is the minor number
  *      * Z is the revision number
- *      * e is an OPTIONAL extra letter
- *      * AKA "0.8.6d" or "0.9.0"
+ *      * .E is an OPTIONAL extra number
+ *      * IE "1.2.0" or "1.1.10.1"
  * Second line is a url of the binary for this last version
  * Remaining text is a required description of the update
  */
@@ -180,10 +180,6 @@ static void EmptyRelease( update_t *p_update )
 static bool GetUpdateFile( update_t *p_update )
 {
     stream_t *p_stream = NULL;
-    int i_major = 0;
-    int i_minor = 0;
-    int i_revision = 0;
-    unsigned char extra;
     char *psz_version_line = NULL;
     char *psz_update_data = NULL;
 
@@ -223,18 +219,12 @@ static bool GetUpdateFile( update_t *p_update )
     strncpy( psz_version_line, psz_update_data, i_len );
     psz_version_line[i_len] = '\0';
 
-    p_update->release.extra = 0;
-    switch( sscanf( psz_version_line, "%i.%i.%i%c",
-                    &i_major, &i_minor, &i_revision, &extra ) )
+    p_update->release.i_extra = 0;
+    int ret = sscanf( psz_version_line, "%i.%i.%i.%i",
+                    &p_update->release.i_major, &p_update->release.i_minor,
+                    &p_update->release.i_revision, &p_update->release.i_extra);
+    if( ret != 3 && ret != 4 )
     {
-        case 4:
-            p_update->release.extra = extra;
-        case 3:
-            p_update->release.i_major = i_major;
-            p_update->release.i_minor = i_minor;
-            p_update->release.i_revision = i_revision;
-            break;
-        default:
             msg_Err( p_update->p_libvlc, "Update version false formated" );
             goto error;
     }
@@ -428,40 +418,39 @@ void* update_CheckReal( void *obj )
     return NULL;
 }
 
-/**
- * Compare a given release's version number to the current VLC's one
- *
- * \param p_update structure
- * \return true if we have to upgrade to the given version to be up to date
- */
-static bool is_strictly_greater( int * a, int * b, int n)
-{
-    if( n <= 0 ) return false;
-    if(a[0] > b[0] ) return true;
-    if(a[0] == b[0] ) return is_strictly_greater( a+1, b+1, n-1 );
-    /* a[0] < b[0] */ return false;
-}
-
 bool update_NeedUpgrade( update_t *p_update )
 {
     assert( p_update );
 
-    int current_version[] = {
-        *PACKAGE_VERSION_MAJOR - '0',
-        *PACKAGE_VERSION_MINOR - '0',
-        *PACKAGE_VERSION_REVISION - '0',
-        /* extra string of development versions is "-git", "-rc" ..
-         * so make sure version a.b.c is newer than a.b.c-XXX */
-        (*PACKAGE_VERSION_EXTRA == '-') ? -1 : *PACKAGE_VERSION_EXTRA
+    static const int current[4] = {
+        PACKAGE_VERSION_MAJOR,
+        PACKAGE_VERSION_MINOR,
+        PACKAGE_VERSION_REVISION,
+        PACKAGE_VERSION_EXTRA
     };
-    int latest_version[] = {
+    const int latest[4] = {
         p_update->release.i_major,
         p_update->release.i_minor,
         p_update->release.i_revision,
-        p_update->release.extra
+        p_update->release.i_extra
     };
 
-    return is_strictly_greater( latest_version, current_version, 4 );
+    for (unsigned i = 0; i < sizeof latest / sizeof *latest; i++) {
+        /* there is a new version available */
+        if (latest[i] > current[i])
+            return true;
+
+        /* current version is more recent than the latest version ?! */
+        if (latest[i] < current[i])
+            return false;
+    }
+
+    /* current version is not a release, it's a -git or -rc version */
+    if (*PACKAGE_VERSION_DEV)
+        return true;
+
+    /* current version is latest version */
+    return false;
 }
 
 /**
