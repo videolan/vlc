@@ -2136,7 +2136,7 @@ vlc_module_begin ()
         change_short('v')
     add_string( "verbose-objects", 0, VERBOSE_OBJECTS_TEXT, VERBOSE_OBJECTS_LONGTEXT,
                  false )
-    add_bool( "quiet", 0, QUIET_TEXT, QUIET_LONGTEXT, true )
+    add_bool( "quiet", 0, QUIET_TEXT, QUIET_LONGTEXT, false )
         change_short('q')
 
 #if !defined(WIN32)
