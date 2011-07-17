@@ -29,6 +29,7 @@
 #import <vlc_input.h>
 #import <vlc_keys.h>
 #import <vlc_osd.h>
+#import <vlc_aout_intf.h>
 
 @implementation VLCCoreInteraction
 static VLCCoreInteraction *_o_sharedInstance = nil;
@@ -110,6 +111,34 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
 - (void)normalSpeed
 {
     var_SetInteger( VLCIntf->p_libvlc, "key-action", ACTIONID_RATE_NORMAL );
+}
+
+- (void)setPlaybackRate:(int)i_value
+{
+    playlist_t * p_playlist = pl_Get( VLCIntf );
+
+    double speed = pow( 2, (double)i_value / 17 );
+    int rate = INPUT_RATE_DEFAULT / speed;
+    if( i_currentPlaybackRate != rate )
+        var_SetFloat( p_playlist, "rate", (float)INPUT_RATE_DEFAULT / (float)rate );
+    i_currentPlaybackRate = rate;
+}
+
+- (int)playbackRate
+{
+    playlist_t * p_playlist = pl_Get( VLCIntf );
+
+    float rate = var_GetFloat( p_playlist, "rate" );
+    double value = 17 * log( rate ) / log( 2. );
+    int returnValue = (int) ( ( value > 0 ) ? value + .5 : value - .5 );
+
+    if( returnValue < -34 )
+        returnValue = -34;
+    else if( returnValue > 34 )
+        returnValue = 34;
+
+    i_currentPlaybackRate = returnValue;
+    return returnValue;
 }
 
 - (void)previous

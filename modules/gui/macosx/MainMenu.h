@@ -74,9 +74,15 @@
     IBOutlet NSMenu * o_mu_controls;
     IBOutlet NSMenuItem * o_mi_play;
     IBOutlet NSMenuItem * o_mi_stop;
-    IBOutlet NSMenuItem * o_mi_faster;
-    IBOutlet NSMenuItem * o_mi_slower;
-    IBOutlet NSMenuItem * o_mi_normalSpeed;
+    IBOutlet NSMenuItem * o_mi_rate;
+    IBOutlet NSView * o_mi_rate_view;
+    IBOutlet id o_mi_rate_lbl;
+    IBOutlet id o_mi_rate_lbl_gray;
+    IBOutlet id o_mi_rate_slower_lbl;
+    IBOutlet id o_mi_rate_normal_lbl;
+    IBOutlet id o_mi_rate_faster_lbl;
+    IBOutlet id o_mi_rate_sld;
+    IBOutlet id o_mi_rate_fld;
     IBOutlet NSMenuItem * o_mi_trackSynchronization;
     IBOutlet NSMenuItem * o_mi_previous;
     IBOutlet NSMenuItem * o_mi_next;
@@ -189,6 +195,7 @@
 - (void)setupMenus;
 - (void)refreshVoutDeviceMenu:(NSNotification *)o_notification;
 - (void)setSubmenusEnabled:(BOOL)b_enabled;
+- (void)setRateControlsEnabled:(BOOL)b_enabled;
 
 - (IBAction)clearRecentItems:(id)sender;
 - (void)openRecentItem:(id)item;
@@ -198,6 +205,8 @@
 - (IBAction)intfOpenDisc:(id)sender;
 - (IBAction)intfOpenNet:(id)sender;
 - (IBAction)intfOpenCapture:(id)sender;
+
+- (IBAction)setPlaybackRate:(id)sender;
 
 - (IBAction)showWizard:(id)sender;
 - (IBAction)showVideoEffects:(id)sender;

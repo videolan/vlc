@@ -26,6 +26,7 @@
 #import <vlc_interface.h>
 
 @interface VLCCoreInteraction : NSObject {
+    int i_currentPlaybackRate;
     BOOL b_lockAspectRatio;
 }
 + (VLCCoreInteraction *)sharedInstance;
@@ -35,6 +36,8 @@
 - (void)faster;
 - (void)slower;
 - (void)normalSpeed;
+- (void)setPlaybackRate:(int)i_value;
+- (int)playbackRate;
 - (void)next;
 - (void)previous;
 - (void)forward;

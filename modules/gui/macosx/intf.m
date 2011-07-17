@@ -1428,6 +1428,7 @@ static void manage_cleanup( void * args )
         [o_embedded_window setPrev: (b_plmul || b_chapters)];
         [o_btn_next setEnabled: (b_plmul || b_chapters)];
         [o_embedded_window setNext: (b_plmul || b_chapters)];
+        [o_mainmenu setRateControlsEnabled: b_control];
 
         [o_timeslider setFloatValue: 0.0];
         [o_timeslider setEnabled: b_seekable];
