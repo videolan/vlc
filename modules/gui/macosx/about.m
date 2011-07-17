@@ -100,7 +100,7 @@ static VLAboutBox *_o_sharedInstance = nil;
 #else
         compiler = [NSString stringWithFormat:@"gcc %s", __VERSION__];
 #endif
-        [o_revision_field setStringValue: [NSString stringWithFormat: _NS("Compiled by %s with %@"), VLC_CompileBy(), compiler]];
+        [o_revision_field setStringValue: [NSString stringWithFormat: _NS("Compiled by %@ with %@"), [NSString stringWithUTF8String:VLC_CompileBy()], compiler]];
 
         /* Setup the nameversion field */
         [o_name_version_field setStringValue: [NSString stringWithFormat:@"Version %s (%s)", VERSION_MESSAGE, PLATFORM]];
