@@ -24,7 +24,7 @@
 
 #include "cmd_input.hpp"
 #include "cmd_dialogs.hpp"
-#include <vlc_aout.h>
+#include <vlc_aout_intf.h>
 #include <vlc_input.h>
 #include <vlc_playlist.h>
 

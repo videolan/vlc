@@ -25,7 +25,7 @@
 #include "../src/vlcproc.hpp"
 #include <vlc_playlist.h>
 #include <vlc_input.h>
-#include <vlc_aout.h>
+#include <vlc_aout_intf.h>
 #include <string>
 
 void CmdSetEqualizer::execute()
