@@ -3788,7 +3788,8 @@ dnl  MacOS X video output/gui modules
 dnl
 AC_ARG_ENABLE(macosx,
   [  --enable-macosx         Mac OS X gui support (default enabled on Mac OS X)])
-if test "x${enable_macosx}" = "xyes"
+if test "x${enable_macosx}" != "xno" &&
+(test "${SYS}" = "darwin" || test "${enable_macosx}" = "yes")
 then
   VLC_ADD_LDFLAGS([macosx minimal_macosx],[-Wl,-framework,Cocoa])
   VLC_ADD_LDFLAGS([macosx minimal_macosx],[-Wl,-framework,OpenGL])
