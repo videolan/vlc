@@ -27,7 +27,7 @@
 
 /**
  * \file
- * This file defines libvlc depreceated API
+ * This file defines libvlc deprecated API
  */
 
 # ifdef __cplusplus

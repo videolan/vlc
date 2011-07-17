@@ -155,7 +155,7 @@ LIBVLC_API libvlc_media_t *
  * The libvlc_media_list_lock should be held upon entering this function.
  *
  * \param p_ml a media list instance
- * \param p_md media list instance
+ * \param p_md media instance
  * \return position of media instance
  */
 LIBVLC_API int
