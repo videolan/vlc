@@ -815,7 +815,7 @@ static VLCMain *_o_sharedMainInstance = nil;
 
     if( psz != NULL )
     {
-        o_str = [[[NSString alloc] initWithFormat:@"%s", psz] autorelease];
+        o_str = [NSString stringWithCString: psz encoding:NSUTF8StringEncoding];
 
         if( o_str == NULL )
         {
