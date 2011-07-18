@@ -32,7 +32,7 @@
 #import "../../audio_filter/equalizer_presets.h"
 
 #import <vlc_common.h>
-#import <vlc_aout.h>
+#import <vlc_aout_intf.h>
 
 #import <math.h>
 
