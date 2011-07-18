@@ -867,7 +867,7 @@ static void Close( vlc_object_t * p_this )
             Boolean b_writeable;
             /* Revert mixable to true if we are allowed to */
             AudioObjectPropertyAddress audioDeviceSupportsMixingAddress = { kAudioDevicePropertySupportsMixing , kAudioDevicePropertyScopeOutput, kAudioObjectPropertyElementMaster };
-            b_writeable = AudioObjectHasProperty( p_sys->i_selected_dev, &audioDeviceSupportsMixingAddress );
+            err = AudioObjectIsPropertySettable( p_sys->i_selected_dev, &audioDeviceSupportsMixingAddress, &b_writeable );
             err = AudioObjectGetPropertyData( p_sys->i_selected_dev, &audioDeviceSupportsMixingAddress, 0, NULL, &i_param_size, &b_mix );
 
             if( !err && b_writeable )
