@@ -181,8 +181,9 @@ demux_t *demux_New( vlc_object_t *p_obj, input_thread_t *p_parent_input,
         /* ID3/APE tags will mess-up demuxer probing so we skip it here.
          * ID3/APE parsers will called later on in the demuxer to access the
          * skipped info. */
-        if( !SkipID3Tag( p_demux ) )
-            SkipAPETag( p_demux );
+        while (SkipID3Tag( p_demux ))
+          ;
+        SkipAPETag( p_demux );
 
         p_demux->p_module =
             module_need( p_demux, "demux", psz_module,
