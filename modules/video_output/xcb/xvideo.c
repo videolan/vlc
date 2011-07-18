@@ -300,10 +300,11 @@ FindFormat (vout_display_t *vd,
 static int Open (vlc_object_t *obj)
 {
     vout_display_t *vd = (vout_display_t *)obj;
-    vout_display_sys_t *p_sys = malloc (sizeof (*p_sys));
+    vout_display_sys_t *p_sys;
 
     if (!var_InheritBool (obj, "overlay"))
         return VLC_EGENERIC;
+    p_sys = malloc (sizeof (*p_sys));
     if (p_sys == NULL)
         return VLC_ENOMEM;
 
