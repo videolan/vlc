@@ -46,6 +46,7 @@ pluginsinclude_HEADERS = \
 	../include/vlc_access.h \
 	../include/vlc_acl.h \
 	../include/vlc_aout.h \
+	../include/vlc_aout_intf.h \
 	../include/vlc_aout_mixer.h \
 	../include/vlc_arrays.h \
 	../include/vlc_art_finder.h \
