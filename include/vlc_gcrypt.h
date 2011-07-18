@@ -76,7 +76,8 @@ static const struct gcry_thread_cbs gcry_threads_vlc =
     gcry_vlc_mutex_init,
     gcry_vlc_mutex_destroy,
     gcry_vlc_mutex_lock,
-    gcry_vlc_mutex_unlock
+    gcry_vlc_mutex_unlock,
+    NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL
 };
 #endif
 
