@@ -36,7 +36,7 @@ static bool PostProcessIsPresent(const char *filter)
     const char  *pp        = "postproc";
     const size_t pp_length = strlen(pp);
     return filter &&
-           !strncmp(filter, pp, strlen(pp)) &&
+           !strncmp(filter, pp, pp_length) &&
            (filter[pp_length] == '\0' || filter[pp_length] == ':');
 }
 
