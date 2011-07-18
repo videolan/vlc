@@ -633,7 +633,7 @@ static int OpenSPDIF( aout_instance_t * p_aout )
 
     /* Set mixable to false if we are allowed to */
     AudioObjectPropertyAddress audioDeviceSupportsMixingAddress = { kAudioDevicePropertySupportsMixing , kAudioDevicePropertyScopeOutput, kAudioObjectPropertyElementMaster };
-    b_writeable = AudioObjectHasProperty( p_sys->i_selected_dev, &audioDeviceSupportsMixingAddress );
+    err = AudioObjectIsPropertySettable( p_sys->i_selected_dev, &audioDeviceSupportsMixingAddress, &b_writeable );
     err = AudioObjectGetPropertyDataSize( p_sys->i_selected_dev, &audioDeviceSupportsMixingAddress, 0, NULL, &i_param_size );
     err = AudioObjectGetPropertyData( p_sys->i_selected_dev, &audioDeviceSupportsMixingAddress, 0, NULL, &i_param_size, &b_mix );
 
@@ -1083,7 +1083,7 @@ static int AudioDeviceSupportsDigital( aout_instance_t *p_aout, AudioDeviceID i_
     bool                  b_return = false;
 
     /* Retrieve all the output streams */
-    AudioObjectPropertyAddress streamsAddress = { kAudioDevicePropertyStreams, kAudioObjectPropertyScopeGlobal, kAudioObjectPropertyElementMaster };
+    AudioObjectPropertyAddress streamsAddress = { kAudioDevicePropertyStreams, kAudioDevicePropertyScopeOutput, kAudioObjectPropertyElementMaster };
     err = AudioObjectGetPropertyDataSize( i_dev_id, &streamsAddress, 0, NULL, &i_param_size );
     if( err != noErr )
     {
