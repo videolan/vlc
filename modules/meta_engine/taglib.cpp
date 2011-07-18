@@ -72,6 +72,8 @@
 # define TAGLIB_HAVE_AIFF_WAV_H
 # include <aifffile.h>
 # include <wavfile.h>
+#else
+# include <id3v2tag.h>
 #endif
 
 #if TAGLIB_VERSION >= VERSION_INT(1,6,1) && defined(TAGLIB_WITH_MP4)
