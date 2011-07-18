@@ -28,7 +28,6 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_aout.h>
-#include <vlc_aout_intf.h>
 #include <vlc_cpu.h>
 
 #include <pulse/pulseaudio.h>
@@ -317,13 +316,13 @@ static void Pause(aout_instance_t *aout, bool b_paused, mtime_t i_date)
     (void) i_date;
 }
 
-static int VolumeSet(aout_instance_t *aout, audio_volume_t vol, bool mute)
+static int VolumeSet(aout_instance_t *aout, float vol, bool mute)
 {
     aout_sys_t *sys = aout->output.p_sys;
     pa_operation *op;
 
     uint32_t idx = pa_stream_get_index(sys->stream);
-    pa_volume_t volume = pa_sw_volume_from_linear(vol / (float)AOUT_VOLUME_DEFAULT);
+    pa_volume_t volume = pa_sw_volume_from_linear(vol);
     pa_cvolume cvolume;
 
     /* TODO: do not ruin the channel balance (if set outside VLC) */

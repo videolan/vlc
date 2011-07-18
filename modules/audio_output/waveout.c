@@ -33,7 +33,6 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_aout.h>
-#include <vlc_aout_intf.h>
 #include <vlc_charset.h>                        /* FromLocaleDup, LocaleFree */
 #include <vlc_atomic.h>
 
@@ -63,7 +62,7 @@ static int PlayWaveOut   ( aout_instance_t *, HWAVEOUT, WAVEHDR *,
 static void CALLBACK WaveOutCallback ( HWAVEOUT, UINT, DWORD, DWORD, DWORD );
 static void* WaveOutThread( void * );
 
-static int VolumeSet( aout_instance_t *, audio_volume_t, bool );
+static int VolumeSet( aout_instance_t *, float, bool );
 
 static int WaveOutClearDoneBuffers(aout_sys_t *p_sys);
 
@@ -999,14 +998,13 @@ static void* WaveOutThread( void *data )
     return NULL;
 }
 
-static int VolumeSet( aout_instance_t * p_aout, audio_volume_t i_volume,
-                      bool mute )
+static int VolumeSet( aout_instance_t * p_aout, float volume, bool mute )
 {
     if( mute )
-        i_volume = AOUT_VOLUME_MIN;
+        volume = 0.;
 
-    unsigned long i_waveout_vol = i_volume * 0xFFFF * 2 / AOUT_VOLUME_MAX;
-    i_waveout_vol |= (i_waveout_vol << 16);
+    unsigned long i_waveout_vol = volume * 0x7FFF;
+    i_waveout_vol = (i_waveout_vol << 16) | (i_waveout_vol & 0xFFFF);
 
 #ifdef UNDER_CE
     waveOutSetVolume( 0, i_waveout_vol );

@@ -25,7 +25,6 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_aout.h>
-#include <vlc_aout_intf.h>
 
 static int Open (vlc_object_t *);
 static void Close (vlc_object_t *);
@@ -73,12 +72,11 @@ static void Play (aout_instance_t *aout)
     }
 }
 
-static int VolumeSet (aout_instance_t *aout, audio_volume_t ivol, bool mute)
+static int VolumeSet (aout_instance_t *aout, float vol, bool mute)
 {
     aout_sys_t *sys = aout->output.p_sys;
-    float fvol = ivol / (float)AOUT_VOLUME_DEFAULT;
 
-    return sys->set_volume (sys->opaque, fvol, mute) ? -1 : 0;
+    return sys->set_volume (sys->opaque, vol, mute) ? -1 : 0;
 }
 
 typedef int (*vlc_audio_format_cb) (void **, char *, unsigned *, unsigned *);

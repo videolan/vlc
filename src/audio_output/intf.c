@@ -86,10 +86,12 @@ static int commitVolume (vlc_object_t *obj, aout_instance_t *aout,
 
     if (aout != NULL)
     {
+        float vol = volume / (float)AOUT_VOLUME_DEFAULT;
+
         aout_lock (aout);
 #warning FIXME: wrong test. Need to check that aout_output is ready.
         if (aout->p_mixer != NULL)
-            ret = aout->output.pf_volume_set (aout, volume, mute);
+            ret = aout->output.pf_volume_set (aout, vol, mute);
         aout_unlock (aout);
 
         if (ret == 0)
@@ -241,11 +243,9 @@ int aout_SetMute (vlc_object_t *obj, audio_volume_t *volp, bool mute)
  * The next functions are not supposed to be called by the interface, but
  * are placeholders for software-only scaling.
  */
-static int aout_VolumeSoftSet (aout_instance_t *aout, audio_volume_t volume,
-                               bool mute)
+static int aout_VolumeSoftSet (aout_instance_t *aout, float volume, bool mute)
 {
-    float f = mute ? 0. : (volume / (float)AOUT_VOLUME_DEFAULT);
-    aout->mixer_multiplier = f;
+    aout->mixer_multiplier = mute ? 0. : volume;
     return 0;
 }
 
@@ -264,8 +264,7 @@ void aout_VolumeSoftInit (aout_instance_t *aout)
  * The next functions are not supposed to be called by the interface, but
  * are placeholders for unsupported scaling.
  */
-static int aout_VolumeNoneSet (aout_instance_t *aout, audio_volume_t volume,
-                               bool mute)
+static int aout_VolumeNoneSet (aout_instance_t *aout, float volume, bool mute)
 {
     (void)aout; (void)volume; (void)mute;
     return -1;

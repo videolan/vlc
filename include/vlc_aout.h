@@ -184,7 +184,7 @@ typedef struct aout_output_t
     struct aout_sys_t *     p_sys;
     void (*pf_play)( aout_instance_t * );
     void (* pf_pause)( aout_instance_t *, bool, mtime_t );
-    int (* pf_volume_set )( aout_instance_t *, audio_volume_t, bool );
+    int (* pf_volume_set )( aout_instance_t *, float, bool );
     int                     i_nb_samples;
 } aout_output_t;
 
