@@ -46,7 +46,14 @@ vlc_module_begin ()
     set_callbacks( Open, Close )
 vlc_module_end ()
 
-/* TODO: single static mainloop */
+/* TODO:
+ * - single static mainloop
+ * - pause input on policy event
+ * - resample to compensate for long term drift
+ * - select music or video stream property correctly (?)
+ * - set further appropriate stream properties
+ * - update output devices list dynamically
+ */
 
 /* NOTE:
  * Be careful what you do when the PulseAudio mainloop is held, which is to say
@@ -61,10 +68,9 @@ struct aout_sys_t
     pa_threaded_mainloop *mainloop; /**< PulseAudio event loop */
     pa_volume_t base_volume; /**< 0dB reference volume */
     pa_cvolume cvolume; /**< actual sink input volume */
-    //uint32_t byterate; /**< bytes per second */
 };
 
-/* Context helpers */
+/*** Context helpers ***/
 static void context_state_cb(pa_context *c, void *userdata)
 {
     pa_threaded_mainloop *mainloop = userdata;
@@ -96,7 +102,7 @@ static void error(aout_instance_t *aout, const char *msg, pa_context *context)
     msg_Err(aout, "%s: %s", msg, pa_strerror(pa_context_errno(context)));
 }
 
-/* Sink */
+/*** Sink ***/
 static void sink_list_cb(pa_context *c, const pa_sink_info *i, int eol,
                          void *userdata)
 {
@@ -136,7 +142,7 @@ static void sink_info_cb(pa_context *c, const pa_sink_info *i, int eol,
     msg_Dbg(aout, "base volume: %f", pa_sw_volume_to_linear(sys->base_volume));
 }
 
-/* Stream helpers */
+/*** Stream helpers ***/
 static void stream_state_cb(pa_stream *s, void *userdata)
 {
     pa_threaded_mainloop *mainloop = userdata;
@@ -238,9 +244,9 @@ static void *data_convert(block_t **pp)
     return block->p_buffer;
 }
 
-/*****************************************************************************
- * Play: play a sound samples buffer
- *****************************************************************************/
+/**
+ * Queue one audio frame to the playabck stream
+ */
 static void Play(aout_instance_t *aout)
 {
     aout_sys_t *sys = aout->output.p_sys;
@@ -260,29 +266,6 @@ static void Play(aout_instance_t *aout)
         msg_Dbg(aout, "uncorking");
     }
 
-#if 0
-    /* This function should be called by the LibVLC core a header of time,
-     * but not more than AOUT_MAX_PREPARE. The PulseAudio latency should be
-     * shorter than that (though it might not be the case with some evil piece
-     * of audio output hardware). So we may need to trigger playback early,
-     * (that is to say, short cut the PulseAudio prebuffering). Otherwise,
-     * audio and video may be out of synchronization. */
-    pa_usec_t latency;
-    int negative;
-    if (pa_stream_get_latency(s, &latency, &negative) < 0) {
-        /* Especially at start of stream, latency may not be known (yet). */
-        if (pa_context_errno(sys->context) != PA_ERR_NODATA)
-            error(aout, "cannot determine latency", sys->context);
-    } else {
-        mtime_t gap = aout_FifoFirstDate(&aout->output.fifo) - mdate()
-                - latency;
-
-        if (gap > AOUT_PTS_TOLERANCE)
-            msg_Dbg(aout, "buffer too early (%"PRId64" us)", gap);
-        else if (gap < -AOUT_PTS_TOLERANCE)
-            msg_Err(aout, "buffer too late (%"PRId64" us)", -gap);
-    }
-#endif
 #if 0 /* Fault injector to test underrun recovery */
     static unsigned u = 0;
     if ((++u % 500) == 0) {
@@ -317,6 +300,9 @@ static void Play(aout_instance_t *aout)
     pa_threaded_mainloop_unlock(sys->mainloop);
 }
 
+/**
+ * Cork or uncork the playback stream
+ */
 static void Pause(aout_instance_t *aout, bool b_paused, mtime_t i_date)
 {
     aout_sys_t *sys = aout->output.p_sys;
@@ -391,9 +377,9 @@ static int StreamMove(vlc_object_t *obj, const char *varname, vlc_value_t old,
 }
 
 
-/*****************************************************************************
- * Open: open the audio device
- *****************************************************************************/
+/**
+ * Create a PulseAudio playback stream, a.k.a. a sink input.
+ */
 static int Open(vlc_object_t *obj)
 {
     aout_instance_t *aout = (aout_instance_t *)obj;
@@ -523,7 +509,6 @@ static int Open(vlc_object_t *obj)
     aout->output.p_sys = sys;
     sys->context = NULL;
     sys->stream = NULL;
-    //sys->byterate = byterate;
 
     /* Channel volume */
     sys->base_volume = PA_VOLUME_NORM;
@@ -610,9 +595,9 @@ fail:
     return VLC_EGENERIC;
 }
 
-/*****************************************************************************
- * Close: close the audio device
- *****************************************************************************/
+/**
+ * Removes a PulseAudio playback stream
+ */
 static void Close (vlc_object_t *obj)
 {
     aout_instance_t *aout = (aout_instance_t *)obj;
