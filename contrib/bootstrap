@@ -188,3 +188,5 @@ Other targets:
  * make clean        clean everything
  * make list         list packages
 EOF
+
+mkdir -p ../../contrib/tarballs
