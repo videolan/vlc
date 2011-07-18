@@ -528,6 +528,17 @@ SOURCES_libvlc_control = \
 	control/media_discoverer.c
 
 ###############################################################################
+# libvlc pulse
+###############################################################################
+
+pkglib_LTLIBRARIES = libvlcpulse.la
+
+libvlcpulse_la_SOURCES = pulse/mainloop.c ../include/vlc_pulse.h
+libvlcpulse_la_CPPFLAGS = $(PULSE_CFLAGS)
+libvlcpulse_la_LIBADD = $(PULSE_LIBS) libvlccore.la
+libvlcpulse_la_LDFLAGS = -export-symbols-regex ^vlc_pa_ -no-undefined
+
+###############################################################################
 # GIT revision
 ###############################################################################
 
