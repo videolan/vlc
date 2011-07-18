@@ -21,7 +21,6 @@ AM_LDFLAGS = -rpath '$(libvlcdir)' \
 	-avoid-version -module \
 	-export-symbols-regex ^vlc_entry \
 	-shrext $(LIBEXT) \
-	-rpath "$(libvlcdir)" \
 	-no-undefined \
 	 `$(VLC_CONFIG) --ldflags plugin $@`
 AM_LIBADD = `$(VLC_CONFIG) -libs plugin $@` \
