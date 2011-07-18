@@ -334,6 +334,7 @@ static void Pause(aout_instance_t *aout, bool b_paused, mtime_t i_date)
         pa_operation_unref(op);
 
     pa_threaded_mainloop_unlock(sys->mainloop);
+    (void) i_date;
 }
 
 static int VolumeSet(aout_instance_t *aout, audio_volume_t vol, bool mute)
