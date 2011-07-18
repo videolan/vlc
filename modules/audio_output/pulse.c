@@ -188,6 +188,16 @@ static int stream_wait(pa_stream *stream)
     return 0;
 }
 
+#ifdef LIBPULSE_GETS_A_CLUE
+static void stream_success_cb(pa_stream *s, int success, void *userdata)
+{
+    vlc_pa_signal(0);
+    (void) s; (void) success; (void) userdata;
+}
+#else
+# define stream_success_cb NULL
+#endif
+
 /* Memory free callback. The block_t address is in front of the data. */
 static void data_free(void *data)
 {
@@ -591,12 +601,20 @@ static void Close (vlc_object_t *obj)
     if (s != NULL) {
         pa_operation *op;
 
-        op = pa_stream_flush(s, NULL, NULL);
-        if (op != NULL)
+        if (pa_stream_is_corked(s) > 0)
+            /* Stream paused: discard all buffers */
+            op = pa_stream_flush(s, stream_success_cb, NULL);
+        else
+            /* Stream playing: wait until buffers are played */
+            op = pa_stream_drain(s, stream_success_cb, NULL);
+        if (likely(op != NULL)) {
+#ifdef LIBPULSE_GETS_A_CLUE
+            while (pa_operation_get_state(op) == PA_OPERATION_RUNNING)
+                vlc_pa_wait();
+#endif
             pa_operation_unref(op);
-        op = pa_stream_drain(s, NULL, NULL);
-        if (op != NULL)
-            pa_operation_unref(op);
+        }
+
         pa_stream_disconnect(s);
         pa_stream_unref(s);
     }
