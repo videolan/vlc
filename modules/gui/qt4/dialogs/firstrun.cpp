@@ -27,6 +27,7 @@
 #include <QGroupBox>
 #include <QCheckBox>
 #include <QLabel>
+#include <QDialogButtonBox>
 #include <QPushButton>
 #include <QSettings>
 
@@ -106,11 +107,12 @@ void FirstRun::buildPrivDialog()
     optionsLayout->addWidget( checkbox2, line++, 0 );
 #endif
 
-    QPushButton *ok = new QPushButton( qtr( "Save and Continue" ) );
+    QDialogButtonBox *buttonsBox = new QDialogButtonBox( this );
+    buttonsBox->addButton( qtr( "Save and Continue" ), QDialogButtonBox::AcceptRole );
 
-    gLayout->addWidget( ok, 2, 2 );
+    gLayout->addWidget( buttonsBox, 2, 0, 2, 3 );
 
-    CONNECT( ok, clicked(), this, save() );
-    ok->setFocus();
+    CONNECT( buttonsBox, accepted(), this, save() );
+    buttonsBox->setFocus();
 }
 
