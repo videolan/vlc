@@ -531,7 +531,9 @@ SOURCES_libvlc_control = \
 # libvlc pulse
 ###############################################################################
 
+if HAVE_PULSE
 pkglib_LTLIBRARIES = libvlcpulse.la
+endif
 
 libvlcpulse_la_SOURCES = pulse/mainloop.c ../include/vlc_pulse.h
 libvlcpulse_la_CPPFLAGS = $(PULSE_CFLAGS)
