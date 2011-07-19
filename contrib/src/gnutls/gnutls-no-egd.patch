@@ -1,0 +1,51 @@
+diff -ru gnutls.orig//lib/nettle/Makefile.am gnutls//lib/nettle/Makefile.am
+--- gnutls.orig//lib/nettle/Makefile.am	2011-07-19 20:25:09.000000000 +0300
++++ gnutls//lib/nettle/Makefile.am	2011-07-19 20:25:39.000000000 +0300
+@@ -35,4 +35,4 @@
+ 
+ noinst_LTLIBRARIES = libcrypto.la
+ 
+-libcrypto_la_SOURCES = pk.c mpi.c mac.c cipher.c rnd.c init.c egd.c egd.h
++libcrypto_la_SOURCES = pk.c mpi.c mac.c cipher.c rnd.c init.c
+diff -ru gnutls.orig//lib/nettle/rnd.c gnutls//lib/nettle/rnd.c
+--- gnutls.orig//lib/nettle/rnd.c	2011-07-19 20:25:09.000000000 +0300
++++ gnutls//lib/nettle/rnd.c	2011-07-19 20:26:47.000000000 +0300
+@@ -159,7 +159,7 @@
+ #ifdef HAVE_GETRUSAGE
+ #include <sys/resource.h>
+ #endif
+-#include "egd.h"
++//#include "egd.h"
+ 
+ #define DEVICE_READ_SIZE 16
+ #define DEVICE_READ_SIZE_MAX 32
+@@ -288,6 +288,7 @@
+   return 0;
+ }
+ 
++#if 0
+ static int
+ do_device_source_egd (int init)
+ {
+@@ -342,6 +343,7 @@
+     }
+   return 0;
+ }
++#endif
+ 
+ static int
+ do_device_source (int init)
+@@ -359,11 +361,13 @@
+ 
+       do_source = do_device_source_urandom;
+       ret = do_source (init);
++#if 0
+       if (ret < 0)
+         {
+           do_source = do_device_source_egd;
+           ret = do_source (init);
+         }
++#endif
+ 
+       if (ret < 0)
+         {

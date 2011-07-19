@@ -16,6 +16,7 @@ $(TARBALLS)/gnutls-$(GNUTLS_VERSION).tar.bz2:
 gnutls: gnutls-$(GNUTLS_VERSION).tar.bz2 .sum-gnutls
 	$(UNPACK)
 	$(APPLY) $(SRC)/gnutls/gnutls-win32.patch
+	$(APPLY) $(SRC)/gnutls/gnutls-no-egd.patch
 	$(MOVE)
 
 GNUTLS_CONF := \
@@ -30,11 +31,17 @@ GNUTLS_CONF := \
 	--disable-session-ticket \
 	--disable-openssl-compatibility \
 	--disable-guile \
-	--with-libgcrypt \
 	$(HOSTCONF)
 
-.gnutls: gnutls .gcrypt .gpg-error
-	#$(RECONF)
+ifdef HAVE_WIN32
+GNUTLS_CONF += --with-libgcrypt
+DEPS_gnutls = gcrypt $(DEPS_gcrypt)
+else
+DEPS_gnutls = nettle $(DEPS_nettle)
+endif
+
+.gnutls: gnutls
+	$(RECONF)
 	cd $< && $(HOSTVARS) ./configure $(GNUTLS_CONF)
 	cd $</lib && $(MAKE) install
 	touch $@
