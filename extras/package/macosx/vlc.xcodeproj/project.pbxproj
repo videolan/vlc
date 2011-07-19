@@ -480,6 +480,7 @@
 		CCD590F110E5B73200D39094 /* dialogProvider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = dialogProvider.m; path = ../../../modules/gui/macosx_dialog_provider/dialogProvider.m; sourceTree = SOURCE_ROOT; };
 		CCD590F210E5B76300D39094 /* VLCLoginPanel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCLoginPanel.h; path = ../../../modules/gui/macosx_dialog_provider/VLCLoginPanel.h; sourceTree = SOURCE_ROOT; };
 		CCD590F310E5B76300D39094 /* VLCLoginPanel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VLCLoginPanel.m; path = ../../../modules/gui/macosx_dialog_provider/VLCLoginPanel.m; sourceTree = SOURCE_ROOT; };
+		CCDBA3B313D32E200006127B /* macosx.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = macosx.m; path = ../../../modules/video_output/macosx.m; sourceTree = "<group>"; };
 		CCF0777913659A8000AF19FD /* SPInvocationGrabbing.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SPInvocationGrabbing.h; path = ../../../modules/gui/macosx/SPInvocationGrabbing.h; sourceTree = "<group>"; };
 		CCF0777A13659A8000AF19FD /* SPInvocationGrabbing.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SPInvocationGrabbing.m; path = ../../../modules/gui/macosx/SPInvocationGrabbing.m; sourceTree = "<group>"; };
 		CCF0777B13659A8000AF19FD /* SPMediaKeyTap.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SPMediaKeyTap.h; path = ../../../modules/gui/macosx/SPMediaKeyTap.h; sourceTree = "<group>"; };
@@ -871,6 +872,7 @@
 				CC6C01BA0DDF3EEC00C7D754 /* auhal.c */,
 				CCC895830D9A8A82005AE59C /* eyetv.m */,
 				CC9E3E7913D1CFCF00429A71 /* qtcapture.m */,
+				CCDBA3B313D32E200006127B /* macosx.m */,
 			);
 			name = "OSX-specific source files";
 			sourceTree = "<group>";

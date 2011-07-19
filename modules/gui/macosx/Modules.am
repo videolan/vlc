@@ -22,8 +22,6 @@ SOURCES_macosx = \
 	applescript.m \
 	controls.h \
 	controls.m \
-	equalizer.m \
-	equalizer.h \
 	coredialogs.m \
 	coredialogs.h \
 	intf.m \
