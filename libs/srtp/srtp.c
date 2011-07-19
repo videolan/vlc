@@ -599,6 +599,12 @@ srtp_send (srtp_session_t *s, uint8_t *buf, size_t *lenp, size_t bufsize)
             }
         }
         memcpy (buf + len, tag, tag_len);
+#if 0
+        printf ("Sent    : 0x");
+        for (unsigned i = 0; i < tag_len; i++)
+            printf ("%02x", tag[i]);
+        puts ("");
+#endif
     }
 
     return 0;
