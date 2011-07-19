@@ -143,8 +143,6 @@ static void test_keystream (void)
 
 static void srtp_test (void)
 {
-    if (init_libgcrypt ())
-        fatal ("Libgcrypt initialization error");
     test_derivation ();
     test_keystream ();
 }

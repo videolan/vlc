@@ -32,11 +32,6 @@ srtp_LDADD = libvlc_srtp.la
 test_recv_LDADD = libvlc_srtp.la
 test_aes_LDADD = @GCRYPT_LIBS@
 
-if !HAVE_WIN32
-libvlc_srtp_la_LIBADD += -lpthread
-test_aes_LDADD += -lpthread
-endif
-
 lcov-run:
 	rm -Rf *.gcda lcov
 	$(MAKE) $(AM_MAKEFLAGS) check

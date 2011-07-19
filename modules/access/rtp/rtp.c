@@ -37,6 +37,8 @@
 #include "rtp.h"
 #ifdef HAVE_SRTP
 # include <srtp.h>
+# include <gcrypt.h>
+# include <vlc_gcrypt.h>
 #endif
 
 #define RTP_CACHING_TEXT N_("RTP de-jitter buffer length (msec)")
@@ -285,6 +287,7 @@ static int Open (vlc_object_t *obj)
     char *key = var_CreateGetNonEmptyString (demux, "srtp-key");
     if (key)
     {
+        vlc_gcrypt_init ();
         p_sys->srtp = srtp_create (SRTP_ENCR_AES_CM, SRTP_AUTH_HMAC_SHA1, 10,
                                    SRTP_PRF_AES_CM, SRTP_RCC_MODE1);
         if (p_sys->srtp == NULL)

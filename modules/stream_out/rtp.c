@@ -42,6 +42,8 @@
 #include <vlc_rand.h>
 #ifdef HAVE_SRTP
 # include <srtp.h>
+# include <gcrypt.h>
+# include <vlc_gcrypt.h>
 #endif
 
 #include "rtp.h"
@@ -995,6 +997,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     char *key = var_GetNonEmptyString (p_stream, SOUT_CFG_PREFIX"key");
     if (key)
     {
+        vlc_gcrypt_init ();
         id->srtp = srtp_create (SRTP_ENCR_AES_CM, SRTP_AUTH_HMAC_SHA1, 10,
                                    SRTP_PRF_AES_CM, SRTP_RCC_MODE1);
         if (id->srtp == NULL)

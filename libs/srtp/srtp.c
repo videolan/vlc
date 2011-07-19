@@ -43,8 +43,6 @@
 # include <winsock2.h>
 #else
 # include <netinet/in.h>
-# include <pthread.h>
-GCRY_THREAD_OPTION_PTHREAD_IMPL;
 #endif
 
 #define debug( ... ) (void)0
@@ -84,41 +82,6 @@ enum
 static inline unsigned rcc_mode (const srtp_session_t *s)
 {
     return (s->flags >> 4) & 3;
-}
-
-static bool libgcrypt_usable = false;
-
-static void initonce_libgcrypt (void)
-{
-#ifndef WIN32
-    gcry_control (GCRYCTL_SET_THREAD_CBS, &gcry_threads_pthread);
-#endif
-
-    if ((gcry_check_version ("1.1.94") == NULL)
-     || gcry_control (GCRYCTL_DISABLE_SECMEM, 0)
-     || gcry_control (GCRYCTL_INITIALIZATION_FINISHED, 0))
-        return;
-
-    libgcrypt_usable = true;
-}
-
-static int init_libgcrypt (void)
-{
-    int retval;
-#ifndef WIN32
-    static pthread_once_t once = PTHREAD_ONCE_INIT;
-
-    pthread_once (&once, initonce_libgcrypt);
-#else
-# warning FIXME: This is not thread-safe.
-    if (!libgcrypt_usable)
-        initonce_libgcrypt ();
-#endif
-
-    retval = libgcrypt_usable ? 0 : -1;
-
-    return retval;
-
 }
 
 
@@ -170,7 +133,7 @@ static int proto_create (srtp_proto_t *p, int gcipher, int gmd)
 srtp_session_t *
 srtp_create (int encr, int auth, unsigned tag_len, int prf, unsigned flags)
 {
-    if ((flags & ~SRTP_FLAGS_MASK) || init_libgcrypt ())
+    if ((flags & ~SRTP_FLAGS_MASK))
         return NULL;
 
     int cipher, md;
