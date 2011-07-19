@@ -220,8 +220,6 @@
 		089C1672FE841209C02AAC07 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		089C167FFE841241C02AAC07 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		1058C7ADFEA557BF11CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
-		2A16E03F06C4F08700C87B09 /* equalizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = equalizer.h; path = ../../../modules/gui/macosx/equalizer.h; sourceTree = SOURCE_ROOT; };
-		2A16E04006C4F08700C87B09 /* equalizer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = equalizer.m; path = ../../../modules/gui/macosx/equalizer.m; sourceTree = SOURCE_ROOT; };
 		2AEF857609A5FEC900130822 /* fspanel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = fspanel.h; path = ../../../modules/gui/macosx/fspanel.h; sourceTree = SOURCE_ROOT; };
 		2AEF857709A5FEC900130822 /* fspanel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = fspanel.m; path = ../../../modules/gui/macosx/fspanel.m; sourceTree = SOURCE_ROOT; };
 		8E49720006417F6800370C9F /* playlistinfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = playlistinfo.h; path = ../../../modules/gui/macosx/playlistinfo.h; sourceTree = SOURCE_ROOT; };
@@ -596,8 +594,6 @@
 				8E49720106417F6800370C9F /* playlistinfo.m */,
 				8E55FB7F0459B0FD00FB3317 /* output.h */,
 				8E55FB800459B0FD00FB3317 /* output.m */,
-				2A16E03F06C4F08700C87B09 /* equalizer.h */,
-				2A16E04006C4F08700C87B09 /* equalizer.m */,
 				8ED6C28703E2EB1C0059A3A7 /* vout.h */,
 				8ED6C28803E2EB1C0059A3A7 /* vout.m */,
 				8E9CA1A506D7DEE800B7186C /* voutgl.m */,

@@ -463,8 +463,6 @@ VLC-release.app: vlc
 	    applescript.m \
 	    controls.h \
 	    controls.m \
-	    equalizer.h \
-	    equalizer.m \
 	    intf.h \
 	    intf.m \
 	    macosx.m \
@@ -599,8 +597,6 @@ VLC.app: vlc $(top_builddir)/src/.libs/libvlccore.dylib $(top_builddir)/src/.lib
 	    applescript.m \
 	    controls.h \
 	    controls.m \
-	    equalizer.h \
-	    equalizer.m \
 	    intf.h \
 	    intf.m \
 	    macosx.m \

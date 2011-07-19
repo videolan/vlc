@@ -517,8 +517,6 @@ modules/gui/macosx/coredialogs.m
 modules/gui/macosx/CoreInteraction.m
 modules/gui/macosx/embeddedwindow.h
 modules/gui/macosx/embeddedwindow.m
-modules/gui/macosx/equalizer.h
-modules/gui/macosx/equalizer.m
 modules/gui/macosx/eyetv.h
 modules/gui/macosx/eyetv.m
 modules/gui/macosx/fspanel.h
