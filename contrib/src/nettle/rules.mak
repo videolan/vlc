@@ -14,6 +14,8 @@ nettle: nettle-$(NETTLE_VERSION).tar.gz .sum-nettle
 	$(UNPACK)
 	$(MOVE)
 
+DEPS_nettle = gmp $(DEPS_gmp)
+
 .nettle: nettle
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF)
 	cd $< && $(MAKE) install
