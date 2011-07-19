@@ -43,11 +43,6 @@
 #include "playlist.h"
 #include "input.h"
 
-typedef struct
-{
-    vlc_object_t *p_obj;
-} vlclua_object_t;
-
 /*****************************************************************************
  * Generic vlc_object_t wrapper creation
  *****************************************************************************/
