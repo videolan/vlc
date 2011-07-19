@@ -57,8 +57,6 @@ static VLCEyeTVController *_o_sharedInstance = nil;
 
 - (void)globalNotificationReceived: (NSNotification *)theNotification
 {
-    NSLog( @"notification received in VLC with name %@ and object %@", [theNotification name], [theNotification object] );
-
     /* update our info on the used device */
     if( [[theNotification name] isEqualToString: @"DeviceAdded"] )
         b_deviceConnected = YES;

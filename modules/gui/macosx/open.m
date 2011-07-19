@@ -1246,8 +1246,6 @@ static VLCOpen *_o_sharedMainInstance = nil;
         msg_Dbg( VLCIntf, "eyetv was launched, no device yet" );
         setEyeTVUnconnected;
     }
-    else
-        msg_Warn( VLCIntf, "unknown external notify '%s' received", [[o_notification name] UTF8String] );
 }    
 
 /* little helper method, since this code needs to be run by multiple objects */
