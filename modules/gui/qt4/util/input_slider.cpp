@@ -221,12 +221,26 @@ void SeekSlider::mouseMoveEvent( QMouseEvent *event )
     {
         int posX = qMax( rect().left(), qMin( rect().right(), event->x() ) );
 
+        QString chapterLabel;
         QPoint p( event->globalX() - ( event->x() - posX ) - ( mTimeTooltip->width() / 2 ),
                   QWidget::mapToGlobal( pos() ).y() - ( mTimeTooltip->height() + 2 ) );
 
+        if ( orientation() == Qt::Horizontal ) /* TODO: vertical */
+        {
+                QList<SeekPoint> points = chapters->getPoints();
+                int i_selected = -1;
+                for( int i = 0 ; i < points.count() ; i++ )
+                {
+                    int x = points.at(i).time / 1000000.0 / inputLength * size().width();
+                    if ( event->x() >= x )
+                        i_selected = i;
+                }
+                if ( i_selected >= 0 )
+                    chapterLabel = points.at( i_selected ).name;
+        }
 
         secstotimestr( psz_length, ( posX * inputLength ) / size().width() );
-        mTimeTooltip->setTime( psz_length );
+        mTimeTooltip->setText( psz_length, chapterLabel );
         mTimeTooltip->move( p );
     }
     event->accept();

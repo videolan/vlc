@@ -40,11 +40,24 @@ TimeTooltip::TimeTooltip( QWidget *parent ) :
 
     // Inherit from the system default font size -5
     mFont = QFont( "Verdana", qMax( qApp->font().pointSize() - 5, 7 ) );
+    mPreviousMetricsWidth = 0;
 
+    // Set default text
+    setText( "00:00:00", "" );
+}
+
+void TimeTooltip::buildPath()
+{
     QFontMetrics metrics( mFont );
 
     // Get the bounding box required to print the text and add some padding
-    QRect textbox = metrics.boundingRect( "00:00:00" ).adjusted( -2, -2, 2, 2 );
+    QRect textbox = metrics.boundingRect( mDisplayedText ).adjusted( -2, -2, 2, 2 );
+
+    if ( mPreviousMetricsWidth == textbox.width() )
+        return; //same width == same path
+    else
+        mPreviousMetricsWidth = textbox.width();
+
     mBox = QRect( 0, 0, textbox.width(), textbox.height() );
 
     // Resize the widget to fit our needs
@@ -54,6 +67,7 @@ TimeTooltip::TimeTooltip( QWidget *parent ) :
     // we only have to generate the text at runtime.
 
     // Draw the text box
+    mPainterPath = QPainterPath();
     mPainterPath.addRect( mBox );
 
     // Draw the tip
@@ -79,14 +93,18 @@ TimeTooltip::TimeTooltip( QWidget *parent ) :
     painter.end();
 
     setMask( mMask );
-
-    // Set default text
-    setTime("00:00");
 }
 
-void TimeTooltip::setTime( const QString& time )
+void TimeTooltip::setText( const QString& time, const QString& text )
 {
+    mDisplayedText = time;
+    if ( !mText.isEmpty() ) mDisplayedText.append( " - " + text );
+
+    if ( time.length() != mTime.length() || mText != text )
+        buildPath();
+
     mTime = time;
+    mText = text;
     update();
 }
 
@@ -101,7 +119,7 @@ void TimeTooltip::paintEvent( QPaintEvent * )
 
     p.setFont( mFont );
     p.setPen( QPen( qApp->palette().text(), 1 ) );
-    p.drawText( mBox, Qt::AlignCenter, mTime );
+    p.drawText( mBox, Qt::AlignCenter, mDisplayedText );
 }
 
 #undef TIP_HEIGHT
