@@ -281,13 +281,12 @@ void LocationBar::setIndex( const QModelIndex &index )
         QString text;
 
         char *fb_name = input_item_GetTitle( item->inputItem() );
-        if( !EMPTY_STR( fb_name ) )
-             text = qfu(fb_name);
-        else
+        if( EMPTY_STR( fb_name ) )
         {
+            free( fb_name );
             fb_name = input_item_GetName( item->inputItem() );
-            text = qtr(fb_name);
         }
+        text = qfu(fb_name);
         free(fb_name);
 
         QAbstractButton *btn = new LocationButton( text, first, !first, this );
