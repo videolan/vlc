@@ -833,7 +833,7 @@ srtcp_send (srtp_session_t *s, uint8_t *buf, size_t *lenp, size_t bufsize)
 
     len += 4; /* Digests SRTCP index too */
 
-    const uint8_t *tag = rtcp_digest (s->rtp.mac, buf, len);
+    const uint8_t *tag = rtcp_digest (s->rtcp.mac, buf, len);
     memcpy (buf + len, tag, s->tag_len);
     *lenp = len + s->tag_len;
     return 0;
@@ -861,7 +861,7 @@ srtcp_recv (srtp_session_t *s, uint8_t *buf, size_t *lenp)
         return EINVAL;
     len -= s->tag_len;
 
-    const uint8_t *tag = rtcp_digest (s->rtp.mac, buf, len);
+    const uint8_t *tag = rtcp_digest (s->rtcp.mac, buf, len);
     if (memcmp (buf + len, tag, s->tag_len))
          return EACCES;
 
