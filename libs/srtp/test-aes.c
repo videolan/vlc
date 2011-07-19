@@ -67,21 +67,21 @@ static void test_derivation (void)
      || gcry_cipher_setkey (prf, key, sizeof (key)))
         fatal ("Internal PRF error");
 
-    if (derive (prf, salt, r, sizeof (r), SRTP_CRYPT, out, 16))
+    if (do_derive (prf, salt, r, sizeof (r), SRTP_CRYPT, out, 16))
         fatal ("Internal cipher derivation error");
     printf (" cipher key:  ");
     printhex (out, 16);
     if (memcmp (out, good_cipher, 16))
         fatal ("Test failed");
 
-    if (derive (prf, salt, r, sizeof (r), SRTP_SALT, out, 14))
+    if (do_derive (prf, salt, r, sizeof (r), SRTP_SALT, out, 14))
         fatal ("Internal salt derivation error");
     printf (" cipher salt: ");
     printhex (out, 14);
     if (memcmp (out, good_salt, 14))
         fatal ("Test failed");
 
-    if (derive (prf, salt, r, sizeof (r), SRTP_AUTH, out, 94))
+    if (do_derive (prf, salt, r, sizeof (r), SRTP_AUTH, out, 94))
         fatal ("Internal auth key derivation error");
     printf (" auth key:    ");
     printhex (out, 94);

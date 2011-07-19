@@ -203,7 +203,7 @@ error:
  * with non-padded (truncated) text
  */
 static int
-ctr_crypt (gcry_cipher_hd_t hd, const void *ctr, uint8_t *data, size_t len)
+do_ctr_crypt (gcry_cipher_hd_t hd, const void *ctr, uint8_t *data, size_t len)
 {
     const size_t ctrlen = 16;
     div_t d = div (len, ctrlen);
@@ -233,9 +233,9 @@ ctr_crypt (gcry_cipher_hd_t hd, const void *ctr, uint8_t *data, size_t len)
  * AES-CM key derivation (saltlen = 14 bytes)
  */
 static int
-derive (gcry_cipher_hd_t prf, const void *salt,
-        const uint8_t *r, size_t rlen, uint8_t label,
-        void *out, size_t outlen)
+do_derive (gcry_cipher_hd_t prf, const void *salt,
+           const uint8_t *r, size_t rlen, uint8_t label,
+           void *out, size_t outlen)
 {
     uint8_t iv[16];
 
@@ -248,48 +248,37 @@ derive (gcry_cipher_hd_t prf, const void *salt,
         iv[sizeof (iv) - rlen + i] ^= r[i];
 
     memset (out, 0, outlen);
-    return ctr_crypt (prf, iv, out, outlen);
-}
-
-
-static int
-proto_derive (srtp_proto_t *p, gcry_cipher_hd_t prf,
-              const void *salt, size_t saltlen,
-              const uint8_t *r, size_t rlen, bool rtcp)
-{
-    if (saltlen != 14)
-        return -1;
-
-    uint8_t keybuf[20];
-    uint8_t label = rtcp ? SRTCP_CRYPT : SRTP_CRYPT;
-
-    if (derive (prf, salt, r, rlen, label++, keybuf, 16)
-     || gcry_cipher_setkey (p->cipher, keybuf, 16)
-     || derive (prf, salt, r, rlen, label++, keybuf, 20)
-     || gcry_md_setkey (p->mac, keybuf, 20)
-     || derive (prf, salt, r, rlen, label, p->salt, 14))
-        return -1;
-
-    return 0;
+    return do_ctr_crypt (prf, iv, out, outlen);
 }
 
 
 /**
- * SRTP/SRTCP cipher/salt/MAC keys derivation.
+ * Sets (or resets) the master key and master salt for a SRTP session.
+ * This must be done at least once before using srtp_send(), srtp_recv(),
+ * srtcp_send() or srtcp_recv(). Also, rekeying is required every
+ * 2^48 RTP packets or 2^31 RTCP packets (whichever comes first),
+ * otherwise the protocol security might be broken.
+ *
+ * @return 0 on success, in case of error:
+ *  EINVAL  invalid or unsupported key/salt sizes combination
  */
-static int
-srtp_derive (srtp_session_t *s, const void *key, size_t keylen,
+int
+srtp_setkey (srtp_session_t *s, const void *key, size_t keylen,
              const void *salt, size_t saltlen)
 {
+    /* SRTP/SRTCP cipher/salt/MAC keys derivation */
     gcry_cipher_hd_t prf;
-    uint8_t r[6];
+    uint8_t r[6], keybuf[20];
+
+    if (saltlen != 14)
+        return EINVAL;
 
     if (gcry_cipher_open (&prf, GCRY_CIPHER_AES, GCRY_CIPHER_MODE_CTR, 0)
      || gcry_cipher_setkey (prf, key, keylen))
-        return -1;
+        return EINVAL;
 
+    /* SRTP key derivation */
 #if 0
-    /* RTP key derivation */
     if (s->kdr != 0)
     {
         uint64_t index = (((uint64_t)s->rtp_roc) << 16) | s->rtp_seq;
@@ -304,35 +293,24 @@ srtp_derive (srtp_session_t *s, const void *key, size_t keylen,
     else
 #endif
         memset (r, 0, sizeof (r));
-
-    if (proto_derive (&s->rtp, prf, salt, saltlen, r, 6, false))
+    if (do_derive (prf, salt, r, 6, SRTP_CRYPT, keybuf, 16)
+     || gcry_cipher_setkey (s->rtp.cipher, keybuf, 16)
+     || do_derive (prf, salt, r, 6, SRTP_AUTH, keybuf, 20)
+     || gcry_md_setkey (s->rtp.mac, keybuf, 20)
+     || do_derive (prf, salt, r, 6, SRTP_SALT, s->rtp.salt, 14))
         return -1;
 
-    /* RTCP key derivation */
+    /* SRTCP key derivation */
     memcpy (r, &(uint32_t){ htonl (s->rtcp_index) }, 4);
-    if (proto_derive (&s->rtcp, prf, salt, saltlen, r, 4, true))
+    if (do_derive (prf, salt, r, 4, SRTCP_CRYPT, keybuf, 16)
+     || gcry_cipher_setkey (s->rtcp.cipher, keybuf, 16)
+     || do_derive (prf, salt, r, 4, SRTCP_AUTH, keybuf, 20)
+     || gcry_md_setkey (s->rtcp.mac, keybuf, 20)
+     || do_derive (prf, salt, r, 4, SRTCP_SALT, s->rtcp.salt, 14))
         return -1;
 
     (void)gcry_cipher_close (prf);
     return 0;
-}
-
-
-/**
- * Sets (or resets) the master key and master salt for a SRTP session.
- * This must be done at least once before using rtp_send(), rtp_recv(),
- * rtcp_send() or rtcp_recv(). Also, rekeying is required every
- * 2^48 RTP packets or 2^31 RTCP packets (whichever comes first),
- * otherwise the protocol security might be broken.
- *
- * @return 0 on success, in case of error:
- *  EINVAL  invalid or unsupported key/salt sizes combination
- */
-int
-srtp_setkey (srtp_session_t *s, const void *key, size_t keylen,
-             const void *salt, size_t saltlen)
-{
-    return srtp_derive (s, key, keylen, salt, saltlen) ? EINVAL : 0;
 }
 
 static int hexdigit (char c)
@@ -423,7 +401,7 @@ rtp_crypt (gcry_cipher_hd_t hd, uint32_t ssrc, uint32_t roc, uint16_t seq,
     counter[3] = salt[3] ^ htonl (seq << 16);
 
     /* Encryption */
-    return ctr_crypt (hd, counter, data, len);
+    return do_ctr_crypt (hd, counter, data, len);
 }
 
 
@@ -458,11 +436,9 @@ static inline uint16_t rtp_seq (const uint8_t *buf)
 
 /** Message Authentication and Integrity for RTP */
 static const uint8_t *
-rtp_digest (srtp_session_t *s, const uint8_t *data, size_t len,
+rtp_digest (gcry_md_hd_t md, const uint8_t *data, size_t len,
             uint32_t roc)
 {
-    const gcry_md_hd_t md = s->rtp.mac;
-
     gcry_md_reset (md);
     gcry_md_write (md, data, len);
     gcry_md_write (md, &(uint32_t){ htonl (roc) }, 4);
@@ -579,7 +555,7 @@ srtp_send (srtp_session_t *s, uint8_t *buf, size_t *lenp, size_t bufsize)
     if (!(s->flags & SRTP_UNAUTHENTICATED))
     {
         uint32_t roc = srtp_compute_roc (s, rtp_seq (buf));
-        const uint8_t *tag = rtp_digest (s, buf, len, roc);
+        const uint8_t *tag = rtp_digest (s->rtp.mac, buf, len, roc);
         if (rcc_mode (s))
         {
             assert (s->rtp_rcc);
@@ -664,7 +640,7 @@ srtp_recv (srtp_session_t *s, uint8_t *buf, size_t *lenp)
         else
             rcc = roc;
 
-        const uint8_t *tag = rtp_digest (s, buf, len, rcc);
+        const uint8_t *tag = rtp_digest (s->rtp.mac, buf, len, rcc);
 #if 0
         printf ("Computed: 0x");
         for (unsigned i = 0; i < tag_len; i++)
