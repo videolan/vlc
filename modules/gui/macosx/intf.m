@@ -36,6 +36,7 @@
 #include <vlc_url.h>
 #include <vlc_modules.h>
 #include <vlc_aout_intf.h>
+#include <vlc_vout_window.h>
 #include <unistd.h> /* execl() */
 
 #import "intf.h"
@@ -104,6 +105,53 @@ void CloseIntf ( vlc_object_t *p_this )
     intf_thread_t *p_intf = (intf_thread_t*) p_this;
 
     free( p_intf->p_sys );
+}
+
+static int WindowControl( vout_window_t *, int i_query, va_list );
+
+int WindowOpen( vout_window_t *p_wnd, const vout_window_cfg_t *cfg )
+{
+    intf_thread_t *p_intf = VLCIntf;
+    if (!p_intf) {
+        msg_Err( p_wnd, "Mac OS X interface not found" );
+        return VLC_EGENERIC;
+    }
+
+    msg_Dbg( p_wnd, "looking for video view" );
+    int i_x = cfg->x;
+    int i_y = cfg->y;
+    unsigned i_width = cfg->width;
+    unsigned i_height = cfg->height;
+    p_wnd->handle.nsobject = [[VLCMain sharedInstance] getVideoViewAtPositionX: &i_x Y: &i_y withWidth: &i_width andHeight: &i_height];
+
+    if ( !p_wnd->handle.nsobject ) {
+        msg_Err( p_wnd, "got no video view from the interface" );
+        return VLC_EGENERIC;
+    }
+
+    p_wnd->control = WindowControl;
+    p_wnd->sys = (vout_window_sys_t *)VLCIntf;
+    return VLC_SUCCESS;
+}
+
+static int WindowControl( vout_window_t *p_wnd, int i_query, va_list args )
+{
+    /* TODO */
+    if( i_query == VOUT_WINDOW_SET_STATE )
+        NSLog( @"WindowControl:VOUT_WINDOW_SET_STATE" );
+    else if( i_query == VOUT_WINDOW_SET_SIZE )
+        NSLog( @"WindowControl:VOUT_WINDOW_SET_SIZE" );
+    else if( i_query == VOUT_WINDOW_SET_FULLSCREEN )
+        NSLog( @"WindowControl:VOUT_WINDOW_SET_FULLSCREEN" );
+    else
+        NSLog( @"WindowControl: unknown query" );
+    return VLC_SUCCESS;
+}
+
+void WindowClose( vout_window_t *p_wnd )
+{
+    NSLog( @"Window Close" );
+    // tell the interface to get rid of the video, TODO
 }
 
 /*****************************************************************************
@@ -1181,6 +1229,22 @@ unsigned int CocoaKeyToVLC( unichar i_key )
         [o_wizard initStrings];
     }
     return o_wizard;
+}
+
+- (id)getVideoViewAtPositionX: (int *)pi_x Y: (int *)pi_y withWidth: (unsigned int*)pi_width andHeight: (unsigned int*)pi_height
+{
+    id videoView = [o_embedded_window videoView];
+    NSRect videoRect = [videoView frame];
+    int i_x = (int)videoRect.origin.x;
+    int i_y = (int)videoRect.origin.y;
+    unsigned int i_width = (int)videoRect.size.width;
+    unsigned int i_height = (int)videoRect.size.height;
+    pi_x = (int *)i_x;
+    pi_y = (int *)i_y;
+    pi_width = (unsigned int*)i_width;
+    pi_height = (unsigned int*)i_height;
+    msg_Dbg( VLCIntf, "returning videoview with x=%i, y=%i, width=%i, height=%i", i_x, i_y, i_width, i_height );
+    return videoView;
 }
 
 - (id)embeddedList

@@ -141,6 +141,8 @@
     /* we don't want this window to be restored on relaunch */
     if ([self respondsToSelector:@selector(setRestorable:)])
         [self setRestorable:NO];
+
+    [self makeKeyAndOrderFront: self];
 }
 
 - (void)controlTintChanged
@@ -179,6 +181,11 @@
     [o_img_pause_pressed release];
 
     [super dealloc];
+}
+
+- (id)videoView
+{
+    return o_video_view;
 }
 
 - (void)setTime:(NSString *)o_arg_time position:(float)f_position

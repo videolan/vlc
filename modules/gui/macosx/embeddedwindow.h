@@ -59,6 +59,7 @@
 	IBOutlet id o_playlist_view;
 	IBOutlet id o_playlist_table;
 	IBOutlet id o_vlc_main;
+    IBOutlet id o_video_view;
 
     NSImage * o_img_play;
     NSImage * o_img_play_pressed;
@@ -81,6 +82,8 @@
 }
 
 - (void)controlTintChanged;
+
+- (id)videoView;
 
 - (void)setTime: (NSString *)o_arg_ime position: (float)f_position;
 - (id)getPgbar;

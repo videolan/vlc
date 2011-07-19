@@ -13,12 +13,12 @@
     <object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
       <bool key="EncodedWithXMLCoder">YES</bool>
       <integer value="2"/>
-      <integer value="915"/>
+      <integer value="2416"/>
       <integer value="283"/>
+      <integer value="4596"/>
       <integer value="235"/>
       <integer value="2730"/>
-      <integer value="2417"/>
-      <integer value="4596"/>
+      <integer value="915"/>
     </object>
     <object class="NSArray" key="IBDocument.PluginDependencies">
       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -882,7 +882,7 @@
               <reference key="NSNextResponder" ref="429932428"/>
               <int key="NSvFlags">-2147482334</int>
               <object class="NSPSMatrix" key="NSDrawMatrix"/>
-              <string key="NSFrame">{{222, 24}, {155, 12}}</string>
+              <string key="NSFrame">{{221, 11}, {155, 12}}</string>
               <reference key="NSSuperview" ref="429932428"/>
               <int key="NSpiFlags">16650</int>
               <double key="NSMaxValue">100</double>
@@ -3084,7 +3084,7 @@
               <int key="NSvFlags">274</int>
               <string key="NSFrame">{{0, 28}, {238, 35}}</string>
               <reference key="NSSuperview" ref="351701434"/>
-              <string key="NSClassName">VLCEmbeddedVoutView</string>
+              <string key="NSClassName">NSView</string>
               <string key="NSExtension">NSView</string>
             </object>
           </object>
@@ -6984,6 +6984,14 @@ LCAuLi4</string>
           </object>
           <int key="connectionID">4625</int>
         </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_video_view</string>
+            <reference key="source" ref="284663135"/>
+            <reference key="destination" ref="627102071"/>
+          </object>
+          <int key="connectionID">4626</int>
+        </object>
       </object>
       <object class="IBMutableOrderedSet" key="objectRecords">
         <object class="NSArray" key="orderedObjects">
@@ -10657,9 +10665,9 @@ LCAuLi4</string>
           <boolean value="YES"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
-          <string>{{243, 631}, {238, 63}}</string>
+          <string>{{330, 631}, {238, 63}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-          <string>{{243, 631}, {238, 63}}</string>
+          <string>{{330, 631}, {238, 63}}</string>
           <boolean value="YES"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
@@ -10856,7 +10864,7 @@ LCAuLi4</string>
           <boolean value="YES"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <object class="NSAffineTransform">
-            <bytes key="NSTransformStruct">P4AAAL+AAABDWwAAwagAAA</bytes>
+            <bytes key="NSTransformStruct">P4AAAL+AAABDXgAAwggAAA</bytes>
           </object>
           <boolean value="YES"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -11213,7 +11221,7 @@ LCAuLi4</string>
         </object>
       </object>
       <nil key="sourceID"/>
-      <int key="maxID">4625</int>
+      <int key="maxID">4626</int>
     </object>
     <object class="IBClassDescriber" key="IBDocument.Classes">
       <object class="NSMutableArray" key="referencedPartialClassDescriptionsV3.1+">
@@ -11608,6 +11616,260 @@ LCAuLi4</string>
           <object class="IBClassDescriptionSource" key="sourceIdentifier">
             <string key="majorKey">IBDocumentRelativeSource</string>
             <string key="minorKey">../../../../../modules/gui/macosx/controls.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">VLCEmbeddedWindow</string>
+          <string key="superclassName">NSWindow</string>
+          <object class="NSMutableDictionary" key="actions">
+            <string key="NS.key.0">togglePlaylist:</string>
+            <string key="NS.object.0">id</string>
+          </object>
+          <object class="NSMutableDictionary" key="actionInfosByName">
+            <string key="NS.key.0">togglePlaylist:</string>
+            <object class="IBActionInfo" key="NS.object.0">
+              <string key="name">togglePlaylist:</string>
+              <string key="candidateClassName">id</string>
+            </object>
+          </object>
+          <object class="NSMutableDictionary" key="outlets">
+            <bool key="EncodedWithXMLCoder">YES</bool>
+            <object class="NSArray" key="dict.sortedKeys">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <string>o_background_view</string>
+              <string>o_backgroundimg_middle</string>
+              <string>o_backgroundimg_right</string>
+              <string>o_btn_backward</string>
+              <string>o_btn_equalizer</string>
+              <string>o_btn_forward</string>
+              <string>o_btn_fullscreen</string>
+              <string>o_btn_next</string>
+              <string>o_btn_play</string>
+              <string>o_btn_playlist</string>
+              <string>o_btn_prev</string>
+              <string>o_btn_stop</string>
+              <string>o_btn_volume_down</string>
+              <string>o_btn_volume_up</string>
+              <string>o_horizontal_split</string>
+              <string>o_main_pgbar</string>
+              <string>o_playlist</string>
+              <string>o_playlist_table</string>
+              <string>o_playlist_view</string>
+              <string>o_scrollfield</string>
+              <string>o_searchfield</string>
+              <string>o_sidebar_list</string>
+              <string>o_status</string>
+              <string>o_time</string>
+              <string>o_timeslider</string>
+              <string>o_vertical_split</string>
+              <string>o_video_view</string>
+              <string>o_videosubview</string>
+              <string>o_view</string>
+              <string>o_vlc_main</string>
+              <string>o_volumeslider</string>
+            </object>
+            <object class="NSMutableArray" key="dict.values">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+            </object>
+          </object>
+          <object class="NSMutableDictionary" key="toOneOutletInfosByName">
+            <bool key="EncodedWithXMLCoder">YES</bool>
+            <object class="NSArray" key="dict.sortedKeys">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <string>o_background_view</string>
+              <string>o_backgroundimg_middle</string>
+              <string>o_backgroundimg_right</string>
+              <string>o_btn_backward</string>
+              <string>o_btn_equalizer</string>
+              <string>o_btn_forward</string>
+              <string>o_btn_fullscreen</string>
+              <string>o_btn_next</string>
+              <string>o_btn_play</string>
+              <string>o_btn_playlist</string>
+              <string>o_btn_prev</string>
+              <string>o_btn_stop</string>
+              <string>o_btn_volume_down</string>
+              <string>o_btn_volume_up</string>
+              <string>o_horizontal_split</string>
+              <string>o_main_pgbar</string>
+              <string>o_playlist</string>
+              <string>o_playlist_table</string>
+              <string>o_playlist_view</string>
+              <string>o_scrollfield</string>
+              <string>o_searchfield</string>
+              <string>o_sidebar_list</string>
+              <string>o_status</string>
+              <string>o_time</string>
+              <string>o_timeslider</string>
+              <string>o_vertical_split</string>
+              <string>o_video_view</string>
+              <string>o_videosubview</string>
+              <string>o_view</string>
+              <string>o_vlc_main</string>
+              <string>o_volumeslider</string>
+            </object>
+            <object class="NSMutableArray" key="dict.values">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_background_view</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_backgroundimg_middle</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_backgroundimg_right</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_btn_backward</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_btn_equalizer</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_btn_forward</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_btn_fullscreen</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_btn_next</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_btn_play</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_btn_playlist</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_btn_prev</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_btn_stop</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_btn_volume_down</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_btn_volume_up</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_horizontal_split</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_main_pgbar</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_playlist</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_playlist_table</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_playlist_view</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_scrollfield</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_searchfield</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_sidebar_list</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_status</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_time</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_timeslider</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_vertical_split</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_video_view</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_videosubview</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_view</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_vlc_main</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_volumeslider</string>
+                <string key="candidateClassName">id</string>
+              </object>
+            </object>
+          </object>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBDocumentRelativeSource</string>
+            <string key="minorKey">../../../../../modules/gui/macosx/embeddedwindow.h</string>
           </object>
         </object>
         <object class="IBPartialClassDescription">

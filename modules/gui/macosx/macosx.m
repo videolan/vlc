@@ -38,12 +38,16 @@
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
+#include <vlc_vout_window.h>
 
 /*****************************************************************************
  * External prototypes
  *****************************************************************************/
 int  OpenIntf     ( vlc_object_t * );
 void CloseIntf    ( vlc_object_t * );
+
+int  WindowOpen   ( vout_window_t *, const vout_window_cfg_t * );
+void WindowClose  ( vout_window_t * );
 
 int  OpenVideoGL  ( vlc_object_t * );
 void CloseVideoGL ( vlc_object_t * );
@@ -117,11 +121,9 @@ vlc_module_begin ()
              false )
 
     add_submodule ()
-        set_description( "Mac OS X OpenGL" )
-        set_capability( "opengl provider", 100 )
-        set_category( CAT_VIDEO)
-        set_subcategory( SUBCAT_VIDEO_VOUT )
-//        set_callbacks( OpenVideoGL, CloseVideoGL )
+        set_description( "Mac OS X Video Output Provider" )
+        set_capability( "vout window nsobject", 100 )
+        set_callbacks( WindowOpen, WindowClose )
 
         add_integer( "macosx-vdev", 0, VDEV_TEXT, VDEV_LONGTEXT,
                      false )

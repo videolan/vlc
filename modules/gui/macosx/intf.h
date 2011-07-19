@@ -208,6 +208,7 @@ struct intf_sys_t
 - (id)info;
 - (id)wizard;
 - (id)embeddedList;
+- (id)getVideoViewAtPositionX: (int *)pi_x Y: (int *)pi_y withWidth: (unsigned int*)pi_width andHeight: (unsigned int*)pi_height;
 - (id)coreDialogProvider;
 - (id)mainIntfPgbar;
 - (id)controllerWindow;
