@@ -2,7 +2,7 @@
  * libcsa.c: CSA scrambler/descrambler
  *****************************************************************************
  * Copyright (C) 2004-2005 Laurent Aimar
- * $Id$
+ * Copyright (C) the deCSA authors
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Jean-Paul Saman <jpsaman #_at_# m2x.nl>
@@ -21,11 +21,6 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
-
-/*
- * XXX: A great part is just a copy/past of deCSA but I can't find the
- * author and the license. If there is a problem with it please e-mail me.
- */
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
