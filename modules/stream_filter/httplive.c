@@ -40,6 +40,7 @@
 #include <vlc_arrays.h>
 #include <vlc_stream.h>
 #include <vlc_url.h>
+#include <vlc_memory.h>
 
 /*****************************************************************************
  * Module descriptor
@@ -135,8 +136,8 @@ static int  Read   (stream_t *, void *p_read, unsigned int i_read);
 static int  Peek   (stream_t *, const uint8_t **pp_peek, unsigned int i_peek);
 static int  Control(stream_t *, int i_query, va_list);
 
-static ssize_t read_M3U8(stream_t *s, vlc_url_t *url, uint8_t **buffer);
-static ssize_t ReadM3U8(stream_t *s, uint8_t **buffer);
+static ssize_t read_M3U8_from_stream(stream_t *s, uint8_t **buffer);
+static ssize_t read_M3U8_from_url(stream_t *s, vlc_url_t *url, uint8_t **buffer);
 static char *ReadLine(uint8_t *buffer, uint8_t **pos, size_t len);
 
 static int hls_Download(stream_t *s, segment_t *segment);
@@ -848,7 +849,7 @@ static int parse_M3U8(stream_t *s, vlc_array_t *streams, uint8_t *buffer, const 
 
                     /* Download playlist file from server */
                     uint8_t *buf = NULL;
-                    ssize_t len = read_M3U8(s, &hls->url, &buf);
+                    ssize_t len = read_M3U8_from_url(s, &hls->url, &buf);
                     if (len < 0)
                         err = VLC_EGENERIC;
                     else
@@ -965,7 +966,7 @@ static int get_HTTPLiveMetaPlaylist(stream_t *s, vlc_array_t **streams)
 
     /* Download new playlist file from server */
     uint8_t *buffer = NULL;
-    ssize_t len = read_M3U8(s, &p_sys->m3u8, &buffer);
+    ssize_t len = read_M3U8_from_url(s, &p_sys->m3u8, &buffer);
     if (len < 0)
         return VLC_EGENERIC;
 
@@ -1411,7 +1412,49 @@ static int hls_Download(stream_t *s, segment_t *segment)
 }
 
 /* Read M3U8 file */
-static ssize_t read_M3U8(stream_t *s, vlc_url_t *url, uint8_t **buffer)
+static ssize_t read_M3U8_from_stream(stream_t *s, uint8_t **buffer)
+{
+    int64_t total_bytes = 0;
+    int64_t total_allocated = 0;
+    uint8_t *p = NULL;
+
+    while (1)
+    {
+        char buf[4096];
+        int64_t bytes;
+
+        bytes = stream_Read(s, buf, sizeof(buf));
+        if (bytes == 0)
+            break;      /* EOF ? */
+        else if (bytes < 0)
+            return bytes;
+
+        if ( (total_bytes + bytes + 1) > total_allocated )
+        {
+            if (total_allocated)
+                total_allocated *= 2;
+            else
+                total_allocated = __MIN(bytes+1, sizeof(buf));
+
+            p = realloc_or_free(p, total_allocated);
+            if (p == NULL)
+                return VLC_ENOMEM;
+        }
+
+        memcpy(p+total_bytes, buf, bytes);
+        total_bytes += bytes;
+    }
+
+    if (total_allocated == 0)
+        return VLC_EGENERIC;
+
+    p[total_bytes] = '\0';
+    *buffer = p;
+
+    return total_bytes;
+}
+
+static ssize_t read_M3U8_from_url(stream_t *s, vlc_url_t *url, uint8_t **buffer)
 {
     assert(*buffer == NULL);
 
@@ -1425,65 +1468,8 @@ static ssize_t read_M3U8(stream_t *s, vlc_url_t *url, uint8_t **buffer)
     if (p_m3u8 == NULL)
         return VLC_EGENERIC;
 
-    int64_t size = stream_Size(p_m3u8);
-    if (size == 0) size = 8192; /* no Content-Length */
-
-    *buffer = calloc(1, size);
-    if (*buffer == NULL)
-    {
-        stream_Delete(p_m3u8);
-        return VLC_ENOMEM;
-    }
-
-    int64_t len = 0, curlen = 0;
-    do {
-        int read = ((size - curlen) >= INT_MAX) ? INT_MAX : (size - curlen);
-        len = stream_Read(p_m3u8, *buffer + curlen, read);
-        if (len <= 0)
-            break;
-        curlen += len;
-        if (curlen >= size)
-        {
-            uint8_t *tmp = realloc(*buffer, size + 8192);
-            if (tmp == NULL)
-                break;
-            size += 8192;
-            *buffer = tmp;
-        }
-    } while (vlc_object_alive(s));
+    ssize_t size = read_M3U8_from_stream(p_m3u8, buffer);
     stream_Delete(p_m3u8);
-
-    (*buffer)[curlen-1] = '\0';
-    return size;
-}
-
-static ssize_t ReadM3U8(stream_t *s, uint8_t **buffer)
-{
-    assert(*buffer == NULL);
-
-    int64_t size = stream_Size(s->p_source);
-    if (size == 0) size = 1024; /* no Content-Length */
-
-    *buffer = calloc(1, size);
-    if (*buffer == NULL)
-        return VLC_ENOMEM;
-
-    int64_t len = 0, curlen = 0;
-    do {
-        int read = ((size - curlen) >= INT_MAX) ? INT_MAX : (size - curlen);
-        len = stream_Read(s->p_source, *buffer + curlen, read);
-        if (len <= 0)
-            break;
-        curlen += len;
-        if (curlen >= size)
-        {
-            uint8_t *tmp = realloc(*buffer, size + 1024);
-            if (tmp == NULL)
-                break;
-            size += 1024;
-            *buffer = tmp;
-        }
-    } while (vlc_object_alive(s));
 
     return size;
 }
@@ -1566,7 +1552,7 @@ static int Open(vlc_object_t *p_this)
 
     /* Parse HLS m3u8 content. */
     uint8_t *buffer = NULL;
-    ssize_t len = ReadM3U8(s, &buffer);
+    ssize_t len = read_M3U8_from_stream(s->p_source, &buffer);
     if (len < 0)
         goto fail;
     if (parse_M3U8(s, p_sys->hls_stream, buffer, len) != VLC_SUCCESS)
