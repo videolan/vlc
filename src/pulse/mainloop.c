@@ -23,7 +23,7 @@
 # include "config.h"
 #endif
 
-#define MODULE_STRING "vlcpulse"
+#define MODULE_STRING "pulse"
 #include <vlc_common.h>
 #include <pulse/pulseaudio.h>
 
@@ -170,6 +170,10 @@ pa_context *vlc_pa_connect (vlc_object_t *obj)
     if (unlikely(mainloop == NULL))
         return NULL;
 
+    msg_Dbg (obj, "using library version %s", pa_get_library_version ());
+    msg_Dbg (obj, " (compiled with version %s, protocol %u)",
+             pa_get_headers_version (), PA_PROTOCOL_VERSION);
+
     char *ua = var_InheritString (obj, "user-agent");
     pa_context *ctx;
 
@@ -188,6 +192,12 @@ pa_context *vlc_pa_connect (vlc_object_t *obj)
         pa_context_unref (ctx);
         goto fail;
     }
+    msg_Dbg (obj, "connected %s to %s as client #%"PRIu32,
+             pa_context_is_local (ctx) ? "locally" : "remotely",
+             pa_context_get_server (ctx), pa_context_get_index (ctx));
+    msg_Dbg (obj, "using protocol %"PRIu32", server protocol %"PRIu32,
+             pa_context_get_protocol_version (ctx),
+             pa_context_get_server_protocol_version (ctx));
 
     pa_threaded_mainloop_unlock (mainloop);
     return ctx;
