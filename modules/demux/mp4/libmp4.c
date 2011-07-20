@@ -476,6 +476,124 @@ static int MP4_ReadBox_mvhd(  stream_t *p_stream, MP4_Box_t *p_box )
     MP4_READBOX_EXIT( 1 );
 }
 
+static int MP4_ReadBox_mfhd(  stream_t *p_stream, MP4_Box_t *p_box )
+{
+    MP4_READBOX_ENTER( MP4_Box_data_mfhd_t );
+
+    MP4_GET4BYTES( p_box->data.p_mfhd->i_sequence_number );
+
+#ifdef MP4_VERBOSE
+    msg_Dbg( p_stream, "read box: \"mfhd\" sequence number %d",
+                  p_box->data.p_mfhd->i_sequence_number );
+#endif
+    MP4_READBOX_EXIT( 1 );
+}
+
+static int MP4_ReadBox_tfhd(  stream_t *p_stream, MP4_Box_t *p_box )
+{
+    MP4_READBOX_ENTER( MP4_Box_data_tfhd_t );
+
+    MP4_GETVERSIONFLAGS( p_box->data.p_tfhd );
+
+    MP4_GET4BYTES( p_box->data.p_tfhd->i_track_ID );
+
+    if( p_box->data.p_tfhd->i_version == 0 )
+    {
+        if( p_box->data.p_tfhd->i_flags & MP4_TFHD_BASE_DATA_OFFSET )
+            MP4_GET8BYTES( p_box->data.p_tfhd->i_base_data_offset );
+        if( p_box->data.p_tfhd->i_flags & MP4_TFHD_SAMPLE_DESC_INDEX )
+            MP4_GET4BYTES( p_box->data.p_tfhd->i_sample_description_index );
+        if( p_box->data.p_tfhd->i_flags & MP4_TFHD_DFLT_SAMPLE_DURATION )
+            MP4_GET4BYTES( p_box->data.p_tfhd->i_default_sample_duration );
+        if( p_box->data.p_tfhd->i_flags & MP4_TFHD_DFLT_SAMPLE_SIZE )
+            MP4_GET4BYTES( p_box->data.p_tfhd->i_default_sample_size );
+        if( p_box->data.p_tfhd->i_flags & MP4_TFHD_DFLT_SAMPLE_FLAGS )
+            MP4_GET4BYTES( p_box->data.p_tfhd->i_default_sample_flags );
+
+#ifdef MP4_VERBOSE
+        char psz_base[128] = "\0";
+        char psz_desc[128] = "\0";
+        char psz_dura[128] = "\0";
+        char psz_size[128] = "\0";
+        char psz_flag[128] = "\0";
+        if( p_box->data.p_tfhd->i_flags & MP4_TFHD_BASE_DATA_OFFSET )
+            snprintf(psz_base, sizeof(psz_base), "base offset %lld", p_box->data.p_tfhd->i_base_data_offset);
+        if( p_box->data.p_tfhd->i_flags & MP4_TFHD_SAMPLE_DESC_INDEX )
+            snprintf(psz_desc, sizeof(psz_desc), "sample description index %d", p_box->data.p_tfhd->i_sample_description_index);
+        if( p_box->data.p_tfhd->i_flags & MP4_TFHD_DFLT_SAMPLE_DURATION )
+            snprintf(psz_dura, sizeof(psz_dura), "sample duration %d", p_box->data.p_tfhd->i_default_sample_duration);
+        if( p_box->data.p_tfhd->i_flags & MP4_TFHD_DFLT_SAMPLE_SIZE )
+            snprintf(psz_size, sizeof(psz_size), "sample size %d", p_box->data.p_tfhd->i_default_sample_size);
+        if( p_box->data.p_tfhd->i_flags & MP4_TFHD_DFLT_SAMPLE_FLAGS )
+            snprintf(psz_flag, sizeof(psz_flag), "sample flags 0x%x", p_box->data.p_tfhd->i_default_sample_flags);
+
+        msg_Dbg( p_stream, "read box: \"tfhd\" version %d flags 0x%x track ID %d %s %s %s %s %s",
+                    p_box->data.p_tfhd->i_version,
+                    p_box->data.p_tfhd->i_flags,
+                    p_box->data.p_tfhd->i_track_ID,
+                    psz_base, psz_desc, psz_dura, psz_size, psz_flag );
+#endif
+    }
+
+    MP4_READBOX_EXIT( 1 );
+}
+
+static int MP4_ReadBox_trun(  stream_t *p_stream, MP4_Box_t *p_box )
+{
+    MP4_READBOX_ENTER( MP4_Box_data_trun_t );
+
+    MP4_GETVERSIONFLAGS( p_box->data.p_trun );
+
+    MP4_GET4BYTES( p_box->data.p_trun->i_sample_count );
+
+    if( p_box->data.p_trun->i_flags & MP4_TRUN_DATA_OFFSET )
+        MP4_GET8BYTES( p_box->data.p_trun->i_data_offset );
+    if( p_box->data.p_trun->i_flags & MP4_TRUN_FIRST_FLAGS )
+        MP4_GET4BYTES( p_box->data.p_trun->i_first_sample_flags );
+
+    p_box->data.p_trun->p_samples =
+      calloc( p_box->data.p_trun->i_sample_count, sizeof(MP4_descriptor_trun_sample_t) );
+    if ( p_box->data.p_trun->p_samples == NULL )
+      MP4_READBOX_EXIT( 0 );
+
+    for( unsigned int i = 0; i<p_box->data.p_trun->i_sample_count; i++ )
+    {
+        MP4_descriptor_trun_sample_t *p_sample = &p_box->data.p_trun->p_samples[i];
+        if( p_box->data.p_trun->i_flags & MP4_TRUN_SAMPLE_DURATION )
+            MP4_GET4BYTES( p_sample->i_duration );
+        if( p_box->data.p_trun->i_flags & MP4_TRUN_SAMPLE_SIZE )
+            MP4_GET4BYTES( p_sample->i_size );
+        if( p_box->data.p_trun->i_flags & MP4_TRUN_SAMPLE_FLAGS )
+            MP4_GET4BYTES( p_sample->i_flags );
+        if( p_box->data.p_trun->i_flags & MP4_TRUN_SAMPLE_TIME_OFFSET )
+            MP4_GET4BYTES( p_sample->i_composition_time_offset );
+    }
+
+#ifdef MP4_VERBOSE
+    msg_Dbg( p_stream, "read box: \"trun\" version %d flags 0x%x sample count %d",
+                  p_box->data.p_trun->i_version,
+                  p_box->data.p_trun->i_flags,
+                  p_box->data.p_trun->i_sample_count );
+
+    for( unsigned int i = 0; i<p_box->data.p_trun->i_sample_count; i++ )
+    {
+        MP4_descriptor_trun_sample_t *p_sample = &p_box->data.p_trun->p_samples[i];
+        msg_Dbg( p_stream, "read box: \"trun\" sample %4.4d flags 0x%x duration %d size %d composition time offset %d",
+                        i, p_sample->i_flags, p_sample->i_duration,
+                        p_sample->i_size, p_sample->i_composition_time_offset );
+    }
+#endif
+
+    MP4_READBOX_EXIT( 1 );
+}
+
+static void MP4_FreeBox_trun( MP4_Box_t *p_box )
+{
+    FREENULL( p_box->data.p_trun->p_samples );
+}
+
+
+
 static int MP4_ReadBox_tkhd(  stream_t *p_stream, MP4_Box_t *p_box )
 {
     unsigned int i;
@@ -2781,6 +2899,12 @@ static const struct
 
     /* iTunes/Quicktime meta info */
     { FOURCC_meta,  MP4_ReadBox_meta,       MP4_FreeBox_Common },
+
+    /* found in smoothstreaming */
+    { FOURCC_traf,  MP4_ReadBoxContainer,      MP4_FreeBox_Common },
+    { FOURCC_mfhd,  MP4_ReadBox_mfhd,          MP4_FreeBox_Common },
+    { FOURCC_tfhd,  MP4_ReadBox_tfhd,          MP4_FreeBox_Common },
+    { FOURCC_trun,  MP4_ReadBox_trun,          MP4_FreeBox_trun },
 
     /* Last entry */
     { 0,             MP4_ReadBox_default,       NULL }

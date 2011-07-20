@@ -368,8 +368,13 @@ static int Open( vlc_object_t * p_this )
 
         if( !p_foov )
         {
-            msg_Err( p_demux, "MP4 plugin discarded (no moov box)" );
-            goto error;
+            /* search also for moof box used by smoothstreaming */
+            p_foov = MP4_BoxGet( p_sys->p_root, "/moof" );
+            if( !p_foov )
+            {
+                msg_Err( p_demux, "MP4 plugin discarded (no moov,foov,moof box)" );
+                goto error;
+            }
         }
         /* we have a free box as a moov, rename it */
         p_foov->i_type = FOURCC_moov;
