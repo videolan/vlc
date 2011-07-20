@@ -1206,10 +1206,11 @@ static void* hls_Thread(void *p_this)
                     (p_sys->download.segment >= count)) &&
                    (p_sys->download.seek == -1))
             {
+                vlc_cond_wait(&p_sys->download.wait, &p_sys->download.lock_wait);
                 if (p_sys->b_live /*&& (mdate() >= p_sys->playlist.wakeup)*/)
                     break;
-                vlc_cond_wait(&p_sys->download.wait, &p_sys->download.lock_wait);
-                if (!vlc_object_alive(s)) break;
+                if (!vlc_object_alive(s))
+                    break;
             }
             /* */
             if (p_sys->download.seek >= 0)
