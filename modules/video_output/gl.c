@@ -45,6 +45,7 @@ static void Close (vlc_object_t *);
 
 vlc_module_begin ()
 #if USE_OPENGL_ES == 2
+# error The OpenGL ES2 plugin is incomplete and not functional. FIXME.
 # define API VLC_OPENGL_ES2
 # define MODULE_VARNAME "gles2"
     set_shortname (N_("OpenGL ES2"))
