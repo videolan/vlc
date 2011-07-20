@@ -261,7 +261,6 @@ static VLCOpen *_o_sharedMainInstance = nil;
     NSWorkspace *sharedWorkspace = [NSWorkspace sharedWorkspace];
 	[[sharedWorkspace notificationCenter] addObserver:self selector:@selector(scanOpticalMedia:) name:NSWorkspaceDidMountNotification object:nil];
 	[[sharedWorkspace notificationCenter] addObserver:self selector:@selector(scanOpticalMedia:) name:NSWorkspaceDidUnmountNotification object:nil];
-	[[sharedWorkspace notificationCenter] addObserver:self selector:@selector(scanOpticalMedia:) name:NSWorkspaceDidRenameVolumeNotification object:nil];
     [self scanOpticalMedia:nil];
 
     [self setMRL: @""];
