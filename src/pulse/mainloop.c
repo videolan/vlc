@@ -29,6 +29,9 @@
 
 #include <vlc_pulse.h>
 #include <assert.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <pwd.h>
 
 #undef vlc_pa_error
 void vlc_pa_error (vlc_object_t *obj, const char *msg, pa_context *ctx)
@@ -177,10 +180,51 @@ pa_context *vlc_pa_connect (vlc_object_t *obj)
     char *ua = var_InheritString (obj, "user-agent");
     pa_context *ctx;
 
+    /* Fill in context (client) properties */
+    pa_proplist *props = pa_proplist_new ();
+    if (likely(props != NULL))
+    {
+        pa_proplist_sets (props, PA_PROP_APPLICATION_NAME, ua);
+        pa_proplist_sets (props, PA_PROP_APPLICATION_ID, "org.VideoLAN.VLC");
+        pa_proplist_sets (props, PA_PROP_APPLICATION_VERSION, PACKAGE_VERSION);
+        pa_proplist_sets (props, PA_PROP_APPLICATION_ICON_NAME, PACKAGE_NAME);
+        // FIXME:?
+        pa_proplist_sets (props, PA_PROP_APPLICATION_LANGUAGE, _("C"));
+        pa_proplist_setf (props, PA_PROP_APPLICATION_PROCESS_ID, "%lu",
+                          (unsigned long) getpid ());
+        //pa_proplist_sets (props, PA_PROP_APPLICATION_PROCESS_BINARY,
+        //                  PACKAGE_NAME);
+
+        char buf[sysconf (_SC_GETPW_R_SIZE_MAX)];
+        struct passwd pwbuf, *pw;
+
+        if (getpwuid_r (getuid (), &pwbuf, buf, sizeof (buf), &pw) == 0
+         && pw != NULL)
+            pa_proplist_sets (props, PA_PROP_APPLICATION_PROCESS_USER,
+                              pw->pw_name);
+
+        char hostname[sysconf (_SC_HOST_NAME_MAX)];
+        if (gethostname (hostname, sizeof (hostname) == 0))
+            pa_proplist_sets (props, PA_PROP_APPLICATION_PROCESS_HOST,
+                              hostname);
+
+        const char *session = getenv ("XDG_SESSION_COOKIE");
+        if (session != NULL)
+        {
+            pa_proplist_setf (props, PA_PROP_APPLICATION_PROCESS_MACHINE_ID,
+                              "%.32s", session); /* XXX: is this valid? */
+            pa_proplist_sets (props, PA_PROP_APPLICATION_PROCESS_SESSION_ID,
+                              session);
+        }
+    }
+
+    /* Connect to PulseAudio daemon */
     pa_threaded_mainloop_lock (mainloop);
 
-    ctx = pa_context_new (pa_threaded_mainloop_get_api (mainloop), ua);
+    ctx = pa_context_new_with_proplist (pa_threaded_mainloop_get_api (mainloop), ua, props);
     free (ua);
+    if (props != NULL)
+        pa_proplist_free(props);
     if (unlikely(ctx == NULL))
         goto fail;
 
