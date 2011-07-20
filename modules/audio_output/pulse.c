@@ -477,7 +477,7 @@ static int Open(vlc_object_t *obj)
         msg_Err(aout, "unsupported channel map");
         return VLC_EGENERIC;
     } else {
-        const char *name = pa_channel_map_to_pretty_name(&map);
+        const char *name = pa_channel_map_to_name(&map);
         msg_Dbg(aout, "using %s channel map", (name != NULL) ? name : "?");
     }
 
