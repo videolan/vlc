@@ -332,9 +332,9 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
 
             vlc_mutex_lock( &p_input->p->p_item->lock );
 
-            /* current title if -1 */
-            if ( *pi_req_title_offset < 0 )
-                *pi_req_title_offset = p_input->p->i_title_offset;
+            int i_current_title = var_GetInteger( p_input, "title" );
+            if ( *pi_req_title_offset < 0 ) /* return current title if -1 */
+                *pi_req_title_offset = i_current_title;
 
             if( p_input->p->i_title && p_input->p->i_title > *pi_req_title_offset )
             {
