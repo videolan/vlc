@@ -887,10 +887,10 @@ static void* WaveOutThread( void *data )
         return NULL;
 
     msg_Dbg( p_aout, "will start to play in %"PRId64" us",
-             (p_sys->start_date - AOUT_PTS_TOLERANCE/4)-mdate());
+             (p_sys->start_date - AOUT_MAX_PTS_ADVANCE/4)-mdate());
 
     // than wait a short time... before grabbing first frames
-    mwait( p_sys->start_date - AOUT_PTS_TOLERANCE/4 );
+    mwait( p_sys->start_date - AOUT_MAX_PTS_ADVANCE/4 );
 
 #define waveout_warn(msg) msg_Warn( p_aout, "aout_OutputNextBuffer no buffer "\
                            "got next_date=%d ms, "\
@@ -937,7 +937,7 @@ static void* WaveOutThread( void *data )
                     // means we are too early to request a new buffer?
                     waveout_warn("waiting...")
                     next_date = aout_FifoFirstDate( &p_aout->output.fifo );
-                    mwait( next_date - AOUT_PTS_TOLERANCE/4 );
+                    mwait( next_date - AOUT_MAX_PTS_ADVANCE/4 );
                     next_date = mdate();
                     p_buffer = aout_OutputNextBuffer( p_aout, next_date,
                                                       b_sleek );

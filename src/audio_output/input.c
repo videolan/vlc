@@ -573,11 +573,9 @@ void aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
     if( !start_date )
         start_date = p_buffer->i_pts;
 
-    mtime_t tolerance = 3 * AOUT_PTS_TOLERANCE
-                          * i_input_rate / INPUT_RATE_DEFAULT;
     mtime_t drift = start_date - p_buffer->i_pts;
 
-    if( drift < -tolerance )
+    if( drift < -i_input_rate * 3 * AOUT_MAX_PTS_ADVANCE / INPUT_RATE_DEFAULT )
     {
         msg_Warn( p_aout, "buffer way too early (%"PRId64"), clearing queue",
                   drift );
@@ -589,7 +587,8 @@ void aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
         start_date = p_buffer->i_pts;
         drift = 0;
     }
-    else if( drift > +tolerance )
+    else
+    if( drift > +i_input_rate * 3 * AOUT_MAX_PTS_DELAY / INPUT_RATE_DEFAULT )
     {
         msg_Warn( p_aout, "buffer way too late (%"PRId64"), dropping buffer",
                   drift );
@@ -607,7 +606,7 @@ void aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
     /* Run the resampler if needed.
      * We first need to calculate the output rate of this resampler. */
     if ( ( p_input->i_resampling_type == AOUT_RESAMPLING_NONE ) &&
-         ( drift < -AOUT_PTS_TOLERANCE || drift > +AOUT_PTS_TOLERANCE ) &&
+         ( drift < -AOUT_MAX_PTS_ADVANCE || drift > +AOUT_MAX_PTS_DELAY ) &&
          p_input->i_nb_resamplers > 0 )
     {
         /* Can happen in several circumstances :

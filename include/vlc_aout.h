@@ -33,19 +33,24 @@
 
 /* Buffers which arrive in advance of more than AOUT_MAX_ADVANCE_TIME
  * will be considered as bogus and be trashed */
-#define AOUT_MAX_ADVANCE_TIME           (DEFAULT_PTS_DELAY * 5)
+#define AOUT_MAX_ADVANCE_TIME           (AOUT_MAX_PREPARE_TIME + CLOCK_FREQ)
 
 /* Buffers which arrive in advance of more than AOUT_MAX_PREPARE_TIME
  * will cause the calling thread to sleep */
-#define AOUT_MAX_PREPARE_TIME           (CLOCK_FREQ/2)
+#define AOUT_MAX_PREPARE_TIME           (2 * CLOCK_FREQ)
 
 /* Buffers which arrive after pts - AOUT_MIN_PREPARE_TIME will be trashed
  * to avoid too heavy resampling */
-#define AOUT_MIN_PREPARE_TIME           (CLOCK_FREQ/25)
+#define AOUT_MIN_PREPARE_TIME           AOUT_MAX_PTS_ADVANCE
 
-/* Max acceptable delay between the coded PTS and the actual presentation
- * time, without resampling */
-#define AOUT_PTS_TOLERANCE              (CLOCK_FREQ/25)
+/* Tolerance values from EBU Recommendation 37 */
+/** Maximum advance of actual audio playback time to coded PTS,
+ * above which downsampling will be performed */
+#define AOUT_MAX_PTS_ADVANCE            (CLOCK_FREQ / 25)
+
+/** Maximum delay of actual audio playback time from coded PTS,
+ * above which upsampling will be performed */
+#define AOUT_MAX_PTS_DELAY              (3 * CLOCK_FREQ / 50)
 
 /* Max acceptable resampling (in %) */
 #define AOUT_MAX_RESAMPLING             10

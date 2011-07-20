@@ -275,7 +275,7 @@ aout_buffer_t * aout_OutputNextBuffer( aout_instance_t * p_aout,
      * In the case of b_can_sleek, we don't use a resampler so we need to be
      * a lot more severe. */
     while( ((p_buffer = p_fifo->p_first) != NULL)
-     && p_buffer->i_pts < (b_can_sleek ? start_date : now) - AOUT_PTS_TOLERANCE )
+     && p_buffer->i_pts < (b_can_sleek ? start_date : now) - AOUT_MAX_PTS_DELAY )
     {
         msg_Dbg( p_aout, "audio output is too slow (%"PRId64"), "
                  "trashing %"PRId64"us", now - p_buffer->i_pts,
@@ -304,12 +304,6 @@ aout_buffer_t * aout_OutputNextBuffer( aout_instance_t * p_aout,
      * generally true, and anyway if it's wrong it won't be a disaster.
      */
     if ( 0 > delta + p_buffer->i_length )
-    /*
-     *                   + AOUT_PTS_TOLERANCE )
-     * There is no reason to want that, it just worsen the scheduling of
-     * an audio sample after an output starvation (ie. on start or on resume)
-     * --Gibalou
-     */
     {
         if ( !p_aout->output.b_starving )
             msg_Dbg( p_aout, "audio output is starving (%"PRId64"), "
@@ -322,17 +316,15 @@ aout_buffer_t * aout_OutputNextBuffer( aout_instance_t * p_aout,
     p_aout->output.b_starving = false;
     p_buffer = aout_FifoPop( p_fifo );
 
-    if( !b_can_sleek )
+    if( !b_can_sleek
+     && ( delta > AOUT_MAX_PTS_DELAY || delta < -AOUT_MAX_PTS_ADVANCE ) )
     {
-        if( delta > AOUT_PTS_TOLERANCE || delta < -AOUT_PTS_TOLERANCE )
-        {
-            /* Try to compensate the drift by doing some resampling. */
-            msg_Warn( p_aout, "output date isn't PTS date, requesting "
-                      "resampling (%"PRId64")", delta );
+        /* Try to compensate the drift by doing some resampling. */
+        msg_Warn( p_aout, "output date isn't PTS date, requesting "
+                  "resampling (%"PRId64")", delta );
 
-            aout_FifoMoveDates( &p_aout->p_input->mixer.fifo, delta );
-            aout_FifoMoveDates( p_fifo, delta );
-        }
+        aout_FifoMoveDates( &p_aout->p_input->mixer.fifo, delta );
+        aout_FifoMoveDates( p_fifo, delta );
     }
 out:
     aout_unlock( p_aout );

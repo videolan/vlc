@@ -569,7 +569,8 @@ static void* ALSAThread( void *data )
 
     /* Wait for the exact time to start playing (avoids resampling) */
     vlc_sem_wait( &p_sys->wait );
-    mwait( p_sys->start_date - AOUT_PTS_TOLERANCE / 4 );
+    mwait( p_sys->start_date - AOUT_MAX_PTS_ADVANCE / 4 );
+#warning Should wait for buffer availability instead!
 
     for(;;)
         ALSAFill( p_aout );

@@ -1028,7 +1028,7 @@ static void* DirectSoundThread( void *data )
     if( !vlc_atomic_get( &p_notif->abort) )
     {
         HRESULT dsresult;
-        mwait( p_notif->start_date - AOUT_PTS_TOLERANCE / 2 );
+        mwait( p_notif->start_date - AOUT_MAX_PTS_ADVANCE / 2 );
 
         /* start playing the buffer */
         dsresult = IDirectSoundBuffer_Play( p_aout->output.p_sys->p_dsbuffer,

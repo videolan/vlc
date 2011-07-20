@@ -633,7 +633,7 @@ static void* OSSThread( void *obj )
             else
             {
                 mtime_t delay = next_date - mdate();
-                if( delay > AOUT_PTS_TOLERANCE )
+                if( delay > AOUT_MAX_PTS_ADVANCE )
                 {
                     msleep( delay / 2 );
                 }
