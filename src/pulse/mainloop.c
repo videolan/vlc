@@ -30,6 +30,7 @@
 #include <vlc_pulse.h>
 #include <assert.h>
 #include <stdlib.h>
+#include <locale.h>
 #include <unistd.h>
 #include <pwd.h>
 
@@ -188,8 +189,10 @@ pa_context *vlc_pa_connect (vlc_object_t *obj)
         pa_proplist_sets (props, PA_PROP_APPLICATION_ID, "org.VideoLAN.VLC");
         pa_proplist_sets (props, PA_PROP_APPLICATION_VERSION, PACKAGE_VERSION);
         pa_proplist_sets (props, PA_PROP_APPLICATION_ICON_NAME, PACKAGE_NAME);
-        // FIXME:?
-        pa_proplist_sets (props, PA_PROP_APPLICATION_LANGUAGE, _("C"));
+        //pa_proplist_sets (props, PA_PROP_APPLICATION_LANGUAGE, _("C"));
+        pa_proplist_sets (props, PA_PROP_APPLICATION_LANGUAGE,
+                          setlocale (LC_MESSAGES, NULL));
+
         pa_proplist_setf (props, PA_PROP_APPLICATION_PROCESS_ID, "%lu",
                           (unsigned long) getpid ());
         //pa_proplist_sets (props, PA_PROP_APPLICATION_PROCESS_BINARY,
