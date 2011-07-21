@@ -352,7 +352,8 @@ static OMX_ERRORTYPE SetPortDefinition(decoder_t *p_dec, OmxPort *p_port,
                                &p_port->i_frame_size, &p_port->i_frame_stride,
                                &p_port->i_frame_stride_chroma_div );
             def->format.video.nStride = p_port->i_frame_stride;
-            def->nBufferSize = p_port->i_frame_size;
+            if (p_port->i_frame_size > def->nBufferSize)
+                def->nBufferSize = p_port->i_frame_size;
         }
         break;
 
