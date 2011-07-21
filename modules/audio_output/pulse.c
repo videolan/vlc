@@ -592,7 +592,6 @@ static int Open(vlc_object_t *obj)
                                   | PA_STREAM_AUTO_TIMING_UPDATE
                                   | PA_STREAM_VARIABLE_RATE;
 
-    const uint32_t byterate = pa_bytes_per_second(&ss);
     struct pa_buffer_attr attr;
     attr.maxlength = -1;
     /* PulseAudio assumes that tlength bytes are available in the buffer. Thus
@@ -601,7 +600,7 @@ static int Open(vlc_object_t *obj)
      * underrun on hardware with large buffers. VLC keeps at least
      * AOUT_MIN_PREPARE and at most AOUT_MAX_PREPARE worth of audio buffers.
      * TODO? tlength could be adaptively increased to reduce wakeups. */
-    attr.tlength = byterate * AOUT_MIN_PREPARE_TIME / CLOCK_FREQ;
+    attr.tlength = pa_usec_to_bytes(AOUT_MIN_PREPARE_TIME, &ss);
     attr.prebuf = 0; /* trigger manually */
     attr.minreq = -1;
     attr.fragsize = 0; /* not used for output */
