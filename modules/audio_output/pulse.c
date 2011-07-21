@@ -140,10 +140,6 @@ static void stream_state_cb(pa_stream *s, void *userdata)
 }
 
 /* Latency management and lip synchronization */
-/* Values from EBU R37 */
-#define AOUT_EARLY_TOLERANCE 40000
-#define AOUT_LATE_TOLERANCE  60000
-
 static void stream_latency_cb(pa_stream *s, void *userdata)
 {
     aout_instance_t *aout = userdata;
@@ -182,11 +178,11 @@ static void stream_latency_cb(pa_stream *s, void *userdata)
     /* NOTE: AOUT_MAX_RESAMPLING (10%) is way too high... */
     const int limit = inrate >> 6;
 
-    if (delta < -AOUT_LATE_TOLERANCE) {
+    if (delta < -AOUT_MAX_PTS_DELAY) {
         msg_Warn(aout, "too late by %"PRId64" us", -delta);
         if (change < 0)
             delta += change; /* be more severe if really out of sync */
-    } else if (delta > +AOUT_EARLY_TOLERANCE) {
+    } else if (delta > +AOUT_MAX_PTS_ADVANCE) {
         msg_Warn(aout, "too early by %"PRId64" us", delta);
         if (change > 0)
             delta += change;
