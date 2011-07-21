@@ -345,43 +345,39 @@ void event_thread_t::EventThread()
                     // select new button
                     if ( best != i_curr_button )
                     {
-                        vlc_value_t val;
+                        uint32_t i_palette;
 
-                        if( var_Get( p_sys->p_input, "highlight-mutex", &val ) == VLC_SUCCESS )
-                        {
-                            vlc_mutex_t *p_mutex = (vlc_mutex_t *) val.p_address;
-                            uint32_t i_palette;
-
-                            if(button_ptr.btn_coln != 0) {
-                                i_palette = pci->hli.btn_colit.btn_coli[button_ptr.btn_coln-1][1];
-                            } else {
-                                i_palette = 0;
-                            }
-
-                            for( int i = 0; i < 4; i++ )
-                            {
-                                uint32_t i_yuv = 0xFF;//p_sys->clut[(hl.palette>>(16+i*4))&0x0f];
-                                uint8_t i_alpha = (i_palette>>(i*4))&0x0f;
-                                i_alpha = i_alpha == 0xf ? 0xff : i_alpha << 4;
-
-                                p_sys->palette[i][0] = (i_yuv >> 16) & 0xff;
-                                p_sys->palette[i][1] = (i_yuv >> 0) & 0xff;
-                                p_sys->palette[i][2] = (i_yuv >> 8) & 0xff;
-                                p_sys->palette[i][3] = i_alpha;
-                            }
-
-                            vlc_mutex_lock( p_mutex );
-                            val.i_int = button_ptr.x_start; var_Set( p_sys->p_input, "x-start", val );
-                            val.i_int = button_ptr.x_end;   var_Set( p_sys->p_input, "x-end",   val );
-                            val.i_int = button_ptr.y_start; var_Set( p_sys->p_input, "y-start", val );
-                            val.i_int = button_ptr.y_end;   var_Set( p_sys->p_input, "y-end",   val );
-
-                            val.p_address = (void *)p_sys->palette;
-                            var_Set( p_sys->p_input, "menu-palette", val );
-
-                            val.b_bool = true; var_Set( p_sys->p_input, "highlight", val );
-                            vlc_mutex_unlock( p_mutex );
+                        if(button_ptr.btn_coln != 0) {
+                            i_palette = pci->hli.btn_colit.btn_coli[button_ptr.btn_coln-1][1];
+                        } else {
+                            i_palette = 0;
                         }
+
+                        for( int i = 0; i < 4; i++ )
+                        {
+                            uint32_t i_yuv = 0xFF;//p_sys->clut[(hl.palette>>(16+i*4))&0x0f];
+                            uint8_t i_alpha = (i_palette>>(i*4))&0x0f;
+                            i_alpha = i_alpha == 0xf ? 0xff : i_alpha << 4;
+
+                            p_sys->palette[i][0] = (i_yuv >> 16) & 0xff;
+                            p_sys->palette[i][1] = (i_yuv >> 0) & 0xff;
+                            p_sys->palette[i][2] = (i_yuv >> 8) & 0xff;
+                            p_sys->palette[i][3] = i_alpha;
+                        }
+
+                        vlc_global_lock( VLC_HIGHLIGHT_MUTEX );
+                        var_SetInteger( p_sys->p_input, "x-start",
+                                        button_ptr.x_start );
+                        var_SetInteger( p_sys->p_input, "x-end",
+                                        button_ptr.x_end );
+                        var_SetInteger( p_sys->p_input, "y-start",
+                                        button_ptr.y_start );
+                        var_SetInteger( p_sys->p_input, "y-end",
+                                        button_ptr.y_end );
+                        var_SetAddress( p_sys->p_input, "menu-palette",
+                                        p_sys->palette );
+                        var_SetBool( p_sys->p_input, "highlight", true );
+                        vlc_global_unlock( VLC_HIGHLIGHT_MUTEX );
                     }
                     vlc_mutex_unlock( &p_sys->lock_demuxer );
                     vlc_mutex_lock( &lock );
@@ -601,7 +597,6 @@ void demux_sys_t::InitUi()
         var_Create( p_input, "color", VLC_VAR_ADDRESS );
         var_Create( p_input, "menu-palette", VLC_VAR_ADDRESS );
         var_Create( p_input, "highlight", VLC_VAR_BOOL );
-        var_Create( p_input, "highlight-mutex", VLC_VAR_MUTEX );
     }
 
     /* Now create our event thread catcher */
@@ -615,7 +610,6 @@ void demux_sys_t::CleanUi()
 
     if( p_input )
     {
-        var_Destroy( p_input, "highlight-mutex" );
         var_Destroy( p_input, "highlight" );
         var_Destroy( p_input, "x-start" );
         var_Destroy( p_input, "x-end" );

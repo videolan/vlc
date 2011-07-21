@@ -481,6 +481,7 @@ enum {
    VLC_GCRYPT_MUTEX,
    VLC_XLIB_MUTEX,
    VLC_MOSAIC_MUTEX,
+   VLC_HIGHLIGHT_MUTEX,
    /* Insert new entry HERE */
    VLC_MAX_MUTEX
 };
