@@ -49,7 +49,6 @@
 struct sout_stream_sys_t
 {
     bridged_es_t *p_es;
-    vlc_mutex_t *p_lock;
 
     decoder_t       *p_decoder;
     image_handler_t *p_image; /* filter for resizing */
@@ -191,10 +190,6 @@ static int Open( vlc_object_t *p_this )
 
     p_stream->p_sys = p_sys;
     p_sys->b_inited = false;
-
-    var_Create( p_libvlc, "mosaic-lock", VLC_VAR_MUTEX );
-    var_Get( p_libvlc, "mosaic-lock", &val );
-    p_sys->p_lock = val.p_address;
 
     p_sys->psz_id = var_CreateGetString( p_stream, CFG_PREFIX "id" );
 
@@ -347,7 +342,7 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     }
 
     p_sys->b_inited = true;
-    vlc_mutex_lock( p_sys->p_lock );
+    vlc_global_lock( VLC_MOSAIC_MUTEX );
 
     p_bridge = GetBridge( p_stream );
     if ( p_bridge == NULL )
@@ -391,7 +386,7 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     p_es->pp_last = &p_es->p_picture;
     p_es->b_empty = false;
 
-    vlc_mutex_unlock( p_sys->p_lock );
+    vlc_global_unlock( VLC_MOSAIC_MUTEX );
 
     if ( p_sys->i_height || p_sys->i_width )
     {
@@ -458,7 +453,7 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
     if( p_sys->p_vf2 )
         filter_chain_Delete( p_sys->p_vf2 );
 
-    vlc_mutex_lock( p_sys->p_lock );
+    vlc_global_lock( VLC_MOSAIC_MUTEX );
 
     p_bridge = GetBridge( p_stream );
     p_es = p_sys->p_es;
@@ -490,7 +485,7 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
         var_Destroy( p_libvlc, "mosaic-struct" );
     }
 
-    vlc_mutex_unlock( p_sys->p_lock );
+    vlc_global_unlock( VLC_MOSAIC_MUTEX );
 
     if ( p_sys->p_image )
     {
@@ -510,13 +505,13 @@ static void PushPicture( sout_stream_t *p_stream, picture_t *p_picture )
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     bridged_es_t *p_es = p_sys->p_es;
 
-    vlc_mutex_lock( p_sys->p_lock );
+    vlc_global_lock( VLC_MOSAIC_MUTEX );
 
     *p_es->pp_last = p_picture;
     p_picture->p_next = NULL;
     p_es->pp_last = &p_picture->p_next;
 
-    vlc_mutex_unlock( p_sys->p_lock );
+    vlc_global_unlock( VLC_MOSAIC_MUTEX );
 }
 
 static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
