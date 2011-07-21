@@ -256,7 +256,7 @@ void aout_VolumeSoftInit (aout_instance_t *aout)
     bool mute = var_InheritBool (aout, "mute");
 
     aout->output.pf_volume_set = aout_VolumeSoftSet;
-    aout_VolumeSoftSet (aout, volume, mute);
+    aout_VolumeSoftSet (aout, volume / (float)AOUT_VOLUME_DEFAULT, mute);
 }
 
 
