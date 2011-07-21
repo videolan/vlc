@@ -61,6 +61,8 @@ static inline bool IsConfigFloatType (int type)
 
 extern vlc_rwlock_t config_lock;
 
+bool config_IsSafe (const char *);
+
 /* The configuration file */
 #define CONFIG_FILE                     "vlcrc"
 

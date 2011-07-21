@@ -235,8 +235,6 @@ extern const size_t libvlc_config_count;
  * Variables stuff
  */
 void var_OptionParse (vlc_object_t *, const char *, bool trusted);
-bool config_IsSafe (const char *);
-
 
 /*
  * Stats stuff

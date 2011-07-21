@@ -37,6 +37,7 @@
 #endif
 
 #include "libvlc.h"
+#include "config/configuration.h"
 
 #include <assert.h>
 #include <math.h>
