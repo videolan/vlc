@@ -71,6 +71,45 @@ struct aout_sys_t
     unsigned rate; /**< Current stream sample rate */
 };
 
+static void sink_input_info_cb(pa_context *, const pa_sink_input_info *,
+                               int, void *);
+
+/*** Context ***/
+static void context_cb(pa_context *ctx, pa_subscription_event_type_t type,
+                       uint32_t idx, void *userdata)
+{
+    audio_output_t *aout = userdata;
+    aout_sys_t *sys = aout->sys;
+    pa_operation *op;
+
+    switch (type & PA_SUBSCRIPTION_EVENT_FACILITY_MASK)
+    {
+      case PA_SUBSCRIPTION_EVENT_SINK_INPUT:
+        if (idx != pa_stream_get_index(sys->stream))
+            break; /* only interested in our sink input */
+
+        /* Gee... PA will not provide the infos directly in the event. */
+        switch (type & PA_SUBSCRIPTION_EVENT_TYPE_MASK)
+        {
+          case PA_SUBSCRIPTION_EVENT_REMOVE:
+            msg_Err(aout, "sink input killed!");
+            break;
+
+          default:
+            op = pa_context_get_sink_input_info(ctx, idx, sink_input_info_cb,
+                                                aout);
+            if (likely(op != NULL))
+                pa_operation_unref(op);
+            break;
+        }
+        break;
+
+      default: /* unsubscribed facility?! */
+        assert(0);
+    }
+}
+
+
 /*** Sink ***/
 static void sink_list_cb(pa_context *c, const pa_sink_info *i, int eol,
                          void *userdata)
@@ -296,6 +335,24 @@ static void stream_success_cb(pa_stream *s, int success, void *userdata)
 # define stream_success_cb NULL
 #endif
 
+
+/*** Sink input ***/
+static void sink_input_info_cb(pa_context *ctx, const pa_sink_input_info *i,
+                               int eol, void *userdata)
+{
+    audio_output_t *aout = userdata;
+
+    if (eol)
+        return;
+
+    const float volume = pa_sw_volume_to_linear(pa_cvolume_avg(&i->volume));
+    aout_VolumeHardSet(aout, volume, i->mute);
+    (void) ctx;
+}
+
+
+/*** VLC audio output callbacks ***/
+
 /* Memory free callback. The block_t address is in front of the data. */
 static void data_free(void *data)
 {
@@ -440,7 +497,6 @@ static int VolumeSet(audio_output_t *aout, float vol, bool mute)
     pa_cvolume cvolume;
 
     /* TODO: do not ruin the channel balance (if set outside VLC) */
-    /* TODO: notify UI about volume changes by other PulseAudio clients */
     pa_cvolume_set(&sys->cvolume, sys->cvolume.channels, volume);
     pa_sw_cvolume_multiply_scalar(&cvolume, &sys->cvolume, sys->base_volume);
     assert(pa_cvolume_valid(&cvolume));
@@ -633,6 +689,14 @@ static int Open(vlc_object_t *obj)
     sys->pts = VLC_TS_INVALID;
     sys->desync = 0;
     sys->rate = ss.rate;
+
+    /* Context events */
+    const pa_subscription_mask_t mask = PA_SUBSCRIPTION_MASK_SINK_INPUT;
+
+    pa_context_set_subscribe_callback(ctx, context_cb, aout);
+    op = pa_context_subscribe(ctx, mask, NULL, NULL);
+    if (likely(op != NULL))
+       pa_operation_unref(op);
 
     /* Channel volume */
     sys->base_volume = PA_VOLUME_NORM;
