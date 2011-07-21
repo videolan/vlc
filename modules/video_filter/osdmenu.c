@@ -106,7 +106,7 @@ static int MouseEvent( filter_t *,
 #if defined( WIN32 ) || defined( UNDER_CE )
 #define OSD_DEFAULT_CFG "osdmenu/default.cfg"
 #else
-#define OSD_DEFAULT_CFG "share/osdmenu/default.cfg"
+#define OSD_DEFAULT_CFG PKGDATADIR"/osdmenu/default.cfg"
 #endif
 
 #define OSD_UPDATE_MIN     0

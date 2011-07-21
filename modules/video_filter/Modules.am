@@ -1,4 +1,5 @@
 SUBDIRS = dynamicoverlay
+
 SOURCES_mosaic = mosaic.c mosaic.h
 SOURCES_transform = transform.c
 SOURCES_invert = invert.c
@@ -25,7 +26,13 @@ SOURCES_scale = scale.c
 SOURCES_marq = marq.c
 SOURCES_rss = rss.c
 SOURCES_motiondetect = motiondetect.c
-SOURCES_osdmenu = osdmenu.c
+
+libosdmenu_plugin_la_SOURCES = osdmenu.c
+libosdmenu_plugin_la_CFLAGS = $(AM_CFLAGS) -DPKGDATADIR=\"$(vlcdatadir)\"
+libosdmenu_plugin_la_LIBADD = $(AM_LIBADD)
+libosdmenu_plugin_la_DEPENDENCIES =
+EXTRA_LTLIBRARIES += libosdmenu_plugin.la
+
 SOURCES_remoteosd = remoteosd.c remoteosd_rfbproto.h
 SOURCES_magnify = magnify.c
 SOURCES_wave = wave.c
