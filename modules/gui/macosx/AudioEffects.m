@@ -196,7 +196,7 @@ static bool GetEqualizerStatus( intf_thread_t *p_custom_intf,
                    VLC_VAR_DOINHERIT );
         psz_preset = var_GetNonEmptyString( p_object, "equalizer-preset" );
         
-        for( i = 0 ; (psz_preset != NULL) && (i < 18) ; i++ )
+        for( i = 0 ; i < NB_PRESETS ; i++ )
         {
             if( strcmp( preset_list[i], psz_preset ) )
                 continue;
@@ -204,8 +204,8 @@ static bool GetEqualizerStatus( intf_thread_t *p_custom_intf,
             [o_eq_presets_popup selectItemAtIndex: i];
             
             
-            [o_eq_preamp_sld setFloatValue: eqz_preset_10b[i]->f_preamp];
-            [self setBandSlidersValues: (float *)eqz_preset_10b[i]->f_amp];
+            [o_eq_preamp_sld setFloatValue: eqz_preset_10b[i],f_preamp];
+            [self setBandSlidersValues: (float *)eqz_preset_10b[i].f_amp];
             
             if( strcmp( psz_preset, "flat" ) )
             {
@@ -214,23 +214,23 @@ static bool GetEqualizerStatus( intf_thread_t *p_custom_intf,
                 snprintf( psz_bands, sizeof( psz_bands ),
                          "%.1f %.1f %.1f %.1f %.1f %.1f %.1f "
                          "%.1f %.1f %.1f",
-                         eqz_preset_10b[i]->f_amp[0],
-                         eqz_preset_10b[i]->f_amp[1],
-                         eqz_preset_10b[i]->f_amp[2],
-                         eqz_preset_10b[i]->f_amp[3],
-                         eqz_preset_10b[i]->f_amp[4],
-                         eqz_preset_10b[i]->f_amp[5],
-                         eqz_preset_10b[i]->f_amp[6],
-                         eqz_preset_10b[i]->f_amp[7],
-                         eqz_preset_10b[i]->f_amp[8],
-                         eqz_preset_10b[i]->f_amp[9] );
+                         eqz_preset_10b[i].f_amp[0],
+                         eqz_preset_10b[i].f_amp[1],
+                         eqz_preset_10b[i].f_amp[2],
+                         eqz_preset_10b[i].f_amp[3],
+                         eqz_preset_10b[i].f_amp[4],
+                         eqz_preset_10b[i].f_amp[5],
+                         eqz_preset_10b[i].f_amp[6],
+                         eqz_preset_10b[i].f_amp[7],
+                         eqz_preset_10b[i].f_amp[8],
+                         eqz_preset_10b[i].f_amp[9] );
                 
                 var_Create( p_object, "equalizer-preamp", VLC_VAR_FLOAT |
                            VLC_VAR_DOINHERIT );
                 var_Create( p_object, "equalizer-bands", VLC_VAR_STRING |
                            VLC_VAR_DOINHERIT );
                 var_SetFloat( p_object, "equalizer-preamp",
-                             eqz_preset_10b[i]->f_preamp );
+                             eqz_preset_10b[i].f_preamp );
                 var_SetString( p_object, "equalizer-bands", psz_bands );
             }
         }
@@ -382,23 +382,23 @@ static bool GetEqualizerStatus( intf_thread_t *p_custom_intf,
     
     NSString *preset = @"";
     const char *psz_values;
-    for( int i = 0; i < 10; i++ )
+    for( int i = 0; i < EQZ_BANDS_MAX; i++ )
     {
-        preset = [preset stringByAppendingFormat:@"%.1f ", eqz_preset_10b[[sender indexOfSelectedItem]]->f_amp[i] ];
+        preset = [preset stringByAppendingFormat:@"%.1f ", eqz_preset_10b[[sender indexOfSelectedItem]].f_amp[i] ];
     }
     psz_values = [preset UTF8String];
     var_SetString( p_object, "equalizer-bands", psz_values );
-    var_SetFloat( p_object, "equalizer-preamp", eqz_preset_10b[[sender indexOfSelectedItem]]->f_preamp);
+    var_SetFloat( p_object, "equalizer-preamp", eqz_preset_10b[[sender indexOfSelectedItem]].f_preamp);
     
-    [o_eq_preamp_sld setFloatValue: eqz_preset_10b[[sender indexOfSelectedItem]]->f_preamp];
+    [o_eq_preamp_sld setFloatValue: eqz_preset_10b[[sender indexOfSelectedItem]].f_preamp];
     
-    [self setBandSlidersValues:(float *)eqz_preset_10b[[sender indexOfSelectedItem]]->f_amp];
+    [self setBandSlidersValues:(float *)eqz_preset_10b[[sender indexOfSelectedItem]].f_amp];
     
     if( (BOOL)config_GetInt( p_intf, "macosx-eq-keep" ) == YES )
     {
         /* save changed to config */
         config_PutPsz( p_intf, "equalizer-bands", psz_values );
-        config_PutFloat( p_intf, "equalizer-preamp", eqz_preset_10b[[sender indexOfSelectedItem]]->f_preamp );
+        config_PutFloat( p_intf, "equalizer-preamp", eqz_preset_10b[[sender indexOfSelectedItem]].f_preamp );
         config_PutPsz( p_intf, "equalizer-preset", preset_list[[sender indexOfSelectedItem]] );
     }
     
