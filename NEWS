@@ -58,6 +58,7 @@ Demuxers:
  * Support for images/cover art in wma/wmv/asf files
  * Improvements in .ape files metadata reading and writing
  * New demuxer module for EBU subtitles (.stl)
+ * Support for caf, mtv, awb, f4v, amr, vro (DVD-VR) files
 
 Interfaces:
  * Skins2 / Qt: misc improvements and usability fixes
