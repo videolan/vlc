@@ -21,13 +21,15 @@ aout_FormatPrint
 aout_FormatPrintChannels
 aout_OutputNextBuffer
 aout_VolumeGet
+aout_VolumeSet
+aout_VolumeUp
 aout_ToggleMute
 aout_IsMuted
 aout_SetMute
 aout_VolumeNoneInit
-aout_VolumeSet
 aout_VolumeSoftInit
-aout_VolumeUp
+aout_VolumeHardInit
+aout_VolumeHardSet
 block_Alloc
 block_FifoCount
 block_FifoEmpty

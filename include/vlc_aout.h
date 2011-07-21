@@ -166,6 +166,8 @@ struct aout_fifo_t
 
 struct aout_mixer_t;
 
+typedef int (*aout_volume_cb) (audio_output_t *, float, bool);
+
 /** Audio output object */
 struct audio_output
 {
@@ -201,8 +203,7 @@ struct audio_output
     void (*pf_play)( audio_output_t * ); /**< Audio buffer callback */
     void (* pf_pause)( audio_output_t *, bool, mtime_t ); /**< Pause/resume
         callback (optional, may be NULL) */
-    int (* pf_volume_set )(audio_output_t *, float, bool); /**< Volume setter
-        (optional, may be NULL) */
+    aout_volume_cb          pf_volume_set; /**< Volume setter (or NULL) */
     int                     i_nb_samples;
 };
 
@@ -273,9 +274,11 @@ VLC_API const char * aout_FormatPrintChannels( const audio_sample_format_t * ) V
 VLC_API mtime_t aout_FifoFirstDate( const aout_fifo_t * ) VLC_USED;
 VLC_API aout_buffer_t *aout_FifoPop( aout_fifo_t * p_fifo ) VLC_USED;
 
-/* From intf.c : */
-VLC_API void aout_VolumeSoftInit( audio_output_t * );
 VLC_API void aout_VolumeNoneInit( audio_output_t * );
+VLC_API void aout_VolumeSoftInit( audio_output_t * );
+VLC_API void aout_VolumeHardInit( audio_output_t *, aout_volume_cb );
+VLC_API void aout_VolumeHardSet( audio_output_t *, float, bool );
+
 VLC_API int aout_ChannelsRestart( vlc_object_t *, const char *, vlc_value_t, vlc_value_t, void * );
 
 /* */

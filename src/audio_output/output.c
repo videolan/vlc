@@ -30,6 +30,7 @@
 
 #include <vlc_common.h>
 #include <vlc_aout.h>
+#include <vlc_aout_intf.h>
 #include <vlc_cpu.h>
 #include <vlc_modules.h>
 
@@ -210,6 +211,7 @@ void aout_OutputDelete( audio_output_t * p_aout )
         return;
 
     module_unneed( p_aout, p_aout->module );
+    aout_VolumeNoneInit( p_aout ); /* clear volume callback */
     p_aout->module = NULL;
     aout_FiltersDestroyPipeline( p_aout->pp_filters, p_aout->i_nb_filters );
     aout_FifoDestroy( &p_aout->fifo );
@@ -249,6 +251,90 @@ void aout_OutputPause( audio_output_t *aout, bool pause, mtime_t date )
     if( aout->pf_pause != NULL )
         aout->pf_pause( aout, pause, date );
 }
+
+
+/*** Volume handling ***/
+
+/**
+ * Dummy volume setter. This is the default volume setter.
+ */
+static int aout_VolumeNoneSet (audio_output_t *aout, float volume, bool mute)
+{
+    (void)aout; (void)volume; (void)mute;
+    return -1;
+}
+
+/**
+ * Configures the dummy volume setter.
+ * @note Audio output plugins for which volume is irrelevant
+ * should call this function during activation.
+ */
+void aout_VolumeNoneInit (audio_output_t *aout)
+{
+    /* aout_New() -safely- calls this function without the lock, before any
+     * other thread knows of this audio output instance.
+    vlc_assert_locked (&aout->lock); */
+    aout->pf_volume_set = aout_VolumeNoneSet;
+}
+
+/**
+ * Volume setter for software volume.
+ */
+static int aout_VolumeSoftSet (audio_output_t *aout, float volume, bool mute)
+{
+    vlc_assert_locked (&aout->lock);
+    aout->mixer_multiplier = mute ? 0. : volume;
+    return 0;
+}
+
+/**
+ * Configures the volume setter for software mixing
+ * and apply the default volume.
+ * @note Audio output plugins that cannot apply the volume
+ * should call this function during activation.
+ */
+void aout_VolumeSoftInit (audio_output_t *aout)
+{
+    audio_volume_t volume = var_InheritInteger (aout, "volume");
+    bool mute = var_InheritBool (aout, "mute");
+
+    vlc_assert_locked (&aout->lock);
+    aout->pf_volume_set = aout_VolumeSoftSet;
+    aout_VolumeSoftSet (aout, volume / (float)AOUT_VOLUME_DEFAULT, mute);
+}
+
+/**
+ * Configures a custom volume setter. This is used by audio outputs that can
+ * control the hardware volume directly and/or emulate it internally.
+ * @param setter volume setter callback
+ */
+void aout_VolumeHardInit (audio_output_t *aout, aout_volume_cb setter)
+{
+    vlc_assert_locked (&aout->lock);
+    aout->pf_volume_set = setter;
+}
+
+/**
+ * Supply or update the current custom ("hardware") volume.
+ * @note This only makes sense after calling aout_VolumeHardInit().
+ * @param setter volume setter callback
+ * @param volume current custom volume
+ * @param mute current mute flag
+ * @note Audio output plugins that cannot apply the volume
+ * should call this function during activation.
+ */
+void aout_VolumeHardSet (audio_output_t *aout, float volume, bool mute)
+{
+#warning FIXME
+    /* REVISIT: This is tricky. We cannot acquire the volume lock as this gets
+     * called from the audio output (it would cause a lock inversion).
+     * We also should not override the input manager volume, but only the
+     * volume of the current audio output... FIXME */
+    msg_Err (aout, "%s(%f, %u)", __func__, volume, (unsigned)mute);
+}
+
+
+/*** Buffer management ***/
 
 /*****************************************************************************
  * aout_OutputNextBuffer : give the audio output plug-in the right buffer

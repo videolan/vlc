@@ -231,44 +231,6 @@ int aout_SetMute (vlc_object_t *obj, audio_volume_t *volp, bool mute)
 
 
 /*
- * The next functions are not supposed to be called by the interface, but
- * are placeholders for software-only scaling.
- */
-static int aout_VolumeSoftSet (audio_output_t *aout, float volume, bool mute)
-{
-    aout->mixer_multiplier = mute ? 0. : volume;
-    return 0;
-}
-
-/* Meant to be called by the output plug-in's Open(). */
-void aout_VolumeSoftInit (audio_output_t *aout)
-{
-    audio_volume_t volume = var_InheritInteger (aout, "volume");
-    bool mute = var_InheritBool (aout, "mute");
-
-    aout->pf_volume_set = aout_VolumeSoftSet;
-    aout_VolumeSoftSet (aout, volume / (float)AOUT_VOLUME_DEFAULT, mute);
-}
-
-
-/*
- * The next functions are not supposed to be called by the interface, but
- * are placeholders for unsupported scaling.
- */
-static int aout_VolumeNoneSet (audio_output_t *aout, float volume, bool mute)
-{
-    (void)aout; (void)volume; (void)mute;
-    return -1;
-}
-
-/* Meant to be called by the output plug-in's Open(). */
-void aout_VolumeNoneInit( audio_output_t * p_aout )
-{
-    p_aout->pf_volume_set = aout_VolumeNoneSet;
-}
-
-
-/*
  * Pipelines management
  */
 
