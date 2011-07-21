@@ -75,9 +75,6 @@ static int vlclua_pushvalue( lua_State *L, int i_type, vlc_value_t val, bool b_e
         case VLC_VAR_ADDRESS:
             vlclua_error( L );
             break;
-        case VLC_VAR_MUTEX:
-            vlclua_error( L );
-            break;
         default:
             vlclua_error( L );
     }
@@ -125,9 +122,6 @@ static int vlclua_tovalue( lua_State *L, int i_type, vlc_value_t *val )
             }
             break;
         case VLC_VAR_ADDRESS:
-            vlclua_error( L );
-            break;
-        case VLC_VAR_MUTEX:
             vlclua_error( L );
             break;
         default:
@@ -387,7 +381,6 @@ static int vlclua_add_callback( lua_State *L )
         case VLC_VAR_TIME:
             break;
         case VLC_VAR_ADDRESS:
-        case VLC_VAR_MUTEX:
         default:
             return vlclua_error( L );
     }

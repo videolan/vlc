@@ -91,7 +91,6 @@ static void DupString( vlc_value_t *p_val )
 
 static void FreeDummy( vlc_value_t *p_val ) { (void)p_val; /* unused */ }
 static void FreeString( vlc_value_t *p_val ) { free( p_val->psz_string ); }
-static void FreeMutex( vlc_value_t *p_val ) { vlc_mutex_destroy( (vlc_mutex_t*)p_val->p_address ); free( p_val->p_address ); }
 
 static void FreeList( vlc_value_t *p_val )
 {
@@ -102,9 +101,6 @@ static void FreeList( vlc_value_t *p_val )
         {
         case VLC_VAR_STRING:
             FreeString( &p_val->p_list->p_values[i] );
-            break;
-        case VLC_VAR_MUTEX:
-            FreeMutex( &p_val->p_list->p_values[i] );
             break;
         default:
             break;
@@ -125,7 +121,6 @@ addr_ops   = { CmpAddress, DupDummy,  FreeDummy,  },
 bool_ops   = { CmpBool,    DupDummy,  FreeDummy,  },
 float_ops  = { CmpFloat,   DupDummy,  FreeDummy,  },
 int_ops    = { CmpInt,     DupDummy,  FreeDummy,  },
-mutex_ops  = { CmpAddress, DupDummy,  FreeMutex,  },
 string_ops = { CmpString,  DupString, FreeString, },
 time_ops   = { CmpTime,    DupDummy,  FreeDummy,  },
 coords_ops = { NULL,       DupDummy,  FreeDummy,  };
@@ -248,11 +243,6 @@ int var_Create( vlc_object_t *p_this, const char *psz_name, int i_type )
         case VLC_VAR_ADDRESS:
             p_var->ops = &addr_ops;
             p_var->val.p_address = NULL;
-            break;
-        case VLC_VAR_MUTEX:
-            p_var->ops = &mutex_ops;
-            p_var->val.p_address = malloc( sizeof(vlc_mutex_t) );
-            vlc_mutex_init( (vlc_mutex_t*)p_var->val.p_address );
             break;
         default:
             p_var->ops = &void_ops;

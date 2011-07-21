@@ -568,7 +568,6 @@ static void DumpVariable (const void *data, const VISIT which, const int depth)
         MYCASE( TIME, "time" );
         MYCASE( COORDS, "coords" );
         MYCASE( ADDRESS, "address" );
-        MYCASE( MUTEX, "mutex" );
 #undef MYCASE
     }
     printf( " *-o \"%s\" (%s", p_var->psz_name, psz_type );
@@ -584,7 +583,6 @@ static void DumpVariable (const void *data, const VISIT which, const int depth)
     switch( p_var->i_type & VLC_VAR_CLASS )
     {
         case VLC_VAR_VOID:
-        case VLC_VAR_MUTEX:
             break;
         case VLC_VAR_BOOL:
             printf( ": %s", p_var->val.b_bool ? "true" : "false" );
