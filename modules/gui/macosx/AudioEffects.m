@@ -204,7 +204,7 @@ static bool GetEqualizerStatus( intf_thread_t *p_custom_intf,
             [o_eq_presets_popup selectItemAtIndex: i];
             
             
-            [o_eq_preamp_sld setFloatValue: eqz_preset_10b[i],f_preamp];
+            [o_eq_preamp_sld setFloatValue: eqz_preset_10b[i].f_preamp];
             [self setBandSlidersValues: (float *)eqz_preset_10b[i].f_amp];
             
             if( strcmp( psz_preset, "flat" ) )
