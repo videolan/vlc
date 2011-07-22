@@ -569,11 +569,8 @@
             free( psz_uri );
         }
 
-        if( [[VLCMain sharedInstance] isPlaylistCollapsed] == NO )
-        {
-            /* update our info-panel to reflect the new item, if we aren't collapsed */
-            [[[VLCMain sharedInstance] info] updatePanelWithItem:p_item->p_input];
-        }
+        /* update our info-panel to reflect the new item */
+        [[[VLCMain sharedInstance] info] updatePanelWithItem:p_item->p_input];
     }
 }
 

@@ -30,6 +30,7 @@
 #import "vout.h"
 #import "misc.h"
 #import "fspanel.h"
+#import "MainWindow.h"
 
 @interface VLCFSPanel ()
 - (void)hideMouse;
@@ -554,7 +555,7 @@
 
 - (IBAction)fsTimeSliderUpdate:(id)sender
 {
-    [[VLCMain sharedInstance] timesliderUpdate: sender];
+    [[VLCMainWindow sharedInstance] updateTimeSlider];
 }
 
 - (IBAction)fsVolumeSliderUpdate:(id)sender

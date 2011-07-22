@@ -67,8 +67,8 @@ aout_instance_t *getAout(void);
 struct intf_sys_t
 {
     /* special actions */
-    bool b_mute;
     int i_play_status;
+    int i_old_play_status;
 
     /* interface update */
     bool b_intf_update;
@@ -76,7 +76,6 @@ struct intf_sys_t
     bool b_playmode_update;
     bool b_current_title_update;
     bool b_fullscreen_update;
-    bool b_volume_update;
     bool b_intf_show;
 
     /* menus handlers */
@@ -93,7 +92,6 @@ struct intf_sys_t
  *****************************************************************************/
 @class AppleRemote;
 @class VLCInformation;
-@class VLCControllerWindow;
 @class VLCEmbeddedWindow;
 @class VLCControls;
 @class VLCPlaylist;
@@ -120,31 +118,7 @@ struct intf_sys_t
     BOOL nib_coredialogs_loaded; /* CoreDialogs nibfile */
     BOOL nib_bookmarks_loaded;   /* Bookmarks nibfile */
 
-    IBOutlet VLCControllerWindow * o_window;                     /* main window */
-    IBOutlet id o_scrollfield;                                  /* info field */
-    IBOutlet NSTextField * o_timefield;                         /* time field */
-    IBOutlet NSSlider * o_timeslider;                                 /* time slider */
-    BOOL b_time_remaining;                                      /* show remaining time or playtime ? */
-    IBOutlet VLCEmbeddedWindow * o_embedded_window;             /* Embedded Vout Window */
-    float f_slider;                                             /* slider value */
-    float f_slider_old;                                         /* old slider val */
-    IBOutlet NSSlider * o_volumeslider;                         /* volume slider */
-
-    IBOutlet NSProgressIndicator * o_main_pgbar;   /* playlist window progress bar */
-    IBOutlet NSButton * o_btn_prev;     /* btn previous   */
-    IBOutlet NSButton * o_btn_rewind;   /* btn rewind     */
-    IBOutlet NSButton * o_btn_play;     /* btn play       */
-    IBOutlet NSButton * o_btn_stop;     /* btn stop       */
-    IBOutlet NSButton * o_btn_ff;       /* btn fast forward     */
-    IBOutlet NSButton * o_btn_next;     /* btn next       */
-    IBOutlet NSButton * o_btn_fullscreen;/* btn fullscreen (embedded vout window) */
-    IBOutlet NSButton * o_btn_playlist; /* btn playlist   */
-    IBOutlet NSButton * o_btn_audioEffects; /* AudioEffects btn */
-
-    NSImage * o_img_play;       /* btn play img   */
-    NSImage * o_img_pause;      /* btn pause img  */
-    NSImage * o_img_play_pressed;       /* btn play img   */
-    NSImage * o_img_pause_pressed;      /* btn pause img  */
+    IBOutlet id o_mainwindow;            /* VLCMainWindow */
 
     IBOutlet VLCControls * o_controls;     /* VLCControls    */
     IBOutlet VLCPlaylist * o_playlist;     /* VLCPlaylist    */
@@ -167,11 +141,8 @@ struct intf_sys_t
     IBOutlet NSButton * o_crashrep_includeEmail_ckb;
     IBOutlet NSTextField * o_crashrep_includeEmail_txt;
 
-    mtime_t i_end_scroll;
-
-    int     i_lastShownVolume;
-
     input_state_e cachedInputState;
+    mtime_t i_end_scroll;
 
     /* the manage thread */
     pthread_t manage_thread;
@@ -204,14 +175,11 @@ struct intf_sys_t
 - (id)simplePreferences;
 - (id)preferences;
 - (id)playlist;
-- (BOOL)isPlaylistCollapsed;
 - (id)info;
 - (id)wizard;
 - (id)embeddedList;
 - (id)getVideoViewAtPositionX: (int *)pi_x Y: (int *)pi_y withWidth: (unsigned int*)pi_width andHeight: (unsigned int*)pi_height;
 - (id)coreDialogProvider;
-- (id)mainIntfPgbar;
-- (id)controllerWindow;
 - (id)eyeTVController;
 - (id)appleRemoteController;
 - (void)applicationWillTerminate:(NSNotification *)notification;
@@ -229,14 +197,8 @@ struct intf_sys_t
 - (void)manage;
 - (void)manageIntf:(NSTimer *)o_timer;
 
-- (void)setScrollField:(NSString *)o_string stopAfter:(int )timeout;
-- (void)resetScrollField;
-
 - (void)updateMessageDisplay;
 - (void)playStatusUpdated:(int) i_status;
-- (void)manageVolumeSlider;
-- (IBAction)timesliderUpdate:(id)sender;
-- (IBAction)timeFieldWasClicked:(id)sender;
 - (IBAction)showController:(id)sender;
 
 - (IBAction)crashReporterAction:(id)sender;

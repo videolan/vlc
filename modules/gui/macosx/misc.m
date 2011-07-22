@@ -26,6 +26,7 @@
 #import <Carbon/Carbon.h>
 
 #import "intf.h"                                          /* VLCApplication */
+#import "MainWindow.h"
 #import "misc.h"
 #import "playlist.h"
 #import "controls.h"
@@ -404,62 +405,6 @@ static NSMutableArray *blackoutWindows = NULL;
 @end
 
 /*****************************************************************************
- * VLCControllerWindow
- *****************************************************************************/
-
-@implementation VLCControllerWindow
-
-- (id)initWithContentRect:(NSRect)contentRect styleMask:(NSUInteger)styleMask
-    backing:(NSBackingStoreType)backingType defer:(BOOL)flag
-{
-    /* FIXME: this should enable the SnowLeopard window style, however, it leads to ugly artifacts
-     *        needs some further investigation! -- feepk
-     BOOL b_useTextured = YES;
-
-    if( [[NSWindow class] instancesRespondToSelector:@selector(setContentBorderThickness:forEdge:)] )
-    {
-        b_useTextured = NO;
-        styleMask ^= NSTexturedBackgroundWindowMask;
-    } */
-
-    self = [super initWithContentRect:contentRect styleMask:styleMask //& ~NSTitledWindowMask
-    backing:backingType defer:flag];
-
-    [[VLCMain sharedInstance] updateTogglePlaylistState];
-
-    /* FIXME: see above...
-    if(! b_useTextured )
-    {
-        [self setContentBorderThickness:28.0 forEdge:NSMinYEdge];
-    }
-    */
-
-    /* we want to be moveable regardless of our style */
-    [self setMovableByWindowBackground: YES];
-
-    /* we don't want this window to be restored on relaunch */
-    if ([self respondsToSelector:@selector(setRestorable:)])
-        [self setRestorable:NO];
-
-    return self;
-}
-
-- (BOOL)performKeyEquivalent:(NSEvent *)o_event
-{
-    /* We indeed want to prioritize Cocoa key equivalent against libvlc,
-       so we perform the menu equivalent now. */
-    if([[NSApp mainMenu] performKeyEquivalent:o_event])
-        return TRUE;
-
-    return [[VLCMain sharedInstance] hasDefinedShortcutKey:o_event] ||
-           [(VLCControls *)[[VLCMain sharedInstance] controls] keyEvent:o_event];
-}
-
-@end
-
-
-
-/*****************************************************************************
  * VLCControllerView
  *****************************************************************************/
 
@@ -771,6 +716,6 @@ void _drawFrameInRect(NSRect frameRect)
     if( [ourEvent clickCount] > 1 )
         [[[VLCMain sharedInstance] controls] goToSpecificTime: nil];
     else
-        [[VLCMain sharedInstance] timeFieldWasClicked: self];
+        [[VLCMainWindow sharedInstance] timeFieldWasClicked: self];
 }
 @end

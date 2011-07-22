@@ -141,8 +141,6 @@
     /* we don't want this window to be restored on relaunch */
     if ([self respondsToSelector:@selector(setRestorable:)])
         [self setRestorable:NO];
-
-    [self makeKeyAndOrderFront: self];
 }
 
 - (void)controlTintChanged
