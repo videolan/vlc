@@ -81,6 +81,9 @@
     IBOutlet id o_input_serverport_txt;
     IBOutlet id o_input_view;
 
+    IBOutlet id o_intf_style_txt;
+    IBOutlet id o_intf_style_dark_bcell;
+    IBOutlet id o_intf_style_bright_bcell;
     IBOutlet id o_intf_art_pop;
     IBOutlet id o_intf_art_txt;
     IBOutlet id o_intf_embedded_ckb;

@@ -142,7 +142,6 @@ struct intf_sys_t
     IBOutlet NSTextField * o_crashrep_includeEmail_txt;
 
     input_state_e cachedInputState;
-    mtime_t i_end_scroll;
 
     /* the manage thread */
     pthread_t manage_thread;

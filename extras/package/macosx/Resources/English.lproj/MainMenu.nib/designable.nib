@@ -12,12 +12,12 @@
     </object>
     <object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
       <bool key="EncodedWithXMLCoder">YES</bool>
-      <integer value="283"/>
       <integer value="235"/>
-      <integer value="915"/>
+      <integer value="283"/>
       <integer value="2730"/>
       <integer value="4596"/>
-      <integer value="2"/>
+      <integer value="21"/>
+      <integer value="915"/>
     </object>
     <object class="NSArray" key="IBDocument.PluginDependencies">
       <bool key="EncodedWithXMLCoder">YES</bool>

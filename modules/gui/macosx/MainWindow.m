@@ -107,7 +107,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
 - (void)awakeFromNib
 {
-    b_gray_interface = YES; //TODO
+    b_dark_interface = config_GetInt( VLCIntf, "macosx-interfacestyle" );
     i_lastShownVolume = -1;
 
     [o_play_btn setToolTip: _NS("Play/Pause")];
@@ -125,7 +125,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [o_volume_up_btn setToolTip: _NS("Full Volume")];
     [o_time_sld setToolTip: _NS("Position")];
 
-    if (b_gray_interface) {
+    if (!b_dark_interface) {
         [o_bottombar_view setImage: [NSImage imageNamed:@"bottom-background"]];
         [o_bwd_btn setImage: [NSImage imageNamed:@"back"]];
         [o_bwd_btn setAlternateImage: [NSImage imageNamed:@"back-pressed"]];

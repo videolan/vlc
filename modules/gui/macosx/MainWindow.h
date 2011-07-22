@@ -53,7 +53,7 @@
     IBOutlet id o_playlist_table;
     IBOutlet id o_video_view;
 
-    BOOL b_gray_interface;
+    BOOL b_dark_interface;
     BOOL b_video_playback_enabled;
     BOOL b_time_remaining;
     int i_lastShownVolume;

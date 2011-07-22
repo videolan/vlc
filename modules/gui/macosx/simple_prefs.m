@@ -222,6 +222,9 @@ create_toolbar_item( NSString * o_itemIdent, NSString * o_name, NSString * o_des
     [o_input_serverport_txt setStringValue: _NS("Default Server Port")];
 
     /* interface */
+    [o_intf_style_txt setStringValue: _NS("Interface style")];
+    [o_intf_style_dark_bcell setTitle: _NS("Dark")];
+    [o_intf_style_bright_bcell setTitle: _NS("Bright")];
     [o_intf_art_txt setStringValue: _NS("Album art download policy")];
     [o_intf_embedded_ckb setTitle: _NS("Add controls to the video window")];
     [o_intf_fspanel_ckb setTitle: _NS("Show Fullscreen Controller")];
@@ -265,8 +268,8 @@ create_toolbar_item( NSString * o_itemIdent, NSString * o_name, NSString * o_des
     [o_video_snap_seqnum_ckb setTitle: _NS("Sequential numbering")];
 
     /* generic stuff */
-    [[o_sprefs_basicFull_matrix cellAtRow: 0 column: 0] setStringValue: _NS("Basic")];
-    [[o_sprefs_basicFull_matrix cellAtRow: 0 column: 1] setStringValue: _NS("All")];
+    [[o_sprefs_basicFull_matrix cellAtRow: 0 column: 0] setTitle: _NS("Basic")];
+    [[o_sprefs_basicFull_matrix cellAtRow: 0 column: 1] setTitle: _NS("All")];
     [o_sprefs_cancel_btn setTitle: _NS("Cancel")];
     [o_sprefs_reset_btn setTitle: _NS("Reset All")];
     [o_sprefs_save_btn setTitle: _NS("Save")];
@@ -433,6 +436,10 @@ static inline char * __config_GetLabel( vlc_object_t *p_this, const char *psz_na
     }
     else
         [o_intf_enableGrowl_ckb setState: NSOffState];
+    if (config_GetInt( p_intf, "macosx-interfacestyle" ))
+        [o_intf_style_dark_bcell setState: YES];
+    else
+        [o_intf_style_dark_bcell setState: NO];
 
     /******************
      * audio settings *
@@ -759,7 +766,8 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
         config_PutInt( p_intf, "macosx-fspanel", [o_intf_fspanel_ckb state] );
         config_PutInt( p_intf, "embedded-video", [o_intf_embedded_ckb state] );
 		config_PutInt( p_intf, "macosx-appleremote", [o_intf_appleremote_ckb state] );
-		config_PutInt( p_intf, "macosx-mediakeys", [o_intf_mediakeys_ckb state] );
+        config_PutInt( p_intf, "macosx-mediakeys", [o_intf_mediakeys_ckb state] );
+        config_PutInt( p_intf, "macosx-interfacestyle", [o_intf_style_dark_bcell state] );
         if( [o_intf_enableGrowl_ckb state] == NSOnState )
         {
             tmpString = getString( "control" );
@@ -913,6 +921,10 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
 
     /* okay, let's save our changes to vlcrc */
     config_SaveConfigFile( p_intf );
+
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"VLCMediaKeySupportSettingChanged"
+                                                            object: nil
+                                                          userInfo: nil];
 }
 
 - (void)showSettingsForCategory: (id)o_new_category_view
