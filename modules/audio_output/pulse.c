@@ -173,34 +173,41 @@ static void stream_latency_cb(pa_stream *s, void *userdata)
     //msg_Dbg(aout, "desync: %+"PRId64" us (variation: %+"PRId64" us)",
     //        delta, change);
 
+    if (delta < -AOUT_MAX_PTS_DELAY)
+        msg_Warn(aout, "too late by %"PRId64" us", -delta);
+    else if (delta > +AOUT_MAX_PTS_ADVANCE)
+        msg_Warn(aout, "too early by %"PRId64" us", delta);
+
     /* Compute playback sample rate */
     const unsigned inrate = aout->output.output.i_rate;
-    /* NOTE: AOUT_MAX_RESAMPLING (10%) is way too high... */
-    const int limit = inrate >> 6;
 
-    if (delta < -AOUT_MAX_PTS_DELAY) {
-        msg_Warn(aout, "too late by %"PRId64" us", -delta);
-        if (change < 0)
-            delta += change; /* be more severe if really out of sync */
-    } else if (delta > +AOUT_MAX_PTS_ADVANCE) {
-        msg_Warn(aout, "too early by %"PRId64" us", delta);
-        if (change > 0)
-            delta += change;
-    }
-
+#define ADJUST_FACTOR 4
+#define ADJUST_MAX    1000 /* Hz (max rate variation per call) */
     /* This is empirical. Feel free to define something smarter. */
-    int outrate = inrate * delta / -(CLOCK_FREQ * 10);
-    if (16 * abs(outrate) < limit)
-        outrate = inrate; /* favor native rate to avoid resampling */
-    else if (outrate > limit)
+    int adj = sys->rate * (delta + change) / (CLOCK_FREQ * ADJUST_FACTOR);
+
+    /* This avoids too fast rate variation. They sound ugly as hell and they
+     * make the algorithm unstable (e.g. oscillation around inrate). */
+    if (adj > +ADJUST_MAX)
+        adj = +ADJUST_MAX;
+    if (adj < -ADJUST_MAX)
+        adj = -ADJUST_MAX;
+
+    if (abs(adj) < (inrate >> 10))
+        adj = 0; /* favor native rate to avoid resampling */
+
+    /* This keeps the effective rate within specified range
+     * (+/-AOUT_MAX_RESAMPLING% - see <vlc_aout.h>) of the nominal rate. */
+    unsigned outrate = inrate - adj;
+    const int limit = inrate * AOUT_MAX_RESAMPLING / 100;
+
+    if (outrate > inrate + limit)
         outrate = inrate + limit;
-    else if (outrate < -limit)
+    if (outrate < inrate - limit)
         outrate = inrate - limit;
-    else
-        outrate += inrate;
 
     /* Apply adjusted sample rate */
-    if (outrate == (int)sys->rate)
+    if (outrate == sys->rate)
         return;
     pa_operation *op = pa_stream_update_sample_rate(s, outrate, NULL, NULL);
     if (unlikely(op == NULL)) {
@@ -208,7 +215,7 @@ static void stream_latency_cb(pa_stream *s, void *userdata)
         return;
     }
     pa_operation_unref(op);
-    msg_Dbg(aout, "changed sample rate to %d Hz", outrate);
+    msg_Dbg(aout, "changed sample rate to %u Hz",outrate);
     sys->rate = outrate;
 }
 
@@ -365,11 +372,13 @@ static void Play(aout_instance_t *aout)
             float *zeroes = calloc (nb, size);
 
             msg_Dbg(aout, "prepending %zu zeroes", nb);
+#if 0 /* Fault injector: add delay */
+            pa_stream_write(s, zeroes, nb * size, NULL, 0, PA_SEEK_RELATIVE);
+            pa_stream_write(s, zeroes, nb * size, NULL, 0, PA_SEEK_RELATIVE);
+#endif
             if (likely(zeroes != NULL))
-#if 1 /* Fault injection: remove this to be too early */
                 if (pa_stream_write(s, zeroes, nb * size, free, 0,
                                     PA_SEEK_RELATIVE) < 0)
-#endif
                     free(zeroes);
         }
 
@@ -382,7 +391,7 @@ static void Play(aout_instance_t *aout)
         msg_Dbg(aout, "uncorking");
     }
 
-#if 0 /* Fault injector to be too late / test underrun recovery */
+#if 0 /* Fault injector to test underrun recovery */
     static unsigned u = 0;
     if ((++u % 500) == 0) {
         msg_Err(aout, "fault injection");
