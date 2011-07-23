@@ -67,10 +67,9 @@ void tls_ServerDelete (tls_server_t *);
 int tls_ServerAddCA (tls_server_t *srv, const char *path);
 int tls_ServerAddCRL (tls_server_t *srv, const char *path);
 
-tls_session_t *tls_ServerSessionPrepare (tls_server_t *);
-int tls_ServerSessionHandshake (tls_session_t *, int fd);
-int tls_SessionContinueHandshake (tls_session_t *);
-void tls_ServerSessionClose (tls_session_t *);
+tls_session_t *tls_ServerSessionCreate (tls_server_t *, int fd);
+int tls_ServerSessionHandshake (tls_session_t *);
+void tls_ServerSessionDelete (tls_session_t *);
 
 VLC_API tls_session_t * tls_ClientCreate( vlc_object_t *, int, const char * );
 VLC_API void tls_ClientDelete( tls_session_t * );

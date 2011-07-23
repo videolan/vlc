@@ -115,31 +115,27 @@ int tls_ServerAddCRL (tls_server_t *srv, const char *path)
 }
 
 
-tls_session_t *tls_ServerSessionPrepare (tls_server_t *srv)
+tls_session_t *tls_ServerSessionCreate (tls_server_t *srv, int fd)
 {
-    return srv->pf_open (srv);
+    tls_session_t *ses = srv->pf_open (srv);
+    if (ses != NULL)
+        ses->pf_set_fd (ses, fd);
+    return ses;
 }
 
 
-void tls_ServerSessionClose (tls_session_t *ses)
+void tls_ServerSessionDelete (tls_session_t *ses)
 {
     tls_server_t *srv = (tls_server_t *)(ses->p_parent);
     srv->pf_close (srv, ses);
 }
 
 
-int tls_ServerSessionHandshake (tls_session_t *ses, int fd)
-{
-    ses->pf_set_fd (ses, fd);
-    return 2;
-}
-
-
-int tls_SessionContinueHandshake (tls_session_t *ses)
+int tls_ServerSessionHandshake (tls_session_t *ses)
 {
     int val = ses->pf_handshake (ses);
     if (val < 0)
-        tls_ServerSessionClose (ses);
+        tls_ServerSessionDelete (ses);
     return val;
 }
 
