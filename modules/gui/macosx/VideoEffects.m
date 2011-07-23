@@ -330,6 +330,9 @@ static VLCVideoEffects *_o_sharedInstance = nil;
     [o_eraselogo_left_lbl setEnabled: [o_eraselogo_ckb state]];
     [o_eraselogo_top_fld setEnabled: [o_eraselogo_ckb state]];
     [o_eraselogo_top_lbl setEnabled: [o_eraselogo_ckb state]];
+
+    if (psz_vfilters)
+        free(psz_vfilters);
 }
 
 - (void)setVideoFilter: (char *)psz_name on:(BOOL)b_on

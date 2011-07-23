@@ -101,6 +101,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
     playlist_t *p_playlist;
     vlc_value_t val;
     id o_vlcmain = [VLCMain sharedInstance];
+    char * key;
 
     /* Check if we already did this once. Opening the other nibs calls it too,
      because VLCMain is the owner */
@@ -108,54 +109,101 @@ static VLCMainMenu *_o_sharedInstance = nil;
 
     [self initStrings];
 
-    o_key = [NSString stringWithFormat:@"%s", config_GetPsz( p_intf, "key-quit" )];
+    key = config_GetPsz( p_intf, "key-quit" );
+    o_key = [NSString stringWithFormat:@"%s", key];
     [o_mi_quit setKeyEquivalent: [o_vlcmain VLCKeyToString: o_key]];
     [o_mi_quit setKeyEquivalentModifierMask: [o_vlcmain VLCModifiersToCocoa:o_key]];
-    o_key = [NSString stringWithFormat:@"%s", config_GetPsz( p_intf, "key-play-pause" )];
+    FREENULL( key );
+
+    key = config_GetPsz( p_intf, "key-play-pause" );
+    o_key = [NSString stringWithFormat:@"%s", key];
     [o_mi_play setKeyEquivalent: [o_vlcmain VLCKeyToString: o_key]];
     [o_mi_play setKeyEquivalentModifierMask: [o_vlcmain VLCModifiersToCocoa:o_key]];
-    o_key = [NSString stringWithFormat:@"%s", config_GetPsz( p_intf, "key-stop" )];
+    FREENULL( key );
+
+    key = config_GetPsz( p_intf, "key-stop" );
+    o_key = [NSString stringWithFormat:@"%s", key];
     [o_mi_stop setKeyEquivalent: [o_vlcmain VLCKeyToString: o_key]];
     [o_mi_stop setKeyEquivalentModifierMask: [o_vlcmain VLCModifiersToCocoa:o_key]];
-    o_key = [NSString stringWithFormat:@"%s", config_GetPsz( p_intf, "key-prev" )];
+    FREENULL( key );
+
+    key = config_GetPsz( p_intf, "key-prev" );
+    o_key = [NSString stringWithFormat:@"%s", key];
     [o_mi_previous setKeyEquivalent: [o_vlcmain VLCKeyToString: o_key]];
     [o_mi_previous setKeyEquivalentModifierMask: [o_vlcmain VLCModifiersToCocoa:o_key]];
-    o_key = [NSString stringWithFormat:@"%s", config_GetPsz( p_intf, "key-next" )];
+    FREENULL( key );
+
+    key = config_GetPsz( p_intf, "key-next" );
+    o_key = [NSString stringWithFormat:@"%s", key];
     [o_mi_next setKeyEquivalent: [o_vlcmain VLCKeyToString: o_key]];
     [o_mi_next setKeyEquivalentModifierMask: [o_vlcmain VLCModifiersToCocoa:o_key]];
-    o_key = [NSString stringWithFormat:@"%s", config_GetPsz( p_intf, "key-jump+short" )];
+    FREENULL( key );
+
+    key = config_GetPsz( p_intf, "key-jump+short" );
+    o_key = [NSString stringWithFormat:@"%s", key];
     [o_mi_fwd setKeyEquivalent: [o_vlcmain VLCKeyToString: o_key]];
     [o_mi_fwd setKeyEquivalentModifierMask: [o_vlcmain VLCModifiersToCocoa:o_key]];
-    o_key = [NSString stringWithFormat:@"%s", config_GetPsz( p_intf, "key-jump-short" )];
+    FREENULL( key );
+
+    key = config_GetPsz( p_intf, "key-jump-short" );
+    o_key = [NSString stringWithFormat:@"%s", key];
     [o_mi_bwd setKeyEquivalent: [o_vlcmain VLCKeyToString: o_key]];
     [o_mi_bwd setKeyEquivalentModifierMask: [o_vlcmain VLCModifiersToCocoa:o_key]];
-    o_key = [NSString stringWithFormat:@"%s", config_GetPsz( p_intf, "key-vol-up" )];
+    FREENULL( key );
+
+    key = config_GetPsz( p_intf, "key-vol-up" );
+    o_key = [NSString stringWithFormat:@"%s", key];
     [o_mi_vol_up setKeyEquivalent: [o_vlcmain VLCKeyToString: o_key]];
     [o_mi_vol_up setKeyEquivalentModifierMask: [o_vlcmain VLCModifiersToCocoa:o_key]];
-    o_key = [NSString stringWithFormat:@"%s", config_GetPsz( p_intf, "key-vol-down" )];
+    FREENULL( key );
+
+    key = config_GetPsz( p_intf, "key-vol-down" );
+    o_key = [NSString stringWithFormat:@"%s", key];
     [o_mi_vol_down setKeyEquivalent: [o_vlcmain VLCKeyToString: o_key]];
     [o_mi_vol_down setKeyEquivalentModifierMask: [o_vlcmain VLCModifiersToCocoa:o_key]];
-    o_key = [NSString stringWithFormat:@"%s", config_GetPsz( p_intf, "key-vol-mute" )];
+    FREENULL( key );
+
+    key = config_GetPsz( p_intf, "key-vol-mute" );
+    o_key = [NSString stringWithFormat:@"%s", key];
     [o_mi_mute setKeyEquivalent: [o_vlcmain VLCKeyToString: o_key]];
     [o_mi_mute setKeyEquivalentModifierMask: [o_vlcmain VLCModifiersToCocoa:o_key]];
-    o_key = [NSString stringWithFormat:@"%s", config_GetPsz( p_intf, "key-toggle-fullscreen" )];
+    FREENULL( key );
+
+    key = config_GetPsz( p_intf, "key-toggle-fullscreen" );
+    o_key = [NSString stringWithFormat:@"%s", key];
     [o_mi_fullscreen setKeyEquivalent: [o_vlcmain VLCKeyToString: o_key]];
     [o_mi_fullscreen setKeyEquivalentModifierMask: [o_vlcmain VLCModifiersToCocoa:o_key]];
-    o_key = [NSString stringWithFormat:@"%s", config_GetPsz( p_intf, "key-snapshot" )];
+    FREENULL( key );
+
+    key = config_GetPsz( p_intf, "key-snapshot" );
+    o_key = [NSString stringWithFormat:@"%s", key];
     [o_mi_snapshot setKeyEquivalent: [o_vlcmain VLCKeyToString: o_key]];
     [o_mi_snapshot setKeyEquivalentModifierMask: [o_vlcmain VLCModifiersToCocoa:o_key]];
-    o_key = [NSString stringWithFormat:@"%s", config_GetPsz( p_intf, "key-random" )];
+    FREENULL( key );
+
+    key = config_GetPsz( p_intf, "key-random" );
+    o_key = [NSString stringWithFormat:@"%s", key];
     [o_mi_random setKeyEquivalent: [o_vlcmain VLCKeyToString: o_key]];
     [o_mi_random setKeyEquivalentModifierMask: [o_vlcmain VLCModifiersToCocoa:o_key]];
-    o_key = [NSString stringWithFormat:@"%s", config_GetPsz( p_intf, "key-zoom-half" )];
+    FREENULL( key );
+
+    key = config_GetPsz( p_intf, "key-zoom-half" );
+    o_key = [NSString stringWithFormat:@"%s", key];
     [o_mi_half_window setKeyEquivalent: [o_vlcmain VLCKeyToString: o_key]];
     [o_mi_half_window setKeyEquivalentModifierMask: [o_vlcmain VLCModifiersToCocoa:o_key]];
-    o_key = [NSString stringWithFormat:@"%s", config_GetPsz( p_intf, "key-zoom-original" )];
+    FREENULL( key );
+
+    key = config_GetPsz( p_intf, "key-zoom-original" );
+    o_key = [NSString stringWithFormat:@"%s", key];
     [o_mi_normal_window setKeyEquivalent: [o_vlcmain VLCKeyToString: o_key]];
     [o_mi_normal_window setKeyEquivalentModifierMask: [o_vlcmain VLCModifiersToCocoa:o_key]];
-    o_key = [NSString stringWithFormat:@"%s", config_GetPsz( p_intf, "key-zoom-double" )];
+    FREENULL( key );
+
+    key = config_GetPsz( p_intf, "key-zoom-double" );
+    o_key = [NSString stringWithFormat:@"%s", key];
     [o_mi_double_window setKeyEquivalent: [o_vlcmain VLCKeyToString: o_key]];
     [o_mi_double_window setKeyEquivalentModifierMask: [o_vlcmain VLCModifiersToCocoa:o_key]];
+    FREENULL( key );
 
     [self setSubmenusEnabled: FALSE];
 
