@@ -1,10 +1,8 @@
 /*****************************************************************************
- * tls.c: Transport Layer Security API
+ * vlc_tls.h: Transport Layer Security API
  *****************************************************************************
- * Copyright (C) 2004-2007 the VideoLAN team
- * $Id$
- *
- * Authors: Rémi Denis-Courmont <rem # videolan.org>
+ * Copyright (C) 2004-2011 Rémi Denis-Courmont
+ * Copyright (C) 2005-2006 the VideoLAN team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,52 +29,56 @@
 
 # include <vlc_network.h>
 
-typedef struct tls_server_sys_t tls_server_sys_t;
+typedef struct vlc_tls_sys vlc_tls_sys_t;
 
-struct tls_server_t
+typedef struct vlc_tls
 {
     VLC_COMMON_MEMBERS
 
-    module_t  *p_module;
-    tls_server_sys_t *p_sys;
-
-    int (*pf_add_CA) ( tls_server_t *, const char * );
-    int (*pf_add_CRL) ( tls_server_t *, const char * );
-
-    tls_session_t * (*pf_open)  ( tls_server_t * );
-    void            (*pf_close) ( tls_server_t *, tls_session_t * );
-};
-
-typedef struct tls_session_sys_t tls_session_sys_t;
-
-struct tls_session_t
-{
-    VLC_COMMON_MEMBERS
-
-    module_t  *p_module;
-    tls_session_sys_t *p_sys;
+    union {
+        module_t *module; /**< Plugin handle (client) */
+        void    (*close) (struct vlc_tls *); /**< Close callback (server) */
+    } u;
+    vlc_tls_sys_t *sys;
 
     struct virtual_socket_t sock;
-    void (*pf_set_fd) ( tls_session_t *, int );
-    int  (*pf_handshake) ( tls_session_t * );
-};
+    int  (*handshake) (struct vlc_tls *);
+} vlc_tls_t;
 
-
-tls_server_t *tls_ServerCreate (vlc_object_t *, const char *, const char *);
-void tls_ServerDelete (tls_server_t *);
-int tls_ServerAddCA (tls_server_t *srv, const char *path);
-int tls_ServerAddCRL (tls_server_t *srv, const char *path);
-
-tls_session_t *tls_ServerSessionCreate (tls_server_t *, int fd);
-int tls_ServerSessionHandshake (tls_session_t *);
-void tls_ServerSessionDelete (tls_session_t *);
-
-VLC_API tls_session_t * tls_ClientCreate( vlc_object_t *, int, const char * );
-VLC_API void tls_ClientDelete( tls_session_t * );
+VLC_API vlc_tls_t *vlc_tls_ClientCreate (vlc_object_t *, int fd,
+                                         const char *hostname);
+VLC_API void vlc_tls_ClientDelete (vlc_tls_t *);
 
 /* NOTE: It is assumed that a->sock.p_sys = a */
-# define tls_Send( a, b, c ) (((tls_session_t *)a)->sock.pf_send (a, b, c ))
+# define tls_Send( a, b, c ) (((vlc_tls_t *)a)->sock.pf_send (a, b, c))
 
-# define tls_Recv( a, b, c ) (((tls_session_t *)a)->sock.pf_recv (a, b, c ))
+# define tls_Recv( a, b, c ) (((vlc_tls_t *)a)->sock.pf_recv (a, b, c))
+
+
+typedef struct vlc_tls_creds_sys vlc_tls_creds_sys_t;
+
+/** TLS (server-side) credentials */
+typedef struct vlc_tls_creds
+{
+    VLC_COMMON_MEMBERS
+
+    module_t  *module;
+    vlc_tls_creds_sys_t *sys;
+
+    int (*add_CA) (struct vlc_tls_creds *, const char *path);
+    int (*add_CRL) (struct vlc_tls_creds *, const char *path);
+
+    vlc_tls_t *(*open) (struct vlc_tls_creds *, int fd);
+} vlc_tls_creds_t;
+
+vlc_tls_creds_t *vlc_tls_ServerCreate (vlc_object_t *,
+                                       const char *cert, const char *key);
+void vlc_tls_ServerDelete (vlc_tls_creds_t *);
+int vlc_tls_ServerAddCA (vlc_tls_creds_t *srv, const char *path);
+int vlc_tls_ServerAddCRL (vlc_tls_creds_t *srv, const char *path);
+
+vlc_tls_t *vlc_tls_ServerSessionCreate (vlc_tls_creds_t *, int fd);
+int vlc_tls_ServerSessionHandshake (vlc_tls_t *);
+void vlc_tls_ServerSessionDelete (vlc_tls_t *);
 
 #endif

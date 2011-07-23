@@ -146,8 +146,8 @@ VLC_API int net_SetCSCov( int fd, int sendcov, int recvcov );
 struct virtual_socket_t
 {
     void *p_sys;
-    int (*pf_recv) ( void *, void *, int );
-    int (*pf_send) ( void *, const void *, int );
+    int (*pf_recv) ( void *, void *, size_t );
+    int (*pf_send) ( void *, const void *, size_t );
 };
 
 VLC_API ssize_t net_Read( vlc_object_t *p_this, int fd, const v_socket_t *, void *p_data, size_t i_data, bool b_retry );

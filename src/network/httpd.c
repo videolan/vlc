@@ -108,7 +108,7 @@ struct httpd_host_t
     httpd_client_t **client;
 
     /* TLS data */
-    tls_server_t *p_tls;
+    vlc_tls_creds_t *p_tls;
 };
 
 
@@ -180,7 +180,7 @@ struct httpd_client_t
     httpd_message_t answer; /* httpd -> client */
 
     /* TLS data */
-    tls_session_t *p_tls;
+    vlc_tls_t *p_tls;
 };
 
 
@@ -982,7 +982,7 @@ httpd_host_t *httpd_TLSHostNew( vlc_object_t *p_this, const char *psz_hostname,
 {
     httpd_t      *httpd;
     httpd_host_t *host;
-    tls_server_t *p_tls;
+    vlc_tls_creds_t *p_tls;
     char *psz_host;
     int i;
 
@@ -1043,20 +1043,20 @@ httpd_host_t *httpd_TLSHostNew( vlc_object_t *p_this, const char *psz_hostname,
     /* determine TLS configuration */
     if ( psz_cert != NULL )
     {
-        p_tls = tls_ServerCreate( p_this, psz_cert, psz_key );
+        p_tls = vlc_tls_ServerCreate( p_this, psz_cert, psz_key );
         if ( p_tls == NULL )
         {
             msg_Err( p_this, "TLS initialization error" );
             goto error;
         }
 
-        if ( ( psz_ca != NULL) && tls_ServerAddCA( p_tls, psz_ca ) )
+        if ( ( psz_ca != NULL) && vlc_tls_ServerAddCA( p_tls, psz_ca ) )
         {
             msg_Err( p_this, "TLS CA error" );
             goto error;
         }
 
-        if ( ( psz_crl != NULL) && tls_ServerAddCRL( p_tls, psz_crl ) )
+        if ( ( psz_crl != NULL) && vlc_tls_ServerAddCRL( p_tls, psz_crl ) )
         {
             msg_Err( p_this, "TLS CRL error" );
             goto error;
@@ -1132,7 +1132,7 @@ error:
     }
 
     if( p_tls != NULL )
-        tls_ServerDelete( p_tls );
+        vlc_tls_ServerDelete( p_tls );
 
     return NULL;
 }
@@ -1184,7 +1184,7 @@ void httpd_HostDelete( httpd_host_t *host )
     }
 
     if( host->p_tls != NULL)
-        tls_ServerDelete( host->p_tls );
+        vlc_tls_ServerDelete( host->p_tls );
 
     net_ListenClose( host->fds );
     free( host->psz_hostname );
@@ -1429,7 +1429,7 @@ static void httpd_ClientClean( httpd_client_t *cl )
     if( cl->fd >= 0 )
     {
         if( cl->p_tls != NULL )
-            tls_ServerSessionDelete( cl->p_tls );
+            vlc_tls_ServerSessionDelete( cl->p_tls );
         net_Close( cl->fd );
         cl->fd = -1;
     }
@@ -1441,7 +1441,7 @@ static void httpd_ClientClean( httpd_client_t *cl )
     cl->p_buffer = NULL;
 }
 
-static httpd_client_t *httpd_ClientNew( int fd, tls_session_t *p_tls, mtime_t now )
+static httpd_client_t *httpd_ClientNew( int fd, vlc_tls_t *p_tls, mtime_t now )
 {
     httpd_client_t *cl = malloc( sizeof( httpd_client_t ) );
 
@@ -1460,7 +1460,7 @@ static httpd_client_t *httpd_ClientNew( int fd, tls_session_t *p_tls, mtime_t no
 static
 ssize_t httpd_NetRecv (httpd_client_t *cl, uint8_t *p, size_t i_len)
 {
-    tls_session_t *p_tls;
+    vlc_tls_t *p_tls;
     ssize_t val;
 
     p_tls = cl->p_tls;
@@ -1474,7 +1474,7 @@ ssize_t httpd_NetRecv (httpd_client_t *cl, uint8_t *p, size_t i_len)
 static
 ssize_t httpd_NetSend (httpd_client_t *cl, const uint8_t *p, size_t i_len)
 {
-    tls_session_t *p_tls;
+    vlc_tls_t *p_tls;
     ssize_t val;
 
     p_tls = cl->p_tls;
@@ -2015,7 +2015,7 @@ static void httpd_ClientSend( httpd_client_t *cl )
 
 static void httpd_ClientTlsHsIn( httpd_client_t *cl )
 {
-    switch( tls_ServerSessionHandshake( cl->p_tls ) )
+    switch( vlc_tls_ServerSessionHandshake( cl->p_tls ) )
     {
         case 0:
             cl->i_state = HTTPD_CLIENT_RECEIVING;
@@ -2033,7 +2033,7 @@ static void httpd_ClientTlsHsIn( httpd_client_t *cl )
 
 static void httpd_ClientTlsHsOut( httpd_client_t *cl )
 {
-    switch( tls_ServerSessionHandshake( cl->p_tls ) )
+    switch( vlc_tls_ServerSessionHandshake( cl->p_tls ) )
     {
         case 0:
             cl->i_state = HTTPD_CLIENT_RECEIVING;
@@ -2533,12 +2533,12 @@ static void* httpd_HostThread( void *data )
             setsockopt (fd, SOL_SOCKET, SO_REUSEADDR,
                         &(int){ 1 }, sizeof(int));
 
-            tls_session_t *p_tls;
+            vlc_tls_t *p_tls;
 
             if( host->p_tls != NULL )
             {
-                p_tls = tls_ServerSessionCreate( host->p_tls, fd );
-                switch( tls_ServerSessionHandshake( p_tls ) )
+                p_tls = vlc_tls_ServerSessionCreate( host->p_tls, fd );
+                switch( vlc_tls_ServerSessionHandshake( p_tls ) )
                 {
                     case -1:
                         msg_Err( host, "Rejecting TLS connection" );

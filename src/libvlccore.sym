@@ -436,8 +436,8 @@ subpicture_Update
 subpicture_region_ChainDelete
 subpicture_region_Delete
 subpicture_region_New
-tls_ClientCreate
-tls_ClientDelete
+vlc_tls_ClientCreate
+vlc_tls_ClientDelete
 ToCharset
 ToLocale
 ToLocaleDup

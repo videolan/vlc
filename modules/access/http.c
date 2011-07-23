@@ -142,8 +142,8 @@ struct access_sys_t
 {
     int fd;
     bool b_error;
-    tls_session_t *p_tls;
-    v_socket_t    *p_vs;
+    vlc_tls_t  *p_tls;
+    v_socket_t *p_vs;
 
     /* From uri */
     vlc_url_t url;
@@ -1195,8 +1195,8 @@ static int Connect( access_t *p_access, uint64_t i_tell )
         }
 
         /* TLS/SSL handshake */
-        p_sys->p_tls = tls_ClientCreate( VLC_OBJECT(p_access), p_sys->fd,
-                                         p_sys->url.psz_host );
+        p_sys->p_tls = vlc_tls_ClientCreate( VLC_OBJECT(p_access), p_sys->fd,
+                                             p_sys->url.psz_host );
         if( p_sys->p_tls == NULL )
         {
             msg_Err( p_access, "cannot establish HTTP/TLS session" );
@@ -1621,7 +1621,7 @@ static void Disconnect( access_t *p_access )
 
     if( p_sys->p_tls != NULL)
     {
-        tls_ClientDelete( p_sys->p_tls );
+        vlc_tls_ClientDelete( p_sys->p_tls );
         p_sys->p_tls = NULL;
         p_sys->p_vs = NULL;
     }
