@@ -140,8 +140,8 @@ DWORD WaitForMultipleObjectsEx (DWORD nCount, const HANDLE *lpHandles,
 }
 #endif
 
-vlc_mutex_t super_mutex;
-vlc_cond_t  super_variable;
+static vlc_mutex_t super_mutex;
+static vlc_cond_t  super_variable;
 
 BOOL WINAPI DllMain (HINSTANCE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
 {
