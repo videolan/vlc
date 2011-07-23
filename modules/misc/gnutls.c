@@ -58,10 +58,6 @@
 #include <gnutls/x509.h>
 
 #include <vlc_gcrypt.h>
-
-#define CACHE_TIMEOUT     3600
-#define CACHE_SIZE          64
-
 #include "dhparams.h"
 
 #include <assert.h>
@@ -93,16 +89,6 @@ static const char *const priorities_text[] = {
     N_("Export (include insecure ciphers)"),
 };
 
-#define CACHE_TIMEOUT_TEXT N_("Expiration time for resumed TLS sessions")
-#define CACHE_TIMEOUT_LONGTEXT N_( \
-    "It is possible to cache the resumed TLS sessions. This is the expiration "\
-    "time of the sessions stored in this cache, in seconds." )
-
-#define CACHE_SIZE_TEXT N_("Number of resumed TLS sessions")
-#define CACHE_SIZE_LONGTEXT N_( \
-    "This is the maximum number of resumed TLS sessions that " \
-    "the cache will hold." )
-
 vlc_module_begin ()
     set_shortname( "GNU TLS" )
     set_description( N_("GNU TLS transport layer security") )
@@ -121,10 +107,6 @@ vlc_module_begin ()
         add_string ("gnutls-priorities", "NORMAL", PRIORITIES_TEXT,
                     PRIORITIES_LONGTEXT, false)
             change_string_list (priorities_values, priorities_text, NULL)
-        add_integer( "gnutls-cache-timeout", CACHE_TIMEOUT,
-                    CACHE_TIMEOUT_TEXT, CACHE_TIMEOUT_LONGTEXT, true )
-        add_integer( "gnutls-cache-size", CACHE_SIZE, CACHE_SIZE_TEXT,
-                    CACHE_SIZE_LONGTEXT, true )
 vlc_module_end ()
 
 static vlc_mutex_t gnutls_mutex = VLC_STATIC_MUTEX;
@@ -744,124 +726,8 @@ struct tls_server_sys_t
 {
     gnutls_certificate_credentials_t x509_cred;
     gnutls_dh_params_t               dh_params;
-
-    struct saved_session_t          *p_cache;
-    struct saved_session_t          *p_store;
-    int                              i_cache_size;
-    vlc_mutex_t                      cache_lock;
-
     int                            (*pf_handshake) (tls_session_t *);
 };
-
-
-/**
- * TLS session resumption callbacks (server-side)
- */
-#define MAX_SESSION_ID    32
-#define MAX_SESSION_DATA  1024
-
-typedef struct saved_session_t
-{
-    char id[MAX_SESSION_ID];
-    char data[MAX_SESSION_DATA];
-
-    unsigned i_idlen;
-    unsigned i_datalen;
-} saved_session_t;
-
-
-static int cb_store( void *p_server, gnutls_datum key, gnutls_datum data )
-{
-    tls_server_sys_t *p_sys = ((tls_server_t *)p_server)->p_sys;
-
-    if( ( p_sys->i_cache_size == 0 )
-     || ( key.size > MAX_SESSION_ID )
-     || ( data.size > MAX_SESSION_DATA ) )
-        return -1;
-
-    vlc_mutex_lock( &p_sys->cache_lock );
-
-    memcpy( p_sys->p_store->id, key.data, key.size);
-    memcpy( p_sys->p_store->data, data.data, data.size );
-    p_sys->p_store->i_idlen = key.size;
-    p_sys->p_store->i_datalen = data.size;
-
-    p_sys->p_store++;
-    if( ( p_sys->p_store - p_sys->p_cache ) == p_sys->i_cache_size )
-        p_sys->p_store = p_sys->p_cache;
-
-    vlc_mutex_unlock( &p_sys->cache_lock );
-
-    return 0;
-}
-
-
-static gnutls_datum cb_fetch( void *p_server, gnutls_datum key )
-{
-    static const gnutls_datum_t err_datum = { NULL, 0 };
-    tls_server_sys_t *p_sys = ((tls_server_t *)p_server)->p_sys;
-    saved_session_t *p_session, *p_end;
-
-    p_session = p_sys->p_cache;
-    p_end = p_session + p_sys->i_cache_size;
-
-    vlc_mutex_lock( &p_sys->cache_lock );
-
-    while( p_session < p_end )
-    {
-        if( ( p_session->i_idlen == key.size )
-         && !memcmp( p_session->id, key.data, key.size ) )
-        {
-            gnutls_datum_t data;
-
-            data.size = p_session->i_datalen;
-
-            data.data = gnutls_malloc( data.size );
-            if( data.data == NULL )
-            {
-                vlc_mutex_unlock( &p_sys->cache_lock );
-                return err_datum;
-            }
-
-            memcpy( data.data, p_session->data, data.size );
-            vlc_mutex_unlock( &p_sys->cache_lock );
-            return data;
-        }
-        p_session++;
-    }
-
-    vlc_mutex_unlock( &p_sys->cache_lock );
-
-    return err_datum;
-}
-
-
-static int cb_delete( void *p_server, gnutls_datum key )
-{
-    tls_server_sys_t *p_sys = ((tls_server_t *)p_server)->p_sys;
-    saved_session_t *p_session, *p_end;
-
-    p_session = p_sys->p_cache;
-    p_end = p_session + p_sys->i_cache_size;
-
-    vlc_mutex_lock( &p_sys->cache_lock );
-
-    while( p_session < p_end )
-    {
-        if( ( p_session->i_idlen == key.size )
-         && !memcmp( p_session->id, key.data, key.size ) )
-        {
-            p_session->i_datalen = p_session->i_idlen = 0;
-            vlc_mutex_unlock( &p_sys->cache_lock );
-            return 0;
-        }
-        p_session++;
-    }
-
-    vlc_mutex_unlock( &p_sys->cache_lock );
-
-    return -1;
-}
 
 
 /**
@@ -944,15 +810,6 @@ gnutls_ServerSessionPrepare( tls_server_t *p_server )
 
     if (p_session->pf_handshake == gnutls_HandshakeAndValidate)
         gnutls_certificate_server_set_request (session, GNUTLS_CERT_REQUIRE);
-
-    /* Session resumption support */
-    i_val = var_InheritInteger (p_server, "gnutls-cache-timeout");
-    if (i_val >= 0)
-        gnutls_db_set_cache_expiration (session, i_val);
-    gnutls_db_set_retrieve_function( session, cb_fetch );
-    gnutls_db_set_remove_function( session, cb_delete );
-    gnutls_db_set_store_function( session, cb_store );
-    gnutls_db_set_ptr( session, p_server );
 
     return p_session;
 
@@ -1046,18 +903,6 @@ static int OpenServer (vlc_object_t *obj)
     if( p_sys == NULL )
         return VLC_ENOMEM;
 
-    p_sys->i_cache_size = var_InheritInteger (obj, "gnutls-cache-size");
-    if (p_sys->i_cache_size == -1) /* Duh, config subsystem exploded?! */
-        p_sys->i_cache_size = 0;
-    p_sys->p_cache = calloc (p_sys->i_cache_size,
-                             sizeof (struct saved_session_t));
-    if (p_sys->p_cache == NULL)
-    {
-        free (p_sys);
-        return VLC_ENOMEM;
-    }
-
-    p_sys->p_store = p_sys->p_cache;
     p_server->p_sys = p_sys;
     p_server->pf_add_CA  = gnutls_ServerAddCA;
     p_server->pf_add_CRL = gnutls_ServerAddCRL;
@@ -1066,8 +911,6 @@ static int OpenServer (vlc_object_t *obj)
 
     /* No certificate validation by default */
     p_sys->pf_handshake  = gnutls_ContinueHandshake;
-
-    vlc_mutex_init( &p_sys->cache_lock );
 
     /* Sets server's credentials */
     val = gnutls_certificate_allocate_credentials( &p_sys->x509_cred );
@@ -1124,8 +967,6 @@ static int OpenServer (vlc_object_t *obj)
     return VLC_SUCCESS;
 
 error:
-    vlc_mutex_destroy (&p_sys->cache_lock);
-    free (p_sys->p_cache);
     free (p_sys);
     return VLC_EGENERIC;
 }
@@ -1136,9 +977,6 @@ error:
 static void CloseServer (vlc_object_t *p_server)
 {
     tls_server_sys_t *p_sys = ((tls_server_t *)p_server)->p_sys;
-
-    vlc_mutex_destroy (&p_sys->cache_lock);
-    free (p_sys->p_cache);
 
     /* all sessions depending on the server are now deinitialized */
     gnutls_certificate_free_credentials (p_sys->x509_cred);
