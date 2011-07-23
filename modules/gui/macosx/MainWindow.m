@@ -149,7 +149,6 @@ static VLCMainWindow *_o_sharedInstance = nil;
         o_shuffle_pressed_img = [[NSImage imageNamed:@"shuffle-pressed"] retain];
         o_shuffle_on_img = [[NSImage imageNamed:@"shuffle-blue"] retain];
         o_shuffle_on_pressed_img = [[NSImage imageNamed:@"shuffle-blue-pressed"] retain];
-        [o_time_fld setTextColor: [NSColor colorWithCalibratedRed:64.0 green:64.0 blue:64.0 alpha:100.0]];
         [o_time_sld_left_view setImage: [NSImage imageNamed:@"progression-track-wrapper-left"]];
         [o_time_sld_middle_view setImage: [NSImage imageNamed:@"progression-track-wrapper-middle"]];
         [o_time_sld_right_view setImage: [NSImage imageNamed:@"progression-track-wrapper-right"]];
@@ -486,8 +485,8 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
     [o_time_sld setFloatValue: 0.0];
     [o_time_sld setEnabled: b_seekable];
-    [o_time_fld setStringValue: @"00:00"];
-    [[[[VLCMain sharedInstance] controls] fspanel] setStreamPos: 0 andTime: @"00:00"];
+    [o_time_fld setStringValue: @"0:00:00"];
+    [[[[VLCMain sharedInstance] controls] fspanel] setStreamPos: 0 andTime: @"0:00:00"];
     [[[[VLCMain sharedInstance] controls] fspanel] setSeekable: b_seekable];
 }
 
