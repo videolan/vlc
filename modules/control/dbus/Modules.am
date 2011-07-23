@@ -1,6 +1,7 @@
 SOURCES_dbus = \
     dbus.c \
     dbus.h \
+    dbus_introspect.h \
     dbus_common.h \
     dbus_root.h \
     dbus_root.c \
