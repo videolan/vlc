@@ -205,6 +205,8 @@ struct intf_sys_t
 - (IBAction)saveDebugLog:(id)sender;
 - (IBAction)showMessagesPanel:(id)sender;
 
+- (void)processReceivedlibvlcMessage:(const msg_item_t *)item;
+
 - (IBAction)togglePlaylist:(id)sender;
 - (void)updateTogglePlaylistState;
 

@@ -112,6 +112,7 @@ static int WindowControl( vout_window_t *, int i_query, va_list );
 
 int WindowOpen( vout_window_t *p_wnd, const vout_window_cfg_t *cfg )
 {
+    NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
     intf_thread_t *p_intf = VLCIntf;
     if (!p_intf) {
         msg_Err( p_wnd, "Mac OS X interface not found" );
@@ -127,6 +128,7 @@ int WindowOpen( vout_window_t *p_wnd, const vout_window_cfg_t *cfg )
 
     if ( !p_wnd->handle.nsobject ) {
         msg_Err( p_wnd, "got no video view from the interface" );
+        [o_pool release];
         return VLC_EGENERIC;
     }
 
@@ -134,6 +136,7 @@ int WindowOpen( vout_window_t *p_wnd, const vout_window_cfg_t *cfg )
     [[VLCMainWindow sharedInstance] togglePlaylist:nil];
     p_wnd->control = WindowControl;
     p_wnd->sys = (vout_window_sys_t *)VLCIntf;
+    [o_pool release];
     return VLC_SUCCESS;
 }
 
@@ -153,9 +156,11 @@ static int WindowControl( vout_window_t *p_wnd, int i_query, va_list args )
 
 void WindowClose( vout_window_t *p_wnd )
 {
+    NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
     [[VLCMainWindow sharedInstance] setVideoplayEnabled:NO];
     NSLog( @"Window Close" );
     // tell the interface to get rid of the video, TODO
+    [o_pool release];
 }
 
 /*****************************************************************************
@@ -197,27 +202,20 @@ static void Run( intf_thread_t *p_intf )
 /*****************************************************************************
  * MsgCallback: Callback triggered by the core once a new debug message is
  * ready to be displayed. We store everything in a NSArray in our Cocoa part
- * of this file, so we are forwarding everything through notifications.
+ * of this file.
  *****************************************************************************/
 static void MsgCallback( msg_cb_data_t *data, const msg_item_t *item )
 {
     int canc = vlc_savecancel();
-    NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
 
     /* this may happen from time to time, let's bail out as info would be useless anyway */
     if( !item->psz_module || !item->psz_msg )
         return;
 
-    NSDictionary *o_dict = [NSDictionary dictionaryWithObjectsAndKeys:
-                                [NSString stringWithUTF8String: item->psz_module], @"Module",
-                                [NSString stringWithUTF8String: item->psz_msg], @"Message",
-                                [NSNumber numberWithInt: item->i_type], @"Type", nil];
-
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"VLCCoreMessageReceived"
-                                                        object: nil
-                                                      userInfo: o_dict];
-
+    NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
+    [[VLCMain sharedInstance] processReceivedlibvlcMessage: item];
     [o_pool release];
+
     vlc_restorecancel( canc );
 }
 
@@ -1706,7 +1704,7 @@ end:
     }
 }
 
-- (void)libvlcMessageReceived: (NSNotification *)o_notification
+- (void)processReceivedlibvlcMessage:(const msg_item_t *)item
 {
     NSColor *o_white = [NSColor whiteColor];
     NSColor *o_red = [NSColor redColor];
@@ -1714,14 +1712,12 @@ end:
     NSColor *o_gray = [NSColor grayColor];
 
     NSColor * pp_color[4] = { o_white, o_red, o_yellow, o_gray };
-    static const char * ppsz_type[4] = { ": ", " error: ",
-    " warning: ", " debug: " };
+    static const char * ppsz_type[4] = { ": ", " error: ", " warning: ", " debug: " };
 
-    NSString *o_msg;
     NSDictionary *o_attr;
     NSAttributedString *o_msg_color;
 
-    int i_type = [[[o_notification userInfo] objectForKey: @"Type"] intValue];
+    int i_type = item->i_type;
 
     [o_msg_lock lock];
 
@@ -1731,20 +1727,12 @@ end:
         [o_msg_arr removeObjectAtIndex: 1];
     }
 
-    o_attr = [NSDictionary dictionaryWithObject: o_gray
-                                         forKey: NSForegroundColorAttributeName];
-    o_msg = [NSString stringWithFormat: @"%@%s",
-             [[o_notification userInfo] objectForKey: @"Module"],
-             ppsz_type[i_type]];
-    o_msg_color = [[NSAttributedString alloc]
-                   initWithString: o_msg attributes: o_attr];
+    o_attr = [NSDictionary dictionaryWithObject: o_gray forKey: NSForegroundColorAttributeName];
+    o_msg_color = [[NSAttributedString alloc] initWithString: [NSString stringWithFormat: @"%s%s", item->psz_module, ppsz_type[i_type]] attributes: o_attr];
     [o_msg_arr addObject: [o_msg_color autorelease]];
 
-    o_attr = [NSDictionary dictionaryWithObject: pp_color[i_type]
-                                         forKey: NSForegroundColorAttributeName];
-    o_msg = [[[o_notification userInfo] objectForKey: @"Message"] stringByAppendingString: @"\n"];
-    o_msg_color = [[NSAttributedString alloc]
-                   initWithString: o_msg attributes: o_attr];
+    o_attr = [NSDictionary dictionaryWithObject: pp_color[i_type] forKey: NSForegroundColorAttributeName];
+    o_msg_color = [[NSAttributedString alloc] initWithString: [NSString stringWithFormat: @"%s\n", item->psz_msg] attributes: o_attr];
     [o_msg_arr addObject: [o_msg_color autorelease]];
 
     b_msg_arr_changed = YES;
