@@ -143,6 +143,8 @@ DWORD WaitForMultipleObjectsEx (DWORD nCount, const HANDLE *lpHandles,
 static vlc_mutex_t super_mutex;
 static vlc_cond_t  super_variable;
 
+BOOL WINAPI DllMain (HINSTANCE, DWORD, LPVOID);
+
 BOOL WINAPI DllMain (HINSTANCE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
 {
     (void) hinstDll;
@@ -326,14 +328,13 @@ int vlc_cond_timedwait (vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex,
         mtime_t total;
         switch (p_condvar->clock)
         {
-            case CLOCK_MONOTONIC:
-                total = mdate();
-                break;
             case CLOCK_REALTIME: /* FIXME? sub-second precision */
                 total = CLOCK_FREQ * time (NULL);
                 break;
             default:
-                assert (0);
+                assert (p_condvar->clock == CLOCK_MONOTONIC);
+                total = mdate();
+                break;
         }
         total = (deadline - total) / 1000;
         if( total < 0 )
@@ -600,14 +601,16 @@ static int vlc_clone_attr (vlc_thread_t *p_handle, bool detached,
      * function instead of CreateThread, otherwise you'll end up with
      * memory leaks and the signal functions not working (see Microsoft
      * Knowledge Base, article 104641) */
-    hThread = (HANDLE)(uintptr_t)
-        _beginthreadex (NULL, 0, vlc_entry, th, CREATE_SUSPENDED, NULL);
-    if (hThread == NULL)
+    uintptr_t h;
+
+    h = _beginthreadex (NULL, 0, vlc_entry, th, CREATE_SUSPENDED, NULL);
+    if (h == 0)
     {
         int err = errno;
         free (th);
         return err;
     }
+    hThread = (HANDLE)h;
 
 #else
     th->cancel_event = CreateEvent (NULL, FALSE, FALSE, NULL);
