@@ -64,79 +64,36 @@ struct vlc_thread
 #ifdef UNDER_CE
 static void CALLBACK vlc_cancel_self (ULONG_PTR dummy);
 
-static DWORD vlc_cancelable_wait (DWORD count, const HANDLE *handles,
-                                  DWORD delay)
-{
-    struct vlc_thread *th = vlc_threadvar_get (thread_key);
-    if (th == NULL)
-    {
-        /* Main thread - cannot be cancelled anyway */
-        return WaitForMultipleObjects (count, handles, FALSE, delay);
-    }
-    HANDLE new_handles[count + 1];
-    memcpy(new_handles, handles, count * sizeof(HANDLE));
-    new_handles[count] = th->cancel_event;
-    DWORD result = WaitForMultipleObjects (count + 1, new_handles, FALSE,
-                                           delay);
-    if (result == WAIT_OBJECT_0 + count)
-    {
-        vlc_cancel_self ((uintptr_t)th);
-        return WAIT_IO_COMPLETION;
-    }
-    else
-    {
-        return result;
-    }
-}
-
-DWORD SleepEx (DWORD dwMilliseconds, BOOL bAlertable)
-{
-    if (bAlertable)
-    {
-        DWORD result = vlc_cancelable_wait (0, NULL, dwMilliseconds);
-        return (result == WAIT_TIMEOUT) ? 0 : WAIT_IO_COMPLETION;
-    }
-    else
-    {
-        Sleep(dwMilliseconds);
-        return 0;
-    }
-}
-
-DWORD WaitForSingleObjectEx (HANDLE hHandle, DWORD dwMilliseconds,
-                             BOOL bAlertable)
-{
-    if (bAlertable)
-    {
-        /* The MSDN documentation specifies different return codes,
-         * but in practice they are the same. We just check that it
-         * remains so. */
-#if WAIT_ABANDONED != WAIT_ABANDONED_0
-# error Windows headers changed, code needs to be rewritten!
-#endif
-        return vlc_cancelable_wait (1, &hHandle, dwMilliseconds);
-    }
-    else
-    {
-        return WaitForSingleObject (hHandle, dwMilliseconds);
-    }
-}
-
 DWORD WaitForMultipleObjectsEx (DWORD nCount, const HANDLE *lpHandles,
                                 BOOL bWaitAll, DWORD dwMilliseconds,
                                 BOOL bAlertable)
 {
+    HANDLE handles[nCount + 1];
+    DWORD ret;
+
+    memcpy(handles, lpHandles, count * sizeof(HANDLE));
     if (bAlertable)
     {
-        /* We do not support the bWaitAll case */
-        assert (! bWaitAll);
-        return vlc_cancelable_wait (nCount, lpHandles, dwMilliseconds);
+        struct vlc_thread *th = vlc_threadvar_get (thread_key);
+        if (th != NULL)
+        {
+            handles[nCount] = th->cancel_event;
+            /* bWaitAll not implemented and not used by VLC... */
+            assert (!bWaitAll);
+        }
+        else
+            bAltertable = FALSE;
     }
-    else
+
+    ret = WaitForMultipleObjects (nCount + bAlertable, handles, bWaitAll,
+                                  dwMilliseconds);
+    if (ret == WAIT_OBJECT_0 + nCount)
     {
-        return WaitForMultipleObjects (nCount, lpHandles, bWaitAll,
-                                       dwMilliseconds);
+        assert (bAlertable);
+        vlc_cancel_self ((uintptr_t)th);
+        ret = WAIT_IO_COMPLETION;
     }
+    return ret;
 }
 #endif
 
@@ -166,6 +123,34 @@ BOOL WINAPI DllMain (HINSTANCE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
     }
     return TRUE;
 }
+
+static DWORD vlc_WaitForMultipleObjects (DWORD count, const HANDLE *handles,
+                                         DWORD delay)
+{
+    DWORD ret = WaitForMultipleObjectsEx (count, handles, FALSE, delay, TRUE);
+
+   /* We do not abandon objects... this would be a bug */
+   assert (ret < WAIT_ABANDONED_0 || WAIT_ABANDONED_0 + count - 1 < ret);
+
+   if (unlikely(ret == WAIT_FAILED))
+       abort (); /* We are screwed! */
+
+   return ret;
+}
+
+static DWORD vlc_WaitForSingleObject (HANDLE handle, DWORD delay)
+{
+    return vlc_WaitForMultipleObjects (1, &handle, delay);
+}
+
+static DWORD vlc_Sleep (DWORD delay)
+{
+    DWORD ret = vlc_WaitForMultipleObjects (0, NULL, delay);
+    if (ret == WAIT_TIMEOUT)
+        ret = 0;
+    return ret;
+}
+
 
 /*** Mutexes ***/
 void vlc_mutex_init( vlc_mutex_t *p_mutex )
@@ -305,13 +290,11 @@ void vlc_cond_wait (vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex)
     {
         vlc_testcancel ();
         LeaveCriticalSection (&p_mutex->mutex);
-        result = WaitForSingleObjectEx (p_condvar->handle, INFINITE, TRUE);
+        result = vlc_WaitForSingleObject (p_condvar->handle, INFINITE);
         EnterCriticalSection (&p_mutex->mutex);
     }
     while (result == WAIT_IO_COMPLETION);
 
-    assert (result != WAIT_ABANDONED); /* another thread failed to cleanup! */
-    assert (result != WAIT_FAILED);
     ResetEvent (p_condvar->handle);
 }
 
@@ -342,13 +325,11 @@ int vlc_cond_timedwait (vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex,
 
         DWORD delay = (total > 0x7fffffff) ? 0x7fffffff : total;
         LeaveCriticalSection (&p_mutex->mutex);
-        result = WaitForSingleObjectEx (p_condvar->handle, delay, TRUE);
+        result = vlc_WaitForSingleObject (p_condvar->handle, delay);
         EnterCriticalSection (&p_mutex->mutex);
     }
     while (result == WAIT_IO_COMPLETION);
 
-    assert (result != WAIT_ABANDONED);
-    assert (result != WAIT_FAILED);
     ResetEvent (p_condvar->handle);
 
     return (result == WAIT_OBJECT_0) ? 0 : ETIMEDOUT;
@@ -380,7 +361,7 @@ void vlc_sem_wait (vlc_sem_t *sem)
     do
     {
         vlc_testcancel ();
-        result = WaitForSingleObjectEx (*sem, INFINITE, TRUE);
+        result = vlc_WaitForSingleObject (*sem, INFINITE);
     }
     while (result == WAIT_IO_COMPLETION);
 }
@@ -808,7 +789,7 @@ void mwait (mtime_t deadline)
         delay /= 1000;
         if (unlikely(delay > 0x7fffffff))
             delay = 0x7fffffff;
-        SleepEx (delay, TRUE);
+        vlc_Sleep (delay);
         vlc_testcancel();
     }
 }
