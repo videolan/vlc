@@ -873,7 +873,7 @@ gnutls_ServerAddCRL( tls_server_t *p_server, const char *psz_crl_path )
                                                 (p_server->p_sys))->x509_cred,
                                                 psz_local_path,
                                                 GNUTLS_X509_FMT_PEM );
-    LocaleFree( psz_crl_path );
+    LocaleFree( psz_local_path );
     if( val < 0 )
     {
         msg_Err( p_server, "cannot add CRL (%s): %s", psz_crl_path,
