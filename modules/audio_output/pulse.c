@@ -193,14 +193,14 @@ static void stream_latency_cb(pa_stream *s, void *userdata)
     if (adj < -ADJUST_MAX)
         adj = -ADJUST_MAX;
 
-    if (abs(adj) < (inrate >> 10))
-        adj = 0; /* favor native rate to avoid resampling */
+    unsigned outrate = sys->rate - adj;
+    /* Favor native rate to avoid resampling (FIXME: really a good idea?) */
+    if (abs(outrate - inrate) < (inrate >> 10))
+        outrate = inrate;
 
     /* This keeps the effective rate within specified range
      * (+/-AOUT_MAX_RESAMPLING% - see <vlc_aout.h>) of the nominal rate. */
-    unsigned outrate = inrate - adj;
     const int limit = inrate * AOUT_MAX_RESAMPLING / 100;
-
     if (outrate > inrate + limit)
         outrate = inrate + limit;
     if (outrate < inrate - limit)
@@ -392,8 +392,8 @@ static void Play(aout_instance_t *aout)
     }
 
 #if 0 /* Fault injector to test underrun recovery */
-    static unsigned u = 0;
-    if ((++u % 500) == 0) {
+    static volatile unsigned u = 0;
+    if ((++u % 1000) == 0) {
         msg_Err(aout, "fault injection");
         pa_operation_unref(pa_stream_flush(s, NULL, NULL));
     }
