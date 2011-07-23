@@ -355,8 +355,8 @@ gnutls_HandshakeAndValidate( tls_session_t *session )
         goto error;
     }
 
-    assert( p_sys->psz_hostname != NULL );
-    if ( !gnutls_x509_crt_check_hostname( cert, p_sys->psz_hostname ) )
+    if( p_sys->psz_hostname != NULL
+     && !gnutls_x509_crt_check_hostname( cert, p_sys->psz_hostname ) )
     {
         msg_Err( session, "Certificate does not match \"%s\"",
                  p_sys->psz_hostname );
