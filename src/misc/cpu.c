@@ -43,6 +43,10 @@
 #endif
 #include <assert.h>
 
+#ifdef __APPLE__
+#include <sys/sysctl.h>
+#endif
+
 #include "libvlc.h"
 
 #if defined( __i386__ ) || defined( __x86_64__ ) || defined( __powerpc__ ) \
