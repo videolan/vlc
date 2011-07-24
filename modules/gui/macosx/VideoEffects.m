@@ -179,6 +179,7 @@ static VLCVideoEffects *_o_sharedInstance = nil;
 - (void)resetValues
 {
     NSString *tmpString;
+    char *tmpChar;
     /* do we have any filter enabled? if yes, show it. */
     char * psz_vfilters;
     psz_vfilters = config_GetPsz( p_intf, "video-filter" );
@@ -244,13 +245,15 @@ static VLCVideoEffects *_o_sharedInstance = nil;
     [o_crop_sync_top_bottom_ckb setState: NSOffState];
     [o_crop_sync_left_right_ckb setState: NSOffState];
 
-    tmpString = [NSString stringWithUTF8String: config_GetPsz( p_intf, "transform-type" )];
+    tmpChar = config_GetPsz( p_intf, "transform-type" );
+    tmpString = [NSString stringWithUTF8String: tmpChar];
     if( [tmpString isEqualToString:@"hflip"] )
         [o_transform_pop selectItemWithTag: 1];
     else if( [tmpString isEqualToString:@"vflip"] )
         [o_transform_pop selectItemWithTag: 2];
     else
         [o_transform_pop selectItemWithTag:[tmpString intValue]];
+    FREENULL( tmpChar );
     [o_transform_pop setEnabled: [o_transform_ckb state]];
     [o_puzzle_rows_fld setIntValue: config_GetInt( p_intf, "puzzle-rows" )];
     [o_puzzle_columns_fld setIntValue: config_GetInt( p_intf, "puzzle-cols" )];
@@ -273,13 +276,15 @@ static VLCVideoEffects *_o_sharedInstance = nil;
     [o_sepia_fld setIntValue: config_GetInt( p_intf, "sepia-intensity" )];
     [o_sepia_fld setEnabled: [o_sepia_ckb state]];
     [o_sepia_lbl setEnabled: [o_sepia_ckb state]];
-    tmpString = [NSString stringWithUTF8String: config_GetPsz( p_intf, "gradient-mode" )];
+    tmpChar = config_GetPsz( p_intf, "gradient-mode" );
+    tmpString = [NSString stringWithUTF8String: tmpChar];
     if( [tmpString isEqualToString:@"hough"] )
         [o_gradient_mode_pop selectItemWithTag: 3];
     else if( [tmpString isEqualToString:@"edge"] )
         [o_gradient_mode_pop selectItemWithTag: 2];
     else
         [o_gradient_mode_pop selectItemWithTag: 1];
+    FREENULL( tmpChar );
     [o_gradient_cartoon_ckb setState: config_GetInt( p_intf, "gradient-cartoon" )];
     [o_gradient_color_ckb setState: config_GetInt( p_intf, "gradient-type" )];
     [o_gradient_mode_pop setEnabled: [o_gradient_ckb state]];
@@ -299,16 +304,24 @@ static VLCVideoEffects *_o_sharedInstance = nil;
     [o_clone_fld setIntValue: config_GetInt( p_intf, "clone-count" )];
     [o_clone_fld setEnabled: [o_clone_ckb state]];
     [o_clone_lbl setEnabled: [o_clone_ckb state]];
-    if( config_GetPsz( p_intf, "marq-marquee" ) )
-        [o_addtext_text_fld setStringValue: [NSString stringWithUTF8String: config_GetPsz( p_intf, "marq-marquee" )]];
+    tmpChar = config_GetPsz( p_intf, "marq-marquee" );
+    if( tmpChar )
+    {
+        [o_addtext_text_fld setStringValue: [NSString stringWithUTF8String: tmpChar]];
+        FREENULL( tmpChar );
+    }
     [o_addtext_pos_pop selectItemWithTag: config_GetInt( p_intf, "marq-position" )];
     [o_addtext_pos_pop setEnabled: [o_addtext_ckb state]];
     [o_addtext_pos_lbl setEnabled: [o_addtext_ckb state]];
     [o_addtext_text_lbl setEnabled: [o_addtext_ckb state]];
     [o_addtext_text_fld setEnabled: [o_addtext_ckb state]];
 
-    if( config_GetPsz( p_intf, "logo-file" ) )
-       [o_addlogo_logo_fld setStringValue: [NSString stringWithUTF8String: config_GetPsz( p_intf, "logo-file" )]];
+    tmpChar = config_GetPsz( p_intf, "logo-file" );
+    if( tmpChar )
+    {
+       [o_addlogo_logo_fld setStringValue: [NSString stringWithUTF8String: tmpChar]];
+        FREENULL( tmpChar );
+    }
     [o_addlogo_top_fld setIntValue: config_GetInt( p_intf, "logo-x" )];
     [o_addlogo_left_fld setIntValue: config_GetInt( p_intf, "logo-y" )];
     [o_addlogo_transparency_sld setIntValue: config_GetInt( p_intf, "logo-opacity" )];
@@ -320,8 +333,12 @@ static VLCVideoEffects *_o_sharedInstance = nil;
     [o_addlogo_top_lbl setEnabled: [o_addlogo_ckb state]];
     [o_addlogo_transparency_sld setEnabled: [o_addlogo_ckb state]];
     [o_addlogo_transparency_lbl setEnabled: [o_addlogo_ckb state]];
-    if( config_GetPsz( p_intf, "erase-mask" ) )
-        [o_eraselogo_mask_fld setStringValue: [NSString stringWithUTF8String: config_GetPsz( p_intf, "erase-mask" )]];
+    tmpChar = config_GetPsz( p_intf, "erase-mask" );
+    if( tmpChar )
+    {
+        [o_eraselogo_mask_fld setStringValue: [NSString stringWithUTF8String: tmpChar]];
+        FREENULL( tmpChar );
+    }
     [o_eraselogo_top_fld setIntValue: config_GetInt( p_intf, "erase-x" )];
     [o_eraselogo_left_fld setIntValue: config_GetInt( p_intf, "erase-y" )];
     [o_eraselogo_mask_fld setEnabled: [o_eraselogo_ckb state]];
@@ -330,9 +347,6 @@ static VLCVideoEffects *_o_sharedInstance = nil;
     [o_eraselogo_left_lbl setEnabled: [o_eraselogo_ckb state]];
     [o_eraselogo_top_fld setEnabled: [o_eraselogo_ckb state]];
     [o_eraselogo_top_lbl setEnabled: [o_eraselogo_ckb state]];
-
-    if (psz_vfilters)
-        free(psz_vfilters);
 }
 
 - (void)setVideoFilter: (char *)psz_name on:(BOOL)b_on
