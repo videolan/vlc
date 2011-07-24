@@ -324,7 +324,8 @@
     {
         if( input_item_HasErrorWhenReading( p_item->p_input ) )
         {
-            o_value = [NSImage imageWithWarningIcon];
+            o_value = [[NSWorkspace sharedWorkspace] iconForFileType:NSFileTypeForHFSTypeCode(kAlertCautionIcon)];
+            [o_value setSize: NSMakeSize(16,16)];
         }
     }
     return o_value;

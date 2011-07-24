@@ -48,10 +48,6 @@ static VLCCoreDialogProvider *_o_sharedInstance = nil;
     else
     {
         _o_sharedInstance = [super init];
-        [[NSNotificationCenter defaultCenter] addObserver:self
-                                                 selector:@selector(performDialogEvent:)
-                                                     name: @"VLCNewCoreDialogEventNotification"
-                                                   object:self];
         o_error_panel = [[VLCErrorPanel alloc] init];
         b_progress_cancelled = NO;
     }
@@ -220,11 +216,6 @@ static VLCCoreDialogProvider *_o_sharedInstance = nil;
     return o_error_panel;
 }
 
--(void)dealloc
-{
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
-    [super dealloc];
-}
 @end
 
 /*****************************************************************************
@@ -279,7 +270,7 @@ static VLCCoreDialogProvider *_o_sharedInstance = nil;
     [o_errors addObject: ourError];
     [ourError release];
 
-    [o_icons addObject: [NSImage imageWithErrorIcon]];
+    [o_icons addObject: [[NSWorkspace sharedWorkspace] iconForFileType:NSFileTypeForHFSTypeCode(kAlertStopIcon)]];
 
     [o_error_table reloadData];
 }

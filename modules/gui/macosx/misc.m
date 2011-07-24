@@ -33,59 +33,6 @@
 #import <vlc_url.h>
 
 /*****************************************************************************
- * NSImage (VLCAdditions)
- *
- *  Addition to NSImage
- *****************************************************************************/
-@implementation NSImage (VLCAdditions)
-+ (id)imageWithSystemName:(int)name
-{
-    /* ugly Carbon stuff following...
-     * regrettably, you can't get the icons through clean Cocoa */
-
-    /* retrieve our error icon */
-    NSImage * icon;
-    IconRef ourIconRef;
-    int returnValue;
-    returnValue = GetIconRef(kOnSystemDisk, 'macs', name, &ourIconRef);
-    icon = [[[NSImage alloc] initWithSize:NSMakeSize(32,32)] autorelease];
-    [icon lockFocus];
-    CGRect rect = CGRectMake(0,0,32,32);
-    PlotIconRefInContext((CGContextRef)[[NSGraphicsContext currentContext]
-        graphicsPort],
-        &rect,
-        kAlignNone,
-        kTransformNone,
-        NULL /*inLabelColor*/,
-        kPlotIconRefNormalFlags,
-        (IconRef)ourIconRef);
-    [icon unlockFocus];
-    returnValue = ReleaseIconRef(ourIconRef);
-    return icon;
-}
-
-+ (id)imageWithWarningIcon
-{
-    static NSImage * imageWithWarningIcon = nil;
-    if( !imageWithWarningIcon )
-    {
-        imageWithWarningIcon = [[[self class] imageWithSystemName:'caut'] retain];
-    }
-    return imageWithWarningIcon;
-}
-
-+ (id)imageWithErrorIcon
-{
-    static NSImage * imageWithErrorIcon = nil;
-    if( !imageWithErrorIcon )
-    {
-        imageWithErrorIcon = [[[self class] imageWithSystemName:'stop'] retain];
-    }
-    return imageWithErrorIcon;
-}
-
-@end
-/*****************************************************************************
  * NSAnimation (VLCAdditions)
  *
  *  Missing extension to NSAnimation
