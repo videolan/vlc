@@ -78,7 +78,7 @@
 }
 + (VLCCoreDialogProvider *)sharedInstance;
 
--(void)performDialogEvent: (NSNotification *)o_notification;
+-(void)performEventWithObject: (NSValue *)o_value ofType: (const char*)type;
 
 -(void)showFatalDialog: (NSValue *)o_value;
 -(void)showFatalWaitDialog: (NSValue *)o_value;

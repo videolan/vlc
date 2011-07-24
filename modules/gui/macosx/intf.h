@@ -75,8 +75,6 @@ struct intf_sys_t
     bool b_playlist_update;
     bool b_playmode_update;
     bool b_current_title_update;
-    bool b_fullscreen_update;
-    bool b_intf_show;
 
     /* menus handlers */
     bool b_input_update;

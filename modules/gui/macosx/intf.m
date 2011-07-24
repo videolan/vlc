@@ -248,7 +248,14 @@ static int ShowController( vlc_object_t *p_this, const char *psz_variable,
 {
     intf_thread_t * p_intf = VLCIntf;
     if( p_intf && p_intf->p_sys )
-        p_intf->p_sys->b_intf_show = true;
+    {
+        NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
+        if( [[[VLCCoreInteraction sharedInstance] voutView] isFullscreen] && config_GetInt( VLCIntf, "macosx-fspanel" ) )
+            [[[[VLCMain sharedInstance] controls] fspanel] fadeIn];
+        else
+            [[VLCMainWindow sharedInstance] makeKeyAndOrderFront: nil];
+        [o_pool release];
+    }
     return VLC_SUCCESS;
 }
 
@@ -261,7 +268,7 @@ static int FullscreenChanged( vlc_object_t *p_this, const char *psz_variable,
 {
     intf_thread_t * p_intf = VLCIntf;
     if( p_intf && p_intf->p_sys )
-        p_intf->p_sys->b_fullscreen_update = true;
+        NSLog( @"we should update fullscreen state" ); //FIXME
     return VLC_SUCCESS;
 }
 
@@ -286,7 +293,7 @@ static int DialogCallback( vlc_object_t *p_this, const char *type, vlc_value_t p
     }
 
     NSValue *o_value = [NSValue valueWithPointer:value.p_address];
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"VLCNewCoreDialogEventNotification" object:[interface coreDialogProvider] userInfo:[NSDictionary dictionaryWithObjectsAndKeys: o_value, @"VLCDialogPointer", [NSString stringWithUTF8String: type], @"VLCDialogType", nil]];
+    [[VLCCoreDialogProvider sharedInstance] performEventWithObject: o_value ofType: type];
 
     [o_pool release];
     return VLC_SUCCESS;
@@ -1372,21 +1379,6 @@ static void manage_cleanup( void * args )
     {
         [o_playlist playlistUpdated];
         p_intf->p_sys->b_playlist_update = false;
-    }
-
-    if( p_intf->p_sys->b_fullscreen_update )
-    {
-        p_intf->p_sys->b_fullscreen_update = false;
-    }
-
-    if( p_intf->p_sys->b_intf_show )
-    {
-        if( [[o_coreinteraction voutView] isFullscreen] && config_GetInt( VLCIntf, "macosx-fspanel" ) )
-            [[o_controls fspanel] fadeIn];
-        else
-            [o_mainwindow makeKeyAndOrderFront: self];
-
-        p_intf->p_sys->b_intf_show = false;
     }
 
     p_input = pl_CurrentInput( p_intf );

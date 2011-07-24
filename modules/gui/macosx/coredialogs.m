@@ -68,25 +68,24 @@ static VLCCoreDialogProvider *_o_sharedInstance = nil;
     [o_prog_cancel_btn setTitle: _NS("Cancel")];
     [o_prog_bar setUsesThreadedAnimation: YES];
 
-}    
+}
 
--(void)performDialogEvent: (NSNotification *)o_notification
+-(void)performEventWithObject: (NSValue *)o_value ofType: (const char*)type
 {
-    NSValue *o_value = [[o_notification userInfo] objectForKey:@"VLCDialogPointer"];
-    NSString *o_type = [[o_notification userInfo] objectForKey:@"VLCDialogType"];
+    NSString *o_type = [NSString stringWithUTF8String:type];
 
     if( [o_type isEqualToString: @"dialog-error"] )
-        [self showFatalDialog: o_value];
+        [self performSelectorOnMainThread:@selector(showFatalDialog:) withObject:o_value waitUntilDone:YES];
     else if( [o_type isEqualToString: @"dialog-critical"] )
-        [self showFatalWaitDialog: o_value];
+        [self performSelectorOnMainThread:@selector(showFatalWaitDialog:) withObject:o_value waitUntilDone:YES];
     else if( [o_type isEqualToString: @"dialog-question"] )
-        [self showQuestionDialog: o_value];
+        [self performSelectorOnMainThread:@selector(showQuestionDialog:) withObject:o_value waitUntilDone:YES];
     else if( [o_type isEqualToString: @"dialog-login"] )
-        [self showLoginDialog: o_value];
+        [self performSelectorOnMainThread:@selector(showLoginDialog:) withObject:o_value waitUntilDone:YES];
     else if( [o_type isEqualToString: @"dialog-progress-bar"] )
-        [self showProgressDialog: o_value];
+        [self performSelectorOnMainThread:@selector(showProgressDialog:) withObject:o_value waitUntilDone:YES];
     else
-        msg_Err( VLCIntf, "unhandled dialog type: '%s'", [o_type UTF8String] );
+        msg_Err( VLCIntf, "unhandled dialog type: '%s'", type );
 }
 
 -(void)showFatalDialog: (NSValue *)o_value
