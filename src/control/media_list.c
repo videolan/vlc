@@ -454,6 +454,7 @@ int libvlc_media_list_index_of_item( libvlc_media_list_t * p_mlist,
         if( p_searched_md == p_md )
             return i;
     }
+    libvlc_printerr( "Media not found" );
     return -1;
 }
 

@@ -156,7 +156,7 @@ LIBVLC_API libvlc_media_t *
  *
  * \param p_ml a media list instance
  * \param p_md media instance
- * \return position of media instance
+ * \return position of media instance or -1 if media not found
  */
 LIBVLC_API int
     libvlc_media_list_index_of_item( libvlc_media_list_t *p_ml,

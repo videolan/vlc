@@ -64,7 +64,10 @@ libvlc_media_library_new( libvlc_instance_t * p_inst )
     p_mlib = malloc(sizeof(libvlc_media_library_t));
 
     if( !p_mlib )
+    {
+        libvlc_printerr( "Not enough memory" );
         return NULL;
+    }
 
     p_mlib->p_libvlc_instance = p_inst;
     p_mlib->i_refcount = 1;
