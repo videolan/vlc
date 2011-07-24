@@ -178,7 +178,6 @@ static int Open( vlc_object_t *p_this )
 {
     sout_stream_t        *p_stream = (sout_stream_t *)p_this;
     sout_stream_sys_t    *p_sys;
-    vlc_object_t         *p_libvlc = VLC_OBJECT( p_this->p_libvlc );
     vlc_value_t           val;
 
     config_ChainParse( p_stream, CFG_PREFIX, ppsz_sout_options,
