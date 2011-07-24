@@ -588,9 +588,12 @@ static const entry_t p_list_video[] = {
         A("IV20"),
         A("RT21"),
 
-        /* Flash Screen Video */
+    /* Flash Screen Video */
     B(VLC_CODEC_FLASHSV, "Flash Screen Video"),
         A("FSV1"),
+    B(VLC_CODEC_FLASHSV2, "Flash Screen Video 2"),
+        A("FSV2"),
+
     B(VLC_CODEC_KMVC, "Karl Morton's Video Codec (Worms)"),
         A("KMVC"),
 

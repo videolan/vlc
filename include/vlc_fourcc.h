@@ -116,6 +116,7 @@
 #define VLC_CODEC_VP8       VLC_FOURCC('V','P','8','0')
 #define VLC_CODEC_JPEG2000  VLC_FOURCC('J','P','2','K')
 #define VLC_CODEC_LAGARITH  VLC_FOURCC('L','A','G','S')
+#define VLC_CODEC_FLASHSV2  VLC_FOURCC('F','S','V','2')
 
 
 /* Planar YUV 4:1:0 Y:V:U */
