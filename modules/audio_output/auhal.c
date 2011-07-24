@@ -677,7 +677,7 @@ static int OpenSPDIF( audio_output_t * p_aout )
     for( int i = 0; i < i_streams && p_sys->i_stream_index < 0 ; i++ )
     {
         /* Find a stream with a cac3 stream */
-        AudioStreamBasicDescription *p_format_list = NULL;
+        AudioStreamRangedDescription *p_format_list = NULL;
         int                         i_formats = 0;
         bool                  b_digital = false;
 
@@ -689,8 +689,8 @@ static int OpenSPDIF( audio_output_t * p_aout )
             continue;
         }
 
-        i_formats = i_param_size / sizeof( AudioStreamBasicDescription );
-        p_format_list = (AudioStreamBasicDescription *)malloc( i_param_size );
+        i_formats = i_param_size / sizeof( AudioStreamRangedDescription );
+        p_format_list = (AudioStreamRangedDescription *)malloc( i_param_size );
         if( p_format_list == NULL )
             continue;
 
@@ -705,8 +705,8 @@ static int OpenSPDIF( audio_output_t * p_aout )
         /* Check if one of the supported formats is a digital format */
         for( int j = 0; j < i_formats; j++ )
         {
-            if( p_format_list[j].mFormatID == 'IAC3' ||
-                  p_format_list[j].mFormatID == kAudioFormat60958AC3 )
+            if( p_format_list[j].mFormat.mFormatID == 'IAC3' ||
+                  p_format_list[j].mFormat.mFormatID == kAudioFormat60958AC3 )
             {
                 b_digital = true;
                 break;
@@ -738,21 +738,21 @@ static int OpenSPDIF( audio_output_t * p_aout )
 
             for( int j = 0; j < i_formats; j++ )
             {
-                if( p_format_list[j].mFormatID == 'IAC3' ||
-                      p_format_list[j].mFormatID == kAudioFormat60958AC3 )
+                if( p_format_list[j].mFormat.mFormatID == 'IAC3' ||
+                      p_format_list[j].mFormat.mFormatID == kAudioFormat60958AC3 )
                 {
-                    if( p_format_list[j].mSampleRate == p_aout->format.i_rate )
+                    if( p_format_list[j].mFormat.mSampleRate == p_aout->format.i_rate )
                     {
                         i_requested_rate_format = j;
                         break;
                     }
-                    else if( p_format_list[j].mSampleRate == p_sys->sfmt_revert.mSampleRate )
+                    else if( p_format_list[j].mFormat.mSampleRate == p_sys->sfmt_revert.mSampleRate )
                     {
                         i_current_rate_format = j;
                     }
                     else
                     {
-                        if( i_backup_rate_format < 0 || p_format_list[j].mSampleRate > p_format_list[i_backup_rate_format].mSampleRate )
+                        if( i_backup_rate_format < 0 || p_format_list[j].mFormat.mSampleRate > p_format_list[i_backup_rate_format].mFormat.mSampleRate )
                             i_backup_rate_format = j;
                     }
                 }
@@ -760,10 +760,10 @@ static int OpenSPDIF( audio_output_t * p_aout )
             }
 
             if( i_requested_rate_format >= 0 ) /* We prefer to output at the samplerate of the original audio */
-                p_sys->stream_format = p_format_list[i_requested_rate_format];
+                p_sys->stream_format = p_format_list[i_requested_rate_format].mFormat;
             else if( i_current_rate_format >= 0 ) /* If not possible, we will try to use the current samplerate of the device */
-                p_sys->stream_format = p_format_list[i_current_rate_format];
-            else p_sys->stream_format = p_format_list[i_backup_rate_format]; /* And if we have to, any digital format will be just fine (highest rate possible) */
+                p_sys->stream_format = p_format_list[i_current_rate_format].mFormat;
+            else p_sys->stream_format = p_format_list[i_backup_rate_format].mFormat; /* And if we have to, any digital format will be just fine (highest rate possible) */
         }
         free( p_format_list );
     }
