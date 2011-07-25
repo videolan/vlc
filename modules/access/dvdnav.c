@@ -1043,7 +1043,6 @@ static void DemuxTitles( demux_t *p_demux )
 static void ButtonUpdate( demux_t *p_demux, bool b_mode )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
-    vlc_value_t val;
     int32_t i_title, i_part;
 
     dvdnav_current_title_info( p_sys->dvdnav, &i_title, &i_part );
