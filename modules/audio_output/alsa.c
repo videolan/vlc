@@ -136,6 +136,8 @@ vlc_module_end ()
 /* VLC will insert a resampling filter in any case, so it is best to turn off
  * ALSA (plug) resampling. */
 static const int mode = SND_PCM_NO_AUTO_RESAMPLE
+/* ALSA just discards extra channels. Not good. Disable it. */
+                      | SND_PCM_NO_AUTO_CHANNELS
 /* VLC is currently unable to leverage ALSA softvol. Disable it. */
                       | SND_PCM_NO_SOFTVOL;
 
@@ -340,14 +342,14 @@ static int Open (vlc_object_t *obj)
 
     snd_pcm_uframes_t i_buffer_size;
     snd_pcm_uframes_t i_period_size;
-    int i_channels;
+    unsigned channels;
 
     if (spdif)
     {
         fourcc = VLC_CODEC_SPDIFL;
         i_buffer_size = ALSA_SPDIF_BUFFER_SIZE;
         pcm_format = SND_PCM_FORMAT_S16;
-        i_channels = 2;
+        channels = 2;
 
         p_aout->i_nb_samples = i_period_size = ALSA_SPDIF_PERIOD_SIZE;
         p_aout->format.i_bytes_per_frame = AOUT_SPDIF_SIZE;
@@ -358,7 +360,7 @@ static int Open (vlc_object_t *obj)
     else
     {
         i_buffer_size = ALSA_DEFAULT_BUFFER_SIZE;
-        i_channels = aout_FormatNbChannels( &p_aout->format );
+        channels = aout_FormatNbChannels( &p_aout->format );
 
         p_aout->i_nb_samples = i_period_size = ALSA_DEFAULT_PERIOD_SIZE;
 
@@ -401,8 +403,13 @@ static int Open (vlc_object_t *obj)
     }
 
     /* Set channels. */
-    val = snd_pcm_hw_params_set_channels( p_sys->p_snd_pcm, p_hw, i_channels );
-    if( val < 0 )
+    val = snd_pcm_hw_params_set_channels (p_sys->p_snd_pcm, p_hw, channels);
+    if (val < 0 && channels > 2) /* Fallback to stereo */
+    {
+        val = snd_pcm_hw_params_set_channels (p_sys->p_snd_pcm, p_hw, 2);
+        channels = 2;
+    }
+    if (val < 0)
     {
         msg_Err( p_aout, "unable to set number of output channels (%s)",
                  snd_strerror( val ) );
@@ -506,6 +513,8 @@ static int Open (vlc_object_t *obj)
 
     p_aout->format.i_format = fourcc;
     p_aout->format.i_rate = rate;
+    if (channels == 2)
+        p_aout->format.i_physical_channels = AOUT_CHAN_LEFT|AOUT_CHAN_RIGHT;
 
     Probe (obj);
     return 0;
