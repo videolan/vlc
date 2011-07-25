@@ -781,7 +781,7 @@ static int OpenSPDIF( audio_output_t * p_aout )
         p_aout->format.i_format = VLC_CODEC_SPDIFL;
     p_aout->format.i_bytes_per_frame = AOUT_SPDIF_SIZE;
     p_aout->format.i_frame_length = A52_FRAME_NB;
-    p_aout->format.i_nb_samples = p_aout->format.i_frame_length;
+    p_aout->i_nb_samples = p_aout->format.i_frame_length;
     p_aout->format.i_rate = (unsigned int)p_sys->stream_format.mSampleRate;
     aout_FormatPrepare( &p_aout->format );
     aout_VolumeNoneInit( p_aout );
