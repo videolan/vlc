@@ -164,8 +164,8 @@ int aout_VolumeUp (vlc_object_t *obj, int value, audio_volume_t *volp)
 
     prepareVolume (obj, &aout, &volume, &mute);
     value += volume;
-    if (value < AOUT_VOLUME_MIN)
-        volume = AOUT_VOLUME_MIN;
+    if (value < 0)
+        volume = 0;
     else
     if (value > AOUT_VOLUME_MAX)
         volume = AOUT_VOLUME_MAX;
@@ -201,7 +201,7 @@ int aout_ToggleMute (vlc_object_t *obj, audio_volume_t *volp)
     mute = !mute;
     ret = commitVolume (obj, aout, volume, mute);
     if (volp != NULL)
-        *volp = mute ? AOUT_VOLUME_MIN : volume;
+        *volp = mute ? 0 : volume;
     return ret;
 }
 
@@ -234,7 +234,7 @@ int aout_SetMute (vlc_object_t *obj, audio_volume_t *volp, bool mute)
     prepareVolume (obj, &aout, &volume, NULL);
     ret = commitVolume (obj, aout, volume, mute);
     if (volp != NULL)
-        *volp = mute ? AOUT_VOLUME_MIN : volume;
+        *volp = mute ? 0 : volume;
     return ret;
 }
 
