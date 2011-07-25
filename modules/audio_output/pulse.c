@@ -493,21 +493,22 @@ static int Open(vlc_object_t *obj)
 
     /* Sample format specification */
     struct pa_sample_spec ss;
+    vlc_fourcc_t format = aout->format.i_format;
 
-    switch(aout->format.i_format)
+    switch(format)
     {
         case VLC_CODEC_F64B:
-            aout->format.i_format = VLC_CODEC_F32B;
+            format = VLC_CODEC_F32B;
         case VLC_CODEC_F32B:
             ss.format = PA_SAMPLE_FLOAT32BE;
             break;
         case VLC_CODEC_F64L:
-            aout->format.i_format = VLC_CODEC_F32L;
+            format = VLC_CODEC_F32L;
         case VLC_CODEC_F32L:
             ss.format = PA_SAMPLE_FLOAT32LE;
             break;
         case VLC_CODEC_FI32:
-            aout->format.i_format = VLC_CODEC_FL32;
+            format = VLC_CODEC_FL32;
             ss.format = PA_SAMPLE_FLOAT32NE;
             break;
         case VLC_CODEC_S32B:
@@ -529,19 +530,19 @@ static int Open(vlc_object_t *obj)
             ss.format = PA_SAMPLE_S16LE;
             break;
         case VLC_CODEC_S8:
-            aout->format.i_format = VLC_CODEC_U8;
+            format = VLC_CODEC_U8;
         case VLC_CODEC_U8:
             ss.format = PA_SAMPLE_U8;
             break;
         default:
             if (HAVE_FPU)
             {
-                aout->format.i_format = VLC_CODEC_FL32;
+                format = VLC_CODEC_FL32;
                 ss.format = PA_SAMPLE_FLOAT32NE;
             }
             else
             {
-                aout->format.i_format = VLC_CODEC_S16N;
+                format = VLC_CODEC_S16N;
                 ss.format = PA_SAMPLE_S16NE;
             }
             break;
@@ -678,6 +679,7 @@ static int Open(vlc_object_t *obj)
     stream_moved_cb(s, aout);
     vlc_pa_unlock();
 
+    aout->format.i_format = format;
     aout->pf_play = Play;
     aout->pf_pause = Pause;
     aout->pf_volume_set = VolumeSet;
