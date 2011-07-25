@@ -243,7 +243,6 @@ static int InputEvent( vlc_object_t *p_this, const char *psz_var,
             break;
         case INPUT_EVENT_TITLE:
         case INPUT_EVENT_CHAPTER:
-            [[VLCMain sharedInstance] updateTitle];
             break;
         case INPUT_EVENT_CACHE:
             [[VLCMain sharedInstance] updateMainWindow];
@@ -262,6 +261,7 @@ static int InputEvent( vlc_object_t *p_this, const char *psz_var,
             break;
         case INPUT_EVENT_ITEM_META:
         case INPUT_EVENT_ITEM_INFO:
+            [[VLCMain sharedInstance] updateTitle];
             [[VLCMain sharedInstance] updateInfoandMetaPanel];
             break;
         case INPUT_EVENT_BOOKMARK:

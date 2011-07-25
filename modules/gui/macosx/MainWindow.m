@@ -32,6 +32,8 @@
 #import "controls.h" // TODO: remove me
 #import <vlc_playlist.h>
 #import <vlc_aout_intf.h>
+#import <vlc_url.h>
+#import <vlc_strings.h>
 
 @implementation VLCMainWindow
 static VLCMainWindow *_o_sharedInstance = nil;
@@ -453,18 +455,52 @@ static VLCMainWindow *_o_sharedInstance = nil;
     if( p_input )
     {
         NSString *aString;
-        input_item_t * p_item = input_GetItem( p_input );
-        char * name = input_item_GetNowPlaying( p_item );
+        char *format = var_InheritString( VLCIntf, "input-title-format" );
+        char *formated = str_format_meta( p_input, format );
+        free( format );
+        aString = [NSString stringWithUTF8String:formated];
+        free( formated );
 
-        if( !name )
-            name = input_item_GetName( p_item );
+        char *uri = input_item_GetURI( input_GetItem( p_input ) );
 
-        aString = [NSString stringWithUTF8String:name];
+        if ([aString isEqualToString:@""])
+        {
 
-        free(name);
+            char *file = uri ? strrchr( uri, '/' ) : NULL;
+            if( file != NULL )
+            {
+                decode_URI( ++file );
+                aString = [NSString stringWithUTF8String:file];
+            }
+            else
+                aString = [NSString stringWithUTF8String:uri];
+        }
+
+        NSMutableString *o_mrl = [NSMutableString stringWithUTF8String: decode_URI(uri)];
+        free( uri );
+        NSRange prefix_range = [o_mrl rangeOfString: @"file:"];
+        if( prefix_range.location != NSNotFound )
+            [o_mrl deleteCharactersInRange: prefix_range];
+
+        if( [o_mrl characterAtIndex:0] == '/' )
+        {
+            /* it's a local file */
+            [self setRepresentedFilename: o_mrl];
+        }
+        else
+        {
+            /* it's from the network or somewhere else,
+             * we clear the previous path */
+            [self setRepresentedFilename: @""];
+        }
 
         [self setTitle: aString];
         [[[[VLCMain sharedInstance] controls] fspanel] setStreamTitle: aString];
+    }
+    else
+    {
+        [self setTitle: _NS("VLC media player")];
+        [self setRepresentedFilename: @""];
     }
 }
 
