@@ -42,7 +42,6 @@
 
 class OSTimer;
 class VarBool;
-struct audio_output_t;
 struct vout_window_t;
 
 
