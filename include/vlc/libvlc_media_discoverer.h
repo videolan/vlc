@@ -96,6 +96,8 @@ LIBVLC_API libvlc_event_manager_t *
  *
  * \param p_mdis media service discover object
  * \return true if running, false if not
+ *
+ * \libvlc_return_bool
  */
 LIBVLC_API int
         libvlc_media_discoverer_is_running( libvlc_media_discoverer_t * p_mdis );

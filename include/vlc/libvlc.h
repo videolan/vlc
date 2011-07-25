@@ -380,6 +380,8 @@ LIBVLC_API void libvlc_log_iterator_free( libvlc_log_iterator_t *p_iter );
  *
  * \param p_iter libvlc log iterator or NULL
  * \return true if iterator has more message objects, else false
+ *
+ * \libvlc_return_bool
  */
 LIBVLC_API int libvlc_log_iterator_has_next( const libvlc_log_iterator_t *p_iter );
 

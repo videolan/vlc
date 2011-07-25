@@ -167,6 +167,8 @@ LIBVLC_API int
  *
  * \param p_ml media list instance
  * \return 1 on readonly, 0 on readwrite
+ *
+ * \libvlc_return_bool
  */
 LIBVLC_API int
     libvlc_media_list_is_readonly( libvlc_media_list_t * p_ml );

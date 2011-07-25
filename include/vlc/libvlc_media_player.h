@@ -179,6 +179,8 @@ LIBVLC_API libvlc_event_manager_t * libvlc_media_player_event_manager ( libvlc_m
  *
  * \param p_mi the Media Player
  * \return 1 if the media player is playing, 0 otherwise
+ *
+ * \libvlc_return_bool
  */
 LIBVLC_API int libvlc_media_player_is_playing ( libvlc_media_player_t *p_mi );
 
@@ -622,6 +624,8 @@ LIBVLC_API int libvlc_media_player_get_chapter_count( libvlc_media_player_t *p_m
  *
  * \param p_mi the Media Player
  * \return boolean
+ *
+ * \libvlc_return_bool
  */
 LIBVLC_API int libvlc_media_player_will_play( libvlc_media_player_t *p_mi );
 
@@ -724,6 +728,8 @@ LIBVLC_API unsigned libvlc_media_player_has_vout( libvlc_media_player_t *p_mi );
  *
  * \param p_mi the media player
  * \return true if the media player can seek
+ *
+ * \libvlc_return_bool
  */
 LIBVLC_API int libvlc_media_player_is_seekable( libvlc_media_player_t *p_mi );
 
@@ -732,6 +738,8 @@ LIBVLC_API int libvlc_media_player_is_seekable( libvlc_media_player_t *p_mi );
  *
  * \param p_mi the media player
  * \return true if the media player can pause
+ *
+ * \libvlc_return_bool
  */
 LIBVLC_API int libvlc_media_player_can_pause( libvlc_media_player_t *p_mi );
 
@@ -794,6 +802,8 @@ LIBVLC_API void libvlc_set_fullscreen( libvlc_media_player_t *p_mi, int b_fullsc
  *
  * \param p_mi the media player
  * \return the fullscreen status (boolean)
+ *
+ * \libvlc_return_bool
  */
 LIBVLC_API int libvlc_get_fullscreen( libvlc_media_player_t *p_mi );
 
@@ -1379,6 +1389,8 @@ LIBVLC_API void libvlc_audio_toggle_mute( libvlc_media_player_t *p_mi );
  *
  * \param p_mi media player
  * \return the mute status (boolean)
+ *
+ * \libvlc_return_bool
  */
 LIBVLC_API int libvlc_audio_get_mute( libvlc_media_player_t *p_mi );
 
