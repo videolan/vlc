@@ -53,10 +53,6 @@ block_t *aout_FilterBufferNew( filter_t *, int );
 /** an input stream for the audio output */
 struct aout_input_t
 {
-    /* When this lock is taken, the pipeline cannot be changed by a
-     * third-party. */
-    vlc_mutex_t             lock;
-
     audio_sample_format_t   input;
 
     /* pre-filters */
