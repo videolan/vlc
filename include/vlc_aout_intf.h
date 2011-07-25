@@ -27,7 +27,6 @@
  */
 
 #define AOUT_VOLUME_DEFAULT             256
-#define AOUT_VOLUME_STEP                32
 #define AOUT_VOLUME_MAX                 1024
 
 VLC_API audio_volume_t aout_VolumeGet( vlc_object_t * );
