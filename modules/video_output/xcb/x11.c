@@ -126,6 +126,7 @@ static int Open (vlc_object_t *obj)
     const xcb_setup_t *setup = xcb_get_setup (conn);
 
     /* Determine our pixel format */
+    video_format_t fmt_pic;
     xcb_visualid_t vid;
     sys->depth = 0;
 
@@ -137,7 +138,7 @@ static int Open (vlc_object_t *obj)
         if (fmt->depth <= sys->depth)
             continue; /* no better than earlier format */
 
-        video_format_t fmt_pic = vd->fmt;
+        fmt_pic = vd->fmt;
 
         /* Check that the pixmap format is supported by VLC. */
         switch (fmt->depth)
@@ -206,7 +207,6 @@ static int Open (vlc_object_t *obj)
                 fmt_pic.i_gmask = vt->green_mask;
                 fmt_pic.i_bmask = vt->blue_mask;
             found_visual:
-                vd->fmt = fmt_pic;
                 vid = vt->visual_id;
                 msg_Dbg (vd, "using X11 visual ID 0x%"PRIx32, vid);
                 sys->depth = fmt->depth;
@@ -305,6 +305,7 @@ found_format:;
     vd->info.has_pictures_invalid = true;
     vd->info.has_event_thread = true;
 
+    vd->fmt = fmt_pic;
     vd->pool = Pool;
     vd->prepare = NULL;
     vd->display = Display;
