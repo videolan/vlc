@@ -1551,16 +1551,10 @@ static int VolumeMove( vlc_object_t *p_this, char const *psz_cmd,
         i_nb_steps = 1;
     }
 
-    if ( !strcmp(psz_cmd, "volup") )
-    {
-        if ( aout_VolumeUp( p_intf->p_sys->p_playlist, i_nb_steps, &i_volume ) < 0 )
-            i_error = VLC_EGENERIC;
-    }
-    else
-    {
-        if ( aout_VolumeDown( p_intf->p_sys->p_playlist, i_nb_steps, &i_volume ) < 0 )
-            i_error = VLC_EGENERIC;
-    }
+    if( !strcmp(psz_cmd, "voldown") )
+        i_nb_steps *= -1;
+    if( aout_VolumeUp( p_intf->p_sys->p_playlist, i_nb_steps, &i_volume ) < 0 )
+        i_error = VLC_EGENERIC;
     osd_Volume( p_this );
 
     if ( !i_error ) msg_rc( STATUS_CHANGE "( audio volume: %d )", i_volume );

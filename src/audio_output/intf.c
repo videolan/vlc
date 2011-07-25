@@ -177,15 +177,6 @@ int aout_VolumeUp (vlc_object_t *obj, int value, audio_volume_t *volp)
     return ret;
 }
 
-#undef aout_VolumeDown
-/**
- * Lowers the volume. See aout_VolumeUp().
- */
-int aout_VolumeDown (vlc_object_t *obj, int steps, audio_volume_t *volp)
-{
-    return aout_VolumeUp (obj, -steps, volp);
-}
-
 #undef aout_ToggleMute
 /**
  * Toggles the mute state.

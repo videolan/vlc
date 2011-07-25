@@ -20,7 +20,6 @@ aout_FormatPrepare
 aout_FormatPrint
 aout_FormatPrintChannels
 aout_OutputNextBuffer
-aout_VolumeDown
 aout_VolumeGet
 aout_ToggleMute
 aout_IsMuted
