@@ -47,7 +47,6 @@
 #import "playlist.h"
 #import "controls.h"
 #import "misc.h"
-#import "sidebarview.h"
 
 #include <vlc_keys.h>
 #import <vlc_services_discovery.h>
@@ -514,7 +513,6 @@
     // TODO Find a way to keep the dict size to a minimum
     //[o_outline_dict removeAllObjects];
     [o_outline_view reloadData];
-    [o_sidebar updateSidebar:[self playingItem]];
     [[[[VLCMain sharedInstance] wizard] playlistWizard] reloadOutlineView];
     [[[[VLCMain sharedInstance] bookmarks] dataTable] reloadData];
 
@@ -800,39 +798,6 @@
         playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, pl_Locked, p_node, p_item );
     }
     PL_UNLOCK;
-}
-
-- (void)playSidebarItem:(id)item
-{
-    intf_thread_t * p_intf = VLCIntf;
-    playlist_t * p_playlist = pl_Get( p_intf );
-
-    playlist_item_t *p_item;
-    playlist_item_t *p_node = NULL;
-
-    p_item = [item pointerValue];
-
-    if( p_item )
-    {
-        if( p_item->i_children == -1 )
-        {
-            p_node = p_item->p_parent;
-
-        }
-        else
-        {
-            p_node = p_item;
-            if( p_node->i_children > 0 && p_node->pp_children[0]->i_children == -1 )
-            {
-                p_item = p_node->pp_children[0];
-            }
-            else
-            {
-                p_item = NULL;
-            }
-        }
-        playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, pl_Unlocked, p_node, p_item );
-    }
 }
 
 - (IBAction)revealItemInFinder:(id)sender

@@ -52,6 +52,8 @@
     // TODO Playlist table, additional ui stuff at the top of the window
     IBOutlet id o_playlist_table;
     IBOutlet id o_video_view;
+    IBOutlet id o_split_view;
+    IBOutlet id o_sidebar_view;
 
     BOOL b_dark_interface;
     BOOL b_video_playback_enabled;

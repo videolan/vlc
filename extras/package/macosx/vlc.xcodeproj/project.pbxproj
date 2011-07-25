@@ -191,6 +191,7 @@
 		CC426FD71020D47100A32659 /* Sparkle.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = CC426FD01020D44F00A32659 /* Sparkle.framework */; };
 		CC5560281365CE4800D54038 /* AudioEffects.nib in Resources */ = {isa = PBXBuildFile; fileRef = CC5560261365CE4800D54038 /* AudioEffects.nib */; };
 		CC707EC8137474A50003010A /* SyncTracks.nib in Resources */ = {isa = PBXBuildFile; fileRef = CC707EC6137474A50003010A /* SyncTracks.nib */; };
+		CC78DA4413DE056700E9603C /* topbar_background.png in Resources */ = {isa = PBXBuildFile; fileRef = CC78DA4313DE056700E9603C /* topbar_background.png */; };
 		CC8062641021F8790021EB9A /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = CC8062631021F8790021EB9A /* dsa_pub.pem */; };
 		CC84FB2D130083BB00816D38 /* BGHUDAppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC84FB2C130083BB00816D38 /* BGHUDAppKit.framework */; };
 		CC84FB481300843200816D38 /* BGHUDAppKit.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = CC84FB2C130083BB00816D38 /* BGHUDAppKit.framework */; };
@@ -401,6 +402,10 @@
 		CC0433CC13B28C8C00D7D52E /* spref_cone_Interface_64.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = spref_cone_Interface_64.png; path = Resources/prefs/spref_cone_Interface_64.png; sourceTree = "<group>"; };
 		CC0433CD13B28C8C00D7D52E /* spref_cone_Subtitles_64.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = spref_cone_Subtitles_64.png; path = Resources/prefs/spref_cone_Subtitles_64.png; sourceTree = "<group>"; };
 		CC0433CE13B28C8C00D7D52E /* spref_cone_Video_64.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = spref_cone_Video_64.png; path = Resources/prefs/spref_cone_Video_64.png; sourceTree = "<group>"; };
+		CC0CD0DF13DE0EAE00B0D90D /* PXSourceList.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = PXSourceList.h; path = ../../../modules/gui/macosx/PXSourceList.h; sourceTree = "<group>"; };
+		CC0CD0E013DE0EAE00B0D90D /* PXSourceList.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = PXSourceList.m; path = ../../../modules/gui/macosx/PXSourceList.m; sourceTree = "<group>"; };
+		CC0CD0E113DE0EAE00B0D90D /* PXSourceListDataSource.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = PXSourceListDataSource.h; path = ../../../modules/gui/macosx/PXSourceListDataSource.h; sourceTree = "<group>"; };
+		CC0CD0E213DE0EAE00B0D90D /* PXSourceListDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = PXSourceListDelegate.h; path = ../../../modules/gui/macosx/PXSourceListDelegate.h; sourceTree = "<group>"; };
 		CC0FB34B0F8BED1100F057F7 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = Resources/English.lproj/CoreDialogs.nib; sourceTree = "<group>"; };
 		CC1941240B9C1F8400635F6B /* QTKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QTKit.framework; path = /System/Library/Frameworks/QTKit.framework; sourceTree = "<absolute>"; };
 		CC1C41D00D9BAD7F002728FA /* noart.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = noart.png; path = Resources/noart.png; sourceTree = "<group>"; };
@@ -432,10 +437,6 @@
 		CC5560231365CDC700D54038 /* AudioEffects.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AudioEffects.h; path = ../../../modules/gui/macosx/AudioEffects.h; sourceTree = "<group>"; };
 		CC5560241365CDC800D54038 /* AudioEffects.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AudioEffects.m; path = ../../../modules/gui/macosx/AudioEffects.m; sourceTree = "<group>"; };
 		CC5560271365CE4800D54038 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = Resources/English.lproj/AudioEffects.nib; sourceTree = "<group>"; };
-		CC62B9080FC5DB9D0077BB8C /* sidebarview.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sidebarview.h; path = ../../../modules/gui/macosx/sidebarview.h; sourceTree = SOURCE_ROOT; };
-		CC62B9090FC5DB9D0077BB8C /* sidebarview.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = sidebarview.m; path = ../../../modules/gui/macosx/sidebarview.m; sourceTree = SOURCE_ROOT; };
-		CC62B90A0FC5DB9D0077BB8C /* sidestatusview.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sidestatusview.h; path = ../../../modules/gui/macosx/sidestatusview.h; sourceTree = SOURCE_ROOT; };
-		CC62B90B0FC5DB9D0077BB8C /* sidestatusview.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = sidestatusview.m; path = ../../../modules/gui/macosx/sidestatusview.m; sourceTree = SOURCE_ROOT; };
 		CC6C01A90DDF3E9200C7D754 /* intf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = intf.h; path = ../../../modules/gui/minimal_macosx/intf.h; sourceTree = SOURCE_ROOT; };
 		CC6C01AA0DDF3E9200C7D754 /* intf.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = intf.m; path = ../../../modules/gui/minimal_macosx/intf.m; sourceTree = SOURCE_ROOT; };
 		CC6C01AB0DDF3E9200C7D754 /* macosx.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = macosx.c; path = ../../../modules/gui/minimal_macosx/macosx.c; sourceTree = SOURCE_ROOT; };
@@ -458,6 +459,7 @@
 		CC707EC7137474A50003010A /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = Resources/English.lproj/SyncTracks.nib; sourceTree = "<group>"; };
 		CC772DAC10E621C100675C9B /* VLCProgressPanel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCProgressPanel.h; path = ../../../modules/gui/macosx_dialog_provider/VLCProgressPanel.h; sourceTree = SOURCE_ROOT; };
 		CC772DAD10E621C100675C9B /* VLCProgressPanel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VLCProgressPanel.m; path = ../../../modules/gui/macosx_dialog_provider/VLCProgressPanel.m; sourceTree = SOURCE_ROOT; };
+		CC78DA4313DE056700E9603C /* topbar_background.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = topbar_background.png; path = Resources/mainwindow/topbar_background.png; sourceTree = "<group>"; };
 		CC8062631021F8790021EB9A /* dsa_pub.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = dsa_pub.pem; path = Resources/dsa_pub.pem; sourceTree = "<group>"; };
 		CC84FB2C130083BB00816D38 /* BGHUDAppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = BGHUDAppKit.framework; path = ../../contrib/BGHUDAppKit/BGHUDAppKit.framework; sourceTree = SOURCE_ROOT; };
 		CC962E2C0CC7992800A56695 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = /System/Library/Frameworks/WebKit.framework; sourceTree = "<absolute>"; };
@@ -601,8 +603,6 @@
 				DC769AB7085DF0DB001A838D /* wizard.m */,
 				DCE7BD0708A5724D007B10AE /* bookmarks.h */,
 				DCE7BD0608A5724D007B10AE /* bookmarks.m */,
-				CC6D8D9C0A878DED006F2BBE /* AppleRemote.h */,
-				CC6D8D9D0A878DED006F2BBE /* AppleRemote.m */,
 				CCC593780AB4A9FB0004FF52 /* embeddedwindow.h */,
 				CCC593790AB4A9FB0004FF52 /* embeddedwindow.m */,
 				2AEF857609A5FEC900130822 /* fspanel.h */,
@@ -611,20 +611,13 @@
 				CC6EDD500B9CA2140096068A /* eyetv.m */,
 				CCB24D5E0D54BBAE004D780C /* simple_prefs.h */,
 				CCB24D5D0D54BBAE004D780C /* simple_prefs.m */,
-				CC62B9080FC5DB9D0077BB8C /* sidebarview.h */,
-				CC62B9090FC5DB9D0077BB8C /* sidebarview.m */,
-				CC62B90A0FC5DB9D0077BB8C /* sidestatusview.h */,
-				CC62B90B0FC5DB9D0077BB8C /* sidestatusview.m */,
-				CCF0777913659A8000AF19FD /* SPInvocationGrabbing.h */,
-				CCF0777A13659A8000AF19FD /* SPInvocationGrabbing.m */,
-				CCF0777B13659A8000AF19FD /* SPMediaKeyTap.h */,
-				CCF0777C13659A8000AF19FD /* SPMediaKeyTap.m */,
 				CC5560231365CDC700D54038 /* AudioEffects.h */,
 				CC5560241365CDC800D54038 /* AudioEffects.m */,
 				CC707EC3137464CD0003010A /* TrackSynchronization.h */,
 				CC707EC4137464CD0003010A /* TrackSynchronization.m */,
 				CCCE366D13817E4500694F2A /* VideoEffects.h */,
 				CCCE366E13817E4500694F2A /* VideoEffects.m */,
+				CC0CD0E513DE0FC600B0D90D /* Imported Code */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
@@ -692,6 +685,7 @@
 		CC0430EE13B2461A00D7D52E /* 10th anniversary ui */ = {
 			isa = PBXGroup;
 			children = (
+				CC78DA4313DE056700E9603C /* topbar_background.png */,
 				CC0432C213B2479E00D7D52E /* bright variant */,
 				CC04326513B246E600D7D52E /* dark variant */,
 			);
@@ -819,6 +813,28 @@
 			name = "simple prefs (taken from qt4)";
 			sourceTree = "<group>";
 		};
+		CC0CD0E413DE0EB500B0D90D /* PXSourceList */ = {
+			isa = PBXGroup;
+			children = (
+				CC0CD0DF13DE0EAE00B0D90D /* PXSourceList.h */,
+				CC0CD0E013DE0EAE00B0D90D /* PXSourceList.m */,
+				CC0CD0E113DE0EAE00B0D90D /* PXSourceListDataSource.h */,
+				CC0CD0E213DE0EAE00B0D90D /* PXSourceListDelegate.h */,
+			);
+			name = PXSourceList;
+			sourceTree = "<group>";
+		};
+		CC0CD0E513DE0FC600B0D90D /* Imported Code */ = {
+			isa = PBXGroup;
+			children = (
+				CC6D8D9C0A878DED006F2BBE /* AppleRemote.h */,
+				CC6D8D9D0A878DED006F2BBE /* AppleRemote.m */,
+				CC0CD0E413DE0EB500B0D90D /* PXSourceList */,
+				CC78DA4A13DE0E0100E9603C /* SPMediaKeyTap */,
+			);
+			name = "Imported Code";
+			sourceTree = "<group>";
+		};
 		CC33C26C0D257958008C4683 /* embedded (to be removed) */ = {
 			isa = PBXGroup;
 			children = (
@@ -857,6 +873,17 @@
 				CC6C01B30DDF3E9200C7D754 /* voutagl.m */,
 			);
 			name = "Minimal Mac OS X Classes";
+			sourceTree = "<group>";
+		};
+		CC78DA4A13DE0E0100E9603C /* SPMediaKeyTap */ = {
+			isa = PBXGroup;
+			children = (
+				CCF0777913659A8000AF19FD /* SPInvocationGrabbing.h */,
+				CCF0777A13659A8000AF19FD /* SPInvocationGrabbing.m */,
+				CCF0777B13659A8000AF19FD /* SPMediaKeyTap.h */,
+				CCF0777C13659A8000AF19FD /* SPMediaKeyTap.m */,
+			);
+			name = SPMediaKeyTap;
 			sourceTree = "<group>";
 		};
 		CCC8957F0D9A8A61005AE59C /* OSX-specific source files */ = {
@@ -1174,6 +1201,7 @@
 				CC0433D413B28C8C00D7D52E /* spref_cone_Video_64.png in Resources */,
 				CC9B43AF13B29C79000205AE /* bottom-background.png in Resources */,
 				CC9B43B113B29FCF000205AE /* bottom-background_dark.png in Resources */,
+				CC78DA4413DE056700E9603C /* topbar_background.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

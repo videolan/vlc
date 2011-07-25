@@ -69,7 +69,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
      if( [[NSWindow class] instancesRespondToSelector:@selector(setContentBorderThickness:forEdge:)] )
      {
      b_useTextured = NO;
-     styleMask ^= NSTexturedBackgroundWindowMask;
+//     styleMask ^= NSTexturedBackgroundWindowMask;
      }
 
     self = [super initWithContentRect:contentRect styleMask:styleMask //& ~NSTitledWindowMask
@@ -208,7 +208,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [o_play_btn setImage: o_play_img];
     [o_play_btn setAlternateImage: o_play_pressed_img];
 
-    [o_video_view setFrame: [o_playlist_table frame]];
+    [o_video_view setFrame: [o_split_view frame]];
     [self setDelegate: self];
     [self setExcludedFromWindowsMenu: YES];
     // Set that here as IB seems to be buggy
@@ -217,6 +217,21 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [o_playlist_btn setEnabled:NO];
 
     [self updateVolumeSlider];
+}
+
+- (void)becomeMainWindow
+{
+    [o_sidebar_view setBackgroundColor: [NSColor colorWithCalibratedRed:0.820
+                                                                  green:0.843
+                                                                   blue:0.886
+                                                                  alpha:1.0]];
+    [super becomeMainWindow];
+}
+
+- (void)resignMainWindow
+{
+    [o_sidebar_view setBackgroundColor: [NSColor colorWithCalibratedWhite:0.91 alpha:1.0]];
+    [super resignMainWindow];
 }
 
 #pragma mark -

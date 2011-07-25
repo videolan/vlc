@@ -80,15 +80,6 @@
     o_img_play = [NSImage imageNamed: @"play_embedded"];
     o_img_pause = [NSImage imageNamed: @"pause_embedded"];
 
-    /* Set color of sidebar to Leopard's "Sidebar Blue" */
-    [o_sidebar_list setBackgroundColor: [NSColor colorWithCalibratedRed:0.820
-                                                                  green:0.843
-                                                                   blue:0.886
-                                                                  alpha:1.0]];
-
-    [self setMinSize:NSMakeSize([o_sidebar_list convertRect:[o_sidebar_list bounds]
-                                                     toView: nil].size.width + 551., 114.)];
-
     /* Useful to save o_view frame in fullscreen mode */
     o_temp_view = [[NSView alloc] init];
     [o_temp_view setAutoresizingMask:NSViewHeightSizable | NSViewWidthSizable];
@@ -299,17 +290,12 @@
 
 - (void)becomeMainWindow
 {
-    [o_sidebar_list setBackgroundColor: [NSColor colorWithCalibratedRed:0.820
-                                                                  green:0.843
-                                                                   blue:0.886
-                                                                  alpha:1.0]];
 	[o_status becomeMainWindow];
     [super becomeMainWindow];
 }
 
 - (void)resignMainWindow
 {
-    [o_sidebar_list setBackgroundColor: [NSColor colorWithCalibratedWhite:0.91 alpha:1.0]];
 	[o_status resignMainWindow];
     [super resignMainWindow];
 }

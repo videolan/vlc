@@ -55,10 +55,10 @@ SOURCES_macosx = \
 	bookmarks.m \
 	embeddedwindow.h \
 	embeddedwindow.m \
-	sidebarview.h \
-	sidebarview.m \
-	sidestatusview.h \
-	sidestatusview.m \
+	PXSourceList.h \
+	PXSourceList.m \
+	PXSourceListDataSource.h \
+	PXSourceListDelegate.h \
 	fspanel.m \
 	fspanel.h \
 	eyetv.h \

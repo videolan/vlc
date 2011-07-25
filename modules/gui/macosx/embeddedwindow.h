@@ -50,7 +50,6 @@
     IBOutlet id o_horizontal_split;
     IBOutlet id o_vertical_split;
     IBOutlet id o_videosubview;
-    IBOutlet id o_sidebar_list;
     IBOutlet id o_view;
     IBOutlet id o_background_view;
 	IBOutlet id o_searchfield;

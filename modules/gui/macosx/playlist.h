@@ -76,7 +76,6 @@
 
     IBOutlet id o_btn_playlist;
     IBOutlet id o_playlist_view;
-    IBOutlet id o_sidebar;
     IBOutlet id o_search_field;
     IBOutlet id o_search_field_other;
     IBOutlet id o_mi_save_playlist;
@@ -142,7 +141,6 @@
 - (IBAction)sortNodeByAuthor:(id)sender;
 - (IBAction)recursiveExpandNode:(id)sender;
 
-- (void)playSidebarItem:(id)item;
 - (id)playingItem;
 
 - (void)appendArray:(NSArray*)o_array atPos:(int)i_position enqueue:(BOOL)b_enqueue;
