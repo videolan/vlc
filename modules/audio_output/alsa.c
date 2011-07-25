@@ -391,8 +391,6 @@ static int Open (vlc_object_t *obj)
         goto error;
     }
 
-    p_aout->format.i_format = fourcc;
-
     val = snd_pcm_hw_params_set_access( p_sys->p_snd_pcm, p_hw,
                                         SND_PCM_ACCESS_RW_INTERLEAVED );
     if( val < 0 )
@@ -412,9 +410,8 @@ static int Open (vlc_object_t *obj)
     }
 
     /* Set rate. */
-    unsigned old_rate = p_aout->format.i_rate;
-    val = snd_pcm_hw_params_set_rate_near (p_sys->p_snd_pcm, p_hw,
-                                           &p_aout->format.i_rate,
+    unsigned rate = p_aout->format.i_rate;
+    val = snd_pcm_hw_params_set_rate_near (p_sys->p_snd_pcm, p_hw, &rate,
                                            NULL);
     if (val < 0)
     {
@@ -422,9 +419,9 @@ static int Open (vlc_object_t *obj)
                  snd_strerror (val));
         goto error;
     }
-    if (p_aout->format.i_rate != old_rate)
-        msg_Warn (p_aout, "resampling from %d Hz to %d Hz", old_rate,
-                  p_aout->format.i_rate);
+    if (p_aout->format.i_rate != rate)
+        msg_Warn (p_aout, "resampling from %d Hz to %d Hz",
+                  p_aout->format.i_rate, rate);
 
     /* Set period size. */
     val = snd_pcm_hw_params_set_period_size_near( p_sys->p_snd_pcm, p_hw,
@@ -506,6 +503,9 @@ static int Open (vlc_object_t *obj)
         vlc_sem_destroy( &p_sys->wait );
         goto error;
     }
+
+    p_aout->format.i_format = fourcc;
+    p_aout->format.i_rate = rate;
 
     Probe (obj);
     return 0;
