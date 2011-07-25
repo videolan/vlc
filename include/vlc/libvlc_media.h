@@ -378,6 +378,8 @@ LIBVLC_API libvlc_state_t libvlc_media_get_state(
  * \param p_stats: structure that contain the statistics about the media
  *                 (this structure must be allocated by the caller)
  * \return true if the statistics are available, false otherwise
+ *
+ * \libvlc_return_bool
  */
 LIBVLC_API int libvlc_media_get_stats( libvlc_media_t *p_md,
                                            libvlc_media_stats_t *p_stats );
