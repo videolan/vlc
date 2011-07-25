@@ -164,31 +164,9 @@ struct aout_fifo_t
 /* FIXME to remove once aout.h is cleaned a bit more */
 #include <vlc_block.h>
 
-/** an output stream for the audio output */
-typedef struct aout_output_t
-{
-    audio_sample_format_t   output;
-    /* Indicates whether the audio output is currently starving, to avoid
-     * printing a 1,000 "output is starving" messages. */
-    bool              b_starving;
-
-    /* post-filters */
-    filter_t *              pp_filters[AOUT_MAX_FILTERS];
-    int                     i_nb_filters;
-
-    aout_fifo_t             fifo;
-
-    struct module_t *       p_module;
-    struct aout_sys_t *     p_sys;
-    void (*pf_play)( aout_instance_t * );
-    void (* pf_pause)( aout_instance_t *, bool, mtime_t );
-    int (* pf_volume_set )( aout_instance_t *, float, bool );
-    int                     i_nb_samples;
-} aout_output_t;
-
 struct aout_mixer_t;
 
-/** audio output thread descriptor */
+/** Audio output object */
 struct aout_instance_t
 {
     VLC_COMMON_MEMBERS
@@ -205,8 +183,27 @@ struct aout_instance_t
     float                   mixer_multiplier;
     struct aout_mixer_t    *p_mixer;
 
-    /* Output plug-in */
-    aout_output_t           output;
+    audio_sample_format_t format; /**< Output format (plugin can modify it
+        only when succesfully probed and not afterward) */
+
+    /* Indicates whether the audio output is currently starving, to avoid
+     * printing a 1,000 "output is starving" messages. */
+    bool              b_starving;
+
+    /* post-filters */
+    filter_t *              pp_filters[AOUT_MAX_FILTERS];
+    int                     i_nb_filters;
+
+    aout_fifo_t             fifo;
+
+    struct module_t *module; /**< Output plugin */
+    struct aout_sys_t *sys; /**< Output plugin private data */
+    void (*pf_play)( aout_instance_t * ); /**< Audio buffer callback */
+    void (* pf_pause)( aout_instance_t *, bool, mtime_t ); /**< Pause/resume
+        callback (optional, may be NULL) */
+    int (* pf_volume_set )(aout_instance_t *, float, bool); /**< Volume setter
+        (optional, may be NULL) */
+    int                     i_nb_samples;
 };
 
 /**

@@ -146,24 +146,24 @@ static int Open( vlc_object_t * p_this )
     }
 
     /* Allocate structure */
-    p_aout->output.p_sys = malloc( sizeof( aout_sys_t ) );
-    if( p_aout->output.p_sys == NULL )
+    p_aout->sys = malloc( sizeof( aout_sys_t ) );
+    if( p_aout->sys == NULL )
         return VLC_ENOMEM;
 
     if( !strcmp( psz_name, "-" ) )
-        p_aout->output.p_sys->p_file = stdout;
+        p_aout->sys->p_file = stdout;
     else
-        p_aout->output.p_sys->p_file = vlc_fopen( psz_name, "wb" );
+        p_aout->sys->p_file = vlc_fopen( psz_name, "wb" );
 
     free( psz_name );
-    if ( p_aout->output.p_sys->p_file == NULL )
+    if ( p_aout->sys->p_file == NULL )
     {
-        free( p_aout->output.p_sys );
+        free( p_aout->sys );
         return VLC_EGENERIC;
     }
 
-    p_aout->output.pf_play = Play;
-    p_aout->output.pf_pause = NULL;
+    p_aout->pf_play = Play;
+    p_aout->pf_pause = NULL;
 
     /* Audio format */
     psz_format = var_CreateGetString( p_this, "audiofile-format" );
@@ -181,25 +181,25 @@ static int Open( vlc_object_t * p_this )
     {
         msg_Err( p_aout, "cannot understand the format string (%s)",
                  psz_format );
-        if( p_aout->output.p_sys->p_file != stdout )
-            fclose( p_aout->output.p_sys->p_file );
-        free( p_aout->output.p_sys );
+        if( p_aout->sys->p_file != stdout )
+            fclose( p_aout->sys->p_file );
+        free( p_aout->sys );
         free( psz_format );
         return VLC_EGENERIC;
     }
     free( psz_format );
 
-    p_aout->output.output.i_format = format_int[i];
-    if ( AOUT_FMT_NON_LINEAR( &p_aout->output.output ) )
+    p_aout->format.i_format = format_int[i];
+    if ( AOUT_FMT_NON_LINEAR( &p_aout->format ) )
     {
-        p_aout->output.i_nb_samples = A52_FRAME_NB;
-        p_aout->output.output.i_bytes_per_frame = AOUT_SPDIF_SIZE;
-        p_aout->output.output.i_frame_length = A52_FRAME_NB;
+        p_aout->i_nb_samples = A52_FRAME_NB;
+        p_aout->format.i_bytes_per_frame = AOUT_SPDIF_SIZE;
+        p_aout->format.i_frame_length = A52_FRAME_NB;
         aout_VolumeNoneInit( p_aout );
     }
     else
     {
-        p_aout->output.i_nb_samples = FRAME_SIZE;
+        p_aout->i_nb_samples = FRAME_SIZE;
         aout_VolumeSoftInit( p_aout );
     }
 
@@ -208,22 +208,22 @@ static int Open( vlc_object_t * p_this )
 
     if( i_channels > 0 && i_channels <= CHANNELS_MAX )
     {
-        p_aout->output.output.i_physical_channels =
+        p_aout->format.i_physical_channels =
             pi_channels_maps[i_channels];
     }
 
     /* WAV header */
-    p_aout->output.p_sys->b_add_wav_header = var_CreateGetBool( p_this,
+    p_aout->sys->b_add_wav_header = var_CreateGetBool( p_this,
                                                         "audiofile-wav" );
 
-    if( p_aout->output.p_sys->b_add_wav_header )
+    if( p_aout->sys->b_add_wav_header )
     {
         /* Write wave header */
-        WAVEHEADER *wh = &p_aout->output.p_sys->waveh;
+        WAVEHEADER *wh = &p_aout->sys->waveh;
 
         memset( wh, 0, sizeof(*wh) );
 
-        switch( p_aout->output.output.i_format )
+        switch( p_aout->format.i_format )
         {
         case VLC_CODEC_FL32:
             wh->Format     = WAVE_FORMAT_IEEE_FLOAT;
@@ -246,8 +246,8 @@ static int Open( vlc_object_t * p_this )
         wh->SubChunkID = VLC_FOURCC('f', 'm', 't', ' ');
         wh->SubChunkLength = 16;
 
-        wh->Modus = aout_FormatNbChannels( &p_aout->output.output );
-        wh->SampleFreq = p_aout->output.output.i_rate;
+        wh->Modus = aout_FormatNbChannels( &p_aout->format );
+        wh->SampleFreq = p_aout->format.i_rate;
         wh->BytesPerSample = wh->Modus * ( wh->BitsPerSample / 8 );
         wh->BytesPerSec = wh->BytesPerSample * wh->SampleFreq;
 
@@ -264,7 +264,7 @@ static int Open( vlc_object_t * p_this )
         SetDWLE( &wh->BytesPerSec, wh->BytesPerSec );
 
         if( fwrite( wh, sizeof(WAVEHEADER), 1,
-                    p_aout->output.p_sys->p_file ) != 1 )
+                    p_aout->sys->p_file ) != 1 )
         {
             msg_Err( p_aout, "write error (%m)" );
         }
@@ -282,34 +282,34 @@ static void Close( vlc_object_t * p_this )
 
     msg_Dbg( p_aout, "closing audio file" );
 
-    if( p_aout->output.p_sys->b_add_wav_header )
+    if( p_aout->sys->b_add_wav_header )
     {
         /* Update Wave Header */
-        p_aout->output.p_sys->waveh.Length =
-            p_aout->output.p_sys->waveh.DataLength + sizeof(WAVEHEADER) - 4;
+        p_aout->sys->waveh.Length =
+            p_aout->sys->waveh.DataLength + sizeof(WAVEHEADER) - 4;
 
         /* Write Wave Header */
-        if( fseek( p_aout->output.p_sys->p_file, 0, SEEK_SET ) )
+        if( fseek( p_aout->sys->p_file, 0, SEEK_SET ) )
         {
             msg_Err( p_aout, "seek error (%m)" );
         }
 
         /* Header -> little endian format */
-        SetDWLE( &p_aout->output.p_sys->waveh.Length,
-                 p_aout->output.p_sys->waveh.Length );
-        SetDWLE( &p_aout->output.p_sys->waveh.DataLength,
-                 p_aout->output.p_sys->waveh.DataLength );
+        SetDWLE( &p_aout->sys->waveh.Length,
+                 p_aout->sys->waveh.Length );
+        SetDWLE( &p_aout->sys->waveh.DataLength,
+                 p_aout->sys->waveh.DataLength );
 
-        if( fwrite( &p_aout->output.p_sys->waveh, sizeof(WAVEHEADER), 1,
-                    p_aout->output.p_sys->p_file ) != 1 )
+        if( fwrite( &p_aout->sys->waveh, sizeof(WAVEHEADER), 1,
+                    p_aout->sys->p_file ) != 1 )
         {
             msg_Err( p_aout, "write error (%m)" );
         }
     }
 
-    if( p_aout->output.p_sys->p_file != stdout )
-        fclose( p_aout->output.p_sys->p_file );
-    free( p_aout->output.p_sys );
+    if( p_aout->sys->p_file != stdout )
+        fclose( p_aout->sys->p_file );
+    free( p_aout->sys );
 }
 
 /*****************************************************************************
@@ -319,18 +319,18 @@ static void Play( aout_instance_t * p_aout )
 {
     aout_buffer_t * p_buffer;
 
-    p_buffer = aout_FifoPop( &p_aout->output.fifo );
+    p_buffer = aout_FifoPop( &p_aout->fifo );
 
     if( fwrite( p_buffer->p_buffer, p_buffer->i_buffer, 1,
-                p_aout->output.p_sys->p_file ) != 1 )
+                p_aout->sys->p_file ) != 1 )
     {
         msg_Err( p_aout, "write error (%m)" );
     }
 
-    if( p_aout->output.p_sys->b_add_wav_header )
+    if( p_aout->sys->b_add_wav_header )
     {
         /* Update Wave Header */
-        p_aout->output.p_sys->waveh.DataLength += p_buffer->i_buffer;
+        p_aout->sys->waveh.DataLength += p_buffer->i_buffer;
     }
 
     aout_BufferFree( p_buffer );

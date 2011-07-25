@@ -139,11 +139,11 @@ static int Open( vlc_object_t * p_this )
     SLresult            result;
 
     /* Allocate structure */
-    p_aout->output.p_sys = malloc( sizeof( aout_sys_t ) );
-    if( unlikely( p_aout->output.p_sys == NULL ) )
+    p_aout->sys = malloc( sizeof( aout_sys_t ) );
+    if( unlikely( p_aout->sys == NULL ) )
         return VLC_ENOMEM;
 
-    aout_sys_t * p_sys = p_aout->output.p_sys;
+    aout_sys_t * p_sys = p_aout->sys;
 
     p_sys->playerObject     = NULL;
     p_sys->engineObject     = NULL;
@@ -204,7 +204,7 @@ static int Open( vlc_object_t * p_this )
     SLDataFormat_PCM format_pcm;
     format_pcm.formatType       = SL_DATAFORMAT_PCM;
     format_pcm.numChannels      = 2;
-    format_pcm.samplesPerSec    = ((SLuint32) p_aout->output.output.i_rate * 1000) ;
+    format_pcm.samplesPerSec    = ((SLuint32) p_aout->format.i_rate * 1000) ;
     format_pcm.bitsPerSample    = SL_PCMSAMPLEFORMAT_FIXED_16;
     format_pcm.containerSize    = SL_PCMSAMPLEFORMAT_FIXED_16;
     format_pcm.channelMask      = SL_SPEAKER_FRONT_LEFT | SL_SPEAKER_FRONT_RIGHT;
@@ -256,13 +256,13 @@ static int Open( vlc_object_t * p_this )
     CHECK_OPENSL_ERROR( result, "Failed to switch to playing state" );
 
     // we want 16bit signed data little endian.
-    p_aout->output.output.i_format              = VLC_CODEC_S16L;
-    p_aout->output.i_nb_samples                 = 2048;
-    p_aout->output.output.i_physical_channels   = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
-    p_aout->output.pf_play                      = Play;
-    p_aout->output.pf_pause = NULL;
+    p_aout->format.i_format              = VLC_CODEC_S16L;
+    p_aout->i_nb_samples                 = 2048;
+    p_aout->format.i_physical_channels   = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
+    p_aout->pf_play                      = Play;
+    p_aout->pf_pause = NULL;
 
-    aout_FormatPrepare( &p_aout->output.output );
+    aout_FormatPrepare( &p_aout->format );
 
     return VLC_SUCCESS;
 error:
@@ -276,7 +276,7 @@ error:
 static void Close( vlc_object_t * p_this )
 {
     aout_instance_t *p_aout = (aout_instance_t *)p_this;
-    aout_sys_t      *p_sys = p_aout->output.p_sys;
+    aout_sys_t      *p_sys = p_aout->sys;
 
     msg_Dbg( p_aout, "Closing OpenSLES" );
 
@@ -292,12 +292,12 @@ static void Close( vlc_object_t * p_this )
  *****************************************************************************/
 static void Play( aout_instance_t * p_aout )
 {
-    aout_sys_t * p_sys = p_aout->output.p_sys;
+    aout_sys_t * p_sys = p_aout->sys;
     aout_buffer_t *p_buffer;
 
     SLresult result;
 
-    p_buffer = aout_FifoPop(&p_aout->output.fifo);
+    p_buffer = aout_FifoPop(&p_aout->fifo);
     if( p_buffer != NULL )
     {
         for (;;)

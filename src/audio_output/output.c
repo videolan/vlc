@@ -45,17 +45,17 @@ int aout_OutputNew( aout_instance_t * p_aout,
                     const audio_sample_format_t * p_format )
 {
     vlc_assert_locked( &p_aout->lock );
-    p_aout->output.output = *p_format;
+    p_aout->format = *p_format;
 
     /* Retrieve user defaults. */
     int i_rate = var_InheritInteger( p_aout, "aout-rate" );
     if ( i_rate != 0 )
-        p_aout->output.output.i_rate = i_rate;
-    aout_FormatPrepare( &p_aout->output.output );
+        p_aout->format.i_rate = i_rate;
+    aout_FormatPrepare( &p_aout->format );
 
     /* Find the best output plug-in. */
-    p_aout->output.p_module = module_need( p_aout, "audio output", "$aout", false );
-    if ( p_aout->output.p_module == NULL )
+    p_aout->module = module_need( p_aout, "audio output", "$aout", false );
+    if ( p_aout->module == NULL )
     {
         msg_Err( p_aout, "no suitable audio output module" );
         return -1;
@@ -68,27 +68,26 @@ int aout_OutputNew( aout_instance_t * p_aout,
         switch( var_InheritInteger( p_aout, "audio-channels" ) )
         {
             case AOUT_VAR_CHAN_RSTEREO:
-                p_aout->output.output.i_original_channels |=
-                                                       AOUT_CHAN_REVERSESTEREO;
+                p_aout->format.i_original_channels |= AOUT_CHAN_REVERSESTEREO;
                 break;
             case AOUT_VAR_CHAN_STEREO:
-                p_aout->output.output.i_original_channels =
+                p_aout->format.i_original_channels =
                                               AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
                 break;
             case AOUT_VAR_CHAN_LEFT:
-                p_aout->output.output.i_original_channels = AOUT_CHAN_LEFT;
+                p_aout->format.i_original_channels = AOUT_CHAN_LEFT;
                 break;
             case AOUT_VAR_CHAN_RIGHT:
-                p_aout->output.output.i_original_channels = AOUT_CHAN_RIGHT;
+                p_aout->format.i_original_channels = AOUT_CHAN_RIGHT;
                 break;
             case AOUT_VAR_CHAN_DOLBYS:
-                p_aout->output.output.i_original_channels =
+                p_aout->format.i_original_channels =
                       AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_DOLBYSTEREO;
                 break;
         }
     }
-    else if ( p_aout->output.output.i_physical_channels == AOUT_CHAN_CENTER
-              && (p_aout->output.output.i_original_channels
+    else if ( p_aout->format.i_physical_channels == AOUT_CHAN_CENTER
+              && (p_aout->format.i_original_channels
                    & AOUT_CHAN_PHYSMASK) == (AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT) )
     {
         vlc_value_t val, text;
@@ -105,18 +104,18 @@ int aout_OutputNew( aout_instance_t * p_aout,
         var_Change( p_aout, "audio-channels", VLC_VAR_ADDCHOICE, &val, &text );
         val.i_int = AOUT_VAR_CHAN_RIGHT; text.psz_string = _("Right");
         var_Change( p_aout, "audio-channels", VLC_VAR_ADDCHOICE, &val, &text );
-        if ( p_aout->output.output.i_original_channels & AOUT_CHAN_DUALMONO )
+        if ( p_aout->format.i_original_channels & AOUT_CHAN_DUALMONO )
         {
             /* Go directly to the left channel. */
-            p_aout->output.output.i_original_channels = AOUT_CHAN_LEFT;
+            p_aout->format.i_original_channels = AOUT_CHAN_LEFT;
             var_SetInteger( p_aout, "audio-channels", AOUT_VAR_CHAN_LEFT );
         }
         var_AddCallback( p_aout, "audio-channels", aout_ChannelsRestart,
                          NULL );
     }
-    else if ( p_aout->output.output.i_physical_channels ==
+    else if ( p_aout->format.i_physical_channels ==
                (AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT)
-                && (p_aout->output.output.i_original_channels &
+                && (p_aout->format.i_original_channels &
                      (AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT)) )
     {
         vlc_value_t val, text;
@@ -127,7 +126,7 @@ int aout_OutputNew( aout_instance_t * p_aout,
         text.psz_string = _("Audio Channels");
         var_Change( p_aout, "audio-channels", VLC_VAR_SETTEXT, &text, NULL );
 
-        if ( p_aout->output.output.i_original_channels & AOUT_CHAN_DOLBYSTEREO )
+        if ( p_aout->format.i_original_channels & AOUT_CHAN_DOLBYSTEREO )
         {
             val.i_int = AOUT_VAR_CHAN_DOLBYS;
             text.psz_string = _("Dolby Surround");
@@ -144,10 +143,10 @@ int aout_OutputNew( aout_instance_t * p_aout,
         var_Change( p_aout, "audio-channels", VLC_VAR_ADDCHOICE, &val, &text );
         val.i_int = AOUT_VAR_CHAN_RSTEREO; text.psz_string=_("Reverse stereo");
         var_Change( p_aout, "audio-channels", VLC_VAR_ADDCHOICE, &val, &text );
-        if ( p_aout->output.output.i_original_channels & AOUT_CHAN_DUALMONO )
+        if ( p_aout->format.i_original_channels & AOUT_CHAN_DUALMONO )
         {
             /* Go directly to the left channel. */
-            p_aout->output.output.i_original_channels = AOUT_CHAN_LEFT;
+            p_aout->format.i_original_channels = AOUT_CHAN_LEFT;
             var_SetInteger( p_aout, "audio-channels", AOUT_VAR_CHAN_LEFT );
         }
         var_AddCallback( p_aout, "audio-channels", aout_ChannelsRestart,
@@ -155,15 +154,15 @@ int aout_OutputNew( aout_instance_t * p_aout,
     }
     var_TriggerCallback( p_aout, "intf-change" );
 
-    aout_FormatPrepare( &p_aout->output.output );
+    aout_FormatPrepare( &p_aout->format );
 
     /* Prepare FIFO. */
-    aout_FifoInit( p_aout, &p_aout->output.fifo, p_aout->output.output.i_rate );
-    aout_FormatPrint( p_aout, "output", &p_aout->output.output );
+    aout_FifoInit( p_aout, &p_aout->fifo, p_aout->format.i_rate );
+    aout_FormatPrint( p_aout, "output", &p_aout->format );
 
     /* Choose the mixer format. */
-    p_aout->mixer_format = p_aout->output.output;
-    if ( AOUT_FMT_NON_LINEAR(&p_aout->output.output) )
+    p_aout->mixer_format = p_aout->format;
+    if ( AOUT_FMT_NON_LINEAR(&p_aout->format) )
         p_aout->mixer_format.i_format = p_format->i_format;
     else
     /* Most audio filters can only deal with single-precision,
@@ -184,15 +183,15 @@ int aout_OutputNew( aout_instance_t * p_aout,
     aout_FormatPrint( p_aout, "mixer", &p_aout->mixer_format );
 
     /* Create filters. */
-    p_aout->output.i_nb_filters = 0;
-    if ( aout_FiltersCreatePipeline( p_aout, p_aout->output.pp_filters,
-                                     &p_aout->output.i_nb_filters,
+    p_aout->i_nb_filters = 0;
+    if ( aout_FiltersCreatePipeline( p_aout, p_aout->pp_filters,
+                                     &p_aout->i_nb_filters,
                                      &p_aout->mixer_format,
-                                     &p_aout->output.output ) < 0 )
+                                     &p_aout->format ) < 0 )
     {
         msg_Err( p_aout, "couldn't create audio output pipeline" );
-        module_unneed( p_aout, p_aout->output.p_module );
-        p_aout->output.p_module = NULL;
+        module_unneed( p_aout, p_aout->module );
+        p_aout->module = NULL;
         return -1;
     }
     return 0;
@@ -207,14 +206,13 @@ void aout_OutputDelete( aout_instance_t * p_aout )
 {
     vlc_assert_locked( &p_aout->lock );
 
-    if( p_aout->output.p_module == NULL )
+    if( p_aout->module == NULL )
         return;
 
-    module_unneed( p_aout, p_aout->output.p_module );
-    p_aout->output.p_module = NULL;
-    aout_FiltersDestroyPipeline( p_aout->output.pp_filters,
-                                 p_aout->output.i_nb_filters );
-    aout_FifoDestroy( &p_aout->output.fifo );
+    module_unneed( p_aout, p_aout->module );
+    p_aout->module = NULL;
+    aout_FiltersDestroyPipeline( p_aout->pp_filters, p_aout->i_nb_filters );
+    aout_FifoDestroy( &p_aout->fifo );
 }
 
 /*****************************************************************************
@@ -226,8 +224,7 @@ void aout_OutputPlay( aout_instance_t * p_aout, aout_buffer_t * p_buffer )
 {
     vlc_assert_locked( &p_aout->lock );
 
-    aout_FiltersPlay( p_aout->output.pp_filters, p_aout->output.i_nb_filters,
-                      &p_buffer );
+    aout_FiltersPlay( p_aout->pp_filters, p_aout->i_nb_filters, &p_buffer );
     if( !p_buffer )
         return;
     if( p_buffer->i_buffer == 0 )
@@ -236,8 +233,8 @@ void aout_OutputPlay( aout_instance_t * p_aout, aout_buffer_t * p_buffer )
         return;
     }
 
-    aout_FifoPush( &p_aout->output.fifo, p_buffer );
-    p_aout->output.pf_play( p_aout );
+    aout_FifoPush( &p_aout->fifo, p_buffer );
+    p_aout->pf_play( p_aout );
 }
 
 /**
@@ -249,8 +246,8 @@ void aout_OutputPause( aout_instance_t *aout, bool pause, mtime_t date )
 {
     vlc_assert_locked( &aout->lock );
 
-    if( aout->output.pf_pause != NULL )
-        aout->output.pf_pause( aout, pause, date );
+    if( aout->pf_pause != NULL )
+        aout->pf_pause( aout, pause, date );
 }
 
 /*****************************************************************************
@@ -265,7 +262,7 @@ aout_buffer_t * aout_OutputNextBuffer( aout_instance_t * p_aout,
                                        mtime_t start_date,
                                        bool b_can_sleek )
 {
-    aout_fifo_t *p_fifo = &p_aout->output.fifo;
+    aout_fifo_t *p_fifo = &p_aout->fifo;
     aout_buffer_t * p_buffer;
     mtime_t now = mdate();
 
@@ -290,11 +287,11 @@ aout_buffer_t * aout_OutputNextBuffer( aout_instance_t * p_aout,
        * to deal with this kind of starvation. */
 
         /* Set date to 0, to allow the mixer to send a new buffer ASAP */
-        aout_FifoSet( &p_aout->output.fifo, 0 );
-        if ( !p_aout->output.b_starving )
+        aout_FifoSet( &p_aout->fifo, 0 );
+        if ( !p_aout->b_starving )
             msg_Dbg( p_aout,
                  "audio output is starving (no input), playing silence" );
-        p_aout->output.b_starving = true;
+        p_aout->b_starving = true;
 #endif
         goto out;
     }
@@ -305,15 +302,15 @@ aout_buffer_t * aout_OutputNextBuffer( aout_instance_t * p_aout,
      */
     if ( 0 > delta + p_buffer->i_length )
     {
-        if ( !p_aout->output.b_starving )
+        if ( !p_aout->b_starving )
             msg_Dbg( p_aout, "audio output is starving (%"PRId64"), "
                      "playing silence", -delta );
-        p_aout->output.b_starving = true;
+        p_aout->b_starving = true;
         p_buffer = NULL;
         goto out;
     }
 
-    p_aout->output.b_starving = false;
+    p_aout->b_starving = false;
     p_buffer = aout_FifoPop( p_fifo );
 
     if( !b_can_sleek

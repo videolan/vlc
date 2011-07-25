@@ -78,7 +78,7 @@ static int Open ( vlc_object_t *p_this )
 {
     aout_instance_t *p_aout = (aout_instance_t *)p_this;
     struct aout_sys_t *p_sys = malloc(sizeof(aout_sys_t));
-    p_aout->output.p_sys = p_sys;
+    p_aout->sys = p_sys;
 
     OSStatus status = 0;
 
@@ -118,12 +118,12 @@ static int Open ( vlc_object_t *p_this )
     /* Volume is entirely done in software. */
     aout_VolumeSoftInit( p_aout );
 
-    p_aout->output.output.i_format = VLC_CODEC_S16L;
-    p_aout->output.output.i_physical_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
-    p_aout->output.output.i_rate = 44100;
-    p_aout->output.i_nb_samples = FRAME_SIZE;
-    p_aout->output.pf_play = Play;
-    p_aout->output.pf_pause = NULL;
+    p_aout->format.i_format = VLC_CODEC_S16L;
+    p_aout->format.i_physical_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
+    p_aout->format.i_rate = 44100;
+    p_aout->format.i_nb_samples = FRAME_SIZE;
+    p_aout->format.pf_play = Play;
+    p_aout->format.pf_pause = NULL;
 
     msg_Dbg(p_aout, "Starting AudioQueue (status = %i)", status);
     status = AudioQueueStart(p_sys->audioQueue, NULL);
@@ -145,7 +145,7 @@ static void Play( aout_instance_t * p_aout )
 static void Close ( vlc_object_t *p_this )
 {
     aout_instance_t *p_aout = (aout_instance_t *)p_this;
-    struct aout_sys_t * p_sys = p_aout->output.p_sys;
+    struct aout_sys_t * p_sys = p_aout->sys;
 
     msg_Dbg(p_aout, "Stopping AudioQueue");
     AudioQueueStop(p_sys->audioQueue, false);
@@ -160,7 +160,7 @@ void AudioQueueCallback(void * inUserData, AudioQueueRef inAQ, AudioQueueBufferR
 
     if (p_aout) {
         vlc_mutex_lock( &p_aout->lock );
-        p_buffer = aout_FifoPop( &p_aout->output.fifo );
+        p_buffer = aout_FifoPop( &p_aout->fifo );
         vlc_mutex_unlock( &p_aout->lock );
     }
 

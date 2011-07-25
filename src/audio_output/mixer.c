@@ -96,7 +96,7 @@ static int MixBuffer( aout_instance_t * p_aout, float volume )
     aout_mixer_input_t *p_input = p_mixer->input;
     aout_fifo_t *p_fifo = &p_input->fifo;
     mtime_t now = mdate();
-    const unsigned samples = p_aout->output.i_nb_samples;
+    const unsigned samples = p_aout->i_nb_samples;
     /* FIXME: Remove this silly constraint. Just pass buffers as they come to
      * "smart" audio outputs. */
     assert( samples > 0 );
@@ -104,7 +104,7 @@ static int MixBuffer( aout_instance_t * p_aout, float volume )
     vlc_assert_locked( &p_aout->lock );
 
     /* Retrieve the date of the next buffer. */
-    date_t exact_start_date = p_aout->output.fifo.end_date;
+    date_t exact_start_date = p_aout->fifo.end_date;
     mtime_t start_date = date_Get( &exact_start_date );
 
     if( start_date != 0 && start_date < now )
@@ -114,7 +114,7 @@ static int MixBuffer( aout_instance_t * p_aout, float volume )
          * happen :). */
         msg_Warn( p_mixer, "output PTS is out of range (%"PRId64"), clearing out",
                   mdate() - start_date );
-        aout_FifoSet( &p_aout->output.fifo, 0 );
+        aout_FifoSet( &p_aout->fifo, 0 );
         date_Set( &exact_start_date, 0 );
         start_date = 0;
     }
@@ -187,7 +187,7 @@ static int MixBuffer( aout_instance_t * p_aout, float volume )
         if( delta < 0 )
         {
             /* Is it really the best way to do it ? */
-            aout_FifoSet( &p_aout->output.fifo, 0 );
+            aout_FifoSet( &p_aout->fifo, 0 );
             date_Set( &exact_start_date, 0 );
             return -1;
         }

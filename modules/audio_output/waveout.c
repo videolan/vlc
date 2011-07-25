@@ -148,13 +148,13 @@ static int Open( vlc_object_t *p_this )
     vlc_value_t val;
 
     /* Allocate structure */
-    p_aout->output.p_sys = malloc( sizeof( aout_sys_t ) );
+    p_aout->sys = malloc( sizeof( aout_sys_t ) );
 
-    if( p_aout->output.p_sys == NULL )
+    if( p_aout->sys == NULL )
         return VLC_ENOMEM;
 
-    p_aout->output.pf_play = Play;
-    p_aout->output.pf_pause = NULL;
+    p_aout->pf_play = Play;
+    p_aout->pf_pause = NULL;
 
     /*
      initialize/update Device selection List
@@ -167,10 +167,10 @@ static int Open( vlc_object_t *p_this )
     */
     char *psz_waveout_dev = var_CreateGetString( p_aout, "waveout-audio-device");
 
-    p_aout->output.p_sys->i_wave_device_id =
+    p_aout->sys->i_wave_device_id =
          findDeviceID( psz_waveout_dev );
 
-    if(p_aout->output.p_sys->i_wave_device_id == WAVE_MAPPER)
+    if(p_aout->sys->i_wave_device_id == WAVE_MAPPER)
     {
        if(psz_waveout_dev &&
           stricmp(psz_waveout_dev,"wavemapper"))
@@ -183,7 +183,7 @@ static int Open( vlc_object_t *p_this )
 
 
     WAVEOUTCAPS waveoutcaps;
-    if(waveOutGetDevCaps( p_aout->output.p_sys->i_wave_device_id,
+    if(waveOutGetDevCaps( p_aout->sys->i_wave_device_id,
                           &waveoutcaps,
                           sizeof(WAVEOUTCAPS)) == MMSYSERR_NOERROR)
     {
@@ -208,7 +208,7 @@ static int Open( vlc_object_t *p_this )
     {
         /* Probe() has failed. */
         var_Destroy( p_aout, "waveout-audio-device");
-        free( p_aout->output.p_sys );
+        free( p_aout->sys );
         return VLC_EGENERIC;
     }
 
@@ -216,27 +216,27 @@ static int Open( vlc_object_t *p_this )
     /* Open the device */
     if( val.i_int == AOUT_VAR_SPDIF )
     {
-        p_aout->output.output.i_format = VLC_CODEC_SPDIFL;
+        p_aout->format.i_format = VLC_CODEC_SPDIFL;
 
         if( OpenWaveOut( p_aout,
-                         p_aout->output.p_sys->i_wave_device_id,
+                         p_aout->sys->i_wave_device_id,
                          VLC_CODEC_SPDIFL,
-                         p_aout->output.output.i_physical_channels,
-                         aout_FormatNbChannels( &p_aout->output.output ),
-                         p_aout->output.output.i_rate, false )
+                         p_aout->format.i_physical_channels,
+                         aout_FormatNbChannels( &p_aout->format ),
+                         p_aout->format.i_rate, false )
             != VLC_SUCCESS )
         {
             msg_Err( p_aout, "cannot open waveout audio device" );
-            free( p_aout->output.p_sys );
+            free( p_aout->sys );
             return VLC_EGENERIC;
         }
 
         /* Calculate the frame size in bytes */
-        p_aout->output.i_nb_samples = A52_FRAME_NB;
-        p_aout->output.output.i_bytes_per_frame = AOUT_SPDIF_SIZE;
-        p_aout->output.output.i_frame_length = A52_FRAME_NB;
-        p_aout->output.p_sys->i_buffer_size =
-            p_aout->output.output.i_bytes_per_frame;
+        p_aout->i_nb_samples = A52_FRAME_NB;
+        p_aout->format.i_bytes_per_frame = AOUT_SPDIF_SIZE;
+        p_aout->format.i_frame_length = A52_FRAME_NB;
+        p_aout->sys->i_buffer_size =
+            p_aout->format.i_bytes_per_frame;
 
         aout_VolumeNoneInit( p_aout );
     }
@@ -247,90 +247,90 @@ static int Open( vlc_object_t *p_this )
         switch( val.i_int )
         {
         case AOUT_VAR_5_1:
-            p_aout->output.output.i_physical_channels
+            p_aout->format.i_physical_channels
                     = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
                       | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT
                       | AOUT_CHAN_LFE;
             break;
         case AOUT_VAR_2F2R:
-            p_aout->output.output.i_physical_channels
+            p_aout->format.i_physical_channels
                     = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT
                       | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT;
             break;
         case AOUT_VAR_MONO:
-            p_aout->output.output.i_physical_channels = AOUT_CHAN_CENTER;
+            p_aout->format.i_physical_channels = AOUT_CHAN_CENTER;
             break;
         default:
-            p_aout->output.output.i_physical_channels
+            p_aout->format.i_physical_channels
                     = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
         }
 
         if( OpenWaveOutPCM( p_aout,
-                            p_aout->output.p_sys->i_wave_device_id,
-                            &p_aout->output.output.i_format,
-                            p_aout->output.output.i_physical_channels,
-                            aout_FormatNbChannels( &p_aout->output.output ),
-                            p_aout->output.output.i_rate, false )
+                            p_aout->sys->i_wave_device_id,
+                            &p_aout->format.i_format,
+                            p_aout->format.i_physical_channels,
+                            aout_FormatNbChannels( &p_aout->format ),
+                            p_aout->format.i_rate, false )
             != VLC_SUCCESS )
         {
             msg_Err( p_aout, "cannot open waveout audio device" );
-            free( p_aout->output.p_sys );
+            free( p_aout->sys );
             return VLC_EGENERIC;
         }
 
         /* Calculate the frame size in bytes */
-        p_aout->output.i_nb_samples = FRAME_SIZE;
-        aout_FormatPrepare( &p_aout->output.output );
-        p_aout->output.p_sys->i_buffer_size = FRAME_SIZE *
-            p_aout->output.output.i_bytes_per_frame;
+        p_aout->i_nb_samples = FRAME_SIZE;
+        aout_FormatPrepare( &p_aout->format );
+        p_aout->sys->i_buffer_size = FRAME_SIZE *
+            p_aout->format.i_bytes_per_frame;
 
         aout_VolumeSoftInit( p_aout );
 
         /* Check for hardware volume support */
-        if( waveOutGetDevCaps( (UINT_PTR)p_aout->output.p_sys->h_waveout,
+        if( waveOutGetDevCaps( (UINT_PTR)p_aout->sys->h_waveout,
                                &wocaps, sizeof(wocaps) ) == MMSYSERR_NOERROR &&
             wocaps.dwSupport & WAVECAPS_VOLUME )
         {
             DWORD i_dummy;
-            if( waveOutGetVolume( p_aout->output.p_sys->h_waveout, &i_dummy )
+            if( waveOutGetVolume( p_aout->sys->h_waveout, &i_dummy )
                 == MMSYSERR_NOERROR )
             {
-                p_aout->output.pf_volume_set = VolumeSet;
+                p_aout->pf_volume_set = VolumeSet;
             }
         }
     }
 
 
-    waveOutReset( p_aout->output.p_sys->h_waveout );
+    waveOutReset( p_aout->sys->h_waveout );
 
     /* Allocate silence buffer */
-    p_aout->output.p_sys->p_silence_buffer =
-        malloc( p_aout->output.p_sys->i_buffer_size );
-    if( p_aout->output.p_sys->p_silence_buffer == NULL )
+    p_aout->sys->p_silence_buffer =
+        malloc( p_aout->sys->i_buffer_size );
+    if( p_aout->sys->p_silence_buffer == NULL )
     {
-        free( p_aout->output.p_sys );
+        free( p_aout->sys );
         return VLC_ENOMEM;
     }
-    p_aout->output.p_sys->i_repeat_counter = 0;
+    p_aout->sys->i_repeat_counter = 0;
 
 
     /* Zero the buffer. WinCE doesn't have calloc(). */
-    memset( p_aout->output.p_sys->p_silence_buffer, 0,
-            p_aout->output.p_sys->i_buffer_size );
+    memset( p_aout->sys->p_silence_buffer, 0,
+            p_aout->sys->i_buffer_size );
 
     /* Now we need to setup our waveOut play notification structure */
-    p_aout->output.p_sys->event = CreateEvent( NULL, FALSE, FALSE, NULL );
-    p_aout->output.p_sys->new_buffer_event = CreateEvent( NULL, FALSE, FALSE, NULL );
+    p_aout->sys->event = CreateEvent( NULL, FALSE, FALSE, NULL );
+    p_aout->sys->new_buffer_event = CreateEvent( NULL, FALSE, FALSE, NULL );
 
     /* define startpoint of playback on first call to play()
       like alsa does (instead of playing a blank sample) */
-    p_aout->output.p_sys->b_playing = 0;
-    p_aout->output.p_sys->start_date = 0;
+    p_aout->sys->b_playing = 0;
+    p_aout->sys->start_date = 0;
 
 
     /* Then launch the notification thread */
-    vlc_atomic_set( &p_aout->output.p_sys->abort, 0);
-    if( vlc_clone( &p_aout->output.p_sys->thread,
+    vlc_atomic_set( &p_aout->sys->abort, 0);
+    if( vlc_clone( &p_aout->sys->thread,
                    WaveOutThread, p_aout, VLC_THREAD_PRIORITY_OUTPUT ) )
     {
         msg_Err( p_aout, "cannot create WaveOutThread" );
@@ -340,8 +340,8 @@ static int Open( vlc_object_t *p_this )
      * working */
     for( int i = 0; i < FRAMES_NUM; i++ )
     {
-        p_aout->output.p_sys->waveheader[i].dwFlags = WHDR_DONE;
-        p_aout->output.p_sys->waveheader[i].dwUser = 0;
+        p_aout->sys->waveheader[i].dwFlags = WHDR_DONE;
+        p_aout->sys->waveheader[i].dwUser = 0;
     }
 
     return VLC_SUCCESS;
@@ -364,13 +364,13 @@ static void Probe( aout_instance_t * p_aout )
     i_physical_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT |
                           AOUT_CHAN_CENTER | AOUT_CHAN_REARLEFT |
                           AOUT_CHAN_REARRIGHT | AOUT_CHAN_LFE;
-    if( p_aout->output.output.i_physical_channels == i_physical_channels )
+    if( p_aout->format.i_physical_channels == i_physical_channels )
     {
         if( OpenWaveOutPCM( p_aout,
-                            p_aout->output.p_sys->i_wave_device_id,
+                            p_aout->sys->i_wave_device_id,
                             &i_format,
                             i_physical_channels, 6,
-                            p_aout->output.output.i_rate, true )
+                            p_aout->format.i_rate, true )
             == VLC_SUCCESS )
         {
             val.i_int = AOUT_VAR_5_1;
@@ -384,14 +384,14 @@ static void Probe( aout_instance_t * p_aout )
     /* Test for 2 Front 2 Rear support */
     i_physical_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT |
                           AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT;
-    if( ( p_aout->output.output.i_physical_channels & i_physical_channels )
+    if( ( p_aout->format.i_physical_channels & i_physical_channels )
         == i_physical_channels )
     {
         if( OpenWaveOutPCM( p_aout,
-                            p_aout->output.p_sys->i_wave_device_id,
+                            p_aout->sys->i_wave_device_id,
                             &i_format,
                             i_physical_channels, 4,
-                            p_aout->output.output.i_rate, true )
+                            p_aout->format.i_rate, true )
             == VLC_SUCCESS )
         {
             val.i_int = AOUT_VAR_2F2R;
@@ -405,10 +405,10 @@ static void Probe( aout_instance_t * p_aout )
     /* Test for stereo support */
     i_physical_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
     if( OpenWaveOutPCM( p_aout,
-                        p_aout->output.p_sys->i_wave_device_id,
+                        p_aout->sys->i_wave_device_id,
                         &i_format,
                         i_physical_channels, 2,
-                        p_aout->output.output.i_rate, true )
+                        p_aout->format.i_rate, true )
         == VLC_SUCCESS )
     {
         val.i_int = AOUT_VAR_STEREO;
@@ -420,10 +420,10 @@ static void Probe( aout_instance_t * p_aout )
     /* Test for mono support */
     i_physical_channels = AOUT_CHAN_CENTER;
     if( OpenWaveOutPCM( p_aout,
-                        p_aout->output.p_sys->i_wave_device_id,
+                        p_aout->sys->i_wave_device_id,
                         &i_format,
                         i_physical_channels, 1,
-                        p_aout->output.output.i_rate, true )
+                        p_aout->format.i_rate, true )
         == VLC_SUCCESS )
     {
         val.i_int = AOUT_VAR_MONO;
@@ -433,14 +433,14 @@ static void Probe( aout_instance_t * p_aout )
     }
 
     /* Test for SPDIF support */
-    if ( AOUT_FMT_NON_LINEAR( &p_aout->output.output ) )
+    if ( AOUT_FMT_NON_LINEAR( &p_aout->format ) )
     {
         if( OpenWaveOut( p_aout,
-                         p_aout->output.p_sys->i_wave_device_id,
+                         p_aout->sys->i_wave_device_id,
                          VLC_CODEC_SPDIFL,
-                         p_aout->output.output.i_physical_channels,
-                         aout_FormatNbChannels( &p_aout->output.output ),
-                         p_aout->output.output.i_rate, true )
+                         p_aout->format.i_physical_channels,
+                         aout_FormatNbChannels( &p_aout->format ),
+                         p_aout->format.i_rate, true )
             == VLC_SUCCESS )
         {
             msg_Dbg( p_aout, "device supports A/52 over S/PDIF" );
@@ -473,20 +473,20 @@ static void Probe( aout_instance_t * p_aout )
  *****************************************************************************/
 static void Play( aout_instance_t *_p_aout )
 {
-    if( !_p_aout->output.p_sys->b_playing )
+    if( !_p_aout->sys->b_playing )
     {
-        _p_aout->output.p_sys->b_playing = 1;
+        _p_aout->sys->b_playing = 1;
 
         /* get the playing date of the first aout buffer */
-        _p_aout->output.p_sys->start_date =
-            aout_FifoFirstDate( &_p_aout->output.fifo );
+        _p_aout->sys->start_date =
+            aout_FifoFirstDate( &_p_aout->fifo );
 
         msg_Dbg( _p_aout, "Wakeup sleeping output thread.");
 
         /* wake up the audio output thread */
-        SetEvent( _p_aout->output.p_sys->event );
+        SetEvent( _p_aout->sys->event );
     } else {
-        SetEvent( _p_aout->output.p_sys->new_buffer_event );
+        SetEvent( _p_aout->sys->new_buffer_event );
     }
 }
 
@@ -496,7 +496,7 @@ static void Play( aout_instance_t *_p_aout )
 static void Close( vlc_object_t *p_this )
 {
     aout_instance_t *p_aout = (aout_instance_t *)p_this;
-    aout_sys_t *p_sys = p_aout->output.p_sys;
+    aout_sys_t *p_sys = p_aout->sys;
 
     /* Before calling waveOutClose we must reset the device */
     vlc_atomic_set( &p_sys->abort, 1);
@@ -577,7 +577,7 @@ static int OpenWaveOut( aout_instance_t *p_aout, uint32_t i_device_id, int i_for
 
     /* Set sound format */
 
-#define waveformat p_aout->output.p_sys->waveformat
+#define waveformat p_aout->sys->waveformat
 
     waveformat.dwChannelMask = 0;
     for( unsigned i = 0; i < sizeof(pi_channels_src)/sizeof(uint32_t); i++ )
@@ -660,7 +660,7 @@ static int OpenWaveOut( aout_instance_t *p_aout, uint32_t i_device_id, int i_for
     }
 
     /* Open the device */
-    result = waveOutOpen( &p_aout->output.p_sys->h_waveout, i_device_id,
+    result = waveOutOpen( &p_aout->sys->h_waveout, i_device_id,
                           (WAVEFORMATEX *)&waveformat,
                           (DWORD_PTR)WaveOutCallback, (DWORD_PTR)p_aout,
                           CALLBACK_FUNCTION | (b_probe?WAVE_FORMAT_QUERY:0) );
@@ -680,12 +680,12 @@ static int OpenWaveOut( aout_instance_t *p_aout, uint32_t i_device_id, int i_for
         return VLC_EGENERIC;
     }
 
-    p_aout->output.p_sys->b_chan_reorder =
+    p_aout->sys->b_chan_reorder =
         aout_CheckChannelReorder( pi_channels_in, pi_channels_out,
                                   waveformat.dwChannelMask, i_nb_channels,
-                                  p_aout->output.p_sys->pi_chan_table );
+                                  p_aout->sys->pi_chan_table );
 
-    if( p_aout->output.p_sys->b_chan_reorder )
+    if( p_aout->sys->b_chan_reorder )
     {
         msg_Dbg( p_aout, "channel reordering needed" );
     }
@@ -750,27 +750,27 @@ static int PlayWaveOut( aout_instance_t *p_aout, HWAVEOUT h_waveout,
         */
         if(b_spdif)
         {
-           vlc_memcpy( p_aout->output.p_sys->p_silence_buffer,
+           vlc_memcpy( p_aout->sys->p_silence_buffer,
                        p_buffer->p_buffer,
-                       p_aout->output.p_sys->i_buffer_size );
-           p_aout->output.p_sys->i_repeat_counter = 2;
+                       p_aout->sys->i_buffer_size );
+           p_aout->sys->i_repeat_counter = 2;
         }
     } else {
         /* Use silence buffer instead */
-        if(p_aout->output.p_sys->i_repeat_counter)
+        if(p_aout->sys->i_repeat_counter)
         {
-           p_aout->output.p_sys->i_repeat_counter--;
-           if(!p_aout->output.p_sys->i_repeat_counter)
+           p_aout->sys->i_repeat_counter--;
+           if(!p_aout->sys->i_repeat_counter)
            {
-               vlc_memset( p_aout->output.p_sys->p_silence_buffer,
-                           0x00, p_aout->output.p_sys->i_buffer_size );
+               vlc_memset( p_aout->sys->p_silence_buffer,
+                           0x00, p_aout->sys->i_buffer_size );
            }
         }
-        p_waveheader->lpData = (LPSTR)p_aout->output.p_sys->p_silence_buffer;
+        p_waveheader->lpData = (LPSTR)p_aout->sys->p_silence_buffer;
     }
 
     p_waveheader->dwUser = p_buffer ? (DWORD_PTR)p_buffer : (DWORD_PTR)1;
-    p_waveheader->dwBufferLength = p_aout->output.p_sys->i_buffer_size;
+    p_waveheader->dwBufferLength = p_aout->sys->i_buffer_size;
     p_waveheader->dwFlags = 0;
 
     result = waveOutPrepareHeader( h_waveout, p_waveheader, sizeof(WAVEHDR) );
@@ -804,13 +804,13 @@ static void CALLBACK WaveOutCallback( HWAVEOUT h_waveout, UINT uMsg,
 
     if( uMsg != WOM_DONE ) return;
 
-    if( vlc_atomic_get(&p_aout->output.p_sys->abort) ) return;
+    if( vlc_atomic_get(&p_aout->sys->abort) ) return;
 
     /* Find out the current latency */
     for( int i = 0; i < FRAMES_NUM; i++ )
     {
         /* Check if frame buf is available */
-        if( !(p_aout->output.p_sys->waveheader[i].dwFlags & WHDR_DONE) )
+        if( !(p_aout->sys->waveheader[i].dwFlags & WHDR_DONE) )
         {
             i_queued_frames++;
         }
@@ -818,7 +818,7 @@ static void CALLBACK WaveOutCallback( HWAVEOUT h_waveout, UINT uMsg,
 
     /* Don't wake up the thread too much */
     if( i_queued_frames <= FRAMES_NUM/2 )
-        SetEvent( p_aout->output.p_sys->event );
+        SetEvent( p_aout->sys->event );
 }
 
 
@@ -868,7 +868,7 @@ static int WaveOutClearDoneBuffers(aout_sys_t *p_sys)
 static void* WaveOutThread( void *data )
 {
     aout_instance_t *p_aout = data;
-    aout_sys_t *p_sys = p_aout->output.p_sys;
+    aout_sys_t *p_sys = p_aout->sys;
     aout_buffer_t *p_buffer = NULL;
     WAVEHDR *p_waveheader = p_sys->waveheader;
     int i, i_queued_frames;
@@ -878,12 +878,12 @@ static void* WaveOutThread( void *data )
     int canc = vlc_savecancel ();
 
     /* We don't want any resampling when using S/PDIF */
-    b_sleek = p_aout->output.output.i_format == VLC_CODEC_SPDIFL;
+    b_sleek = p_aout->format.i_format == VLC_CODEC_SPDIFL;
 
     // wait for first call to "play()"
-    while( !p_sys->start_date && !vlc_atomic_get(&p_aout->output.p_sys->abort) )
+    while( !p_sys->start_date && !vlc_atomic_get(&p_aout->sys->abort) )
            WaitForSingleObject( p_sys->event, INFINITE );
-    if( vlc_atomic_get(&p_aout->output.p_sys->abort) )
+    if( vlc_atomic_get(&p_aout->sys->abort) )
         return NULL;
 
     msg_Dbg( p_aout, "will start to play in %"PRId64" us",
@@ -899,12 +899,12 @@ static void* WaveOutThread( void *data )
                            i_queued_frames, msg);
     next_date = mdate();
 
-    while( !vlc_atomic_get(&p_aout->output.p_sys->abort) )
+    while( !vlc_atomic_get(&p_aout->sys->abort) )
     {
         /* Cleanup and find out the current latency */
         i_queued_frames = WaveOutClearDoneBuffers( p_sys );
 
-        if( vlc_atomic_get(&p_aout->output.p_sys->abort) ) return NULL;
+        if( vlc_atomic_get(&p_aout->sys->abort) ) return NULL;
 
         /* Try to fill in as many frame buffers as possible */
         for( i = 0; i < FRAMES_NUM; i++ )
@@ -913,7 +913,7 @@ static void* WaveOutThread( void *data )
             if( p_waveheader[i].dwFlags & WHDR_DONE )
             {
                 // next_date = mdate() + 1000000 * i_queued_frames /
-                //  p_aout->output.output.i_rate * p_aout->output.i_nb_samples;
+                //  p_aout->format.i_rate * p_aout->i_nb_samples;
 
                 // the realtime has got our back-site:) to come in sync
                 if(next_date < mdate())
@@ -936,7 +936,7 @@ static void* WaveOutThread( void *data )
 #endif
                     // means we are too early to request a new buffer?
                     waveout_warn("waiting...")
-                    next_date = aout_FifoFirstDate( &p_aout->output.fifo );
+                    next_date = aout_FifoFirstDate( &p_aout->fifo );
                     mwait( next_date - AOUT_MAX_PTS_ADVANCE/4 );
                     next_date = mdate();
                     p_buffer = aout_OutputNextBuffer( p_aout, next_date,
@@ -973,7 +973,7 @@ static void* WaveOutThread( void *data )
             }
         }
 
-        if( vlc_atomic_get(&p_aout->output.p_sys->abort) ) return NULL;
+        if( vlc_atomic_get(&p_aout->sys->abort) ) return NULL;
 
         /*
           deal with the case that the loop didn't fillup the buffer to the
@@ -1009,7 +1009,7 @@ static int VolumeSet( aout_instance_t * p_aout, float volume, bool mute )
 #ifdef UNDER_CE
     waveOutSetVolume( 0, i_waveout_vol );
 #else
-    waveOutSetVolume( p_aout->output.p_sys->h_waveout, i_waveout_vol );
+    waveOutSetVolume( p_aout->sys->h_waveout, i_waveout_vol );
 #endif
     return 0;
 }

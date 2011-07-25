@@ -184,7 +184,7 @@ static int Open (vlc_object_t *obj)
         return VLC_ENOMEM;
 
     snd_pcm_format_t pcm_format; /* ALSA sample format */
-    vlc_fourcc_t fourcc = p_aout->output.output.i_format;
+    vlc_fourcc_t fourcc = p_aout->format.i_format;
     bool spdif = false;
 
     switch (fourcc)
@@ -242,7 +242,7 @@ static int Open (vlc_object_t *obj)
             pcm_format = SND_PCM_FORMAT_U8;
             break;
         default:
-            if (AOUT_FMT_NON_LINEAR(&p_aout->output.output))
+            if (AOUT_FMT_NON_LINEAR(&p_aout->format))
                 spdif = var_InheritBool (p_aout, "spdif");
             if (HAVE_FPU)
             {
@@ -263,7 +263,7 @@ static int Open (vlc_object_t *obj)
     {
         unsigned aes3;
 
-        switch (p_aout->output.output.i_rate)
+        switch (p_aout->format.i_rate)
         {
 #define FS(freq) \
             case freq: aes3 = IEC958_AES3_CON_FS_ ## freq; break;
@@ -293,7 +293,7 @@ static int Open (vlc_object_t *obj)
         free (psz_device);
         return VLC_ENOMEM;
     }
-    p_aout->output.p_sys = p_sys;
+    p_aout->sys = p_sys;
 
 #ifdef ALSA_DEBUG
     snd_output_stdio_attach( &p_sys->p_snd_stderr, stderr, 0 );
@@ -349,24 +349,24 @@ static int Open (vlc_object_t *obj)
         pcm_format = SND_PCM_FORMAT_S16;
         i_channels = 2;
 
-        p_aout->output.i_nb_samples = i_period_size = ALSA_SPDIF_PERIOD_SIZE;
-        p_aout->output.output.i_bytes_per_frame = AOUT_SPDIF_SIZE;
-        p_aout->output.output.i_frame_length = A52_FRAME_NB;
+        p_aout->i_nb_samples = i_period_size = ALSA_SPDIF_PERIOD_SIZE;
+        p_aout->format.i_bytes_per_frame = AOUT_SPDIF_SIZE;
+        p_aout->format.i_frame_length = A52_FRAME_NB;
 
         aout_VolumeNoneInit( p_aout );
     }
     else
     {
         i_buffer_size = ALSA_DEFAULT_BUFFER_SIZE;
-        i_channels = aout_FormatNbChannels( &p_aout->output.output );
+        i_channels = aout_FormatNbChannels( &p_aout->format );
 
-        p_aout->output.i_nb_samples = i_period_size = ALSA_DEFAULT_PERIOD_SIZE;
+        p_aout->i_nb_samples = i_period_size = ALSA_DEFAULT_PERIOD_SIZE;
 
         aout_VolumeSoftInit( p_aout );
     }
 
-    p_aout->output.pf_play = Play;
-    p_aout->output.pf_pause = NULL;
+    p_aout->pf_play = Play;
+    p_aout->pf_pause = NULL;
 
     snd_pcm_hw_params_t *p_hw;
     snd_pcm_sw_params_t *p_sw;
@@ -391,7 +391,7 @@ static int Open (vlc_object_t *obj)
         goto error;
     }
 
-    p_aout->output.output.i_format = fourcc;
+    p_aout->format.i_format = fourcc;
 
     val = snd_pcm_hw_params_set_access( p_sys->p_snd_pcm, p_hw,
                                         SND_PCM_ACCESS_RW_INTERLEAVED );
@@ -412,9 +412,9 @@ static int Open (vlc_object_t *obj)
     }
 
     /* Set rate. */
-    unsigned old_rate = p_aout->output.output.i_rate;
+    unsigned old_rate = p_aout->format.i_rate;
     val = snd_pcm_hw_params_set_rate_near (p_sys->p_snd_pcm, p_hw,
-                                           &p_aout->output.output.i_rate,
+                                           &p_aout->format.i_rate,
                                            NULL);
     if (val < 0)
     {
@@ -422,9 +422,9 @@ static int Open (vlc_object_t *obj)
                  snd_strerror (val));
         goto error;
     }
-    if (p_aout->output.output.i_rate != old_rate)
+    if (p_aout->format.i_rate != old_rate)
         msg_Warn (p_aout, "resampling from %d Hz to %d Hz", old_rate,
-                  p_aout->output.output.i_rate);
+                  p_aout->format.i_rate);
 
     /* Set period size. */
     val = snd_pcm_hw_params_set_period_size_near( p_sys->p_snd_pcm, p_hw,
@@ -435,7 +435,7 @@ static int Open (vlc_object_t *obj)
                  snd_strerror( val ) );
         goto error;
     }
-    p_aout->output.i_nb_samples = i_period_size;
+    p_aout->i_nb_samples = i_period_size;
 
     /* Set buffer size. */
     val = snd_pcm_hw_params_set_buffer_size_near( p_sys->p_snd_pcm, p_hw,
@@ -469,7 +469,7 @@ static int Open (vlc_object_t *obj)
     snd_pcm_sw_params_current( p_sys->p_snd_pcm, p_sw );
 
     snd_pcm_sw_params_set_avail_min( p_sys->p_snd_pcm, p_sw,
-                                     p_aout->output.i_nb_samples );
+                                     p_aout->i_nb_samples );
     /* start playing when one period has been written */
     val = snd_pcm_sw_params_set_start_threshold( p_sys->p_snd_pcm, p_sw,
                                                  ALSA_DEFAULT_PERIOD_SIZE);
@@ -529,13 +529,13 @@ static void PlayIgnore( aout_instance_t *p_aout )
  *****************************************************************************/
 static void Play( aout_instance_t *p_aout )
 {
-    p_aout->output.pf_play = PlayIgnore;
+    p_aout->pf_play = PlayIgnore;
 
     /* get the playing date of the first aout buffer */
-    p_aout->output.p_sys->start_date = aout_FifoFirstDate( &p_aout->output.fifo );
+    p_aout->sys->start_date = aout_FifoFirstDate( &p_aout->fifo );
 
     /* wake up the audio output thread */
-    sem_post( &p_aout->output.p_sys->wait );
+    sem_post( &p_aout->sys->wait );
 }
 
 /*****************************************************************************
@@ -544,7 +544,7 @@ static void Play( aout_instance_t *p_aout )
 static void Close (vlc_object_t *obj)
 {
     aout_instance_t *p_aout = (aout_instance_t *)obj;
-    struct aout_sys_t * p_sys = p_aout->output.p_sys;
+    struct aout_sys_t * p_sys = p_aout->sys;
 
     /* Make sure that the thread will stop once it is waken up */
     vlc_cancel( p_sys->thread );
@@ -565,7 +565,7 @@ static void Close (vlc_object_t *obj)
 static void* ALSAThread( void *data )
 {
     aout_instance_t * p_aout = data;
-    struct aout_sys_t * p_sys = p_aout->output.p_sys;
+    struct aout_sys_t * p_sys = p_aout->sys;
 
     /* Wait for the exact time to start playing (avoids resampling) */
     vlc_sem_wait( &p_sys->wait );
@@ -583,7 +583,7 @@ static void* ALSAThread( void *data )
  *****************************************************************************/
 static void ALSAFill( aout_instance_t * p_aout )
 {
-    struct aout_sys_t * p_sys = p_aout->output.p_sys;
+    struct aout_sys_t * p_sys = p_aout->sys;
     snd_pcm_t *p_pcm = p_sys->p_snd_pcm;
     snd_pcm_status_t * p_status;
     int i_snd_rc;
@@ -635,9 +635,9 @@ static void ALSAFill( aout_instance_t * p_aout )
 
         size_t i_bytes = snd_pcm_frames_to_bytes( p_pcm, delay );
         mtime_t delay_us = CLOCK_FREQ * i_bytes
-                / p_aout->output.output.i_bytes_per_frame
-                / p_aout->output.output.i_rate
-                * p_aout->output.output.i_frame_length;
+                / p_aout->format.i_bytes_per_frame
+                / p_aout->format.i_rate
+                * p_aout->format.i_frame_length;
 
 #ifdef ALSA_DEBUG
         snd_pcm_state_t state = snd_pcm_status_get_state( p_status );
@@ -646,16 +646,16 @@ static void ALSAFill( aout_instance_t * p_aout )
 
         msg_Dbg( p_aout, "Delay is %ld frames (%zu bytes)", delay, i_bytes );
 
-        msg_Dbg( p_aout, "Bytes per frame: %d", p_aout->output.output.i_bytes_per_frame );
-        msg_Dbg( p_aout, "Rate: %d", p_aout->output.output.i_rate );
-        msg_Dbg( p_aout, "Frame length: %d", p_aout->output.output.i_frame_length );
+        msg_Dbg( p_aout, "Bytes per frame: %d", p_aout->format.i_bytes_per_frame );
+        msg_Dbg( p_aout, "Rate: %d", p_aout->format.i_rate );
+        msg_Dbg( p_aout, "Frame length: %d", p_aout->format.i_frame_length );
         msg_Dbg( p_aout, "Next date: in %"PRId64" microseconds", delay_us );
 #endif
         next_date = mdate() + delay_us;
     }
 
     block_t *p_buffer = aout_OutputNextBuffer( p_aout, next_date,
-           (p_aout->output.output.i_format ==  VLC_CODEC_SPDIFL) );
+           (p_aout->format.i_format ==  VLC_CODEC_SPDIFL) );
 
     /* Audio output buffer shortage -> stop the fill process and wait */
     if( p_buffer == NULL )

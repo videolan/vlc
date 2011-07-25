@@ -64,8 +64,8 @@ aout_instance_t *aout_New( vlc_object_t * p_parent )
     p_aout->p_input = NULL;
     p_aout->mixer_multiplier = 1.0;
     p_aout->p_mixer = NULL;
-    p_aout->output.b_starving = 1;
-    p_aout->output.p_module = NULL;
+    p_aout->b_starving = true;
+    p_aout->module = NULL;
 
     var_Create( p_aout, "intf-change", VLC_VAR_VOID );
 

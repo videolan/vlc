@@ -93,7 +93,7 @@ static void sink_info_cb(pa_context *c, const pa_sink_info *i, int eol,
                          void *userdata)
 {
     aout_instance_t *aout = userdata;
-    aout_sys_t *sys = aout->output.p_sys;
+    aout_sys_t *sys = aout->sys;
 
     if (eol)
         return;
@@ -114,8 +114,8 @@ static void sink_info_cb(pa_context *c, const pa_sink_info *i, int eol,
 /*** Stream helpers ***/
 static void stream_reset_sync(pa_stream *s, aout_instance_t *aout)
 {
-    aout_sys_t *sys = aout->output.p_sys;
-    const unsigned rate = aout->output.output.i_rate;
+    aout_sys_t *sys = aout->sys;
+    const unsigned rate = aout->format.i_rate;
 
     sys->pts = VLC_TS_INVALID;
     sys->desync = 0;
@@ -143,7 +143,7 @@ static void stream_state_cb(pa_stream *s, void *userdata)
 static void stream_latency_cb(pa_stream *s, void *userdata)
 {
     aout_instance_t *aout = userdata;
-    aout_sys_t *sys = aout->output.p_sys;
+    aout_sys_t *sys = aout->sys;
     mtime_t delta, change;
 
     if (sys->pts == VLC_TS_INVALID)
@@ -179,7 +179,7 @@ static void stream_latency_cb(pa_stream *s, void *userdata)
         msg_Warn(aout, "too early by %"PRId64" us", delta);
 
     /* Compute playback sample rate */
-    const unsigned inrate = aout->output.output.i_rate;
+    const unsigned inrate = aout->format.i_rate;
 
 #define ADJUST_FACTOR 4
 #define ADJUST_MAX    1000 /* Hz (max rate variation per call) */
@@ -222,7 +222,7 @@ static void stream_latency_cb(pa_stream *s, void *userdata)
 static void stream_moved_cb(pa_stream *s, void *userdata)
 {
     aout_instance_t *aout = userdata;
-    aout_sys_t *sys = aout->output.p_sys;
+    aout_sys_t *sys = aout->sys;
     pa_operation *op;
     uint32_t idx = pa_stream_get_device_index(s);
 
@@ -325,11 +325,11 @@ static void *data_convert(block_t **pp)
  */
 static void Play(aout_instance_t *aout)
 {
-    aout_sys_t *sys = aout->output.p_sys;
+    aout_sys_t *sys = aout->sys;
     pa_stream *s = sys->stream;
 
     /* This function is called exactly once per block in the output FIFO. */
-    block_t *block = aout_FifoPop(&aout->output.fifo);
+    block_t *block = aout_FifoPop(&aout->fifo);
     assert (block != NULL);
 
     const void *ptr = data_convert(&block);
@@ -367,8 +367,8 @@ static void Play(aout_instance_t *aout)
             advance -= latency;
 
         if (advance > 0) {
-            size_t nb = (advance * aout->output.output.i_rate) / CLOCK_FREQ;
-            size_t size = aout->output.output.i_bytes_per_frame;
+            size_t nb = (advance * aout->format.i_rate) / CLOCK_FREQ;
+            size_t size = aout->format.i_bytes_per_frame;
             float *zeroes = calloc (nb, size);
 
             msg_Dbg(aout, "prepending %zu zeroes", nb);
@@ -413,7 +413,7 @@ static void Play(aout_instance_t *aout)
  */
 static void Pause(aout_instance_t *aout, bool b_paused, mtime_t i_date)
 {
-    aout_sys_t *sys = aout->output.p_sys;
+    aout_sys_t *sys = aout->sys;
     pa_stream *s = sys->stream;
 
     if (!b_paused)
@@ -432,7 +432,7 @@ static void Pause(aout_instance_t *aout, bool b_paused, mtime_t i_date)
 
 static int VolumeSet(aout_instance_t *aout, float vol, bool mute)
 {
-    aout_sys_t *sys = aout->output.p_sys;
+    aout_sys_t *sys = aout->sys;
     pa_operation *op;
 
     uint32_t idx = pa_stream_get_index(sys->stream);
@@ -461,7 +461,7 @@ static int StreamMove(vlc_object_t *obj, const char *varname, vlc_value_t old,
                       vlc_value_t val, void *userdata)
 {
     aout_instance_t *aout = (aout_instance_t *)obj;
-    aout_sys_t *sys = aout->output.p_sys;
+    aout_sys_t *sys = aout->sys;
     pa_stream *s = userdata;
     pa_operation *op;
     uint32_t idx = pa_stream_get_index(s);
@@ -494,20 +494,20 @@ static int Open(vlc_object_t *obj)
     /* Sample format specification */
     struct pa_sample_spec ss;
 
-    switch(aout->output.output.i_format)
+    switch(aout->format.i_format)
     {
         case VLC_CODEC_F64B:
-            aout->output.output.i_format = VLC_CODEC_F32B;
+            aout->format.i_format = VLC_CODEC_F32B;
         case VLC_CODEC_F32B:
             ss.format = PA_SAMPLE_FLOAT32BE;
             break;
         case VLC_CODEC_F64L:
-            aout->output.output.i_format = VLC_CODEC_F32L;
+            aout->format.i_format = VLC_CODEC_F32L;
         case VLC_CODEC_F32L:
             ss.format = PA_SAMPLE_FLOAT32LE;
             break;
         case VLC_CODEC_FI32:
-            aout->output.output.i_format = VLC_CODEC_FL32;
+            aout->format.i_format = VLC_CODEC_FL32;
             ss.format = PA_SAMPLE_FLOAT32NE;
             break;
         case VLC_CODEC_S32B:
@@ -529,26 +529,26 @@ static int Open(vlc_object_t *obj)
             ss.format = PA_SAMPLE_S16LE;
             break;
         case VLC_CODEC_S8:
-            aout->output.output.i_format = VLC_CODEC_U8;
+            aout->format.i_format = VLC_CODEC_U8;
         case VLC_CODEC_U8:
             ss.format = PA_SAMPLE_U8;
             break;
         default:
             if (HAVE_FPU)
             {
-                aout->output.output.i_format = VLC_CODEC_FL32;
+                aout->format.i_format = VLC_CODEC_FL32;
                 ss.format = PA_SAMPLE_FLOAT32NE;
             }
             else
             {
-                aout->output.output.i_format = VLC_CODEC_S16N;
+                aout->format.i_format = VLC_CODEC_S16N;
                 ss.format = PA_SAMPLE_S16NE;
             }
             break;
     }
 
-    ss.rate = aout->output.output.i_rate;
-    ss.channels = aout_FormatNbChannels(&aout->output.output);
+    ss.rate = aout->format.i_rate;
+    ss.channels = aout_FormatNbChannels(&aout->format);
     if (!pa_sample_spec_valid(&ss)) {
         msg_Err(aout, "unsupported sample specification");
         return VLC_EGENERIC;
@@ -558,28 +558,28 @@ static int Open(vlc_object_t *obj)
     struct pa_channel_map map;
     map.channels = 0;
 
-    if (aout->output.output.i_physical_channels & AOUT_CHAN_LEFT)
+    if (aout->format.i_physical_channels & AOUT_CHAN_LEFT)
         map.map[map.channels++] = PA_CHANNEL_POSITION_FRONT_LEFT;
-    if (aout->output.output.i_physical_channels & AOUT_CHAN_RIGHT)
+    if (aout->format.i_physical_channels & AOUT_CHAN_RIGHT)
         map.map[map.channels++] = PA_CHANNEL_POSITION_FRONT_RIGHT;
-    if (aout->output.output.i_physical_channels & AOUT_CHAN_MIDDLELEFT)
+    if (aout->format.i_physical_channels & AOUT_CHAN_MIDDLELEFT)
         map.map[map.channels++] = PA_CHANNEL_POSITION_SIDE_LEFT;
-    if (aout->output.output.i_physical_channels & AOUT_CHAN_MIDDLERIGHT)
+    if (aout->format.i_physical_channels & AOUT_CHAN_MIDDLERIGHT)
         map.map[map.channels++] = PA_CHANNEL_POSITION_SIDE_RIGHT;
-    if (aout->output.output.i_physical_channels & AOUT_CHAN_REARLEFT)
+    if (aout->format.i_physical_channels & AOUT_CHAN_REARLEFT)
         map.map[map.channels++] = PA_CHANNEL_POSITION_REAR_LEFT;
-    if (aout->output.output.i_physical_channels & AOUT_CHAN_REARRIGHT)
+    if (aout->format.i_physical_channels & AOUT_CHAN_REARRIGHT)
         map.map[map.channels++] = PA_CHANNEL_POSITION_REAR_RIGHT;
-    if (aout->output.output.i_physical_channels & AOUT_CHAN_REARCENTER)
+    if (aout->format.i_physical_channels & AOUT_CHAN_REARCENTER)
         map.map[map.channels++] = PA_CHANNEL_POSITION_REAR_CENTER;
-    if (aout->output.output.i_physical_channels & AOUT_CHAN_CENTER)
+    if (aout->format.i_physical_channels & AOUT_CHAN_CENTER)
     {
         if (ss.channels == 1)
             map.map[map.channels++] = PA_CHANNEL_POSITION_MONO;
         else
             map.map[map.channels++] = PA_CHANNEL_POSITION_FRONT_CENTER;
     }
-    if (aout->output.output.i_physical_channels & AOUT_CHAN_LFE)
+    if (aout->format.i_physical_channels & AOUT_CHAN_LFE)
         map.map[map.channels++] = PA_CHANNEL_POSITION_LFE;
 
     for (unsigned i = 0; map.channels < ss.channels; i++) {
@@ -626,7 +626,7 @@ static int Open(vlc_object_t *obj)
         return VLC_EGENERIC;
     }
 
-    aout->output.p_sys = sys;
+    aout->sys = sys;
     sys->stream = NULL;
     sys->context = ctx;
     sys->pts = VLC_TS_INVALID;
@@ -664,7 +664,7 @@ static int Open(vlc_object_t *obj)
             "prebuf=%u, minreq=%u",
             pba->maxlength, pba->tlength, pba->prebuf, pba->minreq);
 
-    aout->output.i_nb_samples = pba->minreq / pa_frame_size(&ss);
+    aout->i_nb_samples = pba->minreq / pa_frame_size(&ss);
 
     var_Create(aout, "audio-device", VLC_VAR_INTEGER|VLC_VAR_HASCHOICE);
     var_Change(aout, "audio-device", VLC_VAR_SETTEXT,
@@ -678,9 +678,9 @@ static int Open(vlc_object_t *obj)
     stream_moved_cb(s, aout);
     vlc_pa_unlock();
 
-    aout->output.pf_play = Play;
-    aout->output.pf_pause = Pause;
-    aout->output.pf_volume_set = VolumeSet;
+    aout->pf_play = Play;
+    aout->pf_pause = Pause;
+    aout->pf_volume_set = VolumeSet;
     return VLC_SUCCESS;
 
 fail:
@@ -695,7 +695,7 @@ fail:
 static void Close (vlc_object_t *obj)
 {
     aout_instance_t *aout = (aout_instance_t *)obj;
-    aout_sys_t *sys = aout->output.p_sys;
+    aout_sys_t *sys = aout->sys;
     pa_context *ctx = sys->context;
     pa_stream *s = sys->stream;
 

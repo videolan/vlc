@@ -113,7 +113,7 @@ static int Open( vlc_object_t *p_this )
         status = VLC_ENOMEM;
         goto error_out;
     }
-    p_aout->output.p_sys = p_sys;
+    p_aout->sys = p_sys;
     p_sys->latency = 0;
 
     /* Connect to the JACK server */
@@ -133,17 +133,17 @@ static int Open( vlc_object_t *p_this )
     jack_set_process_callback( p_sys->p_jack_client, Process, p_aout );
     jack_set_graph_order_callback ( p_sys->p_jack_client, GraphChange, p_aout );
 
-    p_aout->output.pf_play = Play;
-    p_aout->output.pf_pause = NULL;
+    p_aout->pf_play = Play;
+    p_aout->pf_pause = NULL;
     aout_VolumeSoftInit( p_aout );
 
     /* JACK only supports fl32 format */
-    p_aout->output.output.i_format = VLC_CODEC_FL32;
+    p_aout->format.i_format = VLC_CODEC_FL32;
     // TODO add buffer size callback
-    p_aout->output.i_nb_samples = jack_get_buffer_size( p_sys->p_jack_client );
-    p_aout->output.output.i_rate = jack_get_sample_rate( p_sys->p_jack_client );
+    p_aout->i_nb_samples = jack_get_buffer_size( p_sys->p_jack_client );
+    p_aout->format.i_rate = jack_get_sample_rate( p_sys->p_jack_client );
 
-    p_sys->i_channels = aout_FormatNbChannels( &p_aout->output.output );
+    p_sys->i_channels = aout_FormatNbChannels( &p_aout->format );
 
     p_sys->p_jack_ports = malloc( p_sys->i_channels *
                                   sizeof(jack_port_t *) );
@@ -225,7 +225,7 @@ static int Open( vlc_object_t *p_this )
 
     msg_Dbg( p_aout, "JACK audio output initialized (%d channels, buffer "
              "size=%d, rate=%d)", p_sys->i_channels,
-             p_aout->output.i_nb_samples, p_aout->output.output.i_rate );
+             p_aout->i_nb_samples, p_aout->format.i_rate );
 
 error_out:
     /* Clean up, if an error occurred */
@@ -251,7 +251,7 @@ int Process( jack_nframes_t i_frames, void *p_arg )
 {
     unsigned int i, j, i_nb_samples = 0;
     aout_instance_t *p_aout = (aout_instance_t*) p_arg;
-    struct aout_sys_t *p_sys = p_aout->output.p_sys;
+    struct aout_sys_t *p_sys = p_aout->sys;
     jack_sample_t *p_src = NULL;
 
     jack_nframes_t dframes = p_sys->latency
@@ -312,7 +312,7 @@ int Process( jack_nframes_t i_frames, void *p_arg )
 static int GraphChange( void *p_arg )
 {
   aout_instance_t *p_aout = (aout_instance_t*) p_arg;
-  struct aout_sys_t *p_sys = p_aout->output.p_sys;
+  struct aout_sys_t *p_sys = p_aout->sys;
   unsigned int i;
   jack_nframes_t port_latency;
 
@@ -345,7 +345,7 @@ static void Close( vlc_object_t *p_this )
 {
     int i_error;
     aout_instance_t *p_aout = (aout_instance_t *)p_this;
-    struct aout_sys_t *p_sys = p_aout->output.p_sys;
+    struct aout_sys_t *p_sys = p_aout->sys;
 
     i_error = jack_deactivate( p_sys->p_jack_client );
     if( i_error )

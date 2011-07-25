@@ -110,24 +110,24 @@ static int Open ( vlc_object_t *p_this )
         /* The user has selected an audio device. */
         if ( val.i_int == AOUT_VAR_STEREO )
         {
-            p_aout->output.output.i_physical_channels
+            p_aout->format.i_physical_channels
                 = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
         }
         else if ( val.i_int == AOUT_VAR_MONO )
         {
-            p_aout->output.output.i_physical_channels = AOUT_CHAN_CENTER;
+            p_aout->format.i_physical_channels = AOUT_CHAN_CENTER;
         }
     }
 
-    i_nb_channels = aout_FormatNbChannels( &p_aout->output.output );
+    i_nb_channels = aout_FormatNbChannels( &p_aout->format );
     if ( i_nb_channels > 2 )
     {
         /* SDL doesn't support more than two channels. */
         i_nb_channels = 2;
-        p_aout->output.output.i_physical_channels
+        p_aout->format.i_physical_channels
             = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
     }
-    desired.freq       = p_aout->output.output.i_rate;
+    desired.freq       = p_aout->format.i_rate;
     desired.format     = AUDIO_S16SYS;
     desired.channels   = i_nb_channels;
     desired.callback   = SDLCallback;
@@ -146,24 +146,24 @@ static int Open ( vlc_object_t *p_this )
     switch ( obtained.format )
     {
     case AUDIO_S16LSB:
-        p_aout->output.output.i_format = VLC_CODEC_S16L; break;
+        p_aout->format.i_format = VLC_CODEC_S16L; break;
     case AUDIO_S16MSB:
-        p_aout->output.output.i_format = VLC_CODEC_S16B; break;
+        p_aout->format.i_format = VLC_CODEC_S16B; break;
     case AUDIO_U16LSB:
-        p_aout->output.output.i_format = VLC_CODEC_U16L; break;
+        p_aout->format.i_format = VLC_CODEC_U16L; break;
     case AUDIO_U16MSB:
-        p_aout->output.output.i_format = VLC_CODEC_U16B; break;
+        p_aout->format.i_format = VLC_CODEC_U16B; break;
     case AUDIO_S8:
-        p_aout->output.output.i_format = VLC_CODEC_S8; break;
+        p_aout->format.i_format = VLC_CODEC_S8; break;
     case AUDIO_U8:
-        p_aout->output.output.i_format = VLC_CODEC_U8; break;
+        p_aout->format.i_format = VLC_CODEC_U8; break;
     }
     /* Volume is entirely done in software. */
     aout_VolumeSoftInit( p_aout );
 
     if ( obtained.channels != i_nb_channels )
     {
-        p_aout->output.output.i_physical_channels = (obtained.channels == 2 ?
+        p_aout->format.i_physical_channels = (obtained.channels == 2 ?
                                             AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT :
                                             AOUT_CHAN_CENTER);
 
@@ -212,10 +212,10 @@ static int Open ( vlc_object_t *p_this )
 
     var_TriggerCallback( p_aout, "intf-change" );
 
-    p_aout->output.output.i_rate = obtained.freq;
-    p_aout->output.i_nb_samples = obtained.samples;
-    p_aout->output.pf_play = Play;
-    p_aout->output.pf_pause = NULL;
+    p_aout->format.i_rate = obtained.freq;
+    p_aout->i_nb_samples = obtained.samples;
+    p_aout->pf_play = Play;
+    p_aout->pf_pause = NULL;
 
     return VLC_SUCCESS;
 }
@@ -252,7 +252,7 @@ static void SDLCallback( void * _p_aout, uint8_t * p_stream, int i_len )
      * it at SDL's face. Nah. */
 
     vlc_mutex_lock( &p_aout->lock );
-    p_buffer = aout_FifoPop( &p_aout->output.fifo );
+    p_buffer = aout_FifoPop( &p_aout->fifo );
     vlc_mutex_unlock( &p_aout->lock );
 
     if ( p_buffer != NULL )

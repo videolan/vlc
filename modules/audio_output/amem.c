@@ -61,10 +61,10 @@ struct aout_sys_t
 
 static void Play (aout_instance_t *aout)
 {
-    aout_sys_t *sys = aout->output.p_sys;
+    aout_sys_t *sys = aout->sys;
     block_t *block;
 
-    while ((block = aout_FifoPop(&aout->output.fifo)) != NULL)
+    while ((block = aout_FifoPop(&aout->fifo)) != NULL)
     {
         sys->play (sys->opaque, block->p_buffer, block->i_nb_samples,
                    block->i_pts);
@@ -74,7 +74,7 @@ static void Play (aout_instance_t *aout)
 
 static int VolumeSet (aout_instance_t *aout, float vol, bool mute)
 {
-    aout_sys_t *sys = aout->output.p_sys;
+    aout_sys_t *sys = aout->sys;
 
     return sys->set_volume (sys->opaque, vol, mute) ? -1 : 0;
 }
@@ -88,7 +88,7 @@ static int Open (vlc_object_t *obj)
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
 
-    aout->output.p_sys = sys;
+    aout->sys = sys;
     sys->opaque = var_InheritAddress (obj, "amem-data");
     sys->play = var_InheritAddress (obj, "amem-play");
     sys->set_volume = var_InheritAddress (obj, "amem-set-volume");
@@ -102,8 +102,8 @@ static int Open (vlc_object_t *obj)
 
     if (setup != NULL)
     {
-        rate = aout->output.output.i_rate;
-        channels = aout_FormatNbChannels(&aout->output.output);
+        rate = aout->format.i_rate;
+        channels = aout_FormatNbChannels(&aout->format);
 
         if (setup (&sys->opaque, format, &rate, &channels))
             goto error;
@@ -122,18 +122,18 @@ static int Open (vlc_object_t *obj)
 
     /* TODO: amem-format */
     /* FIXME/TODO channel mapping */
-    if (strcmp(format, "S16N") || aout->output.output.i_channels != channels)
+    if (strcmp(format, "S16N") || aout->format.i_channels != channels)
     {
         msg_Err (aout, "format not supported");
         goto error;
     }
-    aout->output.output.i_format = VLC_CODEC_S16N;
-    aout->output.output.i_rate = rate;
+    aout->format.i_format = VLC_CODEC_S16N;
+    aout->format.i_rate = rate;
 
-    aout->output.pf_play = Play;
-    aout->output.pf_pause = NULL;
+    aout->pf_play = Play;
+    aout->pf_pause = NULL;
     if (sys->set_volume != NULL)
-        aout->output.pf_volume_set = VolumeSet;
+        aout->pf_volume_set = VolumeSet;
     else
         aout_VolumeSoftInit (aout);
     return VLC_SUCCESS;
@@ -146,7 +146,7 @@ error:
 static void Close (vlc_object_t *obj)
 {
     aout_instance_t *aout = (aout_instance_t *)obj;
-    aout_sys_t *sys = aout->output.p_sys;
+    aout_sys_t *sys = aout->sys;
 
     if (sys->cleanup != NULL)
         sys->cleanup (sys->opaque);

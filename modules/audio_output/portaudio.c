@@ -181,9 +181,9 @@ static int Open( vlc_object_t * p_this )
         return VLC_ENOMEM;
     p_sys->p_aout = p_aout;
     p_sys->p_stream = 0;
-    p_aout->output.p_sys = p_sys;
-    p_aout->output.pf_play = Play;
-    p_aout->output.pf_pause = NULL;
+    p_aout->sys = p_sys;
+    p_aout->pf_play = Play;
+    p_aout->pf_pause = NULL;
 
     /* Retrieve output device id from config */
     p_sys->i_device_id = var_CreateGetInteger( p_aout, "portaudio-audio-device" );
@@ -283,7 +283,7 @@ static int Open( vlc_object_t * p_this )
 static void Close ( vlc_object_t *p_this )
 {
     aout_instance_t *p_aout = (aout_instance_t *)p_this;
-    aout_sys_t *p_sys = p_aout->output.p_sys;
+    aout_sys_t *p_sys = p_aout->sys;
 
     msg_Dbg( p_aout, "closing portaudio");
 
@@ -332,7 +332,7 @@ static void Close ( vlc_object_t *p_this )
 
 static int PAOpenDevice( aout_instance_t *p_aout )
 {
-    aout_sys_t *p_sys = p_aout->output.p_sys;
+    aout_sys_t *p_sys = p_aout->sys;
     const PaDeviceInfo *p_pdi;
     PaError i_err;
     vlc_value_t val, text;
@@ -439,7 +439,7 @@ static int PAOpenDevice( aout_instance_t *p_aout )
     }
 
     /* Audio format is paFloat32 (always supported by portaudio v19) */
-    p_aout->output.output.i_format = VLC_CODEC_FL32;
+    p_aout->format.i_format = VLC_CODEC_FL32;
 
     return VLC_SUCCESS;
 
@@ -453,7 +453,7 @@ static int PAOpenDevice( aout_instance_t *p_aout )
 
 static int PAOpenStream( aout_instance_t *p_aout )
 {
-    aout_sys_t *p_sys = p_aout->output.p_sys;
+    aout_sys_t *p_sys = p_aout->sys;
     const PaHostErrorInfo* paLastHostErrorInfo = Pa_GetLastHostErrorInfo();
     PaStreamParameters paStreamParameters;
     vlc_value_t val;
@@ -467,54 +467,54 @@ static int PAOpenStream( aout_instance_t *p_aout )
 
     if( val.i_int == AOUT_VAR_5_1 )
     {
-        p_aout->output.output.i_physical_channels
+        p_aout->format.i_physical_channels
             = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
               | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT
               | AOUT_CHAN_LFE;
     }
     else if( val.i_int == AOUT_VAR_3F2R )
     {
-        p_aout->output.output.i_physical_channels
+        p_aout->format.i_physical_channels
             = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
             | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT;
     }
     else if( val.i_int == AOUT_VAR_2F2R )
     {
-        p_aout->output.output.i_physical_channels
+        p_aout->format.i_physical_channels
             = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT
             | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT;
     }
     else if( val.i_int == AOUT_VAR_MONO )
     {
-        p_aout->output.output.i_physical_channels = AOUT_CHAN_CENTER;
+        p_aout->format.i_physical_channels = AOUT_CHAN_CENTER;
     }
     else
     {
-        p_aout->output.output.i_physical_channels
+        p_aout->format.i_physical_channels
             = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
     }
 
-    i_channels = aout_FormatNbChannels( &p_aout->output.output );
+    i_channels = aout_FormatNbChannels( &p_aout->format );
     msg_Dbg( p_aout, "nb_channels requested = %d", i_channels );
-    i_channel_mask = p_aout->output.output.i_physical_channels;
+    i_channel_mask = p_aout->format.i_physical_channels;
 
     /* Calculate the frame size in bytes */
     p_sys->i_sample_size = 4 * i_channels;
-    p_aout->output.i_nb_samples = FRAME_SIZE;
-    aout_FormatPrepare( &p_aout->output.output );
+    p_aout->i_nb_samples = FRAME_SIZE;
+    aout_FormatPrepare( &p_aout->format );
     aout_VolumeSoftInit( p_aout );
 
     /* Check for channel reordering */
-    p_aout->output.p_sys->i_channel_mask = i_channel_mask;
-    p_aout->output.p_sys->i_bits_per_sample = 32; /* forced to paFloat32 */
-    p_aout->output.p_sys->i_channels = i_channels;
+    p_aout->sys->i_channel_mask = i_channel_mask;
+    p_aout->sys->i_bits_per_sample = 32; /* forced to paFloat32 */
+    p_aout->sys->i_channels = i_channels;
 
-    p_aout->output.p_sys->b_chan_reorder =
+    p_aout->sys->b_chan_reorder =
         aout_CheckChannelReorder( NULL, pi_channels_out,
                                   i_channel_mask, i_channels,
-                                  p_aout->output.p_sys->pi_chan_table );
+                                  p_aout->sys->pi_chan_table );
 
-    if( p_aout->output.p_sys->b_chan_reorder )
+    if( p_aout->sys->b_chan_reorder )
     {
         msg_Dbg( p_aout, "channel reordering needed" );
     }
@@ -527,7 +527,7 @@ static int PAOpenStream( aout_instance_t *p_aout )
     paStreamParameters.hostApiSpecificStreamInfo = NULL;
 
     i_err = Pa_OpenStream( &p_sys->p_stream, NULL /* no input */,
-                &paStreamParameters, (double)p_aout->output.output.i_rate,
+                &paStreamParameters, (double)p_aout->format.i_rate,
                 FRAME_SIZE, paClipOff, paCallback, p_sys );
     if( i_err != paNoError )
     {
@@ -586,7 +586,7 @@ static void* PORTAUDIOThread( void *data )
         pa_thread->b_signal = false;
 
         p_aout = pa_thread->p_aout;
-        p_sys = p_aout->output.p_sys;
+        p_sys = p_aout->sys;
 
         if( PAOpenDevice( p_aout ) != VLC_SUCCESS )
         {

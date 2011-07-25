@@ -91,7 +91,7 @@ static int commitVolume (vlc_object_t *obj, aout_instance_t *aout,
         aout_lock (aout);
 #warning FIXME: wrong test. Need to check that aout_output is ready.
         if (aout->p_mixer != NULL)
-            ret = aout->output.pf_volume_set (aout, vol, mute);
+            ret = aout->pf_volume_set (aout, vol, mute);
         aout_unlock (aout);
 
         if (ret == 0)
@@ -255,7 +255,7 @@ void aout_VolumeSoftInit (aout_instance_t *aout)
     audio_volume_t volume = var_InheritInteger (aout, "volume");
     bool mute = var_InheritBool (aout, "mute");
 
-    aout->output.pf_volume_set = aout_VolumeSoftSet;
+    aout->pf_volume_set = aout_VolumeSoftSet;
     aout_VolumeSoftSet (aout, volume / (float)AOUT_VOLUME_DEFAULT, mute);
 }
 
@@ -273,7 +273,7 @@ static int aout_VolumeNoneSet (aout_instance_t *aout, float volume, bool mute)
 /* Meant to be called by the output plug-in's Open(). */
 void aout_VolumeNoneInit( aout_instance_t * p_aout )
 {
-    p_aout->output.pf_volume_set = aout_VolumeNoneSet;
+    p_aout->pf_volume_set = aout_VolumeNoneSet;
 }
 
 
