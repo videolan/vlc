@@ -232,7 +232,7 @@ static int build_table(VLC *vlc, int table_nb_bits,
    'xxx_size' : gives the number of bytes of each entry of the 'bits'
    or 'codes' tables.
 
-   'wrap' and 'size' allows to use any memory configuration and types
+   'wrap' and 'size' allow using any memory configuration and types
    (byte/word/long) to store the 'bits' and 'codes' tables.
 
    'use_static' should be set to 1 for tables, which should be freed

@@ -347,7 +347,7 @@ static const char *const ppsz_force_dolby_descriptions[] = {
 #define AUDIO_TIME_STRETCH_TEXT N_( \
     "Enable time stretching audio" )
 #define AUDIO_TIME_STRETCH_LONGTEXT N_( \
-    "This allows to play audio at lower or higher speed without " \
+    "This allows playing audio at lower or higher speed without " \
     "affecting the audio pitch" )
 
 

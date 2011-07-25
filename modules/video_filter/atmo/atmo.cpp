@@ -119,7 +119,7 @@ void SaveBitmap(filter_sys_t *p_sys, uint8_t *p_pixels, char *psz_filename);
 strings for settings menus and hints
 */
 #define MODULE_DESCRIPTION N_ ( \
- "This module allows to control an so called AtmoLight device "\
+ "This module allows controlling an so called AtmoLight device "\
  "connected to your computer.\n"\
  "AtmoLight is the homegrown version of what Philips calls AmbiLight.\n"\
  "If you need further information feel free to visit us at\n\n"\

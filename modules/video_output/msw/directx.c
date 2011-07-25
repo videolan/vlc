@@ -66,7 +66,7 @@
 #define SYSMEM_TEXT N_("Use video buffers in system memory")
 #define SYSMEM_LONGTEXT N_(\
     "Create video buffers in system memory instead of video memory. This " \
-    "isn't recommended as usually using video memory allows to benefit from " \
+    "isn't recommended as usually using video memory allows benefiting from " \
     "more hardware acceleration (like rescaling or YUV->RGB conversions). " \
     "This option doesn't have any effect when using overlays.")
 

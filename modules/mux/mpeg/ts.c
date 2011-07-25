@@ -111,7 +111,7 @@ static void    Close  ( vlc_object_t * );
 
 #define PID_TEXT N_("Set PID to ID of ES")
 #define PID_LONGTEXT N_("Sets PID to the ID if the incoming ES. This is for " \
-  "use with --ts-es-id-pid, and allows to have the same PIDs in the input " \
+  "use with --ts-es-id-pid, and allows having the same PIDs in the input " \
   "and output streams.")
 
 #define ALIGNMENT_TEXT N_("Data alignment")

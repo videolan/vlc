@@ -94,7 +94,7 @@ static int FilterCallback ( vlc_object_t *, char const *,
                         " that the line is black.")
 
 #define SKIP_TEXT N_("Skip percentage (%)")
-#define SKIP_LONGTEXT N_("Percentage of the line to consider while checking for black lines. This allows to skip logos in black borders and crop them anyway.")
+#define SKIP_LONGTEXT N_("Percentage of the line to consider while checking for black lines. This allows skipping logos in black borders and crop them anyway.")
 
 #define LUM_TEXT N_("Luminance threshold ")
 #define LUM_LONGTEXT N_("Maximum luminance to consider a pixel as black (0-255).")

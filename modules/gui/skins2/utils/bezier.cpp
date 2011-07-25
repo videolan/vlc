@@ -90,7 +90,7 @@ Bezier::Bezier( intf_thread_t *p_intf, const vector<float> &rAbscissas,
     m_nbPoints = m_leftVect.size();
 
     // If we have only one control point, we duplicate it
-    // This allows to simplify the algorithms used in the class
+    // This allows simplifying the algorithms used in the class
     if( m_nbPoints == 1 )
     {
         m_leftVect.push_back( m_leftVect[0] );

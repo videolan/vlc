@@ -71,12 +71,12 @@ void    input_clock_Reset( input_clock_t * );
 mtime_t input_clock_GetWakeup( input_clock_t * );
 
 /**
- * This functions allows to change the actual reading speed.
+ * This functions allows changing the actual reading speed.
  */
 void    input_clock_ChangeRate( input_clock_t *, int i_rate );
 
 /**
- * This function allows to change the pause status.
+ * This function allows changing the pause status.
  */
 void    input_clock_ChangePause( input_clock_t *, bool b_paused, mtime_t i_date );
 
@@ -87,7 +87,7 @@ void    input_clock_ChangePause( input_clock_t *, bool b_paused, mtime_t i_date 
 void    input_clock_GetSystemOrigin( input_clock_t *, mtime_t *pi_system, mtime_t *pi_delay );
 
 /**
- * This function allows to rebase the original system value date (a valid
+ * This function allows rebasing the original system value date (a valid
  * reference point must have been set).
  * When using the absolute mode, it will create a discontinuity unless
  * called imediatly after a input_clock_Update.

@@ -225,7 +225,7 @@ static void * fast_memcpy(void * to, const void * from, size_t len)
     else
     /*
        Only if SRC is aligned on 16-byte boundary.
-       It allows to use movaps instead of movups, which required data
+       It allows using movaps instead of movups, which required data
        to be aligned or a general-protection exception (#GP) is generated.
     */
     for(; i>0; i--)
