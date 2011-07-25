@@ -261,7 +261,7 @@ typedef struct es_format_t es_format_t;
 typedef struct video_palette_t video_palette_t;
 
 /* Audio */
-typedef struct aout_instance_t aout_instance_t;
+typedef struct audio_output audio_output_t;
 typedef struct aout_sys_t aout_sys_t;
 typedef struct aout_fifo_t aout_fifo_t;
 typedef struct aout_input_t aout_input_t;

@@ -440,11 +440,11 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
 
         case INPUT_GET_AOUT:
         {
-            aout_instance_t *p_aout = input_resource_HoldAout( p_input->p->p_resource );
+            audio_output_t *p_aout = input_resource_HoldAout( p_input->p->p_resource );
             if( !p_aout )
                 return VLC_EGENERIC;
 
-            aout_instance_t **pp_aout = (aout_instance_t**)va_arg( args, aout_instance_t** );
+            audio_output_t **pp_aout = (audio_output_t**)va_arg( args, audio_output_t** );
             *pp_aout = p_aout;
             return VLC_SUCCESS;
         }
@@ -465,7 +465,7 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
             const int i_id = va_arg( args, int );
             vlc_object_t    **pp_decoder = va_arg( args, vlc_object_t ** );
             vout_thread_t   **pp_vout    = va_arg( args, vout_thread_t ** );
-            aout_instance_t **pp_aout    = va_arg( args, aout_instance_t ** );
+            audio_output_t **pp_aout    = va_arg( args, audio_output_t ** );
 
             return es_out_Control( p_input->p->p_es_out_display, ES_OUT_GET_ES_OBJECTS_BY_ID, i_id,
                                    pp_decoder, pp_vout, pp_aout );

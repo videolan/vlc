@@ -41,7 +41,7 @@
  *****************************************************************************
  * Please note that you must hold the mixer lock.
  *****************************************************************************/
-int aout_MixerNew( aout_instance_t * p_aout )
+int aout_MixerNew( audio_output_t * p_aout )
 {
     assert( !p_aout->p_mixer );
     vlc_assert_locked( &p_aout->lock );
@@ -73,7 +73,7 @@ int aout_MixerNew( aout_instance_t * p_aout )
  *****************************************************************************
  * Please note that you must hold the mixer lock.
  *****************************************************************************/
-void aout_MixerDelete( aout_instance_t * p_aout )
+void aout_MixerDelete( audio_output_t * p_aout )
 {
     vlc_assert_locked( &p_aout->lock );
 
@@ -90,7 +90,7 @@ void aout_MixerDelete( aout_instance_t * p_aout )
  *****************************************************************************
  * Please note that you must hold the mixer lock.
  *****************************************************************************/
-static int MixBuffer( aout_instance_t * p_aout, float volume )
+static int MixBuffer( audio_output_t * p_aout, float volume )
 {
     aout_mixer_t *p_mixer = p_aout->p_mixer;
     aout_mixer_input_t *p_input = p_mixer->input;
@@ -257,7 +257,7 @@ static int MixBuffer( aout_instance_t * p_aout, float volume )
  *****************************************************************************
  * Please note that you must hold the mixer lock.
  *****************************************************************************/
-void aout_MixerRun( aout_instance_t * p_aout, float volume )
+void aout_MixerRun( audio_output_t * p_aout, float volume )
 {
     while( MixBuffer( p_aout, volume ) != -1 );
 }

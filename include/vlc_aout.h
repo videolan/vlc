@@ -167,7 +167,7 @@ struct aout_fifo_t
 struct aout_mixer_t;
 
 /** Audio output object */
-struct aout_instance_t
+struct audio_output
 {
     VLC_COMMON_MEMBERS
 
@@ -198,10 +198,10 @@ struct aout_instance_t
 
     struct module_t *module; /**< Output plugin */
     struct aout_sys_t *sys; /**< Output plugin private data */
-    void (*pf_play)( aout_instance_t * ); /**< Audio buffer callback */
-    void (* pf_pause)( aout_instance_t *, bool, mtime_t ); /**< Pause/resume
+    void (*pf_play)( audio_output_t * ); /**< Audio buffer callback */
+    void (* pf_pause)( audio_output_t *, bool, mtime_t ); /**< Pause/resume
         callback (optional, may be NULL) */
-    int (* pf_volume_set )(aout_instance_t *, float, bool); /**< Volume setter
+    int (* pf_volume_set )(audio_output_t *, float, bool); /**< Volume setter
         (optional, may be NULL) */
     int                     i_nb_samples;
 };
@@ -221,7 +221,7 @@ static const uint32_t pi_vlc_chan_order_wg4[] =
  * Prototypes
  *****************************************************************************/
 
-VLC_API aout_buffer_t * aout_OutputNextBuffer( aout_instance_t *, mtime_t, bool ) VLC_USED;
+VLC_API aout_buffer_t * aout_OutputNextBuffer( audio_output_t *, mtime_t, bool ) VLC_USED;
 
 /**
  * This function computes the reordering needed to go from pi_chan_order_in to
@@ -267,15 +267,15 @@ static inline unsigned aout_FormatNbChannels(const audio_sample_format_t *fmt)
 
 VLC_API unsigned int aout_BitsPerSample( vlc_fourcc_t i_format ) VLC_USED;
 VLC_API void aout_FormatPrepare( audio_sample_format_t * p_format );
-VLC_API void aout_FormatPrint( aout_instance_t * p_aout, const char * psz_text, const audio_sample_format_t * p_format );
+VLC_API void aout_FormatPrint( audio_output_t * p_aout, const char * psz_text, const audio_sample_format_t * p_format );
 VLC_API const char * aout_FormatPrintChannels( const audio_sample_format_t * ) VLC_USED;
 
 VLC_API mtime_t aout_FifoFirstDate( const aout_fifo_t * ) VLC_USED;
 VLC_API aout_buffer_t *aout_FifoPop( aout_fifo_t * p_fifo ) VLC_USED;
 
 /* From intf.c : */
-VLC_API void aout_VolumeSoftInit( aout_instance_t * );
-VLC_API void aout_VolumeNoneInit( aout_instance_t * );
+VLC_API void aout_VolumeSoftInit( audio_output_t * );
+VLC_API void aout_VolumeNoneInit( audio_output_t * );
 VLC_API int aout_ChannelsRestart( vlc_object_t *, const char *, vlc_value_t, vlc_value_t, void * );
 
 /* */

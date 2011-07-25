@@ -415,7 +415,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
         if( [o_mi_videotrack isEnabled] == YES )
             [o_mi_subtitle setEnabled: YES];
 
-        aout_instance_t * p_aout = input_GetAout( p_input );
+        audio_output_t * p_aout = input_GetAout( p_input );
         if( p_aout != NULL )
         {
             [self setupVarMenuItem: o_mi_channels target: (vlc_object_t *)p_aout

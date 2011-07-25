@@ -108,17 +108,17 @@ struct aout_sys_t
  * Local prototypes.
  *****************************************************************************/
 static int      Open                    ( vlc_object_t * );
-static int      OpenAnalog              ( aout_instance_t * );
-static int      OpenSPDIF               ( aout_instance_t * );
+static int      OpenAnalog              ( audio_output_t * );
+static int      OpenSPDIF               ( audio_output_t * );
 static void     Close                   ( vlc_object_t * );
 
-static void     Play                    ( aout_instance_t * );
-static void     Probe                   ( aout_instance_t * );
+static void     Play                    ( audio_output_t * );
+static void     Probe                   ( audio_output_t * );
 
 static int      AudioDeviceHasOutput    ( AudioDeviceID );
-static int      AudioDeviceSupportsDigital( aout_instance_t *, AudioDeviceID );
-static int      AudioStreamSupportsDigital( aout_instance_t *, AudioStreamID );
-static int      AudioStreamChangeFormat ( aout_instance_t *, AudioStreamID, AudioStreamBasicDescription );
+static int      AudioDeviceSupportsDigital( audio_output_t *, AudioDeviceID );
+static int      AudioStreamSupportsDigital( audio_output_t *, AudioStreamID );
+static int      AudioStreamChangeFormat ( audio_output_t *, AudioStreamID, AudioStreamBasicDescription );
 
 static OSStatus RenderCallbackAnalog    ( vlc_object_t *, AudioUnitRenderActionFlags *, const AudioTimeStamp *,
                                           unsigned int, unsigned int, AudioBufferList *);
@@ -158,7 +158,7 @@ static int Open( vlc_object_t * p_this )
     UInt32                  i_param_size = 0;
     struct aout_sys_t       *p_sys = NULL;
     vlc_value_t             val;
-    aout_instance_t         *p_aout = (aout_instance_t *)p_this;
+    audio_output_t         *p_aout = (audio_output_t *)p_this;
 
     /* Use int here, to match kAudioDevicePropertyDeviceIsAlive
      * property size */
@@ -290,7 +290,7 @@ error:
 /*****************************************************************************
  * Open: open and setup a HAL AudioUnit to do analog (multichannel) audio output
  *****************************************************************************/
-static int OpenAnalog( aout_instance_t *p_aout )
+static int OpenAnalog( audio_output_t *p_aout )
 {
     struct aout_sys_t           *p_sys = p_aout->sys;
     OSStatus                    err = noErr;
@@ -606,7 +606,7 @@ static int OpenAnalog( aout_instance_t *p_aout )
 /*****************************************************************************
  * Setup a encoded digital stream (SPDIF)
  *****************************************************************************/
-static int OpenSPDIF( aout_instance_t * p_aout )
+static int OpenSPDIF( audio_output_t * p_aout )
 {
     struct aout_sys_t       *p_sys = p_aout->sys;
     OSStatus                err = noErr;
@@ -826,7 +826,7 @@ static int OpenSPDIF( aout_instance_t * p_aout )
  *****************************************************************************/
 static void Close( vlc_object_t * p_this )
 {
-    aout_instance_t     *p_aout = (aout_instance_t *)p_this;
+    audio_output_t     *p_aout = (audio_output_t *)p_this;
     struct aout_sys_t   *p_sys = p_aout->sys;
     OSStatus            err = noErr;
     UInt32              i_param_size = 0;
@@ -909,7 +909,7 @@ static void Close( vlc_object_t * p_this )
 /*****************************************************************************
  * Play: nothing to do
  *****************************************************************************/
-static void Play( aout_instance_t * p_aout )
+static void Play( audio_output_t * p_aout )
 {
     VLC_UNUSED(p_aout);
 }
@@ -918,7 +918,7 @@ static void Play( aout_instance_t * p_aout )
 /*****************************************************************************
  * Probe: Check which devices the OS has, and add them to our audio-device menu
  *****************************************************************************/
-static void Probe( aout_instance_t * p_aout )
+static void Probe( audio_output_t * p_aout )
 {
     OSStatus            err = noErr;
     UInt32              i_param_size = 0;
@@ -1074,7 +1074,7 @@ static int AudioDeviceHasOutput( AudioDeviceID i_dev_id )
 /*****************************************************************************
  * AudioDeviceSupportsDigital: Check i_dev_id for digital stream support.
  *****************************************************************************/
-static int AudioDeviceSupportsDigital( aout_instance_t *p_aout, AudioDeviceID i_dev_id )
+static int AudioDeviceSupportsDigital( audio_output_t *p_aout, AudioDeviceID i_dev_id )
 {
     OSStatus                    err = noErr;
     UInt32                      i_param_size = 0;
@@ -1116,7 +1116,7 @@ static int AudioDeviceSupportsDigital( aout_instance_t *p_aout, AudioDeviceID i_
 /*****************************************************************************
  * AudioStreamSupportsDigital: Check i_stream_id for digital stream support.
  *****************************************************************************/
-static int AudioStreamSupportsDigital( aout_instance_t *p_aout, AudioStreamID i_stream_id )
+static int AudioStreamSupportsDigital( audio_output_t *p_aout, AudioStreamID i_stream_id )
 {
     OSStatus                    err = noErr;
     UInt32                      i_param_size = 0;
@@ -1167,7 +1167,7 @@ static int AudioStreamSupportsDigital( aout_instance_t *p_aout, AudioStreamID i_
 /*****************************************************************************
  * AudioStreamChangeFormat: Change i_stream_id to change_format
  *****************************************************************************/
-static int AudioStreamChangeFormat( aout_instance_t *p_aout, AudioStreamID i_stream_id, AudioStreamBasicDescription change_format )
+static int AudioStreamChangeFormat( audio_output_t *p_aout, AudioStreamID i_stream_id, AudioStreamBasicDescription change_format )
 {
     OSStatus            err = noErr;
     UInt32              i_param_size = 0;
@@ -1261,7 +1261,7 @@ static OSStatus RenderCallbackAnalog( vlc_object_t *_p_aout,
     mtime_t         current_date = 0;
     uint32_t        i_mData_bytes = 0;
 
-    aout_instance_t * p_aout = (aout_instance_t *)_p_aout;
+    audio_output_t * p_aout = (audio_output_t *)_p_aout;
     struct aout_sys_t * p_sys = p_aout->sys;
 
     VLC_UNUSED(ioActionFlags);
@@ -1358,7 +1358,7 @@ static OSStatus RenderCallbackSPDIF( AudioDeviceID inDevice,
     aout_buffer_t * p_buffer;
     mtime_t         current_date;
 
-    aout_instance_t * p_aout = (aout_instance_t *)threadGlobals;
+    audio_output_t * p_aout = (audio_output_t *)threadGlobals;
     struct aout_sys_t * p_sys = p_aout->sys;
 
     VLC_UNUSED(inDevice);
@@ -1401,7 +1401,7 @@ static OSStatus RenderCallbackSPDIF( AudioDeviceID inDevice,
 static OSStatus HardwareListener( AudioObjectID inObjectID,  UInt32 inNumberAddresses, const AudioObjectPropertyAddress inAddresses[], void*inClientData)
 {
     OSStatus err = noErr;
-    aout_instance_t     *p_aout = (aout_instance_t *)inClientData;
+    audio_output_t     *p_aout = (audio_output_t *)inClientData;
     VLC_UNUSED(inObjectID);
 
     for ( unsigned int i = 0; i < inNumberAddresses; i++ )
@@ -1446,7 +1446,7 @@ static OSStatus StreamListener( AudioObjectID inObjectID,  UInt32 inNumberAddres
 static int AudioDeviceCallback( vlc_object_t *p_this, const char *psz_variable,
                      vlc_value_t old_val, vlc_value_t new_val, void *param )
 {
-    aout_instance_t *p_aout = (aout_instance_t *)p_this;
+    audio_output_t *p_aout = (audio_output_t *)p_this;
     var_Set( p_aout->p_libvlc, "macosx-audio-device", new_val );
     msg_Dbg( p_aout, "Set Device: %#"PRIx64, new_val.i_int );
     return aout_ChannelsRestart( p_this, psz_variable, old_val, new_val, param );

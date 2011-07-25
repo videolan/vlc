@@ -434,7 +434,7 @@ typedef enum input_event_type_e
     /* cache" has changed */
     INPUT_EVENT_CACHE,
 
-    /* A aout_instance_t object has been created/deleted by *the input* */
+    /* A audio_output_t object has been created/deleted by *the input* */
     INPUT_EVENT_AOUT,
     /* A vout_thread_t object has been created/deleted by *the input* */
     INPUT_EVENT_VOUT,
@@ -511,9 +511,9 @@ enum input_query_e
 
     /* Input ressources
      * XXX You must call vlc_object_release as soon as possible */
-    INPUT_GET_AOUT,         /* arg1=aout_instance_t **              res=can fail */
+    INPUT_GET_AOUT,         /* arg1=audio_output_t **              res=can fail */
     INPUT_GET_VOUTS,        /* arg1=vout_thread_t ***, size_t *        res=can fail */
-    INPUT_GET_ES_OBJECTS,   /* arg1=int id, vlc_object_t **dec, vout_thread_t **, aout_instance_t ** */
+    INPUT_GET_ES_OBJECTS,   /* arg1=int id, vlc_object_t **dec, vout_thread_t **, audio_output_t ** */
 
     /* External clock managments */
     INPUT_GET_PCR_SYSTEM,   /* arg1=mtime_t *, arg2=mtime_t *       res=can fail */
@@ -603,9 +603,9 @@ static inline vout_thread_t *input_GetVout( input_thread_t *p_input )
  * @return NULL on error, or the audio output (which needs to be
  * released with vlc_object_release()).
  */
-static inline aout_instance_t *input_GetAout( input_thread_t *p_input )
+static inline audio_output_t *input_GetAout( input_thread_t *p_input )
 {
-     aout_instance_t *p_aout;
+     audio_output_t *p_aout;
      return input_Control( p_input, INPUT_GET_AOUT, &p_aout ) ? NULL : p_aout;
 }
 
@@ -617,7 +617,7 @@ static inline aout_instance_t *input_GetAout( input_thread_t *p_input )
  */
 static inline int input_GetEsObjects( input_thread_t *p_input, int i_id,
                                       vlc_object_t **pp_decoder,
-                                      vout_thread_t **pp_vout, aout_instance_t **pp_aout )
+                                      vout_thread_t **pp_vout, audio_output_t **pp_aout )
 {
     return input_Control( p_input, INPUT_GET_ES_OBJECTS, i_id,
                           pp_decoder, pp_vout, pp_aout );

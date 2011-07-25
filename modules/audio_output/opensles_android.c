@@ -75,7 +75,7 @@ typedef SLresult (*slCreateEngine_t)(
  *****************************************************************************/
 static int  Open        ( vlc_object_t * );
 static void Close       ( vlc_object_t * );
-static void Play        ( aout_instance_t * );
+static void Play        ( audio_output_t * );
 static void PlayedCallback ( SLAndroidSimpleBufferQueueItf caller,  void *pContext);
 
 /*****************************************************************************
@@ -135,7 +135,7 @@ static void Clear( aout_sys_t *p_sys )
  *****************************************************************************/
 static int Open( vlc_object_t * p_this )
 {
-    aout_instance_t     *p_aout = (aout_instance_t *)p_this;
+    audio_output_t     *p_aout = (audio_output_t *)p_this;
     SLresult            result;
 
     /* Allocate structure */
@@ -275,7 +275,7 @@ error:
  *****************************************************************************/
 static void Close( vlc_object_t * p_this )
 {
-    aout_instance_t *p_aout = (aout_instance_t *)p_this;
+    audio_output_t *p_aout = (audio_output_t *)p_this;
     aout_sys_t      *p_sys = p_aout->sys;
 
     msg_Dbg( p_aout, "Closing OpenSLES" );
@@ -290,7 +290,7 @@ static void Close( vlc_object_t * p_this )
 /*****************************************************************************
  * Play: play a sound
  *****************************************************************************/
-static void Play( aout_instance_t * p_aout )
+static void Play( audio_output_t * p_aout )
 {
     aout_sys_t * p_sys = p_aout->sys;
     aout_buffer_t *p_buffer;

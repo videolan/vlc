@@ -120,7 +120,7 @@ static VLCAudioEffects *_o_sharedInstance = nil;
 - (void)setAudioFilter: (char *)psz_name on:(BOOL)b_on
 {
     char *psz_tmp;
-    aout_instance_t * p_aout = getAout();
+    audio_output_t * p_aout = getAout();
     if( p_aout )
         psz_tmp = var_GetNonEmptyString( p_aout, "audio-filter" );
     else
@@ -425,7 +425,7 @@ static bool GetEqualizerStatus( intf_thread_t *p_custom_intf,
 - (IBAction)eq_twopass:(id)sender
 {
     bool b_2p = [sender state] ? true : false;
-    aout_instance_t *p_aout = getAout();
+    audio_output_t *p_aout = getAout();
     vlc_object_t *p_object= VLC_OBJECT(p_aout);
     if( p_object == NULL )
         p_object = vlc_object_hold(pl_Get( p_intf ));
@@ -480,7 +480,7 @@ static bool GetEqualizerStatus( intf_thread_t *p_custom_intf,
     config_PutFloat( p_intf, "compressor-knee", 2.500000 );
     config_PutFloat( p_intf, "compressor-makeup-gain", 7.000000 );
 
-    aout_instance_t * p_aout = getAout();
+    audio_output_t * p_aout = getAout();
     if (p_aout) {
         var_SetFloat( p_aout, "compressor-rms-peak", 0.000000 );
         var_SetFloat( p_aout, "compressor-attack", 25.000000 );
@@ -501,7 +501,7 @@ static bool GetEqualizerStatus( intf_thread_t *p_custom_intf,
 
 - (IBAction)comp_sliderUpdated:(id)sender
 {
-    aout_instance_t * p_aout = getAout();
+    audio_output_t * p_aout = getAout();
     char * value;
     if( sender == o_comp_band1_sld )
         value = "compressor-rms-peak";
@@ -573,7 +573,7 @@ static bool GetEqualizerStatus( intf_thread_t *p_custom_intf,
     config_PutFloat( p_intf, "spatializer-dry", 2.000000 );
     config_PutFloat( p_intf, "spatializer-damp", 1.000000 );
 
-    aout_instance_t * p_aout = getAout();
+    audio_output_t * p_aout = getAout();
     if (p_aout) {
         var_SetFloat( p_aout, "spatializer-roomsize", 1.050000 );
         var_SetFloat( p_aout, "spatializer-width", 10.000000 );
@@ -592,7 +592,7 @@ static bool GetEqualizerStatus( intf_thread_t *p_custom_intf,
 
 - (IBAction)spat_sliderUpdated:(id)sender
 {
-    aout_instance_t * p_aout = getAout();
+    audio_output_t * p_aout = getAout();
     char * value;
     if( sender == o_spat_band1_sld )
         value = "spatializer-roomsize";
@@ -653,7 +653,7 @@ static bool GetEqualizerStatus( intf_thread_t *p_custom_intf,
 
 - (IBAction)filter_volNormSliderUpdated:(id)sender
 {
-    aout_instance_t * p_aout= getAout();
+    audio_output_t * p_aout= getAout();
 
     if( p_aout )
     {

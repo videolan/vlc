@@ -108,6 +108,6 @@ size_t input_DecoderGetFifoSize( decoder_t *p_dec );
  *
  * They must be released using vlc_object_release().
  */
-void input_DecoderGetObjects( decoder_t *, vout_thread_t **, aout_instance_t ** );
+void input_DecoderGetObjects( decoder_t *, vout_thread_t **, audio_output_t ** );
 
 #endif

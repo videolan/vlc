@@ -259,7 +259,7 @@ public:
     }
 
     vout_thread_t* getVout();
-    aout_instance_t *getAout();
+    audio_output_t *getAout();
 
     bool getPlayExitState();
 private:

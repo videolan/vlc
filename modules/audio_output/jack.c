@@ -62,7 +62,7 @@ struct aout_sys_t
  *****************************************************************************/
 static int  Open         ( vlc_object_t * );
 static void Close        ( vlc_object_t * );
-static void Play         ( aout_instance_t * );
+static void Play         ( audio_output_t * );
 static int  Process      ( jack_nframes_t i_frames, void *p_arg );
 static int  GraphChange  ( void *p_arg );
 
@@ -100,7 +100,7 @@ vlc_module_end ()
 static int Open( vlc_object_t *p_this )
 {
     char psz_name[32];
-    aout_instance_t *p_aout = (aout_instance_t *)p_this;
+    audio_output_t *p_aout = (audio_output_t *)p_this;
     struct aout_sys_t *p_sys = NULL;
     int status = VLC_SUCCESS;
     unsigned int i;
@@ -250,7 +250,7 @@ error_out:
 int Process( jack_nframes_t i_frames, void *p_arg )
 {
     unsigned int i, j, i_nb_samples = 0;
-    aout_instance_t *p_aout = (aout_instance_t*) p_arg;
+    audio_output_t *p_aout = (audio_output_t*) p_arg;
     struct aout_sys_t *p_sys = p_aout->sys;
     jack_sample_t *p_src = NULL;
 
@@ -311,7 +311,7 @@ int Process( jack_nframes_t i_frames, void *p_arg )
 
 static int GraphChange( void *p_arg )
 {
-  aout_instance_t *p_aout = (aout_instance_t*) p_arg;
+  audio_output_t *p_aout = (audio_output_t*) p_arg;
   struct aout_sys_t *p_sys = p_aout->sys;
   unsigned int i;
   jack_nframes_t port_latency;
@@ -333,7 +333,7 @@ static int GraphChange( void *p_arg )
 /*****************************************************************************
  * Play: nothing to do
  *****************************************************************************/
-static void Play( aout_instance_t *p_aout )
+static void Play( audio_output_t *p_aout )
 {
     VLC_UNUSED( p_aout );
 }
@@ -344,7 +344,7 @@ static void Play( aout_instance_t *p_aout )
 static void Close( vlc_object_t *p_this )
 {
     int i_error;
-    aout_instance_t *p_aout = (aout_instance_t *)p_this;
+    audio_output_t *p_aout = (audio_output_t *)p_this;
     struct aout_sys_t *p_sys = p_aout->sys;
 
     i_error = jack_deactivate( p_sys->p_jack_client );

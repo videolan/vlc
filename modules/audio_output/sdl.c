@@ -58,7 +58,7 @@ struct aout_sys_t
  *****************************************************************************/
 static int  Open        ( vlc_object_t * );
 static void Close       ( vlc_object_t * );
-static void Play        ( aout_instance_t * );
+static void Play        ( audio_output_t * );
 static void SDLCallback ( void *, uint8_t *, int );
 
 /*****************************************************************************
@@ -79,7 +79,7 @@ vlc_module_end ()
  *****************************************************************************/
 static int Open ( vlc_object_t *p_this )
 {
-    aout_instance_t *p_aout = (aout_instance_t *)p_this;
+    audio_output_t *p_aout = (audio_output_t *)p_this;
     SDL_AudioSpec desired, obtained;
     int i_nb_channels;
     vlc_value_t val, text;
@@ -223,7 +223,7 @@ static int Open ( vlc_object_t *p_this )
 /*****************************************************************************
  * Play: play a sound samples buffer
  *****************************************************************************/
-static void Play( aout_instance_t * p_aout )
+static void Play( audio_output_t * p_aout )
 {
     VLC_UNUSED(p_aout);
 }
@@ -244,7 +244,7 @@ static void Close ( vlc_object_t *p_this )
  *****************************************************************************/
 static void SDLCallback( void * _p_aout, uint8_t * p_stream, int i_len )
 {
-    aout_instance_t * p_aout = (aout_instance_t *)_p_aout;
+    audio_output_t * p_aout = (audio_output_t *)_p_aout;
     aout_buffer_t *   p_buffer;
 
     /* SDL is unable to call us at regular times, or tell us its current

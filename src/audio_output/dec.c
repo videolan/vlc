@@ -41,7 +41,7 @@
 /**
  * Creates an audio output
  */
-aout_input_t *aout_DecNew( aout_instance_t *p_aout,
+aout_input_t *aout_DecNew( audio_output_t *p_aout,
                            audio_sample_format_t *p_format,
                            const audio_replay_gain_t *p_replay_gain,
                            const aout_request_vout_t *p_request_vout )
@@ -124,7 +124,7 @@ out:
 /*****************************************************************************
  * aout_DecDelete : delete a decoder
  *****************************************************************************/
-void aout_DecDelete( aout_instance_t * p_aout, aout_input_t * p_input )
+void aout_DecDelete( audio_output_t * p_aout, aout_input_t * p_input )
 {
     aout_lock( p_aout );
     /* Remove the input. */
@@ -166,7 +166,7 @@ aout_buffer_t * aout_DecNewBuffer( aout_input_t * p_input,
 /*****************************************************************************
  * aout_DecDeleteBuffer : destroy an undecoded buffer
  *****************************************************************************/
-void aout_DecDeleteBuffer( aout_instance_t * p_aout, aout_input_t * p_input,
+void aout_DecDeleteBuffer( audio_output_t * p_aout, aout_input_t * p_input,
                            aout_buffer_t * p_buffer )
 {
     (void)p_aout; (void)p_input;
@@ -176,7 +176,7 @@ void aout_DecDeleteBuffer( aout_instance_t * p_aout, aout_input_t * p_input,
 /*****************************************************************************
  * aout_DecPlay : filter & mix the decoded buffer
  *****************************************************************************/
-int aout_DecPlay( aout_instance_t * p_aout, aout_input_t * p_input,
+int aout_DecPlay( audio_output_t * p_aout, aout_input_t * p_input,
                   aout_buffer_t * p_buffer, int i_input_rate )
 {
     assert( i_input_rate >= INPUT_RATE_DEFAULT / AOUT_MAX_INPUT_RATE &&
@@ -203,7 +203,7 @@ int aout_DecPlay( aout_instance_t * p_aout, aout_input_t * p_input,
     return 0;
 }
 
-int aout_DecGetResetLost( aout_instance_t *p_aout, aout_input_t *p_input )
+int aout_DecGetResetLost( audio_output_t *p_aout, aout_input_t *p_input )
 {
     int val;
 
@@ -215,7 +215,7 @@ int aout_DecGetResetLost( aout_instance_t *p_aout, aout_input_t *p_input )
     return val;
 }
 
-void aout_DecChangePause( aout_instance_t *p_aout, aout_input_t *p_input, bool b_paused, mtime_t i_date )
+void aout_DecChangePause( audio_output_t *p_aout, aout_input_t *p_input, bool b_paused, mtime_t i_date )
 {
     mtime_t i_duration = 0;
 
@@ -240,14 +240,14 @@ void aout_DecChangePause( aout_instance_t *p_aout, aout_input_t *p_input, bool b
     aout_unlock( p_aout );
 }
 
-void aout_DecFlush( aout_instance_t *p_aout, aout_input_t *p_input )
+void aout_DecFlush( audio_output_t *p_aout, aout_input_t *p_input )
 {
     aout_lock( p_aout );
     aout_FifoSet( &p_input->mixer.fifo, 0 );
     aout_unlock( p_aout );
 }
 
-bool aout_DecIsEmpty( aout_instance_t * p_aout, aout_input_t * p_input )
+bool aout_DecIsEmpty( audio_output_t * p_aout, aout_input_t * p_input )
 {
     mtime_t end_date;
 

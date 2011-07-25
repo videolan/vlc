@@ -515,7 +515,7 @@ bool InputManager::hasVisualisation()
     if( !p_input )
         return false;
 
-    aout_instance_t *aout = input_GetAout( p_input );
+    audio_output_t *aout = input_GetAout( p_input );
     if( !aout )
         return false;
 
@@ -991,7 +991,7 @@ vout_thread_t* MainInputManager::getVout()
     return p_input ? input_GetVout( p_input ) : NULL;
 }
 
-aout_instance_t * MainInputManager::getAout()
+audio_output_t * MainInputManager::getAout()
 {
     return p_input ? input_GetAout( p_input ) : NULL;
 }

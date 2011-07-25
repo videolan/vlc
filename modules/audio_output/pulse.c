@@ -75,7 +75,7 @@ struct aout_sys_t
 static void sink_list_cb(pa_context *c, const pa_sink_info *i, int eol,
                          void *userdata)
 {
-    aout_instance_t *aout = userdata;
+    audio_output_t *aout = userdata;
     vlc_value_t val, text;
 
     if (eol)
@@ -92,7 +92,7 @@ static void sink_list_cb(pa_context *c, const pa_sink_info *i, int eol,
 static void sink_info_cb(pa_context *c, const pa_sink_info *i, int eol,
                          void *userdata)
 {
-    aout_instance_t *aout = userdata;
+    audio_output_t *aout = userdata;
     aout_sys_t *sys = aout->sys;
 
     if (eol)
@@ -112,7 +112,7 @@ static void sink_info_cb(pa_context *c, const pa_sink_info *i, int eol,
 }
 
 /*** Stream helpers ***/
-static void stream_reset_sync(pa_stream *s, aout_instance_t *aout)
+static void stream_reset_sync(pa_stream *s, audio_output_t *aout)
 {
     aout_sys_t *sys = aout->sys;
     const unsigned rate = aout->format.i_rate;
@@ -142,7 +142,7 @@ static void stream_state_cb(pa_stream *s, void *userdata)
 /* Latency management and lip synchronization */
 static void stream_latency_cb(pa_stream *s, void *userdata)
 {
-    aout_instance_t *aout = userdata;
+    audio_output_t *aout = userdata;
     aout_sys_t *sys = aout->sys;
     mtime_t delta, change;
 
@@ -221,7 +221,7 @@ static void stream_latency_cb(pa_stream *s, void *userdata)
 
 static void stream_moved_cb(pa_stream *s, void *userdata)
 {
-    aout_instance_t *aout = userdata;
+    audio_output_t *aout = userdata;
     aout_sys_t *sys = aout->sys;
     pa_operation *op;
     uint32_t idx = pa_stream_get_device_index(s);
@@ -240,7 +240,7 @@ static void stream_moved_cb(pa_stream *s, void *userdata)
 
 static void stream_overflow_cb(pa_stream *s, void *userdata)
 {
-    aout_instance_t *aout = userdata;
+    audio_output_t *aout = userdata;
 
     msg_Err(aout, "overflow");
     (void) s;
@@ -248,7 +248,7 @@ static void stream_overflow_cb(pa_stream *s, void *userdata)
 
 static void stream_started_cb(pa_stream *s, void *userdata)
 {
-    aout_instance_t *aout = userdata;
+    audio_output_t *aout = userdata;
 
     msg_Dbg(aout, "started");
     (void) s;
@@ -256,7 +256,7 @@ static void stream_started_cb(pa_stream *s, void *userdata)
 
 static void stream_suspended_cb(pa_stream *s, void *userdata)
 {
-    aout_instance_t *aout = userdata;
+    audio_output_t *aout = userdata;
 
     msg_Dbg(aout, "suspended");
     stream_reset_sync(s, aout);
@@ -264,7 +264,7 @@ static void stream_suspended_cb(pa_stream *s, void *userdata)
 
 static void stream_underflow_cb(pa_stream *s, void *userdata)
 {
-    aout_instance_t *aout = userdata;
+    audio_output_t *aout = userdata;
     pa_operation *op;
 
     msg_Warn(aout, "underflow");
@@ -323,7 +323,7 @@ static void *data_convert(block_t **pp)
 /**
  * Queue one audio frame to the playabck stream
  */
-static void Play(aout_instance_t *aout)
+static void Play(audio_output_t *aout)
 {
     aout_sys_t *sys = aout->sys;
     pa_stream *s = sys->stream;
@@ -411,7 +411,7 @@ static void Play(aout_instance_t *aout)
 /**
  * Cork or uncork the playback stream
  */
-static void Pause(aout_instance_t *aout, bool b_paused, mtime_t i_date)
+static void Pause(audio_output_t *aout, bool b_paused, mtime_t i_date)
 {
     aout_sys_t *sys = aout->sys;
     pa_stream *s = sys->stream;
@@ -430,7 +430,7 @@ static void Pause(aout_instance_t *aout, bool b_paused, mtime_t i_date)
     (void) i_date;
 }
 
-static int VolumeSet(aout_instance_t *aout, float vol, bool mute)
+static int VolumeSet(audio_output_t *aout, float vol, bool mute)
 {
     aout_sys_t *sys = aout->sys;
     pa_operation *op;
@@ -460,7 +460,7 @@ static int VolumeSet(aout_instance_t *aout, float vol, bool mute)
 static int StreamMove(vlc_object_t *obj, const char *varname, vlc_value_t old,
                       vlc_value_t val, void *userdata)
 {
-    aout_instance_t *aout = (aout_instance_t *)obj;
+    audio_output_t *aout = (audio_output_t *)obj;
     aout_sys_t *sys = aout->sys;
     pa_stream *s = userdata;
     pa_operation *op;
@@ -488,7 +488,7 @@ static int StreamMove(vlc_object_t *obj, const char *varname, vlc_value_t old,
  */
 static int Open(vlc_object_t *obj)
 {
-    aout_instance_t *aout = (aout_instance_t *)obj;
+    audio_output_t *aout = (audio_output_t *)obj;
     pa_operation *op;
 
     /* Sample format specification */
@@ -694,7 +694,7 @@ fail:
  */
 static void Close (vlc_object_t *obj)
 {
-    aout_instance_t *aout = (aout_instance_t *)obj;
+    audio_output_t *aout = (audio_output_t *)obj;
     aout_sys_t *sys = aout->sys;
     pa_context *ctx = sys->context;
     pa_stream *s = sys->stream;

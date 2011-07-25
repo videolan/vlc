@@ -573,7 +573,7 @@ void VlcProc::on_intf_event_changed( vlc_object_t* p_obj, vlc_value_t newVal )
 
         case INPUT_EVENT_AOUT:
         {
-            aout_instance_t* pAout = input_GetAout( pInput );
+            audio_output_t* pAout = input_GetAout( pInput );
 
             // end of input or aout reuse (nothing to do)
             if( !pAout || pAout == m_pAout )
@@ -718,7 +718,7 @@ void VlcProc::on_volume_changed( vlc_object_t* p_obj, vlc_value_t newVal )
 void VlcProc::on_audio_filter_changed( vlc_object_t* p_obj, vlc_value_t newVal )
 {
     (void)newVal;
-    aout_instance_t* pAout = (aout_instance_t*) p_obj;
+    audio_output_t* pAout = (audio_output_t*) p_obj;
 
     char *pFilters = newVal.psz_string;
 

@@ -2523,7 +2523,7 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
 
             vlc_object_t    **pp_decoder = va_arg( args, vlc_object_t ** );
             vout_thread_t   **pp_vout    = va_arg( args, vout_thread_t ** );
-            aout_instance_t **pp_aout    = va_arg( args, aout_instance_t ** );
+            audio_output_t **pp_aout    = va_arg( args, audio_output_t ** );
             if( p_es->p_dec )
             {
                 if( pp_decoder )

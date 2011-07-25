@@ -41,7 +41,7 @@
 
 #include <vlc_playlist.h>
 
-static aout_instance_t *findAout (vlc_object_t *obj)
+static audio_output_t *findAout (vlc_object_t *obj)
 {
     input_thread_t *(*pf_find_input) (vlc_object_t *);
 
@@ -53,17 +53,17 @@ static aout_instance_t *findAout (vlc_object_t *obj)
     if (p_input == NULL)
        return NULL;
 
-    aout_instance_t *p_aout = input_GetAout (p_input);
+    audio_output_t *p_aout = input_GetAout (p_input);
     vlc_object_release (p_input);
     return p_aout;
 }
 #define findAout(o) findAout(VLC_OBJECT(o))
 
 /** Start a volume change transaction. */
-static void prepareVolume (vlc_object_t *obj, aout_instance_t **aoutp,
+static void prepareVolume (vlc_object_t *obj, audio_output_t **aoutp,
                            audio_volume_t *volp, bool *mutep)
 {
-    aout_instance_t *aout = findAout (obj);
+    audio_output_t *aout = findAout (obj);
 
     /* FIXME: we need interlocking even if aout does not exist! */
     *aoutp = aout;
@@ -76,7 +76,7 @@ static void prepareVolume (vlc_object_t *obj, aout_instance_t **aoutp,
 }
 
 /** Commit a volume change transaction. */
-static int commitVolume (vlc_object_t *obj, aout_instance_t *aout,
+static int commitVolume (vlc_object_t *obj, audio_output_t *aout,
                          audio_volume_t volume, bool mute)
 {
     int ret = 0;
@@ -104,7 +104,7 @@ static int commitVolume (vlc_object_t *obj, aout_instance_t *aout,
 
 #if 0
 /** Cancel a volume change transaction. */
-static void cancelVolume (vlc_object_t *obj, aout_instance_t *aout)
+static void cancelVolume (vlc_object_t *obj, audio_output_t *aout)
 {
     (void) obj;
     if (aout != NULL)
@@ -122,7 +122,7 @@ static void cancelVolume (vlc_object_t *obj, aout_instance_t *aout)
 audio_volume_t aout_VolumeGet (vlc_object_t *obj)
 {
 #if 0
-    aout_instance_t *aout;
+    audio_output_t *aout;
     audio_volume_t volume;
 
     prepareVolume (obj, &aout, &volume, NULL);
@@ -140,7 +140,7 @@ audio_volume_t aout_VolumeGet (vlc_object_t *obj)
  */
 int aout_VolumeSet (vlc_object_t *obj, audio_volume_t volume)
 {
-    aout_instance_t *aout;
+    audio_output_t *aout;
     bool mute;
 
     prepareVolume (obj, &aout, NULL, &mute);
@@ -155,7 +155,7 @@ int aout_VolumeSet (vlc_object_t *obj, audio_volume_t volume)
  */
 int aout_VolumeUp (vlc_object_t *obj, int value, audio_volume_t *volp)
 {
-    aout_instance_t *aout;
+    audio_output_t *aout;
     int ret;
     audio_volume_t volume;
     bool mute;
@@ -192,7 +192,7 @@ int aout_VolumeDown (vlc_object_t *obj, int steps, audio_volume_t *volp)
  */
 int aout_ToggleMute (vlc_object_t *obj, audio_volume_t *volp)
 {
-    aout_instance_t *aout;
+    audio_output_t *aout;
     int ret;
     audio_volume_t volume;
     bool mute;
@@ -211,7 +211,7 @@ int aout_ToggleMute (vlc_object_t *obj, audio_volume_t *volp)
 bool aout_IsMuted (vlc_object_t *obj)
 {
 #if 0
-    aout_instance_t *aout;
+    audio_output_t *aout;
     bool mute;
 
     prepareVolume (obj, &aout, NULL, &mute);
@@ -227,7 +227,7 @@ bool aout_IsMuted (vlc_object_t *obj)
  */
 int aout_SetMute (vlc_object_t *obj, audio_volume_t *volp, bool mute)
 {
-    aout_instance_t *aout;
+    audio_output_t *aout;
     int ret;
     audio_volume_t volume;
 
@@ -243,14 +243,14 @@ int aout_SetMute (vlc_object_t *obj, audio_volume_t *volp, bool mute)
  * The next functions are not supposed to be called by the interface, but
  * are placeholders for software-only scaling.
  */
-static int aout_VolumeSoftSet (aout_instance_t *aout, float volume, bool mute)
+static int aout_VolumeSoftSet (audio_output_t *aout, float volume, bool mute)
 {
     aout->mixer_multiplier = mute ? 0. : volume;
     return 0;
 }
 
 /* Meant to be called by the output plug-in's Open(). */
-void aout_VolumeSoftInit (aout_instance_t *aout)
+void aout_VolumeSoftInit (audio_output_t *aout)
 {
     audio_volume_t volume = var_InheritInteger (aout, "volume");
     bool mute = var_InheritBool (aout, "mute");
@@ -264,14 +264,14 @@ void aout_VolumeSoftInit (aout_instance_t *aout)
  * The next functions are not supposed to be called by the interface, but
  * are placeholders for unsupported scaling.
  */
-static int aout_VolumeNoneSet (aout_instance_t *aout, float volume, bool mute)
+static int aout_VolumeNoneSet (audio_output_t *aout, float volume, bool mute)
 {
     (void)aout; (void)volume; (void)mute;
     return -1;
 }
 
 /* Meant to be called by the output plug-in's Open(). */
-void aout_VolumeNoneInit( aout_instance_t * p_aout )
+void aout_VolumeNoneInit( audio_output_t * p_aout )
 {
     p_aout->pf_volume_set = aout_VolumeNoneSet;
 }
@@ -288,7 +288,7 @@ void aout_VolumeNoneInit( aout_instance_t * p_aout )
  * This function is used whenever the parameters of the output plug-in are
  * changed (eg. selecting S/PDIF or PCM).
  *****************************************************************************/
-static int aout_Restart( aout_instance_t * p_aout )
+static int aout_Restart( audio_output_t * p_aout )
 {
     aout_input_t *p_input;
 
@@ -339,7 +339,7 @@ int aout_ChannelsRestart( vlc_object_t * p_this, const char * psz_variable,
                           vlc_value_t oldval, vlc_value_t newval,
                           void *p_data )
 {
-    aout_instance_t * p_aout = (aout_instance_t *)p_this;
+    audio_output_t * p_aout = (audio_output_t *)p_this;
     (void)oldval; (void)newval; (void)p_data;
 
     if ( !strcmp( psz_variable, "audio-device" ) )
@@ -361,7 +361,7 @@ int aout_ChannelsRestart( vlc_object_t * p_this, const char * psz_variable,
 void aout_EnableFilter( vlc_object_t *p_this, const char *psz_name,
                         bool b_add )
 {
-    aout_instance_t *p_aout = findAout( p_this );
+    audio_output_t *p_aout = findAout( p_this );
 
     if( aout_ChangeFilterString( p_this, p_aout, "audio-filter", psz_name, b_add ) )
     {

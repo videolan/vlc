@@ -45,24 +45,24 @@
  *****************************************************************************/
 static int  Open         ( vlc_object_t * );
 static void Close        ( vlc_object_t * );
-static void Play         ( aout_instance_t * );
+static void Play         ( audio_output_t * );
 
 /*****************************************************************************
  * notification_thread_t: waveOut event thread
  *****************************************************************************/
 /* local functions */
-static void Probe        ( aout_instance_t * );
-static int OpenWaveOut   ( aout_instance_t *, uint32_t,
+static void Probe        ( audio_output_t * );
+static int OpenWaveOut   ( audio_output_t *, uint32_t,
                            int, int, int, int, bool );
-static int OpenWaveOutPCM( aout_instance_t *, uint32_t,
+static int OpenWaveOutPCM( audio_output_t *, uint32_t,
                            vlc_fourcc_t*, int, int, int, bool );
-static int PlayWaveOut   ( aout_instance_t *, HWAVEOUT, WAVEHDR *,
+static int PlayWaveOut   ( audio_output_t *, HWAVEOUT, WAVEHDR *,
                            aout_buffer_t *, bool );
 
 static void CALLBACK WaveOutCallback ( HWAVEOUT, UINT, DWORD, DWORD, DWORD );
 static void* WaveOutThread( void * );
 
-static int VolumeSet( aout_instance_t *, float, bool );
+static int VolumeSet( audio_output_t *, float, bool );
 
 static int WaveOutClearDoneBuffers(aout_sys_t *p_sys);
 
@@ -144,7 +144,7 @@ struct aout_sys_t
  *****************************************************************************/
 static int Open( vlc_object_t *p_this )
 {
-    aout_instance_t *p_aout = (aout_instance_t *)p_this;
+    audio_output_t *p_aout = (audio_output_t *)p_this;
     vlc_value_t val;
 
     /* Allocate structure */
@@ -350,7 +350,7 @@ static int Open( vlc_object_t *p_this )
 /*****************************************************************************
  * Probe: probe the audio device for available formats and channels
  *****************************************************************************/
-static void Probe( aout_instance_t * p_aout )
+static void Probe( audio_output_t * p_aout )
 {
     vlc_value_t val, text;
     vlc_fourcc_t i_format;
@@ -471,7 +471,7 @@ static void Probe( aout_instance_t * p_aout )
  * This doesn't actually play the buffer. This just stores the buffer so it
  * can be played by the callback thread.
  *****************************************************************************/
-static void Play( aout_instance_t *_p_aout )
+static void Play( audio_output_t *_p_aout )
 {
     if( !_p_aout->sys->b_playing )
     {
@@ -495,7 +495,7 @@ static void Play( aout_instance_t *_p_aout )
  *****************************************************************************/
 static void Close( vlc_object_t *p_this )
 {
-    aout_instance_t *p_aout = (aout_instance_t *)p_this;
+    audio_output_t *p_aout = (audio_output_t *)p_this;
     aout_sys_t *p_sys = p_aout->sys;
 
     /* Before calling waveOutClose we must reset the device */
@@ -569,7 +569,7 @@ static void Close( vlc_object_t *p_this )
 /*****************************************************************************
  * OpenWaveOut: open the waveout sound device
  ****************************************************************************/
-static int OpenWaveOut( aout_instance_t *p_aout, uint32_t i_device_id, int i_format,
+static int OpenWaveOut( audio_output_t *p_aout, uint32_t i_device_id, int i_format,
                         int i_channels, int i_nb_channels, int i_rate,
                         bool b_probe )
 {
@@ -699,7 +699,7 @@ static int OpenWaveOut( aout_instance_t *p_aout, uint32_t i_device_id, int i_for
 /*****************************************************************************
  * OpenWaveOutPCM: open a PCM waveout sound device
  ****************************************************************************/
-static int OpenWaveOutPCM( aout_instance_t *p_aout, uint32_t i_device_id,
+static int OpenWaveOutPCM( audio_output_t *p_aout, uint32_t i_device_id,
                            vlc_fourcc_t *i_format,
                            int i_channels, int i_nb_channels, int i_rate,
                            bool b_probe )
@@ -732,7 +732,7 @@ static int OpenWaveOutPCM( aout_instance_t *p_aout, uint32_t i_device_id,
 /*****************************************************************************
  * PlayWaveOut: play a buffer through the WaveOut device
  *****************************************************************************/
-static int PlayWaveOut( aout_instance_t *p_aout, HWAVEOUT h_waveout,
+static int PlayWaveOut( audio_output_t *p_aout, HWAVEOUT h_waveout,
                         WAVEHDR *p_waveheader, aout_buffer_t *p_buffer,
                         bool b_spdif)
 {
@@ -799,7 +799,7 @@ static void CALLBACK WaveOutCallback( HWAVEOUT h_waveout, UINT uMsg,
                                       DWORD dwParam1, DWORD dwParam2 )
 {
     (void)h_waveout;    (void)dwParam1;    (void)dwParam2;
-    aout_instance_t *p_aout = (aout_instance_t *)_p_aout;
+    audio_output_t *p_aout = (audio_output_t *)_p_aout;
     int i_queued_frames = 0;
 
     if( uMsg != WOM_DONE ) return;
@@ -867,7 +867,7 @@ static int WaveOutClearDoneBuffers(aout_sys_t *p_sys)
  *****************************************************************************/
 static void* WaveOutThread( void *data )
 {
-    aout_instance_t *p_aout = data;
+    audio_output_t *p_aout = data;
     aout_sys_t *p_sys = p_aout->sys;
     aout_buffer_t *p_buffer = NULL;
     WAVEHDR *p_waveheader = p_sys->waveheader;
@@ -998,7 +998,7 @@ static void* WaveOutThread( void *data )
     return NULL;
 }
 
-static int VolumeSet( aout_instance_t * p_aout, float volume, bool mute )
+static int VolumeSet( audio_output_t * p_aout, float volume, bool mute )
 {
     if( mute )
         volume = 0.;

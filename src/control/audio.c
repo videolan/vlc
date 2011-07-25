@@ -42,10 +42,10 @@
 #include "media_player_internal.h"
 
 /*
- * Remember to release the returned aout_instance_t since it is locked at
+ * Remember to release the returned audio_output_t since it is locked at
  * the end of this function.
  */
-static aout_instance_t *GetAOut( libvlc_media_player_t *mp )
+static audio_output_t *GetAOut( libvlc_media_player_t *mp )
 {
     assert( mp != NULL );
 
@@ -53,7 +53,7 @@ static aout_instance_t *GetAOut( libvlc_media_player_t *mp )
     if( p_input == NULL )
         return NULL;
 
-    aout_instance_t * p_aout = input_GetAout( p_input );
+    audio_output_t * p_aout = input_GetAout( p_input );
     vlc_object_release( p_input );
     if( p_aout == NULL )
         libvlc_printerr( "No active audio output" );
@@ -284,7 +284,7 @@ void libvlc_audio_output_device_set( libvlc_media_player_t *mp,
  *****************************************************************************/
 int libvlc_audio_output_get_device_type( libvlc_media_player_t *mp )
 {
-    aout_instance_t *p_aout = GetAOut( mp );
+    audio_output_t *p_aout = GetAOut( mp );
     if( p_aout )
     {
         int i_device_type = var_GetInteger( p_aout, "audio-device" );
@@ -300,7 +300,7 @@ int libvlc_audio_output_get_device_type( libvlc_media_player_t *mp )
 void libvlc_audio_output_set_device_type( libvlc_media_player_t *mp,
                                           int device_type )
 {
-    aout_instance_t *p_aout = GetAOut( mp );
+    audio_output_t *p_aout = GetAOut( mp );
     if( !p_aout )
         return;
     if( var_SetInteger( p_aout, "audio-device", device_type ) < 0 )
@@ -456,7 +456,7 @@ end:
  *****************************************************************************/
 int libvlc_audio_get_channel( libvlc_media_player_t *mp )
 {
-    aout_instance_t *p_aout = GetAOut( mp );
+    audio_output_t *p_aout = GetAOut( mp );
     if( !p_aout )
         return 0;
 
@@ -470,7 +470,7 @@ int libvlc_audio_get_channel( libvlc_media_player_t *mp )
  *****************************************************************************/
 int libvlc_audio_set_channel( libvlc_media_player_t *mp, int channel )
 {
-    aout_instance_t *p_aout = GetAOut( mp );
+    audio_output_t *p_aout = GetAOut( mp );
     int ret = 0;
 
     if( !p_aout )

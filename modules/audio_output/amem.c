@@ -59,7 +59,7 @@ struct aout_sys_t
     void (*cleanup) (void *opaque);
 };
 
-static void Play (aout_instance_t *aout)
+static void Play (audio_output_t *aout)
 {
     aout_sys_t *sys = aout->sys;
     block_t *block;
@@ -72,7 +72,7 @@ static void Play (aout_instance_t *aout)
     }
 }
 
-static int VolumeSet (aout_instance_t *aout, float vol, bool mute)
+static int VolumeSet (audio_output_t *aout, float vol, bool mute)
 {
     aout_sys_t *sys = aout->sys;
 
@@ -83,7 +83,7 @@ typedef int (*vlc_audio_format_cb) (void **, char *, unsigned *, unsigned *);
 
 static int Open (vlc_object_t *obj)
 {
-    aout_instance_t *aout = (aout_instance_t *)obj;
+    audio_output_t *aout = (audio_output_t *)obj;
     aout_sys_t *sys = malloc (sizeof (*sys));
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
@@ -145,7 +145,7 @@ error:
 
 static void Close (vlc_object_t *obj)
 {
-    aout_instance_t *aout = (aout_instance_t *)obj;
+    audio_output_t *aout = (audio_output_t *)obj;
     aout_sys_t *sys = aout->sys;
 
     if (sys->cleanup != NULL)

@@ -121,7 +121,7 @@ struct decoder_owner_sys_t
     vlc_cond_t  wait_acknowledge;
 
     /* -- These variables need locking on write(only) -- */
-    aout_instance_t *p_aout;
+    audio_output_t *p_aout;
     aout_input_t    *p_aout_input;
 
     vout_thread_t   *p_vout;
@@ -667,7 +667,7 @@ size_t input_DecoderGetFifoSize( decoder_t *p_dec )
 }
 
 void input_DecoderGetObjects( decoder_t *p_dec,
-                              vout_thread_t **pp_vout, aout_instance_t **pp_aout )
+                              vout_thread_t **pp_vout, audio_output_t **pp_aout )
 {
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
 
@@ -1179,7 +1179,7 @@ static void DecoderPlayAudio( decoder_t *p_dec, aout_buffer_t *p_audio,
                               int *pi_played_sum, int *pi_lost_sum )
 {
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
-    aout_instance_t *p_aout = p_owner->p_aout;
+    audio_output_t *p_aout = p_owner->p_aout;
     aout_input_t    *p_aout_input = p_owner->p_aout_input;
 
     /* */
@@ -1292,7 +1292,7 @@ static void DecoderDecodeAudio( decoder_t *p_dec, block_t *p_block )
 
     while( (p_aout_buf = p_dec->pf_decode_audio( p_dec, &p_block )) )
     {
-        aout_instance_t *p_aout = p_owner->p_aout;
+        audio_output_t *p_aout = p_owner->p_aout;
         aout_input_t    *p_aout_input = p_owner->p_aout_input;
 
         if( DecoderIsExitRequested( p_dec ) )
@@ -2237,7 +2237,7 @@ static aout_buffer_t *aout_new_buffer( decoder_t *p_dec, int i_samples )
               p_owner->audio.i_bytes_per_frame ) )
     {
         aout_input_t *p_aout_input = p_owner->p_aout_input;
-        aout_instance_t *p_aout = p_owner->p_aout;
+        audio_output_t *p_aout = p_owner->p_aout;
 
         /* Parameters changed, restart the aout */
         vlc_mutex_lock( &p_owner->lock );
@@ -2257,7 +2257,7 @@ static aout_buffer_t *aout_new_buffer( decoder_t *p_dec, int i_samples )
         const int i_force_dolby = var_InheritInteger( p_dec, "force-dolby-surround" );
         audio_sample_format_t format;
         aout_input_t *p_aout_input;
-        aout_instance_t *p_aout;
+        audio_output_t *p_aout;
         aout_request_vout_t request_vout;
 
         p_dec->fmt_out.audio.i_format = p_dec->fmt_out.i_codec;

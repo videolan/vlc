@@ -54,7 +54,7 @@ struct aout_sys_t
  *****************************************************************************/
 static int  Open               ( vlc_object_t * );
 static void Close              ( vlc_object_t * );
-static void Play               ( aout_instance_t * );
+static void Play               ( audio_output_t * );
 static void AudioQueueCallback (void *, AudioQueueRef, AudioQueueBufferRef);
 
 /*****************************************************************************
@@ -76,7 +76,7 @@ vlc_module_end ()
 
 static int Open ( vlc_object_t *p_this )
 {
-    aout_instance_t *p_aout = (aout_instance_t *)p_this;
+    audio_output_t *p_aout = (audio_output_t *)p_this;
     struct aout_sys_t *p_sys = malloc(sizeof(aout_sys_t));
     p_aout->sys = p_sys;
 
@@ -134,7 +134,7 @@ static int Open ( vlc_object_t *p_this )
 /*****************************************************************************
  * Play: play a sound samples buffer
  *****************************************************************************/
-static void Play( aout_instance_t * p_aout )
+static void Play( audio_output_t * p_aout )
 {
     VLC_UNUSED(p_aout);
 }
@@ -144,7 +144,7 @@ static void Play( aout_instance_t * p_aout )
  *****************************************************************************/
 static void Close ( vlc_object_t *p_this )
 {
-    aout_instance_t *p_aout = (aout_instance_t *)p_this;
+    audio_output_t *p_aout = (audio_output_t *)p_this;
     struct aout_sys_t * p_sys = p_aout->sys;
 
     msg_Dbg(p_aout, "Stopping AudioQueue");
@@ -155,7 +155,7 @@ static void Close ( vlc_object_t *p_this )
 }
 
 void AudioQueueCallback(void * inUserData, AudioQueueRef inAQ, AudioQueueBufferRef inBuffer) {
-    aout_instance_t * p_aout = (aout_instance_t *)inUserData;
+    audio_output_t * p_aout = (audio_output_t *)inUserData;
     aout_buffer_t *   p_buffer = NULL;
 
     if (p_aout) {

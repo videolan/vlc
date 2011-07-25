@@ -73,7 +73,7 @@ static const int pi_channels_maps[CHANNELS_MAX+1] =
  *****************************************************************************/
 static int     Open        ( vlc_object_t * );
 static void    Close       ( vlc_object_t * );
-static void    Play        ( aout_instance_t * );
+static void    Play        ( audio_output_t * );
 
 /*****************************************************************************
  * Module descriptor
@@ -132,7 +132,7 @@ vlc_module_end ()
  *****************************************************************************/
 static int Open( vlc_object_t * p_this )
 {
-    aout_instance_t * p_aout = (aout_instance_t *)p_this;
+    audio_output_t * p_aout = (audio_output_t *)p_this;
     char * psz_name, * psz_format;
     const char * const * ppsz_compare = format_list;
     int i_channels, i = 0;
@@ -278,7 +278,7 @@ static int Open( vlc_object_t * p_this )
  *****************************************************************************/
 static void Close( vlc_object_t * p_this )
 {
-    aout_instance_t * p_aout = (aout_instance_t *)p_this;
+    audio_output_t * p_aout = (audio_output_t *)p_this;
 
     msg_Dbg( p_aout, "closing audio file" );
 
@@ -315,7 +315,7 @@ static void Close( vlc_object_t * p_this )
 /*****************************************************************************
  * Play: pretend to play a sound
  *****************************************************************************/
-static void Play( aout_instance_t * p_aout )
+static void Play( audio_output_t * p_aout )
 {
     aout_buffer_t * p_buffer;
 

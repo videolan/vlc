@@ -86,10 +86,10 @@ struct aout_sys_t
 static int  Open         ( vlc_object_t * );
 static void Close        ( vlc_object_t * );
 
-static void Play         ( aout_instance_t * );
+static void Play         ( audio_output_t * );
 static void* OSSThread   ( void * );
 
-static mtime_t BufferDuration( aout_instance_t * p_aout );
+static mtime_t BufferDuration( audio_output_t * p_aout );
 
 /*****************************************************************************
  * Module descriptor
@@ -112,7 +112,7 @@ vlc_module_end ()
 /*****************************************************************************
  * Probe: probe the audio device for available formats and channels
  *****************************************************************************/
-static void Probe( aout_instance_t * p_aout )
+static void Probe( audio_output_t * p_aout )
 {
     struct aout_sys_t * p_sys = p_aout->sys;
     vlc_value_t val, text;
@@ -260,7 +260,7 @@ static void Probe( aout_instance_t * p_aout )
  *****************************************************************************/
 static int Open( vlc_object_t *p_this )
 {
-    aout_instance_t * p_aout = (aout_instance_t *)p_this;
+    audio_output_t * p_aout = (audio_output_t *)p_this;
     struct aout_sys_t * p_sys;
     char * psz_device;
     vlc_value_t val;
@@ -519,7 +519,7 @@ static int Open( vlc_object_t *p_this )
 /*****************************************************************************
  * Play: nothing to do
  *****************************************************************************/
-static void Play( aout_instance_t *p_aout )
+static void Play( audio_output_t *p_aout )
 {
     VLC_UNUSED(p_aout);
 }
@@ -529,7 +529,7 @@ static void Play( aout_instance_t *p_aout )
  *****************************************************************************/
 static void Close( vlc_object_t * p_this )
 {
-    aout_instance_t *p_aout = (aout_instance_t *)p_this;
+    audio_output_t *p_aout = (audio_output_t *)p_this;
     struct aout_sys_t * p_sys = p_aout->sys;
 
     vlc_cancel( p_sys->thread );
@@ -547,7 +547,7 @@ static void Close( vlc_object_t * p_this )
  *****************************************************************************
  * This function returns the duration in microseconds of the current buffer.
  *****************************************************************************/
-static mtime_t BufferDuration( aout_instance_t * p_aout )
+static mtime_t BufferDuration( audio_output_t * p_aout )
 {
     struct aout_sys_t * p_sys = p_aout->sys;
     audio_buf_info audio_buf;
@@ -590,7 +590,7 @@ static void OSSThreadCleanup( void *data )
  *****************************************************************************/
 static void* OSSThread( void *obj )
 {
-    aout_instance_t * p_aout = (aout_instance_t*)obj;
+    audio_output_t * p_aout = (audio_output_t*)obj;
     struct aout_sys_t * p_sys = p_aout->sys;
     mtime_t next_date = 0;
 

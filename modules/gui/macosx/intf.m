@@ -442,12 +442,12 @@ vout_thread_t *getVout(void)
     return p_vout;
 }
 
-aout_instance_t *getAout(void)
+audio_output_t *getAout(void)
 {
     input_thread_t *p_input = getInput();
     if (!p_input)
         return NULL;
-    aout_instance_t *p_aout = input_GetAout(p_input);
+    audio_output_t *p_aout = input_GetAout(p_input);
     vlc_object_release(p_input);
     return p_aout;
 }

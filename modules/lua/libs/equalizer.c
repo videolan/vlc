@@ -64,7 +64,7 @@ static int vlclua_preamp_get( lua_State *L )
     if( !p_input )
         return 0;
 
-    aout_instance_t *p_aout = input_GetAout( p_input );
+    audio_output_t *p_aout = input_GetAout( p_input );
     vlc_object_release( p_input );
 
     char *psz_af = var_GetNonEmptyString( p_aout, "audio-filter" );
@@ -91,7 +91,7 @@ static int vlclua_preamp_set( lua_State *L )
     if( !p_input )
         return 0;
 
-    aout_instance_t *p_aout = input_GetAout( p_input );
+    audio_output_t *p_aout = input_GetAout( p_input );
     vlc_object_release( p_input );
     if( !p_aout )
         return 0;
@@ -133,7 +133,7 @@ static int vlclua_equalizer_get( lua_State *L )
     if( !p_input )
         return 0;
 
-    aout_instance_t *p_aout = input_GetAout( p_input );
+    audio_output_t *p_aout = input_GetAout( p_input );
     vlc_object_release( p_input );
     if( !p_aout )
         return 0;
@@ -186,7 +186,7 @@ static int vlclua_equalizer_set( lua_State *L )
         return 0;
 
     int i_pos = 0 , j = 0;
-    aout_instance_t *p_aout = input_GetAout( p_input );
+    audio_output_t *p_aout = input_GetAout( p_input );
     vlc_object_release( p_input );
     if( !p_aout )
         return 0;

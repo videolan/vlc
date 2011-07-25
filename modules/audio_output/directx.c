@@ -44,7 +44,7 @@
  *****************************************************************************/
 typedef struct notification_thread_t
 {
-    aout_instance_t *p_aout;
+    audio_output_t *p_aout;
     int i_frame_size;                          /* size in bytes of one frame */
     int i_write_slot;       /* current write position in our circular buffer */
 
@@ -94,16 +94,16 @@ struct aout_sys_t
  *****************************************************************************/
 static int  OpenAudio  ( vlc_object_t * );
 static void CloseAudio ( vlc_object_t * );
-static void Play       ( aout_instance_t * );
+static void Play       ( audio_output_t * );
 
 /* local functions */
-static void Probe             ( aout_instance_t * );
-static int  InitDirectSound   ( aout_instance_t * );
-static int  CreateDSBuffer    ( aout_instance_t *, int, int, int, int, int, bool );
-static int  CreateDSBufferPCM ( aout_instance_t *, vlc_fourcc_t*, int, int, int, bool );
-static void DestroyDSBuffer   ( aout_instance_t * );
+static void Probe             ( audio_output_t * );
+static int  InitDirectSound   ( audio_output_t * );
+static int  CreateDSBuffer    ( audio_output_t *, int, int, int, int, int, bool );
+static int  CreateDSBufferPCM ( audio_output_t *, vlc_fourcc_t*, int, int, int, bool );
+static void DestroyDSBuffer   ( audio_output_t * );
 static void* DirectSoundThread( void * );
-static int  FillBuffer        ( aout_instance_t *, int, aout_buffer_t * );
+static int  FillBuffer        ( audio_output_t *, int, aout_buffer_t * );
 
 static int ReloadDirectXDevices( vlc_object_t *, char const *,
                                 vlc_value_t, vlc_value_t, void * );
@@ -153,7 +153,7 @@ vlc_module_end ()
  *****************************************************************************/
 static int OpenAudio( vlc_object_t *p_this )
 {
-    aout_instance_t * p_aout = (aout_instance_t *)p_this;
+    audio_output_t * p_aout = (audio_output_t *)p_this;
     vlc_value_t val;
     char * psz_speaker;
     int i = 0;
@@ -332,7 +332,7 @@ static int OpenAudio( vlc_object_t *p_this )
 /*****************************************************************************
  * Probe: probe the audio device for available formats and channels
  *****************************************************************************/
-static void Probe( aout_instance_t * p_aout )
+static void Probe( audio_output_t * p_aout )
 {
     vlc_value_t val, text;
     vlc_fourcc_t i_format;
@@ -568,7 +568,7 @@ static void Probe( aout_instance_t * p_aout )
  *       we know the first buffer has been put in the aout fifo and we also
  *       know its date.
  *****************************************************************************/
-static void Play( aout_instance_t *p_aout )
+static void Play( audio_output_t *p_aout )
 {
     if( !p_aout->sys->b_playing )
     {
@@ -598,7 +598,7 @@ static void Play( aout_instance_t *p_aout )
  *****************************************************************************/
 static void CloseAudio( vlc_object_t *p_this )
 {
-    aout_instance_t * p_aout = (aout_instance_t *)p_this;
+    audio_output_t * p_aout = (audio_output_t *)p_this;
     aout_sys_t *p_sys = p_aout->sys;
 
     msg_Dbg( p_aout, "closing audio device" );
@@ -635,7 +635,7 @@ static int CALLBACK CallBackDirectSoundEnum( LPGUID p_guid, LPCWSTR psz_desc,
 {
     VLC_UNUSED( psz_mod );
 
-    aout_instance_t *p_aout = (aout_instance_t *)_p_aout;
+    audio_output_t *p_aout = (audio_output_t *)_p_aout;
 
     char *psz_device = FromWide( psz_desc );
     msg_Dbg( p_aout, "found device: %s", psz_device );
@@ -667,7 +667,7 @@ static int CALLBACK CallBackDirectSoundEnum( LPGUID p_guid, LPCWSTR psz_desc,
 /*****************************************************************************
  * InitDirectSound: handle all the gory details of DirectSound initialisation
  *****************************************************************************/
-static int InitDirectSound( aout_instance_t *p_aout )
+static int InitDirectSound( audio_output_t *p_aout )
 {
     HRESULT (WINAPI *OurDirectSoundCreate)(LPGUID, LPDIRECTSOUND *, LPUNKNOWN);
     HRESULT (WINAPI *OurDirectSoundEnumerate)(LPDSENUMCALLBACKW, LPVOID);
@@ -754,7 +754,7 @@ static int InitDirectSound( aout_instance_t *p_aout )
  * Once you create a secondary buffer, you cannot change its format anymore so
  * you have to release the current one and create another.
  *****************************************************************************/
-static int CreateDSBuffer( aout_instance_t *p_aout, int i_format,
+static int CreateDSBuffer( audio_output_t *p_aout, int i_format,
                            int i_channels, int i_nb_channels, int i_rate,
                            int i_bytes_per_frame, bool b_probe )
 {
@@ -886,7 +886,7 @@ static int CreateDSBuffer( aout_instance_t *p_aout, int i_format,
  * We first try to create a WAVE_FORMAT_IEEE_FLOAT buffer if supported by
  * the hardware, otherwise we create a WAVE_FORMAT_PCM buffer.
  ****************************************************************************/
-static int CreateDSBufferPCM( aout_instance_t *p_aout, vlc_fourcc_t *i_format,
+static int CreateDSBufferPCM( audio_output_t *p_aout, vlc_fourcc_t *i_format,
                               int i_channels, int i_nb_channels, int i_rate,
                               bool b_probe )
 {
@@ -923,7 +923,7 @@ static int CreateDSBufferPCM( aout_instance_t *p_aout, vlc_fourcc_t *i_format,
  *****************************************************************************
  * This function destroys the secondary buffer.
  *****************************************************************************/
-static void DestroyDSBuffer( aout_instance_t *p_aout )
+static void DestroyDSBuffer( audio_output_t *p_aout )
 {
     if( p_aout->sys->p_dsbuffer )
     {
@@ -937,7 +937,7 @@ static void DestroyDSBuffer( aout_instance_t *p_aout )
  *****************************************************************************
  * Returns VLC_SUCCESS on success.
  *****************************************************************************/
-static int FillBuffer( aout_instance_t *p_aout, int i_frame,
+static int FillBuffer( audio_output_t *p_aout, int i_frame,
                        aout_buffer_t *p_buffer )
 {
     notification_thread_t *p_notif = p_aout->sys->p_notif;
@@ -1011,7 +1011,7 @@ static int FillBuffer( aout_instance_t *p_aout, int i_frame,
 static void* DirectSoundThread( void *data )
 {
     notification_thread_t *p_notif = (notification_thread_t*)data;
-    aout_instance_t *p_aout = p_notif->p_aout;
+    audio_output_t *p_aout = p_notif->p_aout;
     mtime_t last_time;
     int canc = vlc_savecancel ();
 

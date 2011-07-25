@@ -42,7 +42,7 @@
 
 class OSTimer;
 class VarBool;
-struct aout_instance_t;
+struct audio_output_t;
 struct vout_window_t;
 
 
@@ -160,7 +160,7 @@ private:
     /// Vout thread
     vout_thread_t *m_pVout;
     /// Audio output
-    aout_instance_t *m_pAout;
+    audio_output_t *m_pAout;
     bool m_bEqualizer_started;
 
     /**

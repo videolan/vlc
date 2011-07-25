@@ -48,7 +48,7 @@
  *****************************************************************************/
 typedef struct
 {
-    aout_instance_t *p_aout;
+    audio_output_t *p_aout;
 
     vlc_thread_t thread;
     vlc_cond_t  wait;
@@ -63,7 +63,7 @@ typedef struct
 
 struct aout_sys_t
 {
-    aout_instance_t *p_aout;
+    audio_output_t *p_aout;
     PaStream *p_stream;
 
     PaDeviceIndex i_devices;
@@ -95,10 +95,10 @@ static void* PORTAUDIOThread( void * );
  *****************************************************************************/
 static int  Open        ( vlc_object_t * );
 static void Close       ( vlc_object_t * );
-static void Play        ( aout_instance_t * );
+static void Play        ( audio_output_t * );
 
-static int PAOpenDevice( aout_instance_t * );
-static int PAOpenStream( aout_instance_t * );
+static int PAOpenDevice( audio_output_t * );
+static int PAOpenStream( audio_output_t * );
 
 /*****************************************************************************
  * Module descriptor
@@ -130,7 +130,7 @@ static int paCallback( const void *inputBuffer, void *outputBuffer,
     VLC_UNUSED( inputBuffer ); VLC_UNUSED( statusFlags );
 
     struct aout_sys_t *p_sys = (struct aout_sys_t*) p_cookie;
-    aout_instance_t   *p_aout = p_sys->p_aout;
+    audio_output_t   *p_aout = p_sys->p_aout;
     aout_buffer_t     *p_buffer;
     mtime_t out_date;
 
@@ -170,7 +170,7 @@ static int paCallback( const void *inputBuffer, void *outputBuffer,
  *****************************************************************************/
 static int Open( vlc_object_t * p_this )
 {
-    aout_instance_t *p_aout = (aout_instance_t *)p_this;
+    audio_output_t *p_aout = (audio_output_t *)p_this;
     struct aout_sys_t * p_sys;
 
     msg_Dbg( p_aout, "entering Open()");
@@ -282,7 +282,7 @@ static int Open( vlc_object_t * p_this )
  *****************************************************************************/
 static void Close ( vlc_object_t *p_this )
 {
-    aout_instance_t *p_aout = (aout_instance_t *)p_this;
+    audio_output_t *p_aout = (audio_output_t *)p_this;
     aout_sys_t *p_sys = p_aout->sys;
 
     msg_Dbg( p_aout, "closing portaudio");
@@ -330,7 +330,7 @@ static void Close ( vlc_object_t *p_this )
     free( p_sys );
 }
 
-static int PAOpenDevice( aout_instance_t *p_aout )
+static int PAOpenDevice( audio_output_t *p_aout )
 {
     aout_sys_t *p_sys = p_aout->sys;
     const PaDeviceInfo *p_pdi;
@@ -451,7 +451,7 @@ static int PAOpenDevice( aout_instance_t *p_aout )
     return VLC_EGENERIC;
 }
 
-static int PAOpenStream( aout_instance_t *p_aout )
+static int PAOpenStream( audio_output_t *p_aout )
 {
     aout_sys_t *p_sys = p_aout->sys;
     const PaHostErrorInfo* paLastHostErrorInfo = Pa_GetLastHostErrorInfo();
@@ -558,7 +558,7 @@ static int PAOpenStream( aout_instance_t *p_aout )
 /*****************************************************************************
  * Play: play sound
  *****************************************************************************/
-static void Play( aout_instance_t * p_aout )
+static void Play( audio_output_t * p_aout )
 {
     VLC_UNUSED( p_aout );
 }
@@ -571,7 +571,7 @@ static void Play( aout_instance_t * p_aout )
 static void* PORTAUDIOThread( void *data )
 {
     pa_thread_t *pa_thread = (pa_thread_t*)data;
-    aout_instance_t *p_aout;
+    audio_output_t *p_aout;
     aout_sys_t *p_sys;
     int i_err;
     int canc = vlc_savecancel ();

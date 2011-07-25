@@ -41,7 +41,7 @@
  *****************************************************************************
  * This function is entered with the mixer lock.
  *****************************************************************************/
-int aout_OutputNew( aout_instance_t * p_aout,
+int aout_OutputNew( audio_output_t * p_aout,
                     const audio_sample_format_t * p_format )
 {
     vlc_assert_locked( &p_aout->lock );
@@ -202,7 +202,7 @@ int aout_OutputNew( aout_instance_t * p_aout,
  *****************************************************************************
  * This function is entered with the mixer lock.
  *****************************************************************************/
-void aout_OutputDelete( aout_instance_t * p_aout )
+void aout_OutputDelete( audio_output_t * p_aout )
 {
     vlc_assert_locked( &p_aout->lock );
 
@@ -220,7 +220,7 @@ void aout_OutputDelete( aout_instance_t * p_aout )
  *****************************************************************************
  * This function is entered with the mixer lock.
  *****************************************************************************/
-void aout_OutputPlay( aout_instance_t * p_aout, aout_buffer_t * p_buffer )
+void aout_OutputPlay( audio_output_t * p_aout, aout_buffer_t * p_buffer )
 {
     vlc_assert_locked( &p_aout->lock );
 
@@ -242,7 +242,7 @@ void aout_OutputPlay( aout_instance_t * p_aout, aout_buffer_t * p_buffer )
  * This enables the output to expedite pause, instead of waiting for its
  * buffers to drain.
  */
-void aout_OutputPause( aout_instance_t *aout, bool pause, mtime_t date )
+void aout_OutputPause( audio_output_t *aout, bool pause, mtime_t date )
 {
     vlc_assert_locked( &aout->lock );
 
@@ -258,7 +258,7 @@ void aout_OutputPause( aout_instance_t *aout, bool pause, mtime_t date )
  * compensate it by itself. S/PDIF outputs should always set b_can_sleek = 1.
  * This function is entered with no lock at all :-).
  *****************************************************************************/
-aout_buffer_t * aout_OutputNextBuffer( aout_instance_t * p_aout,
+aout_buffer_t * aout_OutputNextBuffer( audio_output_t * p_aout,
                                        mtime_t start_date,
                                        bool b_can_sleek )
 {

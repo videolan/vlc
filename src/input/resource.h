@@ -39,14 +39,14 @@ sout_instance_t *input_resource_RequestSout( input_resource_t *, sout_instance_t
 /**
  * This function handles aout request.
  */
-aout_instance_t *input_resource_RequestAout( input_resource_t *, aout_instance_t * );
+audio_output_t *input_resource_RequestAout( input_resource_t *, audio_output_t * );
 
 /**
  * This function returns the current aout if any.
  *
  * You must call vlc_object_release on the value returned (if non NULL).
  */
-aout_instance_t *input_resource_HoldAout( input_resource_t *p_resource );
+audio_output_t *input_resource_HoldAout( input_resource_t *p_resource );
 
 /**
  * This function handles vout request.

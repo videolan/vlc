@@ -92,9 +92,9 @@ struct aout_sys_t
  *****************************************************************************/
 static int   Open         ( vlc_object_t * );
 static void  Close        ( vlc_object_t * );
-static void  Play         ( aout_instance_t * );
+static void  Play         ( audio_output_t * );
 static void* ALSAThread   ( void * );
-static void  ALSAFill     ( aout_instance_t * );
+static void  ALSAFill     ( audio_output_t * );
 static int FindDevicesCallback( vlc_object_t *p_this, char const *psz_name,
                                 vlc_value_t newval, vlc_value_t oldval, void *p_unused );
 static void GetDevices( vlc_object_t *, module_config_t * );
@@ -171,7 +171,7 @@ static void Probe (vlc_object_t *obj)
  *****************************************************************************/
 static int Open (vlc_object_t *obj)
 {
-    aout_instance_t * p_aout = (aout_instance_t *)obj;
+    audio_output_t * p_aout = (audio_output_t *)obj;
 
     /* Get device name */
     char *psz_device;
@@ -519,7 +519,7 @@ error:
     return VLC_EGENERIC;
 }
 
-static void PlayIgnore( aout_instance_t *p_aout )
+static void PlayIgnore( audio_output_t *p_aout )
 {   /* Already playing - nothing to do */
     (void) p_aout;
 }
@@ -527,7 +527,7 @@ static void PlayIgnore( aout_instance_t *p_aout )
 /*****************************************************************************
  * Play: start playback
  *****************************************************************************/
-static void Play( aout_instance_t *p_aout )
+static void Play( audio_output_t *p_aout )
 {
     p_aout->pf_play = PlayIgnore;
 
@@ -543,7 +543,7 @@ static void Play( aout_instance_t *p_aout )
  *****************************************************************************/
 static void Close (vlc_object_t *obj)
 {
-    aout_instance_t *p_aout = (aout_instance_t *)obj;
+    audio_output_t *p_aout = (audio_output_t *)obj;
     struct aout_sys_t * p_sys = p_aout->sys;
 
     /* Make sure that the thread will stop once it is waken up */
@@ -564,7 +564,7 @@ static void Close (vlc_object_t *obj)
  *****************************************************************************/
 static void* ALSAThread( void *data )
 {
-    aout_instance_t * p_aout = data;
+    audio_output_t * p_aout = data;
     struct aout_sys_t * p_sys = p_aout->sys;
 
     /* Wait for the exact time to start playing (avoids resampling) */
@@ -581,7 +581,7 @@ static void* ALSAThread( void *data )
 /*****************************************************************************
  * ALSAFill: function used to fill the ALSA buffer as much as possible
  *****************************************************************************/
-static void ALSAFill( aout_instance_t * p_aout )
+static void ALSAFill( audio_output_t * p_aout )
 {
     struct aout_sys_t * p_sys = p_aout->sys;
     snd_pcm_t *p_pcm = p_sys->p_snd_pcm;

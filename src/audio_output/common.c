@@ -47,9 +47,9 @@ static void aout_Destructor( vlc_object_t * p_this );
 /*****************************************************************************
  * aout_New: initialize aout structure
  *****************************************************************************/
-aout_instance_t *aout_New( vlc_object_t * p_parent )
+audio_output_t *aout_New( vlc_object_t * p_parent )
 {
-    aout_instance_t * p_aout;
+    audio_output_t * p_aout;
 
     /* Allocate descriptor. */
     p_aout = vlc_custom_create( p_parent, sizeof( *p_aout ), "audio output" );
@@ -79,7 +79,7 @@ aout_instance_t *aout_New( vlc_object_t * p_parent )
  *****************************************************************************/
 static void aout_Destructor( vlc_object_t * p_this )
 {
-    aout_instance_t * p_aout = (aout_instance_t *)p_this;
+    audio_output_t * p_aout = (audio_output_t *)p_this;
     vlc_mutex_destroy( &p_aout->volume_lock );
     vlc_mutex_destroy( &p_aout->lock );
 }
@@ -294,7 +294,7 @@ const char * aout_FormatPrintChannels( const audio_sample_format_t * p_format )
 /*****************************************************************************
  * aout_FormatPrint : print a format in a human-readable form
  *****************************************************************************/
-void aout_FormatPrint( aout_instance_t * p_aout, const char * psz_text,
+void aout_FormatPrint( audio_output_t * p_aout, const char * psz_text,
                        const audio_sample_format_t * p_format )
 {
     msg_Dbg( p_aout, "%s '%4.4s' %d Hz %s frame=%d samples/%d bytes", psz_text,
@@ -306,7 +306,7 @@ void aout_FormatPrint( aout_instance_t * p_aout, const char * psz_text,
 /*****************************************************************************
  * aout_FormatsPrint : print two formats in a human-readable form
  *****************************************************************************/
-void aout_FormatsPrint( aout_instance_t * p_aout, const char * psz_text,
+void aout_FormatsPrint( audio_output_t * p_aout, const char * psz_text,
                         const audio_sample_format_t * p_format1,
                         const audio_sample_format_t * p_format2 )
 {
@@ -680,7 +680,7 @@ static int FilterOrder( const char *psz_name )
 /* This function will add or remove a a module from a string list (colon
  * separated). It will return true if there is a modification
  * In case p_aout is NULL, we will use configuration instead of variable */
-bool aout_ChangeFilterString( vlc_object_t *p_obj, aout_instance_t *p_aout,
+bool aout_ChangeFilterString( vlc_object_t *p_obj, audio_output_t *p_aout,
                               const char *psz_variable,
                               const char *psz_name, bool b_add )
 {

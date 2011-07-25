@@ -243,7 +243,7 @@ static int VideoAutoMenuBuilder( vout_thread_t *p_object,
     return VLC_SUCCESS;
 }
 
-static int AudioAutoMenuBuilder( aout_instance_t *p_object,
+static int AudioAutoMenuBuilder( audio_output_t *p_object,
         input_thread_t *p_input,
         vector<vlc_object_t *> &objects,
         vector<const char *> &varnames )
@@ -567,7 +567,7 @@ QMenu *QVLCMenu::AudioMenu( intf_thread_t *p_intf, QMenu * current )
 {
     vector<vlc_object_t *> objects;
     vector<const char *> varnames;
-    aout_instance_t *p_aout;
+    audio_output_t *p_aout;
     input_thread_t *p_input;
 
     if( current->isEmpty() )
@@ -899,7 +899,7 @@ void QVLCMenu::AudioPopupMenu( intf_thread_t *p_intf, bool show )
     POPUP_BOILERPLATE
     if( p_input )
     {
-        aout_instance_t *p_aout = THEMIM->getAout();
+        audio_output_t *p_aout = THEMIM->getAout();
         AudioAutoMenuBuilder( p_aout, p_input, objects, varnames );
         if( p_aout )
             vlc_object_release( p_aout );

@@ -50,7 +50,7 @@
 
 #define AOUT_ASSERT_LOCKED vlc_assert_locked( &p_aout->lock )
 
-static void inputFailure( aout_instance_t *, aout_input_t *, const char * );
+static void inputFailure( audio_output_t *, aout_input_t *, const char * );
 static void inputDrop( aout_input_t *, aout_buffer_t * );
 static void inputResamplingStop( aout_input_t *p_input );
 
@@ -60,7 +60,7 @@ static int EqualizerCallback( vlc_object_t *, char const *,
                               vlc_value_t, vlc_value_t, void * );
 static int ReplayGainCallback( vlc_object_t *, char const *,
                                vlc_value_t, vlc_value_t, void * );
-static void ReplayGainSelect( aout_instance_t *, aout_input_t * );
+static void ReplayGainSelect( audio_output_t *, aout_input_t * );
 
 static vout_thread_t *RequestVout( void *,
                                    vout_thread_t *, video_format_t *, bool );
@@ -68,7 +68,7 @@ static vout_thread_t *RequestVout( void *,
 /*****************************************************************************
  * aout_InputNew : allocate a new input and rework the filter pipeline
  *****************************************************************************/
-int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input, const aout_request_vout_t *p_request_vout )
+int aout_InputNew( audio_output_t * p_aout, aout_input_t * p_input, const aout_request_vout_t *p_request_vout )
 {
     audio_sample_format_t chain_input_format;
     audio_sample_format_t chain_output_format;
@@ -427,7 +427,7 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input, const aout_
  *****************************************************************************
  * This function must be entered with the mixer lock.
  *****************************************************************************/
-int aout_InputDelete( aout_instance_t * p_aout, aout_input_t * p_input )
+int aout_InputDelete( audio_output_t * p_aout, aout_input_t * p_input )
 {
     AOUT_ASSERT_LOCKED;
     if ( p_input->b_error )
@@ -456,7 +456,7 @@ int aout_InputDelete( aout_instance_t * p_aout, aout_input_t * p_input )
  *****************************************************************************
  * This function must be entered with the input and mixer lock.
  *****************************************************************************/
-void aout_InputCheckAndRestart( aout_instance_t * p_aout, aout_input_t * p_input )
+void aout_InputCheckAndRestart( audio_output_t * p_aout, aout_input_t * p_input )
 {
     AOUT_ASSERT_LOCKED;
 
@@ -487,7 +487,7 @@ void aout_InputCheckAndRestart( aout_instance_t * p_aout, aout_input_t * p_input
  *****************************************************************************/
 /* XXX Do not activate it !! */
 //#define AOUT_PROCESS_BEFORE_CHEKS
-void aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
+void aout_InputPlay( audio_output_t * p_aout, aout_input_t * p_input,
                      aout_buffer_t * p_buffer, int i_input_rate )
 {
     mtime_t start_date;
@@ -699,7 +699,7 @@ void aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
  * static functions
  *****************************************************************************/
 
-static void inputFailure( aout_instance_t * p_aout, aout_input_t * p_input,
+static void inputFailure( audio_output_t * p_aout, aout_input_t * p_input,
                           const char * psz_error_message )
 {
     /* error message */
@@ -746,7 +746,7 @@ static void inputResamplingStop( aout_input_t *p_input )
 static vout_thread_t *RequestVout( void *p_private,
                                    vout_thread_t *p_vout, video_format_t *p_fmt, bool b_recycle )
 {
-    aout_instance_t *p_aout = p_private;
+    audio_output_t *p_aout = p_private;
     VLC_UNUSED(b_recycle);
     vout_configuration_t cfg = {
         .vout       = p_vout,
@@ -773,7 +773,7 @@ vout_thread_t *aout_filter_RequestVout( filter_t *p_filter,
                                        p_vout, p_fmt, p_input->b_recycle_vout );
 }
 
-static int ChangeFiltersString( aout_instance_t * p_aout, const char* psz_variable,
+static int ChangeFiltersString( audio_output_t * p_aout, const char* psz_variable,
                                  const char *psz_name, bool b_add )
 {
     return aout_ChangeFilterString( VLC_OBJECT(p_aout), p_aout,
@@ -783,7 +783,7 @@ static int ChangeFiltersString( aout_instance_t * p_aout, const char* psz_variab
 static int VisualizationCallback( vlc_object_t *p_this, char const *psz_cmd,
                        vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
-    aout_instance_t *p_aout = (aout_instance_t *)p_this;
+    audio_output_t *p_aout = (audio_output_t *)p_this;
     char *psz_mode = newval.psz_string;
     (void)psz_cmd; (void)oldval; (void)p_data;
 
@@ -827,7 +827,7 @@ static int VisualizationCallback( vlc_object_t *p_this, char const *psz_cmd,
 static int EqualizerCallback( vlc_object_t *p_this, char const *psz_cmd,
                        vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
-    aout_instance_t *p_aout = (aout_instance_t *)p_this;
+    audio_output_t *p_aout = (audio_output_t *)p_this;
     char *psz_mode = newval.psz_string;
     int i_ret;
     (void)psz_cmd; (void)oldval; (void)p_data;
@@ -856,7 +856,7 @@ static int ReplayGainCallback( vlc_object_t *p_this, char const *psz_cmd,
 {
     VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval);
     VLC_UNUSED(newval); VLC_UNUSED(p_data);
-    aout_instance_t *p_aout = (aout_instance_t *)p_this;
+    audio_output_t *p_aout = (audio_output_t *)p_this;
 
     aout_lock( p_aout );
     if( p_aout->p_input != NULL )
@@ -866,7 +866,7 @@ static int ReplayGainCallback( vlc_object_t *p_this, char const *psz_cmd,
     return VLC_SUCCESS;
 }
 
-static void ReplayGainSelect( aout_instance_t *p_aout, aout_input_t *p_input )
+static void ReplayGainSelect( audio_output_t *p_aout, aout_input_t *p_input )
 {
     char *psz_replay_gain = var_GetNonEmptyString( p_aout,
                                                    "audio-replay-gain-mode" );

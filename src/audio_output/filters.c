@@ -48,7 +48,7 @@ block_t *aout_FilterBufferNew( filter_t *p_filter, int size )
 /*****************************************************************************
  * FindFilter: find an audio filter for a specific transformation
  *****************************************************************************/
-static filter_t * FindFilter( aout_instance_t * p_aout,
+static filter_t * FindFilter( audio_output_t * p_aout,
                               const audio_sample_format_t * p_input_format,
                               const audio_sample_format_t * p_output_format )
 {
@@ -115,7 +115,7 @@ static int SplitConversion( const audio_sample_format_t *restrict infmt,
  * @param outfmt output audio format
  * @return 0 on success, -1 on failure
  */
-int aout_FiltersCreatePipeline( aout_instance_t *obj,
+int aout_FiltersCreatePipeline( audio_output_t *obj,
                                 filter_t **filters,
                                 int *nb_filters,
                                 const audio_sample_format_t *restrict infmt,
