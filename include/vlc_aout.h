@@ -153,9 +153,6 @@ typedef int32_t vlc_fixed_t;
 /* Number of samples in an A/52 frame. */
 #define A52_FRAME_NB 1536
 
-/* Max input rate factor (1/4 -> 4) */
-#define AOUT_MAX_INPUT_RATE (4)
-
 /** audio output buffer FIFO */
 struct aout_fifo_t
 {
@@ -166,10 +163,6 @@ struct aout_fifo_t
 
 /* FIXME to remove once aout.h is cleaned a bit more */
 #include <vlc_block.h>
-
-#define AOUT_RESAMPLING_NONE     0
-#define AOUT_RESAMPLING_UP       1
-#define AOUT_RESAMPLING_DOWN     2
 
 /** an output stream for the audio output */
 typedef struct aout_output_t

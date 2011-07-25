@@ -24,6 +24,15 @@
 #ifndef LIBVLC_AOUT_INTERNAL_H
 # define LIBVLC_AOUT_INTERNAL_H 1
 
+/* Max input rate factor (1/4 -> 4) */
+# define AOUT_MAX_INPUT_RATE (4)
+
+enum {
+    AOUT_RESAMPLING_NONE=0,
+    AOUT_RESAMPLING_UP,
+    AOUT_RESAMPLING_DOWN
+};
+
 # include <vlc_aout_mixer.h>
 
 typedef struct
