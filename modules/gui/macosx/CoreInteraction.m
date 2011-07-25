@@ -179,9 +179,6 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
         //vout_OSDMessage( VLCIntf, SPU_DEFAULT_CHANNEL, "%s", _( "Random Off" ) );
         config_PutInt( p_playlist, "random", 0 );
     }
-    
-    VLCIntf->p_sys->b_playmode_update = true;
-    VLCIntf->p_sys->b_intf_update = true;
 }
 
 - (void)repeatAll
@@ -194,9 +191,6 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
     config_PutInt( p_playlist, "loop", YES );
 
     //vout_OSDMessage( VLCIntf, SPU_DEFAULT_CHANNEL, "%s", _( "Repeat All" ) );
-
-    VLCIntf->p_sys->b_playmode_update = true;
-    VLCIntf->p_sys->b_intf_update = true;
 }
 
 - (void)repeatOne
@@ -209,9 +203,6 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
     config_PutInt( p_playlist, "loop", NO );
 
     //vout_OSDMessage( VLCIntf, SPU_DEFAULT_CHANNEL, "%s", _( "Repeat One" ) );
-
-    VLCIntf->p_sys->b_playmode_update = true;
-    VLCIntf->p_sys->b_intf_update = true;
 }
 
 - (void)repeatOff
@@ -224,9 +215,6 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
     config_PutInt( p_playlist, "loop", NO );
 
     //vout_OSDMessage( VLCIntf, SPU_DEFAULT_CHANNEL, "%s", _( "Repeat Off" ) );
-
-    VLCIntf->p_sys->b_playmode_update = true;
-    VLCIntf->p_sys->b_intf_update = true;
 }
 
 // CAVE: [o_main manageVolumeSlider]

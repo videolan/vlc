@@ -207,6 +207,7 @@
 - (IBAction)intfOpenCapture:(id)sender;
 
 - (IBAction)setPlaybackRate:(id)sender;
+- (void)updatePlaybackRate;
 
 - (IBAction)showWizard:(id)sender;
 - (IBAction)showVideoEffects:(id)sender;
@@ -228,6 +229,10 @@
 
 - (void)setPlay;
 - (void)setPause;
+- (void)setRepeatOne;
+- (void)setRepeatAll;
+- (void)setRepeatOff;
+- (void)setShuffle;
 
 - (IBAction)toggleVar:(id)sender;
 - (int)toggleVarThread:(id)_o_data;

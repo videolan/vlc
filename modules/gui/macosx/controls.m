@@ -80,21 +80,6 @@
     [[VLCCoreInteraction sharedInstance] stop];
 }
 
-- (IBAction)faster:(id)sender
-{
-    [[VLCCoreInteraction sharedInstance] faster];
-}
-
-- (IBAction)slower:(id)sender
-{
-    [[VLCCoreInteraction sharedInstance] slower];
-}
-
-- (IBAction)normalSpeed:(id)sender
-{
-    [[VLCCoreInteraction sharedInstance] normalSpeed];
-}
-
 - (IBAction)prev:(id)sender
 {
     [[VLCCoreInteraction sharedInstance] previous];
@@ -108,56 +93,7 @@
 - (IBAction)random:(id)sender
 {
     [[VLCCoreInteraction sharedInstance] shuffle];
-
-    vlc_value_t val;
-    playlist_t *p_playlist = pl_Get( VLCIntf );
-    var_Get( p_playlist, "random", &val );
-	if(val.b_bool) {
-        [o_btn_shuffle setImage: [NSImage imageNamed:@"shuffle-on"]];
-        [o_btn_shuffle setAlternateImage: [NSImage imageNamed:@"shuffle-blue-pressed"]];
-    }
-    else
-    {
-        [o_btn_shuffle setImage: [NSImage imageNamed:@"shuffle"]];
-        [o_btn_shuffle setAlternateImage: [NSImage imageNamed:@"shuffle-pressed"]];
-    }
 }
-
-- (IBAction)repeatButtonAction:(id)sender
-{
-    vlc_value_t looping,repeating;
-    intf_thread_t * p_intf = VLCIntf;
-    playlist_t * p_playlist = pl_Get( p_intf );
-
-    var_Get( p_playlist, "repeat", &repeating );
-    var_Get( p_playlist, "loop", &looping );
-
-    if( !repeating.b_bool && !looping.b_bool )
-    {
-        /* was: no repeating at all, switching to Repeat One */
-        [[VLCCoreInteraction sharedInstance] repeatOne];
-
-        [o_btn_repeat setImage: [NSImage imageNamed:@"repeat-one"]];
-        [o_btn_repeat setAlternateImage: [NSImage imageNamed:@"repeat-one-pressed"]];
-    }
-    else if( repeating.b_bool && !looping.b_bool )
-    {
-        /* was: Repeat One, switching to Repeat All */
-        [[VLCCoreInteraction sharedInstance] repeatAll];
-
-        [o_btn_repeat setImage: [NSImage imageNamed:@"repeat-all"]];
-        [o_btn_repeat setAlternateImage: [NSImage imageNamed:@"repeat-all-pressed"]];
-    }
-    else
-    {
-        /* was: Repeat All or bug in VLC, switching to Repeat Off */
-        [[VLCCoreInteraction sharedInstance] repeatOff];
-
-        [o_btn_repeat setImage: [NSImage imageNamed:@"repeat"]];
-        [o_btn_repeat setAlternateImage: [NSImage imageNamed:@"repeat-pressed"]];
-    }
-}
-
 
 - (IBAction)repeat:(id)sender
 {
@@ -201,7 +137,6 @@
 {
     [[VLCCoreInteraction sharedInstance] backward];
 }
-
 
 - (IBAction)volumeUp:(id)sender
 {

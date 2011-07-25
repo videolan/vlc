@@ -33,11 +33,6 @@
 {
     IBOutlet id o_main;
 
-    IBOutlet id o_volumeslider;
-
-    IBOutlet id o_btn_repeat;
-    IBOutlet id o_btn_shuffle;
-
     IBOutlet id o_specificTime_cancel_btn;
     IBOutlet id o_specificTime_enter_fld;
     IBOutlet id o_specificTime_goTo_lbl;
@@ -51,16 +46,12 @@
 }
 - (IBAction)play:(id)sender;
 - (IBAction)stop:(id)sender;
-- (IBAction)faster:(id)sender;
-- (IBAction)slower:(id)sender;
-- (IBAction)normalSpeed:(id)sender;
 
 - (IBAction)prev:(id)sender;
 - (IBAction)next:(id)sender;
 - (IBAction)random:(id)sender;
 - (IBAction)repeat:(id)sender;
 - (IBAction)loop:(id)sender;
-- (IBAction)repeatButtonAction:(id)sender;
 - (IBAction)quitAfterPlayback:(id)sender;
 
 - (IBAction)forward:(id)sender;

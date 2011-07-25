@@ -124,7 +124,7 @@
 - (IBAction)searchItem:(id)sender;
 
 - (void)playlistUpdated;
-- (void)playModeUpdated;
+- (void)outlineViewSelectionDidChange:(NSNotification *)notification;
 - (void)sortNode:(int)i_mode;
 - (void)updateRowSelection;
 

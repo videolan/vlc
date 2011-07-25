@@ -95,7 +95,12 @@
 - (void)updateTimeSlider;
 - (void)updateVolumeSlider;
 - (void)updateWindow;
+- (void)updateTitle;
 - (void)setPause;
 - (void)setPlay;
+- (void)setRepeatOne;
+- (void)setRepeatAll;
+- (void)setRepeatOff;
+- (void)setShuffle;
 
 @end

@@ -66,16 +66,6 @@ aout_instance_t *getAout(void);
  *****************************************************************************/
 struct intf_sys_t
 {
-    /* special actions */
-    int i_play_status;
-    int i_old_play_status;
-
-    /* interface update */
-    bool b_intf_update;
-    bool b_playlist_update;
-    bool b_playmode_update;
-    bool b_current_title_update;
-
     /* menus handlers */
     bool b_input_update;
     bool b_aout_update;
@@ -141,12 +131,6 @@ struct intf_sys_t
 
     input_state_e cachedInputState;
 
-    /* the manage thread */
-    pthread_t manage_thread;
-
-    /* The timer that update the interface */
-    NSTimer * interfaceTimer;
-
     NSURLConnection * crashLogURLConnection;
 
     AppleRemote * o_remote;
@@ -187,15 +171,20 @@ struct intf_sys_t
 - (NSString *)VLCKeyToString:(NSString *)theString;
 - (unsigned int)VLCModifiersToCocoa:(NSString *)theString;
 - (void)updateCurrentlyUsedHotkeys;
-
+- (void)PlaylistItemChanged;
+- (void)playbackStatusUpdated;
+- (void)playbackModeUpdated;
+- (void)updateVolume;
+- (void)updatePlaybackPosition;
+- (void)updateTitle;
+- (void)playlistUpdated;
+- (void)updateInfoandMetaPanel;
+- (void)updateMainWindow;
 - (void)initStrings;
 - (BOOL)application:(NSApplication *)o_app openFile:(NSString *)o_filename;
 
-- (void)manage;
-- (void)manageIntf:(NSTimer *)o_timer;
-
 - (void)updateMessageDisplay;
-- (void)playStatusUpdated:(int) i_status;
+
 - (IBAction)showController:(id)sender;
 
 - (IBAction)crashReporterAction:(id)sender;

@@ -57,7 +57,6 @@ static VLCInfo *_o_sharedInstance = nil;
         if( _o_sharedInstance != nil )
         {
             p_item = NULL;
-            o_statUpdateTimer = nil;
             [self updatePanelWithItem: NULL];
             rootItem = [[VLCInfoTreeItem alloc] init];
         }
@@ -124,59 +123,14 @@ static VLCInfo *_o_sharedInstance = nil;
     [self updatePanelWithItem:p_item];
 }
 
-- (void)stopTimers
-{
-    /* make sure that the timer is released in any case */
-    if( o_statUpdateTimer && [o_statUpdateTimer isValid] )
-        [o_statUpdateTimer invalidate];
-
-    [rootItem release];
-
-    [o_statUpdateTimer release];
-    o_statUpdateTimer = nil;
-}
 
 - (void)dealloc
 {
-    /* make sure that the timer is released in any case */
-    if( o_statUpdateTimer && [o_statUpdateTimer isValid] )
-        [o_statUpdateTimer invalidate];
-
-    [o_statUpdateTimer release];
+    [rootItem release];
 
     if( p_item ) vlc_gc_decref( p_item );
 
     [super dealloc];
-}
-
-- (void)windowDidBecomeKey:(NSNotification *)notification
-{
-    BOOL b_stats = config_GetInt(VLCIntf, "stats");
-    if( b_stats )
-    {
-        if( o_statUpdateTimer )
-        {
-            [o_statUpdateTimer invalidate];
-            [o_statUpdateTimer release];
-            o_statUpdateTimer = nil;
-        }
-        o_statUpdateTimer = [NSTimer scheduledTimerWithTimeInterval: 1
-            target: self selector: @selector(updateStatistics:)
-            userInfo: nil repeats: YES];
-        [o_statUpdateTimer fire];
-        [o_statUpdateTimer retain];
-    }
-}
-
-- (BOOL)windowShouldClose:(id)sender
-{
-    if( [o_statUpdateTimer isValid] )
-        [o_statUpdateTimer invalidate];
-
-    if( o_statUpdateTimer )
-        [o_statUpdateTimer release];
-    o_statUpdateTimer = nil;
-    return YES;
 }
 
 - (void)initPanel
@@ -305,7 +259,7 @@ static VLCInfo *_o_sharedInstance = nil;
     [o_outline_view reloadData];
 
     /* update the stats once to display p_item change faster */
-    [self updateStatistics: nil];
+    [self updateStatistics];
 }
 
 - (void)setMeta: (char *)psz_meta forLabel: (id)theItem
@@ -316,47 +270,50 @@ static VLCInfo *_o_sharedInstance = nil;
         [theItem setStringValue: @""];
 }
 
-- (void)updateStatistics:(NSTimer*)theTimer
+- (void)updateStatistics
 {
-    if( !p_item || !p_item->p_stats )
+    if ([o_info_window isVisible])
     {
-        [self initMediaPanelStats];
-        return;
+        if( !p_item || !p_item->p_stats )
+        {
+            [self initMediaPanelStats];
+            return;
+        }
+
+        vlc_mutex_lock( &p_item->p_stats->lock );
+
+        /* input */
+        [o_read_bytes_txt setStringValue: [NSString stringWithFormat:
+            @"%8.0f KiB", (float)(p_item->p_stats->i_read_bytes)/1024]];
+        [o_input_bitrate_txt setStringValue: [NSString stringWithFormat:
+            @"%6.0f kb/s", (float)(p_item->p_stats->f_input_bitrate)*8000]];
+        [o_demux_bytes_txt setStringValue: [NSString stringWithFormat:
+            @"%8.0f KiB", (float)(p_item->p_stats->i_demux_read_bytes)/1024]];
+        [o_demux_bitrate_txt setStringValue: [NSString stringWithFormat:
+            @"%6.0f kb/s", (float)(p_item->p_stats->f_demux_bitrate)*8000]];
+
+        /* Video */
+        [o_video_decoded_txt setIntValue: p_item->p_stats->i_decoded_video];
+        [o_displayed_txt setIntValue: p_item->p_stats->i_displayed_pictures];
+        [o_lost_frames_txt setIntValue: p_item->p_stats->i_lost_pictures];
+        float f_fps = 0;
+        /* FIXME: input_Control( p_item, INPUT_GET_VIDEO_FPS, &f_fps ); */
+        [o_fps_txt setFloatValue: f_fps];
+
+        /* Sout */
+        [o_sent_packets_txt setIntValue: p_item->p_stats->i_sent_packets];
+        [o_sent_bytes_txt setStringValue: [NSString stringWithFormat: @"%8.0f KiB",
+            (float)(p_item->p_stats->i_sent_bytes)/1024]];
+        [o_sent_bitrate_txt setStringValue: [NSString stringWithFormat:
+            @"%6.0f kb/s", (float)(p_item->p_stats->f_send_bitrate*8)*1000]];
+
+        /* Audio */
+        [o_audio_decoded_txt setIntValue: p_item->p_stats->i_decoded_audio];
+        [o_played_abuffers_txt setIntValue: p_item->p_stats->i_played_abuffers];
+        [o_lost_abuffers_txt setIntValue: p_item->p_stats->i_lost_abuffers];
+
+        vlc_mutex_unlock( &p_item->p_stats->lock );
     }
-
-    vlc_mutex_lock( &p_item->p_stats->lock );
-
-    /* input */
-    [o_read_bytes_txt setStringValue: [NSString stringWithFormat:
-        @"%8.0f KiB", (float)(p_item->p_stats->i_read_bytes)/1024]];
-    [o_input_bitrate_txt setStringValue: [NSString stringWithFormat:
-        @"%6.0f kb/s", (float)(p_item->p_stats->f_input_bitrate)*8000]];
-    [o_demux_bytes_txt setStringValue: [NSString stringWithFormat:
-        @"%8.0f KiB", (float)(p_item->p_stats->i_demux_read_bytes)/1024]];
-    [o_demux_bitrate_txt setStringValue: [NSString stringWithFormat:
-        @"%6.0f kb/s", (float)(p_item->p_stats->f_demux_bitrate)*8000]];
-
-    /* Video */
-    [o_video_decoded_txt setIntValue: p_item->p_stats->i_decoded_video];
-    [o_displayed_txt setIntValue: p_item->p_stats->i_displayed_pictures];
-    [o_lost_frames_txt setIntValue: p_item->p_stats->i_lost_pictures];
-    float f_fps = 0;
-    /* FIXME: input_Control( p_item, INPUT_GET_VIDEO_FPS, &f_fps ); */
-    [o_fps_txt setFloatValue: f_fps];
-
-    /* Sout */
-    [o_sent_packets_txt setIntValue: p_item->p_stats->i_sent_packets];
-    [o_sent_bytes_txt setStringValue: [NSString stringWithFormat: @"%8.0f KiB",
-        (float)(p_item->p_stats->i_sent_bytes)/1024]];
-    [o_sent_bitrate_txt setStringValue: [NSString stringWithFormat:
-        @"%6.0f kb/s", (float)(p_item->p_stats->f_send_bitrate*8)*1000]];
-
-    /* Audio */
-    [o_audio_decoded_txt setIntValue: p_item->p_stats->i_decoded_audio];
-    [o_played_abuffers_txt setIntValue: p_item->p_stats->i_played_abuffers];
-    [o_lost_abuffers_txt setIntValue: p_item->p_stats->i_lost_abuffers];
-
-    vlc_mutex_unlock( &p_item->p_stats->lock );
 }
 
 - (IBAction)metaFieldChanged:(id)sender

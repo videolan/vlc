@@ -255,6 +255,24 @@ static VLCMainWindow *_o_sharedInstance = nil;
     }
 }
 
+- (void)setRepeatOne
+{
+    [o_repeat_btn setImage: o_repeat_one_img];
+    [o_repeat_btn setAlternateImage: o_repeat_one_pressed_img];   
+}
+
+- (void)setRepeatAll
+{
+    [o_repeat_btn setImage: o_repeat_all_img];
+    [o_repeat_btn setAlternateImage: o_repeat_all_pressed_img];
+}
+
+- (void)setRepeatOff
+{
+    [o_repeat_btn setImage: o_repeat_img];
+    [o_repeat_btn setAlternateImage: o_repeat_pressed_img];
+}
+
 - (IBAction)repeat:(id)sender
 {
     vlc_value_t looping,repeating;
@@ -268,36 +286,28 @@ static VLCMainWindow *_o_sharedInstance = nil;
     {
         /* was: no repeating at all, switching to Repeat One */
         [[VLCCoreInteraction sharedInstance] repeatOne];
-
-        [o_repeat_btn setImage: o_repeat_one_img];
-        [o_repeat_btn setAlternateImage: o_repeat_one_pressed_img];
+        [self setRepeatOne];
     }
     else if( repeating.b_bool && !looping.b_bool )
     {
         /* was: Repeat One, switching to Repeat All */
         [[VLCCoreInteraction sharedInstance] repeatAll];
-
-        [o_repeat_btn setImage: o_repeat_all_img];
-        [o_repeat_btn setAlternateImage: o_repeat_all_pressed_img];
+        [self setRepeatAll];
     }
     else
     {
         /* was: Repeat All or bug in VLC, switching to Repeat Off */
         [[VLCCoreInteraction sharedInstance] repeatOff];
-
-        [o_repeat_btn setImage: o_repeat_img];
-        [o_repeat_btn setAlternateImage: o_repeat_pressed_img];
+        [self setRepeatOff];
     }
 }
 
-- (IBAction)shuffle:(id)sender
+- (void)setShuffle
 {
-    [[VLCCoreInteraction sharedInstance] shuffle];
-
-    vlc_value_t val;
+    bool b_value;
     playlist_t *p_playlist = pl_Get( VLCIntf );
-    var_Get( p_playlist, "random", &val );
-	if(val.b_bool) {
+    b_value = var_GetBool( p_playlist, "random" );
+	if(b_value) {
         [o_shuffle_btn setImage: o_shuffle_on_img];
         [o_shuffle_btn setAlternateImage: o_shuffle_on_pressed_img];
     }
@@ -306,6 +316,12 @@ static VLCMainWindow *_o_sharedInstance = nil;
         [o_shuffle_btn setImage: o_shuffle_img];
         [o_shuffle_btn setAlternateImage: o_shuffle_pressed_img];
     }
+}
+
+- (IBAction)shuffle:(id)sender
+{
+    [[VLCCoreInteraction sharedInstance] shuffle];
+    [self setShuffle];
 }
 
 - (IBAction)timeSliderAction:(id)sender
@@ -383,35 +399,32 @@ static VLCMainWindow *_o_sharedInstance = nil;
 #pragma mark Update interface and respond to foreign events
 - (void)updateTimeSlider
 {
-    if ([o_time_sld isEnabled])
+    input_thread_t * p_input;
+    p_input = pl_CurrentInput( VLCIntf );
+    if( p_input )
     {
-        input_thread_t * p_input;
-        p_input = pl_CurrentInput( VLCIntf );
-        if( p_input )
+        vlc_value_t time;
+        NSString * o_time;
+        vlc_value_t pos;
+        char psz_time[MSTRTIME_MAX_SIZE];
+        float f_updated;
+
+        var_Get( p_input, "position", &pos );
+        f_updated = 10000. * pos.f_float;
+        [o_time_sld setFloatValue: f_updated];
+
+        var_Get( p_input, "time", &time );
+
+        mtime_t dur = input_item_GetDuration( input_GetItem( p_input ) );
+        if( b_time_remaining && dur != -1 )
         {
-            vlc_value_t time;
-            NSString * o_time;
-            vlc_value_t pos;
-            char psz_time[MSTRTIME_MAX_SIZE];
-            float f_updated;
-
-            var_Get( p_input, "position", &pos );
-            f_updated = 10000. * pos.f_float;
-            [o_time_sld setFloatValue: f_updated];
-
-            var_Get( p_input, "time", &time );
-
-            mtime_t dur = input_item_GetDuration( input_GetItem( p_input ) );
-            if( b_time_remaining && dur != -1 )
-            {
-                o_time = [NSString stringWithFormat: @"-%s", secstotimestr( psz_time, ((dur - time.i_time) / 1000000))];
-            }
-            else
-                o_time = [NSString stringWithUTF8String: secstotimestr( psz_time, (time.i_time / 1000000) )];
-
-            [o_time_fld setStringValue: o_time];
-    //        [[[[VLCMain sharedInstance] controls] fspanel] setStreamPos: f_updated andTime: o_time];
+            o_time = [NSString stringWithFormat: @"-%s", secstotimestr( psz_time, ((dur - time.i_time) / 1000000))];
         }
+        else
+            o_time = [NSString stringWithUTF8String: secstotimestr( psz_time, (time.i_time / 1000000) )];
+
+        [o_time_fld setStringValue: o_time];
+//        [[[[VLCMain sharedInstance] controls] fspanel] setStreamPos: f_updated andTime: o_time];
     }
 }
 
@@ -429,6 +442,29 @@ static VLCMainWindow *_o_sharedInstance = nil;
         i_volume_step = config_GetInt( VLCIntf->p_libvlc, "volume-step" );
         [o_volume_sld setFloatValue: (float)i_lastShownVolume / i_volume_step];
 //        [[[[VLCMain sharedInstance] controls] fspanel] setVolumeLevel: (float)i_lastShownVolume / i_volume_step];
+    }
+}
+
+- (void)updateTitle
+{
+    input_thread_t * p_input;
+
+    p_input = pl_CurrentInput( VLCIntf );
+    if( p_input )
+    {
+        NSString *aString;
+        input_item_t * p_item = input_GetItem( p_input );
+        char * name = input_item_GetNowPlaying( p_item );
+
+        if( !name )
+            name = input_item_GetName( p_item );
+
+        aString = [NSString stringWithUTF8String:name];
+
+        free(name);
+
+        [self setTitle: aString];
+        [[[[VLCMain sharedInstance] controls] fspanel] setStreamTitle: aString];
     }
 }
 
@@ -483,10 +519,9 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [o_bwd_btn setEnabled: (b_seekable || b_plmul || b_chapters)];
     [[VLCMainMenu sharedInstance] setRateControlsEnabled: b_control];
 
-    [o_time_sld setFloatValue: 0.0];
+
     [o_time_sld setEnabled: b_seekable];
-    [o_time_fld setStringValue: @"0:00:00"];
-    [[[[VLCMain sharedInstance] controls] fspanel] setStreamPos: 0 andTime: @"0:00:00"];
+    [self updateTimeSlider];
     [[[[VLCMain sharedInstance] controls] fspanel] setSeekable: b_seekable];
 }
 

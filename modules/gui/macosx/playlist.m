@@ -521,25 +521,6 @@
     [self outlineViewSelectionDidChange: nil];
 }
 
-- (void)playModeUpdated
-{
-    //FIXME this is broken, re-write with VLCMainWindow!
-    NSLog( @"playModeUpdated is broken, re-write with VLCMainWindow!" );
-    /*
-    playlist_t *p_playlist = pl_Get( VLCIntf );
-
-    bool loop = var_GetBool( p_playlist, "loop" );
-    bool repeat = var_GetBool( p_playlist, "repeat" );
-    if( repeat )
-        [[[VLCMain sharedInstance] controls] repeatOne];
-    else if( loop )
-        [[[VLCMain sharedInstance] controls] repeatAll];
-    else
-        [[[VLCMain sharedInstance] controls] repeatOff];
-
-    [[[VLCMain sharedInstance] controls] shuffle];*/
-}
-
 - (void)outlineViewSelectionDidChange:(NSNotification *)notification
 {
     // FIXME: unsafe
@@ -1481,8 +1462,7 @@
     id o_playing_item;
 
     PL_LOCK;
-    o_playing_item = [o_outline_dict objectForKey:
-                      [NSString stringWithFormat:@"%p",  playlist_CurrentPlayingItem( p_playlist )]];
+    o_playing_item = [o_outline_dict objectForKey: [NSString stringWithFormat:@"%p",  playlist_CurrentPlayingItem( p_playlist )]];
     PL_UNLOCK;
 
     return o_playing_item;

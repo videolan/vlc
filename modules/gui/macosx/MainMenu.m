@@ -549,6 +549,14 @@ static VLCMainMenu *_o_sharedInstance = nil;
     [o_mi_rate_fld setStringValue: [NSString stringWithFormat:@"%ix", i]];
 }
 
+- (void)updatePlaybackRate
+{
+    int i = [[VLCCoreInteraction sharedInstance] playbackRate];
+    if (i == 0)
+        i = 1;
+    [o_mi_rate_fld setStringValue: [NSString stringWithFormat:@"%ix", i]];
+    [o_mi_rate_sld setIntValue: i];
+}
 
 #pragma mark -
 #pragma mark Panels
@@ -719,6 +727,32 @@ static VLCMainMenu *_o_sharedInstance = nil;
     [o_mi_play setTitle: _NS("Pause")];
     [o_dmi_play setTitle: _NS("Pause")];
     [o_vmi_play setTitle: _NS("Pause")];
+}
+
+- (void)setRepeatOne
+{
+    [o_mi_repeat setState: NSOnState];
+    [o_mi_loop setState: NSOffState];
+}
+
+- (void)setRepeatAll
+{
+    [o_mi_repeat setState: NSOffState];
+    [o_mi_loop setState: NSOnState];
+}
+
+- (void)setRepeatOff
+{
+    [o_mi_repeat setState: NSOffState];
+    [o_mi_loop setState: NSOffState];
+}
+
+- (void)setShuffle
+{
+    bool b_value;
+    playlist_t *p_playlist = pl_Get( VLCIntf );
+    b_value = var_GetBool( p_playlist, "random" );
+	[o_mi_random setState: b_value];
 }
 
 #pragma mark -

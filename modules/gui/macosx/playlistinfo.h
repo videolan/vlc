@@ -98,11 +98,9 @@
     VLCInfoTreeItem * rootItem;
 
     input_item_t * p_item;
-    NSTimer * o_statUpdateTimer;
 }
 
 - (void)initPanel;
-- (void)stopTimers;
 
 - (IBAction)metaFieldChanged:(id)sender;
 - (IBAction)saveMetaData:(id)sender;
@@ -111,7 +109,7 @@
 - (void)updatePanelWithItem:(input_item_t *)_p_item;
 - (input_item_t *)item;
 - (void)setMeta: (char *)meta forLabel: (id)theItem;
-- (void)updateStatistics: (NSTimer*)theTimer;
+- (void)updateStatistics;
 
 + (VLCInfo *)sharedInstance;
 @end
