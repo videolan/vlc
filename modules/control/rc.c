@@ -1496,20 +1496,12 @@ static int Volume( vlc_object_t *p_this, char const *psz_cmd,
     {
         /* Set. */
         audio_volume_t i_volume = atoi( newval.psz_string );
-        if ( (i_volume > (audio_volume_t)AOUT_VOLUME_MAX) )
-        {
-            msg_rc( "Volume must be in the range 0-%d.", AOUT_VOLUME_MAX );
-            i_error = VLC_EBADVAR;
-        }
-        else
-        {
-            if( i_volume == 0 )
-                aout_ToggleMute( p_playlist, NULL );
-            if( !aout_VolumeSet( p_playlist, i_volume ) )
-                i_error = VLC_SUCCESS;
-            osd_Volume( p_this );
-            msg_rc( STATUS_CHANGE "( audio volume: %d )", i_volume );
-        }
+        if( i_volume == 0 )
+            aout_ToggleMute( p_playlist, NULL );
+        if( !aout_VolumeSet( p_playlist, i_volume ) )
+            i_error = VLC_SUCCESS;
+        osd_Volume( p_this );
+        msg_rc( STATUS_CHANGE "( audio volume: %d )", i_volume );
     }
     else
     {
