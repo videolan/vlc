@@ -3341,7 +3341,7 @@ then
         VLC_ADD_LIBS([directx],[-lgdi32])
       ],[AC_MSG_ERROR([Cannot find DirectX headers!])]
       )
-      AC_CHECK_HEADERS(GL/gl.h,
+      AC_CHECK_HEADERS(GL/glext.h,
       [ VLC_ADD_PLUGIN([glwin32])
         VLC_ADD_LIBS([glwin32],[-lopengl32 -lgdi32])
       ])
