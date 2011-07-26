@@ -35,7 +35,7 @@ endif
 libpulse_plugin_la_SOURCES = pulse.c
 libpulse_plugin_la_CFLAGS = $(AM_CFLAGS) $(PULSE_CFLAGS)
 libpulse_plugin_la_LIBADD = $(AM_LIBADD) $(PULSE_LIBS) \
-	../../src/libvlcpulse.la
+	$(LIBM) ../../src/libvlcpulse.la
 libpulse_plugin_la_DEPENDENCIES =
 if HAVE_PULSE
 libvlc_LTLIBRARIES += libpulse_plugin.la

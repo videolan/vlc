@@ -147,7 +147,7 @@ static void sink_info_cb(pa_context *c, const pa_sink_info *i, int eol,
         sys->base_volume = i->base_volume;
     else
         sys->base_volume = PA_VOLUME_NORM;
-    msg_Dbg(aout, "base volume: %f", pa_sw_volume_to_linear(sys->base_volume));
+    msg_Dbg(aout, "base volume: %"PRIu32, sys->base_volume);
 }
 
 /*** Stream helpers ***/
@@ -349,7 +349,7 @@ static void sink_input_info_cb(pa_context *ctx, const pa_sink_input_info *i,
     (void) ctx;
 
     sys->cvolume = i->volume;
-    volume = pa_sw_volume_to_linear(pa_cvolume_max(&i->volume));
+    volume = pa_cvolume_max(&i->volume) / (float)PA_VOLUME_NORM;
     aout_VolumeHardSet(aout, volume, i->mute);
 }
 
@@ -497,11 +497,19 @@ static int VolumeSet(audio_output_t *aout, float vol, bool mute)
     uint32_t idx = pa_stream_get_index(sys->stream);
 
     pa_cvolume cvolume = sys->cvolume;
-    pa_volume_t volume = pa_sw_volume_multiply(pa_sw_volume_from_linear(vol),
-                                               sys->base_volume);
+    pa_volume_t volume = sys->base_volume;
 
     pa_cvolume_scale(&cvolume, PA_VOLUME_NORM); /* preserve balance */
+
+    /* VLC provides the software volume so convert directly to PulseAudio
+     * software volume, pa_volume_t. This is not a linear amplification factor
+     * so do not use PulseAudio linear amplification! */
+    vol *= PA_VOLUME_NORM;
+    if (unlikely(vol >= PA_VOLUME_MAX))
+        vol = PA_VOLUME_MAX;
+    volume = pa_sw_volume_multiply(volume, lround(vol));
     pa_sw_cvolume_multiply_scalar(&cvolume, &cvolume, volume);
+
     assert(pa_cvolume_valid(&cvolume));
 
     vlc_pa_lock();
