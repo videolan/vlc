@@ -170,7 +170,7 @@ MarshalVolume( intf_thread_t *p_intf, DBusMessageIter *container )
     audio_volume_t i_vol = aout_VolumeGet( p_intf->p_sys->p_playlist );
 
     /* A volume of 1.0 represents a sensible maximum, ie: 0dB */
-    double d_vol = (double) i_vol / ( AOUT_VOLUME_MAX >> 2 );
+    double d_vol = (double) i_vol / AOUT_VOLUME_DEFAULT;
 
     dbus_message_iter_append_basic( container, DBUS_TYPE_DOUBLE, &d_vol );
 }
