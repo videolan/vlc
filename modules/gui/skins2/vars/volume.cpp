@@ -36,13 +36,13 @@ Volume::Volume( intf_thread_t *pIntf ): VarPercent( pIntf )
     m_step = (float)config_GetInt( pIntf, "volume-step" ) / AOUT_VOLUME_MAX;
     if( var_InheritBool( pIntf, "qt-volume-complete" ) )
     {
-        m_max = 400;
+        m_max = AOUT_VOLUME_MAX * 100 / AOUT_VOLUME_DEFAULT;
         m_volumeMax = AOUT_VOLUME_MAX;
     }
     else
     {
         m_max = 200;
-        m_volumeMax = AOUT_VOLUME_MAX / 2;
+        m_volumeMax = AOUT_VOLUME_DEFAULT * 2;
     }
 
     // Initial value
