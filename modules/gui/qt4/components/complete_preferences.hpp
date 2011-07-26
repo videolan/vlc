@@ -51,6 +51,7 @@ public:
     PrefsItemData()
     { panel = NULL; i_object_id = 0; i_subcat_id = -1; psz_name = NULL; };
     virtual ~PrefsItemData() { free( psz_name ); };
+    bool contains( const QString &text, Qt::CaseSensitivity cs );
     AdvPrefsPanel *panel;
     int i_object_id;
     int i_subcat_id;

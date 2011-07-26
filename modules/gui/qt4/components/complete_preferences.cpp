@@ -343,6 +343,96 @@ void PrefsTree::doAll( bool doclean )
     }
 }
 
+/* go over the module config items and search text in psz_text
+ * also search the module name and head */
+bool PrefsItemData::contains( const QString &text, Qt::CaseSensitivity cs )
+{
+    /* Find our module */
+    module_t *p_module = NULL;
+    if( this->i_type == TYPE_CATEGORY )
+        return false;
+    else if( this->i_type == TYPE_MODULE )
+        p_module = module_find( this->psz_name );
+    else
+    {
+        p_module = module_get_main();
+        assert( p_module );
+    }
+
+    unsigned confsize;
+    module_config_t *const p_config = module_config_get (p_module, &confsize),
+                    *p_item = p_config,
+                    *p_end = p_config + confsize;
+
+    if( this->i_type == TYPE_SUBCATEGORY || this->i_type ==  TYPE_CATSUBCAT )
+    {
+        while ( p_item < p_end )
+        {
+            if( p_item->i_type == CONFIG_SUBCATEGORY &&
+                (
+                    ( this->i_type == TYPE_SUBCATEGORY &&
+                              p_item->value.i == this->i_object_id )
+                    ||
+                    ( this->i_type == TYPE_CATSUBCAT &&
+                              p_item->value.i == this->i_subcat_id )
+                )
+              )
+                break;
+            p_item++;
+        }
+    }
+
+    QString head;
+
+    if( this->i_type == TYPE_SUBCATEGORY || this->i_type ==  TYPE_CATSUBCAT )
+    {
+        head.clear();
+        p_item++; // Why that ? +1
+    }
+    else
+    {
+        head = QString( qtr( module_GetLongName( p_module ) ) );
+    }
+
+    if (name.contains( text, cs ) || head.contains( text, cs ) || help.contains( text, cs ))
+    {
+        module_release( p_module );
+        return true;
+    }
+
+    if( p_item ) do
+    {
+        if (
+            (
+                ( this->i_type == TYPE_SUBCATEGORY && p_item->value.i != this->i_object_id )
+                ||
+                ( this->i_type == TYPE_CATSUBCAT && p_item->value.i != this->i_subcat_id )
+            ) &&
+            ( p_item->i_type == CONFIG_CATEGORY || p_item->i_type == CONFIG_SUBCATEGORY )
+           ) break;
+
+        if( p_item->b_internal ) continue;
+
+        if ( p_item->psz_text && qtr( p_item->psz_text ).contains( text, cs ) )
+        {
+            module_release( p_module );
+            return true;
+        }
+    }
+    while (
+            !(
+                ( this->i_type == TYPE_SUBCATEGORY || this->i_type == TYPE_CATSUBCAT )
+                &&
+                ( p_item->i_type == CONFIG_CATEGORY || p_item->i_type == CONFIG_SUBCATEGORY )
+             )
+             && ( ++p_item < p_end )
+          );
+
+
+    module_release( p_module );
+    return false;
+}
+
 /*********************************************************************
  * The Panel
  *********************************************************************/
