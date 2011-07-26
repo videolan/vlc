@@ -343,6 +343,75 @@ void PrefsTree::doAll( bool doclean )
     }
 }
 
+/* apply filter on tree item and recursively on its sub items
+ * returns whether the item was filtered */
+bool PrefsTree::filterItems( QTreeWidgetItem *item, const QString &text,
+                           Qt::CaseSensitivity cs )
+{
+    bool sub_filtered = true;
+
+    for( int i = 0; i < item->childCount(); i++ )
+    {
+        QTreeWidgetItem *sub_item = item->child( i );
+        if ( !filterItems( sub_item, text, cs ) )
+        {
+            /* not all the sub items were filtered */
+            sub_filtered = false;
+        }
+    }
+
+    PrefsItemData *data = item->data( 0, Qt::UserRole ).value<PrefsItemData *>();
+
+    bool filtered = sub_filtered && !data->contains( text, cs );
+    item->setExpanded( !sub_filtered );
+    item->setHidden( filtered );
+
+    return filtered;
+}
+
+
+/* collapse item if it's not selected or one of its sub items
+ * returns whether the item was collapsed */
+bool PrefsTree::collapseUnselectedItems( QTreeWidgetItem *item )
+{
+    bool sub_collapsed = true;
+
+    for( int i = 0; i < item->childCount(); i++ )
+    {
+        QTreeWidgetItem *sub_item = item->child( i );
+        if ( !collapseUnselectedItems( sub_item ) )
+        {
+            /* not all the sub items were collapsed */
+            sub_collapsed = false;
+        }
+    }
+
+    bool collapsed = sub_collapsed && !item->isSelected();
+    item->setExpanded( !sub_collapsed );
+    item->setHidden( false );
+
+    return collapsed;
+}
+
+/* apply filter on tree */
+void PrefsTree::filter( const QString &text )
+{
+    bool clear_filter = text.isEmpty();
+
+    for( int i = 0 ; i < topLevelItemCount(); i++ )
+    {
+        QTreeWidgetItem *cat_item = topLevelItem( i );
+        if ( clear_filter )
+        {
+            collapseUnselectedItems( cat_item );
+        }
+        else
+        {
+            filterItems( cat_item, text, Qt::CaseInsensitive );
+        }
+    }
+}
+
 /* go over the module config items and search text in psz_text
  * also search the module name and head */
 bool PrefsItemData::contains( const QString &text, Qt::CaseSensitivity cs )

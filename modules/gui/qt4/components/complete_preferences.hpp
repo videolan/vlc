@@ -72,9 +72,12 @@ public:
 
     void applyAll();
     void cleanAll();
+    void filter( const QString &text );
 
 private:
     void doAll( bool );
+    bool filterItems( QTreeWidgetItem *item, const QString &text, Qt::CaseSensitivity cs );
+    bool collapseUnselectedItems( QTreeWidgetItem *item );
     intf_thread_t *p_intf;
 };
 
