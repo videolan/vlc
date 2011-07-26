@@ -678,29 +678,13 @@ AC_CHECK_FUNC(getopt_long,, [
 ])
 AC_SUBST(GNUGETOPT_LIBS)
 
-if test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"; then
 AC_CHECK_LIB(m,cos,[
-  VLC_ADD_LIBS([adjust wave ripple psychedelic gradient a52tofloat32 dtstofloat32 x264 goom visual panoramix rotate noise grain scene kate flac lua chorus_flanger freetype],[-lm])
+  VLC_ADD_LIBS([adjust wave ripple psychedelic gradient a52tofloat32 dtstofloat32 x264 goom visual panoramix rotate noise grain scene kate flac lua chorus_flanger freetype avcodec avformat access_avio swscale postproc i420_rgb faad twolame equalizer spatializer param_eq libvlccore freetype mod mpc dmo quicktime realvideo qt4 compressor headphone_channel_mixer normvol audiobargraph_a speex mono colorthres extract ball access_imem hotkeys mosaic gaussianblur dbus x264],[-lm])
+  LIBM="-lm"
+], [
+  LIBM=""
 ])
-AC_CHECK_LIB(m,pow,[
-  VLC_ADD_LIBS([avcodec avformat access_avio swscale postproc i420_rgb faad twolame equalizer spatializer param_eq libvlccore freetype mod mpc dmo quicktime realvideo qt4],[-lm])
-])
-AC_CHECK_LIB(m,sqrt,[
-  VLC_ADD_LIBS([compressor headphone_channel_mixer normvol audiobargraph_a speex mono colorthres extract ball],[-lm])
-])
-AC_CHECK_LIB(m,ceil,[
-  VLC_ADD_LIBS([access_imem hotkeys mosaic],[-lm])
-])
-AC_CHECK_LIB(m,exp,[
-  VLC_ADD_LIBS([gaussianblur],[-lm])
-])
-AC_CHECK_LIB(m,round,[
-  VLC_ADD_LIBS([dbus],[-lm])
-])
-AC_CHECK_LIB(m,sqrtf,[
-  VLC_ADD_LIBS([x264],[-lm])
-])
-fi # end "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"
+AC_SUBST(LIBM)
 
 AC_CHECK_LIB(m,lrintf, [
   AC_DEFINE(HAVE_LRINTF, 1, [Define to 1 if you have the lrintf function])
