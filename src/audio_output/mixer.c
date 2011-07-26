@@ -51,7 +51,7 @@ int aout_MixerNew( audio_output_t * p_aout )
         return VLC_EGENERIC;
 
     p_mixer->fmt = p_aout->mixer_format;
-    p_mixer->input = &p_aout->p_input->mixer;
+    p_mixer->fifo = &p_aout->p_input->fifo;
     p_mixer->mix = NULL;
     p_mixer->sys = NULL;
 
@@ -93,8 +93,7 @@ void aout_MixerDelete( audio_output_t * p_aout )
 static int MixBuffer( audio_output_t * p_aout, float volume )
 {
     aout_mixer_t *p_mixer = p_aout->p_mixer;
-    aout_mixer_input_t *p_input = p_mixer->input;
-    aout_fifo_t *p_fifo = &p_input->fifo;
+    aout_fifo_t *p_fifo = p_mixer->fifo;
     mtime_t now = mdate();
     const unsigned samples = p_aout->i_nb_samples;
     /* FIXME: Remove this silly constraint. Just pass buffers as they come to

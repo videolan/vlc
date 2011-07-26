@@ -93,7 +93,7 @@ struct aout_input_t
     aout_request_vout_t request_vout;
 
     /* */
-    aout_mixer_input_t mixer;
+    aout_fifo_t       fifo;
  };
 
 /****************************************************************************

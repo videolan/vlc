@@ -40,10 +40,6 @@ extern "C" {
 typedef struct aout_mixer_sys_t aout_mixer_sys_t;
 typedef struct aout_mixer_t aout_mixer_t;
 
-typedef struct {
-    aout_fifo_t fifo;
-} aout_mixer_input_t;
-
 /** 
  * audio output mixer
  */
@@ -59,8 +55,7 @@ struct aout_mixer_t {
      */
     audio_sample_format_t fmt;
 
-    /* Array of mixer inputs */
-    aout_mixer_input_t    *input;
+    aout_fifo_t    *fifo;
 
     /* Mix buffer (mandatory) */
     void (*mix)(aout_mixer_t *, aout_buffer_t *, float);

@@ -81,7 +81,7 @@ int aout_InputNew( audio_output_t * p_aout, aout_input_t * p_input, const aout_r
     p_input->i_nb_resamplers = p_input->i_nb_filters = 0;
 
     /* Prepare FIFO. */
-    aout_FifoInit( p_aout, &p_input->mixer.fifo, p_aout->mixer_format.i_rate );
+    aout_FifoInit( p_aout, &p_input->fifo, p_aout->mixer_format.i_rate );
 
     /* */
     if( p_request_vout )
@@ -446,7 +446,7 @@ int aout_InputDelete( audio_output_t * p_aout, aout_input_t * p_input )
     aout_FiltersDestroyPipeline( p_input->pp_resamplers,
                                  p_input->i_nb_resamplers );
     p_input->i_nb_resamplers = 0;
-    aout_FifoDestroy( &p_input->mixer.fifo );
+    aout_FifoDestroy( &p_input->fifo );
 
     return 0;
 }
@@ -465,16 +465,16 @@ void aout_InputCheckAndRestart( audio_output_t * p_aout, aout_input_t * p_input 
 
     /* A little trick to avoid loosing our input fifo and properties */
 
-    aout_fifo_t fifo = p_input->mixer.fifo;
+    aout_fifo_t fifo = p_input->fifo;
     bool b_paused = p_input->b_paused;
     mtime_t i_pause_date = p_input->i_pause_date;
 
-    aout_FifoInit( p_aout, &p_input->mixer.fifo, p_aout->mixer_format.i_rate );
+    aout_FifoInit( p_aout, &p_input->fifo, p_aout->mixer_format.i_rate );
 
     aout_InputDelete( p_aout, p_input );
 
     aout_InputNew( p_aout, p_input, &p_input->request_vout );
-    p_input->mixer.fifo = fifo;
+    p_input->fifo = fifo;
     p_input->b_paused = b_paused;
     p_input->i_pause_date = i_pause_date;
 
@@ -540,7 +540,7 @@ void aout_InputPlay( audio_output_t * p_aout, aout_input_t * p_input,
     /* We don't care if someone changes the start date behind our back after
      * this. We'll deal with that when pushing the buffer, and compensate
      * with the next incoming buffer. */
-    start_date = aout_FifoNextStart( &p_input->mixer.fifo );
+    start_date = aout_FifoNextStart( &p_input->fifo );
 
     if ( start_date != 0 && start_date < now )
     {
@@ -549,7 +549,7 @@ void aout_InputPlay( audio_output_t * p_aout, aout_input_t * p_input,
          * happen :). */
         msg_Warn( p_aout, "computed PTS is out of range (%"PRId64"), "
                   "clearing out", now - start_date );
-        aout_FifoSet( &p_input->mixer.fifo, 0 );
+        aout_FifoSet( &p_input->fifo, 0 );
         if ( p_input->i_resampling_type != AOUT_RESAMPLING_NONE )
             msg_Warn( p_aout, "timing screwed, stopping resampling" );
         inputResamplingStop( p_input );
@@ -579,7 +579,7 @@ void aout_InputPlay( audio_output_t * p_aout, aout_input_t * p_input,
     {
         msg_Warn( p_aout, "buffer way too early (%"PRId64"), clearing queue",
                   drift );
-        aout_FifoSet( &p_input->mixer.fifo, 0 );
+        aout_FifoSet( &p_input->fifo, 0 );
         if ( p_input->i_resampling_type != AOUT_RESAMPLING_NONE )
             msg_Warn( p_aout, "timing screwed, stopping resampling" );
         inputResamplingStop( p_input );
@@ -692,7 +692,7 @@ void aout_InputPlay( audio_output_t * p_aout, aout_input_t * p_input,
 
     /* Adding the start date will be managed by aout_FifoPush(). */
     p_buffer->i_pts = start_date;
-    aout_FifoPush( &p_input->mixer.fifo, p_buffer );
+    aout_FifoPush( &p_input->fifo, p_buffer );
 }
 
 /*****************************************************************************
@@ -709,7 +709,7 @@ static void inputFailure( audio_output_t * p_aout, aout_input_t * p_input,
     aout_FiltersDestroyPipeline( p_input->pp_filters, p_input->i_nb_filters );
     aout_FiltersDestroyPipeline( p_input->pp_resamplers,
                                  p_input->i_nb_resamplers );
-    aout_FifoDestroy( &p_input->mixer.fifo );
+    aout_FifoDestroy( &p_input->fifo );
     var_Destroy( p_aout, "visual" );
     var_Destroy( p_aout, "equalizer" );
     var_Destroy( p_aout, "audio-filter" );

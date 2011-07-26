@@ -418,7 +418,7 @@ aout_buffer_t * aout_OutputNextBuffer( audio_output_t * p_aout,
         msg_Warn( p_aout, "output date isn't PTS date, requesting "
                   "resampling (%"PRId64")", delta );
 
-        aout_FifoMoveDates( &p_aout->p_input->mixer.fifo, delta );
+        aout_FifoMoveDates( &p_aout->p_input->fifo, delta );
         aout_FifoMoveDates( p_fifo, delta );
     }
 out:

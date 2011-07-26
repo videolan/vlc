@@ -231,7 +231,7 @@ void aout_DecChangePause( audio_output_t *p_aout, aout_input_t *p_input, bool b_
 
     if( i_duration != 0 )
     {
-        for( aout_buffer_t *p = p_input->mixer.fifo.p_first; p != NULL; p = p->p_next )
+        for( aout_buffer_t *p = p_input->fifo.p_first; p != NULL; p = p->p_next )
         {
             p->i_pts += i_duration;
         }
@@ -243,7 +243,7 @@ void aout_DecChangePause( audio_output_t *p_aout, aout_input_t *p_input, bool b_
 void aout_DecFlush( audio_output_t *p_aout, aout_input_t *p_input )
 {
     aout_lock( p_aout );
-    aout_FifoSet( &p_input->mixer.fifo, 0 );
+    aout_FifoSet( &p_input->fifo, 0 );
     aout_unlock( p_aout );
 }
 
@@ -252,7 +252,7 @@ bool aout_DecIsEmpty( audio_output_t * p_aout, aout_input_t * p_input )
     mtime_t end_date;
 
     aout_lock( p_aout );
-    end_date = aout_FifoNextStart( &p_input->mixer.fifo );
+    end_date = aout_FifoNextStart( &p_input->fifo );
     aout_unlock( p_aout );
     return end_date <= mdate();
 }
