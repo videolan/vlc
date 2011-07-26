@@ -33,6 +33,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_aout.h>
+#include <vlc_aout_intf.h>
 #include <vlc_charset.h>                        /* FromLocaleDup, LocaleFree */
 #include <vlc_atomic.h>
 
@@ -1003,8 +1004,13 @@ static int VolumeSet( audio_output_t * p_aout, float volume, bool mute )
     if( mute )
         volume = 0.;
 
-    unsigned long i_waveout_vol = volume * 0x7FFF;
-    i_waveout_vol = (i_waveout_vol << 16) | (i_waveout_vol & 0xFFFF);
+    unsigned long i_waveout_vol = volume
+        * (0xFFFF * AOUT_VOLUME_DEFAULT / AOUT_VOLUME_MAX);
+
+    if( i_waveout_vol <= 0xFFFF )
+        i_waveout_vol |= i_waveout_vol << 16;
+    else
+        i_waveout_vol = 0xFFFFFFFF;
 
 #ifdef UNDER_CE
     waveOutSetVolume( 0, i_waveout_vol );
