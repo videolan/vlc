@@ -278,6 +278,7 @@ static int InputEvent( vlc_object_t *p_this, const char *psz_var,
 
         case INPUT_EVENT_ITEM_NAME:
             [[VLCMain sharedInstance] updateName];
+            [[VLCMain sharedInstance] playlistUpdated];
             break;
 
         case INPUT_EVENT_AUDIO_DELAY:

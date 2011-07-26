@@ -43,6 +43,7 @@
     IBOutlet id o_volume_down_btn;
     IBOutlet id o_volume_up_btn;
     IBOutlet id o_time_sld;
+    IBOutlet id o_time_sld_fancygradient_view;
     IBOutlet id o_time_fld;
     IBOutlet id o_progress_bar;
     IBOutlet id o_bottombar_view;
@@ -111,4 +112,14 @@
 - (void)setRepeatOff;
 - (void)setShuffle;
 
+- (void)drawFancyGradientEffectForTimeSlider;
+
+@end
+
+@interface VLCProgressBarGradientEffect : NSView {
+    NSImage * o_time_sld_gradient_left_img;
+    NSImage * o_time_sld_gradient_middle_img;
+    NSImage * o_time_sld_gradient_right_img;
+}
+- (void)loadImagesInDarkStyle:(BOOL)b_value;
 @end

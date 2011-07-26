@@ -149,6 +149,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
         [o_effects_btn setAlternateImage: [NSImage imageNamed:@"effects-double-buttons-pressed"]];
         [o_fullscreen_btn setImage: [NSImage imageNamed:@"fullscreen-double-buttons"]];
         [o_fullscreen_btn setAlternateImage: [NSImage imageNamed:@"fullscreen-double-buttons-pressed"]];
+        [o_time_sld_fancygradient_view loadImagesInDarkStyle:NO];
     }
     else
     {
@@ -186,7 +187,8 @@ static VLCMainWindow *_o_sharedInstance = nil;
         [o_effects_btn setImage: [NSImage imageNamed:@"effects-double-buttons_dark"]];
         [o_effects_btn setAlternateImage: [NSImage imageNamed:@"effects-double-buttons-pressed_dark"]];
         [o_fullscreen_btn setImage: [NSImage imageNamed:@"fullscreen-double-buttons_dark"]];
-        [o_fullscreen_btn setAlternateImage: [NSImage imageNamed:@"fullscreen-double-buttons-pressed_dark"]];        
+        [o_fullscreen_btn setAlternateImage: [NSImage imageNamed:@"fullscreen-double-buttons-pressed_dark"]];
+        [o_time_sld_fancygradient_view loadImagesInDarkStyle:YES];
     }
     [o_repeat_btn setImage: o_repeat_img];
     [o_repeat_btn setAlternateImage: o_repeat_pressed_img];
@@ -205,6 +207,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [o_playlist_btn setEnabled:NO];
 
     [self updateVolumeSlider];
+    [self updateTimeSlider];
 }
 
 #pragma mark -
@@ -423,6 +426,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
         [[[[VLCMain sharedInstance] controls] fspanel] setStreamPos: f_updated andTime: o_time];
         vlc_object_release( p_input );
     }
+    [self drawFancyGradientEffectForTimeSlider];
 }
 
 - (IBAction)timeFieldWasClicked:(id)sender
@@ -483,6 +487,13 @@ static VLCMainWindow *_o_sharedInstance = nil;
         [o_time_fld setStringValue: o_time];
 //        [[[[VLCMain sharedInstance] controls] fspanel] setStreamPos: f_updated andTime: o_time];
     }
+    else
+    {
+        [o_time_sld setFloatValue: 0.0];
+        [o_time_fld setStringValue: @"00:00"];
+    }
+        
+    [self performSelectorOnMainThread:@selector(drawFancyGradientEffectForTimeSlider) withObject:nil waitUntilDone:NO];
 }
 
 - (void)updateVolumeSlider
@@ -630,6 +641,25 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [o_play_btn setToolTip: _NS("Play")];
 }
 
+- (void)drawFancyGradientEffectForTimeSlider
+{
+    float f_value = ([o_time_sld_middle_view frame].size.width -5) * ([o_time_sld intValue] / [o_time_sld maxValue]);
+    if (f_value > 5.0)
+    {
+        if (f_value != [o_time_sld_fancygradient_view frame].size.width)
+        {
+            [o_time_sld_fancygradient_view setHidden: NO];
+            [o_time_sld_fancygradient_view setFrame: NSMakeRect( [o_time_sld_fancygradient_view frame].origin.x, [o_time_sld_fancygradient_view frame].origin.y, f_value, [o_time_sld_fancygradient_view frame].size.height )];
+            [o_time_sld_fancygradient_view setNeedsDisplay:YES];
+            [o_time_sld_fancygradient_view displayIfNeeded];
+        }
+    }
+    else
+    {
+        [o_time_sld_fancygradient_view setHidden: YES];
+    }
+}
+
 #pragma mark -
 #pragma mark Video Output handling
 
@@ -652,4 +682,28 @@ static VLCMainWindow *_o_sharedInstance = nil;
     }
 }
 
+@end
+
+@implementation VLCProgressBarGradientEffect
+- (void)loadImagesInDarkStyle: (BOOL)b_value
+{
+    if (b_value)
+    {
+        o_time_sld_gradient_left_img = [NSImage imageNamed:@"progressbar-fill-left_dark"];
+        o_time_sld_gradient_middle_img = [NSImage imageNamed:@"progressbar-fill-middle_dark"];
+        o_time_sld_gradient_right_img = [NSImage imageNamed:@"progressbar-fill-right_dark"];
+    }
+    else
+    {
+        o_time_sld_gradient_left_img = [NSImage imageNamed:@"progression-fill-left"];
+        o_time_sld_gradient_middle_img = [NSImage imageNamed:@"progression-fill-middle"];
+        o_time_sld_gradient_right_img = [NSImage imageNamed:@"progression-fill-right"];
+    }
+}
+
+- (void)drawRect:(NSRect)rect
+{
+    NSRect bnds = [self bounds];
+    NSDrawThreePartImage( bnds, o_time_sld_gradient_left_img, o_time_sld_gradient_middle_img, o_time_sld_gradient_right_img, NO, NSCompositeSourceOver, 1, NO );
+}
 @end

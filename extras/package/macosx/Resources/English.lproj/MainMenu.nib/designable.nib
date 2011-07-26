@@ -487,11 +487,11 @@
             <object class="NSSlider" id="704525034">
               <reference key="NSNextResponder" ref="429932428"/>
               <int key="NSvFlags">290</int>
-              <string key="NSFrame">{{221, 10}, {157, 15}}</string>
+              <string key="NSFrame">{{222, 10}, {157, 15}}</string>
               <reference key="NSSuperview" ref="429932428"/>
               <bool key="NSEnabled">YES</bool>
               <object class="NSSliderCell" key="NSCell" id="276068486">
-                <int key="NSCellFlags">-2079981824</int>
+                <int key="NSCellFlags">67501824</int>
                 <int key="NSCellFlags2">131072</int>
                 <object class="NSMutableString" key="NSContents">
                   <characters key="NS.bytes"/>
@@ -504,7 +504,7 @@
                 <reference key="NSControlView" ref="704525034"/>
                 <double key="NSMaxValue">10000</double>
                 <double key="NSMinValue">0.0</double>
-                <double key="NSValue">0.0</double>
+                <double key="NSValue">1161.9718309859154</double>
                 <double key="NSAltIncValue">0.0</double>
                 <int key="NSNumberOfTickMarks">0</int>
                 <int key="NSTickMarkPosition">1</int>
@@ -515,7 +515,7 @@
             <object class="NSTextField" id="533732100">
               <reference key="NSNextResponder" ref="429932428"/>
               <int key="NSvFlags">289</int>
-              <string key="NSFrame">{{382, 11}, {53, 13}}</string>
+              <string key="NSFrame">{{381, 10}, {53, 13}}</string>
               <reference key="NSSuperview" ref="429932428"/>
               <bool key="NSEnabled">YES</bool>
               <object class="NSTextFieldCell" key="NSCell" id="896153998">
@@ -641,6 +641,14 @@
                 <bool key="NSAllowsTickMarkValuesOnly">NO</bool>
                 <bool key="NSVertical">NO</bool>
               </object>
+            </object>
+            <object class="NSCustomView" id="202538583">
+              <reference key="NSNextResponder" ref="429932428"/>
+              <int key="NSvFlags">292</int>
+              <string key="NSFrame">{{222, 12}, {61, 11}}</string>
+              <reference key="NSSuperview" ref="429932428"/>
+              <string key="NSReuseIdentifierKey">_NS:1109</string>
+              <string key="NSClassName">VLCProgressBarGradientEffect</string>
             </object>
             <object class="NSSplitView" id="302568132">
               <reference key="NSNextResponder" ref="429932428"/>
@@ -6908,6 +6916,14 @@ LCAuLi4</string>
           </object>
           <int key="connectionID">4697</int>
         </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_time_sld_fancygradient_view</string>
+            <reference key="source" ref="498338108"/>
+            <reference key="destination" ref="202538583"/>
+          </object>
+          <int key="connectionID">4702</int>
+        </object>
       </object>
       <object class="IBMutableOrderedSet" key="objectRecords">
         <object class="NSArray" key="orderedObjects">
@@ -6958,17 +6974,18 @@ LCAuLi4</string>
               <reference ref="784705424"/>
               <reference ref="474770834"/>
               <reference ref="963106097"/>
-              <reference ref="533732100"/>
               <reference ref="1041205852"/>
               <reference ref="828712633"/>
               <reference ref="354459361"/>
               <reference ref="21901908"/>
-              <reference ref="704525034"/>
               <reference ref="788281303"/>
               <reference ref="955174811"/>
-              <reference ref="664576649"/>
               <reference ref="302568132"/>
               <reference ref="515305233"/>
+              <reference ref="533732100"/>
+              <reference ref="202538583"/>
+              <reference ref="704525034"/>
+              <reference ref="664576649"/>
             </object>
             <reference key="parent" ref="498338108"/>
           </object>
@@ -9292,11 +9309,6 @@ LCAuLi4</string>
             <reference key="parent" ref="955174811"/>
           </object>
           <object class="IBObjectRecord">
-            <int key="objectID">3584</int>
-            <reference key="object" ref="664576649"/>
-            <reference key="parent" ref="429932428"/>
-          </object>
-          <object class="IBObjectRecord">
             <int key="objectID">4680</int>
             <reference key="object" ref="302568132"/>
             <object class="NSMutableArray" key="children">
@@ -9512,6 +9524,16 @@ LCAuLi4</string>
             <int key="objectID">4695</int>
             <reference key="object" ref="1054259352"/>
             <reference key="parent" ref="609070979"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">4701</int>
+            <reference key="object" ref="202538583"/>
+            <reference key="parent" ref="429932428"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">3584</int>
+            <reference key="object" ref="664576649"/>
+            <reference key="parent" ref="429932428"/>
           </object>
         </object>
       </object>
@@ -10198,6 +10220,8 @@ LCAuLi4</string>
           <string>4694.IBPluginDependency</string>
           <string>4694.IBViewBoundsToFrameTransform</string>
           <string>4695.IBPluginDependency</string>
+          <string>4701.IBPluginDependency</string>
+          <string>4701.IBViewBoundsToFrameTransform</string>
           <string>5.IBPluginDependency</string>
           <string>5.ImportedFromIB2</string>
           <string>56.IBPluginDependency</string>
@@ -10435,9 +10459,9 @@ LCAuLi4</string>
           <string>{{473, 633}, {137, 103}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
-          <string>{{330, 299}, {604, 310}}</string>
+          <string>{{329, 301}, {604, 310}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-          <string>{{330, 299}, {604, 310}}</string>
+          <string>{{329, 301}, {604, 310}}</string>
           <boolean value="YES"/>
           <boolean value="YES"/>
           <boolean value="YES"/>
@@ -10669,7 +10693,7 @@ LCAuLi4</string>
           <boolean value="YES"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <object class="NSAffineTransform">
-            <bytes key="NSTransformStruct">P4AAAL+AAABDXgAAwjAAAA</bytes>
+            <bytes key="NSTransformStruct">P4AAAL+AAABDxYAAwggAAA</bytes>
           </object>
           <boolean value="YES"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -10883,13 +10907,13 @@ LCAuLi4</string>
           <string>TimeLineSlider</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <object class="NSAffineTransform">
-            <bytes key="NSTransformStruct">P4AAAL+AAABDXwAAwnQAAA</bytes>
+            <bytes key="NSTransformStruct">P4AAAL+AAABDpIAAweAAAA</bytes>
           </object>
           <boolean value="YES"/>
           <string>VLCTimeField</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <object class="NSAffineTransform">
-            <bytes key="NSTransformStruct">P4AAAL+AAABDvwAAwbAAAA</bytes>
+            <bytes key="NSTransformStruct">P4AAAL+AAABDvwAAwYgAAA</bytes>
           </object>
           <boolean value="YES"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -10912,7 +10936,7 @@ LCAuLi4</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <object class="NSAffineTransform">
-            <bytes key="NSTransformStruct">AUNiAABCMAAAA</bytes>
+            <bytes key="NSTransformStruct">AUNfAABBIAAAA</bytes>
           </object>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -10991,6 +11015,10 @@ LCAuLi4</string>
           </object>
           <string>com.binarymethod.BGHUDAppKitPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+          <object class="NSAffineTransform">
+            <bytes key="NSTransformStruct">AUMMAABBoAAAA</bytes>
+          </object>
+          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
@@ -11056,7 +11084,7 @@ LCAuLi4</string>
         </object>
       </object>
       <nil key="sourceID"/>
-      <int key="maxID">4697</int>
+      <int key="maxID">4702</int>
     </object>
     <object class="IBClassDescriber" key="IBDocument.Classes">
       <object class="NSMutableArray" key="referencedPartialClassDescriptionsV3.1+">
@@ -13007,6 +13035,7 @@ LCAuLi4</string>
               <string>o_stop_btn</string>
               <string>o_time_fld</string>
               <string>o_time_sld</string>
+              <string>o_time_sld_fancygradient_view</string>
               <string>o_time_sld_left_view</string>
               <string>o_time_sld_middle_view</string>
               <string>o_time_sld_right_view</string>
@@ -13018,6 +13047,7 @@ LCAuLi4</string>
             </object>
             <object class="NSMutableArray" key="dict.values">
               <bool key="EncodedWithXMLCoder">YES</bool>
+              <string>id</string>
               <string>id</string>
               <string>id</string>
               <string>id</string>
@@ -13068,6 +13098,7 @@ LCAuLi4</string>
               <string>o_stop_btn</string>
               <string>o_time_fld</string>
               <string>o_time_sld</string>
+              <string>o_time_sld_fancygradient_view</string>
               <string>o_time_sld_left_view</string>
               <string>o_time_sld_middle_view</string>
               <string>o_time_sld_right_view</string>
@@ -13152,6 +13183,10 @@ LCAuLi4</string>
                 <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
+                <string key="name">o_time_sld_fancygradient_view</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
                 <string key="name">o_time_sld_left_view</string>
                 <string key="candidateClassName">id</string>
               </object>
@@ -13185,7 +13220,7 @@ LCAuLi4</string>
               </object>
             </object>
           </object>
-          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+          <object class="IBClassDescriptionSource" key="sourceIdentifier" id="214109311">
             <string key="majorKey">IBDocumentRelativeSource</string>
             <string key="minorKey">../../../../../modules/gui/macosx/MainWindow.h</string>
           </object>
@@ -13597,6 +13632,11 @@ LCAuLi4</string>
           <string key="className">VLCPlaylistView</string>
           <string key="superclassName">NSOutlineView</string>
           <reference key="sourceIdentifier" ref="674629035"/>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">VLCProgressBarGradientEffect</string>
+          <string key="superclassName">NSView</string>
+          <reference key="sourceIdentifier" ref="214109311"/>
         </object>
         <object class="IBPartialClassDescription">
           <string key="className">VLCTimeField</string>
