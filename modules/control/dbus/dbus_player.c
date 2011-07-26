@@ -201,14 +201,12 @@ DBUS_METHOD( VolumeSet )
     if( VLC_SUCCESS != DemarshalSetPropertyValue( p_from, &d_dbus_vol ) )
         return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
 
-    if( d_dbus_vol > 1. )
-        d_dbus_vol = 1.;
-    else if( d_dbus_vol < 0. )
+    d_dbus_vol *= AOUT_VOLUME_DEFAULT;
+    if( d_dbus_vol < 0. )
         d_dbus_vol = 0.;
-
-    double d_vol = d_dbus_vol * AOUT_VOLUME_MAX;
-    audio_volume_t i_vol = round( d_vol );
-    aout_VolumeSet( PL, i_vol );
+    if( d_dbus_vol > AOUT_VOLUME_MAX )
+        d_dbus_vol = AOUT_VOLUME_MAX;
+    aout_VolumeSet( PL, lround(d_dbus_vol) );
 
     REPLY_SEND;
 }
