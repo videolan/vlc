@@ -31,6 +31,9 @@ function string_2_duration(str)
     local index = string.find( str, ':' )
     if( index == nil ) then return str
     else
+        if( index == 1 ) then
+            return string.sub( str, 2 )
+        end
         local index2 = string.find( str, ':', index + 1 )
         if( index2 == nil ) then
             return string.sub( str, 0, index - 1 ) * 60 + string.sub( str, index + 1 )
