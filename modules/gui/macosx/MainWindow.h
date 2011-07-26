@@ -77,6 +77,11 @@
     NSImage * o_shuffle_pressed_img;
     NSImage * o_shuffle_on_img;
     NSImage * o_shuffle_on_pressed_img;
+
+    NSTimeInterval last_fwd_event;
+    NSTimeInterval last_bwd_event;
+    BOOL just_triggered_next;
+    BOOL just_triggered_previous;
 }
 + (VLCMainWindow *)sharedInstance;
 

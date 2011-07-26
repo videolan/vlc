@@ -215,15 +215,82 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [[VLCCoreInteraction sharedInstance] play];
 }
 
-// TODO: we need more advanced handling for the next 2 actions to handling skipping as well
+- (void)resetPreviousButton
+{
+    if (([NSDate timeIntervalSinceReferenceDate] - last_bwd_event) >= 0.35) {
+        // seems like no further event occured, so let's switch the playback item
+        [[VLCCoreInteraction sharedInstance] previous];
+        just_triggered_previous = NO;
+    }
+}
+
+- (void)resetBackwardSkip
+{
+    // the user stopped skipping, so let's allow him to change the item
+    if (([NSDate timeIntervalSinceReferenceDate] - last_bwd_event) >= 0.35)
+        just_triggered_previous = NO;
+}
+
 - (IBAction)bwd:(id)sender
 {
-    [[VLCCoreInteraction sharedInstance] previous];
+    if(!just_triggered_previous)
+    {
+        just_triggered_previous = YES;
+        [self performSelector:@selector(resetPreviousButton)
+                   withObject: NULL
+                   afterDelay:0.40];
+    }
+    else
+    {
+        if (([NSDate timeIntervalSinceReferenceDate] - last_fwd_event) > 0.12 )
+        {
+            // we just skipped 3 "continous" events, otherwise we are too fast
+            [[VLCCoreInteraction sharedInstance] backward];
+            last_bwd_event = [NSDate timeIntervalSinceReferenceDate];
+            [self performSelector:@selector(resetBackwardSkip)
+                       withObject: NULL
+                       afterDelay:0.40];
+        }
+    }
+}
+
+- (void)resetNextButton
+{
+    if (([NSDate timeIntervalSinceReferenceDate] - last_fwd_event) >= 0.35) {
+        // seems like no further event occured, so let's switch the playback item
+        [[VLCCoreInteraction sharedInstance] next];
+        just_triggered_next = NO;
+    }
+}
+
+- (void)resetForwardSkip
+{
+    // the user stopped skipping, so let's allow him to change the item
+    if (([NSDate timeIntervalSinceReferenceDate] - last_fwd_event) >= 0.35)
+        just_triggered_next = NO;
 }
 
 - (IBAction)fwd:(id)sender
 {
-    [[VLCCoreInteraction sharedInstance] next];
+   if(!just_triggered_next)
+    {
+        just_triggered_next = YES;
+        [self performSelector:@selector(resetNextButton)
+                   withObject: NULL
+                   afterDelay:0.40];
+    }
+    else
+    {
+        if (([NSDate timeIntervalSinceReferenceDate] - last_fwd_event) > 0.12 )
+        {
+            // we just skipped 3 "continous" events, otherwise we are too fast
+            [[VLCCoreInteraction sharedInstance] forward];
+            last_fwd_event = [NSDate timeIntervalSinceReferenceDate];
+            [self performSelector:@selector(resetForwardSkip)
+                       withObject: NULL
+                       afterDelay:0.40];
+        }
+    }
 }
 
 - (IBAction)stop:(id)sender
