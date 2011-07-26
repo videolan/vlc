@@ -280,7 +280,12 @@ static int InputChange( vlc_object_t *p_playlist, const char *var,
     }
     p_sys->p_input = VLC_OBJECT(playlist_CurrentInput( p_sys->p_playlist ));
     if( p_sys->p_input )
+    {
+        Inhibit( p_intf, FREEDESKTOP );
+        Inhibit( p_intf, GNOME );
+
         var_AddCallback( p_sys->p_input, "state", StateChange, p_intf );
+    }
 
     (void)var; (void)prev; (void)value; (void)p_playlist;
     return VLC_SUCCESS;
