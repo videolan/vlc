@@ -107,7 +107,7 @@ void ClickLineEdit::focusOutEvent( QFocusEvent *ev )
 SearchLineEdit::SearchLineEdit( QWidget *parent ) : QLineEdit( parent )
 {
     clearButton = new QFramelessButton( this );
-    clearButton->setIcon( QIcon( ":/toolbar/clear" ) );
+    clearButton->setIcon( QIcon( ":/search_clear" ) );
     clearButton->setIconSize( QSize( 16, 16 ) );
     clearButton->setCursor( Qt::ArrowCursor );
     clearButton->setToolTip( qfu(vlc_pgettext("Tooltip|Clear", "Clear")) );
@@ -123,7 +123,7 @@ SearchLineEdit::SearchLineEdit( QWidget *parent ) : QLineEdit( parent )
                                   "padding-bottom: 1px; "
                                   "padding-right: %2px;" )
                                   .arg( metrics.height() + ( 2 * frameWidth ) )
-                                  .arg( clearButton->sizeHint().width() + 1 );
+                                  .arg( clearButton->sizeHint().width() + 6 );
     setStyleSheet( styleSheet );
 
     setMessageVisible( true );
@@ -160,7 +160,8 @@ void SearchLineEdit::resizeEvent ( QResizeEvent * event )
     QLineEdit::resizeEvent( event );
     int frameWidth = style()->pixelMetric(QStyle::PM_DefaultFrameWidth,0,this);
     clearButton->resize( clearButton->sizeHint().width(), height() );
-    clearButton->move( width() - clearButton->width() - frameWidth, 0 );
+    clearButton->move( width() - clearButton->width() - frameWidth - 3,
+                      ( height() - clearButton->height() + 2 ) / 2 );
 }
 
 void SearchLineEdit::focusInEvent( QFocusEvent *event )

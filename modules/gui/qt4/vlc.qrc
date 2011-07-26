@@ -95,6 +95,7 @@
         <file alias="go-next">pixmaps/go-next.png</file>
         <file alias="new.png">pixmaps/profile_new.png</file>
         <file alias="lock">pixmaps/lock.png</file>
+        <file alias="search_clear">pixmaps/search_clear.png</file>
     </qresource>
     <qresource prefix="/prefsmenu">
         <file alias="cone_audio_64">pixmaps/prefs/spref_cone_Audio_64.png</file>
