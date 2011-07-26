@@ -341,13 +341,16 @@ static void sink_input_info_cb(pa_context *ctx, const pa_sink_input_info *i,
                                int eol, void *userdata)
 {
     audio_output_t *aout = userdata;
+    aout_sys_t *sys = aout->sys;
+    float volume;
 
     if (eol)
         return;
-
-    const float volume = pa_sw_volume_to_linear(pa_cvolume_avg(&i->volume));
-    aout_VolumeHardSet(aout, volume, i->mute);
     (void) ctx;
+
+    sys->cvolume = i->volume;
+    volume = pa_sw_volume_to_linear(pa_cvolume_max(&i->volume));
+    aout_VolumeHardSet(aout, volume, i->mute);
 }
 
 
@@ -491,14 +494,14 @@ static int VolumeSet(audio_output_t *aout, float vol, bool mute)
 {
     aout_sys_t *sys = aout->sys;
     pa_operation *op;
-
     uint32_t idx = pa_stream_get_index(sys->stream);
-    pa_volume_t volume = pa_sw_volume_from_linear(vol);
-    pa_cvolume cvolume;
 
-    /* TODO: do not ruin the channel balance (if set outside VLC) */
-    pa_cvolume_set(&sys->cvolume, sys->cvolume.channels, volume);
-    pa_sw_cvolume_multiply_scalar(&cvolume, &sys->cvolume, sys->base_volume);
+    pa_cvolume cvolume = sys->cvolume;
+    pa_volume_t volume = pa_sw_volume_multiply(pa_sw_volume_from_linear(vol),
+                                               sys->base_volume);
+
+    pa_cvolume_scale(&cvolume, PA_VOLUME_NORM); /* preserve balance */
+    pa_sw_cvolume_multiply_scalar(&cvolume, &cvolume, volume);
     assert(pa_cvolume_valid(&cvolume));
 
     vlc_pa_lock();
