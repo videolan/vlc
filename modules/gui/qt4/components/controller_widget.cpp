@@ -152,7 +152,7 @@ void SoundWidget::userUpdateVolume( int i_sliderVolume )
     /* Only if volume is set by user action on slider */
     setMuted( false );
     playlist_t *p_playlist = pl_Get( p_intf );
-    int i_res = i_sliderVolume  * (AOUT_VOLUME_MAX / 2) / VOLUME_MAX;
+    int i_res = i_sliderVolume * QT_VOLUME_MAX / VOLUME_MAX;
     aout_VolumeSet( p_playlist, i_res );
     refreshLabels();
 }
@@ -165,7 +165,7 @@ void SoundWidget::libUpdateVolume()
     playlist_t *p_playlist = pl_Get( p_intf );
 
     i_volume = aout_VolumeGet( p_playlist );
-    i_volume = ( ( i_volume + 1 ) *  VOLUME_MAX )/ (AOUT_VOLUME_MAX/2);
+    i_volume = ((i_volume + 1) * VOLUME_MAX ) / QT_VOLUME_MAX;
 
     if ( i_volume - volumeSlider->value() != 0 )
     {
