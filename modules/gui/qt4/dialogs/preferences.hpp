@@ -40,6 +40,7 @@ class QRadioButton;
 class QWidget;
 class QCheckBox;
 class QLabel;
+class SearchLineEdit;
 
 class PrefsDialog : public QVLCDialog
 {
@@ -63,10 +64,11 @@ private:
     SPrefsPanel *simple_panels[SPrefsMax];
 
     QWidget *tree_panel;
-    QHBoxLayout *tree_panel_l;
+    QVBoxLayout *tree_panel_l;
 
     SPrefsCatList *simple_tree;
     PrefsTree *advanced_tree;
+    SearchLineEdit *tree_filter;
 
     QGroupBox *types;
     QRadioButton *small,*all;
@@ -79,6 +81,7 @@ private slots:
 
     void changeAdvPanel( QTreeWidgetItem * );
     void changeSimplePanel( int );
+    void advancedTreeFilterChanged( const QString & );
 
     void save();
     void cancel();

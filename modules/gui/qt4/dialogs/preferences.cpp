@@ -32,6 +32,7 @@
 
 #include "components/complete_preferences.hpp"
 #include "components/simple_preferences.hpp"
+#include "util/searchlineedit.hpp"
 
 #include <QHBoxLayout>
 #include <QGroupBox>
@@ -54,7 +55,7 @@ PrefsDialog::PrefsDialog( QWidget *parent, intf_thread_t *_p_intf )
 
     /* Create Panels */
     tree_panel = new QWidget;
-    tree_panel_l = new QHBoxLayout;
+    tree_panel_l = new QVBoxLayout;
     tree_panel->setLayout( tree_panel_l );
     main_panel = new QWidget;
     main_panel_l = new QHBoxLayout;
@@ -75,6 +76,7 @@ PrefsDialog::PrefsDialog( QWidget *parent, intf_thread_t *_p_intf )
 
     /* Tree and panel initialisations */
     advanced_tree = NULL;
+    tree_filter = NULL;
     simple_tree = NULL;
     current_simple_panel  = NULL;
     advanced_panel = NULL;
@@ -138,6 +140,19 @@ void PrefsDialog::setAdvanced()
     if( simple_tree )
         if( simple_tree->isVisible() ) simple_tree->hide();
 
+    if ( !tree_filter )
+    {
+        tree_filter = new SearchLineEdit( tree_panel );
+        tree_filter->setMinimumHeight( 26 );
+
+        CONNECT( tree_filter, textChanged( const QString &  ),
+                this, advancedTreeFilterChanged( const QString & ) );
+
+        tree_panel_l->addWidget( tree_filter );
+    }
+
+    tree_filter->show();
+
     /* If don't have already and advanced TREE, then create it */
     if( !advanced_tree )
     {
@@ -178,6 +193,9 @@ void PrefsDialog::setSmall()
     /* If an advanced TREE exists, remove and hide it */
     if( advanced_tree )
         if( advanced_tree->isVisible() ) advanced_tree->hide();
+
+    if( tree_filter )
+        if( tree_filter->isVisible() ) tree_filter->hide();
 
     /* If no simple_tree, create one, connect it */
     if( !simple_tree )
@@ -327,4 +345,9 @@ void PrefsDialog::reset()
 
         accept();
     }
+}
+
+void PrefsDialog::advancedTreeFilterChanged( const QString & text )
+{
+    advanced_tree->filter( text );
 }
