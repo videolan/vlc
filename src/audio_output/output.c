@@ -283,7 +283,19 @@ void aout_VolumeNoneInit (audio_output_t *aout)
 static int aout_VolumeSoftSet (audio_output_t *aout, float volume, bool mute)
 {
     vlc_assert_locked (&aout->lock);
-    aout->mixer_multiplier = mute ? 0. : volume;
+
+    /* Cubic mapping from software volume to amplification factor.
+     * This provides a good tradeoff between low and high volume ranges.
+     *
+     * This code is only used for the VLC software mixer. If you change this
+     * formula, be sure to update the aout_VolumeHardInit()-based plugins also.
+     */
+    if (!mute)
+        volume = volume * volume * volume;
+    else
+        volume = 0.;
+
+    aout->mixer_multiplier = volume;
     return 0;
 }
 
