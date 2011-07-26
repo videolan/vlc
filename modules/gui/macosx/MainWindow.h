@@ -54,6 +54,7 @@
     IBOutlet id o_video_view;
     IBOutlet id o_split_view;
     IBOutlet id o_sidebar_view;
+    IBOutlet id o_chosen_category_lbl;
 
     BOOL b_dark_interface;
     BOOL b_video_playback_enabled;
@@ -97,7 +98,7 @@
 - (void)updateTimeSlider;
 - (void)updateVolumeSlider;
 - (void)updateWindow;
-- (void)updateTitle;
+- (void)updateName;
 - (void)setPause;
 - (void)setPlay;
 - (void)setRepeatOne;

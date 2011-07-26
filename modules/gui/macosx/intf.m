@@ -57,6 +57,7 @@
 #import "eyetv.h"
 #import "simple_prefs.h"
 #import "CoreInteraction.h"
+#import "TrackSynchronization.h"
 
 #import <AddressBook/AddressBook.h>         /* for crashlog send mechanism */
 #import <Sparkle/Sparkle.h>                 /* we're the update delegate */
@@ -261,7 +262,7 @@ static int InputEvent( vlc_object_t *p_this, const char *psz_var,
             break;
         case INPUT_EVENT_ITEM_META:
         case INPUT_EVENT_ITEM_INFO:
-            [[VLCMain sharedInstance] updateTitle];
+            [[VLCMain sharedInstance] updateName];
             [[VLCMain sharedInstance] updateInfoandMetaPanel];
             break;
         case INPUT_EVENT_BOOKMARK:
@@ -276,11 +277,12 @@ static int InputEvent( vlc_object_t *p_this, const char *psz_var,
             break;
 
         case INPUT_EVENT_ITEM_NAME:
-            [[VLCMain sharedInstance] updateTitle];
+            [[VLCMain sharedInstance] updateName];
             break;
 
         case INPUT_EVENT_AUDIO_DELAY:
         case INPUT_EVENT_SUBTITLE_DELAY:
+            [[VLCMain sharedInstance] updateDelays];
             break;
 
         case INPUT_EVENT_DEAD:
@@ -1231,9 +1233,14 @@ unsigned int CocoaKeyToVLC( unichar i_key )
     [o_mainwindow updateWindow];
 }
 
-- (void)updateTitle
+- (void)updateDelays
 {
-    [o_mainwindow updateTitle];
+    [[VLCTrackSynchronization sharedInstance] performSelectorOnMainThread: @selector(updateValues) withObject: nil waitUntilDone:NO];
+}
+
+- (void)updateName
+{
+    [o_mainwindow updateName];
 }
 
 - (void)updatePlaybackPosition

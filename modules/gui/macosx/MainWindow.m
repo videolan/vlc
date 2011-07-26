@@ -62,24 +62,12 @@ static VLCMainWindow *_o_sharedInstance = nil;
 - (id)initWithContentRect:(NSRect)contentRect styleMask:(NSUInteger)styleMask
                   backing:(NSBackingStoreType)backingType defer:(BOOL)flag
 {
-    /* FIXME: this should enable the SnowLeopard window style, however, it leads to ugly artifacts
-     *        needs some further investigation! -- feepk */
-     BOOL b_useTextured = YES;
-
-     if( [[NSWindow class] instancesRespondToSelector:@selector(setContentBorderThickness:forEdge:)] )
-     {
-     b_useTextured = NO;
 //     styleMask ^= NSTexturedBackgroundWindowMask;
-     }
 
     self = [super initWithContentRect:contentRect styleMask:styleMask //& ~NSTitledWindowMask
                               backing:backingType defer:flag];
 
     [[VLCMain sharedInstance] updateTogglePlaylistState];
-
-    // FIXME: see above...
-    if(! b_useTextured )
-     [self setContentBorderThickness:28.0 forEdge:NSMinYEdge];
 
     /* we want to be moveable regardless of our style */
     [self setMovableByWindowBackground: YES];
@@ -217,21 +205,6 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [o_playlist_btn setEnabled:NO];
 
     [self updateVolumeSlider];
-}
-
-- (void)becomeMainWindow
-{
-    [o_sidebar_view setBackgroundColor: [NSColor colorWithCalibratedRed:0.820
-                                                                  green:0.843
-                                                                   blue:0.886
-                                                                  alpha:1.0]];
-    [super becomeMainWindow];
-}
-
-- (void)resignMainWindow
-{
-    [o_sidebar_view setBackgroundColor: [NSColor colorWithCalibratedWhite:0.91 alpha:1.0]];
-    [super resignMainWindow];
 }
 
 #pragma mark -
@@ -462,7 +435,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     }
 }
 
-- (void)updateTitle
+- (void)updateName
 {
     input_thread_t * p_input;
 

@@ -54,6 +54,7 @@
 + (VLCTrackSynchronization *)sharedInstance;
 - (IBAction)toggleWindow:(id)sender;
 - (IBAction)resetValues:(id)sender;
+- (void)updateValues;
 
 /* Audio / Video */
 - (IBAction)avValueChanged:(id)sender;

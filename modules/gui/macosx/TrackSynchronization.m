@@ -89,6 +89,19 @@ static VLCTrackSynchronization *_o_sharedInstance = nil;
     }
 }
 
+- (void)updateValues
+{
+    input_thread_t * p_input = pl_CurrentInput( p_intf );
+
+    if( p_input )
+    {
+        [o_av_value_fld setFloatValue: var_GetTime( p_input, "audio-delay" ) / 1000000];
+        [o_sv_advance_value_fld setFloatValue: var_GetTime( p_input, "spu-delay" ) / 1000000];
+        [o_sv_speed_value_fld setFloatValue: var_GetFloat( p_input, "sub-fps" )];
+        vlc_object_release( p_input );
+    }
+}
+
 - (IBAction)avValueChanged:(id)sender
 {
     if( sender == o_av_minus_btn )

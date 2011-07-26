@@ -176,10 +176,11 @@ struct intf_sys_t
 - (void)playbackModeUpdated;
 - (void)updateVolume;
 - (void)updatePlaybackPosition;
-- (void)updateTitle;
+- (void)updateName;
 - (void)playlistUpdated;
 - (void)updateInfoandMetaPanel;
 - (void)updateMainWindow;
+- (void)updateDelays;
 - (void)initStrings;
 - (BOOL)application:(NSApplication *)o_app openFile:(NSString *)o_filename;
 
