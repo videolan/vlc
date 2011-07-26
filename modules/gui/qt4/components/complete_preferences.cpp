@@ -265,9 +265,14 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
         PrefsItemData *module_data = new PrefsItemData();
         module_data->i_type = TYPE_MODULE;
         module_data->psz_name = strdup( module_get_object( p_module ) );
+        module_data->name = qtr( module_get_name( p_module, false ) );
         module_data->help.clear();
+        const char *psz_help = module_get_help( p_module );
+        if ( psz_help )
+            module_data->help = qtr( psz_help );
+
         QTreeWidgetItem *module_item = new QTreeWidgetItem();
-        module_item->setText( 0, qtr( module_get_name( p_module, false ) ) );
+        module_item->setText( 0, module_data->name );
         module_item->setData( 0, Qt::UserRole,
                               QVariant::fromValue( module_data) );
         //module_item->setSizeHint( 0, QSize( -1, ITEM_HEIGHT ) );
@@ -394,13 +399,7 @@ AdvPrefsPanel::AdvPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
     }
     else
     {
-        const char *psz_help = module_get_help (p_module);
         head = QString( qtr( module_GetLongName( p_module ) ) );
-        if( psz_help )
-        {
-            help.append( "\n" );
-            help.append( qtr( psz_help ) );
-        }
     }
 
     QLabel *titleLabel = new QLabel( head );
