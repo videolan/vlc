@@ -1035,11 +1035,8 @@ static void DisplayVolume( intf_thread_t *p_intf, vout_thread_t *p_vout,
         vout_OSDSlider( p_vout, VOLUME_WIDGET_CHAN,
             i_vol*100/AOUT_VOLUME_MAX, OSD_VERT_SLIDER );
     }
-    else
-    {
-        DisplayMessage( p_vout, VOLUME_TEXT_CHAN, _( "Volume %d%%" ),
-                        i_vol*400/AOUT_VOLUME_MAX );
-    }
+    DisplayMessage( p_vout, VOLUME_TEXT_CHAN, _( "Volume %d%%" ),
+                    i_vol*100/AOUT_VOLUME_DEFAULT );
 }
 
 static void DisplayRate( vout_thread_t *p_vout, float f_rate )
