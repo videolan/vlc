@@ -1537,12 +1537,6 @@ static int VolumeMove( vlc_object_t *p_this, char const *psz_cmd,
         return VLC_EGENERIC;
     }
 
-    i_volume_step = config_GetInt( p_intf->p_libvlc, "volume-step" );
-    if ( i_nb_steps <= 0 || i_nb_steps > (AOUT_VOLUME_MAX/i_volume_step) )
-    {
-        i_nb_steps = 1;
-    }
-
     if( !strcmp(psz_cmd, "voldown") )
         i_nb_steps *= -1;
     if( aout_VolumeUp( p_intf->p_sys->p_playlist, i_nb_steps, &i_volume ) < 0 )
