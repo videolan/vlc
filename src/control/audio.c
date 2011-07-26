@@ -327,29 +327,28 @@ void libvlc_audio_set_mute( libvlc_media_player_t *mp, int mute )
 }
 
 /*****************************************************************************
- * libvlc_audio_get_volume : Get the current volume (range 0-200 %)
+ * libvlc_audio_get_volume : Get the current volume
  *****************************************************************************/
 int libvlc_audio_get_volume( libvlc_media_player_t *mp )
 {
-    audio_volume_t i_volume = aout_VolumeGet( mp );
+    unsigned volume = aout_VolumeGet( mp );
 
-    return (i_volume*200+AOUT_VOLUME_MAX/2)/AOUT_VOLUME_MAX;
+    return (volume * 100 + AOUT_VOLUME_DEFAULT / 2) / AOUT_VOLUME_DEFAULT;
 }
 
 
 /*****************************************************************************
  * libvlc_audio_set_volume : Set the current volume
  *****************************************************************************/
-int libvlc_audio_set_volume( libvlc_media_player_t *mp, int i_volume )
+int libvlc_audio_set_volume( libvlc_media_player_t *mp, int volume )
 {
-    if( i_volume < 0 || i_volume > 200 )
+    volume = (volume * AOUT_VOLUME_DEFAULT + 50) / 100;
+    if (volume < 0 || volume > AOUT_VOLUME_MAX)
     {
         libvlc_printerr( "Volume out of range" );
         return -1;
     }
-
-    i_volume = (i_volume * AOUT_VOLUME_MAX + 100) / 200;
-    aout_VolumeSet( mp, i_volume );
+    aout_VolumeSet (mp, volume);
     return 0;
 }
 

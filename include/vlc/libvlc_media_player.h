@@ -1403,18 +1403,19 @@ LIBVLC_API int libvlc_audio_get_mute( libvlc_media_player_t *p_mi );
 LIBVLC_API void libvlc_audio_set_mute( libvlc_media_player_t *p_mi, int status );
 
 /**
- * Get current audio level.
+ * Get current software audio volume.
  *
  * \param p_mi media player
- * \return the audio level (int)
+ * \return the software volume in percents
+ * (0 = mute, 100 = nominal / 0dB)
  */
 LIBVLC_API int libvlc_audio_get_volume( libvlc_media_player_t *p_mi );
 
 /**
- * Set current audio level.
+ * Set current software audio volume.
  *
  * \param p_mi media player
- * \param i_volume the volume (int)
+ * \param i_volume the volume in percents (0 = mute, 100 = 0dB)
  * \return 0 if the volume was set, -1 if it was out of range
  */
 LIBVLC_API int libvlc_audio_set_volume( libvlc_media_player_t *p_mi, int i_volume );
