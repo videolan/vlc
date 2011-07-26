@@ -198,7 +198,7 @@ int aout_DecPlay( audio_output_t * p_aout, aout_input_t * p_input,
     aout_InputCheckAndRestart( p_aout, p_input );
     aout_InputPlay( p_aout, p_input, p_buffer, i_input_rate );
     /* Run the mixer if it is able to run. */
-    aout_MixerRun( p_aout, p_aout->mixer_multiplier );
+    aout_MixerRun( p_aout, p_aout->mixer_multiplier * p_input->multiplier );
     aout_unlock( p_aout );
     return 0;
 }

@@ -874,7 +874,7 @@ static void ReplayGainSelect( audio_output_t *p_aout, aout_input_t *p_input )
     int i_use;
     float f_gain;
 
-    p_input->mixer.multiplier = 1.0;
+    p_input->multiplier = 1.0;
 
     if( !psz_replay_gain )
         return;
@@ -905,14 +905,14 @@ static void ReplayGainSelect( audio_output_t *p_aout, aout_input_t *p_input )
         f_gain = var_GetFloat( p_aout, "audio-replay-gain-default" );
     else
         f_gain = 0.0;
-    p_input->mixer.multiplier = pow( 10.0, f_gain / 20.0 );
+    p_input->multiplier = pow( 10.0, f_gain / 20.0 );
 
     /* */
     if( p_input->replay_gain.pb_peak[i_use] &&
         var_GetBool( p_aout, "audio-replay-gain-peak-protection" ) &&
-        p_input->replay_gain.pf_peak[i_use] * p_input->mixer.multiplier > 1.0 )
+        p_input->replay_gain.pf_peak[i_use] * p_input->multiplier > 1.0 )
     {
-        p_input->mixer.multiplier = 1.0f / p_input->replay_gain.pf_peak[i_use];
+        p_input->multiplier = 1.0f / p_input->replay_gain.pf_peak[i_use];
     }
 
     free( psz_replay_gain );

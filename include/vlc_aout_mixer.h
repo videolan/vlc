@@ -41,11 +41,7 @@ typedef struct aout_mixer_sys_t aout_mixer_sys_t;
 typedef struct aout_mixer_t aout_mixer_t;
 
 typedef struct {
-    /* */
     aout_fifo_t fifo;
-
-    /* Software multiplier */
-    float       multiplier;
 } aout_mixer_input_t;
 
 /** 

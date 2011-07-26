@@ -54,6 +54,7 @@ block_t *aout_FilterBufferNew( filter_t *, int );
 struct aout_input_t
 {
     audio_sample_format_t   input;
+    float                   multiplier; /**< Replay gain multiplier */
 
     /* pre-filters */
     filter_t *              pp_filters[AOUT_MAX_FILTERS];

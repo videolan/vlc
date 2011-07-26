@@ -60,7 +60,7 @@ static int Activate (vlc_object_t *obj)
 
 static void FilterFI32 (aout_mixer_t *mixer, block_t *block, float volume)
 {
-    const int64_t mult = volume * mixer->input->multiplier * FIXED32_ONE;
+    const int64_t mult = volume * FIXED32_ONE;
 
     if (mult == FIXED32_ONE)
         return;
@@ -72,11 +72,13 @@ static void FilterFI32 (aout_mixer_t *mixer, block_t *block, float volume)
         *p = (*p * mult) >> FIXED32_FRACBITS;
         p++;
     }
+
+    (void) mixer;
 }
 
 static void FilterS16N (aout_mixer_t *mixer, block_t *block, float volume)
 {
-    const int32_t mult = volume * mixer->input->multiplier * 0x10000;
+    const int32_t mult = volume * 0x10000;
 
     if (mult == 0x10000)
         return;
@@ -88,4 +90,6 @@ static void FilterS16N (aout_mixer_t *mixer, block_t *block, float volume)
         *p = (*p * mult) >> 16;
         p++;
     }
+
+    (void) mixer;
 }

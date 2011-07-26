@@ -72,12 +72,12 @@ static int Create( vlc_object_t *p_this )
 static void DoWork( aout_mixer_t * p_mixer, aout_buffer_t *p_buffer,
                     float f_multiplier )
 {
-    f_multiplier *= p_mixer->input->multiplier;
-
     if( f_multiplier == 1.0 )
         return; /* nothing to do */
 
     float *p = (float *)p_buffer->p_buffer;
     for( size_t i = p_buffer->i_buffer / sizeof(float); i > 0; i-- )
         *(p++) *= f_multiplier;
+
+    (void) p_mixer;
 }
