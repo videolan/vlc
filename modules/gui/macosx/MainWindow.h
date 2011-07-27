@@ -59,7 +59,6 @@
 
     BOOL b_dark_interface;
     BOOL b_video_playback_enabled;
-    BOOL b_time_remaining;
     int i_lastShownVolume;
     BOOL b_mute;
     input_state_e cachedInputState;
@@ -94,7 +93,6 @@
 - (IBAction)repeat:(id)sender;
 - (IBAction)shuffle:(id)sender;
 - (IBAction)timeSliderAction:(id)sender;
-- (IBAction)timeFieldWasClicked:(id)sender;
 - (IBAction)volumeAction:(id)sender;
 - (IBAction)effects:(id)sender;
 - (IBAction)fullscreen:(id)sender;

@@ -29,6 +29,7 @@
 #import "CoreInteraction.h"
 #import "AudioEffects.h"
 #import "MainMenu.h"
+#import "misc.h"
 #import "controls.h" // TODO: remove me
 #import <vlc_playlist.h>
 #import <vlc_aout_intf.h>
@@ -415,7 +416,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
         var_Get( p_input, "time", &time );
 
         mtime_t dur = input_item_GetDuration( input_GetItem( p_input ) );
-        if( b_time_remaining && dur != -1 )
+        if( [o_time_fld timeRemaining] && dur != -1 )
         {
             o_time = [NSString stringWithFormat: @"-%s", secstotimestr( psz_time, ((dur - time.i_time) / 1000000) )];
         }
@@ -427,12 +428,6 @@ static VLCMainWindow *_o_sharedInstance = nil;
         vlc_object_release( p_input );
     }
     [self drawFancyGradientEffectForTimeSlider];
-}
-
-- (IBAction)timeFieldWasClicked:(id)sender
-{
-    b_time_remaining = !b_time_remaining;
-    NSLog( @"b_time_remaining %i", b_time_remaining );
 }
 
 - (IBAction)volumeAction:(id)sender
@@ -477,7 +472,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
         var_Get( p_input, "time", &time );
 
         mtime_t dur = input_item_GetDuration( input_GetItem( p_input ) );
-        if( b_time_remaining && dur != -1 )
+        if( [o_time_fld timeRemaining] && dur != -1 )
         {
             o_time = [NSString stringWithFormat: @"-%s", secstotimestr( psz_time, ((dur - time.i_time) / 1000000))];
         }
@@ -485,6 +480,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
             o_time = [NSString stringWithUTF8String: secstotimestr( psz_time, (time.i_time / 1000000) )];
 
         [o_time_fld setStringValue: o_time];
+        [o_time_fld setNeedsDisplay:YES];
 //        [[[[VLCMain sharedInstance] controls] fspanel] setStreamPos: f_updated andTime: o_time];
     }
     else

@@ -658,11 +658,28 @@ void _drawFrameInRect(NSRect frameRect)
  *****************************************************************************/
 
 @implementation VLCTimeField
++ (void)initialize{
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSDictionary *appDefaults = [NSDictionary dictionaryWithObject:@"NO" forKey:@"DisplayTimeAsTimeRemaining"];
+
+    [defaults registerDefaults:appDefaults];
+}
+
 - (void)mouseDown: (NSEvent *)ourEvent
 {
     if( [ourEvent clickCount] > 1 )
         [[[VLCMain sharedInstance] controls] goToSpecificTime: nil];
     else
-        [[VLCMainWindow sharedInstance] timeFieldWasClicked: self];
+    {
+        if ([[NSUserDefaults standardUserDefaults] boolForKey:@"DisplayTimeAsTimeRemaining"])
+            [[NSUserDefaults standardUserDefaults] setObject:@"NO" forKey:@"DisplayTimeAsTimeRemaining"];
+        else
+            [[NSUserDefaults standardUserDefaults] setObject:@"YES" forKey:@"DisplayTimeAsTimeRemaining"];
+    }
+}
+
+- (BOOL)timeRemaining
+{
+    return [[NSUserDefaults standardUserDefaults] boolForKey:@"DisplayTimeAsTimeRemaining"];
 }
 @end

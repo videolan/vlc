@@ -146,4 +146,5 @@
 @interface VLCTimeField : NSTextField
 {
 }
+- (BOOL)timeRemaining;
 @end
