@@ -651,7 +651,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
             [o_time_sld_fancygradient_view setHidden: NO];
             [o_time_sld_fancygradient_view setFrame: NSMakeRect( [o_time_sld_fancygradient_view frame].origin.x, [o_time_sld_fancygradient_view frame].origin.y, f_value, [o_time_sld_fancygradient_view frame].size.height )];
             [o_time_sld_fancygradient_view setNeedsDisplay:YES];
-            [o_time_sld_fancygradient_view displayIfNeeded];
+            [o_time_sld_middle_view setNeedsDisplay:YES];
         }
     }
     else
