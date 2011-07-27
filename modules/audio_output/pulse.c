@@ -253,34 +253,39 @@ static void stream_latency_cb(pa_stream *s, void *userdata)
     //msg_Dbg(aout, "desync: %+"PRId64" us (variation: %+"PRId64" us)",
     //        delta, change);
 
+    const unsigned inrate = aout->format.i_rate;
+    unsigned outrate = sys->rate;
+    bool sync = false;
+
     if (delta < -AOUT_MAX_PTS_DELAY)
         msg_Warn(aout, "too late by %"PRId64" us", -delta);
     else if (delta > +AOUT_MAX_PTS_ADVANCE)
         msg_Warn(aout, "too early by %"PRId64" us", delta);
+    else if (outrate  == inrate)
+        return; /* In sync, do not add unnecessary disturbance! */
+    else
+        sync = true;
 
     /* Compute playback sample rate */
-    const unsigned inrate = aout->format.i_rate;
-    int limit = inrate / 100; /* max varation per iteration */
-
-#define ADJUST_FACTOR 4
     /* This is empirical. Feel free to define something smarter. */
-    int adj = sys->rate * (delta + change) / (CLOCK_FREQ * ADJUST_FACTOR);
-
-    /* This avoids too fast rate variation. They sound ugly as hell and they
-     * make the algorithm unstable (e.g. oscillation around inrate). */
+    int adj = sync ? (outrate - inrate)
+                   : outrate * (delta + change) / (CLOCK_FREQ << 4);
+    /* This avoids too quick rate variation. It sounds really bad and
+     * causes unstability (e.g. oscillation around the correct rate). */
+    int limit = inrate >> 10;
+    /* However, to improve stability and try to converge, closing to the
+     * nominal rate is favored over drifting from it. */
+    if ((adj > 0) == (sys->rate > inrate))
+        limit *= 2;
     if (adj > +limit)
         adj = +limit;
     if (adj < -limit)
         adj = -limit;
-
-    unsigned outrate = sys->rate - adj;
-    /* Favor native rate to avoid resampling (FIXME: really a good idea?) */
-    if (abs(outrate - inrate) < limit)
-        outrate = inrate;
+    outrate -= adj;
 
     /* This keeps the effective rate within specified range
      * (+/-AOUT_MAX_RESAMPLING% - see <vlc_aout.h>) of the nominal rate. */
-    limit *= AOUT_MAX_RESAMPLING;
+    limit = inrate * AOUT_MAX_RESAMPLING / 100;
     if (outrate > inrate + limit)
         outrate = inrate + limit;
     if (outrate < inrate - limit)
