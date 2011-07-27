@@ -553,15 +553,22 @@ static mtime_t BufferDuration( audio_output_t * p_aout )
     audio_buf_info audio_buf;
     int i_bytes;
 
-    /* Fill the audio_buf_info structure:
-     * - fragstotal: total number of fragments allocated
-     * - fragsize: size of a fragment in bytes
-     * - bytes: available space in bytes (includes partially used fragments)
-     * Note! 'bytes' could be more than fragments*fragsize */
-    ioctl( p_sys->i_fd, SNDCTL_DSP_GETOSPACE, &audio_buf );
+#ifdef SNDCTL_DSP_GETODELAY
+    if ( ioctl( p_sys->i_fd, SNDCTL_DSP_GETODELAY, &i_bytes ) < 0 )
+#endif
+    {
+        /* Fall back to GETOSPACE and approximate latency. */
 
-    /* calculate number of available fragments (not partially used ones) */
-    i_bytes = (audio_buf.fragstotal * audio_buf.fragsize) - audio_buf.bytes;
+        /* Fill the audio_buf_info structure:
+         * - fragstotal: total number of fragments allocated
+         * - fragsize: size of a fragment in bytes
+         * - bytes: available space in bytes (includes partially used fragments)
+         * Note! 'bytes' could be more than fragments*fragsize */
+        ioctl( p_sys->i_fd, SNDCTL_DSP_GETOSPACE, &audio_buf );
+
+        /* calculate number of available fragments (not partially used ones) */
+        i_bytes = (audio_buf.fragstotal * audio_buf.fragsize) - audio_buf.bytes;
+    }
 
     /* Return the fragment duration */
     return (mtime_t)i_bytes * 1000000
