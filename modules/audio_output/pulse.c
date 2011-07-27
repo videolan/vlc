@@ -260,27 +260,27 @@ static void stream_latency_cb(pa_stream *s, void *userdata)
 
     /* Compute playback sample rate */
     const unsigned inrate = aout->format.i_rate;
+    int limit = inrate / 100; /* max varation per iteration */
 
 #define ADJUST_FACTOR 4
-#define ADJUST_MAX    1000 /* Hz (max rate variation per call) */
     /* This is empirical. Feel free to define something smarter. */
     int adj = sys->rate * (delta + change) / (CLOCK_FREQ * ADJUST_FACTOR);
 
     /* This avoids too fast rate variation. They sound ugly as hell and they
      * make the algorithm unstable (e.g. oscillation around inrate). */
-    if (adj > +ADJUST_MAX)
-        adj = +ADJUST_MAX;
-    if (adj < -ADJUST_MAX)
-        adj = -ADJUST_MAX;
+    if (adj > +limit)
+        adj = +limit;
+    if (adj < -limit)
+        adj = -limit;
 
     unsigned outrate = sys->rate - adj;
     /* Favor native rate to avoid resampling (FIXME: really a good idea?) */
-    if (abs(outrate - inrate) < (inrate >> 10))
+    if (abs(outrate - inrate) < limit)
         outrate = inrate;
 
     /* This keeps the effective rate within specified range
      * (+/-AOUT_MAX_RESAMPLING% - see <vlc_aout.h>) of the nominal rate. */
-    const int limit = inrate * AOUT_MAX_RESAMPLING / 100;
+    limit *= AOUT_MAX_RESAMPLING;
     if (outrate > inrate + limit)
         outrate = inrate + limit;
     if (outrate < inrate - limit)
