@@ -66,6 +66,7 @@ struct aout_sys_t
     pa_context *context; /**< PulseAudio connection context */
     pa_volume_t base_volume; /**< 0dB reference volume */
     pa_cvolume cvolume; /**< actual sink input volume */
+    mtime_t paused; /**< Time when (last) paused */
     mtime_t pts; /**< Play time of buffer write offset */
     mtime_t desync; /**< Measured desynchronization */
     unsigned rate; /**< Current stream sample rate */
@@ -150,7 +151,21 @@ static void sink_info_cb(pa_context *c, const pa_sink_info *i, int eol,
     msg_Dbg(aout, "base volume: %"PRIu32, sys->base_volume);
 }
 
-/*** Stream helpers ***/
+
+/*** Latency management and lip synchronization ***/
+static mtime_t vlc_pa_get_latency(audio_output_t *aout,
+                                  pa_context *ctx, pa_stream *s)
+{
+    pa_usec_t latency;
+    int negative;
+
+    if (pa_stream_get_latency(s, &latency, &negative)) {
+        vlc_pa_error(aout, "unknown latency", ctx);
+        return VLC_TS_INVALID;
+    }
+    return negative ? -latency : +latency;
+}
+
 static void stream_reset_sync(pa_stream *s, audio_output_t *aout)
 {
     aout_sys_t *sys = aout->sys;
@@ -165,26 +180,62 @@ static void stream_reset_sync(pa_stream *s, audio_output_t *aout)
     sys->rate = rate;
 }
 
-static void stream_state_cb(pa_stream *s, void *userdata)
+/**
+ * Starts or resumes the playback stream.
+ * Tries start playing back audio samples at the most accurate time
+ * in order to minimize desync and resampling during early playback.
+ * @note PulseAudio lock required.
+ */
+static void stream_resync(audio_output_t *aout, pa_stream *s)
 {
-    switch (pa_stream_get_state(s)) {
-        case PA_STREAM_READY:
-        case PA_STREAM_FAILED:
-        case PA_STREAM_TERMINATED:
-            vlc_pa_signal(0);
-        default:
-            break;
-    }
-    (void) userdata;
+    aout_sys_t *sys = aout->sys;
+    pa_operation *op;
+    mtime_t delta;
+
+    assert (pa_stream_is_corked(s) > 0);
+    assert (sys->pts != VLC_TS_INVALID);
+
+    delta = vlc_pa_get_latency(aout, sys->context, s);
+    if (unlikely(delta == VLC_TS_INVALID))
+        delta = 0; /* screwed */
+
+    delta = (sys->pts - mdate()) - delta;
+
+    /* TODO: adjust prebuf instead of padding? */
+    if (delta > 0) {
+        size_t nb = (delta * sys->rate) / CLOCK_FREQ;
+        size_t size = aout->format.i_bytes_per_frame;
+        float *zeroes = calloc (nb, size);
+
+        msg_Dbg(aout, "starting with %zu zeroes (%"PRId64" us)", nb,
+                delta);
+#if 0 /* Fault injector: add delay */
+        pa_stream_write(s, zeroes, nb * size, NULL, 0, PA_SEEK_RELATIVE);
+        pa_stream_write(s, zeroes, nb * size, NULL, 0, PA_SEEK_RELATIVE);
+#endif
+        if (likely(zeroes != NULL))
+            if (pa_stream_write(s, zeroes, nb * size, free, 0,
+                                PA_SEEK_RELATIVE) < 0)
+                free(zeroes);
+    } else
+        msg_Warn(aout, "starting late (%"PRId64" us)", delta);
+
+    op = pa_stream_cork(s, 0, NULL, NULL);
+    if (op != NULL)
+        pa_operation_unref(op);
+    op = pa_stream_trigger(s, NULL, NULL);
+    if (op != NULL)
+        pa_operation_unref(op);
 }
 
-/* Latency management and lip synchronization */
 static void stream_latency_cb(pa_stream *s, void *userdata)
 {
     audio_output_t *aout = userdata;
     aout_sys_t *sys = aout->sys;
     mtime_t delta, change;
 
+    if (pa_stream_is_corked(s))
+        return;
     if (sys->pts == VLC_TS_INVALID)
     {
         msg_Dbg(aout, "missing latency from input");
@@ -192,21 +243,11 @@ static void stream_latency_cb(pa_stream *s, void *userdata)
     }
 
     /* Compute lip desynchronization */
-    {
-        pa_usec_t latency;
-        int negative;
+    delta = vlc_pa_get_latency(aout, sys->context, s);
+    if (delta == VLC_TS_INVALID)
+        return;
 
-        if (pa_stream_get_latency(s, &latency, &negative)) {
-            vlc_pa_error(aout, "missing latency", sys->context);
-            return;
-        }
-        delta = sys->pts - mdate();
-        if (unlikely(negative))
-           delta += latency;
-        else
-           delta -= latency;
-    }
-
+    delta = (sys->pts - mdate()) - delta;
     change = delta - sys->desync;
     sys->desync = delta;
     //msg_Dbg(aout, "desync: %+"PRId64" us (variation: %+"PRId64" us)",
@@ -256,6 +297,21 @@ static void stream_latency_cb(pa_stream *s, void *userdata)
     pa_operation_unref(op);
     msg_Dbg(aout, "changed sample rate to %u Hz",outrate);
     sys->rate = outrate;
+}
+
+
+/*** Stream helpers ***/
+static void stream_state_cb(pa_stream *s, void *userdata)
+{
+    switch (pa_stream_get_state(s)) {
+        case PA_STREAM_READY:
+        case PA_STREAM_FAILED:
+        case PA_STREAM_TERMINATED:
+            vlc_pa_signal(0);
+        default:
+            break;
+    }
+    (void) userdata;
 }
 
 static void stream_moved_cb(pa_stream *s, void *userdata)
@@ -406,50 +462,9 @@ static void Play(audio_output_t *aout)
      * will take place, and sooner or later a deadlock. */
     vlc_pa_lock();
 
-    if (pa_stream_is_corked(s) > 0) {
-        /* Start or resume the stream. Zeroes are prepended to sync.
-         * This does not really work because PulseAudio latency measurement is
-         * garbage at start. */
-        pa_operation *op;
-        pa_usec_t latency;
-        int negative;
-
-        if (pa_stream_get_latency(s, &latency, &negative) == 0)
-            msg_Dbg(aout, "starting with %c%"PRIu64" us latency",
-                    negative ? '-' : '+', latency);
-        else
-            latency = negative = 0;
-
-        mtime_t advance = block->i_pts - mdate();
-        if (negative)
-            advance += latency;
-        else
-            advance -= latency;
-
-        if (advance > 0) {
-            size_t nb = (advance * aout->format.i_rate) / CLOCK_FREQ;
-            size_t size = aout->format.i_bytes_per_frame;
-            float *zeroes = calloc (nb, size);
-
-            msg_Dbg(aout, "prepending %zu zeroes", nb);
-#if 0 /* Fault injector: add delay */
-            pa_stream_write(s, zeroes, nb * size, NULL, 0, PA_SEEK_RELATIVE);
-            pa_stream_write(s, zeroes, nb * size, NULL, 0, PA_SEEK_RELATIVE);
-#endif
-            if (likely(zeroes != NULL))
-                if (pa_stream_write(s, zeroes, nb * size, free, 0,
-                                    PA_SEEK_RELATIVE) < 0)
-                    free(zeroes);
-        }
-
-        op = pa_stream_cork(s, 0, NULL, NULL);
-        if (op != NULL)
-            pa_operation_unref(op);
-        op = pa_stream_trigger(s, NULL, NULL);
-        if (op != NULL)
-            pa_operation_unref(op);
-        msg_Dbg(aout, "uncorking");
-    }
+    sys->pts = pts;
+    if (pa_stream_is_corked(s) > 0)
+        stream_resync(aout, s);
 
 #if 0 /* Fault injector to test underrun recovery */
     static volatile unsigned u = 0;
@@ -463,7 +478,6 @@ static void Play(audio_output_t *aout)
         vlc_pa_error(aout, "cannot write", sys->context);
         block_Release(block);
     }
-    sys->pts = pts;
 
     vlc_pa_unlock();
 }
@@ -471,23 +485,29 @@ static void Play(audio_output_t *aout)
 /**
  * Cork or uncork the playback stream
  */
-static void Pause(audio_output_t *aout, bool b_paused, mtime_t i_date)
+static void Pause(audio_output_t *aout, bool paused, mtime_t date)
 {
     aout_sys_t *sys = aout->sys;
     pa_stream *s = sys->stream;
-
-    if (!b_paused)
-        return; /* nothing to do - yet */
+    pa_operation *op;
 
     vlc_pa_lock();
 
-    pa_operation *op = pa_stream_cork(s, 1, NULL, NULL);
-    if (op != NULL)
-        pa_operation_unref(op);
-    stream_reset_sync(s, aout);
+    if (paused) {
+        sys->paused = date;
+        op = pa_stream_cork(s, paused, NULL, NULL);
+        if (op != NULL)
+            pa_operation_unref(op);
+    } else {
+        assert (sys->paused != VLC_TS_INVALID);
+        date -= sys->paused;
+        msg_Dbg(aout, "resuming after %"PRId64" us", date);
+        sys->paused = VLC_TS_INVALID;
+        sys->pts += date;
+        stream_resync(aout, s);
+    }
 
     vlc_pa_unlock();
-    (void) i_date;
 }
 
 static int VolumeSet(audio_output_t *aout, float vol, bool mute)
@@ -697,6 +717,7 @@ static int Open(vlc_object_t *obj)
     aout->sys = sys;
     sys->stream = NULL;
     sys->context = ctx;
+    sys->paused = VLC_TS_INVALID;
     sys->pts = VLC_TS_INVALID;
     sys->desync = 0;
     sys->rate = ss.rate;
