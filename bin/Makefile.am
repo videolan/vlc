@@ -41,13 +41,14 @@ vlc_static_CFLAGS = $(AM_CFLAGS) \
 	$(NULL)
 vlc_static_DEPENDENCIES = $(vlc_DEPENDENCIES)
 vlc_static_LDADD = $(vlc_LDADD)
-vlc_static_LDFLAGS = $(vlc_LDFLAGS) -no-install -static
+vlc_static_LDFLAGS = $(vlc_LDFLAGS)
 
 if HAVE_WIN32
 vlc_LDADD += -lwininet vlc_win32_rc.$(OBJEXT)
 vlc_DEPENDENCIES += vlc_win32_rc.$(OBJEXT)
 else
 vlc_LDADD += $(LIBDL)
+vlc_LDFLAGS += -no-install -static
 endif
 
 vlc_win32_rc.rc: $(top_builddir)/config.status vlc_win32_rc.rc.in
