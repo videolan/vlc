@@ -111,10 +111,11 @@ static const char *const transmission_user[] = { N_("Automatic"),
 
 #define BANDWIDTH_TEXT N_("Bandwidth (MHz)")
 const int bandwidth_vlc[] = { 0,
-    8, 7, 6, 5,
+    10, 8, 7, 6, 5, 2
 };
 static const char *const bandwidth_user[] = { N_("Automatic"),
-    N_("8 MHz"), N_("7 MHz"), N_("6 MHz"), N_("5 MHz"),
+    N_("10 MHz"), N_("8 MHz"), N_("7 MHz"), N_("6 MHz"),
+    N_("5 MHz"), N_("1.712 MHz"),
 };
 
 #define GUARD_TEXT N_("Guard interval")

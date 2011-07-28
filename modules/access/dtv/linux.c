@@ -798,6 +798,16 @@ int dvb_set_dvbs2 (dvb_device_t *d, uint64_t freq_Hz, const char *modstr,
 
 
 /*** DVB-T ***/
+static uint32_t dvb_parse_bandwidth (uint32_t i)
+{
+    switch (i)
+    {
+      //case  0: return 0;
+        case  2: return 1712000;
+        default: return i * 1000000;
+    }
+}
+
 static int dvb_parse_transmit_mode (int i)
 {
     static const dvb_int_map_t tab[] = {
@@ -857,7 +867,7 @@ int dvb_set_dvbt (dvb_device_t *d, uint32_t freq, const char *modstr,
     uint32_t mod = dvb_parse_modulation (modstr, QAM_AUTO);
     fec_hp = dvb_parse_fec (fec_hp);
     fec_lp = dvb_parse_fec (fec_lp);
-    bandwidth *= 1000000;
+    bandwidth = dvb_parse_bandwidth (bandwidth);
     transmit_mode = dvb_parse_transmit_mode (transmit_mode);
     guard = dvb_parse_guard (guard);
     hierarchy = dvb_parse_hierarchy (hierarchy);
@@ -880,7 +890,7 @@ int dvb_set_dvbt2 (dvb_device_t *d, uint32_t freq, const char *modstr,
 #if DVBv5(3)
     uint32_t mod = dvb_parse_modulation (modstr, QAM_AUTO);
     fec = dvb_parse_fec (fec);
-    bandwidth *= 1000000;
+    bandwidth = dvb_parse_bandwidth (bandwidth);
     transmit_mode = dvb_parse_transmit_mode (transmit_mode);
     guard = dvb_parse_guard (guard);
 
