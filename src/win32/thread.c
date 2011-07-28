@@ -143,6 +143,7 @@ static DWORD vlc_WaitForSingleObject (HANDLE handle, DWORD delay)
     return vlc_WaitForMultipleObjects (1, &handle, delay);
 }
 
+#if 0 // WaitForMultipleObjectsEx() cannot deal with zero handles
 static DWORD vlc_Sleep (DWORD delay)
 {
     DWORD ret = vlc_WaitForMultipleObjects (0, NULL, delay);
@@ -150,6 +151,7 @@ static DWORD vlc_Sleep (DWORD delay)
         ret = 0;
     return ret;
 }
+#endif
 
 
 /*** Mutexes ***/
@@ -789,7 +791,7 @@ void mwait (mtime_t deadline)
         delay /= 1000;
         if (unlikely(delay > 0x7fffffff))
             delay = 0x7fffffff;
-        vlc_Sleep (delay);
+        SleepEx (delay, TRUE);
         vlc_testcancel();
     }
 }
