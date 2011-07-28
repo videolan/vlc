@@ -149,7 +149,7 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
     argv[j++] = FromWide( L"--media-library" );
     argv[j++] = FromWide( L"--no-ignore-config" );
 #ifdef TOP_SRCDIR
-    argv[argc++] = FromWide (L"--data-path=Z:"TOP_SRCDIR"/share");
+    argv[j++] = FromWide (L"--data-path=Z:"TOP_SRCDIR"/share");
 #endif
     for (int i = 1; i < argc; i++)
     {
