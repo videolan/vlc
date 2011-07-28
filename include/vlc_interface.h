@@ -114,7 +114,7 @@ VLC_API void libvlc_Quit( libvlc_int_t * );
  *****************************************************************************/
 #if defined( WIN32 ) && !defined( UNDER_CE )
 #    define CONSOLE_INTRO_MSG \
-         if( !getenv( "PWD" ) || !getenv( "PS1" ) ) /* detect cygwin shell */ \
+         if( !getenv( "PWD" ) ) /* detect Cygwin shell or Wine */ \
          { \
          AllocConsole(); \
          freopen( "CONOUT$", "w", stdout ); \
@@ -128,7 +128,7 @@ VLC_API void libvlc_Quit( libvlc_int_t * );
                              "directory where you installed VLC and run " \
                              "\"vlc -I qt\"\n") )
 #else
-#    define CONSOLE_INTRO_MSG
+#    define CONSOLE_INTRO_MSG (void)0
 #endif
 
 /* Interface dialog ids for dialog providers */

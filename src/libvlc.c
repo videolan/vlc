@@ -1894,7 +1894,7 @@ static void ShowConsole( bool b_dofile )
 #   ifndef UNDER_CE
     FILE *f_help = NULL;
 
-    if( getenv( "PWD" ) && getenv( "PS1" ) ) return; /* cygwin shell */
+    if( getenv( "PWD" ) ) return; /* Cygwin shell or Wine */
 
     AllocConsole();
     /* Use the ANSI code page (e.g. Windows-1252) as expected by the LibVLC
@@ -1928,7 +1928,7 @@ static void PauseConsole( void )
 {
 #   ifndef UNDER_CE
 
-    if( getenv( "PWD" ) && getenv( "PS1" ) ) return; /* cygwin shell */
+    if( getenv( "PWD" ) ) return; /* Cygwin shell or Wine */
 
     utf8_fprintf( stderr, _("\nPress the RETURN key to continue...\n") );
     getchar();
