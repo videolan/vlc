@@ -46,13 +46,13 @@
  * mapping of libvlc_navigate_mode_t to vlc_action_t
  */
 static const vlc_action_t libvlc_navigate_to_action[] =
-  {
+{
     ACTIONID_NAV_ACTIVATE,
     ACTIONID_NAV_UP,
     ACTIONID_NAV_DOWN,
     ACTIONID_NAV_LEFT,
     ACTIONID_NAV_RIGHT
-  };
+};
 
 static const uint32_t libvlc_navigate_to_action_size =			\
   sizeof( libvlc_navigate_to_action ) / sizeof( libvlc_navigate_to_action[0] );

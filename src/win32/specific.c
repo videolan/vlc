@@ -130,9 +130,9 @@ static HANDLE hIPCHelperReady;
 
 typedef struct
 {
-  int argc;
-  int enqueue;
-  char data[];
+    int argc;
+    int enqueue;
+    char data[];
 } vlc_ipc_data_t;
 
 void system_Configure( libvlc_int_t *p_this, int i_argc, const char *const ppsz_argv[] )

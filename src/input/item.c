@@ -992,29 +992,27 @@ input_item_node_t *input_item_node_Create( input_item_t *p_input )
 
 static void RecursiveNodeDelete( input_item_node_t *p_node )
 {
-  for( int i = 0; i < p_node->i_children; i++ )
-      RecursiveNodeDelete( p_node->pp_children[i] );
+    for( int i = 0; i < p_node->i_children; i++ )
+        RecursiveNodeDelete( p_node->pp_children[i] );
 
-  vlc_gc_decref( p_node->p_item );
-  free( p_node->pp_children );
-  free( p_node );
+    vlc_gc_decref( p_node->p_item );
+    free( p_node->pp_children );
+    free( p_node );
 }
 
 void input_item_node_Delete( input_item_node_t *p_node )
 {
-  if(  p_node->p_parent )
-  {
-      for( int i = 0; i < p_node->p_parent->i_children; i++ )
-          if( p_node->p_parent->pp_children[i] == p_node )
-          {
-              REMOVE_ELEM( p_node->p_parent->pp_children,
-                           p_node->p_parent->i_children,
-                           i );
-              break;
-          }
-  }
+    if( p_node->p_parent )
+        for( int i = 0; i < p_node->p_parent->i_children; i++ )
+            if( p_node->p_parent->pp_children[i] == p_node )
+            {
+                REMOVE_ELEM( p_node->p_parent->pp_children,
+                        p_node->p_parent->i_children,
+                        i );
+                break;
+            }
 
-  RecursiveNodeDelete( p_node );
+    RecursiveNodeDelete( p_node );
 }
 
 input_item_node_t *input_item_node_AppendItem( input_item_node_t *p_node, input_item_t *p_item )
@@ -1037,14 +1035,14 @@ void input_item_node_AppendNode( input_item_node_t *p_parent, input_item_node_t 
 
 void input_item_node_PostAndDelete( input_item_node_t *p_root )
 {
-  post_subitems( p_root );
+    post_subitems( p_root );
 
-  vlc_event_t event;
-  event.type = vlc_InputItemSubItemTreeAdded;
-  event.u.input_item_subitem_tree_added.p_root = p_root;
-  vlc_event_send( &p_root->p_item->event_manager, &event );
+    vlc_event_t event;
+    event.type = vlc_InputItemSubItemTreeAdded;
+    event.u.input_item_subitem_tree_added.p_root = p_root;
+    vlc_event_send( &p_root->p_item->event_manager, &event );
 
-  input_item_node_Delete( p_root );
+    input_item_node_Delete( p_root );
 }
 
 /* Called by es_out when a new Elementary Stream is added or updated. */
