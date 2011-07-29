@@ -459,6 +459,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     p_input = pl_CurrentInput( VLCIntf );
     if( p_input )
     {
+        NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
         vlc_value_t time;
         NSString * o_time;
         vlc_value_t pos;
@@ -482,6 +483,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
         [o_time_fld setStringValue: o_time];
         [o_time_fld setNeedsDisplay:YES];
 //        [[[[VLCMain sharedInstance] controls] fspanel] setStreamPos: f_updated andTime: o_time];
+        [o_pool release];
     }
     else
     {
@@ -511,8 +513,8 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
 - (void)updateName
 {
+    NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
     input_thread_t * p_input;
-
     p_input = pl_CurrentInput( VLCIntf );
     if( p_input )
     {
@@ -564,6 +566,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
         [self setTitle: _NS("VLC media player")];
         [self setRepresentedFilename: @""];
     }
+    [o_pool release];
 }
 
 - (void)updateWindow
@@ -639,6 +642,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
 - (void)drawFancyGradientEffectForTimeSlider
 {
+    NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
     float f_value = ([o_time_sld_middle_view frame].size.width -5) * ([o_time_sld intValue] / [o_time_sld maxValue]);
     if (f_value > 5.0)
     {
@@ -654,6 +658,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     {
         [o_time_sld_fancygradient_view setHidden: YES];
     }
+    [o_pool release];
 }
 
 #pragma mark -
@@ -681,19 +686,27 @@ static VLCMainWindow *_o_sharedInstance = nil;
 @end
 
 @implementation VLCProgressBarGradientEffect
+- (void)dealloc
+{
+    [o_time_sld_gradient_left_img release];
+    [o_time_sld_gradient_middle_img release];
+    [o_time_sld_gradient_right_img release];
+    [super dealloc];
+}
+
 - (void)loadImagesInDarkStyle: (BOOL)b_value
 {
     if (b_value)
     {
-        o_time_sld_gradient_left_img = [NSImage imageNamed:@"progressbar-fill-left_dark"];
-        o_time_sld_gradient_middle_img = [NSImage imageNamed:@"progressbar-fill-middle_dark"];
-        o_time_sld_gradient_right_img = [NSImage imageNamed:@"progressbar-fill-right_dark"];
+        o_time_sld_gradient_left_img = [[NSImage imageNamed:@"progressbar-fill-left_dark"] retain];
+        o_time_sld_gradient_middle_img = [[NSImage imageNamed:@"progressbar-fill-middle_dark"] retain];
+        o_time_sld_gradient_right_img = [[NSImage imageNamed:@"progressbar-fill-right_dark"] retain];
     }
     else
     {
-        o_time_sld_gradient_left_img = [NSImage imageNamed:@"progression-fill-left"];
-        o_time_sld_gradient_middle_img = [NSImage imageNamed:@"progression-fill-middle"];
-        o_time_sld_gradient_right_img = [NSImage imageNamed:@"progression-fill-right"];
+        o_time_sld_gradient_left_img = [[NSImage imageNamed:@"progression-fill-left"] retain];
+        o_time_sld_gradient_middle_img = [[NSImage imageNamed:@"progression-fill-middle"] retain];
+        o_time_sld_gradient_right_img = [[NSImage imageNamed:@"progression-fill-right"] retain];
     }
 }
 

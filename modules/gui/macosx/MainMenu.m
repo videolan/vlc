@@ -508,6 +508,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
 
 - (void)setRateControlsEnabled:(BOOL)b_enabled
 {
+    NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
     [o_mi_rate_sld setEnabled: b_enabled];
     [o_mi_rate_sld setIntValue: [[VLCCoreInteraction sharedInstance] playbackRate]];
     int i = [[VLCCoreInteraction sharedInstance] playbackRate];
@@ -523,6 +524,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
         [o_mi_rate_lbl setHidden: YES];
         [o_mi_rate_lbl_gray setHidden: NO];
     }
+    [o_pool release];
 }
 
 #pragma mark -

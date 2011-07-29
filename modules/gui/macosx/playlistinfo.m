@@ -174,6 +174,7 @@ static VLCInfo *_o_sharedInstance = nil;
 
 - (void)updatePanelWithItem:(input_item_t *)_p_item;
 {
+    NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
     if( _p_item != p_item )
     {
         if( p_item ) vlc_gc_decref( p_item );
@@ -260,6 +261,7 @@ static VLCInfo *_o_sharedInstance = nil;
 
     /* update the stats once to display p_item change faster */
     [self updateStatistics];
+    [o_pool release];
 }
 
 - (void)setMeta: (char *)psz_meta forLabel: (id)theItem
