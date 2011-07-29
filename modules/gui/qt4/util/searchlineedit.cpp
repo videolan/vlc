@@ -192,7 +192,7 @@ void SearchLineEdit::paintEvent( QPaintEvent *event )
         .adjusted( 3, 0, clearButton->width() + 1, 0 );
     QPainter painter( this );
     painter.setPen( palette().color( QPalette::Disabled, QPalette::Text ) );
-    painter.drawText( rect, Qt::AlignLeft | Qt::AlignVCenter, qtr( I_PL_FILTER ) );
+    painter.drawText( rect, Qt::AlignLeft | Qt::AlignVCenter, qtr( I_PL_SEARCH ) );
 }
 
 void SearchLineEdit::searchEditingFinished()
