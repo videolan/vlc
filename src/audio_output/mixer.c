@@ -187,7 +187,6 @@ static int MixBuffer( audio_output_t * p_aout, float volume )
         {
             /* Is it really the best way to do it ? */
             aout_FifoSet( &p_aout->fifo, 0 );
-            date_Set( &exact_start_date, 0 );
             return -1;
         }
         if( delta > 0 )
