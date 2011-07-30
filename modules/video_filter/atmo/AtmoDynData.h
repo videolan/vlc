@@ -37,7 +37,7 @@ class CAtmoInput;
 
   you ask? why I didn't used a struct for it? ..mmh I like classes?
 
-  Allways stop the current effect Thread before changing AtmoConnection or
+  Always stop the current effect Thread before changing AtmoConnection or
   AtmoConfig!
 */
 class CAtmoDynData

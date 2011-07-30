@@ -374,7 +374,7 @@
  * It returns the codec associated to a fourcc within a ES category.
  *
  * If not found, it will return the given fourcc.
- * If found, it will allways be one of the VLC_CODEC_ defined above.
+ * If found, it will always be one of the VLC_CODEC_ defined above.
  *
  * You may use UNKNOWN_ES for the ES category if you don't have the information.
  */

@@ -229,7 +229,7 @@ static const char *const ppsz_device_type_descriptions[] = {
 #define ZONE_BOTTOM_TEXT       N_("Number of zones on bottom")
 #define ZONE_BOTTOM_LONGTEXT   N_("Number of zones on the bottom of the screen")
 #define ZONE_LR_TEXT           N_("Zones on left / right side")
-#define ZONE_LR_LONGTEXT       N_("left and right side having allways the " \
+#define ZONE_LR_LONGTEXT       N_("left and right side having always the " \
                                   "same number of zones")
 #define ZONE_SUMMARY_TEXT      N_("Calculate a average zone")
 #define ZONE_SUMMARY_LONGTEXT  N_("it contains the average of all pixels " \
