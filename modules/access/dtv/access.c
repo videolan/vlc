@@ -273,7 +273,7 @@ vlc_module_begin ()
         change_safe ()
 
     set_section (N_("Cable and satellite reception parameters"), NULL)
-    add_string ("dvb-modulation", 0,
+    add_string ("dvb-modulation", NULL,
                  MODULATION_TEXT, MODULATION_LONGTEXT, false)
         change_string_list (modulation_vlc, modulation_user, NULL)
         change_safe ()
