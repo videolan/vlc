@@ -94,7 +94,6 @@ static int MixBuffer( audio_output_t * p_aout, float volume )
 {
     aout_mixer_t *p_mixer = p_aout->p_mixer;
     aout_fifo_t *p_fifo = p_mixer->fifo;
-    mtime_t now = mdate();
     const unsigned samples = p_aout->i_nb_samples;
     /* FIXME: Remove this silly constraint. Just pass buffers as they come to
      * "smart" audio outputs. */
@@ -105,18 +104,6 @@ static int MixBuffer( audio_output_t * p_aout, float volume )
     /* Retrieve the date of the next buffer. */
     date_t exact_start_date = p_aout->fifo.end_date;
     mtime_t start_date = date_Get( &exact_start_date );
-
-    if( start_date != 0 && start_date < now )
-    {
-        /* The output is _very_ late. This can only happen if the user
-         * pauses the stream (or if the decoder is buggy, which cannot
-         * happen :). */
-        msg_Warn( p_mixer, "output PTS is out of range (%"PRId64"), clearing out",
-                  mdate() - start_date );
-        aout_FifoSet( &p_aout->fifo, 0 );
-        date_Set( &exact_start_date, 0 );
-        start_date = 0;
-    }
 
     /* See if we have enough data to prepare a new buffer for the audio output. */
     aout_buffer_t *p_buffer = p_fifo->p_first;

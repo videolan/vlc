@@ -550,6 +550,7 @@ void aout_InputPlay( audio_output_t * p_aout, aout_input_t * p_input,
         msg_Warn( p_aout, "computed PTS is out of range (%"PRId64"), "
                   "clearing out", now - start_date );
         aout_FifoSet( &p_input->fifo, 0 );
+        aout_FifoSet( &p_aout->fifo, 0 );
         if ( p_input->i_resampling_type != AOUT_RESAMPLING_NONE )
             msg_Warn( p_aout, "timing screwed, stopping resampling" );
         inputResamplingStop( p_input );
