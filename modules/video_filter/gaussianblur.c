@@ -46,7 +46,7 @@ static void Destroy   ( vlc_object_t * );
 
 #define SIGMA_TEXT N_("Gaussian's std deviation")
 #define SIGMA_LONGTEXT N_( \
-    "Gaussian's standard deviation. The bluring will take " \
+    "Gaussian's standard deviation. The blurring will take " \
     "into account pixels up to 3*sigma away in any direction.")
 
 #define GAUSSIAN_HELP N_("Add a blurring effect")
