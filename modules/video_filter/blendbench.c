@@ -66,7 +66,7 @@ static picture_t *Filter( filter_t *, picture_t * );
 
 #define BLEND_CHROMA_TEXT N_("Chroma for the blend image")
 #define BLEND_CHROMA_LONGTEXT N_("Chroma which the blend image will be loaded" \
-                                 "in")
+                                 " in")
 
 #define CFG_PREFIX "blendbench-"
 
