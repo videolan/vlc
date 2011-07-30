@@ -58,20 +58,20 @@
  *****************************************************************************/
 
 #define T_VIDEO_PRERENDER_CALLBACK N_( "Video prerender callback" )
-#define LT_VIDEO_PRERENDER_CALLBACK N_( "Address of the video prerender callback function" \
-                                "this function will set the buffer where render will be done" )
+#define LT_VIDEO_PRERENDER_CALLBACK N_( "Address of the video prerender callback function. " \
+                                "This function will set the buffer where render will be done." )
 
 #define T_AUDIO_PRERENDER_CALLBACK N_( "Audio prerender callback" )
-#define LT_AUDIO_PRERENDER_CALLBACK N_( "Address of the audio prerender callback function." \
-                                        "this function will set the buffer where render will be done" )
+#define LT_AUDIO_PRERENDER_CALLBACK N_( "Address of the audio prerender callback function. " \
+                                        "This function will set the buffer where render will be done." )
 
 #define T_VIDEO_POSTRENDER_CALLBACK N_( "Video postrender callback" )
-#define LT_VIDEO_POSTRENDER_CALLBACK N_( "Address of the video postrender callback function." \
-                                        "this function will be called when the render is into the buffer" )
+#define LT_VIDEO_POSTRENDER_CALLBACK N_( "Address of the video postrender callback function. " \
+                                        "This function will be called when the render is into the buffer." )
 
 #define T_AUDIO_POSTRENDER_CALLBACK N_( "Audio postrender callback" )
-#define LT_AUDIO_POSTRENDER_CALLBACK N_( "Address of the audio postrender callback function." \
-                                        "this function will be called when the render is into the buffer" )
+#define LT_AUDIO_POSTRENDER_CALLBACK N_( "Address of the audio postrender callback function. " \
+                                        "This function will be called when the render is into the buffer." )
 
 #define T_VIDEO_DATA N_( "Video Callback data" )
 #define LT_VIDEO_DATA N_( "Data for the video callback function." )
