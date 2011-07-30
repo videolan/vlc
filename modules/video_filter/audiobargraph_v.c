@@ -45,7 +45,7 @@
  *****************************************************************************/
 
 #define I_VALUES_TEXT N_("Value of the audio channels levels")
-#define I_VALUES_LONGTEXT N_("Value of the audio level of each channels between 0 and 1" \
+#define I_VALUES_LONGTEXT N_("Value of the audio level of each channels between 0 and 1. " \
     "Each level should be separated with ':'.")
 #define POSX_TEXT N_("X coordinate")
 #define POSX_LONGTEXT N_("X coordinate of the bargraph." )
