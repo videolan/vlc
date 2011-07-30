@@ -1807,7 +1807,7 @@ if test "${enable_live555}" != "no"; then
           AC_MSG_WARN([The installed liveMedia version is too old:
 Version 2010.05.29 or later is required to proceed.
 You can get an updated one from http://www.live555.com/liveMedia .])
-          AS_IF([test "${enable_live555}" == "yes"], [
+          AS_IF([test "${enable_live555}" = "yes"], [
             AC_MSG_ERROR([Update live555 or pass --disable-live555 to disable the plugin.])
           ])
         ],[
@@ -2541,13 +2541,13 @@ AS_IF([test "${enable_libva}" != "no"], [
            AC_DEFINE(HAVE_AVCODEC_VAAPI, 1, [Define if avcodec has to be built with VAAPI support.])
            echo "VAAPI acceleration activated"
         ],[
-	AS_IF([test "${enable_libva}" == "yes"],
+	AS_IF([test "${enable_libva}" = "yes"],
 	      [AC_MSG_ERROR([libva is present but libavcodec/vaapi.h is missing])],
               [AC_MSG_WARN([libva is present but libavcodec/vaapi.h is missing ])])
         ])
         VLC_RESTORE_FLAGS
       ],[
-	AS_IF([test "${enable_libva}" == "yes"],
+	AS_IF([test "${enable_libva}" = "yes"],
               [AC_MSG_ERROR([Could not find required libva.])],
               [AC_MSG_WARN([libva not found  ])])
       ])
@@ -2574,12 +2574,12 @@ AS_IF([test "${enable_dxva2}" != "no"], [
            AC_DEFINE(HAVE_AVCODEC_DXVA2, 1, [Define if avcodec has to be built with DxVA2 support.])
            echo "DxVA2 acceleration activated"
         ],[
-	AS_IF([test "${enable_dxva2}" == "yes"],
+	AS_IF([test "${enable_dxva2}" = "yes"],
 	      [AC_MSG_ERROR([dxva2 is present but libavcodec/dxva2.h is missing])],
               [AC_MSG_WARN([dxva2 is present but libavcodec/dxva2.h is missing ])])
         ])
       ],[
-	AS_IF([test "${enable_dxva2}" == "yes"],
+	AS_IF([test "${enable_dxva2}" = "yes"],
               [AC_MSG_ERROR([Could not find required dxva2api.h])],
               [AC_MSG_WARN([dxva2api.h not found])])
       ])
