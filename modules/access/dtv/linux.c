@@ -928,6 +928,49 @@ int dvb_set_isdbs (dvb_device_t *d, uint64_t freq_Hz, uint16_t ts_id)
 }
 
 
+/*** ISDB-T ***/
+static int dvb_set_isdbt_layer (dvb_device_t *d, unsigned num,
+                                const isdbt_layer_t *l)
+{
+    uint32_t mod = dvb_parse_modulation (l->modulation, QAM_AUTO);
+    uint32_t fec = dvb_parse_fec (l->code_rate);
+    uint32_t count = l->segment_count;
+    uint32_t ti = l->time_interleaving;
+
+    num *= DTV_ISDBT_LAYERB_FEC - DTV_ISDBT_LAYERA_FEC;
+
+    return dvb_set_props (d, 5, DTV_DELIVERY_SYSTEM, SYS_ISDBT,
+                          DTV_ISDBT_LAYERA_FEC + num, fec,
+                          DTV_ISDBT_LAYERA_MODULATION + num, mod,
+                          DTV_ISDBT_LAYERA_SEGMENT_COUNT + num, count,
+                          DTV_ISDBT_LAYERA_TIME_INTERLEAVING + num, ti);
+}
+
+int dvb_set_isdbt (dvb_device_t *d, uint32_t freq, uint32_t bandwidth,
+                   int transmit_mode, uint32_t guard,
+                   const isdbt_layer_t layers[3])
+{
+#if DVBv5(1)
+    bandwidth = dvb_parse_bandwidth (bandwidth);
+    transmit_mode = dvb_parse_transmit_mode (transmit_mode);
+    guard = dvb_parse_guard (guard);
+
+    if (dvb_find_frontend (d, FE_OFDM, FE_IS_STUPID))
+        return -1;
+    if (dvb_set_props (d, 5, DTV_CLEAR, 0, DTV_DELIVERY_SYSTEM, SYS_ISDBT,
+                       DTV_FREQUENCY, freq, DTV_BANDWIDTH_HZ, bandwidth,
+                       DTV_GUARD_INTERVAL, guard))
+        return -1;
+    for (unsigned i = 0; i < 3; i++)
+        if (dvb_set_isdbt_layer (d, i, layers + i))
+            return -1;
+    return 0;
+#else
+# warning ISDB-T needs Linux DVB version 5.1 or later.
+#endif
+}
+
+
 /*** ATSC ***/
 int dvb_set_atsc (dvb_device_t *d, uint32_t freq, const char *modstr)
 {

@@ -98,20 +98,21 @@ int dvb_set_isdbs (dvb_device_t *, uint64_t freq, uint16_t ts_id);
 typedef struct isdbt_layer
 {
     const char *modulation;
-    const char *code_rate;
+    uint32_t code_rate;
     uint8_t segment_count;
     uint8_t time_interleaving;
 } isdbt_layer_t;
 
+int dvb_set_isdbt (dvb_device_t *, uint32_t freq, uint32_t bandwith,
+                   int transmission, uint32_t guard, const isdbt_layer_t[3]);
+
 typedef struct isdbt_sound
 {
     uint8_t subchannel_id;
-    uint8_t segment_index;    uint8_t segment_cound;
+    uint8_t segment_index;
+    uint8_t segment_count;
 } isdbt_sound_t;
 
-int dvb_set_isdbt (dvb_device_t *, uint32_t freq, const isdbt_layer_t *a,
-                   const isdbt_layer_t *b, const isdbt_layer_t *c,
-                   const isdbt_sound_t *sb);
 # ifdef __cplusplus
 }
 # endif
