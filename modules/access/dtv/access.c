@@ -344,7 +344,7 @@ struct access_sys_t
 
 struct delsys
 {
-    int (*setup) (vlc_object_t *, dvb_device_t *, unsigned freq);
+    int (*setup) (vlc_object_t *, dvb_device_t *, uint64_t freq);
     /* TODO: scan stuff */
 };
 
@@ -687,7 +687,7 @@ static unsigned var_InheritGuardInterval (vlc_object_t *obj)
 
 
 /*** ATSC ***/
-static int atsc_setup (vlc_object_t *obj, dvb_device_t *dev, unsigned freq)
+static int atsc_setup (vlc_object_t *obj, dvb_device_t *dev, uint64_t freq)
 {
     const char *mod = var_InheritModulation (obj);
 
@@ -696,7 +696,7 @@ static int atsc_setup (vlc_object_t *obj, dvb_device_t *dev, unsigned freq)
 
 const delsys_t atsc = { .setup = atsc_setup };
 
-static int cqam_setup (vlc_object_t *obj, dvb_device_t *dev, unsigned freq)
+static int cqam_setup (vlc_object_t *obj, dvb_device_t *dev, uint64_t freq)
 {
     const char *mod = var_InheritModulation (obj);
 
@@ -707,7 +707,7 @@ const delsys_t cqam = { .setup = cqam_setup };
 
 
 /*** DVB-C ***/
-static int dvbc_setup (vlc_object_t *obj, dvb_device_t *dev, unsigned freq)
+static int dvbc_setup (vlc_object_t *obj, dvb_device_t *dev, uint64_t freq)
 {
     const char *mod = var_InheritModulation (obj);
     uint32_t fec = var_InheritCodeRate (obj, "dvb-fec");
@@ -747,7 +747,7 @@ static char var_InheritPolarization (vlc_object_t *obj)
     return pol;
 }
 
-static int sec_setup (vlc_object_t *obj, dvb_device_t *dev, unsigned freq)
+static int sec_setup (vlc_object_t *obj, dvb_device_t *dev, uint64_t freq)
 {
     char pol = var_InheritPolarization (obj);
     unsigned lowf = var_InheritInteger (obj, "dvb-lnb-low");
@@ -757,7 +757,7 @@ static int sec_setup (vlc_object_t *obj, dvb_device_t *dev, unsigned freq)
     return dvb_set_sec (dev, freq, pol, lowf, highf, switchf);
 }
 
-static int dvbs_setup (vlc_object_t *obj, dvb_device_t *dev, unsigned freq)
+static int dvbs_setup (vlc_object_t *obj, dvb_device_t *dev, uint64_t freq)
 {
     uint32_t fec = var_InheritCodeRate (obj, "dvb-fec");
     uint32_t srate = var_InheritInteger (obj, "dvb-srate");
@@ -768,7 +768,7 @@ static int dvbs_setup (vlc_object_t *obj, dvb_device_t *dev, unsigned freq)
     return ret;
 }
 
-static int dvbs2_setup (vlc_object_t *obj, dvb_device_t *dev, unsigned freq)
+static int dvbs2_setup (vlc_object_t *obj, dvb_device_t *dev, uint64_t freq)
 {
     const char *mod = var_InheritModulation (obj);
     uint32_t fec = var_InheritCodeRate (obj, "dvb-fec");
@@ -787,7 +787,7 @@ const delsys_t dvbs2 = { .setup = dvbs2_setup };
 
 
 /*** DVB-T ***/
-static int dvbt_setup (vlc_object_t *obj, dvb_device_t *dev, unsigned freq)
+static int dvbt_setup (vlc_object_t *obj, dvb_device_t *dev, uint64_t freq)
 {
     const char *mod = var_InheritModulation (obj);
     uint32_t fec_hp = var_InheritCodeRate (obj, "dvb-code-rate-hp");
@@ -800,7 +800,7 @@ static int dvbt_setup (vlc_object_t *obj, dvb_device_t *dev, unsigned freq)
     return dvb_set_dvbt (dev, freq, mod, fec_hp, fec_lp, bw, tx, guard, h);
 }
 
-static int dvbt2_setup (vlc_object_t *obj, dvb_device_t *dev, unsigned freq)
+static int dvbt2_setup (vlc_object_t *obj, dvb_device_t *dev, uint64_t freq)
 {
     const char *mod = var_InheritModulation (obj);
     uint32_t fec = var_InheritCodeRate (obj, "dvb-fec");
