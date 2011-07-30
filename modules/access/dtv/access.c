@@ -342,11 +342,13 @@ struct access_sys_t
     dvb_device_t *dev;
 };
 
-struct delsys
+typedef struct delsys
 {
     int (*setup) (vlc_object_t *, dvb_device_t *, uint64_t freq);
     /* TODO: scan stuff */
-};
+} delsys_t;
+
+static const delsys_t dvbc, dvbs, dvbs2, dvbt, dvbt2, atsc, cqam;
 
 static block_t *Read (access_t *);
 static int Control (access_t *, int, va_list);
@@ -694,7 +696,7 @@ static int atsc_setup (vlc_object_t *obj, dvb_device_t *dev, uint64_t freq)
     return dvb_set_atsc (dev, freq, mod);
 }
 
-const delsys_t atsc = { .setup = atsc_setup };
+static const delsys_t atsc = { .setup = atsc_setup };
 
 static int cqam_setup (vlc_object_t *obj, dvb_device_t *dev, uint64_t freq)
 {
@@ -703,7 +705,7 @@ static int cqam_setup (vlc_object_t *obj, dvb_device_t *dev, uint64_t freq)
     return dvb_set_cqam (dev, freq, mod);
 }
 
-const delsys_t cqam = { .setup = cqam_setup };
+static const delsys_t cqam = { .setup = cqam_setup };
 
 
 /*** DVB-C ***/
@@ -716,7 +718,7 @@ static int dvbc_setup (vlc_object_t *obj, dvb_device_t *dev, uint64_t freq)
     return dvb_set_dvbc (dev, freq, mod, srate, fec);
 }
 
-const delsys_t dvbc = { .setup = dvbc_setup };
+static const delsys_t dvbc = { .setup = dvbc_setup };
 
 
 /*** DVB-S ***/
@@ -782,8 +784,8 @@ static int dvbs2_setup (vlc_object_t *obj, dvb_device_t *dev, uint64_t freq)
     return ret;
 }
 
-const delsys_t dvbs = { .setup = dvbs_setup };
-const delsys_t dvbs2 = { .setup = dvbs2_setup };
+static const delsys_t dvbs = { .setup = dvbs_setup };
+static const delsys_t dvbs2 = { .setup = dvbs2_setup };
 
 
 /*** DVB-T ***/
@@ -811,5 +813,5 @@ static int dvbt2_setup (vlc_object_t *obj, dvb_device_t *dev, uint64_t freq)
     return dvb_set_dvbt2 (dev, freq, mod, fec, bw, tx, guard);
 }
 
-const delsys_t dvbt = { .setup = dvbt_setup };
-const delsys_t dvbt2 = { .setup = dvbt2_setup };
+static const delsys_t dvbt = { .setup = dvbt_setup };
+static const delsys_t dvbt2 = { .setup = dvbt2_setup };

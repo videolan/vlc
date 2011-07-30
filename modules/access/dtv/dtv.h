@@ -37,10 +37,6 @@ enum {
     DVB_T2 = 0x00000200,
 };
 
-typedef struct delsys delsys_t;
-
-extern const delsys_t dvbc, dvbs, dvbs2, dvbt, dvbt2, atsc, cqam;
-
 typedef struct dvb_device dvb_device_t;
 
 dvb_device_t *dvb_open (vlc_object_t *obj);
