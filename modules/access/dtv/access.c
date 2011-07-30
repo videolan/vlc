@@ -144,6 +144,8 @@ static const char *const rolloff_user[] = { N_("Automatic"),
     N_("0.35 (same as DVB-S)"), N_("0.20"), N_("0.25"),
 };
 
+#define TS_ID_TEXT N_("Transport stream ID")
+
 #define POLARIZATION_TEXT N_("Polarization (Voltage)")
 #define POLARIZATION_LONGTEXT N_( \
     "To select the polarization of the transponder, a different voltage " \
@@ -217,7 +219,8 @@ vlc_module_begin ()
     set_capability ("access", 0)
     set_callbacks (Open, Close)
     add_shortcut ("dtv", "tv", "dvb", /* "radio", "dab",*/
-                  "cable", "dvb-c", "satellite", "dvb-s", "dvb-s2",
+                  "cable", "dvb-c",
+                  "satellite", "dvb-s", "dvb-s2", "isdb-s",
                   "terrestrial", "dvb-t", "dvb-t2", "atsc", "cqam")
 
     /* All options starting with dvb- can be overridden in the MRL, so they
@@ -292,6 +295,11 @@ vlc_module_begin ()
         change_integer_list (rolloff_vlc, rolloff_user)
         change_safe ()
 
+    set_section (N_("ISDB-S parameters"), NULL)
+    add_integer ("dvb-ts-id", 0, TS_ID_TEXT, TS_ID_TEXT, false)
+        change_integer_range (0, 0xffff)
+        change_safe ()
+
     set_section (N_("Satellite equipment control"), NULL)
     add_string ("dvb-polarization", "",
                 POLARIZATION_TEXT, POLARIZATION_LONGTEXT, false)
@@ -348,7 +356,9 @@ typedef struct delsys
     /* TODO: scan stuff */
 } delsys_t;
 
-static const delsys_t dvbc, dvbs, dvbs2, dvbt, dvbt2, atsc, cqam;
+static const delsys_t dvbc, dvbs, dvbs2, dvbt, dvbt2;
+static const delsys_t isdbs;
+static const delsys_t atsc, cqam;
 
 static block_t *Read (access_t *);
 static int Control (access_t *, int, va_list);
@@ -556,6 +566,8 @@ static const delsys_t *GuessSystem (const char *scheme, dvb_device_t *dev)
         return &dvbt;
     if (!strcasecmp (scheme, "dvb-t2"))
         return &dvbt2;
+    if (!strcasecmp (scheme, "isdb-s"))
+        return &isdbs;
 
     unsigned systems = dvb_enum_systems (dev);
     if (systems & ATSC)
@@ -815,3 +827,17 @@ static int dvbt2_setup (vlc_object_t *obj, dvb_device_t *dev, uint64_t freq)
 
 static const delsys_t dvbt = { .setup = dvbt_setup };
 static const delsys_t dvbt2 = { .setup = dvbt2_setup };
+
+
+/*** ISDB-S ***/
+static int isdbs_setup (vlc_object_t *obj, dvb_device_t *dev, uint64_t freq)
+{
+    uint16_t ts_id = var_InheritInteger (obj, "dvb-ts-id");
+
+    int ret = dvb_set_isdbs (dev, freq, ts_id);
+    if (ret == 0)
+        ret = sec_setup (obj, dev, freq);
+    return ret;
+}
+
+static const delsys_t isdbs = { .setup = isdbs_setup };

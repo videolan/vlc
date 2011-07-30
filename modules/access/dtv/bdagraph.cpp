@@ -244,6 +244,12 @@ int dvb_set_dvbt2 (dvb_device_t *, uint32_t /*freq*/, const char * /*mod*/,
     return VLC_EGENERIC;
 }
 
+/* ISDB-S */
+int dvb_set_isdbs (dvb_device_t *, uint64_t /*freq*/, uint16_t /*ts_id*/)
+{
+    return VLC_EGENERIC;
+}
+
 /* ATSC */
 int dvb_set_atsc (dvb_device_t *d, uint32_t freq, const char * /*mod*/)
 {

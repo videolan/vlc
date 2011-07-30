@@ -35,6 +35,10 @@ enum {
     DVB_S2 = 0x00000080,
     DVB_T  = 0x00000100,
     DVB_T2 = 0x00000200,
+
+    ISDB_C = 0x00001000,
+    ISDB_S = 0x00002000,
+    ISDB_T = 0x00004000,
 };
 
 typedef struct dvb_device dvb_device_t;
@@ -85,6 +89,10 @@ int dvb_set_dvbt2 (dvb_device_t *, uint32_t freq, const char *mod,
 /* ATSC */
 int dvb_set_atsc (dvb_device_t *, uint32_t freq, const char *mod);
 int dvb_set_cqam (dvb_device_t *, uint32_t freq, const char *mod);
+
+/* ISDB-S */
+/* TODO: modulation? */
+int dvb_set_isdbs (dvb_device_t *, uint64_t freq, uint16_t ts_id);
 
 /* ISDB-T */
 typedef struct isdbt_layer

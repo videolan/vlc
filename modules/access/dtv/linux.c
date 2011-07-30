@@ -911,6 +911,23 @@ int dvb_set_dvbt2 (dvb_device_t *d, uint32_t freq, const char *modstr,
 }
 
 
+/*** ISDB-S ***/
+int dvb_set_isdbs (dvb_device_t *d, uint64_t freq_Hz, uint16_t ts_id)
+{
+#if DVBv5(1)
+    uint32_t freq = freq_Hz / 1000;
+
+    if (dvb_find_frontend (d, FE_QPSK, FE_IS_STUPID))
+        return -1;
+    return dvb_set_props (d, 5, DTV_CLEAR, 0, DTV_DELIVERY_SYSTEM, SYS_ISDBS,
+                          DTV_FREQUENCY, freq,
+                          DTV_ISDBS_TS_ID, (uint32_t)ts_id);
+#else
+# warning ISDB-S needs Linux DVB version 5.1 or later.
+#endif
+}
+
+
 /*** ATSC ***/
 int dvb_set_atsc (dvb_device_t *d, uint32_t freq, const char *modstr)
 {
