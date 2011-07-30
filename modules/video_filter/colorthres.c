@@ -76,7 +76,7 @@ vlc_module_begin ()
                  COLOR_LONGTEXT, false )
         change_integer_list( pi_color_values, ppsz_color_descriptions )
     add_integer( CFG_PREFIX "saturationthres", 20,
-                 N_("Saturaton threshold"), "", false )
+                 N_("Saturation threshold"), "", false )
     add_integer( CFG_PREFIX "similaritythres", 15,
                  N_("Similarity threshold"), "", false )
     set_callbacks( Create, Destroy )
