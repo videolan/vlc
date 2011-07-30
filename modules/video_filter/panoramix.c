@@ -99,15 +99,15 @@ vlc_module_begin()
     add_bool( CFG_PREFIX "attenuate", true, ATTENUATION_TEXT, ATTENUATION_LONGTEXT, false )
 
 #define BEGIN_TEXT N_("Attenuation, begin (in %)")
-#define BEGIN_LONGTEXT N_("Select in percent the Lagrange coeff of the beginning blended zone")
+#define BEGIN_LONGTEXT N_("Select in percent the Lagrange coefficient of the beginning blended zone")
     add_integer_with_range( CFG_PREFIX "bz-begin", 0, 0, 100, BEGIN_TEXT, BEGIN_LONGTEXT, true )
 
 #define MIDDLE_TEXT N_("Attenuation, middle (in %)")
-#define MIDDLE_LONGTEXT N_("Select in percent the Lagrange coeff of the middle of blended zone")
+#define MIDDLE_LONGTEXT N_("Select in percent the Lagrange coefficient of the middle of blended zone")
     add_integer_with_range( CFG_PREFIX "bz-middle", 50, 0, 100, MIDDLE_TEXT, MIDDLE_LONGTEXT, false )
 
 #define END_TEXT N_("Attenuation, end (in %)")
-#define END_LONGTEXT N_("Select in percent the Lagrange coeff of the end of blended zone")
+#define END_LONGTEXT N_("Select in percent the Lagrange coefficient of the end of blended zone")
     add_integer_with_range( CFG_PREFIX "bz-end", 100, 0, 100, END_TEXT, END_LONGTEXT, true )
 
 #define MIDDLE_POS_TEXT N_("middle position (in %)")
@@ -577,7 +577,7 @@ static int Open( vlc_object_t *p_this )
             p_gamma[1] = p_gamma[2];
             p_gamma[2] = t;
         }
-        
+
         for( int i_index = 0; i_index < 256; i_index++ )
         {
             for( int i_index2 = 0; i_index2 <= ACCURACY; i_index2++ )
