@@ -124,12 +124,12 @@ struct filter_sys_t
 #define ROWS_TEXT N_("Number of rows")
 #define ROWS_LONGTEXT N_( \
         "Number of image rows in the mosaic (only used if " \
-        "positionning method is set to \"fixed\")." )
+        "positioning method is set to \"fixed\")." )
 
 #define COLS_TEXT N_("Number of columns")
 #define COLS_LONGTEXT N_( \
         "Number of image columns in the mosaic (only used if " \
-        "positionning method is set to \"fixed\"." )
+        "positioning method is set to \"fixed\"." )
 
 #define AR_TEXT N_("Keep aspect ratio")
 #define AR_LONGTEXT N_( \
