@@ -135,7 +135,7 @@ static void Close( vlc_object_t * );
 #define FILTER_LONGTEXT N_( "Loop filter AlphaC0 and Beta parameters. " \
     "Range -6 to 6 for both alpha and beta parameters. -6 means light " \
     "filter, 6 means strong.")
- 
+
 #define LEVEL_TEXT N_("H.264 level")
 #define LEVEL_LONGTEXT N_( "Specify H.264 level (as defined by Annex A " \
     "of the standard). Levels are not enforced; it's up to the user to select " \
@@ -143,7 +143,7 @@ static void Close( vlc_object_t * );
     "(10 to 51 is also allowed). Set to 0 for letting x264 set level.")
 
 #define PROFILE_TEXT N_("H.264 profile")
-#define PROFILE_LONGTEXT N_("Specify H.264 profile which limits are enforced over" \
+#define PROFILE_LONGTEXT N_("Specify H.264 profile which limits are enforced over " \
         "other settings" )
 
 /* In order to play an interlaced output stream encoded by x264, a decoder needs
@@ -852,7 +852,7 @@ static int  Open ( vlc_object_t *p_this )
     else if ( i_val )
         p_sys->param.rc.i_vbv_max_bitrate = i_val;
 
-    
+
     if( !var_GetBool( p_enc, SOUT_CFG_PREFIX "cabac" ) )
         p_sys->param.b_cabac = var_GetBool( p_enc, SOUT_CFG_PREFIX "cabac" );
 
@@ -1041,7 +1041,7 @@ static int  Open ( vlc_object_t *p_this )
 
     p_sys->param.analyse.b_psnr = var_GetBool( p_enc, SOUT_CFG_PREFIX "psnr" );
     p_sys->param.analyse.b_ssim = var_GetBool( p_enc, SOUT_CFG_PREFIX "ssim" );
-    if( !var_GetBool( p_enc, SOUT_CFG_PREFIX "weightb" ) ) 
+    if( !var_GetBool( p_enc, SOUT_CFG_PREFIX "weightb" ) )
        p_sys->param.analyse.b_weighted_bipred = var_GetBool( p_enc,
                                     SOUT_CFG_PREFIX "weightb" );
     if( var_GetInteger( p_enc, SOUT_CFG_PREFIX "weightp" ) != 2 )
@@ -1239,7 +1239,7 @@ static int  Open ( vlc_object_t *p_this )
         p_sys->param.rc.b_stat_read = i_val & 2;
     }
 
-    if( !var_GetBool( p_enc, SOUT_CFG_PREFIX "mbtree" ) ) 
+    if( !var_GetBool( p_enc, SOUT_CFG_PREFIX "mbtree" ) )
        p_sys->param.rc.b_mb_tree = var_GetBool( p_enc, SOUT_CFG_PREFIX "mbtree" );
 
     /* We need to initialize pthreadw32 before we open the encoder,
