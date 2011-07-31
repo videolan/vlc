@@ -159,7 +159,7 @@ static void Close( vlc_object_t * );
 #define MBTREE_LONGTEXT N_("You can disable use of Macroblock-tree on ratecontrol")
 
 #define SLICE_COUNT N_("Force number of slices per frame")
-#define SLICE_COUNT_LONGTEXT N_("Force rectangular slices and is overridden by other slicing optinos")
+#define SLICE_COUNT_LONGTEXT N_("Force rectangular slices and is overridden by other slicing options")
 
 #define SLICE_MAX_SIZE N_("Limit the size of each slice in bytes")
 #define SLICE_MAX_SIZE_LONGTEXT N_("Sets a maximum slice size in bytes, Includes NAL overhead in size")
