@@ -84,7 +84,7 @@ static void Close( vlc_object_t * );
     "then it cannot connect to normal RTSP servers." )
 
 #define WMSERVER_TEXT N_("WMServer RTSP dialect")
-#define WMSERVER_LONGTEXT N_("WMServer uses an unstandard dialect " \
+#define WMSERVER_LONGTEXT N_("WMServer uses a nonstandard dialect " \
     "of RTSP. Selecting this parameter will tell VLC to assume some " \
     "options contrary to RFC 2326 guidelines.")
 
