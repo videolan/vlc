@@ -238,7 +238,7 @@ static void Close( vlc_object_t * );
     "before curve compression. Temporally blurs complexity.")
 
 #define QBLUR_TEXT N_("Reduce fluctuations in QP")
-#define QBLUR_LONGTEXT N_( "This reduces the fluctations in QP " \
+#define QBLUR_LONGTEXT N_( "This reduces the fluctuations in QP " \
     "after curve compression. Temporally blurs quants.")
 
 /* Analysis */
