@@ -92,7 +92,7 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
 
 #define TITLE_TEXT N_( "Show playing item name in window title" )
 #define TITLE_LONGTEXT N_( "Show the name of the song or video in the " \
-                           "controler window title." )
+                           "controller window title." )
 
 #define NOTIFICATION_TEXT N_( "Show notification popup on track change" )
 #define NOTIFICATION_LONGTEXT N_( \
