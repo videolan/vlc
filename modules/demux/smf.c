@@ -558,7 +558,7 @@ skip:
 }
 
 /*****************************************************************************
- * Demux: read chunks and send them to the synthetizer
+ * Demux: read chunks and send them to the synthesizer
  *****************************************************************************
  * Returns -1 in case of error, 0 in case of EOF, 1 otherwise
  *****************************************************************************/
