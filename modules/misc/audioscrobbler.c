@@ -940,7 +940,10 @@ static int ReadMetaData( intf_thread_t *p_this )
 
     p_item = input_GetItem( p_input );
     if( !p_item )
+    {
+        vlc_object_release( p_input );
         return VLC_SUCCESS;
+    }
 
     char *psz_meta;
 #define ALLOC_ITEM_META( a, b ) \
