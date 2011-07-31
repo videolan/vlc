@@ -209,7 +209,7 @@ static void Close( vlc_object_t * );
 
 #define AQ_STRENGTH_TEXT N_("Strength of AQ")
 #define AQ_STRENGTH_LONGTEXT N_("Strength to reduce blocking and blurring in flat\n"\
-        "and textured areas, default 1.0 recommented to be between 0..2\n"\
+        "and textured areas, default 1.0 recommended to be between 0..2\n"\
         " - 0.5: weak AQ\n"\
         " - 1.5: strong AQ")
 
