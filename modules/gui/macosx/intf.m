@@ -145,8 +145,7 @@ int WindowOpen( vout_window_t *p_wnd, const vout_window_cfg_t *cfg )
         return VLC_EGENERIC;
     }
 
-    [[VLCMainWindow sharedInstance] setVideoplayEnabled:YES];
-    [[VLCMainWindow sharedInstance] togglePlaylist:nil];
+    [[VLCMain sharedInstance] setActiveVideoPlayback: YES];
     p_wnd->control = WindowControl;
     p_wnd->sys = (vout_window_sys_t *)VLCIntf;
     [o_pool release];
@@ -170,7 +169,7 @@ static int WindowControl( vout_window_t *p_wnd, int i_query, va_list args )
 void WindowClose( vout_window_t *p_wnd )
 {
     NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
-    [[VLCMainWindow sharedInstance] setVideoplayEnabled:NO];
+    [[VLCMain sharedInstance] setActiveVideoPlayback:NO];
     NSLog( @"Window Close" );
     // tell the interface to get rid of the video, TODO
     [o_pool release];
@@ -234,6 +233,7 @@ static void MsgCallback( msg_cb_data_t *data, const msg_item_t *item )
 static int InputEvent( vlc_object_t *p_this, const char *psz_var,
                        vlc_value_t oldval, vlc_value_t new_val, void *param )
 {
+    NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
     switch (new_val.i_int) {
         case INPUT_EVENT_STATE:
             [[VLCMain sharedInstance] playbackStatusUpdated];
@@ -301,38 +301,47 @@ static int InputEvent( vlc_object_t *p_this, const char *psz_var,
             break;
     }
 
+    [o_pool release];
     return VLC_SUCCESS;
 }
 
 static int PLItemChanged( vlc_object_t *p_this, const char *psz_var,
                          vlc_value_t oldval, vlc_value_t new_val, void *param )
 {
+    NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
     [[VLCMain sharedInstance] performSelectorOnMainThread:@selector(PlaylistItemChanged) withObject:nil waitUntilDone:NO];
 
+    [o_pool release];
     return VLC_SUCCESS;
 }
 
 static int PlaylistUpdated( vlc_object_t *p_this, const char *psz_var,
                          vlc_value_t oldval, vlc_value_t new_val, void *param )
 {
+    NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
     [[VLCMain sharedInstance] performSelectorOnMainThread:@selector(playlistUpdated) withObject:nil waitUntilDone:NO];
 
+    [o_pool release];
     return VLC_SUCCESS;
 }
 
 static int PlaybackModeUpdated( vlc_object_t *p_this, const char *psz_var,
                          vlc_value_t oldval, vlc_value_t new_val, void *param )
 {
+    NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
     [[VLCMain sharedInstance] playbackModeUpdated];
 
+    [o_pool release];
     return VLC_SUCCESS;
 }
 
 static int VolumeUpdated( vlc_object_t *p_this, const char *psz_var,
                          vlc_value_t oldval, vlc_value_t new_val, void *param )
 {
+    NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
     [[VLCMain sharedInstance] updateVolume];
 
+    [o_pool release];
     return VLC_SUCCESS;
 }
 
@@ -1459,10 +1468,16 @@ unsigned int CocoaKeyToVLC( unichar i_key )
 	return o_remote;
 }
 
-- (IBAction)showController:(id)sender
+- (void)setActiveVideoPlayback:(BOOL)b_value
 {
-    //FIXME: why is this function here?!
-    [o_mainwindow makeKeyAndOrderFront:sender];
+    b_active_videoplayback = b_value;
+    [o_mainwindow setVideoplayEnabled];
+    [o_mainwindow togglePlaylist:nil];
+}
+
+- (BOOL)activeVideoPlayback
+{
+    return b_active_videoplayback;
 }
 
 #pragma mark -
@@ -1754,11 +1769,6 @@ unsigned int CocoaKeyToVLC( unichar i_key )
 
 #pragma mark -
 #pragma mark Playlist toggling
-
-- (IBAction)togglePlaylist:(id)sender
-{
-    NSLog( @"needs to be re-implemented" );
-}
 
 - (void)updateTogglePlaylistState
 {

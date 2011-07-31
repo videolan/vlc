@@ -98,7 +98,7 @@
 - (IBAction)fullscreen:(id)sender;
 
 - (id)videoView;
-- (void)setVideoplayEnabled:(BOOL)b_value;
+- (void)setVideoplayEnabled;
 - (void)updateTimeSlider;
 - (void)updateVolumeSlider;
 - (void)updateWindow;

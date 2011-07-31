@@ -327,7 +327,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
     [o_mi_minimize setTitle: _NS("Minimize Window")];
     [o_mi_close_window setTitle: _NS("Close Window")];
     [o_mi_player setTitle: _NS("Player...")];
-    [o_mi_controller setTitle: _NS("Controller...")];
+    [o_mi_controller setTitle: _NS("Main Window...")];
     [o_mi_audioeffects setTitle: _NS("Audio Effects...")];
     [o_mi_videoeffects setTitle: _NS("Video Filters...")];
     [o_mi_bookmarks setTitle: _NS("Bookmarks...")];

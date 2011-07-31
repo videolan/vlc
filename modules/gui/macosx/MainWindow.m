@@ -304,8 +304,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
 - (IBAction)togglePlaylist:(id)sender
 {
-    NSLog( @"b_videoplayen %i", b_video_playback_enabled );
-    if (b_video_playback_enabled && [o_video_view isHidden]) {
+    if ([o_video_view isHidden] && [o_playlist_btn isEnabled]) {
         [o_video_view setHidden: NO];
         [o_playlist_table setHidden: YES];
     }
@@ -669,18 +668,9 @@ static VLCMainWindow *_o_sharedInstance = nil;
     return o_video_view;
 }
 
-- (void)setVideoplayEnabled:(BOOL)b_value
+- (void)setVideoplayEnabled
 {
-    NSLog( @"setVideoplayEnabled:%i", b_value );
-    if (b_value) {
-        b_video_playback_enabled = YES;
-        [o_playlist_btn setEnabled: YES];
-    }
-    else
-    {
-        b_video_playback_enabled = NO;
-        [o_playlist_btn setEnabled: NO];
-    }
+    [o_playlist_btn setEnabled: [[VLCMain sharedInstance] activeVideoPlayback]];
 }
 
 @end

@@ -93,7 +93,7 @@ struct intf_sys_t
     id o_wizard;                /* VLCWizard      */
     id o_embedded_list;         /* VLCEmbeddedList*/
     id o_coredialogs;           /* VLCCoreDialogProvider */
-    VLCInformation * o_info;    /* VLCInformation */
+    id o_info;                  /* VLCInformation */
     id o_eyetv;                 /* VLCEyeTVController */
     id o_bookmarks;             /* VLCBookmarks */
     id o_coreinteraction;       /* VLCCoreInteraction */
@@ -105,6 +105,7 @@ struct intf_sys_t
     BOOL nib_info_loaded;       /* information panel nibfile */
     BOOL nib_coredialogs_loaded; /* CoreDialogs nibfile */
     BOOL nib_bookmarks_loaded;   /* Bookmarks nibfile */
+    BOOL b_active_videoplayback;
 
     IBOutlet id o_mainwindow;            /* VLCMainWindow */
 
@@ -163,6 +164,8 @@ struct intf_sys_t
 - (id)coreDialogProvider;
 - (id)eyeTVController;
 - (id)appleRemoteController;
+- (void)setActiveVideoPlayback:(BOOL)b_value;
+- (BOOL)activeVideoPlayback;
 - (void)applicationWillTerminate:(NSNotification *)notification;
 - (NSString *)localizedString:(const char *)psz;
 - (char *)delocalizeString:(NSString *)psz;
@@ -186,8 +189,6 @@ struct intf_sys_t
 
 - (void)updateMessageDisplay;
 
-- (IBAction)showController:(id)sender;
-
 - (IBAction)crashReporterAction:(id)sender;
 - (IBAction)openCrashLog:(id)sender;
 - (IBAction)saveDebugLog:(id)sender;
@@ -195,7 +196,6 @@ struct intf_sys_t
 
 - (void)processReceivedlibvlcMessage:(const msg_item_t *)item;
 
-- (IBAction)togglePlaylist:(id)sender;
 - (void)updateTogglePlaylistState;
 
 - (void)windowDidBecomeKey:(NSNotification *)o_notification;
