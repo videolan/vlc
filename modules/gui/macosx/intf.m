@@ -92,6 +92,8 @@ static int VolumeUpdated( vlc_object_t *, const char *,
  *****************************************************************************/
 int OpenIntf ( vlc_object_t *p_this )
 {
+    NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
+    [VLCApplication sharedApplication];
     intf_thread_t *p_intf = (intf_thread_t*) p_this;
 
     p_intf->p_sys = malloc( sizeof( intf_sys_t ) );
@@ -105,6 +107,7 @@ int OpenIntf ( vlc_object_t *p_this )
     p_intf->pf_run = Run;
     p_intf->b_should_run_on_first_thread = true;
 
+    [o_pool release];
     return VLC_SUCCESS;
 }
 
@@ -192,10 +195,9 @@ static void Run( intf_thread_t *p_intf )
     pthread_sigmask( SIG_UNBLOCK, &set, NULL );
 
     NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
+    [VLCApplication sharedApplication];
 
     o_appLock = [[NSLock alloc] init];
-
-    [VLCApplication sharedApplication];
 
     [[VLCMain sharedInstance] setIntf: p_intf];
     [NSBundle loadNibNamed: @"MainMenu" owner: NSApp];
@@ -501,6 +503,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     o_mainmenu = [[VLCMainMenu alloc] init];
     o_coreinteraction = [[VLCCoreInteraction alloc] init];
     o_eyetv = [[VLCEyeTVController alloc] init];
+    o_mainwindow = [[VLCMainWindow alloc] init];
 
     /* announce our launch to a potential eyetv plugin */
     [[NSDistributedNotificationCenter defaultCenter] postNotificationName: @"VLCOSXGUIInit"
@@ -522,7 +525,12 @@ static VLCMain *_o_sharedMainInstance = nil;
 {
     playlist_t *p_playlist;
     vlc_value_t val;
+    if( !p_intf ) return;
     var_Create( p_intf, "intf-change", VLC_VAR_BOOL );
+
+    /* Check if we already did this once. Opening the other nibs calls it too,
+     because VLCMain is the owner */
+    if( nib_main_loaded ) return;
 
     [o_msgs_panel setExcludedFromWindowsMenu: YES];
     [o_msgs_panel setDelegate: self];
@@ -691,6 +699,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     [o_embedded_list release];
     [o_coredialogs release];
     [o_eyetv release];
+    [o_mainwindow release];
 
     /* unsubscribe from libvlc's debug messages */
     msg_Unsubscribe( p_intf->p_sys->p_sub );
