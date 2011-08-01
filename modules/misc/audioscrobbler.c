@@ -122,7 +122,7 @@ static int PlayingChange    ( vlc_object_t *, const char *, vlc_value_t,
 
 static void AddToQueue      ( intf_thread_t * );
 static int Handshake        ( intf_thread_t * );
-static int ReadMetaData     ( intf_thread_t * );
+static void ReadMetaData    ( intf_thread_t * );
 static void DeleteSong      ( audioscrobbler_song_t* );
 static int ParseURL         ( char *, char **, char **, int * );
 static void HandleInterval  ( mtime_t *, unsigned int * );
@@ -927,7 +927,7 @@ static void DeleteSong( audioscrobbler_song_t* p_song )
 /*****************************************************************************
  * ReadMetaData : Read meta data when parsed by vlc
  *****************************************************************************/
-static int ReadMetaData( intf_thread_t *p_this )
+static void ReadMetaData( intf_thread_t *p_this )
 {
     input_thread_t      *p_input;
     input_item_t        *p_item;
@@ -936,84 +936,65 @@ static int ReadMetaData( intf_thread_t *p_this )
 
     p_input = playlist_CurrentInput( pl_Get( p_this ) );
     if( !p_input )
-        return( VLC_SUCCESS );
+        return;
 
     p_item = input_GetItem( p_input );
     if( !p_item )
     {
         vlc_object_release( p_input );
-        return VLC_SUCCESS;
+        return;
     }
 
-    char *psz_meta;
-#define ALLOC_ITEM_META( a, b ) \
-    psz_meta = input_item_Get##b( p_item ); \
-    if( psz_meta && *psz_meta ) \
-    { \
-        a = encode_URI_component( psz_meta ); \
-        if( !a ) \
-        { \
-            vlc_mutex_unlock( &p_sys->lock ); \
-            vlc_object_release( p_input ); \
-            free( psz_meta ); \
-            return VLC_ENOMEM; \
-        } \
-    }
+#define ALLOC_ITEM_META( a, b ) do { \
+        char *psz_meta = input_item_Get##b( p_item ); \
+        if( psz_meta && *psz_meta ) \
+            a = encode_URI_component( psz_meta ); \
+        free( psz_meta ); \
+    } while(0)
 
     vlc_mutex_lock( &p_sys->lock );
 
     p_sys->b_meta_read = true;
 
-    ALLOC_ITEM_META( p_sys->p_current_song.psz_a, Artist )
-    else
+    ALLOC_ITEM_META( p_sys->p_current_song.psz_a, Artist );
+    if( !p_sys->p_current_song.psz_a )
     {
-        vlc_mutex_unlock( &p_sys->lock );
         msg_Dbg( p_this, "No artist.." );
-        vlc_object_release( p_input );
-        free( psz_meta );
-        return VLC_EGENERIC;
+        DeleteSong( &p_sys->p_current_song );
+        goto end;
     }
-    free( psz_meta );
 
-    ALLOC_ITEM_META( p_sys->p_current_song.psz_t, Title )
-    else
+    ALLOC_ITEM_META( p_sys->p_current_song.psz_t, Title );
+    if( !p_sys->p_current_song.psz_t )
     {
-        vlc_mutex_unlock( &p_sys->lock );
         msg_Dbg( p_this, "No track name.." );
-        vlc_object_release( p_input );
-        free( p_sys->p_current_song.psz_a );
-        free( psz_meta );
-        return VLC_EGENERIC;
+        DeleteSong( &p_sys->p_current_song );
+        goto end;
     }
-    free( psz_meta );
 
     /* Now we have read the mandatory meta data, so we can submit that info */
     p_sys->b_submit = true;
 
-    ALLOC_ITEM_META( p_sys->p_current_song.psz_b, Album )
-    else
+    ALLOC_ITEM_META( p_sys->p_current_song.psz_b, Album );
+    if( !p_sys->p_current_song.psz_b )
         p_sys->p_current_song.psz_b = calloc( 1, 1 );
-    free( psz_meta );
 
-    ALLOC_ITEM_META( p_sys->p_current_song.psz_m, TrackID )
-    else
+    ALLOC_ITEM_META( p_sys->p_current_song.psz_m, TrackID );
+    if( !p_sys->p_current_song.psz_m )
         p_sys->p_current_song.psz_m = calloc( 1, 1 );
-    free( psz_meta );
 
     p_sys->p_current_song.i_l = input_item_GetDuration( p_item ) / 1000000;
 
-    ALLOC_ITEM_META( p_sys->p_current_song.psz_n, TrackNum )
-    else
+    ALLOC_ITEM_META( p_sys->p_current_song.psz_n, TrackNum );
+    if( !p_sys->p_current_song.psz_n )
         p_sys->p_current_song.psz_n = calloc( 1, 1 );
-    free( psz_meta );
 #undef ALLOC_ITEM_META
 
     msg_Dbg( p_this, "Meta data registered" );
 
+end:
     vlc_mutex_unlock( &p_sys->lock );
     vlc_object_release( p_input );
-    return VLC_SUCCESS;
-
 }
 
 static void HandleInterval( mtime_t *next, unsigned int *i_interval )
