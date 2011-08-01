@@ -250,6 +250,12 @@ void aout_OutputPause( audio_output_t *aout, bool pause, mtime_t date )
 
     if( aout->pf_pause != NULL )
         aout->pf_pause( aout, pause, date );
+    if( !pause )
+    {
+        mtime_t duration = date - aout->p_input->i_pause_date;
+        /* XXX: ^ onk onk! gruik! ^ */
+        aout_FifoMoveDates( &aout->fifo, duration );
+    }
 }
 
 /**
@@ -264,6 +270,7 @@ void aout_OutputFlush( audio_output_t *aout, bool wait )
 
     if( aout->pf_flush != NULL )
         aout->pf_flush( aout, wait );
+    aout_FifoReset( &aout->fifo );
 }
 
 
