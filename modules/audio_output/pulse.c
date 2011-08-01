@@ -515,6 +515,27 @@ static void Pause(audio_output_t *aout, bool paused, mtime_t date)
     vlc_pa_unlock();
 }
 
+/**
+ * Flush or drain the playback stream
+ */
+static void Flush(audio_output_t *aout, bool wait)
+{
+    aout_sys_t *sys = aout->sys;
+    pa_stream *s = sys->stream;
+    pa_operation *op;
+
+    vlc_pa_lock();
+
+    if (wait)
+        op = pa_stream_drain(s, NULL, NULL);
+        /* TODO: wait for drain completion*/
+    else
+        op = pa_stream_flush(s, NULL, NULL);
+    if (op != NULL)
+        pa_operation_unref(op);
+    vlc_pa_unlock();
+}
+
 static int VolumeSet(audio_output_t *aout, float vol, bool mute)
 {
     aout_sys_t *sys = aout->sys;
@@ -783,7 +804,7 @@ static int Open(vlc_object_t *obj)
     aout->format.i_format = format;
     aout->pf_play = Play;
     aout->pf_pause = Pause;
-    aout->pf_flush = NULL;
+    aout->pf_flush = Flush;
     aout->pf_volume_set = VolumeSet;
     return VLC_SUCCESS;
 
