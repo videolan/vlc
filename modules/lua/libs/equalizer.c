@@ -67,6 +67,9 @@ static int vlclua_preamp_get( lua_State *L )
     audio_output_t *p_aout = input_GetAout( p_input );
     vlc_object_release( p_input );
 
+    if( !p_aout)
+        return 0;
+
     char *psz_af = var_GetNonEmptyString( p_aout, "audio-filter" );
     if( strstr ( psz_af, "equalizer" ) == NULL )
     {
