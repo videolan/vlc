@@ -46,7 +46,8 @@ int aout_MixerNew( audio_output_t * p_aout )
     assert( !p_aout->p_mixer );
     vlc_assert_locked( &p_aout->lock );
 
-    aout_mixer_t *p_mixer = vlc_object_create( p_aout, sizeof(*p_mixer) );
+    aout_mixer_t *p_mixer = vlc_custom_create( p_aout, sizeof(*p_mixer),
+                                               "audio mixer" );
     if( !p_mixer )
         return VLC_EGENERIC;
 
@@ -129,7 +130,7 @@ static int MixBuffer( audio_output_t * p_aout, float volume )
             break;
         /* We authorize a +-1 because rounding errors get compensated
          * regularly. */
-        msg_Warn( p_mixer, "the mixer got a packet in the past (%"PRId64")",
+        msg_Warn( p_mixer, "got a packet in the past (%"PRId64")",
                   start_date - prev_date );
         aout_BufferFree( aout_FifoPop( p_fifo ) );
 
@@ -169,7 +170,7 @@ static int MixBuffer( audio_output_t * p_aout, float volume )
         ssize_t delta = (start_date - p_buffer->i_pts)
                       * p_mixer->fmt.i_rate / CLOCK_FREQ;
         if( delta != 0 )
-            msg_Warn( p_mixer, "mixer start is not output end (%zd)", delta );
+            msg_Warn( p_mixer, "input start is not output end (%zd)", delta );
         if( delta < 0 )
         {
             /* Is it really the best way to do it ? */
@@ -199,7 +200,7 @@ static int MixBuffer( audio_output_t * p_aout, float volume )
             aout_buffer_t *p_inbuf = p_fifo->p_first;
             if( unlikely(p_inbuf == NULL) )
             {
-                msg_Err( p_mixer, "internal amix error" );
+                msg_Err( p_mixer, "internal error" );
                 vlc_memset( p_out, 0, needed );
                 break;
             }
