@@ -300,6 +300,7 @@ static int Open( vlc_object_t *p_this )
 
     p_aout->pf_play = Play;
     p_aout->pf_pause = NULL;
+    p_aout->pf_flush = NULL;
 
     if ( var_Type( p_aout, "audio-device" ) == 0 )
     {

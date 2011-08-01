@@ -252,6 +252,20 @@ void aout_OutputPause( audio_output_t *aout, bool pause, mtime_t date )
         aout->pf_pause( aout, pause, date );
 }
 
+/**
+ * Flushes or drains the audio output buffers.
+ * This enables the output to expedite seek and stop.
+ * @param wait if true, wait for buffer playback (i.e. drain),
+ *             if false, discard the buffers immediately (i.e. flush)
+ */
+void aout_OutputFlush( audio_output_t *aout, bool wait )
+{
+    vlc_assert_locked( &aout->lock );
+
+    if( aout->pf_flush != NULL )
+        aout->pf_flush( aout, wait );
+}
+
 
 /*** Volume handling ***/
 

@@ -242,6 +242,8 @@ void aout_DecFlush( audio_output_t *p_aout, aout_input_t *p_input )
 {
     aout_lock( p_aout );
     aout_FifoReset( &p_input->fifo );
+    aout_FifoReset( &p_aout->fifo );
+    aout_OutputFlush( p_aout, false );
     aout_unlock( p_aout );
 }
 

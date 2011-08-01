@@ -203,6 +203,8 @@ struct audio_output
     void (*pf_play)( audio_output_t * ); /**< Audio buffer callback */
     void (* pf_pause)( audio_output_t *, bool, mtime_t ); /**< Pause/resume
         callback (optional, may be NULL) */
+    void (* pf_flush)( audio_output_t *, bool ); /**< Flush/drain callback
+        (optional, may be NULL) */
     aout_volume_cb          pf_volume_set; /**< Volume setter (or NULL) */
     int                     i_nb_samples;
 };

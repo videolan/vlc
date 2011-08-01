@@ -783,6 +783,7 @@ static int Open(vlc_object_t *obj)
     aout->format.i_format = format;
     aout->pf_play = Play;
     aout->pf_pause = Pause;
+    aout->pf_flush = NULL;
     aout->pf_volume_set = VolumeSet;
     return VLC_SUCCESS;
 

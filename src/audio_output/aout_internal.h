@@ -123,6 +123,7 @@ int aout_OutputNew( audio_output_t * p_aout,
                     const audio_sample_format_t * p_format );
 void aout_OutputPlay( audio_output_t * p_aout, aout_buffer_t * p_buffer );
 void aout_OutputPause( audio_output_t * p_aout, bool, mtime_t );
+void aout_OutputFlush( audio_output_t * p_aout, bool );
 void aout_OutputDelete( audio_output_t * p_aout );
 
 

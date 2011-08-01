@@ -132,6 +132,7 @@ static int Open (vlc_object_t *obj)
 
     aout->pf_play = Play;
     aout->pf_pause = NULL;
+    aout->pf_flush = NULL;
     if (sys->set_volume != NULL)
         aout->pf_volume_set = VolumeSet;
     else

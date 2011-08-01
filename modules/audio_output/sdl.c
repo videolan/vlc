@@ -216,6 +216,7 @@ static int Open ( vlc_object_t *p_this )
     p_aout->i_nb_samples = obtained.samples;
     p_aout->pf_play = Play;
     p_aout->pf_pause = NULL;
+    p_aout->pf_flush = NULL;
 
     return VLC_SUCCESS;
 }

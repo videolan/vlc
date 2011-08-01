@@ -184,6 +184,7 @@ static int Open( vlc_object_t * p_this )
     p_aout->sys = p_sys;
     p_aout->pf_play = Play;
     p_aout->pf_pause = NULL;
+    p_aout->pf_flush = NULL;
 
     /* Retrieve output device id from config */
     p_sys->i_device_id = var_CreateGetInteger( p_aout, "portaudio-audio-device" );
