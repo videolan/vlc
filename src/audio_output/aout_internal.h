@@ -114,9 +114,12 @@ void aout_FiltersDestroyPipeline( filter_t *const *, unsigned );
 void aout_FiltersPlay( filter_t *const *, unsigned, aout_buffer_t ** );
 
 /* From mixer.c : */
-int aout_MixerNew( audio_output_t * p_aout );
-void aout_MixerDelete( audio_output_t * p_aout );
-void aout_MixerRun( audio_output_t * p_aout, float );
+audio_mixer_t *aout_MixerNew(vlc_object_t *, const audio_sample_format_t * );
+#define aout_MixerNew(o, f) aout_MixerNew(VLC_OBJECT(o), f)
+void aout_MixerDelete(audio_mixer_t *);
+void aout_MixerRun(audio_mixer_t *, block_t *, float);
+
+block_t *aout_OutputSlice( audio_output_t *, aout_fifo_t * );
 
 /* From output.c : */
 int aout_OutputNew( audio_output_t * p_aout,

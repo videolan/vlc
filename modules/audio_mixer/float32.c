@@ -39,7 +39,7 @@
  * Local prototypes
  *****************************************************************************/
 static int Create( vlc_object_t * );
-static void DoWork( aout_mixer_t *, aout_buffer_t *, float );
+static void DoWork( audio_mixer_t *, aout_buffer_t *, float );
 
 /*****************************************************************************
  * Module descriptor
@@ -57,9 +57,9 @@ vlc_module_end ()
  */
 static int Create( vlc_object_t *p_this )
 {
-    aout_mixer_t * p_mixer = (aout_mixer_t *)p_this;
+    audio_mixer_t *p_mixer = (audio_mixer_t *)p_this;
 
-    if ( p_mixer->fmt.i_format != VLC_CODEC_FL32 )
+    if ( p_mixer->fmt->i_format != VLC_CODEC_FL32 )
         return -1;
 
     p_mixer->mix = DoWork;
@@ -69,7 +69,7 @@ static int Create( vlc_object_t *p_this )
 /**
  * Mixes a new output buffer
  */
-static void DoWork( aout_mixer_t * p_mixer, aout_buffer_t *p_buffer,
+static void DoWork( audio_mixer_t * p_mixer, aout_buffer_t *p_buffer,
                     float f_multiplier )
 {
     if( f_multiplier == 1.0 )

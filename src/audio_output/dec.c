@@ -106,8 +106,9 @@ aout_input_t *aout_DecNew( audio_output_t *p_aout,
 #warning Input without output and mixer = bad idea.
         goto out;
 
-    assert( p_aout->p_mixer == NULL );
-    if( aout_MixerNew( p_aout ) == -1 )
+    assert( p_aout->mixer == NULL );
+    p_aout->mixer = aout_MixerNew( p_aout, &p_aout->mixer_format );
+    if( p_aout->mixer == NULL )
     {
         aout_OutputDelete( p_aout );
 #warning Memory leak.
@@ -133,7 +134,8 @@ void aout_DecDelete( audio_output_t * p_aout, aout_input_t * p_input )
     aout_InputDelete( p_aout, p_input );
 
     aout_OutputDelete( p_aout );
-    aout_MixerDelete( p_aout );
+    aout_MixerDelete( p_aout->mixer );
+    p_aout->mixer = NULL;
     var_Destroy( p_aout, "audio-device" );
     var_Destroy( p_aout, "audio-channels" );
 
@@ -181,7 +183,6 @@ int aout_DecPlay( audio_output_t * p_aout, aout_input_t * p_input,
 {
     assert( i_input_rate >= INPUT_RATE_DEFAULT / AOUT_MAX_INPUT_RATE &&
             i_input_rate <= INPUT_RATE_DEFAULT * AOUT_MAX_INPUT_RATE );
-
     assert( p_buffer->i_pts > 0 );
 
     p_buffer->i_length = (mtime_t)p_buffer->i_nb_samples * 1000000
@@ -197,8 +198,13 @@ int aout_DecPlay( audio_output_t * p_aout, aout_input_t * p_input,
 
     aout_InputCheckAndRestart( p_aout, p_input );
     aout_InputPlay( p_aout, p_input, p_buffer, i_input_rate );
-    /* Run the mixer if it is able to run. */
-    aout_MixerRun( p_aout, p_aout->mixer_multiplier * p_input->multiplier );
+
+    const float amp = p_aout->mixer_multiplier * p_input->multiplier;
+    while( (p_buffer = aout_OutputSlice( p_aout, &p_input->fifo ) ) != NULL )
+    {
+        aout_MixerRun( p_aout->mixer, p_buffer, amp );
+        aout_OutputPlay( p_aout, p_buffer );
+    }
     aout_unlock( p_aout );
     return 0;
 }

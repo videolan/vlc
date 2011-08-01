@@ -38,7 +38,7 @@
  * Local prototypes
  *****************************************************************************/
 static int Create( vlc_object_t * );
-static void DoNothing( aout_mixer_t *, aout_buffer_t *p_buffer, float );
+static void DoNothing( audio_mixer_t *, aout_buffer_t *p_buffer, float );
 
 /*****************************************************************************
  * Module descriptor
@@ -56,13 +56,13 @@ vlc_module_end ()
  *****************************************************************************/
 static int Create( vlc_object_t *p_this )
 {
-    aout_mixer_t *p_mixer = (aout_mixer_t *)p_this;
+    audio_mixer_t *p_mixer = (audio_mixer_t *)p_this;
 
     p_mixer->mix = DoNothing;
     return 0;
 }
 
-static void DoNothing( aout_mixer_t *p_mixer, aout_buffer_t *p_buffer,
+static void DoNothing( audio_mixer_t *p_mixer, aout_buffer_t *p_buffer,
                        float multiplier )
 {
     (void) p_mixer;

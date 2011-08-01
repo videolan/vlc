@@ -34,37 +34,18 @@
 extern "C" {
 #endif
 
-//#include <vlc_aout.h>
-
-/* */
-typedef struct aout_mixer_sys_t aout_mixer_sys_t;
-typedef struct aout_mixer_t aout_mixer_t;
+typedef struct audio_mixer audio_mixer_t;
 
 /** 
  * audio output mixer
  */
-struct aout_mixer_t {
+struct audio_mixer
+{
     VLC_COMMON_MEMBERS
 
-    /* Module */
-    module_t *module;
-
-    /* Mixer format.
-     *
-     * You cannot modify it.
-     */
-    audio_sample_format_t fmt;
-
-    aout_fifo_t    *fifo;
-
-    /* Mix buffer (mandatory) */
-    void (*mix)(aout_mixer_t *, aout_buffer_t *, float);
-
-    /* Private place holder for the aout_mixer_t module (optional)
-     *
-     * A module is free to use it as it wishes.
-     */
-    aout_mixer_sys_t *sys;
+    module_t *module; /**< Module handle */
+    const audio_sample_format_t *fmt; /**< Audio format */
+    void (*mix)(audio_mixer_t *, block_t *, float); /**< Amplifier */
 };
 
 #ifdef __cplusplus

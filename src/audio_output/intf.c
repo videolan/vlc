@@ -90,7 +90,7 @@ static int commitVolume (vlc_object_t *obj, audio_output_t *aout,
 
         aout_lock (aout);
 #warning FIXME: wrong test. Need to check that aout_output is ready.
-        if (aout->p_mixer != NULL)
+        if (aout->mixer != NULL)
             ret = aout->pf_volume_set (aout, vol, mute);
         aout_unlock (aout);
 
@@ -256,7 +256,8 @@ static int aout_Restart( audio_output_t * p_aout )
 
     /* Reinitializes the output */
     aout_InputDelete( p_aout, p_input );
-    aout_MixerDelete( p_aout );
+    aout_MixerDelete( p_aout->mixer );
+    p_aout->mixer = NULL;
     aout_OutputDelete( p_aout );
 
     /* FIXME: This function is notoriously dangerous/unsafe.
@@ -268,7 +269,8 @@ static int aout_Restart( audio_output_t * p_aout )
         return -1;
     }
 
-    if ( aout_MixerNew( p_aout ) == -1 )
+    p_aout->mixer = aout_MixerNew( p_aout, &p_aout->mixer_format );
+    if( p_aout->mixer == NULL )
     {
         aout_OutputDelete( p_aout );
         aout_unlock( p_aout );

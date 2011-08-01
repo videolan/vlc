@@ -37,14 +37,14 @@ vlc_module_begin ()
     set_callbacks (Activate, NULL)
 vlc_module_end ()
 
-static void FilterFI32 (aout_mixer_t *, block_t *, float);
-static void FilterS16N (aout_mixer_t *, block_t *, float);
+static void FilterFI32 (audio_mixer_t *, block_t *, float);
+static void FilterS16N (audio_mixer_t *, block_t *, float);
 
 static int Activate (vlc_object_t *obj)
 {
-    aout_mixer_t *mixer = (aout_mixer_t *)obj;
+    audio_mixer_t *mixer = (audio_mixer_t *)obj;
 
-    switch (mixer->fmt.i_format)
+    switch (mixer->fmt->i_format)
     {
         case VLC_CODEC_FI32:
             mixer->mix = FilterFI32;
@@ -58,7 +58,7 @@ static int Activate (vlc_object_t *obj)
     return 0;
 }
 
-static void FilterFI32 (aout_mixer_t *mixer, block_t *block, float volume)
+static void FilterFI32 (audio_mixer_t *mixer, block_t *block, float volume)
 {
     const int64_t mult = volume * FIXED32_ONE;
 
@@ -76,7 +76,7 @@ static void FilterFI32 (aout_mixer_t *mixer, block_t *block, float volume)
     (void) mixer;
 }
 
-static void FilterS16N (aout_mixer_t *mixer, block_t *block, float volume)
+static void FilterS16N (audio_mixer_t *mixer, block_t *block, float volume)
 {
     const int32_t mult = volume * 0x10000;
 

@@ -183,7 +183,7 @@ struct audio_output
     /* Mixer */
     audio_sample_format_t   mixer_format;
     float                   mixer_multiplier;
-    struct aout_mixer_t    *p_mixer;
+    struct audio_mixer     *mixer;
 
     audio_sample_format_t format; /**< Output format (plugin can modify it
         only when succesfully probed and not afterward) */

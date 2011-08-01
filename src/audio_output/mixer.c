@@ -33,68 +33,61 @@
 #include <vlc_common.h>
 #include <libvlc.h>
 #include <vlc_modules.h>
-
 #include <vlc_aout.h>
+#include <vlc_aout_mixer.h>
 #include "aout_internal.h"
-/*****************************************************************************
- * aout_MixerNew: prepare a mixer plug-in
- *****************************************************************************
- * Please note that you must hold the mixer lock.
- *****************************************************************************/
-int aout_MixerNew( audio_output_t * p_aout )
+
+#undef aout_MixerNew
+/**
+ * Creates a software amplifier.
+ */
+audio_mixer_t *aout_MixerNew(vlc_object_t *obj,
+                             const audio_sample_format_t *fmt)
 {
-    assert( !p_aout->p_mixer );
-    vlc_assert_locked( &p_aout->lock );
+    audio_mixer_t *mixer = vlc_custom_create(obj, sizeof (*mixer), "mixer");
+    if (unlikely(mixer == NULL))
+        return NULL;
 
-    aout_mixer_t *p_mixer = vlc_custom_create( p_aout, sizeof(*p_mixer),
-                                               "audio mixer" );
-    if( !p_mixer )
-        return VLC_EGENERIC;
-
-    p_mixer->fmt = p_aout->mixer_format;
-    p_mixer->fifo = &p_aout->p_input->fifo;
-    p_mixer->mix = NULL;
-    p_mixer->sys = NULL;
-
-    p_mixer->module = module_need( p_mixer, "audio mixer", NULL, false );
-    if( !p_mixer->module )
+    mixer->fmt = fmt;
+    mixer->mix = NULL;
+    mixer->module = module_need(mixer, "audio mixer", NULL, false);
+    if (mixer->module == NULL)
     {
-        msg_Err( p_mixer, "no suitable audio mixer" );
-        vlc_object_release( p_mixer );
-        return VLC_EGENERIC;
+        msg_Err(mixer, "no suitable audio mixer");
+        vlc_object_release(mixer);
+        mixer = NULL;
     }
-
-    /* */
-    p_aout->p_mixer = p_mixer;
-    return VLC_SUCCESS;
+    return mixer;
 }
 
-/*****************************************************************************
- * aout_MixerDelete: delete the mixer
- *****************************************************************************
- * Please note that you must hold the mixer lock.
- *****************************************************************************/
-void aout_MixerDelete( audio_output_t * p_aout )
+/**
+ * Destroys a software amplifier.
+ */
+void aout_MixerDelete(audio_mixer_t *mixer)
 {
-    vlc_assert_locked( &p_aout->lock );
-
-    if( !p_aout->p_mixer )
+    if (mixer == NULL)
         return;
 
-    module_unneed( p_aout->p_mixer, p_aout->p_mixer->module );
-    vlc_object_release( p_aout->p_mixer );
-    p_aout->p_mixer = NULL;
+    module_unneed(mixer, mixer->module);
+    vlc_object_release(mixer);
 }
 
-/*****************************************************************************
- * MixBuffer: try to prepare one output buffer
- *****************************************************************************
- * Please note that you must hold the mixer lock.
- *****************************************************************************/
-static int MixBuffer( audio_output_t * p_aout, float volume )
+/**
+ * Applies replay gain and software volume to an audio buffer.
+ */
+void aout_MixerRun(audio_mixer_t *mixer, block_t *block, float amp)
 {
-    aout_mixer_t *p_mixer = p_aout->p_mixer;
-    aout_fifo_t *p_fifo = p_mixer->fifo;
+    mixer->mix(mixer, block, amp);
+}
+
+
+/**
+ * Rearranges audio blocks in correct number of samples.
+ * @note (FIXME) This is left here for historical reasons. It belongs in the
+ * output code. Besides, this operation should be avoided if possible.
+ */
+block_t *aout_OutputSlice( audio_output_t * p_aout, aout_fifo_t *p_fifo )
+{
     const unsigned samples = p_aout->i_nb_samples;
     /* FIXME: Remove this silly constraint. Just pass buffers as they come to
      * "smart" audio outputs. */
@@ -109,7 +102,7 @@ static int MixBuffer( audio_output_t * p_aout, float volume )
     /* See if we have enough data to prepare a new buffer for the audio output. */
     aout_buffer_t *p_buffer = p_fifo->p_first;
     if( p_buffer == NULL )
-        return -1;
+        return NULL;
 
     /* Find the earliest start date available. */
     if ( start_date == VLC_TS_INVALID )
@@ -130,13 +123,13 @@ static int MixBuffer( audio_output_t * p_aout, float volume )
             break;
         /* We authorize a +-1 because rounding errors get compensated
          * regularly. */
-        msg_Warn( p_mixer, "got a packet in the past (%"PRId64")",
+        msg_Warn( p_aout, "got a packet in the past (%"PRId64")",
                   start_date - prev_date );
         aout_BufferFree( aout_FifoPop( p_fifo ) );
 
         p_buffer = p_fifo->p_first;
         if( p_buffer == NULL )
-            return -1;
+            return NULL;
     }
 
     /* Check that we have enough samples. */
@@ -144,12 +137,12 @@ static int MixBuffer( audio_output_t * p_aout, float volume )
     {
         p_buffer = p_buffer->p_next;
         if( p_buffer == NULL )
-            return -1;
+            return NULL;
 
         /* Check that all buffers are contiguous. */
         if( prev_date != p_buffer->i_pts )
         {
-            msg_Warn( p_mixer,
+            msg_Warn( p_aout,
                       "buffer hole, dropping packets (%"PRId64")",
                       p_buffer->i_pts - prev_date );
 
@@ -161,27 +154,28 @@ static int MixBuffer( audio_output_t * p_aout, float volume )
         prev_date = p_buffer->i_pts + p_buffer->i_length;
     }
 
-    if( !AOUT_FMT_NON_LINEAR( &p_mixer->fmt ) )
+    if( !AOUT_FMT_NON_LINEAR( &p_aout->mixer_format ) )
     {
         p_buffer = p_fifo->p_first;
 
         /* Additionally check that p_first_byte_to_mix is well located. */
-        const unsigned framesize = p_mixer->fmt.i_bytes_per_frame;
+        const unsigned framesize = p_aout->mixer_format.i_bytes_per_frame;
         ssize_t delta = (start_date - p_buffer->i_pts)
-                      * p_mixer->fmt.i_rate / CLOCK_FREQ;
+                      * p_aout->mixer_format.i_rate / CLOCK_FREQ;
         if( delta != 0 )
-            msg_Warn( p_mixer, "input start is not output end (%zd)", delta );
+            msg_Warn( p_aout, "input start is not output end (%zd)", delta );
         if( delta < 0 )
         {
             /* Is it really the best way to do it ? */
             aout_FifoReset( &p_aout->fifo );
-            return -1;
+            return NULL;
         }
         if( delta > 0 )
         {
+            mtime_t t = delta * CLOCK_FREQ / p_aout->mixer_format.i_rate;
             p_buffer->i_nb_samples -= delta;
-            p_buffer->i_pts += delta * CLOCK_FREQ / p_mixer->fmt.i_rate;
-            p_buffer->i_length -= delta * CLOCK_FREQ / p_mixer->fmt.i_rate;
+            p_buffer->i_pts += t;
+            p_buffer->i_length -= t;
             delta *= framesize;
             p_buffer->p_buffer += delta;
             p_buffer->i_buffer -= delta;
@@ -192,7 +186,7 @@ static int MixBuffer( audio_output_t * p_aout, float volume )
         p_buffer = block_Alloc( needed );
         if( unlikely(p_buffer == NULL) )
             /* XXX: should free input buffers */
-            return -1;
+            return NULL;
         p_buffer->i_nb_samples = samples;
 
         for( uint8_t *p_out = p_buffer->p_buffer; needed > 0; )
@@ -200,7 +194,7 @@ static int MixBuffer( audio_output_t * p_aout, float volume )
             aout_buffer_t *p_inbuf = p_fifo->p_first;
             if( unlikely(p_inbuf == NULL) )
             {
-                msg_Err( p_mixer, "internal error" );
+                msg_Err( p_aout, "packetization error" );
                 vlc_memset( p_out, 0, needed );
                 break;
             }
@@ -214,8 +208,10 @@ static int MixBuffer( audio_output_t * p_aout, float volume )
                 p_fifo->p_first->i_buffer -= needed;
                 needed /= framesize;
                 p_fifo->p_first->i_nb_samples -= needed;
-                p_fifo->p_first->i_pts += needed * CLOCK_FREQ / p_mixer->fmt.i_rate;
-                p_fifo->p_first->i_length -= needed * CLOCK_FREQ / p_mixer->fmt.i_rate;
+
+                mtime_t t = needed * CLOCK_FREQ / p_aout->mixer_format.i_rate;
+                p_fifo->p_first->i_pts += t;
+                p_fifo->p_first->i_length -= t;
                 break;
             }
 
@@ -232,18 +228,5 @@ static int MixBuffer( audio_output_t * p_aout, float volume )
     p_buffer->i_pts = start_date;
     p_buffer->i_length = end_date - start_date;
 
-    /* Run the mixer. */
-    p_mixer->mix( p_mixer, p_buffer, volume );
-    aout_OutputPlay( p_aout, p_buffer );
-    return 0;
-}
-
-/*****************************************************************************
- * aout_MixerRun: entry point for the mixer & post-filters processing
- *****************************************************************************
- * Please note that you must hold the mixer lock.
- *****************************************************************************/
-void aout_MixerRun( audio_output_t * p_aout, float volume )
-{
-    while( MixBuffer( p_aout, volume ) != -1 );
+    return p_buffer;
 }
