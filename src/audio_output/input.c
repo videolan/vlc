@@ -542,7 +542,7 @@ void aout_InputPlay( audio_output_t * p_aout, aout_input_t * p_input,
      * with the next incoming buffer. */
     start_date = aout_FifoNextStart( &p_input->fifo );
 
-    if ( start_date != 0 && start_date < now )
+    if ( start_date != VLC_TS_INVALID && start_date < now )
     {
         /* The decoder is _very_ late. This can only happen if the user
          * pauses the stream (or if the decoder is buggy, which cannot
@@ -555,7 +555,7 @@ void aout_InputPlay( audio_output_t * p_aout, aout_input_t * p_input,
             msg_Warn( p_aout, "timing screwed, stopping resampling" );
         inputResamplingStop( p_input );
         p_buffer->i_flags |= BLOCK_FLAG_DISCONTINUITY;
-        start_date = 0;
+        start_date = VLC_TS_INVALID;
     }
 
     if ( p_buffer->i_pts < now + AOUT_MIN_PREPARE_TIME )
@@ -571,7 +571,7 @@ void aout_InputPlay( audio_output_t * p_aout, aout_input_t * p_input,
 
     /* If the audio drift is too big then it's not worth trying to resample
      * the audio. */
-    if( !start_date )
+    if( start_date == VLC_TS_INVALID )
         start_date = p_buffer->i_pts;
 
     mtime_t drift = start_date - p_buffer->i_pts;

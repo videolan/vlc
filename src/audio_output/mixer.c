@@ -111,7 +111,7 @@ static int MixBuffer( audio_output_t * p_aout, float volume )
         return -1;
 
     /* Find the earliest start date available. */
-    if ( !start_date )
+    if ( start_date == VLC_TS_INVALID )
     {
         start_date = p_buffer->i_pts;
         date_Set( &exact_start_date, start_date );

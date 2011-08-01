@@ -252,5 +252,5 @@ bool aout_DecIsEmpty( audio_output_t * p_aout, aout_input_t * p_input )
     aout_lock( p_aout );
     end_date = aout_FifoNextStart( &p_input->fifo );
     aout_unlock( p_aout );
-    return end_date <= mdate();
+    return end_date == VLC_TS_INVALID || end_date <= mdate();
 }
