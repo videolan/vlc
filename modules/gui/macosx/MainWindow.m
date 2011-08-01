@@ -144,7 +144,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
         [o_time_sld_middle_view setImage: [NSImage imageNamed:@"progression-track-wrapper-middle"]];
         [o_time_sld_right_view setImage: [NSImage imageNamed:@"progression-track-wrapper-right"]];
         [o_volume_down_btn setImage: [NSImage imageNamed:@"volume-low"]];
-        [o_volume_track_view setImage: [NSImage imageNamed:@"volumetrack"]];
+        [o_volume_track_view setImage: [NSImage imageNamed:@"volume-slider-track"]];
         [o_volume_up_btn setImage: [NSImage imageNamed:@"volume-high"]];
         [o_effects_btn setImage: [NSImage imageNamed:@"effects-double-buttons"]];
         [o_effects_btn setAlternateImage: [NSImage imageNamed:@"effects-double-buttons-pressed"]];
@@ -458,7 +458,6 @@ static VLCMainWindow *_o_sharedInstance = nil;
     p_input = pl_CurrentInput( VLCIntf );
     if( p_input )
     {
-        NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
         vlc_value_t time;
         NSString * o_time;
         vlc_value_t pos;
@@ -479,15 +478,25 @@ static VLCMainWindow *_o_sharedInstance = nil;
         else
             o_time = [NSString stringWithUTF8String: secstotimestr( psz_time, (time.i_time / 1000000) )];
 
+        if (dur == -1) {
+            [o_time_sld setEnabled: NO];
+            [o_time_sld setHidden: YES];
+        } else {
+            [o_time_sld setEnabled: YES];
+            [o_time_sld setHidden: NO];
+        }
+
         [o_time_fld setStringValue: o_time];
         [o_time_fld setNeedsDisplay:YES];
 //        [[[[VLCMain sharedInstance] controls] fspanel] setStreamPos: f_updated andTime: o_time];
-        [o_pool release];
+        vlc_object_release( p_input );
     }
     else
     {
         [o_time_sld setFloatValue: 0.0];
         [o_time_fld setStringValue: @"00:00"];
+        [o_time_sld setEnabled: NO];
+        [o_time_sld setHidden: YES];
     }
         
     [self performSelectorOnMainThread:@selector(drawFancyGradientEffectForTimeSlider) withObject:nil waitUntilDone:NO];

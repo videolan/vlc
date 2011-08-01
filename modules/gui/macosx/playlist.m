@@ -1293,8 +1293,7 @@
     if( ![[o_outline_view dataSource] outlineView: o_outline_view
                                                     isItemExpandable: o_item] )
     {
-        o_item = [o_outline_dict objectForKey: [NSString
-                   stringWithFormat: @"%p", p_item->p_parent]];
+        o_item = [o_outline_dict objectForKey: [NSString stringWithFormat: @"%p", p_item->p_parent]];
     }
 
     /* We need to collapse the node first, since OSX refuses to recursively
@@ -1404,8 +1403,7 @@
     id o_playing_item;
 
     PL_LOCK;
-    o_playing_item = [o_outline_dict objectForKey:
-                [NSString stringWithFormat:@"%p",  playlist_CurrentPlayingItem( p_playlist )]];
+    o_playing_item = [o_outline_dict objectForKey: [NSString stringWithFormat:@"%p",  playlist_CurrentPlayingItem( p_playlist )]];
     PL_UNLOCK;
 
     if( [self isItem: [o_playing_item pointerValue] inNode:
@@ -1440,10 +1438,8 @@
 {
     id o_value = [super outlineView: outlineView child: index ofItem: item];
 
-    [o_outline_dict setObject:o_value forKey:[NSString stringWithFormat:@"%p",
-                                                    [o_value pointerValue]]];
+    [o_outline_dict setObject:o_value forKey:[NSString stringWithFormat:@"%p", [o_value pointerValue]]];
     return o_value;
-
 }
 
 /* Required for drag & drop and reordering */
@@ -1624,14 +1620,11 @@
             PL_UNLOCK;
         }
         [self playlistUpdated];
-        i_row = [o_outline_view rowForItem:[o_outline_dict
-            objectForKey:[NSString stringWithFormat: @"%p",
-            [[o_all_items objectAtIndex: 0] pointerValue]]]];
+        i_row = [o_outline_view rowForItem:[o_outline_dict objectForKey:[NSString stringWithFormat: @"%p", [[o_all_items objectAtIndex: 0] pointerValue]]]];
 
         if( i_row == -1 )
         {
-            i_row = [o_outline_view rowForItem:[o_outline_dict
-            objectForKey:[NSString stringWithFormat: @"%p", p_new_parent]]];
+            i_row = [o_outline_view rowForItem:[o_outline_dict objectForKey:[NSString stringWithFormat: @"%p", p_new_parent]]];
         }
 
         [o_outline_view deselectAll: self];

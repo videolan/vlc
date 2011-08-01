@@ -245,7 +245,6 @@ EXTRA_DIST += \
 	extras/package/macosx/Resources/mainwindow/volume-low.png \
 	extras/package/macosx/Resources/mainwindow/volume-slider-knob.png \
 	extras/package/macosx/Resources/mainwindow/volume-slider-track.png \
-	extras/package/macosx/Resources/mainwindow/volumetrack.png \
 	extras/package/macosx/Resources/mainwindow_dark/back-pressed_dark.png \
 	extras/package/macosx/Resources/mainwindow_dark/back_dark.png \
 	extras/package/macosx/Resources/mainwindow_dark/bottom-background_dark.png \
