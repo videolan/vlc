@@ -241,7 +241,7 @@ void aout_DecChangePause( audio_output_t *p_aout, aout_input_t *p_input, bool b_
 void aout_DecFlush( audio_output_t *p_aout, aout_input_t *p_input )
 {
     aout_lock( p_aout );
-    aout_FifoSet( &p_input->fifo, 0 );
+    aout_FifoReset( &p_input->fifo );
     aout_unlock( p_aout );
 }
 

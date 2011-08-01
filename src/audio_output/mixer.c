@@ -173,7 +173,7 @@ static int MixBuffer( audio_output_t * p_aout, float volume )
         if( delta < 0 )
         {
             /* Is it really the best way to do it ? */
-            aout_FifoSet( &p_aout->fifo, 0 );
+            aout_FifoReset( &p_aout->fifo );
             return -1;
         }
         if( delta > 0 )

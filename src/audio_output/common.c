@@ -363,14 +363,13 @@ void aout_FifoPush( aout_fifo_t * p_fifo, aout_buffer_t * p_buffer )
 }
 
 /*****************************************************************************
- * aout_FifoSet : set end_date and trash all buffers (because they aren't
- * properly dated)
+ * aout_FifoReset: trash all buffers
  *****************************************************************************/
-void aout_FifoSet( aout_fifo_t * p_fifo, mtime_t date )
+void aout_FifoReset( aout_fifo_t * p_fifo )
 {
     aout_buffer_t * p_buffer;
 
-    date_Set( &p_fifo->end_date, date );
+    date_Set( &p_fifo->end_date, 0 );
     p_buffer = p_fifo->p_first;
     while ( p_buffer != NULL )
     {

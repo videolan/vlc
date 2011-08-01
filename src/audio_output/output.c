@@ -385,7 +385,7 @@ aout_buffer_t * aout_OutputNextBuffer( audio_output_t * p_aout,
        * to deal with this kind of starvation. */
 
         /* Set date to 0, to allow the mixer to send a new buffer ASAP */
-        aout_FifoSet( &p_aout->fifo, 0 );
+        aout_FifoReset( &p_aout->fifo );
         if ( !p_aout->b_starving )
             msg_Dbg( p_aout,
                  "audio output is starving (no input), playing silence" );

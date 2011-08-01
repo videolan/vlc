@@ -135,7 +135,7 @@ void aout_FifoInit( vlc_object_t *, aout_fifo_t *, uint32_t );
 #define aout_FifoInit(o, f, r) aout_FifoInit(VLC_OBJECT(o), f, r)
 mtime_t aout_FifoNextStart( const aout_fifo_t * ) VLC_USED;
 void aout_FifoPush( aout_fifo_t *, aout_buffer_t * );
-void aout_FifoSet( aout_fifo_t *, mtime_t );
+void aout_FifoReset( aout_fifo_t * );
 void aout_FifoMoveDates( aout_fifo_t *, mtime_t );
 void aout_FifoDestroy( aout_fifo_t * p_fifo );
 void aout_FormatsPrint( audio_output_t * p_aout, const char * psz_text, const audio_sample_format_t * p_format1, const audio_sample_format_t * p_format2 );
