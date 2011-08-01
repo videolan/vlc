@@ -1,5 +1,5 @@
 # PNG
-PNG_VERSION := 1.4.7
+PNG_VERSION := 1.4.8
 PNG_URL := $(SF)/libpng/libpng-$(PNG_VERSION).tar.bz2
 
 PKGS += png
