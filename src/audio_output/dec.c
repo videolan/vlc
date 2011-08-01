@@ -231,10 +231,8 @@ void aout_DecChangePause( audio_output_t *p_aout, aout_input_t *p_input, bool b_
 
     if( i_duration != 0 )
     {
-        for( aout_buffer_t *p = p_input->fifo.p_first; p != NULL; p = p->p_next )
-        {
-            p->i_pts += i_duration;
-        }
+        aout_FifoMoveDates( &p_input->fifo, i_duration );
+        aout_FifoMoveDates( &p_aout->fifo, i_duration );
     }
     aout_OutputPause( p_aout, b_paused, i_date );
     aout_unlock( p_aout );
