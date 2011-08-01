@@ -1,8 +1,8 @@
 /*****************************************************************************
  * alsa.c : alsa plugin for vlc
  *****************************************************************************
- * Copyright (C) 2000-2001 the VideoLAN team
- * $Id$
+ * Copyright (C) 2000-2010 the VideoLAN team
+ * Copyright (C) 2009-2011 Rémi Denis-Courmont
  *
  * Authors: Henri Fallon <henri@videolan.org> - Original Author
  *          Jeffrey Baker <jwbaker@acm.org> - Port to ALSA 1.0 API
@@ -35,17 +35,10 @@
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
-
-#include <errno.h>                                                 /* ENOMEM */
 #include <vlc_dialog.h>
-
 #include <vlc_aout.h>
 #include <vlc_cpu.h>
 
-/* ALSA part
-   Note: we use the new API which is available since 0.9.0beta10a. */
-#define ALSA_PCM_NEW_HW_PARAMS_API
-#define ALSA_PCM_NEW_SW_PARAMS_API
 #include <alsa/asoundlib.h>
 #include <alsa/version.h>
 
