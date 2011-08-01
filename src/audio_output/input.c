@@ -466,7 +466,6 @@ void aout_InputCheckAndRestart( audio_output_t * p_aout, aout_input_t * p_input 
     /* A little trick to avoid loosing our input fifo and properties */
 
     aout_fifo_t fifo = p_input->fifo;
-    bool b_paused = p_input->b_paused;
     mtime_t i_pause_date = p_input->i_pause_date;
 
     aout_FifoInit( p_aout, &p_input->fifo, p_aout->mixer_format.i_rate );
@@ -475,7 +474,6 @@ void aout_InputCheckAndRestart( audio_output_t * p_aout, aout_input_t * p_input 
 
     aout_InputNew( p_aout, p_input, &p_input->request_vout );
     p_input->fifo = fifo;
-    p_input->b_paused = b_paused;
     p_input->i_pause_date = i_pause_date;
 
     p_input->b_restart = false;

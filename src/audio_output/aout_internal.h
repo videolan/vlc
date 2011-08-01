@@ -85,7 +85,6 @@ struct aout_input_t
     int               i_buffer_lost;
 
     /* */
-    bool              b_paused;
     mtime_t           i_pause_date;
 
     /* */

@@ -82,8 +82,7 @@ aout_input_t *aout_DecNew( audio_output_t *p_aout,
         return NULL;
 
     p_input->b_error = true;
-    p_input->b_paused = false;
-    p_input->i_pause_date = 0;
+    p_input->i_pause_date = VLC_TS_INVALID;
 
     aout_FormatPrepare( p_format );
 
@@ -223,23 +222,23 @@ int aout_DecGetResetLost( audio_output_t *p_aout, aout_input_t *p_input )
 
 void aout_DecChangePause( audio_output_t *p_aout, aout_input_t *p_input, bool b_paused, mtime_t i_date )
 {
-    mtime_t i_duration = 0;
-
     aout_lock( p_aout );
     assert( p_aout->p_input == p_input );
-    assert( !p_input->b_paused || !b_paused );
-    if( p_input->b_paused )
-    {
-        i_duration = i_date - p_input->i_pause_date;
-    }
-    p_input->b_paused = b_paused;
-    p_input->i_pause_date = i_date;
 
-    if( i_duration != 0 )
+    if( b_paused )
     {
+        p_input->i_pause_date = i_date;
+    }
+    else
+    {
+        assert( p_input->i_pause_date != VLC_TS_INVALID );
+
+        mtime_t i_duration = i_date - p_input->i_pause_date;
+        p_input->i_pause_date = VLC_TS_INVALID;
         aout_FifoMoveDates( &p_input->fifo, i_duration );
         aout_FifoMoveDates( &p_aout->fifo, i_duration );
     }
+
     aout_OutputPause( p_aout, b_paused, i_date );
     aout_unlock( p_aout );
 }
