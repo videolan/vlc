@@ -71,7 +71,7 @@ static int vlclua_preamp_get( lua_State *L )
         return 0;
 
     char *psz_af = var_GetNonEmptyString( p_aout, "audio-filter" );
-    if( strstr ( psz_af, "equalizer" ) == NULL )
+    if( !psz_af || strstr ( psz_af, "equalizer" ) == NULL )
     {
         free( psz_af );
         vlc_object_release( p_aout );
@@ -100,7 +100,7 @@ static int vlclua_preamp_set( lua_State *L )
         return 0;
 
     char *psz_af = var_GetNonEmptyString( p_aout, "audio-filter" );
-    if( strstr ( psz_af, "equalizer" ) == NULL )
+    if( !psz_af || strstr ( psz_af, "equalizer" ) == NULL )
     {
         free( psz_af );
         vlc_object_release( p_aout );
@@ -143,7 +143,7 @@ static int vlclua_equalizer_get( lua_State *L )
 
     float level = 0 ;
     char *psz_af = var_GetNonEmptyString( p_aout, "audio-filter" );
-    if( strstr ( psz_af, "equalizer" ) == NULL )
+    if( !psz_af || strstr ( psz_af, "equalizer" ) == NULL )
     {
         free( psz_af );
         vlc_object_release( p_aout );
@@ -195,7 +195,7 @@ static int vlclua_equalizer_set( lua_State *L )
         return 0;
 
     char *psz_af = var_GetNonEmptyString( p_aout, "audio-filter" );
-    if( strstr ( psz_af, "equalizer" ) == NULL )
+    if( !psz_af || strstr ( psz_af, "equalizer" ) == NULL )
     {
         free( psz_af );
         vlc_object_release( p_aout );
