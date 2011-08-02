@@ -75,7 +75,7 @@ typedef SLresult (*slCreateEngine_t)(
  *****************************************************************************/
 static int  Open        ( vlc_object_t * );
 static void Close       ( vlc_object_t * );
-static void Play        ( audio_output_t * );
+static void Play        ( audio_output_t *, block_t * );
 static void PlayedCallback ( SLAndroidSimpleBufferQueueItf caller,  void *pContext);
 
 /*****************************************************************************
@@ -291,42 +291,36 @@ static void Close( vlc_object_t * p_this )
 /*****************************************************************************
  * Play: play a sound
  *****************************************************************************/
-static void Play( audio_output_t * p_aout )
+static void Play( audio_output_t * p_aout, block_t *p_buffer )
 {
     aout_sys_t * p_sys = p_aout->sys;
     aout_buffer_t *p_buffer;
 
     SLresult result;
 
-    p_buffer = aout_FifoPop(&p_aout->fifo);
-    if( p_buffer != NULL )
+    for (;;)
     {
-        for (;;)
-        {
-            result = (*p_sys->playerBufferQueue)->Enqueue(
+        result = (*p_sys->playerBufferQueue)->Enqueue(
                             p_sys->playerBufferQueue, p_buffer->p_buffer,
                             p_buffer->i_buffer );
-            if( result == SL_RESULT_SUCCESS )
-                break;
-            if ( result != SL_RESULT_BUFFER_INSUFFICIENT )
-            {
-                msg_Warn( p_aout, "Dropping invalid buffer" );
-                aout_BufferFree( p_buffer );
-                return ;
-            }
-
-            msg_Err( p_aout, "write error (%lu)", result );
-
-            // Wait a bit to retry. might miss calls to *cancel
-            // but this is supposed to be rare anyway
-            msleep(CLOCK_FREQ);
+        if( result == SL_RESULT_SUCCESS )
+            break;
+        if ( result != SL_RESULT_BUFFER_INSUFFICIENT )
+        {
+            msg_Warn( p_aout, "Dropping invalid buffer" );
+            aout_BufferFree( p_buffer );
+            return ;
         }
-        p_sys->p_buffer_array[p_sys->i_toappend_buffer] = p_buffer;
-        if( ++p_sys->i_toappend_buffer == BUFF_QUEUE )
-            p_sys->i_toappend_buffer = 0;
+
+        msg_Err( p_aout, "write error (%lu)", result );
+
+        // Wait a bit to retry. might miss calls to *cancel
+        // but this is supposed to be rare anyway
+        msleep(CLOCK_FREQ);
     }
-    else
-        msg_Err( p_aout, "nothing to play?" );
+    p_sys->p_buffer_array[p_sys->i_toappend_buffer] = p_buffer;
+    if( ++p_sys->i_toappend_buffer == BUFF_QUEUE )
+        p_sys->i_toappend_buffer = 0;
 }
 
 static void PlayedCallback (SLAndroidSimpleBufferQueueItf caller, void *pContext )

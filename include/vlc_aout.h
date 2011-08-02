@@ -179,7 +179,7 @@ struct audio_output
     aout_fifo_t             fifo;
 
     struct aout_sys_t *sys; /**< Output plugin private data */
-    void (*pf_play)( audio_output_t * ); /**< Audio buffer callback */
+    void (*pf_play)(audio_output_t *, block_t *); /**< Audio buffer callback */
     void (* pf_pause)( audio_output_t *, bool, mtime_t ); /**< Pause/resume
         callback (optional, may be NULL) */
     void (* pf_flush)( audio_output_t *, bool ); /**< Flush/drain callback
@@ -254,6 +254,7 @@ VLC_API const char * aout_FormatPrintChannels( const audio_sample_format_t * ) V
 
 VLC_API mtime_t aout_FifoFirstDate( const aout_fifo_t * ) VLC_USED;
 VLC_API aout_buffer_t *aout_FifoPop( aout_fifo_t * p_fifo ) VLC_USED;
+VLC_API void aout_FifoPush( aout_fifo_t *, block_t * );
 
 VLC_API void aout_VolumeNoneInit( audio_output_t * );
 VLC_API void aout_VolumeSoftInit( audio_output_t * );

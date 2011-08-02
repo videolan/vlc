@@ -62,7 +62,7 @@ struct aout_sys_t
  *****************************************************************************/
 static int  Open         ( vlc_object_t * );
 static void Close        ( vlc_object_t * );
-static void Play         ( audio_output_t * );
+static void Play         ( audio_output_t *, block_t * );
 static int  Process      ( jack_nframes_t i_frames, void *p_arg );
 static int  GraphChange  ( void *p_arg );
 
@@ -334,9 +334,9 @@ static int GraphChange( void *p_arg )
 /*****************************************************************************
  * Play: nothing to do
  *****************************************************************************/
-static void Play( audio_output_t *p_aout )
+static void Play( audio_output_t *p_aout, block_t *block )
 {
-    VLC_UNUSED( p_aout );
+    aout_FifoPush( &p_aout->fifo, block );
 }
 
 /*****************************************************************************

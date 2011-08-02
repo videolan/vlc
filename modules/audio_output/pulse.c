@@ -444,14 +444,10 @@ static void *data_convert(block_t **pp)
 /**
  * Queue one audio frame to the playabck stream
  */
-static void Play(audio_output_t *aout)
+static void Play(audio_output_t *aout, block_t *block)
 {
     aout_sys_t *sys = aout->sys;
     pa_stream *s = sys->stream;
-
-    /* This function is called exactly once per block in the output FIFO. */
-    block_t *block = aout_FifoPop(&aout->fifo);
-    assert (block != NULL);
 
     const void *ptr = data_convert(&block);
     if (unlikely(ptr == NULL))

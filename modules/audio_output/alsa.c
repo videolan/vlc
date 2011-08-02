@@ -85,7 +85,7 @@ struct aout_sys_t
  *****************************************************************************/
 static int   Open         ( vlc_object_t * );
 static void  Close        ( vlc_object_t * );
-static void  Play         ( audio_output_t * );
+static void  Play         ( audio_output_t *, block_t * );
 static void* ALSAThread   ( void * );
 static void  ALSAFill     ( audio_output_t * );
 static int FindDevicesCallback( vlc_object_t *p_this, char const *psz_name,
@@ -522,20 +522,21 @@ error:
     return VLC_EGENERIC;
 }
 
-static void PlayIgnore( audio_output_t *p_aout )
-{   /* Already playing - nothing to do */
-    (void) p_aout;
+static void PlayIgnore( audio_output_t *p_aout, block_t *block )
+{
+    aout_FifoPush( &p_aout->fifo, block );
 }
 
 /*****************************************************************************
  * Play: start playback
  *****************************************************************************/
-static void Play( audio_output_t *p_aout )
+static void Play( audio_output_t *p_aout, block_t *block )
 {
     p_aout->pf_play = PlayIgnore;
 
     /* get the playing date of the first aout buffer */
-    p_aout->sys->start_date = aout_FifoFirstDate( &p_aout->fifo );
+    p_aout->sys->start_date = block->i_pts;
+    aout_FifoPush( &p_aout->fifo, block );
 
     /* wake up the audio output thread */
     sem_post( &p_aout->sys->wait );

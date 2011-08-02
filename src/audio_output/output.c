@@ -250,10 +250,7 @@ void aout_OutputPlay( audio_output_t * p_aout, aout_buffer_t * p_buffer )
     aout_FifoPush (&owner->partial, p_buffer );
 
     while ((p_buffer = aout_OutputSlice (p_aout, &owner->partial)) != NULL)
-    {
-        aout_FifoPush( &p_aout->fifo, p_buffer );
-        p_aout->pf_play( p_aout );
-    }
+        p_aout->pf_play (p_aout, p_buffer);
 }
 
 /**

@@ -94,7 +94,7 @@ struct aout_sys_t
  *****************************************************************************/
 static int  OpenAudio  ( vlc_object_t * );
 static void CloseAudio ( vlc_object_t * );
-static void Play       ( audio_output_t * );
+static void Play       ( audio_output_t *, block_t * );
 
 /* local functions */
 static void Probe             ( audio_output_t * );
@@ -569,29 +569,23 @@ static void Probe( audio_output_t * p_aout )
  *       we know the first buffer has been put in the aout fifo and we also
  *       know its date.
  *****************************************************************************/
-static void Play( audio_output_t *p_aout )
+static void Play( audio_output_t *p_aout, block_t *p_buffer )
 {
     if( !p_aout->sys->b_playing )
     {
-        aout_buffer_t *p_buffer;
-
         p_aout->sys->b_playing = 1;
 
         /* get the playing date of the first aout buffer */
-        p_aout->sys->p_notif->start_date =
-            aout_FifoFirstDate( &p_aout->fifo );
+        p_aout->sys->p_notif->start_date = p_buffer->i_pts;
 
         /* fill in the first samples */
-        for( int i = 0; i < FRAMES_NUM; i++ )
-        {
-            p_buffer = aout_FifoPop( &p_aout->fifo );
-            if( !p_buffer ) break;
-            FillBuffer( p_aout, i, p_buffer );
-        }
+        FillBuffer( p_aout, 0, p_buffer );
 
         /* wake up the audio output thread */
         SetEvent( p_aout->sys->p_notif->event );
     }
+    else
+        aout_FifoPush( &p_aout->fifo, p_buffer );
 }
 
 /*****************************************************************************

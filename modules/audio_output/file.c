@@ -73,7 +73,7 @@ static const int pi_channels_maps[CHANNELS_MAX+1] =
  *****************************************************************************/
 static int     Open        ( vlc_object_t * );
 static void    Close       ( vlc_object_t * );
-static void    Play        ( audio_output_t * );
+static void    Play        ( audio_output_t *, block_t * );
 
 /*****************************************************************************
  * Module descriptor
@@ -316,12 +316,8 @@ static void Close( vlc_object_t * p_this )
 /*****************************************************************************
  * Play: pretend to play a sound
  *****************************************************************************/
-static void Play( audio_output_t * p_aout )
+static void Play( audio_output_t * p_aout, block_t *p_buffer )
 {
-    aout_buffer_t * p_buffer;
-
-    p_buffer = aout_FifoPop( &p_aout->fifo );
-
     if( fwrite( p_buffer->p_buffer, p_buffer->i_buffer, 1,
                 p_aout->sys->p_file ) != 1 )
     {

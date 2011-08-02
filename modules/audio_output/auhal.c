@@ -112,7 +112,7 @@ static int      OpenAnalog              ( audio_output_t * );
 static int      OpenSPDIF               ( audio_output_t * );
 static void     Close                   ( vlc_object_t * );
 
-static void     Play                    ( audio_output_t * );
+static void     Play                    ( audio_output_t *, block_t * );
 static void     Probe                   ( audio_output_t * );
 
 static int      AudioDeviceHasOutput    ( AudioDeviceID );
@@ -910,9 +910,9 @@ static void Close( vlc_object_t * p_this )
 /*****************************************************************************
  * Play: nothing to do
  *****************************************************************************/
-static void Play( audio_output_t * p_aout )
+static void Play( audio_output_t * p_aout, block_t *block )
 {
-    VLC_UNUSED(p_aout);
+    aout_FifoPush( &p_aout->fifo, block );
 }
 
 

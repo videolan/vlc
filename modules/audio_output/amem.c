@@ -59,17 +59,13 @@ struct aout_sys_t
     void (*cleanup) (void *opaque);
 };
 
-static void Play (audio_output_t *aout)
+static void Play (audio_output_t *aout, block_t *block)
 {
     aout_sys_t *sys = aout->sys;
-    block_t *block;
 
-    while ((block = aout_FifoPop(&aout->fifo)) != NULL)
-    {
-        sys->play (sys->opaque, block->p_buffer, block->i_nb_samples,
-                   block->i_pts);
-        block_Release (block);
-    }
+    sys->play (sys->opaque, block->p_buffer, block->i_nb_samples,
+               block->i_pts);
+    block_Release (block);
 }
 
 static int VolumeSet (audio_output_t *aout, float vol, bool mute)
