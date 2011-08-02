@@ -23,7 +23,6 @@
 
 --[==========================================================================[
 Configuration options:
- * host: A host to listen on.
  * dir: Directory to use as the http interface's root.
  * no_error_detail: If set, do not print the Lua error message when generating
                     a page fails.
@@ -312,8 +311,7 @@ local function load_dir(dir,root,parent_acl)
     return my_acl
 end
 
-local u = vlc.net.url_parse( config.host or "0.0.0.0:8080" )
-h = vlc.httpd(u.host,u.port)
+h = vlc.httpd()
 local root_acl = load_dir( http_dir )
 local a = h:handler("/art",nil,nil,root_acl,callback_art,nil)
 
