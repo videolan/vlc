@@ -107,7 +107,7 @@ aout_input_t *aout_DecNew( audio_output_t *p_aout,
         goto out;
 
     assert (owner->volume.mixer == NULL);
-    owner->volume.mixer = aout_MixerNew (p_aout, &owner->mixer_format);
+    owner->volume.mixer = aout_MixerNew (p_aout, owner->mixer_format.i_format);
     if (owner->volume.mixer == NULL)
     {
         aout_OutputDelete( p_aout );

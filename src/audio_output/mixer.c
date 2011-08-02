@@ -40,14 +40,13 @@
 /**
  * Creates a software amplifier.
  */
-audio_mixer_t *aout_MixerNew(vlc_object_t *obj,
-                             const audio_sample_format_t *fmt)
+audio_mixer_t *aout_MixerNew(vlc_object_t *obj, vlc_fourcc_t format)
 {
     audio_mixer_t *mixer = vlc_custom_create(obj, sizeof (*mixer), "mixer");
     if (unlikely(mixer == NULL))
         return NULL;
 
-    mixer->fmt = fmt;
+    mixer->format = format;
     mixer->mix = NULL;
     mixer->module = module_need(mixer, "audio mixer", NULL, false);
     if (mixer->module == NULL)

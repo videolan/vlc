@@ -44,7 +44,7 @@ static int Activate (vlc_object_t *obj)
 {
     audio_mixer_t *mixer = (audio_mixer_t *)obj;
 
-    switch (mixer->fmt->i_format)
+    switch (mixer->format)
     {
         case VLC_CODEC_FI32:
             mixer->mix = FilterFI32;

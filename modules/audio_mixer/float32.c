@@ -59,7 +59,7 @@ static int Create( vlc_object_t *p_this )
 {
     audio_mixer_t *p_mixer = (audio_mixer_t *)p_this;
 
-    if ( p_mixer->fmt->i_format != VLC_CODEC_FL32 )
+    if (p_mixer->format != VLC_CODEC_FL32)
         return -1;
 
     p_mixer->mix = DoWork;

@@ -145,7 +145,7 @@ void aout_FiltersDestroyPipeline( filter_t *const *, unsigned );
 void aout_FiltersPlay( filter_t *const *, unsigned, aout_buffer_t ** );
 
 /* From mixer.c : */
-struct audio_mixer *aout_MixerNew(vlc_object_t *, const audio_sample_format_t * );
+struct audio_mixer *aout_MixerNew(vlc_object_t *, vlc_fourcc_t);
 #define aout_MixerNew(o, f) aout_MixerNew(VLC_OBJECT(o), f)
 void aout_MixerDelete(struct audio_mixer *);
 void aout_MixerRun(struct audio_mixer *, block_t *, float);

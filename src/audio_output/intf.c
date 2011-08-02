@@ -271,7 +271,7 @@ static int aout_Restart( audio_output_t * p_aout )
         return -1;
     }
 
-    owner->volume.mixer = aout_MixerNew (p_aout, &owner->mixer_format);
+    owner->volume.mixer = aout_MixerNew (p_aout, owner->mixer_format.i_format);
     if (owner->volume.mixer == NULL)
     {
         aout_OutputDelete( p_aout );

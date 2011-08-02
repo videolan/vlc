@@ -44,7 +44,7 @@ struct audio_mixer
     VLC_COMMON_MEMBERS
 
     module_t *module; /**< Module handle */
-    const audio_sample_format_t *fmt; /**< Audio format */
+    vlc_fourcc_t format; /**< Audio samples format */
     void (*mix)(audio_mixer_t *, block_t *, float); /**< Amplifier */
 };
 
