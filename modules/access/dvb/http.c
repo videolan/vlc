@@ -94,13 +94,12 @@ int HTTPOpen( access_t *p_access )
     sprintf( psz_tmp, ":%d", i_port + 1 );
     config_PutPsz( p_access, "dvb-http-host", psz_tmp );
 
-    msg_Dbg( p_access, "base %s:%d", psz_address, i_port );
+    msg_Dbg( p_access, "base %d", i_port );
 
-    p_sys->p_httpd_host = vlc_http_HostNew( VLC_OBJECT(p_access), psz_address,
-                                            i_port );
+    p_sys->p_httpd_host = vlc_http_HostNew( VLC_OBJECT(p_access), i_port );
     if ( p_sys->p_httpd_host == NULL )
     {
-        msg_Err( p_access, "cannot listen on %s:%d", psz_address, i_port );
+        msg_Err( p_access, "cannot listen on port %d", i_port );
         free( psz_address );
         return VLC_EGENERIC;
     }

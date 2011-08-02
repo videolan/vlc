@@ -117,11 +117,9 @@ rtsp_stream_t *RtspSetup( vlc_object_t *owner, vod_media_t *media,
     if( rtsp->psz_path == NULL )
         goto error;
 
-    msg_Dbg( owner, "RTSP stream: host %s port %d at %s",
-             url->psz_host, rtsp->port, rtsp->psz_path );
+    msg_Dbg( owner, "RTSP stream: port %d at %s", rtsp->port, rtsp->psz_path );
 
-    rtsp->host = vlc_rtsp_HostNew( VLC_OBJECT(owner), url->psz_host,
-                                   rtsp->port );
+    rtsp->host = vlc_rtsp_HostNew( VLC_OBJECT(owner), rtsp->port );
     if( rtsp->host == NULL )
         goto error;
 

@@ -58,13 +58,6 @@
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
-#define HOST_TEXT N_( "RTSP host address" )
-#define HOST_LONGTEXT N_( \
-    "This defines the address, port and path the RTSP VOD server will listen " \
-    "on.\nSyntax is address:port/path. The default is to listen on all "\
-    "interfaces (address 0.0.0.0), on port 554, with no path.\nTo listen " \
-    "only on the local interface, use \"localhost\" as address." )
-
 #define THROTTLE_TEXT N_( "Maximum number of connections" )
 #define THROTTLE_LONGTEXT N_( "This limits the maximum number of clients " \
     "that can connect to the RTSP VOD. 0 means no limit."  )
@@ -86,7 +79,6 @@ vlc_module_begin ()
     set_capability( "vod server", 1 )
     set_callbacks( Open, Close )
     add_shortcut( "rtsp" )
-    add_string ( "rtsp-host", NULL, HOST_TEXT, HOST_LONGTEXT, true )
     add_string( "rtsp-raw-mux", "ts", RAWMUX_TEXT,
                 RAWMUX_TEXT, true )
     add_integer( "rtsp-throttle-users", 0, THROTTLE_TEXT,
@@ -172,7 +164,6 @@ struct vod_sys_t
 {
     /* RTSP server */
     httpd_host_t *p_rtsp_host;
-    char *psz_path;
     int i_port;
     int i_throttle_users;
     int i_connections;
@@ -260,14 +251,6 @@ static int Open( vlc_object_t *p_this )
 {
     vod_t *p_vod = (vod_t *)p_this;
     vod_sys_t *p_sys = NULL;
-    char *psz_url = NULL;
-    vlc_url_t url;
-
-    psz_url = var_InheritString( p_vod, "rtsp-host" );
-    vlc_UrlParse( &url, psz_url, 0 );
-    free( psz_url );
-
-    if( url.i_port <= 0 ) url.i_port = 554;
 
     p_vod->p_sys = p_sys = malloc( sizeof( vod_sys_t ) );
     if( !p_sys ) goto error;
@@ -281,19 +264,14 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->psz_raw_mux = var_CreateGetString( p_this, "rtsp-raw-mux" );
 
-    p_sys->p_rtsp_host =
-        vlc_rtsp_HostNew( VLC_OBJECT(p_vod), url.psz_host, url.i_port );
+    p_sys->p_rtsp_host = vlc_rtsp_HostNew( VLC_OBJECT(p_vod), 554 );
     if( !p_sys->p_rtsp_host )
     {
-        msg_Err( p_vod, "cannot create RTSP server (%s:%i)",
-                 url.psz_host, url.i_port );
+        msg_Err( p_vod, "cannot create RTSP server" );
         goto error;
     }
 
-    p_sys->psz_path = strdup( url.psz_path ? url.psz_path : "/" );
-    p_sys->i_port = url.i_port;
-
-    vlc_UrlClean( &url );
+    p_sys->i_port = 554;
 
     TAB_INIT( p_sys->i_media, p_sys->media );
     p_sys->i_media_id = 0;
@@ -306,7 +284,6 @@ static int Open( vlc_object_t *p_this )
     {
         msg_Err( p_vod, "cannot spawn rtsp vod thread" );
         block_FifoRelease( p_sys->p_fifo_cmd );
-        free( p_sys->psz_path );
         goto error;
     }
 
@@ -319,8 +296,6 @@ error:
         free( p_sys->psz_raw_mux );
         free( p_sys );
     }
-    vlc_UrlClean( &url );
-
     return VLC_EGENERIC;
 }
 
@@ -359,7 +334,6 @@ static void Close( vlc_object_t * p_this )
         msg_Err( p_vod, "rtsp vod leaking %d medias", p_sys->i_media );
     TAB_CLEAN( p_sys->i_media, p_sys->media );
 
-    free( p_sys->psz_path );
     free( p_sys->psz_raw_mux );
     free( p_sys );
 }
@@ -382,16 +356,15 @@ static vod_media_t *MediaNew( vod_t *p_vod, const char *psz_name,
     TAB_INIT( p_media->i_rtsp, p_media->rtsp );
     p_media->b_raw = false;
 
-    if( asprintf( &p_media->psz_rtsp_path, "%s%s",
-                  p_sys->psz_path, psz_name ) <0 )
-        return NULL;
+    p_media->psz_rtsp_path = strdup( psz_name );
     p_media->p_rtsp_url =
-        httpd_UrlNewUnique( p_sys->p_rtsp_host, p_media->psz_rtsp_path, NULL,
-                            NULL, NULL );
+        httpd_UrlNewUnique( p_sys->p_rtsp_host, psz_name, NULL, NULL, NULL );
 
-    if( !p_media->p_rtsp_url )
+    if( !p_media->psz_rtsp_path || !p_media->p_rtsp_url )
     {
-        msg_Err( p_vod, "cannot create RTSP url (%s)", p_media->psz_rtsp_path);
+        msg_Err( p_vod, "cannot create RTSP url (%s)", psz_name );
+        if( p_media->p_rtsp_url )
+            httpd_UrlDelete( p_media->p_rtsp_url );
         free( p_media->psz_rtsp_path );
         free( p_media );
         return NULL;

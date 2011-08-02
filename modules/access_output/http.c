@@ -149,7 +149,7 @@ static int Open( vlc_object_t *p_this )
 
     config_ChainParse( p_access, SOUT_CFG_PREFIX, ppsz_sout_options, p_access->p_cfg );
 
-    /* p_access->psz_path = "hostname:port/filename" */
+    /* p_access->psz_path = ":port/filename" */
     psz_bind_addr = strdup( p_access->psz_path );
 
     i_bind_port = 0;
@@ -163,27 +163,13 @@ static int Open( vlc_object_t *p_this )
     else
         psz_file_name = strdup( "/" );
 
-    if( psz_bind_addr[0] == '[' )
+    psz_parser = strrchr( psz_bind_addr, ':' );
+    if( psz_parser )
     {
-        psz_bind_addr++;
-        psz_parser = strstr( psz_bind_addr, "]:" );
-        if( psz_parser )
-        {
-            *psz_parser = '\0';
-            i_bind_port = atoi( psz_parser + 2 );
-        }
-        psz_parser = psz_bind_addr - 1;
+        *psz_parser = '\0';
+        i_bind_port = atoi( psz_parser + 1 );
     }
-    else
-    {
-        psz_parser = strrchr( psz_bind_addr, ':' );
-        if( psz_parser )
-        {
-            *psz_parser = '\0';
-            i_bind_port = atoi( psz_parser + 1 );
-        }
-        psz_parser = psz_bind_addr;
-    }
+    psz_parser = psz_bind_addr;
 
     /* TLS support */
     if( p_access->psz_access && !strcmp( p_access->psz_access, "https" ) )
@@ -191,14 +177,14 @@ static int Open( vlc_object_t *p_this )
         if( i_bind_port <= 0 )
             i_bind_port = DEFAULT_SSL_PORT;
         p_sys->p_httpd_host = vlc_https_HostNew( VLC_OBJECT(p_access),
-                                                 psz_bind_addr, i_bind_port );
+                                                 i_bind_port );
     }
     else
     {
         if( i_bind_port <= 0 )
             i_bind_port = DEFAULT_PORT;
         p_sys->p_httpd_host = vlc_http_HostNew( VLC_OBJECT(p_access),
-                                                psz_bind_addr, i_bind_port );
+                                                i_bind_port );
     }
 
     if( p_sys->p_httpd_host == NULL )

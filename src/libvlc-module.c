@@ -889,6 +889,13 @@ static const char *const ppsz_clock_descriptions[] =
 #define TIMEOUT_LONGTEXT N_( \
     "Default TCP connection timeout (in milliseconds). " )
 
+#define HTTP_HOST_TEXT N_( "HTTP server address" )
+#define RTSP_HOST_TEXT N_( "RTSP server address" )
+#define HOST_LONGTEXT N_( \
+    "By default, the server will listen on any local IP address. " \
+    "Specify an IP address (e.g. ::1 or 127.0.0.1) or a host name " \
+    "(e.g. localhost) to restrict them to a specific network interface." )
+
 #define HTTP_CERT_TEXT N_("HTTP/TLS server certificate")
 #define CERT_LONGTEXT N_( \
    "This X.509 certicate file (PEM format) is used for server-side TLS." )
@@ -1899,6 +1906,8 @@ vlc_module_begin ()
     add_integer( "ipv4-timeout", 5 * 1000, TIMEOUT_TEXT,
                  TIMEOUT_LONGTEXT, true )
 
+    add_string( "http-host", NULL, HTTP_HOST_TEXT, HOST_LONGTEXT, true )
+    add_string( "rtsp-host", NULL, RTSP_HOST_TEXT, HOST_LONGTEXT, true )
     add_loadfile( "http-cert", NULL, HTTP_CERT_TEXT, CERT_LONGTEXT, true )
         add_deprecated_alias( "sout-http-cert" ) /* since 1.2.0 */
     add_loadfile( "http-key", NULL, HTTP_KEY_TEXT, KEY_LONGTEXT, true )

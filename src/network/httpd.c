@@ -88,7 +88,6 @@ struct httpd_host_t
     unsigned    i_ref;
 
     /* address/port and socket for listening at connections */
-    char        *psz_hostname;
     int         i_port;
     int         *fds;
     unsigned     nfd;
@@ -968,13 +967,12 @@ static httpd_host_t *httpd_HostCreate( vlc_object_t *, const char *, int,
                                        vlc_tls_creds_t * );
 
 /* create a new host */
-httpd_host_t *vlc_http_HostNew( vlc_object_t *p_this, const char *psz_host,
-                                int i_port )
+httpd_host_t *vlc_http_HostNew( vlc_object_t *p_this, int i_port )
 {
-    return httpd_HostCreate( p_this, psz_host, i_port, NULL );
+    return httpd_HostCreate( p_this, "http-host", i_port, NULL );
 }
 
-httpd_host_t *vlc_https_HostNew( vlc_object_t *obj, const char *host, int port )
+httpd_host_t *vlc_https_HostNew( vlc_object_t *obj, int port )
 {
     char *cert = var_InheritString( obj, "http-cert" );
     if( cert == NULL )
@@ -1021,36 +1019,27 @@ httpd_host_t *vlc_https_HostNew( vlc_object_t *obj, const char *host, int port )
         free( crl );
     }
 
-    return httpd_HostCreate( obj, host, port, tls );
+    return httpd_HostCreate( obj, "http-host", port, tls );
 
 error:
     vlc_tls_ServerDelete( tls );
     return NULL;
 }
 
-httpd_host_t *vlc_rtsp_HostNew( vlc_object_t *p_this, const char *psz_host,
-                                int i_port )
+httpd_host_t *vlc_rtsp_HostNew( vlc_object_t *p_this, int i_port )
 {
-    return httpd_HostCreate( p_this, psz_host, i_port, NULL );
+    return httpd_HostCreate( p_this, "rtsp-host", i_port, NULL );
 }
 
 static vlc_mutex_t httpd_mutex = VLC_STATIC_MUTEX;
 
 static httpd_host_t *httpd_HostCreate( vlc_object_t *p_this,
-                                       const char *psz_hostname, int i_port,
+                                       const char *hostvar, int i_port,
                                        vlc_tls_creds_t *p_tls )
 {
     httpd_t      *httpd;
     httpd_host_t *host;
-    char *psz_host;
     int i;
-
-    if( psz_hostname == NULL )
-        psz_hostname = "";
-
-    psz_host = strdup( psz_hostname );
-    if( psz_host == NULL )
-        return NULL;
 
     /* to be sure to avoid multiple creation */
     vlc_mutex_lock( &httpd_mutex );
@@ -1064,7 +1053,6 @@ static httpd_host_t *httpd_HostCreate( vlc_object_t *p_this,
         if( httpd == NULL )
         {
             vlc_mutex_unlock( &httpd_mutex );
-            free( psz_host );
             return NULL;
         }
 
@@ -1081,8 +1069,7 @@ static httpd_host_t *httpd_HostCreate( vlc_object_t *p_this,
 
         /* cannot mix TLS and non-TLS hosts */
         if( ( ( httpd->host[i]->p_tls != NULL ) != ( p_tls != NULL ) )
-         || ( host->i_port != i_port )
-         || strcmp( host->psz_hostname, psz_hostname ) )
+         || ( host->i_port != i_port ) )
             continue;
 
         /* Increase existing matching host reference count.
@@ -1112,7 +1099,9 @@ static httpd_host_t *httpd_HostCreate( vlc_object_t *p_this,
     vlc_cond_init( &host->wait );
     host->i_ref = 1;
 
-    host->fds = net_ListenTCP( p_this, psz_host, i_port );
+    char *hostname = var_InheritString( p_this->p_libvlc, hostvar );
+    host->fds = net_ListenTCP( p_this, hostname, i_port );
+    free( hostname );
     if( host->fds == NULL )
     {
         msg_Err( p_this, "cannot create socket(s) for HTTP host" );
@@ -1127,8 +1116,6 @@ static httpd_host_t *httpd_HostCreate( vlc_object_t *p_this,
     }
 
     host->i_port = i_port;
-    host->psz_hostname = psz_host;
-
     host->i_url     = 0;
     host->url       = NULL;
     host->i_client  = 0;
@@ -1151,7 +1138,6 @@ static httpd_host_t *httpd_HostCreate( vlc_object_t *p_this,
     return host;
 
 error:
-    free( psz_host );
     if( httpd->i_host <= 0 )
     {
         libvlc_priv (httpd->p_libvlc)->p_httpd = NULL;
@@ -1223,8 +1209,6 @@ void httpd_HostDelete( httpd_host_t *host )
         vlc_tls_ServerDelete( host->p_tls );
 
     net_ListenClose( host->fds );
-    free( host->psz_hostname );
-
     vlc_cond_destroy( &host->wait );
     vlc_mutex_destroy( &host->lock );
     vlc_object_release( host );
