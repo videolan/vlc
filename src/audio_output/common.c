@@ -49,40 +49,40 @@ static void aout_Destructor( vlc_object_t * p_this );
  *****************************************************************************/
 audio_output_t *aout_New( vlc_object_t * p_parent )
 {
-    audio_output_t * p_aout;
-
-    /* Allocate descriptor. */
-    p_aout = vlc_custom_create( p_parent, sizeof( *p_aout ), "audio output" );
-    if( p_aout == NULL )
-    {
+    audio_output_t *aout = vlc_custom_create (p_parent,
+                                              sizeof (aout_instance_t),
+                                              "audio output");
+    if (unlikely(aout == NULL))
         return NULL;
-    }
 
-    /* Initialize members. */
-    vlc_mutex_init( &p_aout->volume_lock );
-    vlc_mutex_init( &p_aout->lock );
-    p_aout->p_input = NULL;
-    p_aout->mixer_multiplier = 1.0;
-    p_aout->mixer = NULL;
-    p_aout->b_starving = true;
-    p_aout->module = NULL;
-    aout_VolumeNoneInit( p_aout );
+    aout_owner_t *owner = aout_owner (aout);
 
-    var_Create( p_aout, "intf-change", VLC_VAR_VOID );
+    owner->module = NULL;
+    owner->input = NULL;
+    vlc_mutex_init (&owner->volume.lock);
+    owner->volume.multiplier = 1.0;
+    owner->volume.mixer = NULL;
+    owner->b_starving = true;
 
-    vlc_object_set_destructor( p_aout, aout_Destructor );
+    vlc_mutex_init (&aout->lock);
 
-    return p_aout;
+    aout_VolumeNoneInit (aout);
+    vlc_object_set_destructor (aout, aout_Destructor);
+    var_Create (aout, "intf-change", VLC_VAR_VOID);
+
+    return aout;
 }
 
 /*****************************************************************************
  * aout_Destructor: destroy aout structure
  *****************************************************************************/
-static void aout_Destructor( vlc_object_t * p_this )
+static void aout_Destructor (vlc_object_t *obj)
 {
-    audio_output_t * p_aout = (audio_output_t *)p_this;
-    vlc_mutex_destroy( &p_aout->volume_lock );
-    vlc_mutex_destroy( &p_aout->lock );
+    audio_output_t *aout = (audio_output_t *)obj;
+    aout_owner_t *owner = aout_owner (aout);
+
+    vlc_mutex_destroy (&owner->volume.lock);
+    vlc_mutex_destroy (&aout->lock);
 }
 
 #ifdef AOUT_DEBUG

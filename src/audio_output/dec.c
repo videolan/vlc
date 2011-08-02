@@ -93,9 +93,10 @@ aout_input_t *aout_DecNew( audio_output_t *p_aout,
 
     /* We can only be called by the decoder, so no need to lock
      * p_input->lock. */
+    aout_owner_t *owner = aout_owner(p_aout);
     aout_lock( p_aout );
-    assert( p_aout->p_input == NULL );
-    p_aout->p_input = p_input;
+    assert (owner->input == NULL);
+    owner->input = p_input;
 
     var_Destroy( p_aout, "audio-device" );
     var_Destroy( p_aout, "audio-channels" );
@@ -105,9 +106,9 @@ aout_input_t *aout_DecNew( audio_output_t *p_aout,
 #warning Input without output and mixer = bad idea.
         goto out;
 
-    assert( p_aout->mixer == NULL );
-    p_aout->mixer = aout_MixerNew( p_aout, &p_aout->mixer_format );
-    if( p_aout->mixer == NULL )
+    assert (owner->volume.mixer == NULL);
+    owner->volume.mixer = aout_MixerNew (p_aout, &owner->mixer_format);
+    if (owner->volume.mixer == NULL)
     {
         aout_OutputDelete( p_aout );
 #warning Memory leak.
@@ -126,19 +127,24 @@ out:
  *****************************************************************************/
 void aout_DecDelete( audio_output_t * p_aout, aout_input_t * p_input )
 {
+    aout_owner_t *owner = aout_owner (p_aout);
+    struct audio_mixer *mixer;
+
     aout_lock( p_aout );
     /* Remove the input. */
-    assert( p_input == p_aout->p_input ); /* buggy decoder? */
-    p_aout->p_input = NULL;
+    assert (owner->input == p_input); /* buggy decoder? */
+    owner->input = NULL;
     aout_InputDelete( p_aout, p_input );
 
     aout_OutputDelete( p_aout );
-    aout_MixerDelete( p_aout->mixer );
-    p_aout->mixer = NULL;
+    mixer = owner->volume.mixer;
+    owner->volume.mixer = NULL;
     var_Destroy( p_aout, "audio-device" );
     var_Destroy( p_aout, "audio-channels" );
 
     aout_unlock( p_aout );
+
+    aout_MixerDelete (mixer);
     free( p_input );
 }
 
@@ -180,6 +186,7 @@ void aout_DecDeleteBuffer( audio_output_t * p_aout, aout_input_t * p_input,
 int aout_DecPlay( audio_output_t * p_aout, aout_input_t * p_input,
                   aout_buffer_t * p_buffer, int i_input_rate )
 {
+    aout_owner_t *owner = aout_owner (p_aout);
     assert( i_input_rate >= INPUT_RATE_DEFAULT / AOUT_MAX_INPUT_RATE &&
             i_input_rate <= INPUT_RATE_DEFAULT * AOUT_MAX_INPUT_RATE );
     assert( p_buffer->i_pts > 0 );
@@ -202,8 +209,8 @@ int aout_DecPlay( audio_output_t * p_aout, aout_input_t * p_input,
     if( p_buffer != NULL )
     {
         /* Mixer */
-        float amp = p_aout->mixer_multiplier * p_input->multiplier;
-        aout_MixerRun( p_aout->mixer, p_buffer, amp );
+        float amp = owner->volume.multiplier * p_input->multiplier;
+        aout_MixerRun (owner->volume.mixer, p_buffer, amp);
 
         /* Output */
         aout_OutputPlay( p_aout, p_buffer );
@@ -227,8 +234,10 @@ int aout_DecGetResetLost( audio_output_t *p_aout, aout_input_t *p_input )
 
 void aout_DecChangePause( audio_output_t *p_aout, aout_input_t *p_input, bool b_paused, mtime_t i_date )
 {
+    aout_owner_t *owner = aout_owner (p_aout);
+
     aout_lock( p_aout );
-    assert( p_aout->p_input == p_input );
+    assert (owner->input == p_input);
 
     aout_OutputPause( p_aout, b_paused, i_date );
 

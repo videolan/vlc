@@ -91,7 +91,41 @@ struct aout_input_t
 
     /* */
     aout_fifo_t       fifo;
- };
+};
+
+typedef struct
+{
+    module_t *module; /**< Output plugin (or NULL if inactive) */
+    aout_input_t *input;
+
+    struct
+    {
+        vlc_mutex_t lock;
+        float multiplier; /**< Software volume amplification multiplier */
+        struct audio_mixer *mixer; /**< Software volume plugin */
+    } volume; /**< Volume and gain management (FIXME: input manager?) */
+
+    audio_sample_format_t mixer_format;
+
+    /* Filters between mixer and output */
+    filter_t *filters[AOUT_MAX_FILTERS];
+    int       nb_filters;
+
+    /* Indicates whether the audio output is currently starving, to avoid
+     * printing a 1,000 "output is starving" messages. */
+    bool b_starving;
+} aout_owner_t;
+
+typedef struct
+{
+    audio_output_t output;
+    aout_owner_t   owner;
+} aout_instance_t;
+
+static inline aout_owner_t *aout_owner (audio_output_t *aout)
+{
+    return &((aout_instance_t *)aout)->owner;
+}
 
 /****************************************************************************
  * Prototypes
@@ -189,13 +223,13 @@ static inline void aout_unlock( audio_output_t *p_aout )
 static inline void aout_lock_volume( audio_output_t *p_aout )
 {
     aout_lock_check( VOLUME_LOCK );
-    vlc_mutex_lock( &p_aout->volume_lock );
+    vlc_mutex_lock( &aout_owner(p_aout)->volume.lock );
 }
 
 static inline void aout_unlock_volume( audio_output_t *p_aout )
 {
     aout_unlock_check( VOLUME_LOCK );
-    vlc_mutex_unlock( &p_aout->volume_lock );
+    vlc_mutex_unlock( &aout_owner(p_aout)->volume.lock );
 }
 
 /* Helpers */
@@ -206,8 +240,8 @@ static inline void aout_unlock_volume( audio_output_t *p_aout )
 static inline void AoutInputsMarkToRestart( audio_output_t *p_aout )
 {
     aout_lock( p_aout );
-    if( p_aout->p_input != NULL )
-        p_aout->p_input->b_restart = true;
+    if( aout_owner(p_aout)->input != NULL )
+        aout_owner(p_aout)->input->b_restart = true;
     aout_unlock( p_aout );
 }
 

@@ -70,6 +70,7 @@ static vout_thread_t *RequestVout( void *,
  *****************************************************************************/
 int aout_InputNew( audio_output_t * p_aout, aout_input_t * p_input, const aout_request_vout_t *p_request_vout )
 {
+    aout_owner_t *owner = aout_owner (p_aout);
     audio_sample_format_t chain_input_format;
     audio_sample_format_t chain_output_format;
     vlc_value_t val, text;
@@ -81,7 +82,7 @@ int aout_InputNew( audio_output_t * p_aout, aout_input_t * p_input, const aout_r
     p_input->i_nb_resamplers = p_input->i_nb_filters = 0;
 
     /* Prepare FIFO. */
-    aout_FifoInit( p_aout, &p_input->fifo, p_aout->mixer_format.i_rate );
+    aout_FifoInit (p_aout, &p_input->fifo, owner->mixer_format.i_rate);
 
     /* */
     if( p_request_vout )
@@ -96,7 +97,7 @@ int aout_InputNew( audio_output_t * p_aout, aout_input_t * p_input, const aout_r
 
     /* Prepare format structure */
     chain_input_format  = p_input->input;
-    chain_output_format = p_aout->mixer_format;
+    chain_output_format = owner->mixer_format;
     chain_output_format.i_rate = p_input->input.i_rate;
     aout_FormatPrepare( &chain_output_format );
 
@@ -384,20 +385,20 @@ int aout_InputNew( audio_output_t * p_aout, aout_input_t * p_input, const aout_r
     }
 
     /* Create resamplers. */
-    if ( !AOUT_FMT_NON_LINEAR( &p_aout->mixer_format ) )
+    if (!AOUT_FMT_NON_LINEAR(&owner->mixer_format))
     {
         chain_output_format.i_rate = (__MAX(p_input->input.i_rate,
-                                            p_aout->mixer_format.i_rate)
+                                            owner->mixer_format.i_rate)
                                  * (100 + AOUT_MAX_RESAMPLING)) / 100;
-        if ( chain_output_format.i_rate == p_aout->mixer_format.i_rate )
+        if ( chain_output_format.i_rate == owner->mixer_format.i_rate )
         {
             /* Just in case... */
             chain_output_format.i_rate++;
         }
-        if ( aout_FiltersCreatePipeline( p_aout, p_input->pp_resamplers,
-                                         &p_input->i_nb_resamplers,
-                                         &chain_output_format,
-                                         &p_aout->mixer_format ) < 0 )
+        if (aout_FiltersCreatePipeline (p_aout, p_input->pp_resamplers,
+                                        &p_input->i_nb_resamplers,
+                                        &chain_output_format,
+                                        &owner->mixer_format) < 0)
         {
             inputFailure( p_aout, p_input, "couldn't set a resampler pipeline");
             return -1;
@@ -458,6 +459,7 @@ int aout_InputDelete( audio_output_t * p_aout, aout_input_t * p_input )
  *****************************************************************************/
 void aout_InputCheckAndRestart( audio_output_t * p_aout, aout_input_t * p_input )
 {
+    aout_owner_t *owner = aout_owner (p_aout);
     AOUT_ASSERT_LOCKED;
 
     if( !p_input->b_restart )
@@ -468,7 +470,7 @@ void aout_InputCheckAndRestart( audio_output_t * p_aout, aout_input_t * p_input 
     aout_fifo_t fifo = p_input->fifo;
     mtime_t i_pause_date = p_input->i_pause_date;
 
-    aout_FifoInit( p_aout, &p_input->fifo, p_aout->mixer_format.i_rate );
+    aout_FifoInit (p_aout, &p_input->fifo, owner->mixer_format.i_rate);
 
     aout_InputDelete( p_aout, p_input );
 
@@ -856,12 +858,13 @@ static int ReplayGainCallback( vlc_object_t *p_this, char const *psz_cmd,
 {
     VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval);
     VLC_UNUSED(newval); VLC_UNUSED(p_data);
-    audio_output_t *p_aout = (audio_output_t *)p_this;
+    audio_output_t *aout = (audio_output_t *)p_this;
+    aout_owner_t *owner = aout_owner (aout);
 
-    aout_lock( p_aout );
-    if( p_aout->p_input != NULL )
-        ReplayGainSelect( p_aout, p_aout->p_input );
-    aout_unlock( p_aout );
+    aout_lock (aout);
+    if (owner->input != NULL)
+        ReplayGainSelect (aout, owner->input);
+    aout_unlock (aout);
 
     return VLC_SUCCESS;
 }

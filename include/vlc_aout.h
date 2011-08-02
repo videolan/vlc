@@ -164,8 +164,6 @@ struct aout_fifo_t
 /* FIXME to remove once aout.h is cleaned a bit more */
 #include <vlc_block.h>
 
-struct aout_mixer_t;
-
 typedef int (*aout_volume_cb) (audio_output_t *, float, bool);
 
 /** Audio output object */
@@ -173,32 +171,13 @@ struct audio_output
 {
     VLC_COMMON_MEMBERS
 
-    /* Lock for volume variables (FIXME: should be in input manager) */
-    vlc_mutex_t             volume_lock;
     vlc_mutex_t             lock;
-
-    /* Input streams & pre-filters */
-    aout_input_t *          p_input;
-
-    /* Mixer */
-    audio_sample_format_t   mixer_format;
-    float                   mixer_multiplier;
-    struct audio_mixer     *mixer;
 
     audio_sample_format_t format; /**< Output format (plugin can modify it
         only when succesfully probed and not afterward) */
 
-    /* Indicates whether the audio output is currently starving, to avoid
-     * printing a 1,000 "output is starving" messages. */
-    bool              b_starving;
-
-    /* post-filters */
-    filter_t *              pp_filters[AOUT_MAX_FILTERS];
-    int                     i_nb_filters;
-
     aout_fifo_t             fifo;
 
-    struct module_t *module; /**< Output plugin */
     struct aout_sys_t *sys; /**< Output plugin private data */
     void (*pf_play)( audio_output_t * ); /**< Audio buffer callback */
     void (* pf_pause)( audio_output_t *, bool, mtime_t ); /**< Pause/resume

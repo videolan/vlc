@@ -86,11 +86,12 @@ static int commitVolume (vlc_object_t *obj, audio_output_t *aout,
 
     if (aout != NULL)
     {
+        aout_owner_t *owner = aout_owner (aout);
         float vol = volume / (float)AOUT_VOLUME_DEFAULT;
 
         aout_lock (aout);
 #warning FIXME: wrong test. Need to check that aout_output is ready.
-        if (aout->mixer != NULL)
+        if (owner->volume.mixer != NULL)
             ret = aout->pf_volume_set (aout, vol, mute);
         aout_unlock (aout);
 
@@ -244,9 +245,10 @@ int aout_SetMute (vlc_object_t *obj, audio_volume_t *volp, bool mute)
 static int aout_Restart( audio_output_t * p_aout )
 {
     aout_input_t *p_input;
+    aout_owner_t *owner = aout_owner (p_aout);
 
     aout_lock( p_aout );
-    p_input = p_aout->p_input;
+    p_input = owner->input;
     if( p_input == NULL )
     {
         aout_unlock( p_aout );
@@ -256,8 +258,8 @@ static int aout_Restart( audio_output_t * p_aout )
 
     /* Reinitializes the output */
     aout_InputDelete( p_aout, p_input );
-    aout_MixerDelete( p_aout->mixer );
-    p_aout->mixer = NULL;
+    aout_MixerDelete (owner->volume.mixer);
+    owner->volume.mixer = NULL;
     aout_OutputDelete( p_aout );
 
     /* FIXME: This function is notoriously dangerous/unsafe.
@@ -269,8 +271,8 @@ static int aout_Restart( audio_output_t * p_aout )
         return -1;
     }
 
-    p_aout->mixer = aout_MixerNew( p_aout, &p_aout->mixer_format );
-    if( p_aout->mixer == NULL )
+    owner->volume.mixer = aout_MixerNew (p_aout, &owner->mixer_format);
+    if (owner->volume.mixer == NULL)
     {
         aout_OutputDelete( p_aout );
         aout_unlock( p_aout );
