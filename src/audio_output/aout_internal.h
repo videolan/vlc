@@ -33,8 +33,6 @@ enum {
     AOUT_RESAMPLING_DOWN
 };
 
-# include <vlc_aout_mixer.h>
-
 typedef struct
 {
     struct vout_thread_t  *(*pf_request_vout)( void *, struct vout_thread_t *,
@@ -113,10 +111,10 @@ void aout_FiltersDestroyPipeline( filter_t *const *, unsigned );
 void aout_FiltersPlay( filter_t *const *, unsigned, aout_buffer_t ** );
 
 /* From mixer.c : */
-audio_mixer_t *aout_MixerNew(vlc_object_t *, const audio_sample_format_t * );
+struct audio_mixer *aout_MixerNew(vlc_object_t *, const audio_sample_format_t * );
 #define aout_MixerNew(o, f) aout_MixerNew(VLC_OBJECT(o), f)
-void aout_MixerDelete(audio_mixer_t *);
-void aout_MixerRun(audio_mixer_t *, block_t *, float);
+void aout_MixerDelete(struct audio_mixer *);
+void aout_MixerRun(struct audio_mixer *, block_t *, float);
 
 /* From output.c : */
 int aout_OutputNew( audio_output_t * p_aout,
