@@ -159,7 +159,9 @@ httpd_FileNew
 httpd_HandlerDelete
 httpd_HandlerNew
 httpd_HostDelete
-httpd_HostNew
+vlc_http_HostNew
+vlc_https_HostNew
+vlc_rtsp_HostNew
 httpd_MsgAdd
 httpd_MsgGet
 httpd_RedirectDelete
@@ -169,7 +171,6 @@ httpd_StreamDelete
 httpd_StreamHeader
 httpd_StreamNew
 httpd_StreamSend
-httpd_TLSHostNew
 httpd_UrlCatch
 httpd_UrlDelete
 httpd_UrlNew

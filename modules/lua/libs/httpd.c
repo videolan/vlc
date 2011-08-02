@@ -70,7 +70,7 @@ static int vlclua_httpd_tls_host_new( lua_State *L )
     vlc_object_t *p_this = vlclua_get_this( L );
     const char *psz_host = luaL_checkstring( L, 1 );
     int i_port = luaL_checkint( L, 2 );
-    httpd_host_t *p_host = httpd_HostNew( p_this, psz_host, i_port );
+    httpd_host_t *p_host = vlc_http_HostNew( p_this, psz_host, i_port );
     if( !p_host )
         return luaL_error( L, "Failed to create HTTP host \"%s:%d\" ",
                            psz_host, i_port );

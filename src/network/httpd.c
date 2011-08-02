@@ -968,13 +968,13 @@ static httpd_host_t *httpd_HostCreate( vlc_object_t *, const char *, int,
                                        vlc_tls_creds_t * );
 
 /* create a new host */
-httpd_host_t *httpd_HostNew( vlc_object_t *p_this, const char *psz_host,
-                             int i_port )
+httpd_host_t *vlc_http_HostNew( vlc_object_t *p_this, const char *psz_host,
+                                int i_port )
 {
     return httpd_HostCreate( p_this, psz_host, i_port, NULL );
 }
 
-httpd_host_t *httpd_TLSHostNew( vlc_object_t *obj, const char *host, int port )
+httpd_host_t *vlc_https_HostNew( vlc_object_t *obj, const char *host, int port )
 {
     char *cert = var_InheritString( obj, "http-cert" );
     if( cert == NULL )
@@ -1026,6 +1026,12 @@ httpd_host_t *httpd_TLSHostNew( vlc_object_t *obj, const char *host, int port )
 error:
     vlc_tls_ServerDelete( tls );
     return NULL;
+}
+
+httpd_host_t *vlc_rtsp_HostNew( vlc_object_t *p_this, const char *psz_host,
+                                int i_port )
+{
+    return httpd_HostCreate( p_this, psz_host, i_port, NULL );
 }
 
 static vlc_mutex_t httpd_mutex = VLC_STATIC_MUTEX;

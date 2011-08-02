@@ -282,7 +282,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->psz_raw_mux = var_CreateGetString( p_this, "rtsp-raw-mux" );
 
     p_sys->p_rtsp_host =
-        httpd_HostNew( VLC_OBJECT(p_vod), url.psz_host, url.i_port );
+        vlc_rtsp_HostNew( VLC_OBJECT(p_vod), url.psz_host, url.i_port );
     if( !p_sys->p_rtsp_host )
     {
         msg_Err( p_vod, "cannot create RTSP server (%s:%i)",

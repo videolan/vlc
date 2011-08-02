@@ -1320,7 +1320,7 @@ static int HttpSetup( sout_stream_t *p_stream, const vlc_url_t *url)
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
 
-    p_sys->p_httpd_host = httpd_HostNew( VLC_OBJECT(p_stream), url->psz_host,
+    p_sys->p_httpd_host = vlc_http_HostNew( VLC_OBJECT(p_stream), url->psz_host,
                                          url->i_port > 0 ? url->i_port : 80 );
     if( p_sys->p_httpd_host )
     {

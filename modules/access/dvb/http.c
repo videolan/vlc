@@ -96,8 +96,8 @@ int HTTPOpen( access_t *p_access )
 
     msg_Dbg( p_access, "base %s:%d", psz_address, i_port );
 
-    p_sys->p_httpd_host = httpd_HostNew( VLC_OBJECT(p_access), psz_address,
-                                         i_port );
+    p_sys->p_httpd_host = vlc_http_HostNew( VLC_OBJECT(p_access), psz_address,
+                                            i_port );
     if ( p_sys->p_httpd_host == NULL )
     {
         msg_Err( p_access, "cannot listen on %s:%d", psz_address, i_port );

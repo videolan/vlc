@@ -190,15 +190,15 @@ static int Open( vlc_object_t *p_this )
     {
         if( i_bind_port <= 0 )
             i_bind_port = DEFAULT_SSL_PORT;
-        p_sys->p_httpd_host = httpd_TLSHostNew( VLC_OBJECT(p_access),
-                                                psz_bind_addr, i_bind_port );
+        p_sys->p_httpd_host = vlc_https_HostNew( VLC_OBJECT(p_access),
+                                                 psz_bind_addr, i_bind_port );
     }
     else
     {
         if( i_bind_port <= 0 )
             i_bind_port = DEFAULT_PORT;
-        p_sys->p_httpd_host = httpd_HostNew( VLC_OBJECT(p_access),
-                                             psz_bind_addr, i_bind_port );
+        p_sys->p_httpd_host = vlc_http_HostNew( VLC_OBJECT(p_access),
+                                                psz_bind_addr, i_bind_port );
     }
 
     if( p_sys->p_httpd_host == NULL )
