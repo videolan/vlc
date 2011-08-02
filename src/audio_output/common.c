@@ -62,7 +62,6 @@ audio_output_t *aout_New( vlc_object_t * p_parent )
     vlc_mutex_init (&owner->volume.lock);
     owner->volume.multiplier = 1.0;
     owner->volume.mixer = NULL;
-    owner->b_starving = true;
 
     vlc_mutex_init (&aout->lock);
 

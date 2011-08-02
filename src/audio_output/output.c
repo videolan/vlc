@@ -159,10 +159,13 @@ int aout_OutputNew( audio_output_t *p_aout,
     var_TriggerCallback( p_aout, "intf-change" );
 
     aout_FormatPrepare( &p_aout->format );
+    aout_FormatPrint( p_aout, "output", &p_aout->format );
 
     /* Prepare FIFO. */
-    aout_FifoInit( p_aout, &p_aout->fifo, p_aout->format.i_rate );
-    aout_FormatPrint( p_aout, "output", &p_aout->format );
+    aout_FifoInit (p_aout, &p_aout->fifo, p_aout->format.i_rate);
+    aout_FifoInit (p_aout, &owner->partial, p_aout->format.i_rate);
+    owner->pause_date = VLC_TS_INVALID;
+    owner->b_starving = true;
 
     /* Choose the mixer format. */
     owner->mixer_format = p_aout->format;
@@ -218,7 +221,8 @@ void aout_OutputDelete( audio_output_t * p_aout )
     aout_VolumeNoneInit( p_aout ); /* clear volume callback */
     owner->module = NULL;
     aout_FiltersDestroyPipeline (owner->filters, owner->nb_filters);
-    aout_FifoDestroy( &p_aout->fifo );
+    aout_FifoDestroy (&p_aout->fifo);
+    aout_FifoDestroy (&owner->partial);
 }
 
 static block_t *aout_OutputSlice( audio_output_t *, aout_fifo_t * );
@@ -243,11 +247,9 @@ void aout_OutputPlay( audio_output_t * p_aout, aout_buffer_t * p_buffer )
         return;
     }
 
-    aout_fifo_t *fifo = &owner->input->fifo;
-    /* XXX: cleanup */
-    aout_FifoPush( fifo, p_buffer );
+    aout_FifoPush (&owner->partial, p_buffer );
 
-    while( (p_buffer = aout_OutputSlice( p_aout, fifo ) ) != NULL )
+    while ((p_buffer = aout_OutputSlice (p_aout, &owner->partial)) != NULL)
     {
         aout_FifoPush( &p_aout->fifo, p_buffer );
         p_aout->pf_play( p_aout );
@@ -261,17 +263,24 @@ void aout_OutputPlay( audio_output_t * p_aout, aout_buffer_t * p_buffer )
  */
 void aout_OutputPause( audio_output_t *aout, bool pause, mtime_t date )
 {
-    aout_owner_t *owner = aout_owner (aout);
-
     vlc_assert_locked( &aout->lock );
-
     if( aout->pf_pause != NULL )
         aout->pf_pause( aout, pause, date );
-    if( !pause )
+
+    aout_owner_t *owner = aout_owner (aout);
+    if (pause)
     {
-        mtime_t duration = date - owner->input->i_pause_date;
-        /* XXX: ^ onk onk! gruik! ^ */
-        aout_FifoMoveDates( &aout->fifo, duration );
+        owner->pause_date = date;
+    }
+    else
+    {
+        assert (owner->pause_date != VLC_TS_INVALID);
+
+        mtime_t duration = date - owner->pause_date;
+
+        owner->pause_date = VLC_TS_INVALID;
+        aout_FifoMoveDates (&owner->partial, duration);
+        aout_FifoMoveDates (&aout->fifo, duration);
     }
 }
 
@@ -287,7 +296,10 @@ void aout_OutputFlush( audio_output_t *aout, bool wait )
 
     if( aout->pf_flush != NULL )
         aout->pf_flush( aout, wait );
-    aout_FifoReset( &aout->fifo );
+
+    aout_owner_t *owner = aout_owner (aout);
+    aout_FifoReset (&aout->fifo);
+    aout_FifoReset (&owner->partial);
 }
 
 
@@ -609,8 +621,8 @@ aout_buffer_t * aout_OutputNextBuffer( audio_output_t * p_aout,
         msg_Warn( p_aout, "output date isn't PTS date, requesting "
                   "resampling (%"PRId64")", delta );
 
-        aout_FifoMoveDates (&owner->input->fifo, delta);
-        aout_FifoMoveDates( p_fifo, delta );
+        aout_FifoMoveDates (&owner->partial, delta);
+        aout_FifoMoveDates (p_fifo, delta);
     }
 out:
     aout_unlock( p_aout );

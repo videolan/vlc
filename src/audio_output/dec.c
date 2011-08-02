@@ -82,7 +82,6 @@ aout_input_t *aout_DecNew( audio_output_t *p_aout,
         return NULL;
 
     p_input->b_error = true;
-    p_input->i_pause_date = VLC_TS_INVALID;
 
     aout_FormatPrepare( p_format );
 
@@ -239,27 +238,16 @@ void aout_DecChangePause( audio_output_t *p_aout, aout_input_t *p_input, bool b_
     aout_lock( p_aout );
     assert (owner->input == p_input);
 
+    /* XXX: Should the input date be offset by the pause duration instead? */
+    date_Set (&p_input->date, VLC_TS_INVALID);
     aout_OutputPause( p_aout, b_paused, i_date );
-
-    if( b_paused )
-    {
-        p_input->i_pause_date = i_date;
-    }
-    else
-    {
-        assert( p_input->i_pause_date != VLC_TS_INVALID );
-
-        mtime_t i_duration = i_date - p_input->i_pause_date;
-        p_input->i_pause_date = VLC_TS_INVALID;
-        aout_FifoMoveDates( &p_input->fifo, i_duration );
-    }
     aout_unlock( p_aout );
 }
 
 void aout_DecFlush( audio_output_t *p_aout, aout_input_t *p_input )
 {
     aout_lock( p_aout );
-    aout_FifoReset( &p_input->fifo );
+    date_Set (&p_input->date, VLC_TS_INVALID);
     aout_OutputFlush( p_aout, false );
     aout_unlock( p_aout );
 }
@@ -269,7 +257,8 @@ bool aout_DecIsEmpty( audio_output_t * p_aout, aout_input_t * p_input )
     mtime_t end_date;
 
     aout_lock( p_aout );
-    end_date = aout_FifoNextStart( &p_input->fifo );
+    /* FIXME: tell output to drain */
+    end_date = date_Get (&p_input->date);
     aout_unlock( p_aout );
     return end_date == VLC_TS_INVALID || end_date <= mdate();
 }

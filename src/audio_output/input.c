@@ -81,8 +81,8 @@ int aout_InputNew( audio_output_t * p_aout, aout_input_t * p_input, const aout_r
 
     p_input->i_nb_resamplers = p_input->i_nb_filters = 0;
 
-    /* Prepare FIFO. */
-    aout_FifoInit (p_aout, &p_input->fifo, owner->mixer_format.i_rate);
+    date_Init (&p_input->date, owner->mixer_format.i_rate, 1);
+    date_Set (&p_input->date, VLC_TS_INVALID);
 
     /* */
     if( p_request_vout )
@@ -447,7 +447,6 @@ int aout_InputDelete( audio_output_t * p_aout, aout_input_t * p_input )
     aout_FiltersDestroyPipeline( p_input->pp_resamplers,
                                  p_input->i_nb_resamplers );
     p_input->i_nb_resamplers = 0;
-    aout_FifoDestroy( &p_input->fifo );
 
     return 0;
 }
@@ -459,25 +458,18 @@ int aout_InputDelete( audio_output_t * p_aout, aout_input_t * p_input )
  *****************************************************************************/
 void aout_InputCheckAndRestart( audio_output_t * p_aout, aout_input_t * p_input )
 {
-    aout_owner_t *owner = aout_owner (p_aout);
     AOUT_ASSERT_LOCKED;
 
     if( !p_input->b_restart )
         return;
 
-    /* A little trick to avoid loosing our input fifo and properties */
-
-    aout_fifo_t fifo = p_input->fifo;
-    mtime_t i_pause_date = p_input->i_pause_date;
-
-    aout_FifoInit (p_aout, &p_input->fifo, owner->mixer_format.i_rate);
+    /* A little trick to avoid loosing our input properties */
+    date_t date = p_input->date;
 
     aout_InputDelete( p_aout, p_input );
-
     aout_InputNew( p_aout, p_input, &p_input->request_vout );
-    p_input->fifo = fifo;
-    p_input->i_pause_date = i_pause_date;
 
+    p_input->date = date;
     p_input->b_restart = false;
 }
 /*****************************************************************************
@@ -540,7 +532,7 @@ block_t *aout_InputPlay( audio_output_t *p_aout, aout_input_t *p_input,
     /* We don't care if someone changes the start date behind our back after
      * this. We'll deal with that when pushing the buffer, and compensate
      * with the next incoming buffer. */
-    start_date = aout_FifoNextStart( &p_input->fifo );
+    start_date = date_Get (&p_input->date);
 
     if ( start_date != VLC_TS_INVALID && start_date < now )
     {
@@ -549,7 +541,6 @@ block_t *aout_InputPlay( audio_output_t *p_aout, aout_input_t *p_input,
          * happen :). */
         msg_Warn( p_aout, "computed PTS is out of range (%"PRId64"), "
                   "clearing out", now - start_date );
-        aout_FifoReset( &p_input->fifo );
         aout_OutputFlush( p_aout, false );
         if ( p_input->i_resampling_type != AOUT_RESAMPLING_NONE )
             msg_Warn( p_aout, "timing screwed, stopping resampling" );
@@ -572,7 +563,10 @@ block_t *aout_InputPlay( audio_output_t *p_aout, aout_input_t *p_input,
     /* If the audio drift is too big then it's not worth trying to resample
      * the audio. */
     if( start_date == VLC_TS_INVALID )
+    {
         start_date = p_buffer->i_pts;
+        date_Set (&p_input->date, start_date);
+    }
 
     mtime_t drift = start_date - p_buffer->i_pts;
 
@@ -580,13 +574,13 @@ block_t *aout_InputPlay( audio_output_t *p_aout, aout_input_t *p_input,
     {
         msg_Warn( p_aout, "buffer way too early (%"PRId64"), clearing queue",
                   drift );
-        aout_FifoReset( &p_input->fifo );
         aout_OutputFlush( p_aout, false );
         if ( p_input->i_resampling_type != AOUT_RESAMPLING_NONE )
             msg_Warn( p_aout, "timing screwed, stopping resampling" );
         inputResamplingStop( p_input );
         p_buffer->i_flags |= BLOCK_FLAG_DISCONTINUITY;
         start_date = p_buffer->i_pts;
+        date_Set (&p_input->date, start_date);
         drift = 0;
     }
     else
@@ -692,8 +686,8 @@ block_t *aout_InputPlay( audio_output_t *p_aout, aout_input_t *p_input,
     }
 #endif
 
-    /* Adding the start date will be managed by aout_FifoPush(). */
     p_buffer->i_pts = start_date;
+    date_Increment (&p_input->date, p_buffer->i_nb_samples);
     return p_buffer;
 }
 
@@ -711,7 +705,6 @@ static void inputFailure( audio_output_t * p_aout, aout_input_t * p_input,
     aout_FiltersDestroyPipeline( p_input->pp_filters, p_input->i_nb_filters );
     aout_FiltersDestroyPipeline( p_input->pp_resamplers,
                                  p_input->i_nb_resamplers );
-    aout_FifoDestroy( &p_input->fifo );
     var_Destroy( p_aout, "visual" );
     var_Destroy( p_aout, "equalizer" );
     var_Destroy( p_aout, "audio-filter" );

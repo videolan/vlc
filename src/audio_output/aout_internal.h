@@ -83,14 +83,11 @@ struct aout_input_t
     int               i_buffer_lost;
 
     /* */
-    mtime_t           i_pause_date;
-
-    /* */
     bool                b_recycle_vout;
     aout_request_vout_t request_vout;
 
     /* */
-    aout_fifo_t       fifo;
+    date_t                  date;
 };
 
 typedef struct
@@ -114,6 +111,9 @@ typedef struct
     /* Indicates whether the audio output is currently starving, to avoid
      * printing a 1,000 "output is starving" messages. */
     bool b_starving;
+
+    mtime_t pause_date;
+    aout_fifo_t partial;
 } aout_owner_t;
 
 typedef struct
