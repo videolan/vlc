@@ -1,6 +1,18 @@
 Changes between 1.1.x and 1.2.0-git:
 ------------------------------------
 
+Important notes:
+ * HTTP server IP address, port, and TLS configuration is now centralized:
+   - The --http-host option sets the address, e.g. "--http-host=2001:db8::1".
+     By default, both :: and 0.0.0.0 are used.
+   - The --http-port and --https-port options set the port numbers.
+     By default, 8080 is used for HTTP, and 8443 for HTTPS.
+   - The TLS credentials are configured with --http-cert (public certificate),
+     --http-key (private key), --http-ca (optional CA) and
+     --http-crl (optional CRL).
+ * RTSP server IP address and port are updated similarly.
+   Use --rtsp-host and --rtsp-port respectively.
+
 Important changes for packagers:
  * The default builds now assume that the operating system uses UTF-8 for
    its file systems and files content (except the Windows port). If this is
@@ -16,7 +28,6 @@ Important changes for packagers:
 
  * The NPAPI webplugin has moved to git://git.videolan.org/npapi-vlc.git
  * The ActiveX webplugin has moved to git://git.videolan.org/activex-vlc.git
-
 
 Core:
  * Major Video Core and Outputs rework and rewrite:
