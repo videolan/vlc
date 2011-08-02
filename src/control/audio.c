@@ -272,9 +272,9 @@ void libvlc_audio_output_device_set( libvlc_media_player_t *mp,
         return;
     if( asprintf( &psz_config_name, "%s-audio-device", psz_audio_output ) == -1 )
         return;
-    if( !var_Type( mp, psz_audio_output ) )
+    if( !var_Type( mp, psz_config_name ) )
         /* Don't recreate the same variable over and over and over... */
-        var_Create( mp, psz_audio_output, VLC_VAR_STRING );
+        var_Create( mp, psz_config_name, VLC_VAR_STRING );
     var_SetString( mp, psz_config_name, psz_device_id );
     free( psz_config_name );
 }
