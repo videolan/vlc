@@ -63,6 +63,7 @@ vlc_module_begin ()
     add_integer( "udp-caching", DEFAULT_PTS_DELAY / 1000, CACHING_TEXT,
                  CACHING_LONGTEXT, true )
         change_safe()
+    add_obsolete_integer( "server-port" ) /* since 1.2.0 */
 
     set_capability( "access", 0 )
     add_shortcut( "udp", "udpstream", "udp4", "udp6" )
@@ -86,7 +87,7 @@ static int Open( vlc_object_t *p_this )
     char *psz_name = strdup( p_access->psz_location );
     char *psz_parser;
     const char *psz_server_addr, *psz_bind_addr = "";
-    int  i_bind_port, i_server_port = 0;
+    int  i_bind_port = 1234, i_server_port = 0;
     int fam = AF_UNSPEC;
     int fd;
 
@@ -107,8 +108,6 @@ static int Open( vlc_object_t *p_this )
                 break;
         }
     }
-
-    i_bind_port = var_InheritInteger( p_access, "server-port" );
 
     /* Parse psz_name syntax :
      * [serveraddr[:serverport]][@[bindaddr]:[bindport]] */

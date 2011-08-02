@@ -651,10 +651,6 @@ static const int pi_clock_values[] = { -1, 0, 1 };
 static const char *const ppsz_clock_descriptions[] =
 { N_("Default"), N_("Disable"), N_("Enable") };
 
-#define SERVER_PORT_TEXT N_("UDP port")
-#define SERVER_PORT_LONGTEXT N_( \
-    "This is the default port used for UDP streams. Default is 1234." )
-
 #define MTU_TEXT N_("MTU of the network interface")
 #define MTU_LONGTEXT N_( \
     "This is the maximum application-layer packet size that can be " \
@@ -1879,8 +1875,6 @@ vlc_module_begin ()
 
     set_section( N_( "Network settings" ), NULL )
 
-    add_integer( "server-port", 1234,
-                 SERVER_PORT_TEXT, SERVER_PORT_LONGTEXT, false )
     add_integer( "mtu", MTU_DEFAULT, MTU_TEXT, MTU_LONGTEXT, true )
     add_obsolete_bool( "ipv6" ) /* since 1.2.0 */
     add_obsolete_bool( "ipv4" ) /* since 1.2.0 */
