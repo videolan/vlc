@@ -46,6 +46,6 @@ DEPS_theora = ogg $(DEPS_ogg)
 ifdef HAVE_WIN32
 	$(RECONF)
 endif
-	cd $< && $(HOSTVARGS) ./configure $(THEORACONF)
+	cd $< && $(HOSTVARS) ./configure $(THEORACONF)
 	cd $< && $(MAKE) install
 	touch $@
