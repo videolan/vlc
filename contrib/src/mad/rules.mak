@@ -21,9 +21,12 @@ ifdef HAVE_MACOSX
 		-e 's%-dynamiclib%-dynamiclib -arch $(ARCH)%' \
 		-i.orig configure
 endif
+	$(APPLY) $(SRC)/mad/mad-noopt.patch
 	$(MOVE)
 
 .mad: libmad
+	touch libmad/NEWS libmad/AUTHORS libmad/ChangeLog
+	$(RECONF)
 	cd $< && $(HOSTVARS) CFLAGS="$(CFLAGS) -O3 $(NOTHUMB)" ./configure $(HOSTCONF)
 	cd $< && $(MAKE) install
 	touch $@
