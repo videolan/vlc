@@ -161,6 +161,7 @@ static const entry_t p_list_video[] = {
         E("dx50", "DivX MPEG-4 Video"),
         E("BLZ0", "Blizzard MPEG-4 Video"),
         E("DXGM", "Electronic Arts Game MPEG-4 Video"),
+        E("DreX", "DreX Mpeg-4"),
         /* 3ivx delta 4 */
         E("3IV2", "3ivx MPEG-4 Video"),
         E("3iv2", "3ivx MPEG-4 Video"),
@@ -252,6 +253,7 @@ static const entry_t p_list_video[] = {
         E("vssh", "Vanguard VSS H264"),
         E("DAVC", "Dicas MPEGable H.264/MPEG-4 AVC"),
         E("davc", "Dicas MPEGable H.264/MPEG-4 AVC"),
+        E("x3eV", "DreX H.264"),
 
     /* H263 and H263i */
     /* H263(+) is also known as Real Video 1.0 */
