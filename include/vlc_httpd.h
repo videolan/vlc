@@ -117,8 +117,8 @@ VLC_API void httpd_UrlDelete( httpd_url_t * );
 /* Default client mode is FILE, use these to change it */
 VLC_API void httpd_ClientModeStream( httpd_client_t *cl );
 VLC_API void httpd_ClientModeBidir( httpd_client_t *cl );
-VLC_API char* httpd_ClientIP( const httpd_client_t *cl, char *psz_ip );
-VLC_API char* httpd_ServerIP( const httpd_client_t *cl, char *psz_ip );
+VLC_API char* httpd_ClientIP( const httpd_client_t *cl, char *, int * );
+VLC_API char* httpd_ServerIP( const httpd_client_t *cl, char *, int * );
 
 /* High level */
 

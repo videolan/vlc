@@ -32,9 +32,9 @@
 #ifndef ENABLE_HTTPD
 # include <vlc_httpd.h>
 
-char *httpd_ClientIP (const httpd_client_t *cl, char *psz_ip)
+char *httpd_ClientIP (const httpd_client_t *cl, char *psz_ip, int *port)
 {
-    (void) cl; (void) psz_ip;
+    (void) cl; (void) psz_ip; (void) port
     assert (0);
 }
 
@@ -137,9 +137,9 @@ httpd_redirect_t *httpd_RedirectNew (httpd_host_t *host,
     assert (0);
 }
 
-char *httpd_ServerIP (const httpd_client_t *client, char *ip)
+char *httpd_ServerIP (const httpd_client_t *client, char *ip, int *port)
 {
-    (void) client; (void) ip;
+    (void) client; (void) ip; (void) port;
     assert (0);
 }
 

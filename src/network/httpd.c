@@ -533,7 +533,7 @@ httpd_HandlerCallBack( httpd_callback_sys_t *p_sys, httpd_client_t *cl,
     /* We do it ourselves, thanks */
     answer->i_status = 0;
 
-    if( httpd_ClientIP( cl, psz_remote_addr ) == NULL )
+    if( httpd_ClientIP( cl, psz_remote_addr, NULL ) == NULL )
         *psz_remote_addr = '\0';
 
     uint8_t *psz_args = query->psz_args;
@@ -1434,14 +1434,14 @@ void httpd_ClientModeBidir( httpd_client_t *cl )
     cl->i_mode   = HTTPD_CLIENT_BIDIR;
 }
 
-char* httpd_ClientIP( const httpd_client_t *cl, char *psz_ip )
+char* httpd_ClientIP( const httpd_client_t *cl, char *ip, int *port )
 {
-    return net_GetPeerAddress( cl->fd, psz_ip, NULL ) ? NULL : psz_ip;
+    return net_GetPeerAddress( cl->fd, ip, port ) ? NULL : ip;
 }
 
-char* httpd_ServerIP( const httpd_client_t *cl, char *psz_ip )
+char* httpd_ServerIP( const httpd_client_t *cl, char *ip, int *port )
 {
-    return net_GetSockAddress( cl->fd, psz_ip, NULL ) ? NULL : psz_ip;
+    return net_GetSockAddress( cl->fd, ip, port ) ? NULL : ip;
 }
 
 static void httpd_ClientClean( httpd_client_t *cl )
@@ -2259,7 +2259,7 @@ static void* httpd_HostThread( void *data )
                                 {
                                     char ip[NI_MAXNUMERICHOST];
 
-                                    if( ( httpd_ClientIP( cl, ip ) == NULL )
+                                    if( ( httpd_ClientIP( cl, ip, NULL ) == NULL )
                                      || ACL_Check( url->p_acl, ip ) )
                                     {
                                         b_hosts_failed = true;

@@ -164,7 +164,6 @@ struct vod_sys_t
 {
     /* RTSP server */
     httpd_host_t *p_rtsp_host;
-    int i_port;
     int i_throttle_users;
     int i_connections;
 
@@ -271,8 +270,6 @@ static int Open( vlc_object_t *p_this )
         goto error;
     }
 
-    p_sys->i_port = 554;
-
     TAB_INIT( p_sys->i_media, p_sys->media );
     p_sys->i_media_id = 0;
 
@@ -373,8 +370,8 @@ static vod_media_t *MediaNew( vod_t *p_vod, const char *psz_name,
     msg_Dbg( p_vod, "created RTSP url: %s", p_media->psz_rtsp_path );
 
     if( asprintf( &p_media->psz_rtsp_control_v4,
-               "rtsp://%%s:%d%s/trackID=%%d",
-               p_sys->i_port, p_media->psz_rtsp_path ) < 0 )
+                  "rtsp://%%s:%%d%s/trackID=%%d",
+                  p_media->psz_rtsp_path ) < 0 )
     {
         httpd_UrlDelete( p_media->p_rtsp_url );
         free( p_media->psz_rtsp_path );
@@ -382,8 +379,8 @@ static vod_media_t *MediaNew( vod_t *p_vod, const char *psz_name,
         return NULL;
     }
     if( asprintf( &p_media->psz_rtsp_control_v6,
-               "rtsp://[%%s]:%d%s/trackID=%%d",
-              p_sys->i_port, p_media->psz_rtsp_path ) < 0 )
+                  "rtsp://[%%s]:%%d%s/trackID=%%d",
+                  p_media->psz_rtsp_path ) < 0 )
     {
         httpd_UrlDelete( p_media->p_rtsp_url );
         free( p_media->psz_rtsp_path );
@@ -402,6 +399,7 @@ static vod_media_t *MediaNew( vod_t *p_vod, const char *psz_name,
     httpd_UrlCatch( p_media->p_rtsp_url, HTTPD_MSG_GETPARAMETER,
                     RtspCallback, (void*)p_media );
     httpd_UrlCatch( p_media->p_rtsp_url, HTTPD_MSG_TEARDOWN,
+
                     RtspCallback, (void*)p_media );
 
     p_media->p_vod = p_vod;
@@ -965,7 +963,7 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
                     p_media->b_raw = true;
                 }
 
-                if( httpd_ClientIP( cl, ip ) == NULL )
+                if( httpd_ClientIP( cl, ip, NULL ) == NULL )
                 {
                     answer->i_status = 500;
                     answer->i_body = 0;
@@ -1121,7 +1119,7 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
                 break;
             }
 
-            if( httpd_ClientIP( cl, ip ) == NULL ) break;
+            if( httpd_ClientIP( cl, ip, NULL ) == NULL ) break;
 
             p_rtsp->b_playing = true;
 
@@ -1291,7 +1289,7 @@ static int RtspCallbackES( httpd_callback_sys_t *p_args, httpd_client_t *cl,
                 int i_port = atoi( strstr( psz_transport, "client_port=" ) +
                                    strlen("client_port=") );
 
-                if( httpd_ClientIP( cl, ip ) == NULL )
+                if( httpd_ClientIP( cl, ip, NULL ) == NULL )
                 {
                     answer->i_status = 500;
                     answer->i_body = 0;
@@ -1489,8 +1487,9 @@ static char *SDPGenerate( const vod_media_t *p_media, httpd_client_t *cl )
 {
     char *psz_sdp, ip[NI_MAXNUMERICHOST];
     const char *psz_control;
+    int port;
 
-    if( httpd_ServerIP( cl, ip ) == NULL )
+    if( httpd_ServerIP( cl, ip, &port ) == NULL )
         return NULL;
 
     bool ipv6 = ( strchr( ip, ':' ) != NULL );
@@ -1545,7 +1544,7 @@ static char *SDPGenerate( const vod_media_t *p_media, httpd_client_t *cl )
                       p_es->psz_ptname, p_es->i_clock_rate, p_es->i_channels,
                       p_es->psz_fmtp );
 
-        sdp_AddAttribute( &psz_sdp, "control", psz_control, ip, i );
+        sdp_AddAttribute( &psz_sdp, "control", psz_control, ip, port, i );
     }
 
     return psz_sdp;
