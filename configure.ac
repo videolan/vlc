@@ -109,10 +109,10 @@ AC_ARG_WITH(contrib,
 ])
 AC_MSG_CHECKING([for 3rd party libraries path])
 AS_IF([test -z "${with_contrib}" || test "${with_contrib}" = "yes"], [
-  CONTRIB_DIR="${srcdir}/contrib/hosts/${host}"
+  CONTRIB_DIR="${srcdir}/contrib/${host}"
   AS_IF([test ! -d "${CONTRIB_DIR}"], [
     echo "${CONTRIB_DIR} not found" >&AS_MESSAGE_LOG_FD
-    CONTRIB_DIR="${srcdir}/contrib/hosts/`$CC -dumpmachine`"
+    CONTRIB_DIR="${srcdir}/contrib/`$CC -dumpmachine`"
     AS_IF([test ! -d "${CONTRIB_DIR}"], [
       echo "${CONTRIB_DIR} not found" >&AS_MESSAGE_LOG_FD
       CONTRIB_DIR="${srcdir}/extras/contrib/hosts/${host}"
