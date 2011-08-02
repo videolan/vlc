@@ -65,7 +65,6 @@ endif
 endif
 
 .vpx: libvpx
-	env
 	cd $< && CROSS=$(VPX_CROSS) ./configure --target=$(VPX_TARGET) \
 		--enable-runtime-cpu-detect \
 		--disable-install-bins \
