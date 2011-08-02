@@ -462,7 +462,7 @@ static const char *const ppsz_align_descriptions[] =
                                    "controller after x milliseconds")
 #define MOUSE_HIDE_TIMEOUT_LONGTEXT N_( \
     "Hide mouse cursor and fullscreen controller after " \
-    "n milliseconds, default is 3000 ms (3 sec.)")
+    "n milliseconds.")
 
 #define DEINTERLACE_TEXT N_("Deinterlace")
 #define DEINTERLACE_LONGTEXT N_(\
@@ -1686,8 +1686,8 @@ vlc_module_begin ()
                  VIDEO_TITLE_POSITION_LONGTEXT, false )
         change_safe()
         change_integer_list( pi_pos_values, ppsz_pos_descriptions )
-    // autohide after 1.5s
-    add_integer( "mouse-hide-timeout", 1500, MOUSE_HIDE_TIMEOUT_TEXT,
+    // autohide after 1 second
+    add_integer( "mouse-hide-timeout", 1000, MOUSE_HIDE_TIMEOUT_TEXT,
                  MOUSE_HIDE_TIMEOUT_LONGTEXT, false )
     set_section( N_("Snapshot") , NULL )
     add_directory( "snapshot-path", NULL, SNAP_PATH_TEXT,
