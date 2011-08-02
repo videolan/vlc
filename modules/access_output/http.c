@@ -71,22 +71,6 @@ static void Close( vlc_object_t * );
 #define MIME_TEXT N_("Mime")
 #define MIME_LONGTEXT N_("MIME returned by the server (autodetected " \
                         "if not specified)." )
-#define CERT_TEXT N_( "Certificate file" )
-#define CERT_LONGTEXT N_( "Path to the x509 PEM certificate file that will "\
-                          "be used for HTTPS." )
-#define KEY_TEXT N_( "Private key file" )
-#define KEY_LONGTEXT N_( "Path to the x509 PEM private key file that will " \
-                         "be used for HTTPS. Leave " \
-                         "empty if you don't have one." )
-#define CA_TEXT N_( "Root CA file" )
-#define CA_LONGTEXT N_( "Path to the x509 PEM trusted root CA certificates " \
-                        "(certificate authority) file that will be used for " \
-                        "HTTPS. Leave empty if you " \
-                        "don't have one." )
-#define CRL_TEXT N_( "CRL file" )
-#define CRL_LONGTEXT N_( "Path to the x509 PEM Certificates Revocation List " \
-                         "file that will be used for SSL. Leave " \
-                         "empty if you don't have one." )
 #define BONJOUR_TEXT N_( "Advertise with Bonjour")
 #define BONJOUR_LONGTEXT N_( "Advertise the stream with the Bonjour protocol." )
 
@@ -104,14 +88,6 @@ vlc_module_begin ()
                   PASS_TEXT, PASS_LONGTEXT, true )
     add_string( SOUT_CFG_PREFIX "mime", "",
                 MIME_TEXT, MIME_LONGTEXT, true )
-    add_loadfile( SOUT_CFG_PREFIX "cert", "vlc.pem",
-                CERT_TEXT, CERT_LONGTEXT, true )
-    add_loadfile( SOUT_CFG_PREFIX "key", NULL,
-                KEY_TEXT, KEY_LONGTEXT, true )
-    add_loadfile( SOUT_CFG_PREFIX "ca", NULL,
-                CA_TEXT, CA_LONGTEXT, true )
-    add_loadfile( SOUT_CFG_PREFIX "crl", NULL,
-                CRL_TEXT, CRL_LONGTEXT, true )
 #if 0 //def HAVE_AVAHI_CLIENT
     add_bool( SOUT_CFG_PREFIX "bonjour", false,
               BONJOUR_TEXT, BONJOUR_LONGTEXT, true);
@@ -166,8 +142,6 @@ static int Open( vlc_object_t *p_this )
     char                *psz_user;
     char                *psz_pwd;
     char                *psz_mime;
-    char                *psz_cert = NULL, *psz_key = NULL, *psz_ca = NULL,
-                        *psz_crl = NULL;
 
     if( !( p_sys = p_access->p_sys =
                 malloc( sizeof( sout_access_out_sys_t ) ) ) )
@@ -211,31 +185,21 @@ static int Open( vlc_object_t *p_this )
         psz_parser = psz_bind_addr;
     }
 
-    /* SSL support */
+    /* TLS support */
     if( p_access->psz_access && !strcmp( p_access->psz_access, "https" ) )
     {
-        psz_cert = var_CreateGetNonEmptyString( p_this, SOUT_CFG_PREFIX"cert" );
-        psz_key = var_CreateGetNonEmptyString( p_this, SOUT_CFG_PREFIX"key" );
-        psz_ca = var_CreateGetNonEmptyString( p_this, SOUT_CFG_PREFIX"ca" );
-        psz_crl = var_CreateGetNonEmptyString( p_this, SOUT_CFG_PREFIX"crl" );
-
         if( i_bind_port <= 0 )
             i_bind_port = DEFAULT_SSL_PORT;
+        p_sys->p_httpd_host = httpd_TLSHostNew( VLC_OBJECT(p_access),
+                                                psz_bind_addr, i_bind_port );
     }
     else
     {
         if( i_bind_port <= 0 )
             i_bind_port = DEFAULT_PORT;
+        p_sys->p_httpd_host = httpd_HostNew( VLC_OBJECT(p_access),
+                                             psz_bind_addr, i_bind_port );
     }
-
-    p_sys->p_httpd_host = httpd_TLSHostNew( VLC_OBJECT(p_access),
-                                            psz_bind_addr, i_bind_port,
-                                            psz_cert, psz_key, psz_ca,
-                                            psz_crl );
-    free( psz_cert );
-    free( psz_key );
-    free( psz_ca );
-    free( psz_crl );
 
     if( p_sys->p_httpd_host == NULL )
     {

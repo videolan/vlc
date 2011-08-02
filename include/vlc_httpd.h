@@ -100,7 +100,7 @@ struct httpd_message_t
 
 /* create a new host */
 VLC_API httpd_host_t * httpd_HostNew( vlc_object_t *, const char *psz_host, int i_port ) VLC_USED;
-VLC_API httpd_host_t * httpd_TLSHostNew( vlc_object_t *, const char *, int, const char *, const char *, const char *, const char * ) VLC_USED;
+VLC_API httpd_host_t * httpd_TLSHostNew( vlc_object_t *, const char *, int ) VLC_USED;
 
 /* delete a host */
 VLC_API void httpd_HostDelete( httpd_host_t * );

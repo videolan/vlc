@@ -95,7 +95,14 @@ void httpd_HostDelete (httpd_host_t *h)
 
 httpd_host_t *httpd_HostNew (vlc_object_t *obj, const char *host, int port)
 {
-    return httpd_TLSHostNew (obj, host, port, NULL, NULL, NULL, NULL);
+    (void) host; (void) port;
+    msg_Err (obj, "VLC httpd support not compiled-in!");
+    return NULL;
+}
+
+httpd_host_t *httpd_TLSHostNew (vlc_object_t *obj, const char *host, int port)
+{
+     return httpd_HostNew (obj, host, port);
 }
 
 void httpd_MsgAdd (httpd_message_t *m, const char *name, const char *fmt, ...)
@@ -155,16 +162,6 @@ int httpd_StreamSend (httpd_stream_t *stream, uint8_t *data, int count)
 {
     (void) stream; (void) data; (void) count;
     assert (0);
-}
-
-httpd_host_t *httpd_TLSHostNew (vlc_object_t *obj, const char *host, int port,
-                                const char *cert, const char *key,
-                                const char *ca, const char *crl)
-{
-     (void) host; (void) port;
-     (void) cert; (void) key; (void) ca; (void) crl;
-     msg_Err (obj, "VLC httpd support not compiled-in!");
-     return NULL;
 }
 
 int httpd_UrlCatch (httpd_url_t *url, int request, httpd_callback_t cb,

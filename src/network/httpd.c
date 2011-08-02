@@ -964,25 +964,78 @@ void httpd_StreamDelete( httpd_stream_t *stream )
  * Low level
  *****************************************************************************/
 static void* httpd_HostThread( void * );
+static httpd_host_t *httpd_HostCreate( vlc_object_t *, const char *, int,
+                                       vlc_tls_creds_t * );
 
 /* create a new host */
 httpd_host_t *httpd_HostNew( vlc_object_t *p_this, const char *psz_host,
                              int i_port )
 {
-    return httpd_TLSHostNew( p_this, psz_host, i_port, NULL, NULL, NULL, NULL
-                           );
+    return httpd_HostCreate( p_this, psz_host, i_port, NULL );
+}
+
+httpd_host_t *httpd_TLSHostNew( vlc_object_t *obj, const char *host, int port )
+{
+    char *cert = var_InheritString( obj, "http-cert" );
+    if( cert == NULL )
+    {
+        msg_Err( obj, "HTTP/TLS certificate not specified!" );
+        return NULL;
+    }
+
+    char *key = var_InheritString( obj, "http-key" );
+    vlc_tls_creds_t *tls = vlc_tls_ServerCreate( obj, cert, key );
+
+    if( tls == NULL )
+    {
+        msg_Err( obj, "HTTP/TLS certificate error (%s and %s)",
+                 cert, (key != NULL) ? key : cert );
+        free( key );
+        free( cert );
+        return NULL;
+    }
+    free( key );
+    free( cert );
+
+    char *ca = var_InheritString( obj, "http-ca" );
+    if( ca != NULL )
+    {
+        if( vlc_tls_ServerAddCA( tls, ca ) )
+        {
+            msg_Err( obj, "HTTP/TLS CA error (%s)", ca );
+            free( ca );
+            goto error;
+        }
+        free( ca );
+    }
+
+    char *crl = var_InheritString( obj, "http-crl" );
+    if( crl != NULL )
+    {
+        if( vlc_tls_ServerAddCRL( tls, crl ) )
+        {
+            msg_Err( obj, "TLS CRL error (%s)", crl );
+            free( crl );
+            goto error;
+        }
+        free( crl );
+    }
+
+    return httpd_HostCreate( obj, host, port, tls );
+
+error:
+    vlc_tls_ServerDelete( tls );
+    return NULL;
 }
 
 static vlc_mutex_t httpd_mutex = VLC_STATIC_MUTEX;
 
-httpd_host_t *httpd_TLSHostNew( vlc_object_t *p_this, const char *psz_hostname,
-                                int i_port,
-                                const char *psz_cert, const char *psz_key,
-                                const char *psz_ca, const char *psz_crl )
+static httpd_host_t *httpd_HostCreate( vlc_object_t *p_this,
+                                       const char *psz_hostname, int i_port,
+                                       vlc_tls_creds_t *p_tls )
 {
     httpd_t      *httpd;
     httpd_host_t *host;
-    vlc_tls_creds_t *p_tls;
     char *psz_host;
     int i;
 
@@ -1021,7 +1074,7 @@ httpd_host_t *httpd_TLSHostNew( vlc_object_t *p_this, const char *psz_hostname,
         host = httpd->host[i];
 
         /* cannot mix TLS and non-TLS hosts */
-        if( ( ( httpd->host[i]->p_tls != NULL ) != ( psz_cert != NULL ) )
+        if( ( ( httpd->host[i]->p_tls != NULL ) != ( p_tls != NULL ) )
          || ( host->i_port != i_port )
          || strcmp( host->psz_hostname, psz_hostname ) )
             continue;
@@ -1035,35 +1088,12 @@ httpd_host_t *httpd_TLSHostNew( vlc_object_t *p_this, const char *psz_hostname,
         vlc_mutex_unlock( &host->lock );
 
         vlc_mutex_unlock( &httpd_mutex );
+        if( p_tls != NULL )
+            vlc_tls_ServerDelete( p_tls );
         return host;
     }
 
     host = NULL;
-
-    /* determine TLS configuration */
-    if ( psz_cert != NULL )
-    {
-        p_tls = vlc_tls_ServerCreate( p_this, psz_cert, psz_key );
-        if ( p_tls == NULL )
-        {
-            msg_Err( p_this, "TLS initialization error" );
-            goto error;
-        }
-
-        if ( ( psz_ca != NULL) && vlc_tls_ServerAddCA( p_tls, psz_ca ) )
-        {
-            msg_Err( p_this, "TLS CA error" );
-            goto error;
-        }
-
-        if ( ( psz_crl != NULL) && vlc_tls_ServerAddCRL( p_tls, psz_crl ) )
-        {
-            msg_Err( p_this, "TLS CRL error" );
-            goto error;
-        }
-    }
-    else
-        p_tls = NULL;
 
     /* create the new host */
     host = (httpd_host_t *)vlc_custom_create( p_this, sizeof (*host),
