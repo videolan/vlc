@@ -99,9 +99,9 @@ struct httpd_message_t
 };
 
 /* create a new host */
-VLC_API httpd_host_t *vlc_http_HostNew( vlc_object_t *, int ) VLC_USED;
-VLC_API httpd_host_t *vlc_https_HostNew( vlc_object_t *, int ) VLC_USED;
-VLC_API httpd_host_t *vlc_rtsp_HostNew( vlc_object_t *, int ) VLC_USED;
+VLC_API httpd_host_t *vlc_http_HostNew( vlc_object_t * ) VLC_USED;
+VLC_API httpd_host_t *vlc_https_HostNew( vlc_object_t * ) VLC_USED;
+VLC_API httpd_host_t *vlc_rtsp_HostNew( vlc_object_t * ) VLC_USED;
 
 /* delete a host */
 VLC_API void httpd_HostDelete( httpd_host_t * );

@@ -64,8 +64,7 @@ static int HttpCallback( httpd_file_sys_t *p_args,
 int HTTPOpen( access_t *p_access )
 {
     access_sys_t *p_sys = p_access->p_sys;
-    char          *psz_address, *psz_user = NULL, *psz_password = NULL;
-    int           i_port       = 0;
+    char          *psz_user = NULL, *psz_password = NULL;
     char          psz_tmp[10];
     httpd_file_sys_t *f;
 
@@ -74,33 +73,9 @@ int HTTPOpen( access_t *p_access )
     p_sys->b_request_frontend_info = p_sys->b_request_mmi_info = false;
     p_sys->i_httpd_timeout = 0;
 
-    psz_address = var_GetNonEmptyString( p_access, "dvb-http-host" );
-    if( psz_address != NULL )
-    {
-        char *psz_parser = strchr( psz_address, ':' );
-        if( psz_parser )
-        {
-            *psz_parser++ = '\0';
-            i_port = atoi( psz_parser );
-        }
-    }
-    else
-        return VLC_SUCCESS;
-
-    if ( i_port <= 0 )
-        i_port= 8082;
-
-    /* Ugly hack to allow to run several HTTP servers on different ports. */
-    sprintf( psz_tmp, ":%d", i_port + 1 );
-    config_PutPsz( p_access, "dvb-http-host", psz_tmp );
-
-    msg_Dbg( p_access, "base %d", i_port );
-
-    p_sys->p_httpd_host = vlc_http_HostNew( VLC_OBJECT(p_access), i_port );
+    p_sys->p_httpd_host = vlc_http_HostNew( VLC_OBJECT(p_access) );
     if ( p_sys->p_httpd_host == NULL )
     {
-        msg_Err( p_access, "cannot listen on port %d", i_port );
-        free( psz_address );
         return VLC_EGENERIC;
     }
     free( psz_address );

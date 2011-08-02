@@ -93,21 +93,20 @@ void httpd_HostDelete (httpd_host_t *h)
     assert (0);
 }
 
-httpd_host_t *vlc_http_HostNew (vlc_object_t *obj, int port)
+httpd_host_t *vlc_http_HostNew (vlc_object_t *obj)
 {
-    (void) port;
     msg_Err (obj, "HTTP server not compiled-in!");
     return NULL;
 }
 
-httpd_host_t *vlc_https_HostNew (vlc_object_t *obj, int port)
+httpd_host_t *vlc_https_HostNew (vlc_object_t *obj)
 {
-     return httpd_HostNew (obj, port);
+    msg_Err (obj, "HTTPS server not compiled-in!");
+    return NULL;
 }
 
-httpd_host_t *vlc_rtsp_HostNew (vlc_object_t *obj, int port)
+httpd_host_t *vlc_rtsp_HostNew (vlc_object_t *obj)
 {
-    (void) port;
     msg_Err (obj, "RTSP server not compiled-in!");
     return NULL;
 }

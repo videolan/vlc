@@ -896,6 +896,27 @@ static const char *const ppsz_clock_descriptions[] =
     "Specify an IP address (e.g. ::1 or 127.0.0.1) or a host name " \
     "(e.g. localhost) to restrict them to a specific network interface." )
 
+#define HTTP_PORT_TEXT N_( "HTTP server port" )
+#define HTTP_PORT_LONGTEXT N_( \
+    "The HTTP server will listen on this TCP port. " \
+    "The standard HTTP port number is 80. " \
+    "However allocation of port numbers below 1025 is usually restricted " \
+    "by the operating system." )
+
+#define HTTPS_PORT_TEXT N_( "HTTPS server port" )
+#define HTTPS_PORT_LONGTEXT N_( \
+    "The HTTPS server will listen on this TCP port. " \
+    "The standard HTTPS port number is 443. " \
+    "However allocation of port numbers below 1025 is usually restricted " \
+    "by the operating system." )
+
+#define RTSP_PORT_TEXT N_( "RTSP server port" )
+#define RTSP_PORT_LONGTEXT N_( \
+    "The HTTPS server will listen on this TCP port. " \
+    "The standard RTSP port number is 554. " \
+    "However allocation of port numbers below 1025 is usually restricted " \
+    "by the operating system." )
+
 #define HTTP_CERT_TEXT N_("HTTP/TLS server certificate")
 #define CERT_LONGTEXT N_( \
    "This X.509 certicate file (PEM format) is used for server-side TLS." )
@@ -1907,7 +1928,13 @@ vlc_module_begin ()
                  TIMEOUT_LONGTEXT, true )
 
     add_string( "http-host", NULL, HTTP_HOST_TEXT, HOST_LONGTEXT, true )
+    add_integer( "http-port", 8080, HTTP_PORT_TEXT, HTTP_PORT_LONGTEXT, true )
+        change_integer_range( 1, 65535 )
+    add_integer( "https-port", 8443, HTTPS_PORT_TEXT, HTTPS_PORT_LONGTEXT, true )
+        change_integer_range( 1, 65535 )
     add_string( "rtsp-host", NULL, RTSP_HOST_TEXT, HOST_LONGTEXT, true )
+    add_integer( "rtsp-port", 5554, RTSP_PORT_TEXT, RTSP_PORT_LONGTEXT, true )
+        change_integer_range( 1, 65535 )
     add_loadfile( "http-cert", NULL, HTTP_CERT_TEXT, CERT_LONGTEXT, true )
         add_deprecated_alias( "sout-http-cert" ) /* since 1.2.0 */
     add_loadfile( "http-key", NULL, HTTP_KEY_TEXT, KEY_LONGTEXT, true )

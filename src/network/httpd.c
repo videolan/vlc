@@ -88,7 +88,6 @@ struct httpd_host_t
     unsigned    i_ref;
 
     /* address/port and socket for listening at connections */
-    int         i_port;
     int         *fds;
     unsigned     nfd;
 
@@ -963,16 +962,16 @@ void httpd_StreamDelete( httpd_stream_t *stream )
  * Low level
  *****************************************************************************/
 static void* httpd_HostThread( void * );
-static httpd_host_t *httpd_HostCreate( vlc_object_t *, const char *, int,
-                                       vlc_tls_creds_t * );
+static httpd_host_t *httpd_HostCreate( vlc_object_t *, const char *,
+                                       const char *, vlc_tls_creds_t * );
 
 /* create a new host */
-httpd_host_t *vlc_http_HostNew( vlc_object_t *p_this, int i_port )
+httpd_host_t *vlc_http_HostNew( vlc_object_t *p_this )
 {
-    return httpd_HostCreate( p_this, "http-host", i_port, NULL );
+    return httpd_HostCreate( p_this, "http-host", "http-port", NULL );
 }
 
-httpd_host_t *vlc_https_HostNew( vlc_object_t *obj, int port )
+httpd_host_t *vlc_https_HostNew( vlc_object_t *obj )
 {
     char *cert = var_InheritString( obj, "http-cert" );
     if( cert == NULL )
@@ -1019,22 +1018,23 @@ httpd_host_t *vlc_https_HostNew( vlc_object_t *obj, int port )
         free( crl );
     }
 
-    return httpd_HostCreate( obj, "http-host", port, tls );
+    return httpd_HostCreate( obj, "http-host", "https-port", tls );
 
 error:
     vlc_tls_ServerDelete( tls );
     return NULL;
 }
 
-httpd_host_t *vlc_rtsp_HostNew( vlc_object_t *p_this, int i_port )
+httpd_host_t *vlc_rtsp_HostNew( vlc_object_t *p_this )
 {
-    return httpd_HostCreate( p_this, "rtsp-host", i_port, NULL );
+    return httpd_HostCreate( p_this, "rtsp-host", "rtsp-port", NULL );
 }
 
 static vlc_mutex_t httpd_mutex = VLC_STATIC_MUTEX;
 
 static httpd_host_t *httpd_HostCreate( vlc_object_t *p_this,
-                                       const char *hostvar, int i_port,
+                                       const char *hostvar,
+                                       const char *portvar,
                                        vlc_tls_creds_t *p_tls )
 {
     httpd_t      *httpd;
@@ -1068,8 +1068,7 @@ static httpd_host_t *httpd_HostCreate( vlc_object_t *p_this,
         host = httpd->host[i];
 
         /* cannot mix TLS and non-TLS hosts */
-        if( ( ( httpd->host[i]->p_tls != NULL ) != ( p_tls != NULL ) )
-         || ( host->i_port != i_port ) )
+        if( ( httpd->host[i]->p_tls != NULL ) != ( p_tls != NULL ) )
             continue;
 
         /* Increase existing matching host reference count.
@@ -1100,7 +1099,8 @@ static httpd_host_t *httpd_HostCreate( vlc_object_t *p_this,
     host->i_ref = 1;
 
     char *hostname = var_InheritString( p_this->p_libvlc, hostvar );
-    host->fds = net_ListenTCP( p_this, hostname, i_port );
+    int port = var_InheritInteger( p_this->p_libvlc, portvar );
+    host->fds = net_ListenTCP( p_this, hostname, port );
     free( hostname );
     if( host->fds == NULL )
     {
@@ -1115,13 +1115,11 @@ static httpd_host_t *httpd_HostCreate( vlc_object_t *p_this,
         goto error;
     }
 
-    host->i_port = i_port;
-    host->i_url     = 0;
-    host->url       = NULL;
-    host->i_client  = 0;
-    host->client    = NULL;
-
-    host->p_tls = p_tls;
+    host->i_url    = 0;
+    host->url      = NULL;
+    host->i_client = 0;
+    host->client   = NULL;
+    host->p_tls    = p_tls;
 
     /* create the thread */
     if( vlc_clone( &host->thread, httpd_HostThread, host,
