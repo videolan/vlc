@@ -20,11 +20,7 @@ libshout: libshout-$(SHOUT_VERSION).tar.gz .sum-shout
 	$(MOVE)
 
 DEPS_shout = ogg $(DEPS_ogg) theora $(DEPS_theora) speex $(DEPS_speex)
-ifdef HAVE_FPU
 DEPS_shout += vorbis $(DEPS_vorbis)
-else
-DEPS_shout += tremor $(DEPS_tremor)
-endif
 
 .shout: libshout
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF)
