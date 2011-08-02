@@ -102,8 +102,8 @@ struct aout_input_t
 /* From input.c : */
 int aout_InputNew( audio_output_t * p_aout, aout_input_t * p_input, const aout_request_vout_t * );
 int aout_InputDelete( audio_output_t * p_aout, aout_input_t * p_input );
-void aout_InputPlay( audio_output_t * p_aout, aout_input_t * p_input,
-                     aout_buffer_t * p_buffer, int i_input_rate );
+block_t *aout_InputPlay( audio_output_t *p_aout, aout_input_t *p_input,
+                         block_t *p_buffer, int i_input_rate );
 void aout_InputCheckAndRestart( audio_output_t * p_aout, aout_input_t * p_input );
 
 /* From filters.c : */
@@ -117,8 +117,6 @@ audio_mixer_t *aout_MixerNew(vlc_object_t *, const audio_sample_format_t * );
 #define aout_MixerNew(o, f) aout_MixerNew(VLC_OBJECT(o), f)
 void aout_MixerDelete(audio_mixer_t *);
 void aout_MixerRun(audio_mixer_t *, block_t *, float);
-
-block_t *aout_OutputSlice( audio_output_t *, aout_fifo_t * );
 
 /* From output.c : */
 int aout_OutputNew( audio_output_t * p_aout,

@@ -195,15 +195,20 @@ int aout_DecPlay( audio_output_t * p_aout, aout_input_t * p_input,
         return -1;
     }
 
+    /* Input */
     aout_InputCheckAndRestart( p_aout, p_input );
-    aout_InputPlay( p_aout, p_input, p_buffer, i_input_rate );
+    p_buffer = aout_InputPlay( p_aout, p_input, p_buffer, i_input_rate );
 
-    const float amp = p_aout->mixer_multiplier * p_input->multiplier;
-    while( (p_buffer = aout_OutputSlice( p_aout, &p_input->fifo ) ) != NULL )
+    if( p_buffer != NULL )
     {
+        /* Mixer */
+        float amp = p_aout->mixer_multiplier * p_input->multiplier;
         aout_MixerRun( p_aout->mixer, p_buffer, amp );
+
+        /* Output */
         aout_OutputPlay( p_aout, p_buffer );
     }
+
     aout_unlock( p_aout );
     return 0;
 }

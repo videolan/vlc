@@ -218,6 +218,8 @@ void aout_OutputDelete( audio_output_t * p_aout )
     aout_FifoDestroy( &p_aout->fifo );
 }
 
+static block_t *aout_OutputSlice( audio_output_t *, aout_fifo_t * );
+
 /*****************************************************************************
  * aout_OutputPlay : play a buffer
  *****************************************************************************
@@ -236,8 +238,15 @@ void aout_OutputPlay( audio_output_t * p_aout, aout_buffer_t * p_buffer )
         return;
     }
 
-    aout_FifoPush( &p_aout->fifo, p_buffer );
-    p_aout->pf_play( p_aout );
+    aout_fifo_t *fifo = &p_aout->p_input->fifo;
+    /* XXX: cleanup */
+    aout_FifoPush( fifo, p_buffer );
+
+    while( (p_buffer = aout_OutputSlice( p_aout, fifo ) ) != NULL )
+    {
+        aout_FifoPush( &p_aout->fifo, p_buffer );
+        p_aout->pf_play( p_aout );
+    }
 }
 
 /**
@@ -375,7 +384,7 @@ void aout_VolumeHardSet (audio_output_t *aout, float volume, bool mute)
  * @note (FIXME) This is left here for historical reasons. It belongs in the
  * output code. Besides, this operation should be avoided if possible.
  */
-block_t *aout_OutputSlice( audio_output_t * p_aout, aout_fifo_t *p_fifo )
+static block_t *aout_OutputSlice (audio_output_t *p_aout, aout_fifo_t *p_fifo)
 {
     const unsigned samples = p_aout->i_nb_samples;
     /* FIXME: Remove this silly constraint. Just pass buffers as they come to
@@ -443,14 +452,14 @@ block_t *aout_OutputSlice( audio_output_t * p_aout, aout_fifo_t *p_fifo )
         prev_date = p_buffer->i_pts + p_buffer->i_length;
     }
 
-    if( !AOUT_FMT_NON_LINEAR( &p_aout->mixer_format ) )
+    if( !AOUT_FMT_NON_LINEAR( &p_aout->format ) )
     {
         p_buffer = p_fifo->p_first;
 
         /* Additionally check that p_first_byte_to_mix is well located. */
-        const unsigned framesize = p_aout->mixer_format.i_bytes_per_frame;
+        const unsigned framesize = p_aout->format.i_bytes_per_frame;
         ssize_t delta = (start_date - p_buffer->i_pts)
-                      * p_aout->mixer_format.i_rate / CLOCK_FREQ;
+                      * p_aout->format.i_rate / CLOCK_FREQ;
         if( delta != 0 )
             msg_Warn( p_aout, "input start is not output end (%zd)", delta );
         if( delta < 0 )
@@ -461,7 +470,7 @@ block_t *aout_OutputSlice( audio_output_t * p_aout, aout_fifo_t *p_fifo )
         }
         if( delta > 0 )
         {
-            mtime_t t = delta * CLOCK_FREQ / p_aout->mixer_format.i_rate;
+            mtime_t t = delta * CLOCK_FREQ / p_aout->format.i_rate;
             p_buffer->i_nb_samples -= delta;
             p_buffer->i_pts += t;
             p_buffer->i_length -= t;
@@ -498,7 +507,7 @@ block_t *aout_OutputSlice( audio_output_t * p_aout, aout_fifo_t *p_fifo )
                 needed /= framesize;
                 p_fifo->p_first->i_nb_samples -= needed;
 
-                mtime_t t = needed * CLOCK_FREQ / p_aout->mixer_format.i_rate;
+                mtime_t t = needed * CLOCK_FREQ / p_aout->format.i_rate;
                 p_fifo->p_first->i_pts += t;
                 p_fifo->p_first->i_length -= t;
                 break;

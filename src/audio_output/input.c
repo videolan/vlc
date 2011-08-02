@@ -485,8 +485,8 @@ void aout_InputCheckAndRestart( audio_output_t * p_aout, aout_input_t * p_input 
  *****************************************************************************/
 /* XXX Do not activate it !! */
 //#define AOUT_PROCESS_BEFORE_CHEKS
-void aout_InputPlay( audio_output_t * p_aout, aout_input_t * p_input,
-                     aout_buffer_t * p_buffer, int i_input_rate )
+block_t *aout_InputPlay( audio_output_t *p_aout, aout_input_t *p_input,
+                         block_t *p_buffer, int i_input_rate )
 {
     mtime_t start_date;
     AOUT_ASSERT_LOCKED;
@@ -494,7 +494,7 @@ void aout_InputPlay( audio_output_t * p_aout, aout_input_t * p_input,
     if( i_input_rate != INPUT_RATE_DEFAULT && p_input->p_playback_rate_filter == NULL )
     {
         inputDrop( p_input, p_buffer );
-        return;
+        return NULL;
     }
 
 #ifdef AOUT_PROCESS_BEFORE_CHEKS
@@ -502,7 +502,7 @@ void aout_InputPlay( audio_output_t * p_aout, aout_input_t * p_input,
     aout_FiltersPlay( p_aout, p_input->pp_filters, p_input->i_nb_filters,
                       &p_buffer );
     if( !p_buffer )
-        return;
+        return NULL;
 
     /* Actually run the resampler now. */
     if ( p_input->i_nb_resamplers > 0 )
@@ -514,11 +514,11 @@ void aout_InputPlay( audio_output_t * p_aout, aout_input_t * p_input,
     }
 
     if( !p_buffer )
-        return;
+        return NULL;
     if( p_buffer->i_nb_samples <= 0 )
     {
         block_Release( p_buffer );
-        return;
+        return NULL;
     }
 #endif
 
@@ -564,7 +564,7 @@ void aout_InputPlay( audio_output_t * p_aout, aout_input_t * p_input,
                   now - p_buffer->i_pts );
         inputDrop( p_input, p_buffer );
         inputResamplingStop( p_input );
-        return;
+        return NULL;
     }
 
     /* If the audio drift is too big then it's not worth trying to resample
@@ -593,14 +593,14 @@ void aout_InputPlay( audio_output_t * p_aout, aout_input_t * p_input,
         msg_Warn( p_aout, "buffer way too late (%"PRId64"), dropping buffer",
                   drift );
         inputDrop( p_input, p_buffer );
-        return;
+        return NULL;
     }
 
 #ifndef AOUT_PROCESS_BEFORE_CHEKS
     /* Run pre-filters. */
     aout_FiltersPlay( p_input->pp_filters, p_input->i_nb_filters, &p_buffer );
     if( !p_buffer )
-        return;
+        return NULL;
 #endif
 
     /* Run the resampler if needed.
@@ -682,17 +682,17 @@ void aout_InputPlay( audio_output_t * p_aout, aout_input_t * p_input,
     }
 
     if( !p_buffer )
-        return;
+        return NULL;
     if( p_buffer->i_nb_samples <= 0 )
     {
         block_Release( p_buffer );
-        return;
+        return NULL;
     }
 #endif
 
     /* Adding the start date will be managed by aout_FifoPush(). */
     p_buffer->i_pts = start_date;
-    aout_FifoPush( &p_input->fifo, p_buffer );
+    return p_buffer;
 }
 
 /*****************************************************************************
