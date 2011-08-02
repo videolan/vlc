@@ -12,7 +12,9 @@ $(TARBALLS)/$(LIVE555_FILE):
 .sum-live555: $(LIVE555_FILE)
 
 live555: $(LIVE555_FILE) .sum-live555
+	rm -Rf live
 	$(UNPACK)
+	chmod -R u+w live
 	patch -p0 < $(SRC)/live555/live-uselocale.patch
 	patch -p0 < $(SRC)/live555/live-inet_ntop.patch
 	patch -p0 < $(SRC)/live555/live-intptr.patch
