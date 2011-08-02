@@ -289,7 +289,8 @@ static int InputEvent( vlc_object_t *p_this, const char *psz_var,
             break;
 
         case INPUT_EVENT_DEAD:
-            //NSLog( @"dying input" );
+            [[VLCMain sharedInstance] updateName];
+            [[VLCMain sharedInstance] updateTimeSlider];
             break;
 
         case INPUT_EVENT_ABORT:

@@ -59,6 +59,8 @@ SOURCES_macosx = \
 	PXSourceList.m \
 	PXSourceListDataSource.h \
 	PXSourceListDelegate.h \
+	SideBarItem.h \
+	SideBarItem.m \
 	fspanel.m \
 	fspanel.h \
 	eyetv.h \

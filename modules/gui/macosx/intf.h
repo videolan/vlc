@@ -78,12 +78,15 @@ struct intf_sys_t
 /*****************************************************************************
  * VLCMain interface
  *****************************************************************************/
+#ifndef MAC_OS_X_VERSION_10_6
+@protocol NSWindowDelegate <NSObject> @end
+#endif
 @class AppleRemote;
 @class VLCInformation;
 @class VLCEmbeddedWindow;
 @class VLCControls;
 @class VLCPlaylist;
-@interface VLCMain : NSObject
+@interface VLCMain : NSObject <NSWindowDelegate>
 {
     intf_thread_t *p_intf;      /* The main intf object */
     id o_mainmenu;              /* VLCMainMenu */

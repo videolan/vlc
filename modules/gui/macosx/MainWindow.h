@@ -25,9 +25,14 @@
  *****************************************************************************/
 
 #import <Cocoa/Cocoa.h>
+#import "PXSourceList.h"
 #import <vlc_input.h>
 
-@interface VLCMainWindow : NSWindow {
+#ifndef MAC_OS_X_VERSION_10_6
+@protocol NSWindowDelegate <NSObject> @end
+#endif
+
+@interface VLCMainWindow : NSWindow <PXSourceListDataSource, PXSourceListDelegate, NSWindowDelegate> {
     IBOutlet id o_play_btn;
     IBOutlet id o_bwd_btn;
     IBOutlet id o_fwd_btn;
@@ -82,6 +87,7 @@
     NSTimeInterval last_bwd_event;
     BOOL just_triggered_next;
     BOOL just_triggered_previous;
+    NSMutableArray *o_sidebaritems;
 }
 + (VLCMainWindow *)sharedInstance;
 

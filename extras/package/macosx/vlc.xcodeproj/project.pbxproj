@@ -472,6 +472,8 @@
 		CCC593790AB4A9FB0004FF52 /* embeddedwindow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = embeddedwindow.m; path = ../../../modules/gui/macosx/embeddedwindow.m; sourceTree = SOURCE_ROOT; };
 		CCC895830D9A8A82005AE59C /* eyetv.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = eyetv.m; path = ../../../modules/access/eyetv.m; sourceTree = SOURCE_ROOT; };
 		CCC896B90D9AA9E8005AE59C /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = Resources/English.lproj/MediaInfo.nib; sourceTree = "<group>"; };
+		CCCDDEEF13E870BB00A35661 /* SideBarItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SideBarItem.h; path = ../../../modules/gui/macosx/SideBarItem.h; sourceTree = "<group>"; };
+		CCCDDEF013E870BB00A35661 /* SideBarItem.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SideBarItem.m; path = ../../../modules/gui/macosx/SideBarItem.m; sourceTree = "<group>"; };
 		CCCE366D13817E4500694F2A /* VideoEffects.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = VideoEffects.h; path = ../../../modules/gui/macosx/VideoEffects.h; sourceTree = "<group>"; };
 		CCCE366E13817E4500694F2A /* VideoEffects.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = VideoEffects.m; path = ../../../modules/gui/macosx/VideoEffects.m; sourceTree = "<group>"; };
 		CCD590F010E5B73200D39094 /* dialogProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dialogProvider.h; path = ../../../modules/gui/macosx_dialog_provider/dialogProvider.h; sourceTree = SOURCE_ROOT; };
@@ -813,6 +815,8 @@
 		CC0CD0E413DE0EB500B0D90D /* PXSourceList */ = {
 			isa = PBXGroup;
 			children = (
+				CCCDDEEF13E870BB00A35661 /* SideBarItem.h */,
+				CCCDDEF013E870BB00A35661 /* SideBarItem.m */,
 				CC0CD0DF13DE0EAE00B0D90D /* PXSourceList.h */,
 				CC0CD0E013DE0EAE00B0D90D /* PXSourceList.m */,
 				CC0CD0E113DE0EAE00B0D90D /* PXSourceListDataSource.h */,

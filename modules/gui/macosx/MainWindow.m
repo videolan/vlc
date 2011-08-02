@@ -31,10 +31,12 @@
 #import "MainMenu.h"
 #import "misc.h"
 #import "controls.h" // TODO: remove me
+#import "SideBarItem.h"
 #import <vlc_playlist.h>
 #import <vlc_aout_intf.h>
 #import <vlc_url.h>
 #import <vlc_strings.h>
+#import <vlc_services_discovery.h>
 
 @implementation VLCMainWindow
 static VLCMainWindow *_o_sharedInstance = nil;
@@ -93,11 +95,13 @@ static VLCMainWindow *_o_sharedInstance = nil;
 - (void)dealloc
 {
     config_PutInt( VLCIntf->p_libvlc, "volume", i_lastShownVolume );
+    [o_sidebaritems release];
     [super dealloc];
 }
 
 - (void)awakeFromNib
 {
+    /* setup the styled interface */
     b_dark_interface = config_GetInt( VLCIntf, "macosx-interfacestyle" );
     i_lastShownVolume = -1;
 
@@ -195,10 +199,10 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [o_repeat_btn setAlternateImage: o_repeat_pressed_img];
     [o_shuffle_btn setImage: o_shuffle_img];
     [o_shuffle_btn setAlternateImage: o_shuffle_pressed_img];
-
     [o_play_btn setImage: o_play_img];
     [o_play_btn setAlternateImage: o_play_pressed_img];
 
+    /* interface builder action */
     [o_video_view setFrame: [o_split_view frame]];
     [self setDelegate: self];
     [self setExcludedFromWindowsMenu: YES];
@@ -207,8 +211,79 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [self setTitle: _NS("VLC media player")];
     [o_playlist_btn setEnabled:NO];
 
+    /* reset the interface */
     [self updateVolumeSlider];
     [self updateTimeSlider];
+
+    /* create the sidebar */
+    o_sidebaritems = [[NSMutableArray alloc] init];
+    SideBarItem *libraryItem = [SideBarItem itemWithTitle:_NS("LIBRARY") identifier:@"library"];
+    SideBarItem *playlistItem = [SideBarItem itemWithTitle:_NS("Playlist") identifier:@"playlist"];
+    SideBarItem *mycompItem = [SideBarItem itemWithTitle:_NS("MY COMPUTER") identifier:@"mycomputer"];
+    SideBarItem *devicesItem = [SideBarItem itemWithTitle:_NS("DEVICES") identifier:@"devices"];
+    SideBarItem *lanItem = [SideBarItem itemWithTitle:_NS("LOCAL NETWORK") identifier:@"localnetwork"];
+    SideBarItem *internetItem = [SideBarItem itemWithTitle:_NS("INTERNET") identifier:@"internet"];
+
+    /* SD subnodes, inspired by the Qt4 intf */
+    char **ppsz_longnames;
+    int *p_categories;
+    char **ppsz_names = vlc_sd_GetNames( pl_Get( VLCIntf ), &ppsz_longnames, &p_categories );
+    if (!ppsz_names)
+        msg_Err( VLCIntf, "no sd item found" ); //TODO
+    char **ppsz_name = ppsz_names, **ppsz_longname = ppsz_longnames;
+    int *p_category = p_categories;
+    NSMutableArray *internetItems = [[NSMutableArray alloc] init];
+    NSMutableArray *devicesItems = [[NSMutableArray alloc] init];
+    NSMutableArray *lanItems = [[NSMutableArray alloc] init];
+    NSMutableArray *mycompItems = [[NSMutableArray alloc] init];
+    for (; *ppsz_name; ppsz_name++, ppsz_longname++, p_category++)
+    {
+        switch (*p_category) {
+            case SD_CAT_INTERNET:
+                [internetItems addObject: [SideBarItem itemWithTitle: [NSString stringWithCString: *ppsz_longname encoding: NSUTF8StringEncoding] identifier: [NSString stringWithCString: *ppsz_name encoding: NSUTF8StringEncoding]]];
+                break;
+            case SD_CAT_DEVICES:
+                [devicesItems addObject: [SideBarItem itemWithTitle: [NSString stringWithCString: *ppsz_longname encoding: NSUTF8StringEncoding] identifier: [NSString stringWithCString: *ppsz_name encoding: NSUTF8StringEncoding]]];
+                break;
+            case SD_CAT_LAN:
+                [lanItems addObject: [SideBarItem itemWithTitle: [NSString stringWithCString: *ppsz_longname encoding: NSUTF8StringEncoding] identifier: [NSString stringWithCString: *ppsz_name encoding: NSUTF8StringEncoding]]];
+                break;
+            case SD_CAT_MYCOMPUTER:
+                [mycompItems addObject: [SideBarItem itemWithTitle: [NSString stringWithCString: *ppsz_longname encoding: NSUTF8StringEncoding] identifier: [NSString stringWithCString: *ppsz_name encoding: NSUTF8StringEncoding]]];
+                break;
+            default:
+                msg_Warn( VLCIntf, "unknown SD type found, skipping (%s)", *ppsz_name );
+                break;
+        }
+
+        free( *ppsz_name );
+        free( *ppsz_longname );
+    }
+    [mycompItem setChildren: [NSArray arrayWithArray: mycompItems]];
+    [devicesItem setChildren: [NSArray arrayWithArray: devicesItems]];
+    [lanItem setChildren: [NSArray arrayWithArray: lanItems]];
+    [internetItem setChildren: [NSArray arrayWithArray: internetItems]];
+    [mycompItems release];
+    [devicesItems release];
+    [lanItems release];
+    [internetItems release];
+    free( ppsz_names );
+    free( ppsz_longnames );
+    free( p_categories );
+
+    [libraryItem setChildren: [NSArray arrayWithObject: playlistItem]];
+    [o_sidebaritems addObject: libraryItem];
+    if ([mycompItem hasChildren])
+        [o_sidebaritems addObject: mycompItem];
+    if ([devicesItem hasChildren])
+        [o_sidebaritems addObject: devicesItem];
+    if ([lanItem hasChildren])
+        [o_sidebaritems addObject: lanItem];
+    if ([internetItem hasChildren])
+        [o_sidebaritems addObject: internetItem];
+
+    msg_Dbg( VLCIntf, "side bar should contain %lu items", [o_sidebaritems count] );
+    [o_sidebar_view reloadData];
 }
 
 #pragma mark -
@@ -680,6 +755,109 @@ static VLCMainWindow *_o_sharedInstance = nil;
 - (void)setVideoplayEnabled
 {
     [o_playlist_btn setEnabled: [[VLCMain sharedInstance] activeVideoPlayback]];
+}
+
+#pragma mark -
+#pragma mark Side Bar Data handling
+/* taken under BSD-new from the PXSourceList sample project, adapted for VLC */
+- (NSUInteger)sourceList:(PXSourceList*)sourceList numberOfChildrenOfItem:(id)item
+{
+	//Works the same way as the NSOutlineView data source: `nil` means a parent item
+	if(item==nil) {
+		return [o_sidebaritems count];
+	}
+	else {
+		return [[item children] count];
+	}
+}
+
+
+- (id)sourceList:(PXSourceList*)aSourceList child:(NSUInteger)index ofItem:(id)item
+{
+    //Works the same way as the NSOutlineView data source: `nil` means a parent item
+	if(item==nil) {
+		return [o_sidebaritems objectAtIndex:index];
+	}
+	else {
+		return [[item children] objectAtIndex:index];
+	}
+}
+
+
+- (id)sourceList:(PXSourceList*)aSourceList objectValueForItem:(id)item
+{
+	return [item title];
+}
+
+- (void)sourceList:(PXSourceList*)aSourceList setObjectValue:(id)object forItem:(id)item
+{
+	[item setTitle:object];
+}
+
+- (BOOL)sourceList:(PXSourceList*)aSourceList isItemExpandable:(id)item
+{
+	return [item hasChildren];
+}
+
+
+- (BOOL)sourceList:(PXSourceList*)aSourceList itemHasBadge:(id)item
+{
+	return [item hasBadge];
+}
+
+
+- (NSInteger)sourceList:(PXSourceList*)aSourceList badgeValueForItem:(id)item
+{
+	return [item badgeValue];
+}
+
+
+- (BOOL)sourceList:(PXSourceList*)aSourceList itemHasIcon:(id)item
+{
+	return [item hasIcon];
+}
+
+
+- (NSImage*)sourceList:(PXSourceList*)aSourceList iconForItem:(id)item
+{
+	return [item icon];
+}
+
+- (NSMenu*)sourceList:(PXSourceList*)aSourceList menuForEvent:(NSEvent*)theEvent item:(id)item
+{
+	if ([theEvent type] == NSRightMouseDown || ([theEvent type] == NSLeftMouseDown && ([theEvent modifierFlags] & NSControlKeyMask) == NSControlKeyMask)) {
+		NSMenu * m = [[NSMenu alloc] init];
+		if (item != nil)
+			[m addItemWithTitle:[item title] action:nil keyEquivalent:@""];
+		return [m autorelease];
+	}
+	return nil;
+}
+
+#pragma mark -
+#pragma mark Side Bar Delegate Methods
+/* taken under BSD-new from the PXSourceList sample project, adapted for VLC */
+- (BOOL)sourceList:(PXSourceList*)aSourceList isGroupAlwaysExpanded:(id)group
+{
+	if([[group identifier] isEqualToString:@"library"])
+		return YES;
+
+	return NO;
+}
+
+- (void)sourceListSelectionDidChange:(NSNotification *)notification
+{
+	NSIndexSet *selectedIndexes = [o_sidebar_view selectedRowIndexes];
+
+	//Set the label text to represent the new selection
+    if([selectedIndexes count]==1) {
+		NSString *title = [[o_sidebar_view itemAtRow:[selectedIndexes firstIndex]] title];
+
+		[o_chosen_category_lbl setStringValue:title];
+	}
+	else {
+		[o_chosen_category_lbl setStringValue:@"(none)"];
+	}
 }
 
 @end

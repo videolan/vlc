@@ -34,17 +34,20 @@
 /*****************************************************************************
  * VLCPlaylistCommon interface
  *****************************************************************************/
-@interface VLCPlaylistCommon : NSObject
+#ifndef MAC_OS_X_VERSION_10_6
+@protocol NSOutlineViewDataSource <NSObject> @end
+#endif
+@interface VLCPlaylistCommon : NSObject <NSOutlineViewDataSource, NSOutlineViewDelegate>
 {
     IBOutlet id o_tc_name;
     IBOutlet id o_tc_author;
     IBOutlet id o_tc_duration;
-    IBOutlet id o_outline_view;
+    IBOutlet VLCPlaylistView* o_outline_view;
 
     IBOutlet id o_tc_name_other;
     IBOutlet id o_tc_author_other;
     IBOutlet id o_tc_duration_other;
-    IBOutlet id o_outline_view_other;
+    IBOutlet VLCPlaylistView* o_outline_view_other;
 
     NSMutableDictionary *o_outline_dict;
 }

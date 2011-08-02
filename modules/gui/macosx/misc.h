@@ -25,6 +25,10 @@
 #import <Cocoa/Cocoa.h>
 #import <ApplicationServices/ApplicationServices.h>
 
+#ifndef MAC_OS_X_VERSION_10_6
+@protocol NSWindowDelegate <NSObject> @end
+#endif
+
 /*****************************************************************************
  * NSAnimation (VLCAddition)
  *****************************************************************************/
@@ -56,7 +60,7 @@
  *  Missing extension to NSWindow
  *****************************************************************************/
 
-@interface VLCWindow : NSWindow
+@interface VLCWindow : NSWindow <NSWindowDelegate>
 {
     BOOL b_canBecomeKeyWindow;
     BOOL b_isset_canBecomeKeyWindow;

@@ -25,7 +25,11 @@
 #import "intf.h"
 #import <vlc_common.h>
 
-@interface VLCSimplePrefs : NSObject
+#ifndef MAC_OS_X_VERSION_10_6
+@protocol NSToolbarDelegate <NSObject> @end
+#endif
+
+@interface VLCSimplePrefs : NSObject <NSToolbarDelegate>
 {
     IBOutlet id o_audio_dolby_pop;
     IBOutlet id o_audio_dolby_txt;
