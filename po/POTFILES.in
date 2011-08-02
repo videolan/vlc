@@ -324,7 +324,6 @@ modules/audio_output/jack.c
 modules/audio_output/oss.c
 modules/audio_output/portaudio.c
 modules/audio_output/pulse.c
-modules/audio_output/sdl.c
 modules/audio_output/waveout.c
 modules/audio_output/windows_audio_common.h
 modules/codec/a52.c

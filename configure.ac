@@ -347,7 +347,7 @@ case "${host_os}" in
         VLC_ADD_LIBS([libvlccore],[-lws2_32 -lnetapi32 -lwinmm])
         VLC_ADD_LDFLAGS([vlc],[-mwindows])
         VLC_ADD_LIBS([win32text],[-lgdi32])
-        VLC_ADD_LIBS([cdda vcdx sdl_image aout_sdl vout_sdl],[-lwinmm])
+        VLC_ADD_LIBS([cdda vcdx sdl_image vout_sdl],[-lwinmm])
         VLC_ADD_LIBS([access_http access_mms access_udp access_tcp access_ftp access_rtmp access_output_udp access_output_shout access_output_rtmp sap stream_out_standard stream_out_select stream_out_rtp stream_out_raop vod_rtsp access_realrtsp rtp oldrc netsync gnutls growl_udp flac ts audioscrobbler lua remoteosd zvbi audiobargraph_a netsync],[-lws2_32])
         VLC_ADD_LIBS([filesystem], [-lshlwapi])
         dnl
@@ -3221,13 +3221,13 @@ then
    PKG_CHECK_MODULES(SDL, [sdl >= 1.2.10], [
       # SDL on Darwin is heavily patched and can only run SDL_image
       if test "${SYS}" != "darwin"; then
-        VLC_ADD_PLUGIN([vout_sdl aout_sdl])
+        VLC_ADD_PLUGIN([vout_sdl])
       fi
       if test "${SYS}" != "mingw32"; then
         VLC_ADD_LIBS([vout_sdl],[${X_LIBS} ${X_PRE_LIBS} -lX11])
       fi
-      VLC_ADD_CFLAGS([vout_sdl aout_sdl],[${SDL_CFLAGS}])
-      VLC_ADD_LIBS([vout_sdl aout_sdl],[${SDL_LIBS}])
+      VLC_ADD_CFLAGS([vout_sdl],[${SDL_CFLAGS}])
+      VLC_ADD_LIBS([vout_sdl],[${SDL_LIBS}])
 
       # SDL_image
       AS_IF([ test "${enable_sdl_image}" != "no"],[

@@ -46,7 +46,6 @@ $Id$
  * antiflicker: anti-flicker video filter
  * aout_directx: audio output module using the DirectX API
  * aout_file: Audio output to write to a file
- * aout_sdl: audio output module using the SDL library
  * araw: Pseudo audio decoder for raw PCM
  * asf: ASF demuxer
  * atmo: Ambilight-like video-output

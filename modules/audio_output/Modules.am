@@ -1,6 +1,5 @@
 SOURCES_aout_directx = directx.c windows_audio_common.h
 SOURCES_aout_file = file.c
-SOURCES_aout_sdl = sdl.c
 SOURCES_waveout = waveout.c windows_audio_common.h
 SOURCES_portaudio = portaudio.c
 SOURCES_auhal = auhal.c
