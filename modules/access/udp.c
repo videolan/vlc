@@ -73,8 +73,6 @@ vlc_module_end ()
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-#define RTP_HEADER_LEN 12
-
 static block_t *BlockUDP( access_t * );
 static int Control( access_t *, int, va_list );
 
