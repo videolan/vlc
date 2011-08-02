@@ -163,7 +163,8 @@ Removed modules:
  * upnp: use upnp_intel
  * removal of old telnet interface in favor of the new lua CLI
  * removal of http interface in favor of luahttp
- * remove of the noise filter
+ * removal of the noise filter
+ * removal of the SDL audio output, use the native outputs
 
 
 Changes between 1.1.10 and 1.1.11:
