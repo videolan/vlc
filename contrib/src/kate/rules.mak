@@ -23,5 +23,5 @@ DEPS_kate = ogg $(DEPS_ogg)
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) \
 		--disable-valgrind \
 		--disable-doc
-	cd $< && $(MAKE) install
+	cd $< && $(MAKE) SUBDIRS=. install
 	touch $@
