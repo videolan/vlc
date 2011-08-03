@@ -14,6 +14,7 @@ $(TARBALLS)/libass-$(ASS_VERSION).tar.gz:
 
 libass: libass-$(ASS_VERSION).tar.gz .sum-ass
 	$(UNPACK)
+	$(APPLY) $(SRC)/ass/libass-pkg-static.patch
 	$(MOVE)
 
 DEPS_ass = freetype2 $(DEPS_freetype2) fontconfig $(DEPS_fontconfig)

@@ -1,0 +1,13 @@
+diff -ru libass.orig/libass.pc.in libass/libass.pc.in
+--- libass.orig/libass.pc.in	2011-08-03 10:52:37.000000000 +0300
++++ libass/libass.pc.in	2011-08-03 10:52:56.000000000 +0300
+@@ -6,7 +6,6 @@
+ Name: libass
+ Description: LibASS is an SSA/ASS subtitles rendering library
+ Version: @PACKAGE_VERSION@
+-Requires.private: @PKG_REQUIRES@
+-Libs: -L${libdir} -lass
+-Libs.private: -lm
++Requires: @PKG_REQUIRES@
++Libs: -L${libdir} -lass -lm
+ Cflags: -I${includedir}
