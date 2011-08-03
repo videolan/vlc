@@ -38,6 +38,7 @@
 #include <vlc_block_helper.h>
 #include <vlc_bits.h>
 #include <vlc_modules.h>
+#include <vlc_cpu.h>
 
 /*****************************************************************************
  * Module descriptor
@@ -120,7 +121,7 @@ static block_t       *GetSoutBuffer( decoder_t * );
 static int OpenDecoder( vlc_object_t *p_this )
 {
     /* HACK: Don't use this codec if we don't have an dts audio filter */
-    if( !module_exists( "dtstofloat32" ) )
+    if( !HAVE_FPU || !module_exists( "dtstofloat32" ) )
         return VLC_EGENERIC;
 
     return OpenCommon( p_this, false );
