@@ -29,7 +29,6 @@
 #import "CoreInteraction.h"
 #import "AudioEffects.h"
 #import "MainMenu.h"
-#import "misc.h"
 #import "controls.h" // TODO: remove me
 #import "SideBarItem.h"
 #import <vlc_playlist.h>

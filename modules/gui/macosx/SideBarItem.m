@@ -30,15 +30,15 @@
 	{
 		badgeValue = -1;	//We don't want a badge value by default
 	}
-	
+
 	return self;
 }
 
 
 + (id)itemWithTitle:(NSString*)aTitle identifier:(NSString*)anIdentifier
-{	
+{
 	SideBarItem *item = [SideBarItem itemWithTitle:aTitle identifier:anIdentifier icon:nil];
-	
+
 	return item;
 }
 
@@ -46,11 +46,11 @@
 + (id)itemWithTitle:(NSString*)aTitle identifier:(NSString*)anIdentifier icon:(NSImage*)anIcon
 {
 	SideBarItem *item = [[[SideBarItem alloc] init] autorelease];
-	
+
 	[item setTitle:aTitle];
 	[item setIdentifier:anIdentifier];
 	[item setIcon:anIcon];
-	
+
 	return item;
 }
 
@@ -60,7 +60,7 @@
 	[identifier release];
 	[icon release];
 	[children release];
-	
+
 	[super dealloc];
 }
 
@@ -70,7 +70,7 @@
 	identifier = nil;
 	icon = nil;
 	children = nil;
-	
+
 	[super finalize];
 }
 

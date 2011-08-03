@@ -22,6 +22,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#import "PXSourceList.h"
+
 /*****************************************************************************
  * VLCPlaylistView interface
  *****************************************************************************/
@@ -34,9 +36,6 @@
 /*****************************************************************************
  * VLCPlaylistCommon interface
  *****************************************************************************/
-#ifndef MAC_OS_X_VERSION_10_6
-@protocol NSOutlineViewDataSource <NSObject> @end
-#endif
 @interface VLCPlaylistCommon : NSObject <NSOutlineViewDataSource, NSOutlineViewDelegate>
 {
     IBOutlet id o_tc_name;

@@ -27,10 +27,7 @@
 #import <Cocoa/Cocoa.h>
 #import "PXSourceList.h"
 #import <vlc_input.h>
-
-#ifndef MAC_OS_X_VERSION_10_6
-@protocol NSWindowDelegate <NSObject> @end
-#endif
+#import "misc.h"
 
 @interface VLCMainWindow : NSWindow <PXSourceListDataSource, PXSourceListDelegate, NSWindowDelegate> {
     IBOutlet id o_play_btn;
@@ -127,3 +124,4 @@
 }
 - (void)loadImagesInDarkStyle:(BOOL)b_value;
 @end
+

@@ -290,7 +290,7 @@ static int InputEvent( vlc_object_t *p_this, const char *psz_var,
 
         case INPUT_EVENT_DEAD:
             [[VLCMain sharedInstance] updateName];
-            [[VLCMain sharedInstance] updateTimeSlider];
+            [[VLCMain sharedInstance] updatePlaybackPosition];
             break;
 
         case INPUT_EVENT_ABORT:

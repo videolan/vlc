@@ -11,7 +11,7 @@
 #import <Cocoa/Cocoa.h>
 
 /*An example of a class that could be used to represent a Source List Item
- 
+
  Provides a title, an identifier, and an icon to be shown, as well as a badge value and a property to determine
  whether the current item has a badge or not (`badgeValue` is set to -1 if no badge is shown)
  
@@ -32,7 +32,7 @@
 	NSString *identifier;
 	NSImage *icon;
 	NSInteger badgeValue;
-	
+
 	NSArray *children;
 }
 

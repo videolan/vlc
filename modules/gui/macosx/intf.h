@@ -37,6 +37,7 @@
 
 #include <Cocoa/Cocoa.h>
 #import "SPMediaKeyTap.h"                   /* for the media key support */
+#import "misc.h"
 
 /*****************************************************************************
  * Local prototypes.
@@ -78,9 +79,6 @@ struct intf_sys_t
 /*****************************************************************************
  * VLCMain interface
  *****************************************************************************/
-#ifndef MAC_OS_X_VERSION_10_6
-@protocol NSWindowDelegate <NSObject> @end
-#endif
 @class AppleRemote;
 @class VLCInformation;
 @class VLCEmbeddedWindow;
