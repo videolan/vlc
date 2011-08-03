@@ -1,0 +1,22 @@
+diff -ru libmatroska.orig/make/linux/Makefile libmatroska/make/linux/Makefile
+--- libmatroska.orig/make/linux/Makefile	2011-06-15 15:00:37.000000000 +0300
++++ libmatroska/make/linux/Makefile	2011-08-03 13:33:25.000000000 +0300
+@@ -65,7 +65,7 @@
+ # object files; replace .cxx extension with .o
+ objects:=$(patsubst %$(EXTENSION),%.o,$(sources))
+ 
+-objects_so:=$(patsubst %$(EXTENSION),%.lo,$(sources))
++objects_so:=$(objects)
+ 
+ WARNINGFLAGS=-Wall -Wno-unknown-pragmas -ansi -fno-gnu-keywords -D_GNU_SOURCE \
+ 		-Wshadow
+@@ -89,9 +89,6 @@
+ 
+ # Build rules
+ %.o: %$(EXTENSION)
+-	$(CXX) -c $(COMPILEFLAGS) -o $@ $<
+-
+-%.lo: %$(EXTENSION)
+ 	$(CXX) -c $(COMPILEFLAGS) -fPIC -o $@ $<
+ 
+ $(LIBRARY): $(objects)

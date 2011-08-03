@@ -14,6 +14,7 @@ $(TARBALLS)/libmatroska-$(MATROSKA_VERSION).tar.bz2:
 
 libmatroska: libmatroska-$(MATROSKA_VERSION).tar.bz2 .sum-matroska
 	$(UNPACK)
+	$(APPLY) $(SRC)/matroska/matroska-pic.patch
 	$(MOVE)
 
 .matroska: libmatroska
