@@ -354,21 +354,14 @@ static int OpenFilter( vlc_object_t *p_this )
     filter_sys_t *p_sys;
     int i_ret;
 
-    if( p_filter->fmt_in.i_codec != VLC_CODEC_A52 ||
-        p_filter->fmt_out.audio.i_format == VLC_CODEC_SPDIFB ||
-        p_filter->fmt_out.audio.i_format == VLC_CODEC_SPDIFL )
-    {
+    if( p_filter->fmt_in.i_codec != VLC_CODEC_A52 )
         return VLC_EGENERIC;
-    }
-
-    p_filter->fmt_out.audio.i_format =
 #ifdef LIBA52_FIXED
-        p_filter->fmt_out.i_codec = VLC_CODEC_FI32;
+    if( p_filter->fmt_out.audio.i_format != VLC_CODEC_FI32 )
 #else
-        p_filter->fmt_out.i_codec = VLC_CODEC_FL32;
+    if( p_filter->fmt_out.audio.i_format != VLC_CODEC_FL32 )
 #endif
-    p_filter->fmt_out.audio.i_bitspersample =
-        aout_BitsPerSample( p_filter->fmt_out.i_codec );
+        return VLC_EGENERIC;
 
     /* Allocate the memory needed to store the module's structure */
     p_filter->p_sys = p_sys = malloc( sizeof(filter_sys_t) );
