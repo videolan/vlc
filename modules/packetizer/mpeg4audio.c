@@ -206,7 +206,7 @@ static int OpenPacketizer( vlc_object_t *p_this )
     /* Misc init */
     p_sys->i_state = STATE_NOSYNC;
     date_Set( &p_sys->end_date, 0 );
-    p_sys->bytestream = block_BytestreamInit();
+    block_BytestreamInit( &p_sys->bytestream );
     p_sys->b_latm_cfg = false;
 
     /* Set output properties */

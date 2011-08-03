@@ -157,7 +157,7 @@ static int OpenCommon( vlc_object_t *p_this, bool b_packetizer )
     p_sys->b_dts_hd = false;
     p_sys->i_pts = VLC_TS_INVALID;
 
-    p_sys->bytestream = block_BytestreamInit();
+    block_BytestreamInit( &p_sys->bytestream );
 
     /* Set output properties */
     p_dec->fmt_out.i_cat = AUDIO_ES;

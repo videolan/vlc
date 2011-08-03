@@ -127,7 +127,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_state       = STATE_NOSYNC;
     p_sys->b_stream_info = false;
     p_sys->i_pts         = VLC_TS_INVALID;
-    p_sys->bytestream    = block_BytestreamInit();
+    block_BytestreamInit( &p_sys->bytestream );
 
     /* */
     es_format_Copy( &p_dec->fmt_out, &p_dec->fmt_in );

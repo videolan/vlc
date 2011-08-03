@@ -37,15 +37,10 @@ typedef struct block_bytestream_t
 /*****************************************************************************
  * block_bytestream_t management
  *****************************************************************************/
-VLC_USED
-static inline block_bytestream_t block_BytestreamInit( void )
+static inline void block_BytestreamInit( block_bytestream_t *p_bytestream )
 {
-    block_bytestream_t bytestream;
-
-    bytestream.i_offset = 0;
-    bytestream.p_chain = bytestream.p_block = NULL;
-
-    return bytestream;
+    p_bytestream->p_chain = p_bytestream->p_block = NULL;
+    p_bytestream->i_offset = 0;
 }
 
 static inline void block_BytestreamRelease( block_bytestream_t *p_bytestream )
@@ -65,8 +60,7 @@ static inline void block_BytestreamRelease( block_bytestream_t *p_bytestream )
 static inline void block_BytestreamEmpty( block_bytestream_t *p_bytestream )
 {
     block_BytestreamRelease( p_bytestream );
-
-    *p_bytestream = block_BytestreamInit();
+    block_BytestreamInit( p_bytestream );
 }
 
 /**

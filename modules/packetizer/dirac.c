@@ -1365,7 +1365,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_dts_last_out = p_sys->i_pts_last_out = VLC_TS_INVALID;
 
     p_sys->i_state = NOT_SYNCED;
-    p_sys->bytestream = block_BytestreamInit();
+    block_BytestreamInit( &p_sys->bytestream );
 
     p_sys->pp_outqueue_last = &p_sys->p_outqueue;
     p_sys->pp_eu_last = &p_sys->p_eu;

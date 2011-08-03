@@ -68,7 +68,7 @@ static inline void packetizer_Init( packetizer_t *p_pack,
                                     void *p_private )
 {
     p_pack->i_state = STATE_NOSYNC;
-    p_pack->bytestream = block_BytestreamInit();
+    block_BytestreamInit( &p_pack->bytestream );
     p_pack->i_offset = 0;
     p_pack->b_flushing = false;
 

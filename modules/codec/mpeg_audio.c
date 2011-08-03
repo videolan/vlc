@@ -150,7 +150,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->b_packetizer = false;
     p_sys->i_state = STATE_NOSYNC;
     date_Set( &p_sys->end_date, 0 );
-    p_sys->bytestream = block_BytestreamInit();
+    block_BytestreamInit( &p_sys->bytestream );
     p_sys->i_pts = VLC_TS_INVALID;
     p_sys->b_discontinuity = false;
 

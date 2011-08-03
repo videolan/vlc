@@ -140,7 +140,7 @@ static int OpenCommon( vlc_object_t *p_this, bool b_packetizer )
     date_Set( &p_sys->end_date, 0 );
     p_sys->i_pts = VLC_TS_INVALID;
 
-    p_sys->bytestream = block_BytestreamInit();
+    block_BytestreamInit( &p_sys->bytestream );
 
     /* Set output properties */
     p_dec->fmt_out.i_cat = AUDIO_ES;
