@@ -1,0 +1,13 @@
+diff -ru a52dec.orig/liba52/configure.incl a52dec/liba52/configure.incl
+--- a52dec.orig/liba52/configure.incl	2011-08-03 13:22:24.000000000 +0300
++++ a52dec/liba52/configure.incl	2011-08-03 13:22:46.000000000 +0300
+@@ -1,9 +1,6 @@
+ AC_SUBST([LIBA52_CFLAGS])
+ AC_SUBST([LIBA52_LIBS])
+ 
+-dnl avoid -fPIC when possible
+-LIBA52_CFLAGS="$LIBA52_CFLAGS -prefer-non-pic"
+-
+ AC_ARG_ENABLE([double],
+     [  --enable-double         use double-precision samples])
+ if test x"$enable_double" = x"yes"; then

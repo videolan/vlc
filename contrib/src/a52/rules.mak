@@ -12,15 +12,14 @@ $(TARBALLS)/a52dec-$(A52DEC_VERSION).tar.gz:
 
 a52dec: a52dec-$(A52DEC_VERSION).tar.gz .sum-a52
 	$(UNPACK)
+	$(APPLY) $(SRC)/a52/liba52-pic.patch
 ifndef HAVE_FPU
 	$(APPLY) $(SRC)/a52/liba52-fixed.diff
 endif
 	$(MOVE)
 
 .a52: a52dec
-ifdef HAVE_WIN64
 	$(RECONF)
-endif
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF)
 	cd $</liba52 && $(MAKE) install
 	cd $</include && $(MAKE) install
