@@ -36,6 +36,7 @@
 
 #include <vlc_aout.h>
 #include <vlc_filter.h>
+#include <vlc_cpu.h>
 #include "aout_internal.h"
 #include <libvlc.h>
 
@@ -100,7 +101,20 @@ static int SplitConversion( const audio_sample_format_t *restrict infmt,
         midfmt->i_original_channels = infmt->i_original_channels;
     }
     else
-        return -1;
+    {
+        assert( infmt->i_format != outfmt->i_format );
+        if( AOUT_FMT_NON_LINEAR( infmt ) )
+        {
+            if( AOUT_FMT_NON_LINEAR( outfmt ) )
+                return -1; /* no indirect non-linear -> non-linear */
+            /* NOTE: our non-linear -> linear filters always output 32-bits */
+            midfmt->i_format = HAVE_FPU ? VLC_CODEC_FL32 : VLC_CODEC_FI32;
+        }
+        else
+            /* NOTE: Use S16N as intermediate. We have all conversions to S16N,
+             * and all useful conversions from S16N. TODO: FL32 if HAVE_FPU. */
+            midfmt->i_format = VLC_CODEC_S16N;
+    }
 
     aout_FormatPrepare( midfmt );
     return AOUT_FMTS_IDENTICAL( infmt, midfmt ) ? -1 : 0;
