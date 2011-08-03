@@ -21,6 +21,7 @@ ifeq ($(call need_pkg,"glib-2.0"),)
 FLUID_TARBALL := fluidsynth-$(FLUID_VERSION).tar.bz2
 else
 FLUID_TARBALL := fluidsynth-1.0.9.tar.gz
+FLUID_VERSION := 1.0.9
 endif
 
 fluidsynth: $(FLUID_TARBALL) .sum-fluid
@@ -28,6 +29,9 @@ fluidsynth: $(FLUID_TARBALL) .sum-fluid
 	$(APPLY) $(SRC)/fluid/fluid-no-bin.patch
 ifdef HAVE_WIN32
 	$(APPLY) $(SRC)/fluid/fluid-static-win32.patch
+endif
+ifneq ($(FLUID_VERSION),1.0.9)
+	$(APPLY) $(SRC)/fluid/fluid-pkg-static.patch
 endif
 	$(MOVE)
 

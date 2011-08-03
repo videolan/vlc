@@ -1,0 +1,10 @@
+diff -ru fluidsynth.orig/fluidsynth.pc.in fluidsynth/fluidsynth.pc.in
+--- fluidsynth.orig/fluidsynth.pc.in	2011-08-03 10:45:08.000000000 +0300
++++ fluidsynth/fluidsynth.pc.in	2011-08-03 10:45:51.000000000 +0300
+@@ -6,5 +6,5 @@
+ Name: FluidSynth
+ Description: Software SoundFont synth
+ Version: @VERSION@
+-Libs: -L${libdir} -lfluidsynth
++Libs: -L${libdir} -lfluidsynth -lgthread-2.0 -lglib-2.0 -lm
+ Cflags: -I${includedir}
