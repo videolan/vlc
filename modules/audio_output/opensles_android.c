@@ -294,8 +294,6 @@ static void Close( vlc_object_t * p_this )
 static void Play( audio_output_t * p_aout, block_t *p_buffer )
 {
     aout_sys_t * p_sys = p_aout->sys;
-    aout_buffer_t *p_buffer;
-
     SLresult result;
 
     for (;;)
