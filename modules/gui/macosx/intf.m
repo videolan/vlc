@@ -1277,6 +1277,7 @@ unsigned int CocoaKeyToVLC( unichar i_key )
 {
     [self playbackStatusUpdated];
     [o_playlist playlistUpdated];
+    [o_mainwindow updateWindow];
 }
 
 - (void)updateInfoandMetaPanel

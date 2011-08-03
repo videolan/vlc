@@ -29,6 +29,7 @@
 #import "CoreInteraction.h"
 #import "AudioEffects.h"
 #import "MainMenu.h"
+#import "open.h"
 #import "controls.h" // TODO: remove me
 #import "SideBarItem.h"
 #import <vlc_playlist.h>
@@ -118,6 +119,8 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [o_volume_down_btn setToolTip: _NS("Mute")];
     [o_volume_up_btn setToolTip: _NS("Full Volume")];
     [o_time_sld setToolTip: _NS("Position")];
+    [o_dropzone_btn setTitle: _NS("Open media...")];
+    [o_dropzone_lbl setStringValue: _NS("Drop media here")];
 
     if (!b_dark_interface) {
         [o_bottombar_view setImage: [NSImage imageNamed:@"bottom-background"]];
@@ -206,7 +209,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [self setDelegate: self];
     [self setExcludedFromWindowsMenu: YES];
     // Set that here as IB seems to be buggy
-    [self setContentMinSize:NSMakeSize(500., 200.)];
+    [self setContentMinSize:NSMakeSize(400., 288.)];
     [self setTitle: _NS("VLC media player")];
     [o_playlist_btn setEnabled:NO];
 
@@ -308,6 +311,13 @@ static VLCMainWindow *_o_sharedInstance = nil;
         [o_sidebaritems addObject: internetItem];
 
     [o_sidebar_view reloadData];
+    [o_sidebar_view selectRowIndexes:[NSIndexSet indexSetWithIndex:0] byExtendingSelection:YES];
+
+    playlist_t *p_playlist = pl_Get( VLCIntf );
+    PL_LOCK;
+    if( playlist_CurrentSize( p_playlist ) < 1 )
+        [self showDropZone];
+    PL_UNLOCK;
 }
 
 #pragma mark -
@@ -549,8 +559,26 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [[VLCCoreInteraction sharedInstance] toggleFullscreen];
 }
 
+- (IBAction)dropzoneButtonAction:(id)sender
+{
+    [[[VLCMain sharedInstance] open] openFileGeneric];
+}
+
 #pragma mark -
 #pragma mark Update interface and respond to foreign events
+- (void)showDropZone
+{
+    [o_playlist_table setHidden:YES];
+    [o_dropzone_view setFrame: [o_playlist_table frame]];
+    [o_right_split_view addSubview: o_dropzone_view];
+}
+
+- (void)hideDropZone
+{
+    [o_playlist_table setHidden: NO];
+    [o_dropzone_view removeFromSuperview];
+}
+
 - (void)updateTimeSlider
 {
     input_thread_t * p_input;
@@ -727,10 +755,16 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [o_bwd_btn setEnabled: (b_seekable || b_plmul || b_chapters)];
     [[VLCMainMenu sharedInstance] setRateControlsEnabled: b_control];
 
-
     [o_time_sld setEnabled: b_seekable];
     [self updateTimeSlider];
     [[[[VLCMain sharedInstance] controls] fspanel] setSeekable: b_seekable];
+
+    PL_LOCK;
+    if (playlist_CurrentSize( p_playlist ) >= 1)
+        [self hideDropZone];
+    else
+        [self showDropZone];
+    PL_UNLOCK;
 }
 
 - (void)setPause

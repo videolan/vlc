@@ -188,6 +188,7 @@
 		CC402F440E00ABBB006A4BA4 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC962E2C0CC7992800A56695 /* WebKit.framework */; };
 		CC426FD11020D44F00A32659 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC426FD01020D44F00A32659 /* Sparkle.framework */; };
 		CC426FD71020D47100A32659 /* Sparkle.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = CC426FD01020D44F00A32659 /* Sparkle.framework */; };
+		CC4EFC2D13E96BD00091D19A /* dropzone.png in Resources */ = {isa = PBXBuildFile; fileRef = CC4EFC2C13E96BD00091D19A /* dropzone.png */; };
 		CC5560281365CE4800D54038 /* AudioEffects.nib in Resources */ = {isa = PBXBuildFile; fileRef = CC5560261365CE4800D54038 /* AudioEffects.nib */; };
 		CC707EC8137474A50003010A /* SyncTracks.nib in Resources */ = {isa = PBXBuildFile; fileRef = CC707EC6137474A50003010A /* SyncTracks.nib */; };
 		CC78DA4413DE056700E9603C /* topbar_background.png in Resources */ = {isa = PBXBuildFile; fileRef = CC78DA4313DE056700E9603C /* topbar_background.png */; };
@@ -198,6 +199,7 @@
 		CC9B43B113B29FCF000205AE /* bottom-background_dark.png in Resources */ = {isa = PBXBuildFile; fileRef = CC9B43B013B29FCF000205AE /* bottom-background_dark.png */; };
 		CCBE999F0F922C51000705F8 /* CoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CCBE999E0F922C51000705F8 /* CoreServices.framework */; };
 		CCC0C2AA13A285F700AC92B3 /* VideoEffects.nib in Resources */ = {isa = PBXBuildFile; fileRef = CCC0C2A813A285F700AC92B3 /* VideoEffects.nib */; };
+		CCDB535D13E97D3500A1782F /* dropzone-background.png in Resources */ = {isa = PBXBuildFile; fileRef = CCDB535C13E97D3500A1782F /* dropzone-background.png */; };
 		CCE6439413E8CC170061B5F2 /* document-music-playlist.png in Resources */ = {isa = PBXBuildFile; fileRef = CCE6438E13E8CC170061B5F2 /* document-music-playlist.png */; };
 		CCE6439513E8CC170061B5F2 /* film-cast.png in Resources */ = {isa = PBXBuildFile; fileRef = CCE6438F13E8CC170061B5F2 /* film-cast.png */; };
 		CCE6439613E8CC170061B5F2 /* film.png in Resources */ = {isa = PBXBuildFile; fileRef = CCE6439013E8CC170061B5F2 /* film.png */; };
@@ -438,6 +440,7 @@
 		CC4ED9AD0ABE07C800CA4CC5 /* add_embedded.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = add_embedded.png; path = Resources/add_embedded.png; sourceTree = "<group>"; };
 		CC4ED9AF0ABE07C800CA4CC5 /* repeat_embedded.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = repeat_embedded.png; path = Resources/repeat_embedded.png; sourceTree = "<group>"; };
 		CC4ED9B20ABE07C800CA4CC5 /* shuffle_embedded.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = shuffle_embedded.png; path = Resources/shuffle_embedded.png; sourceTree = "<group>"; };
+		CC4EFC2C13E96BD00091D19A /* dropzone.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = dropzone.png; path = Resources/mainwindow/dropzone.png; sourceTree = "<group>"; };
 		CC5560231365CDC700D54038 /* AudioEffects.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AudioEffects.h; path = ../../../modules/gui/macosx/AudioEffects.h; sourceTree = "<group>"; };
 		CC5560241365CDC800D54038 /* AudioEffects.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AudioEffects.m; path = ../../../modules/gui/macosx/AudioEffects.m; sourceTree = "<group>"; };
 		CC5560271365CE4800D54038 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = Resources/English.lproj/AudioEffects.nib; sourceTree = "<group>"; };
@@ -486,6 +489,7 @@
 		CCD590F110E5B73200D39094 /* dialogProvider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = dialogProvider.m; path = ../../../modules/gui/macosx_dialog_provider/dialogProvider.m; sourceTree = SOURCE_ROOT; };
 		CCD590F210E5B76300D39094 /* VLCLoginPanel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCLoginPanel.h; path = ../../../modules/gui/macosx_dialog_provider/VLCLoginPanel.h; sourceTree = SOURCE_ROOT; };
 		CCD590F310E5B76300D39094 /* VLCLoginPanel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VLCLoginPanel.m; path = ../../../modules/gui/macosx_dialog_provider/VLCLoginPanel.m; sourceTree = SOURCE_ROOT; };
+		CCDB535C13E97D3500A1782F /* dropzone-background.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "dropzone-background.png"; path = "Resources/mainwindow/dropzone-background.png"; sourceTree = "<group>"; };
 		CCDBA3B313D32E200006127B /* macosx.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = macosx.m; path = ../../../modules/video_output/macosx.m; sourceTree = "<group>"; };
 		CCE6438E13E8CC170061B5F2 /* document-music-playlist.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "document-music-playlist.png"; path = "Resources/sidebar-icons/document-music-playlist.png"; sourceTree = "<group>"; };
 		CCE6438F13E8CC170061B5F2 /* film-cast.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "film-cast.png"; path = "Resources/sidebar-icons/film-cast.png"; sourceTree = "<group>"; };
@@ -697,6 +701,8 @@
 		CC0430EE13B2461A00D7D52E /* 10th anniversary ui */ = {
 			isa = PBXGroup;
 			children = (
+				CC4EFC2C13E96BD00091D19A /* dropzone.png */,
+				CCDB535C13E97D3500A1782F /* dropzone-background.png */,
 				CC78DA4313DE056700E9603C /* topbar_background.png */,
 				CCE6438C13E8CC040061B5F2 /* sidebar */,
 				CC0432C213B2479E00D7D52E /* bright variant */,
@@ -1234,6 +1240,8 @@
 				CCE6439713E8CC170061B5F2 /* music-beam.png in Resources */,
 				CCE6439813E8CC170061B5F2 /* network-cloud.png in Resources */,
 				CCE6439913E8CC170061B5F2 /* picture.png in Resources */,
+				CC4EFC2D13E96BD00091D19A /* dropzone.png in Resources */,
+				CCDB535D13E97D3500A1782F /* dropzone-background.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
