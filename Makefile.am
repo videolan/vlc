@@ -305,6 +305,13 @@ EXTRA_DIST += \
 	extras/package/macosx/Resources/repeat_single_embedded_graphite.png \
 	extras/package/macosx/Resources/shuffle_embedded.png \
 	extras/package/macosx/Resources/shuffle_embedded_graphite.png \
+	extras/package/macosx/Resources/sidebar-icons/document-music-playlist.png \
+	extras/package/macosx/Resources/sidebar-icons/film-cast.png \
+	extras/package/macosx/Resources/sidebar-icons/film.png \
+	extras/package/macosx/Resources/sidebar-icons/music-beam.png \
+	extras/package/macosx/Resources/sidebar-icons/network-cloud.png \
+	extras/package/macosx/Resources/sidebar-icons/picture.png \
+	extras/package/macosx/Resources/sidebar-icons/README \
 	extras/package/macosx/Resources/skip_forward_active_embedded.png \
 	extras/package/macosx/Resources/skip_forward_embedded_graphite.png \
 	extras/package/macosx/Resources/skip_previous_active_embedded.png \

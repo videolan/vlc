@@ -198,6 +198,12 @@
 		CC9B43B113B29FCF000205AE /* bottom-background_dark.png in Resources */ = {isa = PBXBuildFile; fileRef = CC9B43B013B29FCF000205AE /* bottom-background_dark.png */; };
 		CCBE999F0F922C51000705F8 /* CoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CCBE999E0F922C51000705F8 /* CoreServices.framework */; };
 		CCC0C2AA13A285F700AC92B3 /* VideoEffects.nib in Resources */ = {isa = PBXBuildFile; fileRef = CCC0C2A813A285F700AC92B3 /* VideoEffects.nib */; };
+		CCE6439413E8CC170061B5F2 /* document-music-playlist.png in Resources */ = {isa = PBXBuildFile; fileRef = CCE6438E13E8CC170061B5F2 /* document-music-playlist.png */; };
+		CCE6439513E8CC170061B5F2 /* film-cast.png in Resources */ = {isa = PBXBuildFile; fileRef = CCE6438F13E8CC170061B5F2 /* film-cast.png */; };
+		CCE6439613E8CC170061B5F2 /* film.png in Resources */ = {isa = PBXBuildFile; fileRef = CCE6439013E8CC170061B5F2 /* film.png */; };
+		CCE6439713E8CC170061B5F2 /* music-beam.png in Resources */ = {isa = PBXBuildFile; fileRef = CCE6439113E8CC170061B5F2 /* music-beam.png */; };
+		CCE6439813E8CC170061B5F2 /* network-cloud.png in Resources */ = {isa = PBXBuildFile; fileRef = CCE6439213E8CC170061B5F2 /* network-cloud.png */; };
+		CCE6439913E8CC170061B5F2 /* picture.png in Resources */ = {isa = PBXBuildFile; fileRef = CCE6439313E8CC170061B5F2 /* picture.png */; };
 		CCF11B540F8BFB520088542D /* ErrorPanel.nib in Resources */ = {isa = PBXBuildFile; fileRef = CCF11B520F8BFB520088542D /* ErrorPanel.nib */; };
 /* End PBXBuildFile section */
 
@@ -481,6 +487,12 @@
 		CCD590F210E5B76300D39094 /* VLCLoginPanel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCLoginPanel.h; path = ../../../modules/gui/macosx_dialog_provider/VLCLoginPanel.h; sourceTree = SOURCE_ROOT; };
 		CCD590F310E5B76300D39094 /* VLCLoginPanel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VLCLoginPanel.m; path = ../../../modules/gui/macosx_dialog_provider/VLCLoginPanel.m; sourceTree = SOURCE_ROOT; };
 		CCDBA3B313D32E200006127B /* macosx.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = macosx.m; path = ../../../modules/video_output/macosx.m; sourceTree = "<group>"; };
+		CCE6438E13E8CC170061B5F2 /* document-music-playlist.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "document-music-playlist.png"; path = "Resources/sidebar-icons/document-music-playlist.png"; sourceTree = "<group>"; };
+		CCE6438F13E8CC170061B5F2 /* film-cast.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "film-cast.png"; path = "Resources/sidebar-icons/film-cast.png"; sourceTree = "<group>"; };
+		CCE6439013E8CC170061B5F2 /* film.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = film.png; path = "Resources/sidebar-icons/film.png"; sourceTree = "<group>"; };
+		CCE6439113E8CC170061B5F2 /* music-beam.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "music-beam.png"; path = "Resources/sidebar-icons/music-beam.png"; sourceTree = "<group>"; };
+		CCE6439213E8CC170061B5F2 /* network-cloud.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "network-cloud.png"; path = "Resources/sidebar-icons/network-cloud.png"; sourceTree = "<group>"; };
+		CCE6439313E8CC170061B5F2 /* picture.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = picture.png; path = "Resources/sidebar-icons/picture.png"; sourceTree = "<group>"; };
 		CCF0777913659A8000AF19FD /* SPInvocationGrabbing.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SPInvocationGrabbing.h; path = ../../../modules/gui/macosx/SPInvocationGrabbing.h; sourceTree = "<group>"; };
 		CCF0777A13659A8000AF19FD /* SPInvocationGrabbing.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SPInvocationGrabbing.m; path = ../../../modules/gui/macosx/SPInvocationGrabbing.m; sourceTree = "<group>"; };
 		CCF0777B13659A8000AF19FD /* SPMediaKeyTap.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SPMediaKeyTap.h; path = ../../../modules/gui/macosx/SPMediaKeyTap.h; sourceTree = "<group>"; };
@@ -686,6 +698,7 @@
 			isa = PBXGroup;
 			children = (
 				CC78DA4313DE056700E9603C /* topbar_background.png */,
+				CCE6438C13E8CC040061B5F2 /* sidebar */,
 				CC0432C213B2479E00D7D52E /* bright variant */,
 				CC04326513B246E600D7D52E /* dark variant */,
 			);
@@ -948,6 +961,19 @@
 			name = "Minimal Dialog Provider";
 			sourceTree = "<group>";
 		};
+		CCE6438C13E8CC040061B5F2 /* sidebar */ = {
+			isa = PBXGroup;
+			children = (
+				CCE6438E13E8CC170061B5F2 /* document-music-playlist.png */,
+				CCE6438F13E8CC170061B5F2 /* film-cast.png */,
+				CCE6439013E8CC170061B5F2 /* film.png */,
+				CCE6439113E8CC170061B5F2 /* music-beam.png */,
+				CCE6439213E8CC170061B5F2 /* network-cloud.png */,
+				CCE6439313E8CC170061B5F2 /* picture.png */,
+			);
+			name = sidebar;
+			sourceTree = "<group>";
+		};
 		DCF358BC077F1236007DB450 /* nibs */ = {
 			isa = PBXGroup;
 			children = (
@@ -1202,6 +1228,12 @@
 				CC9B43AF13B29C79000205AE /* bottom-background.png in Resources */,
 				CC9B43B113B29FCF000205AE /* bottom-background_dark.png in Resources */,
 				CC78DA4413DE056700E9603C /* topbar_background.png in Resources */,
+				CCE6439413E8CC170061B5F2 /* document-music-playlist.png in Resources */,
+				CCE6439513E8CC170061B5F2 /* film-cast.png in Resources */,
+				CCE6439613E8CC170061B5F2 /* film.png in Resources */,
+				CCE6439713E8CC170061B5F2 /* music-beam.png in Resources */,
+				CCE6439813E8CC170061B5F2 /* network-cloud.png in Resources */,
+				CCE6439913E8CC170061B5F2 /* picture.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

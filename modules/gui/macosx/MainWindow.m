@@ -218,6 +218,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     o_sidebaritems = [[NSMutableArray alloc] init];
     SideBarItem *libraryItem = [SideBarItem itemWithTitle:_NS("LIBRARY") identifier:@"library"];
     SideBarItem *playlistItem = [SideBarItem itemWithTitle:_NS("Playlist") identifier:@"playlist"];
+    [playlistItem setIcon: [NSImage imageNamed:@"document-music-playlist"]];
     SideBarItem *mycompItem = [SideBarItem itemWithTitle:_NS("MY COMPUTER") identifier:@"mycomputer"];
     SideBarItem *devicesItem = [SideBarItem itemWithTitle:_NS("DEVICES") identifier:@"devices"];
     SideBarItem *lanItem = [SideBarItem itemWithTitle:_NS("LOCAL NETWORK") identifier:@"localnetwork"];
@@ -235,20 +236,45 @@ static VLCMainWindow *_o_sharedInstance = nil;
     NSMutableArray *devicesItems = [[NSMutableArray alloc] init];
     NSMutableArray *lanItems = [[NSMutableArray alloc] init];
     NSMutableArray *mycompItems = [[NSMutableArray alloc] init];
+    NSString *o_identifier;
     for (; *ppsz_name; ppsz_name++, ppsz_longname++, p_category++)
     {
+        o_identifier = [NSString stringWithCString: *ppsz_name encoding: NSUTF8StringEncoding];
+        o_identifier = [[o_identifier componentsSeparatedByString:@"{"] objectAtIndex:0];
         switch (*p_category) {
             case SD_CAT_INTERNET:
-                [internetItems addObject: [SideBarItem itemWithTitle: [NSString stringWithCString: *ppsz_longname encoding: NSUTF8StringEncoding] identifier: [NSString stringWithCString: *ppsz_name encoding: NSUTF8StringEncoding]]];
+                {
+                    [internetItems addObject: [SideBarItem itemWithTitle: [NSString stringWithCString: *ppsz_longname encoding: NSUTF8StringEncoding] identifier: o_identifier]];
+                    if (!strncmp( *ppsz_name, "podcast", 7 ))
+                        [[internetItems lastObject] setIcon: [NSImage imageNamed:@"film-cast"]];
+                    else
+                        [[internetItems lastObject] setIcon: [NSImage imageNamed:@"NSApplicationIcon"]];
+                }
                 break;
             case SD_CAT_DEVICES:
-                [devicesItems addObject: [SideBarItem itemWithTitle: [NSString stringWithCString: *ppsz_longname encoding: NSUTF8StringEncoding] identifier: [NSString stringWithCString: *ppsz_name encoding: NSUTF8StringEncoding]]];
+                {
+                    [devicesItems addObject: [SideBarItem itemWithTitle: [NSString stringWithCString: *ppsz_longname encoding: NSUTF8StringEncoding] identifier: o_identifier]];
+                    [[devicesItems lastObject] setIcon: [NSImage imageNamed:@"NSApplicationIcon"]];
+                }
                 break;
             case SD_CAT_LAN:
-                [lanItems addObject: [SideBarItem itemWithTitle: [NSString stringWithCString: *ppsz_longname encoding: NSUTF8StringEncoding] identifier: [NSString stringWithCString: *ppsz_name encoding: NSUTF8StringEncoding]]];
+                {
+                    [lanItems addObject: [SideBarItem itemWithTitle: [NSString stringWithCString: *ppsz_longname encoding: NSUTF8StringEncoding] identifier: o_identifier]];
+                    [[lanItems lastObject] setIcon: [NSImage imageNamed:@"network-cloud"]];
+                }
                 break;
             case SD_CAT_MYCOMPUTER:
-                [mycompItems addObject: [SideBarItem itemWithTitle: [NSString stringWithCString: *ppsz_longname encoding: NSUTF8StringEncoding] identifier: [NSString stringWithCString: *ppsz_name encoding: NSUTF8StringEncoding]]];
+                {
+                    [mycompItems addObject: [SideBarItem itemWithTitle: [NSString stringWithCString: *ppsz_longname encoding: NSUTF8StringEncoding] identifier: o_identifier]];
+                    if (!strncmp( *ppsz_name, "video_dir", 9 ))
+                        [[mycompItems lastObject] setIcon: [NSImage imageNamed:@"film"]];
+                    else if (!strncmp( *ppsz_name, "audio_dir", 9 ))
+                        [[mycompItems lastObject] setIcon: [NSImage imageNamed:@"music-beam"]];
+                    else if (!strncmp( *ppsz_name, "picture_dir", 11 ))
+                        [[mycompItems lastObject] setIcon: [NSImage imageNamed:@"picture"]];
+                    else
+                        [[mycompItems lastObject] setIcon: [NSImage imageNamed:@"NSApplicationIcon"]];
+                }
                 break;
             default:
                 msg_Warn( VLCIntf, "unknown SD type found, skipping (%s)", *ppsz_name );
@@ -281,7 +307,6 @@ static VLCMainWindow *_o_sharedInstance = nil;
     if ([internetItem hasChildren])
         [o_sidebaritems addObject: internetItem];
 
-    msg_Dbg( VLCIntf, "side bar should contain %lu items", [o_sidebaritems count] );
     [o_sidebar_view reloadData];
 }
 
