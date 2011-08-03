@@ -1,0 +1,22 @@
+diff -ru libebml.orig/make/linux/Makefile libebml/make/linux/Makefile
+--- libebml.orig/make/linux/Makefile	2011-08-03 13:39:21.000000000 +0300
++++ libebml/make/linux/Makefile	2011-08-03 13:39:57.000000000 +0300
+@@ -59,7 +59,7 @@
+ 
+ # object files; replace .cxx extension with .o
+ objects:=$(patsubst %$(EXTENSION),%.o,$(sources))
+-objects_so:=$(patsubst %$(EXTENSION),%.lo,$(sources))
++objects_so:=$(objects)
+ 
+ WARNINGFLAGS=-Wall -Wno-unknown-pragmas -ansi -fno-gnu-keywords -Wshadow
+ COMPILEFLAGS=$(WARNINGFLAGS) $(CXXFLAGS) $(CPPFLAGS) $(DEBUGFLAGS) $(INCLUDE)
+@@ -81,9 +81,6 @@
+ 
+ # Build rules
+ %.o: %$(EXTENSION)
+-	$(CXX) -c $(COMPILEFLAGS) -o $@ $<
+-
+-%.lo: %$(EXTENSION)
+ 	$(CXX) -c $(COMPILEFLAGS) -fPIC -o $@ $<
+ 
+ $(LIBRARY): $(objects)
