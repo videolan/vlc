@@ -108,12 +108,7 @@ typedef struct
     filter_t *filters[AOUT_MAX_FILTERS];
     int       nb_filters;
 
-    /* Indicates whether the audio output is currently starving, to avoid
-     * printing a 1,000 "output is starving" messages. */
-    bool b_starving;
-
-    mtime_t pause_date;
-    aout_fifo_t partial;
+    aout_packet_t packet;
 } aout_owner_t;
 
 typedef struct

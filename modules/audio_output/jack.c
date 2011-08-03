@@ -133,9 +133,9 @@ static int Open( vlc_object_t *p_this )
     jack_set_process_callback( p_sys->p_jack_client, Process, p_aout );
     jack_set_graph_order_callback ( p_sys->p_jack_client, GraphChange, p_aout );
 
-    p_aout->pf_play = Play;
-    p_aout->pf_pause = NULL;
-    p_aout->pf_flush = NULL;
+    p_aout->pf_play = aout_PacketPlay;
+    p_aout->pf_pause = aout_PacketPause;
+    p_aout->pf_flush = aout_PacketFlush;
     aout_VolumeSoftInit( p_aout );
 
     /* JACK only supports fl32 format */
@@ -329,14 +329,6 @@ static int GraphChange( void *p_arg )
   msg_Dbg(p_aout, "JACK graph reordered. Our maximum latency=%d.", p_sys->latency);
 
   return 0;
-}
-
-/*****************************************************************************
- * Play: nothing to do
- *****************************************************************************/
-static void Play( audio_output_t *p_aout, block_t *block )
-{
-    aout_FifoPush( &p_aout->fifo, block );
 }
 
 /*****************************************************************************

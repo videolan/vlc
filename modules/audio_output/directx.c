@@ -76,8 +76,6 @@ struct aout_sys_t
 
     notification_thread_t *p_notif;                  /* DirectSoundThread id */
 
-    int      b_playing;                                    /* playing status */
-
     int      i_frame_size;                     /* Size in bytes of one frame */
 
     int      i_speaker_setup;                      /* Speaker setup override */
@@ -171,11 +169,10 @@ static int OpenAudio( vlc_object_t *p_this )
     p_aout->sys->p_dsobject = NULL;
     p_aout->sys->p_dsbuffer = NULL;
     p_aout->sys->p_notif = NULL;
-    p_aout->sys->b_playing = 0;
 
     p_aout->pf_play = Play;
-    p_aout->pf_pause = NULL;
-    p_aout->pf_flush = NULL;
+    p_aout->pf_pause = aout_PacketPause;
+    p_aout->pf_flush = aout_PacketFlush;
     aout_VolumeSoftInit( p_aout );
 
     /* Retrieve config values */
@@ -571,21 +568,17 @@ static void Probe( audio_output_t * p_aout )
  *****************************************************************************/
 static void Play( audio_output_t *p_aout, block_t *p_buffer )
 {
-    if( !p_aout->sys->b_playing )
-    {
-        p_aout->sys->b_playing = 1;
+    /* get the playing date of the first aout buffer */
+    p_aout->sys->p_notif->start_date = p_buffer->i_pts;
 
-        /* get the playing date of the first aout buffer */
-        p_aout->sys->p_notif->start_date = p_buffer->i_pts;
+    /* fill in the first samples (zeroes) */
+    FillBuffer( p_aout, 0, NULL );
 
-        /* fill in the first samples */
-        FillBuffer( p_aout, 0, p_buffer );
+    /* wake up the audio output thread */
+    SetEvent( p_aout->sys->p_notif->event );
 
-        /* wake up the audio output thread */
-        SetEvent( p_aout->sys->p_notif->event );
-    }
-    else
-        aout_FifoPush( &p_aout->fifo, p_buffer );
+    aout_PacketPlay( p_aout, p_buffer );
+    p_aout->pf_play = aout_PacketPlay;
 }
 
 /*****************************************************************************
@@ -603,7 +596,8 @@ static void CloseAudio( vlc_object_t *p_this )
     {
         vlc_atomic_set(&p_aout->sys->p_notif->abort, 1);
         /* wake up the audio thread if needed */
-        if( !p_sys->b_playing ) SetEvent( p_sys->p_notif->event );
+        if( p_aout->pf_play == Play )
+            SetEvent( p_sys->p_notif->event );
 
         vlc_join( p_sys->p_notif->thread, NULL );
         free( p_sys->p_notif );

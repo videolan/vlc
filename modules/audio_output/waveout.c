@@ -155,8 +155,8 @@ static int Open( vlc_object_t *p_this )
         return VLC_ENOMEM;
 
     p_aout->pf_play = Play;
-    p_aout->pf_pause = NULL;
-    p_aout->pf_flush = NULL;
+    p_aout->pf_pause = aout_PacketPause;
+    p_aout->pf_flush = aout_PacketFlush;
 
     /*
      initialize/update Device selection List
@@ -475,8 +475,6 @@ static void Probe( audio_output_t * p_aout )
  *****************************************************************************/
 static void Play( audio_output_t *_p_aout, block_t *block )
 {
-    aout_FifoPush( &_p_aout->fifo, block );
-
     if( !_p_aout->sys->b_playing )
     {
         _p_aout->sys->b_playing = 1;
@@ -491,6 +489,8 @@ static void Play( audio_output_t *_p_aout, block_t *block )
     } else {
         SetEvent( _p_aout->sys->new_buffer_event );
     }
+
+    aout_PacketPlay( _p_aout, block );
 }
 
 /*****************************************************************************
@@ -939,7 +939,6 @@ static void* WaveOutThread( void *data )
 #endif
                     // means we are too early to request a new buffer?
                     waveout_warn("waiting...")
-                    next_date = aout_FifoFirstDate( &p_aout->fifo );
                     mwait( next_date - AOUT_MAX_PTS_ADVANCE/4 );
                     next_date = mdate();
                     p_buffer = aout_OutputNextBuffer( p_aout, next_date,

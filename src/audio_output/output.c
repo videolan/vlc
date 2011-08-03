@@ -162,10 +162,7 @@ int aout_OutputNew( audio_output_t *p_aout,
     aout_FormatPrint( p_aout, "output", &p_aout->format );
 
     /* Prepare FIFO. */
-    aout_FifoInit (p_aout, &p_aout->fifo, p_aout->format.i_rate);
-    aout_FifoInit (p_aout, &owner->partial, p_aout->format.i_rate);
-    owner->pause_date = VLC_TS_INVALID;
-    owner->b_starving = true;
+    aout_PacketInit (p_aout, &owner->packet, p_aout->i_nb_samples);
 
     /* Choose the mixer format. */
     owner->mixer_format = p_aout->format;
@@ -221,36 +218,30 @@ void aout_OutputDelete( audio_output_t * p_aout )
     aout_VolumeNoneInit( p_aout ); /* clear volume callback */
     owner->module = NULL;
     aout_FiltersDestroyPipeline (owner->filters, owner->nb_filters);
-    aout_FifoDestroy (&p_aout->fifo);
-    aout_FifoDestroy (&owner->partial);
+    aout_PacketDestroy (p_aout);
 }
-
-static block_t *aout_OutputSlice( audio_output_t *, aout_fifo_t * );
 
 /*****************************************************************************
  * aout_OutputPlay : play a buffer
  *****************************************************************************
  * This function is entered with the mixer lock.
  *****************************************************************************/
-void aout_OutputPlay( audio_output_t * p_aout, aout_buffer_t * p_buffer )
+void aout_OutputPlay (audio_output_t *aout, block_t *block)
 {
-    aout_owner_t *owner = aout_owner (p_aout);
+    aout_owner_t *owner = aout_owner (aout);
 
-    vlc_assert_locked( &p_aout->lock );
+    vlc_assert_locked (&aout->lock);
 
-    aout_FiltersPlay (owner->filters, owner->nb_filters, &p_buffer);
-    if( !p_buffer )
+    aout_FiltersPlay (owner->filters, owner->nb_filters, &block);
+    if (block == NULL)
         return;
-    if( p_buffer->i_buffer == 0 )
+    if (block->i_buffer == 0)
     {
-        block_Release( p_buffer );
+        block_Release (block);
         return;
     }
 
-    aout_FifoPush (&owner->partial, p_buffer );
-
-    while ((p_buffer = aout_OutputSlice (p_aout, &owner->partial)) != NULL)
-        p_aout->pf_play (p_aout, p_buffer);
+    aout->pf_play (aout, block);
 }
 
 /**
@@ -263,22 +254,6 @@ void aout_OutputPause( audio_output_t *aout, bool pause, mtime_t date )
     vlc_assert_locked( &aout->lock );
     if( aout->pf_pause != NULL )
         aout->pf_pause( aout, pause, date );
-
-    aout_owner_t *owner = aout_owner (aout);
-    if (pause)
-    {
-        owner->pause_date = date;
-    }
-    else
-    {
-        assert (owner->pause_date != VLC_TS_INVALID);
-
-        mtime_t duration = date - owner->pause_date;
-
-        owner->pause_date = VLC_TS_INVALID;
-        aout_FifoMoveDates (&owner->partial, duration);
-        aout_FifoMoveDates (&aout->fifo, duration);
-    }
 }
 
 /**
@@ -293,10 +268,6 @@ void aout_OutputFlush( audio_output_t *aout, bool wait )
 
     if( aout->pf_flush != NULL )
         aout->pf_flush( aout, wait );
-
-    aout_owner_t *owner = aout_owner (aout);
-    aout_FifoReset (&aout->fifo);
-    aout_FifoReset (&owner->partial);
 }
 
 
@@ -395,15 +366,84 @@ void aout_VolumeHardSet (audio_output_t *aout, float volume, bool mute)
 }
 
 
-/*** Buffer management ***/
+/*** Packet-oriented audio output support ***/
+
+static inline aout_packet_t *aout_packet (audio_output_t *aout)
+{
+    aout_owner_t *owner = aout_owner (aout);
+    return &owner->packet;
+}
+
+void aout_PacketInit (audio_output_t *aout, aout_packet_t *p, unsigned samples)
+{
+    assert (p == aout_packet (aout));
+
+    aout_FifoInit (aout, &p->partial, aout->format.i_rate);
+    aout_FifoInit (aout, &p->fifo, aout->format.i_rate);
+    p->pause_date = VLC_TS_INVALID;
+    p->samples = samples;
+    p->starving = true;
+}
+
+void aout_PacketDestroy (audio_output_t *aout)
+{
+    aout_packet_t *p = aout_packet (aout);
+
+    aout_FifoDestroy (&p->partial);
+    aout_FifoDestroy (&p->fifo);
+}
+
+static block_t *aout_OutputSlice (audio_output_t *);
+
+void aout_PacketPlay (audio_output_t *aout, block_t *block)
+{
+    aout_packet_t *p = aout_packet (aout);
+
+    aout_FifoPush (&p->partial, block);
+    while ((block = aout_OutputSlice (aout)) != NULL)
+        aout_FifoPush (&p->fifo, block);
+}
+
+void aout_PacketPause (audio_output_t *aout, bool pause, mtime_t date)
+{
+    aout_packet_t *p = aout_packet (aout);
+
+    if (pause)
+    {
+        assert (p->pause_date == VLC_TS_INVALID);
+        p->pause_date = date;
+    }
+    else
+    {
+        assert (p->pause_date != VLC_TS_INVALID);
+
+        mtime_t duration = date - p->pause_date;
+
+        p->pause_date = VLC_TS_INVALID;
+        aout_FifoMoveDates (&p->partial, duration);
+        aout_FifoMoveDates (&p->fifo, duration);
+    }
+}
+
+void aout_PacketFlush (audio_output_t *aout, bool drain)
+{
+    aout_packet_t *p = aout_packet (aout);
+
+    aout_FifoReset (&p->partial);
+    aout_FifoReset (&p->fifo);
+    (void) drain; /* TODO */
+}
+
 
 /**
  * Rearranges audio blocks in correct number of samples.
  * @note (FIXME) This is left here for historical reasons. It belongs in the
  * output code. Besides, this operation should be avoided if possible.
  */
-static block_t *aout_OutputSlice (audio_output_t *p_aout, aout_fifo_t *p_fifo)
+static block_t *aout_OutputSlice (audio_output_t *p_aout)
 {
+    aout_packet_t *p = aout_packet (p_aout);
+    aout_fifo_t *p_fifo = &p->partial;
     const unsigned samples = p_aout->i_nb_samples;
     /* FIXME: Remove this silly constraint. Just pass buffers as they come to
      * "smart" audio outputs. */
@@ -412,7 +452,7 @@ static block_t *aout_OutputSlice (audio_output_t *p_aout, aout_fifo_t *p_fifo)
     vlc_assert_locked( &p_aout->lock );
 
     /* Retrieve the date of the next buffer. */
-    date_t exact_start_date = p_aout->fifo.end_date;
+    date_t exact_start_date = p->fifo.end_date;
     mtime_t start_date = date_Get( &exact_start_date );
 
     /* See if we have enough data to prepare a new buffer for the audio output. */
@@ -483,7 +523,7 @@ static block_t *aout_OutputSlice (audio_output_t *p_aout, aout_fifo_t *p_fifo)
         if( delta < 0 )
         {
             /* Is it really the best way to do it ? */
-            aout_FifoReset( &p_aout->fifo );
+            aout_FifoReset (&p->fifo);
             return NULL;
         }
         if( delta > 0 )
@@ -559,8 +599,8 @@ aout_buffer_t * aout_OutputNextBuffer( audio_output_t * p_aout,
                                        mtime_t start_date,
                                        bool b_can_sleek )
 {
-    aout_owner_t *owner = aout_owner (p_aout);
-    aout_fifo_t *p_fifo = &p_aout->fifo;
+    aout_packet_t *p = aout_packet (p_aout);
+    aout_fifo_t *p_fifo = &p->fifo;
     aout_buffer_t * p_buffer;
     mtime_t now = mdate();
 
@@ -585,11 +625,11 @@ aout_buffer_t * aout_OutputNextBuffer( audio_output_t * p_aout,
        * to deal with this kind of starvation. */
 
         /* Set date to 0, to allow the mixer to send a new buffer ASAP */
-        aout_FifoReset( &p_aout->fifo );
-        if ( !p_aout->b_starving )
+        aout_FifoReset( &p->fifo );
+        if ( !p->starving )
             msg_Dbg( p_aout,
                  "audio output is starving (no input), playing silence" );
-        p_aout->b_starving = true;
+        p_aout->starving = true;
 #endif
         goto out;
     }
@@ -600,15 +640,15 @@ aout_buffer_t * aout_OutputNextBuffer( audio_output_t * p_aout,
      */
     if ( 0 > delta + p_buffer->i_length )
     {
-        if (!owner->b_starving)
+        if (!p->starving)
             msg_Dbg( p_aout, "audio output is starving (%"PRId64"), "
                      "playing silence", -delta );
-        owner->b_starving = true;
+        p->starving = true;
         p_buffer = NULL;
         goto out;
     }
 
-    owner->b_starving = false;
+    p->starving = false;
     p_buffer = aout_FifoPop( p_fifo );
 
     if( !b_can_sleek
@@ -618,7 +658,7 @@ aout_buffer_t * aout_OutputNextBuffer( audio_output_t * p_aout,
         msg_Warn( p_aout, "output date isn't PTS date, requesting "
                   "resampling (%"PRId64")", delta );
 
-        aout_FifoMoveDates (&owner->partial, delta);
+        aout_FifoMoveDates (&p->partial, delta);
         aout_FifoMoveDates (p_fifo, delta);
     }
 out:

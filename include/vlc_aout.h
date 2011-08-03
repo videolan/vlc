@@ -153,14 +153,6 @@ typedef int32_t vlc_fixed_t;
 /* Number of samples in an A/52 frame. */
 #define A52_FRAME_NB 1536
 
-/** audio output buffer FIFO */
-struct aout_fifo_t
-{
-    aout_buffer_t *         p_first;
-    aout_buffer_t **        pp_last;
-    date_t                  end_date;
-};
-
 /* FIXME to remove once aout.h is cleaned a bit more */
 #include <vlc_block.h>
 
@@ -175,8 +167,6 @@ struct audio_output
 
     audio_sample_format_t format; /**< Output format (plugin can modify it
         only when succesfully probed and not afterward) */
-
-    aout_fifo_t             fifo;
 
     struct aout_sys_t *sys; /**< Output plugin private data */
     void (*pf_play)(audio_output_t *, block_t *); /**< Audio buffer callback */
@@ -265,5 +255,34 @@ VLC_API int aout_ChannelsRestart( vlc_object_t *, const char *, vlc_value_t, vlc
 
 /* */
 VLC_API vout_thread_t * aout_filter_RequestVout( filter_t *, vout_thread_t *p_vout, video_format_t *p_fmt ) VLC_USED;
+
+/** Audio output buffer FIFO */
+struct aout_fifo_t
+{
+    aout_buffer_t *         p_first;
+    aout_buffer_t **        pp_last;
+    date_t                  end_date;
+};
+
+/* Legacy packet-oriented audio output helpers */
+typedef struct
+{
+   aout_fifo_t partial; /**< Audio blocks before packetization */
+   aout_fifo_t fifo; /**< Packetized audio blocks */
+   mtime_t pause_date; /**< Date when paused or VLC_TS_INVALID */
+   unsigned samples; /**< Samples per packet */
+   bool starving;
+   /* Indicates whether the audio output is currently starving, to avoid
+    * printing a 1,000 "output is starving" messages. */
+} aout_packet_t;
+
+VLC_API void aout_PacketInit(audio_output_t *, aout_packet_t *, unsigned);
+VLC_API void aout_PacketDestroy(audio_output_t *);
+
+VLC_API void aout_PacketPlay(audio_output_t *, block_t *);
+VLC_API void aout_PacketPause(audio_output_t *, bool, mtime_t);
+VLC_API void aout_PacketFlush(audio_output_t *, bool);
+
+VLC_API block_t *aout_PacketNext(audio_output_t *, mtime_t, bool) VLC_USED;
 
 #endif /* VLC_AOUT_H */

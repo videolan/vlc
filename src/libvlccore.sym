@@ -21,6 +21,9 @@ aout_FormatPrepare
 aout_FormatPrint
 aout_FormatPrintChannels
 aout_OutputNextBuffer
+aout_PacketPlay
+aout_PacketPause
+aout_PacketFlush
 aout_VolumeGet
 aout_VolumeSet
 aout_VolumeUp

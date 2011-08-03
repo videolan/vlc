@@ -41,7 +41,7 @@
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
-static void    Play        ( audio_output_t * );
+static void Play( audio_output_t *, block_t * );
 
 /*****************************************************************************
  * OpenAudio: open a dummy audio device
@@ -75,9 +75,9 @@ int OpenAudio ( vlc_object_t * p_this )
 /*****************************************************************************
  * Play: pretend to play a sound
  *****************************************************************************/
-static void Play( audio_output_t * p_aout )
+static void Play( audio_output_t *aout, block_t *block )
 {
-    aout_buffer_t * p_buffer = aout_FifoPop( &p_aout->fifo );
-    aout_BufferFree( p_buffer );
+    block_Release( block );
+    (void) aout;
 }
 

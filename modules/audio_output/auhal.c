@@ -187,9 +187,9 @@ static int Open( vlc_object_t * p_this )
     p_sys->b_changed_mixing = false;
     memset( p_sys->p_remainder_buffer, 0, sizeof(uint8_t) * BUFSIZE );
 
-    p_aout->pf_play = Play;
-    p_aout->pf_pause = NULL;
-    p_aout->pf_flush = NULL;
+    p_aout->pf_play = aout_PacketPlay;
+    p_aout->pf_pause = aout_PacketPause;
+    p_aout->pf_flush = aout_PacketFlush;
 
     aout_FormatPrint( p_aout, "VLC is looking for:", &p_aout->format );
 
@@ -906,15 +906,6 @@ static void Close( vlc_object_t * p_this )
 
     free( p_sys );
 }
-
-/*****************************************************************************
- * Play: nothing to do
- *****************************************************************************/
-static void Play( audio_output_t * p_aout, block_t *block )
-{
-    aout_FifoPush( &p_aout->fifo, block );
-}
-
 
 /*****************************************************************************
  * Probe: Check which devices the OS has, and add them to our audio-device menu

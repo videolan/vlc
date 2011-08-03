@@ -361,8 +361,8 @@ static int Open (vlc_object_t *obj)
     }
 
     p_aout->pf_play = Play;
-    p_aout->pf_pause = NULL;
-    p_aout->pf_flush = NULL;
+    p_aout->pf_pause = aout_PacketPause;
+    p_aout->pf_flush = aout_PacketFlush;
 
     snd_pcm_hw_params_t *p_hw;
     snd_pcm_sw_params_t *p_sw;
@@ -522,21 +522,16 @@ error:
     return VLC_EGENERIC;
 }
 
-static void PlayIgnore( audio_output_t *p_aout, block_t *block )
-{
-    aout_FifoPush( &p_aout->fifo, block );
-}
-
 /*****************************************************************************
  * Play: start playback
  *****************************************************************************/
 static void Play( audio_output_t *p_aout, block_t *block )
 {
-    p_aout->pf_play = PlayIgnore;
-
     /* get the playing date of the first aout buffer */
     p_aout->sys->start_date = block->i_pts;
-    aout_FifoPush( &p_aout->fifo, block );
+
+    aout_PacketPlay( p_aout, block );
+    p_aout->pf_play = aout_PacketPlay;
 
     /* wake up the audio output thread */
     sem_post( &p_aout->sys->wait );

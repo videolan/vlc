@@ -182,9 +182,9 @@ static int Open( vlc_object_t * p_this )
     p_sys->p_aout = p_aout;
     p_sys->p_stream = 0;
     p_aout->sys = p_sys;
-    p_aout->pf_play = Play;
-    p_aout->pf_pause = NULL;
-    p_aout->pf_flush = NULL;
+    p_aout->pf_play = aout_PacketPlay;
+    p_aout->pf_pause = aout_PacketPause;
+    p_aout->pf_flush = aout_PacketFlush;
 
     /* Retrieve output device id from config */
     p_sys->i_device_id = var_CreateGetInteger( p_aout, "portaudio-audio-device" );
@@ -554,14 +554,6 @@ static int PAOpenStream( audio_output_t *p_aout )
     }
 
     return VLC_SUCCESS;
-}
-
-/*****************************************************************************
- * Play: play sound
- *****************************************************************************/
-static void Play( audio_output_t * p_aout, block_t *block )
-{
-    aout_FifoPush( &p_aout->fifo, block );
 }
 
 #ifdef PORTAUDIO_IS_SERIOUSLY_BROKEN
