@@ -64,15 +64,21 @@ VPX_TARGET := $(VPX_ARCH)-$(VPX_OS)-gcc
 endif
 endif
 
+VPX_CONF := \
+	--enable-runtime-cpu-detect \
+	--disable-install-bins \
+	--disable-install-srcs \
+	--disable-install-libs \
+	--disable-install-docs \
+	--disable-examples \
+	--disable-vp8-decoder
+ifndef HAVE_WIN32
+VPX_CONF += --enable-pic
+endif
+
 .vpx: libvpx
 	cd $< && CROSS=$(VPX_CROSS) ./configure --target=$(VPX_TARGET) \
-		--enable-runtime-cpu-detect \
-		--disable-install-bins \
-		--disable-install-srcs \
-		--disable-install-libs \
-		--disable-install-docs \
-		--disable-examples \
-		--disable-vp8-decoder
+		$(VPX_CONF)
 	cd $< && $(MAKE) install
 	rm -Rf -- "$(PREFIX)/include/vpx/"
 	mkdir -p -- "$(PREFIX)/include/vpx/"
