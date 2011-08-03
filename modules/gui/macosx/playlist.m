@@ -825,35 +825,27 @@
 - (IBAction)preparseItem:(id)sender
 {
     int i_count;
-    NSMutableArray *o_to_preparse;
+    NSIndexSet *o_selected_indexes;
     intf_thread_t * p_intf = VLCIntf;
     playlist_t * p_playlist = pl_Get( p_intf );
-
-    o_to_preparse = [NSMutableArray arrayWithArray:[[o_outline_view selectedRowEnumerator] allObjects]];
-    i_count = [o_to_preparse count];
-
-    int i, i_row;
-    NSNumber *o_number;
     playlist_item_t *p_item = NULL;
 
-    for( i = 0; i < i_count; i++ )
+    o_selected_indexes = [o_outline_view selectedRowIndexes];
+    i_count = [o_selected_indexes count];
+
+    NSUInteger indexes[i_count];
+    [o_selected_indexes getIndexes:indexes maxCount:i_count inIndexRange:nil];
+    for (int i = 0; i < i_count; i++)
     {
-        o_number = [o_to_preparse lastObject];
-        i_row = [o_number intValue];
-        p_item = [[o_outline_view itemAtRow:i_row] pointerValue];
-        [o_to_preparse removeObject: o_number];
-        [o_outline_view deselectRow: i_row];
+        p_item = [[o_outline_view itemAtRow:indexes[i]] pointerValue];
+        [o_outline_view deselectRow: indexes[i]];
 
         if( p_item )
         {
             if( p_item->i_children == -1 )
-            {
                 playlist_PreparseEnqueue( p_playlist, p_item->p_input );
-            }
             else
-            {
                 msg_Dbg( p_intf, "preparsing nodes not implemented" );
-            }
         }
     }
     [self playlistUpdated];
@@ -862,29 +854,23 @@
 - (IBAction)downloadCoverArt:(id)sender
 {
     int i_count;
-    NSMutableArray *o_to_preparse;
+    NSIndexSet *o_selected_indexes;
     intf_thread_t * p_intf = VLCIntf;
     playlist_t * p_playlist = pl_Get( p_intf );
-
-    o_to_preparse = [NSMutableArray arrayWithArray:[[o_outline_view selectedRowEnumerator] allObjects]];
-    i_count = [o_to_preparse count];
-
-    int i, i_row;
-    NSNumber *o_number;
     playlist_item_t *p_item = NULL;
 
-    for( i = 0; i < i_count; i++ )
+    o_selected_indexes = [o_outline_view selectedRowIndexes];
+    i_count = [o_selected_indexes count];
+
+    NSUInteger indexes[i_count];
+    [o_selected_indexes getIndexes:indexes maxCount:i_count inIndexRange:nil];
+    for (int i = 0; i < i_count; i++)
     {
-        o_number = [o_to_preparse lastObject];
-        i_row = [o_number intValue];
-        p_item = [[o_outline_view itemAtRow:i_row] pointerValue];
-        [o_to_preparse removeObject: o_number];
-        [o_outline_view deselectRow: i_row];
+        p_item = [[o_outline_view itemAtRow: indexes[i]] pointerValue];   
+        [o_outline_view deselectRow: indexes[i]];
 
         if( p_item && p_item->i_children == -1 )
-        {
             playlist_AskForArtEnqueue( p_playlist, p_item->p_input );
-        }
     }
     [self playlistUpdated];
 }
@@ -913,24 +899,22 @@
 
 - (IBAction)deleteItem:(id)sender
 {
-    int i_count, i_row;
-    NSMutableArray *o_to_delete;
-    NSNumber *o_number;
-
+    int i_count;
+    NSIndexSet *o_selected_indexes;
     playlist_t * p_playlist;
     intf_thread_t * p_intf = VLCIntf;
 
-    o_to_delete = [NSMutableArray arrayWithArray:[[o_outline_view selectedRowEnumerator] allObjects]];
-    i_count = [o_to_delete count];
+    o_selected_indexes = [o_outline_view selectedRowIndexes];
+    i_count = [o_selected_indexes count];
 
     p_playlist = pl_Get( p_intf );
 
-    for( int i = 0; i < i_count; i++ )
+    NSUInteger indexes[i_count];
+    [o_selected_indexes getIndexes:indexes maxCount:i_count inIndexRange:nil];
+    for (int i = 0; i < i_count; i++)
     {
-        o_number = [o_to_delete lastObject];
-        i_row = [o_number intValue];
-        id o_item = [o_outline_view itemAtRow: i_row];
-        [o_outline_view deselectRow: i_row];
+        id o_item = [o_outline_view itemAtRow: indexes[i]];
+        [o_outline_view deselectRow: indexes[i]];
 
         PL_LOCK;
         playlist_item_t *p_item = [o_item pointerValue];
@@ -938,14 +922,12 @@
         msg_Dbg( p_intf, "deleting item %i (of %i) with id \"%i\", pointerValue \"%p\" and %i children", i+1, i_count,
                 p_item->p_input->i_id, [o_item pointerValue], p_item->i_children +1 );
 #endif
-        [o_to_delete removeObject: o_number];
 
         if( p_item->i_children != -1 )
         //is a node and not an item
         {
             if( playlist_Status( p_playlist ) != PLAYLIST_STOPPED &&
-                [self isItem: playlist_CurrentPlayingItem( p_playlist ) inNode:
-                        ((playlist_item_t *)[o_item pointerValue])
+                [self isItem: playlist_CurrentPlayingItem( p_playlist ) inNode: ((playlist_item_t *)[o_item pointerValue])
                         checkItemExistence: NO locked:YES] == YES )
                 // if current item is in selected node and is playing then stop playlist
                 playlist_Control(p_playlist, PLAYLIST_STOP, pl_Locked );
@@ -956,8 +938,7 @@
             playlist_DeleteFromInput( p_playlist, p_item->p_input, pl_Locked );
 
         PL_UNLOCK;
-        [o_outline_dict removeObjectForKey:[NSString stringWithFormat:@"%p",
-                                                     [o_item pointerValue]]];
+        [o_outline_dict removeObjectForKey:[NSString stringWithFormat:@"%p", [o_item pointerValue]]];
         [o_item release];
     }
 
