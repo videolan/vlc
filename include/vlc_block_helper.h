@@ -57,8 +57,6 @@ static inline void block_BytestreamRelease( block_bytestream_t *p_bytestream )
         p_bytestream->p_chain->pf_release( p_bytestream->p_chain );
         p_bytestream->p_chain = p_next;
     }
-    p_bytestream->i_offset = 0;
-    p_bytestream->p_chain = p_bytestream->p_block = NULL;
 }
 
 /**
