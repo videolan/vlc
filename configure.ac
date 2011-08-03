@@ -3528,8 +3528,20 @@ AS_IF([test "${enable_pulse}" != "no"], [
   PKG_CHECK_MODULES([PULSE], [libpulse >= 0.9.22], [
     have_pulse="yes"
   ], [
-    AS_IF([test "x${enable_pulse}" != "x"], [
-      AC_MSG_ERROR([$PULSE_PKG_ERRORS. PulseAudio 0.9.22 or later required.])
+    PKG_CHECK_MODULES([PULSE], [libpulse >= 0.9.16], [
+      AS_IF([test "${no_x}" != "yes"], [
+        have_pulse="yes"
+        PULSE_LIBS="$PULSE_LIBS ${X_LIBS} ${X_PRE_LIBS} -lX11"
+      ], [
+        AS_IF([test "${enable_pulse}" = "yes"], [
+          AC_MSG_ERROR([Xlib is required with PulseAudio pre-0.9.22 versions
+(see http://www.pulseaudio.org/ticket/799 for further reference).])
+        ])
+      ])
+    ], [
+      AS_IF([test "x${enable_pulse}" != "x"], [
+        AC_MSG_ERROR([$PULSE_PKG_ERRORS. PulseAudio 0.9.22 or later required.])
+      ])
     ])
   ])
 ])

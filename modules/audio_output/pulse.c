@@ -32,6 +32,9 @@
 
 #include <pulse/pulseaudio.h>
 #include <vlc_pulse.h>
+#if !PA_CHECK_VERSION(0,9,22)
+# include <vlc_xlib.h>
+#endif
 
 static int  Open        ( vlc_object_t * );
 static void Close       ( vlc_object_t * );
@@ -597,6 +600,11 @@ static int StreamMove(vlc_object_t *obj, const char *varname, vlc_value_t old,
  */
 static int Open(vlc_object_t *obj)
 {
+#if !PA_CHECK_VERSION(0,9,22)
+    if (!vlc_xlib_init(obj))
+        return VLC_EGENERIC;
+#endif
+
     audio_output_t *aout = (audio_output_t *)obj;
     pa_operation *op;
 
