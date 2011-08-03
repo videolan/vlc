@@ -39,7 +39,6 @@
 #include <vlc_aout.h>
 #include <vlc_block.h>
 #include <vlc_filter.h>
-#include <vlc_cpu.h>
 
 /*****************************************************************************
  * Local prototypes
@@ -177,9 +176,14 @@ static int OpenFilter( vlc_object_t *p_this )
     filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys;
 
-    if( p_filter->fmt_in.i_codec != VLC_CODEC_MPGA &&
-        p_filter->fmt_in.i_codec != VLC_FOURCC('m','p','g','3') )
+    if( p_filter->fmt_in.audio.i_format != VLC_CODEC_MPGA &&
+        p_filter->fmt_in.audio.i_format != VLC_FOURCC('m','p','g','3') )
         return VLC_EGENERIC;
+
+    if( p_filter->fmt_out.audio.i_format != VLC_CODEC_FL32
+     && p_filter->fmt_out.audio.i_format != VLC_CODEC_FI32 )
+        return VLC_EGENERIC;
+
     if( !AOUT_FMTS_SIMILAR( &p_filter->fmt_in.audio, &p_filter->fmt_out.audio ) )
         return VLC_EGENERIC;
 
@@ -196,11 +200,6 @@ static int OpenFilter( vlc_object_t *p_this )
     mad_frame_init( &p_sys->mad_frame );
     mad_synth_init( &p_sys->mad_synth );
     mad_stream_options( &p_sys->mad_stream, MAD_OPTION_IGNORECRC );
-
-    p_filter->fmt_out.i_codec = HAVE_FPU ? VLC_CODEC_FL32 : VLC_CODEC_FI32;
-    p_filter->fmt_out.audio.i_format = p_filter->fmt_out.i_codec;
-    p_filter->fmt_out.audio.i_bitspersample =
-        aout_BitsPerSample( p_filter->fmt_out.i_codec );
 
     msg_Dbg( p_this, "%4.4s->%4.4s, bits per sample: %i",
              (char *)&p_filter->fmt_in.i_codec,
