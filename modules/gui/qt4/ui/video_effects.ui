@@ -81,7 +81,7 @@
           <enum>QSlider::TicksBelow</enum>
          </property>
          <property name="tickInterval">
-          <number>50</number>
+          <number>100</number>
          </property>
         </widget>
        </item>
@@ -119,7 +119,7 @@
           <enum>QSlider::TicksBelow</enum>
          </property>
          <property name="tickInterval">
-          <number>50</number>
+          <number>100</number>
          </property>
         </widget>
        </item>
@@ -145,7 +145,7 @@
           <enum>QSlider::TicksBelow</enum>
          </property>
          <property name="tickInterval">
-          <number>50</number>
+          <number>100</number>
          </property>
         </widget>
        </item>
