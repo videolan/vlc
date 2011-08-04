@@ -30,7 +30,6 @@
 #import "vout.h"
 #import "misc.h"
 #import "fspanel.h"
-#import "MainWindow.h"
 
 @interface VLCFSPanel ()
 - (void)hideMouse;
@@ -555,7 +554,17 @@
 
 - (IBAction)fsTimeSliderUpdate:(id)sender
 {
-    [[VLCMainWindow sharedInstance] updateTimeSlider];
+    input_thread_t * p_input;
+    p_input = pl_CurrentInput( VLCIntf );
+    if( p_input != NULL )
+    {
+        vlc_value_t pos;
+
+        pos.f_float = [o_fs_timeSlider floatValue] / 10000.;
+        var_Set( p_input, "position", pos );
+        vlc_object_release( p_input );
+    }
+    [[VLCMain sharedInstance] updatePlaybackPosition];
 }
 
 - (IBAction)fsVolumeSliderUpdate:(id)sender

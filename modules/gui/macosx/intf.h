@@ -130,9 +130,6 @@ struct intf_sys_t
     IBOutlet NSWindow * o_crashrep_win;
     IBOutlet NSButton * o_crashrep_includeEmail_ckb;
     IBOutlet NSTextField * o_crashrep_includeEmail_txt;
-
-    input_state_e cachedInputState;
-
     NSURLConnection * crashLogURLConnection;
 
     AppleRemote * o_remote;
