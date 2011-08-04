@@ -240,7 +240,7 @@ static int Open( vlc_object_t *p_this )
         p_aout->sys->i_buffer_size =
             p_aout->format.i_bytes_per_frame;
 
-        aout_PacketInit( p_aout, &p_aout->p_sys->packet, A52_FRAME_NB );
+        aout_PacketInit( p_aout, &p_aout->sys->packet, A52_FRAME_NB );
         aout_VolumeNoneInit( p_aout );
     }
     else
@@ -286,7 +286,7 @@ static int Open( vlc_object_t *p_this )
         p_aout->sys->i_buffer_size = FRAME_SIZE *
             p_aout->format.i_bytes_per_frame;
 
-        aout_PacketInit( p_aout, &p_aout->p_sys->packet, FRAME_SIZE );
+        aout_PacketInit( p_aout, &p_aout->sys->packet, FRAME_SIZE );
         aout_VolumeSoftInit( p_aout );
 
         /* Check for hardware volume support */

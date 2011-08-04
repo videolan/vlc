@@ -241,7 +241,7 @@ static int OpenAudio( vlc_object_t *p_this )
             return VLC_EGENERIC;
         }
 
-        aout_PacketInit( p_aout, &p_sys->packet, A52_FRAME_NB );
+        aout_PacketInit( p_aout, &p_aout->sys->packet, A52_FRAME_NB );
         aout_VolumeNoneInit( p_aout );
     }
     else
@@ -296,7 +296,7 @@ static int OpenAudio( vlc_object_t *p_this )
 
         /* Calculate the frame size in bytes */
         aout_FormatPrepare( &p_aout->format );
-        aout_PacketInit( p_aout, &p_sys->packet, FRAME_SIZE );
+        aout_PacketInit( p_aout, &p_aout->sys->packet, FRAME_SIZE );
         aout_VolumeSoftInit( p_aout );
     }
 
@@ -1044,7 +1044,7 @@ static void* DirectSoundThread( void *data )
     {
         DWORD l_read;
         int l_queued = 0, l_free_slots;
-        unsigned i_frame_siz = p_sys->packet.samples;
+        unsigned i_frame_siz = p_aout->sys->packet.samples;
         mtime_t mtime = mdate();
         int i;
 
