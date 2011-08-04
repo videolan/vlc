@@ -3,7 +3,7 @@
 SDL_VERSION := 1.2.14
 SDL_URL := http://www.libsdl.org/release/SDL-$(SDL_VERSION).tar.gz
 
-PKGS += sdl
+#PKGS += sdl
 ifeq ($(call need_pkg,"sdl"),)
 PKGS_FOUND += sdl
 endif
