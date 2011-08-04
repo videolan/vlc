@@ -597,6 +597,12 @@ static int DirectXCreateWindow( event_thread_t *p_event )
     {
         i_style = WS_VISIBLE|WS_CLIPCHILDREN|WS_CHILD;
         i_stylex = 0;
+
+        /* allow user to regain control over input events if requested */
+        bool b_mouse_support = var_InheritBool( vd, "mouse-events" );
+        bool b_key_support = var_InheritBool( vd, "keyboard-events" );
+        if( !b_mouse_support && !b_key_support )
+            i_style |= WS_DISABLED;
     }
 
     p_event->i_window_style = i_style;
