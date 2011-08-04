@@ -791,8 +791,6 @@ static int Open(vlc_object_t *obj)
             "prebuf=%u, minreq=%u",
             pba->maxlength, pba->tlength, pba->prebuf, pba->minreq);
 
-    aout->i_nb_samples = pba->minreq / pa_frame_size(&ss);
-
     var_Create(aout, "audio-device", VLC_VAR_INTEGER|VLC_VAR_HASCHOICE);
     var_Change(aout, "audio-device", VLC_VAR_SETTEXT,
                &(vlc_value_t){ .psz_string = (char *)_("Audio device") },

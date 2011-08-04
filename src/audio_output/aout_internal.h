@@ -107,8 +107,6 @@ typedef struct
     /* Filters between mixer and output */
     filter_t *filters[AOUT_MAX_FILTERS];
     int       nb_filters;
-
-    aout_packet_t packet;
 } aout_owner_t;
 
 typedef struct

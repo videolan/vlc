@@ -111,6 +111,7 @@ vlc_module_end ()
  *****************************************************************************/
 struct aout_sys_t
 {
+    aout_packet_t packet;
     uint32_t i_wave_device_id;               /* ID of selected output device */
 
     HWAVEOUT h_waveout;                        /* handle to waveout instance */
@@ -234,12 +235,12 @@ static int Open( vlc_object_t *p_this )
         }
 
         /* Calculate the frame size in bytes */
-        p_aout->i_nb_samples = A52_FRAME_NB;
         p_aout->format.i_bytes_per_frame = AOUT_SPDIF_SIZE;
         p_aout->format.i_frame_length = A52_FRAME_NB;
         p_aout->sys->i_buffer_size =
             p_aout->format.i_bytes_per_frame;
 
+        aout_PacketInit( p_aout, &p_aout->p_sys->packet, A52_FRAME_NB );
         aout_VolumeNoneInit( p_aout );
     }
     else
@@ -281,11 +282,11 @@ static int Open( vlc_object_t *p_this )
         }
 
         /* Calculate the frame size in bytes */
-        p_aout->i_nb_samples = FRAME_SIZE;
         aout_FormatPrepare( &p_aout->format );
         p_aout->sys->i_buffer_size = FRAME_SIZE *
             p_aout->format.i_bytes_per_frame;
 
+        aout_PacketInit( p_aout, &p_aout->p_sys->packet, FRAME_SIZE );
         aout_VolumeSoftInit( p_aout );
 
         /* Check for hardware volume support */
@@ -566,6 +567,7 @@ static void Close( vlc_object_t *p_this )
     CloseHandle( p_sys->new_buffer_event);
 
     free( p_sys->p_silence_buffer );
+    aout_PacketDestroy( p_aout );
     free( p_sys );
 }
 

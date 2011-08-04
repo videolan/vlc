@@ -35,7 +35,6 @@
 
 #include <AudioToolBox/AudioToolBox.h>
 
-#define FRAME_SIZE 2048
 #define NUMBER_OF_BUFFERS 3
 
 /*****************************************************************************
@@ -46,6 +45,7 @@
  *****************************************************************************/
 struct aout_sys_t
 {
+    aout_packet_t packet;
     AudioQueueRef audioQueue;
 };
 
@@ -121,7 +121,7 @@ static int Open ( vlc_object_t *p_this )
     p_aout->format.i_format = VLC_CODEC_S16L;
     p_aout->format.i_physical_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
     p_aout->format.i_rate = 44100;
-    p_aout->format.i_nb_samples = FRAME_SIZE;
+    aout_PacketInit(p_aout, &p_sys->packet, FRAME_SIZE);
     p_aout->pf_play = aout_PacketPlay;
     p_aout->pf_pause = aout_PacketPause;
     p_aout->pf_flush = aout_PacketFlush;
@@ -144,6 +144,7 @@ static void Close ( vlc_object_t *p_this )
     AudioQueueStop(p_sys->audioQueue, false);
     msg_Dbg(p_aout, "Disposing of AudioQueue");
     AudioQueueDispose(p_sys->audioQueue, false);
+    aout_PacketDestroy(p_aout);
     free (p_sys);
 }
 

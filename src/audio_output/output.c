@@ -161,9 +161,6 @@ int aout_OutputNew( audio_output_t *p_aout,
     aout_FormatPrepare( &p_aout->format );
     aout_FormatPrint( p_aout, "output", &p_aout->format );
 
-    /* Prepare FIFO. */
-    aout_PacketInit (p_aout, &owner->packet, p_aout->i_nb_samples);
-
     /* Choose the mixer format. */
     owner->mixer_format = p_aout->format;
     if (AOUT_FMT_NON_LINEAR(&p_aout->format))
@@ -218,7 +215,6 @@ void aout_OutputDelete( audio_output_t * p_aout )
     aout_VolumeNoneInit( p_aout ); /* clear volume callback */
     owner->module = NULL;
     aout_FiltersDestroyPipeline (owner->filters, owner->nb_filters);
-    aout_PacketDestroy (p_aout);
 }
 
 /*****************************************************************************
@@ -370,8 +366,7 @@ void aout_VolumeHardSet (audio_output_t *aout, float volume, bool mute)
 
 static inline aout_packet_t *aout_packet (audio_output_t *aout)
 {
-    aout_owner_t *owner = aout_owner (aout);
-    return &owner->packet;
+    return (aout_packet_t *)(aout->sys);
 }
 
 void aout_PacketInit (audio_output_t *aout, aout_packet_t *p, unsigned samples)
@@ -444,9 +439,7 @@ static block_t *aout_OutputSlice (audio_output_t *p_aout)
 {
     aout_packet_t *p = aout_packet (p_aout);
     aout_fifo_t *p_fifo = &p->partial;
-    const unsigned samples = p_aout->i_nb_samples;
-    /* FIXME: Remove this silly constraint. Just pass buffers as they come to
-     * "smart" audio outputs. */
+    const unsigned samples = p->samples;
     assert( samples > 0 );
 
     vlc_assert_locked( &p_aout->lock );

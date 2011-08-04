@@ -70,6 +70,7 @@
  *****************************************************************************/
 struct aout_sys_t
 {
+    aout_packet_t packet;
     int i_fd;
     int i_fragstotal;
     mtime_t max_buffer_duration;
@@ -381,10 +382,10 @@ static int Open( vlc_object_t *p_this )
         }
 
         p_aout->format.i_format = VLC_CODEC_SPDIFL;
-        p_aout->i_nb_samples = A52_FRAME_NB;
         p_aout->format.i_bytes_per_frame = AOUT_SPDIF_SIZE;
         p_aout->format.i_frame_length = A52_FRAME_NB;
 
+        aout_PacketInit( p_aout, &p_sys->packet, A52_FRAME_NB );
         aout_VolumeNoneInit( p_aout );
     }
 
@@ -485,22 +486,19 @@ static int Open( vlc_object_t *p_this )
             free( p_sys );
             return VLC_EGENERIC;
         }
-        else
-        {
-            /* Number of fragments actually allocated */
-            p_aout->sys->i_fragstotal = audio_buf.fragstotal;
 
-            /* Maximum duration the soundcard's buffer can hold */
-            p_aout->sys->max_buffer_duration =
+        /* Number of fragments actually allocated */
+        p_aout->sys->i_fragstotal = audio_buf.fragstotal;
+
+        /* Maximum duration the soundcard's buffer can hold */
+        p_aout->sys->max_buffer_duration =
                 (mtime_t)audio_buf.fragstotal * audio_buf.fragsize * 1000000
                 / p_aout->format.i_bytes_per_frame
                 / p_aout->format.i_rate
                 * p_aout->format.i_frame_length;
 
-            p_aout->i_nb_samples = audio_buf.fragsize /
-                p_aout->format.i_bytes_per_frame;
-        }
-
+        aout_PacketInit( p_aout, &p_sys->packet,
+                         audio_buf.fragsize/p_aout->format.i_bytes_per_frame );
         aout_VolumeSoftInit( p_aout );
     }
 
@@ -532,6 +530,7 @@ static void Close( vlc_object_t * p_this )
     ioctl( p_sys->i_fd, SNDCTL_DSP_RESET, NULL );
     close( p_sys->i_fd );
 
+    aout_PacketDestroy( p_aout );
     free( p_sys );
 }
 

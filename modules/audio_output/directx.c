@@ -64,6 +64,7 @@ typedef struct notification_thread_t
  *****************************************************************************/
 struct aout_sys_t
 {
+    aout_packet_t       packet;
     HINSTANCE           hdsound_dll;      /* handle of the opened dsound dll */
 
     char *              psz_device;              /* user defined device name */
@@ -224,7 +225,6 @@ static int OpenAudio( vlc_object_t *p_this )
         p_aout->format.i_format = VLC_CODEC_SPDIFL;
 
         /* Calculate the frame size in bytes */
-        p_aout->i_nb_samples = A52_FRAME_NB;
         p_aout->format.i_bytes_per_frame = AOUT_SPDIF_SIZE;
         p_aout->format.i_frame_length = A52_FRAME_NB;
         p_aout->sys->i_frame_size = p_aout->format.i_bytes_per_frame;
@@ -241,6 +241,7 @@ static int OpenAudio( vlc_object_t *p_this )
             return VLC_EGENERIC;
         }
 
+        aout_PacketInit( p_aout, &p_sys->packet, A52_FRAME_NB );
         aout_VolumeNoneInit( p_aout );
     }
     else
@@ -294,8 +295,8 @@ static int OpenAudio( vlc_object_t *p_this )
         }
 
         /* Calculate the frame size in bytes */
-        p_aout->i_nb_samples = FRAME_SIZE;
         aout_FormatPrepare( &p_aout->format );
+        aout_PacketInit( p_aout, &p_sys->packet, FRAME_SIZE );
         aout_VolumeSoftInit( p_aout );
     }
 
@@ -613,6 +614,7 @@ static void CloseAudio( vlc_object_t *p_this )
     if( p_sys->hdsound_dll ) FreeLibrary( p_sys->hdsound_dll );
 
     free( p_aout->sys->p_device_guid );
+    aout_PacketDestroy( p_aout );
     free( p_sys );
 }
 
@@ -1042,7 +1044,7 @@ static void* DirectSoundThread( void *data )
     {
         DWORD l_read;
         int l_queued = 0, l_free_slots;
-        unsigned i_frame_siz = p_aout->i_nb_samples;
+        unsigned i_frame_siz = p_sys->packet.samples;
         mtime_t mtime = mdate();
         int i;
 

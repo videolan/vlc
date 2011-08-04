@@ -79,6 +79,7 @@
  *****************************************************************************/
 struct aout_sys_t
 {
+    aout_packet_t               packet;
     AudioDeviceID               i_default_dev;  /* Keeps DeviceID of defaultOutputDevice */
     AudioDeviceID               i_selected_dev; /* Keeps DeviceID of the selected device */
     AudioDeviceIOProcID         i_procID;       /* DeviceID of current device */
@@ -566,7 +567,7 @@ static int OpenAnalog( audio_output_t *p_aout )
 
     /* Do the last VLC aout setups */
     aout_FormatPrepare( &p_aout->format );
-    p_aout->i_nb_samples = FRAMESIZE;
+    aout_PacketInit( p_aout, &p_sys->packet, FRAMESIZE );
     aout_VolumeSoftInit( p_aout );
 
     /* set the IOproc callback */
@@ -782,9 +783,9 @@ static int OpenSPDIF( audio_output_t * p_aout )
         p_aout->format.i_format = VLC_CODEC_SPDIFL;
     p_aout->format.i_bytes_per_frame = AOUT_SPDIF_SIZE;
     p_aout->format.i_frame_length = A52_FRAME_NB;
-    p_aout->i_nb_samples = p_aout->format.i_frame_length;
     p_aout->format.i_rate = (unsigned int)p_sys->stream_format.mSampleRate;
     aout_FormatPrepare( &p_aout->format );
+    aout_PacketInit( p_aout, &p_sys->packet, A52_FRAME_NB );
     aout_VolumeNoneInit( p_aout );
 
     /* Add IOProc callback */
@@ -904,6 +905,7 @@ static void Close( vlc_object_t * p_this )
         if( err != noErr ) msg_Err( p_aout, "Could not release hogmode: [%4.4s]", (char *)&err );
     }
 
+    aout_PacketDestroy( p_aout );
     free( p_sys );
 }
 

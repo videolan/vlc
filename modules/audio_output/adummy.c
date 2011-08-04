@@ -44,7 +44,6 @@ vlc_module_begin ()
     add_shortcut( "dummy" )
 vlc_module_end ()
 
-#define FRAME_SIZE 2048
 #define A52_FRAME_NB 1536
 
 /*****************************************************************************
@@ -73,7 +72,6 @@ static int Open( vlc_object_t * p_this )
     }
     else
         p_aout->format.i_format = HAVE_FPU ? VLC_CODEC_FL32 : VLC_CODEC_S16N;
-    p_aout->i_nb_samples = A52_FRAME_NB;
 
     /* Create the variable for the audio-device */
     var_Create( p_aout, "audio-device", VLC_VAR_INTEGER | VLC_VAR_HASCHOICE );

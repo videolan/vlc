@@ -52,6 +52,7 @@
  *****************************************************************************/
 struct aout_sys_t
 {
+    aout_packet_t packet;
     snd_pcm_t         * p_snd_pcm;
     unsigned int                 i_period_time;
 
@@ -344,7 +345,7 @@ static int Open (vlc_object_t *obj)
         pcm_format = SND_PCM_FORMAT_S16;
         channels = 2;
 
-        p_aout->i_nb_samples = i_period_size = ALSA_SPDIF_PERIOD_SIZE;
+        i_period_size = ALSA_SPDIF_PERIOD_SIZE;
         p_aout->format.i_bytes_per_frame = AOUT_SPDIF_SIZE;
         p_aout->format.i_frame_length = A52_FRAME_NB;
 
@@ -355,7 +356,7 @@ static int Open (vlc_object_t *obj)
         i_buffer_size = ALSA_DEFAULT_BUFFER_SIZE;
         channels = aout_FormatNbChannels( &p_aout->format );
 
-        p_aout->i_nb_samples = i_period_size = ALSA_DEFAULT_PERIOD_SIZE;
+        i_period_size = ALSA_DEFAULT_PERIOD_SIZE;
 
         aout_VolumeSoftInit( p_aout );
     }
@@ -433,7 +434,6 @@ static int Open (vlc_object_t *obj)
                  snd_strerror( val ) );
         goto error;
     }
-    p_aout->i_nb_samples = i_period_size;
 
     /* Set buffer size. */
     val = snd_pcm_hw_params_set_buffer_size_near( p_sys->p_snd_pcm, p_hw,
@@ -466,8 +466,7 @@ static int Open (vlc_object_t *obj)
     /* Get Initial software parameters */
     snd_pcm_sw_params_current( p_sys->p_snd_pcm, p_sw );
 
-    snd_pcm_sw_params_set_avail_min( p_sys->p_snd_pcm, p_sw,
-                                     p_aout->i_nb_samples );
+    snd_pcm_sw_params_set_avail_min( p_sys->p_snd_pcm, p_sw, i_period_size );
     /* start playing when one period has been written */
     val = snd_pcm_sw_params_set_start_threshold( p_sys->p_snd_pcm, p_sw,
                                                  ALSA_DEFAULT_PERIOD_SIZE);
@@ -495,6 +494,7 @@ static int Open (vlc_object_t *obj)
 
     p_sys->start_date = 0;
     vlc_sem_init( &p_sys->wait, 0 );
+    aout_PacketInit (p_aout, &p_sys->packet, i_period_size);
 
     /* Create ALSA thread and wait for its readiness. */
     if( vlc_clone( &p_sys->thread, ALSAThread, p_aout,
@@ -549,6 +549,7 @@ static void Close (vlc_object_t *obj)
     vlc_cancel( p_sys->thread );
     vlc_join( p_sys->thread, NULL );
     vlc_sem_destroy( &p_sys->wait );
+    aout_PacketDestroy (p_aout);
 
     snd_pcm_drop( p_sys->p_snd_pcm );
     snd_pcm_close( p_sys->p_snd_pcm );

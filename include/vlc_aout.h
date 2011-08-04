@@ -175,7 +175,6 @@ struct audio_output
     void (* pf_flush)( audio_output_t *, bool ); /**< Flush/drain callback
         (optional, may be NULL) */
     aout_volume_cb          pf_volume_set; /**< Volume setter (or NULL) */
-    int                     i_nb_samples;
 };
 
 /**

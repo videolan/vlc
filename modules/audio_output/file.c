@@ -36,7 +36,6 @@
 #include <vlc_codecs.h> /* WAVEHEADER */
 #include <vlc_fs.h>
 
-#define FRAME_SIZE 2048
 #define A52_FRAME_NB 1536
 
 /*****************************************************************************
@@ -193,16 +192,12 @@ static int Open( vlc_object_t * p_this )
     p_aout->format.i_format = format_int[i];
     if ( AOUT_FMT_NON_LINEAR( &p_aout->format ) )
     {
-        p_aout->i_nb_samples = A52_FRAME_NB;
         p_aout->format.i_bytes_per_frame = AOUT_SPDIF_SIZE;
         p_aout->format.i_frame_length = A52_FRAME_NB;
         aout_VolumeNoneInit( p_aout );
     }
     else
-    {
-        p_aout->i_nb_samples = FRAME_SIZE;
         aout_VolumeSoftInit( p_aout );
-    }
 
     /* Channels number */
     i_channels = var_CreateGetInteger( p_this, "audiofile-channels" );

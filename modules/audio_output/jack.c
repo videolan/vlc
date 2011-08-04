@@ -50,6 +50,7 @@ typedef jack_default_audio_sample_t jack_sample_t;
  *****************************************************************************/
 struct aout_sys_t
 {
+    aout_packet_t   packet;
     jack_client_t  *p_jack_client;
     jack_port_t   **p_jack_ports;
     jack_sample_t **p_jack_buffers;
@@ -135,12 +136,13 @@ static int Open( vlc_object_t *p_this )
     p_aout->pf_play = aout_PacketPlay;
     p_aout->pf_pause = aout_PacketPause;
     p_aout->pf_flush = aout_PacketFlush;
+    aout_PacketInit( p_aout, &p_sys->packet,
+                     jack_get_buffer_size( p_sys->p_jack_client ) );
     aout_VolumeSoftInit( p_aout );
 
     /* JACK only supports fl32 format */
     p_aout->format.i_format = VLC_CODEC_FL32;
     // TODO add buffer size callback
-    p_aout->i_nb_samples = jack_get_buffer_size( p_sys->p_jack_client );
     p_aout->format.i_rate = jack_get_sample_rate( p_sys->p_jack_client );
 
     p_sys->i_channels = aout_FormatNbChannels( &p_aout->format );
@@ -223,9 +225,8 @@ static int Open( vlc_object_t *p_this )
         free( pp_in_ports );
     }
 
-    msg_Dbg( p_aout, "JACK audio output initialized (%d channels, buffer "
-             "size=%d, rate=%d)", p_sys->i_channels,
-             p_aout->i_nb_samples, p_aout->format.i_rate );
+    msg_Dbg( p_aout, "JACK audio output initialized (%d channels, rate=%d)",
+             p_sys->i_channels, p_aout->format.i_rate );
 
 error_out:
     /* Clean up, if an error occurred */
@@ -352,5 +353,6 @@ static void Close( vlc_object_t *p_this )
     }
     free( p_sys->p_jack_ports );
     free( p_sys->p_jack_buffers );
+    aout_PacketDestroy( p_aout );
     free( p_sys );
 }

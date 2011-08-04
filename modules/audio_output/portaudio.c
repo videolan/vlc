@@ -63,6 +63,7 @@ typedef struct
 
 struct aout_sys_t
 {
+    aout_packet_t packet;
     audio_output_t *p_aout;
     PaStream *p_stream;
 
@@ -328,6 +329,7 @@ static void Close ( vlc_object_t *p_this )
 #endif
 
     msg_Dbg( p_aout, "portaudio closed");
+    aout_PacketDestroy( p_aout );
     free( p_sys );
 }
 
@@ -501,8 +503,8 @@ static int PAOpenStream( audio_output_t *p_aout )
 
     /* Calculate the frame size in bytes */
     p_sys->i_sample_size = 4 * i_channels;
-    p_aout->i_nb_samples = FRAME_SIZE;
     aout_FormatPrepare( &p_aout->format );
+    aout_PacketInit( p_aout, &p_sys->packet, FRAME_SIZE );
     aout_VolumeSoftInit( p_aout );
 
     /* Check for channel reordering */
