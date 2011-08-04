@@ -88,9 +88,9 @@ function parse()
                 -- vlc.msg.err( t )
                 -- video_id = string.gsub( line, ".*&video_id:'([^']*)'.*", "%1" )
                 fmt_url_map = string.match( line, "\"fmt_url_map\": \"(.-)\"" )
-                -- FIXME: do this properly
-                fmt_url_map = string.gsub( fmt_url_map, "\\u0026", "&" )
                 if fmt_url_map then
+                    -- FIXME: do this properly
+                    fmt_url_map = string.gsub( fmt_url_map, "\\u0026", "&" )
                     for itag,url in string.gmatch( fmt_url_map, "(%d+)|([^,]+)" ) do
                         -- Apparently formats are listed in quality order,
                         -- so we can afford to simply take the first one
