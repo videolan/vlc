@@ -95,30 +95,30 @@ aout_input_t *aout_DecNew( audio_output_t *p_aout,
     aout_owner_t *owner = aout_owner(p_aout);
     aout_lock( p_aout );
     assert (owner->input == NULL);
-    owner->input = p_input;
 
     var_Destroy( p_aout, "audio-device" );
     var_Destroy( p_aout, "audio-channels" );
 
     /* Recreate the output using the new format. */
     if( aout_OutputNew( p_aout, p_format ) < 0 )
-#warning Input without output and mixer = bad idea.
-        goto out;
+        goto error;
 
     assert (owner->volume.mixer == NULL);
     owner->volume.mixer = aout_MixerNew (p_aout, owner->mixer_format.i_format);
     if (owner->volume.mixer == NULL)
     {
         aout_OutputDelete( p_aout );
-#warning Memory leak.
-        p_input = NULL;
-        goto out;
+        goto error;
     }
 
+    owner->input = p_input;
     aout_InputNew( p_aout, p_input, p_request_vout );
-out:
     aout_unlock( p_aout );
     return p_input;
+error:
+    aout_unlock( p_aout );
+    free( p_input );
+    return NULL;
 }
 
 /*****************************************************************************
