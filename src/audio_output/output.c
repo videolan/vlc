@@ -613,10 +613,12 @@ aout_buffer_t * aout_OutputNextBuffer( audio_output_t * p_aout,
 {
     aout_packet_t *p = aout_packet (p_aout);
     aout_fifo_t *p_fifo = &p->fifo;
-    aout_buffer_t * p_buffer;
+    aout_buffer_t *p_buffer = NULL;
     mtime_t now = mdate();
 
     vlc_mutex_lock( &p->lock );
+    if( p->pause_date != VLC_TS_INVALID )
+        goto out;
 
     /* Drop the audio sample if the audio output is really late.
      * In the case of b_can_sleek, we don't use a resampler so we need to be
