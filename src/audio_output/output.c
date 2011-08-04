@@ -373,6 +373,7 @@ void aout_PacketInit (audio_output_t *aout, aout_packet_t *p, unsigned samples)
 {
     assert (p == aout_packet (aout));
 
+    vlc_mutex_init (&p->lock);
     aout_FifoInit (aout, &p->partial, aout->format.i_rate);
     aout_FifoInit (aout, &p->fifo, aout->format.i_rate);
     p->pause_date = VLC_TS_INVALID;
@@ -386,6 +387,7 @@ void aout_PacketDestroy (audio_output_t *aout)
 
     aout_FifoDestroy (&p->partial);
     aout_FifoDestroy (&p->fifo);
+    vlc_mutex_destroy (&p->lock);
 }
 
 static block_t *aout_OutputSlice (audio_output_t *);
@@ -394,9 +396,11 @@ void aout_PacketPlay (audio_output_t *aout, block_t *block)
 {
     aout_packet_t *p = aout_packet (aout);
 
+    vlc_mutex_lock (&p->lock);
     aout_FifoPush (&p->partial, block);
     while ((block = aout_OutputSlice (aout)) != NULL)
         aout_FifoPush (&p->fifo, block);
+    vlc_mutex_unlock (&p->lock);
 }
 
 void aout_PacketPause (audio_output_t *aout, bool pause, mtime_t date)
@@ -415,8 +419,10 @@ void aout_PacketPause (audio_output_t *aout, bool pause, mtime_t date)
         mtime_t duration = date - p->pause_date;
 
         p->pause_date = VLC_TS_INVALID;
+        vlc_mutex_lock (&p->lock);
         aout_FifoMoveDates (&p->partial, duration);
         aout_FifoMoveDates (&p->fifo, duration);
+        vlc_mutex_unlock (&p->lock);
     }
 }
 
@@ -424,8 +430,11 @@ void aout_PacketFlush (audio_output_t *aout, bool drain)
 {
     aout_packet_t *p = aout_packet (aout);
 
+    vlc_mutex_lock (&p->lock);
     aout_FifoReset (&p->partial);
     aout_FifoReset (&p->fifo);
+    vlc_mutex_unlock (&p->lock);
+
     (void) drain; /* TODO */
 }
 
@@ -442,7 +451,7 @@ static block_t *aout_OutputSlice (audio_output_t *p_aout)
     const unsigned samples = p->samples;
     assert( samples > 0 );
 
-    aout_assert_locked( p_aout );
+    vlc_assert_locked( &p->lock );
 
     /* Retrieve the date of the next buffer. */
     date_t exact_start_date = p->fifo.end_date;
@@ -597,7 +606,7 @@ aout_buffer_t * aout_OutputNextBuffer( audio_output_t * p_aout,
     aout_buffer_t * p_buffer;
     mtime_t now = mdate();
 
-    aout_lock( p_aout );
+    vlc_mutex_lock( &p->lock );
 
     /* Drop the audio sample if the audio output is really late.
      * In the case of b_can_sleek, we don't use a resampler so we need to be
@@ -653,8 +662,9 @@ aout_buffer_t * aout_OutputNextBuffer( audio_output_t * p_aout,
 
         aout_FifoMoveDates (&p->partial, delta);
         aout_FifoMoveDates (p_fifo, delta);
+#warning FIXME: feed back to input for resampling!!!
     }
 out:
-    aout_unlock( p_aout );
+    vlc_mutex_unlock( &p->lock );
     return p_buffer;
 }

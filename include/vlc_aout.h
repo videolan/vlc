@@ -260,13 +260,14 @@ struct aout_fifo_t
 /* Legacy packet-oriented audio output helpers */
 typedef struct
 {
-   aout_fifo_t partial; /**< Audio blocks before packetization */
-   aout_fifo_t fifo; /**< Packetized audio blocks */
-   mtime_t pause_date; /**< Date when paused or VLC_TS_INVALID */
-   unsigned samples; /**< Samples per packet */
-   bool starving;
-   /* Indicates whether the audio output is currently starving, to avoid
-    * printing a 1,000 "output is starving" messages. */
+    vlc_mutex_t lock;
+    aout_fifo_t partial; /**< Audio blocks before packetization */
+    aout_fifo_t fifo; /**< Packetized audio blocks */
+    mtime_t pause_date; /**< Date when paused or VLC_TS_INVALID */
+    unsigned samples; /**< Samples per packet */
+    bool starving;
+    /* Indicates whether the audio output is currently starving, to avoid
+     * printing a 1,000 "output is starving" messages. */
 } aout_packet_t;
 
 VLC_API void aout_PacketInit(audio_output_t *, aout_packet_t *, unsigned);
