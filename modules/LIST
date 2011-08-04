@@ -106,7 +106,7 @@ $Id$
  * dtstofloat32: DTS Audio converter
  * dtstospdif: Audio converter that encapsulates DTS into S/PDIF
  * dtv: DVB support (superseds bda module for Windows)
- * dummy: dummy audio output, video output, interface and input modules
+ * dummy: dummy interface
  * dvb: input module for DVB-S/C/T streaming using v4l2 API
  * dvbsub: decoder module for subs in dvb streams
  * dvdnav: access module for DVDs with libdvdnav

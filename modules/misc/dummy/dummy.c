@@ -32,37 +32,17 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 
-#include "dummy.h"
-
 static int OpenDummy(vlc_object_t *);
 
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#ifdef WIN32
-#define QUIET_TEXT N_("Do not open a DOS command box interface")
-#define QUIET_LONGTEXT N_( \
-    "By default the dummy interface plugin will start a DOS command box. " \
-    "Enabling the quiet mode will not bring this command box but can also " \
-    "be pretty annoying when you want to stop VLC and no video window is " \
-    "open." )
-#endif
-
 vlc_module_begin ()
     set_shortname( N_("Dummy"))
-    set_description( N_("Dummy interface function") )
-    set_capability( "interface", 0 )
-    set_callbacks( OpenIntf, NULL )
-#ifdef WIN32
-    set_section( N_( "Dummy Interface" ), NULL )
-    add_category_hint( N_("Interface"), NULL, false )
-    add_bool( "dummy-quiet", false, QUIET_TEXT, QUIET_LONGTEXT, false )
-#endif
-    add_submodule ()
-        set_description( N_("libc memcpy") )
-        set_capability( "memcpy", 50 )
-        set_callbacks( OpenDummy, NULL )
-        add_shortcut( "c", "libc" )
+    set_description( N_("libc memcpy") )
+    set_capability( "memcpy", 50 )
+    set_callbacks( OpenDummy, NULL )
+    add_shortcut( "c", "libc" )
 vlc_module_end ()
 
 static int OpenDummy( vlc_object_t *obj )

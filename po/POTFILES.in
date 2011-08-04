@@ -397,6 +397,7 @@ modules/control/dbus/dbus_root.c
 modules/control/dbus/dbus_root.h
 modules/control/dbus/dbus_tracklist.c
 modules/control/dbus/dbus_tracklist.h
+modules/control/dummy.c
 modules/control/gestures.c
 modules/control/globalhotkeys/win32.c
 modules/control/globalhotkeys/xcb.c
@@ -911,8 +912,6 @@ modules/meta_engine/taglib.cpp
 modules/misc/audioscrobbler.c
 modules/misc/dhparams.h
 modules/misc/dummy/dummy.c
-modules/misc/dummy/dummy.h
-modules/misc/dummy/interface.c
 modules/misc/gnutls.c
 modules/misc/inhibit.c
 modules/misc/inhibit/osso.c
