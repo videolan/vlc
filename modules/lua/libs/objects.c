@@ -33,6 +33,7 @@
 #endif
 
 #include <vlc_common.h>
+#include <vlc_vout.h>
 
 #include <lua.h>        /* Low level lua C API */
 #include <lauxlib.h>    /* Higher level C API */
@@ -111,6 +112,22 @@ int vlclua_push_vlc_object( lua_State *L, vlc_object_t *p_obj )
     lua_setmetatable( L, -2 );
     return 1;
 }
+static int vlclua_get_vout( lua_State *L )
+{
+    input_thread_t *p_input= vlclua_get_input_internal( L );
+    if( p_input )
+    {
+        vout_thread_t *p_vout = input_GetVout( p_input );
+        vlc_object_release( p_input );
+        if(p_vout)
+        {
+            vlclua_push_vlc_object( L, (vlc_object_t *) p_vout );
+            return 1;
+        }
+    }
+    lua_pushnil( L );
+    return 1;
+}
 
 /*****************************************************************************
  *
@@ -120,6 +137,7 @@ static const luaL_Reg vlclua_object_reg[] = {
     { "playlist", vlclua_get_playlist },
     { "libvlc", vlclua_get_libvlc },
     { "find", vlclua_object_find },
+    { "vout", vlclua_get_vout},
     { NULL, NULL }
 };
 

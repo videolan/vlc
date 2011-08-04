@@ -306,7 +306,7 @@ getstatus = function (includecategories)
 local input = vlc.object.input()
 local item = vlc.input.item()
 local playlist = vlc.object.playlist()
-local vout = input and vlc.object.find(input,'vout','child')
+local vout = vlc.object.vout()
 
 	local s ={}
 	
