@@ -1,4 +1,4 @@
-BASE_SUBDIRS = notify playlist stats osd
+BASE_SUBDIRS = playlist stats osd
 
 SUBDIRS = $(BASE_SUBDIRS)
 DIST_SUBDIRS = $(BASE_SUBDIRS)

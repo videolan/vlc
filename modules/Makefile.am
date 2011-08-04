@@ -11,6 +11,7 @@ BASE_SUBDIRS = \
 	meta_engine \
 	misc \
 	media_library \
+	notify \
 	packetizer \
 	services_discovery \
 	stream_filter \
