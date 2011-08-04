@@ -241,7 +241,6 @@ VLC_API void aout_FormatPrepare( audio_sample_format_t * p_format );
 VLC_API void aout_FormatPrint( audio_output_t * p_aout, const char * psz_text, const audio_sample_format_t * p_format );
 VLC_API const char * aout_FormatPrintChannels( const audio_sample_format_t * ) VLC_USED;
 
-VLC_API mtime_t aout_FifoFirstDate( const aout_fifo_t * ) VLC_USED;
 VLC_API aout_buffer_t *aout_FifoPop( aout_fifo_t * p_fifo ) VLC_USED;
 VLC_API void aout_FifoPush( aout_fifo_t *, block_t * );
 

@@ -398,24 +398,6 @@ void aout_FifoMoveDates( aout_fifo_t *fifo, mtime_t difference )
 }
 
 /*****************************************************************************
- * aout_FifoNextStart : return the current end_date
- *****************************************************************************/
-mtime_t aout_FifoNextStart( const aout_fifo_t *p_fifo )
-{
-    return date_Get( &p_fifo->end_date );
-}
-
-/*****************************************************************************
- * aout_FifoFirstDate : return the playing date of the first buffer in the
- * FIFO
- *****************************************************************************/
-mtime_t aout_FifoFirstDate( const aout_fifo_t *fifo )
-{
-    block_t *first = fifo->p_first;
-    return (first != NULL) ? first->i_pts : VLC_TS_INVALID;
-}
-
-/*****************************************************************************
  * aout_FifoPop : get the next buffer out of the FIFO
  *****************************************************************************/
 aout_buffer_t *aout_FifoPop( aout_fifo_t * p_fifo )
