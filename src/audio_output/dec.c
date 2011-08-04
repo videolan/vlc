@@ -36,6 +36,7 @@
 #include <vlc_input.h>
 
 #include "aout_internal.h"
+#include "libvlc.h"
 
 #undef aout_DecNew
 /**
@@ -147,6 +148,43 @@ void aout_DecDelete( audio_output_t * p_aout, aout_input_t * p_input )
     free( p_input );
 }
 
+static void aout_CheckRestart (audio_output_t *aout)
+{
+    aout_owner_t *owner = aout_owner (aout);
+    aout_input_t *input = owner->input;
+
+    aout_assert_locked (aout);
+
+    if (likely(!owner->need_restart))
+        return;
+    owner->need_restart = false;
+
+    /* Reinitializes the output */
+    aout_InputDelete (aout, owner->input);
+    aout_MixerDelete (owner->volume.mixer);
+    owner->volume.mixer = NULL;
+    aout_OutputDelete (aout);
+
+    if (aout_OutputNew (aout, &input->input))
+    {
+error:
+        input->b_error = true;
+        return; /* we are officially screwed */
+    }
+
+    owner->volume.mixer = aout_MixerNew (aout, owner->mixer_format.i_format);
+    if (owner->volume.mixer == NULL)
+    {
+        aout_OutputDelete (aout);
+        goto error;
+    }
+
+    if (aout_InputNew (aout, input, &input->request_vout))
+        assert (input->b_error);
+    else
+        assert (!input->b_error);
+}
+
 
 /*
  * Buffer management
@@ -201,8 +239,10 @@ int aout_DecPlay( audio_output_t * p_aout, aout_input_t * p_input,
         return -1;
     }
 
-    /* Input */
+    aout_CheckRestart( p_aout );
     aout_InputCheckAndRestart( p_aout, p_input );
+
+    /* Input */
     p_buffer = aout_InputPlay( p_aout, p_input, p_buffer, i_input_rate );
 
     if( p_buffer != NULL )

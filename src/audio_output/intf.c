@@ -234,58 +234,18 @@ int aout_SetMute (vlc_object_t *obj, audio_volume_t *volp, bool mute)
  * Pipelines management
  */
 
-/*****************************************************************************
- * aout_Restart : re-open the output device and rebuild the input and output
- *                pipelines
- *****************************************************************************
- * This function is used whenever the parameters of the output plug-in are
- * changed (eg. selecting S/PDIF or PCM).
- *****************************************************************************/
-static int aout_Restart( audio_output_t * p_aout )
+/**
+ * Marks the audio output for restart, to update any parameter of the output
+ * plug-in (e.g. output device or channel mapping).
+ */
+static void aout_Restart (audio_output_t *aout)
 {
-    aout_input_t *p_input;
-    aout_owner_t *owner = aout_owner (p_aout);
+    aout_owner_t *owner = aout_owner (aout);
 
-    aout_lock( p_aout );
-    p_input = owner->input;
-    if( p_input == NULL )
-    {
-        aout_unlock( p_aout );
-        msg_Err( p_aout, "no decoder thread" );
-        return -1;
-    }
-
-    /* Reinitializes the output */
-    aout_InputDelete( p_aout, p_input );
-    aout_MixerDelete (owner->volume.mixer);
-    owner->volume.mixer = NULL;
-    aout_OutputDelete( p_aout );
-
-    /* FIXME: This function is notoriously dangerous/unsafe.
-     * By the way, if OutputNew or MixerNew fails, we are totally screwed. */
-    if ( aout_OutputNew( p_aout, &p_input->input ) == -1 )
-    {
-        /* Release all locks and report the error. */
-        aout_unlock( p_aout );
-        return -1;
-    }
-
-    owner->volume.mixer = aout_MixerNew (p_aout, owner->mixer_format.i_format);
-    if (owner->volume.mixer == NULL)
-    {
-        aout_OutputDelete( p_aout );
-        aout_unlock( p_aout );
-        return -1;
-    }
-
-    if( aout_InputNew( p_aout, p_input, &p_input->request_vout ) )
-    {
-#warning FIXME: deal with errors
-        aout_unlock( p_aout );
-        return -1;
-    }
-    aout_unlock( p_aout );
-    return 0;
+    aout_lock (aout);
+    if (owner->input != NULL)
+        owner->need_restart = true;
+    aout_unlock (aout);
 }
 
 /*****************************************************************************
