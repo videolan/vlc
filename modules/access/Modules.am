@@ -21,6 +21,11 @@ libfilesystem_plugin_la_CFLAGS = $(AM_CFLAGS)
 libfilesystem_plugin_la_LIBADD = $(AM_LIBADD)
 libfilesystem_plugin_la_DEPENDENCIES =
 
+libidummy_plugin_la_SOURCES = idummy.c
+libidummy_plugin_la_CFLAGS = $(AM_CFLAGS)
+libidummy_plugin_la_LIBADD = $(AM_LIBADD)
+libidummy_plugin_la_DEPENDENCIES =
+
 libsdp_plugin_la_SOURCES = sdp.c
 libsdp_plugin_la_CFLAGS = $(AM_CFLAGS)
 libsdp_plugin_la_LIBADD = $(AM_LIBADD)
@@ -80,6 +85,7 @@ libaccess_rtmp_plugin_la_DEPENDENCIES =
 
 libvlc_LTLIBRARIES += \
 	libfilesystem_plugin.la \
+	libidummy_plugin.la \
 	libaccess_udp_plugin.la \
 	libaccess_tcp_plugin.la \
 	libaccess_http_plugin.la \

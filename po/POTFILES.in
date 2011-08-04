@@ -207,6 +207,7 @@ modules/access/fs.c
 modules/access/ftp.c
 modules/access/gnomevfs.c
 modules/access/http.c
+modules/access/idummy.c
 modules/access/imem.c
 modules/access/jack.c
 modules/access/linsys/linsys_sdi.c
@@ -911,7 +912,6 @@ modules/misc/dummy/decoder.c
 modules/misc/dummy/dummy.c
 modules/misc/dummy/dummy.h
 modules/misc/dummy/encoder.c
-modules/misc/dummy/input.c
 modules/misc/dummy/interface.c
 modules/misc/dummy/renderer.c
 modules/misc/gnutls.c

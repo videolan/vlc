@@ -160,6 +160,7 @@ $Id$
  * i422_yuy2: planar 4:2:2 YUV to packed YUV conversion functions
  * i422_yuy2_mmx: MMX accelerated version of i422_yuy2
  * i422_yuy2_sse2: sse2 accelerated version of i422_yuy2
+ * idummy: dummy input
  * image: Image file video output
  * inhibit: preventing the computer from suspending
  * invert: inverse video filter

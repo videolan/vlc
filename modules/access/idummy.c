@@ -1,5 +1,5 @@
 /*****************************************************************************
- * input_dummy.c: dummy input plugin, to manage "vlc://" special options
+ * idummy.c: dummy input plugin, to manage "vlc://" special options
  *****************************************************************************
  * Copyright (C) 2001, 2002 the VideoLAN team
  * $Id$
@@ -30,11 +30,21 @@
 #endif
 
 #include <vlc_common.h>
+#include <vlc_plugin.h>
 #include <vlc_interface.h>
 #include <vlc_demux.h>
 #include <vlc_charset.h>
 
-#include "dummy.h"
+static int OpenDemux( vlc_object_t * );
+static void CloseDemux( vlc_object_t * );
+
+vlc_module_begin ()
+    set_shortname( N_("Dummy") )
+    set_description( N_("Dummy input") )
+    set_capability( "access_demux", 0 )
+    set_callbacks( OpenDemux, CloseDemux )
+    add_shortcut( "dummy", "vlc" )
+vlc_module_end ()
 
 static int DemuxControl( demux_t *, int, va_list );
 
@@ -129,7 +139,7 @@ static int ControlPause( demux_t *demux, int query, va_list args )
 /*****************************************************************************
  * OpenDemux: initialize the target, ie. parse the command
  *****************************************************************************/
-int OpenDemux ( vlc_object_t *p_this )
+static int OpenDemux( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t*)p_this;
     char * psz_name = p_demux->psz_location;
@@ -195,7 +205,7 @@ nop:
 /*****************************************************************************
  * CloseDemux: initialize the target, ie. parse the command
  *****************************************************************************/
-void CloseDemux ( vlc_object_t *p_this )
+static void CloseDemux( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t*)p_this;
 
