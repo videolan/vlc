@@ -13,8 +13,6 @@ aout_ChannelsRestart
 aout_CheckChannelExtraction
 aout_CheckChannelReorder
 aout_EnableFilter
-aout_FifoPop
-aout_FifoPush
 aout_filter_RequestVout
 aout_FormatPrepare
 aout_FormatPrint
