@@ -953,7 +953,7 @@ void libvlc_audio_set_callbacks( libvlc_media_player_t *mp,
     var_SetAddress( mp, "amem-flush", flush_cb );
     var_SetAddress( mp, "amem-drain", drain_cb );
     var_SetAddress( mp, "amem-data", opaque );
-    var_SetString( mp, "aout", "amem" );
+    var_SetString( mp, "aout", "amem,none" );
 }
 
 void libvlc_audio_set_volume_callback( libvlc_media_player_t *mp,
