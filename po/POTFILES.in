@@ -914,7 +914,6 @@ modules/misc/dummy/encoder.c
 modules/misc/dummy/input.c
 modules/misc/dummy/interface.c
 modules/misc/dummy/renderer.c
-modules/misc/dummy/vout.c
 modules/misc/gnutls.c
 modules/misc/inhibit.c
 modules/misc/inhibit/osso.c
@@ -1121,6 +1120,7 @@ modules/video_output/msw/events.c
 modules/video_output/msw/glwin32.c
 modules/video_output/msw/wingdi.c
 modules/video_output/sdl.c
+modules/video_output/vdummy.c
 modules/video_output/vmem.c
 modules/video_output/xcb/glx.c
 modules/video_output/xcb/window.c

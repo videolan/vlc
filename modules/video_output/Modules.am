@@ -119,6 +119,12 @@ EXTRA_LTLIBRARIES += libegl_plugin.la
 libvlc_LTLIBRARIES += $(LTLIBegl)
 
 ### Common ###
+libvdummy_plugin_la_SOURCES = vdummy.c
+libvdummy_plugin_la_CFLAGS = $(AM_CFLAGS)
+libvdummy_plugin_la_LIBADD = $(AM_LIBADD)
+libvdummy_plugin_la_DEPENDENCIES =
+
 libvlc_LTLIBRARIES += \
+	libvdummy_plugin.la \
 	libvmem_plugin.la \
 	libyuv_plugin.la

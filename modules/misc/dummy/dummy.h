@@ -36,8 +36,4 @@ void CloseDecoder   ( vlc_object_t * );
 int  OpenEncoder  ( vlc_object_t * );
 void CloseEncoder ( vlc_object_t * );
 
-int  OpenVideo    ( vlc_object_t * );
-int  OpenVideoStat( vlc_object_t * );
-void CloseVideo   ( vlc_object_t * );
-
 int  OpenRenderer ( vlc_object_t * );

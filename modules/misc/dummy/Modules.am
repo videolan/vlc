@@ -1,7 +1,6 @@
 SOURCES_dummy = \
 	dummy.c \
 	dummy.h \
-	vout.c \
 	interface.c \
 	input.c \
 	decoder.c \

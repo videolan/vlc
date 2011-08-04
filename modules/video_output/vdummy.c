@@ -30,8 +30,37 @@
 #endif
 
 #include <vlc_common.h>
+#include <vlc_plugin.h>
 #include <vlc_vout_display.h>
-#include "dummy.h"
+
+#define CHROMA_TEXT N_("Dummy image chroma format")
+#define CHROMA_LONGTEXT N_( \
+    "Force the dummy video output to create images using a specific chroma " \
+    "format instead of trying to improve performances by using the most " \
+    "efficient one.")
+
+static int OpenDummy( vlc_object_t * );
+static int OpenStats( vlc_object_t * );
+static void Close( vlc_object_t * );
+
+vlc_module_begin ()
+    set_shortname( N_("Dummy") )
+    set_description( N_("Dummy video output") )
+    set_capability( "vout display", 1 )
+    set_callbacks( OpenDummy, Close )
+    add_shortcut( "dummy" )
+
+    set_category( CAT_VIDEO )
+    set_subcategory( SUBCAT_VIDEO_VOUT )
+    add_string( "dummy-chroma", NULL, CHROMA_TEXT, CHROMA_LONGTEXT, true )
+
+    add_submodule ()
+    set_description( N_("Statistics video output") )
+    set_capability( "vout display", 0 )
+    add_shortcut( "stats" )
+    set_callbacks( OpenStats, Close )
+vlc_module_end ()
+
 
 /*****************************************************************************
  * Local prototypes
@@ -48,7 +77,8 @@ static void            Manage (vout_display_t *);
 /*****************************************************************************
  * OpenVideo: activates dummy vout display method
  *****************************************************************************/
-static int OpenVideoCommon(vlc_object_t *object, bool display_stat)
+static int Open(vlc_object_t *object,
+                void (*display)(vout_display_t *, picture_t *, subpicture_t *))
 {
     vout_display_t *vd = (vout_display_t *)object;
     vout_display_sys_t *sys;
@@ -71,22 +101,24 @@ static int OpenVideoCommon(vlc_object_t *object, bool display_stat)
     }
     vd->pool    = Pool;
     vd->prepare = NULL;
-    vd->display = display_stat ? DisplayStat : Display;
+    vd->display = display;
     vd->control = Control;
     vd->manage  = Manage;
 
     return VLC_SUCCESS;
 }
-int OpenVideo(vlc_object_t *object)
+
+static int OpenDummy(vlc_object_t *object)
 {
-    return OpenVideoCommon(object, false);
-}
-int OpenVideoStat(vlc_object_t *object)
-{
-    return OpenVideoCommon(object, true);
+    return Open(object, Display);
 }
 
-void CloseVideo(vlc_object_t *object)
+static int OpenStats(vlc_object_t *object)
+{
+    return Open(object, DisplayStat);
+}
+
+static void Close(vlc_object_t *object)
 {
     vout_display_t *vd = (vout_display_t *)object;
     vout_display_sys_t *sys = vd->sys;

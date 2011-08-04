@@ -39,12 +39,6 @@ static int OpenDummy(vlc_object_t *);
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define CHROMA_TEXT N_("Dummy image chroma format")
-#define CHROMA_LONGTEXT N_( \
-    "Force the dummy video output to create images using a specific chroma " \
-    "format instead of trying to improve performances by using the most " \
-    "efficient one.")
-
 #define SAVE_TEXT N_("Save raw codec data")
 #define SAVE_LONGTEXT N_( \
     "Save the raw codec data if you have selected/forced the dummy " \
@@ -92,21 +86,6 @@ vlc_module_begin ()
         set_description( N_("Dummy encoder function") )
         set_capability( "encoder", 0 )
         set_callbacks( OpenEncoder, CloseEncoder )
-    add_submodule ()
-        set_description( N_("Dummy video output function") )
-        set_section( N_( "Dummy Video output" ), NULL )
-        set_capability( "vout display", 1 )
-        set_callbacks( OpenVideo, CloseVideo )
-        set_category( CAT_VIDEO )
-        set_subcategory( SUBCAT_VIDEO_VOUT )
-        add_category_hint( N_("Video"), NULL, false )
-        add_string( "dummy-chroma", NULL, CHROMA_TEXT, CHROMA_LONGTEXT, true )
-    add_submodule ()
-        set_section( N_( "Stats video output" ), NULL )
-        set_description( N_("Stats video output function") )
-        set_capability( "vout display", 0 )
-        add_shortcut( "stats" )
-        set_callbacks( OpenVideoStat, CloseVideo )
     add_submodule ()
         set_description( N_("Dummy font renderer function") )
         set_capability( "text renderer", 1 )
