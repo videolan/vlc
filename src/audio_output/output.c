@@ -28,6 +28,8 @@
 # include "config.h"
 #endif
 
+#include <math.h>
+
 #include <assert.h>
 #include <vlc_common.h>
 #include <vlc_aout.h>
@@ -289,6 +291,8 @@ void aout_VolumeNoneInit (audio_output_t *aout)
      * other thread knows of this audio output instance.
     aout_assert_locked (aout); */
     aout->pf_volume_set = aout_VolumeNoneSet;
+    var_Destroy (aout, "volume");
+    var_Destroy (aout, "mute");
 }
 
 /**
@@ -340,6 +344,8 @@ void aout_VolumeHardInit (audio_output_t *aout, aout_volume_cb setter)
 {
     aout_assert_locked (aout);
     aout->pf_volume_set = setter;
+    var_Create (aout, "volume", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT);
+    var_Create (aout, "mute", VLC_VAR_BOOL|VLC_VAR_DOINHERIT);
 }
 
 /**
@@ -348,17 +354,21 @@ void aout_VolumeHardInit (audio_output_t *aout, aout_volume_cb setter)
  * @param setter volume setter callback
  * @param volume current custom volume
  * @param mute current mute flag
- * @note Audio output plugins that cannot apply the volume
- * should call this function during activation.
+ *
+ * @warning The caller (i.e. the audio output plug-in) is responsible for
+ * interlocking and synchronizing call to this function and to the
+ * audio_output_t.pf_volume_set callback. This ensures that VLC gets correct
+ * volume information (possibly with a latency).
  */
 void aout_VolumeHardSet (audio_output_t *aout, float volume, bool mute)
 {
-#warning FIXME
-    /* REVISIT: This is tricky. We cannot acquire the volume lock as this gets
-     * called from the audio output (it would cause a lock inversion).
-     * We also should not override the input manager volume, but only the
-     * volume of the current audio output... FIXME */
-    msg_Err (aout, "%s(%f, %u)", __func__, volume, (unsigned)mute);
+    audio_volume_t vol = lroundf (volume * (float)AOUT_VOLUME_DEFAULT);
+
+    /* We cannot acquire the volume lock as this gets called from the audio
+     * output plug-in (it would cause a lock inversion). */
+    var_SetInteger (aout, "volume", vol);
+    var_SetBool (aout, "mute", mute);
+    var_TriggerCallback (aout, "intf-change");
 }
 
 
