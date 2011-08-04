@@ -544,6 +544,7 @@ static int PAOpenStream( audio_output_t *p_aout )
                      paLastHostErrorInfo->errorText );
         }
         p_sys->p_stream = 0;
+        aout_PacketDestroy( p_aout );
         return VLC_EGENERIC;
     }
 
@@ -552,6 +553,7 @@ static int PAOpenStream( audio_output_t *p_aout )
     {
         msg_Err( p_aout, "Pa_StartStream() failed" );
         Pa_CloseStream( p_sys->p_stream );
+        aout_PacketDestroy( p_aout );
         return VLC_EGENERIC;
     }
 

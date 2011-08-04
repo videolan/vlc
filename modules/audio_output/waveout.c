@@ -311,6 +311,7 @@ static int Open( vlc_object_t *p_this )
         malloc( p_aout->sys->i_buffer_size );
     if( p_aout->sys->p_silence_buffer == NULL )
     {
+        aout_PacketDestroy( p_aout );
         free( p_aout->sys );
         return VLC_ENOMEM;
     }

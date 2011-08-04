@@ -501,6 +501,7 @@ static int Open (vlc_object_t *obj)
                    VLC_THREAD_PRIORITY_OUTPUT ) )
     {
         msg_Err( p_aout, "cannot create ALSA thread (%m)" );
+        aout_PacketDestroy (p_aout);
         vlc_sem_destroy( &p_sys->wait );
         goto error;
     }

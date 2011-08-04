@@ -796,6 +796,7 @@ static int OpenSPDIF( audio_output_t * p_aout )
     if( err != noErr )
     {
         msg_Err( p_aout, "AudioDeviceCreateIOProcID failed: [%4.4s]", (char *)&err );
+        aout_PacketDestroy (p_aout);
         return false;
     }
 
@@ -816,6 +817,7 @@ static int OpenSPDIF( audio_output_t * p_aout )
         {
             msg_Err( p_aout, "AudioDeviceDestroyIOProcID failed: [%4.4s]", (char *)&err );
         }
+        aout_PacketDestroy (p_aout);
         return false;
     }
 

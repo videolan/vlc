@@ -236,6 +236,7 @@ error_out:
         {
             jack_deactivate( p_sys->p_jack_client );
             jack_client_close( p_sys->p_jack_client );
+            aout_PacketDestroy( p_aout );
         }
         free( p_sys->p_jack_ports );
         free( p_sys->p_jack_buffers );
