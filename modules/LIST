@@ -327,6 +327,7 @@ $Id$
  * swscale: Video scaling filter
  * t140: T.140 text encoder
  * taglib: Taglib tags parser and writer
+ * tdummy: dummy text renderer
  * telepathy: Telepathy Presence information using MissionControl notification
  * telx: teletext subtitles decoder
  * theora: a theora video decoder/packetizer/encoder using the libtheora library

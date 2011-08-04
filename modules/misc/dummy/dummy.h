@@ -25,5 +25,3 @@
  * External prototypes
  *****************************************************************************/
 int  OpenIntf     ( vlc_object_t * );
-
-int  OpenRenderer ( vlc_object_t * );

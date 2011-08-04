@@ -913,7 +913,6 @@ modules/misc/dhparams.h
 modules/misc/dummy/dummy.c
 modules/misc/dummy/dummy.h
 modules/misc/dummy/interface.c
-modules/misc/dummy/renderer.c
 modules/misc/gnutls.c
 modules/misc/inhibit.c
 modules/misc/inhibit/osso.c
@@ -945,6 +944,7 @@ modules/misc/stats/stats.h
 modules/misc/text_renderer/freetype.c
 modules/misc/text_renderer/quartztext.c
 modules/misc/text_renderer/svg.c
+modules/misc/text_renderer/tdummy.c
 modules/misc/text_renderer/win32text.c
 modules/misc/xml/libxml.c
 modules/mmx/memcpy.c

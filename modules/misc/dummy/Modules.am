@@ -2,7 +2,6 @@ SOURCES_dummy = \
 	dummy.c \
 	dummy.h \
 	interface.c \
-	renderer.c \
 	$(NULL)
 
 libvlc_LTLIBRARIES += libdummy_plugin.la
