@@ -1,0 +1,10 @@
+SOURCES_freetype = freetype.c
+SOURCES_quartztext = quartztext.c
+SOURCES_svg = svg.c
+SOURCES_tdummy = tdummy.c
+SOURCES_win32text = win32text.c
+
+libvlc_LTLIBRARIES += libtdummy_plugin.la
+if HAVE_WINCE
+libvlc_LTLIBRARIES += libwin32text_plugin.la
+endif

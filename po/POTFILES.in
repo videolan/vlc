@@ -940,11 +940,6 @@ modules/misc/stats/demux.c
 modules/misc/stats/encoder.c
 modules/misc/stats/stats.c
 modules/misc/stats/stats.h
-modules/misc/text_renderer/freetype.c
-modules/misc/text_renderer/quartztext.c
-modules/misc/text_renderer/svg.c
-modules/misc/text_renderer/tdummy.c
-modules/misc/text_renderer/win32text.c
 modules/misc/xml/libxml.c
 modules/mmx/memcpy.c
 modules/mmxext/memcpy.c
@@ -1006,6 +1001,11 @@ modules/stream_out/smem.c
 modules/stream_out/standard.c
 modules/stream_out/switcher.c
 modules/stream_out/transcode/transcode.c
+modules/text_renderer/freetype.c
+modules/text_renderer/quartztext.c
+modules/text_renderer/svg.c
+modules/text_renderer/tdummy.c
+modules/text_renderer/win32text.c
 modules/video_chroma/grey_yuv.c
 modules/video_chroma/i420_rgb.c
 modules/video_chroma/i420_rgb.h

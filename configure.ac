@@ -4411,6 +4411,7 @@ AC_CONFIG_FILES([
   modules/stream_filter/Makefile
   modules/stream_out/Makefile
   modules/stream_out/transcode/Makefile
+  modules/text_renderer/Makefile
   modules/video_chroma/Makefile
   modules/video_filter/Makefile
   modules/video_filter/dynamicoverlay/Makefile

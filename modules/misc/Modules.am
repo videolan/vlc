@@ -3,13 +3,6 @@ BASE_SUBDIRS = notify playlist stats osd
 SUBDIRS = $(BASE_SUBDIRS)
 DIST_SUBDIRS = $(BASE_SUBDIRS)
 
-SOURCES_freetype = text_renderer/freetype.c
-SOURCES_tdummy = text_renderer/tdummy.c
-SOURCES_win32text = text_renderer/win32text.c
-SOURCES_quartztext = text_renderer/quartztext.c
-libvlc_LTLIBRARIES += libtdummy_plugin.la
-
-SOURCES_svg = text_renderer/svg.c
 SOURCES_logger = logger.c
 SOURCES_vod_rtsp = rtsp.c
 SOURCES_gnutls = gnutls.c dhparams.h
@@ -41,9 +34,6 @@ libvlc_LTLIBRARIES += \
 	libaudioscrobbler_plugin.la \
 	liblogger_plugin.la
 
-if HAVE_WINCE
-libvlc_LTLIBRARIES += libwin32text_plugin.la
-endif
 if ENABLE_SOUT
 libvlc_LTLIBRARIES += \
 	libvod_rtsp_plugin.la \
