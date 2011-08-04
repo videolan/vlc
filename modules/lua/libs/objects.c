@@ -128,7 +128,22 @@ static int vlclua_get_vout( lua_State *L )
     lua_pushnil( L );
     return 1;
 }
-
+static int vlclua_get_aout( lua_State *L )
+{
+    input_thread_t *p_input= vlclua_get_input_internal( L );
+    if( p_input )
+    {
+        audio_output_t *p_aout = input_GetAout( p_input );
+        vlc_object_release(p_input);
+        if(p_aout)
+        {
+            vlclua_push_vlc_object( L, (vlc_object_t *)p_aout );
+            return 1;
+        }
+    }
+    lua_pushnil( L );
+    return 1;
+}
 /*****************************************************************************
  *
  *****************************************************************************/
@@ -138,6 +153,7 @@ static const luaL_Reg vlclua_object_reg[] = {
     { "libvlc", vlclua_get_libvlc },
     { "find", vlclua_object_find },
     { "vout", vlclua_get_vout},
+    { "aout", vlclua_get_aout},
     { NULL, NULL }
 };
 
