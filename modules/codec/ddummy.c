@@ -1,5 +1,5 @@
 /*****************************************************************************
- * decoder.c: dummy decoder plugin for vlc.
+ * dddumy.c: dummy decoder plugin for vlc.
  *****************************************************************************
  * Copyright (C) 2002 the VideoLAN team
  * $Id$
@@ -29,11 +29,37 @@
 #endif
 
 #include <vlc_common.h>
+#include <vlc_plugin.h>
 #include <vlc_codec.h>
 #include <vlc_fs.h>
 
+#define SAVE_TEXT N_("Save raw codec data")
+#define SAVE_LONGTEXT N_( \
+    "Save the raw codec data if you have selected/forced the dummy " \
+    "decoder in the main options." )
 
-#include "dummy.h"
+static int OpenDecoder( vlc_object_t * );
+static int OpenDecoderDump( vlc_object_t * );
+static void CloseDecoder( vlc_object_t * );
+
+vlc_module_begin ()
+    set_shortname( N_("Dummy") )
+    set_description( N_("Dummy decoder") )
+    set_capability( "decoder", 0 )
+    set_callbacks( OpenDecoder, CloseDecoder )
+    set_category( CAT_INPUT )
+    set_subcategory( SUBCAT_INPUT_SCODEC )
+    add_bool( "dummy-save-es", false, SAVE_TEXT, SAVE_LONGTEXT, true )
+    add_shortcut( "dummy" )
+
+    add_submodule ()
+    set_section( N_( "Dump decoder" ), NULL )
+    set_description( N_("Dump decoder") )
+    set_capability( "decoder", -1 )
+    set_callbacks( OpenDecoderDump, CloseDecoder )
+    add_shortcut( "dump" )
+vlc_module_end ()
+
 
 /*****************************************************************************
  * Local prototypes
@@ -79,12 +105,12 @@ static int OpenDecoderCommon( vlc_object_t *p_this, bool b_force_dump )
     return VLC_SUCCESS;
 }
 
-int OpenDecoder( vlc_object_t *p_this )
+static int OpenDecoder( vlc_object_t *p_this )
 {
     return OpenDecoderCommon( p_this, false );
 }
 
-int  OpenDecoderDump( vlc_object_t *p_this )
+static int  OpenDecoderDump( vlc_object_t *p_this )
 {
     return OpenDecoderCommon( p_this, true );
 }
@@ -117,7 +143,7 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 /*****************************************************************************
  * CloseDecoder: decoder destruction
  *****************************************************************************/
-void CloseDecoder ( vlc_object_t *p_this )
+static void CloseDecoder( vlc_object_t *p_this )
 {
     decoder_t *p_dec = (decoder_t *)p_this;
     FILE *stream = (void *)p_dec->p_sys;
@@ -125,4 +151,3 @@ void CloseDecoder ( vlc_object_t *p_this )
     if( stream != NULL )
         fclose( stream );
 }
-

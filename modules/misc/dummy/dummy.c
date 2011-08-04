@@ -39,11 +39,6 @@ static int OpenDummy(vlc_object_t *);
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define SAVE_TEXT N_("Save raw codec data")
-#define SAVE_LONGTEXT N_( \
-    "Save the raw codec data if you have selected/forced the dummy " \
-    "decoder in the main options." )
-
 #ifdef WIN32
 #define QUIET_TEXT N_("Do not open a DOS command box interface")
 #define QUIET_LONGTEXT N_( \
@@ -63,20 +58,6 @@ vlc_module_begin ()
     add_category_hint( N_("Interface"), NULL, false )
     add_bool( "dummy-quiet", false, QUIET_TEXT, QUIET_LONGTEXT, false )
 #endif
-    add_submodule ()
-        set_section( N_( "Dummy decoder" ), NULL )
-        set_description( N_("Dummy decoder function") )
-        set_capability( "decoder", 0 )
-        set_callbacks( OpenDecoder, CloseDecoder )
-        set_category( CAT_INPUT )
-        set_subcategory( SUBCAT_INPUT_SCODEC )
-        add_bool( "dummy-save-es", false, SAVE_TEXT, SAVE_LONGTEXT, true )
-    add_submodule ()
-        set_section( N_( "Dump decoder" ), NULL )
-        set_description( N_("Dump decoder function") )
-        set_capability( "decoder", -1 )
-        set_callbacks( OpenDecoderDump, CloseDecoder )
-        add_shortcut( "dump" )
     add_submodule ()
         set_description( N_("Dummy encoder function") )
         set_capability( "encoder", 0 )

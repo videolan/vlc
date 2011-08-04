@@ -38,6 +38,7 @@ SOURCES_subsusf = subsusf.c
 SOURCES_t140 = t140.c
 SOURCES_crystalhd = crystalhd.c
 SOURCES_stl = stl.c
+SOURCES_ddummy = ddummy.c
 
 libvlc_LTLIBRARIES += \
 	liba52_plugin.la \
@@ -47,6 +48,7 @@ libvlc_LTLIBRARIES += \
 	libcc_plugin.la \
         libcdg_plugin.la \
 	libcvdsub_plugin.la \
+	libddummy_plugin.la \
 	libdts_plugin.la \
 	libdvbsub_plugin.la \
 	liblpcm_plugin.la \

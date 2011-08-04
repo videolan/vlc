@@ -345,6 +345,7 @@ modules/codec/cc.c
 modules/codec/cc.h
 modules/codec/cdg.c
 modules/codec/cvdsub.c
+modules/codec/ddummy.c
 modules/codec/dirac.c
 modules/codec/dmo/buffer.c
 modules/codec/dmo/dmo.c
@@ -908,7 +909,6 @@ modules/meta_engine/folder.c
 modules/meta_engine/taglib.cpp
 modules/misc/audioscrobbler.c
 modules/misc/dhparams.h
-modules/misc/dummy/decoder.c
 modules/misc/dummy/dummy.c
 modules/misc/dummy/dummy.h
 modules/misc/dummy/encoder.c
