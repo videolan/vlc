@@ -31,6 +31,31 @@ local function stripslashes(s)
   return string.gsub(s,"\\(.)","%1")
 end
 
+function strsplit(text, delimiter)
+	local strfind = string.find
+	local strsub = string.sub
+	local tinsert = table.insert
+	local list = {}
+	local pos = 1
+	if strfind("", delimiter, 1) then -- this would result in endless loops
+		error("delimiter matches empty string!")
+	end
+	local i=1
+	while 1 do
+		i=i+1
+		local first, last = strfind(text, delimiter, pos)
+		if first then -- found?
+			tinsert(list,i, strsub(text, pos, first-1))
+			pos = last+1
+		else
+			tinsert(list,i, strsub(text, pos))
+		break
+		end
+	end
+	return list
+end
+
+
 --main function to process commands sent with the request
 
 processcommands = function ()
@@ -307,6 +332,7 @@ local input = vlc.object.input()
 local item = vlc.input.item()
 local playlist = vlc.object.playlist()
 local vout = vlc.object.vout()
+local aout = vlc.object.aout()
 
 	local s ={}
 	
@@ -336,7 +362,16 @@ local vout = vlc.object.vout()
 	else
 		s.fullscreen=0
 	end
-	
+	if aout then
+		local filters=vlc.var.get(aout,"audio-filter")
+		local temp=strsplit(filters,":")
+		s.audiofilters={}
+		local id=0
+		for i,j in pairs(temp) do
+			s.audiofilters['filter_'..id]=j
+			id=id+1
+		end
+	end
 	s.state=vlc.playlist.status()
 	s.random=vlc.var.get(playlist,"random")
 	s.loop=vlc.var.get(playlist,"loop")
