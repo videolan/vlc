@@ -46,7 +46,7 @@ static void Close( vlc_object_t * );
 vlc_module_begin ()
     set_shortname( N_("Dummy") )
     set_description( N_("Dummy video output") )
-    set_capability( "vout display", 1 )
+    set_capability( "vout display", 0 )
     set_callbacks( OpenDummy, Close )
     add_shortcut( "dummy" )
 

@@ -39,7 +39,7 @@ static int Open( vlc_object_t * p_this );
 vlc_module_begin ()
     set_shortname( N_("Dummy") )
     set_description( N_("Dummy audio output") )
-    set_capability( "audio output", 1 )
+    set_capability( "audio output", 0 )
     set_callbacks( Open, NULL )
     add_shortcut( "dummy" )
 vlc_module_end ()
