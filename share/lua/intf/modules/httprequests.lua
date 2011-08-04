@@ -31,6 +31,10 @@ local function stripslashes(s)
   return string.gsub(s,"\\(.)","%1")
 end
 
+function round(what, precision)
+  if what then return math.floor(what*math.pow(10,precision)+0.5) / math.pow(10,precision) else return "" end
+end
+
 function strsplit(text, delimiter)
 	local strfind = string.find
 	local strsub = string.sub
@@ -372,6 +376,12 @@ local aout = vlc.object.aout()
 			id=id+1
 		end
 	end
+	s.videoeffects={}
+		s.videoeffects.hue=round(vlc.config.get("hue"),2)
+		s.videoeffects.brightness=round(vlc.config.get("brightness"),2)
+		s.videoeffects.contrast=round(vlc.config.get("contrast"),2)
+		s.videoeffects.saturation=round(vlc.config.get("saturation"),2)
+		s.videoeffects.gamma=round(vlc.config.get("gamma"),2)
 	s.state=vlc.playlist.status()
 	s.random=vlc.var.get(playlist,"random")
 	s.loop=vlc.var.get(playlist,"loop")
