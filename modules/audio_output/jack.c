@@ -62,7 +62,6 @@ struct aout_sys_t
  *****************************************************************************/
 static int  Open         ( vlc_object_t * );
 static void Close        ( vlc_object_t * );
-static void Play         ( audio_output_t *, block_t * );
 static int  Process      ( jack_nframes_t i_frames, void *p_arg );
 static int  GraphChange  ( void *p_arg );
 
