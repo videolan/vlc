@@ -476,9 +476,39 @@ typedef void (*libvlc_audio_play_cb)(void *data, const void *samples,
                                      unsigned count, int64_t pts);
 
 /**
+ * Callback prototype for audio pause.
+ * \note The pause callback is never called if the audio is already paused.
+ * \param data data pointer as passed to libvlc_audio_set_callbacks() [IN]
+ * \param pts time stamp of the pause request (should be elapsed already)
+ */
+typedef void (*libvlc_audio_pause_cb)(void *data, int64_t pts);
+
+/**
+ * Callback prototype for audio resumption (i.e. restart from pause).
+ * \note The resume callback is never called if the audio is not paused.
+ * \param data data pointer as passed to libvlc_audio_set_callbacks() [IN]
+ * \param pts time stamp of the resumption request (should be elapsed already)
+ */
+typedef void (*libvlc_audio_resume_cb)(void *data, int64_t pts);
+
+/**
+ * Callback prototype for audio buffer flush
+ * (i.e. discard all pending buffers and stop playback as soon as possible).
+ * \param data data pointer as passed to libvlc_audio_set_callbacks() [IN]
+ */
+typedef void (*libvlc_audio_flush_cb)(void *data, int64_t pts);
+
+/**
+ * Callback prototype for audio buffer drain
+ * (i.e. wait for pending buffers to be played).
+ * \param data data pointer as passed to libvlc_audio_set_callbacks() [IN]
+ */
+typedef void (*libvlc_audio_drain_cb)(void *data);
+
+/**
  * Callback prototype for audio volume change.
  * \param data data pointer as passed to libvlc_audio_set_callbacks() [IN]
- * \param volume linear volume (1. = nominal, 0. = mute)
+ * \param volume software volume (1. = nominal, 0. = mute)
  * \param mute muted flag
  */
 typedef void (*libvlc_audio_set_volume_cb)(void *data,
@@ -491,15 +521,35 @@ typedef void (*libvlc_audio_set_volume_cb)(void *data,
  *
  * \param mp the media player
  * \param play callback to play audio samples (must not be NULL)
- * \param set_volume callback to set audio volume, or NULL for software volume
- * \param opaque private pointer for the two callbacks (as first parameter)
+ * \param pause callback to pause playback (or NULL to ignore)
+ * \param resume callback to resume playback (or NULL to ignore)
+ * \param flush callback to flush audio buffers (or NULL to ignore)
+ * \param drain callback to drain audio buffers (or NULL to ignore)
+ * \param opaque private pointer for the audio callbacks (as first parameter)
  * \version LibVLC 1.2.0 or later
  */
 LIBVLC_API
 void libvlc_audio_set_callbacks( libvlc_media_player_t *mp,
                                  libvlc_audio_play_cb play,
-                                 libvlc_audio_set_volume_cb set_volume,
+                                 libvlc_audio_pause_cb pause,
+                                 libvlc_audio_resume_cb resume,
+                                 libvlc_audio_flush_cb flush,
+                                 libvlc_audio_drain_cb drain,
                                  void *opaque );
+
+/**
+ * Set callbacks and private data for decoded audio.
+ * Use libvlc_audio_set_format() or libvlc_audio_set_format_callbacks()
+ * to configure the decoded audio format.
+ *
+ * \param mp the media player
+ * \param set_volume callback to apply audio volume,
+ *                   or NULL to apply volume in software
+ * \version LibVLC 1.2.0 or later
+ */
+LIBVLC_API
+void libvlc_audio_set_volume_callback( libvlc_media_player_t *mp,
+                                       libvlc_audio_set_volume_cb set_volume );
 
 /**
  * Callback prototype to setup the audio playback.

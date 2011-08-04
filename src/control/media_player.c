@@ -937,13 +937,25 @@ void *libvlc_media_player_get_hwnd( libvlc_media_player_t *p_mi )
 
 void libvlc_audio_set_callbacks( libvlc_media_player_t *mp,
                                  libvlc_audio_play_cb play_cb,
-                                 libvlc_audio_set_volume_cb set_volume_cb,
+                                 libvlc_audio_pause_cb pause_cb,
+                                 libvlc_audio_resume_cb resume_cb,
+                                 libvlc_audio_flush_cb flush_cb,
+                                 libvlc_audio_drain_cb drain_cb,
                                  void *opaque )
 {
     var_SetAddress( mp, "amem-play", play_cb );
-    var_SetAddress( mp, "amem-set-volume", set_volume_cb );
+    var_SetAddress( mp, "amem-pause", pause_cb );
+    var_SetAddress( mp, "amem-resume", resume_cb );
+    var_SetAddress( mp, "amem-flush", flush_cb );
+    var_SetAddress( mp, "amem-drain", drain_cb );
     var_SetAddress( mp, "amem-data", opaque );
     var_SetString( mp, "aout", "amem" );
+}
+
+void libvlc_audio_set_volume_callback( libvlc_media_player_t *mp,
+                                       libvlc_audio_set_volume_cb cb )
+{
+    var_SetAddress( mp, "amem-set-volume", cb );
 }
 
 void libvlc_audio_set_format_callbacks( libvlc_media_player_t *mp,

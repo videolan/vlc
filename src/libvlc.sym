@@ -28,6 +28,7 @@ libvlc_audio_toggle_mute
 libvlc_audio_set_format
 libvlc_audio_set_format_callbacks
 libvlc_audio_set_callbacks
+libvlc_audio_set_volume_callback
 libvlc_clock
 libvlc_event_attach
 libvlc_event_detach
