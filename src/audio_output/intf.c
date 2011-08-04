@@ -93,10 +93,10 @@ static int commitVolume (vlc_object_t *obj, audio_output_t *aout,
         if (owner->module != NULL)
             ret = aout->pf_volume_set (aout, vol, mute);
         aout_unlock (aout);
+        aout_unlock_volume (aout);
 
         if (ret == 0)
             var_TriggerCallback (aout, "intf-change");
-        aout_unlock_volume (aout);
         vlc_object_release (aout);
     }
     return ret;
