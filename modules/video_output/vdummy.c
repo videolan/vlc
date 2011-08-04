@@ -72,7 +72,6 @@ static picture_pool_t *Pool(vout_display_t *, unsigned count);
 static void            Display(vout_display_t *, picture_t *, subpicture_t *);
 static void            DisplayStat(vout_display_t *, picture_t *, subpicture_t *);
 static int             Control(vout_display_t *, int, va_list);
-static void            Manage (vout_display_t *);
 
 /*****************************************************************************
  * OpenVideo: activates dummy vout display method
@@ -103,7 +102,7 @@ static int Open(vlc_object_t *object,
     vd->prepare = NULL;
     vd->display = display;
     vd->control = Control;
-    vd->manage  = Manage;
+    vd->manage  = NULL;
 
     return VLC_SUCCESS;
 }
@@ -162,9 +161,4 @@ static int Control(vout_display_t *vd, int query, va_list args)
     VLC_UNUSED(query);
     VLC_UNUSED(args);
     return VLC_SUCCESS;
-}
-
-static void Manage(vout_display_t *vd)
-{
-    VLC_UNUSED(vd);
 }
