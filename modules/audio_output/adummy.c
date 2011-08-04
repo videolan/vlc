@@ -1,5 +1,5 @@
 /*****************************************************************************
- * aout.c : dummy audio output plugin
+ * adummy.c : dummy audio output plugin
  *****************************************************************************
  * Copyright (C) 2002 the VideoLAN team
  * $Id$
@@ -30,10 +30,19 @@
 #endif
 
 #include <vlc_common.h>
+#include <vlc_plugin.h>
 #include <vlc_aout.h>
 #include <vlc_cpu.h>
 
-#include "dummy.h"
+static int Open( vlc_object_t * p_this );
+
+vlc_module_begin ()
+    set_shortname( N_("Dummy") )
+    set_description( N_("Dummy audio output") )
+    set_capability( "audio output", 1 )
+    set_callbacks( Open, NULL )
+    add_shortcut( "dummy" )
+vlc_module_end ()
 
 #define FRAME_SIZE 2048
 #define A52_FRAME_NB 1536
@@ -46,7 +55,7 @@ static void Play( audio_output_t *, block_t * );
 /*****************************************************************************
  * OpenAudio: open a dummy audio device
  *****************************************************************************/
-int OpenAudio ( vlc_object_t * p_this )
+static int Open( vlc_object_t * p_this )
 {
     audio_output_t * p_aout = (audio_output_t *)p_this;
 
@@ -80,4 +89,3 @@ static void Play( audio_output_t *aout, block_t *block )
     block_Release( block );
     (void) aout;
 }
-

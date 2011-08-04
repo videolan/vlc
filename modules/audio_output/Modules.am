@@ -7,12 +7,18 @@ SOURCES_jack = jack.c
 SOURCES_audioqueue = audioqueue.c
 SOURCES_opensles_android = opensles_android.c
 
+libadummy_plugin_la_SOURCES = adummy.c
+libadummy_plugin_la_CFLAGS = $(AM_CFLAGS)
+libadummy_plugin_la_LIBADD = $(AM_LIBADD)
+libadummy_plugin_la_DEPENDENCIES =
+
 libamem_plugin_la_SOURCES = amem.c
 libamem_plugin_la_CFLAGS = $(AM_CFLAGS)
 libamem_plugin_la_LIBADD = $(AM_LIBADD)
 libamem_plugin_la_DEPENDENCIES =
 
 libvlc_LTLIBRARIES += \
+	libadummy_plugin.la \
 	libamem_plugin.la \
 	libaout_file_plugin.la
 

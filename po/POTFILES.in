@@ -314,6 +314,7 @@ modules/audio_filter/spatializer/tuning.h
 modules/audio_mixer/fixed32.c
 modules/audio_mixer/float32.c
 modules/audio_mixer/trivial.c
+modules/audio_output/adummy.c
 modules/audio_output/alsa.c
 modules/audio_output/amem.c
 modules/audio_output/audioqueue.c
@@ -906,7 +907,6 @@ modules/meta_engine/folder.c
 modules/meta_engine/taglib.cpp
 modules/misc/audioscrobbler.c
 modules/misc/dhparams.h
-modules/misc/dummy/aout.c
 modules/misc/dummy/decoder.c
 modules/misc/dummy/dummy.c
 modules/misc/dummy/dummy.h

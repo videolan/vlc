@@ -37,6 +37,7 @@ $Id$
  * access_vdr: VDR access module
  * adjust: Contrast/Hue/saturation/Brightness adjust module
  * adpcm: ADPCM audio decoder
+ * adummy: dummy audio output
  * aes3: aes3 decoder/packetizer
  * aiff: AIFF demuxer
  * alphamask: Alpha layer mask video filter
