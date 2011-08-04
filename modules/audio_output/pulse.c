@@ -807,7 +807,7 @@ static int Open(vlc_object_t *obj)
     aout->pf_play = Play;
     aout->pf_pause = Pause;
     aout->pf_flush = Flush;
-    aout->pf_volume_set = VolumeSet;
+    aout_VolumeHardInit (aout, VolumeSet);
     return VLC_SUCCESS;
 
 fail:
