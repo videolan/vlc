@@ -1,5 +1,0 @@
-SOURCES_dummy = \
-	dummy.c \
-	$(NULL)
-
-libvlc_LTLIBRARIES += libdummy_plugin.la

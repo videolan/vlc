@@ -1,5 +1,5 @@
 /*****************************************************************************
- * dummy.c : dummy plugin for vlc
+ * memcpy.c : default memcpy plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 the VideoLAN team
  * $Id$
@@ -38,7 +38,7 @@ static int OpenDummy(vlc_object_t *);
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin ()
-    set_shortname( N_("Dummy"))
+    set_shortname( N_("Dummy") )
     set_description( N_("libc memcpy") )
     set_capability( "memcpy", 50 )
     set_callbacks( OpenDummy, NULL )

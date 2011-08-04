@@ -186,6 +186,7 @@ $Id$
  * mash: OpenMash based decoder
  * media_library: a sql based media library
  * mediadirs: Picture/Music/Video user directories as service discoveries
+ * memcpy: default unaccelerated memcpy
  * memcpy3dn: 3D Now! accelerated version of memcpy
  * memcpyaltivec: Altivec accelerated version of memcpy
  * memcpymmx: MMX accelerated version of memcpy

@@ -1,4 +1,4 @@
-BASE_SUBDIRS = dummy notify playlist stats osd
+BASE_SUBDIRS = notify playlist stats osd
 
 SUBDIRS = $(BASE_SUBDIRS)
 DIST_SUBDIRS = $(BASE_SUBDIRS)
@@ -17,6 +17,9 @@ SOURCES_audioscrobbler = audioscrobbler.c
 SOURCES_inhibit = inhibit.c
 SOURCES_sqlite = sqlite.c
 SOURCES_xml = xml/libxml.c
+
+SOURCES_memcpy = memcpy.c
+libvlc_LTLIBRARIES += libmemcpy_plugin.la
 
 libxdg_screensaver_plugin_la_SOURCES = inhibit/xdg.c
 libxdg_screensaver_plugin_la_CFLAGS = $(AM_CFLAGS)
