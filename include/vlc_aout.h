@@ -163,8 +163,6 @@ struct audio_output
 {
     VLC_COMMON_MEMBERS
 
-    vlc_mutex_t             lock;
-
     audio_sample_format_t format; /**< Output format (plugin can modify it
         only when succesfully probed and not afterward) */
 

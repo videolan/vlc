@@ -92,6 +92,7 @@ struct aout_input_t
 
 typedef struct
 {
+    vlc_mutex_t lock;
     module_t *module; /**< Output plugin (or NULL if inactive) */
     aout_input_t *input;
 
@@ -205,13 +206,13 @@ void aout_unlock_check (unsigned);
 static inline void aout_lock( audio_output_t *p_aout )
 {
     aout_lock_check( OUTPUT_LOCK );
-    vlc_mutex_lock( &p_aout->lock );
+    vlc_mutex_lock( &aout_owner(p_aout)->lock );
 }
 
 static inline void aout_unlock( audio_output_t *p_aout )
 {
     aout_unlock_check( OUTPUT_LOCK );
-    vlc_mutex_unlock( &p_aout->lock );
+    vlc_mutex_unlock( &aout_owner(p_aout)->lock );
 }
 
 static inline void aout_lock_volume( audio_output_t *p_aout )
@@ -225,6 +226,9 @@ static inline void aout_unlock_volume( audio_output_t *p_aout )
     aout_unlock_check( VOLUME_LOCK );
     vlc_mutex_unlock( &aout_owner(p_aout)->volume.lock );
 }
+
+#define aout_assert_locked( aout ) \
+        vlc_assert_locked( &aout_owner(aout)->lock )
 
 /* Helpers */
 

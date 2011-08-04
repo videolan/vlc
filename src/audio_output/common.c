@@ -57,13 +57,12 @@ audio_output_t *aout_New( vlc_object_t * p_parent )
 
     aout_owner_t *owner = aout_owner (aout);
 
+    vlc_mutex_init (&owner->lock);
     owner->module = NULL;
     owner->input = NULL;
     vlc_mutex_init (&owner->volume.lock);
     owner->volume.multiplier = 1.0;
     owner->volume.mixer = NULL;
-
-    vlc_mutex_init (&aout->lock);
 
     aout_VolumeNoneInit (aout);
     vlc_object_set_destructor (aout, aout_Destructor);
@@ -81,7 +80,7 @@ static void aout_Destructor (vlc_object_t *obj)
     aout_owner_t *owner = aout_owner (aout);
 
     vlc_mutex_destroy (&owner->volume.lock);
-    vlc_mutex_destroy (&aout->lock);
+    vlc_mutex_destroy (&owner->lock);
 }
 
 #ifdef AOUT_DEBUG

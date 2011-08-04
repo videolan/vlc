@@ -48,8 +48,6 @@
 
 #include "aout_internal.h"
 
-#define AOUT_ASSERT_LOCKED vlc_assert_locked( &p_aout->lock )
-
 static void inputFailure( audio_output_t *, aout_input_t *, const char * );
 static void inputDrop( aout_input_t *, aout_buffer_t * );
 static void inputResamplingStop( aout_input_t *p_input );
@@ -430,7 +428,7 @@ int aout_InputNew( audio_output_t * p_aout, aout_input_t * p_input, const aout_r
  *****************************************************************************/
 int aout_InputDelete( audio_output_t * p_aout, aout_input_t * p_input )
 {
-    AOUT_ASSERT_LOCKED;
+    aout_assert_locked( p_aout );
     if ( p_input->b_error )
         return 0;
 
@@ -458,7 +456,7 @@ int aout_InputDelete( audio_output_t * p_aout, aout_input_t * p_input )
  *****************************************************************************/
 void aout_InputCheckAndRestart( audio_output_t * p_aout, aout_input_t * p_input )
 {
-    AOUT_ASSERT_LOCKED;
+    aout_assert_locked( p_aout );
 
     if( !p_input->b_restart )
         return;
@@ -483,7 +481,8 @@ block_t *aout_InputPlay( audio_output_t *p_aout, aout_input_t *p_input,
                          block_t *p_buffer, int i_input_rate )
 {
     mtime_t start_date;
-    AOUT_ASSERT_LOCKED;
+
+    aout_assert_locked( p_aout );
 
     if( i_input_rate != INPUT_RATE_DEFAULT && p_input->p_playback_rate_filter == NULL )
     {

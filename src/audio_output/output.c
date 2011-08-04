@@ -48,7 +48,7 @@ int aout_OutputNew( audio_output_t *p_aout,
 {
     aout_owner_t *owner = aout_owner (p_aout);
 
-    vlc_assert_locked( &p_aout->lock );
+    aout_assert_locked( p_aout );
     p_aout->format = *p_format;
 
     /* Retrieve user defaults. */
@@ -206,7 +206,7 @@ void aout_OutputDelete( audio_output_t * p_aout )
 {
     aout_owner_t *owner = aout_owner (p_aout);
 
-    vlc_assert_locked( &p_aout->lock );
+    aout_assert_locked( p_aout );
 
     if (owner->module == NULL)
         return;
@@ -226,7 +226,7 @@ void aout_OutputPlay (audio_output_t *aout, block_t *block)
 {
     aout_owner_t *owner = aout_owner (aout);
 
-    vlc_assert_locked (&aout->lock);
+    aout_assert_locked (aout);
 
     aout_FiltersPlay (owner->filters, owner->nb_filters, &block);
     if (block == NULL)
@@ -247,7 +247,7 @@ void aout_OutputPlay (audio_output_t *aout, block_t *block)
  */
 void aout_OutputPause( audio_output_t *aout, bool pause, mtime_t date )
 {
-    vlc_assert_locked( &aout->lock );
+    aout_assert_locked( aout );
     if( aout->pf_pause != NULL )
         aout->pf_pause( aout, pause, date );
 }
@@ -260,7 +260,7 @@ void aout_OutputPause( audio_output_t *aout, bool pause, mtime_t date )
  */
 void aout_OutputFlush( audio_output_t *aout, bool wait )
 {
-    vlc_assert_locked( &aout->lock );
+    aout_assert_locked( aout );
 
     if( aout->pf_flush != NULL )
         aout->pf_flush( aout, wait );
@@ -287,7 +287,7 @@ void aout_VolumeNoneInit (audio_output_t *aout)
 {
     /* aout_New() -safely- calls this function without the lock, before any
      * other thread knows of this audio output instance.
-    vlc_assert_locked (&aout->lock); */
+    aout_assert_locked (aout); */
     aout->pf_volume_set = aout_VolumeNoneSet;
 }
 
@@ -298,7 +298,7 @@ static int aout_VolumeSoftSet (audio_output_t *aout, float volume, bool mute)
 {
     aout_owner_t *owner = aout_owner (aout);
 
-    vlc_assert_locked (&aout->lock);
+    aout_assert_locked (aout);
 
     /* Cubic mapping from software volume to amplification factor.
      * This provides a good tradeoff between low and high volume ranges.
@@ -326,7 +326,7 @@ void aout_VolumeSoftInit (audio_output_t *aout)
     audio_volume_t volume = var_InheritInteger (aout, "volume");
     bool mute = var_InheritBool (aout, "mute");
 
-    vlc_assert_locked (&aout->lock);
+    aout_assert_locked (aout);
     aout->pf_volume_set = aout_VolumeSoftSet;
     aout_VolumeSoftSet (aout, volume / (float)AOUT_VOLUME_DEFAULT, mute);
 }
@@ -338,7 +338,7 @@ void aout_VolumeSoftInit (audio_output_t *aout)
  */
 void aout_VolumeHardInit (audio_output_t *aout, aout_volume_cb setter)
 {
-    vlc_assert_locked (&aout->lock);
+    aout_assert_locked (aout);
     aout->pf_volume_set = setter;
 }
 
@@ -442,7 +442,7 @@ static block_t *aout_OutputSlice (audio_output_t *p_aout)
     const unsigned samples = p->samples;
     assert( samples > 0 );
 
-    vlc_assert_locked( &p_aout->lock );
+    aout_assert_locked( p_aout );
 
     /* Retrieve the date of the next buffer. */
     date_t exact_start_date = p->fifo.end_date;
