@@ -26,7 +26,4 @@
  *****************************************************************************/
 int  OpenIntf     ( vlc_object_t * );
 
-int  OpenEncoder  ( vlc_object_t * );
-void CloseEncoder ( vlc_object_t * );
-
 int  OpenRenderer ( vlc_object_t * );

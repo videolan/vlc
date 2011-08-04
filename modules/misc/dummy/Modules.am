@@ -2,7 +2,6 @@ SOURCES_dummy = \
 	dummy.c \
 	dummy.h \
 	interface.c \
-	encoder.c \
 	renderer.c \
 	$(NULL)
 

@@ -112,6 +112,7 @@ $Id$
  * dvdnav: access module for DVDs with libdvdnav
  * dvdread: input module for accessing DVDs, uses libdvdread
  * dynamicoverlay: subpicture filter using shared memory that can be written to by external applications
+ * edummy: dummy encoder
  * egl: EGL video output
  * equalizer: a equalizer audio filter
  * erase: Logo erase video filter

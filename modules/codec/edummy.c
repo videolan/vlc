@@ -29,8 +29,20 @@
 #endif
 
 #include <vlc_common.h>
+#include <vlc_plugin.h>
 #include <vlc_codec.h>
-#include "dummy.h"
+
+static int OpenEncoder( vlc_object_t * );
+static void CloseEncoder( vlc_object_t * );
+
+vlc_module_begin ()
+    set_shortname( N_("Dummy") )
+    set_description( N_("Dummy encoder") )
+    set_capability( "encoder", 0 )
+    set_callbacks( OpenEncoder, CloseEncoder )
+    add_shortcut( "dummy" )
+vlc_module_end ()
+
 
 /*****************************************************************************
  * Local prototypes
@@ -41,7 +53,7 @@ static block_t *EncodeAudio( encoder_t *p_enc, aout_buffer_t *p_buf );
 /*****************************************************************************
  * OpenDecoder: open the dummy encoder.
  *****************************************************************************/
-int OpenEncoder ( vlc_object_t *p_this )
+static int OpenEncoder( vlc_object_t *p_this )
 {
     encoder_t *p_enc = (encoder_t *)p_this;
 
@@ -72,7 +84,7 @@ static block_t *EncodeAudio( encoder_t *p_enc, aout_buffer_t *p_buf )
 /*****************************************************************************
  * CloseDecoder: decoder destruction
  *****************************************************************************/
-void CloseEncoder ( vlc_object_t *p_this )
+static void CloseEncoder( vlc_object_t *p_this )
 {
     VLC_UNUSED(p_this);
 }

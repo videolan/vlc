@@ -352,6 +352,7 @@ modules/codec/dmo/dmo.c
 modules/codec/dmo/dmo.h
 modules/codec/dts.c
 modules/codec/dvbsub.c
+modules/codec/edummy.c
 modules/codec/faad.c
 modules/codec/flac.c
 modules/codec/fluidsynth.c
@@ -911,7 +912,6 @@ modules/misc/audioscrobbler.c
 modules/misc/dhparams.h
 modules/misc/dummy/dummy.c
 modules/misc/dummy/dummy.h
-modules/misc/dummy/encoder.c
 modules/misc/dummy/interface.c
 modules/misc/dummy/renderer.c
 modules/misc/gnutls.c

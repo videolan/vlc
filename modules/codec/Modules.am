@@ -39,6 +39,7 @@ SOURCES_t140 = t140.c
 SOURCES_crystalhd = crystalhd.c
 SOURCES_stl = stl.c
 SOURCES_ddummy = ddummy.c
+SOURCES_edummy = edummy.c
 
 libvlc_LTLIBRARIES += \
 	liba52_plugin.la \
@@ -51,6 +52,7 @@ libvlc_LTLIBRARIES += \
 	libddummy_plugin.la \
 	libdts_plugin.la \
 	libdvbsub_plugin.la \
+	libedummy_plugin.la \
 	liblpcm_plugin.la \
 	libmpeg_audio_plugin.la \
 	librawvideo_plugin.la \
