@@ -3,8 +3,6 @@
 JPEG_VERSION := 8c
 JPEG_URL := http://www.ijg.org/files/jpegsrc.v$(JPEG_VERSION).tar.gz
 
-PKGS += jpeg
-
 $(TARBALLS)/jpegsrc.v$(JPEG_VERSION).tar.gz:
 	$(call download,$(JPEG_URL))
 
