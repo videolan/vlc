@@ -456,6 +456,10 @@ libvlc_media_player_new( libvlc_instance_t *instance )
     var_Create (mp, "amem-setup", VLC_VAR_ADDRESS);
     var_Create (mp, "amem-close", VLC_VAR_ADDRESS);
     var_Create (mp, "amem-play", VLC_VAR_ADDRESS);
+    var_Create (mp, "amem-pause", VLC_VAR_ADDRESS);
+    var_Create (mp, "amem-resume", VLC_VAR_ADDRESS);
+    var_Create (mp, "amem-flush", VLC_VAR_ADDRESS);
+    var_Create (mp, "amem-drain", VLC_VAR_ADDRESS);
     var_Create (mp, "amem-set-volume", VLC_VAR_ADDRESS);
     var_Create (mp, "amem-format", VLC_VAR_STRING | VLC_VAR_DOINHERIT);
     var_Create (mp, "amem-rate", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT);
