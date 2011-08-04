@@ -1,7 +1,7 @@
 [ -z $CONTRIB_DIR ] && export CONTRIB_DIR=/usr/win32
 
   $CONFIGURE \
-      --with-contrib \
+      --with-contrib="$CONTRIB_DIR" \
       --enable-update-check \
       --enable-lua \
       --enable-faad \
