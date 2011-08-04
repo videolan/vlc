@@ -90,8 +90,7 @@ static int commitVolume (vlc_object_t *obj, audio_output_t *aout,
         float vol = volume / (float)AOUT_VOLUME_DEFAULT;
 
         aout_lock (aout);
-#warning FIXME: wrong test. Need to check that aout_output is ready.
-        if (owner->volume.mixer != NULL)
+        if (owner->module != NULL)
             ret = aout->pf_volume_set (aout, vol, mute);
         aout_unlock (aout);
 
