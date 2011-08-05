@@ -87,16 +87,15 @@ function parse()
                 _,_,t = string.find( line, "\"t\": \"(.-)\"" )
                 -- vlc.msg.err( t )
                 -- video_id = string.gsub( line, ".*&video_id:'([^']*)'.*", "%1" )
-                fmt_url_map = string.match( line, "\"fmt_url_map\": \"(.-)\"" )
+                fmt_url_map = string.match( line, "\"url_encoded_fmt_stream_map\": \"(.-)\"" )
                 if fmt_url_map then
                     -- FIXME: do this properly
                     fmt_url_map = string.gsub( fmt_url_map, "\\u0026", "&" )
-                    for itag,url in string.gmatch( fmt_url_map, "(%d+)|([^,]+)" ) do
+                    for url,itag in string.gmatch( fmt_url_map, "url=([^&,]+).-&itag=(%d+)" ) do
                         -- Apparently formats are listed in quality order,
                         -- so we can afford to simply take the first one
                         if not fmt or tonumber( itag ) == tonumber( fmt ) then
-                            -- do unescaping of /
-                            url = string.gsub( url, '\\/','/' )
+                            url = vlc.strings.decode_uri( url )
                             path = url
                             break
                         end
