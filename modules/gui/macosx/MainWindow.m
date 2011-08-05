@@ -205,13 +205,13 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [o_play_btn setAlternateImage: o_play_pressed_img];
 
     /* interface builder action */
-    [o_video_view setFrame: [o_split_view frame]];
     [self setDelegate: self];
     [self setExcludedFromWindowsMenu: YES];
     // Set that here as IB seems to be buggy
     [self setContentMinSize:NSMakeSize(400., 288.)];
     [self setTitle: _NS("VLC media player")];
     [o_playlist_btn setEnabled:NO];
+    [o_video_view setFrame: [o_split_view frame]];
 
     /* reset the interface */
     [self updateVolumeSlider];
@@ -414,13 +414,13 @@ static VLCMainWindow *_o_sharedInstance = nil;
 - (IBAction)togglePlaylist:(id)sender
 {
     if ([o_video_view isHidden] && [o_playlist_btn isEnabled]) {
-        [o_video_view setHidden: NO];
         [o_playlist_table setHidden: YES];
+        [o_video_view setHidden: NO];
     }
     else
     {
-        [o_playlist_table setHidden: NO];
         [o_video_view setHidden: YES];
+        [o_playlist_table setHidden: NO];
     }
 }
 
@@ -568,15 +568,15 @@ static VLCMainWindow *_o_sharedInstance = nil;
 #pragma mark Update interface and respond to foreign events
 - (void)showDropZone
 {
-    [o_playlist_table setHidden:YES];
-    [o_dropzone_view setFrame: [o_playlist_table frame]];
     [o_right_split_view addSubview: o_dropzone_view];
+    [[o_dropzone_view animator] setFrame: [o_playlist_table frame]];
+    [[o_playlist_table animator] setHidden:YES];
 }
 
 - (void)hideDropZone
 {
-    [o_playlist_table setHidden: NO];
     [o_dropzone_view removeFromSuperview];
+    [[o_playlist_table animator] setHidden: NO];
 }
 
 - (void)updateTimeSlider

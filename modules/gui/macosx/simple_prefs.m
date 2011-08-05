@@ -939,26 +939,28 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
         o_old_view_rect = [o_currentlyShownCategoryView frame];
         o_win_rect.size.height = o_win_rect.size.height - o_old_view_rect.size.height;
         o_win_rect.origin.y = ( o_win_rect.origin.y + o_old_view_rect.size.height ) - o_view_rect.size.height;
-
-        /* remove our previous category view */
-        [o_currentlyShownCategoryView removeFromSuperviewWithoutNeedingDisplay];
     }
 
     o_win_rect.size.height = o_win_rect.size.height + o_view_rect.size.height;
-
-    [o_sprefs_win displayIfNeeded];
-    [o_sprefs_win setFrame: o_win_rect display:YES animate: YES];
 
     [o_new_category_view setFrame: NSMakeRect( 0,
                                                [o_sprefs_controls_box frame].size.height,
                                                o_view_rect.size.width,
                                                o_view_rect.size.height )];
-    [o_new_category_view setNeedsDisplay: YES];
     [o_new_category_view setAutoresizesSubviews: YES];
-    [[o_sprefs_win contentView] addSubview: o_new_category_view];
+    if (o_currentlyShownCategoryView)
+    {
+        [[[o_sprefs_win contentView] animator] replaceSubview: o_currentlyShownCategoryView with: o_new_category_view];
+        [o_currentlyShownCategoryView release];
+        [[o_sprefs_win animator] setFrame: o_win_rect display:YES];
+    }
+    else
+    {
+        [[o_sprefs_win contentView] addSubview: o_new_category_view];
+        [o_sprefs_win setFrame: o_win_rect display:YES animate:NO];
+    }
 
     /* keep our current category for further reference */
-    [o_currentlyShownCategoryView release];
     o_currentlyShownCategoryView = o_new_category_view;
     [o_currentlyShownCategoryView retain];
 }

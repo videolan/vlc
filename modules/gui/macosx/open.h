@@ -60,7 +60,6 @@
     IBOutlet id o_file_subtitles_icon_well;
 
     /* open disc */
-    IBOutlet id o_disc_icon_well;
     IBOutlet id o_disc_selector_pop;
 
     IBOutlet id o_disc_nodisc_view;
@@ -214,6 +213,7 @@
     BOOL b_autoplay;
     BOOL b_nodvdmenus;
     id o_currentOpticalMediaView;
+    id o_currentOpticalMediaIconView;
     NSMutableArray *o_opticalDevices;
     NSMutableArray *o_specialMediaFolders;
     NSString *o_file_path;

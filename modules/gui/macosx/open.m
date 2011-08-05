@@ -97,6 +97,8 @@ static VLCOpen *_o_sharedMainInstance = nil;
     if( o_file_slave_path )
         [o_file_slave_path release];
     [o_mrl release];
+    [o_currentOpticalMediaIconView release];
+    [o_currentOpticalMediaView release];
     [super dealloc];
 }
 
@@ -498,8 +500,8 @@ static VLCOpen *_o_sharedMainInstance = nil;
         o_win_rect.size.height = o_win_rect.size.height + o_view_rect.size.height;
     }
 
-    [o_panel setFrame: o_win_rect display:YES animate: YES];
-    [o_panel displayIfNeeded];
+    [[o_panel animator] setFrame: o_win_rect display:YES];
+//    [o_panel displayIfNeeded];
     if( [o_mrl_btn state] == NSOnState )
         [[o_panel contentView] addSubview: o_mrl_view];
 }
@@ -635,22 +637,36 @@ static VLCOpen *_o_sharedMainInstance = nil;
     [self openFilePathChanged: nil];
 }
 
-- (void)showOpticalMediaView: theView
+- (void)showOpticalMediaView: theView withIcon:(NSImage *)icon
 {
     NSRect o_view_rect;
     o_view_rect = [theView frame];
-    if( o_currentOpticalMediaView )
+    [theView setFrame: NSMakeRect( 233, 0, o_view_rect.size.width, o_view_rect.size.height)];
+    [theView setAutoresizesSubviews: YES];
+    if (o_currentOpticalMediaView)
     {
-        [o_currentOpticalMediaView removeFromSuperviewWithoutNeedingDisplay];
+        [[[[o_tabview tabViewItemAtIndex: [o_tabview indexOfTabViewItemWithIdentifier:@"optical"]] view] animator] replaceSubview: o_currentOpticalMediaView with: theView];
         [o_currentOpticalMediaView release];
     }
-    [theView setFrame: NSMakeRect( 233, 0, o_view_rect.size.width, o_view_rect.size.height)];
-    [theView setNeedsDisplay: YES];
-    [theView setAutoresizesSubviews: YES];
-    [[[o_tabview tabViewItemAtIndex: [o_tabview indexOfTabViewItemWithIdentifier:@"optical"]] view] addSubview: theView];
-    [theView displayIfNeeded];
+    else
+        [[[[o_tabview tabViewItemAtIndex: [o_tabview indexOfTabViewItemWithIdentifier:@"optical"]] view] animator] addSubview: theView];
     o_currentOpticalMediaView = theView;
     [o_currentOpticalMediaView retain];
+
+    NSImageView *imageView;
+    imageView = [[NSImageView alloc] init];
+    [imageView setFrame: NSMakeRect( 53, 61, 128, 128 )];
+    [icon setSize: NSMakeSize(128,128)];
+    [imageView setImage: icon];
+    if (o_currentOpticalMediaIconView)
+    {
+        [[[[o_tabview tabViewItemAtIndex: [o_tabview indexOfTabViewItemWithIdentifier:@"optical"]] view] animator] replaceSubview: o_currentOpticalMediaIconView with: imageView];
+        [o_currentOpticalMediaIconView release];
+    }
+    else
+         [[[[o_tabview tabViewItemAtIndex: [o_tabview indexOfTabViewItemWithIdentifier:@"optical"]] view] animator] addSubview: imageView];
+    o_currentOpticalMediaIconView = imageView;
+    [o_currentOpticalMediaIconView retain];
 }
 
 - (NSString *) getBSDNodeFromMountPath:(NSString *)mountPath
@@ -767,7 +783,6 @@ static VLCOpen *_o_sharedMainInstance = nil;
     {
         [o_disc_dvd_lbl setStringValue: [[NSFileManager defaultManager] displayNameAtPath:[o_opticalDevices objectAtIndex: index]]];
         [o_disc_dvdwomenus_lbl setStringValue: [o_disc_dvd_lbl stringValue]];
-        [o_disc_icon_well setImage: [[NSWorkspace sharedWorkspace] iconForFile: [o_opticalDevices objectAtIndex: index]]];
         NSString *pathToOpen;
         if (diskType == kVLCMediaVideoTSFolder)
             pathToOpen = [o_opticalDevices objectAtIndex: index];
@@ -775,32 +790,29 @@ static VLCOpen *_o_sharedMainInstance = nil;
             pathToOpen = [self getBSDNodeFromMountPath:[o_opticalDevices objectAtIndex: index]];
         if (!b_nodvdmenus) {
             [self setMRL: [NSString stringWithFormat: @"dvdnav://%@", pathToOpen]];
-            [self showOpticalMediaView: o_disc_dvd_view];
+            [self showOpticalMediaView: o_disc_dvd_view withIcon: [[NSWorkspace sharedWorkspace] iconForFile: [o_opticalDevices objectAtIndex: index]]];
         } else {
             [self setMRL: [NSString stringWithFormat: @"dvdread://%@@%i:%i-", pathToOpen, [o_disc_dvdwomenus_title intValue], [o_disc_dvdwomenus_chapter intValue]]];
-            [self showOpticalMediaView: o_disc_dvdwomenus_view];
+            [self showOpticalMediaView: o_disc_dvdwomenus_view withIcon: [[NSWorkspace sharedWorkspace] iconForFile: [o_opticalDevices objectAtIndex: index]]];
         }
     }
     else if (diskType == kVLCMediaAudioCD)
     {
         [o_disc_audiocd_lbl setStringValue: [[NSFileManager defaultManager] displayNameAtPath:[o_opticalDevices objectAtIndex: index]]];
         [o_disc_audiocd_trackcount_lbl setStringValue: [NSString stringWithFormat:_NS("%i tracks"), [[[NSFileManager defaultManager] subpathsOfDirectoryAtPath: [o_opticalDevices objectAtIndex: index] error:NULL] count] - 1]]; // minus .TOC.plist
-        [self showOpticalMediaView: o_disc_audiocd_view];
-        [o_disc_icon_well setImage: [[NSWorkspace sharedWorkspace] iconForFile: [o_opticalDevices objectAtIndex: index]]];
+        [self showOpticalMediaView: o_disc_audiocd_view withIcon: [[NSWorkspace sharedWorkspace] iconForFile: [o_opticalDevices objectAtIndex: index]]];
         [self setMRL: [NSString stringWithFormat: @"cdda://%@", [self getBSDNodeFromMountPath:[o_opticalDevices objectAtIndex: index]]]];
     }
     else if (diskType == kVLCMediaVCD || diskType == kVLCMediaSVCD)
     {
         [o_disc_vcd_lbl setStringValue: [[NSFileManager defaultManager] displayNameAtPath:[o_opticalDevices objectAtIndex: index]]];
-        [self showOpticalMediaView: o_disc_vcd_view];
-        [o_disc_icon_well setImage: [[NSWorkspace sharedWorkspace] iconForFile: [o_opticalDevices objectAtIndex: index]]];
+        [self showOpticalMediaView: o_disc_vcd_view withIcon: [[NSWorkspace sharedWorkspace] iconForFile: [o_opticalDevices objectAtIndex: index]]];
         [self setMRL: [NSString stringWithFormat: @"vcd://%@@%i:%i", [self getBSDNodeFromMountPath:[o_opticalDevices objectAtIndex: index]], [o_disc_vcd_title intValue], [o_disc_vcd_chapter intValue]]];
     }
     else if (diskType == kVLCMediaBD || diskType == kVLCMediaBDMVFolder)
     {
         [o_disc_bd_lbl setStringValue: [[NSFileManager defaultManager] displayNameAtPath:[o_opticalDevices objectAtIndex: index]]];
-        [self showOpticalMediaView: o_disc_bd_view];
-        [o_disc_icon_well setImage: [[NSWorkspace sharedWorkspace] iconForFile: [o_opticalDevices objectAtIndex: index]]];
+        [self showOpticalMediaView: o_disc_bd_view withIcon: [[NSWorkspace sharedWorkspace] iconForFile: [o_opticalDevices objectAtIndex: index]]];
         if (diskType == kVLCMediaBD)
             [self setMRL: [NSString stringWithFormat: @"bluray://%@", [self getBSDNodeFromMountPath:[o_opticalDevices objectAtIndex: index]]]];
         else
@@ -809,11 +821,9 @@ static VLCOpen *_o_sharedMainInstance = nil;
     else
     {
         msg_Warn( VLCIntf, "unknown disk type, no idea what to display" );
-        [o_disc_icon_well setImage: [NSImage imageNamed:@"NSApplicationIcon"]];
-        [self showOpticalMediaView: o_disc_nodisc_view];
+        [self showOpticalMediaView: o_disc_nodisc_view withIcon: [NSImage imageNamed:@"NSApplicationIcon"]];
     }
 
-    [[o_disc_icon_well image] setSize: NSMakeSize(128,128)];
     [o_pool release];
 }
 
@@ -839,8 +849,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
     {
         msg_Dbg( VLCIntf, "no optical media found" );
         [o_disc_selector_pop setHidden: YES];
-        [o_disc_icon_well setImage: [NSImage imageNamed: @"NSApplicationIcon"]];
-        [self showOpticalMediaView: o_disc_nodisc_view];
+        [self showOpticalMediaView: o_disc_nodisc_view withIcon: [NSImage imageNamed: @"NSApplicationIcon"]];
     }
 }
 
@@ -881,12 +890,12 @@ static VLCOpen *_o_sharedMainInstance = nil;
     if (sender == o_disc_dvdwomenus_enablemenus_btn) {
         b_nodvdmenus = NO;
         [self setMRL: [NSString stringWithFormat: @"dvdnav://%@", [self getBSDNodeFromMountPath:[o_opticalDevices objectAtIndex: [o_disc_selector_pop indexOfSelectedItem]]]]];
-        [self showOpticalMediaView: o_disc_dvd_view];
+        [self showOpticalMediaView: o_disc_dvd_view withIcon: [o_currentOpticalMediaIconView image]];
         return;
     }
     if (sender == o_disc_dvd_disablemenus_btn) {
         b_nodvdmenus = YES;
-        [self showOpticalMediaView: o_disc_dvdwomenus_view];
+        [self showOpticalMediaView: o_disc_dvdwomenus_view withIcon: [o_currentOpticalMediaIconView image]];
     }
 
     if (sender == o_disc_dvdwomenus_title)
@@ -1111,16 +1120,15 @@ static VLCOpen *_o_sharedMainInstance = nil;
 {
     NSRect o_view_rect;
     o_view_rect = [theView frame];
-    if( o_currentCaptureView )
+    [theView setFrame: NSMakeRect( 0, -10, o_view_rect.size.width, o_view_rect.size.height)];
+    [theView setAutoresizesSubviews: YES];
+    if (o_currentCaptureView)
     {
-        [o_currentCaptureView removeFromSuperviewWithoutNeedingDisplay];
+        [[[[o_tabview tabViewItemAtIndex: 3] view] animator] replaceSubview: o_currentCaptureView with: theView];
         [o_currentCaptureView release];
     }
-    [theView setFrame: NSMakeRect( 0, -10, o_view_rect.size.width, o_view_rect.size.height)];
-    [theView setNeedsDisplay: YES];
-    [theView setAutoresizesSubviews: YES];
-    [[[o_tabview tabViewItemAtIndex: 3] view] addSubview: theView];
-    [theView displayIfNeeded];
+    else
+         [[[[o_tabview tabViewItemAtIndex: 3] view] animator] addSubview: theView];
     o_currentCaptureView = theView;
     [o_currentCaptureView retain];
 }
