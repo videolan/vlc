@@ -219,7 +219,6 @@ create_toolbar_item( NSString * o_itemIdent, NSString * o_name, NSString * o_des
     [o_input_postproc_txt setStringValue: _NS("Post-Processing Quality")];
     [o_input_rtsp_ckb setTitle: _NS("Use RTP over RTSP (TCP)")];
     [o_input_skipLoop_txt setStringValue: _NS("Skip the loop filter for H.264 decoding")];
-    [o_input_serverport_txt setStringValue: _NS("Default Server Port")];
 
     /* interface */
     [o_intf_style_txt setStringValue: _NS("Interface style")];
@@ -516,8 +515,6 @@ static inline char * __config_GetLabel( vlc_object_t *p_this, const char *psz_na
     /***************************
      * input & codecs settings *
      ***************************/
-    [o_input_serverport_fld setIntValue: config_GetInt( p_intf, "server-port")];
-    [o_input_serverport_fld setToolTip: [NSString stringWithUTF8String: config_GetLabel( p_intf, "server-port")]];
     [self setupField: o_input_httpproxy_fld forOption:"http-proxy"];
     [self setupField: o_input_httpproxypwd_sfld forOption:"http-proxy-pwd"];
     [o_input_postproc_fld setIntValue: config_GetInt( p_intf, "postproc-q")];
@@ -858,7 +855,6 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
      ***************************/
     if( b_inputSettingChanged )
     {
-        config_PutInt( p_intf, "server-port", [o_input_serverport_fld intValue] );
         config_PutPsz( p_intf, "http-proxy", [[o_input_httpproxy_fld stringValue] UTF8String] );
         config_PutPsz( p_intf, "http-proxy-pwd", [[o_input_httpproxypwd_sfld stringValue] UTF8String] );
         config_PutInt( p_intf, "postproc-q", [o_input_postproc_fld intValue] );
