@@ -123,6 +123,7 @@ int vlc_mkdir( const char *dirname, mode_t mode )
 
 char *vlc_getcwd (void)
 {
+#ifndef UNDER_CE
     wchar_t *wdir = _wgetcwd (NULL, 0);
     if (wdir == NULL)
         return NULL;
@@ -130,6 +131,9 @@ char *vlc_getcwd (void)
     char *dir = FromWide (wdir);
     free (wdir);
     return dir;
+#else
+    return NULL;
+#endif
 }
 
 /* Under Windows, these wrappers return the list of drive letters
