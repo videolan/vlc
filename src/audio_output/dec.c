@@ -38,49 +38,48 @@
 #include "aout_internal.h"
 #include "libvlc.h"
 
-#undef aout_DecNew
 /**
  * Creates an audio output
  */
-aout_input_t *aout_DecNew( audio_output_t *p_aout,
-                           const audio_sample_format_t *p_format,
-                           const audio_replay_gain_t *p_replay_gain,
-                           const aout_request_vout_t *p_request_vout )
+int aout_DecNew( audio_output_t *p_aout,
+                 const audio_sample_format_t *p_format,
+                 const audio_replay_gain_t *p_replay_gain,
+                 const aout_request_vout_t *p_request_vout )
 {
     /* Sanitize audio format */
     if( p_format->i_channels > 32 )
     {
         msg_Err( p_aout, "too many audio channels (%u)",
                  p_format->i_channels );
-        return NULL;
+        return -1;
     }
     if( p_format->i_channels <= 0 )
     {
         msg_Err( p_aout, "no audio channels" );
-        return NULL;
+        return -1;
     }
     if( p_format->i_channels != aout_FormatNbChannels( p_format ) )
     {
         msg_Err( p_aout, "incompatible audio channels count with layout mask" );
-        return NULL;
+        return -1;
     }
 
     if( p_format->i_rate > 192000 )
     {
         msg_Err( p_aout, "excessive audio sample frequency (%u)",
                  p_format->i_rate );
-        return NULL;
+        return -1;
     }
     if( p_format->i_rate < 4000 )
     {
         msg_Err( p_aout, "too low audio sample frequency (%u)",
                  p_format->i_rate );
-        return NULL;
+        return -1;
     }
 
     aout_input_t *p_input = calloc( 1, sizeof(aout_input_t));
     if( !p_input )
-        return NULL;
+        return -1;
 
     p_input->b_error = true;
 
@@ -113,26 +112,27 @@ aout_input_t *aout_DecNew( audio_output_t *p_aout,
     owner->input = p_input;
     aout_InputNew( p_aout, p_input, p_request_vout );
     aout_unlock( p_aout );
-    return p_input;
+    return 0;
 error:
     aout_unlock( p_aout );
     free( p_input );
-    return NULL;
+    return -1;
 }
 
 /*****************************************************************************
  * aout_DecDelete : delete a decoder
  *****************************************************************************/
-void aout_DecDelete( audio_output_t * p_aout, aout_input_t * p_input )
+void aout_DecDelete( audio_output_t * p_aout )
 {
     aout_owner_t *owner = aout_owner (p_aout);
+    aout_input_t *input;
     struct audio_mixer *mixer;
 
     aout_lock( p_aout );
     /* Remove the input. */
-    assert (owner->input == p_input); /* buggy decoder? */
+    input = owner->input;
+    aout_InputDelete (p_aout, input);
     owner->input = NULL;
-    aout_InputDelete( p_aout, p_input );
 
     aout_OutputDelete( p_aout );
     mixer = owner->volume.mixer;
@@ -143,7 +143,7 @@ void aout_DecDelete( audio_output_t * p_aout, aout_input_t * p_input )
     aout_unlock( p_aout );
 
     aout_MixerDelete (mixer);
-    free( p_input );
+    free (input);
 }
 
 static void aout_CheckRestart (audio_output_t *aout)
@@ -191,15 +191,18 @@ error:
 /*****************************************************************************
  * aout_DecNewBuffer : ask for a new empty buffer
  *****************************************************************************/
-aout_buffer_t * aout_DecNewBuffer( aout_input_t * p_input,
-                                   size_t i_nb_samples )
+block_t *aout_DecNewBuffer (audio_output_t *aout, size_t samples)
 {
-    size_t length = i_nb_samples * p_input->input.i_bytes_per_frame
-                                 / p_input->input.i_frame_length;
+    /* NOTE: the caller is responsible for serializing input change */
+    aout_owner_t *owner = aout_owner (aout);
+    aout_input_t *input = owner->input;
+
+    size_t length = samples * input->input.i_bytes_per_frame
+                            / input->input.i_frame_length;
     block_t *block = block_Alloc( length );
     if( likely(block != NULL) )
     {
-        block->i_nb_samples = i_nb_samples;
+        block->i_nb_samples = samples;
         block->i_pts = block->i_length = 0;
     }
     return block;
@@ -208,20 +211,20 @@ aout_buffer_t * aout_DecNewBuffer( aout_input_t * p_input,
 /*****************************************************************************
  * aout_DecDeleteBuffer : destroy an undecoded buffer
  *****************************************************************************/
-void aout_DecDeleteBuffer( audio_output_t * p_aout, aout_input_t * p_input,
-                           aout_buffer_t * p_buffer )
+void aout_DecDeleteBuffer (audio_output_t *aout, block_t *block)
 {
-    (void)p_aout; (void)p_input;
-    aout_BufferFree( p_buffer );
+    (void) aout;
+    aout_BufferFree (block);
 }
 
 /*****************************************************************************
  * aout_DecPlay : filter & mix the decoded buffer
  *****************************************************************************/
-int aout_DecPlay( audio_output_t * p_aout, aout_input_t * p_input,
-                  aout_buffer_t * p_buffer, int i_input_rate )
+int aout_DecPlay (audio_output_t *p_aout, block_t *p_buffer, int i_input_rate)
 {
     aout_owner_t *owner = aout_owner (p_aout);
+    aout_input_t *p_input = owner->input;
+
     assert( i_input_rate >= INPUT_RATE_DEFAULT / AOUT_MAX_INPUT_RATE &&
             i_input_rate <= INPUT_RATE_DEFAULT * AOUT_MAX_INPUT_RATE );
     assert( p_buffer->i_pts > 0 );
@@ -257,46 +260,53 @@ int aout_DecPlay( audio_output_t * p_aout, aout_input_t * p_input,
     return 0;
 }
 
-int aout_DecGetResetLost( audio_output_t *p_aout, aout_input_t *p_input )
+int aout_DecGetResetLost (audio_output_t *aout)
 {
+    aout_owner_t *owner = aout_owner (aout);
+    aout_input_t *input = owner->input;
     int val;
 
-    aout_lock( p_aout );
-    val = p_input->i_buffer_lost;
-    p_input->i_buffer_lost = 0;
-    aout_unlock( p_aout );
+    aout_lock (aout);
+    val = input->i_buffer_lost;
+    input->i_buffer_lost = 0;
+    aout_unlock (aout);
 
     return val;
 }
 
-void aout_DecChangePause( audio_output_t *p_aout, aout_input_t *p_input, bool b_paused, mtime_t i_date )
+void aout_DecChangePause (audio_output_t *aout, bool paused, mtime_t date)
 {
-    aout_owner_t *owner = aout_owner (p_aout);
+    aout_owner_t *owner = aout_owner (aout);
+    aout_input_t *p_input = owner->input;
 
-    aout_lock( p_aout );
-    assert (owner->input == p_input);
+    aout_lock (aout);
 
     /* XXX: Should the input date be offset by the pause duration instead? */
     date_Set (&p_input->date, VLC_TS_INVALID);
-    aout_OutputPause( p_aout, b_paused, i_date );
-    aout_unlock( p_aout );
+    aout_OutputPause (aout, paused, date);
+    aout_unlock (aout);
 }
 
-void aout_DecFlush( audio_output_t *p_aout, aout_input_t *p_input )
+void aout_DecFlush (audio_output_t *aout)
 {
-    aout_lock( p_aout );
-    date_Set (&p_input->date, VLC_TS_INVALID);
-    aout_OutputFlush( p_aout, false );
-    aout_unlock( p_aout );
+    aout_owner_t *owner = aout_owner (aout);
+    aout_input_t *input = owner->input;
+
+    aout_lock (aout);
+    date_Set (&input->date, VLC_TS_INVALID);
+    aout_OutputFlush (aout, false);
+    aout_unlock (aout);
 }
 
-bool aout_DecIsEmpty( audio_output_t * p_aout, aout_input_t * p_input )
+bool aout_DecIsEmpty (audio_output_t *aout)
 {
+    aout_owner_t *owner = aout_owner (aout);
+    aout_input_t *input = owner->input;
     mtime_t end_date;
 
-    aout_lock( p_aout );
+    aout_lock (aout);
     /* FIXME: tell output to drain */
-    end_date = date_Get (&p_input->date);
-    aout_unlock( p_aout );
+    end_date = date_Get (&input->date);
+    aout_unlock (aout);
     return end_date == VLC_TS_INVALID || end_date <= mdate();
 }

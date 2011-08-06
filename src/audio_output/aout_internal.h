@@ -172,17 +172,16 @@ void aout_FormatsPrint( audio_output_t * p_aout, const char * psz_text, const au
 bool aout_ChangeFilterString( vlc_object_t *, audio_output_t *, const char *psz_variable, const char *psz_name, bool b_add );
 
 /* From dec.c */
-aout_input_t *aout_DecNew(audio_output_t *, const audio_sample_format_t *,
-                          const audio_replay_gain_t *,
-                          const aout_request_vout_t *);
-void aout_DecDelete ( audio_output_t *, aout_input_t * );
-aout_buffer_t * aout_DecNewBuffer( aout_input_t *, size_t );
-void aout_DecDeleteBuffer( audio_output_t *, aout_input_t *, aout_buffer_t * );
-int aout_DecPlay( audio_output_t *, aout_input_t *, aout_buffer_t *, int i_input_rate );
-int aout_DecGetResetLost( audio_output_t *, aout_input_t * );
-void aout_DecChangePause( audio_output_t *, aout_input_t *, bool b_paused, mtime_t i_date );
-void aout_DecFlush( audio_output_t *, aout_input_t * );
-bool aout_DecIsEmpty( audio_output_t * p_aout, aout_input_t * p_input );
+int aout_DecNew(audio_output_t *, const audio_sample_format_t *,
+                const audio_replay_gain_t *, const aout_request_vout_t *);
+void aout_DecDelete(audio_output_t *);
+block_t *aout_DecNewBuffer(audio_output_t *, size_t);
+void aout_DecDeleteBuffer(audio_output_t *, block_t *);
+int aout_DecPlay(audio_output_t *, block_t *, int i_input_rate);
+int aout_DecGetResetLost(audio_output_t *);
+void aout_DecChangePause(audio_output_t *, bool b_paused, mtime_t i_date);
+void aout_DecFlush(audio_output_t *);
+bool aout_DecIsEmpty(audio_output_t *);
 
 /* Audio output locking */
 

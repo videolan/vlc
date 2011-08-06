@@ -122,7 +122,6 @@ struct decoder_owner_sys_t
 
     /* -- These variables need locking on write(only) -- */
     audio_output_t *p_aout;
-    aout_input_t    *p_aout_input;
 
     vout_thread_t   *p_vout;
 
@@ -428,7 +427,7 @@ bool input_DecoderIsEmpty( decoder_t * p_dec )
         if( p_dec->fmt_out.i_cat == VIDEO_ES && p_owner->p_vout )
             b_empty = vout_IsEmpty( p_owner->p_vout );
         else if( p_dec->fmt_out.i_cat == AUDIO_ES && p_owner->p_aout )
-            b_empty = aout_DecIsEmpty( p_owner->p_aout, p_owner->p_aout_input );
+            b_empty = aout_DecIsEmpty( p_owner->p_aout );
         vlc_mutex_unlock( &p_owner->lock );
     }
     return b_empty;
@@ -781,7 +780,6 @@ static decoder_t * CreateDecoder( vlc_object_t *p_parent,
     p_owner->p_input = p_input;
     p_owner->p_resource = p_resource;
     p_owner->p_aout = NULL;
-    p_owner->p_aout_input = NULL;
     p_owner->p_vout = NULL;
     p_owner->p_spu_vout = NULL;
     p_owner->i_spu_channel = 0;
@@ -1054,8 +1052,7 @@ static void DecoderOutputChangePause( decoder_t *p_dec, bool b_paused, mtime_t i
     if( p_dec->fmt_out.i_cat == AUDIO_ES )
     {
         if( p_owner->p_aout )
-            aout_DecChangePause( p_owner->p_aout, p_owner->p_aout_input,
-                                 b_paused, i_date );
+            aout_DecChangePause( p_owner->p_aout, b_paused, i_date );
     }
     else if( p_dec->fmt_out.i_cat == VIDEO_ES )
     {
@@ -1180,7 +1177,6 @@ static void DecoderPlayAudio( decoder_t *p_dec, aout_buffer_t *p_audio,
 {
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
     audio_output_t *p_aout = p_owner->p_aout;
-    aout_input_t    *p_aout_input = p_owner->p_aout_input;
 
     /* */
     if( p_audio->i_pts <= VLC_TS_INVALID ) // FIXME --VLC_TS_INVALID verify audio_output/*
@@ -1244,7 +1240,7 @@ static void DecoderPlayAudio( decoder_t *p_dec, aout_buffer_t *p_audio,
 
         vlc_mutex_unlock( &p_owner->lock );
 
-        if( !p_aout || !p_aout_input ||
+        if( !p_aout ||
             p_audio->i_pts <= VLC_TS_INVALID ||
             i_rate < INPUT_RATE_DEFAULT/AOUT_MAX_INPUT_RATE ||
             i_rate > INPUT_RATE_DEFAULT*AOUT_MAX_INPUT_RATE )
@@ -1255,9 +1251,9 @@ static void DecoderPlayAudio( decoder_t *p_dec, aout_buffer_t *p_audio,
 
         if( !b_reject )
         {
-            if( !aout_DecPlay( p_aout, p_aout_input, p_audio, i_rate ) )
+            if( !aout_DecPlay( p_aout, p_audio, i_rate ) )
                 *pi_played_sum += 1;
-            *pi_lost_sum += aout_DecGetResetLost( p_aout, p_aout_input );
+            *pi_lost_sum += aout_DecGetResetLost( p_aout );
         }
         else
         {
@@ -1293,12 +1289,11 @@ static void DecoderDecodeAudio( decoder_t *p_dec, block_t *p_block )
     while( (p_aout_buf = p_dec->pf_decode_audio( p_dec, &p_block )) )
     {
         audio_output_t *p_aout = p_owner->p_aout;
-        aout_input_t    *p_aout_input = p_owner->p_aout_input;
 
         if( DecoderIsExitRequested( p_dec ) )
         {
             /* It prevent freezing VLC in case of broken decoder */
-            aout_DecDeleteBuffer( p_aout, p_aout_input, p_aout_buf );
+            aout_DecDeleteBuffer( p_aout, p_aout_buf );
             if( p_block )
                 block_Release( p_block );
             break;
@@ -1308,15 +1303,15 @@ static void DecoderDecodeAudio( decoder_t *p_dec, block_t *p_block )
         if( p_owner->i_preroll_end > VLC_TS_INVALID &&
             p_aout_buf->i_pts < p_owner->i_preroll_end )
         {
-            aout_DecDeleteBuffer( p_aout, p_aout_input, p_aout_buf );
+            aout_DecDeleteBuffer( p_aout, p_aout_buf );
             continue;
         }
 
         if( p_owner->i_preroll_end > VLC_TS_INVALID )
         {
             msg_Dbg( p_dec, "End of audio preroll" );
-            if( p_owner->p_aout && p_owner->p_aout_input )
-                aout_DecFlush( p_owner->p_aout, p_owner->p_aout_input );
+            if( p_owner->p_aout )
+                aout_DecFlush( p_owner->p_aout );
             /* */
             p_owner->i_preroll_end = VLC_TS_INVALID;
         }
@@ -1941,7 +1936,7 @@ static void DecoderProcessAudio( decoder_t *p_dec, block_t *p_block, bool b_flus
     }
 
     if( b_flush && p_owner->p_aout )
-        aout_DecFlush( p_owner->p_aout, p_owner->p_aout_input );
+        aout_DecFlush( p_owner->p_aout );
 }
 
 /* This function process a subtitle block
@@ -2121,7 +2116,7 @@ static void DeleteDecoder( decoder_t * p_dec )
     /* Cleanup */
     if( p_owner->p_aout )
     {
-        aout_DecDelete( p_owner->p_aout, p_owner->p_aout_input );
+        aout_DecDelete( p_owner->p_aout );
         input_resource_RequestAout( p_owner->p_resource, p_owner->p_aout );
         if( p_owner->p_input != NULL )
             input_SendEventAout( p_owner->p_input );
@@ -2229,14 +2224,13 @@ static aout_buffer_t *aout_new_buffer( decoder_t *p_dec, int i_samples )
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
     aout_buffer_t *p_buffer;
 
-    if( p_owner->p_aout_input != NULL &&
+    if( p_owner->p_aout &&
         ( p_dec->fmt_out.audio.i_rate != p_owner->audio.i_rate ||
           p_dec->fmt_out.audio.i_original_channels !=
               p_owner->audio.i_original_channels ||
           p_dec->fmt_out.audio.i_bytes_per_frame !=
               p_owner->audio.i_bytes_per_frame ) )
     {
-        aout_input_t *p_aout_input = p_owner->p_aout_input;
         audio_output_t *p_aout = p_owner->p_aout;
 
         /* Parameters changed, restart the aout */
@@ -2244,19 +2238,17 @@ static aout_buffer_t *aout_new_buffer( decoder_t *p_dec, int i_samples )
 
         DecoderFlushBuffering( p_dec );
 
-        aout_DecDelete( p_owner->p_aout, p_aout_input );
+        aout_DecDelete( p_owner->p_aout );
         p_owner->p_aout = NULL;
-        p_owner->p_aout_input = NULL;
 
         vlc_mutex_unlock( &p_owner->lock );
         input_resource_RequestAout( p_owner->p_resource, p_aout );
     }
 
-    if( p_owner->p_aout_input == NULL )
+    if( p_owner->p_aout == NULL )
     {
         const int i_force_dolby = var_InheritInteger( p_dec, "force-dolby-surround" );
         audio_sample_format_t format;
-        aout_input_t *p_aout_input;
         audio_output_t *p_aout;
         aout_request_vout_t request_vout;
 
@@ -2288,22 +2280,18 @@ static aout_buffer_t *aout_new_buffer( decoder_t *p_dec, int i_samples )
         if( p_aout )
         {
             aout_FormatPrepare( &format );
-            p_aout_input = aout_DecNew( p_aout, &format,
-                                        &p_dec->fmt_out.audio_replay_gain,
-                                        &request_vout );
-            if( p_aout_input == NULL )
+            if( aout_DecNew( p_aout, &format,
+                             &p_dec->fmt_out.audio_replay_gain,
+                             &request_vout ) )
             {
                 input_resource_RequestAout( p_owner->p_resource, p_aout );
                 p_aout = NULL;
             }
         }
-        else
-            p_aout_input = NULL;
 
         vlc_mutex_lock( &p_owner->lock );
 
         p_owner->p_aout = p_aout;
-        p_owner->p_aout_input = p_aout_input;
         DecoderUpdateFormatLocked( p_dec );
 
         vlc_mutex_unlock( &p_owner->lock );
@@ -2311,7 +2299,7 @@ static aout_buffer_t *aout_new_buffer( decoder_t *p_dec, int i_samples )
         if( p_owner->p_input != NULL )
             input_SendEventAout( p_owner->p_input );
 
-        if( p_owner->p_aout_input == NULL )
+        if( p_aout == NULL )
         {
             msg_Err( p_dec, "failed to create audio output" );
             p_dec->b_error = true;
@@ -2321,7 +2309,7 @@ static aout_buffer_t *aout_new_buffer( decoder_t *p_dec, int i_samples )
             p_owner->audio.i_bytes_per_frame;
     }
 
-    p_buffer = aout_DecNewBuffer( p_owner->p_aout_input, i_samples );
+    p_buffer = aout_DecNewBuffer( p_owner->p_aout, i_samples );
 
     return p_buffer;
 }
@@ -2330,8 +2318,7 @@ static void aout_del_buffer( decoder_t *p_dec, aout_buffer_t *p_buffer )
 {
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
 
-    aout_DecDeleteBuffer( p_owner->p_aout,
-                          p_owner->p_aout_input, p_buffer );
+    aout_DecDeleteBuffer( p_owner->p_aout, p_buffer );
 }
 
 static picture_t *vout_new_buffer( decoder_t *p_dec )
