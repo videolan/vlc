@@ -278,7 +278,7 @@ void aout_EnableFilter( vlc_object_t *p_this, const char *psz_name,
 {
     audio_output_t *p_aout = findAout( p_this );
 
-    if( aout_ChangeFilterString( p_this, p_aout, "audio-filter", psz_name, b_add ) )
+    if( aout_ChangeFilterString( p_this, VLC_OBJECT(p_aout), "audio-filter", psz_name, b_add ) )
     {
         if( p_aout )
             AoutInputsMarkToRestart( p_aout );

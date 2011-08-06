@@ -664,7 +664,7 @@ static int FilterOrder( const char *psz_name )
 /* This function will add or remove a a module from a string list (colon
  * separated). It will return true if there is a modification
  * In case p_aout is NULL, we will use configuration instead of variable */
-bool aout_ChangeFilterString( vlc_object_t *p_obj, audio_output_t *p_aout,
+bool aout_ChangeFilterString( vlc_object_t *p_obj, vlc_object_t *p_aout,
                               const char *psz_variable,
                               const char *psz_name, bool b_add )
 {

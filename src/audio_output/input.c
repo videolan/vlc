@@ -135,7 +135,7 @@ int aout_InputNew( audio_output_t * p_aout, aout_input_t * p_input, const aout_r
             var_SetString( p_aout, "visual", val.psz_string );
             free( val.psz_string );
         }
-        var_AddCallback( p_aout, "visual", VisualizationCallback, NULL );
+        var_AddCallback( p_aout, "visual", VisualizationCallback, p_input );
     }
 
     if( var_Type( p_aout, "equalizer" ) == 0 )
@@ -767,81 +767,75 @@ vout_thread_t *aout_filter_RequestVout( filter_t *p_filter,
                                        p_vout, p_fmt, p_input->b_recycle_vout );
 }
 
-static int ChangeFiltersString( audio_output_t * p_aout, const char* psz_variable,
-                                 const char *psz_name, bool b_add )
+static inline bool ChangeFiltersString (vlc_object_t *aout, const char *var,
+                                        const char *filter, bool add)
 {
-    return aout_ChangeFilterString( VLC_OBJECT(p_aout), p_aout,
-                                    psz_variable, psz_name, b_add ) ? 1 : 0;
+    return aout_ChangeFilterString (aout, aout, var, filter, add);
 }
 
-static int VisualizationCallback( vlc_object_t *p_this, char const *psz_cmd,
-                       vlc_value_t oldval, vlc_value_t newval, void *p_data )
+static int VisualizationCallback (vlc_object_t *obj, char const *var,
+                                  vlc_value_t oldval, vlc_value_t newval,
+                                  void *data)
 {
-    audio_output_t *p_aout = (audio_output_t *)p_this;
-    char *psz_mode = newval.psz_string;
-    (void)psz_cmd; (void)oldval; (void)p_data;
+    const char *mode = newval.psz_string;
+    aout_input_t *input = data;
 
-    if( !psz_mode || !*psz_mode )
+    if (!*mode)
     {
-        ChangeFiltersString( p_aout, "audio-visual", "goom", false );
-        ChangeFiltersString( p_aout, "audio-visual", "visual", false );
-        ChangeFiltersString( p_aout, "audio-visual", "projectm", false );
+        ChangeFiltersString (obj, "audio-visual", "goom", false);
+        ChangeFiltersString (obj, "audio-visual", "visual", false);
+        ChangeFiltersString (obj, "audio-visual", "projectm", false);
+    }
+    else if (!strcmp ("goom", mode))
+    {
+        ChangeFiltersString (obj, "audio-visual", "visual", false );
+        ChangeFiltersString (obj, "audio-visual", "goom", true );
+        ChangeFiltersString (obj, "audio-visual", "projectm", false );
+    }
+    else if (!strcmp ("projectm", mode))
+    {
+        ChangeFiltersString (obj, "audio-visual", "visual", false);
+        ChangeFiltersString (obj, "audio-visual", "goom", false);
+        ChangeFiltersString (obj, "audio-visual", "projectm", true);
     }
     else
     {
-        if( !strcmp( "goom", psz_mode ) )
-        {
-            ChangeFiltersString( p_aout, "audio-visual", "visual", false );
-            ChangeFiltersString( p_aout, "audio-visual", "goom", true );
-            ChangeFiltersString( p_aout, "audio-visual", "projectm", false );
-        }
-        else if( !strcmp( "projectm", psz_mode ) )
-        {
-            ChangeFiltersString( p_aout, "audio-visual", "visual", false );
-            ChangeFiltersString( p_aout, "audio-visual", "goom", false );
-            ChangeFiltersString( p_aout, "audio-visual", "projectm", true );
-        }
-        else
-        {
-            var_Create( p_aout, "effect-list", VLC_VAR_STRING );
-            var_SetString( p_aout, "effect-list", psz_mode );
+        var_Create (obj, "effect-list", VLC_VAR_STRING);
+        var_SetString (obj, "effect-list", mode);
 
-            ChangeFiltersString( p_aout, "audio-visual", "goom", false );
-            ChangeFiltersString( p_aout, "audio-visual", "visual", true );
-            ChangeFiltersString( p_aout, "audio-visual", "projectm", false );
-        }
+        ChangeFiltersString (obj, "audio-visual", "goom", false);
+        ChangeFiltersString (obj, "audio-visual", "visual", true);
+        ChangeFiltersString (obj, "audio-visual", "projectm", false);
     }
 
-    /* That sucks */
-    AoutInputsMarkToRestart( p_aout );
+    /* That sucks FIXME: use "input" instead of cast */
+    AoutInputsMarkToRestart ((audio_output_t *)obj);
 
+    (void) var; (void) oldval;
     return VLC_SUCCESS;
 }
 
-static int EqualizerCallback( vlc_object_t *p_this, char const *psz_cmd,
-                       vlc_value_t oldval, vlc_value_t newval, void *p_data )
+static int EqualizerCallback (vlc_object_t *obj, char const *cmd,
+                              vlc_value_t oldval, vlc_value_t newval,
+                              void *data)
 {
-    audio_output_t *p_aout = (audio_output_t *)p_this;
-    char *psz_mode = newval.psz_string;
-    int i_ret;
-    (void)psz_cmd; (void)oldval; (void)p_data;
+    char *mode = newval.psz_string;
+    aout_input_t *input = data;
+    bool ret;
 
-    if( !psz_mode || !*psz_mode )
-    {
-        i_ret = ChangeFiltersString( p_aout, "audio-filter", "equalizer",
-                                     false );
-    }
+    (void) cmd; (void) oldval;
+    if (!*mode)
+        ret = ChangeFiltersString (obj, "audio-filter", "equalizer", false);
     else
     {
-        var_Create( p_aout, "equalizer-preset", VLC_VAR_STRING );
-        var_SetString( p_aout, "equalizer-preset", psz_mode );
-        i_ret = ChangeFiltersString( p_aout, "audio-filter", "equalizer",
-                                     true );
+        var_Create (obj, "equalizer-preset", VLC_VAR_STRING);
+        var_SetString (obj, "equalizer-preset", mode);
+        ret = ChangeFiltersString (obj, "audio-filter", "equalizer", true);
     }
 
     /* That sucks */
-    if( i_ret == 1 )
-        AoutInputsMarkToRestart( p_aout );
+    if (ret)
+        AoutInputsMarkToRestart ((audio_output_t *)obj);
     return VLC_SUCCESS;
 }
 
