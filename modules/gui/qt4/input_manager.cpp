@@ -24,6 +24,7 @@
  *****************************************************************************/
 
 #define __STDC_FORMAT_MACROS 1
+#define __STDC_CONSTANT_MACROS 1
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -407,7 +408,7 @@ void InputManager::UpdatePosition()
     int i_length;
     int64_t i_time;
     float f_pos;
-    i_length = var_GetTime(  p_input , "length" ) / 1000000;
+    i_length = var_GetTime(  p_input , "length" ) / CLOCK_FREQ;
     i_time = var_GetTime(  p_input , "time");
     f_pos = var_GetFloat(  p_input , "position" );
     emit positionUpdated( f_pos, i_time, i_length );
@@ -882,7 +883,7 @@ void InputManager::jumpFwd()
     int i_interval = var_InheritInteger( p_input, "short-jump-size" );
     if( i_interval > 0 )
     {
-        mtime_t val = (mtime_t)(i_interval) * 1000000L;
+        mtime_t val = CLOCK_FREQ * i_interval;
         var_SetTime( p_input, "time-offset", val );
     }
 }
@@ -892,7 +893,7 @@ void InputManager::jumpBwd()
     int i_interval = var_InheritInteger( p_input, "short-jump-size" );
     if( i_interval > 0 )
     {
-        mtime_t val = -1 *(mtime_t)(i_interval) * 1000000L;
+        mtime_t val = -CLOCK_FREQ * i_interval;
         var_SetTime( p_input, "time-offset", val );
     }
 }
