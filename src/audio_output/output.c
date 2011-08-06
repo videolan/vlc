@@ -599,74 +599,67 @@ static block_t *aout_OutputSlice (audio_output_t *p_aout)
     return p_buffer;
 }
 
-/*****************************************************************************
- * aout_OutputNextBuffer : give the audio output plug-in the right buffer
- *****************************************************************************
- * If b_can_sleek is 1, the aout core functions won't try to resample
- * new buffers to catch up - that is we suppose that the output plug-in can
- * compensate it by itself. S/PDIF outputs should always set b_can_sleek = 1.
- * This function is entered with no lock at all :-).
- *****************************************************************************/
-aout_buffer_t * aout_OutputNextBuffer( audio_output_t * p_aout,
-                                       mtime_t start_date,
-                                       bool b_can_sleek )
+/**
+ * Dequeues the next audio packet (a.k.a. audio fragment).
+ * The audio output plugin must first call aout_PacketPlay() to queue the
+ * decoded audio samples. Typically, audio_output_t.pf_play is set to, or calls
+ * aout_PacketPlay().
+ * @note This function is considered legacy. Please do not use this function in
+ * new audio output plugins.
+ * @param p_aout audio output instance
+ * @param start_date expected PTS of the audio packet
+ */
+block_t *aout_PacketNext (audio_output_t *p_aout, mtime_t start_date)
 {
     aout_packet_t *p = aout_packet (p_aout);
     aout_fifo_t *p_fifo = &p->fifo;
     aout_buffer_t *p_buffer = NULL;
-    mtime_t now = mdate();
+    const bool b_can_sleek = AOUT_FMT_NON_LINEAR (&p_aout->format);
+    const mtime_t threshold =
+        b_can_sleek ? start_date : mdate () - AOUT_MAX_PTS_DELAY;
 
     vlc_mutex_lock( &p->lock );
     if( p->pause_date != VLC_TS_INVALID )
-        goto out;
+        goto out; /* paused: do not dequeue buffers */
 
-    /* Drop the audio sample if the audio output is really late.
-     * In the case of b_can_sleek, we don't use a resampler so we need to be
-     * a lot more severe. */
-    while( ((p_buffer = p_fifo->p_first) != NULL)
-     && p_buffer->i_pts < (b_can_sleek ? start_date : now) - AOUT_MAX_PTS_DELAY )
+    for (;;)
     {
-        msg_Dbg( p_aout, "audio output is too slow (%"PRId64"), "
-                 "trashing %"PRId64"us", now - p_buffer->i_pts,
-                 p_buffer->i_length );
-        aout_BufferFree( aout_FifoPop( p_fifo ) );
+        p_buffer = p_fifo->p_first;
+        if (p_buffer == NULL)
+            goto out; /* nothing to play */
+
+        if (p_buffer->i_pts >= threshold)
+            break;
+
+        /* Drop the audio sample if the audio output is really late.
+         * In the case of b_can_sleek, we don't use a resampler so we need to
+         * be a lot more severe. */
+        msg_Dbg (p_aout, "audio output is too slow (%"PRId64" us): "
+                 " trashing %"PRId64" us", threshold - p_buffer->i_pts,
+                 p_buffer->i_length);
+        block_Release (aout_FifoPop (p_fifo));
     }
 
-    if( p_buffer == NULL )
-    {
-#if 0 /* This is bad because the audio output might just be trying to fill
-       * in its internal buffers. And anyway, it's up to the audio output
-       * to deal with this kind of starvation. */
-
-        /* Set date to 0, to allow the mixer to send a new buffer ASAP */
-        aout_FifoReset( &p->fifo );
-        if ( !p->starving )
-            msg_Dbg( p_aout,
-                 "audio output is starving (no input), playing silence" );
-        p_aout->starving = true;
-#endif
-        goto out;
-    }
-
-    mtime_t delta = start_date - p_buffer->i_pts;
-    /* Here we suppose that all buffers have the same duration - this is
-     * generally true, and anyway if it's wrong it won't be a disaster.
-     */
-    if ( 0 > delta + p_buffer->i_length )
+    mtime_t delta = p_buffer->i_pts - start_date;
+    /* This assumes that all buffers have the same duration. This is true
+     * since aout_PacketPlay() (aout_OutputSlice()) is used. */
+    if (delta >= p_buffer->i_length)
     {
         if (!p->starving)
-            msg_Dbg( p_aout, "audio output is starving (%"PRId64"), "
-                     "playing silence", -delta );
-        p->starving = true;
+        {
+            msg_Dbg (p_aout, "audio output is starving (%"PRId64"), "
+                     "playing silence", delta);
+            p->starving = true;
+        }
         p_buffer = NULL;
-        goto out;
+        goto out; /* nothing to play _yet_ */
     }
 
     p->starving = false;
     p_buffer = aout_FifoPop( p_fifo );
 
-    if( !b_can_sleek
-     && ( delta > AOUT_MAX_PTS_DELAY || delta < -AOUT_MAX_PTS_ADVANCE ) )
+    if (!b_can_sleek
+     && (delta > AOUT_MAX_PTS_ADVANCE || delta < -AOUT_MAX_PTS_DELAY))
     {
         /* Try to compensate the drift by doing some resampling. */
         msg_Warn( p_aout, "output date isn't PTS date, requesting "

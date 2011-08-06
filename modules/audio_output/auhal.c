@@ -1303,7 +1303,7 @@ static OSStatus RenderCallbackAnalog( vlc_object_t *_p_aout,
     {
         /* We don't have enough data yet */
         aout_buffer_t * p_buffer;
-        p_buffer = aout_OutputNextBuffer( p_aout, current_date , false );
+        p_buffer = aout_PacketNext( p_aout, current_date );
 
         if( p_buffer != NULL )
         {
@@ -1370,7 +1370,7 @@ static OSStatus RenderCallbackSPDIF( AudioDeviceID inDevice,
                    AudioConvertHostTimeToNanos( inOutputTime->mHostTime ) / 1000;
                    //- ((mtime_t) 1000000 / p_aout->format.i_rate * 31 ); // 31 = Latency in Frames. retrieve somewhere
 
-    p_buffer = aout_OutputNextBuffer( p_aout, current_date, true );
+    p_buffer = aout_PacketNext( p_aout, current_date );
 
 #define BUFFER outOutputData->mBuffers[p_sys->i_stream_index]
     if( p_buffer != NULL )

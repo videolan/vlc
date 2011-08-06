@@ -1006,9 +1006,6 @@ static void* DirectSoundThread( void *data )
     mtime_t last_time;
     int canc = vlc_savecancel ();
 
-    /* We don't want any resampling when using S/PDIF output */
-    bool b_sleek = (p_aout->format.i_format == VLC_CODEC_SPDIFL);
-
     msg_Dbg( p_aout, "DirectSoundThread ready" );
 
     /* Wait here until Play() is called */
@@ -1077,9 +1074,9 @@ static void* DirectSoundThread( void *data )
 
         for( i = 0; i < l_free_slots; i++ )
         {
-            aout_buffer_t *p_buffer = aout_OutputNextBuffer( p_aout,
+            aout_buffer_t *p_buffer = aout_PacketNext( p_aout,
                 mtime + INT64_C(1000000) * (i * i_frame_siz + l_queued) /
-                p_aout->format.i_rate, b_sleek );
+                p_aout->format.i_rate );
 
             /* If there is no audio data available and we have some buffered
              * already, then just wait for the next time */

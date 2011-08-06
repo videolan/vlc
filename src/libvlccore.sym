@@ -17,12 +17,12 @@ aout_filter_RequestVout
 aout_FormatPrepare
 aout_FormatPrint
 aout_FormatPrintChannels
-aout_OutputNextBuffer
 aout_PacketInit
 aout_PacketDestroy
 aout_PacketPlay
 aout_PacketPause
 aout_PacketFlush
+aout_PacketNext
 aout_VolumeGet
 aout_VolumeSet
 aout_VolumeUp

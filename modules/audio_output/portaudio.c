@@ -137,7 +137,7 @@ static int paCallback( const void *inputBuffer, void *outputBuffer,
 
     out_date = mdate() + (mtime_t) ( 1000000 *
         ( paDate->outputBufferDacTime - paDate->currentTime ) );
-    p_buffer = aout_OutputNextBuffer( p_aout, out_date, true );
+    p_buffer = aout_PacketNext( p_aout, out_date );
 
     if ( p_buffer != NULL )
     {
@@ -150,12 +150,6 @@ static int paCallback( const void *inputBuffer, void *outputBuffer,
         }
         vlc_memcpy( outputBuffer, p_buffer->p_buffer,
                     framesPerBuffer * p_sys->i_sample_size );
-        /* aout_BufferFree may be dangereous here, but then so is
-         * aout_OutputNextBuffer (calls aout_BufferFree internally).
-         * one solution would be to link the no longer useful buffers
-         * in a second fifo (in aout_OutputNextBuffer too) and to
-         * wait until we are in Play to do the actual free.
-         */
         aout_BufferFree( p_buffer );
     }
     else

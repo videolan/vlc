@@ -898,7 +898,7 @@ static void* WaveOutThread( void *data )
     // than wait a short time... before grabbing first frames
     mwait( p_sys->start_date - AOUT_MAX_PTS_ADVANCE/4 );
 
-#define waveout_warn(msg) msg_Warn( p_aout, "aout_OutputNextBuffer no buffer "\
+#define waveout_warn(msg) msg_Warn( p_aout, "aout_PacketNext no buffer "\
                            "got next_date=%d ms, "\
                            "%d frames to play, %s",\
                            (int)(next_date/(mtime_t)1000), \
@@ -927,25 +927,19 @@ static void* WaveOutThread( void *data )
 
 
                 /* Take into account the latency */
-                p_buffer = aout_OutputNextBuffer( p_aout,
-                    next_date,
-                    b_sleek );
-
+                p_buffer = aout_PacketNext( p_aout, next_date );
                 if(!p_buffer)
                 {
 #if 0
-                    msg_Dbg( p_aout, "aout_OutputNextBuffer no buffer "
-                                      "got next_date=%d ms, "
-                                      "%d frames to play",
-                                      (int)(next_date/(mtime_t)1000),
-                                      i_queued_frames);
+                    msg_Dbg( p_aout, "aout_PacketNext no buffer got "
+                             "next_date=%"PRId64" ms, %d frames to play",
+                             next_date/1000, i_queued_frames);
 #endif
                     // means we are too early to request a new buffer?
                     waveout_warn("waiting...")
                     mwait( next_date - AOUT_MAX_PTS_ADVANCE/4 );
                     next_date = mdate();
-                    p_buffer = aout_OutputNextBuffer( p_aout, next_date,
-                                                      b_sleek );
+                    p_buffer = aout_PacketNext( p_aout, next_date );
                 }
 
                 if( !p_buffer && i_queued_frames )

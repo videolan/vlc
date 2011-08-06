@@ -655,8 +655,7 @@ static void ALSAFill( audio_output_t * p_aout )
         next_date = mdate() + delay_us;
     }
 
-    block_t *p_buffer = aout_OutputNextBuffer( p_aout, next_date,
-           (p_aout->format.i_format ==  VLC_CODEC_SPDIFL) );
+    block_t *p_buffer = aout_PacketNext( p_aout, next_date );
 
     /* Audio output buffer shortage -> stop the fill process and wait */
     if( p_buffer == NULL )

@@ -604,8 +604,7 @@ static void* OSSThread( void *obj )
             mtime_t buffered = BufferDuration( p_aout );
 
             /* Next buffer will be played at mdate() + buffered */
-            p_buffer = aout_OutputNextBuffer( p_aout, mdate() + buffered,
-                                              false );
+            p_buffer = aout_PacketNext( p_aout, mdate() + buffered );
 
             if( p_buffer == NULL &&
                 buffered > ( p_aout->sys->max_buffer_duration
@@ -642,7 +641,7 @@ static void* OSSThread( void *obj )
             for( ;; )
             {
                 canc = vlc_savecancel ();
-                p_buffer = aout_OutputNextBuffer( p_aout, next_date, true );
+                p_buffer = aout_PacketNext( p_aout );
                 if ( p_buffer )
                     break;
                 vlc_restorecancel (canc);

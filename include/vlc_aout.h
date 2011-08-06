@@ -190,8 +190,6 @@ static const uint32_t pi_vlc_chan_order_wg4[] =
  * Prototypes
  *****************************************************************************/
 
-VLC_API aout_buffer_t * aout_OutputNextBuffer( audio_output_t *, mtime_t, bool ) VLC_USED;
-
 /**
  * This function computes the reordering needed to go from pi_chan_order_in to
  * pi_chan_order_out.
@@ -275,6 +273,7 @@ VLC_API void aout_PacketPlay(audio_output_t *, block_t *);
 VLC_API void aout_PacketPause(audio_output_t *, bool, mtime_t);
 VLC_API void aout_PacketFlush(audio_output_t *, bool);
 
-VLC_API block_t *aout_PacketNext(audio_output_t *, mtime_t, bool) VLC_USED;
+VLC_API block_t *aout_PacketNext(audio_output_t *, mtime_t) VLC_USED;
+
 
 #endif /* VLC_AOUT_H */
