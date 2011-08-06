@@ -29,5 +29,5 @@ DEPS_dvdread = dvdcss
 .dvdread: dvdread .dvdcss
 	cd $< && sh autogen.sh noconfig
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) --with-libdvdcss=$(PREFIX)
-	cd $< && SUBDIRS="src misc m4" $(MAKE) install
+	cd $< && $(MAKE) install
 	touch $@
