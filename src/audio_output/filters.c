@@ -49,14 +49,14 @@ block_t *aout_FilterBufferNew( filter_t *p_filter, int size )
 /*****************************************************************************
  * FindFilter: find an audio filter for a specific transformation
  *****************************************************************************/
-static filter_t * FindFilter( audio_output_t * p_aout,
+static filter_t * FindFilter( vlc_object_t *obj,
                               const audio_sample_format_t * p_input_format,
                               const audio_sample_format_t * p_output_format )
 {
     static const char typename[] = "audio filter";
     filter_t * p_filter;
 
-    p_filter = vlc_custom_create( p_aout, sizeof(*p_filter), typename );
+    p_filter = vlc_custom_create( obj, sizeof(*p_filter), typename );
 
     if ( p_filter == NULL ) return NULL;
 
@@ -120,6 +120,7 @@ static int SplitConversion( const audio_sample_format_t *restrict infmt,
     return AOUT_FMTS_IDENTICAL( infmt, midfmt ) ? -1 : 0;
 }
 
+#undef aout_FiltersCreatePipeline
 /**
  * Allocates audio format conversion filters
  * @param obj parent VLC object for new filters
@@ -129,7 +130,7 @@ static int SplitConversion( const audio_sample_format_t *restrict infmt,
  * @param outfmt output audio format
  * @return 0 on success, -1 on failure
  */
-int aout_FiltersCreatePipeline( audio_output_t *obj,
+int aout_FiltersCreatePipeline( vlc_object_t *obj,
                                 filter_t **filters,
                                 int *nb_filters,
                                 const audio_sample_format_t *restrict infmt,

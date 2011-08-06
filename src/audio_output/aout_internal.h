@@ -135,8 +135,10 @@ block_t *aout_InputPlay( audio_output_t *p_aout, aout_input_t *p_input,
 void aout_InputCheckAndRestart( audio_output_t * p_aout, aout_input_t * p_input );
 
 /* From filters.c : */
-int aout_FiltersCreatePipeline( audio_output_t *, filter_t **, int *,
+int aout_FiltersCreatePipeline( vlc_object_t *, filter_t **, int *,
     const audio_sample_format_t *, const audio_sample_format_t * );
+#define aout_FiltersCreatePipeline(o, pv, pc, inf, outf) \
+        aout_FiltersCreatePipeline(VLC_OBJECT(o), pv, pc, inf, outf)
 void aout_FiltersDestroyPipeline( filter_t *const *, unsigned );
 void aout_FiltersPlay( filter_t *const *, unsigned, aout_buffer_t ** );
 
