@@ -2,7 +2,6 @@
 DVDCSS_VERSION := 1.2.10
 DVDCSS_URL := $(VIDEOLAN)/libdvdcss/$(DVDCSS_VERSION)/libdvdcss-$(DVDCSS_VERSION).tar.bz2
 
-PKGS += dvdcss
 ifeq ($(call need_pkg,"libdvdcss"),)
 PKGS_FOUND += dvdcss
 endif
