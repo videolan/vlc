@@ -1,0 +1,9 @@
+--- libcddb/libcddb.pc.in.orig	2009-10-25 21:36:57.000000000 +0100
++++ libcddb/libcddb.pc.in	2009-10-25 21:36:11.000000000 +0100
+@@ -6,5 +6,5 @@
+ Name: libcddb
+ Description: CDDB server access library
+ Version: @VERSION@
+-Libs: -L${libdir} -lcddb @LIBICONV@
++Libs: -L${libdir} -lcddb -lregex ${libdir}/libregex.a @LIBICONV@ -lws2_32
+ Cflags: -I${includedir}

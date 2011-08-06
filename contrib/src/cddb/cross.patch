@@ -1,0 +1,30 @@
+--- libcddb/Makefile.am.orig	2009-10-24 17:24:43.000000000 +0200
++++ libcddb/Makefile.am	2009-10-24 17:26:58.000000000 +0200
+@@ -1,5 +1,5 @@
+ 
+-SUBDIRS	= include lib examples tests
++SUBDIRS	= include lib 
+ EXTRA_DIST = doc/doxygen.conf misc/$(PACKAGE).ebuild
+ 
+ dist-hook:
+--- libcddb/configure.ac.orig	2009-10-25 01:51:35.000000000 +0200
++++ libcddb/configure.ac	2009-10-25 01:51:44.000000000 +0200
+@@ -107,8 +107,6 @@
+ AC_TYPE_SIZE_T
+ 
+ dnl Checks for library functions.
+-AC_FUNC_MALLOC
+-AC_FUNC_REALLOC
+ AC_FUNC_STAT
+ AC_FUNC_VPRINTF
+ AC_FUNC_SELECT_ARGTYPES
+--- libcddb/include/cddb/cddb_ni.h.orig	2009-10-25 21:58:20.000000000 +0100
++++ libcddb/include/cddb/cddb_ni.h	2009-10-25 21:58:46.000000000 +0100
+@@ -35,6 +35,7 @@
+ #  include <iconv.h>
+ #else
+    typedef void *iconv_t;       /* for code uniformity */
++   #define ICONV_CONST const
+ #endif
+ 
+ #ifdef HAVE_WINDOWS_H
