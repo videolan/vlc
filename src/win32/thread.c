@@ -61,42 +61,6 @@ struct vlc_thread
     void          *data;
 };
 
-#ifdef UNDER_CE
-static void CALLBACK vlc_cancel_self (ULONG_PTR dummy);
-
-DWORD WaitForMultipleObjectsEx (DWORD nCount, const HANDLE *lpHandles,
-                                BOOL bWaitAll, DWORD dwMilliseconds,
-                                BOOL bAlertable)
-{
-    struct vlc_thread *th = vlc_threadvar_get (thread_key);
-    HANDLE handles[nCount + 1];
-    DWORD ret;
-
-    memcpy(handles, lpHandles, nCount * sizeof(HANDLE));
-    if (bAlertable)
-    {
-        if (th != NULL)
-        {
-            handles[nCount] = th->cancel_event;
-            /* bWaitAll not implemented and not used by VLC... */
-            assert (!bWaitAll);
-        }
-        else
-            bAlertable = FALSE;
-    }
-
-    ret = WaitForMultipleObjects (nCount + bAlertable, handles, bWaitAll,
-                                  dwMilliseconds);
-    if (ret == WAIT_OBJECT_0 + nCount)
-    {
-        assert (bAlertable);
-        vlc_cancel_self ((uintptr_t)th);
-        ret = WAIT_IO_COMPLETION;
-    }
-    return ret;
-}
-#endif
-
 static vlc_mutex_t super_mutex;
 static vlc_cond_t  super_variable;
 
@@ -124,18 +88,52 @@ BOOL WINAPI DllMain (HINSTANCE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
     return TRUE;
 }
 
+static void CALLBACK vlc_cancel_self (ULONG_PTR);
+
 static DWORD vlc_WaitForMultipleObjects (DWORD count, const HANDLE *handles,
                                          DWORD delay)
 {
-    DWORD ret = WaitForMultipleObjectsEx (count, handles, FALSE, delay, TRUE);
+    DWORD ret;
+#ifdef UNDER_CE
+    HANDLE buf[count + 1];
 
-   /* We do not abandon objects... this would be a bug */
-   assert (ret < WAIT_ABANDONED_0 || WAIT_ABANDONED_0 + count - 1 < ret);
+    struct vlc_thread *th = vlc_threadvar_get (thread_key);
+    if (th != NULL)
+    {
+        memcpy (buf, handles, count * sizeof(HANDLE));
+        buf[count++] = th->cancel_event;
+        handles = buf;
+    }
 
-   if (unlikely(ret == WAIT_FAILED))
-       abort (); /* We are screwed! */
+    if (count == 0)
+    {
+         Sleep (delay);
+         ret = WAIT_TIMEOUT;
+    }
+    else
+        ret = WaitForMultipleObjects (count, handles, FALSE, delay);
 
-   return ret;
+    if ((th != NULL) && (ret == WAIT_OBJECT_0 + count - 1))
+    {
+        vlc_cancel_self ((uintptr_t)th);
+        ret = WAIT_IO_COMPLETION;
+    }
+#else
+    if (count == 0)
+    {
+        ret = SleepEx (delay, TRUE);
+        if (ret == 0)
+            ret = WAIT_TIMEOUT;
+    }
+    else
+        ret = WaitForMultipleObjectsEx (count, handles, FALSE, delay, TRUE);
+#endif
+    /* We do not abandon objects... this would be a bug */
+    assert (ret < WAIT_ABANDONED_0 || WAIT_ABANDONED_0 + count - 1 < ret);
+
+    if (unlikely(ret == WAIT_FAILED))
+        abort (); /* We are screwed! */
+    return ret;
 }
 
 static DWORD vlc_WaitForSingleObject (HANDLE handle, DWORD delay)
@@ -143,15 +141,11 @@ static DWORD vlc_WaitForSingleObject (HANDLE handle, DWORD delay)
     return vlc_WaitForMultipleObjects (1, &handle, delay);
 }
 
-#if 0 // WaitForMultipleObjectsEx() cannot deal with zero handles
 static DWORD vlc_Sleep (DWORD delay)
 {
     DWORD ret = vlc_WaitForMultipleObjects (0, NULL, delay);
-    if (ret == WAIT_TIMEOUT)
-        ret = 0;
-    return ret;
+    return (ret != WAIT_TIMEOUT) ? ret : 0;
 }
-#endif
 
 
 /*** Mutexes ***/
@@ -638,7 +632,7 @@ void vlc_join (vlc_thread_t th, void **result)
 {
     do
         vlc_testcancel ();
-    while (WaitForSingleObjectEx (th->id, INFINITE, TRUE)
+    while (vlc_WaitForSingleObject (th->id, INFINITE)
                                                         == WAIT_IO_COMPLETION);
 
     if (result != NULL)
@@ -791,7 +785,7 @@ void mwait (mtime_t deadline)
         delay /= 1000;
         if (unlikely(delay > 0x7fffffff))
             delay = 0x7fffffff;
-        SleepEx (delay, TRUE);
+        vlc_Sleep (delay);
         vlc_testcancel();
     }
 }
