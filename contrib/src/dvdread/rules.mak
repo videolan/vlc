@@ -1,5 +1,12 @@
 # DVDREAD
 
+ifdef BUILD_DISCS
+PKGS += dvdread
+endif
+ifeq ($(call need_pkg,"dvdread"),)
+PKGS_FOUND += dvdread
+endif
+
 $(TARBALLS)/dvdread-svn.tar.xz:
 	rm -Rf dvdread-svn
 	$(SVN) export svn://svn.mplayerhq.hu/dvdnav/trunk/libdvdread dvdread-svn
