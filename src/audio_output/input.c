@@ -79,9 +79,6 @@ int aout_InputNew( audio_output_t * p_aout, aout_input_t * p_input, const aout_r
 
     p_input->i_nb_resamplers = p_input->i_nb_filters = 0;
 
-    date_Init (&p_input->date, owner->mixer_format.i_rate, 1);
-    date_Set (&p_input->date, VLC_TS_INVALID);
-
     /* */
     if( p_request_vout )
     {
@@ -461,13 +458,9 @@ void aout_InputCheckAndRestart( audio_output_t * p_aout, aout_input_t * p_input 
     if( !p_input->b_restart )
         return;
 
-    /* A little trick to avoid loosing our input properties */
-    date_t date = p_input->date;
-
     aout_InputDelete( p_aout, p_input );
     aout_InputNew( p_aout, p_input, &p_input->request_vout );
 
-    p_input->date = date;
     p_input->b_restart = false;
 }
 /*****************************************************************************
@@ -477,8 +470,8 @@ void aout_InputCheckAndRestart( audio_output_t * p_aout, aout_input_t * p_input 
  *****************************************************************************/
 /* XXX Do not activate it !! */
 //#define AOUT_PROCESS_BEFORE_CHEKS
-block_t *aout_InputPlay( audio_output_t *p_aout, aout_input_t *p_input,
-                         block_t *p_buffer, int i_input_rate )
+block_t *aout_InputPlay(audio_output_t *p_aout, aout_input_t *p_input,
+                        block_t *p_buffer, int i_input_rate, date_t *date )
 {
     mtime_t start_date;
 
@@ -531,7 +524,7 @@ block_t *aout_InputPlay( audio_output_t *p_aout, aout_input_t *p_input,
     /* We don't care if someone changes the start date behind our back after
      * this. We'll deal with that when pushing the buffer, and compensate
      * with the next incoming buffer. */
-    start_date = date_Get (&p_input->date);
+    start_date = date_Get (date);
 
     if ( start_date != VLC_TS_INVALID && start_date < now )
     {
@@ -564,7 +557,7 @@ block_t *aout_InputPlay( audio_output_t *p_aout, aout_input_t *p_input,
     if( start_date == VLC_TS_INVALID )
     {
         start_date = p_buffer->i_pts;
-        date_Set (&p_input->date, start_date);
+        date_Set (date, start_date);
     }
 
     mtime_t drift = start_date - p_buffer->i_pts;
@@ -579,7 +572,7 @@ block_t *aout_InputPlay( audio_output_t *p_aout, aout_input_t *p_input,
         inputResamplingStop( p_input );
         p_buffer->i_flags |= BLOCK_FLAG_DISCONTINUITY;
         start_date = p_buffer->i_pts;
-        date_Set (&p_input->date, start_date);
+        date_Set (date, start_date);
         drift = 0;
     }
     else
@@ -686,7 +679,6 @@ block_t *aout_InputPlay( audio_output_t *p_aout, aout_input_t *p_input,
 #endif
 
     p_buffer->i_pts = start_date;
-    date_Increment (&p_input->date, p_buffer->i_nb_samples);
     return p_buffer;
 }
 

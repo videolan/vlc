@@ -109,6 +109,9 @@ int aout_DecNew( audio_output_t *p_aout,
         goto error;
     }
 
+    date_Init (&owner->sync.date, owner->mixer_format.i_rate, 1);
+    date_Set (&owner->sync.date, VLC_TS_INVALID);
+
     owner->input = p_input;
     aout_InputNew( p_aout, p_input, p_request_vout );
     aout_unlock( p_aout );
@@ -244,10 +247,12 @@ int aout_DecPlay (audio_output_t *p_aout, block_t *p_buffer, int i_input_rate)
     aout_InputCheckAndRestart( p_aout, p_input );
 
     /* Input */
-    p_buffer = aout_InputPlay( p_aout, p_input, p_buffer, i_input_rate );
-
+    p_buffer = aout_InputPlay (p_aout, p_input, p_buffer, i_input_rate,
+                               &owner->sync.date);
     if( p_buffer != NULL )
     {
+        date_Increment (&owner->sync.date, p_buffer->i_nb_samples);
+
         /* Mixer */
         float amp = owner->volume.multiplier * p_input->multiplier;
         aout_MixerRun (owner->volume.mixer, p_buffer, amp);
@@ -277,12 +282,10 @@ int aout_DecGetResetLost (audio_output_t *aout)
 void aout_DecChangePause (audio_output_t *aout, bool paused, mtime_t date)
 {
     aout_owner_t *owner = aout_owner (aout);
-    aout_input_t *p_input = owner->input;
 
     aout_lock (aout);
-
-    /* XXX: Should the input date be offset by the pause duration instead? */
-    date_Set (&p_input->date, VLC_TS_INVALID);
+    /* XXX: Should the date be offset by the pause duration instead? */
+    date_Set (&owner->sync.date, VLC_TS_INVALID);
     aout_OutputPause (aout, paused, date);
     aout_unlock (aout);
 }
@@ -290,10 +293,9 @@ void aout_DecChangePause (audio_output_t *aout, bool paused, mtime_t date)
 void aout_DecFlush (audio_output_t *aout)
 {
     aout_owner_t *owner = aout_owner (aout);
-    aout_input_t *input = owner->input;
 
     aout_lock (aout);
-    date_Set (&input->date, VLC_TS_INVALID);
+    date_Set (&owner->sync.date, VLC_TS_INVALID);
     aout_OutputFlush (aout, false);
     aout_unlock (aout);
 }
@@ -301,12 +303,11 @@ void aout_DecFlush (audio_output_t *aout)
 bool aout_DecIsEmpty (audio_output_t *aout)
 {
     aout_owner_t *owner = aout_owner (aout);
-    aout_input_t *input = owner->input;
     mtime_t end_date;
 
     aout_lock (aout);
     /* FIXME: tell output to drain */
-    end_date = date_Get (&input->date);
+    end_date = date_Get (&owner->sync.date);
     aout_unlock (aout);
     return end_date == VLC_TS_INVALID || end_date <= mdate();
 }

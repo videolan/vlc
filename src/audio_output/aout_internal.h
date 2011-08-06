@@ -85,9 +85,6 @@ struct aout_input_t
     /* */
     bool                b_recycle_vout;
     aout_request_vout_t request_vout;
-
-    /* */
-    date_t                  date;
 };
 
 typedef struct
@@ -95,6 +92,11 @@ typedef struct
     vlc_mutex_t lock;
     module_t *module; /**< Output plugin (or NULL if inactive) */
     aout_input_t *input;
+
+    struct
+    {
+        date_t date;
+    } sync;
 
     struct
     {
@@ -131,7 +133,7 @@ static inline aout_owner_t *aout_owner (audio_output_t *aout)
 int aout_InputNew( audio_output_t * p_aout, aout_input_t * p_input, const aout_request_vout_t * );
 int aout_InputDelete( audio_output_t * p_aout, aout_input_t * p_input );
 block_t *aout_InputPlay( audio_output_t *p_aout, aout_input_t *p_input,
-                         block_t *p_buffer, int i_input_rate );
+                         block_t *p_buffer, int i_input_rate, date_t * );
 void aout_InputCheckAndRestart( audio_output_t * p_aout, aout_input_t * p_input );
 
 /* From filters.c : */
