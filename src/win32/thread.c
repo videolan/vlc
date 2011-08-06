@@ -71,7 +71,7 @@ DWORD WaitForMultipleObjectsEx (DWORD nCount, const HANDLE *lpHandles,
     HANDLE handles[nCount + 1];
     DWORD ret;
 
-    memcpy(handles, lpHandles, count * sizeof(HANDLE));
+    memcpy(handles, lpHandles, nCount * sizeof(HANDLE));
     if (bAlertable)
     {
         struct vlc_thread *th = vlc_threadvar_get (thread_key);
@@ -82,7 +82,7 @@ DWORD WaitForMultipleObjectsEx (DWORD nCount, const HANDLE *lpHandles,
             assert (!bWaitAll);
         }
         else
-            bAltertable = FALSE;
+            bAlertable = FALSE;
     }
 
     ret = WaitForMultipleObjects (nCount + bAlertable, handles, bWaitAll,
