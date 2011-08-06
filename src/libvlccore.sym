@@ -29,6 +29,7 @@ aout_VolumeUp
 aout_ToggleMute
 aout_IsMuted
 aout_SetMute
+aout_TimeReport
 aout_VolumeNoneInit
 aout_VolumeSoftInit
 aout_VolumeHardInit

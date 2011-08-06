@@ -244,6 +244,8 @@ VLC_API void aout_VolumeSoftInit( audio_output_t * );
 VLC_API void aout_VolumeHardInit( audio_output_t *, aout_volume_cb );
 VLC_API void aout_VolumeHardSet( audio_output_t *, float, bool );
 
+VLC_API void aout_TimeReport(audio_output_t *, mtime_t);
+
 VLC_API int aout_ChannelsRestart( vlc_object_t *, const char *, vlc_value_t, vlc_value_t, void * );
 
 /* */

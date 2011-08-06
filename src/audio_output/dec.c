@@ -311,3 +311,46 @@ bool aout_DecIsEmpty (audio_output_t *aout)
     aout_unlock (aout);
     return end_date == VLC_TS_INVALID || end_date <= mdate();
 }
+
+/**
+ * Notifies the audio input of the drift from the requested audio
+ * playback timestamp (@ref block_t.i_pts) to the anticipated playback time
+ * as reported by the audio output hardware.
+ * Depending on the drift amplitude, the input core may ignore the drift
+ * trigger upsampling or downsampling, or even discard samples.
+ * Future VLC versions may instead adjust the input decoding speed.
+ *
+ * The audio output plugin is responsible for estimating the ideal current
+ * playback time defined as follows:
+ *  ideal time = buffer timestamp - (output latency + pending buffer duration)
+ *
+ * Practically, this is the PTS (block_t.i_pts) of the current buffer minus
+ * the latency reported by the output programming interface.
+ * Computing the estimated drift directly would probably be more intuitive.
+ * However the use of an absolute time value does not introduce extra
+ * measurement errors due to the CPU scheduling jitter and clock resolution.
+ * Furthermore, the ideal while it is an abstract value, is easy for most
+ * audio output plugins to compute.
+ * The following definition is equivalent but depends on the clock time:
+ *  ideal time = real time + drift
+
+ * @note If aout_LatencyReport() is never called, the core will assume that
+ * there is no drift.
+ *
+ * @param ideal estimated ideal time as defined above.
+ */
+void aout_TimeReport (audio_output_t *aout, mtime_t ideal)
+{
+    mtime_t delta = mdate() - ideal /* = -drift */;
+
+    aout_assert_locked (aout);
+    if (delta < -AOUT_MAX_PTS_ADVANCE || +AOUT_MAX_PTS_DELAY < delta)
+    {
+        aout_owner_t *owner = aout_owner (aout);
+
+        msg_Warn (aout, "not synchronized (%"PRId64" us), resampling",
+                  delta);
+        if (date_Get (&owner->sync.date) != VLC_TS_INVALID)
+            date_Move (&owner->sync.date, delta);
+    }
+}
