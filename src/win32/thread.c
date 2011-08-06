@@ -68,13 +68,13 @@ DWORD WaitForMultipleObjectsEx (DWORD nCount, const HANDLE *lpHandles,
                                 BOOL bWaitAll, DWORD dwMilliseconds,
                                 BOOL bAlertable)
 {
+    struct vlc_thread *th = vlc_threadvar_get (thread_key);
     HANDLE handles[nCount + 1];
     DWORD ret;
 
     memcpy(handles, lpHandles, nCount * sizeof(HANDLE));
     if (bAlertable)
     {
-        struct vlc_thread *th = vlc_threadvar_get (thread_key);
         if (th != NULL)
         {
             handles[nCount] = th->cancel_event;
