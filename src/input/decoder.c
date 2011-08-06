@@ -2287,6 +2287,7 @@ static aout_buffer_t *aout_new_buffer( decoder_t *p_dec, int i_samples )
         p_aout = input_resource_RequestAout( p_owner->p_resource, NULL );
         if( p_aout )
         {
+            aout_FormatPrepare( &format );
             p_aout_input = aout_DecNew( p_aout, &format,
                                         &p_dec->fmt_out.audio_replay_gain,
                                         &request_vout );

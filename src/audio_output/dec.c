@@ -43,7 +43,7 @@
  * Creates an audio output
  */
 aout_input_t *aout_DecNew( audio_output_t *p_aout,
-                           audio_sample_format_t *p_format,
+                           const audio_sample_format_t *p_format,
                            const audio_replay_gain_t *p_replay_gain,
                            const aout_request_vout_t *p_request_vout )
 {
@@ -83,8 +83,6 @@ aout_input_t *aout_DecNew( audio_output_t *p_aout,
         return NULL;
 
     p_input->b_error = true;
-
-    aout_FormatPrepare( p_format );
 
     memcpy( &p_input->input, p_format,
             sizeof(audio_sample_format_t) );
