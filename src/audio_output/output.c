@@ -387,6 +387,7 @@ void aout_PacketInit (audio_output_t *aout, aout_packet_t *p, unsigned samples)
     aout_FifoInit (aout, &p->partial, aout->format.i_rate);
     aout_FifoInit (aout, &p->fifo, aout->format.i_rate);
     p->pause_date = VLC_TS_INVALID;
+    p->time_report = VLC_TS_INVALID;
     p->samples = samples;
     p->starving = true;
 }
@@ -405,12 +406,19 @@ static block_t *aout_OutputSlice (audio_output_t *);
 void aout_PacketPlay (audio_output_t *aout, block_t *block)
 {
     aout_packet_t *p = aout_packet (aout);
+    mtime_t time_report;
 
     vlc_mutex_lock (&p->lock);
     aout_FifoPush (&p->partial, block);
     while ((block = aout_OutputSlice (aout)) != NULL)
         aout_FifoPush (&p->fifo, block);
+
+    time_report = p->time_report;
+    p->time_report = VLC_TS_INVALID;
     vlc_mutex_unlock (&p->lock);
+
+    if (time_report != VLC_TS_INVALID)
+        aout_TimeReport (aout, mdate () + time_report);
 }
 
 void aout_PacketPause (audio_output_t *aout, bool pause, mtime_t date)
@@ -613,10 +621,11 @@ block_t *aout_PacketNext (audio_output_t *p_aout, mtime_t start_date)
 {
     aout_packet_t *p = aout_packet (p_aout);
     aout_fifo_t *p_fifo = &p->fifo;
-    aout_buffer_t *p_buffer = NULL;
+    block_t *p_buffer;
     const bool b_can_sleek = AOUT_FMT_NON_LINEAR (&p_aout->format);
+    const mtime_t now = mdate ();
     const mtime_t threshold =
-        b_can_sleek ? start_date : mdate () - AOUT_MAX_PTS_DELAY;
+        (b_can_sleek ? start_date : now) - AOUT_MAX_PTS_DELAY;
 
     vlc_mutex_lock( &p->lock );
     if( p->pause_date != VLC_TS_INVALID )
@@ -640,10 +649,10 @@ block_t *aout_PacketNext (audio_output_t *p_aout, mtime_t start_date)
         block_Release (aout_FifoPop (p_fifo));
     }
 
-    mtime_t delta = p_buffer->i_pts - start_date;
+    mtime_t delta = start_date - p_buffer->i_pts;
     /* This assumes that all buffers have the same duration. This is true
      * since aout_PacketPlay() (aout_OutputSlice()) is used. */
-    if (delta >= p_buffer->i_length)
+    if (0 >= delta + p_buffer->i_length)
     {
         if (!p->starving)
         {
@@ -651,7 +660,6 @@ block_t *aout_PacketNext (audio_output_t *p_aout, mtime_t start_date)
                      "playing silence", delta);
             p->starving = true;
         }
-        p_buffer = NULL;
         goto out; /* nothing to play _yet_ */
     }
 
@@ -659,17 +667,17 @@ block_t *aout_PacketNext (audio_output_t *p_aout, mtime_t start_date)
     p_buffer = aout_FifoPop( p_fifo );
 
     if (!b_can_sleek
-     && (delta > AOUT_MAX_PTS_ADVANCE || delta < -AOUT_MAX_PTS_DELAY))
+     && (delta < -AOUT_MAX_PTS_ADVANCE || AOUT_MAX_PTS_DELAY < delta))
     {
-        /* Try to compensate the drift by doing some resampling. */
-        msg_Warn( p_aout, "output date isn't PTS date, requesting "
-                  "resampling (%"PRId64")", delta );
-
+        msg_Warn (p_aout, "audio output out of sync, "
+                          "adjusting dates (%"PRId64" us)", delta);
         aout_FifoMoveDates (&p->partial, delta);
         aout_FifoMoveDates (p_fifo, delta);
-#warning FIXME: feed back to input for resampling!!!
+        p->time_report = delta;
     }
-out:
     vlc_mutex_unlock( &p->lock );
     return p_buffer;
+out:
+    vlc_mutex_unlock( &p->lock );
+    return NULL;
 }

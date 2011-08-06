@@ -266,6 +266,7 @@ typedef struct
     aout_fifo_t partial; /**< Audio blocks before packetization */
     aout_fifo_t fifo; /**< Packetized audio blocks */
     mtime_t pause_date; /**< Date when paused or VLC_TS_INVALID */
+    mtime_t time_report; /**< Desynchronization estimate or VLC_TS_INVALID */
     unsigned samples; /**< Samples per packet */
     bool starving; /**< Whether currently starving (to limit error messages) */
 } aout_packet_t;
