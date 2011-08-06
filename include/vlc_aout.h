@@ -234,7 +234,9 @@ static inline unsigned aout_FormatNbChannels(const audio_sample_format_t *fmt)
 
 VLC_API unsigned int aout_BitsPerSample( vlc_fourcc_t i_format ) VLC_USED;
 VLC_API void aout_FormatPrepare( audio_sample_format_t * p_format );
-VLC_API void aout_FormatPrint( audio_output_t * p_aout, const char * psz_text, const audio_sample_format_t * p_format );
+VLC_API void aout_FormatPrint(vlc_object_t *, const char *,
+                              const audio_sample_format_t *);
+#define aout_FormatPrint(o, t, f) aout_FormatPrint(VLC_OBJECT(o), t, f)
 VLC_API const char * aout_FormatPrintChannels( const audio_sample_format_t * ) VLC_USED;
 
 VLC_API void aout_VolumeNoneInit( audio_output_t * );

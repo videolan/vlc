@@ -168,7 +168,11 @@ aout_buffer_t *aout_FifoPop( aout_fifo_t * p_fifo ) VLC_USED;
 void aout_FifoReset( aout_fifo_t * );
 void aout_FifoMoveDates( aout_fifo_t *, mtime_t );
 void aout_FifoDestroy( aout_fifo_t * p_fifo );
-void aout_FormatsPrint( audio_output_t * p_aout, const char * psz_text, const audio_sample_format_t * p_format1, const audio_sample_format_t * p_format2 );
+void aout_FormatsPrint(vlc_object_t *, const char *,
+                       const audio_sample_format_t *,
+                       const audio_sample_format_t *);
+#define aout_FormatsPrint(o, t, a, b) \
+        aout_FormatsPrint(VLC_OBJECT(o), t, a, b)
 bool aout_ChangeFilterString( vlc_object_t *, audio_output_t *, const char *psz_variable, const char *psz_name, bool b_add );
 
 /* From dec.c */
