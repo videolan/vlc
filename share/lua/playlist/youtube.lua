@@ -51,16 +51,14 @@ function probe()
             return false
         end
     end
-    return (  string.match( vlc.path, "watch%?v=" ) -- the html page
-            or string.match( vlc.path, "watch_fullscreen%?video_id=" ) -- the fullscreen page
-            or string.match( vlc.path, "p.swf" ) -- the (old?) player url
-            or string.match( vlc.path, "jp.swf" ) -- the (new?) player url (as of 24/08/2007)
-            or string.match( vlc.path, "player2.swf" ) ) -- another player url
+    return (  string.match( vlc.path, "/watch%?" ) -- the html page
+            or string.match( vlc.path, "/v/" ) -- video in swf player
+            or string.match( vlc.path, "/player2.swf" ) ) -- another player url
 end
 
 -- Parse function.
 function parse()
-    if string.match( vlc.path, "watch%?v=" )
+    if string.match( vlc.path, "/watch%?" )
     then -- This is the HTML page's URL
         -- fmt is the format of the video
         -- (cf. http://en.wikipedia.org/wiki/YouTube#Quality_and_codecs)
@@ -109,32 +107,31 @@ function parse()
             end
         end
 
-        if not arturl then
-            arturl = get_arturl()
-        end
-
         if not path then
             vlc.msg.err( "Couldn't extract youtube video URL, please check for updates to this script" )
             return { }
         end
+
+        if not arturl then
+            arturl = get_arturl()
+        end
+
         return { { path = path; name = name; description = description; artist = artist; arturl = arturl } }
     else -- This is the flash player's URL
-        if string.match( vlc.path, "title=" ) then
-            name = vlc.strings.decode_uri(get_url_param( vlc.path, "title" ))
-        end
         video_id = get_url_param( vlc.path, "video_id" )
-        arturl = get_arturl( vlc.path, video_id )
+        if not video_id then
+            _,_,video_id = string.find( vlc.path, "/v/([^?]*)" )
+        end
+        if not video_id then
+            vlc.msg.err( "Couldn't extract youtube video URL" )
+            return { }
+        end
         fmt = get_url_param( vlc.path, "fmt" )
         if fmt then
             format = "&fmt=" .. fmt
         else
             format = ""
         end
-        if not string.match( vlc.path, "t=" ) then
-            -- This sucks, we're missing "t" which is now mandatory. Let's
-            -- try using another url
-            return { { path = "http://www.youtube.com/v/"..video_id; name = name; arturl = arturl } }
-        end
-        return { { path = "http://www.youtube.com/get_video.php?video_id="..video_id.."&t="..get_url_param( vlc.path, "t" )..format; name = name; arturl = arturl } }
+        return { { path = "http://www.youtube.com/watch?v="..video_id..format } }
     end
 end
