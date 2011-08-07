@@ -116,11 +116,11 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
 {
     int argc;
 
+#ifndef UNDER_CE
 #ifdef TOP_BUILDDIR
     putenv("VLC_PLUGIN_PATH=Z:"TOP_BUILDDIR"/modules");
 #endif
 
-#ifndef UNDER_CE
     HeapSetInformation(NULL, HeapEnableTerminationOnCorruption, NULL, 0);
 
     /* SetProcessDEPPolicy */
