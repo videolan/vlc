@@ -219,6 +219,7 @@ static void *Thread( void *data )
         Preparse( p_playlist, p_current );
 
         Art( p_preparser, p_current );
+        vlc_gc_decref(p_current);
     }
     return NULL;
 }
