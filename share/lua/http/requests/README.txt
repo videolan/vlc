@@ -61,6 +61,10 @@ status.xml or status.json
 > set playback rate. must be > 0
   ?command=rate&val=<newplaybackrate>
 
+> set aspect ratio. Must be one of the following values. Any other value will reset aspect ratio to default
+  ?command=aspectratio&val=<newratio>
+  Valid aspect ratio values: 1:1 , 4:3 , 5:4 , 16:9 , 16:10 , 221:100 , 235:100 , 239:100 
+
 > sort playlist using sort mode <val> and order <id>:
   ?command=pl_sort&id=<id>&val=<val>
   If id=0 then items will be sorted in normal order, if id=1 they will be

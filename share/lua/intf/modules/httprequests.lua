@@ -154,6 +154,10 @@ processcommands = function ()
 	  if vlc.object.input() then
 	   vlc.var.set(vlc.object.input(),"spu-delay",val)
 	  end
+	elseif command == "aspectratio" then
+	  if vlc.object.vout() then
+	   vlc.var.set(vlc.object.vout(),"aspect-ratio",val)
+	  end
 	end
 	
 	local input = nil
@@ -360,9 +364,10 @@ local aout = vlc.object.aout()
 		s.rate=1
 		s.subtitledelay=0
 	end
-	
 	if vout then
 		s.fullscreen=vlc.var.get(vout,"fullscreen")
+		s.aspectratio=vlc.var.get(vout,"aspect-ratio");
+		if s.aspectratio=="" then s.aspectratio = "default" end
 	else
 		s.fullscreen=0
 	end
