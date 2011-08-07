@@ -26,7 +26,6 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_demux.h>
-#include <vlc_aout.h>
 #include <vlc_charset.h>
 #include <limits.h>
 
@@ -231,8 +230,6 @@ static int Open (vlc_object_t * p_this)
     es_format_t  fmt;
     es_format_Init (&fmt, AUDIO_ES, VLC_CODEC_MIDI);
     fmt.audio.i_channels = 2;
-    fmt.audio.i_original_channels = fmt.audio.i_physical_channels =
-        AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
     fmt.audio.i_rate = 44100; /* dummy value */
     p_sys->es = es_out_Add (p_demux->out, &fmt);
 
