@@ -34,6 +34,7 @@
 
 #include <vlc_common.h>
 #include <vlc_aout.h>
+#include <vlc_aout_intf.h>
 #include <vlc_input.h>
 #include <vlc_charset.h>
 
@@ -42,6 +43,9 @@
 
 #include "input.h"
 #include "../libs.h"
+#include "../vlc.h"
+#include "playlist.h"
+#include "../../audio_filter/equalizer_presets.h"
 
 #if !defined WIN32
 # include <locale.h>
@@ -128,14 +132,14 @@ Band 8: 14 kHz
 Band 9: 16 kHz
 *****************************************************************************/
 /*****************************************************************************
-* Get the equalizer level for the specified band
+* Return EQ level for all bands as a Table
 *****************************************************************************/
 static int vlclua_equalizer_get( lua_State *L )
 {
+    int bands = 9;
     input_thread_t *p_input = vlclua_get_input_internal( L );
     if( !p_input )
         return 0;
-
     audio_output_t *p_aout = input_GetAout( p_input );
     vlc_object_release( p_input );
     if( !p_aout )
@@ -151,15 +155,28 @@ static int vlclua_equalizer_get( lua_State *L )
     }
     free( psz_af );
 
-    int bandid = luaL_checknumber( L, 1 );
     char *psz_bands_origin, *psz_bands;
     psz_bands_origin = psz_bands = var_GetNonEmptyString( p_aout, "equalizer-bands" );
+    if( !psz_bands )
+    {
+        vlc_object_release( p_aout );
+        return 0;
+    }
     locale_t loc = newlocale (LC_NUMERIC_MASK, "C", NULL);
     locale_t oldloc = uselocale (loc);
-    while( bandid >= 0 )
+    int i = 0;
+    char *str;
+    lua_newtable( L );
+    while( bands >= 0 )
     {
         level = strtof( psz_bands, &psz_bands);
-        bandid--;
+        bands--;
+        asprintf( &str , "%f" , level );
+        lua_pushstring( L, str );
+        free(str);
+        asprintf( &str , "band_%d", i++ );
+        lua_setfield( L , -2 , str );
+        free(str);
     }
     free( psz_bands_origin );
     if (loc != (locale_t)0)
@@ -167,15 +184,8 @@ static int vlclua_equalizer_get( lua_State *L )
         uselocale (oldloc);
         freelocale (loc);
     }
-
     vlc_object_release( p_aout );
-    if( bandid == -1 )
-    {
-        lua_pushnumber( L, level );
-        return 1;
-    }
-    else
-        return 0;
+    return 1;
 }
 
 
@@ -184,6 +194,9 @@ static int vlclua_equalizer_get( lua_State *L )
 *****************************************************************************/
 static int vlclua_equalizer_set( lua_State *L )
 {
+    int bandid = luaL_checknumber( L, 1 );
+    if ( bandid < 0 || bandid > 9)
+        return 0;
     input_thread_t *p_input = vlclua_get_input_internal( L );
     if( !p_input )
         return 0;
@@ -203,7 +216,6 @@ static int vlclua_equalizer_set( lua_State *L )
     }
     free( psz_af );
 
-    int bandid = luaL_checknumber( L, 1 );
     float level = luaL_checknumber( L, 2 );
     char *bands = var_GetString( p_aout, "equalizer-bands" );
     char newstr[7];
@@ -227,12 +239,39 @@ static int vlclua_equalizer_set( lua_State *L )
     return 1;
 }
 
-
+/****************************************************************************
+* Enable/disable Equalizer
+*****************************************************************************/
+static int vlclua_equalizer_enable ( lua_State *L )
+{
+    playlist_t *p_playlist = vlclua_get_playlist_internal( L );
+    bool state = luaL_checkboolean ( L , 1 );
+    aout_EnableFilter( p_playlist, "equalizer", state );
+    return 0;
+}
+/*****************************************************************************
+* Get preset names
+*****************************************************************************/
+static int vlclua_equalizer_get_presets( lua_State *L )
+{
+    lua_newtable( L );
+    char *str;
+    for( int i = 0 ; i < NB_PRESETS ; i++ )
+    {
+        lua_pushstring( L, preset_list_text[i] );
+        asprintf( &str , "id_%d",i );
+        lua_setfield( L , -2 , str );
+        free(str);
+    }
+    return 1;
+}
 static const luaL_Reg vlclua_equalizer_reg[] = {
     { "preampget", vlclua_preamp_get },
     { "preampset", vlclua_preamp_set },
     { "equalizerget", vlclua_equalizer_get },
     { "equalizerset", vlclua_equalizer_set },
+    { "enable", vlclua_equalizer_enable },
+    {"presets",vlclua_equalizer_get_presets },
     { NULL, NULL }
 };
 

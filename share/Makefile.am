@@ -333,7 +333,6 @@ DIST_http_lua = \
 	lua/http/requests/playlist.xml \
 	lua/http/requests/README.txt \
 	lua/http/requests/playlist_jstree.xml \
-	lua/http/requests/equalizer.xml \
 	lua/http/requests/browse.xml \
 	lua/http/requests/vlm_cmd.xml \
 	lua/http/requests/status.xml \
