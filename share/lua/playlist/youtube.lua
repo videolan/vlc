@@ -76,6 +76,9 @@ function parse()
                 description = vlc.strings.resolve_xml_special_chars( description )
                 description = vlc.strings.resolve_xml_special_chars( description )
             end
+            if string.match( line, "<meta property=\"og:image\"" ) then
+                _,_,arturl = string.find( line, "content=\"(.-)\"" )
+            end
             if string.match( line, " rel=\"author\"" ) then
                 _,_,artist = string.find( line, "href=\"/user/([^\"]*)\"" )
             end
@@ -102,8 +105,10 @@ function parse()
             end
         end
 
-        video_id = get_url_param( vlc.path, "v" )
-        arturl = get_arturl( vlc.path, video_id )
+        if not arturl then
+            video_id = get_url_param( vlc.path, "v" )
+            arturl = get_arturl( vlc.path, video_id )
+        end
 
         if not path then
             vlc.msg.err( "Couldn't extract youtube video URL, please check for updates to this script" )
