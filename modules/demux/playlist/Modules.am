@@ -17,7 +17,6 @@ SOURCES_playlist = \
 	shoutcast.c \
 	wpl.c \
 	xspf.c \
-	xspf.h \
 	zpl.c \
 	$(NULL)
 
