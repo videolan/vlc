@@ -65,10 +65,8 @@ void Close_xspf(vlc_object_t *p_this)
     demux_t *p_demux = (demux_t *)p_this;
     demux_sys_t *p_sys = p_demux->p_sys;
     for (int i = 0; i < p_sys->i_tracklist_entries; i++)
-    {
         if (p_sys->pp_tracklist[i])
             vlc_gc_decref(p_sys->pp_tracklist[i]);
-    }
     free(p_sys->pp_tracklist);
     free(p_sys->psz_base);
     free(p_sys);
@@ -323,7 +321,6 @@ static bool parse_track_node COMPLEX_INTERFACE
     const xml_elem_hnd_t *p_handler = NULL;
     demux_sys_t *p_sys = p_demux->p_sys;
     int i_node;
-    bool b_ret = false;
 
     static const xml_elem_hnd_t track_elements[] =
         { {"location",     SIMPLE_CONTENT,  {NULL} },
@@ -375,8 +372,10 @@ static bool parse_track_node COMPLEX_INTERFACE
             FREE_VALUE();
 
             if (!p_handler->pf_handler.cmplx(p_demux, p_new_node,
-                                             p_xml_reader, p_handler->name))
+                                             p_xml_reader, p_handler->name)) {
+                input_item_node_Delete(p_new_node);
                 return false;
+            }
 
             p_handler = NULL;
         }
@@ -420,6 +419,7 @@ static bool parse_track_node COMPLEX_INTERFACE
                 if (!pp)
                 {
                     vlc_gc_decref(p_new_input);
+                    input_item_node_Delete(p_new_node);
                     return false;
                 }
                 p_sys->pp_tracklist = pp;
@@ -430,10 +430,12 @@ static bool parse_track_node COMPLEX_INTERFACE
             {
                 msg_Err(p_demux, "track ID %d collision", p_sys->i_track_id);
                 vlc_gc_decref(p_new_input);
+                input_item_node_Delete(p_new_node);
                 return false;
             }
 
             p_sys->pp_tracklist[ p_sys->i_track_id ] = p_new_input;
+            input_item_node_Delete(p_new_node);
             return true;
         }
         /* there MUST have been a start tag for that element name */
@@ -489,8 +491,10 @@ static bool parse_track_node COMPLEX_INTERFACE
     msg_Err(p_demux, "unexpected end of xml data");
 
 end:
+
+    input_item_node_Delete(p_new_node);
     free(psz_value);
-    return b_ret;
+    return false;
 }
 
 /**
