@@ -28,7 +28,6 @@
 
 #include <vlc_common.h>
 #include <vlc_demux.h>
-#include <vlc_aout.h>
 #include <vlc_network.h>
 #ifdef HAVE_POLL
 # include <poll.h>
