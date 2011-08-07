@@ -24,13 +24,17 @@ function get_url_param( url, name )
     return res
 end
 
-function get_arturl( path, video_id )
-    if string.match( vlc.path, "iurl=" ) then
-        return vlc.strings( get_url_param( vlc.path, "iurl" ) )
+function get_arturl()
+    -- FIXME: vlc.strings() is not a function, it should probably be
+    -- vlc.strings.decode_uri()
+    --if string.match( vlc.path, "iurl=" ) then
+    --    return vlc.strings( get_url_param( vlc.path, "iurl" ) )
+    --end
+    video_id = get_url_param( vlc.path, "v" )
+    if not video_id then
+        return nil
     end
-    if not arturl then
-        return "http://img.youtube.com/vi/"..video_id.."/default.jpg"
-    end
+    return "http://img.youtube.com/vi/"..video_id.."/default.jpg"
 end
 
 -- Probe function.
@@ -106,8 +110,7 @@ function parse()
         end
 
         if not arturl then
-            video_id = get_url_param( vlc.path, "v" )
-            arturl = get_arturl( vlc.path, video_id )
+            arturl = get_arturl()
         end
 
         if not path then
