@@ -76,8 +76,8 @@ function parse()
                 description = vlc.strings.resolve_xml_special_chars( description )
                 description = vlc.strings.resolve_xml_special_chars( description )
             end
-            if string.match( line, "subscribe_to_user=" ) then
-                _,_,artist = string.find( line, "subscribe_to_user=([^&]*)" )
+            if string.match( line, " rel=\"author\"" ) then
+                _,_,artist = string.find( line, "href=\"/user/([^\"]*)\"" )
             end
             -- JSON parameters, also formerly known as "swfConfig",
             -- "SWF_ARGS", "swfArgs" ...
