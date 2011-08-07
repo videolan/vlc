@@ -641,7 +641,7 @@ static void* OSSThread( void *obj )
             for( ;; )
             {
                 canc = vlc_savecancel ();
-                p_buffer = aout_PacketNext( p_aout );
+                p_buffer = aout_PacketNext( p_aout, next_date );
                 if ( p_buffer )
                     break;
                 vlc_restorecancel (canc);
