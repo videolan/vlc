@@ -794,54 +794,6 @@ int playlist_DeleteItem( playlist_t * p_playlist, playlist_item_t *p_item,
 {
     assert( b_stop );
     return playlist_NodeDelete( p_playlist, p_item, true, false );
-#if 0
-    int i;
-    int i_id = p_item->i_id;
-    PL_ASSERT_LOCKED;
-
-    if( p_item->i_children > -1 )
-    {
-        return playlist_NodeDelete( p_playlist, p_item, true, false );
-    }
-
-    pl_priv(p_playlist)->b_reset_currently_playing = true;
-    var_SetInteger( p_playlist, "playlist-item-deleted", i_id );
-
-    /* Remove the item from the bank */
-    ARRAY_BSEARCH( p_playlist->all_items,->i_id, int, i_id, i );
-    if( i != -1 )
-        ARRAY_REMOVE( p_playlist->all_items, i );
-
-    ARRAY_BSEARCH( p_playlist->items,->i_id, int, i_id, i );
-    if( i != -1 )
-        ARRAY_REMOVE( p_playlist->items, i );
-
-    /* Check if it is the current item */
-    if( get_current_status_item( p_playlist ) == p_item )
-    {
-        /* Stop it if we have to */
-        if( b_stop )
-        {
-            playlist_Control( p_playlist, PLAYLIST_STOP, pl_Locked );
-            msg_Info( p_playlist, "stopping playback" );
-        }
-        /* In any case, this item can't be the next one to be played ! */
-        set_current_status_item( p_playlist, NULL );
-    }
-
-    ARRAY_BSEARCH( p_playlist->current,->i_id, int, i_id, i );
-    if( i != -1 )
-        ARRAY_REMOVE( p_playlist->current, i );
-
-    PL_DEBUG( "deleting item `%s'", p_item->p_input->psz_name );
-
-    /* Remove the item from its parent */
-    playlist_NodeRemoveItem( p_playlist, p_item, p_item->p_parent );
-
-    playlist_ItemRelease( p_item );
-
-    return VLC_SUCCESS;
-#endif
 }
 
 static int RecursiveAddIntoParent (
