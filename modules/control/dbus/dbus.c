@@ -113,7 +113,6 @@ static void watch_toggled   ( DBusWatch *p_watch, void *p_data );
 
 static void wakeup_main_loop( void *p_data );
 
-static int GetPollFds( intf_thread_t *p_intf, struct pollfd *p_fds );
 static int UpdateTimeouts( intf_thread_t *p_intf, mtime_t i_lastrun );
 
 static void ProcessEvents  ( intf_thread_t    *p_intf,
@@ -835,9 +834,10 @@ static void Run          ( intf_thread_t *p_intf )
         vlc_mutex_lock( &p_sys->lock );
 
         int i_watches = vlc_array_count( p_sys->p_watches );
-        struct pollfd *p_fds = calloc( i_watches, sizeof( struct pollfd ) );
+        struct pollfd fds[i_watches];
+        memset(fds, 0, sizeof fds);
 
-        int i_fds = GetPollFds( p_intf, p_fds );
+        int i_fds = GetPollFds( p_intf, fds );
 
         mtime_t i_now = mdate(), i_loop_interval = i_now - i_last_run;
 
@@ -857,7 +857,7 @@ static void Run          ( intf_thread_t *p_intf )
         /* thread cancellation is allowed while the main loop sleeps */
         vlc_restorecancel( canc );
 
-        int i_pollres = poll( p_fds, i_fds, i_next_timeout );
+        int i_pollres = poll( fds, i_fds, i_next_timeout );
         int i_errsv   = errno;
 
         canc = vlc_savecancel();
@@ -867,17 +867,16 @@ static void Run          ( intf_thread_t *p_intf )
         if( -1 == i_pollres )
         { /* XXX: What should we do when poll() fails ? */
             msg_Err( p_intf, "poll() failed: %m" );
-            free( p_fds ); p_fds = NULL;
             vlc_restorecancel( canc );
             continue;
         }
 
         /* Was the main loop woken up manually ? */
-        if( 0 < i_pollres && ( p_fds[0].revents & POLLIN ) )
+        if( 0 < i_pollres && ( fds[0].revents & POLLIN ) )
         {
             char buf;
             msg_Dbg( p_intf, "Removing a byte from the self-pipe" );
-            (void)read( p_fds[0].fd, &buf, 1 );
+            (void)read( fds[0].fd, &buf, 1 );
         }
 
         /* We need to lock the mutex while building lists of events,
@@ -920,9 +919,7 @@ static void Run          ( intf_thread_t *p_intf )
         vlc_mutex_unlock( &p_intf->p_sys->lock );
 
         ProcessEvents( p_intf, p_info, i_events );
-        ProcessWatches( p_intf, p_watches, i_watches, p_fds, i_fds );
-
-        free( p_fds ); p_fds = NULL;
+        ProcessWatches( p_intf, p_watches, i_watches, fds, i_fds );
 
         ProcessTimeouts( p_intf, p_timeouts, i_timeouts );
         DispatchDBusMessages( p_intf );
