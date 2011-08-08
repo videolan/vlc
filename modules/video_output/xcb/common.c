@@ -29,7 +29,8 @@
 
 #include <sys/types.h>
 #ifdef HAVE_SYS_SHM_H
-#include <sys/shm.h>
+# include <sys/shm.h>
+# include <sys/stat.h>
 #endif
 
 #include <xcb/xcb.h>
@@ -196,7 +197,7 @@ int PictureResourceAlloc (vout_display_t *vd, picture_resource_t *res, size_t si
 
 #ifdef HAVE_SYS_SHM_H
     /* Allocate shared memory segment */
-    int id = shmget (IPC_PRIVATE, size, IPC_CREAT | 0700);
+    int id = shmget (IPC_PRIVATE, size, IPC_CREAT | S_IRWXU);
     if (id == -1)
     {
         msg_Err (vd, "shared memory allocation error: %m");
@@ -223,16 +224,33 @@ int PictureResourceAlloc (vout_display_t *vd, picture_resource_t *res, size_t si
         segment = xcb_generate_id (conn);
         ck = xcb_shm_attach_checked (conn, segment, id, 1);
 
-        if (CheckError (vd, conn, "shared memory server-side error", ck))
+        switch (CheckError (vd, conn, "shared memory server-side error", ck))
         {
-            msg_Info (vd, "using buggy X11 server - SSH proxying?");
-            segment = 0;
+            case 0:
+                break;
+
+            case XCB_ACCESS:
+            {
+                struct shmid_ds buf;
+                /* Retry with promiscuous permissions */
+                shmctl (id, IPC_STAT, &buf);
+                buf.shm_perm.mode |= S_IRGRP|S_IROTH;
+                shmctl (id, IPC_SET, &buf);
+                ck = xcb_shm_attach_checked (conn, segment, id, 1);
+                if (CheckError (vd, conn, "same error on retry", ck) == 0)
+                    break;
+                /* fall through */
+            }
+
+            default:
+                msg_Info (vd, "using buggy X11 server - SSH proxying?");
+                segment = 0;
         }
     }
     else
         segment = 0;
 
-    shmctl (id, IPC_RMID, 0);
+    shmctl (id, IPC_RMID, NULL);
     res->p_sys->segment = segment;
     res->p->p_pixels = shm;
 #else
