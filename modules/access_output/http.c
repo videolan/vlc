@@ -100,7 +100,7 @@ vlc_module_end ()
  * Exported prototypes
  *****************************************************************************/
 static const char *const ppsz_sout_options[] = {
-    "user", "pwd", "mime", "cert", "key", "ca", "crl", NULL
+    "user", "pwd", "mime", NULL
 };
 
 static ssize_t Write( sout_access_out_t *, block_t * );
