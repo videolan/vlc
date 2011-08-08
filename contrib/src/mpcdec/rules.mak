@@ -39,7 +39,7 @@ endif
 	touch $@
 
 .mpcdec: musepack toolchain.cmake
-	cd $< && $(CMAKE) -DSHARED=OFF .
+	cd $< && $(HOSTVARS_PIC) $(CMAKE) -DSHARED=OFF .
 	cd $< && $(MAKE) install
 	mkdir -p -- "$(PREFIX)/lib"
 	cd $< && cp libmpcdec/libmpcdec_static.a "$(PREFIX)/lib/libmpcdec.a"

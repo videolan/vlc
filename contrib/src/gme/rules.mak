@@ -16,6 +16,6 @@ game-music-emu: game-music-emu-$(GME_VERSION).tar.bz2 .sum-gme
 	$(MOVE)
 
 .gme: game-music-emu toolchain.cmake
-	cd $< && $(CMAKE) .
+	cd $< && $(HOSTVARS_PIC) $(CMAKE) .
 	cd $< && $(MAKE) install
 	touch $@

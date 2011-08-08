@@ -20,7 +20,7 @@ endif
 	$(MOVE)
 
 .taglib: taglib toolchain.cmake
-	cd $< && $(HOSTVARS) $(CMAKE) \
+	cd $< && $(HOSTVARS_PIC) $(CMAKE) \
 		-DENABLE_STATIC:BOOL=ON \
 		-DWITH_ASF:BOOL=ON \
 		-DWITH_MP4:BOOL=ON .
