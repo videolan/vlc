@@ -468,6 +468,19 @@ void aout_InputCheckAndRestart( audio_output_t * p_aout, aout_input_t * p_input 
 
     p_input->b_restart = false;
 }
+
+/**
+ * This function will safely mark aout input to be restarted as soon as
+ * possible to take configuration changes into account
+ */
+void aout_InputRequestRestart( audio_output_t *p_aout )
+{
+    aout_lock( p_aout );
+    if( aout_owner(p_aout)->input != NULL )
+        aout_owner(p_aout)->input->b_restart = true;
+    aout_unlock( p_aout );
+}
+
 /*****************************************************************************
  * aout_InputPlay : play a buffer
  *****************************************************************************
@@ -806,7 +819,7 @@ static int VisualizationCallback (vlc_object_t *obj, char const *var,
     }
 
     /* That sucks FIXME: use "input" instead of cast */
-    AoutInputsMarkToRestart ((audio_output_t *)obj);
+    aout_InputRequestRestart ((audio_output_t *)obj);
 
     (void) var; (void) oldval;
     return VLC_SUCCESS;
@@ -832,7 +845,7 @@ static int EqualizerCallback (vlc_object_t *obj, char const *cmd,
 
     /* That sucks */
     if (ret)
-        AoutInputsMarkToRestart ((audio_output_t *)obj);
+        aout_InputRequestRestart ((audio_output_t *)obj);
     return VLC_SUCCESS;
 }
 

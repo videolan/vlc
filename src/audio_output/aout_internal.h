@@ -137,6 +137,7 @@ int aout_InputDelete( audio_output_t * p_aout, aout_input_t * p_input );
 block_t *aout_InputPlay( audio_output_t *p_aout, aout_input_t *p_input,
                          block_t *p_buffer, int i_input_rate, date_t * );
 void aout_InputCheckAndRestart( audio_output_t * p_aout, aout_input_t * p_input );
+void aout_InputRequestRestart( audio_output_t *p_aout );
 
 /* From filters.c : */
 int aout_FiltersCreatePipeline( vlc_object_t *, filter_t **, int *,
@@ -242,18 +243,5 @@ static inline void aout_unlock_volume( audio_output_t *p_aout )
 
 #define aout_assert_locked( aout ) \
         vlc_assert_locked( &aout_owner(aout)->lock )
-
-/* Helpers */
-
-/**
- * This function will safely mark aout input to be restarted as soon as
- * possible to take configuration changes into account */
-static inline void AoutInputsMarkToRestart( audio_output_t *p_aout )
-{
-    aout_lock( p_aout );
-    if( aout_owner(p_aout)->input != NULL )
-        aout_owner(p_aout)->input->b_restart = true;
-    aout_unlock( p_aout );
-}
 
 #endif /* !LIBVLC_AOUT_INTERNAL_H */
