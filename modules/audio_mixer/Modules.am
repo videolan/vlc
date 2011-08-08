@@ -1,8 +1,6 @@
-SOURCES_trivial_mixer = trivial.c
 SOURCES_float32_mixer = float32.c
 SOURCES_fixed32_mixer = fixed32.c
 
 libvlc_LTLIBRARIES += \
 	libfloat32_mixer_plugin.la \
-	libfixed32_mixer_plugin.la \
-	libtrivial_mixer_plugin.la
+	libfixed32_mixer_plugin.la
