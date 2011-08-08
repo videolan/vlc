@@ -51,7 +51,6 @@ audio_mixer_t *aout_MixerNew(vlc_object_t *obj, vlc_fourcc_t format)
     mixer->module = module_need(mixer, "audio mixer", NULL, false);
     if (mixer->module == NULL)
     {
-        msg_Err(mixer, "no suitable audio mixer");
         vlc_object_release(mixer);
         mixer = NULL;
     }
@@ -75,5 +74,6 @@ void aout_MixerDelete(audio_mixer_t *mixer)
  */
 void aout_MixerRun(audio_mixer_t *mixer, block_t *block, float amp)
 {
-    mixer->mix(mixer, block, amp);
+    if (mixer != NULL)
+        mixer->mix(mixer, block, amp);
 }

@@ -103,11 +103,6 @@ int aout_DecNew( audio_output_t *p_aout,
 
     assert (owner->volume.mixer == NULL);
     owner->volume.mixer = aout_MixerNew (p_aout, owner->mixer_format.i_format);
-    if (owner->volume.mixer == NULL)
-    {
-        aout_OutputDelete( p_aout );
-        goto error;
-    }
 
     date_Init (&owner->sync.date, owner->mixer_format.i_rate, 1);
     date_Set (&owner->sync.date, VLC_TS_INVALID);
@@ -168,17 +163,11 @@ static void aout_CheckRestart (audio_output_t *aout)
 
     if (aout_OutputNew (aout, &input->input))
     {
-error:
         input->b_error = true;
         return; /* we are officially screwed */
     }
 
     owner->volume.mixer = aout_MixerNew (aout, owner->mixer_format.i_format);
-    if (owner->volume.mixer == NULL)
-    {
-        aout_OutputDelete (aout);
-        goto error;
-    }
 
     if (aout_InputNew (aout, input, &input->request_vout))
         assert (input->b_error);
