@@ -1,6 +1,6 @@
 # modplug
 
-MODPLUG_VERSION := 0.8.8.3
+MODPLUG_VERSION := 0.8.8.4
 MODPLUG_URL := $(SF)/modplug-xmms/libmodplug-$(MODPLUG_VERSION).tar.gz
 
 PKGS += modplug
