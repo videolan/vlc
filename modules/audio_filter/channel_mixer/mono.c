@@ -106,7 +106,7 @@ static const uint32_t pi_channels_out[] =
  *****************************************************************************/
 vlc_module_begin ()
     set_description( N_("Audio filter for stereo to mono conversion") )
-    set_capability( "audio filter", 2 )
+    set_capability( "audio filter", 0 )
     set_category( CAT_AUDIO )
     set_subcategory( SUBCAT_AUDIO_AFILTER )
     set_callbacks( OpenFilter, CloseFilter )
