@@ -37,13 +37,44 @@
 #include "dbus_root.h"
 #include "dbus_common.h"
 
+static const char* ppsz_supported_uri_schemes[] = {
+    "file", "http", "https", "rtsp", "realrtsp", "pnm", "ftp", "mtp", "smb",
+    "mms", "mmsu", "mmst", "mmsh", "unsv", "itpc", "icyx", "rtmp", "rtp",
+    "dccp", "dvd", "vcd", "vcdx"
+};
+
+static const char* ppsz_supported_mime_types[] = {
+    "audio/mpeg", "audio/x-mpeg",
+    "video/mpeg", "video/x-mpeg",
+    "video/mpeg-system", "video/x-mpeg-system",
+    "video/mp4",
+    "audio/mp4",
+    "video/x-msvideo",
+    "video/quicktime",
+    "application/ogg", "application/x-ogg",
+    "video/x-ms-asf",  "video/x-ms-asf-plugin",
+    "application/x-mplayer2",
+    "video/x-ms-wmv",
+    "video/x-google-vlc-plugin",
+    "audio/wav", "audio/x-wav",
+    "audio/3gpp",
+    "video/3gpp",
+    "audio/3gpp2",
+    "video/3gpp2",
+    "video/divx",
+    "video/flv", "video/x-flv",
+    "video/x-matroska",
+    "audio/x-matroska",
+    "application/xspf+xml"
+};
+
 DBUS_METHOD( Identity )
 {
     VLC_UNUSED(p_this);
     REPLY_INIT;
     OUT_ARGUMENTS;
 
-    char *psz_identity = VLC_IDENTITY;
+    const char *psz_identity = _("VLC media player");
 
     DBusMessageIter v;
     dbus_message_iter_open_container( &args, DBUS_TYPE_VARIANT, "s", &v );
