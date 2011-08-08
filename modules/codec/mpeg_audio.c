@@ -633,7 +633,7 @@ static int SyncInfo( uint32_t i_header, unsigned int * pi_channels,
     };
 
     int i_version, i_mode, i_emphasis;
-    bool b_padding, b_mpeg_2_5, b_crc;
+    bool b_padding, b_mpeg_2_5;
     int i_frame_size = 0;
     int i_bitrate_index, i_samplerate_index;
     int i_max_bit_rate;
@@ -641,7 +641,7 @@ static int SyncInfo( uint32_t i_header, unsigned int * pi_channels,
     b_mpeg_2_5  = 1 - ((i_header & 0x100000) >> 20);
     i_version   = 1 - ((i_header & 0x80000) >> 19);
     *pi_layer   = 4 - ((i_header & 0x60000) >> 17);
-    b_crc = !((i_header >> 16) & 0x01);
+    //bool b_crc = !((i_header >> 16) & 0x01);
     i_bitrate_index = (i_header & 0xf000) >> 12;
     i_samplerate_index = (i_header & 0xc00) >> 10;
     b_padding   = (i_header & 0x200) >> 9;
