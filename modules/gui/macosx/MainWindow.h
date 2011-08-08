@@ -29,7 +29,11 @@
 #import <vlc_input.h>
 #import "misc.h"
 
-@interface VLCMainWindow : NSWindow <PXSourceListDataSource, PXSourceListDelegate, NSWindowDelegate> {
+#ifndef MAC_OS_X_VERSION_10_6
+@protocol NSAnimationDelegate <NSObject> @end
+#endif
+
+@interface VLCMainWindow : NSWindow <PXSourceListDataSource, PXSourceListDelegate, NSWindowDelegate, NSAnimationDelegate> {
     IBOutlet id o_play_btn;
     IBOutlet id o_bwd_btn;
     IBOutlet id o_fwd_btn;
@@ -90,6 +94,19 @@
     BOOL just_triggered_next;
     BOOL just_triggered_previous;
     NSMutableArray *o_sidebaritems;
+
+    VLCWindow       * o_fullscreen_window;
+    NSViewAnimation * o_fullscreen_anim1;
+    NSViewAnimation * o_fullscreen_anim2;
+    NSViewAnimation * o_makekey_anim;
+    NSView          * o_temp_view;
+    /* set to yes if we are fullscreen and all animations are over */
+    BOOL              b_fullscreen;
+    BOOL              b_window_is_invisible;
+    NSRecursiveLock * o_animation_lock;
+    NSSize nativeVideoSize;
+
+    NSInteger i_originalLevel;
 }
 + (VLCMainWindow *)sharedInstance;
 
@@ -106,8 +123,6 @@
 - (IBAction)fullscreen:(id)sender;
 - (IBAction)dropzoneButtonAction:(id)sender;
 
-- (id)videoView;
-- (void)setVideoplayEnabled;
 - (void)showDropZone;
 - (void)hideDropZone;
 - (void)updateTimeSlider;
@@ -122,6 +137,22 @@
 - (void)setShuffle;
 
 - (void)drawFancyGradientEffectForTimeSlider;
+
+- (id)videoView;
+- (void)setVideoplayEnabled;
+- (void)resizeWindow;
+- (void)setNativeVideoSize:(NSSize)size;
+
+/* fullscreen handling */
+- (BOOL)isFullscreen;
+- (void)lockFullscreenAnimation;
+- (void)unlockFullscreenAnimation;
+- (void)enterFullscreen;
+- (void)leaveFullscreen;
+- (void)leaveFullscreenAndFadeOut: (BOOL)fadeout;
+- (void)hasEndedFullscreen;
+- (void)hasBecomeFullscreen;
+- (void)setFrameOnMainThread:(NSData*)packedargs;
 
 @end
 

@@ -108,7 +108,7 @@ struct intf_sys_t
     BOOL nib_bookmarks_loaded;   /* Bookmarks nibfile */
     BOOL b_active_videoplayback;
 
-    IBOutlet id o_mainwindow;            /* VLCMainWindow */
+    id o_mainwindow;            /* VLCMainWindow */
 
     IBOutlet VLCControls * o_controls;     /* VLCControls    */
     IBOutlet VLCPlaylist * o_playlist;     /* VLCPlaylist    */
@@ -159,6 +159,7 @@ struct intf_sys_t
 - (id)wizard;
 - (id)embeddedList;
 - (id)getVideoViewAtPositionX: (int *)pi_x Y: (int *)pi_y withWidth: (unsigned int*)pi_width andHeight: (unsigned int*)pi_height;
+- (void)setNativeVideoSize:(NSSize)size;
 - (id)coreDialogProvider;
 - (id)eyeTVController;
 - (id)appleRemoteController;
@@ -172,6 +173,7 @@ struct intf_sys_t
 - (NSString *)VLCKeyToString:(NSString *)theString;
 - (unsigned int)VLCModifiersToCocoa:(NSString *)theString;
 - (void)updateCurrentlyUsedHotkeys;
+- (void)fullscreenChanged;
 - (void)PlaylistItemChanged;
 - (void)playbackStatusUpdated;
 - (void)playbackModeUpdated;

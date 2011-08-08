@@ -132,7 +132,6 @@ int WindowOpen( vout_window_t *p_wnd, const vout_window_cfg_t *cfg )
         return VLC_EGENERIC;
     }
 
-    msg_Dbg( p_wnd, "looking for video view" );
     int i_x = cfg->x;
     int i_y = cfg->y;
     unsigned i_width = cfg->width;
@@ -145,6 +144,7 @@ int WindowOpen( vout_window_t *p_wnd, const vout_window_cfg_t *cfg )
         return VLC_EGENERIC;
     }
 
+    [[VLCMain sharedInstance] setNativeVideoSize:NSMakeSize( cfg->width, cfg->height )];
     [[VLCMain sharedInstance] setActiveVideoPlayback: YES];
     p_wnd->control = WindowControl;
     p_wnd->sys = (vout_window_sys_t *)VLCIntf;
@@ -158,7 +158,12 @@ static int WindowControl( vout_window_t *p_wnd, int i_query, va_list args )
     if( i_query == VOUT_WINDOW_SET_STATE )
         NSLog( @"WindowControl:VOUT_WINDOW_SET_STATE" );
     else if( i_query == VOUT_WINDOW_SET_SIZE )
+    {
         NSLog( @"WindowControl:VOUT_WINDOW_SET_SIZE" );
+        unsigned int i_width  = va_arg( args, unsigned int );
+        unsigned int i_height = va_arg( args, unsigned int );
+        [[VLCMain sharedInstance] setNativeVideoSize:NSMakeSize( i_width, i_height )];
+    }
     else if( i_query == VOUT_WINDOW_SET_FULLSCREEN )
         NSLog( @"WindowControl:VOUT_WINDOW_SET_FULLSCREEN" );
     else
@@ -340,7 +345,7 @@ static int VolumeUpdated( vlc_object_t *p_this, const char *psz_var,
                          vlc_value_t oldval, vlc_value_t new_val, void *param )
 {
     NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
-    [[VLCMain sharedInstance] updateVolume];
+    [[VLCMain sharedInstance] performSelectorOnMainThread:@selector(updateVolume) withObject:nil waitUntilDone:NO];
 
     [o_pool release];
     return VLC_SUCCESS;
@@ -357,12 +362,7 @@ static int ShowController( vlc_object_t *p_this, const char *psz_variable,
     intf_thread_t * p_intf = VLCIntf;
     if( p_intf && p_intf->p_sys )
     {
-        NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
-        if( [[[VLCCoreInteraction sharedInstance] voutView] isFullscreen] && config_GetInt( VLCIntf, "macosx-fspanel" ) )
-            [[[[VLCMain sharedInstance] controls] fspanel] fadeIn];
-        else
-            [[VLCMainWindow sharedInstance] makeKeyAndOrderFront: nil];
-        [o_pool release];
+        NSLog( @"fixme! we should implement ShowController here" );
     }
     return VLC_SUCCESS;
 }
@@ -375,8 +375,12 @@ static int FullscreenChanged( vlc_object_t *p_this, const char *psz_variable,
                      vlc_value_t old_val, vlc_value_t new_val, void *param )
 {
     intf_thread_t * p_intf = VLCIntf;
-    if( p_intf && p_intf->p_sys )
-        NSLog( @"we should update fullscreen state" ); //FIXME
+    if (p_intf)
+    {
+        NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
+        [[VLCMain sharedInstance] fullscreenChanged];
+        [o_pool release];
+    }
     return VLC_SUCCESS;
 }
 
@@ -1229,6 +1233,14 @@ unsigned int CocoaKeyToVLC( unichar i_key )
 
 #pragma mark -
 #pragma mark Interface updaters
+- (void)fullscreenChanged
+{
+    if(! [o_mainwindow isFullscreen] )
+        [o_mainwindow performSelectorOnMainThread:@selector(enterFullscreen) withObject:nil waitUntilDone:NO];
+    else
+        [o_mainwindow performSelectorOnMainThread:@selector(leaveFullscreen) withObject:nil waitUntilDone:NO];
+}
+
 - (void)PlaylistItemChanged
 {
     input_thread_t * p_input;
@@ -1240,7 +1252,8 @@ unsigned int CocoaKeyToVLC( unichar i_key )
         [o_mainmenu setRateControlsEnabled: YES];
         vlc_object_release( p_input );
     }
-    else[o_mainmenu setRateControlsEnabled: NO];
+    else
+        [o_mainmenu setRateControlsEnabled: NO];
 
     [o_playlist updateRowSelection];
     [o_mainwindow updateWindow];
@@ -1439,6 +1452,11 @@ unsigned int CocoaKeyToVLC( unichar i_key )
     pi_height = (unsigned int*)i_height;
     msg_Dbg( VLCIntf, "returning videoview with x=%i, y=%i, width=%i, height=%i", i_x, i_y, i_width, i_height );
     return videoView;
+}
+
+- (void)setNativeVideoSize:(NSSize)size
+{
+    [o_mainwindow setNativeVideoSize:size];
 }
 
 - (id)embeddedList
@@ -1748,10 +1766,8 @@ unsigned int CocoaKeyToVLC( unichar i_key )
 
 - (IBAction)saveDebugLog:(id)sender
 {
-    NSOpenPanel * saveFolderPanel = [[NSSavePanel alloc] init];
+    NSSavePanel * saveFolderPanel = [[NSSavePanel alloc] init];
 
-    [saveFolderPanel setCanChooseDirectories: NO];
-    [saveFolderPanel setCanChooseFiles: YES];
     [saveFolderPanel setCanSelectHiddenExtension: NO];
     [saveFolderPanel setCanCreateDirectories: YES];
     [saveFolderPanel setAllowedFileTypes: [NSArray arrayWithObject:@"rtfd"]];

@@ -39,6 +39,7 @@
 #import "playlistinfo.h"
 #import "vout.h"
 #import "CoreInteraction.h"
+#import "MainWindow.h"
 
 @implementation VLCMainMenu
 static VLCMainMenu *_o_sharedInstance = nil;
@@ -558,6 +559,68 @@ static VLCMainMenu *_o_sharedInstance = nil;
         i = 1;
     [o_mi_rate_fld setStringValue: [NSString stringWithFormat:@"%ix", i]];
     [o_mi_rate_sld setIntValue: i];
+}
+
+#pragma mark -
+#pragma video menu
+- (IBAction)toggleFullscreen:(id)sender
+{
+    [[VLCCoreInteraction sharedInstance] toggleFullscreen];
+}
+
+- (IBAction)resizeVideoWindow:(id)sender
+{
+    input_thread_t *p_input = pl_CurrentInput( VLCIntf );
+    if (p_input)
+    {
+        vout_thread_t *p_vout = getVout();
+        if (p_vout)
+        {
+            if (sender == o_mi_half_window)
+                var_SetFloat( p_vout, "zoom", 0.5 );
+            else if (sender == o_mi_normal_window)
+                var_SetFloat( p_vout, "zoom", 1.0 );
+            else if (sender == o_mi_double_window)
+                var_SetFloat( p_vout, "zoom", 2.0 );
+            else
+            {
+                if (![[VLCMainWindow sharedInstance] isZoomed])
+                    [[VLCMainWindow sharedInstance] performZoom: sender];
+            }
+            vlc_object_release( p_vout );
+        }
+        vlc_object_release( p_input );
+    }
+}
+
+- (IBAction)floatOnTop:(id)sender
+{
+    input_thread_t *p_input = pl_CurrentInput( VLCIntf );
+    if (p_input)
+    {
+        vout_thread_t *p_vout = getVout();
+        if (p_vout)
+        {
+            var_ToggleBool( p_vout, "video-on-top" );
+            vlc_object_release( p_vout );
+        }
+        vlc_object_release( p_input );
+    }
+}
+
+- (IBAction)createVideoSnapshot:(id)sender
+{
+    input_thread_t *p_input = pl_CurrentInput( VLCIntf );
+    if (p_input)
+    {
+        vout_thread_t *p_vout = getVout();
+        if (p_vout)
+        {
+            var_TriggerCallback( p_vout, "video-snapshot" );
+            vlc_object_release( p_vout );
+        }
+        vlc_object_release( p_input );
+    }
 }
 
 #pragma mark -
@@ -1132,9 +1195,6 @@ static VLCMainMenu *_o_sharedInstance = nil;
             [o_title isEqualToString: _NS("Fullscreen")] ||
             [o_title isEqualToString: _NS("Float on Top")] )
     {
-        id o_window;
-        NSArray *o_windows = [NSApp orderedWindows];
-        NSEnumerator *o_enumerator = [o_windows objectEnumerator];
         bEnabled = FALSE;
 
         if( p_input != NULL )
@@ -1148,16 +1208,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
                     [o_mi setState: val.b_bool ?  NSOnState : NSOffState];
                 }
 
-                while( (o_window = [o_enumerator nextObject]))
-                {
-                    if( [[o_window className] isEqualToString: @"VLCVoutWindow"] ||
-                       [[[VLCMain sharedInstance] embeddedList]
-                        windowContainsEmbedded: o_window])
-                    {
-                        bEnabled = TRUE;
-                        break;
-                    }
-                }
+                bEnabled = TRUE;
 
                 vlc_object_release( (vlc_object_t *)p_vout );
             }

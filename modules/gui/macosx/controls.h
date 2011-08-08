@@ -63,9 +63,6 @@
 - (IBAction)volumeSliderUpdated:(id)sender;
 
 - (IBAction)showPosition: (id)sender;
-- (IBAction)toogleFullscreen:(id)sender;
-- (BOOL)isFullscreen;
-- (IBAction)windowAction:(id)sender;
 
 - (IBAction)telxTransparent:(id)sender;
 - (IBAction)telxNavLink:(id)sender;

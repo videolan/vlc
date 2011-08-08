@@ -186,52 +186,6 @@
     return NO;
 }
 
-- (IBAction)windowAction:(id)sender
-{
-    NSString *o_title = [sender title];
-    input_thread_t * p_input = pl_CurrentInput( VLCIntf );
-
-    if( p_input != NULL )
-    {
-        vout_thread_t *p_vout = input_GetVout( p_input );
-        if( p_vout != NULL )
-        {
-            id o_vout_view = [[VLCCoreInteraction sharedInstance] voutView];
-            if( o_vout_view )
-            {
-                if( [o_title isEqualToString: _NS("Half Size") ] )
-                    [o_vout_view scaleWindowWithFactor: 0.5 animate: YES];
-                else if( [o_title isEqualToString: _NS("Normal Size") ] )
-                    [o_vout_view scaleWindowWithFactor: 1.0 animate: YES];
-                else if( [o_title isEqualToString: _NS("Double Size") ] )
-                    [o_vout_view scaleWindowWithFactor: 2.0 animate: YES];
-                else if( [o_title isEqualToString: _NS("Float on Top") ] )
-                    [o_vout_view toggleFloatOnTop];
-                else if( [o_title isEqualToString: _NS("Fit to Screen") ] )
-                {
-                    id o_window = [o_vout_view voutWindow];
-                    if( ![o_window isZoomed] )
-                        [o_window performZoom:self];
-                }
-                else if( [o_title isEqualToString: _NS("Snapshot") ] )
-                {
-                    [o_vout_view snapshot];
-                }
-                else
-                {
-                    [[VLCCoreInteraction sharedInstance] toggleFullscreen];
-                }
-            }
-            vlc_object_release( (vlc_object_t *)p_vout );
-        }
-        else
-        {
-            [[VLCCoreInteraction sharedInstance] toggleFullscreen];
-        }
-        vlc_object_release( p_input );
-    }
-}
-
 - (IBAction)telxTransparent:(id)sender
 {
     vlc_object_t *p_vbi;

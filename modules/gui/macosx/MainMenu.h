@@ -209,6 +209,11 @@
 - (IBAction)setPlaybackRate:(id)sender;
 - (void)updatePlaybackRate;
 
+- (IBAction)toggleFullscreen:(id)sender;
+- (IBAction)resizeVideoWindow:(id)sender;
+- (IBAction)floatOnTop:(id)sender;
+- (IBAction)createVideoSnapshot:(id)sender;
+
 - (IBAction)showWizard:(id)sender;
 - (IBAction)showVideoEffects:(id)sender;
 - (IBAction)showAudioEffects:(id)sender;
