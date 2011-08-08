@@ -1,0 +1,141 @@
+diff -Naur goom-origin/src/convolve_fx.c goom/src/convolve_fx.c
+--- goom-origin/src/convolve_fx.c	2005-02-07 14:46:42.000000000 +0100
++++ goom/src/convolve_fx.c	2009-03-23 11:16:13.000000000 +0100
+@@ -107,7 +107,9 @@
+ }
+ 
+ static void convolve_free(VisualFX *_this) {
+-  free (_this->fx_data);
++  ConvData *data = _this->fx_data;
++  free (data->params.params);
++  free (data);
+ }
+ 
+ static void create_output_with_brightness(VisualFX *_this, Pixel *src, Pixel *dest,
+diff -Naur goom-origin/src/filters.c goom/src/filters.c
+--- goom-origin/src/filters.c	2005-02-07 14:46:41.000000000 +0100
++++ goom/src/filters.c	2009-03-23 10:46:34.000000000 +0100
+@@ -731,6 +731,12 @@
+ 
+ static void zoomFilterVisualFXWrapper_free (struct _VISUAL_FX *_this)
+ {
++    ZoomFilterFXWrapperData *data = (ZoomFilterFXWrapperData*)_this->fx_data;
++    if (data->brutS) free (data->freebrutS);
++    if (data->brutD) free (data->freebrutD);
++    if (data->brutT) free (data->freebrutT);
++    free (data->firedec);
++    free (data->params.params);
+     free(_this->fx_data);
+ }
+ 
+diff -Naur goom-origin/src/flying_stars_fx.c goom/src/flying_stars_fx.c
+--- goom-origin/src/flying_stars_fx.c	2005-02-07 14:46:41.000000000 +0100
++++ goom/src/flying_stars_fx.c	2009-03-23 11:18:57.000000000 +0100
+@@ -129,7 +129,10 @@
+ }
+ 
+ static void fs_free(VisualFX *_this) {
+-	free (_this->fx_data);
++        FSData *data = (FSData*)_this->fx_data;
++        free (data->stars);
++        free (data->params.params);
++	free (data);
+ }
+ 
+ 
+diff -Naur goom-origin/src/gfontlib.c goom/src/gfontlib.c
+--- goom-origin/src/gfontlib.c	2005-02-07 14:46:41.000000000 +0100
++++ goom/src/gfontlib.c	2009-03-23 09:06:27.000000000 +0100
+@@ -126,6 +126,8 @@
+         small_font_width [32] = font_width [32]/2;
+         font_chars [32] = 0;
+         small_font_chars [32] = 0;
++        free( gfont );
++        free( font_pos );
+ }
+ 
+ void    goom_draw_text (Pixel * buf,int resolx,int resoly,
+diff -Naur goom-origin/src/goom_core.c goom/src/goom_core.c
+--- goom-origin/src/goom_core.c	2005-02-07 14:46:41.000000000 +0100
++++ goom/src/goom_core.c	2009-03-23 11:21:11.000000000 +0100
+@@ -765,6 +765,15 @@
+     goomInfo->star_fx.free(&goomInfo->star_fx);
+     goomInfo->tentacles_fx.free(&goomInfo->tentacles_fx);
+     goomInfo->zoomFilter_fx.free(&goomInfo->zoomFilter_fx);
++
++    // Release info visual
++    free (goomInfo->params);
++    free (goomInfo->sound.params.params);
++
++    // Release PluginInfo
++    free (goomInfo->visuals);
++    gsl_free (goomInfo->scanner);
++    gsl_free (goomInfo->main_scanner);
+     
+     free(goomInfo);
+ }
+diff -Naur goom-origin/src/goomsl.c goom/src/goomsl.c
+--- goom-origin/src/goomsl.c	2005-02-07 14:46:41.000000000 +0100
++++ goom/src/goomsl.c	2009-03-23 11:07:25.000000000 +0100
+@@ -90,6 +90,7 @@
+ 
+ void iflow_free(InstructionFlow *_this)
+ { /* {{{ */
++  free(_this->instr);
+   goom_hash_free(_this->labels);
+   free(_this); /*TODO: finir cette fonction */
+ } /* }}} */
+@@ -1422,8 +1423,12 @@
+ void gsl_free(GoomSL *gss)
+ { /* {{{ */
+   iflow_free(gss->iflow);
+-  free(gss->vars);
+-  free(gss->functions);
++  goom_hash_free(gss->vars);
++  goom_hash_free(gss->functions);
++  goom_hash_free(gss->structIDS);
++  free(gss->gsl_struct);
++  goom_heap_delete(gss->data_heap);
++  free(gss->ptrArray);
+   free(gss);
+ } /* }}} */
+ 
+diff -Naur goom-origin/src/lines.c goom/src/lines.c
+--- goom-origin/src/lines.c	2005-02-07 14:46:41.000000000 +0100
++++ goom/src/lines.c	2009-03-23 10:28:26.000000000 +0100
+@@ -199,6 +199,7 @@
+ goom_lines_free (GMLine ** l)
+ {
+ 	free ((*l)->points);
++	free ((*l)->points2);
+ 	free (*l);
+ 	l = NULL;
+ }
+diff -Naur goom-origin/src/tentacle3d.c goom/src/tentacle3d.c
+--- goom-origin/src/tentacle3d.c	2005-02-07 14:46:41.000000000 +0100
++++ goom/src/tentacle3d.c	2009-03-23 11:13:38.000000000 +0100
+@@ -90,7 +90,9 @@
+ }
+ 
+ static void tentacle_fx_free(VisualFX *_this) {
+-	tentacle_free((TentacleFXData*)_this->fx_data);
++        TentacleFXData *data = (TentacleFXData*)_this->fx_data;
++        free(data->params.params);
++	tentacle_free(data);
+ 	free(_this->fx_data);
+ }
+ 
+@@ -106,6 +108,13 @@
+ 
+ static void tentacle_free (TentacleFXData *data) {
+ 	/* TODO : un vrai FREE GRID!! */
++        int tmp;
++        for (tmp=0;tmp<nbgrid;tmp++){
++            grid3d *g = data->grille[tmp];
++            free (g->surf.vertex);
++            free (g->surf.svertex);
++            free (g);
++        }
+ 	free (data->vals);
+ }
+ 

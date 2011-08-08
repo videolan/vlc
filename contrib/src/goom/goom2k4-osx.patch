@@ -1,0 +1,11 @@
+--- goom/configure.in.orig	2010-11-01 00:05:11.000000000 +0100
++++ goom/configure.in	2010-11-01 00:05:16.000000000 +0100
+@@ -43,8 +43,6 @@
+ dnl HOST
+ case "$host" in
+ *-apple-darwin*)
+-	MACTARGET="yes"
+-	MACFOLDER="mac"
+ 	AC_SUBST(MACFOLDER)
+   	CCAS='$(CC)'
+   	AC_SUBST(CCAS)

@@ -1,0 +1,18 @@
+--- goom/src/Makefile.am	2005-02-07 14:46:41.000000000 +0100
++++ goom.new/src/Makefile.am	2009-08-19 09:21:57.000000000 +0200
+@@ -16,7 +16,7 @@
+ goom2_libdir = $(libdir)
+ 
+ goom2_library_includedir=$(includedir)/goom
+-goom2_library_include_HEADERS = goom.h goom_plugin_info.h goom_typedefs.h goom_graphic.h goom_config_param.h goom_visual_fx.h goom_filters.h goom_tools.h goomsl.h goomsl_hash.h goomsl_heap.h goom_tools.h goom_config.h
++goom2_library_include_HEADERS = goom.h goom_plugin_info.h goom_typedefs.h goom_graphic.h goom_config_param.h goom_visual_fx.h goom_filters.h goom_tools.h goomsl.h goomsl_hash.h goomsl_heap.h goom_config.h
+ libgoom2_la_LDFLAGS = -export-dynamic -export-symbols-regex "goom.*" 
+ libgoom2_la_SOURCES = \
+ 	goomsl_yacc.y goomsl_lex.l goomsl.c goomsl_hash.c goomsl_heap.c \
+--- goom/Makefile.am.orig	2010-10-31 21:43:45.514184001 +0100
++++ goom/Makefile.am	2010-10-31 21:44:01.382194251 +0100
+@@ -1,3 +1,4 @@
++ACLOCAL_AMFLAGS = -I m4
+ SUBDIRS = src xmms-goom sdl-goom @MACFOLDER@
+ 
+ #.pc file

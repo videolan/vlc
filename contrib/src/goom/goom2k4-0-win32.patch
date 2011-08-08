@@ -1,0 +1,68 @@
+diff -Naur goom-orig/configure.in goom/configure.in
+--- goom-2k4-0-src/configure.in.orig	2005-02-07 14:46:41.000000000 +0100
++++ goom-2k4-0-src/configure.in	2011-08-08 23:18:39.204832964 +0200
+@@ -1,6 +1,5 @@
+ AC_INIT(README)
+ 
+-AM_DISABLE_STATIC
+ AM_INIT_AUTOMAKE(SDL_Goom, 2k4)
+ 
+ ACLOCAL="$ACLOCAL -I m4"
+@@ -76,24 +75,7 @@
+ AM_CONDITIONAL(MACTARGET,test "x$MACTARGET" = "xyes")
+ 
+ 
+-AC_CHECK_HEADER(pthread.h,,AC_MSG_ERROR([*** POSIX thread support not installed - please install first ***]))
+-
+-PTHREAD_LIBS=error
+-AC_CHECK_LIB(pthread, pthread_attr_init, PTHREAD_LIBS="-lpthread")
+-
+-if test "x$PTHREAD_LIBS" = xerror; then
+-    AC_CHECK_LIB(pthreads, pthread_attr_init, PTHREAD_LIBS="-lpthreads")
+-fi
+-
+-if test "x$PTHREAD_LIBS" = xerror; then
+-    AC_CHECK_LIB(c_r, pthread_attr_init, PTHREAD_LIBS="-lc_r")
+-fi
+-
+-if test "x$PTHREAD_LIBS" = xerror; then
+-    AC_CHECK_FUNC(pthread_attr_init, PTHREAD_LIBS="")
+-fi
+-
+-AC_SUBST(PTHREAD_LIBS)
++dnl AC_SUBST(PTHREAD_LIBS)
+ 
+ dnl rm -f mmx_zoom.s
+ dnl 	echo -n checking for nasm...
+diff -Naur goom-orig/src/filters.c goom/src/filters.c
+--- goom-orig/src/filters.c	2005-02-07 14:46:41.000000000 +0100
++++ goom/src/filters.c	2005-08-26 16:31:17.000000000 +0200
+@@ -201,8 +201,8 @@
+     /* Noise */
+     if (data->noisify)
+     {
+-        vx += (((float)random()) / ((float)RAND_MAX) - 0.5f) / 50.0f;
+-        vy += (((float)random()) / ((float)RAND_MAX) - 0.5f) / 50.0f;
++        vx += (((float)rand()) / ((float)RAND_MAX) - 0.5f) / 50.0f;
++        vy += (((float)rand()) / ((float)RAND_MAX) - 0.5f) / 50.0f;
+     }
+     
+     /* Hypercos */
+diff -Naur goom-orig/src/goom_core.c goom/src/goom_core.c
+--- goom-orig/src/goom_core.c	2005-02-07 14:46:41.000000000 +0100
++++ goom/src/goom_core.c	2005-08-26 16:33:01.000000000 +0200
+@@ -40,11 +40,11 @@
+ static void init_buffers(PluginInfo *goomInfo, int buffsize)
+ {
+     goomInfo->pixel = (guint32 *) malloc (buffsize * sizeof (guint32) + 128);
+-    bzero (goomInfo->pixel, buffsize * sizeof (guint32) + 128);
++    memset (goomInfo->pixel, 0, buffsize * sizeof (guint32) + 128);
+     goomInfo->back = (guint32 *) malloc (buffsize * sizeof (guint32) + 128);
+-    bzero (goomInfo->back, buffsize * sizeof (guint32) + 128);
++    memset (goomInfo->back, 0, buffsize * sizeof (guint32) + 128);
+     goomInfo->conv = (Pixel *) malloc (buffsize * sizeof (guint32) + 128);
+-    bzero (goomInfo->conv, buffsize * sizeof (guint32) + 128);
++    memset (goomInfo->conv, 0, buffsize * sizeof (guint32) + 128);
+ 
+     goomInfo->outputBuf = goomInfo->conv;
+     
