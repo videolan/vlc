@@ -887,7 +887,7 @@ void FullscreenControllerWidget::customEvent( QEvent *event )
 {
     bool b_fs;
 
-    switch( event->type() )
+    switch( (int)event->type() )
     {
         /* This is used when the 'i' hotkey is used, to force quick toggle */
         case FullscreenControlToggle_Type:
