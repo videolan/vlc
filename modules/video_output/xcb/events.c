@@ -45,11 +45,14 @@ int CheckError (vout_display_t *vd, xcb_connection_t *conn,
     err = xcb_request_check (conn, ck);
     if (err)
     {
-        msg_Err (vd, "%s: X11 error %d", str, err->error_code);
+        int code = err->error_code;
+
         free (err);
-        return VLC_EGENERIC;
+        msg_Err (vd, "%s: X11 error %d", str, code);
+        assert (code != 0);
+        return code;
     }
-    return VLC_SUCCESS;
+    return 0;
 }
 
 /**
