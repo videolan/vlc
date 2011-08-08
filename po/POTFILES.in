@@ -480,7 +480,6 @@ modules/demux/playlist/qtl.c
 modules/demux/playlist/sgimb.c
 modules/demux/playlist/shoutcast.c
 modules/demux/playlist/xspf.c
-modules/demux/playlist/xspf.h
 modules/demux/ps.c
 modules/demux/ps.h
 modules/demux/pva.c
