@@ -289,17 +289,51 @@ static int Control (vout_display_t *vd, int query, va_list ap)
     {
         case VOUT_DISPLAY_CHANGE_FULLSCREEN:
         case VOUT_DISPLAY_CHANGE_WINDOW_STATE:
+        {
+            /* todo */
+            return VLC_EGENERIC;
+        }
         case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
         case VOUT_DISPLAY_CHANGE_DISPLAY_FILLED:
         case VOUT_DISPLAY_CHANGE_ZOOM:
         case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
         case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
         {
-            /* todo */
-            return VLC_EGENERIC;
-        }
-        case VOUT_DISPLAY_HIDE_MOUSE:
+            NSPoint topleftbase;
+            NSPoint topleftscreen;
+            NSRect new_frame;
+            const vout_display_cfg_t *cfg;
+            topleftbase.x = 0;
+            topleftbase.y = [[sys->glView window] frame].size.height;
+            topleftscreen = [[sys->glView window] convertBaseToScreen: topleftbase];
+            cfg = (const vout_display_cfg_t*)va_arg (ap, const vout_display_cfg_t *);
+            int i_width = cfg->display.width;
+            int i_height = cfg->display.height;
+
+            /* Calculate the window's new size, if it is larger than our minimal size */
+            if (i_width < [[sys->glView window] minSize].width)
+                i_width = [[sys->glView window] minSize].width;
+            if (i_height < [[sys->glView window] minSize].height)
+                i_height = [[sys->glView window] minSize].height;
+
+            if( i_height != [sys->glView frame].size.height || i_width != [sys->glView frame].size.width )
+            {
+                new_frame.size.width = [[sys->glView window] frame].size.width - [sys->glView frame].size.width + i_width;
+                new_frame.size.height = [[sys->glView window] frame].size.height - [sys->glView frame].size.height + i_height;
+
+                new_frame.origin.x = topleftscreen.x;
+                new_frame.origin.y = topleftscreen.y - new_frame.size.height;
+
+                [[sys->glView window] setFrame:new_frame display:YES animate:YES];
+            }
             return VLC_SUCCESS;
+        }
+
+        case VOUT_DISPLAY_HIDE_MOUSE:
+        {
+            [NSCursor setHiddenUntilMouseMoves: YES];
+            return VLC_SUCCESS;
+        }
 
         case VOUT_DISPLAY_GET_OPENGL:
         {
