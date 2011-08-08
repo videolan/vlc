@@ -858,7 +858,6 @@ static void Run          ( intf_thread_t *p_intf )
         vlc_restorecancel( canc );
 
         int i_pollres = poll( fds, i_fds, i_next_timeout );
-        int i_errsv   = errno;
 
         canc = vlc_savecancel();
 
