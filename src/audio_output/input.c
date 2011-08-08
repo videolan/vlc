@@ -66,7 +66,10 @@ static vout_thread_t *RequestVout( void *,
 /*****************************************************************************
  * aout_InputNew : allocate a new input and rework the filter pipeline
  *****************************************************************************/
-int aout_InputNew( audio_output_t * p_aout, aout_input_t * p_input, const aout_request_vout_t *p_request_vout )
+int aout_InputNew( audio_output_t * p_aout,
+                   const audio_sample_format_t *restrict format,
+                   aout_input_t * p_input,
+                   const aout_request_vout_t *p_request_vout )
 {
     aout_owner_t *owner = aout_owner (p_aout);
     audio_sample_format_t chain_input_format;
@@ -75,7 +78,8 @@ int aout_InputNew( audio_output_t * p_aout, aout_input_t * p_input, const aout_r
     char *psz_filters, *psz_visual, *psz_scaletempo;
     int i_visual;
 
-    aout_FormatPrint( p_aout, "input", &p_input->input );
+    aout_FormatPrint( p_aout, "input", format );
+    p_input->samplerate = format->i_rate;
 
     p_input->i_nb_resamplers = p_input->i_nb_filters = 0;
 
@@ -91,9 +95,9 @@ int aout_InputNew( audio_output_t * p_aout, aout_input_t * p_input, const aout_r
     }
 
     /* Prepare format structure */
-    chain_input_format  = p_input->input;
+    chain_input_format  = *format;
     chain_output_format = owner->mixer_format;
-    chain_output_format.i_rate = p_input->input.i_rate;
+    chain_output_format.i_rate = format->i_rate;
     aout_FormatPrepare( &chain_output_format );
 
     /* Now add user filters */
@@ -382,7 +386,7 @@ int aout_InputNew( audio_output_t * p_aout, aout_input_t * p_input, const aout_r
     /* Create resamplers. */
     if (AOUT_FMT_LINEAR(&owner->mixer_format))
     {
-        chain_output_format.i_rate = (__MAX(p_input->input.i_rate,
+        chain_output_format.i_rate = (__MAX(p_input->samplerate,
                                             owner->mixer_format.i_rate)
                                  * (100 + AOUT_MAX_RESAMPLING)) / 100;
         if ( chain_output_format.i_rate == owner->mixer_format.i_rate )
@@ -400,7 +404,7 @@ int aout_InputNew( audio_output_t * p_aout, aout_input_t * p_input, const aout_r
         }
 
         /* Setup the initial rate of the resampler */
-        p_input->pp_resamplers[0]->fmt_in.audio.i_rate = p_input->input.i_rate;
+        p_input->pp_resamplers[0]->fmt_in.audio.i_rate = p_input->samplerate;
     }
     p_input->i_resampling_type = AOUT_RESAMPLING_NONE;
 
@@ -453,13 +457,14 @@ int aout_InputDelete( audio_output_t * p_aout, aout_input_t * p_input )
  *****************************************************************************/
 void aout_InputCheckAndRestart( audio_output_t * p_aout, aout_input_t * p_input )
 {
+    aout_owner_t *owner = aout_owner(p_aout);
     aout_assert_locked( p_aout );
 
     if( !p_input->b_restart )
         return;
 
     aout_InputDelete( p_aout, p_input );
-    aout_InputNew( p_aout, p_input, &p_input->request_vout );
+    aout_InputNew( p_aout, &owner->input_format, p_input, &p_input->request_vout );
 
     p_input->b_restart = false;
 }
@@ -513,8 +518,8 @@ block_t *aout_InputPlay(audio_output_t *p_aout, aout_input_t *p_input,
     {
         unsigned int * const pi_rate = &p_input->p_playback_rate_filter->fmt_in.audio.i_rate;
 #define F(r,ir) ( INPUT_RATE_DEFAULT * (r) / (ir) )
-        const int i_delta = *pi_rate - F(p_input->input.i_rate,p_input->i_last_input_rate);
-        *pi_rate = F(p_input->input.i_rate + i_delta, i_input_rate);
+        const int i_delta = *pi_rate - F(p_input->samplerate,p_input->i_last_input_rate);
+        *pi_rate = F(p_input->samplerate + i_delta, i_input_rate);
 #undef F
         p_input->i_last_input_rate = i_input_rate;
     }
@@ -628,8 +633,8 @@ block_t *aout_InputPlay(audio_output_t *p_aout, aout_input_t *p_input,
          * resampling */
         unsigned int i_nominal_rate =
           (p_input->pp_resamplers[0] == p_input->p_playback_rate_filter)
-          ? INPUT_RATE_DEFAULT * p_input->input.i_rate / i_input_rate
-          : p_input->input.i_rate;
+          ? INPUT_RATE_DEFAULT * p_input->samplerate / i_input_rate
+          : p_input->samplerate;
         if( p_input->pp_resamplers[0]->fmt_in.audio.i_rate == i_nominal_rate )
         {
             p_input->i_resampling_type = AOUT_RESAMPLING_NONE;
@@ -724,8 +729,8 @@ static void inputResamplingStop( aout_input_t *p_input )
     {
         p_input->pp_resamplers[0]->fmt_in.audio.i_rate =
             ( p_input->pp_resamplers[0] == p_input->p_playback_rate_filter )
-            ? INPUT_RATE_DEFAULT * p_input->input.i_rate / p_input->i_last_input_rate
-            : p_input->input.i_rate;
+            ? INPUT_RATE_DEFAULT * p_input->samplerate / p_input->i_last_input_rate
+            : p_input->samplerate;
     }
 }
 

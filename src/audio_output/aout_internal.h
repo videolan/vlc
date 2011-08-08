@@ -51,8 +51,8 @@ block_t *aout_FilterBufferNew( filter_t *, int );
 /** an input stream for the audio output */
 struct aout_input_t
 {
-    audio_sample_format_t   input;
     float                   multiplier; /**< Replay gain multiplier */
+    unsigned            samplerate; /**< Input sample rate */
 
     /* pre-filters */
     filter_t *              pp_filters[AOUT_MAX_FILTERS];
@@ -106,6 +106,7 @@ typedef struct
     } volume; /**< Volume and gain management (FIXME: input manager?) */
 
     audio_sample_format_t mixer_format;
+    audio_sample_format_t input_format;
 
     /* Filters between mixer and output */
     filter_t *filters[AOUT_MAX_FILTERS];
@@ -130,7 +131,8 @@ static inline aout_owner_t *aout_owner (audio_output_t *aout)
  *****************************************************************************/
 
 /* From input.c : */
-int aout_InputNew( audio_output_t * p_aout, aout_input_t * p_input, const aout_request_vout_t * );
+int aout_InputNew(audio_output_t *, const audio_sample_format_t *,
+                  aout_input_t *, const aout_request_vout_t *);
 int aout_InputDelete( audio_output_t * p_aout, aout_input_t * p_input );
 block_t *aout_InputPlay( audio_output_t *p_aout, aout_input_t *p_input,
                          block_t *p_buffer, int i_input_rate, date_t * );

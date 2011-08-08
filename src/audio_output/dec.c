@@ -83,8 +83,6 @@ int aout_DecNew( audio_output_t *p_aout,
 
     p_input->b_error = true;
 
-    memcpy( &p_input->input, p_format,
-            sizeof(audio_sample_format_t) );
     if( p_replay_gain )
         p_input->replay_gain = *p_replay_gain;
 
@@ -98,6 +96,7 @@ int aout_DecNew( audio_output_t *p_aout,
     var_Destroy( p_aout, "audio-channels" );
 
     /* Recreate the output using the new format. */
+    owner->input_format = *p_format;
     if( aout_OutputNew( p_aout, p_format ) < 0 )
         goto error;
 
@@ -108,7 +107,7 @@ int aout_DecNew( audio_output_t *p_aout,
     date_Set (&owner->sync.date, VLC_TS_INVALID);
 
     owner->input = p_input;
-    aout_InputNew( p_aout, p_input, p_request_vout );
+    aout_InputNew( p_aout, p_format, p_input, p_request_vout );
     aout_unlock( p_aout );
     return 0;
 error:
@@ -161,7 +160,7 @@ static void aout_CheckRestart (audio_output_t *aout)
     owner->volume.mixer = NULL;
     aout_OutputDelete (aout);
 
-    if (aout_OutputNew (aout, &input->input))
+    if (aout_OutputNew (aout, &owner->input_format))
     {
         input->b_error = true;
         return; /* we are officially screwed */
@@ -169,7 +168,7 @@ static void aout_CheckRestart (audio_output_t *aout)
 
     owner->volume.mixer = aout_MixerNew (aout, owner->mixer_format.i_format);
 
-    if (aout_InputNew (aout, input, &input->request_vout))
+    if (aout_InputNew (aout, &owner->input_format, input, &input->request_vout))
         assert (input->b_error);
     else
         assert (!input->b_error);
@@ -187,10 +186,9 @@ block_t *aout_DecNewBuffer (audio_output_t *aout, size_t samples)
 {
     /* NOTE: the caller is responsible for serializing input change */
     aout_owner_t *owner = aout_owner (aout);
-    aout_input_t *input = owner->input;
 
-    size_t length = samples * input->input.i_bytes_per_frame
-                            / input->input.i_frame_length;
+    size_t length = samples * owner->input_format.i_bytes_per_frame
+                            / owner->input_format.i_frame_length;
     block_t *block = block_Alloc( length );
     if( likely(block != NULL) )
     {
@@ -222,7 +220,7 @@ int aout_DecPlay (audio_output_t *p_aout, block_t *p_buffer, int i_input_rate)
     assert( p_buffer->i_pts > 0 );
 
     p_buffer->i_length = (mtime_t)p_buffer->i_nb_samples * 1000000
-                                / p_input->input.i_rate;
+                                / owner->input_format.i_rate;
 
     aout_lock( p_aout );
     if( p_input->b_error )
