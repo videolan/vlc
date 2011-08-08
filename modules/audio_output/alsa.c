@@ -238,7 +238,7 @@ static int Open (vlc_object_t *obj)
             pcm_format = SND_PCM_FORMAT_U8;
             break;
         default:
-            if (AOUT_FMT_NON_LINEAR(&p_aout->format))
+            if (AOUT_FMT_SPDIF(&p_aout->format))
                 spdif = var_InheritBool (p_aout, "spdif");
             if (HAVE_FPU)
             {

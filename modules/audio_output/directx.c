@@ -531,7 +531,7 @@ static void Probe( audio_output_t * p_aout )
     var_Set( p_aout, "audio-device", val );
 
     /* Test for SPDIF support */
-    if ( AOUT_FMT_NON_LINEAR( &p_aout->format ) )
+    if ( AOUT_FMT_SPDIF( &p_aout->format ) )
     {
         if( CreateDSBuffer( p_aout, VLC_CODEC_SPDIFL,
                             p_aout->format.i_physical_channels,

@@ -103,17 +103,16 @@ static int SplitConversion( const audio_sample_format_t *restrict infmt,
     else
     {
         assert( infmt->i_format != outfmt->i_format );
-        if( AOUT_FMT_NON_LINEAR( infmt ) )
-        {
-            if( AOUT_FMT_NON_LINEAR( outfmt ) )
-                return -1; /* no indirect non-linear -> non-linear */
-            /* NOTE: our non-linear -> linear filters always output 32-bits */
-            midfmt->i_format = HAVE_FPU ? VLC_CODEC_FL32 : VLC_CODEC_FI32;
-        }
-        else
+        if( AOUT_FMT_LINEAR( infmt ) )
             /* NOTE: Use S16N as intermediate. We have all conversions to S16N,
              * and all useful conversions from S16N. TODO: FL32 if HAVE_FPU. */
             midfmt->i_format = VLC_CODEC_S16N;
+        else
+        if( AOUT_FMT_LINEAR( outfmt ) )
+            /* NOTE: our non-linear -> linear filters always output 32-bits */
+            midfmt->i_format = HAVE_FPU ? VLC_CODEC_FL32 : VLC_CODEC_FI32;
+        else
+            return -1; /* no indirect non-linear -> non-linear */
     }
 
     aout_FormatPrepare( midfmt );

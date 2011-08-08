@@ -67,10 +67,13 @@
       && ((p_first)->i_physical_channels == (p_second)->i_physical_channels)\
       && ((p_first)->i_original_channels == (p_second)->i_original_channels) )
 
+#define AOUT_FMT_LINEAR( p_format ) \
+    (aout_BitsPerSample((p_format)->i_format) != 0)
+
 #define VLC_CODEC_SPDIFL VLC_FOURCC('s','p','d','i')
 #define VLC_CODEC_SPDIFB VLC_FOURCC('s','p','d','b')
 
-#define AOUT_FMT_NON_LINEAR( p_format )                 \
+#define AOUT_FMT_SPDIF( p_format ) \
     ( ((p_format)->i_format == VLC_CODEC_SPDIFL)       \
        || ((p_format)->i_format == VLC_CODEC_SPDIFB)   \
        || ((p_format)->i_format == VLC_CODEC_A52)       \

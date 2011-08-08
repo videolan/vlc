@@ -264,7 +264,7 @@ static int Open( vlc_object_t * p_this )
     }
 
     /* Check for Digital mode or Analog output mode */
-    if( AOUT_FMT_NON_LINEAR( &p_aout->format ) && p_sys->b_supports_digital )
+    if( AOUT_FMT_SPDIF( &p_aout->format ) && p_sys->b_supports_digital )
     {
         if( OpenSPDIF( p_aout ) )
         {

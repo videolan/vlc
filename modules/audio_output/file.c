@@ -190,7 +190,7 @@ static int Open( vlc_object_t * p_this )
     free( psz_format );
 
     p_aout->format.i_format = format_int[i];
-    if ( AOUT_FMT_NON_LINEAR( &p_aout->format ) )
+    if ( AOUT_FMT_SPDIF( &p_aout->format ) )
     {
         p_aout->format.i_bytes_per_frame = AOUT_SPDIF_SIZE;
         p_aout->format.i_frame_length = A52_FRAME_NB;

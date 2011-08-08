@@ -165,7 +165,7 @@ int aout_OutputNew( audio_output_t *p_aout,
 
     /* Choose the mixer format. */
     owner->mixer_format = p_aout->format;
-    if (AOUT_FMT_NON_LINEAR(&p_aout->format))
+    if (!AOUT_FMT_LINEAR(&p_aout->format))
         owner->mixer_format.i_format = p_format->i_format;
     else
     /* Most audio filters can only deal with single-precision,
@@ -530,7 +530,7 @@ static block_t *aout_OutputSlice (audio_output_t *p_aout)
         prev_date = p_buffer->i_pts + p_buffer->i_length;
     }
 
-    if( !AOUT_FMT_NON_LINEAR( &p_aout->format ) )
+    if( AOUT_FMT_LINEAR( &p_aout->format ) )
     {
         p_buffer = p_fifo->p_first;
 
@@ -622,7 +622,7 @@ block_t *aout_PacketNext (audio_output_t *p_aout, mtime_t start_date)
     aout_packet_t *p = aout_packet (p_aout);
     aout_fifo_t *p_fifo = &p->fifo;
     block_t *p_buffer;
-    const bool b_can_sleek = AOUT_FMT_NON_LINEAR (&p_aout->format);
+    const bool b_can_sleek = AOUT_FMT_LINEAR (&p_aout->format);
     const mtime_t now = mdate ();
     const mtime_t threshold =
         (b_can_sleek ? start_date : now) - AOUT_MAX_PTS_DELAY;

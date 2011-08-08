@@ -437,7 +437,7 @@ static void Probe( audio_output_t * p_aout )
     }
 
     /* Test for SPDIF support */
-    if ( AOUT_FMT_NON_LINEAR( &p_aout->format ) )
+    if ( AOUT_FMT_SPDIF( &p_aout->format ) )
     {
         if( OpenWaveOut( p_aout,
                          p_aout->sys->i_wave_device_id,

@@ -229,7 +229,7 @@ int aout_InputNew( audio_output_t * p_aout, aout_input_t * p_input, const aout_r
     char *const ppsz_array[] = { psz_scaletempo, psz_filters, psz_visual };
     p_input->p_playback_rate_filter = NULL;
 
-    for( i_visual = 0; i_visual < 3 && !AOUT_FMT_NON_LINEAR(&chain_output_format); i_visual++ )
+    for( i_visual = 0; i_visual < 3 && AOUT_FMT_LINEAR(&chain_output_format); i_visual++ )
     {
         char *psz_next = NULL;
         char *psz_parser = ppsz_array[i_visual];
@@ -380,7 +380,7 @@ int aout_InputNew( audio_output_t * p_aout, aout_input_t * p_input, const aout_r
     }
 
     /* Create resamplers. */
-    if (!AOUT_FMT_NON_LINEAR(&owner->mixer_format))
+    if (AOUT_FMT_LINEAR(&owner->mixer_format))
     {
         chain_output_format.i_rate = (__MAX(p_input->input.i_rate,
                                             owner->mixer_format.i_rate)

@@ -229,7 +229,7 @@ static void Probe( audio_output_t * p_aout )
     }
 
     /* Test for spdif. */
-    if ( AOUT_FMT_NON_LINEAR( &p_aout->format ) )
+    if ( AOUT_FMT_SPDIF( &p_aout->format ) )
     {
         i_format = AFMT_AC3;
 
@@ -368,7 +368,7 @@ static int Open( vlc_object_t *p_this )
     }
 
     /* Set the output format */
-    if ( AOUT_FMT_NON_LINEAR( &p_aout->format ) )
+    if ( AOUT_FMT_SPDIF( &p_aout->format ) )
     {
         int i_format = AFMT_AC3;
 
@@ -388,8 +388,7 @@ static int Open( vlc_object_t *p_this )
         aout_PacketInit( p_aout, &p_sys->packet, A52_FRAME_NB );
         aout_VolumeNoneInit( p_aout );
     }
-
-    if ( !AOUT_FMT_NON_LINEAR( &p_aout->format ) )
+    else
     {
         unsigned int i_format = AFMT_S16_NE;
         unsigned int i_frame_size, i_fragments;

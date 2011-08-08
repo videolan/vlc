@@ -63,7 +63,7 @@ static int Open( vlc_object_t * p_this )
     p_aout->pf_flush = NULL;
     aout_VolumeSoftInit( p_aout );
 
-    if( AOUT_FMT_NON_LINEAR( &p_aout->format )
+    if( AOUT_FMT_SPDIF( &p_aout->format )
      && var_InheritBool( p_this, "spdif" ) )
     {
         p_aout->format.i_format = VLC_CODEC_SPDIFL;
