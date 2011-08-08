@@ -30,6 +30,7 @@ Makefile.in
 stamp-*
 vlc-config
 vlc-config.in
+vlc
 qvlc
 rvlc
 svlc
