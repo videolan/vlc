@@ -28,6 +28,7 @@
 #import "PXSourceList.h"
 #import <vlc_input.h>
 #import "misc.h"
+#import "fspanel.h"
 
 #ifndef MAC_OS_X_VERSION_10_6
 @protocol NSAnimationDelegate <NSObject> @end
@@ -67,6 +68,8 @@
     IBOutlet id o_dropzone_view;
     IBOutlet id o_dropzone_btn;
     IBOutlet id o_dropzone_lbl;
+
+    IBOutlet VLCFSPanel *o_fspanel;
 
     BOOL b_dark_interface;
     BOOL b_video_playback_enabled;

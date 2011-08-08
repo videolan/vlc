@@ -57,7 +57,10 @@ static VLCMainWindow *_o_sharedInstance = nil;
         return _o_sharedInstance;
     }
     else
+    {
+        o_fspanel = [[VLCFSPanel alloc] init];
         _o_sharedInstance = [super init];
+    }
 
     return _o_sharedInstance;
 }
@@ -534,7 +537,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
             o_time = [NSString stringWithUTF8String: secstotimestr( psz_time, (time.i_time / 1000000) )];
 
         [o_time_fld setStringValue: o_time];
-        [[[[VLCMain sharedInstance] controls] fspanel] setStreamPos: f_updated andTime: o_time];
+        [o_fspanel setStreamPos: f_updated andTime: o_time];
         vlc_object_release( p_input );
     }
     [self drawFancyGradientEffectForTimeSlider];
@@ -616,7 +619,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
         [o_time_fld setStringValue: o_time];
         [o_time_fld setNeedsDisplay:YES];
-//        [[[[VLCMain sharedInstance] controls] fspanel] setStreamPos: f_updated andTime: o_time];
+        [o_fspanel setStreamPos: f_updated andTime: o_time];
         vlc_object_release( p_input );
     }
     else
@@ -643,7 +646,8 @@ static VLCMainWindow *_o_sharedInstance = nil;
         int i_volume_step = 0;
         i_volume_step = config_GetInt( VLCIntf->p_libvlc, "volume-step" );
         [o_volume_sld setFloatValue: (float)i_lastShownVolume / i_volume_step];
-//        [[[[VLCMain sharedInstance] controls] fspanel] setVolumeLevel: (float)i_lastShownVolume / i_volume_step];
+        if ([o_fspanel respondsToSelector:@selector(setVolumeLevel:)])
+            [o_fspanel setVolumeLevel: (float)i_lastShownVolume / i_volume_step];
     }
 }
 
@@ -695,7 +699,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
         }
 
         [self setTitle: aString];
-        [[[[VLCMain sharedInstance] controls] fspanel] setStreamTitle: aString];
+        [o_fspanel setStreamTitle: aString];
     }
     else
     {
@@ -758,7 +762,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
     [o_time_sld setEnabled: b_seekable];
     [self updateTimeSlider];
-    [[[[VLCMain sharedInstance] controls] fspanel] setSeekable: b_seekable];
+    [o_fspanel setSeekable: b_seekable];
 
     PL_LOCK;
     if (playlist_CurrentSize( p_playlist ) >= 1)
@@ -773,6 +777,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [o_play_btn setImage: o_pause_img];
     [o_play_btn setAlternateImage: o_pause_pressed_img];
     [o_play_btn setToolTip: _NS("Pause")];
+    [o_fspanel setPause];
 }
 
 - (void)setPlay
@@ -780,6 +785,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [o_play_btn setImage: o_play_img];
     [o_play_btn setAlternateImage: o_play_pressed_img];
     [o_play_btn setToolTip: _NS("Play")];
+    [o_fspanel setPlay];
 }
 
 - (void)drawFancyGradientEffectForTimeSlider
@@ -1027,12 +1033,12 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [o_fullscreen_window setAcceptsMouseMovedEvents: TRUE];
 
     /* tell the fspanel to move itself to front next time it's triggered */
-    [[[[VLCMain sharedInstance] controls] fspanel] setVoutWasUpdated: (int)[[o_fullscreen_window screen] displayID]];
+    [o_fspanel setVoutWasUpdated: (int)[[o_fullscreen_window screen] displayID]];
 
     if([self isVisible])
         [super orderOut: self];
 
-    [[[[VLCMain sharedInstance] controls] fspanel] setActive: nil];
+    [o_fspanel setActive: nil];
 
     b_fullscreen = YES;
     [self unlockFullscreenAnimation];
@@ -1076,7 +1082,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
             CGDisplayFade( token, 0.3, kCGDisplayBlendNormal, kCGDisplayBlendSolidColor, 0, 0, 0, YES );
         }
 
-        [[[[VLCMain sharedInstance] controls] fspanel] setNonActive: nil];
+        [o_fspanel setNonActive: nil];
         SetSystemUIMode( kUIModeNormal, kUIOptionAutoShowMenuBar);
 
         /* Will release the lock */
@@ -1098,7 +1104,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [self setAlphaValue: 0.0];
     [self orderFront: self];
 
-    [[[[VLCMain sharedInstance] controls] fspanel] setNonActive: nil];
+    [o_fspanel setNonActive: nil];
     SetSystemUIMode( kUIModeNormal, kUIOptionAutoShowMenuBar);
 
     if (o_fullscreen_anim1)

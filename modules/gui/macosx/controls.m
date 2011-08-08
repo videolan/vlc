@@ -46,13 +46,6 @@
  *****************************************************************************/
 @implementation VLCControls
 
-- (id)init
-{
-    [super init];
-    o_fs_panel = [[VLCFSPanel alloc] init];
-    return self;
-}
-
 - (void)awakeFromNib
 {
     [o_specificTime_mi setTitle: _NS("Jump To Time")];
@@ -265,17 +258,6 @@
                 msg_Warn( VLCIntf, "unable to load subtitles from '%s'",
                          [[[[openPanel URLs] objectAtIndex: i] path] UTF8String] );
         }
-    }
-}
-
-- (id)fspanel
-{
-    if( o_fs_panel )
-        return o_fs_panel;
-    else
-    {
-        msg_Err( VLCIntf, "FSPanel is nil" );
-        return NULL;
     }
 }
 

@@ -42,7 +42,6 @@
 #import "intf.h"
 #import "MainMenu.h"
 #import "MainWindow.h"
-#import "fspanel.h"
 #import "vout.h"
 #import "prefs.h"
 #import "playlist.h"
@@ -362,7 +361,7 @@ static int ShowController( vlc_object_t *p_this, const char *psz_variable,
     intf_thread_t * p_intf = VLCIntf;
     if( p_intf && p_intf->p_sys )
     {
-        NSLog( @"fixme! we should implement ShowController here" );
+//        [[[VLCMain sharedInstance] fspanel] makeKeyAndOrderFront: nil];
     }
     return VLC_SUCCESS;
 }
@@ -507,8 +506,6 @@ static VLCMain *_o_sharedMainInstance = nil;
 
     o_msg_lock = [[NSLock alloc] init];
     o_msg_arr = [[NSMutableArray arrayWithCapacity: 600] retain];
-    /* subscribe to LibVLC's debug messages as early as possible (for us) */
-    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(libvlcMessageReceived:) name: @"VLCCoreMessageReceived" object: nil];
 
     o_open = [[VLCOpen alloc] init];
     //o_embedded_list = [[VLCEmbeddedList alloc] init];
@@ -1308,7 +1305,6 @@ unsigned int CocoaKeyToVLC( unichar i_key )
         int state = var_GetInteger( p_input, "state" );
         if( state == PLAYING_S )
         {
-            [[[self controls] fspanel] setPause];
             [[self mainMenu] setPause];
             [o_mainwindow setPause];
         }
@@ -1316,7 +1312,6 @@ unsigned int CocoaKeyToVLC( unichar i_key )
         {
             if (state == END_S)
                 [o_mainmenu setSubmenusEnabled: FALSE];
-            [[[self controls] fspanel] setPlay];
             [[self mainMenu] setPlay];
             [o_mainwindow setPlay];
         }
