@@ -27,8 +27,8 @@ DEPS_ffmpeg = zlib gsm vpx $(DEPS_vpx)
 # Optional dependencies
 ifdef BUILD_ENCODERS
 # TODO:
-#FFMPEGCONF += --enable-libmp3lame
-#DEPS_ffmpeg += lame $(DEPS_lame)
+FFMPEGCONF += --enable-libmp3lame
+DEPS_ffmpeg += lame $(DEPS_lame)
 else
 FFMPEGCONF += --disable-encoders --disable-muxers
 # XXX: REVISIT --enable-small ?
