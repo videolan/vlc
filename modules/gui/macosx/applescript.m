@@ -26,8 +26,7 @@
  *****************************************************************************/
 #include "intf.h"
 #include "applescript.h"
-#include "controls.h"
-#include "open.h"
+#include "CoreInteraction.h"
 
 /*****************************************************************************
  * VLGetURLScriptCommand implementation
@@ -94,42 +93,37 @@
         return nil;
     }
  
-    VLCControls * o_controls = [[VLCMain sharedInstance] controls];
- 
-    if ( o_controls )
+    if ( [o_command isEqualToString:@"play"] )
     {
-        if ( [o_command isEqualToString:@"play"] )
-        {
-            [o_controls play:self];
-        }
-        else if ( [o_command isEqualToString:@"stop"] )
-        {
-            [o_controls stop:self];
-        }
-        else if ( [o_command isEqualToString:@"previous"] )
-        {
-            [o_controls prev:self];
-        }
-        else if ( [o_command isEqualToString:@"next"] )
-        {
-            [o_controls next:self];
-        }
-        else if ( [o_command isEqualToString:@"fullscreen"] )
-        {
-            [o_controls toogleFullscreen: self];
-        }
-        else if ( [o_command isEqualToString:@"mute"] )
-        {
-            [o_controls mute:self];
-        }
-        else if ( [o_command isEqualToString:@"volumeUp"] )
-        {
-            [o_controls volumeUp:self];
-        }
-        else if ( [o_command isEqualToString:@"volumeDown"] )
-        {
-            [o_controls volumeDown:self];
-        }
+        [[VLCCoreInteraction sharedInstance] play];
+    }
+    else if ( [o_command isEqualToString:@"stop"] )
+    {
+        [[VLCCoreInteraction sharedInstance] stop];
+    }
+    else if ( [o_command isEqualToString:@"previous"] )
+    {
+        [[VLCCoreInteraction sharedInstance] previous];
+    }
+    else if ( [o_command isEqualToString:@"next"] )
+    {
+        [[VLCCoreInteraction sharedInstance] next];
+    }
+    else if ( [o_command isEqualToString:@"fullscreen"] )
+    {
+        [[VLCCoreInteraction sharedInstance] toggleFullscreen];
+    }
+    else if ( [o_command isEqualToString:@"mute"] )
+    {
+        [[VLCCoreInteraction sharedInstance] mute];
+    }
+    else if ( [o_command isEqualToString:@"volumeUp"] )
+    {
+        [[VLCCoreInteraction sharedInstance] volumeUp];
+    }
+    else if ( [o_command isEqualToString:@"volumeDown"] )
+    {
+        [[VLCCoreInteraction sharedInstance] volumeDown];
     }
     return nil;
 }
@@ -147,7 +141,7 @@
 - (void) setScriptFullscreenMode: (BOOL) mode {
     VLCControls * o_controls = [[VLCMain sharedInstance] controls];
     if (mode == [o_controls isFullscreen]) return;
-    [o_controls toogleFullscreen: self];
+    [[VLCCoreInteraction sharedInstance] toggleFullscreen];
 }
 
 @end
