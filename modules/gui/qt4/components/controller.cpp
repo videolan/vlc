@@ -624,7 +624,7 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
 {
     /* advanced Controls handling */
     b_advancedVisible = b_advControls;
-#if DEBUG_LAYOUT
+#ifdef DEBUG_LAYOUT
     setStyleSheet( "background: red ");
 #endif
 
@@ -677,7 +677,7 @@ AdvControlsWidget::AdvControlsWidget( intf_thread_t *_p_i, QWidget *_parent ) :
     controlLayout = new QHBoxLayout( this );
     controlLayout->setMargin( 0 );
     controlLayout->setSpacing( 0 );
-#if DEBUG_LAYOUT
+#ifdef DEBUG_LAYOUT
     setStyleSheet( "background: orange ");
 #endif
 
@@ -693,7 +693,7 @@ InputControlsWidget::InputControlsWidget( intf_thread_t *_p_i, QWidget *_parent 
     controlLayout = new QHBoxLayout( this );
     controlLayout->setMargin( 0 );
     controlLayout->setSpacing( 0 );
-#if DEBUG_LAYOUT
+#ifdef DEBUG_LAYOUT
     setStyleSheet( "background: green ");
 #endif
 
