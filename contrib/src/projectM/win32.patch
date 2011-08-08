@@ -1,0 +1,201 @@
+diff -ruN libprojectM/Renderer/TextureManager.cpp libprojectM.new/Renderer/TextureManager.cpp
+--- libprojectM/Renderer/TextureManager.cpp	2009-12-01 07:38:42.000000000 +0100
++++ libprojectM.new/Renderer/TextureManager.cpp	2009-12-03 23:28:44.000000000 +0100
+@@ -59,7 +59,7 @@
+ 	ilLoadL(IL_TYPE_UNKNOWN,(ILvoid*) M_data, M_bytes);
+ 	GLuint tex = ilutGLBindTexImage();
+ #else
+-	 uint tex = SOIL_load_OGL_texture_from_memory(
++	 unsigned int tex = SOIL_load_OGL_texture_from_memory(
+ 					  M_data,
+ 					  M_bytes,
+ 					  SOIL_LOAD_AUTO,
+@@ -173,7 +173,7 @@
+ #else
+        int width, height;
+ 
+-       uint tex = SOIL_load_OGL_texture_size(
++       unsigned int tex = SOIL_load_OGL_texture_size(
+     		   imageURL.c_str(),
+ 					  SOIL_LOAD_AUTO,
+ 					  SOIL_CREATE_NEW_ID,
+diff -ruN libprojectM/win32-dirent.h libprojectM.new/win32-dirent.h
+--- libprojectM/win32-dirent.h	2009-12-01 07:38:42.000000000 +0100
++++ libprojectM.new/win32-dirent.h	2009-12-03 23:29:13.000000000 +0100
+@@ -19,7 +19,7 @@
+ 
+ typedef struct DIR DIR;
+ 
+-static int errno;
++//static int errno;
+ 
+ struct dirent
+ {
+diff -ruN libprojectM/PresetLoader.hpp libprojectM.new2/PresetLoader.hpp
+--- libprojectM/PresetLoader.hpp	2009-12-01 07:38:42.000000000 +0100
++++ libprojectM.new2/PresetLoader.hpp	2009-12-04 00:29:20.000000000 +0100
+@@ -6,7 +6,7 @@
+ #include <sys/types.h>
+ 
+ #ifdef WIN32
+-#include "win32-dirent.h"
++#include <dirent.h>
+ #endif
+ 
+ #ifdef LINUX
+diff -ruN libprojectM/projectM.cpp libprojectM.new2/projectM.cpp
+--- libprojectM/projectM.cpp	2009-12-01 07:38:42.000000000 +0100
++++ libprojectM.new2/projectM.cpp	2009-12-04 00:28:29.000000000 +0100
+@@ -24,9 +24,6 @@
+ #include "fatal.h"
+ #include "Common.hpp"
+ 
+-#ifdef WIN32
+-#include "win32-dirent.h"
+-#endif
+ 
+ #include "timer.h"
+ #include <iostream>
+diff -ruN libprojectM/projectM.hpp libprojectM.new2/projectM.hpp
+--- libprojectM/projectM.hpp	2009-12-01 07:38:42.000000000 +0100
++++ libprojectM.new2/projectM.hpp	2009-12-04 00:28:22.000000000 +0100
+@@ -29,11 +29,7 @@
+ #ifndef _PROJECTM_HPP
+ #define _PROJECTM_HPP
+ 
+-#ifdef WIN32
+-#include "win32-dirent.h"
+-#else
+ #include <dirent.h>
+-#endif /** WIN32 */
+ #include <cmath>
+ #include <cstdio>
+ #include <string>
+
+--- libprojectM/CMakeLists.txt	2009-12-01 07:38:42.000000000 +0100
++++ libprojectM.new/CMakeLists.txt	2009-12-04 00:34:12.000000000 +0100
+@@ -121,15 +121,13 @@
+ 
+ SET_TARGET_PROPERTIES(projectM PROPERTIES VERSION 2.00 SOVERSION 2)
+ 
+-ADD_DEFINITIONS(-DUSE_THREADS)
+-
+ if (APPLE)
+ ADD_DEFINITIONS(-DMACOS -DSTBI_NO_DDS -DUSE_THREADS)
+ set(RESOURCE_PREFIX "Resources")
+ else (APPLE)
+ if (WIN32)
+ set (RESOURCE_PREFIX "Resources")
+-ADD_DEFINITIONS(-DWIN32 -DSTBI_NO_DDS -DUSE_THREADS)
++ADD_DEFINITIONS(-DWIN32 -DSTBI_NO_DDS )
+ else(WIN32)
+ set (RESOURCE_PREFIX "share/projectM")
+ ADD_DEFINITIONS(-DLINUX -DSTBI_NO_DDS -DUSE_THREADS)
+--- libprojectM.new/CMakeLists.txt	2009-12-04 00:34:12.000000000 +0100
++++ libprojectM/CMakeLists.txt	2009-12-04 09:04:54.000000000 +0100
+@@ -62,6 +62,8 @@
+ SET(PRESET_FACTORY_SOURCES ${PRESET_FACTORY_SOURCES} ${NativePresetFactory_SOURCE_DIR})
+ SET(PRESET_FACTORY_BINARY_DIR ${PRESET_FACTORY_BINARY_DIR} ${NativePresetFactory_BINARY_DIR})
+ SET(PRESET_FACTORY_LINK_TARGETS ${PRESET_FACTORY_LINK_TARGETS} NativePresetFactory)
++else (NOT DISABLE_NATIVE_PRESETS)
++ADD_DEFINITIONS(-DDISABLE_NATIVE_PRESETS)
+ endif(NOT DISABLE_NATIVE_PRESETS)
+ 
+ if (NOT DISABLE_MILKDROP_PRESETS)
+@@ -114,6 +116,7 @@
+ endif(COMMAND cmake_policy)
+ 
+ if (BUILD_PROJECTM_STATIC)
++ADD_DEFINITIONS(-DGLEW_STATIC)
+ ADD_LIBRARY(projectM STATIC ${projectM_SOURCES})
+ else(BUILD_PROJECTM_STATIC)
+ ADD_LIBRARY(projectM SHARED ${projectM_SOURCES})
+--- libprojectM.new/libprojectM.pc.in	2009-12-04 00:33:48.000000000 +0100
++++ libprojectM/libprojectM.pc.in	2009-12-04 08:59:27.000000000 +0100
+@@ -9,5 +9,5 @@
+ Version: 2.0.0
+ Description: projectM - OpenGL Milkdrop
+ Requires:
+-Libs: -L${libdir} -lprojectM 
++Libs: -L${libdir} -lprojectM -lglu32 -lglew32 -lopengl32
+ Cflags: -I${includedir} 
+--- libprojectM/libprojectM.pc.in	2009-12-04 09:55:20.000000000 +0100
++++ libprojectM.new/libprojectM.pc.in	2009-12-04 09:54:55.000000000 +0100
+@@ -9,5 +9,5 @@
+ Version: 2.0.0
+ Description: projectM - OpenGL Milkdrop
+ Requires:
+-Libs: -L${libdir} -lprojectM -lglu32 -lglew32 -lopengl32
++Libs: -L${libdir} -lprojectM ${libdir}/libMilkdropPresetFactory.a ${libdir}/libRenderer.a  ${libdir}/libprojectM.a -lglu32 -lglew32 -lopengl32
+ Cflags: -I${includedir} 
+diff -ruN libprojectM.new/libprojectM.pc.in libprojectM/libprojectM.pc.in
+--- libprojectM.new/libprojectM.pc.in	2009-12-04 09:54:55.000000000 +0100
++++ libprojectM/libprojectM.pc.in	2009-12-04 10:15:18.000000000 +0100
+@@ -1,6 +1,6 @@
+ prefix=@CMAKE_INSTALL_PREFIX@
+ exec_prefix=@CMAKE_INSTALL_PREFIX@
+-libdir=@LIB_INSTALL_DIR@
++libdir=@CMAKE_INSTALL_PREFIX@/lib
+ includedir=@CMAKE_INSTALL_PREFIX@/include
+ pkgdatadir=@CMAKE_INSTALL_PREFIX@/@RESOURCE_PREFIX@
+ sysconfdir=@CMAKE_INSTALL_PREFIX@/@RESOURCE_PREFIX@
+@@ -9,5 +9,5 @@
+ Version: 2.0.0
+ Description: projectM - OpenGL Milkdrop
+ Requires:
+-Libs: -L${libdir} -lprojectM ${libdir}/libMilkdropPresetFactory.a ${libdir}/libRenderer.a  ${libdir}/libprojectM.a -lglu32 -lglew32 -lopengl32
++Libs: -L${libdir} -lprojectM -lMilkdropPresetFactory -lRenderer -lglu32 -lglew32 -lopengl32
+ Cflags: -I${includedir} 
+diff -ruN libprojectM.new/MilkdropPresetFactory/CMakeLists.txt libprojectM/MilkdropPresetFactory/CMakeLists.txt
+--- libprojectM.new/MilkdropPresetFactory/CMakeLists.txt	2009-12-01 07:38:42.000000000 +0100
++++ libprojectM/MilkdropPresetFactory/CMakeLists.txt	2009-12-04 10:26:42.000000000 +0100
+@@ -5,7 +5,11 @@
+       cmake_policy(SET CMP0003 NEW)
+     endif(COMMAND cmake_policy)
+ 
+-SET(MilkdropPresetFactory_SOURCES BuiltinFuncs.cpp Func.cpp MilkdropPreset.cpp Param.hpp PresetFrameIO.cpp CustomShape.cpp  Eval.cpp MilkdropPresetFactory.cpp PerPixelEqn.cpp BuiltinParams.cpp InitCond.cpp Parser.cpp CustomWave.cpp Expr.cpp PerPointEqn.cpp Param.cpp PerFrameEqn.cpp IdlePreset.cpp)
++SET(MilkdropPresetFactory_SOURCES BuiltinFuncs.cpp Func.cpp MilkdropPreset.cpp
++        Param.hpp PresetFrameIO.cpp CustomShape.cpp  Eval.cpp
++        MilkdropPresetFactory.cpp PerPixelEqn.cpp BuiltinParams.cpp
++        InitCond.cpp Parser.cpp CustomWave.cpp Expr.cpp PerPointEqn.cpp
++        Param.cpp PerFrameEqn.cpp IdlePreset.cpp ../PresetFactory.cpp )
+ 
+ SET (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
+ 
+diff -ruN libprojectM.new/Renderer/Renderer.cpp libprojectM/Renderer/Renderer.cpp
+--- libprojectM.new/Renderer/Renderer.cpp	2009-12-01 07:38:42.000000000 +0100
++++ libprojectM/Renderer/Renderer.cpp	2009-12-04 10:21:38.000000000 +0100
+@@ -222,7 +222,7 @@
+ 	glTranslatef(-0.5, -0.5, 0);
+ 
+ 	// When console refreshes, there is a chance the preset has been changed by the user
+-	refreshConsole();
++	//refreshConsole();
+ 	draw_title_to_screen(false);
+ 	if (this->showhelp % 2)
+ 		draw_help();
+diff -ruN libprojectM/RandomNumberGenerators.hpp libprojectM.new/RandomNumberGenerators.hpp
+--- libprojectM/RandomNumberGenerators.hpp	2009-12-01 07:38:42.000000000 +0100
++++ libprojectM.new/RandomNumberGenerators.hpp	2010-01-09 01:09:38.000000000 +0100
+@@ -4,6 +4,7 @@
+ #include <vector>
+ #include <cassert>
+ #include <iostream>
++#include <stdlib.h>
+ 
+ #define WEIGHTED_RANDOM_DEBUG 0
+ 
+diff -ruN libprojectM/Renderer/TextureManager.cpp libprojectM.new/Renderer/TextureManager.cpp
+--- libprojectM/Renderer/TextureManager.cpp	2010-01-09 01:16:11.000000000 +0100
++++ libprojectM.new/Renderer/TextureManager.cpp	2010-01-09 01:03:59.000000000 +0100
+@@ -30,6 +30,10 @@
+ #include "IdleTextures.hpp"
+ 
+ 
++#include <stdio.h>
++#include <stdlib.h>
++#include <time.h>
++
+ 
+ TextureManager::TextureManager(const std::string _presetURL): presetURL(_presetURL)
+ {
