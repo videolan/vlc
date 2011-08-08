@@ -557,8 +557,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
 - (IBAction)fullscreen:(id)sender
 {
-//?!    [[VLCCoreInteraction sharedInstance] toggleFullscreen];
-    [self enterFullscreen];
+    [[VLCCoreInteraction sharedInstance] toggleFullscreen];
 }
 
 - (IBAction)dropzoneButtonAction:(id)sender

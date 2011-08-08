@@ -288,10 +288,18 @@ static int Control (vout_display_t *vd, int query, va_list ap)
     switch (query)
     {
         case VOUT_DISPLAY_CHANGE_FULLSCREEN:
-        case VOUT_DISPLAY_CHANGE_WINDOW_STATE:
         {
             /* todo */
             return VLC_EGENERIC;
+        }
+        case VOUT_DISPLAY_CHANGE_WINDOW_STATE:
+        {
+            unsigned state = va_arg (ap, unsigned);
+            if( (state & VOUT_WINDOW_STATE_ABOVE) != 0)
+                [[sys->glView window] setLevel: NSStatusWindowLevel];
+            else
+                [[sys->glView window] setLevel: NSNormalWindowLevel];
+            return VLC_SUCCESS;
         }
         case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
         case VOUT_DISPLAY_CHANGE_DISPLAY_FILLED:
