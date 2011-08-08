@@ -169,6 +169,15 @@ PluginTab::~PluginTab()
                              treePlugins->header()->saveState() );
 }
 
+void PluginTab::keyPressEvent( QKeyEvent *keyEvent )
+{
+    if( keyEvent->key() == Qt::Key_Return ||
+        keyEvent->key() == Qt::Key_Enter )
+        keyEvent->accept();
+    else
+        keyEvent->ignore();
+}
+
 bool PluginTreeItem::operator< ( const QTreeWidgetItem & other ) const
 {
     int col = treeWidget()->sortColumn();
@@ -236,7 +245,11 @@ ExtensionTab::~ExtensionTab()
 // Do not close on ESC or ENTER
 void ExtensionTab::keyPressEvent( QKeyEvent *keyEvent )
 {
-    keyEvent->ignore();
+    if( keyEvent->key() == Qt::Key_Return ||
+        keyEvent->key() == Qt::Key_Enter )
+        keyEvent->accept();
+    else
+        keyEvent->ignore();
 }
 
 // Show more information

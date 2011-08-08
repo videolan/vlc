@@ -70,6 +70,9 @@ class PluginTab : public QVLCFrame
 {
     Q_OBJECT
 
+protected:
+    virtual void keyPressEvent( QKeyEvent *keyEvent );
+
 private:
     PluginTab( intf_thread_t *p_intf );
     virtual ~PluginTab();
