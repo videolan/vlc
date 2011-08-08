@@ -520,7 +520,7 @@ static int MP4_ReadBox_tfhd(  stream_t *p_stream, MP4_Box_t *p_box )
         char psz_size[128] = "\0";
         char psz_flag[128] = "\0";
         if( p_box->data.p_tfhd->i_flags & MP4_TFHD_BASE_DATA_OFFSET )
-            snprintf(psz_base, sizeof(psz_base), "base offset %lld", p_box->data.p_tfhd->i_base_data_offset);
+            snprintf(psz_base, sizeof(psz_base), "base offset %"PRId64, p_box->data.p_tfhd->i_base_data_offset);
         if( p_box->data.p_tfhd->i_flags & MP4_TFHD_SAMPLE_DESC_INDEX )
             snprintf(psz_desc, sizeof(psz_desc), "sample description index %d", p_box->data.p_tfhd->i_sample_description_index);
         if( p_box->data.p_tfhd->i_flags & MP4_TFHD_DFLT_SAMPLE_DURATION )
