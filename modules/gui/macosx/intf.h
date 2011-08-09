@@ -183,6 +183,7 @@ struct intf_sys_t
 - (void)playlistUpdated;
 - (void)updateInfoandMetaPanel;
 - (void)updateMainWindow;
+- (void)showFullscreenController;
 - (void)updateDelays;
 - (void)initStrings;
 - (BOOL)application:(NSApplication *)o_app openFile:(NSString *)o_filename;

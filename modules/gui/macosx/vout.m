@@ -32,7 +32,6 @@
 #import <string.h>
 
 #import "intf.h"
-#import "fspanel.h"
 #import "vout.h"
 #import "CoreInteraction.h"
 #import "MainMenu.h"
@@ -367,9 +366,8 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
         {
             var_SetCoords( p_vout, "mouse-moved", ((int)ml.x), ((int)ml.y) );
         }
-//        if( var_GetBool( p_vout, "fullscreen") )
-            [[[VLCMainWindow sharedInstance] fspanel] fadeIn];
         vlc_object_release( p_vout );
+        [[VLCMain sharedInstance] showFullscreenController];
     }
 
     [super mouseMoved: o_event];

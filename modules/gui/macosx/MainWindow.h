@@ -147,6 +147,7 @@
 - (void)setNativeVideoSize:(NSSize)size;
 
 /* fullscreen handling */
+- (void)showFullscreenController;
 - (BOOL)isFullscreen;
 - (void)lockFullscreenAnimation;
 - (void)unlockFullscreenAnimation;
@@ -156,8 +157,6 @@
 - (void)hasEndedFullscreen;
 - (void)hasBecomeFullscreen;
 - (void)setFrameOnMainThread:(NSData*)packedargs;
-
-- (id)fspanel;
 
 @end
 

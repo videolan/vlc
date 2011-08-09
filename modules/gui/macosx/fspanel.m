@@ -178,16 +178,8 @@
 
 - (void)setActive:(id)noData
 {
-    vout_thread_t *p_vout = getVout();
-    if (p_vout)
-    {
-        if (var_GetBool( p_vout, "fullscreen" ))
-        {
-            b_nonActive = NO;
-            [self fadeIn];
-        }
-        vlc_object_release( p_vout );
-    }
+    b_nonActive = NO;
+    [[VLCMain sharedInstance] showFullscreenController];
 }
 
 /* This routine is called repeatedly to fade in the window */
@@ -429,7 +421,7 @@
     addButton( o_play, @"fs_play"          , @"fs_play_highlight"         , 267, 10, play );
     addButton( o_fwd, @"fs_forward"       , @"fs_forward_highlight"      , 313, 14, forward );
     addButton( o_next, @"fs_skip_next"     , @"fs_skip_next_highlight"    , 365, 15, next );
-    addButton( o_fullscreen, @"fs_exit_fullscreen", @"fs_exit_fullscreen_hightlight", 507, 13, windowAction );
+    addButton( o_fullscreen, @"fs_exit_fullscreen", @"fs_exit_fullscreen_hightlight", 507, 13, toggleFullscreen );
 /*
     addButton( o_button, @"image (off state)", @"image (on state)", 38, 51, something );
  */
@@ -531,32 +523,32 @@
 
 - (IBAction)play:(id)sender
 {
-    [[[VLCMain sharedInstance] controls] play: sender];
+    [[VLCCoreInteraction sharedInstance] play];
 }
 
 - (IBAction)forward:(id)sender
 {
-    [[[VLCMain sharedInstance] controls] forward: sender];
+    [[VLCCoreInteraction sharedInstance] forward];
 }
 
 - (IBAction)backward:(id)sender
 {
-    [[[VLCMain sharedInstance] controls] backward: sender];
+    [[VLCCoreInteraction sharedInstance] backward];
 }
 
 - (IBAction)prev:(id)sender
 {
-    [[[VLCMain sharedInstance] controls] prev: sender];
+    [[VLCCoreInteraction sharedInstance] previous];
 }
 
 - (IBAction)next:(id)sender
 {
-    [[[VLCMain sharedInstance] controls] next: sender];
+    [[VLCCoreInteraction sharedInstance] next];
 }
 
-- (IBAction)windowAction:(id)sender
+- (IBAction)toggleFullscreen:(id)sender
 {
-    [[[VLCMain sharedInstance] controls] windowAction: sender];
+    [[VLCCoreInteraction sharedInstance] toggleFullscreen];
 }
 
 - (IBAction)fsTimeSliderUpdate:(id)sender

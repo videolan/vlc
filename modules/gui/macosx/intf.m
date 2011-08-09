@@ -609,6 +609,8 @@ static VLCMain *_o_sharedMainInstance = nil;
 
     [self _removeOldPreferences];
 
+    [o_mainwindow updateTimeSlider];
+    [o_mainwindow updateVolumeSlider];
     [o_mainwindow makeKeyAndOrderFront: self];
 
     /* Handle sleep notification */
@@ -1257,6 +1259,11 @@ unsigned int CocoaKeyToVLC( unichar i_key )
 - (void)updateMainWindow
 {
     [o_mainwindow updateWindow];
+}
+
+- (void)showFullscreenController
+{
+    [o_mainwindow showFullscreenController];
 }
 
 - (void)updateDelays

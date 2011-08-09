@@ -218,10 +218,6 @@ static VLCMainWindow *_o_sharedInstance = nil;
     o_temp_view = [[NSView alloc] init];
     [o_temp_view setAutoresizingMask:NSViewHeightSizable | NSViewWidthSizable];
 
-    /* reset the interface */
-    [self updateVolumeSlider];
-    [self updateTimeSlider];
-
     /* create the sidebar */
     o_sidebaritems = [[NSMutableArray alloc] init];
     SideBarItem *libraryItem = [SideBarItem itemWithTitle:_NS("LIBRARY") identifier:@"library"];
@@ -646,8 +642,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
         int i_volume_step = 0;
         i_volume_step = config_GetInt( VLCIntf->p_libvlc, "volume-step" );
         [o_volume_sld setFloatValue: (float)i_lastShownVolume / i_volume_step];
-//        if ([o_fspanel respondsToSelector:@selector(setVolumeLevel:)])
-//            [o_fspanel setVolumeLevel: (float)i_lastShownVolume / i_volume_step];
+        [o_fspanel setVolumeLevel: (float)i_lastShownVolume / i_volume_step];
     }
 }
 
@@ -855,6 +850,12 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
 #pragma mark -
 #pragma mark Fullscreen support
+- (void)showFullscreenController
+{
+    if (b_fullscreen)
+        [o_fspanel fadeIn];
+}
+
 - (BOOL)isFullscreen
 {
     return b_fullscreen;
@@ -1302,11 +1303,6 @@ static VLCMainWindow *_o_sharedInstance = nil;
     else {
         [super setFrame:args->frame display:args->display animate:args->animate];
     }
-}
-
-- (id)fspanel
-{
-    return o_fspanel;
 }
 
 #pragma mark -
