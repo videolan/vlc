@@ -157,11 +157,8 @@ int playlist_NodeDelete( playlist_t *p_playlist, playlist_item_t *p_root,
     int i;
     var_SetInteger( p_playlist, "playlist-item-deleted", p_root->i_id );
     ARRAY_BSEARCH( p_playlist->all_items, ->i_id, int, p_root->i_id, i );
-    if( i != -1 ) {
-        vlc_gc_decref(p_playlist->all_items.p_elems[i]->p_input);
-        printf("deleting %d %p\n", i, p_playlist->all_items.p_elems[i]->p_input);
+    if( i != -1 )
         ARRAY_REMOVE( p_playlist->all_items, i );
-    }
 
     if( p_root->i_children == -1 ) {
         ARRAY_BSEARCH( p_playlist->items,->i_id, int, p_root->i_id, i );
