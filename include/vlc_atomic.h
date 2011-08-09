@@ -53,4 +53,21 @@ static inline uintptr_t vlc_atomic_dec (vlc_atomic_t *atom)
 VLC_API uintptr_t vlc_atomic_swap(vlc_atomic_t *, uintptr_t);
 VLC_API uintptr_t vlc_atomic_compare_swap(vlc_atomic_t *, uintptr_t, uintptr_t);
 
+/** Helper to retrieve a single precision from an atom. */
+static inline float vlc_atomic_getf(const vlc_atomic_t *atom)
+{
+    union { float f; uintptr_t i; } u;
+    u.i = vlc_atomic_get(atom);
+    return u.f;
+}
+
+/** Helper to store a single precision into an atom. */
+static inline float vlc_atomic_setf(vlc_atomic_t *atom, float f)
+{
+    union { float f; uintptr_t i; } u;
+    u.f = f;
+    vlc_atomic_set(atom, u.i);
+    return f;
+}
+
 #endif
