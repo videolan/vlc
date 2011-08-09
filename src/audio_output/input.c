@@ -67,19 +67,19 @@ static vout_thread_t *RequestVout( void *,
  * aout_InputNew : allocate a new input and rework the filter pipeline
  *****************************************************************************/
 int aout_InputNew( audio_output_t * p_aout,
-                   const audio_sample_format_t *restrict format,
+                   const audio_sample_format_t *restrict infmt,
+                   const audio_sample_format_t *restrict outfmt,
                    aout_input_t * p_input,
                    const aout_request_vout_t *p_request_vout )
 {
-    aout_owner_t *owner = aout_owner (p_aout);
     audio_sample_format_t chain_input_format;
     audio_sample_format_t chain_output_format;
     vlc_value_t val, text;
     char *psz_filters, *psz_visual, *psz_scaletempo;
     int i_visual;
 
-    aout_FormatPrint( p_aout, "input", format );
-    p_input->samplerate = format->i_rate;
+    aout_FormatPrint( p_aout, "input", infmt );
+    p_input->samplerate = infmt->i_rate;
 
     p_input->i_nb_resamplers = p_input->i_nb_filters = 0;
 
@@ -95,9 +95,9 @@ int aout_InputNew( audio_output_t * p_aout,
     }
 
     /* Prepare format structure */
-    chain_input_format  = *format;
-    chain_output_format = owner->mixer_format;
-    chain_output_format.i_rate = format->i_rate;
+    chain_input_format  = *infmt;
+    chain_output_format = *outfmt;
+    chain_output_format.i_rate = infmt->i_rate;
     aout_FormatPrepare( &chain_output_format );
 
     /* Now add user filters */
@@ -163,7 +163,7 @@ int aout_InputNew( audio_output_t * p_aout,
                             &val, &text );
             }
 
-            var_AddCallback( p_aout, "equalizer", EqualizerCallback, NULL );
+            var_AddCallback( p_aout, "equalizer", EqualizerCallback, p_input );
         }
     }
 
@@ -204,7 +204,7 @@ int aout_InputNew( audio_output_t * p_aout,
                             &val, &text );
             }
 
-            var_AddCallback( p_aout, "audio-replay-gain-mode", ReplayGainCallback, NULL );
+            var_AddCallback( p_aout, "audio-replay-gain-mode", ReplayGainCallback, p_input );
         }
     }
     if( var_Type( p_aout, "audio-replay-gain-preamp" ) == 0 )
@@ -384,20 +384,19 @@ int aout_InputNew( audio_output_t * p_aout,
     }
 
     /* Create resamplers. */
-    if (AOUT_FMT_LINEAR(&owner->mixer_format))
+    if (AOUT_FMT_LINEAR(outfmt))
     {
         chain_output_format.i_rate = (__MAX(p_input->samplerate,
-                                            owner->mixer_format.i_rate)
+                                            outfmt->i_rate)
                                  * (100 + AOUT_MAX_RESAMPLING)) / 100;
-        if ( chain_output_format.i_rate == owner->mixer_format.i_rate )
+        if ( chain_output_format.i_rate == outfmt->i_rate )
         {
             /* Just in case... */
             chain_output_format.i_rate++;
         }
         if (aout_FiltersCreatePipeline (p_aout, p_input->pp_resamplers,
                                         &p_input->i_nb_resamplers,
-                                        &chain_output_format,
-                                        &owner->mixer_format) < 0)
+                                        &chain_output_format, outfmt) < 0)
         {
             inputFailure( p_aout, p_input, "couldn't set a resampler pipeline");
             return -1;
@@ -448,37 +447,6 @@ int aout_InputDelete( audio_output_t * p_aout, aout_input_t * p_input )
     p_input->i_nb_resamplers = 0;
 
     return 0;
-}
-
-/*****************************************************************************
- * aout_InputCheckAndRestart : restart an input
- *****************************************************************************
- * This function must be entered with the input and mixer lock.
- *****************************************************************************/
-void aout_InputCheckAndRestart( audio_output_t * p_aout, aout_input_t * p_input )
-{
-    aout_owner_t *owner = aout_owner(p_aout);
-    aout_assert_locked( p_aout );
-
-    if( !p_input->b_restart )
-        return;
-
-    aout_InputDelete( p_aout, p_input );
-    aout_InputNew( p_aout, &owner->input_format, p_input, &p_input->request_vout );
-
-    p_input->b_restart = false;
-}
-
-/**
- * This function will safely mark aout input to be restarted as soon as
- * possible to take configuration changes into account
- */
-void aout_InputRequestRestart( audio_output_t *p_aout )
-{
-    aout_lock( p_aout );
-    if( aout_owner(p_aout)->input != NULL )
-        aout_owner(p_aout)->input->b_restart = true;
-    aout_unlock( p_aout );
 }
 
 /*****************************************************************************
@@ -849,19 +817,17 @@ static int EqualizerCallback (vlc_object_t *obj, char const *cmd,
     return VLC_SUCCESS;
 }
 
-static int ReplayGainCallback( vlc_object_t *p_this, char const *psz_cmd,
-                               vlc_value_t oldval, vlc_value_t newval, void *p_data )
+static int ReplayGainCallback (vlc_object_t *p_this, char const *psz_cmd,
+                               vlc_value_t oldval, vlc_value_t val, void *data)
 {
-    VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval);
-    VLC_UNUSED(newval); VLC_UNUSED(p_data);
     audio_output_t *aout = (audio_output_t *)p_this;
-    aout_owner_t *owner = aout_owner (aout);
+    aout_input_t *input = data;
 
     aout_lock (aout);
-    if (owner->input != NULL)
-        ReplayGainSelect (aout, owner->input);
+    ReplayGainSelect (aout, input);
     aout_unlock (aout);
 
+    VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval); VLC_UNUSED(val);
     return VLC_SUCCESS;
 }
 

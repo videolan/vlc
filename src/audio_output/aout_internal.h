@@ -132,11 +132,11 @@ static inline aout_owner_t *aout_owner (audio_output_t *aout)
 
 /* From input.c : */
 int aout_InputNew(audio_output_t *, const audio_sample_format_t *,
+                  const audio_sample_format_t *,
                   aout_input_t *, const aout_request_vout_t *);
 int aout_InputDelete( audio_output_t * p_aout, aout_input_t * p_input );
 block_t *aout_InputPlay( audio_output_t *p_aout, aout_input_t *p_input,
                          block_t *p_buffer, int i_input_rate, date_t * );
-void aout_InputCheckAndRestart( audio_output_t * p_aout, aout_input_t * p_input );
 void aout_InputRequestRestart( audio_output_t *p_aout );
 
 /* From filters.c : */

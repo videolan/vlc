@@ -107,7 +107,8 @@ int aout_DecNew( audio_output_t *p_aout,
     date_Set (&owner->sync.date, VLC_TS_INVALID);
 
     owner->input = p_input;
-    aout_InputNew( p_aout, p_format, p_input, p_request_vout );
+    aout_InputNew( p_aout, p_format, &owner->mixer_format, p_input,
+                   p_request_vout );
     aout_unlock( p_aout );
     return 0;
 error:
@@ -168,10 +169,42 @@ static void aout_CheckRestart (audio_output_t *aout)
 
     owner->volume.mixer = aout_MixerNew (aout, owner->mixer_format.i_format);
 
-    if (aout_InputNew (aout, &owner->input_format, input, &input->request_vout))
+    if (aout_InputNew (aout, &owner->input_format, &owner->mixer_format, input,
+                       &input->request_vout))
         assert (input->b_error);
     else
         assert (!input->b_error);
+}
+
+/**
+ * Restarts the audio filter chain if needed.
+ */
+static void aout_InputCheckAndRestart (audio_output_t *aout)
+{
+    aout_owner_t *owner = aout_owner (aout);
+    aout_input_t *input = owner->input;
+
+    aout_assert_locked (aout);
+
+    if (!input->b_restart)
+        return;
+    input->b_restart = false;
+
+    aout_InputDelete (aout, input);
+    aout_InputNew (aout, &owner->input_format, &owner->mixer_format,
+                   input, &input->request_vout);
+}
+
+/**
+ * This function will safely mark aout input to be restarted as soon as
+ * possible to take configuration changes into account
+ */
+void aout_InputRequestRestart (audio_output_t *aout)
+{
+    aout_lock (aout);
+    if (aout_owner (aout)->input != NULL)
+        aout_owner (aout)->input->b_restart = true;
+    aout_unlock (aout);
 }
 
 
@@ -231,7 +264,7 @@ int aout_DecPlay (audio_output_t *p_aout, block_t *p_buffer, int i_input_rate)
     }
 
     aout_CheckRestart( p_aout );
-    aout_InputCheckAndRestart( p_aout, p_input );
+    aout_InputCheckAndRestart (p_aout);
 
     /* Input */
     p_buffer = aout_InputPlay (p_aout, p_input, p_buffer, i_input_rate,
