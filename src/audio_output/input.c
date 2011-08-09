@@ -756,7 +756,8 @@ static int VisualizationCallback (vlc_object_t *obj, char const *var,
                                   void *data)
 {
     const char *mode = newval.psz_string;
-    aout_input_t *input = data;
+    //aout_input_t *input = data;
+    (void) data;
 
     if (!*mode)
     {
@@ -798,9 +799,10 @@ static int EqualizerCallback (vlc_object_t *obj, char const *cmd,
                               void *data)
 {
     char *mode = newval.psz_string;
-    aout_input_t *input = data;
+    //aout_input_t *input = data;
     bool ret;
 
+    (void) data;
     (void) cmd; (void) oldval;
     if (!*mode)
         ret = ChangeFiltersString (obj, "audio-filter", "equalizer", false);
