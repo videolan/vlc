@@ -214,22 +214,6 @@ int aout_InputNew( audio_output_t * p_aout,
                                        &p_input->replay_gain));
     free (gain);
 
-    if( var_Type( p_aout, "audio-replay-gain-preamp" ) == 0 )
-    {
-        var_Create( p_aout, "audio-replay-gain-preamp",
-                    VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );
-    }
-    if( var_Type( p_aout, "audio-replay-gain-default" ) == 0 )
-    {
-        var_Create( p_aout, "audio-replay-gain-default",
-                    VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );
-    }
-    if( var_Type( p_aout, "audio-replay-gain-peak-protection" ) == 0 )
-    {
-        var_Create( p_aout, "audio-replay-gain-peak-protection",
-                    VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
-    }
-
     psz_filters = var_GetString( p_aout, "audio-filter" );
     psz_visual = var_GetString( p_aout, "audio-visual");
     psz_scaletempo = var_InheritBool( p_aout, "audio-time-stretch" ) ? strdup( "scaletempo" ) : NULL;
@@ -698,9 +682,6 @@ static void inputFailure( audio_output_t * p_aout, aout_input_t * p_input,
     var_Destroy( p_aout, "audio-visual" );
 
     var_Destroy( p_aout, "audio-replay-gain-mode" );
-    var_Destroy( p_aout, "audio-replay-gain-default" );
-    var_Destroy( p_aout, "audio-replay-gain-preamp" );
-    var_Destroy( p_aout, "audio-replay-gain-peak-protection" );
 
     /* error flag */
     p_input->b_error = 1;
