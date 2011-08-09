@@ -105,6 +105,7 @@ Audio Output:
  * New audio output in memory (amem)
  * Important simplification and improvements in the core audio output
  * New audio output based on OpenSL ES API for Android
+ * New audio resampler using the Secret Rabbit Code (a.k.a. libsamplerate)
 
 Video Filter:
  * New gradfun filter for debanding videos using dithering

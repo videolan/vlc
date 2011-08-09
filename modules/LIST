@@ -275,6 +275,7 @@ $Id$
  * rss: Display a RSS feed on the video output
  * rtp: rtp demux module
  * rv32: RV32 image format conversion module
+ * samplerate: Secret Rabbit Code (libsamplerate) audio resampler
  * sap: Interface module to read SAP/SDP announcements
  * scale: Images rescaler
  * scaletempo: Scale audio tempo in sync with playback rate
