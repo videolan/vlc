@@ -258,6 +258,13 @@ static void vlc_object_destroy( vlc_object_t *p_this )
     if( p_priv->pf_destructor )
         p_priv->pf_destructor( p_this );
 
+    if (unlikely(p_this == VLC_OBJECT(p_this->p_libvlc)))
+    {
+        /* TODO: should be in src/libvlc.c */
+        var_DelCallback (p_this, "tree", DumpCommand, p_this);
+        var_DelCallback (p_this, "vars", DumpCommand, p_this);
+    }
+
     /* Destroy the associated variables. */
     var_DestroyAll( p_this );
 
