@@ -33,6 +33,7 @@
 
 #include <vlc_common.h>
 #include <vlc_aout.h>
+#include <vlc_modules.h>
 #include "aout_internal.h"
 #include "libvlc.h"
 
@@ -66,7 +67,103 @@ audio_output_t *aout_New( vlc_object_t * p_parent )
 
     aout_VolumeNoneInit (aout);
     vlc_object_set_destructor (aout, aout_Destructor);
+
+    /*
+     * Persistent audio output variables
+     */
+    vlc_value_t val, text;
+    char *str;
+
     var_Create (aout, "intf-change", VLC_VAR_VOID);
+
+    /* Visualizations */
+    var_Create (aout, "visual", VLC_VAR_STRING | VLC_VAR_HASCHOICE);
+    text.psz_string = _("Visualizations");
+    var_Change (aout, "visual", VLC_VAR_SETTEXT, &text, NULL);
+    val.psz_string = (char *)"";
+    text.psz_string = _("Disable");
+    var_Change (aout, "visual", VLC_VAR_ADDCHOICE, &val, &text);
+    val.psz_string = (char *)"spectrometer";
+    text.psz_string = _("Spectrometer");
+    var_Change (aout, "visual", VLC_VAR_ADDCHOICE, &val, &text);
+    val.psz_string = (char *)"scope";
+    text.psz_string = _("Scope");
+    var_Change (aout, "visual", VLC_VAR_ADDCHOICE, &val, &text);
+    val.psz_string = (char *)"spectrum";
+    text.psz_string = _("Spectrum");
+    var_Change (aout, "visual", VLC_VAR_ADDCHOICE, &val, &text);
+    val.psz_string = (char *)"vuMeter";
+    text.psz_string = _("Vu meter");
+    var_Change (aout, "visual", VLC_VAR_ADDCHOICE, &val, &text);
+    /* Look for goom plugin */
+    if (module_exists ("goom"))
+    {
+        val.psz_string = (char *)"goom";
+        text.psz_string = (char *)"Goom";
+        var_Change (aout, "visual", VLC_VAR_ADDCHOICE, &val, &text);
+    }
+    /* Look for libprojectM plugin */
+    if (module_exists ("projectm"))
+    {
+        val.psz_string = (char *)"projectm";
+        text.psz_string = (char*)"projectM";
+        var_Change (aout, "visual", VLC_VAR_ADDCHOICE, &val, &text);
+    }
+    str = var_GetNonEmptyString (aout, "effect-list");
+    if (str != NULL)
+    {
+        var_SetString (aout, "visual", str);
+        free (str);
+    }
+
+    /* Equalizer */
+    var_Create (aout, "equalizer", VLC_VAR_STRING | VLC_VAR_HASCHOICE);
+    text.psz_string = _("Equalizer");
+    var_Change (aout, "equalizer", VLC_VAR_SETTEXT, &text, NULL);
+    val.psz_string = (char*)"";
+    text.psz_string = _("Disable");
+    var_Change (aout, "equalizer", VLC_VAR_ADDCHOICE, &val, &text);
+    {
+        module_config_t *cfg = config_FindConfig (VLC_OBJECT(aout),
+                                                  "equalizer-preset");
+        if (cfg != NULL)
+            for (int i = 0; i < cfg->i_list; i++)
+            {
+                val.psz_string = (char *)cfg->ppsz_list[i];
+                text.psz_string = (char *)cfg->ppsz_list_text[i];
+                var_Change (aout, "equalizer", VLC_VAR_ADDCHOICE, &val, &text);
+            }
+    }
+
+
+    var_Create (aout, "audio-filter", VLC_VAR_STRING | VLC_VAR_DOINHERIT);
+    text.psz_string = _("Audio filters");
+    var_Change (aout, "audio-filter", VLC_VAR_SETTEXT, &text, NULL);
+
+
+    var_Create (aout, "audio-visual", VLC_VAR_STRING | VLC_VAR_DOINHERIT);
+    text.psz_string = _("Audio visualizations");
+    var_Change (aout, "audio-visual", VLC_VAR_SETTEXT, &text, NULL);
+
+
+    /* Replay gain */
+    var_Create (aout, "audio-replay-gain-mode",
+                VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+    text.psz_string = _("Replay gain");
+    var_Change (aout, "audio-replay-gain-mode", VLC_VAR_SETTEXT, &text, NULL);
+    {
+        module_config_t *cfg = config_FindConfig (VLC_OBJECT(aout),
+                                                  "audio-replay-gain-mode");
+        if( cfg != NULL )
+            for (int i = 0; i < cfg->i_list; i++)
+            {
+                val.psz_string = (char *)cfg->ppsz_list[i];
+                text.psz_string = (char *)cfg->ppsz_list_text[i];
+                var_Change (aout, "audio-replay-gain-mode", VLC_VAR_ADDCHOICE,
+                            &val, &text);
+            }
+    }
+
 
     return aout;
 }

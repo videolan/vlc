@@ -75,7 +75,6 @@ int aout_InputNew( audio_output_t * p_aout,
 {
     audio_sample_format_t chain_input_format;
     audio_sample_format_t chain_output_format;
-    vlc_value_t val, text;
     char *psz_filters, *psz_visual, *psz_scaletempo;
     int i_visual;
 
@@ -102,110 +101,8 @@ int aout_InputNew( audio_output_t * p_aout,
     aout_FormatPrepare( &chain_output_format );
 
     /* Now add user filters */
-    if( var_Type( p_aout, "visual" ) == 0 )
-    {
-        var_Create( p_aout, "visual", VLC_VAR_STRING | VLC_VAR_HASCHOICE );
-        text.psz_string = _("Visualizations");
-        var_Change( p_aout, "visual", VLC_VAR_SETTEXT, &text, NULL );
-        val.psz_string = (char*)""; text.psz_string = _("Disable");
-        var_Change( p_aout, "visual", VLC_VAR_ADDCHOICE, &val, &text );
-        val.psz_string = (char*)"spectrometer"; text.psz_string = _("Spectrometer");
-        var_Change( p_aout, "visual", VLC_VAR_ADDCHOICE, &val, &text );
-        val.psz_string = (char*)"scope"; text.psz_string = _("Scope");
-        var_Change( p_aout, "visual", VLC_VAR_ADDCHOICE, &val, &text );
-        val.psz_string = (char*)"spectrum"; text.psz_string = _("Spectrum");
-        var_Change( p_aout, "visual", VLC_VAR_ADDCHOICE, &val, &text );
-        val.psz_string = (char*)"vuMeter"; text.psz_string = _("Vu meter");
-        var_Change( p_aout, "visual", VLC_VAR_ADDCHOICE, &val, &text );
-
-        /* Look for goom plugin */
-        if( module_exists( "goom" ) )
-        {
-            val.psz_string = (char*)"goom"; text.psz_string = (char*)"Goom";
-            var_Change( p_aout, "visual", VLC_VAR_ADDCHOICE, &val, &text );
-        }
-
-        /* Look for libprojectM plugin */
-        if( module_exists( "projectm" ) )
-        {
-            val.psz_string = (char*)"projectm"; text.psz_string = (char*)"projectM";
-            var_Change( p_aout, "visual", VLC_VAR_ADDCHOICE, &val, &text );
-        }
-
-        if( var_Get( p_aout, "effect-list", &val ) == VLC_SUCCESS )
-        {
-            var_SetString( p_aout, "visual", val.psz_string );
-            free( val.psz_string );
-        }
-    }
     var_AddCallback( p_aout, "visual", VisualizationCallback, p_input );
-
-    if( var_Type( p_aout, "equalizer" ) == 0 )
-    {
-        module_config_t *p_config;
-        int i;
-
-        var_Create( p_aout, "equalizer",
-                    VLC_VAR_STRING | VLC_VAR_HASCHOICE );
-        p_config = config_FindConfig( VLC_OBJECT(p_aout), "equalizer-preset" );
-        if( p_config && p_config->i_list )
-        {
-            text.psz_string = _("Equalizer");
-            var_Change( p_aout, "equalizer", VLC_VAR_SETTEXT, &text, NULL );
-
-            val.psz_string = (char*)""; text.psz_string = _("Disable");
-            var_Change( p_aout, "equalizer", VLC_VAR_ADDCHOICE, &val, &text );
-
-            for( i = 0; i < p_config->i_list; i++ )
-            {
-                val.psz_string = (char *)p_config->ppsz_list[i];
-                text.psz_string = (char *)p_config->ppsz_list_text[i];
-                var_Change( p_aout, "equalizer", VLC_VAR_ADDCHOICE,
-                            &val, &text );
-            }
-
-        }
-    }
     var_AddCallback( p_aout, "equalizer", EqualizerCallback, p_input );
-
-    if( var_Type( p_aout, "audio-filter" ) == 0 )
-    {
-        var_Create( p_aout, "audio-filter",
-                    VLC_VAR_STRING | VLC_VAR_DOINHERIT );
-        text.psz_string = _("Audio filters");
-        var_Change( p_aout, "audio-filter", VLC_VAR_SETTEXT, &text, NULL );
-    }
-    if( var_Type( p_aout, "audio-visual" ) == 0 )
-    {
-        var_Create( p_aout, "audio-visual",
-                    VLC_VAR_STRING | VLC_VAR_DOINHERIT );
-        text.psz_string = _("Audio visualizations");
-        var_Change( p_aout, "audio-visual", VLC_VAR_SETTEXT, &text, NULL );
-    }
-
-    if( var_Type( p_aout, "audio-replay-gain-mode" ) == 0 )
-    {
-        module_config_t *p_config;
-        int i;
-
-        p_config = config_FindConfig( VLC_OBJECT(p_aout), "audio-replay-gain-mode" );
-        if( p_config && p_config->i_list )
-        {
-            var_Create( p_aout, "audio-replay-gain-mode",
-                        VLC_VAR_STRING | VLC_VAR_DOINHERIT );
-
-            text.psz_string = _("Replay gain");
-            var_Change( p_aout, "audio-replay-gain-mode", VLC_VAR_SETTEXT, &text, NULL );
-
-            for( i = 0; i < p_config->i_list; i++ )
-            {
-                val.psz_string = (char *)p_config->ppsz_list[i];
-                text.psz_string = (char *)p_config->ppsz_list_text[i];
-                var_Change( p_aout, "audio-replay-gain-mode", VLC_VAR_ADDCHOICE,
-                            &val, &text );
-            }
-        }
-    }
     var_AddCallback( p_aout, "audio-replay-gain-mode", ReplayGainCallback, p_input );
 
     char *gain = var_InheritString (p_aout, "audio-replay-gain-mode");
@@ -676,12 +573,6 @@ static void inputFailure( audio_output_t * p_aout, aout_input_t * p_input,
     aout_FiltersDestroyPipeline( p_input->pp_filters, p_input->i_nb_filters );
     aout_FiltersDestroyPipeline( p_input->pp_resamplers,
                                  p_input->i_nb_resamplers );
-    var_Destroy( p_aout, "visual" );
-    var_Destroy( p_aout, "equalizer" );
-    var_Destroy( p_aout, "audio-filter" );
-    var_Destroy( p_aout, "audio-visual" );
-
-    var_Destroy( p_aout, "audio-replay-gain-mode" );
 
     /* error flag */
     p_input->b_error = 1;
