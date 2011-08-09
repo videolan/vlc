@@ -3,10 +3,6 @@
 LAME_VERSION := 3.98.4
 LAME_URL := $(SF)/lame/lame-$(LAME_VERSION).tar.gz
 
-ifdef BUILD_ENCODERS
-PKGS += lame
-endif
-
 $(TARBALLS)/lame-$(LAME_VERSION).tar.gz:
 	$(call download,$(LAME_URL))
 

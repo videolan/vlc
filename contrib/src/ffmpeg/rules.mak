@@ -26,7 +26,6 @@ DEPS_ffmpeg = zlib gsm vpx $(DEPS_vpx)
 
 # Optional dependencies
 ifdef BUILD_ENCODERS
-# TODO:
 FFMPEGCONF += --enable-libmp3lame
 DEPS_ffmpeg += lame $(DEPS_lame)
 else
