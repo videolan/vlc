@@ -945,7 +945,8 @@ static VLCMainWindow *_o_sharedInstance = nil;
             [o_fullscreen_window makeKeyAndOrderFront:self];
             [o_fullscreen_window orderFront:self animate:YES];
 
-            [o_fullscreen_window setFrame:screen_rect display:YES];
+            [o_fullscreen_window setFrame:screen_rect display:YES animate:YES];
+            [o_fullscreen_window setLevel:NSNormalWindowLevel];
 
             if( blackout_other_displays )
             {
@@ -1034,6 +1035,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
     /* tell the fspanel to move itself to front next time it's triggered */
     [o_fspanel setVoutWasUpdated: (int)[[o_fullscreen_window screen] displayID]];
+    [o_fspanel setActive: nil];
 
     if([self isVisible])
         [super orderOut: self];
@@ -1062,6 +1064,16 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
     /* We always try to do so */
     [NSScreen unblackoutScreens];
+    vout_thread_t *p_vout = getVout();
+    if (p_vout)
+    {
+        if( var_GetBool( p_vout, "video-on-top" ) )
+            [self setLevel: NSStatusWindowLevel];
+        else
+            [self setLevel: NSNormalWindowLevel];
+        vlc_object_release( p_vout );
+    }
+    [self makeKeyAndOrderFront: nil];
 
     /* Don't do anything if o_fullscreen_window is already closed */
     if (!o_fullscreen_window)

@@ -152,19 +152,9 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
     [o_view setFrameSize: [self frame].size];
 }
 
-- (void)drawRect:(NSRect)rect
-{
-    /* When there is no subview we draw a black background */
-    [self lockFocus];
-    [[NSColor blackColor] set];
-    NSRectFill(rect);
-    [self unlockFocus];
-}
-
 - (void)closeVout
 {
     /* Make sure we don't see a white flash */
-    [[o_view window] disableScreenUpdatesUntilFlush];
     [o_view removeFromSuperview];
     [o_view release];
     o_view = nil;

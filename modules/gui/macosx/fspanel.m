@@ -27,7 +27,7 @@
  *****************************************************************************/
 #import "intf.h"
 #import "CoreInteraction.h"
-#import "vout.h"
+#import "MainWindow.h"
 #import "misc.h"
 #import "fspanel.h"
 
@@ -253,7 +253,7 @@
     if (p_vout)
     {
         if (var_GetBool( p_vout, "fullscreen" ))
-            [[[[VLCCoreInteraction sharedInstance] voutView] window] makeKeyWindow];
+            [[[[VLCMainWindow sharedInstance] videoView] window] makeKeyWindow];
         vlc_object_release( p_vout );
     }
 }
