@@ -58,7 +58,8 @@ static int EqualizerCallback( vlc_object_t *, char const *,
                               vlc_value_t, vlc_value_t, void * );
 static int ReplayGainCallback( vlc_object_t *, char const *,
                                vlc_value_t, vlc_value_t, void * );
-static void ReplayGainSelect( audio_output_t *, aout_input_t * );
+static float ReplayGainSelect(vlc_object_t *, const char *,
+                              const audio_replay_gain_t *);
 
 static vout_thread_t *RequestVout( void *,
                                    vout_thread_t *, video_format_t *, bool );
@@ -207,6 +208,12 @@ int aout_InputNew( audio_output_t * p_aout,
             var_AddCallback( p_aout, "audio-replay-gain-mode", ReplayGainCallback, p_input );
         }
     }
+
+    char *gain = var_InheritString (p_aout, "audio-replay-gain-mode");
+    p_input->multiplier = ReplayGainSelect (VLC_OBJECT(p_aout), gain,
+                                            &p_input->replay_gain);
+    free (gain);
+
     if( var_Type( p_aout, "audio-replay-gain-preamp" ) == 0 )
     {
         var_Create( p_aout, "audio-replay-gain-preamp",
@@ -411,8 +418,6 @@ int aout_InputNew( audio_output_t * p_aout,
     {
         p_input->p_playback_rate_filter = p_input->pp_resamplers[0];
     }
-
-    ReplayGainSelect( p_aout, p_input );
 
     /* Success */
     p_input->b_error = false;
@@ -819,68 +824,60 @@ static int EqualizerCallback (vlc_object_t *obj, char const *cmd,
     return VLC_SUCCESS;
 }
 
-static int ReplayGainCallback (vlc_object_t *p_this, char const *psz_cmd,
+static int ReplayGainCallback (vlc_object_t *obj, char const *var,
                                vlc_value_t oldval, vlc_value_t val, void *data)
 {
-    audio_output_t *aout = (audio_output_t *)p_this;
+    audio_output_t *aout = (audio_output_t *)obj;
     aout_input_t *input = data;
+    float multiplier = ReplayGainSelect (obj, val.psz_string,
+                                         &input->replay_gain);
 
     aout_lock (aout);
-    ReplayGainSelect (aout, input);
+    input->multiplier = multiplier;
     aout_unlock (aout);
 
-    VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval); VLC_UNUSED(val);
+    VLC_UNUSED(var); VLC_UNUSED(oldval);
     return VLC_SUCCESS;
 }
 
-static void ReplayGainSelect( audio_output_t *p_aout, aout_input_t *p_input )
+static float ReplayGainSelect (vlc_object_t *obj, const char *str,
+                               const audio_replay_gain_t *replay_gain)
 {
-    char *psz_replay_gain = var_GetNonEmptyString( p_aout,
-                                                   "audio-replay-gain-mode" );
-    int i_mode;
-    int i_use;
-    float f_gain;
+    float gain = 0.;
+    unsigned mode = AUDIO_REPLAY_GAIN_MAX;
 
-    p_input->multiplier = 1.0;
+    if (likely(str != NULL))
+    {   /* Find selectrf mode */
+        if (!strcmp (str, "track"))
+            mode = AUDIO_REPLAY_GAIN_TRACK;
+        else
+        if (!strcmp (str, "album"))
+            mode = AUDIO_REPLAY_GAIN_ALBUM;
 
-    if( !psz_replay_gain )
-        return;
-
-    /* Find select mode */
-    if( !strcmp( psz_replay_gain, "track" ) )
-        i_mode = AUDIO_REPLAY_GAIN_TRACK;
-    else if( !strcmp( psz_replay_gain, "album" ) )
-        i_mode = AUDIO_REPLAY_GAIN_ALBUM;
-    else
-        i_mode = AUDIO_REPLAY_GAIN_MAX;
-
-    /* If the select mode is not available, prefer the other one */
-    i_use = i_mode;
-    if( i_use != AUDIO_REPLAY_GAIN_MAX && !p_input->replay_gain.pb_gain[i_use] )
-    {
-        for( i_use = 0; i_use < AUDIO_REPLAY_GAIN_MAX; i_use++ )
+        /* If the selectrf mode is not available, prefer the other one */
+        if (mode != AUDIO_REPLAY_GAIN_MAX && !replay_gain->pb_gain[mode])
         {
-            if( p_input->replay_gain.pb_gain[i_use] )
-                break;
+            if (replay_gain->pb_gain[!mode])
+                mode = !mode;
         }
     }
 
     /* */
-    if( i_use != AUDIO_REPLAY_GAIN_MAX )
-        f_gain = p_input->replay_gain.pf_gain[i_use] + var_GetFloat( p_aout, "audio-replay-gain-preamp" );
-    else if( i_mode != AUDIO_REPLAY_GAIN_MAX )
-        f_gain = var_GetFloat( p_aout, "audio-replay-gain-default" );
+    if (mode == AUDIO_REPLAY_GAIN_MAX)
+        return 1.;
+
+    if (replay_gain->pb_gain[mode])
+        gain = replay_gain->pf_gain[mode]
+             + var_InheritFloat (obj, "audio-replay-gain-preamp");
     else
-        f_gain = 0.0;
-    p_input->multiplier = pow( 10.0, f_gain / 20.0 );
+        gain = var_InheritFloat (obj, "audio-replay-gain-default");
 
-    /* */
-    if( p_input->replay_gain.pb_peak[i_use] &&
-        var_GetBool( p_aout, "audio-replay-gain-peak-protection" ) &&
-        p_input->replay_gain.pf_peak[i_use] * p_input->multiplier > 1.0 )
-    {
-        p_input->multiplier = 1.0f / p_input->replay_gain.pf_peak[i_use];
-    }
+    float multiplier = pow (10., gain / 20.);
 
-    free( psz_replay_gain );
+    if (replay_gain->pb_peak[mode]
+     && var_InheritBool (obj, "audio-replay-gain-peak-protection")
+     && replay_gain->pf_peak[mode] * multiplier > 1.0)
+        multiplier = 1.0f / replay_gain->pf_peak[mode];
+
+    return multiplier;
 }
