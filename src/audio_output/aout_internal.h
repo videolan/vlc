@@ -70,9 +70,6 @@ struct aout_input_t
     /* Mixer information */
     audio_replay_gain_t     replay_gain;
 
-    /* If b_restart == 1, the input pipeline will be re-created. */
-    bool              b_restart;
-
     /* If b_error == 1, there is no input pipeline. */
     bool              b_error;
 
@@ -112,7 +109,7 @@ typedef struct
     filter_t *filters[AOUT_MAX_FILTERS];
     int       nb_filters;
 
-    bool need_restart;
+    vlc_atomic_t restart;
 } aout_owner_t;
 
 typedef struct
@@ -137,7 +134,6 @@ int aout_InputNew(audio_output_t *, const audio_sample_format_t *,
 int aout_InputDelete( audio_output_t * p_aout, aout_input_t * p_input );
 block_t *aout_InputPlay( audio_output_t *p_aout, aout_input_t *p_input,
                          block_t *p_buffer, int i_input_rate, date_t * );
-void aout_InputRequestRestart( audio_output_t *p_aout );
 
 /* From filters.c : */
 int aout_FiltersCreatePipeline( vlc_object_t *, filter_t **, int *,
@@ -194,6 +190,9 @@ int aout_DecGetResetLost(audio_output_t *);
 void aout_DecChangePause(audio_output_t *, bool b_paused, mtime_t i_date);
 void aout_DecFlush(audio_output_t *);
 bool aout_DecIsEmpty(audio_output_t *);
+
+void aout_InputRequestRestart(audio_output_t *);
+void aout_RequestRestart(audio_output_t *);
 
 /* Audio output locking */
 

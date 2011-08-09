@@ -31,9 +31,9 @@
 #include <assert.h>
 
 #include <vlc_common.h>
-
 #include <vlc_aout.h>
 #include <vlc_input.h>
+#include <vlc_atomic.h>
 
 #include "aout_internal.h"
 #include "libvlc.h"
@@ -97,6 +97,7 @@ int aout_DecNew( audio_output_t *p_aout,
 
     /* Recreate the output using the new format. */
     owner->input_format = *p_format;
+    vlc_atomic_set (&owner->restart, 0);
     if( aout_OutputNew( p_aout, p_format ) < 0 )
         goto error;
 
@@ -144,6 +145,8 @@ void aout_DecDelete( audio_output_t * p_aout )
     free (input);
 }
 
+#define AOUT_RESTART_OUTPUT 1
+#define AOUT_RESTART_INPUT  2
 static void aout_CheckRestart (audio_output_t *aout)
 {
     aout_owner_t *owner = aout_owner (aout);
@@ -151,23 +154,28 @@ static void aout_CheckRestart (audio_output_t *aout)
 
     aout_assert_locked (aout);
 
-    if (likely(!owner->need_restart))
+    int restart = vlc_atomic_swap (&owner->restart, 0);
+    if (likely(restart == 0))
         return;
-    owner->need_restart = false;
+
+    assert (restart & AOUT_RESTART_INPUT);
+    aout_InputDelete (aout, input);
 
     /* Reinitializes the output */
-    aout_InputDelete (aout, owner->input);
-    aout_MixerDelete (owner->volume.mixer);
-    owner->volume.mixer = NULL;
-    aout_OutputDelete (aout);
-
-    if (aout_OutputNew (aout, &owner->input_format))
+    if (restart & AOUT_RESTART_OUTPUT)
     {
-        input->b_error = true;
-        return; /* we are officially screwed */
-    }
+        aout_MixerDelete (owner->volume.mixer);
+        owner->volume.mixer = NULL;
+        aout_OutputDelete (aout);
 
-    owner->volume.mixer = aout_MixerNew (aout, owner->mixer_format.i_format);
+        if (aout_OutputNew (aout, &owner->input_format))
+        {
+            input->b_error = true;
+            return; /* we are officially screwed */
+        }
+        owner->volume.mixer = aout_MixerNew (aout,
+                                             owner->mixer_format.i_format);
+    }
 
     if (aout_InputNew (aout, &owner->input_format, &owner->mixer_format, input,
                        &input->request_vout))
@@ -177,22 +185,15 @@ static void aout_CheckRestart (audio_output_t *aout)
 }
 
 /**
- * Restarts the audio filter chain if needed.
+ * Marks the audio output for restart, to update any parameter of the output
+ * plug-in (e.g. output device or channel mapping).
  */
-static void aout_InputCheckAndRestart (audio_output_t *aout)
+void aout_RequestRestart (audio_output_t *aout)
 {
     aout_owner_t *owner = aout_owner (aout);
-    aout_input_t *input = owner->input;
 
-    aout_assert_locked (aout);
-
-    if (!input->b_restart)
-        return;
-    input->b_restart = false;
-
-    aout_InputDelete (aout, input);
-    aout_InputNew (aout, &owner->input_format, &owner->mixer_format,
-                   input, &input->request_vout);
+    /* DO NOT remove AOUT_RESTART_INPUT. You need to change the atomic ops. */
+    vlc_atomic_set (&owner->restart, AOUT_RESTART_OUTPUT|AOUT_RESTART_INPUT);
 }
 
 /**
@@ -201,10 +202,9 @@ static void aout_InputCheckAndRestart (audio_output_t *aout)
  */
 void aout_InputRequestRestart (audio_output_t *aout)
 {
-    aout_lock (aout);
-    if (aout_owner (aout)->input != NULL)
-        aout_owner (aout)->input->b_restart = true;
-    aout_unlock (aout);
+    aout_owner_t *owner = aout_owner (aout);
+
+    vlc_atomic_compare_swap (&owner->restart, 0, AOUT_RESTART_INPUT);
 }
 
 
@@ -264,7 +264,6 @@ int aout_DecPlay (audio_output_t *p_aout, block_t *p_buffer, int i_input_rate)
     }
 
     aout_CheckRestart( p_aout );
-    aout_InputCheckAndRestart (p_aout);
 
     /* Input */
     p_buffer = aout_InputPlay (p_aout, p_input, p_buffer, i_input_rate,

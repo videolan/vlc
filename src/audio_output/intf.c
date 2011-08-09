@@ -233,20 +233,6 @@ int aout_SetMute (vlc_object_t *obj, audio_volume_t *volp, bool mute)
  * Pipelines management
  */
 
-/**
- * Marks the audio output for restart, to update any parameter of the output
- * plug-in (e.g. output device or channel mapping).
- */
-static void aout_Restart (audio_output_t *aout)
-{
-    aout_owner_t *owner = aout_owner (aout);
-
-    aout_lock (aout);
-    if (owner->input != NULL)
-        owner->need_restart = true;
-    aout_unlock (aout);
-}
-
 /*****************************************************************************
  * aout_ChannelsRestart : change the audio device or channels and restart
  *****************************************************************************/
@@ -263,7 +249,7 @@ int aout_ChannelsRestart( vlc_object_t * p_this, const char * psz_variable,
          * rebuilding the channel choices. */
         var_Destroy( p_aout, "audio-channels" );
     }
-    aout_Restart( p_aout );
+    aout_RequestRestart (p_aout);
     return 0;
 }
 
