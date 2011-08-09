@@ -37,13 +37,13 @@
 #include "dbus_root.h"
 #include "dbus_common.h"
 
-static const char* ppsz_supported_uri_schemes[] = {
+static const char const ppsz_supported_uri_schemes[][9] = {
     "file", "http", "https", "rtsp", "realrtsp", "pnm", "ftp", "mtp", "smb",
     "mms", "mmsu", "mmst", "mmsh", "unsv", "itpc", "icyx", "rtmp", "rtp",
     "dccp", "dvd", "vcd", "vcdx"
 };
 
-static const char* ppsz_supported_mime_types[] = {
+static const char const ppsz_supported_mime_types[][26] = {
     "audio/mpeg", "audio/x-mpeg",
     "video/mpeg", "video/x-mpeg",
     "video/mpeg-system", "video/x-mpeg-system",
