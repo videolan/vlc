@@ -137,19 +137,19 @@ int aout_InputNew( audio_output_t * p_aout,
             var_SetString( p_aout, "visual", val.psz_string );
             free( val.psz_string );
         }
-        var_AddCallback( p_aout, "visual", VisualizationCallback, p_input );
     }
+    var_AddCallback( p_aout, "visual", VisualizationCallback, p_input );
 
     if( var_Type( p_aout, "equalizer" ) == 0 )
     {
         module_config_t *p_config;
         int i;
 
+        var_Create( p_aout, "equalizer",
+                    VLC_VAR_STRING | VLC_VAR_HASCHOICE );
         p_config = config_FindConfig( VLC_OBJECT(p_aout), "equalizer-preset" );
         if( p_config && p_config->i_list )
         {
-               var_Create( p_aout, "equalizer",
-                           VLC_VAR_STRING | VLC_VAR_HASCHOICE );
             text.psz_string = _("Equalizer");
             var_Change( p_aout, "equalizer", VLC_VAR_SETTEXT, &text, NULL );
 
@@ -164,9 +164,9 @@ int aout_InputNew( audio_output_t * p_aout,
                             &val, &text );
             }
 
-            var_AddCallback( p_aout, "equalizer", EqualizerCallback, p_input );
         }
     }
+    var_AddCallback( p_aout, "equalizer", EqualizerCallback, p_input );
 
     if( var_Type( p_aout, "audio-filter" ) == 0 )
     {
@@ -204,10 +204,9 @@ int aout_InputNew( audio_output_t * p_aout,
                 var_Change( p_aout, "audio-replay-gain-mode", VLC_VAR_ADDCHOICE,
                             &val, &text );
             }
-
-            var_AddCallback( p_aout, "audio-replay-gain-mode", ReplayGainCallback, p_input );
         }
     }
+    var_AddCallback( p_aout, "audio-replay-gain-mode", ReplayGainCallback, p_input );
 
     char *gain = var_InheritString (p_aout, "audio-replay-gain-mode");
     vlc_atomic_setf (&p_input->multiplier,
@@ -437,6 +436,11 @@ int aout_InputDelete( audio_output_t * p_aout, aout_input_t * p_input )
     aout_assert_locked( p_aout );
     if ( p_input->b_error )
         return 0;
+
+    var_DelCallback (p_aout, "audio-replay-gain-mode", ReplayGainCallback,
+                     p_input);
+    var_DelCallback (p_aout, "equalizer", EqualizerCallback, p_input);
+    var_DelCallback (p_aout, "visual", VisualizationCallback, p_input);
 
     /* XXX We need to update b_recycle_vout before calling aout_FiltersDestroyPipeline.
      * FIXME They can be a race condition if audio-visual is updated between
