@@ -623,6 +623,11 @@ static VLCMainMenu *_o_sharedInstance = nil;
     }
 }
 
+- (id)voutMenu
+{
+    return o_vout_menu;
+}
+
 #pragma mark -
 #pragma mark Panels
 
@@ -1204,8 +1209,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
             {
                 if( [o_title isEqualToString: _NS("Float on Top")] )
                 {
-                    var_Get( p_vout, "video-on-top", &val );
-                    [o_mi setState: val.b_bool ?  NSOnState : NSOffState];
+                    [o_mi setState: var_GetBool( p_vout, "video-on-top" )];
                 }
 
                 bEnabled = TRUE;
@@ -1215,8 +1219,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
         }
         if( [o_title isEqualToString: _NS("Fullscreen")] )
         {
-            var_Get( p_playlist, "fullscreen", &val );
-            [o_mi setState: val.b_bool];
+        [o_mi setState: var_GetBool( p_playlist, "fullscreen" )];
             bEnabled = TRUE;
         }
         [self setupMenus]; /* Make sure video menu is up to date */

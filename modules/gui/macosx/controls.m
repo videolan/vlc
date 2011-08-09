@@ -166,19 +166,6 @@
     }
 }
 
-- (IBAction)toogleFullscreen:(id)sender {
-    [[VLCCoreInteraction sharedInstance] toggleFullscreen];
-}
-
-- (BOOL) isFullscreen {
-    id o_vout_view = [[VLCCoreInteraction sharedInstance] voutView];
-    if( o_vout_view )
-    {
-        return [o_vout_view isFullscreen];
-    }
-    return NO;
-}
-
 - (IBAction)telxTransparent:(id)sender
 {
     vlc_object_t *p_vbi;
@@ -329,11 +316,14 @@
                 /* Escape */
                 if( key == (unichar) 0x1b )
                 {
-                    id o_vout_view = [[VLCCoreInteraction sharedInstance] voutView];
-                    if( o_vout_view && [o_vout_view isFullscreen] )
+                    vout_thread_t *p_vout = getVout();
+                    if (p_vout)
                     {
-                        [o_vout_view toggleFullscreen];
-                        eventHandled = YES;
+                        if (var_GetBool( p_vout, "fullscreen" ))
+                        {
+                            [[VLCCoreInteraction sharedInstance] toggleFullscreen];
+                            eventHandled = YES;
+                        }
                     }
                 }
                 else if( key == ' ' )

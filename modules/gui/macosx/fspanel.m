@@ -178,13 +178,15 @@
 
 - (void)setActive:(id)noData
 {
-    if( [[VLCCoreInteraction sharedInstance] voutView] != nil )
+    vout_thread_t *p_vout = getVout();
+    if (p_vout)
     {
-        if( [[[VLCCoreInteraction sharedInstance] voutView] isFullscreen] )
+        if (var_GetBool( p_vout, "fullscreen" ))
         {
             b_nonActive = NO;
             [self fadeIn];
         }
+        vlc_object_release( p_vout );
     }
 }
 
@@ -247,8 +249,13 @@
 - (void)mouseExited:(NSEvent *)theEvent
 {
     /* give up our focus, so the vout may show us again without letting the user clicking it */
-    if( [[[VLCCoreInteraction sharedInstance] voutView] isFullscreen] )
-        [[[[VLCCoreInteraction sharedInstance] voutView] window] makeKeyWindow];
+    vout_thread_t *p_vout = getVout();
+    if (p_vout)
+    {
+        if (var_GetBool( p_vout, "fullscreen" ))
+            [[[[VLCCoreInteraction sharedInstance] voutView] window] makeKeyWindow];
+        vlc_object_release( p_vout );
+    }
 }
 
 - (void)hideMouse

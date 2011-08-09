@@ -2,9 +2,9 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.10">
   <data>
     <int key="IBDocument.SystemTarget">1040</int>
-    <string key="IBDocument.SystemVersion">11C26</string>
+    <string key="IBDocument.SystemVersion">11A511</string>
     <string key="IBDocument.InterfaceBuilderVersion">851</string>
-    <string key="IBDocument.AppKitVersion">1138.11</string>
+    <string key="IBDocument.AppKitVersion">1138</string>
     <string key="IBDocument.HIToolboxVersion">566.00</string>
     <object class="NSMutableDictionary" key="IBDocument.PluginVersions">
       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -21,14 +21,14 @@
     </object>
     <object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
       <bool key="EncodedWithXMLCoder">YES</bool>
-      <integer value="1617"/>
-      <integer value="2730"/>
-      <integer value="4682"/>
       <integer value="4596"/>
       <integer value="915"/>
-      <integer value="334"/>
-      <integer value="283"/>
+      <integer value="1617"/>
+      <integer value="2730"/>
       <integer value="4722"/>
+      <integer value="283"/>
+      <integer value="2"/>
+      <integer value="334"/>
     </object>
     <object class="NSArray" key="IBDocument.PluginDependencies">
       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -1217,7 +1217,7 @@
                 <bool key="CIEnabled">YES</bool>
               </object>
               <int key="NSViewLayerContentsRedrawPolicy">2</int>
-              <string key="NSClassName">NSView</string>
+              <string key="NSClassName">VLCVoutView</string>
             </object>
           </object>
           <string key="NSFrameSize">{604, 310}</string>
@@ -16237,6 +16237,25 @@ LCAuLi4</string>
           <string key="className">VLCProgressBarGradientEffect</string>
           <string key="superclassName">NSView</string>
           <reference key="sourceIdentifier" ref="736371707"/>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">VLCVoutView</string>
+          <string key="superclassName">NSView</string>
+          <object class="NSMutableDictionary" key="outlets">
+            <string key="NS.key.0">o_window</string>
+            <string key="NS.object.0">id</string>
+          </object>
+          <object class="NSMutableDictionary" key="toOneOutletInfosByName">
+            <string key="NS.key.0">o_window</string>
+            <object class="IBToOneOutletInfo" key="NS.object.0">
+              <string key="name">o_window</string>
+              <string key="candidateClassName">id</string>
+            </object>
+          </object>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBDocumentRelativeSource</string>
+            <string key="minorKey">../../../../../modules/gui/macosx/vout.h</string>
+          </object>
         </object>
       </object>
       <object class="NSMutableArray" key="referencedPartialClassDescriptionsV3.2+">

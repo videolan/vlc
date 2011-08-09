@@ -70,10 +70,8 @@ contrib-macosx-$(ARCH)-$(CONTRIBREV).tar.bz2:
 	(cd build-src && rm -rf *gecko* && $(MAKE) .gecko)
     # libiconv.la is no longer present on Snow Leopard, so fix possible references to it, which would
     # result in linking issues
-ifdef HAVE_MACOSX_DARWIN_10
 	(cd $(PREFIX)/lib && sed -e 's%/usr/lib/libiconv.la%$(PREFIX)/lib/libiconv.la%g' -i.orig *.la && rm -f *.la.orig)
 	(cd build-src && rm -f .iconv && $(MAKE) .iconv-from-os)
-endif
 	touch .$(CONTRIBREV)
 
 using-bin: .$(CONTRIBREV) 

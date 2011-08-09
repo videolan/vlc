@@ -646,8 +646,8 @@ static VLCMainWindow *_o_sharedInstance = nil;
         int i_volume_step = 0;
         i_volume_step = config_GetInt( VLCIntf->p_libvlc, "volume-step" );
         [o_volume_sld setFloatValue: (float)i_lastShownVolume / i_volume_step];
-        if ([o_fspanel respondsToSelector:@selector(setVolumeLevel:)])
-            [o_fspanel setVolumeLevel: (float)i_lastShownVolume / i_volume_step];
+//        if ([o_fspanel respondsToSelector:@selector(setVolumeLevel:)])
+//            [o_fspanel setVolumeLevel: (float)i_lastShownVolume / i_volume_step];
     }
 }
 
@@ -1292,6 +1292,10 @@ static VLCMainWindow *_o_sharedInstance = nil;
     }
 }
 
+- (id)fspanel
+{
+    return o_fspanel;
+}
 
 #pragma mark -
 #pragma mark Side Bar Data handling

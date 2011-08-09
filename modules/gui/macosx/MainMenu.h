@@ -251,6 +251,7 @@
                  var:(const char *)psz_variable
             selector:(SEL)pf_callback;
 
+- (id)voutMenu;
 @end
 
 /*****************************************************************************

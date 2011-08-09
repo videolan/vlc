@@ -23,7 +23,6 @@
 
 #import "CoreInteraction.h"
 #import "intf.h"
-#import "vout.h"
 #import "open.h"
 #import <vlc_playlist.h>
 #import <vlc_input.h>
@@ -93,9 +92,6 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
 - (void)stop
 {
     var_SetInteger( VLCIntf->p_libvlc, "key-action", ACTIONID_STOP );
-    /* Close the window directly, because we do know that there
-     * won't be anymore video. It's currently waiting a bit. */
-    [[[self voutView] window] orderOut:self];
 }
 
 - (void)faster
@@ -269,27 +265,5 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
 
         vlc_object_release( p_input );
     }
-}
-
-- (id)voutView
-{
-    id o_window;
-    id o_voutView = nil;
-    id o_embeddedViewList = [[VLCMain sharedInstance] embeddedList];
-    NSEnumerator *o_enumerator = [[NSApp orderedWindows] objectEnumerator];
-    while( !o_voutView && ( o_window = [o_enumerator nextObject] ) )
-    {
-        /* We have an embedded vout */
-        if( [o_embeddedViewList windowContainsEmbedded: o_window] )
-        {
-            o_voutView = [o_embeddedViewList viewForWindow: o_window];
-        }
-        /* We have a detached vout */
-        else if( [[o_window className] isEqualToString: @"VLCVoutWindow"] )
-        {
-            o_voutView = [o_window voutView];
-        }
-    }
-    return [[o_voutView retain] autorelease];
 }
 @end

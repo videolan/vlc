@@ -744,10 +744,6 @@ static VLCMain *_o_sharedMainInstance = nil;
     [NSApp activateIgnoringOtherApps:YES];
     [o_remote stopListening: self];
     var_SetInteger( p_intf->p_libvlc, "key-action", ACTIONID_STOP );
-
-    /* Close the window directly, because we do know that there
-     * won't be anymore video. It's currently waiting a bit. */
-    [[[o_coreinteraction voutView] window] orderOut:self];
 }
 
 #pragma mark -
@@ -1276,6 +1272,15 @@ unsigned int CocoaKeyToVLC( unichar i_key )
 - (void)updatePlaybackPosition
 {
     [o_mainwindow updateTimeSlider];
+
+    input_thread_t * p_input;
+    p_input = pl_CurrentInput( p_intf );
+    if( p_input )
+    {
+        if( var_GetInteger( p_input, "state" ) == PLAYING_S )
+            UpdateSystemActivity( UsrActivity );
+        vlc_object_release( p_input );
+    }
 }
 
 - (void)updateVolume

@@ -157,6 +157,8 @@
 - (void)hasBecomeFullscreen;
 - (void)setFrameOnMainThread:(NSData*)packedargs;
 
+- (id)fspanel;
+
 @end
 
 @interface VLCProgressBarGradientEffect : NSView {
