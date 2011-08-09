@@ -136,11 +136,23 @@
 @implementation NSApplication(ScriptSupport)
 
 - (BOOL) scriptFullscreenMode {    
-    return [[[VLCMain sharedInstance] controls] isFullscreen];
+    vout_thread_t * p_vout = getVout();
+    if( !p_vout )
+        return NO;
+    BOOL b_value = var_GetBool( p_vout, "fullscreen");
+    vlc_object_release( p_vout );
+    return b_value;
 }
 - (void) setScriptFullscreenMode: (BOOL) mode {
-    VLCControls * o_controls = [[VLCMain sharedInstance] controls];
-    if (mode == [o_controls isFullscreen]) return;
+    vout_thread_t * p_vout = getVout();
+    if( !p_vout )
+        return;
+    if (var_GetBool( p_vout, "fullscreen") == mode)
+    {
+        vlc_object_release( p_vout );
+        return;
+    }
+    vlc_object_release( p_vout );
     [[VLCCoreInteraction sharedInstance] toggleFullscreen];
 }
 
