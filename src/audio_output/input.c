@@ -41,9 +41,9 @@
 #include <vlc_input.h>
 #include <vlc_vout.h>                  /* for vout_Request */
 #include <vlc_modules.h>
-
 #include <vlc_aout.h>
 #include <vlc_filter.h>
+#include <vlc_atomic.h>
 #include <libvlc.h>
 
 #include "aout_internal.h"
@@ -210,8 +210,9 @@ int aout_InputNew( audio_output_t * p_aout,
     }
 
     char *gain = var_InheritString (p_aout, "audio-replay-gain-mode");
-    p_input->multiplier = ReplayGainSelect (VLC_OBJECT(p_aout), gain,
-                                            &p_input->replay_gain);
+    vlc_atomic_setf (&p_input->multiplier,
+                     ReplayGainSelect (VLC_OBJECT(p_aout), gain,
+                                       &p_input->replay_gain));
     free (gain);
 
     if( var_Type( p_aout, "audio-replay-gain-preamp" ) == 0 )
@@ -824,17 +825,19 @@ static int EqualizerCallback (vlc_object_t *obj, char const *cmd,
     return VLC_SUCCESS;
 }
 
+float aout_InputGetMultiplier (const aout_input_t *input)
+{
+    return vlc_atomic_getf (&input->multiplier);
+}
+
 static int ReplayGainCallback (vlc_object_t *obj, char const *var,
                                vlc_value_t oldval, vlc_value_t val, void *data)
 {
-    audio_output_t *aout = (audio_output_t *)obj;
     aout_input_t *input = data;
     float multiplier = ReplayGainSelect (obj, val.psz_string,
                                          &input->replay_gain);
 
-    aout_lock (aout);
-    input->multiplier = multiplier;
-    aout_unlock (aout);
+    vlc_atomic_setf (&input->multiplier, multiplier);
 
     VLC_UNUSED(var); VLC_UNUSED(oldval);
     return VLC_SUCCESS;

@@ -51,7 +51,7 @@ block_t *aout_FilterBufferNew( filter_t *, int );
 /** an input stream for the audio output */
 struct aout_input_t
 {
-    float                   multiplier; /**< Replay gain multiplier */
+    vlc_atomic_t        multiplier; /**< Replay gain multiplier */
     unsigned            samplerate; /**< Input sample rate */
 
     /* pre-filters */
@@ -134,6 +134,7 @@ int aout_InputNew(audio_output_t *, const audio_sample_format_t *,
 int aout_InputDelete( audio_output_t * p_aout, aout_input_t * p_input );
 block_t *aout_InputPlay( audio_output_t *p_aout, aout_input_t *p_input,
                          block_t *p_buffer, int i_input_rate, date_t * );
+float aout_InputGetMultiplier(const aout_input_t *);
 
 /* From filters.c : */
 int aout_FiltersCreatePipeline( vlc_object_t *, filter_t **, int *,

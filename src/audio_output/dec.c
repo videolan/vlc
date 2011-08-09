@@ -273,7 +273,8 @@ int aout_DecPlay (audio_output_t *p_aout, block_t *p_buffer, int i_input_rate)
         date_Increment (&owner->sync.date, p_buffer->i_nb_samples);
 
         /* Mixer */
-        float amp = owner->volume.multiplier * p_input->multiplier;
+        float amp = owner->volume.multiplier
+                  * aout_InputGetMultiplier (p_input);
         aout_MixerRun (owner->volume.mixer, p_buffer, amp);
 
         /* Output */
