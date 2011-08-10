@@ -51,7 +51,6 @@ block_t *aout_FilterBufferNew( filter_t *, int );
 /** an input stream for the audio output */
 struct aout_input_t
 {
-    vlc_atomic_t        multiplier; /**< Replay gain multiplier */
     unsigned            samplerate; /**< Input sample rate */
 
     /* pre-filters */
@@ -66,9 +65,6 @@ struct aout_input_t
     int                     i_resampling_type;
     mtime_t                 i_resamp_start_date;
     int                     i_resamp_start_drift;
-
-    /* Mixer information */
-    audio_replay_gain_t     replay_gain;
 
     /* If b_error == 1, there is no input pipeline. */
     bool              b_error;
@@ -100,7 +96,13 @@ typedef struct
         vlc_mutex_t lock;
         float multiplier; /**< Software volume amplification multiplier */
         struct audio_mixer *mixer; /**< Software volume plugin */
-    } volume; /**< Volume and gain management (FIXME: input manager?) */
+    } volume;
+
+    struct
+    {
+        vlc_atomic_t multiplier;
+        audio_replay_gain_t data;
+    } gain;
 
     audio_sample_format_t mixer_format;
     audio_sample_format_t input_format;
@@ -134,7 +136,6 @@ int aout_InputNew(audio_output_t *, const audio_sample_format_t *,
 int aout_InputDelete( audio_output_t * p_aout, aout_input_t * p_input );
 block_t *aout_InputPlay( audio_output_t *p_aout, aout_input_t *p_input,
                          block_t *p_buffer, int i_input_rate, date_t * );
-float aout_InputGetMultiplier(const aout_input_t *);
 
 /* From filters.c : */
 int aout_FiltersCreatePipeline( vlc_object_t *, filter_t **, int *,
@@ -149,6 +150,20 @@ struct audio_mixer *aout_MixerNew(vlc_object_t *, vlc_fourcc_t);
 #define aout_MixerNew(o, f) aout_MixerNew(VLC_OBJECT(o), f)
 void aout_MixerDelete(struct audio_mixer *);
 void aout_MixerRun(struct audio_mixer *, block_t *, float);
+float aout_ReplayGainSelect(vlc_object_t *, const char *,
+                            const audio_replay_gain_t *);
+#define aout_ReplayGainSelect(o, s, g) \
+        aout_ReplayGainSelect(VLC_OBJECT(o), s, g)
+
+static inline void aout_ReplayGainInit(audio_replay_gain_t *restrict d,
+                                       const audio_replay_gain_t *restrict s)
+{
+    if (s != NULL)
+        *d = *s;
+    else
+        memset (d, 0, sizeof (*d));
+}
+
 
 /* From output.c : */
 int aout_OutputNew( audio_output_t * p_aout,

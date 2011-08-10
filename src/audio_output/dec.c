@@ -38,6 +38,9 @@
 #include "aout_internal.h"
 #include "libvlc.h"
 
+static int ReplayGainCallback (vlc_object_t *, char const *,
+                               vlc_value_t, vlc_value_t, void *);
+
 /**
  * Creates an audio output
  */
@@ -83,30 +86,34 @@ int aout_DecNew( audio_output_t *p_aout,
 
     p_input->b_error = true;
 
-    if( p_replay_gain )
-        p_input->replay_gain = *p_replay_gain;
-
     /* We can only be called by the decoder, so no need to lock
      * p_input->lock. */
     aout_owner_t *owner = aout_owner(p_aout);
     aout_lock( p_aout );
-    assert (owner->input == NULL);
 
+    /* Create the audio output stream */
     var_Destroy( p_aout, "audio-device" );
     var_Destroy( p_aout, "audio-channels" );
 
-    /* Recreate the output using the new format. */
     owner->input_format = *p_format;
     vlc_atomic_set (&owner->restart, 0);
     if( aout_OutputNew( p_aout, p_format ) < 0 )
         goto error;
 
+    /* Allocate a software mixer */
     assert (owner->volume.mixer == NULL);
     owner->volume.mixer = aout_MixerNew (p_aout, owner->mixer_format.i_format);
 
+    aout_ReplayGainInit (&owner->gain.data, p_replay_gain);
+    var_AddCallback (p_aout, "audio-replay-gain-mode",
+                     ReplayGainCallback, owner);
+    var_TriggerCallback (p_aout, "audio-replay-gain-mode");
+
+    /* Create the audio filtering "input" pipeline */
     date_Init (&owner->sync.date, owner->mixer_format.i_rate, 1);
     date_Set (&owner->sync.date, VLC_TS_INVALID);
 
+    assert (owner->input == NULL);
     owner->input = p_input;
     aout_InputNew( p_aout, p_format, &owner->mixer_format, p_input,
                    p_request_vout );
@@ -133,9 +140,13 @@ void aout_DecDelete( audio_output_t * p_aout )
     aout_InputDelete (p_aout, input);
     owner->input = NULL;
 
-    aout_OutputDelete( p_aout );
     mixer = owner->volume.mixer;
     owner->volume.mixer = NULL;
+
+    var_DelCallback (p_aout, "audio-replay-gain-mode",
+                     ReplayGainCallback, owner);
+
+    aout_OutputDelete( p_aout );
     var_Destroy( p_aout, "audio-device" );
     var_Destroy( p_aout, "audio-channels" );
 
@@ -273,9 +284,12 @@ int aout_DecPlay (audio_output_t *p_aout, block_t *p_buffer, int i_input_rate)
         date_Increment (&owner->sync.date, p_buffer->i_nb_samples);
 
         /* Mixer */
-        float amp = owner->volume.multiplier
-                  * aout_InputGetMultiplier (p_input);
-        aout_MixerRun (owner->volume.mixer, p_buffer, amp);
+        if (owner->volume.mixer != NULL)
+        {
+            float amp = owner->volume.multiplier
+                      * vlc_atomic_getf (&owner->gain.multiplier);
+            aout_MixerRun (owner->volume.mixer, p_buffer, amp);
+        }
 
         /* Output */
         aout_OutputPlay( p_aout, p_buffer );
@@ -373,4 +387,15 @@ void aout_TimeReport (audio_output_t *aout, mtime_t ideal)
         if (date_Get (&owner->sync.date) != VLC_TS_INVALID)
             date_Move (&owner->sync.date, delta);
     }
+}
+
+static int ReplayGainCallback (vlc_object_t *obj, char const *var,
+                               vlc_value_t oldval, vlc_value_t val, void *data)
+{
+    aout_owner_t *owner = data;
+    float multiplier = aout_ReplayGainSelect (obj, val.psz_string,
+                                              &owner->gain.data);
+    vlc_atomic_setf (&owner->gain.multiplier, multiplier);
+    VLC_UNUSED(var); VLC_UNUSED(oldval);
+    return VLC_SUCCESS;
 }

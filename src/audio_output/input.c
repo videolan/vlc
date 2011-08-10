@@ -35,7 +35,6 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <math.h>
 #include <assert.h>
 
 #include <vlc_input.h>
@@ -43,7 +42,6 @@
 #include <vlc_modules.h>
 #include <vlc_aout.h>
 #include <vlc_filter.h>
-#include <vlc_atomic.h>
 #include <libvlc.h>
 
 #include "aout_internal.h"
@@ -56,10 +54,6 @@ static int VisualizationCallback( vlc_object_t *, char const *,
                                   vlc_value_t, vlc_value_t, void * );
 static int EqualizerCallback( vlc_object_t *, char const *,
                               vlc_value_t, vlc_value_t, void * );
-static int ReplayGainCallback( vlc_object_t *, char const *,
-                               vlc_value_t, vlc_value_t, void * );
-static float ReplayGainSelect(vlc_object_t *, const char *,
-                              const audio_replay_gain_t *);
 
 static vout_thread_t *RequestVout( void *,
                                    vout_thread_t *, video_format_t *, bool );
@@ -103,13 +97,6 @@ int aout_InputNew( audio_output_t * p_aout,
     /* Now add user filters */
     var_AddCallback( p_aout, "visual", VisualizationCallback, p_input );
     var_AddCallback( p_aout, "equalizer", EqualizerCallback, p_input );
-    var_AddCallback( p_aout, "audio-replay-gain-mode", ReplayGainCallback, p_input );
-
-    char *gain = var_InheritString (p_aout, "audio-replay-gain-mode");
-    vlc_atomic_setf (&p_input->multiplier,
-                     ReplayGainSelect (VLC_OBJECT(p_aout), gain,
-                                       &p_input->replay_gain));
-    free (gain);
 
     psz_filters = var_GetString( p_aout, "audio-filter" );
     psz_visual = var_GetString( p_aout, "audio-visual");
@@ -318,8 +305,6 @@ int aout_InputDelete( audio_output_t * p_aout, aout_input_t * p_input )
     if ( p_input->b_error )
         return 0;
 
-    var_DelCallback (p_aout, "audio-replay-gain-mode", ReplayGainCallback,
-                     p_input);
     var_DelCallback (p_aout, "equalizer", EqualizerCallback, p_input);
     var_DelCallback (p_aout, "visual", VisualizationCallback, p_input);
 
@@ -699,64 +684,4 @@ static int EqualizerCallback (vlc_object_t *obj, char const *cmd,
     if (ret)
         aout_InputRequestRestart ((audio_output_t *)obj);
     return VLC_SUCCESS;
-}
-
-float aout_InputGetMultiplier (const aout_input_t *input)
-{
-    return vlc_atomic_getf (&input->multiplier);
-}
-
-static int ReplayGainCallback (vlc_object_t *obj, char const *var,
-                               vlc_value_t oldval, vlc_value_t val, void *data)
-{
-    aout_input_t *input = data;
-    float multiplier = ReplayGainSelect (obj, val.psz_string,
-                                         &input->replay_gain);
-
-    vlc_atomic_setf (&input->multiplier, multiplier);
-
-    VLC_UNUSED(var); VLC_UNUSED(oldval);
-    return VLC_SUCCESS;
-}
-
-static float ReplayGainSelect (vlc_object_t *obj, const char *str,
-                               const audio_replay_gain_t *replay_gain)
-{
-    float gain = 0.;
-    unsigned mode = AUDIO_REPLAY_GAIN_MAX;
-
-    if (likely(str != NULL))
-    {   /* Find selectrf mode */
-        if (!strcmp (str, "track"))
-            mode = AUDIO_REPLAY_GAIN_TRACK;
-        else
-        if (!strcmp (str, "album"))
-            mode = AUDIO_REPLAY_GAIN_ALBUM;
-
-        /* If the selectrf mode is not available, prefer the other one */
-        if (mode != AUDIO_REPLAY_GAIN_MAX && !replay_gain->pb_gain[mode])
-        {
-            if (replay_gain->pb_gain[!mode])
-                mode = !mode;
-        }
-    }
-
-    /* */
-    if (mode == AUDIO_REPLAY_GAIN_MAX)
-        return 1.;
-
-    if (replay_gain->pb_gain[mode])
-        gain = replay_gain->pf_gain[mode]
-             + var_InheritFloat (obj, "audio-replay-gain-preamp");
-    else
-        gain = var_InheritFloat (obj, "audio-replay-gain-default");
-
-    float multiplier = pow (10., gain / 20.);
-
-    if (replay_gain->pb_peak[mode]
-     && var_InheritBool (obj, "audio-replay-gain-peak-protection")
-     && replay_gain->pf_peak[mode] * multiplier > 1.0)
-        multiplier = 1.0f / replay_gain->pf_peak[mode];
-
-    return multiplier;
 }

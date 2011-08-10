@@ -29,6 +29,8 @@
 #endif
 
 #include <stddef.h>
+#include <math.h>
+
 #include <vlc_common.h>
 #include <libvlc.h>
 #include <vlc_modules.h>
@@ -74,6 +76,48 @@ void aout_MixerDelete(audio_mixer_t *mixer)
  */
 void aout_MixerRun(audio_mixer_t *mixer, block_t *block, float amp)
 {
-    if (mixer != NULL)
-        mixer->mix(mixer, block, amp);
+    mixer->mix(mixer, block, amp);
+}
+
+/*** Replay gain ***/
+float (aout_ReplayGainSelect)(vlc_object_t *obj, const char *str,
+                              const audio_replay_gain_t *replay_gain)
+{
+    float gain = 0.;
+    unsigned mode = AUDIO_REPLAY_GAIN_MAX;
+
+    if (likely(str != NULL))
+    {   /* Find selectrf mode */
+        if (!strcmp (str, "track"))
+            mode = AUDIO_REPLAY_GAIN_TRACK;
+        else
+        if (!strcmp (str, "album"))
+            mode = AUDIO_REPLAY_GAIN_ALBUM;
+
+        /* If the selectrf mode is not available, prefer the other one */
+        if (mode != AUDIO_REPLAY_GAIN_MAX && !replay_gain->pb_gain[mode])
+        {
+            if (replay_gain->pb_gain[!mode])
+                mode = !mode;
+        }
+    }
+
+    /* */
+    if (mode == AUDIO_REPLAY_GAIN_MAX)
+        return 1.;
+
+    if (replay_gain->pb_gain[mode])
+        gain = replay_gain->pf_gain[mode]
+             + var_InheritFloat (obj, "audio-replay-gain-preamp");
+    else
+        gain = var_InheritFloat (obj, "audio-replay-gain-default");
+
+    float multiplier = pow (10., gain / 20.);
+
+    if (replay_gain->pb_peak[mode]
+     && var_InheritBool (obj, "audio-replay-gain-peak-protection")
+     && replay_gain->pf_peak[mode] * multiplier > 1.0)
+        multiplier = 1.0f / replay_gain->pf_peak[mode];
+
+    return multiplier;
 }
