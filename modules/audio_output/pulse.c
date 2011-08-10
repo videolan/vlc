@@ -390,16 +390,6 @@ static int stream_wait(pa_stream *stream)
     return 0;
 }
 
-#ifdef LIBPULSE_GETS_A_CLUE
-static void stream_success_cb(pa_stream *s, int success, void *userdata)
-{
-    vlc_pa_signal(0);
-    (void) s; (void) success; (void) userdata;
-}
-#else
-# define stream_success_cb NULL
-#endif
-
 
 /*** Sink input ***/
 static void sink_input_info_cb(pa_context *ctx, const pa_sink_input_info *i,
