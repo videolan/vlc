@@ -302,8 +302,12 @@ static int Control (vout_display_t *vd, int query, va_list ap)
                 [[sys->glView window] setLevel: NSNormalWindowLevel];
             return VLC_SUCCESS;
         }
-        case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
         case VOUT_DISPLAY_CHANGE_DISPLAY_FILLED:
+        {
+            [[sys->glView window] performZoom: nil];
+            return VLC_SUCCESS;
+        }
+        case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
         case VOUT_DISPLAY_CHANGE_ZOOM:
         case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
         case VOUT_DISPLAY_CHANGE_SOURCE_CROP:

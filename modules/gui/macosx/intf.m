@@ -298,7 +298,6 @@ static int InputEvent( vlc_object_t *p_this, const char *psz_var,
             break;
 
         case INPUT_EVENT_ABORT:
-            //NSLog( @"input stopped by user" );
             break;
 
         default:
@@ -609,6 +608,7 @@ static VLCMain *_o_sharedMainInstance = nil;
 
     [self _removeOldPreferences];
 
+    [o_mainwindow updateWindow];
     [o_mainwindow updateTimeSlider];
     [o_mainwindow updateVolumeSlider];
     [o_mainwindow makeKeyAndOrderFront: self];
@@ -1252,6 +1252,7 @@ unsigned int CocoaKeyToVLC( unichar i_key )
 
     [o_playlist updateRowSelection];
     [o_mainwindow updateWindow];
+    [o_mainwindow updateName];
     [o_mainmenu setupMenus];
     [o_mainmenu updatePlaybackRate];
 }

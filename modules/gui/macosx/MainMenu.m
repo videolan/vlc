@@ -584,8 +584,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
                 var_SetFloat( p_vout, "zoom", 2.0 );
             else
             {
-                if (![[VLCMainWindow sharedInstance] isZoomed])
-                    [[VLCMainWindow sharedInstance] performZoom: sender];
+                var_ToggleBool( p_vout, "autoscale" );
             }
             vlc_object_release( p_vout );
         }

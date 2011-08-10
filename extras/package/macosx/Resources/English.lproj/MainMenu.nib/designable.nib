@@ -21,14 +21,14 @@
     </object>
     <object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
       <bool key="EncodedWithXMLCoder">YES</bool>
-      <integer value="2730"/>
+      <integer value="21"/>
       <integer value="915"/>
-      <integer value="2"/>
-      <integer value="283"/>
+      <integer value="4596"/>
+      <integer value="2730"/>
       <integer value="1617"/>
       <integer value="334"/>
+      <integer value="283"/>
       <integer value="4722"/>
-      <integer value="4596"/>
     </object>
     <object class="NSArray" key="IBDocument.PluginDependencies">
       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -861,7 +861,7 @@
                     <object class="BGHUDLabel" id="609070979">
                       <reference key="NSNextResponder" ref="440594360"/>
                       <int key="NSvFlags">266</int>
-                      <string key="NSFrame">{{4, 257}, {154, 14}}</string>
+                      <string key="NSFrame">{{4, 257}, {362, 14}}</string>
                       <reference key="NSSuperview" ref="440594360"/>
                       <int key="NSViewLayerContentsRedrawPolicy">2</int>
                       <bool key="NSEnabled">YES</bool>
@@ -884,7 +884,7 @@
                     <object class="NSSearchField" id="596740638">
                       <reference key="NSNextResponder" ref="440594360"/>
                       <int key="NSvFlags">265</int>
-                      <string key="NSFrame">{{371, 255}, {110, 19}}</string>
+                      <string key="NSFrame">{{371, 254}, {110, 19}}</string>
                       <reference key="NSSuperview" ref="440594360"/>
                       <int key="NSViewLayerContentsRedrawPolicy">2</int>
                       <bool key="NSEnabled">YES</bool>
@@ -1227,7 +1227,9 @@
         <string key="NSScreenRect">{{0, 0}, {1280, 778}}</string>
         <string key="NSMinSize">{400, 310}</string>
         <string key="NSMaxSize">{1.7976931348623157e+308, 1.7976931348623157e+308}</string>
-        <string key="NSFrameAutosaveName">vlc-10thanniversary</string>
+        <string key="NSFrameAutosaveName">mainwindow</string>
+        <bool key="NSAutorecalculatesContentBorderThicknessMinY">NO</bool>
+        <bool key="NSAutorecalculatesContentBorderThicknessMaxY">NO</bool>
         <bool key="NSWindowIsRestorable">YES</bool>
       </object>
       <object class="NSMenu" id="782168084">
@@ -4431,10 +4433,11 @@ LCAuLi4</string>
             <int key="NSBoxType">0</int>
             <int key="NSTitlePosition">0</int>
             <bool key="NSTransparent">NO</bool>
+            <bool key="NSFullyTransparent">YES</bool>
           </object>
           <object class="NSImageView" id="619354303">
             <reference key="NSNextResponder" ref="256817023"/>
-            <int key="NSvFlags">306</int>
+            <int key="NSvFlags">274</int>
             <object class="NSMutableSet" key="NSDragTypes">
               <bool key="EncodedWithXMLCoder">YES</bool>
               <object class="NSArray" key="set.sortedObjects">
@@ -11378,7 +11381,7 @@ LCAuLi4</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <object class="NSAffineTransform">
-            <bytes key="NSTransformStruct">P4AAAL+AAABDJsYAwpIAAA</bytes>
+            <bytes key="NSTransformStruct">P4AAAL+AAABCJAAAwhQAAA</bytes>
           </object>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>VLBrushedMetalImageView</string>

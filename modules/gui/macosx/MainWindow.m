@@ -217,6 +217,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [o_video_view setFrame: [o_split_view frame]];
     o_temp_view = [[NSView alloc] init];
     [o_temp_view setAutoresizingMask:NSViewHeightSizable | NSViewWidthSizable];
+    [o_dropzone_view setFrame: [o_playlist_table frame]];
 
     /* create the sidebar */
     o_sidebaritems = [[NSMutableArray alloc] init];
@@ -313,12 +314,6 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
     [o_sidebar_view reloadData];
     [o_sidebar_view selectRowIndexes:[NSIndexSet indexSetWithIndex:0] byExtendingSelection:YES];
-
-    playlist_t *p_playlist = pl_Get( VLCIntf );
-    PL_LOCK;
-    if( playlist_CurrentSize( p_playlist ) < 1 )
-        [self showDropZone];
-    PL_UNLOCK;
 }
 
 #pragma mark -
@@ -569,7 +564,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 - (void)showDropZone
 {
     [o_right_split_view addSubview: o_dropzone_view];
-    [[o_dropzone_view animator] setFrame: [o_playlist_table frame]];
+    [o_dropzone_view setFrame: [o_playlist_table frame]];
     [[o_playlist_table animator] setHidden:YES];
 }
 
@@ -939,7 +934,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
             if ([screen isMainScreen])
                 SetSystemUIMode( kUIModeAllHidden, kUIOptionAutoShowMenuBar);
 
-            [[o_video_view superview] replaceSubview:o_dropzone_view with:o_temp_view];
+            [[o_video_view superview] replaceSubview:o_video_view with:o_temp_view];
             [o_temp_view setFrame:[o_video_view frame]];
             [o_fullscreen_window setContentView:o_video_view];
 
