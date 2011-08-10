@@ -53,10 +53,6 @@ int aout_OutputNew( audio_output_t *p_aout,
     aout_assert_locked( p_aout );
     p_aout->format = *p_format;
 
-    /* Retrieve user defaults. */
-    int i_rate = var_InheritInteger( p_aout, "aout-rate" );
-    if ( i_rate != 0 )
-        p_aout->format.i_rate = i_rate;
     aout_FormatPrepare( &p_aout->format );
 
     /* Find the best output plug-in. */

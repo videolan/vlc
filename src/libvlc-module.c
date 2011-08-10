@@ -1640,8 +1640,7 @@ vlc_module_begin ()
     add_integer_with_range( "volume-step", AOUT_VOLUME_STEP, 0,
                             AOUT_VOLUME_MAX, VOLUME_STEP_TEXT,
                             VOLUME_STEP_LONGTEXT, true )
-    add_integer( "aout-rate", 0, AOUT_RATE_TEXT,
-                 AOUT_RATE_LONGTEXT, true )
+    add_obsolete_integer( "aout-rate" ) /* since 1.2.0 */
 #if HAVE_FPU && !defined( __APPLE__ )
     add_bool( "hq-resampling", 1, AOUT_RESAMP_TEXT,
               AOUT_RESAMP_LONGTEXT, true )
