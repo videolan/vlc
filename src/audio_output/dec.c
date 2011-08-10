@@ -80,15 +80,9 @@ int aout_DecNew( audio_output_t *p_aout,
         return -1;
     }
 
-    aout_input_t *p_input = calloc( 1, sizeof(aout_input_t));
-    if( !p_input )
-        return -1;
-
-    p_input->b_error = true;
-
-    /* We can only be called by the decoder, so no need to lock
-     * p_input->lock. */
     aout_owner_t *owner = aout_owner(p_aout);
+    int ret = -1;
+
     aout_lock( p_aout );
 
     /* Create the audio output stream */
@@ -114,15 +108,15 @@ int aout_DecNew( audio_output_t *p_aout,
     date_Set (&owner->sync.date, VLC_TS_INVALID);
 
     assert (owner->input == NULL);
-    owner->input = p_input;
-    aout_InputNew( p_aout, p_format, &owner->mixer_format, p_input,
-                   p_request_vout );
-    aout_unlock( p_aout );
-    return 0;
+    owner->input = aout_InputNew (p_aout, p_format, &owner->mixer_format,
+                                  p_request_vout);
+    if (owner->input == NULL)
+        aout_OutputDelete (p_aout);
+    else
+        ret = 0;
 error:
     aout_unlock( p_aout );
-    free( p_input );
-    return -1;
+    return ret;
 }
 
 /*****************************************************************************
@@ -161,7 +155,6 @@ void aout_DecDelete( audio_output_t * p_aout )
 static void aout_CheckRestart (audio_output_t *aout)
 {
     aout_owner_t *owner = aout_owner (aout);
-    aout_input_t *input = owner->input;
 
     aout_assert_locked (aout);
 
@@ -170,7 +163,11 @@ static void aout_CheckRestart (audio_output_t *aout)
         return;
 
     assert (restart & AOUT_RESTART_INPUT);
-    aout_InputDelete (aout, input);
+
+    const aout_request_vout_t request_vout = owner->input->request_vout;
+
+    aout_InputDelete (aout, owner->input);
+    owner->input = NULL;
 
     /* Reinitializes the output */
     if (restart & AOUT_RESTART_OUTPUT)
@@ -180,19 +177,13 @@ static void aout_CheckRestart (audio_output_t *aout)
         aout_OutputDelete (aout);
 
         if (aout_OutputNew (aout, &owner->input_format))
-        {
-            input->b_error = true;
             return; /* we are officially screwed */
-        }
         owner->volume.mixer = aout_MixerNew (aout,
                                              owner->mixer_format.i_format);
     }
 
-    if (aout_InputNew (aout, &owner->input_format, &owner->mixer_format, input,
-                       &input->request_vout))
-        assert (input->b_error);
-    else
-        assert (!input->b_error);
+    owner->input = aout_InputNew (aout, &owner->input_format,
+                                  &owner->mixer_format, &request_vout);
 }
 
 /**
@@ -267,7 +258,7 @@ int aout_DecPlay (audio_output_t *p_aout, block_t *p_buffer, int i_input_rate)
                                 / owner->input_format.i_rate;
 
     aout_lock( p_aout );
-    if( p_input->b_error )
+    if (unlikely(p_input == NULL)) /* can happen due to restart */
     {
         aout_unlock( p_aout );
         aout_BufferFree( p_buffer );

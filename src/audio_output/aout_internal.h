@@ -66,9 +66,6 @@ struct aout_input_t
     mtime_t                 i_resamp_start_date;
     int                     i_resamp_start_drift;
 
-    /* If b_error == 1, there is no input pipeline. */
-    bool              b_error;
-
     /* last rate from input */
     int               i_last_input_rate;
 
@@ -130,9 +127,9 @@ static inline aout_owner_t *aout_owner (audio_output_t *aout)
  *****************************************************************************/
 
 /* From input.c : */
-int aout_InputNew(audio_output_t *, const audio_sample_format_t *,
-                  const audio_sample_format_t *,
-                  aout_input_t *, const aout_request_vout_t *);
+aout_input_t *aout_InputNew(audio_output_t *, const audio_sample_format_t *,
+                            const audio_sample_format_t *,
+                            const aout_request_vout_t *);
 int aout_InputDelete( audio_output_t * p_aout, aout_input_t * p_input );
 block_t *aout_InputPlay( audio_output_t *p_aout, aout_input_t *p_input,
                          block_t *p_buffer, int i_input_rate, date_t * );

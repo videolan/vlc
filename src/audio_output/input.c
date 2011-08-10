@@ -29,8 +29,6 @@
 # include "config.h"
 #endif
 
-#include <assert.h>
-
 #include <vlc_common.h>
 
 #include <stdio.h>
@@ -46,7 +44,6 @@
 
 #include "aout_internal.h"
 
-static void inputFailure( audio_output_t *, aout_input_t *, const char * );
 static void inputDrop( aout_input_t *, aout_buffer_t * );
 static void inputResamplingStop( aout_input_t *p_input );
 
@@ -61,16 +58,14 @@ static vout_thread_t *RequestVout( void *,
 /*****************************************************************************
  * aout_InputNew : allocate a new input and rework the filter pipeline
  *****************************************************************************/
-int aout_InputNew( audio_output_t * p_aout,
-                   const audio_sample_format_t *restrict infmt,
-                   const audio_sample_format_t *restrict outfmt,
-                   aout_input_t * p_input,
-                   const aout_request_vout_t *p_request_vout )
+aout_input_t *aout_InputNew (audio_output_t * p_aout,
+                             const audio_sample_format_t *restrict infmt,
+                             const audio_sample_format_t *restrict outfmt,
+                             const aout_request_vout_t *p_request_vout)
 {
-    audio_sample_format_t chain_input_format;
-    audio_sample_format_t chain_output_format;
-    char *psz_filters, *psz_visual, *psz_scaletempo;
-    int i_visual;
+    aout_input_t *p_input = malloc (sizeof (*p_input));
+    if (unlikely(p_input == NULL))
+        return NULL;
 
     aout_FormatPrint( p_aout, "input", infmt );
     p_input->samplerate = infmt->i_rate;
@@ -89,8 +84,9 @@ int aout_InputNew( audio_output_t * p_aout,
     }
 
     /* Prepare format structure */
-    chain_input_format  = *infmt;
-    chain_output_format = *outfmt;
+    audio_sample_format_t chain_input_format = *infmt;
+    audio_sample_format_t chain_output_format = *outfmt;
+
     chain_output_format.i_rate = infmt->i_rate;
     aout_FormatPrepare( &chain_output_format );
 
@@ -98,9 +94,9 @@ int aout_InputNew( audio_output_t * p_aout,
     var_AddCallback( p_aout, "visual", VisualizationCallback, p_input );
     var_AddCallback( p_aout, "equalizer", EqualizerCallback, p_input );
 
-    psz_filters = var_GetString( p_aout, "audio-filter" );
-    psz_visual = var_GetString( p_aout, "audio-visual");
-    psz_scaletempo = var_InheritBool( p_aout, "audio-time-stretch" ) ? strdup( "scaletempo" ) : NULL;
+    char *psz_filters = var_GetString( p_aout, "audio-filter" );
+    char *psz_visual = var_GetString( p_aout, "audio-visual");
+    char *psz_scaletempo = var_InheritBool( p_aout, "audio-time-stretch" ) ? strdup( "scaletempo" ) : NULL;
 
     p_input->b_recycle_vout = psz_visual && *psz_visual;
 
@@ -108,7 +104,9 @@ int aout_InputNew( audio_output_t * p_aout,
     char *const ppsz_array[] = { psz_scaletempo, psz_filters, psz_visual };
     p_input->p_playback_rate_filter = NULL;
 
-    for( i_visual = 0; i_visual < 3 && AOUT_FMT_LINEAR(&chain_output_format); i_visual++ )
+    for (unsigned i_visual = 0;
+         i_visual < 3 && AOUT_FMT_LINEAR(&chain_output_format);
+         i_visual++)
     {
         char *psz_next = NULL;
         char *psz_parser = ppsz_array[i_visual];
@@ -254,8 +252,8 @@ int aout_InputNew( audio_output_t * p_aout,
                                      &chain_input_format,
                                      &chain_output_format ) < 0 )
     {
-        inputFailure( p_aout, p_input, "couldn't set an input pipeline" );
-        return -1;
+        msg_Err (p_aout, "cannot setup filtering pipeline");
+        goto error;
     }
 
     /* Create resamplers. */
@@ -273,8 +271,8 @@ int aout_InputNew( audio_output_t * p_aout,
                                         &p_input->i_nb_resamplers,
                                         &chain_output_format, outfmt) < 0)
         {
-            inputFailure( p_aout, p_input, "couldn't set a resampler pipeline");
-            return -1;
+            msg_Err (p_aout, "cannot setup a resampling pipeline");
+            goto error;
         }
 
         /* Setup the initial rate of the resampler */
@@ -288,10 +286,16 @@ int aout_InputNew( audio_output_t * p_aout,
     }
 
     /* Success */
-    p_input->b_error = false;
     p_input->i_last_input_rate = INPUT_RATE_DEFAULT;
+    p_input->i_buffer_lost = 0;
+    return p_input;
 
-    return 0;
+error:
+    aout_FiltersDestroyPipeline( p_input->pp_filters, p_input->i_nb_filters );
+    aout_FiltersDestroyPipeline( p_input->pp_resamplers,
+                                 p_input->i_nb_resamplers );
+    free (p_input);
+    return NULL;
 }
 
 /*****************************************************************************
@@ -301,10 +305,6 @@ int aout_InputNew( audio_output_t * p_aout,
  *****************************************************************************/
 int aout_InputDelete( audio_output_t * p_aout, aout_input_t * p_input )
 {
-    aout_assert_locked( p_aout );
-    if ( p_input->b_error )
-        return 0;
-
     var_DelCallback (p_aout, "equalizer", EqualizerCallback, p_input);
     var_DelCallback (p_aout, "visual", VisualizationCallback, p_input);
 
@@ -547,21 +547,6 @@ block_t *aout_InputPlay(audio_output_t *p_aout, aout_input_t *p_input,
 /*****************************************************************************
  * static functions
  *****************************************************************************/
-
-static void inputFailure( audio_output_t * p_aout, aout_input_t * p_input,
-                          const char * psz_error_message )
-{
-    /* error message */
-    msg_Err( p_aout, "%s", psz_error_message );
-
-    /* clean up */
-    aout_FiltersDestroyPipeline( p_input->pp_filters, p_input->i_nb_filters );
-    aout_FiltersDestroyPipeline( p_input->pp_resamplers,
-                                 p_input->i_nb_resamplers );
-
-    /* error flag */
-    p_input->b_error = 1;
-}
 
 static void inputDrop( aout_input_t *p_input, aout_buffer_t *p_buffer )
 {
