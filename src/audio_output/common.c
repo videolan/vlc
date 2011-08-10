@@ -168,6 +168,11 @@ audio_output_t *aout_New( vlc_object_t * p_parent )
     return aout;
 }
 
+void aout_Destroy (audio_output_t *aout)
+{
+    vlc_object_release (aout);
+}
+
 /*****************************************************************************
  * aout_Destructor: destroy aout structure
  *****************************************************************************/

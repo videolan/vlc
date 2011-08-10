@@ -172,9 +172,9 @@ void aout_OutputDelete( audio_output_t * p_aout );
 
 
 /* From common.c : */
-/* Release with vlc_object_release() */
-audio_output_t *aout_New ( vlc_object_t * );
+audio_output_t *aout_New (vlc_object_t *);
 #define aout_New(a) aout_New(VLC_OBJECT(a))
+void aout_Destroy (audio_output_t *);
 
 void aout_FifoInit( vlc_object_t *, aout_fifo_t *, uint32_t );
 mtime_t aout_FifoFirstDate( const aout_fifo_t * ) VLC_USED;
