@@ -49,9 +49,6 @@ void CloseIntf    ( vlc_object_t * );
 int  WindowOpen   ( vout_window_t *, const vout_window_cfg_t * );
 void WindowClose  ( vout_window_t * );
 
-int  OpenVideoGL  ( vlc_object_t * );
-void CloseVideoGL ( vlc_object_t * );
-
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -64,18 +61,9 @@ void CloseVideoGL ( vlc_object_t * );
 #define OPAQUENESS_LONGTEXT N_( "Set the transparency of the video output. 1 is non-transparent (default) " \
                                 "0 is fully transparent.")
 
-#define STRETCH_TEXT N_("Stretch video to fill window")
-#define STRETCH_LONGTEXT N_("Stretch the video to fill the entire window when "\
-                            "resizing the video instead of keeping the aspect ratio and "\
-                            "displaying black borders.")
-
 #define BLACK_TEXT N_("Black screens in fullscreen")
 #define BLACK_LONGTEXT N_("In fullscreen mode, keep screen where there is no " \
                           "video displayed black" )
-
-#define BACKGROUND_TEXT N_("Use as Desktop Background")
-#define BACKGROUND_LONGTEXT N_("Use the video as the Desktop Background " \
-                               "Desktop icons cannot be interacted with in this mode." )
 
 #define FSPANEL_TEXT N_("Show Fullscreen controller")
 #define FSPANEL_LONGTEXT N_("Shows a lucent controller when moving the mouse " \
@@ -132,13 +120,9 @@ vlc_module_begin ()
 
         add_integer( "macosx-vdev", 0, VDEV_TEXT, VDEV_LONGTEXT,
                      false )
-        add_bool( "macosx-stretch", false, STRETCH_TEXT, STRETCH_LONGTEXT,
-                  false )
         add_float_with_range( "macosx-opaqueness", 1, 0, 1,
                               OPAQUENESS_TEXT, OPAQUENESS_LONGTEXT, true );
         add_bool( "macosx-black", true, BLACK_TEXT, BLACK_LONGTEXT,
-                  false )
-        add_bool( "macosx-background", false, BACKGROUND_TEXT, BACKGROUND_LONGTEXT,
                   false )
 vlc_module_end ()
 

@@ -44,6 +44,7 @@
 #include <vlc_plugin.h>
 #include <vlc_vout_display.h>
 #include <vlc_opengl.h>
+#include <vlc_dialog.h>
 #include "opengl.h"
 
 /**
@@ -116,6 +117,15 @@ static int Open(vlc_object_t *this)
 
     if (!sys)
         return VLC_ENOMEM;
+
+    if( !CGDisplayUsesOpenGLAcceleration( kCGDirectMainDisplay ) )
+    {
+        msg_Err( this, "no OpenGL hardware acceleration found, video output will fail" );
+        dialog_Fatal( this, _("Video output is not supported"), _("Your Mac lacks Quartz Extreme acceleration, which is required for video output.") );
+        return VLC_EGENERIC;
+    }
+    else
+        msg_Dbg( this, "Quartz Extreme acceleration is active" );
 
     vd->sys = sys;
     sys->pool = NULL;
