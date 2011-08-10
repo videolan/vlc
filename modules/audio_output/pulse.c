@@ -831,30 +831,20 @@ static void Close (vlc_object_t *obj)
         /* The callback takes mainloop lock, so it CANNOT be held here! */
         var_DelCallback (aout, "audio-device", StreamMove, s);
         var_Destroy (aout, "audio-device");
-    }
-
-    vlc_pa_lock();
-    if (s != NULL) {
-        pa_operation *op;
-
-        if (pa_stream_is_corked(s) > 0)
-            /* Stream paused: discard all buffers */
-            op = pa_stream_flush(s, stream_success_cb, NULL);
-        else
-            /* Stream playing: wait until buffers are played */
-            op = pa_stream_drain(s, stream_success_cb, NULL);
-        if (likely(op != NULL)) {
-#ifdef LIBPULSE_GETS_A_CLUE
-            while (pa_operation_get_state(op) == PA_OPERATION_RUNNING)
-                vlc_pa_wait();
-#endif
-            pa_operation_unref(op);
-        }
 
         pa_stream_disconnect(s);
+
+        /* Clear all callbacks */
+        pa_stream_set_state_callback(s, NULL, NULL);
+        pa_stream_set_latency_update_callback(s, NULL, aout);
+        pa_stream_set_moved_callback(s, NULL, aout);
+        pa_stream_set_overflow_callback(s, NULL, aout);
+        pa_stream_set_started_callback(s, NULL, aout);
+        pa_stream_set_suspended_callback(s, NULL, aout);
+        pa_stream_set_underflow_callback(s, NULL, aout);
+
         pa_stream_unref(s);
     }
-    vlc_pa_unlock();
 
     vlc_pa_disconnect(obj, ctx);
     free(sys);
