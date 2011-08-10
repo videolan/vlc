@@ -81,9 +81,27 @@ int aout_DecNew( audio_output_t *p_aout,
     }
 
     aout_owner_t *owner = aout_owner(p_aout);
+
+    /* Calling decoder is responsible for serializing aout_DecNew() and
+     * aout_DecDelete(). So no need to lock to _read_ those properties. */
+    if (owner->module != NULL) /* <- output exists */
+    {   /* Check if we can recycle the existing output and pipelines */
+        if (AOUT_FMTS_IDENTICAL(&owner->input_format, p_format))
+            return 0;
+
+        /* TODO? If the new input format is closer to the output format than
+         * the old input format was, then the output could be recycled. The
+         * input pipeline however would need to be restarted. */
+
+        /* No recycling: delete everything and restart from scratch */
+        aout_Shutdown (p_aout);
+    }
+
     int ret = -1;
 
+    /* TODO: reduce lock scope depending on decoder's real need */
     aout_lock( p_aout );
+    assert (owner->module == NULL);
 
     /* Create the audio output stream */
     var_Destroy( p_aout, "audio-device" );
@@ -119,10 +137,10 @@ error:
     return ret;
 }
 
-/*****************************************************************************
- * aout_DecDelete : delete a decoder
- *****************************************************************************/
-void aout_DecDelete( audio_output_t * p_aout )
+/**
+ * Stops all plugins involved in the audio output.
+ */
+void aout_Shutdown (audio_output_t *p_aout)
 {
     aout_owner_t *owner = aout_owner (p_aout);
     aout_input_t *input;
@@ -148,6 +166,18 @@ void aout_DecDelete( audio_output_t * p_aout )
 
     aout_MixerDelete (mixer);
     free (input);
+}
+
+/**
+ * Stops the decoded audio input.
+ * @note Due to output recycling, this function is esssentially a stub.
+ */
+void aout_DecDelete (audio_output_t *aout)
+{
+    aout_owner_t *owner = aout_owner (aout);
+
+    assert (owner->module != NULL);
+    (void) owner;
 }
 
 #define AOUT_RESTART_OUTPUT 1
