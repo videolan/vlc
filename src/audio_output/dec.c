@@ -81,7 +81,7 @@ int aout_DecNew( audio_output_t *p_aout,
     }
 
     aout_owner_t *owner = aout_owner(p_aout);
-
+#ifdef RECYCLE
     /* Calling decoder is responsible for serializing aout_DecNew() and
      * aout_DecDelete(). So no need to lock to _read_ those properties. */
     if (owner->module != NULL) /* <- output exists */
@@ -96,7 +96,7 @@ int aout_DecNew( audio_output_t *p_aout,
         /* No recycling: delete everything and restart from scratch */
         aout_Shutdown (p_aout);
     }
-
+#endif
     int ret = -1;
 
     /* TODO: reduce lock scope depending on decoder's real need */
@@ -177,7 +177,11 @@ void aout_DecDelete (audio_output_t *aout)
     aout_owner_t *owner = aout_owner (aout);
 
     assert (owner->module != NULL);
+#ifdef RECYCLE
     (void) owner;
+#else
+    aout_Shutdown (aout);
+#endif
 }
 
 #define AOUT_RESTART_OUTPUT 1
