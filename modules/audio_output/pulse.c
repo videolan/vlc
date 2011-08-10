@@ -164,7 +164,8 @@ static mtime_t vlc_pa_get_latency(audio_output_t *aout,
     int negative;
 
     if (pa_stream_get_latency(s, &latency, &negative)) {
-        vlc_pa_error(aout, "unknown latency", ctx);
+        if (pa_context_errno (ctx) != PA_ERR_NODATA)
+            vlc_pa_error(aout, "unknown latency", ctx);
         return VLC_TS_INVALID;
     }
     return negative ? -latency : +latency;
