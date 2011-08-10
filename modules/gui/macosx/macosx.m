@@ -112,6 +112,8 @@ vlc_module_begin ()
              false )
     add_bool( "macosx-interfacestyle", true, INTERFACE_STYLE_TEXT, INTERFACE_STYLE_LONGTEXT,
              false )
+    add_obsolete_bool( "macosx-stretch" ) /* since 1.2.0 */
+    add_obsolete_bool( "macosx-background" ) /* since 1.2.0 */
 
     add_submodule ()
         set_description( "Mac OS X Video Output Provider" )
