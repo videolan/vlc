@@ -1,7 +1,7 @@
 /*****************************************************************************
  * voutgl.m: MacOS X OpenGL provider
  *****************************************************************************
- * Copyright (C) 2001-2009 the VideoLAN team
+ * Copyright (C) 2001-2011 the VideoLAN team
  * $Id$
  *
  * Authors: Colin Delacroix <colin@zoy.org>
@@ -12,6 +12,7 @@
  *          Benjamin Pracht <bigben at videolan dot org>
  *          Damien Fouilleul <damienf at videolan dot org>
  *          Pierre d'Herbemont <pdherbemont at videolan dot org>
+ *          Felix Paul Kühne <fkuehne at videolan dot org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -311,28 +312,34 @@ static int Control (vout_display_t *vd, int query, va_list ap)
             NSPoint topleftscreen;
             NSRect new_frame;
             const vout_display_cfg_t *cfg;
+
+            id o_window = [sys->glView window];
+            NSRect windowFrame = [o_window frame];
+            NSRect glViewFrame = [sys->glView frame];
+            NSSize windowMinSize = [o_window minSize];
+
             topleftbase.x = 0;
-            topleftbase.y = [[sys->glView window] frame].size.height;
-            topleftscreen = [[sys->glView window] convertBaseToScreen: topleftbase];
+            topleftbase.y = windowFrame.size.height;
+            topleftscreen = [o_window convertBaseToScreen: topleftbase];
             cfg = (const vout_display_cfg_t*)va_arg (ap, const vout_display_cfg_t *);
             int i_width = cfg->display.width;
             int i_height = cfg->display.height;
 
             /* Calculate the window's new size, if it is larger than our minimal size */
-            if (i_width < [[sys->glView window] minSize].width)
-                i_width = [[sys->glView window] minSize].width;
-            if (i_height < [[sys->glView window] minSize].height)
-                i_height = [[sys->glView window] minSize].height;
+            if (i_width < windowMinSize.width)
+                i_width = windowMinSize.width;
+            if (i_height < windowMinSize.height)
+                i_height = windowMinSize.height;
 
-            if( i_height != [sys->glView frame].size.height || i_width != [sys->glView frame].size.width )
+            if( i_height != glViewFrame.size.height || i_width != glViewFrame.size.width )
             {
-                new_frame.size.width = [[sys->glView window] frame].size.width - [sys->glView frame].size.width + i_width;
-                new_frame.size.height = [[sys->glView window] frame].size.height - [sys->glView frame].size.height + i_height;
+                new_frame.size.width = windowFrame.size.width - glViewFrame.size.width + i_width;
+                new_frame.size.height = windowFrame.size.height - glViewFrame.size.height + i_height;
 
                 new_frame.origin.x = topleftscreen.x;
                 new_frame.origin.y = topleftscreen.y - new_frame.size.height;
 
-                [[sys->glView window] setFrame:new_frame display:YES animate:YES];
+                [o_window setFrame:new_frame display:YES animate:YES];
             }
             return VLC_SUCCESS;
         }
