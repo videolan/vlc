@@ -91,26 +91,26 @@ static VLCInfo *_o_sharedInstance = nil;
     [o_language_lbl setStringValue: _NS(VLC_META_LANGUAGE)];
     [o_nowPlaying_lbl setStringValue: _NS(VLC_META_NOW_PLAYING)];
     [o_publisher_lbl setStringValue: _NS(VLC_META_PUBLISHER)];
+    [o_encodedby_lbl setStringValue: _NS(VLC_META_ENCODED_BY)];
 
     /* statistics */
-    [o_input_box setTitle: _NS("Input")];
+    [o_input_lbl setStringValue: _NS("Input")];
     [o_read_bytes_lbl setStringValue: _NS("Read at media")];
     [o_input_bitrate_lbl setStringValue: _NS("Input bitrate")];
     [o_demux_bytes_lbl setStringValue: _NS("Demuxed")];
     [o_demux_bitrate_lbl setStringValue: _NS("Stream bitrate")];
 
-    [o_video_box setTitle: _NS("Video")];
+    [o_video_lbl setStringValue: _NS("Video")];
     [o_video_decoded_lbl setStringValue: _NS("Decoded blocks")];
     [o_displayed_lbl setStringValue: _NS("Displayed frames")];
     [o_lost_frames_lbl setStringValue: _NS("Lost frames")];
-	[o_fps_lbl setStringValue: _NS("Frames per Second")];
 
-    [o_sout_box setTitle: _NS("Streaming")];
+    [o_sout_lbl setStringValue: _NS("Streaming")];
     [o_sent_packets_lbl setStringValue: _NS("Sent packets")];
     [o_sent_bytes_lbl setStringValue: _NS("Sent bytes")];
     [o_sent_bitrate_lbl setStringValue: _NS("Send rate")];
 
-    [o_audio_box setTitle: _NS("Audio")];
+    [o_audio_lbl setStringValue: _NS("Audio")];
     [o_audio_decoded_lbl setStringValue: _NS("Decoded blocks")];
     [o_played_abuffers_lbl setStringValue: _NS("Played buffers")];
     [o_lost_abuffers_lbl setStringValue: _NS("Lost buffers")];
@@ -158,7 +158,6 @@ static VLCInfo *_o_sharedInstance = nil;
     [o_video_decoded_txt setIntValue:0];
     [o_displayed_txt setIntValue:0];
     [o_lost_frames_txt setIntValue:0];
-    [o_fps_txt setFloatValue:0];
 
     //Initializing Output Variables
     [o_sent_packets_txt setIntValue: 0];
@@ -200,6 +199,7 @@ static VLCInfo *_o_sharedInstance = nil;
         SET( language );
         SET( date );
         SET( description );
+        SET( encodedby );
     #undef SET
         [o_image_well setImage: [NSImage imageNamed: @"noart.png"]];
     }
@@ -238,6 +238,7 @@ static VLCInfo *_o_sharedInstance = nil;
         SET( language, Language );
         SET( date, Date );
         SET( description, Description );
+        SET( encodedby, EncodedBy );
 
     #undef SET
 
@@ -298,9 +299,6 @@ static VLCInfo *_o_sharedInstance = nil;
         [o_video_decoded_txt setIntValue: p_item->p_stats->i_decoded_video];
         [o_displayed_txt setIntValue: p_item->p_stats->i_displayed_pictures];
         [o_lost_frames_txt setIntValue: p_item->p_stats->i_lost_pictures];
-        float f_fps = 0;
-        /* FIXME: input_Control( p_item, INPUT_GET_VIDEO_FPS, &f_fps ); */
-        [o_fps_txt setFloatValue: f_fps];
 
         /* Sout */
         [o_sent_packets_txt setIntValue: p_item->p_stats->i_sent_packets];
