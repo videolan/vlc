@@ -618,10 +618,10 @@ block_t *aout_PacketNext (audio_output_t *p_aout, mtime_t start_date)
     aout_packet_t *p = aout_packet (p_aout);
     aout_fifo_t *p_fifo = &p->fifo;
     block_t *p_buffer;
-    const bool b_can_sleek = AOUT_FMT_LINEAR (&p_aout->format);
+    const bool b_can_sleek = !AOUT_FMT_LINEAR(&p_aout->format);
     const mtime_t now = mdate ();
     const mtime_t threshold =
-        (b_can_sleek ? start_date : now) - AOUT_MAX_PTS_DELAY;
+        (b_can_sleek ? now : start_date) - AOUT_MAX_PTS_DELAY;
 
     vlc_mutex_lock( &p->lock );
     if( p->pause_date != VLC_TS_INVALID )
