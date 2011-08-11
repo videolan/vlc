@@ -46,61 +46,49 @@ static vlc_mutex_t lock = VLC_STATIC_MUTEX;
 
 /**
  * Creates and references the VLC PulseAudio threaded main loop.
- * @return the mainloop or NULL on failure
+ * @return 0 on success, -1 on failure
  */
-static pa_threaded_mainloop *vlc_pa_mainloop_init (void)
+static int vlc_pa_mainloop_init (void)
 {
-    pa_threaded_mainloop *mainloop;
-
     vlc_mutex_lock (&lock);
     if (refs == 0)
     {
-        mainloop = pa_threaded_mainloop_new ();
-        if (unlikely(mainloop == NULL))
-            goto out;
+        vlc_pa_mainloop = pa_threaded_mainloop_new ();
+        if (unlikely(vlc_pa_mainloop == NULL))
+            goto err;
 
-        if (pa_threaded_mainloop_start (mainloop) < 0)
+        if (pa_threaded_mainloop_start (vlc_pa_mainloop) < 0)
         {
-            pa_threaded_mainloop_free (mainloop);
-            goto out;
+            pa_threaded_mainloop_free (vlc_pa_mainloop);
+            goto err;
         }
-        vlc_pa_mainloop = mainloop;
     }
     else
     {
-        if (unlikely(refs < UINT_MAX))
-        {
-            mainloop = NULL;
-            goto out;
-        }
-        mainloop = vlc_pa_mainloop;
+        if (unlikely(refs >= UINT_MAX))
+            goto err;
     }
-
-    assert (mainloop != NULL);
     refs++;
-out:
     vlc_mutex_unlock (&lock);
-    return mainloop;
+    return 0;
+err:
+    vlc_mutex_unlock (&lock);
+    return -1;
 }
 
 /**
  * Releases a reference to the VLC PulseAudio main loop.
  */
-static void vlc_pa_mainloop_deinit (pa_threaded_mainloop *mainloop)
+static void vlc_pa_mainloop_deinit (void)
 {
     vlc_mutex_lock (&lock);
     assert (refs > 0);
-    assert (mainloop == vlc_pa_mainloop);
-
     if (--refs > 0)
-        mainloop = NULL;
-    vlc_mutex_unlock (&lock);
-
-    if (mainloop != NULL)
     {
-        pa_threaded_mainloop_stop (mainloop);
-        pa_threaded_mainloop_free (mainloop);
+        pa_threaded_mainloop_stop (vlc_pa_mainloop);
+        pa_threaded_mainloop_free (vlc_pa_mainloop);
     }
+    vlc_mutex_unlock (&lock);
 }
 
 /**
@@ -138,20 +126,19 @@ void vlc_pa_wait (void)
 
 static void context_state_cb (pa_context *ctx, void *userdata)
 {
-    pa_threaded_mainloop *mainloop = userdata;
-
     switch (pa_context_get_state(ctx))
     {
         case PA_CONTEXT_READY:
         case PA_CONTEXT_FAILED:
         case PA_CONTEXT_TERMINATED:
-            pa_threaded_mainloop_signal(mainloop, 0);
+            vlc_pa_signal (0);
         default:
             break;
     }
+    (void) userdata;
 }
 
-static bool context_wait (pa_threaded_mainloop *mainloop, pa_context *ctx)
+static bool context_wait (pa_context *ctx)
 {
     pa_context_state_t state;
 
@@ -159,7 +146,7 @@ static bool context_wait (pa_threaded_mainloop *mainloop, pa_context *ctx)
     {
         if (state == PA_CONTEXT_FAILED || state == PA_CONTEXT_TERMINATED)
             return -1;
-        pa_threaded_mainloop_wait (mainloop);
+        vlc_pa_wait ();
     }
     return 0;
 }
@@ -170,8 +157,7 @@ static bool context_wait (pa_threaded_mainloop *mainloop, pa_context *ctx)
  */
 pa_context *vlc_pa_connect (vlc_object_t *obj)
 {
-    pa_threaded_mainloop *mainloop = vlc_pa_mainloop_init ();
-    if (unlikely(mainloop == NULL))
+    if (unlikely(vlc_pa_mainloop_init ()))
         return NULL;
 
     msg_Dbg (obj, "using library version %s", pa_get_library_version ());
@@ -222,18 +208,18 @@ pa_context *vlc_pa_connect (vlc_object_t *obj)
     }
 
     /* Connect to PulseAudio daemon */
-    pa_threaded_mainloop_lock (mainloop);
+    vlc_pa_lock ();
 
-    ctx = pa_context_new_with_proplist (pa_threaded_mainloop_get_api (mainloop), ua, props);
+    ctx = pa_context_new_with_proplist (pa_threaded_mainloop_get_api (vlc_pa_mainloop), ua, props);
     free (ua);
     if (props != NULL)
         pa_proplist_free(props);
     if (unlikely(ctx == NULL))
         goto fail;
 
-    pa_context_set_state_callback (ctx, context_state_cb, mainloop);
+    pa_context_set_state_callback (ctx, context_state_cb, NULL);
     if (pa_context_connect (ctx, NULL, 0, NULL) < 0
-     || context_wait (mainloop, ctx))
+     || context_wait (ctx))
     {
         vlc_pa_error (obj, "PulseAudio server connection failure", ctx);
         pa_context_unref (ctx);
@@ -246,12 +232,12 @@ pa_context *vlc_pa_connect (vlc_object_t *obj)
              pa_context_get_protocol_version (ctx),
              pa_context_get_server_protocol_version (ctx));
 
-    pa_threaded_mainloop_unlock (mainloop);
+    vlc_pa_unlock ();
     return ctx;
 
 fail:
-    pa_threaded_mainloop_unlock (mainloop);
-    vlc_pa_mainloop_deinit (mainloop);
+    vlc_pa_unlock ();
+    vlc_pa_mainloop_deinit ();
     return NULL;
 }
 
@@ -260,14 +246,12 @@ fail:
  */
 void vlc_pa_disconnect (vlc_object_t *obj, pa_context *ctx)
 {
-    pa_threaded_mainloop *mainloop = vlc_pa_mainloop;
-
     vlc_pa_lock ();
     pa_context_disconnect (ctx);
     pa_context_set_state_callback (ctx, NULL, NULL);
     pa_context_unref (ctx);
     vlc_pa_unlock ();
 
-    vlc_pa_mainloop_deinit (mainloop);
+    vlc_pa_mainloop_deinit ();
     (void) obj;
 }
