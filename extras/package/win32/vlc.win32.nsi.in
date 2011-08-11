@@ -883,7 +883,7 @@ UAC_Success:
   "UninstallString"
   StrCmp $R0 "" done
 
-  MessageBox MB_YESNO|MB_ICONEXCLAMATION $Message_AlreadyInstalled IDNO done
+  MessageBox MB_YESNO|MB_ICONEXCLAMATION $Message_AlreadyInstalled /SD IDNO IDNO done
 
   ;Run the uninstaller
   ;uninst:
