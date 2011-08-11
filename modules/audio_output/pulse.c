@@ -272,9 +272,10 @@ static void stream_latency_cb(pa_stream *s, void *userdata)
         sync = true;
 
     /* Compute playback sample rate */
-    /* This is empirical. Feel free to define something smarter. */
+    /* This is empirical (especially the shift values).
+     * Feel free to define something smarter. */
     int adj = sync ? (outrate - inrate)
-                   : outrate * (delta + change) / (CLOCK_FREQ << 4);
+                   : outrate * ((delta >> 4) + change) / (CLOCK_FREQ << 2);
     /* This avoids too quick rate variation. It sounds really bad and
      * causes unstability (e.g. oscillation around the correct rate). */
     int limit = inrate >> 10;
