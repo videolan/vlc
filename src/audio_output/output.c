@@ -485,76 +485,22 @@ static block_t *aout_OutputSlice (audio_output_t *p_aout)
     /* Compute the end date for the new buffer. */
     mtime_t end_date = date_Increment( &exact_start_date, samples );
 
-    /* Check that start_date is available. */
-    mtime_t prev_date;
-    for( ;; )
-    {
-        /* Check for the continuity of start_date */
-        prev_date = p_buffer->i_pts + p_buffer->i_length;
-        if( prev_date >= start_date - 1 )
-            break;
-        /* We authorize a +-1 because rounding errors get compensated
-         * regularly. */
-        msg_Warn( p_aout, "got a packet in the past (%"PRId64")",
-                  start_date - prev_date );
-        aout_BufferFree( aout_FifoPop( p_fifo ) );
-
-        p_buffer = p_fifo->p_first;
-        if( p_buffer == NULL )
-            return NULL;
-    }
-
-    /* Check that we have enough samples. */
-    while( prev_date < end_date )
+    /* Check that we have enough samples (TODO merge with next loop). */
+    for( unsigned available = 0; available < samples; )
     {
         p_buffer = p_buffer->p_next;
         if( p_buffer == NULL )
             return NULL;
 
-        /* Check that all buffers are contiguous. */
-        if( prev_date != p_buffer->i_pts )
-        {
-            msg_Warn( p_aout,
-                      "buffer hole, dropping packets (%"PRId64")",
-                      p_buffer->i_pts - prev_date );
-
-            aout_buffer_t *p_deleted;
-            while( (p_deleted = p_fifo->p_first) != p_buffer )
-                aout_BufferFree( aout_FifoPop( p_fifo ) );
-        }
-
-        prev_date = p_buffer->i_pts + p_buffer->i_length;
+        available += p_buffer->i_nb_samples;
     }
 
     if( AOUT_FMT_LINEAR( &p_aout->format ) )
     {
-        p_buffer = p_fifo->p_first;
-
-        /* Additionally check that p_first_byte_to_mix is well located. */
         const unsigned framesize = p_aout->format.i_bytes_per_frame;
-        ssize_t delta = (start_date - p_buffer->i_pts)
-                      * p_aout->format.i_rate / CLOCK_FREQ;
-        if( delta != 0 )
-            msg_Warn( p_aout, "input start is not output end (%zd)", delta );
-        if( delta < 0 )
-        {
-            /* Is it really the best way to do it ? */
-            aout_FifoReset (&p->fifo);
-            return NULL;
-        }
-        if( delta > 0 )
-        {
-            mtime_t t = delta * CLOCK_FREQ / p_aout->format.i_rate;
-            p_buffer->i_nb_samples -= delta;
-            p_buffer->i_pts += t;
-            p_buffer->i_length -= t;
-            delta *= framesize;
-            p_buffer->p_buffer += delta;
-            p_buffer->i_buffer -= delta;
-        }
-
         /* Build packet with adequate number of samples */
         unsigned needed = samples * framesize;
+
         p_buffer = block_Alloc( needed );
         if( unlikely(p_buffer == NULL) )
             /* XXX: should free input buffers */
