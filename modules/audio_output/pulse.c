@@ -823,18 +823,20 @@ static void Close (vlc_object_t *obj)
         var_DelCallback (aout, "audio-device", StreamMove, s);
         var_Destroy (aout, "audio-device");
 
+        vlc_pa_lock ();
         pa_stream_disconnect(s);
 
         /* Clear all callbacks */
         pa_stream_set_state_callback(s, NULL, NULL);
-        pa_stream_set_latency_update_callback(s, NULL, aout);
-        pa_stream_set_moved_callback(s, NULL, aout);
-        pa_stream_set_overflow_callback(s, NULL, aout);
-        pa_stream_set_started_callback(s, NULL, aout);
-        pa_stream_set_suspended_callback(s, NULL, aout);
-        pa_stream_set_underflow_callback(s, NULL, aout);
+        pa_stream_set_latency_update_callback(s, NULL, NULL);
+        pa_stream_set_moved_callback(s, NULL, NULL);
+        pa_stream_set_overflow_callback(s, NULL, NULL);
+        pa_stream_set_started_callback(s, NULL, NULL);
+        pa_stream_set_suspended_callback(s, NULL, NULL);
+        pa_stream_set_underflow_callback(s, NULL, NULL);
 
         pa_stream_unref(s);
+        vlc_pa_unlock ();
     }
 
     vlc_pa_disconnect(obj, ctx);

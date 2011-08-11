@@ -262,9 +262,11 @@ void vlc_pa_disconnect (vlc_object_t *obj, pa_context *ctx)
 {
     pa_threaded_mainloop *mainloop = vlc_pa_mainloop;
 
+    vlc_pa_lock ();
     pa_context_disconnect (ctx);
     pa_context_set_state_callback (ctx, NULL, NULL);
     pa_context_unref (ctx);
+    vlc_pa_unlock ();
 
     vlc_pa_mainloop_deinit (mainloop);
     (void) obj;
