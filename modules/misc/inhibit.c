@@ -111,7 +111,11 @@ static int Activate( vlc_object_t *p_this )
     p_sys->p_input = NULL;
 
     dbus_error_init( &error );
-    p_sys->p_conn = dbus_bus_get( DBUS_BUS_SESSION, &error );
+
+    /* connect privately to the session bus
+     * the connection will not be shared with other vlc modules which use dbus,
+     * thus avoiding a whole class of concurrency issues */
+    p_sys->p_conn = dbus_bus_get_private( DBUS_BUS_SESSION, &error );
     if( !p_sys->p_conn )
     {
         msg_Err( p_this, "Failed to connect to the D-Bus session daemon: %s",
@@ -146,6 +150,10 @@ static void Deactivate( vlc_object_t *p_this )
         UnInhibit( p_intf, FREEDESKTOP );
     if( p_sys->i_cookie[GNOME] )
         UnInhibit( p_intf, GNOME );
+
+    /* The dbus connection is private,
+     * so we are responsible for closing it */
+    dbus_connection_close( p_sys->p_conn );
     dbus_connection_unref( p_sys->p_conn );
 
     free( p_sys );

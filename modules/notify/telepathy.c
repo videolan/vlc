@@ -89,9 +89,12 @@ static int Open( vlc_object_t *p_this )
     if( !p_intf->p_sys )
         return VLC_ENOMEM;
 
-    /* connect to the session bus */
     dbus_error_init( &error );
-    p_intf->p_sys->p_conn = dbus_bus_get( DBUS_BUS_SESSION, &error );
+
+    /* connect privately to the session bus
+     * the connection will not be shared with other vlc modules which use dbus,
+     * thus avoiding a whole class of concurrency issues */
+    p_intf->p_sys->p_conn = dbus_bus_get_private( DBUS_BUS_SESSION, &error );
     if( !p_intf->p_sys->p_conn )
     {
         msg_Err( p_this, "Failed to connect to the DBus session daemon: %s",
@@ -140,7 +143,9 @@ static void Close( vlc_object_t *p_this )
     /* Do not check for VLC_ENOMEM as we're closing */
     SendToTelepathy( p_intf, "" );
 
-    /* we won't use the DBus connection anymore */
+    /* The dbus connection is private,
+     * so we are responsible for closing it */
+    dbus_connection_close( p_intf->p_sys->p_conn );
     dbus_connection_unref( p_intf->p_sys->p_conn );
 
     /* Destroy structure */
