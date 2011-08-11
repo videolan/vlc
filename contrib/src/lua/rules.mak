@@ -49,7 +49,7 @@ endif
 	$(MOVE)
 
 .lua: lua
-	cd $< && $(HOSTVARS) $(MAKE) $(LUA_TARGET)
+	cd $< && $(HOSTVARS_PIC) $(MAKE) $(LUA_TARGET)
 ifdef HAVE_WIN32
 	cd $</src && $(HOSTVARS) $(MAKE) liblua.a
 endif
