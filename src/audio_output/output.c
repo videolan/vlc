@@ -414,7 +414,7 @@ void aout_PacketPlay (audio_output_t *aout, block_t *block)
     vlc_mutex_unlock (&p->lock);
 
     if (time_report != VLC_TS_INVALID)
-        aout_TimeReport (aout, mdate () + time_report);
+        aout_TimeReport (aout, mdate () - time_report);
 }
 
 void aout_PacketPause (audio_output_t *aout, bool pause, mtime_t date)
@@ -621,7 +621,7 @@ block_t *aout_PacketNext (audio_output_t *p_aout, mtime_t start_date)
     const bool b_can_sleek = !AOUT_FMT_LINEAR(&p_aout->format);
     const mtime_t now = mdate ();
     const mtime_t threshold =
-        (b_can_sleek ? now : start_date) - AOUT_MAX_PTS_DELAY;
+        (b_can_sleek ? start_date : now) - AOUT_MAX_PTS_DELAY;
 
     vlc_mutex_lock( &p->lock );
     if( p->pause_date != VLC_TS_INVALID )
