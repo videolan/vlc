@@ -28,7 +28,7 @@ args="--disable-macosx-defaults $args"
 args="--disable-macosx $args" # Disable old gui/macosx
 args="--disable-macosx-vlc-app $args" # Don't build old vlc.app
 
-args="--with-macosx-version-min=10.5 $args"
+args="--with-macosx-version-min=10.6 $args"
 
 # optional modules
 args="--enable-faad $args"
@@ -90,6 +90,7 @@ for arch in $ARCHS; do
         export CXXFLAGS="-m64 -arch x86_64"
         export OBJCFLAGS="-m64 -arch x86_64"
         export CPPFLAGS="-m64 -arch x86_64"
+        this_args="--with-contrib=${VLC_SRC_DIR}/extras/contrib/hosts/x86_64-apple-darwin10 $this_args"
         $top_srcdir/configure --build=x86_64-apple-darwin10 $this_args
     fi
     if test $arch = "i386"; then
@@ -97,6 +98,7 @@ for arch in $ARCHS; do
         export CXXFLAGS="-m32 -arch i686"
         export OBJCFLAGS="-m32 -arch i686"
         export CPPFLAGS="-m32 -arch i686"
+        this_args="--with-contrib=${VLC_SRC_DIR}/extras/contrib/hosts/i386-apple-darwin10 $this_args"
         $top_srcdir/configure --build=i686-apple-darwin10 $this_args
     fi
     if test $arch = "ppc"; then
@@ -104,6 +106,7 @@ for arch in $ARCHS; do
         export CXXFLAGS="-m32 -arch ppc"
         export OBJCFLAGS="-m32 -arch ppc"
         export CPPFLAGS="-m32 -arch ppc"
+        this_args="--with-contrib=${VLC_SRC_DIR}/extras/contrib/hosts/powerpc-apple-darwin9 $this_args"
         $top_srcdir/configure --build=powerpc-apple-darwin9 $this_args
     fi
     cd ..

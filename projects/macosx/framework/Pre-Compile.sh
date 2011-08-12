@@ -238,22 +238,6 @@ for module in `find ${main_build_dir}/modules -path "*dylib.dSYM*" -prune -o -na
 done
 
 ##########################
-# Install the module cache
-if test "$use_archs" = "no"; then
-    cache=`ls ${main_build_dir}/modules/plugins-*.dat | sed -e s:${main_build_dir}/::`
-    vlc_install `dirname ${cache}` `basename ${cache}` ${target_plugins} "data"
-else
-    for arch in $ARCHS; do
-        build="${VLC_BUILD_DIR}/${arch}"
-        cache=`ls ${build}/modules/plugins-*.dat | sed -e s:${build}/::`
-
-        # The cache is arch dependant. Use vlc_install_object directly.
-        vlc_install_object "${cache}" "${target_plugins}" "data"
-    done;
-fi
-
-
-##########################
 # Build the lib folder
 
 vlc_install "src/${prefix}" "libvlc.5.dylib" "${target_lib}" "library"
