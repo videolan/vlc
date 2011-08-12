@@ -18,47 +18,45 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ * along with this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
+
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
-#include <unistd.h>
-
 #include <vlc_common.h>
 #include <vlc_plugin.h>
-#include <vlc_dialog.h>
-#include <vlc_aout.h>
+#include <vlc_dialog.h> 		  // dialog_Fatal
+#include <vlc_aout.h>   	          // aout_*
 
-#include <CoreAudio/CoreAudio.h>
-#include <AudioUnit/AudioUnit.h>
-#include <AudioToolbox/AudioFormat.h>
-
-#include <CoreServices/CoreServices.h>
+#include <AudioUnit/AudioUnit.h> 	  // AudioDeviceID
+#include <AudioToolbox/AudioFormat.h>     // AudioFormatGetProperty
 
 #ifndef verify_noerr
-#define verify_noerr(a) assert((a) == noErr)
+# define verify_noerr(a) assert((a) == noErr)
 #endif
 
 #define STREAM_FORMAT_MSG( pre, sfm ) \
-    pre "[%u][%4.4s][%u][%u][%u][%u][%u][%u]", \
-    (UInt32)sfm.mSampleRate, (char *)&sfm.mFormatID, \
-    sfm.mFormatFlags, sfm.mBytesPerPacket, \
-    sfm.mFramesPerPacket, sfm.mBytesPerFrame, \
-    sfm.mChannelsPerFrame, sfm.mBitsPerChannel
+    pre "[%f][%4.4s][%u][%u][%u][%u][%u][%u]", \
+    sfm.mSampleRate, (char *)&sfm.mFormatID, \
+    (unsigned int)sfm.mFormatFlags, (unsigned int)sfm.mBytesPerPacket, \
+    (unsigned int)sfm.mFramesPerPacket, (unsigned int)sfm.mBytesPerFrame, \
+    (unsigned int)sfm.mChannelsPerFrame, (unsigned int)sfm.mBitsPerChannel
 
+#ifndef NDEBUG
 #define STREAM_FORMAT_MSG_FULL( pre, sfm ) \
-    pre ":\nsamplerate: [%u]\nFormatID: [%4.4s]\nFormatFlags: [%u]\nBypesPerPacket: [%u]\nFramesPerPacket: [%u]\nBytesPerFrame: [%u]\nChannelsPerFrame: [%u]\nBitsPerChannel[%u]", \
+    pre ":\nsamplerate: [%"PRIu32"]\nFormatID: [%4.4s]\nFormatFlags: [%"PRIu32"]\nBypesPerPacket: [%"PRIu32"]\nFramesPerPacket: [%"PRIu32"]\nBytesPerFrame: [%u]\nChannelsPerFrame: [%u]\nBitsPerChannel[%u]", \
     (UInt32)sfm.mSampleRate, (char *)&sfm.mFormatID, \
     sfm.mFormatFlags, sfm.mBytesPerPacket, \
     sfm.mFramesPerPacket, sfm.mBytesPerFrame, \
     sfm.mChannelsPerFrame, sfm.mBitsPerChannel
+#endif
 
 #define FRAMESIZE 2048
 #define BUFSIZE (FRAMESIZE * 8) * 8
@@ -80,29 +78,29 @@
 struct aout_sys_t
 {
     aout_packet_t               packet;
-    AudioDeviceID               i_default_dev;  /* Keeps DeviceID of defaultOutputDevice */
-    AudioDeviceID               i_selected_dev; /* Keeps DeviceID of the selected device */
-    AudioDeviceIOProcID         i_procID;       /* DeviceID of current device */
-    UInt32                      i_devices;      /* Number of CoreAudio Devices */
-    bool                        b_supports_digital;/* Does the currently selected device support digital mode? */
-    bool                        b_digital;      /* Are we running in digital mode? */
-    mtime_t                     clock_diff;     /* Difference between VLC clock and Device clock */
+    AudioDeviceID               i_default_dev;       /* DeviceID of defaultOutputDevice */
+    AudioDeviceID               i_selected_dev;      /* DeviceID of the selected device */
+    AudioDeviceIOProcID         i_procID;            /* DeviceID of current device */
+    UInt32                      i_devices;           /* Number of CoreAudio Devices */
+    bool                        b_supports_digital;  /* Does the currently selected device support digital mode? */
+    bool                        b_digital;           /* Are we running in digital mode? */
+    mtime_t                     clock_diff;          /* Difference between VLC clock and Device clock */
 
     /* AUHAL specific */
-    Component                   au_component;   /* The Audiocomponent we use */
-    AudioUnit                   au_unit;        /* The AudioUnit we use */
+    Component                   au_component;        /* The Audiocomponent we use */
+    AudioUnit                   au_unit;             /* The AudioUnit we use */
     uint8_t                     p_remainder_buffer[BUFSIZE];
     uint32_t                    i_read_bytes;
     uint32_t                    i_total_bytes;
 
     /* CoreAudio SPDIF mode specific */
-    pid_t                       i_hog_pid;      /* The keep the pid of our hog status */
-    AudioStreamID               i_stream_id;    /* The StreamID that has a cac3 streamformat */
-    int                         i_stream_index; /* The index of i_stream_id in an AudioBufferList */
-    AudioStreamBasicDescription stream_format;  /* The format we changed the stream to */
-    AudioStreamBasicDescription sfmt_revert;    /* The original format of the stream */
-    bool                        b_revert;       /* Wether we need to revert the stream format */
-    bool                        b_changed_mixing;/* Wether we need to set the mixing mode back */
+    pid_t                       i_hog_pid;           /* The keep the pid of our hog status */
+    AudioStreamID               i_stream_id;         /* The StreamID that has a cac3 streamformat */
+    int                         i_stream_index;      /* The index of i_stream_id in an AudioBufferList */
+    AudioStreamBasicDescription stream_format;       /* The format we changed the stream to */
+    AudioStreamBasicDescription sfmt_revert;         /* The original format of the stream */
+    bool                        b_revert;            /* Wether we need to revert the stream format */
+    bool                        b_changed_mixing;    /* Wether we need to set the mixing mode back */
 };
 
 /*****************************************************************************
@@ -113,7 +111,6 @@ static int      OpenAnalog              ( audio_output_t * );
 static int      OpenSPDIF               ( audio_output_t * );
 static void     Close                   ( vlc_object_t * );
 
-static void     Play                    ( audio_output_t *, block_t * );
 static void     Probe                   ( audio_output_t * );
 
 static int      AudioDeviceHasOutput    ( AudioDeviceID );
@@ -129,7 +126,6 @@ static OSStatus HardwareListener        ( AudioObjectID, UInt32, const AudioObje
 static OSStatus StreamListener          ( AudioObjectID, UInt32, const AudioObjectPropertyAddress *, void * );
 static int      AudioDeviceCallback     ( vlc_object_t *, const char *,
                                           vlc_value_t, vlc_value_t, void * );
-
 
 
 /*****************************************************************************
@@ -159,7 +155,7 @@ static int Open( vlc_object_t * p_this )
     UInt32                  i_param_size = 0;
     struct aout_sys_t       *p_sys = NULL;
     vlc_value_t             val;
-    audio_output_t         *p_aout = (audio_output_t *)p_this;
+    audio_output_t          *p_aout = (audio_output_t *)p_this;
 
     /* Use int here, to match kAudioDevicePropertyDeviceIsAlive
      * property size */
@@ -197,7 +193,7 @@ static int Open( vlc_object_t * p_this )
     /* Persistent device variable */
     if( var_Type( p_aout->p_libvlc, "macosx-audio-device" ) == 0 )
     {
-        var_Create( p_aout->p_libvlc, "macosx-audio-device", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+        var_CreateGetInteger( p_aout->p_libvlc, "macosx-audio-device" );
     }
 
     /* Build a list of devices */
@@ -231,7 +227,8 @@ static int Open( vlc_object_t * p_this )
     if( err != noErr )
     {
         /* Be tolerant, only give a warning here */
-        msg_Warn( p_aout, "could not check whether device [0x%x] is alive: %4.4s", (unsigned int)p_sys->i_selected_dev, (char *)&err );
+        msg_Warn( p_aout, "could not check whether device [0x%x] is alive: %4.4s",
+			  (unsigned int)p_sys->i_selected_dev, (char *)&err );
         b_alive = false;
     }
 
@@ -615,7 +612,7 @@ static int OpenSPDIF( audio_output_t * p_aout )
     UInt32                  i_param_size = 0, b_mix = 0;
     Boolean                 b_writeable = false;
     AudioStreamID           *p_streams = NULL;
-    int                     i_streams = 0;
+    UInt32                  i_streams = 0;
 
     /* Start doing the SPDIF setup proces */
     p_sys->b_digital = true;
@@ -676,18 +673,18 @@ static int OpenSPDIF( audio_output_t * p_aout )
     }
 
     AudioObjectPropertyAddress physicalFormatsAddress = { kAudioStreamPropertyAvailablePhysicalFormats, kAudioObjectPropertyScopeGlobal, 0 };
-    for( int i = 0; i < i_streams && p_sys->i_stream_index < 0 ; i++ )
+    for( unsigned i = 0; i < i_streams && p_sys->i_stream_index < 0 ; i++ )
     {
         /* Find a stream with a cac3 stream */
         AudioStreamRangedDescription *p_format_list = NULL;
-        int                         i_formats = 0;
-        bool                  b_digital = false;
+        int                          i_formats = 0;
+        bool                         b_digital = false;
 
         /* Retrieve all the stream formats supported by each output stream */
         err = AudioObjectGetPropertyDataSize( p_streams[i], &physicalFormatsAddress, 0, NULL, &i_param_size );
         if( err != noErr )
         {
-            msg_Err( p_aout, "OpenSPDIF: could not get number of streamformats: [%s] (%i)", (char *)&err, err );
+            msg_Err( p_aout, "OpenSPDIF: could not get number of streamformats: [%s] (%i)", (char *)&err, (int32_t)err );
             continue;
         }
 
@@ -940,7 +937,7 @@ static void Probe( audio_output_t * p_aout )
         msg_Err( p_aout, "No audio output devices were found." );
         goto error;
     }
-    msg_Dbg( p_aout, "found %u audio device(s)", p_sys->i_devices );
+    msg_Dbg( p_aout, "found %u audio device(s)", (unsigned)p_sys->i_devices );
 
     /* Allocate DeviceID array */
     p_devices = (AudioDeviceID*)malloc( sizeof(AudioDeviceID) * p_sys->i_devices );
@@ -986,7 +983,7 @@ static void Probe( audio_output_t * p_aout )
         err = AudioObjectGetPropertyData( p_devices[i], &deviceNameAddress, 0, NULL, &i_param_size, psz_name );
         if( err ) goto error;
 
-        msg_Dbg( p_aout, "DevID: %u DevName: %s", p_devices[i], psz_name );
+        msg_Dbg( p_aout, "DevID: %u DevName: %s", (unsigned)p_devices[i], psz_name );
 
         if( !AudioDeviceHasOutput( p_devices[i]) )
         {
@@ -1083,7 +1080,7 @@ static int AudioDeviceSupportsDigital( audio_output_t *p_aout, AudioDeviceID i_d
     err = AudioObjectGetPropertyDataSize( i_dev_id, &streamsAddress, 0, NULL, &i_param_size );
     if( err != noErr )
     {
-        msg_Err( p_aout, "could not get number of streams: [%s] (%i)", (char *)&err, err );
+        msg_Err( p_aout, "could not get number of streams: [%s] (%i)", (char *)&err, (int32_t)err );
         return false;
     }
 
@@ -1125,7 +1122,7 @@ static int AudioStreamSupportsDigital( audio_output_t *p_aout, AudioStreamID i_s
     err = AudioObjectGetPropertyDataSize( i_stream_id, &physicalFormatsAddress, 0, NULL, &i_param_size );
     if( err != noErr )
     {
-        msg_Err( p_aout, "could not get number of streamformats: [%s] (%i)", (char *)&err, err );
+        msg_Err( p_aout, "could not get number of streamformats: [%s] (%i)", (char *)&err, (int32_t)err );
         return false;
     }
 
