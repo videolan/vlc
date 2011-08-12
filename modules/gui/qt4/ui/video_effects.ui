@@ -6,12 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>542</width>
-    <height>284</height>
+    <width>629</width>
+    <height>321</height>
    </rect>
   </property>
   <property name="currentIndex">
-   <number>0</number>
+   <number>3</number>
   </property>
   <widget class="QWidget" name="tab">
    <attribute name="title">
@@ -860,13 +860,6 @@
       </property>
      </widget>
     </item>
-    <item row="3" column="1">
-     <widget class="QCheckBox" name="noiseEnable">
-      <property name="text">
-       <string>Noise</string>
-      </property>
-     </widget>
-    </item>
    </layout>
   </widget>
   <widget class="QWidget" name="tab_atmo">
@@ -1652,7 +1645,6 @@
   <tabstop>gradientCartoonCheck</tabstop>
   <tabstop>sepiaEnable</tabstop>
   <tabstop>sepiaIntensitySpin</tabstop>
-  <tabstop>noiseEnable</tabstop>
   <tabstop>posterizeEnable</tabstop>
   <tabstop>posterizeLevelSpin</tabstop>
   <tabstop>motionblurEnable</tabstop>

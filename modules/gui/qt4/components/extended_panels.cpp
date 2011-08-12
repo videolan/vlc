@@ -164,8 +164,6 @@ ExtVideo::ExtVideo( intf_thread_t *_p_intf, QTabWidget *_parent ) :
 
     SETUP_VFILTER( motiondetect )
 
-//    SETUP_VFILTER( noise )
-
     SETUP_VFILTER( psychedelic )
 
     SETUP_VFILTER( sharpen )
