@@ -612,7 +612,6 @@ static int OpenSPDIF( audio_output_t * p_aout )
     UInt32                  i_param_size = 0, b_mix = 0;
     Boolean                 b_writeable = false;
     AudioStreamID           *p_streams = NULL;
-    UInt32                  i_streams = 0;
 
     /* Start doing the SPDIF setup proces */
     p_sys->b_digital = true;
@@ -658,7 +657,6 @@ static int OpenSPDIF( audio_output_t * p_aout )
         return false;
     }
 
-    i_streams = i_param_size / sizeof( AudioStreamID );
     p_streams = (AudioStreamID *)malloc( i_param_size );
     if( p_streams == NULL )
         return false;
@@ -673,7 +671,7 @@ static int OpenSPDIF( audio_output_t * p_aout )
     }
 
     AudioObjectPropertyAddress physicalFormatsAddress = { kAudioStreamPropertyAvailablePhysicalFormats, kAudioObjectPropertyScopeGlobal, 0 };
-    for( unsigned i = 0; i < i_streams && p_sys->i_stream_index < 0 ; i++ )
+    for( unsigned i = 0; i < i_param_size / sizeof( AudioStreamID ) && p_sys->i_stream_index < 0 ; i++ )
     {
         /* Find a stream with a cac3 stream */
         AudioStreamRangedDescription *p_format_list = NULL;
@@ -1072,7 +1070,6 @@ static int AudioDeviceSupportsDigital( audio_output_t *p_aout, AudioDeviceID i_d
     OSStatus                    err = noErr;
     UInt32                      i_param_size = 0;
     AudioStreamID               *p_streams = NULL;
-    int                         i_streams = 0;
     bool                  b_return = false;
 
     /* Retrieve all the output streams */
@@ -1084,7 +1081,6 @@ static int AudioDeviceSupportsDigital( audio_output_t *p_aout, AudioDeviceID i_d
         return false;
     }
 
-    i_streams = i_param_size / sizeof( AudioStreamID );
     p_streams = (AudioStreamID *)malloc( i_param_size );
     if( p_streams == NULL )
         return VLC_ENOMEM;
@@ -1096,7 +1092,7 @@ static int AudioDeviceSupportsDigital( audio_output_t *p_aout, AudioDeviceID i_d
         return false;
     }
 
-    for( int i = 0; i < i_streams; i++ )
+    for( unsigned i = 0; i < i_param_size / sizeof( AudioStreamID ); i++ )
     {
         if( AudioStreamSupportsDigital( p_aout, p_streams[i] ) )
             b_return = true;
