@@ -25,22 +25,19 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
+
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
-#include <vlc_common.h>
-#include <vlc_plugin.h>
-
-#include <sys/types.h>
 #include <limits.h>
 
+#include <vlc_common.h>
+#include <vlc_plugin.h>
 #include <vlc_demux.h>
 
 #include "ps.h"
 #include "vobsub.h"
-
-#define MAX_LINE 8192
 
 /*****************************************************************************
  * Module descriptor
@@ -69,8 +66,6 @@ typedef struct
     int     i_line;
     char    **line;
 } text_t;
-static int  TextLoad( text_t *, stream_t *s );
-static void TextUnload( text_t * );
 
 typedef struct
 {
@@ -93,25 +88,28 @@ typedef struct
 
 struct demux_sys_t
 {
-    int64_t     i_next_demux_date;
-    int64_t     i_length;
+    int64_t        i_next_demux_date;
+    int64_t        i_length;
 
-    text_t      txt;
-    stream_t    *p_vobsub_stream;
+    text_t         txt;
+    stream_t       *p_vobsub_stream;
 
     /* all tracks */
     int            i_tracks;
     vobsub_track_t *track;
 
-    int         i_original_frame_width;
-    int         i_original_frame_height;
-    bool  b_palette;
-    uint32_t    palette[16];
+    int            i_original_frame_width;
+    int            i_original_frame_height;
+    bool           b_palette;
+    uint32_t       palette[16];
 };
+
 
 static int Demux( demux_t * );
 static int Control( demux_t *, int, va_list );
 
+static int  TextLoad( text_t *, stream_t *s );
+static void TextUnload( text_t * );
 static int ParseVobSubIDX( demux_t * );
 static int DemuxVobSub( demux_t *, block_t *);
 
@@ -138,7 +136,6 @@ static int Open ( vlc_object_t *p_this )
             return VLC_EGENERIC;
         }
         free( s );
-
     }
     else
     {
@@ -146,11 +143,11 @@ static int Open ( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    p_demux->pf_demux = Demux;
-    p_demux->pf_control = Control;
+    /* */
     p_demux->p_sys = p_sys = malloc( sizeof( demux_sys_t ) );
     if( unlikely( !p_sys ) )
         return VLC_ENOMEM;
+
     p_sys->i_length = 0;
     p_sys->p_vobsub_stream = NULL;
     p_sys->i_tracks = 0;
@@ -174,8 +171,7 @@ static int Open ( vlc_object_t *p_this )
     /* Find the total length of the vobsubs */
     if( p_sys->i_tracks > 0 )
     {
-        int i;
-        for( i = 0; i < p_sys->i_tracks; i++ )
+        for( int i = 0; i < p_sys->i_tracks; i++ )
         {
             if( p_sys->track[i].i_subtitles > 1 )
             {
@@ -185,8 +181,7 @@ static int Open ( vlc_object_t *p_this )
         }
     }
 
-    if( asprintf( &psz_vobname, "%s://%s", p_demux->psz_access,
-                  p_demux->psz_location ) == -1 )
+    if( asprintf( &psz_vobname, "%s://%s", p_demux->psz_access, p_demux->psz_location ) == -1 )
         goto error;
 
     i_len = strlen( psz_vobname );
@@ -202,6 +197,9 @@ static int Open ( vlc_object_t *p_this )
         goto error;
     }
     free( psz_vobname );
+
+    p_demux->pf_demux = Demux;
+    p_demux->pf_control = Control;
 
     return VLC_SUCCESS;
 
@@ -220,19 +218,16 @@ error:
  *****************************************************************************/
 static void Close( vlc_object_t *p_this )
 {
-    int i;
     demux_t *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys = p_demux->p_sys;
-
-    /* Clean all subs from all tracks */
-    for( i = 0; i < p_sys->i_tracks; i++ )
-        free( p_sys->track[i].p_subtitles );
-
-    free( p_sys->track );
 
     if( p_sys->p_vobsub_stream )
         stream_Delete( p_sys->p_vobsub_stream );
 
+    /* Clean all subs from all tracks */
+    for( int i = 0; i < p_sys->i_tracks; i++ )
+        free( p_sys->track[i].p_subtitles );
+    free( p_sys->track );
     free( p_sys );
 }
 
@@ -354,9 +349,9 @@ static int Demux( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     int64_t i_maxdate;
-    int i, i_read;
+    int i_read;
 
-    for( i = 0; i < p_sys->i_tracks; i++ )
+    for( int i = 0; i < p_sys->i_tracks; i++ )
     {
 #define tk p_sys->track[i]
         if( tk.i_current_subtitle >= tk.i_subtitles )
@@ -459,12 +454,10 @@ static int TextLoad( text_t *txt, stream_t *s )
 
 static void TextUnload( text_t *txt )
 {
-    int i;
-
-    for( i = 0; i < txt->i_line_count; i++ )
+    for( int i = 0; i < txt->i_line_count; i++ )
         free( txt->line[i] );
-
     free( txt->line );
+
     txt->i_line       = 0;
     txt->i_line_count = 0;
 }
