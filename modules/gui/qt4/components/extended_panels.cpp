@@ -116,15 +116,17 @@ ExtVideo::ExtVideo( intf_thread_t *_p_intf, QTabWidget *_parent ) :
         { \
             vlc_object_release( p_obj ); \
             if( checkbox ) checkbox->setChecked( true ); \
-            else groupbox->setChecked( true ); \
+            else if (groupbox) groupbox->setChecked( true ); \
         } \
         else \
         { \
             if( checkbox ) checkbox->setChecked( false ); \
-            else groupbox->setChecked( false ); \
+            else if (groupbox)  groupbox->setChecked( false ); \
         } \
     } \
     CONNECT( ui.widget##Enable, clicked(), this, updateFilters() );
+
+
 #define SETUP_VFILTER_OPTION( widget, signal ) \
     initComboBoxItems( ui.widget ); \
     setWidgetValue( ui.widget ); \
@@ -142,7 +144,6 @@ ExtVideo::ExtVideo( intf_thread_t *_p_intf, QTabWidget *_parent ) :
     SETUP_VFILTER_OPTION( extractComponentText, textChanged( const QString& ) )
 
     SETUP_VFILTER( posterize )
-    SETUP_VFILTER_OPTION( posterizeLevelSpin, valueChanged( int ) )
 
     SETUP_VFILTER( colorthres )
     SETUP_VFILTER_OPTION( colorthresColorText, textChanged( const QString& ) )
@@ -195,10 +196,6 @@ ExtVideo::ExtVideo( intf_thread_t *_p_intf, QTabWidget *_parent ) :
     SETUP_VFILTER_OPTION( wallRowsSpin, valueChanged( int ) )
     SETUP_VFILTER_OPTION( wallColsSpin, valueChanged( int ) )
 
-    SETUP_VFILTER( panoramix )
-    SETUP_VFILTER_OPTION( panoramixRowsSpin, valueChanged( int ) )
-    SETUP_VFILTER_OPTION( panoramixColsSpin, valueChanged( int ) )
-
 
     SETUP_VFILTER( erase )
     SETUP_VFILTER_OPTION( eraseMaskText, editingFinished() )
@@ -222,6 +219,15 @@ ExtVideo::ExtVideo( intf_thread_t *_p_intf, QTabWidget *_parent ) :
 
     SETUP_VFILTER( grain )
     SETUP_VFILTER_OPTION( grainVarianceSlider, valueChanged( int ) )
+
+    SETUP_VFILTER( mirror )
+
+    SETUP_VFILTER( gaussianblur )
+    SETUP_VFILTER_OPTION( gaussianbluSigmaSlider, valueChanged( int ) )
+
+    SETUP_VFILTER( antiflicker )
+    SETUP_VFILTER_OPTION( antiflickerSofteningSizeSlider, valueChanged( int ) )
+
 
     if( module_exists( "atmo" ) )
     {
