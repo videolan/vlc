@@ -238,7 +238,6 @@ static void FindLength( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     int64_t i_current_pos = -1, i_size = 0, i_end = 0;
-    int i;
 
     if( !var_CreateGetBool( p_demux, "ps-trust-timestamps" ) )
         return;
@@ -247,7 +246,7 @@ static void FindLength( demux_t *p_demux )
     {
         p_sys->i_length = 0;
         /* Check beginning */
-        i = 0;
+        int i = 0;
         i_current_pos = stream_Tell( p_demux->s );
         while( vlc_object_alive (p_demux) && i < 40 && Demux2( p_demux, false ) > 0 ) i++;
 
@@ -255,13 +254,13 @@ static void FindLength( demux_t *p_demux )
         i_size = stream_Size( p_demux->s );
         i_end = __MAX( 0, __MIN( 200000, i_size ) );
         stream_Seek( p_demux->s, i_size - i_end );
-        i = 0;
 
-        while( vlc_object_alive (p_demux) && i < 40 && Demux2( p_demux, true ) > 0 );
+        i = 0;
+        while( vlc_object_alive (p_demux) && i < 40 && Demux2( p_demux, true ) > 0 ) i++;
         if( i_current_pos >= 0 ) stream_Seek( p_demux->s, i_current_pos );
     }
 
-    for( i = 0; i < PS_TK_COUNT; i++ )
+    for( int i = 0; i < PS_TK_COUNT; i++ )
     {
         ps_track_t *tk = &p_sys->tk[i];
         if( tk->i_first_pts >= 0 && tk->i_last_pts > 0 )
