@@ -117,8 +117,6 @@ void module_InitBank( vlc_object_t *p_this )
     {
         p_bank = calloc (1, sizeof(*p_bank));
         p_bank->i_usage = 1;
-        p_bank->i_cache = 0;
-        p_bank->pp_cache = NULL;
         p_bank->head = NULL;
 
         /* Everything worked, attach the object */
@@ -176,15 +174,6 @@ void module_EndBank( vlc_object_t *p_this, bool b_plugins )
     vlc_rwlock_destroy (&config_lock);
     p_module_bank = NULL;
     vlc_mutex_unlock( &module_lock );
-
-#ifdef HAVE_DYNAMIC_PLUGINS
-    while( p_bank->i_cache-- )
-    {
-        free( p_bank->pp_cache[p_bank->i_cache]->path );
-        free( p_bank->pp_cache[p_bank->i_cache] );
-    }
-    free( p_bank->pp_cache );
-#endif
 
     while( p_bank->head != NULL )
         DeleteModule( p_bank, p_bank->head );
@@ -870,9 +859,8 @@ static void AllocateAllPlugins( vlc_object_t *p_this, module_bank_t *p_bank )
 static void AllocatePluginPath( vlc_object_t *p_this, module_bank_t *p_bank,
                                 const char *path, cache_mode_t mode )
 {
-    module_cache_t **cache;
+    module_cache_t **cache = NULL;
     size_t count = 0;
-    size_t offset = p_module_bank->i_cache;
 
     switch( mode )
     {
@@ -889,6 +877,8 @@ static void AllocatePluginPath( vlc_object_t *p_this, module_bank_t *p_bank,
     msg_Dbg( p_this, "recursively browsing `%s'", path );
 
     /* TODO: pass as argument, remove this hack */
+    p_bank->pp_cache = NULL;
+    p_bank->i_cache = 0;
     p_bank->pp_loaded_cache = cache;
     p_bank->i_loaded_cache = count;
     /* Don't go deeper than 5 subdirectories */
@@ -907,8 +897,7 @@ static void AllocatePluginPath( vlc_object_t *p_this, module_bank_t *p_bank,
                 }
             free( cache );
         case CACHE_RESET:
-            CacheSave( p_this, path, p_bank->pp_cache + offset,
-                       p_bank->i_cache - offset );
+            CacheSave (p_this, path, p_bank->pp_cache, p_bank->i_cache);
         case CACHE_IGNORE:
             break;
     }

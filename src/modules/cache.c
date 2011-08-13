@@ -397,22 +397,19 @@ static int CacheLoadConfig( module_t *p_module, FILE *file )
 
 static int CacheSaveBank( FILE *file, module_cache_t *const *, size_t );
 
-/*****************************************************************************
- * SavePluginsCache: saves the plugins cache to a file
- *****************************************************************************/
+/**
+ * Saves a module cache to disk, and release cache data from memory.
+ */
 void CacheSave (vlc_object_t *p_this, const char *dir,
-                module_cache_t *const *pp_cache, size_t n)
+               module_cache_t **entries, size_t n)
 {
-    char *filename, *tmpname;
+    char *filename = NULL, *tmpname = NULL;
 
     if (asprintf (&filename, "%s"DIR_SEP CACHE_NAME, dir ) == -1)
-        return;
+        goto out;
 
     if (asprintf (&tmpname, "%s.%"PRIu32, filename, (uint32_t)getpid ()) == -1)
-    {
-        free (filename);
-        return;
-    }
+        goto out;
     msg_Dbg (p_this, "saving plugins cache %s", filename);
 
     FILE *file = vlc_fopen (tmpname, "wb");
@@ -423,7 +420,7 @@ void CacheSave (vlc_object_t *p_this, const char *dir,
         goto out;
     }
 
-    if (CacheSaveBank (file, pp_cache, n))
+    if (CacheSaveBank (file, entries, n))
     {
         msg_Warn (p_this, "cannot write %s (%m)", tmpname);
         clearerr (file);
@@ -443,6 +440,13 @@ void CacheSave (vlc_object_t *p_this, const char *dir,
 out:
     free (filename);
     free (tmpname);
+
+    for (size_t i = 0; i < n; i++)
+    {
+        free (entries[i]->path);
+        free (entries[i]);
+    }
+    free (entries);
 }
 
 static int CacheSaveConfig (FILE *, const module_t *);
