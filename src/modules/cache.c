@@ -229,7 +229,6 @@ size_t CacheLoad( vlc_object_t *p_this, const char *dir, module_cache_t **r )
         if (CacheLoadConfig (module, file) != VLC_SUCCESS)
             goto error;
 
-        LOAD_STRING(module->psz_filename);
         LOAD_STRING(module->domain);
         if (module->domain != NULL)
             vlc_bindtextdomain (module->domain);
@@ -515,7 +514,6 @@ static int CacheSaveBank (FILE *file, const module_cache_t *cache,
         if (CacheSaveConfig (file, module))
             goto error;
 
-        SAVE_STRING(module->psz_filename);
         SAVE_STRING(module->domain);
 
         i_submodule = module->submodule_count;
@@ -649,12 +647,16 @@ module_t *CacheFind (module_cache_t *cache, size_t count,
 {
     while (count > 0)
     {
-        if (!strcmp (cache->path, path)
+        if (cache->path != NULL
+         && !strcmp (cache->path, path)
          && cache->mtime == st->st_mtime
          && cache->size == st->st_size)
        {
             module_t *module = cache->p_module;
-            cache->p_module = NULL; /* Return NULL next time */
+            cache->p_module = NULL;
+
+            module->psz_filename = cache->path;
+            cache->path = NULL;
             return module;
        }
        cache++;
