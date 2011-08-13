@@ -270,6 +270,8 @@ size_t CacheLoad( vlc_object_t *p_this, const char *dir, module_cache_t **r )
 
         /* Load common info */
         LOAD_STRING(path);
+        if (path == NULL)
+            goto error;
         LOAD_IMMEDIATE(st.st_mtime);
         LOAD_IMMEDIATE(st.st_size);
 
