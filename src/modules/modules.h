@@ -27,25 +27,6 @@
 typedef struct module_cache_t module_cache_t;
 
 /*****************************************************************************
- * module_bank_t: the module bank
- *****************************************************************************
- * This variable is accessed by any function using modules.
- *****************************************************************************/
-typedef struct module_bank_t
-{
-    unsigned         i_usage;
-
-    /* Plugins cache */
-    int            i_cache;
-    module_cache_t **pp_cache;
-
-    int            i_loaded_cache;
-    module_cache_t **pp_loaded_cache;
-
-    module_t       *head;
-} module_bank_t;
-
-/*****************************************************************************
  * Module cache description structure
  *****************************************************************************/
 struct module_cache_t

@@ -58,6 +58,20 @@
 
 #include "modules/modules.h"
 
+typedef struct
+{
+    unsigned         i_usage;
+
+    /* Plugins cache */
+    int            i_cache;
+    module_cache_t **pp_cache;
+
+    int            i_loaded_cache;
+    module_cache_t **pp_loaded_cache;
+
+    module_t       *head;
+} module_bank_t;
+
 static module_bank_t *p_module_bank = NULL;
 static vlc_mutex_t module_lock = VLC_STATIC_MUTEX;
 
