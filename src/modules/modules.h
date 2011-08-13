@@ -150,6 +150,7 @@ void   CacheMerge (vlc_object_t *, module_t *, module_t *);
 void   CacheDelete(vlc_object_t *, const char *);
 size_t CacheLoad  (vlc_object_t *, const char *, module_cache_t ***);
 void   CacheSave  (vlc_object_t *, const char *, module_cache_t *const *, size_t);
-module_t * CacheFind (module_bank_t *, const char *, const struct stat *);
+module_t *CacheFind (module_cache_t *const *, size_t,
+                     const char *, const struct stat *);
 
 #endif /* !LIBVLC_MODULES_H */

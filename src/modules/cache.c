@@ -634,23 +634,25 @@ void CacheMerge( vlc_object_t *p_this, module_t *p_cache, module_t *p_module )
 }
 
 /**
- * Looks up a plugin file in a list of cached plugins.
+ * Looks up a plugin file in a table of cached plugins.
  */
-module_t *CacheFind (module_bank_t *p_bank,
+module_t *CacheFind (module_cache_t *const *entries, size_t count,
                      const char *path, const struct stat *st)
 {
-    module_cache_t **cache = p_bank->pp_loaded_cache;
-    size_t n = p_bank->i_loaded_cache;
+    while (count > 0)
+    {
+        module_cache_t *entry = *(entries++);
 
-    for( size_t i = 0; i < n; i++ )
-        if( !strcmp( cache[i]->path, path )
-         && cache[i]->mtime == st->st_mtime
-         && cache[i]->size == st->st_size)
+        if (!strcmp (entry->path, path)
+         && entry->mtime == st->st_mtime
+         && entry->size == st->st_size)
        {
-            module_t *module = cache[i]->p_module;
-            cache[i]->p_module = NULL;
+            module_t *module = entry->p_module;
+            entry->p_module = NULL; /* Return NULL next time */
             return module;
        }
+       count--;
+    }
 
     return NULL;
 }

@@ -969,7 +969,8 @@ static int AllocatePluginFile( vlc_object_t * p_this, module_bank_t *p_bank,
                 p_module->psz_object_name, p_module->psz_longname ); */
     /* Check our plugins cache first then load plugin if needed */
     if( mode == CACHE_USE )
-        p_module = CacheFind( p_bank, path, st );
+        p_module = CacheFind (p_bank->pp_loaded_cache, p_bank->i_loaded_cache,
+                              path, st);
     if( p_module == NULL )
         p_module = AllocatePlugin( p_this, path, true );
     if( p_module == NULL )
