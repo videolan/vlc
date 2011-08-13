@@ -88,7 +88,7 @@ void CacheDelete( vlc_object_t *obj, const char *dir )
  * actually load the dynamically loadable module.
  * This allows us to only fully load plugins when they are actually used.
  */
-size_t CacheLoad( vlc_object_t *p_this, const char *dir, module_cache_t ***r )
+size_t CacheLoad( vlc_object_t *p_this, const char *dir, module_cache_t **r )
 {
     char *psz_filename;
     FILE *file;
@@ -169,7 +169,7 @@ size_t CacheLoad( vlc_object_t *p_this, const char *dir, module_cache_t ***r )
         return 0;
     }
 
-    module_cache_t **pp_cache = NULL;
+    module_cache_t *cache = NULL;
 
 #define LOAD_IMMEDIATE(a) \
     if( fread( (void *)&a, sizeof(char), sizeof(a), file ) != sizeof(a) ) goto error
@@ -273,13 +273,13 @@ size_t CacheLoad( vlc_object_t *p_this, const char *dir, module_cache_t ***r )
         LOAD_IMMEDIATE(st.st_mtime);
         LOAD_IMMEDIATE(st.st_size);
 
-        CacheAdd (&pp_cache, &count, path, &st, module);
+        CacheAdd (&cache, &count, path, &st, module);
         free (path);
         /* TODO: deal with errors */
     }
     fclose( file );
 
-    *r = pp_cache;
+    *r = cache;
     return i_cache;
 
 error:
@@ -399,13 +399,13 @@ static int CacheLoadConfig( module_t *p_module, FILE *file )
     return VLC_EGENERIC;
 }
 
-static int CacheSaveBank( FILE *file, module_cache_t *const *, size_t );
+static int CacheSaveBank( FILE *file, const module_cache_t *, size_t );
 
 /**
  * Saves a module cache to disk, and release cache data from memory.
  */
 void CacheSave (vlc_object_t *p_this, const char *dir,
-               module_cache_t **entries, size_t n)
+               module_cache_t *entries, size_t n)
 {
     char *filename = NULL, *tmpname = NULL;
 
@@ -446,17 +446,14 @@ out:
     free (tmpname);
 
     for (size_t i = 0; i < n; i++)
-    {
-        free (entries[i]->path);
-        free (entries[i]);
-    }
+        free (entries[i].path);
     free (entries);
 }
 
 static int CacheSaveConfig (FILE *, const module_t *);
 static int CacheSaveSubmodule (FILE *, const module_t *);
 
-static int CacheSaveBank (FILE *file, module_cache_t *const *pp_cache,
+static int CacheSaveBank (FILE *file, const module_cache_t *cache,
                           size_t i_cache)
 {
     uint32_t i_file_size = 0;
@@ -496,37 +493,38 @@ static int CacheSaveBank (FILE *file, module_cache_t *const *pp_cache,
 
     for (unsigned i = 0; i < i_cache; i++)
     {
+        module_t *module = cache[i].p_module;
         uint32_t i_submodule;
 
         /* Save additional infos */
-        SAVE_STRING( pp_cache[i]->p_module->psz_object_name );
-        SAVE_STRING( pp_cache[i]->p_module->psz_shortname );
-        SAVE_STRING( pp_cache[i]->p_module->psz_longname );
-        SAVE_STRING( pp_cache[i]->p_module->psz_help );
-        SAVE_IMMEDIATE( pp_cache[i]->p_module->i_shortcuts );
-        for (unsigned j = 0; j < pp_cache[i]->p_module->i_shortcuts; j++)
-            SAVE_STRING( pp_cache[i]->p_module->pp_shortcuts[j] );
+        SAVE_STRING(module->psz_object_name);
+        SAVE_STRING(module->psz_shortname);
+        SAVE_STRING(module->psz_longname);
+        SAVE_STRING(module->psz_help);
+        SAVE_IMMEDIATE(module->i_shortcuts);
+        for (unsigned j = 0; j < module->i_shortcuts; j++)
+            SAVE_STRING(module->pp_shortcuts[j]);
 
-        SAVE_STRING( pp_cache[i]->p_module->psz_capability );
-        SAVE_IMMEDIATE( pp_cache[i]->p_module->i_score );
-        SAVE_IMMEDIATE( pp_cache[i]->p_module->b_unloadable );
+        SAVE_STRING(module->psz_capability);
+        SAVE_IMMEDIATE(module->i_score);
+        SAVE_IMMEDIATE(module->b_unloadable);
 
         /* Config stuff */
-        if (CacheSaveConfig (file, pp_cache[i]->p_module))
+        if (CacheSaveConfig (file, module))
             goto error;
 
-        SAVE_STRING( pp_cache[i]->p_module->psz_filename );
-        SAVE_STRING( pp_cache[i]->p_module->domain );
+        SAVE_STRING(module->psz_filename);
+        SAVE_STRING(module->domain);
 
-        i_submodule = pp_cache[i]->p_module->submodule_count;
+        i_submodule = module->submodule_count;
         SAVE_IMMEDIATE( i_submodule );
-        if( CacheSaveSubmodule( file, pp_cache[i]->p_module->submodule ) )
+        if (CacheSaveSubmodule (file, module->submodule))
             goto error;
 
         /* Save common info */
-        SAVE_STRING(pp_cache[i]->path);
-        SAVE_IMMEDIATE(pp_cache[i]->mtime);
-        SAVE_IMMEDIATE(pp_cache[i]->size);
+        SAVE_STRING(cache[i].path);
+        SAVE_IMMEDIATE(cache[i].mtime);
+        SAVE_IMMEDIATE(cache[i].size);
     }
 
     if (fflush (file)) /* flush libc buffers */
@@ -644,21 +642,20 @@ void CacheMerge( vlc_object_t *p_this, module_t *p_cache, module_t *p_module )
 /**
  * Looks up a plugin file in a table of cached plugins.
  */
-module_t *CacheFind (module_cache_t *const *entries, size_t count,
+module_t *CacheFind (module_cache_t *cache, size_t count,
                      const char *path, const struct stat *st)
 {
     while (count > 0)
     {
-        module_cache_t *entry = *(entries++);
-
-        if (!strcmp (entry->path, path)
-         && entry->mtime == st->st_mtime
-         && entry->size == st->st_size)
+        if (!strcmp (cache->path, path)
+         && cache->mtime == st->st_mtime
+         && cache->size == st->st_size)
        {
-            module_t *module = entry->p_module;
-            entry->p_module = NULL; /* Return NULL next time */
+            module_t *module = cache->p_module;
+            cache->p_module = NULL; /* Return NULL next time */
             return module;
        }
+       cache++;
        count--;
     }
 
@@ -666,25 +663,24 @@ module_t *CacheFind (module_cache_t *const *entries, size_t count,
 }
 
 /** Adds entry to the cache */
-int CacheAdd (module_cache_t ***cache, size_t *count,
+int CacheAdd (module_cache_t **cachep, size_t *countp,
               const char *path, const struct stat *st, module_t *module)
 {
-    module_cache_t **entries;
+    module_cache_t *cache = *cachep;
+    const size_t count = *countp;
 
-    entries = realloc (*cache, (*count + 1) * sizeof (*entries));
-    if (unlikely(entries == NULL))
+    cache = realloc (cache, (count + 1) * sizeof (*cache));
+    if (unlikely(cache == NULL))
         return -1;
-    *cache = entries;
+    *cachep = cache;
 
-    entries[*count] = malloc (sizeof (**entries));
-    if (unlikely(entries[*count] == NULL))
-        return -1;
+    cache += count;
     /* NOTE: strdup() could be avoided, but it would be a bit ugly */
-    entries[*count]->path = strdup (path);
-    entries[*count]->mtime = st->st_mtime;
-    entries[*count]->size = st->st_size;
-    entries[*count]->p_module = module;
-    (*count)++;
+    cache->path = strdup (path);
+    cache->mtime = st->st_mtime;
+    cache->size = st->st_size;
+    cache->p_module = module;
+    *countp = count + 1;
     return 0;
 }
 
