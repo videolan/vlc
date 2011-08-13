@@ -567,14 +567,6 @@ void ExtVideo::updateFilterOptions()
         b_is_command = ( i_type & VLC_VAR_ISCOMMAND );
     }
 
-    if( !b_is_command )
-    {
-        msg_Warn( p_intf, "Module %s's %s variable isn't a command. You'll need to restart the filter to take change into account.",
-                 qtu( module ),
-                 qtu( option ) );
-        /* FIXME: restart automatically somewhere near the end of this function */
-    }
-
     /* Try to cast to all the widgets we're likely to encounter. Only
      * one of the casts is expected to work. */
     QSlider        *slider        = qobject_cast<QSlider*>       ( sender() );
@@ -636,6 +628,15 @@ void ExtVideo::updateFilterOptions()
                  qtu( module ),
                  qtu( option ),
                  i_type );
+
+    if( !b_is_command )
+    {
+        msg_Warn( p_intf, "Module %s's %s variable isn't a command. Brute-restarting the filter.",
+                 qtu( module ),
+                 qtu( option ) );
+        ChangeVFiltersString( p_intf, qtu( module ), false );
+        ChangeVFiltersString( p_intf, qtu( module ), true );
+    }
 
     if( p_obj ) vlc_object_release( p_obj );
 }
