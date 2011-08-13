@@ -94,7 +94,7 @@ size_t CacheLoad( vlc_object_t *p_this, const char *dir, module_cache_t ***r )
     int i_size, i_read;
     char p_cachestring[sizeof(CACHE_STRING)];
     size_t i_cache;
-    int32_t i_file_size, i_marker;
+    int32_t i_marker;
 
     assert( dir != NULL );
 
@@ -113,26 +113,6 @@ size_t CacheLoad( vlc_object_t *p_this, const char *dir, module_cache_t ***r )
         return 0;
     }
     free( psz_filename );
-
-    /* Check the file size */
-    i_read = fread( &i_file_size, 1, sizeof(i_file_size), file );
-    if( i_read != sizeof(i_file_size) )
-    {
-        msg_Warn( p_this, "This doesn't look like a valid plugins cache "
-                  "(too short)" );
-        fclose( file );
-        return 0;
-    }
-
-    fseek( file, 0, SEEK_END );
-    if( ftell( file ) != i_file_size )
-    {
-        msg_Warn( p_this, "This doesn't look like a valid plugins cache "
-                  "(corrupted size)" );
-        fclose( file );
-        return 0;
-    }
-    fseek( file, sizeof(i_file_size), SEEK_SET );
 
     /* Check the file is a plugins cache */
     i_size = sizeof(CACHE_STRING) - 1;
@@ -472,10 +452,6 @@ static int CacheSaveBank (FILE *file, module_cache_t *const *pp_cache,
 {
     uint32_t i_file_size = 0;
 
-    /* Empty space for file size */
-    if (fwrite (&i_file_size, sizeof (i_file_size), 1, file) != 1)
-        goto error;
-
     /* Contains version number */
     if (fputs (CACHE_STRING, file) == EOF)
         goto error;
@@ -544,11 +520,7 @@ static int CacheSaveBank (FILE *file, module_cache_t *const *pp_cache,
             goto error;
     }
 
-    /* Fill-up file size */
-    i_file_size = ftell( file );
-    fseek( file, 0, SEEK_SET );
-    if (fwrite (&i_file_size, sizeof (i_file_size), 1, file) != 1
-     || fflush (file)) /* flush libc buffers */
+    if (fflush (file)) /* flush libc buffers */
         goto error;
     return 0; /* success! */
 
