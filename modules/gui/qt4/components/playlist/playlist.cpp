@@ -141,7 +141,7 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QWidget *_par )
     searchEdit->setMaximumWidth( 250 );
     searchEdit->setMinimumWidth( 80 );
     layout->addWidget( searchEdit, 0, 3 );
-    CONNECT( searchEdit, textEdited( const QString& ),
+    CONNECT( searchEdit, textChanged( const QString& ),
              mainView, search( const QString& ) );
     CONNECT( searchEdit, searchDelayedChanged( const QString& ),
              mainView, searchDelayed( const QString & ) );
