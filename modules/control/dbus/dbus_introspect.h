@@ -1,9 +1,9 @@
 /*****************************************************************************
  * dbus-introspect.h : dbus control module (mpris v2.1) - introspection data
  *****************************************************************************
- * Copyright © 2006-2008 Rafaël Carré
- * Copyright © 2007-2010 Mirsal Ennaime
- * Copyright © 2009-2010 The VideoLAN team
+ * Copyright © 2006-2011 Rafaël Carré
+ * Copyright © 2007-2011 Mirsal Ennaime
+ * Copyright © 2009-2011 The VideoLAN team
  * $Id$
  *
  * Authors:    Mirsal Ennaime <mirsal at mirsal fr>
@@ -86,6 +86,9 @@ static const char* psz_introspection_xml =
 "    <method name=\"Play\" />\n"
 "    <method name=\"Pause\" />\n"
 "    <method name=\"PlayPause\" />\n"
+"    <method name=\"Seek\">\n"
+"      <arg type=\"x\" direction=\"out\" />\n"
+"    </method>"
 "    <method name=\"OpenUri\">\n"
 "      <arg type=\"s\" direction=\"in\" />\n"
 "    </method>\n"
