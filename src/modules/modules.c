@@ -63,7 +63,7 @@ typedef struct
     unsigned         i_usage;
 
     /* Plugins cache */
-    int            i_cache;
+    size_t         i_cache;
     module_cache_t **pp_cache;
 
     int            i_loaded_cache;
@@ -1010,20 +1010,8 @@ static int AllocatePluginFile( vlc_object_t * p_this, module_bank_t *p_bank,
         return 0;
 
     /* Add entry to cache */
-    module_cache_t **pp_cache = p_bank->pp_cache;
-
-    pp_cache = realloc_or_free( pp_cache, (p_bank->i_cache + 1) * sizeof(void *) );
-    if( pp_cache == NULL )
-        return -1;
-    pp_cache[p_bank->i_cache] = malloc( sizeof(module_cache_t) );
-    if( pp_cache[p_bank->i_cache] == NULL )
-        return -1;
-    pp_cache[p_bank->i_cache]->path = strdup( path );
-    pp_cache[p_bank->i_cache]->mtime = st->st_mtime;
-    pp_cache[p_bank->i_cache]->size = st->st_size;
-    pp_cache[p_bank->i_cache]->p_module = p_module;
-    p_bank->pp_cache = pp_cache;
-    p_bank->i_cache++;
+    CacheAdd (&p_bank->pp_cache, &p_bank->i_cache, path, st, p_module);
+    /* TODO: deal with errors */
     return  0;
 }
 

@@ -133,5 +133,7 @@ size_t CacheLoad  (vlc_object_t *, const char *, module_cache_t ***);
 void   CacheSave  (vlc_object_t *, const char *, module_cache_t **, size_t);
 module_t *CacheFind (module_cache_t *const *, size_t,
                      const char *, const struct stat *);
+int CacheAdd (module_cache_t ***, size_t *,
+              const char *, const struct stat *, module_t *);
 
 #endif /* !LIBVLC_MODULES_H */

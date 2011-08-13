@@ -169,9 +169,7 @@ size_t CacheLoad( vlc_object_t *p_this, const char *dir, module_cache_t ***r )
         return 0;
     }
 
-    module_cache_t **pp_cache = malloc( i_cache * sizeof(*pp_cache) );
-    if( pp_cache == NULL )
-        i_cache = 0; /* don't load anything */
+    module_cache_t **pp_cache = NULL;
 
 #define LOAD_IMMEDIATE(a) \
     if( fread( (void *)&a, sizeof(char), sizeof(a), file ) != sizeof(a) ) goto error
@@ -195,90 +193,96 @@ size_t CacheLoad( vlc_object_t *p_this, const char *dir, module_cache_t ***r )
     } \
 }
 
-    for( size_t i = 0; i < i_cache; i++ )
+    for (size_t count = 0; count < i_cache;)
     {
+        module_t *module;
         uint16_t i_size;
         int i_submodules;
 
-        pp_cache[i] = xmalloc( sizeof(module_cache_t) );
-
-        /* Load common info */
-        LOAD_STRING( pp_cache[i]->path );
-        LOAD_IMMEDIATE( pp_cache[i]->mtime );
-        LOAD_IMMEDIATE( pp_cache[i]->size );
-
-        pp_cache[i]->p_module = vlc_module_create();
+        module = vlc_module_create();
 
         /* Load additional infos */
-        free( pp_cache[i]->p_module->psz_object_name );
-        LOAD_STRING( pp_cache[i]->p_module->psz_object_name );
-        LOAD_STRING( pp_cache[i]->p_module->psz_shortname );
-        LOAD_STRING( pp_cache[i]->p_module->psz_longname );
-        LOAD_STRING( pp_cache[i]->p_module->psz_help );
+        free (module->psz_object_name);
+        LOAD_STRING(module->psz_object_name);
+        LOAD_STRING(module->psz_shortname);
+        LOAD_STRING(module->psz_longname);
+        LOAD_STRING(module->psz_help);
 
-        LOAD_IMMEDIATE( pp_cache[i]->p_module->i_shortcuts );
-        if( pp_cache[i]->p_module->i_shortcuts > MODULE_SHORTCUT_MAX )
+        LOAD_IMMEDIATE(module->i_shortcuts);
+        if (module->i_shortcuts > MODULE_SHORTCUT_MAX)
             goto error;
-        else if( pp_cache[i]->p_module->i_shortcuts == 0 )
-            pp_cache[i]->p_module->pp_shortcuts = NULL;
+        else if (module->i_shortcuts == 0)
+            module->pp_shortcuts = NULL;
         else
         {
-            pp_cache[i]->p_module->pp_shortcuts =
-                    xmalloc( sizeof( char ** ) * pp_cache[i]->p_module->i_shortcuts );
-            for( unsigned j = 0; j < pp_cache[i]->p_module->i_shortcuts; j++ )
-                LOAD_STRING( pp_cache[i]->p_module->pp_shortcuts[j] );
+            module->pp_shortcuts =
+                              xmalloc (sizeof (char **) * module->i_shortcuts);
+            for (unsigned j = 0; j < module->i_shortcuts; j++)
+                LOAD_STRING(module->pp_shortcuts[j]);
         }
 
-        LOAD_STRING( pp_cache[i]->p_module->psz_capability );
-        LOAD_IMMEDIATE( pp_cache[i]->p_module->i_score );
-        LOAD_IMMEDIATE( pp_cache[i]->p_module->b_unloadable );
+        LOAD_STRING(module->psz_capability);
+        LOAD_IMMEDIATE(module->i_score);
+        LOAD_IMMEDIATE(module->b_unloadable);
 
         /* Config stuff */
-        if( CacheLoadConfig( pp_cache[i]->p_module, file ) != VLC_SUCCESS )
+        if (CacheLoadConfig (module, file) != VLC_SUCCESS)
             goto error;
 
-        LOAD_STRING( pp_cache[i]->p_module->psz_filename );
-        LOAD_STRING( pp_cache[i]->p_module->domain );
-        if( pp_cache[i]->p_module->domain != NULL )
-            vlc_bindtextdomain( pp_cache[i]->p_module->domain );
+        LOAD_STRING(module->psz_filename);
+        LOAD_STRING(module->domain);
+        if (module->domain != NULL)
+            vlc_bindtextdomain (module->domain);
 
         LOAD_IMMEDIATE( i_submodules );
 
         while( i_submodules-- )
         {
-            module_t *p_module = vlc_submodule_create( pp_cache[i]->p_module );
-            free( p_module->psz_object_name );
-            free( p_module->pp_shortcuts );
-            LOAD_STRING( p_module->psz_object_name );
-            LOAD_STRING( p_module->psz_shortname );
-            LOAD_STRING( p_module->psz_longname );
-            LOAD_STRING( p_module->psz_help );
+            module_t *submodule = vlc_submodule_create (module);
+            free (submodule->psz_object_name);
+            free (submodule->pp_shortcuts);
+            LOAD_STRING(submodule->psz_object_name);
+            LOAD_STRING(submodule->psz_shortname);
+            LOAD_STRING(submodule->psz_longname);
+            LOAD_STRING(submodule->psz_help);
 
-            LOAD_IMMEDIATE( p_module->i_shortcuts );
-            if( p_module->i_shortcuts > MODULE_SHORTCUT_MAX )
+            LOAD_IMMEDIATE(submodule->i_shortcuts);
+            if (submodule->i_shortcuts > MODULE_SHORTCUT_MAX)
                 goto error;
-            else if( p_module->i_shortcuts == 0 )
-                p_module->pp_shortcuts = NULL;
+            else if (submodule->i_shortcuts == 0)
+                submodule->pp_shortcuts = NULL;
             else
             {
-                p_module->pp_shortcuts = xmalloc( sizeof( char ** ) * p_module->i_shortcuts );
-                for( unsigned j = 0; j < p_module->i_shortcuts; j++ )
-                    LOAD_STRING( p_module->pp_shortcuts[j] );
+                submodule->pp_shortcuts =
+                           xmalloc (sizeof (char **) * submodule->i_shortcuts);
+                for (unsigned j = 0; j < submodule->i_shortcuts; j++)
+                    LOAD_STRING(submodule->pp_shortcuts[j]);
             }
 
-            LOAD_STRING( p_module->psz_capability );
-            LOAD_IMMEDIATE( p_module->i_score );
-            LOAD_IMMEDIATE( p_module->b_unloadable );
-            LOAD_STRING( p_module->domain );
+            LOAD_STRING(submodule->psz_capability);
+            LOAD_IMMEDIATE(submodule->i_score);
+            LOAD_IMMEDIATE(submodule->b_unloadable);
+            LOAD_STRING(submodule->domain);
         }
+
+        char *path;
+        struct stat st;
+
+        /* Load common info */
+        LOAD_STRING(path);
+        LOAD_IMMEDIATE(st.st_mtime);
+        LOAD_IMMEDIATE(st.st_size);
+
+        CacheAdd (&pp_cache, &count, path, &st, module);
+        free (path);
+        /* TODO: deal with errors */
     }
     fclose( file );
 
     *r = pp_cache;
     return i_cache;
 
- error:
-
+error:
     msg_Warn( p_this, "plugins cache not loaded (corrupted)" );
 
     /* TODO: cleanup */
@@ -494,11 +498,6 @@ static int CacheSaveBank (FILE *file, module_cache_t *const *pp_cache,
     {
         uint32_t i_submodule;
 
-        /* Save common info */
-        SAVE_STRING( pp_cache[i]->path );
-        SAVE_IMMEDIATE( pp_cache[i]->mtime );
-        SAVE_IMMEDIATE( pp_cache[i]->size );
-
         /* Save additional infos */
         SAVE_STRING( pp_cache[i]->p_module->psz_object_name );
         SAVE_STRING( pp_cache[i]->p_module->psz_shortname );
@@ -523,6 +522,11 @@ static int CacheSaveBank (FILE *file, module_cache_t *const *pp_cache,
         SAVE_IMMEDIATE( i_submodule );
         if( CacheSaveSubmodule( file, pp_cache[i]->p_module->submodule ) )
             goto error;
+
+        /* Save common info */
+        SAVE_STRING(pp_cache[i]->path);
+        SAVE_IMMEDIATE(pp_cache[i]->mtime);
+        SAVE_IMMEDIATE(pp_cache[i]->size);
     }
 
     if (fflush (file)) /* flush libc buffers */
@@ -659,6 +663,29 @@ module_t *CacheFind (module_cache_t *const *entries, size_t count,
     }
 
     return NULL;
+}
+
+/** Adds entry to the cache */
+int CacheAdd (module_cache_t ***cache, size_t *count,
+              const char *path, const struct stat *st, module_t *module)
+{
+    module_cache_t **entries;
+
+    entries = realloc (*cache, (*count + 1) * sizeof (*entries));
+    if (unlikely(entries == NULL))
+        return -1;
+    *cache = entries;
+
+    entries[*count] = malloc (sizeof (**entries));
+    if (unlikely(entries[*count] == NULL))
+        return -1;
+    /* NOTE: strdup() could be avoided, but it would be a bit ugly */
+    entries[*count]->path = strdup (path);
+    entries[*count]->mtime = st->st_mtime;
+    entries[*count]->size = st->st_size;
+    entries[*count]->p_module = module;
+    (*count)++;
+    return 0;
 }
 
 #endif /* HAVE_DYNAMIC_PLUGINS */
