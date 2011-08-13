@@ -1,9 +1,9 @@
 /*****************************************************************************
  * dbus-player.h : dbus control module (mpris v1.0) - /Player object
  *****************************************************************************
- * Copyright © 2006-2008 Rafaël Carré
- * Copyright © 2007-2010 Mirsal Ennaime
- * Copyright © 2009-2010 The VideoLAN team
+ * Copyright © 2006-2011 Rafaël Carré
+ * Copyright © 2007-2011 Mirsal Ennaime
+ * Copyright © 2009-2011 The VideoLAN team
  * $Id$
  *
  * Authors:    Mirsal Ennaime <mirsal at mirsal fr>
@@ -127,7 +127,7 @@ DBUS_METHOD( SetPosition )
 DBUS_METHOD( Seek )
 {
     REPLY_INIT;
-    dbus_int32_t i_step;
+    dbus_int64_t i_step;
     vlc_value_t  newpos;
     mtime_t      i_pos;
 
@@ -135,7 +135,7 @@ DBUS_METHOD( Seek )
     dbus_error_init( &error );
 
     dbus_message_get_args( p_from, &error,
-            DBUS_TYPE_INT32, &i_step,
+            DBUS_TYPE_INT64, &i_step,
             DBUS_TYPE_INVALID );
 
     if( dbus_error_is_set( &error ) )
