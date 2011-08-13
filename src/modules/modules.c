@@ -58,22 +58,12 @@
 
 #include "modules/modules.h"
 
-typedef struct
+static struct
 {
-    unsigned         i_usage;
-
-    /* Plugins cache */
-    size_t         i_cache;
-    module_cache_t *cache;
-
-    int            i_loaded_cache;
-    module_cache_t *loaded_cache;
-
-    module_t       *head;
-} module_bank_t;
-
-static module_bank_t *p_module_bank = NULL;
-static vlc_mutex_t module_lock = VLC_STATIC_MUTEX;
+    vlc_mutex_t lock;
+    module_t *head;
+    unsigned usage;
+} modules = { VLC_STATIC_MUTEX, NULL, 0 };
 
 int vlc_entry__main( module_t * );
 
@@ -82,9 +72,10 @@ int vlc_entry__main( module_t * );
  *****************************************************************************/
 #ifdef HAVE_DYNAMIC_PLUGINS
 typedef enum { CACHE_USE, CACHE_RESET, CACHE_IGNORE } cache_mode_t;
-static void AllocateAllPlugins( vlc_object_t *, module_bank_t * );
-static void AllocatePluginPath( vlc_object_t *, module_bank_t *, const char *,
-                                cache_mode_t );
+typedef struct module_bank module_bank_t;
+
+static void AllocateAllPlugins (vlc_object_t *);
+static void AllocatePluginPath (vlc_object_t *, const char *, cache_mode_t);
 static void AllocatePluginDir( vlc_object_t *, module_bank_t *, const char *,
                                unsigned, cache_mode_t );
 static int  AllocatePluginFile( vlc_object_t *, module_bank_t *, const char *,
@@ -92,7 +83,7 @@ static int  AllocatePluginFile( vlc_object_t *, module_bank_t *, const char *,
 static module_t * AllocatePlugin( vlc_object_t *, const char *, bool );
 #endif
 static int  AllocateBuiltinModule( vlc_object_t *, int ( * ) ( module_t * ) );
-static void DeleteModule ( module_bank_t *, module_t * );
+static void DeleteModule (module_t **, module_t *);
 #ifdef HAVE_DYNAMIC_PLUGINS
 static void   DupModule        ( module_t * );
 static void   UndupModule      ( module_t * );
@@ -109,19 +100,10 @@ static void   UndupModule      ( module_t * );
  */
 void module_InitBank( vlc_object_t *p_this )
 {
-    module_bank_t *p_bank = NULL;
+    vlc_mutex_lock (&modules.lock);
 
-    vlc_mutex_lock( &module_lock );
-
-    if( p_module_bank == NULL )
+    if (modules.usage == 0)
     {
-        p_bank = calloc (1, sizeof(*p_bank));
-        p_bank->i_usage = 1;
-        p_bank->head = NULL;
-
-        /* Everything worked, attach the object */
-        p_module_bank = p_bank;
-
         /* Fills the module bank structure with the main module infos.
          * This is very useful as it will allow us to consider the main
          * library just as another module, and for instance the configuration
@@ -131,8 +113,7 @@ void module_InitBank( vlc_object_t *p_this )
         vlc_rwlock_init (&config_lock);
         config_SortConfig ();
     }
-    else
-        p_module_bank->i_usage++;
+    modules.usage++;
 
     /* We do retain the module bank lock until the plugins are loaded as well.
      * This is ugly, this staged loading approach is needed: LibVLC gets
@@ -141,7 +122,7 @@ void module_InitBank( vlc_object_t *p_this )
      * once it is ready, so we need to fully serialize initialization.
      * DO NOT UNCOMMENT the following line unless you managed to squeeze
      * module_LoadPlugins() before you unlock the mutex. */
-    /*vlc_mutex_unlock( &module_lock );*/
+    /*vlc_mutex_unlock (&modules.lock);*/
 }
 
 #undef module_EndBank
@@ -153,32 +134,27 @@ void module_InitBank( vlc_object_t *p_this )
  */
 void module_EndBank( vlc_object_t *p_this, bool b_plugins )
 {
-    module_bank_t *p_bank = p_module_bank;
-
-    assert (p_bank != NULL);
+    module_t *head = NULL;
 
     /* If plugins were _not_ loaded, then the caller still has the bank lock
      * from module_InitBank(). */
     if( b_plugins )
-        vlc_mutex_lock( &module_lock );
+        vlc_mutex_lock (&modules.lock);
     /*else
-        vlc_assert_locked( &module_lock ); not for static mutexes :( */
+        vlc_assert_locked (&modules.lock); not for static mutexes :( */
 
-    if( --p_bank->i_usage > 0 )
+    assert (modules.usage > 0);
+    if (--modules.usage == 0)
     {
-        vlc_mutex_unlock( &module_lock );
-        return;
+        config_UnsortConfig ();
+        vlc_rwlock_destroy (&config_lock);
+        head = modules.head;
+        modules.head = NULL;
     }
+    vlc_mutex_unlock (&modules.lock);
 
-    config_UnsortConfig ();
-    vlc_rwlock_destroy (&config_lock);
-    p_module_bank = NULL;
-    vlc_mutex_unlock( &module_lock );
-
-    while( p_bank->head != NULL )
-        DeleteModule( p_bank, p_bank->head );
-
-    free( p_bank );
+    while (head != NULL)
+        DeleteModule (&head, head);
 }
 
 #undef module_LoadPlugins
@@ -189,23 +165,20 @@ void module_EndBank( vlc_object_t *p_this, bool b_plugins )
  * \param p_this vlc object structure
  * \return nothing
  */
-void module_LoadPlugins( vlc_object_t * p_this )
+void module_LoadPlugins (vlc_object_t *obj)
 {
-    module_bank_t *p_bank = p_module_bank;
-
-    assert( p_bank );
-    /*vlc_assert_locked( &module_lock ); not for static mutexes :( */
+    /*vlc_assert_locked (&modules.lock); not for static mutexes :( */
 
 #ifdef HAVE_DYNAMIC_PLUGINS
-    if( p_bank->i_usage == 1 )
+    if (modules.usage == 1)
     {
-        msg_Dbg( p_this, "checking plugin modules" );
-        AllocateAllPlugins( p_this, p_module_bank );
+        msg_Dbg (obj, "searching plug-in modules");
+        AllocateAllPlugins (obj);
         config_UnsortConfig ();
         config_SortConfig ();
     }
 #endif
-    vlc_mutex_unlock( &module_lock );
+    vlc_mutex_unlock (&modules.lock);
 }
 
 /**
@@ -356,8 +329,7 @@ module_t **module_list_get (size_t *n)
     module_t **tab = NULL;
     size_t i = 0;
 
-    assert (p_module_bank);
-    for (module_t *mod = p_module_bank->head; mod; mod = mod->next)
+    for (module_t *mod = modules.head; mod; mod = mod->next)
     {
          module_t **nt;
          nt  = realloc (tab, (i + 2 + mod->submodule_count) * sizeof (*tab));
@@ -566,7 +538,7 @@ found_shortcut:
                 continue;
             }
             CacheMerge( p_this, p_real, p_new_module );
-            DeleteModule( p_module_bank, p_new_module );
+            DeleteModule (&modules.head, p_new_module);
         }
 #endif
         p_this->b_force = p_list[i].b_force;
@@ -816,7 +788,7 @@ char *psz_vlcpath = NULL;
 /*****************************************************************************
  * AllocateAllPlugins: load all plugin modules we can find.
  *****************************************************************************/
-static void AllocateAllPlugins( vlc_object_t *p_this, module_bank_t *p_bank )
+static void AllocateAllPlugins (vlc_object_t *p_this)
 {
     const char *vlcpath = psz_vlcpath;
     char *paths;
@@ -835,7 +807,7 @@ static void AllocateAllPlugins( vlc_object_t *p_this, module_bank_t *p_bank )
 
     if( asprintf( &paths, "%s" DIR_SEP "plugins", vlcpath ) != -1 )
     {
-        AllocatePluginPath( p_this, p_bank, paths, mode );
+        AllocatePluginPath (p_this, paths, mode);
         free( paths );
     }
 
@@ -851,14 +823,25 @@ static void AllocateAllPlugins( vlc_object_t *p_this, module_bank_t *p_bank )
     for( char *buf, *path = strtok_r( paths, PATH_SEP, &buf );
          path != NULL;
          path = strtok_r( NULL, PATH_SEP, &buf ) )
-        AllocatePluginPath( p_this, p_bank, path, mode );
+        AllocatePluginPath (p_this, path, mode);
 
     free( paths );
 }
 
-static void AllocatePluginPath( vlc_object_t *p_this, module_bank_t *p_bank,
-                                const char *path, cache_mode_t mode )
+struct module_bank
 {
+    /* Plugins cache */
+    size_t         i_cache;
+    module_cache_t *cache;
+
+    int            i_loaded_cache;
+    module_cache_t *loaded_cache;
+};
+
+static void AllocatePluginPath (vlc_object_t *p_this, const char *path,
+                                cache_mode_t mode)
+{
+    module_bank_t bank;
     module_cache_t *cache = NULL;
     size_t count = 0;
 
@@ -876,13 +859,13 @@ static void AllocatePluginPath( vlc_object_t *p_this, module_bank_t *p_bank,
 
     msg_Dbg( p_this, "recursively browsing `%s'", path );
 
-    /* TODO: pass as argument, remove this hack */
-    p_bank->cache = NULL;
-    p_bank->i_cache = 0;
-    p_bank->loaded_cache = cache;
-    p_bank->i_loaded_cache = count;
+    bank.cache = NULL;
+    bank.i_cache = 0;
+    bank.loaded_cache = cache;
+    bank.i_loaded_cache = count;
+
     /* Don't go deeper than 5 subdirectories */
-    AllocatePluginDir( p_this, p_bank, path, 5, mode );
+    AllocatePluginDir (p_this, &bank, path, 5, mode);
 
     switch( mode )
     {
@@ -890,12 +873,12 @@ static void AllocatePluginPath( vlc_object_t *p_this, module_bank_t *p_bank,
             for( size_t i = 0; i < count; i++ )
             {
                 if (cache[i].p_module != NULL)
-                   DeleteModule (p_bank, cache[i].p_module);
+                   DeleteModule (&modules.head, cache[i].p_module);
                 free (cache[i].path);
             }
             free( cache );
         case CACHE_RESET:
-            CacheSave (p_this, path, p_bank->cache, p_bank->i_cache);
+            CacheSave (p_this, path, bank.cache, bank.i_cache);
         case CACHE_IGNORE:
             break;
     }
@@ -996,13 +979,13 @@ static int AllocatePluginFile( vlc_object_t * p_this, module_bank_t *p_bank,
          {
              /* !unloadable not allowed for plugins with callbacks */
              assert( !p_module->b_loaded );
-             DeleteModule( p_bank, p_module );
+             DeleteModule (&modules.head, p_module);
              p_module = AllocatePlugin( p_this, path, false );
              break;
          }
 
-    p_module->next = p_bank->head;
-    p_bank->head = p_module;
+    p_module->next = modules.head;
+    modules.head = p_module;
 
     if( mode == CACHE_IGNORE )
         return 0;
@@ -1155,8 +1138,8 @@ static int AllocateBuiltinModule( vlc_object_t * p_this,
     /* Everything worked fine ! The module is ready to be added to the list. */
     p_module->b_builtin = true;
     /* LOCK */
-    p_module->next = p_module_bank->head;
-    p_module_bank->head = p_module;
+    p_module->next = modules.head;
+    modules.head = p_module;
     /* UNLOCK */
 
     /* msg_Dbg( p_this, "builtin \"%s\", %s",
@@ -1170,12 +1153,12 @@ static int AllocateBuiltinModule( vlc_object_t * p_this,
  *****************************************************************************
  * This function can only be called if the module isn't being used.
  *****************************************************************************/
-static void DeleteModule( module_bank_t *p_bank, module_t * p_module )
+static void DeleteModule (module_t **head, module_t *p_module)
 {
     assert( p_module );
 
     /* Unlist the module (if it is in the list) */
-    module_t **pp_self = &p_bank->head;
+    module_t **pp_self = head;
     while (*pp_self != NULL && *pp_self != p_module)
         pp_self = &((*pp_self)->next);
     if (*pp_self)
