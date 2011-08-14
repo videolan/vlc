@@ -1283,6 +1283,7 @@ live555-$(LIVEDOTCOM_VERSION).tar.gz:
 
 live: live555-$(LIVEDOTCOM_VERSION).tar.gz
 	$(EXTRACT_GZ)
+	chmod -R u+w live
 	patch -p0 < Patches/live-uselocale.patch
 	patch -p0 < Patches/live-inet_ntop.patch
 ifdef HAVE_WIN64
