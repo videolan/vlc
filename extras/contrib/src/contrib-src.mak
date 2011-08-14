@@ -2242,6 +2242,9 @@ taglib-$(TAGLIB_VERSION).tar.gz:
 
 taglib: taglib-$(TAGLIB_VERSION).tar.gz
 	$(EXTRACT_GZ)
+ifdef HAVE_ANDROID
+	patch -p0 < Patches/taglib-android.patch
+endif
 ifdef HAVE_WIN32
 	patch -p0 < Patches/taglib-static.patch
 endif
