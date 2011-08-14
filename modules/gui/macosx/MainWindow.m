@@ -657,35 +657,19 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
         char *uri = input_item_GetURI( input_GetItem( p_input ) );
 
+        NSURL * o_url = [NSURL URLWithString: [NSString stringWithUTF8String: uri]];
+        if ([o_url isFileURL])
+            [self setRepresentedURL: o_url];
+        else
+            [self setRepresentedURL: [NSURL URLWithString:@""]];
+        free( uri );
+
         if ([aString isEqualToString:@""])
         {
-
-            char *file = uri ? strrchr( uri, '/' ) : NULL;
-            if( file != NULL )
-            {
-                decode_URI( ++file );
-                aString = [NSString stringWithUTF8String:file];
-            }
+            if ([o_url isFileURL])
+                aString = [[NSFileManager defaultManager] displayNameAtPath: [o_url path]];
             else
-                aString = [NSString stringWithUTF8String:uri];
-        }
-
-        NSMutableString *o_mrl = [NSMutableString stringWithUTF8String: decode_URI(uri)];
-        free( uri );
-        NSRange prefix_range = [o_mrl rangeOfString: @"file:"];
-        if( prefix_range.location != NSNotFound )
-            [o_mrl deleteCharactersInRange: prefix_range];
-
-        if( [o_mrl characterAtIndex:0] == '/' )
-        {
-            /* it's a local file */
-            [self setRepresentedFilename: o_mrl];
-        }
-        else
-        {
-            /* it's from the network or somewhere else,
-             * we clear the previous path */
-            [self setRepresentedFilename: @""];
+                aString = [o_url absoluteString];
         }
 
         [self setTitle: aString];
@@ -694,7 +678,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     else
     {
         [self setTitle: _NS("VLC media player")];
-        [self setRepresentedFilename: @""];
+        [self setRepresentedURL: [NSURL URLWithString: @""]];
     }
     [o_pool release];
 }
