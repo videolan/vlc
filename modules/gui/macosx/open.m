@@ -1082,9 +1082,8 @@ static VLCOpen *_o_sharedMainInstance = nil;
 - (void)openFile
 {
     NSOpenPanel *o_open_panel = [NSOpenPanel openPanel];
-    int i;
     b_autoplay = config_GetInt( VLCIntf, "macosx-autoplay" );
- 
+
     [o_open_panel setAllowsMultipleSelection: YES];
     [o_open_panel setCanChooseDirectories: YES];
     [o_open_panel setTitle: _NS("Open File")];
@@ -1092,14 +1091,20 @@ static VLCOpen *_o_sharedMainInstance = nil;
  
     if( [o_open_panel runModal] == NSOKButton )
     {
-        NSArray *o_array = [NSArray array];
-        NSArray *o_values = [[o_open_panel URLs]
-                sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
+        NSArray * o_urls = [o_open_panel URLs];
+        NSUInteger count = [o_urls count];
+        NSMutableArray *o_values = [NSMutableArray arrayWithCapacity:count];
+        NSMutableArray *o_array = [NSMutableArray arrayWithCapacity:count];
+        for( NSUInteger i = 0; i < count; i++ )
+        {
+            [o_values addObject: [[o_urls objectAtIndex: i] path]];
+        }
+        [o_values sortUsingSelector:@selector(caseInsensitiveCompare:)];
 
-        for( i = 0; i < (int)[o_values count]; i++)
+        for( NSUInteger i = 0; i < count; i++ )
         {
             NSDictionary *o_dic;
-            char *psz_uri = make_URI([[[o_values objectAtIndex:i] path] UTF8String], "file");
+            char *psz_uri = make_URI([[o_values objectAtIndex:i] UTF8String], "file");
             if( !psz_uri )
                 continue;
 
@@ -1107,7 +1112,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
 
             free( psz_uri );
 
-            o_array = [o_array arrayByAddingObject: o_dic];
+            [o_array addObject: o_dic];
         }
         if( b_autoplay )
             [o_playlist appendArray: o_array atPos: -1 enqueue:NO];
