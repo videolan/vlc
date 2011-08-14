@@ -161,18 +161,27 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
 {
     vlc_value_t val;
     playlist_t * p_playlist = pl_Get( VLCIntf );
-    
+    vout_thread_t *p_vout = getVout();
+
     var_Get( p_playlist, "random", &val );
     val.b_bool = !val.b_bool;
     var_Set( p_playlist, "random", val );
     if( val.b_bool )
     {
-        //vout_OSDMessage( VLCIntf, SPU_DEFAULT_CHANNEL, "%s", _( "Random On" ) );
+        if (p_vout)
+        {
+            vout_OSDMessage( p_vout, SPU_DEFAULT_CHANNEL, "%s", _( "Random On" ) );
+            vlc_object_release( p_vout );
+        }
         config_PutInt( p_playlist, "random", 1 );
     }
     else
     {
-        //vout_OSDMessage( VLCIntf, SPU_DEFAULT_CHANNEL, "%s", _( "Random Off" ) );
+        if (p_vout)
+        {
+            vout_OSDMessage( p_vout, SPU_DEFAULT_CHANNEL, "%s", _( "Random Off" ) );
+            vlc_object_release( p_vout );
+        }
         config_PutInt( p_playlist, "random", 0 );
     }
 }
@@ -186,7 +195,12 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
     config_PutInt( p_playlist, "repeat", NO );
     config_PutInt( p_playlist, "loop", YES );
 
-    //vout_OSDMessage( VLCIntf, SPU_DEFAULT_CHANNEL, "%s", _( "Repeat All" ) );
+    vout_thread_t *p_vout = getVout();
+    if (p_vout)
+    {
+        vout_OSDMessage( p_vout, SPU_DEFAULT_CHANNEL, "%s", _( "Repeat All" ) );
+        vlc_object_release( p_vout );
+    }
 }
 
 - (void)repeatOne
@@ -198,7 +212,12 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
     config_PutInt( p_playlist, "repeat", YES );
     config_PutInt( p_playlist, "loop", NO );
 
-    //vout_OSDMessage( VLCIntf, SPU_DEFAULT_CHANNEL, "%s", _( "Repeat One" ) );
+    vout_thread_t *p_vout = getVout();
+    if (p_vout)
+    {
+        vout_OSDMessage( p_vout, SPU_DEFAULT_CHANNEL, "%s", _( "Repeat One" ) );
+        vlc_object_release( p_vout );
+    }
 }
 
 - (void)repeatOff
@@ -210,10 +229,13 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
     config_PutInt( p_playlist, "repeat", NO );
     config_PutInt( p_playlist, "loop", NO );
 
-    //vout_OSDMessage( VLCIntf, SPU_DEFAULT_CHANNEL, "%s", _( "Repeat Off" ) );
+    vout_thread_t *p_vout = getVout();
+    if (p_vout)
+    {
+        vout_OSDMessage( p_vout, SPU_DEFAULT_CHANNEL, "%s", _( "Repeat Off" ) );
+        vlc_object_release( p_vout );
+    }
 }
-
-// CAVE: [o_main manageVolumeSlider]
 
 - (void)volumeUp
 {
