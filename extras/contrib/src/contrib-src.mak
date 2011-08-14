@@ -975,7 +975,7 @@ FFMPEGCONF += --cross-prefix=arm-none-symbianelf- --arch=armv6 --disable-asm --t
 FFMPEGCONF += $(FFMPEGCONFSMALL)
 endif
 else
-FFMPEGCONF += --cross-prefix=arm-linux-androideabi- --arch=armv4l
+FFMPEGCONF += --cross-prefix=arm-linux-androideabi- --arch=armv6
 FFMPEGCONF += $(FFMPEGCONFSMALL)
 endif
 endif
