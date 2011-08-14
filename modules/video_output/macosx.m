@@ -314,7 +314,7 @@ static int Control (vout_display_t *vd, int query, va_list ap)
         }
         case VOUT_DISPLAY_CHANGE_DISPLAY_FILLED:
         {
-            [[sys->glView window] performZoom: nil];
+            [[sys->glView window] performSelectorOnMainThread:@selector(performZoom:) withObject: nil waitUntilDone:NO];
             return VLC_SUCCESS;
         }
         case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
@@ -328,6 +328,8 @@ static int Control (vout_display_t *vd, int query, va_list ap)
             const vout_display_cfg_t *cfg;
 
             id o_window = [sys->glView window];
+            if (!o_window)
+                return VLC_SUCCESS; // this is okay, since the event will occur again when we have a window
             NSRect windowFrame = [o_window frame];
             NSRect glViewFrame = [sys->glView frame];
             NSSize windowMinSize = [o_window minSize];
@@ -353,7 +355,7 @@ static int Control (vout_display_t *vd, int query, va_list ap)
                 new_frame.origin.x = topleftscreen.x;
                 new_frame.origin.y = topleftscreen.y - new_frame.size.height;
 
-                [o_window setFrame:new_frame display:YES animate:YES];
+                [sys->glView performSelectorOnMainThread:@selector(setWindowFrameWithValue:) withObject:[NSValue valueWithRect:new_frame] waitUntilDone:NO];
             }
             return VLC_SUCCESS;
         }
@@ -468,6 +470,17 @@ static void OpenglSwap(vlc_gl_t *gl)
 - (void)setFrameWithValue:(NSValue *)value
 {
     [self setFrame:[value rectValue]];
+}
+
+/**
+ * Gets called by Control() to make sure that we're performing on the main thread
+ */
+- (void)setWindowFrameWithValue:(NSValue *)value
+{
+    NSRect frame = [value rectValue];
+    if (frame.origin.x <= 0.0 && frame.origin.y <= 0.0)
+        [[self window] center];
+    [[self window] setFrame:frame display:YES animate: YES];
 }
 
 /**

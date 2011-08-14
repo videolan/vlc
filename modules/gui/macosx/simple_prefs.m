@@ -225,7 +225,7 @@ create_toolbar_item( NSString * o_itemIdent, NSString * o_name, NSString * o_des
     [o_intf_style_dark_bcell setTitle: _NS("Dark")];
     [o_intf_style_bright_bcell setTitle: _NS("Bright")];
     [o_intf_art_txt setStringValue: _NS("Album art download policy")];
-    [o_intf_embedded_ckb setTitle: _NS("Add controls to the video window")];
+    [o_intf_embedded_ckb setTitle: _NS("Show video within the main window")];
     [o_intf_fspanel_ckb setTitle: _NS("Show Fullscreen Controller")];
     [o_intf_lang_txt setStringValue: _NS("Language")];
     [o_intf_network_box setTitle: _NS("Privacy / Network Interaction")];
@@ -436,9 +436,15 @@ static inline char * __config_GetLabel( vlc_object_t *p_this, const char *psz_na
     else
         [o_intf_enableGrowl_ckb setState: NSOffState];
     if (config_GetInt( p_intf, "macosx-interfacestyle" ))
+    {
         [o_intf_style_dark_bcell setState: YES];
+        [o_intf_style_bright_bcell setState: NO];
+    }
     else
+    {
         [o_intf_style_dark_bcell setState: NO];
+        [o_intf_style_bright_bcell setState: YES];
+    }
 
     /******************
      * audio settings *

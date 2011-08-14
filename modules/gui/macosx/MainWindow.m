@@ -409,14 +409,22 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
 - (IBAction)togglePlaylist:(id)sender
 {
-    if ([o_video_view isHidden] && [o_playlist_btn isEnabled]) {
-        [o_playlist_table setHidden: YES];
-        [o_video_view setHidden: NO];
+    if (!b_nonembedded)
+    {
+        if ([o_video_view isHidden] && [o_playlist_btn isEnabled]) {
+            [o_playlist_table setHidden: YES];
+            [o_video_view setHidden: NO];
+        }
+        else
+        {
+            [o_video_view setHidden: YES];
+            [o_playlist_table setHidden: NO];
+        }
     }
     else
     {
-        [o_video_view setHidden: YES];
         [o_playlist_table setHidden: NO];
+        [o_video_view setHidden: NO];
     }
 }
 
@@ -788,12 +796,60 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
 - (id)videoView
 {
+    vout_thread_t *p_vout = getVout();
+    if (config_GetInt( VLCIntf, "embedded-video" ))
+    {
+        if ([o_video_view window] != self)
+        {
+            [o_video_view removeFromSuperviewWithoutNeedingDisplay];
+            [o_video_view setFrame: [o_split_view frame]];
+            [[self contentView] addSubview: o_video_view];
+        }
+        b_nonembedded = NO;
+    }
+    else
+    {
+        [o_video_view removeFromSuperviewWithoutNeedingDisplay];
+        if (o_nonembedded_window)
+            [o_nonembedded_window release];
+
+        o_nonembedded_window = [[VLCWindow alloc] initWithContentRect:[o_video_view frame] styleMask: NSBorderlessWindowMask|NSResizableWindowMask backing:NSBackingStoreBuffered defer:YES];
+        [o_nonembedded_window setFrame:[o_video_view frame] display:NO];
+        [o_nonembedded_window setBackgroundColor: [NSColor blackColor]];
+        [o_nonembedded_window setMovableByWindowBackground: YES];
+        [o_nonembedded_window setCanBecomeKeyWindow: YES];
+        [o_nonembedded_window setHasShadow:YES];
+        [o_nonembedded_window setContentView: o_video_view];
+        [o_nonembedded_window setLevel:NSNormalWindowLevel];
+        [o_nonembedded_window useOptimizedDrawing: YES];
+        [o_nonembedded_window center];
+        [o_nonembedded_window makeKeyAndOrderFront:self];
+        [o_nonembedded_window orderFront:self animate:YES];
+        [o_nonembedded_window setReleasedWhenClosed:NO];
+        b_nonembedded = YES;
+    }
+
+    if (p_vout)
+    {
+        if( var_GetBool( p_vout, "video-on-top" ) )
+            [[o_video_view window] setLevel: NSStatusWindowLevel];
+        else
+            [[o_video_view window] setLevel: NSNormalWindowLevel];
+        vlc_object_release( p_vout );
+    }
     return o_video_view;
 }
 
 - (void)setVideoplayEnabled
 {
-    [o_playlist_btn setEnabled: [[VLCMain sharedInstance] activeVideoPlayback]];
+    if (!b_nonembedded)
+        [o_playlist_btn setEnabled: [[VLCMain sharedInstance] activeVideoPlayback]];
+    else
+    {
+        [o_playlist_btn setEnabled: NO];
+        if (![[VLCMain sharedInstance] activeVideoPlayback])
+            [o_nonembedded_window orderOut: nil];
+    }
 }
 
 - (void)resizeWindow
@@ -1048,12 +1104,12 @@ static VLCMainWindow *_o_sharedInstance = nil;
     if (p_vout)
     {
         if( var_GetBool( p_vout, "video-on-top" ) )
-            [self setLevel: NSStatusWindowLevel];
+            [[o_video_view window] setLevel: NSStatusWindowLevel];
         else
-            [self setLevel: NSNormalWindowLevel];
+            [[o_video_view window] setLevel: NSNormalWindowLevel];
         vlc_object_release( p_vout );
     }
-    [self makeKeyAndOrderFront: nil];
+    [[o_video_view window] makeKeyAndOrderFront: nil];
 
     /* Don't do anything if o_fullscreen_window is already closed */
     if (!o_fullscreen_window)
@@ -1094,7 +1150,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     }
 
     [self setAlphaValue: 0.0];
-    [self orderFront: self];
+    [[o_video_view window] orderFront: self];
 
     [o_fspanel setNonActive: nil];
     SetSystemUIMode( kUIModeNormal, kUIOptionAutoShowMenuBar);

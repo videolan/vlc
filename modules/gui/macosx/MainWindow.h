@@ -98,6 +98,9 @@
     BOOL just_triggered_previous;
     NSMutableArray *o_sidebaritems;
 
+    VLCWindow       * o_nonembedded_window;
+    BOOL              b_nonembedded;
+
     VLCWindow       * o_fullscreen_window;
     NSViewAnimation * o_fullscreen_anim1;
     NSViewAnimation * o_fullscreen_anim2;
