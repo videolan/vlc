@@ -314,7 +314,7 @@ static int Control (vout_display_t *vd, int query, va_list ap)
         }
         case VOUT_DISPLAY_CHANGE_DISPLAY_FILLED:
         {
-            [[sys->glView window] performSelectorOnMainThread:@selector(performZoom:) withObject: nil waitUntilDone:NO];
+            [[sys->glView window] performSelectorOnMainThread:@selector(zoom:) withObject: nil waitUntilDone:NO];
             return VLC_SUCCESS;
         }
         case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:

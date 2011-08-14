@@ -424,7 +424,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     else
     {
         [o_playlist_table setHidden: NO];
-        [o_video_view setHidden: NO];
+        [o_video_view setHidden: ![[VLCMain sharedInstance] activeVideoPlayback]];
     }
 }
 
@@ -669,7 +669,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
         if ([o_url isFileURL])
             [self setRepresentedURL: o_url];
         else
-            [self setRepresentedURL: [NSURL URLWithString:@""]];
+            [self setRepresentedURL: nil];
         free( uri );
 
         if ([aString isEqualToString:@""])
@@ -686,7 +686,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     else
     {
         [self setTitle: _NS("VLC media player")];
-        [self setRepresentedURL: [NSURL URLWithString: @""]];
+        [self setRepresentedURL: nil];
     }
     [o_pool release];
 }
@@ -1150,6 +1150,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     }
 
     [self setAlphaValue: 0.0];
+    [self orderFront: self];
     [[o_video_view window] orderFront: self];
 
     [o_fspanel setNonActive: nil];
