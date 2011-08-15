@@ -1387,10 +1387,11 @@ static void Usage( libvlc_int_t *p_this, char const *psz_search )
         module_config_t *p_item = NULL;
         module_config_t *p_section = NULL;
         module_config_t *p_end = p_parser->p_config + p_parser->confsize;
+        const char *objname = module_get_object (p_parser);
 
         if( psz_search &&
-            ( b_strict ? strcmp( psz_search, p_parser->psz_object_name )
-                       : !strstr( p_parser->psz_object_name, psz_search ) ) )
+            ( b_strict ? strcmp( objname, psz_search )
+                       : !strstr( objname, psz_search ) ) )
         {
             char *const *pp_shortcuts = p_parser->pp_shortcuts;
             unsigned i;
@@ -1410,7 +1411,7 @@ static void Usage( libvlc_int_t *p_this, char const *psz_search )
             continue;
         }
 
-        b_help_module = !strcmp( "help", p_parser->psz_object_name );
+        b_help_module = !strcmp( "help", objname );
         /* Ugly hack to make sure that the help options always come first
          * (part 2) */
         if( !psz_search && b_help_module )
@@ -1437,12 +1438,12 @@ static void Usage( libvlc_int_t *p_this, char const *psz_search )
         b_found = true;
 
         /* Print name of module */
-        if( strcmp( "main", p_parser->psz_object_name ) )
+        if( strcmp( "main", objname ) )
         {
             if( b_color )
                 utf8_fprintf( stdout, "\n " GREEN "%s" GRAY " (%s)\n",
                               module_gettext( p_parser, p_parser->psz_longname ),
-                              p_parser->psz_object_name );
+                              objname );
             else
                 utf8_fprintf( stdout, "\n %s\n",
                               module_gettext(p_parser, p_parser->psz_longname ) );
@@ -1487,7 +1488,7 @@ static void Usage( libvlc_int_t *p_this, char const *psz_search )
                 {
                 case CONFIG_HINT_CATEGORY:
                 case CONFIG_HINT_USAGE:
-                    if( !strcmp( "main", p_parser->psz_object_name ) )
+                    if( !strcmp( "main", objname ) )
                     {
                         if( b_color )
                             utf8_fprintf( stdout, GREEN "\n %s\n" GRAY,
@@ -1508,7 +1509,7 @@ static void Usage( libvlc_int_t *p_this, char const *psz_search )
                 break;
 
                 case CONFIG_HINT_SUBCATEGORY:
-                    if( strcmp( "main", p_parser->psz_object_name ) )
+                    if( strcmp( "main", objname ) )
                         break;
                 case CONFIG_SECTION:
                     p_section = p_item;
@@ -1816,13 +1817,12 @@ static void ListModules( libvlc_int_t *p_this, bool b_verbose )
     /* Enumerate each module */
     for (size_t j = 0; (p_parser = list[j]) != NULL; j++)
     {
+        const char *objname = module_get_object (p_parser);
         if( b_color )
-            utf8_fprintf( stdout, GREEN"  %-22s "WHITE"%s\n"GRAY,
-                          p_parser->psz_object_name,
+            utf8_fprintf( stdout, GREEN"  %-22s "WHITE"%s\n"GRAY, objname,
                           module_gettext( p_parser, p_parser->psz_longname ) );
         else
-            utf8_fprintf( stdout, "  %-22s %s\n",
-                          p_parser->psz_object_name,
+            utf8_fprintf( stdout, "  %-22s %s\n", objname,
                           module_gettext( p_parser, p_parser->psz_longname ) );
 
         if( b_verbose )
@@ -1830,7 +1830,7 @@ static void ListModules( libvlc_int_t *p_this, bool b_verbose )
             char *const *pp_shortcuts = p_parser->pp_shortcuts;
             for( unsigned i = 0; i < p_parser->i_shortcuts; i++ )
             {
-                if( strcmp( pp_shortcuts[i], p_parser->psz_object_name ) )
+                if( strcmp( pp_shortcuts[i], objname ) )
                 {
                     if( b_color )
                         utf8_fprintf( stdout, CYAN"   s %s\n"GRAY,

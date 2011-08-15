@@ -39,11 +39,9 @@ static void vlc_module_destruct (gc_object_t *obj)
     module_t *module = vlc_priv (obj, module_t);
 
     free (module->pp_shortcuts);
-    free (module->psz_object_name);
+    free (module->object_name);
     free (module);
 }
-
-static const char default_name[] = "unnamed";
 
 module_t *vlc_module_create (void)
 {
@@ -51,7 +49,7 @@ module_t *vlc_module_create (void)
     if (module == NULL)
         return NULL;
 
-    module->psz_object_name = strdup( default_name );
+    module->object_name = NULL;
     module->next = NULL;
     module->submodule = NULL;
     module->parent = NULL;
@@ -59,7 +57,7 @@ module_t *vlc_module_create (void)
     vlc_gc_init (module, vlc_module_destruct);
 
     module->psz_shortname = NULL;
-    module->psz_longname = (char*)default_name;
+    module->psz_longname = NULL;
     module->psz_help = NULL;
     module->pp_shortcuts = NULL;
     module->i_shortcuts = 0;
@@ -85,7 +83,7 @@ static void vlc_submodule_destruct (gc_object_t *obj)
 {
     module_t *module = vlc_priv (obj, module_t);
     free (module->pp_shortcuts);
-    free (module->psz_object_name);
+    free (module->object_name);
     free (module);
 }
 
@@ -109,7 +107,7 @@ module_t *vlc_submodule_create (module_t *module)
     submodule->pp_shortcuts[0] = module->pp_shortcuts[0]; /* object name */
     submodule->i_shortcuts = 1;
 
-    submodule->psz_object_name = strdup( module->psz_object_name );
+    submodule->object_name = strdup (module->object_name);
     submodule->psz_shortname = module->psz_shortname;
     submodule->psz_longname = module->psz_longname;
     submodule->psz_capability = module->psz_capability;
@@ -223,13 +221,14 @@ int vlc_plugin_set (module_t *module, module_config_t *item, int propid, ...)
         case VLC_MODULE_NAME:
         {
             const char *value = va_arg (ap, const char *);
-            free( module->psz_object_name );
-            module->psz_object_name = strdup( value );
+
+            assert (module->object_name == NULL);
+            module->object_name = strdup (value);
             module->pp_shortcuts = malloc( sizeof( char ** ) );
             module->pp_shortcuts[0] = (char*)value; /* dooh! */
             module->i_shortcuts = 1;
 
-            if (module->psz_longname == default_name)
+            if (module->psz_longname == NULL)
                 module->psz_longname = (char*)value; /* dooh! */
             break;
         }

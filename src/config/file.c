@@ -356,7 +356,6 @@ static int config_PrepareDir (vlc_object_t *obj)
  *****************************************************************************/
 static int SaveConfigFile (vlc_object_t *p_this)
 {
-    module_t *p_parser;
     char *permanent = NULL, *temporary = NULL;
 
     if( config_PrepareDir( p_this ) )
@@ -404,12 +403,15 @@ static int SaveConfigFile (vlc_object_t *p_this)
 
             if ((line[0] == '[') && (p_index2 = strchr(line,']')))
             {
+                module_t *module;
+
                 /* we found a new section, check if we need to do a backup */
                 backup = true;
-                for (int i = 0; (p_parser = list[i]) != NULL; i++)
+                for (int i = 0; (module = list[i]) != NULL; i++)
                 {
-                    if (!strncmp (line + 1, p_parser->psz_object_name,
-                                  strlen (p_parser->psz_object_name)))
+                    const char *objname = module_get_object (module);
+
+                    if (!strncmp (line + 1, objname, strlen (objname)))
                     {
                         backup = false; /* no, we will rewrite it! */
                         break;
@@ -495,6 +497,7 @@ static int SaveConfigFile (vlc_object_t *p_this)
     vlc_rwlock_rdlock (&config_lock);*/
 
     /* Look for the selected module, if NULL then save everything */
+    module_t *p_parser;
     for (int i = 0; (p_parser = list[i]) != NULL; i++)
     {
         module_config_t *p_item, *p_end;
@@ -502,7 +505,7 @@ static int SaveConfigFile (vlc_object_t *p_this)
         if( !p_parser->i_config_items )
             continue;
 
-        fprintf( file, "[%s]", p_parser->psz_object_name );
+        fprintf( file, "[%s]", module_get_object (p_parser) );
         if( p_parser->psz_longname )
             fprintf( file, " # %s\n\n", p_parser->psz_longname );
         else

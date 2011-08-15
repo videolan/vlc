@@ -203,7 +203,9 @@ bool module_provides( const module_t *m, const char *cap )
  */
 const char *module_get_object( const module_t *m )
 {
-    return m->psz_object_name;
+    if (unlikely(m->object_name == NULL))
+        return "unnamed";
+    return m->object_name;
 }
 
 /**
@@ -218,7 +220,9 @@ const char *module_get_name( const module_t *m, bool long_name )
     if( long_name && ( m->psz_longname != NULL) )
         return m->psz_longname;
 
-    return m->psz_shortname ? m->psz_shortname : m->psz_object_name;
+    if (m->psz_shortname != NULL)
+        return m->psz_shortname;
+    return module_get_object (m);
 }
 
 /**
@@ -587,9 +591,9 @@ found_shortcut:
     if( p_module != NULL )
     {
         msg_Dbg( p_this, "using %s module \"%s\"",
-                 psz_capability, p_module->psz_object_name );
+                 psz_capability, module_get_object(p_module) );
         vlc_object_set_name( p_this, psz_alias ? psz_alias
-                                               : p_module->psz_object_name );
+                                               : module_get_object(p_module) );
     }
     else if( count == 0 )
         msg_Dbg( p_this, "no %s module matched \"%s\"",
@@ -655,29 +659,32 @@ module_t *module_need(vlc_object_t *obj, const char *cap, const char *name,
 #undef module_unneed
 void module_unneed(vlc_object_t *obj, module_t *module)
 {
-    msg_Dbg(obj, "removing module \"%s\"", module->psz_object_name);
+    msg_Dbg(obj, "removing module \"%s\"", module_get_object(module));
     vlc_module_unload(module, generic_stop, obj);
 }
 
 /**
  * Get a pointer to a module_t given it's name.
  *
- * \param psz_name the name of the module
+ * \param name the name of the module
  * \return a pointer to the module or NULL in case of a failure
  */
-module_t *module_find( const char * psz_name )
+module_t *module_find (const char *name)
 {
     module_t **list, *module;
 
+    assert (name != NULL);
     list = module_list_get (NULL);
     if (!list)
         return NULL;
 
     for (size_t i = 0; (module = list[i]) != NULL; i++)
     {
-        const char *psz_module_name = module->psz_object_name;
+        const char *objname = module->object_name;
 
-        if( psz_module_name && !strcmp( psz_module_name, psz_name ) )
+        if (unlikely(objname == NULL))
+            continue;
+        if (!strcmp (objname, name))
         {
             module_hold (module);
             break;
@@ -951,8 +958,6 @@ static int AllocatePluginFile( vlc_object_t * p_this, module_bank_t *p_bank,
 {
     module_t * p_module = NULL;
 
-    /* msg_Dbg( p_this, "plugin \"%s\", %s",
-                p_module->psz_object_name, p_module->psz_longname ); */
     /* Check our plugins cache first then load plugin if needed */
     if( mode == CACHE_USE )
         p_module = CacheFind (p_bank->loaded_cache, p_bank->i_loaded_cache,
@@ -1128,7 +1133,7 @@ static int AllocateBuiltinModule( vlc_object_t * p_this,
     if( p_module == NULL )
         return -1;
 
-    /* Initialize the module : fill p_module->psz_object_name, etc. */
+    /* Initialize the module : fill *p_module structure */
     if( pf_entry( p_module ) != 0 )
     {
         /* With a well-written module we shouldn't have to print an
@@ -1144,9 +1149,6 @@ static int AllocateBuiltinModule( vlc_object_t * p_this,
     p_module->next = modules.head;
     modules.head = p_module;
     /* UNLOCK */
-
-    /* msg_Dbg( p_this, "builtin \"%s\", %s",
-                p_module->psz_object_name, p_module->psz_longname ); */
 
     return 0;
 }
