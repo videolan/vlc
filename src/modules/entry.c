@@ -34,14 +34,6 @@
 #include "config/configuration.h"
 #include "libvlc.h"
 
-static void vlc_module_destruct (gc_object_t *obj)
-{
-    module_t *module = vlc_priv (obj, module_t);
-
-    free (module->pp_shortcuts);
-    free (module);
-}
-
 module_t *vlc_module_create (void)
 {
     module_t *module = malloc (sizeof (*module));
@@ -52,7 +44,6 @@ module_t *vlc_module_create (void)
     module->submodule = NULL;
     module->parent = NULL;
     module->submodule_count = 0;
-    vlc_gc_init (module, vlc_module_destruct);
 
     module->psz_shortname = NULL;
     module->psz_longname = NULL;
@@ -76,11 +67,8 @@ module_t *vlc_module_create (void)
     return module;
 }
 
-
-static void vlc_submodule_destruct (gc_object_t *obj)
+void vlc_module_destroy (module_t *module)
 {
-    module_t *module = vlc_priv (obj, module_t);
-
     free (module->pp_shortcuts);
     free (module);
 }
@@ -94,8 +82,6 @@ module_t *vlc_submodule_create (module_t *module)
         return NULL;
 
     /* TODO: replace module/submodules with plugin/modules */
-    vlc_gc_init (submodule, vlc_submodule_destruct);
-
     submodule->next = module->submodule;
     module->submodule = submodule;
     module->submodule_count++;

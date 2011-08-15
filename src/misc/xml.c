@@ -96,7 +96,6 @@ void xml_ReaderDelete(xml_reader_t *reader)
 {
     if (reader->p_stream)
         module_stop(reader, reader->p_module);
-    module_release(reader->p_module);
     vlc_object_release(reader);
 }
 
@@ -121,7 +120,6 @@ xml_reader_t *xml_ReaderReset(xml_reader_t *reader, stream_t *stream)
     reader->p_stream = stream;
     if ((stream != NULL) && module_start(reader, reader->p_module))
     {
-        module_release(reader->p_module);
         vlc_object_release(reader);
         return NULL;
     }

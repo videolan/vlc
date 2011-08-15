@@ -268,12 +268,10 @@ module_get_name
 module_get_object
 module_get_score
 module_gettext
-module_hold
 module_list_free
 module_list_get
 module_need
 module_provides
-module_release
 module_unneed
 vlc_module_load
 vlc_module_unload

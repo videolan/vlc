@@ -317,11 +317,9 @@ static void ChangeVFiltersString( struct intf_thread_t *p_intf, const char *psz_
     }
     else
     {
-        module_release (p_obj);
         msg_Err( p_intf, "Unknown video filter type." );
         return;
     }
-    module_release (p_obj);
 
     psz_string = config_GetPsz( p_intf, psz_filter_type );
 

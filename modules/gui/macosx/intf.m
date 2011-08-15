@@ -1222,7 +1222,6 @@ unsigned int CocoaKeyToVLC( unichar i_key )
         }
     }
     module_config_free (p_config);
-    module_release (p_main);
     o_usedHotkeys = [[NSArray alloc] initWithArray: o_usedHotkeys copyItems: YES];
 }
 

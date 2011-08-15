@@ -1339,6 +1339,5 @@ void CaptureOpenPanel::advancedDialog()
     qDeleteAll( controls );
     delete adv;
     module_config_free( p_config );
-    module_release (p_module);
 }
 

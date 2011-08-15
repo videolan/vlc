@@ -187,7 +187,6 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
         }
     }
     module_config_free( p_config );
-    module_release( p_module );
 
 
     module_t **p_list = module_list_get( NULL );
@@ -464,10 +463,7 @@ bool PrefsItemData::contains( const QString &text, Qt::CaseSensitivity cs )
     }
 
     if (name.contains( text, cs ) || head.contains( text, cs ) || help.contains( text, cs ))
-    {
-        module_release( p_module );
         return true;
-    }
 
     if( p_item ) do
     {
@@ -483,10 +479,7 @@ bool PrefsItemData::contains( const QString &text, Qt::CaseSensitivity cs )
         if( p_item->b_internal ) continue;
 
         if ( p_item->psz_text && qtr( p_item->psz_text ).contains( text, cs ) )
-        {
-            module_release( p_module );
             return true;
-        }
     }
     while (
             !(
@@ -497,8 +490,6 @@ bool PrefsItemData::contains( const QString &text, Qt::CaseSensitivity cs )
              && ( ++p_item < p_end )
           );
 
-
-    module_release( p_module );
     return false;
 }
 
@@ -647,8 +638,6 @@ AdvPrefsPanel::AdvPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
         box->show();
         layout->addWidget( box, i_line, 0, 1, -1 );
     }
-
-    module_release (p_module);
 
     scrolled_area->setSizePolicy( QSizePolicy::Preferred,QSizePolicy::Fixed );
     scrolled_area->setLayout( layout );

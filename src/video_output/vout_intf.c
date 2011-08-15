@@ -484,11 +484,9 @@ void vout_EnableFilter( vout_thread_t *p_vout, const char *psz_name,
     }
     else
     {
-        module_release( p_obj );
         msg_Err( p_vout, "Unknown video filter type." );
         return;
     }
-    module_release( p_obj );
 
     psz_string = var_GetString( p_vout, psz_filter_type );
 

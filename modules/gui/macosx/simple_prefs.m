@@ -632,8 +632,7 @@ static inline char * __config_GetLabel( vlc_object_t *p_this, const char *psz_na
         }
     }
     module_config_free (p_config);
-    module_release (p_main);
-                  
+
     [o_hotkeyDescriptions release];
     o_hotkeyDescriptions = [[NSArray alloc] initWithArray: o_tempArray_desc copyItems: YES];
     [o_tempArray_desc release];

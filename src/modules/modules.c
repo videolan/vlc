@@ -280,17 +280,6 @@ const char *module_gettext (const module_t *m, const char *str)
 #endif
 }
 
-module_t *module_hold (module_t *m)
-{
-    vlc_hold (&m->vlc_gc_data);
-    return m;
-}
-
-void module_release (module_t *m)
-{
-    vlc_release (&m->vlc_gc_data);
-}
-
 #undef module_start
 int module_start (vlc_object_t *obj, const module_t *m)
 {
@@ -316,11 +305,6 @@ void module_stop (vlc_object_t *obj, const module_t *m)
  */
 void module_list_free (module_t **list)
 {
-    if (list == NULL)
-        return;
-
-    for (size_t i = 0; list[i] != NULL; i++)
-         module_release (list[i]);
     free (list);
 }
 
@@ -348,9 +332,9 @@ module_t **module_list_get (size_t *n)
          }
 
          tab = nt;
-         tab[i++] = module_hold (mod);
+         tab[i++] = mod;
          for (module_t *subm = mod->submodule; subm; subm = subm->next)
-             tab[i++] = module_hold (subm);
+             tab[i++] = subm;
          tab[i] = NULL;
     }
     if (n != NULL)
@@ -508,7 +492,7 @@ module_t *vlc_module_load(vlc_object_t *p_this, const char *psz_capability,
 
 found_shortcut:
         /* Store this new module */
-        p_list[count].p_module = module_hold (p_module);
+        p_list[count].p_module = p_module;
         p_list[count].i_score = p_module->i_score + i_shortcut_bonus;
         p_list[count].b_force = i_shortcut_bonus && b_strict;
         count++;
@@ -542,7 +526,6 @@ found_shortcut:
             if( p_new_module == NULL )
             {   /* Corrupted module */
                 msg_Err( p_this, "possibly corrupt module cache" );
-                module_release( p_cand );
                 continue;
             }
             CacheMerge( p_this, p_real, p_new_module );
@@ -573,17 +556,11 @@ found_shortcut:
 
         case VLC_ETIMEOUT:
             /* good module, but aborted */
-            module_release( p_cand );
             break;
 
         default: /* bad module */
-            module_release( p_cand );
             continue;
         }
-
-        /* Release the remaining modules */
-        while (++i < count)
-            module_release (p_list[i].p_module);
     }
 
     va_end (args);
@@ -631,7 +608,6 @@ void vlc_module_unload(module_t *module, vlc_deactivate_t deinit, ...)
         deinit(module->pf_deactivate, ap);
         va_end(ap);
     }
-    module_release(module);
 }
 
 
@@ -685,10 +661,7 @@ module_t *module_find (const char *name)
         if (unlikely(module->i_shortcuts == 0))
             continue;
         if (!strcmp (module->pp_shortcuts[0], name))
-        {
-            module_hold (module);
             break;
-        }
     }
     module_list_free (list);
     return module;
@@ -702,10 +675,7 @@ module_t *module_find (const char *name)
  */
 bool module_exists (const char * psz_name)
 {
-    module_t *p_module = module_find (psz_name);
-    if( p_module )
-        module_release (p_module);
-    return p_module != NULL;
+    return module_find (psz_name) != NULL;
 }
 
 /**
@@ -726,16 +696,9 @@ module_t *module_find_by_shortcut (const char *psz_shortcut)
         return NULL;
 
     for (size_t i = 0; (module = list[i]) != NULL; i++)
-    {
         for (size_t j = 0; j < module->i_shortcuts; j++)
-        {
             if (!strcmp (module->pp_shortcuts[j], psz_shortcut))
-            {
-                module_hold (module);
                 goto out;
-             }
-        }
-    }
 out:
     module_list_free (list);
     return module;
@@ -1059,7 +1022,7 @@ static module_t *AllocatePlugin( vlc_object_t * p_this, const char *psz_file,
     return p_module;
 error:
     free( p_module->psz_filename );
-    module_release( p_module );
+    vlc_module_destroy (p_module);
     module_Unload( handle );
     return NULL;
 }
@@ -1139,7 +1102,7 @@ static int AllocateBuiltinModule( vlc_object_t * p_this,
         /* With a well-written module we shouldn't have to print an
          * additional error message here, but just make sure. */
         msg_Err( p_this, "failed calling entry point in builtin module" );
-        module_release( p_module );
+        vlc_module_destroy (p_module);
         return -1;
     }
 
@@ -1187,9 +1150,9 @@ static void DeleteModule (module_t **head, module_t *p_module)
     {
         module_t *submodule = p_module->submodule;
         p_module->submodule = submodule->next;
-        module_release (submodule);
+        vlc_module_destroy (submodule);
     }
 
     config_Free( p_module );
-    module_release( p_module );
+    vlc_module_destroy (p_module);
 }

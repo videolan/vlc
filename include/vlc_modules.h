@@ -53,8 +53,6 @@ void module_stop(vlc_object_t *, const module_t *);
 VLC_API module_config_t * module_config_get( const module_t *, unsigned * ) VLC_USED;
 VLC_API void module_config_free( module_config_t * );
 
-VLC_API module_t * module_hold(module_t *module);
-VLC_API void module_release(module_t *module);
 VLC_API void module_list_free(module_t **);
 VLC_API module_t ** module_list_get(size_t *n) VLC_USED;
 

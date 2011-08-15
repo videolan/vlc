@@ -62,8 +62,6 @@ typedef void * module_handle_t;
  */
 struct module_t
 {
-    gc_object_t vlc_gc_data;
-
     module_t   *next;
     module_t   *parent;
     module_t   *submodule;
@@ -110,6 +108,7 @@ struct module_t
 
 module_t *vlc_module_create (void);
 module_t *vlc_submodule_create (module_t *module);
+void vlc_module_destroy (module_t *);
 
 void  module_InitBank( vlc_object_t * );
 #define module_InitBank(a) module_InitBank(VLC_OBJECT(a))
