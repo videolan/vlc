@@ -149,7 +149,8 @@ void aout_Shutdown (audio_output_t *p_aout)
     aout_lock( p_aout );
     /* Remove the input. */
     input = owner->input;
-    aout_InputDelete (p_aout, input);
+    if (likely(input != NULL))
+        aout_InputDelete (p_aout, input);
     owner->input = NULL;
 
     mixer = owner->volume.mixer;
@@ -174,11 +175,8 @@ void aout_Shutdown (audio_output_t *p_aout)
  */
 void aout_DecDelete (audio_output_t *aout)
 {
-    aout_owner_t *owner = aout_owner (aout);
-
-    assert (owner->module != NULL);
 #ifdef RECYCLE
-    (void) owner;
+    (void) aout;
 #else
     aout_Shutdown (aout);
 #endif
@@ -200,7 +198,8 @@ static void aout_CheckRestart (audio_output_t *aout)
 
     const aout_request_vout_t request_vout = owner->input->request_vout;
 
-    aout_InputDelete (aout, owner->input);
+    if (likely(owner->input != NULL))
+        aout_InputDelete (aout, owner->input);
     owner->input = NULL;
 
     /* Reinitializes the output */
@@ -282,7 +281,7 @@ void aout_DecDeleteBuffer (audio_output_t *aout, block_t *block)
 int aout_DecPlay (audio_output_t *p_aout, block_t *p_buffer, int i_input_rate)
 {
     aout_owner_t *owner = aout_owner (p_aout);
-    aout_input_t *p_input = owner->input;
+    aout_input_t *input;
 
     assert( i_input_rate >= INPUT_RATE_DEFAULT / AOUT_MAX_INPUT_RATE &&
             i_input_rate <= INPUT_RATE_DEFAULT * AOUT_MAX_INPUT_RATE );
@@ -292,17 +291,18 @@ int aout_DecPlay (audio_output_t *p_aout, block_t *p_buffer, int i_input_rate)
                                 / owner->input_format.i_rate;
 
     aout_lock( p_aout );
-    if (unlikely(p_input == NULL)) /* can happen due to restart */
+    aout_CheckRestart( p_aout );
+
+    input = owner->input;
+    if (unlikely(input == NULL)) /* can happen due to restart */
     {
         aout_unlock( p_aout );
         aout_BufferFree( p_buffer );
         return -1;
     }
 
-    aout_CheckRestart( p_aout );
-
     /* Input */
-    p_buffer = aout_InputPlay (p_aout, p_input, p_buffer, i_input_rate,
+    p_buffer = aout_InputPlay (p_aout, input, p_buffer, i_input_rate,
                                &owner->sync.date);
     if( p_buffer != NULL )
     {
@@ -331,8 +331,13 @@ int aout_DecGetResetLost (audio_output_t *aout)
     int val;
 
     aout_lock (aout);
-    val = input->i_buffer_lost;
-    input->i_buffer_lost = 0;
+    if (likely(input != NULL))
+    {
+        val = input->i_buffer_lost;
+        input->i_buffer_lost = 0;
+    }
+    else
+        val = 0; /* if aout_CheckRestart() failed */
     aout_unlock (aout);
 
     return val;
