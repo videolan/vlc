@@ -509,8 +509,10 @@ found_shortcut:
         /* Make sure the module is loaded in mem */
         module_t *p_real = p_cand->parent ? p_cand->parent : p_cand;
 
-        if( !p_real->b_builtin && !p_real->b_loaded )
+        if (!p_real->b_loaded)
         {
+            assert (p_real->psz_filename != NULL);
+
             module_t *p_new_module =
                 AllocatePlugin( p_this, p_real->psz_filename, false );
             if( p_new_module == NULL )
@@ -924,7 +926,6 @@ static int AllocatePluginFile( vlc_object_t * p_this, module_bank_t *p_bank,
     assert( p_module->next == NULL );
 
     /* Unload plugin until we really need it */
-    assert( !p_module->b_builtin );
     if( p_module->b_loaded && p_module->b_unloadable )
     {
         module_Unload( p_module->handle );
@@ -981,7 +982,9 @@ static module_t *AllocatePlugin( vlc_object_t * p_this, const char *psz_file,
         return NULL;
     }
 
-    p_module->psz_filename = strdup( psz_file );
+    p_module->psz_filename = strdup (psz_file);
+    if (unlikely(p_module->psz_filename == NULL))
+        goto error;
     p_module->handle = handle;
     p_module->b_loaded = true;
 
@@ -1006,8 +1009,6 @@ static module_t *AllocatePlugin( vlc_object_t * p_this, const char *psz_file,
         msg_Err( p_this, "cannot initialize plugin `%s'", psz_file );
         goto error;
     }
-
-    assert( !p_module->b_builtin );
     return p_module;
 error:
     free( p_module->psz_filename );
@@ -1030,7 +1031,6 @@ static module_t *module_InitStatic (vlc_plugin_cb entry)
     if (entry (module))
         assert (0);
 
-    module->b_builtin = true;
     module->b_loaded = true;
     module->b_unloadable = false;
 
@@ -1060,14 +1060,9 @@ static void DeleteModule (module_t **head, module_t *p_module)
 
     /* We free the structures that we strdup()ed in Allocate*Module(). */
 #ifdef HAVE_DYNAMIC_PLUGINS
-    if( !p_module->b_builtin )
-    {
-        if( p_module->b_loaded && p_module->b_unloadable )
-        {
-            module_Unload( p_module->handle );
-        }
-        free( p_module->psz_filename );
-    }
+    if (p_module->b_loaded && p_module->b_unloadable)
+        module_Unload (p_module->handle);
+    free (p_module->psz_filename);
 #endif
 
     /* Free and detach the object's children */

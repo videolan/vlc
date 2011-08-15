@@ -67,7 +67,6 @@ module_t *vlc_module_create (void)
     /*module->handle = garbage */
     module->psz_filename = NULL;
     module->domain = NULL;
-    module->b_builtin = false;
     module->b_loaded = false;
     return module;
 }
@@ -108,7 +107,6 @@ module_t *vlc_submodule_create (module_t *module)
     submodule->psz_help = NULL;
     submodule->psz_capability = NULL;
     submodule->i_score = module->i_score;
-    submodule->b_builtin = false;
     submodule->b_loaded = false;
     submodule->b_unloadable = false;
     submodule->pf_activate = NULL;

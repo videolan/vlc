@@ -83,7 +83,6 @@ struct module_t
     char    *psz_capability;                                 /**< Capability */
     int      i_score;                          /**< Score for the capability */
 
-    bool          b_builtin;  /* Set to true if the module is built in */
     bool          b_loaded;        /* Set to true if the dll is loaded */
     bool b_unloadable;                        /**< Can we be dlclosed? */
 
