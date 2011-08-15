@@ -85,16 +85,13 @@ static module_t * AllocatePlugin( vlc_object_t *, const char *, bool );
 static module_t *module_InitStatic (vlc_plugin_cb);
 static void DeleteModule (module_t **, module_t *);
 
-#undef module_InitBank
 /**
  * Init bank
  *
  * Creates a module bank structure which will be filled later
  * on with all the modules found.
- * \param p_this vlc object structure
- * \return nothing
  */
-void module_InitBank( vlc_object_t *p_this )
+void module_InitBank (void)
 {
     vlc_mutex_lock (&modules.lock);
 
@@ -121,14 +118,11 @@ void module_InitBank( vlc_object_t *p_this )
     /*vlc_mutex_unlock (&modules.lock);*/
 }
 
-#undef module_EndBank
 /**
  * Unloads all unused plugin modules and empties the module
  * bank in case of success.
- * \param p_this vlc object structure
- * \return nothing
  */
-void module_EndBank( vlc_object_t *p_this, bool b_plugins )
+void module_EndBank (bool b_plugins)
 {
     module_t *head = NULL;
 

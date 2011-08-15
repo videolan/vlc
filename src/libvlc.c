@@ -279,11 +279,11 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
      * main module. We need to do this at this stage to be able to display
      * a short help if required by the user. (short help == main module
      * options) */
-    module_InitBank( p_libvlc );
+    module_InitBank ();
 
     if( config_LoadCmdLine( p_libvlc, i_argc, ppsz_argv, NULL ) )
     {
-        module_EndBank( p_libvlc, false );
+        module_EndBank (false);
         return VLC_EGENERIC;
     }
 
@@ -378,7 +378,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
 
     if( b_exit )
     {
-        module_EndBank( p_libvlc, false );
+        module_EndBank (false);
         return i_ret;
     }
 
@@ -470,7 +470,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
 
     if( b_exit )
     {
-        module_EndBank( p_libvlc, true );
+        module_EndBank (true);
         return i_ret;
     }
 
@@ -501,7 +501,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
                  "that they are valid.\n" );
         PauseConsole();
 #endif
-        module_EndBank( p_libvlc, true );
+        module_EndBank (true);
         return VLC_EGENERIC;
     }
     priv->i_verbose = var_InheritInteger( p_libvlc, "verbose" );
@@ -800,7 +800,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
         {
             module_unneed( p_libvlc, priv->p_memcpy_module );
         }
-        module_EndBank( p_libvlc, true );
+        module_EndBank (true);
         return VLC_EGENERIC;
     }
 
@@ -1047,7 +1047,7 @@ void libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
         config_AutoSaveConfigFile( VLC_OBJECT(p_libvlc) );
 
     /* Free module bank. It is refcounted, so we call this each time  */
-    module_EndBank( p_libvlc, true );
+    module_EndBank (true);
 
     vlc_DeinitActions( p_libvlc, priv->actions );
 }

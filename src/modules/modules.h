@@ -112,12 +112,10 @@ module_t *vlc_module_create (void);
 module_t *vlc_submodule_create (module_t *module);
 void vlc_module_destroy (module_t *);
 
-void  module_InitBank( vlc_object_t * );
-#define module_InitBank(a) module_InitBank(VLC_OBJECT(a))
+void module_InitBank (void);
 void module_LoadPlugins( vlc_object_t * );
 #define module_LoadPlugins(a) module_LoadPlugins(VLC_OBJECT(a))
-void module_EndBank( vlc_object_t *, bool );
-#define module_EndBank(a,b) module_EndBank(VLC_OBJECT(a), b)
+void module_EndBank (bool);
 
 int vlc_bindtextdomain (const char *);
 
