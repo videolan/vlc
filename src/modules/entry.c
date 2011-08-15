@@ -252,6 +252,8 @@ int vlc_plugin_set (module_t *module, module_config_t *item, int propid, ...)
             break;
 
         case VLC_MODULE_HELP:
+            assert (module->parent == NULL);
+            assert (module->psz_help == NULL);
             module->psz_help = va_arg (ap, char *);
             break;
 

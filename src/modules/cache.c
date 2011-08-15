@@ -237,7 +237,6 @@ size_t CacheLoad( vlc_object_t *p_this, const char *dir, module_cache_t **r )
             free (submodule->pp_shortcuts);
             LOAD_STRING(submodule->psz_shortname);
             LOAD_STRING(submodule->psz_longname);
-            LOAD_STRING(submodule->psz_help);
 
             LOAD_IMMEDIATE(submodule->i_shortcuts);
             if (submodule->i_shortcuts > MODULE_SHORTCUT_MAX)
@@ -535,7 +534,6 @@ static int CacheSaveSubmodule( FILE *file, const module_t *p_module )
 
     SAVE_STRING( p_module->psz_shortname );
     SAVE_STRING( p_module->psz_longname );
-    SAVE_STRING( p_module->psz_help );
     SAVE_IMMEDIATE( p_module->i_shortcuts );
     for( unsigned j = 0; j < p_module->i_shortcuts; j++ )
          SAVE_STRING( p_module->pp_shortcuts[j] );
