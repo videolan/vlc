@@ -45,9 +45,9 @@ VLC_API void module_unneed( vlc_object_t *, module_t * );
 VLC_API bool module_exists(const char *) VLC_USED;
 VLC_API module_t * module_find(const char *) VLC_USED;
 
-int module_start(vlc_object_t *, module_t *);
+int module_start(vlc_object_t *, const module_t *);
 #define module_start(o, m) module_start(VLC_OBJECT(o),m)
-void module_stop(vlc_object_t *, module_t *);
+void module_stop(vlc_object_t *, const module_t *);
 #define module_stop(o, m) module_stop(VLC_OBJECT(o),m)
 
 VLC_API module_config_t * module_config_get( const module_t *, unsigned * ) VLC_USED;

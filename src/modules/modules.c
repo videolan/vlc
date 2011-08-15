@@ -292,7 +292,7 @@ void module_release (module_t *m)
 }
 
 #undef module_start
-int module_start (vlc_object_t *obj, module_t *m)
+int module_start (vlc_object_t *obj, const module_t *m)
 {
    int (*activate) (vlc_object_t *) = m->pf_activate;
 
@@ -300,7 +300,7 @@ int module_start (vlc_object_t *obj, module_t *m)
 }
 
 #undef module_stop
-void module_stop (vlc_object_t *obj, module_t *m)
+void module_stop (vlc_object_t *obj, const module_t *m)
 {
    void (*deactivate) (vlc_object_t *) = m->pf_deactivate;
 
