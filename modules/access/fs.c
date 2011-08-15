@@ -73,8 +73,7 @@ vlc_module_begin ()
     set_callbacks( Open, Close )
 
     add_submodule()
-    set_shortname( N_("Directory" ) )
-    set_description( N_("Directory input") )
+    set_section( N_("Directory" ), NULL )
     set_capability( "access", 55 )
     add_string( "recursive", "expand" , RECURSIVE_TEXT,
                 RECURSIVE_LONGTEXT, false )
