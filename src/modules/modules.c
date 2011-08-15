@@ -190,6 +190,8 @@ void module_LoadPlugins (vlc_object_t *obj)
  */
 bool module_provides( const module_t *m, const char *cap )
 {
+    if (unlikely(m->psz_capability == NULL))
+        return false;
     return !strcmp( m->psz_capability, cap );
 }
 
@@ -1071,7 +1073,8 @@ static void DupModule( module_t *p_module )
 
     /* We strdup() these entries so that they are still valid when the
      * module is unloaded. */
-    p_module->psz_capability = strdup( p_module->psz_capability );
+    p_module->psz_capability =
+        p_module->psz_capability ? strdup( p_module->psz_capability ) : NULL;
     p_module->psz_shortname = p_module->psz_shortname ?
                                  strdup( p_module->psz_shortname ) : NULL;
     p_module->psz_longname = strdup( p_module->psz_longname );

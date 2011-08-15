@@ -63,7 +63,7 @@ module_t *vlc_module_create (void)
     module->psz_help = NULL;
     module->pp_shortcuts = NULL;
     module->i_shortcuts = 0;
-    module->psz_capability = (char*)"";
+    module->psz_capability = NULL;
     module->i_score = 1;
     module->b_unloadable = true;
     module->pf_activate = NULL;

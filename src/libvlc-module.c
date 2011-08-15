@@ -2811,7 +2811,6 @@ vlc_module_begin ()
     /* add_usage_hint( PLAYLIST_USAGE ) */
 
     set_description( N_("main program") )
-    set_capability( "main", 100 )
 vlc_module_end ()
 
 /*****************************************************************************
