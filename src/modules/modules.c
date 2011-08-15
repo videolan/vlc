@@ -203,9 +203,9 @@ bool module_provides( const module_t *m, const char *cap )
  */
 const char *module_get_object( const module_t *m )
 {
-    if (unlikely(m->object_name == NULL))
+    if (unlikely(m->i_shortcuts == 0))
         return "unnamed";
-    return m->object_name;
+    return m->pp_shortcuts[0];
 }
 
 /**
@@ -680,11 +680,9 @@ module_t *module_find (const char *name)
 
     for (size_t i = 0; (module = list[i]) != NULL; i++)
     {
-        const char *objname = module->object_name;
-
-        if (unlikely(objname == NULL))
+        if (unlikely(module->i_shortcuts == 0))
             continue;
-        if (!strcmp (objname, name))
+        if (!strcmp (module->pp_shortcuts[0], name))
         {
             module_hold (module);
             break;

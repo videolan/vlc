@@ -202,7 +202,6 @@ size_t CacheLoad( vlc_object_t *p_this, const char *dir, module_cache_t **r )
         module = vlc_module_create();
 
         /* Load additional infos */
-        LOAD_STRING(module->object_name);
         LOAD_STRING(module->psz_shortname);
         LOAD_STRING(module->psz_longname);
         LOAD_STRING(module->psz_help);
@@ -210,8 +209,6 @@ size_t CacheLoad( vlc_object_t *p_this, const char *dir, module_cache_t **r )
         LOAD_IMMEDIATE(module->i_shortcuts);
         if (module->i_shortcuts > MODULE_SHORTCUT_MAX)
             goto error;
-        else if (module->i_shortcuts == 0)
-            module->pp_shortcuts = NULL;
         else
         {
             module->pp_shortcuts =
@@ -237,9 +234,7 @@ size_t CacheLoad( vlc_object_t *p_this, const char *dir, module_cache_t **r )
         while( i_submodules-- )
         {
             module_t *submodule = vlc_submodule_create (module);
-            free (submodule->object_name);
             free (submodule->pp_shortcuts);
-            LOAD_STRING(submodule->object_name);
             LOAD_STRING(submodule->psz_shortname);
             LOAD_STRING(submodule->psz_longname);
             LOAD_STRING(submodule->psz_help);
@@ -247,8 +242,6 @@ size_t CacheLoad( vlc_object_t *p_this, const char *dir, module_cache_t **r )
             LOAD_IMMEDIATE(submodule->i_shortcuts);
             if (submodule->i_shortcuts > MODULE_SHORTCUT_MAX)
                 goto error;
-            else if (submodule->i_shortcuts == 0)
-                submodule->pp_shortcuts = NULL;
             else
             {
                 submodule->pp_shortcuts =
@@ -497,7 +490,6 @@ static int CacheSaveBank (FILE *file, const module_cache_t *cache,
         uint32_t i_submodule;
 
         /* Save additional infos */
-        SAVE_STRING(module->object_name);
         SAVE_STRING(module->psz_shortname);
         SAVE_STRING(module->psz_longname);
         SAVE_STRING(module->psz_help);
@@ -541,7 +533,6 @@ static int CacheSaveSubmodule( FILE *file, const module_t *p_module )
     if( CacheSaveSubmodule( file, p_module->next ) )
         goto error;
 
-    SAVE_STRING( p_module->object_name );
     SAVE_STRING( p_module->psz_shortname );
     SAVE_STRING( p_module->psz_longname );
     SAVE_STRING( p_module->psz_help );

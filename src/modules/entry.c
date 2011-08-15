@@ -39,7 +39,6 @@ static void vlc_module_destruct (gc_object_t *obj)
     module_t *module = vlc_priv (obj, module_t);
 
     free (module->pp_shortcuts);
-    free (module->object_name);
     free (module);
 }
 
@@ -49,7 +48,6 @@ module_t *vlc_module_create (void)
     if (module == NULL)
         return NULL;
 
-    module->object_name = NULL;
     module->next = NULL;
     module->submodule = NULL;
     module->parent = NULL;
@@ -82,8 +80,8 @@ module_t *vlc_module_create (void)
 static void vlc_submodule_destruct (gc_object_t *obj)
 {
     module_t *module = vlc_priv (obj, module_t);
+
     free (module->pp_shortcuts);
-    free (module->object_name);
     free (module);
 }
 
@@ -107,7 +105,6 @@ module_t *vlc_submodule_create (module_t *module)
     submodule->pp_shortcuts[0] = module->pp_shortcuts[0]; /* object name */
     submodule->i_shortcuts = 1;
 
-    submodule->object_name = strdup (module->object_name);
     submodule->psz_shortname = module->psz_shortname;
     submodule->psz_longname = module->psz_longname;
     submodule->psz_capability = module->psz_capability;
@@ -222,8 +219,7 @@ int vlc_plugin_set (module_t *module, module_config_t *item, int propid, ...)
         {
             const char *value = va_arg (ap, const char *);
 
-            assert (module->object_name == NULL);
-            module->object_name = strdup (value);
+            assert (module->i_shortcuts == 0);
             module->pp_shortcuts = malloc( sizeof( char ** ) );
             module->pp_shortcuts[0] = (char*)value; /* dooh! */
             module->i_shortcuts = 1;

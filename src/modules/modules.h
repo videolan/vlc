@@ -62,7 +62,6 @@ typedef void * module_handle_t;
  */
 struct module_t
 {
-    char       *object_name;
     gc_object_t vlc_gc_data;
 
     module_t   *next;
