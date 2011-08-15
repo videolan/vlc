@@ -195,31 +195,31 @@ int aout_OutputNew( audio_output_t *p_aout,
     return 0;
 }
 
-/*****************************************************************************
- * aout_OutputDelete : delete the output
- *****************************************************************************
- * This function is entered with the mixer lock.
- *****************************************************************************/
-void aout_OutputDelete( audio_output_t * p_aout )
+/**
+ * Destroys the audio output plug-in instance.
+ */
+void aout_OutputDelete (audio_output_t *aout)
 {
-    aout_owner_t *owner = aout_owner (p_aout);
+    aout_owner_t *owner = aout_owner (aout);
 
-    aout_assert_locked( p_aout );
+    aout_assert_locked (aout);
 
     if (owner->module == NULL)
         return;
 
-    module_unneed (p_aout, owner->module);
-    aout_VolumeNoneInit( p_aout ); /* clear volume callback */
+    module_unneed (aout, owner->module);
+    /* Clear callbacks */
+    aout->pf_play = aout_DecDeleteBuffer; /* gruik */
+    aout->pf_pause = NULL;
+    aout->pf_flush = NULL;
+    aout_VolumeNoneInit (aout);
     owner->module = NULL;
     aout_FiltersDestroyPipeline (owner->filters, owner->nb_filters);
 }
 
-/*****************************************************************************
- * aout_OutputPlay : play a buffer
- *****************************************************************************
- * This function is entered with the mixer lock.
- *****************************************************************************/
+/**
+ * Plays a decoded audio buffer.
+ */
 void aout_OutputPlay (audio_output_t *aout, block_t *block)
 {
     aout_owner_t *owner = aout_owner (aout);
