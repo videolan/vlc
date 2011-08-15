@@ -226,6 +226,7 @@ int vlc_plugin_set (module_t *module, module_config_t *item, int propid, ...)
             break;
 
         case VLC_MODULE_NO_UNLOAD:
+            assert (module->parent == NULL);
             module->b_unloadable = false;
             break;
 
