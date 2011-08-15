@@ -24,6 +24,9 @@ status.xml or status.json
 > add <mrl> to playlist:
   ?command=in_enqueue&input=<mrl>
 
+> add subtitle to currently playing file
+  ?command=addsubtitle&val=<path>
+
 > play playlist item <id>. If <id> is omitted, play last active item:
   ?command=pl_play&id=<id>
 

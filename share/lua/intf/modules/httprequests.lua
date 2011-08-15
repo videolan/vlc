@@ -88,6 +88,8 @@ processcommands = function ()
 	  vlc.msg.err( "</options>" )
 	  --]]
 	  vlc.playlist.add({{path=stripslashes(input),options=options}})
+	elseif command == "addsubtitle" then
+	  vlc.input.add_subtitle (stripslashes(val))
 	elseif command == "in_enqueue" then
 	  vlc.playlist.enqueue({{path=stripslashes(input),options=options}})
 	elseif command == "pl_play" then
