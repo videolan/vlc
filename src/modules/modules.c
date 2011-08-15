@@ -84,10 +84,6 @@ static module_t * AllocatePlugin( vlc_object_t *, const char *, bool );
 #endif
 static int  AllocateBuiltinModule( vlc_object_t *, int ( * ) ( module_t * ) );
 static void DeleteModule (module_t **, module_t *);
-#ifdef HAVE_DYNAMIC_PLUGINS
-static void   DupModule        ( module_t * );
-static void   UndupModule      ( module_t * );
-#endif
 
 #undef module_InitBank
 /**
@@ -1017,7 +1013,6 @@ static module_t *AllocatePlugin( vlc_object_t * p_this, const char *psz_file,
         goto error;
     }
 
-    DupModule( p_module );
     assert( !p_module->b_builtin );
     return p_module;
 error:
@@ -1026,56 +1021,6 @@ error:
     module_Unload( handle );
     return NULL;
 }
-
-/*****************************************************************************
- * DupModule: make a plugin module standalone.
- *****************************************************************************
- * This function duplicates all strings in the module, so that the dynamic
- * object can be unloaded. It acts recursively on submodules.
- *****************************************************************************/
-static void DupModule( module_t *p_module )
-{
-    char **pp_shortcuts = p_module->pp_shortcuts;
-    for( unsigned i = 0; i < p_module->i_shortcuts; i++ )
-        pp_shortcuts[i] = strdup( p_module->pp_shortcuts[i] );
-
-    /* We strdup() these entries so that they are still valid when the
-     * module is unloaded. */
-    p_module->psz_capability =
-        p_module->psz_capability ? strdup( p_module->psz_capability ) : NULL;
-    p_module->psz_shortname = p_module->psz_shortname ?
-                                 strdup( p_module->psz_shortname ) : NULL;
-    p_module->psz_longname = strdup( p_module->psz_longname );
-    p_module->psz_help = p_module->psz_help ? strdup( p_module->psz_help )
-                                            : NULL;
-    p_module->domain = p_module->domain ? strdup( p_module->domain ) : NULL;
-
-    for (module_t *subm = p_module->submodule; subm; subm = subm->next)
-        DupModule (subm);
-}
-
-/*****************************************************************************
- * UndupModule: free a duplicated module.
- *****************************************************************************
- * This function frees the allocations done in DupModule().
- *****************************************************************************/
-static void UndupModule( module_t *p_module )
-{
-    char **pp_shortcuts = p_module->pp_shortcuts;
-
-    for (module_t *subm = p_module->submodule; subm; subm = subm->next)
-        UndupModule (subm);
-
-    for( unsigned i = 0; i < p_module->i_shortcuts; i++ )
-        free( pp_shortcuts[i] );
-
-    free( p_module->psz_capability );
-    FREENULL( p_module->psz_shortname );
-    free( p_module->psz_longname );
-    FREENULL( p_module->psz_help );
-    free( p_module->domain );
-}
-
 #endif /* HAVE_DYNAMIC_PLUGINS */
 
 /*****************************************************************************
@@ -1140,7 +1085,6 @@ static void DeleteModule (module_t **head, module_t *p_module)
         {
             module_Unload( p_module->handle );
         }
-        UndupModule( p_module );
         free( p_module->psz_filename );
     }
 #endif
