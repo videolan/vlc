@@ -122,8 +122,8 @@ module_t *vlc_submodule_create (module_t *module)
     submodule->i_config_items = 0;
     submodule->i_bool_items = 0;
     /*submodule->handle = unused*/
-    submodule->psz_filename = NULL;
-    submodule->domain = module->domain;
+    /*submodule->psz_filename unused */
+    submodule->domain = NULL;
     return submodule;
 }
 

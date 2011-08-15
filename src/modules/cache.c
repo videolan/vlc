@@ -252,7 +252,6 @@ size_t CacheLoad( vlc_object_t *p_this, const char *dir, module_cache_t **r )
             LOAD_STRING(submodule->psz_capability);
             LOAD_IMMEDIATE(submodule->i_score);
             LOAD_IMMEDIATE(submodule->b_unloadable);
-            LOAD_STRING(submodule->domain);
         }
 
         char *path;
@@ -541,7 +540,6 @@ static int CacheSaveSubmodule( FILE *file, const module_t *p_module )
     SAVE_STRING( p_module->psz_capability );
     SAVE_IMMEDIATE( p_module->i_score );
     SAVE_IMMEDIATE( p_module->b_unloadable );
-    SAVE_STRING( p_module->domain );
     return 0;
 
 error:
