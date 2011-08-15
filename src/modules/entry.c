@@ -89,26 +89,40 @@ module_t *vlc_submodule_create (module_t *module)
 {
     assert (module != NULL);
 
-    module_t *submodule = calloc( 1, sizeof(*submodule) );
-    if( !submodule )
+    module_t *submodule = malloc (sizeof (*submodule));
+    if (unlikely(submodule == NULL))
         return NULL;
 
+    /* TODO: replace module/submodules with plugin/modules */
     vlc_gc_init (submodule, vlc_submodule_destruct);
 
     submodule->next = module->submodule;
-    submodule->parent = module;
     module->submodule = submodule;
     module->submodule_count++;
+    submodule->parent = module;
+    submodule->submodule = NULL;
+    submodule->submodule_count = 0;
 
-    /* Muahahaha! Heritage! Polymorphism! Ugliness!! */
-    submodule->pp_shortcuts = malloc( sizeof( char ** ) );
+    submodule->pp_shortcuts = xmalloc (sizeof (char **));
     submodule->pp_shortcuts[0] = module->pp_shortcuts[0]; /* object name */
     submodule->i_shortcuts = 1;
 
     submodule->psz_shortname = module->psz_shortname;
     submodule->psz_longname = module->psz_longname;
+    submodule->psz_help = NULL;
     submodule->psz_capability = module->psz_capability;
     submodule->i_score = module->i_score;
+    submodule->b_builtin = false;
+    submodule->b_loaded = false;
+    submodule->b_unloadable = false;
+    submodule->pf_activate = NULL;
+    submodule->pf_deactivate = NULL;
+    submodule->p_config = NULL;
+    submodule->confsize = 0;
+    submodule->i_config_items = 0;
+    submodule->i_bool_items = 0;
+    /*submodule->handle = unused*/
+    submodule->psz_filename = NULL;
     submodule->domain = module->domain;
     return submodule;
 }
