@@ -246,11 +246,11 @@ static int Open( vlc_object_t *p_this )
 
         goto error;
     }
-    int ivideo;
-    for(ivideo = 0; ivideo < [myVideoDevices count]; ivideo++){
+    NSUInteger deviceCount = [myVideoDevices count];
+    for(NSUInteger ivideo = 0; ivideo < deviceCount; ivideo++){
         QTCaptureDevice *qtk_device;
         qtk_device = [myVideoDevices objectAtIndex:ivideo];
-        msg_Dbg( p_demux, "qtcapture %d/%lu %s %s", ivideo, [myVideoDevices count], [[qtk_device localizedDisplayName] UTF8String], [[qtk_device uniqueID] UTF8String]);
+        msg_Dbg( p_demux, "qtcapture %d/%lu %s %s", ivideo, deviceCount, [[qtk_device localizedDisplayName] UTF8String], [[qtk_device uniqueID] UTF8String]);
         if([[[qtk_device uniqueID]stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]] isEqualToString:qtk_currdevice_uid]){
             break;
         }
@@ -302,7 +302,8 @@ static int Open( vlc_object_t *p_this )
     /* Get the formats */
     NSArray *format_array = [p_sys->device formatDescriptions];
     QTFormatDescription* camera_format = NULL;
-    for( int k = 0; k < [format_array count]; k++ )
+    NSUInteger formatCount = [format_array count];
+    for( NSUInteger k = 0; k < formatCount; k++ )
     {
         camera_format = [format_array objectAtIndex: k];
 

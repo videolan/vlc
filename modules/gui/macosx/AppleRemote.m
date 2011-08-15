@@ -627,8 +627,8 @@ static void QueueCallbackFunction(void* target,  IOReturn result, void* refcon, 
         memset(cookies, 0, sizeof(IOHIDElementCookie) * NUMBER_OF_APPLE_REMOTE_ACTIONS);
         */
         allCookies = [[NSMutableArray alloc] init];
-        unsigned int i;
-        for (i=0; i< [elements count]; i++) {
+        NSUInteger elementCount = [elements count];
+        for (NSUInteger i=0; i< elementCount; i++) {
             element = [elements objectAtIndex:i];
 
             //Get cookie
@@ -668,8 +668,8 @@ static void QueueCallbackFunction(void* target,  IOReturn result, void* refcon, 
         if (queue) {
             result = (*queue)->create(queue, 0, 12);    //depth: maximum number of elements in queue before oldest elements in queue begin to be lost.
 
-            unsigned int i=0;
-            for(i=0; i<[allCookies count]; i++) {
+            NSUInteger cookieCount = [allCookies count];
+            for(NSUInteger i=0; i<cookieCount; i++) {
                 IOHIDElementCookie cookie = (IOHIDElementCookie)[[allCookies objectAtIndex:i] intValue];
                 (*queue)->addElement(queue, cookie, 0);
             }

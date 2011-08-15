@@ -83,9 +83,9 @@ static NSMutableArray *blackoutWindows = NULL;
 
 + (NSScreen *)screenWithDisplayID: (CGDirectDisplayID)displayID
 {
-    int i;
+    NSUInteger count = [[NSScreen screens] count];
 
-    for( i = 0; i < [[NSScreen screens] count]; i++ )
+    for( NSUInteger i = 0; i < count; i++ )
     {
         NSScreen *screen = [[NSScreen screens] objectAtIndex: i];
         if([screen displayID] == displayID)
@@ -111,13 +111,12 @@ static NSMutableArray *blackoutWindows = NULL;
 
 - (void)blackoutOtherScreens
 {
-    unsigned int i;
-
     /* Free our previous blackout window (follow blackoutWindow alloc strategy) */
     [blackoutWindows makeObjectsPerformSelector:@selector(close)];
     [blackoutWindows removeAllObjects];
 
-    for(i = 0; i < [[NSScreen screens] count]; i++)
+    NSUInteger screenCount = [[NSScreen screens] count];
+    for(NSUInteger i = 0; i < screenCount; i++)
     {
         NSScreen *screen = [[NSScreen screens] objectAtIndex: i];
         VLCWindow *blackoutWindow;
@@ -151,9 +150,9 @@ static NSMutableArray *blackoutWindows = NULL;
 
 + (void)unblackoutScreens
 {
-    unsigned int i;
+    NSUInteger blackoutWindowCount = [blackoutWindows count];
 
-    for(i = 0; i < [blackoutWindows count]; i++)
+    for(NSUInteger i = 0; i < blackoutWindowCount; i++)
     {
         VLCWindow *blackoutWindow = [blackoutWindows objectAtIndex: i];
         [blackoutWindow closeAndAnimate: YES];
@@ -398,12 +397,11 @@ static NSMutableArray *blackoutWindows = NULL;
     {
         if ([o_desired_type isEqualToString:NSFilenamesPboardType])
         {
-            int i;
             NSArray *o_array = [NSArray array];
-            NSArray *o_values = [[o_paste propertyListForType: NSFilenamesPboardType]
-                        sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
+            NSArray *o_values = [[o_paste propertyListForType: NSFilenamesPboardType] sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
+            NSUInteger count = [o_values count];
 
-            for( i = 0; i < (int)[o_values count]; i++)
+            for( NSUInteger i = 0; i < count; i++)
             {
                 NSDictionary *o_dic;
                 char *psz_uri = make_URI([[o_values objectAtIndex:i] UTF8String], NULL);
@@ -483,12 +481,11 @@ static NSMutableArray *blackoutWindows = NULL;
     {
         if ([o_desired_type isEqualToString:NSFilenamesPboardType])
         {
-            int i;
             NSArray *o_array = [NSArray array];
-            NSArray *o_values = [[o_paste propertyListForType: NSFilenamesPboardType]
-                        sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
+            NSArray *o_values = [[o_paste propertyListForType: NSFilenamesPboardType] sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
+            NSUInteger count = [o_values count];
 
-            for( i = 0; i < (int)[o_values count]; i++)
+            for( NSUInteger i = 0; i < count; i++)
             {
                 NSDictionary *o_dic;
                 char *psz_uri = make_URI([[o_values objectAtIndex:i] UTF8String], NULL);

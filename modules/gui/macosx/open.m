@@ -211,7 +211,8 @@ static VLCOpen *_o_sharedMainInstance = nil;
             qtk_currdevice_uid = [[[QTCaptureDevice defaultInputDeviceWithMediaType: QTMediaTypeVideo] uniqueID]
                                                                 stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
         }
-        for(int ivideo = 0; ivideo < [qtkvideoDevices count]; ivideo++){
+        NSUInteger deviceCount = [qtkvideoDevices count];
+        for(int ivideo = 0; ivideo < deviceCount; ivideo++){
             QTCaptureDevice *qtk_device;
             qtk_device = [qtkvideoDevices objectAtIndex:ivideo];
             [o_qtk_device_pop addItemWithTitle: [qtk_device localizedDisplayName]];
@@ -368,7 +369,6 @@ static VLCOpen *_o_sharedMainInstance = nil;
     {
         NSMutableDictionary *o_dic;
         NSMutableArray *o_options = [NSMutableArray array];
-        unsigned int i;
 
         o_dic = [NSMutableDictionary dictionaryWithObject: [self MRL] forKey: @"ITEM_URL"];
         if( [o_file_sub_ckbox state] == NSOnState )
@@ -400,10 +400,10 @@ static VLCOpen *_o_sharedMainInstance = nil;
         }
         if( [o_output_ckbox state] == NSOnState )
         {
-            for (i = 0 ; i < [[o_sout_options mrl] count] ; i++)
+            NSUInteger count = [[o_sout_options mrl] count];
+            for (NSUInteger i = 0 ; i < count ; i++)
             {
-                [o_options addObject: [NSString stringWithString:
-                      [[(VLCOutput *)o_sout_options mrl] objectAtIndex: i]]];
+                [o_options addObject: [NSString stringWithString: [[(VLCOutput *)o_sout_options mrl] objectAtIndex: i]]];
             }
         }
         if( [o_file_slave_ckbox state] && o_file_slave_path )
@@ -752,7 +752,8 @@ static VLCOpen *_o_sharedMainInstance = nil;
             {
                 NSArray * topLevelItems;
                 topLevelItems = [[NSFileManager defaultManager] subpathsOfDirectoryAtPath: mountPath error: NULL];
-                for (int i = 0; i < [topLevelItems count]; i++) {
+                NSUInteger itemCount = [topLevelItems count];
+                for (int i = 0; i < itemCount; i++) {
                     if([[topLevelItems objectAtIndex:i] rangeOfString:@"SVCD"].location != NSNotFound) {
                         returnValue = kVLCMediaSVCD;
                         break;
@@ -835,7 +836,8 @@ static VLCOpen *_o_sharedMainInstance = nil;
     if ([o_specialMediaFolders count] > 0)
         [o_opticalDevices addObjectsFromArray: o_specialMediaFolders];
     if ([o_opticalDevices count] > 0) {
-        for (int i = 0; i < [o_opticalDevices count] ; i++)
+        NSUInteger deviceCount = [o_opticalDevices count];
+        for (NSUInteger i = 0; i < deviceCount ; i++)
             [o_disc_selector_pop addItemWithTitle: [[NSFileManager defaultManager] displayNameAtPath:[o_opticalDevices objectAtIndex: i]]];
 
         if ([o_disc_selector_pop numberOfItems] <= 1)

@@ -916,7 +916,8 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
      ********************/
     if( b_hotkeyChanged )
     {
-        for( NSUInteger i = 0; i < [o_hotkeySettings count]; i++ )
+        NSUInteger hotKeyCount = [o_hotkeySettings count];
+        for( NSUInteger i = 0; i < hotKeyCount; i++ )
             config_PutPsz( p_intf, [[o_hotkeyNames objectAtIndex:i] UTF8String], [[o_hotkeySettings objectAtIndex:i]UTF8String] );
         b_hotkeyChanged = NO;
     }

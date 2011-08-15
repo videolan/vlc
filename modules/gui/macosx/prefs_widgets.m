@@ -2308,8 +2308,8 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
 - (IBAction)tableChanged:(id)sender
 {
     NSString *o_newstring = @"";
-    unsigned int i;
-    for( i = 0 ; i < [o_modulearray count] ; i++ )
+    NSUInteger count = [o_modulearray count];
+    for( NSUInteger i = 0 ; i < count ; i++ )
         if( [[[o_modulearray objectAtIndex:i] objectAtIndex:2]
             boolValue] != NO )
         {

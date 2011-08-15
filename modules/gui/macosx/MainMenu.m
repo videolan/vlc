@@ -375,7 +375,8 @@ static VLCMainMenu *_o_sharedInstance = nil;
     if( !p_intf ) return;
     
     NSArray *menuitems_array = [the_menu itemArray];
-    for( int i=0; i<[menuitems_array count]; i++ )
+    NSUInteger menuItemCount = [menuitems_array count];
+    for( NSUInteger i=0; i < menuItemCount; i++ )
     {
         NSMenuItem *one_item = [menuitems_array objectAtIndex: i];
         if( [one_item hasSubmenu] )

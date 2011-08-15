@@ -416,27 +416,21 @@
             /* split up the hostname and the following path to paste the
              * port correctly. Not need, if there isn't any path following the
              * hostname. */
-            NSArray * o_urlItems = [[o_stream_address stringValue] \
-                componentsSeparatedByString: @"/"];
+            NSArray * o_urlItems = [[o_stream_address stringValue] componentsSeparatedByString: @"/"];
             NSMutableString * o_finalStreamAddress;
             o_finalStreamAddress = [[NSMutableString alloc] init];
  
             if ([o_urlItems count] == 1)
             {
-                [o_finalStreamAddress appendFormat: @"\"%@:%@\"", \
-                    [o_stream_address stringValue],[o_stream_port stringValue]];
+                [o_finalStreamAddress appendFormat: @"\"%@:%@\"", [o_stream_address stringValue],[o_stream_port stringValue]];
             }
             else
             {
-                [o_finalStreamAddress appendFormat: @"\"%@:%@", [o_urlItems \
-                    objectAtIndex: 0], [o_stream_port stringValue]];
-                unsigned int x;
-                x = 1;
-                while (x != [o_urlItems count])
+                [o_finalStreamAddress appendFormat: @"\"%@:%@", [o_urlItems objectAtIndex: 0], [o_stream_port stringValue]];
+                NSUInteger itemCount = [o_urlItems count];
+                for (NSUInteger x = 0; x < itemCount; x++)
                 {
-                    [o_finalStreamAddress appendFormat: @"/%@", [o_urlItems \
-                        objectAtIndex: x]];
-                    x = (x + 1);
+                    [o_finalStreamAddress appendFormat: @"/%@", [o_urlItems objectAtIndex: x]];
                 }
                 [o_finalStreamAddress appendString: @"\""];
             }
