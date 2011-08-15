@@ -90,7 +90,7 @@ xml_reader_t *xml_ReaderCreate(vlc_object_t *obj, stream_t *stream)
 
 /**
  * Deletes an XML reader.
- * @param reader XML reader created with xml_RaederCreate().
+ * @param reader XML reader created with xml_ReaderCreate().
  */
 void xml_ReaderDelete(xml_reader_t *reader)
 {
