@@ -246,11 +246,12 @@ static int Open( vlc_object_t *p_this )
 
         goto error;
     }
+    NSUInteger ivideo;
     NSUInteger deviceCount = [myVideoDevices count];
-    for(NSUInteger ivideo = 0; ivideo < deviceCount; ivideo++){
+    for(ivideo = 0; ivideo < deviceCount; ivideo++){
         QTCaptureDevice *qtk_device;
         qtk_device = [myVideoDevices objectAtIndex:ivideo];
-        msg_Dbg( p_demux, "qtcapture %d/%lu %s %s", ivideo, deviceCount, [[qtk_device localizedDisplayName] UTF8String], [[qtk_device uniqueID] UTF8String]);
+        msg_Dbg( p_demux, "qtcapture %lu/%lu %s %s", ivideo, deviceCount, [[qtk_device localizedDisplayName] UTF8String], [[qtk_device uniqueID] UTF8String]);
         if([[[qtk_device uniqueID]stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]] isEqualToString:qtk_currdevice_uid]){
             break;
         }
