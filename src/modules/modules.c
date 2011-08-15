@@ -82,7 +82,7 @@ static int  AllocatePluginFile( vlc_object_t *, module_bank_t *, const char *,
                                 const struct stat *, cache_mode_t );
 static module_t * AllocatePlugin( vlc_object_t *, const char *, bool );
 #endif
-static int  AllocateBuiltinModule( vlc_object_t *, int ( * ) ( module_t * ) );
+static module_t *module_InitStatic (vlc_plugin_cb);
 static void DeleteModule (module_t **, module_t *);
 
 #undef module_InitBank
@@ -105,7 +105,7 @@ void module_InitBank( vlc_object_t *p_this )
          * library just as another module, and for instance the configuration
          * options of main will be available in the module bank structure just
          * as for every other module. */
-        AllocateBuiltinModule( p_this, vlc_entry__main );
+        module_InitStatic (vlc_entry__main);
         vlc_rwlock_init (&config_lock);
         config_SortConfig ();
     }
@@ -1023,42 +1023,29 @@ error:
 }
 #endif /* HAVE_DYNAMIC_PLUGINS */
 
-/*****************************************************************************
- * AllocateBuiltinModule: initialize a builtin module.
- *****************************************************************************
- * This function registers a builtin module and allocates a structure
- * for its information data. The module can then be handled by module_need
- * and module_unneed. It can be removed by DeleteModule.
- *****************************************************************************/
-static int AllocateBuiltinModule( vlc_object_t * p_this,
-                                  int ( *pf_entry ) ( module_t * ) )
+/**
+ * Registers a statically-linked plug-in.
+ */
+static module_t *module_InitStatic (vlc_plugin_cb entry)
 {
-    module_t * p_module;
+    module_t *module = vlc_module_create ();
+    if (unlikely(module == NULL))
+        return NULL;
 
-    /* Now that we have successfully loaded the module, we can
-     * allocate a structure for it */
-    p_module = vlc_module_create();
-    if( p_module == NULL )
-        return -1;
+    /* Initializes the module */
+    if (entry (module))
+        assert (0);
 
-    /* Initialize the module : fill *p_module structure */
-    if( pf_entry( p_module ) != 0 )
-    {
-        /* With a well-written module we shouldn't have to print an
-         * additional error message here, but just make sure. */
-        msg_Err( p_this, "failed calling entry point in builtin module" );
-        vlc_module_destroy (p_module);
-        return -1;
-    }
+    module->b_builtin = true;
+    module->b_loaded = true;
+    module->b_unloadable = false;
 
-    /* Everything worked fine ! The module is ready to be added to the list. */
-    p_module->b_builtin = true;
     /* LOCK */
-    p_module->next = modules.head;
-    modules.head = p_module;
+    module->next = modules.head;
+    modules.head = module;
     /* UNLOCK */
 
-    return 0;
+    return module;
 }
 
 /*****************************************************************************

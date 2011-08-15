@@ -57,6 +57,8 @@ typedef void * module_handle_t;
 typedef void * module_handle_t;
 #endif
 
+typedef int (*vlc_plugin_cb) (module_t *);
+
 /**
  * Internal module descriptor
  */
