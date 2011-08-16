@@ -856,7 +856,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
 - (void)resizeWindow
 {
-    if ( !b_fullscreen )
+    if ( !b_fullscreen && !(NSAppKitVersionNumber >= 1115.2 && [NSApp currentSystemPresentationOptions] == NSApplicationPresentationFullScreen) )
     {
         NSPoint topleftbase;
         NSPoint topleftscreen;

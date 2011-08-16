@@ -477,10 +477,13 @@ static void OpenglSwap(vlc_gl_t *gl)
  */
 - (void)setWindowFrameWithValue:(NSValue *)value
 {
-    NSRect frame = [value rectValue];
-    if (frame.origin.x <= 0.0 && frame.origin.y <= 0.0)
-        [[self window] center];
-    [[self window] setFrame:frame display:YES animate: YES];
+    if (!(NSAppKitVersionNumber >= 1115.2 && [NSApp currentSystemPresentationOptions] == NSApplicationPresentationFullScreen))
+    {
+        NSRect frame = [value rectValue];
+        if (frame.origin.x <= 0.0 && frame.origin.y <= 0.0)
+            [[self window] center];
+        [[self window] setFrame:frame display:YES animate: YES];
+    }
 }
 
 /**
