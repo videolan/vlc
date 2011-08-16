@@ -892,14 +892,9 @@ void VLMWrapper::EditSchedule( const QString& name, const QString& input,
 
 void VLMDialog::toggleVisible()
 {
-    QList<VLMAWidget *>::iterator it;
-    for( it = vlmItems.begin(); it != vlmItems.end(); ++it )
-    {
-        VLMAWidget *item =  *it;
-        delete item;
-        item = NULL;
-    }
+    qDeleteAll( vlmItems );
     vlmItems.clear();
+
     ui.vlmListItem->clear();
     mediasPopulator();
     QVLCDialog::toggleVisible();
