@@ -338,7 +338,7 @@ void ExtensionListModel::updateList()
     FOREACH_ARRAY( p_ext, p_mgr->extensions )
     {
         ext = new ExtensionCopy( p_ext );
-        extensions.push_back( ext );
+        extensions.append( ext );
     }
     FOREACH_END()
     vlc_mutex_unlock( &p_mgr->lock );

@@ -706,7 +706,7 @@ ModuleListConfigControl::~ModuleListConfigControl()
        cbl->checkBox = cb; \
 \
        cbl->psz_module = strdup( module_get_object( p_parser ) ); \
-       modules.push_back( cbl ); \
+       modules.append( cbl ); \
 \
        if( p_item->value.psz && strstr( p_item->value.psz, cbl->psz_module ) ) \
             cbl->checkBox->setChecked( true ); \
