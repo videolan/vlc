@@ -91,6 +91,8 @@ void vlc_module_destroy (module_t *module)
         vlc_module_destroy (m);
     }
 
+    config_Free (module->p_config, module->confsize);
+
     free (module->domain);
     free (module->psz_filename);
     for (unsigned i = 0; i < module->i_shortcuts; i++)

@@ -1053,7 +1053,5 @@ static void DeleteModule (module_t **head, module_t *p_module)
     if (p_module->b_loaded && p_module->b_unloadable)
         module_Unload (p_module->handle);
 #endif
-
-    config_Free( p_module );
     vlc_module_destroy (p_module);
 }

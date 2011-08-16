@@ -420,18 +420,16 @@ module_config_t *config_FindConfig (vlc_object_t *p_this, const char *name)
     return p ? *p : NULL;
 }
 
-/*****************************************************************************
- * config_Free: frees a duplicated module's configuration data.
- *****************************************************************************
- * This function frees all the data duplicated by config_Duplicate.
- *****************************************************************************/
-void config_Free( module_t *p_module )
+/**
+ * Destroys an array of configuration items.
+ * \param config start of array of items
+ * \param confsize number of items in the array
+ */
+void config_Free (module_config_t *config, size_t confsize)
 {
-    int i;
-
-    for (size_t j = 0; j < p_module->confsize; j++)
+    for (size_t j = 0; j < confsize; j++)
     {
-        module_config_t *p_item = p_module->p_config + j;
+        module_config_t *p_item = config + j;
 
         free( p_item->psz_type );
         free( p_item->psz_name );
@@ -446,10 +444,10 @@ void config_Free( module_t *p_module )
         }
 
         if( p_item->ppsz_list )
-            for( i = 0; i < p_item->i_list; i++ )
+            for (int i = 0; i < p_item->i_list; i++)
                 free( p_item->ppsz_list[i] );
         if( p_item->ppsz_list_text )
-            for( i = 0; i < p_item->i_list; i++ )
+            for (int i = 0; i < p_item->i_list; i++)
                 free( p_item->ppsz_list_text[i] );
         free( p_item->ppsz_list );
         free( p_item->ppsz_list_text );
@@ -457,17 +455,14 @@ void config_Free( module_t *p_module )
 
         if( p_item->i_action )
         {
-            for( i = 0; i < p_item->i_action; i++ )
-            {
+            for (int i = 0; i < p_item->i_action; i++)
                 free( p_item->ppsz_action_text[i] );
-            }
             free( p_item->ppf_action );
             free( p_item->ppsz_action_text );
         }
     }
 
-    free (p_module->p_config);
-    p_module->p_config = NULL;
+    free (config);
 }
 
 #undef config_ResetAll
