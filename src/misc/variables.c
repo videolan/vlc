@@ -170,7 +170,7 @@ static void Destroy( variable_t *p_var )
         free( p_var->choices.p_values );
         free( p_var->choices_text.p_values );
     }
-#ifndef NDEBUG
+#if 0 // ndef NDEBUG
     for (int i = 0; i < p_var->i_entries; i++)
     {
         const char *file = "?", *symbol = "?";
