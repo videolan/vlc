@@ -67,6 +67,12 @@ static VLAboutBox *_o_sharedInstance = nil;
     [super dealloc];
 }
 
+- (void)awakeFromNib
+{
+    if (NSAppKitVersionNumber >= 1115.2)
+        [o_about_window setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
+}
+
 /*****************************************************************************
 * VLC About Window
 *****************************************************************************/

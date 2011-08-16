@@ -71,6 +71,9 @@ static VLCBookmarks *_o_sharedInstance = nil;
 
 - (void)awakeFromNib
 {
+    if (NSAppKitVersionNumber >= 1115.2)
+        [o_bookmarks_window setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
+
     [self initStrings];
 }
 

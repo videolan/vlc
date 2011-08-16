@@ -71,6 +71,9 @@ static VLCWizard *_o_sharedInstance = nil;
 
 - (void)awakeFromNib
 {
+    if (NSAppKitVersionNumber >= 1115.2)
+        [o_wizard_window setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
+
     /* some minor cleanup */
     [o_t2_tbl_plst setEnabled:NO];
     o_userSelections = [[NSMutableDictionary alloc] init];

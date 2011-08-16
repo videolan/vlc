@@ -60,6 +60,9 @@ static VLCVideoEffects *_o_sharedInstance = nil;
 {
     [o_window setTitle: _NS("Video Effects")];
     [o_window setExcludedFromWindowsMenu:YES];
+    if (NSAppKitVersionNumber >= 1115.2)
+        [o_window setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
+
     [[o_tableView tabViewItemAtIndex:[o_tableView indexOfTabViewItemWithIdentifier:@"basic"]] setLabel:_NS("Basic")];
     [[o_tableView tabViewItemAtIndex:[o_tableView indexOfTabViewItemWithIdentifier:@"crop"]] setLabel:_NS("Crop")];
     [[o_tableView tabViewItemAtIndex:[o_tableView indexOfTabViewItemWithIdentifier:@"geometry"]] setLabel:_NS("Geometry")];

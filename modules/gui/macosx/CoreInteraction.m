@@ -278,14 +278,7 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
 
 - (void)toggleFullscreen
 {
-    input_thread_t * p_input = pl_CurrentInput( VLCIntf );
-
-    if( p_input != NULL )
-    {
-        playlist_t * p_playlist = pl_Get( VLCIntf );
-        var_ToggleBool( p_playlist, "fullscreen" );
-
-        vlc_object_release( p_input );
-    }
+    playlist_t * p_playlist = pl_Get( VLCIntf );
+    var_ToggleBool( p_playlist, "fullscreen" );
 }
 @end

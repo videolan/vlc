@@ -38,6 +38,7 @@
 #include <Cocoa/Cocoa.h>
 #import "SPMediaKeyTap.h"                   /* for the media key support */
 #import "misc.h"
+#import "MainWindow.h"
 
 /*****************************************************************************
  * Local prototypes.
@@ -108,7 +109,7 @@ struct intf_sys_t
     BOOL nib_bookmarks_loaded;   /* Bookmarks nibfile */
     BOOL b_active_videoplayback;
 
-    id o_mainwindow;            /* VLCMainWindow */
+    VLCMainWindow *o_mainwindow;            /* VLCMainWindow */
 
     IBOutlet VLCControls * o_controls;     /* VLCControls    */
     IBOutlet VLCPlaylist * o_playlist;     /* VLCPlaylist    */

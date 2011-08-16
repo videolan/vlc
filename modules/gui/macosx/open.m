@@ -104,6 +104,9 @@ static VLCOpen *_o_sharedMainInstance = nil;
 
 - (void)awakeFromNib
 {
+    if (NSAppKitVersionNumber >= 1115.2)
+        [o_panel setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
+
     [o_panel setTitle: _NS("Open Source")];
     [o_mrl_lbl setStringValue: _NS("Media Resource Locator (MRL)")];
 

@@ -41,7 +41,6 @@
 
 #import "intf.h"
 #import "MainMenu.h"
-#import "MainWindow.h"
 #import "vout.h"
 #import "prefs.h"
 #import "playlist.h"
@@ -260,7 +259,6 @@ static int InputEvent( vlc_object_t *p_this, const char *psz_var,
         case INPUT_EVENT_ES:
             break;
         case INPUT_EVENT_TELETEXT:
-            NSLog( @"teletext" );
             break;
         case INPUT_EVENT_AOUT:
             break;
@@ -562,6 +560,9 @@ static VLCMain *_o_sharedMainInstance = nil;
     var_AddCallback(p_playlist, "loop", PlaybackModeUpdated, self);
     var_AddCallback(p_playlist, "volume", VolumeUpdated, self);
     var_AddCallback(p_playlist, "mute", VolumeUpdated, self);
+
+    if ([NSApp currentSystemPresentationOptions] == NSApplicationPresentationFullScreen)
+        var_SetBool( p_playlist, "fullscreen", YES );
 
     /* load our Core Dialogs nib */
     nib_coredialogs_loaded = [NSBundle loadNibNamed:@"CoreDialogs" owner: NSApp];
@@ -1229,10 +1230,30 @@ unsigned int CocoaKeyToVLC( unichar i_key )
 #pragma mark Interface updaters
 - (void)fullscreenChanged
 {
-    if(! [o_mainwindow isFullscreen] )
-        [o_mainwindow performSelectorOnMainThread:@selector(enterFullscreen) withObject:nil waitUntilDone:NO];
+    playlist_t * p_playlist = pl_Get( VLCIntf );
+    BOOL b_fullscreen = var_GetBool( p_playlist, "fullscreen" );
+
+    if (NSAppKitVersionNumber >= 1115.2)
+    {
+        [o_mainwindow toggleFullScreen: self];
+        if(b_fullscreen)
+            [NSApp setPresentationOptions:(NSApplicationPresentationFullScreen)];
+        else
+            [NSApp setPresentationOptions:(NSApplicationPresentationDefault)];
+    }
     else
-        [o_mainwindow performSelectorOnMainThread:@selector(leaveFullscreen) withObject:nil waitUntilDone:NO];
+    {
+        input_thread_t * p_input = pl_CurrentInput( VLCIntf );
+
+        if( p_input != NULL )
+        {
+            if(b_fullscreen)
+                [o_mainwindow performSelectorOnMainThread:@selector(enterFullscreen) withObject:nil waitUntilDone:NO];
+            else
+                [o_mainwindow performSelectorOnMainThread:@selector(leaveFullscreen) withObject:nil waitUntilDone:NO];
+            vlc_object_release( p_input );
+        }
+    }
 }
 
 - (void)PlaylistItemChanged

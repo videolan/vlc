@@ -83,6 +83,7 @@ Interfaces:
  * Mac OS X: new Track Synchronization panel
  * Mac OS X: new Video Effects panel for color and geometry adjustments
  * Mac OS X: re-written Open Disc functionality with automatic media detection
+ * Mac OS X: support for the native fullscreen mode on OS X Lion
  * The rc and telnet lua interfaces were merged into a new "cli" interface
  * dbus: Rewrite of the main loop to use a more efficient poll-based model
  * dbus: Upgrade to an mpris2 compliant interface, see http://www.mpris.org
@@ -99,6 +100,7 @@ Video Output:
    chroma conversion
  * New video output for Android platform, based on Surface
  * Support for 9/10bits output in the OpenGL output
+ * Updated OpenGL video output for Mac, which requires a Quartz Extreme capable Mac
 
 Audio Output:
  * New audio output based on AudioQueue API for iOS

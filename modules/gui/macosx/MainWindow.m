@@ -218,6 +218,8 @@ static VLCMainWindow *_o_sharedInstance = nil;
     o_temp_view = [[NSView alloc] init];
     [o_temp_view setAutoresizingMask:NSViewHeightSizable | NSViewWidthSizable];
     [o_dropzone_view setFrame: [o_playlist_table frame]];
+    if (NSAppKitVersionNumber >= 1115.2)
+        [self setCollectionBehavior: NSWindowCollectionBehaviorFullScreenPrimary];
 
     /* create the sidebar */
     o_sidebaritems = [[NSMutableArray alloc] init];
@@ -803,7 +805,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
         {
             [o_video_view removeFromSuperviewWithoutNeedingDisplay];
             [o_video_view setFrame: [o_split_view frame]];
-            [[self contentView] addSubview: o_video_view];
+            [[self contentView] addSubview:o_video_view positioned:NSWindowAbove relativeTo:nil];
         }
         b_nonembedded = NO;
     }
@@ -1312,8 +1314,6 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
     /* fullscreenAnimation will be unlocked when animation ends */
 }
-
-
 
 /* Make sure setFrame gets executed on main thread especially if we are animating.
  * (Thus we won't block the video output thread) */

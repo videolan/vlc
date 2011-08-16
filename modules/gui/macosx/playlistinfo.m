@@ -69,6 +69,8 @@ static VLCInfo *_o_sharedInstance = nil;
 {
     [o_info_window setExcludedFromWindowsMenu: YES];
     [o_info_window setFloatingPanel: NO];
+    if (NSAppKitVersionNumber >= 1115.2)
+        [o_info_window setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
 
     [o_info_window setTitle: _NS("Media Information")];
     [o_uri_lbl setStringValue: _NS("Location")];
