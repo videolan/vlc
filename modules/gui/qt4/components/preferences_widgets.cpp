@@ -58,6 +58,9 @@
 
 QString formatTooltip(const QString & tooltip)
 {
+    QString text = tooltip;
+    text.replace("\n", "<br/>");
+
     QString formatted =
     "<html><head><meta name=\"qrichtext\" content=\"1\" />"
     "<style type=\"text/css\"> p, li { white-space: pre-wrap; } </style></head>"
@@ -65,8 +68,7 @@ QString formatTooltip(const QString & tooltip)
     "font-style:normal; text-decoration:none;\">"
     "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; "
     "margin-right:0px; -qt-block-indent:0; text-indent:0px;\">" +
-    tooltip +
-    "</p></body></html>";
+    text + "</p></body></html>";
     return formatted;
 }
 
