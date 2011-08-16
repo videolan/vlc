@@ -26,12 +26,6 @@
 #define LEFTMARGIN  18
 #define RIGHTMARGIN 18
 
-#ifndef MAC_OS_X_VERSION_10_6
-@protocol NSComboBoxDataSource <NSObject> @end
-@protocol NSTextFieldDelegate <NSObject> @end
-@protocol NSTableViewDataSource <NSObject> @end
-#endif
-
 static NSMenu   *o_keys_menu = nil;
 
 @interface VLCConfigControl : NSView

@@ -52,6 +52,7 @@
 #include <vlc_common.h>
 #include <vlc_config_cat.h>
 
+#import "CompatibilityFixes.h"
 #import "intf.h"
 #import "prefs.h"
 #import "simple_prefs.h"
@@ -175,7 +176,7 @@ static VLCPrefs *_o_sharedMainInstance = nil;
 {
     p_intf = VLCIntf;
 
-    if (NSAppKitVersionNumber >= 1115.2)
+    if (OSX_LION)
         [o_prefs_window setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
 
     [self initStrings];

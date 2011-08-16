@@ -29,6 +29,7 @@
 #import "about.h"
 #import <vlc_intf_strings.h>
 #import <vlc_about.h>
+#import "CompatibilityFixes.h"
 
 #ifdef __x86_64__
 #define PLATFORM "Intel 64bit"
@@ -69,7 +70,7 @@ static VLAboutBox *_o_sharedInstance = nil;
 
 - (void)awakeFromNib
 {
-    if (NSAppKitVersionNumber >= 1115.2)
+    if (OSX_LION)
         [o_about_window setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
 }
 

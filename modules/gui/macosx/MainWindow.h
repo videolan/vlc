@@ -30,10 +30,6 @@
 #import "misc.h"
 #import "fspanel.h"
 
-#ifndef MAC_OS_X_VERSION_10_6
-@protocol NSAnimationDelegate <NSObject> @end
-#endif
-
 @interface VLCMainWindow : NSWindow <PXSourceListDataSource, PXSourceListDelegate, NSWindowDelegate, NSAnimationDelegate> {
     IBOutlet id o_play_btn;
     IBOutlet id o_bwd_btn;

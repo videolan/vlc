@@ -39,6 +39,7 @@
 #include <vlc_vout_window.h>
 #include <unistd.h> /* execl() */
 
+#import "CompatibilityFixes.h"
 #import "intf.h"
 #import "MainMenu.h"
 #import "vout.h"
@@ -1233,7 +1234,7 @@ unsigned int CocoaKeyToVLC( unichar i_key )
     playlist_t * p_playlist = pl_Get( VLCIntf );
     BOOL b_fullscreen = var_GetBool( p_playlist, "fullscreen" );
 
-    if (NSAppKitVersionNumber >= 1115.2)
+    if (OSX_LION)
     {
         [o_mainwindow toggleFullScreen: self];
         if(b_fullscreen)

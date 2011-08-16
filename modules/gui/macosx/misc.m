@@ -25,6 +25,7 @@
 #import <Cocoa/Cocoa.h>
 #import <Carbon/Carbon.h>
 
+#import "CompatibilityFixes.h"
 #import "intf.h"                                          /* VLCApplication */
 #import "MainWindow.h"
 #import "misc.h"
@@ -147,7 +148,7 @@ static NSMutableArray *blackoutWindows = NULL;
         {
             if ([screen isMainScreen])
             {
-                if (NSAppKitVersionNumber < 1038) // Leopard
+                if (OSX_LEOPARD)
                     SetSystemUIMode( kUIModeAllHidden, kUIOptionAutoShowMenuBar);
                 else
                     [NSApp setPresentationOptions:(NSApplicationPresentationAutoHideDock | NSApplicationPresentationAutoHideMenuBar)];
@@ -166,7 +167,7 @@ static NSMutableArray *blackoutWindows = NULL;
         [blackoutWindow closeAndAnimate: YES];
     }
 
-    if (NSAppKitVersionNumber < 1038) // Leopard
+    if (OSX_LEOPARD)
         SetSystemUIMode( kUIModeNormal, kUIOptionAutoShowMenuBar);
     else
         [NSApp setPresentationOptions:(NSApplicationPresentationDefault)];

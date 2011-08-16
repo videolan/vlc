@@ -27,10 +27,6 @@
 
 #import "misc.h"
 
-#ifndef MAC_OS_X_VERSION_10_6
-@protocol NSAnimationDelegate <NSObject> @end
-#endif
-
 @interface VLCEmbeddedWindow : NSWindow <NSWindowDelegate, NSAnimationDelegate>
 {
     IBOutlet id o_btn_backward;

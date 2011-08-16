@@ -55,6 +55,7 @@
 
 /* this was added by the VideoLAN team to ensure Leopard-compatibility and is VLC-only */
 #import "intf.h"
+#import "CompatibilityFixes.h"
 
 const char* AppleRemoteDeviceName = "AppleIRController";
 const int REMOTE_SWITCH_COOKIE=19;
@@ -99,7 +100,7 @@ static AppleRemote *_o_sharedInstance = nil;
             [cookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonPlay_Sleep]   forKey:@"35_31_18_35_31_18_"];
             [cookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteControl_Switched]   forKey:@"19_"];
         }
-        else if( NSAppKitVersionNumber >= 1115.2 )
+        else if( OSX_LION )
         {
             /* omg, keys from the future */
             msg_Dbg( VLCIntf, "using future AR cookies" );

@@ -37,13 +37,7 @@
 #import "bookmarks.h"
 #import "wizard.h"
 #import <vlc_interface.h>
-
-/*****************************************************************************
- * VLCExtended implementation
- *
- * implements the GUI functions for the window, the data source and the
- * delegate for o_tbl_dataTable
- *****************************************************************************/
+#import "CompatibilityFixes.h"
 
 @implementation VLCBookmarks
 
@@ -71,7 +65,7 @@ static VLCBookmarks *_o_sharedInstance = nil;
 
 - (void)awakeFromNib
 {
-    if (NSAppKitVersionNumber >= 1115.2)
+    if (OSX_LION)
         [o_bookmarks_window setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
 
     [self initStrings];

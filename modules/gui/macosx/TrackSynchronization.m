@@ -22,6 +22,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#import "CompatibilityFixes.h"
 #import "intf.h"
 #import <vlc_common.h>
 #import "TrackSynchronization.h"
@@ -61,7 +62,7 @@ static VLCTrackSynchronization *_o_sharedInstance = nil;
     [o_sv_speed_lbl setStringValue: _NS("Speed of the subtitles:")];
     [[o_sv_speed_value_fld formatter] setFormat:[NSString stringWithFormat:@"#,##0.000 %@", _NS("fps")]];
 
-    if (NSAppKitVersionNumber >= 1115.2)
+    if (OSX_LION)
         [o_window setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
 
     [self resetValues:self];

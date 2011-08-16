@@ -31,6 +31,7 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
+#import "CompatibilityFixes.h"
 #import "wizard.h"
 #import "intf.h"
 #import "playlist.h"
@@ -71,7 +72,7 @@ static VLCWizard *_o_sharedInstance = nil;
 
 - (void)awakeFromNib
 {
-    if (NSAppKitVersionNumber >= 1115.2)
+    if (OSX_LION)
         [o_wizard_window setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
 
     /* some minor cleanup */

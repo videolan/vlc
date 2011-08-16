@@ -40,6 +40,7 @@
 #import <Cocoa/Cocoa.h>
 #import <QTKit/QTKit.h>
 
+#import "CompatibilityFixes.h"
 #import "intf.h"
 #import "playlist.h"
 #import "open.h"
@@ -104,7 +105,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
 
 - (void)awakeFromNib
 {
-    if (NSAppKitVersionNumber >= 1115.2)
+    if (OSX_LION)
         [o_panel setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
 
     [o_panel setTitle: _NS("Open Source")];

@@ -21,6 +21,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#import "CompatibilityFixes.h"
 #import "intf.h"
 #import <vlc_common.h>
 #import "VideoEffects.h"
@@ -60,7 +61,7 @@ static VLCVideoEffects *_o_sharedInstance = nil;
 {
     [o_window setTitle: _NS("Video Effects")];
     [o_window setExcludedFromWindowsMenu:YES];
-    if (NSAppKitVersionNumber >= 1115.2)
+    if (OSX_LION)
         [o_window setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
 
     [[o_tableView tabViewItemAtIndex:[o_tableView indexOfTabViewItemWithIdentifier:@"basic"]] setLabel:_NS("Basic")];

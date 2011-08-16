@@ -30,6 +30,7 @@
 #import "MainWindow.h"
 #import "misc.h"
 #import "fspanel.h"
+#import "CompatibilityFixes.h"
 
 @interface VLCFSPanel ()
 - (void)hideMouse;
@@ -49,7 +50,7 @@
     [win setOpaque:NO];
     [win setHasShadow: NO];
     [win setBackgroundColor:[NSColor clearColor]];
-    if (NSAppKitVersionNumber >= 1115.2)
+    if (OSX_LION)
         [win setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
 
     /* let the window sit on top of everything else and start out completely transparent */

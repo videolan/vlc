@@ -11,11 +11,6 @@
 #import "PXSourceListDelegate.h"
 #import "PXSourceListDataSource.h"
 
-#ifndef MAC_OS_X_VERSION_10_6
-@protocol NSOutlineViewDelegate <NSObject> @end
-@protocol NSOutlineViewDataSource <NSObject> @end
-#endif
-
 @interface PXSourceList: NSOutlineView <NSOutlineViewDelegate, NSOutlineViewDataSource>
 {
 	id <PXSourceListDelegate> _secondaryDelegate;		//Used to store the publicly visible delegate

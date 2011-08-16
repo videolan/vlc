@@ -30,6 +30,7 @@
 #import "intf.h"
 #import "AudioEffects.h"
 #import "../../audio_filter/equalizer_presets.h"
+#import "CompatibilityFixes.h"
 
 #import <vlc_common.h>
 #import <vlc_aout_intf.h>
@@ -102,7 +103,7 @@ static VLCAudioEffects *_o_sharedInstance = nil;
     [[o_tableView tabViewItemAtIndex:[o_tableView indexOfTabViewItemWithIdentifier:@"filter"]] setLabel:_NS("Filter")];
     [o_window setTitle:_NS("Audio Effects")];
     [o_window setExcludedFromWindowsMenu:YES];
-    if (NSAppKitVersionNumber >= 1115.2)
+    if (OSX_LION)
         [o_window setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
 
     [self setupEqualizer];

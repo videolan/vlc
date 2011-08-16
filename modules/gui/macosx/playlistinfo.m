@@ -26,10 +26,11 @@
  * Preamble
  *****************************************************************************/
 
-#include "intf.h"
-#include "playlistinfo.h"
-#include "playlist.h"
-#include <vlc_url.h>
+#import "CompatibilityFixes.h"
+#import "intf.h"
+#import "playlistinfo.h"
+#import "playlist.h"
+#import <vlc_url.h>
 
 /*****************************************************************************
  * VLCPlaylistInfo Implementation
@@ -69,7 +70,7 @@ static VLCInfo *_o_sharedInstance = nil;
 {
     [o_info_window setExcludedFromWindowsMenu: YES];
     [o_info_window setFloatingPanel: NO];
-    if (NSAppKitVersionNumber >= 1115.2)
+    if (OSX_LION)
         [o_info_window setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
 
     [o_info_window setTitle: _NS("Media Information")];

@@ -24,6 +24,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#import "CompatibilityFixes.h"
 #import "MainWindow.h"
 #import "intf.h"
 #import "CoreInteraction.h"
@@ -218,7 +219,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     o_temp_view = [[NSView alloc] init];
     [o_temp_view setAutoresizingMask:NSViewHeightSizable | NSViewWidthSizable];
     [o_dropzone_view setFrame: [o_playlist_table frame]];
-    if (NSAppKitVersionNumber >= 1115.2)
+    if (OSX_LION)
         [self setCollectionBehavior: NSWindowCollectionBehaviorFullScreenPrimary];
 
     /* create the sidebar */
@@ -856,7 +857,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
 - (void)resizeWindow
 {
-    if ( !b_fullscreen && !(NSAppKitVersionNumber >= 1115.2 && [NSApp currentSystemPresentationOptions] == NSApplicationPresentationFullScreen) )
+    if ( !b_fullscreen && !(OSX_LION && [NSApp currentSystemPresentationOptions] == NSApplicationPresentationFullScreen) )
     {
         NSPoint topleftbase;
         NSPoint topleftscreen;
@@ -975,7 +976,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
             if ([screen isMainScreen])
             {
-                if (NSAppKitVersionNumber < 1038) // Leopard
+                if (OSX_LEOPARD)
                     SetSystemUIMode( kUIModeAllHidden, kUIOptionAutoShowMenuBar);
                 else
                     [NSApp setPresentationOptions:(NSApplicationPresentationAutoHideDock | NSApplicationPresentationAutoHideMenuBar)];
@@ -1034,7 +1035,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
     if ([screen isMainScreen])
     {
-        if (NSAppKitVersionNumber < 1038) // Leopard
+        if (OSX_LEOPARD)
             SetSystemUIMode( kUIModeAllHidden, kUIOptionAutoShowMenuBar);
         else
             [NSApp setPresentationOptions:(NSApplicationPresentationAutoHideDock | NSApplicationPresentationAutoHideMenuBar)];
@@ -1143,7 +1144,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
         }
 
         [o_fspanel setNonActive: nil];
-        if (NSAppKitVersionNumber < 1038) // Leopard
+        if (OSX_LEOPARD)
             SetSystemUIMode( kUIModeNormal, kUIOptionAutoShowMenuBar);
         else
             [NSApp setPresentationOptions:(NSApplicationPresentationDefault)];
@@ -1169,7 +1170,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [[o_video_view window] orderFront: self];
 
     [o_fspanel setNonActive: nil];
-    if (NSAppKitVersionNumber < 1038) // Leopard
+    if (OSX_LEOPARD)
         SetSystemUIMode( kUIModeNormal, kUIOptionAutoShowMenuBar);
     else
         [NSApp setPresentationOptions:(NSApplicationPresentationDefault)];

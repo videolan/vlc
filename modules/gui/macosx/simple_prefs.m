@@ -21,6 +21,7 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
 *****************************************************************************/
 
+#import "CompatibilityFixes.h"
 #import "simple_prefs.h"
 #import "prefs.h"
 #import <vlc_keys.h>
@@ -104,7 +105,7 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
     [o_sprefs_toolbar setDelegate: self];
     [o_sprefs_win setToolbar: o_sprefs_toolbar];
 
-    if (NSAppKitVersionNumber >= 1115.2)
+    if (OSX_LION)
         [o_sprefs_win setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
 
     /* setup useful stuff */
