@@ -60,16 +60,7 @@ static struct
  * Local prototypes
  *****************************************************************************/
 #ifdef HAVE_DYNAMIC_PLUGINS
-typedef enum { CACHE_USE, CACHE_RESET, CACHE_IGNORE } cache_mode_t;
-typedef struct module_bank module_bank_t;
-
 static void AllocateAllPlugins (vlc_object_t *);
-static void AllocatePluginPath (vlc_object_t *, const char *, cache_mode_t);
-static void AllocatePluginDir( vlc_object_t *, module_bank_t *, const char *,
-                               unsigned, cache_mode_t );
-static int  AllocatePluginFile( vlc_object_t *, module_bank_t *, const char *,
-                                const struct stat *, cache_mode_t );
-static module_t *module_InitDynamic (vlc_object_t *, const char *, bool);
 #endif
 static module_t *module_InitStatic (vlc_plugin_cb);
 
@@ -229,10 +220,18 @@ module_t **module_list_get (size_t *n)
 char *psz_vlcpath = NULL;
 
 #ifdef HAVE_DYNAMIC_PLUGINS
+typedef enum { CACHE_USE, CACHE_RESET, CACHE_IGNORE } cache_mode_t;
 
-/*****************************************************************************
- * AllocateAllPlugins: load all plugin modules we can find.
- *****************************************************************************/
+static void AllocatePluginPath (vlc_object_t *, const char *, cache_mode_t);
+
+/**
+ * Enumerates all dynamic plug-ins that can be found.
+ *
+ * This function will recursively browse the default plug-ins directory and any
+ * directory listed in the VLC_PLUGIN_PATH environment variable.
+ * For performance reasons, a cache is normally used so that plug-in shared
+ * objects do not need to loaded and linked into the process.
+ */
 static void AllocateAllPlugins (vlc_object_t *p_this)
 {
     const char *vlcpath = psz_vlcpath;
@@ -273,16 +272,26 @@ static void AllocateAllPlugins (vlc_object_t *p_this)
     free( paths );
 }
 
-struct module_bank
+typedef struct module_bank
 {
-    /* Plugins cache */
+    vlc_object_t *obj;
+    const char   *base;
+    cache_mode_t  mode;
+
     size_t         i_cache;
     module_cache_t *cache;
 
     int            i_loaded_cache;
     module_cache_t *loaded_cache;
-};
+} module_bank_t;
 
+static void AllocatePluginDir (module_bank_t *, unsigned,
+                               const char *, const char *);
+
+/**
+ * Scans for plug-ins within a file system hierarchy.
+ * \param path base directory to browse
+ */
 static void AllocatePluginPath (vlc_object_t *p_this, const char *path,
                                 cache_mode_t mode)
 {
@@ -304,13 +313,16 @@ static void AllocatePluginPath (vlc_object_t *p_this, const char *path,
 
     msg_Dbg( p_this, "recursively browsing `%s'", path );
 
+    bank.obj = p_this;
+    bank.base = path;
+    bank.mode = mode;
     bank.cache = NULL;
     bank.i_cache = 0;
     bank.loaded_cache = cache;
     bank.i_loaded_cache = count;
 
     /* Don't go deeper than 5 subdirectories */
-    AllocatePluginDir (p_this, &bank, path, 5, mode);
+    AllocatePluginDir (&bank, 5, path, NULL);
 
     switch( mode )
     {
@@ -330,109 +342,135 @@ static void AllocatePluginPath (vlc_object_t *p_this, const char *path,
     }
 }
 
-/*****************************************************************************
- * AllocatePluginDir: recursively parse a directory to look for plugins
- *****************************************************************************/
-static void AllocatePluginDir( vlc_object_t *p_this, module_bank_t *p_bank,
-                               const char *psz_dir, unsigned i_maxdepth,
-                               cache_mode_t mode )
-{
-    if( i_maxdepth == 0 )
-        return;
+static int AllocatePluginFile (module_bank_t *, const char *,
+                               const char *, const struct stat *);
 
-    DIR *dh = vlc_opendir (psz_dir);
+/**
+ * Recursively browses a directory to look for plug-ins.
+ */
+static void AllocatePluginDir (module_bank_t *bank, unsigned maxdepth,
+                               const char *absdir, const char *reldir)
+{
+    if (maxdepth == 0)
+        return;
+    maxdepth--;
+
+    DIR *dh = vlc_opendir (absdir);
     if (dh == NULL)
         return;
 
     /* Parse the directory and try to load all files it contains. */
     for (;;)
     {
-        char *file = vlc_readdir (dh), *path;
-        struct stat st;
-
+        char *file = vlc_readdir (dh), *relpath = NULL, *abspath = NULL;
         if (file == NULL)
             break;
 
         /* Skip ".", ".." */
         if (!strcmp (file, ".") || !strcmp (file, ".."))
+            goto skip;
+
+        /* Compute path relative to plug-in base directory */
+        if (reldir != NULL)
         {
-            free (file);
-            continue;
+            if (asprintf (&relpath, "%s"DIR_SEP"%s", reldir, file) == -1)
+                relpath = NULL;
+        }
+        else
+            relpath = strdup (file);
+        if (unlikely(relpath == NULL))
+            goto skip;
+
+        /* Compute absolute path */
+        if (asprintf (&abspath, "%s"DIR_SEP"%s", bank->base, relpath) == -1)
+        {
+            abspath = NULL;
+            goto skip;
         }
 
-        const int pathlen = asprintf (&path, "%s"DIR_SEP"%s", psz_dir, file);
-        free (file);
-        if (pathlen == -1 || vlc_stat (path, &st))
-            continue;
+        struct stat st;
+        if (vlc_stat (abspath, &st) == -1)
+            goto skip;
 
-        if (S_ISDIR (st.st_mode))
+        if (S_ISREG (st.st_mode))
+        {
+            static const char prefix[] = "lib";
+            static const char suffix[] = "_plugin"LIBEXT;
+            size_t len = strlen (file);
+
+            /* Check that file matches the "lib*_plugin"LIBEXT pattern */
+            if (len > strlen (suffix)
+             && !strncmp (file, prefix, strlen (prefix))
+             && !strcmp (file + len - strlen (suffix), suffix))
+                AllocatePluginFile (bank, abspath, relpath, &st);
+        }
+        else if (S_ISDIR (st.st_mode))
             /* Recurse into another directory */
-            AllocatePluginDir (p_this, p_bank, path, i_maxdepth - 1, mode);
-        else
-        if (S_ISREG (st.st_mode)
-         && strncmp (path, "lib", 3)
-         && ((size_t)pathlen >= sizeof ("_plugin"LIBEXT))
-         && !strncasecmp (path + pathlen - strlen ("_plugin"LIBEXT),
-                          "_plugin"LIBEXT, strlen ("_plugni"LIBEXT)))
-            /* ^^ We only load files matching "lib*_plugin"LIBEXT */
-            AllocatePluginFile (p_this, p_bank, path, &st, mode);
-
-        free (path);
+            AllocatePluginDir (bank, maxdepth, abspath, relpath);
+    skip:
+        free (relpath);
+        free (abspath);
+        free (file);
     }
     closedir (dh);
 }
 
-/*****************************************************************************
- * AllocatePluginFile: load a module into memory and initialize it.
- *****************************************************************************
- * This function loads a dynamically loadable module and allocates a structure
- * for its information data. The module can then be handled by module_need
- * and module_unneed.
- *****************************************************************************/
-static int AllocatePluginFile( vlc_object_t * p_this, module_bank_t *p_bank,
-                               const char *path, const struct stat *st,
-                               cache_mode_t mode )
+static module_t *module_InitDynamic (vlc_object_t *, const char *, bool);
+
+/**
+ * Scans a plug-in from a file.
+ */
+static int AllocatePluginFile (module_bank_t *bank, const char *abspath,
+                               const char *relpath, const struct stat *st)
 {
-    module_t * p_module = NULL;
+    module_t *module = NULL;
 
     /* Check our plugins cache first then load plugin if needed */
-    if( mode == CACHE_USE )
-        p_module = CacheFind (p_bank->loaded_cache, p_bank->i_loaded_cache,
-                              path, st);
-    if( p_module == NULL )
-        p_module = module_InitDynamic (p_this, path, true);
-    if( p_module == NULL )
+    if (bank->mode == CACHE_USE)
+    {
+        module = CacheFind (bank->loaded_cache, bank->i_loaded_cache,
+                            relpath, st);
+        if (module != NULL)
+        {
+            module->psz_filename = strdup (abspath);
+            if (unlikely(module->psz_filename == NULL))
+            {
+                vlc_module_destroy (module);
+                module = NULL;
+            }
+        }
+    }
+    if (module == NULL)
+        module = module_InitDynamic (bank->obj, abspath, true);
+    if (module == NULL)
         return -1;
 
     /* We have not already scanned and inserted this module */
-    assert( p_module->next == NULL );
+    assert (module->next == NULL);
 
     /* Unload plugin until we really need it */
-    if( p_module->b_loaded && p_module->b_unloadable )
+    if (module->b_loaded && module->b_unloadable)
     {
-        module_Unload( p_module->handle );
-        p_module->b_loaded = false;
+        module_Unload (module->handle);
+        module->b_loaded = false;
     }
 
     /* For now we force loading if the module's config contains
      * callbacks or actions.
      * Could be optimized by adding an API call.*/
-    for( size_t n = p_module->confsize, i = 0; i < n; i++ )
-         if( p_module->p_config[i].i_action )
+    for (size_t n = module->confsize, i = 0; i < n; i++)
+         if (module->p_config[i].i_action)
          {
              /* !unloadable not allowed for plugins with callbacks */
-             vlc_module_destroy (p_module);
-             p_module = module_InitDynamic (p_this, path, false);
+             vlc_module_destroy (module);
+             module = module_InitDynamic (bank->obj, abspath, false);
              break;
          }
 
-    module_StoreBank (p_module);
+    module_StoreBank (module);
 
-    if( mode == CACHE_IGNORE )
-        return 0;
-
-    /* Add entry to cache */
-    CacheAdd (&p_bank->cache, &p_bank->i_cache, path, st, p_module);
+    if (bank->mode != CACHE_IGNORE) /* Add entry to cache */
+        CacheAdd (&bank->cache, &bank->i_cache, relpath, st, module);
     /* TODO: deal with errors */
     return  0;
 }
@@ -446,8 +484,8 @@ static int AllocatePluginFile( vlc_object_t * p_this, module_bank_t *p_bank,
  * \param fast whether to optimize loading for speed or safety
  *             (fast is used when the plug-in is registered but not used)
  */
-static module_t *module_InitDynamic (vlc_object_t *obj,
-                                     const char *path, bool fast)
+static module_t *module_InitDynamic (vlc_object_t *obj, const char *path,
+                                     bool fast)
 {
     module_handle_t handle;
 

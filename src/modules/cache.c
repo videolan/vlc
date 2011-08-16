@@ -59,7 +59,7 @@ static int    CacheLoadConfig  ( module_t *, FILE * );
 
 /* Sub-version number
  * (only used to avoid breakage in dev version when cache structure changes) */
-#define CACHE_SUBVERSION_NUM 16
+#define CACHE_SUBVERSION_NUM 17
 
 /* Cache filename */
 #define CACHE_NAME "plugins.dat"
@@ -638,9 +638,6 @@ module_t *CacheFind (module_cache_t *cache, size_t count,
        {
             module_t *module = cache->p_module;
             cache->p_module = NULL;
-
-            module->psz_filename = cache->path;
-            cache->path = NULL;
             return module;
        }
        cache++;
