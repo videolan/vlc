@@ -2037,10 +2037,6 @@ have_v4l2="no"
 AS_IF([test "${enable_v4l2}" != "no"], [
   AC_CHECK_HEADERS([linux/videodev2.h sys/videoio.h], [
     have_v4l2="yes"
-  ], [
-    AS_IF([test "x${enable_v4l2}" != "x"], [
-      AC_MSG_ERROR([Video4Linux2 headers not found!])
-    ])
   ])
 ])
 AM_CONDITIONAL(HAVE_V4L2, [test "${have_v4l2}" != "no"])
