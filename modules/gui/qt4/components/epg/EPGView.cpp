@@ -106,7 +106,7 @@ const QDateTime& EPGView::baseTime()
 
 bool EPGView::hasValidData()
 {
-    return !epgitemsByChannel.empty();
+    return !epgitemsByChannel.isEmpty();
 }
 
 static void cleanOverlapped( EPGEventByTimeQMap *epgItemByTime, EPGItem *epgItem, QGraphicsScene *scene )
@@ -207,7 +207,7 @@ void EPGView::removeEPGEvent( vlc_epg_event_t *data, QString channelName )
             delete epgItem;
         }
 
-        if ( epgItemByTime->keys().empty() )
+        if ( epgItemByTime->keys().isEmpty() )
         { /* Now unused channel */
             epgitemsByChannel.remove( channelName );
             delete epgItemByTime;
@@ -275,7 +275,7 @@ void EPGView::cleanup()
             }
         }
 
-        if ( epgItemByTime->keys().empty() )
+        if ( epgItemByTime->keys().isEmpty() )
         { /* Now unused channel */
             epgitemsByChannel.remove( channelName );
             delete epgItemByTime;

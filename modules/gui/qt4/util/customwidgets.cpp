@@ -344,7 +344,7 @@ void AnimatedIcon::play( int loops, int interval )
         interval = 20;
     }
 
-    if( !mIdleFrame && (mFrames.empty() || loops != 0 ) )
+    if( !mIdleFrame && (mFrames.isEmpty() || loops != 0 ) )
     {
 #ifndef NDEBUG
         printf( "AnimatedIcon::play(): no frames to display" );
@@ -373,7 +373,7 @@ void AnimatedIcon::play( int loops, int interval )
 // private slot
 void AnimatedIcon::onTimerTick()
 {
-    //assert( !mFrames.empty() );
+    //assert( !mFrames.isEmpty() );
     if( ++mCurrentFrame > mFrames.count() )
     {
         if( mRemainingLoops != -1 )
