@@ -511,17 +511,17 @@ found_shortcut:
 
         if (!p_real->b_loaded)
         {
-            assert (p_real->psz_filename != NULL);
+            module_t *uncache; /* Map module in process */
 
-            module_t *p_new_module =
-                module_InitDynamic (p_this, p_real->psz_filename, false);
-            if( p_new_module == NULL )
+            assert (p_real->psz_filename != NULL);
+            uncache = module_InitDynamic (p_this, p_real->psz_filename, false);
+            if (uncache == NULL)
             {   /* Corrupted module */
                 msg_Err( p_this, "possibly corrupt module cache" );
                 continue;
             }
-            CacheMerge( p_this, p_real, p_new_module );
-            DeleteModule (&modules.head, p_new_module);
+            CacheMerge (p_this, p_real, uncache);
+            vlc_module_destroy (uncache);
         }
 #endif
         p_this->b_force = p_list[i].b_force;
@@ -834,10 +834,11 @@ static void AllocatePluginPath (vlc_object_t *p_this, const char *path,
     switch( mode )
     {
         case CACHE_USE:
+            /* Discard unmatched cache entries */
             for( size_t i = 0; i < count; i++ )
             {
                 if (cache[i].p_module != NULL)
-                   DeleteModule (&modules.head, cache[i].p_module);
+                   vlc_module_destroy (cache[i].p_module);
                 free (cache[i].path);
             }
             free( cache );
@@ -939,8 +940,7 @@ static int AllocatePluginFile( vlc_object_t * p_this, module_bank_t *p_bank,
          if( p_module->p_config[i].i_action )
          {
              /* !unloadable not allowed for plugins with callbacks */
-             assert( !p_module->b_loaded );
-             DeleteModule (&modules.head, p_module);
+             vlc_module_destroy (p_module);
              p_module = module_InitDynamic (p_this, path, false);
              break;
          }
@@ -1051,7 +1051,10 @@ static void DeleteModule (module_t **head, module_t *p_module)
     /* We free the structures that we strdup()ed in Allocate*Module(). */
 #ifdef HAVE_DYNAMIC_PLUGINS
     if (p_module->b_loaded && p_module->b_unloadable)
+    {
         module_Unload (p_module->handle);
+        p_module->b_loaded = false;
+    }
 #endif
     vlc_module_destroy (p_module);
 }

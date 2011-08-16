@@ -83,8 +83,14 @@ module_t *vlc_module_create (module_t *parent)
     return module;
 }
 
+/**
+ * Destroys a plug-in.
+ * @warning If the plug-in is loaded in memory, the handle will be leaked.
+ */
 void vlc_module_destroy (module_t *module)
 {
+    assert (!module->b_loaded || !module->b_unloadable);
+
     for (module_t *m = module->submodule, *next; m != NULL; m = next)
     {
         next = m->next;
