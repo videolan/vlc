@@ -439,6 +439,7 @@ SOURCES_libvlc_common = \
 	misc/picture_pool.c \
 	modules/modules.h \
 	modules/modules.c \
+	modules/bank.c \
 	modules/cache.c \
 	modules/entry.c \
 	modules/textdomain.c \
