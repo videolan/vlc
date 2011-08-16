@@ -91,10 +91,10 @@ struct intf_sys_t
 #define qtu( i ) ((i).toUtf8().constData())
 
 #define CONNECT( a, b, c, d ) \
-        connect( a, SIGNAL( b ), c, SLOT(d) )
+        connect( a, SIGNAL(b), c, SLOT(d) )
 #define DCONNECT( a, b, c, d ) \
-        connect( a, SIGNAL( b ), c, SLOT(d), Qt::DirectConnection )
-#define BUTTONACT( b, a ) connect( b, SIGNAL( clicked() ), this, SLOT(a) )
+        connect( a, SIGNAL(b), c, SLOT(d), Qt::DirectConnection )
+#define BUTTONACT( b, a ) connect( b, SIGNAL(clicked()), this, SLOT(a) )
 
 #define BUTTON_SET( button, text, tooltip )  \
     button->setText( text );                 \
