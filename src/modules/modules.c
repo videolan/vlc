@@ -83,7 +83,6 @@ static int  AllocatePluginFile( vlc_object_t *, module_bank_t *, const char *,
 static module_t *module_InitDynamic (vlc_object_t *, const char *, bool);
 #endif
 static module_t *module_InitStatic (vlc_plugin_cb);
-static void DeleteModule (module_t **, module_t *);
 
 /**
  * Init bank
@@ -144,7 +143,19 @@ void module_EndBank (bool b_plugins)
     vlc_mutex_unlock (&modules.lock);
 
     while (head != NULL)
-        DeleteModule (&head, head);
+    {
+        module_t *module = head;
+
+        head = module->next;
+#ifdef HAVE_DYNAMIC_PLUGINS
+        if (module->b_loaded && module->b_unloadable)
+        {
+            module_Unload (module->handle);
+            module->b_loaded = false;
+        }
+#endif
+        vlc_module_destroy (module);
+    }
 }
 
 #undef module_LoadPlugins
@@ -906,7 +917,7 @@ static void AllocatePluginDir( vlc_object_t *p_this, module_bank_t *p_bank,
  *****************************************************************************
  * This function loads a dynamically loadable module and allocates a structure
  * for its information data. The module can then be handled by module_need
- * and module_unneed. It can be removed by DeleteModule.
+ * and module_unneed.
  *****************************************************************************/
 static int AllocatePluginFile( vlc_object_t * p_this, module_bank_t *p_bank,
                                const char *path, const struct stat *st,
@@ -961,7 +972,6 @@ static int AllocatePluginFile( vlc_object_t * p_this, module_bank_t *p_bank,
  * Loads a dynamically-linked plug-in into memory and initialize it.
  *
  * The module can then be handled by module_need() and module_unneed().
- * It can be removed by DeleteModule.
  *
  * \param path file path of the shared object
  * \param fast whether to optimize loading for speed or safety
@@ -1029,32 +1039,4 @@ static module_t *module_InitStatic (vlc_plugin_cb entry)
     /* UNLOCK */
 
     return module;
-}
-
-/*****************************************************************************
- * DeleteModule: delete a module and its structure.
- *****************************************************************************
- * This function can only be called if the module isn't being used.
- *****************************************************************************/
-static void DeleteModule (module_t **head, module_t *p_module)
-{
-    assert( p_module );
-    assert (p_module->parent == NULL);
-
-    /* Unlist the module (if it is in the list) */
-    module_t **pp_self = head;
-    while (*pp_self != NULL && *pp_self != p_module)
-        pp_self = &((*pp_self)->next);
-    if (*pp_self)
-        *pp_self = p_module->next;
-
-    /* We free the structures that we strdup()ed in Allocate*Module(). */
-#ifdef HAVE_DYNAMIC_PLUGINS
-    if (p_module->b_loaded && p_module->b_unloadable)
-    {
-        module_Unload (p_module->handle);
-        p_module->b_loaded = false;
-    }
-#endif
-    vlc_module_destroy (p_module);
 }
