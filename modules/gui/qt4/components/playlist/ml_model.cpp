@@ -235,7 +235,7 @@ void MLModel::remove( MLItem *item )
 
 void MLModel::doDelete( QModelIndexList list )
 {
-    for (int i = 0; i < list.size(); ++i)
+    for (int i = 0; i < list.count(); ++i)
     {
         int id = getId( list.at(i) );
         ml_DeleteSimple( p_ml, id );
@@ -562,7 +562,7 @@ void MLModel::popupInfo()
 QStringList MLModel::selectedURIs()
 {
     QStringList list;
-    for( int i = 0; i < current_selection.size(); i++ )
+    for( int i = 0; i < current_selection.count(); i++ )
     {
         QModelIndex idx = current_selection.value(i);
         MLItem *item = static_cast< MLItem* >( idx.internalPointer() );

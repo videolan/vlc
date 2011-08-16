@@ -380,7 +380,7 @@ QModelIndex ExtensionListModel::index( int row, int column,
 {
     if( column != 0 )
         return QModelIndex();
-    if( row < 0 || row >= extensions.size() )
+    if( row < 0 || row >= extensions.count() )
         return QModelIndex();
 
     return createIndex( row, 0, extensions.at( row ) );

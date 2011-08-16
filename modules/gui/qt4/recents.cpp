@@ -100,7 +100,7 @@ void RecentsMRL::addRecent( const QString &mrl )
     else
     {
         stack->prepend( mrl );
-        if( stack->size() > RECENTS_LIST_SIZE )
+        if( stack->count() > RECENTS_LIST_SIZE )
             stack->takeLast();
     }
     QVLCMenu::updateRecents( p_intf );
@@ -128,7 +128,7 @@ void RecentsMRL::load()
     QStringList list = getSettings()->value( "RecentsMRL/list" ).toStringList();
 
     /* And filter the regexp on the list */
-    for( int i = 0; i < list.size(); ++i )
+    for( int i = 0; i < list.count(); ++i )
     {
         if ( !filter || filter->indexIn( list.at(i) ) == -1 )
             stack->append( list.at(i) );

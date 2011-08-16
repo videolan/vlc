@@ -49,7 +49,7 @@ Qt::ItemFlags MLDirModel::flags( const QModelIndex &index ) const
     flags |= Qt::ItemIsUserCheckable;
     if( b_recursive )
     {
-        for( int i = 0; i < monitoredDirs.size(); i++ )
+        for( int i = 0; i < monitoredDirs.count(); i++ )
         {
             if( filePath( index ).startsWith( monitoredDirs.at( i ) ) )
             {
@@ -70,7 +70,7 @@ QVariant MLDirModel::data( const QModelIndex &index, int role ) const
             return itemCheckState.value( filePath( index ) );
         else if( b_recursive )
         {
-            for( int i = 0; i < monitoredDirs.size(); i++ )
+            for( int i = 0; i < monitoredDirs.count(); i++ )
             {
                 if( filePath( index ).startsWith( monitoredDirs.at( i ) ) )
                     return Qt::Checked;
@@ -108,7 +108,7 @@ bool MLDirModel::setData( const QModelIndex &index, const QVariant &value,
                in recursive mode */
             if( b_recursive )
             {
-                for( int i = 0; i < monitoredDirs.size()-1; i++ )
+                for( int i = 0; i < monitoredDirs.count()-1; i++ )
                 {
                     if( monitoredDirs.at( i ).startsWith( filePath( index ) ) )
                     {
@@ -126,13 +126,13 @@ bool MLDirModel::setData( const QModelIndex &index, const QVariant &value,
                if index is his only child */
             for( idx = index.parent(); idx != QModelIndex(); idx = idx.parent() )
             {
-                if( monitoredDirs.size() == 0 )
+                if( monitoredDirs.count() == 0 )
                 {
                     itemCheckState.take( filePath(idx) );
                     topLeft = idx;
                     continue;
                 }
-                for( int i = 0; i < monitoredDirs.size(); i++ )
+                for( int i = 0; i < monitoredDirs.count(); i++ )
                 {
                     if( monitoredDirs.at( i ).startsWith( filePath( idx ) ) )
                         break;
@@ -173,9 +173,9 @@ void MLDirModel::setRecursivity( bool _b_recursive )
        monitoredDirs some directories  */
     if( !b_recursive && _b_recursive )
     {
-        for( int i = 0; i < monitoredDirs.size(); i++ )
+        for( int i = 0; i < monitoredDirs.count(); i++ )
         {
-            for( int j = i+1; j < monitoredDirs.size(); j++ )
+            for( int j = i+1; j < monitoredDirs.count(); j++ )
             {
                 if( monitoredDirs.at( i ).startsWith( monitoredDirs.at( j ) ) )
                 {
@@ -271,11 +271,11 @@ void MLConfDialog::save()
         }
     }
 
-    for( int i = 0; i < toDelete.size(); i++ )
+    for( int i = 0; i < toDelete.count(); i++ )
     {
         ml_Control( p_ml, ML_DEL_MONITORED, qtu( toDelete.at( i ) ) );
     }
-    for( int i = 0; i < newDirs.size(); i++ )
+    for( int i = 0; i < newDirs.count(); i++ )
     {
         ml_Control( p_ml, ML_ADD_MONITORED, qtu( newDirs.at( i ) ) );
     }

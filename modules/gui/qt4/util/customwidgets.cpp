@@ -327,7 +327,7 @@ void AnimatedIcon::addFrame( const QPixmap &pxm, int index )
         return;
     }
     QPixmap *copy = new QPixmap( pxm );
-    mFrames.insert( ( index < 0 || index > mFrames.size() ) ? mFrames.size() :
+    mFrames.insert( ( index < 0 || index > mFrames.count() ) ? mFrames.count() :
                     index, copy );
     if( !pixmap() )
         setPixmap( *copy );
@@ -374,7 +374,7 @@ void AnimatedIcon::play( int loops, int interval )
 void AnimatedIcon::onTimerTick()
 {
     //assert( !mFrames.empty() );
-    if( ++mCurrentFrame > mFrames.size() )
+    if( ++mCurrentFrame > mFrames.count() )
     {
         if( mRemainingLoops != -1 )
         {
@@ -387,7 +387,7 @@ void AnimatedIcon::onTimerTick()
         }
         mCurrentFrame = 1;
     }
-    //assert( mCurrentFrame >= 1 && mCurrentFrame <= mFrames.size() );
+    //assert( mCurrentFrame >= 1 && mCurrentFrame <= mFrames.count() );
     setPixmap( *mFrames.at( mCurrentFrame - 1 ) );
 }
 

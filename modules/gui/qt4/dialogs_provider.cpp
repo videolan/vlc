@@ -640,7 +640,7 @@ void DialogsProvider::streamingDialog( QWidget *parent,
         p_input = input_item_New( qtu( mrl ), _("Streaming") );
 
         /* Add normal Options */
-        for( int j = 0; j < options.size(); j++ )
+        for( int j = 0; j < options.count(); j++ )
         {
             QString qs = colon_unescape( options[j] );
             if( !qs.isEmpty() )

@@ -504,8 +504,8 @@ SoundSlider::SoundSlider( QWidget *_parent, int _i_step, bool b_hard,
     free( psz_colors );
 
     /* Fill with 255 if the list is too short */
-    if( colorList.size() < 12 )
-        for( int i = colorList.size(); i < 12; i++)
+    if( colorList.count() < 12 )
+        for( int i = colorList.count(); i < 12; i++)
             colorList.append( "255" );
 
     /* Regular colors */

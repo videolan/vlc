@@ -198,7 +198,7 @@ OpenDialog::~OpenDialog()
 /* Used by VLM dialog and inputSlave selection */
 QString OpenDialog::getMRL( bool b_all )
 {
-    if( itemsMRL.size() == 0 ) return "";
+    if( itemsMRL.count() == 0 ) return "";
     return b_all ? itemsMRL[0] + ui.advancedLineInput->text()
                  : itemsMRL[0];
 }
@@ -359,7 +359,7 @@ void OpenDialog::finish( bool b_enqueue = false )
     itemsMRL.sort();
 
     /* Go through the item list */
-    for( int i = 0; i < itemsMRL.size(); i++ )
+    for( int i = 0; i < itemsMRL.count(); i++ )
     {
         bool b_start = !i && !b_enqueue;
 
@@ -374,7 +374,7 @@ void OpenDialog::finish( bool b_enqueue = false )
             QStringList optionsList = ui.advancedLineInput->text().split( " :" );
 
             /* Insert options */
-            for( int j = 0; j < optionsList.size(); j++ )
+            for( int j = 0; j < optionsList.count(); j++ )
             {
                 QString qs = colon_unescape( optionsList[j] );
                 if( !qs.isEmpty() )
@@ -461,10 +461,10 @@ QStringList OpenDialog::SeparateEntries( const QString& entries )
     QString entry;
 
     int index = 0;
-    while( index < entries.size() )
+    while( index < entries.count() )
     {
         int delim_pos = entries.indexOf( QRegExp( "\\s+|\"" ), index );
-        if( delim_pos < 0 ) delim_pos = entries.size() - 1;
+        if( delim_pos < 0 ) delim_pos = entries.count() - 1;
         entry += entries.mid( index, delim_pos - index + 1 );
         index = delim_pos + 1;
 
@@ -473,22 +473,22 @@ QStringList OpenDialog::SeparateEntries( const QString& entries )
         if( !b_quotes_mode && entry.endsWith( "\"" ) )
         {
             /* Enters quotes mode */
-            entry.truncate( entry.size() - 1 );
+            entry.truncate( entry.count() - 1 );
             b_quotes_mode = true;
         }
         else if( b_quotes_mode && entry.endsWith( "\"" ) )
         {
             /* Finished the quotes mode */
-            entry.truncate( entry.size() - 1 );
+            entry.truncate( entry.count() - 1 );
             b_quotes_mode = false;
         }
         else if( !b_quotes_mode && !entry.endsWith( "\"" ) )
         {
             /* we found a non-quoted standalone string */
-            if( index < entries.size() ||
+            if( index < entries.count() ||
                 entry.endsWith( " " ) || entry.endsWith( "\t" ) ||
                 entry.endsWith( "\r" ) || entry.endsWith( "\n" ) )
-                entry.truncate( entry.size() - 1 );
+                entry.truncate( entry.count() - 1 );
             if( !entry.isEmpty() ) entries_array.append( entry );
             entry.clear();
         }

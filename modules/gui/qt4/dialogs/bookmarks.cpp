@@ -218,11 +218,11 @@ void BookmarksDialog::edit( QTreeWidgetItem *item, int column )
     else if( column == 2 )
     {
         fields = item->text( column ).split( ":", QString::SkipEmptyParts );
-        if( fields.size() == 1 )
+        if( fields.count() == 1 )
             p_seekpoint->i_time_offset = 1000000 * ( fields[0].toInt() );
-        else if( fields.size() == 2 )
+        else if( fields.count() == 2 )
             p_seekpoint->i_time_offset = 1000000 * ( fields[0].toInt() * 60 + fields[1].toInt() );
-        else if( fields.size() == 3 )
+        else if( fields.count() == 3 )
             p_seekpoint->i_time_offset = 1000000 * ( fields[0].toInt() * 3600 + fields[1].toInt() * 60 + fields[2].toInt() );
         else
         {

@@ -168,7 +168,7 @@ void VLCProfileSelector::saveProfiles()
 void VLCProfileSelector::updateOptions( int i )
 {
     QStringList options = profileBox->itemData( i ).toString().split( ";" );
-    if( options.size() < 16 )
+    if( options.count() < 16 )
         return;
 
     mux = options[0];
@@ -317,7 +317,7 @@ inline void VLCProfileEditor::registerCodecs()
 void VLCProfileEditor::fillProfile( const QString& qs )
 {
     QStringList options = qs.split( ";" );
-    if( options.size() < 16 )
+    if( options.count() < 16 )
         return;
 
     const QString mux = options[0];

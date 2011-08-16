@@ -1450,7 +1450,7 @@ void KeyInputDialog::checkForConflicts( int i_vlckey )
          table->findItems( VLCKeyToString( i_vlckey ), Qt::MatchExactly,
                            b_global ? 2 : 1 );
 
-    if( conflictList.size() &&
+    if( conflictList.count() &&
         conflictList[0]->data( b_global ? 2 : 1, Qt::UserRole ).toInt() > 1 )
         /* Avoid 0 or -1 that are the "Unset" states */
     {

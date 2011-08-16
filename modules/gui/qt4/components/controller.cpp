@@ -112,10 +112,10 @@ void AbstractController::parseAndCreate( const QString& config,
                                          QBoxLayout *controlLayout )
 {
     QStringList list = config.split( ";", QString::SkipEmptyParts ) ;
-    for( int i = 0; i < list.size(); i++ )
+    for( int i = 0; i < list.count(); i++ )
     {
         QStringList list2 = list.at( i ).split( "-" );
-        if( list2.size() < 1 )
+        if( list2.count() < 1 )
         {
             msg_Warn( p_intf, "Parsing error 1. Please, report this." );
             continue;
@@ -130,7 +130,7 @@ void AbstractController::parseAndCreate( const QString& config,
             continue;
         }
 
-        if( list2.size() > 1 )
+        if( list2.count() > 1 )
         {
             i_option = list2.at( 1 ).toInt( &ok );
             if( !ok )
@@ -471,7 +471,7 @@ QWidget *AbstractController::createWidget( buttonType_e button, int options )
         if( frame )
         {
             QList<QToolButton *> allTButtons = frame->findChildren<QToolButton *>();
-            for( int i = 0; i < allTButtons.size(); i++ )
+            for( int i = 0; i < allTButtons.count(); i++ )
                 applyAttributes( allTButtons[i], b_flat, b_big );
         }
         else

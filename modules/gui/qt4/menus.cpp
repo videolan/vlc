@@ -154,7 +154,7 @@ void EnableStaticEntries( QMenu *menu, bool enable = true )
     if( !menu ) return;
 
     QList< QAction* > actions = menu->actions();
-    for( int i = 0; i < actions.size(); ++i )
+    for( int i = 0; i < actions.count(); ++i )
     {
         actions[i]->setEnabled( actions[i]->data().toString()
                                 == ENTRY_ALWAYS_ENABLED ||
@@ -173,7 +173,7 @@ inline int DeleteNonStaticEntries( QMenu *menu )
     int i_ret = 0;
 
     QList< QAction* > actions = menu->actions();
-    for( int i = 0; i < actions.size(); ++i )
+    for( int i = 0; i < actions.count(); ++i )
     {
         if( actions[i]->data().toString() != STATIC_ENTRY )
             delete actions[i];
@@ -189,7 +189,7 @@ inline int DeleteNonStaticEntries( QMenu *menu )
 static QAction * FindActionWithVar( QMenu *menu, const char *psz_var )
 {
     QList< QAction* > actions = menu->actions();
-    for( int i = 0; i < actions.size(); ++i )
+    for( int i = 0; i < actions.count(); ++i )
     {
         if( actions[i]->data().toString() == psz_var )
             return actions[i];
@@ -1113,7 +1113,7 @@ QMenu * QVLCMenu::Populate( intf_thread_t *p_intf,
 
     currentGroup = NULL;
 
-    for( int i = 0; i < (int)objects.size() ; i++ )
+    for( int i = 0; i < (int)objects.count() ; i++ )
     {
         if( !varnames[i] || !*varnames[i] )
         {
@@ -1478,14 +1478,14 @@ void QVLCMenu::updateRecents( intf_thread_t *p_intf )
 
         recentsMenu->clear();
 
-        if( !l.size() )
+        if( !l.count() )
         {
             action = recentsMenu->addAction( qtr(" - Empty - ") );
             action->setEnabled( false );
         }
         else
         {
-            for( int i = 0; i < l.size(); ++i )
+            for( int i = 0; i < l.count(); ++i )
             {
                 char *psz_temp = decode_URI_duplicate( qtu( l.at( i ) ) );
 

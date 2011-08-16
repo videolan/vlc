@@ -596,7 +596,7 @@ NetOpenPanel::~NetOpenPanel()
     if( !mrlList ) return;
 
     QStringList tempL = mrlList->stringList();
-    while( tempL.size() > 8 ) tempL.removeFirst();
+    while( tempL.count() > 8 ) tempL.removeFirst();
 
     getSettings()->setValue( "Open/netMRL", tempL );
 
@@ -1303,7 +1303,7 @@ void CaptureOpenPanel::advancedDialog()
     if( adv->exec() )
     {
         QString tempMRL = "";
-        for( int i = 0; i < controls.size(); i++ )
+        for( int i = 0; i < controls.count(); i++ )
         {
             ConfigControl *control = controls[i];
 
