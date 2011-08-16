@@ -156,8 +156,16 @@ static VLCMainWindow *_o_sharedInstance = nil;
         [o_volume_down_btn setImage: [NSImage imageNamed:@"volume-low"]];
         [o_volume_track_view setImage: [NSImage imageNamed:@"volume-slider-track"]];
         [o_volume_up_btn setImage: [NSImage imageNamed:@"volume-high"]];
-        [o_effects_btn setImage: [NSImage imageNamed:@"effects-double-buttons"]];
-        [o_effects_btn setAlternateImage: [NSImage imageNamed:@"effects-double-buttons-pressed"]];
+        if (OSX_LION)
+        {
+            [o_effects_btn setImage: [NSImage imageNamed:@"effects-one-button"]];
+            [o_effects_btn setAlternateImage: [NSImage imageNamed:@"effects-one-button-blue"]];
+        }
+        else
+        {
+            [o_effects_btn setImage: [NSImage imageNamed:@"effects-double-buttons"]];
+            [o_effects_btn setAlternateImage: [NSImage imageNamed:@"effects-double-buttons-pressed"]];
+        }
         [o_fullscreen_btn setImage: [NSImage imageNamed:@"fullscreen-double-buttons"]];
         [o_fullscreen_btn setAlternateImage: [NSImage imageNamed:@"fullscreen-double-buttons-pressed"]];
         [o_time_sld_fancygradient_view loadImagesInDarkStyle:NO];
@@ -195,8 +203,16 @@ static VLCMainWindow *_o_sharedInstance = nil;
         [o_volume_down_btn setImage: [NSImage imageNamed:@"volume-low_dark"]];
         [o_volume_track_view setImage: [NSImage imageNamed:@"volume-slider-track_dark"]];
         [o_volume_up_btn setImage: [NSImage imageNamed:@"volume-high_dark"]];
-        [o_effects_btn setImage: [NSImage imageNamed:@"effects-double-buttons_dark"]];
-        [o_effects_btn setAlternateImage: [NSImage imageNamed:@"effects-double-buttons-pressed_dark"]];
+        if (OSX_LION)
+        {
+            [o_effects_btn setImage: [NSImage imageNamed:@"effects-one-button_dark"]];
+            [o_effects_btn setAlternateImage: [NSImage imageNamed:@"effects-one-button-blue_dark"]];
+        }
+        else
+        {
+            [o_effects_btn setImage: [NSImage imageNamed:@"effects-double-buttons_dark"]];
+            [o_effects_btn setAlternateImage: [NSImage imageNamed:@"effects-double-buttons-pressed_dark"]];            
+        }
         [o_fullscreen_btn setImage: [NSImage imageNamed:@"fullscreen-double-buttons_dark"]];
         [o_fullscreen_btn setAlternateImage: [NSImage imageNamed:@"fullscreen-double-buttons-pressed_dark"]];
         [o_time_sld_fancygradient_view loadImagesInDarkStyle:YES];
@@ -220,7 +236,38 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [o_temp_view setAutoresizingMask:NSViewHeightSizable | NSViewWidthSizable];
     [o_dropzone_view setFrame: [o_playlist_table frame]];
     if (OSX_LION)
+    {
         [self setCollectionBehavior: NSWindowCollectionBehaviorFullScreenPrimary];
+        NSRect frame;
+        float f_width = [o_fullscreen_btn frame].size.width;
+
+        #define moveItem( item ) \
+        frame = [item frame]; \
+        frame.origin.x = f_width + frame.origin.x; \
+        [item setFrame: frame]
+
+        moveItem( o_effects_btn );
+        moveItem( o_volume_up_btn );
+        moveItem( o_volume_sld );
+        moveItem( o_volume_track_view );
+        moveItem( o_volume_down_btn );
+        moveItem( o_time_fld );
+        moveItem( o_time_sld_right_view );
+        #undef moveItem
+
+        #define enlargeItem( item ) \
+        frame = [item frame]; \
+        frame.size.width = f_width + frame.size.width; \
+        [item setFrame: frame]
+
+        enlargeItem( o_time_sld );
+        enlargeItem( o_progress_bar );
+        enlargeItem( o_time_sld_middle_view );
+        enlargeItem( o_time_sld_fancygradient_view );
+        #undef enlargeItem
+
+        [o_fullscreen_btn removeFromSuperviewWithoutNeedingDisplay];
+    }
 
     /* create the sidebar */
     o_sidebaritems = [[NSMutableArray alloc] init];
