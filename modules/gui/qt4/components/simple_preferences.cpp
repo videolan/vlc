@@ -771,7 +771,7 @@ void SPrefsPanel::updateAudioVolume( int volume )
 void SPrefsPanel::apply()
 {
     /* Generic save for ever panel */
-    QList<ConfigControl *>::Iterator i;
+    QList<ConfigControl *>::const_iterator i;
     for( i = controls.begin() ; i != controls.end() ; ++i )
     {
         ConfigControl *c = qobject_cast<ConfigControl *>(*i);
