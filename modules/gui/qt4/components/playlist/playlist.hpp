@@ -130,7 +130,7 @@ private:
 
     PLModel *model;
     QSignalMapper *mapper;
-    QList<QWidget*> buttons;
+    QWidgetList buttons;
     QList<QAction*> actions;
     LocationButton *btnMore;
     QMenu *menuMore;

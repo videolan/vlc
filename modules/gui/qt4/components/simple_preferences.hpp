@@ -119,7 +119,7 @@ private:
 
     int number;
 
-    QList<QWidget *> optionWidgets;
+    QWidgetList optionWidgets;
     QStringList qs_filter;
     QButtonGroup *radioGroup;
 
