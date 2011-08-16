@@ -2032,22 +2032,18 @@ dnl  Video4Linux2 plugin
 dnl
 AC_ARG_ENABLE(v4l2,
   [AS_HELP_STRING([--disable-v4l2],
-    [do not support Video4Linux version 2 (default auto)])])
-AC_ARG_WITH(v4l2,
-  [AS_HELP_STRING([--with-v4l2=PATH], [path to a V4L2-enabled kernel tree])])
-if test "${enable_v4l2}" != "no"
-then
-  if test "${with_v4l2}" != "no" -a -n "${with_v4l2}"
-  then
-    VLC_ADD_CPPFLAGS([v4l2],[-I${with_v4l2}/include])
-  fi
-
-  CPPFLAGS="${CPPFLAGS_save} ${CPPFLAGS_v4l2}"
-  AC_CHECK_HEADERS(linux/videodev2.h sys/videoio.h, [
-    VLC_ADD_PLUGIN([v4l2])
-  ],[])
-  CPPFLAGS="${CPPFLAGS_save}"
-fi
+    [disable Video4Linux2 support (default auto)])])
+have_v4l2="no"
+AS_IF([test "${enable_v4l2}" != "no"], [
+  AC_CHECK_HEADERS([linux/videodev2.h sys/videoio.h], [
+    have_v4l2="yes"
+  ], [
+    AS_IF([test "x${enable_v4l2}" != "x"], [
+      AC_MSG_ERROR([Video4Linux2 headers not found!])
+    ])
+  ])
+])
+AM_CONDITIONAL(HAVE_V4L2, [test "${have_v4l2}" != "no"])
 
 dnl
 dnl libv4l2 support for video4linux.
