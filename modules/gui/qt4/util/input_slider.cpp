@@ -32,8 +32,6 @@
 #include "adapters/seekpoints.hpp"
 #include <vlc_aout_intf.h>
 
-#include <stdlib.h>
-
 #include <QPaintEvent>
 #include <QPainter>
 #include <QBitmap>
