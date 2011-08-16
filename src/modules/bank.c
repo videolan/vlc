@@ -56,8 +56,6 @@ static struct
     unsigned usage;
 } modules = { VLC_STATIC_MUTEX, NULL, 0 };
 
-module_t *vlc_entry__main (void);
-
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
@@ -467,7 +465,7 @@ static module_t *module_InitDynamic (vlc_object_t *obj,
     }
 
     /* We can now try to call the symbol */
-    module_t *module = entry ();
+    module_t *module = vlc_plugin_describe (entry);
     if (unlikely(module == NULL))
     {
         /* With a well-written module we shouldn't have to print an
@@ -497,8 +495,8 @@ error:
 static module_t *module_InitStatic (vlc_plugin_cb entry)
 {
     /* Initializes the module */
-    module_t *module = entry ();
-    if (unlikely (module == NULL))
+    module_t *module = vlc_plugin_describe (entry);
+    if (unlikely(module == NULL))
         return NULL;
 
     module->b_loaded = true;

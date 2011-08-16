@@ -46,7 +46,11 @@ struct module_cache_t
 /** The module handle type */
 typedef void *module_handle_t;
 
-typedef module_t *(*vlc_plugin_cb) (void);
+/** Plugin entry point prototype */
+typedef int (*vlc_plugin_cb) (int (*)(void *, void *, int, ...), void *);
+
+/** Main module */
+int vlc_entry__main (int (*)(void *, void *, int, ...), void *);
 
 /**
  * Internal module descriptor
@@ -96,6 +100,7 @@ struct module_t
     char *              domain;                            /* gettext domain */
 };
 
+module_t *vlc_plugin_describe (vlc_plugin_cb);
 module_t *vlc_module_create (module_t *);
 void vlc_module_destroy (module_t *);
 

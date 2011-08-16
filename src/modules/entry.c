@@ -145,8 +145,14 @@ static module_config_t *vlc_config_create (module_t *module, int type)
 }
 
 
-int vlc_plugin_set (module_t *module, module_config_t *item, int propid, ...)
+/**
+ * Callback for the plugin descriptor functions.
+ */
+static int vlc_plugin_setter (void *plugin, void *tgt, int propid, ...)
 {
+    module_t **pprimary = plugin;
+    module_t *module = tgt;
+    module_config_t *item = tgt;
     va_list ap;
     int ret = 0;
 
@@ -155,18 +161,20 @@ int vlc_plugin_set (module_t *module, module_config_t *item, int propid, ...)
     {
         case VLC_MODULE_CREATE:
         {
-            module_t **pp = va_arg (ap, module_t **);
+            module = *pprimary;
             module_t *submodule = vlc_module_create (module);
-
             if (unlikely(submodule == NULL))
             {
                 ret = -1;
                 break;
             }
 
-            *pp = submodule;
-            if (module == NULL)
+            *(va_arg (ap, module_t **)) = submodule;
+            if (*pprimary == NULL)
+            {
+                *pprimary = submodule;
                 break;
+            }
             /* Inheritance. Ugly!! */
             submodule->pp_shortcuts = xmalloc (sizeof (char **));
             submodule->pp_shortcuts[0] = strdup_null (module->pp_shortcuts[0]);
@@ -182,9 +190,14 @@ int vlc_plugin_set (module_t *module, module_config_t *item, int propid, ...)
         {
             int type = va_arg (ap, int);
             module_config_t **pp = va_arg (ap, module_config_t **);
-            *pp = vlc_config_create (module, type);
-            if (*pp == NULL)
+
+            item = vlc_config_create (*pprimary, type);
+            if (unlikely(item == NULL))
+            {
                 ret = -1;
+                break;
+            }
+            *pp = item;
             break;
         }
 
@@ -464,4 +477,20 @@ int vlc_plugin_set (module_t *module, module_config_t *item, int propid, ...)
 
     va_end (ap);
     return ret;
+}
+
+/**
+ * Runs a plug-in descriptor. This loads the plug-in meta-data in memory.
+ */
+module_t *vlc_plugin_describe (vlc_plugin_cb entry)
+{
+    module_t *module = NULL;
+
+    if (entry (vlc_plugin_setter, &module) != 0)
+    {
+        if (module != NULL) /* partially initialized plug-in... */
+            vlc_module_destroy (module);
+        module = NULL;
+    }
+    return module;
 }
