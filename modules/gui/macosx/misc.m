@@ -144,7 +144,15 @@ static NSMutableArray *blackoutWindows = NULL;
         [blackoutWindow release];
 
         if( [screen isMainScreen ] )
-           SetSystemUIMode( kUIModeAllHidden, kUIOptionAutoShowMenuBar);
+        {
+            if ([screen isMainScreen])
+            {
+                if (NSAppKitVersionNumber < 1038) // Leopard
+                    SetSystemUIMode( kUIModeAllHidden, kUIOptionAutoShowMenuBar);
+                else
+                    [NSApp setPresentationOptions:(NSApplicationPresentationAutoHideDock | NSApplicationPresentationAutoHideMenuBar)];
+            }
+        }
     }
 }
 
@@ -158,7 +166,10 @@ static NSMutableArray *blackoutWindows = NULL;
         [blackoutWindow closeAndAnimate: YES];
     }
 
-   SetSystemUIMode( kUIModeNormal, 0);
+    if (NSAppKitVersionNumber < 1038) // Leopard
+        SetSystemUIMode( kUIModeNormal, kUIOptionAutoShowMenuBar);
+    else
+        [NSApp setPresentationOptions:(NSApplicationPresentationDefault)];
 }
 
 @end

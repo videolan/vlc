@@ -972,7 +972,12 @@ static VLCMainWindow *_o_sharedInstance = nil;
             }
 
             if ([screen isMainScreen])
-                SetSystemUIMode( kUIModeAllHidden, kUIOptionAutoShowMenuBar);
+            {
+                if (NSAppKitVersionNumber < 1038) // Leopard
+                    SetSystemUIMode( kUIModeAllHidden, kUIOptionAutoShowMenuBar);
+                else
+                    [NSApp setPresentationOptions:(NSApplicationPresentationAutoHideDock | NSApplicationPresentationAutoHideMenuBar)];
+            }
 
             [[o_video_view superview] replaceSubview:o_video_view with:o_temp_view];
             [o_temp_view setFrame:[o_video_view frame]];
@@ -1026,7 +1031,12 @@ static VLCMainWindow *_o_sharedInstance = nil;
     }
 
     if ([screen isMainScreen])
-        SetSystemUIMode( kUIModeAllHidden, kUIOptionAutoShowMenuBar);
+    {
+        if (NSAppKitVersionNumber < 1038) // Leopard
+            SetSystemUIMode( kUIModeAllHidden, kUIOptionAutoShowMenuBar);
+        else
+            [NSApp setPresentationOptions:(NSApplicationPresentationAutoHideDock | NSApplicationPresentationAutoHideMenuBar)];
+    }
 
     dict1 = [[NSMutableDictionary alloc] initWithCapacity:2];
     dict2 = [[NSMutableDictionary alloc] initWithCapacity:3];
@@ -1131,7 +1141,10 @@ static VLCMainWindow *_o_sharedInstance = nil;
         }
 
         [o_fspanel setNonActive: nil];
-        SetSystemUIMode( kUIModeNormal, kUIOptionAutoShowMenuBar);
+        if (NSAppKitVersionNumber < 1038) // Leopard
+            SetSystemUIMode( kUIModeNormal, kUIOptionAutoShowMenuBar);
+        else
+            [NSApp setPresentationOptions:(NSApplicationPresentationDefault)];
 
         /* Will release the lock */
         [self hasEndedFullscreen];
@@ -1154,7 +1167,10 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [[o_video_view window] orderFront: self];
 
     [o_fspanel setNonActive: nil];
-    SetSystemUIMode( kUIModeNormal, kUIOptionAutoShowMenuBar);
+    if (NSAppKitVersionNumber < 1038) // Leopard
+        SetSystemUIMode( kUIModeNormal, kUIOptionAutoShowMenuBar);
+    else
+        [NSApp setPresentationOptions:(NSApplicationPresentationDefault)];
 
     if (o_fullscreen_anim1)
     {

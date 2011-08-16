@@ -27,6 +27,9 @@
 
 #ifndef MAC_OS_X_VERSION_10_6
 @protocol NSWindowDelegate <NSObject> @end
+NSUInteger NSApplicationPresentationAutoHideDock;
+NSUInteger NSApplicationPresentationAutoHideMenuBar;
+NSUInteger NSApplicationPresentationDefault;
 #endif
 
 /*****************************************************************************
