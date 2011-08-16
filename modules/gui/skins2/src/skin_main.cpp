@@ -57,15 +57,6 @@
 #include "../commands/cmd_on_top.hpp"
 
 //---------------------------------------------------------------------------
-// Exported interface functions.
-//---------------------------------------------------------------------------
-#ifdef WIN32_SKINS
-extern "C" __declspec( dllexport )
-    int __VLC_SYMBOL( vlc_entry ) ( module_t *p_module );
-#endif
-
-
-//---------------------------------------------------------------------------
 // Local prototypes
 //---------------------------------------------------------------------------
 static int  Open  ( vlc_object_t * );
