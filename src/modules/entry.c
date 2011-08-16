@@ -39,15 +39,27 @@ static char *strdup_null (const char *str)
     return (str != NULL) ? strdup (str) : NULL;
 }
 
-module_t *vlc_module_create (void)
+module_t *vlc_module_create (module_t *parent)
 {
     module_t *module = malloc (sizeof (*module));
     if (module == NULL)
         return NULL;
 
-    module->next = NULL;
+    /* TODO: replace module/submodules with plugin/modules */
+    if (parent == NULL)
+    {
+        module->next = NULL;
+        module->parent = NULL;
+    }
+    else
+    {
+        module->next = parent->submodule;
+        parent->submodule = module;
+        parent->submodule_count++;
+        module->parent = parent;
+    }
+
     module->submodule = NULL;
-    module->parent = NULL;
     module->submodule_count = 0;
 
     module->psz_shortname = NULL;
@@ -56,8 +68,9 @@ module_t *vlc_module_create (void)
     module->pp_shortcuts = NULL;
     module->i_shortcuts = 0;
     module->psz_capability = NULL;
-    module->i_score = 1;
-    module->b_unloadable = true;
+    module->i_score = (parent != NULL) ? parent->i_score : 1;
+    module->b_loaded = false;
+    module->b_unloadable = parent == NULL;
     module->pf_activate = NULL;
     module->pf_deactivate = NULL;
     module->p_config = NULL;
@@ -67,7 +80,6 @@ module_t *vlc_module_create (void)
     /*module->handle = garbage */
     module->psz_filename = NULL;
     module->domain = NULL;
-    module->b_loaded = false;
     return module;
 }
 
@@ -89,44 +101,6 @@ void vlc_module_destroy (module_t *module)
     free (module->psz_longname);
     free (module->psz_shortname);
     free (module);
-}
-
-module_t *vlc_submodule_create (module_t *module)
-{
-    assert (module != NULL);
-
-    module_t *submodule = malloc (sizeof (*submodule));
-    if (unlikely(submodule == NULL))
-        return NULL;
-
-    /* TODO: replace module/submodules with plugin/modules */
-    submodule->next = module->submodule;
-    module->submodule = submodule;
-    module->submodule_count++;
-    submodule->parent = module;
-    submodule->submodule = NULL;
-    submodule->submodule_count = 0;
-
-    submodule->pp_shortcuts = NULL;
-    submodule->i_shortcuts = 0;
-
-    submodule->psz_shortname = NULL;
-    submodule->psz_longname = NULL;
-    submodule->psz_help = NULL;
-    submodule->psz_capability = NULL;
-    submodule->i_score = module->i_score;
-    submodule->b_loaded = false;
-    submodule->b_unloadable = false;
-    submodule->pf_activate = NULL;
-    submodule->pf_deactivate = NULL;
-    submodule->p_config = NULL;
-    submodule->confsize = 0;
-    submodule->i_config_items = 0;
-    submodule->i_bool_items = 0;
-    /*submodule->handle = unused*/
-    /*submodule->psz_filename unused */
-    submodule->domain = NULL;
-    return submodule;
 }
 
 static module_config_t *vlc_config_create (module_t *module, int type)
@@ -171,10 +145,10 @@ int vlc_plugin_set (module_t *module, module_config_t *item, int propid, ...)
     va_start (ap, propid);
     switch (propid)
     {
-        case VLC_SUBMODULE_CREATE:
+        case VLC_MODULE_CREATE:
         {
             module_t **pp = va_arg (ap, module_t **);
-            module_t *submodule = vlc_submodule_create (module);
+            module_t *submodule = vlc_module_create (module);
 
             if (unlikely(submodule == NULL))
             {
@@ -182,6 +156,9 @@ int vlc_plugin_set (module_t *module, module_config_t *item, int propid, ...)
                 break;
             }
 
+            *pp = submodule;
+            if (module == NULL)
+                break;
             /* Inheritance. Ugly!! */
             submodule->pp_shortcuts = xmalloc (sizeof (char **));
             submodule->pp_shortcuts[0] = strdup_null (module->pp_shortcuts[0]);
@@ -190,7 +167,6 @@ int vlc_plugin_set (module_t *module, module_config_t *item, int propid, ...)
             submodule->psz_shortname = strdup_null (module->psz_shortname);
             submodule->psz_longname = strdup_null (module->psz_longname);
             submodule->psz_capability = strdup_null (module->psz_capability);
-            *pp = submodule;
             break;
         }
 

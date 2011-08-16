@@ -65,7 +65,7 @@ static struct
     unsigned usage;
 } modules = { VLC_STATIC_MUTEX, NULL, 0 };
 
-int vlc_entry__main( module_t * );
+module_t *vlc_entry__main (void);
 
 /*****************************************************************************
  * Local prototypes
@@ -80,7 +80,7 @@ static void AllocatePluginDir( vlc_object_t *, module_bank_t *, const char *,
                                unsigned, cache_mode_t );
 static int  AllocatePluginFile( vlc_object_t *, module_bank_t *, const char *,
                                 const struct stat *, cache_mode_t );
-static module_t * AllocatePlugin( vlc_object_t *, const char *, bool );
+static module_t *module_InitDynamic (vlc_object_t *, const char *, bool);
 #endif
 static module_t *module_InitStatic (vlc_plugin_cb);
 static void DeleteModule (module_t **, module_t *);
@@ -514,7 +514,7 @@ found_shortcut:
             assert (p_real->psz_filename != NULL);
 
             module_t *p_new_module =
-                AllocatePlugin( p_this, p_real->psz_filename, false );
+                module_InitDynamic (p_this, p_real->psz_filename, false);
             if( p_new_module == NULL )
             {   /* Corrupted module */
                 msg_Err( p_this, "possibly corrupt module cache" );
@@ -918,7 +918,7 @@ static int AllocatePluginFile( vlc_object_t * p_this, module_bank_t *p_bank,
         p_module = CacheFind (p_bank->loaded_cache, p_bank->i_loaded_cache,
                               path, st);
     if( p_module == NULL )
-        p_module = AllocatePlugin( p_this, path, true );
+        p_module = module_InitDynamic (p_this, path, true);
     if( p_module == NULL )
         return -1;
 
@@ -941,7 +941,7 @@ static int AllocatePluginFile( vlc_object_t * p_this, module_bank_t *p_bank,
              /* !unloadable not allowed for plugins with callbacks */
              assert( !p_module->b_loaded );
              DeleteModule (&modules.head, p_module);
-             p_module = AllocatePlugin( p_this, path, false );
+             p_module = module_InitDynamic (p_this, path, false);
              break;
          }
 
@@ -957,62 +957,54 @@ static int AllocatePluginFile( vlc_object_t * p_this, module_bank_t *p_bank,
     return  0;
 }
 
-/*****************************************************************************
- * AllocatePlugin: load a module into memory and initialize it.
- *****************************************************************************
- * This function loads a dynamically loadable module and allocates a structure
- * for its information data. The module can then be handled by module_need
- * and module_unneed. It can be removed by DeleteModule.
- *****************************************************************************/
-static module_t *AllocatePlugin( vlc_object_t * p_this, const char *psz_file,
-                                 bool fast )
+/**
+ * Loads a dynamically-linked plug-in into memory and initialize it.
+ *
+ * The module can then be handled by module_need() and module_unneed().
+ * It can be removed by DeleteModule.
+ *
+ * \param path file path of the shared object
+ * \param fast whether to optimize loading for speed or safety
+ *             (fast is used when the plug-in is registered but not used)
+ */
+static module_t *module_InitDynamic (vlc_object_t *obj,
+                                     const char *path, bool fast)
 {
-    module_t * p_module = NULL;
     module_handle_t handle;
 
-    if( module_Load( p_this, psz_file, &handle, fast ) )
+    if (module_Load (obj, path, &handle, fast))
         return NULL;
-
-    /* Now that we have successfully loaded the module, we can
-     * allocate a structure for it */
-    p_module = vlc_module_create();
-    if( p_module == NULL )
-    {
-        module_Unload( handle );
-        return NULL;
-    }
-
-    p_module->psz_filename = strdup (psz_file);
-    if (unlikely(p_module->psz_filename == NULL))
-        goto error;
-    p_module->handle = handle;
-    p_module->b_loaded = true;
-
-    /* Initialize the module: fill p_module, default config */
-    static const char entry[] = "vlc_entry" MODULE_SUFFIX;
 
     /* Try to resolve the symbol */
-    int (*pf_symbol)(module_t * p_module)
-        = (int (*)(module_t *)) module_Lookup( p_module->handle,entry );
-    if( pf_symbol == NULL )
+    static const char entry_name[] = "vlc_entry" MODULE_SUFFIX;
+    vlc_plugin_cb entry =
+        (vlc_plugin_cb) module_Lookup (handle, entry_name);
+    if (entry == NULL)
     {
-        msg_Warn( p_this, "cannot find symbol \"%s\" in plugin `%s'",
-                  entry, psz_file );
+        msg_Warn (obj, "cannot find plug-in entry point in %s", path);
         goto error;
     }
-    else
+
     /* We can now try to call the symbol */
-    if( pf_symbol( p_module ) != 0 )
+    module_t *module = entry ();
+    if (unlikely(module == NULL))
     {
         /* With a well-written module we shouldn't have to print an
          * additional error message here, but just make sure. */
-        msg_Err( p_this, "cannot initialize plugin `%s'", psz_file );
+        msg_Err (obj, "cannot initialize plug-in %s", path);
         goto error;
     }
-    return p_module;
+
+    module->psz_filename = strdup (path);
+    if (unlikely(module->psz_filename == NULL))
+    {
+        vlc_module_destroy (module);
+        goto error;
+    }
+    module->handle = handle;
+    module->b_loaded = true;
+    return module;
 error:
-    free( p_module->psz_filename );
-    vlc_module_destroy (p_module);
     module_Unload( handle );
     return NULL;
 }
@@ -1023,13 +1015,10 @@ error:
  */
 static module_t *module_InitStatic (vlc_plugin_cb entry)
 {
-    module_t *module = vlc_module_create ();
-    if (unlikely(module == NULL))
-        return NULL;
-
     /* Initializes the module */
-    if (entry (module))
-        assert (0);
+    module_t *module = entry ();
+    if (unlikely (module == NULL))
+        abort (); /* FIXME: OOM or bug */
 
     module->b_loaded = true;
     module->b_unloadable = false;

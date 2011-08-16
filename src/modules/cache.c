@@ -199,7 +199,7 @@ size_t CacheLoad( vlc_object_t *p_this, const char *dir, module_cache_t **r )
         uint16_t i_size;
         int i_submodules;
 
-        module = vlc_module_create();
+        module = vlc_module_create (NULL);
 
         /* Load additional infos */
         LOAD_STRING(module->psz_shortname);
@@ -233,7 +233,7 @@ size_t CacheLoad( vlc_object_t *p_this, const char *dir, module_cache_t **r )
 
         while( i_submodules-- )
         {
-            module_t *submodule = vlc_submodule_create (module);
+            module_t *submodule = vlc_module_create (module);
             free (submodule->pp_shortcuts);
             LOAD_STRING(submodule->psz_shortname);
             LOAD_STRING(submodule->psz_longname);

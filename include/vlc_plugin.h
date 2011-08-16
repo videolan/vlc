@@ -36,7 +36,7 @@ VLC_API int vlc_plugin_set(module_t *, module_config_t *, int, ...);
 
 enum vlc_module_properties
 {
-    VLC_SUBMODULE_CREATE,
+    VLC_MODULE_CREATE,
     VLC_CONFIG_CREATE,
 
     /* DO NOT EVER REMOVE, INSERT OR REPLACE ANY ITEM! It would break the ABI!
@@ -110,8 +110,8 @@ enum vlc_module_properties
 /**
  * Current plugin ABI version
  */
-# define MODULE_SYMBOL 1_2_0h
-# define MODULE_SUFFIX "__1_2_0h"
+# define MODULE_SYMBOL 1_2_0i
+# define MODULE_SUFFIX "__1_2_0i"
 
 /*****************************************************************************
  * Add a few defines. You do not want to read this section. Really.
@@ -166,26 +166,28 @@ enum vlc_module_properties
  */
 #define vlc_module_begin() \
 EXTERN_SYMBOL DLL_SYMBOL \
-int CDECL_SYMBOL __VLC_SYMBOL(vlc_entry) (module_t *); \
+module_t *CDECL_SYMBOL __VLC_SYMBOL(vlc_entry) (void); \
 EXTERN_SYMBOL DLL_SYMBOL \
-int CDECL_SYMBOL __VLC_SYMBOL(vlc_entry) (module_t *p_module) \
+module_t *CDECL_SYMBOL __VLC_SYMBOL(vlc_entry) (void) \
 { \
-    module_t *p_submodule; \
+    module_t *module, *p_submodule; \
     module_config_t *p_config = NULL; \
-    if (vlc_module_set (p_module, VLC_MODULE_NAME, (MODULE_STRING))) \
+    if (vlc_plugin_set (NULL, NULL, VLC_MODULE_CREATE, &module)) \
         goto error; \
-    p_submodule = p_module;
+    if (vlc_module_set (module, VLC_MODULE_NAME, (MODULE_STRING))) \
+        goto error; \
+    p_submodule = module;
 
 #define vlc_module_end() \
     (void) p_config; \
-    return VLC_SUCCESS; \
+    return module; \
 error: \
-    return VLC_EGENERIC; \
+    return NULL; \
 } \
 VLC_METADATA_EXPORTS
 
 #define add_submodule( ) \
-    if (vlc_plugin_set (p_module, NULL, VLC_SUBMODULE_CREATE, &p_submodule)) \
+    if (vlc_plugin_set (module, NULL, VLC_MODULE_CREATE, &p_submodule)) \
         goto error;
 
 #define add_shortcut( ... ) \
@@ -227,7 +229,7 @@ VLC_METADATA_EXPORTS
         goto error;
 
 #define set_text_domain( dom ) \
-    if (vlc_module_set (p_module, VLC_MODULE_TEXTDOMAIN, (dom))) \
+    if (vlc_module_set (module, VLC_MODULE_TEXTDOMAIN, (dom))) \
         goto error;
 
 /*****************************************************************************
@@ -244,7 +246,7 @@ VLC_METADATA_EXPORTS
  *****************************************************************************/
 
 #define add_type_inner( type ) \
-    vlc_plugin_set (p_module, NULL, VLC_CONFIG_CREATE, (type), &p_config);
+    vlc_plugin_set (module, NULL, VLC_CONFIG_CREATE, (type), &p_config);
 
 #define add_typedesc_inner( type, text, longtext ) \
     add_type_inner( type ) \
