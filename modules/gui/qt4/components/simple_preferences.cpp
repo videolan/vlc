@@ -903,7 +903,6 @@ void SPrefsPanel::configML()
 #ifdef WIN32
 #include <QDialogButtonBox>
 #include "util/registry.hpp"
-#include <string>
 
 bool SPrefsPanel::addType( const char * psz_ext, QTreeWidgetItem* current,
                            QTreeWidgetItem* parent, QVLCRegistry *qvReg )
@@ -1026,8 +1025,8 @@ void SPrefsPanel::assoDialog()
 
 void addAsso( QVLCRegistry *qvReg, const char *psz_ext )
 {
-    std::string s_path( "VLC" ); s_path += psz_ext;
-    std::string s_path2 = s_path;
+    QString s_path( "VLC" ); s_path += psz_ext;
+    QString s_path2 = s_path;
 
     /* Save a backup if already assigned */
     char *psz_value = qvReg->ReadRegistryString( psz_ext, "", ""  );
@@ -1037,27 +1036,26 @@ void addAsso( QVLCRegistry *qvReg, const char *psz_ext )
     delete psz_value;
 
     /* Put a "link" to VLC.EXT as default */
-    qvReg->WriteRegistryString( psz_ext, "", s_path.c_str() );
+    qvReg->WriteRegistryString( psz_ext, "", qtu( s_path ) );
 
     /* Create the needed Key if they weren't done in the installer */
-    if( !qvReg->RegistryKeyExists( s_path.c_str() ) )
+    if( !qvReg->RegistryKeyExists( qtu( s_path ) ) )
     {
-        qvReg->WriteRegistryString( psz_ext, "", s_path.c_str() );
-        qvReg->WriteRegistryString( s_path.c_str(), "", "Media file" );
-        qvReg->WriteRegistryString( s_path.append( "\\shell" ).c_str() , "", "Play" );
+        qvReg->WriteRegistryString( psz_ext, "", qtu( s_path ) );
+        qvReg->WriteRegistryString( qtu( s_path ), "", "Media file" );
+        qvReg->WriteRegistryString( qtu( s_path.append( "\\shell" ) ), "", "Play" );
 
         /* Get the installer path */
         QVLCRegistry *qvReg2 = new QVLCRegistry( HKEY_LOCAL_MACHINE );
-        std::string str_temp; str_temp.assign(
-            qvReg2->ReadRegistryString( "Software\\VideoLAN\\VLC", "", "" ) );
+        QString str_temp = qvReg2->ReadRegistryString( "Software\\VideoLAN\\VLC", "", "" );
 
         if( str_temp.size() )
         {
-            qvReg->WriteRegistryString( s_path.append( "\\Play\\command" ).c_str(),
-                "", str_temp.append(" --started-from-file \"%1\"" ).c_str() );
+            qvReg->WriteRegistryString( qtu( s_path.append( "\\Play\\command" ) ),
+                "", qtu( str_temp.append(" --started-from-file \"%1\"" ) ) );
 
-            qvReg->WriteRegistryString( s_path2.append( "\\DefaultIcon" ).c_str(),
-                        "", str_temp.append(",0").c_str() );
+            qvReg->WriteRegistryString( qtu( s_path2.append( "\\DefaultIcon" ) ),
+                        "", qtu( str_temp.append(",0") ) );
         }
         delete qvReg2;
     }
