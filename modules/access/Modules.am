@@ -99,6 +99,7 @@ libvlc_LTLIBRARIES += \
 	$(NULL)
 
 libaccess_oss_plugin_la_SOURCES = oss.c
+libaccess_oss_plugin_la_CFLAGS = $(AM_CFLAGS)
 libaccess_oss_plugin_la_LIBADD = $(AM_LIBADD) $(OSS_LIBS)
 libaccess_oss_plugin_la_DEPENDENCIES =
 if HAVE_OSS
