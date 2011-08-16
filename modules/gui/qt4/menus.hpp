@@ -30,7 +30,7 @@
 #include <QObject>
 #include <QAction>
 #include <QMenu>
-#include <vector>
+#include <QVector>
 
 using namespace std;
 
@@ -131,7 +131,7 @@ private:
 
     /* Generic automenu methods */
     static QMenu * Populate( intf_thread_t *, QMenu *current,
-                             vector<const char*>&, vector<vlc_object_t *>& );
+                             QVector<const char*>&, QVector<vlc_object_t *>& );
 
     static void CreateAndConnect( QMenu *, const char *, const QString&,
                                   const QString&, int, vlc_object_t *,

@@ -416,7 +416,7 @@ public:
     virtual ~StringConfigControl();
     virtual QString getValue();
 private:
-    std::vector<ModuleCheckBox> checkboxes;
+    QVector<ModuleCheckBox> checkboxes;
     QLineEdit *text;
 private slot:
     void OnUpdate();
