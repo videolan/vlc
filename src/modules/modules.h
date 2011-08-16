@@ -43,19 +43,8 @@ struct module_cache_t
 
 #define MODULE_SHORTCUT_MAX 20
 
-/* The module handle type. */
-#if defined(HAVE_DL_DYLD) && !defined(__x86_64__)
-#   if defined (HAVE_MACH_O_DYLD_H)
-#       include <mach-o/dyld.h>
-#   endif
-typedef NSModule module_handle_t;
-#elif defined(HAVE_IMAGE_H)
-typedef int module_handle_t;
-#elif defined(WIN32) || defined(UNDER_CE) || defined(__SYMBIAN32__)
-typedef void * module_handle_t;
-#elif defined(HAVE_DL_DLOPEN)
-typedef void * module_handle_t;
-#endif
+/** The module handle type */
+typedef void *module_handle_t;
 
 typedef int (*vlc_plugin_cb) (module_t *);
 
