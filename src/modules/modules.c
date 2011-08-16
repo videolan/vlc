@@ -84,6 +84,13 @@ static module_t *module_InitDynamic (vlc_object_t *, const char *, bool);
 #endif
 static module_t *module_InitStatic (vlc_plugin_cb);
 
+static void module_StoreBank (module_t *module)
+{
+    /*vlc_assert_locked (&modules.lock);*/
+    module->next = modules.head;
+    modules.head = module;
+}
+
 /**
  * Init bank
  *
@@ -101,7 +108,10 @@ void module_InitBank (void)
          * library just as another module, and for instance the configuration
          * options of main will be available in the module bank structure just
          * as for every other module. */
-        module_InitStatic (vlc_entry__main);
+        module_t *module = module_InitStatic (vlc_entry__main);
+        if (likely(module != NULL))
+            module_StoreBank (module);
+
         vlc_rwlock_init (&config_lock);
         config_SortConfig ();
     }
@@ -956,8 +966,7 @@ static int AllocatePluginFile( vlc_object_t * p_this, module_bank_t *p_bank,
              break;
          }
 
-    p_module->next = modules.head;
-    modules.head = p_module;
+    module_StoreBank (p_module);
 
     if( mode == CACHE_IGNORE )
         return 0;
@@ -1028,15 +1037,9 @@ static module_t *module_InitStatic (vlc_plugin_cb entry)
     /* Initializes the module */
     module_t *module = entry ();
     if (unlikely (module == NULL))
-        abort (); /* FIXME: OOM or bug */
+        return NULL;
 
     module->b_loaded = true;
     module->b_unloadable = false;
-
-    /* LOCK */
-    module->next = modules.head;
-    modules.head = module;
-    /* UNLOCK */
-
     return module;
 }
