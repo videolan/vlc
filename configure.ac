@@ -723,7 +723,6 @@ if test "${ac_cv_have_plugins}" = "no"; then
   if test "${SYS}" = "mingw32" ; then
     AC_CHECK_LIB(kernel32, main,
      [VLC_ADD_LIBS([libvlccore],[-lkernel32])
-      AC_DEFINE(HAVE_DL_WINDOWS, 1, [Define if you have Windows' LoadLibrary])
       ac_cv_have_plugins=yes])
   fi
 fi
@@ -731,7 +730,6 @@ fi
 # WinCE style
 if test "${ac_cv_have_plugins}" = "no"; then
   if test "${SYS}" = "mingwce"; then
-    AC_DEFINE(HAVE_DL_WINDOWS, 1, [Define if you have Windows' LoadLibrary])
     ac_cv_have_plugins=yes
   fi
 fi
