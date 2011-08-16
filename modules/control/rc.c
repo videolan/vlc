@@ -87,7 +87,7 @@ static void RegisterCallbacks( intf_thread_t * );
 
 static bool ReadCommand( intf_thread_t *, char *, int * );
 
-static input_item_t *parse_MRL( intf_thread_t *, char * );
+static input_item_t *parse_MRL( const char * );
 
 static int  Input        ( vlc_object_t *, char const *,
                            vlc_value_t, vlc_value_t, void * );
@@ -1360,7 +1360,7 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
     else if( !strcmp( psz_cmd, "add" ) &&
              newval.psz_string && *newval.psz_string )
     {
-        input_item_t *p_item = parse_MRL( p_intf, newval.psz_string );
+        input_item_t *p_item = parse_MRL( newval.psz_string );
 
         if( p_item )
         {
@@ -1378,7 +1378,7 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
     else if( !strcmp( psz_cmd, "enqueue" ) &&
              newval.psz_string && *newval.psz_string )
     {
-        input_item_t *p_item = parse_MRL( p_intf, newval.psz_string );
+        input_item_t *p_item = parse_MRL( newval.psz_string );
 
         if( p_item )
         {
@@ -2024,20 +2024,20 @@ bool ReadCommand( intf_thread_t *p_intf, char *p_buffer, int *pi_size )
  * We don't check for '"' or '\'', we just assume that a ':' that follows a
  * space is a new option. Should be good enough for our purpose.
  *****************************************************************************/
-static input_item_t *parse_MRL( intf_thread_t *p_intf, char *psz_mrl )
+static input_item_t *parse_MRL( const char *mrl )
 {
 #define SKIPSPACE( p ) { while( *p == ' ' || *p == '\t' ) p++; }
 #define SKIPTRAILINGSPACE( p, d ) \
     { char *e=d; while( e > p && (*(e-1)==' ' || *(e-1)=='\t') ){e--;*e=0;} }
 
     input_item_t *p_item = NULL;
-    char *psz_item = NULL, *psz_item_mrl = NULL, *psz_orig;
+    char *psz_item = NULL, *psz_item_mrl = NULL, *psz_orig, *psz_mrl;
     char **ppsz_options = NULL;
     int i, i_options = 0;
 
-    if( !psz_mrl ) return 0;
+    if( !mrl ) return 0;
 
-    psz_mrl = psz_orig = strdup( psz_mrl );
+    psz_mrl = psz_orig = strdup( mrl );
     if( !psz_mrl )
         return NULL;
     while( *psz_mrl )
