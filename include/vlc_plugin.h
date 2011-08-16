@@ -164,29 +164,25 @@ enum vlc_module_properties
  * instance the module name, its shortcuts, its capabilities... we also create
  * a copy of its config because the module can be unloaded at any time.
  */
-#define vlc_module_begin( )                                                   \
-    EXTERN_SYMBOL DLL_SYMBOL int CDECL_SYMBOL                                 \
-    __VLC_SYMBOL(vlc_entry) ( module_t *p_module );                           \
-                                                                              \
-    EXTERN_SYMBOL DLL_SYMBOL int CDECL_SYMBOL                                 \
-    __VLC_SYMBOL(vlc_entry) ( module_t *p_module )                            \
-    {                                                                         \
-        module_config_t *p_config = NULL;                                     \
-        if (vlc_module_set (p_module, VLC_MODULE_NAME,                        \
-                            (const char *)(MODULE_STRING)))                   \
-            goto error;                                                       \
-        {                                                                     \
-            module_t *p_submodule = p_module;
+#define vlc_module_begin() \
+EXTERN_SYMBOL DLL_SYMBOL \
+int CDECL_SYMBOL __VLC_SYMBOL(vlc_entry) (module_t *); \
+EXTERN_SYMBOL DLL_SYMBOL \
+int CDECL_SYMBOL __VLC_SYMBOL(vlc_entry) (module_t *p_module) \
+{ \
+    module_t *p_submodule; \
+    module_config_t *p_config = NULL; \
+    if (vlc_module_set (p_module, VLC_MODULE_NAME, (MODULE_STRING))) \
+        goto error; \
+    p_submodule = p_module;
 
-#define vlc_module_end( )                                                     \
-        }                                                                     \
-        (void)p_config;                                                       \
-        return VLC_SUCCESS;                                                   \
-                                                                              \
-    error:                                                                    \
-        return VLC_EGENERIC;                                                  \
-    }                                                                         \
-    VLC_METADATA_EXPORTS
+#define vlc_module_end() \
+    (void) p_config; \
+    return VLC_SUCCESS; \
+error: \
+    return VLC_EGENERIC; \
+} \
+VLC_METADATA_EXPORTS
 
 #define add_submodule( ) \
     if (vlc_plugin_set (p_module, NULL, VLC_SUBMODULE_CREATE, &p_submodule)) \
