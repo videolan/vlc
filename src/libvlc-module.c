@@ -38,6 +38,7 @@
 #include <vlc_cpu.h>
 #include <vlc_aout_intf.h>
 #include "libvlc.h"
+#include "modules/modules.h"
 
 //#define Nothing here, this is just to prevent update-po from being stupid
 #include "vlc_keys.h"
