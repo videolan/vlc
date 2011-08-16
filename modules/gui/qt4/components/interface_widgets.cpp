@@ -235,8 +235,8 @@ void BackgroundWidget::paintEvent( QPaintEvent *e )
     QBitmap pMask;
     float f_alpha = 1.0;
 
-    i_maxwidth = std::min( maximumWidth(), width() ) - MARGIN * 2;
-    i_maxheight = std::min( maximumHeight(), height() ) - MARGIN * 2;
+    i_maxwidth  = __MIN( maximumWidth(), width() ) - MARGIN * 2;
+    i_maxheight = __MIN( maximumHeight(), height() ) - MARGIN * 2;
 
     if ( height() > MARGIN * 2 )
     {
