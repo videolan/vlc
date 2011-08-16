@@ -1524,7 +1524,6 @@ static int VolumeMove( vlc_object_t *p_this, char const *psz_cmd,
         playlist_CurrentInput( p_intf->p_sys->p_playlist );
     int i_nb_steps = atoi(newval.psz_string);
     int i_error = VLC_SUCCESS;
-    int i_volume_step = 0;
 
     if( !p_input )
         return VLC_ENOOBJ;
