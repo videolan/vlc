@@ -1050,6 +1050,7 @@ static module_t *module_InitStatic (vlc_plugin_cb entry)
 static void DeleteModule (module_t **head, module_t *p_module)
 {
     assert( p_module );
+    assert (p_module->parent == NULL);
 
     /* Unlist the module (if it is in the list) */
     module_t **pp_self = head;
@@ -1062,16 +1063,7 @@ static void DeleteModule (module_t **head, module_t *p_module)
 #ifdef HAVE_DYNAMIC_PLUGINS
     if (p_module->b_loaded && p_module->b_unloadable)
         module_Unload (p_module->handle);
-    free (p_module->psz_filename);
 #endif
-
-    /* Free and detach the object's children */
-    while (p_module->submodule)
-    {
-        module_t *submodule = p_module->submodule;
-        p_module->submodule = submodule->next;
-        vlc_module_destroy (submodule);
-    }
 
     config_Free( p_module );
     vlc_module_destroy (p_module);
