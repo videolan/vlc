@@ -32,10 +32,11 @@
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
-#include <vlc_dialog.h> 		  // dialog_Fatal
-#include <vlc_aout.h>   	          // aout_*
+#include <vlc_dialog.h>                   // dialog_Fatal
+#include <vlc_aout.h>                     // aout_*
 
-#include <AudioUnit/AudioUnit.h> 	  // AudioDeviceID
+#include <AudioUnit/AudioUnit.h>          // AudioUnit
+#include <CoreAudio/AudioHardware.h>      // AudioDeviceID
 #include <AudioToolbox/AudioFormat.h>     // AudioFormatGetProperty
 
 #ifndef verify_noerr
@@ -224,7 +225,7 @@ static int Open( vlc_object_t * p_this )
     {
         /* Be tolerant, only give a warning here */
         msg_Warn( p_aout, "could not check whether device [0x%x] is alive: %4.4s",
-			  (unsigned int)p_sys->i_selected_dev, (char *)&err );
+                           (unsigned int)p_sys->i_selected_dev, (char *)&err );
         b_alive = false;
     }
 
