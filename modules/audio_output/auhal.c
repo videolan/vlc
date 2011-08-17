@@ -82,7 +82,6 @@ struct aout_sys_t
     AudioDeviceID               i_selected_dev;      /* DeviceID of the selected device */
     AudioDeviceIOProcID         i_procID;            /* DeviceID of current device */
     UInt32                      i_devices;           /* Number of CoreAudio Devices */
-    bool                        b_supports_digital;  /* Does the currently selected device support digital mode? */
     bool                        b_digital;           /* Are we running in digital mode? */
     mtime_t                     clock_diff;          /* Difference between VLC clock and Device clock */
 
@@ -170,7 +169,6 @@ static int Open( vlc_object_t * p_this )
     p_sys->i_default_dev = 0;
     p_sys->i_selected_dev = 0;
     p_sys->i_devices = 0;
-    p_sys->b_supports_digital = false;
     p_sys->b_digital = false;
     p_sys->au_component = NULL;
     p_sys->au_unit = NULL;
@@ -210,11 +208,9 @@ static int Open( vlc_object_t * p_this )
     }
 
     p_sys->i_selected_dev = val.i_int & ~AOUT_VAR_SPDIF_FLAG; /* remove SPDIF flag to get the true DeviceID */
-    p_sys->b_supports_digital = ( val.i_int & AOUT_VAR_SPDIF_FLAG ) ? true : false;
-    if( p_sys->b_supports_digital )
+    bool b_supports_digital = ( val.i_int & AOUT_VAR_SPDIF_FLAG );
+    if( b_supports_digital )
         msg_Dbg( p_aout, "audio device supports digital output" );
-    else
-        msg_Dbg( p_aout, "audio device does not support digital output" );
 
     /* Check if the desired device is alive and usable */
     /* TODO: add a callback to the device to alert us if the device dies */
@@ -261,7 +257,7 @@ static int Open( vlc_object_t * p_this )
     }
 
     /* Check for Digital mode or Analog output mode */
-    if( AOUT_FMT_SPDIF( &p_aout->format ) && p_sys->b_supports_digital )
+    if( AOUT_FMT_SPDIF( &p_aout->format ) && b_supports_digital )
     {
         if( OpenSPDIF( p_aout ) )
         {
@@ -1417,7 +1413,7 @@ static OSStatus StreamListener( AudioObjectID inObjectID,  UInt32 inNumberAddres
 
     VLC_UNUSED(inObjectID);
 
-    for ( unsigned int i = 0; i < inNumberAddresses; i++ )
+    for( unsigned int i = 0; i < inNumberAddresses; i++ )
     {
         if( inAddresses[i].mSelector == kAudioStreamPropertyPhysicalFormat )
         {
