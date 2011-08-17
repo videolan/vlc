@@ -170,6 +170,7 @@ static const int16_t alawtos16[256] =
 static void DecodeAlaw( void *, const uint8_t *, unsigned );
 static void DecodeUlaw( void *, const uint8_t *, unsigned );
 static void DecodeS20B( void *, const uint8_t *, unsigned );
+static void DecodeDAT12( void *, const uint8_t *, unsigned );
 
 /*****************************************************************************
  * DecoderOpen: probe the decoder and return score
@@ -192,6 +193,7 @@ static int DecoderOpen( vlc_object_t *p_this )
 
     case VLC_CODEC_ALAW:
     case VLC_CODEC_MULAW:
+    case VLC_CODEC_DAT12:
 
     case VLC_CODEC_F64L:
     case VLC_CODEC_F64B:
@@ -273,6 +275,13 @@ static int DecoderOpen( vlc_object_t *p_this )
     {
         p_dec->fmt_out.i_codec = p_dec->fmt_in.i_codec;
         p_dec->fmt_in.audio.i_bitspersample = 16;
+    }
+    else if( p_dec->fmt_in.i_codec == VLC_CODEC_DAT12 )
+    {
+        p_dec->fmt_out.i_codec = VLC_CODEC_S16N;
+        p_dec->fmt_out.audio.i_bitspersample = 16;
+        p_sys->decode = DecodeDAT12;
+        p_dec->fmt_in.audio.i_bitspersample = 12;
     }
     else if( p_dec->fmt_in.i_codec == VLC_CODEC_S8 ||
              p_dec->fmt_in.i_codec == VLC_CODEC_U8 )
@@ -424,6 +433,34 @@ static void DecodeS20B( void *outp, const uint8_t *in, unsigned samples )
     /* No U32_AT() for the last odd sample: avoid off-by-one overflow! */
     if( samples )
         *(out++) = ((U16_AT(in) << 16) | (in[2] << 8)) & ~0xFFF;
+}
+
+static int16_t dat12tos16( uint16_t y )
+{
+    static const uint16_t diff[16] = {
+       0x0000, 0x0000, 0x0100, 0x0200, 0x0300, 0x0400, 0x0500, 0x0600,
+       0x0A00, 0x0B00, 0x0C00, 0x0D00, 0x0E00, 0x0F00, 0x1000, 0x1000 };
+    static const uint8_t shift[16] = {
+        0, 0, 1, 2, 3, 4, 5, 6, 6, 5, 4, 3, 2, 1, 0, 0 };
+
+    int d = y >> 8;
+    return (y - diff[d]) << shift[d];
+}
+
+static void DecodeDAT12( void *outp, const uint8_t *in, unsigned samples )
+{
+    int32_t *out = outp;
+
+    while( samples >= 2 )
+    {
+        *(out++) = dat12tos16(U16_AT(in) >> 4);
+        *(out++) = dat12tos16(U16_AT(in + 1) & ~0xF000);
+        in += 3;
+        samples -= 2;
+    }
+
+    if( samples )
+        *(out++) = dat12tos16(U16_AT(in) >> 4);
 }
 
 /*****************************************************************************
