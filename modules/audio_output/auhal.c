@@ -36,8 +36,9 @@
 #include <vlc_aout.h>                     // aout_*
 
 #include <AudioUnit/AudioUnit.h>          // AudioUnit
-#include <CoreAudio/AudioHardware.h>      // AudioDeviceID
+#include <CoreAudio/CoreAudio.h>      // AudioDeviceID
 #include <AudioToolbox/AudioFormat.h>     // AudioFormatGetProperty
+#include <CoreServices/CoreServices.h>
 
 #ifndef verify_noerr
 # define verify_noerr(a) assert((a) == noErr)
