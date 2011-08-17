@@ -630,6 +630,46 @@ static inline unsigned popcount (unsigned x)
 #endif
 }
 
+/** Byte swap (16 bits) */
+VLC_USED
+static inline uint16_t bswap16 (uint16_t x)
+{
+    return (x << 8) | (x >> 8);
+}
+
+/** Byte swap (32 bits) */
+VLC_USED
+static inline uint32_t bswap32 (uint32_t x)
+{
+#if VLC_GCC_VERSION(4,3)
+    return __builtin_bswap32 (x);
+#else
+    return ((x & 0x000000FF) << 24)
+         | ((x & 0x0000FF00) <<  8)
+         | ((x & 0x00FF0000) >>  8)
+         | ((x & 0xFF000000) >> 24);
+#endif
+}
+
+/** Byte swap (64 bits) */
+VLC_USED
+static inline uint64_t bswap64 (uint64_t x)
+{
+#if VLC_GCC_VERSION(4,3)
+    return __builtin_bswap64 (x);
+#else
+    return ((x & 0x00000000000000FF) << 56)
+         | ((x & 0x000000000000FF00) << 40)
+         | ((x & 0x0000000000FF0000) << 24)
+         | ((x & 0x00000000FF000000) <<  8)
+         | ((x & 0x000000FF00000000) >>  8)
+         | ((x & 0x0000FF0000000000) >> 24)
+         | ((x & 0x00FF000000000000) >> 40)
+         | ((x & 0xFF00000000000000) >> 56);
+#endif
+}
+
+
 /* Free and set set the variable to NULL */
 #define FREENULL(a) do { free( a ); a = NULL; } while(0)
 
@@ -641,123 +681,140 @@ VLC_API char const * vlc_error( int ) VLC_USED;
 
 /* MSB (big endian)/LSB (little endian) conversions - network order is always
  * MSB, and should be used for both network communications and files. */
+
+#ifdef WORDS_BIGENDIAN
+# define hton16(i) ((uint16_t)(i))
+# define hton32(i) ((uint32_t)(i))
+# define hton64(i) ((uint32_t)(i))
+#else
+# define hton16(i) bswap16(i)
+# define hton32(i) bswap32(i)
+# define hton64(i) bswap64(i)
+#endif
+#define ntoh16(i) hton16(i)
+#define ntoh32(i) hton32(i)
+#define ntoh64(i) hton64(i)
+
+/** Reads 16 bits in network byte order */
 VLC_USED
-static inline uint16_t U16_AT( const void * _p )
+static inline uint16_t U16_AT (const void *p)
 {
-    const uint8_t * p = (const uint8_t *)_p;
-    return ( ((uint16_t)p[0] << 8) | p[1] );
+    uint16_t x;
+
+    memcpy (&x, p, sizeof (x));
+    return ntoh16 (x);
 }
 
+/** Reads 32 bits in network byte order */
 VLC_USED
-static inline uint32_t U32_AT( const void * _p )
+static inline uint32_t U32_AT (const void *p)
 {
-    const uint8_t * p = (const uint8_t *)_p;
-    return ( ((uint32_t)p[0] << 24) | ((uint32_t)p[1] << 16)
-              | ((uint32_t)p[2] << 8) | p[3] );
+    uint32_t x;
+
+    memcpy (&x, p, sizeof (x));
+    return ntoh32 (x);
 }
 
+/** Reads 64 bits in network byte order */
 VLC_USED
-static inline uint64_t U64_AT( const void * _p )
+static inline uint64_t U64_AT (const void *p)
 {
-    const uint8_t * p = (const uint8_t *)_p;
-    return ( ((uint64_t)p[0] << 56) | ((uint64_t)p[1] << 48)
-              | ((uint64_t)p[2] << 40) | ((uint64_t)p[3] << 32)
-              | ((uint64_t)p[4] << 24) | ((uint64_t)p[5] << 16)
-              | ((uint64_t)p[6] << 8) | p[7] );
+    uint64_t x;
+
+    memcpy (&x, p, sizeof (x));
+    return ntoh64 (x);
 }
 
+#define GetWBE(p)  U16_AT(p)
+#define GetDWBE(p) U32_AT(p)
+#define GetQWBE(p) U64_AT(p)
+
+/** Reads 16 bits in little-endian order */
 VLC_USED
-static inline uint16_t GetWLE( const void * _p )
+static inline uint16_t GetWLE (const void *p)
 {
-    const uint8_t * p = (const uint8_t *)_p;
-    return ( ((uint16_t)p[1] << 8) | p[0] );
+    uint16_t x;
+
+    memcpy (&x, p, sizeof (x));
+#ifdef WORDS_BIGENDIAN
+    x = bswap16 (x);
+#endif
+    return x;
 }
 
+/** Reads 32 bits in little-endian order */
 VLC_USED
-static inline uint32_t GetDWLE( const void * _p )
+static inline uint32_t GetDWLE (const void *p)
 {
-    const uint8_t * p = (const uint8_t *)_p;
-    return ( ((uint32_t)p[3] << 24) | ((uint32_t)p[2] << 16)
-              | ((uint32_t)p[1] << 8) | p[0] );
+    uint32_t x;
+
+    memcpy (&x, p, sizeof (x));
+#ifdef WORDS_BIGENDIAN
+    x = bswap32 (x);
+#endif
+    return x;
 }
 
+/** Reads 64 bits in little-endian order */
 VLC_USED
-static inline uint64_t GetQWLE( const void * _p )
+static inline uint64_t GetQWLE (const void *p)
 {
-    const uint8_t * p = (const uint8_t *)_p;
-    return ( ((uint64_t)p[7] << 56) | ((uint64_t)p[6] << 48)
-              | ((uint64_t)p[5] << 40) | ((uint64_t)p[4] << 32)
-              | ((uint64_t)p[3] << 24) | ((uint64_t)p[2] << 16)
-              | ((uint64_t)p[1] << 8) | p[0] );
+    uint64_t x;
+
+    memcpy (&x, p, sizeof (x));
+#ifdef WORDS_BIGENDIAN
+    x = bswap64 (x);
+#endif
+    return x;
 }
 
-#define GetWBE( p )     U16_AT( p )
-#define GetDWBE( p )    U32_AT( p )
-#define GetQWBE( p )    U64_AT( p )
-
-/* Helper writer functions */
-#define SetWLE( p, v ) _SetWLE( (uint8_t*)(p), v)
-static inline void _SetWLE( uint8_t *p, uint16_t i_dw )
+/** Writes 16 bits in network byte order */
+static inline void SetWLE (void *p, uint16_t w)
 {
-    p[1] = ( i_dw >>  8 )&0xff;
-    p[0] = ( i_dw       )&0xff;
+    w = hton16 (w);
+    memcpy (p, &w, sizeof (w));
 }
 
-#define SetDWLE( p, v ) _SetDWLE( (uint8_t*)(p), v)
-static inline void _SetDWLE( uint8_t *p, uint32_t i_dw )
+/** Writes 32 bits in network byte order */
+static inline void SetDWLE (void *p, uint32_t dw)
 {
-    p[3] = ( i_dw >> 24 )&0xff;
-    p[2] = ( i_dw >> 16 )&0xff;
-    p[1] = ( i_dw >>  8 )&0xff;
-    p[0] = ( i_dw       )&0xff;
-}
-#define SetQWLE( p, v ) _SetQWLE( (uint8_t*)(p), v)
-static inline void _SetQWLE( uint8_t *p, uint64_t i_qw )
-{
-    SetDWLE( p,   i_qw&0xffffffff );
-    SetDWLE( p+4, ( i_qw >> 32)&0xffffffff );
-}
-#define SetWBE( p, v ) _SetWBE( (uint8_t*)(p), v)
-static inline void _SetWBE( uint8_t *p, uint16_t i_dw )
-{
-    p[0] = ( i_dw >>  8 )&0xff;
-    p[1] = ( i_dw       )&0xff;
+    dw = hton32 (dw);
+    memcpy (p, &dw, sizeof (dw));
 }
 
-#define SetDWBE( p, v ) _SetDWBE( (uint8_t*)(p), v)
-static inline void _SetDWBE( uint8_t *p, uint32_t i_dw )
+/** Writes 64 bits in network byte order */
+static inline void SetQWLE (void *p, uint64_t qw)
 {
-    p[0] = ( i_dw >> 24 )&0xff;
-    p[1] = ( i_dw >> 16 )&0xff;
-    p[2] = ( i_dw >>  8 )&0xff;
-    p[3] = ( i_dw       )&0xff;
-}
-#define SetQWBE( p, v ) _SetQWBE( (uint8_t*)(p), v)
-static inline void _SetQWBE( uint8_t *p, uint64_t i_qw )
-{
-    SetDWBE( p+4,   i_qw&0xffffffff );
-    SetDWBE( p, ( i_qw >> 32)&0xffffffff );
+    qw = hton64 (qw);
+    memcpy (p, &qw, sizeof (qw));
 }
 
-#define hton16(i) htons(i)
-#define hton32(i) htonl(i)
-#define ntoh16(i) ntohs(i)
-#define ntoh32(i) ntohl(i)
-
-VLC_USED
-static inline uint64_t ntoh64 (uint64_t ll)
+/** Writes 16 bits in little endian order */
+static inline void SetWBE (void *p, uint16_t w)
 {
-    union { uint64_t qw; uint8_t b[16]; } v = { ll };
-    return ((uint64_t)v.b[0] << 56)
-         | ((uint64_t)v.b[1] << 48)
-         | ((uint64_t)v.b[2] << 40)
-         | ((uint64_t)v.b[3] << 32)
-         | ((uint64_t)v.b[4] << 24)
-         | ((uint64_t)v.b[5] << 16)
-         | ((uint64_t)v.b[6] <<  8)
-         | ((uint64_t)v.b[7] <<  0);
+#ifdef WORDS_BIGENDIAN
+    w = bswap16 (w);
+#endif
+    memcpy (p, &w, sizeof (w));
 }
-#define hton64(i) ntoh64(i)
+
+/** Writes 32 bits in little endian order */
+static inline void SetDWBE (void *p, uint32_t dw)
+{
+#ifdef WORDS_BIGENDIAN
+    dw = bswap32 (dw);
+#endif
+    memcpy (p, &dw, sizeof (dw));
+}
+
+/** Writes 64 bits in little endian order */
+static inline void SetQWBE (void *p, uint64_t qw)
+{
+#ifdef WORDS_BIGENDIAN
+    qw = bswap32 (qw);
+#endif
+    memcpy (p, &qw, sizeof (qw));
+}
 
 /* */
 #define VLC_UNUSED(x) (void)(x)
