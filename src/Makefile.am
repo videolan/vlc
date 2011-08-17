@@ -11,6 +11,7 @@ EXTRA_DIST = \
 	vlc-plugin.pc.in \
 	libvlc.sym \
 	libvlccore.sym \
+	revision.txt \
 	../include/vlc/libvlc_version.h.in
 
 BUILT_SOURCES = \
@@ -198,7 +199,6 @@ AM_LDFLAGS += -avoid-version
 endif
 
 libvlccore_la_SOURCES = $(SOURCES_libvlc)
-nodist_libvlccore_la_SOURCES = revision.c
 libvlccore_la_CFLAGS = `$(VLC_CONFIG) --cflags libvlccore` \
 	-DMODULE_STRING=\"main\" \
 	-DLOCALEDIR=\"$(localedir)\" \
@@ -221,7 +221,6 @@ libvlc_win32_rc.$(OBJEXT): libvlc_win32_rc.rc
 	$(WINDRES) --include-dir $(top_srcdir)/share -i $< -o $@
 
 libvlc_la_SOURCES = $(SOURCES_libvlc_control)
-nodist_libvlc_la_SOURCES = revision.c
 libvlc_la_LIBADD = `$(VLC_CONFIG) -libs libvlc` \
 	libvlccore.la ../compat/libcompat.la
 libvlc_la_CFLAGS = `$(VLC_CONFIG) --cflags libvlc`
@@ -323,6 +322,7 @@ SOURCES_libvlc_common = \
 	libvlc.h \
 	libvlc-module.c \
 	missing.c \
+	revision.c \
 	version.c \
 	interface/dialog.c \
 	interface/interface.c \
@@ -506,6 +506,7 @@ SOURCES_libvlc = \
 	$(NULL)
 
 SOURCES_libvlc_control = \
+	revision.c \
 	control/libvlc_internal.h \
 	control/event_internal.h \
 	control/media_internal.h \
@@ -546,26 +547,29 @@ libvlcpulse_la_LDFLAGS = -export-symbols-regex ^vlc_pa_ -no-undefined
 ###############################################################################
 
 BUILT_SOURCES += stamp-revision
-CLEANFILES += revision.txt revision.c
 
-revision.c: revision.txt
-	$(AM_V_at)rm -f -- revision.c
-	$(AM_V_GEN)echo "const char psz_vlc_changeset[] = \"$$(cat revision.txt)\";" \
-		> revision.c
+$(srcdir)/revision.c: $(srcdir)/revision.txt
+	$(AM_V_at)rm -f -- $@
+	$(AM_V_GEN)echo "const char psz_vlc_changeset[] = \"$$(cat $<)\";" \
+		> $@
 
-revision.txt: Makefile.am
+$(srcdir)/revision.txt:
 	$(AM_V_at)$(MAKE) stamp-revision
-	$(AM_V_GEN)touch revision.txt
+	$(AM_V_GEN)touch $@
 
 stamp-revision:
 	$(AM_V_at)rm -f -- revision.tmp
-	$(AM_V_GEN)(git --git-dir="$(top_srcdir)/.git/" describe --tags --long \
-		--match '?.*.*' --always || echo exported) > revision.tmp
-	$(AM_V_at)if diff revision.tmp revision.txt >/dev/null 2>&1; then \
+	$(AM_V_GEN)if ! git \
+			--git-dir="$(top_srcdir)/.git/" describe \
+			--tags --long --match '?.*.*' --always; then \
+		cat $(srcdir)/revision.txt ; \
+	fi > revision.tmp
+	$(AM_V_at)if diff revision.tmp $(srcdir)/revision.txt >/dev/null 2>&1; then \
 		rm -f -- revision.tmp; \
 	else \
-		mv -f -- revision.tmp revision.txt; \
-	fi 2>&1
+		mv -f -- revision.tmp $(srcdir)/revision.txt; \
+	fi
+#2>&1
 
 ###############################################################################
 # Unit/regression test
