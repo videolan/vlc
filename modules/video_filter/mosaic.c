@@ -281,11 +281,9 @@ static int CreateFilter( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys;
-    vlc_object_t *p_libvlc = VLC_OBJECT( p_filter->p_libvlc );
     char *psz_order, *_psz_order;
     char *psz_offsets;
     int i_index;
-    vlc_value_t val;
     int i_command;
 
     /* Allocate structure */
