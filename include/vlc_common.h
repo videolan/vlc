@@ -56,6 +56,14 @@
 # include <stdbool.h>
 #endif
 
+/* Helper for GCC version checks */
+#ifdef __GNUC__
+# define VLC_GCC_VERSION(maj,min) \
+    ((__GNUC__ > (maj)) || (__GNUC__ == (maj) && __GNUC_MINOR__ >= (min)))
+#else
+# define VLC_GCC_VERSION(maj,min) (0)
+#endif
+
 /* Try to fix format strings for all versions of mingw and mingw64 */
 #if defined( _WIN32 ) && defined( __USE_MINGW_ANSI_STDIO )
  #undef PRId64
@@ -72,26 +80,33 @@
  #define vsnprintf       __mingw_vsnprintf
 #endif
 
-/* Format string sanity checks */
+/* Function attributes for compiler warnings */
 #ifdef __GNUC__
-#   if defined( _WIN32 ) && (__GNUC__ > 4 || ( __GNUC__ == 4 && __GNUC_MINOR__ >= 4 ) )
-#     define VLC_FORMAT(x,y) __attribute__ ((format(gnu_printf,x,y)))
-#   else
-#     define VLC_FORMAT(x,y) __attribute__ ((format(printf,x,y)))
-#   endif
-#   define VLC_FORMAT_ARG(x) __attribute__ ((format_arg(x)))
-#   if __GNUC__ > 3 || (__GNUC__ == 3 && (__GNUC_MINOR__ >= 4))
-#     define VLC_USED __attribute__ ((warn_unused_result))
-#   else
-#     define VLC_USED
-#   endif
-#   define VLC_MALLOC __attribute__ ((malloc))
+# define VLC_DEPRECATED __attribute__((deprecated))
+
+# if defined( _WIN32 ) && VLC_GCC_VERSION(4,4)
+#  define VLC_FORMAT(x,y) __attribute__ ((format(gnu_printf,x,y)))
+# else
+#  define VLC_FORMAT(x,y) __attribute__ ((format(printf,x,y)))
+# endif
+# define VLC_FORMAT_ARG(x) __attribute__ ((format_arg(x)))
+
+# define VLC_MALLOC __attribute__ ((malloc))
+
+# if VLC_GCC_VERSION(3,4)
+#  define VLC_USED __attribute__ ((warn_unused_result))
+# else
+#  define VLC_USED
+# endif
+
 #else
-#   define VLC_FORMAT(x,y)
-#   define VLC_FORMAT_ARG(x)
-#   define VLC_USED
-#   define VLC_MALLOC
+# define VLC_DEPRECATED
+# define VLC_FORMAT(x,y)
+# define VLC_FORMAT_ARG(x)
+# define VLC_MALLOC
+# define VLC_USED
 #endif
+
 
 /* Branch prediction */
 #ifdef __GNUC__
@@ -100,12 +115,6 @@
 #else
 #   define likely(p)   (!!(p))
 #   define unlikely(p) (!!(p))
-#endif
-
-#if defined(__GNUC__) && !defined __cplusplus
-# define VLC_DEPRECATED __attribute__((deprecated))
-#else
-# define VLC_DEPRECATED
 #endif
 
 /* Linkage */
@@ -117,7 +126,7 @@
 
 #if defined (WIN32) && defined (DLL_EXPORT)
 # define VLC_EXPORT __declspec(dllexport)
-#elif defined (__GNUC__) && (__GNUC__ >= 4)
+#elif VLC_GCC_VERSION(4,0)
 # define VLC_EXPORT __attribute__((visibility("default")))
 #else
 # define VLC_EXPORT
@@ -505,7 +514,7 @@ typedef union
 /**@}*/                                                                     \
 
 /* VLC_OBJECT: attempt at doing a clever cast */
-#if defined( __GNUC__ ) && __GNUC__ > 3
+#if VLC_GCC_VERSION(4,0)
 # ifndef __cplusplus
 #  define VLC_OBJECT( x ) \
     __builtin_choose_expr( \
@@ -579,11 +588,11 @@ static inline uint8_t clip_uint8_vlc( int32_t a )
     else           return a;
 }
 
-/* Count leading zeroes */
+/** Count leading zeroes */
 VLC_USED
 static inline unsigned clz (unsigned x)
 {
-#ifdef __GNUC_
+#if VLC_GCC_VERSION(3,4)
     return __builtin_clz (x);
 #else
     unsigned i = sizeof (x) * 8;
@@ -602,11 +611,11 @@ static inline unsigned clz (unsigned x)
 /* XXX: this assumes that int is 32-bits or more */
 #define clz32( x ) (clz(x) - ((sizeof(unsigned) - sizeof (uint32_t)) * 8))
 
-/* Bit weight */
+/** Bit weight */
 VLC_USED
 static inline unsigned popcount (unsigned x)
 {
-#ifdef __GNUC_
+#if VLC_GCC_VERSION(3,4)
     return __builtin_popcount (x);
 #else
     unsigned count = 0;
