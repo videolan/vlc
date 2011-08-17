@@ -169,6 +169,7 @@ static const int16_t alawtos16[256] =
 
 static void DecodeAlaw( void *, const uint8_t *, unsigned );
 static void DecodeUlaw( void *, const uint8_t *, unsigned );
+static void DecodeS20B( void *, const uint8_t *, unsigned );
 
 /*****************************************************************************
  * DecoderOpen: probe the decoder and return score
@@ -200,6 +201,7 @@ static int DecoderOpen( vlc_object_t *p_this )
     case VLC_CODEC_S32B:
     case VLC_CODEC_S24L:
     case VLC_CODEC_S24B:
+    case VLC_CODEC_S20B:
     case VLC_CODEC_S16L:
     case VLC_CODEC_S16B:
     case VLC_CODEC_S8:
@@ -258,6 +260,13 @@ static int DecoderOpen( vlc_object_t *p_this )
     {
         p_dec->fmt_out.i_codec = p_dec->fmt_in.i_codec;
         p_dec->fmt_in.audio.i_bitspersample = 24;
+    }
+    else if( p_dec->fmt_in.i_codec == VLC_CODEC_S20B )
+    {
+        p_dec->fmt_out.i_codec = VLC_CODEC_S32N;
+        p_dec->fmt_out.audio.i_bitspersample = 32;
+        p_sys->decode = DecodeS20B;
+        p_dec->fmt_in.audio.i_bitspersample = 20;
     }
     else if( p_dec->fmt_in.i_codec == VLC_CODEC_S16L ||
              p_dec->fmt_in.i_codec == VLC_CODEC_S16B )
@@ -398,6 +407,23 @@ static void DecodeUlaw( void *outp, const uint8_t *in, unsigned samples )
 
     for( unsigned i = 0; i < samples; i++ )
        *(out++) = ulawtos16[*(in++)];
+}
+
+static void DecodeS20B( void *outp, const uint8_t *in, unsigned samples )
+{
+    int32_t *out = outp;
+
+    while( samples >= 2 )
+    {
+        *(out++) = U32_AT(in) & ~0xFFF;
+        *(out++) = U32_AT(in + 1) << 12;
+        in += 5;
+        samples -= 2;
+    }
+
+    /* No U32_AT() for the last odd sample: avoid off-by-one overflow! */
+    if( samples )
+        *(out++) = ((U16_AT(in) << 16) | (in[2] << 8)) & ~0xFFF;
 }
 
 /*****************************************************************************
