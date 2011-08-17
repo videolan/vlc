@@ -1963,6 +1963,7 @@ static void TaskInterruptData( void *p_private )
 /*****************************************************************************
  *
  *****************************************************************************/
+VLC_NORETURN
 static void* TimeoutPrevention( void *p_data )
 {
     timeout_thread_t *p_timeout = (timeout_thread_t *)p_data;

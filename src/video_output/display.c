@@ -538,9 +538,7 @@ static void VoutDisplayEventMouse(vout_display_t *vd, int event, va_list args)
     vlc_mutex_unlock(&osys->lock);
 }
 
-#ifdef __GNUC__
-static void *VoutDisplayEventKeyDispatch(void *data) __attribute__((noreturn));
-#endif
+VLC_NORETURN
 static void *VoutDisplayEventKeyDispatch(void *data)
 {
     vout_display_owner_sys_t *osys = data;

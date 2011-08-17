@@ -1018,6 +1018,7 @@ struct vlc_timer
     vlc_atomic_t overruns;
 };
 
+VLC_NORETURN
 static void *vlc_timer_thread (void *data)
 {
     struct vlc_timer *timer = data;

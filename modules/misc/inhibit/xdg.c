@@ -112,6 +112,7 @@ static void Inhibit (vlc_inhibit_t *ih, bool suspend)
 
 extern char **environ;
 
+VLC_NORETURN
 static void *Thread (void *data)
 {
     vlc_inhibit_t *ih = data;

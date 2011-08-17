@@ -1554,6 +1554,7 @@ static int mms_HeaderMediaRead( access_t *p_access, int i_type )
     return -1;
 }
 
+VLC_NORETURN
 static void *KeepAliveThread( void *p_data )
 {
     access_t *p_access = p_data;

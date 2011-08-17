@@ -170,6 +170,7 @@ static void AddressDestroy (sap_address_t *addr)
  * \param p_this the SAP Handler object
  * \return nothing
  */
+VLC_NORETURN
 static void *RunThread (void *self)
 {
     sap_address_t *addr = self;

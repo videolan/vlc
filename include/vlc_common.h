@@ -92,6 +92,7 @@
 # define VLC_FORMAT_ARG(x) __attribute__ ((format_arg(x)))
 
 # define VLC_MALLOC __attribute__ ((malloc))
+# define VLC_NORETURN __attribute__ ((noreturn))
 
 # if VLC_GCC_VERSION(3,4)
 #  define VLC_USED __attribute__ ((warn_unused_result))
@@ -104,6 +105,7 @@
 # define VLC_FORMAT(x,y)
 # define VLC_FORMAT_ARG(x)
 # define VLC_MALLOC
+# define VLC_NORETURN
 # define VLC_USED
 #endif
 

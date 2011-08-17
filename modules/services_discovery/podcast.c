@@ -200,6 +200,7 @@ static void Close( vlc_object_t *p_this )
 /*****************************************************************************
  * Run: main thread
  *****************************************************************************/
+VLC_NORETURN
 static void *Run( void *data )
 {
     services_discovery_t *p_sd = data;
