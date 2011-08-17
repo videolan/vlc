@@ -28,14 +28,15 @@
 #   include "config.h"
 #endif
 
-#include <vlc_common.h>
-#include <vlc_interface.h>
-#include <vlc_playlist.h>
-#include <vlc_vout.h>
-#include <vlc_aout.h>
-#include <vlc_input.h>
+#import <vlc_common.h>
+#import <vlc_interface.h>
+#import <vlc_playlist.h>
+#import <vlc_vout.h>
+#import <vlc_aout.h>
+#import <vlc_input.h>
 
-#include <Cocoa/Cocoa.h>
+#import <Cocoa/Cocoa.h>
+#import "CompatibilityFixes.h"
 #import "SPMediaKeyTap.h"                   /* for the media key support */
 #import "misc.h"
 #import "MainWindow.h"

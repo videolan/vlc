@@ -25,6 +25,7 @@
  * VLCEmbeddedWindow interface
  *****************************************************************************/
 
+#import "CompatibilityFixes.h"
 #import "misc.h"
 
 @interface VLCEmbeddedWindow : NSWindow <NSWindowDelegate, NSAnimationDelegate>
