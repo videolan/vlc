@@ -720,7 +720,7 @@ static int Demux( demux_t *p_demux)
 
         if( p_sys->i_pts >= p_sys->i_start_pts  )
         {
-            if ( p_vsegment->UpdateCurrentToChapter( *p_demux ) )
+            if ( p_vsegment->UpdateCurrentToChapter( *p_demux ) && p_vsegment->CurrentEdition() && p_vsegment->CurrentEdition()->b_ordered )
             {
                 i_return = 1;
                 delete block;
