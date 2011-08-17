@@ -179,13 +179,8 @@ static int Open( vlc_object_t * p_this )
                             continue; // don't reuse the original opened file
                         }
 
-#if defined(__GNUC__) && (__GNUC__ < 3)
-                        if (!s_filename.compare("mkv", s_filename.length() - 3, 3) ||
-                            !s_filename.compare("mka", s_filename.length() - 3, 3))
-#else
                         if (!s_filename.compare(s_filename.length() - 3, 3, "mkv") ||
                             !s_filename.compare(s_filename.length() - 3, 3, "mka"))
-#endif
                         {
                             // test wether this file belongs to our family
                             const uint8_t *p_peek;
