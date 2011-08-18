@@ -4480,5 +4480,4 @@ else
 echo "build vlc executable  : no"
 fi
 echo "
-You can tune the compiler flags in vlc-config.
 To build vlc and its plugins, type \`./compile' or \`$USE_MAKE_OR_GMAKE'."
