@@ -593,7 +593,7 @@ static void *Run( void *data )
         }
 
         if( !p_sd->p_sys->i_announces )
-            timeout = -1; /* We can safely poll indefinitly. */
+            timeout = -1; /* We can safely poll indefinitely. */
         else if( timeout < 200 )
             timeout = 200; /* Don't wakeup too fast. */
     }
