@@ -255,7 +255,6 @@ void msg_GenericVa (vlc_object_t *p_this, int i_type,
                            const char *psz_module,
                            const char *psz_format, va_list _args)
 {
-    char *       psz_str = NULL;                 /* formatted message string */
     va_list      args;
 
     assert (p_this);
@@ -326,39 +325,16 @@ void msg_GenericVa (vlc_object_t *p_this, int i_type,
 #endif
 
     /* Convert message to string  */
+    static const char nomemstr[] = "<not enough memory to format message>";
+    char *str;
+
     vlc_va_copy( args, _args );
-    if( vasprintf( &psz_str, psz_format, args ) == -1 )
-        psz_str = NULL;
+    if (unlikely(vasprintf (&str, psz_format, args) == -1))
+        str = (char *)nomemstr;
     va_end( args );
 
     uselocale (locale);
     freelocale (c);
-
-    if (unlikely(psz_str == NULL))
-    {
-        int canc = vlc_savecancel (); /* Do not print half of a message... */
-#ifdef __GLIBC__
-        fprintf( stderr, "main warning: can't store message (%m): " );
-#else
-        char psz_err[1001];
-#ifndef WIN32
-        /* we're not using GLIBC, so we are sure that the error description
-         * will be stored in the buffer we provide to strerror_r() */
-        strerror_r( errno, psz_err, 1001 );
-#else
-        strncpy( psz_err, strerror( errno ), 1001 );
-#endif
-        psz_err[1000] = '\0';
-        fprintf( stderr, "main warning: can't store message (%s): ", psz_err );
-#endif
-        vlc_va_copy( args, _args );
-        /* We should use utf8_vfprintf - but it calls malloc()... */
-        vfprintf( stderr, psz_format, args );
-        va_end( args );
-        fputs( "\n", stderr );
-        vlc_restorecancel (canc);
-        return;
-    }
 
     /* Fill message information fields */
     msg_item_t msg;
@@ -367,7 +343,7 @@ void msg_GenericVa (vlc_object_t *p_this, int i_type,
     msg.i_object_id = (uintptr_t)p_this;
     msg.psz_object_type = p_this->psz_object_type;
     msg.psz_module = psz_module;
-    msg.psz_msg = psz_str;
+    msg.psz_msg = str;
     msg.psz_header = NULL;
 
     for (vlc_object_t *o = p_this; o != NULL; o = o->p_parent)
@@ -413,7 +389,9 @@ void msg_GenericVa (vlc_object_t *p_this, int i_type,
         sub->func (sub->opaque, &msg);
     }
     vlc_rwlock_unlock (&bank->lock);
-    free (msg.psz_msg);
+
+    if (likely(str != (char *)nomemstr))
+        free (str);
 }
 
 /*****************************************************************************
