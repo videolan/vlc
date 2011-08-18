@@ -52,14 +52,12 @@
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
-#include <vlc_vout.h>
 
 #include <vlc_filter.h>
-#include <vlc_image.h>
-#include <vlc_keys.h>
+#include <vlc_keys.h>                  /* KEY_MODIFIER_CTRL */
 
-#include <vlc_network.h>
-#include <gcrypt.h>              /* to encrypt password */
+#include <vlc_network.h>               /* net_*, htonl */
+#include <gcrypt.h>                    /* to encrypt password */
 #include <vlc_gcrypt.h>
 
 #include "remoteosd_rfbproto.h" /* type definitions of the RFB protocol for VNC */
@@ -226,7 +224,7 @@ struct filter_sys_t
 
     uint16_t      i_vnc_width;          /* The with of the VNC screen */
     uint16_t      i_vnc_height;         /* The height of the VNC screen */
-	uint32_t      i_vnc_pixels;         /* The pixels of the VNC screen */
+    uint32_t      i_vnc_pixels;         /* The pixels of the VNC screen */
 
     bool    b_alpha_from_vnc;    /* Special ffnetdev alpha feature enabled ? */
 
@@ -670,7 +668,7 @@ static void* vnc_worker_thread( void *obj )
         vlc_mutex_unlock( &p_sys->lock );
         goto exit;
     }
-	p_sys->i_vnc_pixels = p_sys->i_vnc_width * p_sys->i_vnc_height;
+    p_sys->i_vnc_pixels = p_sys->i_vnc_width * p_sys->i_vnc_height;
 
     vlc_mutex_unlock( &p_sys->lock );
 
@@ -802,14 +800,13 @@ static void* update_request_thread( void *obj )
     }
 
     udr.incremental = 1;
-    mtime_t i_poll_interval_microsec = p_sys->i_vnc_poll_interval * 1000;
 
     if( p_sys->b_vnc_poll)
     {
         vlc_cleanup_push( update_request_thread_cleanup, p_filter );
         for( ;; )
         {
-            msleep( i_poll_interval_microsec );
+            msleep( p_sys->i_vnc_poll_interval * 1000 );
             if( !write_exact(p_filter, p_sys->i_socket, (char*)&udr,
                              sz_rfbFramebufferUpdateRequestMsg))
             {
