@@ -92,7 +92,6 @@ void module_InitBank (void)
         if (likely(module != NULL))
             module_StoreBank (module);
 
-        vlc_rwlock_init (&config_lock);
         config_SortConfig ();
     }
     modules.usage++;
@@ -126,7 +125,6 @@ void module_EndBank (bool b_plugins)
     if (--modules.usage == 0)
     {
         config_UnsortConfig ();
-        vlc_rwlock_destroy (&config_lock);
         head = modules.head;
         modules.head = NULL;
     }

@@ -36,7 +36,7 @@
 #include "configuration.h"
 #include "modules/modules.h"
 
-vlc_rwlock_t config_lock;
+vlc_rwlock_t config_lock = VLC_STATIC_RWLOCK;
 
 static inline char *strdupnull (const char *src)
 {
