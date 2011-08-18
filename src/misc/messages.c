@@ -266,8 +266,7 @@ void msg_GenericVa (vlc_object_t *p_this, int i_type,
 
     assert (p_this);
 
-    if( p_this->i_flags & OBJECT_FLAGS_QUIET ||
-        (p_this->i_flags & OBJECT_FLAGS_NODBG && i_type == VLC_MSG_DBG) )
+    if( p_this->i_flags & OBJECT_FLAGS_QUIET )
         return;
 
     msg_bank_t *bank = libvlc_bank (p_this->p_libvlc);
