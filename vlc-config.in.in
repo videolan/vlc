@@ -7,8 +7,6 @@ datarootdir="@datarootdir@"
 
 optim="@optim@"
 
-plugins="@PLUGINS@ "
-
 cppflags=""
 cflags=""
 cxxflags=""
@@ -29,7 +27,6 @@ Options:
         [--prefix[=DIR]]          set prefix
         [--exec-prefix[=DIR]]     set exec prefix
         [--version]               print version and exit
-        [--list]                  print modules names and exit
         [--libs]                  output linking flags
         [--cflags]                output C compilation flags
         [--cxxflags]              output C++ compilation flags
@@ -120,9 +117,6 @@ while test $# -gt 0; do
       echo "@VERSION@"
       exit 0
       ;;
-    --list)
-      echo_list=yes
-      ;;
     --cflags)
       echo_cflags=yes
       ;;
@@ -146,9 +140,6 @@ while test $# -gt 0; do
       ;;
     libvlccore)
       ;;
-    plugin)
-      echo_plugin=yes
-      ;;
     *)
       module="$tgt"
       ;;
@@ -170,14 +161,6 @@ fi
 #
 #  Output what we were asked
 #
-if test "${echo_list}" = yes; then
-  if test "${echo_plugin}" = yes; then
-    echo "${plugins}"
-    printf '\n'
-  fi
-  exit 0
-fi
-
 if test "${echo_prefix}" = yes; then
   echo "${prefix}"
 fi

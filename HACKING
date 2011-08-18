@@ -69,8 +69,8 @@ file. If you add a new directory you will need to create a new Modules.am,
 inside that directory. Do not forget to add a corresponding
 Makefile line at the end of configure.ac for this new Modules.am file.
 
-To have the module built, you need to add a call to VLC_ADD_PLUGIN or
-VLC_ADD_BUILTINS to configure.ac with your new module name as argument.
+To have the module built, you need to add a call to VLC_ADD_PLUGIN to
+configure.ac with your new module name as argument.
 Look at other modules for guidelines on how to add build and linkage options.
 
 After changing configure.ac you will always need to rerun bootstrap and 

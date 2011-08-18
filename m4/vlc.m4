@@ -90,8 +90,6 @@ AC_DEFUN([VLC_OUTPUT_VLC_CONFIG_IN], [
   sed -ne '/#@1@#/q;p' < "${srcdir}/vlc-config.in.in" \
     | sed \
           -e "s/@optim@/${enable_optimizations}/" \
-          -e "s/@PLUGINS@/${PLUGINS}/" \
-          -e "s/@BUILTINS@/${BUILTINS}/" \
           -e "s/@CFLAGS_TUNING@/${CFLAGS_TUNING}/" \
     > vlc-config.in
 
