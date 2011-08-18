@@ -19,6 +19,9 @@ libfilesystem_plugin_la_SOURCES = \
 	fs.c
 libfilesystem_plugin_la_CFLAGS = $(AM_CFLAGS)
 libfilesystem_plugin_la_LIBADD = $(AM_LIBADD)
+if HAVE_WIN32
+libfilesystem_plugin_la_LIBADD += -lshlwapi
+endif
 libfilesystem_plugin_la_DEPENDENCIES =
 
 libidummy_plugin_la_SOURCES = idummy.c
