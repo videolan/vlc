@@ -61,6 +61,7 @@ Codecs:
  * New module for decoding EBU subtitles (.stl)
  * Support for 9bits and 10bits H.264/AVC decoding
  * Support for Lagarith Lossless video codec
+ * Support for 20-bits PCM and DAT-12 (digital magnetic tapes) from RTP
 
 Demuxers:
  * New images demuxer supporting jpeg, png, targa, xcf, git, tiff, bmp, pcx, lbm
