@@ -1818,7 +1818,6 @@ static void HandleKey(intf_thread_t *p_intf)
 static void MsgCallback(msg_cb_data_t *data, const msg_item_t *msg)
 {
     intf_sys_t *p_sys = data->p_sys;
-    int canc = vlc_savecancel();
 
     vlc_mutex_lock(&p_sys->msg_lock);
 
@@ -1830,8 +1829,6 @@ static void MsgCallback(msg_cb_data_t *data, const msg_item_t *msg)
         p_sys->i_msgs = 0;
 
     vlc_mutex_unlock(&p_sys->msg_lock);
-
-    vlc_restorecancel(canc);
 }
 
 static inline void UpdateInput(intf_sys_t *p_sys, playlist_t *p_playlist)
