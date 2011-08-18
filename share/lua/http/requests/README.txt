@@ -19,7 +19,10 @@ status.xml or status.json
 < Get VLC version, and http api version
 
 > add <mrl> to playlist and start playback:
-  ?command=in_play&input=<mrl>
+  ?command=in_play&input=<mrl>&option=<option>
+  the option field is optional, and can have the values:
+    noaudio
+    novideo
 
 > add <mrl> to playlist:
   ?command=in_enqueue&input=<mrl>
