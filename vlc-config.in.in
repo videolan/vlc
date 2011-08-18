@@ -1,10 +1,5 @@
 #!@SHELL@
 
-prefix="@prefix@"
-exec_prefix="@exec_prefix@"
-exec_prefix_set=no
-datarootdir="@datarootdir@"
-
 optim="@optim@"
 
 cppflags=""
@@ -24,8 +19,6 @@ usage()
         cat << BLAH
 Usage: vlc-config OPTIONS MODULES
 Options:
-        [--prefix[=DIR]]          set prefix
-        [--exec-prefix[=DIR]]     set exec prefix
         [--version]               print version and exit
         [--libs]                  output linking flags
         [--cflags]                output C compilation flags
@@ -97,22 +90,6 @@ while test $# -gt 0; do
   esac
 
   case "$tgt" in
-    --prefix=*)
-      prefix="${optarg}"
-      if test "${exec_prefix_set}" = no ; then
-        exec_prefix="${optarg}"
-      fi
-      ;;
-    --prefix)
-      echo_prefix=yes
-      ;;
-    --exec-prefix=*)
-      exec_prefix="${optarg}"
-      exec_prefix_set=yes
-      ;;
-    --exec-prefix)
-      echo_exec_prefix=yes
-      ;;
     --version)
       echo "@VERSION@"
       exit 0
@@ -161,12 +138,6 @@ fi
 #
 #  Output what we were asked
 #
-if test "${echo_prefix}" = yes; then
-  echo "${prefix}"
-fi
-if test "${echo_exec_prefix}" = yes; then
-  echo "${exec_prefix}"
-fi
 if test "${echo_cppflags}" = yes; then
   echo "${cppflags}"
 fi
