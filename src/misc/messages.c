@@ -200,18 +200,6 @@ void msg_Unsubscribe (msg_subscription_t *sub)
     free (sub);
 }
 
-void msg_SubscriptionSetVerbosity( msg_subscription_t *sub, const int i_verbosity )
-{
-    if( i_verbosity < 0 || i_verbosity > 2 ) return;
-
-    msg_bank_t *bank = libvlc_bank ( sub->instance );
-
-    vlc_rwlock_wrlock (&bank->lock);
-
-    sub->verbosity = i_verbosity;
-
-    vlc_rwlock_unlock (&bank->lock);
-}
 /*****************************************************************************
  * msg_*: print a message
  *****************************************************************************

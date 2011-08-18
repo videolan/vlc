@@ -281,7 +281,6 @@ msg_Generic
 msg_GenericVa
 msg_Subscribe
 msg_Unsubscribe
-msg_SubscriptionSetVerbosity
 msleep
 mstrtime
 mwait
