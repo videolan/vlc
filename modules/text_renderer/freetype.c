@@ -256,7 +256,7 @@ typedef struct
 typedef struct line_desc_t line_desc_t;
 struct line_desc_t
 {
-    line_desc_t    *p_next;
+    line_desc_t      *p_next;
 
     int              i_width;
     int              i_base_line;
@@ -694,7 +694,7 @@ static int RenderYUVP( filter_t *p_filter, subpicture_region_t *p_region,
     for( ; p_line != NULL; p_line = p_line->p_next )
     {
         int i_align_left = 0;
-        if( p_line->i_width < fmt.i_visible_width )
+        if( p_line->i_width < (int)fmt.i_visible_width )
         {
             if( (p_region->i_align & 0x3) == SUBPICTURE_ALIGN_RIGHT )
                 i_align_left = ( fmt.i_visible_width - p_line->i_width );
@@ -2107,7 +2107,7 @@ static int ProcessLines( filter_t *p_filter,
                     BBoxEnlarge( &line_bbox_new, &shadow_bbox );
 
                 b_break_line = i_index > i_start &&
-                               line_bbox_new.xMax - line_bbox_new.xMin >= p_filter->fmt_out.video.i_visible_width;
+                               line_bbox_new.xMax - line_bbox_new.xMin >= (int)p_filter->fmt_out.video.i_visible_width;
                 if( b_break_line )
                 {
                     FT_Done_Glyph( glyph );
@@ -2218,7 +2218,7 @@ static int ProcessLines( filter_t *p_filter,
         if( i_start < i_len && psz_text[i_start] == '\n' )
             i_start++;
 
-        if( bbox.yMax - bbox.yMin >= p_filter->fmt_out.video.i_visible_height )
+        if( bbox.yMax - bbox.yMin >= (int)p_filter->fmt_out.video.i_visible_height )
         {
             msg_Err( p_filter, "Truncated too high subtitle" );
             break;
