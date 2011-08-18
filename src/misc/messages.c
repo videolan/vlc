@@ -55,17 +55,6 @@
 #include <vlc_charset.h>
 #include "../libvlc.h"
 
-/*****************************************************************************
- * Local macros
- *****************************************************************************/
-#if defined(HAVE_VA_COPY)
-#   define vlc_va_copy(dest,src) va_copy(dest,src)
-#elif defined(HAVE___VA_COPY)
-#   define vlc_va_copy(dest,src) __va_copy(dest,src)
-#else
-#   define vlc_va_copy(dest,src) (dest)=(src)
-#endif
-
 static inline msg_bank_t *libvlc_bank (libvlc_int_t *inst)
 {
     return (libvlc_priv (inst))->msg_bank;
@@ -251,12 +240,9 @@ void msg_Generic( vlc_object_t *p_this, int i_type, const char *psz_module,
  * is full). If the message can't be converted to string in memory, it issues
  * a warning.
  */
-void msg_GenericVa (vlc_object_t *p_this, int i_type,
-                           const char *psz_module,
-                           const char *psz_format, va_list _args)
+void msg_GenericVa (vlc_object_t *p_this, int i_type, const char *psz_module,
+                    const char *psz_format, va_list args)
 {
-    va_list      args;
-
     assert (p_this);
 
     if( p_this->i_flags & OBJECT_FLAGS_QUIET )
@@ -328,10 +314,8 @@ void msg_GenericVa (vlc_object_t *p_this, int i_type,
     static const char nomemstr[] = "<not enough memory to format message>";
     char *str;
 
-    vlc_va_copy( args, _args );
     if (unlikely(vasprintf (&str, psz_format, args) == -1))
         str = (char *)nomemstr;
-    va_end( args );
 
     uselocale (locale);
     freelocale (c);

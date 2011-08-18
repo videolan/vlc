@@ -646,26 +646,6 @@ LIBS_save="${LIBS}"
 AC_SEARCH_LIBS([getaddrinfo], [nsl],,, [${SOCKET_LIBS}])
 LIBS="${LIBS_save}"
 
-dnl Check for va_copy
-AC_CACHE_CHECK([for va_copy], ac_cv_c_va_copy,
-  AC_TRY_LINK(
-    [#include <stdarg.h>],
-    [va_list ap1, ap2; va_copy(ap1,ap2);],
-    [ac_cv_c_va_copy="yes"],
-    [ac_cv_c_va_copy="no"]))
-if test "${ac_cv_c_va_copy}" = "yes"; then
-  AC_DEFINE(HAVE_VA_COPY, 1, [Define if <stdarg.h> defines va_copy.])
-fi
-AC_CACHE_CHECK([for __va_copy], ac_cv_c___va_copy,
-  AC_TRY_LINK(
-    [#include <stdarg.h>],
-    [va_list ap1, ap2; __va_copy(ap1,ap2);],
-    [ac_cv_c___va_copy="yes"],
-    [ac_cv_c___va_copy="no"]))
-if test "${ac_cv_c___va_copy}" = "yes"; then
-  AC_DEFINE(HAVE___VA_COPY, 1, [Define if <stdarg.h> defines __va_copy.])
-fi
-
 AC_CHECK_FUNCS(inet_aton,,[
   AC_CHECK_LIB(resolv,inet_aton,[
     VLC_ADD_LIBS([libvlccore],[-lresolv])
