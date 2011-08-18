@@ -46,10 +46,6 @@
 #   include <vlc_network.h>          /* 'net_strerror' and 'WSAGetLastError' */
 #endif
 
-#ifdef HAVE_UNISTD_H
-#   include <unistd.h>                                   /* close(), write() */
-#endif
-
 #include <assert.h>
 
 #include <vlc_charset.h>
