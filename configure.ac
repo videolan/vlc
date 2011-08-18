@@ -3060,8 +3060,7 @@ AS_IF([test "${enable_kate}" != "no"], [
         AC_CHECK_HEADERS(kate/kate.h, [
           AC_CHECK_LIB(kate, kate_decode_init, [
             VLC_ADD_PLUGIN([kate])
-            kate_libs="-lkate -logg"
-            VLC_ADD_LDFLAGS([kate],[${kate_libs}]) ],[
+            VLC_ADD_LIBS([kate],[-lkate -logg]) ],[
             AS_IF([test "x${enable_kate}" != "x"], [
               AC_MSG_ERROR([libkate doesn't appear to be installed on your system.
               You also need to check that you have a libogg posterior to the 1.0 release.])
