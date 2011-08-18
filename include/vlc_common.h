@@ -657,7 +657,7 @@ static inline uint64_t bswap64 (uint64_t x)
 {
 #if VLC_GCC_VERSION(4,3)
     return __builtin_bswap64 (x);
-#else
+#elif !defined (__cplusplus)
     return ((x & 0x00000000000000FF) << 56)
          | ((x & 0x000000000000FF00) << 40)
          | ((x & 0x0000000000FF0000) << 24)
@@ -666,6 +666,15 @@ static inline uint64_t bswap64 (uint64_t x)
          | ((x & 0x0000FF0000000000) >> 24)
          | ((x & 0x00FF000000000000) >> 40)
          | ((x & 0xFF00000000000000) >> 56);
+#else
+    return ((x & 0x00000000000000FFLLU) << 56)
+         | ((x & 0x000000000000FF00LLU) << 40)
+         | ((x & 0x0000000000FF0000LLU) << 24)
+         | ((x & 0x00000000FF000000LLU) <<  8)
+         | ((x & 0x000000FF00000000LLU) >>  8)
+         | ((x & 0x0000FF0000000000LLU) >> 24)
+         | ((x & 0x00FF000000000000LLU) >> 40)
+         | ((x & 0xFF00000000000000LLU) >> 56);
 #endif
 }
 
