@@ -179,6 +179,7 @@ dnl
 dnl  Set default values
 dnl
 LDFLAGS_vlc="${LDFLAGS}"
+SOCKET_LIBS=""
 
 dnl
 dnl  Check the operating system
@@ -348,8 +349,9 @@ case "${host_os}" in
         VLC_ADD_LDFLAGS([vlc],[-mwindows])
         VLC_ADD_LIBS([win32text],[-lgdi32])
         VLC_ADD_LIBS([cdda vcdx sdl_image vout_sdl],[-lwinmm])
-        VLC_ADD_LIBS([access_http access_mms access_udp access_tcp access_ftp access_rtmp access_output_udp access_output_shout access_output_rtmp sap stream_out_standard stream_out_select stream_out_rtp stream_out_raop vod_rtsp access_realrtsp rtp oldrc netsync gnutls growl_udp flac ts audioscrobbler lua remoteosd zvbi audiobargraph_a netsync],[-lws2_32])
+        VLC_ADD_LIBS([access_http access_mms access_udp access_tcp access_ftp access_rtmp access_output_udp access_output_shout access_output_rtmp sap stream_out_standard stream_out_select stream_out_rtp stream_out_raop vod_rtsp access_realrtsp oldrc netsync gnutls growl_udp flac ts audioscrobbler lua remoteosd zvbi audiobargraph_a netsync],[-lws2_32])
         VLC_ADD_LIBS([filesystem], [-lshlwapi])
+        SOCKET_LIBS="-lws2_32"
         dnl
         dnl DEP and ASLR options
         dnl
@@ -380,7 +382,8 @@ case "${host_os}" in
     fi
     if test "${SYS}" = "mingwce"; then
         # add ws2 for closesocket, select, recv
-        VLC_ADD_LIBS([libvlccore access_http access_mms access_udp access_tcp access_ftp access_rtmp access_output_udp access_output_rtmp sap netsync audioscrobbler growl rtp stream_out_standard stream_out_select stream_out_rtp remoteosd ts audiobargraph_a netsync],[-lws2])
+        VLC_ADD_LIBS([libvlccore access_http access_mms access_udp access_tcp access_ftp access_rtmp access_output_udp access_output_rtmp sap netsync audioscrobbler growl stream_out_standard stream_out_select stream_out_rtp remoteosd ts audiobargraph_a netsync],[-lws2])
+        SOCKET_LIBS="-lws2"
         VLC_ADD_LIBS([libvlccore],[-lmmtimer])
         AC_CHECK_PROGS(U2D, [unix2dos todos], unix2dos)
         ac_default_prefix="`pwd`/_wince"
@@ -607,20 +610,13 @@ AC_CHECK_FUNCS([accept4 pipe2 eventfd vmsplice sched_getaffinity])
 
 AH_BOTTOM([#include <vlc_fixups.h>])
 
-SOCKET_LIBS=""
 AC_CHECK_FUNCS(connect,,[
   AC_CHECK_LIB(socket,connect,[
-    VLC_ADD_LIBS([libvlccore cdda],-lsocket)
+    VLC_ADD_LIBS([libvlccore cdda access_http access_mms access_udp access_tcp access_ftp access_rtmp sap access_output_udp access_output_rtmp stream_out_standard growl_udp remoteosd netsync],[-lsocket])
     SOCKET_LIBS="-lsocket"
   ])
 ])
 AC_SUBST(SOCKET_LIBS)
-
-AC_CHECK_FUNCS(send,,[
-  AC_CHECK_LIB(socket,send,[
-    VLC_ADD_LIBS([access_http access_mms access_udp access_tcp access_ftp access_rtmp sap access_output_udp access_output_rtmp stream_out_standard growl_udp remoteosd netsync],[-lsocket])
-  ])
-])
 
 
 dnl Check for socklen_t

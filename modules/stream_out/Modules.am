@@ -44,7 +44,7 @@ libvlc_LTLIBRARIES += \
 libstream_out_rtp_plugin_la_SOURCES = \
 	rtp.c rtp.h rtpfmt.c rtcp.c rtsp.c vod.c
 libstream_out_rtp_plugin_la_CFLAGS = $(AM_CFLAGS)
-libstream_out_rtp_plugin_la_LIBADD = $(AM_LIBADD)
+libstream_out_rtp_plugin_la_LIBADD = $(AM_LIBADD) $(SOCKET_LIBS)
 libstream_out_rtp_plugin_la_DEPENDENCIES =
 if HAVE_GCRYPT
 SRTP_CFLAGS = -I$(top_srcdir)/libs/srtp
