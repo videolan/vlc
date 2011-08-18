@@ -424,15 +424,17 @@ static void DecodeS20B( void *outp, const uint8_t *in, unsigned samples )
 
     while( samples >= 2 )
     {
-        *(out++) = U32_AT(in) & ~0xFFF;
-        *(out++) = U32_AT(in + 1) << 12;
-        in += 5;
+        uint32_t dw = U32_AT(in);
+        in += 4;
+        *(out++) = dw & ~0xFFF;
+        *(out++) = (dw << 20) | (*in << 12);
+        in++;
         samples -= 2;
     }
 
     /* No U32_AT() for the last odd sample: avoid off-by-one overflow! */
     if( samples )
-        *(out++) = ((U16_AT(in) << 16) | (in[2] << 8)) & ~0xFFF;
+        *(out++) = (U16_AT(in) << 16) | ((in[2] & 0xF0) << 8);
 }
 
 static int16_t dat12tos16( uint16_t y )
