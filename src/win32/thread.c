@@ -281,13 +281,12 @@ void vlc_cond_wait (vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex)
 {
     DWORD result;
 
-    assert (p_mutex->dynamic); /* TODO */
     do
     {
         vlc_testcancel ();
-        LeaveCriticalSection (&p_mutex->mutex);
+        vlc_mutex_unlock (p_mutex);
         result = vlc_WaitForSingleObject (p_condvar->handle, INFINITE);
-        EnterCriticalSection (&p_mutex->mutex);
+        vlc_mutex_lock (p_mutex);
     }
     while (result == WAIT_IO_COMPLETION);
 
@@ -299,7 +298,6 @@ int vlc_cond_timedwait (vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex,
 {
     DWORD result;
 
-    assert (p_mutex->dynamic); /* TODO */
     do
     {
         vlc_testcancel ();
@@ -320,9 +318,9 @@ int vlc_cond_timedwait (vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex,
             total = 0;
 
         DWORD delay = (total > 0x7fffffff) ? 0x7fffffff : total;
-        LeaveCriticalSection (&p_mutex->mutex);
+        vlc_mutex_unlock (p_mutex);
         result = vlc_WaitForSingleObject (p_condvar->handle, delay);
-        EnterCriticalSection (&p_mutex->mutex);
+        vlc_mutex_lock (p_mutex);
     }
     while (result == WAIT_IO_COMPLETION);
 
