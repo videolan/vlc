@@ -223,6 +223,7 @@ libvlc_win32_rc.$(OBJEXT): libvlc_win32_rc.rc
 libvlc_la_SOURCES = $(SOURCES_libvlc_control)
 libvlc_la_LIBADD = `$(VLC_CONFIG) -libs libvlc` \
 	libvlccore.la ../compat/libcompat.la
+libvlc_la_CPPFLAGS = -DMODULE_STRING=\"libvlc\"
 libvlc_la_CFLAGS = `$(VLC_CONFIG) --cflags libvlc`
 libvlc_la_LDFLAGS = $(AM_LDFLAGS) `$(VLC_CONFIG) --ldflags libvlc` \
 	-version-info 6:0:1 \

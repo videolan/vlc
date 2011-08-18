@@ -13,7 +13,14 @@ CLEANFILES = $(BUILT_SOURCES)
 
 LTLIBVLCCORE = $(top_builddir)/src/libvlccore.la
 
-AM_CPPFLAGS = -D__PLUGIN__
+# Module name from object or executable file name.
+MODULE_NAME = `p="$@"; p="$${p\#\#*/}"; p="$${p\#lib}"; echo "$${p%_plugin*}"`
+
+AM_CPPFLAGS = \
+	-DMODULE_NAME=$(MODULE_NAME) \
+	-DMODULE_NAME_IS_$(MODULE_NAME) \
+	-DMODULE_STRING=\"$(MODULE_NAME)\"
+	-D__PLUGIN__
 AM_CFLAGS = `$(VLC_CONFIG) --cflags plugin $@`
 AM_CXXFLAGS = `$(VLC_CONFIG) --cxxflags plugin $@`
 AM_OBJCFLAGS = `$(VLC_CONFIG) --objcflags plugin $@`
