@@ -373,13 +373,14 @@ int OpenDemux( vlc_object_t *p_this )
                 }
                 else msg_Warn( p_demux, "unsupported attachment type (%u) in ffmpeg demux", cc->codec_id );
             }
-            break;
+            else
 #endif
+            {
+                if( cc->codec_type == AVMEDIA_TYPE_DATA )
+                    psz_type = "data";
 
-            if( cc->codec_type == AVMEDIA_TYPE_DATA )
-                psz_type = "data";
-
-            msg_Warn( p_demux, "unsupported track type in ffmpeg demux" );
+                msg_Warn( p_demux, "unsupported track type in ffmpeg demux" );
+            }
             break;
         }
 
@@ -393,6 +394,7 @@ int OpenDemux( vlc_object_t *p_this )
 #ifdef HAVE_FFMPEG_CODEC_ATTACHMENT
         if( cc->codec_type != AVMEDIA_TYPE_ATTACHMENT )
 #endif
+        if( cc->codec_type != AVMEDIA_TYPE_DATA )
         {
             const bool    b_ogg = !strcmp( p_sys->fmt->name, "ogg" );
             const uint8_t *p_extra = cc->extradata;
