@@ -1577,37 +1577,6 @@ static const char *const ppsz_albumart_descriptions[] =
 
 #define AUDI_DEVICE_CYCLE_KEY_TEXT N_("Cycle through audio devices")
 #define AUDI_DEVICE_CYCLE_KEY_LONGTEXT N_("Cycle through available audio devices")
-const char vlc_usage[] = N_(
-    "Usage: %s [options] [stream] ..."
-    "\nYou can specify multiple streams on the commandline. They will be enqueued in the playlist."
-    "\nThe first item specified will be played first."
-    "\n"
-    "\nOptions-styles:"
-    "\n  --option  A global option that is set for the duration of the program."
-    "\n   -option  A single letter version of a global --option."
-    "\n   :option  An option that only applies to the stream directly before it"
-    "\n            and that overrides previous settings."
-    "\n"
-    "\nStream MRL syntax:"
-    "\n  [[access][/demux]://]URL[@[title][:chapter][-[title][:chapter]]] [:option=value ...]"
-    "\n"
-    "\n  Many of the global --options can also be used as MRL specific :options."
-    "\n  Multiple :option=value pairs can be specified."
-    "\n"
-    "\nURL syntax:"
-    "\n  [file://]filename              Plain media file"
-    "\n  http://ip:port/file            HTTP URL"
-    "\n  ftp://ip:port/file             FTP URL"
-    "\n  mms://ip:port/file             MMS URL"
-    "\n  screen://                      Screen capture"
-    "\n  [dvd://][device][@raw_device]  DVD device"
-    "\n  [vcd://][device]               VCD device"
-    "\n  [cdda://][device]              Audio CD device"
-    "\n  udp://[[<source address>]@[<bind address>][:<bind port>]]"
-    "\n                                 UDP stream sent by a streaming server"
-    "\n  vlc://pause:<seconds>          Special item to pause the playlist for a certain time"
-    "\n  vlc://quit                     Special item to quit VLC"
-    "\n");
 
 /*
  * Quick usage guide for the configuration options:
