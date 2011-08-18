@@ -153,7 +153,6 @@ struct msg_subscription_t
     libvlc_int_t   *instance;
     msg_callback_t  func;
     msg_cb_data_t  *opaque;
-    int             verbosity;
 };
 
 /**
@@ -176,7 +175,6 @@ msg_subscription_t *msg_Subscribe (libvlc_int_t *instance, msg_callback_t cb,
     sub->instance = instance;
     sub->func = cb;
     sub->opaque = opaque;
-    sub->verbosity = 2; /* by default, give all the messages */
 
     msg_bank_t *bank = libvlc_bank (instance);
     vlc_rwlock_wrlock (&bank->lock);
@@ -340,20 +338,6 @@ void msg_GenericVa (vlc_object_t *p_this, int i_type, const char *psz_module,
             if( val == kObjectPrintingEnabled  ); /* Allowed */
             else if( !bank->all_objects_enabled ) continue;
         }
-        switch( msg.i_type )
-        {
-            case VLC_MSG_INFO:
-            case VLC_MSG_ERR:
-                if( sub->verbosity < 0 ) continue;
-                break;
-            case VLC_MSG_WARN:
-                if( sub->verbosity < 1 ) continue;
-                break;
-            case VLC_MSG_DBG:
-                if( sub->verbosity < 2 ) continue;
-                break;
-        }
-
         sub->func (sub->opaque, &msg);
     }
     vlc_rwlock_unlock (&bank->lock);
