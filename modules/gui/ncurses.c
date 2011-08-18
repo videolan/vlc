@@ -194,6 +194,7 @@ struct intf_sys_t
     msg_subscription_t  *p_sub;         // message bank subscription
     msg_item_t          *msgs[50];      // ring buffer
     int                 i_msgs;
+    int                 i_verbosity;
     vlc_mutex_t         msg_lock;
 
     /* Search Box context */
@@ -1819,6 +1820,10 @@ static void MsgCallback(msg_cb_data_t *data, const msg_item_t *msg)
 {
     intf_sys_t *p_sys = data->p_sys;
 
+    if (p_sys->i_verbosity < 0
+     || p_sys->i_verbosity < (msg->i_type - VLC_MSG_ERR))
+        return;
+
     vlc_mutex_lock(&p_sys->msg_lock);
 
     if (p_sys->msgs[p_sys->i_msgs])
@@ -1893,11 +1898,10 @@ static int Open(vlc_object_t *p_this)
     msg_cb_data->p_sys = p_sys;
     vlc_mutex_init(&p_sys->msg_lock);
     vlc_mutex_init(&p_sys->pl_lock);
-    p_sys->i_msgs = 0;
     memset(p_sys->msgs, 0, sizeof p_sys->msgs);
+    p_sys->i_msgs = 0;
+    p_sys->i_verbosity = var_InheritInteger(p_intf, "verbose");
     p_sys->p_sub = msg_Subscribe(p_intf->p_libvlc, MsgCallback, msg_cb_data);
-    msg_SubscriptionSetVerbosity(p_sys->p_sub,
-            var_GetInteger(p_intf->p_libvlc, "verbose"));
 
     p_sys->i_box_type = BOX_PLAYLIST;
     p_sys->b_plidx_follow = true;
