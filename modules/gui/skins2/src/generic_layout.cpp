@@ -219,7 +219,6 @@ void GenericLayout::refreshRect( int x, int y, int width, int height )
 
     // Draw all the controls of the layout
     list<LayeredControl>::const_iterator iter;
-    list<LayeredControl>::const_iterator iterVideo = m_controlList.end();
     for( iter = m_controlList.begin(); iter != m_controlList.end(); ++iter )
     {
         CtrlGeneric *pCtrl = (*iter).m_pControl;
