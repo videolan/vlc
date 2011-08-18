@@ -232,8 +232,8 @@ void vlc_mutex_unlock (vlc_mutex_t *p_mutex)
 /*** Condition variables ***/
 enum
 {
+    CLOCK_REALTIME=0, /* must be zero for VLC_STATIC_COND */
     CLOCK_MONOTONIC,
-    CLOCK_REALTIME,
 };
 
 static void vlc_cond_init_common (vlc_cond_t *p_condvar, unsigned clock)
@@ -262,22 +262,31 @@ void vlc_cond_destroy (vlc_cond_t *p_condvar)
 
 void vlc_cond_signal (vlc_cond_t *p_condvar)
 {
-    /* NOTE: This will cause a broadcast, that is wrong.
-     * This will also wake up the next waiting thread if no threads are yet
-     * waiting, which is also wrong. However both of these issues are allowed
-     * by the provision for spurious wakeups. Better have too many wakeups
-     * than too few (= deadlocks). */
-    SetEvent (p_condvar->handle);
+    if (!p_condvar->handle)
+        return;
+
+    /* This is suboptimal but works. */
+    vlc_cond_broadcast (p_condvar);
 }
 
 void vlc_cond_broadcast (vlc_cond_t *p_condvar)
 {
+    if (!p_condvar->handle)
+        return;
+
+    /* Wake all threads up (as the event HANDLE has manual reset) */
     SetEvent (p_condvar->handle);
 }
 
 void vlc_cond_wait (vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex)
 {
     DWORD result;
+
+    if (!p_condvar->handle)
+    {   /* FIXME FIXME FIXME */
+        msleep (50000);
+        return;
+    }
 
     do
     {
@@ -295,6 +304,12 @@ int vlc_cond_timedwait (vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex,
                         mtime_t deadline)
 {
     DWORD result;
+
+    if (!p_condvar->handle)
+    {   /* FIXME FIXME FIXME */
+        msleep (50000);
+        return 0;
+    }
 
     do
     {
