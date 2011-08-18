@@ -543,22 +543,6 @@ if test "${SYS}" = "mingw32" ; then
     CFLAGS="${CFLAGS_save}"; CXXFLAGS="${CXXFLAGS_save}"
 fi
 
-dnl Check for fvtable-thunks support for mingw32
-if test "${SYS}" = "mingw32" -a "${CXX}" != "" ; then
-    AC_LANG_PUSH(C++)
-    AC_CACHE_CHECK([if \$CXX accepts -fvtable-thunks],
-        [ac_cv_cxx_fvtable_thunks],
-        [CXXFLAGS="${CXXFLAGS_save} -Wall -Werror -fvtable-thunks"
-         AC_TRY_COMPILE([],,ac_cv_cxx_fvtable_thunks=yes,
-                        ac_cv_cxx_fvtable_thunks=no)])
-    if test "${ac_cv_cxx_fvtable_thunks}" = "yes"; then
-        CXXFLAGS_mingw32_special="-fvtable-thunks"
-    fi
-
-    CXXFLAGS_save="${CXXFLAGS_save} ${CXXFLAGS_mingw32_special}"; CXXFLAGS="${CXXFLAGS_save}"
-    AC_LANG_POP(C++)
-fi
-
 dnl
 dnl Buggy glibc prevention. Purposedly not cached.
 dnl See sourceware.org bugs 5058 and 5443.
