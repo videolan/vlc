@@ -53,6 +53,9 @@ private:
     void customEvent( QEvent * );
     void sinkMessage( MsgEvent * );
 
+    vlc_atomic_t verbosity;
+    static void MsgCallback( msg_cb_data_t *, const msg_item_t * );
+
 private slots:
     bool save();
     void updateConfig();

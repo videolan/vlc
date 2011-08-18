@@ -42,28 +42,27 @@
  * @{
  */
 
+/** Message types */
+enum msg_item_type
+{
+    VLC_MSG_INFO=0, /**< Important information */
+    VLC_MSG_ERR,    /**< Error */
+    VLC_MSG_WARN,   /**< Warning */
+    VLC_MSG_DBG,    /**< Debug */
+};
+
 /**
- * Store a single message sent to user.
+ * Log message
  */
 typedef struct
 {
-    int     i_type;                             /**< message type, see below */
-    uintptr_t   i_object_id;
-    const char *psz_object_type;
-    const char *psz_module;
-    const char *psz_header;                     /**< Additional header */
-    char *  psz_msg;                            /**< the message itself */
+    unsigned    i_type;  /**< Message type, see @ref msg_item_type */
+    uintptr_t   i_object_id; /**< Emitter (temporaly) unique object ID or 0 */
+    const char *psz_object_type; /**< Emitter object type name */
+    const char *psz_module; /**< Emitter module (source code) */
+    const char *psz_header; /**< Additional header (used by VLM media) */
+    char       *psz_msg; /**< Message text */
 } msg_item_t;
-
-/* Message types */
-/** standard messages */
-#define VLC_MSG_INFO  0
-/** error messages */
-#define VLC_MSG_ERR   1
-/** warning messages */
-#define VLC_MSG_WARN  2
-/** debug messages */
-#define VLC_MSG_DBG   3
 
 VLC_MALLOC VLC_USED
 static inline msg_item_t *msg_Copy (const msg_item_t *msg)

@@ -1,7 +1,7 @@
 /*****************************************************************************
  * Messages.cpp : Information about an item
  ****************************************************************************
- * Copyright (C) 2006-2007 the VideoLAN team
+ * Copyright (C) 2006-2011 the VideoLAN team
  * $Id$
  *
  * Authors: Jean-Baptiste Kempf <jb (at) videolan.org>
@@ -25,6 +25,7 @@
 #endif
 
 #include "dialogs/messages.hpp"
+#include <vlc_atomic.h>
 
 #include <QTextEdit>
 #include <QTextCursor>
@@ -73,8 +74,6 @@ struct msg_cb_data_t
     MessagesDialog *self;
 };
 
-static void MsgCallback( msg_cb_data_t *, const msg_item_t * );
-
 MessagesDialog::MessagesDialog( intf_thread_t *_p_intf)
                : QVLCFrame( _p_intf )
 {
@@ -92,7 +91,9 @@ MessagesDialog::MessagesDialog( intf_thread_t *_p_intf)
     /* Buttons and general layout */
     ui.saveLogButton->setToolTip( qtr( "Saves all the displayed logs to a file" ) );
 
-    ui.verbosityBox->setValue( var_InheritInteger( p_intf, "verbose" ) );
+    int verbosity = var_InheritInteger( p_intf, "verbose" );
+    vlc_atomic_set( &this->verbosity, verbosity );
+    ui.verbosityBox->setValue( verbosity );
 
     ui.vbobjectsEdit->setText(config_GetPsz( p_intf, "verbose-objects"));
     ui.vbobjectsEdit->setToolTip( "verbose-objects usage: \n"
@@ -122,7 +123,6 @@ MessagesDialog::MessagesDialog( intf_thread_t *_p_intf)
     cbData = new msg_cb_data_t;
     cbData->self = this;
     sub = msg_Subscribe( p_intf->p_libvlc, MsgCallback, cbData );
-    changeVerbosity( ui.verbosityBox->value() );
 }
 
 MessagesDialog::~MessagesDialog()
@@ -134,7 +134,7 @@ MessagesDialog::~MessagesDialog()
 
 void MessagesDialog::changeVerbosity( int verbosity )
 {
-    msg_SubscriptionSetVerbosity( sub , verbosity );
+    vlc_atomic_set( &this->verbosity, verbosity );
 }
 
 void MessagesDialog::updateConfig()
@@ -296,11 +296,15 @@ void MessagesDialog::tabChanged( int i )
     updateButton->setVisible( i == 1 );
 }
 
-static void MsgCallback( msg_cb_data_t *data, const msg_item_t *item )
+void MessagesDialog::MsgCallback( msg_cb_data_t *data, const msg_item_t *item )
 {
+    MessagesDialog *dialog = data->self;
+    int verbosity = vlc_atomic_get( &dialog->verbosity );
+
+    if( verbosity < 0 || verbosity < (item->i_type - VLC_MSG_ERR) )
+        return;
+
     int canc = vlc_savecancel();
-
-    QApplication::postEvent( data->self, new MsgEvent( item ) );
-
+    QApplication::postEvent( dialog, new MsgEvent( item ) );
     vlc_restorecancel( canc );
 }
