@@ -225,12 +225,12 @@ resources.cpp: vlc.qrc $(DEPS_res)
 
 .hpp.moc.cpp:
 if HAVE_DARWIN
-	$(moc_verbose)$(MOC) -DQ_WS_MAC $(DEFS) -I$(top_srcdir)/include -I$(top_builddir)/include -I$(top_builddir) `$(VLC_CONFIG) --cppflags plugin qt4` -o $@ $<
+	$(moc_verbose)$(MOC) -DQ_WS_MAC $(DEFS) -I$(top_srcdir)/include -I$(top_builddir)/include -I$(top_builddir) $(CPPFLAGS_qt4) -o $@ $<
 else
 if HAVE_WIN32
-	$(moc_verbose)$(MOC) -DWIN32 $(DEFS) -I$(top_srcdir)/include -I$(top_builddir)/include -I$(top_builddir) `$(VLC_CONFIG) --cppflags plugin qt4` -o $@ $<
+	$(moc_verbose)$(MOC) -DWIN32 $(DEFS) -I$(top_srcdir)/include -I$(top_builddir)/include -I$(top_builddir) $(CPPFLAGS_qt4) -o $@ $<
 else
-	$(moc_verbose)$(MOC) $(DEFS) -I$(top_srcdir)/include -I$(top_builddir)/include -I$(top_builddir) `$(VLC_CONFIG) --cppflags plugin qt4` -o $@ $<
+	$(moc_verbose)$(MOC) $(DEFS) -I$(top_srcdir)/include -I$(top_builddir)/include -I$(top_builddir) $(CPPFLAGS_qt4) -o $@ $<
 endif
 endif
 
@@ -243,7 +243,7 @@ endif
 	$(AM_V_at)rm -f $@.tmp
 
 .mm.lo: 
-	$(top_builddir)/libtool --verbose --mode=compile $(CXX) $(objcxxflags) -DQ_WS_MAC -I$(top_srcdir)/include -I$(top_builddir)/include -I$(top_builddir) `$(VLC_CONFIG) --cxxflags plugin qt4` -c $< -o $@ 
+	$(top_builddir)/libtool --verbose --mode=compile $(CXX) $(objcxxflags) -DQ_WS_MAC -I$(top_srcdir)/include -I$(top_builddir)/include -I$(top_builddir) $(CXXFLAGS_qt4) -c $< -o $@ 
 
 SOURCES_qt4 = 	qt4.cpp \
 		menus.cpp \

@@ -12,12 +12,12 @@ check_PROGRAMS = \
 
 TESTS = $(check_PROGRAMS)
 
-AM_CFLAGS = `$(VLC_CONFIG) --cflags libvlccore`
+AM_CFLAGS = $(CFLAGS_libvlccore)
 AM_LDFLAGS = -no-install
 LDADD = ../libvlccore.la
 
 test_block_SOURCES = block_test.c ../misc/block.c
-test_block_LDADD = $(LDADD) `$(VLC_CONFIG) -libs libvlccore`
+test_block_LDADD = $(LDADD) $(LIBS_libvlccore)
 test_block_DEPENDENCIES =
 
 test_dictionary_SOURCES = dictionary.c

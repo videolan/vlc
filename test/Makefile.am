@@ -51,7 +51,7 @@ samples/meta.sample:
 	mkdir -p `dirname $@`
 	curl $(SAMPLES_SERVER)/metadata/id3tag/Wesh-Bonneville.mp3 > $@
 
-CFLAGS_tests = `$(VLC_CONFIG) --cflags libvlc` -DSRCDIR=\"$(srcdir)\"
+CFLAGS_tests = $(LIBS_libvlc) -DSRCDIR=\"$(srcdir)\"
 LDFLAGS_tests = -no-install -static
 
 test_libvlc_core_SOURCES = libvlc/core.c

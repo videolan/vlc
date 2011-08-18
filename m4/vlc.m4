@@ -17,42 +17,42 @@ dnl  Special cases: vlc, pics, plugins, save
 AC_DEFUN([VLC_ADD_CPPFLAGS], [
   m4_foreach_w([element], [$1], [
     [eval "CPPFLAGS_]element[="'"$'"{CPPFLAGS_]element[} $2"'"']
-    [am_modules_with_cppflags="${am_modules_with_cppflags} ]element["]
+    AC_SUBST([CPPFLAGS_]element)
   ])
 ])
 
 AC_DEFUN([VLC_ADD_CFLAGS], [
   m4_foreach_w([element], [$1], [
     [eval "CFLAGS_]element[="'"$'"{CFLAGS_]element[} $2"'"']
-    [am_modules_with_cflags="${am_modules_with_cflags} ]element["]
+    AC_SUBST([CFLAGS_]element)
   ])
 ])
 
 AC_DEFUN([VLC_ADD_CXXFLAGS], [
   m4_foreach_w([element], [$1], [
     [eval "CXXFLAGS_]element[="'"$'"{CXXFLAGS_]element[} $2"'"']
-    [am_modules_with_cxxflags="${am_modules_with_cxxflags} ]element["]
+    AC_SUBST([CXXFLAGS_]element)
   ])
 ])
 
 AC_DEFUN([VLC_ADD_OBJCFLAGS], [
   m4_foreach_w([element], [$1], [
     [eval "OBJCFLAGS_]element[="'"$'"{OBJCFLAGS_]element[} $2"'"']
-    [am_modules_with_objcflags="${am_modules_with_objcflags} ]element["]
+    AC_SUBST([OBJCFLAGS_]element)
   ])
 ])
 
 AC_DEFUN([VLC_ADD_LDFLAGS], [
   m4_foreach_w([element], [$1], [
     [eval "LDFLAGS_]element[="'"$2 $'"{LDFLAGS_]element[}"'"']
-    [am_modules_with_ldflags="${am_modules_with_ldflags} ]element["]
+    AC_SUBST([LDFLAGS_]element)
   ])
 ])
 
 AC_DEFUN([VLC_ADD_LIBS], [
   m4_foreach_w([element], [$1], [
     [eval "LIBS_]element[="'"'"$2 "'$'"{LIBS_]element[}"'"']
-    [am_modules_with_libs="${am_modules_with_libs} ]element["]
+    AC_SUBST([LIBS_]element)
   ])
 ])
 

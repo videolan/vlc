@@ -8,7 +8,8 @@ EXTRA_DIST = vlc_win32_rc.rc.in
 
 SUFFIXES = .rc.in .rc
 
-AM_CFLAGS = `$(VLC_CONFIG) --cflags vlc`
+AM_CPPFLAGS = $(CPPFLAGS_vlc)
+AM_CFLAGS = $(CFLAGS_vlc)
 
 
 if !HAVE_WIN32
@@ -31,8 +32,8 @@ vlc_wrapper_SOURCES = rootwrap.c
 vlc_wrapper_LDADD = $(SOCKET_LIBS)
 
 vlc_DEPENDENCIES = ../src/libvlc.sym
-vlc_LDFLAGS = `$(VLC_CONFIG) --ldflags vlc`
-vlc_LDADD = ../src/libvlc.la ../src/libvlccore.la `$(VLC_CONFIG) -libs vlc`
+vlc_LDFLAGS = $(LDFLAGS_vlc)
+vlc_LDADD = ../src/libvlc.la ../src/libvlccore.la $(LIBS_vlc)
 
 vlc_static_SOURCES = $(vlc_SOURCES)
 vlc_static_CFLAGS = $(AM_CFLAGS) \
