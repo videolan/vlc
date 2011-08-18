@@ -4275,8 +4275,6 @@ AC_DEFINE_UNQUOTED(VLC_COMPILER, "`$CC -v 2>&1 | tail -n 1`", [compiler])
 dnl
 dnl  Handle substvars that use $(top_srcdir)
 dnl
-VLC_CONFIG="top_srcdir=\"\$(top_srcdir)\" top_builddir=\"\$(top_builddir)\" \$(top_builddir)/vlc-config"
-AC_SUBST(VLC_CONFIG)
 CPPFLAGS_save="-I\$(top_srcdir)/include -I\$(top_builddir)/include ${CPPFLAGS_save}"
 
 dnl
@@ -4288,11 +4286,6 @@ dnl
 dnl Sort the modules list
 dnl
 PLUGINS=$( (for i in `echo $PLUGINS`; do echo $i; done)|sort|xargs )
-
-dnl
-dnl  Create the vlc-config script
-dnl
-LDFLAGS_libvlc="${LDFLAGS_libvlc} ${LDFLAGS_builtin}"
 
 dnl
 dnl  Configuration is finished
@@ -4311,9 +4304,6 @@ AC_SUBST(AM_CPPFLAGS)
 AC_SUBST(MACOSX_DEPLOYMENT_TARGET)
 AC_SUBST(FILE_LIBVLCCORE_DLL)
 AC_SUBST(FILE_LIBVLC_DLL)
-
-dnl Create vlc-config.in
-VLC_OUTPUT_VLC_CONFIG_IN
 
 AC_CONFIG_FILES([
   Makefile
@@ -4416,11 +4406,6 @@ AM_COND_IF([HAVE_DARWIN], [
 
 dnl Generate makefiles
 AC_OUTPUT
-
-# Cannot use AC_CONFIG_FILES([vlc-config]) as is automatically built,
-# not provided with the source
-${SHELL} ./config.status --file=vlc-config
-chmod 0755 vlc-config
 
 /bin/echo -n "Enabled modules: ${PLUGINS}"
 

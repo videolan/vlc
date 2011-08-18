@@ -100,7 +100,6 @@ sh modules/genmf `sed -ne 's,modules/\(.*\)/Makefile,\1,p' configure.ac`
 set -x
 
 # Automake complains if these are not present
-echo > vlc-config.in
 echo > ABOUT-NLS
 cp -f INSTALL INSTALL.git
 
@@ -112,7 +111,6 @@ mv -f INSTALL.git INSTALL
 ##
 ##  files which need to be regenerated
 ##
-rm -f vlc-config.in vlc-config
 rm -f stamp-h*
 
 # Shut up

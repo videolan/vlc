@@ -14,7 +14,7 @@ noinst_LTLIBRARIES = libloader.la
 # TODO: real check for vsscanf() and <sys/mmap.h>
 AM_CPPFLAGS = -D__WINE__ -DHAVE_SYS_MMAN_H=1 -DHAVE_VSSCANF=1 \
 	-DWIN32_PATH=\"\" -DTRACE\(...\)=\(void\)0
-AM_CFLAGS = -fno-PIC `$(top_builddir)/vlc-config --cflags libs` -U_FILE_OFFSET_BITS \
+AM_CFLAGS = -fno-PIC -U_FILE_OFFSET_BITS \
 	-fno-omit-frame-pointer -mno-omit-leaf-frame-pointer
 
 noinst_HEADERS = com.h driver.h ext.h ldt_keeper.h loader.h registry.h \

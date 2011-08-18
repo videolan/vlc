@@ -22,7 +22,7 @@
 /* config.h is NOT installed, headers MUST NOT depend on it.
  # include <config.h> */
 /* One thing we don't check is the CPPFLAGS - these MUST be exposed publicly,
- * e.g. using pkg-config or the broken old vlc-config. */
+ * e.g. using pkg-config. */
 
 #define PACKAGE "vlc"
 

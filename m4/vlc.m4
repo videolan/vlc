@@ -78,52 +78,6 @@ AC_DEFUN([VLC_RESTORE_FLAGS], [
 ])
 
 dnl ===========================================================================
-dnl  Helper macro to generate the vlc-config.in file
-
-AC_DEFUN([VLC_OUTPUT_VLC_CONFIG_IN], [
-
-  AC_MSG_RESULT(configure: creating ./vlc-config.in)
-
-  am_all_modules="`for x in ${am_modules_with_cppflags} ${am_modules_with_cflags} ${am_modules_with_cxxflags} ${am_modules_with_objcflags} ${am_modules_with_ldflags} ${am_modules_with_libs}; do echo $x; done | sort | uniq`"
-
-  rm -f vlc-config.in
-  sed -ne '/#@1@#/q;p' < "${srcdir}/vlc-config.in.in" \
-    | sed \
-          -e "s/@optim@/${enable_optimizations}/" \
-          -e "s/@CFLAGS_TUNING@/${CFLAGS_TUNING}/" \
-    > vlc-config.in
-
-  dnl  Switch/case loop
-  for x in `echo ${am_all_modules}`
-  do [
-    echo "    ${x})"
-    if test "`eval echo @'$'CPPFLAGS_${x}@`" != "@@"; then
-      echo "      cppflags=\"\${cppflags} `eval echo '$'CPPFLAGS_${x}`\""
-    fi
-    if test "`eval echo @'$'CFLAGS_${x}@`" != "@@"; then
-      echo "      cflags=\"\${cflags} `eval echo '$'CFLAGS_${x}`\""
-    fi
-    if test "`eval echo @'$'CXXFLAGS_${x}@`" != "@@"; then
-      echo "      cxxflags=\"\${cxxflags} `eval echo '$'CXXFLAGS_${x}`\""
-    fi
-    if test "`eval echo @'$'OBJCFLAGS_${x}@`" != "@@"; then
-      echo "      objcflags=\"\${objcflags} `eval echo '$'OBJCFLAGS_${x}`\""
-    fi
-    if test "`eval echo @'$'LDFLAGS_${x}@`" != "@@"; then
-      echo "      ldflags=\"\${ldflags} `eval echo '$'LDFLAGS_${x}`\""
-    fi
-    if test "`eval echo @'$'LIBS_${x}@`" != "@@"; then
-      echo "      libs=\"\${libs} `eval echo '$'LIBS_${x}`\""
-    fi
-    echo "    ;;"
-  ] done >> vlc-config.in
-
-  dnl  '/#@1@#/,${/#@.@#/d;p}' won't work on OS X
-  sed -ne '/#@1@#/,$p' < "${srcdir}/vlc-config.in.in" \
-   | sed -e '/#@.@#/d' >> vlc-config.in
-])
-
-dnl ===========================================================================
 dnl  Macros for shared object handling (TODO)
 
 AC_DEFUN([VLC_LIBRARY_SUFFIX], [

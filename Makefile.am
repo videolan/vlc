@@ -35,7 +35,6 @@ EXTRA_DIST = \
 	extras/package/win32/vlc.exe.manifest \
 	extras/package/win32/libvlc.dll.manifest \
 	extras/package/macosx/README.MacOSX.rtf \
-	vlc-config.in.in \
 	extras/package/rpm/vlc.fedora.spec \
 	extras/package/rpm/vlc.altlinux.spec \
 	extras/package/win32/vlc.win32.nsi.in \
@@ -70,7 +69,7 @@ EXTRA_DIST = \
 dist_noinst_SCRIPTS = bootstrap
 nodist_noinst_SCRIPTS = compile
 
-BUILT_SOURCES_distclean = vlc-config
+BUILT_SOURCES_distclean =
 if HAVE_WIN32
 BUILT_SOURCES_distclean += \
 	extras/package/win32/vlc.win32.nsi extras/package/win32/spad.nsi
@@ -364,18 +363,8 @@ EXTRA_DIST += \
 # Building libvlc
 ###############################################################################
 
-noinst_SCRIPTS = vlc-config
-vlc-config: $(top_builddir)/config.status $(top_builddir)/vlc-config.in
-	$(SHELL) ./config.status --file=$@
-	chmod 0755 $@
-	touch $@
-
-vlc-config.in: vlc-config.in.in
-	./config.status --recheck
-	touch $@
-
 CLEANFILES = $(BUILT_SOURCES_clean)
-DISTCLEANFILES = $(BUILT_SOURCES_distclean) vlc-config.in compile
+DISTCLEANFILES = $(BUILT_SOURCES_distclean) compile
 MAINTAINERCLEANFILES = ChangeLog
 
 # Shortcut for developers to rebuild the core (libvlc + vlc)
@@ -427,7 +416,7 @@ mvlc: make-alias Makefile
 	$(AM_V_GEN)$(MKALIAS) maemo
 
 if BUILD_VLC
-noinst_SCRIPTS += vlc$(EXEEXT)
+noinst_SCRIPTS = vlc$(EXEEXT)
 endif
 
 vlc$(EXEEXT):
@@ -1042,5 +1031,5 @@ update-po:
 ###############################################################################
 # Enforce Mac OS X deployment target environment variable
 ###############################################################################
-macosx-sdk: Makefile.in $(HEADERS_include) vlc-config
+macosx-sdk: Makefile.in $(HEADERS_include)
 	export MACOSX_DEPLOYMENT_TARGET=$(MACOSX_DEPLOYMENT_TARGET)

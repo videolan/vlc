@@ -24,8 +24,7 @@ CHANGELOGS = \
 
 man1_MANS = \
 	   vlc.1 \
-	   vlc-wrapper.1 \
-	   vlc-config.1
+	   vlc-wrapper.1
 
 EXTRA_DIST = \
 	$(CHANGELOGS) \
