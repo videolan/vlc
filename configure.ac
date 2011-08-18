@@ -4444,8 +4444,7 @@ AC_OUTPUT
 ${SHELL} ./config.status --file=vlc-config
 chmod 0755 vlc-config
 
-/bin/echo -n "Enabled modules: "
-./vlc-config --list plugin
+/bin/echo -n "Enabled modules: ${PLUGINS}"
 
 dnl Do we have to use make or gmake ?
 USE_MAKE_OR_GMAKE=`case "${SYS}" in openbsd*) echo "gmake";; *) echo "make";; esac`
