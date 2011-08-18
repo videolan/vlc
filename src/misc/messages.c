@@ -88,7 +88,6 @@ struct msg_bank_t
     int i_sub;
     msg_subscription_t **pp_sub;
 
-    locale_t locale; /**< C locale for error messages */
     vlc_dictionary_t enabled_objects; ///< Enabled objects
     bool all_objects_enabled; ///< Should we print all objects?
 };
@@ -108,8 +107,6 @@ msg_bank_t *msg_Create (void)
     bank->i_sub = 0;
     bank->pp_sub = NULL;
 
-    /* C locale to get error messages in English in the logs */
-    bank->locale = newlocale (LC_MESSAGES_MASK, "C", (locale_t)0);
     return bank;
 }
 
@@ -159,9 +156,6 @@ void msg_Destroy (msg_bank_t *bank)
 {
     if (unlikely(bank->i_sub != 0))
         fputs ("stale interface subscribers (LibVLC might crash)\n", stderr);
-
-    if (bank->locale != (locale_t)0)
-       freelocale (bank->locale);
 
     vlc_dictionary_clear (&bank->enabled_objects, NULL, NULL);
 
@@ -270,7 +264,10 @@ void msg_GenericVa (vlc_object_t *p_this, int i_type,
         return;
 
     msg_bank_t *bank = libvlc_bank (p_this->p_libvlc);
-    locale_t locale = uselocale (bank->locale);
+
+    /* C locale to get error messages in English in the logs */
+    locale_t c = newlocale (LC_MESSAGES_MASK, "C", (locale_t)0);
+    locale_t locale = uselocale (c);
 
 #ifndef __GLIBC__
     /* Expand %m to strerror(errno) - only once */
@@ -334,7 +331,10 @@ void msg_GenericVa (vlc_object_t *p_this, int i_type,
         psz_str = NULL;
     va_end( args );
 
-    if( psz_str == NULL )
+    uselocale (locale);
+    freelocale (c);
+
+    if (unlikely(psz_str == NULL))
     {
         int canc = vlc_savecancel (); /* Do not print half of a message... */
 #ifdef __GLIBC__
@@ -357,10 +357,8 @@ void msg_GenericVa (vlc_object_t *p_this, int i_type,
         va_end( args );
         fputs( "\n", stderr );
         vlc_restorecancel (canc);
-        uselocale (locale);
         return;
     }
-    uselocale (locale);
 
     /* Fill message information fields */
     msg_item_t msg;
