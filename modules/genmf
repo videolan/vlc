@@ -61,6 +61,7 @@ lib${mod}_plugin_la_CXXFLAGS = \$(AM_CXXFLAGS) \$(CXXFLAGS_${mod})
 lib${mod}_plugin_la_OBJCFLAGS = \$(AM_OBJCFLAGS) \$(OBJCFLAGS_${mod})
 # Set LIBADD and DEPENDENCIES manually:
 lib${mod}_plugin_la_LIBADD = \$(AM_LIBADD) \$(LIBS_${mod})
+lib${mod}_plugin_la_LDFLAGS = \$(AM_LDFLAGS) \$(LDFLAGS_${mod})
 lib${mod}_plugin_la_DEPENDENCIES =
 
 EOF
