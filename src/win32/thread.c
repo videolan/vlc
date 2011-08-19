@@ -39,7 +39,6 @@
 #ifdef UNDER_CE
 # include <mmsystem.h>
 #endif
-#include "config/configuration.h"
 
 static vlc_threadvar_t thread_key;
 
@@ -64,6 +63,7 @@ struct vlc_thread
 
 static CRITICAL_SECTION super_mutex;
 static HANDLE           super_cond;
+extern vlc_rwlock_t config_lock, msg_lock;
 
 BOOL WINAPI DllMain (HINSTANCE, DWORD, LPVOID);
 
@@ -81,9 +81,11 @@ BOOL WINAPI DllMain (HINSTANCE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
             InitializeCriticalSection (&super_mutex);
             vlc_threadvar_create (&thread_key, NULL);
             vlc_rwlock_init (&config_lock);
+            vlc_rwlock_init (&msg_lock);
             break;
 
         case DLL_PROCESS_DETACH:
+            vlc_rwlock_destroy (&msg_lock);
             vlc_rwlock_destroy (&config_lock);
             vlc_threadvar_delete (&thread_key);
             DeleteCriticalSection (&super_mutex);

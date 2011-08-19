@@ -212,11 +212,6 @@ libvlc_int_t * libvlc_InternalCreate( void )
     priv->p_dialog_provider = NULL;
     priv->p_vlm = NULL;
 
-    /* Initialize message queue */
-    priv->msg_bank = msg_Create ();
-    if (unlikely(priv->msg_bank == NULL))
-        goto error;
-
     /* Find verbosity from VLC_VERBOSE environment variable */
     psz_env = getenv( "VLC_VERBOSE" );
     if( psz_env != NULL )
@@ -235,9 +230,6 @@ libvlc_int_t * libvlc_InternalCreate( void )
     vlc_ExitInit( &priv->exit );
 
     return p_libvlc;
-error:
-    vlc_object_release (p_libvlc);
-    return NULL;
 }
 
 /**
@@ -1048,8 +1040,6 @@ void libvlc_InternalDestroy( libvlc_int_t *p_libvlc )
         system_End( p_libvlc );
     }
     vlc_mutex_unlock( &global_lock );
-
-    msg_Destroy (priv->msg_bank);
 
     /* Destroy mutexes */
     vlc_ExitDestroy( &priv->exit );

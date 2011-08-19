@@ -51,11 +51,6 @@
 #include <vlc_charset.h>
 #include "../libvlc.h"
 
-static inline msg_bank_t *libvlc_bank (libvlc_int_t *inst)
-{
-    return (libvlc_priv (inst))->msg_bank;
-}
-
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
@@ -64,49 +59,12 @@ static void PrintMsg ( vlc_object_t *, const msg_item_t * );
 /**
  * Store all data required by messages interfaces.
  */
-struct msg_bank_t
-{
-    /** Message queue lock */
-    vlc_rwlock_t lock;
-
-    /* Subscribers */
-    int i_sub;
-    msg_subscription_t **pp_sub;
-};
-
-/**
- * Initialize messages queues
- * This function initializes all message queues
- */
-msg_bank_t *msg_Create (void)
-{
-    msg_bank_t *bank = malloc (sizeof (*bank));
-
-    vlc_rwlock_init (&bank->lock);
-    bank->i_sub = 0;
-    bank->pp_sub = NULL;
-    return bank;
-}
-
-/**
- * Destroy the message queues
- *
- * This functions prints all messages remaining in the queues,
- * then frees all the allocated resources
- * No other messages interface functions should be called after this one.
- */
-void msg_Destroy (msg_bank_t *bank)
-{
-    if (unlikely(bank->i_sub != 0))
-        fputs ("stale interface subscribers (LibVLC might crash)\n", stderr);
-
-    vlc_rwlock_destroy (&bank->lock);
-    free (bank);
-}
+vlc_rwlock_t msg_lock = VLC_STATIC_RWLOCK;
+msg_subscription_t *msg_head;
 
 struct msg_subscription_t
 {
-    libvlc_int_t   *instance;
+    msg_subscription_t *prev, *next;
     msg_callback_t  func;
     msg_cb_data_t  *opaque;
 };
@@ -116,7 +74,6 @@ struct msg_subscription_t
  * Whenever a message is emitted, a callback will be called.
  * Callback invocation are serialized within a subscription.
  *
- * @param instance LibVLC instance to get messages from
  * @param cb callback function
  * @param opaque data for the callback function
  * @return a subscription pointer, or NULL in case of failure
@@ -128,14 +85,14 @@ msg_subscription_t *msg_Subscribe (libvlc_int_t *instance, msg_callback_t cb,
     if (sub == NULL)
         return NULL;
 
-    sub->instance = instance;
+    sub->prev = NULL;
     sub->func = cb;
     sub->opaque = opaque;
 
-    msg_bank_t *bank = libvlc_bank (instance);
-    vlc_rwlock_wrlock (&bank->lock);
-    TAB_APPEND (bank->i_sub, bank->pp_sub, sub);
-    vlc_rwlock_unlock (&bank->lock);
+    vlc_rwlock_wrlock (&msg_lock);
+    sub->next = msg_head;
+    msg_head = sub;
+    vlc_rwlock_unlock (&msg_lock);
 
     return sub;
 }
@@ -146,11 +103,17 @@ msg_subscription_t *msg_Subscribe (libvlc_int_t *instance, msg_callback_t cb,
  */
 void msg_Unsubscribe (msg_subscription_t *sub)
 {
-    msg_bank_t *bank = libvlc_bank (sub->instance);
-
-    vlc_rwlock_wrlock (&bank->lock);
-    TAB_REMOVE (bank->i_sub, bank->pp_sub, sub);
-    vlc_rwlock_unlock (&bank->lock);
+    vlc_rwlock_wrlock (&msg_lock);
+    if (sub->next != NULL)
+        sub->next->prev = sub->prev;
+    if (sub->prev != NULL)
+        sub->prev->next = sub->next;
+    else
+    {
+        assert (msg_head == sub);
+        msg_head = sub->next;
+    }
+    vlc_rwlock_unlock (&msg_lock);
     free (sub);
 }
 
@@ -185,8 +148,6 @@ void msg_GenericVa (vlc_object_t *p_this, int i_type, const char *psz_module,
 
     if( p_this->i_flags & OBJECT_FLAGS_QUIET )
         return;
-
-    msg_bank_t *bank = libvlc_bank (p_this->p_libvlc);
 
     /* C locale to get error messages in English in the logs */
     locale_t c = newlocale (LC_MESSAGES_MASK, "C", (locale_t)0);
@@ -277,14 +238,10 @@ void msg_GenericVa (vlc_object_t *p_this, int i_type, const char *psz_module,
 
     PrintMsg( p_this, &msg );
 
-    vlc_rwlock_rdlock (&bank->lock);
-    for (int i = 0; i < bank->i_sub; i++)
-    {
-        msg_subscription_t *sub = bank->pp_sub[i];
-
+    vlc_rwlock_rdlock (&msg_lock);
+    for (msg_subscription_t *sub = msg_head; sub != NULL; sub = sub->next)
         sub->func (sub->opaque, &msg);
-    }
-    vlc_rwlock_unlock (&bank->lock);
+    vlc_rwlock_unlock (&msg_lock);
 
     if (likely(str != (char *)nomemstr))
         free (str);

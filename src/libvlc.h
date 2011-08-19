@@ -70,15 +70,6 @@ extern uint32_t cpu_flags;
 uint32_t CPUCapabilities( void );
 
 /*
- * Message/logging stuff
- */
-
-typedef struct msg_bank_t msg_bank_t;
-
-msg_bank_t *msg_Create (void);
-void msg_Destroy (msg_bank_t *);
-
-/*
  * LibVLC exit event handling
  */
 typedef struct vlc_exit
@@ -182,7 +173,6 @@ typedef struct libvlc_priv_t
     bool               playlist_active;
 
     /* Messages */
-    msg_bank_t        *msg_bank;    ///< The message bank
     int                i_verbose;   ///< info messages
     bool               b_color;     ///< color messages?
 
