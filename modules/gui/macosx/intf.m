@@ -102,7 +102,7 @@ int OpenIntf ( vlc_object_t *p_this )
     memset( p_intf->p_sys, 0, sizeof( *p_intf->p_sys ) );
 
     /* subscribe to LibVLCCore's messages */
-    p_intf->p_sys->p_sub = msg_Subscribe( p_intf->p_libvlc, MsgCallback, NULL );
+    p_intf->p_sys->p_sub = vlc_Subscribe( MsgCallback, NULL );
     p_intf->pf_run = Run;
     p_intf->b_should_run_on_first_thread = true;
 
@@ -721,7 +721,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     [o_mainwindow release];
 
     /* unsubscribe from libvlc's debug messages */
-    msg_Unsubscribe( p_intf->p_sys->p_sub );
+    vlc_Unsubscribe( p_intf->p_sys->p_sub );
 
     [o_msg_arr removeAllObjects];
     [o_msg_arr release];

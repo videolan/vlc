@@ -100,7 +100,7 @@ libvlc_log_t *libvlc_log_open( libvlc_instance_t *p_instance )
     vlc_spin_init( &p_log->data.lock );
     p_log->data.count = 0;
     p_log->data.verbosity = p_instance->verbosity;
-    p_log->p_messages = msg_Subscribe(p_instance->p_libvlc_int, handler, &p_log->data);
+    p_log->p_messages = vlc_Subscribe(handler, &p_log->data);
 
     if( !p_log->p_messages )
     {
@@ -119,7 +119,7 @@ void libvlc_log_close( libvlc_log_t *p_log )
         return;
 
     assert( p_log->p_messages );
-    msg_Unsubscribe(p_log->p_messages);
+    vlc_Unsubscribe(p_log->p_messages);
     libvlc_release( p_log->p_instance );
     libvlc_log_clear( p_log );
     vlc_spin_destroy( &p_log->data.lock );

@@ -128,13 +128,13 @@ MessagesDialog::MessagesDialog( intf_thread_t *_p_intf)
     /* Hook up to LibVLC messaging */
     cbData = new msg_cb_data_t;
     cbData->self = this;
-    sub = msg_Subscribe( p_intf->p_libvlc, MsgCallback, cbData );
+    sub = vlc_Subscribe( MsgCallback, cbData );
 }
 
 MessagesDialog::~MessagesDialog()
 {
     writeSettings( "Messages" );
-    msg_Unsubscribe( sub );
+    vlc_Unsubscribe( sub );
     delete cbData;
 };
 

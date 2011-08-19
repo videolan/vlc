@@ -93,22 +93,20 @@ typedef struct msg_subscription_t msg_subscription_t;
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-VLC_API void msg_Generic( vlc_object_t *, int, const char *, const char *, ... ) VLC_FORMAT( 4, 5 );
-VLC_API void msg_GenericVa( vlc_object_t *, int, const char *, const char *, va_list args );
-#define msg_GenericVa(a, b, c, d, e) msg_GenericVa(VLC_OBJECT(a), b, c, d, e)
+VLC_API void vlc_Log(vlc_object_t *, int,
+                     const char *, const char *, ...) VLC_FORMAT( 4, 5 );
+VLC_API void vlc_vaLog(vlc_object_t *, int,
+                       const char *, const char *, va_list);
+#define msg_GenericVa(a, b, c, d, e) vlc_vaLog(VLC_OBJECT(a), b, c, d, e)
 
 #define msg_Info( p_this, ... ) \
-        msg_Generic( VLC_OBJECT(p_this), VLC_MSG_INFO, \
-                     MODULE_STRING, __VA_ARGS__ )
+    vlc_Log( VLC_OBJECT(p_this), VLC_MSG_INFO, MODULE_STRING, __VA_ARGS__ )
 #define msg_Err( p_this, ... ) \
-        msg_Generic( VLC_OBJECT(p_this), VLC_MSG_ERR, \
-                     MODULE_STRING, __VA_ARGS__ )
+    vlc_Log( VLC_OBJECT(p_this), VLC_MSG_ERR,  MODULE_STRING, __VA_ARGS__ )
 #define msg_Warn( p_this, ... ) \
-        msg_Generic( VLC_OBJECT(p_this), VLC_MSG_WARN, \
-                     MODULE_STRING, __VA_ARGS__ )
+    vlc_Log( VLC_OBJECT(p_this), VLC_MSG_WARN, MODULE_STRING, __VA_ARGS__ )
 #define msg_Dbg( p_this, ... ) \
-        msg_Generic( VLC_OBJECT(p_this), VLC_MSG_DBG, \
-                     MODULE_STRING, __VA_ARGS__ )
+    vlc_Log( VLC_OBJECT(p_this), VLC_MSG_DBG,  MODULE_STRING, __VA_ARGS__ )
 
 typedef struct msg_cb_data_t msg_cb_data_t;
 
@@ -118,8 +116,8 @@ typedef struct msg_cb_data_t msg_cb_data_t;
  */
 typedef void (*msg_callback_t) (msg_cb_data_t *, const msg_item_t *);
 
-VLC_API msg_subscription_t* msg_Subscribe( libvlc_int_t *, msg_callback_t, msg_cb_data_t * ) VLC_USED;
-VLC_API void msg_Unsubscribe( msg_subscription_t * );
+VLC_API msg_subscription_t *vlc_Subscribe(msg_callback_t, msg_cb_data_t *) VLC_USED;
+VLC_API void vlc_Unsubscribe(msg_subscription_t *);
 
 /**
  * @}

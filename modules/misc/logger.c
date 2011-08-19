@@ -322,7 +322,7 @@ static int Open( vlc_object_t *p_this )
 #endif
     }
 
-    p_sys->p_sub = msg_Subscribe( p_intf->p_libvlc, Overflow, &p_sys->msg );
+    p_sys->p_sub = vlc_Subscribe( Overflow, &p_sys->msg );
 
     return 0;
 }
@@ -337,7 +337,7 @@ static void Close( vlc_object_t *p_this )
 
     /* Flush the queue and unsubscribe from the message queue */
     /* FIXME: flush */
-    msg_Unsubscribe( p_sys->p_sub );
+    vlc_Unsubscribe( p_sys->p_sub );
 
     switch( p_sys->msg.i_mode )
     {

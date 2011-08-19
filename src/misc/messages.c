@@ -78,8 +78,7 @@ struct msg_subscription_t
  * @param opaque data for the callback function
  * @return a subscription pointer, or NULL in case of failure
  */
-msg_subscription_t *msg_Subscribe (libvlc_int_t *instance, msg_callback_t cb,
-                                   msg_cb_data_t *opaque)
+msg_subscription_t *vlc_Subscribe (msg_callback_t cb, msg_cb_data_t *opaque)
 {
     msg_subscription_t *sub = malloc (sizeof (*sub));
     if (sub == NULL)
@@ -101,7 +100,7 @@ msg_subscription_t *msg_Subscribe (libvlc_int_t *instance, msg_callback_t cb,
  * Unsubscribe from the message queue.
  * This function waits for the message callback to return if needed.
  */
-void msg_Unsubscribe (msg_subscription_t *sub)
+void vlc_Unsubscribe (msg_subscription_t *sub)
 {
     vlc_rwlock_wrlock (&msg_lock);
     if (sub->next != NULL)
@@ -117,36 +116,34 @@ void msg_Unsubscribe (msg_subscription_t *sub)
     free (sub);
 }
 
-/*****************************************************************************
- * msg_*: print a message
- *****************************************************************************
- * These functions queue a message for later printing.
- *****************************************************************************/
-void msg_Generic( vlc_object_t *p_this, int i_type, const char *psz_module,
-                    const char *psz_format, ... )
+/**
+ * Emit a log message.
+ * \param obj VLC object emitting the message
+ * \param type VLC_MSG_* message type (info, error, warning or debug)
+ * \param module name of module from which the message come
+ *               (normally MODULE_STRING)
+ * \param format printf-like message format
+ */
+void vlc_Log (vlc_object_t *obj, int type, const char *module,
+              const char *format, ... )
 {
     va_list args;
 
-    va_start( args, psz_format );
-    msg_GenericVa (p_this, i_type, psz_module, psz_format, args);
-    va_end( args );
+    va_start (args, format);
+    vlc_vaLog (obj, type, module, format, args);
+    va_end (args);
 }
 
-#undef msg_GenericVa
 /**
- * Add a message to a queue
- *
- * This function provides basic functionnalities to other msg_* functions.
- * It adds a message to a queue (after having printed all stored messages if it
- * is full). If the message can't be converted to string in memory, it issues
- * a warning.
+ * Emit a log message. This function is the variable argument list equivalent
+ * to vlc_Log().
  */
-void msg_GenericVa (vlc_object_t *p_this, int i_type, const char *psz_module,
-                    const char *psz_format, va_list args)
+void vlc_vaLog (vlc_object_t *obj, int type, const char *module,
+                const char *format, va_list args)
 {
-    assert (p_this);
+    assert (obj != NULL);
 
-    if( p_this->i_flags & OBJECT_FLAGS_QUIET )
+    if (obj->i_flags & OBJECT_FLAGS_QUIET)
         return;
 
     /* C locale to get error messages in English in the logs */
@@ -155,10 +152,10 @@ void msg_GenericVa (vlc_object_t *p_this, int i_type, const char *psz_module,
 
 #ifndef __GLIBC__
     /* Expand %m to strerror(errno) - only once */
-    char buf[strlen( psz_format ) + 2001], *ptr;
-    strcpy( buf, psz_format );
+    char buf[strlen(format) + 2001], *ptr;
+    strcpy (buf, format);
     ptr = (char*)buf;
-    psz_format = (const char*) buf;
+    format = (const char*) buf;
 
     for( ;; )
     {
@@ -213,7 +210,7 @@ void msg_GenericVa (vlc_object_t *p_this, int i_type, const char *psz_module,
     static const char nomemstr[] = "<not enough memory to format message>";
     char *str;
 
-    if (unlikely(vasprintf (&str, psz_format, args) == -1))
+    if (unlikely(vasprintf (&str, format, args) == -1))
         str = (char *)nomemstr;
 
     uselocale (locale);
@@ -222,21 +219,21 @@ void msg_GenericVa (vlc_object_t *p_this, int i_type, const char *psz_module,
     /* Fill message information fields */
     msg_item_t msg;
 
-    msg.i_type = i_type;
-    msg.i_object_id = (uintptr_t)p_this;
-    msg.psz_object_type = p_this->psz_object_type;
-    msg.psz_module = psz_module;
+    msg.i_type = type;
+    msg.i_object_id = (uintptr_t)obj;
+    msg.psz_object_type = obj->psz_object_type;
+    msg.psz_module = module;
     msg.psz_msg = str;
     msg.psz_header = NULL;
 
-    for (vlc_object_t *o = p_this; o != NULL; o = o->p_parent)
+    for (vlc_object_t *o = obj; o != NULL; o = o->p_parent)
         if (o->psz_header != NULL)
         {
             msg.psz_header = o->psz_header;
             break;
         }
 
-    PrintMsg( p_this, &msg );
+    PrintMsg (obj, &msg);
 
     vlc_rwlock_rdlock (&msg_lock);
     for (msg_subscription_t *sub = msg_head; sub != NULL; sub = sub->next)

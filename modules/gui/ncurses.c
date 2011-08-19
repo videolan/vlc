@@ -1901,7 +1901,7 @@ static int Open(vlc_object_t *p_this)
     memset(p_sys->msgs, 0, sizeof p_sys->msgs);
     p_sys->i_msgs = 0;
     p_sys->i_verbosity = var_InheritInteger(p_intf, "verbose");
-    p_sys->p_sub = msg_Subscribe(p_intf->p_libvlc, MsgCallback, msg_cb_data);
+    p_sys->p_sub = vlc_Subscribe(MsgCallback, msg_cb_data);
 
     p_sys->i_box_type = BOX_PLAYLIST;
     p_sys->b_plidx_follow = true;
@@ -1956,7 +1956,7 @@ static void Close(vlc_object_t *p_this)
 
     endwin();   /* Close the ncurses interface */
 
-    msg_Unsubscribe(p_sys->p_sub);
+    vlc_Unsubscribe(p_sys->p_sub);
     vlc_mutex_destroy(&p_sys->msg_lock);
     vlc_mutex_destroy(&p_sys->pl_lock);
     for(unsigned i = 0; i < sizeof p_sys->msgs / sizeof *p_sys->msgs; i++)

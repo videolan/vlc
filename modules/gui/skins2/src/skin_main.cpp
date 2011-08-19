@@ -83,7 +83,7 @@ static int Open( vlc_object_t *p_this )
 
     // Suscribe to messages bank
 #if 0
-    p_intf->p_sys->p_sub = msg_Subscribe( p_intf );
+    p_intf->p_sys->p_sub = vlc_Subscribe( p_intf );
 #endif
 
     p_intf->p_sys->p_input = NULL;
@@ -152,7 +152,7 @@ static void Close( vlc_object_t *p_this )
 
     // Unsubscribe from messages bank
 #if 0
-    msg_Unsubscribe( p_intf, p_intf->p_sys->p_sub );
+    vlc_Unsubscribe( p_intf, p_intf->p_sys->p_sub );
 #endif
 
     // Destroy structure
