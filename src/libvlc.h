@@ -41,6 +41,7 @@ void system_Init      ( void );
 void system_Configure ( libvlc_int_t *, int, const char *const [] );
 void system_End       ( void );
 
+void vlc_CPU_init(void);
 void vlc_CPU_dump(vlc_object_t *);
 
 /*
@@ -64,12 +65,6 @@ void vlc_assert_locked (vlc_mutex_t *);
 #else
 # define vlc_assert_locked( m ) (void)m
 #endif
-
-/*
- * CPU capabilities
- */
-extern uint32_t cpu_flags;
-uint32_t CPUCapabilities( void );
 
 /*
  * LibVLC exit event handling

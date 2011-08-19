@@ -191,8 +191,6 @@ libvlc_int_t * libvlc_InternalCreate( void )
     vlc_mutex_lock( &global_lock );
     if( i_instances == 0 )
     {
-        /* Guess what CPU we have */
-        cpu_flags = CPUCapabilities();
         /* The module bank will be initialized later */
     }
 

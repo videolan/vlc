@@ -82,6 +82,7 @@ BOOL WINAPI DllMain (HINSTANCE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
             vlc_threadvar_create (&thread_key, NULL);
             vlc_rwlock_init (&config_lock);
             vlc_rwlock_init (&msg_lock);
+            vlc_CPU_init ();
             break;
 
         case DLL_PROCESS_DETACH:

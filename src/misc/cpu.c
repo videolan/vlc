@@ -49,6 +49,8 @@
 
 #include "libvlc.h"
 
+static uint32_t cpu_flags;
+
 #if defined( __i386__ ) || defined( __x86_64__ ) || defined( __powerpc__ ) \
  || defined( __ppc__ ) || defined( __ppc64__ ) || defined( __powerpc64__ )
 # ifndef WIN32
@@ -90,12 +92,11 @@ static bool check_OS_capability( const char *psz_capability, pid_t pid )
 # endif
 #endif
 
-/*****************************************************************************
- * CPUCapabilities: get the CPU capabilities
- *****************************************************************************
- * This function is called to list extensions the CPU may have.
- *****************************************************************************/
-uint32_t CPUCapabilities( void )
+/**
+ * Determines the CPU capabilities and stores them in cpu_flags.
+ * The result can be retrieved with vlc_CPU().
+ */
+void vlc_CPU_init (void)
 {
     uint32_t i_capabilities = 0;
 
@@ -322,17 +323,19 @@ out:
 #   endif
 
 #endif
-    return i_capabilities;
+
+    cpu_flags = i_capabilities;
 }
 
-uint32_t cpu_flags = 0;
-
-
-/*****************************************************************************
- * vlc_CPU: get pre-computed CPU capability flags
- ****************************************************************************/
+/**
+ * Retrieves pre-computed CPU capability flags
+ */
 unsigned vlc_CPU (void)
 {
+#ifndef WIN32 /* On Windows, initialized from DllMain() instead */
+    static pthread_once_t once = PTHREAD_ONCE_INIT;
+    pthread_once (&once, vlc_CPU_init);
+#endif
     return cpu_flags;
 }
 
