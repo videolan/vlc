@@ -260,7 +260,7 @@ void system_Configure( libvlc_int_t *p_this, int i_argc, const char *const ppsz_
             ReleaseMutex( hmutex );
 
             /* Bye bye */
-            system_End( p_this );
+            system_End( );
             exit( 0 );
         }
     }
@@ -371,26 +371,20 @@ LRESULT CALLBACK WMCOPYWNDPROC( HWND hwnd, UINT uMsg, WPARAM wParam,
 /*****************************************************************************
  * system_End: terminate winsock.
  *****************************************************************************/
-void system_End( libvlc_int_t *p_this )
+void system_End( void )
 {
     HWND ipcwindow;
-    if( p_this )
-    {
-        free( psz_vlcpath );
-        psz_vlcpath = NULL;
-    }
 
-    if (p_helper && p_helper->p_parent == VLC_OBJECT(p_this) )
+    free( psz_vlcpath );
+    psz_vlcpath = NULL;
+
+    /* FIXME: thread-safety... */
+    if (p_helper)
     {
-        /* this is the first instance (in a one-instance system)
-         * it is the owner of the helper thread
-         */
         if( ( ipcwindow = FindWindow( 0, L"VLC ipc "VERSION ) ) != 0 )
         {
             SendMessage( ipcwindow, WM_QUIT, 0, 0 );
         }
-
-        /* FIXME: thread-safety... */
         vlc_object_release (p_helper);
         p_helper = NULL;
     }

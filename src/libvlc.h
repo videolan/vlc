@@ -39,7 +39,7 @@ size_t vlc_towc (const char *str, uint32_t *restrict pwc);
  */
 void system_Init      ( void );
 void system_Configure ( libvlc_int_t *, int, const char *const [] );
-void system_End       ( libvlc_int_t * );
+void system_End       ( void );
 
 /*
  * Threads subsystem

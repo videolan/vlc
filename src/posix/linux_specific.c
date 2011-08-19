@@ -119,12 +119,10 @@ void system_Configure (libvlc_int_t *libvlc,
     (void)libvlc; (void)argc; (void)argv;
 }
 
-void system_End (libvlc_int_t *libvlc)
+void system_End (void)
 {
     vlc_mutex_lock (&once.lock);
     if (--once.refs == 0)
         unset_libvlc_path ();
     vlc_mutex_unlock (&once.lock);
-
-    (void)libvlc;
 }

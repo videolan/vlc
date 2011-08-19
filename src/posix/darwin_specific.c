@@ -166,9 +166,8 @@ void system_Configure( libvlc_int_t *p_this,
 /*****************************************************************************
  * system_End: free the program path.
  *****************************************************************************/
-void system_End( libvlc_int_t *p_this )
+void system_End( void )
 {
-    (void)p_this;
     free( psz_vlcpath );
     psz_vlcpath = NULL;
 }
