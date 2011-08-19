@@ -463,17 +463,18 @@ static VLCMainWindow *_o_sharedInstance = nil;
     if (!b_nonembedded)
     {
         if ([o_video_view isHidden] && [o_playlist_btn isEnabled]) {
-            [o_playlist_table setHidden: YES];
+            [o_split_view setHidden: YES];
             [o_video_view setHidden: NO];
         }
         else
         {
             [o_video_view setHidden: YES];
-            [o_playlist_table setHidden: NO];
+            [o_split_view setHidden: NO];
         }
     }
     else
     {
+        [o_split_view setHidden: NO];
         [o_playlist_table setHidden: NO];
         [o_video_view setHidden: ![[VLCMain sharedInstance] activeVideoPlayback]];
     }
