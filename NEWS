@@ -62,6 +62,8 @@ Codecs:
  * Support for 9bits and 10bits H.264/AVC decoding
  * Support for Lagarith Lossless video codec
  * Support for 20-bits PCM and DAT-12 (digital magnetic tapes) from RTP
+ * New module for Dirac encoding, using the faster libschroedinger
+   The Schroedinger module should be prefered to the Dirac one
 
 Demuxers:
  * New images demuxer supporting jpeg, png, targa, xcf, git, tiff, bmp, pcx, lbm
