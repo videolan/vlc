@@ -98,7 +98,6 @@
 /*****************************************************************************
  * The evil global variables. We handle them with care, don't worry.
  *****************************************************************************/
-static unsigned          i_instances = 0;
 
 #ifndef WIN32
 static bool b_daemon = false;
@@ -173,7 +172,6 @@ static void PauseConsole  ( void );
 #endif
 static int  ConsoleWidth  ( void );
 
-static vlc_mutex_t global_lock = VLC_STATIC_MUTEX;
 extern const char psz_vlc_changeset[];
 
 /**
@@ -188,19 +186,9 @@ libvlc_int_t * libvlc_InternalCreate( void )
 
     /* Now that the thread system is initialized, we don't have much, but
      * at least we have variables */
-    vlc_mutex_lock( &global_lock );
-    if( i_instances == 0 )
-    {
-        /* The module bank will be initialized later */
-    }
-
     /* Allocate a libvlc instance object */
     p_libvlc = vlc_custom_create( (vlc_object_t *)NULL, sizeof (*priv),
                                   "libvlc" );
-    if( p_libvlc != NULL )
-        i_instances++;
-    vlc_mutex_unlock( &global_lock );
-
     if( p_libvlc == NULL )
         return NULL;
 
@@ -969,15 +957,7 @@ void libvlc_InternalDestroy( libvlc_int_t *p_libvlc )
 {
     libvlc_priv_t *priv = libvlc_priv( p_libvlc );
 
-    vlc_mutex_lock( &global_lock );
-    i_instances--;
-
-    if( i_instances == 0 )
-    {
-        /* System specific cleaning code */
-        system_End( );
-    }
-    vlc_mutex_unlock( &global_lock );
+    system_End( );
 
     /* Destroy mutexes */
     vlc_ExitDestroy( &priv->exit );
