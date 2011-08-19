@@ -389,10 +389,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
      * default values.
      */
     module_LoadPlugins( p_libvlc );
-    if( p_libvlc->b_die )
-    {
-        b_exit = true;
-    }
 
     size_t module_count;
     module_t **list = module_list_get( &module_count );
