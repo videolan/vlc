@@ -34,7 +34,6 @@ typedef struct {
 #ifdef FINISHED
     vcdplay_ptr             vmg;
 #endif
-    intf_thread_t *         p_intf;
 
 #ifdef DEMUX_FINISHED
     int                     i_audio_nb;

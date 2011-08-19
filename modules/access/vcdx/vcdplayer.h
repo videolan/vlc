@@ -154,7 +154,6 @@ typedef struct vcdplayer_input_s
   input_title_t *p_title[CDIO_CD_MAX_TRACKS+2];
 
   /* Probably gets moved into another structure...*/
-  intf_thread_t *p_intf;
   int            i_audio_nb;
   int            i_still;
   bool           b_end_of_cell;

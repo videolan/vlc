@@ -198,8 +198,6 @@ VCDReadBlock( access_t * p_access )
                          p_vcdplayer->i_track, &(p_vcdplayer->play_item));
             // p_vcd->in_still = false;
             dbg_print(INPUT_DBG_STILL, "still wait time done");
-#else
-            vcdIntfStillTime(p_vcdplayer->p_intf, *p_buf);
 #endif
 
             block_Release( p_block );
@@ -953,10 +951,6 @@ VCDOpen ( vlc_object_t *p_this )
         VCDFixupPlayList(p_access,p_vcd,psz_source,&itemid,play_single_item);
 #endif
 
-#ifdef FIXED
-    p_vcdplayer->p_intf = intf_Create( p_access, "vcdx" );
-    p_vcdplayer->p_intf->b_block = false;
-#endif
     p_vcdplayer->p_access = p_access;
 
     free( psz_source );
