@@ -107,8 +107,6 @@ static inline void *realloc_down( void *ptr, size_t size )
 
 #define TAB_APPEND( count, tab, p )             \
     TAB_APPEND_CAST( , count, tab, p )
-#define TAB_APPEND_CPP( type, count, tab, p )   \
-    TAB_APPEND_CAST( (type**), count, tab, p )
 
 #define TAB_FIND( count, tab, p, index )        \
   do {                                          \
