@@ -40,16 +40,18 @@
  *   -- some character, Beneath a Steel Sky
  */
 
-struct msg_cb_data_t
+typedef struct
 {
     vlc_spinlock_t lock;
     msg_item_t *items[VLC_MSG_QSIZE];
     unsigned    count;
     int         verbosity;
-};
+} msg_cb_data_t;
 
-static void handler( msg_cb_data_t *d, const msg_item_t *p_item )
+static void handler( void *opaque, const msg_item_t *p_item )
 {
+    msg_cb_data_t *d = opaque;
+
     if (p_item->i_type > d->verbosity)
         return;
 

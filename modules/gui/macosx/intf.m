@@ -70,7 +70,7 @@ static void updateProgressPanel (void *, const char *, float);
 static bool checkProgressPanel (void *);
 static void destroyProgressPanel (void *);
 
-static void MsgCallback( msg_cb_data_t *, const msg_item_t * );
+static void MsgCallback( void *, const msg_item_t * );
 
 static int InputEvent( vlc_object_t *, const char *,
                       vlc_value_t, vlc_value_t, void * );
@@ -219,7 +219,7 @@ static void Run( intf_thread_t *p_intf )
  * ready to be displayed. We store everything in a NSArray in our Cocoa part
  * of this file.
  *****************************************************************************/
-static void MsgCallback( msg_cb_data_t *data, const msg_item_t *item )
+static void MsgCallback( void *data, const msg_item_t *item )
 {
     int canc = vlc_savecancel();
 

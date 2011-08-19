@@ -221,11 +221,6 @@ struct intf_sys_t
 
 };
 
-struct msg_cb_data_t
-{
-    intf_sys_t *p_sys;
-};
-
 /*****************************************************************************
  * Directories
  *****************************************************************************/
@@ -1816,9 +1811,9 @@ static void HandleKey(intf_thread_t *p_intf)
  *
  */
 
-static void MsgCallback(msg_cb_data_t *data, const msg_item_t *msg)
+static void MsgCallback(void *data, const msg_item_t *msg)
 {
-    intf_sys_t *p_sys = data->p_sys;
+    intf_sys_t *p_sys = data;
 
     if (p_sys->i_verbosity < 0
      || p_sys->i_verbosity < (msg->i_type - VLC_MSG_ERR))
@@ -1883,25 +1878,16 @@ static int Open(vlc_object_t *p_this)
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
     intf_sys_t    *p_sys  = p_intf->p_sys = calloc(1, sizeof(intf_sys_t));
-    struct msg_cb_data_t *msg_cb_data;
 
     if (!p_sys)
         return VLC_ENOMEM;
 
-    msg_cb_data = malloc(sizeof *msg_cb_data);
-    if (!msg_cb_data)
-    {
-        free(p_sys);
-        return VLC_ENOMEM;
-    }
-
-    msg_cb_data->p_sys = p_sys;
     vlc_mutex_init(&p_sys->msg_lock);
     vlc_mutex_init(&p_sys->pl_lock);
     memset(p_sys->msgs, 0, sizeof p_sys->msgs);
     p_sys->i_msgs = 0;
     p_sys->i_verbosity = var_InheritInteger(p_intf, "verbose");
-    p_sys->p_sub = vlc_Subscribe(MsgCallback, msg_cb_data);
+    p_sys->p_sub = vlc_Subscribe(MsgCallback, p_sys);
 
     p_sys->i_box_type = BOX_PLAYLIST;
     p_sys->b_plidx_follow = true;

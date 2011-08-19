@@ -108,15 +108,13 @@ VLC_API void vlc_vaLog(vlc_object_t *, int,
 #define msg_Dbg( p_this, ... ) \
     vlc_Log( VLC_OBJECT(p_this), VLC_MSG_DBG,  MODULE_STRING, __VA_ARGS__ )
 
-typedef struct msg_cb_data_t msg_cb_data_t;
-
 /**
  * Message logging callback signature.
  * Accepts one private data pointer, the message, and an overrun counter.
  */
-typedef void (*msg_callback_t) (msg_cb_data_t *, const msg_item_t *);
+typedef void (*msg_callback_t) (void *, const msg_item_t *);
 
-VLC_API msg_subscription_t *vlc_Subscribe(msg_callback_t, msg_cb_data_t *) VLC_USED;
+VLC_API msg_subscription_t *vlc_Subscribe(msg_callback_t, void *) VLC_USED;
 VLC_API void vlc_Unsubscribe(msg_subscription_t *);
 
 /**

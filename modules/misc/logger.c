@@ -72,20 +72,14 @@
 #include <syslog.h>
 #endif
 
-struct msg_cb_data_t
-{
-    intf_thread_t *p_intf;
-    FILE *p_file;
-    int   i_mode;
-};
-
 /*****************************************************************************
  * intf_sys_t: description and status of log interface
  *****************************************************************************/
 struct intf_sys_t
 {
     msg_subscription_t *p_sub;
-    msg_cb_data_t msg;
+    FILE *p_file;
+    int   i_mode;
 };
 
 /*****************************************************************************
@@ -94,7 +88,7 @@ struct intf_sys_t
 static int  Open    ( vlc_object_t * );
 static void Close   ( vlc_object_t * );
 
-static void Overflow (msg_cb_data_t *p_sys, const msg_item_t *p_item);
+static void Overflow (void *p_sys, const msg_item_t *p_item);
 static void TextPrint         ( const msg_item_t *, FILE * );
 static void HtmlPrint         ( const msg_item_t *, FILE * );
 #ifdef HAVE_SYSLOG_H
@@ -201,8 +195,7 @@ static int Open( vlc_object_t *p_this )
     if( p_sys == NULL )
         return VLC_ENOMEM;
 
-    p_sys->msg.p_intf = p_intf;
-    p_sys->msg.i_mode = MODE_TEXT;
+    p_sys->i_mode = MODE_TEXT;
     psz_mode = var_InheritString( p_intf, "logmode" );
     if( psz_mode )
     {
@@ -210,18 +203,18 @@ static int Open( vlc_object_t *p_this )
             ;
         else if( !strcmp( psz_mode, "html" ) )
         {
-            p_sys->msg.i_mode = MODE_HTML;
+            p_sys->i_mode = MODE_HTML;
         }
 #ifdef HAVE_SYSLOG_H
         else if( !strcmp( psz_mode, "syslog" ) )
         {
-            p_sys->msg.i_mode = MODE_SYSLOG;
+            p_sys->i_mode = MODE_SYSLOG;
         }
 #endif
         else
         {
             msg_Warn( p_intf, "invalid log mode `%s', using `text'", psz_mode );
-            p_sys->msg.i_mode = MODE_TEXT;
+            p_sys->i_mode = MODE_TEXT;
         }
         free( psz_mode );
     }
@@ -230,7 +223,7 @@ static int Open( vlc_object_t *p_this )
         msg_Warn( p_intf, "no log mode specified, using `text'" );
     }
 
-    if( p_sys->msg.i_mode != MODE_SYSLOG )
+    if( p_sys->i_mode != MODE_SYSLOG )
     {
         char *psz_file = var_InheritString( p_intf, "logfile" );
         if( !psz_file )
@@ -239,12 +232,12 @@ static int Open( vlc_object_t *p_this )
             char *home = config_GetUserDir(VLC_DOCUMENTS_DIR);
             if( home == NULL
              || asprintf( &psz_file, "%s/"LOG_DIR"/%s", home,
-                (p_sys->msg.i_mode == MODE_HTML) ? LOG_FILE_HTML
+                (p_sys->i_mode == MODE_HTML) ? LOG_FILE_HTML
                                              : LOG_FILE_TEXT ) == -1 )
                 psz_file = NULL;
             free(home);
 #else
-            switch( p_sys->msg.i_mode )
+            switch( p_sys->i_mode )
             {
             case MODE_HTML:
                 psz_file = strdup( LOG_FILE_HTML );
@@ -261,33 +254,33 @@ static int Open( vlc_object_t *p_this )
 
         /* Open the log file and remove any buffering for the stream */
         msg_Dbg( p_intf, "opening logfile `%s'", psz_file );
-        p_sys->msg.p_file = vlc_fopen( psz_file, "at" );
-        if( p_sys->msg.p_file == NULL )
+        p_sys->p_file = vlc_fopen( psz_file, "at" );
+        if( p_sys->p_file == NULL )
         {
             msg_Err( p_intf, "error opening logfile `%s'", psz_file );
             free( p_sys );
             free( psz_file );
             return -1;
         }
-        setvbuf( p_sys->msg.p_file, NULL, _IONBF, 0 );
+        setvbuf( p_sys->p_file, NULL, _IONBF, 0 );
 
         free( psz_file );
 
-        switch( p_sys->msg.i_mode )
+        switch( p_sys->i_mode )
         {
         case MODE_HTML:
-            fputs( HTML_HEADER, p_sys->msg.p_file );
+            fputs( HTML_HEADER, p_sys->p_file );
             break;
         case MODE_TEXT:
         default:
-            fputs( TEXT_HEADER, p_sys->msg.p_file );
+            fputs( TEXT_HEADER, p_sys->p_file );
             break;
         }
 
     }
     else
     {
-        p_sys->msg.p_file = NULL;
+        p_sys->p_file = NULL;
 #ifdef HAVE_SYSLOG_H
         int i_facility;
         char *psz_facility = var_InheritString( p_intf, "syslog-facility" );
@@ -322,7 +315,7 @@ static int Open( vlc_object_t *p_this )
 #endif
     }
 
-    p_sys->p_sub = vlc_Subscribe( Overflow, &p_sys->msg );
+    p_sys->p_sub = vlc_Subscribe( Overflow, p_intf );
 
     return 0;
 }
@@ -339,10 +332,10 @@ static void Close( vlc_object_t *p_this )
     /* FIXME: flush */
     vlc_Unsubscribe( p_sys->p_sub );
 
-    switch( p_sys->msg.i_mode )
+    switch( p_sys->i_mode )
     {
     case MODE_HTML:
-        fputs( HTML_FOOTER, p_sys->msg.p_file );
+        fputs( HTML_FOOTER, p_sys->p_file );
         break;
 #ifdef HAVE_SYSLOG_H
     case MODE_SYSLOG:
@@ -351,13 +344,13 @@ static void Close( vlc_object_t *p_this )
 #endif
     case MODE_TEXT:
     default:
-        fputs( TEXT_FOOTER, p_sys->msg.p_file );
+        fputs( TEXT_FOOTER, p_sys->p_file );
         break;
     }
 
     /* Close the log file */
-    if( p_sys->msg.p_file )
-        fclose( p_sys->msg.p_file );
+    if( p_sys->p_file )
+        fclose( p_sys->p_file );
 
     /* Destroy structure */
     free( p_sys );
@@ -366,11 +359,14 @@ static void Close( vlc_object_t *p_this )
 /**
  * Log a message
  */
-static void Overflow (msg_cb_data_t *p_sys, const msg_item_t *p_item)
+static void Overflow (void *opaque, const msg_item_t *p_item)
 {
-    int verbosity = var_InheritInteger( p_sys->p_intf, "log-verbose" );
+    intf_thread_t *p_intf = opaque;
+    intf_sys_t *p_sys = p_intf->p_sys;
+
+    int verbosity = var_InheritInteger( p_intf, "log-verbose" );
     if (verbosity == -1)
-        verbosity = var_InheritInteger( p_sys->p_intf, "verbose" );
+        verbosity = var_InheritInteger( p_intf, "verbose" );
 
     switch( p_item->i_type )
     {

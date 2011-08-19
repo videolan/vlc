@@ -66,7 +66,7 @@ struct msg_subscription_t
 {
     msg_subscription_t *prev, *next;
     msg_callback_t  func;
-    msg_cb_data_t  *opaque;
+    void           *opaque;
 };
 
 /**
@@ -78,7 +78,7 @@ struct msg_subscription_t
  * @param opaque data for the callback function
  * @return a subscription pointer, or NULL in case of failure
  */
-msg_subscription_t *vlc_Subscribe (msg_callback_t cb, msg_cb_data_t *opaque)
+msg_subscription_t *vlc_Subscribe (msg_callback_t cb, void *opaque)
 {
     msg_subscription_t *sub = malloc (sizeof (*sub));
     if (sub == NULL)

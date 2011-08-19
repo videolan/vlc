@@ -69,11 +69,6 @@ MsgEvent::MsgEvent( const msg_item_t *msg )
 {
 }
 
-struct msg_cb_data_t
-{
-    MessagesDialog *self;
-};
-
 MessagesDialog::MessagesDialog( intf_thread_t *_p_intf)
                : QVLCFrame( _p_intf )
 {
@@ -126,16 +121,13 @@ MessagesDialog::MessagesDialog( intf_thread_t *_p_intf)
     readSettings( "Messages", QSize( 600, 450 ) );
 
     /* Hook up to LibVLC messaging */
-    cbData = new msg_cb_data_t;
-    cbData->self = this;
-    sub = vlc_Subscribe( MsgCallback, cbData );
+    sub = vlc_Subscribe( MsgCallback, this );
 }
 
 MessagesDialog::~MessagesDialog()
 {
     writeSettings( "Messages" );
     vlc_Unsubscribe( sub );
-    delete cbData;
 };
 
 void MessagesDialog::changeVerbosity( int verbosity )
@@ -307,9 +299,9 @@ void MessagesDialog::tabChanged( int i )
     updateButton->setVisible( i == 1 );
 }
 
-void MessagesDialog::MsgCallback( msg_cb_data_t *data, const msg_item_t *item )
+void MessagesDialog::MsgCallback( void *self, const msg_item_t *item )
 {
-    MessagesDialog *dialog = data->self;
+    MessagesDialog *dialog = (MessagesDialog *)self;
     int verbosity = vlc_atomic_get( &dialog->verbosity );
 
     if( verbosity < 0 || verbosity < (item->i_type - VLC_MSG_ERR) )
