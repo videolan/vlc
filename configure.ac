@@ -2009,7 +2009,7 @@ AC_ARG_ENABLE(libv4l2,
 if test "${enable_libv4l2}" != "no" -a "${enable_v4l2}" != "no"
 then
     PKG_CHECK_MODULES( LIBV4L2, libv4l2, [
-      VLC_ADD_LDFLAGS([v4l2],[${LIBV4L2_LIBS}])
+      VLC_ADD_LIBS([v4l2],[${LIBV4L2_LIBS}])
       VLC_ADD_CFLAGS([v4l2],[${LIBV4L2_CFLAGS}])
       AC_DEFINE(HAVE_LIBV4L2, 1, Define if libv4l2 is available)],
       AC_MSG_WARN([LibV4L2 support disabled because libv4l2 development headers were not found])

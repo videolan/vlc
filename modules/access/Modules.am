@@ -123,8 +123,8 @@ libaccess_shm_plugin_la_DEPENDENCIES =
 libvlc_LTLIBRARIES += $(LTLIBaccess_shm)
 
 libv4l2_plugin_la_SOURCES = v4l2.c
-libv4l2_plugin_la_CFLAGS = $(AM_CFLAGS)
-libv4l2_plugin_la_LIBADD = $(AM_LIBADD)
+libv4l2_plugin_la_CFLAGS = $(AM_CFLAGS) $(CFLAGS_v4L2)
+libv4l2_plugin_la_LIBADD = $(AM_LIBADD) $(LDFLAGS_v4l2)
 libv4l2_plugin_la_DEPENDENCIES =
 if HAVE_V4L2
 libvlc_LTLIBRARIES += libv4l2_plugin.la
