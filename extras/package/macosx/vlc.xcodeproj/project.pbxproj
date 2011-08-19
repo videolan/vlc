@@ -152,18 +152,11 @@
 		CC0433D213B28C8C00D7D52E /* spref_cone_Interface_64.png in Resources */ = {isa = PBXBuildFile; fileRef = CC0433CC13B28C8C00D7D52E /* spref_cone_Interface_64.png */; };
 		CC0433D313B28C8C00D7D52E /* spref_cone_Subtitles_64.png in Resources */ = {isa = PBXBuildFile; fileRef = CC0433CD13B28C8C00D7D52E /* spref_cone_Subtitles_64.png */; };
 		CC0433D413B28C8C00D7D52E /* spref_cone_Video_64.png in Resources */ = {isa = PBXBuildFile; fileRef = CC0433CE13B28C8C00D7D52E /* spref_cone_Video_64.png */; };
-		CC0FB34C0F8BED1100F057F7 /* CoreDialogs.nib in Resources */ = {isa = PBXBuildFile; fileRef = CC0FB34A0F8BED1100F057F7 /* CoreDialogs.nib */; };
 		CC3F9F861350B2A000B0E885 /* Growl.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC3F9F851350B2A000B0E885 /* Growl.framework */; };
-		CC402EB10E00ABBB006A4BA4 /* MainMenu.nib in Resources */ = {isa = PBXBuildFile; fileRef = F74F13EA02C2A79C01EE194C /* MainMenu.nib */; };
 		CC402EB80E00ABBB006A4BA4 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = F69B0CA602E24F6401A80112 /* InfoPlist.strings */; };
 		CC402EB90E00ABBB006A4BA4 /* vlc.scriptSuite in Resources */ = {isa = PBXBuildFile; fileRef = 8EBF3FA303F13FFB0059A3A7 /* vlc.scriptSuite */; };
 		CC402EBA0E00ABBB006A4BA4 /* vlc.scriptTerminology in Resources */ = {isa = PBXBuildFile; fileRef = 8EBF3FA503F140960059A3A7 /* vlc.scriptTerminology */; };
 		CC402EBB0E00ABBB006A4BA4 /* README.MacOSX.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 8EDAC3430440F72D0059A3A7 /* README.MacOSX.rtf */; };
-		CC402EED0E00ABBB006A4BA4 /* About.nib in Resources */ = {isa = PBXBuildFile; fileRef = DCA00AA7075F948800E6BF46 /* About.nib */; };
-		CC402EEE0E00ABBB006A4BA4 /* Preferences.nib in Resources */ = {isa = PBXBuildFile; fileRef = DCF358B9077F10BA007DB450 /* Preferences.nib */; };
-		CC402EEF0E00ABBB006A4BA4 /* Open.nib in Resources */ = {isa = PBXBuildFile; fileRef = DCA693C10789DF8700139EC6 /* Open.nib */; };
-		CC402EF00E00ABBB006A4BA4 /* Wizard.nib in Resources */ = {isa = PBXBuildFile; fileRef = DCFCCDB7085CE18F001E36AF /* Wizard.nib */; };
-		CC402EF20E00ABBB006A4BA4 /* Bookmarks.nib in Resources */ = {isa = PBXBuildFile; fileRef = DCE7BD0308A56C8B007B10AE /* Bookmarks.nib */; };
 		CC402EF30E00ABBB006A4BA4 /* about_bg.png in Resources */ = {isa = PBXBuildFile; fileRef = DCDA5E6408F94518009D93A8 /* about_bg.png */; };
 		CC402EF50E00ABBB006A4BA4 /* skip_forward_active_embedded.png in Resources */ = {isa = PBXBuildFile; fileRef = C2F2A6FA0958A6E600018C74 /* skip_forward_active_embedded.png */; };
 		CC402EF60E00ABBB006A4BA4 /* play_embedded.png in Resources */ = {isa = PBXBuildFile; fileRef = C2F2A6FC0958A94500018C74 /* play_embedded.png */; };
@@ -180,7 +173,6 @@
 		CC402F2D0E00ABBB006A4BA4 /* shuffle_embedded_graphite.png in Resources */ = {isa = PBXBuildFile; fileRef = CC33C2490D2578F5008C4683 /* shuffle_embedded_graphite.png */; };
 		CC402F2E0E00ABBB006A4BA4 /* skip_forward_embedded_graphite.png in Resources */ = {isa = PBXBuildFile; fileRef = CC33C24A0D2578F5008C4683 /* skip_forward_embedded_graphite.png */; };
 		CC402F300E00ABBB006A4BA4 /* skip_previous_embedded_graphite.png in Resources */ = {isa = PBXBuildFile; fileRef = CC33C24C0D2578F5008C4683 /* skip_previous_embedded_graphite.png */; };
-		CC402F3B0E00ABBB006A4BA4 /* MediaInfo.nib in Resources */ = {isa = PBXBuildFile; fileRef = CCC896B80D9AA9E8005AE59C /* MediaInfo.nib */; };
 		CC402F3C0E00ABBB006A4BA4 /* noart.png in Resources */ = {isa = PBXBuildFile; fileRef = CC1C41D00D9BAD7F002728FA /* noart.png */; };
 		CC402F410E00ABBB006A4BA4 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7ADFEA557BF11CA2CBB /* Cocoa.framework */; };
 		CC402F420E00ABBB006A4BA4 /* ApplicationServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC3DC89B0A7CDB9600B53F32 /* ApplicationServices.framework */; };
@@ -189,8 +181,6 @@
 		CC426FD11020D44F00A32659 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC426FD01020D44F00A32659 /* Sparkle.framework */; };
 		CC426FD71020D47100A32659 /* Sparkle.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = CC426FD01020D44F00A32659 /* Sparkle.framework */; };
 		CC4EFC2D13E96BD00091D19A /* dropzone.png in Resources */ = {isa = PBXBuildFile; fileRef = CC4EFC2C13E96BD00091D19A /* dropzone.png */; };
-		CC5560281365CE4800D54038 /* AudioEffects.nib in Resources */ = {isa = PBXBuildFile; fileRef = CC5560261365CE4800D54038 /* AudioEffects.nib */; };
-		CC707EC8137474A50003010A /* SyncTracks.nib in Resources */ = {isa = PBXBuildFile; fileRef = CC707EC6137474A50003010A /* SyncTracks.nib */; };
 		CC78DA4413DE056700E9603C /* topbar_background.png in Resources */ = {isa = PBXBuildFile; fileRef = CC78DA4313DE056700E9603C /* topbar_background.png */; };
 		CC8062641021F8790021EB9A /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = CC8062631021F8790021EB9A /* dsa_pub.pem */; };
 		CC84FB2D130083BB00816D38 /* BGHUDAppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC84FB2C130083BB00816D38 /* BGHUDAppKit.framework */; };
@@ -198,7 +188,18 @@
 		CC9B43AF13B29C79000205AE /* bottom-background.png in Resources */ = {isa = PBXBuildFile; fileRef = CC9B43AE13B29C79000205AE /* bottom-background.png */; };
 		CC9B43B113B29FCF000205AE /* bottom-background_dark.png in Resources */ = {isa = PBXBuildFile; fileRef = CC9B43B013B29FCF000205AE /* bottom-background_dark.png */; };
 		CCBE999F0F922C51000705F8 /* CoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CCBE999E0F922C51000705F8 /* CoreServices.framework */; };
-		CCC0C2AA13A285F700AC92B3 /* VideoEffects.nib in Resources */ = {isa = PBXBuildFile; fileRef = CCC0C2A813A285F700AC92B3 /* VideoEffects.nib */; };
+		CCD83E2D13FE9B90004F1652 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = CCD83E2B13FE9B90004F1652 /* MainMenu.xib */; };
+		CCD83E4413FEA143004F1652 /* About.xib in Resources */ = {isa = PBXBuildFile; fileRef = CCD83E2E13FEA143004F1652 /* About.xib */; };
+		CCD83E4513FEA143004F1652 /* AudioEffects.xib in Resources */ = {isa = PBXBuildFile; fileRef = CCD83E3013FEA143004F1652 /* AudioEffects.xib */; };
+		CCD83E4613FEA143004F1652 /* Bookmarks.xib in Resources */ = {isa = PBXBuildFile; fileRef = CCD83E3213FEA143004F1652 /* Bookmarks.xib */; };
+		CCD83E4713FEA143004F1652 /* CoreDialogs.xib in Resources */ = {isa = PBXBuildFile; fileRef = CCD83E3413FEA143004F1652 /* CoreDialogs.xib */; };
+		CCD83E4813FEA143004F1652 /* ErrorPanel.xib in Resources */ = {isa = PBXBuildFile; fileRef = CCD83E3613FEA143004F1652 /* ErrorPanel.xib */; };
+		CCD83E4913FEA143004F1652 /* MediaInfo.xib in Resources */ = {isa = PBXBuildFile; fileRef = CCD83E3813FEA143004F1652 /* MediaInfo.xib */; };
+		CCD83E4A13FEA143004F1652 /* Open.xib in Resources */ = {isa = PBXBuildFile; fileRef = CCD83E3A13FEA143004F1652 /* Open.xib */; };
+		CCD83E4B13FEA143004F1652 /* Preferences.xib in Resources */ = {isa = PBXBuildFile; fileRef = CCD83E3C13FEA143004F1652 /* Preferences.xib */; };
+		CCD83E4C13FEA143004F1652 /* SyncTracks.xib in Resources */ = {isa = PBXBuildFile; fileRef = CCD83E3E13FEA143004F1652 /* SyncTracks.xib */; };
+		CCD83E4D13FEA143004F1652 /* VideoEffects.xib in Resources */ = {isa = PBXBuildFile; fileRef = CCD83E4013FEA143004F1652 /* VideoEffects.xib */; };
+		CCD83E4E13FEA143004F1652 /* Wizard.xib in Resources */ = {isa = PBXBuildFile; fileRef = CCD83E4213FEA143004F1652 /* Wizard.xib */; };
 		CCDB535D13E97D3500A1782F /* dropzone-background.png in Resources */ = {isa = PBXBuildFile; fileRef = CCDB535C13E97D3500A1782F /* dropzone-background.png */; };
 		CCE6439413E8CC170061B5F2 /* document-music-playlist.png in Resources */ = {isa = PBXBuildFile; fileRef = CCE6438E13E8CC170061B5F2 /* document-music-playlist.png */; };
 		CCE6439513E8CC170061B5F2 /* film-cast.png in Resources */ = {isa = PBXBuildFile; fileRef = CCE6438F13E8CC170061B5F2 /* film-cast.png */; };
@@ -206,7 +207,6 @@
 		CCE6439713E8CC170061B5F2 /* music-beam.png in Resources */ = {isa = PBXBuildFile; fileRef = CCE6439113E8CC170061B5F2 /* music-beam.png */; };
 		CCE6439813E8CC170061B5F2 /* network-cloud.png in Resources */ = {isa = PBXBuildFile; fileRef = CCE6439213E8CC170061B5F2 /* network-cloud.png */; };
 		CCE6439913E8CC170061B5F2 /* picture.png in Resources */ = {isa = PBXBuildFile; fileRef = CCE6439313E8CC170061B5F2 /* picture.png */; };
-		CCF11B540F8BFB520088542D /* ErrorPanel.nib in Resources */ = {isa = PBXBuildFile; fileRef = CCF11B520F8BFB520088542D /* ErrorPanel.nib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -412,7 +412,6 @@
 		CC0CD0E013DE0EAE00B0D90D /* PXSourceList.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = PXSourceList.m; path = ../../../modules/gui/macosx/PXSourceList.m; sourceTree = "<group>"; };
 		CC0CD0E113DE0EAE00B0D90D /* PXSourceListDataSource.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = PXSourceListDataSource.h; path = ../../../modules/gui/macosx/PXSourceListDataSource.h; sourceTree = "<group>"; };
 		CC0CD0E213DE0EAE00B0D90D /* PXSourceListDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = PXSourceListDelegate.h; path = ../../../modules/gui/macosx/PXSourceListDelegate.h; sourceTree = "<group>"; };
-		CC0FB34B0F8BED1100F057F7 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = Resources/English.lproj/CoreDialogs.nib; sourceTree = "<group>"; };
 		CC1941240B9C1F8400635F6B /* QTKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QTKit.framework; path = /System/Library/Frameworks/QTKit.framework; sourceTree = "<absolute>"; };
 		CC1C41D00D9BAD7F002728FA /* noart.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = noart.png; path = Resources/noart.png; sourceTree = "<group>"; };
 		CC33C2200D2572DE008C4683 /* pause_embedded_graphite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = pause_embedded_graphite.png; path = Resources/pause_embedded_graphite.png; sourceTree = "<group>"; };
@@ -443,7 +442,6 @@
 		CC4EFC2C13E96BD00091D19A /* dropzone.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = dropzone.png; path = Resources/mainwindow/dropzone.png; sourceTree = "<group>"; };
 		CC5560231365CDC700D54038 /* AudioEffects.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AudioEffects.h; path = ../../../modules/gui/macosx/AudioEffects.h; sourceTree = "<group>"; };
 		CC5560241365CDC800D54038 /* AudioEffects.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AudioEffects.m; path = ../../../modules/gui/macosx/AudioEffects.m; sourceTree = "<group>"; };
-		CC5560271365CE4800D54038 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = Resources/English.lproj/AudioEffects.nib; sourceTree = "<group>"; };
 		CC6C01A90DDF3E9200C7D754 /* intf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = intf.h; path = ../../../modules/gui/minimal_macosx/intf.h; sourceTree = SOURCE_ROOT; };
 		CC6C01AA0DDF3E9200C7D754 /* intf.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = intf.m; path = ../../../modules/gui/minimal_macosx/intf.m; sourceTree = SOURCE_ROOT; };
 		CC6C01AB0DDF3E9200C7D754 /* macosx.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = macosx.c; path = ../../../modules/gui/minimal_macosx/macosx.c; sourceTree = SOURCE_ROOT; };
@@ -463,7 +461,6 @@
 		CC6EDD500B9CA2140096068A /* eyetv.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = eyetv.m; path = ../../../modules/gui/macosx/eyetv.m; sourceTree = SOURCE_ROOT; };
 		CC707EC3137464CD0003010A /* TrackSynchronization.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TrackSynchronization.h; path = ../../../modules/gui/macosx/TrackSynchronization.h; sourceTree = "<group>"; };
 		CC707EC4137464CD0003010A /* TrackSynchronization.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TrackSynchronization.m; path = ../../../modules/gui/macosx/TrackSynchronization.m; sourceTree = "<group>"; };
-		CC707EC7137474A50003010A /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = Resources/English.lproj/SyncTracks.nib; sourceTree = "<group>"; };
 		CC772DAC10E621C100675C9B /* VLCProgressPanel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCProgressPanel.h; path = ../../../modules/gui/macosx_dialog_provider/VLCProgressPanel.h; sourceTree = SOURCE_ROOT; };
 		CC772DAD10E621C100675C9B /* VLCProgressPanel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VLCProgressPanel.m; path = ../../../modules/gui/macosx_dialog_provider/VLCProgressPanel.m; sourceTree = SOURCE_ROOT; };
 		CC78DA4313DE056700E9603C /* topbar_background.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = topbar_background.png; path = Resources/mainwindow/topbar_background.png; sourceTree = "<group>"; };
@@ -477,11 +474,9 @@
 		CCB24D5D0D54BBAE004D780C /* simple_prefs.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = simple_prefs.m; path = ../../../modules/gui/macosx/simple_prefs.m; sourceTree = SOURCE_ROOT; };
 		CCB24D5E0D54BBAE004D780C /* simple_prefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = simple_prefs.h; path = ../../../modules/gui/macosx/simple_prefs.h; sourceTree = SOURCE_ROOT; };
 		CCBE999E0F922C51000705F8 /* CoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreServices.framework; path = /System/Library/Frameworks/CoreServices.framework; sourceTree = "<absolute>"; };
-		CCC0C2A913A285F700AC92B3 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = Resources/English.lproj/VideoEffects.nib; sourceTree = "<group>"; };
 		CCC593780AB4A9FB0004FF52 /* embeddedwindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = embeddedwindow.h; path = ../../../modules/gui/macosx/embeddedwindow.h; sourceTree = SOURCE_ROOT; };
 		CCC593790AB4A9FB0004FF52 /* embeddedwindow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = embeddedwindow.m; path = ../../../modules/gui/macosx/embeddedwindow.m; sourceTree = SOURCE_ROOT; };
 		CCC895830D9A8A82005AE59C /* eyetv.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = eyetv.m; path = ../../../modules/access/eyetv.m; sourceTree = SOURCE_ROOT; };
-		CCC896B90D9AA9E8005AE59C /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = Resources/English.lproj/MediaInfo.nib; sourceTree = "<group>"; };
 		CCCDDEEF13E870BB00A35661 /* SideBarItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SideBarItem.h; path = ../../../modules/gui/macosx/SideBarItem.h; sourceTree = "<group>"; };
 		CCCDDEF013E870BB00A35661 /* SideBarItem.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SideBarItem.m; path = ../../../modules/gui/macosx/SideBarItem.m; sourceTree = "<group>"; };
 		CCCE366D13817E4500694F2A /* VideoEffects.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = VideoEffects.h; path = ../../../modules/gui/macosx/VideoEffects.h; sourceTree = "<group>"; };
@@ -490,6 +485,18 @@
 		CCD590F110E5B73200D39094 /* dialogProvider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = dialogProvider.m; path = ../../../modules/gui/macosx_dialog_provider/dialogProvider.m; sourceTree = SOURCE_ROOT; };
 		CCD590F210E5B76300D39094 /* VLCLoginPanel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCLoginPanel.h; path = ../../../modules/gui/macosx_dialog_provider/VLCLoginPanel.h; sourceTree = SOURCE_ROOT; };
 		CCD590F310E5B76300D39094 /* VLCLoginPanel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VLCLoginPanel.m; path = ../../../modules/gui/macosx_dialog_provider/VLCLoginPanel.m; sourceTree = SOURCE_ROOT; };
+		CCD83E2C13FE9B90004F1652 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/MainMenu.xib; sourceTree = "<group>"; };
+		CCD83E2F13FEA143004F1652 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/About.xib; sourceTree = "<group>"; };
+		CCD83E3113FEA143004F1652 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/AudioEffects.xib; sourceTree = "<group>"; };
+		CCD83E3313FEA143004F1652 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/Bookmarks.xib; sourceTree = "<group>"; };
+		CCD83E3513FEA143004F1652 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/CoreDialogs.xib; sourceTree = "<group>"; };
+		CCD83E3713FEA143004F1652 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/ErrorPanel.xib; sourceTree = "<group>"; };
+		CCD83E3913FEA143004F1652 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/MediaInfo.xib; sourceTree = "<group>"; };
+		CCD83E3B13FEA143004F1652 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/Open.xib; sourceTree = "<group>"; };
+		CCD83E3D13FEA143004F1652 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/Preferences.xib; sourceTree = "<group>"; };
+		CCD83E3F13FEA143004F1652 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/SyncTracks.xib; sourceTree = "<group>"; };
+		CCD83E4113FEA143004F1652 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/VideoEffects.xib; sourceTree = "<group>"; };
+		CCD83E4313FEA143004F1652 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/Wizard.xib; sourceTree = "<group>"; };
 		CCDB535C13E97D3500A1782F /* dropzone-background.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "dropzone-background.png"; path = "Resources/mainwindow/dropzone-background.png"; sourceTree = "<group>"; };
 		CCDBA3B313D32E200006127B /* macosx.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = macosx.m; path = ../../../modules/video_output/macosx.m; sourceTree = "<group>"; };
 		CCE6438E13E8CC170061B5F2 /* document-music-playlist.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "document-music-playlist.png"; path = "Resources/sidebar-icons/document-music-playlist.png"; sourceTree = "<group>"; };
@@ -502,19 +509,12 @@
 		CCF0777A13659A8000AF19FD /* SPInvocationGrabbing.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SPInvocationGrabbing.m; path = ../../../modules/gui/macosx/SPInvocationGrabbing.m; sourceTree = "<group>"; };
 		CCF0777B13659A8000AF19FD /* SPMediaKeyTap.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SPMediaKeyTap.h; path = ../../../modules/gui/macosx/SPMediaKeyTap.h; sourceTree = "<group>"; };
 		CCF0777C13659A8000AF19FD /* SPMediaKeyTap.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SPMediaKeyTap.m; path = ../../../modules/gui/macosx/SPMediaKeyTap.m; sourceTree = "<group>"; };
-		CCF11B530F8BFB520088542D /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = Resources/English.lproj/ErrorPanel.nib; sourceTree = "<group>"; };
 		DC769AB7085DF0DB001A838D /* wizard.m */ = {isa = PBXFileReference; fileEncoding = 5; indentWidth = 4; lastKnownFileType = sourcecode.c.objc; name = wizard.m; path = ../../../modules/gui/macosx/wizard.m; sourceTree = SOURCE_ROOT; tabWidth = 4; usesTabs = 0; };
 		DC769AB8085DF0DB001A838D /* wizard.h */ = {isa = PBXFileReference; fileEncoding = 5; lastKnownFileType = sourcecode.c.h; name = wizard.h; path = ../../../modules/gui/macosx/wizard.h; sourceTree = SOURCE_ROOT; };
-		DCA00AA8075F948800E6BF46 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = Resources/English.lproj/About.nib; sourceTree = "<group>"; };
-		DCA693C20789DF8700139EC6 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = Resources/English.lproj/Open.nib; sourceTree = "<group>"; };
 		DCDA5E6408F94518009D93A8 /* about_bg.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = about_bg.png; path = Resources/about_bg.png; sourceTree = "<group>"; };
-		DCE7BD0408A56C8B007B10AE /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = Resources/English.lproj/Bookmarks.nib; sourceTree = "<group>"; };
 		DCE7BD0608A5724D007B10AE /* bookmarks.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = bookmarks.m; path = ../../../modules/gui/macosx/bookmarks.m; sourceTree = SOURCE_ROOT; };
 		DCE7BD0708A5724D007B10AE /* bookmarks.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = bookmarks.h; path = ../../../modules/gui/macosx/bookmarks.h; sourceTree = SOURCE_ROOT; };
-		DCF358BA077F10BA007DB450 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = Resources/English.lproj/Preferences.nib; sourceTree = "<group>"; };
-		DCFCCDB8085CE18F001E36AF /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = Resources/English.lproj/Wizard.nib; sourceTree = "<group>"; };
 		F69B0CA702E24F6401A80112 /* English */ = {isa = PBXFileReference; fileEncoding = 5; lastKnownFileType = text.plist.strings; name = English; path = Resources/English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		F74F13EB02C2A79C01EE194C /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = Resources/English.lproj/MainMenu.nib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -563,7 +563,7 @@
 			isa = PBXGroup;
 			children = (
 				CCCB86BF0ACFDE4A00CF1E10 /* fspanel */,
-				DCF358BC077F1236007DB450 /* nibs */,
+				DCF358BC077F1236007DB450 /* xibs */,
 				DCDA5E6408F94518009D93A8 /* about_bg.png */,
 				CC33C26C0D257958008C4683 /* embedded (to be removed) */,
 				8E445F86047289E50059A3A7 /* fileicons */,
@@ -982,23 +982,23 @@
 			name = sidebar;
 			sourceTree = "<group>";
 		};
-		DCF358BC077F1236007DB450 /* nibs */ = {
+		DCF358BC077F1236007DB450 /* xibs */ = {
 			isa = PBXGroup;
 			children = (
-				CCF11B520F8BFB520088542D /* ErrorPanel.nib */,
-				CC0FB34A0F8BED1100F057F7 /* CoreDialogs.nib */,
-				CCC896B80D9AA9E8005AE59C /* MediaInfo.nib */,
-				DCA00AA7075F948800E6BF46 /* About.nib */,
-				F74F13EA02C2A79C01EE194C /* MainMenu.nib */,
-				DCF358B9077F10BA007DB450 /* Preferences.nib */,
-				DCA693C10789DF8700139EC6 /* Open.nib */,
-				DCFCCDB7085CE18F001E36AF /* Wizard.nib */,
-				DCE7BD0308A56C8B007B10AE /* Bookmarks.nib */,
-				CC5560261365CE4800D54038 /* AudioEffects.nib */,
-				CC707EC6137474A50003010A /* SyncTracks.nib */,
-				CCC0C2A813A285F700AC92B3 /* VideoEffects.nib */,
+				CCD83E2E13FEA143004F1652 /* About.xib */,
+				CCD83E3013FEA143004F1652 /* AudioEffects.xib */,
+				CCD83E3213FEA143004F1652 /* Bookmarks.xib */,
+				CCD83E3413FEA143004F1652 /* CoreDialogs.xib */,
+				CCD83E3613FEA143004F1652 /* ErrorPanel.xib */,
+				CCD83E3813FEA143004F1652 /* MediaInfo.xib */,
+				CCD83E3A13FEA143004F1652 /* Open.xib */,
+				CCD83E3C13FEA143004F1652 /* Preferences.xib */,
+				CCD83E3E13FEA143004F1652 /* SyncTracks.xib */,
+				CCD83E4013FEA143004F1652 /* VideoEffects.xib */,
+				CCD83E4213FEA143004F1652 /* Wizard.xib */,
+				CCD83E2B13FE9B90004F1652 /* MainMenu.xib */,
 			);
-			name = nibs;
+			name = xibs;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -1055,16 +1055,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				CC8062641021F8790021EB9A /* dsa_pub.pem in Resources */,
-				CC402EB10E00ABBB006A4BA4 /* MainMenu.nib in Resources */,
 				CC402EB80E00ABBB006A4BA4 /* InfoPlist.strings in Resources */,
 				CC402EB90E00ABBB006A4BA4 /* vlc.scriptSuite in Resources */,
 				CC402EBA0E00ABBB006A4BA4 /* vlc.scriptTerminology in Resources */,
 				CC402EBB0E00ABBB006A4BA4 /* README.MacOSX.rtf in Resources */,
-				CC402EED0E00ABBB006A4BA4 /* About.nib in Resources */,
-				CC402EEE0E00ABBB006A4BA4 /* Preferences.nib in Resources */,
-				CC402EEF0E00ABBB006A4BA4 /* Open.nib in Resources */,
-				CC402EF00E00ABBB006A4BA4 /* Wizard.nib in Resources */,
-				CC402EF20E00ABBB006A4BA4 /* Bookmarks.nib in Resources */,
 				CC402EF30E00ABBB006A4BA4 /* about_bg.png in Resources */,
 				CC402EF50E00ABBB006A4BA4 /* skip_forward_active_embedded.png in Resources */,
 				CC402EF60E00ABBB006A4BA4 /* play_embedded.png in Resources */,
@@ -1081,13 +1075,7 @@
 				CC402F2D0E00ABBB006A4BA4 /* shuffle_embedded_graphite.png in Resources */,
 				CC402F2E0E00ABBB006A4BA4 /* skip_forward_embedded_graphite.png in Resources */,
 				CC402F300E00ABBB006A4BA4 /* skip_previous_embedded_graphite.png in Resources */,
-				CC402F3B0E00ABBB006A4BA4 /* MediaInfo.nib in Resources */,
 				CC402F3C0E00ABBB006A4BA4 /* noart.png in Resources */,
-				CC0FB34C0F8BED1100F057F7 /* CoreDialogs.nib in Resources */,
-				CCF11B540F8BFB520088542D /* ErrorPanel.nib in Resources */,
-				CC5560281365CE4800D54038 /* AudioEffects.nib in Resources */,
-				CC707EC8137474A50003010A /* SyncTracks.nib in Resources */,
-				CCC0C2AA13A285F700AC92B3 /* VideoEffects.nib in Resources */,
 				CC04323B13B246DF00D7D52E /* back_dark.png in Resources */,
 				CC04323C13B246DF00D7D52E /* back-pressed_dark.png in Resources */,
 				CC04323D13B246DF00D7D52E /* effects-double-buttons_dark.png in Resources */,
@@ -1244,98 +1232,118 @@
 				CCE6439913E8CC170061B5F2 /* picture.png in Resources */,
 				CC4EFC2D13E96BD00091D19A /* dropzone.png in Resources */,
 				CCDB535D13E97D3500A1782F /* dropzone-background.png in Resources */,
+				CCD83E2D13FE9B90004F1652 /* MainMenu.xib in Resources */,
+				CCD83E4413FEA143004F1652 /* About.xib in Resources */,
+				CCD83E4513FEA143004F1652 /* AudioEffects.xib in Resources */,
+				CCD83E4613FEA143004F1652 /* Bookmarks.xib in Resources */,
+				CCD83E4713FEA143004F1652 /* CoreDialogs.xib in Resources */,
+				CCD83E4813FEA143004F1652 /* ErrorPanel.xib in Resources */,
+				CCD83E4913FEA143004F1652 /* MediaInfo.xib in Resources */,
+				CCD83E4A13FEA143004F1652 /* Open.xib in Resources */,
+				CCD83E4B13FEA143004F1652 /* Preferences.xib in Resources */,
+				CCD83E4C13FEA143004F1652 /* SyncTracks.xib in Resources */,
+				CCD83E4D13FEA143004F1652 /* VideoEffects.xib in Resources */,
+				CCD83E4E13FEA143004F1652 /* Wizard.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXVariantGroup section */
-		CC0FB34A0F8BED1100F057F7 /* CoreDialogs.nib */ = {
+		CCD83E2B13FE9B90004F1652 /* MainMenu.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
-				CC0FB34B0F8BED1100F057F7 /* English */,
+				CCD83E2C13FE9B90004F1652 /* English */,
 			);
-			name = CoreDialogs.nib;
+			name = MainMenu.xib;
 			sourceTree = "<group>";
 		};
-		CC5560261365CE4800D54038 /* AudioEffects.nib */ = {
+		CCD83E2E13FEA143004F1652 /* About.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
-				CC5560271365CE4800D54038 /* English */,
+				CCD83E2F13FEA143004F1652 /* English */,
 			);
-			name = AudioEffects.nib;
+			name = About.xib;
 			sourceTree = "<group>";
 		};
-		CC707EC6137474A50003010A /* SyncTracks.nib */ = {
+		CCD83E3013FEA143004F1652 /* AudioEffects.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
-				CC707EC7137474A50003010A /* English */,
+				CCD83E3113FEA143004F1652 /* English */,
 			);
-			name = SyncTracks.nib;
+			name = AudioEffects.xib;
 			sourceTree = "<group>";
 		};
-		CCC0C2A813A285F700AC92B3 /* VideoEffects.nib */ = {
+		CCD83E3213FEA143004F1652 /* Bookmarks.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
-				CCC0C2A913A285F700AC92B3 /* English */,
+				CCD83E3313FEA143004F1652 /* English */,
 			);
-			name = VideoEffects.nib;
+			name = Bookmarks.xib;
 			sourceTree = "<group>";
 		};
-		CCC896B80D9AA9E8005AE59C /* MediaInfo.nib */ = {
+		CCD83E3413FEA143004F1652 /* CoreDialogs.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
-				CCC896B90D9AA9E8005AE59C /* English */,
+				CCD83E3513FEA143004F1652 /* English */,
 			);
-			name = MediaInfo.nib;
+			name = CoreDialogs.xib;
 			sourceTree = "<group>";
 		};
-		CCF11B520F8BFB520088542D /* ErrorPanel.nib */ = {
+		CCD83E3613FEA143004F1652 /* ErrorPanel.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
-				CCF11B530F8BFB520088542D /* English */,
+				CCD83E3713FEA143004F1652 /* English */,
 			);
-			name = ErrorPanel.nib;
+			name = ErrorPanel.xib;
 			sourceTree = "<group>";
 		};
-		DCA00AA7075F948800E6BF46 /* About.nib */ = {
+		CCD83E3813FEA143004F1652 /* MediaInfo.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
-				DCA00AA8075F948800E6BF46 /* English */,
+				CCD83E3913FEA143004F1652 /* English */,
 			);
-			name = About.nib;
+			name = MediaInfo.xib;
 			sourceTree = "<group>";
 		};
-		DCA693C10789DF8700139EC6 /* Open.nib */ = {
+		CCD83E3A13FEA143004F1652 /* Open.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
-				DCA693C20789DF8700139EC6 /* English */,
+				CCD83E3B13FEA143004F1652 /* English */,
 			);
-			name = Open.nib;
+			name = Open.xib;
 			sourceTree = "<group>";
 		};
-		DCE7BD0308A56C8B007B10AE /* Bookmarks.nib */ = {
+		CCD83E3C13FEA143004F1652 /* Preferences.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
-				DCE7BD0408A56C8B007B10AE /* English */,
+				CCD83E3D13FEA143004F1652 /* English */,
 			);
-			name = Bookmarks.nib;
+			name = Preferences.xib;
 			sourceTree = "<group>";
 		};
-		DCF358B9077F10BA007DB450 /* Preferences.nib */ = {
+		CCD83E3E13FEA143004F1652 /* SyncTracks.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
-				DCF358BA077F10BA007DB450 /* English */,
+				CCD83E3F13FEA143004F1652 /* English */,
 			);
-			name = Preferences.nib;
+			name = SyncTracks.xib;
 			sourceTree = "<group>";
 		};
-		DCFCCDB7085CE18F001E36AF /* Wizard.nib */ = {
+		CCD83E4013FEA143004F1652 /* VideoEffects.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
-				DCFCCDB8085CE18F001E36AF /* English */,
+				CCD83E4113FEA143004F1652 /* English */,
 			);
-			name = Wizard.nib;
+			name = VideoEffects.xib;
+			sourceTree = "<group>";
+		};
+		CCD83E4213FEA143004F1652 /* Wizard.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				CCD83E4313FEA143004F1652 /* English */,
+			);
+			name = Wizard.xib;
 			sourceTree = "<group>";
 		};
 		F69B0CA602E24F6401A80112 /* InfoPlist.strings */ = {
@@ -1344,14 +1352,6 @@
 				F69B0CA702E24F6401A80112 /* English */,
 			);
 			name = InfoPlist.strings;
-			sourceTree = "<group>";
-		};
-		F74F13EA02C2A79C01EE194C /* MainMenu.nib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				F74F13EB02C2A79C01EE194C /* English */,
-			);
-			name = MainMenu.nib;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */

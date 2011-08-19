@@ -121,31 +121,18 @@ EXTRA_DIST += \
 	extras/package/macosx/Resources/add_embedded_graphite.png \
 	extras/package/macosx/Resources/dsa_pub.pem \
 	extras/package/macosx/Resources/embedded_vout.png \
-	extras/package/macosx/Resources/English.lproj/About.nib/designable.nib \
-	extras/package/macosx/Resources/English.lproj/About.nib/keyedobjects.nib \
-	extras/package/macosx/Resources/English.lproj/AudioEffects.nib/designable.nib \
-	extras/package/macosx/Resources/English.lproj/AudioEffects.nib/keyedobjects.nib \
-	extras/package/macosx/Resources/English.lproj/Bookmarks.nib/designable.nib \
-	extras/package/macosx/Resources/English.lproj/Bookmarks.nib/keyedobjects.nib \
-	extras/package/macosx/Resources/English.lproj/CoreDialogs.nib/designable.nib \
-	extras/package/macosx/Resources/English.lproj/CoreDialogs.nib/keyedobjects.nib \
-	extras/package/macosx/Resources/English.lproj/ErrorPanel.nib/designable.nib \
-	extras/package/macosx/Resources/English.lproj/ErrorPanel.nib/keyedobjects.nib \
-	extras/package/macosx/Resources/English.lproj/InfoPlist.strings.in \
-	extras/package/macosx/Resources/English.lproj/MainMenu.nib/designable.nib \
-	extras/package/macosx/Resources/English.lproj/MainMenu.nib/keyedobjects.nib \
-	extras/package/macosx/Resources/English.lproj/MediaInfo.nib/designable.nib \
-	extras/package/macosx/Resources/English.lproj/MediaInfo.nib/keyedobjects.nib \
-	extras/package/macosx/Resources/English.lproj/Open.nib/designable.nib \
-	extras/package/macosx/Resources/English.lproj/Open.nib/keyedobjects.nib \
-	extras/package/macosx/Resources/English.lproj/Preferences.nib/designable.nib \
-	extras/package/macosx/Resources/English.lproj/Preferences.nib/keyedobjects.nib \
-	extras/package/macosx/Resources/English.lproj/SyncTracks.nib/designable.nib \
-	extras/package/macosx/Resources/English.lproj/SyncTracks.nib/keyedobjects.nib \
-	extras/package/macosx/Resources/English.lproj/VideoEffects.nib/designable.nib \
-	extras/package/macosx/Resources/English.lproj/VideoEffects.nib/keyedobjects.nib \
-	extras/package/macosx/Resources/English.lproj/Wizard.nib/designable.nib \
-	extras/package/macosx/Resources/English.lproj/Wizard.nib/keyedobjects.nib \
+	extras/package/macosx/Resources/English.lproj/About.xib \
+	extras/package/macosx/Resources/English.lproj/AudioEffects.xib \
+	extras/package/macosx/Resources/English.lproj/Bookmarks.xib \
+	extras/package/macosx/Resources/English.lproj/CoreDialogs.xib \
+	extras/package/macosx/Resources/English.lproj/ErrorPanel.xib \
+	extras/package/macosx/Resources/English.lproj/MainMenu.xib \
+	extras/package/macosx/Resources/English.lproj/MediaInfo.xib \
+	extras/package/macosx/Resources/English.lproj/Open.xib \
+	extras/package/macosx/Resources/English.lproj/Preferences.xib \
+	extras/package/macosx/Resources/English.lproj/SyncTracks.xib \
+	extras/package/macosx/Resources/English.lproj/VideoEffects.xib \
+	extras/package/macosx/Resources/English.lproj/Wizard.xib \
 	extras/package/macosx/Resources/fspanel/fs_background.png \
 	extras/package/macosx/Resources/fspanel/fs_exit_fullscreen.png \
 	extras/package/macosx/Resources/fspanel/fs_exit_fullscreen_highlight.png \
@@ -558,12 +545,11 @@ VLC-release.app: vlc
 	  mkdir -p $(top_builddir)/VLC-release.app/Contents/Resources/$${i}.lproj ; \
 	  $(LN_S) -f ../English.lproj/InfoPlist.strings \
 	      $(top_builddir)/VLC-release.app/Contents/Resources/$${i}.lproj ; \
-	  $(LN_S) -f ../English.lproj/MainMenu.nib \
+	  $(LN_S) -f ../English.lproj/MainMenu.xib \
 	      $(top_builddir)/VLC-release.app/Contents/Resources/$${i}.lproj ; \
 	done
 	printf "APPLVLC#" >| $(top_builddir)/VLC-release.app/Contents/PkgInfo
 	rm -Rf $(top_builddir)/VLC-release.app/Contents/Frameworks/BGHUDAppKit.framework/Resources/
-	find $(top_builddir)/VLC-release.app/Contents/Resources/English.lproj -name designable.nib -delete;
 	find $(top_builddir)/VLC-release.app -type d -exec chmod ugo+rx '{}' \;
 	find $(top_builddir)/VLC-release.app -type f -exec chmod ugo+r '{}' \;
 
@@ -656,7 +642,7 @@ VLC.app: vlc $(top_builddir)/src/.libs/libvlccore.dylib $(top_builddir)/src/.lib
 	  mkdir -p $(top_builddir)/VLC.app/Contents/Resources/$${i}.lproj ; \
 	  $(LN_S) -f ../English.lproj/InfoPlist.strings \
 	      $(top_builddir)/VLC.app/Contents/Resources/$${i}.lproj ; \
-	  $(LN_S) -f ../English.lproj/MainMenu.nib \
+	  $(LN_S) -f ../English.lproj/MainMenu.xib \
 	      $(top_builddir)/VLC.app/Contents/Resources/$${i}.lproj ; \
 	done
 	printf "APPLVLC#" >| $(top_builddir)/VLC.app/Contents/PkgInfo
