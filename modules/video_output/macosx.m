@@ -207,8 +207,10 @@ static int Open(vlc_object_t *this)
     sys->gl.swap = OpenglSwap;
     sys->gl.getProcAddress = NULL;
     sys->gl.sys = sys;
+    const vlc_fourcc_t *subpicture_chromas;
+    video_format_t fmt = vd->fmt;
 
-	sys->vgl = vout_display_opengl_New(&vd->fmt, NULL, &sys->gl);
+	sys->vgl = vout_display_opengl_New(&vd->fmt, &subpicture_chromas, &sys->gl);
 	if (!sys->vgl)
     {
         sys->gl.sys = NULL;
@@ -218,6 +220,8 @@ static int Open(vlc_object_t *this)
     /* */
     vout_display_info_t info = vd->info;
     info.has_pictures_invalid = false;
+    info.has_event_thread = true;
+    info.subpicture_chromas = subpicture_chromas;
 
     /* Setup vout_display_t once everything is fine */
     vd->info = info;
@@ -329,6 +333,7 @@ static int Control (vout_display_t *vd, int query, va_list ap)
         case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
         case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
         {
+            NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
             NSPoint topleftbase;
             NSPoint topleftscreen;
             NSRect new_frame;
@@ -364,6 +369,7 @@ static int Control (vout_display_t *vd, int query, va_list ap)
 
                 [sys->glView performSelectorOnMainThread:@selector(setWindowFrameWithValue:) withObject:[NSValue valueWithRect:new_frame] waitUntilDone:NO];
             }
+            [o_pool release];
             return VLC_SUCCESS;
         }
 
