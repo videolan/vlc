@@ -450,7 +450,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
     [o_capture_height_fld setIntValue: [sizes sizeValue].height];
     [o_capture_width_stp setIntValue: [o_capture_width_fld intValue]];
     [o_capture_height_stp setIntValue: [o_capture_height_fld intValue]];
-    qtk_currdevice_uid = [[[qtkvideoDevices objectAtIndex:[o_qtk_device_pop indexOfSelectedItem]] uniqueID]
+    qtk_currdevice_uid = [[(QTCaptureDevice *)[qtkvideoDevices objectAtIndex:[o_qtk_device_pop indexOfSelectedItem]] uniqueID]
                           stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
     [self setMRL:[NSString stringWithFormat:@"qtcapture://%@", qtk_currdevice_uid]];
 }
@@ -671,6 +671,10 @@ static VLCOpen *_o_sharedMainInstance = nil;
          [[[[o_tabview tabViewItemAtIndex: [o_tabview indexOfTabViewItemWithIdentifier:@"optical"]] view] animator] addSubview: imageView];
     o_currentOpticalMediaIconView = imageView;
     [o_currentOpticalMediaIconView retain];
+    [o_currentOpticalMediaView setNeedsDisplay: YES];
+    [o_currentOpticalMediaIconView setNeedsDisplay: YES];
+    [[[o_tabview tabViewItemAtIndex: [o_tabview indexOfTabViewItemWithIdentifier:@"optical"]] view] setNeedsDisplay: YES];
+    [[[o_tabview tabViewItemAtIndex: [o_tabview indexOfTabViewItemWithIdentifier:@"optical"]] view] displayIfNeeded];
 }
 
 - (NSString *) getBSDNodeFromMountPath:(NSString *)mountPath
@@ -780,6 +784,12 @@ static VLCOpen *_o_sharedMainInstance = nil;
 - (void)showOpticalAtIndex: (NSNumber *)n_index
 {
     NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
+
+    if (!o_opticalDevices)
+        return;
+
+    if ([o_opticalDevices count] == 0)
+        return;
 
     unsigned int index = [n_index intValue];
     char *diskType = [self getVolumeTypeFromMountPath:[o_opticalDevices objectAtIndex: index]];
