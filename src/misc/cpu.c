@@ -336,6 +336,44 @@ unsigned vlc_CPU (void)
     return cpu_flags;
 }
 
+void vlc_CPU_dump (vlc_object_t *obj)
+{
+    const unsigned flags = vlc_CPU();
+    char buf[200], *p = buf;
+
+#define PRINT_CAPABILITY( capability, string ) \
+    if (flags & (capability)) \
+        p += sprintf (p, "%s ", (string) )
+
+#if defined (__i386__) || defined (__x86_64__)
+    PRINT_CAPABILITY(CPU_CAPABILITY_MMX, "MMX");
+    PRINT_CAPABILITY(CPU_CAPABILITY_3DNOW, "3DNow!");
+    PRINT_CAPABILITY(CPU_CAPABILITY_MMXEXT, "MMXEXT");
+    PRINT_CAPABILITY(CPU_CAPABILITY_SSE, "SSE");
+    PRINT_CAPABILITY(CPU_CAPABILITY_SSE2, "SSE2");
+    PRINT_CAPABILITY(CPU_CAPABILITY_SSE3, "SSE3");
+    PRINT_CAPABILITY(CPU_CAPABILITY_SSSE3, "SSSE3");
+    PRINT_CAPABILITY(CPU_CAPABILITY_SSE4_1, "SSE4.1");
+    PRINT_CAPABILITY(CPU_CAPABILITY_SSE4_2, "SSE4.2");
+    PRINT_CAPABILITY(CPU_CAPABILITY_SSE4A,  "SSE4A");
+
+#elif defined (__powerpc__) || defined (__ppc__) || defined (__ppc64__)
+    PRINT_CAPABILITY(CPU_CAPABILITY_ALTIVEC, "AltiVec");
+
+#elif defined (__arm__)
+    PRINT_CAPABILITY(CPU_CAPABILITY_NEON, "NEONv1");
+
+#endif
+
+#if HAVE_FPU
+    p += sprintf (p, "FPU ");
+#endif
+
+    if (p > buf)
+        msg_Dbg (obj, "CPU has capabilities %s", buf);
+}
+
+
 static vlc_memcpy_t pf_vlc_memcpy = memcpy;
 
 void vlc_fastmem_register (vlc_memcpy_t cpy)

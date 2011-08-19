@@ -666,45 +666,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     if( priv->b_color )
         priv->b_color = var_InheritBool( p_libvlc, "color" );
 
-    char p_capabilities[200];
-#define PRINT_CAPABILITY( capability, string )                              \
-    if( vlc_CPU() & capability )                                            \
-    {                                                                       \
-        strncat( p_capabilities, string " ",                                \
-                 sizeof(p_capabilities) - strlen(p_capabilities) );         \
-        p_capabilities[sizeof(p_capabilities) - 1] = '\0';                  \
-    }
-    p_capabilities[0] = '\0';
-
-#if defined( __i386__ ) || defined( __x86_64__ )
-    PRINT_CAPABILITY( CPU_CAPABILITY_MMX, "MMX" );
-    PRINT_CAPABILITY( CPU_CAPABILITY_3DNOW, "3DNow!" );
-    PRINT_CAPABILITY( CPU_CAPABILITY_MMXEXT, "MMXEXT" );
-    PRINT_CAPABILITY( CPU_CAPABILITY_SSE, "SSE" );
-    PRINT_CAPABILITY( CPU_CAPABILITY_SSE2, "SSE2" );
-    PRINT_CAPABILITY( CPU_CAPABILITY_SSE3, "SSE3" );
-    PRINT_CAPABILITY( CPU_CAPABILITY_SSSE3, "SSSE3" );
-    PRINT_CAPABILITY( CPU_CAPABILITY_SSE4_1, "SSE4.1" );
-    PRINT_CAPABILITY( CPU_CAPABILITY_SSE4_2, "SSE4.2" );
-    PRINT_CAPABILITY( CPU_CAPABILITY_SSE4A,  "SSE4A" );
-
-#elif defined( __powerpc__ ) || defined( __ppc__ ) || defined( __ppc64__ )
-    PRINT_CAPABILITY( CPU_CAPABILITY_ALTIVEC, "AltiVec" );
-
-#elif defined( __arm__ )
-    PRINT_CAPABILITY( CPU_CAPABILITY_NEON, "NEONv1" );
-
-#endif
-
-#if HAVE_FPU
-    strncat( p_capabilities, "FPU ",
-             sizeof(p_capabilities) - strlen( p_capabilities) );
-    p_capabilities[sizeof(p_capabilities) - 1] = '\0';
-#endif
-
-    if (p_capabilities[0])
-        msg_Dbg( p_libvlc, "CPU has capabilities %s", p_capabilities );
-
+    vlc_CPU_dump( VLC_OBJECT(p_libvlc) );
     /*
      * Choose the best memcpy module
      */

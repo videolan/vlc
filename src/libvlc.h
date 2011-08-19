@@ -41,6 +41,8 @@ void system_Init      ( void );
 void system_Configure ( libvlc_int_t *, int, const char *const [] );
 void system_End       ( void );
 
+void vlc_CPU_dump(vlc_object_t *);
+
 /*
  * Threads subsystem
  */
