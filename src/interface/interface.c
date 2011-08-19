@@ -129,7 +129,6 @@ int intf_Create( vlc_object_t *p_this, const char *chain )
         goto error;
     }
 
-    vlc_mutex_lock( &lock );
 #if defined( __APPLE__ )
     /* Hack to get Mac OS X Cocoa runtime running
      * (it needs access to the main thread) */
@@ -139,7 +138,6 @@ int intf_Create( vlc_object_t *p_this, const char *chain )
                        MonitorLibVLCDeath, p_intf, VLC_THREAD_PRIORITY_LOW ) )
         {
             msg_Err( p_intf, "cannot spawn libvlc death monitoring thread" );
-            vlc_mutex_unlock( &lock );
             goto error;
         }
         assert( p_intf->pf_run );
@@ -158,10 +156,10 @@ int intf_Create( vlc_object_t *p_this, const char *chain )
                    RunInterface, p_intf, VLC_THREAD_PRIORITY_LOW ) )
     {
         msg_Err( p_intf, "cannot spawn interface thread" );
-        vlc_mutex_unlock( &lock );
         goto error;
     }
 
+    vlc_mutex_lock( &lock );
     p_intf->p_next = libvlc_priv( p_libvlc )->p_intf;
     libvlc_priv( p_libvlc )->p_intf = p_intf;
     vlc_mutex_unlock( &lock );
