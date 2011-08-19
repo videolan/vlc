@@ -60,6 +60,9 @@
     IBOutlet id o_hotkeys_listbox;
     IBOutlet id o_hotkeys_view;
 
+    IBOutlet id o_input_record_box;
+    IBOutlet id o_input_record_fld;
+    IBOutlet id o_input_record_btn;
     IBOutlet id o_input_avi_pop;
     IBOutlet id o_input_avi_txt;
     IBOutlet id o_input_cachelevel_pop;

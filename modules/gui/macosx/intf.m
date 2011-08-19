@@ -250,6 +250,7 @@ static int InputEvent( vlc_object_t *p_this, const char *psz_var,
             break;
         case INPUT_EVENT_TITLE:
         case INPUT_EVENT_CHAPTER:
+            [[VLCMain sharedInstance] updateMainMenu];
             break;
         case INPUT_EVENT_CACHE:
             [[VLCMain sharedInstance] updateMainWindow];
@@ -267,14 +268,17 @@ static int InputEvent( vlc_object_t *p_this, const char *psz_var,
             break;
         case INPUT_EVENT_ITEM_META:
         case INPUT_EVENT_ITEM_INFO:
+            [[VLCMain sharedInstance] updateMainMenu];
             [[VLCMain sharedInstance] updateName];
             [[VLCMain sharedInstance] updateInfoandMetaPanel];
             break;
         case INPUT_EVENT_BOOKMARK:
             break;
         case INPUT_EVENT_RECORD:
+            [[VLCMain sharedInstance] updateRecordState: var_GetBool( p_this, "record" )];
             break;
         case INPUT_EVENT_PROGRAM:
+            [[VLCMain sharedInstance] updateMainMenu];
             break;
         case INPUT_EVENT_ITEM_EPG:
             break;
@@ -1273,7 +1277,11 @@ unsigned int CocoaKeyToVLC( unichar i_key )
 
     [o_playlist updateRowSelection];
     [o_mainwindow updateWindow];
-    [o_mainwindow updateName];
+    [self updateMainMenu];
+}
+
+- (void)updateMainMenu
+{
     [o_mainmenu setupMenus];
     [o_mainmenu updatePlaybackRate];
 }
@@ -1322,6 +1330,12 @@ unsigned int CocoaKeyToVLC( unichar i_key )
     [self playbackStatusUpdated];
     [o_playlist playlistUpdated];
     [o_mainwindow updateWindow];
+}
+
+- (void)updateRecordState: (BOOL)b_value
+{
+    NSLog( @"record state: %i", b_value );
+    [o_mainmenu updateRecordState:b_value];
 }
 
 - (void)updateInfoandMetaPanel

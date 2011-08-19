@@ -183,7 +183,9 @@ struct intf_sys_t
 - (void)updatePlaybackPosition;
 - (void)updateName;
 - (void)playlistUpdated;
+- (void)updateRecordState: (BOOL)b_value;
 - (void)updateInfoandMetaPanel;
+- (void)updateMainMenu;
 - (void)updateMainWindow;
 - (void)showFullscreenController;
 - (void)updateDelays;

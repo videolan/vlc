@@ -74,6 +74,7 @@
     IBOutlet NSMenu * o_mu_controls;
     IBOutlet NSMenuItem * o_mi_play;
     IBOutlet NSMenuItem * o_mi_stop;
+    IBOutlet NSMenuItem * o_mi_record;
     IBOutlet NSMenuItem * o_mi_rate;
     IBOutlet NSView * o_mi_rate_view;
     IBOutlet id o_mi_rate_lbl;
@@ -206,6 +207,8 @@
 - (IBAction)intfOpenNet:(id)sender;
 - (IBAction)intfOpenCapture:(id)sender;
 
+- (IBAction)toggleRecord:(id)sender;
+- (void)updateRecordState:(BOOL)b_value;
 - (IBAction)setPlaybackRate:(id)sender;
 - (void)updatePlaybackRate;
 

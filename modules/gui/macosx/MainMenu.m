@@ -255,6 +255,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
     [o_mu_controls setTitle: _NS("Playback")];
     [o_mi_play setTitle: _NS("Play")];
     [o_mi_stop setTitle: _NS("Stop")];
+    [o_mi_record setTitle: _NS("Record")];
     [o_mi_rate setView: o_mi_rate_view];
     [o_mi_rate_lbl setStringValue: _NS("Playback Speed")];
     [o_mi_rate_lbl_gray setStringValue: _NS("Playback Speed")];
@@ -395,6 +396,8 @@ static VLCMainMenu *_o_sharedInstance = nil;
     input_thread_t * p_input = playlist_CurrentInput( p_playlist );
     if( p_input != NULL )
     {
+        [o_mi_record setEnabled: var_GetBool( p_input, "can-record" )];
+
         [self setupVarMenuItem: o_mi_program target: (vlc_object_t *)p_input
                                  var: "program" selector: @selector(toggleVar:)];
 
@@ -460,6 +463,10 @@ static VLCMainMenu *_o_sharedInstance = nil;
             vlc_object_release( (vlc_object_t *)p_vout );
         }
         vlc_object_release( p_input );
+    }
+    else
+    {
+        [o_mi_record setEnabled: NO];
     }
 }
 
@@ -544,6 +551,16 @@ static VLCMainMenu *_o_sharedInstance = nil;
 
 #pragma mark -
 #pragma mark Playback
+- (IBAction)toggleRecord:(id)sender
+{
+    [[VLCCoreInteraction sharedInstance] toggleRecord];
+}
+
+- (void)updateRecordState:(BOOL)b_value
+{
+    [o_mi_record setState:b_value];
+}
+
 - (IBAction)setPlaybackRate:(id)sender
 {
     [[VLCCoreInteraction sharedInstance] setPlaybackRate: [o_mi_rate_sld intValue]];

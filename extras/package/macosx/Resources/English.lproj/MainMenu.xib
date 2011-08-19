@@ -11,14 +11,14 @@
 			<string key="com.binarymethod.BGHUDAppKitPlugin">1</string>
 		</dictionary>
 		<array class="NSMutableArray" key="IBDocument.EditedObjectIDs">
-			<integer value="283"/>
-			<integer value="915"/>
-			<integer value="1617"/>
 			<integer value="2730"/>
-			<integer value="334"/>
 			<integer value="4596"/>
 			<integer value="21"/>
 			<integer value="4722"/>
+			<integer value="915"/>
+			<integer value="1617"/>
+			<integer value="283"/>
+			<integer value="235"/>
 		</array>
 		<array key="IBDocument.PluginDependencies">
 			<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -1604,6 +1604,17 @@
 									<string key="NSTitle">Stop</string>
 									<string key="NSKeyEquiv">.</string>
 									<int key="NSKeyEquivModMask">1048576</int>
+									<int key="NSMnemonicLoc">2147483647</int>
+									<reference key="NSOnImage" ref="447396056"/>
+									<reference key="NSMixedImage" ref="100133332"/>
+								</object>
+								<object class="NSMenuItem" id="261314859">
+									<reference key="NSMenu" ref="1017583928"/>
+									<bool key="NSIsDisabled">YES</bool>
+									<bool key="NSIsAlternate">YES</bool>
+									<string key="NSTitle">Record</string>
+									<string key="NSKeyEquiv">r</string>
+									<int key="NSKeyEquivModMask">1572864</int>
 									<int key="NSMnemonicLoc">2147483647</int>
 									<reference key="NSOnImage" ref="447396056"/>
 									<reference key="NSMixedImage" ref="100133332"/>
@@ -6955,6 +6966,22 @@ LCAuLi4</string>
 					</object>
 					<int key="connectionID">4752</int>
 				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">toggleRecord:</string>
+						<reference key="source" ref="651263286"/>
+						<reference key="destination" ref="261314859"/>
+					</object>
+					<int key="connectionID">4754</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">o_mi_record</string>
+						<reference key="source" ref="651263286"/>
+						<reference key="destination" ref="261314859"/>
+					</object>
+					<int key="connectionID">4755</int>
+				</object>
 			</array>
 			<object class="IBMutableOrderedSet" key="objectRecords">
 				<array key="orderedObjects">
@@ -7507,6 +7534,7 @@ LCAuLi4</string>
 							<reference ref="938524312"/>
 							<reference ref="823365566"/>
 							<reference ref="375871953"/>
+							<reference ref="261314859"/>
 						</array>
 						<reference key="parent" ref="565445175"/>
 					</object>
@@ -9504,6 +9532,11 @@ LCAuLi4</string>
 						<reference key="object" ref="869331277"/>
 						<reference key="parent" ref="959811945"/>
 					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">4753</int>
+						<reference key="object" ref="261314859"/>
+						<reference key="parent" ref="1017583928"/>
+					</object>
 				</array>
 			</object>
 			<dictionary class="NSMutableDictionary" key="flattenedProperties">
@@ -9539,7 +9572,7 @@ LCAuLi4</string>
 				<boolean value="YES" key="1055.ImportedFromIB2"/>
 				<string key="1056.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="1056.ImportedFromIB2"/>
-				<string key="1057.IBEditorWindowLastContentRect">{{725, 390}, {64, 6}}</string>
+				<string key="1057.IBEditorWindowLastContentRect">{{650, 356}, {64, 6}}</string>
 				<string key="1057.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="1057.ImportedFromIB2"/>
 				<string key="1058.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -9690,7 +9723,7 @@ LCAuLi4</string>
 				<boolean value="YES" key="202.ImportedFromIB2"/>
 				<string key="203.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="203.ImportedFromIB2"/>
-				<string key="205.IBEditorWindowLastContentRect">{{473, 633}, {137, 103}}</string>
+				<string key="205.IBEditorWindowLastContentRect">{{430, 565}, {137, 103}}</string>
 				<string key="205.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="205.ImportedFromIB2"/>
 				<string key="21.IBEditorWindowLastContentRect">{{329, 301}, {604, 310}}</string>
@@ -9747,7 +9780,7 @@ LCAuLi4</string>
 				<boolean value="YES" key="2312.ImportedFromIB2"/>
 				<string key="234.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="234.ImportedFromIB2"/>
-				<string key="235.IBEditorWindowLastContentRect">{{517, 393}, {222, 343}}</string>
+				<string key="235.IBEditorWindowLastContentRect">{{428, 299}, {222, 363}}</string>
 				<string key="235.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="235.ImportedFromIB2"/>
 				<string key="238.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -9913,7 +9946,7 @@ LCAuLi4</string>
 				<boolean value="YES" key="2832.ImportedFromIB2"/>
 				<string key="2834.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="2834.ImportedFromIB2"/>
-				<string key="29.IBEditorWindowLastContentRect">{{330, 668}, {468, 20}}</string>
+				<string key="29.IBEditorWindowLastContentRect">{{284, 662}, {468, 20}}</string>
 				<string key="29.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="29.ImportedFromIB2"/>
 				<string key="3292.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -10270,6 +10303,7 @@ LCAuLi4</string>
 				<string key="4731.CustomClassName">VLBrushedMetalImageView</string>
 				<string key="4731.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="4732.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="4753.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="5.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="5.ImportedFromIB2"/>
 				<string key="56.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -10292,7 +10326,7 @@ LCAuLi4</string>
 				<boolean value="YES" key="79.ImportedFromIB2"/>
 				<string key="801.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="801.ImportedFromIB2"/>
-				<string key="81.IBEditorWindowLastContentRect">{{431, 493}, {297, 243}}</string>
+				<string key="81.IBEditorWindowLastContentRect">{{388, 425}, {297, 243}}</string>
 				<string key="81.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="81.ImportedFromIB2"/>
 				<string key="816.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -10323,7 +10357,7 @@ LCAuLi4</string>
 			<nil key="activeLocalization"/>
 			<dictionary class="NSMutableDictionary" key="localizations"/>
 			<nil key="sourceID"/>
-			<int key="maxID">4752</int>
+			<int key="maxID">4755</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -12560,6 +12594,7 @@ LCAuLi4</string>
 						<string key="showVideoEffects:">id</string>
 						<string key="showWizard:">id</string>
 						<string key="toggleFullscreen:">id</string>
+						<string key="toggleRecord:">id</string>
 						<string key="toggleVar:">id</string>
 						<string key="viewAbout:">id</string>
 						<string key="viewErrorsAndWarnings:">id</string>
@@ -12657,6 +12692,10 @@ LCAuLi4</string>
 						</object>
 						<object class="IBActionInfo" key="toggleFullscreen:">
 							<string key="name">toggleFullscreen:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="toggleRecord:">
+							<string key="name">toggleRecord:</string>
 							<string key="candidateClassName">id</string>
 						</object>
 						<object class="IBActionInfo" key="toggleVar:">
@@ -12760,6 +12799,7 @@ LCAuLi4</string>
 						<string key="o_mi_rate_slower_lbl">id</string>
 						<string key="o_mi_rate_view">NSView</string>
 						<string key="o_mi_readme">NSMenuItem</string>
+						<string key="o_mi_record">NSMenuItem</string>
 						<string key="o_mi_repeat">NSMenuItem</string>
 						<string key="o_mi_screen">NSMenuItem</string>
 						<string key="o_mi_select_all">NSMenuItem</string>
@@ -13134,6 +13174,10 @@ LCAuLi4</string>
 						</object>
 						<object class="IBToOneOutletInfo" key="o_mi_readme">
 							<string key="name">o_mi_readme</string>
+							<string key="candidateClassName">NSMenuItem</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="o_mi_record">
+							<string key="name">o_mi_record</string>
 							<string key="candidateClassName">NSMenuItem</string>
 						</object>
 						<object class="IBToOneOutletInfo" key="o_mi_repeat">

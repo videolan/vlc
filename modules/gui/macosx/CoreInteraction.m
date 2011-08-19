@@ -109,6 +109,17 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
     var_SetInteger( VLCIntf->p_libvlc, "key-action", ACTIONID_RATE_NORMAL );
 }
 
+- (void)toggleRecord
+{
+    input_thread_t * p_input;
+    p_input = pl_CurrentInput( VLCIntf );
+    if( p_input )
+    {
+        var_ToggleBool( p_input, "record" );
+        vlc_object_release( p_input );
+    }
+}
+
 - (void)setPlaybackRate:(int)i_value
 {
     playlist_t * p_playlist = pl_Get( VLCIntf );

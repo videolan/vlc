@@ -36,6 +36,7 @@
 - (void)faster;
 - (void)slower;
 - (void)normalSpeed;
+- (void)toggleRecord;
 - (void)setPlaybackRate:(int)i_value;
 - (int)playbackRate;
 - (void)next;

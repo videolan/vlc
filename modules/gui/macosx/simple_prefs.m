@@ -212,6 +212,9 @@ create_toolbar_item( NSString * o_itemIdent, NSString * o_name, NSString * o_des
     [[[o_hotkeys_listbox tableColumnWithIdentifier: @"shortcut"] headerCell] setStringValue: _NS("Shortcut")];
 
     /* input */
+    [o_input_record_box setTitle: _NS("Record directory or filename")];
+    [o_input_record_btn setTitle: _NS("Browse...")];
+    [o_input_record_btn setToolTip: _NS("Directory or filename where the records will be stored")];
     [o_input_avi_txt setStringValue: _NS("Repair AVI Files")];
     [o_input_cachelevel_txt setStringValue: _NS("Default Caching Level")];
     [o_input_caching_box setTitle: _NS("Caching")];
@@ -525,6 +528,7 @@ static inline char * __config_GetLabel( vlc_object_t *p_this, const char *psz_na
     /***************************
      * input & codecs settings *
      ***************************/
+    [self setupField: o_input_record_fld forOption:"input-record-path"];
     [self setupField: o_input_httpproxy_fld forOption:"http-proxy"];
     [self setupField: o_input_httpproxypwd_sfld forOption:"http-proxy-pwd"];
     [o_input_postproc_fld setIntValue: config_GetInt( p_intf, "postproc-q")];
@@ -864,6 +868,7 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
      ***************************/
     if( b_inputSettingChanged )
     {
+        config_PutPsz( p_intf, "input-record-path", [[o_input_record_fld stringValue] UTF8String] );
         config_PutPsz( p_intf, "http-proxy", [[o_input_httpproxy_fld stringValue] UTF8String] );
         config_PutPsz( p_intf, "http-proxy-pwd", [[o_input_httpproxypwd_sfld stringValue] UTF8String] );
         config_PutInt( p_intf, "postproc-q", [o_input_postproc_fld intValue] );
@@ -1041,6 +1046,11 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
             [o_video_snap_folder_fld setStringValue: [[o_selectFolderPanel URL] path]];
             b_videoSettingChanged = YES;
         }
+        else if( contextInfo == o_input_record_btn )
+        {
+            [o_input_record_fld setStringValue: [[o_selectFolderPanel URL] path]];
+            b_inputSettingChanged = YES;
+        }
     }
 
     [o_selectFolderPanel release];
@@ -1097,6 +1107,22 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
             [o_input_cachelevel_custom_txt setHidden: NO];
         else
             [o_input_cachelevel_custom_txt setHidden: YES];
+    }
+    else if( sender == o_input_record_btn )
+    {
+        o_selectFolderPanel = [[NSOpenPanel alloc] init];
+        [o_selectFolderPanel setCanChooseDirectories: YES];
+        [o_selectFolderPanel setCanChooseFiles: YES];
+        [o_selectFolderPanel setResolvesAliases: YES];
+        [o_selectFolderPanel setAllowsMultipleSelection: NO];
+        [o_selectFolderPanel setMessage: _NS("Choose the directory or filename where the records will be stored.")];
+        [o_selectFolderPanel setCanCreateDirectories: YES];
+        [o_selectFolderPanel setPrompt: _NS("Choose")];
+        [o_selectFolderPanel beginSheetForDirectory: nil file: nil modalForWindow: o_sprefs_win
+                                      modalDelegate: self
+                                     didEndSelector: @selector(savePanelDidEnd:returnCode:contextInfo:)
+                                        contextInfo: o_input_record_btn];
+        return;
     }
 
     b_inputSettingChanged = YES;
