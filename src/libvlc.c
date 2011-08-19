@@ -661,30 +661,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     /*
      * Message queue options
      */
-    char * psz_verbose_objects = var_CreateGetNonEmptyString( p_libvlc, "verbose-objects" );
-    if( psz_verbose_objects )
-    {
-        char * psz_object, * iter = psz_verbose_objects;
-        while( (psz_object = strsep( &iter, "," )) )
-        {
-            switch( psz_object[0] )
-            {
-                printf("%s\n", psz_object+1);
-                case '+': msg_EnableObjectPrinting(p_libvlc, psz_object+1); break;
-                case '-': msg_DisableObjectPrinting(p_libvlc, psz_object+1); break;
-                default:
-                    msg_Err( p_libvlc, "verbose-objects usage: \n"
-                            "--verbose-objects=+printthatobject,"
-                            "-dontprintthatone\n"
-                            "(keyword 'all' to applies to all objects)");
-                    free( psz_verbose_objects );
-                    /* FIXME: leaks!!!! */
-                    return VLC_EGENERIC;
-            }
-        }
-        free( psz_verbose_objects );
-    }
-
     /* Last chance to set the verbosity. Once we start interfaces and other
      * threads, verbosity becomes read-only. */
     var_Create( p_libvlc, "verbose", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );

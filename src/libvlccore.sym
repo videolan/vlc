@@ -275,8 +275,6 @@ module_provides
 module_unneed
 vlc_module_load
 vlc_module_unload
-msg_DisableObjectPrinting
-msg_EnableObjectPrinting
 msg_Generic
 msg_GenericVa
 msg_Subscribe

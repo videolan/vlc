@@ -72,9 +72,6 @@ struct msg_bank_t
     /* Subscribers */
     int i_sub;
     msg_subscription_t **pp_sub;
-
-    vlc_dictionary_t enabled_objects; ///< Enabled objects
-    bool all_objects_enabled; ///< Should we print all objects?
 };
 
 /**
@@ -86,48 +83,9 @@ msg_bank_t *msg_Create (void)
     msg_bank_t *bank = malloc (sizeof (*bank));
 
     vlc_rwlock_init (&bank->lock);
-    vlc_dictionary_init (&bank->enabled_objects, 0);
-    bank->all_objects_enabled = true;
-
     bank->i_sub = 0;
     bank->pp_sub = NULL;
-
     return bank;
-}
-
-/**
- * Object Printing selection
- */
-static void const * kObjectPrintingEnabled = &kObjectPrintingEnabled;
-static void const * kObjectPrintingDisabled = &kObjectPrintingDisabled;
-
-
-#undef msg_EnableObjectPrinting
-void msg_EnableObjectPrinting (vlc_object_t *obj, const char * psz_object)
-{
-    msg_bank_t *bank = libvlc_bank (obj->p_libvlc);
-
-    vlc_rwlock_wrlock (&bank->lock);
-    if( !strcmp(psz_object, "all") )
-        bank->all_objects_enabled = true;
-    else
-        vlc_dictionary_insert (&bank->enabled_objects, psz_object,
-                               (void *)kObjectPrintingEnabled);
-    vlc_rwlock_unlock (&bank->lock);
-}
-
-#undef msg_DisableObjectPrinting
-void msg_DisableObjectPrinting (vlc_object_t *obj, const char * psz_object)
-{
-    msg_bank_t *bank = libvlc_bank (obj->p_libvlc);
-
-    vlc_rwlock_wrlock (&bank->lock);
-    if( !strcmp(psz_object, "all") )
-        bank->all_objects_enabled = false;
-    else
-        vlc_dictionary_insert (&bank->enabled_objects, psz_object,
-                               (void *)kObjectPrintingDisabled);
-    vlc_rwlock_unlock (&bank->lock);
 }
 
 /**
@@ -141,8 +99,6 @@ void msg_Destroy (msg_bank_t *bank)
 {
     if (unlikely(bank->i_sub != 0))
         fputs ("stale interface subscribers (LibVLC might crash)\n", stderr);
-
-    vlc_dictionary_clear (&bank->enabled_objects, NULL, NULL);
 
     vlc_rwlock_destroy (&bank->lock);
     free (bank);
@@ -325,19 +281,7 @@ void msg_GenericVa (vlc_object_t *p_this, int i_type, const char *psz_module,
     for (int i = 0; i < bank->i_sub; i++)
     {
         msg_subscription_t *sub = bank->pp_sub[i];
-        libvlc_priv_t *priv = libvlc_priv( sub->instance );
-        msg_bank_t *bank = priv->msg_bank;
-        void *val = vlc_dictionary_value_for_key( &bank->enabled_objects,
-                                                  msg.psz_module );
-        if( val == kObjectPrintingDisabled ) continue;
-        if( val != kObjectPrintingEnabled  ) /*if not allowed */
-        {
-            val = vlc_dictionary_value_for_key( &bank->enabled_objects,
-                                                msg.psz_object_type );
-            if( val == kObjectPrintingDisabled ) continue;
-            if( val == kObjectPrintingEnabled  ); /* Allowed */
-            else if( !bank->all_objects_enabled ) continue;
-        }
+
         sub->func (sub->opaque, &msg);
     }
     vlc_rwlock_unlock (&bank->lock);
@@ -368,26 +312,6 @@ static void PrintMsg ( vlc_object_t *p_this, const msg_item_t *p_item )
     if (priv->i_verbose < 0 || priv->i_verbose < (type - VLC_MSG_ERR))
         return;
 
-    const char *objtype = p_item->psz_object_type;
-    msg_bank_t *bank = priv->msg_bank;
-    void * val = vlc_dictionary_value_for_key (&bank->enabled_objects,
-                                               p_item->psz_module);
-    if( val == kObjectPrintingDisabled )
-        return;
-    if( val == kObjectPrintingEnabled )
-        /* Allowed */;
-    else
-    {
-        val = vlc_dictionary_value_for_key (&bank->enabled_objects,
-                                            objtype);
-        if( val == kObjectPrintingDisabled )
-            return;
-        if( val == kObjectPrintingEnabled )
-            /* Allowed */;
-        else if( !bank->all_objects_enabled )
-            return;
-    }
-
     /* Send the message to stderr */
     FILE *stream = stderr;
     int canc = vlc_savecancel ();
@@ -397,8 +321,8 @@ static void PrintMsg ( vlc_object_t *p_this, const msg_item_t *p_item )
             (void *)p_item->i_object_id);
     if (p_item->psz_header != NULL)
         utf8_fprintf (stream, "[%s] ", p_item->psz_header);
-    utf8_fprintf (stream, "%s %s%s: ", p_item->psz_module, objtype,
-                  msgtype[type]);
+    utf8_fprintf (stream, "%s %s%s: ", p_item->psz_module,
+                  p_item->psz_object_type, msgtype[type]);
     if (priv->b_color)
         fputs (msgcolor[type], stream);
     fputs (p_item->psz_msg, stream);

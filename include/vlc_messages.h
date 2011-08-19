@@ -121,13 +121,6 @@ typedef void (*msg_callback_t) (msg_cb_data_t *, const msg_item_t *);
 VLC_API msg_subscription_t* msg_Subscribe( libvlc_int_t *, msg_callback_t, msg_cb_data_t * ) VLC_USED;
 VLC_API void msg_Unsubscribe( msg_subscription_t * );
 
-/* Enable or disable a certain object debug messages */
-VLC_API void msg_EnableObjectPrinting( vlc_object_t *, const char * psz_object );
-#define msg_EnableObjectPrinting(a,b) msg_EnableObjectPrinting(VLC_OBJECT(a),b)
-VLC_API void msg_DisableObjectPrinting( vlc_object_t *, const char * psz_object );
-#define msg_DisableObjectPrinting(a,b) msg_DisableObjectPrinting(VLC_OBJECT(a),b)
-
-
 /**
  * @}
  */
