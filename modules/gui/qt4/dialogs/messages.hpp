@@ -51,10 +51,13 @@ private:
     msg_cb_data_t *cbData;
     static void sinkMessage( msg_cb_data_t *, msg_item_t *, unsigned );
     void customEvent( QEvent * );
-    void sinkMessage( MsgEvent * );
+    void sinkMessage( const MsgEvent * );
 
     vlc_atomic_t verbosity;
     static void MsgCallback( msg_cb_data_t *, const msg_item_t * );
+
+    QStringList filter;
+    bool filterDefault;
 
 private slots:
     bool save();

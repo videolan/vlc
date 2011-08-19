@@ -95,7 +95,13 @@ MessagesDialog::MessagesDialog( intf_thread_t *_p_intf)
     vlc_atomic_set( &this->verbosity, verbosity );
     ui.verbosityBox->setValue( verbosity );
 
-    ui.vbobjectsEdit->setText(config_GetPsz( p_intf, "verbose-objects"));
+    char *objs = var_InheritString( p_intf, "verbose-objects" );
+    if( objs != NULL )
+    {
+        ui.vbobjectsEdit->setText( qfu(objs) );
+        free( objs );
+    }
+    updateConfig();
     ui.vbobjectsEdit->setToolTip( "verbose-objects usage: \n"
                             "--verbose-objects=+printthatobject,-dontprintthatone\n"
                             "(keyword 'all' to applies to all objects)");
@@ -139,37 +145,42 @@ void MessagesDialog::changeVerbosity( int verbosity )
 
 void MessagesDialog::updateConfig()
 {
-    config_PutPsz(p_intf, "verbose-objects", qtu(ui.vbobjectsEdit->text()));
-    //vbobjectsEdit->setText("vbEdit changed!");
+    const QString& objects = ui.vbobjectsEdit->text();
+    /* FIXME: config item should be part of Qt4 module */
+    config_PutPsz(p_intf, "verbose-objects", qtu(objects));
 
-    if( !ui.vbobjectsEdit->text().isEmpty() )
+    QStringList filterOut, filterIn;
+    /* If a filter is set, disable by default */
+    /* If no filters are set, enable */
+    filterDefault = objects.isEmpty();
+    foreach( const QString& elem, objects.split(QChar(',')) )
     {
-        /* if user sets filter, go with the idea that user just wants that to be shown,
-           so disable all by default and enable those that user wants */
-        msg_DisableObjectPrinting( p_intf, "all");
-        char * psz_verbose_objects = strdup(qtu(ui.vbobjectsEdit->text()));
-        char * psz_object, * iter =  psz_verbose_objects;
-        while( (psz_object = strsep( &iter, "," )) )
+        QString object = elem;
+        bool add = true;
+
+        if( elem.startsWith(QChar('-')) )
         {
-            switch( psz_object[0] )
-            {
-                printf("%s\n", psz_object+1);
-                case '+': msg_EnableObjectPrinting(p_intf, psz_object+1); break;
-                case '-': msg_DisableObjectPrinting(p_intf, psz_object+1); break;
-                /* user can but just 'lua,playlist' on filter */
-                default: msg_EnableObjectPrinting(p_intf, psz_object); break;
-             }
+            add = false;
+            object.remove( 0, 1 );
         }
-        free( psz_verbose_objects );
+        else if( elem.startsWith(QChar('+')) )
+            object.remove( 0, 1 );
+
+        if( object.compare(qfu("all"), Qt::CaseInsensitive) == 0 )
+            filterDefault = add;
+        else
+            (add ? &filterIn : &filterOut)->append( object );
     }
-    else
-    {
-        msg_EnableObjectPrinting( p_intf, "all");
-    }
+    filter = filterDefault ? filterOut : filterIn;
+    filter.removeDuplicates();
 }
 
-void MessagesDialog::sinkMessage( MsgEvent *msg )
+void MessagesDialog::sinkMessage( const MsgEvent *msg )
 {
+    if( (filter.contains(msg->module) || filter.contains(msg->object_type))
+                                                            == filterDefault )
+        return;
+
     QTextEdit *messages = ui.messages;
     /* Only scroll if the viewport is at the end.
        Don't bug user by auto-changing/loosing viewport on insert(). */
