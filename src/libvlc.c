@@ -677,25 +677,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     p_capabilities[0] = '\0';
 
 #if defined( __i386__ ) || defined( __x86_64__ )
-    if( !var_InheritBool( p_libvlc, "mmx" ) )
-        cpu_flags &= ~CPU_CAPABILITY_MMX;
-    if( !var_InheritBool( p_libvlc, "3dn" ) )
-        cpu_flags &= ~CPU_CAPABILITY_3DNOW;
-    if( !var_InheritBool( p_libvlc, "mmxext" ) )
-        cpu_flags &= ~CPU_CAPABILITY_MMXEXT;
-    if( !var_InheritBool( p_libvlc, "sse" ) )
-        cpu_flags &= ~CPU_CAPABILITY_SSE;
-    if( !var_InheritBool( p_libvlc, "sse2" ) )
-        cpu_flags &= ~CPU_CAPABILITY_SSE2;
-    if( !var_InheritBool( p_libvlc, "sse3" ) )
-        cpu_flags &= ~CPU_CAPABILITY_SSE3;
-    if( !var_InheritBool( p_libvlc, "ssse3" ) )
-        cpu_flags &= ~CPU_CAPABILITY_SSSE3;
-    if( !var_InheritBool( p_libvlc, "sse41" ) )
-        cpu_flags &= ~CPU_CAPABILITY_SSE4_1;
-    if( !var_InheritBool( p_libvlc, "sse42" ) )
-        cpu_flags &= ~CPU_CAPABILITY_SSE4_2;
-
     PRINT_CAPABILITY( CPU_CAPABILITY_MMX, "MMX" );
     PRINT_CAPABILITY( CPU_CAPABILITY_3DNOW, "3DNow!" );
     PRINT_CAPABILITY( CPU_CAPABILITY_MMXEXT, "MMXEXT" );
@@ -708,9 +689,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     PRINT_CAPABILITY( CPU_CAPABILITY_SSE4A,  "SSE4A" );
 
 #elif defined( __powerpc__ ) || defined( __ppc__ ) || defined( __ppc64__ )
-    if( !var_InheritBool( p_libvlc, "altivec" ) )
-        cpu_flags &= ~CPU_CAPABILITY_ALTIVEC;
-
     PRINT_CAPABILITY( CPU_CAPABILITY_ALTIVEC, "AltiVec" );
 
 #elif defined( __arm__ )

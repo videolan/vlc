@@ -1081,56 +1081,6 @@ static const char *const ppsz_clock_descriptions[] =
     "These options allow you to enable special CPU optimizations. " \
     "You should always leave all these enabled." )
 
-#define MMX_TEXT N_("Enable CPU MMX support")
-#define MMX_LONGTEXT N_( \
-    "If your processor supports the MMX instructions set, VLC can take " \
-    "advantage of them.")
-
-#define THREE_DN_TEXT N_("Enable CPU 3D Now! support")
-#define THREE_DN_LONGTEXT N_( \
-    "If your processor supports the 3D Now! instructions set, VLC can take " \
-    "advantage of them.")
-
-#define MMXEXT_TEXT N_("Enable CPU MMX EXT support")
-#define MMXEXT_LONGTEXT N_( \
-    "If your processor supports the MMX EXT instructions set, VLC can take " \
-    "advantage of them.")
-
-#define SSE_TEXT N_("Enable CPU SSE support")
-#define SSE_LONGTEXT N_( \
-    "If your processor supports the SSE instructions set, VLC can take " \
-    "advantage of them.")
-
-#define SSE2_TEXT N_("Enable CPU SSE2 support")
-#define SSE2_LONGTEXT N_( \
-    "If your processor supports the SSE2 instructions set, VLC can take " \
-    "advantage of them.")
-
-#define SSE3_TEXT N_("Enable CPU SSE3 support")
-#define SSE3_LONGTEXT N_( \
-    "If your processor supports the SSE3 instructions set, VLC can take " \
-    "advantage of them.")
-
-#define SSSE3_TEXT N_("Enable CPU SSSE3 support")
-#define SSSE3_LONGTEXT N_( \
-    "If your processor supports the SSSE3 instructions set, VLC can take " \
-    "advantage of them.")
-
-#define SSE4_1_TEXT N_("Enable CPU SSE4.1 support")
-#define SSE4_1_LONGTEXT N_( \
-    "If your processor supports the SSE4.1 instructions set, VLC can take " \
-    "advantage of them.")
-
-#define SSE4_2_TEXT N_("Enable CPU SSE4.2 support")
-#define SSE4_2_LONGTEXT N_( \
-    "If your processor supports the SSE4.2 instructions set, VLC can take " \
-    "advantage of them.")
-
-#define ALTIVEC_TEXT N_("Enable CPU AltiVec support")
-#define ALTIVEC_LONGTEXT N_( \
-    "If your processor supports the AltiVec instructions set, VLC can take " \
-    "advantage of them.")
-
 // DEPRECATED
 #define MISC_CAT_LONGTEXT N_( \
     "These options allow you to select default modules. Leave these " \
@@ -2051,18 +2001,18 @@ vlc_module_begin ()
     add_category_hint( N_("CPU"), CPU_CAT_LONGTEXT, true )
     add_obsolete_bool( "fpu" )
 #if defined( __i386__ ) || defined( __x86_64__ )
-    add_bool( "mmx", 1, MMX_TEXT, MMX_LONGTEXT, true )
-    add_bool( "3dn", 1, THREE_DN_TEXT, THREE_DN_LONGTEXT, true )
-    add_bool( "mmxext", 1, MMXEXT_TEXT, MMXEXT_LONGTEXT, true )
-    add_bool( "sse", 1, SSE_TEXT, SSE_LONGTEXT, true )
-    add_bool( "sse2", 1, SSE2_TEXT, SSE2_LONGTEXT, true )
-    add_bool( "sse3", 1, SSE3_TEXT, SSE3_LONGTEXT, true )
-    add_bool( "ssse3", 1, SSSE3_TEXT, SSSE3_LONGTEXT, true )
-    add_bool( "sse41", 1, SSE4_1_TEXT, SSE4_1_LONGTEXT, true )
-    add_bool( "sse42", 1, SSE4_2_TEXT, SSE4_2_LONGTEXT, true )
+    add_obsolete_bool( "mmx" ) /* since 1.2.0 */
+    add_obsolete_bool( "3dn" ) /* since 1.2.0 */
+    add_obsolete_bool( "mmxext" ) /* since 1.2.0 */
+    add_obsolete_bool( "sse" ) /* since 1.2.0 */
+    add_obsolete_bool( "sse2" ) /* since 1.2.0 */
+    add_obsolete_bool( "sse3" ) /* since 1.2.0 */
+    add_obsolete_bool( "ssse3" ) /* since 1.2.0 */
+    add_obsolete_bool( "sse41" ) /* since 1.2.0 */
+    add_obsolete_bool( "sse42" ) /* since 1.2.0 */
 #endif
 #if defined( __powerpc__ ) || defined( __ppc__ ) || defined( __ppc64__ )
-    add_bool( "altivec", 1, ALTIVEC_TEXT, ALTIVEC_LONGTEXT, true )
+    add_obsolete_bool( "altivec" ) /* since 1.2.0 */
 #endif
 
 /* Misc options */
