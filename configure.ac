@@ -240,11 +240,11 @@ case "${host_os}" in
     CPPFLAGS_save="${CPPFLAGS_save} ${ARCH_flag}"; CPPFLAGS="${CPPFLAGS_save}"
     OBJCFLAGS_save="${OBJCFLAGS_save} -D_INTL_REDIRECT_MACROS -std=gnu99 ${ARCH_flag}"; OBJCFLAGS="${OBJCFLAGS_save}"
     LDFLAGS_save="${LDFLAGS_save} -Wl,-headerpad_max_install_names ${ARCH_flag}"; LDFLAGS="${LDFLAGS_save}"
-    VLC_ADD_LDFLAGS([mkv mp4 motion], [-Wl,-framework,IOKit,-framework,CoreFoundation])
+    VLC_ADD_LIBS([mkv mp4 motion], [-Wl,-framework,IOKit,-framework,CoreFoundation])
     VLC_ADD_LDFLAGS([libvlc vlc],[-Wl,-undefined,dynamic_lookup])
     VLC_ADD_LDFLAGS([avcodec avformat access_avio swscale postproc i420_rgb_mmx x264],[-Wl,-read_only_relocs,suppress])
     VLC_ADD_CFLAGS([motion],[-fconstant-cfstrings])
-    VLC_ADD_LDFLAGS([libvlccore],[-Wl,-framework,CoreFoundation])
+    VLC_ADD_LIBS([libvlccore],[-Wl,-framework,CoreFoundation])
     AC_ARG_ENABLE(macosx-defaults,
       AS_HELP_STRING([--enable-macosx-defaults],[Build the default configuration on Mac OS X (default enabled)]))
     if test "x${enable_macosx_defaults}" != "xno"
@@ -1210,7 +1210,7 @@ elif test "${SYS}" != "mingwce"; then
     VLC_ADD_LIBS([dmo],[-lole32 -luuid])
 fi
 if test "${SYS}" = "darwin"; then
-    VLC_ADD_LDFLAGS([quartztext],[-Wl,-framework,ApplicationServices])
+    VLC_ADD_LIBS([quartztext],[-Wl,-framework,ApplicationServices])
 fi
 
 dnl
@@ -1541,7 +1541,7 @@ dnl - Others: test should fail
      LDFLAGS="${LDFLAGS_save}"
     ])
   AS_IF([test "${ac_cv_ld_altivec}" != "no"], [
-    VLC_ADD_LDFLAGS([libvlccore memcpyaltivec],[-Wl,-framework,vecLib])
+    VLC_ADD_LIBS([libvlccore memcpyaltivec],[-Wl,-framework,vecLib])
   ])
 ])
 AM_CONDITIONAL([HAVE_ALTIVEC], [test "$have_altivec" = "yes"])
@@ -1698,7 +1698,7 @@ AS_IF([test "${enable_growl}" != "no"], [
     VLC_ADD_PLUGIN([growl_udp])
     AC_CHECK_HEADERS(${CONTRIB_DIR}/Growl/Growl.framework/Versions/A/Headers/GrowlDefines.h, [
       VLC_ADD_PLUGIN([growl])
-      VLC_ADD_LDFLAGS([growl], [-F${CONTRIB_DIR}/Growl -Wl,-framework,Growl,-framework,CoreFoundation])
+      VLC_ADD_LIBS([growl], [-F${CONTRIB_DIR}/Growl -Wl,-framework,Growl,-framework,CoreFoundation])
       VLC_ADD_OBJCFLAGS([growl], [-F${CONTRIB_DIR}/Growl])
       VLC_ADD_OBJCFLAGS([growl], [-fobjc-exceptions] )
     ])
@@ -2123,7 +2123,7 @@ then
   if test "${SYS}" = "darwin"
   then
     VLC_ADD_PLUGIN([vcd cdda])
-    VLC_ADD_LDFLAGS([vcd vcdx cdda],[-Wl,-framework,IOKit,-framework,CoreFoundation])
+    VLC_ADD_LIBS([vcd vcdx cdda],[-Wl,-framework,IOKit,-framework,CoreFoundation])
     VLC_ADD_LIBS([vcdx cdda],[-liconv])
   fi
 
@@ -2157,7 +2157,7 @@ if test "${enable_screen}" != "no"; then
     AC_CHECK_HEADERS(OpenGL/gl.h, [
       AC_CHECK_HEADERS(ApplicationServices/ApplicationServices.h, [
         VLC_ADD_PLUGIN([screen])
-        VLC_ADD_LDFLAGS([screen],[-Wl,-framework,OpenGL,-framework,ApplicationServices])
+        VLC_ADD_LIBS([screen],[-Wl,-framework,OpenGL,-framework,ApplicationServices])
       ])
     ])
   elif test "${SYS}" = "mingw32"; then
@@ -2728,7 +2728,7 @@ if test "${enable_quicktime}" = "yes"; then
   else
   AC_CHECK_HEADERS(QuickTime/QuickTime.h,
     [ VLC_ADD_PLUGIN([quicktime])
-      VLC_ADD_LDFLAGS([quicktime],[-Wl,-framework,QuickTime,-framework,Carbon])
+      VLC_ADD_LIBS([quicktime],[-Wl,-framework,QuickTime,-framework,Carbon])
     ], [ AC_MSG_ERROR([cannot find QuickTime headers]) ])
   fi
 fi
@@ -2924,7 +2924,7 @@ if test "${enable_x264}" != "no"; then
       VLC_ADD_LIBS([x264],[-L${real_x264_tree}])
       PKG_CHECK_MODULES(X264,x264, [
         VLC_ADD_PLUGIN([x264])
-        VLC_ADD_LDFLAGS([x264],[${X264_LIBS}])
+        VLC_ADD_LIBS([x264],[${X264_LIBS}])
         VLC_ADD_CFLAGS([x264],[${X264_CFLAGS}])
         if echo ${X264_LIBS} |grep -q 'pthreadGC2'; then
           VLC_ADD_CFLAGS([x264], [-DPTW32_STATIC_LIB])
@@ -3220,7 +3220,7 @@ if test "${enable_freetype}" != "no"; then
       VLC_ADD_LIBS([freetype skins2],[${FREETYPE_LIBS}])
 
       AC_CHECK_HEADERS(Carbon/Carbon.h,
-                       [VLC_ADD_LDFLAGS([freetype],[-Wl,-framework,Carbon])])
+                       [VLC_ADD_LIBS([freetype],[-Wl,-framework,Carbon])])
 
       dnl fontconfig support
       if test "${SYS}" != "mingw32"; then
@@ -3282,7 +3282,7 @@ if test "${enable_ios_vout}" = "yes"
 then
   VLC_ADD_PLUGIN([vout_ios])
   VLC_ADD_CFLAGS([vout_ios], [-DUSE_OPENGL_ES=1])
-  VLC_ADD_LDFLAGS([vout_ios], [-Wl,-framework,OpenGLES,-framework,QuartzCore,-framework,UIKit,-framework,Foundation])
+  VLC_ADD_LIBS([vout_ios], [-Wl,-framework,OpenGLES,-framework,QuartzCore,-framework,UIKit,-framework,Foundation])
 fi
 
 dnl
@@ -3294,7 +3294,7 @@ if test "x${enable_macosx_quartztext}" != "xno" &&
   (test "${SYS}" = "darwin" || test "${enable_macosx_quartztext}" = "yes")
 then
   VLC_ADD_PLUGIN([quartztext])
-  VLC_ADD_LDFLAGS([quartztext],[-Wl,-framework,ApplicationServices])
+  VLC_ADD_LIBS([quartztext],[-Wl,-framework,ApplicationServices])
 fi
 
 dnl
@@ -3575,7 +3575,7 @@ if test "x${enable_macosx_audio}" != "xno" &&
 then
   AC_CHECK_HEADERS(CoreAudio/CoreAudio.h,
     [ VLC_ADD_PLUGIN([auhal])
-      VLC_ADD_LDFLAGS([auhal],[-Wl,-framework,CoreAudio,-framework,AudioUnit,-framework,AudioToolbox,-framework,Carbon])
+      VLC_ADD_LIBS([auhal],[-Wl,-framework,CoreAudio,-framework,AudioUnit,-framework,AudioToolbox,-framework,Carbon])
     ], [ AC_MSG_ERROR([cannot find CoreAudio headers]) ])
 fi
 
@@ -3587,7 +3587,7 @@ AC_ARG_ENABLE(audioqueue,
 if test "${enable_audioqueue}" = "yes"
 then
   VLC_ADD_PLUGIN([audioqueue])
-  VLC_ADD_LDFLAGS([audioqueue], [-Wl,-framework,AudioToolbox,-framework,CoreFoundation])
+  VLC_ADD_LIBS([audioqueue], [-Wl,-framework,AudioToolbox,-framework,CoreFoundation])
 fi
 
 dnl
@@ -3654,7 +3654,7 @@ AS_IF([test "${enable_skins2}" = "yes"], [
   ], [test "${SYS}" = "darwin"], [
     VLC_ADD_CPPFLAGS([skins2],[-Imodules/gui/skins2 -DMACOSX_SKINS])
     VLC_ADD_CXXFLAGS([skins2],[-O2 -fno-rtti])
-    VLC_ADD_LDFLAGS([skins2],[-Wl,-framework,Carbon])
+    VLC_ADD_LIBS([skins2],[-Wl,-framework,Carbon])
 
   ], [
     PKG_CHECK_MODULES([XPM], [xpm])
@@ -3735,7 +3735,7 @@ AS_IF([test "${enable_qt4}" != "no"], [
         VLC_ADD_LIBS([qt4],[-lole32])
     ])
     AS_IF([test "${SYS}" = "darwin" ],[
-         VLC_ADD_LDFLAGS([qt4], [-Wl,-framework,Cocoa])
+         VLC_ADD_LIBS([qt4], [-Wl,-framework,Cocoa])
     ])
     AC_PATH_PROGS(MOC, [moc-qt4 moc], moc,`eval $PKG_CONFIG --variable=exec_prefix QtCore`/bin)
     AC_PATH_PROG(RCC, rcc, rcc,`eval $PKG_CONFIG --variable=exec_prefix QtCore`/bin)
@@ -3766,20 +3766,20 @@ AC_ARG_ENABLE(macosx,
 if test "x${enable_macosx}" != "xno" &&
 (test "${SYS}" = "darwin" || test "${enable_macosx}" = "yes")
 then
-  VLC_ADD_LDFLAGS([macosx minimal_macosx],[-Wl,-framework,Cocoa])
-  VLC_ADD_LDFLAGS([macosx minimal_macosx],[-Wl,-framework,OpenGL])
-  VLC_ADD_LDFLAGS([macosx minimal_macosx],            [-Wl,-framework,Carbon])
-  VLC_ADD_LDFLAGS([macosx minimal_macosx],            [-Wl,-framework,CoreServices])
-  VLC_ADD_LDFLAGS([macosx minimal_macosx],            [-Wl,-framework,AGL])
-  VLC_ADD_LDFLAGS([macosx],                           [-Wl,-framework,QTKit])
-  VLC_ADD_LDFLAGS([macosx],                           [-Wl,-framework,IOKit])
-  VLC_ADD_LDFLAGS([macosx],                           [-F${CONTRIB_DIR}/Sparkle -Wl,-framework,Sparkle])
+  VLC_ADD_LIBS([macosx minimal_macosx],[-Wl,-framework,Cocoa])
+  VLC_ADD_LIBS([macosx minimal_macosx],[-Wl,-framework,OpenGL])
+  VLC_ADD_LIBS([macosx minimal_macosx],            [-Wl,-framework,Carbon])
+  VLC_ADD_LIBS([macosx minimal_macosx],            [-Wl,-framework,CoreServices])
+  VLC_ADD_LIBS([macosx minimal_macosx],            [-Wl,-framework,AGL])
+  VLC_ADD_LIBS([macosx],                           [-Wl,-framework,QTKit])
+  VLC_ADD_LIBS([macosx],                           [-Wl,-framework,IOKit])
+  VLC_ADD_LIBS([macosx],                           [-F${CONTRIB_DIR}/Sparkle -Wl,-framework,Sparkle])
   VLC_ADD_OBJCFLAGS([macosx],                         [-F${CONTRIB_DIR}/Sparkle])
-  VLC_ADD_LDFLAGS([macosx],                           [-F${CONTRIB_DIR}/BGHUDAppKit -Wl,-framework,BGHUDAppKit])
+  VLC_ADD_LIBS([macosx],                           [-F${CONTRIB_DIR}/BGHUDAppKit -Wl,-framework,BGHUDAppKit])
   VLC_ADD_OBJCFLAGS([macosx],                         [-F${CONTRIB_DIR}/BGHUDAppKit])
   dnl For bug report
-  VLC_ADD_LDFLAGS([macosx],                           [-Wl,-framework,AddressBook])
-  VLC_ADD_LDFLAGS([macosx],                           [-Wl,-framework,WebKit])
+  VLC_ADD_LIBS([macosx],                           [-Wl,-framework,AddressBook])
+  VLC_ADD_LIBS([macosx],                           [-Wl,-framework,WebKit])
   VLC_ADD_OBJCFLAGS([macosx minimal_macosx], [-fobjc-exceptions] )
 
   VLC_ADD_PLUGIN([macosx minimal_macosx])
@@ -3794,8 +3794,8 @@ AC_ARG_ENABLE(macosx-vout,
 if test "x${enable_macosx_vout}" != "xno" &&
   (test "${SYS}" = "darwin" || test "${enable_macosx_vout}" = "yes")
 then
-  VLC_ADD_LDFLAGS([vout_macosx],[-Wl,-framework,Cocoa])
-  VLC_ADD_LDFLAGS([vout_macosx],[-Wl,-framework,OpenGL])
+  VLC_ADD_LIBS([vout_macosx],[-Wl,-framework,Cocoa])
+  VLC_ADD_LIBS([vout_macosx],[-Wl,-framework,OpenGL])
   VLC_ADD_PLUGIN([vout_macosx])
 fi
 
@@ -3804,7 +3804,7 @@ AC_ARG_ENABLE(macosx-dialog-provider,
 if test "x${enable_macosx_dialog_provider}" != "xno" &&
   (test "${SYS}" = "darwin" || test "${enable_macosx_dialog_provider}" = "yes")
 then
-  VLC_ADD_LDFLAGS([macosx_dialog_provider],[-Wl,-framework,Cocoa])
+  VLC_ADD_LIBS([macosx_dialog_provider],[-Wl,-framework,Cocoa])
   VLC_ADD_PLUGIN([macosx_dialog_provider])
 fi
 
@@ -3813,11 +3813,11 @@ AC_ARG_ENABLE(macosx-qtcapture,
 if test "x${enable_macosx_qtcapture}" != "xno" &&
   (test "${SYS}" = "darwin" || test "${enable_macosx_qtcapture}" = "yes")
 then
-  VLC_ADD_LDFLAGS([qtcapture], [-Wl,-framework,Cocoa])
-  VLC_ADD_LDFLAGS([qtcapture], [-Wl,-framework,QTKit])
-  VLC_ADD_LDFLAGS([qtcapture], [-Wl,-framework,CoreAudio])
-  VLC_ADD_LDFLAGS([qtcapture], [-Wl,-framework,QuartzCore])
-  VLC_ADD_LDFLAGS([qtcapture], [-Wl,-framework,CoreVideo])
+  VLC_ADD_LIBS([qtcapture], [-Wl,-framework,Cocoa])
+  VLC_ADD_LIBS([qtcapture], [-Wl,-framework,QTKit])
+  VLC_ADD_LIBS([qtcapture], [-Wl,-framework,CoreAudio])
+  VLC_ADD_LIBS([qtcapture], [-Wl,-framework,QuartzCore])
+  VLC_ADD_LIBS([qtcapture], [-Wl,-framework,CoreVideo])
   VLC_ADD_PLUGIN([qtcapture])
 fi
 
@@ -3826,7 +3826,7 @@ AC_ARG_ENABLE(macosx-eyetv,
 if test "x${enable_macosx_eyetv}" != "xno" &&
   (test "${SYS}" = "darwin" || test "${enable_macosx_eyetv}" = "yes")
 then
-  VLC_ADD_LDFLAGS([access_eyetv], [-Wl,-framework,Foundation])
+  VLC_ADD_LIBS([access_eyetv], [-Wl,-framework,Foundation])
   VLC_ADD_PLUGIN([access_eyetv])
 fi
 
