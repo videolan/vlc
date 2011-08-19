@@ -241,8 +241,8 @@ case "${host_os}" in
     OBJCFLAGS_save="${OBJCFLAGS_save} -D_INTL_REDIRECT_MACROS -std=gnu99 ${ARCH_flag}"; OBJCFLAGS="${OBJCFLAGS_save}"
     LDFLAGS_save="${LDFLAGS_save} -Wl,-headerpad_max_install_names ${ARCH_flag}"; LDFLAGS="${LDFLAGS_save}"
     VLC_ADD_LIBS([mkv mp4 motion], [-Wl,-framework,IOKit,-framework,CoreFoundation])
-    VLC_ADD_LDFLAGS([libvlc vlc],[-Wl,-undefined,dynamic_lookup])
-    VLC_ADD_LDFLAGS([avcodec avformat access_avio swscale postproc i420_rgb_mmx x264],[-Wl,-read_only_relocs,suppress])
+    VLC_ADD_LIBS([libvlc vlc],[-Wl,-undefined,dynamic_lookup])
+    VLC_ADD_LIBS([avcodec avformat access_avio swscale postproc i420_rgb_mmx x264],[-Wl,-read_only_relocs,suppress])
     VLC_ADD_CFLAGS([motion],[-fconstant-cfstrings])
     VLC_ADD_LIBS([libvlccore],[-Wl,-framework,CoreFoundation])
     AC_ARG_ENABLE(macosx-defaults,
@@ -2483,7 +2483,7 @@ AS_IF([test "${enable_avcodec}" != "no"], [
       VLC_ADD_PLUGIN([avcodec])
       VLC_ADD_LIBS([avcodec],[$AVCODEC_LIBS])
       AS_IF([test "${ac_cv_ld_bsymbolic}" != "no"], [
-        VLC_ADD_LDFLAGS([avcodec],[-Wl,-Bsymbolic])
+        VLC_ADD_LIBS([avcodec],[-Wl,-Bsymbolic])
       ])
       VLC_ADD_CFLAGS([avcodec],[$AVCODEC_CFLAGS])
       VLC_RESTORE_FLAGS
@@ -2602,7 +2602,7 @@ then
         VLC_ADD_LIBS([avformat access_avio],[$AVFORMAT_LIBS $AVUTIL_LIBS])
         VLC_ADD_CFLAGS([avformat access_avio],[$AVFORMAT_CFLAGS $AVUTIL_CFLAGS])
         AS_IF([test "${ac_cv_ld_bsymbolic}" != "no"], [
-          VLC_ADD_LDFLAGS([avformat access_avio],[-Wl,-Bsymbolic])
+          VLC_ADD_LIBS([avformat access_avio],[-Wl,-Bsymbolic])
         ])
       ], [
         VLC_ADD_LIBS([avcodec],[$AVFORMAT_LIBS $AVUTIL_LIBS])
@@ -2633,7 +2633,7 @@ then
       VLC_ADD_LIBS([swscale],[$SWSCALE_LIBS])
       VLC_ADD_CFLAGS([swscale],[$SWSCALE_CFLAGS])
       AS_IF([test "${ac_cv_ld_bsymbolic}" != "no"], [
-        VLC_ADD_LDFLAGS([swscale],[-Wl,-Bsymbolic])
+        VLC_ADD_LIBS([swscale],[-Wl,-Bsymbolic])
       ])
       VLC_RESTORE_FLAGS
     ],[
@@ -2943,7 +2943,7 @@ if test "${enable_x264}" != "no"; then
         VLC_ADD_LDFLAGS([x264],[${X264_LIBS}])
 
         AS_IF([test "${ac_cv_ld_bsymbolic}" != "no"], [
-          VLC_ADD_LDFLAGS([x264],[-Wl,-Bsymbolic])
+          VLC_ADD_LIBS([x264],[-Wl,-Bsymbolic])
         ])
 
         VLC_ADD_CFLAGS([x264],[${X264_CFLAGS}])
