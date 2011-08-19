@@ -11,14 +11,14 @@
 			<string key="com.binarymethod.BGHUDAppKitPlugin">1</string>
 		</dictionary>
 		<array class="NSMutableArray" key="IBDocument.EditedObjectIDs">
-			<integer value="4682"/>
+			<integer value="283"/>
+			<integer value="915"/>
 			<integer value="1617"/>
+			<integer value="2730"/>
 			<integer value="334"/>
 			<integer value="4596"/>
-			<integer value="283"/>
+			<integer value="21"/>
 			<integer value="4722"/>
-			<integer value="2730"/>
-			<integer value="915"/>
 		</array>
 		<array key="IBDocument.PluginDependencies">
 			<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -663,7 +663,7 @@
 														<object class="NSOutlineView" id="1064884668">
 															<reference key="NSNextResponder" ref="18556274"/>
 															<int key="NSvFlags">4352</int>
-															<string key="NSFrameSize">{121, 272}</string>
+															<string key="NSFrameSize">{120, 272}</string>
 															<reference key="NSSuperview" ref="18556274"/>
 															<int key="NSViewLayerContentsRedrawPolicy">2</int>
 															<bool key="NSEnabled">YES</bool>
@@ -674,7 +674,7 @@
 															</object>
 															<array class="NSMutableArray" key="NSTableColumns">
 																<object class="NSTableColumn" id="291003631">
-																	<double key="NSWidth">118</double>
+																	<double key="NSWidth">117</double>
 																	<double key="NSMinWidth">16</double>
 																	<double key="NSMaxWidth">1000</double>
 																	<object class="NSTableHeaderCell" key="NSHeaderCell">
@@ -764,7 +764,7 @@
 															<float key="NSOutlineViewIndentationPerLevelKey">14</float>
 														</object>
 													</array>
-													<string key="NSFrame">{{1, 1}, {121, 272}}</string>
+													<string key="NSFrame">{{1, 1}, {120, 272}}</string>
 													<reference key="NSSuperview" ref="979766179"/>
 													<reference key="NSNextKeyView" ref="1064884668"/>
 													<int key="NSViewLayerContentsRedrawPolicy">2</int>
@@ -794,7 +794,7 @@
 													<double key="NSPercent">0.9953052</double>
 												</object>
 											</array>
-											<string key="NSFrame">{{-1, 0}, {123, 274}}</string>
+											<string key="NSFrameSize">{122, 274}</string>
 											<reference key="NSSuperview" ref="824340487"/>
 											<reference key="NSNextKeyView" ref="18556274"/>
 											<int key="NSViewLayerContentsRedrawPolicy">2</int>
@@ -6947,6 +6947,14 @@ LCAuLi4</string>
 					</object>
 					<int key="connectionID">4751</int>
 				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">o_left_split_view</string>
+						<reference key="source" ref="498338108"/>
+						<reference key="destination" ref="824340487"/>
+					</object>
+					<int key="connectionID">4752</int>
+				</object>
 			</array>
 			<object class="IBMutableOrderedSet" key="objectRecords">
 				<array key="orderedObjects">
@@ -10232,6 +10240,9 @@ LCAuLi4</string>
 					<bytes key="NSTransformStruct">AUMMAABBoAAAA</bytes>
 				</object>
 				<string key="4713.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<object class="NSAffineTransform" key="4713.IBViewBoundsToFrameTransform">
+					<bytes key="NSTransformStruct">P4AAAL+AAAAAAAAAw4gAAA</bytes>
+				</object>
 				<string key="4714.CustomClassName">PXSourceList</string>
 				<string key="4714.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="4715.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -10312,7 +10323,7 @@ LCAuLi4</string>
 			<nil key="activeLocalization"/>
 			<dictionary class="NSMutableDictionary" key="localizations"/>
 			<nil key="sourceID"/>
-			<int key="maxID">4751</int>
+			<int key="maxID">4752</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -13441,6 +13452,7 @@ LCAuLi4</string>
 						<string key="o_fspanel">VLCFSPanel</string>
 						<string key="o_fullscreen_btn">id</string>
 						<string key="o_fwd_btn">id</string>
+						<string key="o_left_split_view">id</string>
 						<string key="o_play_btn">id</string>
 						<string key="o_playlist_btn">id</string>
 						<string key="o_playlist_table">id</string>
@@ -13503,6 +13515,10 @@ LCAuLi4</string>
 						</object>
 						<object class="IBToOneOutletInfo" key="o_fwd_btn">
 							<string key="name">o_fwd_btn</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="o_left_split_view">
+							<string key="name">o_left_split_view</string>
 							<string key="candidateClassName">id</string>
 						</object>
 						<object class="IBToOneOutletInfo" key="o_play_btn">

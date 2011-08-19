@@ -235,6 +235,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     o_temp_view = [[NSView alloc] init];
     [o_temp_view setAutoresizingMask:NSViewHeightSizable | NSViewWidthSizable];
     [o_dropzone_view setFrame: [o_playlist_table frame]];
+    [o_left_split_view setFrame: [o_sidebar_view frame]];
     if (OSX_LION)
     {
         [self setCollectionBehavior: NSWindowCollectionBehaviorFullScreenPrimary];
@@ -754,6 +755,8 @@ static VLCMainWindow *_o_sharedInstance = nil;
     PL_LOCK;
     b_plmul = playlist_CurrentSize( p_playlist ) > 1;
     PL_UNLOCK;
+
+    [o_sidebar_view reloadData];
 
     input_thread_t * p_input = playlist_CurrentInput( p_playlist );
 
@@ -1450,12 +1453,25 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
 - (BOOL)sourceList:(PXSourceList*)aSourceList itemHasBadge:(id)item
 {
+    if ([[item identifier] isEqualToString: @"playlist"])
+        return YES;
+
 	return [item hasBadge];
 }
 
 
 - (NSInteger)sourceList:(PXSourceList*)aSourceList badgeValueForItem:(id)item
 {
+    if ([[item identifier] isEqualToString: @"playlist"]) {
+        playlist_t * p_playlist = pl_Get( VLCIntf );
+        NSInteger i_playlist_size;
+
+        PL_LOCK;
+        i_playlist_size = playlist_CurrentSize( p_playlist );
+        PL_UNLOCK;
+
+        return i_playlist_size;
+    }
 	return [item badgeValue];
 }
 

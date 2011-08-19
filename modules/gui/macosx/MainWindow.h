@@ -58,6 +58,7 @@
     IBOutlet id o_playlist_table;
     IBOutlet id o_video_view;
     IBOutlet id o_split_view;
+    IBOutlet id o_left_split_view;
     IBOutlet id o_right_split_view;
     IBOutlet id o_sidebar_view;
     IBOutlet id o_chosen_category_lbl;
