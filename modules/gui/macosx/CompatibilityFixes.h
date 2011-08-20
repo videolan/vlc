@@ -62,7 +62,6 @@ enum {
 #pragma Fixes for OS X Snow Leopard (10.6)
 
 #ifndef MAC_OS_X_VERSION_10_7
-
 enum {
     NSWindowCollectionBehaviorFullScreenPrimary = 1 << 7,
     NSWindowCollectionBehaviorFullScreenAuxiliary = 1 << 8

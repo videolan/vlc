@@ -31,6 +31,8 @@
 #import <stdlib.h>                                      /* malloc(), free() */
 #import <sys/param.h>                                    /* for MAXPATHLEN */
 
+#import "CompatibilityFixes.h"
+
 #import <paths.h>
 #import <IOKit/IOBSD.h>
 #import <IOKit/storage/IOMedia.h>
@@ -40,7 +42,6 @@
 #import <Cocoa/Cocoa.h>
 #import <QTKit/QTKit.h>
 
-#import "CompatibilityFixes.h"
 #import "intf.h"
 #import "playlist.h"
 #import "open.h"
@@ -98,6 +99,8 @@ static VLCOpen *_o_sharedMainInstance = nil;
     if( o_file_slave_path )
         [o_file_slave_path release];
     [o_mrl release];
+    if (o_sub_path)
+        [o_sub_path release];
     [o_currentOpticalMediaIconView release];
     [o_currentOpticalMediaView release];
     [super dealloc];
@@ -296,7 +299,10 @@ static VLCOpen *_o_sharedMainInstance = nil;
     module_config_t * p_item;
 
     [o_file_sub_ckbox setTitle: _NS("Load subtitles file:")];
-    [o_file_sub_btn_settings setTitle: _NS("Settings...")];
+    [o_file_sub_path_lbl setStringValue: _NS("Choose a file")];
+    [o_file_sub_path_lbl setHidden: NO];
+    [o_file_sub_path_fld setStringValue: @""];
+    [o_file_sub_btn_settings setTitle: _NS("Choose...")];
     [o_file_sub_btn_browse setTitle: _NS("Browse...")];
     [o_file_sub_override setTitle: _NS("Override parametters")];
     [o_file_sub_delay_lbl setStringValue: _NS("Delay")];
@@ -379,7 +385,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
         {
             module_config_t * p_item;
 
-            [o_options addObject: [NSString stringWithFormat: @"sub-file=%@", [o_file_sub_path stringValue]]];
+            [o_options addObject: [NSString stringWithFormat: @"sub-file=%@", o_sub_path]];
             if( [o_file_sub_override state] == NSOnState )
             {
                 [o_options addObject: [NSString stringWithFormat: @"sub-delay=%i", (int)( [o_file_sub_delay intValue] * 10 )]];
@@ -1321,9 +1327,9 @@ static VLCOpen *_o_sharedMainInstance = nil;
     if ([o_file_sub_ckbox state] == NSOnState)
     {
         [o_file_sub_btn_settings setEnabled:YES];
-        if ([[o_file_sub_path stringValue] length] > 0) {
-            [o_file_subtitles_filename_lbl setStringValue: [[NSFileManager defaultManager] displayNameAtPath:[o_file_sub_path stringValue]]];
-            [o_file_subtitles_icon_well setImage: [[NSWorkspace sharedWorkspace] iconForFile: [o_file_sub_path stringValue]]];
+        if (o_sub_path) {
+            [o_file_subtitles_filename_lbl setStringValue: [[NSFileManager defaultManager] displayNameAtPath:o_sub_path]];
+            [o_file_subtitles_icon_well setImage: [[NSWorkspace sharedWorkspace] iconForFile:o_sub_path]];
         }
     }
     else
@@ -1360,10 +1366,21 @@ static VLCOpen *_o_sharedMainInstance = nil;
 
     if( [o_open_panel runModal] == NSOKButton )
     {
-        NSString *o_filename = [[[o_open_panel URLs] objectAtIndex: 0] path];
-        [o_file_sub_path setStringValue: o_filename];
-        [o_file_subtitles_filename_lbl setStringValue: [[NSFileManager defaultManager] displayNameAtPath:o_filename]];
-        [o_file_subtitles_icon_well setImage: [[NSWorkspace sharedWorkspace] iconForFile: o_filename]];
+        o_sub_path = [[[o_open_panel URLs] objectAtIndex: 0] path];
+        [o_sub_path retain];
+        [o_file_subtitles_filename_lbl setStringValue: [[NSFileManager defaultManager] displayNameAtPath:o_sub_path]];
+        [o_file_sub_path_fld setStringValue: [o_file_subtitles_filename_lbl stringValue]];
+        [o_file_sub_path_lbl setHidden: YES];
+        [o_file_subtitles_icon_well setImage: [[NSWorkspace sharedWorkspace] iconForFile:o_sub_path]];
+        [o_file_sub_icon_view setImage: [o_file_subtitles_icon_well image]];
+    }
+    else
+    {
+        [o_file_sub_path_lbl setHidden: NO];
+        [o_file_sub_path_fld setStringValue:@""];
+        [o_file_subtitles_filename_lbl setStringValue:@""];
+        [o_file_subtitles_icon_well setImage: nil];
+        [o_file_sub_icon_view setImage: nil];
     }
 }
 

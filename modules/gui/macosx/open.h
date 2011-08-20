@@ -136,7 +136,9 @@
     IBOutlet id o_file_sub_ckbox;
     IBOutlet id o_file_sub_btn_settings;
     IBOutlet id o_file_sub_sheet;
-    IBOutlet id o_file_sub_path;
+    IBOutlet id o_file_sub_path_lbl;
+    IBOutlet id o_file_sub_path_fld;
+    IBOutlet id o_file_sub_icon_view;
     IBOutlet id o_file_sub_btn_browse;
     IBOutlet id o_file_sub_override;
     IBOutlet id o_file_sub_delay;
@@ -219,6 +221,7 @@
     NSString *o_file_path;
     id o_currentCaptureView;
     NSString *o_file_slave_path;
+    NSString *o_sub_path;
     NSString *o_mrl;
     intf_thread_t * p_intf;
 }

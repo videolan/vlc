@@ -1334,7 +1334,6 @@ unsigned int CocoaKeyToVLC( unichar i_key )
 
 - (void)updateRecordState: (BOOL)b_value
 {
-    NSLog( @"record state: %i", b_value );
     [o_mainmenu updateRecordState:b_value];
 }
 
