@@ -384,8 +384,7 @@ void vlc_sem_wait (vlc_sem_t *sem)
 void vlc_rwlock_init (vlc_rwlock_t *lock)
 {
     vlc_mutex_init (&lock->mutex);
-    vlc_cond_init (&lock->read_wait);
-    vlc_cond_init (&lock->write_wait);
+    vlc_cond_init (&lock->wait);
     lock->readers = 0; /* active readers */
     lock->writers = 0; /* waiting writers */
     lock->writer = 0; /* ID of active writer */
@@ -393,8 +392,7 @@ void vlc_rwlock_init (vlc_rwlock_t *lock)
 
 void vlc_rwlock_destroy (vlc_rwlock_t *lock)
 {
-    vlc_cond_destroy (&lock->read_wait);
-    vlc_cond_destroy (&lock->write_wait);
+    vlc_cond_destroy (&lock->wait);
     vlc_mutex_destroy (&lock->mutex);
 }
 
@@ -411,7 +409,7 @@ void vlc_rwlock_rdlock (vlc_rwlock_t *lock)
     while (lock->writer != 0)
     {
         assert (lock->readers == 0);
-        vlc_cond_wait (&lock->read_wait, &lock->mutex);
+        vlc_cond_wait (&lock->wait, &lock->mutex);
     }
     if (unlikely(lock->readers == ULONG_MAX))
         abort ();
@@ -426,7 +424,7 @@ static void vlc_rwlock_rdunlock (vlc_rwlock_t *lock)
 
     /* If there are no readers left, wake up a writer. */
     if (--lock->readers == 0 && lock->writers > 0)
-        vlc_cond_signal (&lock->write_wait);
+        vlc_cond_signal (&lock->wait);
     vlc_mutex_unlock (&lock->mutex);
 }
 
@@ -438,7 +436,7 @@ void vlc_rwlock_wrlock (vlc_rwlock_t *lock)
     lock->writers++;
     /* Wait until nobody owns the lock in either way. */
     while ((lock->readers > 0) || (lock->writer != 0))
-        vlc_cond_wait (&lock->write_wait, &lock->mutex);
+        vlc_cond_wait (&lock->wait, &lock->mutex);
     lock->writers--;
     assert (lock->writer == 0);
     lock->writer = GetCurrentThreadId ();
@@ -453,9 +451,7 @@ static void vlc_rwlock_wrunlock (vlc_rwlock_t *lock)
     lock->writer = 0; /* Write unlock */
 
     /* Let reader and writer compete. Scheduler decides who wins. */
-    if (lock->writers > 0)
-        vlc_cond_signal (&lock->write_wait);
-    vlc_cond_broadcast (&lock->read_wait);
+    vlc_cond_broadcast (&lock->wait);
     vlc_mutex_unlock (&lock->mutex);
 }
 
