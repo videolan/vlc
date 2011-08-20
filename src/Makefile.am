@@ -502,8 +502,6 @@ SOURCES_libvlc_vlm = \
 
 SOURCES_libvlc = \
 	$(SOURCES_libvlc_common) \
-	$(OPT_SOURCES_libvlc_darwin) \
-	$(OPT_SOURCES_libvlc_win32) \
 	$(NULL)
 
 SOURCES_libvlc_control = \
