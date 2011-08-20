@@ -64,27 +64,6 @@ typedef struct
     char       *psz_msg; /**< Message text */
 } msg_item_t;
 
-VLC_MALLOC VLC_USED
-static inline msg_item_t *msg_Copy (const msg_item_t *msg)
-{
-    msg_item_t *copy = (msg_item_t *)xmalloc (sizeof (*copy));
-    copy->i_type = msg->i_type;
-    copy->i_object_id = msg->i_object_id;
-    copy->psz_object_type = msg->psz_object_type;
-    copy->psz_module = strdup (msg->psz_module);
-    copy->psz_msg = strdup (msg->psz_msg);
-    copy->psz_header = msg->psz_header ? strdup (msg->psz_header) : NULL;
-    return copy;
-}
-
-static inline void msg_Free (msg_item_t *msg)
-{
-    free ((char *)msg->psz_module);
-    free ((char *)msg->psz_header);
-    free (msg->psz_msg);
-    free (msg);
-}
-
 /**
  * Used by interface plugins which subscribe to the message bank.
  */
