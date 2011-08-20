@@ -280,6 +280,7 @@ SOURCES_libvlc_darwin = \
 	misc/atomic.c \
 	posix/filesystem.c \
 	posix/plugin.c \
+	network/poll.c \
 	posix/thread.c \
 	posix/darwin_specific.c \
 	$(NULL)
@@ -289,6 +290,7 @@ SOURCES_libvlc_linux = \
 	misc/atomic.c \
 	posix/filesystem.c \
 	posix/plugin.c \
+	network/poll.c \
 	posix/thread.c \
 	posix/linux_specific.c \
 	$(NULL)
@@ -298,6 +300,7 @@ SOURCES_libvlc_win32 = \
 	win32/atomic.c \
 	win32/filesystem.c \
 	win32/plugin.c \
+	win32/poll.c \
 	win32/thread.c \
 	win32/specific.c \
 	win32/winsock.c \
@@ -314,6 +317,7 @@ SOURCES_libvlc_other = \
 	posix/dirs.c \
 	misc/atomic.c \
 	posix/filesystem.c \
+	network/poll.c \
 	posix/thread.c \
 	posix/specific.c \
 	$(NULL)
@@ -421,7 +425,6 @@ SOURCES_libvlc_common = \
 	network/udp.c \
 	network/rootbind.c \
 	network/tls.c \
-	network/poll.c \
 	text/charset.c \
 	text/strings.c \
 	text/unicode.c \
