@@ -48,7 +48,7 @@ enum {
 class MsgEvent : public QEvent
 {
 public:
-    MsgEvent( const msg_item_t * );
+    MsgEvent( int, const msg_item_t *, const char * );
 
     int priority;
     uintptr_t object_id;
@@ -58,14 +58,14 @@ public:
     QString text;
 };
 
-MsgEvent::MsgEvent( const msg_item_t *msg )
+MsgEvent::MsgEvent( int type, const msg_item_t *msg, const char *text )
     : QEvent( (QEvent::Type)MsgEvent_Type ),
-      priority( msg->i_type ),
+      priority( type ),
       object_id( msg->i_object_id ),
       object_type( qfu(msg->psz_object_type) ),
       header( qfu(msg->psz_header) ),
       module( qfu(msg->psz_module) ),
-      text( qfu(msg->psz_msg) )
+      text( qfu(text) )
 {
 }
 
@@ -299,15 +299,19 @@ void MessagesDialog::tabChanged( int i )
     updateButton->setVisible( i == 1 );
 }
 
-void MessagesDialog::MsgCallback( void *self, const msg_item_t *item )
+void MessagesDialog::MsgCallback( void *self, int type, const msg_item_t *item,
+                                  const char *format, va_list ap )
 {
     MessagesDialog *dialog = (MessagesDialog *)self;
+    char *str;
     int verbosity = vlc_atomic_get( &dialog->verbosity );
 
-    if( verbosity < 0 || verbosity < (item->i_type - VLC_MSG_ERR) )
+    if( verbosity < 0 || verbosity < (type - VLC_MSG_ERR)
+     || unlikely(vasprintf( &str, format, ap ) == -1) )
         return;
 
     int canc = vlc_savecancel();
-    QApplication::postEvent( dialog, new MsgEvent( item ) );
+    QApplication::postEvent( dialog, new MsgEvent( type, item, str ) );
     vlc_restorecancel( canc );
+    free( str );
 }

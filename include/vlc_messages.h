@@ -56,12 +56,10 @@ enum msg_item_type
  */
 typedef struct
 {
-    unsigned    i_type;  /**< Message type, see @ref msg_item_type */
     uintptr_t   i_object_id; /**< Emitter (temporaly) unique object ID or 0 */
     const char *psz_object_type; /**< Emitter object type name */
     const char *psz_module; /**< Emitter module (source code) */
     const char *psz_header; /**< Additional header (used by VLM media) */
-    char       *psz_msg; /**< Message text */
 } msg_item_t;
 
 /**
@@ -91,7 +89,8 @@ VLC_API void vlc_vaLog(vlc_object_t *, int,
  * Message logging callback signature.
  * Accepts one private data pointer, the message, and an overrun counter.
  */
-typedef void (*msg_callback_t) (void *, const msg_item_t *);
+typedef void (*msg_callback_t) (void *, int, const msg_item_t *,
+                                const char *, va_list);
 
 VLC_API msg_subscription_t *vlc_Subscribe(msg_callback_t, void *) VLC_USED;
 VLC_API void vlc_Unsubscribe(msg_subscription_t *);

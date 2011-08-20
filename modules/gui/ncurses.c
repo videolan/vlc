@@ -192,7 +192,12 @@ struct intf_sys_t
     int             i_box_idx;          // selected line
 
     msg_subscription_t  *p_sub;         // message bank subscription
-    msg_item_t          *msgs[50];      // ring buffer
+    struct
+    {
+        int              type;
+        msg_item_t      *item;
+        char            *msg;
+    } msgs[50];      // ring buffer
     int                 i_msgs;
     int                 i_verbosity;
     vlc_mutex_t         msg_lock;
@@ -1064,12 +1069,13 @@ static int DrawMessages(intf_thread_t *p_intf)
     i = p_sys->i_msgs;
     for(;;)
     {
-        msg_item_t *msg = p_sys->msgs[i];
+        msg_item_t *msg = p_sys->msgs[i].item;
         if (msg)
         {
             if (p_sys->b_color)
-                color_set(msg->i_type + C_INFO, NULL);
-            MainBoxWrite(p_sys, l++, "[%s] %s", msg->psz_module, msg->psz_msg);
+                color_set(p_sys->msgs[i].type + C_INFO, NULL);
+            MainBoxWrite(p_sys, l++, "[%s] %s", msg->psz_module,
+                         p_sys->msgs[i].msg);
         }
 
         if (++i == sizeof p_sys->msgs / sizeof *p_sys->msgs)
@@ -1813,11 +1819,9 @@ static void HandleKey(intf_thread_t *p_intf)
 static msg_item_t *msg_Copy (const msg_item_t *msg)
 {
     msg_item_t *copy = (msg_item_t *)xmalloc (sizeof (*copy));
-    copy->i_type = msg->i_type;
     copy->i_object_id = msg->i_object_id;
     copy->psz_object_type = msg->psz_object_type;
     copy->psz_module = strdup (msg->psz_module);
-    copy->psz_msg = strdup (msg->psz_msg);
     copy->psz_header = msg->psz_header ? strdup (msg->psz_header) : NULL;
     return copy;
 }
@@ -1826,25 +1830,30 @@ static void msg_Free (msg_item_t *msg)
 {
     free ((char *)msg->psz_module);
     free ((char *)msg->psz_header);
-    free (msg->psz_msg);
     free (msg);
 }
 
-static void MsgCallback(void *data, const msg_item_t *msg)
+static void MsgCallback(void *data, int type, const msg_item_t *msg,
+                        const char *format, va_list ap)
 {
     intf_sys_t *p_sys = data;
+    char *text;
 
     if (p_sys->i_verbosity < 0
-     || p_sys->i_verbosity < (msg->i_type - VLC_MSG_ERR))
+     || p_sys->i_verbosity < (type - VLC_MSG_ERR)
+     || vasprintf(&text, format, ap) == -1)
         return;
 
     vlc_mutex_lock(&p_sys->msg_lock);
 
-    if (p_sys->msgs[p_sys->i_msgs])
-        msg_Free(p_sys->msgs[p_sys->i_msgs]);
-    p_sys->msgs[p_sys->i_msgs++] = msg_Copy(msg);
+    p_sys->msgs[p_sys->i_msgs].type = type;
+    if (p_sys->msgs[p_sys->i_msgs].item != NULL)
+        msg_Free(p_sys->msgs[p_sys->i_msgs].item);
+    p_sys->msgs[p_sys->i_msgs].item = msg_Copy(msg);
+    free(p_sys->msgs[p_sys->i_msgs].msg);
+    p_sys->msgs[p_sys->i_msgs].msg = text;
 
-    if (p_sys->i_msgs == (sizeof p_sys->msgs / sizeof *p_sys->msgs))
+    if (++p_sys->i_msgs == (sizeof p_sys->msgs / sizeof *p_sys->msgs))
         p_sys->i_msgs = 0;
 
     vlc_mutex_unlock(&p_sys->msg_lock);
@@ -1965,8 +1974,10 @@ static void Close(vlc_object_t *p_this)
     vlc_mutex_destroy(&p_sys->msg_lock);
     vlc_mutex_destroy(&p_sys->pl_lock);
     for(unsigned i = 0; i < sizeof p_sys->msgs / sizeof *p_sys->msgs; i++)
-        if (p_sys->msgs[i])
-            msg_Free(p_sys->msgs[i]);
-
+    {
+        if (p_sys->msgs[i].item)
+            msg_Free(p_sys->msgs[i].item);
+        free(p_sys->msgs[i].msg);
+    }
     free(p_sys);
 }

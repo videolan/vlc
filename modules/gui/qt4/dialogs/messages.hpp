@@ -27,6 +27,7 @@
 #include "util/qvlcframe.hpp"
 #include "util/singleton.hpp"
 #include "ui/messages_panel.h"
+#include <stdarg.h>
 
 class QTabWidget;
 class QPushButton;
@@ -53,7 +54,8 @@ private:
     void sinkMessage( const MsgEvent * );
 
     vlc_atomic_t verbosity;
-    static void MsgCallback( void *, const msg_item_t * );
+    static void MsgCallback( void *, int, const msg_item_t *, const char *,
+                             va_list );
 
     QStringList filter;
     bool filterDefault;

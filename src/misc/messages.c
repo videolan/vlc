@@ -129,8 +129,9 @@ void vlc_Log (vlc_object_t *obj, int type, const char *module,
     va_end (args);
 }
 
-static void PrintColorMsg (void *, const msg_item_t *);
-static void PrintMsg (void *, const msg_item_t *);
+static void PrintColorMsg (void *, int, const msg_item_t *,
+                           const char *, va_list);
+static void PrintMsg (void *, int, const msg_item_t *, const char *, va_list);
 
 /**
  * Emit a log message. This function is the variable argument list equivalent
@@ -204,24 +205,12 @@ void vlc_vaLog (vlc_object_t *obj, int type, const char *module,
     }
 #endif
 
-    /* Convert message to string  */
-    static const char nomemstr[] = "<not enough memory to format message>";
-    char *str;
-
-    if (unlikely(vasprintf (&str, format, args) == -1))
-        str = (char *)nomemstr;
-
-    uselocale (locale);
-    freelocale (c);
-
     /* Fill message information fields */
     msg_item_t msg;
 
-    msg.i_type = type;
     msg.i_object_id = (uintptr_t)obj;
     msg.psz_object_type = obj->psz_object_type;
     msg.psz_module = module;
-    msg.psz_msg = str;
     msg.psz_header = NULL;
 
     for (vlc_object_t *o = obj; o != NULL; o = o->p_parent)
@@ -234,18 +223,26 @@ void vlc_vaLog (vlc_object_t *obj, int type, const char *module,
     /* Pass message to subscribers */
     libvlc_priv_t *priv = libvlc_priv (obj->p_libvlc);
 
+    va_list ap;
+
+    va_copy (ap, args);
     if (priv->b_color)
-        PrintColorMsg (&priv->i_verbose, &msg);
+        PrintColorMsg (&priv->i_verbose, type, &msg, format, ap);
     else
-        PrintMsg (&priv->i_verbose, &msg);
+        PrintMsg (&priv->i_verbose, type, &msg, format, ap);
+    va_end (ap);
 
     vlc_rwlock_rdlock (&msg_lock);
     for (msg_subscription_t *sub = msg_head; sub != NULL; sub = sub->next)
-        sub->func (sub->opaque, &msg);
+    {
+        va_copy (ap, args);
+        sub->func (sub->opaque, type, &msg, format, ap);
+        va_end (ap);
+    }
     vlc_rwlock_unlock (&msg_lock);
 
-    if (likely(str != (char *)nomemstr))
-        free (str);
+    uselocale (locale);
+    freelocale (c);
 }
 
 static const char msg_type[4][9] = { "", " error", " warning", " debug" };
@@ -257,11 +254,11 @@ static const char msg_type[4][9] = { "", " error", " warning", " debug" };
 #define GRAY    "\033[0m"
 static const char msg_color[4][8] = { WHITE, RED, YELLOW, GRAY };
 
-static void PrintColorMsg (void *d, const msg_item_t *p_item)
+static void PrintColorMsg (void *d, int type, const msg_item_t *p_item,
+                           const char *format, va_list ap)
 {
     const int *pverbose = d;
     FILE *stream = stderr;
-    int type = p_item->i_type;
 
     if (*pverbose < 0 || *pverbose < (type - VLC_MSG_ERR))
         return;
@@ -272,9 +269,10 @@ static void PrintColorMsg (void *d, const msg_item_t *p_item)
     fprintf (stream, "["GREEN"%p"GRAY"] ", (void *)p_item->i_object_id);
     if (p_item->psz_header != NULL)
         utf8_fprintf (stream, "[%s] ", p_item->psz_header);
-    utf8_fprintf (stream, "%s %s%s: %s%s"GRAY"\n", p_item->psz_module,
-                  p_item->psz_object_type, msg_type[type], msg_color[type],
-                  p_item->psz_msg);
+    utf8_fprintf (stream, "%s %s%s: %s", p_item->psz_module,
+                  p_item->psz_object_type, msg_type[type], msg_color[type]);
+    utf8_vfprintf (stream, format, ap);
+    fputs (GRAY"\n", stream);
 #if defined (WIN32) || defined (__OS2__)
     fflush (stream);
 #endif
@@ -282,11 +280,11 @@ static void PrintColorMsg (void *d, const msg_item_t *p_item)
     vlc_restorecancel (canc);
 }
 
-static void PrintMsg (void *d, const msg_item_t *p_item)
+static void PrintMsg (void *d, int type, const msg_item_t *p_item,
+                      const char *format, va_list ap)
 {
     const int *pverbose = d;
     FILE *stream = stderr;
-    int type = p_item->i_type;
 
     if (*pverbose < 0 || *pverbose < (type - VLC_MSG_ERR))
         return;
@@ -297,8 +295,10 @@ static void PrintMsg (void *d, const msg_item_t *p_item)
     fprintf (stream, "[%p] ", (void *)p_item->i_object_id);
     if (p_item->psz_header != NULL)
         utf8_fprintf (stream, "[%s] ", p_item->psz_header);
-    utf8_fprintf (stream, "%s %s%s: %s\n", p_item->psz_module,
-                  p_item->psz_object_type, msg_type[type], p_item->psz_msg);
+    utf8_fprintf (stream, "%s %s%s: ", p_item->psz_module,
+                  p_item->psz_object_type, msg_type[type]);
+    utf8_vfprintf (stream, format, ap);
+    fputc_unlocked ('\n', stream);
 #if defined (WIN32) || defined (__OS2__)
     fflush (stream);
 #endif

@@ -35,6 +35,7 @@
 #include <vlc_fs.h>
 #include <vlc_charset.h>
 
+#include <stdarg.h>
 #include <assert.h>
 
 #define MODE_TEXT 0
@@ -88,11 +89,11 @@ struct intf_sys_t
 static int  Open    ( vlc_object_t * );
 static void Close   ( vlc_object_t * );
 
-static void Overflow (void *p_sys, const msg_item_t *p_item);
-static void TextPrint         ( const msg_item_t *, FILE * );
-static void HtmlPrint         ( const msg_item_t *, FILE * );
+static void Overflow (void *, int, const msg_item_t *, const char *, va_list);
+static void TextPrint (FILE *, int, const msg_item_t *, const char *);
+static void HtmlPrint (FILE *, int, const msg_item_t *, const char *);
 #ifdef HAVE_SYSLOG_H
-static void SyslogPrint       ( const msg_item_t *);
+static void SyslogPrint (int, const msg_item_t *, const char *);
 #endif
 
 /*****************************************************************************
@@ -359,49 +360,42 @@ static void Close( vlc_object_t *p_this )
 /**
  * Log a message
  */
-static void Overflow (void *opaque, const msg_item_t *p_item)
+static void Overflow (void *opaque, int type, const msg_item_t *p_item,
+                      const char *format, va_list ap)
 {
     intf_thread_t *p_intf = opaque;
     intf_sys_t *p_sys = p_intf->p_sys;
+    char *str;
 
+    /* TODO: cache value... */
     int verbosity = var_InheritInteger( p_intf, "log-verbose" );
     if (verbosity == -1)
         verbosity = var_InheritInteger( p_intf, "verbose" );
 
-    switch( p_item->i_type )
-    {
-        case VLC_MSG_INFO:
-        case VLC_MSG_ERR:
-            if( verbosity < 0 ) return;
-            break;
-        case VLC_MSG_WARN:
-            if( verbosity < 1 ) return;
-            break;
-        case VLC_MSG_DBG:
-            if( verbosity < 2 ) return;
-            break;
-    }
-
+    if( verbosity < 0 || verbosity < (type - VLC_MSG_ERR)
+     || vasprintf( &str, format, ap) == -1 )
+        return;
 
     int canc = vlc_savecancel();
 
     switch( p_sys->i_mode )
     {
         case MODE_HTML:
-            HtmlPrint( p_item, p_sys->p_file );
+            HtmlPrint( p_sys->p_file, type, p_item, str );
             break;
 #ifdef HAVE_SYSLOG_H
         case MODE_SYSLOG:
-            SyslogPrint( p_item );
+            SyslogPrint( type, p_item, str );
             break;
 #endif
         case MODE_TEXT:
         default:
-            TextPrint( p_item, p_sys->p_file );
+            TextPrint( p_sys->p_file, type, p_item, str );
             break;
     }
 
     vlc_restorecancel( canc );
+    free( str );
 }
 
 static const char ppsz_type[4][11] = {
@@ -411,29 +405,31 @@ static const char ppsz_type[4][11] = {
     " debug: ",
 };
 
-static void TextPrint( const msg_item_t *p_msg, FILE *p_file )
+static void TextPrint( FILE *stream, int type, const msg_item_t *item,
+                       const char *str )
 {
-    utf8_fprintf( p_file, "%s%s%s\n", p_msg->psz_module,
-                  ppsz_type[p_msg->i_type], p_msg->psz_msg );
+    utf8_fprintf( stream, "%s%s%s\n", item->psz_module,
+                  ppsz_type[type], str );
 }
 
 #ifdef HAVE_SYSLOG_H
-static void SyslogPrint( const msg_item_t *p_msg )
+static void SyslogPrint( int type, const msg_item_t *item, const char *str )
 {
     static const int i_prio[4] = { LOG_INFO, LOG_ERR, LOG_WARNING, LOG_DEBUG };
-    int i_priority = i_prio[p_msg->i_type];
+    int i_priority = i_prio[type];
 
-    if( p_msg->psz_header )
-        syslog( i_priority, "[%s] %s%s%s", p_msg->psz_header,
-                p_msg->psz_module, ppsz_type[p_msg->i_type], p_msg->psz_msg );
+    if( item->psz_header != NULL )
+        syslog( i_priority, "[%s] %s%s%s", item->psz_header,
+                item->psz_module, ppsz_type[type], str );
     else
         syslog( i_priority, "%s%s%s",
-                p_msg->psz_module, ppsz_type[p_msg->i_type], p_msg->psz_msg );
+                item->psz_module, ppsz_type[type], str );
  
 }
 #endif
 
-static void HtmlPrint( const msg_item_t *p_msg, FILE *p_file )
+static void HtmlPrint( FILE *stream, int type, const msg_item_t *item,
+                       const char *str )
 {
     static const char ppsz_color[4][30] = {
         "<span style=\"color: #ffffff\">",
@@ -442,7 +438,6 @@ static void HtmlPrint( const msg_item_t *p_msg, FILE *p_file )
         "<span style=\"color: #aaaaaa\">",
     };
 
-    fprintf( p_file, "%s%s%s%s</span>\n", p_msg->psz_module,
-             ppsz_type[p_msg->i_type], ppsz_color[p_msg->i_type],
-             p_msg->psz_msg );
+    fprintf( stream, "%s%s%s%s</span>\n", item->psz_module,
+             ppsz_type[type], ppsz_color[type], str );
 }
