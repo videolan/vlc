@@ -110,30 +110,27 @@ static inline void *realloc_down( void *ptr, size_t size )
 
 #define TAB_FIND( count, tab, p, index )        \
   do {                                          \
-        int _i_;                                \
-        (index) = -1;                           \
-        for( _i_ = 0; _i_ < (count); _i_++ )    \
+    (index) = -1;                               \
+    for( int i = 0; i < (count); i++ )          \
+        if( (tab)[i] == (p) )                   \
         {                                       \
-            if( (tab)[_i_] == (p) )             \
-            {                                   \
-                (index) = _i_;                  \
-                break;                          \
-            }                                   \
+            (index) = i;                        \
+            break;                              \
         }                                       \
   } while(0)
 
 
 #define TAB_REMOVE( count, tab, p )             \
   do {                                          \
-        int _i_index_;                          \
-        TAB_FIND( count, tab, p, _i_index_ );   \
-        if( _i_index_ >= 0 )                    \
+        int i_index;                            \
+        TAB_FIND( count, tab, p, i_index );     \
+        if( i_index >= 0 )                      \
         {                                       \
             if( (count) > 1 )                   \
             {                                   \
-                memmove( ((void**)(tab) + _i_index_),    \
-                         ((void**)(tab) + _i_index_+1),  \
-                         ( (count) - _i_index_ - 1 ) * sizeof( void* ) );\
+                memmove( ((void**)(tab) + i_index),    \
+                         ((void**)(tab) + i_index+1),  \
+                         ( (count) - i_index - 1 ) * sizeof( void* ) );\
             }                                   \
             (count)--;                          \
             if( (count) == 0 )                  \
@@ -208,24 +205,6 @@ static inline void *realloc_down( void *ptr, size_t size )
         _ARRAY_ALLOC(array, (int)(array.i_alloc * 1.5) )                    \
 }
 
-#define _ARRAY_GROW(array,additional) {                                     \
-     int i_first = (array).i_alloc;                                         \
-     while( (array).i_alloc - i_first < additional )                        \
-     {                                                                      \
-         if( (array).i_alloc < 10 )                                         \
-            _ARRAY_ALLOC(array, 10 )                                        \
-        else if( (array).i_alloc == (array).i_size )                        \
-            _ARRAY_ALLOC(array, (int)((array).i_alloc * 1.5) )              \
-        else break;                                                         \
-     }                                                                      \
-}
-
-#define _ARRAY_SHRINK(array) {                                              \
-    if( (array).i_size > 10 && (array).i_size < (int)((array).i_alloc / 1.5) ) {  \
-        _ARRAY_ALLOC(array, (array).i_size + 5);                            \
-    }                                                                       \
-}
-
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
 
 /* API */
@@ -268,6 +247,12 @@ static inline void *realloc_down( void *ptr, size_t size )
     (array).p_elems[pos] = elem;                                            \
     (array).i_size++;                                                       \
   } while(0)
+
+#define _ARRAY_SHRINK(array) {                                              \
+    if( (array).i_size > 10 && (array).i_size < (int)((array).i_alloc / 1.5) ) {  \
+        _ARRAY_ALLOC(array, (array).i_size + 5);                            \
+    }                                                                       \
+}
 
 #define ARRAY_REMOVE(array,pos)                                             \
   do {                                                                      \
