@@ -344,13 +344,10 @@ case "${host_os}" in
     esac
 
     if test "${SYS}" = "mingw32"; then
-        # add ws2_32 for closesocket, select, recv
-        VLC_ADD_LIBS([libvlccore],[-lws2_32 -lnetapi32 -lwinmm])
+        VLC_ADD_LIBS([libvlccore],[-lnetapi32 -lwinmm])
         VLC_ADD_LDFLAGS([vlc],[-mwindows])
         VLC_ADD_LIBS([win32text],[-lgdi32])
         VLC_ADD_LIBS([cdda vcdx sdl_image vout_sdl],[-lwinmm])
-        VLC_ADD_LIBS([access_http access_mms access_udp access_tcp access_ftp access_rtmp access_output_udp access_output_shout access_output_rtmp sap stream_out_standard stream_out_select stream_out_rtp stream_out_raop vod_rtsp access_realrtsp oldrc netsync gnutls growl_udp flac ts audioscrobbler lua remoteosd zvbi audiobargraph_a netsync],[-lws2_32])
-        SOCKET_LIBS="-lws2_32"
         dnl
         dnl DEP and ASLR options
         dnl
@@ -380,9 +377,6 @@ case "${host_os}" in
 
     fi
     if test "${SYS}" = "mingwce"; then
-        # add ws2 for closesocket, select, recv
-        VLC_ADD_LIBS([libvlccore access_http access_mms access_udp access_tcp access_ftp access_rtmp access_output_udp access_output_rtmp sap netsync audioscrobbler growl stream_out_standard stream_out_select stream_out_rtp remoteosd ts audiobargraph_a netsync],[-lws2])
-        SOCKET_LIBS="-lws2"
         VLC_ADD_LIBS([libvlccore],[-lmmtimer])
         AC_CHECK_PROGS(U2D, [unix2dos todos], unix2dos)
         ac_default_prefix="`pwd`/_wince"
@@ -593,14 +587,34 @@ AC_CHECK_FUNCS([accept4 pipe2 eventfd vmsplice sched_getaffinity])
 
 AH_BOTTOM([#include <vlc_fixups.h>])
 
-AC_CHECK_FUNCS(connect,,[
-  AC_CHECK_LIB(socket,connect,[
-    VLC_ADD_LIBS([libvlccore cdda access_http access_mms access_udp access_tcp access_ftp access_rtmp sap access_output_udp access_output_rtmp stream_out_standard growl_udp remoteosd netsync],[-lsocket])
-    SOCKET_LIBS="-lsocket"
+dnl Check for poll
+AC_SEARCH_LIBS(poll, [poll], [
+  AC_DEFINE(HAVE_POLL, 1, [Define to 1 if the OS has poll().])
+], [
+  AS_IF([test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"], [
+    AC_MSG_ERROR([poll() is required.])
   ])
 ])
-AC_SUBST(SOCKET_LIBS)
 
+LIBS_save="$LIBS"
+SOCKET_LIBS=""
+AC_SEARCH_LIBS(connect, [socket], [
+  AS_IF([test "$ac_cv_search_connect" != "none required"], [
+    SOCKET_LIBS="$ac_cv_search_connect"
+  ])
+], [
+  AS_IF([test "${SYS}" = "mingw32"], [
+    SOCKET_LIBS="-lws2_32"
+  ])
+  AS_IF([test "${SYS}" = "mingwce"], [
+    SOCKET_LIBS="-lws2"
+  ])
+])
+LIBS="$LIBS_save"
+AS_IF([test -n "$SOCKET_LIBS"], [
+  VLC_ADD_LIBS([libvlccore cdda access_http access_mms access_udp access_tcp access_ftp access_rtmp sap access_output_udp access_output_rtmp stream_out_standard growl_udp remoteosd netsync],[${SOCKET_LIBS}])
+])
+AC_SUBST(SOCKET_LIBS)
 
 dnl Check for socklen_t
 AH_TEMPLATE(socklen_t, [Define to `int' if <sys/socket.h> does not define.])
@@ -788,14 +802,6 @@ dnl LP64 and LLP64 architectures had better define ssize_t by themselves...
 AH_TEMPLATE(ssize_t, [Define to `int' if <stddef.h> does not define.])
 AC_CHECK_TYPE(ssize_t,, [
   AC_DEFINE(ssize_t, int)
-])
-
-dnl Check for poll
-AC_SEARCH_LIBS(poll, [poll], [AC_DEFINE(HAVE_POLL, 1, [Define to 1 if the OS is usabl... err, has poll().])], [
-if test ${SYS} != "mingw32" -a ${SYS} != "mingwce"
-then
-    AC_MSG_WARN([Your platform does not support poll(). VLC has it's own poll() implementation, but it is only intended to be used on Windows. VLC might crash or be insecure when you see this message. Either switch to an OS with a proper poll() implementation, or implement one for your OS in VLC])
-fi
 ])
 
 dnl Check for threads library
