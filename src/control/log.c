@@ -37,14 +37,14 @@ struct libvlc_log_t
 
 unsigned libvlc_get_log_verbosity( const libvlc_instance_t *p_instance )
 {
-    assert( p_instance );
-    return p_instance->verbosity;
+    (void) p_instance;
+    return -1;
 }
 
 void libvlc_set_log_verbosity( libvlc_instance_t *p_instance, unsigned level )
 {
-    assert( p_instance );
-    p_instance->verbosity = level;
+    (void) p_instance;
+    (void) level;
 }
 
 libvlc_log_t *libvlc_log_open( libvlc_instance_t *p_instance )

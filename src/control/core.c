@@ -67,7 +67,6 @@ libvlc_instance_t * libvlc_new( int argc, const char *const *argv )
     p_new->libvlc_vlm.p_event_manager = NULL;
     p_new->libvlc_vlm.pf_release = NULL;
     p_new->ref_count = 1;
-    p_new->verbosity = 1;
     p_new->p_callback_list = NULL;
     vlc_mutex_init(&p_new->instance_lock);
     var_Create( p_libvlc_int, "http-user-agent",

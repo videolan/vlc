@@ -312,19 +312,23 @@ LIBVLC_API const char * libvlc_event_type_name( libvlc_event_type_t event_type )
  */
 
 /**
- * Return the VLC messaging verbosity level.
+ * Always returns minus one.
+ * This function is only provided for backward compatibility.
  *
- * \param p_instance libvlc instance
- * \return verbosity level for messages
+ * \param p_instance ignored
+ * \return always -1
  */
+LIBVLC_DEPRECATED
 LIBVLC_API unsigned libvlc_get_log_verbosity( const libvlc_instance_t *p_instance );
 
 /**
- * Set the VLC messaging verbosity level.
+ * This function does nothing.
+ * It is only provided for backward compatibility.
  *
- * \param p_instance libvlc log instance
- * \param level log level
+ * \param p_instance ignored
+ * \param level ignored
  */
+LIBVLC_DEPRECATED
 LIBVLC_API void libvlc_set_log_verbosity( libvlc_instance_t *p_instance, unsigned level );
 
 /**
