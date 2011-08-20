@@ -328,74 +328,81 @@ LIBVLC_API unsigned libvlc_get_log_verbosity( const libvlc_instance_t *p_instanc
 LIBVLC_API void libvlc_set_log_verbosity( libvlc_instance_t *p_instance, unsigned level );
 
 /**
- * Open a VLC message log instance.
+ * This function does nothing useful.
+ * It is only provided for backward compatibility.
  *
  * \param p_instance libvlc instance
- * \return log message instance or NULL on error
+ * \return an unique pointer or NULL on error
  */
+LIBVLC_DEPRECATED
 LIBVLC_API libvlc_log_t *libvlc_log_open( libvlc_instance_t *p_instance );
 
 /**
- * Close a VLC message log instance.
+ * Frees memory allocated by libvlc_log_open().
  *
  * \param p_log libvlc log instance or NULL
  */
+LIBVLC_DEPRECATED
 LIBVLC_API void libvlc_log_close( libvlc_log_t *p_log );
 
 /**
- * Returns the number of messages in a log instance.
+ * Always returns zero.
+ * This function is only provided for backward compatibility.
  *
- * \param p_log libvlc log instance or NULL
- * \return number of log messages, 0 if p_log is NULL
+ * \param p_log ignored
+ * \return always zero
  */
+LIBVLC_DEPRECATED
 LIBVLC_API unsigned libvlc_log_count( const libvlc_log_t *p_log );
 
 /**
- * Clear a log instance.
+ * This function does nothing.
+ * It is only provided for backward compatibility.
  *
- * All messages in the log are removed. The log should be cleared on a
- * regular basis to avoid clogging.
- *
- * \param p_log libvlc log instance or NULL
+ * \param p_log ignored
  */
+LIBVLC_DEPRECATED
 LIBVLC_API void libvlc_log_clear( libvlc_log_t *p_log );
 
 /**
- * Allocate and returns a new iterator to messages in log.
+ * This function does nothing useful.
+ * It is only provided for backward compatibility.
  *
- * \param p_log libvlc log instance
- * \return log iterator object or NULL on error
+ * \param p_log ignored
+ * \return an unique pointer or NULL on error or if the parameter was NULL
  */
+LIBVLC_DEPRECATED
 LIBVLC_API libvlc_log_iterator_t *libvlc_log_get_iterator( const libvlc_log_t *p_log );
 
 /**
- * Release a previoulsy allocated iterator.
+ * Frees memory allocated by libvlc_log_get_iterator().
  *
  * \param p_iter libvlc log iterator or NULL
  */
+LIBVLC_DEPRECATED
 LIBVLC_API void libvlc_log_iterator_free( libvlc_log_iterator_t *p_iter );
 
 /**
- * Return whether log iterator has more messages.
+ * Always returns zero.
+ * This function is only provided for backward compatibility.
  *
- * \param p_iter libvlc log iterator or NULL
- * \return true if iterator has more message objects, else false
- *
- * \libvlc_return_bool
+ * \param p_iter ignored
+ * \return always zero
  */
+LIBVLC_DEPRECATED
 LIBVLC_API int libvlc_log_iterator_has_next( const libvlc_log_iterator_t *p_iter );
 
 /**
- * Return the next log message.
- *
- * The message contents must not be freed
+ * Always returns NULL.
+ * This function is only provided for backward compatibility.
  *
  * \param p_iter libvlc log iterator or NULL
- * \param p_buffer log buffer
- * \return log message object or NULL if none left
+ * \param p_buffer ignored
+ * \return always NULL
  */
+LIBVLC_DEPRECATED
 LIBVLC_API libvlc_log_message_t *libvlc_log_iterator_next( libvlc_log_iterator_t *p_iter,
-                                                               libvlc_log_message_t *p_buffer );
+                                                           libvlc_log_message_t *p_buffer );
 
 /** @} */
 
