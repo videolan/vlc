@@ -432,19 +432,7 @@ net_IPv6Join (vlc_object_t *obj, int fd, const struct sockaddr_in6 *src)
 #  warning Your C headers are out-of-date. Please update.
 
 #  define MCAST_JOIN_GROUP 41
-struct group_req
-{
-    ULONG gr_interface;
-    struct sockaddr_storage gr_group;
-};
-
 #  define MCAST_JOIN_SOURCE_GROUP 45 /* from <ws2ipdef.h> */
-struct group_source_req
-{
-    uint32_t gsr_interface;
-    struct sockaddr_storage gsr_group;
-    struct sockaddr_storage gsr_source;
-};
 #endif
 
 /**
