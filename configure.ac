@@ -596,6 +596,17 @@ AC_SEARCH_LIBS(poll, [poll], [
   ])
 ])
 
+dnl Check for struct pollfd
+AC_CHECK_TYPES([struct pollfd],,,
+[#include <sys/types.h>
+#if HAVE_POLL
+# include <poll.h>
+#elif defined (WIN32)
+# include <winsock2.h>
+#endif
+])
+
+dnl Check for connect
 LIBS_save="$LIBS"
 SOCKET_LIBS=""
 AC_SEARCH_LIBS(connect, [socket], [
