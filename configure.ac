@@ -179,7 +179,6 @@ dnl
 dnl  Set default values
 dnl
 LDFLAGS_vlc="${LDFLAGS}"
-SOCKET_LIBS=""
 
 dnl
 dnl  Check the operating system
@@ -623,7 +622,7 @@ AC_SEARCH_LIBS(connect, [socket], [
 ])
 LIBS="$LIBS_save"
 AS_IF([test -n "$SOCKET_LIBS"], [
-  VLC_ADD_LIBS([libvlccore cdda access_http access_mms access_udp access_tcp access_ftp access_rtmp sap access_output_udp access_output_rtmp stream_out_standard growl_udp remoteosd netsync],[${SOCKET_LIBS}])
+  VLC_ADD_LIBS([libvlccore access_http access_mms access_udp access_tcp access_ftp access_rtmp access_output_udp access_output_shout sap stream_out_standard stream_out_rtp stream_out_raop vod_rtsp access_realrtsp rtp oldrc netsync gnutls growl_udp flac ts audioscrobbler lua remoteosd zvbi audiobargraph_a netsync],[${SOCKET_LIBS}])
 ])
 AC_SUBST(SOCKET_LIBS)
 
