@@ -187,7 +187,21 @@ static int Create( vlc_object_t *p_this )
     {
         input_attachment_t *p_attach = pp_attachments[k];
 
+        bool found = false;
+
+        /* Check mimetype*/
         if( !strcasecmp( p_attach->psz_mime, "application/x-truetype-font" ) )
+            found = true;
+        /* Then extension */
+        else if( !found && strlen( p_attach->psz_name ) > 4 )
+        {
+            char *ext = p_attach->psz_name + strlen( p_attach->psz_name ) - 4;
+
+            if( !strcasecmp( ext, ".ttf" ) || !strcasecmp( ext, ".otf" ) || !strcasecmp( ext, ".ttc" ) )
+                found = true;
+        }
+
+        if( found )
         {
             msg_Dbg( p_dec, "adding embedded font %s", p_attach->psz_name );
 
