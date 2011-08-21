@@ -113,7 +113,7 @@ void vlc_Unsubscribe (msg_subscription_t *sub)
 
 /**
  * Emit a log message.
- * \param obj VLC object emitting the message
+ * \param obj VLC object emitting the message or NULL
  * \param type VLC_MSG_* message type (info, error, warning or debug)
  * \param module name of module from which the message come
  *               (normally MODULE_STRING)
@@ -140,9 +140,7 @@ static void PrintMsg (void *, int, const msg_item_t *, const char *, va_list);
 void vlc_vaLog (vlc_object_t *obj, int type, const char *module,
                 const char *format, va_list args)
 {
-    assert (obj != NULL);
-
-    if (obj->i_flags & OBJECT_FLAGS_QUIET)
+    if (obj != NULL && obj->i_flags & OBJECT_FLAGS_QUIET)
         return;
 
     /* C locale to get error messages in English in the logs */
@@ -209,7 +207,7 @@ void vlc_vaLog (vlc_object_t *obj, int type, const char *module,
     msg_item_t msg;
 
     msg.i_object_id = (uintptr_t)obj;
-    msg.psz_object_type = obj->psz_object_type;
+    msg.psz_object_type = (obj != NULL) ? obj->psz_object_type : "generic";
     msg.psz_module = module;
     msg.psz_header = NULL;
 
