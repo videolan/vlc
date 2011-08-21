@@ -144,7 +144,7 @@ typedef struct
     HANDLE   handle;
     unsigned clock;
 } vlc_cond_t;
-#define VLC_STATIC_COND { 0, 0, 0 }
+#define VLC_STATIC_COND { 0, 0 }
 
 typedef HANDLE  vlc_sem_t;
 
