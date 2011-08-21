@@ -3353,14 +3353,12 @@ AC_ARG_ENABLE(direct2d,
   ])
 ])
 AS_IF([test "${enable_direct2d}" != "no"], [
-  AC_LANG_PUSH([C++])
   AC_CHECK_HEADERS(d2d1.h, [
     VLC_ADD_PLUGIN([direct2d])
     VLC_ADD_LIBS([direct2d],[-lgdi32 -lole32])
   ], [
     AC_MSG_WARN([Cannot find Direct2D headers!])
   ])
-  AC_LANG_POP([C++])
 ])
 
 dnl
