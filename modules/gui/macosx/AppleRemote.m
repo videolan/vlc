@@ -102,7 +102,7 @@ static AppleRemote *_o_sharedInstance = nil;
         }
         else if( OSX_LION )
         {
-            /* omg, keys from the future */
+            /* Lion cookies */
             msg_Dbg( VLCIntf, "using future AR cookies" );
             [cookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonVolume_Plus]    forKey:@"33_31_30_21_20_2_"];
             [cookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonVolume_Minus]   forKey:@"33_32_30_21_20_2_"];
@@ -120,7 +120,7 @@ static AppleRemote *_o_sharedInstance = nil;
         }
         else
         {
-            /* current Snow Leopard cookies */
+            /* 10.6.2+ Snow Leopard cookies */
             msg_Dbg( VLCIntf, "using Snow Leopard AR cookies" );
             [cookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonVolume_Plus]    forKey:@"33_31_30_21_20_2_"];
             [cookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonVolume_Minus]   forKey:@"33_32_30_21_20_2_"];

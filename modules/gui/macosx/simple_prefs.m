@@ -107,6 +107,8 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
 
     if (OSX_LION)
         [o_sprefs_win setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
+    else
+        [o_intf_nativefullscreen_ckb setEnabled:NO];
 
     /* setup useful stuff */
     o_hotkeysNonUseableKeys = [[NSArray arrayWithObjects: @"Command-c", @"Command-x", @"Command-v", @"Command-a", @"Command-," , @"Command-h", @"Command-Alt-h", @"Command-Shift-o", @"Command-o", @"Command-d", @"Command-n", @"Command-s", @"Command-z", @"Command-l", @"Command-r", @"Command-3", @"Command-m", @"Command-w", @"Command-Shift-w", @"Command-Shift-c", @"Command-Shift-p", @"Command-i", @"Command-e", @"Command-Shift-e", @"Command-b", @"Command-Shift-m", @"Command-Ctrl-m", @"Command-?", @"Command-Alt-?", nil] retain];
@@ -233,6 +235,7 @@ create_toolbar_item( NSString * o_itemIdent, NSString * o_name, NSString * o_des
     [o_intf_style_bright_bcell setTitle: _NS("Bright")];
     [o_intf_art_txt setStringValue: _NS("Album art download policy")];
     [o_intf_embedded_ckb setTitle: _NS("Show video within the main window")];
+    [o_intf_nativefullscreen_ckb setTitle: _NS("Use the native fullscreen mode on OS X Lion")];
     [o_intf_fspanel_ckb setTitle: _NS("Show Fullscreen Controller")];
     [o_intf_lang_txt setStringValue: _NS("Language")];
     [o_intf_network_box setTitle: _NS("Privacy / Network Interaction")];
@@ -428,6 +431,7 @@ static inline char * __config_GetLabel( vlc_object_t *p_this, const char *psz_na
     [self setupButton: o_intf_art_pop forIntList: "album-art"];
 
     [self setupButton: o_intf_fspanel_ckb forBoolValue: "macosx-fspanel"];
+    [self setupButton: o_intf_nativefullscreen_ckb forBoolValue: "macosx-nativefullscreenmode"];
     [self setupButton: o_intf_embedded_ckb forBoolValue: "embedded-video"];
 	[self setupButton: o_intf_appleremote_ckb forBoolValue: "macosx-appleremote"];
 	[self setupButton: o_intf_mediakeys_ckb forBoolValue: "macosx-mediakeys"];
@@ -778,6 +782,7 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
 		config_PutInt( p_intf, "macosx-appleremote", [o_intf_appleremote_ckb state] );
         config_PutInt( p_intf, "macosx-mediakeys", [o_intf_mediakeys_ckb state] );
         config_PutInt( p_intf, "macosx-interfacestyle", [o_intf_style_dark_bcell state] );
+        config_PutInt( p_intf, "macosx-nativefullscreenmode", [o_intf_nativefullscreen_ckb state] );
         if( [o_intf_enableGrowl_ckb state] == NSOnState )
         {
             tmpString = getString( "control" );

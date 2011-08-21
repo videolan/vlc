@@ -109,6 +109,7 @@ struct intf_sys_t
     BOOL nib_coredialogs_loaded; /* CoreDialogs nibfile */
     BOOL nib_bookmarks_loaded;   /* Bookmarks nibfile */
     BOOL b_active_videoplayback;
+    BOOL b_nativeFullscreenMode;
 
     VLCMainWindow *o_mainwindow;            /* VLCMainWindow */
 

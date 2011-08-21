@@ -98,6 +98,7 @@
     IBOutlet id o_intf_update_ckb;
     IBOutlet id o_intf_last_update_lbl;
     IBOutlet id o_intf_enableGrowl_ckb;
+    IBOutlet id o_intf_nativefullscreen_ckb;
 
     IBOutlet id o_osd_encoding_pop;
     IBOutlet id o_osd_encoding_txt;

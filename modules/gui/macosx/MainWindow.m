@@ -107,6 +107,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 {
     /* setup the styled interface */
     b_dark_interface = config_GetInt( VLCIntf, "macosx-interfacestyle" );
+    b_nativeFullscreenMode = config_GetInt( VLCIntf, "macosx-nativefullscreenmode" );
     i_lastShownVolume = -1;
 
     [o_play_btn setToolTip: _NS("Play/Pause")];
@@ -156,7 +157,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
         [o_volume_down_btn setImage: [NSImage imageNamed:@"volume-low"]];
         [o_volume_track_view setImage: [NSImage imageNamed:@"volume-slider-track"]];
         [o_volume_up_btn setImage: [NSImage imageNamed:@"volume-high"]];
-        if (OSX_LION)
+        if (OSX_LION && b_nativeFullscreenMode)
         {
             [o_effects_btn setImage: [NSImage imageNamed:@"effects-one-button"]];
             [o_effects_btn setAlternateImage: [NSImage imageNamed:@"effects-one-button-blue"]];
@@ -203,7 +204,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
         [o_volume_down_btn setImage: [NSImage imageNamed:@"volume-low_dark"]];
         [o_volume_track_view setImage: [NSImage imageNamed:@"volume-slider-track_dark"]];
         [o_volume_up_btn setImage: [NSImage imageNamed:@"volume-high_dark"]];
-        if (OSX_LION)
+        if (OSX_LION && b_nativeFullscreenMode)
         {
             [o_effects_btn setImage: [NSImage imageNamed:@"effects-one-button_dark"]];
             [o_effects_btn setAlternateImage: [NSImage imageNamed:@"effects-one-button-blue_dark"]];
@@ -236,7 +237,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [o_temp_view setAutoresizingMask:NSViewHeightSizable | NSViewWidthSizable];
     [o_dropzone_view setFrame: [o_playlist_table frame]];
     [o_left_split_view setFrame: [o_sidebar_view frame]];
-    if (OSX_LION)
+    if (OSX_LION && b_nativeFullscreenMode)
     {
         [self setCollectionBehavior: NSWindowCollectionBehaviorFullScreenPrimary];
         NSRect frame;
@@ -908,7 +909,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
 - (void)resizeWindow
 {
-    if ( !b_fullscreen && !(OSX_LION && [NSApp currentSystemPresentationOptions] == NSApplicationPresentationFullScreen) )
+    if ( !b_fullscreen && !(OSX_LION && [NSApp currentSystemPresentationOptions] == NSApplicationPresentationFullScreen && b_nativeFullscreenMode) )
     {
         NSPoint topleftbase;
         NSPoint topleftscreen;

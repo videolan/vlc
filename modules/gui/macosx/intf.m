@@ -305,6 +305,8 @@ static int InputEvent( vlc_object_t *p_this, const char *psz_var,
             break;
 
         case INPUT_EVENT_ABORT:
+            [[VLCMain sharedInstance] updateName];
+            [[VLCMain sharedInstance] updatePlaybackPosition];
             break;
 
         default:
@@ -597,6 +599,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     [o_remote setDelegate: _o_sharedMainInstance];
 
     /* yeah, we are done */
+    b_nativeFullscreenMode = config_GetInt( p_intf, "macosx-nativefullscreenmode" );
     nib_main_loaded = TRUE;
 }
 
@@ -1242,7 +1245,7 @@ unsigned int CocoaKeyToVLC( unichar i_key )
     playlist_t * p_playlist = pl_Get( VLCIntf );
     BOOL b_fullscreen = var_GetBool( p_playlist, "fullscreen" );
 
-    if (OSX_LION)
+    if (OSX_LION && b_nativeFullscreenMode)
     {
         [o_mainwindow toggleFullScreen: self];
         if(b_fullscreen)
@@ -1334,6 +1337,7 @@ unsigned int CocoaKeyToVLC( unichar i_key )
     [self playbackStatusUpdated];
     [o_playlist playlistUpdated];
     [o_mainwindow updateWindow];
+    [o_mainwindow updateName];
 }
 
 - (void)updateRecordState: (BOOL)b_value

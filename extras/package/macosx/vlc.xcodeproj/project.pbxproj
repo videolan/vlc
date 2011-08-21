@@ -434,7 +434,6 @@
 		CC448A6313B68A0B009F72E0 /* MainWindow.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = MainWindow.m; path = ../../../modules/gui/macosx/MainWindow.m; sourceTree = "<group>"; };
 		CC4A33210F8CB017000FC4A7 /* coredialogs.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = coredialogs.m; path = ../../../modules/gui/macosx/coredialogs.m; sourceTree = SOURCE_ROOT; };
 		CC4A33220F8CB017000FC4A7 /* coredialogs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = coredialogs.h; path = ../../../modules/gui/macosx/coredialogs.h; sourceTree = SOURCE_ROOT; };
-		CC4D67F51348F587003FCC5B /* quartztext.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = quartztext.c; path = ../../../modules/misc/text_renderer/quartztext.c; sourceTree = "<group>"; };
 		CC4D67F71348F601003FCC5B /* darwin_specific.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = darwin_specific.c; path = ../../../src/posix/darwin_specific.c; sourceTree = "<group>"; };
 		CC4ED9AD0ABE07C800CA4CC5 /* add_embedded.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = add_embedded.png; path = Resources/add_embedded.png; sourceTree = "<group>"; };
 		CC4ED9AF0ABE07C800CA4CC5 /* repeat_embedded.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = repeat_embedded.png; path = Resources/repeat_embedded.png; sourceTree = "<group>"; };
@@ -464,6 +463,8 @@
 		CC772DAC10E621C100675C9B /* VLCProgressPanel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCProgressPanel.h; path = ../../../modules/gui/macosx_dialog_provider/VLCProgressPanel.h; sourceTree = SOURCE_ROOT; };
 		CC772DAD10E621C100675C9B /* VLCProgressPanel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VLCProgressPanel.m; path = ../../../modules/gui/macosx_dialog_provider/VLCProgressPanel.m; sourceTree = SOURCE_ROOT; };
 		CC78DA4313DE056700E9603C /* topbar_background.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = topbar_background.png; path = Resources/mainwindow/topbar_background.png; sourceTree = "<group>"; };
+		CC79F66614014FC30015D89E /* opengl.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = opengl.h; path = ../../../modules/video_output/opengl.h; sourceTree = "<group>"; };
+		CC79F66714014FDC0015D89E /* quartztext.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = quartztext.c; path = ../../../modules/text_renderer/quartztext.c; sourceTree = "<group>"; };
 		CC8062631021F8790021EB9A /* dsa_pub.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = dsa_pub.pem; path = Resources/dsa_pub.pem; sourceTree = "<group>"; };
 		CC84FB2C130083BB00816D38 /* BGHUDAppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = BGHUDAppKit.framework; path = ../../contrib/BGHUDAppKit/BGHUDAppKit.framework; sourceTree = SOURCE_ROOT; };
 		CC962E2C0CC7992800A56695 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = /System/Library/Frameworks/WebKit.framework; sourceTree = "<absolute>"; };
@@ -911,7 +912,8 @@
 		CCC8957F0D9A8A61005AE59C /* OSX-specific source files */ = {
 			isa = PBXGroup;
 			children = (
-				CC4D67F51348F587003FCC5B /* quartztext.c */,
+				CC79F66714014FDC0015D89E /* quartztext.c */,
+				CC79F66614014FC30015D89E /* opengl.h */,
 				CC6C01BB0DDF3F0700C7D754 /* opengl.c */,
 				CC4D67F71348F601003FCC5B /* darwin_specific.c */,
 				CC6C01BA0DDF3EEC00C7D754 /* auhal.c */,
