@@ -70,7 +70,7 @@ static void updateProgressPanel (void *, const char *, float);
 static bool checkProgressPanel (void *);
 static void destroyProgressPanel (void *);
 
-static void MsgCallback( void *, const msg_item_t * );
+static void MsgCallback( void *data, int type, const msg_item_t *item, const char *format, va_list ap );
 
 static int InputEvent( vlc_object_t *, const char *,
                       vlc_value_t, vlc_value_t, void * );
@@ -219,19 +219,24 @@ static void Run( intf_thread_t *p_intf )
  * ready to be displayed. We store everything in a NSArray in our Cocoa part
  * of this file.
  *****************************************************************************/
-static void MsgCallback( void *data, const msg_item_t *item )
+static void MsgCallback( void *data, int type, const msg_item_t *item, const char *format, va_list ap )
 {
     int canc = vlc_savecancel();
+    char *str;
 
     /* this may happen from time to time, let's bail out as info would be useless anyway */
-    if( !item->psz_module || !item->psz_msg )
+    if( !item->psz_module || !format )
+        return;
+
+    if (vasprintf( &str, format, ap ) == -1)
         return;
 
     NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
-    [[VLCMain sharedInstance] processReceivedlibvlcMessage: item];
+    [[VLCMain sharedInstance] processReceivedlibvlcMessage: item ofType: type withStr: str];
     [o_pool release];
 
     vlc_restorecancel( canc );
+    free( str );
 }
 
 static int InputEvent( vlc_object_t *p_this, const char *psz_var,
@@ -1769,7 +1774,7 @@ unsigned int CocoaKeyToVLC( unichar i_key )
     }
 }
 
-- (void)processReceivedlibvlcMessage:(const msg_item_t *)item
+- (void)processReceivedlibvlcMessage:(const msg_item_t *) item ofType: (int)i_type withStr: (char *)str
 {
     NSColor *o_white = [NSColor whiteColor];
     NSColor *o_red = [NSColor redColor];
@@ -1781,8 +1786,6 @@ unsigned int CocoaKeyToVLC( unichar i_key )
 
     NSDictionary *o_attr;
     NSAttributedString *o_msg_color;
-
-    int i_type = item->i_type;
 
     [o_msg_lock lock];
 
@@ -1797,7 +1800,7 @@ unsigned int CocoaKeyToVLC( unichar i_key )
     [o_msg_arr addObject: [o_msg_color autorelease]];
 
     o_attr = [NSDictionary dictionaryWithObject: pp_color[i_type] forKey: NSForegroundColorAttributeName];
-    o_msg_color = [[NSAttributedString alloc] initWithString: [NSString stringWithFormat: @"%s\n", item->psz_msg] attributes: o_attr];
+    o_msg_color = [[NSAttributedString alloc] initWithString: [NSString stringWithFormat: @"%s\n", str] attributes: o_attr];
     [o_msg_arr addObject: [o_msg_color autorelease]];
 
     b_msg_arr_changed = YES;
