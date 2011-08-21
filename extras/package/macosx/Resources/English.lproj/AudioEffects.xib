@@ -21,7 +21,7 @@
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="80"/>
+			<integer value="1"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -46,7 +46,7 @@
 			<object class="NSWindowTemplate" id="1005">
 				<int key="NSWindowStyleMask">8211</int>
 				<int key="NSWindowBacking">2</int>
-				<string key="NSWindowRect">{{196, 280}, {426, 230}}</string>
+				<string key="NSWindowRect">{{196, 289}, {409, 220}}</string>
 				<int key="NSWTFlags">-260571136</int>
 				<string key="NSWindowTitle">Audio Effects</string>
 				<string key="NSWindowClass">NSPanel</string>
@@ -60,7 +60,7 @@
 						<object class="BGHUDTabView" id="876119583">
 							<reference key="NSNextResponder" ref="1006"/>
 							<int key="NSvFlags">18</int>
-							<string key="NSFrameSize">{424, 224}</string>
+							<string key="NSFrame">{{-7, -10}, {424, 223}}</string>
 							<reference key="NSSuperview" ref="1006"/>
 							<object class="NSMutableArray" key="NSTabViewItems">
 								<bool key="EncodedWithXMLCoder">YES</bool>
@@ -318,7 +318,7 @@
 											<object class="NSPopUpButton" id="931005261">
 												<reference key="NSNextResponder" ref="327218412"/>
 												<int key="NSvFlags">268</int>
-												<string key="NSFrame">{{193, 154}, {155, 22}}</string>
+												<string key="NSFrame">{{193, 153}, {155, 22}}</string>
 												<reference key="NSSuperview" ref="327218412"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="BGHUDPopUpButtonCell" key="NSCell" id="550017305">
@@ -541,7 +541,7 @@
 											<object class="NSButton" id="182341567">
 												<reference key="NSNextResponder" ref="327218412"/>
 												<int key="NSvFlags">268</int>
-												<string key="NSFrame">{{14, 157}, {80, 18}}</string>
+												<string key="NSFrame">{{14, 156}, {80, 18}}</string>
 												<reference key="NSSuperview" ref="327218412"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="BGHUDButtonCell" key="NSCell" id="784077794">
@@ -570,7 +570,7 @@
 											<object class="NSButton" id="554619921">
 												<reference key="NSNextResponder" ref="327218412"/>
 												<int key="NSvFlags">268</int>
-												<string key="NSFrame">{{106, 157}, {88, 18}}</string>
+												<string key="NSFrame">{{106, 156}, {88, 18}}</string>
 												<reference key="NSSuperview" ref="327218412"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="BGHUDButtonCell" key="NSCell" id="261344303">
@@ -594,7 +594,7 @@
 											<object class="NSSlider" id="465183195">
 												<reference key="NSNextResponder" ref="327218412"/>
 												<int key="NSvFlags">268</int>
-												<string key="NSFrame">{{16, 37}, {19, 101}}</string>
+												<string key="NSFrame">{{16, 36}, {19, 101}}</string>
 												<reference key="NSSuperview" ref="327218412"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="BGHUDSliderCell" key="NSCell" id="1033603998">
@@ -616,7 +616,7 @@
 											<object class="NSSlider" id="132219455">
 												<reference key="NSNextResponder" ref="327218412"/>
 												<int key="NSvFlags">268</int>
-												<string key="NSFrame">{{108, 37}, {19, 101}}</string>
+												<string key="NSFrame">{{108, 36}, {19, 101}}</string>
 												<reference key="NSSuperview" ref="327218412"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="BGHUDSliderCell" key="NSCell" id="315969382">
@@ -638,7 +638,7 @@
 											<object class="NSSlider" id="303266664">
 												<reference key="NSNextResponder" ref="327218412"/>
 												<int key="NSvFlags">268</int>
-												<string key="NSFrame">{{137, 37}, {19, 101}}</string>
+												<string key="NSFrame">{{137, 36}, {19, 101}}</string>
 												<reference key="NSSuperview" ref="327218412"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="BGHUDSliderCell" key="NSCell" id="952935049">
@@ -660,7 +660,7 @@
 											<object class="NSSlider" id="820106195">
 												<reference key="NSNextResponder" ref="327218412"/>
 												<int key="NSvFlags">268</int>
-												<string key="NSFrame">{{166, 37}, {19, 101}}</string>
+												<string key="NSFrame">{{166, 36}, {19, 101}}</string>
 												<reference key="NSSuperview" ref="327218412"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="BGHUDSliderCell" key="NSCell" id="259517504">
@@ -682,7 +682,7 @@
 											<object class="NSSlider" id="459434870">
 												<reference key="NSNextResponder" ref="327218412"/>
 												<int key="NSvFlags">268</int>
-												<string key="NSFrame">{{195, 37}, {19, 101}}</string>
+												<string key="NSFrame">{{195, 36}, {19, 101}}</string>
 												<reference key="NSSuperview" ref="327218412"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="BGHUDSliderCell" key="NSCell" id="314108466">
@@ -704,7 +704,7 @@
 											<object class="NSSlider" id="997864460">
 												<reference key="NSNextResponder" ref="327218412"/>
 												<int key="NSvFlags">268</int>
-												<string key="NSFrame">{{224, 37}, {19, 101}}</string>
+												<string key="NSFrame">{{224, 36}, {19, 101}}</string>
 												<reference key="NSSuperview" ref="327218412"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="BGHUDSliderCell" key="NSCell" id="57982058">
@@ -726,7 +726,7 @@
 											<object class="NSSlider" id="358721570">
 												<reference key="NSNextResponder" ref="327218412"/>
 												<int key="NSvFlags">268</int>
-												<string key="NSFrame">{{253, 37}, {19, 101}}</string>
+												<string key="NSFrame">{{253, 36}, {19, 101}}</string>
 												<reference key="NSSuperview" ref="327218412"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="BGHUDSliderCell" key="NSCell" id="1023325097">
@@ -748,7 +748,7 @@
 											<object class="NSSlider" id="882691691">
 												<reference key="NSNextResponder" ref="327218412"/>
 												<int key="NSvFlags">268</int>
-												<string key="NSFrame">{{282, 37}, {19, 101}}</string>
+												<string key="NSFrame">{{282, 36}, {19, 101}}</string>
 												<reference key="NSSuperview" ref="327218412"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="BGHUDSliderCell" key="NSCell" id="1061795325">
@@ -770,7 +770,7 @@
 											<object class="NSSlider" id="51800310">
 												<reference key="NSNextResponder" ref="327218412"/>
 												<int key="NSvFlags">268</int>
-												<string key="NSFrame">{{311, 37}, {19, 101}}</string>
+												<string key="NSFrame">{{311, 36}, {19, 101}}</string>
 												<reference key="NSSuperview" ref="327218412"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="BGHUDSliderCell" key="NSCell" id="668690250">
@@ -792,7 +792,7 @@
 											<object class="NSSlider" id="870122856">
 												<reference key="NSNextResponder" ref="327218412"/>
 												<int key="NSvFlags">268</int>
-												<string key="NSFrame">{{340, 37}, {19, 101}}</string>
+												<string key="NSFrame">{{340, 36}, {19, 101}}</string>
 												<reference key="NSSuperview" ref="327218412"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="BGHUDSliderCell" key="NSCell" id="149612815">
@@ -814,7 +814,7 @@
 											<object class="NSSlider" id="29054022">
 												<reference key="NSNextResponder" ref="327218412"/>
 												<int key="NSvFlags">268</int>
-												<string key="NSFrame">{{369, 37}, {19, 101}}</string>
+												<string key="NSFrame">{{369, 36}, {19, 101}}</string>
 												<reference key="NSSuperview" ref="327218412"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="BGHUDSliderCell" key="NSCell" id="1005956915">
@@ -834,7 +834,7 @@
 												</object>
 											</object>
 										</object>
-										<string key="NSFrame">{{10, 33}, {404, 178}}</string>
+										<string key="NSFrame">{{10, 33}, {404, 177}}</string>
 									</object>
 									<string key="NSLabel">Graphic Equalizer</string>
 									<reference key="NSColor" ref="423257821"/>
@@ -850,7 +850,7 @@
 											<object class="NSButton" id="360813730">
 												<reference key="NSNextResponder" ref="605508444"/>
 												<int key="NSvFlags">268</int>
-												<string key="NSFrame">{{14, 157}, {375, 18}}</string>
+												<string key="NSFrame">{{14, 156}, {375, 18}}</string>
 												<reference key="NSSuperview" ref="605508444"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="BGHUDButtonCell" key="NSCell" id="438651954">
@@ -890,7 +890,7 @@
 											<object class="NSSlider" id="452050343">
 												<reference key="NSNextResponder" ref="605508444"/>
 												<int key="NSvFlags">268</int>
-												<string key="NSFrame">{{37, 50}, {19, 101}}</string>
+												<string key="NSFrame">{{37, 49}, {19, 101}}</string>
 												<reference key="NSSuperview" ref="605508444"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="BGHUDSliderCell" key="NSCell" id="848483206">
@@ -928,7 +928,7 @@
 											<object class="NSSlider" id="979247831">
 												<reference key="NSNextResponder" ref="605508444"/>
 												<int key="NSvFlags">268</int>
-												<string key="NSFrame">{{89, 50}, {19, 101}}</string>
+												<string key="NSFrame">{{89, 49}, {19, 101}}</string>
 												<reference key="NSSuperview" ref="605508444"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="BGHUDSliderCell" key="NSCell" id="137950649">
@@ -966,7 +966,7 @@
 											<object class="NSSlider" id="287960640">
 												<reference key="NSNextResponder" ref="605508444"/>
 												<int key="NSvFlags">268</int>
-												<string key="NSFrame">{{140, 50}, {19, 101}}</string>
+												<string key="NSFrame">{{140, 49}, {19, 101}}</string>
 												<reference key="NSSuperview" ref="605508444"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="BGHUDSliderCell" key="NSCell" id="38419774">
@@ -1004,7 +1004,7 @@
 											<object class="NSSlider" id="328850867">
 												<reference key="NSNextResponder" ref="605508444"/>
 												<int key="NSvFlags">268</int>
-												<string key="NSFrame">{{193, 50}, {19, 101}}</string>
+												<string key="NSFrame">{{193, 49}, {19, 101}}</string>
 												<reference key="NSSuperview" ref="605508444"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="BGHUDSliderCell" key="NSCell" id="610746211">
@@ -1042,7 +1042,7 @@
 											<object class="NSSlider" id="930805085">
 												<reference key="NSNextResponder" ref="605508444"/>
 												<int key="NSvFlags">268</int>
-												<string key="NSFrame">{{245, 50}, {19, 101}}</string>
+												<string key="NSFrame">{{245, 49}, {19, 101}}</string>
 												<reference key="NSSuperview" ref="605508444"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="BGHUDSliderCell" key="NSCell" id="713767167">
@@ -1080,7 +1080,7 @@
 											<object class="NSSlider" id="259964095">
 												<reference key="NSNextResponder" ref="605508444"/>
 												<int key="NSvFlags">268</int>
-												<string key="NSFrame">{{297, 50}, {19, 101}}</string>
+												<string key="NSFrame">{{297, 49}, {19, 101}}</string>
 												<reference key="NSSuperview" ref="605508444"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="BGHUDSliderCell" key="NSCell" id="1060145376">
@@ -1230,7 +1230,7 @@
 											<object class="NSSlider" id="1026127583">
 												<reference key="NSNextResponder" ref="605508444"/>
 												<int key="NSvFlags">268</int>
-												<string key="NSFrame">{{349, 50}, {19, 101}}</string>
+												<string key="NSFrame">{{349, 49}, {19, 101}}</string>
 												<reference key="NSSuperview" ref="605508444"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="BGHUDSliderCell" key="NSCell" id="417624963">
@@ -1252,7 +1252,7 @@
 											<object class="NSButton" id="235290804">
 												<reference key="NSNextResponder" ref="605508444"/>
 												<int key="NSvFlags">268</int>
-												<string key="NSFrame">{{341, 157}, {46, 17}}</string>
+												<string key="NSFrame">{{341, 156}, {46, 17}}</string>
 												<reference key="NSSuperview" ref="605508444"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="BGHUDButtonCell" key="NSCell" id="846216840">
@@ -1318,7 +1318,7 @@ AADzUQABAAAAARbMY3VydgAAAAAAAAABAc0AAA</bytes>
 												</object>
 											</object>
 										</object>
-										<string key="NSFrame">{{10, 33}, {404, 178}}</string>
+										<string key="NSFrame">{{10, 33}, {404, 177}}</string>
 									</object>
 									<string key="NSLabel">Compressor</string>
 									<reference key="NSColor" ref="423257821"/>
@@ -1334,7 +1334,7 @@ AADzUQABAAAAARbMY3VydgAAAAAAAAABAc0AAA</bytes>
 											<object class="NSButton" id="1069564620">
 												<reference key="NSNextResponder" ref="322923036"/>
 												<int key="NSvFlags">268</int>
-												<string key="NSFrame">{{14, 157}, {375, 18}}</string>
+												<string key="NSFrame">{{14, 156}, {375, 18}}</string>
 												<reference key="NSSuperview" ref="322923036"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="BGHUDButtonCell" key="NSCell" id="471884429">
@@ -1358,7 +1358,7 @@ AADzUQABAAAAARbMY3VydgAAAAAAAAABAc0AAA</bytes>
 											<object class="NSButton" id="188755332">
 												<reference key="NSNextResponder" ref="322923036"/>
 												<int key="NSvFlags">268</int>
-												<string key="NSFrame">{{341, 157}, {46, 17}}</string>
+												<string key="NSFrame">{{341, 156}, {46, 17}}</string>
 												<reference key="NSSuperview" ref="322923036"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="BGHUDButtonCell" key="NSCell" id="995442362">
@@ -1439,7 +1439,7 @@ AADzUQABAAAAARbMY3VydgAAAAAAAAABAc0AAA</bytes>
 											<object class="NSSlider" id="741495357">
 												<reference key="NSNextResponder" ref="322923036"/>
 												<int key="NSvFlags">268</int>
-												<string key="NSFrame">{{89, 50}, {19, 101}}</string>
+												<string key="NSFrame">{{89, 49}, {19, 101}}</string>
 												<reference key="NSSuperview" ref="322923036"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="BGHUDSliderCell" key="NSCell" id="75159425">
@@ -1477,7 +1477,7 @@ AADzUQABAAAAARbMY3VydgAAAAAAAAABAc0AAA</bytes>
 											<object class="NSSlider" id="1031346102">
 												<reference key="NSNextResponder" ref="322923036"/>
 												<int key="NSvFlags">268</int>
-												<string key="NSFrame">{{140, 50}, {19, 101}}</string>
+												<string key="NSFrame">{{140, 49}, {19, 101}}</string>
 												<reference key="NSSuperview" ref="322923036"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="BGHUDSliderCell" key="NSCell" id="754498492">
@@ -1515,7 +1515,7 @@ AADzUQABAAAAARbMY3VydgAAAAAAAAABAc0AAA</bytes>
 											<object class="NSSlider" id="617363316">
 												<reference key="NSNextResponder" ref="322923036"/>
 												<int key="NSvFlags">268</int>
-												<string key="NSFrame">{{193, 50}, {19, 101}}</string>
+												<string key="NSFrame">{{193, 49}, {19, 101}}</string>
 												<reference key="NSSuperview" ref="322923036"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="BGHUDSliderCell" key="NSCell" id="62457534">
@@ -1553,7 +1553,7 @@ AADzUQABAAAAARbMY3VydgAAAAAAAAABAc0AAA</bytes>
 											<object class="NSSlider" id="534023896">
 												<reference key="NSNextResponder" ref="322923036"/>
 												<int key="NSvFlags">268</int>
-												<string key="NSFrame">{{245, 50}, {19, 101}}</string>
+												<string key="NSFrame">{{245, 49}, {19, 101}}</string>
 												<reference key="NSSuperview" ref="322923036"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="BGHUDSliderCell" key="NSCell" id="647680886">
@@ -1591,7 +1591,7 @@ AADzUQABAAAAARbMY3VydgAAAAAAAAABAc0AAA</bytes>
 											<object class="NSSlider" id="765211162">
 												<reference key="NSNextResponder" ref="322923036"/>
 												<int key="NSvFlags">268</int>
-												<string key="NSFrame">{{297, 50}, {19, 101}}</string>
+												<string key="NSFrame">{{297, 49}, {19, 101}}</string>
 												<reference key="NSSuperview" ref="322923036"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="BGHUDSliderCell" key="NSCell" id="35114134">
@@ -1691,7 +1691,7 @@ AADzUQABAAAAARbMY3VydgAAAAAAAAABAc0AAA</bytes>
 												</object>
 											</object>
 										</object>
-										<string key="NSFrame">{{10, 33}, {404, 178}}</string>
+										<string key="NSFrame">{{10, 33}, {404, 177}}</string>
 									</object>
 									<string key="NSLabel">Spatializer</string>
 									<reference key="NSColor" ref="423257821"/>
@@ -1707,7 +1707,7 @@ AADzUQABAAAAARbMY3VydgAAAAAAAAABAc0AAA</bytes>
 											<object class="NSTextField" id="896704654">
 												<reference key="NSNextResponder" ref="195046814"/>
 												<int key="NSvFlags">256</int>
-												<string key="NSFrame">{{32, 101}, {99, 14}}</string>
+												<string key="NSFrame">{{32, 108}, {99, 14}}</string>
 												<reference key="NSSuperview" ref="195046814"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSTextFieldCell" key="NSCell" id="1001800019">
@@ -1723,7 +1723,7 @@ AADzUQABAAAAARbMY3VydgAAAAAAAAABAc0AAA</bytes>
 											<object class="NSSlider" id="955449777">
 												<reference key="NSNextResponder" ref="195046814"/>
 												<int key="NSvFlags">268</int>
-												<string key="NSFrame">{{136, 99}, {251, 15}}</string>
+												<string key="NSFrame">{{136, 107}, {251, 15}}</string>
 												<reference key="NSSuperview" ref="195046814"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="BGHUDSliderCell" key="NSCell" id="427048854">
@@ -1745,7 +1745,7 @@ AADzUQABAAAAARbMY3VydgAAAAAAAAABAc0AAA</bytes>
 											<object class="NSButton" id="743541601">
 												<reference key="NSNextResponder" ref="195046814"/>
 												<int key="NSvFlags">268</int>
-												<string key="NSFrame">{{14, 112}, {335, 32}}</string>
+												<string key="NSFrame">{{14, 125}, {335, 18}}</string>
 												<reference key="NSSuperview" ref="195046814"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="BGHUDButtonCell" key="NSCell" id="237181004">
@@ -1769,7 +1769,7 @@ AADzUQABAAAAARbMY3VydgAAAAAAAAABAc0AAA</bytes>
 											<object class="NSButton" id="150505351">
 												<reference key="NSNextResponder" ref="195046814"/>
 												<int key="NSvFlags">268</int>
-												<string key="NSFrame">{{14, 145}, {335, 32}}</string>
+												<string key="NSFrame">{{14, 156}, {335, 18}}</string>
 												<reference key="NSSuperview" ref="195046814"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="BGHUDButtonCell" key="NSCell" id="138993131">
@@ -1791,7 +1791,7 @@ AADzUQABAAAAARbMY3VydgAAAAAAAAABAc0AAA</bytes>
 												</object>
 											</object>
 										</object>
-										<string key="NSFrame">{{10, 33}, {404, 178}}</string>
+										<string key="NSFrame">{{10, 33}, {404, 177}}</string>
 										<reference key="NSSuperview" ref="876119583"/>
 									</object>
 									<string key="NSLabel">Filter</string>
@@ -1815,7 +1815,7 @@ AADzUQABAAAAARbMY3VydgAAAAAAAAABAc0AAA</bytes>
 							</object>
 						</object>
 					</object>
-					<string key="NSFrameSize">{426, 230}</string>
+					<string key="NSFrameSize">{409, 220}</string>
 					<reference key="NSSuperview"/>
 				</object>
 				<string key="NSScreenRect">{{0, 0}, {1680, 1028}}</string>
@@ -4269,9 +4269,9 @@ AADzUQABAAAAARbMY3VydgAAAAAAAAABAc0AAA</bytes>
 				<object class="NSMutableArray" key="dict.values">
 					<bool key="EncodedWithXMLCoder">YES</bool>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{503, 486}, {426, 230}}</string>
+					<string>{{490, 337}, {409, 220}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{503, 486}, {426, 230}}</string>
+					<string>{{490, 337}, {409, 220}}</string>
 					<boolean value="NO"/>
 					<string>{196, 240}</string>
 					<string>{{357, 418}, {480, 270}}</string>
