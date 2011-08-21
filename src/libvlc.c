@@ -238,20 +238,9 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     int          i_ret = VLC_EEXIT;
     playlist_t  *p_playlist = NULL;
     char        *psz_val;
-#if defined( ENABLE_NLS ) \
-     && ( defined( HAVE_GETTEXT ) || defined( HAVE_INCLUDED_GETTEXT ) )
-# if defined (WIN32) || defined (__APPLE__)
-    char *       psz_language;
-#endif
-#endif
 
     /* System specific initialization code */
     system_Init();
-
-    /*
-     * Support for gettext
-     */
-    vlc_bindtextdomain (PACKAGE_NAME);
 
     /* Initialize the module bank and load the configuration of the
      * main module. We need to do this at this stage to be able to display
@@ -308,6 +297,20 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     }
     priv->i_verbose = var_InheritInteger( p_libvlc, "verbose" );
 
+    /*
+     * Support for gettext
+     */
+#if defined( ENABLE_NLS ) \
+     && ( defined( HAVE_GETTEXT ) || defined( HAVE_INCLUDED_GETTEXT ) )
+# if defined (WIN32) || defined (__APPLE__)
+    /* Check if the user specified a custom language */
+    char *lang = var_InheritString (p_libvlc, "language");
+    if (lang != NULL && strcmp (lang, "auto"))
+        SetLanguage (lang);
+    free (lang);
+# endif
+    vlc_bindtextdomain (PACKAGE_NAME);
+#endif
     /*xgettext: Translate "C" to the language code: "fr", "en_GB", "nl", "ru"... */
     msg_Dbg( p_libvlc, "translation test: code is \"%s\"", _("C") );
 
@@ -396,24 +399,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
         module_EndBank (true);
         return i_ret;
     }
-
-    /* Check for translation config option */
-#if defined( ENABLE_NLS ) \
-     && ( defined( HAVE_GETTEXT ) || defined( HAVE_INCLUDED_GETTEXT ) )
-# if defined (WIN32) || defined (__APPLE__)
-    /* Check if the user specified a custom language */
-    psz_language = var_CreateGetNonEmptyString( p_libvlc, "language" );
-    if( psz_language && strcmp( psz_language, "auto" ) )
-    {
-        /* Reset the default domain */
-        SetLanguage( psz_language );
-
-        /* Translate "C" to the language code: "fr", "en_GB", "nl", "ru"... */
-        msg_Dbg( p_libvlc, "translation test: code is \"%s\"", _("C") );
-    }
-    free( psz_language );
-# endif
-#endif
 
     /* Check for help on modules */
     if( (p_tmp = var_InheritString( p_libvlc, "module" )) )
