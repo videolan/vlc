@@ -564,9 +564,6 @@ dnl Plugin compilation stuff
 
 VLC_LIBRARY_SUFFIX
 
-dnl The -DSYS_FOO flag
-CPPFLAGS_save="${CPPFLAGS_save} -DSYS_`echo ${SYS} | sed -e 's/-.*//' | tr 'abcdefghijklmnopqrstuvwxyz.' 'ABCDEFGHIJKLMNOPQRSTUVWXYZ_'`"; CPPFLAGS="${CPPFLAGS_save}"
-
 dnl Check for system libs needed
 need_libc=false
 
