@@ -259,18 +259,55 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
      * options) */
     module_InitBank ();
 
+    /* Get command line options that affect module loading. */
     if( config_LoadCmdLine( p_libvlc, i_argc, ppsz_argv, NULL ) )
     {
         module_EndBank (false);
         return VLC_EGENERIC;
     }
-
     priv->i_verbose = var_InheritInteger( p_libvlc, "verbose" );
-    /* Announce who we are - Do it only for first instance ? */
+
+    /* Announce who we are (TODO: only first instance?) */
     msg_Dbg( p_libvlc, "VLC media player - %s", VERSION_MESSAGE );
     msg_Dbg( p_libvlc, "%s", COPYRIGHT_MESSAGE );
     msg_Dbg( p_libvlc, "revision %s", psz_vlc_changeset );
     msg_Dbg( p_libvlc, "configured with %s", CONFIGURE_LINE );
+
+    /* Load the builtins and plugins into the module_bank.
+     * We have to do it before config_Load*() because this also gets the
+     * list of configuration options exported by each module and loads their
+     * default values. */
+    size_t module_count = module_LoadPlugins (p_libvlc);
+
+    /*
+     * Override default configuration with config file settings
+     */
+    if( !var_InheritBool( p_libvlc, "ignore-config" ) )
+    {
+        if( var_InheritBool( p_libvlc, "reset-config" ) )
+            config_SaveConfigFile( p_libvlc ); /* Save default config */
+        else
+            config_LoadConfigFile( p_libvlc );
+    }
+
+    /*
+     * Override configuration with command line settings
+     */
+    int vlc_optind;
+    if( config_LoadCmdLine( p_libvlc, i_argc, ppsz_argv, &vlc_optind ) )
+    {
+#ifdef WIN32
+        ShowConsole( false );
+        /* Pause the console because it's destroyed when we exit */
+        fprintf( stderr, "The command line options couldn't be loaded, check "
+                 "that they are valid.\n" );
+        PauseConsole();
+#endif
+        module_EndBank (true);
+        return VLC_EGENERIC;
+    }
+    priv->i_verbose = var_InheritInteger( p_libvlc, "verbose" );
+
     /*xgettext: Translate "C" to the language code: "fr", "en_GB", "nl", "ru"... */
     msg_Dbg( p_libvlc, "translation test: code is \"%s\"", _("C") );
 
@@ -356,7 +393,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
 
     if( b_exit )
     {
-        module_EndBank (false);
+        module_EndBank (true);
         return i_ret;
     }
 
@@ -364,10 +401,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
 #if defined( ENABLE_NLS ) \
      && ( defined( HAVE_GETTEXT ) || defined( HAVE_INCLUDED_GETTEXT ) )
 # if defined (WIN32) || defined (__APPLE__)
-    if( !var_InheritBool( p_libvlc, "ignore-config" ) )
-        config_LoadConfigFile( p_libvlc );
-    priv->i_verbose = var_InheritInteger( p_libvlc, "verbose" );
-
     /* Check if the user specified a custom language */
     psz_language = var_CreateGetNonEmptyString( p_libvlc, "language" );
     if( psz_language && strcmp( psz_language, "auto" ) )
@@ -381,19 +414,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     free( psz_language );
 # endif
 #endif
-
-    /*
-     * Load the builtins and plugins into the module_bank.
-     * We have to do it before config_Load*() because this also gets the
-     * list of configuration options exported by each module and loads their
-     * default values.
-     */
-    module_LoadPlugins( p_libvlc );
-
-    size_t module_count;
-    module_t **list = module_list_get( &module_count );
-    module_list_free( list );
-    msg_Dbg( p_libvlc, "module bank initialized (%zu modules)", module_count );
 
     /* Check for help on modules */
     if( (p_tmp = var_InheritString( p_libvlc, "module" )) )
@@ -447,38 +467,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
         module_EndBank (true);
         return i_ret;
     }
-
-    /*
-     * Override default configuration with config file settings
-     */
-    if( !var_InheritBool( p_libvlc, "ignore-config" ) )
-    {
-        if( var_InheritBool( p_libvlc, "reset-config" ) )
-        {
-            config_ResetAll( p_libvlc );
-            config_SaveConfigFile( p_libvlc );
-        }
-        else
-            config_LoadConfigFile( p_libvlc );
-    }
-
-    /*
-     * Override configuration with command line settings
-     */
-    int vlc_optind;
-    if( config_LoadCmdLine( p_libvlc, i_argc, ppsz_argv, &vlc_optind ) )
-    {
-#ifdef WIN32
-        ShowConsole( false );
-        /* Pause the console because it's destroyed when we exit */
-        fprintf( stderr, "The command line options couldn't be loaded, check "
-                 "that they are valid.\n" );
-        PauseConsole();
-#endif
-        module_EndBank (true);
-        return VLC_EGENERIC;
-    }
-    priv->i_verbose = var_InheritInteger( p_libvlc, "verbose" );
 
 /* FIXME: could be replaced by using Unix sockets */
 #ifdef HAVE_DBUS

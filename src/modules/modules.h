@@ -105,7 +105,7 @@ module_t *vlc_module_create (module_t *);
 void vlc_module_destroy (module_t *);
 
 void module_InitBank (void);
-void module_LoadPlugins( vlc_object_t * );
+size_t module_LoadPlugins( vlc_object_t * );
 #define module_LoadPlugins(a) module_LoadPlugins(VLC_OBJECT(a))
 void module_EndBank (bool);
 int module_Map (vlc_object_t *, module_t *);
