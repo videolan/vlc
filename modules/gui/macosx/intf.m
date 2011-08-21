@@ -224,12 +224,11 @@ static void MsgCallback( void *data, int type, const msg_item_t *item, const cha
     int canc = vlc_savecancel();
     char *str;
 
-    /* this may happen from time to time, let's bail out as info would be useless anyway */
-    if( !item->psz_module || !format )
-        return;
-
     if (vasprintf( &str, format, ap ) == -1)
+    {
+        vlc_restorecancel( canc );
         return;
+    }
 
     NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
     [[VLCMain sharedInstance] processReceivedlibvlcMessage: item ofType: type withStr: str];
