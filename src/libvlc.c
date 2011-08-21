@@ -235,7 +235,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     char *       psz_parser = NULL;
     char *       psz_control = NULL;
     bool   b_exit = false;
-    int          i_ret = VLC_EEXIT;
     playlist_t  *p_playlist = NULL;
     char        *psz_val;
 
@@ -319,27 +318,72 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     {
         Help( p_libvlc, "help" );
         b_exit = true;
-        i_ret = VLC_EEXITSUCCESS;
     }
     /* Check for version option */
     else if( var_InheritBool( p_libvlc, "version" ) )
     {
         Version();
         b_exit = true;
-        i_ret = VLC_EEXITSUCCESS;
+    }
+    /* Check for help on modules */
+    else if( (p_tmp = var_InheritString( p_libvlc, "module" )) )
+    {
+        Help( p_libvlc, p_tmp );
+        free( p_tmp );
+        b_exit = true;
+    }
+    /* Check for full help option */
+    else if( var_InheritBool( p_libvlc, "full-help" ) )
+    {
+        var_Create( p_libvlc, "advanced", VLC_VAR_BOOL );
+        var_SetBool( p_libvlc, "advanced", true );
+        var_Create( p_libvlc, "help-verbose", VLC_VAR_BOOL );
+        var_SetBool( p_libvlc, "help-verbose", true );
+        Help( p_libvlc, "full-help" );
+        b_exit = true;
+    }
+    /* Check for long help option */
+    else if( var_InheritBool( p_libvlc, "longhelp" ) )
+    {
+        Help( p_libvlc, "longhelp" );
+        b_exit = true;
+    }
+    /* Check for module list option */
+    else if( var_InheritBool( p_libvlc, "list" ) )
+    {
+        ListModules( p_libvlc, false );
+        b_exit = true;
+    }
+    else if( var_InheritBool( p_libvlc, "list-verbose" ) )
+    {
+        ListModules( p_libvlc, true );
+        b_exit = true;
     }
 
+    if( b_exit )
+    {
+        module_EndBank (true);
+        return VLC_EEXITSUCCESS;
+    }
+
+    if( module_count <= 1 )
+    {
+        msg_Err( p_libvlc, "No plugins found! Check your VLC installation.");
+        module_EndBank (true);
+        return VLC_ENOITEM;
+    }
+
+#ifdef HAVE_DAEMON
     /* Check for daemon mode */
-#if !defined( WIN32 ) && !defined( __SYMBIAN32__ )
     if( var_InheritBool( p_libvlc, "daemon" ) )
     {
-#ifdef HAVE_DAEMON
         char *psz_pidfile = NULL;
 
         if( daemon( 1, 0) != 0 )
         {
             msg_Err( p_libvlc, "Unable to fork vlc to daemon mode" );
-            b_exit = true;
+            module_EndBank (true);
+            return VLC_EEXIT;
         }
         b_daemon = true;
 
@@ -364,94 +408,8 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
             }
         }
         free( psz_pidfile );
-
-#else
-        pid_t i_pid;
-
-        if( ( i_pid = fork() ) < 0 )
-        {
-            msg_Err( p_libvlc, "unable to fork vlc to daemon mode" );
-            b_exit = true;
-        }
-        else if( i_pid )
-        {
-            /* This is the parent, exit right now */
-            msg_Dbg( p_libvlc, "closing parent process" );
-            b_exit = true;
-            i_ret = VLC_EEXITSUCCESS;
-        }
-        else
-        {
-            /* We are the child */
-            msg_Dbg( p_libvlc, "daemon spawned" );
-            close( STDIN_FILENO );
-            close( STDOUT_FILENO );
-            close( STDERR_FILENO );
-
-            b_daemon = true;
-        }
-#endif
     }
 #endif
-
-    if( b_exit )
-    {
-        module_EndBank (true);
-        return i_ret;
-    }
-
-    /* Check for help on modules */
-    if( (p_tmp = var_InheritString( p_libvlc, "module" )) )
-    {
-        Help( p_libvlc, p_tmp );
-        free( p_tmp );
-        b_exit = true;
-        i_ret = VLC_EEXITSUCCESS;
-    }
-    /* Check for full help option */
-    else if( var_InheritBool( p_libvlc, "full-help" ) )
-    {
-        var_Create( p_libvlc, "advanced", VLC_VAR_BOOL );
-        var_SetBool( p_libvlc, "advanced", true );
-        var_Create( p_libvlc, "help-verbose", VLC_VAR_BOOL );
-        var_SetBool( p_libvlc, "help-verbose", true );
-        Help( p_libvlc, "full-help" );
-        b_exit = true;
-        i_ret = VLC_EEXITSUCCESS;
-    }
-    /* Check for long help option */
-    else if( var_InheritBool( p_libvlc, "longhelp" ) )
-    {
-        Help( p_libvlc, "longhelp" );
-        b_exit = true;
-        i_ret = VLC_EEXITSUCCESS;
-    }
-    /* Check for module list option */
-    else if( var_InheritBool( p_libvlc, "list" ) )
-    {
-        ListModules( p_libvlc, false );
-        b_exit = true;
-        i_ret = VLC_EEXITSUCCESS;
-    }
-    else if( var_InheritBool( p_libvlc, "list-verbose" ) )
-    {
-        ListModules( p_libvlc, true );
-        b_exit = true;
-        i_ret = VLC_EEXITSUCCESS;
-    }
-
-    if( module_count <= 1 )
-    {
-        msg_Err( p_libvlc, "No plugins found! Check your VLC installation.");
-        b_exit = true;
-        i_ret = VLC_ENOITEM;
-    }
-
-    if( b_exit )
-    {
-        module_EndBank (true);
-        return i_ret;
-    }
 
 /* FIXME: could be replaced by using Unix sockets */
 #ifdef HAVE_DBUS
