@@ -351,7 +351,7 @@ static void TextPrint( void *opaque, int type, const msg_item_t *item,
     flockfile( stream );
     utf8_fprintf( stream, "%s%s: ", item->psz_module, ppsz_type[type] );
     utf8_fprintf( stream, fmt, ap );
-    fputc_unlocked( '\n', stream );
+    putc_unlocked( '\n', stream );
     funlockfile( stream );
     vlc_restorecancel( canc );
 }

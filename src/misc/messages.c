@@ -298,7 +298,7 @@ static void PrintMsg (void *d, int type, const msg_item_t *p_item,
     utf8_fprintf (stream, "%s %s%s: ", p_item->psz_module,
                   p_item->psz_object_type, msg_type[type]);
     utf8_vfprintf (stream, format, ap);
-    fputc_unlocked ('\n', stream);
+    putc_unlocked ('\n', stream);
 #if defined (WIN32) || defined (__OS2__)
     fflush (stream);
 #endif
