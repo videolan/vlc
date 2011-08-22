@@ -25,6 +25,8 @@
 #ifndef LIBVLC_LIBVLC_H
 # define LIBVLC_LIBVLC_H 1
 
+extern const char psz_vlc_changeset[];
+
 typedef struct variable_t variable_t;
 
 /* Actions (hot keys) */

@@ -36,6 +36,7 @@ int config_LoadCmdLine   ( vlc_object_t *, int, const char *[], int * );
 int config_LoadConfigFile( vlc_object_t * );
 #define config_LoadCmdLine(a,b,c,d) config_LoadCmdLine(VLC_OBJECT(a),b,c,d)
 #define config_LoadConfigFile(a) config_LoadConfigFile(VLC_OBJECT(a))
+bool config_PrintHelp (vlc_object_t *);
 
 int config_SortConfig (void);
 void config_UnsortConfig (void);

@@ -456,6 +456,7 @@ SOURCES_libvlc_common = \
 	config/core.c \
 	config/chain.c \
 	config/file.c \
+        config/help.c \
 	config/intf.c \
 	config/keys.c \
 	config/cmdline.c \
