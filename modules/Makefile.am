@@ -63,11 +63,13 @@ SUBDIRS += .
 
 dist_noinst_SCRIPTS = genmf list.sh
 dist_noinst_DATA = LIST
-MOSTLYCLEANFILES = plugins.dat*
+noinst_DATA = plugins.dat
+MOSTLYCLEANFILES = $(noinst_DATA)
 
-.PHONY: stamp-cache
+.PHONY: plugins.dat
 
-stamp-cache:
+plugins.dat:
+	$(AM_V_at)rm -f plugins.dat
 	$(AM_V_GEN)if test "$(build)" = "$(host)"; then \
 		../bin/vlc-cache-gen$(EXEEXT) . ; \
 	else \
