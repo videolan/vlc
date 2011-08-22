@@ -34,6 +34,7 @@
 #include <vlc_common.h>
 
 #include <errno.h>
+#include <assert.h>
 
 #include <vlc_network.h>
 
@@ -321,106 +322,19 @@ static int net_SetMcastOut (vlc_object_t *p_this, int fd, int family,
 }
 
 
-/**
- * Old-style any-source multicast join.
- * In use on Windows XP/2003 and older.
- */
-static int
-net_IPv4Join (vlc_object_t *obj, int fd,
-              const struct sockaddr_in *src, const struct sockaddr_in *grp)
+static unsigned var_GetIfIndex (vlc_object_t *obj)
 {
-#ifdef IP_ADD_MEMBERSHIP
-    union
-    {
-        struct ip_mreq gr4;
-# ifdef IP_ADD_SOURCE_MEMBERSHIP
-        struct ip_mreq_source gsr4;
-# endif
-    } opt;
-    int cmd;
-    struct in_addr id = { .s_addr = INADDR_ANY };
-    socklen_t optlen;
-
-    /* Multicast interface IPv4 address */
-    char *iface = var_InheritString (obj, "miface-addr");
-    if ((iface != NULL)
-     && (inet_pton (AF_INET, iface, &id) <= 0))
-    {
-        msg_Err (obj, "invalid multicast interface address %s", iface);
-        free (iface);
-        goto error;
-    }
-    free (iface);
-
-    memset (&opt, 0, sizeof (opt));
-    if (src != NULL)
-    {
-# if defined( IP_ADD_SOURCE_MEMBERSHIP ) && !defined( __ANDROID__ )
-        cmd = IP_ADD_SOURCE_MEMBERSHIP;
-        opt.gsr4.imr_multiaddr = grp->sin_addr;
-        opt.gsr4.imr_sourceaddr = src->sin_addr;
-        opt.gsr4.imr_interface = id;
-        optlen = sizeof (opt.gsr4);
-# else
-        errno = ENOSYS;
-        goto error;
-# endif
-    }
-    else
-    {
-        cmd = IP_ADD_MEMBERSHIP;
-        opt.gr4.imr_multiaddr = grp->sin_addr;
-        opt.gr4.imr_interface = id;
-        optlen = sizeof (opt.gr4);
-    }
-
-    msg_Dbg (obj, "IP_ADD_%sMEMBERSHIP multicast request",
-             (src != NULL) ? "SOURCE_" : "");
-
-    if (setsockopt (fd, SOL_IP, cmd, &opt, optlen) == 0)
+    char *ifname = var_InheritString (obj, "miface");
+    if (ifname == NULL)
         return 0;
 
-error:
-#endif
-
-    msg_Err (obj, "cannot join IPv4 multicast group (%m)");
-    return -1;
+    unsigned ifindex = if_nametoindex (ifname);
+    if (ifindex == 0)
+        msg_Err (obj, "invalid multicast interface: %s", ifname);
+    free (ifname);
+    return ifindex;
 }
 
-
-static int
-net_IPv6Join (vlc_object_t *obj, int fd, const struct sockaddr_in6 *src)
-{
-#ifdef IPV6_JOIN_GROUP
-    struct ipv6_mreq gr6;
-    memset (&gr6, 0, sizeof (gr6));
-    gr6.ipv6mr_interface = src->sin6_scope_id;
-    memcpy (&gr6.ipv6mr_multiaddr, &src->sin6_addr, 16);
-
-    msg_Dbg (obj, "IPV6_JOIN_GROUP multicast request");
-
-    if (!setsockopt (fd, SOL_IPV6, IPV6_JOIN_GROUP, &gr6, sizeof (gr6)))
-        return 0;
-#else
-    errno = ENOSYS;
-#endif
-
-    msg_Err (obj, "cannot join IPv6 any-source multicast group (%m)");
-    return -1;
-}
-
-
-#if defined (WIN32) && !defined (MCAST_JOIN_SOURCE_GROUP)
-/*
- * I hate manual definitions: Error-prone. Portability hell.
- * Developers shall use UP-TO-DATE compilers. Full point.
- * If you remove the warning, you remove the whole ifndef.
- */
-#  warning Your C headers are out-of-date. Please update.
-
-#  define MCAST_JOIN_GROUP 41
-#  define MCAST_JOIN_SOURCE_GROUP 45 /* from <ws2ipdef.h> */
-#endif
 
 /**
  * IP-agnostic multicast join,
@@ -431,148 +345,159 @@ net_SourceSubscribe (vlc_object_t *obj, int fd,
                      const struct sockaddr *src, socklen_t srclen,
                      const struct sockaddr *grp, socklen_t grplen)
 {
-    int level, iid = 0;
+#ifdef MCAST_JOIN_SOURCE_GROUP
+    /* Agnostic SSM multicast join */
+    int level;
+    struct group_source_req gsr;
 
-    char *iface = var_InheritString (obj, "miface");
-    if (iface != NULL)
-    {
-        iid = if_nametoindex (iface);
-        if (iid == 0)
-        {
-            msg_Err (obj, "invalid multicast interface: %s", iface);
-            free (iface);
-            return -1;
-        }
-        free (iface);
-    }
+    memset (&gsr, 0, sizeof (gsr));
+    gsr.gsr_interface = var_GetIfIndex (obj);
 
     switch (grp->sa_family)
     {
 #ifdef AF_INET6
         case AF_INET6:
-            level = SOL_IPV6;
-            if (((const struct sockaddr_in6 *)grp)->sin6_scope_id)
-                iid = ((const struct sockaddr_in6 *)grp)->sin6_scope_id;
-            break;
-#endif
+        {
+            const struct sockaddr_in6 *g6 = (const struct sockaddr_in6 *)grp;
 
+            level = SOL_IPV6;
+            assert (grplen >= sizeof (struct sockaddr_in6));
+            if (g6->sin6_scope_id != 0)
+                gsr.gsr_interface = g6->sin6_scope_id;
+            break;
+        }
+#endif
         case AF_INET:
             level = SOL_IP;
             break;
-
         default:
             errno = EAFNOSUPPORT;
             return -1;
     }
 
-    if (src != NULL)
-        switch (src->sa_family)
-        {
-#ifdef AF_INET6
-            case AF_INET6:
-                if (memcmp (&((const struct sockaddr_in6 *)src)->sin6_addr,
-                            &in6addr_any, sizeof (in6addr_any)) == 0)
-                    src = NULL;
-            break;
-#endif
-
-            case AF_INET:
-                if (((const struct sockaddr_in *)src)->sin_addr.s_addr
-                     == INADDR_ANY)
-                    src = NULL;
-                break;
-        }
-
-
-    /* Agnostic ASM/SSM multicast join */
-#ifdef MCAST_JOIN_SOURCE_GROUP
-    union
-    {
-        struct group_req gr;
-        struct group_source_req gsr;
-    } opt;
-    socklen_t optlen;
-
-    memset (&opt, 0, sizeof (opt));
-
-    if (src != NULL)
-    {
-        if ((grplen > sizeof (opt.gsr.gsr_group))
-         || (srclen > sizeof (opt.gsr.gsr_source)))
-            return -1;
-
-        opt.gsr.gsr_interface = iid;
-        memcpy (&opt.gsr.gsr_source, src, srclen);
-        memcpy (&opt.gsr.gsr_group,  grp, grplen);
-        optlen = sizeof (opt.gsr);
-    }
-    else
-    {
-        if (grplen > sizeof (opt.gr.gr_group))
-            return -1;
-
-        opt.gr.gr_interface = iid;
-        memcpy (&opt.gr.gr_group, grp, grplen);
-        optlen = sizeof (opt.gr);
-    }
-
-    msg_Dbg (obj, "Multicast %sgroup join request", src ? "source " : "");
-
-    if (setsockopt (fd, level,
-                    src ? MCAST_JOIN_SOURCE_GROUP : MCAST_JOIN_GROUP,
-                    (void *)&opt, optlen) == 0)
+    assert (grplen <= sizeof (gsr.gsr_group));
+    memcpy (&gsr.gsr_source, src, srclen);
+    assert (srclen <= sizeof (gsr.gsr_source));
+    memcpy (&gsr.gsr_group,  grp, grplen);
+    if (setsockopt (fd, level, MCAST_JOIN_SOURCE_GROUP,
+                    &gsr, sizeof (gsr)) == 0)
         return 0;
-#endif
 
-    /* Fallback to IPv-specific APIs */
-    if ((src != NULL) && (src->sa_family != grp->sa_family))
+#else
+    if (src->sa_family != grp->sa_family)
+    {
+        errno = EAFNOSUPPORT;
         return -1;
+    }
 
     switch (grp->sa_family)
     {
+# ifdef IP_ADD_SOURCE_MEMBERSHIP
+        /* IPv4-specific API */
         case AF_INET:
-            if ((grplen < sizeof (struct sockaddr_in))
-             || ((src != NULL) && (srclen < sizeof (struct sockaddr_in))))
-                return -1;
+        {
+            struct ip_mreq_source imr;
 
-            if (net_IPv4Join (obj, fd, (const struct sockaddr_in *)src,
-                              (const struct sockaddr_in *)grp) == 0)
+            memset (&imr, 0, sizeof (imr));
+            assert (grplen >= sizeof (struct sockaddr_in));
+            imr.imr_multiaddr = ((const struct sockaddr_in *)grp)->sin_addr;
+            assert (srclen >= sizeof (struct sockaddr_in));
+            imr.imr_sourceaddr = ((const struct sockaddr_in *)src)->sin_addr;
+            if (setsockopt (fd, SOL_IP, IP_ADD_SOURCE_MEMBERSHIP,
+                            &imr, sizeof (imr)) == 0)
                 return 0;
             break;
+        }
+# endif
+        default:
+            errno = EAFNOSUPPORT;
+    }
 
-#ifdef AF_INET6
-        case AF_INET6:
-            if ((grplen < sizeof (struct sockaddr_in6))
-             || ((src != NULL) && (srclen < sizeof (struct sockaddr_in6))))
-                return -1;
-
-            /* IPv6-specific SSM API does not exist. So if we're here
-             * it means IPv6 SSM is not supported on this OS and we
-             * directly fallback to ASM */
-
-            if (net_IPv6Join (obj, fd, (const struct sockaddr_in6 *)grp) == 0)
-                return 0;
-            break;
 #endif
-    }
-
-    msg_Err (obj, "Multicast group join error (%m)");
-
-    if (src != NULL)
-    {
-        msg_Warn (obj, "Trying ASM instead of SSM...");
-        return net_Subscribe (obj, fd, grp, grplen);
-    }
-
-    msg_Err (obj, "Multicast not supported");
-    return -1;
+    msg_Err (obj, "cannot join source multicast group: %m");
+    msg_Warn (obj, "trying ASM instead of SSM...");
+    return net_Subscribe (obj, fd, grp, grplen);
 }
 
 
 int net_Subscribe (vlc_object_t *obj, int fd,
-                   const struct sockaddr *addr, socklen_t addrlen)
+                   const struct sockaddr *grp, socklen_t grplen)
 {
-    return net_SourceSubscribe (obj, fd, NULL, 0, addr, addrlen);
+#ifdef MCAST_JOIN_GROUP
+    /* Agnostic SSM multicast join */
+    int level;
+    struct group_req gr;
+
+    memset (&gr, 0, sizeof (gr));
+    gr.gr_interface = var_GetIfIndex (obj);
+
+    switch (grp->sa_family)
+    {
+#ifdef AF_INET6
+        case AF_INET6:
+        {
+            const struct sockaddr_in6 *g6 = (const struct sockaddr_in6 *)grp;
+
+            level = SOL_IPV6;
+            assert (grplen >= sizeof (struct sockaddr_in6));
+            if (g6->sin6_scope_id != 0)
+                gr.gr_interface = g6->sin6_scope_id;
+            break;
+        }
+#endif
+        case AF_INET:
+            level = SOL_IP;
+            break;
+        default:
+            errno = EAFNOSUPPORT;
+            return -1;
+    }
+
+    assert (grplen <= sizeof (gr.gr_group));
+    memcpy (&gr.gr_group, grp, grplen);
+    if (setsockopt (fd, level, MCAST_JOIN_GROUP, &gr, sizeof (gr)) == 0)
+        return 0;
+
+#else
+    switch (grp->sa_family)
+    {
+# ifdef IPV6_JOIN_GROUP
+        case AF_INET6:
+        {
+            struct ipv6_mreq ipv6mr;
+            const struct sockaddr_in6 *g6 = (const struct sockaddr_in6 *)grp;
+
+            memset (&ipv6mr, 0, sizeof (ipv6mr));
+            assert (grplen >= sizeof (struct sockaddr_in6));
+            ipv6mr.ipv6mr_multiaddr = g6->sin6_addr;
+            ipv6mr.ipv6mr_interface = g6->sin6_scope_id;
+            if (!setsockopt (fd, SOL_IPV6, IPV6_JOIN_GROUP,
+                             &ipv6mr, sizeof (ipv6mr)))
+                return 0;
+            break;
+        }
+# endif
+# ifdef IP_ADD_MEMBERSHIP
+        case AF_INET:
+        {
+            struct ip_mreq imr;
+
+            memset (&imr, 0, sizeof (imr));
+            assert (grplen >= sizeof (struct sockaddr_in));
+            imr.imr_multiaddr = ((const struct sockaddr_in *)grp)->sin_addr;
+            if (setsockopt (fd, SOL_IP, IP_ADD_MEMBERSHIP,
+                            &imr, sizeof (imr)) == 0)
+                return 0;
+            break;
+        }
+# endif
+        default:
+            errno = EAFNOSUPPORT;
+    }
+
+#endif
+    msg_Err (obj, "cannot join multicast group: %m");
+    return -1;
 }
 
 
