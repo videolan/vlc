@@ -65,7 +65,7 @@ static int AdjustCallback( vlc_object_t *p_this, char const *psz_var,
 
 #define THRES_TEXT N_("Brightness threshold")
 #define THRES_LONGTEXT N_("When this mode is enabled, pixels will be " \
-        "shown as black or white. The threshold value will be the brighness " \
+        "shown as black or white. The threshold value will be the brightness " \
         "defined below." )
 #define CONT_TEXT N_("Image contrast (0-2)")
 #define CONT_LONGTEXT N_("Set the image contrast, between 0 and 2. Defaults to 1.")
