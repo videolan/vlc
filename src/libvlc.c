@@ -271,11 +271,9 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     if( config_LoadCmdLine( p_libvlc, i_argc, ppsz_argv, &vlc_optind ) )
     {
 #ifdef WIN32
-        ShowConsole( false );
-        /* Pause the console because it's destroyed when we exit */
-        fprintf( stderr, "The command line options couldn't be loaded, check "
-                 "that they are valid.\n" );
-        PauseConsole();
+        MessageBoxA (NULL, "The command line options could not be parsed.\n"
+                     "Make sure they are valid.", "VLC media player",
+                     MB_OK|MB_ICONERROR);
 #endif
         module_EndBank (true);
         return VLC_EGENERIC;
@@ -939,58 +937,3 @@ static void GetFilenames( libvlc_int_t *p_vlc, unsigned n,
         free( mrl );
     }
 }
-
-/*****************************************************************************
- * ShowConsole: On Win32, create an output console for debug messages
- *****************************************************************************
- * This function is useful only on Win32.
- *****************************************************************************/
-#ifdef WIN32 /*  */
-static void ShowConsole( bool b_dofile )
-{
-#   ifndef UNDER_CE
-    FILE *f_help = NULL;
-
-    if( getenv( "PWD" ) ) return; /* Cygwin shell or Wine */
-
-    AllocConsole();
-    /* Use the ANSI code page (e.g. Windows-1252) as expected by the LibVLC
-     * Unicode/locale subsystem. By default, we have the obsolecent OEM code
-     * page (e.g. CP437 or CP850). */
-    SetConsoleOutputCP (GetACP ());
-    SetConsoleTitle ("VLC media player version "PACKAGE_VERSION);
-
-    freopen( "CONOUT$", "w", stderr );
-    freopen( "CONIN$", "r", stdin );
-
-    if( b_dofile && (f_help = fopen( "vlc-help.txt", "wt" )) )
-    {
-        fclose( f_help );
-        freopen( "vlc-help.txt", "wt", stdout );
-        utf8_fprintf( stderr, _("\nDumped content to vlc-help.txt file.\n") );
-    }
-    else freopen( "CONOUT$", "w", stdout );
-
-#   endif
-}
-#endif
-
-/*****************************************************************************
- * PauseConsole: On Win32, wait for a key press before closing the console
- *****************************************************************************
- * This function is useful only on Win32.
- *****************************************************************************/
-#ifdef WIN32 /*  */
-static void PauseConsole( void )
-{
-#   ifndef UNDER_CE
-
-    if( getenv( "PWD" ) ) return; /* Cygwin shell or Wine */
-
-    utf8_fprintf( stderr, _("\nPress the RETURN key to continue...\n") );
-    getchar();
-    fclose( stdout );
-
-#   endif
-}
-#endif
