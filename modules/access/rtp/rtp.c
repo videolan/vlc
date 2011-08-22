@@ -216,13 +216,11 @@ static int Open (vlc_object_t *obj)
     {
         case IPPROTO_UDP:
         case IPPROTO_UDPLITE:
-            fd = net_OpenDgram (obj, dhost, dport,
-                                shost, sport, AF_UNSPEC, tp);
+            fd = net_OpenDgram (obj, dhost, dport, shost, sport, tp);
             if (fd == -1)
                 break;
             if (rtcp_dport > 0) /* XXX: source port is unknown */
-                rtcp_fd = net_OpenDgram (obj, dhost, rtcp_dport, shost, 0,
-                                         AF_UNSPEC, tp);
+                rtcp_fd = net_OpenDgram (obj, dhost, rtcp_dport, shost, 0, tp);
             break;
 
          case IPPROTO_DCCP:

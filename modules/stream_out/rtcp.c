@@ -106,7 +106,7 @@ rtcp_sender_t *OpenRTCP (vlc_object_t *obj, int rtp_fd, int proto,
         sport++;
         dport++;
 
-        fd = net_OpenDgram (obj, src, sport, dst, dport, AF_UNSPEC, proto);
+        fd = net_OpenDgram (obj, src, sport, dst, dport, proto);
         if (fd != -1)
         {
             /* Copy the multicast IPv4 TTL value (useless for IPv6) */

@@ -134,12 +134,11 @@ static int net_SetupDgramSocket( vlc_object_t *p_obj, int fd, const struct addri
 
 /* */
 static int net_ListenSingle (vlc_object_t *obj, const char *host, int port,
-                             int family, int protocol)
+                             int protocol)
 {
     struct addrinfo hints, *res;
 
     memset (&hints, 0, sizeof( hints ));
-    hints.ai_family = family;
     hints.ai_socktype = SOCK_DGRAM;
     hints.ai_protocol = protocol;
     hints.ai_flags = AI_PASSIVE;
@@ -171,22 +170,10 @@ static int net_ListenSingle (vlc_object_t *obj, const char *host, int port,
         }
 
 #ifdef IPV6_V6ONLY
-        /* If IPv6 was forced, set IPv6-only mode.
-         * If IPv4 was forced, do nothing extraordinary.
-         * If nothing was forced, try dual-mode IPv6. */
+        /* Try dual-mode IPv6 if available. */
         if (ptr->ai_family == AF_INET6)
-        {
-            int on = (family == AF_INET6);
-            setsockopt (fd, SOL_IPV6, IPV6_V6ONLY, &on, sizeof (on));
-        }
-        if (ptr->ai_family == AF_INET)
+            setsockopt (fd, SOL_IPV6, IPV6_V6ONLY, &(int){ 0 }, sizeof (int));
 #endif
-        if (family == AF_UNSPEC && ptr->ai_next != NULL)
-        {
-            msg_Warn (obj, "ambiguous network protocol specification");
-            msg_Warn (obj, "please select IP version explicitly");
-        }
-
         fd = net_SetupDgramSocket( obj, fd, ptr );
         if( fd == -1 )
             continue;
@@ -728,11 +715,10 @@ int net_ConnectDgram( vlc_object_t *p_this, const char *psz_host, int i_port,
  * OpenDgram a datagram socket and return a handle
  *****************************************************************************/
 int net_OpenDgram( vlc_object_t *obj, const char *psz_bind, int i_bind,
-                   const char *psz_server, int i_server,
-                   int family, int protocol )
+                   const char *psz_server, int i_server, int protocol )
 {
     if ((psz_server == NULL) || (psz_server[0] == '\0'))
-        return net_ListenSingle (obj, psz_bind, i_bind, family, protocol);
+        return net_ListenSingle (obj, psz_bind, i_bind, protocol);
 
     msg_Dbg (obj, "net: connecting to [%s]:%d from [%s]:%d",
              psz_server, i_server, psz_bind, i_bind);
@@ -741,7 +727,6 @@ int net_OpenDgram( vlc_object_t *obj, const char *psz_bind, int i_bind,
     int val;
 
     memset (&hints, 0, sizeof (hints));
-    hints.ai_family = family;
     hints.ai_socktype = SOCK_DGRAM;
     hints.ai_protocol = protocol;
 

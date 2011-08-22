@@ -88,26 +88,11 @@ static int Open( vlc_object_t *p_this )
     char *psz_parser;
     const char *psz_server_addr, *psz_bind_addr = "";
     int  i_bind_port = 1234, i_server_port = 0;
-    int fam = AF_UNSPEC;
     int fd;
 
     /* Set up p_access */
     access_InitFields( p_access );
     ACCESS_SET_CALLBACKS( NULL, BlockUDP, Control, NULL );
-
-    if (strlen (p_access->psz_access) > 0)
-    {
-        switch (p_access->psz_access[strlen (p_access->psz_access) - 1])
-        {
-            case '4':
-                fam = AF_INET;
-                break;
-
-            case '6':
-                fam = AF_INET6;
-                break;
-        }
-    }
 
     /* Parse psz_name syntax :
      * [serveraddr[:serverport]][@[bindaddr]:[bindport]] */
@@ -152,7 +137,7 @@ static int Open( vlc_object_t *p_this )
              psz_server_addr, i_server_port, psz_bind_addr, i_bind_port );
 
     fd = net_OpenDgram( p_access, psz_bind_addr, i_bind_port,
-                        psz_server_addr, i_server_port, fam, IPPROTO_UDP );
+                        psz_server_addr, i_server_port, IPPROTO_UDP );
     free (psz_name);
     if( fd == -1 )
     {
