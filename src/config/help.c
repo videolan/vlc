@@ -40,6 +40,9 @@
 #if defined( WIN32 ) && !defined( UNDER_CE )
 static void ShowConsole (void);
 static void PauseConsole (void);
+#else
+# define ShowConsole() (void)0
+# define PauseConsole() (void)0
 #endif
 
 static void Help (vlc_object_t *, const char *);
@@ -162,9 +165,7 @@ static const char vlc_usage[] = N_(
 
 static void Help (vlc_object_t *p_this, char const *psz_help_name)
 {
-#if defined (WIN32) && !defined (UNDER_CE)
     ShowConsole();
-#endif
 
     if( psz_help_name && !strcmp( psz_help_name, "help" ) )
     {
@@ -189,9 +190,7 @@ static void Help (vlc_object_t *p_this, char const *psz_help_name)
         Usage( p_this, psz_help_name );
     }
 
-#if defined (WIN32) && !defined (UNDER_CE)
     PauseConsole();
-#endif
 }
 
 /*****************************************************************************
@@ -729,10 +728,8 @@ static void ListModules (vlc_object_t *p_this, bool b_verbose)
 
     bool b_color = var_InheritBool( p_this, "color" );
 
-#ifdef WIN32
-# ifndef UNDER_CE
     ShowConsole();
-# endif
+#ifdef WIN32
     b_color = false; // don't put color control codes in a .txt file
 #else
     if( !isatty( 1 ) )
@@ -782,10 +779,7 @@ static void ListModules (vlc_object_t *p_this, bool b_verbose)
         }
     }
     module_list_free (list);
-
-#if defined (WIN32) && !defined (UNDER_CE)
     PauseConsole();
-#endif
 }
 
 /*****************************************************************************
@@ -795,20 +789,14 @@ static void ListModules (vlc_object_t *p_this, bool b_verbose)
  *****************************************************************************/
 static void Version( void )
 {
-#if defined (WIN32) && !defined (UNDER_CE)
     ShowConsole();
-#endif
-
     utf8_fprintf( stdout, _("VLC version %s (%s)\n"), VERSION_MESSAGE,
                   psz_vlc_changeset );
     utf8_fprintf( stdout, _("Compiled by %s on %s (%s)\n"),
              VLC_CompileBy(), VLC_CompileHost(), __DATE__" "__TIME__ );
     utf8_fprintf( stdout, _("Compiler: %s\n"), VLC_Compiler() );
     utf8_fprintf( stdout, "%s", LICENSE_MSG );
-
-#ifdef WIN32        /* Pause the console because it's destroyed when we exit */
     PauseConsole();
-#endif
 }
 
 #if defined (WIN32) && !defined (UNDER_CE)
