@@ -68,8 +68,7 @@ static VLCVideoEffects *_o_sharedInstance = nil;
     [[o_tableView tabViewItemAtIndex:[o_tableView indexOfTabViewItemWithIdentifier:@"crop"]] setLabel:_NS("Crop")];
     [[o_tableView tabViewItemAtIndex:[o_tableView indexOfTabViewItemWithIdentifier:@"geometry"]] setLabel:_NS("Geometry")];
     [[o_tableView tabViewItemAtIndex:[o_tableView indexOfTabViewItemWithIdentifier:@"color"]] setLabel:_NS("Color")];
-    [[o_tableView tabViewItemAtIndex:[o_tableView indexOfTabViewItemWithIdentifier:@"overlay"]] setLabel:_NS("Video output/Overlay")];
-    [[o_tableView tabViewItemAtIndex:[o_tableView indexOfTabViewItemWithIdentifier:@"logo"]] setLabel:_NS("Logo")];
+    [[o_tableView tabViewItemAtIndex:[o_tableView indexOfTabViewItemWithIdentifier:@"misc"]] setLabel:_NS("Miscellaneous")];
 
     [o_adjust_ckb setTitle:_NS("Image Adjust")];
     [o_adjust_hue_lbl setStringValue:_NS("Hue")];
@@ -164,16 +163,11 @@ static VLCVideoEffects *_o_sharedInstance = nil;
     [[o_addtext_pos_pop lastItem] setTag: 9];
     [o_addtext_pos_pop addItemWithTitle: _NS("Bottom-Right")];
     [[o_addtext_pos_pop lastItem] setTag: 10];
-
     [o_addlogo_ckb setTitle:_NS("Add logo")];
     [o_addlogo_logo_lbl setStringValue:_NS("Logo")];
     [o_addlogo_top_lbl setStringValue:_NS("Top")];
     [o_addlogo_left_lbl setStringValue:_NS("Left")];
     [o_addlogo_transparency_lbl setStringValue:_NS("Transparency")];
-    [o_eraselogo_ckb setTitle:_NS("Logo erase")];
-    [o_eraselogo_mask_lbl setStringValue:_NS("Mask")];
-    [o_eraselogo_top_lbl setStringValue:_NS("Top")];
-    [o_eraselogo_left_lbl setStringValue:_NS("Left")];
 
     [o_tableView selectFirstTabViewItem:self];
 
@@ -337,20 +331,6 @@ static VLCVideoEffects *_o_sharedInstance = nil;
     [o_addlogo_top_lbl setEnabled: [o_addlogo_ckb state]];
     [o_addlogo_transparency_sld setEnabled: [o_addlogo_ckb state]];
     [o_addlogo_transparency_lbl setEnabled: [o_addlogo_ckb state]];
-    tmpChar = config_GetPsz( p_intf, "erase-mask" );
-    if( tmpChar )
-    {
-        [o_eraselogo_mask_fld setStringValue: [NSString stringWithUTF8String: tmpChar]];
-        FREENULL( tmpChar );
-    }
-    [o_eraselogo_top_fld setIntValue: config_GetInt( p_intf, "erase-x" )];
-    [o_eraselogo_left_fld setIntValue: config_GetInt( p_intf, "erase-y" )];
-    [o_eraselogo_mask_fld setEnabled: [o_eraselogo_ckb state]];
-    [o_eraselogo_mask_lbl setEnabled: [o_eraselogo_ckb state]];
-    [o_eraselogo_left_fld setEnabled: [o_eraselogo_ckb state]];
-    [o_eraselogo_left_lbl setEnabled: [o_eraselogo_ckb state]];
-    [o_eraselogo_top_fld setEnabled: [o_eraselogo_ckb state]];
-    [o_eraselogo_top_lbl setEnabled: [o_eraselogo_ckb state]];
 }
 
 - (void)setVideoFilter: (char *)psz_name on:(BOOL)b_on
@@ -776,7 +756,7 @@ static VLCVideoEffects *_o_sharedInstance = nil;
 
 
 #pragma mark -
-#pragma mark video output & overlay
+#pragma mark Miscellaneous
 - (IBAction)enableClone:(id)sender
 {
     msg_Dbg( p_intf, "not yet implemented" );
@@ -797,9 +777,6 @@ static VLCVideoEffects *_o_sharedInstance = nil;
     msg_Dbg( p_intf, "not yet implemented" );
 }
 
-
-#pragma mark -
-#pragma mark logo
 - (IBAction)enableAddLogo:(id)sender
 {
     msg_Dbg( p_intf, "not yet implemented" );
@@ -809,16 +786,5 @@ static VLCVideoEffects *_o_sharedInstance = nil;
 {
     msg_Dbg( p_intf, "not yet implemented" );
 }
-
-- (IBAction)enableEraseLogo:(id)sender
-{
-    msg_Dbg( p_intf, "not yet implemented" );
-}
-
-- (IBAction)eraseLogoModifierChanged:(id)sender
-{
-    msg_Dbg( p_intf, "not yet implemented" );
-}
-
 
 @end
