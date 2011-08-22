@@ -741,6 +741,9 @@ static VLCMainWindow *_o_sharedInstance = nil;
         [self setTitle: _NS("VLC media player")];
         [self setRepresentedURL: nil];
     }
+
+    [o_sidebar_view reloadData];
+
     [o_pool release];
 }
 
@@ -757,8 +760,6 @@ static VLCMainWindow *_o_sharedInstance = nil;
     PL_LOCK;
     b_plmul = playlist_CurrentSize( p_playlist ) > 1;
     PL_UNLOCK;
-
-    [o_sidebar_view reloadData];
 
     input_thread_t * p_input = playlist_CurrentInput( p_playlist );
 
