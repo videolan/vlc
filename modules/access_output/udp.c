@@ -102,7 +102,6 @@ static const char *const ppsz_core_options[] = {
     "dscp",
     "ttl",
     "miface",
-    "miface-addr",
     NULL
 };
 

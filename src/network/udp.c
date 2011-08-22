@@ -244,80 +244,38 @@ static int net_SetMcastHopLimit( vlc_object_t *p_this,
 }
 
 
-static int net_SetMcastOutIface (int fd, int family, int scope)
+static int net_SetMcastOut (vlc_object_t *p_this, int fd, int family,
+                            const char *iface)
 {
+    int scope = if_nametoindex (iface);
+    if (scope == 0)
+    {
+        msg_Err (p_this, "invalid multicast interface: %s", iface);
+        return -1;
+    }
+
     switch (family)
     {
 #ifdef IPV6_MULTICAST_IF
         case AF_INET6:
-            return setsockopt (fd, SOL_IPV6, IPV6_MULTICAST_IF,
-                               &scope, sizeof (scope));
+            if (setsockopt (fd, SOL_IPV6, IPV6_MULTICAST_IF,
+                            &scope, sizeof (scope) == 0))
+                return 0;
 #endif
 
 #ifdef __linux__
         case AF_INET:
         {
             struct ip_mreqn req = { .imr_ifindex = scope };
-
-            return setsockopt (fd, SOL_IP, IP_MULTICAST_IF, &req,
-                               sizeof (req));
-        }
-#endif
-    }
-
-    errno = EAFNOSUPPORT;
-    return -1;
-}
-
-
-static inline int net_SetMcastOutIPv4 (int fd, struct in_addr ipv4)
-{
-#ifdef IP_MULTICAST_IF
-    return setsockopt( fd, SOL_IP, IP_MULTICAST_IF, &ipv4, sizeof (ipv4));
-#else
-    errno = EAFNOSUPPORT;
-    return -1;
-#endif
-}
-
-
-static int net_SetMcastOut (vlc_object_t *p_this, int fd, int family,
-                            const char *iface, const char *addr)
-{
-    if (iface != NULL)
-    {
-        int scope = if_nametoindex (iface);
-        if (scope == 0)
-        {
-            msg_Err (p_this, "invalid multicast interface: %s", iface);
-            return -1;
-        }
-
-        if (net_SetMcastOutIface (fd, family, scope) == 0)
-            return 0;
-
-        msg_Err (p_this, "%s: %m", iface);
-    }
-
-    if (addr != NULL)
-    {
-        if (family == AF_INET)
-        {
-            struct in_addr ipv4;
-            if (inet_pton (AF_INET, addr, &ipv4) <= 0)
-            {
-                msg_Err (p_this, "invalid IPv4 address for multicast: %s",
-                         addr);
-                return -1;
-            }
-
-            if (net_SetMcastOutIPv4 (fd, ipv4) == 0)
+            if (setsockopt (fd, SOL_IP, IP_MULTICAST_IF,
+                            &req, sizeof (req)) == 0)
                 return 0;
-
-            msg_Err (p_this, "%s: %m", addr);
         }
+#endif
+        default:
+            errno = EAFNOSUPPORT;
     }
-
+    msg_Err (p_this, "cannot force multicast interface %s: %m", iface);
     return -1;
 }
 
@@ -586,14 +544,7 @@ int net_ConnectDgram( vlc_object_t *p_this, const char *psz_host, int i_port,
         str = var_InheritString (p_this, "miface");
         if (str != NULL)
         {
-            net_SetMcastOut (p_this, fd, ptr->ai_family, str, NULL);
-            free (str);
-        }
-
-        str = var_InheritString (p_this, "miface-addr");
-        if (str != NULL)
-        {
-            net_SetMcastOut (p_this, fd, ptr->ai_family, NULL, str);
+            net_SetMcastOut (p_this, fd, ptr->ai_family, str);
             free (str);
         }
 

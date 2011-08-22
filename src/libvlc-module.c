@@ -669,11 +669,6 @@ static const char *const ppsz_clock_descriptions[] =
 #define MIFACE_LONGTEXT N_( \
     "Default multicast interface. This overrides the routing table.")
 
-#define MIFACE_ADDR_TEXT N_("IPv4 multicast output interface address")
-#define MIFACE_ADDR_LONGTEXT N_( \
-    "IPv4 address for the default multicast interface. This overrides " \
-    "the routing table.")
-
 #define DSCP_TEXT N_("DiffServ Code Point")
 #define DSCP_LONGTEXT N_("Differentiated Services Code Point " \
     "for outgoing UDP streams (or IPv4 Type Of Service, " \
@@ -1982,7 +1977,7 @@ vlc_module_begin ()
                 ACCESS_OUTPUT_TEXT, ACCESS_OUTPUT_LONGTEXT, true )
     add_integer( "ttl", -1, TTL_TEXT, TTL_LONGTEXT, true )
     add_string( "miface", NULL, MIFACE_TEXT, MIFACE_LONGTEXT, true )
-    add_string( "miface-addr", NULL, MIFACE_ADDR_TEXT, MIFACE_ADDR_LONGTEXT, true )
+    add_obsolete_string( "miface-addr" )
     add_integer( "dscp", 0, DSCP_TEXT, DSCP_LONGTEXT, true )
 
     set_subcategory( SUBCAT_SOUT_PACKETIZER )
