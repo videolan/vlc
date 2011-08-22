@@ -76,6 +76,7 @@ src/config/cmdline.c
 src/config/configuration.h
 src/config/core.c
 src/config/file.c
+src/config/help.c
 src/config/intf.c
 src/control/audio.c
 src/control/core.c
