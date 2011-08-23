@@ -496,25 +496,25 @@ static OMX_ERRORTYPE DeinitialiseComponent(decoder_t *p_dec,
     if(!omx_handle) return OMX_ErrorNone;
 
     omx_error = OMX_GetState(omx_handle, &state);
-    CHECK_ERROR(omx_error, "ONX_GetState failed (%x)", omx_error );
+    CHECK_ERROR(omx_error, "OMX_GetState failed (%x)", omx_error );
 
     if(state == OMX_StateExecuting)
     {
         omx_error = OMX_SendCommand( omx_handle, OMX_CommandStateSet,
                                      OMX_StateIdle, 0 );
-        CHECK_ERROR(omx_error, "ONX_CommandStateSet Idle failed (%x)", omx_error );
+        CHECK_ERROR(omx_error, "OMX_CommandStateSet Idle failed (%x)", omx_error );
         omx_error = WaitForSpecificOmxEvent(p_dec, OMX_EventCmdComplete, 0, 0, 0);
         CHECK_ERROR(omx_error, "Wait for Idle failed (%x)", omx_error );
     }
 
     omx_error = OMX_GetState(omx_handle, &state);
-    CHECK_ERROR(omx_error, "ONX_GetState failed (%x)", omx_error );
+    CHECK_ERROR(omx_error, "OMX_GetState failed (%x)", omx_error );
 
     if(state == OMX_StateIdle)
     {
         omx_error = OMX_SendCommand( omx_handle, OMX_CommandStateSet,
                                      OMX_StateLoaded, 0 );
-        CHECK_ERROR(omx_error, "ONX_CommandStateSet Loaded failed (%x)", omx_error );
+        CHECK_ERROR(omx_error, "OMX_CommandStateSet Loaded failed (%x)", omx_error );
 
         for(i = 0; i < p_sys->ports; i++)
         {
@@ -529,7 +529,7 @@ static OMX_ERRORTYPE DeinitialiseComponent(decoder_t *p_dec,
 
                 if(omx_error != OMX_ErrorNone) break;
             }
-            CHECK_ERROR(omx_error, "ONX_FreeBuffer failed (%x, %i, %i)",
+            CHECK_ERROR(omx_error, "OMX_FreeBuffer failed (%x, %i, %i)",
                         omx_error, (int)p_port->i_port_index, j );
         }
 
@@ -653,7 +653,7 @@ static OMX_ERRORTYPE InitialiseComponent(decoder_t *p_dec,
         {
             omx_error = OMX_SendCommand( omx_handle, OMX_CommandPortEnable,
                                          p_port->i_port_index, NULL);
-            CHECK_ERROR(omx_error, "ONX_CommandPortEnable on %i failed (%x)",
+            CHECK_ERROR(omx_error, "OMX_CommandPortEnable on %i failed (%x)",
                         (int)p_port->i_port_index, omx_error );
             omx_error = WaitForSpecificOmxEvent(p_dec, OMX_EventCmdComplete, 0, 0, 0);
             CHECK_ERROR(omx_error, "Wait for PortEnable on %i failed (%x)",
@@ -837,7 +837,7 @@ static int OpenGeneric( vlc_object_t *p_this, bool b_encode )
 
     /* Move component to Idle then Executing state */
     OMX_SendCommand( p_sys->omx_handle, OMX_CommandStateSet, OMX_StateIdle, 0 );
-    CHECK_ERROR(omx_error, "ONX_CommandStateSet Idle failed (%x)", omx_error );
+    CHECK_ERROR(omx_error, "OMX_CommandStateSet Idle failed (%x)", omx_error );
 
     /* Allocate omx buffers */
     for(i = 0; i < p_sys->ports; i++)
@@ -868,7 +868,7 @@ static int OpenGeneric( vlc_object_t *p_this, bool b_encode )
             OMX_FIFO_PUT(&p_port->fifo, p_port->pp_buffers[j]);
         }
         p_port->i_buffers = j;
-        CHECK_ERROR(omx_error, "ONX_UseBuffer failed (%x, %i, %i)",
+        CHECK_ERROR(omx_error, "OMX_UseBuffer failed (%x, %i, %i)",
                     omx_error, (int)p_port->i_port_index, j );
     }
 
@@ -877,7 +877,7 @@ static int OpenGeneric( vlc_object_t *p_this, bool b_encode )
 
     omx_error = OMX_SendCommand( p_sys->omx_handle, OMX_CommandStateSet,
                                  OMX_StateExecuting, 0);
-    CHECK_ERROR(omx_error, "ONX_CommandStateSet Executing failed (%x)", omx_error );
+    CHECK_ERROR(omx_error, "OMX_CommandStateSet Executing failed (%x)", omx_error );
     omx_error = WaitForSpecificOmxEvent(p_dec, OMX_EventCmdComplete, 0, 0, 0);
     CHECK_ERROR(omx_error, "Wait for Executing failed (%x)", omx_error );
 
@@ -950,7 +950,7 @@ static OMX_ERRORTYPE PortReconfigure(decoder_t *p_dec, OmxPort *p_port)
 
     omx_error = OMX_SendCommand( p_sys->omx_handle, OMX_CommandPortDisable,
                                  p_port->i_port_index, NULL);
-    CHECK_ERROR(omx_error, "ONX_CommandPortDisable on %i failed (%x)",
+    CHECK_ERROR(omx_error, "OMX_CommandPortDisable on %i failed (%x)",
                 (int)p_port->i_port_index, omx_error );
 
     for(i = 0; i < p_port->i_buffers; i++)
@@ -961,7 +961,7 @@ static OMX_ERRORTYPE PortReconfigure(decoder_t *p_dec, OmxPort *p_port)
 
         if(omx_error != OMX_ErrorNone) break;
     }
-    CHECK_ERROR(omx_error, "ONX_FreeBuffer failed (%x, %i, %i)",
+    CHECK_ERROR(omx_error, "OMX_FreeBuffer failed (%x, %i, %i)",
                 omx_error, (int)p_port->i_port_index, i );
 
     omx_error = WaitForSpecificOmxEvent(p_dec, OMX_EventCmdComplete, 0, 0, 0);
@@ -977,7 +977,7 @@ static OMX_ERRORTYPE PortReconfigure(decoder_t *p_dec, OmxPort *p_port)
 
     omx_error = OMX_SendCommand( p_sys->omx_handle, OMX_CommandPortEnable,
                                  p_port->i_port_index, NULL);
-    CHECK_ERROR(omx_error, "ONX_CommandPortEnable on %i failed (%x)",
+    CHECK_ERROR(omx_error, "OMX_CommandPortEnable on %i failed (%x)",
                 (int)p_port->i_port_index, omx_error );
 
     for(i = 0; i < p_port->i_buffers; i++)
@@ -997,7 +997,7 @@ static OMX_ERRORTYPE PortReconfigure(decoder_t *p_dec, OmxPort *p_port)
         OMX_FIFO_PUT(&p_port->fifo, p_port->pp_buffers[i]);
     }
     p_port->i_buffers = i;
-    CHECK_ERROR(omx_error, "ONX_UseBuffer failed (%x, %i, %i)",
+    CHECK_ERROR(omx_error, "OMX_UseBuffer failed (%x, %i, %i)",
                 omx_error, (int)p_port->i_port_index, i );
 
     omx_error = WaitForSpecificOmxEvent(p_dec, OMX_EventCmdComplete, 0, 0, 0);
