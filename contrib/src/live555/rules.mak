@@ -23,6 +23,7 @@ ifndef HAVE_WINCE
 	patch -p0 < $(SRC)/live555/live-getaddrinfo.patch
 endif
 endif
+	patch -p0 < $(SRC)/live555/live-cloexec.patch
 	mv live $@
 	touch $@
 
