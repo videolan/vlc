@@ -199,18 +199,21 @@ AM_LDFLAGS += -avoid-version
 endif
 
 libvlccore_la_SOURCES = $(SOURCES_libvlc)
-libvlccore_la_CFLAGS = $(CFLAGS_libvlccore) \
+libvlccore_la_CPPFLAGS = $(INCICONV) \
 	-DMODULE_STRING=\"main\" \
 	-DLOCALEDIR=\"$(localedir)\" \
 	-DSYSCONFDIR=\"$(sysconfdir)\" \
 	-DDATA_PATH=\"$(vlcdatadir)\" \
 	-DPKGLIBDIR=\"$(vlclibdir)\"
+libvlccore_la_CFLAGS = $(CFLAGS_libvlccore)
 libvlccore_la_LDFLAGS = $(LDFLAGS_libvlccore) $(AM_LDFLAGS) \
 	-no-undefined \
 	-export-symbols $(srcdir)/libvlccore.sym \
 	-version-info 5:0:0
-libvlccore_la_LIBADD = $(LIBS_libvlccore) $(AM_LIBADD) \
-	$(LTLIBINTL) ../compat/libcompat.la
+libvlccore_la_LIBADD = $(LIBS_libvlccore) \
+	$(LTLIBINTL) $(LTLIBICONV) \
+	$(SOCKET_LIBS) $(LIBDL) $(LIBM) \
+	../compat/libcompat.la
 libvlccore_la_DEPENDENCIES = libvlccore.sym
 if HAVE_WIN32
 libvlccore_la_DEPENDENCIES += libvlc_win32_rc.$(OBJEXT)

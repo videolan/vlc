@@ -475,8 +475,6 @@ dnl
 dnl Iconv stuff
 dnl
 AM_ICONV
-VLC_ADD_CFLAGS([libvlccore],[${INCICONV}])
-VLC_ADD_LIBS([libvlccore],[${LTLIBICONV}])
 
 dnl Check for broken versions of mingw-runtime compatability library
 AS_IF([test "${SYS}" = "mingw32" -o "${SYS}" = "mingwce"], [
@@ -614,7 +612,7 @@ AC_SEARCH_LIBS(connect, [socket], [
 ])
 LIBS="$LIBS_save"
 AS_IF([test -n "$SOCKET_LIBS"], [
-  VLC_ADD_LIBS([libvlccore access_http access_mms access_udp access_tcp access_ftp access_rtmp access_output_udp access_output_shout sap stream_out_select stream_out_standard stream_out_rtp stream_out_raop vod_rtsp access_realrtsp rtp oldrc netsync gnutls growl_udp flac ts audioscrobbler lua remoteosd zvbi audiobargraph_a netsync],[${SOCKET_LIBS}])
+  VLC_ADD_LIBS([access_http access_mms access_udp access_tcp access_ftp access_rtmp access_output_udp access_output_shout sap stream_out_select stream_out_standard stream_out_rtp stream_out_raop vod_rtsp access_realrtsp rtp oldrc netsync gnutls growl_udp flac ts audioscrobbler lua remoteosd zvbi audiobargraph_a netsync],[${SOCKET_LIBS}])
 ])
 AC_SUBST(SOCKET_LIBS)
 
@@ -678,7 +676,7 @@ AC_CHECK_FUNC(getopt_long,, [
 AC_SUBST(GNUGETOPT_LIBS)
 
 AC_CHECK_LIB(m,cos,[
-  VLC_ADD_LIBS([adjust wave ripple psychedelic gradient a52tofloat32 dtstofloat32 x264 goom visual panoramix rotate noise grain scene kate flac lua chorus_flanger freetype avcodec avformat access_avio swscale postproc i420_rgb faad twolame equalizer spatializer param_eq samplerate libvlccore freetype mod mpc dmo quicktime realvideo qt4 compressor headphone_channel_mixer normvol audiobargraph_a speex mono colorthres extract ball access_imem hotkeys mosaic gaussianblur dbus x264],[-lm])
+  VLC_ADD_LIBS([adjust wave ripple psychedelic gradient a52tofloat32 dtstofloat32 x264 goom visual panoramix rotate noise grain scene kate flac lua chorus_flanger freetype avcodec avformat access_avio swscale postproc i420_rgb faad twolame equalizer spatializer param_eq samplerate freetype mod mpc dmo quicktime realvideo qt4 compressor headphone_channel_mixer normvol audiobargraph_a speex mono colorthres extract ball access_imem hotkeys mosaic gaussianblur dbus x264],[-lm])
   LIBM="-lm"
 ], [
   LIBM=""
@@ -713,7 +711,7 @@ AS_IF([test "$LIBDL" != "no"], [
   LIBDL=""
 ])
 AC_SUBST(LIBDL)
-VLC_ADD_LIBS([libvlccore realvideo lua],[$LIBDL])
+VLC_ADD_LIBS([realvideo lua],[$LIBDL])
 
 dnl Check for thread library
 if test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"; then
