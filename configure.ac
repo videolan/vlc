@@ -470,7 +470,6 @@ dnl Gettext stuff
 dnl
 AM_GNU_GETTEXT_VERSION([0.18.1])
 AM_GNU_GETTEXT([external])
-VLC_ADD_LIBS([libvlccore vlc], [${LTLIBINTL}])
 
 dnl
 dnl Iconv stuff
