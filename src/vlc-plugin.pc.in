@@ -19,3 +19,6 @@ Cflags: -I${includedir} -I${pkgincludedir}/plugins \
 	-D_REENTRANT \
 	-D_THREAD_SAFE
 Libs: -L${libdir} -lvlccore
+Libs.private: @LIBS_libvlccore@ \
+	@LTLIBINTL@ @LTLIBICONV@ \
+	@SOCKET_LIBS@ @LIBDL@ @LIBM@

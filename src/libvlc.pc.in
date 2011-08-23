@@ -8,4 +8,4 @@ Description: VLC media player external control library
 Version: @VERSION@
 Cflags: -I${includedir}
 Libs: -L${libdir} -lvlc
-Libs.private: -lvlccore
+Libs.private: -lvlccore @LIBS_libvlc@
