@@ -68,9 +68,12 @@ static VLCAudioEffects *_o_sharedInstance = nil;
     [o_eq_twopass_ckb setTitle:_NS("2 Pass")];
     [o_eq_preamp_lbl setStringValue:_NS("Preamp")];
     [o_eq_presets_popup removeAllItems];
-    for( int i = 0; i < 18 ; i++ )
-        [o_eq_presets_popup insertItemWithTitle: _NS(preset_list_text[i]) atIndex: i];
-    
+    for( int i = 0; i < NB_PRESETS ; i++ )
+    {
+        [o_eq_presets_popup addItemWithTitle: _NS(preset_list_text[i])];
+        [[o_eq_presets_popup lastItem] setTag: i];
+    }
+
     /* Compressor */
     [o_comp_enable_ckb setTitle:_NS("Enable dynamic range compressor")];
     [o_comp_reset_btn setTitle:_NS("Reset")];
@@ -185,34 +188,31 @@ static bool GetEqualizerStatus( intf_thread_t *p_custom_intf,
 
 - (void)setupEqualizer
 {
-    int i;
     vlc_object_t *p_object= VLC_OBJECT(getAout());
     if( p_object == NULL )
-        p_object = vlc_object_hold(pl_Get( VLCIntf ));
-    
+        p_object = pl_Get( VLCIntf );
+
     if( p_object )
     {
         char *psz_preset;
-        
-        var_Create( p_object, "equalizer-preset", VLC_VAR_STRING |
-                   VLC_VAR_DOINHERIT );
+
+        var_Create( p_object, "equalizer-preset", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
         psz_preset = var_GetNonEmptyString( p_object, "equalizer-preset" );
-        
-        for( i = 0 ; i < NB_PRESETS ; i++ )
+
+        for( int i = 0 ; i < NB_PRESETS ; i++ )
         {
             if( strcmp( preset_list[i], psz_preset ) )
                 continue;
-            
-            [o_eq_presets_popup selectItemAtIndex: i];
-            
-            
+
+            [o_eq_presets_popup selectItemWithTag:i];
+
             [o_eq_preamp_sld setFloatValue: eqz_preset_10b[i].f_preamp];
             [self setBandSlidersValues: (float *)eqz_preset_10b[i].f_amp];
-            
+
             if( strcmp( psz_preset, "flat" ) )
             {
                 char psz_bands[100];
-                
+
                 snprintf( psz_bands, sizeof( psz_bands ),
                          "%.1f %.1f %.1f %.1f %.1f %.1f %.1f "
                          "%.1f %.1f %.1f",
@@ -227,19 +227,15 @@ static bool GetEqualizerStatus( intf_thread_t *p_custom_intf,
                          eqz_preset_10b[i].f_amp[8],
                          eqz_preset_10b[i].f_amp[9] );
                 
-                var_Create( p_object, "equalizer-preamp", VLC_VAR_FLOAT |
-                           VLC_VAR_DOINHERIT );
-                var_Create( p_object, "equalizer-bands", VLC_VAR_STRING |
-                           VLC_VAR_DOINHERIT );
-                var_SetFloat( p_object, "equalizer-preamp",
-                             eqz_preset_10b[i].f_preamp );
+                var_Create( p_object, "equalizer-preamp", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );
+                var_Create( p_object, "equalizer-bands", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+                var_SetFloat( p_object, "equalizer-preamp", eqz_preset_10b[i].f_preamp );
                 var_SetString( p_object, "equalizer-bands", psz_bands );
             }
         }
         free( psz_preset );
-        vlc_object_release( p_object );
     }
-    
+
     [self equalizerUpdated];
 }
 
@@ -248,7 +244,6 @@ static bool GetEqualizerStatus( intf_thread_t *p_custom_intf,
     float f_preamp, f_band[10];
     char *psz_bands, *psz_bands_init, *p_next;
     bool b_2p;
-    int i;
     bool b_enabled = GetEqualizerStatus( p_intf, (char *)"equalizer" );
     vlc_object_t *p_object = VLC_OBJECT(getAout());
     
@@ -276,7 +271,7 @@ static bool GetEqualizerStatus( intf_thread_t *p_custom_intf,
     /* Set the bands slider */
     psz_bands_init = psz_bands;
     
-    for( i = 0; i < 10; i++ )
+    for( int i = 0; i < 10; i++ )
     {
         /* Read dB -20/20 */
         f_band[i] = strtof( psz_bands, &p_next );
@@ -368,27 +363,28 @@ static bool GetEqualizerStatus( intf_thread_t *p_custom_intf,
     vlc_object_t *p_object= VLC_OBJECT(getAout());
     if( p_object == NULL )
         p_object = vlc_object_hold(pl_Get( p_intf ));
+    NSInteger numberOfChosenPreset = [[sender selectedItem] tag];
     
-    var_SetString( p_object , "equalizer-preset" , preset_list[[sender indexOfSelectedItem]] );
+    var_SetString( p_object , "equalizer-preset" , preset_list[numberOfChosenPreset] );
     
     NSString *preset = @"";
     const char *psz_values;
     for( int i = 0; i < EQZ_BANDS_MAX; i++ )
     {
-        preset = [preset stringByAppendingFormat:@"%.1f ", eqz_preset_10b[[sender indexOfSelectedItem]].f_amp[i] ];
+        preset = [preset stringByAppendingFormat:@"%.1f ", eqz_preset_10b[numberOfChosenPreset].f_amp[i] ];
     }
     psz_values = [preset UTF8String];
     var_SetString( p_object, "equalizer-bands", psz_values );
-    var_SetFloat( p_object, "equalizer-preamp", eqz_preset_10b[[sender indexOfSelectedItem]].f_preamp);
+    var_SetFloat( p_object, "equalizer-preamp", eqz_preset_10b[[[sender selectedItem] tag]].f_preamp);
     
-    [o_eq_preamp_sld setFloatValue: eqz_preset_10b[[sender indexOfSelectedItem]].f_preamp];
+    [o_eq_preamp_sld setFloatValue: eqz_preset_10b[numberOfChosenPreset].f_preamp];
     
-    [self setBandSlidersValues:(float *)eqz_preset_10b[[sender indexOfSelectedItem]].f_amp];
+    [self setBandSlidersValues:(float *)eqz_preset_10b[numberOfChosenPreset].f_amp];
     
     /* save changed to config */
     config_PutPsz( p_intf, "equalizer-bands", psz_values );
-    config_PutFloat( p_intf, "equalizer-preamp", eqz_preset_10b[[sender indexOfSelectedItem]].f_preamp );
-    config_PutPsz( p_intf, "equalizer-preset", preset_list[[sender indexOfSelectedItem]] );
+    config_PutFloat( p_intf, "equalizer-preamp", eqz_preset_10b[numberOfChosenPreset].f_preamp );
+    config_PutPsz( p_intf, "equalizer-preset", preset_list[numberOfChosenPreset] );
 
     vlc_object_release( p_object );
 }

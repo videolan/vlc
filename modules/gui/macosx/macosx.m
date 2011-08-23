@@ -97,18 +97,12 @@ vlc_module_begin ()
     set_category( CAT_INTERFACE )
     set_subcategory( SUBCAT_INTERFACE_MAIN )
     cannot_unload_broken_library( )
-    add_bool( "macosx-autoplay", true, AUTOPLAY_OSX_TEST, AUTOPLAY_OSX_LONGTEXT,
-              false )
-    add_bool( "macosx-recentitems", true, RECENT_ITEMS_TEXT, RECENT_ITEMS_LONGTEXT,
-              false )
-    add_bool( "macosx-fspanel", true, FSPANEL_TEXT, FSPANEL_LONGTEXT,
-              false )
-    add_bool( "macosx-appleremote", true, USE_APPLE_REMOTE_TEXT, USE_APPLE_REMOTE_LONGTEXT,
-             false )
-    add_bool( "macosx-mediakeys", true, USE_MEDIAKEYS_TEXT, USE_MEDIAKEYS_LONGTEXT,
-             false )
-    add_bool( "macosx-interfacestyle", true, INTERFACE_STYLE_TEXT, INTERFACE_STYLE_LONGTEXT,
-             false )
+    add_bool( "macosx-autoplay", true, AUTOPLAY_OSX_TEST, AUTOPLAY_OSX_LONGTEXT, false )
+    add_bool( "macosx-recentitems", true, RECENT_ITEMS_TEXT, RECENT_ITEMS_LONGTEXT, false )
+    add_bool( "macosx-fspanel", true, FSPANEL_TEXT, FSPANEL_LONGTEXT, false )
+    add_bool( "macosx-appleremote", true, USE_APPLE_REMOTE_TEXT, USE_APPLE_REMOTE_LONGTEXT, false )
+    add_bool( "macosx-mediakeys", true, USE_MEDIAKEYS_TEXT, USE_MEDIAKEYS_LONGTEXT, false )
+    add_bool( "macosx-interfacestyle", true, INTERFACE_STYLE_TEXT, INTERFACE_STYLE_LONGTEXT, false )
     add_bool( "macosx-nativefullscreenmode", true, NATIVE_FULLSCREEN_MODE_ON_LION_TEXT, NATIVE_FULLSCREEN_MODE_ON_LION_LONGTEXT, false )
     add_obsolete_bool( "macosx-stretch" ) /* since 1.2.0 */
     add_obsolete_bool( "macosx-background" ) /* since 1.2.0 */
@@ -119,11 +113,8 @@ vlc_module_begin ()
         set_capability( "vout window nsobject", 100 )
         set_callbacks( WindowOpen, WindowClose )
 
-        add_integer( "macosx-vdev", 0, VDEV_TEXT, VDEV_LONGTEXT,
-                     false )
-        add_float_with_range( "macosx-opaqueness", 1, 0, 1,
-                              OPAQUENESS_TEXT, OPAQUENESS_LONGTEXT, true );
-        add_bool( "macosx-black", true, BLACK_TEXT, BLACK_LONGTEXT,
-                  false )
+        add_integer( "macosx-vdev", 0, VDEV_TEXT, VDEV_LONGTEXT, false )
+        add_float_with_range( "macosx-opaqueness", 1, 0, 1, OPAQUENESS_TEXT, OPAQUENESS_LONGTEXT, true );
+        add_bool( "macosx-black", true, BLACK_TEXT, BLACK_LONGTEXT, false )
 vlc_module_end ()
 

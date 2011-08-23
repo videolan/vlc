@@ -664,6 +664,9 @@ static VLCMain *_o_sharedMainInstance = nil;
     if( !p_intf )
         return;
 
+    // save stuff
+    config_SaveConfigFile( p_intf );
+
     // don't allow a double termination call. If the user has
     // already invoked the quit then simply return this time.
     int isTerminating = false;
