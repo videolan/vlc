@@ -28,10 +28,6 @@
 # include "config.h"
 #endif
 
-#if defined(HAVE_DL_DLOPEN)
-# include <dlfcn.h>
-#endif
-
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_codec.h>
