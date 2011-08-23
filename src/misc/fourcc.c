@@ -393,8 +393,6 @@ static const entry_t p_list_video[] = {
     B(VLC_CODEC_WMVA, "Windows Media Video Advanced Profile"),
         A("WMVA"),
         A("wmva"),
-        A("WVP2"),
-        A("wvp2"),
 
     B(VLC_CODEC_VC1, "Windows Media Video VC1"),
         A("WVC1"),
@@ -405,6 +403,10 @@ static const entry_t p_list_video[] = {
     B(VLC_CODEC_WMVP, "Windows Media Video Presentation"),
         A("WMVP"),
         A("wmvp"),
+
+    B(VLC_CODEC_WMVP2, "Windows Media Video Presentation, v2"),
+        A("WVP2"),
+        A("wvp2"),
 
     /* Microsoft Video 1 */
     B(VLC_CODEC_MSVIDEO1, "Microsoft Video 1"),
