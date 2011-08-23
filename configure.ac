@@ -728,7 +728,6 @@ if test "${ac_cv_have_plugins}" = "no" -o "${SYS}" = "darwin"; then
     ])
   ])
   if test "${ac_cv_my_have_dlopen}" = "yes"; then
-    AC_DEFINE(HAVE_DL_DLOPEN, 1, [Define if you have the dlopen API])
     ac_cv_have_plugins=yes
     VLC_ADD_LIBS([libvlccore realvideo lua],[$LIBDL])
   fi
