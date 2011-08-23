@@ -452,13 +452,9 @@ dnl fail on anything other than pass_all.
 AC_CACHE_VAL(lt_cv_deplibs_check_method,
     [lt_cv_deplibs_check_method=pass_all])
 
-AC_DISABLE_STATIC
-dnl AC_DISABLE_FAST_INSTALL
-AC_LIBTOOL_DLOPEN
-AC_LIBTOOL_WIN32_DLL
-m4_undefine([AC_PROG_F77])
-m4_defun([AC_PROG_F77],[])
-AC_PROG_LIBTOOL
+LT_INIT([dlopen win32-dll shared disable-static])
+LT_LANG([C++])
+LT_LANG([Windows Resource])
 
 m4_undefine([AC_DEPLIBS_CHECK_METHOD])
 m4_defun([AC_DEPLIBS_CHECK_METHOD],[])
