@@ -226,6 +226,10 @@ static const struct
     { VLC_CODEC_FLASHSV2, CODEC_ID_FLASHSV2, VIDEO_ES },
 #endif
 
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 53, 9, 0 )
+    { VLC_CODEC_WMVP, CODEC_ID_WMV3IMAGE, VIDEO_ES },
+#endif
+
 #if 0
 /*    UNTESTED VideoGames*/
     { VLC_FOURCC('W','C','3','V'), CODEC_ID_XAN_WC3,
