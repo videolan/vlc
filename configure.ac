@@ -692,48 +692,31 @@ AC_CHECK_LIB(m,lrintf, [
 ])
 
 dnl Check for dynamic plugins
-ac_cv_have_plugins=no
-
-# Win32 style
-if test "${ac_cv_have_plugins}" = "no"; then
-  if test "${SYS}" = "mingw32" ; then
-    AC_CHECK_LIB(kernel32, main,
-     [VLC_ADD_LIBS([libvlccore],[-lkernel32])
-      ac_cv_have_plugins=yes])
-  fi
-fi
-
-# WinCE style
-if test "${ac_cv_have_plugins}" = "no"; then
-  if test "${SYS}" = "mingwce"; then
-    ac_cv_have_plugins=yes
-  fi
-fi
-
-# Only test for dlopen() if the others didn't work
-LIBDL=""
-if test "${ac_cv_have_plugins}" = "no" -o "${SYS}" = "darwin"; then
-  ac_cv_my_have_dlopen=no
-  AC_CHECK_FUNC(dlopen, [
-    ac_cv_my_have_dlopen=yes
-  ], [
-    AC_CHECK_LIB(dl, dlopen, [
-      ac_cv_my_have_dlopen=yes
-      LIBDL="-ldl"
-    ], [
-      AC_CHECK_LIB(svld, dlopen, [
-        ac_cv_my_have_dlopen=yes
-        LIBDL="-lsvld"
-      ])
-    ])
+LIBDL="no"
+LIBS_save="$LIBS"
+AC_SEARCH_LIBS(dlopen, [dl svld], [
+  AS_IF([test "$ac_cv_search_dlopen" != "none required"], [
+    LIBDL="$ac_cv_search_dlopen"
   ])
-  if test "${ac_cv_my_have_dlopen}" = "yes"; then
-    ac_cv_have_plugins=yes
-    VLC_ADD_LIBS([libvlccore realvideo lua],[$LIBDL])
-  fi
-fi
-AC_SUBST(LIBDL)
+])
+LIBS="$LIBS_save"
 
+# Windows
+AS_IF([test "${SYS}" = "mingw32" -o "${SYS}" = "mingwce"], [
+  LIBDL=""
+])
+
+AS_IF([test "$LIBDL" != "no"], [
+  AC_DEFINE(HAVE_DYNAMIC_PLUGINS, 1,
+            [Define to 1 if dynamic plugins are supported.])
+], [
+  dnl Clear $LIBDL so as not to break linking
+  LIBDL=""
+])
+AC_SUBST(LIBDL)
+VLC_ADD_LIBS([libvlccore realvideo lua],[$LIBDL])
+
+dnl Check for thread library
 if test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"; then
   dnl Check for pthreads - borrowed from XMMS
   THREAD_LIB=error
@@ -4210,23 +4193,6 @@ AC_ARG_ENABLE(vlc,
   [  --enable-vlc            build the VLC media player (default enabled)])
 AM_CONDITIONAL(BUILD_VLC, [test "${enable_vlc}" != "no"])
 
-
-dnl
-dnl  Plugin and builtin checks
-dnl
-plugin_support=yes
-
-dnl Automagically disable plugins if there is no system support for
-dnl dynamically loadable files (.so, .dll, .dylib).
-dnl don't forget vlc-win32 still can load .dll as plugins
-AS_IF([test "${ac_cv_have_plugins}" = "no"], [
-  AC_MSG_WARN([*** No plugin support! Building statically! ***])
-  plugin_support=no
-])
-
-AS_IF([test "${plugin_support}" != "no"], [
-  AC_DEFINE(HAVE_DYNAMIC_PLUGINS, 1, [Define if dynamic plugins are supported])
-])
 
 dnl
 dnl Pic and shared libvlc stuff
