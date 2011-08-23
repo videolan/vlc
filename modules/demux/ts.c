@@ -35,15 +35,14 @@
 
 #include <assert.h>
 
-#include <vlc_access.h> /* DVB-specific things */
+#include <vlc_access.h>    /* DVB-specific things */
 #include <vlc_demux.h>
 #include <vlc_meta.h>
 #include <vlc_epg.h>
+#include <vlc_charset.h>   /* FromCharset, for EIT */
 
-#include <vlc_iso_lang.h>
-#include <vlc_network.h>
-#include <vlc_charset.h>
-#include <vlc_fs.h>
+#include <vlc_network.h>   /* net_ for ts-out mode */
+#include <vlc_fs.h>        /* vlc_fopen for file-dump mode */
 
 #include "../mux/mpeg/csa.h"
 
