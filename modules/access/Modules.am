@@ -34,13 +34,21 @@ libsdp_plugin_la_CFLAGS = $(AM_CFLAGS)
 libsdp_plugin_la_LIBADD = $(AM_LIBADD)
 libsdp_plugin_la_DEPENDENCIES =
 
+libaccess_smb_plugin_la_SOURCES = smb.c
+libaccess_smb_plugin_la_CFLAGS = $(AM_CFLAGS)
+libaccess_smb_plugin_la_LIBADD = $(AM_LIBADD)
+if HAVE_WIN32
+libaccess_smb_plugin_la_LIBADD += -lmpr
+endif
+libaccess_smb_plugin_la_DEPENDENCIES =
+libvlc_LTLIBRARIES += $(LTLIBaccess_smb)
+
 SOURCES_access_directory = directory.c
 SOURCES_access_dv = dv.c
 SOURCES_access_udp = udp.c
 SOURCES_access_tcp = tcp.c
 SOURCES_access_http = http.c
 SOURCES_access_ftp = ftp.c
-SOURCES_access_smb = smb.c
 SOURCES_access_gnomevfs = gnomevfs.c
 SOURCES_access_eyetv = eyetv.m
 SOURCES_dvdnav = dvdnav.c
@@ -175,7 +183,8 @@ libvlc_LTLIBRARIES += libdtv_plugin.la
 endif
 
 
-
 EXTRA_LTLIBRARIES += \
 	libaccess_rtmp_plugin.la \
-	libaccess_shm_plugin.la
+	libaccess_shm_plugin.la \
+	libaccess_smb_plugin.la \
+	$(NULL)

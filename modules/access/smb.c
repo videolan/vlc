@@ -363,27 +363,11 @@ static void Win32AddConnection( access_t *p_access, char *psz_path,
                                 char *psz_user, char *psz_pwd,
                                 char *psz_domain )
 {
-    DWORD WINAPI (*OurWNetAddConnection2)( LPNETRESOURCE, LPCTSTR, LPCTSTR, DWORD );
     char psz_remote[MAX_PATH], psz_server[MAX_PATH], psz_share[MAX_PATH];
     NETRESOURCE net_resource;
     DWORD i_result;
     char *psz_parser;
     VLC_UNUSED( psz_domain );
-
-    HINSTANCE hdll = LoadLibrary(_T("MPR.DLL"));
-    if( !hdll )
-    {
-        msg_Warn( p_access, "couldn't load mpr.dll" );
-        return;
-    }
-
-    OurWNetAddConnection2 =
-      (void *)GetProcAddress( hdll, _T("WNetAddConnection2A") );
-    if( !OurWNetAddConnection2 )
-    {
-        msg_Warn( p_access, "couldn't find WNetAddConnection2 in mpr.dll" );
-        return;
-    }
 
     memset( &net_resource, 0, sizeof(net_resource) );
     net_resource.dwType = RESOURCETYPE_DISK;
@@ -402,7 +386,7 @@ static void Win32AddConnection( access_t *p_access, char *psz_path,
     snprintf( psz_remote, sizeof( psz_remote ), "\\\\%s\\%s", psz_server, psz_share );
     net_resource.lpRemoteName = psz_remote;
 
-    i_result = OurWNetAddConnection2( &net_resource, psz_pwd, psz_user, 0 );
+    i_result = WNetAddConnection2( &net_resource, psz_pwd, psz_user, 0 );
 
     if( i_result != NO_ERROR )
     {
@@ -417,7 +401,5 @@ static void Win32AddConnection( access_t *p_access, char *psz_path,
     {
         msg_Dbg( p_access, "failed to connect to %s", psz_remote );
     }
-
-    FreeLibrary( hdll );
 }
 #endif // WIN32
