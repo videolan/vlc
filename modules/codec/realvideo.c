@@ -45,13 +45,8 @@ int WINAPI FreeLibrary( void *handle );
 #   define WINAPI
 #endif
 
-#if defined(HAVE_DL_DLOPEN)
-#   if defined(HAVE_DLFCN_H) /* Linux, BSD, Hurd */
-#       include <dlfcn.h>
-#   endif
-#   if defined(HAVE_SYS_DL_H)
-#       include <sys/dl.h>
-#   endif
+#ifndef WIN32
+#   include <dlfcn.h>
 #endif
 
 typedef struct cmsg_data_s
