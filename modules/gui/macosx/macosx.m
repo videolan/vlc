@@ -77,10 +77,6 @@ void WindowClose  ( vout_window_t * );
 #define RECENT_ITEMS_LONGTEXT N_("By default, VLC keeps a list of the last 10 items. " \
                                  "This feature can be disabled here.")
 
-#define EQ_KEEP_TEXT N_("Keep current Equalizer settings")
-#define EQ_KEEP_LONGTEXT N_("By default, VLC keeps the last equalizer settings before " \
-                            "termination. This feature can be disabled here.")
-
 #define USE_APPLE_REMOTE_TEXT N_("Control playback with the Apple Remote")
 #define USE_APPLE_REMOTE_LONGTEXT N_("By default, VLC can be remotely controlled with the Apple Remote.")
 
@@ -105,8 +101,6 @@ vlc_module_begin ()
               false )
     add_bool( "macosx-recentitems", true, RECENT_ITEMS_TEXT, RECENT_ITEMS_LONGTEXT,
               false )
-    add_bool( "macosx-eq-keep", true, EQ_KEEP_TEXT, EQ_KEEP_LONGTEXT,
-              false )
     add_bool( "macosx-fspanel", true, FSPANEL_TEXT, FSPANEL_LONGTEXT,
               false )
     add_bool( "macosx-appleremote", true, USE_APPLE_REMOTE_TEXT, USE_APPLE_REMOTE_LONGTEXT,
@@ -118,6 +112,7 @@ vlc_module_begin ()
     add_bool( "macosx-nativefullscreenmode", true, NATIVE_FULLSCREEN_MODE_ON_LION_TEXT, NATIVE_FULLSCREEN_MODE_ON_LION_LONGTEXT, false )
     add_obsolete_bool( "macosx-stretch" ) /* since 1.2.0 */
     add_obsolete_bool( "macosx-background" ) /* since 1.2.0 */
+    add_obsolete_bool( "macosx-eq-keep" ) /* since 1.2.0 */
 
     add_submodule ()
         set_description( "Mac OS X Video Output Provider" )
