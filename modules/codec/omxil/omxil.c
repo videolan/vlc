@@ -28,9 +28,9 @@
 # include "config.h"
 #endif
 
-#if defined(HAVE_DL_DLOPEN)
-# include <dlfcn.h>
-#endif
+#include <dlfcn.h>
+#define dll_open(name) dlopen( name, RTLD_NOW )
+#define dll_close(handle) dlclose(handle)
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
@@ -52,17 +52,6 @@ static const char *ppsz_dll_list[] =
     "libomxil-bellagio.so",  /* Bellagio IL core */
     0
 };
-
-/*****************************************************************************
- * defines
- *****************************************************************************/
-#if defined(HAVE_DL_DLOPEN)
-# define dll_open(name) dlopen( name, RTLD_NOW )
-# define dll_close(handle) dlclose(handle)
-#else
-# define dll_open(name) (NULL)
-# define dll_close(handle) (void)0
-#endif
 
 /*****************************************************************************
  * Local prototypes
