@@ -677,7 +677,7 @@ ModuleListConfigControl::ModuleListConfigControl( vlc_object_t *_p_this,
         boxline++;
     }
 
-    layoutGroupBox->addWidget( text, boxline, 0 );
+    layoutGroupBox->addWidget( text, boxline, 0, 1, 2 );
 
     if( !l )
     {
