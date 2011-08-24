@@ -1,7 +1,7 @@
 /*****************************************************************************
  * preferences.cpp : "Normal preferences"
  ****************************************************************************
- * Copyright (C) 2006-2007 the VideoLAN team
+ * Copyright (C) 2006-2011 the VideoLAN team
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
@@ -58,6 +58,9 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
 
     setIconSize( QSize( ITEM_HEIGHT,ITEM_HEIGHT ) );
     setTextElideMode( Qt::ElideNone );
+
+    setUniformRowHeights( true );
+    CONNECT( this, itemExpanded(QTreeWidgetItem*), this, resizeColumns() );
 
     /* Nice icons */
 #define BI( a,b) QIcon a##_icon = QIcon( b )
@@ -285,8 +288,6 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
     resizeColumnToContents( 0 );
 }
 
-PrefsTree::~PrefsTree() {}
-
 void PrefsTree::applyAll()
 {
     doAll( false );
@@ -409,6 +410,11 @@ void PrefsTree::filter( const QString &text )
             filterItems( cat_item, text, Qt::CaseInsensitive );
         }
     }
+}
+
+void PrefsTree::resizeColumns()
+{
+    resizeColumnToContents( 0 );
 }
 
 /* go over the module config items and search text in psz_text

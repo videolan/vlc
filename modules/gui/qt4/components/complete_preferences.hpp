@@ -68,7 +68,6 @@ class PrefsTree : public QTreeWidget
     Q_OBJECT
 public:
     PrefsTree( intf_thread_t *, QWidget * );
-    virtual ~PrefsTree();
 
     void applyAll();
     void cleanAll();
@@ -79,6 +78,9 @@ private:
     bool filterItems( QTreeWidgetItem *item, const QString &text, Qt::CaseSensitivity cs );
     bool collapseUnselectedItems( QTreeWidgetItem *item );
     intf_thread_t *p_intf;
+
+private slots:
+    void resizeColumns();
 };
 
 class ConfigControl;
