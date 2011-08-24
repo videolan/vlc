@@ -694,7 +694,7 @@ VLC_API char const * vlc_error( int ) VLC_USED;
 #ifdef WORDS_BIGENDIAN
 # define hton16(i) ((uint16_t)(i))
 # define hton32(i) ((uint32_t)(i))
-# define hton64(i) ((uint32_t)(i))
+# define hton64(i) ((uint64_t)(i))
 #else
 # define hton16(i) bswap16(i)
 # define hton32(i) bswap32(i)
@@ -778,28 +778,28 @@ static inline uint64_t GetQWLE (const void *p)
 }
 
 /** Writes 16 bits in network byte order */
-static inline void SetWLE (void *p, uint16_t w)
+static inline void SetWBE (void *p, uint16_t w)
 {
     w = hton16 (w);
     memcpy (p, &w, sizeof (w));
 }
 
 /** Writes 32 bits in network byte order */
-static inline void SetDWLE (void *p, uint32_t dw)
+static inline void SetDWBE (void *p, uint32_t dw)
 {
     dw = hton32 (dw);
     memcpy (p, &dw, sizeof (dw));
 }
 
 /** Writes 64 bits in network byte order */
-static inline void SetQWLE (void *p, uint64_t qw)
+static inline void SetQWBE (void *p, uint64_t qw)
 {
     qw = hton64 (qw);
     memcpy (p, &qw, sizeof (qw));
 }
 
 /** Writes 16 bits in little endian order */
-static inline void SetWBE (void *p, uint16_t w)
+static inline void SetWLE (void *p, uint16_t w)
 {
 #ifdef WORDS_BIGENDIAN
     w = bswap16 (w);
@@ -808,7 +808,7 @@ static inline void SetWBE (void *p, uint16_t w)
 }
 
 /** Writes 32 bits in little endian order */
-static inline void SetDWBE (void *p, uint32_t dw)
+static inline void SetDWLE (void *p, uint32_t dw)
 {
 #ifdef WORDS_BIGENDIAN
     dw = bswap32 (dw);
@@ -817,10 +817,10 @@ static inline void SetDWBE (void *p, uint32_t dw)
 }
 
 /** Writes 64 bits in little endian order */
-static inline void SetQWBE (void *p, uint64_t qw)
+static inline void SetQWLE (void *p, uint64_t qw)
 {
 #ifdef WORDS_BIGENDIAN
-    qw = bswap32 (qw);
+    qw = bswap64 (qw);
 #endif
     memcpy (p, &qw, sizeof (qw));
 }
