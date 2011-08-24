@@ -3097,20 +3097,20 @@ static void __MP4_BoxDumpStructure( stream_t *s,
         unsigned int i;
 
         char str[512];
-        if( i_level >= (sizeof(str) - 1)/5 )
+        if( i_level >= (sizeof(str) - 1)/4 )
             return;
 
         memset( str, ' ', sizeof(str) );
         for( i = 0; i < i_level; i++ )
         {
-            str[i*5] = '|';
+            str[i*4] = '|';
         }
         if( MP4_BOX_TYPE_ASCII() )
-            snprintf( &str[i_level * 5], sizeof(str) - 5*i_level,
+            snprintf( &str[i_level * 4], sizeof(str) - 4*i_level,
                       "+ %4.4s size %d",
                         (char*)&p_box->i_type, (uint32_t)p_box->i_size );
         else
-            snprintf( &str[i_level * 5], sizeof(str) - 5*i_level,
+            snprintf( &str[i_level * 4], sizeof(str) - 4*i_level,
                       "+ c%3.3s size %d",
                         (char*)&p_box->i_type+1, (uint32_t)p_box->i_size );
         msg_Dbg( s, "%s", str );
