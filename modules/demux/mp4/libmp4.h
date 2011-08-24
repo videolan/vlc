@@ -69,7 +69,6 @@
 #define FOURCC_padb VLC_FOURCC( 'p', 'a', 'd', 'b' )
 #define FOURCC_edts VLC_FOURCC( 'e', 'd', 't', 's' )
 #define FOURCC_elst VLC_FOURCC( 'e', 'l', 's', 't' )
-#define FOURCC_udta VLC_FOURCC( 'u', 'd', 't', 'a' )
 #define FOURCC_mvex VLC_FOURCC( 'm', 'v', 'e', 'x' )
 #define FOURCC_trex VLC_FOURCC( 't', 'r', 'e', 'x' )
 #define FOURCC_mfhd VLC_FOURCC( 'm', 'f', 'h', 'd' )
