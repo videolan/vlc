@@ -756,7 +756,7 @@ static int MP4_ReadBox_hdlr( stream_t *p_stream, MP4_Box_t *p_box )
     }
 
 #ifdef MP4_VERBOSE
-        msg_Dbg( p_stream, "read box: \"hdlr\" handler type %4.4s name %s",
+        msg_Dbg( p_stream, "read box: \"hdlr\" handler type: \"%4.4s\" name: \"%s\"",
                    (char*)&p_box->data.p_hdlr->i_handler_type,
                    p_box->data.p_hdlr->psz_name );
 
