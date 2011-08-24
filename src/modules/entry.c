@@ -319,17 +319,15 @@ static int vlc_plugin_setter (void *plugin, void *tgt, int propid, ...)
 
         case VLC_CONFIG_RANGE:
         {
-            if (IsConfigIntegerType (item->i_type)
-             || !CONFIG_ITEM(item->i_type))
-            {
-                item->min.i = va_arg (ap, int64_t);
-                item->max.i = va_arg (ap, int64_t);
-            }
-            else
             if (IsConfigFloatType (item->i_type))
             {
                 item->min.f = va_arg (ap, double);
                 item->max.f = va_arg (ap, double);
+            }
+            else
+            {
+                item->min.i = va_arg (ap, int64_t);
+                item->max.i = va_arg (ap, int64_t);
             }
             break;
         }
