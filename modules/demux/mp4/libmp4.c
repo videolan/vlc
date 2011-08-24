@@ -1433,8 +1433,10 @@ static int MP4_ReadBox_sample_soun( stream_t *p_stream, MP4_Box_t *p_box )
         p_box->data.p_sample_soun->i_bytes_per_frame = 0;
         p_box->data.p_sample_soun->i_bytes_per_sample = 0;
 
+#ifdef MP4_VERBOSE
         msg_Dbg( p_stream, "read box: \"soun\" mp4 or qt1/2 (rest=%"PRId64")",
                  i_read );
+#endif
         stream_Seek( p_stream, p_box->i_pos +
                         MP4_BOX_HEADERSIZE( p_box ) + 28 );
     }
