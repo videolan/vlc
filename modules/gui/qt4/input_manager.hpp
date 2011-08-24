@@ -73,8 +73,8 @@ enum {
 };
 
 enum { NORMAL,    /* loop: 0, repeat: 0 */
-       REPEAT_ONE,/* loop: 1, repeat: 0 */
-       REPEAT_ALL,/* loop: 0, repeat: 1 */
+       REPEAT_ONE,/* loop: 0, repeat: 1 */
+       REPEAT_ALL,/* loop: 1, repeat: 0 */
 };
 
 class IMEvent : public QEvent
