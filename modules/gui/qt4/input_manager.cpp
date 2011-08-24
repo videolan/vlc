@@ -985,6 +985,10 @@ MainInputManager::~MainInputManager()
     var_DelCallback( THEPL, "repeat", RepeatChanged, this );
     var_DelCallback( THEPL, "loop", LoopChanged, this );
 
+    /* Save some interface state in configuration, at module quit */
+    config_PutInt( p_intf, "random", var_GetBool( THEPL, "random" ) );
+    config_PutInt( p_intf, "loop", var_GetBool( THEPL, "loop" ) );
+    config_PutInt( p_intf, "repeat", var_GetBool( THEPL, "repeat" ) );
 }
 
 vout_thread_t* MainInputManager::getVout()
