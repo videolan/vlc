@@ -28,32 +28,32 @@
 
 static inline info_t *info_New(const char *name, const char *value )
 {
-	info_t *info = malloc(sizeof(*info));
-	if (!info)
-		return NULL;
+    info_t *info = malloc(sizeof(*info));
+    if (!info)
+        return NULL;
 
-	info->psz_name = strdup(name);
-	info->psz_value = value ? strdup(value) : NULL;
-	return info;
+    info->psz_name = strdup(name);
+    info->psz_value = value ? strdup(value) : NULL;
+    return info;
 }
 
 static inline void info_Delete(info_t *i)
 {
-	free(i->psz_name);
-	free(i->psz_value);
-	free(i);
+    free(i->psz_name);
+    free(i->psz_value);
+    free(i);
 }
 
 static inline info_category_t *info_category_New(const char *name)
 {
-	info_category_t *cat = malloc(sizeof(*cat));
-	if (!cat)
-		return NULL;
-	cat->psz_name = strdup(name);
-	cat->i_infos  = 0;
-	cat->pp_infos = NULL;
+    info_category_t *cat = malloc(sizeof(*cat));
+    if (!cat)
+        return NULL;
+    cat->psz_name = strdup(name);
+    cat->i_infos  = 0;
+    cat->pp_infos = NULL;
 
-	return cat;
+    return cat;
 }
 
 static inline info_t *info_category_FindInfo(const info_category_t *cat,
@@ -61,24 +61,24 @@ static inline info_t *info_category_FindInfo(const info_category_t *cat,
 {
     for (int i = 0; i < cat->i_infos; i++) {
         if (!strcmp(cat->pp_infos[i]->psz_name, name)) {
-			if (index)
-				*index = i;
-			return cat->pp_infos[i];
+            if (index)
+                *index = i;
+            return cat->pp_infos[i];
         }
     }
-	return NULL;
+    return NULL;
 }
 
 static inline void info_category_ReplaceInfo(info_category_t *cat,
                                              info_t *info)
 {
     int index;
-	info_t *old = info_category_FindInfo(cat, &index, info->psz_name);
-	if (old) {
+    info_t *old = info_category_FindInfo(cat, &index, info->psz_name);
+    if (old) {
         info_Delete(cat->pp_infos[index]);
         cat->pp_infos[index] = info;
     } else {
-	    INSERT_ELEM(cat->pp_infos, cat->i_infos, cat->i_infos, info);
+        INSERT_ELEM(cat->pp_infos, cat->i_infos, cat->i_infos, info);
     }
 }
 
@@ -114,22 +114,22 @@ static inline info_t *info_category_AddInfo(info_category_t *cat,
 
 static inline int info_category_DeleteInfo(info_category_t *cat, const char *name)
 {
-	int index;
-	if (info_category_FindInfo(cat, &index, name)) {
-		info_Delete(cat->pp_infos[index]);
-		REMOVE_ELEM(cat->pp_infos, cat->i_infos, index);
-		return VLC_SUCCESS;
-	}
-	return VLC_EGENERIC;
+    int index;
+    if (info_category_FindInfo(cat, &index, name)) {
+        info_Delete(cat->pp_infos[index]);
+        REMOVE_ELEM(cat->pp_infos, cat->i_infos, index);
+        return VLC_SUCCESS;
+    }
+    return VLC_EGENERIC;
 }
 
 static inline void info_category_Delete(info_category_t *cat)
 {
-	for (int i = 0; i < cat->i_infos; i++)
-		info_Delete(cat->pp_infos[i]);
-	free(cat->pp_infos);
-	free(cat->psz_name);
-	free(cat);
+    for (int i = 0; i < cat->i_infos; i++)
+        info_Delete(cat->pp_infos[i]);
+    free(cat->pp_infos);
+    free(cat->psz_name);
+    free(cat);
 }
 
 #endif
