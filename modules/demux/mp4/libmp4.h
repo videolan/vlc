@@ -958,6 +958,20 @@ typedef struct
 
 } MP4_Box_data_trkn_t;
 
+typedef struct
+{
+    uint8_t  i_version;
+    uint32_t i_flags;
+
+    uint16_t i_object_descriptor;
+    uint8_t i_OD_profile_level;
+    uint8_t i_scene_profile_level;
+    uint8_t i_audio_profile_level;
+    uint8_t i_visual_profile_level;
+    uint8_t i_graphics_profile_level;
+
+} MP4_Box_data_iods_t;
+
 /*
 typedef struct MP4_Box_data__s
 {
@@ -998,6 +1012,7 @@ typedef union MP4_Box_data_s
     MP4_Box_data_enda_t *p_enda;
     MP4_Box_data_gnre_t *p_gnre;
     MP4_Box_data_trkn_t *p_trkn;
+    MP4_Box_data_iods_t *p_iods;
 
     MP4_Box_data_stsz_t *p_stsz;
     MP4_Box_data_stz2_t *p_stz2;
