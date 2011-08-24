@@ -660,6 +660,7 @@ ModuleListConfigControl::ModuleListConfigControl( vlc_object_t *_p_this,
     VStringConfigControl( _p_this, _p_item, _parent )
 {
     groupBox = NULL;
+
     /* Special Hack */
     if( !p_item->psz_text ) return;
 
@@ -671,7 +672,11 @@ ModuleListConfigControl::ModuleListConfigControl( vlc_object_t *_p_this,
 
     int boxline = 0;
     foreach ( checkBoxListItem *it, modules )
-        layoutGroupBox->addWidget( it->checkBox, boxline++, 0 );
+    {
+        layoutGroupBox->addWidget( it->checkBox, boxline / 2, boxline % 2 );
+        boxline++;
+    }
+
     layoutGroupBox->addWidget( text, boxline, 0 );
 
     if( !l )
