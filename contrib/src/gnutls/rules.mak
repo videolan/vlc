@@ -1,6 +1,6 @@
 # GnuTLS
 
-GNUTLS_VERSION := 2.12.2
+GNUTLS_VERSION := 2.12.7
 GNUTLS_URL := http://ftp.gnu.org/pub/gnu/gnutls/gnutls-$(GNUTLS_VERSION).tar.bz2
 
 PKGS += gnutls
