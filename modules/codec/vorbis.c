@@ -570,6 +570,10 @@ static void ParseVorbisComments( decoder_t *p_dec )
             *psz_value = '\0';
             psz_value++;
 
+            /* Don't add empty values */
+            if( *psz_value == '\0' )
+                break;
+
             if( !p_dec->p_description )
                 p_dec->p_description = vlc_meta_New();
             if( p_dec->p_description )
