@@ -458,7 +458,6 @@ static block_t *MemToBlock( uint8_t *p_mem, size_t i_mem, size_t offset)
     if( likely(p_block != NULL) )
     {
         memcpy( p_block->p_buffer + offset, p_mem, i_mem );
-        //p_block->i_rate = p_input->stream.control.i_rate;
     }
     return p_block;
 }

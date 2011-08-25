@@ -184,7 +184,6 @@ static block_t *Filter(filter_t *filter, block_t *block)
             out->i_dts        = block->i_dts;
             out->i_pts        = block->i_pts;
             out->i_length     = block->i_length;
-            out->i_rate       = block->i_rate;
 
             sys->indirects[i](out, block);
 

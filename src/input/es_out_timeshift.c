@@ -1190,7 +1190,6 @@ static void TsStoragePopCmd( ts_storage_t *p_storage, ts_cmd_t *p_cmd, bool b_fl
                 p_block->i_pts      = block.i_pts;
                 p_block->i_flags    = block.i_flags;
                 p_block->i_length   = block.i_length;
-                p_block->i_rate     = block.i_rate;
                 p_block->i_nb_samples = block.i_nb_samples;
                 p_block->i_buffer = fread( p_block->p_buffer, 1, block.i_buffer, p_storage->p_filer );
             }

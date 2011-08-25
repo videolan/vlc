@@ -1960,8 +1960,6 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
             p_block->i_flags |= BLOCK_FLAG_PREROLL;
     }
 
-    p_block->i_rate = 0;
-
     if( !es->p_dec )
     {
         block_Release( p_block );

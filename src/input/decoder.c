@@ -1704,8 +1704,7 @@ static void DecoderPlaySout( decoder_t *p_dec, block_t *p_sout_block,
         p_sout_block->p_next = NULL;
 
         DecoderFixTs( p_dec, &p_sout_block->i_dts, &p_sout_block->i_pts,
-                      &p_sout_block->i_length,
-                      &p_sout_block->i_rate, INT64_MAX, b_telx );
+                      &p_sout_block->i_length, NULL, INT64_MAX, b_telx );
 
         vlc_mutex_unlock( &p_owner->lock );
 

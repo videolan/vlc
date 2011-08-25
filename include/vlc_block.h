@@ -40,7 +40,6 @@
  * - i_dts/i_pts could be VLC_TS_INVALID, it means no pts/dts
  * - i_length: length in microseond of the packet, can be null except in the
  *      sout where it is mandatory.
- * - i_rate 0 or a valid input rate, look at vlc_input.h
  *
  * - i_buffer number of valid data pointed by p_buffer
  *      you can freely decrease it but never increase it yourself
@@ -111,7 +110,6 @@ struct block_t
     mtime_t     i_length;
 
     unsigned    i_nb_samples; /* Used for audio */
-    int         i_rate;
 
     size_t      i_buffer;
     uint8_t     *p_buffer;
@@ -153,7 +151,6 @@ static inline block_t *block_Duplicate( block_t *p_block )
     p_dup->i_pts     = p_block->i_pts;
     p_dup->i_flags   = p_block->i_flags;
     p_dup->i_length  = p_block->i_length;
-    p_dup->i_rate    = p_block->i_rate;
     p_dup->i_nb_samples = p_block->i_nb_samples;
     memcpy( p_dup->p_buffer, p_block->p_buffer, p_block->i_buffer );
 
