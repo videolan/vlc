@@ -528,7 +528,7 @@ static aout_buffer_t *DecodeAudio( decoder_t *p_dec, block_t **pp_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    block_t     *p_block;
+    block_t     *p_block = *pp_block;
     int         i_error;
 
 #ifdef LOADER
@@ -547,11 +547,10 @@ static aout_buffer_t *DecodeAudio( decoder_t *p_dec, block_t **pp_block )
     }
 #endif
 
-    if( pp_block == NULL || *pp_block == NULL )
+    if( p_block == NULL )
     {
         return NULL;
     }
-    p_block = *pp_block;
 
     if( p_sys->i_out_frames > 0 && p_sys->i_out >= p_sys->i_out_frames )
     {
