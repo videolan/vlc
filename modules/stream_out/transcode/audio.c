@@ -94,12 +94,6 @@ static aout_buffer_t *audio_new_buffer( decoder_t *p_dec, int i_samples )
     return p_block;
 }
 
-static void audio_del_buffer( decoder_t *p_dec, aout_buffer_t *p_buffer )
-{
-    VLC_UNUSED(p_dec);
-    block_Release( p_buffer );
-}
-
 static int transcode_audio_filter_allocation_init( filter_t *p_filter,
                                                    void *data )
 {
@@ -224,7 +218,6 @@ int transcode_audio_new( sout_stream_t *p_stream,
     id->p_decoder->fmt_out.p_extra = 0;
     id->p_decoder->pf_decode_audio = NULL;
     id->p_decoder->pf_aout_buffer_new = audio_new_buffer;
-    id->p_decoder->pf_aout_buffer_del = audio_del_buffer;
     /* id->p_decoder->p_cfg = p_sys->p_audio_cfg; */
 
     id->p_decoder->p_module =

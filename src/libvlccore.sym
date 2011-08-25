@@ -80,7 +80,6 @@ date_Increment
 date_Init
 date_Move
 date_Set
-decoder_DeleteAudioBuffer
 decoder_DeletePicture
 decoder_DeleteSubpicture
 decoder_GetDisplayDate

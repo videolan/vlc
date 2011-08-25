@@ -213,10 +213,6 @@ aout_buffer_t *decoder_NewAudioBuffer( decoder_t *p_decoder, int i_size )
         return NULL;
     return p_decoder->pf_aout_buffer_new( p_decoder, i_size );
 }
-void decoder_DeleteAudioBuffer( decoder_t *p_decoder, aout_buffer_t *p_buffer )
-{
-    p_decoder->pf_aout_buffer_del( p_decoder, p_buffer );
-}
 
 subpicture_t *decoder_NewSubpicture( decoder_t *p_decoder,
                                      const subpicture_updater_t *p_dyn )
@@ -800,7 +796,6 @@ static decoder_t * CreateDecoder( vlc_object_t *p_parent,
 
     /* Set buffers allocation callbacks for the decoders */
     p_dec->pf_aout_buffer_new = aout_new_buffer;
-    p_dec->pf_aout_buffer_del = aout_del_buffer;
     p_dec->pf_vout_buffer_new = vout_new_buffer;
     p_dec->pf_vout_buffer_del = vout_del_buffer;
     p_dec->pf_picture_link    = vout_link_picture;
@@ -2313,13 +2308,6 @@ static aout_buffer_t *aout_new_buffer( decoder_t *p_dec, int i_samples )
     p_buffer = aout_DecNewBuffer( p_owner->p_aout, i_samples );
 
     return p_buffer;
-}
-
-static void aout_del_buffer( decoder_t *p_dec, aout_buffer_t *p_buffer )
-{
-    decoder_owner_sys_t *p_owner = p_dec->p_owner;
-
-    aout_DecDeleteBuffer( p_owner->p_aout, p_buffer );
 }
 
 static picture_t *vout_new_buffer( decoder_t *p_dec )

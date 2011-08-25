@@ -105,7 +105,6 @@ struct decoder_t
     /* Audio output callbacks
      * XXX use decoder_NewAudioBuffer/decoder_DeleteAudioBuffer */
     aout_buffer_t  *(*pf_aout_buffer_new)( decoder_t *, int );
-    void            (*pf_aout_buffer_del)( decoder_t *, aout_buffer_t * );
 
     /* SPU output callbacks
      * XXX use decoder_NewSubpicture and decoder_DeleteSubpicture */
@@ -205,11 +204,6 @@ VLC_API void decoder_UnlinkPicture( decoder_t *, picture_t * );
  * or by returning it to the caller as a pf_decode_audio return value.
  */
 VLC_API aout_buffer_t * decoder_NewAudioBuffer( decoder_t *, int i_size ) VLC_USED;
-
-/**
- * This function will release a audio buffer created by decoder_NewAudioBuffer.
- */
-VLC_API void decoder_DeleteAudioBuffer( decoder_t *, aout_buffer_t *p_buffer );
 
 /**
  * This function will return a new subpicture usable by a decoder as an output
