@@ -185,7 +185,7 @@ static const int pi_channels_maps[6] =
  * Local prototypes
  ****************************************************************************/
 
-static void *DecodeBlock  ( decoder_t *, block_t ** );
+static block_t *DecodeBlock  ( decoder_t *, block_t ** );
 static aout_buffer_t *DecodeRtpSpeexPacket( decoder_t *, block_t **);
 static int  ProcessHeaders( decoder_t * );
 static int  ProcessInitialHeader ( decoder_t *, ogg_packet * );
@@ -233,16 +233,13 @@ static int OpenDecoder( vlc_object_t *p_this )
     {
         msg_Dbg( p_dec, "Using RTP version of Speex decoder @ rate %d.", 
 	    p_dec->fmt_in.audio.i_rate );
-        p_dec->pf_decode_audio = (aout_buffer_t *(*)(decoder_t *, block_t **))
-            DecodeRtpSpeexPacket;
+        p_dec->pf_decode_audio = DecodeRtpSpeexPacket;
     }
     else
     {
-        p_dec->pf_decode_audio = (aout_buffer_t *(*)(decoder_t *, block_t **))
-            DecodeBlock;
+        p_dec->pf_decode_audio = DecodeBlock;
     }
-    p_dec->pf_packetize    = (block_t *(*)(decoder_t *, block_t **))
-        DecodeBlock;
+    p_dec->pf_packetize    = DecodeBlock;
 
     p_sys->p_state = NULL;
     p_sys->p_header = NULL;
@@ -271,7 +268,7 @@ static int OpenPacketizer( vlc_object_t *p_this )
  ****************************************************************************
  * This function must be fed with ogg packets.
  ****************************************************************************/
-static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
+static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     ogg_packet oggpacket;

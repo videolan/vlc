@@ -162,7 +162,7 @@ typedef struct
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static void *DecodeFrame  ( decoder_t *, block_t ** );
+static block_t *DecodeFrame  ( decoder_t *, block_t ** );
 
 /* */
 static int VobHeader( unsigned *pi_rate,
@@ -266,10 +266,8 @@ static int OpenCommon( vlc_object_t *p_this, bool b_packetizer )
     }
 
     /* Set callback */
-    p_dec->pf_decode_audio = (aout_buffer_t *(*)(decoder_t *, block_t **))
-        DecodeFrame;
-    p_dec->pf_packetize    = (block_t *(*)(decoder_t *, block_t **))
-        DecodeFrame;
+    p_dec->pf_decode_audio = DecodeFrame;
+    p_dec->pf_packetize    = DecodeFrame;
 
     return VLC_SUCCESS;
 }
@@ -287,7 +285,7 @@ static int OpenPacketizer( vlc_object_t *p_this )
  ****************************************************************************
  * Beware, this function must be fed with complete frames (PES packet).
  *****************************************************************************/
-static void *DecodeFrame( decoder_t *p_dec, block_t **pp_block )
+static block_t *DecodeFrame( decoder_t *p_dec, block_t **pp_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     block_t       *p_block;

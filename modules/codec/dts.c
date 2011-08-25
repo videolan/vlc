@@ -105,7 +105,7 @@ enum {
  * Local prototypes
  ****************************************************************************/
 static int OpenCommon( vlc_object_t *, bool b_packetizer );
-static void *DecodeBlock( decoder_t *, block_t ** );
+static block_t *DecodeBlock( decoder_t *, block_t ** );
 
 static inline int SyncCode( const uint8_t * );
 static int  SyncInfo( const uint8_t *, bool *, unsigned int *, unsigned int *,
@@ -165,10 +165,8 @@ static int OpenCommon( vlc_object_t *p_this, bool b_packetizer )
     p_dec->fmt_out.audio.i_rate = 0; /* So end_date gets initialized */
 
     /* Set callback */
-    p_dec->pf_decode_audio = (aout_buffer_t *(*)(decoder_t *, block_t **))
-        DecodeBlock;
-    p_dec->pf_packetize    = (block_t *(*)(decoder_t *, block_t **))
-        DecodeBlock;
+    p_dec->pf_decode_audio = DecodeBlock;
+    p_dec->pf_packetize    = DecodeBlock;
 
     return VLC_SUCCESS;
 }
@@ -176,7 +174,7 @@ static int OpenCommon( vlc_object_t *p_this, bool b_packetizer )
 /****************************************************************************
  * DecodeBlock: the whole thing
  ****************************************************************************/
-static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
+static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     uint8_t p_header[DTS_HEADER_SIZE];

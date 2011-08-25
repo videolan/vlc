@@ -95,7 +95,7 @@ enum {
 static int  OpenDecoder   ( vlc_object_t * );
 static int  OpenPacketizer( vlc_object_t * );
 static void CloseDecoder  ( vlc_object_t * );
-static void *DecodeBlock  ( decoder_t *, block_t ** );
+static block_t *DecodeBlock  ( decoder_t *, block_t ** );
 
 static uint8_t       *GetOutBuffer ( decoder_t *, block_t ** );
 static aout_buffer_t *GetAoutBuffer( decoder_t * );
@@ -160,10 +160,8 @@ static int Open( vlc_object_t *p_this )
     p_dec->fmt_out.audio.i_rate = 0; /* So end_date gets initialized */
 
     /* Set callback */
-    p_dec->pf_decode_audio = (aout_buffer_t *(*)(decoder_t *, block_t **))
-        DecodeBlock;
-    p_dec->pf_packetize    = (block_t *(*)(decoder_t *, block_t **))
-        DecodeBlock;
+    p_dec->pf_decode_audio = DecodeBlock;
+    p_dec->pf_packetize    = DecodeBlock;
 
     /* Start with the minimum size for a free bitrate frame */
     p_sys->i_free_frame_size = MPGA_HEADER_SIZE;
@@ -196,7 +194,7 @@ static int OpenPacketizer( vlc_object_t *p_this )
  ****************************************************************************
  * This function is called just after the thread is launched.
  ****************************************************************************/
-static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
+static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     uint8_t p_header[MAD_BUFFER_GUARD];

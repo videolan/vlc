@@ -98,7 +98,7 @@ enum {
 /****************************************************************************
  * Local prototypes
  ****************************************************************************/
-static void *DecodeBlock  ( decoder_t *, block_t ** );
+static block_t *DecodeBlock  ( decoder_t *, block_t ** );
 
 static uint8_t       *GetOutBuffer ( decoder_t *, block_t ** );
 static aout_buffer_t *GetAoutBuffer( decoder_t * );
@@ -150,11 +150,9 @@ static int OpenCommon( vlc_object_t *p_this, bool b_packetizer )
 
     /* Set callback */
     if( b_packetizer )
-        p_dec->pf_packetize    = (block_t *(*)(decoder_t *, block_t **))
-            DecodeBlock;
+        p_dec->pf_packetize    = DecodeBlock;
     else
-        p_dec->pf_decode_audio = (aout_buffer_t *(*)(decoder_t *, block_t **))
-            DecodeBlock;
+        p_dec->pf_decode_audio = DecodeBlock;
     return VLC_SUCCESS;
 }
 
@@ -176,7 +174,7 @@ static int OpenPacketizer( vlc_object_t *p_this )
  ****************************************************************************
  * This function is called just after the thread is launched.
  ****************************************************************************/
-static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
+static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     uint8_t p_header[VLC_A52_HEADER_SIZE];
