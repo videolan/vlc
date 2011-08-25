@@ -234,6 +234,8 @@ int transcode_audio_new( sout_stream_t *p_stream,
         msg_Err( p_stream, "cannot find audio decoder" );
         return VLC_EGENERIC;
     }
+    /* decoders don't set audio.i_format, but audio filters use it */
+    id->p_decoder->fmt_out.audio.i_format = id->p_decoder->fmt_out.i_codec;
     id->p_decoder->fmt_out.audio.i_bitspersample =
         aout_BitsPerSample( id->p_decoder->fmt_out.i_codec );
     fmt_last = id->p_decoder->fmt_out;
