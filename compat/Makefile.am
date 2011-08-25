@@ -7,5 +7,5 @@ BUILT_SOURCES = dummy.c
 CLEANFILES = dummy.c
 
 dummy.c:
-	rm -f dummy.c
-	echo '/* Automatically generated */' > dummy.c
+	$(AM_V_at)rm -f dummy.c
+	$(AM_V_GEN)echo '/* Automatically generated */' > dummy.c
