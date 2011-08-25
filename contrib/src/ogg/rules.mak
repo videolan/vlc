@@ -1,6 +1,6 @@
 # libogg
 
-OGG_VERSION := 1.2.2
+OGG_VERSION := 1.3.0
 
 OGG_URL := http://downloads.xiph.org/releases/ogg/libogg-$(OGG_VERSION).tar.xz
 #OGG_URL := $(CONTRIB_VIDEOLAN)/libogg-$(OGG_VERSION).tar.xz
