@@ -730,8 +730,14 @@ static const entry_t p_list_video[] = {
     B(VLC_CODEC_V210, "10-bit 4:2:2 Component YCbCr"),
         A("v210"),
 
-    B(VLC_CODEC_NV12, "Planar  Y, Packet UV (420)"),
+    B(VLC_CODEC_NV12, "Biplanar 4:2:0 Y/UV"),
         A("NV12"),
+    B(VLC_CODEC_NV21, "Biplanar 4:2:0 Y/VU"),
+        A("NV21"),
+    B(VLC_CODEC_NV16, "Biplanar 4:2:2 Y/UV"),
+        A("NV16"),
+    B(VLC_CODEC_NV61, "Biplanar 4:2:2 Y/VU"),
+        A("NV61"),
 
     B(VLC_CODEC_I420_9L, "Planar 4:2:0 YUV 9-bit LE"),
         A("I09L"),

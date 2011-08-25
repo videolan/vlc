@@ -202,8 +202,14 @@
 #define VLC_CODEC_CYUV      VLC_FOURCC('c','y','u','v')
 /* 10-bit 4:2:2 Component YCbCr */
 #define VLC_CODEC_V210      VLC_FOURCC('v','2','1','0')
-/* Planar Y Packet UV (420) */
+/* 2 planes Y/UV 4:2:0 */
 #define VLC_CODEC_NV12      VLC_FOURCC('N','V','1','2')
+/* 2 planes Y/VU 4:2:0 */
+#define VLC_CODEC_NV21      VLC_FOURCC('N','V','2','1')
+/* 2 planes Y/UV 4:2:2 */
+#define VLC_CODEC_NV16      VLC_FOURCC('N','V','1','6')
+/* 2 planes Y/VU 4:2:2 */
+#define VLC_CODEC_NV61      VLC_FOURCC('N','V','6','1')
 
 /* Image codec (video) */
 #define VLC_CODEC_PNG       VLC_FOURCC('p','n','g',' ')
