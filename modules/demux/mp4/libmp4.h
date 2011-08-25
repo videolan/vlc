@@ -885,6 +885,12 @@ typedef struct
 
 typedef struct
 {
+    char *psz_text;
+
+} MP4_Box_data_name_t;
+
+typedef struct
+{
     uint32_t i_entry_count;
     uint32_t *i_track_ID;
 
@@ -1042,6 +1048,7 @@ typedef union MP4_Box_data_s
     MP4_Box_data_0xa9xxx_t *p_0xa9xxx;
     MP4_Box_data_chpl_t *p_chpl;
     MP4_Box_data_tref_generic_t *p_tref_generic;
+    MP4_Box_data_name_t *p_name;
 
     void                *p_data; /* for unknow type */
 } MP4_Box_data_t;
