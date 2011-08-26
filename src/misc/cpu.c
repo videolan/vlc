@@ -73,21 +73,21 @@ static bool check_OS_capability( const char *psz_capability, pid_t pid )
     return false;
 }
 
-#  define check_capability(name, flag, code)   \
-     do {                                      \
-        pid_t pid = fork();                    \
-        if( pid == 0 )                         \
-        {                                      \
-            signal(SIGILL, SIG_DFL);           \
-            __asm__ __volatile__ ( code : : ); \
-            _exit(0);                          \
-        }                                      \
-        if( check_OS_capability((name), pid )) \
-            i_capabilities |= (flag);          \
+#  define check_capability(name, flag, code, input)     \
+     do {                                               \
+        pid_t pid = fork();                             \
+        if( pid == 0 )                                  \
+        {                                               \
+            signal(SIGILL, SIG_DFL);                    \
+            __asm__ __volatile__ ( code : : input );    \
+            _exit(0);                                   \
+        }                                               \
+        if( check_OS_capability((name), pid ))          \
+            i_capabilities |= (flag);                   \
      } while(0)
 
 # else /* WIN32 */
-#  define check_capability(name, flag, code)   \
+#  define check_capability(name, flag, code, input)   \
         i_capabilities |= (flag);
 # endif
 #endif
@@ -184,7 +184,7 @@ void vlc_CPU_init (void)
 
 #   ifdef CAN_COMPILE_SSE
         check_capability( "SSE", CPU_CAPABILITY_SSE,
-                          "xorps %%xmm0,%%xmm0\n" );
+                          "xorps %%xmm0,%%xmm0\n", );
 #   endif
     }
 # endif
@@ -194,7 +194,7 @@ void vlc_CPU_init (void)
 # elif defined (CAN_COMPILE_SSE2)
     if( i_edx & 0x04000000 )
         check_capability( "SSE2", CPU_CAPABILITY_SSE2,
-                          "movupd %%xmm0, %%xmm0\n" );
+                          "movupd %%xmm0, %%xmm0\n", );
 # endif
 
 # if defined (__SSE3__)
@@ -202,7 +202,7 @@ void vlc_CPU_init (void)
 # elif defined (CAN_COMPILE_SSE3)
     if( i_ecx & 0x00000001 )
         check_capability( "SSE3", CPU_CAPABILITY_SSE3,
-                          "movsldup %%xmm1, %%xmm0\n" );
+                          "movsldup %%xmm1, %%xmm0\n", );
 # endif
 
 # if defined (__SSSE3__)
@@ -210,7 +210,7 @@ void vlc_CPU_init (void)
 # elif defined (CAN_COMPILE_SSSE3)
     if( i_ecx & 0x00000200 )
         check_capability( "SSSE3", CPU_CAPABILITY_SSSE3,
-                          "pabsw %%xmm1, %%xmm0\n" );
+                          "pabsw %%xmm1, %%xmm0\n", );
 # endif
 
 # if defined (__SSE4_1__)
@@ -218,7 +218,7 @@ void vlc_CPU_init (void)
 # elif defined (CAN_COMPILE_SSE4_1)
     if( i_ecx & 0x00080000 )
         check_capability( "SSE4.1", CPU_CAPABILITY_SSE4_1,
-                          "pmaxsb %%xmm1, %%xmm0\n" );
+                          "pmaxsb %%xmm1, %%xmm0\n", );
 # endif
 
 # if defined (__SSE4_2__)
@@ -226,7 +226,7 @@ void vlc_CPU_init (void)
 # elif defined (CAN_COMPILE_SSE4_2)
     if( i_ecx & 0x00100000 )
         check_capability( "SSE4.2", CPU_CAPABILITY_SSE4_2,
-                          "pcmpgtq %%xmm1, %%xmm0\n" );
+                          "pcmpgtq %%xmm1, %%xmm0\n", );
 # endif
 
     /* test for additional capabilities */
@@ -243,7 +243,7 @@ void vlc_CPU_init (void)
 # elif defined (CAN_COMPILE_3DNOW)
     if( i_edx & 0x80000000 )
         check_capability( "3D Now!", CPU_CAPABILITY_3DNOW,
-                          "pfadd %%mm0,%%mm0\n" "femms\n" );
+                          "pfadd %%mm0,%%mm0\n" "femms\n", );
 # endif
 
     if( b_amd && ( i_edx & 0x00400000 ) )
@@ -257,10 +257,6 @@ out:
 # if defined (__ARM_NEON__)
     i_capabilities |= CPU_CAPABILITY_NEON;
 # elif defined (CAN_COMPILE_NEON)
-#  define NEED_RUNTIME_CPU_CHECK 1
-# endif
-
-# ifdef NEED_RUNTIME_CPU_CHECK
 #  if defined (__linux__)
     FILE *info = fopen ("/proc/cpuinfo", "rt");
     if (info != NULL)
@@ -274,11 +270,11 @@ out:
 
              if (strncmp (line, "Features\t:", 10))
                  continue;
-#   if defined (CAN_COMPILE_NEON) && !defined (__ARM_NEON__)
+
              cap = strstr (line + 10, " neon");
              if (cap != NULL && (cap[5] == '\0' || cap[5] == ' '))
                  i_capabilities |= CPU_CAPABILITY_NEON;
-#   endif
+
              break;
         }
         fclose (info);
@@ -306,19 +302,10 @@ out:
         i_capabilities |= CPU_CAPABILITY_ALTIVEC;
 
 #   elif defined( CAN_COMPILE_ALTIVEC )
-    pid_t pid = fork();
-    if( pid == 0 )
-    {
-        signal(SIGILL, SIG_DFL);
-        asm volatile ("mtspr 256, %0\n\t"
-                      "vand %%v0, %%v0, %%v0"
-                      :
-                      : "r" (-1));
-        _exit(0);
-    }
-
-    if( check_OS_capability( "Altivec", pid ) )
-        i_capabilities |= CPU_CAPABILITY_ALTIVEC;
+    check_capability( "Altivec", CPU_CAPABILITY_ALTIVEC,
+        "mtspr 256, %0\n\t"
+        "vand %%v0, %%v0, %%v0",
+                      "r" (-1));
 
 #   endif
 
