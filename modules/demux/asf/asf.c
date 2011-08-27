@@ -53,10 +53,10 @@ static void Close ( vlc_object_t * );
 vlc_module_begin ()
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_DEMUX )
-    set_description( N_("ASF v1.0 demuxer") )
+    set_description( N_("ASF/WMV demuxer") )
     set_capability( "demux", 200 )
     set_callbacks( Open, Close )
-    add_shortcut( "asf" )
+    add_shortcut( "asf", "wmv" )
 vlc_module_end ()
 
 
@@ -126,8 +126,7 @@ static int Open( vlc_object_t * p_this )
     /* Set p_demux fields */
     p_demux->pf_demux = Demux;
     p_demux->pf_control = Control;
-    p_demux->p_sys = p_sys = malloc( sizeof( demux_sys_t ) );
-    memset( p_sys, 0, sizeof( demux_sys_t ) );
+    p_demux->p_sys = p_sys = calloc( 1, sizeof( demux_sys_t ) );
 
     /* Load the headers */
     if( DemuxInit( p_demux ) )
@@ -811,12 +810,12 @@ static int DemuxInit( demux_t *p_demux )
         if( p_hdr_ext )
         {
             int i_ext_stream = ASF_CountObject( p_hdr_ext,
-                                                &asf_object_extended_stream_properties );
+                                                &asf_object_extended_stream_properties_guid );
             for( int i = 0; i < i_ext_stream; i++ )
             {
                 asf_object_t *p_tmp =
                     ASF_FindObject( p_hdr_ext,
-                                    &asf_object_extended_stream_properties, i );
+                                    &asf_object_extended_stream_properties_guid, i );
                 if( p_tmp->ext_stream.i_stream_number == p_sp->i_stream_number )
                 {
                     p_esp = &p_tmp->ext_stream;

@@ -2,7 +2,7 @@
  * libasf.h :
  *****************************************************************************
  * Copyright © 2001-2004, 2011 the VideoLAN team
- * 
+ *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -31,6 +31,14 @@ typedef struct guid_s
     uint16_t v3; /* le */
     uint8_t  v4[8];
 } guid_t;
+
+#define GUID_FMT "0x%x-0x%x-0x%x-0x%2.2x%2.2x%2.2x%2.2x%2.2x%2.2x%2.2x%2.2x"
+#define GUID_PRINT( guid )  \
+    (guid).v1,              \
+    (guid).v2,              \
+    (guid).v3,              \
+    (guid).v4[0],(guid).v4[1],(guid).v4[2],(guid).v4[3],    \
+    (guid).v4[4],(guid).v4[5],(guid).v4[6],(guid).v4[7]
 
 enum
 {
@@ -150,7 +158,7 @@ static const guid_t asf_object_padding =
 {0x1806D474, 0xCADF, 0x4509, {0xA4, 0xBA, 0x9A, 0xAB, 0xCB, 0x96, 0xAA, 0xE8}};
 
 // header extension
-static const guid_t asf_object_extended_stream_properties =
+static const guid_t asf_object_extended_stream_properties_guid =
 {0x14E6A5CB, 0xC672, 0x4332, {0x83, 0x99, 0xA9, 0x69, 0x52, 0x06, 0x5B, 0x5A}};
 
 static const guid_t asf_object_group_mutual_exclusion_guid =
@@ -300,12 +308,14 @@ typedef struct
 
 } asf_object_header_extension_t;
 
-#define ASF_METADATA_TYPE_STRING 0x0000
-#define ASF_METADATA_TYPE_BYTE   0x0001
-#define ASF_METADATA_TYPE_BOOL   0x0002
-#define ASF_METADATA_TYPE_DWORD  0x0003
-#define ASF_METADATA_TYPE_QWORD  0x0004
-#define ASF_METADATA_TYPE_WORD   0x0005
+enum {
+    ASF_METADATA_TYPE_STRING,
+    ASF_METADATA_TYPE_BYTE,
+    ASF_METADATA_TYPE_BOOL,
+    ASF_METADATA_TYPE_DWORD,
+    ASF_METADATA_TYPE_QWORD,
+    ASF_METADATA_TYPE_WORD,
+};
 
 typedef struct
 {

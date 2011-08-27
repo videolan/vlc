@@ -32,14 +32,6 @@
 
 #define ASF_DEBUG 1
 
-#define GUID_FMT "0x%x-0x%x-0x%x-0x%2.2x%2.2x%2.2x%2.2x%2.2x%2.2x%2.2x%2.2x"
-#define GUID_PRINT( guid )  \
-    (guid).v1,              \
-    (guid).v2,              \
-    (guid).v3,              \
-    (guid).v4[0],(guid).v4[1],(guid).v4[2],(guid).v4[3],    \
-    (guid).v4[4],(guid).v4[5],(guid).v4[6],(guid).v4[7]
-
 /* Helpers:
  * They ensure that invalid reads will not create problems.
  * They are expansion safe
@@ -1274,7 +1266,7 @@ static const struct
     { &asf_object_stream_bitrate_properties, ASF_OBJECT_OTHER,
       ASF_ReadObject_stream_bitrate_properties,
       ASF_FreeObject_stream_bitrate_properties },
-    { &asf_object_extended_stream_properties, ASF_OBJECT_OTHER,
+    { &asf_object_extended_stream_properties_guid, ASF_OBJECT_OTHER,
       ASF_ReadObject_extended_stream_properties,
       ASF_FreeObject_extended_stream_properties },
     { &asf_object_advanced_mutual_exclusion, ASF_OBJECT_OTHER,
@@ -1435,7 +1427,7 @@ static const struct
     { &asf_object_language_list, "Language List" },
     { &asf_object_stream_bitrate_properties, "Stream Bitrate Properties" },
     { &asf_object_padding, "Padding" },
-    { &asf_object_extended_stream_properties, "Extended Stream Properties" },
+    { &asf_object_extended_stream_properties_guid, "Extended Stream Properties" },
     { &asf_object_advanced_mutual_exclusion, "Advanced Mutual Exclusion" },
     { &asf_object_stream_prioritization, "Stream Prioritization" },
     { &asf_object_extended_content_description, "Extended content description"},
@@ -1568,12 +1560,12 @@ asf_object_root_t *ASF_ReadObjectRoot( stream_t *s, int b_seekable )
                                     &asf_object_metadata_guid, 0 );
                 /* Special case for broken designed file format :( */
                 i_ext_stream = ASF_CountObject( p_hdr_ext,
-                                    &asf_object_extended_stream_properties );
+                                    &asf_object_extended_stream_properties_guid );
                 for( i = 0; i < i_ext_stream; i++ )
                 {
                     asf_object_t *p_esp =
                         ASF_FindObject( p_hdr_ext,
-                                   &asf_object_extended_stream_properties, i );
+                                   &asf_object_extended_stream_properties_guid, i );
                     if( p_esp->ext_stream.p_sp )
                     {
                         asf_object_t *p_sp =
