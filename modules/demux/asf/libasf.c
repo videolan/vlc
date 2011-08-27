@@ -750,7 +750,7 @@ static int ASF_ReadObject_content_description(stream_t *s, asf_object_t *p_obj)
     } } while(0)
 
     p_data = p_peek + 24;
-    
+
     i_title         = ASF_READ2();
     i_artist        = ASF_READ2();
     i_copyright     = ASF_READ2();
@@ -946,7 +946,7 @@ static int ASF_ReadObject_extended_stream_properties( stream_t *s,
         asf_object_t *p_sp;
         /* Cannot fail as peek succeed */
         stream_Read( s, NULL, p_data - p_peek );
- 
+
         p_sp = malloc( sizeof( asf_object_t ) );
 
         if( !p_sp || ASF_ReadObject( s, p_sp, NULL ) )
@@ -1025,7 +1025,7 @@ static int ASF_ReadObject_advanced_mutual_exclusion( stream_t *s,
         p_ae->pi_stream_number[i] = ASF_READ2();
     }
     p_ae->i_stream_number_count = i;
- 
+
 #ifdef ASF_DEBUG
     msg_Dbg( s, "read \"advanced mutual exclusion object\"" );
     for( i = 0; i < p_ae->i_stream_number_count; i++ )
@@ -1420,7 +1420,8 @@ static const struct
 {
     { &asf_object_header_guid, "Header" },
     { &asf_object_data_guid, "Data" },
-    { &asf_object_simple_index_guid, "Index" },
+    { &asf_object_index_guid, "Index" },
+    { &asf_object_simple_index_guid, "Simple Index" },
     { &asf_object_file_properties_guid, "File Properties" },
     { &asf_object_stream_properties_guid, "Stream Properties" },
     { &asf_object_content_description_guid, "Content Description" },
