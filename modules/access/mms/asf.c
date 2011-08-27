@@ -31,21 +31,6 @@
 #include "asf.h"
 #include "buffer.h"
 
-static int CmpGuid( const guid_t *p_guid1, const guid_t *p_guid2 )
-{
-    return( ( p_guid1->v1 == p_guid2->v1 &&
-              p_guid1->v2 == p_guid2->v2 &&
-              p_guid1->v3 == p_guid2->v3 &&
-              p_guid1->v4[0] == p_guid2->v4[0] &&
-              p_guid1->v4[1] == p_guid2->v4[1] &&
-              p_guid1->v4[2] == p_guid2->v4[2] &&
-              p_guid1->v4[3] == p_guid2->v4[3] &&
-              p_guid1->v4[4] == p_guid2->v4[4] &&
-              p_guid1->v4[5] == p_guid2->v4[5] &&
-              p_guid1->v4[6] == p_guid2->v4[6] &&
-              p_guid1->v4[7] == p_guid2->v4[7] ) ? 1 : 0 );
-}
-
 void  GenerateGuid ( guid_t *p_guid )
 {
     p_guid->v1 = 0xbabac001;
@@ -74,7 +59,7 @@ void  asf_HeaderParse ( asf_header_t *hdr,
     var_buffer_initread( &buffer, p_header, i_header );
     var_buffer_getguid( &buffer, &guid );
 
-    if( !CmpGuid( &guid, &asf_object_header_guid ) )
+    if( !CmpGUID( &guid, &asf_object_header_guid ) )
     {
         /* ERROR: */
     }
@@ -85,7 +70,7 @@ void  asf_HeaderParse ( asf_header_t *hdr,
         var_buffer_getguid( &buffer, &guid );
         i_size = var_buffer_get64( &buffer );
 
-        if( CmpGuid( &guid, &asf_object_file_properties_guid ) )
+        if( CmpGUID( &guid, &asf_object_file_properties_guid ) )
         {
             var_buffer_getmemory( &buffer, NULL, 16 );
             hdr->i_file_size            = var_buffer_get64( &buffer );
@@ -96,12 +81,12 @@ void  asf_HeaderParse ( asf_header_t *hdr,
 
             var_buffer_getmemory( &buffer, NULL, i_size - 24 - 16 - 8 - 8 - 8 - 8-8-8-4 - 4);
         }
-        else if( CmpGuid( &guid, &asf_object_header_extension_guid ) )
+        else if( CmpGUID( &guid, &asf_object_header_extension_guid ) )
         {
             /* Enter it */
             var_buffer_getmemory( &buffer, NULL, 46 - 24 );
         }
-        else if( CmpGuid( &guid, &asf_object_extended_stream_properties_guid ) )
+        else if( CmpGUID( &guid, &asf_object_extended_stream_properties_guid ) )
         {
             /* Grrrrrr */
             int16_t i_count1, i_count2;
@@ -141,7 +126,7 @@ void  asf_HeaderParse ( asf_header_t *hdr,
             /* It's a hack we just skip the first part of the object until
              * the embed stream properties if any (ugly, but whose fault ?) */
         }
-        else if( CmpGuid( &guid, &asf_object_stream_properties_guid ) )
+        else if( CmpGUID( &guid, &asf_object_stream_properties_guid ) )
         {
             int     i_stream_id;
             guid_t  stream_type;
@@ -152,11 +137,11 @@ void  asf_HeaderParse ( asf_header_t *hdr,
             i_stream_id = var_buffer_get8( &buffer ) & 0x7f;
             var_buffer_getmemory( &buffer, NULL, i_size - 24 - 32 - 16 - 1);
 
-            if( CmpGuid( &stream_type, &asf_object_stream_type_video ) )
+            if( CmpGUID( &stream_type, &asf_object_stream_type_video ) )
             {
                 hdr->stream[i_stream_id].i_cat = ASF_STREAM_VIDEO;
             }
-            else if( CmpGuid( &stream_type, &asf_object_stream_type_audio ) )
+            else if( CmpGUID( &stream_type, &asf_object_stream_type_audio ) )
             {
                 hdr->stream[i_stream_id].i_cat = ASF_STREAM_AUDIO;
             }
@@ -165,7 +150,7 @@ void  asf_HeaderParse ( asf_header_t *hdr,
                 hdr->stream[i_stream_id].i_cat = ASF_STREAM_UNKNOWN;
             }
         }
-        else if ( CmpGuid( &guid, &asf_object_bitrate_properties_guid ) )
+        else if ( CmpGUID( &guid, &asf_object_stream_bitrate_properties ) )
         {
             int     i_count;
             uint8_t i_stream_id;

@@ -9,6 +9,7 @@ SOURCES_access_mms = \
 	buffer.h \
 	asf.h \
 	asf.c \
+	../../demux/asf/libasf_guid.h \
 	$(NULL)
 
 libvlc_LTLIBRARIES += libaccess_mms_plugin.la
