@@ -115,29 +115,6 @@ static char *AsfObjectHelperReadString( const uint8_t *p_peek, int i_peek, uint8
 static int ASF_ReadObject( stream_t *, asf_object_t *,  asf_object_t * );
 
 /****************************************************************************
- * GUID functions
- ****************************************************************************/
-void ASF_GetGUID( guid_t *p_guid, const uint8_t *p_data )
-{
-    p_guid->v1 = GetDWLE( p_data );
-    p_guid->v2 = GetWLE( p_data + 4);
-    p_guid->v3 = GetWLE( p_data + 6);
-    memcpy( p_guid->v4, p_data + 8, 8 );
-}
-
-bool ASF_CmpGUID( const guid_t *p_guid1, const guid_t *p_guid2 )
-{
-    if( (p_guid1->v1 != p_guid2->v1 )||
-        (p_guid1->v2 != p_guid2->v2 )||
-        (p_guid1->v3 != p_guid2->v3 )||
-        ( memcmp( p_guid1->v4, p_guid2->v4,8 )) )
-    {
-        return false;
-    }
-    return true;
-}
-
-/****************************************************************************
  *
  ****************************************************************************/
 static int ASF_ReadObjectCommon( stream_t *s, asf_object_t *p_obj )
@@ -1312,9 +1289,9 @@ static int ASF_ReadObject( stream_t *s, asf_object_t *p_obj,
     /* find this object */
     for( i_index = 0; ; i_index++ )
     {
-        if( ASF_CmpGUID( ASF_Object_Function[i_index].p_id,
+        if( CmpGUID( ASF_Object_Function[i_index].p_id,
                          &p_obj->common.i_object_id ) ||
-            ASF_CmpGUID( ASF_Object_Function[i_index].p_id,
+            CmpGUID( ASF_Object_Function[i_index].p_id,
                          &asf_object_null_guid ) )
         {
             break;
@@ -1373,9 +1350,9 @@ static void ASF_FreeObject( stream_t *s, asf_object_t *p_obj )
     /* find this object */
     for( i_index = 0; ; i_index++ )
     {
-        if( ASF_CmpGUID( ASF_Object_Function[i_index].p_id,
+        if( CmpGUID( ASF_Object_Function[i_index].p_id,
                      &p_obj->common.i_object_id )||
-            ASF_CmpGUID( ASF_Object_Function[i_index].p_id,
+            CmpGUID( ASF_Object_Function[i_index].p_id,
                      &asf_object_null_guid ) )
         {
             break;
@@ -1446,7 +1423,7 @@ static void ASF_ObjectDumpDebug( vlc_object_t *p_obj,
     /* Find the name */
     for( i = 0; ASF_ObjectDumpDebugInfo[i].p_id != NULL; i++ )
     {
-        if( ASF_CmpGUID( ASF_ObjectDumpDebugInfo[i].p_id,
+        if( CmpGUID( ASF_ObjectDumpDebugInfo[i].p_id,
                           &p_node->i_object_id ) )
             break;
     }
@@ -1619,7 +1596,7 @@ int  __ASF_CountObject( asf_object_t *p_obj, const guid_t *p_guid )
     p_child = p_obj->common.p_first;
     while( p_child )
     {
-        if( ASF_CmpGUID( &p_child->common.i_object_id, p_guid ) )
+        if( CmpGUID( &p_child->common.i_object_id, p_guid ) )
             i_count++;
 
         p_child = p_child->common.p_next;
@@ -1636,7 +1613,7 @@ void *__ASF_FindObject( asf_object_t *p_obj, const guid_t *p_guid,
 
     while( p_child )
     {
-        if( ASF_CmpGUID( &p_child->common.i_object_id, p_guid ) )
+        if( CmpGUID( &p_child->common.i_object_id, p_guid ) )
         {
             if( i_number == 0 )
                 return p_child;

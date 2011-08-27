@@ -121,7 +121,7 @@ static int Open( vlc_object_t * p_this )
     if( stream_Peek( p_demux->s, &p_peek, 16 ) < 16 ) return VLC_EGENERIC;
 
     ASF_GetGUID( &guid, p_peek );
-    if( !ASF_CmpGUID( &guid, &asf_object_header_guid ) ) return VLC_EGENERIC;
+    if( !CmpGUID( &guid, &asf_object_header_guid ) ) return VLC_EGENERIC;
 
     /* Set p_demux fields */
     p_demux->pf_demux = Demux;
@@ -167,7 +167,7 @@ static int Demux( demux_t *p_demux )
             guid_t guid;
 
             ASF_GetGUID( &guid, p_peek );
-            if( ASF_CmpGUID( &guid, &asf_object_header_guid ) )
+            if( CmpGUID( &guid, &asf_object_header_guid ) )
             {
                 msg_Warn( p_demux, "found a new ASF header" );
                 /* We end this stream */
@@ -826,7 +826,7 @@ static int DemuxInit( demux_t *p_demux )
 
         es_format_t fmt;
 
-        if( ASF_CmpGUID( &p_sp->i_stream_type, &asf_object_stream_type_audio ) &&
+        if( CmpGUID( &p_sp->i_stream_type, &asf_object_stream_type_audio ) &&
             p_sp->i_type_specific_data_length >= sizeof( WAVEFORMATEX ) - 2 )
         {
             uint8_t *p_data = p_sp->p_type_specific_data;
@@ -856,7 +856,7 @@ static int DemuxInit( demux_t *p_demux )
             msg_Dbg( p_demux, "added new audio stream(codec:0x%x,ID:%d)",
                     GetWLE( p_data ), p_sp->i_stream_number );
         }
-        else if( ASF_CmpGUID( &p_sp->i_stream_type,
+        else if( CmpGUID( &p_sp->i_stream_type,
                               &asf_object_stream_type_video ) &&
                  p_sp->i_type_specific_data_length >= 11 +
                  sizeof( BITMAPINFOHEADER ) )
@@ -931,7 +931,7 @@ static int DemuxInit( demux_t *p_demux )
             msg_Dbg( p_demux, "added new video stream(ID:%d)",
                      p_sp->i_stream_number );
         }
-        else if( ASF_CmpGUID( &p_sp->i_stream_type, &asf_object_extended_stream_header ) &&
+        else if( CmpGUID( &p_sp->i_stream_type, &asf_object_extended_stream_header ) &&
             p_sp->i_type_specific_data_length >= 64 )
         {
             /* Now follows a 64 byte header of which we don't know much */
@@ -940,7 +940,7 @@ static int DemuxInit( demux_t *p_demux )
             unsigned int i_data = p_sp->i_type_specific_data_length - 64;
 
             msg_Dbg( p_demux, "Ext stream header detected. datasize = %d", p_sp->i_type_specific_data_length );
-            if( ASF_CmpGUID( p_ref, &asf_object_extended_stream_type_audio ) &&
+            if( CmpGUID( p_ref, &asf_object_extended_stream_type_audio ) &&
                 i_data >= sizeof( WAVEFORMATEX ) - 2)
             {
                 int      i_format;
