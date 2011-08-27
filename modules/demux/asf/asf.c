@@ -249,7 +249,7 @@ static int SeekIndex( demux_t *p_demux, mtime_t i_date, float f_pos )
     if( i_date < 0 )
         i_date = p_sys->i_length * f_pos;
 
-    p_index = ASF_FindObject( p_sys->p_root, &asf_object_index_guid, 0 );
+    p_index = ASF_FindObject( p_sys->p_root, &asf_object_simple_index_guid, 0 );
 
     uint64_t i_entry = i_date * 10 / p_index->i_index_entry_time_interval;
     if( i_entry >= p_index->i_index_entry_count )
@@ -765,7 +765,7 @@ static int DemuxInit( demux_t *p_demux )
 
     /* check if index is available */
     asf_object_index_t *p_index = ASF_FindObject( p_sys->p_root,
-                                                  &asf_object_index_guid, 0 );
+                                                  &asf_object_simple_index_guid, 0 );
     const bool b_index = p_index && p_index->i_index_entry_count;
 
     /* Find the extended header if any */

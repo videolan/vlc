@@ -1253,7 +1253,7 @@ static const struct
       ASF_ReadObject_Header, ASF_FreeObject_Null },
     { &asf_object_data_guid, ASF_OBJECT_DATA,
       ASF_ReadObject_Data, ASF_FreeObject_Null },
-    { &asf_object_index_guid, ASF_OBJECT_INDEX,
+    { &asf_object_simple_index_guid, ASF_OBJECT_INDEX,
       ASF_ReadObject_Index, ASF_FreeObject_Index },
     { &asf_object_file_properties_guid, ASF_OBJECT_FILE_PROPERTIES,
       ASF_ReadObject_file_properties, ASF_FreeObject_Null },
@@ -1420,7 +1420,7 @@ static const struct
 {
     { &asf_object_header_guid, "Header" },
     { &asf_object_data_guid, "Data" },
-    { &asf_object_index_guid, "Index" },
+    { &asf_object_simple_index_guid, "Index" },
     { &asf_object_file_properties_guid, "File Properties" },
     { &asf_object_stream_properties_guid, "Stream Properties" },
     { &asf_object_content_description_guid, "Content Description" },
