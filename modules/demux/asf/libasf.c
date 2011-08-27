@@ -1,8 +1,7 @@
 /*****************************************************************************
  * libasf.c : asf stream demux module for vlc
  *****************************************************************************
- * Copyright (C) 2001-2003 the VideoLAN team
- * $Id$
+ * Copyright © 2001-2004, 2006-2008 the VideoLAN team
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@videolan.org>
@@ -26,9 +25,8 @@
 # include "config.h"
 #endif
 
-#include <vlc_common.h>
 #include <vlc_demux.h>
-#include <vlc_charset.h>
+#include <vlc_charset.h>          /* FromCharset */
 
 #include "libasf.h"
 

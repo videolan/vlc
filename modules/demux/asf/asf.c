@@ -1,8 +1,7 @@
 /*****************************************************************************
  * asf.c : ASF demux module
  *****************************************************************************
- * Copyright (C) 2002-2003 the VideoLAN team
- * $Id$
+ * Copyright © 2002-2004, 2006-2008, 2010 the VideoLAN team
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -34,9 +33,10 @@
 #include <vlc_demux.h>
 #include <vlc_dialog.h>
 
-#include <vlc_meta.h>
+#include <vlc_meta.h>                  /* vlc_meta_Set*, vlc_meta_New */
 #include <vlc_access.h>                /* GET_PRIVATE_ID_STATE */
 #include <vlc_codecs.h>                /* BITMAPINFOHEADER, WAVEFORMATEX */
+
 #include "libasf.h"
 
 /* TODO
