@@ -33,10 +33,10 @@
 
 void  GenerateGuid ( guid_t *p_guid )
 {
-    p_guid->v1 = 0xbabac001;
-    vlc_rand_bytes(&p_guid->v2, sizeof(p_guid->v2));
-    vlc_rand_bytes(&p_guid->v3, sizeof(p_guid->v3));
-    vlc_rand_bytes(p_guid->v4, sizeof(p_guid->v4));
+    p_guid->Data1 = 0xbabac001;
+    vlc_rand_bytes(&p_guid->Data2, sizeof(p_guid->Data2));
+    vlc_rand_bytes(&p_guid->Data3, sizeof(p_guid->Data3));
+    vlc_rand_bytes(p_guid->Data4, sizeof(p_guid->Data4));
 }
 
 void  asf_HeaderParse ( asf_header_t *hdr,

@@ -213,12 +213,12 @@ void var_buffer_getguid( var_buffer_t *p_buf, guid_t *p_guid )
 {
     int i;
 
-    p_guid->v1 = var_buffer_get32( p_buf );
-    p_guid->v2 = var_buffer_get16( p_buf );
-    p_guid->v3 = var_buffer_get16( p_buf );
+    p_guid->Data1 = var_buffer_get32( p_buf );
+    p_guid->Data2 = var_buffer_get16( p_buf );
+    p_guid->Data3 = var_buffer_get16( p_buf );
 
     for( i = 0; i < 8; i++ )
     {
-        p_guid->v4[i] = var_buffer_get8( p_buf );
+        p_guid->Data4[i] = var_buffer_get8( p_buf );
     }
 }

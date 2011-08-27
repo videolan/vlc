@@ -28,19 +28,19 @@
  *****************************************************************************/
 typedef struct guid_s
 {
-    uint32_t v1; /* le */
-    uint16_t v2; /* le */
-    uint16_t v3; /* le */
-    uint8_t  v4[8];
+    uint32_t Data1; /* le */
+    uint16_t Data2; /* le */
+    uint16_t Data3; /* le */
+    uint8_t  Data4[8];
 } guid_t;
 
 #define GUID_FMT "0x%x-0x%x-0x%x-0x%2.2x%2.2x%2.2x%2.2x%2.2x%2.2x%2.2x%2.2x"
 #define GUID_PRINT( guid )  \
-    (guid).v1,              \
-    (guid).v2,              \
-    (guid).v3,              \
-    (guid).v4[0],(guid).v4[1],(guid).v4[2],(guid).v4[3],    \
-    (guid).v4[4],(guid).v4[5],(guid).v4[6],(guid).v4[7]
+    (guid).Data1,              \
+    (guid).Data2,              \
+    (guid).Data3,              \
+    (guid).Data4[0],(guid).Data4[1],(guid).Data4[2],(guid).Data4[3],    \
+    (guid).Data4[4],(guid).Data4[5],(guid).Data4[6],(guid).Data4[7]
 
 enum
 {
@@ -226,18 +226,18 @@ static const guid_t asf_guid_audio_conceal_spread =
  ****************************************************************************/
 static inline void ASF_GetGUID( guid_t *p_guid, const uint8_t *p_data )
 {
-    p_guid->v1 = GetDWLE( p_data );
-    p_guid->v2 = GetWLE( p_data + 4);
-    p_guid->v3 = GetWLE( p_data + 6);
-    memcpy( p_guid->v4, p_data + 8, 8 );
+    p_guid->Data1 = GetDWLE( p_data );
+    p_guid->Data2 = GetWLE( p_data + 4);
+    p_guid->Data3 = GetWLE( p_data + 6);
+    memcpy( p_guid->Data4, p_data + 8, 8 );
 }
 
 static inline bool CmpGUID( const guid_t *p_guid1, const guid_t *p_guid2 )
 {
-    if( (p_guid1->v1 != p_guid2->v1 )||
-        (p_guid1->v2 != p_guid2->v2 )||
-        (p_guid1->v3 != p_guid2->v3 )||
-        ( memcmp( p_guid1->v4, p_guid2->v4, 8 )) )
+    if( (p_guid1->Data1 != p_guid2->Data1 )||
+        (p_guid1->Data2 != p_guid2->Data2 )||
+        (p_guid1->Data3 != p_guid2->Data3 )||
+        ( memcmp( p_guid1->Data4, p_guid2->Data4, 8 )) )
     {
         return false;
     }
