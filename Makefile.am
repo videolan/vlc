@@ -7,16 +7,14 @@
 # which have makefiles with distribution information.
 #  - src (libvlc) is nedeed by modules
 #  - libs/* are needed by modules
-BASE_SUBDIRS = po compat src bin modules share doc test
-EXTRA_SUBDIRS = m4 \
-	libs/srtp
-DIST_SUBDIRS = $(BASE_SUBDIRS) $(EXTRA_SUBDIRS)
-
-SUBDIRS = po compat src
+DIST_SUBDIRS = \
+	m4 compat doc po share src \
+	bin modules test
+SUBDIRS = compat doc po share src
 if BUILD_VLC
 SUBDIRS += bin
 endif
-SUBDIRS += modules share doc test
+SUBDIRS += modules test
 
 EXTRA_DIST = \
 	HACKING \
