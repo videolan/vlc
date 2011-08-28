@@ -147,7 +147,7 @@ static void CreateUUID( UUID_t *p_uuid, uint32_t i_fourcc )
 }
 
 /* some functions for mp4 encoding of variables */
-
+#ifdef MP4_VERBOSE
 static void MP4_ConvertDate2Str( char *psz, uint64_t i_date )
 {
     int i_day;
@@ -164,6 +164,7 @@ static void MP4_ConvertDate2Str( char *psz, uint64_t i_date )
     i_sec =  i_date % 60;
     sprintf( psz, "%dd-%2.2dh:%2.2dm:%2.2ds", i_day, i_hour, i_min, i_sec );
 }
+#endif
 
 /*****************************************************************************
  * Some prototypes.
