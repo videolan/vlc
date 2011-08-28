@@ -1289,9 +1289,9 @@ static int ASF_ReadObject( stream_t *s, asf_object_t *p_obj,
     /* find this object */
     for( i_index = 0; ; i_index++ )
     {
-        if( CmpGUID( ASF_Object_Function[i_index].p_id,
+        if( guidcmp( ASF_Object_Function[i_index].p_id,
                          &p_obj->common.i_object_id ) ||
-            CmpGUID( ASF_Object_Function[i_index].p_id,
+            guidcmp( ASF_Object_Function[i_index].p_id,
                          &asf_object_null_guid ) )
         {
             break;
@@ -1350,9 +1350,9 @@ static void ASF_FreeObject( stream_t *s, asf_object_t *p_obj )
     /* find this object */
     for( i_index = 0; ; i_index++ )
     {
-        if( CmpGUID( ASF_Object_Function[i_index].p_id,
+        if( guidcmp( ASF_Object_Function[i_index].p_id,
                      &p_obj->common.i_object_id )||
-            CmpGUID( ASF_Object_Function[i_index].p_id,
+            guidcmp( ASF_Object_Function[i_index].p_id,
                      &asf_object_null_guid ) )
         {
             break;
@@ -1423,7 +1423,7 @@ static void ASF_ObjectDumpDebug( vlc_object_t *p_obj,
     /* Find the name */
     for( i = 0; ASF_ObjectDumpDebugInfo[i].p_id != NULL; i++ )
     {
-        if( CmpGUID( ASF_ObjectDumpDebugInfo[i].p_id,
+        if( guidcmp( ASF_ObjectDumpDebugInfo[i].p_id,
                           &p_node->i_object_id ) )
             break;
     }
@@ -1596,7 +1596,7 @@ int  __ASF_CountObject( asf_object_t *p_obj, const guid_t *p_guid )
     p_child = p_obj->common.p_first;
     while( p_child )
     {
-        if( CmpGUID( &p_child->common.i_object_id, p_guid ) )
+        if( guidcmp( &p_child->common.i_object_id, p_guid ) )
             i_count++;
 
         p_child = p_child->common.p_next;
@@ -1613,7 +1613,7 @@ void *__ASF_FindObject( asf_object_t *p_obj, const guid_t *p_guid,
 
     while( p_child )
     {
-        if( CmpGUID( &p_child->common.i_object_id, p_guid ) )
+        if( guidcmp( &p_child->common.i_object_id, p_guid ) )
         {
             if( i_number == 0 )
                 return p_child;

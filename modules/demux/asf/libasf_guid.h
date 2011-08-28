@@ -23,17 +23,11 @@
 #ifndef LIBASG_GUID_H
 #define LIBASG_GUID_H
 
+#include <vlc_codecs.h>
+
 /*****************************************************************************
  * Structure needed for decoder
  *****************************************************************************/
-typedef struct guid_s
-{
-    uint32_t Data1; /* le */
-    uint16_t Data2; /* le */
-    uint16_t Data3; /* le */
-    uint8_t  Data4[8];
-} guid_t;
-
 #define GUID_FMT "0x%x-0x%x-0x%x-0x%2.2x%2.2x%2.2x%2.2x%2.2x%2.2x%2.2x%2.2x"
 #define GUID_PRINT( guid )  \
     (guid).Data1,              \
@@ -230,18 +224,6 @@ static inline void ASF_GetGUID( guid_t *p_guid, const uint8_t *p_data )
     p_guid->Data2 = GetWLE( p_data + 4);
     p_guid->Data3 = GetWLE( p_data + 6);
     memcpy( p_guid->Data4, p_data + 8, 8 );
-}
-
-static inline bool CmpGUID( const guid_t *p_guid1, const guid_t *p_guid2 )
-{
-    if( (p_guid1->Data1 != p_guid2->Data1 )||
-        (p_guid1->Data2 != p_guid2->Data2 )||
-        (p_guid1->Data3 != p_guid2->Data3 )||
-        ( memcmp( p_guid1->Data4, p_guid2->Data4, 8 )) )
-    {
-        return false;
-    }
-    return true;
 }
 
 #endif

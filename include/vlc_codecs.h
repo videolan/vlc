@@ -43,6 +43,8 @@ typedef struct _GUID
 } GUID, *REFGUID, *LPGUID;
 #endif /* GUID_DEFINED */
 
+typedef GUID guid_t;
+
 #ifdef HAVE_ATTRIBUTE_PACKED
 #   define ATTR_PACKED __attribute__((__packed__))
 #elif defined(__SUNPRO_C)
