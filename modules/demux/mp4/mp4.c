@@ -2403,15 +2403,19 @@ static void MP4_TrackCreate( demux_t *p_demux, mp4_track_t *p_track,
     p_udta = MP4_BoxGet( p_box_trak, "udta" );
     if( p_udta )
     {
-        MP4_Box_t *p_0xa9xxx;
-        for( p_0xa9xxx = p_udta->p_first; p_0xa9xxx != NULL;
-                 p_0xa9xxx = p_0xa9xxx->p_next )
+        MP4_Box_t *p_box_iter;
+        for( p_box_iter = p_udta->p_first; p_box_iter != NULL;
+                 p_box_iter = p_box_iter->p_next )
         {
-            switch( p_0xa9xxx->i_type )
+            switch( p_box_iter->i_type )
             {
                 case ATOM_0xa9nam:
                     p_track->fmt.psz_description =
-                        strdup( p_0xa9xxx->data.p_0xa9xxx->psz_text );
+                        strdup( p_box_iter->data.p_0xa9xxx->psz_text );
+                    break;
+                case ATOM_name:
+                    p_track->fmt.psz_description =
+                        strdup( p_box_iter->data.p_name->psz_text );
                     break;
             }
         }
