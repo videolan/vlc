@@ -3,7 +3,7 @@ SOURCES_mux_dummy = dummy.c
 SOURCES_mux_avi = avi.c
 SOURCES_mux_ogg = ogg.c
 SOURCES_mux_mp4 = mp4.c
-SOURCES_mux_asf = asf.c
+SOURCES_mux_asf = asf.c ../demux/asf/libasf_guid.h
 SOURCES_mux_wav = wav.c
 SOURCES_mux_mpjpeg = mpjpeg.c
 
