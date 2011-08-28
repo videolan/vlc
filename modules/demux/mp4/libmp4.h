@@ -23,6 +23,7 @@
 #ifndef _VLC_MP4_H
 #define _VLC_MP4_H 1
 
+#define ATOM_root VLC_FOURCC( 'r', 'o', 'o', 't' )
 #define ATOM_uuid VLC_FOURCC( 'u', 'u', 'i', 'd' )
 
 #define ATOM_ftyp VLC_FOURCC( 'f', 't', 'y', 'p' )
@@ -38,6 +39,8 @@
 #define ATOM_free VLC_FOURCC( 'f', 'r', 'e', 'e' )
 #define ATOM_udta VLC_FOURCC( 'u', 'd', 't', 'a' )
 #define ATOM_wide VLC_FOURCC( 'w', 'i', 'd', 'e' )
+
+#define ATOM_data VLC_FOURCC( 'd', 'a', 't', 'a' )
 
 #define ATOM_trak VLC_FOURCC( 't', 'r', 'a', 'k' )
 #define ATOM_mvhd VLC_FOURCC( 'm', 'v', 'h', 'd' )

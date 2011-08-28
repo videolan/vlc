@@ -334,7 +334,7 @@ static int MP4_ReadBoxSkip( stream_t *p_stream, MP4_Box_t *p_box )
 {
     /* XXX sometime moov is hiden in a free box */
     if( p_box->p_father &&
-        p_box->p_father->i_type == VLC_FOURCC( 'r', 'o', 'o', 't' ) &&
+        p_box->p_father->i_type == ATOM_root &&
         p_box->i_type == ATOM_free )
     {
         const uint8_t *p_peek;
@@ -1284,7 +1284,7 @@ static int MP4_ReadBox_gnre( stream_t *p_stream, MP4_Box_t *p_box )
 
     MP4_GET4BYTES( i_data_len );
     MP4_GETFOURCC( i_data_tag );
-    if( i_data_len < 10 || i_data_tag != VLC_FOURCC('d', 'a', 't', 'a') )
+    if( i_data_len < 10 || i_data_tag != ATOM_data )
         MP4_READBOX_EXIT( 0 );
 
     uint32_t i_version;
@@ -1313,7 +1313,7 @@ static int MP4_ReadBox_trkn( stream_t *p_stream, MP4_Box_t *p_box )
 
     MP4_GET4BYTES( i_data_len );
     MP4_GETFOURCC( i_data_tag );
-    if( i_data_len < 12 || i_data_tag != VLC_FOURCC('d', 'a', 't', 'a') )
+    if( i_data_len < 12 || i_data_tag != ATOM_data )
         MP4_READBOX_EXIT( 0 );
 
     uint32_t i_version;
@@ -2506,7 +2506,7 @@ static int MP4_ReadBox_0xa9xxx( stream_t *p_stream, MP4_Box_t *p_box )
         MP4_GET4BYTES( i_data_len );
         if( i_data_len > i_read ) i_data_len = i_read;
         MP4_GETFOURCC( i_data_tag );
-        if( (i_data_len > 0) && (i_data_tag == VLC_FOURCC('d', 'a', 't', 'a')) )
+        if( (i_data_len > 0) && (i_data_tag == ATOM_data) )
         {
             /* data box contains a version/flags field */
             uint32_t i_version;
@@ -3088,7 +3088,7 @@ MP4_Box_t *MP4_BoxGetRoot( stream_t *s )
         return NULL;
 
     p_root->i_pos = 0;
-    p_root->i_type = VLC_FOURCC( 'r', 'o', 'o', 't' );
+    p_root->i_type = ATOM_root;
     p_root->i_shortsize = 1;
     p_root->i_size = stream_Size( s );
     CreateUUID( &p_root->i_uuid, p_root->i_type );
@@ -3285,7 +3285,7 @@ static void MP4_BoxGet_Internal( MP4_Box_t **pp_result,
         if( !strcmp( psz_token, "/" ) )
         {
             /* Find root box */
-            while( p_box && p_box->i_type != VLC_FOURCC( 'r', 'o', 'o', 't' ) )
+            while( p_box && p_box->i_type != ATOM_root )
             {
                 p_box = p_box->p_father;
             }
