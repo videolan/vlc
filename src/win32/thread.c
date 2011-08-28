@@ -61,8 +61,8 @@ struct vlc_thread
     void          *data;
 };
 
-static CRITICAL_SECTION super_mutex;
-static HANDLE           super_cond;
+static vlc_mutex_t super_mutex;
+static vlc_cond_t  super_variable;
 extern vlc_rwlock_t config_lock, msg_lock;
 
 BOOL WINAPI DllMain (HINSTANCE, DWORD, LPVOID);
@@ -75,10 +75,8 @@ BOOL WINAPI DllMain (HINSTANCE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
     switch (fdwReason)
     {
         case DLL_PROCESS_ATTACH:
-            super_cond = CreateEvent (NULL, TRUE, FALSE, NULL);
-            if (unlikely(!super_cond))
-                return FALSE;
-            InitializeCriticalSection (&super_mutex);
+            vlc_mutex_init (&super_mutex);
+            vlc_cond_init (&super_variable);
             vlc_threadvar_create (&thread_key, NULL);
             vlc_rwlock_init (&config_lock);
             vlc_rwlock_init (&msg_lock);
@@ -89,8 +87,8 @@ BOOL WINAPI DllMain (HINSTANCE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
             vlc_rwlock_destroy (&msg_lock);
             vlc_rwlock_destroy (&config_lock);
             vlc_threadvar_delete (&thread_key);
-            DeleteCriticalSection (&super_mutex);
-            CloseHandle (super_cond);
+            vlc_cond_destroy (&super_variable);
+            vlc_mutex_destroy (&super_mutex);
             break;
     }
     return TRUE;
@@ -181,19 +179,20 @@ void vlc_mutex_destroy (vlc_mutex_t *p_mutex)
 void vlc_mutex_lock (vlc_mutex_t *p_mutex)
 {
     if (!p_mutex->dynamic)
-    {   /* static mutexes (inefficient on Windows) */
-        EnterCriticalSection (&super_mutex);
+    {   /* static mutexes */
+        int canc = vlc_savecancel ();
+        assert (p_mutex != &super_mutex); /* this one cannot be static */
+
+        vlc_mutex_lock (&super_mutex);
         while (p_mutex->locked)
         {
             p_mutex->contention++;
-            LeaveCriticalSection (&super_mutex);
-            WaitForSingleObject (super_cond, INFINITE);
-            EnterCriticalSection (&super_mutex);
-            assert (p_mutex->contention > 0);
+            vlc_cond_wait (&super_variable, &super_mutex);
             p_mutex->contention--;
         }
         p_mutex->locked = true;
-        LeaveCriticalSection (&super_mutex);
+        vlc_mutex_unlock (&super_mutex);
+        vlc_restorecancel (canc);
         return;
     }
 
@@ -206,13 +205,14 @@ int vlc_mutex_trylock (vlc_mutex_t *p_mutex)
     {   /* static mutexes */
         int ret = EBUSY;
 
-        EnterCriticalSection (&super_mutex);
+        assert (p_mutex != &super_mutex); /* this one cannot be static */
+        vlc_mutex_lock (&super_mutex);
         if (!p_mutex->locked)
         {
             p_mutex->locked = true;
             ret = 0;
         }
-        LeaveCriticalSection (&super_mutex);
+        vlc_mutex_unlock (&super_mutex);
         return ret;
     }
 
@@ -223,12 +223,14 @@ void vlc_mutex_unlock (vlc_mutex_t *p_mutex)
 {
     if (!p_mutex->dynamic)
     {   /* static mutexes */
-        EnterCriticalSection (&super_mutex);
+        assert (p_mutex != &super_mutex); /* this one cannot be static */
+
+        vlc_mutex_lock (&super_mutex);
         assert (p_mutex->locked);
         p_mutex->locked = false;
-        if (p_mutex->contention > 0)
-            SetEvent (super_cond);
-        LeaveCriticalSection (&super_mutex);
+        if (p_mutex->contention)
+            vlc_cond_broadcast (&super_variable);
+        vlc_mutex_unlock (&super_mutex);
         return;
     }
 
@@ -491,10 +493,10 @@ int vlc_threadvar_create (vlc_threadvar_t *p_tls, void (*destr) (void *))
     var->next = NULL;
     *p_tls = var;
 
-    EnterCriticalSection (&super_mutex);
+    vlc_mutex_lock (&super_mutex);
     var->prev = vlc_threadvar_last;
     vlc_threadvar_last = var;
-    LeaveCriticalSection (&super_mutex);
+    vlc_mutex_unlock (&super_mutex);
     return 0;
 }
 
@@ -502,14 +504,14 @@ void vlc_threadvar_delete (vlc_threadvar_t *p_tls)
 {
     struct vlc_threadvar *var = *p_tls;
 
-    EnterCriticalSection (&super_mutex);
+    vlc_mutex_lock (&super_mutex);
     if (var->prev != NULL)
         var->prev->next = var->next;
     else
         vlc_threadvar_last = var->next;
     if (var->next != NULL)
         var->next->prev = var->prev;
-    LeaveCriticalSection (&super_mutex);
+    vlc_mutex_unlock (&super_mutex);
 
     TlsFree (var->id);
     free (var);
@@ -537,19 +539,19 @@ static void vlc_thread_cleanup (struct vlc_thread *th)
 
 retry:
     /* TODO: use RW lock or something similar */
-    EnterCriticalSection (&super_mutex);
+    vlc_mutex_lock (&super_mutex);
     for (key = vlc_threadvar_last; key != NULL; key = key->prev)
     {
         void *value = vlc_threadvar_get (key);
         if (value != NULL && key->destroy != NULL)
         {
-            EnterCriticalSection (&super_mutex);
+            vlc_mutex_unlock (&super_mutex);
             vlc_threadvar_set (key, NULL);
             key->destroy (value);
             goto retry;
         }
     }
-    EnterCriticalSection (&super_mutex);
+    vlc_mutex_unlock (&super_mutex);
 
     if (th->detached)
     {
