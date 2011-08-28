@@ -281,7 +281,7 @@ int drms_init( void *_p_drms, uint32_t i_type,
 
     switch( i_type )
     {
-        case FOURCC_user:
+        case ATOM_user:
             if( i_len < sizeof(p_drms->i_user) )
             {
                 i_ret = -2;
@@ -291,7 +291,7 @@ int drms_init( void *_p_drms, uint32_t i_type,
             p_drms->i_user = U32_AT( p_info );
             break;
 
-        case FOURCC_key:
+        case ATOM_key:
             if( i_len < sizeof(p_drms->i_key) )
             {
                 i_ret = -2;
@@ -301,7 +301,7 @@ int drms_init( void *_p_drms, uint32_t i_type,
             p_drms->i_key = U32_AT( p_info );
             break;
 
-        case FOURCC_iviv:
+        case ATOM_iviv:
             if( i_len < sizeof(p_drms->p_key) )
             {
                 i_ret = -2;
@@ -311,7 +311,7 @@ int drms_init( void *_p_drms, uint32_t i_type,
             memcpy( p_drms->p_iviv, p_info, 16 );
             break;
 
-        case FOURCC_name:
+        case ATOM_name:
             p_drms->p_name = (uint8_t*) strdup( (char *)p_info );
 
             if( p_drms->p_name == NULL )
@@ -320,7 +320,7 @@ int drms_init( void *_p_drms, uint32_t i_type,
             }
             break;
 
-        case FOURCC_priv:
+        case ATOM_priv:
         {
             uint32_t p_priv[ 64 ];
             struct md5_s md5;
