@@ -1645,7 +1645,6 @@ static block_t *StreamParseAsf( demux_t *p_demux, live_track_t *tk,
         unsigned i_length_offset = (p_data[1] << 16) |
                                    (p_data[2] <<  8) |
                                    (p_data[3]      );
-        bool b_key = i_flags & 0x80;
         bool b_length = i_flags & 0x40;
         bool b_relative_ts = i_flags & 0x20;
         bool b_duration = i_flags & 0x10;
