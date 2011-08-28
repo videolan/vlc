@@ -2,7 +2,7 @@
  * mp4.c : MP4 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001-2004, 2010 the VideoLAN team
- * $Id$
+ *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -31,17 +31,14 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 
-
 #include <vlc_demux.h>
-#include <vlc_md5.h>
-#include <vlc_charset.h>
-#include <vlc_iso_lang.h>
-#include <vlc_meta.h>
+#include <vlc_charset.h>                           /* EnsureUTF8 */
+#include <vlc_meta.h>                              /* vlc_meta_t, vlc_meta_ */
 #include <vlc_input.h>
 
 #include "libmp4.h"
 #include "drms.h"
-#include "id3genres.h"
+#include "id3genres.h"                             /* for FOURCC_gnre */
 
 /*****************************************************************************
  * Module descriptor
@@ -54,7 +51,7 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_INPUT_DEMUX )
     set_description( N_("MP4 stream demuxer") )
     set_shortname( N_("MP4") )
-    set_capability( "demux", 242 )
+    set_capability( "demux", 240 )
     set_callbacks( Open, Close )
 vlc_module_end ()
 
