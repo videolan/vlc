@@ -188,6 +188,8 @@ static int Demux( demux_t *p_demux )
             SET( psz_encodedby, EncodedBy );
             SET( psz_description, Description );
             SET( psz_copyright, Copyright );
+            SET( psz_url, URL );
+            SET( psz_publisher, Publisher );
 #undef SET
 
             vlc_gc_decref( p_input );
