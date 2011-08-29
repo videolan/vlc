@@ -257,6 +257,10 @@ out:
 # if defined (__ARM_NEON__)
     i_capabilities |= CPU_CAPABILITY_NEON;
 # elif defined (CAN_COMPILE_NEON)
+#  define NEED_RUNTIME_CPU_CHECK 1
+# endif
+
+# ifdef NEED_RUNTIME_CPU_CHECK
 #  if defined (__linux__)
     FILE *info = fopen ("/proc/cpuinfo", "rt");
     if (info != NULL)
@@ -266,16 +270,18 @@ out:
 
         while (getline (&line, &linelen, info) != -1)
         {
-             const char *cap;
+            const char *cap;
 
-             if (strncmp (line, "Features\t:", 10))
-                 continue;
+            if (strncmp (line, "Features\t:", 10))
+                continue;
 
-             cap = strstr (line + 10, " neon");
-             if (cap != NULL && (cap[5] == '\0' || cap[5] == ' '))
-                 i_capabilities |= CPU_CAPABILITY_NEON;
-
-             break;
+            /* TODO: detect other CPU features when we use them */
+#   if defined (CAN_COMPILE_NEON) && !defined (__ARM_NEON__)
+                cap = strstr (line + 10, " neon");
+            if (cap != NULL && (cap[5] == '\0' || cap[5] == ' '))
+                i_capabilities |= CPU_CAPABILITY_NEON;
+#   endif
+            break;
         }
         fclose (info);
         free (line);
