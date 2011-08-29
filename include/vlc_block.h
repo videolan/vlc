@@ -103,16 +103,15 @@ struct block_t
 {
     block_t     *p_next;
 
+    uint8_t     *p_buffer;
+    size_t      i_buffer;
+
     uint32_t    i_flags;
+    unsigned    i_nb_samples; /* Used for audio */
 
     mtime_t     i_pts;
     mtime_t     i_dts;
     mtime_t     i_length;
-
-    unsigned    i_nb_samples; /* Used for audio */
-
-    size_t      i_buffer;
-    uint8_t     *p_buffer;
 
     /* Rudimentary support for overloading block (de)allocation. */
     block_free_t pf_release;
@@ -147,11 +146,11 @@ static inline block_t *block_Duplicate( block_t *p_block )
     if( p_dup == NULL )
         return NULL;
 
+    p_dup->i_flags   = p_block->i_flags;
+    p_dup->i_nb_samples = p_block->i_nb_samples;
     p_dup->i_dts     = p_block->i_dts;
     p_dup->i_pts     = p_block->i_pts;
-    p_dup->i_flags   = p_block->i_flags;
     p_dup->i_length  = p_block->i_length;
-    p_dup->i_nb_samples = p_block->i_nb_samples;
     memcpy( p_dup->p_buffer, p_block->p_buffer, p_block->i_buffer );
 
     return p_dup;

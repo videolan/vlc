@@ -60,13 +60,13 @@ void block_Init( block_t *restrict b, void *buf, size_t size )
 {
     /* Fill all fields to their default */
     b->p_next = NULL;
+    b->p_buffer = buf;
+    b->i_buffer = size;
     b->i_flags = 0;
+    b->i_nb_samples = 0;
     b->i_pts =
     b->i_dts = VLC_TS_INVALID;
     b->i_length = 0;
-    b->i_nb_samples = 0;
-    b->p_buffer = buf;
-    b->i_buffer = size;
 #ifndef NDEBUG
     b->pf_release = BlockNoRelease;
 #endif
@@ -80,11 +80,11 @@ static void BlockRelease( block_t *p_block )
 static void BlockMetaCopy( block_t *restrict out, const block_t *in )
 {
     out->p_next    = in->p_next;
+    out->i_nb_samples = in->i_nb_samples;
     out->i_dts     = in->i_dts;
     out->i_pts     = in->i_pts;
     out->i_flags   = in->i_flags;
     out->i_length  = in->i_length;
-    out->i_nb_samples = in->i_nb_samples;
 }
 
 /* Memory alignment (must be a multiple of sizeof(void*) and a power of two) */
