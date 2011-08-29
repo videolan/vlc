@@ -170,7 +170,6 @@ typedef struct {
 } parse_info_t;
 
 typedef struct {
-    block_free_t pf_blk_release;
     /*> next_parse_offset of the final data unit in associated block_t */
     uint32_t u_last_next_offset;
     /*> picture number is invalid if block has flags DIRAC_NON_DATED */
@@ -225,7 +224,6 @@ static dirac_block_encap_t *dirac_RemoveBlockEncap( block_t *p_block )
     dirac_block_encap_t *p_dbe = p_fake->p_priv;
 
     p_fake->p_priv = NULL;
-    p_dbe->pf_blk_release = NULL;
     return p_dbe;
 }
 
@@ -247,7 +245,6 @@ static void dirac_AddBlockEncap( block_t **pp_block, dirac_block_encap_t *p_dbe 
     *pp_block = &p_fake->fake;
 
     p_fake->p_priv = p_dbe;
-    p_dbe->pf_blk_release = p_fake->p_orig->pf_release;
     p_fake->fake.pf_release = dirac_ReleaseBlockAndEncap;
 }
 
