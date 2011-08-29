@@ -1,5 +1,5 @@
 /*****************************************************************************
- * demux.c: demuxer using ffmpeg (libavformat).
+ * demux.c: demuxer using libavformat
  *****************************************************************************
  * Copyright (C) 2004-2009 the VideoLAN team
  * $Id$
@@ -52,7 +52,7 @@
 #if defined(HAVE_FFMPEG_AVFORMAT_H) || defined(HAVE_LIBAVFORMAT_AVFORMAT_H)
 
 #if (LIBAVCODEC_VERSION_INT >= ((51<<16)+(50<<8)+0) )
-#   define HAVE_FFMPEG_CODEC_ATTACHMENT 1
+#   define HAVE_AVUTIL_CODEC_ATTACHMENT 1
 #endif
 
 /*****************************************************************************
@@ -353,7 +353,7 @@ int OpenDemux( vlc_object_t *p_this )
 
         default:
             es_format_Init( &fmt, UNKNOWN_ES, 0 );
-#ifdef HAVE_FFMPEG_CODEC_ATTACHMENT
+#ifdef HAVE_AVUTIL_CODEC_ATTACHMENT
             if( cc->codec_type == AVMEDIA_TYPE_ATTACHMENT )
             {
                 input_attachment_t *p_attachment;
@@ -371,7 +371,7 @@ int OpenDemux( vlc_object_t *p_this )
                                 p_attachment );
                     }
                 }
-                else msg_Warn( p_demux, "unsupported attachment type (%u) in ffmpeg demux", cc->codec_id );
+                else msg_Warn( p_demux, "unsupported attachment type (%u) in avformat demux", cc->codec_id );
             }
             else
 #endif
@@ -379,7 +379,7 @@ int OpenDemux( vlc_object_t *p_this )
                 if( cc->codec_type == AVMEDIA_TYPE_DATA )
                     psz_type = "data";
 
-                msg_Warn( p_demux, "unsupported track type in ffmpeg demux" );
+                msg_Warn( p_demux, "unsupported track type (%u) in avformat demux", cc->codec_type );
             }
             break;
         }
@@ -391,7 +391,7 @@ int OpenDemux( vlc_object_t *p_this )
         if( s->disposition & AV_DISPOSITION_DEFAULT )
             fmt.i_priority = 1000;
 
-#ifdef HAVE_FFMPEG_CODEC_ATTACHMENT
+#ifdef HAVE_AVUTIL_CODEC_ATTACHMENT
         if( cc->codec_type != AVMEDIA_TYPE_ATTACHMENT )
 #endif
         if( cc->codec_type != AVMEDIA_TYPE_DATA )

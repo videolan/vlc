@@ -1,5 +1,5 @@
 /*****************************************************************************
- * mux.c: muxer using ffmpeg (libavformat).
+ * mux.c: muxer using libavformat
  *****************************************************************************
  * Copyright (C) 2006 the VideoLAN team
  * $Id$
