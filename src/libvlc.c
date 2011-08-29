@@ -47,10 +47,6 @@
 #include <string.h>
 #include <stdlib.h>                                                /* free() */
 
-#ifndef WIN32
-#   include <netinet/in.h>                            /* BSD: struct in_addr */
-#endif
-
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
 #elif defined( WIN32 ) && !defined( UNDER_CE )
