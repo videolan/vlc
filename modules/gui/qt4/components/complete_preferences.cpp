@@ -638,7 +638,7 @@ AdvPrefsPanel::AdvPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                p_item->i_type == CONFIG_SUBCATEGORY ) )
         && ( ++p_item < p_end ) );
 
-    if( box )
+    if( box && i_boxline > 0 )
     {
         box->setLayout( boxlayout );
         box->show();
