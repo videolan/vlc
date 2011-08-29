@@ -576,7 +576,7 @@ static int dvb_vset_props (dvb_device_t *d, size_t n, va_list ap)
     {
         prop->cmd = va_arg (ap, uint32_t);
         prop->u.data = va_arg (ap, uint32_t);
-        msg_Dbg (d->obj, "setting property %"PRIu32" to %"PRIu32,
+        msg_Dbg (d->obj, "setting property %2"PRIu32" to %"PRIu32,
                  prop->cmd, prop->u.data);
         prop++;
         n--;
