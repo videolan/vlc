@@ -215,23 +215,24 @@ enum {
 typedef struct {
     block_t fake;
     block_t *p_orig;
-    void *p_priv;
+    dirac_block_encap_t *p_dbe;
 } fake_block_t;
 
 static dirac_block_encap_t *dirac_RemoveBlockEncap( block_t *p_block )
 {
     fake_block_t *p_fake = (fake_block_t *)p_block;
-    dirac_block_encap_t *p_dbe = p_fake->p_priv;
+    dirac_block_encap_t *p_dbe = p_fake->p_dbe;
 
-    p_fake->p_priv = NULL;
+    p_fake->p_dbe = NULL;
     return p_dbe;
 }
 
 static void dirac_ReleaseBlockAndEncap( block_t *p_block )
 {
     fake_block_t *p_fake = (fake_block_t *)p_block;
+
     free( dirac_RemoveBlockEncap( p_block ) );
-    p_fake->p_orig->pf_release( p_fake->p_orig );
+    block_Release( p_fake->p_orig );
     free( p_fake );
 }
 
@@ -239,13 +240,19 @@ static void dirac_AddBlockEncap( block_t **pp_block, dirac_block_encap_t *p_dbe 
 {
     /* must not fail, fixby: adding a p_priv to block_t */
     fake_block_t *p_fake = xcalloc( 1, sizeof( *p_fake ) );
+    block_t *in = *pp_block, *out = &p_fake->fake;
 
-    p_fake->p_orig = *pp_block;
-    memcpy( &p_fake->fake, *pp_block, sizeof( block_t ) );
-    *pp_block = &p_fake->fake;
+    block_Init( out, in->p_buffer, in->i_buffer );
+    out->i_flags = in->i_flags;
+    out->i_nb_samples = in->i_nb_samples;
+    out->i_pts = in->i_pts;
+    out->i_dts = in->i_dts;
+    out->i_length = in->i_length;
+    out->pf_release = dirac_ReleaseBlockAndEncap;
+    p_fake->p_orig = in;
+    p_fake->p_dbe = p_dbe;
 
-    p_fake->p_priv = p_dbe;
-    p_fake->fake.pf_release = dirac_ReleaseBlockAndEncap;
+    *pp_block = out;
 }
 
 static dirac_block_encap_t *dirac_NewBlockEncap( block_t **pp_block )
@@ -257,7 +264,7 @@ static dirac_block_encap_t *dirac_NewBlockEncap( block_t **pp_block )
 
 static dirac_block_encap_t *dirac_GetBlockEncap( block_t *p_block )
 {
-    return (dirac_block_encap_t*) ((fake_block_t *)p_block)->p_priv;
+    return ((fake_block_t *)p_block)->p_dbe;
 }
 
 /***
