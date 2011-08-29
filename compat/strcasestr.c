@@ -34,17 +34,17 @@ char *strcasestr (const char *psz_big, const char *psz_little)
 
     while( *p_pos )
     {
-        if( toupper( *p_pos ) == toupper( *psz_little ) )
+        if( toupper( (unsigned char)*p_pos ) == toupper( (unsigned char)*psz_little ) )
         {
-            char * psz_cur1 = p_pos + 1;
-            char * psz_cur2 = (char *)psz_little + 1;
-            while( *psz_cur1 && *psz_cur2 &&
-                   toupper( *psz_cur1 ) == toupper( *psz_cur2 ) )
+            char *cur1 = p_pos + 1;
+            char *cur2 = (char *)psz_little + 1;
+            while( *cur1 && *cur2
+             && toupper( (unsigned char)*cur1 ) == toupper( (unsigned char)*cur2 ) )
             {
-                psz_cur1++;
-                psz_cur2++;
+                cur1++;
+                cur2++;
             }
-            if( !*psz_cur2 ) return p_pos;
+            if( !*cur2 ) return p_pos;
         }
         p_pos++;
     }

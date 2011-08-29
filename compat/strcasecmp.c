@@ -33,10 +33,11 @@ int strcasecmp (const char *s1, const char *s2)
 #else
     for (size_t i = 0;; i++)
     {
-        int d = tolower (s1[i]) - tolower (s2[i]);
-        if (d || !s1[i])
+        unsigned char c1 = s1[i], c2 = s2[i];
+        int d = tolower (c1) - tolower (c2);
+        if (d || !c1)
             return d;
-        assert (s2[i]);
+        assert (c2);
     }
 #endif
 }
