@@ -387,7 +387,7 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
     {
         /* abort on read error */
         msg_Err( p_access, "failed to read (%m)" );
-        dialog_Fatal( p_access, _("File reading failed"), "%s",
+        dialog_Fatal( p_access, _("File reading failed"), "%s (%m)",
                       _("VLC could not read the file.") );
         SwitchFile( p_access, -1 );
         return 0;
@@ -558,7 +558,7 @@ static bool SwitchFile( access_t *p_access, unsigned i_file )
 
 error:
     dialog_Fatal (p_access, _("File reading failed"), _("VLC could not"
-        " open the file \"%s\"."), psz_path);
+        " open the file \"%s\". (%m)"), psz_path);
     if( p_sys->fd != -1 )
     {
         close( p_sys->fd );

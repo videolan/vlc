@@ -218,7 +218,7 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
 
             default:
                 msg_Err( p_access, "read failed (%m)" );
-                dialog_Fatal( p_access, _( "File reading failed" ), "%s",
+                dialog_Fatal( p_access, _( "File reading failed" ), "%s (%m)",
                                 _( "VLC could not read the file." ) );
                 p_access->info.b_eof = true;
                 return 0;
@@ -307,7 +307,7 @@ static int open_file( access_t *p_access, const char *path )
     {
         msg_Err( p_access, "cannot open file %s (%m)", path );
         dialog_Fatal( p_access, _( "File reading failed" ),
-                        _( "VLC could not open the file \"%s\"." ), path );
+                        _( "VLC could not open the file \"%s\". (%m)" ), path );
         return -1;
     }
 
