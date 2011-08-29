@@ -71,6 +71,25 @@ static void module_StoreBank (module_t *module)
     modules.head = module;
 }
 
+#ifdef __GNUC__
+__attribute__((weak))
+#else
+#pragma weak vlc_static_modules
+#endif
+extern vlc_plugin_cb vlc_static_modules[];
+
+static void module_InitStaticModules(void)
+{
+    if (!vlc_static_modules)
+        return;
+
+    for (unsigned i = 0; vlc_static_modules[i]; i++) {
+        module_t *module = module_InitStatic (vlc_static_modules[i]);
+        if (likely(module != NULL))
+            module_StoreBank (module);
+    }
+}
+
 /**
  * Init bank
  *
@@ -92,6 +111,7 @@ void module_InitBank (void)
         if (likely(module != NULL))
             module_StoreBank (module);
 
+        module_InitStaticModules();
         config_SortConfig ();
     }
     modules.usage++;
