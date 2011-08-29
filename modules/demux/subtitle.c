@@ -1626,10 +1626,10 @@ static int ParseJSS( demux_t *p_demux, subtitle_t *p_subtitle, int i_idx )
 
             strcpy( psz_text, s );
 
-            switch( toupper( psz_text[1] ) )
+            switch( toupper( (unsigned char)psz_text[1] ) )
             {
             case 'S':
-                 shift = isalpha( psz_text[2] ) ? 6 : 2 ;
+                 shift = isalpha( (unsigned char)psz_text[2] ) ? 6 : 2 ;
 
                  if( sscanf( &psz_text[shift], "%d", &h ) )
                  {
@@ -1666,7 +1666,7 @@ static int ParseJSS( demux_t *p_demux, subtitle_t *p_subtitle, int i_idx )
                  break;
 
             case 'T':
-                shift = isalpha( psz_text[2] ) ? 8 : 2 ;
+                shift = isalpha( (unsigned char)psz_text[2] ) ? 8 : 2 ;
 
                 sscanf( &psz_text[shift], "%d", &p_sys->jss.i_time_resolution );
                 break;
@@ -1710,7 +1710,7 @@ static int ParseJSS( demux_t *p_demux, subtitle_t *p_subtitle, int i_idx )
     while( *psz_text == ' ' || *psz_text == '\t' ) psz_text++;
 
     /* Parse the directives */
-    if( isalpha( *psz_text ) || *psz_text == '[' )
+    if( isalpha( (unsigned char)*psz_text ) || *psz_text == '[' )
     {
         while( *psz_text != ' ' )
         { psz_text++ ;};
@@ -1767,8 +1767,8 @@ static int ParseJSS( demux_t *p_demux, subtitle_t *p_subtitle, int i_idx )
                 psz_text2++;
                 break;
             }
-            if( ( toupper(*(psz_text + 1 ) ) == 'C' ) ||
-                    ( toupper(*(psz_text + 1 ) ) == 'F' ) )
+            if( ( toupper((unsigned char)*(psz_text + 1 ) ) == 'C' ) ||
+                    ( toupper((unsigned char)*(psz_text + 1 ) ) == 'F' ) )
             {
                 psz_text++; psz_text++;
                 break;

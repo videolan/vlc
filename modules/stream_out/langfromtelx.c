@@ -190,7 +190,7 @@ static void SetLanguage( sout_stream_t *p_stream, char *psz_language )
     if ( strncmp( p_sys->psz_language, psz_language, 3 ) )
         msg_Dbg( p_stream, "changing language to %s", psz_language );
 
-    strncpy( p_sys->psz_language, psz_language, 3 );
+    strncpy( p_sys->psz_language, (const char *)psz_language, 3 );
 }
 
 /*****************************************************************************

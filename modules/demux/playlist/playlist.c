@@ -198,7 +198,7 @@ char *ProcessMRL( const char *psz_mrl, const char *psz_prefix )
         goto uri;
 #if defined( WIN32 ) || defined( __OS2__ )
     /* Drive letter (this assumes URL scheme are not a single character) */
-    if( isalpha(psz_mrl[0]) && psz_mrl[1] == ':' )
+    if( isalpha((unsigned char)psz_mrl[0]) && psz_mrl[1] == ':' )
         goto uri;
 #endif
     if( strstr( psz_mrl, "://" ) )

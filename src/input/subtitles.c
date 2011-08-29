@@ -66,22 +66,24 @@ static const char const sub_exts[][6] = {
 
 static void strcpy_trim( char *d, const char *s )
 {
+    unsigned char c;
+
     /* skip leading whitespace */
-    while( *s && !isalnum(*s) )
+    while( ((c = *s) != '\0') && !isalnum(c) )
     {
         s++;
     }
     for(;;)
     {
         /* copy word */
-        while( *s && isalnum(*s) )
+        while( ((c = *s) != '\0') && isalnum(c) )
         {
-            *d = tolower(*s);
+            *d = tolower(c);
             s++; d++;
         }
         if( *s == 0 ) break;
         /* trim excess whitespace */
-        while( *s && !isalnum(*s) )
+        while( ((c = *s) != '\0') && !isalnum(c) )
         {
             s++;
         }
@@ -93,6 +95,8 @@ static void strcpy_trim( char *d, const char *s )
 
 static void strcpy_strip_ext( char *d, const char *s )
 {
+    unsigned char c;
+
     const char *tmp = strrchr(s, '.');
     if( !tmp )
     {
@@ -101,9 +105,9 @@ static void strcpy_strip_ext( char *d, const char *s )
     }
     else
         strlcpy(d, s, tmp - s + 1 );
-    while( *d )
+    while( (c = *d) != '\0' )
     {
-        *d = tolower(*d);
+        *d = tolower(c);
         d++;
     }
 }
@@ -119,9 +123,11 @@ static void strcpy_get_ext( char *d, const char *s )
 
 static int whiteonly( const char *s )
 {
-    while( *s )
+    unsigned char c;
+
+    while( (c = *s) != '\0' )
     {
-        if( isalnum( *s ) )
+        if( isalnum( c ) )
             return 0;
         s++;
     }

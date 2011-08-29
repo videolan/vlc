@@ -262,7 +262,7 @@ LRESULT CALLBACK Win32Loop::processEvent( HWND hwnd, UINT msg,
             if( !key )
             {
                 // This appears to be a "normal" (ascii) key
-                key = tolower( MapVirtualKey( wParam, 2 ) );
+                key = tolower( (unsigned char)MapVirtualKey( wParam, 2 ) );
             }
 
             if( key )

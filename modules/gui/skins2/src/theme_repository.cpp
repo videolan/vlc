@@ -168,8 +168,8 @@ void ThemeRepository::parseDirectory( const string &rDir_locale )
             string shortname = name.substr( 0, name.size() - 4 );
             for( string::size_type i = 0; i < shortname.size(); i++ )
                 shortname[i] = ( i == 0 ) ?
-                               toupper( shortname[i] ) :
-                               tolower( shortname[i] );
+                               toupper( (unsigned char)shortname[i] ) :
+                               tolower( (unsigned char)shortname[i] );
             m_skinsMap[shortname] = path;
 
             msg_Dbg( getIntf(), "found skin %s", path.c_str() );

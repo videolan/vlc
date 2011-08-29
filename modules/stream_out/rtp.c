@@ -887,7 +887,8 @@ char *SDPGenerate( sout_stream_t *p_stream, const char *rtsp_url )
                 sdp_AddAttribute( &psz_sdp, "setup", "passive" );
             if( p_sys->proto == IPPROTO_DCCP )
                 sdp_AddAttribute( &psz_sdp, "dccp-service-code",
-                                  "SC:RTP%c", toupper( mime_major[0] ) );
+                                  "SC:RTP%c",
+                                  toupper( (unsigned char)mime_major[0] ) );
         }
     }
 out:

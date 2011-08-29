@@ -125,7 +125,7 @@ static int ParseTime(char *s, size_t i_strlen)
     s = SkipBlanks(s, i_strlen);
 
     val = 0;
-    while( (s < end) && isdigit(*s) )
+    while( (s < end) && isdigit((unsigned char)*s) )
     {
         int newval = val*10 + (*s - '0');
         if( newval < val )
@@ -145,7 +145,7 @@ static int ParseTime(char *s, size_t i_strlen)
         s = SkipBlanks(s, end-s);
         result = result * 60;
         val = 0;
-        while( (s < end) && isdigit(*s) )
+        while( (s < end) && isdigit((unsigned char)*s) )
         {
             int newval = val*10 + (*s - '0');
             if( newval < val )
@@ -165,7 +165,7 @@ static int ParseTime(char *s, size_t i_strlen)
             s = SkipBlanks(s, end-s);
             result = result * 60;
             val = 0;
-            while( (s < end) && isdigit(*s) )
+            while( (s < end) && isdigit((unsigned char)*s) )
             {
                 int newval = val*10 + (*s - '0');
                 if( newval < val )

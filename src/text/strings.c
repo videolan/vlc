@@ -1079,7 +1079,7 @@ char *make_URI (const char *path, const char *scheme)
     char *buf;
 #if defined( WIN32 ) || defined( __OS2__ )
     /* Drive letter */
-    if (isalpha (path[0]) && (path[1] == ':'))
+    if (isalpha ((unsigned char)path[0]) && (path[1] == ':'))
     {
         if (asprintf (&buf, "%s:///%c:", scheme ? scheme : "file",
                       path[0]) == -1)

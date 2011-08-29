@@ -71,7 +71,7 @@ void IniFile::parseFile()
                 // Convert to lower case because of some buggy winamp2 skins
                 for( size_t i = 0; i < name.size(); i++ )
                 {
-                    name[i] = tolower( name[i] );
+                    name[i] = tolower( (unsigned char)name[i] );
                 }
 
                 // Register the value in the var manager

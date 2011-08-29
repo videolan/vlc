@@ -322,7 +322,7 @@ int ACL_LoadFile( vlc_acl_t *p_acl, const char *psz_path )
         psz_ip = line;
 
         /* skips blanks - cannot overflow given '\0' is not space */
-        while( isspace( *psz_ip ) )
+        while( isspace( (unsigned char)*psz_ip ) )
             psz_ip++;
 
         if( *psz_ip == '\0' ) /* empty/blank line */
@@ -351,7 +351,7 @@ int ACL_LoadFile( vlc_acl_t *p_acl, const char *psz_path )
         }
 
         /* look for first space, CR, LF, etc. or comment character */
-        for( ptr = psz_ip; ( *ptr!='#' ) && !isspace( *ptr ) && *ptr; ++ptr );
+        for( ptr = psz_ip; ( *ptr!='#' ) && !isspace( (unsigned char)*ptr ) && *ptr; ++ptr );
 
         *ptr = '\0';
 

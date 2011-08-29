@@ -244,7 +244,7 @@ static void *Thread( void *p_data )
             HANDLE( MEDIA_NEXT_TRACK );
 
             default:
-                i_vk = toupper( i_key & ~KEY_MODIFIER );
+                i_vk = toupper( (uint8_t)(i_key & ~KEY_MODIFIER) );
                 break;
         }
         if( !i_vk ) continue;

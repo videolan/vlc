@@ -204,11 +204,12 @@ static inline int vlc_UrlIsNotEncoded( const char *psz_url )
 
     for( ptr = psz_url; *ptr; ptr++ )
     {
-        char c = *ptr;
+        unsigned char c = *ptr;
 
         if( c == '%' )
         {
-            if( !isxdigit( ptr[1] ) || !isxdigit( ptr[2] ) )
+            if( !isxdigit( (unsigned char)ptr[1] )
+             || !isxdigit( (unsigned char)ptr[2] ) )
                 return 1; /* not encoded */
             ptr += 2;
         }

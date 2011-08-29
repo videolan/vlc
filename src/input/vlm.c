@@ -695,13 +695,15 @@ static int vlm_OnMediaUpdate( vlm_t *p_vlm, vlm_media_sys_t *p_media )
                     psz_mux = p_cfg->vod.psz_mux;
 
                 es_format_t es, *p_es = &es;
-                union { char text[5]; uint32_t value; } fourcc;
+                union {
+                    char text[5];
+                    unsigned char utext[5];
+                    uint32_t value;
+                } fourcc;
 
                 sprintf( fourcc.text, "%4.4s", psz_mux );
-                fourcc.text[0] = tolower(fourcc.text[0]);
-                fourcc.text[1] = tolower(fourcc.text[1]);
-                fourcc.text[2] = tolower(fourcc.text[2]);
-                fourcc.text[3] = tolower(fourcc.text[3]);
+                for( int i = 0; i < 4; i++ )
+                    fourcc.utext[i] = tolower(fourcc.utext[i]);
 
                 item.i_es = 1;
                 item.es = &p_es;

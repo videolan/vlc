@@ -191,7 +191,7 @@ bool ThemeLoader::extractFileInZip( unzFile file, const string &rootDir,
     // use the wrong case...
     if( isWsz )
         for( size_t i = 0; i < strlen( filenameInZip ); i++ )
-            filenameInZip[i] = tolower( filenameInZip[i] );
+            filenameInZip[i] = tolower( (unsigned char)filenameInZip[i] );
 
     // Allocate the buffer
     void *pBuffer = malloc( ZIP_BUFFER_SIZE );

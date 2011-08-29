@@ -3115,24 +3115,24 @@ static void MRLSections( input_thread_t *p_input, char *psz_source,
     /* Check we are really dealing with a title/chapter section */
     psz_check = psz + 1;
     if( !*psz_check ) return;
-    if( isdigit(*psz_check) )
+    if( isdigit((unsigned char)*psz_check) )
         if(!next(&psz_check)) return;
     if( *psz_check != ':' && *psz_check != '-' && *psz_check ) return;
     if( *psz_check == ':' && ++psz_check )
     {
-        if( isdigit(*psz_check) )
+        if( isdigit((unsigned char)*psz_check) )
             if(!next(&psz_check)) return;
     }
     if( *psz_check != '-' && *psz_check ) return;
     if( *psz_check == '-' && ++psz_check )
     {
-        if( isdigit(*psz_check) )
+        if( isdigit((unsigned char)*psz_check) )
             if(!next(&psz_check)) return;
     }
     if( *psz_check != ':' && *psz_check ) return;
     if( *psz_check == ':' && ++psz_check )
     {
-        if( isdigit(*psz_check) )
+        if( isdigit((unsigned char)*psz_check) )
             if(!next(&psz_check)) return;
     }
     if( *psz_check ) return;

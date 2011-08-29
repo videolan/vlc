@@ -367,7 +367,7 @@ static void *EventThread( void *p_this )
             if( !i_key )
             {
                 /* This appears to be a "normal" (ascii) key */
-                i_key = tolower( MapVirtualKey( msg.wParam, 2 ) );
+                i_key = tolower( (unsigned char)MapVirtualKey( msg.wParam, 2 ) );
             }
 
             if( i_key )
