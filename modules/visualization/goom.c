@@ -64,7 +64,7 @@ vlc_module_begin ()
                  WIDTH_TEXT, RES_LONGTEXT, false )
     add_integer( "goom-height", 640,
                  HEIGHT_TEXT, RES_LONGTEXT, false )
-    add_integer( "goom-speed", 6,
+    add_integer_with_range( "goom-speed", 6, 1, 10,
                  SPEED_TEXT, SPEED_LONGTEXT, false )
     set_callbacks( Open, Close )
     add_shortcut( "goom" )
