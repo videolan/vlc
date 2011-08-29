@@ -139,7 +139,6 @@ block_t *block_Alloc( size_t i_size )
 
 block_t *block_Realloc( block_t *p_block, ssize_t i_prebody, size_t i_body )
 {
-    block_sys_t *p_sys = (block_sys_t *)p_block;
     size_t requested = i_prebody + i_body;
 
     /* Corner case: empty block requested */
@@ -159,9 +158,9 @@ block_t *block_Realloc( block_t *p_block, ssize_t i_prebody, size_t i_body )
             return NULL;
 
         p_block = p_dup;
-        p_sys = (block_sys_t *)p_block;
     }
 
+    block_sys_t *p_sys = (block_sys_t *)p_block;
     uint8_t *p_start = p_sys->p_allocated_buffer;
     uint8_t *p_end = p_sys->p_allocated_buffer + p_sys->i_allocated_buffer;
 
