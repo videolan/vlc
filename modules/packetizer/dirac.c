@@ -223,7 +223,7 @@ static dirac_block_encap_t *dirac_RemoveBlockEncap( block_t *p_block )
 {
     fake_block_t *p_fake = (fake_block_t *)p_block;
     dirac_block_encap_t *p_dbe = p_fake->p_priv;
-    if( !p_dbe ) return NULL;
+
     p_fake->p_priv = NULL;
     p_dbe->pf_blk_release = NULL;
     return p_dbe;
