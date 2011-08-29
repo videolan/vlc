@@ -81,8 +81,9 @@ static void    Play        ( audio_output_t *, block_t * );
 #define FORMAT_LONGTEXT N_("One of \"u8\", \"s8\", \"u16\", \"s16\", " \
     "\"u16_le\", \"s16_le\", \"u16_be\", \"s16_be\", \"fixed32\", " \
     "\"float32\" or \"spdif\"")
+
 #define CHANNELS_TEXT N_("Number of output channels")
-#define CHANNELS_LONGTEXT N_("By default, all the channels of the incoming " \
+#define CHANNELS_LONGTEXT N_("By default (0), all the channels of the incoming " \
     "will be saved but you can restrict the number of channels here.")
 
 #define WAV_TEXT N_("Add WAVE header")
@@ -112,14 +113,14 @@ vlc_module_begin ()
     set_category( CAT_AUDIO )
     set_subcategory( SUBCAT_AUDIO_AOUT )
 
+    add_savefile( "audiofile-file", "audiofile.wav", FILE_TEXT,
+                  FILE_LONGTEXT, false )
     add_string( "audiofile-format", "s16",
                 FORMAT_TEXT, FORMAT_LONGTEXT, true )
         change_string_list( format_list, 0, 0 )
     add_integer( "audiofile-channels", 0,
                  CHANNELS_TEXT, CHANNELS_LONGTEXT, true )
         change_integer_range( 0, 6 )
-    add_savefile( "audiofile-file", "audiofile.wav", FILE_TEXT,
-                  FILE_LONGTEXT, false )
     add_bool( "audiofile-wav", true, WAV_TEXT, WAV_LONGTEXT, true )
 
     set_capability( "audio output", 0 )
