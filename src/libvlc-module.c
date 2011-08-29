@@ -627,6 +627,22 @@ static const char *const ppsz_pos_descriptions[] =
     "subsystem, such as the DVD or VCD device, the network interface " \
     "settings or the subtitle channel.")
 
+#define CACHING_TEXT N_("File caching (ms)")
+#define CACHING_LONGTEXT N_( \
+    "Caching value for local files, in milliseconds." )
+
+#define CAPTURE_CACHING_TEXT N_("Live capture caching (ms)")
+#define CAPTURE_CACHING_LONGTEXT N_( \
+    "Caching value for cameras and microphones, in milliseconds." )
+
+#define DISC_CACHING_TEXT N_("Disc caching (ms)")
+#define DISC_CACHING_LONGTEXT N_( \
+    "Caching value for optical media, in milliseconds." )
+
+#define NETWORK_CACHING_TEXT N_("Network caching (ms)")
+#define NETWORK_CACHING_LONGTEXT N_( \
+    "Caching value for network resources, in milliseconds." )
+
 #define CR_AVERAGE_TEXT N_("Clock reference average counter")
 #define CR_AVERAGE_LONGTEXT N_( \
     "When using the PVR input (or a very irregular source), you should " \
@@ -1894,6 +1910,19 @@ vlc_module_begin ()
         change_safe()
 
     set_section( N_( "Advanced" ), NULL )
+
+    add_integer( "file-caching", DEFAULT_PTS_DELAY / 1000,
+                 CACHING_TEXT, CACHING_LONGTEXT, true )
+        change_safe()
+    add_integer( "capture-caching", DEFAULT_PTS_DELAY / 1000,
+                 CAPTURE_CACHING_TEXT, CAPTURE_CACHING_LONGTEXT, true )
+        change_safe()
+    add_integer( "disc-caching", DEFAULT_PTS_DELAY / 1000,
+                 DISC_CACHING_TEXT, DISC_CACHING_LONGTEXT, true )
+        change_safe()
+    add_integer( "network-caching", CLOCK_FREQ / 1000,
+                 NETWORK_CACHING_TEXT, NETWORK_CACHING_LONGTEXT, true )
+        change_safe()
 
     add_integer( "cr-average", 40, CR_AVERAGE_TEXT,
                  CR_AVERAGE_LONGTEXT, true )

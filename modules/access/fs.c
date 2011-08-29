@@ -30,14 +30,6 @@
 #include "fs.h"
 #include <vlc_plugin.h>
 
-#define CACHING_TEXT N_("Caching value (ms)")
-#define CACHING_LONGTEXT N_( \
-    "Caching value for files, in milliseconds." )
-
-#define NETWORK_CACHING_TEXT N_("Extra network caching value (ms)")
-#define NETWORK_CACHING_LONGTEXT N_( \
-    "Supplementary caching value for remote files, in milliseconds." )
-
 #define RECURSIVE_TEXT N_("Subdirectory behavior")
 #define RECURSIVE_LONGTEXT N_( \
         "Select whether subdirectories must be expanded.\n" \
@@ -61,12 +53,6 @@ vlc_module_begin ()
     set_shortname( N_("File") )
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_ACCESS )
-    add_integer( "file-caching", DEFAULT_PTS_DELAY / 1000,
-                 CACHING_TEXT, CACHING_LONGTEXT, true )
-        change_safe()
-    add_integer( "network-caching", 3 * DEFAULT_PTS_DELAY / 1000,
-                 NETWORK_CACHING_TEXT, NETWORK_CACHING_LONGTEXT, true )
-        change_safe()
     add_obsolete_string( "file-cat" )
     set_capability( "access", 50 )
     add_shortcut( "file", "fd", "stream" )
