@@ -239,8 +239,9 @@ static void dirac_ReleaseBlockAndEncap( block_t *p_block )
 
 static void dirac_AddBlockEncap( block_t **pp_block, dirac_block_encap_t *p_dbe )
 {
-    fake_block_t *p_fake = calloc( 1, sizeof( *p_fake ) );
-    assert( p_fake ); /* must not fail, fixby: adding a p_priv to block_t */
+    /* must not fail, fixby: adding a p_priv to block_t */
+    fake_block_t *p_fake = xcalloc( 1, sizeof( *p_fake ) );
+
     p_fake->p_orig = *pp_block;
     memcpy( &p_fake->fake, *pp_block, sizeof( block_t ) );
     *pp_block = &p_fake->fake;
