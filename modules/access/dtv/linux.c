@@ -875,7 +875,7 @@ int dvb_set_dvbt (dvb_device_t *d, uint32_t freq, const char *modstr,
     if (dvb_find_frontend (d, FE_OFDM, FE_IS_STUPID))
         return -1;
     return dvb_set_props (d, 10, DTV_CLEAR, 0, DTV_DELIVERY_SYSTEM, SYS_DVBT,
-                          DTV_FREQUENCY, freq * 1000, DTV_MODULATION, mod,
+                          DTV_FREQUENCY, freq, DTV_MODULATION, mod,
                           DTV_CODE_RATE_HP, fec_hp, DTV_CODE_RATE_LP, fec_lp,
                           DTV_BANDWIDTH_HZ, bandwidth,
                           DTV_TRANSMISSION_MODE, transmit_mode,
@@ -897,7 +897,7 @@ int dvb_set_dvbt2 (dvb_device_t *d, uint32_t freq, const char *modstr,
     if (dvb_find_frontend (d, FE_OFDM, FE_CAN_2G_MODULATION))
         return -1;
     return dvb_set_props (d, 8, DTV_CLEAR, 0, DTV_DELIVERY_SYSTEM, SYS_DVBT2,
-                          DTV_FREQUENCY, freq * 1000, DTV_MODULATION, mod,
+                          DTV_FREQUENCY, freq, DTV_MODULATION, mod,
                           DTV_INNER_FEC, fec, DTV_BANDWIDTH_HZ, bandwidth,
                           DTV_TRANSMISSION_MODE, transmit_mode,
                           DTV_GUARD_INTERVAL, guard);
@@ -979,7 +979,7 @@ int dvb_set_atsc (dvb_device_t *d, uint32_t freq, const char *modstr)
     if (dvb_find_frontend (d, FE_ATSC, FE_IS_STUPID))
         return -1;
     return dvb_set_props (d, 4, DTV_CLEAR, 0, DTV_DELIVERY_SYSTEM, SYS_ATSC,
-                          DTV_FREQUENCY, freq * 1000, DTV_MODULATION, mod);
+                          DTV_FREQUENCY, freq, DTV_MODULATION, mod);
 }
 
 int dvb_set_cqam (dvb_device_t *d, uint32_t freq, const char *modstr)
@@ -990,5 +990,5 @@ int dvb_set_cqam (dvb_device_t *d, uint32_t freq, const char *modstr)
         return -1;
     return dvb_set_props (d, 4, DTV_CLEAR, 0,
                           DTV_DELIVERY_SYSTEM, SYS_DVBC_ANNEX_B,
-                          DTV_FREQUENCY, freq * 1000, DTV_MODULATION, mod);
+                          DTV_FREQUENCY, freq, DTV_MODULATION, mod);
 }
