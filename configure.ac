@@ -461,9 +461,11 @@ m4_defun([AC_DEPLIBS_CHECK_METHOD],[])
 
 lt_cv_deplibs_check_method=pass_all
 
-AS_IF([test "${enable_shared}" = "no"], [
+AS_IF([test "${enable_shared}" = "no" -a "${enable_vlc}" != "no"], [
   AC_MSG_ERROR([VLC is based on plugins. Shared libraries cannot be disabled.])
 ])
+
+AM_CONDITIONAL(HAVE_SHARED_PLUGINS, [test "${enable_shared}" != "no"])
 
 dnl
 dnl Gettext stuff
