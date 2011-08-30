@@ -9,7 +9,9 @@
 # by their respective owner(s).
 #
 
+if LOADER
 noinst_LTLIBRARIES = libloader.la
+endif
 
 # TODO: real check for vsscanf() and <sys/mmap.h>
 AM_CPPFLAGS = -D__WINE__ -DHAVE_SYS_MMAN_H=1 -DHAVE_VSSCANF=1 \

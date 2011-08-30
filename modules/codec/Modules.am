@@ -1,4 +1,4 @@
-SUBDIRS = dmo avcodec shine spudec wmafixed omxil
+SUBDIRS = loader dmo avcodec shine spudec wmafixed omxil
 SOURCES_a52 = a52.c a52.h
 SOURCES_dts = dts.c
 SOURCES_flac = flac.c

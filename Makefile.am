@@ -9,13 +9,10 @@
 #  - libs/* are needed by modules
 BASE_SUBDIRS = po compat src bin modules share doc test
 EXTRA_SUBDIRS = m4 \
-	libs/loader libs/srtp
+	libs/srtp
 DIST_SUBDIRS = $(BASE_SUBDIRS) $(EXTRA_SUBDIRS)
 
 SUBDIRS = po compat src
-if LOADER
-SUBDIRS += libs/loader
-endif
 if HAVE_GCRYPT
 SUBDIRS += libs/srtp
 endif

@@ -4175,8 +4175,8 @@ AC_ARG_ENABLE(loader,
 AM_CONDITIONAL(LOADER, [test "${enable_loader}" = "yes"])
 AS_IF([test "${enable_loader}" = "yes"],
   [ VLC_ADD_PLUGIN([dmo])
-    VLC_ADD_CPPFLAGS([dmo quicktime realvideo],[-I\\\${top_srcdir}/libs/loader])
-    VLC_ADD_LIBS([dmo quicktime realvideo],[\\\${top_builddir}/libs/loader/libloader.la])
+    VLC_ADD_CPPFLAGS([dmo quicktime realvideo],[-I\\\${top_srcdir}/modules/codec/loader])
+    VLC_ADD_LIBS([dmo quicktime realvideo],[\\\${top_builddir}/modules/codec/loader/libloader.la])
     VLC_ADD_CPPFLAGS([realvideo], [-DLOADER])
     VLC_ADD_LIBS([dmo quicktime], [-lpthread])
   ])
@@ -4259,7 +4259,6 @@ AC_SUBST(FILE_LIBVLC_DLL)
 AC_CONFIG_FILES([
   Makefile
   doc/Makefile
-  libs/loader/Makefile
   libs/srtp/Makefile
   modules/Makefile
   m4/Makefile
@@ -4288,6 +4287,7 @@ AC_CONFIG_FILES([
   modules/codec/Makefile
   modules/codec/avcodec/Makefile
   modules/codec/dmo/Makefile
+  modules/codec/loader/Makefile
   modules/codec/omxil/Makefile
   modules/codec/shine/Makefile
   modules/codec/spudec/Makefile
