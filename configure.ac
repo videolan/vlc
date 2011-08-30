@@ -822,14 +822,12 @@ then
       MINIZIP_LIBS="-lminizip -lz"
     ], [
       have_minizip=no
-      MINIZIP_CFLAGS="-I\\\${top_srcdir}/libs/unzip"
-      MINIZIP_LIBS="\\\${top_builddir}/libs/unzip/libunzip.la"
+      MINIZIP_CFLAGS="-I\\\${top_srcdir}/modules/access/zip/unzip"
+      MINIZIP_LIBS="\\\${top_builddir}/modules/access/zip/unzip/libunzip.la"
     ])
   ])
   VLC_ADD_CPPFLAGS([skins2],[$MINIZIP_CFLAGS])
-  VLC_ADD_CFLAGS([zip],[$MINIZIP_CFLAGS])
-  VLC_ADD_LIBS([skins2 zip],[$MINIZIP_LIBS])
-  VLC_ADD_PLUGIN([unzip zip])
+  VLC_ADD_LIBS([skins2],[$MINIZIP_LIBS])
 fi
 AM_CONDITIONAL(HAVE_MINIZIP, [ test "${have_minizip}" = "yes" ])
 
@@ -4263,7 +4261,6 @@ AC_CONFIG_FILES([
   doc/Makefile
   libs/loader/Makefile
   libs/srtp/Makefile
-  libs/unzip/Makefile
   modules/Makefile
   m4/Makefile
   po/Makefile.in
@@ -4283,6 +4280,7 @@ AC_CONFIG_FILES([
   modules/access/vcdx/Makefile
   modules/access/screen/Makefile
   modules/access/zip/Makefile
+  modules/access/zip/unzip/Makefile
   modules/access_output/Makefile
   modules/audio_filter/Makefile
   modules/audio_mixer/Makefile

@@ -9,7 +9,7 @@
 #  - libs/* are needed by modules
 BASE_SUBDIRS = po compat src bin modules share doc test
 EXTRA_SUBDIRS = m4 \
-	libs/loader libs/srtp libs/unzip
+	libs/loader libs/srtp
 DIST_SUBDIRS = $(BASE_SUBDIRS) $(EXTRA_SUBDIRS)
 
 SUBDIRS = po compat src
@@ -18,11 +18,6 @@ SUBDIRS += libs/loader
 endif
 if HAVE_GCRYPT
 SUBDIRS += libs/srtp
-endif
-if HAVE_ZLIB
-if !HAVE_MINIZIP
-SUBDIRS += libs/unzip
-endif
 endif
 if BUILD_VLC
 SUBDIRS += bin
