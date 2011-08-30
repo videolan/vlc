@@ -82,6 +82,9 @@ static char *config_GetHomeDir (void)
     }
 #endif
 
+    if (!home)
+        return NULL
+
     return FromLocaleDup (home);
 }
 
@@ -204,7 +207,7 @@ static char *config_GetTypeDir (const char *xdg_name)
         if (strcmp (xdg_name, "DESKTOP") == 0)
         {
             if (asprintf (&path, "%s/Desktop", home) == -1)
-                path = NULL;
+                return NULL;
         }
         else
             path = strdup (home);
