@@ -33,7 +33,7 @@ vlc_wrapper_SOURCES = rootwrap.c
 vlc_wrapper_LDADD = $(SOCKET_LIBS)
 
 vlc_LDFLAGS = $(LDFLAGS_vlc)
-vlc_LDADD = ../src/libvlc.la ../src/libvlccore.la $(LIBS_vlc)
+vlc_LDADD = ../lib/libvlc.la ../src/libvlccore.la $(LIBS_vlc)
 
 vlc_static_SOURCES = $(vlc_SOURCES)
 vlc_static_CFLAGS = $(AM_CFLAGS) \
@@ -63,7 +63,7 @@ vlc_cache_gen_SOURCES = cachegen.c
 vlc_cache_gen_LDADD = \
 	$(GNUGETOPT_LIBS) \
 	../compat/libcompat.la \
-	../src/libvlc.la ../src/libvlccore.la
+	../lib/libvlc.la ../src/libvlccore.la
 if HAVE_WIN32
 vlc_cache_gen_LDADD += vlc_win32_rc.$(OBJEXT)
 vlc_cache_gen_DEPENDENCIES = vlc_win32_rc.$(OBJEXT)

@@ -51,48 +51,27 @@ samples/meta.sample:
 	mkdir -p `dirname $@`
 	curl $(SAMPLES_SERVER)/metadata/id3tag/Wesh-Bonneville.mp3 > $@
 
-CFLAGS_tests = $(LIBS_libvlc) -DSRCDIR=\"$(srcdir)\"
-LDFLAGS_tests = -no-install -static
+AM_CFLAGS = -DSRCDIR=\"$(srcdir)\"
+AM_LDFLAGS = -no-install -static
+LIBVLCCORE = ../src/libvlccore.la
+LIBVLC = ../lib/libvlc.la
 
 test_libvlc_core_SOURCES = libvlc/core.c
-test_libvlc_core_LDADD = $(top_builddir)/src/libvlc.la
-test_libvlc_core_CFLAGS = $(CFLAGS_tests)
-test_libvlc_core_LDFLAGS = $(LDFLAGS_tests)
-
+test_libvlc_core_LDADD = $(LIBVLC)
 test_libvlc_media_SOURCES = libvlc/media.c
-test_libvlc_media_LDADD = $(top_builddir)/src/libvlc.la
-test_libvlc_media_CFLAGS = $(CFLAGS_tests)
-test_libvlc_media_LDFLAGS = $(LDFLAGS_tests)
-
+test_libvlc_media_LDADD = $(LIBVLC)
 test_libvlc_media_list_player_SOURCES = libvlc/media_list_player.c
-test_libvlc_media_list_player_LDADD = $(top_builddir)/src/libvlc.la
-test_libvlc_media_list_player_CFLAGS = $(CFLAGS_tests)
-test_libvlc_media_list_player_LDFLAGS = $(LDFLAGS_tests)
-
+test_libvlc_media_list_player_LDADD = $(LIBVLC)
 test_libvlc_media_list_SOURCES = libvlc/media_list.c
-test_libvlc_media_list_LDADD = $(top_builddir)/src/libvlc.la
-test_libvlc_media_list_CFLAGS = $(CFLAGS_tests)
-test_libvlc_media_list_LDFLAGS = $(LDFLAGS_tests)
-
+test_libvlc_media_list_LDADD = $(LIBVLC)
 test_libvlc_media_player_SOURCES = libvlc/media_player.c
-test_libvlc_media_player_LDADD = $(top_builddir)/src/libvlc.la
-test_libvlc_media_player_CFLAGS = $(CFLAGS_tests)
-test_libvlc_media_player_LDFLAGS = $(LDFLAGS_tests)
-
+test_libvlc_media_player_LDADD = $(LIBVLC)
 test_libvlc_meta_SOURCES = libvlc/meta.c
-test_libvlc_meta_LDADD = $(top_builddir)/src/libvlc.la
-test_libvlc_meta_CFLAGS = $(CFLAGS_tests)
-test_libvlc_meta_LDFLAGS = $(LDFLAGS_tests)
-
+test_libvlc_meta_LDADD = $(LIBVLC)
 test_src_misc_variables_SOURCES = src/misc/variables.c
-test_src_misc_variables_LDADD = $(top_builddir)/src/libvlc.la
-test_src_misc_variables_CFLAGS = $(CFLAGS_tests)
-test_src_misc_variables_LDFLAGS = $(LDFLAGS_tests)
-
+test_src_misc_variables_LDADD = $(LIBVLCCORE) $(LIBVLC)
 test_src_config_chain_SOURCES = src/config/chain.c
-test_src_config_chain_LDADD = $(top_builddir)/src/libvlc.la
-test_src_config_chain_CFLAGS = $(CFLAGS_tests)
-test_src_config_chain_LDFLAGS = $(LDFLAGS_tests)
+test_src_config_chain_LDADD = $(LIBVLCCORE)
 
 checkall:
 	$(MAKE) check_PROGRAMS="$(check_PROGRAMS) $(EXTRA_PROGRAMS)" check
