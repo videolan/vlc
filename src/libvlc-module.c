@@ -1919,14 +1919,21 @@ vlc_module_begin ()
                  CAPTURE_CACHING_TEXT, CAPTURE_CACHING_LONGTEXT, true )
         change_integer_range( 0, 60000 )
         change_safe()
+#if defined (__linux__)
+        add_deprecated_alias( "v4l2-caching" ) /* 1.2.0 */
+#elif defined (WIN32)
+        add_deprecated_alias( "dshow-caching" ) /* 1.2.0 */
+#endif
     add_integer( "disc-caching", DEFAULT_PTS_DELAY / 1000,
                  DISC_CACHING_TEXT, DISC_CACHING_LONGTEXT, true )
         change_integer_range( 0, 60000 )
         change_safe()
+        add_deprecated_alias( "dvdnav-caching" ) /* 1.2.0 */
     add_integer( "network-caching", CLOCK_FREQ / 1000,
                  NETWORK_CACHING_TEXT, NETWORK_CACHING_LONGTEXT, true )
         change_integer_range( 0, 60000 )
         change_safe()
+        add_deprecated_alias( "http-caching" ) /* 1.2.0 */
 
     add_integer( "cr-average", 40, CR_AVERAGE_TEXT,
                  CR_AVERAGE_LONGTEXT, true )
