@@ -11,10 +11,40 @@ librtp_plugin_la_CFLAGS = $(AM_CFLAGS)
 librtp_plugin_la_LIBADD = $(AM_LIBADD) $(SOCKET_LIBS)
 librtp_plugin_la_DEPENDENCIES =
 
+# Secure RTP library
+libvlc_srtp_la_SOURCES = srtp.c
+libvlc_srtp_la_CPPFLAGS =
+libvlc_srtp_la_CFLAGS = $(GCRYPT_CFLAGS)
+libvlc_srtp_la_LDFLAGS =
+libvlc_srtp_la_LIBADD = $(GCRYPT_LIBS)
+srtp_test_recv_CPPFLAGS =
+srtp_test_recv_LDADD = libvlc_srtp.la
+srtp_test_aes_CPPFLAGS =
+srtp_test_aes_LDADD = $(GCRYPT_LIBS)
+
 if HAVE_GCRYPT
-librtp_plugin_la_CFLAGS += -DHAVE_SRTP -I$(top_srcdir)/libs/srtp \
-	$(GCRYPT_CFLAGS)
-librtp_plugin_la_LIBADD += $(top_builddir)/libs/srtp/libvlc_srtp.la \
-	$(GCRYPT_LIBS)
-librtp_plugin_la_DEPENDENCIES += $(top_builddir)/libs/srtp/libvlc_srtp.la
+noinst_HEADERS = srtp.h
+noinst_LTLIBRARIES = libvlc_srtp.la
+
+check_PROGRAMS = srtp-test-aes srtp-test-recv
+TESTS = $(check_PROGRAMS)
+
+librtp_plugin_la_CFLAGS += -DHAVE_SRTP $(GCRYPT_CFLAGS)
+librtp_plugin_la_LIBADD += libvlc_srtp.la $(GCRYPT_LIBS)
+librtp_plugin_la_DEPENDENCIES += libvlc_srtp.la
 endif
+
+lcov-run:
+	rm -Rf *.gcda lcov
+	$(MAKE) $(AM_MAKEFLAGS) check
+
+lcov-pre.out:
+	lcov -c -d . -o lcov.tmp
+
+lcov.out: lcov-pre.out
+	lcov -r lcov.tmp '*test*' > lcov.out
+
+lcov: lcov.out
+	genhtml lcov.out -o lcov
+
+.PHONY: lcov-run

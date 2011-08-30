@@ -13,9 +13,6 @@ EXTRA_SUBDIRS = m4 \
 DIST_SUBDIRS = $(BASE_SUBDIRS) $(EXTRA_SUBDIRS)
 
 SUBDIRS = po compat src
-if HAVE_GCRYPT
-SUBDIRS += libs/srtp
-endif
 if BUILD_VLC
 SUBDIRS += bin
 endif

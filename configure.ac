@@ -4259,7 +4259,6 @@ AC_SUBST(FILE_LIBVLC_DLL)
 AC_CONFIG_FILES([
   Makefile
   doc/Makefile
-  libs/srtp/Makefile
   modules/Makefile
   m4/Makefile
   po/Makefile.in
