@@ -491,43 +491,16 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 #define TestCaC( name ) \
     b_cache_equal =  b_cache_equal && \
      ( i_cache == config_GetInt( p_intf, name ) )
-
-#define TestCaCi( name, int ) \
-    b_cache_equal = b_cache_equal &&  \
-    ( ( i_cache * int ) == config_GetInt( p_intf, name ) )
             /* Select the accurate value of the ComboBox */
             bool b_cache_equal = true;
             int i_cache = config_GetInt( p_intf, "file-caching");
 
-            TestCaC( "udp-caching" );
-            if (module_exists ("dvdread"))
-                TestCaC( "dvdread-caching" );
-            if (module_exists ("dvdnav"))
-                TestCaC( "dvdnav-caching" );
-            TestCaC( "tcp-caching" );
-            TestCaC( "cdda-caching" );
-            TestCaC( "screen-caching" ); TestCaC( "vcd-caching" );
-            #ifdef WIN32
-            TestCaC( "dshow-caching" );
-            #else
-            if (module_exists ("access_jack"))
-                TestCaC( "jack-input-caching" );
-            if (module_exists ("v4l2"))
-                TestCaC( "v4l2-caching" );
-            if (module_exists ("pvr"))
-                TestCaC( "pvr-caching" );
-            #endif
-            if (module_exists ("livedotcom"))
-                TestCaCi( "rtsp-caching", 4 );
-            TestCaCi( "ftp-caching", 2 );
-            TestCaCi( "http-caching", 2 );
-            if (module_exists ("access_realrtsp"))
-                TestCaCi( "realrtsp-caching", 10 );
-            TestCaCi( "mms-caching", 10 );
+            TestCaC( "network-caching" );
+            TestCaC( "disc-caching" );
+            TestCaC( "live-caching" );
             if( b_cache_equal == 1 )
                 ui.cachingCombo->setCurrentIndex(
                 ui.cachingCombo->findData( QVariant( i_cache ) ) );
-#undef TestCaCi
 #undef TestCaC
 
         END_SPREFS_CAT;
@@ -792,41 +765,18 @@ void SPrefsPanel::apply()
             config_PutPsz( p_intf, "cd-audio", devicepath );
         }
 
-#define CaCi( name, int ) config_PutInt( p_intf, name, int * i_comboValue )
-#define CaC( name ) CaCi( name, 1 )
+#define CaC( name ) config_PutInt( p_intf, name, i_comboValue )
         /* Caching */
         QComboBox *cachingCombo = qobject_cast<QComboBox *>(optionWidgets[cachingCoB]);
         int i_comboValue = cachingCombo->itemData( cachingCombo->currentIndex() ).toInt();
         if( i_comboValue )
         {
-            CaC( "udp-caching" );
-            if (module_exists ("dvdread" ))
-                CaC( "dvdread-caching" );
-            if (module_exists ("dvdnav" ))
-                CaC( "dvdnav-caching" );
-            CaC( "tcp-caching" ); CaC( "vcd-caching" );
-            CaC( "cdda-caching" ); CaC( "file-caching" );
-            CaC( "screen-caching" ); CaC( "bd-caching" );
-            CaCi( "rtsp-caching", 2 ); CaCi( "ftp-caching", 2 );
-            CaCi( "http-caching", 2 );
-            if (module_exists ("access_realrtsp" ))
-                CaCi( "realrtsp-caching", 10 );
-            CaCi( "mms-caching", 10 );
-            #ifdef WIN32
-            CaC( "dshow-caching" );
-            #else
-            if (module_exists ( "access_jack" ))
-            CaC( "jack-input-caching" );
-            if (module_exists ( "v4l2" ))
-                CaC( "v4l2-caching" );
-            if (module_exists ( "pvr" ))
-                CaC( "pvr-caching" );
-            #endif
-            //CaCi( "dv-caching" ) too short...
+            CaC( "network-caching" );
+            CaC( "disc-caching" );
+            CaC( "live-caching" );
         }
         break;
 #undef CaC
-#undef CaCi
     }
 
     /* Interfaces */

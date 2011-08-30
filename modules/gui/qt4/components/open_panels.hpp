@@ -207,7 +207,7 @@ private:
     QComboBox *v4l2VideoDevice, *v4l2AudioDevice;
     QLineEdit *pvrDevice, *pvrRadioDevice;
     QComboBox *v4l2StdBox, *pvrNormBox;
-    QSpinBox *jackChannels, *jackCaching;
+    QSpinBox *jackChannels;
     QCheckBox *jackPace, *jackConnect;
     QLineEdit *jackPortsSelected;
 #endif

@@ -289,8 +289,8 @@ void FileOpenPanel::updateMRL()
         mrl.append( " :sub-file=" + colon_escape( ui.subInput->text() ) );
     }
 
-    emit mrlUpdated( fileList, mrl );
     emit methodChanged( "file-caching" );
+    emit mrlUpdated( fileList, mrl );
 }
 
 /* Function called by Open Dialog when clicke on Play/Enqueue */
@@ -494,11 +494,6 @@ void DiscOpenPanel::updateMRL()
         else
             mrl = "dvdsimple://" LOCALHOST + discPath;
 
-        if( !ui.dvdsimple->isChecked() )
-            emit methodChanged( "dvdnav-caching" );
-        else
-            emit methodChanged( "dvdread-caching" );
-
         if ( ui.titleSpin->value() > 0 ) {
             mrl += QString("@%1").arg( ui.titleSpin->value() );
             if ( ui.chapterSpin->value() > 0 ) {
@@ -509,7 +504,6 @@ void DiscOpenPanel::updateMRL()
     /* VCD */
     } else if ( ui.vcdRadioButton->isChecked() ) {
         mrl = "vcd://" LOCALHOST + discPath;
-        emit methodChanged( "vcd-caching" );
 
         if( ui.titleSpin->value() > 0 ) {
             mrl += QString("@E%1").arg( ui.titleSpin->value() );
@@ -518,8 +512,8 @@ void DiscOpenPanel::updateMRL()
     /* CDDA */
     } else {
         mrl = "cdda://" LOCALHOST + discPath;
-        emit methodChanged( "cdda-caching" );
     }
+    emit methodChanged( "disc-caching" );
 
     fileList << mrl; mrl = "";
 
@@ -612,47 +606,11 @@ void NetOpenPanel::onFocus()
     ui.urlComboBox->lineEdit()->selectAll();
 }
 
-static int strcmp_void( const void *k, const void *e )
-{
-    return strcmp( (const char *)k, (const char *)e );
-}
-
 void NetOpenPanel::updateMRL()
 {
-    static const struct caching_map
-    {
-        char proto[6];
-        char caching[6];
-    } schemes[] =
-    {   /* KEEP alphabetical order on first column!! */
-        { "dccp",  "rtp"   },
-        { "ftp",   "ftp"   },
-        { "ftps",  "ftp"   },
-        { "http",  "http"  },
-        { "https", "http"  },
-        { "mms",   "mms"   },
-        { "mmsh",  "mms"   },
-        { "mmst",  "mms"   },
-        { "mmsu",  "mms"   },
-        { "sftp",  "sftp"  },
-        { "smb",   "smb"   },
-        { "rtmp",  "rtmp"  },
-        { "rtp",   "rtp"   },
-        { "rtsp",  "rtsp"  },
-        { "udp",   "udp"   },
-    };
-
     QString url = ui.urlComboBox->lineEdit()->text();
-    if( !url.contains( "://") )
-        return; /* nothing to do this far */
 
-    /* Match the correct item in the comboBox */
-    QString proto = url.section( ':', 0, 0 );
-    const struct caching_map *r = (const struct caching_map *)
-        bsearch( qtu(proto), schemes, sizeof(schemes) / sizeof(schemes[0]),
-                 sizeof(schemes[0]), strcmp_void );
-    if( r )
-        emit methodChanged( qfu( r->caching ) + qfu( "-caching" ) );
+    emit methodChanged( qfu( "network-caching" ) );
 
     QStringList qsl;
     qsl << url;
@@ -839,27 +797,16 @@ void CaptureOpenPanel::initialize()
 
     /* Jack Props panel */
 
-    /* Caching */
-    QLabel *jackCachingLabel = new QLabel( qtr( "Input caching:" ) );
-    jackPropLayout->addWidget( jackCachingLabel, 1 , 0 );
-    jackCaching = new QSpinBox;
-    setSpinBoxFreq( jackCaching );
-    jackCaching->setSuffix( " ms" );
-    jackCaching->setValue(1000);
-    jackCaching->setAlignment( Qt::AlignRight );
-    jackPropLayout->addWidget( jackCaching, 1 , 2 );
-
     /* Pace */
     jackPace = new QCheckBox(qtr( "Use VLC pace" ));
-    jackPropLayout->addWidget( jackPace, 2, 1 );
+    jackPropLayout->addWidget( jackPace, 1, 1 );
 
     /* Auto Connect */
     jackConnect = new QCheckBox( qtr( "Auto connection" ));
-    jackPropLayout->addWidget( jackConnect, 2, 2 );
+    jackPropLayout->addWidget( jackConnect, 1, 2 );
 
     /* Jack CONNECTs */
     CuMRL( jackChannels, valueChanged( int ) );
-    CuMRL( jackCaching, valueChanged( int ) );
     CuMRL( jackPace, stateChanged( int ) );
     CuMRL( jackConnect, stateChanged( int ) );
     CuMRL( jackPortsSelected, textChanged( const QString& ) );
@@ -1101,7 +1048,6 @@ void CaptureOpenPanel::updateMRL()
             colon_escape( QString("%1").arg( adevDshowW->getValue() ) )+" ";
         if( dshowVSizeLine->isModified() )
             mrl += ":dshow-size=" + dshowVSizeLine->text();
-        emit methodChanged( "dshow-caching" );
         break;
 #else
     case V4L2_DEVICE:
@@ -1115,7 +1061,6 @@ void CaptureOpenPanel::updateMRL()
         mrl += ":ports=" + jackPortsSelected->text();
         fileList << mrl; mrl = "";
 
-        mrl += " :jack-input-caching=" + QString::number( jackCaching->value() );
         if ( jackPace->isChecked() )
         {
                 mrl += " :jack-input-use-vlc-pace";
@@ -1172,10 +1117,10 @@ void CaptureOpenPanel::updateMRL()
     case SCREEN_DEVICE:
         fileList << "screen://";
         mrl = " :screen-fps=" + QString::number( screenFPS->value(), 'f' );
-        emit methodChanged( "screen-caching" );
         updateButtons();
         break;
     }
+    emit methodChanged( "live-caching" );
 
     if( !advMRL.isEmpty() ) mrl += advMRL;
 

@@ -566,21 +566,9 @@ static inline char * __config_GetLabel( vlc_object_t *p_this, const char *psz_na
     bool b_cache_equal = true;
     int i_cache = config_GetInt( p_intf, "file-caching");
 
-    TestCaC( "udp-caching" );
-    if( module_exists ("dvdread") )
-        TestCaC( "dvdread-caching" );
-    if( module_exists ("dvdnav") )
-        TestCaC( "dvdnav-caching" );
-    TestCaC( "tcp-caching" );
-    TestCaC( "cdda-caching" );
-    TestCaC( "screen-caching" );
-    TestCaC( "vcd-caching" );
-    TestCaCi( "rtsp-caching", 4 );
-    TestCaCi( "ftp-caching", 2 );
-    TestCaCi( "http-caching", 4 );
-    if(module_exists ("access_realrtsp"))
-        TestCaCi( "realrtsp-caching", 10 );
-    TestCaCi( "mms-caching", 19 );
+    TestCaC( "network-caching" );
+    TestCaC( "disc-caching" );
+    TestCaC( "live-caching" );
     if( b_cache_equal )
     {
         [o_input_cachelevel_pop selectItemWithTag: i_cache];
@@ -886,19 +874,9 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
         #define CaCi( name, int ) config_PutInt( p_intf, name, int * [[o_input_cachelevel_pop selectedItem] tag] )
         #define CaC( name ) CaCi( name, 1 )
         msg_Dbg( p_intf, "Adjusting all cache values to: %i", (int)[[o_input_cachelevel_pop selectedItem] tag] );
-        CaC( "udp-caching" );
-        if( module_exists ( "dvdread" ) )
-            CaC( "dvdread-caching" );
-        if( module_exists ( "dvdnav" ) )
-            CaC( "dvdnav-caching" );
-        CaC( "tcp-caching" ); CaC( "vcd-caching" );
-        CaC( "cdda-caching" ); CaC( "file-caching" );
-        CaC( "screen-caching" );
-        CaCi( "rtsp-caching", 4 ); CaCi( "ftp-caching", 2 );
-        CaCi( "http-caching", 4 );
-        if( module_exists ( "access_realrtsp" ) )
-            CaCi( "realrtsp-caching", 10 );
-        CaCi( "mms-caching", 19 );
+        CaC( "network-caching" );
+        CaC( "disc-caching" );
+        CaC( "live-caching" );
         b_inputSettingChanged = NO;
     }
 
