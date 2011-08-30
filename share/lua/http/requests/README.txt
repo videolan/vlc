@@ -125,6 +125,9 @@ status.xml or status.json
  0 --  disables the equalizer
  1 --  enables the equalizer
 
+>command=setpreset&val=<presetid>
+ set the equalizer preset as per the id specified
+
 <Displays the equalizer band gains.
 Band 0: 60 Hz, 1: 170 Hz, 2: 310 Hz, 3: 600 Hz, 4: 1 kHz,
 5: 3 kHz, 6: 6 kHz, 7: 12 kHz , 8: 14 kHz , 9: 16 kHz

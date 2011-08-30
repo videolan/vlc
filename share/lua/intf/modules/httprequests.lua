@@ -172,6 +172,8 @@ processcommands = function ()
 	  vlc.equalizer.equalizerset(band,val)
 	elseif command == "enableeq" then
 	  if val == '0' then vlc.equalizer.enable(false) else vlc.equalizer.enable(true) end
+	elseif command == "setpreset" then 
+	  vlc.equalizer.setpreset(val)
 	end
 
 	local input = nil

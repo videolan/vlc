@@ -176,7 +176,7 @@ static int vlclua_equalizer_get( lua_State *L )
         free(str);
         asprintf( &str , "band_%d", i++ );
         lua_setfield( L , -2 , str );
-        free(str);
+        free( str );
     }
     free( psz_bands_origin );
     if (loc != (locale_t)0)
@@ -239,6 +239,47 @@ static int vlclua_equalizer_set( lua_State *L )
     return 1;
 }
 
+/*****************************************************************************
+* Set the preset specified by preset id
+*****************************************************************************/
+static int vlclua_equalizer_setpreset( lua_State *L )
+{
+    int presetid = luaL_checknumber( L, 1 );
+    if( presetid >= NB_PRESETS || presetid < 0 )
+        return 0;
+    input_thread_t *p_input = vlclua_get_input_internal( L );
+    if( p_input )
+    {
+        audio_output_t *p_aout = input_GetAout( p_input );
+        vlc_object_release( p_input );
+        if ( !p_aout )
+        {
+            return 0;
+        }
+        char *psz_af = var_GetNonEmptyString( p_aout, "audio-filter" );
+        if ( !psz_af || strstr ( psz_af, "equalizer" ) == NULL )
+        {
+            vlc_object_release( p_aout );
+            return 0;
+        }
+        char *newstr;
+        if( asprintf( &newstr , "%6.1f" , eqz_preset_10b[presetid].f_amp[0] ) == -1 )
+            return 0;
+        for ( int i = 1 ; i < 10 ; i++ )
+        {
+            if ( asprintf( &newstr, "%s%6.1f",newstr ,eqz_preset_10b[presetid].f_amp[i]) == -1 )
+                return 0;
+        }
+        var_SetString( p_aout, "equalizer-bands",newstr );
+        var_SetFloat( p_aout, "equalizer-preamp", eqz_preset_10b[presetid].f_preamp );
+        var_SetString( p_aout , "equalizer-preset" , preset_list[presetid] );
+        vlc_object_release( p_aout );
+        free( newstr );
+        return 1;
+    }
+    return 0;
+}
+ 
 /****************************************************************************
 * Enable/disable Equalizer
 *****************************************************************************/
@@ -271,7 +312,8 @@ static const luaL_Reg vlclua_equalizer_reg[] = {
     { "equalizerget", vlclua_equalizer_get },
     { "equalizerset", vlclua_equalizer_set },
     { "enable", vlclua_equalizer_enable },
-    {"presets",vlclua_equalizer_get_presets },
+    { "presets",vlclua_equalizer_get_presets },
+    { "setpreset", vlclua_equalizer_setpreset },
     { NULL, NULL }
 };
 
