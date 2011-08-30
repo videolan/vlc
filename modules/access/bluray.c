@@ -39,9 +39,6 @@
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define CACHING_TEXT N_("Caching value in ms")
-#define CACHING_LONGTEXT N_( "Caching value for BDs. This "\
-                             "value should be set in milliseconds." )
 
 /* Callbacks */
 static int  blurayOpen ( vlc_object_t * );
@@ -54,9 +51,6 @@ vlc_module_begin ()
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_ACCESS )
     set_capability( "access_demux", 200)
-
-    add_integer( "bluray-caching", 1000,
-        CACHING_TEXT, CACHING_LONGTEXT, true )
 
     add_shortcut( "bluray", "file" )
 
@@ -72,9 +66,6 @@ struct demux_sys_t
     unsigned int    i_title;
     unsigned int    i_longest_title;
     input_title_t **pp_title;
-
-    /* caching */
-    int             i_bd_delay;
 
     /* TS stream */
     stream_t       *p_parser;
@@ -198,7 +189,6 @@ static int blurayOpen( vlc_object_t *object )
         return VLC_EGENERIC;
     }
 
-    p_sys->i_bd_delay = var_InheritInteger(p_demux, "bluray-caching");
     p_sys->p_parser   = stream_DemuxNew(p_demux, "ts", p_demux->out);
     if (!p_sys->p_parser) {
         msg_Err(p_demux, "Failed to create TS demuxer");
@@ -323,7 +313,8 @@ static int blurayControl(demux_t *p_demux, int query, va_list args)
 
         case DEMUX_GET_PTS_DELAY:
             pi_64 = (int64_t*)va_arg( args, int64_t * );
-            *pi_64 = p_sys->i_bd_delay;
+            *pi_64 =
+                INT64_C(1000) * var_InheritInteger( p_demux, "disc-caching" );
             break;
 
         case DEMUX_SET_PAUSE_STATE:

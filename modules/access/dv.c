@@ -56,18 +56,11 @@ static void Close( vlc_object_t * );
 static block_t *Block( access_t * );
 static int Control( access_t *, int, va_list );
 
-#define CACHING_TEXT N_("Caching value in ms")
-#define CACHING_LONGTEXT N_( \
-    "Caching value for DV streams. This " \
-    "value should be set in milliseconds." )
-
 vlc_module_begin ()
     set_description( N_("Digital Video (Firewire/ieee1394)  input") )
     set_shortname( N_("DV") )
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_ACCESS )
-    add_integer( "dv-caching", 60000 / 1000, CACHING_TEXT, CACHING_LONGTEXT, true )
-        change_safe()
     set_capability( "access", 0 )
     add_shortcut( "dv", "dv1394", "raw1394" )
     set_callbacks( Open, Close )
@@ -209,9 +202,6 @@ static int Open( vlc_object_t *p_this )
     p_sys->raw1394_poll.fd = raw1394_get_fd( p_sys->p_raw1394 );
     p_sys->raw1394_poll.events = POLLIN | POLLPRI;
 
-    /* Update default_pts to a suitable value for udp access */
-    var_Create( p_access, "dv-caching", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-
     /* Now create our event thread catcher */
     p_sys->p_ev = calloc( 1, sizeof( *p_sys->p_ev ) );
     if( !p_sys->p_ev )
@@ -290,8 +280,8 @@ static int Control( access_t *p_access, int i_query, va_list args )
             break;
 
         case ACCESS_GET_PTS_DELAY:
-            *va_arg( args, int64_t * )
-                   = var_GetInteger( p_access, "dv-caching" ) * 1000;
+            *va_arg( args, int64_t * ) =
+                INT64_C(1000) * var_InheritInteger( p_access, "live-caching" );
             break;
 
         /* */

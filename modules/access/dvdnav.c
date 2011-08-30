@@ -72,10 +72,6 @@
 #define ANGLE_LONGTEXT N_( \
      "Default DVD angle." )
 
-#define CACHING_TEXT N_("Caching value in ms")
-#define CACHING_LONGTEXT N_( \
-    "Caching value for DVDs. This "\
-    "value should be set in milliseconds." )
 #define MENU_TEXT N_("Start directly in menu")
 #define MENU_LONGTEXT N_( \
     "Start the DVD directly in the main menu. This "\
@@ -93,8 +89,6 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_INPUT_ACCESS )
     add_integer( "dvdnav-angle", 1, ANGLE_TEXT,
         ANGLE_LONGTEXT, false )
-    add_integer( "dvdnav-caching", DEFAULT_PTS_DELAY / 1000,
-        CACHING_TEXT, CACHING_LONGTEXT, true )
     add_bool( "dvdnav-menu", true,
         MENU_TEXT, MENU_LONGTEXT, false )
     set_capability( "access_demux", 5 )
@@ -355,9 +349,6 @@ static int Open( vlc_object_t *p_this )
     i_angle = var_CreateGetInteger( p_demux, "dvdnav-angle" );
     if( i_angle <= 0 ) i_angle = 1;
 
-    /* Update default_pts to a suitable value for dvdnav access */
-    var_Create( p_demux, "dvdnav-caching", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
-
     /* FIXME hack hack hack hack FIXME */
     /* Get p_input and create variable */
     p_sys->p_input = demux_GetParentInput( p_demux );
@@ -563,8 +554,8 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return VLC_SUCCESS;
 
         case DEMUX_GET_PTS_DELAY:
-            *va_arg( args, int64_t * )
-                 = (int64_t)var_GetInteger( p_demux, "dvdnav-caching" ) *1000;
+            *va_arg( args, int64_t * ) =
+                INT64_C(1000) * var_InheritInteger( p_demux, "disc-caching" );
             return VLC_SUCCESS;
 
         case DEMUX_GET_META:

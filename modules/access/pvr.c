@@ -55,11 +55,6 @@
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
-#define CACHING_TEXT N_("Caching value in ms")
-#define CACHING_LONGTEXT N_( \
-    "Default caching value for PVR streams. This " \
-    "value should be set in milliseconds." )
-
 #define DEVICE_TEXT N_( "Device" )
 #define DEVICE_LONGTEXT N_( "PVR video device" )
 
@@ -130,8 +125,6 @@ vlc_module_begin ()
     set_capability( "access", 0 )
     add_shortcut( "pvr" )
 
-    add_integer( "pvr-caching", DEFAULT_PTS_DELAY / 1000, CACHING_TEXT,
-                 CACHING_LONGTEXT, true )
     add_string( "pvr-device", "/dev/video0", DEVICE_TEXT,
                  DEVICE_LONGTEXT, false )
     add_string( "pvr-radio-device", "/dev/radio0", RADIO_DEVICE_TEXT,
@@ -552,8 +545,6 @@ static int Open( vlc_object_t * p_this )
     if( !p_sys ) return VLC_ENOMEM;
 
     /* defaults values */
-    var_Create( p_access, "pvr-caching", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-
     p_sys->psz_videodev = var_InheritString( p_access, "pvr-device" );
     p_sys->psz_radiodev = var_InheritString( p_access, "pvr-radio-device" );
     p_sys->i_standard   = var_InheritInteger( p_access, "pvr-norm" );
@@ -940,7 +931,8 @@ static int Control( access_t *p_access, int i_query, va_list args )
         /* */
         case ACCESS_GET_PTS_DELAY:
             pi_64 = (int64_t*)va_arg( args, int64_t * );
-            *pi_64 = var_GetInteger( p_access, "pvr-caching" ) * 1000;
+            *pi_64 = INT64_C(1000)
+                   * var_InheritInteger( p_access, "live-caching" );
             break;
 
         /* */

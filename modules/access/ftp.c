@@ -55,10 +55,6 @@ static void  InClose( vlc_object_t * );
 static int  OutOpen ( vlc_object_t * );
 static void OutClose( vlc_object_t * );
 
-#define CACHING_TEXT N_("Caching value in ms")
-#define CACHING_LONGTEXT N_( \
-    "Caching value for FTP streams. This " \
-    "value should be set in milliseconds." )
 #define USER_TEXT N_("FTP user name")
 #define USER_LONGTEXT N_("User name that will " \
     "be used for the connection.")
@@ -75,9 +71,6 @@ vlc_module_begin ()
     set_capability( "access", 0 )
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_ACCESS )
-    add_integer( "ftp-caching", 2 * DEFAULT_PTS_DELAY / 1000,
-                 CACHING_TEXT, CACHING_LONGTEXT, true )
-        change_safe()
     add_string( "ftp-user", "anonymous", USER_TEXT, USER_LONGTEXT,
                 false )
     add_string( "ftp-pwd", "anonymous@example.com", PASS_TEXT,
@@ -382,9 +375,6 @@ static int InOpen( vlc_object_t *p_this )
         goto exit_error;
     }
 
-    /* Update default_pts to a suitable value for ftp access */
-    var_Create( p_access, "ftp-caching", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-
     return VLC_SUCCESS;
 
 error:
@@ -602,7 +592,8 @@ static int Control( access_t *p_access, int i_query, va_list args )
         /* */
         case ACCESS_GET_PTS_DELAY:
             pi_64 = (int64_t*)va_arg( args, int64_t * );
-            *pi_64 = var_GetInteger( p_access, "ftp-caching" ) * INT64_C(1000);
+            *pi_64 = INT64_C(1000)
+                   * var_InheritInteger( p_access, "network-caching" );
             break;
 
         /* */

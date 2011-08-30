@@ -70,7 +70,6 @@ struct demux_sys_t
     vlc_thread_t  thread;
 
     mtime_t       timeout;
-    unsigned      caching;
     uint16_t      max_dropout; /**< Max packet forward misordering */
     uint16_t      max_misorder; /**< Max packet backward misordering */
     uint8_t       max_src; /**< Max simultaneous RTP sources */

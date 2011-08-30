@@ -86,7 +86,6 @@ struct access_sys_t
     int fd;
 
     /* */
-    unsigned caching;
     bool b_pace_control;
 };
 
@@ -218,9 +217,6 @@ int Open( vlc_object_t *p_this )
     p_access->p_sys = p_sys;
     p_sys->i_nb_reads = 0;
     p_sys->fd = fd;
-    p_sys->caching = var_InheritInteger (p_access, "file-caching");
-    if (IsRemote(fd))
-        p_sys->caching += var_InheritInteger (p_access, "network-caching");
     p_sys->b_pace_control = true;
 
     if (S_ISREG (st.st_mode))
@@ -380,7 +376,11 @@ int FileControl( access_t *p_access, int i_query, va_list args )
         /* */
         case ACCESS_GET_PTS_DELAY:
             pi_64 = (int64_t*)va_arg( args, int64_t * );
-            *pi_64 = p_sys->caching * INT64_C(1000);
+            if (IsRemote (p_sys->fd))
+                *pi_64 = var_InheritInteger (p_access, "network-caching");
+            else
+                *pi_64 = var_InheritInteger (p_access, "file-caching");
+            *pi_64 *= 1000;
             break;
 
         /* */

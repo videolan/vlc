@@ -58,11 +58,6 @@
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
-#define CACHING_TEXT N_("Caching value in ms")
-#define CACHING_LONGTEXT N_( \
-    "Default caching value for Audio CDs. This " \
-    "value should be set in milliseconds." )
-
 vlc_module_begin ()
     set_shortname( N_("Audio CD") )
     set_description( N_("Audio CD input") )
@@ -72,10 +67,6 @@ vlc_module_begin ()
     set_callbacks( Open, Close )
 
     add_usage_hint( N_("[cdda:][device][@[track]]") )
-    add_integer( "cdda-caching", DEFAULT_PTS_DELAY / 1000, CACHING_TEXT,
-                 CACHING_LONGTEXT, true )
-        change_safe()
-
     add_integer( "cdda-track", 0 , NULL, NULL, true )
         change_volatile ()
     add_integer( "cdda-first-sector", -1, NULL, NULL, true )
@@ -231,9 +222,6 @@ static int Open( vlc_object_t *p_this )
                                      * (int64_t)CDDA_DATA_SIZE;
     }
 
-    /* PTS delay */
-    var_Create( p_access, "cdda-caching", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
-
     return VLC_SUCCESS;
 
 error:
@@ -347,7 +335,7 @@ static int Control( access_t *p_access, int i_query, va_list args )
 
         case ACCESS_GET_PTS_DELAY:
             *va_arg( args, int64_t * ) =
-                   var_GetInteger( p_access, "cdda-caching" ) * INT64_C(1000);
+                INT64_C(1000) * var_InheritInteger( p_access, "disc-caching" );
             break;
 
         case ACCESS_SET_PAUSE_STATE:

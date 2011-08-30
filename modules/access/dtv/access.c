@@ -32,10 +32,6 @@
 
 #include "dtv/dtv.h"
 
-#define CACHING_TEXT N_("Caching value (ms)")
-#define CACHING_LONGTEXT N_( \
-    "The cache size (delay) for digital broadcasts (in milliseconds).")
-
 #define ADAPTER_TEXT N_("DVB adapter")
 #define ADAPTER_LONGTEXT N_( \
     "If there is more than one digital broadcasting adapter, " \
@@ -242,10 +238,6 @@ vlc_module_begin ()
      * really specific to the local system (e.g. device ID...).
      * It wouldn't make sense to deliver those through a playlist. */
 
-    add_integer ("dvb-caching", DEFAULT_PTS_DELAY / 1000,
-                 CACHING_TEXT, CACHING_LONGTEXT, true)
-        change_integer_range (0, 60000)
-        change_safe ()
 #ifdef __linux__
     add_integer ("dvb-adapter", 0, ADAPTER_TEXT, ADAPTER_LONGTEXT, false)
         change_integer_range (0, 255)
@@ -524,7 +516,7 @@ static int Control (access_t *access, int query, va_list args)
         case ACCESS_GET_PTS_DELAY:
         {
             int64_t *v = va_arg (args, int64_t *);
-            *v = var_InheritInteger (access, "dvb-caching") * INT64_C(1000);
+            *v = var_InheritInteger (access, "live-caching") * INT64_C(1000);
             return VLC_SUCCESS;
         }
 

@@ -49,11 +49,6 @@
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define CACHING_TEXT N_("Caching value in ms")
-#define CACHING_LONGTEXT N_( \
-    "Caching value for BDs. This "\
-    "value should be set in milliseconds." )
-
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
@@ -62,8 +57,6 @@ vlc_module_begin ()
     set_description( N_("Blu-Ray Disc Input") )
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_ACCESS )
-    add_integer( "bd-caching", DEFAULT_PTS_DELAY / 1000,
-        CACHING_TEXT, CACHING_LONGTEXT, true )
     set_capability( "access_demux", 60 )
     add_shortcut( "bd", "file" )
     set_callbacks( Open, Close )
@@ -354,7 +347,9 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     case DEMUX_GET_PTS_DELAY:
     {
         int64_t *pi_delay = (int64_t*)va_arg( args, int64_t * );
-        *pi_delay = var_GetInteger( p_demux, "bd-caching" ) * INT64_C(1000);
+
+        *pi_delay =
+            INT64_C(1000) * var_InheritInteger( p_demux, "disc-caching" );
         return VLC_SUCCESS;
     }
 

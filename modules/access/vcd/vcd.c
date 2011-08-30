@@ -43,11 +43,6 @@
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
-#define CACHING_TEXT N_("Caching value in ms")
-#define CACHING_LONGTEXT N_( \
-    "Caching value for VCDs. This " \
-    "value should be set in milliseconds." )
-
 vlc_module_begin ()
     set_shortname( N_("VCD"))
     set_description( N_("VCD input") )
@@ -57,8 +52,6 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_INPUT_ACCESS )
 
     add_usage_hint( N_("[vcd:][device][@[title][,[chapter]]]") )
-    add_integer( "vcd-caching", DEFAULT_PTS_DELAY / 1000, CACHING_TEXT,
-                 CACHING_LONGTEXT, true )
     add_shortcut( "vcd", "svcd" )
 vlc_module_end ()
 
@@ -256,8 +249,8 @@ static int Control( access_t *p_access, int i_query, va_list args )
 
         /* */
         case ACCESS_GET_PTS_DELAY:
-            *va_arg( args, int64_t * )
-                     = var_GetInteger(p_access,"vcd-caching") * 1000;
+            *va_arg( args, int64_t * ) = INT64_C(1000)
+                * var_InheritInteger(p_access, "disc-caching");
             break;
 
         /* */

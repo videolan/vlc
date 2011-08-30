@@ -60,11 +60,6 @@
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
-#define CACHING_TEXT N_("Caching value in ms")
-#define CACHING_LONGTEXT N_( \
-    "Caching value for files. This " \
-    "value should be set in milliseconds." )
-
 vlc_module_begin()
     set_description( N_("MTP input") )
     set_shortname( N_("MTP") )
@@ -106,9 +101,6 @@ static int Open( vlc_object_t *p_this )
     LIBMTP_mtpdevice_t *p_device;
     int i_numrawdevices;
     int i_ret;
-
-    /* Update default_pts to a suitable value for file access */
-    var_Create( p_access, "file-caching", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
 
     if( sscanf( p_access->psz_location, "%"SCNu32":%"SCNu8":%"SCNu16":%d",
                 &i_bus, &i_dev, &i_product_id, &i_track_id ) != 4 )
@@ -272,7 +264,8 @@ static int Control( access_t *p_access, int i_query, va_list args )
 
         case ACCESS_GET_PTS_DELAY:
             pi_64 = ( int64_t* )va_arg( args, int64_t * );
-            *pi_64 = var_GetInteger( p_access, "file-caching" ) * INT64_C( 1000 );
+            *pi_64 = INT64_C(1000)
+                   * var_InheritInteger( p_access, "file-caching" );
             break;
 
         /* */

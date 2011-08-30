@@ -46,11 +46,6 @@
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define CACHING_TEXT N_("Caching value in ms")
-#define CACHING_LONGTEXT N_( \
-    "Caching value for UDP streams. This " \
-    "value should be set in milliseconds." )
-
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
@@ -60,9 +55,6 @@ vlc_module_begin ()
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_ACCESS )
 
-    add_integer( "udp-caching", DEFAULT_PTS_DELAY / 1000, CACHING_TEXT,
-                 CACHING_LONGTEXT, true )
-        change_safe()
     add_obsolete_integer( "server-port" ) /* since 1.2.0 */
 
     set_capability( "access", 0 )
@@ -146,8 +138,6 @@ static int Open( vlc_object_t *p_this )
     }
     p_access->p_sys = (void *)(intptr_t)fd;
 
-    /* Update default_pts to a suitable value for udp access */
-    var_Create( p_access, "udp-caching", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     return VLC_SUCCESS;
 }
 
@@ -182,7 +172,8 @@ static int Control( access_t *p_access, int i_query, va_list args )
         /* */
         case ACCESS_GET_PTS_DELAY:
             pi_64 = (int64_t*)va_arg( args, int64_t * );
-            *pi_64 = var_GetInteger(p_access,"udp-caching") * 1000;
+            *pi_64 = INT64_C(1000)
+                   * var_InheritInteger(p_access, "network-caching");
             break;
 
         /* */

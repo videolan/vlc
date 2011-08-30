@@ -188,10 +188,6 @@ static void AccessClose( vlc_object_t * );
 #define AUDIO_LOUDNESS_LONGTEXT N_( \
     "Loudness of the audio input (if supported by the v4l2 driver)." )
 
-#define CACHING_TEXT N_("Caching value in ms")
-#define CACHING_LONGTEXT N_( \
-    "Caching value for V4L2 captures. This " \
-    "value should be set in milliseconds." )
 #define S_CTRLS_TEXT N_("v4l2 driver controls")
 #define S_CTRLS_LONGTEXT N_( \
     "Set the v4l2 driver controls to the values specified using a comma " \
@@ -306,8 +302,6 @@ vlc_module_begin ()
     add_string( CFG_PREFIX "aspect-ratio", "4:3", ASPECT_TEXT,
               ASPECT_LONGTEXT, true )
     add_float( CFG_PREFIX "fps", 0, FPS_TEXT, FPS_LONGTEXT, true )
-    add_integer( CFG_PREFIX "caching", DEFAULT_PTS_DELAY / 1000,
-                CACHING_TEXT, CACHING_LONGTEXT, true )
 #ifdef HAVE_LIBV4L2
     add_bool( CFG_PREFIX "use-libv4l2", false, LIBV4L2_TEXT, LIBV4L2_LONGTEXT, true );
 #endif
@@ -541,8 +535,6 @@ struct demux_sys_t
     /* Video */
     io_method io;
 
-    int i_cache;
-
     struct v4l2_capability dev_cap;
 
     unsigned i_input;
@@ -726,8 +718,6 @@ static void GetV4L2Params( demux_sys_t *p_sys, vlc_object_t *p_obj )
 
     p_sys->f_fps = var_CreateGetFloat( p_obj, "v4l2-fps" );
     p_sys->psz_requested_chroma = var_CreateGetString( p_obj, "v4l2-chroma" );
-
-    p_sys->i_cache = var_CreateGetInteger( p_obj, "v4l2-caching" );
 
     p_sys->i_cur_tuner = var_CreateGetInteger( p_obj, "v4l2-tuner" );
     p_sys->i_frequency = var_CreateGetInteger( p_obj, "v4l2-tuner-frequency" );
@@ -923,11 +913,6 @@ static void ParseMRL( demux_sys_t *p_sys, char *psz_path, vlc_object_t *p_obj )
                             &psz_parser, 0 ) );
             }
 #endif
-            else if( !strncmp( psz_parser, "caching=", strlen( "caching=" ) ) )
-            {
-                p_sys->i_cache = strtol( psz_parser + strlen( "caching=" ),
-                                         &psz_parser, 0 );
-            }
             else if( !strncmp( psz_parser, "tuner=", strlen( "tuner=" ) ) )
             {
                 p_sys->i_cur_tuner = strtol( psz_parser + strlen( "tuner=" ),
@@ -1195,7 +1180,8 @@ static int DemuxControl( demux_t *p_demux, int i_query, va_list args )
             return VLC_SUCCESS;
 
         case DEMUX_GET_PTS_DELAY:
-            *va_arg(args,int64_t *) = (int64_t)p_demux->p_sys->i_cache*1000;
+            *va_arg(args,int64_t *) = INT64_C(1000)
+                * var_InheritInteger( p_demux, "live-caching" );
             return VLC_SUCCESS;
 
         case DEMUX_GET_TIME:
@@ -1215,8 +1201,6 @@ static int DemuxControl( demux_t *p_demux, int i_query, va_list args )
  *****************************************************************************/
 static int AccessControl( access_t *p_access, int i_query, va_list args )
 {
-    demux_sys_t  *p_sys = (demux_sys_t *) p_access->p_sys;
-
     switch( i_query )
     {
         /* */
@@ -1229,7 +1213,8 @@ static int AccessControl( access_t *p_access, int i_query, va_list args )
 
         /* */
         case ACCESS_GET_PTS_DELAY:
-            *va_arg(args,int64_t *) = (int64_t)p_sys->i_cache*1000;
+            *va_arg(args,int64_t *) = INT64_C(1000)
+                * var_InheritInteger( p_access, "live-caching" );
             break;
 
         /* */

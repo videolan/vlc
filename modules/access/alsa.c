@@ -72,11 +72,6 @@ static void DemuxClose( vlc_object_t * );
 #define SAMPLERATE_LONGTEXT N_( \
     "Samplerate of the captured audio stream, in Hz (eg: 11025, 22050, 44100, 48000)" )
 
-#define CACHING_TEXT N_("Caching value in ms")
-#define CACHING_LONGTEXT N_( \
-    "Caching value for Alsa captures. This " \
-    "value should be set in milliseconds." )
-
 #define HELP_TEXT N_( \
     "Use alsa:// to open the default audio input. If multiple audio " \
     "inputs are available, they will be listed in the vlc debug output. " \
@@ -100,8 +95,6 @@ vlc_module_begin()
                 true )
     add_integer( CFG_PREFIX "samplerate", 48000, SAMPLERATE_TEXT,
                 SAMPLERATE_LONGTEXT, true )
-    add_integer( CFG_PREFIX "caching", DEFAULT_PTS_DELAY / 1000,
-                CACHING_TEXT, CACHING_LONGTEXT, true )
 vlc_module_end()
 
 /*****************************************************************************
@@ -121,7 +114,6 @@ static char *ListAvailableDevices( demux_t *, bool b_probe );
 struct demux_sys_t
 {
     /* Audio */
-    int i_cache;
     unsigned int i_sample_rate;
     bool b_stereo;
     size_t i_max_frame_size;
@@ -249,7 +241,6 @@ static int DemuxOpen( vlc_object_t *p_this )
 
     p_sys->i_sample_rate = var_InheritInteger( p_demux, CFG_PREFIX "samplerate" );
     p_sys->b_stereo = var_InheritBool( p_demux, CFG_PREFIX "stereo" );
-    p_sys->i_cache = var_InheritInteger( p_demux, CFG_PREFIX "caching" );
     p_sys->p_es = NULL;
     p_sys->p_block = NULL;
     p_sys->i_next_demux_date = -1;
@@ -307,7 +298,8 @@ static int DemuxControl( demux_t *p_demux, int i_query, va_list args )
             return VLC_SUCCESS;
 
         case DEMUX_GET_PTS_DELAY:
-            *va_arg( args, int64_t * ) = (int64_t)p_sys->i_cache * 1000;
+            *va_arg( args, int64_t * ) =
+                INT64_C(1000) * var_InheritInteger( p_demux, "live-caching" );
             return VLC_SUCCESS;
 
         case DEMUX_GET_TIME:

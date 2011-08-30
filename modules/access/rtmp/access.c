@@ -40,11 +40,6 @@
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define CACHING_TEXT N_("Caching value in ms")
-#define CACHING_LONGTEXT N_( \
-    "Caching value for RTMP streams. This " \
-    "value should be set in milliseconds." )
-
 #define SWFURL_TEXT N_("Default SWF Referrer URL")
 #define SWFURL_LONGTEXT N_("The SFW URL to use as referrer when connecting to "\
                            "the server. This is the SWF file that contained "  \
@@ -64,8 +59,6 @@ vlc_module_begin ()
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_ACCESS )
 
-    add_integer( "rtmp-caching", DEFAULT_PTS_DELAY / 1000, CACHING_TEXT,
-                 CACHING_LONGTEXT, true )
     add_string( "rtmp-swfurl", "file:///player.swf", SWFURL_TEXT,
                 SWFURL_LONGTEXT, true )
     add_string( "rtmp-pageurl", "file:///player.htm", PAGEURL_TEXT,
@@ -248,9 +241,6 @@ static int Open( vlc_object_t *p_this )
     p_access->p_sys->flv_packet = NULL;
     p_access->p_sys->read_packet = 1;
 
-    /* Update default_pts to a suitable value for rtmp access */
-    var_Create( p_access, "rtmp-caching", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-
     return VLC_SUCCESS;
 
 error2:
@@ -304,8 +294,6 @@ static void Close( vlc_object_t * p_this )
     }
 
     net_Close( p_sys->p_thread->fd );
-
-    var_Destroy( p_access, "rtmp-caching" );
 
     vlc_UrlClean( &p_sys->p_thread->url );
     free( p_sys->p_thread->psz_application );
@@ -492,7 +480,8 @@ static int Control( access_t *p_access, int i_query, va_list args )
         /* */
         case ACCESS_GET_PTS_DELAY:
             pi_64 = (int64_t*) va_arg( args, int64_t * );
-            *pi_64 = var_GetInteger( p_access, "rtmp-caching" ) * INT64_C(1000);
+            *pi_64 = INT64_C(1000)
+                   * var_InheritInteger( p_access, "network-caching" );
             break;
 
         /* */

@@ -130,10 +130,6 @@ static const char *const ppsz_standards_list_text[] =
         "PAL_N_COMBO"
     };
 
-#define CACHING_TEXT N_("Caching value in ms")
-#define CACHING_LONGTEXT N_( \
-    "Caching value for DirectShow streams. " \
-    "This value should be set in milliseconds." )
 #define VDEV_TEXT N_("Video device name")
 #define VDEV_LONGTEXT N_( \
     "Name of the video device that will be used by the " \
@@ -228,8 +224,6 @@ vlc_module_begin ()
     set_description( N_("DirectShow input") )
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_ACCESS )
-    add_integer( CFG_PREFIX "caching", (mtime_t)(0.2*CLOCK_FREQ) / 1000,
-                 CACHING_TEXT, CACHING_LONGTEXT, true )
 
     add_string( CFG_PREFIX "vdev", NULL, VDEV_TEXT, VDEV_LONGTEXT, false)
         change_string_list( ppsz_vdev, ppsz_vdev_text, FindDevicesCallback )
@@ -504,8 +498,6 @@ static int CommonOpen( vlc_object_t *p_this, access_sys_t *p_sys,
 
     var_Create( p_this, CFG_PREFIX "amtuner-mode",
                 VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-
-    var_Create( p_this, CFG_PREFIX "caching", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
 
     var_Create( p_this, CFG_PREFIX "video-input", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Create( p_this, CFG_PREFIX "audio-input", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
@@ -1953,7 +1945,8 @@ static int AccessControl( access_t *p_access, int i_query, va_list args )
     /* */
     case ACCESS_GET_PTS_DELAY:
         pi_64 = (int64_t*)va_arg( args, int64_t * );
-        *pi_64 = var_GetInteger( p_access, CFG_PREFIX "caching" ) * 1000;
+        *pi_64 =
+            INT64_C(1000) * var_InheritInteger( p_access, "live-caching" );
         break;
 
     /* */
@@ -1993,7 +1986,8 @@ static int DemuxControl( demux_t *p_demux, int i_query, va_list args )
 
     case DEMUX_GET_PTS_DELAY:
         pi64 = (int64_t*)va_arg( args, int64_t * );
-        *pi64 = var_GetInteger( p_demux, CFG_PREFIX "caching" ) * 1000;
+        *pi_64 =
+            INT64_C(1000) * var_InheritInteger( p_access, "live-caching" );
         return VLC_SUCCESS;
 
     case DEMUX_GET_TIME:

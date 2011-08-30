@@ -86,10 +86,6 @@ static void Close( vlc_object_t * );
 
 #define HELP_TEXT N_("Support for VDR recordings (http://www.tvdr.de/).")
 
-#define CACHING_TEXT N_("Caching value in ms")
-#define CACHING_LONGTEXT N_( \
-    "Caching value for files. This value should be set in milliseconds." )
-
 #define CHAPTER_OFFSET_TEXT N_("Chapter offset in ms")
 #define CHAPTER_OFFSET_LONGTEXT N_( \
     "Move all chapters. This value should be set in milliseconds." )
@@ -104,8 +100,6 @@ vlc_module_begin ()
     set_help( HELP_TEXT )
     set_subcategory( SUBCAT_INPUT_ACCESS )
     set_description( N_("VDR recordings") )
-    add_integer( "vdr-caching", 5 * DEFAULT_PTS_DELAY / 1000,
-        CACHING_TEXT, CACHING_LONGTEXT, true )
     add_integer( "vdr-chapter-offset", 0,
         CHAPTER_OFFSET_TEXT, CHAPTER_OFFSET_LONGTEXT, true )
     add_float_with_range( "vdr-fps", 25, 1, 1000,
@@ -299,7 +293,8 @@ static int Control( access_t *p_access, int i_query, va_list args )
 
         case ACCESS_GET_PTS_DELAY:
             pi64 = va_arg( args, int64_t * );
-            *pi64 = var_InheritInteger( p_access, "vdr-caching" ) * INT64_C(1000);
+            *pi64 = INT64_C(1000)
+                  * var_InheritInteger( p_access, "file-caching" );
             break;
 
         case ACCESS_SET_PAUSE_STATE:

@@ -78,11 +78,6 @@ static void Close( vlc_object_t * );
 #define PROXY_PASS_LONGTEXT N_( \
     "If your HTTP proxy requires a password, set it here." )
 
-#define CACHING_TEXT N_("Caching value in ms")
-#define CACHING_LONGTEXT N_( \
-    "Caching value for HTTP streams. This " \
-    "value should be set in milliseconds." )
-
 #define RECONNECT_TEXT N_("Auto re-connect")
 #define RECONNECT_LONGTEXT N_( \
     "Automatically try to reconnect to the stream in case of a sudden " \
@@ -114,9 +109,6 @@ vlc_module_begin ()
                 false )
     add_password( "http-proxy-pwd", NULL,
                   PROXY_PASS_TEXT, PROXY_PASS_LONGTEXT, false )
-    add_integer( "http-caching", 4 * DEFAULT_PTS_DELAY / 1000,
-                 CACHING_TEXT, CACHING_LONGTEXT, true )
-        change_safe()
     add_string( "http-referrer", NULL, REFERER_TEXT, REFERER_LONGTEXT, false )
         change_safe()
     add_string( "http-user-agent", NULL, UA_TEXT, UA_LONGTEXT, false )
@@ -660,9 +652,6 @@ connect:
 
     if( p_sys->b_reconnect ) msg_Dbg( p_access, "auto re-connect enabled" );
 
-    /* PTS delay */
-    var_Create( p_access, "http-caching", VLC_VAR_INTEGER |VLC_VAR_DOINHERIT );
-
     return VLC_SUCCESS;
 
 error:
@@ -1047,7 +1036,8 @@ static int Control( access_t *p_access, int i_query, va_list args )
         /* */
         case ACCESS_GET_PTS_DELAY:
             pi_64 = (int64_t*)va_arg( args, int64_t * );
-            *pi_64 = var_GetInteger( p_access, "http-caching" ) * 1000;
+            *pi_64 = INT64_C(1000)
+                * var_InheritInteger( p_access, "network-caching" );
             break;
 
         /* */

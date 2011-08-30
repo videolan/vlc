@@ -38,10 +38,6 @@
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define CACHING_TEXT N_("Caching value in ms")
-#define CACHING_LONGTEXT N_( \
-    "Caching value for screen capture. "\
-    "This value should be set in milliseconds." )
 #define FPS_TEXT N_("Frame rate")
 #define FPS_LONGTEXT N_( \
     "Desired frame rate for the capture." )
@@ -93,8 +89,6 @@ vlc_module_begin ()
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_ACCESS )
 
-    add_integer( "screen-caching", DEFAULT_PTS_DELAY / 1000,
-        CACHING_TEXT, CACHING_LONGTEXT, true )
     add_float( "screen-fps", SCREEN_FPS, FPS_TEXT, FPS_LONGTEXT, false )
 
 #ifdef SCREEN_SUBSCREEN
@@ -140,9 +134,6 @@ static int Open( vlc_object_t *p_this )
     p_demux->p_sys = p_sys = calloc( 1, sizeof( demux_sys_t ) );
     if( !p_sys )
         return VLC_ENOMEM;
-
-    /* Update default_pts to a suitable value for screen access */
-    var_Create( p_demux, "screen-caching", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
 
     p_sys->f_fps = var_CreateGetFloat( p_demux, "screen-fps" );
     p_sys->i_incr = 1000000 / p_sys->f_fps;;
@@ -297,7 +288,8 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_GET_PTS_DELAY:
             pi64 = (int64_t*)va_arg( args, int64_t * );
-            *pi64 = var_GetInteger( p_demux, "screen-caching" ) *1000;
+            *pi64 = INT64_C(1000)
+                  * var_InheritInteger( p_demux, "live-caching" );
             return VLC_SUCCESS;
 
         case DEMUX_GET_TIME:

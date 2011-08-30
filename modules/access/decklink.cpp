@@ -51,11 +51,6 @@ static void Close( vlc_object_t * );
     "This value should be a FOURCC code in textual " \
     "form, e.g. \"ntsc\"." )
 
-#define CACHING_TEXT N_("Caching value in ms")
-#define CACHING_LONGTEXT N_( \
-    "Caching value for DeckLink captures. This " \
-    "value should be set in milliseconds." )
-
 #define AUDIO_CONNECTION_TEXT N_("Audio connection")
 #define AUDIO_CONNECTION_LONGTEXT N_( \
     "Audio connection to use for DeckLink captures. " \
@@ -107,8 +102,6 @@ vlc_module_begin ()
                  CARD_INDEX_TEXT, CARD_INDEX_LONGTEXT, true )
     add_string( "decklink-mode", "pal ",
                  MODE_TEXT, MODE_LONGTEXT, true )
-    add_integer( "decklink-caching", DEFAULT_PTS_DELAY / 1000,
-                 CACHING_TEXT, CACHING_LONGTEXT, true )
     add_string( "decklink-audio-connection", 0,
                  AUDIO_CONNECTION_TEXT, AUDIO_CONNECTION_LONGTEXT, true )
         change_string_list( ppsz_audioconns, ppsz_audioconns_text, 0 )
@@ -648,7 +641,8 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_GET_PTS_DELAY:
             pi64 = (int64_t*)va_arg( args, int64_t * );
-            *pi64 = var_InheritInteger( p_demux, "decklink-caching" ) * 1000;
+            *pi64 =
+                INT64_C(1000) * var_InheritInteger( p_demux, "live-caching" );
             return VLC_SUCCESS;
 
         case DEMUX_GET_TIME:

@@ -400,7 +400,7 @@ static int Control( access_t *p_access, int i_query, va_list args )
         /* */
         case ACCESS_GET_PTS_DELAY:
             pi_64 = (int64_t*)va_arg( args, int64_t * );
-            *pi_64 = var_GetInteger( p_access, "dvb-caching" ) * 1000;
+            *pi_64 = DEFAULT_PTS_DELAY;
             break;
 
         /* */
@@ -497,9 +497,6 @@ static void VarInit( access_t *p_access )
     var_Destroy( p_access, "dvb-code-rate-hp" );
     var_Destroy( p_access, "dvb-code-rate-lp" );
     var_Destroy( p_access, "dvb-guard" );
-
-    /* */
-    var_Create( p_access, "dvb-caching", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
 
     /* */
     var_Create( p_access, "dvb-adapter", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );

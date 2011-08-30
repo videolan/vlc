@@ -31,11 +31,6 @@
 #include <vlc_demux.h>
 #include <vlc_plugin.h>
 
-#define CACHING_TEXT N_("Caching value in ms")
-#define CACHING_LONGTEXT N_( \
-    "Caching value for screen capture. " \
-    "This value should be set in milliseconds.")
-
 #define FPS_TEXT N_("Frame rate")
 #define FPS_LONGTEXT N_( \
     "How many times the screen content should be refreshed per second.")
@@ -74,8 +69,6 @@ vlc_module_begin ()
     set_capability ("access_demux", 0)
     set_callbacks (Open, Close)
 
-    add_integer ("screen-caching", DEFAULT_PTS_DELAY * 1000 / CLOCK_FREQ,
-                 CACHING_TEXT, CACHING_LONGTEXT, true)
     add_float ("screen-fps", 2.0, FPS_TEXT, FPS_LONGTEXT, true)
     add_integer ("screen-left", 0, LEFT_TEXT, LEFT_LONGTEXT, true)
         change_integer_range (-32768, 32767)
@@ -219,7 +212,6 @@ static int Open (vlc_object_t *obj)
     p_sys->interval = (float)CLOCK_FREQ / p_sys->rate;
     if (!p_sys->interval)
         goto error;
-    var_Create (obj, "screen-caching", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT);
 
     p_sys->cur_w = 0;
     p_sys->cur_h = 0;
@@ -282,7 +274,7 @@ static int Control (demux_t *demux, int query, va_list args)
         case DEMUX_GET_PTS_DELAY:
         {
             int64_t *v = va_arg (args, int64_t *);
-            *v = var_GetInteger (demux, "screen-caching") * UINT64_C(1000);
+            *v = INT64_C(1000) * var_InheritInteger (demux, "live-caching");
             return VLC_SUCCESS;
         }
 

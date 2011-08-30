@@ -43,19 +43,11 @@
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
-#define CACHING_TEXT N_("Caching value (ms)")
-#define CACHING_LONGTEXT N_( \
-    "Caching value for RTSP streams. This " \
-    "value should be set in milliseconds." )
-
 vlc_module_begin ()
     set_description( N_("Real RTSP") )
     set_shortname( N_("Real RTSP") )
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_ACCESS )
-    add_integer( "realrtsp-caching", 3000,
-                 CACHING_TEXT, CACHING_LONGTEXT, true )
-        change_safe()
     set_capability( "access", 10 )
     set_callbacks( Open, Close )
     add_shortcut( "realrtsp", "rtsp", "pnm" )
@@ -249,10 +241,6 @@ static int Open( vlc_object_t *p_this )
         goto error;
     }
 
-    /* Update default_pts to a suitable value for file access */
-    var_Create( p_access, "realrtsp-caching",
-                VLC_VAR_INTEGER | VLC_VAR_DOINHERIT);
-
     free( psz_server );
     return VLC_SUCCESS;
 
@@ -331,8 +319,8 @@ static int Control( access_t *p_access, int i_query, va_list args )
             break;
 
         case ACCESS_GET_PTS_DELAY:
-            *va_arg( args, int64_t * ) =
-                    var_GetInteger(p_access,"realrtsp-caching")*1000;
+            *va_arg( args, int64_t * ) = INT64_C(1000)
+                * var_InheritInteger(p_access, "network-caching");
             break;
 
         /* */

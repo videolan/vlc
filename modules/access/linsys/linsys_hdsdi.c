@@ -69,10 +69,6 @@
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define CACHING_TEXT N_("Caching value in ms")
-#define CACHING_LONGTEXT N_( \
-    "Allows you to modify the default caching value for hdsdi capture " \
-    "streams. This value should be set in millisecond units." )
 #define LINK_TEXT N_("Link #")
 #define LINK_LONGTEXT N_( \
     "Allows you to set the desired link of the board for the capture (starting at 0)." )
@@ -95,8 +91,6 @@ vlc_module_begin()
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_ACCESS )
 
-    add_integer( "linsys-hdsdi-caching", DEFAULT_PTS_DELAY / 1000,
-        CACHING_TEXT, CACHING_LONGTEXT, true )
     add_integer( "linsys-hdsdi-link", 0,
         LINK_TEXT, LINK_LONGTEXT, true )
 
@@ -250,9 +244,6 @@ static int Open( vlc_object_t *p_this )
         p_sys->p_audios[i].i_channel = -1;
 
 
-    /* Update default_pts to a suitable value for hdsdi access */
-    var_Create( p_demux, "linsys-hdsdi-caching", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
-
     p_sys->i_link = var_InheritInteger( p_demux, "linsys-hdsdi-link" );
 
     if( InitCapture( p_demux ) != VLC_SUCCESS )
@@ -304,7 +295,8 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_GET_PTS_DELAY:
             pi64 = (int64_t*)va_arg( args, int64_t * );
-            *pi64 = (int64_t)var_GetInteger( p_demux, "linsys-hdsdi-caching" ) *1000;
+            *pi64 = INT64_C(1000)
+                  * var_InheritInteger( p_demux, "live-caching" );
             return VLC_SUCCESS;
 
         /* TODO implement others */
