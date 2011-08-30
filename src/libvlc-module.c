@@ -1913,15 +1913,19 @@ vlc_module_begin ()
 
     add_integer( "file-caching", DEFAULT_PTS_DELAY / 1000,
                  CACHING_TEXT, CACHING_LONGTEXT, true )
+        change_integer_range( 0, 60000 )
         change_safe()
-    add_integer( "capture-caching", DEFAULT_PTS_DELAY / 1000,
+    add_integer( "live-caching", DEFAULT_PTS_DELAY / 1000,
                  CAPTURE_CACHING_TEXT, CAPTURE_CACHING_LONGTEXT, true )
+        change_integer_range( 0, 60000 )
         change_safe()
     add_integer( "disc-caching", DEFAULT_PTS_DELAY / 1000,
                  DISC_CACHING_TEXT, DISC_CACHING_LONGTEXT, true )
+        change_integer_range( 0, 60000 )
         change_safe()
     add_integer( "network-caching", CLOCK_FREQ / 1000,
                  NETWORK_CACHING_TEXT, NETWORK_CACHING_LONGTEXT, true )
+        change_integer_range( 0, 60000 )
         change_safe()
 
     add_integer( "cr-average", 40, CR_AVERAGE_TEXT,
