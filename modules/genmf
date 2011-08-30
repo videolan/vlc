@@ -11,7 +11,6 @@ cd $(dirname "$0")/.. || exit 1
 
 while test "$1"
 do
-  printf "."
   dir="$1"
   modf="modules/${dir}/Modules.am"
   if ! test -f "$modf"; then
@@ -69,4 +68,3 @@ EOF
 
   shift
 done
-printf "\n"

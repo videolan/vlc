@@ -91,7 +91,13 @@ AC_DEFUN([PKG_CHECK_MODULES],[ifelse([\$4], , :, [\$4])])
 EOF
 fi
 
-sh modules/genmf `sed -ne 's,modules/\(.*\)/Makefile,\1,p' configure.ac`
+find modules/ -name Modules.am | \
+sed -ne 's,modules/\(.*\)/Modules.am,\1,p' | \
+while read d; do
+	sh modules/genmf "$d"
+	printf "."
+done
+printf "\n"
 
 ###
 ###  classic bootstrap stuff
