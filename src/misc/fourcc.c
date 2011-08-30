@@ -1085,6 +1085,7 @@ static const entry_t p_list_audio[] = {
 
     B(VLC_CODEC_NELLYMOSER, "NellyMoser ASAO"),
         A("NELL"),
+        A("nmos"),
 
     B(VLC_CODEC_APE, "Monkey's Audio"),
         A("APE "),
