@@ -31,7 +31,6 @@ endif
 vlc_wrapper_SOURCES = rootwrap.c
 vlc_wrapper_LDADD = $(SOCKET_LIBS)
 
-vlc_DEPENDENCIES = ../src/libvlc.sym
 vlc_LDFLAGS = $(LDFLAGS_vlc)
 vlc_LDADD = ../src/libvlc.la ../src/libvlccore.la $(LIBS_vlc)
 
@@ -46,7 +45,7 @@ vlc_static_LDFLAGS = $(vlc_LDFLAGS)
 
 if HAVE_WIN32
 vlc_LDADD += -lwininet vlc_win32_rc.$(OBJEXT)
-vlc_DEPENDENCIES += vlc_win32_rc.$(OBJEXT)
+vlc_DEPENDENCIES = vlc_win32_rc.$(OBJEXT)
 else
 vlc_LDADD += $(LIBDL)
 vlc_static_LDFLAGS += -no-install -static

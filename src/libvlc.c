@@ -37,7 +37,7 @@
 #endif
 
 #include <vlc_common.h>
-#include "control/libvlc_internal.h"
+#include "../lib/libvlc_internal.h"
 #include <vlc_input.h>
 
 #include "modules/modules.h"

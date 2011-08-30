@@ -78,21 +78,6 @@ src/config/core.c
 src/config/file.c
 src/config/help.c
 src/config/intf.c
-src/control/audio.c
-src/control/core.c
-src/control/event.c
-src/control/libvlc_internal.h
-src/control/log.c
-src/control/media.c
-src/control/media_discoverer.c
-src/control/media_library.c
-src/control/media_list.c
-src/control/media_list_path.h
-src/control/media_list_player.c
-src/control/media_player.c
-src/control/playlist.c
-src/control/video.c
-src/control/vlm.c
 src/extras/libc.c
 src/extras/tdestroy.c
 src/input/access.c
@@ -183,6 +168,22 @@ src/video_output/vout_control.h
 src/video_output/vout_internal.h
 src/video_output/vout_intf.c
 src/video_output/vout_subpictures.c
+
+lib/audio.c
+lib/core.c
+lib/event.c
+lib/libvlc_internal.h
+lib/log.c
+lib/media.c
+lib/media_discoverer.c
+lib/media_library.c
+lib/media_list.c
+lib/media_list_path.h
+lib/media_list_player.c
+lib/media_player.c
+lib/playlist.c
+lib/video.c
+lib/vlm.c
 
 # modules
 modules/3dnow/memcpy.c

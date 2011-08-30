@@ -26,7 +26,7 @@
 #endif
 
 #include "libvlc_internal.h"
-#include "libvlc.h"
+#include "../src/libvlc.h"
 
 #include <vlc/libvlc_structures.h>
 #include <vlc/libvlc.h>

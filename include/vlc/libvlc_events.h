@@ -45,7 +45,7 @@ extern "C" {
 enum libvlc_event_e {
     /* Append new event types at the end of a category.
      * Do not remove, insert or re-order any entry.
-     * Keep this in sync with src/control/event.c:libvlc_event_type_name(). */
+     * Keep this in sync with lib/event.c:libvlc_event_type_name(). */
     libvlc_MediaMetaChanged=0,
     libvlc_MediaSubItemAdded,
     libvlc_MediaDurationChanged,

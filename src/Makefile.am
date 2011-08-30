@@ -7,16 +7,11 @@ SUBDIRS = . test
 
 NULL =
 EXTRA_DIST = \
-	libvlc.pc.in \
 	vlc-plugin.pc.in \
-	libvlc.sym \
 	libvlccore.sym \
-	revision.txt \
-	../include/vlc/libvlc_version.h.in
+	revision.txt
 
-BUILT_SOURCES = \
-	$(nodist_pkginclude_HEADERS) \
-	$(nodist_pluginsinclude_HEADERS)
+BUILT_SOURCES = $(nodist_pluginsinclude_HEADERS)
 CLEANFILES = $(BUILT_SOURCES)
 
 SUFFIXES = .pc.in .pc .rc.in .rc
@@ -26,22 +21,6 @@ SUFFIXES = .pc.in .pc .rc.in .rc
 ###############################################################################
 
 pluginsincludedir = $(pkgincludedir)/plugins
-
-pkginclude_HEADERS = \
-	../include/vlc/vlc.h \
-	../include/vlc/deprecated.h \
-	../include/vlc/libvlc.h \
-	../include/vlc/libvlc_events.h \
-	../include/vlc/libvlc_media.h \
-	../include/vlc/libvlc_media_discoverer.h \
-	../include/vlc/libvlc_media_library.h \
-	../include/vlc/libvlc_media_list.h \
-	../include/vlc/libvlc_media_list_player.h \
-	../include/vlc/libvlc_media_player.h \
-	../include/vlc/libvlc_structures.h \
-	../include/vlc/libvlc_vlm.h \
-	$(NULL)
-nodist_pkginclude_HEADERS = ../include/vlc/libvlc_version.h
 
 pluginsinclude_HEADERS = \
 	../include/vlc_access.h \
@@ -138,10 +117,6 @@ noinst_HEADERS = \
 	../include/vlc_windows_interfaces.h \
 	$(NULL)
 
-../include/vlc/libvlc_version.h: ../include/vlc/libvlc_version.h.in $(top_builddir)/config.status
-	$(AM_V_GEN)cd "$(top_builddir)" && \
-	$(SHELL) ./config.status --file="src/$@"
-
 ../include/vlc_about.h: Makefile.am $(top_srcdir)/COPYING $(top_srcdir)/THANKS $(top_srcdir)/AUTHORS
 	$(AM_V_at)rm -f -- "$@.tmp"
 	$(AM_V_at)mkdir -p -- ../include
@@ -164,7 +139,7 @@ noinst_HEADERS = \
 ###############################################################################
 
 pkgconfigdir = $(libdir)/pkgconfig
-pkgconfig_DATA = libvlc.pc vlc-plugin.pc
+pkgconfig_DATA = vlc-plugin.pc
 CLEANFILES += $(pkgconfig_DATA)
 
 .pc.in.pc: $(top_builddir)/config.status
@@ -188,25 +163,20 @@ EXTRA_DIST += libvlc_win32_rc.rc.in
 # Building libvlc
 ###############################################################################
 
-lib_LTLIBRARIES = libvlccore.la libvlc.la
+lib_LTLIBRARIES = libvlccore.la
 
-AM_LDFLAGS = -no-undefined
-if HAVE_WIN32
-AM_LDFLAGS += -avoid-version
-endif
-if HAVE_WINCE
-AM_LDFLAGS += -avoid-version
-endif
-
-libvlccore_la_SOURCES = $(SOURCES_libvlc)
-libvlccore_la_CPPFLAGS = $(INCICONV) \
+AM_CPPFLAGS = $(INCICONV) \
 	-DMODULE_STRING=\"main\" \
 	-DLOCALEDIR=\"$(localedir)\" \
 	-DSYSCONFDIR=\"$(sysconfdir)\" \
 	-DDATA_PATH=\"$(vlcdatadir)\" \
 	-DPKGLIBDIR=\"$(vlclibdir)\"
-libvlccore_la_CFLAGS = $(CFLAGS_libvlccore)
-libvlccore_la_LDFLAGS = $(LDFLAGS_libvlccore) $(AM_LDFLAGS) \
+AM_CFLAGS = $(CFLAGS_libvlccore)
+
+libvlccore_la_SOURCES = $(SOURCES_libvlc)
+libvlccore_la_LDFLAGS = \
+	-no-undefined \
+	$(LDFLAGS_libvlccore) \
 	-no-undefined \
 	-export-symbols $(srcdir)/libvlccore.sym \
 	-version-info 5:0:0
@@ -217,26 +187,11 @@ libvlccore_la_LIBADD = $(LIBS_libvlccore) \
 libvlccore_la_DEPENDENCIES = libvlccore.sym
 if HAVE_WIN32
 libvlccore_la_DEPENDENCIES += libvlc_win32_rc.$(OBJEXT)
-libvlccore_la_LDFLAGS += -Wl,libvlc_win32_rc.$(OBJEXT)
+libvlccore_la_LDFLAGS += -Wl,libvlc_win32_rc.$(OBJEXT) -avoid-version
 endif
 
 libvlc_win32_rc.$(OBJEXT): libvlc_win32_rc.rc
 	$(WINDRES) --include-dir $(top_srcdir)/share -i $< -o $@
-
-libvlc_la_SOURCES = $(SOURCES_libvlc_control)
-libvlc_la_LIBADD = $(LIBS_libvlc) \
-	libvlccore.la ../compat/libcompat.la
-libvlc_la_CPPFLAGS = -DMODULE_STRING=\"libvlc\"
-libvlc_la_CFLAGS = $(CFLAGS_libvlc)
-libvlc_la_LDFLAGS = $(AM_LDFLAGS) $(LDFLAGS_libvlc) \
-	-version-info 6:0:1 \
-	-export-symbols $(srcdir)/libvlc.sym
-libvlc_la_DEPENDENCIES = libvlc.sym libvlccore.la
-if HAVE_WIN32
-libvlc_la_DEPENDENCIES += libvlc_win32_rc.$(OBJEXT)
-libvlc_la_LDFLAGS += -Wl,libvlc_win32_rc.$(OBJEXT)
-endif
-
 
 EXTRA_libvlccore_la_SOURCES = \
 	$(SOURCES_libvlc_darwin) \
@@ -511,30 +466,6 @@ SOURCES_libvlc = \
 	$(SOURCES_libvlc_common) \
 	$(NULL)
 
-SOURCES_libvlc_control = \
-	revision.c \
-	control/libvlc_internal.h \
-	control/event_internal.h \
-	control/media_internal.h \
-	control/media_list_internal.h \
-	control/media_player_internal.h \
-	control/core.c \
-	control/error.c \
-	control/log.c \
-	control/playlist.c \
-	control/vlm.c \
-	control/video.c \
-	control/audio.c \
-	control/event.c \
-	control/event_async.c \
-	control/media.c \
-	control/media_player.c \
-	control/media_list.c \
-	control/media_list_path.h \
-	control/media_list_player.c \
-	control/media_library.c \
-	control/media_discoverer.c
-
 ###############################################################################
 # libvlc pulse
 ###############################################################################
@@ -593,7 +524,6 @@ check-local:
 			exit 1; \
 		fi ; \
 	done
-	$(srcdir)/check_headers $(pkginclude_HEADERS)
 	$(srcdir)/check_headers $(pluginsinclude_HEADERS)
 
 FORCE:

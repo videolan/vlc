@@ -38,7 +38,7 @@
 #include <vlc_playlist.h> /* For the preparser */
 #include <vlc_url.h>
 
-#include "libvlc.h"
+#include "../src/libvlc.h"
 
 #include "libvlc_internal.h"
 #include "media_internal.h"

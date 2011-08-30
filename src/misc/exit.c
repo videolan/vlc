@@ -25,7 +25,7 @@
 #include <vlc_common.h>
 #include <vlc_interface.h>
 #include "libvlc.h"
-#include "control/libvlc_internal.h"
+#include "../lib/libvlc_internal.h"
 
 void vlc_ExitInit( vlc_exit_t *exit )
 {

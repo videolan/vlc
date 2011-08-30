@@ -7,10 +7,8 @@
 # which have makefiles with distribution information.
 #  - src (libvlc) is nedeed by modules
 #  - libs/* are needed by modules
-DIST_SUBDIRS = \
-	m4 compat doc po share src \
-	bin modules test
-SUBDIRS = compat doc po share src
+DIST_SUBDIRS = m4 compat doc po share src modules lib bin test
+SUBDIRS = compat doc po share src lib
 if BUILD_VLC
 SUBDIRS += bin
 endif
@@ -347,8 +345,11 @@ MAINTAINERCLEANFILES = ChangeLog
 libcompat:
 	cd compat && $(MAKE) $(AM_MAKEFLAGS)
 
-libvlc: libcompat
-	cd src && $(MAKE) $(AM_MAKEFLAGS) libvlc.la
+libvlccore: libcompat
+	cd src && $(MAKE) $(AM_MAKEFLAGS) libvlccore.la
+
+libvlc: libvlccore
+	cd lib && $(MAKE) $(AM_MAKEFLAGS) libvlc.la
 
 core: libvlc vlc$(EXEEXT)
 	cd bin && $(MAKE) $(AM_MAKEFLAGS) vlc$(EXEEXT) vlc-static$(EXEEXT)

@@ -322,7 +322,7 @@ static bool active = false;
 
 #ifdef Q_WS_MAC
 /* Used to abort the app.exec() on OSX after libvlc_Quit is called */
-#include "../../../src/control/libvlc_internal.h" /* libvlc_SetExitHandler */
+#include "../../../lib/libvlc_internal.h" /* libvlc_SetExitHandler */
 static void Abort( void *obj )
 {
     QVLCApp::triggerQuit();

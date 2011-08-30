@@ -34,7 +34,7 @@
     This allows for the direct addition of subitems in the playback options test.
     This would not be necessary if there were an add subitems function.
 */
-#include "../../src/control/media_internal.h"
+#include "../../lib/media_internal.h"
 
 struct check_items_order_data {
     bool done_playing;

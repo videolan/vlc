@@ -4266,6 +4266,7 @@ AC_CONFIG_FILES([
   compat/Makefile
   src/Makefile
   src/test/Makefile
+  lib/Makefile
   bin/Makefile
   test/Makefile
   modules/access/Makefile

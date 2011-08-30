@@ -24,7 +24,7 @@
 #include <limits.h>
 
 #include "../../libvlc/test.h"
-#include <../src/control/libvlc_internal.h>
+#include "../lib/libvlc_internal.h"
 
 const char *psz_var_name[] = { "a", "abcdef", "abcdefg", "abc123", "abc-123", "é€!!" };
 const int i_var_count = 6;

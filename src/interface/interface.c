@@ -41,10 +41,6 @@
 #include <vlc_common.h>
 #include <vlc_modules.h>
 #include <vlc_interface.h>
-
-#if defined( __APPLE__ ) || defined( WIN32 )
-#include "../control/libvlc_internal.h"
-#endif
 #include "libvlc.h"
 
 /*****************************************************************************
