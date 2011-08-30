@@ -52,7 +52,8 @@ sh $VLC_SOURCEDIR/configure --host=arm-eabi-linux --build=x86_64-unknown-linux $
                 --enable-opensles \
                 --enable-android-surface \
                 --enable-debug \
-                --disable-mkv \
+                --enable-mkv \
+                --enable-taglib \
                 --disable-vlc \
                 --disable-vlm --disable-sout \
                 --disable-dbus \
