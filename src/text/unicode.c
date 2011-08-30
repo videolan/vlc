@@ -90,6 +90,9 @@ char *FromLocale (const char *locale)
  */
 char *FromLocaleDup (const char *locale)
 {
+    if (!locale)
+        return NULL;
+
 #ifdef ASSUME_UTF8
     return strdup (locale);
 #else
