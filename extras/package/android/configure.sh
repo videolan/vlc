@@ -44,7 +44,6 @@ RANLIB="${CROSS_COMPILE}ranlib" \
 AR="${CROSS_COMPILE}ar" \
 PKG_CONFIG_LIBDIR="$VLC_SOURCEDIR/extras/contrib/hosts/arm-eabi/lib/pkgconfig" \
 sh $VLC_SOURCEDIR/configure --host=arm-eabi-linux --build=x86_64-unknown-linux $EXTRA_PARAMS \
-                --enable-static-modules \
                 --enable-live555 --enable-realrtsp \
                 --enable-avformat \
                 --enable-swscale \
@@ -54,7 +53,7 @@ sh $VLC_SOURCEDIR/configure --host=arm-eabi-linux --build=x86_64-unknown-linux $
                 --enable-debug \
                 --enable-mkv \
                 --enable-taglib \
-                --disable-vlc \
+                --disable-vlc --disable-shared \
                 --disable-vlm --disable-sout \
                 --disable-dbus \
                 --disable-lua \
