@@ -74,6 +74,7 @@ struct xml_reader_t
     const char *(*pf_next_attr) ( xml_reader_t *, const char ** );
 
     int (*pf_use_dtd) ( xml_reader_t * );
+    int (*pf_is_empty) ( xml_reader_t * );
 };
 
 VLC_API xml_reader_t * xml_ReaderCreate(vlc_object_t *, stream_t *) VLC_USED;
@@ -95,6 +96,14 @@ static inline const char *xml_ReaderNextAttr( xml_reader_t *reader,
 static inline int xml_ReaderUseDTD( xml_reader_t *reader )
 {
   return reader->pf_use_dtd( reader );
+}
+
+static inline int xml_ReaderIsEmptyElement( xml_reader_t *reader )
+{
+    if(reader->pf_is_empty == NULL)
+        return -2;
+
+    return reader->pf_is_empty( reader );
 }
 
 enum {

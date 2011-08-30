@@ -62,6 +62,7 @@ vlc_module_end ()
 
 static int ReaderNextNode( xml_reader_t *, const char ** );
 static const char *ReaderNextAttr( xml_reader_t *, const char ** );
+static int ReaderIsEmptyElement( xml_reader_t *);
 
 static int ReaderUseDTD ( xml_reader_t * );
 
@@ -175,6 +176,7 @@ static int ReaderOpen( vlc_object_t *p_this )
     p_reader->p_sys = p_sys;
     p_reader->pf_next_node = ReaderNextNode;
     p_reader->pf_next_attr = ReaderNextAttr;
+    p_reader->pf_is_empty = ReaderIsEmptyElement;
     p_reader->pf_use_dtd = ReaderUseDTD;
 
     return VLC_SUCCESS;
@@ -286,4 +288,9 @@ static int StreamRead( void *p_context, char *p_buffer, int i_buffer )
 {
     stream_t *s = (stream_t*)p_context;
     return stream_Read( s, p_buffer, i_buffer );
+}
+
+static int ReaderIsEmptyElement( xml_reader_t *p_reader )
+{
+    return xmlTextReaderIsEmptyElement( p_reader->p_sys->xml );
 }
