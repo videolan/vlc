@@ -360,8 +360,8 @@ case "$DISTRO" in
     fi
     # The given host (arm-eabi) is not the real one (arm-linux-androideabi)
     ln -sfn $TARGET hosts/arm-linux-androideabi
-    CC="arm-linux-androideabi-gcc -nostdlib -lc -lgcc"
-    CXX="arm-linux-androideabi-g++ -nostdlib -lc -lgcc"
+    CC="arm-linux-androideabi-gcc --sysroot=$ANDROID_NDK/platforms/android-9/arch-arm"
+    CXX="arm-linux-androideabi-g++ --sysroot=$ANDROID_NDK/platforms/android-9/arch-arm"
     NM=arm-linux-androideabi-nm
     AR=arm-linux-androideabi-ar
     LD=arm-linux-androideabi-ld
