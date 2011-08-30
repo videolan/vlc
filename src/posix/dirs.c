@@ -83,7 +83,7 @@ static char *config_GetHomeDir (void)
 #endif
 
     if (!home)
-        return NULL
+        return NULL;
 
     return FromLocaleDup (home);
 }
