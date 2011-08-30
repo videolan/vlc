@@ -88,13 +88,6 @@ ifeq ($(RANLIB),)
 RANLIB=ranlib
 endif
 
-# For libebml/libmatroska. Grrr.
-ifneq ($(AR),)
-HOSTCC2=$(HOSTCC) AR="$(AR) rcvu"
-else
-HOSTCC2=$(HOSTCC)
-endif
-
 # Just a shortcut for readability
 ENABLED=1
 
@@ -815,7 +808,7 @@ libebml: libebml-$(LIBEBML_VERSION).tar.bz2
 ifdef HAVE_WIN32
 	(cd $<; make -C make/mingw32 prefix=$(PREFIX) $(HOSTCC) SHARED=no && make -C make/linux install_staticlib install_headers prefix=$(PREFIX) $(HOSTCC))
 else
-	(cd $<; make -C make/linux prefix=$(PREFIX) $(HOSTCC2) staticlib && make -C make/linux install_staticlib install_headers prefix=$(PREFIX))
+	(cd $<; make -C make/linux prefix=$(PREFIX) $(HOSTCC) staticlib && make -C make/linux install_staticlib install_headers prefix=$(PREFIX))
 	$(RANLIB) $(PREFIX)/lib/libebml.a
 endif
 	touch $@
