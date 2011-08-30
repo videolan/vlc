@@ -31,10 +31,12 @@ local function stripslashes(s)
   return string.gsub(s,"\\(.)","%1")
 end
 
+--Round the number to the specified precision
 function round(what, precision)
   if what then return math.floor(what*math.pow(10,precision)+0.5) / math.pow(10,precision) else return "" end
 end
 
+--split text where it matches the delimiter
 function strsplit(text, delimiter)
 	local strfind = string.find
 	local strsub = string.sub
@@ -374,6 +376,7 @@ local aout = vlc.object.aout()
 		s.rate=1
 		s.subtitledelay=0
 	end
+
 	if vout then
 		s.fullscreen=vlc.var.get(vout,"fullscreen")
 		s.aspectratio=vlc.var.get(vout,"aspect-ratio");
@@ -381,6 +384,7 @@ local aout = vlc.object.aout()
 	else
 		s.fullscreen=0
 	end
+
 	if aout then
 		local filters=vlc.var.get(aout,"audio-filter")
 		local temp=strsplit(filters,":")
@@ -391,16 +395,19 @@ local aout = vlc.object.aout()
 			id=id+1
 		end
 	end
+
 	s.videoeffects={}
-		s.videoeffects.hue=round(vlc.config.get("hue"),2)
-		s.videoeffects.brightness=round(vlc.config.get("brightness"),2)
-		s.videoeffects.contrast=round(vlc.config.get("contrast"),2)
-		s.videoeffects.saturation=round(vlc.config.get("saturation"),2)
-		s.videoeffects.gamma=round(vlc.config.get("gamma"),2)
+	s.videoeffects.hue=round(vlc.config.get("hue"),2)
+	s.videoeffects.brightness=round(vlc.config.get("brightness"),2)
+	s.videoeffects.contrast=round(vlc.config.get("contrast"),2)
+	s.videoeffects.saturation=round(vlc.config.get("saturation"),2)
+	s.videoeffects.gamma=round(vlc.config.get("gamma"),2)
+
 	s.state=vlc.playlist.status()
 	s.random=vlc.var.get(playlist,"random")
 	s.loop=vlc.var.get(playlist,"loop")
 	s["repeat"]=vlc.var.get(playlist,"repeat")
+
         s.equalizer={}
 		s.equalizer.preamp=round(vlc.equalizer.preampget(),2)
 		s.equalizer.bands=vlc.equalizer.equalizerget()
@@ -432,10 +439,7 @@ local aout = vlc.object.aout()
         	local tag = string.gsub(k,"_","")
         s.stats[tag]=xmlString(v)
       end
-
-
 	end
-
 	return s
 end
 

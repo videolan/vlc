@@ -128,7 +128,6 @@ Band 0: 60 Hz, 1: 170 Hz, 2: 310 Hz, 3: 600 Hz, 4: 1 kHz,
 
 <Display the list of presets available for the equalizer
 
-=======
 playlist.xml:
 =============
 < get the full playlist tree
