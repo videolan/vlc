@@ -69,7 +69,6 @@ export AUTOPOINT
 test "$AUTOPOINT" || AUTOPOINT=autopoint
 if ! "$AUTOPOINT" --dry-run --force >/dev/null 2>&1; then
   AUTOPOINT=true
-  echo > ABOUT-NLS
 fi
 
 ##
