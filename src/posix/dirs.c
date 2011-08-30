@@ -117,7 +117,6 @@ static char *config_GetTypeDir (const char *xdg_name)
 {
     const size_t namelen = strlen (xdg_name);
     const char *home = getenv ("HOME");
-    const size_t homelen = strlen (home);
     const char *dir = getenv ("XDG_CONFIG_HOME");
     const char *file = "user-dirs.dirs";
 
@@ -174,6 +173,7 @@ static char *config_GetTypeDir (const char *xdg_name)
             }
             else
             {   /* Prefix with $HOME */
+                const size_t homelen = strlen (home);
                 ptr += 5;
                 path = malloc (homelen + linelen - 5);
                 if (path == NULL)
