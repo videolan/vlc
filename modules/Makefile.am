@@ -63,24 +63,3 @@ SUBDIRS += .
 
 dist_noinst_SCRIPTS = genmf list.sh
 dist_noinst_DATA = LIST
-noinst_DATA = plugins.dat
-MOSTLYCLEANFILES = $(noinst_DATA)
-
-.PHONY: plugins.dat
-
-plugins.dat:
-	$(AM_V_at)rm -f plugins.dat
-	$(AM_V_GEN)if test "$(build)" = "$(host)"; then \
-		../bin/vlc-cache-gen$(EXEEXT) . ; \
-	else \
-		echo "Cross-compilation: cache generation skipped!" ; \
-	fi
-
-install-exec-hook:
-	if test "$(build)" = "$(host)"; then \
-		LD_LIBRARY_PATH="$(DESTDIR)$(libdir):$$LD_LIBRARY_PATH" \
-		"$(DESTDIR)$(vlclibdir)/vlc-cache-gen$(EXEEXT)" \
-			 "$(DESTDIR)$(vlclibdir)/plugins" ; \
-	else \
-		echo "Cross-compilation: cache generation skipped!" ; \
-	fi

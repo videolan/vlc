@@ -8,11 +8,11 @@
 #  - src (libvlc) is nedeed by modules
 #  - libs/* are needed by modules
 DIST_SUBDIRS = m4 compat doc po share src modules lib bin test
-SUBDIRS = compat doc po share src lib
+SUBDIRS = compat doc po share src modules lib
 if BUILD_VLC
 SUBDIRS += bin
 endif
-SUBDIRS += modules test
+SUBDIRS += test
 
 EXTRA_DIST = \
 	HACKING \

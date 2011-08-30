@@ -2,6 +2,7 @@
 #
 bin_PROGRAMS = vlc
 noinst_PROGRAMS = vlc-static
+noinst_DATA =
 vlclib_PROGRAMS = vlc-cache-gen
 EXTRA_PROGRAMS = vlc-wrapper
 EXTRA_DIST = vlc_win32_rc.rc.in
@@ -22,7 +23,7 @@ endif
 EXTRA_vlc_SOURCES = vlc.c winvlc.c
 if HAVE_WIN32
 vlc_SOURCES = winvlc.c
-noinst_DATA = vlc_win32_rc.rc
+noinst_DATA += vlc_win32_rc.rc
 endif
 if HAVE_WINCE
 vlc_SOURCES = winvlc.c
@@ -68,3 +69,27 @@ vlc_cache_gen_LDADD += vlc_win32_rc.$(OBJEXT)
 vlc_cache_gen_DEPENDENCIES = vlc_win32_rc.$(OBJEXT)
 endif
 
+#
+# Plug-ins cache
+#
+noinst_DATA += ../modules/plugins.dat
+MOSTLYCLEANFILES = $(noinst_DATA)
+
+.PHONY: ../modules/plugins.dat
+
+../modules/plugins.dat: vlc-cache-gen$(EXEEXT)
+	$(AM_V_at)rm -f ../modules/plugins.dat
+	$(AM_V_GEN)if test "$(build)" = "$(host)"; then \
+		./vlc-cache-gen$(EXEEXT) ../modules ; \
+	else \
+		echo "Cross-compilation: cache generation skipped!" ; \
+	fi
+
+install-exec-hook:
+	if test "$(build)" = "$(host)"; then \
+		LD_LIBRARY_PATH="$(DESTDIR)$(libdir):$$LD_LIBRARY_PATH" \
+		"$(DESTDIR)$(vlclibdir)/vlc-cache-gen$(EXEEXT)" \
+			 "$(DESTDIR)$(vlclibdir)/plugins" ; \
+	else \
+		echo "Cross-compilation: cache generation skipped!" ; \
+	fi
