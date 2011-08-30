@@ -5,7 +5,7 @@ all: .zlib \
      .flac .speex .faad .lame .ffmpeg \
      .twolame \
      .png .dvbpsi \
-     .dca .kate .ebml .matroska
+     .dca .kate .ebml .matroska .tag
 
 
 ANDROID_INCLUDE=$(ANDROID_NDK)/platforms/android-9/arch-arm/usr/include

@@ -87,7 +87,7 @@ sh $VLC_SOURCEDIR/configure --host=arm-eabi-linux --build=x86_64-unknown-linux $
                 --disable-qt4 \
                 --disable-skins2 \
                 --disable-mtp \
-                --disable-taglib \
+                --enable-taglib \
                 --disable-notify \
                 --disable-freetype \
                 --disable-libass \
