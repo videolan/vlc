@@ -89,7 +89,6 @@ struct access_sys_t
     bool b_pace_control;
 };
 
-#if !defined (WIN32) && !defined (__OS2__)
 static bool IsRemote (int fd)
 {
 #if defined (HAVE_FSTATVFS) && defined (MNT_LOCAL)
@@ -124,7 +123,6 @@ static bool IsRemote (int fd)
 
 #endif
 }
-#endif
 
 #ifndef HAVE_POSIX_FADVISE
 # define posix_fadvise(fd, off, len, adv)
@@ -173,14 +171,6 @@ int Open( vlc_object_t *p_this )
             dialog_Fatal (p_access, _("File reading failed"),
                           _("VLC could not open the file \"%s\". (%m)"), path);
         }
-
-#ifdef WIN32
-        wchar_t *wpath = ToWide (path);
-        if (wpath != NULL && PathIsNetworkPathW (wpath))
-            is_remote = true;
-        free (wpath);
-# define IsRemote( fd ) ((void)fd, is_remote)
-#endif
     }
     if (fd == -1)
         return VLC_EGENERIC;
