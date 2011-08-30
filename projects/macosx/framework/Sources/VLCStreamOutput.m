@@ -190,7 +190,11 @@
         if( destination ) [subOptions addObject:[NSString stringWithFormat:@"dst=\"%@\"", [destination stringByReplacingOccurrencesOfString:@"\"" withString:@"\\\""]]];
         if( url ) [subOptions addObject:[NSString stringWithFormat:@"url=\"%@\"", [url stringByReplacingOccurrencesOfString:@"\"" withString:@"\\\""]]];
         if( access )      [subOptions addObject:[NSString stringWithFormat:@"access=%@", access]];
-        [optionsAsArray addObject:[NSString stringWithFormat:@"#std{%@}", [subOptions componentsJoinedByString:@","]]];
+        NSString *std = [NSString stringWithFormat:@"std{%@}", [subOptions componentsJoinedByString:@","]];
+        if ( !transcodingOptions )
+            std = [NSString stringWithFormat:@"#%@", std];
+
+        [optionsAsArray addObject:std];
         [subOptions removeAllObjects];
     }
 
@@ -207,7 +211,11 @@
         if( sdp )      [subOptions addObject:[NSString stringWithFormat:@"sdp=%@", sdp]];
         if( sap )      [subOptions addObject:@"sap"];
         if( name )      [subOptions addObject:[NSString stringWithFormat:@"name=\"%@\"", name]];
-        [optionsAsArray addObject:[NSString stringWithFormat:@"#rtp{%@}", [subOptions componentsJoinedByString:@","]]];
+        NSString *rtp = [NSString stringWithFormat:@"#rtp{%@}", [subOptions componentsJoinedByString:@","]];
+        if ( !transcodingOptions )
+            rtp = [NSString stringWithFormat:@"#%@", rtp];
+
+        [optionsAsArray addObject:rtp];
         [subOptions removeAllObjects];
     }
     representedOptions = [optionsAsArray componentsJoinedByString:@":"];
