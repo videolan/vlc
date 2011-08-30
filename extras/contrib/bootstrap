@@ -370,10 +370,18 @@ case "$DISTRO" in
     # Add the PATH to the NDK
     add_makefile_cfg "ANDROID_NDK = ${ANDROID_NDK}"
     add_makefile_cfg "PATH = ${ANDROID_NDK}/toolchains/arm-linux-androideabi-4.4.3/prebuilt/linux-x86/bin/:${PATH}"
+
     add_enabled_makefile_cfg "HAVE_LINUX"
     if test -z "$NO_NEON"; then
         add_enabled_makefile_cfg "HAVE_NEON"
+        ARM_EABI=armeabi-v7a
+    else
+        ARM_EABI=armeabi
     fi
+    # make sure android toolchain can build C++
+    EXTRA_CPPFLAGS="$EXTRA_CPPFLAGS -D__STDC_VERSION__=199901L"
+    EXTRA_CPPFLAGS="$EXTRA_CPPFLAGS -I${ANDROID_NDK}/sources/cxx-stl/gnu-libstdc++/include"
+    EXTRA_CPPFLAGS="$EXTRA_CPPFLAGS -I${ANDROID_NDK}/sources/cxx-stl/gnu-libstdc++/libs/$ARM_EABI/include"
 esac
 
 # Save passed flags
