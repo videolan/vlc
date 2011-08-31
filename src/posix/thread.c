@@ -968,7 +968,7 @@ mtime_t mdate (void)
  */
 void mwait (mtime_t deadline)
 {
-#if (_POSIX_TIMERS > 0)
+#if (_POSIX_CLOCK_SELECTION > 0)
     vlc_clock_setup ();
     /* If the deadline is already elapsed, or within the clock precision,
      * do not even bother the system timer. */
@@ -995,8 +995,8 @@ void msleep (mtime_t delay)
 {
     struct timespec ts = mtime_to_ts (delay);
 
+#if (_POSIX_CLOCK_SELECTION > 0)
     vlc_clock_setup ();
-#if (_POSIX_TIMERS > 0)
     while (clock_nanosleep (vlc_clock_id, 0, &ts, &ts) == EINTR);
 
 #else
