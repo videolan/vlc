@@ -2139,7 +2139,7 @@ EXPLODE
 ], [
   ac_cv_linux_s2api=no
 ])])
-AM_CONDITIONAL([HAVE_LINUX_DVB], [test "$ac_cv_linux_s2api" = no])
+AM_CONDITIONAL([HAVE_LINUX_DVB], [test "$ac_cv_linux_s2api" = "yes"])
 
 dnl
 dnl  libdvbpsi check for ts mux/demux
