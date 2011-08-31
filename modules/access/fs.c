@@ -56,7 +56,7 @@ vlc_module_begin ()
     add_obsolete_string( "file-cat" )
     set_capability( "access", 50 )
     add_shortcut( "file", "fd", "stream" )
-    set_callbacks( Open, Close )
+    set_callbacks( FileOpen, FileClose )
 
     add_submodule()
     set_section( N_("Directory" ), NULL )

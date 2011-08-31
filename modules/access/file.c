@@ -129,9 +129,9 @@ static bool IsRemote (int fd)
 #endif
 
 /*****************************************************************************
- * Open: open the file
+ * FileOpen: open the file
  *****************************************************************************/
-int Open( vlc_object_t *p_this )
+int FileOpen( vlc_object_t *p_this )
 {
     access_t     *p_access = (access_t*)p_this;
 #ifdef WIN32
@@ -242,9 +242,9 @@ error:
 }
 
 /*****************************************************************************
- * Close: close the target
+ * FileClose: close the target
  *****************************************************************************/
-void Close (vlc_object_t * p_this)
+void FileClose (vlc_object_t * p_this)
 {
     access_t     *p_access = (access_t*)p_this;
 

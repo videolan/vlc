@@ -20,8 +20,8 @@
 
 #include <dirent.h>
 
-int Open (vlc_object_t *);
-void Close (vlc_object_t *);
+int FileOpen (vlc_object_t *);
+void FileClose (vlc_object_t *);
 int NoSeek (access_t *, uint64_t);
 
 ssize_t FileRead (access_t *, uint8_t *, size_t);
