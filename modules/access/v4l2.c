@@ -578,7 +578,6 @@ struct demux_sys_t
 
 #ifdef HAVE_LIBV4L2
     /* */
-    int (*pf_open)(const char *, int, ...);
     int (*pf_close)( int );
     int (*pf_dup)( int );
     int (*pf_ioctl)( int, unsigned long int, ... );
@@ -592,7 +591,6 @@ struct demux_sys_t
 #ifdef HAVE_LIBV4L2
 static void use_kernel_v4l2( demux_sys_t *p_sys )
 {
-    p_sys->pf_open = vlc_open;
     p_sys->pf_close = close;
     p_sys->pf_dup = dup;
     p_sys->pf_ioctl = ioctl;
@@ -604,7 +602,6 @@ static void use_kernel_v4l2( demux_sys_t *p_sys )
 
 static void use_libv4l2( demux_sys_t *p_sys )
 {
-    p_sys->pf_open = v4l2_open;
     p_sys->pf_close = v4l2_close;
     p_sys->pf_dup = v4l2_dup;
     p_sys->pf_ioctl = v4l2_ioctl;
@@ -614,7 +611,6 @@ static void use_libv4l2( demux_sys_t *p_sys )
     p_sys->b_libv4l2 = true;
 }
 
-#   define v4l2_open (p_sys->pf_open)
 #   define v4l2_close (p_sys->pf_close)
 #   define v4l2_dup (p_sys->pf_dup)
 #   define v4l2_ioctl (p_sys->pf_ioctl)
@@ -622,7 +618,6 @@ static void use_libv4l2( demux_sys_t *p_sys )
 #   define v4l2_mmap (p_sys->pf_mmap)
 #   define v4l2_munmap (p_sys->pf_munmap)
 #else
-#   define v4l2_open vlc_open
 #   define v4l2_close close
 #   define v4l2_dup dup
 #   define v4l2_ioctl ioctl
@@ -1812,7 +1807,6 @@ static void GetMaxDimensions( demux_t *p_demux, int i_fd,
  *****************************************************************************/
 static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
 {
-    int i_fd;
     struct v4l2_cropcap cropcap;
     struct v4l2_crop crop;
     struct v4l2_format fmt;
@@ -1821,10 +1815,11 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
     const char *psz_device = p_sys->psz_device;
     es_format_t es_fmt;
 
-    if( ( i_fd = v4l2_open( psz_device, O_RDWR ) ) < 0 )
+    int i_fd = vlc_open( psz_device, O_RDWR );
+    if( i_fd == -1 )
     {
-        msg_Err( p_obj, "cannot open device (%m)" );
-        goto open_failed;
+        msg_Err( p_obj, "cannot open device %s (%m)", psz_device );
+        return -1;
     }
 
 #ifdef HAVE_LIBV4L2
@@ -2370,9 +2365,8 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
     return i_fd;
 
 open_failed:
-    if( i_fd >= 0 ) v4l2_close( i_fd );
+    v4l2_close( i_fd );
     return -1;
-
 }
 
 /*****************************************************************************
@@ -2381,12 +2375,11 @@ open_failed:
 static bool ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
                                  const char *psz_device )
 {
-    int i_fd;
-
-    if( ( i_fd = v4l2_open( psz_device, O_RDWR ) ) < 0 )
+    int i_fd = vlc_open( psz_device, O_RDWR );
+    if( i_fd == -1 )
     {
-        msg_Err( p_obj, "cannot open video device '%s' (%m)", psz_device );
-        goto open_failed;
+        msg_Err( p_obj, "cannot open video device %s: %m", psz_device );
+        return -1;
     }
 
 #ifdef HAVE_LIBV4L2
@@ -2735,14 +2728,11 @@ static bool ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
             }
         }
     }
-
-
-    if( i_fd >= 0 ) v4l2_close( i_fd );
+    v4l2_close( i_fd );
     return true;
 
 open_failed:
-
-    if( i_fd >= 0 ) v4l2_close( i_fd );
+    v4l2_close( i_fd );
     return false;
 
 }
