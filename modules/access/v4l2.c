@@ -46,6 +46,7 @@
 #include <vlc_input.h>
 
 #include <ctype.h>
+#include <assert.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <sys/ioctl.h>
@@ -290,8 +291,10 @@ vlc_module_begin ()
                 true )
     add_integer( CFG_PREFIX "input", 0, INPUT_TEXT, INPUT_LONGTEXT,
                 true )
+        change_integer_range( 0, 0xFFFFFFFE )
     add_integer( CFG_PREFIX "audio-input", 0, AUDIO_INPUT_TEXT,
                  AUDIO_INPUT_LONGTEXT, true )
+        change_integer_range( 0, 0xFFFFFFFE )
     add_integer( CFG_PREFIX "io", IO_METHOD_AUTO, IOMETHOD_TEXT,
                  IOMETHOD_LONGTEXT, true )
         change_integer_list( i_iomethod_list, psz_iomethod_list_text )
@@ -309,6 +312,7 @@ vlc_module_begin ()
     set_section( N_( "Tuner" ), NULL )
     add_integer( CFG_PREFIX "tuner", 0, TUNER_TEXT, TUNER_LONGTEXT,
                  true )
+        change_integer_range( 0, 0xFFFFFFFE )
     add_integer( CFG_PREFIX "tuner-frequency", -1, FREQUENCY_TEXT,
                  FREQUENCY_LONGTEXT, true )
     add_integer( CFG_PREFIX "tuner-audio-mode", -1, TUNER_AUDIO_MODE_TEXT,
@@ -537,7 +541,7 @@ struct demux_sys_t
 
     struct v4l2_capability dev_cap;
 
-    unsigned i_input;
+    uint32_t i_input;
     struct v4l2_input *p_inputs;
     unsigned i_selected_input;
 
@@ -545,12 +549,12 @@ struct demux_sys_t
     struct v4l2_standard *p_standards;
     v4l2_std_id i_selected_standard_id;
 
-    unsigned i_audio;
+    uint32_t i_audio;
     /* V4L2 devices cannot have more than 32 audio inputs */
     struct v4l2_audio p_audios[32];
-    int i_selected_audio_input;
+    unsigned i_selected_audio_input;
 
-    unsigned i_tuner;
+    uint32_t i_tuner;
     struct v4l2_tuner *p_tuners;
 
     unsigned i_codec;
@@ -569,7 +573,7 @@ struct demux_sys_t
     es_out_id_t *p_es;
 
     /* Tuner */
-    int i_cur_tuner;
+    uint32_t i_cur_tuner;
     int i_frequency;
     int i_audio_mode;
 
@@ -1493,15 +1497,15 @@ static int InitRead( vlc_object_t *p_demux, demux_sys_t *p_sys, unsigned int i_b
     (void)p_demux;
 
     p_sys->p_buffers = calloc( 1, sizeof( *p_sys->p_buffers ) );
-    if( !p_sys->p_buffers )
-        return VLC_EGENERIC;
+    if( unlikely(p_sys->p_buffers == NULL) )
+        return -1;
 
     p_sys->p_buffers[0].length = i_buffer_size;
     p_sys->p_buffers[0].start = malloc( i_buffer_size );
     if( !p_sys->p_buffers[0].start )
-        return VLC_ENOMEM;
+        return -1;
 
-    return VLC_SUCCESS;
+    return 0;
 }
 
 /*****************************************************************************
@@ -1518,19 +1522,19 @@ static int InitMmap( vlc_object_t *p_demux, demux_sys_t *p_sys, int i_fd )
 
     if( v4l2_ioctl( i_fd, VIDIOC_REQBUFS, &req ) < 0 )
     {
-        msg_Err( p_demux, "device does not support mmap i/o" );
-        goto open_failed;
+        msg_Err( p_demux, "device does not support mmap I/O" );
+        return -1;
     }
 
     if( req.count < 2 )
     {
-        msg_Err( p_demux, "Insufficient buffer memory" );
-        goto open_failed;
+        msg_Err( p_demux, "insufficient buffers" );
+        return -1;
     }
 
     p_sys->p_buffers = calloc( req.count, sizeof( *p_sys->p_buffers ) );
-    if( !p_sys->p_buffers )
-        goto open_failed;
+    if( unlikely(!p_sys->p_buffers) )
+        return -1;
 
     for( p_sys->i_nbuffers = 0; p_sys->i_nbuffers < req.count; ++p_sys->i_nbuffers )
     {
@@ -1543,8 +1547,8 @@ static int InitMmap( vlc_object_t *p_demux, demux_sys_t *p_sys, int i_fd )
 
         if( v4l2_ioctl( i_fd, VIDIOC_QUERYBUF, &buf ) < 0 )
         {
-            msg_Err( p_demux, "VIDIOC_QUERYBUF" );
-            goto open_failed;
+            msg_Err( p_demux, "VIDIOC_QUERYBUF: %m" );
+            return -1;
         }
 
         p_sys->p_buffers[p_sys->i_nbuffers].length = buf.length;
@@ -1553,16 +1557,12 @@ static int InitMmap( vlc_object_t *p_demux, demux_sys_t *p_sys, int i_fd )
 
         if( p_sys->p_buffers[p_sys->i_nbuffers].start == MAP_FAILED )
         {
-            msg_Err( p_demux, "mmap failed (%m)" );
-            goto open_failed;
+            msg_Err( p_demux, "mmap failed: %m" );
+            return -1;
         }
     }
 
-    return VLC_SUCCESS;
-
-open_failed:
-    return VLC_EGENERIC;
-
+    return 0;
 }
 
 /*****************************************************************************
@@ -1584,27 +1584,22 @@ static int InitUserP( vlc_object_t *p_demux, demux_sys_t *p_sys, int i_fd, unsig
     if( v4l2_ioctl( i_fd, VIDIOC_REQBUFS, &req ) < 0 )
     {
         msg_Err( p_demux, "device does not support user pointer i/o" );
-        return VLC_EGENERIC;
+        return -1;
     }
 
     p_sys->p_buffers = calloc( 4, sizeof( *p_sys->p_buffers ) );
     if( !p_sys->p_buffers )
-        goto open_failed;
+        return -1;
 
     for( p_sys->i_nbuffers = 0; p_sys->i_nbuffers < 4; ++p_sys->i_nbuffers )
     {
         p_sys->p_buffers[p_sys->i_nbuffers].length = i_buffer_size;
         if( posix_memalign( &p_sys->p_buffers[p_sys->i_nbuffers].start,
                 /* boundary */ i_page_size, i_buffer_size ) )
-            goto open_failed;
+            return -1;
     }
 
-    return VLC_SUCCESS;
-
-open_failed:
-    free( p_sys->p_buffers );
-    return VLC_EGENERIC;
-
+    return 0;
 }
 
 /*****************************************************************************
@@ -1818,7 +1813,7 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
     int i_fd = vlc_open( psz_device, O_RDWR );
     if( i_fd == -1 )
     {
-        msg_Err( p_obj, "cannot open device %s (%m)", psz_device );
+        msg_Err( p_obj, "cannot open device %s: %m", psz_device );
         return -1;
     }
 
@@ -1842,34 +1837,27 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
 
     if( p_sys->i_selected_standard_id != V4L2_STD_UNKNOWN )
     {
-        if( v4l2_ioctl( i_fd, VIDIOC_S_STD, &p_sys->i_selected_standard_id ) < 0 )
+        v4l2_std_id std = p_sys->i_selected_standard_id;
+        if( v4l2_ioctl( i_fd, VIDIOC_S_STD, &std ) < 0
+         || v4l2_ioctl( i_fd, VIDIOC_G_STD, &std ) < 0 )
         {
-            msg_Err( p_obj, "cannot set standard (%m)" );
-            goto open_failed;
+            msg_Err( p_obj, "cannot set standard 0x%"PRIx64": %m", std );
+            goto error;
         }
-        if( v4l2_ioctl( i_fd, VIDIOC_G_STD, &p_sys->i_selected_standard_id ) < 0 )
-        {
-            msg_Err( p_obj, "cannot get standard (%m). This should never happen!" );
-            goto open_failed;
-        }
-        msg_Dbg( p_obj, "Set standard to (0x%"PRIx64"):", (int64_t)p_sys->i_selected_standard_id );
-        for(unsigned i_standard = 0; i_standard<p_sys->i_standard; i_standard++)
-        {
-            if( p_sys->p_standards[i_standard].id & p_sys->i_selected_standard_id )
-            {
-                msg_Dbg( p_obj, "  %s",
-                        p_sys->p_standards[i_standard].name );
-            }
-        }
+        msg_Dbg( p_obj, "standard set to 0x%"PRIx64":", std );
+        p_sys->i_selected_standard_id = std;
+        for( unsigned i = 0; i < p_sys->i_standard; i++)
+            if( p_sys->p_standards[i].id & std )
+                msg_Dbg( p_obj, "  %s", p_sys->p_standards[i].name );
     }
 
     /* Tune the tuner */
     if( p_sys->i_frequency >= 0 )
     {
-        if( p_sys->i_cur_tuner < 0 || (unsigned)p_sys->i_cur_tuner >= p_sys->i_tuner )
+        if( p_sys->i_cur_tuner >= p_sys->i_tuner )
         {
-            msg_Err( p_obj, "invalid tuner %d.", p_sys->i_cur_tuner );
-            goto open_failed;
+            msg_Err( p_obj, "invalid tuner %"PRIu32, p_sys->i_cur_tuner );
+            goto error;
         }
         struct v4l2_frequency frequency;
         memset( &frequency, 0, sizeof( frequency ) );
@@ -1878,19 +1866,19 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
         frequency.frequency = p_sys->i_frequency / 62.5;
         if( v4l2_ioctl( i_fd, VIDIOC_S_FREQUENCY, &frequency ) < 0 )
         {
-            msg_Err( p_obj, "cannot set tuner frequency (%m)" );
-            goto open_failed;
+            msg_Err( p_obj, "cannot set tuner frequency: %m" );
+            goto error;
         }
-        msg_Dbg( p_obj, "Tuner frequency set" );
+        msg_Dbg( p_obj, "tuner frequency set" );
     }
 
     /* Set the tuner's audio mode */
     if( p_sys->i_audio_mode >= 0 )
     {
-        if( p_sys->i_cur_tuner < 0 || (unsigned)p_sys->i_cur_tuner >= p_sys->i_tuner )
+        if( p_sys->i_cur_tuner >= p_sys->i_tuner )
         {
-            msg_Err( p_obj, "invalid tuner %d.", p_sys->i_cur_tuner );
-            goto open_failed;
+            msg_Err( p_obj, "invalid tuner %"PRIu32, p_sys->i_cur_tuner );
+            goto error;
         }
         struct v4l2_tuner tuner;
         memset( &tuner, 0, sizeof( tuner ) );
@@ -1898,43 +1886,46 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
         tuner.audmode = p_sys->i_audio_mode;
         if( v4l2_ioctl( i_fd, VIDIOC_S_TUNER, &tuner ) < 0 )
         {
-            msg_Err( p_obj, "cannot set tuner audio mode (%m)" );
-            goto open_failed;
+            msg_Err( p_obj, "cannot set tuner audio mode: %m" );
+            goto error;
         }
-        msg_Dbg( p_obj, "Tuner audio mode set" );
+        msg_Dbg( p_obj, "tuner audio mode set" );
     }
 
     /* Select input */
 
     if( p_sys->i_selected_input >= p_sys->i_input )
     {
-        msg_Warn( p_obj, "invalid input. Using the default one" );
+        msg_Warn( p_obj, "invalid input: using default instead" );
         p_sys->i_selected_input = 0;
     }
 
     if( v4l2_ioctl( i_fd, VIDIOC_S_INPUT, &p_sys->i_selected_input ) < 0 )
     {
-        msg_Err( p_obj, "cannot set input (%m)" );
-        goto open_failed;
+        msg_Err( p_obj, "cannot set input %u: %m", p_sys->i_selected_input );
+        goto error;
     }
+    msg_Dbg( p_obj, "input set to %u", p_sys->i_selected_input );
 
     /* Set audio input */
 
     if( p_sys->i_audio > 0 )
     {
-        if( p_sys->i_selected_audio_input < 0
-         || (unsigned)p_sys->i_selected_audio_input >= p_sys->i_audio )
+        if( p_sys->i_selected_audio_input >= p_sys->i_audio )
         {
-            msg_Warn( p_obj, "invalid audio input. Using the default one" );
+            msg_Warn( p_obj, "invalid audio input: using default instead" );
             p_sys->i_selected_audio_input = 0;
         }
 
-        if( v4l2_ioctl( i_fd, VIDIOC_S_AUDIO, &p_sys->p_audios[p_sys->i_selected_audio_input] ) < 0 )
+        if( v4l2_ioctl( i_fd, VIDIOC_S_AUDIO,
+                        &p_sys->p_audios[p_sys->i_selected_audio_input] ) < 0 )
         {
-            msg_Err( p_obj, "cannot set audio input (%m)" );
-            goto open_failed;
+            msg_Err( p_obj, "cannot set audio input %u: %m",
+                     p_sys->i_selected_audio_input );
+            goto error;
         }
-        msg_Dbg( p_obj, "Audio input set to %d", p_sys->i_selected_audio_input );
+        msg_Dbg( p_obj, "audio input set to %u",
+                 p_sys->i_selected_audio_input );
     }
 
 
@@ -1951,27 +1942,27 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
             if( !(p_sys->dev_cap.capabilities & V4L2_CAP_READWRITE) )
             {
                 msg_Err( p_obj, "device does not support read i/o" );
-                goto open_failed;
+                goto error;
             }
-            msg_Dbg( p_obj, "using read i/o" );
+            msg_Dbg( p_obj, "using read I/O" );
             break;
 
         case IO_METHOD_MMAP:
         case IO_METHOD_USERPTR:
             if( !(p_sys->dev_cap.capabilities & V4L2_CAP_STREAMING) )
             {
-                msg_Err( p_obj, "device does not support streaming i/o" );
-                goto open_failed;
+                msg_Err( p_obj, "device does not support streaming I/O" );
+                goto error;
             }
             if( p_sys->io == IO_METHOD_MMAP )
-                msg_Dbg( p_obj, "using streaming i/o (mmap)" );
+                msg_Dbg( p_obj, "using streaming I/O (mmap)" );
             else
-                msg_Dbg( p_obj, "using streaming i/o (userptr)" );
+                msg_Dbg( p_obj, "using streaming I/O (userptr)" );
             break;
 
         default:
-            msg_Err( p_obj, "io method not supported" );
-            goto open_failed;
+            msg_Err( p_obj, "I/O method not supported" );
+            goto error;
     }
 
     /* Reset Cropping */
@@ -2007,8 +1998,8 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
         /* Use current width and height settings */
         if( v4l2_ioctl( i_fd, VIDIOC_G_FMT, &fmt ) < 0 )
         {
-            msg_Err( p_obj, "Cannot get default width and height." );
-            goto open_failed;
+            msg_Err( p_obj, "cannot get default width and height: %m" );
+            goto error;
         }
 
         msg_Dbg( p_obj, "found default width and height of %ux%u",
@@ -2016,13 +2007,14 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
 
         if( p_sys->i_width < 0 || p_sys->i_height < 0 )
         {
-            msg_Dbg( p_obj, "will try to find optimal width and height." );
+            msg_Dbg( p_obj, "will try to find optimal width and height" );
         }
     }
     else
     {
         /* Use user specified width and height */
-        msg_Dbg( p_obj, "trying specified size %dx%d", p_sys->i_width, p_sys->i_height );
+        msg_Dbg( p_obj, "trying specified size %dx%d",
+                 p_sys->i_width, p_sys->i_height );
         fmt.fmt.pix.width = p_sys->i_width;
         fmt.fmt.pix.height = p_sys->i_height;
     }
@@ -2091,7 +2083,7 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
             if( i == ARRAY_SIZE( p_chroma_fallbacks ) )
             {
                 msg_Warn( p_demux, "Could not select any of the default chromas; attempting to open as MPEG encoder card (access)" );
-                goto open_failed;
+                goto error;
             }
         }
 
@@ -2117,7 +2109,7 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
                 {
                     msg_Err( p_obj, "Cannot set size to optimal dimensions "
                                     "%ux%u", i_width, i_height );
-                    goto open_failed;
+                    goto error;
                 }
             }
             else
@@ -2252,21 +2244,21 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
     switch( p_sys->io )
     {
     case IO_METHOD_READ:
-        if( b_demux )
-            if( InitRead( p_obj, p_sys, fmt.fmt.pix.sizeimage ) != VLC_SUCCESS ) goto open_failed;
+        if( b_demux && InitRead( p_obj, p_sys, fmt.fmt.pix.sizeimage ) )
+            goto error;
         break;
 
     case IO_METHOD_MMAP:
-        if( InitMmap( p_obj, p_sys, i_fd ) != VLC_SUCCESS ) goto open_failed;
+        if( InitMmap( p_obj, p_sys, i_fd ) )
+            goto error;
         break;
 
     case IO_METHOD_USERPTR:
-        if( InitUserP( p_obj, p_sys, i_fd, fmt.fmt.pix.sizeimage ) != VLC_SUCCESS ) goto open_failed;
+        if( InitUserP( p_obj, p_sys, i_fd, fmt.fmt.pix.sizeimage ) )
+            goto error;
         break;
-
     default:
-        goto open_failed;
-        break;
+        assert(0);
     }
 
     if( b_demux )
@@ -2310,7 +2302,7 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
             if( v4l2_ioctl( i_fd, VIDIOC_QBUF, &buf ) < 0 )
             {
                 msg_Err( p_obj, "VIDIOC_QBUF failed" );
-                goto open_failed;
+                goto error;
             }
         }
 
@@ -2318,7 +2310,7 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
         if( v4l2_ioctl( i_fd, VIDIOC_STREAMON, &buf_type ) < 0 )
         {
             msg_Err( p_obj, "VIDIOC_STREAMON failed" );
-            goto open_failed;
+            goto error;
         }
 
         break;
@@ -2338,7 +2330,7 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
             if( v4l2_ioctl( i_fd, VIDIOC_QBUF, &buf ) < 0 )
             {
                 msg_Err( p_obj, "VIDIOC_QBUF failed" );
-                goto open_failed;
+                goto error;
             }
         }
 
@@ -2346,14 +2338,11 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
         if( v4l2_ioctl( i_fd, VIDIOC_STREAMON, &buf_type ) < 0 )
         {
             msg_Err( p_obj, "VIDIOC_STREAMON failed" );
-            goto open_failed;
+            goto error;
         }
-
         break;
-
     default:
-        goto open_failed;
-        break;
+        assert(0);
     }
 
     /* report fps */
@@ -2364,7 +2353,7 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
 
     return i_fd;
 
-open_failed:
+error:
     v4l2_close( i_fd );
     return -1;
 }
@@ -2402,8 +2391,8 @@ static bool ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
 
     if( v4l2_ioctl( i_fd, VIDIOC_QUERYCAP, &p_sys->dev_cap ) < 0 )
     {
-        msg_Err( p_obj, "cannot get video capabilities (%m)" );
-        goto open_failed;
+        msg_Err( p_obj, "cannot get video capabilities: %m" );
+        goto error;
     }
 
     msg_Dbg( p_obj, "V4L2 device: %s using driver: %s (version: %u.%u.%u) on %s",
@@ -2472,7 +2461,7 @@ static bool ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
 
         free( p_sys->p_inputs );
         p_sys->p_inputs = calloc( 1, p_sys->i_input * sizeof( struct v4l2_input ) );
-        if( !p_sys->p_inputs ) goto open_failed;
+        if( !p_sys->p_inputs ) goto error;
 
         for( unsigned i_index = 0; i_index < p_sys->i_input; i_index++ )
         {
@@ -2480,8 +2469,8 @@ static bool ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
 
             if( v4l2_ioctl( i_fd, VIDIOC_ENUMINPUT, &p_sys->p_inputs[i_index] ) )
             {
-                msg_Err( p_obj, "cannot get video input characteristics (%m)" );
-                goto open_failed;
+                msg_Err( p_obj, "cannot get video input characteristics: %m" );
+                goto error;
             }
             msg_Dbg( p_obj, "video input %u (%s) has type: %s %c",
                                 i_index,
@@ -2510,7 +2499,7 @@ static bool ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
 
         free( p_sys->p_standards );
         p_sys->p_standards = calloc( 1, p_sys->i_standard * sizeof( struct v4l2_standard ) );
-        if( !p_sys->p_standards ) goto open_failed;
+        if( !p_sys->p_standards ) goto error;
 
         for( unsigned i_standard = 0; i_standard < p_sys->i_standard; i_standard++ )
         {
@@ -2518,8 +2507,8 @@ static bool ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
 
             if( v4l2_ioctl( i_fd, VIDIOC_ENUMSTD, &p_sys->p_standards[i_standard] ) )
             {
-                msg_Err( p_obj, "cannot get video input standards (%m)" );
-                goto open_failed;
+                msg_Err( p_obj, "cannot get video input standards: %m" );
+                goto error;
             }
             msg_Dbg( p_obj, "video standard %u is: %s %c",
                                 i_standard,
@@ -2542,8 +2531,8 @@ static bool ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
         {
             if( v4l2_ioctl( i_fd, VIDIOC_G_AUDIO, &p_sys->p_audios[ p_sys->i_audio] ) < 0 )
             {
-                msg_Err( p_obj, "cannot get audio input characteristics (%m)" );
-                goto open_failed;
+                msg_Err( p_obj, "cannot get audio input characteristics: %m" );
+                goto error;
             }
 
             msg_Dbg( p_obj, "audio input %u (%s) is %s %s %c",
@@ -2578,7 +2567,7 @@ static bool ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
 
         free( p_sys->p_tuners );
         p_sys->p_tuners = calloc( 1, p_sys->i_tuner * sizeof( struct v4l2_tuner ) );
-        if( !p_sys->p_tuners ) goto open_failed;
+        if( !p_sys->p_tuners ) goto error;
 
         for( unsigned i_index = 0; i_index < p_sys->i_tuner; i_index++ )
         {
@@ -2586,8 +2575,8 @@ static bool ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
 
             if( v4l2_ioctl( i_fd, VIDIOC_G_TUNER, &p_sys->p_tuners[i_index] ) )
             {
-                msg_Err( p_obj, "cannot get tuner characteristics (%m)" );
-                goto open_failed;
+                msg_Err( p_obj, "cannot get tuner characteristics: %m" );
+                goto error;
             }
             msg_Dbg( p_obj, "tuner %u (%s) has type: %s, "
                               "frequency range: %.1f %s -> %.1f %s",
@@ -2609,8 +2598,8 @@ static bool ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
             memset( &frequency, 0, sizeof( frequency ) );
             if( v4l2_ioctl( i_fd, VIDIOC_G_FREQUENCY, &frequency ) < 0 )
             {
-                msg_Err( p_obj, "cannot get tuner frequency (%m)" );
-                goto open_failed;
+                msg_Err( p_obj, "cannot get tuner frequency: %m" );
+                goto error;
             }
             msg_Dbg( p_obj, "tuner %u (%s) frequency: %.1f %s",
                      i_index,
@@ -2652,8 +2641,8 @@ static bool ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
 
             if( v4l2_ioctl( i_fd, VIDIOC_ENUM_FMT, &p_sys->p_codecs[i_index] ) < 0 )
             {
-                msg_Err( p_obj, "cannot get codec description (%m)" );
-                goto open_failed;
+                msg_Err( p_obj, "cannot get codec description: %m" );
+                goto error;
             }
 
             /* only print if vlc supports the format */
@@ -2731,7 +2720,7 @@ static bool ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
     v4l2_close( i_fd );
     return true;
 
-open_failed:
+error:
     v4l2_close( i_fd );
     return false;
 
