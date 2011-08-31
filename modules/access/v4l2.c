@@ -1827,7 +1827,7 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
     if( p_sys->b_libv4l2 )
     {
         int libv4l2_fd;
-        libv4l2_fd = v4l2_fd_open( i_fd, V4L2_ENABLE_ENUM_FMT_EMULATION );
+        libv4l2_fd = v4l2_fd_open( i_fd, 0 );
         if( libv4l2_fd != -1 )
             i_fd = libv4l2_fd;
     }
@@ -2381,7 +2381,7 @@ static bool ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
     if( p_sys->b_libv4l2 )
     {
         int libv4l2_fd;
-        libv4l2_fd = v4l2_fd_open( i_fd, V4L2_ENABLE_ENUM_FMT_EMULATION );
+        libv4l2_fd = v4l2_fd_open( i_fd, 0 );
         if( libv4l2_fd != -1 )
             i_fd = libv4l2_fd;
     }
