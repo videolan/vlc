@@ -224,7 +224,7 @@ static void* RunInterface( void *p_this )
 }
 
 #if defined( __APPLE__ )
-#include "control/libvlc_internal.h" /* libvlc_InternalWait */
+#include "../lib/libvlc_internal.h" /* libvlc_InternalWait */
 /**
  * MonitorLibVLCDeath: Used when b_should_run_on_first_thread is set.
  *
