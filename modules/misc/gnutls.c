@@ -396,103 +396,57 @@ gnutls_SessionPrioritize (vlc_object_t *obj, gnutls_session_t session)
     return val;
 }
 
-
-static int
-gnutls_Addx509File( vlc_object_t *p_this,
-                    gnutls_certificate_credentials_t cred,
-                    const char *psz_path, bool b_priv );
-
-static int
-gnutls_Addx509Directory( vlc_object_t *p_this,
-                         gnutls_certificate_credentials_t cred,
-                         const char *psz_dirname,
-                         bool b_priv )
+#ifndef WIN32
+/**
+ * Loads x509 credentials from a file descriptor (directory or regular file)
+ * and closes the descriptor.
+ */
+static void gnutls_Addx509FD (vlc_object_t *obj,
+                              gnutls_certificate_credentials_t cred,
+                              int fd, bool priv, unsigned recursion)
 {
-    DIR* dir;
-
-    if( *psz_dirname == '\0' )
-        psz_dirname = ".";
-
-    dir = vlc_opendir( psz_dirname );
-    if( dir == NULL )
+    DIR *dir = fdopendir (fd);
+    if (dir != NULL)
     {
-        if (errno != ENOENT)
+        if (recursion == 0)
+            goto skipdir;
+        recursion--;
+
+        for (;;)
         {
-            msg_Err (p_this, "cannot open directory (%s): %m", psz_dirname);
-            return VLC_EGENERIC;
+            char *ent = vlc_readdir (dir);
+            if (ent == NULL)
+                break;
+
+            if ((strcmp (ent, ".") == 0) || (strcmp (ent, "..") == 0))
+            {
+                free (ent);
+                continue;
+            }
+
+            int nfd = vlc_openat (fd, ent, O_RDONLY);
+            if (nfd != -1)
+            {
+                msg_Dbg (obj, "loading x509 credentials from %s...", ent);
+                gnutls_Addx509FD (obj, cred, nfd, priv, recursion);
+            }
+            else
+                msg_Dbg (obj, "cannot access x509 credentials in %s", ent);
+            free (ent);
         }
-
-        msg_Dbg (p_this, "creating empty certificate directory: %s",
-                 psz_dirname);
-        vlc_mkdir (psz_dirname, b_priv ? 0700 : 0755);
-        return VLC_SUCCESS;
+    skipdir:
+        closedir (dir);
+        return;
     }
-#ifdef S_ISLNK
-    else
-    {
-        struct stat st1, st2;
-        int fd = dirfd( dir );
-
-        /*
-         * Gets stats for the directory path, checks that it is not a
-         * symbolic link (to avoid possibly infinite recursion), and verifies
-         * that the inode is still the same, to avoid TOCTOU race condition.
-         */
-        if( ( fd == -1)
-         || fstat( fd, &st1 ) || vlc_lstat( psz_dirname, &st2 )
-         || S_ISLNK( st2.st_mode ) || ( st1.st_ino != st2.st_ino ) )
-        {
-            closedir( dir );
-            return VLC_EGENERIC;
-        }
-    }
-#endif
-
-    for (;;)
-    {
-        char *ent = vlc_readdir (dir);
-        if (ent == NULL)
-            break;
-
-        if ((strcmp (ent, ".") == 0) || (strcmp (ent, "..") == 0))
-        {
-            free( ent );
-            continue;
-        }
-
-        char path[strlen (psz_dirname) + strlen (ent) + 2];
-        sprintf (path, "%s"DIR_SEP"%s", psz_dirname, ent);
-        free (ent);
-
-        gnutls_Addx509File( p_this, cred, path, b_priv );
-    }
-
-    closedir( dir );
-    return VLC_SUCCESS;
-}
-
-
-static int
-gnutls_Addx509File( vlc_object_t *p_this,
-                    gnutls_certificate_credentials cred,
-                    const char *psz_path, bool b_priv )
-{
-    struct stat st;
-
-    int fd = vlc_open (psz_path, O_RDONLY);
-    if (fd == -1)
-        goto error;
 
     block_t *block = block_File (fd);
     if (block != NULL)
     {
-        close (fd);
-
         gnutls_datum data = {
             .data = block->p_buffer,
             .size = block->i_buffer,
         };
-        int res = b_priv
+        int res = priv
             ? gnutls_certificate_set_x509_key_mem (cred, &data, &data,
                                                    GNUTLS_X509_FMT_PEM)
             : gnutls_certificate_set_x509_trust_mem (cred, &data,
@@ -500,32 +454,47 @@ gnutls_Addx509File( vlc_object_t *p_this,
         block_Release (block);
 
         if (res < 0)
-        {
-            msg_Warn (p_this, "cannot add x509 credentials (%s): %s",
-                      psz_path, gnutls_strerror (res));
-            return VLC_EGENERIC;
-        }
-        msg_Dbg (p_this, "added %d %s(s) from %s", res,
-                 b_priv ? "key" : "certificate", psz_path);
-        return VLC_SUCCESS;
+            msg_Warn (obj, "cannot add x509 credentials: %s",
+                      gnutls_strerror (res));
+        else
+            msg_Dbg (obj, "added %d %s(s)", res, priv ? "key" : "certificate");
     }
-
-    if (!fstat (fd, &st) && S_ISDIR (st.st_mode))
-    {
-        close (fd);
-        msg_Dbg (p_this, "looking recursively for x509 credentials in %s",
-                 psz_path);
-        return gnutls_Addx509Directory (p_this, cred, psz_path, b_priv);
-    }
-
-error:
-    msg_Warn (p_this, "cannot add x509 credentials (%s): %m", psz_path);
-    if (fd != -1)
-        close (fd);
-    return VLC_EGENERIC;
+    else
+        msg_Warn (obj, "cannot read x509 credentials: %m");
+    close (fd);
 }
 
-#ifdef WIN32
+static void gnutls_Addx509Directory (vlc_object_t *obj,
+                                     gnutls_certificate_credentials cred,
+                                     const char *path, bool priv)
+{
+    msg_Dbg (obj, "browsing x509 credentials in %s...", path);
+    int fd = vlc_open (path, O_RDONLY|O_DIRECTORY);
+    if (fd == -1)
+    {
+        msg_Warn (obj, "cannot access x509 in %s: %m", path);
+        return;
+    }
+
+    gnutls_Addx509FD (obj, cred, fd, priv, 5);
+}
+
+static void gnutls_Addx509File (vlc_object_t *obj,
+                                gnutls_certificate_credentials cred,
+                                const char *path, bool priv)
+{
+    msg_Dbg (obj, "loading x509 credentials from %s...", path);
+
+    int fd = vlc_open (path, O_RDONLY);
+    if (fd == -1)
+    {
+        msg_Warn (obj, "cannot access x509 in %s: %m", path);
+        return;
+    }
+
+    gnutls_Addx509FD (obj, cred, fd, priv, 0);
+}
+#else /* WIN32 */
 static int
 gnutls_loadOSCAList (vlc_object_t *p_this,
                      gnutls_certificate_credentials cred)
@@ -555,7 +524,7 @@ gnutls_loadOSCAList (vlc_object_t *p_this,
     }
     return VLC_SUCCESS;
 }
-#endif
+#endif /* WIN32 */
 
 /**
  * Initializes a client-side TLS session.
@@ -586,6 +555,7 @@ static int OpenClient (vlc_tls_t *session, int fd, const char *hostname)
         goto error;
     }
 
+#ifndef WIN32
     char *userdir = config_GetUserDir (VLC_DATA_DIR);
     if (userdir != NULL)
     {
@@ -600,9 +570,6 @@ static int OpenClient (vlc_tls_t *session, int fd, const char *hostname)
         free (userdir);
     }
 
-#ifdef WIN32
-    gnutls_loadOSCAList (VLC_OBJECT(session), sys->x509_cred);
-#else
     const char *confdir = config_GetConfDir ();
     {
         char path[strlen (confdir)
@@ -610,6 +577,8 @@ static int OpenClient (vlc_tls_t *session, int fd, const char *hostname)
         sprintf (path, "%s/ssl/certs/ca-certificates.crt", confdir);
         gnutls_Addx509File (VLC_OBJECT(session), sys->x509_cred, path, false);
     }
+#else /* WIN32 */
+    gnutls_loadOSCAList (VLC_OBJECT(session), sys->x509_cred);
 #endif
     session->handshake = gnutls_HandshakeAndValidate;
     /*session->_handshake = gnutls_ContinueHandshake;*/
