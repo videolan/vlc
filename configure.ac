@@ -2127,6 +2127,21 @@ then
 fi
 
 dnl
+dnl Linux DVB
+dnl
+AC_CACHE_CHECK([for Linux DVB version 5], [ac_cv_linux_s2api], [
+  AC_PREPROC_IFELSE([AC_LANG_PROGRAM([
+[#include <linux/dvb/version.h>
+#if (DVB_API_VERSION < 5)
+EXPLODE
+#endif]])], [
+  ac_cv_linux_s2api=yes
+], [
+  ac_cv_linux_s2api=no
+])])
+AM_CONDITIONAL([HAVE_LINUX_DVB], [test "$ac_cv_linux_s2api" = no])
+
+dnl
 dnl  libdvbpsi check for ts mux/demux
 dnl
 have_dvbpsi="no"

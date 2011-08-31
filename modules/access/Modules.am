@@ -158,7 +158,7 @@ libdtv_plugin_la_CFLAGS = $(AM_CFLAGS)
 libdtv_plugin_la_LIBADD = $(AM_LIBADD)
 libdtv_plugin_la_DEPENDENCIES =
 
-if HAVE_LINUX
+if HAVE_LINUX_DVB
 libdtv_plugin_la_SOURCES += dtv/linux.c
 if HAVE_DVBPSI
 libdtv_plugin_la_SOURCES += dtv/en50221.c dtv/en50221.h
