@@ -239,6 +239,8 @@ unsigned int aout_BitsPerSample( vlc_fourcc_t i_format )
     {
     case VLC_CODEC_U8:
     case VLC_CODEC_S8:
+    case VLC_CODEC_ALAW:
+    case VLC_CODEC_MULAW:
         return 8;
 
     case VLC_CODEC_U16L:
