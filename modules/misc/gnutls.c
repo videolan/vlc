@@ -401,10 +401,6 @@ static int
 gnutls_Addx509File( vlc_object_t *p_this,
                     gnutls_certificate_credentials_t cred,
                     const char *psz_path, bool b_priv );
-#ifdef WIN32
-static int gnutls_loadOSCAList(vlc_object_t *p_this,
-                               gnutls_certificate_credentials_t cred);
-#endif
 
 static int
 gnutls_Addx509Directory( vlc_object_t *p_this,
