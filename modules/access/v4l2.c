@@ -581,47 +581,11 @@ struct demux_sys_t
     char *psz_set_ctrls;
 
 #ifdef HAVE_LIBV4L2
-    /* */
-    int (*pf_close)( int );
-    int (*pf_dup)( int );
-    int (*pf_ioctl)( int, unsigned long int, ... );
-    ssize_t (*pf_read)( int, void *, size_t );
-    void *(*pf_mmap)( void *, size_t, int, int, int, off_t );
-    int (*pf_munmap)( void *, size_t );
     bool b_libv4l2;
 #endif
 };
 
-#ifdef HAVE_LIBV4L2
-static void use_kernel_v4l2( demux_sys_t *p_sys )
-{
-    p_sys->pf_close = close;
-    p_sys->pf_dup = dup;
-    p_sys->pf_ioctl = ioctl;
-    p_sys->pf_read = read;
-    p_sys->pf_mmap = mmap;
-    p_sys->pf_munmap = munmap;
-    p_sys->b_libv4l2 = false;
-}
-
-static void use_libv4l2( demux_sys_t *p_sys )
-{
-    p_sys->pf_close = v4l2_close;
-    p_sys->pf_dup = v4l2_dup;
-    p_sys->pf_ioctl = v4l2_ioctl;
-    p_sys->pf_read = v4l2_read;
-    p_sys->pf_mmap = v4l2_mmap;
-    p_sys->pf_munmap = v4l2_munmap;
-    p_sys->b_libv4l2 = true;
-}
-
-#   define v4l2_close (p_sys->pf_close)
-#   define v4l2_dup (p_sys->pf_dup)
-#   define v4l2_ioctl (p_sys->pf_ioctl)
-#   define v4l2_read (p_sys->pf_read)
-#   define v4l2_mmap (p_sys->pf_mmap)
-#   define v4l2_munmap (p_sys->pf_munmap)
-#else
+#ifndef HAVE_LIBV4L2
 #   define v4l2_close close
 #   define v4l2_dup dup
 #   define v4l2_ioctl ioctl
@@ -680,13 +644,13 @@ static int DemuxOpen( vlc_object_t *p_this )
     if( !var_InheritBool( p_this, CFG_PREFIX "use-libv4l2" ) )
     {
         msg_Dbg( p_this, "Trying direct kernel v4l2" );
-        use_kernel_v4l2( p_sys );
+        p_sys->b_libv4l2 = false;
         if( FindMainDevice( p_this, p_sys, true ) == VLC_SUCCESS)
             return VLC_SUCCESS;
     }
 
     msg_Dbg( p_this, "Trying libv4l2 wrapper" );
-    use_libv4l2( p_sys );
+    p_sys->b_libv4l2 = true;
 #endif
     if( FindMainDevice( p_this, p_sys, true ) == VLC_SUCCESS)
         return VLC_SUCCESS;
@@ -1129,7 +1093,7 @@ static int AccessOpen( vlc_object_t * p_this )
     if( !var_InheritBool( p_this, CFG_PREFIX "use-libv4l2" ) )
     {
         msg_Dbg( p_this, "Trying direct kernel v4l2" );
-        use_kernel_v4l2( p_sys );
+        p_sys->b_libv4l2 = false;
         if( FindMainDevice( p_this, p_sys, false ) == VLC_SUCCESS)
         {
             if( p_sys->io == IO_METHOD_READ )
@@ -1145,7 +1109,7 @@ static int AccessOpen( vlc_object_t * p_this )
     }
 
     msg_Dbg( p_this, "Trying libv4l2 wrapper" );
-    use_libv4l2( p_sys );
+    p_sys->b_libv4l2 = true;
 #endif
     if( FindMainDevice( p_this, p_sys, false ) == VLC_SUCCESS )
     {
