@@ -309,25 +309,34 @@ vlc_module_begin ()
     set_section( N_( "Video input" ), NULL )
     add_string( CFG_PREFIX "dev", "/dev/video0", DEVICE_TEXT, DEVICE_LONGTEXT,
                  false )
+        change_safe()
     add_string( CFG_PREFIX "standard", "",
                 STANDARD_TEXT, STANDARD_LONGTEXT, false )
         change_string_list( standards_vlc, standards_user, NULL )
+        change_safe()
     add_string( CFG_PREFIX "chroma", NULL, CHROMA_TEXT, CHROMA_LONGTEXT,
                 true )
+        change_safe()
     add_integer( CFG_PREFIX "input", 0, INPUT_TEXT, INPUT_LONGTEXT,
                 true )
         change_integer_range( 0, 0xFFFFFFFE )
+        change_safe()
     add_integer( CFG_PREFIX "audio-input", 0, AUDIO_INPUT_TEXT,
                  AUDIO_INPUT_LONGTEXT, true )
         change_integer_range( 0, 0xFFFFFFFE )
+        change_safe()
     add_obsolete_integer( CFG_PREFIX "io" ) /* since 1.2.0 */
     add_integer( CFG_PREFIX "width", DEFAULT_WIDTH, WIDTH_TEXT,
                 WIDTH_LONGTEXT, true )
+        change_safe()
     add_integer( CFG_PREFIX "height", DEFAULT_HEIGHT, HEIGHT_TEXT,
                 HEIGHT_LONGTEXT, true )
+        change_safe()
     add_string( CFG_PREFIX "aspect-ratio", "4:3", ASPECT_TEXT,
               ASPECT_LONGTEXT, true )
+        change_safe()
     add_float( CFG_PREFIX "fps", 0, FPS_TEXT, FPS_LONGTEXT, true )
+        change_safe()
 #ifdef HAVE_LIBV4L2
     add_bool( CFG_PREFIX "use-libv4l2", false, LIBV4L2_TEXT, LIBV4L2_LONGTEXT, true );
 #endif
@@ -336,17 +345,21 @@ vlc_module_begin ()
     add_integer( CFG_PREFIX "tuner", 0, TUNER_TEXT, TUNER_LONGTEXT,
                  true )
         change_integer_range( 0, 0xFFFFFFFE )
+        change_safe()
     add_integer( CFG_PREFIX "tuner-frequency", -1, FREQUENCY_TEXT,
                  FREQUENCY_LONGTEXT, true )
+        change_safe()
     add_integer( CFG_PREFIX "tuner-audio-mode", -1, TUNER_AUDIO_MODE_TEXT,
                  TUNER_AUDIO_MODE_LONGTEXT, true )
         change_integer_list( i_tuner_audio_modes_list,
                              psz_tuner_audio_modes_list_text )
+        change_safe()
 
     set_section( N_( "Controls" ),
                  N_( "v4l2 driver controls, if supported by your v4l2 driver." ) )
     add_bool( CFG_PREFIX "controls-reset", false, CTRL_RESET_TEXT,
               CTRL_RESET_LONGTEXT, true )
+        change_safe()
     add_integer( CFG_PREFIX "brightness", -1, BRIGHTNESS_TEXT,
                  BRIGHTNESS_LONGTEXT, true )
     add_integer( CFG_PREFIX "contrast", -1, CONTRAST_TEXT,
@@ -395,6 +408,7 @@ vlc_module_begin ()
                 AUDIO_LOUDNESS_LONGTEXT, true )
     add_string( CFG_PREFIX "set-ctrls", NULL, S_CTRLS_TEXT,
               S_CTRLS_LONGTEXT, true )
+        change_safe()
 
     add_obsolete_string( CFG_PREFIX "adev" )
     add_obsolete_integer( CFG_PREFIX "audio-method" )
