@@ -222,27 +222,61 @@ typedef enum {
     IO_METHOD_USERPTR,
 } io_method;
 
-static const int i_standards_list[] =
-    { V4L2_STD_UNKNOWN, V4L2_STD_SECAM, V4L2_STD_PAL, V4L2_STD_NTSC,
-      V4L2_STD_PAL_B, V4L2_STD_PAL_B1, V4L2_STD_PAL_G, V4L2_STD_PAL_H,
-      V4L2_STD_PAL_I, V4L2_STD_PAL_D, V4L2_STD_PAL_D1, V4L2_STD_PAL_K,
-      V4L2_STD_PAL_M, V4L2_STD_PAL_N, V4L2_STD_PAL_Nc, V4L2_STD_PAL_60,
-      V4L2_STD_NTSC_M, V4L2_STD_NTSC_M_JP, V4L2_STD_NTSC_443,
-      V4L2_STD_NTSC_M_KR,
-      V4L2_STD_SECAM_B, V4L2_STD_SECAM_D, V4L2_STD_SECAM_G,
-      V4L2_STD_SECAM_H, V4L2_STD_SECAM_K, V4L2_STD_SECAM_K1,
-      V4L2_STD_SECAM_L, V4L2_STD_SECAM_LC,
-      V4L2_STD_ATSC_8_VSB, V4L2_STD_ATSC_16_VSB,
-      };
-static const char *const psz_standards_list_text[] =
-    { N_("Default"), "SECAM", "PAL",  "NTSC",
-      "PAL_B", "PAL_B1", "PAL_G", "PAL_H", "PAL_I", "PAL_D",
-      "PAL_D1", "PAL_K", "PAL_M", "PAL_N", "PAL_Nc", "PAL_60",
-      "NTSC_M", "NTSC_M_JP", "NTSC_443", "NTSC_M_KR",
-      "SECAM_B", "SECAM_D", "SECAM_G", "SECAM_H", "SECAM_K",
-      "SECAM_K1", "SECAM_L", "SECAM_LC",
-      "ATSC_8_VSB", "ATSC_16_VSB"
-    };
+static const v4l2_std_id standards_v4l2[] = { V4L2_STD_UNKNOWN, V4L2_STD_ALL,
+    V4L2_STD_PAL,     V4L2_STD_PAL_BG,   V4L2_STD_PAL_DK,
+    V4L2_STD_NTSC,
+    V4L2_STD_SECAM,   V4L2_STD_SECAM_DK,
+    V4L2_STD_525_60,  V4L2_STD_625_50,
+    V4L2_STD_ATSC,
+
+    V4L2_STD_MN,      V4L2_STD_B,        V4L2_STD_GH,       V4L2_STD_DK,
+
+    V4L2_STD_PAL_B,   V4L2_STD_PAL_B1,   V4L2_STD_PAL_G,    V4L2_STD_PAL_H,
+    V4L2_STD_PAL_I,   V4L2_STD_PAL_D,    V4L2_STD_PAL_D1,   V4L2_STD_PAL_K,
+    V4L2_STD_PAL_M,   V4L2_STD_PAL_N,    V4L2_STD_PAL_Nc,   V4L2_STD_PAL_60,
+    V4L2_STD_NTSC_M,  V4L2_STD_NTSC_M_JP,V4L2_STD_NTSC_443, V4L2_STD_NTSC_M_KR,
+    V4L2_STD_SECAM_B, V4L2_STD_SECAM_D,  V4L2_STD_SECAM_G,  V4L2_STD_SECAM_H,
+    V4L2_STD_SECAM_K, V4L2_STD_SECAM_K1, V4L2_STD_SECAM_L,  V4L2_STD_SECAM_LC,
+    V4L2_STD_ATSC_8_VSB, V4L2_STD_ATSC_16_VSB,
+};
+static const char *const standards_vlc[] = { "", "ALL",
+    /* Pseudo standards */
+    "PAL", "PAL_BG", "PAL_DK",
+    "NTSC",
+    "SECAM", "SECAM_DK",
+    "525_60", "625_50",
+    "ATSC",
+
+    /* Areas (PAL/NTSC or PAL/SECAM) */
+    "MN", "B", "GH", "DK",
+
+    /* Individual standards */
+    "PAL_B",          "PAL_B1",          "PAL_G",           "PAL_H",
+    "PAL_I",          "PAL_D",           "PAL_D1",          "PAL_K",
+    "PAL_M",          "PAL_N",           "PAL_Nc",          "PAL_60",
+    "NTSC_M",         "NTSC_M_JP",       "NTSC_443",        "NTSC_M_KR",
+    "SECAM_B",        "SECAM_D",         "SECAM_G",         "SECAM_H",
+    "SECAM_K",        "SECAM_K1",        "SECAM_L",         "SECAM_LC",
+    "ATSC_8_VSB",     "ATSC_16_VSB",
+};
+static const char *const standards_user[] = { N_("Undefined"), N_("All"),
+    "PAL",            "PAL B/G",         "PAL D/K",
+    "NTSC",
+    "SECAM",          "SECAM D/K",
+    N_("525 lines / 60 Hz"), N_("625 lines / 50 Hz"),
+    "ATSC",
+
+    "PAL/NTSC M/N",
+    "PAL/SECAM B",    "PAL/SECAM G/H",   "PAL/SECAM D/K",
+
+    "PAL B",          "PAL B1",          "PAL G",           "PAL H",
+    "PAL I",          "PAL D",           "PAL D1",          "PAL K",
+    "PAL M",          "PAL N",           N_("PAL N Argentina"), "PAL 60",
+    "NTSC M",        N_("NTSC M Japan"), "NTSC 443",  N_("NTSC M South Korea"),
+    "SECAM B",        "SECAM D",         "SECAM G",         "SECAM H",
+    "SECAM K",        "SECAM K1",        "SECAM L",         "SECAM L/C",
+    "ATSC 8-VSB",     "ATSC 16-VSB",
+};
 
 static const int i_iomethod_list[] =
     { IO_METHOD_AUTO, IO_METHOD_READ, IO_METHOD_MMAP, IO_METHOD_USERPTR };
@@ -284,9 +318,9 @@ vlc_module_begin ()
     set_section( N_( "Video input" ), NULL )
     add_string( CFG_PREFIX "dev", "/dev/video0", DEVICE_TEXT, DEVICE_LONGTEXT,
                  false )
-    add_integer( CFG_PREFIX "standard", 0, STANDARD_TEXT,
-                 STANDARD_LONGTEXT, false )
-        change_integer_list( i_standards_list, psz_standards_list_text )
+    add_string( CFG_PREFIX "standard", "",
+                STANDARD_TEXT, STANDARD_LONGTEXT, false )
+        change_string_list( standards_vlc, standards_user, NULL )
     add_string( CFG_PREFIX "chroma", NULL, CHROMA_TEXT, CHROMA_LONGTEXT,
                 true )
     add_integer( CFG_PREFIX "input", 0, INPUT_TEXT, INPUT_LONGTEXT,
@@ -545,7 +579,7 @@ struct demux_sys_t
     struct v4l2_input *p_inputs;
     unsigned i_selected_input;
 
-    v4l2_std_id i_selected_standard_id;
+    char *psz_standard;
 
     uint32_t i_audio;
     /* V4L2 devices cannot have more than 32 audio inputs */
@@ -664,8 +698,6 @@ static void GetV4L2Params( demux_sys_t *p_sys, vlc_object_t *p_obj )
 {
     p_sys->psz_device = var_CreateGetNonEmptyString( p_obj, "v4l2-dev" );
 
-    p_sys->i_selected_standard_id =
-        var_CreateGetInteger( p_obj, "v4l2-standard" );
     p_sys->i_selected_input = var_CreateGetInteger( p_obj, "v4l2-input" );
     p_sys->i_selected_audio_input =
         var_CreateGetInteger( p_obj, "v4l2-audio-input" );
@@ -726,23 +758,16 @@ static void ParseMRL( demux_sys_t *p_sys, char *psz_path, vlc_object_t *p_obj )
 
             if( !strncmp( psz_parser, "standard=", strlen( "standard=" ) ) )
             {
-                psz_parser += strlen( "standard=" );
-                size_t i;
-                for( i = 0; i < ARRAY_SIZE(psz_standards_list_text); i++ )
-                {
-                    const char *psz_value = psz_standards_list_text[i];
-                    size_t i_len = strlen( psz_value );
-                    if( !strncasecmp( psz_parser, psz_value, i_len ) &&
-                        ( psz_parser[i_len] == ':' || psz_parser[i_len] == 0 ) )
-                    {
-                        p_sys->i_selected_standard_id = i_standards_list[i];
-                        psz_parser += i_len;
-                        break;
-                    }
-                }
+                int i_len;
 
-                if( i == ARRAY_SIZE(psz_standards_list_text) )
-                    p_sys->i_selected_standard_id = i_standards_list[strtol( psz_parser, &psz_parser, 0 )];
+                psz_parser += strlen( "standard=" );
+                if( strchr( psz_parser, ':' ) )
+                    i_len = strchr( psz_parser, ':' ) - psz_parser;
+                else
+                    i_len = strlen( psz_parser );
+
+                p_sys->psz_standard = strndup( psz_parser, i_len );
+                psz_parser += i_len;
             }
             else if( !strncmp( psz_parser, "chroma=", strlen( "chroma=" ) ) )
             {
@@ -1053,6 +1078,7 @@ static void CommonClose( vlc_object_t *p_this, demux_sys_t *p_sys )
     /* Close */
     if( p_sys->i_fd >= 0 ) v4l2_close( p_sys->i_fd );
     free( p_sys->psz_device );
+    free( p_sys->psz_standard );
     free( p_sys->p_inputs );
     free( p_sys->p_tuners );
     free( p_sys->p_codecs );
@@ -1778,9 +1804,26 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
 #endif
 
     /* Select standard */
-    if( p_sys->i_selected_standard_id != V4L2_STD_UNKNOWN )
+    bool bottom_first;
+    const char *stdname = p_sys->psz_standard;
+    if( stdname == NULL )
+        stdname = var_InheritString( p_obj, CFG_PREFIX"standard" );
+    if( stdname != NULL )
     {
-        v4l2_std_id std = p_sys->i_selected_standard_id;
+        v4l2_std_id std = strtoull( stdname, NULL, 0 );
+        if( std == 0 )
+        {
+            const size_t n = sizeof(standards_vlc) / sizeof(*standards_vlc);
+            assert( n == sizeof(standards_v4l2) / sizeof(*standards_v4l2) );
+            assert( n == sizeof(standards_user) / sizeof(*standards_user) );
+            for( size_t i = 0; i < n; i++ )
+                if( strcasecmp( stdname, standards_vlc[i] ) == 0 )
+                {
+                    std = standards_v4l2[i];
+                    break;
+                }
+        }
+
         if( v4l2_ioctl( i_fd, VIDIOC_S_STD, &std ) < 0
          || v4l2_ioctl( i_fd, VIDIOC_G_STD, &std ) < 0 )
         {
@@ -1788,8 +1831,10 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
             goto error;
         }
         msg_Dbg( p_obj, "standard set to 0x%"PRIx64":", std );
-        p_sys->i_selected_standard_id = std;
+        bottom_first = std == V4L2_STD_NTSC;
     }
+    else
+        bottom_first = false;
 
     /* Tune the tuner */
     if( p_sys->i_frequency >= 0 )
@@ -2080,7 +2125,7 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
             break;
         case V4L2_FIELD_INTERLACED:
             msg_Dbg( p_obj, "Interlacing setting: interleaved (bottom top if M/NTSC, top bottom otherwise)" );
-            if( p_sys->i_selected_standard_id == V4L2_STD_NTSC )
+            if( bottom_first )
                 p_sys->i_block_flags = BLOCK_FLAG_BOTTOM_FIELD_FIRST;
             else
                 p_sys->i_block_flags = BLOCK_FLAG_TOP_FIELD_FIRST;
