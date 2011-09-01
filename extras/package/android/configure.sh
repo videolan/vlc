@@ -17,9 +17,9 @@ LDFLAGS="-Wl,-Bdynamic,-dynamic-linker=/system/bin/linker -Wl,--no-undefined"
 
 if [ -z "$NO_NEON" ]; then
     CXX_TARGET="armeabi-v7a"
-    CFLAGS="$CFLAGS -mfpu=neon -mtune=cortex-a8 -ftree-vectorize -mvectorize-with-neon-quad"
+    CFLAGS="$CFLAGS -mfpu=neon -march=armv7-a -mtune=cortex-a8 -mfloat-abi=softfp -ftree-vectorize -mvectorize-with-neon-quad -funsafe-math-optimizations"
     LDFLAGS="$LDFLAGS -Wl,--fix-cortex-a8"
-    EXTRA_PARAMS=""
+    EXTRA_PARAMS=" --enable-neon"
 else
     CXX_TARGET="armeabi"
     CFLAGS="$CFLAGS -march=armv6j -mtune=arm1136j-s -msoft-float"
