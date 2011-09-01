@@ -1552,6 +1552,14 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
     }
 #endif
 
+    /* Select input */
+    if( v4l2_ioctl( i_fd, VIDIOC_S_INPUT, &p_sys->i_selected_input ) < 0 )
+    {
+        msg_Err( p_obj, "cannot set input %u: %m", p_sys->i_selected_input );
+        goto error;
+    }
+    msg_Dbg( p_obj, "input set to %u", p_sys->i_selected_input );
+
     /* Select standard */
     bool bottom_first;
     const char *stdname = p_sys->psz_standard;
@@ -1625,15 +1633,6 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
         }
         msg_Dbg( p_obj, "tuner audio mode set" );
     }
-
-    /* Select input */
-
-    if( v4l2_ioctl( i_fd, VIDIOC_S_INPUT, &p_sys->i_selected_input ) < 0 )
-    {
-        msg_Err( p_obj, "cannot set input %u: %m", p_sys->i_selected_input );
-        goto error;
-    }
-    msg_Dbg( p_obj, "input set to %u", p_sys->i_selected_input );
 
     /* Set audio input */
 
