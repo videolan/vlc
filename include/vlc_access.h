@@ -153,23 +153,29 @@ static inline void access_InitFields( access_t *p_a )
  */
 VLC_API input_thread_t * access_GetParentInput( access_t *p_access ) VLC_USED;
 
-#define ACCESS_SET_CALLBACKS( read, block, control, seek )              \
-    p_access->pf_read = read;                                           \
-    p_access->pf_block = block;                                         \
-    p_access->pf_control = control;                                     \
-    p_access->pf_seek = seek;
+#define ACCESS_SET_CALLBACKS( read, block, control, seek ) \
+    do { \
+        p_access->pf_read = (read); \
+        p_access->pf_block = (block); \
+        p_access->pf_control = (control); \
+        p_access->pf_seek = (seek); \
+    } while(0)
 
-#define STANDARD_READ_ACCESS_INIT                                       \
-    access_InitFields( p_access );                                      \
-    ACCESS_SET_CALLBACKS( Read, NULL, Control, Seek );                  \
-    p_sys = p_access->p_sys = calloc( 1, sizeof( access_sys_t ));       \
-    if( !p_sys ) return VLC_ENOMEM;
+#define STANDARD_READ_ACCESS_INIT \
+    do { \
+        access_InitFields( p_access ); \
+        ACCESS_SET_CALLBACKS( Read, NULL, Control, Seek ); \
+        p_sys = p_access->p_sys = calloc( 1, sizeof( access_sys_t ) ); \
+        if( !p_sys ) return VLC_ENOMEM;\
+    } while(0);
 
-#define STANDARD_BLOCK_ACCESS_INIT                                      \
-    access_InitFields( p_access );                                      \
-    ACCESS_SET_CALLBACKS( NULL, Block, Control, Seek );                 \
-    p_sys = p_access->p_sys = calloc( 1, sizeof( access_sys_t ) );      \
-    if( !p_sys ) return VLC_ENOMEM;
+#define STANDARD_BLOCK_ACCESS_INIT \
+    do { \
+        access_InitFields( p_access ); \
+        ACCESS_SET_CALLBACKS( NULL, Block, Control, Seek ); \
+        p_sys = p_access->p_sys = calloc( 1, sizeof( access_sys_t ) ); \
+        if( !p_sys ) return VLC_ENOMEM; \
+    } while(0);
 
 /**
  * @}
