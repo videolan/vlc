@@ -40,10 +40,8 @@
 #include "v4l2.h"
 #include <vlc_plugin.h>
 #include <vlc_access.h>
-#include <vlc_charset.h>
 #include <vlc_fs.h>
 #include <vlc_demux.h>
-#include <vlc_input.h>
 
 #include <math.h>
 #include <assert.h>
