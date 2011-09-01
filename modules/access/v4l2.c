@@ -446,8 +446,7 @@ static bool IsPixelFormatSupported( demux_t *p_demux,
                                           unsigned int i_pixelformat );
 
 static int OpenVideoDev( vlc_object_t *, demux_sys_t *, bool );
-static bool ProbeVideoDev( vlc_object_t *, demux_sys_t *,
-                                 const char *psz_device );
+static int ProbeVideoDev( vlc_object_t *, demux_sys_t *, int );
 
 static int ControlList( vlc_object_t *, int , bool, bool );
 static int Control( vlc_object_t *, int i_fd,
@@ -624,13 +623,7 @@ static int FindMainDevice( vlc_object_t *p_this, demux_sys_t *p_sys,
 {
     /* TODO: if using default device, loop through all /dev/video* until
      * one works */
-    msg_Dbg( p_this, "opening device '%s'", p_sys->psz_device );
-    if( ProbeVideoDev( p_this, p_sys, p_sys->psz_device ) )
-    {
-        msg_Dbg( p_this, "'%s' is a video device", p_sys->psz_device );
-        p_sys->i_fd = OpenVideoDev( p_this, p_sys, b_demux );
-    }
-
+    p_sys->i_fd = OpenVideoDev( p_this, p_sys, b_demux );
     if( p_sys->i_fd < 0 ) return VLC_EGENERIC;
     return VLC_SUCCESS;
 }
@@ -1529,6 +1522,8 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
     const char *psz_device = p_sys->psz_device;
     es_format_t es_fmt;
 
+    msg_Dbg( p_obj, "opening device '%s'", psz_device );
+
     int i_fd = vlc_open( psz_device, O_RDWR );
     if( i_fd == -1 )
     {
@@ -1551,6 +1546,9 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
             i_fd = libv4l2_fd;
     }
 #endif
+
+    if( ProbeVideoDev( p_obj, p_sys, i_fd ) )
+        goto error;
 
     /* Select input */
     if( v4l2_ioctl( i_fd, VIDIOC_S_INPUT, &p_sys->i_selected_input ) < 0 )
@@ -2054,39 +2052,15 @@ error:
 /*****************************************************************************
  * ProbeVideoDev: probe video for capabilities
  *****************************************************************************/
-static bool ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
-                                 const char *psz_device )
+static int ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, int i_fd )
 {
-    int i_fd = vlc_open( psz_device, O_RDWR );
-    if( i_fd == -1 )
-    {
-        msg_Err( p_obj, "cannot open video device %s: %m", psz_device );
-        return -1;
-    }
-
-#ifdef HAVE_LIBV4L2
-    /* Note the v4l2_xxx functions are designed so that if they get passed an
-       unknown fd, the will behave exactly as their regular xxx counterparts,
-       so if v4l2_fd_open fails, we continue as normal (missing the libv4l2
-       custom cam format to normal formats conversion). Chances are big we will
-       still fail then though, as normally v4l2_fd_open only fails if the
-       device is not a v4l2 device. */
-    if( p_sys->b_libv4l2 )
-    {
-        int libv4l2_fd;
-        libv4l2_fd = v4l2_fd_open( i_fd, 0 );
-        if( libv4l2_fd != -1 )
-            i_fd = libv4l2_fd;
-    }
-#endif
-
     /* Get device capabilites */
     struct v4l2_capability cap;
 
     if( v4l2_ioctl( i_fd, VIDIOC_QUERYCAP, &cap ) < 0 )
     {
         msg_Err( p_obj, "cannot get video capabilities: %m" );
-        goto error;
+        return -1;
     }
 
     msg_Dbg( p_obj, "device %s using driver %s (version %u.%u.%u) on %s",
@@ -2111,7 +2085,7 @@ static bool ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
     else
     {
         msg_Err( p_obj, "no supported I/O method" );
-        goto error;
+        return -1;
     }
 
     if( cap.capabilities & V4L2_CAP_RDS_CAPTURE )
@@ -2162,7 +2136,7 @@ static bool ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
             if( v4l2_ioctl( i_fd, VIDIOC_G_AUDIO, &p_sys->p_audios[ p_sys->i_audio] ) < 0 )
             {
                 msg_Err( p_obj, "cannot get audio input characteristics: %m" );
-                goto error;
+                return -1;
             }
 
             msg_Dbg( p_obj, "audio input %u (%s) is %s %s %c",
@@ -2197,7 +2171,7 @@ static bool ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
 
         free( p_sys->p_tuners );
         p_sys->p_tuners = calloc( 1, p_sys->i_tuner * sizeof( struct v4l2_tuner ) );
-        if( !p_sys->p_tuners ) goto error;
+        if( !p_sys->p_tuners ) return -1;
 
         for( unsigned i_index = 0; i_index < p_sys->i_tuner; i_index++ )
         {
@@ -2206,7 +2180,7 @@ static bool ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
             if( v4l2_ioctl( i_fd, VIDIOC_G_TUNER, &p_sys->p_tuners[i_index] ) )
             {
                 msg_Err( p_obj, "cannot get tuner characteristics: %m" );
-                goto error;
+                return -1;
             }
             msg_Dbg( p_obj, "tuner %u (%s) has type: %s, "
                               "frequency range: %.1f %s -> %.1f %s",
@@ -2229,7 +2203,7 @@ static bool ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
             if( v4l2_ioctl( i_fd, VIDIOC_G_FREQUENCY, &frequency ) < 0 )
             {
                 msg_Err( p_obj, "cannot get tuner frequency: %m" );
-                goto error;
+                return -1;
             }
             msg_Dbg( p_obj, "tuner %u (%s) frequency: %.1f %s",
                      i_index,
@@ -2272,7 +2246,7 @@ static bool ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
             if( v4l2_ioctl( i_fd, VIDIOC_ENUM_FMT, &p_sys->p_codecs[i_index] ) < 0 )
             {
                 msg_Err( p_obj, "cannot get codec description: %m" );
-                goto error;
+                return -1;
             }
 
             /* only print if vlc supports the format */
@@ -2347,13 +2321,7 @@ static bool ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
             }
         }
     }
-    v4l2_close( i_fd );
-    return true;
-
-error:
-    v4l2_close( i_fd );
-    return false;
-
+    return 0;
 }
 
 static void name2var( unsigned char *name )
