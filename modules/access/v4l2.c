@@ -93,9 +93,6 @@ static void AccessClose( vlc_object_t * );
 #define AUDIO_INPUT_TEXT N_( "Audio input" )
 #define AUDIO_INPUT_LONGTEXT N_( \
     "Audio input of the card to use (see debug)." )
-#define IOMETHOD_TEXT N_( "IO Method" )
-#define IOMETHOD_LONGTEXT N_( \
-    "IO Method (READ, MMAP, USERPTR)." )
 #define WIDTH_TEXT N_( "Width" )
 #define WIDTH_LONGTEXT N_( \
     "Force width (-1 for autodetect, 0 for driver default)." )
@@ -216,8 +213,7 @@ static void AccessClose( vlc_object_t * );
 #define ASPECT_LONGTEXT N_("Define input picture aspect-ratio to use. Default is 4:3" )
 
 typedef enum {
-    IO_METHOD_AUTO,
-    IO_METHOD_READ,
+    IO_METHOD_READ=1,
     IO_METHOD_MMAP,
     IO_METHOD_USERPTR,
 } io_method;
@@ -278,11 +274,6 @@ static const char *const standards_user[] = { N_("Undefined"), N_("All"),
     "ATSC 8-VSB",     "ATSC 16-VSB",
 };
 
-static const int i_iomethod_list[] =
-    { IO_METHOD_AUTO, IO_METHOD_READ, IO_METHOD_MMAP, IO_METHOD_USERPTR };
-static const char *const psz_iomethod_list_text[] =
-    { N_("AUTO"), N_("READ"), N_("MMAP"),  N_("USERPTR") };
-
 static const int i_tuner_audio_modes_list[] = {
       -1, V4L2_TUNER_MODE_MONO, V4L2_TUNER_MODE_STEREO,
       V4L2_TUNER_MODE_LANG1, V4L2_TUNER_MODE_LANG2,
@@ -329,9 +320,7 @@ vlc_module_begin ()
     add_integer( CFG_PREFIX "audio-input", 0, AUDIO_INPUT_TEXT,
                  AUDIO_INPUT_LONGTEXT, true )
         change_integer_range( 0, 0xFFFFFFFE )
-    add_integer( CFG_PREFIX "io", IO_METHOD_AUTO, IOMETHOD_TEXT,
-                 IOMETHOD_LONGTEXT, true )
-        change_integer_list( i_iomethod_list, psz_iomethod_list_text )
+    add_obsolete_integer( CFG_PREFIX "io" ) /* since 1.2.0 */
     add_integer( CFG_PREFIX "width", DEFAULT_WIDTH, WIDTH_TEXT,
                 WIDTH_LONGTEXT, true )
     add_integer( CFG_PREFIX "height", DEFAULT_HEIGHT, HEIGHT_TEXT,
@@ -573,8 +562,6 @@ struct demux_sys_t
     /* Video */
     io_method io;
 
-    struct v4l2_capability dev_cap;
-
     uint32_t i_input;
     struct v4l2_input *p_inputs;
     unsigned i_selected_input;
@@ -702,8 +689,6 @@ static void GetV4L2Params( demux_sys_t *p_sys, vlc_object_t *p_obj )
     p_sys->i_selected_audio_input =
         var_CreateGetInteger( p_obj, "v4l2-audio-input" );
 
-    p_sys->io = var_CreateGetInteger( p_obj, "v4l2-io" );
-
     p_sys->i_width = var_CreateGetInteger( p_obj, "v4l2-width" );
     p_sys->i_height = var_CreateGetInteger( p_obj, "v4l2-height" );
 
@@ -802,34 +787,6 @@ static void ParseMRL( demux_sys_t *p_sys, char *psz_path, vlc_object_t *p_obj )
             {
                 p_sys->f_fps = us_strtof( psz_parser + strlen( "fps=" ),
                                           &psz_parser );
-            }
-            else if( !strncmp( psz_parser, "io=", strlen( "io=" ) ) )
-            {
-                psz_parser += strlen( "io=" );
-                if( !strncmp( psz_parser, "read", strlen( "read" ) ) )
-                {
-                    p_sys->io = IO_METHOD_READ;
-                    psz_parser += strlen( "read" );
-                }
-                else if( !strncmp( psz_parser, "mmap", strlen( "mmap" ) ) )
-                {
-                    p_sys->io = IO_METHOD_MMAP;
-                    psz_parser += strlen( "mmap" );
-                }
-                else if( !strncmp( psz_parser, "userptr", strlen( "userptr" ) ) )
-                {
-                    p_sys->io = IO_METHOD_USERPTR;
-                    psz_parser += strlen( "userptr" );
-                }
-                else if( !strncmp( psz_parser, "auto", strlen( "auto" ) ) )
-                {
-                    p_sys->io = IO_METHOD_AUTO;
-                    psz_parser += strlen( "auto" );
-                }
-                else
-                {
-                    p_sys->io = strtol( psz_parser, &psz_parser, 0 );
-                }
             }
             else if( !strncmp( psz_parser, "width=",
                                strlen( "width=" ) ) )
@@ -1032,9 +989,6 @@ static void DemuxClose( vlc_object_t *p_this )
             }
 
             break;
-
-        default:
-            break;
         }
     }
 
@@ -1061,9 +1015,6 @@ static void DemuxClose( vlc_object_t *p_this )
             {
                free( p_sys->p_buffers[i].start );
             }
-            break;
-
-        default:
             break;
         }
         free( p_sys->p_buffers );
@@ -1441,9 +1392,6 @@ static block_t* GrabVideo( vlc_object_t *p_demux, demux_sys_t *p_sys )
         }
 
         break;
-
-    default:
-        return NULL;
     }
 
     /* Timestamp */
@@ -1920,36 +1868,6 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
                  b_demux );
     SetAvailControlsByString( p_obj, p_sys, i_fd );
 
-    /* Verify device support for the various IO methods */
-    switch( p_sys->io )
-    {
-        case IO_METHOD_READ:
-            if( !(p_sys->dev_cap.capabilities & V4L2_CAP_READWRITE) )
-            {
-                msg_Err( p_obj, "device does not support read i/o" );
-                goto error;
-            }
-            msg_Dbg( p_obj, "using read I/O" );
-            break;
-
-        case IO_METHOD_MMAP:
-        case IO_METHOD_USERPTR:
-            if( !(p_sys->dev_cap.capabilities & V4L2_CAP_STREAMING) )
-            {
-                msg_Err( p_obj, "device does not support streaming I/O" );
-                goto error;
-            }
-            if( p_sys->io == IO_METHOD_MMAP )
-                msg_Dbg( p_obj, "using streaming I/O (mmap)" );
-            else
-                msg_Dbg( p_obj, "using streaming I/O (userptr)" );
-            break;
-
-        default:
-            msg_Err( p_obj, "I/O method not supported" );
-            goto error;
-    }
-
     /* Reset Cropping */
     memset( &cropcap, 0, sizeof(cropcap) );
     cropcap.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
@@ -2242,8 +2160,6 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
         if( InitUserP( p_obj, p_sys, i_fd, fmt.fmt.pix.sizeimage ) )
             goto error;
         break;
-    default:
-        assert(0);
     }
 
     if( b_demux )
@@ -2326,8 +2242,6 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
             goto error;
         }
         break;
-    default:
-        assert(0);
     }
 
     /* report fps */
@@ -2373,65 +2287,57 @@ static bool ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
 #endif
 
     /* Get device capabilites */
+    struct v4l2_capability cap;
 
-    if( v4l2_ioctl( i_fd, VIDIOC_QUERYCAP, &p_sys->dev_cap ) < 0 )
+    if( v4l2_ioctl( i_fd, VIDIOC_QUERYCAP, &cap ) < 0 )
     {
         msg_Err( p_obj, "cannot get video capabilities: %m" );
         goto error;
     }
 
-    msg_Dbg( p_obj, "V4L2 device: %s using driver: %s (version: %u.%u.%u) on %s",
-                            p_sys->dev_cap.card,
-                            p_sys->dev_cap.driver,
-                            (p_sys->dev_cap.version >> 16) & 0xFF,
-                            (p_sys->dev_cap.version >> 8) & 0xFF,
-                            p_sys->dev_cap.version & 0xFF,
-                            p_sys->dev_cap.bus_info );
+    msg_Dbg( p_obj, "device %s using driver %s (version %u.%u.%u) on %s",
+            cap.card, cap.driver, (cap.version >> 16) & 0xFF,
+            (cap.version >> 8) & 0xFF, cap.version & 0xFF, cap.bus_info );
+    msg_Dbg( p_obj, "the device has the capabilities:"
+             " (%c) Video Capture, (%c) Audio, (%c) Tuner, (%c) Radio",
+             ( cap.capabilities & V4L2_CAP_VIDEO_CAPTURE  ? 'X':' '),
+             ( cap.capabilities & V4L2_CAP_AUDIO  ? 'X':' '),
+             ( cap.capabilities & V4L2_CAP_TUNER  ? 'X':' '),
+             ( cap.capabilities & V4L2_CAP_RADIO  ? 'X':' ') );
+    msg_Dbg( p_obj, "supported I/O methods are:"
+             " (%c) Read/Write, (%c) Streaming, (%c) Asynchronous",
+            ( cap.capabilities & V4L2_CAP_READWRITE ? 'X':' ' ),
+            ( cap.capabilities & V4L2_CAP_STREAMING ? 'X':' ' ),
+            ( cap.capabilities & V4L2_CAP_ASYNCIO ? 'X':' ' ) );
 
-    msg_Dbg( p_obj, "the device has the capabilities: (%c) Video Capture, "
-                                                       "(%c) Audio, "
-                                                       "(%c) Tuner, "
-                                                       "(%c) Radio",
-             ( p_sys->dev_cap.capabilities & V4L2_CAP_VIDEO_CAPTURE  ? 'X':' '),
-             ( p_sys->dev_cap.capabilities & V4L2_CAP_AUDIO  ? 'X':' '),
-             ( p_sys->dev_cap.capabilities & V4L2_CAP_TUNER  ? 'X':' '),
-             ( p_sys->dev_cap.capabilities & V4L2_CAP_RADIO  ? 'X':' ') );
-
-    msg_Dbg( p_obj, "supported I/O methods are: (%c) Read/Write, "
-                                                 "(%c) Streaming, "
-                                                 "(%c) Asynchronous",
-            ( p_sys->dev_cap.capabilities & V4L2_CAP_READWRITE ? 'X':' ' ),
-            ( p_sys->dev_cap.capabilities & V4L2_CAP_STREAMING ? 'X':' ' ),
-            ( p_sys->dev_cap.capabilities & V4L2_CAP_ASYNCIO ? 'X':' ' ) );
-
-    if( p_sys->io == IO_METHOD_AUTO )
+    if( cap.capabilities & V4L2_CAP_STREAMING )
+        p_sys->io = IO_METHOD_MMAP;
+    else if( cap.capabilities & V4L2_CAP_READWRITE )
+        p_sys->io = IO_METHOD_READ;
+    else
     {
-        if( p_sys->dev_cap.capabilities & V4L2_CAP_STREAMING )
-            p_sys->io = IO_METHOD_MMAP;
-        else if( p_sys->dev_cap.capabilities & V4L2_CAP_READWRITE )
-            p_sys->io = IO_METHOD_READ;
-        else
-            msg_Err( p_obj, "No known I/O method supported" );
+        msg_Err( p_obj, "no supported I/O method" );
+        goto error;
     }
 
-    if( p_sys->dev_cap.capabilities & V4L2_CAP_RDS_CAPTURE )
+    if( cap.capabilities & V4L2_CAP_RDS_CAPTURE )
         msg_Dbg( p_obj, "device supports RDS" );
 
 #ifdef V4L2_CAP_HW_FREQ_SEEK
-    if( p_sys->dev_cap.capabilities & V4L2_CAP_HW_FREQ_SEEK )
+    if( cap.capabilities & V4L2_CAP_HW_FREQ_SEEK )
         msg_Dbg( p_obj, "device supports hardware frequency seeking" );
 #endif
-    if( p_sys->dev_cap.capabilities & V4L2_CAP_VBI_CAPTURE )
+    if( cap.capabilities & V4L2_CAP_VBI_CAPTURE )
         msg_Dbg( p_obj, "device supports raw VBI capture" );
 
-    if( p_sys->dev_cap.capabilities & V4L2_CAP_SLICED_VBI_CAPTURE )
+    if( cap.capabilities & V4L2_CAP_SLICED_VBI_CAPTURE )
         msg_Dbg( p_obj, "device supports sliced VBI capture" );
 
     /* Now, enumerate all the video inputs. This is useless at the moment
        since we have no way to present that info to the user except with
        debug messages */
 
-    if( p_sys->dev_cap.capabilities & V4L2_CAP_VIDEO_CAPTURE )
+    if( cap.capabilities & V4L2_CAP_VIDEO_CAPTURE )
     {
         struct v4l2_input t_input;
         memset( &t_input, 0, sizeof(t_input) );
@@ -2475,7 +2381,7 @@ static bool ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
     }
 
     /* Probe audio inputs */
-    if( p_sys->dev_cap.capabilities & V4L2_CAP_AUDIO )
+    if( cap.capabilities & V4L2_CAP_AUDIO )
     {
         while( p_sys->i_audio < 32 &&
                v4l2_ioctl( i_fd, VIDIOC_S_AUDIO, &p_sys->p_audios[p_sys->i_audio] ) >= 0 )
@@ -2502,7 +2408,7 @@ static bool ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
     }
 
     /* List tuner caps */
-    if( p_sys->dev_cap.capabilities & V4L2_CAP_TUNER )
+    if( cap.capabilities & V4L2_CAP_TUNER )
     {
         struct v4l2_tuner tuner;
         memset( &tuner, 0, sizeof(tuner) );
@@ -2563,7 +2469,7 @@ static bool ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
     }
 
     /* Probe for available chromas */
-    if( p_sys->dev_cap.capabilities & V4L2_CAP_VIDEO_CAPTURE )
+    if( cap.capabilities & V4L2_CAP_VIDEO_CAPTURE )
     {
         struct v4l2_fmtdesc codec;
 
