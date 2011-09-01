@@ -316,9 +316,9 @@ vlc_module_begin ()
                 true )
         change_integer_range( 0, 0xFFFFFFFE )
         change_safe()
-    add_integer( CFG_PREFIX "audio-input", 0, AUDIO_INPUT_TEXT,
+    add_integer( CFG_PREFIX "audio-input", -1, AUDIO_INPUT_TEXT,
                  AUDIO_INPUT_LONGTEXT, true )
-        change_integer_range( 0, 0xFFFFFFFE )
+        change_integer_range( -1, 0xFFFFFFFE )
         change_safe()
     add_obsolete_integer( CFG_PREFIX "io" ) /* since 1.2.0 */
     add_integer( CFG_PREFIX "width", DEFAULT_WIDTH, WIDTH_TEXT,
@@ -573,11 +573,6 @@ struct demux_sys_t
     unsigned i_selected_input;
     char *psz_standard;
 
-    uint32_t i_audio;
-    /* V4L2 devices cannot have more than 32 audio inputs */
-    struct v4l2_audio p_audios[32];
-    unsigned i_selected_audio_input;
-
     unsigned i_codec;
     struct v4l2_fmtdesc *p_codecs;
 
@@ -592,6 +587,9 @@ struct demux_sys_t
     uint32_t i_block_flags;
 
     es_out_id_t *p_es;
+
+    /* Audio */
+    uint32_t i_audio_input;
 
     /* Tuner */
     uint32_t i_tuner;
@@ -679,8 +677,7 @@ static void GetV4L2Params( demux_sys_t *p_sys, vlc_object_t *p_obj )
         p_sys->psz_device = var_CreateGetNonEmptyString( p_obj, "v4l2-dev" );
 
     p_sys->i_selected_input = var_CreateGetInteger( p_obj, "v4l2-input" );
-    p_sys->i_selected_audio_input =
-        var_CreateGetInteger( p_obj, "v4l2-audio-input" );
+    p_sys->i_audio_input = var_CreateGetInteger( p_obj, "v4l2-audio-input" );
 
     p_sys->i_width = var_CreateGetInteger( p_obj, "v4l2-width" );
     p_sys->i_height = var_CreateGetInteger( p_obj, "v4l2-height" );
@@ -1623,24 +1620,21 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
     }
 
     /* Set audio input */
-
-    if( p_sys->i_audio > 0 )
+    if( p_sys->i_audio_input != (uint32_t)-1 )
     {
-        if( p_sys->i_selected_audio_input >= p_sys->i_audio )
-        {
-            msg_Warn( p_obj, "invalid audio input: using default instead" );
-            p_sys->i_selected_audio_input = 0;
-        }
+        struct v4l2_audio audio = {
+            .index = p_sys->i_audio_input,
+            .mode = 0, /* TODO: AVL support */
+        };
 
-        if( v4l2_ioctl( i_fd, VIDIOC_S_AUDIO,
-                        &p_sys->p_audios[p_sys->i_selected_audio_input] ) < 0 )
+        if( v4l2_ioctl( i_fd, VIDIOC_S_AUDIO, &audio ) < 0 )
         {
             msg_Err( p_obj, "cannot set audio input %u: %m",
-                     p_sys->i_selected_audio_input );
+                     p_sys->i_audio_input );
             goto error;
         }
         msg_Dbg( p_obj, "audio input set to %u",
-                 p_sys->i_selected_audio_input );
+                 p_sys->i_audio_input );
     }
 
 
@@ -2111,36 +2105,20 @@ static int ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, int i_fd )
         }
     }
 
-    /* initialize the structures for the ioctls */
-    for( unsigned i_index = 0; i_index < 32; i_index++ )
-    {
-        p_sys->p_audios[i_index].index = i_index;
-    }
-
     /* Probe audio inputs */
     if( cap.capabilities & V4L2_CAP_AUDIO )
     {
-        while( p_sys->i_audio < 32 &&
-               v4l2_ioctl( i_fd, VIDIOC_S_AUDIO, &p_sys->p_audios[p_sys->i_audio] ) >= 0 )
+        struct v4l2_audio audio = { .index = 0 };
+
+        while( v4l2_ioctl( i_fd, VIDIOC_ENUMAUDIO, &audio ) >= 0 )
         {
-            if( v4l2_ioctl( i_fd, VIDIOC_G_AUDIO, &p_sys->p_audios[ p_sys->i_audio] ) < 0 )
-            {
-                msg_Err( p_obj, "cannot get audio input characteristics: %m" );
-                return -1;
-            }
-
-            msg_Dbg( p_obj, "audio input %u (%s) is %s %s %c",
-                                p_sys->i_audio,
-                                p_sys->p_audios[p_sys->i_audio].name,
-                                p_sys->p_audios[p_sys->i_audio].capability &
-                                                    V4L2_AUDCAP_STEREO ?
-                                        "Stereo" : "Mono",
-                                p_sys->p_audios[p_sys->i_audio].capability &
-                                                    V4L2_AUDCAP_AVL ?
-                                    "(Automatic Volume Level supported)" : "",
-                                p_sys->i_audio == (unsigned)p_sys->i_selected_audio_input ? '*' : ' ' );
-
-            p_sys->i_audio++;
+            msg_Dbg( p_obj, "audio input %u (%s) is %s%s %c", audio.index,
+                     audio.name,
+                     audio.capability & V4L2_AUDCAP_STEREO ? "Stereo" : "Mono",
+                     audio.capability & V4L2_AUDCAP_AVL
+                         ? " (Automatic Volume Level supported)" : "",
+                     p_sys->i_audio_input == audio.index );
+            audio.index++;
         }
     }
 
