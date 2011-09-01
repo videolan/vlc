@@ -165,30 +165,6 @@ vlc_module_end ()
 static ssize_t Read   ( access_t *, uint8_t *, size_t );
 static int Control( access_t *, int, va_list );
 
-/* ivtv specific ioctls */
-#define IVTV_IOC_G_CODEC    0xFFEE7703
-#define IVTV_IOC_S_CODEC    0xFFEE7704
-
-/* for use with IVTV_IOC_G_CODEC and IVTV_IOC_S_CODEC */
-
-struct ivtv_ioctl_codec {
-    uint32_t aspect;
-    uint32_t audio_bitmask;
-    uint32_t bframes;
-    uint32_t bitrate_mode;
-    uint32_t bitrate;
-    uint32_t bitrate_peak;
-    uint32_t dnr_mode;
-    uint32_t dnr_spatial;
-    uint32_t dnr_temporal;
-    uint32_t dnr_type;
-    uint32_t framerate;
-    uint32_t framespergop;
-    uint32_t gop_closure;
-    uint32_t pulldown;
-    uint32_t stream_type;
-};
-
 struct access_sys_t
 {
     /* file descriptor */
@@ -212,91 +188,8 @@ struct access_sys_t
     int i_audio_bitmask;
     int i_input;
     int i_volume;
-
-    /* driver version */
-    bool b_v4l2_api;
 };
 
-/*****************************************************************************
- * ConfigureIVTV: set up codec parameters using the old ivtv api
- *****************************************************************************/
-static int ConfigureIVTV( access_t * p_access )
-{
-    access_sys_t *p_sys = (access_sys_t *) p_access->p_sys;
-    struct ivtv_ioctl_codec codec;
-    int result;
-
-    memset( &codec, 0, sizeof(struct ivtv_ioctl_codec) );
-
-    result = ioctl( p_sys->i_fd, IVTV_IOC_G_CODEC, &codec );
-    if( result < 0 )
-    {
-        msg_Err( p_access, "Failed to read current capture card settings." );
-        return VLC_EGENERIC;
-    }
-
-    if( p_sys->i_framerate != -1 )
-    {
-        switch( p_sys->i_framerate )
-        {
-            case 30:
-                codec.framerate = 0;
-                break;
-
-            case 25:
-                codec.framerate = 1;
-                break;
-
-            default:
-                msg_Warn( p_access, "Invalid framerate, reverting to 25." );
-                codec.framerate = 1;
-                break;
-        }
-    }
-
-    if( p_sys->i_bitrate != -1 )
-    {
-        codec.bitrate = p_sys->i_bitrate;
-    }
-
-    if( p_sys->i_bitrate_peak != -1 )
-    {
-        codec.bitrate_peak = p_sys->i_bitrate_peak;
-    }
-
-    if( p_sys->i_bitrate_mode != -1 )
-    {
-        codec.bitrate_mode = p_sys->i_bitrate_mode;
-    }
-
-    if( p_sys->i_audio_bitmask != -1 )
-    {
-        codec.audio_bitmask = p_sys->i_audio_bitmask;
-    }
-
-    if( p_sys->i_keyint != -1 )
-    {
-        codec.framespergop = p_sys->i_keyint;
-    }
-
-    if( p_sys->i_bframes != -1 )
-    {
-        codec.bframes = p_sys->i_bframes;
-    }
-
-    result = ioctl( p_sys->i_fd, IVTV_IOC_S_CODEC, &codec );
-    if( result  < 0 )
-    {
-        msg_Err( p_access, "Failed to write new capture card settings." );
-        return VLC_EGENERIC;
-    }
-
-    msg_Dbg( p_access, "Setting codec parameters to:  framerate: "
-                        "%d, bitrate: %d/%d/%d",
-                        codec.framerate, codec.bitrate,
-                        codec.bitrate_peak, codec.bitrate_mode );
-    return VLC_SUCCESS;
-}
 
 #define MAX_V4L2_CTRLS (6)
 /*****************************************************************************
@@ -676,18 +569,6 @@ static int Open( vlc_object_t * p_this )
             ( device_capability.version >>  8 ) & 0xff,
             ( device_capability.version       ) & 0xff);
 
-    if ( strncmp( (char *) device_capability.driver, "ivtv", 4 )
-           || device_capability.version >= 0x000800 )
-    {
-        /* Drivers > 0.8.0 use v4l2 API instead of IVTV ioctls */
-        msg_Dbg( p_access, "this driver uses the v4l2 API" );
-        p_sys->b_v4l2_api = true;
-    }
-    else
-    {
-        p_sys->b_v4l2_api = false;
-    }
-
     /* set the input */
     if ( p_sys->i_input != -1 )
     {
@@ -839,23 +720,11 @@ static int Open( vlc_object_t * p_this )
             || (p_sys->i_bitrate != -1)
             || (p_sys->i_audio_bitmask != -1) )
     {
-        if( p_sys->b_v4l2_api )
+        result = ConfigureV4L2( p_access );
+        if( result != VLC_SUCCESS )
         {
-            result = ConfigureV4L2( p_access );
-            if( result != VLC_SUCCESS )
-            {
-                Close( VLC_OBJECT(p_access) );
-                return result;
-            }
-        }
-        else
-        {
-            result = ConfigureIVTV( p_access );
-            if( result != VLC_SUCCESS )
-            {
-                Close( VLC_OBJECT(p_access) );
-                return result;
-            }
+            Close( VLC_OBJECT(p_access) );
+            return result;
         }
     }
 
