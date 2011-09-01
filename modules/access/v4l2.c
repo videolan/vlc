@@ -46,6 +46,7 @@
 #include <vlc_input.h>
 
 #include <ctype.h>
+#include <math.h>
 #include <assert.h>
 #include <errno.h>
 #include <fcntl.h>
@@ -343,6 +344,7 @@ vlc_module_begin ()
         change_safe()
     add_integer( CFG_PREFIX "tuner-frequency", -1, FREQUENCY_TEXT,
                  FREQUENCY_LONGTEXT, true )
+        change_integer_range( -1, 0xFFFFFFFE )
         change_safe()
     add_integer( CFG_PREFIX "tuner-audio-mode", -1, TUNER_AUDIO_MODE_TEXT,
                  TUNER_AUDIO_MODE_LONGTEXT, true )
@@ -565,13 +567,10 @@ struct demux_sys_t
     char *psz_device;  /* Main device from MRL */
     int  i_fd;
 
-    char *psz_requested_chroma;
-
     /* Video */
     io_method io;
 
     unsigned i_selected_input;
-    char *psz_standard;
 
     unsigned i_codec;
     struct v4l2_fmtdesc *p_codecs;
@@ -582,7 +581,6 @@ struct demux_sys_t
     int i_width;
     int i_height;
     unsigned int i_aspect;
-    float f_fps;            /* <= 0.0 mean to grab at full rate */
     int i_fourcc;
     uint32_t i_block_flags;
 
@@ -594,7 +592,6 @@ struct demux_sys_t
     /* Tuner */
     uint32_t i_tuner;
     enum v4l2_tuner_type i_tuner_type;
-    int i_frequency;
     int i_tuner_audio_mode;
 
 #ifdef HAVE_LIBV4L2
@@ -681,12 +678,8 @@ static void GetV4L2Params( demux_sys_t *p_sys, vlc_object_t *p_obj )
 
     var_Create( p_obj, "v4l2-controls-reset", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
 
-    p_sys->f_fps = var_CreateGetFloat( p_obj, "v4l2-fps" );
-    p_sys->psz_requested_chroma = var_CreateGetString( p_obj, "v4l2-chroma" );
-
     p_sys->i_tuner = var_CreateGetInteger( p_obj, "v4l2-tuner" );
     p_sys->i_tuner_type = V4L2_TUNER_RADIO; /* non-trap default value */
-    p_sys->i_frequency = var_CreateGetInteger( p_obj, "v4l2-tuner-frequency" );
     p_sys->i_tuner_audio_mode = var_CreateGetInteger( p_obj, "v4l2-tuner-audio-mode" );
 
     char *psz_aspect = var_CreateGetString( p_obj, "v4l2-aspect-ratio" );
@@ -816,9 +809,7 @@ static void CommonClose( vlc_object_t *p_this, demux_sys_t *p_sys )
     /* Close */
     if( p_sys->i_fd >= 0 ) v4l2_close( p_sys->i_fd );
     free( p_sys->psz_device );
-    free( p_sys->psz_standard );
     free( p_sys->p_codecs );
-    free( p_sys->psz_requested_chroma );
 
     free( p_sys );
 }
@@ -1549,9 +1540,7 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
 
     /* Select standard */
     bool bottom_first;
-    const char *stdname = p_sys->psz_standard;
-    if( stdname == NULL )
-        stdname = var_InheritString( p_obj, CFG_PREFIX"standard" );
+    const char *stdname = var_InheritString( p_obj, CFG_PREFIX"standard" );
     if( stdname != NULL )
     {
         v4l2_std_id std = strtoull( stdname, NULL, 0 );
@@ -1581,12 +1570,13 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
         bottom_first = false;
 
     /* Tune the tuner */
-    if( p_sys->i_frequency >= 0 )
+    uint32_t freq = var_InheritInteger( p_obj, CFG_PREFIX"frequency" );
+    if( freq != (uint32_t)-1 )
     {
         struct v4l2_frequency frequency = {
             .tuner = p_sys->i_tuner,
             .type = p_sys->i_tuner_type,
-            .frequency = p_sys->i_frequency / 62.5,
+            .frequency = freq / 62.5,
         };
 
         if( v4l2_ioctl( i_fd, VIDIOC_S_FREQUENCY, &frequency ) < 0 )
@@ -1694,17 +1684,19 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
 
     fmt.fmt.pix.field = V4L2_FIELD_NONE;
 
+    float f_fps;
     if (b_demux)
     {
         demux_t *p_demux = (demux_t *) p_obj;
+        char *reqchroma = var_InheritString( p_obj, CFG_PREFIX"chroma" );
 
         /* Test and set Chroma */
         fmt.fmt.pix.pixelformat = 0;
-        if( p_sys->psz_requested_chroma && *p_sys->psz_requested_chroma )
+        if( reqchroma != NULL )
         {
             /* User specified chroma */
             const vlc_fourcc_t i_requested_fourcc =
-                vlc_fourcc_GetCodecFromString( VIDEO_ES, p_sys->psz_requested_chroma );
+                vlc_fourcc_GetCodecFromString( VIDEO_ES, reqchroma );
 
             for( int i = 0; v4l2chroma_to_fourcc[i].i_v4l2 != 0; i++ )
             {
@@ -1730,9 +1722,11 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
             }
             if( b_error )
             {
-                msg_Warn( p_demux, "Driver is unable to use specified chroma %s. Trying defaults.", p_sys->psz_requested_chroma );
+                msg_Warn( p_obj, "requested chroma %s not supported. "
+                          " Trying default.", reqchroma );
                 fmt.fmt.pix.pixelformat = 0;
             }
+            free( reqchroma );
         }
 
         /* If no user specified chroma, find best */
@@ -1762,20 +1756,21 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
 
         if( p_sys->i_width < 0 || p_sys->i_height < 0 )
         {
-            if( p_sys->f_fps <= 0 )
+            f_fps = var_InheritFloat( p_obj, CFG_PREFIX"fps" );
+            if( f_fps <= 0. )
             {
-                p_sys->f_fps = GetAbsoluteMaxFrameRate( p_demux, i_fd,
-                                                        fmt.fmt.pix.pixelformat );
-                msg_Dbg( p_demux, "Found maximum framerate of %f", p_sys->f_fps );
+                f_fps = GetAbsoluteMaxFrameRate( p_demux, i_fd,
+                                                 fmt.fmt.pix.pixelformat );
+                msg_Dbg( p_demux, "Found maximum framerate of %f", f_fps );
             }
             uint32_t i_width, i_height;
             GetMaxDimensions( p_demux, i_fd,
-                              fmt.fmt.pix.pixelformat, p_sys->f_fps,
+                              fmt.fmt.pix.pixelformat, f_fps,
                               &i_width, &i_height );
             if( i_width || i_height )
             {
                 msg_Dbg( p_demux, "Found optimal dimensions for framerate %f "
-                                  "of %ux%u", p_sys->f_fps, i_width, i_height );
+                                  "of %ux%u", f_fps, i_width, i_height );
                 fmt.fmt.pix.width = i_width;
                 fmt.fmt.pix.height = i_height;
                 if( v4l2_ioctl( i_fd, VIDIOC_S_FMT, &fmt ) < 0 )
@@ -1943,12 +1938,14 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
         es_fmt.video.i_sar_den = VOUT_ASPECT_FACTOR * es_fmt.video.i_width;
 
         /* Framerate */
-        es_fmt.video.i_frame_rate = p_sys->f_fps * INT64_C(1000000);
-        es_fmt.video.i_frame_rate_base = INT64_C(1000000);
+        es_fmt.video.i_frame_rate = lround(f_fps * 1000000.);
+        es_fmt.video.i_frame_rate_base = 1000000;
 
         demux_t *p_demux = (demux_t *) p_obj;
         msg_Dbg( p_demux, "added new video es %4.4s %dx%d",
             (char*)&es_fmt.i_codec, es_fmt.video.i_width, es_fmt.video.i_height );
+        msg_Dbg( p_obj, " frame rate: %f", f_fps );
+
         p_sys->p_es = es_out_Add( p_demux->out, &es_fmt );
     }
 
@@ -2012,12 +2009,6 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
             goto error;
         }
         break;
-    }
-
-    /* report fps */
-    if( p_sys->f_fps >= 0.1 )
-    {
-        msg_Dbg( p_obj, "User set fps=%f", p_sys->f_fps );
     }
 
     return i_fd;
