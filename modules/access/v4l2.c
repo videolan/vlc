@@ -1561,7 +1561,7 @@ static int OpenVideoDev( vlc_object_t *p_obj, const char *path,
         bottom_first = false;
 
     /* Tune the tuner */
-    uint32_t freq = var_InheritInteger( p_obj, CFG_PREFIX"frequency" );
+    uint32_t freq = var_InheritInteger( p_obj, CFG_PREFIX"tuner-frequency" );
     if( freq != (uint32_t)-1 )
     {
         struct v4l2_frequency frequency = {
