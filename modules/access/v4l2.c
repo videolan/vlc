@@ -545,8 +545,6 @@ struct demux_sys_t
     struct v4l2_input *p_inputs;
     unsigned i_selected_input;
 
-    unsigned i_standard;
-    struct v4l2_standard *p_standards;
     v4l2_std_id i_selected_standard_id;
 
     uint32_t i_audio;
@@ -1055,7 +1053,6 @@ static void CommonClose( vlc_object_t *p_this, demux_sys_t *p_sys )
     /* Close */
     if( p_sys->i_fd >= 0 ) v4l2_close( p_sys->i_fd );
     free( p_sys->psz_device );
-    free( p_sys->p_standards );
     free( p_sys->p_inputs );
     free( p_sys->p_tuners );
     free( p_sys->p_codecs );
@@ -1781,7 +1778,6 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
 #endif
 
     /* Select standard */
-
     if( p_sys->i_selected_standard_id != V4L2_STD_UNKNOWN )
     {
         v4l2_std_id std = p_sys->i_selected_standard_id;
@@ -1793,9 +1789,6 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
         }
         msg_Dbg( p_obj, "standard set to 0x%"PRIx64":", std );
         p_sys->i_selected_standard_id = std;
-        for( unsigned i = 0; i < p_sys->i_standard; i++)
-            if( p_sys->p_standards[i].id & std )
-                msg_Dbg( p_obj, "  %s", p_sys->p_standards[i].name );
     }
 
     /* Tune the tuner */
@@ -2427,40 +2420,6 @@ static bool ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
                                         "Tuner adapter" :
                                         "External analog input",
                                 i_index == p_sys->i_selected_input ? '*' : ' ' );
-        }
-    }
-
-    /* Probe video standards */
-    if( p_sys->dev_cap.capabilities & V4L2_CAP_VIDEO_CAPTURE )
-    {
-        struct v4l2_standard t_standards;
-        t_standards.index = 0;
-        p_sys->i_standard = 0;
-        while( v4l2_ioctl( i_fd, VIDIOC_ENUMSTD, &t_standards ) >=0 )
-        {
-            if( t_standards.index != p_sys->i_standard )
-                break;
-            p_sys->i_standard++;
-            t_standards.index = p_sys->i_standard;
-        }
-
-        free( p_sys->p_standards );
-        p_sys->p_standards = calloc( 1, p_sys->i_standard * sizeof( struct v4l2_standard ) );
-        if( !p_sys->p_standards ) goto error;
-
-        for( unsigned i_standard = 0; i_standard < p_sys->i_standard; i_standard++ )
-        {
-            p_sys->p_standards[i_standard].index = i_standard;
-
-            if( v4l2_ioctl( i_fd, VIDIOC_ENUMSTD, &p_sys->p_standards[i_standard] ) )
-            {
-                msg_Err( p_obj, "cannot get video input standards: %m" );
-                goto error;
-            }
-            msg_Dbg( p_obj, "video standard %u is: %s %c",
-                                i_standard,
-                                p_sys->p_standards[i_standard].name,
-                                (p_sys->p_standards[i_standard].id & p_sys->i_selected_standard_id) ? '*' : ' ' );
         }
     }
 
