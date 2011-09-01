@@ -84,12 +84,3 @@ MOSTLYCLEANFILES = $(noinst_DATA)
 	else \
 		echo "Cross-compilation: cache generation skipped!" ; \
 	fi
-
-install-exec-hook:
-	if test "$(build)" = "$(host)"; then \
-		LD_LIBRARY_PATH="$(DESTDIR)$(libdir):$$LD_LIBRARY_PATH" \
-		"$(DESTDIR)$(vlclibdir)/vlc-cache-gen$(EXEEXT)" \
-			 "$(DESTDIR)$(vlclibdir)/plugins" ; \
-	else \
-		echo "Cross-compilation: cache generation skipped!" ; \
-	fi

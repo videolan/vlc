@@ -404,6 +404,18 @@ noinst_DATA = VLC.app
 endif
 endif
 
+###############################################################################
+# Installing plugins cache
+###############################################################################
+install-exec-hook:
+	if test "$(build)" = "$(host)"; then \
+		LD_LIBRARY_PATH="$(DESTDIR)$(libdir):$$LD_LIBRARY_PATH" \
+		"$(DESTDIR)$(vlclibdir)/vlc-cache-gen$(EXEEXT)" \
+			 "$(DESTDIR)$(vlclibdir)/plugins" ; \
+	else \
+		echo "Cross-compilation: cache generation skipped!" ; \
+	fi
+
 silentstd = $(silentstd_$(V))
 silentstd_ = $(silentstd_$(AM_DEFAULT_VERBOSITY))
 silentstd_0 = 2>&1 >/dev/null
