@@ -430,7 +430,7 @@ vlc_module_end ()
 static void CommonClose( vlc_object_t *, demux_sys_t * );
 static char *ParseMRL( vlc_object_t *, const char * );
 static void GetV4L2Params( demux_sys_t *, vlc_object_t * );
-static void SetAvailControlsByString( vlc_object_t *, demux_sys_t *, int );
+static void SetAvailControlsByString( vlc_object_t *, int );
 
 static int DemuxControl( demux_t *, int, va_list );
 static int AccessControl( access_t *, int, va_list );
@@ -597,9 +597,6 @@ struct demux_sys_t
     int i_frequency;
     int i_tuner_audio_mode;
 
-    /* Controls */
-    char *psz_set_ctrls;
-
 #ifdef HAVE_LIBV4L2
     bool b_libv4l2;
 #endif
@@ -691,8 +688,6 @@ static void GetV4L2Params( demux_sys_t *p_sys, vlc_object_t *p_obj )
     p_sys->i_tuner_type = V4L2_TUNER_RADIO; /* non-trap default value */
     p_sys->i_frequency = var_CreateGetInteger( p_obj, "v4l2-tuner-frequency" );
     p_sys->i_tuner_audio_mode = var_CreateGetInteger( p_obj, "v4l2-tuner-audio-mode" );
-
-    p_sys->psz_set_ctrls = var_CreateGetString( p_obj, "v4l2-set-ctrls" );
 
     char *psz_aspect = var_CreateGetString( p_obj, "v4l2-aspect-ratio" );
     char *psz_delim = !EMPTY_STR(psz_aspect) ? strchr( psz_aspect, ':' ) : NULL;
@@ -824,7 +819,6 @@ static void CommonClose( vlc_object_t *p_this, demux_sys_t *p_sys )
     free( p_sys->psz_standard );
     free( p_sys->p_codecs );
     free( p_sys->psz_requested_chroma );
-    free( p_sys->psz_set_ctrls );
 
     free( p_sys );
 }
@@ -1642,7 +1636,7 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
     /* if MPEG encoder card, no need to do anything else after this */
     ControlList( p_obj, i_fd, var_GetBool( p_obj, "v4l2-controls-reset" ),
                  b_demux );
-    SetAvailControlsByString( p_obj, p_sys, i_fd );
+    SetAvailControlsByString( p_obj, i_fd );
 
     /* Reset Cropping */
     memset( &cropcap, 0, sizeof(cropcap) );
@@ -2555,79 +2549,67 @@ static int ControlList( vlc_object_t *p_obj, int i_fd, bool b_reset,
     return VLC_SUCCESS;
 }
 
-static void SetAvailControlsByString( vlc_object_t *p_obj, demux_sys_t *p_sys,
-                                      int i_fd )
+static void SetAvailControlsByString( vlc_object_t *p_obj, int i_fd )
 {
-    char *psz_parser = p_sys->psz_set_ctrls;
-    vlc_value_t val, text, name;
-
-    if( psz_parser == NULL )
+    char *ctrls = var_InheritString( p_obj, CFG_PREFIX"set-ctrls" );
+    if( ctrls == NULL )
         return;
 
-    if( *psz_parser == '{' )
-        psz_parser++;
+    vlc_value_t val, text;
 
-    int i_ret = var_Change( p_obj, "allcontrols", VLC_VAR_GETCHOICES,
-                            &val, &text );
-    if( i_ret < 0 )
+    if( var_Change( p_obj, "allcontrols", VLC_VAR_GETCHOICES, &val, &text ) )
     {
         msg_Err( p_obj, "Oops, can't find 'allcontrols' variable." );
+        free( ctrls );
         return;
     }
 
-    while( *psz_parser && *psz_parser != '}' )
+    char *p = ctrls;
+    if( *p == '{' )
+        p++;
+
+    while( p != NULL && *p && *p != '}' )
     {
-        char *psz_delim, *psz_assign;
+        p += strspn( p, ", " );
 
-        while( *psz_parser == ',' || *psz_parser == ' ' )
-            psz_parser++;
+        const char *name = p;
+        char *end = strchr( p, ',' );
+        if( end == NULL )
+            end = strchr( p, '}' );
+        if( end != NULL )
+            *(end++) = '\0';
 
-        psz_delim = strchr( psz_parser, ',' );
-        if( psz_delim == NULL )
-            psz_delim = strchr( psz_parser, '}' );
-        if( psz_delim == NULL )
-            psz_delim = psz_parser + strlen( psz_parser );
-
-        psz_assign = memchr( psz_parser, '=', psz_delim - psz_parser );
-        if( psz_assign == NULL )
+        char *value = strchr( p, '=' );
+        if( value == NULL )
         {
-            char *psz_name = strndup( psz_parser, psz_delim - psz_parser );
-            msg_Err( p_obj, "%s missing '='", psz_name );
-            free( psz_name );
-            psz_parser = psz_delim + 1;
+            msg_Err( p_obj, "syntax error in \"%s\": missing '='", name );
+            p = end;
             continue;
         }
+        *(value++) = '\0';
 
-        for( int i = 0;
-             i < val.p_list->i_count ;//&& psz_parser < psz_assign;
-             i++ )
+        for( int i = 0; i < val.p_list->i_count; i++ )
         {
-            const char *psz_var = text.p_list->p_values[i].psz_string;
-            int i_cid = val.p_list->p_values[i].i_int;
-            var_Change( p_obj, psz_var, VLC_VAR_GETTEXT, &name, NULL );
-            const char *psz_name = name.psz_string;
+            vlc_value_t vartext;
+            const char *var = text.p_list->p_values[i].psz_string;
 
-            int i_availstrlen = strlen( psz_name );
-            int i_parsestrlen = psz_assign - psz_parser;
-            int i_maxstrlen = __MAX( i_availstrlen, i_parsestrlen);
-
-            if( !strncasecmp( psz_name, psz_parser, i_maxstrlen ) )
+            var_Change( p_obj, var, VLC_VAR_GETTEXT, &vartext, NULL );
+            if( !strcasecmp( vartext.psz_string, name ) )
             {
-                Control( p_obj, i_fd, psz_name, i_cid,
-                         strtol( ++psz_assign, &psz_parser, 0) );
+                Control( p_obj, i_fd, name,
+                         val.p_list->p_values[i].i_int,
+                         strtol( value, NULL, 0 ) );
+                free( vartext.psz_string );
+                goto found;
             }
-            free( name.psz_string );
+            free( vartext.psz_string );
         }
-
-        if( psz_parser < psz_assign )
-        {
-            char *psz_name = strndup( psz_parser, psz_assign - psz_parser );
-            msg_Err( p_obj, "Control %s not available", psz_name );
-            free( psz_name );
-            psz_parser = ( *psz_delim ) ? ( psz_delim + 1 ) : psz_delim;
-        }
+        msg_Err( p_obj, "control %s not available", name );
+    found:
+        p = end;
     }
     var_FreeList( &val, &text );
+    free( ctrls );
 }
 
 /*****************************************************************************
