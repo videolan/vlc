@@ -204,11 +204,6 @@ static void AccessClose( vlc_object_t * );
 #define TUNER_AUDIO_MODE_LONGTEXT N_( \
     "Tuner audio mono/stereo and track selection." )
 
-#define AUDIO_DEPRECATED_ERROR N_( \
-    "Alsa or OSS audio capture in the v4l2 access is deprecated. " \
-    "please use 'v4l2:/""/ :input-slave=alsa:/""/' or " \
-    "'v4l2:/""/ :input-slave=oss:/""/' instead." )
-
 #define ASPECT_TEXT N_("Picture aspect-ratio n:m")
 #define ASPECT_LONGTEXT N_("Define input picture aspect-ratio to use. Default is 4:3" )
 
@@ -433,7 +428,7 @@ vlc_module_end ()
  *****************************************************************************/
 
 static void CommonClose( vlc_object_t *, demux_sys_t * );
-static void ParseMRL( demux_sys_t *, char *, vlc_object_t * );
+static char *ParseMRL( vlc_object_t *, const char * );
 static void GetV4L2Params( demux_sys_t *, vlc_object_t * );
 static void SetAvailControlsByString( vlc_object_t *, demux_sys_t *, int );
 
@@ -665,9 +660,8 @@ static int DemuxOpen( vlc_object_t *p_this )
     p_demux->p_sys = p_sys = calloc( 1, sizeof( demux_sys_t ) );
     if( p_sys == NULL ) return VLC_ENOMEM;
 
-    GetV4L2Params(p_sys, (vlc_object_t *) p_demux);
-
-    ParseMRL( p_sys, p_demux->psz_location, (vlc_object_t *) p_demux );
+    p_sys->psz_device = ParseMRL( p_this, p_demux->psz_location );
+    GetV4L2Params( p_sys, p_this );
 
 #ifdef HAVE_LIBV4L2
     if( !var_InheritBool( p_this, CFG_PREFIX "use-libv4l2" ) )
@@ -693,7 +687,8 @@ static int DemuxOpen( vlc_object_t *p_this )
  *****************************************************************************/
 static void GetV4L2Params( demux_sys_t *p_sys, vlc_object_t *p_obj )
 {
-    p_sys->psz_device = var_CreateGetNonEmptyString( p_obj, "v4l2-dev" );
+    if( p_sys->psz_device == NULL )
+        p_sys->psz_device = var_CreateGetNonEmptyString( p_obj, "v4l2-dev" );
 
     p_sys->i_selected_input = var_CreateGetInteger( p_obj, "v4l2-input" );
     p_sys->i_selected_audio_input =
@@ -731,225 +726,26 @@ static void GetV4L2Params( demux_sys_t *p_sys, vlc_object_t *p_obj )
     p_sys->p_es = NULL;
 }
 
-/*****************************************************************************
- * ParseMRL: parse the options contained in the MRL
- *****************************************************************************/
-static void ParseMRL( demux_sys_t *p_sys, char *psz_path, vlc_object_t *p_obj )
+/**
+ * Parses a V4L2 MRL.
+ * \return device node path (use free()) or NULL if not specified
+ */
+static char *ParseMRL( vlc_object_t *obj, const char *mrl )
 {
-    char *psz_dup = strdup( psz_path );
-    char *psz_parser = psz_dup;
+    const char *p = strchr( mrl, ':' );
 
-    while( *psz_parser && *psz_parser != ':' )
+    if( p != NULL )
     {
-        psz_parser++;
+        var_LocationParse( obj, p + 1, CFG_PREFIX );
+        if( p > mrl )
+            return strndup( mrl, p - mrl );
     }
-
-    if( *psz_parser == ':' )
+    else
     {
-        /* read options */
-        for( ;; )
-        {
-            *psz_parser++ = '\0';
-
-            if( !strncmp( psz_parser, "standard=", strlen( "standard=" ) ) )
-            {
-                int i_len;
-
-                psz_parser += strlen( "standard=" );
-                if( strchr( psz_parser, ':' ) )
-                    i_len = strchr( psz_parser, ':' ) - psz_parser;
-                else
-                    i_len = strlen( psz_parser );
-
-                p_sys->psz_standard = strndup( psz_parser, i_len );
-                psz_parser += i_len;
-            }
-            else if( !strncmp( psz_parser, "chroma=", strlen( "chroma=" ) ) )
-            {
-                int  i_len;
-
-                psz_parser += strlen( "chroma=" );
-                if( strchr( psz_parser, ':' ) )
-                {
-                    i_len = strchr( psz_parser, ':' ) - psz_parser;
-                }
-                else
-                {
-                    i_len = strlen( psz_parser );
-                }
-
-                free( p_sys->psz_requested_chroma );
-                p_sys->psz_requested_chroma = strndup( psz_parser, i_len );
-
-                psz_parser += i_len;
-            }
-            else if( !strncmp( psz_parser, "input=", strlen( "input=" ) ) )
-            {
-                p_sys->i_selected_input = strtol( psz_parser + strlen( "input=" ),
-                                       &psz_parser, 0 );
-            }
-            else if( !strncmp( psz_parser, "audio-input=", strlen( "audio-input=" ) ) )
-            {
-                p_sys->i_selected_audio_input = strtol( psz_parser + strlen( "audio-input=" ),
-                                       &psz_parser, 0 );
-            }
-            else if( !strncmp( psz_parser, "fps=", strlen( "fps=" ) ) )
-            {
-                p_sys->f_fps = us_strtof( psz_parser + strlen( "fps=" ),
-                                          &psz_parser );
-            }
-            else if( !strncmp( psz_parser, "width=",
-                               strlen( "width=" ) ) )
-            {
-                p_sys->i_width =
-                    strtol( psz_parser + strlen( "width=" ),
-                            &psz_parser, 0 );
-            }
-            else if( !strncmp( psz_parser, "height=",
-                               strlen( "height=" ) ) )
-            {
-                p_sys->i_height =
-                    strtol( psz_parser + strlen( "height=" ),
-                            &psz_parser, 0 );
-            }
-            else if( !strncmp( psz_parser, "aspect-ratio=",
-                               strlen( "aspect-ratio=" ) ) )
-            {
-                unsigned int num,den;
-                num = strtol( psz_parser + strlen( "aspect-ratio=" ),
-                              &psz_parser, 0 );
-                den = strtol( psz_parser + strlen( ":" ),
-                              &psz_parser, 0 );
-                if( num && den )
-                    p_sys->i_aspect = num * VOUT_ASPECT_FACTOR / den;
-            }
-            else if( !strncmp( psz_parser, "controls-reset",
-                               strlen( "controls-reset" ) ) )
-            {
-                var_SetBool( p_obj, "v4l2-controls-reset", true );
-                psz_parser += strlen( "controls-reset" );
-            }
-#if 0
-            else if( !strncmp( psz_parser, "brightness=",
-                               strlen( "brightness=" ) ) )
-            {
-                var_SetInteger( p_obj, "brightness",
-                    strtol( psz_parser + strlen( "brightness=" ),
-                            &psz_parser, 0 ) );
-            }
-            else if( !strncmp( psz_parser, "contrast=",
-                               strlen( "contrast=" ) ) )
-            {
-                var_SetInteger( p_obj, "contrast",
-                    strtol( psz_parser + strlen( "contrast=" ),
-                            &psz_parser, 0 ) );
-            }
-            else if( !strncmp( psz_parser, "saturation=",
-                               strlen( "saturation=" ) ) )
-            {
-                var_SetInteger( p_obj, "saturation",
-                    strtol( psz_parser + strlen( "saturation=" ),
-                            &psz_parser, 0 ) );
-            }
-            else if( !strncmp( psz_parser, "hue=",
-                               strlen( "hue=" ) ) )
-            {
-                var_SetInteger( p_obj, "hue",
-                    strtol( psz_parser + strlen( "hue=" ),
-                            &psz_parser, 0 ) );
-            }
-            else if( !strncmp( psz_parser, "gamma=",
-                               strlen( "gamma=" ) ) )
-            {
-                var_SetInteger( p_obj, "gamma",
-                    strtol( psz_parser + strlen( "gamma=" ),
-                            &psz_parser, 0 ) );
-            }
-#endif
-            else if( !strncmp( psz_parser, "tuner=", strlen( "tuner=" ) ) )
-            {
-                p_sys->i_cur_tuner = strtol( psz_parser + strlen( "tuner=" ),
-                                         &psz_parser, 0 );
-            }
-            else if( !strncmp( psz_parser, "tuner-frequency=", strlen( "tuner-frequency=" ) ) )
-            {
-                p_sys->i_frequency = strtol( psz_parser
-                                          + strlen( "tuner-frequency=" ),
-                                          &psz_parser, 0 );
-            }
-            else if( !strncmp( psz_parser, "tuner-audio-mode=", strlen( "tuner-audio-mode=" ) ) )
-            {
-                p_sys->i_audio_mode = strtol( psz_parser
-                                          + strlen( "tuner-audio-mode=" ),
-                                          &psz_parser, 0 );
-            }
-            else if( !strncmp( psz_parser, "set-ctrls=", strlen( "set-ctrls=" )) )
-            {
-                int  i_len;
-
-                psz_parser += strlen( "set-ctrls=" );
-                if( strchr( psz_parser, ':' ) )
-                {
-                    i_len = strchr( psz_parser, ':' ) - psz_parser;
-                }
-                else
-                {
-                    i_len = strlen( psz_parser );
-                }
-
-                p_sys->psz_set_ctrls = strndup( psz_parser, i_len );
-
-                psz_parser += i_len;
-            }
-            else if( !strncmp( psz_parser, "adev=", strlen( "adev=" ) )
-             || !strncmp( psz_parser, "samplerate=", strlen( "samplerate=" ) )
-             || !strncmp( psz_parser, "audio-method", strlen( "audio-method" ) )
-             || !strncmp( psz_parser, "stereo", strlen( "stereo" ) )
-             || !strncmp( psz_parser, "mono", strlen( "mono" ) ) )
-            {
-                if( strchr( psz_parser, ':' ) )
-                {
-                    psz_parser = strchr( psz_parser, ':' );
-                }
-                else
-                {
-                    psz_parser += strlen( psz_parser );
-                }
-
-                msg_Err( p_obj, AUDIO_DEPRECATED_ERROR );
-            }
-            else
-            {
-                char *psz_unk = strchr( psz_parser, ':' );
-                if (psz_unk)
-                    psz_unk = strndup( psz_parser, psz_unk - psz_parser );
-                else
-                    psz_unk = strdup( psz_parser);
-                msg_Warn( p_obj, "unknown option %s", psz_unk );
-                free (psz_unk);
-            }
-
-            while( *psz_parser && *psz_parser != ':' )
-            {
-                psz_parser++;
-            }
-
-            if( *psz_parser == '\0' )
-            {
-                break;
-            }
-        }
+        if( mrl[0] )
+            return strdup( mrl );
     }
-
-    /* Main device */
-    if( *psz_dup )
-    {
-        free( p_sys->psz_device );
-        p_sys->psz_device = strdup( psz_dup );
-    }
-    else if( p_sys->psz_device == NULL )
-        p_sys->psz_device = strdup( V4L2_DEFAULT );
-    free( psz_dup );
+    return NULL;
 }
 
 /*****************************************************************************
@@ -1069,9 +865,8 @@ static int AccessOpen( vlc_object_t * p_this )
     if( !p_sys ) return VLC_ENOMEM;
     p_access->p_sys = (access_sys_t*)p_sys;
 
-    GetV4L2Params( p_sys, (vlc_object_t *) p_access );
-
-    ParseMRL( p_sys, p_access->psz_location, (vlc_object_t *) p_access );
+    p_sys->psz_device = ParseMRL( p_this, p_access->psz_location );
+    GetV4L2Params( p_sys, p_this );
 
 #ifdef HAVE_LIBV4L2
     if( !var_InheritBool( p_this, CFG_PREFIX "use-libv4l2" ) )
