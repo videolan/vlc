@@ -571,10 +571,7 @@ struct demux_sys_t
     /* Video */
     io_method io;
 
-    uint32_t i_input;
-    struct v4l2_input *p_inputs;
     unsigned i_selected_input;
-
     char *psz_standard;
 
     uint32_t i_audio;
@@ -836,7 +833,6 @@ static void CommonClose( vlc_object_t *p_this, demux_sys_t *p_sys )
     if( p_sys->i_fd >= 0 ) v4l2_close( p_sys->i_fd );
     free( p_sys->psz_device );
     free( p_sys->psz_standard );
-    free( p_sys->p_inputs );
     free( p_sys->p_tuners );
     free( p_sys->p_codecs );
     free( p_sys->psz_requested_chroma );
@@ -1632,12 +1628,6 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
 
     /* Select input */
 
-    if( p_sys->i_selected_input >= p_sys->i_input )
-    {
-        msg_Warn( p_obj, "invalid input: using default instead" );
-        p_sys->i_selected_input = 0;
-    }
-
     if( v4l2_ioctl( i_fd, VIDIOC_S_INPUT, &p_sys->i_selected_input ) < 0 )
     {
         msg_Err( p_obj, "cannot set input %u: %m", p_sys->i_selected_input );
@@ -2144,38 +2134,17 @@ static bool ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
 
     if( cap.capabilities & V4L2_CAP_VIDEO_CAPTURE )
     {
-        struct v4l2_input t_input;
-        memset( &t_input, 0, sizeof(t_input) );
-        p_sys->i_input = 0;
-        while( v4l2_ioctl( i_fd, VIDIOC_ENUMINPUT, &t_input ) >= 0 )
+        struct v4l2_input input;
+
+        input.index = 0;
+        while( v4l2_ioctl( i_fd, VIDIOC_ENUMINPUT, &input ) >= 0 )
         {
-            if( t_input.index != p_sys->i_input )
-                break;
-            p_sys->i_input++;
-            t_input.index = p_sys->i_input;
-        }
-
-        free( p_sys->p_inputs );
-        p_sys->p_inputs = calloc( 1, p_sys->i_input * sizeof( struct v4l2_input ) );
-        if( !p_sys->p_inputs ) goto error;
-
-        for( unsigned i_index = 0; i_index < p_sys->i_input; i_index++ )
-        {
-            p_sys->p_inputs[i_index].index = i_index;
-
-            if( v4l2_ioctl( i_fd, VIDIOC_ENUMINPUT, &p_sys->p_inputs[i_index] ) )
-            {
-                msg_Err( p_obj, "cannot get video input characteristics: %m" );
-                goto error;
-            }
             msg_Dbg( p_obj, "video input %u (%s) has type: %s %c",
-                                i_index,
-                                p_sys->p_inputs[i_index].name,
-                                p_sys->p_inputs[i_index].type
-                                        == V4L2_INPUT_TYPE_TUNER ?
-                                        "Tuner adapter" :
-                                        "External analog input",
-                                i_index == p_sys->i_selected_input ? '*' : ' ' );
+                     input.index, input.name,
+                     input.type == V4L2_INPUT_TYPE_TUNER
+                         ? "Tuner adapter" : "External analog input",
+                     input.index == p_sys->i_selected_input ? '*' : ' ' );
+            input.index++;
         }
     }
 
