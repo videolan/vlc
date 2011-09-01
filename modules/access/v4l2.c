@@ -597,7 +597,7 @@ struct demux_sys_t
     uint32_t i_tuner;
     enum v4l2_tuner_type i_tuner_type;
     int i_frequency;
-    int i_audio_mode;
+    int i_tuner_audio_mode;
 
     /* Controls */
     char *psz_set_ctrls;
@@ -693,7 +693,7 @@ static void GetV4L2Params( demux_sys_t *p_sys, vlc_object_t *p_obj )
     p_sys->i_tuner = var_CreateGetInteger( p_obj, "v4l2-tuner" );
     p_sys->i_tuner_type = V4L2_TUNER_RADIO; /* non-trap default value */
     p_sys->i_frequency = var_CreateGetInteger( p_obj, "v4l2-tuner-frequency" );
-    p_sys->i_audio_mode = var_CreateGetInteger( p_obj, "v4l2-tuner-audio-mode" );
+    p_sys->i_tuner_audio_mode = var_CreateGetInteger( p_obj, "v4l2-tuner-audio-mode" );
 
     p_sys->psz_set_ctrls = var_CreateGetString( p_obj, "v4l2-set-ctrls" );
 
@@ -1607,11 +1607,11 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
     }
 
     /* Set the tuner's audio mode */
-    if( p_sys->i_audio_mode >= 0 )
+    if( p_sys->i_tuner_audio_mode >= 0 )
     {
         struct v4l2_tuner tuner = {
             .index = p_sys->i_tuner,
-            .audmode = p_sys->i_audio_mode,
+            .audmode = p_sys->i_tuner_audio_mode,
         };
 
         if( v4l2_ioctl( i_fd, VIDIOC_S_TUNER, &tuner ) < 0 )
