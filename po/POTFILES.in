@@ -259,7 +259,8 @@ modules/access/shm.c
 modules/access/smb.c
 modules/access/tcp.c
 modules/access/udp.c
-modules/access/v4l2.c
+modules/access/v4l2/controls.c
+modules/access/v4l2/video.c
 modules/access/vcd/cdrom.c
 modules/access/vcd/cdrom.h
 modules/access/vcd/cdrom_internals.h
