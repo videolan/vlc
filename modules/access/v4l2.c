@@ -402,7 +402,7 @@ vlc_module_begin ()
     add_obsolete_integer( CFG_PREFIX "samplerate" )
 
     add_shortcut( "v4l2" )
-    set_capability( "access_demux", 10 )
+    set_capability( "access_demux", 0 )
     set_callbacks( DemuxOpen, DemuxClose )
 
     add_submodule ()
@@ -640,10 +640,6 @@ static int DemuxOpen( vlc_object_t *p_this )
 {
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys;
-
-    /* Only when selected */
-    if( strcmp( p_demux->psz_access, "v4l2" ) )
-        return VLC_EGENERIC;
 
     /* Set up p_demux */
     p_demux->pf_control = DemuxControl;
