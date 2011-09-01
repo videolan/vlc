@@ -578,9 +578,6 @@ struct demux_sys_t
     struct v4l2_audio p_audios[32];
     unsigned i_selected_audio_input;
 
-    uint32_t i_tuner;
-    struct v4l2_tuner *p_tuners;
-
     unsigned i_codec;
     struct v4l2_fmtdesc *p_codecs;
 
@@ -597,7 +594,8 @@ struct demux_sys_t
     es_out_id_t *p_es;
 
     /* Tuner */
-    uint32_t i_cur_tuner;
+    uint32_t i_tuner;
+    enum v4l2_tuner_type i_tuner_type;
     int i_frequency;
     int i_audio_mode;
 
@@ -692,7 +690,8 @@ static void GetV4L2Params( demux_sys_t *p_sys, vlc_object_t *p_obj )
     p_sys->f_fps = var_CreateGetFloat( p_obj, "v4l2-fps" );
     p_sys->psz_requested_chroma = var_CreateGetString( p_obj, "v4l2-chroma" );
 
-    p_sys->i_cur_tuner = var_CreateGetInteger( p_obj, "v4l2-tuner" );
+    p_sys->i_tuner = var_CreateGetInteger( p_obj, "v4l2-tuner" );
+    p_sys->i_tuner_type = V4L2_TUNER_RADIO; /* non-trap default value */
     p_sys->i_frequency = var_CreateGetInteger( p_obj, "v4l2-tuner-frequency" );
     p_sys->i_audio_mode = var_CreateGetInteger( p_obj, "v4l2-tuner-audio-mode" );
 
@@ -826,7 +825,6 @@ static void CommonClose( vlc_object_t *p_this, demux_sys_t *p_sys )
     if( p_sys->i_fd >= 0 ) v4l2_close( p_sys->i_fd );
     free( p_sys->psz_device );
     free( p_sys->psz_standard );
-    free( p_sys->p_tuners );
     free( p_sys->p_codecs );
     free( p_sys->psz_requested_chroma );
     free( p_sys->psz_set_ctrls );
@@ -1594,16 +1592,12 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
     /* Tune the tuner */
     if( p_sys->i_frequency >= 0 )
     {
-        if( p_sys->i_cur_tuner >= p_sys->i_tuner )
-        {
-            msg_Err( p_obj, "invalid tuner %"PRIu32, p_sys->i_cur_tuner );
-            goto error;
-        }
-        struct v4l2_frequency frequency;
-        memset( &frequency, 0, sizeof( frequency ) );
-        frequency.tuner = p_sys->i_cur_tuner;
-        frequency.type = p_sys->p_tuners[p_sys->i_cur_tuner].type;
-        frequency.frequency = p_sys->i_frequency / 62.5;
+        struct v4l2_frequency frequency = {
+            .tuner = p_sys->i_tuner,
+            .type = p_sys->i_tuner_type,
+            .frequency = p_sys->i_frequency / 62.5,
+        };
+
         if( v4l2_ioctl( i_fd, VIDIOC_S_FREQUENCY, &frequency ) < 0 )
         {
             msg_Err( p_obj, "cannot set tuner frequency: %m" );
@@ -1615,15 +1609,11 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
     /* Set the tuner's audio mode */
     if( p_sys->i_audio_mode >= 0 )
     {
-        if( p_sys->i_cur_tuner >= p_sys->i_tuner )
-        {
-            msg_Err( p_obj, "invalid tuner %"PRIu32, p_sys->i_cur_tuner );
-            goto error;
-        }
-        struct v4l2_tuner tuner;
-        memset( &tuner, 0, sizeof( tuner ) );
-        tuner.index = p_sys->i_cur_tuner;
-        tuner.audmode = p_sys->i_audio_mode;
+        struct v4l2_tuner tuner = {
+            .index = p_sys->i_tuner,
+            .audmode = p_sys->i_audio_mode,
+        };
+
         if( v4l2_ioctl( i_fd, VIDIOC_S_TUNER, &tuner ) < 0 )
         {
             msg_Err( p_obj, "cannot set tuner audio mode: %m" );
@@ -2158,60 +2148,32 @@ static int ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, int i_fd )
     if( cap.capabilities & V4L2_CAP_TUNER )
     {
         struct v4l2_tuner tuner;
-        memset( &tuner, 0, sizeof(tuner) );
-        p_sys->i_tuner = 0;
+
+        tuner.index = 0;
         while( v4l2_ioctl( i_fd, VIDIOC_G_TUNER, &tuner ) >= 0 )
         {
-            if( tuner.index != p_sys->i_tuner )
-                break;
-            p_sys->i_tuner++;
-            memset( &tuner, 0, sizeof(tuner) );
-            tuner.index = p_sys->i_tuner;
-        }
+            if( tuner.index == p_sys->i_tuner )
+                p_sys->i_tuner_type = tuner.type;
 
-        free( p_sys->p_tuners );
-        p_sys->p_tuners = calloc( 1, p_sys->i_tuner * sizeof( struct v4l2_tuner ) );
-        if( !p_sys->p_tuners ) return -1;
-
-        for( unsigned i_index = 0; i_index < p_sys->i_tuner; i_index++ )
-        {
-            p_sys->p_tuners[i_index].index = i_index;
-
-            if( v4l2_ioctl( i_fd, VIDIOC_G_TUNER, &p_sys->p_tuners[i_index] ) )
-            {
-                msg_Err( p_obj, "cannot get tuner characteristics: %m" );
-                return -1;
-            }
+            const char *unit =
+                (tuner.capability & V4L2_TUNER_CAP_LOW) ? "Hz" : "kHz";
             msg_Dbg( p_obj, "tuner %u (%s) has type: %s, "
-                              "frequency range: %.1f %s -> %.1f %s",
-                                i_index,
-                                p_sys->p_tuners[i_index].name,
-                                p_sys->p_tuners[i_index].type
-                                        == V4L2_TUNER_RADIO ?
-                                        "Radio" : "Analog TV",
-                                p_sys->p_tuners[i_index].rangelow * 62.5,
-                                p_sys->p_tuners[i_index].capability &
-                                        V4L2_TUNER_CAP_LOW ?
-                                        "Hz" : "kHz",
-                                p_sys->p_tuners[i_index].rangehigh * 62.5,
-                                p_sys->p_tuners[i_index].capability &
-                                        V4L2_TUNER_CAP_LOW ?
-                                        "Hz" : "kHz" );
+                     "frequency range: %.1f %s -> %.1f %s", tuner.index,
+                     tuner.name,
+                     tuner.type == V4L2_TUNER_RADIO ? "Radio" : "Analog TV",
+                     tuner.rangelow * 62.5, unit,
+                     tuner.rangehigh * 62.5, unit );
 
-            struct v4l2_frequency frequency;
-            memset( &frequency, 0, sizeof( frequency ) );
+            struct v4l2_frequency frequency = { .tuner = tuner.index };
             if( v4l2_ioctl( i_fd, VIDIOC_G_FREQUENCY, &frequency ) < 0 )
             {
                 msg_Err( p_obj, "cannot get tuner frequency: %m" );
                 return -1;
             }
-            msg_Dbg( p_obj, "tuner %u (%s) frequency: %.1f %s",
-                     i_index,
-                     p_sys->p_tuners[i_index].name,
-                     frequency.frequency * 62.5,
-                     p_sys->p_tuners[i_index].capability &
-                             V4L2_TUNER_CAP_LOW ?
-                             "Hz" : "kHz" );
+            msg_Dbg( p_obj, "tuner %u (%s) frequency: %.1f %s", tuner.index,
+                     tuner.name, frequency.frequency * 62.5, unit );
+
+            tuner.index++;
         }
     }
 
