@@ -114,7 +114,7 @@ static int FindMeta( vlc_object_t *p_this )
         if( asprintf( &filepath, "%s%s", psz_path, filename ) == -1 )
             filepath = NULL;
         free( filebuf );
-        if( unlikely(filepath != NULL) )
+        if( unlikely(filepath == NULL) )
             continue;
 
         struct stat dummy;
