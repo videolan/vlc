@@ -447,7 +447,7 @@ static block_t* ProcessVideoFrame( vlc_object_t *p_demux, uint8_t *p_frame, size
 static bool IsPixelFormatSupported( demux_t *p_demux,
                                           unsigned int i_pixelformat );
 
-static int OpenVideoDev( vlc_object_t *, demux_sys_t *, bool );
+static int OpenVideoDev( vlc_object_t *, const char *path, demux_sys_t *, bool );
 static int ProbeVideoDev( vlc_object_t *, demux_sys_t *, int );
 
 static int ControlList( vlc_object_t *, int , bool, bool );
@@ -564,7 +564,6 @@ struct buffer_t
 
 struct demux_sys_t
 {
-    char *psz_device;  /* Main device from MRL */
     int  i_fd;
 
     /* Video */
@@ -608,16 +607,6 @@ struct demux_sys_t
 #   define v4l2_munmap munmap
 #endif
 
-static int FindMainDevice( vlc_object_t *p_this, demux_sys_t *p_sys,
-                           bool b_demux )
-{
-    /* TODO: if using default device, loop through all /dev/video* until
-     * one works */
-    p_sys->i_fd = OpenVideoDev( p_this, p_sys, b_demux );
-    if( p_sys->i_fd < 0 ) return VLC_EGENERIC;
-    return VLC_SUCCESS;
-}
-
 /*****************************************************************************
  * DemuxOpen: opens v4l2 device, access_demux callback
  *****************************************************************************
@@ -640,26 +629,37 @@ static int DemuxOpen( vlc_object_t *p_this )
     p_demux->p_sys = p_sys = calloc( 1, sizeof( demux_sys_t ) );
     if( p_sys == NULL ) return VLC_ENOMEM;
 
-    p_sys->psz_device = ParseMRL( p_this, p_demux->psz_location );
+    char *path = ParseMRL( p_this, p_demux->psz_location );
+    if( path == NULL )
+        path = var_CreateGetNonEmptyString( p_this, CFG_PREFIX"dev" );
     GetV4L2Params( p_sys, p_this );
 
 #ifdef HAVE_LIBV4L2
+    p_sys->i_fd = -1;
     if( !var_InheritBool( p_this, CFG_PREFIX "use-libv4l2" ) )
     {
-        msg_Dbg( p_this, "Trying direct kernel v4l2" );
         p_sys->b_libv4l2 = false;
-        if( FindMainDevice( p_this, p_sys, true ) == VLC_SUCCESS)
-            return VLC_SUCCESS;
+#endif
+        msg_Dbg( p_this, "Trying direct kernel v4l2" );
+        p_sys->i_fd = OpenVideoDev( p_this, path, p_sys, true );
+#ifdef HAVE_LIBV4L2
     }
 
-    msg_Dbg( p_this, "Trying libv4l2 wrapper" );
-    p_sys->b_libv4l2 = true;
+    if( p_sys->i_fd == -1 )
+    {
+        p_sys->b_libv4l2 = true;
+        msg_Dbg( p_this, "Trying libv4l2 wrapper" );
+        p_sys->i_fd = OpenVideoDev( p_this, path, p_sys, true );
+    }
 #endif
-    if( FindMainDevice( p_this, p_sys, true ) == VLC_SUCCESS)
-        return VLC_SUCCESS;
-
-    DemuxClose( p_this );
-    return VLC_EGENERIC;
+    free( path );
+    if( p_sys->i_fd == -1 )
+    {
+        free( p_sys->p_codecs );
+        free( p_sys );
+        return VLC_EGENERIC;
+    }
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -667,9 +667,6 @@ static int DemuxOpen( vlc_object_t *p_this )
  *****************************************************************************/
 static void GetV4L2Params( demux_sys_t *p_sys, vlc_object_t *p_obj )
 {
-    if( p_sys->psz_device == NULL )
-        p_sys->psz_device = var_CreateGetNonEmptyString( p_obj, "v4l2-dev" );
-
     p_sys->i_selected_input = var_CreateGetInteger( p_obj, "v4l2-input" );
     p_sys->i_audio_input = var_CreateGetInteger( p_obj, "v4l2-audio-input" );
 
@@ -808,9 +805,7 @@ static void CommonClose( vlc_object_t *p_this, demux_sys_t *p_sys )
     (void)p_this;
     /* Close */
     if( p_sys->i_fd >= 0 ) v4l2_close( p_sys->i_fd );
-    free( p_sys->psz_device );
     free( p_sys->p_codecs );
-
     free( p_sys );
 }
 
@@ -834,46 +829,41 @@ static int AccessOpen( vlc_object_t * p_this )
     if( !p_sys ) return VLC_ENOMEM;
     p_access->p_sys = (access_sys_t*)p_sys;
 
-    p_sys->psz_device = ParseMRL( p_this, p_access->psz_location );
+    char *path = ParseMRL( p_this, p_access->psz_location );
+    if( path == NULL )
+        path = var_InheritString( p_this, CFG_PREFIX"dev" );
     GetV4L2Params( p_sys, p_this );
 
 #ifdef HAVE_LIBV4L2
+    p_sys->i_fd = -1;
     if( !var_InheritBool( p_this, CFG_PREFIX "use-libv4l2" ) )
     {
-        msg_Dbg( p_this, "Trying direct kernel v4l2" );
         p_sys->b_libv4l2 = false;
-        if( FindMainDevice( p_this, p_sys, false ) == VLC_SUCCESS)
-        {
-            if( p_sys->io == IO_METHOD_READ )
-            {
-                ACCESS_SET_CALLBACKS( AccessReadStream, NULL, AccessControl, NULL );
-            }
-            else
-            {
-                ACCESS_SET_CALLBACKS( NULL, AccessRead, AccessControl, NULL );
-            }
-            return VLC_SUCCESS;
-        }
-    }
-
-    msg_Dbg( p_this, "Trying libv4l2 wrapper" );
-    p_sys->b_libv4l2 = true;
 #endif
-    if( FindMainDevice( p_this, p_sys, false ) == VLC_SUCCESS )
+        msg_Dbg( p_this, "Trying direct kernel v4l2" );
+        p_sys->i_fd = OpenVideoDev( p_this, path, p_sys, false );
+#ifdef HAVE_LIBV4L2
+    }
+    if( p_sys->i_fd == -1 )
     {
-        if( p_sys->io == IO_METHOD_READ )
-        {
-            ACCESS_SET_CALLBACKS( AccessReadStream, NULL, AccessControl, NULL );
-        }
-        else
-        {
-            ACCESS_SET_CALLBACKS( NULL, AccessRead, AccessControl, NULL );
-        }
-        return VLC_SUCCESS;
+        p_sys->b_libv4l2 = true;
+        msg_Dbg( p_this, "Trying libv4l2 wrapper" );
+        p_sys->i_fd = OpenVideoDev( p_this, path, p_sys, false );
+    }
+#endif
+    free( path );
+    if( p_sys->i_fd == -1 )
+    {
+        free( p_sys->p_codecs );
+        free( p_sys );
+        return VLC_EGENERIC;
     }
 
-    AccessClose( p_this );
-    return VLC_EGENERIC;
+    if( p_sys->io == IO_METHOD_READ )
+        ACCESS_SET_CALLBACKS( AccessReadStream, NULL, AccessControl, NULL );
+    else
+        ACCESS_SET_CALLBACKS( NULL, AccessRead, AccessControl, NULL );
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -1489,25 +1479,26 @@ static void GetMaxDimensions( demux_t *p_demux, int i_fd,
 #endif
 }
 
-/*****************************************************************************
- * OpenVideoDev: open and set up the video device and probe for capabilities
- *****************************************************************************/
-static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
+/**
+ * Opens and sets up a video device
+ * \return file descriptor or -1 on error
+ */
+static int OpenVideoDev( vlc_object_t *p_obj, const char *path,
+                         demux_sys_t *p_sys, bool b_demux )
 {
     struct v4l2_cropcap cropcap;
     struct v4l2_crop crop;
     struct v4l2_format fmt;
     unsigned int i_min;
     enum v4l2_buf_type buf_type;
-    const char *psz_device = p_sys->psz_device;
     es_format_t es_fmt;
 
-    msg_Dbg( p_obj, "opening device '%s'", psz_device );
+    msg_Dbg( p_obj, "opening device '%s'", path );
 
-    int i_fd = vlc_open( psz_device, O_RDWR );
+    int i_fd = vlc_open( path, O_RDWR );
     if( i_fd == -1 )
     {
-        msg_Err( p_obj, "cannot open device %s: %m", psz_device );
+        msg_Err( p_obj, "cannot open device %s: %m", path );
         return -1;
     }
 
