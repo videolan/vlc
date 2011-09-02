@@ -377,33 +377,26 @@ static block_t* GrabAudio( demux_t *p_demux )
         return NULL;
     }
 
+    if( i_read < 0 )
+        i_read = snd_pcm_recover( p_sys->p_alsa_pcm, i_read, 0 );
+
     if( i_read <= 0 )
     {
         switch( i_read )
         {
-            case -EPIPE:
-                /* xrun */
-                snd_pcm_prepare( p_sys->p_alsa_pcm );
-                break;
-            case -ESTRPIPE:
-            {
-                /* suspend */
-                int i_resume = snd_pcm_resume( p_sys->p_alsa_pcm );
-                if( i_resume < 0 && i_resume != -EAGAIN ) snd_pcm_prepare( p_sys->p_alsa_pcm );
-                break;
-            }
+            case 0: /* state recovered or no data */
+                return NULL;
+            case -EAGAIN:
+                snd_pcm_wait( p_sys->p_alsa_pcm, 10 ); /* See poll() comment in oss.c */
+                return NULL;
             default:
                 msg_Err( p_demux, "Failed to read alsa frame (%s)", snd_strerror( i_read ) );
                 return 0;
         }
     }
-    else
-    {
-        /* convert from frames to bytes */
-        i_read *= p_sys->i_alsa_frame_size;
-    }
 
-    if( i_read <= 0 ) return 0;
+    /* convert from frames to bytes */
+    i_read *= p_sys->i_alsa_frame_size;
 
     p_block->i_buffer = i_read;
     p_sys->p_block = 0;
