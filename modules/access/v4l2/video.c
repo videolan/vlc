@@ -424,7 +424,6 @@ static bool IsPixelFormatSupported( demux_t *p_demux,
                                           unsigned int i_pixelformat );
 
 static int OpenVideoDev( vlc_object_t *, const char *path, demux_sys_t *, bool );
-static int ProbeVideoDev( vlc_object_t *, demux_sys_t *, int );
 
 static const struct
 {
@@ -1398,16 +1397,65 @@ static int OpenVideoDev( vlc_object_t *p_obj, const char *path,
     }
 #endif
 
-    if( ProbeVideoDev( p_obj, p_sys, i_fd ) )
-        goto error;
-
-    /* Select input */
-    if( v4l2_ioctl( i_fd, VIDIOC_S_INPUT, &p_sys->i_selected_input ) < 0 )
+    /* Get device capabilites */
+    struct v4l2_capability cap;
+    if( v4l2_ioctl( i_fd, VIDIOC_QUERYCAP, &cap ) < 0 )
     {
-        msg_Err( p_obj, "cannot set input %u: %m", p_sys->i_selected_input );
+        msg_Err( p_obj, "cannot get video capabilities: %m" );
+        return -1;
+    }
+
+    msg_Dbg( p_obj, "device %s using driver %s (version %u.%u.%u) on %s",
+            cap.card, cap.driver, (cap.version >> 16) & 0xFF,
+            (cap.version >> 8) & 0xFF, cap.version & 0xFF, cap.bus_info );
+    msg_Dbg( p_obj, "the device has the capabilities: 0x%08X",
+             cap.capabilities );
+    msg_Dbg( p_obj, " (%c) Video Capture, (%c) Audio, (%c) Tuner, (%c) Radio",
+             ( cap.capabilities & V4L2_CAP_VIDEO_CAPTURE  ? 'X':' '),
+             ( cap.capabilities & V4L2_CAP_AUDIO  ? 'X':' '),
+             ( cap.capabilities & V4L2_CAP_TUNER  ? 'X':' '),
+             ( cap.capabilities & V4L2_CAP_RADIO  ? 'X':' ') );
+    msg_Dbg( p_obj, " (%c) Read/Write, (%c) Streaming, (%c) Asynchronous",
+            ( cap.capabilities & V4L2_CAP_READWRITE ? 'X':' ' ),
+            ( cap.capabilities & V4L2_CAP_STREAMING ? 'X':' ' ),
+            ( cap.capabilities & V4L2_CAP_ASYNCIO ? 'X':' ' ) );
+
+    if( cap.capabilities & V4L2_CAP_STREAMING )
+        p_sys->io = IO_METHOD_MMAP;
+    else if( cap.capabilities & V4L2_CAP_READWRITE )
+        p_sys->io = IO_METHOD_READ;
+    else
+    {
+        msg_Err( p_obj, "no supported I/O method" );
         goto error;
     }
-    msg_Dbg( p_obj, "input set to %u", p_sys->i_selected_input );
+
+    /* Now, enumerate all the video inputs. This is useless at the moment
+       since we have no way to present that info to the user except with
+       debug messages */
+    if( cap.capabilities & V4L2_CAP_VIDEO_CAPTURE )
+    {
+        struct v4l2_input input;
+        input.index = 0;
+        while( v4l2_ioctl( i_fd, VIDIOC_ENUMINPUT, &input ) >= 0 )
+        {
+            msg_Dbg( p_obj, "video input %u (%s) has type: %s %c",
+                     input.index, input.name,
+                     input.type == V4L2_INPUT_TYPE_TUNER
+                          ? "Tuner adapter" : "External analog input",
+                     input.index == p_sys->i_selected_input ? '*' : ' ' );
+            input.index++;
+        }
+
+        /* Select input */
+        if( v4l2_ioctl( i_fd, VIDIOC_S_INPUT, &p_sys->i_selected_input ) < 0 )
+        {
+            msg_Err( p_obj, "cannot set input %u: %m",
+                     p_sys->i_selected_input );
+            goto error;
+        }
+        msg_Dbg( p_obj, "input set to %u", p_sys->i_selected_input );
+    }
 
     /* Select standard */
     bool bottom_first;
@@ -1439,6 +1487,74 @@ static int OpenVideoDev( vlc_object_t *p_obj, const char *path,
     }
     else
         bottom_first = false;
+
+    /* Probe audio inputs */
+    if( cap.capabilities & V4L2_CAP_AUDIO )
+    {
+        struct v4l2_audio audio = { .index = 0 };
+
+        while( v4l2_ioctl( i_fd, VIDIOC_ENUMAUDIO, &audio ) >= 0 )
+        {
+            msg_Dbg( p_obj, "audio input %u (%s) is %s%s %c", audio.index,
+                     audio.name,
+                     audio.capability & V4L2_AUDCAP_STEREO ? "Stereo" : "Mono",
+                     audio.capability & V4L2_AUDCAP_AVL
+                         ? " (Automatic Volume Level supported)" : "",
+                     p_sys->i_audio_input == audio.index );
+            audio.index++;
+        }
+    }
+
+    /* Set audio input */
+    if( p_sys->i_audio_input != (uint32_t)-1 )
+    {
+        struct v4l2_audio audio = {
+            .index = p_sys->i_audio_input,
+            .mode = 0, /* TODO: AVL support */
+        };
+
+        if( v4l2_ioctl( i_fd, VIDIOC_S_AUDIO, &audio ) < 0 )
+        {
+            msg_Err( p_obj, "cannot set audio input %u: %m",
+                     p_sys->i_audio_input );
+            goto error;
+        }
+        msg_Dbg( p_obj, "audio input set to %u",
+                 p_sys->i_audio_input );
+    }
+
+    /* List tuner caps */
+    if( cap.capabilities & V4L2_CAP_TUNER )
+    {
+        struct v4l2_tuner tuner;
+
+        tuner.index = 0;
+        while( v4l2_ioctl( i_fd, VIDIOC_G_TUNER, &tuner ) >= 0 )
+        {
+            if( tuner.index == p_sys->i_tuner )
+                p_sys->i_tuner_type = tuner.type;
+
+            const char *unit =
+                (tuner.capability & V4L2_TUNER_CAP_LOW) ? "Hz" : "kHz";
+            msg_Dbg( p_obj, "tuner %u (%s) has type: %s, "
+                     "frequency range: %.1f %s -> %.1f %s", tuner.index,
+                     tuner.name,
+                     tuner.type == V4L2_TUNER_RADIO ? "Radio" : "Analog TV",
+                     tuner.rangelow * 62.5, unit,
+                     tuner.rangehigh * 62.5, unit );
+
+            struct v4l2_frequency frequency = { .tuner = tuner.index };
+            if( v4l2_ioctl( i_fd, VIDIOC_G_FREQUENCY, &frequency ) < 0 )
+            {
+                msg_Err( p_obj, "cannot get tuner frequency: %m" );
+                return -1;
+            }
+            msg_Dbg( p_obj, "tuner %u (%s) frequency: %.1f %s", tuner.index,
+                     tuner.name, frequency.frequency * 62.5, unit );
+
+            tuner.index++;
+        }
+    }
 
     /* Tune the tuner */
     uint32_t freq = var_InheritInteger( p_obj, CFG_PREFIX"tuner-frequency" );
@@ -1474,24 +1590,112 @@ static int OpenVideoDev( vlc_object_t *p_obj, const char *path,
         msg_Dbg( p_obj, "tuner audio mode set" );
     }
 
-    /* Set audio input */
-    if( p_sys->i_audio_input != (uint32_t)-1 )
+    /* Probe for available chromas */
+    if( cap.capabilities & V4L2_CAP_VIDEO_CAPTURE )
     {
-        struct v4l2_audio audio = {
-            .index = p_sys->i_audio_input,
-            .mode = 0, /* TODO: AVL support */
-        };
+        struct v4l2_fmtdesc codec;
 
-        if( v4l2_ioctl( i_fd, VIDIOC_S_AUDIO, &audio ) < 0 )
+        unsigned i_index = 0;
+        memset( &codec, 0, sizeof(codec) );
+        codec.index = i_index;
+        codec.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+
+        while( v4l2_ioctl( i_fd, VIDIOC_ENUM_FMT, &codec ) >= 0 )
         {
-            msg_Err( p_obj, "cannot set audio input %u: %m",
-                     p_sys->i_audio_input );
-            goto error;
+            if( codec.index != i_index )
+                break;
+            i_index++;
+            codec.index = i_index;
         }
-        msg_Dbg( p_obj, "audio input set to %u",
-                 p_sys->i_audio_input );
-    }
 
+        p_sys->i_codec = i_index;
+
+        free( p_sys->p_codecs );
+        p_sys->p_codecs = calloc( 1, p_sys->i_codec * sizeof( struct v4l2_fmtdesc ) );
+
+        for( i_index = 0; i_index < p_sys->i_codec; i_index++ )
+        {
+            p_sys->p_codecs[i_index].index = i_index;
+            p_sys->p_codecs[i_index].type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+
+            if( v4l2_ioctl( i_fd, VIDIOC_ENUM_FMT, &p_sys->p_codecs[i_index] ) < 0 )
+            {
+                msg_Err( p_obj, "cannot get codec description: %m" );
+                return -1;
+            }
+
+            /* only print if vlc supports the format */
+            char psz_fourcc_v4l2[5];
+            memset( &psz_fourcc_v4l2, 0, sizeof( psz_fourcc_v4l2 ) );
+            vlc_fourcc_to_char( p_sys->p_codecs[i_index].pixelformat,
+                                &psz_fourcc_v4l2 );
+            bool b_codec_supported = false;
+            for( int i = 0; v4l2chroma_to_fourcc[i].i_v4l2 != 0; i++ )
+            {
+                if( v4l2chroma_to_fourcc[i].i_v4l2 == p_sys->p_codecs[i_index].pixelformat )
+                {
+                    b_codec_supported = true;
+
+                    char psz_fourcc[5];
+                    memset( &psz_fourcc, 0, sizeof( psz_fourcc ) );
+                    vlc_fourcc_to_char( v4l2chroma_to_fourcc[i].i_fourcc,
+                                        &psz_fourcc );
+                    msg_Dbg( p_obj, "device supports chroma %4.4s [%s, %s]",
+                                psz_fourcc,
+                                p_sys->p_codecs[i_index].description,
+                                psz_fourcc_v4l2 );
+
+#ifdef VIDIOC_ENUM_FRAMESIZES
+                    /* This is new in Linux 2.6.19 */
+                    /* List valid frame sizes for this format */
+                    struct v4l2_frmsizeenum frmsize;
+                    memset( &frmsize, 0, sizeof(frmsize) );
+                    frmsize.pixel_format = p_sys->p_codecs[i_index].pixelformat;
+                    if( v4l2_ioctl( i_fd, VIDIOC_ENUM_FRAMESIZES, &frmsize ) < 0 )
+                    {
+                        /* Not all devices support this ioctl */
+                        msg_Warn( p_obj, "Unable to query for frame sizes" );
+                    }
+                    else
+                    {
+                        switch( frmsize.type )
+                        {
+                            case V4L2_FRMSIZE_TYPE_DISCRETE:
+                                do
+                                {
+                                    msg_Dbg( p_obj,
+                "    device supports size %dx%d",
+                frmsize.discrete.width, frmsize.discrete.height );
+                                    frmsize.index++;
+                                } while( v4l2_ioctl( i_fd, VIDIOC_ENUM_FRAMESIZES, &frmsize ) >= 0 );
+                                break;
+                            case V4L2_FRMSIZE_TYPE_STEPWISE:
+                                msg_Dbg( p_obj,
+                "    device supports sizes %dx%d to %dx%d using %dx%d increments",
+                frmsize.stepwise.min_width, frmsize.stepwise.min_height,
+                frmsize.stepwise.max_width, frmsize.stepwise.max_height,
+                frmsize.stepwise.step_width, frmsize.stepwise.step_height );
+                                break;
+                            case V4L2_FRMSIZE_TYPE_CONTINUOUS:
+                                msg_Dbg( p_obj,
+                "    device supports all sizes %dx%d to %dx%d",
+                frmsize.stepwise.min_width, frmsize.stepwise.min_height,
+                frmsize.stepwise.max_width, frmsize.stepwise.max_height );
+                                break;
+                        }
+                    }
+#endif
+                }
+            }
+            if( !b_codec_supported )
+            {
+                    msg_Dbg( p_obj,
+                         "device codec %4.4s (%s) not supported",
+                         psz_fourcc_v4l2,
+                         p_sys->p_codecs[i_index].description );
+            }
+        }
+    }
 
     /* TODO: Move the resolution stuff up here */
     /* if MPEG encoder card, no need to do anything else after this */
@@ -1885,235 +2089,4 @@ static int OpenVideoDev( vlc_object_t *p_obj, const char *path,
 error:
     v4l2_close( i_fd );
     return -1;
-}
-
-/*****************************************************************************
- * ProbeVideoDev: probe video for capabilities
- *****************************************************************************/
-static int ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, int i_fd )
-{
-    /* Get device capabilites */
-    struct v4l2_capability cap;
-
-    if( v4l2_ioctl( i_fd, VIDIOC_QUERYCAP, &cap ) < 0 )
-    {
-        msg_Err( p_obj, "cannot get video capabilities: %m" );
-        return -1;
-    }
-
-    msg_Dbg( p_obj, "device %s using driver %s (version %u.%u.%u) on %s",
-            cap.card, cap.driver, (cap.version >> 16) & 0xFF,
-            (cap.version >> 8) & 0xFF, cap.version & 0xFF, cap.bus_info );
-    msg_Dbg( p_obj, "the device has the capabilities:"
-             " (%c) Video Capture, (%c) Audio, (%c) Tuner, (%c) Radio",
-             ( cap.capabilities & V4L2_CAP_VIDEO_CAPTURE  ? 'X':' '),
-             ( cap.capabilities & V4L2_CAP_AUDIO  ? 'X':' '),
-             ( cap.capabilities & V4L2_CAP_TUNER  ? 'X':' '),
-             ( cap.capabilities & V4L2_CAP_RADIO  ? 'X':' ') );
-    msg_Dbg( p_obj, "supported I/O methods are:"
-             " (%c) Read/Write, (%c) Streaming, (%c) Asynchronous",
-            ( cap.capabilities & V4L2_CAP_READWRITE ? 'X':' ' ),
-            ( cap.capabilities & V4L2_CAP_STREAMING ? 'X':' ' ),
-            ( cap.capabilities & V4L2_CAP_ASYNCIO ? 'X':' ' ) );
-
-    if( cap.capabilities & V4L2_CAP_STREAMING )
-        p_sys->io = IO_METHOD_MMAP;
-    else if( cap.capabilities & V4L2_CAP_READWRITE )
-        p_sys->io = IO_METHOD_READ;
-    else
-    {
-        msg_Err( p_obj, "no supported I/O method" );
-        return -1;
-    }
-
-    if( cap.capabilities & V4L2_CAP_RDS_CAPTURE )
-        msg_Dbg( p_obj, "device supports RDS" );
-
-#ifdef V4L2_CAP_HW_FREQ_SEEK
-    if( cap.capabilities & V4L2_CAP_HW_FREQ_SEEK )
-        msg_Dbg( p_obj, "device supports hardware frequency seeking" );
-#endif
-    if( cap.capabilities & V4L2_CAP_VBI_CAPTURE )
-        msg_Dbg( p_obj, "device supports raw VBI capture" );
-
-    if( cap.capabilities & V4L2_CAP_SLICED_VBI_CAPTURE )
-        msg_Dbg( p_obj, "device supports sliced VBI capture" );
-
-    /* Now, enumerate all the video inputs. This is useless at the moment
-       since we have no way to present that info to the user except with
-       debug messages */
-
-    if( cap.capabilities & V4L2_CAP_VIDEO_CAPTURE )
-    {
-        struct v4l2_input input;
-
-        input.index = 0;
-        while( v4l2_ioctl( i_fd, VIDIOC_ENUMINPUT, &input ) >= 0 )
-        {
-            msg_Dbg( p_obj, "video input %u (%s) has type: %s %c",
-                     input.index, input.name,
-                     input.type == V4L2_INPUT_TYPE_TUNER
-                         ? "Tuner adapter" : "External analog input",
-                     input.index == p_sys->i_selected_input ? '*' : ' ' );
-            input.index++;
-        }
-    }
-
-    /* Probe audio inputs */
-    if( cap.capabilities & V4L2_CAP_AUDIO )
-    {
-        struct v4l2_audio audio = { .index = 0 };
-
-        while( v4l2_ioctl( i_fd, VIDIOC_ENUMAUDIO, &audio ) >= 0 )
-        {
-            msg_Dbg( p_obj, "audio input %u (%s) is %s%s %c", audio.index,
-                     audio.name,
-                     audio.capability & V4L2_AUDCAP_STEREO ? "Stereo" : "Mono",
-                     audio.capability & V4L2_AUDCAP_AVL
-                         ? " (Automatic Volume Level supported)" : "",
-                     p_sys->i_audio_input == audio.index );
-            audio.index++;
-        }
-    }
-
-    /* List tuner caps */
-    if( cap.capabilities & V4L2_CAP_TUNER )
-    {
-        struct v4l2_tuner tuner;
-
-        tuner.index = 0;
-        while( v4l2_ioctl( i_fd, VIDIOC_G_TUNER, &tuner ) >= 0 )
-        {
-            if( tuner.index == p_sys->i_tuner )
-                p_sys->i_tuner_type = tuner.type;
-
-            const char *unit =
-                (tuner.capability & V4L2_TUNER_CAP_LOW) ? "Hz" : "kHz";
-            msg_Dbg( p_obj, "tuner %u (%s) has type: %s, "
-                     "frequency range: %.1f %s -> %.1f %s", tuner.index,
-                     tuner.name,
-                     tuner.type == V4L2_TUNER_RADIO ? "Radio" : "Analog TV",
-                     tuner.rangelow * 62.5, unit,
-                     tuner.rangehigh * 62.5, unit );
-
-            struct v4l2_frequency frequency = { .tuner = tuner.index };
-            if( v4l2_ioctl( i_fd, VIDIOC_G_FREQUENCY, &frequency ) < 0 )
-            {
-                msg_Err( p_obj, "cannot get tuner frequency: %m" );
-                return -1;
-            }
-            msg_Dbg( p_obj, "tuner %u (%s) frequency: %.1f %s", tuner.index,
-                     tuner.name, frequency.frequency * 62.5, unit );
-
-            tuner.index++;
-        }
-    }
-
-    /* Probe for available chromas */
-    if( cap.capabilities & V4L2_CAP_VIDEO_CAPTURE )
-    {
-        struct v4l2_fmtdesc codec;
-
-        unsigned i_index = 0;
-        memset( &codec, 0, sizeof(codec) );
-        codec.index = i_index;
-        codec.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-
-        while( v4l2_ioctl( i_fd, VIDIOC_ENUM_FMT, &codec ) >= 0 )
-        {
-            if( codec.index != i_index )
-                break;
-            i_index++;
-            codec.index = i_index;
-        }
-
-        p_sys->i_codec = i_index;
-
-        free( p_sys->p_codecs );
-        p_sys->p_codecs = calloc( 1, p_sys->i_codec * sizeof( struct v4l2_fmtdesc ) );
-
-        for( i_index = 0; i_index < p_sys->i_codec; i_index++ )
-        {
-            p_sys->p_codecs[i_index].index = i_index;
-            p_sys->p_codecs[i_index].type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-
-            if( v4l2_ioctl( i_fd, VIDIOC_ENUM_FMT, &p_sys->p_codecs[i_index] ) < 0 )
-            {
-                msg_Err( p_obj, "cannot get codec description: %m" );
-                return -1;
-            }
-
-            /* only print if vlc supports the format */
-            char psz_fourcc_v4l2[5];
-            memset( &psz_fourcc_v4l2, 0, sizeof( psz_fourcc_v4l2 ) );
-            vlc_fourcc_to_char( p_sys->p_codecs[i_index].pixelformat,
-                                &psz_fourcc_v4l2 );
-            bool b_codec_supported = false;
-            for( int i = 0; v4l2chroma_to_fourcc[i].i_v4l2 != 0; i++ )
-            {
-                if( v4l2chroma_to_fourcc[i].i_v4l2 == p_sys->p_codecs[i_index].pixelformat )
-                {
-                    b_codec_supported = true;
-
-                    char psz_fourcc[5];
-                    memset( &psz_fourcc, 0, sizeof( psz_fourcc ) );
-                    vlc_fourcc_to_char( v4l2chroma_to_fourcc[i].i_fourcc,
-                                        &psz_fourcc );
-                    msg_Dbg( p_obj, "device supports chroma %4.4s [%s, %s]",
-                                psz_fourcc,
-                                p_sys->p_codecs[i_index].description,
-                                psz_fourcc_v4l2 );
-
-#ifdef VIDIOC_ENUM_FRAMESIZES
-                    /* This is new in Linux 2.6.19 */
-                    /* List valid frame sizes for this format */
-                    struct v4l2_frmsizeenum frmsize;
-                    memset( &frmsize, 0, sizeof(frmsize) );
-                    frmsize.pixel_format = p_sys->p_codecs[i_index].pixelformat;
-                    if( v4l2_ioctl( i_fd, VIDIOC_ENUM_FRAMESIZES, &frmsize ) < 0 )
-                    {
-                        /* Not all devices support this ioctl */
-                        msg_Warn( p_obj, "Unable to query for frame sizes" );
-                    }
-                    else
-                    {
-                        switch( frmsize.type )
-                        {
-                            case V4L2_FRMSIZE_TYPE_DISCRETE:
-                                do
-                                {
-                                    msg_Dbg( p_obj,
-                "    device supports size %dx%d",
-                frmsize.discrete.width, frmsize.discrete.height );
-                                    frmsize.index++;
-                                } while( v4l2_ioctl( i_fd, VIDIOC_ENUM_FRAMESIZES, &frmsize ) >= 0 );
-                                break;
-                            case V4L2_FRMSIZE_TYPE_STEPWISE:
-                                msg_Dbg( p_obj,
-                "    device supports sizes %dx%d to %dx%d using %dx%d increments",
-                frmsize.stepwise.min_width, frmsize.stepwise.min_height,
-                frmsize.stepwise.max_width, frmsize.stepwise.max_height,
-                frmsize.stepwise.step_width, frmsize.stepwise.step_height );
-                                break;
-                            case V4L2_FRMSIZE_TYPE_CONTINUOUS:
-                                msg_Dbg( p_obj,
-                "    device supports all sizes %dx%d to %dx%d",
-                frmsize.stepwise.min_width, frmsize.stepwise.min_height,
-                frmsize.stepwise.max_width, frmsize.stepwise.max_height );
-                                break;
-                        }
-                    }
-#endif
-                }
-            }
-            if( !b_codec_supported )
-            {
-                    msg_Dbg( p_obj,
-                         "device codec %4.4s (%s) not supported",
-                         psz_fourcc_v4l2,
-                         p_sys->p_codecs[i_index].description );
-            }
-        }
-    }
-    return 0;
 }
