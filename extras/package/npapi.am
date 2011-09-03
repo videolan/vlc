@@ -24,7 +24,7 @@ stamp-npapi-configure: stamp-npapi-autogen
 		CXX="$(CXX)" CXXFLAGS="$(CXXFLAGS)" \
 		LD="$(LD)" LDFLAGS="$(LDFLAGS)" \
 		SHELL="$(SHELL)" \
-		PKG_CONFIG_LIBDIR="../$(srcdir)/extras/contrib/lib/pkgconfig:../src:../lib"
+		PKG_CONFIG_LIBDIR="../$(srcdir)/extras/contrib/lib/pkgconfig:../lib"
 	touch $@
 
 stamp-npapi-build: stamp-npapi-configure
