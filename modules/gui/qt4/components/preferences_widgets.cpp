@@ -541,7 +541,7 @@ void setfillVLCConfigCombo( const char *configname, intf_thread_t *p_intf,
        if( string )
            def = QVariant( qfu(p_config->value.psz) );
        else
-           def = QVariant( p_config->value.i );
+           def = QVariant( qlonglong( p_config->value.i ) );
 
        if(p_config->pf_update_list)
         {
