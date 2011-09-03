@@ -529,12 +529,20 @@ QString StringListConfigControl::getValue() const
 }
 
 void setfillVLCConfigCombo( const char *configname, intf_thread_t *p_intf,
-                        QComboBox *combo )
+                            QComboBox *combo )
 {
     module_config_t *p_config =
                       config_FindConfig( VLC_OBJECT(p_intf), configname );
     if( p_config )
     {
+       QVariant def;
+       bool string = (p_config->i_type & 0xF0) == CONFIG_ITEM_STRING;
+
+       if( string )
+           def = QVariant( qfu(p_config->value.psz) );
+       else
+           def = QVariant( p_config->value.i );
+
        if(p_config->pf_update_list)
         {
             vlc_value_t val;
@@ -548,12 +556,15 @@ void setfillVLCConfigCombo( const char *configname, intf_thread_t *p_intf,
 
         for ( int i_index = 0; i_index < p_config->i_list; i_index++ )
         {
-            combo->addItem( qtr(p_config->ppsz_list_text[i_index]),
-                    QVariant( p_config->pi_list[i_index] ) );
-            if( p_config->value.i == p_config->pi_list[i_index] )
-            {
+            QVariant value;
+
+            if( string )
+                value = QVariant( qfu(p_config->ppsz_list[i_index]) );
+            else
+                value =QVariant( p_config->pi_list[i_index] );
+            combo->addItem( qtr(p_config->ppsz_list_text[i_index]), value );
+            if( def == value )
                 combo->setCurrentIndex( i_index );
-            }
         }
 
         if( p_config->psz_longtext )
