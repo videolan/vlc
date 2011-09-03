@@ -914,7 +914,6 @@ static block_t *VideoGetBuffer( sout_stream_t *p_stream, sout_stream_id_t *id,
     p_out->i_length = p_buffer->i_length;
     p_out->i_pts = p_buffer->i_dts;
     p_out->i_dts = p_buffer->i_dts;
-    p_out->i_rate = p_buffer->i_rate;
 
     switch ( id->ff_enc_c->coded_frame->pict_type )
     {
@@ -958,7 +957,6 @@ static block_t *AudioGetBuffer( sout_stream_t *p_stream, sout_stream_id_t *id,
     p_out->i_length = p_buffer->i_length;
     p_out->i_pts = p_buffer->i_dts;
     p_out->i_dts = p_buffer->i_dts;
-    p_out->i_rate = p_buffer->i_rate;
 
     block_Release( p_buffer );
 
