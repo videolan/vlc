@@ -71,11 +71,12 @@ static void module_StoreBank (module_t *module)
     modules.head = module;
 }
 
-#ifdef __GNUC__
+#ifdef __ELF__
+# ifdef __GNUC__
 __attribute__((weak))
-#else
-#pragma weak vlc_static_modules
-#endif
+# else
+#  pragma weak vlc_static_modules
+# endif
 extern vlc_plugin_cb vlc_static_modules[];
 
 static void module_InitStaticModules(void)
@@ -89,6 +90,9 @@ static void module_InitStaticModules(void)
             module_StoreBank (module);
     }
 }
+#else
+static void module_InitStaticModules(void) { }
+#endif
 
 /**
  * Init bank
