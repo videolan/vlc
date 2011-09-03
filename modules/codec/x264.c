@@ -1366,28 +1366,24 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pict )
 
 
     /* Get size of block we need */
-    i_out = p_sys->i_sei_size;
     for( i = 0; i < i_nal; i++ )
         i_out += nal[i].i_payload;
 
-    p_block = block_New( p_enc, i_out );
+    p_block = block_New( p_enc, i_out + p_sys->i_sei_size );
     if( !p_block ) return NULL;
 
-    /* copy encoded data directly to block */
-    for( i = 0, i_out = 0; i < i_nal; i++ )
+    unsigned int i_offset = 0;
+    if( unlikely( p_sys->i_sei_size && ( i_nal > 1 ) ) )
     {
-        if( p_sys->i_sei_size && nal[i].i_type == NAL_SLICE )
-        {
-            /* insert x264 headers SEI nal before first SLICE nal */
-            memcpy( p_block->p_buffer, p_sys->p_sei, p_sys->i_sei_size );
-            i_out += p_sys->i_sei_size;
-            p_sys->i_sei_size = 0;
-            free( p_sys->p_sei );
-            p_sys->p_sei = NULL;
-        }
-        memcpy( p_block->p_buffer + i_out, nal[i].p_payload, nal[i].i_payload );
-        i_out += nal[i].i_payload;
+       /* insert x264 headers SEI nal into the first picture block at the start */
+       memcpy( p_block->p_buffer, p_sys->p_sei, p_sys->i_sei_size );
+       i_offset = p_sys->i_sei_size;
+       p_sys->i_sei_size = 0;
+       free( p_sys->p_sei );
+       p_sys->p_sei = NULL;
     }
+    /* copy encoded data directly to block */
+    memcpy( p_block->p_buffer + i_offset, nal[0].p_payload, i_out );
 
     if( pic.b_keyframe )
         p_block->i_flags |= BLOCK_FLAG_TYPE_I;
