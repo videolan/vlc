@@ -1052,8 +1052,9 @@ void CaptureOpenPanel::updateMRL()
 #else
     case V4L2_DEVICE:
         fileList << "v4l2://" + v4l2VideoDevice->currentText();
+        mrl += ":v4l2-standard="
+            + v4l2StdBox->itemData( v4l2StdBox->currentIndex() ).toString();
         mrl += " :input-slave=alsa://" + v4l2AudioDevice->currentText();
-        mrl += " :v4l2-standard=" + QString::number( v4l2StdBox->currentIndex() );
         break;
     case JACK_DEVICE:
         mrl = "jack://";
