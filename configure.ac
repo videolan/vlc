@@ -691,21 +691,24 @@ AC_CHECK_LIB(m,lrintf, [
 ])
 
 dnl Check for dynamic plugins
-LIBDL="no"
+LIBDL=""
+have_dynamic_objects="no"
 LIBS_save="$LIBS"
 AC_SEARCH_LIBS(dlopen, [dl svld], [
   AS_IF([test "$ac_cv_search_dlopen" != "none required"], [
     LIBDL="$ac_cv_search_dlopen"
   ])
+  have_dynamic_objects="yes"
 ])
 LIBS="$LIBS_save"
 
 # Windows
 AS_IF([test "${SYS}" = "mingw32" -o "${SYS}" = "mingwce"], [
   LIBDL=""
+  have_dynamic_objects="yes" #assume we can use shared objects
 ])
 
-AS_IF([test "$LIBDL" != "no"], [
+AS_IF([test "$have_dynamic_objects" != "no"], [
   AC_DEFINE(HAVE_DYNAMIC_PLUGINS, 1,
             [Define to 1 if dynamic plugins are supported.])
 ], [
