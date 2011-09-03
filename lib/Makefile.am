@@ -53,7 +53,7 @@ libvlc_la_SOURCES = \
 	media_library.c \
 	media_discoverer.c \
 	../src/revision.c
-EXTRA_DIST = libvlc.pc.in libvlc.sym
+EXTRA_DIST = libvlc.pc.in libvlc.sym ../include/vlc/libvlc_version.h.in
 
 libvlc_la_LIBADD = $(LIBS_libvlc) \
 	../src/libvlccore.la ../compat/libcompat.la
