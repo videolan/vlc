@@ -64,7 +64,8 @@ typedef struct
 # include <sys/types.h> /* ssize_t, pid_t */
 #endif
 
-#ifndef HAVE_DIRFD
+#if !defined (HAVE_DIRFD) || \
+    !defined (HAVE_FDOPENDIR)
 # include <dirent.h>
 #endif
 
@@ -186,6 +187,10 @@ int fsync (int fd);
 #undef dirfd
 #endif
 int dirfd (DIR *);
+#endif
+
+#ifndef HAVE_FDOPENDIR
+DIR *fdopendir (int);
 #endif
 
 #ifdef __cplusplus
