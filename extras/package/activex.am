@@ -23,7 +23,7 @@ stamp-activex-configure: stamp-activex-autogen
 		CXX="$(CXX)" CXXFLAGS="$(CXXFLAGS)" \
 		LD="$(LD)" LDFLAGS="$(LDFLAGS)" \
 		SHELL="$(SHELL)" \
-		PKG_CONFIG_LIBDIR="../$(srcdir)/extras/contrib/lib/pkgconfig:../src"
+		PKG_CONFIG_LIBDIR="../$(srcdir)/extras/contrib/lib/pkgconfig:../src:../lib"
 	touch $@
 
 stamp-activex-build: stamp-activex-configure
