@@ -394,4 +394,14 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
        events */
     return NO;
 }
+
+- (void)renewGState
+{
+    NSWindow *window = [self window];
+
+	if ([window respondsToSelector:@selector(disableScreenUpdatesUntilFlush)])
+		[window disableScreenUpdatesUntilFlush];
+
+    [super renewGState];
+}
 @end
