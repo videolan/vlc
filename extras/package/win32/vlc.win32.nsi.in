@@ -128,7 +128,7 @@ RequestExecutionLevel user
   !insertmacro MUI_LANGUAGE "Polish"
   !insertmacro MUI_LANGUAGE "Romanian"
   !insertmacro MUI_LANGUAGE "Slovak"
-  !insertmacro MUI_LANGUAGE "Serbian
+  !insertmacro MUI_LANGUAGE "Serbian"
   !insertmacro MUI_LANGUAGE "Czech"
   !insertmacro MUI_LANGUAGE "Hungarian"
   !insertmacro MUI_LANGUAGE "Catalan"
