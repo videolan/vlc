@@ -73,7 +73,7 @@
 #if USE_OPENGL_ES
 #   define VLCGL_TEXTURE_COUNT 1
 #   define VLCGL_PICTURE_MAX 1
-#elif defined(MACOS_OPENGL)
+#elif defined(BROKEN_MACOS_OPENGL)
 #   define VLCGL_TEXTURE_COUNT 2
 #   define VLCGL_PICTURE_MAX 2
 #else
@@ -224,7 +224,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     vgl->tex_format   = GL_RGB;
     vgl->tex_internal = GL_RGB;
     vgl->tex_type     = GL_UNSIGNED_SHORT_5_6_5;
-#elif defined(MACOS_OPENGL)
+#elif defined(BROKEN_MACOS_OPENGL)
 #   if defined(WORDS_BIGENDIAN)
     vgl->fmt.i_chroma = VLC_CODEC_YUYV;
 #   else
@@ -288,7 +288,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     bool supports_npot = false;
 #if USE_OPENGL_ES == 2
     supports_npot = true;
-#elif defined(MACOS_OPENGL)
+#elif defined(BROKEN_MACOS_OPENGL)
     supports_npot = true;
 #else
     supports_npot |= HasExtension(extensions, "GL_APPLE_texture_2D_limited_npot") ||
@@ -367,6 +367,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
             vgl->local_count += 4;
         }
         if (code) {
+        // Here you have shaders
             vgl->GenProgramsARB(1, &vgl->program);
             vgl->BindProgramARB(GL_FRAGMENT_PROGRAM_ARB, vgl->program);
             vgl->ProgramStringARB(GL_FRAGMENT_PROGRAM_ARB,
@@ -410,7 +411,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     *fmt = vgl->fmt;
     if (subpicture_chromas) {
         *subpicture_chromas = NULL;
-#if !defined(MACOS_OPENGL) && !USE_OPENGL_ES
+#if !defined(BROKEN_MACOS_OPENGL) && !USE_OPENGL_ES
         if (supports_npot)
             *subpicture_chromas = gl_subpicture_chromas;
 #endif
@@ -443,7 +444,7 @@ void vout_display_opengl_Delete(vout_display_opengl_t *vgl)
     free(vgl);
 }
 
-#ifdef MACOS_OPENGL
+#ifdef BROKEN_MACOS_OPENGL
 struct picture_sys_t {
     vout_display_opengl_t *vgl;
     GLuint *texture;
@@ -492,7 +493,7 @@ picture_pool_t *vout_display_opengl_GetPool(vout_display_opengl_t *vgl, unsigned
         if (!picture[count])
             break;
 
-#ifdef MACOS_OPENGL
+#ifdef BROKEN_MACOS_OPENGL
         picture_sys_t *sys = picture[count]->p_sys = malloc(sizeof(*sys));
         if (sys) {
             sys->vgl = vgl;
@@ -508,7 +509,7 @@ picture_pool_t *vout_display_opengl_GetPool(vout_display_opengl_t *vgl, unsigned
     memset(&cfg, 0, sizeof(cfg));
     cfg.picture_count = count;
     cfg.picture       = picture;
-#ifdef MACOS_OPENGL
+#ifdef BROKEN_MACOS_OPENGL
     cfg.lock          = PictureLock;
     cfg.unlock        = PictureUnlock;
 #endif
@@ -538,7 +539,7 @@ picture_pool_t *vout_display_opengl_GetPool(vout_display_opengl_t *vgl, unsigned
             glTexParameteri(vgl->tex_target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
             glTexParameteri(vgl->tex_target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-#ifdef MACOS_OPENGL
+#ifdef BROKEN_MACOS_OPENGL
             /* Tell the driver not to make a copy of the texture but to use
                our buffer */
             glEnable(GL_UNPACK_CLIENT_STORAGE_APPLE);
@@ -588,7 +589,7 @@ int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
     if (vlc_gl_Lock(vgl->gl))
         return VLC_EGENERIC;
 
-#ifdef MACOS_OPENGL
+#ifdef BROKEN_MACOS_OPENGL
     /* Bind to the texture for drawing */
     glBindTexture(vgl->tex_target, PictureGetTexture(picture));
 #else
@@ -750,7 +751,7 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 #else
-#if !defined(MACOS_OPENGL)
+#if !defined(BROKEN_MACOS_OPENGL)
     for (unsigned j = 0; j < vgl->chroma->plane_count; j++) {
         if (vgl->use_multitexture)
             vgl->ActiveTextureARB(GL_TEXTURE0_ARB + j);
