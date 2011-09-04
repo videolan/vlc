@@ -426,6 +426,7 @@ silentstd_0 = 2>&1 >/dev/null
 # use package-macosx to get a nice dmg
 VLC-release.app: vlc
 	( cd src && $(MAKE) $(AM_MAKEFLAGS) install $(silentstd) )
+	( cd lib && $(MAKE) $(AM_MAKEFLAGS) install $(silentstd) )
 	rm -Rf "$(top_builddir)/tmp"
 	mkdir -p "$(top_builddir)/tmp/extras/package/macosx"
 	rm -Rf $(top_builddir)/VLC-release.app
@@ -554,6 +555,7 @@ VLC-release.app: vlc
 # The resulting VLC.app will only run in this tree.
 VLC.app: vlc $(top_builddir)/src/.libs/libvlccore.dylib $(top_builddir)/lib/.libs/libvlc.dylib
 	$(AM_V_GEN)(cd src && make install $(silentstd))
+	$(AM_V_GEN)(cd lib && make install $(silentstd))
 	rm -Rf $(top_builddir)/tmp
 	mkdir -p "$(top_builddir)/tmp/extras/package/macosx"
 	rm -Rf $(top_builddir)/VLC.app
