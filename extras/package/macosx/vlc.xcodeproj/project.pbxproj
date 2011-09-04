@@ -239,7 +239,6 @@
 		8E6BC6FA041684EC0059A3A7 /* controls.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = controls.h; path = ../../../modules/gui/macosx/controls.h; sourceTree = SOURCE_ROOT; };
 		8E9CA1A306D7DEE800B7186C /* prefs_widgets.h */ = {isa = PBXFileReference; fileEncoding = 5; lastKnownFileType = sourcecode.c.h; name = prefs_widgets.h; path = ../../../modules/gui/macosx/prefs_widgets.h; sourceTree = SOURCE_ROOT; };
 		8E9CA1A406D7DEE800B7186C /* prefs_widgets.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = prefs_widgets.m; path = ../../../modules/gui/macosx/prefs_widgets.m; sourceTree = SOURCE_ROOT; };
-		8E9CA1A506D7DEE800B7186C /* voutgl.m */ = {isa = PBXFileReference; fileEncoding = 5; lastKnownFileType = sourcecode.c.objc; name = voutgl.m; path = ../../../modules/gui/macosx/voutgl.m; sourceTree = SOURCE_ROOT; };
 		8EBF3FA303F13FFB0059A3A7 /* vlc.scriptSuite */ = {isa = PBXFileReference; lastKnownFileType = text; name = vlc.scriptSuite; path = Resources/vlc.scriptSuite; sourceTree = SOURCE_ROOT; };
 		8EBF3FA503F140960059A3A7 /* vlc.scriptTerminology */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = vlc.scriptTerminology; path = Resources/vlc.scriptTerminology; sourceTree = SOURCE_ROOT; };
 		8ED6C27B03E2EB1C0059A3A7 /* controls.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = controls.m; path = ../../../modules/gui/macosx/controls.m; sourceTree = SOURCE_ROOT; };
@@ -254,8 +253,6 @@
 		8ED6C28403E2EB1C0059A3A7 /* playlist.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = playlist.m; path = ../../../modules/gui/macosx/playlist.m; sourceTree = SOURCE_ROOT; };
 		8ED6C28503E2EB1C0059A3A7 /* prefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = prefs.h; path = ../../../modules/gui/macosx/prefs.h; sourceTree = SOURCE_ROOT; };
 		8ED6C28603E2EB1C0059A3A7 /* prefs.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = prefs.m; path = ../../../modules/gui/macosx/prefs.m; sourceTree = SOURCE_ROOT; };
-		8ED6C28703E2EB1C0059A3A7 /* vout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vout.h; path = ../../../modules/gui/macosx/vout.h; sourceTree = SOURCE_ROOT; };
-		8ED6C28803E2EB1C0059A3A7 /* vout.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = vout.m; path = ../../../modules/gui/macosx/vout.m; sourceTree = SOURCE_ROOT; };
 		8EDAC3430440F72D0059A3A7 /* README.MacOSX.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; path = README.MacOSX.rtf; sourceTree = SOURCE_ROOT; };
 		8EE1AF9F044465080059A3A7 /* about.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = about.h; path = ../../../modules/gui/macosx/about.h; sourceTree = SOURCE_ROOT; };
 		8EE1AFA0044465080059A3A7 /* about.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = about.m; path = ../../../modules/gui/macosx/about.m; sourceTree = SOURCE_ROOT; };
@@ -475,9 +472,9 @@
 		CCB24D5D0D54BBAE004D780C /* simple_prefs.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = simple_prefs.m; path = ../../../modules/gui/macosx/simple_prefs.m; sourceTree = SOURCE_ROOT; };
 		CCB24D5E0D54BBAE004D780C /* simple_prefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = simple_prefs.h; path = ../../../modules/gui/macosx/simple_prefs.h; sourceTree = SOURCE_ROOT; };
 		CCBE999E0F922C51000705F8 /* CoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreServices.framework; path = /System/Library/Frameworks/CoreServices.framework; sourceTree = "<absolute>"; };
-		CCC593780AB4A9FB0004FF52 /* embeddedwindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = embeddedwindow.h; path = ../../../modules/gui/macosx/embeddedwindow.h; sourceTree = SOURCE_ROOT; };
-		CCC593790AB4A9FB0004FF52 /* embeddedwindow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = embeddedwindow.m; path = ../../../modules/gui/macosx/embeddedwindow.m; sourceTree = SOURCE_ROOT; };
 		CCC895830D9A8A82005AE59C /* eyetv.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = eyetv.m; path = ../../../modules/access/eyetv.m; sourceTree = SOURCE_ROOT; };
+		CCCCDCA01413E1C000FE3DE1 /* VideoView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = VideoView.h; path = ../../../modules/gui/macosx/VideoView.h; sourceTree = "<group>"; };
+		CCCCDCA11413E1C000FE3DE1 /* VideoView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = VideoView.m; path = ../../../modules/gui/macosx/VideoView.m; sourceTree = "<group>"; };
 		CCCDDEEF13E870BB00A35661 /* SideBarItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SideBarItem.h; path = ../../../modules/gui/macosx/SideBarItem.h; sourceTree = "<group>"; };
 		CCCDDEF013E870BB00A35661 /* SideBarItem.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SideBarItem.m; path = ../../../modules/gui/macosx/SideBarItem.m; sourceTree = "<group>"; };
 		CCCE366D13817E4500694F2A /* VideoEffects.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = VideoEffects.h; path = ../../../modules/gui/macosx/VideoEffects.h; sourceTree = "<group>"; };
@@ -615,15 +612,12 @@
 				8E49720106417F6800370C9F /* playlistinfo.m */,
 				8E55FB7F0459B0FD00FB3317 /* output.h */,
 				8E55FB800459B0FD00FB3317 /* output.m */,
-				8ED6C28703E2EB1C0059A3A7 /* vout.h */,
-				8ED6C28803E2EB1C0059A3A7 /* vout.m */,
-				8E9CA1A506D7DEE800B7186C /* voutgl.m */,
+				CCCCDCA01413E1C000FE3DE1 /* VideoView.h */,
+				CCCCDCA11413E1C000FE3DE1 /* VideoView.m */,
 				DC769AB8085DF0DB001A838D /* wizard.h */,
 				DC769AB7085DF0DB001A838D /* wizard.m */,
 				DCE7BD0708A5724D007B10AE /* bookmarks.h */,
 				DCE7BD0608A5724D007B10AE /* bookmarks.m */,
-				CCC593780AB4A9FB0004FF52 /* embeddedwindow.h */,
-				CCC593790AB4A9FB0004FF52 /* embeddedwindow.m */,
 				2AEF857609A5FEC900130822 /* fspanel.h */,
 				2AEF857709A5FEC900130822 /* fspanel.m */,
 				CC6EDD4F0B9CA2140096068A /* eyetv.h */,

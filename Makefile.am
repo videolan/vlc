@@ -475,19 +475,14 @@ VLC-release.app: vlc
 	    prefs.m \
 	    simple_prefs.h \
 	    simple_prefs.m \
-	    vout.h \
-	    voutgl.m \
 	    wizard.h \
 	    wizard.m \
 	    bookmarks.h \
 	    bookmarks.m \
 	    coredialogs.h \
 	    coredialogs.m \
-	    embeddedwindow.h \
-	    embeddedwindow.m \
 	    fspanel.h \
-	    fspanel.m \
-	    vout.m; do \
+	    fspanel.m; do \
 	  cp "$(srcdir)/modules/gui/macosx/$$i" \
              $(top_builddir)/tmp/modules/gui/macosx; \
 	done
@@ -608,19 +603,14 @@ VLC.app: vlc $(top_builddir)/src/.libs/libvlccore.dylib $(top_builddir)/lib/.lib
 	    prefs.m \
 	    simple_prefs.h \
 	    simple_prefs.m \
-	    vout.h \
-	    voutgl.m \
 	    wizard.h \
 	    wizard.m \
 	    bookmarks.h \
 	    bookmarks.m \
 	    coredialogs.h \
 	    coredialogs.m \
-	    embeddedwindow.h \
-	    embeddedwindow.m \
 	    fspanel.h \
-	    fspanel.m \
-	    vout.m; do \
+	    fspanel.m; do \
 	  cp "$(srcdir)/modules/gui/macosx/$$i" \
              $(top_builddir)/tmp/modules/gui/macosx; \
 	done

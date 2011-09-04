@@ -33,7 +33,7 @@
 #include <string.h>
 
 #import "intf.h"
-#import "vout.h"
+#import "VideoView.h"
 #import "open.h"
 #import "controls.h"
 #import "playlist.h"

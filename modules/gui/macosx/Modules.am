@@ -54,8 +54,6 @@ SOURCES_macosx = \
 	VideoEffects.m \
 	bookmarks.h \
 	bookmarks.m \
-	embeddedwindow.h \
-	embeddedwindow.m \
 	PXSourceList.h \
 	PXSourceList.m \
 	PXSourceListDataSource.h \
@@ -66,8 +64,7 @@ SOURCES_macosx = \
 	fspanel.h \
 	eyetv.h \
 	eyetv.m \
-	vout.h \
-	vout.m \
-	voutgl.m \
+	VideoView.h \
+	VideoView.m \
 	$(NULL)
 

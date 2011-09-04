@@ -1,5 +1,5 @@
 /*****************************************************************************
- * vout.m: MacOS X video output module
+ * VideoView.m: MacOS X video output module
  *****************************************************************************
  * Copyright (C) 2002-2011 the VideoLAN team
  * $Id$
@@ -32,7 +32,7 @@
 #import <string.h>
 
 #import "intf.h"
-#import "vout.h"
+#import "VideoView.h"
 #import "CoreInteraction.h"
 #import "MainMenu.h"
 #import "MainWindow.h"

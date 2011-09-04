@@ -1,5 +1,5 @@
 /*****************************************************************************
- * vout.h: MacOS X video output module
+ * VideoView.h: MacOS X video output module
  *****************************************************************************
  * Copyright (C) 2002-2011 the VideoLAN team
  * $Id$

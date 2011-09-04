@@ -37,7 +37,7 @@
 #import "coredialogs.h"
 #import "controls.h"
 #import "playlistinfo.h"
-#import "vout.h"
+#import "VideoView.h"
 #import "CoreInteraction.h"
 #import "MainWindow.h"
 
