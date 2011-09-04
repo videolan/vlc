@@ -122,8 +122,7 @@
     IBOutlet id o_osd_osd_ckb;
     IBOutlet id o_osd_view;
 
-    IBOutlet id o_sprefs_basic_box;
-    IBOutlet id o_sprefs_basicFull_matrix;
+    IBOutlet id o_sprefs_showAll_btn;
     IBOutlet id o_sprefs_cancel_btn;
     IBOutlet id o_sprefs_controls_box;
     IBOutlet id o_sprefs_reset_btn;

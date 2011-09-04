@@ -40,7 +40,7 @@
     IBOutlet id o_save_btn;
     IBOutlet id o_cancel_btn;
     IBOutlet id o_reset_btn;
-    IBOutlet id o_basicFull_matrix;
+    IBOutlet id o_showBasic_btn;
 }
 
 + (VLCPrefs *)sharedInstance;

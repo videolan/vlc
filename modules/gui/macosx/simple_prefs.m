@@ -277,8 +277,7 @@ create_toolbar_item( NSString * o_itemIdent, NSString * o_name, NSString * o_des
     [o_video_snap_seqnum_ckb setTitle: _NS("Sequential numbering")];
 
     /* generic stuff */
-    [[o_sprefs_basicFull_matrix cellAtRow: 0 column: 0] setTitle: _NS("Basic")];
-    [[o_sprefs_basicFull_matrix cellAtRow: 0 column: 1] setTitle: _NS("All")];
+    [o_sprefs_showAll_btn setTitle: _NS("Show All")];
     [o_sprefs_cancel_btn setTitle: _NS("Cancel")];
     [o_sprefs_reset_btn setTitle: _NS("Reset All")];
     [o_sprefs_save_btn setTitle: _NS("Save")];
@@ -420,9 +419,6 @@ static inline char * __config_GetLabel( vlc_object_t *p_this, const char *psz_na
     module_config_t *p_item;
     int i, y = 0;
     char *psz_tmp;
-
-    [[o_sprefs_basicFull_matrix cellAtRow:0 column:0] setState: NSOnState];
-    [[o_sprefs_basicFull_matrix cellAtRow:0 column:1] setState: NSOffState];
 
     /**********************
      * interface settings *
@@ -672,11 +668,9 @@ static inline char * __config_GetLabel( vlc_object_t *p_this, const char *psz_na
                                         @selector(sheetDidEnd: returnCode: contextInfo:), NULL, nil,
                                         _NS("Beware this will reset the VLC media player preferences.\n"
                                             "Are you sure you want to continue?") );
-    else if( sender == o_sprefs_basicFull_matrix )
+    else if( sender == o_sprefs_showAll_btn )
     {
         [o_sprefs_win orderOut: self];
-        [[o_sprefs_basicFull_matrix cellAtRow:0 column:0] setState: NSOffState];
-        [[o_sprefs_basicFull_matrix cellAtRow:0 column:1] setState: NSOnState];
         [[[VLCMain sharedInstance] preferences] showPrefs];
     }
     else

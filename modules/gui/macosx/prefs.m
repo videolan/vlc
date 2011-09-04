@@ -194,9 +194,6 @@ static VLCPrefs *_o_sharedMainInstance = nil;
 
 - (void)showPrefs
 {
-    [[o_basicFull_matrix cellAtRow:0 column:0] setState: NSOffState];
-    [[o_basicFull_matrix cellAtRow:0 column:1] setState: NSOnState];
-    
     [o_prefs_window center];
     [o_prefs_window makeKeyAndOrderFront:self];
     [_rootTreeItem resetView];
@@ -208,8 +205,7 @@ static VLCPrefs *_o_sharedMainInstance = nil;
     [o_save_btn setTitle: _NS("Save")];
     [o_cancel_btn setTitle: _NS("Cancel")];
     [o_reset_btn setTitle: _NS("Reset All")];
-    [[o_basicFull_matrix cellAtRow: 0 column: 0] setStringValue: _NS("Basic")];
-    [[o_basicFull_matrix cellAtRow: 0 column: 1] setStringValue: _NS("All")];
+    [o_showBasic_btn setTitle: _NS("Show Basic")];
 }
 
 - (IBAction)savePrefs: (id)sender
@@ -247,8 +243,6 @@ static VLCPrefs *_o_sharedMainInstance = nil;
 - (IBAction)buttonAction: (id)sender
 {
     [o_prefs_window orderOut: self];
-    [[o_basicFull_matrix cellAtRow:0 column:0] setState: NSOnState];
-    [[o_basicFull_matrix cellAtRow:0 column:1] setState: NSOffState];
     [[[VLCMain sharedInstance] simplePreferences] showSimplePrefs];
 }
 
