@@ -216,7 +216,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
 #   endif
     vgl->tex_target   = GL_TEXTURE_RECTANGLE_EXT;
     vgl->tex_format   = GL_YCBCR_422_APPLE;
-    vgl->tex_internal = GL_YCBCR_422_APPLE;
+    vgl->tex_internal = GL_RGBA;
     vgl->tex_type     = GL_UNSIGNED_SHORT_8_8_APPLE;
 #else
     vgl->fmt.i_chroma = VLC_CODEC_RGB32;
@@ -506,6 +506,7 @@ picture_pool_t *vout_display_opengl_GetPool(vout_display_opengl_t *vgl, unsigned
     for (int i = 0; i < VLCGL_TEXTURE_COUNT; i++) {
         glGenTextures(vgl->chroma->plane_count, vgl->texture[i]);
         for (unsigned j = 0; j < vgl->chroma->plane_count; j++) {
+			uint8_t *buffer = NULL;
             if (vgl->use_multitexture)
                 vgl->ActiveTextureARB(GL_TEXTURE0_ARB + j);
             glBindTexture(vgl->tex_target, vgl->texture[i][j]);
@@ -527,6 +528,8 @@ picture_pool_t *vout_display_opengl_GetPool(vout_display_opengl_t *vgl, unsigned
             glEnable(GL_UNPACK_CLIENT_STORAGE_APPLE);
             glPixelStorei(GL_UNPACK_CLIENT_STORAGE_APPLE, GL_TRUE);
 
+			buffer = picture[i]->p[j].p_pixels;
+
             /* Use AGP texturing */
             glTexParameteri(vgl->tex_target, GL_TEXTURE_STORAGE_HINT_APPLE,
                              GL_STORAGE_SHARED_APPLE);
@@ -535,7 +538,7 @@ picture_pool_t *vout_display_opengl_GetPool(vout_display_opengl_t *vgl, unsigned
             /* Call glTexImage2D only once, and use glTexSubImage2D later */
             glTexImage2D(vgl->tex_target, 0,
                          vgl->tex_internal, vgl->tex_width[j], vgl->tex_height[j],
-                         0, vgl->tex_format, vgl->tex_type, NULL);
+                         0, vgl->tex_format, vgl->tex_type, buffer);
         }
     }
 
