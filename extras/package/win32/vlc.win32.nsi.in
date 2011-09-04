@@ -134,6 +134,7 @@ RequestExecutionLevel user
   !insertmacro MUI_LANGUAGE "Bulgarian"
   !insertmacro MUI_LANGUAGE "Estonian"
   !insertmacro MUI_LANGUAGE "Lithuanian"
+  !insertmacro MUI_LANGUAGE "Basque"
 
 ; Reserve files for solid compression
   !insertmacro MUI_RESERVEFILE_LANGDLL
@@ -814,6 +815,7 @@ UAC_Success:
   StrCmp $LANGUAGE ${LANG_SPANISH} Spanish 0
   StrCmp $LANGUAGE ${LANG_ESTONIAN} Estonian 0
   StrCmp $LANGUAGE ${LANG_LITHUANIAN} Lithuanian 0
+  StrCmp $LANGUAGE ${LANG_BASQUE} Basque 0
   StrCmp $LANGUAGE ${LANG_PORTUGUESEBR} Brazilian EndLanguageCmp
   French:
   !include "languages\french.nsh"
@@ -874,6 +876,9 @@ UAC_Success:
   Goto EndLanguageCmp
   Lithuanian:
   !include "languages\lithuanian.nsh"
+  Goto EndLanguageCmp
+  Basque:
+  !include "languages\basque.nsh"
   Goto EndLanguageCmp
   Brazilian:
   !include "languages\brazilian_portuguese.nsh"
@@ -1156,6 +1161,7 @@ UAC_Success:
   StrCmp $LANGUAGE ${LANG_SPANISH} Spanish 0
   StrCmp $LANGUAGE ${LANG_ESTONIAN} Estonian 0
   StrCmp $LANGUAGE ${LANG_LITHUANIAN} Lithuanian 0
+  StrCmp $LANGUAGE ${LANG_BASQUE} Basque 0
   StrCmp $LANGUAGE ${LANG_PORTUGUESEBR} Brazilian EndLanguageCmp
   French:
   !include "languages\french.nsh"
@@ -1216,6 +1222,9 @@ UAC_Success:
   Goto EndLanguageCmp
   Lithuanian:
   !include "languages\lithuanian.nsh"
+  Goto EndLanguageCmp
+  Basque:
+  !include "languages\basque.nsh"
   Goto EndLanguageCmp
   Brazilian:
   !include "languages\brazilian_portuguese.nsh"
