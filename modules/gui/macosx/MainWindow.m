@@ -80,7 +80,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [self setMovableByWindowBackground: YES];
 
     /* we don't want this window to be restored on relaunch */
-    if ([self respondsToSelector:@selector(setRestorable:)])
+    if (OSX_LION)
         [self setRestorable:NO];
 
     return self;

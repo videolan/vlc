@@ -56,6 +56,11 @@ enum {
     NSApplicationPresentationDisableHideApplication     = (1 <<  8),
     NSApplicationPresentationDisableMenuBarTransparency = (1 <<  9)
 };
+
+@interface NSWindow (IntroducedInLion) // just to shut off warnings, not implemented!
+- (void)setRestorable:(BOOL);
+@end
+
 #endif
 
 #pragma mark -

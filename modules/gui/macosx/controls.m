@@ -252,7 +252,7 @@
 {
     intf_thread_t * p_intf = VLCIntf;
     BOOL b_invertedEventFromDevice = NO;
-    if ([theEvent respondsToSelector:@selector(isDirectionInvertedFromDevice)])
+    if (OSX_LION)
     {
         if ([theEvent isDirectionInvertedFromDevice])
             b_invertedEventFromDevice = YES;

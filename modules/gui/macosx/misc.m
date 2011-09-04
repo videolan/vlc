@@ -190,7 +190,7 @@ static NSMutableArray *blackoutWindows = NULL;
     {
         b_isset_canBecomeKeyWindow = NO;
         /* we don't want this window to be restored on relaunch */
-        if ([self respondsToSelector:@selector(setRestorable:)])
+        if (OSX_LION)
             [self setRestorable:NO];
     }
     return self;
