@@ -324,8 +324,8 @@ case "$DISTRO" in
     HAVE_MACOSX_DARWIN_9=1
     EXTRA_LDFLAGS="${EXTRA_LDFLAGS} -isysroot \${MACOSX_SDK} -Wl,-syslibroot,\${MACOSX_SDK} -mmacosx-version-min=\${SDK_TARGET}"
     EXTRA_CFLAGS="${EXTRA_CFLAGS} -D\${ENVP} -isysroot \${MACOSX_SDK} -mmacosx-version-min=\${SDK_TARGET}"
-    CC="/usr/bin/gcc-4.2"
-    CXX="/usr/bin/g++-4.2"
+    CC="/usr/bin/gcc"
+    CXX="/usr/bin/g++"
     LD="ld"
     RANLIB="ranlib"
     AR=
@@ -463,8 +463,8 @@ fi
 
 if test $HAVE_MACOSX_DARWIN_9; then
     add_enabled_makefile_cfg "HAVE_MACOSX_DARWIN_9"
-    if ! /usr/bin/gcc-4.2 --version>/dev/null 2>&1; then
-        error "You do not have GCC-4.2 installed in /usr/bin, compilation WILL FAIL."
+    if ! /usr/bin/gcc --version>/dev/null 2>&1; then
+        error "You do not have GCC installed in /usr/bin, compilation WILL FAIL."
     fi
 fi
 
