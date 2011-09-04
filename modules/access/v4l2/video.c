@@ -408,7 +408,6 @@ vlc_module_end ()
 
 static void CommonClose( vlc_object_t *, demux_sys_t * );
 static char *ParseMRL( vlc_object_t *, const char * );
-static void GetV4L2Params( demux_sys_t *, vlc_object_t * );
 
 static int DemuxControl( demux_t *, int, va_list );
 static int AccessControl( access_t *, int, va_list );
@@ -513,7 +512,6 @@ static int DemuxOpen( vlc_object_t *p_this )
     char *path = ParseMRL( p_this, p_demux->psz_location );
     if( path == NULL )
         path = var_CreateGetNonEmptyString( p_this, CFG_PREFIX"dev" );
-    GetV4L2Params( p_sys, p_this );
 
 #ifdef HAVE_LIBV4L2
     p_sys->i_fd = -1;
@@ -541,39 +539,6 @@ static int DemuxOpen( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
     return VLC_SUCCESS;
-}
-
-/*****************************************************************************
- * GetV4L2Params: fill in p_sys parameters (shared by DemuxOpen and AccessOpen)
- *****************************************************************************/
-static void GetV4L2Params( demux_sys_t *p_sys, vlc_object_t *p_obj )
-{
-    p_sys->i_selected_input = var_CreateGetInteger( p_obj, "v4l2-input" );
-    p_sys->i_audio_input = var_CreateGetInteger( p_obj, "v4l2-audio-input" );
-
-    p_sys->i_width = var_CreateGetInteger( p_obj, "v4l2-width" );
-    p_sys->i_height = var_CreateGetInteger( p_obj, "v4l2-height" );
-
-    p_sys->i_tuner = var_CreateGetInteger( p_obj, "v4l2-tuner" );
-    p_sys->i_tuner_type = V4L2_TUNER_RADIO; /* non-trap default value */
-    p_sys->i_tuner_audio_mode = var_CreateGetInteger( p_obj, "v4l2-tuner-audio-mode" );
-
-    char *psz_aspect = var_CreateGetString( p_obj, "v4l2-aspect-ratio" );
-    char *psz_delim = !EMPTY_STR(psz_aspect) ? strchr( psz_aspect, ':' ) : NULL;
-    if( psz_delim )
-    {
-        p_sys->i_aspect = atoi( psz_aspect ) * VOUT_ASPECT_FACTOR / atoi( psz_delim + 1 );
-    }
-    else
-    {
-        p_sys->i_aspect = 4 * VOUT_ASPECT_FACTOR / 3 ;
-
-    }
-    free( psz_aspect );
-
-    p_sys->i_fd = -1;
-
-    p_sys->p_es = NULL;
 }
 
 /**
@@ -711,7 +676,6 @@ static int AccessOpen( vlc_object_t * p_this )
     char *path = ParseMRL( p_this, p_access->psz_location );
     if( path == NULL )
         path = var_InheritString( p_this, CFG_PREFIX"dev" );
-    GetV4L2Params( p_sys, p_this );
 
 #ifdef HAVE_LIBV4L2
     p_sys->i_fd = -1;
@@ -1436,6 +1400,8 @@ static int OpenVideoDev( vlc_object_t *p_obj, const char *path,
     if( cap.capabilities & V4L2_CAP_VIDEO_CAPTURE )
     {
         struct v4l2_input input;
+        unsigned index = var_InheritInteger( p_obj, CFG_PREFIX"input" );
+
         input.index = 0;
         while( v4l2_ioctl( i_fd, VIDIOC_ENUMINPUT, &input ) >= 0 )
         {
@@ -1443,18 +1409,17 @@ static int OpenVideoDev( vlc_object_t *p_obj, const char *path,
                      input.index, input.name,
                      input.type == V4L2_INPUT_TYPE_TUNER
                           ? "Tuner adapter" : "External analog input",
-                     input.index == p_sys->i_selected_input ? '*' : ' ' );
+                     input.index == index ? '*' : ' ' );
             input.index++;
         }
 
         /* Select input */
-        if( v4l2_ioctl( i_fd, VIDIOC_S_INPUT, &p_sys->i_selected_input ) < 0 )
+        if( v4l2_ioctl( i_fd, VIDIOC_S_INPUT, &index ) < 0 )
         {
-            msg_Err( p_obj, "cannot set input %u: %m",
-                     p_sys->i_selected_input );
+            msg_Err( p_obj, "cannot set input %u: %m", index );
             goto error;
         }
-        msg_Dbg( p_obj, "input set to %u", p_sys->i_selected_input );
+        msg_Dbg( p_obj, "input set to %u", index );
     }
 
     /* Select standard */
@@ -1488,11 +1453,13 @@ static int OpenVideoDev( vlc_object_t *p_obj, const char *path,
     else
         bottom_first = false;
 
-    /* Probe audio inputs */
+    /* Set audio input */
     if( cap.capabilities & V4L2_CAP_AUDIO )
     {
         struct v4l2_audio audio = { .index = 0 };
+        uint32_t idx = var_InheritInteger( p_obj, CFG_PREFIX"audio-input" );
 
+        /* Probe audio inputs */
         while( v4l2_ioctl( i_fd, VIDIOC_ENUMAUDIO, &audio ) >= 0 )
         {
             msg_Dbg( p_obj, "audio input %u (%s) is %s%s %c", audio.index,
@@ -1500,39 +1467,37 @@ static int OpenVideoDev( vlc_object_t *p_obj, const char *path,
                      audio.capability & V4L2_AUDCAP_STEREO ? "Stereo" : "Mono",
                      audio.capability & V4L2_AUDCAP_AVL
                          ? " (Automatic Volume Level supported)" : "",
-                     p_sys->i_audio_input == audio.index );
+                     audio.index == idx );
             audio.index++;
         }
-    }
 
-    /* Set audio input */
-    if( p_sys->i_audio_input != (uint32_t)-1 )
-    {
-        struct v4l2_audio audio = {
-            .index = p_sys->i_audio_input,
-            .mode = 0, /* TODO: AVL support */
-        };
-
-        if( v4l2_ioctl( i_fd, VIDIOC_S_AUDIO, &audio ) < 0 )
+        if( idx != (uint32_t)-1 )
         {
-            msg_Err( p_obj, "cannot set audio input %u: %m",
-                     p_sys->i_audio_input );
-            goto error;
+            memset( &audio, 0, sizeof(audio) );
+            audio.index = idx;
+            /* TODO: AVL support (audio.mode) */
+
+            if( v4l2_ioctl( i_fd, VIDIOC_S_AUDIO, &audio ) < 0 )
+            {
+                msg_Err( p_obj, "cannot set audio input %"PRIu32": %m", idx );
+                goto error;
+            }
+            msg_Dbg( p_obj, "audio input set to %"PRIu32, idx );
         }
-        msg_Dbg( p_obj, "audio input set to %u",
-                 p_sys->i_audio_input );
     }
 
     /* List tuner caps */
     if( cap.capabilities & V4L2_CAP_TUNER )
     {
         struct v4l2_tuner tuner;
+        uint32_t idx = var_CreateGetInteger( p_obj, CFG_PREFIX"tuner" );
+        enum v4l2_tuner_type type = V4L2_TUNER_RADIO;
 
         tuner.index = 0;
         while( v4l2_ioctl( i_fd, VIDIOC_G_TUNER, &tuner ) >= 0 )
         {
-            if( tuner.index == p_sys->i_tuner )
-                p_sys->i_tuner_type = tuner.type;
+            if( tuner.index == idx )
+                type = tuner.type;
 
             const char *unit =
                 (tuner.capability & V4L2_TUNER_CAP_LOW) ? "Hz" : "kHz";
@@ -1551,43 +1516,45 @@ static int OpenVideoDev( vlc_object_t *p_obj, const char *path,
             }
             msg_Dbg( p_obj, "tuner %u (%s) frequency: %.1f %s", tuner.index,
                      tuner.name, frequency.frequency * 62.5, unit );
-
             tuner.index++;
         }
-    }
 
-    /* Tune the tuner */
-    uint32_t freq = var_InheritInteger( p_obj, CFG_PREFIX"tuner-frequency" );
-    if( freq != (uint32_t)-1 )
-    {
-        struct v4l2_frequency frequency = {
-            .tuner = p_sys->i_tuner,
-            .type = p_sys->i_tuner_type,
-            .frequency = freq / 62.5,
-        };
-
-        if( v4l2_ioctl( i_fd, VIDIOC_S_FREQUENCY, &frequency ) < 0 )
+        /* Tune the tuner */
+        uint32_t freq = var_InheritInteger( p_obj,
+                                            CFG_PREFIX"tuner-frequency" );
+        if( freq != (uint32_t)-1 )
         {
-            msg_Err( p_obj, "cannot set tuner frequency: %m" );
-            goto error;
+            struct v4l2_frequency frequency = {
+                .tuner = idx,
+                .type = type,
+                .frequency = freq / 62.5,
+            };
+
+            if( v4l2_ioctl( i_fd, VIDIOC_S_FREQUENCY, &frequency ) < 0 )
+            {
+                msg_Err( p_obj, "cannot set tuner frequency: %m" );
+                goto error;
+            }
+            msg_Dbg( p_obj, "tuner frequency set" );
         }
-        msg_Dbg( p_obj, "tuner frequency set" );
-    }
 
-    /* Set the tuner's audio mode */
-    if( p_sys->i_tuner_audio_mode >= 0 )
-    {
-        struct v4l2_tuner tuner = {
-            .index = p_sys->i_tuner,
-            .audmode = p_sys->i_tuner_audio_mode,
-        };
-
-        if( v4l2_ioctl( i_fd, VIDIOC_S_TUNER, &tuner ) < 0 )
+        /* Set the tuner audio mode */
+        int32_t audmode = var_InheritInteger( p_obj,
+                                              CFG_PREFIX"tuner-audio-mode" );
+        if( audmode >= 0 )
         {
-            msg_Err( p_obj, "cannot set tuner audio mode: %m" );
-            goto error;
+            struct v4l2_tuner tuner = {
+                .index = idx,
+                .audmode = audmode,
+            };
+
+            if( v4l2_ioctl( i_fd, VIDIOC_S_TUNER, &tuner ) < 0 )
+            {
+                msg_Err( p_obj, "cannot set tuner audio mode: %m" );
+                goto error;
+            }
+            msg_Dbg( p_obj, "tuner audio mode set" );
         }
-        msg_Dbg( p_obj, "tuner audio mode set" );
     }
 
     /* Probe for available chromas */
@@ -1726,10 +1693,13 @@ static int OpenVideoDev( vlc_object_t *p_obj, const char *path,
     }
 
     /* Try and find default resolution if not specified */
+    int width = var_InheritInteger( p_obj, CFG_PREFIX"width" );
+    int height = var_InheritInteger( p_obj, CFG_PREFIX"height" );
+
     memset( &fmt, 0, sizeof(fmt) );
     fmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 
-    if( p_sys->i_width <= 0 || p_sys->i_height <= 0 )
+    if( width <= 0 || height <= 0 )
     {
         /* Use current width and height settings */
         if( v4l2_ioctl( i_fd, VIDIOC_G_FMT, &fmt ) < 0 )
@@ -1741,7 +1711,7 @@ static int OpenVideoDev( vlc_object_t *p_obj, const char *path,
         msg_Dbg( p_obj, "found default width and height of %ux%u",
                  fmt.fmt.pix.width, fmt.fmt.pix.height );
 
-        if( p_sys->i_width < 0 || p_sys->i_height < 0 )
+        if( width < 0 || height < 0 )
         {
             msg_Dbg( p_obj, "will try to find optimal width and height" );
         }
@@ -1749,10 +1719,9 @@ static int OpenVideoDev( vlc_object_t *p_obj, const char *path,
     else
     {
         /* Use user specified width and height */
-        msg_Dbg( p_obj, "trying specified size %dx%d",
-                 p_sys->i_width, p_sys->i_height );
-        fmt.fmt.pix.width = p_sys->i_width;
-        fmt.fmt.pix.height = p_sys->i_height;
+        msg_Dbg( p_obj, "trying specified size %dx%d", width, height );
+        fmt.fmt.pix.width = width;
+        fmt.fmt.pix.height = height;
     }
 
     fmt.fmt.pix.field = V4L2_FIELD_NONE;
@@ -1827,7 +1796,7 @@ static int OpenVideoDev( vlc_object_t *p_obj, const char *path,
             }
         }
 
-        if( p_sys->i_width < 0 || p_sys->i_height < 0 )
+        if( width < 0 || height < 0 )
         {
             f_fps = var_InheritFloat( p_obj, CFG_PREFIX"fps" );
             if( f_fps <= 0. )
@@ -1861,8 +1830,8 @@ static int OpenVideoDev( vlc_object_t *p_obj, const char *path,
         }
     }
 
-    p_sys->i_width = fmt.fmt.pix.width;
-    p_sys->i_height = fmt.fmt.pix.height;
+    width = fmt.fmt.pix.width;
+    height = fmt.fmt.pix.height;
 
     if( v4l2_ioctl( i_fd, VIDIOC_G_FMT, &fmt ) < 0 ) {;}
     /* Print extra info */
@@ -1894,7 +1863,7 @@ static int OpenVideoDev( vlc_object_t *p_obj, const char *path,
             break;
         case V4L2_FIELD_ALTERNATE:
             msg_Dbg( p_obj, "Interlacing setting: alternate fields (TODO)" );
-            p_sys->i_height = p_sys->i_height * 2;
+            height *= 2;
             break;
         case V4L2_FIELD_INTERLACED_TB:
             msg_Dbg( p_obj, "Interlacing setting: interleaved top bottom" );
@@ -1939,8 +1908,8 @@ static int OpenVideoDev( vlc_object_t *p_obj, const char *path,
     struct v4l2_frmivalenum frmival;
     memset( &frmival, 0, sizeof(frmival) );
     frmival.pixel_format = fmt.fmt.pix.pixelformat;
-    frmival.width = p_sys->i_width;
-    frmival.height = p_sys->i_height;
+    frmival.width = width;
+    frmival.height = height;
     if( v4l2_ioctl( i_fd, VIDIOC_ENUM_FRAMEINTERVALS, &frmival ) >= 0 )
     {
         char psz_fourcc[5];
@@ -2002,12 +1971,22 @@ static int OpenVideoDev( vlc_object_t *p_obj, const char *path,
 
     if( b_demux )
     {
+        int ar = 4 * VOUT_ASPECT_FACTOR / 3;
+        char *str = var_InheritString( p_obj, CFG_PREFIX"aspect-ratio" );
+        if( likely(str != NULL) )
+        {
+            const char *delim = strchr( str, ':' );
+            if( delim )
+                ar = atoi( str ) * VOUT_ASPECT_FACTOR / atoi( delim + 1 );
+            free( str );
+        }
+
         /* Add */
-        es_fmt.video.i_width  = p_sys->i_width;
-        es_fmt.video.i_height = p_sys->i_height;
+        es_fmt.video.i_width  = width;
+        es_fmt.video.i_height = height;
 
         /* Get aspect-ratio */
-        es_fmt.video.i_sar_num = p_sys->i_aspect    * es_fmt.video.i_height;
+        es_fmt.video.i_sar_num = ar * es_fmt.video.i_height;
         es_fmt.video.i_sar_den = VOUT_ASPECT_FACTOR * es_fmt.video.i_width;
 
         /* Framerate */

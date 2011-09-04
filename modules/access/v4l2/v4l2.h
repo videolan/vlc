@@ -58,29 +58,16 @@ struct demux_sys_t
     /* Video */
     io_method io;
 
-    unsigned i_selected_input;
-
     unsigned i_codec;
     struct v4l2_fmtdesc *p_codecs;
 
     struct buffer_t *p_buffers;
     unsigned int i_nbuffers;
 
-    int i_width;
-    int i_height;
-    unsigned int i_aspect;
     int i_fourcc;
     uint32_t i_block_flags;
 
     es_out_id_t *p_es;
-
-    /* Audio */
-    uint32_t i_audio_input;
-
-    /* Tuner */
-    uint32_t i_tuner;
-    enum v4l2_tuner_type i_tuner_type;
-    int i_tuner_audio_mode;
 
 #ifdef HAVE_LIBV4L2
     bool b_libv4l2;
