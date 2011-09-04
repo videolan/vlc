@@ -149,3 +149,12 @@
 }
 - (BOOL)timeRemaining;
 @end
+
+/*****************************************************************************
+ * VLCMainWindowSplitView interface
+ *****************************************************************************/
+@interface VLCMainWindowSplitView : NSSplitView
+{
+}
+
+@end

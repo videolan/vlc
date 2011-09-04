@@ -692,3 +692,23 @@ void _drawFrameInRect(NSRect frameRect)
     return [[NSUserDefaults standardUserDefaults] boolForKey:@"DisplayTimeAsTimeRemaining"];
 }
 @end
+
+/*****************************************************************************
+ * VLCMainWindowSplitView implementation
+ * comments taken from NSSplitView.h (10.7 SDK)
+ *****************************************************************************/
+@implementation VLCMainWindowSplitView : NSSplitView
+/* Return the color of the dividers that the split view is drawing between subviews. The default implementation of this method returns [NSColor clearColor] for the thick divider style. It will also return [NSColor clearColor] for the thin divider style when the split view is in a textured window. All other thin dividers are drawn with a color that looks good between two white panes. You can override this method to change the color of dividers.
+ */
+- (NSColor *)dividerColor
+{
+    return [NSColor blackColor];
+}
+
+/* Return the thickness of the dividers that the split view is drawing between subviews. The default implementation returns a value that depends on the divider style. You can override this method to change the size of dividers.
+ */
+- (CGFloat)dividerThickness
+{
+    return 0.01;
+}
+@end
