@@ -42,6 +42,7 @@ EXTRA_DIST = \
 	extras/package/win32/languages/hungarian.nsh \
 	extras/package/win32/languages/italian.nsh \
 	extras/package/win32/languages/japanese.nsh \
+	extras/package/win32/languages/lithuanian.nsh \
 	extras/package/win32/languages/occitan.nsh \
 	extras/package/win32/languages/polish.nsh \
 	extras/package/win32/languages/punjabi.nsh \
