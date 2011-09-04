@@ -46,4 +46,4 @@ Var Action_OnArrivalVideoFiles
 Var Action_OnArrivalMusicFiles
 Var Action_OnArrivalDVDAudio
 
-Var Licence_NextText
+Var License_NextText

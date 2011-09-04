@@ -60,4 +60,4 @@ StrCpy $Action_OnArrivalVideoFiles "Play video files"
 StrCpy $Action_OnArrivalMusicFiles "Play audio files"
 StrCpy $Action_OnArrivalDVDAudio "Play audio DVD"
 
-StrCpy $Licence_NextText "You are now aware of your rights. Click Next to continue."
+StrCpy $License_NextText "You are now aware of your rights. Click Next to continue."

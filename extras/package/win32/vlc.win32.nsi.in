@@ -72,7 +72,7 @@ RequestExecutionLevel user
     !insertmacro MUI_PAGE_WELCOME
   ; License page
     !define MUI_LICENSEPAGE_BUTTON $(^NextBtn)
-    !define MUI_LICENSEPAGE_TEXT_BOTTOM $Licence_NextText
+    !define MUI_LICENSEPAGE_TEXT_BOTTOM $License_NextText
     !insertmacro MUI_PAGE_LICENSE "COPYING.txt"
   ; Components page
     !insertmacro MUI_PAGE_COMPONENTS
