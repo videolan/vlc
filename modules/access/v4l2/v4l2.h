@@ -58,9 +58,6 @@ struct demux_sys_t
     /* Video */
     io_method io;
 
-    unsigned i_codec;
-    struct v4l2_fmtdesc *p_codecs;
-
     struct buffer_t *p_buffers;
     unsigned int i_nbuffers;
 

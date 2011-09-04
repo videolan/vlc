@@ -419,9 +419,6 @@ static ssize_t AccessReadStream( access_t * p_access, uint8_t * p_buffer, size_t
 static block_t* GrabVideo( vlc_object_t *p_demux, demux_sys_t *p_sys );
 static block_t* ProcessVideoFrame( vlc_object_t *p_demux, uint8_t *p_frame, size_t );
 
-static bool IsPixelFormatSupported( demux_t *p_demux,
-                                          unsigned int i_pixelformat );
-
 static int OpenVideoDev( vlc_object_t *, const char *path, demux_sys_t *, bool );
 
 static const struct
@@ -534,7 +531,6 @@ static int DemuxOpen( vlc_object_t *p_this )
     free( path );
     if( p_sys->i_fd == -1 )
     {
-        free( p_sys->p_codecs );
         free( p_sys );
         return VLC_EGENERIC;
     }
@@ -649,7 +645,6 @@ static void CommonClose( vlc_object_t *p_this, demux_sys_t *p_sys )
     (void)p_this;
     /* Close */
     if( p_sys->i_fd >= 0 ) v4l2_close( p_sys->i_fd );
-    free( p_sys->p_codecs );
     free( p_sys );
 }
 
@@ -697,7 +692,6 @@ static int AccessOpen( vlc_object_t * p_this )
     free( path );
     if( p_sys->i_fd == -1 )
     {
-        free( p_sys->p_codecs );
         free( p_sys );
         return VLC_EGENERIC;
     }
@@ -1144,20 +1138,16 @@ static int InitUserP( vlc_object_t *p_demux, demux_sys_t *p_sys, int i_fd, unsig
     return 0;
 }
 
-/*****************************************************************************
- * IsPixelFormatSupported: returns true if the specified V4L2 pixel format is
+/**
+ * \return true if the specified V4L2 pixel format is
  * in the array of supported formats returned by the driver
- *****************************************************************************/
-static bool IsPixelFormatSupported( demux_t *p_demux, unsigned int i_pixelformat )
+ */
+static bool IsPixelFormatSupported( struct v4l2_fmtdesc *codecs, size_t n,
+                                    unsigned int i_pixelformat )
 {
-    demux_sys_t *p_sys = p_demux->p_sys;
-
-    for( unsigned i_index = 0; i_index < p_sys->i_codec; i_index++ )
-    {
-        if( p_sys->p_codecs[i_index].pixelformat == i_pixelformat )
+    for( size_t i = 0; i < n; i++ )
+        if( codecs[i].pixelformat == i_pixelformat )
             return true;
-    }
-
     return false;
 }
 
@@ -1335,6 +1325,7 @@ static int OpenVideoDev( vlc_object_t *p_obj, const char *path,
     unsigned int i_min;
     enum v4l2_buf_type buf_type;
     es_format_t es_fmt;
+    struct v4l2_fmtdesc *codecs = NULL;
 
     msg_Dbg( p_obj, "opening device '%s'", path );
 
@@ -1558,66 +1549,56 @@ static int OpenVideoDev( vlc_object_t *p_obj, const char *path,
     }
 
     /* Probe for available chromas */
+    uint_fast32_t ncodec = 0;
     if( cap.capabilities & V4L2_CAP_VIDEO_CAPTURE )
     {
-        struct v4l2_fmtdesc codec;
-
-        unsigned i_index = 0;
-        memset( &codec, 0, sizeof(codec) );
-        codec.index = i_index;
-        codec.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+        struct v4l2_fmtdesc codec = {
+            .index = 0,
+            .type = V4L2_BUF_TYPE_VIDEO_CAPTURE,
+        };
 
         while( v4l2_ioctl( i_fd, VIDIOC_ENUM_FMT, &codec ) >= 0 )
+            codec.index = ++ncodec;
+
+        codecs = malloc( ncodec * sizeof( *codecs ) );
+        if( unlikely(codecs == NULL) )
+            ncodec = 0;
+
+        for( uint_fast32_t i = 0; i < ncodec; i++ )
         {
-            if( codec.index != i_index )
-                break;
-            i_index++;
-            codec.index = i_index;
-        }
+            codecs[i].index = i;
+            codecs[i].type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 
-        p_sys->i_codec = i_index;
-
-        free( p_sys->p_codecs );
-        p_sys->p_codecs = calloc( 1, p_sys->i_codec * sizeof( struct v4l2_fmtdesc ) );
-
-        for( i_index = 0; i_index < p_sys->i_codec; i_index++ )
-        {
-            p_sys->p_codecs[i_index].index = i_index;
-            p_sys->p_codecs[i_index].type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-
-            if( v4l2_ioctl( i_fd, VIDIOC_ENUM_FMT, &p_sys->p_codecs[i_index] ) < 0 )
+            if( v4l2_ioctl( i_fd, VIDIOC_ENUM_FMT, &codecs[i] ) < 0 )
             {
                 msg_Err( p_obj, "cannot get codec description: %m" );
                 return -1;
             }
 
             /* only print if vlc supports the format */
-            char psz_fourcc_v4l2[5];
-            memset( &psz_fourcc_v4l2, 0, sizeof( psz_fourcc_v4l2 ) );
-            vlc_fourcc_to_char( p_sys->p_codecs[i_index].pixelformat,
-                                &psz_fourcc_v4l2 );
-            bool b_codec_supported = false;
-            for( int i = 0; v4l2chroma_to_fourcc[i].i_v4l2 != 0; i++ )
-            {
-                if( v4l2chroma_to_fourcc[i].i_v4l2 == p_sys->p_codecs[i_index].pixelformat )
-                {
-                    b_codec_supported = true;
+            char fourcc_v4l2[5];
+            memset( fourcc_v4l2, 0, sizeof( fourcc_v4l2 ) );
+            vlc_fourcc_to_char( codecs[i].pixelformat, fourcc_v4l2 );
 
-                    char psz_fourcc[5];
-                    memset( &psz_fourcc, 0, sizeof( psz_fourcc ) );
-                    vlc_fourcc_to_char( v4l2chroma_to_fourcc[i].i_fourcc,
-                                        &psz_fourcc );
+            bool b_codec_supported = false;
+            for( unsigned j = 0; v4l2chroma_to_fourcc[j].i_v4l2 != 0; j++ )
+            {
+                if( v4l2chroma_to_fourcc[j].i_v4l2 == codecs[i].pixelformat )
+                {
+                    char fourcc[5];
+                    memset( fourcc, 0, sizeof( fourcc ) );
+                    vlc_fourcc_to_char( v4l2chroma_to_fourcc[j].i_fourcc,
+                                        fourcc );
                     msg_Dbg( p_obj, "device supports chroma %4.4s [%s, %s]",
-                                psz_fourcc,
-                                p_sys->p_codecs[i_index].description,
-                                psz_fourcc_v4l2 );
+                             fourcc, codecs[i].description, fourcc_v4l2 );
+                    b_codec_supported = true;
 
 #ifdef VIDIOC_ENUM_FRAMESIZES
                     /* This is new in Linux 2.6.19 */
                     /* List valid frame sizes for this format */
                     struct v4l2_frmsizeenum frmsize;
                     memset( &frmsize, 0, sizeof(frmsize) );
-                    frmsize.pixel_format = p_sys->p_codecs[i_index].pixelformat;
+                    frmsize.pixel_format = codecs[i].pixelformat;
                     if( v4l2_ioctl( i_fd, VIDIOC_ENUM_FRAMESIZES, &frmsize ) < 0 )
                     {
                         /* Not all devices support this ioctl */
@@ -1656,10 +1637,8 @@ static int OpenVideoDev( vlc_object_t *p_obj, const char *path,
             }
             if( !b_codec_supported )
             {
-                    msg_Dbg( p_obj,
-                         "device codec %4.4s (%s) not supported",
-                         psz_fourcc_v4l2,
-                         p_sys->p_codecs[i_index].description );
+                msg_Dbg( p_obj, "device codec %4.4s (%s) not supported",
+                         fourcc_v4l2, codecs[i].description );
             }
         }
     }
@@ -1749,7 +1728,8 @@ static int OpenVideoDev( vlc_object_t *p_obj, const char *path,
                 }
             }
             /* Try and set user chroma */
-            bool b_error = !IsPixelFormatSupported( p_demux, fmt.fmt.pix.pixelformat );
+            bool b_error = !IsPixelFormatSupported( codecs, ncodec,
+                                                    fmt.fmt.pix.pixelformat );
             if( !b_error && fmt.fmt.pix.pixelformat )
             {
                 if( v4l2_ioctl( i_fd, VIDIOC_S_FMT, &fmt ) < 0 )
@@ -1779,7 +1759,8 @@ static int OpenVideoDev( vlc_object_t *p_obj, const char *path,
             for( i = 0; i < ARRAY_SIZE( p_chroma_fallbacks ); i++ )
             {
                 fmt.fmt.pix.pixelformat = p_chroma_fallbacks[i];
-                if( IsPixelFormatSupported( p_demux, fmt.fmt.pix.pixelformat ) )
+                if( IsPixelFormatSupported( codecs, ncodec,
+                                            fmt.fmt.pix.pixelformat ) )
                 {
                     if( v4l2_ioctl( i_fd, VIDIOC_S_FMT, &fmt ) >= 0 )
                         break;
@@ -2063,9 +2044,11 @@ static int OpenVideoDev( vlc_object_t *p_obj, const char *path,
         break;
     }
 
+    free( codecs );
     return i_fd;
 
 error:
     v4l2_close( i_fd );
+    free( codecs );
     return -1;
 }
