@@ -521,8 +521,6 @@ modules/gui/macosx/controls.m
 modules/gui/macosx/coredialogs.h
 modules/gui/macosx/coredialogs.m
 modules/gui/macosx/CoreInteraction.m
-modules/gui/macosx/embeddedwindow.h
-modules/gui/macosx/embeddedwindow.m
 modules/gui/macosx/eyetv.h
 modules/gui/macosx/eyetv.m
 modules/gui/macosx/fspanel.h
@@ -546,7 +544,7 @@ modules/gui/macosx/prefs_widgets.h
 modules/gui/macosx/prefs_widgets.m
 modules/gui/macosx/simple_prefs.h
 modules/gui/macosx/simple_prefs.m
-modules/gui/macosx/vout.m
+modules/gui/macosx/VideoView.m
 modules/gui/macosx/wizard.h
 modules/gui/macosx/wizard.m
 modules/gui/macosx_dialog_provider/VLCLoginPanel.h
