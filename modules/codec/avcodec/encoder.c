@@ -429,6 +429,9 @@ int OpenEncoder( vlc_object_t *p_this )
                p_enc->fmt_out.i_codec == VLC_CODEC_MP1V ) )
             p_context->flags |= CODEC_FLAG_LOW_DELAY;
 
+        if( p_enc->fmt_out.i_codec == VLC_CODEC_MP2V )
+            p_context->idct_algo = FF_IDCT_LIBMPEG2MMX;
+
         av_reduce( &p_context->sample_aspect_ratio.num,
                    &p_context->sample_aspect_ratio.den,
                    p_enc->fmt_in.video.i_sar_num,
