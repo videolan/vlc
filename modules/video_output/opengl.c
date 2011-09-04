@@ -36,23 +36,7 @@
 #include "opengl.h"
 // Define USE_OPENGL_ES to the GL ES Version you want to select
 
-#if !defined (__APPLE__)
-# if USE_OPENGL_ES == 2
-#  include <GLES2/gl2ext.h>
-# elif USE_OPENGL_ES == 1
-#  include <GLES/glext.h>
-# else
-#   include <GL/glext.h>
-# endif
-#else
-# if USE_OPENGL_ES == 2
-#  include <OpenGLES/ES2/gl.h>
-# elif USE_OPENGL_ES == 1
-#  include <OpenGLES/ES1/gl.h>
-# else
-#  define MACOS_OPENGL
-#  include <OpenGL/glext.h>
-# endif
+#ifdef __APPLE__
 # define PFNGLGENPROGRAMSARBPROC              typeof(glGenProgramsARB)*
 # define PFNGLBINDPROGRAMARBPROC              typeof(glBindProgramARB)*
 # define PFNGLPROGRAMSTRINGARBPROC            typeof(glProgramStringARB)*
@@ -73,7 +57,7 @@
 #if USE_OPENGL_ES
 #   define VLCGL_TEXTURE_COUNT 1
 #   define VLCGL_PICTURE_MAX 1
-#elif defined(BROKEN_MACOS_OPENGL)
+#elif defined(MACOS_OPENGL)
 #   define VLCGL_TEXTURE_COUNT 2
 #   define VLCGL_PICTURE_MAX 2
 #else
@@ -288,8 +272,6 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     bool supports_npot = false;
 #if USE_OPENGL_ES == 2
     supports_npot = true;
-#elif defined(BROKEN_MACOS_OPENGL)
-    supports_npot = true;
 #else
     supports_npot |= HasExtension(extensions, "GL_APPLE_texture_2D_limited_npot") ||
                      HasExtension(extensions, "GL_ARB_texture_non_power_of_two");
@@ -411,7 +393,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     *fmt = vgl->fmt;
     if (subpicture_chromas) {
         *subpicture_chromas = NULL;
-#if !defined(BROKEN_MACOS_OPENGL) && !USE_OPENGL_ES
+#if !USE_OPENGL_ES
         if (supports_npot)
             *subpicture_chromas = gl_subpicture_chromas;
 #endif
