@@ -1931,7 +1931,7 @@ static int OpenVideoDev( vlc_object_t *p_obj, const char *path,
 #endif
 
 
-    /* Init IO method */
+    /* Init I/O method */
     switch( p_sys->io )
     {
     case IO_METHOD_READ:
@@ -1942,13 +1942,61 @@ static int OpenVideoDev( vlc_object_t *p_obj, const char *path,
     case IO_METHOD_MMAP:
         if( InitMmap( p_obj, p_sys, i_fd ) )
             goto error;
+        for (unsigned int i = 0; i < p_sys->i_nbuffers; ++i)
+        {
+            struct v4l2_buffer buf;
+
+            memset( &buf, 0, sizeof(buf) );
+            buf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+            buf.memory = V4L2_MEMORY_MMAP;
+            buf.index = i;
+
+            if( v4l2_ioctl( i_fd, VIDIOC_QBUF, &buf ) < 0 )
+            {
+                msg_Err( p_obj, "VIDIOC_QBUF failed" );
+                goto error;
+            }
+        }
+
+        buf_type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+        if( v4l2_ioctl( i_fd, VIDIOC_STREAMON, &buf_type ) < 0 )
+        {
+            msg_Err( p_obj, "VIDIOC_STREAMON failed" );
+            goto error;
+        }
         break;
 
     case IO_METHOD_USERPTR:
         if( InitUserP( p_obj, p_sys, i_fd, fmt.fmt.pix.sizeimage ) )
             goto error;
+        for( unsigned int i = 0; i < p_sys->i_nbuffers; ++i )
+        {
+            struct v4l2_buffer buf;
+
+            memset( &buf, 0, sizeof(buf) );
+            buf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+            buf.memory = V4L2_MEMORY_USERPTR;
+            buf.index = i;
+            buf.m.userptr = (unsigned long)p_sys->p_buffers[i].start;
+            buf.length = p_sys->p_buffers[i].length;
+
+            if( v4l2_ioctl( i_fd, VIDIOC_QBUF, &buf ) < 0 )
+            {
+                msg_Err( p_obj, "VIDIOC_QBUF failed" );
+                goto error;
+            }
+        }
+
+        buf_type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+        if( v4l2_ioctl( i_fd, VIDIOC_STREAMON, &buf_type ) < 0 )
+        {
+            msg_Err( p_obj, "VIDIOC_STREAMON failed" );
+            goto error;
+        }
         break;
     }
+
+    free( codecs );
 
     if( b_demux )
     {
@@ -1981,70 +2029,6 @@ static int OpenVideoDev( vlc_object_t *p_obj, const char *path,
 
         p_sys->p_es = es_out_Add( p_demux->out, &es_fmt );
     }
-
-    /* Start Capture */
-
-    switch( p_sys->io )
-    {
-    case IO_METHOD_READ:
-        /* Nothing to do */
-        break;
-
-    case IO_METHOD_MMAP:
-        for (unsigned int i = 0; i < p_sys->i_nbuffers; ++i)
-        {
-            struct v4l2_buffer buf;
-
-            memset( &buf, 0, sizeof(buf) );
-            buf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-            buf.memory = V4L2_MEMORY_MMAP;
-            buf.index = i;
-
-            if( v4l2_ioctl( i_fd, VIDIOC_QBUF, &buf ) < 0 )
-            {
-                msg_Err( p_obj, "VIDIOC_QBUF failed" );
-                goto error;
-            }
-        }
-
-        buf_type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-        if( v4l2_ioctl( i_fd, VIDIOC_STREAMON, &buf_type ) < 0 )
-        {
-            msg_Err( p_obj, "VIDIOC_STREAMON failed" );
-            goto error;
-        }
-
-        break;
-
-    case IO_METHOD_USERPTR:
-        for( unsigned int i = 0; i < p_sys->i_nbuffers; ++i )
-        {
-            struct v4l2_buffer buf;
-
-            memset( &buf, 0, sizeof(buf) );
-            buf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-            buf.memory = V4L2_MEMORY_USERPTR;
-            buf.index = i;
-            buf.m.userptr = (unsigned long)p_sys->p_buffers[i].start;
-            buf.length = p_sys->p_buffers[i].length;
-
-            if( v4l2_ioctl( i_fd, VIDIOC_QBUF, &buf ) < 0 )
-            {
-                msg_Err( p_obj, "VIDIOC_QBUF failed" );
-                goto error;
-            }
-        }
-
-        buf_type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-        if( v4l2_ioctl( i_fd, VIDIOC_STREAMON, &buf_type ) < 0 )
-        {
-            msg_Err( p_obj, "VIDIOC_STREAMON failed" );
-            goto error;
-        }
-        break;
-    }
-
-    free( codecs );
     return i_fd;
 
 error:
