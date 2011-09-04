@@ -702,13 +702,13 @@ void _drawFrameInRect(NSRect frameRect)
  */
 - (NSColor *)dividerColor
 {
-    return [NSColor blackColor];
+    return [NSColor colorWithCalibratedRed:.60 green:.60 blue:.60 alpha:1.];
 }
 
 /* Return the thickness of the dividers that the split view is drawing between subviews. The default implementation returns a value that depends on the divider style. You can override this method to change the size of dividers.
  */
 - (CGFloat)dividerThickness
 {
-    return 0.01;
+    return .01;
 }
 @end
