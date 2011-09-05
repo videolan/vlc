@@ -419,7 +419,7 @@ static ssize_t AccessReadStream( access_t * p_access, uint8_t * p_buffer, size_t
 static block_t* GrabVideo( vlc_object_t *p_demux, demux_sys_t *p_sys );
 static block_t* ProcessVideoFrame( vlc_object_t *p_demux, uint8_t *p_frame, size_t );
 
-static int OpenVideoDev( vlc_object_t *, demux_sys_t *, bool );
+static int OpenVideo( vlc_object_t *, demux_sys_t *, bool );
 
 static const struct
 {
@@ -507,25 +507,7 @@ static int DemuxOpen( vlc_object_t *p_this )
     if( p_sys == NULL ) return VLC_ENOMEM;
 
     ParseMRL( p_this, p_demux->psz_location );
-
-#ifdef HAVE_LIBV4L2
-    p_sys->i_fd = -1;
-    if( !var_InheritBool( p_this, CFG_PREFIX "use-libv4l2" ) )
-    {
-        p_sys->b_libv4l2 = false;
-#endif
-        msg_Dbg( p_this, "Trying direct kernel v4l2" );
-        p_sys->i_fd = OpenVideoDev( p_this, p_sys, true );
-#ifdef HAVE_LIBV4L2
-    }
-
-    if( p_sys->i_fd == -1 )
-    {
-        p_sys->b_libv4l2 = true;
-        msg_Dbg( p_this, "Trying libv4l2 wrapper" );
-        p_sys->i_fd = OpenVideoDev( p_this, p_sys, true );
-    }
-#endif
+    p_sys->i_fd = OpenVideo( p_this, p_sys, true );
     if( p_sys->i_fd == -1 )
     {
         free( p_sys );
@@ -672,24 +654,7 @@ static int AccessOpen( vlc_object_t * p_this )
     p_access->p_sys = (access_sys_t*)p_sys;
 
     ParseMRL( p_this, p_access->psz_location );
-
-#ifdef HAVE_LIBV4L2
-    p_sys->i_fd = -1;
-    if( !var_InheritBool( p_this, CFG_PREFIX "use-libv4l2" ) )
-    {
-        p_sys->b_libv4l2 = false;
-#endif
-        msg_Dbg( p_this, "Trying direct kernel v4l2" );
-        p_sys->i_fd = OpenVideoDev( p_this, p_sys, false );
-#ifdef HAVE_LIBV4L2
-    }
-    if( p_sys->i_fd == -1 )
-    {
-        p_sys->b_libv4l2 = true;
-        msg_Dbg( p_this, "Trying libv4l2 wrapper" );
-        p_sys->i_fd = OpenVideoDev( p_this, p_sys, false );
-    }
-#endif
+    p_sys->i_fd = OpenVideo( p_this, p_sys, false );
     if( p_sys->i_fd == -1 )
     {
         free( p_sys );
@@ -1312,11 +1277,59 @@ static void GetMaxDimensions( demux_t *p_demux, int i_fd,
 #endif
 }
 
+static int InitVideo( vlc_object_t *p_obj, int i_fd, demux_sys_t *p_sys,
+                      bool b_demux );
+
 /**
  * Opens and sets up a video device
  * \return file descriptor or -1 on error
  */
-static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
+static int OpenVideo( vlc_object_t *obj, demux_sys_t *sys, bool b_demux )
+{
+    char *path = var_InheritString( obj, CFG_PREFIX"dev" );
+    if( unlikely(path == NULL) )
+        return -1; /* probably OOM */
+
+    msg_Dbg( obj, "opening device '%s'", path );
+
+    int fd = vlc_open( path, O_RDWR );
+    if( fd == -1 )
+    {
+        msg_Err( obj, "cannot open device '%s': %m", path );
+        free( path );
+        return -1;
+    }
+    free( path );
+#ifdef HAVE_LIBV4L2
+    if( !var_InheritBool( obj, CFG_PREFIX "use-libv4l2" ) )
+    {
+        msg_Dbg( obj, "trying kernel V4L2" );
+        if( InitVideo( obj, fd, sys, b_demux ) == 0 )
+            return fd;
+    }
+    msg_Dbg( obj, "trying library V4L2" );
+    /* Note the v4l2_xxx functions are designed so that if they get passed an
+       unknown fd, the will behave exactly as their regular xxx counterparts,
+       so if v4l2_fd_open fails, we continue as normal (missing the libv4l2
+       custom cam format to normal formats conversion). Chances are big we will
+       still fail then though, as normally v4l2_fd_open only fails if the
+       device is not a v4l2 device. */
+    int libfd = v4l2_fd_open( fd, 0 );
+    if( libfd == -1 )
+        goto error;
+    fd = libfd;
+#endif
+    if( InitVideo( obj, fd, sys, b_demux ) )
+        goto error;
+
+    return fd;
+error:
+    close( fd );
+    return -1;
+}
+
+static int InitVideo( vlc_object_t *p_obj, int i_fd, demux_sys_t *p_sys,
+                      bool b_demux )
 {
     struct v4l2_cropcap cropcap;
     struct v4l2_crop crop;
@@ -1324,38 +1337,6 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
     unsigned int i_min;
     enum v4l2_buf_type buf_type;
     es_format_t es_fmt;
-    struct v4l2_fmtdesc *codecs = NULL;
-
-    char *path = var_InheritString( p_obj, CFG_PREFIX"dev" );
-    if( unlikely(path == NULL) )
-        return -1; /* probably OOM */
-
-    msg_Dbg( p_obj, "opening device '%s'", path );
-
-    int i_fd = vlc_open( path, O_RDWR );
-    if( i_fd == -1 )
-    {
-        msg_Err( p_obj, "cannot open device '%s': %m", path );
-        free( path );
-        return -1;
-    }
-    free( path );
-
-#ifdef HAVE_LIBV4L2
-    /* Note the v4l2_xxx functions are designed so that if they get passed an
-       unknown fd, the will behave exactly as their regular xxx counterparts,
-       so if v4l2_fd_open fails, we continue as normal (missing the libv4l2
-       custom cam format to normal formats conversion). Chances are big we will
-       still fail then though, as normally v4l2_fd_open only fails if the
-       device is not a v4l2 device. */
-    if( p_sys->b_libv4l2 )
-    {
-        int libv4l2_fd;
-        libv4l2_fd = v4l2_fd_open( i_fd, 0 );
-        if( libv4l2_fd != -1 )
-            i_fd = libv4l2_fd;
-    }
-#endif
 
     /* Get device capabilites */
     struct v4l2_capability cap;
@@ -1387,7 +1368,7 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
     else
     {
         msg_Err( p_obj, "no supported I/O method" );
-        goto error;
+        return -1;
     }
 
     /* Now, enumerate all the video inputs. This is useless at the moment
@@ -1413,7 +1394,7 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
         if( v4l2_ioctl( i_fd, VIDIOC_S_INPUT, &index ) < 0 )
         {
             msg_Err( p_obj, "cannot set input %u: %m", index );
-            goto error;
+            return -1;
         }
         msg_Dbg( p_obj, "input set to %u", index );
     }
@@ -1441,7 +1422,7 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
          || v4l2_ioctl( i_fd, VIDIOC_G_STD, &std ) < 0 )
         {
             msg_Err( p_obj, "cannot set standard 0x%"PRIx64": %m", std );
-            goto error;
+            return -1;
         }
         msg_Dbg( p_obj, "standard set to 0x%"PRIx64":", std );
         bottom_first = std == V4L2_STD_NTSC;
@@ -1476,7 +1457,7 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
             if( v4l2_ioctl( i_fd, VIDIOC_S_AUDIO, &audio ) < 0 )
             {
                 msg_Err( p_obj, "cannot set audio input %"PRIu32": %m", idx );
-                goto error;
+                return -1;
             }
             msg_Dbg( p_obj, "audio input set to %"PRIu32, idx );
         }
@@ -1529,7 +1510,7 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
             if( v4l2_ioctl( i_fd, VIDIOC_S_FREQUENCY, &frequency ) < 0 )
             {
                 msg_Err( p_obj, "cannot set tuner frequency: %m" );
-                goto error;
+                return -1;
             }
             msg_Dbg( p_obj, "tuner frequency set" );
         }
@@ -1547,13 +1528,14 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
             if( v4l2_ioctl( i_fd, VIDIOC_S_TUNER, &tuner ) < 0 )
             {
                 msg_Err( p_obj, "cannot set tuner audio mode: %m" );
-                goto error;
+                return -1;
             }
             msg_Dbg( p_obj, "tuner audio mode set" );
         }
     }
 
     /* Probe for available chromas */
+    struct v4l2_fmtdesc *codecs = NULL;
     uint_fast32_t ncodec = 0;
     if( cap.capabilities & V4L2_CAP_VIDEO_CAPTURE )
     {
@@ -1577,7 +1559,7 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
             if( v4l2_ioctl( i_fd, VIDIOC_ENUM_FMT, &codecs[i] ) < 0 )
             {
                 msg_Err( p_obj, "cannot get codec description: %m" );
-                return -1;
+                goto error;
             }
 
             /* only print if vlc supports the format */
@@ -2034,10 +2016,9 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
 
         p_sys->p_es = es_out_Add( p_demux->out, &es_fmt );
     }
-    return i_fd;
+    return 0;
 
 error:
-    v4l2_close( i_fd );
     free( codecs );
     return -1;
 }
