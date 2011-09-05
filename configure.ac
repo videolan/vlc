@@ -1948,45 +1948,25 @@ if test "${enable_sftp}" = "yes"; then
 fi
 
 dnl
-dnl  Video4Linux2 plugin
+dnl  Video4Linux 2
 dnl
-AC_ARG_ENABLE(v4l2,
-  [AS_HELP_STRING([--disable-v4l2],
-    [disable Video4Linux2 support (default auto)])])
+AC_ARG_ENABLE(pvr, [AS_HELP_STRING([--enable-pvr],
+  [support PVR V4L2 cards (default disabled)])])
 have_v4l2="no"
-AS_IF([test "${enable_v4l2}" != "no"], [
-  AC_CHECK_HEADERS([linux/videodev2.h sys/videoio.h], [
-    have_v4l2="yes"
+AC_CHECK_HEADERS([linux/videodev2.h sys/videoio.h], [
+  have_v4l2="yes"
+])
+AS_IF([test "$have_v4l2" = "yes"], [
+  PKG_CHECK_MODULES(LIBV4L2, libv4l2, [
+    AC_DEFINE(HAVE_LIBV4L2, 1, [Define to 1 if libv4l2 is available])
+  ], [
+    AC_MSG_WARN([libv4l2 development headers were not found])
+  ])
+  AS_IF([test "${enable_pvr}" = "yes"], [
+    VLC_ADD_PLUGIN([pvr])
   ])
 ])
 AM_CONDITIONAL(HAVE_V4L2, [test "${have_v4l2}" != "no"])
-
-dnl
-dnl libv4l2 support for video4linux.
-dnl
-AC_ARG_ENABLE(libv4l2,
-  [AS_HELP_STRING([--enable-libv4l2],
-    [use V4L2 through libv4l2 (default auto)])])
-if test "${enable_libv4l2}" != "no" -a "${enable_v4l2}" != "no"
-then
-    PKG_CHECK_MODULES( LIBV4L2, libv4l2, [
-      VLC_ADD_LIBS([v4l2],[${LIBV4L2_LIBS}])
-      VLC_ADD_CFLAGS([v4l2],[${LIBV4L2_CFLAGS}])
-      AC_DEFINE(HAVE_LIBV4L2, 1, Define if libv4l2 is available)],
-      AC_MSG_WARN([LibV4L2 support disabled because libv4l2 development headers were not found])
-    )
-fi
-
-dnl
-dnl  special access module for Hauppauge PVR cards
-dnl
-AC_ARG_ENABLE(pvr,
-  [AS_HELP_STRING([--enable-pvr],
-    [support PVR V4L2 cards (default disabled)])])
-if test "${enable_pvr}" = "yes"
-then
-  VLC_ADD_PLUGIN([pvr])
-fi
 
 dnl
 dnl special access module for Blackmagic SDI cards
