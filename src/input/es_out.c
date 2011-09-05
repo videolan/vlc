@@ -2988,6 +2988,15 @@ static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const es_format_t *
                info_category_AddInfo( p_cat, _("Frame rate"), "%"PRId64,
                                       div.quot );
        }
+       if( fmt->i_codec != p_fmt_es->i_codec )
+       {
+           const char *psz_chroma_description =
+                vlc_fourcc_GetDescription( VIDEO_ES, fmt->i_codec );
+           if( psz_chroma_description )
+               info_category_AddInfo( p_cat, _("Decoded format"), "%s",
+                                      psz_chroma_description );
+       }
+
        break;
 
     case SPU_ES:
