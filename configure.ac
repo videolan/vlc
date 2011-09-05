@@ -50,11 +50,6 @@ vlclibdir="\${libdir}/\${PKGDIR}"
 AC_SUBST(vlclibdir)
 
 dnl
-dnl  Save *FLAGS
-dnl
-VLC_SAVE_FLAGS
-
-dnl
 dnl Check for tools
 dnl
 AC_PROG_CC_C99
@@ -86,6 +81,11 @@ dnl Check for compiler properties
 AC_C_CONST
 AC_C_INLINE
 AC_C_RESTRICT
+
+dnl
+dnl  Save *FLAGS
+dnl
+VLC_SAVE_FLAGS
 
 dnl Extend the --help string at the current spot.
 AC_DEFUN([EXTEND_HELP_STRING], [m4_divert_once([HELP_ENABLE], [$1])])
@@ -921,16 +921,12 @@ dnl  Debugging mode
 dnl
 AC_ARG_ENABLE(debug,
   [AS_HELP_STRING([--enable-debug],
-    [build with run-time assertions and debug symbols (default disabled)])],,
+    [build with run-time assertions (default disabled)])],,
   [enable_debug="no"])
 AH_TEMPLATE(NDEBUG,
             [Define to 1 if debug code should NOT be compiled])
 AS_IF([test "${enable_debug}" != "no"], [
   AC_CHECK_HEADERS([valgrind/valgrind.h])
-  CFLAGS="${CFLAGS} -g"
-  CXXFLAGS="${CXXFLAGS} -g"
-  OBJCFLAGS="${OBJCFLAGS} -g"
-  LDFLAGS="${LDFLAGS} -g"
 ], [
   AC_DEFINE(NDEBUG)
 ])
@@ -1031,33 +1027,6 @@ AS_IF([test "${enable_optimizations}" != "no"], [
       ])
       AS_IF([test "${ac_cv_c_o3}" != "no"], [
         C_O="-O3"
-      ])
-    ])
-  ])
-
-  dnl -O2 and -O in both production and debug builds
-  AS_IF([test "x$C_O" = "x"], [
-    AC_CACHE_CHECK([if \$CC accepts -O2], [ac_cv_c_o2], [
-      CFLAGS="${CFLAGS_save} -O2"
-      AC_COMPILE_IFELSE([AC_LANG_PROGRAM()], [
-        ac_cv_c_o2=yes
-      ], [
-        ac_cv_c_o2=no
-      ])
-    ])
-    AS_IF([test "${ac_cv_c_o2}" != "no"], [
-      C_O="-O2"
-    ], [
-      AC_CACHE_CHECK([if \$CC accepts -O], [ac_cv_c_o], [
-        CFLAGS="${CFLAGS_save} -O"
-        AC_COMPILE_IFELSE([AC_LANG_PROGRAM()], [
-          ac_cv_c_o=yes
-        ], [
-          ac_cv_c_o=no
-        ])
-      ])
-      AS_IF([test "${ac_cv_c_o}" != "no"], [
-        C_O="-O"
       ])
     ])
   ])
