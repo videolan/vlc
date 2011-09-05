@@ -515,6 +515,8 @@ libvlc_media_player_new( libvlc_instance_t *instance )
     register_event(mp, TitleChanged);
     register_event(mp, PausableChanged);
 
+    register_event(mp, Vout);
+
     /* Snapshot initialization */
     register_event(mp, SnapshotTaken);
 
