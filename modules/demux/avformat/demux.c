@@ -379,7 +379,7 @@ int OpenDemux( vlc_object_t *p_this )
                 if( cc->codec_type == AVMEDIA_TYPE_DATA )
                     psz_type = "data";
 
-                msg_Warn( p_demux, "unsupported track type (%u) in avformat demux", cc->codec_type );
+                msg_Warn( p_demux, "unsupported track type (%u:%u) in avformat demux", cc->codec_type, cc->codec_id );
             }
             break;
         }
