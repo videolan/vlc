@@ -490,14 +490,11 @@ connect:
             if( !vlc_object_alive (p_access) || Connect( p_access, 0 ) )
                 goto error;
 
-#ifndef NDEBUG
         case 0:
             break;
 
         default:
-            msg_Err( p_access, "You should not be here" );
-            abort();
-#endif
+            assert(0);
     }
 
     if( p_sys->i_code == 401 )

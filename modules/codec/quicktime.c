@@ -912,7 +912,7 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
         p_sys->i_late = 0;
     }
 #ifndef NDEBUG
-    msg_Dbg( p_dec, "bufsize: %d", (int)p_block->i_buffer);
+    msg_Dbg( p_dec, "bufsize: %zu", p_block->i_buffer);
 #endif
 
     if( p_sys->i_late > 10 )
