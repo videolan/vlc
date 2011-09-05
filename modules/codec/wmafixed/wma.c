@@ -98,7 +98,7 @@ static aout_buffer_t *SplitBuffer( decoder_t *p_dec )
 
     if( i_samples == 0 ) return NULL;
 
-    if( !( p_buffer = p_dec->pf_aout_buffer_new( p_dec, i_samples ) ) )
+    if( !( p_buffer = decoder_NewAudioBuffer( p_dec, i_samples ) ) )
         return NULL;
 
     p_buffer->i_pts = date_Get( &p_sys->end_date );
