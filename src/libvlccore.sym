@@ -558,7 +558,6 @@ vlc_join
 vlc_list_children
 vlc_list_release
 vlc_memcpy
-vlc_memalign
 vlc_meta_AddExtra
 vlc_meta_CopyExtraNames
 vlc_meta_Delete

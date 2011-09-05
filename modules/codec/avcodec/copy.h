@@ -25,7 +25,6 @@
 #define _VLC_AVCODEC_COPY_H 1
 
 typedef struct {
-    void    *base;
     uint8_t *buffer;
     size_t  size;
 } copy_cache_t;

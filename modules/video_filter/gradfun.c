@@ -103,7 +103,6 @@ struct filter_sys_t {
     float            strength;
     int              radius;
     const vlc_chroma_description_t *chroma;
-    void             *base_buf;
     struct vf_priv_s cfg;
 };
 
@@ -128,7 +127,7 @@ static int Open(vlc_object_t *object)
     sys->radius   = var_CreateGetIntegerCommand(filter, CFG_PREFIX "radius");
     var_AddCallback(filter, CFG_PREFIX "strength", Callback, NULL);
     var_AddCallback(filter, CFG_PREFIX "radius",   Callback, NULL);
-    sys->base_buf = NULL;
+    sys->cfg.buf = NULL;
 
     struct vf_priv_s *cfg = &sys->cfg;
     cfg->thresh      = 0.0;
@@ -162,7 +161,7 @@ static void Close(vlc_object_t *object)
 
     var_DelCallback(filter, CFG_PREFIX "radius",   Callback, NULL);
     var_DelCallback(filter, CFG_PREFIX "strength", Callback, NULL);
-    free(sys->base_buf);
+    free(sys->cfg.buf);
     vlc_mutex_destroy(&sys->lock);
     free(sys);
 }
@@ -188,7 +187,7 @@ static picture_t *Filter(filter_t *filter, picture_t *src)
     cfg->thresh = (1 << 15) / strength;
     if (cfg->radius != radius) {
         cfg->radius = radius;
-        cfg->buf    = vlc_memalign(&sys->base_buf, 16,
+        cfg->buf    = vlc_memalign(16,
                                    (((fmt->i_width + 15) & ~15) * (cfg->radius + 1) / 2 + 32) * sizeof(*cfg->buf));
     }
 

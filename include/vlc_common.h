@@ -883,7 +883,21 @@ static inline void SetQWLE (void *p, uint64_t qw)
 
 VLC_API bool vlc_ureduce( unsigned *, unsigned *, uint64_t, uint64_t, uint64_t );
 
-VLC_API void * vlc_memalign( void **base, size_t alignment, size_t size ) VLC_USED;
+/* Aligned memory allocator */
+#ifdef WIN32
+# include <malloc.h>
+# define vlc_memalign(align, size) (__mingw_aligned_malloc(size, align))
+# define vlc_free(base)            (__mingw_aligned_free(base))
+#else
+static inline void *vlc_memalign(size_t align, size_t size)
+{
+    void *base;
+    if (unlikely(posix_memalign(&base, align, size)))
+        base = NULL;
+    return base;
+}
+# define vlc_free(base) free(base)
+#endif
 
 VLC_API void vlc_tdestroy( void *, void (*)(void *) );
 
