@@ -159,7 +159,6 @@ aout_input_t *aout_InputNew (audio_output_t * p_aout,
             memcpy( &p_filter->fmt_out.audio, &chain_output_format,
                     sizeof(audio_sample_format_t) );
             p_filter->fmt_out.i_codec = chain_output_format.i_format;
-            p_filter->pf_audio_buffer_new = aout_FilterBufferNew;
 
             /* try to find the requested filter */
             if( i_visual == 2 ) /* this can only be a visualization module */

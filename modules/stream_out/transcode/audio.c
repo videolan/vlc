@@ -62,12 +62,6 @@ static inline void audio_timer_close( encoder_t * p_encoder )
     stats_TimerClean( p_encoder, STATS_TIMER_AUDIO_FRAME_ENCODING );
 }
 
-static block_t *transcode_audio_alloc( filter_t *p_filter, int size )
-{
-    VLC_UNUSED( p_filter );
-    return block_Alloc( size );
-}
-
 static aout_buffer_t *audio_new_buffer( decoder_t *p_dec, int i_samples )
 {
     block_t *p_block;
@@ -97,8 +91,8 @@ static aout_buffer_t *audio_new_buffer( decoder_t *p_dec, int i_samples )
 static int transcode_audio_filter_allocation_init( filter_t *p_filter,
                                                    void *data )
 {
+    VLC_UNUSED(p_filter);
     VLC_UNUSED(data);
-    p_filter->pf_audio_buffer_new = transcode_audio_alloc;
     return VLC_SUCCESS;
 }
 

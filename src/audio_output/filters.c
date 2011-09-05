@@ -40,12 +40,6 @@
 #include "aout_internal.h"
 #include <libvlc.h>
 
-block_t *aout_FilterBufferNew( filter_t *p_filter, int size )
-{
-    (void) p_filter;
-    return block_Alloc( size );
-}
-
 /*****************************************************************************
  * FindFilter: find an audio filter for a specific transformation
  *****************************************************************************/
@@ -66,7 +60,6 @@ static filter_t * FindFilter( vlc_object_t *obj,
     memcpy( &p_filter->fmt_out.audio, p_output_format,
             sizeof(audio_sample_format_t) );
     p_filter->fmt_out.i_codec = p_output_format->i_format;
-    p_filter->pf_audio_buffer_new = aout_FilterBufferNew;
     p_filter->p_owner = NULL;
 
     p_filter->p_module = module_need( p_filter, "audio filter", NULL, false );

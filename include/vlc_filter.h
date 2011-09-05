@@ -89,10 +89,8 @@ struct filter_t
         struct
         {
             block_t *   (*pf_filter) ( filter_t *, block_t * );
-            block_t *   (*pf_buffer_new) ( filter_t *, int );
         } audio;
 #define pf_audio_filter     u.audio.pf_filter
-#define pf_audio_buffer_new u.audio.pf_buffer_new
 
         struct
         {
@@ -211,23 +209,7 @@ static inline void filter_DeleteSubpicture( filter_t *p_filter, subpicture_t *p_
     p_filter->pf_sub_buffer_del( p_filter, p_subpicture );
 }
 
-/**
- * This function will return a new audio buffer usable by p_filter as an
- * output buffer. You have to release it using block_Release or by returning
- * it to the caller as a pf_audio_filter return value.
- * Provided for convenience.
- *
- * \param p_filter filter_t object
- * \param i_size size of audio buffer requested
- * \return block to be used as audio output buffer
- */
-static inline block_t *filter_NewAudioBuffer( filter_t *p_filter, int i_size )
-{
-    block_t *p_block = p_filter->pf_audio_buffer_new( p_filter, i_size );
-    if( !p_block )
-        msg_Warn( p_filter, "can't get output block" );
-    return p_block;
-}
+#define filter_NewAudioBuffer block_New
 
 /**
  * This function gives all input attachments at once.

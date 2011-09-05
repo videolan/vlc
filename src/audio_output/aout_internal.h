@@ -46,8 +46,6 @@ struct filter_owner_sys_t
     aout_input_t    *p_input;
 };
 
-block_t *aout_FilterBufferNew( filter_t *, int );
-
 /** an input stream for the audio output */
 struct aout_input_t
 {

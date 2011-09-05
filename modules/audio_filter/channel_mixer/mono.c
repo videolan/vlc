@@ -466,7 +466,7 @@ static block_t *Convert( filter_t *p_filter, block_t *p_block )
     i_out_size = p_block->i_nb_samples * p_filter->p_sys->i_bitspersample/8 *
                  aout_FormatNbChannels( &(p_filter->fmt_out.audio) );
 
-    p_out = p_filter->pf_audio_buffer_new( p_filter, i_out_size );
+    p_out = block_Alloc( i_out_size );
     if( !p_out )
     {
         msg_Warn( p_filter, "can't get output buffer" );
