@@ -68,6 +68,8 @@ static int PopupMenuCB( vlc_object_t *p_this, const char *psz_variable,
                         vlc_value_t old_val, vlc_value_t new_val, void *param );
 static int IntfShowCB( vlc_object_t *p_this, const char *psz_variable,
                        vlc_value_t old_val, vlc_value_t new_val, void *param );
+static int IntfBossCB( vlc_object_t *p_this, const char *psz_variable,
+                       vlc_value_t old_val, vlc_value_t new_val, void *param );
 
 MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 {
@@ -235,6 +237,8 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 
     CONNECT( this, askToQuit(), THEDP, quit() );
 
+    CONNECT( this, askBoss(), this, setBoss() );
+
     /** END of CONNECTS**/
 
 
@@ -242,6 +246,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
      * Callbacks
      ************/
     var_AddCallback( p_intf->p_libvlc, "intf-show", IntfShowCB, p_intf );
+    var_AddCallback( p_intf->p_libvlc, "intf-boss", IntfBossCB, p_intf );
 
     /* Register callback for the intf-popupmenu variable */
     var_AddCallback( p_intf->p_libvlc, "intf-popupmenu", PopupMenuCB, p_intf );
@@ -326,6 +331,7 @@ MainInterface::~MainInterface()
     delete statusBar();
 
     /* Unregister callbacks */
+    var_DelCallback( p_intf->p_libvlc, "intf-boss", IntfBossCB, p_intf );
     var_DelCallback( p_intf->p_libvlc, "intf-show", IntfShowCB, p_intf );
     var_DelCallback( p_intf->p_libvlc, "intf-popupmenu", PopupMenuCB, p_intf );
 
@@ -1267,6 +1273,25 @@ void MainInterface::toggleInterfaceFullScreen()
     emit fullscreenInterfaceToggled( b_interfaceFullScreen );
 }
 
+void MainInterface::emitBoss()
+{
+    emit askBoss();
+}
+void MainInterface::setBoss()
+{
+    THEMIM->pause();
+#ifndef HAVE_MAEMO
+    if( sysTray )
+    {
+        hide();
+    }
+    else
+#endif
+    {
+        showMinimized();
+    }
+}
+
 /*****************************************************************************
  * PopupMenuCB: callback triggered by the intf-popupmenu playlist variable.
  *  We don't show the menu directly here because we don't want the
@@ -1302,4 +1327,19 @@ static int IntfShowCB( vlc_object_t *p_this, const char *psz_variable,
 
     /* Show event */
      return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * IntfBossCB: callback triggered by the intf-boss libvlc variable.
+ *****************************************************************************/
+static int IntfBossCB( vlc_object_t *p_this, const char *psz_variable,
+                       vlc_value_t old_val, vlc_value_t new_val, void *param )
+{
+    VLC_UNUSED( p_this ); VLC_UNUSED( psz_variable ); VLC_UNUSED( old_val );
+    VLC_UNUSED( new_val );
+
+    intf_thread_t *p_intf = (intf_thread_t *)param;
+    p_intf->p_sys->p_mi->emitBoss();
+
+    return VLC_SUCCESS;
 }

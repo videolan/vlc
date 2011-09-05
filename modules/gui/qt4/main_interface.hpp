@@ -203,6 +203,8 @@ public slots:
                        unsigned *pi_width, unsigned *pi_height );
     void releaseVideoSlot( void );
 
+    void emitBoss();
+
 private slots:
     void debug();
     void destroyPopupMenu();
@@ -240,6 +242,7 @@ private slots:
     void setVideoSize( unsigned int, unsigned int );
     void setVideoFullScreen( bool );
     void setVideoOnTop( bool );
+    void setBoss();
 
 signals:
     void askGetVideo( WId *p_id, int *pi_x, int *pi_y,
@@ -251,6 +254,7 @@ signals:
     void minimalViewToggled( bool );
     void fullscreenInterfaceToggled( bool );
     void askToQuit();
+    void askBoss();
 
 };
 
