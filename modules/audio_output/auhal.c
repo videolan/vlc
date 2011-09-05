@@ -51,15 +51,6 @@
     (unsigned int)sfm.mFramesPerPacket, (unsigned int)sfm.mBytesPerFrame, \
     (unsigned int)sfm.mChannelsPerFrame, (unsigned int)sfm.mBitsPerChannel
 
-#ifndef NDEBUG
-#define STREAM_FORMAT_MSG_FULL( pre, sfm ) \
-    pre ":\nsamplerate: [%"PRIu32"]\nFormatID: [%4.4s]\nFormatFlags: [%"PRIu32"]\nBypesPerPacket: [%"PRIu32"]\nFramesPerPacket: [%"PRIu32"]\nBytesPerFrame: [%u]\nChannelsPerFrame: [%u]\nBitsPerChannel[%u]", \
-    (UInt32)sfm.mSampleRate, (char *)&sfm.mFormatID, \
-    sfm.mFormatFlags, sfm.mBytesPerPacket, \
-    sfm.mFramesPerPacket, sfm.mBytesPerFrame, \
-    sfm.mChannelsPerFrame, sfm.mBitsPerChannel
-#endif
-
 #define FRAMESIZE 2048
 #define BUFSIZE (FRAMESIZE * 8) * 8
 #define AOUT_VAR_SPDIF_FLAG 0xf00000
