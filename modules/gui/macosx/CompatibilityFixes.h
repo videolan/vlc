@@ -57,10 +57,6 @@ enum {
     NSApplicationPresentationDisableMenuBarTransparency = (1 <<  9)
 };
 
-@interface NSWindow (IntroducedInLion) // just to shut off warnings, not implemented!
-- (void)setRestorable:(BOOL);
-@end
-
 #endif
 
 #pragma mark -
@@ -76,5 +72,15 @@ enum {
     NSApplicationPresentationFullScreen                 = (1 << 10),
     NSApplicationPresentationAutoHideToolbar            = (1 << 11)
 };
+
+/* the follow is just to fix warnings, not for implementation! */
+@interface NSWindow (IntroducedInLion)
+- (void)setRestorable:(BOOL)b_value;
+- (void)toggleFullScreen:(id)id_value;
+@end
+
+@interface NSEvent (IntroducedInLion)
+- (BOOL)isDirectionInvertedFromDevice;
+@end
 
 #endif
