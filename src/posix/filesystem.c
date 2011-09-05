@@ -374,6 +374,20 @@ int vlc_dup (int oldfd)
     return newfd;
 }
 
+#ifdef __ANDROID__ /* && we support android < 2.3 */
+/* pipe2() is declared and available since android-9 NDK,
+ * although it is available in libc.a since android-3
+ * We redefine the function here in order to be able to run
+ * on versions of Android older than 2.3
+ */
+#include <sys/syscall.h>
+//#include <sys/linux-syscalls.h> // fucking brokeness
+int pipe2(int fds[2], int flags)
+{
+    return syscall(/*__NR_pipe2 */ 359, fds, flags);
+}
+#endif /* __ANDROID__ */
+
 /**
  * Creates a pipe (see "man pipe" for further reference).
  */
