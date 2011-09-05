@@ -72,7 +72,6 @@
 #   endif
 #   define lseek _lseeki64
 #elif defined( UNDER_CE )
-/* FIXME the commandline on wince is a mess */
 # define PathIsNetworkPathW(wpath) (! wcsncmp(wpath, L"\\\\", 2))
 #endif
 
