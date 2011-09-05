@@ -316,6 +316,25 @@ input_event_changed( vlc_object_t * p_this, char const * psz_cmd,
             var_GetFloat( p_input, "cache" ));
         libvlc_event_send( p_mi->p_event_manager, &event );
     }
+    else if( newval.i_int == INPUT_EVENT_VOUT )
+    {
+        vout_thread_t **pp_vout;
+        size_t i_vout;
+        if( input_Control( p_input, INPUT_GET_VOUTS, &pp_vout, &i_vout ) )
+        {
+            i_vout  = 0;
+        }
+        else
+        {
+            for( size_t i = 0; i < i_vout; i++ )
+                vlc_object_release( pp_vout[i] );
+            free( pp_vout );
+        }
+
+        event.type = libvlc_MediaPlayerVout;
+        event.u.media_player_vout.new_count = i_vout;
+        libvlc_event_send( p_mi->p_event_manager, &event );
+    }
 
     return VLC_SUCCESS;
 }
