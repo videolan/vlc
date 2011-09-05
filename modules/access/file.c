@@ -71,8 +71,6 @@
 #      undef lseek
 #   endif
 #   define lseek _lseeki64
-#elif defined( UNDER_CE )
-# define PathIsNetworkPathW(wpath) (! wcsncmp(wpath, L"\\\\", 2))
 #endif
 
 #include <vlc_fs.h>
@@ -88,6 +86,7 @@ struct access_sys_t
     bool b_pace_control;
 };
 
+#ifndef WIN32
 static bool IsRemote (int fd)
 {
 #if defined (HAVE_FSTATVFS) && defined (MNT_LOCAL)
@@ -122,6 +121,22 @@ static bool IsRemote (int fd)
 
 #endif
 }
+# define IsRemote(fd,path) IsRemote(fd)
+
+#else /* WIN32 */
+static bool IsRemote (const char *path)
+{
+# ifndef UNDER_CE
+    wchar_t *wpath = ToWide (path);
+    bool is_remote = (wpath != NULL && PathIsNetworkPathW (wpath));
+    free (wpath);
+    return is_remote;
+# else
+    return (! strncmp(path, "\\\\", 2));
+# endif
+}
+# define IsRemote(fd,path) IsRemote(path)
+#endif
 
 #ifndef HAVE_POSIX_FADVISE
 # define posix_fadvise(fd, off, len, adv)
@@ -133,9 +148,6 @@ static bool IsRemote (int fd)
 int FileOpen( vlc_object_t *p_this )
 {
     access_t     *p_access = (access_t*)p_this;
-#ifdef WIN32
-    bool is_remote = false;
-#endif
 
     /* Open file */
     int fd = -1;
@@ -365,7 +377,7 @@ int FileControl( access_t *p_access, int i_query, va_list args )
         /* */
         case ACCESS_GET_PTS_DELAY:
             pi_64 = (int64_t*)va_arg( args, int64_t * );
-            if (IsRemote (p_sys->fd))
+            if (IsRemote (p_sys->fd, p_access->psz_filepath))
                 *pi_64 = var_InheritInteger (p_access, "network-caching");
             else
                 *pi_64 = var_InheritInteger (p_access, "file-caching");
