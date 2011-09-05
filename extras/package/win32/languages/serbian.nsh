@@ -60,5 +60,5 @@ StrCpy $Action_OnArrivalVideoFiles "Пуштај видео фајлове"
 StrCpy $Action_OnArrivalMusicFiles "Пуштај аудио фајлове"
 StrCpy $Action_OnArrivalDVDAudio "Пуштај аудио DVD"
 
-StrCpy $Licence_NextText "Сада си упознат(а) са својим правима. Кликни на Next за наставак."
+StrCpy $License_NextText "Сада си упознат(а) са својим правима. Кликни на Next за наставак."
 
