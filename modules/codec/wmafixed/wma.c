@@ -197,9 +197,6 @@ static aout_buffer_t *DecodeFrame( decoder_t *p_dec, block_t **pp_block )
     decoder_sys_t *p_sys = p_dec->p_sys;
     block_t       *p_block = *pp_block;
     aout_buffer_t *p_aout_buffer = NULL;
-#ifdef NDEBUG
-    mtime_t start = mdate(); /* for statistics */
-#endif
 
     if( !p_block ) return NULL;
 
@@ -300,9 +297,6 @@ static aout_buffer_t *DecodeFrame( decoder_t *p_dec, block_t **pp_block )
     p_aout_buffer = SplitBuffer( p_dec );
     assert( p_aout_buffer );
 
-#ifdef NDEBUG
-    msg_Dbg( p_dec, "%s took %"PRIi64" us",__func__,mdate()-start);
-#endif
     return p_aout_buffer;
 }
 

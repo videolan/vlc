@@ -144,10 +144,6 @@ WId VideoWidget::request( int *pi_x, int *pi_y,
     XSelectInput( dpy, w, attr.your_event_mask );
 #endif
     sync();
-#ifndef NDEBUG
-    msg_Dbg( p_intf, "embedded video ready (handle %p)",
-             (void *)stable->winId() );
-#endif
     return stable->winId();
 }
 

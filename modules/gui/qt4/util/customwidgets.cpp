@@ -337,18 +337,11 @@ void AnimatedIcon::play( int loops, int interval )
 {
     if( interval < 20 )
     {
-#ifndef NDEBUG
-        printf( "AnimatedIcon::play(): interval is too short (%d ms)",
-                interval );
-#endif
         interval = 20;
     }
 
     if( !mIdleFrame && (mFrames.isEmpty() || loops != 0 ) )
     {
-#ifndef NDEBUG
-        printf( "AnimatedIcon::play(): no frames to display" );
-#endif
         return;
     }
 
