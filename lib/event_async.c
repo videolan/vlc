@@ -47,9 +47,6 @@ struct libvlc_event_async_queue {
     bool is_idle;
     vlc_cond_t signal_idle;
     vlc_threadvar_t is_asynch_dispatch_thread_var;
-#ifndef NDEBUG
-    long count;
-#endif
 };
 
 /*
@@ -89,15 +86,6 @@ static void push(libvlc_event_manager_t * p_em,
     else
         queue(p_em)->last_elmt->next = elmt;
     queue(p_em)->last_elmt = elmt;
-
-#ifndef NDEBUG
-    enum { MaxQueueSize = 300000 };
-    if(queue(p_em)->count++ > MaxQueueSize)
-    {
-        fprintf(stderr, "Warning: libvlc event overflow.\n");
-        abort();
-    }
-#endif
 }
 
 static inline void queue_lock(libvlc_event_manager_t * p_em)
@@ -124,10 +112,6 @@ static bool pop(libvlc_event_manager_t * p_em,
     queue(p_em)->first_elmt = elmt->next;
     if( !elmt->next ) queue(p_em)->last_elmt=NULL;
 
-#ifndef NDEBUG
-    queue(p_em)->count--;
-#endif
-
     free(elmt);
     return true;
 }
@@ -147,9 +131,6 @@ static void pop_listener(libvlc_event_manager_t * p_em, libvlc_event_listener_t 
                 prev->next = to_delete->next;
             iter = to_delete->next;
             free(to_delete);
-#ifndef NDEBUG
-            queue(p_em)->count--;
-#endif
         }
         else {
             prev = iter;
