@@ -708,12 +708,12 @@ static void DirectXCloseWindow( event_thread_t *p_event )
         vout_display_DeleteWindow( vd, p_event->parent_window );
     p_event->hwnd = NULL;
 
-    if( p_event->vlc_icon )
-        DestroyIcon( p_event->vlc_icon );
-
     HINSTANCE hInstance = GetModuleHandle(NULL);
     UnregisterClass( p_event->class_video, hInstance );
     UnregisterClass( p_event->class_main, hInstance );
+
+    if( p_event->vlc_icon )
+        DestroyIcon( p_event->vlc_icon );
 
 #ifndef UNDER_CE
     DestroyCursor( p_event->cursor_empty );
