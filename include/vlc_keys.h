@@ -149,6 +149,7 @@ typedef enum vlc_action {
     ACTIONID_SUBTITLE_TRACK,
     ACTIONID_INTF_SHOW,
     ACTIONID_INTF_HIDE,
+    ACTIONID_INTF_BOSS,
     /* chapter and title navigation */
     ACTIONID_TITLE_PREV,
     ACTIONID_TITLE_NEXT,

@@ -254,6 +254,7 @@ static const struct action actions[] =
     { "faster", ACTIONID_FASTER, },
     { "frame-next", ACTIONID_FRAME_NEXT, },
     { "incr-scalefactor", ACTIONID_SCALE_UP, },
+    { "intf-boss", ACTIONID_INTF_BOSS, },
     { "intf-hide", ACTIONID_INTF_HIDE, },
     { "intf-show", ACTIONID_INTF_SHOW, },
     { "jump+extrashort", ACTIONID_JUMP_FORWARD_EXTRASHORT, },

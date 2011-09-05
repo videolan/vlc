@@ -533,6 +533,9 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     var_Create( p_libvlc, "intf-show", VLC_VAR_BOOL );
     var_SetBool( p_libvlc, "intf-show", true );
 
+    /* Create a variable for the Boss Key */
+    var_Create( p_libvlc, "intf-boss", VLC_VAR_VOID );
+
     /* Create a variable for showing the right click menu */
     var_Create( p_libvlc, "intf-popupmenu", VLC_VAR_BOOL );
 

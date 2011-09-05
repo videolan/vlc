@@ -226,6 +226,10 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
             var_SetBool( p_intf->p_libvlc, "intf-show", false );
             break;
 
+        case ACTIONID_INTF_BOSS:
+            var_TriggerCallback( p_intf->p_libvlc, "intf-boss" );
+            break;
+
         /* Video Output actions */
         case ACTIONID_SNAPSHOT:
             if( p_vout )
