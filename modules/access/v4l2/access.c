@@ -88,10 +88,16 @@ static block_t *AccessRead( access_t *access )
 
     /* Wait for data */
     /* FIXME: kill timeout */
-    if( poll( &fd, 1, 500 ) > 0 )
-        return GrabVideo( VLC_OBJECT(access), sys );
+    if( poll( &fd, 1, 500 ) <= 0 )
+        return NULL;
 
-    return NULL;
+    block_t *block = GrabVideo( VLC_OBJECT(access), sys );
+    if( block != NULL )
+    {
+        block->i_pts = block->i_dts = mdate();
+        block->i_flags |= sys->i_block_flags;
+    }
+    return block;
 }
 
 static ssize_t AccessReadStream( access_t *access, uint8_t *buf, size_t len )

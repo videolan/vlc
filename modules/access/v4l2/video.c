@@ -494,34 +494,10 @@ block_t* GrabVideo( vlc_object_t *p_demux, demux_sys_t *p_sys )
 {
     block_t *p_block;
     struct v4l2_buffer buf;
-    ssize_t i_ret;
 
     /* Grab Video Frame */
     switch( p_sys->io )
     {
-    case IO_METHOD_READ:
-        i_ret = v4l2_read( p_sys->i_fd, p_sys->p_buffers[0].start, p_sys->p_buffers[0].length );
-        if( i_ret == -1 )
-        {
-            switch( errno )
-            {
-            case EAGAIN:
-                return NULL;
-            case EIO:
-                /* Could ignore EIO, see spec. */
-                /* fall through */
-            default:
-                msg_Err( p_demux, "Failed to read frame" );
-                return 0;
-               }
-        }
-
-        p_block = ProcessVideoFrame( p_demux, (uint8_t*)p_sys->p_buffers[0].start, i_ret );
-        if( !p_block )
-            return NULL;
-
-        break;
-
     case IO_METHOD_MMAP:
         memset( &buf, 0, sizeof(buf) );
         buf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
@@ -608,14 +584,10 @@ block_t* GrabVideo( vlc_object_t *p_demux, demux_sys_t *p_sys )
             block_Release( p_block );
             return NULL;
         }
-
         break;
+    default:
+        assert(0);
     }
-
-    /* Timestamp */
-    p_block->i_pts = p_block->i_dts = mdate();
-    p_block->i_flags |= p_sys->i_block_flags;
-
     return p_block;
 }
 
@@ -640,25 +612,6 @@ static block_t* ProcessVideoFrame( vlc_object_t *p_demux, uint8_t *p_frame, size
     memcpy( p_block->p_buffer, p_frame, i_size );
 
     return p_block;
-}
-
-/*****************************************************************************
- * Helper function to initalise video IO using the Read method
- *****************************************************************************/
-static int InitRead( vlc_object_t *p_demux, demux_sys_t *p_sys, unsigned int i_buffer_size )
-{
-    (void)p_demux;
-
-    p_sys->p_buffers = calloc( 1, sizeof( *p_sys->p_buffers ) );
-    if( unlikely(p_sys->p_buffers == NULL) )
-        return -1;
-
-    p_sys->p_buffers[0].length = i_buffer_size;
-    p_sys->p_buffers[0].start = malloc( i_buffer_size );
-    if( !p_sys->p_buffers[0].start )
-        return -1;
-
-    return 0;
 }
 
 /*****************************************************************************
@@ -1408,13 +1361,11 @@ static int InitVideo( vlc_object_t *p_obj, int i_fd, demux_sys_t *p_sys,
     }
 #endif
 
-
     /* Init I/O method */
     switch( p_sys->io )
     {
     case IO_METHOD_READ:
-        if( b_demux && InitRead( p_obj, p_sys, fmt.fmt.pix.sizeimage ) )
-            goto error;
+        p_sys->blocksize = fmt.fmt.pix.sizeimage;
         break;
 
     case IO_METHOD_MMAP:

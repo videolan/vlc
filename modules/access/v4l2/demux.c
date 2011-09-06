@@ -147,32 +147,64 @@ static int DemuxControl( demux_t *demux, int query, va_list args )
     return VLC_EGENERIC;
 }
 
+/** Gets a frame in read/write mode */
+static block_t *BlockRead( vlc_object_t *obj, int fd, size_t size )
+{
+    block_t *block = block_Alloc( size );
+    if( unlikely(block == NULL) )
+        return NULL;
+
+    ssize_t val = v4l2_read( fd, block->p_buffer, size );
+    if( val == -1 )
+    {
+        block_Release( block );
+        switch( errno )
+        {
+            case EAGAIN:
+                return NULL;
+            case EIO: /* could be ignored per specification */
+                /* fall through */
+            default:
+                msg_Err( obj, "cannot read frame: %m" );
+                return NULL;
+        }
+    }
+    block->i_buffer = val;
+    return block;
+}
+
 static int Demux( demux_t *demux )
 {
     demux_sys_t *sys = demux->p_sys;
-    struct pollfd fd;
+    struct pollfd ufd;
 
-    fd.fd = sys->i_fd;
-    fd.events = POLLIN|POLLPRI;
+    ufd.fd = sys->i_fd;
+    ufd.events = POLLIN|POLLPRI;
     /* Wait for data */
     /* FIXME: remove timeout */
-    while( poll( &fd, 1, 500 ) == -1 )
+    while( poll( &ufd, 1, 500 ) == -1 )
         if( errno != EINTR )
         {
             msg_Err( demux, "poll error: %m" );
             return -1;
         }
 
-    if( fd.revents )
-    {
-         block_t *p_block = GrabVideo( VLC_OBJECT(demux), sys );
-         if( p_block )
-         {
-             es_out_Control( demux->out, ES_OUT_SET_PCR, p_block->i_pts );
-             es_out_Send( demux->out, sys->p_es, p_block );
-        }
-    }
+    if( ufd.revents == 0 )
+        return 1;
 
+    block_t *block;
+
+    if( sys->io == IO_METHOD_READ )
+        block = BlockRead( VLC_OBJECT(demux), ufd.fd, sys->blocksize );
+    else
+        block = GrabVideo( VLC_OBJECT(demux), sys );
+    if( block == NULL )
+        return 1;
+
+    block->i_pts = block->i_dts = mdate();
+    block->i_flags |= sys->i_block_flags;
+    es_out_Control( demux->out, ES_OUT_SET_PCR, block->i_pts );
+    es_out_Send( demux->out, sys->p_es, block );
     return 1;
 }
 

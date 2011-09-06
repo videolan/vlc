@@ -60,6 +60,7 @@ struct demux_sys_t
 
     struct buffer_t *p_buffers;
     unsigned int i_nbuffers;
+#define blocksize i_nbuffers /* HACK HACK */
 
     int i_fourcc;
     uint32_t i_block_flags;
