@@ -1024,47 +1024,6 @@ static int InitVideo( vlc_object_t *p_obj, int i_fd, demux_sys_t *p_sys,
                     msg_Dbg( p_obj, "device supports chroma %4.4s [%s, %s]",
                              fourcc, codecs[i].description, fourcc_v4l2 );
                     b_codec_supported = true;
-
-#ifdef VIDIOC_ENUM_FRAMESIZES
-                    /* This is new in Linux 2.6.19 */
-                    /* List valid frame sizes for this format */
-                    struct v4l2_frmsizeenum frmsize;
-                    memset( &frmsize, 0, sizeof(frmsize) );
-                    frmsize.pixel_format = codecs[i].pixelformat;
-                    if( v4l2_ioctl( i_fd, VIDIOC_ENUM_FRAMESIZES, &frmsize ) < 0 )
-                    {
-                        /* Not all devices support this ioctl */
-                        msg_Warn( p_obj, "Unable to query for frame sizes" );
-                    }
-                    else
-                    {
-                        switch( frmsize.type )
-                        {
-                            case V4L2_FRMSIZE_TYPE_DISCRETE:
-                                do
-                                {
-                                    msg_Dbg( p_obj,
-                "    device supports size %dx%d",
-                frmsize.discrete.width, frmsize.discrete.height );
-                                    frmsize.index++;
-                                } while( v4l2_ioctl( i_fd, VIDIOC_ENUM_FRAMESIZES, &frmsize ) >= 0 );
-                                break;
-                            case V4L2_FRMSIZE_TYPE_STEPWISE:
-                                msg_Dbg( p_obj,
-                "    device supports sizes %dx%d to %dx%d using %dx%d increments",
-                frmsize.stepwise.min_width, frmsize.stepwise.min_height,
-                frmsize.stepwise.max_width, frmsize.stepwise.max_height,
-                frmsize.stepwise.step_width, frmsize.stepwise.step_height );
-                                break;
-                            case V4L2_FRMSIZE_TYPE_CONTINUOUS:
-                                msg_Dbg( p_obj,
-                "    device supports all sizes %dx%d to %dx%d",
-                frmsize.stepwise.min_width, frmsize.stepwise.min_height,
-                frmsize.stepwise.max_width, frmsize.stepwise.max_height );
-                                break;
-                        }
-                    }
-#endif
                 }
             }
             if( !b_codec_supported )
