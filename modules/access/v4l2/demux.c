@@ -208,7 +208,7 @@ static int Demux( demux_t *demux )
     return 1;
 }
 
-static float GetMaxFPS( int fd, uint32_t pixel_format,
+static float GetMaxFPS( vlc_object_t *obj, int fd, uint32_t pixel_format,
                         uint32_t width, uint32_t height )
 {
 #ifdef VIDIOC_ENUM_FRAMEINTERVALS
@@ -233,6 +233,9 @@ static float GetMaxFPS( int fd, uint32_t pixel_format,
                           / (float)fie.discrete.numerator;
                 if( fps > max )
                     max = fps;
+                msg_Dbg( obj, " discrete frame interval %"PRIu32"/%"PRIu32
+                         " supported",
+                         fie.discrete.numerator, fie.discrete.denominator );
                 fie.index++;
             } while( v4l2_ioctl( fd, VIDIOC_ENUM_FRAMEINTERVALS, &fie ) >= 0 );
             return max;
@@ -240,6 +243,14 @@ static float GetMaxFPS( int fd, uint32_t pixel_format,
 
         case V4L2_FRMIVAL_TYPE_STEPWISE:
         case V4L2_FRMIVAL_TYPE_CONTINUOUS:
+            msg_Dbg( obj, " frame intervals from %"PRIu32"/%"PRIu32
+                    "to %"PRIu32"/%"PRIu32" supported",
+                    fie.stepwise.min.numerator, fie.stepwise.min.denominator,
+                    fie.stepwise.max.numerator, fie.stepwise.max.denominator );
+            if( fie.type == V4L2_FRMIVAL_TYPE_STEPWISE )
+                msg_Dbg( obj, "  with %"PRIu32"/%"PRIu32" step",
+                         fie.stepwise.step.numerator,
+                         fie.stepwise.step.denominator );
             return __MAX( (float)fie.stepwise.max.denominator
                         / (float)fie.stepwise.max.numerator,
                           (float)fie.stepwise.min.denominator
@@ -267,8 +278,8 @@ float GetAbsoluteMaxFrameRate( vlc_object_t *obj, int fd,
         case V4L2_FRMSIZE_TYPE_DISCRETE:
             do
             {
-                float fps = GetMaxFPS( fd, pixel_format, fse.discrete.width,
-                                       fse.discrete.height );
+                float fps = GetMaxFPS( obj, fd, pixel_format,
+                                     fse.discrete.width, fse.discrete.height );
                 if( fps > max )
                     max = fps;
                 msg_Dbg( obj, " discrete size %"PRIu32"x%"PRIu32" supported",
@@ -285,7 +296,7 @@ float GetAbsoluteMaxFrameRate( vlc_object_t *obj, int fd,
                  width += fse.stepwise.step_width,
                  height += fse.stepwise.step_height )
             {
-                float fps = GetMaxFPS( fd, pixel_format, width, height );
+                float fps = GetMaxFPS( obj, fd, pixel_format, width, height );
                 if( fps > max )
                     max = fps;
             }
@@ -299,7 +310,7 @@ float GetAbsoluteMaxFrameRate( vlc_object_t *obj, int fd,
         case V4L2_FRMSIZE_TYPE_CONTINUOUS:
             /* FIXME */
             msg_Err( obj, "V4L2_FRMSIZE_TYPE_CONTINUOUS support incorrect" );
-            max = GetMaxFPS( fd, pixel_format, fse.stepwise.max_width,
+            max = GetMaxFPS( obj, fd, pixel_format, fse.stepwise.max_width,
                              fse.stepwise.max_height );
             msg_Dbg( obj, " sizes from %"PRIu32"x%"PRIu32" to %"PRIu32
                      "x%"PRIu32" all supported",
@@ -333,8 +344,8 @@ void GetMaxDimensions( vlc_object_t *obj, int fd, uint32_t pixel_format,
         case V4L2_FRMSIZE_TYPE_DISCRETE:
             do
             {
-                float fps = GetMaxFPS( fd, pixel_format, fse.discrete.width,
-                                       fse.discrete.height );
+                float fps = GetMaxFPS( obj, fd, pixel_format,
+                                     fse.discrete.width, fse.discrete.height );
                 if( fps >= fps_min && fse.discrete.width > *pwidth )
                 {
                     *pwidth = fse.discrete.width;
@@ -352,7 +363,7 @@ void GetMaxDimensions( vlc_object_t *obj, int fd, uint32_t pixel_format,
                  width += fse.stepwise.step_width,
                  height += fse.stepwise.step_height )
             {
-                float fps = GetMaxFPS( fd, pixel_format, width, height );
+                float fps = GetMaxFPS( obj, fd, pixel_format, width, height );
                 if( fps >= fps_min && width > *pwidth )
                 {
                     *pwidth = width;
@@ -363,8 +374,8 @@ void GetMaxDimensions( vlc_object_t *obj, int fd, uint32_t pixel_format,
 
         case V4L2_FRMSIZE_TYPE_CONTINUOUS:
         {
-            float fps = GetMaxFPS( fd, pixel_format, fse.stepwise.max_width,
-                                   fse.stepwise.max_height );
+            float fps = GetMaxFPS( obj, fd, pixel_format,
+                             fse.stepwise.max_width, fse.stepwise.max_height );
             msg_Err( obj, "V4L2_FRMSIZE_TYPE_CONTINUOUS support incorrect" );
             if( fps >= fps_min && fse.stepwise.max_width > *pwidth )
             {

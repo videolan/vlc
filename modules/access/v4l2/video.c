@@ -1273,53 +1273,6 @@ static int InitVideo( vlc_object_t *p_obj, int i_fd, demux_sys_t *p_sys,
     if( fmt.fmt.pix.sizeimage < i_min )
         fmt.fmt.pix.sizeimage = i_min;
 
-#ifdef VIDIOC_ENUM_FRAMEINTERVALS
-    /* This is new in Linux 2.6.19 */
-    /* List supported frame rates */
-    struct v4l2_frmivalenum frmival;
-    memset( &frmival, 0, sizeof(frmival) );
-    frmival.pixel_format = fmt.fmt.pix.pixelformat;
-    frmival.width = width;
-    frmival.height = height;
-    if( v4l2_ioctl( i_fd, VIDIOC_ENUM_FRAMEINTERVALS, &frmival ) >= 0 )
-    {
-        char psz_fourcc[5];
-        memset( &psz_fourcc, 0, sizeof( psz_fourcc ) );
-        vlc_fourcc_to_char( p_sys->i_fourcc, &psz_fourcc );
-        msg_Dbg( p_obj, "supported frame intervals for %4.4s, %dx%d:",
-                 psz_fourcc, frmival.width, frmival.height );
-        switch( frmival.type )
-        {
-            case V4L2_FRMIVAL_TYPE_DISCRETE:
-                do
-                {
-                    msg_Dbg( p_obj, "    supported frame interval: %d/%d",
-                             frmival.discrete.numerator,
-                             frmival.discrete.denominator );
-                    frmival.index++;
-                } while( v4l2_ioctl( i_fd, VIDIOC_ENUM_FRAMEINTERVALS, &frmival ) >= 0 );
-                break;
-            case V4L2_FRMIVAL_TYPE_STEPWISE:
-                msg_Dbg( p_obj, "    supported frame intervals: %d/%d to "
-                         "%d/%d using %d/%d increments",
-                         frmival.stepwise.min.numerator,
-                         frmival.stepwise.min.denominator,
-                         frmival.stepwise.max.numerator,
-                         frmival.stepwise.max.denominator,
-                         frmival.stepwise.step.numerator,
-                         frmival.stepwise.step.denominator );
-                break;
-            case V4L2_FRMIVAL_TYPE_CONTINUOUS:
-                msg_Dbg( p_obj, "    supported frame intervals: %d/%d to %d/%d",
-                         frmival.stepwise.min.numerator,
-                         frmival.stepwise.min.denominator,
-                         frmival.stepwise.max.numerator,
-                         frmival.stepwise.max.denominator );
-                break;
-        }
-    }
-#endif
-
     /* Init I/O method */
     switch( p_sys->io )
     {
