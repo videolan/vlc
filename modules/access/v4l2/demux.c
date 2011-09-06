@@ -238,7 +238,7 @@ static float GetMaxFPS( int fd, uint32_t pixel_format,
             return max;
         }
 
-        case V4L2_FRMSIZE_TYPE_STEPWISE:
+        case V4L2_FRMIVAL_TYPE_STEPWISE:
         case V4L2_FRMIVAL_TYPE_CONTINUOUS:
             return __MAX( (float)fie.stepwise.max.denominator
                         / (float)fie.stepwise.max.numerator,
