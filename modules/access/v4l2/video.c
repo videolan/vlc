@@ -39,7 +39,6 @@
 
 #include "v4l2.h"
 #include <vlc_plugin.h>
-#include <vlc_access.h>
 #include <vlc_fs.h>
 #include <vlc_demux.h>
 
@@ -57,8 +56,6 @@
 
 static int  DemuxOpen ( vlc_object_t * );
 static void DemuxClose( vlc_object_t * );
-static int  AccessOpen ( vlc_object_t * );
-static void AccessClose( vlc_object_t * );
 
 #define DEVICE_TEXT N_( "Device" )
 #define DEVICE_LONGTEXT N_( \
@@ -406,20 +403,10 @@ vlc_module_end ()
  * Access: local prototypes
  *****************************************************************************/
 
-static void CommonClose( vlc_object_t *, demux_sys_t * );
-static void ParseMRL( vlc_object_t *, const char * );
-
 static int DemuxControl( demux_t *, int, va_list );
-static int AccessControl( access_t *, int, va_list );
-
 static int Demux( demux_t * );
-static block_t *AccessRead( access_t * );
-static ssize_t AccessReadStream( access_t * p_access, uint8_t * p_buffer, size_t i_len );
 
-static block_t* GrabVideo( vlc_object_t *p_demux, demux_sys_t *p_sys );
 static block_t* ProcessVideoFrame( vlc_object_t *p_demux, uint8_t *p_frame, size_t );
-
-static int OpenVideo( vlc_object_t *, demux_sys_t *, bool );
 
 static const struct
 {
@@ -519,7 +506,7 @@ static int DemuxOpen( vlc_object_t *p_this )
 /**
  * Parses a V4L2 MRL into VLC object variables.
  */
-static void ParseMRL( vlc_object_t *obj, const char *mrl )
+void ParseMRL( vlc_object_t *obj, const char *mrl )
 {
     const char *p = strchr( mrl, ':' );
     char *dev = NULL;
@@ -547,14 +534,6 @@ static void ParseMRL( vlc_object_t *obj, const char *mrl )
 /*****************************************************************************
  * Close: close device, free resources
  *****************************************************************************/
-static void AccessClose( vlc_object_t *p_this )
-{
-    access_t    *p_access = (access_t *)p_this;
-    demux_sys_t *p_sys   = (demux_sys_t *) p_access->p_sys;
-
-    CommonClose( p_this, p_sys );
-}
-
 static void DemuxClose( vlc_object_t *p_this )
 {
     struct v4l2_buffer buf;
@@ -622,50 +601,8 @@ static void DemuxClose( vlc_object_t *p_this )
         free( p_sys->p_buffers );
     }
 
-    CommonClose( p_this, p_sys );
-}
-
-static void CommonClose( vlc_object_t *p_this, demux_sys_t *p_sys )
-{
-    (void)p_this;
-    /* Close */
-    if( p_sys->i_fd >= 0 ) v4l2_close( p_sys->i_fd );
+    v4l2_close( p_sys->i_fd );
     free( p_sys );
-}
-
-/*****************************************************************************
- * AccessOpen: opens v4l2 device, access callback
- *****************************************************************************
- *
- * url: <video device>::::
- *
- *****************************************************************************/
-static int AccessOpen( vlc_object_t * p_this )
-{
-    access_t *p_access = (access_t*) p_this;
-    demux_sys_t * p_sys;
-
-    /* Only when selected */
-    if( *p_access->psz_access == '\0' ) return VLC_EGENERIC;
-
-    access_InitFields( p_access );
-    p_sys = calloc( 1, sizeof( demux_sys_t ));
-    if( !p_sys ) return VLC_ENOMEM;
-    p_access->p_sys = (access_sys_t*)p_sys;
-
-    ParseMRL( p_this, p_access->psz_location );
-    p_sys->i_fd = OpenVideo( p_this, p_sys, false );
-    if( p_sys->i_fd == -1 )
-    {
-        free( p_sys );
-        return VLC_EGENERIC;
-    }
-
-    if( p_sys->io == IO_METHOD_READ )
-        ACCESS_SET_CALLBACKS( AccessReadStream, NULL, AccessControl, NULL );
-    else
-        ACCESS_SET_CALLBACKS( NULL, AccessRead, AccessControl, NULL );
-    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -697,108 +634,6 @@ static int DemuxControl( demux_t *p_demux, int i_query, va_list args )
     }
 
     return VLC_EGENERIC;
-}
-
-/*****************************************************************************
- * AccessControl: access callback
- *****************************************************************************/
-static int AccessControl( access_t *p_access, int i_query, va_list args )
-{
-    switch( i_query )
-    {
-        /* */
-        case ACCESS_CAN_SEEK:
-        case ACCESS_CAN_FASTSEEK:
-        case ACCESS_CAN_PAUSE:
-        case ACCESS_CAN_CONTROL_PACE:
-            *va_arg( args, bool* ) = false;
-            break;
-
-        /* */
-        case ACCESS_GET_PTS_DELAY:
-            *va_arg(args,int64_t *) = INT64_C(1000)
-                * var_InheritInteger( p_access, "live-caching" );
-            break;
-
-        /* */
-        case ACCESS_SET_PAUSE_STATE:
-            /* Nothing to do */
-            break;
-
-        case ACCESS_GET_TITLE_INFO:
-        case ACCESS_SET_TITLE:
-        case ACCESS_SET_SEEKPOINT:
-        case ACCESS_SET_PRIVATE_ID_STATE:
-        case ACCESS_GET_CONTENT_TYPE:
-        case ACCESS_GET_META:
-            return VLC_EGENERIC;
-
-        default:
-            msg_Warn( p_access, "Unimplemented query in control(%d).", i_query);
-            return VLC_EGENERIC;
-
-    }
-    return VLC_SUCCESS;
-}
-
-/*****************************************************************************
- * AccessRead: access callback
- ******************************************************************************/
-static block_t *AccessRead( access_t * p_access )
-{
-    demux_sys_t *p_sys = (demux_sys_t *)p_access->p_sys;
-
-    struct pollfd fd;
-    fd.fd = p_sys->i_fd;
-    fd.events = POLLIN|POLLPRI;
-    fd.revents = 0;
-
-    /* Wait for data */
-    if( poll( &fd, 1, 500 ) > 0 ) /* Timeout after 0.5 seconds since I don't know if pf_demux can be blocking. */
-        return GrabVideo( VLC_OBJECT(p_access), p_sys );
-
-    return NULL;
-}
-
-static ssize_t AccessReadStream( access_t * p_access, uint8_t * p_buffer, size_t i_len )
-{
-    demux_sys_t *p_sys = (demux_sys_t *) p_access->p_sys;
-    struct pollfd ufd;
-    int i_ret;
-
-    ufd.fd = p_sys->i_fd;
-    ufd.events = POLLIN;
-
-    if( p_access->info.b_eof )
-        return 0;
-
-    do
-    {
-        if( !vlc_object_alive (p_access) )
-            return 0;
-
-        ufd.revents = 0;
-    }
-    while( ( i_ret = poll( &ufd, 1, 500 ) ) == 0 );
-
-    if( i_ret < 0 )
-    {
-        if( errno != EINTR )
-            msg_Err( p_access, "poll error" );
-        return -1;
-    }
-
-    i_ret = v4l2_read( p_sys->i_fd, p_buffer, i_len );
-    if( i_ret == 0 )
-    {
-        p_access->info.b_eof = true;
-    }
-    else if( i_ret > 0 )
-    {
-        p_access->info.i_pos += i_ret;
-    }
-
-    return i_ret;
 }
 
 /*****************************************************************************
@@ -838,7 +673,7 @@ static int Demux( demux_t *p_demux )
 /*****************************************************************************
  * GrabVideo: Grab a video frame
  *****************************************************************************/
-static block_t* GrabVideo( vlc_object_t *p_demux, demux_sys_t *p_sys )
+block_t* GrabVideo( vlc_object_t *p_demux, demux_sys_t *p_sys )
 {
     block_t *p_block;
     struct v4l2_buffer buf;
@@ -1284,7 +1119,7 @@ static int InitVideo( vlc_object_t *p_obj, int i_fd, demux_sys_t *p_sys,
  * Opens and sets up a video device
  * \return file descriptor or -1 on error
  */
-static int OpenVideo( vlc_object_t *obj, demux_sys_t *sys, bool b_demux )
+int OpenVideo( vlc_object_t *obj, demux_sys_t *sys, bool b_demux )
 {
     char *path = var_InheritString( obj, CFG_PREFIX"dev" );
     if( unlikely(path == NULL) )

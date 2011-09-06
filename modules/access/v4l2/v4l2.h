@@ -71,4 +71,11 @@ struct demux_sys_t
 #endif
 };
 
+/* video.c */
+void ParseMRL(vlc_object_t *, const char *);
+int OpenVideo(vlc_object_t *, demux_sys_t *, bool);
+block_t* GrabVideo(vlc_object_t *, demux_sys_t *);
 
+/* access.c */
+int AccessOpen(vlc_object_t *);
+void AccessClose(vlc_object_t *);
