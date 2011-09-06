@@ -54,9 +54,6 @@
  * Module descriptior
  *****************************************************************************/
 
-static int  DemuxOpen ( vlc_object_t * );
-static void DemuxClose( vlc_object_t * );
-
 #define DEVICE_TEXT N_( "Device" )
 #define DEVICE_LONGTEXT N_( \
     "Video device (Default: /dev/video0)." )
@@ -403,9 +400,6 @@ vlc_module_end ()
  * Access: local prototypes
  *****************************************************************************/
 
-static int DemuxControl( demux_t *, int, va_list );
-static int Demux( demux_t * );
-
 static block_t* ProcessVideoFrame( vlc_object_t *p_demux, uint8_t *p_frame, size_t );
 
 static const struct
@@ -465,44 +459,6 @@ static const uint32_t p_chroma_fallbacks[] =
   V4L2_PIX_FMT_YUYV, V4L2_PIX_FMT_UYVY, V4L2_PIX_FMT_BGR24,
   V4L2_PIX_FMT_BGR32, V4L2_PIX_FMT_MJPEG, V4L2_PIX_FMT_JPEG };
 
-struct buffer_t
-{
-    void *  start;
-    size_t  length;
-};
-
-/*****************************************************************************
- * DemuxOpen: opens v4l2 device, access_demux callback
- *****************************************************************************
- *
- * url: <video device>::::
- *
- *****************************************************************************/
-static int DemuxOpen( vlc_object_t *p_this )
-{
-    demux_t     *p_demux = (demux_t*)p_this;
-    demux_sys_t *p_sys;
-
-    /* Set up p_demux */
-    p_demux->pf_control = DemuxControl;
-    p_demux->pf_demux = Demux;
-    p_demux->info.i_update = 0;
-    p_demux->info.i_title = 0;
-    p_demux->info.i_seekpoint = 0;
-
-    p_demux->p_sys = p_sys = calloc( 1, sizeof( demux_sys_t ) );
-    if( p_sys == NULL ) return VLC_ENOMEM;
-
-    ParseMRL( p_this, p_demux->psz_location );
-    p_sys->i_fd = OpenVideo( p_this, p_sys, true );
-    if( p_sys->i_fd == -1 )
-    {
-        free( p_sys );
-        return VLC_EGENERIC;
-    }
-    return VLC_SUCCESS;
-}
-
 /**
  * Parses a V4L2 MRL into VLC object variables.
  */
@@ -529,145 +485,6 @@ void ParseMRL( vlc_object_t *obj, const char *mrl )
         var_SetString( obj, CFG_PREFIX"dev", dev );
         free( dev );
     }
-}
-
-/*****************************************************************************
- * Close: close device, free resources
- *****************************************************************************/
-static void DemuxClose( vlc_object_t *p_this )
-{
-    struct v4l2_buffer buf;
-    enum v4l2_buf_type buf_type;
-    unsigned int i;
-
-    demux_t     *p_demux = (demux_t *)p_this;
-    demux_sys_t *p_sys   = p_demux->p_sys;
-
-    /* Stop video capture */
-    if( p_sys->i_fd >= 0 )
-    {
-        switch( p_sys->io )
-        {
-        case IO_METHOD_READ:
-            /* Nothing to do */
-            break;
-
-        case IO_METHOD_MMAP:
-        case IO_METHOD_USERPTR:
-            /* Some drivers 'hang' internally if this is not done before streamoff */
-            for( unsigned int i = 0; i < p_sys->i_nbuffers; i++ )
-            {
-                memset( &buf, 0, sizeof(buf) );
-                buf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-                buf.memory = ( p_sys->io == IO_METHOD_USERPTR ) ?
-                    V4L2_MEMORY_USERPTR : V4L2_MEMORY_MMAP;
-                v4l2_ioctl( p_sys->i_fd, VIDIOC_DQBUF, &buf ); /* ignore result */
-            }
-
-            buf_type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-            if( v4l2_ioctl( p_sys->i_fd, VIDIOC_STREAMOFF, &buf_type ) < 0 ) {
-                msg_Err( p_this, "VIDIOC_STREAMOFF failed" );
-            }
-
-            break;
-        }
-    }
-
-    /* Free Video Buffers */
-    if( p_sys->p_buffers ) {
-        switch( p_sys->io )
-        {
-        case IO_METHOD_READ:
-            free( p_sys->p_buffers[0].start );
-            break;
-
-        case IO_METHOD_MMAP:
-            for( i = 0; i < p_sys->i_nbuffers; ++i )
-            {
-                if( v4l2_munmap( p_sys->p_buffers[i].start, p_sys->p_buffers[i].length ) )
-                {
-                    msg_Err( p_this, "munmap failed" );
-                }
-            }
-            break;
-
-        case IO_METHOD_USERPTR:
-            for( i = 0; i < p_sys->i_nbuffers; ++i )
-            {
-               free( p_sys->p_buffers[i].start );
-            }
-            break;
-        }
-        free( p_sys->p_buffers );
-    }
-
-    v4l2_close( p_sys->i_fd );
-    free( p_sys );
-}
-
-/*****************************************************************************
- * DemuxControl:
- *****************************************************************************/
-static int DemuxControl( demux_t *p_demux, int i_query, va_list args )
-{
-    switch( i_query )
-    {
-        /* Special for access_demux */
-        case DEMUX_CAN_PAUSE:
-        case DEMUX_CAN_SEEK:
-        case DEMUX_CAN_CONTROL_PACE:
-            *va_arg( args, bool * ) = false;
-            return VLC_SUCCESS;
-
-        case DEMUX_GET_PTS_DELAY:
-            *va_arg(args,int64_t *) = INT64_C(1000)
-                * var_InheritInteger( p_demux, "live-caching" );
-            return VLC_SUCCESS;
-
-        case DEMUX_GET_TIME:
-            *va_arg( args, int64_t * ) = mdate();
-            return VLC_SUCCESS;
-
-        /* TODO implement others */
-        default:
-            return VLC_EGENERIC;
-    }
-
-    return VLC_EGENERIC;
-}
-
-/*****************************************************************************
- * Demux: Processes the audio or video frame
- *****************************************************************************/
-static int Demux( demux_t *p_demux )
-{
-    demux_sys_t *p_sys = p_demux->p_sys;
-
-    struct pollfd fd;
-    fd.fd = p_sys->i_fd;
-    fd.events = POLLIN|POLLPRI;
-    fd.revents = 0;
-
-    /* Wait for data */
-    /* Timeout after 0.5 seconds since I don't know if pf_demux can be blocking. */
-    while( poll( &fd, 1, 500 ) == -1 )
-        if( errno != EINTR )
-        {
-            msg_Err( p_demux, "poll error: %m" );
-            return -1;
-        }
-
-    if( fd.revents )
-    {
-         block_t *p_block = GrabVideo( VLC_OBJECT(p_demux), p_sys );
-         if( p_block )
-         {
-             es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_block->i_pts );
-             es_out_Send( p_demux->out, p_sys->p_es, p_block );
-        }
-    }
-
-    return 1;
 }
 
 /*****************************************************************************
@@ -951,166 +768,6 @@ static bool IsPixelFormatSupported( struct v4l2_fmtdesc *codecs, size_t n,
     return false;
 }
 
-static float GetMaxFrameRate( int i_fd, uint32_t i_pixel_format,
-                              uint32_t i_width, uint32_t i_height )
-{
-#ifdef VIDIOC_ENUM_FRAMEINTERVALS
-    /* This is new in Linux 2.6.19 */
-    struct v4l2_frmivalenum frmival;
-    memset( &frmival, 0, sizeof(frmival) );
-    frmival.pixel_format = i_pixel_format;
-    frmival.width = i_width;
-    frmival.height = i_height;
-    if( v4l2_ioctl( i_fd, VIDIOC_ENUM_FRAMEINTERVALS, &frmival ) >= 0 )
-    {
-        switch( frmival.type )
-        {
-            case V4L2_FRMIVAL_TYPE_DISCRETE:
-            {
-                float f_fps_max = -1;
-                do
-                {
-                    float f_fps = (float)frmival.discrete.denominator
-                                / (float)frmival.discrete.numerator;
-                    if( f_fps > f_fps_max ) f_fps_max = f_fps;
-                    frmival.index++;
-                } while( v4l2_ioctl( i_fd, VIDIOC_ENUM_FRAMEINTERVALS,
-                                     &frmival ) >= 0 );
-                return f_fps_max;
-            }
-            case V4L2_FRMSIZE_TYPE_STEPWISE:
-            case V4L2_FRMIVAL_TYPE_CONTINUOUS:
-                return __MAX( (float)frmival.stepwise.max.denominator
-                            / (float)frmival.stepwise.max.numerator,
-                              (float)frmival.stepwise.min.denominator
-                            / (float)frmival.stepwise.min.numerator );
-        }
-    }
-#endif
-    return -1.;
-}
-
-static float GetAbsoluteMaxFrameRate( demux_t *p_demux, int i_fd,
-                                      uint32_t i_pixel_format )
-{
-    float f_fps_max = -1.;
-#ifdef VIDIOC_ENUM_FRAMESIZES
-    /* This is new in Linux 2.6.19 */
-    struct v4l2_frmsizeenum frmsize;
-    memset( &frmsize, 0, sizeof(frmsize) );
-    frmsize.pixel_format = i_pixel_format;
-    if( v4l2_ioctl( i_fd, VIDIOC_ENUM_FRAMESIZES, &frmsize ) >= 0 )
-    {
-        switch( frmsize.type )
-        {
-            case V4L2_FRMSIZE_TYPE_DISCRETE:
-                do
-                {
-                    frmsize.index++;
-                    float f_fps = GetMaxFrameRate( i_fd, i_pixel_format,
-                                                   frmsize.discrete.width,
-                                                   frmsize.discrete.height );
-                    if( f_fps > f_fps_max ) f_fps_max = f_fps;
-                } while( v4l2_ioctl( i_fd, VIDIOC_ENUM_FRAMESIZES,
-                         &frmsize ) >= 0 );
-                break;
-            case V4L2_FRMSIZE_TYPE_STEPWISE:
-            {
-                uint32_t i_width = frmsize.stepwise.min_width;
-                uint32_t i_height = frmsize.stepwise.min_height;
-                for( ;
-                     i_width <= frmsize.stepwise.max_width &&
-                     i_height <= frmsize.stepwise.max_width;
-                     i_width += frmsize.stepwise.step_width,
-                     i_height += frmsize.stepwise.step_height )
-                {
-                    float f_fps = GetMaxFrameRate( i_fd, i_pixel_format,
-                                                   i_width, i_height );
-                    if( f_fps > f_fps_max ) f_fps_max = f_fps;
-                }
-                break;
-            }
-            case V4L2_FRMSIZE_TYPE_CONTINUOUS:
-                /* FIXME */
-                msg_Err( p_demux, "GetAbsoluteMaxFrameRate implementation for V4L2_FRMSIZE_TYPE_CONTINUOUS isn't correct" );
-                 f_fps_max = GetMaxFrameRate( i_fd, i_pixel_format,
-                                              frmsize.stepwise.max_width,
-                                              frmsize.stepwise.max_height );
-                break;
-        }
-    }
-#endif
-    return f_fps_max;
-}
-
-static void GetMaxDimensions( demux_t *p_demux, int i_fd,
-                              uint32_t i_pixel_format, float f_fps_min,
-                              uint32_t *pi_width, uint32_t *pi_height )
-{
-    *pi_width = 0;
-    *pi_height = 0;
-#ifdef VIDIOC_ENUM_FRAMESIZES
-    /* This is new in Linux 2.6.19 */
-    struct v4l2_frmsizeenum frmsize;
-    memset( &frmsize, 0, sizeof(frmsize) );
-    frmsize.pixel_format = i_pixel_format;
-    if( v4l2_ioctl( i_fd, VIDIOC_ENUM_FRAMESIZES, &frmsize ) >= 0 )
-    {
-        switch( frmsize.type )
-        {
-            case V4L2_FRMSIZE_TYPE_DISCRETE:
-                do
-                {
-                    frmsize.index++;
-                    float f_fps = GetMaxFrameRate( i_fd, i_pixel_format,
-                                                   frmsize.discrete.width,
-                                                   frmsize.discrete.height );
-                    if( f_fps >= f_fps_min &&
-                        frmsize.discrete.width > *pi_width )
-                    {
-                        *pi_width = frmsize.discrete.width;
-                        *pi_height = frmsize.discrete.height;
-                    }
-                } while( v4l2_ioctl( i_fd, VIDIOC_ENUM_FRAMESIZES,
-                         &frmsize ) >= 0 );
-                break;
-            case V4L2_FRMSIZE_TYPE_STEPWISE:
-            {
-                uint32_t i_width = frmsize.stepwise.min_width;
-                uint32_t i_height = frmsize.stepwise.min_height;
-                for( ;
-                     i_width <= frmsize.stepwise.max_width &&
-                     i_height <= frmsize.stepwise.max_width;
-                     i_width += frmsize.stepwise.step_width,
-                     i_height += frmsize.stepwise.step_height )
-                {
-                    float f_fps = GetMaxFrameRate( i_fd, i_pixel_format,
-                                                   i_width, i_height );
-                    if( f_fps >= f_fps_min && i_width > *pi_width )
-                    {
-                        *pi_width = i_width;
-                        *pi_height = i_height;
-                    }
-                }
-                break;
-            }
-            case V4L2_FRMSIZE_TYPE_CONTINUOUS:
-                /* FIXME */
-                msg_Err( p_demux, "GetMaxDimension implementation for V4L2_FRMSIZE_TYPE_CONTINUOUS isn't correct" );
-                float f_fps = GetMaxFrameRate( i_fd, i_pixel_format,
-                                               frmsize.stepwise.max_width,
-                                               frmsize.stepwise.max_height );
-                if( f_fps >= f_fps_min &&
-                    frmsize.stepwise.max_width > *pi_width )
-                {
-                    *pi_width = frmsize.stepwise.max_width;
-                    *pi_height = frmsize.stepwise.max_height;
-                }
-                break;
-        }
-    }
-#endif
-}
 
 static int InitVideo( vlc_object_t *p_obj, int i_fd, demux_sys_t *p_sys,
                       bool b_demux );
@@ -1530,7 +1187,6 @@ static int InitVideo( vlc_object_t *p_obj, int i_fd, demux_sys_t *p_sys,
     float f_fps;
     if (b_demux)
     {
-        demux_t *p_demux = (demux_t *) p_obj;
         char *reqchroma = var_InheritString( p_obj, CFG_PREFIX"chroma" );
 
         /* Test and set Chroma */
@@ -1594,7 +1250,7 @@ static int InitVideo( vlc_object_t *p_obj, int i_fd, demux_sys_t *p_sys,
             }
             if( i == ARRAY_SIZE( p_chroma_fallbacks ) )
             {
-                msg_Warn( p_demux, "Could not select any of the default chromas; attempting to open as MPEG encoder card (access)" );
+                msg_Warn( p_obj, "Could not select any of the default chromas; attempting to open as MPEG encoder card (access)" );
                 goto error;
             }
         }
@@ -1604,17 +1260,17 @@ static int InitVideo( vlc_object_t *p_obj, int i_fd, demux_sys_t *p_sys,
             f_fps = var_InheritFloat( p_obj, CFG_PREFIX"fps" );
             if( f_fps <= 0. )
             {
-                f_fps = GetAbsoluteMaxFrameRate( p_demux, i_fd,
+                f_fps = GetAbsoluteMaxFrameRate( p_obj, i_fd,
                                                  fmt.fmt.pix.pixelformat );
-                msg_Dbg( p_demux, "Found maximum framerate of %f", f_fps );
+                msg_Dbg( p_obj, "Found maximum framerate of %f", f_fps );
             }
             uint32_t i_width, i_height;
-            GetMaxDimensions( p_demux, i_fd,
+            GetMaxDimensions( p_obj, i_fd,
                               fmt.fmt.pix.pixelformat, f_fps,
                               &i_width, &i_height );
             if( i_width || i_height )
             {
-                msg_Dbg( p_demux, "Found optimal dimensions for framerate %f "
+                msg_Dbg( p_obj, "Found optimal dimensions for framerate %f "
                                   "of %ux%u", f_fps, i_width, i_height );
                 fmt.fmt.pix.width = i_width;
                 fmt.fmt.pix.height = i_height;
@@ -1845,7 +1501,7 @@ static int InitVideo( vlc_object_t *p_obj, int i_fd, demux_sys_t *p_sys,
         es_fmt.video.i_frame_rate_base = 1000000;
 
         demux_t *p_demux = (demux_t *) p_obj;
-        msg_Dbg( p_demux, "added new video es %4.4s %dx%d",
+        msg_Dbg( p_obj, "added new video es %4.4s %dx%d",
             (char*)&es_fmt.i_codec, es_fmt.video.i_width, es_fmt.video.i_height );
         msg_Dbg( p_obj, " frame rate: %f", f_fps );
 

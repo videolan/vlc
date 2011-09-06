@@ -71,10 +71,23 @@ struct demux_sys_t
 #endif
 };
 
+struct buffer_t
+{
+    void *  start;
+    size_t  length;
+};
+
 /* video.c */
 void ParseMRL(vlc_object_t *, const char *);
 int OpenVideo(vlc_object_t *, demux_sys_t *, bool);
 block_t* GrabVideo(vlc_object_t *, demux_sys_t *);
+
+/* demux.c */
+int DemuxOpen(vlc_object_t *);
+void DemuxClose(vlc_object_t *);
+float GetAbsoluteMaxFrameRate(vlc_object_t *, int fd, uint32_t fmt);
+void GetMaxDimensions(vlc_object_t *, int fd, uint32_t fmt, float fps_min,
+                      uint32_t *pwidth, uint32_t *pheight);
 
 /* access.c */
 int AccessOpen(vlc_object_t *);
