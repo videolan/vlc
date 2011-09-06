@@ -1950,6 +1950,8 @@ fi
 dnl
 dnl  Video4Linux 2
 dnl
+AC_ARG_ENABLE(libv4l2, [AS_HELP_STRING([--disable-libv4l2],
+  [disable userspace V4L2 library (default auto)])])
 AC_ARG_ENABLE(pvr, [AS_HELP_STRING([--enable-pvr],
   [support PVR V4L2 cards (default disabled)])])
 have_v4l2="no"
@@ -1957,10 +1959,12 @@ AC_CHECK_HEADERS([linux/videodev2.h sys/videoio.h], [
   have_v4l2="yes"
 ])
 AS_IF([test "$have_v4l2" = "yes"], [
-  PKG_CHECK_MODULES(LIBV4L2, libv4l2, [
-    AC_DEFINE(HAVE_LIBV4L2, 1, [Define to 1 if libv4l2 is available])
-  ], [
-    AC_MSG_WARN([libv4l2 development headers were not found])
+  AS_IF([test "${enable_libv4l2}" != "no"], [
+    PKG_CHECK_MODULES(LIBV4L2, libv4l2, [
+      AC_DEFINE(HAVE_LIBV4L2, 1, [Define to 1 if libv4l2 is available])
+    ], [
+      AC_MSG_WARN([${LIBV4L2_PKG_ERRORS}])
+    ])
   ])
   AS_IF([test "${enable_pvr}" = "yes"], [
     VLC_ADD_PLUGIN([pvr])
