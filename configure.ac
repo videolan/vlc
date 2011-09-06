@@ -3580,29 +3580,10 @@ EXTEND_HELP_STRING([Interface plugins:])
 dnl
 dnl Skins2 module
 dnl
-AC_ARG_ENABLE(libtar,
-  [  --enable-libtar         libtar support for skins2 (default auto)])
-AS_IF([test "${enable_libtar}" != "no"], [
-  AC_CHECK_HEADERS(libtar.h, [
-    VLC_ADD_LIBS([skins2],[-ltar])
-  ])
-])
-
 AC_ARG_ENABLE(skins2,
-  [AS_HELP_STRING([--enable-skins2],[Skins2 interface module (default
-   enabled except on MacOSX and WinCE)])],, [
-  AS_IF([test "${SYS}" != "darwin" && test "${SYS}" != "mingwce"], [
-    enable_skins2="yes"
-  ], [
-    enable_skins2="no"
-  ])
-])
-AS_IF([test "${enable_skins2}" = "yes"], [
-  dnl freetype
-  AS_IF([test "${have_freetype}" != "yes"], [
-    AC_MSG_ERROR([Could not find FreeType (required for skins2)])
-  ])
-
+  [AS_HELP_STRING([--enable-skins2], [skins interface module (default auto)])])
+AS_IF([test "${enable_skins2}" != "no"], [
+  have_skins_deps="yes"
   AS_IF([test "${SYS}" = "mingw32"], [
     VLC_ADD_CPPFLAGS([skins2],[-U_OFF_T_ -U_off_t -Imodules/gui/skins2 -DWIN32_SKINS])
     VLC_ADD_CXXFLAGS([skins2],[-O2 -fno-rtti])
@@ -3614,18 +3595,37 @@ AS_IF([test "${enable_skins2}" = "yes"], [
     VLC_ADD_LIBS([skins2],[-Wl,-framework,Carbon])
 
   ], [
-    PKG_CHECK_MODULES([XPM], [xpm])
-    PKG_CHECK_MODULES([XINERAMA], [xinerama])
-    PKG_CHECK_MODULES([XEXT], [xext])
+    PKG_CHECK_MODULES([XPM], [xpm],, [have_skins_deps="no"])
+    PKG_CHECK_MODULES([XINERAMA], [xinerama],, [have_skins_deps="no"])
+    PKG_CHECK_MODULES([XEXT], [xext],, [have_skins_deps="no"])
     VLC_ADD_CPPFLAGS([skins2],[-Imodules/gui/skins2 ${X_CFLAGS} ${XEXT_CFLAGS} ${XPM_CFLAGS} -DX11_SKINS])
     VLC_ADD_CXXFLAGS([skins2],[-O2 -fno-rtti])
     VLC_ADD_LIBS([skins2],[${X_LIBS} ${X_PRE_LIBS} ${XEXT_LIBS} ${XPM_LIBS} ${XINERAMA_LIBS} -lX11])
 
   ])
+  AS_IF([test "${have_freetype}" != "yes"], [
+    have_skins_deps="no"
+  ])
+
+  AS_IF([test "${have_skins_deps}" = "no"], [
+    AS_IF([test "x${enable_skins2}" = "x"], [
+      AC_MSG_WARN([Skins2 interface disabled due to missing dependencies.])
+    ], [
+      AC_MSG_ERROR([Skins2 interface requires FreeType, libxpm, libxext and libxinerama])
+    ])
+  ])
   VLC_ADD_PLUGIN([skins2])
   ALIASES="${ALIASES} svlc"
 ])
 AM_CONDITIONAL(BUILD_SKINS, [test "${enable_skins2}" = "yes"])
+
+AC_ARG_ENABLE(libtar,
+  [  --enable-libtar         libtar support for skins2 (default auto)])
+AS_IF([test "${enable_skins2}" = "yes" && test "${enable_libtar}" != "no"], [
+  AC_CHECK_HEADERS(libtar.h, [
+    VLC_ADD_LIBS([skins2],[-ltar])
+  ])
+])
 
 dnl
 dnl Hildon UI
