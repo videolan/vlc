@@ -329,8 +329,7 @@ static void CloseAccess(vlc_object_t *object)
  */
 static int ControlAccess(access_t *access, int i_query, va_list args)
 {
-    imem_sys_t *sys = (imem_sys_t*)access->p_sys;
-
+    (void) access;
     switch (i_query)
     {
     case ACCESS_CAN_SEEK:
