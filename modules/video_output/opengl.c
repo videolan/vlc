@@ -272,6 +272,8 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     bool supports_npot = false;
 #if USE_OPENGL_ES == 2
     supports_npot = true;
+#elif defined(BROKEN_MACOS_OPENGL)
+    supports_npot = true;
 #else
     supports_npot |= HasExtension(extensions, "GL_APPLE_texture_2D_limited_npot") ||
                      HasExtension(extensions, "GL_ARB_texture_non_power_of_two");
@@ -393,7 +395,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     *fmt = vgl->fmt;
     if (subpicture_chromas) {
         *subpicture_chromas = NULL;
-#if !USE_OPENGL_ES
+#if !defined(BROKEN_MACOS_OPENGL) && !USE_OPENGL_ES
         if (supports_npot)
             *subpicture_chromas = gl_subpicture_chromas;
 #endif
