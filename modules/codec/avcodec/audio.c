@@ -257,10 +257,12 @@ aout_buffer_t * DecodeAudio ( decoder_t *p_dec, block_t **pp_block )
     decoder_sys_t *p_sys = p_dec->p_sys;
     int i_used, i_output;
     aout_buffer_t *p_buffer;
-    block_t *p_block = *pp_block;
+    block_t *p_block;
     AVPacket pkt;
 
-    if( !p_block ) return NULL;
+    if( !pp_block || !*pp_block ) return NULL;
+
+    p_block = *pp_block;
 
     if( !p_sys->p_context->extradata_size && p_dec->fmt_in.i_extra &&
         p_sys->b_delayed_open)

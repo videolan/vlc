@@ -1155,10 +1155,12 @@ aout_buffer_t *DecodeAudio ( decoder_t *p_dec, block_t **pp_block )
     aout_buffer_t *p_buffer = 0;
     OMX_BUFFERHEADERTYPE *p_header;
     OMX_ERRORTYPE omx_error;
-    block_t *p_block = *pp_block;
+    block_t *p_block;
     unsigned int i;
 
-    if( !p_block ) return NULL;
+    if( !pp_block || !*pp_block ) return NULL;
+
+    p_block = *pp_block;
 
     /* Check for errors from codec */
     if(p_sys->b_error)

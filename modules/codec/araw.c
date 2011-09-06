@@ -346,9 +346,10 @@ static int DecoderOpen( vlc_object_t *p_this )
 static aout_buffer_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    block_t *p_block = *pp_block;
 
-    if( !p_block ) return NULL;
+    if( !pp_block || !*pp_block ) return NULL;
+
+    block_t *p_block = *pp_block;
 
     if( p_block->i_pts > VLC_TS_INVALID &&
         p_block->i_pts != date_Get( &p_sys->end_date ) )

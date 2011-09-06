@@ -195,10 +195,12 @@ static int OpenDecoder( vlc_object_t *p_this )
 static aout_buffer_t *DecodeFrame( decoder_t *p_dec, block_t **pp_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    block_t       *p_block = *pp_block;
+    block_t       *p_block;
     aout_buffer_t *p_aout_buffer = NULL;
 
-    if( !p_block ) return NULL;
+    if( !pp_block || !*pp_block ) return NULL;
+
+    p_block = *pp_block;
 
     if( p_block->i_flags&(BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED) )
     {

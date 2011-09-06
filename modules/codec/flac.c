@@ -527,20 +527,19 @@ static void decoder_state_error( decoder_t *p_dec,
 static aout_buffer_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    block_t *p_block = *pp_block;
 
-    if( !p_block )
+    if( !pp_block || !*pp_block )
         return NULL;
-    if( p_block->i_flags&(BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED) )
+    if( (*pp_block)->i_flags&(BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED) )
     {
-        block_Release( p_block );
+        block_Release( *pp_block );
         return NULL;
     }
 
     if( !p_sys->b_stream_info )
         ProcessHeader( p_dec );
 
-    p_sys->p_block = p_block;
+    p_sys->p_block = *pp_block;
     *pp_block = NULL;
 
     if( p_sys->p_block->i_pts > VLC_TS_INVALID &&
