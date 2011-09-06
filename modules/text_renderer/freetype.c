@@ -2180,7 +2180,8 @@ static int ProcessLines( filter_t *p_filter,
         /* Update our baseline */
         if( i_face_height_previous > 0 )
             i_base_line += __MAX(i_face_height, i_face_height_previous);
-        i_face_height_previous = i_face_height;
+        if( i_face_height > 0 )
+            i_face_height_previous = i_face_height;
 
         /* Update the line bbox with the actual base line */
         if (line_bbox.yMax > line_bbox.yMin) {
