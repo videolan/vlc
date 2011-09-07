@@ -239,6 +239,9 @@ bool MainInterface::winEvent ( MSG * msg, long * result )
 
 void MainInterface::changeThumbbarButtons( int i_status )
 {
+    if( p_taskbl == NULL )
+        return;
+
     // Define an array of three buttons. These buttons provide images through an
     // image list and also provide tooltips.
     DWORD dwMask = THB_BITMAP | THB_FLAGS;
