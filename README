@@ -14,7 +14,6 @@ COPYING            - The GPL license.
 ChangeLog          - The VLC ChangeLog.
 HACKING            - Hacking VLC.
 INSTALL            - Installation instructions.
-INSTALL.win32      - Installation instructions for the Win32 version of VLC.
 NEWS               - Important modifications between the releases.
 README             - This file.
 THANKS             - All VLC contributors.

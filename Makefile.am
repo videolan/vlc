@@ -16,7 +16,6 @@ SUBDIRS += test
 
 EXTRA_DIST = \
 	HACKING \
-	INSTALL.win32 \
 	extras/package/win32/vlc.exe.manifest \
 	extras/package/win32/libvlc.dll.manifest \
 	extras/package/macosx/README.MacOSX.rtf \
