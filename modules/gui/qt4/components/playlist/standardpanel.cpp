@@ -48,6 +48,7 @@
 #include <QStackedLayout>
 #include <QSignalMapper>
 #include <QSettings>
+#include <QScrollBar>
 
 #include <assert.h>
 
@@ -409,6 +410,12 @@ int StandardPLPanel::currentViewIndex() const
         return LIST_VIEW;
     else
         return PICTUREFLOW_VIEW;
+}
+
+int StandardPLPanel::getScrollBarsSize() const
+{
+    /* FIXME: should return a set in case of different widths */
+    return currentView->verticalScrollBar()->sizeHint().width();
 }
 
 void StandardPLPanel::cycleViews()
