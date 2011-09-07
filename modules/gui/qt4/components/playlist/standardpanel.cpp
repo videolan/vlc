@@ -189,6 +189,8 @@ void StandardPLPanel::setRoot( playlist_item_t *p_item, bool b )
         currentView->setModel( mlmodel );
     }
     else
+#else
+    Q_UNUSED( b );
 #endif
     {
         msg_Dbg( p_intf, "Normal PL/ML or SD" );
@@ -352,6 +354,7 @@ void StandardPLPanel::changeModel( bool b_ml )
     if( currentView->model() != mod )
         currentView->setModel( mod );
 #else
+    Q_UNUSED( b_ml );
     if( currentView->model() != model )
         currentView->setModel( model );
 #endif
