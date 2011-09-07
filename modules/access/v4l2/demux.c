@@ -31,6 +31,7 @@
 #include <vlc_demux.h>
 #include <errno.h>
 #include <sys/ioctl.h>
+#include <sys/mman.h>
 #include <poll.h>
 
 static int DemuxControl( demux_t *, int, va_list );
