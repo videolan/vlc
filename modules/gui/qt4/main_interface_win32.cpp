@@ -155,7 +155,7 @@ bool MainInterface::winEvent ( MSG * msg, long * result )
 {
     if (msg->message == taskbar_wmsg)
     {
-        //We received the taskbarbuttoncreated, now we can really create th buttons
+        //We received the taskbarbuttoncreated, now we can really create the buttons
         createTaskBarButtons();
     }
 
@@ -237,7 +237,7 @@ bool MainInterface::winEvent ( MSG * msg, long * result )
     return false;
 }
 
-void MainInterface::changeThumbbarButtons( int i_status)
+void MainInterface::changeThumbbarButtons( int i_status )
 {
     // Define an array of three buttons. These buttons provide images through an
     // image list and also provide tooltips.
