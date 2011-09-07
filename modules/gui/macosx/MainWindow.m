@@ -742,8 +742,6 @@ static VLCMainWindow *_o_sharedInstance = nil;
         [self setRepresentedURL: nil];
     }
 
-    [o_sidebar_view reloadData];
-
     [o_pool release];
 }
 
