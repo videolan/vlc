@@ -190,7 +190,7 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QWidget *_par )
     CONNECT( zoomSlider, valueChanged( int ), model, changeZoom( int ) );
 
     /* pad our zoom slider */
-    QGridLayout *sliderLayout = new QGridLayout( this );
+    QGridLayout *sliderLayout = new QGridLayout;
     QSpacerItem* sliderSpacer =
             new QSpacerItem( mainView->getScrollBarsSize(),
                              mainView->getScrollBarsSize(),
