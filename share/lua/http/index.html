@@ -28,9 +28,11 @@
 		<link href="favicon.ico" type="image/x-icon" rel="shortcut icon" />
 		<script type="text/javascript" src="js/common.js"></script>
 		<script type="text/javascript">
+		//<![CDATA[
 			if(isMobile()){
 				window.location='mobile.html';
 			}
+		//]]>
 		</script>
 		<link type="text/css" href="css/ui-lightness/jquery-ui-1.8.13.custom.css" rel="stylesheet" />
 		<link type="text/css" href="css/main.css" rel="stylesheet" />
@@ -41,6 +43,7 @@
 		<script type="text/javascript" src="js/ui.js"></script>
 		<script type="text/javascript" src="js/controlers.js"></script>
 		<script type="text/javascript">
+		//<![CDATA[
 			var pollStatus	=	true;
 			$(function(){
 				$('.button').hover(function(){$(this).addClass('ui-state-hover')},function(){$(this).removeClass('ui-state-hover')});
@@ -185,6 +188,7 @@
 				});
 				$('#viewContainer').animate({height: 'toggle'});
 			});
+		//]]>
 		</script>
 	</head>
 	<body>
