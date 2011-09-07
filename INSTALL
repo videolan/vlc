@@ -1,13 +1,19 @@
 INSTALL file for the VLC media player
+=====================================
 
 More extensive information for *nix, Windows and Mac OS X users can be
-found here: http://developers.videolan.org/vlc/
+found here: http://wiki.videolan.org/Compile_VLC
+
+People installing VLC for Windows from source MUST read:
+http://wiki.videolan.org/Win32Compile
 
 Bootstrapping VLC
 =================
 
-If you retrieved VLC from the git server and do not have a "configure"
-script, please refer to the HACKING file.
+If you retrieved VLC from the git server and do not have yet a "configure"
+script, please run:
+
+    ./bootstrap
 
 Configuring VLC
 ===============

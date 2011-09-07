@@ -15,21 +15,21 @@ been downloaded close to one billion times.
 Links:
 ======
 
-The VideoLAN web site . . . http://www.videolan.org/
 The VLC web site  . . . . . http://www.videolan.org/
 Support . . . . . . . . . . http://www.videolan.org/support/
 Forums  . . . . . . . . . . http://forum.videolan.org/
 Wiki  . . . . . . . . . . . http://wiki.videolan.org/
 The Developers site . . . . http://wiki.videolan.org/Developers_Corner
-Bugtracker  . . . . . . . . http://trac.videolan.org/
+VLC hacking guide . . . . . http://wiki.videolan.org/Documentation:Hacker%27s_Guide
+Bugtracker  . . . . . . . . http://trac.videolan.org/vlc/
+The VideoLAN web site . . . http://www.videolan.org/
 
 Files:
 ======
 ABOUT-NLS          - Notes on the Free Translation Project.
 AUTHORS            - VLC authors.
 COPYING            - The GPL license.
-HACKING            - Hacking VLC.
-INSTALL            - Installation instructions.
+INSTALL            - Installation and building instructions.
 NEWS               - Important modifications between the releases.
 README             - This file.
 THANKS             - VLC contributors.
