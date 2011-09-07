@@ -607,6 +607,7 @@ void DialogsProvider::streamingDialog( QWidget *parent,
     if( !b_transcode_only )
     {
         SoutDialog *s = new SoutDialog( parent, p_intf, mrl );
+        s->setAttribute( Qt::WA_QuitOnClose, false ); // See #4883
         if( s->exec() == QDialog::Accepted )
         {
             soutoption = s->getMrl();
@@ -619,6 +620,7 @@ void DialogsProvider::streamingDialog( QWidget *parent,
     } else {
     /* Convert */
         ConvertDialog *s = new ConvertDialog( parent, p_intf, mrl );
+        s->setAttribute( Qt::WA_QuitOnClose, false ); // See #4883
         if( s->exec() == QDialog::Accepted )
         {
             soutoption = s->getMrl();
