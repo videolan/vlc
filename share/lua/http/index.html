@@ -188,15 +188,15 @@
 		</script>
 	</head>
 	<body>
-		<div align="center">
-		<div id="mainContainer" align="center">
+			<div class="centered">
+			<div id="mainContainer" class="centered">
 			<div id="controlContainer" class="ui-widget">
 				<div class="ui-widget-header" style="text-align: left;">
 					<img src="images/vlc16x16.png" alt="VLC" width="16" height="16"/> Controls
 				</div>
 				<table width="100%" border="0" cellspacing="0" id="controlTable" class="ui-widget-content">
 					<tr>
-						<td id="controlButtons" width="380px">
+						<td id="controlButtons">
 							<div id="buttonPrev" class="button48  ui-corner-all" title="Previous"></div>
 							<div id="buttonPlay" class="button48  ui-corner-all" title="Play"></div>
 							<div id="buttonNext" class="button48  ui-corner-all" title="Next"></div>
@@ -205,7 +205,7 @@
 							<div id="buttonFull" class="button48  ui-corner-all" title="Full Screen"></div>
 							<div id="buttonSout" class="button48  ui-corner-all" title="Easy Stream"></div>
 						</td>
-						<td valign="top" width="42px">
+						<td id="buttonszone">
 							<div id="buttonPlayList" class="button ui-widget ui-state-default ui-corner-all" title="Hide / Show Library" style="float: left;"><span class="ui-icon ui-icon-note"></span></div>
 							<div id="buttonViewer" class="button ui-widget ui-state-default ui-corner-all" title="Hide / Show Viewer" style="float: left;"><span class="ui-icon ui-icon-video"></span></div>
 							<div id="buttonStreams" class="button ui-widget ui-state-default ui-corner-all" title="Manage Streams" style="float: left;"><span class="ui-icon ui-icon-script"></span></div>
@@ -214,12 +214,12 @@
 							<div id="buttonBatch" class="button ui-widget ui-state-default ui-corner-all" title="VLM Batch Commands" style="float: left;"><span class="ui-icon ui-icon-suitcase"></span></div>
 						</td>
 						<td>
-							<div style="margin-left:20px;">
-								<div id="volumeSlider" title="Volume" style="width:200px"><img src="images/speaker-32.png" class="ui-slider-handle" alt="volume"/></div>
+							<div id="volumesliderzone">
+								<div id="volumeSlider" title="Volume"><img src="images/speaker-32.png" class="ui-slider-handle" alt="volume"/></div>
 								<div id="currentVolume" class="dynamic">50%</div>
 							</div>
 						</td>
-						<td rowspan="3" valign="top" width="141px">
+						<td id="artszone" rowspan="3">
 							<img id="albumArt" src="/art" width="141px" height="130px" alt="Album Art"/>
 						</td>
 					</tr>
@@ -229,7 +229,7 @@
 						</td>
 					</tr>
 					<tr>
-						<td id="seekContainer" valign="bottom" colspan="3">
+						<td id="seekContainer" colspan="3">
 							<div id="seekSlider" title="Seek Time" style="width:98%; margin-left:10px;"></div>
 							<table width="100%">
 								<tr>
