@@ -370,7 +370,7 @@ QVariant PLModel::data( const QModelIndex &index, const int role ) const
     else if( role == Qt::FontRole )
     {
         QFont f;
-        f.setPointSize( std::max( f.pointSize() - 1 + i_zoom, 1 ) );
+        f.setPointSize( __MAX( f.pointSize() - 1 + i_zoom, 4 ) );
         if( isCurrent( index ) )
             f.setBold( true );
         return QVariant( f );
