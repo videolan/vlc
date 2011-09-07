@@ -3614,9 +3614,11 @@ AS_IF([test "${enable_skins2}" != "no"], [
     ], [
       AC_MSG_ERROR([Skins2 interface requires FreeType, libxpm, libxext and libxinerama])
     ])
+    enable_skins2="no"
+  ], [
+    VLC_ADD_PLUGIN([skins2])
+    ALIASES="${ALIASES} svlc"
   ])
-  VLC_ADD_PLUGIN([skins2])
-  ALIASES="${ALIASES} svlc"
 ])
 AM_CONDITIONAL(BUILD_SKINS, [test "${enable_skins2}" = "yes"])
 
