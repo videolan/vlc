@@ -480,17 +480,17 @@ void StringListConfigControl::finish(module_config_t *p_module_config )
 
     if( p_module_config->pf_update_list )
     {
-       vlc_value_t val;
-       val.psz_string = strdup(p_module_config->value.psz);
+        vlc_value_t val;
+        val.psz_string = strdup(p_module_config->value.psz);
 
-       p_module_config->pf_update_list(p_this, p_item->psz_name, val, val, NULL);
+        p_module_config->pf_update_list(p_this, p_item->psz_name, val, val, NULL);
 
-       // assume in any case that dirty was set to true
-       // because lazy programmes will use the same callback for
-       // this, like the one behind the refresh push button?
-       p_module_config->b_dirty = false;
+        // assume in any case that dirty was set to true
+        // because lazy programmes will use the same callback for
+        // this, like the one behind the refresh push button?
+        p_module_config->b_dirty = false;
 
-       free( val.psz_string );
+        free( val.psz_string );
     }
 
     for( int i_index = 0; i_index < p_module_config->i_list; i_index++ )
@@ -535,15 +535,15 @@ void setfillVLCConfigCombo( const char *configname, intf_thread_t *p_intf,
                       config_FindConfig( VLC_OBJECT(p_intf), configname );
     if( p_config )
     {
-       QVariant def;
-       bool string = (p_config->i_type & 0xF0) == CONFIG_ITEM_STRING;
+        QVariant def;
+        bool string = (p_config->i_type & 0xF0) == CONFIG_ITEM_STRING;
 
-       if( string )
-           def = QVariant( qfu(p_config->value.psz) );
-       else
-           def = QVariant( qlonglong( p_config->value.i ) );
+        if( string )
+            def = QVariant( qfu(p_config->value.psz) );
+        else
+            def = QVariant( qlonglong( p_config->value.i ) );
 
-       if(p_config->pf_update_list)
+        if(p_config->pf_update_list)
         {
             vlc_value_t val;
             val.i_int = p_config->value.i;
@@ -623,7 +623,7 @@ void ModuleConfigControl::finish( bool bycat )
             module_config_t *p_config;
 
             p_config = module_config_get (p_parser, &confsize);
-             for (size_t i = 0; i < confsize; i++)
+            for (size_t i = 0; i < confsize; i++)
             {
                 /* Hack: required subcategory is stored in i_min */
                 const module_config_t *p_cfg = p_config + i;
@@ -714,19 +714,19 @@ ModuleListConfigControl::~ModuleListConfigControl()
 
 #define CHECKBOX_LISTS \
 { \
-       QCheckBox *cb = new QCheckBox( qtr( module_GetLongName( p_parser ) ) );\
-       checkBoxListItem *cbl = new checkBoxListItem; \
+        QCheckBox *cb = new QCheckBox( qtr( module_GetLongName( p_parser ) ) );\
+        checkBoxListItem *cbl = new checkBoxListItem; \
 \
-       CONNECT( cb, stateChanged( int ), this, onUpdate() );\
-       const char *help = module_get_help( p_parser ); \
-       if( help != NULL ) \
-           cb->setToolTip( formatTooltip( qtr( help ) ) ); \
-       cbl->checkBox = cb; \
+        CONNECT( cb, stateChanged( int ), this, onUpdate() );\
+        const char *help = module_get_help( p_parser ); \
+        if( help != NULL ) \
+            cb->setToolTip( formatTooltip( qtr( help ) ) ); \
+        cbl->checkBox = cb; \
 \
-       cbl->psz_module = strdup( module_get_object( p_parser ) ); \
-       modules.append( cbl ); \
+        cbl->psz_module = strdup( module_get_object( p_parser ) ); \
+        modules.append( cbl ); \
 \
-       if( p_item->value.psz && strstr( p_item->value.psz, cbl->psz_module ) ) \
+        if( p_item->value.psz && strstr( p_item->value.psz, cbl->psz_module ) ) \
             cbl->checkBox->setChecked( true ); \
 }
 
