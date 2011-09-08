@@ -144,6 +144,7 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QWidget *_par )
     searchEdit = new SearchLineEdit( this );
     searchEdit->setMaximumWidth( 250 );
     searchEdit->setMinimumWidth( 80 );
+    searchEdit->setToolTip( qtr("Search the playlist") );
     topbarLayout->addWidget( searchEdit );
     CONNECT( searchEdit, textChanged( const QString& ),
              mainView, search( const QString& ) );
@@ -158,6 +159,7 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QWidget *_par )
     zoomSlider->setRange( -10, 10);
     zoomSlider->setPageStep( 3 );
     zoomSlider->setValue( model->getZoom() );
+    zoomSlider->setToolTip( qtr("Zoom playlist") );
     CONNECT( zoomSlider, valueChanged( int ), model, changeZoom( int ) );
     topbarLayout->addWidget( zoomSlider );
 
