@@ -448,6 +448,7 @@ static int PictureLock(picture_t *picture)
     vout_display_opengl_t *vgl = picture->p_sys->vgl;
     if (!vlc_gl_Lock(vgl->gl)) {
         glBindTexture(vgl->tex_target, PictureGetTexture(picture));
+        glPixelStorei(GL_UNPACK_ROW_LENGTH, picture->p->i_pitch / picture->p->i_pixel_pitch);
         glTexSubImage2D(vgl->tex_target, 0,
                         0, 0, vgl->fmt.i_width, vgl->fmt.i_height,
                         vgl->tex_format, vgl->tex_type, picture->p[0].p_pixels);
