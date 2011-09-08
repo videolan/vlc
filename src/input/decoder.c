@@ -924,6 +924,14 @@ static void *DecoderThread( void *p_data )
         {
             int canc = vlc_savecancel();
 
+            if( p_block->i_flags & BLOCK_FLAG_CORE_EOS )
+            {
+                /* calling DecoderProcess() with NULL block will make
+                 * decoders/packetizers flush their buffers */
+                block_Release( p_block );
+                p_block = NULL;
+            }
+
             if( p_dec->b_error )
                 DecoderError( p_dec, p_block );
             else

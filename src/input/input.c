@@ -617,6 +617,7 @@ static void MainLoopDemux( input_thread_t *p_input, bool *pb_changed, bool *pb_d
     {
         msg_Dbg( p_input, "EOF reached" );
         p_input->p->input.b_eof = true;
+        es_out_Eos(p_input->p->p_es_out);
     }
     else if( i_ret < 0 )
     {

@@ -79,6 +79,9 @@ enum es_out_query_private_e
 
     /* Get forced group */
     ES_OUT_GET_GROUP_FORCED,                        /* arg1=int * res=cannot fail */
+
+    /* Set End Of Stream */
+    ES_OUT_SET_EOS,                                 /* res=cannot fail */
 };
 
 static inline void es_out_SetMode( es_out_t *p_out, int i_mode )
@@ -158,6 +161,11 @@ static inline int es_out_GetGroupForced( es_out_t *p_out )
     int i_ret = es_out_Control( p_out, ES_OUT_GET_GROUP_FORCED, &i_group );
     assert( !i_ret );
     return i_group;
+}
+static inline void es_out_Eos( es_out_t *p_out )
+{
+    int i_ret = es_out_Control( p_out, ES_OUT_SET_EOS );
+    assert( !i_ret );
 }
 
 es_out_t  *input_EsOutNew( input_thread_t *, int i_rate );
