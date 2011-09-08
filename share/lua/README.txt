@@ -221,6 +221,8 @@ Objects
 object.input(): Get the current input object.
 object.playlist(): Get the playlist object.
 object.libvlc(): Get the libvlc object.
+object.aout(): Get the audio output object.
+object.vout(): Get the video output object.
 
 object.find( object, type, mode ): Return nil. DO NOT USE.
 
