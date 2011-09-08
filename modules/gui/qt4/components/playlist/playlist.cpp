@@ -110,7 +110,7 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QWidget *_par )
     CONNECT( locationBar, invoked( const QModelIndex & ),
              mainView, browseInto( const QModelIndex & ) );
 
-    QHBoxLayout *topbarLayout = new QHBoxLayout( this );
+    QHBoxLayout *topbarLayout = new QHBoxLayout();
     layout->addLayout( topbarLayout, 0, 1 );
     topbarLayout->setSpacing( 10 );
 
