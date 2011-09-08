@@ -472,7 +472,14 @@ end
 
 function listvalue(obj,var)
     return function(client,value)
-        local o = vlc.object.find(nil,obj,"anywhere")
+        local o
+        if obj == "input" then
+            o = vlc.object.input()
+        elseif obj == "aout" then
+            o = vlc.object.aout()
+        elseif obj == "vout" then
+            o = vlc.object.vout()
+        end
         if not o then return end
         if value then
             vlc.var.set( o, var, value )
