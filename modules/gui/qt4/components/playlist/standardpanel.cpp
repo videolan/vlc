@@ -421,8 +421,10 @@ void StandardPLPanel::cycleViews()
     else if( currentView == treeView )
         showView( LIST_VIEW );
     else if( currentView == listView )
+#ifndef NDEBUG
         showView( PICTUREFLOW_VIEW  );
     else if( currentView == picFlowView )
+#endif
         showView( ICON_VIEW );
     else
         assert( 0 );

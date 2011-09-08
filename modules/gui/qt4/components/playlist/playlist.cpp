@@ -126,7 +126,12 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QWidget *_par )
 
     QActionGroup *actionGroup = new QActionGroup( this );
 
-    for( int i = 0; i < StandardPLPanel::VIEW_COUNT; i++ )
+#ifndef NDEBUG
+# define MAX_VIEW StandardPLPanel::VIEW_COUNT
+#else
+# define MAX_VIEW StandardPLPanel::VIEW_COUNT - 1
+#endif
+    for( int i = 0; i < MAX_VIEW; i++ )
     {
         viewActions[i] = actionGroup->addAction( viewNames[i] );
         viewActions[i]->setCheckable( true );
