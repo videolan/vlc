@@ -69,7 +69,6 @@ public:
            VIEW_COUNT };
 
     int currentViewIndex() const;
-    int getScrollBarsSize() const;
 
 protected:
     PLModel *model;

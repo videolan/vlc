@@ -41,8 +41,6 @@
 #include <QMenu>
 #include <QSignalMapper>
 #include <QSlider>
-#include <QSpacerItem>
-#include <QList>
 
 /**********************************************************************
  * Playlist Widget. The embedded playlist
@@ -112,11 +110,15 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QWidget *_par )
     CONNECT( locationBar, invoked( const QModelIndex & ),
              mainView, browseInto( const QModelIndex & ) );
 
+    QHBoxLayout *topbarLayout = new QHBoxLayout( this );
+    layout->addLayout( topbarLayout, 0, 1 );
+    topbarLayout->setSpacing( 10 );
+
     /* Button to switch views */
     QToolButton *viewButton = new QToolButton( this );
     viewButton->setIcon( style()->standardIcon( QStyle::SP_FileDialogDetailedView ) );
     viewButton->setToolTip( qtr("Change playlistview") );
-    layout->addWidget( viewButton, 0, 2 );
+    topbarLayout->addWidget( viewButton );
 
     /* View selection menu */
     QSignalMapper *viewSelectionMapper = new QSignalMapper( this );
@@ -142,7 +144,7 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QWidget *_par )
     searchEdit = new SearchLineEdit( this );
     searchEdit->setMaximumWidth( 250 );
     searchEdit->setMinimumWidth( 80 );
-    layout->addWidget( searchEdit, 0, 3 );
+    topbarLayout->addWidget( searchEdit );
     CONNECT( searchEdit, textChanged( const QString& ),
              mainView, search( const QString& ) );
     CONNECT( searchEdit, searchDelayedChanged( const QString& ),
@@ -150,7 +152,14 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QWidget *_par )
 
     CONNECT( mainView, viewChanged( const QModelIndex& ),
              this, changeView( const QModelIndex &) );
-    layout->setColumnStretch( 3, 3 );
+
+    /* Zoom */
+    QSlider *zoomSlider = new QSlider( Qt::Horizontal, this );
+    zoomSlider->setRange( -10, 10);
+    zoomSlider->setPageStep( 3 );
+    zoomSlider->setValue( model->getZoom() );
+    CONNECT( zoomSlider, valueChanged( int ), model, changeZoom( int ) );
+    topbarLayout->addWidget( zoomSlider );
 
     /* Connect the activation of the selector to a redefining of the PL */
     DCONNECT( selector, categoryActivated( playlist_item_t *, bool ),
@@ -181,24 +190,6 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QWidget *_par )
     getSettings()->endGroup();
 
     layout->addWidget( split, 1, 0, 1, -1 );
-
-    /* Zoom */
-    QSlider *zoomSlider = new QSlider( Qt::Horizontal, this );
-    zoomSlider->setRange( -10, 10);
-    zoomSlider->setPageStep( 3 );
-    zoomSlider->setValue( model->getZoom() );
-    CONNECT( zoomSlider, valueChanged( int ), model, changeZoom( int ) );
-
-    /* pad our zoom slider */
-    QGridLayout *sliderLayout = new QGridLayout;
-    QSpacerItem* sliderSpacer =
-            new QSpacerItem( mainView->getScrollBarsSize(),
-                             mainView->getScrollBarsSize(),
-                            QSizePolicy::Fixed, QSizePolicy::Fixed );
-    sliderLayout->addWidget( zoomSlider, 0, 0, Qt::AlignCenter );
-    sliderLayout->addItem( sliderSpacer, 1, 1, Qt::AlignCenter );
-
-    layout->addLayout( sliderLayout, 1, 3, ( Qt::AlignBottom | Qt::AlignRight ) );
 
     setAcceptDrops( true );
     setWindowTitle( qtr( "Playlist" ) );
