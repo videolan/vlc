@@ -34,7 +34,7 @@ end
 
 -- Take a video snapshot
 function snapshot()
-    local vout = vlc.object.find(nil,"vout","anywhere")
+    local vout = vlc.object.vout()
     if not vout then return end
     vlc.var.set(vout,"video-snapshot",nil)
 end
