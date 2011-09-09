@@ -85,37 +85,39 @@ body{
 	border: none;
 	display: inline-block;
 	cursor: pointer;
+	background-image: url("../images/buttons.png");
+	background-repeat: no-repeat;
 }
 .button{
 	cursor: pointer;
 	display: inline-block;
 }
 #buttonOpen{
-	background-image: url("../images/button_eject-48.png");
+	background-position: 0px 0px;
 }
 #buttonStop{
-	background-image: url("../images/button_stop-48.png");
+	background-position: -576px 0px;
 }
-#buttonPlay{
-	background-image: url("../images/button_play-48.png") ;
+.playing {
+	background-position: -336px 0px;
 }
-#buttonPause{
-	background-image: url("../images/button_pause-48.png") ;
+.paused {
+	background-position: -384px 0px;
 }
 #buttonPrev{
-	background-image: url("../images/button_first-48.png") ;
+	background-position: -144px 0px;
 }
 #buttonNext{
-	background-image: url("../images/button_last-48.png") ;
+	background-position: -288px 0px;
 }
 #buttonFull{
-	background-image: url("../images/button_full-48.png") ;
+	background-position: -192px 0px;
 }
 #buttonSout{
-	background-image: url("../images/button_stream-48.png") ;
+	background-position: -624px 0px;
 }
 #buttonEQ{
-	background-image: url("../images/button-equalizer-48.png") ;
+	background-position: -48px 0px;
 }
 #window_browse ol{
 	list-style-type: none;

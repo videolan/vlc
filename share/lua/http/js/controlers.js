@@ -23,13 +23,11 @@ function updateStatus(){
 				$('#buttonPlay').attr('state',$('state',data).text());
 				$('#buttonPlay').attr('mrl',$('[name="filename"]',data).text());
 				if($('state',data).text()=='playing'){
-					$('#buttonPlay').css({
-						'background-image':'url("images/button_pause-48.png")'
-					});
+					$('#buttonPlay').removeClass('paused');
+					$('#buttonPlay').addClass('playing');
 				}else{
-					$('#buttonPlay').css({
-						'background-image':'url("images/button_play-48.png")'
-					});
+					$('#buttonPlay').removeClass('playing');
+					$('#buttonPlay').addClass('paused');
 				}
 				if($('random',data).text()=='true'){
 					$('#buttonShuffle').removeClass('ui-state-default');
@@ -313,13 +311,11 @@ function updateStreams(){
 				$('#seekSlider').attr('totalLength',$('[name="Current"] instance',data).attr('length')/1000000);
 				$('#buttonPlay').attr('state',$('[name="Current"] instance',data).length>0 ? $('[name="Current"] instance',data).attr('state') : 'stopped');
 				if($('[name="Current"] instance',data).attr('state')=='playing'){
-					$('#buttonPlay').css({
-						'background-image':'url("images/button_pause-48.png'
-					});
+					$('#buttonPlay').removeClass('paused');
+					$('#buttonPlay').addClass('playing');
 				}else{
-					$('#buttonPlay').css({
-						'background-image':'url("images/button_play-48.png'
-					});
+					$('#buttonPlay').removeClass('playing');
+					$('#buttonPlay').addClass('paused');
 				}
 				setTimeout( updateStreams, 1000 );
 			}
