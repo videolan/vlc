@@ -1373,7 +1373,7 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pict )
     if( !p_block ) return NULL;
 
     unsigned int i_offset = 0;
-    if( unlikely( p_sys->i_sei_size && ( i_nal > 1 ) ) )
+    if( unlikely( p_sys->i_sei_size ) )
     {
        /* insert x264 headers SEI nal into the first picture block at the start */
        memcpy( p_block->p_buffer, p_sys->p_sei, p_sys->i_sei_size );
