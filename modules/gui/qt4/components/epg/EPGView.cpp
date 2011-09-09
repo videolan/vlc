@@ -104,7 +104,7 @@ const QDateTime& EPGView::baseTime()
     return m_baseTime;
 }
 
-bool EPGView::hasValidData()
+bool EPGView::hasValidData() const
 {
     return !epgitemsByChannel.isEmpty();
 }
