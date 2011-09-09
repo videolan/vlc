@@ -1776,8 +1776,6 @@ static int GetGlyph( filter_t *p_filter,
         FT_Done_Glyph( glyph );
         if( outline )
             FT_Done_Glyph( outline );
-        if( shadow )
-            FT_Done_Glyph( shadow );
         return VLC_EGENERIC;
     }
     FT_Glyph_Get_CBox( glyph, ft_glyph_bbox_pixels, p_glyph_bbox );
