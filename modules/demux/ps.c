@@ -218,7 +218,7 @@ static int Demux2( demux_t *p_demux, bool b_end )
     if( (i_id = ps_pkt_id( p_pkt )) >= 0xc0 )
     {
         ps_track_t *tk = &p_sys->tk[PS_ID_TO_TK(i_id)];
-        if( !ps_pkt_parse_pes( p_pkt, tk->i_skip ) )
+        if( !ps_pkt_parse_pes( p_pkt, tk->i_skip ) && p_pkt->i_pts > VLC_TS_INVALID )
         {
             if( b_end && p_pkt->i_pts > tk->i_last_pts )
             {
