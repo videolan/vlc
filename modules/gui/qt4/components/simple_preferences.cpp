@@ -547,6 +547,8 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             ui.stylesCombo->setCurrentIndex( ui.stylesCombo->findText(
                         getSettings()->value( "MainWindow/QtStyle", "" ).toString() ) );
             ui.stylesCombo->insertSeparator( 1 );
+            if ( ui.stylesCombo->currentIndex() < 0 )
+                ui.stylesCombo->setCurrentIndex( 0 ); /* default */
 
             CONNECT( ui.stylesCombo, currentIndexChanged( QString ), this, changeStyle( QString ) );
             optionWidgets.append( ui.stylesCombo );
