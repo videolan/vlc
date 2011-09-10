@@ -342,6 +342,7 @@ static void ChangeVFiltersString( struct intf_thread_t *p_intf, const char *psz_
         }
         else
         {
+            free( psz_string );
             return;
         }
     }
