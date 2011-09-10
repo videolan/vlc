@@ -53,35 +53,19 @@ GotoTimeDialog::GotoTimeDialog( intf_thread_t *_p_intf)
     buttonBox->addButton( gotoButton, QDialogButtonBox::AcceptRole );
     buttonBox->addButton( cancelButton, QDialogButtonBox::RejectRole );
 
-    QGroupBox *timeGroupBox = new QGroupBox;
-    QGridLayout *boxLayout = new QGridLayout( timeGroupBox );
-
     QLabel *timeIntro = new QLabel( qtr( "Go to time" ) + ":" );
     timeIntro->setWordWrap( true );
     timeIntro->setAlignment( Qt::AlignCenter );
 
     timeEdit = new QTimeEdit();
-    timeEdit->setDisplayFormat( "hh : mm : ss" );
+    timeEdit->setDisplayFormat( "HH'H':mm'm':ss's'" );
     timeEdit->setAlignment( Qt::AlignRight );
     timeEdit->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Minimum );
 
-    QLabel *helpFormat = new QLabel( timeEdit->displayFormat() );
-    helpFormat->setSizePolicy( QSizePolicy::Minimum, QSizePolicy::Preferred );
+    mainLayout->addWidget( timeIntro, 0, 0, 1, 1 );
+    mainLayout->addWidget( timeEdit, 0, 1, 1, 1 );
 
-    QSpacerItem *spacerBox = new QSpacerItem( 20, 10, QSizePolicy::Minimum,
-                                        QSizePolicy::Fixed );
-
-    QSpacerItem *spacerItem = new QSpacerItem( 20, 3, QSizePolicy::Minimum,
-                                        QSizePolicy::Expanding );
-
-    boxLayout->addWidget( timeIntro, 0, 0, 1, 2 );
-    boxLayout->addItem( spacerBox, 1, 0, 1, 2 );
-    boxLayout->addWidget( timeEdit, 2, 0, 1, 1 );
-    boxLayout->addWidget( helpFormat, 2, 1, 1, 1 );
-
-    mainLayout->addWidget( timeGroupBox, 0, 0, 1, 4 );
-    mainLayout->addItem( spacerItem, 1, 0 );
-    mainLayout->addWidget( buttonBox, 2, 3 );
+    mainLayout->addWidget( buttonBox, 1, 0, 1, 2 );
 
     BUTTONACT( gotoButton, close() );
     BUTTONACT( cancelButton, cancel() );
