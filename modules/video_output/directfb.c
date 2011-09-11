@@ -1,9 +1,10 @@
 /*****************************************************************************
  * directfb.c: DirectFB video output display method
  *****************************************************************************
- * Copyright (C) 2005-2009 the VideoLAN team
+ * Copyright © 2005-2009 VLC authors and VideoLAN
  *
- * Authors: Iuri Diniz <iuri@digizap.com.br>
+ * Authors: Iuri Diniz <iuridiniz@gmail.com>
+ *          Laurent Aimar <fenrir@videolan.org>
  *
  * This code is based in sdl.c and fb.c, thanks for VideoLAN team.
  *
@@ -18,8 +19,8 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ * along with this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
 /*****************************************************************************
