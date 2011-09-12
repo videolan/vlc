@@ -21,6 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#import <Cocoa/Cocoa.h>
+
 /*****************************************************************************
  * VLGetURLScriptCommand interface
  *****************************************************************************/
@@ -40,4 +42,15 @@
 
 - (BOOL)scriptFullscreenMode;
 - (void)setScriptFullscreenMode: (BOOL)mode;
+
+- (double)audioVolume;
+- (void)setAudioVolume: (double)mode;
+
+- (int)currentTime;
+- (void)setCurrentTime: (int)mode;
+
+- (int) durationOfCurrentItem;
+- (NSString*) pathOfCurrentItem;
+- (NSString*) nameOfCurrentItem;
+
 @end

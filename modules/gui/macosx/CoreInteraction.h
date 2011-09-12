@@ -41,8 +41,22 @@
 - (int)playbackRate;
 - (void)next;
 - (void)previous;
-- (void)forward;
-- (void)backward;
+- (BOOL)isPlaying;
+- (int)currentTime;
+- (void)setCurrentTime:(int)i_value;
+- (int)durationOfCurrentPlaylistItem;
+- (NSURL*)URLOfCurrentPlaylistItem;
+- (NSString*)nameOfCurrentPlaylistItem;
+- (void)forward;        //LEGACY SUPPORT
+- (void)backward;       //LEGACY SUPPORT
+- (void)forwardExtraShort;
+- (void)backwardExtraShort;
+- (void)forwardShort;
+- (void)backwardShort;
+- (void)forwardMedium;
+- (void)backwardMedium;
+- (void)forwardLong;
+- (void)backwardLong;
 
 - (void)repeatOne;
 - (void)repeatAll;
@@ -52,7 +66,9 @@
 - (void)volumeUp;
 - (void)volumeDown;
 - (void)mute;
-- (void)setVolume: (int)i_value;
+- (BOOL)isMuted;
+- (int)volume;
+- (void)setVolume:(int)i_value;
 
 - (void)setAspectRatioLocked:(BOOL)b_value;
 - (BOOL)aspectRatioIsLocked;

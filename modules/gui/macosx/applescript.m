@@ -27,6 +27,7 @@
 #include "intf.h"
 #include "applescript.h"
 #include "CoreInteraction.h"
+#include "vlc_aout_intf.h"
 
 /*****************************************************************************
  * VLGetURLScriptCommand implementation
@@ -85,7 +86,8 @@
 
 - (id)performDefaultImplementation {
     NSString *o_command = [[self commandDescription] commandName];
-
+        NSString *o_parameter = [self directParameter];
+        
     intf_thread_t * p_intf = VLCIntf;
     playlist_t * p_playlist = pl_Get( p_intf );
     if( p_playlist == NULL )
@@ -125,7 +127,67 @@
     {
         [[VLCCoreInteraction sharedInstance] volumeDown];
     }
-    return nil;
+        else if ( [o_command isEqualToString:@"stepForward"] )
+    {           
+                //default: forwardShort
+                if (o_parameter) 
+                {
+                        int i_parameter = [o_parameter intValue];
+                        switch (i_parameter) 
+                        {
+                                case 1:
+                                        [[VLCCoreInteraction sharedInstance] forwardExtraShort];
+                                        break;
+                                case 2:
+                                        [[VLCCoreInteraction sharedInstance] forwardShort];
+                                        break;
+                                case 3:
+                                        [[VLCCoreInteraction sharedInstance] forwardMedium];
+                                        break;
+                                case 4:
+                                        [[VLCCoreInteraction sharedInstance] forwardLong];
+                                        break;
+                                default:
+                                        [[VLCCoreInteraction sharedInstance] forwardShort];
+                                        break;
+                        }
+                }
+                else 
+                {
+                        [[VLCCoreInteraction sharedInstance] forwardShort];
+                }
+    }
+        else if ( [o_command isEqualToString:@"stepBackward"] )
+    {
+                //default: backwardShort
+                if (o_parameter) 
+                {
+                        int i_parameter = [o_parameter intValue];
+                        switch (i_parameter) 
+                        {
+                                case 1:
+                                        [[VLCCoreInteraction sharedInstance] backwardExtraShort];
+                                        break;
+                                case 2:
+                                        [[VLCCoreInteraction sharedInstance] backwardShort];
+                                        break;
+                                case 3:
+                                        [[VLCCoreInteraction sharedInstance] backwardMedium];
+                                        break;
+                                case 4:
+                                        [[VLCCoreInteraction sharedInstance] backwardLong];
+                                        break;
+                                default:
+                                        [[VLCCoreInteraction sharedInstance] backwardShort];
+                                        break;
+                        }
+                }
+                else 
+                {
+                        [[VLCCoreInteraction sharedInstance] backwardShort];
+                }
+    }
+   return nil;
 }
 
 @end
@@ -154,6 +216,61 @@
     }
     vlc_object_release( p_vout );
     [[VLCCoreInteraction sharedInstance] toggleFullscreen];
+}
+
+- (BOOL) muted {
+        return [[VLCCoreInteraction sharedInstance] isMuted];
+}
+
+- (BOOL) playing {
+        return [[VLCCoreInteraction sharedInstance] isPlaying];
+}
+
+- (double) audioVolume {
+        return ( (double)[[VLCCoreInteraction sharedInstance] volume] / (double)AOUT_VOLUME_DEFAULT );
+}
+
+- (void) setAudioVolume: (double) d_audioVolume {
+        //1 = 100%, 4 = 400%; 0 <= d_audioVolume  <= 4 
+        //0-1024 (but AOUT_VOLUME_MAX == 512)???
+        //AOUT_VOLUME_DEFAULT = 256 = 100%
+        //somehow [[VLCCoreInteraction sharedInstance] setVolume:i_parameter] has 0-32 steps with 32 as stepWidth (0 - 1024)
+        if (d_audioVolume < 0)
+                d_audioVolume = 0;
+        
+        if (d_audioVolume > 4)
+                d_audioVolume = 4;
+        
+        intf_thread_t * p_intf = VLCIntf;
+        playlist_t * p_playlist = pl_Get( VLCIntf );
+        int i_volume_step = config_GetInt( VLCIntf->p_libvlc, "volume-step" );
+
+        int i_parameter = (int) ( d_audioVolume * i_volume_step / 4 );
+        [[VLCCoreInteraction sharedInstance] setVolume:i_parameter];
+}
+
+- (int) currentTime {
+        return [[VLCCoreInteraction sharedInstance] currentTime];
+}
+
+- (void) setCurrentTime: (int) i_currentTime {
+        if (i_currentTime) {
+                [[VLCCoreInteraction sharedInstance] setCurrentTime:i_currentTime];
+        }
+}
+
+#pragma mark -
+//TODO:whenever VLC should implement NSDocument, the methods below should move or be additionaly implemented in the NSDocument category
+- (int) durationOfCurrentItem {
+        return [[VLCCoreInteraction sharedInstance] durationOfCurrentPlaylistItem];
+}
+
+- (NSString*) pathOfCurrentItem {
+        return [[[VLCCoreInteraction sharedInstance] URLOfCurrentPlaylistItem] path];
+}
+
+- (NSString*) nameOfCurrentItem {
+        return [[VLCCoreInteraction sharedInstance] nameOfCurrentPlaylistItem];
 }
 
 @end
