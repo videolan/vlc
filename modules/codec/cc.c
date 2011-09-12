@@ -750,6 +750,9 @@ static bool Eia608ParsePac( eia608_t *h, uint8_t d1, uint8_t d2 )
     else if( d2 >= 0x40 )
         d2 -= 0x40;
     h->cursor.i_column = pac2_attribs[d2].i_column;
+    h->color = pac2_attribs[d2].i_color;
+    h->font  = pac2_attribs[d2].i_font;
+
     return false;
 }
 
