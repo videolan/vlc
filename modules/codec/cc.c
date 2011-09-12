@@ -822,7 +822,7 @@ static void Eia608TextUtf8( char *psz_utf8, uint8_t c ) // Returns number of byt
         E2( 0x86, 0xc2,0xa3), // Pounds sterling
         E3( 0x87, 0xe2,0x99,0xaa), // Music note
         E2( 0x88, 0xc3,0xa0), // lowercase a, grave accent
-        E1( 0x89, 0x20), // transparent space, we make it regular
+        E2( 0x89, 0xc2,0xa0), // transparent space
         E2( 0x8a, 0xc3,0xa8), // lowercase e, grave accent
         E2( 0x8b, 0xc3,0xa2), // lowercase a, circumflex accent
         E2( 0x8c, 0xc3,0xaa), // lowercase e, circumflex accent
