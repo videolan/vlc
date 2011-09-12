@@ -1103,10 +1103,10 @@ static void ffmpeg_ReleaseFrameBuf( struct AVCodecContext *p_context,
 }
 
 #ifdef HAVE_AVCODEC_VA
-static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *p_codec,
+static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *p_context,
                                           const enum PixelFormat *pi_fmt )
 {
-    decoder_t *p_dec = p_codec->opaque;
+    decoder_t *p_dec = p_context->opaque;
     decoder_sys_t *p_sys = p_dec->p_sys;
 
     if( p_sys->p_va )
@@ -1189,7 +1189,7 @@ static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *p_codec,
     }
 
     /* Fallback to default behaviour */
-    return avcodec_default_get_format( p_codec, pi_fmt );
+    return avcodec_default_get_format( p_context, pi_fmt );
 }
 #endif
 
