@@ -324,8 +324,8 @@ static int DecodeScroll( decoder_sys_t *p_cdg, const uint8_t *p_data, int b_copy
 
             if( b_copy )
             {
-                dy %= CDG_SCREEN_HEIGHT;
-                dx %= CDG_SCREEN_WIDTH;
+                dy = (dy + CDG_SCREEN_HEIGHT) % CDG_SCREEN_HEIGHT;
+                dx = (dx + CDG_SCREEN_WIDTH ) % CDG_SCREEN_WIDTH;
             }
             else
             {
