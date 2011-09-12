@@ -471,7 +471,7 @@ libvlc_media_player_new( libvlc_instance_t *instance )
     var_SetAddress (mp, "find-input-callback", find_input);
     var_Create (mp, "amem-data", VLC_VAR_ADDRESS);
     var_Create (mp, "amem-setup", VLC_VAR_ADDRESS);
-    var_Create (mp, "amem-close", VLC_VAR_ADDRESS);
+    var_Create (mp, "amem-cleanup", VLC_VAR_ADDRESS);
     var_Create (mp, "amem-play", VLC_VAR_ADDRESS);
     var_Create (mp, "amem-pause", VLC_VAR_ADDRESS);
     var_Create (mp, "amem-resume", VLC_VAR_ADDRESS);
