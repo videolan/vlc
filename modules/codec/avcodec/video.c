@@ -1159,14 +1159,14 @@ static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *p_context,
 #endif
 
         if( p_sys->p_va &&
-            p_sys->p_context->width > 0 && p_sys->p_context->height > 0 )
+            p_context->width > 0 && p_context->height > 0 )
         {
             /* We try to call vlc_va_Setup when possible to detect errors when
              * possible (later is too late) */
             if( vlc_va_Setup( p_sys->p_va,
-                              &p_sys->p_context->hwaccel_context,
+                              &p_context->hwaccel_context,
                               &p_dec->fmt_out.video.i_chroma,
-                              p_sys->p_context->width, p_sys->p_context->height ) )
+                              p_context->width, p_context->height ) )
             {
                 msg_Err( p_dec, "vlc_va_Setup failed" );
                 vlc_va_Delete( p_sys->p_va );
@@ -1183,7 +1183,7 @@ static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *p_context,
              * even if a new pixel format is renegociated
              */
             p_sys->b_direct_rendering = false;
-            p_sys->p_context->draw_horiz_band = NULL;
+            p_context->draw_horiz_band = NULL;
             return pi_fmt[i];
         }
     }
