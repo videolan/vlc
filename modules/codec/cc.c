@@ -838,7 +838,7 @@ static void Eia608TextUtf8( char *psz_utf8, uint8_t c ) // Returns number of byt
         E2( 0x94, 0xc3,0x9c), // capital letter U with diaresis
         E2( 0x95, 0xc3,0xbc), // lowercase letter U with diaeresis
         E1( 0x96, 0x27), // apostrophe
-        E2( 0x97, 0xc1,0xa1), // inverted exclamation mark
+        E2( 0x97, 0xc2,0xa1), // inverted exclamation mark
         E1( 0x98, 0x2a), // asterisk
         E1( 0x99, 0x27), // apostrophe (yes, duped). See CCADI source code.
         E1( 0x9a, 0x2d), // hyphen-minus
