@@ -974,7 +974,7 @@ static void Eia608TextLine( struct eia608_screen *screen, char *psz_text, int i_
 
             /* Be sure to create valid html */
             b_close_italics |= b_last_italics && b_close_color;
-            b_close_underline = b_last_underline && ( b_close_italics || b_close_color );
+            b_close_underline |= b_last_underline && ( b_close_italics || b_close_color );
 
             if( b_close_underline )
                 CAT( "</u>" );
