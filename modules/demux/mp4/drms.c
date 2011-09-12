@@ -1566,7 +1566,7 @@ static int GetSCIData( char *psz_ipod, uint32_t **pp_sci,
 #ifdef WIN32
         const char *SCIfile =
         "\\Apple Computer\\iTunes\\SC Info\\SC Info.sidb";
-        strncpy(p_tmp, config_GetConfDir(), sizeof(p_tmp -1));
+        strncpy( p_tmp, config_GetConfDir(), sizeof(p_tmp) - 1 );
         if( strlen( p_tmp ) + strlen( SCIfile ) >= PATH_MAX )
             return -1;
         strcat(p_tmp, SCIfile);
