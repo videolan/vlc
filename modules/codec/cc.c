@@ -845,8 +845,8 @@ static void Eia608TextUtf8( char *psz_utf8, uint8_t c ) // Returns number of byt
         E2( 0x9b, 0xc2,0xa9), // copyright sign
         E3( 0x9c, 0xe2,0x84,0xa0), // Service mark
         E1( 0x9d, 0x2e), // Full stop (.)
-        E1( 0x9e, 0x22), // Quoatation mark
-        E1( 0x9f, 0x22), // Quoatation mark
+        E3( 0x9e, 0xe2,0x80,0x9c), // Quotation mark
+        E3( 0x9f, 0xe2,0x80,0x9d), // Quotation mark
         E2( 0xa0, 0xc3,0x80), // uppercase A, grave accent
         E2( 0xa1, 0xc3,0x82), // uppercase A, circumflex
         E2( 0xa2, 0xc3,0x87), // uppercase C with cedilla
