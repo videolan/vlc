@@ -77,7 +77,7 @@ div.helper hr {
 div.title {
 	width: 100%/*576px*/; /* see overflow:hidden several lines 
                                 * before for explanation */
-	background: #000 url('images/vlc16x16.png') no-repeat top left;
+	background: #000 url('/images/vlc16x16.png') no-repeat top left;
 	padding-left: 24px;
 	color: #fff;
 	font-weight: bold;
@@ -166,7 +166,7 @@ div#browser {
 div#mosaic_list {
 	width: 50%;
 	left: 25%;
-	background: url('images/white.png') repeat;
+	background: url('/old/images/white.png') repeat;
 	display: none;
 }
 
@@ -231,7 +231,7 @@ div.menu {
 	border: 1px solid #ccc;
 	padding: 5px;
 	margin-top: -5px;
-	background: url('images/white.png') repeat;
+	background: url('/old/images/white.png') repeat;
 	z-index: 2;
 	display: none;
 }

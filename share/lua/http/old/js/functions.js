@@ -188,13 +188,13 @@ function toggle_show_node( id )
     if( element.style.display == 'block' || element.style.display == '' )
     {
         element.style.display = 'none';
-        img.setAttribute( 'src', 'images/plus.png' );
+        img.setAttribute( 'src', '/old/images/plus.png' );
         img.setAttribute( 'alt', '[+]' );
     }
     else
     {
         element.style.display = 'block';
-        img.setAttribute( 'src', 'images/minus.png' );
+        img.setAttribute( 'src', '/old/images/minus.png' );
         img.setAttribute( 'alt', '[-]' );
     }
 }
@@ -533,13 +533,13 @@ function parse_status()
             var statustag = status.getElementsByTagName( 'state' );
             if( statustag.length > 0 ? statustag[0].firstChild.data == "playing" : 0 )
             {
-                document.getElementById( 'btn_pause_img' ).setAttribute( 'src', 'images/pause.png' );
+                document.getElementById( 'btn_pause_img' ).setAttribute( 'src', '/old/images/pause.png' );
                 document.getElementById( 'btn_pause_img' ).setAttribute( 'alt', 'Pause' );
                 document.getElementById( 'btn_pause' ).setAttribute( 'title', 'Pause' );
             }
             else
             {
-                document.getElementById( 'btn_pause_img' ).setAttribute( 'src', 'images/play.png' );
+                document.getElementById( 'btn_pause_img' ).setAttribute( 'src', '/old/images/play.png' );
                 document.getElementById( 'btn_pause_img' ).setAttribute( 'alt', 'Play' );
                 document.getElementById( 'btn_pause' ).setAttribute( 'title', 'Play' );
             }
@@ -623,7 +623,7 @@ function parse_playlist()
                     var nda = document.createElement( 'a' );
                     nda.setAttribute( 'href', 'javascript:toggle_show_node(\''+elt.getAttribute( 'id' )+'\');' );
                     var ndai = document.createElement( 'img' );
-                    ndai.setAttribute( 'src', 'images/minus.png' );
+                    ndai.setAttribute( 'src', '/old/images/minus.png' );
                     ndai.setAttribute( 'alt', '[-]' );
                     ndai.setAttribute( 'id', 'pl_img_'+elt.getAttribute( 'id' ) );
                     nda.appendChild( ndai );
@@ -636,7 +636,7 @@ function parse_playlist()
                         var del = document.createElement( "a" );
                         del.setAttribute( 'href', 'javascript:pl_delete('+elt.getAttribute( 'id' )+')' );
                             var delimg = document.createElement( "img" );
-                            delimg.setAttribute( 'src', 'images/delete_small.png' );
+                            delimg.setAttribute( 'src', '/old/images/delete_small.png' );
                             delimg.setAttribute( 'alt', '(delete)' );
                         del.appendChild( delimg );
                         pos.appendChild( del );
@@ -677,7 +677,7 @@ function parse_playlist()
                         var del = document.createElement( "a" );
                         del.setAttribute( 'href', 'javascript:pl_delete('+elt.getAttribute( 'id' )+')' );
                             var delimg = document.createElement( "img" );
-                            delimg.setAttribute( 'src', 'images/delete_small.png' );
+                            delimg.setAttribute( 'src', '/old/images/delete_small.png' );
                             delimg.setAttribute( 'alt', '(delete)' );
                         del.appendChild( delimg );
                         pos.appendChild( del );
@@ -1123,7 +1123,7 @@ function refresh_input_options_list()
         var od = document.createElement( 'a' );
         od.setAttribute( 'href', 'javascript:delete_input_option('+i+');' );
         var delimg = document.createElement( "img" );
-        delimg.setAttribute( 'src', 'images/delete_small.png' );
+        delimg.setAttribute( 'src', '/old/images/delete_small.png' );
         delimg.setAttribute( 'alt', '(delete)' );
         od.appendChild( delimg );
         o.appendChild( od );

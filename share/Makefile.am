@@ -262,60 +262,60 @@ DIST_http_lua = \
 	lua/http/dialogs/stream_window.html \
 	lua/http/dialogs/offset_window.html \
 	lua/http/dialogs/stream_config_window.html \
-	lua/http/dialogs/browse \
-	lua/http/dialogs/footer \
-	lua/http/dialogs/input \
-	lua/http/dialogs/main \
-	lua/http/dialogs/playlist \
-	lua/http/dialogs/sout \
-	lua/http/dialogs/vlm \
+	lua/http/dialogs/old/browse \
+	lua/http/dialogs/old/footer \
+	lua/http/dialogs/old/input \
+	lua/http/dialogs/old/main \
+	lua/http/dialogs/old/playlist \
+	lua/http/dialogs/old/sout \
+	lua/http/dialogs/old/vlm \
 	lua/http/custom.lua \
 	lua/http/vlm.html \
-	lua/http/images/loop.png \
+	lua/http/old/images/loop.png \
 	lua/http/images/buttons.png \
 	lua/http/images/speaker-32.png \
-	lua/http/images/fullscreen.png \
+	lua/http/old/images/fullscreen.png \
 	lua/http/images/vlc-48.png \
-	lua/http/images/prev.png \
-	lua/http/images/play.png \
+	lua/http/old/images/prev.png \
+	lua/http/old/images/play.png \
 	lua/http/images/Audio-48.png \
-	lua/http/images/empty.png \
-	lua/http/images/minus.png \
-	lua/http/images/slider_right.png \
-	lua/http/images/slider_point.png \
-	lua/http/images/pause.png \
-	lua/http/images/speaker_mute.png \
-	lua/http/images/delete_small.png \
-	lua/http/images/snapshot.png \
+	lua/http/old/images/empty.png \
+	lua/http/old/images/minus.png \
+	lua/http/old/images/slider_right.png \
+	lua/http/old/images/slider_point.png \
+	lua/http/old/images/pause.png \
+	lua/http/old/images/speaker_mute.png \
+	lua/http/old/images/delete_small.png \
+	lua/http/old/images/snapshot.png \
 	lua/http/images/Folder-48.png \
-	lua/http/images/info.png \
-	lua/http/images/refresh.png \
-	lua/http/images/sout.png \
-	lua/http/images/sort.png \
-	lua/http/images/white_cross_small.png \
-	lua/http/images/shuffle.png \
+	lua/http/old/images/info.png \
+	lua/http/old/images/refresh.png \
+	lua/http/old/images/sout.png \
+	lua/http/old/images/sort.png \
+	lua/http/old/images/white_cross_small.png \
+	lua/http/old/images/shuffle.png \
 	lua/http/images/Other-48.png \
-	lua/http/images/repeat.png \
-	lua/http/images/slow.png \
-	lua/http/images/slider_left.png \
-	lua/http/images/help.png \
-	lua/http/images/stop.png \
-	lua/http/images/sd.png \
-	lua/http/images/speaker.png \
-	lua/http/images/delete.png \
+	lua/http/old/images/repeat.png \
+	lua/http/old/images/slow.png \
+	lua/http/old/images/slider_left.png \
+	lua/http/old/images/help.png \
+	lua/http/old/images/stop.png \
+	lua/http/old/images/sd.png \
+	lua/http/old/images/speaker.png \
+	lua/http/old/images/delete.png \
 	lua/http/images/Back-48.png \
 	lua/http/images/Video-48.png \
-	lua/http/images/playlist_small.png \
-	lua/http/images/eject.png \
-	lua/http/images/playlist.png \
-	lua/http/images/volume_up.png \
-	lua/http/images/next.png \
-	lua/http/images/volume_down.png \
-	lua/http/images/slider_bar.png \
+	lua/http/old/images/playlist_small.png \
+	lua/http/old/images/eject.png \
+	lua/http/old/images/playlist.png \
+	lua/http/old/images/volume_up.png \
+	lua/http/old/images/next.png \
+	lua/http/old/images/volume_down.png \
+	lua/http/old/images/slider_bar.png \
 	lua/http/images/vlc16x16.png \
-	lua/http/images/plus.png \
-	lua/http/images/white.png \
-	lua/http/images/reset.png \
+	lua/http/old/images/plus.png \
+	lua/http/old/images/white.png \
+	lua/http/old/images/reset.png \
 	lua/http/mobile_equalizer.html \
 	lua/http/vlm_export.html \
 	lua/http/mobile_browse.html \
@@ -348,14 +348,14 @@ DIST_http_lua = \
 	lua/http/css/ui-lightness/images/ui-bg_glass_100_fdf5ce_1x400.png \
 	lua/http/css/main.css \
 	lua/http/js/jquery-1.5.1.min.js \
-	lua/http/js/functions.js \
-	lua/http/js/vlm.js \
+	lua/http/old/js/functions.js \
+	lua/http/old/js/vlm.js \
 	lua/http/js/ui.js \
 	lua/http/js/common.js \
 	lua/http/js/jquery.jstree.js \
 	lua/http/js/controlers.js \
 	lua/http/js/jquery-ui-1.8.13.custom.min.js \
-	lua/http/style.css
+	lua/http/old/style.css
 
 DIST_maemo = \
 	maemo/vlc_intf.rc \
