@@ -93,6 +93,7 @@ LIBMATROSKA_VERSION=1.2.0
 LIBMATROSKA_URL=http://dl.matroska.org/downloads/libmatroska/libmatroska-$(LIBMATROSKA_VERSION).tar.bz2
 #IBMATROSKA_URL=$(CONTRIB_VIDEOLAN)/libmatroska-$(LIBMATROSKA_VERSION).tar.bz2
 FFMPEG_GIT=git://git.videolan.org/ffmpeg.git
+#FFMPEG_GIT=git://git.libav.org/libav.git
 LIBDVDCSS_VERSION=1.2.10
 LIBDVDCSS_URL=$(VIDEOLAN)/libdvdcss/$(LIBDVDCSS_VERSION)/libdvdcss-$(LIBDVDCSS_VERSION).tar.bz2
 LIBDVDNAV_VERSION=4.1.1
