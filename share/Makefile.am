@@ -262,6 +262,13 @@ DIST_http_lua = \
 	lua/http/dialogs/stream_window.html \
 	lua/http/dialogs/offset_window.html \
 	lua/http/dialogs/stream_config_window.html \
+	lua/http/dialogs/browse \
+	lua/http/dialogs/footer \
+	lua/http/dialogs/input \
+	lua/http/dialogs/main \
+	lua/http/dialogs/playlist \
+	lua/http/dialogs/sout \
+	lua/http/dialogs/vlm \
 	lua/http/custom.lua \
 	lua/http/flash.html \
 	lua/http/vlm.html \
