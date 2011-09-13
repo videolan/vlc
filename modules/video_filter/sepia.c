@@ -47,7 +47,6 @@ static void RVSepia( picture_t *, picture_t *, int );
 static void PlanarI420Sepia( picture_t *, picture_t *, int);
 static void PackedYUVSepia( picture_t *, picture_t *, int);
 static picture_t *Filter( filter_t *, picture_t * );
-inline void Sepia8ySSE2( uint8_t *, const uint8_t *, int );
 static const char *const ppsz_filter_options[] = {
     "intensity", NULL
 };
@@ -198,6 +197,37 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 
     return CopyInfoAndRelease( p_outpic, p_pic );
 }
+
+#if defined(CAN_COMPILE_SSE2)
+/*****************************************************************************
+ * Sepia8ySSE2
+ *****************************************************************************
+ * This function applies sepia effect to eight bytes of yellow using SSE4.1
+ * instructions. It copies those 8 bytes to 128b register and fills the gaps
+ * with zeroes and following operations are made with word-operating instructs.
+ *****************************************************************************/
+static inline void Sepia8ySSE2(uint8_t * dst, const uint8_t * src,
+                         int i_intensity_spread)
+{
+    __asm__ volatile (
+        // y = y - y / 4 + i_intensity / 4
+        "movq            (%1), %%xmm1\n"
+        "punpcklbw     %%xmm7, %%xmm1\n"
+        "movq            (%1), %%xmm2\n" // store bytes as words with 0s in between
+        "punpcklbw     %%xmm7, %%xmm2\n"
+        "movd              %2, %%xmm3\n"
+        "pshufd    $0, %%xmm3, %%xmm3\n"
+        "psrlw             $2, %%xmm2\n"    // rotate right 2
+        "psubusb       %%xmm1, %%xmm2\n"    // subtract
+        "psrlw             $2, %%xmm3\n"
+        "paddsb        %%xmm1, %%xmm3\n"    // add
+        "packuswb      %%xmm2, %%xmm1\n"    // pack back to bytes
+        "movq          %%xmm1, (%0)  \n"    // load to dest
+        :
+        :"r" (dst), "r"(src), "r"(i_intensity_spread)
+        :"memory");
+}
+#endif
 
 /*****************************************************************************
  * PlanarI420Sepia: Applies sepia to one frame of the planar I420 video
@@ -456,37 +486,6 @@ static void RVSepia( picture_t *p_pic, picture_t *p_outpic, int i_intensity )
 #undef SCALEBITS
 #undef ONE_HALF
 #undef FIX
-}
-
-/*****************************************************************************
- * Sepia8ySSE2
- *****************************************************************************
- * This function applies sepia effect to eight bytes of yellow using SSE4.1
- * instructions. It copies those 8 bytes to 128b register and fills the gaps
- * with zeroes and following operations are made with word-operating instructs.
- *****************************************************************************/
-inline void Sepia8ySSE2(uint8_t * dst, const uint8_t * src,
-                         int i_intensity_spread)
-{
-#if defined(CAN_COMPILE_SSE2)
-    __asm__ volatile (
-        // y = y - y / 4 + i_intensity / 4
-        "movq            (%1), %%xmm1\n"
-        "punpcklbw     %%xmm7, %%xmm1\n"
-        "movq            (%1), %%xmm2\n" // store bytes as words with 0s in between
-        "punpcklbw     %%xmm7, %%xmm2\n"
-        "movd              %2, %%xmm3\n"
-        "pshufd    $0, %%xmm3, %%xmm3\n"
-        "psrlw             $2, %%xmm2\n"    // rotate right 2
-        "psubusb       %%xmm1, %%xmm2\n"    // subtract
-        "psrlw             $2, %%xmm3\n"
-        "paddsb        %%xmm1, %%xmm3\n"    // add
-        "packuswb      %%xmm2, %%xmm1\n"    // pack back to bytes
-        "movq          %%xmm1, (%0)  \n"    // load to dest
-        :
-        :"r" (dst), "r"(src), "r"(i_intensity_spread)
-        :"memory");
-#endif
 }
 
 static int FilterCallback ( vlc_object_t *p_this, char const *psz_var,
