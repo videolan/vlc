@@ -29,7 +29,11 @@
 enum
 {
     STATE_NOSYNC,
-    STATE_NEXT_SYNC
+    STATE_SYNC,
+    STATE_HEADER,
+    STATE_NEXT_SYNC,
+    STATE_GET_DATA,
+    STATE_SEND_DATA
 };
 
 typedef void (*packetizer_reset_t)( void *p_private, bool b_broken );

@@ -40,6 +40,8 @@
 
 #include <vlc_block_helper.h>
 
+#include "../packetizer/packetizer_helper.h"
+
 /*****************************************************************************
  * decoder_sys_t : decoder descriptor
  *****************************************************************************/
@@ -69,16 +71,6 @@ struct decoder_sys_t
     unsigned int i_layer, i_bit_rate;
 
     bool   b_discontinuity;
-};
-
-enum {
-
-    STATE_NOSYNC,
-    STATE_SYNC,
-    STATE_HEADER,
-    STATE_NEXT_SYNC,
-    STATE_GET_DATA,
-    STATE_SEND_DATA
 };
 
 /* This isn't the place to put mad-specific stuff. However, it makes the

@@ -39,6 +39,8 @@
 
 #include "a52.h"
 
+#include "../packetizer/packetizer_helper.h"
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -83,16 +85,6 @@ struct decoder_sys_t
     mtime_t i_pts;
 
     vlc_a52_header_t frame;
-};
-
-enum {
-
-    STATE_NOSYNC,
-    STATE_SYNC,
-    STATE_HEADER,
-    STATE_NEXT_SYNC,
-    STATE_GET_DATA,
-    STATE_SEND_DATA
 };
 
 /****************************************************************************

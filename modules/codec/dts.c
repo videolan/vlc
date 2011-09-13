@@ -40,6 +40,8 @@
 #include <vlc_modules.h>
 #include <vlc_cpu.h>
 
+#include "../packetizer/packetizer_helper.h"
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -87,16 +89,6 @@ struct decoder_sys_t
     unsigned int i_rate;
     unsigned int i_channels;
     unsigned int i_channels_conf;
-};
-
-enum {
-
-    STATE_NOSYNC,
-    STATE_SYNC,
-    STATE_HEADER,
-    STATE_NEXT_SYNC,
-    STATE_GET_DATA,
-    STATE_SEND_DATA
 };
 
 #define DTS_HEADER_SIZE 14

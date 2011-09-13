@@ -38,6 +38,7 @@
 #include <vlc_bits.h>
 
 #include <vlc_block_helper.h>
+#include "packetizer_helper.h"
 
 #include <assert.h>
 
@@ -138,15 +139,6 @@ struct decoder_sys_t
     /* LOAS */
     bool b_latm_cfg;
     latm_mux_t latm;
-};
-
-enum {
-    STATE_NOSYNC,
-    STATE_SYNC,
-    STATE_HEADER,
-    STATE_NEXT_SYNC,
-    STATE_GET_DATA,
-    STATE_SEND_DATA
 };
 
 enum {

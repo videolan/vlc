@@ -36,6 +36,7 @@
 
 #include <vlc_block_helper.h>
 #include <vlc_bits.h>
+#include "packetizer_helper.h"
 
 /*****************************************************************************
  * Module descriptor
@@ -87,16 +88,6 @@ struct decoder_sys_t
     int i_frame_length;
     size_t i_frame_size;
     unsigned int i_rate, i_channels, i_bits_per_sample;
-};
-
-enum
-{
-    STATE_NOSYNC,
-    STATE_SYNC,
-    STATE_HEADER,
-    STATE_NEXT_SYNC,
-    STATE_GET_DATA,
-    STATE_SEND_DATA
 };
 
 /*****************************************************************************
