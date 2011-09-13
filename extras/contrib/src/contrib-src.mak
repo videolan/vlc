@@ -1079,10 +1079,10 @@ FFMPEGCONF += --enable-pthreads
 FFMPEG_CFLAGS += --std=gnu99
 endif
 
-PHONY += ffmpeg-svn ffmpeg-tar
+ifdef GIT
 
-ffmpeg/.svn:
-	$(SVN) co $(FFMPEG_SVN) ffmpeg
+ffmpeg:
+	$(GIT) clone $(FFMPEG_GIT)
 ifdef HAVE_ISA_THUMB
 	patch -p0 < Patches/ffmpeg-avcodec-no-thumb.patch
 endif
@@ -1100,14 +1100,13 @@ endif
 	(cd ffmpeg; patch -p1 < ../Patches/libavformat-ape.c.patch )
 	touch $@
 
-ffmpeg-$(FFMPEG_VERSION).tar.gz:
-	echo "ffmpeg snapshot is too old, you MUST use subversion !"
-	exit -1
-	$(WGET) $(FFMPEG_URL)
+else
 
-ffmpeg/.untar: ffmpeg-$(FFMPEG_VERSION).tar.gz
-	$(EXTRACT_GZ)
-	touch $@
+ffmpeg:
+	echo "ffmpeg snapshot is too old, you MUST use git !"
+	exit 1
+
+endif
 
 ifeq ($(ARCH),armel)
 HAVE_ARMELF=1
@@ -1124,26 +1123,19 @@ FFMPEG_DEPS-$(HAVE_WIN32)  += .dshow_headers
 FFMPEG_DEPS-$(HAVE_ANDROID) =
 FFMPEG_DEPS-$(HAVE_SYMBIAN) =
 
-ifdef SVN
-FFMPEG_MK_TARGET = ffmpeg/.svn
-else
-FFMPEG_MK_TARGET = ffmpeg/.untar
-endif
-
-.ffmpeg: $(FFMPEG_MK_TARGET) $(FFMPEG_DEPS-1)
+.ffmpeg: ffmpeg $(FFMPEG_DEPS-1)
 	(cd ffmpeg; $(HOSTCC) ./configure --prefix=$(PREFIX) --extra-cflags="$(FFMPEG_CFLAGS) -DHAVE_STDINT_H" --extra-ldflags="$(LDFLAGS)" $(FFMPEGCONF) --disable-shared --enable-static && make && make install-libs install-headers)
 	touch $@
 
-ifdef SVN
+ifdef GIT
 ffmpeg-source: ffmpeg
-	tar cv --exclude=.svn ffmpeg | bzip2 > ffmpeg-$(DATE).tar.bz2
+	tar cv --exclude=.git ffmpeg | bzip2 > ffmpeg-$(DATE).tar.bz2
 
 SOURCE += ffmpeg-source
 endif
 
 CLEAN_FILE += .ffmpeg
 CLEAN_PKG += ffmpeg
-DISTCLEAN_PKG += ffmpeg-$(FFMPEG_VERSION).tar.gz
 
 # ***************************************************************************
 # libdvdcss
