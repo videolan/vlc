@@ -634,25 +634,32 @@ QMenu *QVLCMenu::VideoMenu( intf_thread_t *p_intf, QMenu *current, bool b_subtit
             SubtitleMenu( current );
 
         current->addSeparator();
-
+        /* Surface modifiers */
         addActionWithCheckbox( current, "fullscreen", qtr( "&Fullscreen" ) );
         addActionWithCheckbox( current, "autoscale", qtr( "Always Fit &Window" ) );
         addActionWithCheckbox( current, "video-on-top", qtr( "Always &on Top" ) );
 #ifdef WIN32
         addActionWithCheckbox( current, "direct3d-desktop", qtr( "Display on &Desktop" ) );
 #endif
-        addAction( current, "video-snapshot", qtr( "Take &Snapshot" ) );
+
 #ifdef WIN32
         addActionWithCheckbox( current, "video-wallpaper", qtr( "Set as Wall&paper" ) );
 #endif
         current->addSeparator();
-
+        /* Size modifiers */
         addActionWithSubmenu( current, "zoom", qtr( "&Zoom" ) );
         addActionWithSubmenu( current, "aspect-ratio", qtr( "&Aspect Ratio" ) );
         addActionWithSubmenu( current, "crop", qtr( "&Crop" ) );
+
+        current->addSeparator();
+        /* Rendering modifiers */
         addActionWithSubmenu( current, "deinterlace", qtr( "&Deinterlace" ) );
         addActionWithSubmenu( current, "deinterlace-mode", qtr( "&Deinterlace mode" ) );
         addActionWithSubmenu( current, "postprocess", qtr( "&Post processing" ) );
+
+        current->addSeparator();
+        /* Other actions */
+        addAction( current, "video-snapshot", qtr( "Take &Snapshot" ) );
     }
 
     p_input = THEMIM->getInput();
