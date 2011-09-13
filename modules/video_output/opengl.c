@@ -628,13 +628,13 @@ int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
 
             glr->texture = 0;
             for (int j = 0; j < last_count; j++) {
-                if (last[i].texture &&
-                    last[i].width  == glr->width &&
-                    last[i].height == glr->height &&
-                    last[i].format == glr->format &&
-                    last[i].type   == glr->type) {
-                    glr->texture = last[i].texture;
-                    memset(&last[i], 0, sizeof(last[i]));
+                if (last[j].texture &&
+                    last[j].width  == glr->width &&
+                    last[j].height == glr->height &&
+                    last[j].format == glr->format &&
+                    last[j].type   == glr->type) {
+                    glr->texture = last[j].texture;
+                    memset(&last[j], 0, sizeof(last[j]));
                     break;
                 }
             }
