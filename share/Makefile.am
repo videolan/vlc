@@ -319,7 +319,6 @@ DIST_http_lua = \
 	lua/http/mobile_equalizer.html \
 	lua/http/vlm_export.html \
 	lua/http/mobile_browse.html \
-	lua/http/mosaic.html \
 	lua/http/favicon.ico \
 	lua/http/mobile_view.html \
 	lua/http/.hosts \
@@ -356,7 +355,6 @@ DIST_http_lua = \
 	lua/http/js/jquery.jstree.js \
 	lua/http/js/controlers.js \
 	lua/http/js/jquery-ui-1.8.13.custom.min.js \
-	lua/http/js/mosaic.js \
 	lua/http/style.css
 
 DIST_maemo = \
