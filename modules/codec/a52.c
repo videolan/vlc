@@ -316,8 +316,6 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             return p_out_buffer;
         }
     }
-
-    return NULL;
 }
 
 /*****************************************************************************
@@ -384,14 +382,14 @@ static uint8_t *GetOutBuffer( decoder_t *p_dec, block_t **pp_out_buffer )
 static aout_buffer_t *GetAoutBuffer( decoder_t *p_dec )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    aout_buffer_t *p_buf;
 
-    p_buf = decoder_NewAudioBuffer( p_dec, p_sys->frame.i_samples );
-    if( p_buf == NULL ) return NULL;
-
-    p_buf->i_pts = date_Get( &p_sys->end_date );
-    p_buf->i_length = date_Increment( &p_sys->end_date,
-                                      p_sys->frame.i_samples ) - p_buf->i_pts;
+    aout_buffer_t *p_buf = decoder_NewAudioBuffer( p_dec, p_sys->frame.i_samples );
+    if( p_buf )
+    {
+        p_buf->i_pts = date_Get( &p_sys->end_date );
+        p_buf->i_length = date_Increment( &p_sys->end_date,
+                                          p_sys->frame.i_samples ) - p_buf->i_pts;
+    }
 
     return p_buf;
 }
@@ -402,15 +400,14 @@ static aout_buffer_t *GetAoutBuffer( decoder_t *p_dec )
 static block_t *GetSoutBuffer( decoder_t *p_dec )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    block_t *p_block;
 
-    p_block = block_New( p_dec, p_sys->frame.i_size );
-    if( p_block == NULL ) return NULL;
-
-    p_block->i_pts = p_block->i_dts = date_Get( &p_sys->end_date );
-
-    p_block->i_length =
-        date_Increment( &p_sys->end_date, p_sys->frame.i_samples ) - p_block->i_pts;
+    block_t *p_block = block_New( p_dec, p_sys->frame.i_size );
+    if( p_block )
+    {
+        p_block->i_pts = p_block->i_dts = date_Get( &p_sys->end_date );
+        p_block->i_length =
+            date_Increment( &p_sys->end_date, p_sys->frame.i_samples ) - p_block->i_pts;
+    }
 
     return p_block;
 }
