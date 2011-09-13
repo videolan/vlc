@@ -270,7 +270,6 @@ DIST_http_lua = \
 	lua/http/dialogs/sout \
 	lua/http/dialogs/vlm \
 	lua/http/custom.lua \
-	lua/http/flash.html \
 	lua/http/vlm.html \
 	lua/http/images/loop.png \
 	lua/http/images/buttons.png \
@@ -349,7 +348,6 @@ DIST_http_lua = \
 	lua/http/css/ui-lightness/images/ui-icons_ef8c08_256x240.png \
 	lua/http/css/ui-lightness/images/ui-bg_glass_100_fdf5ce_1x400.png \
 	lua/http/css/main.css \
-	lua/http/iehacks.css \
 	lua/http/js/jquery-1.5.1.min.js \
 	lua/http/js/functions.js \
 	lua/http/js/vlm.js \
