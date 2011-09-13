@@ -142,7 +142,7 @@ static int DtsInit( demux_t *p_demux );
 static int MlpProbe( demux_t *p_demux, int64_t *pi_offset );
 static int MlpInit( demux_t *p_demux );
 
-static int Parse( demux_t *p_demux, block_t **pp_output );
+static bool Parse( demux_t *p_demux, block_t **pp_output );
 
 static const codec_t p_codecs[] = {
     { VLC_CODEC_MP4A, false, "mp4 audio",  AacProbe,  AacInit },
@@ -256,13 +256,14 @@ static int OpenVideo( vlc_object_t *p_this )
  *****************************************************************************/
 static int Demux( demux_t *p_demux )
 {
+    int ret = 1;
     demux_sys_t *p_sys = p_demux->p_sys;
 
     block_t *p_block_out = p_sys->p_packetized_data;
     if( p_block_out )
         p_sys->p_packetized_data = NULL;
-    else if( Parse( p_demux, &p_block_out ) )
-        return 0;
+    else
+        ret = Parse( p_demux, &p_block_out ) ? 0 : 1;
 
     while( p_block_out )
     {
@@ -302,7 +303,7 @@ static int Demux( demux_t *p_demux )
 
         p_block_out = p_next;
     }
-    return 1;
+    return ret;
 }
 
 /*****************************************************************************
@@ -393,9 +394,10 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 }
 
 /*****************************************************************************
- * Returned a link list of buffer of parsed data
+ * Makes a link list of buffer of parsed data
+ * Returns true if EOF
  *****************************************************************************/
-static int Parse( demux_t *p_demux, block_t **pp_output )
+static bool Parse( demux_t *p_demux, block_t **pp_output )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     block_t *p_block_in, *p_block_out;
@@ -410,19 +412,22 @@ static int Parse( demux_t *p_demux, block_t **pp_output )
             stream_Read( p_demux->s, NULL, 1 );
     }
 
-    if( ( p_block_in = stream_Block( p_demux->s, p_sys->i_packet_size ) ) == NULL )
-        return VLC_EGENERIC;
+    p_block_in = stream_Block( p_demux->s, p_sys->i_packet_size );
+    bool b_eof = p_block_in == NULL;
 
-    if( p_sys->codec.b_use_word && !p_sys->b_big_endian && p_block_in->i_buffer > 0 )
+    if( p_block_in )
     {
-        /* Convert to big endian */
-        swab( p_block_in->p_buffer, p_block_in->p_buffer, p_block_in->i_buffer );
-    }
+        if( p_sys->codec.b_use_word && !p_sys->b_big_endian && p_block_in->i_buffer > 0 )
+        {
+            /* Convert to big endian */
+            swab( p_block_in->p_buffer, p_block_in->p_buffer, p_block_in->i_buffer );
+        }
 
-    p_block_in->i_pts = p_block_in->i_dts = p_sys->b_start || p_sys->b_initial_sync_failed ? VLC_TS_0 : VLC_TS_INVALID;
+        p_block_in->i_pts = p_block_in->i_dts = p_sys->b_start || p_sys->b_initial_sync_failed ? VLC_TS_0 : VLC_TS_INVALID;
+    }
     p_sys->b_initial_sync_failed = p_sys->b_start; /* Only try to resync once */
 
-    while( ( p_block_out = p_sys->p_packetizer->pf_packetize( p_sys->p_packetizer, &p_block_in ) ) )
+    while( ( p_block_out = p_sys->p_packetizer->pf_packetize( p_sys->p_packetizer, p_block_in ? &p_block_in : NULL ) ) )
     {
         p_sys->b_initial_sync_failed = false;
         while( p_block_out )
@@ -462,7 +467,8 @@ static int Parse( demux_t *p_demux, block_t **pp_output )
     if( p_sys->b_initial_sync_failed )
         msg_Dbg( p_demux, "did not sync on first block" );
     p_sys->b_start = false;
-    return VLC_SUCCESS;
+
+    return b_eof;
 }
 
 /*****************************************************************************
