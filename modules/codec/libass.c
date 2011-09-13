@@ -120,23 +120,6 @@ static void RegionDraw( subpicture_region_t *p_region, ASS_Image *p_img );
 
 //#define DEBUG_REGION
 
-static void MessageCallback( int level, const char *fmt, va_list args, void *data )
-{
-    decoder_t *p_dec = (decoder_t *)data;
-
-    // translate verbosity level
-    if( level > 6 )
-        return;
-    else if( level > 4 )
-        level = VLC_MSG_DBG;
-    else if( level > 1 )
-        level = VLC_MSG_WARN;
-    else
-        level = VLC_MSG_ERR;
-
-    msg_GenericVa( p_dec, level, MODULE_STRING, fmt, args );
-}
-
 /*****************************************************************************
  * Create: Open libass decoder.
  *****************************************************************************/
@@ -171,9 +154,6 @@ static int Create( vlc_object_t *p_this )
         DecSysRelease( p_sys );
         return VLC_EGENERIC;
     }
-
-    /* Add message callback for logging */
-    ass_set_message_cb( p_sys->p_library, MessageCallback, p_dec );
 
     /* load attachments */
     input_attachment_t  **pp_attachments;
