@@ -1759,15 +1759,22 @@ static int GetGlyph( filter_t *p_filter,
     if( p_filter->p_sys->p_stroker )
     {
         outline = glyph;
-        FT_Glyph_StrokeBorder( &outline, p_filter->p_sys->p_stroker, 0, 0 );
+        if( FT_Glyph_StrokeBorder( &outline, p_filter->p_sys->p_stroker, 0, 0 ) )
+            outline = NULL;
     }
 
     FT_Glyph shadow = NULL;
     if( p_filter->p_sys->i_shadow_opacity > 0 )
     {
         shadow = outline ? outline : glyph;
-        FT_Glyph_To_Bitmap( &shadow, FT_RENDER_MODE_NORMAL, p_pen_shadow, 0 );
-        FT_Glyph_Get_CBox( shadow, ft_glyph_bbox_pixels, p_shadow_bbox );
+        if( FT_Glyph_To_Bitmap( &shadow, FT_RENDER_MODE_NORMAL, p_pen_shadow, 0  ) )
+        {
+            shadow = NULL;
+        }
+        else
+        {
+            FT_Glyph_Get_CBox( shadow, ft_glyph_bbox_pixels, p_shadow_bbox );
+        }
     }
     *pp_shadow = shadow;
 
