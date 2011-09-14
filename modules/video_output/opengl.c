@@ -583,15 +583,16 @@ int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
 #else
     /* Update the texture */
     for (unsigned j = 0; j < vgl->chroma->plane_count; j++) {
+        const int plane = vgl->fmt.i_chroma == VLC_CODEC_YV12 && j > 0 ?  (3 - j) : j;
         if (vgl->use_multitexture)
             vgl->ActiveTextureARB(GL_TEXTURE0_ARB + j);
         glBindTexture(vgl->tex_target, vgl->texture[0][j]);
-        glPixelStorei(GL_UNPACK_ROW_LENGTH, picture->p[j].i_pitch / picture->p[j].i_pixel_pitch);
+        glPixelStorei(GL_UNPACK_ROW_LENGTH, picture->p[plane].i_pitch / picture->p[plane].i_pixel_pitch);
         glTexSubImage2D(vgl->tex_target, 0,
                         0, 0,
-                        vgl->fmt.i_width  * vgl->chroma->p[j].w.num / vgl->chroma->p[j].w.den,
-                        vgl->fmt.i_height * vgl->chroma->p[j].h.num / vgl->chroma->p[j].h.den,
-                        vgl->tex_format, vgl->tex_type, picture->p[j].p_pixels);
+                        vgl->fmt.i_width  * vgl->chroma->p[plane].w.num / vgl->chroma->p[plane].w.den,
+                        vgl->fmt.i_height * vgl->chroma->p[plane].h.num / vgl->chroma->p[plane].h.den,
+                        vgl->tex_format, vgl->tex_type, picture->p[plane].p_pixels);
     }
 #endif
 
