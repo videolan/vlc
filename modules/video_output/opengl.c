@@ -509,7 +509,7 @@ picture_pool_t *vout_display_opengl_GetPool(vout_display_opengl_t *vgl, unsigned
     for (int i = 0; i < VLCGL_TEXTURE_COUNT; i++) {
         glGenTextures(vgl->chroma->plane_count, vgl->texture[i]);
         for (unsigned j = 0; j < vgl->chroma->plane_count; j++) {
-			uint8_t *buffer = NULL;
+            uint8_t *buffer = NULL;
             if (vgl->use_multitexture)
                 vgl->ActiveTextureARB(GL_TEXTURE0_ARB + j);
             glBindTexture(vgl->tex_target, vgl->texture[i][j]);
@@ -531,7 +531,7 @@ picture_pool_t *vout_display_opengl_GetPool(vout_display_opengl_t *vgl, unsigned
             glEnable(GL_UNPACK_CLIENT_STORAGE_APPLE);
             glPixelStorei(GL_UNPACK_CLIENT_STORAGE_APPLE, GL_TRUE);
 
-			buffer = picture[i]->p[j].p_pixels;
+            buffer = picture[i]->p[j].p_pixels;
 
             /* Use AGP texturing */
             glTexParameteri(vgl->tex_target, GL_TEXTURE_STORAGE_HINT_APPLE,
