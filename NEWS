@@ -65,6 +65,7 @@ Codecs:
  * New module for Dirac encoding, using the faster libschroedinger
    The Schroedinger module should be prefered to the Dirac one
  * Support for WMV Images, aka WMVP and WVP2, as used by Photo Story
+ * EIA-608 closed captions improvements
 
 Demuxers:
  * New images demuxer supporting jpeg, png, targa, xcf, git, tiff, bmp, pcx, lbm

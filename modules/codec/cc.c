@@ -1,8 +1,7 @@
 /*****************************************************************************
- * cc608.c : CC 608/708 subtitles decoder
+ * cc.c : CC 608/708 subtitles decoder
  *****************************************************************************
- * Copyright (C) 2007 Laurent Aimar
- * $Id$
+ * Copyright © 2007-2010 Laurent Aimar, 2011 VLC authors and VideoLAN
  *
  * Authors: Laurent Aimar < fenrir # via.ecp.fr>
  *
@@ -36,7 +35,7 @@
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
-#include <string.h>
+
 #include <assert.h>
 
 #include <vlc_common.h>
