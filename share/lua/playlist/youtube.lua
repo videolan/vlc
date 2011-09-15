@@ -37,6 +37,17 @@ function get_arturl()
     return "http://img.youtube.com/vi/"..video_id.."/default.jpg"
 end
 
+function get_prefres()
+    local prefres = -1
+    if vlc.var and vlc.var.inherit then
+        prefres = vlc.var.inherit(nil, "preferred-resolution")
+        if prefres == nil then
+            prefres = -1
+        end
+    end
+    return prefres
+end
+
 -- Probe function.
 function probe()
     if vlc.access ~= "http" and vlc.access ~= "https" then
@@ -87,6 +98,24 @@ function parse()
             -- JSON parameters, also formerly known as "swfConfig",
             -- "SWF_ARGS", "swfArgs" ...
             if string.match( line, "PLAYER_CONFIG" ) then
+                if not fmt then
+                    prefres = get_prefres()
+                    if prefres >= 0 then
+                        fmt_list = string.match( line, "\"fmt_list\": \"(.-)\"" )
+                        if fmt_list then
+                            for itag,height in string.gmatch( fmt_list, "(%d+)\\/%d+x(%d+)\\/[^,]+" ) do
+                                -- Apparently formats are listed in quality
+                                -- order, so we take the first one that works,
+                                -- or fallback to the lowest quality
+                                fmt = itag
+                                if tonumber(height) <= prefres then
+                                    break
+                                end
+                            end
+                        end
+                    end
+                end
+
                 url_map = string.match( line, "\"url_encoded_fmt_stream_map\": \"(.-)\"" )
                 if url_map then
                     -- FIXME: do this properly
