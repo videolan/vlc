@@ -129,7 +129,7 @@ static int Open (vlc_object_t *obj)
 
         if (setup (&sys->opaque, format, &rate, &channels))
             goto error;
-        /* Only call this callback if setup succeeded */ 
+        /* Only call this callback if setup succeeded */
         sys->cleanup = var_InheritAddress (obj, "amem-cleanup");
     }
     else
