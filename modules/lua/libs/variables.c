@@ -130,6 +130,27 @@ static int vlclua_tovalue( lua_State *L, int i_type, vlc_value_t *val )
     return 1;
 }
 
+static int vlclua_var_inherit( lua_State *L )
+{
+    vlc_value_t val;
+    vlc_object_t *p_obj;
+    if( lua_type( L, 1 ) == LUA_TNIL )
+        p_obj = vlclua_get_this( L );
+    else
+    {
+        vlc_object_t **pp_obj = luaL_checkudata( L, 1, "vlc_object" );
+        p_obj = *pp_obj;
+    }
+    const char *psz_var = luaL_checkstring( L, 2 );
+
+    int i_type = config_GetType( p_obj, psz_var );
+    if( var_Inherit( p_obj, psz_var, i_type, &val ) != VLC_SUCCESS )
+        return 0;
+
+    lua_pop( L, 2 );
+    return vlclua_pushvalue( L, i_type, val, true );
+}
+
 static int vlclua_var_get( lua_State *L )
 {
     vlc_value_t val;
@@ -611,6 +632,7 @@ static int vlclua_togglebool( lua_State *L )
  *
  *****************************************************************************/
 static const luaL_Reg vlclua_var_reg[] = {
+    { "inherit", vlclua_var_inherit },
     { "get", vlclua_var_get },
     { "get_list", vlclua_var_get_list },
     { "set", vlclua_var_set },

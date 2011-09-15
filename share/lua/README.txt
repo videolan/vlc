@@ -375,6 +375,8 @@ strings.from_charset( charset, str ): convert a string from a specified
 
 Variables
 ---------
+var.inherit( object, name ): Find the variable "name"'s value inherited by
+  the object. If object is unset, the current module's object will be used.
 var.get( object, name ): Get the object's variable "name"'s value.
 var.get_list( object, name ): Get the object's variable "name"'s value list.
   1st return value is the value list, 2nd return value is the text list.
