@@ -11,6 +11,7 @@ FFMPEGCONF = \
 	--disable-decoder=libvpx \
 	--enable-libgsm \
 	--enable-libvpx \
+	--enable-libopenjpeg \
 	--disable-debug \
 	--enable-gpl \
 	--enable-postproc \
@@ -22,7 +23,7 @@ FFMPEGCONF = \
 	--disable-protocols \
 	--disable-avfilter \
 	--disable-network
-DEPS_ffmpeg = zlib gsm vpx $(DEPS_vpx)
+DEPS_ffmpeg = zlib gsm vpx $(DEPS_vpx) openjpeg
 
 # Optional dependencies
 ifdef BUILD_ENCODERS
