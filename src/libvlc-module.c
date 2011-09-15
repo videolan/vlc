@@ -733,6 +733,19 @@ static const char *const ppsz_clock_descriptions[] =
 #define INPUT_SUBTRACK_ID_LONGTEXT N_( \
     "Stream ID of the subtitle track to use.")
 
+#define INPUT_PREFERREDRESOLUTION_TEXT N_("Preferred video resolution")
+#define INPUT_PREFERREDRESOLUTION_LONGTEXT N_( \
+    "When several video formats are available, select one whose " \
+    "resolution is closest to (but not higher than) this setting, " \
+    "in number of lines. Use this option if you don't have enough CPU " \
+    "power or network bandwith to play higher resolutions.")
+static const int pi_prefres[] = { -1, 1080, 720, 576, 320 };
+static const char *const ppsz_prefres[] = {
+    N_("Best available"), N_("Full HD (1080p)"), N_("HD (720p)"),
+    N_("Standard Definition (576 or 480 lines)"),
+    N_("Low definition (320 lines)")
+};
+
 #define INPUT_REPEAT_TEXT N_("Input repetitions")
 #define INPUT_REPEAT_LONGTEXT N_( \
     "Number of time the same input will be repeated")
@@ -1813,6 +1826,10 @@ vlc_module_begin ()
     add_integer( "sub-track-id", -1,
                  INPUT_SUBTRACK_ID_TEXT, INPUT_SUBTRACK_ID_LONGTEXT, true )
         change_safe ()
+    add_integer( "preferred-resolution", -1, INPUT_PREFERREDRESOLUTION_TEXT,
+                 INPUT_PREFERREDRESOLUTION_LONGTEXT, false )
+        change_safe ()
+        change_integer_list( pi_prefres, ppsz_prefres )
 
     set_section( N_( "Playback control" ) , NULL)
     add_integer( "input-repeat", 0,
