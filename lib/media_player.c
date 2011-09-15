@@ -1,8 +1,7 @@
 /*****************************************************************************
  * media_player.c: Libvlc API Media Instance management functions
  *****************************************************************************
- * Copyright (C) 2005-2009 the VideoLAN team
- * $Id$
+ * Copyright (C) 2005-2011 the VideoLAN team
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *
@@ -52,7 +51,7 @@ static const vlc_action_t libvlc_navigate_to_action[] =
     ACTIONID_NAV_RIGHT
 };
 
-static const uint32_t libvlc_navigate_to_action_size =			\
+static const uint32_t libvlc_navigate_to_action_size =                        \
   sizeof( libvlc_navigate_to_action ) / sizeof( libvlc_navigate_to_action[0] );
 
 
@@ -1292,7 +1291,7 @@ int libvlc_media_player_is_seekable( libvlc_media_player_t *p_mi )
 }
 
 void libvlc_media_player_navigate( libvlc_media_player_t* p_mi,
-				   unsigned navigate )
+                                   unsigned navigate )
 {
     input_thread_t *p_input_thread;
 
@@ -1304,7 +1303,7 @@ void libvlc_media_player_navigate( libvlc_media_player_t* p_mi,
       return;
 
     var_SetInteger( p_mi->p_libvlc_instance->p_libvlc_int,
-		    "key-action", libvlc_navigate_to_action[navigate] );
+                    "key-action", libvlc_navigate_to_action[navigate] );
 
     vlc_object_release( p_input_thread );
 }
