@@ -1496,7 +1496,7 @@ SyncControls::SyncControls( intf_thread_t *_p_intf, QWidget *_parent ) :
     AVLayout->addWidget( plusAV, 0, 3, 1, 1 );
 
     QLabel *AVLabel = new QLabel;
-    AVLabel->setText( qtr( "Advance of audio over video:" ) );
+    AVLabel->setText( qtr( "Add a delay to the audio track:" ) );
     AVLayout->addWidget( AVLabel, 0, 0, 1, 1 );
 
     AVSpin = new QDoubleSpinBox;
@@ -1505,8 +1505,8 @@ SyncControls::SyncControls( intf_thread_t *_p_intf, QWidget *_parent ) :
     AVSpin->setMinimum( -600.0 );
     AVSpin->setMaximum( 600.0 );
     AVSpin->setSingleStep( 0.1 );
-    AVSpin->setToolTip( qtr( "A positive value means that\n"
-                             "the audio is ahead of the video" ) );
+    AVSpin->setToolTip( qtr( "A positive value will delay\n"
+                             "the audio, when it was ahead of the video" ) );
     AVSpin->setSuffix( " s" );
     AVLayout->addWidget( AVSpin, 0, 2, 1, 1 );
     mainLayout->addWidget( AVBox, 1, 0, 1, 5 );
@@ -1529,7 +1529,7 @@ SyncControls::SyncControls( intf_thread_t *_p_intf, QWidget *_parent ) :
     subsLayout->addWidget( plussubs, 0, 3, 1, 1 );
 
     QLabel *subsLabel = new QLabel;
-    subsLabel->setText( qtr( "Advance of subtitles over video:" ) );
+    subsLabel->setText( qtr( "Add a delay to the subtitle track:" ) );
     subsLayout->addWidget( subsLabel, 0, 0, 1, 1 );
 
     subsSpin = new QDoubleSpinBox;
@@ -1538,8 +1538,8 @@ SyncControls::SyncControls( intf_thread_t *_p_intf, QWidget *_parent ) :
     subsSpin->setMinimum( -600.0 );
     subsSpin->setMaximum( 600.0 );
     subsSpin->setSingleStep( 0.1 );
-    subsSpin->setToolTip( qtr( "A positive value means that\n"
-                             "the subtitles are ahead of the video" ) );
+    subsSpin->setToolTip( qtr( "A positive value will delay the\n"
+                             "subtitles, when they were ahead of the video" ) );
     subsSpin->setSuffix( " s" );
     subsLayout->addWidget( subsSpin, 0, 2, 1, 1 );
 
