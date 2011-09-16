@@ -77,7 +77,7 @@ public slots:
     void selectSlots();
     void play();
     void stream( bool b_transode_only = false );
-    void enqueue();
+    void enqueue( bool b_enqueue = true );
     void transcode();
 
 private:
@@ -104,8 +104,6 @@ private:
 
     QPushButton *cancelButton, *selectButton;
     QToolButton *playButton;
-
-    void finish( bool );
 
 private slots:
     void setMenuAction();
