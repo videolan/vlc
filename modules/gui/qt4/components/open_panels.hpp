@@ -73,6 +73,7 @@ public:
     virtual ~OpenPanel() {};
     virtual void clear() = 0;
     virtual void onFocus() {}
+    virtual void onAccept() {}
 protected:
     intf_thread_t *p_intf;
 public slots:
@@ -140,13 +141,12 @@ public:
     virtual ~NetOpenPanel();
     virtual void clear() ;
     void onFocus();
+    void onAccept();
 private:
     Ui::OpenNetwork ui;
-    QStringListModel *mrlList;
+    bool b_recentList;
 public slots:
     virtual void updateMRL();
-private slots:
-    void updateModel();
 };
 
 class UrlValidator : public QValidator

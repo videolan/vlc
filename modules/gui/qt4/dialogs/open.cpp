@@ -358,8 +358,8 @@ void OpenDialog::enqueue( bool b_enqueue )
         return;
     }
 
-/*    for( int i = 0; i < OPEN_TAB_MAX; i++ )
-        dynamic_cast<OpenPanel*>( ui.Tab->widget( i ) )->onAccept(); */
+    for( int i = 0; i < OPEN_TAB_MAX; i++ )
+        dynamic_cast<OpenPanel*>( ui.Tab->widget( i ) )->onAccept();
 
     /* Sort alphabetically */
     itemsMRL.sort();

@@ -565,40 +565,50 @@ NetOpenPanel::NetOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
                                 OpenPanel( _parent, _p_intf )
 {
     ui.setupUi( this );
+    CONNECT( ui.urlComboBox, editTextChanged( const QString& ), this, updateMRL());
 
-    /* CONNECTs */
-    CONNECT( ui.urlComboBox->lineEdit(), textChanged( const QString& ), this, updateMRL());
-    CONNECT( ui.urlComboBox, currentIndexChanged( const QString& ), this, updateMRL());
-
+    /* */
     if( var_InheritBool( p_intf, "qt-recentplay" ) )
     {
-        mrlList = new QStringListModel(
-                getSettings()->value( "Open/netMRL" ).toStringList() );
-        ui.urlComboBox->setModel( mrlList );
-        ui.urlComboBox->clearEditText();
-        CONNECT( ui.urlComboBox->lineEdit(), editingFinished(), this, updateModel() );
+        b_recentList = true;
+        ui.urlComboBox->addItems( getSettings()->value( "Open/netMRL" ).toStringList() );
+        ui.urlComboBox->setMaxCount( 10 );
     }
     else
-        mrlList = NULL;
+        b_recentList = false;
 
+    /* Use a simple validator for URLs */
     ui.urlComboBox->setValidator( new UrlValidator( this ) );
     ui.urlComboBox->setFocus();
 }
 
 NetOpenPanel::~NetOpenPanel()
 {
-    if( !mrlList ) return;
+    if( !b_recentList ) return;
 
-    QStringList tempL = mrlList->stringList();
-    while( tempL.count() > 8 ) tempL.removeFirst();
+    /* Create the list with the current items */
+    QStringList mrlList;
+    for( int i = 0; i < ui.urlComboBox->count(); i++ )
+        mrlList << ui.urlComboBox->itemText( i );
 
-    getSettings()->setValue( "Open/netMRL", tempL );
-
-    delete mrlList;
+    /* Clean the list... */
+#if HAS_QT45
+    mrlList.removeDuplicates();
+#endif
+    /* ...and save the 8 last entries */
+    getSettings()->setValue( "Open/netMRL", mrlList );
 }
 
 void NetOpenPanel::clear()
-{}
+{
+    ui.urlComboBox->clear();
+}
+
+void NetOpenPanel::onAccept()
+{
+    if( ui.urlComboBox->findText( ui.urlComboBox->currentText() ) == -1 )
+        ui.urlComboBox->insertItem( 0, ui.urlComboBox->currentText());
+}
 
 void NetOpenPanel::onFocus()
 {
@@ -610,25 +620,14 @@ void NetOpenPanel::updateMRL()
 {
     QString url = ui.urlComboBox->lineEdit()->text();
 
+    if( url.isEmpty() )
+        return;
+
     emit methodChanged( qfu( "network-caching" ) );
 
     QStringList qsl;
     qsl << url;
     emit mrlUpdated( qsl, "" );
-}
-
-void NetOpenPanel::updateModel()
-{
-    assert( mrlList );
-    QStringList tempL = mrlList->stringList();
-    if( !tempL.contains( ui.urlComboBox->lineEdit()->text() ) )
-        tempL.append( ui.urlComboBox->lineEdit()->text() );
-    mrlList->setStringList( tempL );
-}
-
-void UrlValidator::fixup( QString& str ) const
-{
-    str = str.trimmed();
 }
 
 QValidator::State UrlValidator::validate( QString& str, int& ) const
@@ -638,6 +637,11 @@ QValidator::State UrlValidator::validate( QString& str, int& ) const
     if( !str.contains( "://" ) )
         return QValidator::Intermediate;
     return QValidator::Acceptable;
+}
+
+void UrlValidator::fixup( QString& str ) const
+{
+    str = str.trimmed();
 }
 
 /**************************************************************************
