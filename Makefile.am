@@ -145,6 +145,33 @@ EXTRA_DIST += \
 	extras/package/macosx/Resources/fspanel/fs_volume_slider_bar.png \
 	extras/package/macosx/Resources/fspanel/fs_volume_slider_knob.png \
 	extras/package/macosx/Resources/fspanel/fs_volume_slider_knob_highlight.png \
+	extras/package/macosx/Resources/fspanel/fs_background@x1.5.png \
+	extras/package/macosx/Resources/fspanel/fs_exit_fullscreen@x1.5.png \
+	extras/package/macosx/Resources/fspanel/fs_exit_fullscreen_highlight@x1.5.png \
+	extras/package/macosx/Resources/fspanel/fs_forward@x1.5.png \
+	extras/package/macosx/Resources/fspanel/fs_forward_highlight@x1.5.png \
+	extras/package/macosx/Resources/fspanel/fs_pause@x1.5.png \
+	extras/package/macosx/Resources/fspanel/fs_pause_highlight@x1.5.png \
+	extras/package/macosx/Resources/fspanel/fs_play@x1.5.png \
+	extras/package/macosx/Resources/fspanel/fs_play_highlight@x1.5.png \
+	extras/package/macosx/Resources/fspanel/fs_rewind@x1.5.png \
+	extras/package/macosx/Resources/fspanel/fs_rewind_highlight@x1.5.png \
+	extras/package/macosx/Resources/fspanel/fs_skip_next@x1.5.png \
+	extras/package/macosx/Resources/fspanel/fs_skip_next_highlight@x1.5.png \
+	extras/package/macosx/Resources/fspanel/fs_skip_previous@x1.5.png \
+	extras/package/macosx/Resources/fspanel/fs_skip_previous_highlight@x1.5.png \
+	extras/package/macosx/Resources/fspanel/fs_stop@x1.5.png \
+	extras/package/macosx/Resources/fspanel/fs_stop_highlight@x1.5.png \
+	extras/package/macosx/Resources/fspanel/fs_time_slider@x1.5.png \
+	extras/package/macosx/Resources/fspanel/fs_time_slider_knob@x1.5.png \
+	extras/package/macosx/Resources/fspanel/fs_time_slider_knob_highlight@x1.5.png \
+	extras/package/macosx/Resources/fspanel/fs_volume_max@x1.5.png \
+	extras/package/macosx/Resources/fspanel/fs_volume_max_highlight@x1.5.png \
+	extras/package/macosx/Resources/fspanel/fs_volume_mute@x1.5.png \
+	extras/package/macosx/Resources/fspanel/fs_volume_mute_highlight@x1.5.png \
+	extras/package/macosx/Resources/fspanel/fs_volume_slider_bar@x1.5.png \
+	extras/package/macosx/Resources/fspanel/fs_volume_slider_knob@x1.5.png \
+	extras/package/macosx/Resources/fspanel/fs_volume_slider_knob_highlight@x1.5.png \
 	extras/package/macosx/Resources/icons/aiff.icns \
 	extras/package/macosx/Resources/icons/audio.icns \
 	extras/package/macosx/Resources/icons/avi.icns \
@@ -169,7 +196,7 @@ EXTRA_DIST += \
 	extras/package/macosx/Resources/mainwindow/back-pressed.png \
 	extras/package/macosx/Resources/mainwindow/back.png \
 	extras/package/macosx/Resources/mainwindow/bottom-background.png \
-	extras/package/macosx/Resources/mainwindow/bottom-bar-mini.png \
+	extras/package/macosx/Resources/mainwindow/bottombar-mini.png \
 	extras/package/macosx/Resources/mainwindow/dropzone-background.png \
 	extras/package/macosx/Resources/mainwindow/dropzone.png \
 	extras/package/macosx/Resources/mainwindow/effects-double-buttons-blue.png \
@@ -221,6 +248,7 @@ EXTRA_DIST += \
 	extras/package/macosx/Resources/mainwindow_dark/back-pressed_dark.png \
 	extras/package/macosx/Resources/mainwindow_dark/back_dark.png \
 	extras/package/macosx/Resources/mainwindow_dark/bottom-background_dark.png \
+	extras/package/macosx/Resources/mainwindow_dark/bottombar-mini.png \
 	extras/package/macosx/Resources/mainwindow_dark/effects-double-buttons-blue_dark.png \
 	extras/package/macosx/Resources/mainwindow_dark/effects-double-buttons-pressed_dark.png \
 	extras/package/macosx/Resources/mainwindow_dark/effects-double-buttons_dark.png \
