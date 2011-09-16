@@ -115,7 +115,6 @@
 		CC04338613B28B8200D7D52E /* repeat-pressed.png in Resources */ = {isa = PBXBuildFile; fileRef = CC04335213B28B8200D7D52E /* repeat-pressed.png */; };
 		CC04338713B28B8200D7D52E /* repeat.png in Resources */ = {isa = PBXBuildFile; fileRef = CC04335313B28B8200D7D52E /* repeat.png */; };
 		CC04338813B28B8200D7D52E /* shuffle-blue-pressed.png in Resources */ = {isa = PBXBuildFile; fileRef = CC04335413B28B8200D7D52E /* shuffle-blue-pressed.png */; };
-		CC04338913B28B8200D7D52E /* shuffle-on.png in Resources */ = {isa = PBXBuildFile; fileRef = CC04335513B28B8200D7D52E /* shuffle-on.png */; };
 		CC04338A13B28B8200D7D52E /* shuffle-pressed.png in Resources */ = {isa = PBXBuildFile; fileRef = CC04335613B28B8200D7D52E /* shuffle-pressed.png */; };
 		CC04338B13B28B8200D7D52E /* shuffle.png in Resources */ = {isa = PBXBuildFile; fileRef = CC04335713B28B8200D7D52E /* shuffle.png */; };
 		CC04338C13B28B8200D7D52E /* stop-pressed.png in Resources */ = {isa = PBXBuildFile; fileRef = CC04335813B28B8200D7D52E /* stop-pressed.png */; };
@@ -215,6 +214,7 @@
 		CC84FB481300843200816D38 /* BGHUDAppKit.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = CC84FB2C130083BB00816D38 /* BGHUDAppKit.framework */; };
 		CC9B43AF13B29C79000205AE /* bottom-background.png in Resources */ = {isa = PBXBuildFile; fileRef = CC9B43AE13B29C79000205AE /* bottom-background.png */; };
 		CC9B43B113B29FCF000205AE /* bottom-background_dark.png in Resources */ = {isa = PBXBuildFile; fileRef = CC9B43B013B29FCF000205AE /* bottom-background_dark.png */; };
+		CCB320721423AAEE002CB53B /* shuffle-blue.png in Resources */ = {isa = PBXBuildFile; fileRef = CCB320711423AAEE002CB53B /* shuffle-blue.png */; };
 		CCBE999F0F922C51000705F8 /* CoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CCBE999E0F922C51000705F8 /* CoreServices.framework */; };
 		CCD83E2D13FE9B90004F1652 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = CCD83E2B13FE9B90004F1652 /* MainMenu.xib */; };
 		CCD83E4413FEA143004F1652 /* About.xib in Resources */ = {isa = PBXBuildFile; fileRef = CCD83E2E13FEA143004F1652 /* About.xib */; };
@@ -396,7 +396,6 @@
 		CC04335213B28B8200D7D52E /* repeat-pressed.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "repeat-pressed.png"; path = "Resources/mainwindow/repeat-pressed.png"; sourceTree = "<group>"; };
 		CC04335313B28B8200D7D52E /* repeat.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = repeat.png; path = Resources/mainwindow/repeat.png; sourceTree = "<group>"; };
 		CC04335413B28B8200D7D52E /* shuffle-blue-pressed.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "shuffle-blue-pressed.png"; path = "Resources/mainwindow/shuffle-blue-pressed.png"; sourceTree = "<group>"; };
-		CC04335513B28B8200D7D52E /* shuffle-on.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "shuffle-on.png"; path = "Resources/mainwindow/shuffle-on.png"; sourceTree = "<group>"; };
 		CC04335613B28B8200D7D52E /* shuffle-pressed.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "shuffle-pressed.png"; path = "Resources/mainwindow/shuffle-pressed.png"; sourceTree = "<group>"; };
 		CC04335713B28B8200D7D52E /* shuffle.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = shuffle.png; path = Resources/mainwindow/shuffle.png; sourceTree = "<group>"; };
 		CC04335813B28B8200D7D52E /* stop-pressed.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "stop-pressed.png"; path = "Resources/mainwindow/stop-pressed.png"; sourceTree = "<group>"; };
@@ -527,6 +526,7 @@
 		CCB0BB3013FAC9F40095BD0A /* CompatibilityFixes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CompatibilityFixes.h; path = ../../../modules/gui/macosx/CompatibilityFixes.h; sourceTree = "<group>"; };
 		CCB24D5D0D54BBAE004D780C /* simple_prefs.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = simple_prefs.m; path = ../../../modules/gui/macosx/simple_prefs.m; sourceTree = SOURCE_ROOT; };
 		CCB24D5E0D54BBAE004D780C /* simple_prefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = simple_prefs.h; path = ../../../modules/gui/macosx/simple_prefs.h; sourceTree = SOURCE_ROOT; };
+		CCB320711423AAEE002CB53B /* shuffle-blue.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "shuffle-blue.png"; path = "Resources/mainwindow/shuffle-blue.png"; sourceTree = "<group>"; };
 		CCBE999E0F922C51000705F8 /* CoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreServices.framework; path = /System/Library/Frameworks/CoreServices.framework; sourceTree = "<absolute>"; };
 		CCC895830D9A8A82005AE59C /* eyetv.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = eyetv.m; path = ../../../modules/access/eyetv.m; sourceTree = SOURCE_ROOT; };
 		CCCCDCA01413E1C000FE3DE1 /* VideoView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = VideoView.h; path = ../../../modules/gui/macosx/VideoView.h; sourceTree = "<group>"; };
@@ -860,7 +860,7 @@
 				CC04335213B28B8200D7D52E /* repeat-pressed.png */,
 				CC04335313B28B8200D7D52E /* repeat.png */,
 				CC04335413B28B8200D7D52E /* shuffle-blue-pressed.png */,
-				CC04335513B28B8200D7D52E /* shuffle-on.png */,
+				CCB320711423AAEE002CB53B /* shuffle-blue.png */,
 				CC04335613B28B8200D7D52E /* shuffle-pressed.png */,
 				CC04335713B28B8200D7D52E /* shuffle.png */,
 				CC04335813B28B8200D7D52E /* stop-pressed.png */,
@@ -1272,7 +1272,6 @@
 				CC04338613B28B8200D7D52E /* repeat-pressed.png in Resources */,
 				CC04338713B28B8200D7D52E /* repeat.png in Resources */,
 				CC04338813B28B8200D7D52E /* shuffle-blue-pressed.png in Resources */,
-				CC04338913B28B8200D7D52E /* shuffle-on.png in Resources */,
 				CC04338A13B28B8200D7D52E /* shuffle-pressed.png in Resources */,
 				CC04338B13B28B8200D7D52E /* shuffle.png in Resources */,
 				CC04338C13B28B8200D7D52E /* stop-pressed.png in Resources */,
@@ -1360,6 +1359,7 @@
 				CC58012C1423A85300166912 /* fs_volume_slider_bar@x1.5.png in Resources */,
 				CC58012D1423A85300166912 /* fs_volume_slider_knob_highlight@x1.5.png in Resources */,
 				CC58012E1423A85300166912 /* fs_volume_slider_knob@x1.5.png in Resources */,
+				CCB320721423AAEE002CB53B /* shuffle-blue.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

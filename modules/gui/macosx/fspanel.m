@@ -432,7 +432,7 @@
     /* time slider */
     s_rc = [self frame];
     s_rc.origin.x = 15;
-    s_rc.origin.y = 53;
+    s_rc.origin.y = 55;
     s_rc.size.width = 518;
     s_rc.size.height = 9;
     o_fs_timeSlider = [[VLCFSTimeSlider alloc] initWithFrame: s_rc];
@@ -447,7 +447,7 @@
     /* volume slider */
     s_rc = [self frame];
     s_rc.origin.x = 26;
-    s_rc.origin.y = 17.5;
+    s_rc.origin.y = 18.5;
     s_rc.size.width = 95;
     s_rc.size.height = 10;
     o_fs_volumeSlider = [[VLCFSVolumeSlider alloc] initWithFrame: s_rc];
