@@ -60,11 +60,12 @@ Codecs:
  * Experimental Hardware decoding using Broadcom CrystalHD cards
  * New module for decoding EBU subtitles (.stl)
  * Support for 9bits and 10bits H.264/AVC decoding
- * Support for Lagarith Lossless video codec
  * Support for 20-bits PCM and DAT-12 (digital magnetic tapes) from RTP
  * New module for Dirac encoding, using the faster libschroedinger
    The Schroedinger module should be prefered to the Dirac one
  * Support for WMV Images, aka WMVP and WVP2, as used by Photo Story
+ * Support for Lagarith Lossless video codec
+ * Support for ProRes 422 video codec in 10bits
  * EIA-608 closed captions improvements
  * Support for JPEG 2000 and Motion JPEG 2000 in the Windows and Mac binaries
 
