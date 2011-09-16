@@ -153,6 +153,7 @@ static const entry_t p_list_video[] = {
         A("INMC"),
         A("SN40"),
         A("EPHV"),
+        A("DM4V"),
         /* XVID flavours */
         E("xvid", "Xvid MPEG-4 Video"),
         E("XVID", "Xvid MPEG-4 Video"),
@@ -172,6 +173,7 @@ static const entry_t p_list_video[] = {
         E("UMP4", "UB MPEG-4 Video"),
         E("SEDG", "Samsung MPEG-4 Video"),
         E("RMP4", "REALmagic MPEG-4 Video"),
+        E("LMP4", "Lead MPEG-4 Video"),
         E("HDX4", "Jomigo HDX4 (MPEG-4 Video)"),
         E("hdx4", "Jomigo HDX4 (MPEG-4 Video)"),
         E("SMP4", "Samsung SMP4 (MPEG-4 Video)"),
@@ -180,6 +182,7 @@ static const entry_t p_list_video[] = {
         E("FVFW", "FFmpeg MPEG-4"),
         E("FFDS", "FFDShow MPEG-4"),
         E("VIDM", "vidm 4.01 codec"),
+        E("DP02", "DynaPel MPEG-4 codec"),
         /* 3ivx delta 3.5 Unsupported
          * putting it here gives extreme distorted images */
         //E("3IV1", "3ivx delta 3.5 MPEG-4 Video"),
@@ -230,6 +233,7 @@ static const entry_t p_list_video[] = {
         /* who knows? */
         A("3VID"),
         A("3vid"),
+        A("DVX1"),
         A("DVX3"),
 
     /* Sorenson v1 */
@@ -283,6 +287,7 @@ static const entry_t p_list_video[] = {
         A("U263"),
         A("u263"),
         E("D263", "DEC H263"),
+        E("d263", "DEC H263"),
         E("L263", "LEAD H263"),
         E("M263", "Microsoft H263"),
         E("X263", "Xirlink H263"),
@@ -300,6 +305,7 @@ static const entry_t p_list_video[] = {
         E("viv1", "H263+"),
         E("vivO", "H263+"),
         E("viv2", "H263+"),
+        E("VIVO", "H263+"),
         E("U263", "UB H263+"),
 
     /* Flash (H263) variant */
@@ -318,7 +324,9 @@ static const entry_t p_list_video[] = {
     /* MJPEG */
     B(VLC_CODEC_MJPG, "Motion JPEG Video"),
         A("MJPG"),
+        A("MJPx"),
         A("mjpg"),
+        A("mJPG"),
         A("mjpa"),
         A("jpeg"),
         A("JPEG"),
@@ -326,12 +334,15 @@ static const entry_t p_list_video[] = {
         A("JPGL"),
         A("AVDJ"),
         A("MMJP"),
+        A("FLJP"),
+        A("FMJP"),
+        A("SJPG"),
         A("QIVG"),
-        /* AVID MJPEG */
         E("AVRn", "Avid Motion JPEG"),
         E("AVDJ", "Avid Motion JPEG"),
         E("ADJV", "Avid Motion JPEG"),
         E("dmb1", "Motion JPEG OpenDML Video"),
+        E("DMB1", "Motion JPEG OpenDML Video"),
         E("ijpg", "Intergraph JPEG Video"),
         E("IJPG", "Intergraph JPEG Video"),
         E("ACDV", "ACD Systems Digital"),
@@ -342,6 +353,7 @@ static const entry_t p_list_video[] = {
 
     B(VLC_CODEC_LJPG, "Lead Motion JPEG Video"),
         A("LJPG"),
+        E("Ljpg", "Lead Motion JPEG"),
 
     // ? from avcodec/fourcc.c but makes not sense.
     //{ VLC_FOURCC( 'L','J','P','G' ), CODEC_ID_MJPEG,       VIDEO_ES, "Lead Motion JPEG Video" },
@@ -359,6 +371,7 @@ static const entry_t p_list_video[] = {
     /* DV */
     B(VLC_CODEC_DV, "DV Video"),
         A("dv  "),
+        A("dvc "),
         A("dvsl"),
         A("DVSD"),
         A("dvsd"),
@@ -372,10 +385,16 @@ static const entry_t p_list_video[] = {
         A("dvh6"),
         A("dv1n"),
         A("dv1p"),
-        A("dvc "),
         A("dv25"),
+        A("dc25"),
         A("dvh1"),
         A("dvs1"),
+        A("dvis"),
+        A("CDV2"),
+        A("CDVP"),
+        A("PDVC"),
+        A("IPDV"),
+        A("ipdv"),
         E("dvcp", "DV Video PAL"),
         E("dvp ", "DV Video Pro"),
         E("dvpp", "DV Video Pro PAL"),
@@ -869,6 +888,7 @@ static const entry_t p_list_video[] = {
         A("mjp2"),
         A("MJP2"),
         A("MJ2C"),
+        A("LJ2C"),
 
     B(VLC_CODEC_LAGARITH, "Lagarith Lossless"),
         A("LAGS"),
