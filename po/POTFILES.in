@@ -952,7 +952,6 @@ modules/mux/mpjpeg.c
 modules/mux/ogg.c
 modules/mux/wav.c
 modules/notify/growl.m
-modules/notify/growl_udp.c
 modules/notify/msn.c
 modules/notify/notify.c
 modules/notify/telepathy.c

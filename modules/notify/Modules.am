@@ -5,7 +5,6 @@ LIBTOOL=@LIBTOOL@ --tag=CC
 
 SOURCES_msn = msn.c
 SOURCES_growl = growl.m
-SOURCES_growl_udp = growl_udp.c
 SOURCES_notify = notify.c
 SOURCES_xosd = xosd.c
 SOURCES_telepathy = telepathy.c
