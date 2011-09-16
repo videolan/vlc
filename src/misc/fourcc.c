@@ -1,10 +1,10 @@
 /*****************************************************************************
  * fourcc.c: fourcc helpers functions
  *****************************************************************************
- * Copyright (C) 2009 Laurent Aimar
- * $Id$
+ * Copyright © 2009-2011 Laurent Aimar
  *
  * Authors: Laurent Aimar <fenrir@videolan.org>
+ *          Jean-Baptiste Kempf <jb@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
