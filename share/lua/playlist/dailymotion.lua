@@ -49,7 +49,13 @@ function parse()
 
             arturl = find( line, "\"videoPreviewURL\":\"([^\"]*)\"")
             name = find( line, "\"videoTitle\":\"([^\"]*)\"")
+            if name then
+                name = string.gsub( name, "+", " " )
+            end
             description = find( line, "\"videoDescription\":\"([^\"]*)\"")
+            if description then
+                description = string.gsub( description, "+", " " )
+            end
 
            --[[ we get a list of different streams available, at various codecs
                 and resolutions:
