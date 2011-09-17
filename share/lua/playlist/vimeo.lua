@@ -20,6 +20,17 @@
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
 --]]
 
+function get_prefres()
+    local prefres = -1
+    if vlc.var and vlc.var.inherit then
+        prefres = vlc.var.inherit(nil, "preferred-resolution")
+        if prefres == nil then
+            prefres = -1
+        end
+    end
+    return prefres
+end
+
 -- Probe function.
 function probe()
     return vlc.access == "http"
@@ -29,7 +40,6 @@ end
 
 -- Parse function.
 function parse()
-    p = {}
     if string.match ( vlc.path, "vimeo.com/%d+" ) then
         _,_,id = string.find( vlc.path, "vimeo.com/(.*)")
         -- Vimeo disables HD if the user-agent contains "VLC", so we
@@ -39,6 +49,8 @@ function parse()
     end
 
     if string.match ( vlc.path, "vimeo.com/moogaloop" ) then
+        prefres = get_prefres()
+        ishd = false
         while true do
             -- Try to find the video's title
             line = vlc.readline()
@@ -64,11 +76,15 @@ function parse()
             if string.match( line, "<isHD>1</isHD>" ) then
                 ishd = true
             end
+            if string.match( line, "<height>%d+</height>" ) then
+                _,_,height = string.find( line, "<height>(%d+)</height>" )
+            end
         end
-        table.insert( p, { path = "http://vimeo.com/moogaloop/play/clip:"..id.."/"..rsig.."/"..rsigtime; name = name; arturl = arturl } )
-        if ishd == true then
-            table.insert( p, { path = "http://vimeo.com/moogaloop/play/clip:"..id.."/"..rsig.."/"..rsigtime.."/?q=hd"; name = name.." (HD)"; arturl = arturl } )
+        path = "http://vimeo.com/moogaloop/play/clip:"..id.."/"..rsig.."/"..rsigtime
+        if ishd and ( not height or prefres < 0 or prefres >= tonumber(height) ) then
+            path = path.."/?q=hd"
         end
+        return { { path = path; name = name; arturl = arturl } }
     end
-    return p
+    return {}
 end
