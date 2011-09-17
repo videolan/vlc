@@ -1463,25 +1463,36 @@ void Spatializer::addCallbacks( vlc_object_t *p_aout )
 #define SUBSDELAY_MODE_RELATIVE_SOURCE_DELAY   1
 #define SUBSDELAY_MODE_RELATIVE_SOURCE_CONTENT 2
 
-SyncWidget::SyncWidget( QWidget *_parent ) : QDoubleSpinBox( _parent )
+SyncWidget::SyncWidget( QWidget *_parent ) : QWidget( _parent )
 {
-    setAlignment( Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter );
-    setDecimals( 3 );
-    setMinimum( -600.0 );
-    setMaximum( 600.0 );
-    setSingleStep( 0.1 );
-    setButtonSymbols( QDoubleSpinBox::PlusMinus );
-    CONNECT( this, valueChanged( double ), this, valueChangedHandler( double ) );
+    QHBoxLayout *layout = new QHBoxLayout;
+    spinBox.setAlignment( Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter );
+    spinBox.setDecimals( 3 );
+    spinBox.setMinimum( -600.0 );
+    spinBox.setMaximum( 600.0 );
+    spinBox.setSingleStep( 0.1 );
+    spinBox.setSuffix( " s" );
+    spinBox.setButtonSymbols( QDoubleSpinBox::PlusMinus );
+    CONNECT( &spinBox, valueChanged( double ), this, valueChangedHandler( double ) );
+    layout->addWidget( &spinBox );
+    layout->addWidget( &spinLabel );
+    layout->setContentsMargins( 0, 0, 0, 0 );
+    setLayout( layout );
 }
 
 void SyncWidget::valueChangedHandler( double d )
 {
     if ( d < 0 )
-        setPrefix( qtr("Hastened by ") );
+        spinLabel.setText( qtr("(Hastened)") );
     else if ( d > 0 )
-        setPrefix( qtr("Delayed by ") );
+        spinLabel.setText( qtr("(Delayed)") );
     else
-        setPrefix( "" );
+        spinLabel.setText( "" );
+}
+
+void SyncWidget::setValue( double d )
+{
+    spinBox.setValue( d );
 }
 
 SyncControls::SyncControls( intf_thread_t *_p_intf, QWidget *_parent ) :
@@ -1503,7 +1514,6 @@ SyncControls::SyncControls( intf_thread_t *_p_intf, QWidget *_parent ) :
     AVLayout->addWidget( AVLabel, 0, 0, 1, 1 );
 
     AVSpin = new SyncWidget( this );
-    AVSpin->setSuffix( " s" );
     AVLayout->addWidget( AVSpin, 0, 2, 1, 1 );
     mainLayout->addWidget( AVBox, 1, 0, 1, 5 );
 
@@ -1516,7 +1526,6 @@ SyncControls::SyncControls( intf_thread_t *_p_intf, QWidget *_parent ) :
     subsLayout->addWidget( subsLabel, 0, 0, 1, 1 );
 
     subsSpin = new SyncWidget( this );
-    subsSpin->setSuffix( " s" );
     subsLayout->addWidget( subsSpin, 0, 2, 1, 1 );
 
     QLabel *subSpeedLabel = new QLabel;

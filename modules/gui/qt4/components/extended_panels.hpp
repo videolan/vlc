@@ -168,13 +168,19 @@ private slots:
     void setInitValues();
 };
 
-class SyncWidget : public QDoubleSpinBox
+class SyncWidget : public QWidget
 {
     Q_OBJECT
 public:
     SyncWidget( QWidget * );
+    void setValue( double d );
+signals:
+    void valueChanged( double );
 private slots:
     void valueChangedHandler( double d );
+private:
+    QDoubleSpinBox spinBox;
+    QLabel spinLabel;
 };
 
 class SyncControls : public QWidget
@@ -186,8 +192,8 @@ public:
     virtual ~SyncControls();
 private:
     intf_thread_t *p_intf;
-    QDoubleSpinBox *AVSpin;
-    QDoubleSpinBox *subsSpin;
+    SyncWidget *AVSpin;
+    SyncWidget *subsSpin;
     QDoubleSpinBox *subSpeedSpin;
     QDoubleSpinBox *subDurationSpin;
 
