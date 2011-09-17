@@ -168,6 +168,15 @@ private slots:
     void setInitValues();
 };
 
+class SyncWidget : public QDoubleSpinBox
+{
+    Q_OBJECT
+public:
+    SyncWidget( QWidget * );
+private slots:
+    void valueChangedHandler( double d );
+};
+
 class SyncControls : public QWidget
 {
     Q_OBJECT

@@ -1463,16 +1463,31 @@ void Spatializer::addCallbacks( vlc_object_t *p_aout )
 #define SUBSDELAY_MODE_RELATIVE_SOURCE_DELAY   1
 #define SUBSDELAY_MODE_RELATIVE_SOURCE_CONTENT 2
 
+SyncWidget::SyncWidget( QWidget *_parent ) : QDoubleSpinBox( _parent )
+{
+    setAlignment( Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter );
+    setDecimals( 3 );
+    setMinimum( -600.0 );
+    setMaximum( 600.0 );
+    setSingleStep( 0.1 );
+    setButtonSymbols( QDoubleSpinBox::PlusMinus );
+    CONNECT( this, valueChanged( double ), this, valueChangedHandler( double ) );
+}
+
+void SyncWidget::valueChangedHandler( double d )
+{
+    if ( d < 0 )
+        setPrefix( qtr("Hastened by ") );
+    else if ( d > 0 )
+        setPrefix( qtr("Delayed by ") );
+    else
+        setPrefix( "" );
+}
+
 SyncControls::SyncControls( intf_thread_t *_p_intf, QWidget *_parent ) :
                             QWidget( _parent ) , p_intf( _p_intf )
 {
     QGroupBox *AVBox, *subsBox;
-
-    QToolButton *moinsAV, *plusAV;
-    QToolButton *moinssubs, *plussubs;
-    QToolButton *moinssubSpeed, *plussubSpeed;
-    QToolButton *moinssubDuration, *plussubDuration;
-
     QToolButton *updateButton;
 
     b_userAction = true;
@@ -1483,81 +1498,29 @@ SyncControls::SyncControls( intf_thread_t *_p_intf, QWidget *_parent ) :
     AVBox = new QGroupBox( qtr( "Audio/Video" ) );
     QGridLayout *AVLayout = new QGridLayout( AVBox );
 
-    moinsAV = new QToolButton;
-    moinsAV->setToolButtonStyle( Qt::ToolButtonTextOnly );
-    moinsAV->setAutoRaise( true );
-    moinsAV->setText( "-" );
-    AVLayout->addWidget( moinsAV, 0, 1, 1, 1 );
-
-    plusAV = new QToolButton;
-    plusAV->setToolButtonStyle( Qt::ToolButtonTextOnly );
-    plusAV->setAutoRaise( true );
-    plusAV->setText( "+" );
-    AVLayout->addWidget( plusAV, 0, 3, 1, 1 );
-
     QLabel *AVLabel = new QLabel;
-    AVLabel->setText( qtr( "Add a delay to the audio track:" ) );
+    AVLabel->setText( qtr( "Audio track synchronization:" ) );
     AVLayout->addWidget( AVLabel, 0, 0, 1, 1 );
 
-    AVSpin = new QDoubleSpinBox;
-    AVSpin->setAlignment( Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter );
-    AVSpin->setDecimals( 3 );
-    AVSpin->setMinimum( -600.0 );
-    AVSpin->setMaximum( 600.0 );
-    AVSpin->setSingleStep( 0.1 );
-    AVSpin->setToolTip( qtr( "A positive value will delay\n"
-                             "the audio, when it was ahead of the video" ) );
+    AVSpin = new SyncWidget( this );
     AVSpin->setSuffix( " s" );
     AVLayout->addWidget( AVSpin, 0, 2, 1, 1 );
     mainLayout->addWidget( AVBox, 1, 0, 1, 5 );
-
 
     /* Subs */
     subsBox = new QGroupBox( qtr( "Subtitles/Video" ) );
     QGridLayout *subsLayout = new QGridLayout( subsBox );
 
-    moinssubs = new QToolButton;
-    moinssubs->setToolButtonStyle( Qt::ToolButtonTextOnly );
-    moinssubs->setAutoRaise( true );
-    moinssubs->setText( "-" );
-    subsLayout->addWidget( moinssubs, 0, 1, 1, 1 );
-
-    plussubs = new QToolButton;
-    plussubs->setToolButtonStyle( Qt::ToolButtonTextOnly );
-    plussubs->setAutoRaise( true );
-    plussubs->setText( "+" );
-    subsLayout->addWidget( plussubs, 0, 3, 1, 1 );
-
     QLabel *subsLabel = new QLabel;
-    subsLabel->setText( qtr( "Add a delay to the subtitle track:" ) );
+    subsLabel->setText( qtr( "Subtitle track syncronization:" ) );
     subsLayout->addWidget( subsLabel, 0, 0, 1, 1 );
 
-    subsSpin = new QDoubleSpinBox;
-    subsSpin->setAlignment( Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter );
-    subsSpin->setDecimals( 3 );
-    subsSpin->setMinimum( -600.0 );
-    subsSpin->setMaximum( 600.0 );
-    subsSpin->setSingleStep( 0.1 );
-    subsSpin->setToolTip( qtr( "A positive value will delay the\n"
-                             "subtitles, when they were ahead of the video" ) );
+    subsSpin = new SyncWidget( this );
     subsSpin->setSuffix( " s" );
     subsLayout->addWidget( subsSpin, 0, 2, 1, 1 );
 
-
-    moinssubSpeed = new QToolButton;
-    moinssubSpeed->setToolButtonStyle( Qt::ToolButtonTextOnly );
-    moinssubSpeed->setAutoRaise( true );
-    moinssubSpeed->setText( "-" );
-    subsLayout->addWidget( moinssubSpeed, 1, 1, 1, 1 );
-
-    plussubSpeed = new QToolButton;
-    plussubSpeed->setToolButtonStyle( Qt::ToolButtonTextOnly );
-    plussubSpeed->setAutoRaise( true );
-    plussubSpeed->setText( "+" );
-    subsLayout->addWidget( plussubSpeed, 1, 3, 1, 1 );
-
     QLabel *subSpeedLabel = new QLabel;
-    subSpeedLabel->setText( qtr( "Speed of the subtitles:" ) );
+    subSpeedLabel->setText( qtr( "Subtitles speed:" ) );
     subsLayout->addWidget( subSpeedLabel, 1, 0, 1, 1 );
 
     subSpeedSpin = new QDoubleSpinBox;
@@ -1567,19 +1530,8 @@ SyncControls::SyncControls( intf_thread_t *_p_intf, QWidget *_parent ) :
     subSpeedSpin->setMaximum( 100 );
     subSpeedSpin->setSingleStep( 0.2 );
     subSpeedSpin->setSuffix( " fps" );
+    subSpeedSpin->setButtonSymbols( QDoubleSpinBox::PlusMinus );
     subsLayout->addWidget( subSpeedSpin, 1, 2, 1, 1 );
-
-    moinssubDuration = new QToolButton;
-    moinssubDuration->setToolButtonStyle( Qt::ToolButtonTextOnly );
-    moinssubDuration->setAutoRaise( true );
-    moinssubDuration->setText( "-" );
-    subsLayout->addWidget( moinssubDuration, 2, 1, 1, 1 );
-
-    plussubDuration = new QToolButton;
-    plussubDuration->setToolButtonStyle( Qt::ToolButtonTextOnly );
-    plussubDuration->setAutoRaise( true );
-    plussubDuration->setText( "+" );
-    subsLayout->addWidget( plussubDuration, 2, 3, 1, 1 );
 
     QLabel *subDurationLabel = new QLabel;
     subDurationLabel->setText( qtr( "Subtitles duration factor:" ) );
@@ -1591,6 +1543,7 @@ SyncControls::SyncControls( intf_thread_t *_p_intf, QWidget *_parent ) :
     subDurationSpin->setMinimum( 0 );
     subDurationSpin->setMaximum( 20 );
     subDurationSpin->setSingleStep( 0.2 );
+    subDurationSpin->setButtonSymbols( QDoubleSpinBox::PlusMinus );
     subsLayout->addWidget( subDurationSpin, 2, 2, 1, 1 );
 
     mainLayout->addWidget( subsBox, 2, 0, 2, 5 );
@@ -1599,16 +1552,7 @@ SyncControls::SyncControls( intf_thread_t *_p_intf, QWidget *_parent ) :
     updateButton->setAutoRaise( true );
     mainLayout->addWidget( updateButton, 0, 4, 1, 1 );
 
-
     /* Various Connects */
-    CONNECT( moinsAV, clicked(), AVSpin, stepDown () );
-    CONNECT( plusAV, clicked(), AVSpin, stepUp () );
-    CONNECT( moinssubs, clicked(), subsSpin, stepDown () );
-    CONNECT( plussubs, clicked(), subsSpin, stepUp () );
-    CONNECT( moinssubSpeed, clicked(), subSpeedSpin, stepDown () );
-    CONNECT( plussubSpeed, clicked(), subSpeedSpin, stepUp () );
-    CONNECT( moinssubDuration, clicked(), subDurationSpin, stepDown () );
-    CONNECT( plussubDuration, clicked(), subDurationSpin, stepUp () );
     CONNECT( AVSpin, valueChanged ( double ), this, advanceAudio( double ) ) ;
     CONNECT( subsSpin, valueChanged ( double ), this, advanceSubs( double ) ) ;
     CONNECT( subSpeedSpin, valueChanged ( double ),
