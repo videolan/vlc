@@ -32,7 +32,10 @@ function parse()
     p = {}
     if string.match ( vlc.path, "vimeo.com/%d+" ) then
         _,_,id = string.find( vlc.path, "vimeo.com/(.*)")
-        return { { path = "http://vimeo.com/moogaloop/load/clip:" .. id .. "/local/", name = "Vimeo playlist" } }
+        -- Vimeo disables HD if the user-agent contains "VLC", so we
+        -- set it to something inconspicuous. We do it here because
+        -- they seem to do some detection across requests
+        return { { path = "http://vimeo.com/moogaloop/load/clip:" .. id .. "/local/", name = "Vimeo playlist", options = { ":http-user-agent=Mozilla/5.0 (Windows NT 6.1; rv:6.0.2) Gecko/20100101 Firefox/6.0.2" } } }
     end
 
     if string.match ( vlc.path, "vimeo.com/moogaloop" ) then
