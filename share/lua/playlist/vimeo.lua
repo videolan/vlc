@@ -31,9 +31,7 @@ end
 function parse()
     p = {}
     if string.match ( vlc.path, "vimeo.com/%d+" ) then
-        print (" vlc path is : " .. vlc.path )
         _,_,id = string.find( vlc.path, "vimeo.com/(.*)")
-        print (" id is : " .. id )
         return { { path = "http://vimeo.com/moogaloop/load/clip:" .. id .. "/local/", name = "Vimeo playlist" } }
     end
 
