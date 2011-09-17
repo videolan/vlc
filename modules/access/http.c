@@ -53,6 +53,7 @@
 #endif
 
 #include <assert.h>
+#include <limits.h>
 
 #ifdef HAVE_LIBPROXY
 #    include <proxy.h>
@@ -320,15 +321,39 @@ static int OpenWithCookies( vlc_object_t *p_this, const char *psz_access,
     }
 
     /* Determine the HTTP user agent */
-    /* See RFC2616 §2.2 token definition and §3.8 user-agent header */
+    /* See RFC2616 §2.2 token and comment definition, and §3.8 and
+     * §14.43 user-agent header */
     p_sys->psz_user_agent = var_InheritString( p_access, "http-user-agent" );
     if (p_sys->psz_user_agent)
     {
+        unsigned comment_level = 0;
         for( char *p = p_sys->psz_user_agent; *p; p++ )
         {
             uint8_t c = *p;
-            if( c < 32 || strchr( "()<>@,;:\\\"[]?={}", c ) )
-                *p = '_'; /* remove potentially harmful characters */
+            if (comment_level == 0)
+            {
+                if( c < 32 || strchr( ")<>@,;:\\\"[]?={}", c ) )
+                    *p = '_'; /* remove potentially harmful characters */
+            }
+            else
+            {
+                if (c == ')')
+                    comment_level--;
+                else if( c < 32 && strchr( "\t\r\n", c ) == NULL)
+                    *p = '_'; /* remove potentially harmful characters */
+            }
+            if (c == '(')
+            {
+                if (comment_level == UINT_MAX)
+                    break;
+                comment_level++;
+            }
+        }
+        /* truncate evil unclosed comments */
+        if (comment_level > 0)
+        {
+            char *p = strchr(p_sys->psz_user_agent, '(');
+            *p = '\0';
         }
     }
 
