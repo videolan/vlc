@@ -490,6 +490,7 @@ DroppingController::DroppingController( intf_thread_t *_p_intf,
                                         QWidget *_parent )
                    : AbstractController( _p_intf, _parent )
 {
+    RTL_UNAFFECTED_WIDGET
     rubberband = NULL;
     b_draging = false;
     setAcceptDrops( true );

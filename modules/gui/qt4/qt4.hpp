@@ -117,6 +117,9 @@ struct intf_sys_t
 #define TOGGLEV( x ) { if( x->isVisible() ) x->hide();          \
             else  x->show(); }
 
+/* for widgets which must not follow the RTL auto layout changes */
+#define RTL_UNAFFECTED_WIDGET setLayoutDirection( Qt::LeftToRight );
+
 #define getSettings() p_intf->p_sys->mainSettings
 
 #define QT_VOLUME_DEFAULT AOUT_VOLUME_DEFAULT

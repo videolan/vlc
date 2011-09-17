@@ -623,12 +623,12 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
                                 QWidget *_parent ) :
                                 AbstractController( _p_i, _parent )
 {
+    RTL_UNAFFECTED_WIDGET
     /* advanced Controls handling */
     b_advancedVisible = b_advControls;
 #ifdef DEBUG_LAYOUT
     setStyleSheet( "background: red ");
 #endif
-
     setAttribute( Qt::WA_MacBrushedMetal);
     QVBoxLayout *controlLayout = new QVBoxLayout( this );
     controlLayout->setContentsMargins( 4, 1, 0, 0 );
@@ -675,6 +675,7 @@ void ControlsWidget::toggleAdvanced()
 AdvControlsWidget::AdvControlsWidget( intf_thread_t *_p_i, QWidget *_parent ) :
                                      AbstractController( _p_i, _parent )
 {
+    RTL_UNAFFECTED_WIDGET
     controlLayout = new QHBoxLayout( this );
     controlLayout->setMargin( 0 );
     controlLayout->setSpacing( 0 );
@@ -691,6 +692,7 @@ AdvControlsWidget::AdvControlsWidget( intf_thread_t *_p_i, QWidget *_parent ) :
 InputControlsWidget::InputControlsWidget( intf_thread_t *_p_i, QWidget *_parent ) :
                                      AbstractController( _p_i, _parent )
 {
+    RTL_UNAFFECTED_WIDGET
     controlLayout = new QHBoxLayout( this );
     controlLayout->setMargin( 0 );
     controlLayout->setSpacing( 0 );
@@ -707,6 +709,7 @@ InputControlsWidget::InputControlsWidget( intf_thread_t *_p_i, QWidget *_parent 
 FullscreenControllerWidget::FullscreenControllerWidget( intf_thread_t *_p_i, QWidget *_parent )
                            : AbstractController( _p_i, _parent )
 {
+    RTL_UNAFFECTED_WIDGET
     i_mouse_last_x      = -1;
     i_mouse_last_y      = -1;
     b_mouse_over        = false;
