@@ -1443,6 +1443,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = "";
+				IBC_PLUGINS = "\"$(SRCROOT)/../../contrib/BGHUDAppKit/BGHUDAppKit.framework/Resources/BGHUDAppKitPlugin.ibplugin\"";
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(HOME)/Library/Bundles";
 				JAVAC_SOURCE_FILE_ENCODING = "ISO-8859-1";
@@ -1476,6 +1477,7 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = "";
+				IBC_PLUGINS = "\"$(SRCROOT)/../../contrib/BGHUDAppKit/BGHUDAppKit.framework/Resources/BGHUDAppKitPlugin.ibplugin\"";
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(HOME)/Library/Bundles";
 				JAVAC_SOURCE_FILE_ENCODING = "ISO-8859-1";
@@ -1508,6 +1510,7 @@
 				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/../../contrib/Sparkle\"";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = "";
+				IBC_PLUGINS = "\"$(SRCROOT)/../../contrib/BGHUDAppKit/BGHUDAppKit.framework/Resources/BGHUDAppKitPlugin.ibplugin\"";
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(HOME)/Library/Bundles";
 				JAVAC_SOURCE_FILE_ENCODING = "ISO-8859-1";
