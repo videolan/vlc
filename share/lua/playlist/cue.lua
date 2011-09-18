@@ -49,7 +49,7 @@ function cue_path( src )
 		return src
 	end
 
-	local path = string.gsub( vlc.path, '\\', '/' )
+	local path = string.gsub( vlc.strings.decode_uri(vlc.path), '\\', '/' )
 	local slash = string.find( string.reverse( path ), '/' )
 	if( path == nil ) then
 		return src
