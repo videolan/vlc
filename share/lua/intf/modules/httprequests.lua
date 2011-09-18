@@ -131,9 +131,15 @@ processcommands = function ()
 	elseif command == "pl_random" then
 	  vlc.playlist.random()
 	elseif command == "pl_loop" then
-	  vlc.playlist.loop()
+	--if loop is set true, then repeat needs to be set false
+	  if vlc.playlist.loop() then
+		vlc.playlist.repeat_("off")
+	  end
 	elseif command == "pl_repeat" then
-	  vlc.playlist.repeat_()
+	--if repeat is set true, then loop needs to be set false
+	  if vlc.playlist.repeat_() then
+		vlc.playlist.loop("off")
+	  end
 	elseif command == "pl_sd" then
 	  if vlc.sd.is_loaded(val) then
 		vlc.sd.remove(val)
