@@ -102,10 +102,7 @@ ChangeLog: Makefile.am
 
 EXTRA_DIST += \
 	extras/package/macosx/Resources/about_bg.png \
-	extras/package/macosx/Resources/add_embedded.png \
-	extras/package/macosx/Resources/add_embedded_graphite.png \
 	extras/package/macosx/Resources/dsa_pub.pem \
-	extras/package/macosx/Resources/embedded_vout.png \
 	extras/package/macosx/Resources/English.lproj/About.xib \
 	extras/package/macosx/Resources/English.lproj/AudioEffects.xib \
 	extras/package/macosx/Resources/English.lproj/Bookmarks.xib \
@@ -236,7 +233,7 @@ EXTRA_DIST += \
 	extras/package/macosx/Resources/mainwindow/repeat-pressed.png \
 	extras/package/macosx/Resources/mainwindow/repeat.png \
 	extras/package/macosx/Resources/mainwindow/shuffle-blue-pressed.png \
-	extras/package/macosx/Resources/mainwindow/shuffle-on.png \
+	extras/package/macosx/Resources/mainwindow/shuffle-blue.png \
 	extras/package/macosx/Resources/mainwindow/shuffle-pressed.png \
 	extras/package/macosx/Resources/mainwindow/shuffle.png \
 	extras/package/macosx/Resources/mainwindow/stop-pressed.png \
@@ -290,10 +287,6 @@ EXTRA_DIST += \
 	extras/package/macosx/Resources/mainwindow_dark/volume-slider-knob_dark.png \
 	extras/package/macosx/Resources/mainwindow_dark/volume-slider-track_dark.png \
 	extras/package/macosx/Resources/noart.png \
-	extras/package/macosx/Resources/pause_embedded.png \
-	extras/package/macosx/Resources/pause_embedded_graphite.png \
-	extras/package/macosx/Resources/play_embedded.png \
-	extras/package/macosx/Resources/play_embedded_graphite.png \
 	extras/package/macosx/Resources/prefs/spref_cone_Audio_64.png \
 	extras/package/macosx/Resources/prefs/spref_cone_Hotkeys_64.png \
 	extras/package/macosx/Resources/prefs/spref_cone_Input_64.png \
@@ -301,11 +294,6 @@ EXTRA_DIST += \
 	extras/package/macosx/Resources/prefs/spref_cone_Subtitles_64.png \
 	extras/package/macosx/Resources/prefs/spref_cone_Video_64.png \
 	extras/package/macosx/Resources/README \
-	extras/package/macosx/Resources/repeat_embedded.png \
-	extras/package/macosx/Resources/repeat_embedded_graphite.png \
-	extras/package/macosx/Resources/repeat_single_embedded_graphite.png \
-	extras/package/macosx/Resources/shuffle_embedded.png \
-	extras/package/macosx/Resources/shuffle_embedded_graphite.png \
 	extras/package/macosx/Resources/sidebar-icons/document-music-playlist.png \
 	extras/package/macosx/Resources/sidebar-icons/film-cast.png \
 	extras/package/macosx/Resources/sidebar-icons/film.png \
@@ -313,10 +301,6 @@ EXTRA_DIST += \
 	extras/package/macosx/Resources/sidebar-icons/network-cloud.png \
 	extras/package/macosx/Resources/sidebar-icons/picture.png \
 	extras/package/macosx/Resources/sidebar-icons/README \
-	extras/package/macosx/Resources/skip_forward_active_embedded.png \
-	extras/package/macosx/Resources/skip_forward_embedded_graphite.png \
-	extras/package/macosx/Resources/skip_previous_active_embedded.png \
-	extras/package/macosx/Resources/skip_previous_embedded_graphite.png \
 	extras/package/macosx/Resources/vlc.scriptSuite \
 	extras/package/macosx/Resources/vlc.scriptTerminology \
 	extras/package/macosx/fullscreen_panel.svg \
