@@ -8,7 +8,7 @@ $(function(){
 			$( "#currentTime" ).empty().append( format_time(Math.round((ui.value/100)*$('#seekSlider').attr('totalLength'))) );
 			switch(current_que){
 				case 'main':
-					sendCommand({'command':'seek','val':Math.round((ui.value/100)*$('#seekSlider').attr('totalLength'))});
+					sendCommand({'command':'seek','val':(ui.value)+'%'});
 					break;
 				case 'stream':
 					sendVLMCmd('control Current seek '+ui.value);
