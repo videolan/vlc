@@ -24,6 +24,7 @@
  *****************************************************************************/
 
 #include "Ebml_parser.hpp"
+#include "stream_io_callback.hpp"
 
 /*****************************************************************************
  * Ebml Stream parser
@@ -77,7 +78,7 @@ EbmlElement* EbmlParser::UnGet( uint64 i_block_pos, uint64 i_cluster_pos )
     }
     m_got = NULL;
     mb_keep = false;
-    if ( m_el[1]->GetElementPosition() == i_cluster_pos )
+    if ( m_el[1] && m_el[1]->GetElementPosition() == i_cluster_pos )
     {
         m_es->I_O().setFilePointer( i_block_pos, seek_beginning );
         return (EbmlMaster*) m_el[1];
@@ -161,8 +162,9 @@ EbmlElement *EbmlParser::Get( void )
         }
         mb_keep = false;
     }
-
-    m_el[mi_level] = m_es->FindNextElement( EBML_CONTEXT(m_el[mi_level - 1]), i_ulev, 0xFFFFFFFFL, mb_dummy != 0, 1 );
+    vlc_stream_io_callback & io_stream = (vlc_stream_io_callback &) m_es->I_O();
+    uint64 i_size = io_stream.toRead();
+    m_el[mi_level] = m_es->FindNextElement( EBML_CONTEXT(m_el[mi_level - 1]), i_ulev, i_size, mb_dummy != 0, 1 );
 //    mi_remain_size[mi_level] = m_el[mi_level]->GetSize();
     if( i_ulev > 0 )
     {

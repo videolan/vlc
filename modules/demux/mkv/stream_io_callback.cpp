@@ -87,3 +87,18 @@ size_t vlc_stream_io_callback::write(const void *, size_t )
     return 0;
 }
 
+uint64 vlc_stream_io_callback::toRead( void )
+{
+    uint64_t i_size;
+
+    if( s == NULL)
+        return 0;
+
+    stream_Control( s, STREAM_GET_SIZE, &i_size );
+
+    if( i_size == 0 )
+        return 0xFFFFFFFFL;
+
+    return (uint64) i_size - stream_Tell( s );
+}
+
