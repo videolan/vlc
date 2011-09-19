@@ -1,9 +1,7 @@
 # FFmpeg
 
-FFMPEG_VERSION=0.4.8
-FFMPEG_URL=$(SF)/ffmpeg/ffmpeg-$(FFMPEG_VERSION).tar.gz
-FFMPEG_SVN=svn://svn.ffmpeg.org/ffmpeg/trunk
-FFMPEG_SVN_REV=26400
+FFMPEG_SNAPURL := http://git.videolan.org/?p=ffmpeg.git;a=snapshot;h=HEAD;sf=tgz
+#FFMPEG_SNAPURL := http://git.libav.org/?p=libav.git;a=snapshot;h=HEAD;sf=tgz
 
 FFMPEGCONF = \
 	--cc="$(CC)" \
@@ -105,29 +103,25 @@ ifeq ($(call need_pkg,"libavcodec libavformat libswscale"),)
 PKGS_FOUND += ffmpeg
 endif
 
-ffmpeg-$(FFMPEG_VERSION).tar.gz:
-	$(error FFmpeg snapshot is too old, VCS must be used!)
-	$(call download,$(FFMPEG_URL))
+$(TARBALLS)/ffmpeg-git.tar.gz:
+	$(call download,$(FFMPEG_SNAPURL))
 
-$(TARBALLS)/ffmpeg-svn.tar.gz:
-	$(SVN) export $(FFMPEG_SVN) ffmpeg-svn
-	tar cvz ffmpeg-svn > $@
-
-FFMPEG_VERSION := svn
+FFMPEG_VERSION := git
 
 .sum-ffmpeg: $(TARBALLS)/ffmpeg-$(FFMPEG_VERSION).tar.gz
 	$(warning Not implemented.)
 	touch $@
 
 ffmpeg: ffmpeg-$(FFMPEG_VERSION).tar.gz .sum-ffmpeg
-	$(UNPACK)
+	rm -Rf ffmpeg-git
+	mkdir -p ffmpeg-git
+	zcat "$<" | (cd ffmpeg-git && tar xv --strip-components=1)
 ifdef HAVE_WIN64
 	$(APPLY) $(SRC)/ffmpeg/ffmpeg-win64.patch
 endif
 ifdef HAVE_WIN32
 	sed -i "s/std=c99/std=gnu99/" $@-$(FFMPEG_VERSION)/configure
 endif
-	$(APPLY) $(SRC)/ffmpeg/libavformat-ape.c.patch
 	$(MOVE)
 
 .ffmpeg: ffmpeg
