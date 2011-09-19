@@ -398,12 +398,12 @@ typedef struct meta_engine_t meta_engine_t;
 
 /* stat/lstat/fstat */
 #ifdef WIN32
-#include <sys/stat.h>
+# include <sys/stat.h>
 
 # ifndef UNDER_CE
 struct _stati64;
-#define stat _stati64
-#define fstat _fstati64
+#  define stat _stati64
+#  define fstat _fstati64
 #endif
 
 /* You should otherwise use vlc_stat and vlc_lstat. */
@@ -472,8 +472,10 @@ typedef int ( * vlc_callback_t ) ( vlc_object_t *,      /* variable's object */
  * OS-specific headers and thread types
  *****************************************************************************/
 #if defined( WIN32 ) || defined( UNDER_CE )
-#   define WIN32_LEAN_AND_MEAN
-#   include <windows.h>
+/* WIN32_LEAN_AND_MEAN is needed to be able to include winsock2.h because else,
+ * windows.h will also include winsock.h and declarations will conflict */
+# define WIN32_LEAN_AND_MEAN
+# include <windows.h>
 #endif
 
 #include "vlc_mtime.h"
@@ -855,7 +857,7 @@ static inline void SetQWLE (void *p, uint64_t qw)
 #       endif
 #   endif
 
-#   if defined( _MSC_VER ) && !defined( __WXMSW__ )
+#   if defined( _MSC_VER )
 #       if !defined( _OFF_T_DEFINED )
             typedef __int64 off_t;
 #           define _OFF_T_DEFINED
