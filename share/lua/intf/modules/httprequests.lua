@@ -354,6 +354,63 @@ playlisttable = function ()
 	return parseplaylist(basePlaylist)
 end
 
+getbrowsetable = function ()
+
+local dir = _GET["dir"]
+if dir == nil then dir = "" end
+--allow browse to deal with file-style URI's as well as paths
+local start=string.sub(dir,0,8)
+if start=="file:///" then
+	dir= string.sub(dir,9)
+end
+
+
+	local result={}
+	result.element={}
+	result.element._array={}
+
+
+	if dir then
+		if dir == "~" then dir = vlc.misc.homedir() end
+			dir = common.realpath(dir.."/")
+			local d = vlc.net.opendir(dir)
+			table.sort(d)
+
+			--paths are returned as an array of elements
+
+
+
+			for _,f in pairs(d) do
+				if f == ".." or not string.match(f,"^%.") then
+				local df = common.realpath(dir..f)
+				local s = vlc.net.stat(df)
+				local path, name = vlc.strings.convert_xml_special_chars( df, f )
+				local element={}
+
+				for k,v in pairs(s) do
+					element[k]=v
+				end
+				element["path"]=path
+				element["name"]=name
+
+				local uri=vlc.strings.make_uri(path)
+				--windows paths are returned with / separators, but make_uri expects \ for windows and returns nil
+				if not uri then
+					--convert failed path to windows format and try again
+					path=string.gsub(path,"/","\\")
+					uri=vlc.strings.make_uri(path)
+				end
+				element["uri"]=uri
+
+				table.insert(result.element._array,element)
+			end
+
+		end
+	end
+
+	return result;
+end
+
 
 getstatus = function (includecategories)
 

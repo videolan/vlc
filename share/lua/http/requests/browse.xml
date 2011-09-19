@@ -25,24 +25,32 @@ vim:syntax=lua
 < - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
 ]] ?>
 
-<root>
 <?vlc
-local dir = _GET["dir"]
-if dir then
-  if dir == "~" then dir = vlc.misc.homedir() end
-  dir = common.realpath(dir.."/")
-  local d = vlc.net.opendir(dir)
-  table.sort(d)
-  for _,f in pairs(d) do
-    if f == ".." or not string.match(f,"^%.") then
-      local df = common.realpath(dir..f)
-      local s = vlc.net.stat(df)
-      local path, name = vlc.strings.convert_xml_special_chars( df, f )
-      print("<element")
-      for k,v in pairs(s) do print(" "..k.."='"..v.."'") end
-      print(" path='"..path.."' name='"..name.."'/>\n")
-    end
-  end
+
+--package.loaded.httprequests = nil --uncomment to debug changes
+require "httprequests"
+
+httprequests.processcommands()
+
+local browseTable=httprequests.getbrowsetable()
+
+print('<root>\n')
+
+--httprequests.printTableAsJson(browseTable.element._array,0)
+
+
+for i,e in ipairs(browseTable.element._array) do
+	print('<element ')
+
+	for k,v in pairs(e) do
+		print(" "..k.."='"..v.."'")
+	end
+
+	print('/>')
 end
+
+
+print('</root>')
+
 ?>
-</root>
+
