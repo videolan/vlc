@@ -1,5 +1,4 @@
 dnl  Macros needed for VLC
-dnl  $Id$
 
 dnl ===========================================================================
 dnl  Macros to add plugins or builtins and handle their flags
@@ -13,7 +12,6 @@ AC_DEFUN([VLC_ADD_PLUGIN], [
   ])
 ])
 
-dnl  Special cases: vlc, pics, plugins, save
 AC_DEFUN([VLC_ADD_CPPFLAGS], [
   m4_foreach_w([element], [$1], [
     [eval "CPPFLAGS_]element[="'"$'"{CPPFLAGS_]element[} $2"'"']
@@ -99,4 +97,3 @@ AC_DEFUN([VLC_LIBRARY_SUFFIX], [
   AC_MSG_RESULT(${LIBEXT})
   AC_DEFINE_UNQUOTED(LIBEXT, "${LIBEXT}", [Dynamic object extension])
 ])
-
