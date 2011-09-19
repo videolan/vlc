@@ -77,6 +77,7 @@ libxcb_glx_plugin_la_DEPENDENCIES =
 
 libxcb_window_plugin_la_SOURCES = xcb/window.c xcb/keys.c xcb/keysym.h xcb/xcb_keysym.h
 libxcb_window_plugin_la_CFLAGS = $(AM_CFLAGS) \
+	$(CFLAGS_xcb_window) \
 	$(XPROTO_CFLAGS) \
 	$(XCB_CFLAGS) \
 	$(XCB_KEYSYMS_CFLAGS)
