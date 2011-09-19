@@ -73,7 +73,6 @@ struct demux_sys_t
     es_out_id_t     **tk;
 
     int64_t     i_pcr;
-    int64_t     i_pcr_inc;
     int         i_pcr_tk;
 
     unsigned    i_ssa_order;
