@@ -49,7 +49,7 @@ local item = vlc.input.item()
       if item then
         local metas = item:metas()
         for k,v in pairs(metas) do
-          print("<info name='"..k.."'>"..vlc.strings.convert_xml_special_chars(v).."</info>")
+          print("<info name='"..vlc.strings.convert_xml_special_chars(k).."'>"..vlc.strings.convert_xml_special_chars(v).."</info>")
         end
       end
     ?>
@@ -58,9 +58,9 @@ local item = vlc.input.item()
     if item then
       local info = item:info()
       for k, v in pairs(info) do
-        print("<category name='"..k.."'>")
+        print("<category name='"..vlc.strings.convert_xml_special_chars(k).."'>")
           for k2, v2 in pairs(v) do
-            print("<info name='"..k2.."'>"..vlc.strings.convert_xml_special_chars(v2).."</info>")
+            print("<info name='"..vlc.strings.convert_xml_special_chars(k2).."'>"..vlc.strings.convert_xml_special_chars(v2).."</info>")
           end
         print("</category>")
       end
