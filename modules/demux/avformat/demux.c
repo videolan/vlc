@@ -233,6 +233,7 @@ int OpenDemux( vlc_object_t *p_this )
                               p_sys->fmt, NULL ) )
     {
         msg_Err( p_demux, "av_open_input_stream failed" );
+        p_sys->ic = NULL;
         free( psz_url );
         CloseDemux( p_this );
         return VLC_EGENERIC;
