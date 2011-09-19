@@ -213,11 +213,10 @@
 		63D88C56124E9A5100F65FA0 /* Quartz.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Quartz.framework; path = System/Library/Frameworks/Quartz.framework; sourceTree = SDKROOT; };
 		63D88CA9124E9A8200F65FA0 /* ApplicationServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ApplicationServices.framework; path = System/Library/Frameworks/ApplicationServices.framework; sourceTree = SDKROOT; };
 		63D88D92124E9BF600F65FA0 /* VLCMediaThumbnailer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCMediaThumbnailer.h; path = Public/VLCMediaThumbnailer.h; sourceTree = "<group>"; };
-		8DC2EF5B0486A6940098B216 /* VLCKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = VLCKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		A26DCC7314279D2400EA47A0 /* VLCKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = VLCKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A7A0CEA20D2EF13000F2C039 /* VLCVideoCommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCVideoCommon.h; path = Internal/VLCVideoCommon.h; sourceTree = "<group>"; };
 		A7A0CEA30D2EF13000F2C039 /* VLCVideoCommon.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCVideoCommon.m; sourceTree = "<group>"; };
-		CC4C593F13F53EA400FB0EFC /* VLCKit copy.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = "VLCKit copy.framework"; sourceTree = BUILT_PRODUCTS_DIR; };
-		CC4C594013F53EA400FB0EFC /* VLCKit copy-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "VLCKit copy-Info.plist"; path = "/Users/fpk/Desktop/videolan/vlc/projects/macosx/framework/VLCKit copy-Info.plist"; sourceTree = "<absolute>"; };
+		CC4C594013F53EA400FB0EFC /* VLCKit-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "VLCKit-Info.plist"; path = "/Users/dilaroga/dev/vlc_workspace/vlc/projects/macosx/framework/VLCKit-Info.plist"; sourceTree = "<absolute>"; };
 		CCEC5B73114D9BE800D34AAB /* deprecated.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = deprecated.h; path = ../../../include/vlc/deprecated.h; sourceTree = SOURCE_ROOT; };
 		CCEC5B74114D9BE800D34AAB /* libvlc_events.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = libvlc_events.h; path = ../../../include/vlc/libvlc_events.h; sourceTree = SOURCE_ROOT; };
 		CCEC5B75114D9BE800D34AAB /* libvlc_media_discoverer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = libvlc_media_discoverer.h; path = ../../../include/vlc/libvlc_media_discoverer.h; sourceTree = SOURCE_ROOT; };
@@ -278,8 +277,7 @@
 		034768DFFF38A50411DB9C8B /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				8DC2EF5B0486A6940098B216 /* VLCKit.framework */,
-				CC4C593F13F53EA400FB0EFC /* VLCKit copy.framework */,
+				A26DCC7314279D2400EA47A0 /* VLCKit.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -295,7 +293,7 @@
 				034768DFFF38A50411DB9C8B /* Products */,
 				63D88C56124E9A5100F65FA0 /* Quartz.framework */,
 				63D88CA9124E9A8200F65FA0 /* ApplicationServices.framework */,
-				CC4C594013F53EA400FB0EFC /* VLCKit copy-Info.plist */,
+				CC4C594013F53EA400FB0EFC /* VLCKit-Info.plist */,
 			);
 			name = VLC;
 			sourceTree = "<group>";
@@ -537,7 +535,7 @@
 			name = "Build just VLCKit";
 			productInstallPath = "$(HOME)/Library/Frameworks";
 			productName = VLC;
-			productReference = 8DC2EF5B0486A6940098B216 /* VLCKit.framework */;
+			productReference = A26DCC7314279D2400EA47A0 /* VLCKit.framework */;
 			productType = "com.apple.product-type.framework";
 		};
 		CC4C590813F53EA400FB0EFC /* Build Everything */ = {
@@ -561,7 +559,6 @@
 			name = "Build Everything";
 			productInstallPath = "$(HOME)/Library/Frameworks";
 			productName = VLC;
-			productReference = CC4C593F13F53EA400FB0EFC /* VLCKit copy.framework */;
 			productType = "com.apple.product-type.framework";
 		};
 /* End PBXNativeTarget section */
@@ -1008,7 +1005,7 @@
 					"$(VLC_SRC_DIR)/include",
 					"Headers/**",
 				);
-				INFOPLIST_FILE = "VLCKit copy-Info.plist";
+				INFOPLIST_FILE = "VLCKit-Info.plist";
 				INSTALL_PATH = "@loader_path/../Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(CONFIGURATION_BUILD_DIR)/$(PRODUCT_NAME).$(WRAPPER_EXTENSION)/lib";
 				OTHER_LDFLAGS = (
@@ -1019,7 +1016,7 @@
 					"-lvlc",
 				);
 				PRIVATE_HEADERS_FOLDER_PATH = "$(CONTENTS_FOLDER_PATH)/PrivateHeaders";
-				PRODUCT_NAME = "VLCKit copy";
+				PRODUCT_NAME = VLCKit;
 				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = YES;
 				SDKROOT = macosx;
 				WRAPPER_EXTENSION = framework;
@@ -1042,7 +1039,7 @@
 					"$(VLC_SRC_DIR)/include",
 					"Headers/**",
 				);
-				INFOPLIST_FILE = "VLCKit copy-Info.plist";
+				INFOPLIST_FILE = "VLCKit-Info.plist";
 				INSTALL_PATH = "@loader_path/../Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(CONFIGURATION_BUILD_DIR)/$(PRODUCT_NAME).$(WRAPPER_EXTENSION)/lib";
 				OTHER_LDFLAGS = (
@@ -1053,7 +1050,7 @@
 					"-lvlc",
 				);
 				PRIVATE_HEADERS_FOLDER_PATH = "$(CONTENTS_FOLDER_PATH)/PrivateHeaders";
-				PRODUCT_NAME = "VLCKit copy";
+				PRODUCT_NAME = VLCKit;
 				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = YES;
 				SDKROOT = macosx;
 				WRAPPER_EXTENSION = framework;
