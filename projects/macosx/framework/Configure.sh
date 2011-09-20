@@ -94,10 +94,10 @@ for arch in $ARCHS; do
         $top_srcdir/configure --build=x86_64-apple-darwin10 $this_args
     fi
     if test $arch = "i386"; then
-        export CFLAGS="-m32 -arch i686"
-        export CXXFLAGS="-m32 -arch i686"
-        export OBJCFLAGS="-m32 -arch i686"
-        export CPPFLAGS="-m32 -arch i686"
+        export CFLAGS="-m32 -arch i386"
+        export CXXFLAGS="-m32 -arch i386"
+        export OBJCFLAGS="-m32 -arch i386"
+        export CPPFLAGS="-m32 -arch i386"
         this_args="--with-contrib=${VLC_SRC_DIR}/extras/contrib/hosts/i686-apple-darwin10 $this_args"
         $top_srcdir/configure --build=i686-apple-darwin10 $this_args
     fi
