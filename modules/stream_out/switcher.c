@@ -358,6 +358,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
         /* Set CPU capabilities */
         unsigned i_cpu = vlc_CPU();
         id->ff_enc_c->dsp_mask = 0;
+#if LIBAVCODEC_VERSION_MAJOR < 53
         if( !(i_cpu & CPU_CAPABILITY_MMX) )
         {
             id->ff_enc_c->dsp_mask |= FF_MM_MMX;
@@ -375,7 +376,25 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
             id->ff_enc_c->dsp_mask |= FF_MM_SSE;
             id->ff_enc_c->dsp_mask |= FF_MM_SSE2;
         }
-
+#else
+        if( !(i_cpu & CPU_CAPABILITY_MMX) )
+        {
+            id->ff_enc_c->dsp_mask |= AV_CPU_FLAG_MMX;
+        }
+        if( !(i_cpu & CPU_CAPABILITY_MMXEXT) )
+        {
+            id->ff_enc_c->dsp_mask |= AV_CPU_FLAG_MMX2;
+        }
+        if( !(i_cpu & CPU_CAPABILITY_3DNOW) )
+        {
+            id->ff_enc_c->dsp_mask |= AV_CPU_FLAG_3DNOW;
+        }
+        if( !(i_cpu & CPU_CAPABILITY_SSE) )
+        {
+            id->ff_enc_c->dsp_mask |= AV_CPU_FLAG_SSE;
+            id->ff_enc_c->dsp_mask |= AV_CPU_FLAG_SSE2;
+        }
+#endif
         id->ff_enc_c->sample_rate = p_fmt->audio.i_rate;
         id->ff_enc_c->channels    = p_fmt->audio.i_channels;
         id->ff_enc_c->bit_rate    = p_fmt->i_bitrate;
@@ -747,6 +766,7 @@ static mtime_t VideoCommand( sout_stream_t *p_stream, sout_stream_id_t *id )
         /* Set CPU capabilities */
         unsigned i_cpu = vlc_CPU();
         id->ff_enc_c->dsp_mask = 0;
+#if LIBAVCODEC_VERSION_MAJOR < 53
         if( !(i_cpu & CPU_CAPABILITY_MMX) )
         {
             id->ff_enc_c->dsp_mask |= FF_MM_MMX;
@@ -764,6 +784,25 @@ static mtime_t VideoCommand( sout_stream_t *p_stream, sout_stream_id_t *id )
             id->ff_enc_c->dsp_mask |= FF_MM_SSE;
             id->ff_enc_c->dsp_mask |= FF_MM_SSE2;
         }
+#else
+        if( !(i_cpu & CPU_CAPABILITY_MMX) )
+        {
+            id->ff_enc_c->dsp_mask |= AV_CPU_FLAG_MMX;
+        }
+        if( !(i_cpu & CPU_CAPABILITY_MMXEXT) )
+        {
+            id->ff_enc_c->dsp_mask |= AV_CPU_FLAG_MMX2;
+        }
+        if( !(i_cpu & CPU_CAPABILITY_3DNOW) )
+        {
+            id->ff_enc_c->dsp_mask |= AV_CPU_FLAG_3DNOW;
+        }
+        if( !(i_cpu & CPU_CAPABILITY_SSE) )
+        {
+            id->ff_enc_c->dsp_mask |= AV_CPU_FLAG_SSE;
+            id->ff_enc_c->dsp_mask |= AV_CPU_FLAG_SSE2;
+        }
+#endif
 
         id->ff_enc_c->width = p_sys->p_pictures[p_sys->i_cmd-1].format.i_width;
         id->ff_enc_c->height = p_sys->p_pictures[p_sys->i_cmd-1].format.i_height;
