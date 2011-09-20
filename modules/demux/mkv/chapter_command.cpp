@@ -172,7 +172,7 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
         return false;
 
     virtual_segment_c *p_segment = NULL;
-    chapter_item_c *p_chapter = NULL;
+    virtual_chapter_c *p_chapter = NULL;
     bool f_result = false;
     uint16 i_command = ( p_command[0] << 8 ) + p_command[1];
 
@@ -481,7 +481,7 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
             p_chapter = sys.p_current_segment->BrowseCodecPrivate( 1, MatchIsDomain, NULL, 0 );
             if ( p_chapter != NULL )
             {
-                int16 i_curr_title = p_chapter->GetTitleNumber( );
+                int16 i_curr_title = ( p_chapter->p_chapter )? p_chapter->p_chapter->GetTitleNumber() : 0;
                 if ( i_curr_title > 0 )
                 {
                     p_chapter = sys.BrowseCodecPrivate( 1, MatchVTSNumber, &i_curr_title, sizeof(i_curr_title), p_segment );
@@ -531,7 +531,7 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
             {
                 if ( !p_chapter->Enter( true ) )
                     // jump to the location in the found segment
-                    sys.p_current_segment->Seek( sys.demuxer, p_chapter->i_user_start_time, -1, p_chapter, -1 );
+                    sys.p_current_segment->Seek( sys.demuxer, p_chapter->i_virtual_start_time, -1, p_chapter, -1 );
 
                 f_result = true;
             }
@@ -549,7 +549,7 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
             {
                 if ( !p_chapter->Enter( true ) )
                     // jump to the location in the found segment
-                    sys.p_current_segment->Seek( sys.demuxer, p_chapter->i_user_start_time, -1, p_chapter, -1 );
+                    sys.p_current_segment->Seek( sys.demuxer, p_chapter->i_virtual_start_time, -1, p_chapter, -1 );
 
                 f_result = true;
             }
@@ -742,14 +742,14 @@ bool matroska_script_interpretor_c::Interpret( const binary * p_command, size_t 
         int64_t i_chapter_uid = atoi( st.c_str() );
 
         virtual_segment_c *p_segment;
-        chapter_item_c *p_chapter = sys.FindChapter( i_chapter_uid, p_segment );
+        virtual_chapter_c *p_chapter = sys.FindChapter( i_chapter_uid, p_segment );
 
         if ( p_chapter == NULL )
             msg_Dbg( &sys.demuxer, "Chapter %"PRId64" not found", i_chapter_uid);
         else
         {
             if ( !p_chapter->EnterAndLeave( sys.p_current_segment->CurrentChapter() ) )
-                p_segment->Seek( sys.demuxer, p_chapter->i_user_start_time, -1, p_chapter, -1 );
+                p_segment->Seek( sys.demuxer, p_chapter->i_virtual_start_time, -1, p_chapter, -1 );
             b_result = true;
         }
     }

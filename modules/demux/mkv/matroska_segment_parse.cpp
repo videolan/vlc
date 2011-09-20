@@ -855,6 +855,16 @@ void matroska_segment_c::ParseChapterAtom( int i_level, KaxChapterAtom *ca, chap
 
             msg_Dbg( &sys.demuxer, "|   |   |   |   + ChapterFlagHidden: %s", chapters.b_display_seekpoint ? "no":"yes" );
         }
+        else if( MKV_IS_ID( l, KaxChapterSegmentUID ) )
+        {
+            chapters.p_segment_uid = new KaxChapterSegmentUID( *static_cast<KaxChapterSegmentUID*>(l) );
+            msg_Dbg( &sys.demuxer, "|   |   |   |   + ChapterSegmentUID= %u", *(uint32*)chapters.p_segment_uid->GetBuffer() );
+        }
+        else if( MKV_IS_ID( l, KaxChapterSegmentEditionUID ) )
+        {
+            chapters.p_segment_edition_uid = new KaxChapterSegmentEditionUID( *static_cast<KaxChapterSegmentEditionUID*>(l) );
+            msg_Dbg( &sys.demuxer, "|   |   |   |   + ChapterSegmentEditionUID= %u", *(uint32*)chapters.p_segment_edition_uid->GetBuffer() );
+        }
         else if( MKV_IS_ID( l, KaxChapterTimeStart ) )
         {
             KaxChapterTimeStart &start =*(KaxChapterTimeStart*)l;
@@ -998,7 +1008,6 @@ void matroska_segment_c::ParseChapters( KaxChapters *chapters )
 {
     EbmlElement *el;
     int i_upper_level = 0;
-    mtime_t i_dur;
 
     /* Master elements */
     chapters->Read( es, EBML_CONTEXT(chapters), i_upper_level, el, true );
@@ -1051,19 +1060,6 @@ void matroska_segment_c::ParseChapters( KaxChapters *chapters )
         {
             msg_Dbg( &sys.demuxer, "|   |   + Unknown (%s)", typeid(*l).name() );
         }
-    }
-
-    for( size_t i = 0; i < stored_editions.size(); i++ )
-    {
-        stored_editions[i]->RefreshChapters( );
-    }
-
-    if ( stored_editions.size() != 0 && stored_editions[i_default_edition]->b_ordered )
-    {
-        /* update the duration of the segment according to the sum of all sub chapters */
-        i_dur = stored_editions[i_default_edition]->Duration() / INT64_C(1000);
-        if (i_dur > 0)
-            i_duration = i_dur;
     }
 }
 

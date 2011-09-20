@@ -28,46 +28,12 @@
 
 chapter_item_c::~chapter_item_c()
 {
+    if( p_segment_uid )
+        delete p_segment_uid;
+    if( p_segment_edition_uid )
+        delete p_segment_edition_uid;
     vlc_delete_all( codecs );
     vlc_delete_all( sub_chapters );
-}
-
-int chapter_item_c::PublishChapters( input_title_t & title, int & i_user_chapters, int i_level )
-{
-    // add support for meta-elements from codec like DVD Titles
-    if ( !b_display_seekpoint || psz_name == "" )
-    {
-        psz_name = GetCodecName();
-        if ( psz_name != "" )
-            b_display_seekpoint = true;
-    }
-
-    if (b_display_seekpoint)
-    {
-        seekpoint_t *sk = vlc_seekpoint_New();
-
-        sk->i_level = i_level;
-        sk->i_time_offset = i_start_time;
-        sk->psz_name = strdup( psz_name.c_str() );
-
-        // A start time of '0' is ok. A missing ChapterTime element is ok, too, because '0' is its default value.
-        title.i_seekpoint++;
-        title.seekpoint = (seekpoint_t**)xrealloc( title.seekpoint,
-                                 title.i_seekpoint * sizeof( seekpoint_t* ) );
-        title.seekpoint[title.i_seekpoint-1] = sk;
-
-        if ( b_user_display )
-            i_user_chapters++;
-    }
-
-    for ( size_t i=0; i<sub_chapters.size() ; i++)
-    {
-        sub_chapters[i]->PublishChapters( title, i_user_chapters, i_level+1 );
-    }
-
-    i_seekpoint_num = i_user_chapters;
-
-    return i_user_chapters;
 }
 
 chapter_item_c *chapter_item_c::BrowseCodecPrivate( unsigned int codec_id,
@@ -75,6 +41,7 @@ chapter_item_c *chapter_item_c::BrowseCodecPrivate( unsigned int codec_id,
                                     const void *p_cookie,
                                     size_t i_cookie_size )
 {
+    VLC_UNUSED( codec_id );
     // this chapter
     std::vector<chapter_codec_cmds_c*>::const_iterator index = codecs.begin();
     while ( index != codecs.end() )
@@ -83,19 +50,7 @@ chapter_item_c *chapter_item_c::BrowseCodecPrivate( unsigned int codec_id,
             return this;
         ++index;
     }
-
-    // sub-chapters
-    chapter_item_c *p_result = NULL;
-    std::vector<chapter_item_c*>::const_iterator index2 = sub_chapters.begin();
-    while ( index2 != sub_chapters.end() )
-    {
-        p_result = (*index2)->BrowseCodecPrivate( codec_id, match, p_cookie, i_cookie_size );
-        if ( p_result != NULL )
-            return p_result;
-        ++index2;
-    }
-
-    return p_result;
+    return NULL;
 }
 
 void chapter_item_c::Append( const chapter_item_c & chapter )
@@ -116,9 +71,6 @@ void chapter_item_c::Append( const chapter_item_c & chapter )
             sub_chapters.push_back( chapter.sub_chapters[i] );
         }
     }
-
-    i_user_start_time = min( i_user_start_time, chapter.i_user_start_time );
-    i_user_end_time = max( i_user_end_time, chapter.i_user_end_time );
 }
 
 chapter_item_c * chapter_item_c::FindChapter( int64_t i_find_uid )
@@ -168,79 +120,6 @@ int16 chapter_item_c::GetTitleNumber( ) const
     }
 
     return result;
-}
-
-int64_t chapter_item_c::RefreshChapters( bool b_ordered, int64_t i_prev_user_time )
-{
-    int64_t i_user_time = i_prev_user_time;
-
-    // first the sub-chapters, and then ourself
-    std::vector<chapter_item_c*>::iterator index = sub_chapters.begin();
-    while ( index != sub_chapters.end() )
-    {
-        i_user_time = (*index)->RefreshChapters( b_ordered, i_user_time );
-        ++index;
-    }
-
-    if ( b_ordered )
-    {
-        // the ordered chapters always start at zero
-        if ( i_prev_user_time == -1 )
-        {
-            if ( i_user_time == -1 )
-                i_user_time = 0;
-            i_prev_user_time = 0;
-        }
-
-        i_user_start_time = i_prev_user_time;
-        if ( i_end_time != -1 && i_user_time == i_prev_user_time )
-        {
-            i_user_end_time = i_user_start_time - i_start_time + i_end_time;
-        }
-        else
-        {
-            i_user_end_time = i_user_time;
-        }
-    }
-    else
-    {
-        if ( sub_chapters.begin() != sub_chapters.end() )
-            std::sort( sub_chapters.begin(), sub_chapters.end(), chapter_item_c::CompareTimecode );
-        i_user_start_time = i_start_time;
-        if ( i_end_time != -1 )
-            i_user_end_time = i_end_time;
-        else if ( i_user_time != -1 )
-            i_user_end_time = i_user_time;
-        else
-            i_user_end_time = i_user_start_time;
-    }
-
-    return i_user_end_time;
-}
-
-chapter_item_c *chapter_item_c::FindTimecode( mtime_t i_user_timecode, const chapter_item_c * p_current, bool & b_found )
-{
-    chapter_item_c *psz_result = NULL;
-
-    if ( p_current == this )
-        b_found = true;
-
-    if ( i_user_timecode >= i_user_start_time &&
-        ( i_user_timecode < i_user_end_time ||
-          ( i_user_start_time == i_user_end_time && i_user_timecode == i_user_end_time )))
-    {
-        std::vector<chapter_item_c*>::iterator index = sub_chapters.begin();
-        while ( index != sub_chapters.end() && ((p_current == NULL && psz_result == NULL) || (p_current != NULL && (!b_found || psz_result == NULL))))
-        {
-            psz_result = (*index)->FindTimecode( i_user_timecode, p_current, b_found );
-            ++index;
-        }
-
-        if ( psz_result == NULL )
-            psz_result = this;
-    }
-
-    return psz_result;
 }
 
 bool chapter_item_c::ParentOf( const chapter_item_c & item ) const
@@ -359,33 +238,4 @@ std::string chapter_edition_c::GetMainName() const
     }
     return "";
 }
-
-void chapter_edition_c::RefreshChapters( )
-{
-    chapter_item_c::RefreshChapters( b_ordered, -1 );
-    b_display_seekpoint = false;
-}
-
-mtime_t chapter_edition_c::Duration() const
-{
-    mtime_t i_result = 0;
-
-    if ( sub_chapters.size() )
-    {
-        std::vector<chapter_item_c*>::const_iterator index = sub_chapters.end();
-        --index;
-        i_result = (*index)->i_user_end_time;
-    }
-
-    return i_result;
-}
-
-chapter_item_c * chapter_edition_c::FindTimecode( mtime_t i_timecode, const chapter_item_c * p_current )
-{
-    if ( !b_ordered )
-        p_current = NULL;
-    bool b_found_current = false;
-    return chapter_item_c::FindTimecode( i_timecode, p_current, b_found_current );
-}
-
 

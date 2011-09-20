@@ -692,7 +692,7 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset, int64_t i_
                 {
                     IndexAppendCluster( cluster );
                 }
-                if( es.I_O().getFilePointer() >= i_global_position )
+                if( es.I_O().getFilePointer() >= (unsigned) i_global_position )
                 {
                     ParseCluster();
                     msg_Dbg( &sys.demuxer, "we found a cluster that is in the neighbourhood" );
@@ -769,9 +769,9 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset, int64_t i_
         }
 
         if( simpleblock )
-            sys.i_pts = (sys.i_chapter_time + simpleblock->GlobalTimecode()) / (mtime_t) 1000;
+            sys.i_pts = sys.i_chapter_time + simpleblock->GlobalTimecode() / (mtime_t) 1000;
         else
-            sys.i_pts = (sys.i_chapter_time + block->GlobalTimecode()) / (mtime_t) 1000;
+            sys.i_pts = sys.i_chapter_time + block->GlobalTimecode() / (mtime_t) 1000;
 
         if( i_track < tracks.size() )
         {

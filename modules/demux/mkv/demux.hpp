@@ -371,18 +371,18 @@ public:
     float                   f_duration;
 
     matroska_segment_c *FindSegment( const EbmlBinary & uid ) const;
-    chapter_item_c *BrowseCodecPrivate( unsigned int codec_id,
+    virtual_chapter_c *BrowseCodecPrivate( unsigned int codec_id,
                                         bool (*match)(const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size ),
                                         const void *p_cookie,
                                         size_t i_cookie_size,
                                         virtual_segment_c * & p_segment_found );
-    chapter_item_c *FindChapter( int64_t i_find_uid, virtual_segment_c * & p_segment_found );
+    virtual_chapter_c *FindChapter( int64_t i_find_uid, virtual_segment_c * & p_segment_found );
 
     void PreloadFamily( const matroska_segment_c & of_segment );
-    void PreloadLinked( matroska_segment_c *p_segment );
+    void PreloadLinked();
     bool PreparePlayback( virtual_segment_c *p_new_segment );
     matroska_stream_c *AnalyseAllSegmentsFound( demux_t *p_demux, EbmlStream *p_estream, bool b_initial = false );
-    void JumpTo( virtual_segment_c & p_segment, chapter_item_c * p_chapter );
+    void JumpTo( virtual_segment_c & p_segment, virtual_chapter_c * p_chapter );
 
     void InitUi();
     void CleanUi();
@@ -396,8 +396,7 @@ public:
     event_thread_t *p_ev;
 
 protected:
-    virtual_segment_c *VirtualFromSegments( matroska_segment_c *p_segment ) const;
-    bool IsUsedSegment( matroska_segment_c &p_segment ) const;
+    virtual_segment_c *VirtualFromSegments( std::vector<matroska_segment_c*> *p_segments ) const;
 };
 
 
