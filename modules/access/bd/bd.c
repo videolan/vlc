@@ -1300,7 +1300,7 @@ static es_out_id_t *EsOutAdd( es_out_t *p_out, const es_format_t *p_fmt )
         break;
     }
     if( fmt.i_priority < 0 )
-        msg_Dbg( p_demux, "Hidding one stream (pid=%d)", fmt.i_id );
+        msg_Dbg( p_demux, "Hiding one stream (pid=%d)", fmt.i_id );
 
     /* */
     es_out_id_t *p_es = es_out_Add( p_demux->out, &fmt );
