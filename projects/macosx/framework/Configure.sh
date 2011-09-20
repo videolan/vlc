@@ -98,7 +98,7 @@ for arch in $ARCHS; do
         export CXXFLAGS="-m32 -arch i686"
         export OBJCFLAGS="-m32 -arch i686"
         export CPPFLAGS="-m32 -arch i686"
-        this_args="--with-contrib=${VLC_SRC_DIR}/extras/contrib/hosts/i386-apple-darwin10 $this_args"
+        this_args="--with-contrib=${VLC_SRC_DIR}/extras/contrib/hosts/i686-apple-darwin10 $this_args"
         $top_srcdir/configure --build=i686-apple-darwin10 $this_args
     fi
     if test $arch = "ppc"; then
