@@ -984,6 +984,16 @@ static OMX_ERRORTYPE PortReconfigure(decoder_t *p_dec, OmxPort *p_port)
     CHECK_ERROR(omx_error, "OMX_CommandPortEnable on %i failed (%x)",
                 (int)p_port->i_port_index, omx_error );
 
+    if (p_port->definition.nBufferCountActual > p_port->i_buffers) {
+        free(p_port->pp_buffers);
+        p_port->pp_buffers = malloc(p_port->definition.nBufferCountActual * sizeof(OMX_BUFFERHEADERTYPE*));
+        if(!p_port->pp_buffers)
+        {
+            omx_error = OMX_ErrorInsufficientResources;
+            CHECK_ERROR(omx_error, "memory allocation failed");
+        }
+    }
+    p_port->i_buffers = p_port->definition.nBufferCountActual;
     for(i = 0; i < p_port->i_buffers; i++)
     {
         if(0 && p_port->b_direct)
