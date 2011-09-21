@@ -72,11 +72,12 @@ Codecs:
 Demuxers:
  * New images demuxer supporting jpeg, png, targa, xcf, git, tiff, bmp, pcx, lbm
  * C64 SID file playback support using sidplay2
- * Ogg seeking improvements
  * Support for images/cover art in wma/wmv/asf files
  * Improvements in .ape files metadata reading and writing
  * New demuxer module for EBU subtitles (.stl)
  * Support for caf, mtv, awb, f4v, amr, vro (DVD-VR) files
+ * Ogg, flv, mxf, amr seeking improvements
+ * Major improvements in mkv chapters/segments handling
 
 Interfaces:
  * Skins2 / Qt: misc improvements and usability fixes
