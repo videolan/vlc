@@ -29,8 +29,15 @@
 #endif
 
 #include <dlfcn.h>
+#if defined(USE_IOMX)
+#include "iomx.h"
+#define dll_open(name) iomx_dlopen(name)
+#define dll_close(handle) iomx_dlclose(handle)
+#define dlsym(handle, name) iomx_dlsym(handle, name)
+#else
 #define dll_open(name) dlopen( name, RTLD_NOW )
 #define dll_close(handle) dlclose(handle)
+#endif
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
