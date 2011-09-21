@@ -816,7 +816,12 @@ LIBVLC_API void libvlc_media_player_navigate( libvlc_media_player_t* p_mi,
  *
  * \param p_track_description the structure to release
  */
-LIBVLC_API void libvlc_track_description_release( libvlc_track_description_t *p_track_description );
+LIBVLC_API void libvlc_track_description_list_release( libvlc_track_description_t *p_track_description );
+
+/**
+ * \deprecated Use libvlc_track_description_list_release instead
+ */
+LIBVLC_DEPRECATED void libvlc_track_description_release( libvlc_track_description_t *p_track_description );
 
 /** \defgroup libvlc_video LibVLC video controls
  * @{

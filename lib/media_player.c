@@ -1344,7 +1344,7 @@ libvlc_track_description_t *
                 malloc( sizeof( libvlc_track_description_t ) );
             if ( !p_actual )
             {
-                libvlc_track_description_release( p_track_description );
+                libvlc_track_description_list_release( p_track_description );
                 libvlc_printerr( "Not enough memory" );
                 goto end;
             }
@@ -1365,7 +1365,13 @@ end:
     return p_track_description;
 }
 
+// Deprecated alias for libvlc_track_description_list_release
 void libvlc_track_description_release( libvlc_track_description_t *p_td )
+{
+    libvlc_track_description_list_release( p_td );
+}
+
+void libvlc_track_description_list_release( libvlc_track_description_t *p_td )
 {
     libvlc_track_description_t *p_actual, *p_before;
     p_actual = p_td;
