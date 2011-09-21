@@ -432,6 +432,9 @@ $(function(){
 		"themeroller":{
 			"item_leaf":"ui-icon-video"
 		},
+		"core" :{
+			"initially_open": ["plid_1","plid_2","plid_3"]
+		},
 		"plugins" : ["xml_data","ui","themeroller"]
 	}).bind("loaded.jstree", function (event, data) {
 		$('[current]','[id^="plid_"]').each(function(){
