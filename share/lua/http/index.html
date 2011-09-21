@@ -39,7 +39,6 @@
 		<script type="text/javascript" src="js/jquery-1.5.1.min.js"></script>
 		<script type="text/javascript" src="js/jquery-ui-1.8.13.custom.min.js"></script>
 		<script type="text/javascript" src="js/jquery.jstree.js"></script>
-		<script type="text/javascript" src="http://static.flowplayer.org/js/flowplayer-3.2.6.min.js"></script>
 		<script type="text/javascript" src="js/ui.js"></script>
 		<script type="text/javascript" src="js/controlers.js"></script>
 		<script type="text/javascript">
@@ -173,9 +172,7 @@
 								}
 								var defaultStream	=	'new Current broadcast enabled input "'+file+'" output #transcode{vcodec=FLV1,vb=4096,fps=25,scale=1,acodec=mp3,ab=512,samplerate=44100,channels=2}:std{access='+$('#stream_protocol').val()+',mux=ffmpeg{{mux=flv}},dst=0.0.0.0:'+$('#stream_port').val()+'/'+$('#stream_file').val()+'}';
 								sendVLMCmd('del Current;'+defaultStream+';control Current play');
-								$('#player').empty();
 								$('#player').attr('href',$('#stream_protocol').val()+'://'+$('#stream_host').val()+':'+$('#stream_port').val()+'/'+$('#stream_file').val());
-								flowplayer("player", "http://releases.flowplayer.org/swf/flowplayer-3.2.7.swf");
 								current_que			=	'stream';
 								updateStreams();
 							}
@@ -188,6 +185,12 @@
 				});
 				$('#viewContainer').animate({height: 'toggle'});
 			});
+			/* delay script loading so we won't block if we have no net access */
+			$.getScript('http://static.flowplayer.org/js/flowplayer-3.2.6.min.js', function(data, textStatus){
+				$('#player').empty();
+				flowplayer("player", "http://releases.flowplayer.org/swf/flowplayer-3.2.7.swf");
+				/* .getScript only handles success() */
+			 });
 		//]]>
 		</script>
 	</head>
@@ -253,7 +256,9 @@
 			<div id="viewContainer" class="ui-widget">
 				<div class="ui-widget-header" style="text-align: left;"><img src="images/vlc16x16.png" alt="VLC" width="16" height="16"/> Viewer</div>
 				<div id="mediaViewer" class="ui-widget-content">
-					<div href="http://localhost:8081/stream.flv" style="display:block; width:100%" id="player"></div>
+					<div href="http://localhost:8081/stream.flv" style="display:block; width:100%" id="player">
+						<p>Loading flowplayer...<br/>If nothing appears, check your internet connection.</p>
+					</div>
 				</div>
 			</div>
 			<div id="libraryContainer" class="ui-widget">
