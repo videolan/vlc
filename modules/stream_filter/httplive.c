@@ -1268,9 +1268,9 @@ static void* hls_Reload(void *p_this)
 
     int canc = vlc_savecancel();
 
+    double wait = 0.5;
     while (vlc_object_alive(s))
     {
-        double wait = 1;
         mtime_t now = mdate();
         if (now >= p_sys->playlist.wakeup)
         {
@@ -1283,7 +1283,11 @@ static void* hls_Reload(void *p_this)
                 else if (p_sys->playlist.tries == 2) wait = 1;
                 else if (p_sys->playlist.tries >= 3) wait = 3;
             }
-            else p_sys->playlist.tries = 0;
+            else
+            {
+                p_sys->playlist.tries = 0;
+                wait = 0.5;
+            }
 
             hls_stream_t *hls = hls_Get(p_sys->hls_stream, p_sys->download.stream);
             assert(hls);
