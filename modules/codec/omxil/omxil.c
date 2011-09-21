@@ -577,8 +577,11 @@ static OMX_ERRORTYPE InitialiseComponent(decoder_t *p_dec,
     }
     strncpy(p_sys->psz_component, psz_component, OMX_MAX_STRINGNAME_SIZE-1);
 
-    OMX_ComponentRoleEnum(omx_handle, psz_role, 0);
-    msg_Dbg(p_dec, "loaded component %s of role %s", psz_component, psz_role);
+    omx_error = OMX_ComponentRoleEnum(omx_handle, psz_role, 0);
+    if(omx_error == OMX_ErrorNone)
+        msg_Dbg(p_dec, "loaded component %s of role %s", psz_component, psz_role);
+    else
+        msg_Dbg(p_dec, "loaded component %s", psz_component);
     PrintOmx(p_dec, omx_handle, OMX_ALL);
 
     /* Set component role */
