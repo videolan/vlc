@@ -1111,6 +1111,10 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
 
     /* Send the input buffer to the component */
     OMX_FIFO_GET(&p_sys->in.fifo, p_header);
+
+    if (p_header && p_header->nFlags & OMX_BUFFERFLAG_EOS)
+        goto reconfig;
+
     if(p_header)
     {
         p_header->nFilledLen = p_block->i_buffer;
@@ -1147,6 +1151,7 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
         *pp_block = NULL; /* Avoid being fed the same packet again */
     }
 
+reconfig:
     /* Handle the PortSettingsChanged events */
     for(i = 0; i < p_sys->ports; i++)
     {
@@ -1453,6 +1458,9 @@ static OMX_ERRORTYPE OmxEventHandler( OMX_HANDLETYPE omx_handle,
         for(i = 0; i < p_sys->ports; i++)
             if(p_sys->p_ports[i].definition.eDir == OMX_DirOutput)
                 p_sys->p_ports[i].b_reconfigure = true;
+        memset(&p_sys->sentinel_buffer, 0, sizeof(p_sys->sentinel_buffer));
+        p_sys->sentinel_buffer.nFlags = OMX_BUFFERFLAG_EOS;
+        OMX_FIFO_PUT(&p_sys->in.fifo, &p_sys->sentinel_buffer);
         break;
 
     default:
