@@ -119,7 +119,7 @@ OMX_ERRORTYPE WaitForSpecificOmxEvent(decoder_t *p_dec,
 /*****************************************************************************
  * Picture utility functions
  *****************************************************************************/
-void CopyOmxPicture( decoder_t *, picture_t *, OMX_BUFFERHEADERTYPE * );
+void CopyOmxPicture( decoder_t *, picture_t *, OMX_BUFFERHEADERTYPE *, int );
 void CopyVlcPicture( decoder_t *, OMX_BUFFERHEADERTYPE *, picture_t * );
 
 /*****************************************************************************

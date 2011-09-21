@@ -119,7 +119,7 @@ OMX_ERRORTYPE WaitForSpecificOmxEvent(decoder_t *p_dec,
  * Picture utility functions
  *****************************************************************************/
 void CopyOmxPicture( decoder_t *p_dec, picture_t *p_pic,
-                     OMX_BUFFERHEADERTYPE *p_header )
+                     OMX_BUFFERHEADERTYPE *p_header, int i_slice_height )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     int i_src_stride, i_dst_stride;
@@ -142,6 +142,13 @@ void CopyOmxPicture( decoder_t *p_dec, picture_t *p_pic,
             p_src += i_src_stride;
             p_dst += i_dst_stride;
         }
+        /* Handle plane height, which may be indicated via nSliceHeight in OMX.
+         * The handling for chroma planes currently assumes vertically
+         * subsampled chroma, e.g. 422 planar wouldn't work right. */
+        if( i_plane == 0 && i_slice_height > p_pic->p[i_plane].i_visible_lines )
+            p_src += i_src_stride * (i_slice_height - p_pic->p[i_plane].i_visible_lines);
+        else if ( i_plane > 0 && i_slice_height/2 > p_pic->p[i_plane].i_visible_lines )
+            p_src += i_src_stride * (i_slice_height/2 - p_pic->p[i_plane].i_visible_lines);
     }
 }
 

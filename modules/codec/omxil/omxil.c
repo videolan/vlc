@@ -1079,7 +1079,7 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
                 p_pic = decoder_NewPicture( p_dec );
                 if( !p_pic ) break; /* No picture available */
 
-                CopyOmxPicture(p_dec, p_pic, p_header);
+                CopyOmxPicture(p_dec, p_pic, p_header, p_sys->out.definition.format.video.nSliceHeight);
             }
 
             p_pic->date = p_header->nTimeStamp;
