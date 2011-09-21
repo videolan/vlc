@@ -450,6 +450,7 @@ $(function(){
 		event.preventDefault();
 		current_id	=	$(this).parent().attr('id').substr(5);
 		sendCommand('command=pl_play&id=' + current_id);
+		updatePlayList();
 	});
 	updateStatus();
 	updateStreams();
