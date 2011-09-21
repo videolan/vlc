@@ -805,7 +805,7 @@ AC_ARG_VAR(PKG_CONFIG_PATH,
        [Paths where to find .pc not at the default location])
 PKG_PROG_PKG_CONFIG()
 
-dnl On some OS we need static linking 
+dnl On some OS we need static linking
 AS_IF([test -n "${PKG_CONFIG}" ],[
     AS_IF([test "${SYS}" = "mingw32" -o "${SYS}" = "mingwce" -o "${SYS}" = "darwin" ],[
         PKG_CONFIG="${PKG_CONFIG} --static"
@@ -822,7 +822,7 @@ if test "${have_zlib}" = "yes"
 then
   VLC_ADD_LIBS([access_http mp4 skins2 sap mkv unzip zip],[-lz])
   PKG_CHECK_MODULES([MINIZIP], [minizip] , [ have_minizip=yes ], [
-    AC_CHECK_HEADERS([unzip.h], [ 
+    AC_CHECK_HEADERS([unzip.h], [
       have_minizip=yes
       MINIZIP_LIBS="-lminizip -lz"
     ], [
@@ -1803,8 +1803,8 @@ You can get an updated one from http://www.live555.com/liveMedia .])
            AC_MSG_ERROR([Your version of liveMedia is too old: you may get a more recent one from http://www.live555.com/liveMedia.
 lternatively you can use --disable-live555 to disable the liveMedia plugin.])
         ],[
-	   AC_MSG_RESULT([yes])
-	   ])
+       AC_MSG_RESULT([yes])
+       ])
       ])
 
       VLC_ADD_PLUGIN([live555])
@@ -1831,7 +1831,7 @@ lternatively you can use --disable-live555 to disable the liveMedia plugin.])
         AC_MSG_RESULT(no)
       if test "${enable_live555}" = "yes"; then
         AC_MSG_ERROR([cannot find ${real_live555_tree}/liveMedia/libliveMedia.a, make sure you compiled live555 in ${with_live555_tree}])
-      fi	
+      fi
     fi
   fi
 fi
@@ -2009,14 +2009,14 @@ AC_ARG_ENABLE(vcdx,
     [navigate VCD with libvcdinfo (default disabled)])])
 if test "${enable_vcdx}" = "yes"
 then
-	PKG_CHECK_MODULES(LIBCDIO, [libcdio >= 0.78.2 libiso9660 >= 0.72],
-	  [VLC_ADD_LIBS([vcdx],[$LIBCDIO_LIBS])
-		 VLC_ADD_CFLAGS([vcdx],[$LIBCDIO_CFLAGS])],
-		[AC_MSG_ERROR([vcdx plugin requires libcdio >= 0.78.2 and libiso9660 >= 0.72])])
-	PKG_CHECK_MODULES(LIBVCDINFO, libvcdinfo >= 0.7.22,
-		[VLC_ADD_LIBS([vcdx],[$LIBVCDINFO_LIBS])
-		 VLC_ADD_CFLAGS([vcdx],[$LIBVCDINFO_CFLAGS])],
-	  [AC_MSG_ERROR([vcdx plugin requires libvcdinfo library >= 0.7.22])])
+    PKG_CHECK_MODULES(LIBCDIO, [libcdio >= 0.78.2 libiso9660 >= 0.72],
+      [VLC_ADD_LIBS([vcdx],[$LIBCDIO_LIBS])
+         VLC_ADD_CFLAGS([vcdx],[$LIBCDIO_CFLAGS])],
+        [AC_MSG_ERROR([vcdx plugin requires libcdio >= 0.78.2 and libiso9660 >= 0.72])])
+    PKG_CHECK_MODULES(LIBVCDINFO, libvcdinfo >= 0.7.22,
+        [VLC_ADD_LIBS([vcdx],[$LIBVCDINFO_LIBS])
+         VLC_ADD_CFLAGS([vcdx],[$LIBVCDINFO_CFLAGS])],
+      [AC_MSG_ERROR([vcdx plugin requires libvcdinfo library >= 0.7.22])])
         VLC_ADD_PLUGIN([vcdx])
 fi
 
@@ -2164,27 +2164,32 @@ AS_IF([test "${enable_gme}" != "no"], [
 dnl
 dnl  SIDPlay plugin
 dnl
-PKG_WITH_MODULES([SID], [libsidplay2],
-		AC_LANG_PUSH(C++)
-		oldCPPFLAGS="$CPPFLAGS"
-		CPPFLAGS="$CPPFLAGS $SID_CFLAGS"
-		AC_CHECK_HEADER([sidplay/builders/resid.h], [
-			VLC_ADD_PLUGIN([sid])
-			VLC_ADD_CFLAGS([sid], [$SID_CFLAGS])
-			VLC_ADD_LIBS([sid], [$SID_LIBS] [-lresid-builder])
-		], [
-			AS_IF([test "x${enable_sid}" = "xyes"],
-				[AC_MSG_ERROR(Library libresid-builder needed for sid was not found)],
-				[AC_MSG_WARN(Library libresid-builder needed for sid was not found)]
-				)
-		])
-		CPPFLAGS="$oldCPPFLAGS"
-		AC_LANG_POP(C++),
-		AS_IF([test "x${enable_sid}" = "xyes"],
-			[AC_MSG_ERROR(Library libsidplay2 needed for sid was not found)],
-			[AC_MSG_WARN(Library libsidplay2 needed for sid was not found)]
-			),
-		[C64 sid demux support], [auto])
+AC_ARG_ENABLE(sid,
+    [AS_HELP_STRING([--enable-sid],[C64 sid demux support (default auto)])])
+AS_IF([test "${enable_sid}" != "no"], [
+    PKG_CHECK_MODULES(sid, [libsidplay2], [
+        AC_LANG_PUSH(C++)
+        oldCPPFLAGS="$CPPFLAGS"
+        CPPFLAGS="$CPPFLAGS $SID_CFLAGS"
+        AC_CHECK_HEADER([sidplay/builders/resid.h], [
+            VLC_ADD_PLUGIN([sid])
+            VLC_ADD_CFLAGS([sid], [$SID_CFLAGS])
+            VLC_ADD_LIBS([sid], [$SID_LIBS] [-lresid-builder])
+        ], [
+            AS_IF([test "x${enable_sid}" = "xyes"],
+                [AC_MSG_ERROR(Library libresid-builder needed for sid was not found)],
+                [AC_MSG_WARN(Library libresid-builder needed for sid was not found)]
+                )
+        ])
+        CPPFLAGS="$oldCPPFLAGS"
+        AC_LANG_POP(C++)
+    ], [
+        AS_IF([test "x${enable_sid}" = "xyes"],
+            [AC_MSG_ERROR(Library libsidplay2 needed for sid was not found)],
+            [AC_MSG_WARN(Library libsidplay2 needed for sid was not found)]
+            )
+    ])
+])
 
 
 dnl
@@ -2470,13 +2475,13 @@ AS_IF([test "${enable_libva}" != "no"], [
            AC_DEFINE(HAVE_AVCODEC_VAAPI, 1, [Define if avcodec has to be built with VAAPI support.])
            echo "VAAPI acceleration activated"
         ],[
-	AS_IF([test "${enable_libva}" = "yes"],
-	      [AC_MSG_ERROR([libva is present but libavcodec/vaapi.h is missing])],
+    AS_IF([test "${enable_libva}" = "yes"],
+          [AC_MSG_ERROR([libva is present but libavcodec/vaapi.h is missing])],
               [AC_MSG_WARN([libva is present but libavcodec/vaapi.h is missing ])])
         ])
         VLC_RESTORE_FLAGS
       ],[
-	AS_IF([test "${enable_libva}" = "yes"],
+    AS_IF([test "${enable_libva}" = "yes"],
               [AC_MSG_ERROR([Could not find required libva.])],
               [AC_MSG_WARN([libva not found  ])])
       ])
@@ -2496,19 +2501,19 @@ AC_ARG_ENABLE(dxva2,
 AS_IF([test "${enable_dxva2}" != "no"], [
   if test "${SYS}" = "mingw32"; then
   AS_IF([test "x${have_avcodec}" = "xyes"], [
-    AC_CHECK_HEADERS(dxva2api.h, 
+    AC_CHECK_HEADERS(dxva2api.h,
       [
         AC_CHECK_HEADERS(libavcodec/dxva2.h, [
            VLC_ADD_LIBS([avcodec],[-lole32 -lshlwapi -luuid])
            AC_DEFINE(HAVE_AVCODEC_DXVA2, 1, [Define if avcodec has to be built with DxVA2 support.])
            echo "DxVA2 acceleration activated"
         ],[
-	AS_IF([test "${enable_dxva2}" = "yes"],
-	      [AC_MSG_ERROR([dxva2 is present but libavcodec/dxva2.h is missing])],
+    AS_IF([test "${enable_dxva2}" = "yes"],
+          [AC_MSG_ERROR([dxva2 is present but libavcodec/dxva2.h is missing])],
               [AC_MSG_WARN([dxva2 is present but libavcodec/dxva2.h is missing ])])
         ])
       ],[
-	AS_IF([test "${enable_dxva2}" = "yes"],
+    AS_IF([test "${enable_dxva2}" = "yes"],
               [AC_MSG_ERROR([Could not find required dxva2api.h])],
               [AC_MSG_WARN([dxva2api.h not found])])
       ])
@@ -2576,7 +2581,7 @@ dnl
 
 AC_ARG_ENABLE(swscale,
   AS_HELP_STRING([--enable-swscale],[libswscale image scaling and conversion
-		  (default enabled)]))
+          (default enabled)]))
 if test "${enable_swscale}" != "no"
 then
   PKG_CHECK_MODULES(SWSCALE,[libswscale],
@@ -3000,7 +3005,7 @@ AS_IF([test "${enable_kate}" != "no"], [
               AC_MSG_ERROR([libkate doesn't appear to be installed on your system.
               You also need to check that you have a libogg posterior to the 1.0 release.])
             ])
-	  ], [-lkate -logg])
+      ], [-lkate -logg])
         ],[
           AS_IF([test "x${enable_kate}" != "x"], [
             AC_MSG_ERROR([libkate headers do not appear to be installed on your system.
@@ -4142,7 +4147,7 @@ dnl
 loader=false
 AC_ARG_ENABLE(loader,
   AS_HELP_STRING([--enable-loader],[build DLL loader for ELF i386 platforms
-		  (default disabled)]))
+          (default disabled)]))
 AM_CONDITIONAL(LOADER, [test "${enable_loader}" = "yes"])
 AS_IF([test "${enable_loader}" = "yes"],
   [ VLC_ADD_PLUGIN([dmo])
