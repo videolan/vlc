@@ -443,6 +443,10 @@ $(function(){
 			$(this).addClass('ui-state-highlight');
 			current_id	=	$(this).attr('id').substr(5);
 		});
+	}).delegate("#plid_2 li.jstree-leaf a", "click",function(event, data){
+		event.preventDefault();
+		current_id	=	$(this).parent().attr('id').substr(5);
+		sendCommand('command=pl_play&id=' + current_id);
 	});
 	updateStatus();
 	updateStreams();
