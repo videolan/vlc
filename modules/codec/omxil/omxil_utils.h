@@ -167,3 +167,4 @@ OMX_ERRORTYPE GetAudioParameters(OMX_HANDLETYPE handle,
     OmxFormatParam *param, OMX_U32 i_port, OMX_AUDIO_CODINGTYPE encoding,
     uint8_t *pi_channels, unsigned int *pi_samplerate,
     unsigned int *pi_bitrate, unsigned int *pi_bps, unsigned int *pi_blocksize);
+unsigned int GetAudioParamSize(OMX_INDEXTYPE index);

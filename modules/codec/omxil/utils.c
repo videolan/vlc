@@ -576,7 +576,7 @@ static OMX_INDEXTYPE GetAudioParamFormatIndex(OMX_AUDIO_CODINGTYPE encoding)
   return audio_encoding_param[i].index;
 }
 
-static unsigned int GetAudioParamSize(OMX_INDEXTYPE index)
+unsigned int GetAudioParamSize(OMX_INDEXTYPE index)
 {
   int i;
 
