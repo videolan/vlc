@@ -10,7 +10,7 @@ function updateStatus(){
 				$('#mediaTitle').append($('[name="filename"]',data).text());
 				$('#totalTime').append(format_time($('length',data).text()));
 				$('#currentTime').append(format_time($('time',data).text()));
-				$('#seekSlider').slider({value: ($('position',data).text()*100) });
+				$('#seekSlider').slider({value: toFloat($('position',data).text()) * 100 });
 				$('#currentVolume').append(Math.round($('volume',data).text()/5.12)+'%');
 				$('#volumeSlider').slider({value: ($('volume',data).text()/5.12) });
 				$('#rateSlider').slider({value: ($('rate',data).text()) });

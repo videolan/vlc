@@ -12,6 +12,10 @@ function format_time( s ){
 	seconds		=	seconds<10 ? "0"+seconds : seconds;
     return hours+":"+minutes+":"+seconds;
 }
+function toFloat(text)
+{
+	return parseFloat(text.replace(',','.'));
+}
 function setIntv(){
 	if(intv>0){
 		intv++;
