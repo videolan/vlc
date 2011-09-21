@@ -35,33 +35,56 @@ body{
 #volumeSlider{
 	width: 100px;
 	display: inline-block;
-	margin-bottom: 20px;
 }
 #currentVolume{
 	display: inline-block;
-	margin-left: -110px;
 }
 #mediaTitle{
+	position: absolute;
+	top: 60px;
+	left: 0px;
+	width: 500px;
 	text-align: left;
+	padding: 5px;
+	overflow: hidden;
 }
 #currentTime{
+	float: left;
 	text-align: left;
 }
 #totalTime{
+	float: right;
 	text-align: right;
 }
+#controlTable{
+	position:relative;
+	height: 140px;
+}
 #controlButtons{
+	position: absolute;
+	top: 0;
+	left: 0;
+	padding: 0;
+	margin: 0;
 	text-align: left;
 	width: 380px;
 }
 
 #buttonszone{
+	position: absolute;
+	top: 5px;
+	left: 388px;
 	width: 42px;
 	vertical-align: top;
+	margin: 0;
+	padding: 0;
 }
 
 #volumesliderzone{
-	margin-left: 20px;
+	position: absolute;
+	top: 20px;
+	left: 440px;
+	width: 205px;
 }
 
 #volumeSlider{
@@ -69,11 +92,18 @@ body{
 }
 
 #artszone{
+	position: absolute;
+	top: 0;
+	left: 650px;
 	width: 141px;
 	vertical-align: top;
 }
 
 #seekContainer{
+	position:absolute;
+	left: 0;
+	top: 100px;
+	width: 650px;
 	vertical-align: bottom;
 }
 
