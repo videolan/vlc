@@ -1,7 +1,7 @@
 # tiff
 
 TIFF_VERSION := 3.9.5
-TIFF_URL := ftp://ftp.remotesensing.org/libtiff/tiff-$(TIFF_VERSION).tar.gz
+TIFF_URL := http://download.osgeo.org/libtiff/tiff-$(TIFF_VERSION).tar.gz
 
 $(TARBALLS)/tiff-$(TIFF_VERSION).tar.gz:
 	$(call download,$(TIFF_URL))
