@@ -62,9 +62,9 @@
     "  </head>\n" \
     "  <body style=\"background-color: #000000; color: #aaaaaa;\">\n" \
     "    <pre>\n" \
-    "      <b>-- logger module started --</b>\n"
+    "      <strong>-- logger module started --</strong>\n"
 #define HTML_FOOTER \
-    "      <b>-- logger module stopped --</b>\n" \
+    "      <strong>-- logger module stopped --</strong>\n" \
     "    </pre>\n" \
     "  </body>\n" \
     "</html>\n"
