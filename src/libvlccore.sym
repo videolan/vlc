@@ -675,4 +675,5 @@ xml_ReaderCreate
 xml_ReaderDelete
 xml_ReaderReset
 vlc_keycode2str
+vlc_memalign
 vlc_str2keycode

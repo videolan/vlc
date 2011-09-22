@@ -32,6 +32,12 @@
 #include <vlc_common.h>
 #include <vlc_charset.h>
 
+#if defined(HAVE_POSIX_MEMALIGN)
+#   include <stdlib.h>
+#elif defined(HAVE_MEMALIGN) || defined(HAVE_WIN32)
+#   include <malloc.h>
+#endif
+
 #include <errno.h>
 
 #undef iconv_t
@@ -418,4 +424,20 @@ bool vlc_ureduce( unsigned *pi_dst_nom, unsigned *pi_dst_den,
     *pi_dst_den = i_den;
 
     return b_exact;
+}
+
+void *vlc_memalign(size_t align, size_t size)
+{
+    void *base;
+#if defined(HAVE_POSIX_MEMALIGN)
+    if (unlikely(posix_memalign(&base, align, size)))
+        base = NULL;
+#elif defined(HAVE_MEMALIGN)
+    base = memalign(align, size);
+#elif defined(HAVE_WIN32)
+    base = __mingw_aligned_malloc(size, align);
+#else
+#   error Unimplemented!
+#endif
+    return base;
 }

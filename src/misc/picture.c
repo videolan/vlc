@@ -268,7 +268,7 @@ void picture_Delete( picture_t *p_picture )
     assert( p_picture->p_release_sys == NULL );
 
     free( p_picture->p_q );
-    vlc_free( p_picture->p_data_orig );
+    vlc_aligned_free( p_picture->p_data_orig );
     free( p_picture->p_sys );
     free( p_picture );
 }
