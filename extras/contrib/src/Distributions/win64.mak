@@ -8,7 +8,7 @@ all: .iconv .intl .freetype .fribidi .zlib \
         .dca .kate .libass .SDL_image  \
         .libbluray .dvdcss .libupnp .dvdnav .qt4_win32 \
         .dx_headers .dshow_headers .portaudio .gecko \
-        .lua .tag .peflags .sqlite3 .libprojectM
+        .lua .peflags .libprojectM
 # .pthreads
 #.zvbi \
 #        .fluid
