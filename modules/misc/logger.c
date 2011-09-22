@@ -49,7 +49,7 @@
 #define LOG_FILE_TEXT "vlc-log.txt"
 #define LOG_FILE_HTML "vlc-log.html"
 
-#define TEXT_HEADER "-- logger module started --\n"
+#define TEXT_HEADER "\xEF\xBB\xBF-- logger module started --\n"
 #define TEXT_FOOTER "-- logger module stopped --\n"
 
 #define HTML_HEADER \
@@ -349,8 +349,8 @@ static void TextPrint( void *opaque, int type, const msg_item_t *item,
 
     int canc = vlc_savecancel();
     flockfile( stream );
-    utf8_fprintf( stream, "%s%s: ", item->psz_module, ppsz_type[type] );
-    utf8_fprintf( stream, fmt, ap );
+    fprintf( stream, "%s%s: ", item->psz_module, ppsz_type[type] );
+    vfprintf( stream, fmt, ap );
     putc_unlocked( '\n', stream );
     funlockfile( stream );
     vlc_restorecancel( canc );
