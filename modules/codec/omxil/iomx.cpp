@@ -248,6 +248,19 @@ static OMX_ERRORTYPE iomx_component_role_enum(OMX_HANDLETYPE component, OMX_U8 *
     return OMX_ErrorInvalidComponentName;
 }
 
+static OMX_ERRORTYPE iomx_get_extension_index(OMX_HANDLETYPE component, OMX_STRING parameter, OMX_INDEXTYPE *index)
+{
+    OMXNode* node = (OMXNode*) ((OMX_COMPONENTTYPE*)component)->pComponentPrivate;
+    return get_error(ctx->iomx->getExtensionIndex(node->node, parameter, index));
+}
+
+static OMX_ERRORTYPE iomx_set_config(OMX_HANDLETYPE component, OMX_INDEXTYPE index, OMX_PTR param)
+{
+    OMXNode* node = (OMXNode*) ((OMX_COMPONENTTYPE*)component)->pComponentPrivate;
+    /* TODO: Need a way to map index to param size */
+    return get_error(ctx->iomx->setConfig(node->node, index, param, sizeof(OMX_BOOL)));
+}
+
 static OMX_ERRORTYPE iomx_get_handle(OMX_HANDLETYPE *handle_ptr, const char *component_name, OMX_PTR app_data, const OMX_CALLBACKTYPE *callbacks)
 {
     OMXNode* node = new OMXNode();
@@ -275,6 +288,8 @@ static OMX_ERRORTYPE iomx_get_handle(OMX_HANDLETYPE *handle_ptr, const char *com
     component->GetState = iomx_get_state;
     component->AllocateBuffer = iomx_allocate_buffer;
     component->ComponentRoleEnum = iomx_component_role_enum;
+    component->GetExtensionIndex = iomx_get_extension_index;
+    component->SetConfig = iomx_set_config;
 
     *handle_ptr = component;
     node->handle = component;
