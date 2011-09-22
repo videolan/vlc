@@ -9,3 +9,15 @@
  EXTRA_DIST = autogen.sh README.SVN
  DISTCLEANFILES = 
  
+diff -ur libgcrypt.orig//Makefile.in libgcrypt/Makefile.in
+--- libgcrypt.orig//Makefile.in	2011-09-23 01:27:00.000000000 +0200
++++ libgcrypt/Makefile.in	2011-09-23 01:28:03.000000000 +0200
+@@ -240,7 +240,7 @@
+   --enable-ciphers=arcfour:blowfish:cast5:des:aes:twofish:serpent:rfc2268:seed:camellia
+ 
+ DIST_SUBDIRS = m4 mpi cipher random src doc tests
+-SUBDIRS = mpi cipher random src doc tests
++SUBDIRS = mpi cipher random src
+ EXTRA_DIST = autogen.sh README.SVN
+ DISTCLEANFILES = 
+ all: config.h
