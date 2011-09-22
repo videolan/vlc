@@ -636,6 +636,18 @@ static OMX_ERRORTYPE InitialiseComponent(decoder_t *p_dec,
         CHECK_ERROR(omx_error, "couldn't find an input and output port");
     }
 
+    if(!strncmp(p_sys->psz_component, "OMX.SEC.", 8))
+    {
+        OMX_INDEXTYPE index;
+        omx_error = OMX_GetExtensionIndex(omx_handle, "OMX.SEC.index.ThumbnailMode", &index);
+        if(omx_error == OMX_ErrorNone)
+        {
+            OMX_BOOL enable = OMX_TRUE;
+            omx_error = OMX_SetConfig(omx_handle, index, &enable);
+            CHECK_ERROR(omx_error, "Unable to set ThumbnailMode");
+        }
+    }
+
     /* Set port definitions */
     for(i = 0; i < p_sys->ports; i++)
     {
