@@ -30,7 +30,8 @@ body{
 	width: 500px;
 }
 #seekSlider{
-	width: 90%;
+	width: 98%;
+	margin-left:10px;
 }
 #volumeSlider{
 	width: 100px;
@@ -78,6 +79,9 @@ body{
 	vertical-align: top;
 	margin: 0;
 	padding: 0;
+}
+#buttonszone li{
+	float: left;
 }
 
 #volumesliderzone{
