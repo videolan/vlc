@@ -46,10 +46,6 @@
 			var pollStatus	=	true;
 			$(function(){
 				$('.button').hover(function(){$(this).addClass('ui-state-hover')},function(){$(this).removeClass('ui-state-hover')});
-				$('.button48').hover(
-					function(){$(this).css({'filter':'alpha(opacity=50)','-moz-opacity':'0.5','-khtml-opacity': '0.5'})},
-					function(){$(this).css({'filter':'alpha(opacity=100)','-moz-opacity':'1','-khtml-opacity': '1'})}
-				);
 				$('#buttonPlayList').click(function(){
 					$('#libraryContainer').animate({
 						height: 'toggle'

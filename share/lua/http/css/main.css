@@ -118,6 +118,15 @@ body{
 	background-image: url("../images/buttons.png");
 	background-repeat: no-repeat;
 }
+.button48:hover{
+	filter: alpha(opacity:0.5);
+	-ms-filter: "alpha(opacity=50)";
+	-khtml-opacity: 0.50;
+	-moz-opacity: 0.5;
+	filter: alpha(opacity=50);
+	opacity: 0.5;
+}
+
 .button{
 	cursor: pointer;
 	display: inline-block;
