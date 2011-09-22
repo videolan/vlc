@@ -70,7 +70,6 @@ sh $VLC_SOURCEDIR/configure --host=arm-eabi-linux --build=x86_64-unknown-linux $
                 --disable-dv \
                 --disable-mod \
                 --disable-sid \
-                --disable-mad \
                 --disable-x264 \
                 --disable-mad \
                 --disable-schroedinger --disable-dirac \
