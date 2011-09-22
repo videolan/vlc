@@ -86,7 +86,7 @@ private:
     CoverArtLabel *art_cover;
 
     QLabel   *lblURL;
-    char     *currentURL;
+    QString  currentURL;
 
 public slots:
     void update( input_item_t * );

@@ -236,9 +236,9 @@ void MetaPanel::update( input_item_t *p_item )
 
     /* URL */
     psz_meta = input_item_GetURL( p_item );
-    if( !EMPTY_STR( psz_meta ) && strcmp( psz_meta, currentURL ) )
+    if( !EMPTY_STR( psz_meta ) && currentURL != psz_meta )
     {
-        free( currentURL ); currentURL = strdup( psz_meta );
+        currentURL = psz_meta;
 
         lblURL->setText( "<a href='" + qfu( psz_meta ) + "'>" +
                         qfu( psz_meta ).remove( QRegExp( ".*://") ) + "</a>" );
