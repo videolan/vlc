@@ -24,12 +24,24 @@
 /*****************************************************************************
  * OMX macros
  *****************************************************************************/
+#ifdef __ANDROID__
+#define OMX_VERSION_MAJOR 1
+#define OMX_VERSION_MINOR 0
+#define OMX_VERSION_REV   0
+#define OMX_VERSION_STEP  0
+#else
+#define OMX_VERSION_MAJOR 1
+#define OMX_VERSION_MINOR 1
+#define OMX_VERSION_REV   1
+#define OMX_VERSION_STEP  0
+#endif
+
 #define OMX_INIT_COMMON(a) \
   (a).nSize = sizeof(a); \
-  (a).nVersion.s.nVersionMajor = 1; \
-  (a).nVersion.s.nVersionMinor = 1; \
-  (a).nVersion.s.nRevision = 1; \
-  (a).nVersion.s.nStep = 0
+  (a).nVersion.s.nVersionMajor = OMX_VERSION_MAJOR; \
+  (a).nVersion.s.nVersionMinor = OMX_VERSION_MINOR; \
+  (a).nVersion.s.nRevision = OMX_VERSION_REV; \
+  (a).nVersion.s.nStep = OMX_VERSION_STEP
 
 #define OMX_INIT_STRUCTURE(a) \
   memset(&(a), 0, sizeof(a)); \
