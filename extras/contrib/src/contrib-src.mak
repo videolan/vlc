@@ -1097,7 +1097,6 @@ endif
 ifdef HAVE_WIN32
 	sed -i "s/std=c99/std=gnu99/" ffmpeg/configure
 endif
-	(cd ffmpeg; patch -p1 < ../Patches/libavformat-ape.c.patch )
 	touch $@
 
 else
