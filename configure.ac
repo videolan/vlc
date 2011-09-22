@@ -2167,7 +2167,7 @@ dnl
 AC_ARG_ENABLE(sid,
     [AS_HELP_STRING([--enable-sid],[C64 sid demux support (default auto)])])
 AS_IF([test "${enable_sid}" != "no"], [
-    PKG_CHECK_MODULES(sid, [libsidplay2], [
+    PKG_CHECK_MODULES(SID, [libsidplay2], [
         AC_LANG_PUSH(C++)
         oldCPPFLAGS="$CPPFLAGS"
         CPPFLAGS="$CPPFLAGS $SID_CFLAGS"
