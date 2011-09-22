@@ -52,7 +52,7 @@ vlc_module_begin ()
 
     add_bool( "mkv-use-ordered-chapters", true,
             N_("Ordered chapters"),
-            N_("Play ordered chapters as specified in the segment."), true );
+            N_("Play ordered chapters as specified in the segment."), false );
 
     add_bool( "mkv-use-chapter-codec", true,
             N_("Chapter codecs"),
@@ -60,7 +60,7 @@ vlc_module_begin ()
 
     add_bool( "mkv-preload-local-dir", false,
             N_("Preload Directory"),
-            N_("Preload matroska files from the same family in the same directory (not good for broken files)."), true );
+            N_("Preload matroska files from the same family in the same directory (not good for broken files)."), false );
 
     add_bool( "mkv-seek-percent", false,
             N_("Seek based on percent not time"),
