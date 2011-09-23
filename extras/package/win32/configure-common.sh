@@ -1,4 +1,5 @@
 [ -z $CONTRIB_DIR ] && export CONTRIB_DIR=/usr/win32
+[ "$CONTRIB_DIR" = no ] && export CONTRIB_DIR=""
 
   $CONFIGURE \
       --with-contrib="$CONTRIB_DIR" \
