@@ -104,6 +104,7 @@ DEPS_res = \
 	pixmaps/clear.png \
 	pixmaps/eject.png \
 	pixmaps/faster.png \
+	pixmaps/faster2.png \
 	pixmaps/go-next.png \
 	pixmaps/menus/help_16px.png \
 	pixmaps/menus/info_16px.png \
@@ -150,6 +151,7 @@ DEPS_res = \
 	pixmaps/sample_minimal.png \
 	pixmaps/sample_skins.png \
 	pixmaps/slower.png \
+	pixmaps/slower2.png \
 	pixmaps/space.png \
 	pixmaps/stop.png \
 	pixmaps/stop_16px.png \

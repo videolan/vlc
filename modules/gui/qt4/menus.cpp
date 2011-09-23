@@ -794,7 +794,7 @@ void QVLCMenu::PopupMenuControlEntries( QMenu *menu, intf_thread_t *p_intf )
     action = menu->addAction( qtr( "&Faster" ), THEMIM->getIM(),
                               SLOT( faster() ) );
 #ifndef __APPLE__ /* No icons in menus in Mac */
-    action->setIcon( QIcon( ":/toolbar/faster") );
+    action->setIcon( QIcon( ":/toolbar/faster2") );
 #endif
     action->setData( STATIC_ENTRY );
 
@@ -813,7 +813,7 @@ void QVLCMenu::PopupMenuControlEntries( QMenu *menu, intf_thread_t *p_intf )
     action = menu->addAction( qtr( "Slo&wer" ), THEMIM->getIM(),
                               SLOT( slower() ) );
 #ifndef __APPLE__ /* No icons in menus in Mac */
-    action->setIcon( QIcon( ":/toolbar/slower") );
+    action->setIcon( QIcon( ":/toolbar/slower2") );
 #endif
     action->setData( STATIC_ENTRY );
 

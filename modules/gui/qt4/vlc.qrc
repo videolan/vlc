@@ -63,6 +63,8 @@
         <file alias="tv">pixmaps/toolbar/tv.png</file>
         <file alias="tvtelx">pixmaps/toolbar/tvtelx.png</file>
         <file alias="space">pixmaps/space.png</file>
+        <file alias="slower2">pixmaps/slower2.png</file>
+        <file alias="faster2">pixmaps/faster2.png</file>
     </qresource>
     <qresource prefix="/buttons/playlist">
         <file alias="playlist_add">pixmaps/playlist/add.png</file>
