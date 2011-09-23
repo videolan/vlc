@@ -8,7 +8,8 @@ all: .iconv .intl .freetype .fribidi .zlib \
         .dca .kate .libass .SDL_image  \
         .libbluray .dvdcss .libupnp .dvdnav .qt4_win32 \
         .dx_headers .dshow_headers .portaudio .gecko \
-        .lua .peflags .libprojectM
+        .lua .peflags
+# .libprojectM .tag .sqlite3 ## FIXME: these need working cmake
 # .pthreads
 #.zvbi \
 #        .fluid
