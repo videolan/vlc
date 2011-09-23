@@ -2233,8 +2233,13 @@ ifdef HAVE_CYGWIN
 	patch -p0 < Patches/taglib-cygwin.patch
 endif
 
+ifdef HAVE_WIN64
+TAGLIB_CMAKE_OPTS=-DCMAKE_SYSTEM_NAME=Generic
+else
+TAGLIB_CMAKE_OPTS=
+endif
 .tag: taglib
-	(cd $<; $(HOSTCC) CPPFLAGS="$(CPPFLAGS)" cmake . -DCMAKE_TOOLCHAIN_FILE=../../toolchain.cmake -DCMAKE_INSTALL_PREFIX=$(PREFIX) -DENABLE_STATIC:BOOL=ON -DWITH_ASF:BOOL=ON -DWITH_MP4:BOOL=ON && make && make install)
+	(cd $<; $(HOSTCC) CPPFLAGS="$(CPPFLAGS)" cmake . -DCMAKE_TOOLCHAIN_FILE=../../toolchain.cmake -DCMAKE_INSTALL_PREFIX=$(PREFIX) -DENABLE_STATIC:BOOL=ON -DWITH_ASF:BOOL=ON -DWITH_MP4:BOOL=ON $(TAGLIB_CMAKE_OPTS) && make && make install)
 	$(INSTALL_NAME)
 	touch $@
 
