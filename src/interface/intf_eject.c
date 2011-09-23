@@ -145,7 +145,6 @@ int intf_Eject( vlc_object_t *p_this, const char *psz_device )
 
 #elif defined(WIN32)
     MCI_OPEN_PARMS op;
-    MCI_STATUS_PARMS st;
     DWORD i_flags;
     char psz_drive[4];
 
@@ -162,7 +161,6 @@ int intf_Eject( vlc_object_t *p_this, const char *psz_device )
 
     if( !mciSendCommand( 0, MCI_OPEN, i_flags, (uintptr_t)&op ) )
     {
-        st.dwItem = MCI_STATUS_READY;
         /* Eject disc */
         i_ret = mciSendCommand( op.wDeviceID, MCI_SET, MCI_SET_DOOR_OPEN, 0 );
         /* Release access to the device */
