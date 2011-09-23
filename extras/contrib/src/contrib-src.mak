@@ -1644,10 +1644,6 @@ portaudio: pa_stable_v$(PORTAUDIO_VERSION).tgz
 ifneq ($(HOST),$(BUILD))
 	(patch -p0 < Patches/portaudio-cross.patch;cd $@;  autoconf)
 endif
-ifdef HAVE_WIN64
-	patch -p0 < Patches/portaudio-static.patch
-	(cd $@ ; autoreconf -if)
-endif
 
 .portaudio: portaudio
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make  install)
