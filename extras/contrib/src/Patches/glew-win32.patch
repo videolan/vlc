@@ -75,3 +75,15 @@
  LDFLAGS.GL = -lglu32 -lopengl32 -lgdi32 -luser32 -lkernel32
  LDFLAGS.EXTRA = -L/mingw/lib
  WARN = -Wall -W
+diff -ur glew.orig//include/GL/glew.h glew/include/GL/glew.h
+--- glew.orig//include/GL/glew.h	2011-09-23 01:38:28.524786958 -0400
++++ glew/include/GL/glew.h	2011-09-23 01:45:16.405385194 -0400
+@@ -150,7 +150,7 @@
+ #endif
+ #if !defined(_PTRDIFF_T_DEFINED) && !defined(_PTRDIFF_T_)
+ #  ifdef _WIN64
+-typedef __int64 ptrdiff_t;
++#include <stdint.h>
+ #  else
+ typedef _W64 int ptrdiff_t;
+ #  endif
