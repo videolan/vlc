@@ -1086,9 +1086,6 @@ ffmpeg:
 ifdef HAVE_ISA_THUMB
 	patch -p0 < Patches/ffmpeg-avcodec-no-thumb.patch
 endif
-ifdef HAVE_WIN64
-	(cd ffmpeg/libswscale; patch -p0 < ../../Patches/ffmpeg-win64.patch;)
-endif
 ifdef HAVE_UCLIBC
 	patch -p0 < Patches/ffmpeg-svn-uclibc.patch
 	patch -p0 < Patches/ffmpeg-svn-internal-define.patch
