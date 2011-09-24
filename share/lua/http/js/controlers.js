@@ -195,7 +195,7 @@ function browse(dir){
 					case '#mobile':
 						break;
 					default:
-						sendCommand('command=in_play&input='+encodeURIComponent($(this).attr('openfile')));
+						sendCommand('command=in_play&v=2&input='+encodeURIComponent($(this).attr('openfile')));
 						break;
 				}
 				$('#window_browse').dialog('close');
@@ -212,7 +212,7 @@ function browse(dir){
 			$('[openfile]').click(function(){
 				switch(tgt){
 					case '#mobile':
-						sendCommand('command=in_play&input='+encodeURIComponent($(this).attr('openfile')),"window.location='mobile.html'");
+						sendCommand('command=in_play&v=2&input='+encodeURIComponent($(this).attr('openfile')),"window.location='mobile.html'");
 						break;
 					default:
 						break;
