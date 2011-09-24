@@ -1,6 +1,15 @@
 var current_id	=	1;
 var currentArt	=	null;
 var current_que	=	'main';
+function updateArt(url)
+{
+	$('#albumArt').fadeOut(500, function(){
+		$(this).addClass('hidden')
+		.removeAttr('height')
+		.removeAttr('width')
+		.attr('src',url);
+	});
+}
 function updateStatus(){
 	$.ajax({
 		url: 'requests/status.xml',
@@ -50,16 +59,18 @@ function updateStatus(){
 					$('#buttonRepeat').addClass('ui-state-default');
 					$('#buttonRepeat').removeClass('ui-state-active');
 				}
-				if($('[name="artwork_url"]',data).text()!=currentArt){
+
+				if($('[name="artwork_url"]',data).text()!=currentArt
+					&& $('[name="artwork_url"]',data).text()!="")
+				{
 					var tmp	=	new Date();
-					$('#albumArt').attr('src','/art?'+tmp.getTime());
 					currentArt	=	$('[name="artwork_url"]',data).text();
-					$('#albumArt').css({
-						'visibility':'visible',
-						'display':'block'
-					});
-				}else if($('[name="artwork_url"]',data).text()==""){
-					$('#albumArt').attr('src','images/vlc-48.png');
+					updateArt('/art?'+tmp.getTime());
+				}else if($('[name="artwork_url"]',data).text()==""
+						 &&	currentArt!='images/vlc-48.png')
+				{
+					currentArt='images/vlc-48.png';
+					updateArt(currentArt);
 				}
 				if(pollStatus){
 					setTimeout( updateStatus, 1000 );
@@ -422,6 +433,23 @@ function sendEQCmd(params){
 }
 
 $(function(){
+	$('#albumArt').load(function(){
+		var width=$(this).width();
+		var height=$(this).height();
+		var max=Math.max(width,height);
+		if(max>150)
+		{
+			var ratio=150/max;
+			width=Math.floor(width*ratio);
+			height=Math.floor(height*ratio);
+		}
+		$(this).attr('width',width)
+		.attr('height',height)
+		.css('margin-left', Math.floor((150 - width)/2))
+		.css('margin-top', Math.floor((150 - height)/2))
+		.removeClass('hidden')
+		.fadeIn();
+	});
 	$('#libraryTree').jstree({
 		"xml_data":{
 			"ajax":{

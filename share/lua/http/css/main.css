@@ -59,7 +59,7 @@ body{
 }
 #controlTable{
 	position:relative;
-	height: 140px;
+	height: 150px;
 }
 #controlButtons{
 	position: absolute;
@@ -87,19 +87,20 @@ body{
 #volumesliderzone{
 	position: absolute;
 	top: 20px;
-	left: 440px;
-	width: 205px;
+	left: 435px;
+	width: 210px;
 }
 
 #volumeSlider{
-	width: 200px;
+	width: 208px;
 }
 
 #artszone{
 	position: absolute;
 	top: 0;
-	left: 650px;
-	width: 141px;
+	left: 648px;
+	width: 150px;
+	height: 150px;
 	vertical-align: top;
 }
 
@@ -107,7 +108,7 @@ body{
 	position:absolute;
 	left: 0;
 	top: 100px;
-	width: 650px;
+	width: 645px;
 	vertical-align: bottom;
 }
 
@@ -207,4 +208,9 @@ body{
 div.centered{
 	margin-left: auto;
 	margin-right: auto;
+}
+
+.hidden{
+	visibility: hidden;
+	display: none;
 }
