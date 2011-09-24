@@ -315,7 +315,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 
             /* Audio Options */
             ui.volumeValue->setMaximum( QT_VOLUME_MAX / QT_VOLUME_DEFAULT * 100 );
-            CONFIG_GENERIC_NO_BOOL( "qt-startvolume" , IntegerRangeSlider, NULL,
+            CONFIG_GENERIC_NO_BOOL( "volume" , IntegerRangeSlider, NULL,
                                      defaultVolume );
             CONNECT( ui.defaultVolume, valueChanged( int ),
                      this, updateAudioVolume( int ) );

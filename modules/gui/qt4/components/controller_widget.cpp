@@ -89,7 +89,7 @@ SoundWidget::SoundWidget( QWidget *_parent, intf_thread_t * _p_intf,
     {
         volumeSlider = new SoundSlider( this,
             config_GetInt( p_intf, "volume-step" ),
-            var_InheritBool( p_intf, "qt-volume-complete" ),
+            false,
             var_InheritString( p_intf, "qt-slider-colours" ) );
     }
     else
@@ -98,8 +98,7 @@ SoundWidget::SoundWidget( QWidget *_parent, intf_thread_t * _p_intf,
         volumeSlider->setAttribute( Qt::WA_MacSmallSize);
         volumeSlider->setOrientation( b_special ? Qt::Vertical
                                                 : Qt::Horizontal );
-        volumeSlider->setMaximum( var_InheritBool( p_intf, "qt-volume-complete" )
-                                  ? 400 : 200 );
+        volumeSlider->setMaximum( 200 );
     }
 
     volumeSlider->setFocusPolicy( Qt::NoFocus );

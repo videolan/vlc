@@ -124,14 +124,7 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
                             "two weeks." )
 #define UPDATER_DAYS_TEXT N_("Number of days between two update checks")
 
-#define COMPLETEVOL_TEXT N_( "Allow the volume to be set to 400%" )
-#define COMPLETEVOL_LONGTEXT N_( "Allow the volume to have range from 0% to " \
-                                 "400%, instead of 0% to 200%. This option " \
-                                 "can distort the audio, since it uses " \
-                                 "software amplification." )
-
 #define SAVEVOL_TEXT N_( "Automatically save the volume on exit" )
-#define STARTVOL_TEXT N_( "Default start volume" )
 
 #define PRIVACY_TEXT N_( "Ask for network policy at start" )
 
@@ -236,13 +229,8 @@ vlc_module_begin ()
                  UPDATER_DAYS_TEXT, false )
 #endif
 
-    add_bool( "qt-volume-complete", false, COMPLETEVOL_TEXT,
-              COMPLETEVOL_LONGTEXT, true )
     add_bool( "qt-autosave-volume", false, SAVEVOL_TEXT,
               SAVEVOL_TEXT, true )
-    add_integer_with_range( "qt-startvolume", QT_VOLUME_DEFAULT, 0,
-               QT_VOLUME_MAX, STARTVOL_TEXT, STARTVOL_TEXT, true )
-
 #ifdef WIN32
     add_bool( "qt-disable-volume-keys"             /* name */,
               true                                 /* default value */,
@@ -278,13 +266,14 @@ vlc_module_begin ()
     add_bool( "qt-bgcone-expands", false, QT_BGCONE_EXPANDS_TEXT,
               QT_BGCONE_EXPANDS_LONGTEXT, true )
 
-
-    add_obsolete_bool( "qt-blingbling" ) /* Suppressed since 1.0.0 */
-    add_obsolete_integer( "qt-display-mode" ) /* Suppressed since 1.1.0 */
-
     add_bool( "qt-icon-change", true, ICONCHANGE_TEXT, ICONCHANGE_LONGTEXT, true )
 
-    add_obsolete_bool( "qt-adv-options" ) /* Since 1.2.0 */
+    add_obsolete_bool( "qt-blingbling" )      /* Suppressed since 1.0.0 */
+    add_obsolete_integer( "qt-display-mode" ) /* Suppressed since 1.1.0 */
+
+    add_obsolete_bool( "qt-adv-options" )     /* Since 1.2.0 */
+    add_obsolete_bool( "qt-volume-complete" ) /* Since 1.2.0 */
+    add_obsolete_integer( "qt-startvolume" )  /* Since 1.2.0 */
 
     cannot_unload_broken_library()
 
