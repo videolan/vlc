@@ -72,7 +72,7 @@
       <item row="4" column="0" colspan="3">
        <widget class="QCheckBox" name="hwAccelBox">
         <property name="text">
-         <string>Use GPU acceleration (experimental)</string>
+         <string>Use GPU accelerated decoding</string>
         </property>
        </widget>
       </item>
