@@ -22,7 +22,7 @@ $(function(){
 		min: 0,
 		max: 100,
 		stop: function( event, ui ) {
-			$( "#currentVolume" ).empty().append( ui.value+"%" );
+			$( "#currentVolume" ).empty().append( ui.value * 2 +"%" );
 			sendCommand({
 				'command':'volume',
 				'val':Math.round(ui.value*5.12)

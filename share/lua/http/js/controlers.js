@@ -20,7 +20,7 @@ function updateStatus(){
 				$('#totalTime').append(format_time($('length',data).text()));
 				$('#currentTime').append(format_time($('time',data).text()));
 				$('#seekSlider').slider({value: toFloat($('position',data).text()) * 100 });
-				$('#currentVolume').append(Math.round($('volume',data).text()/5.12)+'%');
+				$('#currentVolume').append(Math.round($('volume',data).text()/2.56)+'%');
 				$('#volumeSlider').slider({value: ($('volume',data).text()/5.12) });
 				$('#rateSlider').slider({value: ($('rate',data).text()) });
 				$('#currentRate').append(Math.round($('rate',data).text()*100)/100+'x');
