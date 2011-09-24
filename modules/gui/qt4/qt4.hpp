@@ -122,9 +122,6 @@ struct intf_sys_t
 
 #define getSettings() p_intf->p_sys->mainSettings
 
-#define QT_VOLUME_DEFAULT AOUT_VOLUME_DEFAULT
-#define QT_VOLUME_MAX (AOUT_VOLUME_DEFAULT * 2)
-
 static inline QString QVLCUserDir( vlc_userdir_t type )
 {
     char *dir = config_GetUserDir( type );

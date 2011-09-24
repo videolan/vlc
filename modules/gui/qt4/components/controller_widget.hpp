@@ -67,7 +67,7 @@ private slots:
     void updateButtonIcons( bool, bool );
 };
 
-#define VOLUME_MAX (QT_VOLUME_MAX * 100 / QT_VOLUME_DEFAULT)
+#define VOLUME_MAX 200
 class SoundWidget : public QWidget
 {
     Q_OBJECT
