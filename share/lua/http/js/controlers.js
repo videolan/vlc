@@ -29,35 +29,40 @@ function updateStatus(){
 				$('#subtitleSlider').slider({value: ($('subtitledelay',data).text()) });
 				$('#currentSubtitleDelay').append(Math.round($('subtitledelay',data).text()*100)/100+'s');
 				$('#seekSlider').attr('totalLength',$('length',data).text());
-				$('#buttonPlay').attr('state',$('state',data).text());
-				$('#buttonPlay').attr('mrl',$('[name="filename"]',data).text());
+				$('#buttonPlay')
+				.attr('state',$('state',data).text())
+				.attr('mrl',$('[name="filename"]',data).text());
 				if($('state',data).text()=='playing'){
-					$('#buttonPlay').removeClass('paused');
-					$('#buttonPlay').addClass('playing');
+					$('#buttonPlay').removeClass('paused').addClass('playing');
 				}else{
-					$('#buttonPlay').removeClass('playing');
-					$('#buttonPlay').addClass('paused');
+					$('#buttonPlay').removeClass('playing').addClass('paused');
 				}
 				if($('random',data).text()=='true'){
-					$('#buttonShuffle').removeClass('ui-state-default');
-					$('#buttonShuffle').addClass('ui-state-active');
+					$('#buttonShuffle')
+					.removeClass('ui-state-default')
+					.addClass('ui-state-active');
 				}else{
-					$('#buttonShuffle').addClass('ui-state-default');
-					$('#buttonShuffle').removeClass('ui-state-active');
+					$('#buttonShuffle')
+					.addClass('ui-state-default')
+					.removeClass('ui-state-active');
 				}
 				if($('loop',data).text()=='true'){
-					$('#buttonLoop').removeClass('ui-state-default');
-					$('#buttonLoop').addClass('ui-state-active');
+					$('#buttonLoop')
+					.removeClass('ui-state-default')
+					.addClass('ui-state-active');
 				}else{
-					$('#buttonLoop').addClass('ui-state-default');
-					$('#buttonLoop').removeClass('ui-state-active');
+					$('#buttonLoop')
+					.addClass('ui-state-default')
+					.removeClass('ui-state-active');
 				}
 				if($('repeat',data).text()=='true'){
-					$('#buttonRepeat').removeClass('ui-state-default');
-					$('#buttonRepeat').addClass('ui-state-active');
+					$('#buttonRepeat')
+					.removeClass('ui-state-default')
+					.addClass('ui-state-active');
 				}else{
-					$('#buttonRepeat').addClass('ui-state-default');
-					$('#buttonRepeat').removeClass('ui-state-active');
+					$('#buttonRepeat')
+					.addClass('ui-state-default')
+					.removeClass('ui-state-active');
 				}
 
 				if($('[name="artwork_url"]',data).text()!=currentArt
