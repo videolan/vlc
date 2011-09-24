@@ -145,7 +145,6 @@ $Id$
  * grain: Grain Video filter
  * grey_yuv: grayscale to others conversion module
  * growl: announce currently playing stream to growl
- * growl_udp: growl UDP notification plugin
  * h264: H264 decoder
  * headphone_channel_mixer:  headphone channel mixer with virtual spatialization effect
  * hildon: Maemo interface based on Hildon
@@ -166,6 +165,7 @@ $Id$
  * image: Image file video output
  * inhibit: preventing the computer from suspending
  * invert: inverse video filter
+ * iomx: IPC/OpenMaxIL for Android
  * jack: jack server audio output
  * kate: kate text bitstream decoder
  * libass: Subtitle renderers using libass
@@ -186,8 +186,8 @@ $Id$
  * mash: OpenMash based decoder
  * media_library: a sql based media library
  * mediadirs: Picture/Music/Video user directories as service discoveries
- * memcpy: default unaccelerated memcpy
  * memcpy3dn: 3D Now! accelerated version of memcpy
+ * memcpy: default unaccelerated memcpy
  * memcpyaltivec: Altivec accelerated version of memcpy
  * memcpymmx: MMX accelerated version of memcpy
  * memcpymmxext: MMX EXT accelerated version of memcpy

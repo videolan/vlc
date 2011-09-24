@@ -68,16 +68,17 @@ Codecs:
  * Support for ProRes 422 video codec in 10bits
  * EIA-608 closed captions improvements
  * Support for JPEG 2000 and Motion JPEG 2000 in the Windows and Mac binaries
+ * Experimental support of IOMX for OpenMAX IL codecs on Android
 
 Demuxers:
  * New images demuxer supporting jpeg, png, targa, xcf, git, tiff, bmp, pcx, lbm
- * C64 SID file playback support using sidplay2
+ * C64 SID file playback support of using sidplay2
  * Support for images/cover art in wma/wmv/asf files
  * Improvements in .ape files metadata reading and writing
  * New demuxer module for EBU subtitles (.stl)
  * Support for caf, mtv, awb, f4v, amr, vro (DVD-VR) files
  * Ogg, flv, mxf, amr seeking improvements
- * Major improvements in mkv chapters/segments handling
+ * Major improvements in Matroska (mkv) chapters/segments handling
 
 Interfaces:
  * Skins2 / Qt: misc improvements and usability fixes
