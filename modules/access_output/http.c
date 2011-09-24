@@ -131,7 +131,6 @@ static int Open( vlc_object_t *p_this )
     sout_access_out_t       *p_access = (sout_access_out_t*)p_this;
     sout_access_out_sys_t   *p_sys;
 
-    char                *psz_file_name;
     char                *psz_user;
     char                *psz_pwd;
     char                *psz_mime;
@@ -142,12 +141,17 @@ static int Open( vlc_object_t *p_this )
 
     config_ChainParse( p_access, SOUT_CFG_PREFIX, ppsz_sout_options, p_access->p_cfg );
 
+    const char *path = p_access->psz_path;
     /* Skip everything before / - backward compatibiltiy with VLC 1.1 */
-    const char *psz_parser = strchr( p_access->psz_path, '/' );
-    if( psz_parser )
-        psz_file_name = strdup( psz_parser );
-    else
-        psz_file_name = strdup( "/" );
+    path += strcspn( path, "/" );
+    if( path > p_access->psz_path )
+    {
+        msg_Err( p_access, "\"%.*s\" HTTP host specification ignored",
+                 path - p_access->psz_path, p_access->psz_path );
+        msg_Info( p_access, "(Use --http-host and/or --http-port instead.)" );
+    }
+    if( !*path )
+        path = "/";
 
     /* TLS support */
     if( p_access->psz_access && !strcmp( p_access->psz_access, "https" ) )
@@ -158,7 +162,6 @@ static int Open( vlc_object_t *p_this )
     if( p_sys->p_httpd_host == NULL )
     {
         msg_Err( p_access, "cannot start HTTP server" );
-        free( psz_file_name );
         free( p_sys );
         return VLC_EGENERIC;
     }
@@ -175,7 +178,7 @@ static int Open( vlc_object_t *p_this )
     }
 
     p_sys->p_httpd_stream =
-        httpd_StreamNew( p_sys->p_httpd_host, psz_file_name, psz_mime,
+        httpd_StreamNew( p_sys->p_httpd_host, path, psz_mime,
                          psz_user, psz_pwd, NULL );
     free( psz_user );
     free( psz_pwd );
@@ -183,10 +186,9 @@ static int Open( vlc_object_t *p_this )
 
     if( p_sys->p_httpd_stream == NULL )
     {
-        msg_Err( p_access, "cannot add stream %s", psz_file_name );
+        msg_Err( p_access, "cannot add stream %s", path );
         httpd_HostDelete( p_sys->p_httpd_host );
 
-        free( psz_file_name );
         free( p_sys );
         return VLC_EGENERIC;
     }
@@ -203,8 +205,7 @@ static int Open( vlc_object_t *p_this )
         if( psz_name != NULL ) psz_name++;
         else psz_name = psz_newuri;
 
-        if( psz_file_name &&
-            asprintf( &psz_txt, "path=%s", psz_file_name ) == -1 )
+        if( asprintf( &psz_txt, "path=%s", path ) == -1 )
             {
                 free( psz_uri );
                 return VLC_ENOMEM;
@@ -223,8 +224,6 @@ static int Open( vlc_object_t *p_this )
     else
         p_sys->p_bonjour = NULL;
 #endif
-
-    free( psz_file_name );
 
     p_sys->i_header_allocated = 1024;
     p_sys->i_header_size      = 0;
