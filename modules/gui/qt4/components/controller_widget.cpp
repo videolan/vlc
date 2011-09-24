@@ -164,7 +164,7 @@ void SoundWidget::libUpdateVolume()
     playlist_t *p_playlist = pl_Get( p_intf );
 
     i_volume = aout_VolumeGet( p_playlist );
-    i_volume = ((i_volume + 1) * VOLUME_MAX ) / (AOUT_VOLUME_DEFAULT * 2);
+    i_volume = (i_volume * VOLUME_MAX ) / (AOUT_VOLUME_DEFAULT * 2);
 
     if ( i_volume - volumeSlider->value() != 0 )
     {
