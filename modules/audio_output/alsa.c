@@ -384,7 +384,7 @@ static int Open (vlc_object_t *obj)
 
     /* Set channels count */
     val = snd_pcm_hw_params_set_channels (pcm, hw, channels);
-    if (val && channels > 2) /* Fallback to stereo */
+    if (val && channels != 2) /* Fallback to stereo */
     {
         val = snd_pcm_hw_params_set_channels (pcm, hw, 2);
         channels = 2;
