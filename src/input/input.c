@@ -85,7 +85,7 @@ static void UpdateGenericFromAccess( input_thread_t * );
 static int  UpdateTitleSeekpointFromDemux( input_thread_t * );
 static void UpdateGenericFromDemux( input_thread_t * );
 
-static void MRLSections( input_thread_t *, char *, int *, int *, int *, int *);
+static void MRLSections( char *, int *, int *, int *, int *);
 
 static input_source_t *InputSourceNew( input_thread_t *);
 static int  InputSourceInit( input_thread_t *, input_source_t *,
@@ -2381,8 +2381,8 @@ static int InputSourceInit( input_thread_t *p_input,
              strncmp( psz_access, "rtp", 3 )) )
         {
             /* Find optional titles and seekpoints */
-            MRLSections( p_input, psz_path, &in->i_title_start, &in->i_title_end,
-                     &in->i_seekpoint_start, &in->i_seekpoint_end );
+            MRLSections( psz_path, &in->i_title_start, &in->i_title_end,
+                         &in->i_seekpoint_start, &in->i_seekpoint_end );
         }
 
         if( psz_forced_demux && *psz_forced_demux )
@@ -3080,96 +3080,69 @@ void input_SplitMRL( const char **ppsz_access, const char **ppsz_demux,
     *ppsz_access = p;
 }
 
-static inline bool next(char ** src)
+static const char *MRLSeekPoint( const char *str, int *title, int *chapter )
 {
     char *end;
-    errno = 0;
-    long result = strtol( *src, &end, 0 );
-    if( errno != 0 || result >= LONG_MAX || result <= LONG_MIN ||
-        end == *src )
+    unsigned long u;
+
+    /* Look for the title */
+    u = strtoul( str, &end, 0 );
+    *title = (str == end || u > (unsigned long)INT_MAX) ? -1 : (int)u;
+    str = end;
+
+    /* Look for the chapter */
+    if( *str == ':' )
     {
-        return false;
+        str++;
+        u = strtoul( str, &end, 0 );
+        *chapter = (str == end || u > (unsigned long)INT_MAX) ? -1 : (int)u;
+        str = end;
     }
-    *src = end;
-    return true;
+    else
+        *chapter = -1;
+
+    return str;
 }
+
 
 /*****************************************************************************
  * MRLSections: parse title and seekpoint info from the Media Resource Locator.
  *
  * Syntax:
- * [url][@[title-start][:chapter-start][-[title-end][:chapter-end]]]
+ * [url][@[title_start][:chapter_start][-[title_end][:chapter_end]]]
  *****************************************************************************/
-static void MRLSections( input_thread_t *p_input, char *psz_source,
+static void MRLSections( char *psz_source,
                          int *pi_title_start, int *pi_title_end,
                          int *pi_chapter_start, int *pi_chapter_end )
 {
-    char *psz, *psz_end, *psz_next, *psz_check;
-
-    *pi_title_start = *pi_title_end = -1;
-    *pi_chapter_start = *pi_chapter_end = -1;
+    *pi_title_start = *pi_title_end = *pi_chapter_start = *pi_chapter_end = -1;
 
     /* Start by parsing titles and chapters */
-    if( !psz_source || !( psz = strrchr( psz_source, '@' ) ) ) return;
+    char *psz = strrchr( psz_source, '@' );
+    if( psz == NULL )
+        return;
 
+    const char *p = psz + 1;
+    int title_start, chapter_start, title_end, chapter_end;
 
-    /* Check we are really dealing with a title/chapter section */
-    psz_check = psz + 1;
-    if( !*psz_check ) return;
-    if( isdigit((unsigned char)*psz_check) )
-        if(!next(&psz_check)) return;
-    if( *psz_check != ':' && *psz_check != '-' && *psz_check ) return;
-    if( *psz_check == ':' && ++psz_check )
-    {
-        if( isdigit((unsigned char)*psz_check) )
-            if(!next(&psz_check)) return;
-    }
-    if( *psz_check != '-' && *psz_check ) return;
-    if( *psz_check == '-' && ++psz_check )
-    {
-        if( isdigit((unsigned char)*psz_check) )
-            if(!next(&psz_check)) return;
-    }
-    if( *psz_check != ':' && *psz_check ) return;
-    if( *psz_check == ':' && ++psz_check )
-    {
-        if( isdigit((unsigned char)*psz_check) )
-            if(!next(&psz_check)) return;
-    }
-    if( *psz_check ) return;
+    if( *p != '-' )
+        p = MRLSeekPoint( p, &title_start, &chapter_start );
+    else
+        title_start = chapter_start = -1;
 
-    /* Separate start and end */
-    *psz++ = 0;
-    if( ( psz_end = strchr( psz, '-' ) ) ) *psz_end++ = 0;
+    if( *p == '-' )
+        p = MRLSeekPoint( p + 1, &title_end, &chapter_end );
+    else
+        title_end = chapter_end = -1;
 
-    /* Look for the start title */
-    *pi_title_start = strtol( psz, &psz_next, 0 );
-    if( !*pi_title_start && psz == psz_next ) *pi_title_start = -1;
-    *pi_title_end = *pi_title_start;
-    psz = psz_next;
+    if( *p ) /* syntax error */
+        return;
 
-    /* Look for the start chapter */
-    if( *psz ) psz++;
-    *pi_chapter_start = strtol( psz, &psz_next, 0 );
-    if( !*pi_chapter_start && psz == psz_next ) *pi_chapter_start = -1;
-    *pi_chapter_end = *pi_chapter_start;
-
-    if( psz_end )
-    {
-        /* Look for the end title */
-        *pi_title_end = strtol( psz_end, &psz_next, 0 );
-        if( !*pi_title_end && psz_end == psz_next ) *pi_title_end = -1;
-        psz_end = psz_next;
-
-        /* Look for the end chapter */
-        if( *psz_end ) psz_end++;
-        *pi_chapter_end = strtol( psz_end, &psz_next, 0 );
-        if( !*pi_chapter_end && psz_end == psz_next ) *pi_chapter_end = -1;
-    }
-
-    msg_Dbg( p_input, "source=`%s' title=%d/%d seekpoint=%d/%d",
-             psz_source, *pi_title_start, *pi_chapter_start,
-             *pi_title_end, *pi_chapter_end );
+    *pi_title_start = title_start;
+    *pi_title_end = title_end;
+    *pi_chapter_start = chapter_start;
+    *pi_chapter_end = chapter_end;
+    *psz = '\0';
 }
 
 /*****************************************************************************
