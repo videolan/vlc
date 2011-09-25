@@ -121,6 +121,8 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     /* Do we want anoying popups or not */
     b_notificationEnabled = var_InheritBool( p_intf, "qt-notification" );
 
+    b_pauseOnMinimize = var_InheritBool( p_intf, "qt-pause-minimized" );
+
     /* Set the other interface settings */
     settings = getSettings();
     settings->beginGroup( "MainWindow" );
@@ -1128,9 +1130,8 @@ void MainInterface::changeEvent(QEvent *event)
             b_hasPausedWhenMinimized = false;
 
             if( THEMIM->getIM()->playingStatus() == PLAYING_S &&
-                THEMIM->getIM()->hasVideo() &&
-                !THEMIM->getIM()->hasVisualisation() &&
-                var_InheritBool( p_intf, "qt-pause-minimized" ) )
+                THEMIM->getIM()->hasVideo() && !THEMIM->getIM()->hasVisualisation() &&
+                b_pauseOnMinimize )
             {
                 b_hasPausedWhenMinimized = true;
                 THEMIM->pause();

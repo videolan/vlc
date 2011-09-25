@@ -161,6 +161,7 @@ private:
     bool                 b_hideAfterCreation;
     bool                 b_minimalView;         ///< Minimal video
     bool                 b_interfaceFullScreen;
+    bool                 b_pauseOnMinimize;
 
     /* States */
     bool                 playlistVisible;       ///< Is the playlist visible ?
