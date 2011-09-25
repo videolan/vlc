@@ -1045,39 +1045,29 @@ void PLModel::popupSave()
 
 void PLModel::popupExplore()
 {
+    char *uri = NULL, *path = NULL;
+
     PL_LOCK;
     playlist_item_t *p_item = playlist_ItemGetById( p_playlist, i_popup_item );
     if( p_item )
     {
         input_item_t *p_input = p_item->p_input;
-        char *psz_meta = input_item_GetURI( p_input );
-        PL_UNLOCK;
-        if( psz_meta )
-        {
-            const char *psz_access;
-            const char *psz_demux;
-            char  *psz_path;
-            input_SplitMRL( &psz_access, &psz_demux, &psz_path, psz_meta );
-
-            if( !EMPTY_STR( psz_access ) && (
-                   !strncasecmp( psz_access, "file", 4 ) ||
-                   !strncasecmp( psz_access, "dire", 4 ) ))
-            {
-#if defined( WIN32 ) || defined( __OS2__ )
-                /* Qt openURL doesn't know to open files that starts with a / or \ */
-                if( psz_path[0] == '/' || psz_path[0] == '\\'  )
-                    psz_path++;
-#endif
-
-                QFileInfo info( qfu( decode_URI( psz_path ) ) );
-                QDesktopServices::openUrl(
-                        QUrl::fromLocalFile( info.absolutePath() ) );
-            }
-            free( psz_meta );
-        }
+        uri = input_item_GetURI( p_input );
     }
-    else
-        PL_UNLOCK;
+    PL_UNLOCK;
+
+    if( uri != NULL )
+    {
+        path = make_path( uri );
+        free( uri );
+    }
+    if( path == NULL )
+        return;
+
+    QFileInfo info( qfu( path ) );
+    free( path );
+
+    QDesktopServices::openUrl( QUrl::fromLocalFile( info.absolutePath() ) );
 }
 
 void PLModel::popupAddNode()
