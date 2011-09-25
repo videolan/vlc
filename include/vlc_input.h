@@ -644,15 +644,6 @@ VLC_API void input_DecoderDelete( decoder_t * );
 VLC_API void input_DecoderDecode( decoder_t *, block_t *, bool b_do_pace );
 
 /**
- * This function allows to split a MRL into access, demux and path part.
- *
- *  You should not write into access and demux string as they may not point into
- * the provided buffer.
- *  The buffer provided by psz_dup will be modified.
- */
-VLC_API void input_SplitMRL( const char **ppsz_access, const char **ppsz_demux, char **ppsz_path, char *psz_dup );
-
-/**
  * This function creates a sane filename path.
  */
 VLC_API char * input_CreateFilename( vlc_object_t *, const char *psz_path, const char *psz_prefix, const char *psz_extension ) VLC_USED;

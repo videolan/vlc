@@ -243,4 +243,7 @@ void input_ConfigVarInit ( input_thread_t * );
 char **subtitles_Detect( input_thread_t *, char* path, const char *fname );
 int subtitles_Filter( const char *);
 
+/* input.c */
+void input_SplitMRL( const char **, const char **, char **, char * );
+
 #endif

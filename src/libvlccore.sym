@@ -227,7 +227,6 @@ input_resource_New
 input_resource_Release
 input_resource_TerminateVout
 input_resource_Terminate
-input_SplitMRL
 input_Start
 input_Stop
 input_vaControl
