@@ -68,21 +68,10 @@
 
 static void httpd_ClientClean( httpd_client_t *cl );
 
-struct httpd_t
-{
-    VLC_COMMON_MEMBERS
-
-    int          i_host;
-    httpd_host_t **host;
-};
-
-
 /* each host run in his own thread */
 struct httpd_host_t
 {
     VLC_COMMON_MEMBERS
-
-    httpd_t     *httpd;
 
     /* ref count */
     unsigned    i_ref;
@@ -1030,45 +1019,31 @@ httpd_host_t *vlc_rtsp_HostNew( vlc_object_t *p_this )
     return httpd_HostCreate( p_this, "rtsp-host", "rtsp-port", NULL );
 }
 
-static vlc_mutex_t httpd_mutex = VLC_STATIC_MUTEX;
+static struct httpd_t
+{
+    vlc_mutex_t  mutex;
+
+    httpd_host_t **host;
+    int          i_host;
+} httpd = { VLC_STATIC_MUTEX, NULL, 0 };
 
 static httpd_host_t *httpd_HostCreate( vlc_object_t *p_this,
                                        const char *hostvar,
                                        const char *portvar,
                                        vlc_tls_creds_t *p_tls )
 {
-    httpd_t      *httpd;
     httpd_host_t *host;
-    int i;
 
     /* to be sure to avoid multiple creation */
-    vlc_mutex_lock( &httpd_mutex );
-    httpd = libvlc_priv (p_this->p_libvlc)->p_httpd;
-
-    if( httpd == NULL )
-    {
-        msg_Info( p_this, "creating httpd" );
-        httpd = (httpd_t *)vlc_custom_create( p_this, sizeof (*httpd),
-                                              "http server" );
-        if( httpd == NULL )
-        {
-            vlc_mutex_unlock( &httpd_mutex );
-            return NULL;
-        }
-
-        httpd->i_host = 0;
-        httpd->host   = NULL;
-
-        libvlc_priv (p_this->p_libvlc)->p_httpd = httpd;
-    }
+    vlc_mutex_lock( &httpd.mutex );
 
     /* verify if it already exist */
-    for( i = httpd->i_host - 1; i >= 0; i-- )
+    for( int i = 0; i < httpd.i_host; i++ )
     {
-        host = httpd->host[i];
+        host = httpd.host[i];
 
         /* cannot mix TLS and non-TLS hosts */
-        if( ( httpd->host[i]->p_tls != NULL ) != ( p_tls != NULL ) )
+        if( ( host->p_tls != NULL ) != ( p_tls != NULL ) )
             continue;
 
         /* Increase existing matching host reference count.
@@ -1079,7 +1054,7 @@ static httpd_host_t *httpd_HostCreate( vlc_object_t *p_this,
         host->i_ref++;
         vlc_mutex_unlock( &host->lock );
 
-        vlc_mutex_unlock( &httpd_mutex );
+        vlc_mutex_unlock( &httpd.mutex );
         if( p_tls != NULL )
             vlc_tls_ServerDelete( p_tls );
         return host;
@@ -1093,7 +1068,6 @@ static httpd_host_t *httpd_HostCreate( vlc_object_t *p_this,
     if (host == NULL)
         goto error;
 
-    host->httpd = httpd;
     vlc_mutex_init( &host->lock );
     vlc_cond_init( &host->wait );
     host->i_ref = 1;
@@ -1130,18 +1104,13 @@ static httpd_host_t *httpd_HostCreate( vlc_object_t *p_this,
     }
 
     /* now add it to httpd */
-    TAB_APPEND( httpd->i_host, httpd->host, host );
-    vlc_mutex_unlock( &httpd_mutex );
+    TAB_APPEND( httpd.i_host, httpd.host, host );
+    vlc_mutex_unlock( &httpd.mutex );
 
     return host;
 
 error:
-    if( httpd->i_host <= 0 )
-    {
-        libvlc_priv (httpd->p_libvlc)->p_httpd = NULL;
-        vlc_object_release( httpd );
-    }
-    vlc_mutex_unlock( &httpd_mutex );
+    vlc_mutex_unlock( &httpd.mutex );
 
     if( host != NULL )
     {
@@ -1160,11 +1129,10 @@ error:
 /* delete a host */
 void httpd_HostDelete( httpd_host_t *host )
 {
-    httpd_t *httpd = host->httpd;
     int i;
     bool delete = false;
 
-    vlc_mutex_lock( &httpd_mutex );
+    vlc_mutex_lock( &httpd.mutex );
 
     vlc_mutex_lock( &host->lock );
     host->i_ref--;
@@ -1177,11 +1145,11 @@ void httpd_HostDelete( httpd_host_t *host )
     if( !delete )
     {
         /* still used */
-        vlc_mutex_unlock( &httpd_mutex );
+        vlc_mutex_unlock( &httpd.mutex );
         msg_Dbg( host, "httpd_HostDelete: host still in use" );
         return;
     }
-    TAB_REMOVE( httpd->i_host, httpd->host, host );
+    TAB_REMOVE( httpd.i_host, httpd.host, host );
 
     vlc_object_kill( host );
     vlc_join( host->thread, NULL );
@@ -1210,15 +1178,7 @@ void httpd_HostDelete( httpd_host_t *host )
     vlc_cond_destroy( &host->wait );
     vlc_mutex_destroy( &host->lock );
     vlc_object_release( host );
-
-    if( httpd->i_host <= 0 )
-    {
-        msg_Dbg( httpd, "no hosts left, stopping httpd" );
-
-        libvlc_priv (httpd->p_libvlc)->p_httpd = NULL;
-        vlc_object_release( httpd );
-    }
-    vlc_mutex_unlock( &httpd_mutex );
+    vlc_mutex_unlock( &httpd.mutex );
 }
 
 /* register a new url */

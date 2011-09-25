@@ -188,7 +188,6 @@ typedef struct libvlc_priv_t
     vlc_mutex_t       ml_lock; ///< Mutex for ML creation
     vlm_t             *p_vlm;  ///< the VLM singleton (or NULL)
     vlc_object_t      *p_dialog_provider; ///< dialog provider
-    httpd_t           *p_httpd; ///< HTTP daemon (src/network/httpd.c)
 #ifdef ENABLE_SOUT
     sap_handler_t     *p_sap; ///< SAP SDP advertiser
 #endif
