@@ -79,7 +79,6 @@ struct httpd_host_t
     /* address/port and socket for listening at connections */
     int         *fds;
     unsigned     nfd;
-    unsigned     port;
 
     vlc_thread_t thread;
     vlc_mutex_t lock;
@@ -952,13 +951,21 @@ void httpd_StreamDelete( httpd_stream_t *stream )
  * Low level
  *****************************************************************************/
 static void* httpd_HostThread( void * );
-static httpd_host_t *httpd_HostCreate( vlc_object_t *, const char *,
-                                       const char *, vlc_tls_creds_t * );
+static httpd_host_t *httpd_HostCreate( vlc_object_t *, httpd_host_t **,
+                                       const char *, const char *,
+                                       vlc_tls_creds_t * );
+
+static struct httpd_t
+{
+    vlc_mutex_t  mutex;
+    httpd_host_t *http, *https, *rtsp;
+} httpd = { VLC_STATIC_MUTEX, NULL, NULL, NULL };
 
 /* create a new host */
 httpd_host_t *vlc_http_HostNew( vlc_object_t *p_this )
 {
-    return httpd_HostCreate( p_this, "http-host", "http-port", NULL );
+    return httpd_HostCreate( p_this, &httpd.http,
+                             "http-host", "http-port", NULL );
 }
 
 httpd_host_t *vlc_https_HostNew( vlc_object_t *obj )
@@ -1008,7 +1015,8 @@ httpd_host_t *vlc_https_HostNew( vlc_object_t *obj )
         free( crl );
     }
 
-    return httpd_HostCreate( obj, "http-host", "https-port", tls );
+    return httpd_HostCreate( obj, &httpd.https,
+                             "http-host", "https-port", tls );
 
 error:
     vlc_tls_ServerDelete( tls );
@@ -1017,38 +1025,25 @@ error:
 
 httpd_host_t *vlc_rtsp_HostNew( vlc_object_t *p_this )
 {
-    return httpd_HostCreate( p_this, "rtsp-host", "rtsp-port", NULL );
+    return httpd_HostCreate( p_this, &httpd.rtsp,
+                             "rtsp-host", "rtsp-port", NULL );
 }
 
-static struct httpd_t
-{
-    vlc_mutex_t  mutex;
-
-    httpd_host_t **host;
-    int          i_host;
-} httpd = { VLC_STATIC_MUTEX, NULL, 0 };
-
 static httpd_host_t *httpd_HostCreate( vlc_object_t *p_this,
+                                       httpd_host_t **hostp,
                                        const char *hostvar,
                                        const char *portvar,
                                        vlc_tls_creds_t *p_tls )
 {
     httpd_host_t *host;
-    unsigned port = var_InheritInteger( p_this->p_libvlc, portvar );
 
     /* to be sure to avoid multiple creation */
     vlc_mutex_lock( &httpd.mutex );
 
     /* verify if it already exist */
-    for( int i = 0; i < httpd.i_host; i++ )
+    host = *hostp;
+    if( host != NULL )
     {
-        host = httpd.host[i];
-
-        /* cannot mix TLS and non-TLS hosts */
-        if( host->port != port
-         || (host->p_tls != NULL) != (p_tls != NULL) )
-            continue;
-
         /* Increase existing matching host reference count.
          * The reference count is written under both the global httpd and the
          * host lock. It is read with either or both locks held. The global
@@ -1063,8 +1058,6 @@ static httpd_host_t *httpd_HostCreate( vlc_object_t *p_this,
         return host;
     }
 
-    host = NULL;
-
     /* create the new host */
     host = (httpd_host_t *)vlc_custom_create( p_this, sizeof (*host),
                                               "http host" );
@@ -1076,6 +1069,7 @@ static httpd_host_t *httpd_HostCreate( vlc_object_t *p_this,
     host->i_ref = 1;
 
     char *hostname = var_InheritString( p_this->p_libvlc, hostvar );
+    unsigned port = var_InheritInteger( p_this->p_libvlc, portvar );
     host->fds = net_ListenTCP( p_this, hostname, port );
     free( hostname );
     if( host->fds == NULL )
@@ -1091,7 +1085,6 @@ static httpd_host_t *httpd_HostCreate( vlc_object_t *p_this,
         goto error;
     }
 
-    host->port     = port;
     host->i_url    = 0;
     host->url      = NULL;
     host->i_client = 0;
@@ -1106,8 +1099,7 @@ static httpd_host_t *httpd_HostCreate( vlc_object_t *p_this,
         goto error;
     }
 
-    /* now add it to httpd */
-    TAB_APPEND( httpd.i_host, httpd.host, host );
+    *hostp = host;
     vlc_mutex_unlock( &httpd.mutex );
 
     return host;
@@ -1152,7 +1144,6 @@ void httpd_HostDelete( httpd_host_t *host )
         msg_Dbg( host, "httpd_HostDelete: host still in use" );
         return;
     }
-    TAB_REMOVE( httpd.i_host, httpd.host, host );
 
     vlc_object_kill( host );
     vlc_join( host->thread, NULL );
@@ -1181,6 +1172,14 @@ void httpd_HostDelete( httpd_host_t *host )
     vlc_cond_destroy( &host->wait );
     vlc_mutex_destroy( &host->lock );
     vlc_object_release( host );
+    if( host == httpd.http )
+        httpd.http = NULL;
+    else if( host == httpd.https )
+        httpd.https = NULL;
+    else if( host == httpd.rtsp )
+        httpd.rtsp = NULL;
+    else
+        assert(0);
     vlc_mutex_unlock( &httpd.mutex );
 }
 
