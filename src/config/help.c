@@ -154,7 +154,7 @@ static const char vlc_usage[] = N_(
   "  ftp://host[:port]/file         FTP URL\n"
   "  mms://host[:port]/file         MMS URL\n"
   "  screen://                      Screen capture\n"
-  "  dvd://[device][@raw_device]    DVD device\n"
+  "  dvd://[device]                 DVD device\n"
   "  vcd://[device]                 VCD device\n"
   "  cdda://[device]                Audio CD device\n"
   "  udp://[[<source address>]@[<bind address>][:<bind port>]]\n"
