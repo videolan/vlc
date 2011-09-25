@@ -126,7 +126,7 @@ private:
     static void PopupMenuStaticEntries( QMenu *menu );
     static void PopupPlayEntries( QMenu *menu, intf_thread_t *p_intf,
                                          input_thread_t *p_input );
-    static void PopupMenuControlEntries( QMenu *menu, intf_thread_t *p_intf );
+    static void PopupMenuControlEntries( QMenu *menu, intf_thread_t *p_intf, bool b = true );
     static void PopupMenuPlaylistControlEntries( QMenu *menu, intf_thread_t *p_intf );
 
     /* Generic automenu methods */

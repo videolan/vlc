@@ -560,6 +560,21 @@ void QVLCMenu::ExtensionsMenu( intf_thread_t *p_intf, QMenu *extMenu )
     extMgr->menu( extMenu );
 }
 
+static inline void VolumeEntries( intf_thread_t *p_intf, QMenu *current )
+{
+        current->addSeparator();
+
+        QAction *action = current->addAction( qtr( "Increase Volume" ),
+                ActionsManager::getInstance( p_intf ), SLOT( AudioUp() ) );
+        action->setData( STATIC_ENTRY );
+        action = current->addAction( qtr( "Decrease Volume" ),
+                ActionsManager::getInstance( p_intf ), SLOT( AudioDown() ) );
+        action->setData( STATIC_ENTRY );
+        action = current->addAction( qtr( "Mute" ),
+                ActionsManager::getInstance( p_intf ), SLOT( toggleMuteAudio() ) );
+        action->setData( STATIC_ENTRY );
+}
+
 /**
  * Main Audio Menu
  **/
@@ -578,17 +593,7 @@ QMenu *QVLCMenu::AudioMenu( intf_thread_t *p_intf, QMenu * current )
         current->addSeparator();
 
         addActionWithSubmenu( current, "visual", qtr( "&Visualizations" ) );
-        current->addSeparator();
-
-        QAction *action = current->addAction( qtr( "Increase Volume" ),
-                ActionsManager::getInstance( p_intf ), SLOT( AudioUp() ) );
-        action->setData( STATIC_ENTRY );
-        action = current->addAction( qtr( "Decrease Volume" ),
-                ActionsManager::getInstance( p_intf ), SLOT( AudioDown() ) );
-        action->setData( STATIC_ENTRY );
-        action = current->addAction( qtr( "Mute" ),
-                ActionsManager::getInstance( p_intf ), SLOT( toggleMuteAudio() ) );
-        action->setData( STATIC_ENTRY );
+        VolumeEntries( p_intf, current );
     }
 
     p_input = THEMIM->getInput();
@@ -786,17 +791,21 @@ void QVLCMenu::PopupPlayEntries( QMenu *menu,
     }
 }
 
-void QVLCMenu::PopupMenuControlEntries( QMenu *menu, intf_thread_t *p_intf )
+void QVLCMenu::PopupMenuControlEntries( QMenu *menu, intf_thread_t *p_intf,
+                                        bool b_normal )
 {
     QAction *action;
 
-    /* Faster/Slower */
-    action = menu->addAction( qtr( "&Faster" ), THEMIM->getIM(),
-                              SLOT( faster() ) );
+    if( b_normal )
+    {
+        /* Faster/Slower */
+        action = menu->addAction( qtr( "&Faster" ), THEMIM->getIM(),
+                                  SLOT( faster() ) );
 #ifndef __APPLE__ /* No icons in menus in Mac */
-    action->setIcon( QIcon( ":/toolbar/faster2") );
+        action->setIcon( QIcon( ":/toolbar/faster2") );
 #endif
-    action->setData( STATIC_ENTRY );
+        action->setData( STATIC_ENTRY );
+    }
 
     action = menu->addAction( qtr( "Faster (fine)" ), THEMIM->getIM(),
                               SLOT( littlefaster() ) );
@@ -810,14 +819,19 @@ void QVLCMenu::PopupMenuControlEntries( QMenu *menu, intf_thread_t *p_intf )
                               SLOT( littleslower() ) );
     action->setData( STATIC_ENTRY );
 
-    action = menu->addAction( qtr( "Slo&wer" ), THEMIM->getIM(),
-                              SLOT( slower() ) );
+    if( b_normal )
+    {
+        action = menu->addAction( qtr( "Slo&wer" ), THEMIM->getIM(),
+                                  SLOT( slower() ) );
 #ifndef __APPLE__ /* No icons in menus in Mac */
-    action->setIcon( QIcon( ":/toolbar/slower2") );
+        action->setIcon( QIcon( ":/toolbar/slower2") );
 #endif
-    action->setData( STATIC_ENTRY );
+        action->setData( STATIC_ENTRY );
+    }
 
     menu->addSeparator();
+
+    if( !b_normal ) return;
 
     action = menu->addAction( qtr( "&Jump Forward" ), THEMIM->getIM(),
              SLOT( jumpFwd() ) );
@@ -1092,8 +1106,10 @@ void QVLCMenu::updateSystrayMenu( MainInterface *mi,
 
     PopupPlayEntries( sysMenu, p_intf, p_input );
     PopupMenuPlaylistControlEntries( sysMenu, p_intf);
-    PopupMenuControlEntries( sysMenu, p_intf);
+    PopupMenuControlEntries( sysMenu, p_intf, false );
 
+    VolumeEntries( p_intf, sysMenu );
+    sysMenu->addSeparator();
     addDPStaticEntry( sysMenu, qtr( "&Open a Media" ),
             ":/type/file-wide", SLOT( openFileDialog() ) );
     addDPStaticEntry( sysMenu, qtr( "&Quit" ) ,
