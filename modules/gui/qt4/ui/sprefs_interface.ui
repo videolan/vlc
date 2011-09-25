@@ -495,7 +495,7 @@
               </widget>
              </item>
              <item row="5" column="0">
-              <widget class="QLabel" name="label">
+              <widget class="QLabel" name="stylesLabel">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
                  <horstretch>0</horstretch>

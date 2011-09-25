@@ -543,7 +543,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 
             optionWidgets.append( ui.skins );
             optionWidgets.append( ui.qt4 );
-#if !defined(NDEBUG) || !defined( WIN32)
+#if !defined( WIN32)
             ui.stylesCombo->addItem( qtr("System's default") );
             ui.stylesCombo->addItems( QStyleFactory::keys() );
             ui.stylesCombo->setCurrentIndex( ui.stylesCombo->findText(
@@ -556,6 +556,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             optionWidgets.append( ui.stylesCombo );
 #else
             ui.stylesCombo->hide();
+            ui.stylesLabel->hide();
             optionWidgets.append( NULL );
 #endif
             radioGroup = new QButtonGroup(this);
