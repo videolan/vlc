@@ -946,6 +946,7 @@ FFMPEGCONF = --disable-doc \
 	--disable-ffserver \
 	--disable-ffmpeg \
 	--disable-ffplay \
+	--disable-avconv \
 	--disable-devices \
 	--disable-protocols \
 	--disable-avfilter \
