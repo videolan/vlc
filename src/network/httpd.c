@@ -79,6 +79,7 @@ struct httpd_host_t
     /* address/port and socket for listening at connections */
     int         *fds;
     unsigned     nfd;
+    unsigned     port;
 
     vlc_thread_t thread;
     vlc_mutex_t lock;
@@ -1033,6 +1034,7 @@ static httpd_host_t *httpd_HostCreate( vlc_object_t *p_this,
                                        vlc_tls_creds_t *p_tls )
 {
     httpd_host_t *host;
+    unsigned port = var_InheritInteger( p_this->p_libvlc, portvar );
 
     /* to be sure to avoid multiple creation */
     vlc_mutex_lock( &httpd.mutex );
@@ -1043,7 +1045,8 @@ static httpd_host_t *httpd_HostCreate( vlc_object_t *p_this,
         host = httpd.host[i];
 
         /* cannot mix TLS and non-TLS hosts */
-        if( ( host->p_tls != NULL ) != ( p_tls != NULL ) )
+        if( host->port != port
+         || (host->p_tls != NULL) != (p_tls != NULL) )
             continue;
 
         /* Increase existing matching host reference count.
@@ -1073,7 +1076,6 @@ static httpd_host_t *httpd_HostCreate( vlc_object_t *p_this,
     host->i_ref = 1;
 
     char *hostname = var_InheritString( p_this->p_libvlc, hostvar );
-    int port = var_InheritInteger( p_this->p_libvlc, portvar );
     host->fds = net_ListenTCP( p_this, hostname, port );
     free( hostname );
     if( host->fds == NULL )
@@ -1089,6 +1091,7 @@ static httpd_host_t *httpd_HostCreate( vlc_object_t *p_this,
         goto error;
     }
 
+    host->port     = port;
     host->i_url    = 0;
     host->url      = NULL;
     host->i_client = 0;
