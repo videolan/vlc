@@ -34,7 +34,7 @@
 
 #if defined(HAVE_POSIX_MEMALIGN)
 #   include <stdlib.h>
-#elif defined(HAVE_MEMALIGN) || defined(WIN32)
+#elif defined(HAVE_MEMALIGN) || defined(HAVE_WIN32)
 #   include <malloc.h>
 #endif
 
@@ -434,7 +434,7 @@ void *vlc_memalign(size_t align, size_t size)
         base = NULL;
 #elif defined(HAVE_MEMALIGN)
     base = memalign(align, size);
-#elif defined(WIN32)
+#elif defined(HAVE_WIN32)
     base = __mingw_aligned_malloc(size, align);
 #else
 #   error Unimplemented!
