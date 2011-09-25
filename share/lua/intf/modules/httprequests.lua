@@ -356,7 +356,14 @@ end
 
 getbrowsetable = function ()
 
-	local dir = _GET["dir"]
+	local dir = nil
+	local uri = _GET["uri"]
+	--uri takes precedence, but fall back to dir
+	if uri then
+		dir = vlc.strings.make_path(uri)
+	else
+		dir = _GET["dir"]
+	end
 
 	local result={}
 	--paths are returned as an array of elements

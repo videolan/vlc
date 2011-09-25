@@ -146,6 +146,11 @@ It may be removed without notice.
 
 browse.xml:
 ===========
+
+< ?dir=<uri>
+> get file list from uri. At the moment, only local file uris are supported
+
+NB: uri is the preferred parameter. Dir is deprecated and may be removed in a future release.
 < ?dir=<dir>
 > get <dir>'s filelist
 
