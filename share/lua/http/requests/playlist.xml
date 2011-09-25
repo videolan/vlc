@@ -8,6 +8,7 @@ vim:syntax=lua
 <  $Id$
 <
 <  Authors: Antoine Cellerier <dionoea -at- videolan -dot- org>
+<  Authors: Rob Jonson <rob -at- hobbyistsoftware -dot- com>
 <
 <  This program is free software; you can redistribute it and/or modify
 <  it under the terms of the GNU General Public License as published by
@@ -26,53 +27,66 @@ vim:syntax=lua
 ]] ?>
 
 <?vlc
---[[
-function a(t,pre)
-  local pre = pre or ""
-  for k,v in pairs(t) do
-    vlc.msg.err(pre..tostring(k).." : "..tostring(v))
-    if type(v) == "table" then
-      a(v,pre.."  ")
-    end
-  end
-end
---]]
 
-function print_playlist(item)
-    if item.flags.disabled then return end
-    if(item.children) then
-        local name = vlc.strings.convert_xml_special_chars(item.name or "")
-        print('<node id="' ..tostring(item.id).. '" name="' ..tostring(name).. '" ro="' ..(item.flags.ro and "ro" or "rw").. '">')
-        for _, child in ipairs(item.children) do
-            print_playlist(child)
-        end
-        print('</node>')
-    else
-        local name, path = vlc.strings.convert_xml_special_chars(item.name or "", item.path or "")
-        local current_item = vlc.input.item()
-        local current = ""
-        -- Is the item the one currently played
-        if(current_item ~= nil) then
-            if(vlc.input.item().uri(current_item) == path) then
-                current = 'current="current"'
-            end
-        end
-        print('<leaf id="' ..tostring(item.id).. '" uri="' ..tostring(path).. '" name="' ..name.. '" ro="' ..(item.flags.ro and "ro" or "rw").. '" duration ="' ..math.floor(item.duration).. '" ' ..current.. ' />')
+--package.loaded.httprequests = nil --uncomment to debug changes
+require "httprequests"
+
+local printleaf = function(item)
+	print ("\n<leaf")
+
+	for k,v in pairs(item) do
+
+		if (k~="type") then
+			print(" "..k.."=\""..v.."\"")
+		end
     end
+
+	print ("/>")
 end
 
-local p
-if _GET["search"] then
-  if _GET["search"] ~= "" then
-    _G.search_key = _GET["search"]
-  else
-    _G.search_key = nil
-  end
-  local key = vlc.strings.decode_uri(_GET["search"])
-  p = vlc.playlist.search(key)
-else
-  p = vlc.playlist.get()
+local printnode = function(item)
+	local children=NULL
+
+	print ("\n<node")
+
+	for k,v in pairs(item) do
+
+		if (k=="type") then
+
+		elseif (k=="children") then
+			children=v._array
+		else
+			print(" "..k.."=\""..v.."\"")
+		end
+    end
+
+	print (">")
+
+	return children
 end
---a(p) --Uncomment to debug
-print_playlist(p)
+
+printitem = function(item)
+	local children=NULL
+
+	if item.type=="node" then
+		children=printnode(item)
+		if (children) then
+			for i,v in ipairs(children) do
+				printitem(v)
+			end
+		end
+		print ("</node>")
+	else
+		printleaf(item)
+	end
+
+end
+
+httprequests.processcommands()
+
+local pt=httprequests.playlisttable()
+
+printitem(pt)
+
+
 ?>
