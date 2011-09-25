@@ -300,7 +300,7 @@ int CopyInitCache(copy_cache_t *cache, unsigned width)
 }
 void CopyCleanCache(copy_cache_t *cache)
 {
-    vlc_aligned_free(cache->buffer);
+    vlc_free(cache->buffer);
     cache->buffer = NULL;
     cache->size   = 0;
 }
