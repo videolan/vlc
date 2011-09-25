@@ -142,7 +142,7 @@ static const char vlc_usage[] = N_(
   "            and that overrides previous settings.\n"
   "\n"
   "Stream MRL syntax:\n"
-  "  [[access][/demux]://]URL[@[title][:chapter][-[title][:chapter]]]\n"
+  "  [[access][/demux]://]URL[#[title][:chapter][-[title][:chapter]]]\n"
   "  [:option=value ...]\n"
   "\n"
   "  Many of the global --options can also be used as MRL specific :options.\n"
