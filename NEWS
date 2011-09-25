@@ -2,6 +2,10 @@ Changes between 1.1.x and 1.2.0-git:
 ------------------------------------
 
 Important notes:
+ * Start/end titles/chapters are now specified with # rather than @ to fix
+   conflicts with some URLs and file names. For instance, this plays a DVD
+   from the 2nd chapter of the 1st title up to the 4th chapter of the 3rd
+   title:  vlc dvd://#1:2-3:4
  * HTTP server IP address, port, and TLS configuration is now centralized:
    - The --http-host option sets the address, e.g. "--http-host=2001:db8::1".
      By default, both :: and 0.0.0.0 are used.
