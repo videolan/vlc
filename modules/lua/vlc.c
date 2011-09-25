@@ -521,15 +521,7 @@ int vlclua_playlist_add_internal( vlc_object_t *p_this, lua_State *L,
                     {
                         if( !lua_isnil( L, -1 ) )
                             msg_Warn( p_this, "Playlist item name should be a string." );
-
-                        psz_u8path = make_path( psz_path );
-                        if ( psz_u8path )
-                        {
-                            psz_name = strrchr( psz_u8path, '/' );
-                            if ( psz_name != NULL )
-                                psz_name++;
-                        }
-                        if ( !psz_name ) psz_name = psz_path;
+                        psz_name = NULL;
                     }
 
                     /* Read duration */
