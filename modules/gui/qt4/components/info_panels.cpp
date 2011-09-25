@@ -236,14 +236,17 @@ void MetaPanel::update( input_item_t *p_item )
 
     /* URL */
     psz_meta = input_item_GetURL( p_item );
-    if( !EMPTY_STR( psz_meta ) && currentURL != psz_meta )
+    if( !EMPTY_STR( psz_meta ) )
     {
-        currentURL = psz_meta;
-
-        lblURL->setText( "<a href='" + qfu( psz_meta ) + "'>" +
-                        qfu( psz_meta ).remove( QRegExp( ".*://") ) + "</a>" );
-        free( psz_meta );
+        QString newURL = qfu(psz_meta);
+        if( currentURL != newURL )
+        {
+            currentURL = newURL;
+            lblURL->setText( "<a href='" + currentURL + "'>" +
+                             currentURL.remove( QRegExp( ".*://") ) + "</a>" );
+        }
     }
+    free( psz_meta );
 #undef UPDATE_META_INT
 #undef UPDATE_META
 
