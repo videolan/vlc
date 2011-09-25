@@ -960,4 +960,7 @@ reactor leaks ionizing radiations."
 < courmisch> aww, I had a genius idea, and then I figured out it did not work
  -- #videolan, maybe an evil plan?!?
 %
-
+< linkfanel> what am i supposed to mean?
+< mru> that is a very good question
+ -- #videolan, sunday philosophy
+%
