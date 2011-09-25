@@ -1044,9 +1044,11 @@ void MainInterface::toggleUpdateSystrayMenu()
         hide();
 #endif
     }
-    QVLCMenu::updateSystrayMenu( this, p_intf );
+    if( sysTray )
+        QVLCMenu::updateSystrayMenu( this, p_intf );
 }
 
+/* First Item of the systray menu */
 void MainInterface::showUpdateSystrayMenu()
 {
     if( isHidden() )
@@ -1058,12 +1060,14 @@ void MainInterface::showUpdateSystrayMenu()
     QVLCMenu::updateSystrayMenu( this, p_intf );
 }
 
+/* First Item of the systray menu */
 void MainInterface::hideUpdateSystrayMenu()
 {
     hide();
     QVLCMenu::updateSystrayMenu( this, p_intf );
 }
 
+/* Click on systray Icon */
 void MainInterface::handleSystrayClick(
                                     QSystemTrayIcon::ActivationReason reason )
 {
