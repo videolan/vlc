@@ -138,11 +138,6 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 
     settings->endGroup( );
 
-    /*********************************
-     * Create the Systray Management *
-     *********************************/
-    initSystray();
-
     /**************************
      *  UI and Widgets design
      **************************/
@@ -173,6 +168,11 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     p_taskbl = NULL;
     taskbar_wmsg = RegisterWindowMessage("TaskbarButtonCreated");
 #endif
+
+    /*********************************
+     * Create the Systray Management *
+     *********************************/
+    initSystray();
 
     /************************************************************
      * Connect the input manager to the GUI elements it manages *
