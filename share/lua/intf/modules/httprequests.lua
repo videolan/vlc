@@ -356,29 +356,18 @@ end
 
 getbrowsetable = function ()
 
-local dir = _GET["dir"]
-if dir == nil then dir = "" end
---allow browse to deal with file-style URI's as well as paths
-local start=string.sub(dir,0,8)
-if start=="file:///" then
-	dir= string.sub(dir,9)
-end
-
+	local dir = _GET["dir"]
 
 	local result={}
+	--paths are returned as an array of elements
 	result.element={}
 	result.element._array={}
-
 
 	if dir then
 		if dir == "~" then dir = vlc.misc.homedir() end
 			dir = common.realpath(dir.."/")
 			local d = vlc.net.opendir(dir)
 			table.sort(d)
-
-			--paths are returned as an array of elements
-
-
 
 			for _,f in pairs(d) do
 				if f == ".." or not string.match(f,"^%.") then
