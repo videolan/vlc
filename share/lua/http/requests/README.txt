@@ -141,6 +141,9 @@ playlist.xml or playlist.json:
 =============
 < get the full playlist tree
 
+NB: playlist_jstree.xml is used for the internal web client. It should not be relied upon by external remotes.
+It may be removed without notice.
+
 browse.xml:
 ===========
 < ?dir=<dir>
