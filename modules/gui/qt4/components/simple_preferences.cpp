@@ -227,10 +227,12 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             CONFIG_GENERIC( "directx-device", StringList, ui.dxDeviceLabel,
                             dXdisplayDevice );
             CONFIG_BOOL( "directx-hw-yuv", hwYUVBox );
+            CONNECT( ui.overlay, toggled( bool ), ui.hwYUVBox, setEnabled( bool ) );
 #else
             ui.directXBox->setVisible( false );
             ui.hwYUVBox->setVisible( false );
 #endif
+
 
             CONFIG_GENERIC( "deinterlace", IntegerList, ui.deinterLabel, deinterlaceBox );
             CONFIG_GENERIC( "deinterlace-mode", StringList, ui.deinterModeLabel, deinterlaceModeBox );
