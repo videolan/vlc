@@ -323,6 +323,7 @@ DIST_http_lua = \
 	lua/http/mobile_view.html \
 	lua/http/.hosts \
 	lua/http/requests/playlist.xml \
+	lua/http/requests/playlist.json \
 	lua/http/requests/README.txt \
 	lua/http/requests/playlist_jstree.xml \
 	lua/http/requests/browse.xml \
