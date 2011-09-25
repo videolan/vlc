@@ -327,6 +327,7 @@ DIST_http_lua = \
 	lua/http/requests/README.txt \
 	lua/http/requests/playlist_jstree.xml \
 	lua/http/requests/browse.xml \
+	lua/http/requests/browse.json \
 	lua/http/requests/vlm_cmd.xml \
 	lua/http/requests/status.xml \
 	lua/http/requests/status.json \
