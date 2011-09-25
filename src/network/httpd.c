@@ -1238,7 +1238,7 @@ static httpd_url_t *httpd_UrlNewPrivate( httpd_host_t *host, const char *psz_url
         {
             if( !strcmp( psz_url, host->url[i]->psz_url ) )
             {
-                msg_Warn( host->httpd,
+                msg_Warn( host,
                           "cannot add '%s' (url already defined)", psz_url );
                 vlc_mutex_unlock( &host->lock );
                 return NULL;
