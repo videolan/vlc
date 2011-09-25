@@ -121,6 +121,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     /* Do we want anoying popups or not */
     b_notificationEnabled = var_InheritBool( p_intf, "qt-notification" );
 
+    /* */
     b_pauseOnMinimize = var_InheritBool( p_intf, "qt-pause-minimized" );
 
     /* Set the other interface settings */
@@ -374,6 +375,20 @@ void MainInterface::recreateToolbars()
     mainLayout->insertWidget( settings->value( "ToolbarPos", 0 ).toInt() ? 0: 3,
                               controls );
     settings->endGroup();
+}
+
+void MainInterface::reloadPrefs()
+{
+    b_notificationEnabled = var_InheritBool( p_intf, "qt-notification" );
+    b_pauseOnMinimize = var_InheritBool( p_intf, "qt-pause-minimized" );
+#ifdef WIN32
+    p_intf->p_sys->disable_volume_keys = var_InheritBool( p_intf, "qt-disable-volume-keys" );
+#endif
+    if( !var_InheritBool( p_intf, "qt-fs-controller" ) && fullscreenControls )
+    {
+        delete fullscreenControls;
+        fullscreenControls = NULL;
+    }
 }
 
 void MainInterface::createMainWidget( QSettings *settings )

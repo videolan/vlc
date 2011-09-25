@@ -206,6 +206,8 @@ public slots:
 
     void emitBoss();
 
+    void reloadPrefs();
+
 private slots:
     void debug();
     void destroyPopupMenu();

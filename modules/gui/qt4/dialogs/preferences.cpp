@@ -33,6 +33,7 @@
 #include "components/complete_preferences.hpp"
 #include "components/simple_preferences.hpp"
 #include "util/searchlineedit.hpp"
+#include "main_interface.hpp"
 
 #include <QHBoxLayout>
 #include <QGroupBox>
@@ -318,6 +319,9 @@ void PrefsDialog::save()
         ErrorsDialog::getInstance (p_intf)->addError( qtr( "Cannot save Configuration" ),
             qtr("Preferences file could not be saved") );
     }
+
+    if( p_intf->p_sys->p_mi )
+        p_intf->p_sys->p_mi->reloadPrefs();
     accept();
 }
 
