@@ -1,7 +1,7 @@
 /*****************************************************************************
  * main_interface.cpp : Main interface
  ****************************************************************************
- * Copyright (C) 2006-2010 VideoLAN and AUTHORS
+ * Copyright (C) 2006-2011 VideoLAN and AUTHORS
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
@@ -174,9 +174,10 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
      *********************************/
     initSystray();
 
-    /************************************************************
-     * Connect the input manager to the GUI elements it manages *
-     ************************************************************/
+    /*************************************************************
+     * Connect the input manager to the GUI elements it manages  *
+     * Beware initSystray did some connects on input manager too *
+     *************************************************************/
     /**
      * Connects on nameChanged()
      * Those connects are different because options can impeach them to trigger.
@@ -184,33 +185,12 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     /* Main Interface statusbar */
     CONNECT( THEMIM->getIM(), nameChanged( const QString& ),
              this, setName( const QString& ) );
-    /* and systray */
-#ifndef HAVE_MAEMO
-    if( sysTray )
-    {
-        CONNECT( THEMIM->getIM(), nameChanged( const QString& ),
-                 this, updateSystrayTooltipName( const QString& ) );
-    }
-#endif
     /* and title of the Main Interface*/
     if( var_InheritBool( p_intf, "qt-name-in-title" ) )
     {
         CONNECT( THEMIM->getIM(), nameChanged( const QString& ),
                  this, setVLCWindowsTitle( const QString& ) );
     }
-
-    /**
-     * CONNECTS on PLAY_STATUS
-     **/
-    /* Status on the systray */
-#ifndef HAVE_MAEMO
-    if( sysTray )
-    {
-        CONNECT( THEMIM->getIM(), playingStatusChanged( int ),
-                 this, updateSystrayTooltipStatus( int ) );
-    }
-#endif
-
     /* END CONNECTS ON IM */
 
     /* VideoWidget connects for asynchronous calls */
@@ -997,6 +977,13 @@ void MainInterface::createSystray()
 
     CONNECT( sysTray, activated( QSystemTrayIcon::ActivationReason ),
              this, handleSystrayClick( QSystemTrayIcon::ActivationReason ) );
+
+    /* Connects on nameChanged() */
+    CONNECT( THEMIM->getIM(), nameChanged( const QString& ),
+             this, updateSystrayTooltipName( const QString& ) );
+    /* Connect PLAY_STATUS on the systray */
+    CONNECT( THEMIM->getIM(), playingStatusChanged( int ),
+             this, updateSystrayTooltipStatus( int ) );
 }
 
 /**
