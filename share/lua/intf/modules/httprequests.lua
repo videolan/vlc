@@ -71,12 +71,10 @@ processcommands = function ()
 
 	local input = _GET['input']
 	local command = _GET['command']
-	local version = tonumber(_GET['v'] or 1)
 	local id = tonumber(_GET['id'] or -1)
 	local val = _GET['val']
 	local options = _GET['option']
 	local band = _GET['band']
-	local decodedpath
 	if type(options) ~= "table" then -- Deal with the 0 or 1 option case
 	  options = { options }
 	end
@@ -89,16 +87,11 @@ processcommands = function ()
 	  end
 	  vlc.msg.err( "</options>" )
 	  --]]
-	  if version == 2 then
-		decodedpath = input
-	  else
-		decodedpath = stripslashes(input)
-	  end
-	  vlc.playlist.add({{path=decodedpath,options=options}})
+	  vlc.playlist.add({{path=stripslashes(input),options=options}})
 	elseif command == "addsubtitle" then
 	  vlc.input.add_subtitle (stripslashes(val))
 	elseif command == "in_enqueue" then
-	  vlc.playlist.enqueue({{path=decodedpath,options=options}})
+	  vlc.playlist.enqueue({{path=stripslashes(input),options=options}})
 	elseif command == "pl_play" then
 	  if id == -1 then
 		vlc.playlist.play()
