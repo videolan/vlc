@@ -914,6 +914,9 @@ static void vlc_free(void *ptr)
     if (ptr)
         free((char*)ptr - ((char*)ptr)[-1]);
 }
+#elif defined(__ANDROID__)
+# define vlc_memalign(align, size) memalign(align, size)
+# define vlc_free(base) free(base)
 #else
 static inline void *vlc_memalign(size_t align, size_t size)
 {
