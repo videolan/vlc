@@ -85,7 +85,7 @@ static void UpdateGenericFromAccess( input_thread_t * );
 static int  UpdateTitleSeekpointFromDemux( input_thread_t * );
 static void UpdateGenericFromDemux( input_thread_t * );
 
-static void MRLSections( char *, int *, int *, int *, int *);
+static void MRLSections( const char *, int *, int *, int *, int *);
 
 static input_source_t *InputSourceNew( input_thread_t *);
 static int  InputSourceInit( input_thread_t *, input_source_t *,
@@ -2356,9 +2356,7 @@ static int InputSourceInit( input_thread_t *p_input,
                             input_source_t *in, const char *psz_mrl,
                             const char *psz_forced_demux, bool b_in_can_fail )
 {
-    const char *psz_access;
-    const char *psz_demux;
-    char *psz_path;
+    const char *psz_access, *psz_demux, *psz_path, *psz_anchor;
     char *psz_var_demux = NULL;
     double f_fps;
 
@@ -2369,22 +2367,15 @@ static int InputSourceInit( input_thread_t *p_input,
         goto error;
 
     /* Split uri */
-    input_SplitMRL( &psz_access, &psz_demux, &psz_path, psz_dup );
+    input_SplitMRL( &psz_access, &psz_demux, &psz_path, &psz_anchor, psz_dup );
 
     msg_Dbg( p_input, "`%s' gives access `%s' demux `%s' path `%s'",
              psz_mrl, psz_access, psz_demux, psz_path );
     if( !p_input->b_preparsing )
     {
-        /* Hack to allow udp://@:port syntax */
-        if( !psz_access ||
-            (strncmp( psz_access, "udp", 3 ) &&
-             strncmp( psz_access, "rtp", 3 )) )
-        {
-            /* Find optional titles and seekpoints */
-            MRLSections( psz_path, &in->i_title_start, &in->i_title_end,
-                         &in->i_seekpoint_start, &in->i_seekpoint_end );
-        }
-
+        /* Find optional titles and seekpoints */
+        MRLSections( psz_anchor, &in->i_title_start, &in->i_title_end,
+                     &in->i_seekpoint_start, &in->i_seekpoint_end );
         if( psz_forced_demux && *psz_forced_demux )
         {
             psz_demux = psz_forced_demux;
@@ -3032,52 +3023,57 @@ static void input_ChangeState( input_thread_t *p_input, int i_state )
  * MRLSplit: parse the access, demux and url part of the
  *           Media Resource Locator.
  *****************************************************************************/
-void input_SplitMRL( const char **ppsz_access, const char **ppsz_demux,
-                     char **ppsz_path, char *psz_dup )
+void input_SplitMRL( const char **access, const char **demux,
+                     const char **path, const char **anchor, char *buf )
 {
     char *p;
 
     /* Separate <path> from <access>[/<demux>]:// */
-    p = strstr( psz_dup, "://" );
+    p = strstr( buf, "://" );
     if( p != NULL )
     {
         *p = '\0';
         p += 3; /* skips "://" */
-        *ppsz_path = p;
+        *path = p;
 
         /* Remove HTML anchor if present (not supported).
          * The hash symbol itself should be URI-encoded. */
         p = strchr( p, '#' );
-        if( p )
-            *p = '\0';
+        if( p != NULL )
+        {
+            *(p++) = '\0';
+            *anchor = p;
+        }
+        else
+            *anchor = "";
     }
     else
     {
 #ifndef NDEBUG
         fprintf( stderr, "%s(\"%s\") probably not a valid URI!\n", __func__,
-                 psz_dup );
+                 buf );
 #endif
         /* Note: this is a valid non const pointer to "": */
-        *ppsz_path = psz_dup + strlen( psz_dup );
+        *path = buf + strlen( buf );
     }
 
     /* Separate access from demux */
-    p = strchr( psz_dup, '/' );
+    p = strchr( buf, '/' );
     if( p != NULL )
     {
         *(p++) = '\0';
         if( p[0] == '$' )
             p++;
-        *ppsz_demux = p;
+        *demux = p;
     }
     else
-        *ppsz_demux = "";
+        *demux = "";
 
     /* We really don't want module name substitution here! */
-    p = psz_dup;
+    p = buf;
     if( p[0] == '$' )
         p++;
-    *ppsz_access = p;
+    *access = p;
 }
 
 static const char *MRLSeekPoint( const char *str, int *title, int *chapter )
@@ -3111,18 +3107,12 @@ static const char *MRLSeekPoint( const char *str, int *title, int *chapter )
  * Syntax:
  * [url][@[title_start][:chapter_start][-[title_end][:chapter_end]]]
  *****************************************************************************/
-static void MRLSections( char *psz_source,
+static void MRLSections( const char *p,
                          int *pi_title_start, int *pi_title_end,
                          int *pi_chapter_start, int *pi_chapter_end )
 {
     *pi_title_start = *pi_title_end = *pi_chapter_start = *pi_chapter_end = -1;
 
-    /* Start by parsing titles and chapters */
-    char *psz = strrchr( psz_source, '@' );
-    if( psz == NULL )
-        return;
-
-    const char *p = psz + 1;
     int title_start, chapter_start, title_end, chapter_end;
 
     if( *p != '-' )
@@ -3142,7 +3132,6 @@ static void MRLSections( char *psz_source,
     *pi_title_end = title_end;
     *pi_chapter_start = chapter_start;
     *pi_chapter_end = chapter_end;
-    *psz = '\0';
 }
 
 /*****************************************************************************
