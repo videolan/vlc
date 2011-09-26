@@ -501,7 +501,6 @@ int virtual_chapter_c::PublishChapters( input_title_t & title, int & i_user_chap
     {
         seekpoint_t *sk = vlc_seekpoint_New();
 
-        sk->i_level = i_level;
         sk->i_time_offset = i_virtual_start_time;
         if( p_chapter )
             sk->psz_name = strdup( p_chapter->psz_name.c_str() );
@@ -534,7 +533,6 @@ int virtual_edition_c::PublishChapters( input_title_t & title, int & i_user_chap
     {
         seekpoint_t *sk = vlc_seekpoint_New();
 
-        sk->i_level = i_level;
         sk->i_time_offset = 0;
         if( p_edition )
             sk->psz_name = strdup( p_edition->psz_name.c_str() );
