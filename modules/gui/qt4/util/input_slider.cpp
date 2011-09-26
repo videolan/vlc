@@ -6,6 +6,7 @@
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *          Jean-Baptiste Kempf <jb@videolan.org>
+ *          Ludovic Fauvet <etix@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,6 +41,11 @@
 #include <QLinearGradient>
 #include <QTimer>
 #include <QRadialGradient>
+#include <QLinearGradient>
+#include <QSize>
+#include <QPalette>
+#include <QColor>
+#include <QPoint>
 
 #define MINIMUM 0
 #define MAXIMUM 1000
@@ -433,32 +439,52 @@ void SeekSlider::paintEvent( QPaintEvent *event )
         if ( sliderPos != -1 )
         {
             const int margin = 0;
-            QSize hs = handleSize() - QSize( 5, 5 );
+            QSize hSize = handleSize() - QSize( 6, 6 );
             QPoint pos;
 
             switch ( orientation() )
             {
                 case Qt::Horizontal:
-                    pos = QPoint( sliderPos - ( hs.width() / 2 ), 2 );
+                    pos = QPoint( sliderPos - ( hSize.width() / 2 ), 2 );
                     pos.rx() = qMax( margin, pos.x() );
-                    pos.rx() = qMin( width() - hs.width() - margin, pos.x() );
+                    pos.rx() = qMin( width() - hSize.width() - margin, pos.x() );
                     break;
                 case Qt::Vertical:
-                    pos = QPoint( 2, height() - ( sliderPos + ( hs.height() / 2 ) ) );
+                    pos = QPoint( 2, height() - ( sliderPos + ( hSize.height() / 2 ) ) );
                     pos.ry() = qMax( margin, pos.y() );
-                    pos.ry() = qMin( height() - hs.height() - margin, pos.y() );
+                    pos.ry() = qMin( height() - hSize.height() - margin, pos.y() );
                     break;
             }
 
-            QRadialGradient buttonGradient( pos.x() + ( hs.width() / 2 ) - 2,
-                                            pos.y() + ( hs.height() / 2 ) - 2,
-                                            qMax( hs.width(), hs.height() ) );
-            buttonGradient.setColorAt( 0.0, QColor(  0,  0,  0 ) );
-            buttonGradient.setColorAt( 1.0, QColor( 80, 80, 80 ) );
+            QPalette p;
+            QPoint shadowPos( pos - QPoint( 2, 2 ) );
+            QSize sSize( handleSize() - QSize( 2, 2 ) );
+
+            // prepare the handle's gradient
+            QLinearGradient handleGradient( 0, 0, 0, hSize.height() );
+            handleGradient.setColorAt( 0.0, p.midlight().color() );
+            handleGradient.setColorAt( 0.9, p.mid().color() );
+
+            // prepare the handle's shadow gradient
+            QColor shadowDark( p.shadow().color().darker( 150 ) );
+            QColor shadowLight( p.shadow().color().lighter( 180 ) );
+            shadowLight.setAlpha( 50 );
+
+            QRadialGradient shadowGradient( shadowPos.x() + ( sSize.width() / 2 ),
+                                            shadowPos.y() + ( sSize.height() / 2 ),
+                                            qMax( sSize.width(), sSize.height() ) / 2 );
+            shadowGradient.setColorAt( 0.4, shadowDark );
+            shadowGradient.setColorAt( 1.0, shadowLight );
 
             painter.setPen( Qt::NoPen );
-            painter.setBrush( buttonGradient );
-            painter.drawEllipse( pos.x(), pos.y(), hs.width(), hs.height() );
+
+            // draw the handle's shadow
+            painter.setBrush( shadowGradient );
+            painter.drawEllipse( shadowPos.x(), shadowPos.y() + 1, sSize.width(), sSize.height() );
+
+            // finally draw the handle
+            painter.setBrush( handleGradient );
+            painter.drawEllipse( pos.x(), pos.y(), hSize.width(), hSize.height() );
         }
     }
 }
