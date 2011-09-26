@@ -60,7 +60,7 @@ static int OpenWaveOutPCM( audio_output_t *, uint32_t,
 static int PlayWaveOut   ( audio_output_t *, HWAVEOUT, WAVEHDR *,
                            aout_buffer_t *, bool );
 
-static void CALLBACK WaveOutCallback ( HWAVEOUT, UINT, DWORD, DWORD, DWORD );
+static void CALLBACK WaveOutCallback ( HWAVEOUT, UINT, DWORD_PTR, DWORD_PTR, DWORD_PTR );
 static void* WaveOutThread( void * );
 
 static int VolumeSet( audio_output_t *, float, bool );
@@ -802,8 +802,8 @@ static int PlayWaveOut( audio_output_t *p_aout, HWAVEOUT h_waveout,
  * WaveOutCallback: what to do once WaveOut has played its sound samples
  *****************************************************************************/
 static void CALLBACK WaveOutCallback( HWAVEOUT h_waveout, UINT uMsg,
-                                      DWORD _p_aout,
-                                      DWORD dwParam1, DWORD dwParam2 )
+                                      DWORD_PTR _p_aout,
+                                      DWORD_PTR dwParam1, DWORD_PTR dwParam2 )
 {
     (void)h_waveout;    (void)dwParam1;    (void)dwParam2;
     audio_output_t *p_aout = (audio_output_t *)_p_aout;
