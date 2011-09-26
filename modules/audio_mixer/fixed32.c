@@ -78,17 +78,31 @@ static void FilterFI32 (audio_mixer_t *mixer, block_t *block, float volume)
 
 static void FilterS16N (audio_mixer_t *mixer, block_t *block, float volume)
 {
-    const int32_t mult = volume * 0x10000;
+    int32_t mult = volume * 0x1.p16;
 
     if (mult == 0x10000)
         return;
 
     int16_t *p = (int16_t *)block->p_buffer;
 
-    for (size_t n = block->i_buffer / sizeof (*p); n > 0; n--)
+    if (mult < 0x10000)
     {
-        *p = (*p * mult) >> 16;
-        p++;
+        for (size_t n = block->i_buffer / sizeof (*p); n > 0; n--)
+        {
+            *p = (*p * mult) >> 16;
+            p++;
+        }
+    }
+    else
+    {
+        mult >>= 4;
+        for (size_t n = block->i_buffer / sizeof (*p); n > 0; n--)
+        {
+            int32_t v = (*p * mult) >> 12;
+            if (abs (v) > 0x7fff)
+                v = 0x8000;
+            *(p++) = v;
+        }
     }
 
     (void) mixer;
