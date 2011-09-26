@@ -1137,6 +1137,18 @@ unsigned int CocoaKeyToVLC( unichar i_key )
         theString = [theString stringByReplacingOccurrencesOfString:@"+" withString:@""];
         theString = [theString stringByReplacingOccurrencesOfString:@"-" withString:@""];
     }
+    if ([theString length] > 1)
+    {
+        if([theString rangeOfString:@"Up"].location != NSNotFound)
+            return [NSString stringWithFormat:@"%C", NSUpArrowFunctionKey];
+        else if([theString rangeOfString:@"Down"].location != NSNotFound)
+            return [NSString stringWithFormat:@"%C", NSDownArrowFunctionKey];
+        else if([theString rangeOfString:@"Right"].location != NSNotFound)
+            return [NSString stringWithFormat:@"%C", NSRightArrowFunctionKey];
+        else if([theString rangeOfString:@"Left"].location != NSNotFound)
+            return [NSString stringWithFormat:@"%C", NSLeftArrowFunctionKey];
+    }
+
     return theString;
 }
 

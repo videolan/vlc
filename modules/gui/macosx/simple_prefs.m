@@ -85,6 +85,10 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
         theString = [theString stringByReplacingOccurrencesOfString:@"Ctrl" withString: [NSString stringWithUTF8String: "\xE2\x8C\x83"]];
         theString = [theString stringByReplacingOccurrencesOfString:@"+" withString:@""];
         theString = [theString stringByReplacingOccurrencesOfString:@"-" withString:@""];
+        theString = [theString stringByReplacingOccurrencesOfString:@"Right" withString:[NSString stringWithUTF8String:"\xE2\x86\x92"]];
+        theString = [theString stringByReplacingOccurrencesOfString:@"Left" withString:[NSString stringWithUTF8String:"\xE2\x86\x90"]];
+        theString = [theString stringByReplacingOccurrencesOfString:@"Up" withString:[NSString stringWithUTF8String:"\xE2\x86\x91"]];
+        theString = [theString stringByReplacingOccurrencesOfString:@"Down" withString:[NSString stringWithUTF8String:"\xE2\x86\x93"]];
         theString = [theString capitalizedString];
     }
     else
@@ -1256,6 +1260,9 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
 - (BOOL)performKeyEquivalent:(NSEvent *)o_theEvent
 {
     NSMutableString *tempString = [[[NSMutableString alloc] init] autorelease];
+    NSString *keyString = [o_theEvent characters];
+	unichar key = [keyString characterAtIndex:0];
+
     if( [o_theEvent modifierFlags] & NSControlKeyMask )
         [tempString appendString:@"Ctrl-"];
     
@@ -1268,11 +1275,20 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
     if( [o_theEvent modifierFlags] & NSCommandKeyMask )
         [tempString appendString:@"Command-"];
 
-    if (![[[o_theEvent charactersIgnoringModifiers] lowercaseString] isEqualToString:@""]) {
+    if( key == NSUpArrowFunctionKey )
+        [tempString appendString:@"Up"];
+    else if( key == NSDownArrowFunctionKey )
+        [tempString appendString:@"Down"];
+    else if( key == NSLeftArrowFunctionKey )
+        [tempString appendString:@"Left"];
+    else if( key == NSRightArrowFunctionKey )
+        [tempString appendString:@"Right"];
+    else if (![[[o_theEvent charactersIgnoringModifiers] lowercaseString] isEqualToString:@""])
         [tempString appendString:[[o_theEvent charactersIgnoringModifiers] lowercaseString]];
-            return [[[VLCMain sharedInstance] simplePreferences] changeHotkeyTo: tempString];
-    }
-    return NO;
+    else
+        return NO;
+
+    return [[[VLCMain sharedInstance] simplePreferences] changeHotkeyTo: tempString];
 }
 
 @end
