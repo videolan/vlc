@@ -60,16 +60,16 @@ static int Activate (vlc_object_t *obj)
 
 static void FilterFI32 (audio_mixer_t *mixer, block_t *block, float volume)
 {
-    const int64_t mult = volume * FIXED32_ONE;
+    const int64_t mult = volume * 0x1.p32;
 
-    if (mult == FIXED32_ONE)
+    if (mult == 0x1.p32)
         return;
 
     int32_t *p = (int32_t *)block->p_buffer;
 
     for (size_t n = block->i_buffer / sizeof (*p); n > 0; n--)
     {
-        *p = (*p * mult) >> FIXED32_FRACBITS;
+        *p = (*p * mult) >> INT64_C(32);
         p++;
     }
 
