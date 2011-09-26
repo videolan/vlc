@@ -38,11 +38,13 @@ class QWheelEvent;
 class QHideEvent;
 class QTimer;
 class SeekPoints;
+class QPropertyAnimation;
 
 /* Input Slider derived from QSlider */
 class SeekSlider : public QSlider
 {
     Q_OBJECT
+    Q_PROPERTY(qreal handleOpacity READ handleOpacity WRITE setHandleOpacity)
 public:
     SeekSlider( QWidget *_parent );
     SeekSlider( Qt::Orientation q, QWidget *_parent );
@@ -63,6 +65,9 @@ protected:
 
     QSize handleSize() const;
     QSize sizeHint() const;
+    bool isAnimationRunning() const;
+    qreal handleOpacity() const;
+    void setHandleOpacity( qreal opacity );
 
 private:
     bool b_isSliding;       /* Whether we are currently sliding by user action */
@@ -74,9 +79,15 @@ private:
     float f_buffering;
     SeekPoints* chapters;
 
+    /* Handle's animation */
+    qreal mHandleOpacity;
+    QPropertyAnimation *animHandle;
+    QTimer *hideHandleTimer;
+
 public slots:
     void setPosition( float, int64_t, int );
     void updateBuffering( float );
+    void hideHandle();
 
 private slots:
     void startSeekTimer();

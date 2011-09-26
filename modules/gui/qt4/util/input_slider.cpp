@@ -46,10 +46,13 @@
 #include <QPalette>
 #include <QColor>
 #include <QPoint>
+#include <QPropertyAnimation>
 
 #define MINIMUM 0
 #define MAXIMUM 1000
 #define CHAPTERSSPOTSIZE 3
+#define FADEDURATION 300
+#define FADEOUTDELAY 2000
 
 SeekSlider::SeekSlider( QWidget *_parent ) : QSlider( _parent )
 {
@@ -61,6 +64,7 @@ SeekSlider::SeekSlider( Qt::Orientation q, QWidget *_parent )
 {
     b_isSliding = false;
     f_buffering = 1.0;
+    mHandleOpacity = 1.0;
     chapters = NULL;
 
     /* Timer used to fire intermediate updatePos() when sliding */
@@ -83,8 +87,18 @@ SeekSlider::SeekSlider( Qt::Orientation q, QWidget *_parent )
     setPosition( -1.0, 0, 0 );
     secstotimestr( psz_length, 0 );
 
+    animHandle = new QPropertyAnimation( this, "handleOpacity", this );
+    animHandle->setDuration( FADEDURATION );
+    animHandle->setStartValue( 0.0 );
+    animHandle->setEndValue( 1.0 );
+
+    hideHandleTimer = new QTimer( this );
+    hideHandleTimer->setSingleShot( true );
+    hideHandleTimer->setInterval( FADEOUTDELAY );
+
     CONNECT( this, sliderMoved( int ), this, startSeekTimer() );
     CONNECT( seekLimitTimer, timeout(), this, updatePos() );
+    CONNECT( hideHandleTimer, timeout(), this, hideHandle() );
     mTimeTooltip->installEventFilter( this );
 }
 
@@ -266,6 +280,17 @@ void SeekSlider::wheelEvent( QWheelEvent *event )
 
 void SeekSlider::enterEvent( QEvent * )
 {
+    /* Cancel the fade-out timer */
+    hideHandleTimer->stop();
+    /* Only start the fade-in if needed */
+    if( animHandle->direction() != QAbstractAnimation::Forward )
+    {
+        /* If pause is called while not running Qt will complain */
+        if( animHandle->state() == QAbstractAnimation::Running )
+            animHandle->pause();
+        animHandle->setDirection( QAbstractAnimation::Forward );
+        animHandle->start();
+    }
     /* Don't show the tooltip if the slider is disabled */
     if( isEnabled() && inputLength > 0 )
         mTimeTooltip->show();
@@ -273,6 +298,7 @@ void SeekSlider::enterEvent( QEvent * )
 
 void SeekSlider::leaveEvent( QEvent * )
 {
+    hideHandleTimer->start();
     if( !rect().contains( mapFromGlobal( QCursor::pos() ) ) )
         mTimeTooltip->hide();
 }
@@ -411,7 +437,7 @@ void SeekSlider::paintEvent( QPaintEvent *event )
         painter.drawRoundedRect( innerRect, barCorner, barCorner );
     }
 
-    if ( option.state & QStyle::State_MouseOver )
+    if ( option.state & QStyle::State_MouseOver || isAnimationRunning() )
     {
         /* draw chapters tickpoints */
         if ( chapters && inputLength && size().width() )
@@ -477,6 +503,7 @@ void SeekSlider::paintEvent( QPaintEvent *event )
             shadowGradient.setColorAt( 1.0, shadowLight );
 
             painter.setPen( Qt::NoPen );
+            painter.setOpacity( mHandleOpacity );
 
             // draw the handle's shadow
             painter.setBrush( shadowGradient );
@@ -489,6 +516,33 @@ void SeekSlider::paintEvent( QPaintEvent *event )
     }
 }
 
+qreal SeekSlider::handleOpacity() const
+{
+    return mHandleOpacity;
+}
+
+void SeekSlider::setHandleOpacity(qreal opacity)
+{
+    mHandleOpacity = opacity;
+    /* Request a new paintevent */
+    update();
+}
+
+void SeekSlider::hideHandle()
+{
+    /* If pause is called while not running Qt will complain */
+    if( animHandle->state() == QAbstractAnimation::Running )
+        animHandle->pause();
+    /* Play the animation backward */
+    animHandle->setDirection( QAbstractAnimation::Backward );
+    animHandle->start();
+}
+
+bool SeekSlider::isAnimationRunning() const
+{
+    return animHandle->state() == QAbstractAnimation::Running
+            || hideHandleTimer->isActive();
+}
 
 /* This work is derived from Amarok's work under GPLv2+
     - Mark Kretschmann
@@ -678,4 +732,3 @@ void SoundSlider::paintEvent( QPaintEvent *e )
     painter.end();
     e->accept();
 }
-
