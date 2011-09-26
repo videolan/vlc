@@ -16,7 +16,7 @@ export PIXDIR="usr/share/pixmaps"
 export DESTDIR=${HOME}/arm-linux
 export PKGDIR=${HOME}/packages/vlc-$(VERSION)
 
-export CONFIG_FLAGS="--enable-release --prefix=${HOME}/arm-linux/task-bootgpe2-v0.7.2-3600/usr \
+export CONFIG_FLAGS="--prefix=${HOME}/arm-linux/task-bootgpe2-v0.7.2-3600/usr \
 	--disable-plugins \
 	--disable-gtk \
 	--disable-gtk2 \

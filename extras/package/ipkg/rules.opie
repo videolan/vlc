@@ -12,7 +12,7 @@ export PKGDIR=${HOME}/packages/opie-vlc-$(VERSION)
 export QTDIR=${HOME}/arm-linux/opt/QtPalmtop
 
 # Compilation options
-export CONFIG_FLAGS="--enable-release --prefix=/usr \
+export CONFIG_FLAGS="--prefix=/usr \
 	--disable-plugins \
 	--disable-gtk \
 	--disable-gtk2 \

@@ -916,7 +916,6 @@ export JAVA_HOME=%_libdir/j2se1.5-sun
 	--enable-oss \
 	--enable-png \
 	--enable-realrtsp \
-	--enable-release \
 	--enable-screen \
 	--enable-sdl \
 	--enable-shout \

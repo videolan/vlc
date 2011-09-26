@@ -145,7 +145,6 @@ export XPIDL_INCL=$(xulrunner-config --idlflags)
    --enable-optimizations \
    --disable-altivec \
    --disable-debug \
-   --enable-release \
    --enable-sout \
    --with-ffmpeg-faac \
    --enable-httpd \

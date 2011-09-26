@@ -366,7 +366,6 @@ export JAVA_HOME=%{_prefix}/lib/jvm/java
 	--disable-dependency-tracking		\
 	--disable-rpath				\
 	--enable-shout				\
-	--enable-release			\
 	--enable-live555 			\
 %if %with_static_live555 
 	--with-live555-tree=live		\
