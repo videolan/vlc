@@ -243,7 +243,7 @@ create_toolbar_item( NSString * o_itemIdent, NSString * o_name, NSString * o_des
 	[o_intf_mediakeys_ckb setTitle: _NS("Control playback with media keys")];
     [o_intf_update_ckb setTitle: _NS("Automatically check for updates")];
     [o_intf_last_update_lbl setStringValue: @""];
-    [o_intf_enableGrowl_ckb setStringValue: _NS("Enable Growl notifications (on playlist item change)")];
+    [o_intf_enableGrowl_ckb setTitle: _NS("Enable Growl notifications (on playlist item change)")];
 
     /* Subtitles and OSD */
     [o_osd_encoding_txt setStringValue: _NS("Default Encoding")];
