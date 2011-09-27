@@ -389,12 +389,12 @@ getbrowsetable = function ()
 				element["path"]=path
 				element["name"]=name
 
-				local uri=vlc.strings.make_uri(path)
+				local uri=vlc.strings.make_uri(df)
 				--windows paths are returned with / separators, but make_uri expects \ for windows and returns nil
 				if not uri then
 					--convert failed path to windows format and try again
 					path=string.gsub(path,"/","\\")
-					uri=vlc.strings.make_uri(path)
+					uri=vlc.strings.make_uri(df)
 				end
 				element["uri"]=uri
 
