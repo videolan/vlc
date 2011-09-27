@@ -648,6 +648,9 @@ static int Open(vlc_object_t *obj)
     /* Sample format specification */
     struct pa_sample_spec ss;
     vlc_fourcc_t format = aout->format.i_format;
+#if PA_CHECK_VERSION(1,0,0)
+    pa_encoding_t encoding = PA_ENCODING_INVALID;
+#endif
 
     switch(format)
     {
@@ -688,6 +691,28 @@ static int Open(vlc_object_t *obj)
         case VLC_CODEC_U8:
             ss.format = PA_SAMPLE_U8;
             break;
+#if PA_CHECK_VERSION(1,0,0)
+        case VLC_CODEC_A52:
+            format = VLC_CODEC_SPDIFL;
+            encoding = PA_ENCODING_AC3_IEC61937;
+            ss.format = HAVE_FPU ? PA_SAMPLE_FLOAT32NE : PA_SAMPLE_S16NE;
+            break;
+        /*case VLC_CODEC_EAC3:
+            format = VLC_CODEC_SPDIFL FIXME;
+            encoding = PA_ENCODING_EAC3_IEC61937;
+            ss.format = HAVE_FPU ? PA_SAMPLE_FLOAT32NE : PA_SAMPLE_S16NE;
+            break;
+        case VLC_CODEC_MPGA:
+            format = VLC_CODEC_SPDIFL FIXME;
+            encoding = PA_ENCODING_MPEG_IEC61937;
+            ss.format = HAVE_FPU ? PA_SAMPLE_FLOAT32NE : PA_SAMPLE_S16NE;
+            break;*/
+        case VLC_CODEC_DTS:
+            format = VLC_CODEC_SPDIFL;
+            encoding = PA_ENCODING_DTS_IEC61937;
+            ss.format = HAVE_FPU ? PA_SAMPLE_FLOAT32NE : PA_SAMPLE_S16NE;
+            break;
+#endif
         default:
             if (HAVE_FPU)
             {
@@ -802,9 +827,39 @@ static int Open(vlc_object_t *obj)
     sys->base_volume = PA_VOLUME_NORM;
     pa_cvolume_set(&sys->cvolume, ss.channels, PA_VOLUME_NORM);
 
-    vlc_pa_lock();
+#if PA_CHECK_VERSION(1,0,0)
+    pa_format_info *formatv[2];
+    unsigned formatc = 0;
+
+    /* Favor digital pass-through if available*/
+    if (encoding != PA_ENCODING_INVALID) {
+        formatv[formatc] = pa_format_info_new();
+        formatv[formatc]->encoding = encoding;
+        pa_format_info_set_rate(formatv[formatc], ss.rate);
+        pa_format_info_set_channels(formatv[formatc], ss.channels);
+        formatc++;
+    }
+
+    /* Fallback to PCM */
+    formatv[formatc] = pa_format_info_new();
+    formatv[formatc]->encoding = PA_ENCODING_PCM;
+    pa_format_info_set_sample_format(formatv[formatc], ss.format);
+    pa_format_info_set_rate(formatv[formatc], ss.rate);
+    pa_format_info_set_channels(formatv[formatc], ss.channels);
+    formatc++;
+
     /* Create a playback stream */
+    pa_stream *s;
+
+    vlc_pa_lock();
+    s = pa_stream_new_extended(ctx, "audio stream", formatv, formatc, NULL);
+
+    for (unsigned i = 0; i < formatc; i++)
+        pa_format_info_free(formatv[i]);
+#else
+    vlc_pa_lock();
     pa_stream *s = pa_stream_new(ctx, "audio stream", &ss, &map);
+#endif
     if (s == NULL) {
         vlc_pa_error(obj, "stream creation failure", ctx);
         goto fail;
@@ -824,6 +879,21 @@ static int Open(vlc_object_t *obj)
         vlc_pa_error(obj, "stream connection failure", ctx);
         goto fail;
     }
+
+#if PA_CHECK_VERSION(1,0,0)
+    if (encoding != PA_ENCODING_INVALID) {
+        const pa_format_info *info = pa_stream_get_format_info(s);
+
+        assert (info != NULL);
+        if (pa_format_info_is_pcm (info)) {
+            msg_Dbg(aout, "digital pass-through not available");
+            format = HAVE_FPU ? VLC_CODEC_FL32 : VLC_CODEC_S16N;
+        } else {
+            msg_Dbg(aout, "digital pass-through enabled");
+            pa_stream_set_latency_update_callback(s, NULL, NULL);
+        }
+    }
+#endif
 
     const struct pa_buffer_attr *pba = pa_stream_get_buffer_attr(s);
     msg_Dbg(aout, "using buffer metrics: maxlength=%u, tlength=%u, "
