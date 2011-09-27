@@ -863,7 +863,13 @@ void matroska_segment_c::ParseChapterAtom( int i_level, KaxChapterAtom *ca, chap
         else if( MKV_IS_ID( l, KaxChapterSegmentEditionUID ) )
         {
             chapters.p_segment_edition_uid = new KaxChapterSegmentEditionUID( *static_cast<KaxChapterSegmentEditionUID*>(l) );
-            msg_Dbg( &sys.demuxer, "|   |   |   |   + ChapterSegmentEditionUID= %u", *(uint32*)chapters.p_segment_edition_uid->GetBuffer() );
+            msg_Dbg( &sys.demuxer, "|   |   |   |   + ChapterSegmentEditionUID= %u",
+#if LIBMATROSKA_VERSION < 0x010300
+            *(uint32*)chapters.p_segment_edition_uid->GetBuffer()
+#else
+            *(uint32*)chapters.p_segment_edition_uid
+#endif
+            );
         }
         else if( MKV_IS_ID( l, KaxChapterTimeStart ) )
         {
