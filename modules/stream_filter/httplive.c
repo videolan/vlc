@@ -358,7 +358,7 @@ static int ChooseSegment(stream_t *s, const int current)
     hls_stream_t *hls = hls_Get(p_sys->hls_stream, current);
     if (hls == NULL) return 0;
 
-    /* Choose a segment to start which is no closer then
+    /* Choose a segment to start which is no closer than
      * 3 times the target duration from the end of the playlist.
      */
     int wanted = 0;
@@ -374,7 +374,7 @@ static int ChooseSegment(stream_t *s, const int current)
 
         if (segment->duration > hls->duration)
         {
-            msg_Err(s, "EXTINF:%d duration is larger then EXT-X-TARGETDURATION:%d",
+            msg_Err(s, "EXTINF:%d duration is larger than EXT-X-TARGETDURATION:%d",
                     segment->duration, hls->duration);
         }
 
@@ -626,7 +626,7 @@ static int parse_StreamInformation(stream_t *s, vlc_array_t **hls_stream,
         return VLC_EGENERIC;
     }
 
-    msg_Info(s, "bandwidth adaption detected (program-id=%d, bandwidth=%"PRIu64").", id, bw);
+    msg_Info(s, "bandwidth adaptation detected (program-id=%d, bandwidth=%"PRIu64").", id, bw);
 
     char *psz_uri = relative_URI(s, uri, NULL);
 
@@ -1141,7 +1141,7 @@ static int Download(stream_t *s, hls_stream_t *hls, segment_t *segment, int *cur
         int estimated = (int)(size / p_sys->bandwidth);
         if (estimated > segment->duration)
         {
-            msg_Warn(s,"downloading of segment %d takes %ds, which is longer then its playback (%ds)",
+            msg_Warn(s,"downloading of segment %d takes %ds, which is longer than its playback (%ds)",
                         segment->sequence, estimated, segment->duration);
         }
     }
@@ -1571,7 +1571,7 @@ static int Open(vlc_object_t *p_this)
 
     if (p_sys->b_live && (p_sys->playback.segment < 0))
     {
-        msg_Warn(s, "less data then 3 times 'target duration' available for live playback, playback may stall");
+        msg_Warn(s, "less data than 3 times 'target duration' available for live playback, playback may stall");
     }
 
     if (Prefetch(s, &current) != VLC_SUCCESS)
