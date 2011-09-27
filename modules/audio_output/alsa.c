@@ -393,17 +393,44 @@ static int Open (vlc_object_t *obj)
     }
 
     /* Set channels count */
-    val = snd_pcm_hw_params_set_channels (pcm, hw, channels);
-    if (val && channels != 2) /* Fallback to stereo */
+    unsigned chans;
+    /* By default, ALSA plug will discard extra channels and zero missing ones
+     * instead of remixing, so remixing was disabled at snd_pcm_open() above.
+     * Then, the configuration space will contain only channels configurations
+     * supported by the audio device, but not necessarily functional (e.g.
+     * surround-capable card with stereo speakers). */
+    /* If there is only channels configuration, use that one.
+     * This should deal with "surround40", "surround51" and "surround71". */
+    if (snd_pcm_hw_params_get_channels (hw, &chans) == 0)
+        ;
+    /* Otherwise, if we have 5 channels and they are supported, use that.
+     * This should deal with "surround41" and "surround50" routers.
+     * This assumes that no real hardware supports exactly 5 channels. */
+    else if (channels == 5
+     && snd_pcm_hw_params_set_channels (pcm, hw, channels))
+        chans = channels;
+    /* Otherwise, if stereo is supported, then use that. This deals with
+     * the "front" device that fails to enforce stereo on Surround cards. */
+    else if (snd_pcm_hw_params_set_channels (pcm, hw, 2) == 0)
+        chans = 2;
+    /* Out of desperation, try the original channels count. */
+    else if (snd_pcm_hw_params_set_channels (pcm, hw, channels) == 0)
+        ;
+    /* As last chance, try anything. */
+    else
     {
-        val = snd_pcm_hw_params_set_channels (pcm, hw, 2);
-        channels = 2;
+        chans = channels;
+        val = snd_pcm_hw_params_set_channels_near (pcm, hw, &chans);
+        if (val)
+        {
+            msg_Err (aout, "cannot set channels count: %s",
+                     snd_strerror (val));
+            goto error;
+        }
     }
-    if (val)
-    {
-        msg_Err (aout, "cannot set channels count: %s", snd_strerror (val));
-        goto error;
-    }
+
+    if (channels != chans)
+        msg_Dbg (aout, "remixing from %u to %u channels", channels, chans);
 
     /* Set sample rate */
     unsigned rate = aout->format.i_rate;
@@ -484,11 +511,53 @@ static int Open (vlc_object_t *obj)
         goto error;
     }
 
+    /* Guess the channel map */
+    switch (chans)
+    {
+        case 1:
+            chans = AOUT_CHAN_CENTER;
+            break;
+        case 2: /* front */
+            chans = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
+            break;
+        case 4: /* surround40 */
+            chans = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT
+                  | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT;
+            break;
+        case 5: /* surround50 ... or surround41! Uho! */
+#if 1
+            chans = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT
+                  | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT
+                  | AOUT_CHAN_LFE;
+#else
+            chans = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT
+                  | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT
+                  | AOUT_CHAN_CENTER;
+#endif
+            break;
+        case 6: /* surround51 */
+            chans = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT
+                  | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT
+                  | AOUT_CHAN_CENTER | AOUT_CHAN_LFE;
+            break;
+#if 0 /* FIXME reorder */
+         case 8: /* surround71 */
+            chans = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT
+                  | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT
+                  | AOUT_CHAN_CENTER | AOUT_CHAN_LFE
+                  | AOUT_CHAN_MIDDLELEFT | AOUT_CHAN_MIDDLERIGHT;
+            break;
+#endif
+        default:
+            msg_Err (aout, "unknown %u channels configuration", chans);
+            goto error;
+    }
+
     /* Setup audio_output_t */
     aout->format.i_format = fourcc;
     aout->format.i_rate = rate;
-    if (channels == 2)
-        aout->format.i_physical_channels = AOUT_CHAN_LEFT|AOUT_CHAN_RIGHT;
+    aout->format.i_original_channels =
+    aout->format.i_physical_channels = chans;
     if (spdif)
     {
         aout->format.i_bytes_per_frame = AOUT_SPDIF_SIZE;
