@@ -25,11 +25,7 @@
 module("httprequests",package.seeall)
 
 
---input utilities
 
-local function stripslashes(s)
-  return string.gsub(s,"\\(.)","%1")
-end
 
 --Round the number to the specified precision
 function round(what, precision)
@@ -87,11 +83,11 @@ processcommands = function ()
 	  end
 	  vlc.msg.err( "</options>" )
 	  --]]
-	  vlc.playlist.add({{path=stripslashes(input),options=options}})
+	  vlc.playlist.add({{path=input,options=options}})
 	elseif command == "addsubtitle" then
-	  vlc.input.add_subtitle (stripslashes(val))
+	  vlc.input.add_subtitle (val)
 	elseif command == "in_enqueue" then
-	  vlc.playlist.enqueue({{path=stripslashes(input),options=options}})
+	  vlc.playlist.enqueue({{path=input,options=options}})
 	elseif command == "pl_play" then
 	  if id == -1 then
 		vlc.playlist.play()
