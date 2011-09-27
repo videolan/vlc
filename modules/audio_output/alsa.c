@@ -367,9 +367,19 @@ static int Open (vlc_object_t *obj)
 
     /* Set sample format */
     val = snd_pcm_hw_params_set_format (pcm, hw, pcm_format);
-    if (val < 0)
+    if (val == 0)
+        ;
+    else if (pcm_format != SND_PCM_FORMAT_FLOAT
+     && snd_pcm_hw_params_set_format (pcm, hw, SND_PCM_FORMAT_FLOAT) == 0)
+        fourcc = VLC_CODEC_FL32;
+    else if (pcm_format != SND_PCM_FORMAT_S32
+     && snd_pcm_hw_params_set_format (pcm, hw, SND_PCM_FORMAT_S32) == 0)
+        fourcc = VLC_CODEC_S32N;
+    else if (pcm_format != SND_PCM_FORMAT_S16
+     && snd_pcm_hw_params_set_format (pcm, hw, SND_PCM_FORMAT_S16) == 0)
+        fourcc = VLC_CODEC_S16N;
+    else
     {
-        /* TODO: fallback to FL32 / S16N */
         msg_Err (aout, "cannot set sample format: %s", snd_strerror (val));
         goto error;
     }
