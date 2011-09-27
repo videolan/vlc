@@ -49,7 +49,7 @@ local item = vlc.input.item()
       if item then
         local metas = item:metas()
         for k,v in pairs(metas) do
-          print("<info name='"..vlc.strings.convert_xml_special_chars(k).."'>"..vlc.strings.convert_xml_special_chars(v).."</info>")
+          print("<info name='"..httprequests.xmlString(k).."'>"..httprequests.xmlString(v).."</info>")
         end
       end
     ?>
@@ -58,9 +58,9 @@ local item = vlc.input.item()
     if item then
       local info = item:info()
       for k, v in pairs(info) do
-        print("<category name='"..vlc.strings.convert_xml_special_chars(k).."'>")
+        print("<category name='"..httprequests.xmlString(k).."'>")
           for k2, v2 in pairs(v) do
-            print("<info name='"..vlc.strings.convert_xml_special_chars(k2).."'>"..vlc.strings.convert_xml_special_chars(v2).."</info>")
+            print("<info name='"..httprequests.xmlString(k2).."'>"..httprequests.xmlString(v2).."</info>")
           end
         print("</category>")
       end
@@ -73,7 +73,7 @@ local item = vlc.input.item()
       local stats = item:stats()
       for k,v in pairs(stats) do
         local tag = string.gsub(k,"_","")
-        print("<"..tag..">"..tostring(v).."</"..tag..">\n")
+        print("<"..httprequests.xmlString(tag)..">"..httprequests.xmlString(v).."</"..httprequests.xmlString(tag)..">\n")
       end
     end
   ?>

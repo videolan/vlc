@@ -40,17 +40,17 @@ print('<root>\n')
 
 
 for i,e in ipairs(browseTable.element._array) do
-	print('<element ')
+	print('\n<element ')
 
 	for k,v in pairs(e) do
-		print(" "..k.."='"..v.."'")
+		print(" "..httprequests.xmlString(k).."='"..httprequests.xmlString(v).."'")
 	end
 
 	print('/>')
 end
 
 
-print('</root>')
+print('\n</root>')
 
 ?>
 

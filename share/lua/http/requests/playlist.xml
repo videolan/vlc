@@ -37,7 +37,7 @@ local printleaf = function(item)
 	for k,v in pairs(item) do
 
 		if (k~="type") then
-			print(" "..k.."=\""..v.."\"")
+			print(" "..httprequests.xmlString(k).."=\""..httprequests.xmlString(v).."\"")
 		end
     end
 
@@ -56,7 +56,7 @@ local printnode = function(item)
 		elseif (k=="children") then
 			children=v._array
 		else
-			print(" "..k.."=\""..v.."\"")
+			print(" "..httprequests.xmlString(k).."=\""..httprequests.xmlString(v).."\"")
 		end
     end
 

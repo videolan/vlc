@@ -187,7 +187,7 @@ end
 
 --utilities for formatting output
 
-local function xmlString(s)
+function xmlString(s)
   if (type(s)=="string") then
   	return vlc.strings.convert_xml_special_chars(s)
   else
@@ -252,7 +252,7 @@ local printXmlKeyValue = function (k,v,indent)
     end
 
     if (k) then
-		print("</"..k..">")
+		print("</"..xmlString(k)..">")
 	end
 end
 
@@ -301,7 +301,7 @@ parseplaylist = function (item)
 
 	if (item.children) then
 		local result={}
-		local name = vlc.strings.convert_xml_special_chars(item.name or "")
+		local name = (item.name or "")
 
 		result["type"]="node"
 		result.id=tostring(item.id)
@@ -321,7 +321,8 @@ parseplaylist = function (item)
 		return result
 	else
 		local result={}
-		local name, path = vlc.strings.convert_xml_special_chars(item.name or "", item.path or "")
+		local name, path = item.name or ""
+		local path = item.path or ""
 		local current_item = vlc.input.item()
 
 		-- Is the item the one currently played
@@ -376,7 +377,7 @@ getbrowsetable = function ()
 				if f == ".." or not string.match(f,"^%.") then
 				local df = common.realpath(dir..f)
 				local s = vlc.net.stat(df)
-				local path, name = vlc.strings.convert_xml_special_chars( df, f )
+				local path, name =  df, f
 				local element={}
 
 				for k,v in pairs(s) do
@@ -485,10 +486,10 @@ local aout = vlc.object.aout()
 			local streamTable={}
 			for k2, v2 in pairs(v) do
 				local tag = string.gsub(k2," ","_")
-				streamTable[xmlString(tag)]=xmlString(v2)
+				streamTable[tag]=v2
 			end
 
-			s.information.category[xmlString(k)]=streamTable
+			s.information.category[k]=streamTable
 		end
 
 		s.stats={}
@@ -496,7 +497,7 @@ local aout = vlc.object.aout()
 		local statsdata = item:stats()
       	for k,v in pairs(statsdata) do
         	local tag = string.gsub(k,"_","")
-        s.stats[tag]=xmlString(v)
+        s.stats[tag]=v
       end
 	end
 	return s
