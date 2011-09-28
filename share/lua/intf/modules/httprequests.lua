@@ -24,6 +24,7 @@
 
 module("httprequests",package.seeall)
 
+local dkjson = require ("dkjson")
 
 
 
@@ -195,47 +196,11 @@ function xmlString(s)
   end
 end
 
-local printJsonKeyValue = function (k,v,indent)
-	print("\n")
-	for i=1,indent do print(" ") end
-	if (k) then
-		print("\""..k.."\":")
-	end
-
-	if (type(v)=="number") then
-		print(xmlString(v))
-	elseif (type(v)=="table") then
-		 if (v._array==NULL) then
-          	print("{\n")
-    		printTableAsJson(v,indent+2)
-    		print("\n}")
-          else
-          	print("[")
-          	printArrayAsJson(v._array,indent+2)
-          	print("\n]")
-          end
-	else
-    	print("\""..xmlString(v).."\"")
-    end
-end
 
 
-printArrayAsJson = function(array,indent)
-	first=true
-	for i,v in ipairs(array) do
-		if not first then print(",") end
-		printJsonKeyValue(NULL,v,indent)
-		first=false
-	end
-end
-
-printTableAsJson = function (dict,indent)
-	first=true
-	for k,v in pairs(dict) do
-		if not first then print(",") end
-		printJsonKeyValue(k,v,indent)
-		first=false
-    end
+printTableAsJson = function (dict)
+	local output=dkjson.encode (dict, { indent = true })
+	print(output)
 end
 
 local printXmlKeyValue = function (k,v,indent)

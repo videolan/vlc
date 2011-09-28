@@ -31,8 +31,6 @@ require "httprequests"
 
 httprequests.processcommands()
 
-print('{')
-httprequests.printTableAsJson(httprequests.playlisttable(),0)
-print('}')
+httprequests.printTableAsJson(httprequests.playlisttable())
 
 ?>
