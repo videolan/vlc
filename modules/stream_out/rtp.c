@@ -717,6 +717,18 @@ static void SDPHandleUrl( sout_stream_t *p_stream, const char *psz_url )
             goto out;
         }
 
+        if( url.psz_host != NULL )
+        {
+            msg_Err( p_stream, "\"%s\" RTSP host ignored", url.psz_host );
+            msg_Info( p_stream, "Pass --rtsp-host=%s on the command line "
+                      "instead.", url.psz_host );
+        }
+        if( url.i_port != 0 )
+        {
+            msg_Err( p_stream, "\"%u\" RTSP port ignored", url.i_port );
+            msg_Info( p_stream, "Pass --rtsp-port=%u on the command line "
+                      "instead.", url.i_port );
+        }
         p_sys->rtsp = RtspSetup( VLC_OBJECT(p_stream), NULL, url.psz_path );
         if( p_sys->rtsp == NULL )
             msg_Err( p_stream, "cannot export SDP as RTSP" );
