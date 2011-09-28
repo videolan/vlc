@@ -76,8 +76,6 @@
  #define PRIo64 "llo"
  #undef PRIx64
  #define PRIx64 "llx"
- #define snprintf        __mingw_snprintf
- #define vsnprintf       __mingw_vsnprintf
 #endif
 
 /* Function attributes for compiler warnings */
