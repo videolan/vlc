@@ -196,9 +196,28 @@ function xmlString(s)
   end
 end
 
+--dkjson outputs numbered tables as arrays
+--so we don't need the array indicators
+function removeArrayIndicators(dict)
+	local newDict=dict
 
+	for k,v in pairs(dict) do
+		if (type(v)=="table") then
+			local arrayEntry=v._array
+			if arrayEntry then
+				v=arrayEntry
+			end
+
+			dict[k]=removeArrayIndicators(v)
+		end
+	end
+
+	return newDict
+end
 
 printTableAsJson = function (dict)
+	dict=removeArrayIndicators(dict)
+
 	local output=dkjson.encode (dict, { indent = true })
 	print(output)
 end
