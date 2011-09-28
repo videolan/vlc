@@ -163,9 +163,9 @@ static int Open( vlc_object_t *p_this )
         {
             int len = path - ++port;
             msg_Err( p_access, "\"%.*s\" HTTP port ignored", len, port );
-            msg_Info( p_access,
-                      "Pass --http-port=%.*s on the command line instead.",
-                      len, port );
+            msg_Info( p_access, "Pass --%s-port=%.*s on the command line "
+                      "instead.", strcasecmp( p_access->psz_access, "https" )
+                      ? "http" : "https", len, port );
         }
     }
 #endif
