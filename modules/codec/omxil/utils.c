@@ -349,7 +349,7 @@ static const struct
 {
     { VLC_CODEC_I420, OMX_COLOR_FormatYUV420Planar, 3, 1, 2 },
     { VLC_CODEC_I420, OMX_COLOR_FormatYUV420PackedPlanar, 3, 1, 2 },
-    { VLC_CODEC_NV21, OMX_COLOR_FormatYUV420SemiPlanar, 3, 1, 1 },
+    { VLC_CODEC_NV12, OMX_COLOR_FormatYUV420SemiPlanar, 3, 1, 1 },
     { VLC_CODEC_NV21, OMX_QCOM_COLOR_FormatYVU420SemiPlanar, 3, 1, 1 },
     { VLC_CODEC_YUYV, OMX_COLOR_FormatYCbYCr, 4, 2, 0 },
     { VLC_CODEC_YVYU, OMX_COLOR_FormatYCrYCb, 4, 2, 0 },
