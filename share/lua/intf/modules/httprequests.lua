@@ -83,11 +83,11 @@ processcommands = function ()
 	  end
 	  vlc.msg.err( "</options>" )
 	  --]]
-	  vlc.playlist.add({{path=input,options=options}})
+	  vlc.playlist.add({{path=vlc.strings.make_uri(input),options=options}})
 	elseif command == "addsubtitle" then
-	  vlc.input.add_subtitle (val)
+	  vlc.input.add_subtitle (vlc.strings.make_uri(val))
 	elseif command == "in_enqueue" then
-	  vlc.playlist.enqueue({{path=input,options=options}})
+	  vlc.playlist.enqueue({{path=vlc.strings.make_uri(input),options=options}})
 	elseif command == "pl_play" then
 	  if id == -1 then
 		vlc.playlist.play()

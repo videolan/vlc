@@ -104,6 +104,7 @@ Interfaces:
  * dbus: Upgrade to an mpris2 compliant interface, see http://www.mpris.org
  * webUI/http: Rewrite of the web interface, using jQuery
  * webUI/http: some requests are now supported in JSON in addition to XML
+ * webUI/http: path values for input and output are deprecated in favour of uri
 
 Video Output:
  * New video output based on Direct2D for Windows 7 and Vista (with Platform Update)
