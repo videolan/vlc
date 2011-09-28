@@ -28,11 +28,6 @@
 #include "pictureflow.hpp"
 #include "components/playlist/ml_model.hpp"
 
-// detect Qt version
-#if QT_VERSION < 0x040300
-#error PictureFlow widgets need Qt 4.3 or later
-#endif
-
 #include <QApplication>
 #include <QImage>
 #include <QKeyEvent>

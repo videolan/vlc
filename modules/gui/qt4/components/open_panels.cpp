@@ -592,9 +592,7 @@ NetOpenPanel::~NetOpenPanel()
         mrlList << ui.urlComboBox->itemText( i );
 
     /* Clean the list... */
-#if HAS_QT45
     mrlList.removeDuplicates();
-#endif
     /* ...and save the 8 last entries */
     getSettings()->setValue( "Open/netMRL", mrlList );
 }

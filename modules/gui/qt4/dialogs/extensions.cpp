@@ -186,13 +186,8 @@ ExtensionDialog::ExtensionDialog( intf_thread_t *_p_intf,
              this, parentDestroyed() );
 
     msg_Dbg( p_intf, "Creating a new dialog: '%s'", p_dialog->psz_title );
-#if HAS_QT45
     this->setWindowFlags( Qt::WindowMinMaxButtonsHint
                         | Qt::WindowCloseButtonHint );
-#else
-    this->setWindowFlags( Qt::WindowMinMaxButtonsHint );
-#endif
-
     this->setWindowTitle( qfu( p_dialog->psz_title ) );
 
     layout = new QGridLayout( this );

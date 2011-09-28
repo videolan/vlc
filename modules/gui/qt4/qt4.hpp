@@ -36,14 +36,10 @@
 #define QT_NO_CAST_TO_ASCII
 #include <QString>
 
-#if ( QT_VERSION < 0x040400 )
-# error Update your Qt version to at least 4.4.0
-#endif
-#if QT_VERSION == 0x040500
-# error Please update Qt version to 4.5.1. 4.5.0 is too buggy
+#if ( QT_VERSION < 0x040600 )
+# error Update your Qt version to at least 4.6.0
 #endif
 
-#define HAS_QT45 ( QT_VERSION >= 0x040500 )
 #define HAS_QT47 ( QT_VERSION >= 0x040700 )
 
 enum {
