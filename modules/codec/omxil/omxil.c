@@ -391,6 +391,7 @@ static OMX_ERRORTYPE SetPortDefinition(decoder_t *p_dec, OmxPort *p_port,
 static OMX_ERRORTYPE GetPortDefinition(decoder_t *p_dec, OmxPort *p_port,
                                        es_format_t *p_fmt)
 {
+    decoder_sys_t *p_sys = p_dec->p_sys;
     OMX_PARAM_PORTDEFINITIONTYPE *def = &p_port->definition;
     OMX_ERRORTYPE omx_error;
 
@@ -408,6 +409,14 @@ static OMX_ERRORTYPE GetPortDefinition(decoder_t *p_dec, OmxPort *p_port,
         p_fmt->video.i_visible_height = def->format.video.nFrameHeight;
         p_fmt->video.i_frame_rate = p_dec->fmt_in.video.i_frame_rate;
         p_fmt->video.i_frame_rate_base = p_dec->fmt_in.video.i_frame_rate_base;
+
+        /* Hack: Nexus One (stock firmware with binary OMX driver blob)
+         * claims to output 420Planar even though it in in practice is
+         * NV21. */
+        if(def->format.video.eColorFormat == OMX_COLOR_FormatYUV420Planar &&
+           !strncmp(p_sys->psz_component, "OMX.qcom.video.decoder",
+                    strlen("OMX.qcom.video.decoder")))
+            def->format.video.eColorFormat = OMX_QCOM_COLOR_FormatYVU420SemiPlanar;
 
         if(!GetVlcVideoFormat( def->format.video.eCompressionFormat,
                                &p_fmt->i_codec, 0 ) )

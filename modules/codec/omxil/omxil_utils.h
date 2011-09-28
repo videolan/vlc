@@ -180,3 +180,8 @@ OMX_ERRORTYPE GetAudioParameters(OMX_HANDLETYPE handle,
     uint8_t *pi_channels, unsigned int *pi_samplerate,
     unsigned int *pi_bitrate, unsigned int *pi_bps, unsigned int *pi_blocksize);
 unsigned int GetAudioParamSize(OMX_INDEXTYPE index);
+
+/*****************************************************************************
+ * Vendor specific color formats
+ *****************************************************************************/
+#define OMX_QCOM_COLOR_FormatYVU420SemiPlanar 0x7FA30C00
