@@ -346,6 +346,11 @@ getbrowsetable = function ()
 		dir = _GET["dir"]
 	end
 
+	--backwards compatibility with old format driveLetter:\\..
+	--this is forgiving with the slash type and number
+	local position=string.find(dir, '%a:[\\/]*%.%.',0)
+	if position==1 then dir="" end
+
 	local result={}
 	--paths are returned as an array of elements
 	result.element={}
