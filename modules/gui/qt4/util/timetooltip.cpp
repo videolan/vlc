@@ -40,6 +40,7 @@ TimeTooltip::TimeTooltip( QWidget *parent ) :
     // Tell Qt that it doesn't need to erase the background before
     // a paintEvent occurs. This should save some CPU cycles.
     setAttribute( Qt::WA_OpaquePaintEvent );
+    setAttribute( Qt::WA_ShowWithoutActivating );
 
     // Inherit from the system default font size -5
     mFont = QFont( "Verdana", qMax( qApp->font().pointSize() - 5, 7 ) );
