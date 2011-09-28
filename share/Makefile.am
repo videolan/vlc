@@ -149,6 +149,7 @@ nobase_vlclib_DATA = \
 	lua/meta/art/01_googleimage.luac \
 	lua/meta/fetcher/tvrage.luac \
 	lua/meta/reader/filename.luac \
+	lua/modules/dkjson.luac \
 	lua/modules/sandbox.luac \
 	lua/modules/simplexml.luac \
 	lua/playlist/anevia_streams.luac \
@@ -215,6 +216,7 @@ EXTRA_DIST += \
 	lua/meta/fetcher/tvrage.lua \
 	lua/meta/reader/README.txt \
 	lua/meta/reader/filename.lua \
+	lua/modules/dkjson.lua \
 	lua/modules/sandbox.lua \
 	lua/modules/simplexml.lua \
 	lua/playlist/README.txt \
