@@ -114,9 +114,9 @@ FFMPEG_VERSION := git
 	touch $@
 
 ffmpeg: ffmpeg-$(FFMPEG_VERSION).tar.gz .sum-ffmpeg
-	rm -Rf ffmpeg-git
-	mkdir -p ffmpeg-git
-	zcat "$<" | (cd ffmpeg-git && tar xv --strip-components=1)
+	rm -Rf $@ $@-git
+	mkdir -p $@-git
+	zcat "$<" | (cd $@-git && tar xv --strip-components=1)
 ifdef HAVE_WIN32
 	sed -i "s/std=c99/std=gnu99/" $@-$(FFMPEG_VERSION)/configure
 endif
