@@ -142,14 +142,33 @@ static int Open( vlc_object_t *p_this )
     config_ChainParse( p_access, SOUT_CFG_PREFIX, ppsz_sout_options, p_access->p_cfg );
 
     const char *path = p_access->psz_path;
+#if 1
     /* Skip everything before / - backward compatibiltiy with VLC 1.1 */
     path += strcspn( path, "/" );
     if( path > p_access->psz_path )
     {
-        msg_Err( p_access, "\"%.*s\" HTTP host specification ignored",
-                 path - p_access->psz_path, p_access->psz_path );
-        msg_Info( p_access, "(Use --http-host and/or --http-port instead.)" );
+        const char *port = strrchr( p_access->psz_path, ':' );
+        if( port != NULL && strchr( port, ']' ) != NULL )
+            port = NULL; /* IPv6 numeral */
+        if( port != p_access->psz_path )
+        {
+            int len = port ? (port - p_access->psz_path)
+                           : (int)strlen( p_access->psz_path );
+            msg_Err( p_access, "\"%.*s\" HTTP host ignored", len,
+                     p_access->psz_path );
+            msg_Info( p_access,
+                      "Pass --http-host=IP on the command line instead." );
+        }
+        if( port != NULL )
+        {
+            int len = path - ++port;
+            msg_Err( p_access, "\"%.*s\" HTTP port ignored", len, port );
+            msg_Info( p_access,
+                      "Pass --http-port=%.*s on the command line instead.",
+                      len, port );
+        }
     }
+#endif
     if( !*path )
         path = "/";
 
