@@ -45,6 +45,7 @@
 #include <vlc_aout.h>
 #include <vlc_block_helper.h>
 #include <vlc_cpu.h>
+#include "../h264_nal.h"
 
 #include "omxil.h"
 
@@ -919,7 +920,16 @@ static int OpenGeneric( vlc_object_t *p_this, bool b_encode )
         OMX_FIFO_GET(&p_sys->in.fifo, p_header);
         p_header->nFilledLen = p_dec->fmt_in.i_extra;
 
-        if(p_sys->in.b_direct)
+        /* Convert H.264 NAL format to annex b */
+        if( p_sys->i_nal_size_length && !p_sys->in.b_direct )
+        {
+            p_header->nFilledLen = 0;
+            convert_sps_pps( p_dec, p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra,
+                             p_header->pBuffer, p_header->nAllocLen,
+                             (uint32_t*) &p_header->nFilledLen,
+                             &p_sys->i_nal_size_length );
+        }
+        else if(p_sys->in.b_direct)
         {
             p_header->pOutputPortPrivate = p_header->pBuffer;
             p_header->pBuffer = p_dec->fmt_in.p_extra;
@@ -1170,6 +1180,26 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
             block_Release(p_block);
         }
 
+        /* Convert H.264 NAL format to annex b */
+        if( p_sys->i_nal_size_length >= 3 && p_sys->i_nal_size_length <= 4 )
+        {
+            /* This only works for NAL sizes 3-4 */
+            int i_len = p_header->nFilledLen, i;
+            uint8_t* ptr = p_header->pBuffer;
+            while( i_len >= p_sys->i_nal_size_length )
+            {
+                uint32_t nal_len = 0;
+                for( i = 0; i < p_sys->i_nal_size_length; i++ ) {
+                    nal_len = (nal_len << 8) | ptr[i];
+                    ptr[i] = 0;
+                }
+                ptr[p_sys->i_nal_size_length - 1] = 1;
+                if( nal_len > INT_MAX || nal_len > (unsigned int) i_len )
+                    break;
+                ptr   += nal_len + 4;
+                i_len -= nal_len + 4;
+            }
+        }
 #ifdef OMXIL_EXTRA_DEBUG
         msg_Dbg( p_dec, "EmptyThisBuffer %p, %p, %i", p_header, p_header->pBuffer,
                  (int)p_header->nFilledLen );
