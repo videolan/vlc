@@ -116,6 +116,7 @@ void DemuxClose( vlc_object_t *obj )
         free( sys->p_buffers );
     }
 
+    ControlsDeinit( obj, sys->controls );
     v4l2_close( fd );
     free( sys );
 }

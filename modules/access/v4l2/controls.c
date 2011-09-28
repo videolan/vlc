@@ -28,19 +28,17 @@
 #endif
 
 #include "v4l2.h"
-/* TODO: make callbacks independent of object type */
-/* TODO: remove callbacks at exit */
-#include <vlc_access.h>
-#include <vlc_demux.h>
-
 #include <ctype.h>
 #include <sys/ioctl.h>
 
-static const struct
+typedef struct vlc_v4l2_ctrl_name
 {
-    const char *psz_name;
-    unsigned int i_cid;
-} controls[] =
+    const char name[20];
+    uint32_t cid;
+} vlc_v4l2_ctrl_name_t;
+
+/* NOTE: must be sorted by ID */
+static const vlc_v4l2_ctrl_name_t controls[] =
 {
     { "brightness", V4L2_CID_BRIGHTNESS },
     { "contrast", V4L2_CID_CONTRAST },
@@ -65,609 +63,447 @@ static const struct
     { "vflip", V4L2_CID_VFLIP },
     { "hcenter", V4L2_CID_HCENTER },
     { "vcenter", V4L2_CID_VCENTER },
-    { NULL, 0 }
+    /* TODO: add more standardized controls */
+#define CTRL_CID_KNOWN(cid) \
+    ((((uint32_t)cid) - V4L2_CID_BRIGHTNESS) \
+        <= (V4L2_CID_VCENTER - V4L2_CID_BRIGHTNESS))
 };
 
-static void name2var( unsigned char *name )
+typedef struct vlc_v4l2_ctrl
 {
-    for( ; *name; name++ )
-        *name = (*name == ' ') ? '_' : tolower( *name );
+    int                   fd;
+    uint32_t              id;
+    enum v4l2_ctrl_type   type;
+    char                  name[32];
+    int32_t               default_value;
+    struct vlc_v4l2_ctrl *next;
+} vlc_v4l2_ctrl_t;
+
+static int ControlSet (const vlc_v4l2_ctrl_t *c, int_fast32_t value)
+{
+    struct v4l2_control ctrl = {
+        .id = c->id,
+        .value = value,
+    };
+    if (v4l2_ioctl (c->fd, VIDIOC_S_CTRL, &ctrl) < 0)
+        return -1;
+    return 0;
 }
 
-/*****************************************************************************
- * Issue user-class v4l2 controls
- *****************************************************************************/
-static int Control( vlc_object_t *p_obj, int i_fd,
-                    const char *psz_name, int i_cid, int i_value )
+static int ControlSetCallback (vlc_object_t *obj, const char *var,
+                               vlc_value_t old, vlc_value_t cur, void *data)
 {
-    struct v4l2_queryctrl queryctrl;
-    struct v4l2_control control;
-    struct v4l2_ext_control ext_control;
-    struct v4l2_ext_controls ext_controls;
+    const vlc_v4l2_ctrl_t *ctrl = data;
 
-    if( i_value == -1 )
-        return VLC_SUCCESS;
-
-    memset( &queryctrl, 0, sizeof( queryctrl ) );
-
-    queryctrl.id = i_cid;
-
-    if( v4l2_ioctl( i_fd, VIDIOC_QUERYCTRL, &queryctrl ) < 0
-        || queryctrl.flags & V4L2_CTRL_FLAG_DISABLED )
+    if (ControlSet (ctrl, cur.i_int))
     {
-        msg_Dbg( p_obj, "%s (%x) control is not supported.", psz_name, i_cid );
+        msg_Err (obj, "cannot set control %s: %m", var);
         return VLC_EGENERIC;
     }
-
-    memset( &control, 0, sizeof( control ) );
-    memset( &ext_control, 0, sizeof( ext_control ) );
-    memset( &ext_controls, 0, sizeof( ext_controls ) );
-    control.id = i_cid;
-    ext_control.id = i_cid;
-    ext_controls.ctrl_class = V4L2_CTRL_ID2CLASS( i_cid );
-    ext_controls.count = 1;
-    ext_controls.controls = &ext_control;
-
-    int i_ret = -1;
-
-    if( i_value >= queryctrl.minimum && i_value <= queryctrl.maximum )
-    {
-        ext_control.value = i_value;
-        if( v4l2_ioctl( i_fd, VIDIOC_S_EXT_CTRLS, &ext_controls ) < 0 )
-        {
-            control.value = i_value;
-            if( v4l2_ioctl( i_fd, VIDIOC_S_CTRL, &control ) < 0 )
-            {
-                msg_Err( p_obj, "unable to set %s (%x) to %d (%m)",
-                         psz_name, i_cid, i_value );
-                return VLC_EGENERIC;
-            }
-            i_ret = v4l2_ioctl( i_fd, VIDIOC_G_CTRL, &control );
-        }
-        else
-        {
-            i_ret = v4l2_ioctl( i_fd, VIDIOC_G_EXT_CTRLS, &ext_controls );
-            control.value = ext_control.value;
-        }
-    }
-
-    if( i_ret >= 0 )
-    {
-        vlc_value_t val;
-        msg_Dbg( p_obj, "video %s: %d", psz_name, control.value );
-        switch( var_Type( p_obj, psz_name ) & VLC_VAR_TYPE )
-        {
-            case VLC_VAR_BOOL:
-                val.b_bool = control.value;
-                var_Change( p_obj, psz_name, VLC_VAR_SETVALUE, &val, NULL );
-                var_TriggerCallback( p_obj, "controls-update" );
-                break;
-            case VLC_VAR_INTEGER:
-                val.i_int = control.value;
-                var_Change( p_obj, psz_name, VLC_VAR_SETVALUE, &val, NULL );
-                var_TriggerCallback( p_obj, "controls-update" );
-                break;
-        }
-    }
+    (void) old;
     return VLC_SUCCESS;
 }
 
-static int DemuxControlCallback( vlc_object_t *p_this,
-    const char *psz_var, vlc_value_t oldval, vlc_value_t newval,
-    void *p_data )
+static void ControlsReset (vlc_v4l2_ctrl_t *list)
 {
-    (void)oldval;
-    demux_t *p_demux = (demux_t*)p_this;
-    demux_sys_t *p_sys = p_demux->p_sys;
-    int i_cid = (long int)p_data;
-
-    int i_fd = p_sys->i_fd;
-
-    if( i_fd < 0 )
-        return VLC_EGENERIC;
-
-    Control( p_this, i_fd, psz_var, i_cid, newval.i_int );
-
-    return VLC_EGENERIC;
+    while (list != NULL)
+    {
+        if (list->type != V4L2_CTRL_TYPE_BUTTON)
+            ControlSet (list, list->default_value);
+        list = list->next;
+    }
 }
 
-static int AccessControlCallback( vlc_object_t *p_this,
-    const char *psz_var, vlc_value_t oldval, vlc_value_t newval,
-    void *p_data )
+static int ControlsResetCallback (vlc_object_t *obj, const char *var,
+                                  vlc_value_t old, vlc_value_t cur, void *data)
 {
-    (void)oldval;
-    access_t *p_access = (access_t *)p_this;
-    demux_sys_t *p_sys = (demux_sys_t *) p_access->p_sys;
-    int i_cid = (long int)p_data;
+    ControlsReset (data);
+    (void) obj; (void) var; (void) old; (void) cur;
+    return VLC_SUCCESS;
+}
 
-    int i_fd = p_sys->i_fd;
+static void ControlsSetFromString (vlc_object_t *obj,
+                                   const vlc_v4l2_ctrl_t *list)
+{
+    char *buf = var_InheritString (obj, CFG_PREFIX"set-ctrls");
+    if (buf == NULL)
+        return;
 
-    if( i_fd < 0 )
-        return VLC_EGENERIC;
+    char *p = buf;
+    if (*p == '{')
+        p++;
 
-    Control( p_this, i_fd, psz_var, i_cid, newval.i_int );
+    char *end = strchr (p, '}');
+    if (end != NULL)
+        *end = '\0';
+next:
+    while (p != NULL && *p)
+    {
+        const char *name, *value;
 
-    return VLC_EGENERIC;
+        p += strspn (p, ", ");
+        name = p;
+        end = strchr (p, ',');
+        if (end != NULL)
+            *(end++) = '\0';
+        p = end; /* next name/value pair */
+
+        end = strchr (name, '=');
+        if (end == NULL)
+        {
+            /* TODO? support button controls that way? */
+            msg_Err (obj, "syntax error in \"%s\": missing '='", name);
+            continue;
+        }
+        *(end++) = '\0';
+        value = end;
+
+        long val = strtol (value, &end, 0);
+        if (*end)
+        {
+            msg_Err (obj, "syntax error in \"%s\": not an integer", value);
+            continue;
+        }
+
+        for (const vlc_v4l2_ctrl_t *c = list; c != NULL; c = c->next)
+            if (!strcasecmp (name, c->name))
+            {
+                ControlSet (c, val);
+                goto next;
+            }
+
+        msg_Err (obj, "control \"%s\" not available", name);
+    }
+    free (buf);
+}
+
+static int cidcmp (const void *a, const void *b)
+{
+    const uint32_t *id = a;
+    const vlc_v4l2_ctrl_name_t *name = b;
+
+    return (int32_t)(*id - name->cid);
 }
 
 /**
- * Resets all user-class V4L2 controls to their default value
+ * Creates a VLC-V4L2 control structure:
+ * In particular, determines a name suitable for a VLC object variable.
+ * \param query V4L2 control query structure [IN]
+ * \return NULL on error
  */
-static int ControlReset( vlc_object_t *p_obj, int i_fd )
+static vlc_v4l2_ctrl_t *ControlCreate (int fd,
+                                       const struct v4l2_queryctrl *query)
 {
-    struct v4l2_queryctrl queryctrl;
-    int i_cid;
-    memset( &queryctrl, 0, sizeof( queryctrl ) );
+    vlc_v4l2_ctrl_t *ctrl = malloc (sizeof (*ctrl));
+    if (unlikely(ctrl == NULL))
+        return NULL;
 
-    queryctrl.id = V4L2_CTRL_FLAG_NEXT_CTRL;
-    if( v4l2_ioctl( i_fd, VIDIOC_QUERYCTRL, &queryctrl ) >= 0 )
-    {
-        /* Extended control API supported */
-        queryctrl.id = V4L2_CTRL_FLAG_NEXT_CTRL;
-        while( v4l2_ioctl( i_fd, VIDIOC_QUERYCTRL, &queryctrl ) >= 0 )
-        {
-            if( queryctrl.type == V4L2_CTRL_TYPE_CTRL_CLASS
-             || V4L2_CTRL_ID2CLASS( queryctrl.id ) == V4L2_CTRL_CLASS_MPEG )
-            {
-                queryctrl.id |= V4L2_CTRL_FLAG_NEXT_CTRL;
-                continue;
-            }
-            struct v4l2_control control;
-            memset( &control, 0, sizeof( control ) );
-            control.id = queryctrl.id;
-            if( v4l2_ioctl( i_fd, VIDIOC_G_CTRL, &control ) >= 0
-             && queryctrl.default_value != control.value )
-            {
-                int i;
-                for( i = 0; controls[i].psz_name != NULL; i++ )
-                    if( controls[i].i_cid == queryctrl.id ) break;
-                name2var( queryctrl.name );
-                Control( p_obj, i_fd,
-                         controls[i].psz_name ? controls[i].psz_name
-                          : (const char *)queryctrl.name,
-                         queryctrl.id, queryctrl.default_value );
-            }
-            queryctrl.id |= V4L2_CTRL_FLAG_NEXT_CTRL;
-        }
-    }
+    ctrl->fd = fd;
+    ctrl->id = query->id;
+    ctrl->type = query->type;
+
+    /* Search for a well-known control */
+    const vlc_v4l2_ctrl_name_t *known;
+    known = bsearch (&query->id, controls, sizeof (controls) / sizeof (*known),
+                     sizeof (*known), cidcmp);
+    if (known != NULL)
+        strcpy (ctrl->name, known->name);
     else
+    /* Fallback to automatically-generated control name */
     {
-
-        /* public controls */
-        for( i_cid = V4L2_CID_BASE;
-             i_cid < V4L2_CID_LASTP1;
-             i_cid ++ )
+        size_t i;
+        for (i = 0; query->name[i]; i++)
         {
-            queryctrl.id = i_cid;
-            if( v4l2_ioctl( i_fd, VIDIOC_QUERYCTRL, &queryctrl ) >= 0 )
-            {
-                struct v4l2_control control;
-                if( queryctrl.flags & V4L2_CTRL_FLAG_DISABLED )
-                    continue;
-                memset( &control, 0, sizeof( control ) );
-                control.id = queryctrl.id;
-                if( v4l2_ioctl( i_fd, VIDIOC_G_CTRL, &control ) >= 0
-                 && queryctrl.default_value != control.value )
-                {
-                    int i;
-                    for( i = 0; controls[i].psz_name != NULL; i++ )
-                        if( controls[i].i_cid == queryctrl.id ) break;
-                    name2var( queryctrl.name );
-                    Control( p_obj, i_fd,
-                             controls[i].psz_name ? controls[i].psz_name
-                              : (const char *)queryctrl.name,
-                             queryctrl.id, queryctrl.default_value );
-                }
-            }
+            unsigned char c = query->name[i];
+            if (c == ' ')
+                c = '_';
+            if (c < 128)
+                c = tolower (c);
+            ctrl->name[i] = c;
         }
-
-        /* private controls */
-        for( i_cid = V4L2_CID_PRIVATE_BASE;
-             ;
-             i_cid ++ )
-        {
-            queryctrl.id = i_cid;
-            if( v4l2_ioctl( i_fd, VIDIOC_QUERYCTRL, &queryctrl ) >= 0 )
-            {
-                struct v4l2_control control;
-                if( queryctrl.flags & V4L2_CTRL_FLAG_DISABLED )
-                    continue;
-                memset( &control, 0, sizeof( control ) );
-                control.id = queryctrl.id;
-                if( v4l2_ioctl( i_fd, VIDIOC_G_CTRL, &control ) >= 0
-                 && queryctrl.default_value != control.value )
-                {
-                    name2var( queryctrl.name );
-                    Control( p_obj, i_fd, (const char *)queryctrl.name,
-                             queryctrl.id, queryctrl.default_value );
-                }
-            }
-            else
-                break;
-        }
+        ctrl->name[i] = '\0';
     }
-    return VLC_SUCCESS;
+
+    ctrl->default_value = query->default_value;
+    return ctrl;
 }
 
-static int DemuxControlResetCallback( vlc_object_t *p_this,
-    const char *psz_var, vlc_value_t oldval, vlc_value_t newval, void *p_data )
+
+#ifndef V4L2_CTRL_FLAG_VOLATILE
+# define V4L2_CTRL_FLAG_VOLATILE 0x0080
+# warning Please update V4L2 kernel headers!
+#endif
+
+#define CTRL_FLAGS_IGNORE \
+    (V4L2_CTRL_FLAG_DISABLED /* not implemented at all */ \
+    |V4L2_CTRL_FLAG_READ_ONLY /* value is constant */ \
+    |V4L2_CTRL_FLAG_VOLATILE /* value is (variable but) read-only */)
+
+static vlc_v4l2_ctrl_t *ControlAddInteger (vlc_object_t *obj, int fd,
+                                           const struct v4l2_queryctrl *query)
 {
-    (void)psz_var;    (void)oldval;    (void)newval;    (void)p_data;
-    demux_t *p_demux = (demux_t*)p_this;
-    demux_sys_t *p_sys = p_demux->p_sys;
+    msg_Dbg (obj, " integer  %s (%08"PRIX32")", query->name, query->id);
+    if (query->flags & (CTRL_FLAGS_IGNORE | V4L2_CTRL_FLAG_WRITE_ONLY))
+        return NULL;
 
-    int i_fd = p_sys->i_fd;
+    vlc_v4l2_ctrl_t *c = ControlCreate (fd, query);
+    if (unlikely(c == NULL))
+        return NULL;
 
-    if( i_fd < 0 )
-        return VLC_EGENERIC;
+    if (var_Create (obj, c->name, VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND))
+    {
+        free (c);
+        return NULL;
+    }
 
-    ControlReset( p_this, i_fd );
+    vlc_value_t val;
+    struct v4l2_control ctrl = { .id = query->id };
 
-    return VLC_EGENERIC;
+    if (v4l2_ioctl (fd, VIDIOC_G_CTRL, &ctrl) >= 0)
+    {
+        msg_Dbg (obj, "  current: %3"PRId32", default: %3"PRId32,
+                 ctrl.value, query->default_value);
+        val.i_int = ctrl.value;
+        var_Change (obj, c->name, VLC_VAR_SETVALUE, &val, NULL);
+    }
+    val.i_int = query->minimum;
+    var_Change (obj, c->name, VLC_VAR_SETMIN, &val, NULL);
+    val.i_int = query->maximum;
+    var_Change (obj, c->name, VLC_VAR_SETMAX, &val, NULL);
+    if (query->step != 1)
+    {
+        val.i_int = query->step;
+        var_Change (obj, c->name, VLC_VAR_SETSTEP, &val, NULL);
+    }
+    val.i_int = query->default_value;
+    var_Change (obj, c->name, VLC_VAR_SETDEFAULT, &val, NULL);
+    return c;
 }
 
-static int AccessControlResetCallback( vlc_object_t *p_this,
-    const char *psz_var, vlc_value_t oldval, vlc_value_t newval, void *p_data )
+static vlc_v4l2_ctrl_t *ControlAddBoolean (vlc_object_t *obj, int fd,
+                                           const struct v4l2_queryctrl *query)
 {
-    (void)psz_var;     (void)oldval;     (void)newval;     (void)p_data;
-    access_t *p_access = (access_t *)p_this;
-    demux_sys_t *p_sys = (demux_sys_t *) p_access->p_sys;
+    msg_Dbg (obj, " boolean  %s (%08"PRIX32")", query->name, query->id);
+    if (query->flags & (CTRL_FLAGS_IGNORE | V4L2_CTRL_FLAG_WRITE_ONLY))
+        return NULL;
 
-    int i_fd = p_sys->i_fd;
+    vlc_v4l2_ctrl_t *c = ControlCreate (fd, query);
+    if (unlikely(c == NULL))
+        return NULL;
 
-    if( i_fd < 0 )
-        return VLC_EGENERIC;
+    if (var_Create (obj, c->name, VLC_VAR_BOOL | VLC_VAR_ISCOMMAND))
+    {
+        free (c);
+        return NULL;
+    }
 
-    ControlReset( p_this, i_fd );
+    vlc_value_t val;
+    struct v4l2_control ctrl = { .id = query->id };
 
-    return VLC_EGENERIC;
+    if (v4l2_ioctl (fd, VIDIOC_G_CTRL, &ctrl) >= 0)
+    {
+        msg_Dbg (obj, "  current: %s, default: %s",
+                 ctrl.value ? " true" : "false",
+                 query->default_value ? " true" : "false");
+        val.b_bool = ctrl.value;
+        var_Change (obj, c->name, VLC_VAR_SETVALUE, &val, NULL);
+    }
+    val.b_bool = query->default_value;
+    var_Change (obj, c->name, VLC_VAR_SETDEFAULT, &val, NULL);
+    return c;
 }
 
-/*****************************************************************************
- * Print a user-class v4l2 control's details, create the relevant variable,
- * change the value if needed.
- *****************************************************************************/
-static void ControlListPrint( vlc_object_t *p_obj, int i_fd,
-                              struct v4l2_queryctrl queryctrl,
-                              bool b_reset, bool b_demux )
+static vlc_v4l2_ctrl_t *ControlAddMenu (vlc_object_t *obj, int fd,
+                                        const struct v4l2_queryctrl *query)
 {
-    struct v4l2_querymenu querymenu;
-    unsigned int i_mid;
+    msg_Dbg (obj, " menu     %s (%08"PRIX32")", query->name, query->id);
+    if (query->flags & (CTRL_FLAGS_IGNORE | V4L2_CTRL_FLAG_WRITE_ONLY))
+        return NULL;
 
-    int i;
-    int i_val;
+    vlc_v4l2_ctrl_t *c = ControlCreate (fd, query);
+    if (unlikely(c == NULL))
+        return NULL;
 
-    char *psz_name;
-    vlc_value_t val, val2;
-
-    if( queryctrl.flags & V4L2_CTRL_FLAG_GRABBED )
-        msg_Dbg( p_obj, "    control is busy" );
-    if( queryctrl.flags & V4L2_CTRL_FLAG_READ_ONLY )
-        msg_Dbg( p_obj, "    control is read-only" );
-
-    for( i = 0; controls[i].psz_name != NULL; i++ )
-        if( controls[i].i_cid == queryctrl.id ) break;
-
-    if( controls[i].psz_name )
+    if (var_Create (obj, c->name, VLC_VAR_INTEGER | VLC_VAR_HASCHOICE
+                                                  | VLC_VAR_ISCOMMAND))
     {
-        psz_name = strdup( controls[i].psz_name );
-        char psz_cfg_name[40];
-        sprintf( psz_cfg_name, CFG_PREFIX "%s", psz_name );
-        i_val = var_CreateGetInteger( p_obj, psz_cfg_name );
-        var_Destroy( p_obj, psz_cfg_name );
-    }
-    else
-    {
-        psz_name = strdup( (const char *)queryctrl.name );
-        name2var( (unsigned char *)psz_name );
-        i_val = -1;
+        free (c);
+        return NULL;
     }
 
-    switch( queryctrl.type )
-    {
-        case V4L2_CTRL_TYPE_INTEGER:
-            msg_Dbg( p_obj, "    integer control" );
-            msg_Dbg( p_obj,
-                     "    valid values: %d to %d by steps of %d",
-                     queryctrl.minimum, queryctrl.maximum,
-                     queryctrl.step );
+    vlc_value_t val;
+    struct v4l2_control ctrl = { .id = query->id };
 
-            var_Create( p_obj, psz_name,
-                        VLC_VAR_INTEGER | VLC_VAR_HASMIN | VLC_VAR_HASMAX
-                      | VLC_VAR_HASSTEP | VLC_VAR_ISCOMMAND );
-            val.i_int = queryctrl.minimum;
-            var_Change( p_obj, psz_name, VLC_VAR_SETMIN, &val, NULL );
-            val.i_int = queryctrl.maximum;
-            var_Change( p_obj, psz_name, VLC_VAR_SETMAX, &val, NULL );
-            val.i_int = queryctrl.step;
-            var_Change( p_obj, psz_name, VLC_VAR_SETSTEP, &val, NULL );
-            break;
-        case V4L2_CTRL_TYPE_BOOLEAN:
-            msg_Dbg( p_obj, "    boolean control" );
-            var_Create( p_obj, psz_name,
-                        VLC_VAR_BOOL | VLC_VAR_ISCOMMAND );
-            break;
-        case V4L2_CTRL_TYPE_MENU:
-            msg_Dbg( p_obj, "    menu control" );
-            var_Create( p_obj, psz_name,
-                        VLC_VAR_INTEGER | VLC_VAR_HASCHOICE
-                      | VLC_VAR_ISCOMMAND );
-            memset( &querymenu, 0, sizeof( querymenu ) );
-            for( i_mid = queryctrl.minimum;
-                 i_mid <= (unsigned)queryctrl.maximum;
-                 i_mid++ )
-            {
-                querymenu.index = i_mid;
-                querymenu.id = queryctrl.id;
-                if( v4l2_ioctl( i_fd, VIDIOC_QUERYMENU, &querymenu ) >= 0 )
-                {
-                    msg_Dbg( p_obj, "        %d: %s",
-                             querymenu.index, querymenu.name );
-                    val.i_int = querymenu.index;
-                    val2.psz_string = (char *)querymenu.name;
-                    var_Change( p_obj, psz_name,
-                                VLC_VAR_ADDCHOICE, &val, &val2 );
-                }
-            }
-            break;
-        case V4L2_CTRL_TYPE_BUTTON:
-            msg_Dbg( p_obj, "    button control" );
-            var_Create( p_obj, psz_name,
-                        VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
-            break;
-        case V4L2_CTRL_TYPE_CTRL_CLASS:
-            msg_Dbg( p_obj, "    control class" );
-            var_Create( p_obj, psz_name, VLC_VAR_VOID );
-            break;
-        default:
-            msg_Dbg( p_obj, "    unknown control type (FIXME)" );
-            /* FIXME */
-            break;
+    if (v4l2_ioctl (fd, VIDIOC_G_CTRL, &ctrl) >= 0)
+    {
+        msg_Dbg (obj, "  current: %"PRId32", default: %"PRId32,
+                 ctrl.value, query->default_value);
+        val.i_int = ctrl.value;
+        var_Change (obj, c->name, VLC_VAR_SETVALUE, &val, NULL);
     }
+    val.b_bool = query->default_value;
+    var_Change (obj, c->name, VLC_VAR_SETDEFAULT, &val, NULL);
+    val.i_int = query->minimum;
+    var_Change (obj, c->name, VLC_VAR_SETMIN, &val, NULL);
+    val.i_int = query->maximum;
+    var_Change (obj, c->name, VLC_VAR_SETMAX, &val, NULL);
 
-    switch( queryctrl.type )
+    /* Import menu choices */
+    for (uint_fast32_t idx = query->minimum;
+         idx <= (uint_fast32_t)query->maximum;
+         idx++)
     {
-        case V4L2_CTRL_TYPE_INTEGER:
-        case V4L2_CTRL_TYPE_BOOLEAN:
-        case V4L2_CTRL_TYPE_MENU:
-            {
-                struct v4l2_control control;
-                msg_Dbg( p_obj, "    default value: %d",
-                         queryctrl.default_value );
-                memset( &control, 0, sizeof( control ) );
-                control.id = queryctrl.id;
-                if( v4l2_ioctl( i_fd, VIDIOC_G_CTRL, &control ) >= 0 )
-                {
-                    msg_Dbg( p_obj, "    current value: %d", control.value );
-                }
-                if( i_val == -1 )
-                {
-                    i_val = control.value;
-                    if( b_reset && queryctrl.default_value != control.value )
-                    {
-                        msg_Dbg( p_obj, "    reset value to default" );
-                        Control( p_obj, i_fd, psz_name,
-                                 queryctrl.id, queryctrl.default_value );
-                    }
-                }
-                else
-                {
-                    Control( p_obj, i_fd, psz_name, queryctrl.id, i_val );
-                }
-            }
-            break;
-        default:
-            break;
-    }
+        struct v4l2_querymenu menu = { .id = query->id, .index = idx };
 
-    val.psz_string = (char *)queryctrl.name;
-    var_Change( p_obj, psz_name, VLC_VAR_SETTEXT, &val, NULL );
-    val.i_int = queryctrl.id;
-    val2.psz_string = (char *)psz_name;
-    var_Change( p_obj, "allcontrols", VLC_VAR_ADDCHOICE, &val, &val2 );
-    /* bad things happen changing MPEG mid-stream
-     * so don't add to Ext Settings GUI */
-    if( V4L2_CTRL_ID2CLASS( queryctrl.id ) != V4L2_CTRL_CLASS_MPEG )
-        var_Change( p_obj, "controls", VLC_VAR_ADDCHOICE, &val, &val2 );
-
-    switch( var_Type( p_obj, psz_name ) & VLC_VAR_TYPE )
-    {
-        case VLC_VAR_BOOL:
-            var_SetBool( p_obj, psz_name, i_val );
-            break;
-        case VLC_VAR_INTEGER:
-            var_SetInteger( p_obj, psz_name, i_val );
-            break;
-        case VLC_VAR_VOID:
-            break;
-        default:
-            msg_Warn( p_obj, "FIXME: %s %s %d", __FILE__, __func__,
-                      __LINE__ );
-            break;
-    }
-
-    if( b_demux )
-        var_AddCallback( p_obj, psz_name,
-                        DemuxControlCallback, (void*)(intptr_t)queryctrl.id );
-    else
-        var_AddCallback( p_obj, psz_name,
-                        AccessControlCallback, (void*)(intptr_t)queryctrl.id );
-
-    free( psz_name );
-}
-
-static void SetAvailControlsByString( vlc_object_t *p_obj, int i_fd )
-{
-    char *ctrls = var_InheritString( p_obj, CFG_PREFIX"set-ctrls" );
-    if( ctrls == NULL )
-        return;
-
-    vlc_value_t val, text;
-
-    if( var_Change( p_obj, "allcontrols", VLC_VAR_GETCHOICES, &val, &text ) )
-    {
-        msg_Err( p_obj, "Oops, can't find 'allcontrols' variable." );
-        free( ctrls );
-        return;
-    }
-
-    char *p = ctrls;
-    if( *p == '{' )
-        p++;
-
-    while( p != NULL && *p && *p != '}' )
-    {
-        p += strspn( p, ", " );
-
-        const char *name = p;
-        char *end = strchr( p, ',' );
-        if( end == NULL )
-            end = strchr( p, '}' );
-        if( end != NULL )
-            *(end++) = '\0';
-
-        char *value = strchr( p, '=' );
-        if( value == NULL )
-        {
-            msg_Err( p_obj, "syntax error in \"%s\": missing '='", name );
-            p = end;
+        if (v4l2_ioctl (fd, VIDIOC_QUERYMENU, &menu) < 0)
             continue;
-        }
-        *(value++) = '\0';
+        msg_Dbg (obj, "  choice %"PRIu32") %s", menu.index, menu.name);
 
-        for( int i = 0; i < val.p_list->i_count; i++ )
-        {
-            vlc_value_t vartext;
-            const char *var = text.p_list->p_values[i].psz_string;
-
-            var_Change( p_obj, var, VLC_VAR_GETTEXT, &vartext, NULL );
-            if( !strcasecmp( vartext.psz_string, name ) )
-            {
-                Control( p_obj, i_fd, name,
-                         val.p_list->p_values[i].i_int,
-                         strtol( value, NULL, 0 ) );
-                free( vartext.psz_string );
-                goto found;
-            }
-            free( vartext.psz_string );
-        }
-        msg_Err( p_obj, "control %s not available", name );
-    found:
-        p = end;
+        vlc_value_t text;
+        val.i_int = menu.index;
+        text.psz_string = (char *)menu.name;
+        var_Change (obj, c->name, VLC_VAR_ADDCHOICE, &val, &text);
     }
-    var_FreeList( &val, &text );
-    free( ctrls );
+    return c;
 }
+
+static vlc_v4l2_ctrl_t *ControlAddButton (vlc_object_t *obj, int fd,
+                                          const struct v4l2_queryctrl *query)
+{
+    msg_Dbg (obj, " button   %s (%08"PRIX32")", query->name, query->id);
+    if (query->flags & CTRL_FLAGS_IGNORE)
+        return NULL;
+
+    vlc_v4l2_ctrl_t *c = ControlCreate (fd, query);
+    if (unlikely(c == NULL))
+        return NULL;
+
+    if (var_Create (obj, c->name, VLC_VAR_VOID | VLC_VAR_ISCOMMAND))
+        return NULL;
+    (void) fd;
+    return c;
+}
+
+static vlc_v4l2_ctrl_t *ControlAddClass (vlc_object_t *obj, int fd,
+                                         const struct v4l2_queryctrl *query)
+{
+    msg_Dbg (obj, "control class %s:", query->name);
+    (void) fd;
+    return NULL;
+}
+
+static vlc_v4l2_ctrl_t *ControlAddUnknown (vlc_object_t *obj, int fd,
+                                           const struct v4l2_queryctrl *query)
+{
+    msg_Dbg (obj, " unknown %s (%08"PRIX32")", query->name, query->id);
+    msg_Warn (obj, "  unknown control type %u", (unsigned)query->type);
+    (void) fd;
+    return NULL;
+}
+
+typedef vlc_v4l2_ctrl_t *(*ctrl_type_cb) (vlc_object_t *, int,
+                                          const struct v4l2_queryctrl *);
 
 /**
  * Lists all user-class v4l2 controls, sets them to the user specified
  * value and create the relevant variables to enable run-time changes.
  */
-int ControlList( vlc_object_t *p_obj, int i_fd, bool b_demux )
+vlc_v4l2_ctrl_t *ControlsInit (vlc_object_t *obj, int fd)
 {
-    struct v4l2_queryctrl queryctrl;
-    int i_cid;
-    const bool b_reset = var_InheritBool( p_obj, CFG_PREFIX"controls-reset" );
+    /* A list of controls that can be modified at run-time is stored in the
+     * "controls" variable. The V4L2 controls dialog can be built from this. */
+    var_Create (obj, "controls", VLC_VAR_INTEGER | VLC_VAR_HASCHOICE);
 
-    memset( &queryctrl, 0, sizeof( queryctrl ) );
+    static const ctrl_type_cb handlers[] =
+    {
+        [V4L2_CTRL_TYPE_INTEGER] = ControlAddInteger,
+        [V4L2_CTRL_TYPE_BOOLEAN] = ControlAddBoolean,
+        [V4L2_CTRL_TYPE_MENU] = ControlAddMenu,
+        [V4L2_CTRL_TYPE_BUTTON] = ControlAddButton,
+        [V4L2_CTRL_TYPE_CTRL_CLASS] = ControlAddClass,
+    };
 
-    /* A list of available controls (aka the variable name) will be
-     * stored as choices in the "allcontrols" variable. We'll thus be able
-     * to use those to create an appropriate interface
-     * A list of available controls that can be changed mid-stream will
-     * be stored in the "controls" variable */
-    var_Create( p_obj, "controls", VLC_VAR_INTEGER | VLC_VAR_HASCHOICE );
-    var_Create( p_obj, "allcontrols", VLC_VAR_INTEGER | VLC_VAR_HASCHOICE );
+    vlc_v4l2_ctrl_t *list = NULL;
+    struct v4l2_queryctrl query;
 
-    var_Create( p_obj, "controls-update", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
+    query.id = V4L2_CTRL_FLAG_NEXT_CTRL;
+    while (v4l2_ioctl (fd, VIDIOC_QUERYCTRL, &query) >= 0)
+    {
+        ctrl_type_cb handler = NULL;
+        if (query.type < (sizeof (handlers) / sizeof (handlers[0])))
+            handler = handlers[query.type];
+        if (handler == NULL)
+            handler = ControlAddUnknown;
+
+        vlc_v4l2_ctrl_t *c = handler (obj, fd, &query);
+        if (c != NULL)
+        {
+            vlc_value_t val, text;
+
+            var_AddCallback (obj, c->name, ControlSetCallback, c);
+            text.psz_string = (char *)query.name;
+            var_Change (obj, c->name, VLC_VAR_SETTEXT, &text, NULL);
+            val.i_int = query.id;
+            text.psz_string = (char *)c->name;
+            var_Change (obj, "controls", VLC_VAR_ADDCHOICE, &val, &text);
+
+            c->next = list;
+            list = c;
+        }
+        query.id |= V4L2_CTRL_FLAG_NEXT_CTRL;
+    }
+
+    /* Set well-known controls from VLC configuration */
+    for (vlc_v4l2_ctrl_t *ctrl = list; ctrl != NULL; ctrl = ctrl->next)
+    {
+        if (!CTRL_CID_KNOWN (ctrl->id))
+            continue;
+
+        char varname[sizeof (CFG_PREFIX) + sizeof (ctrl->name) - 1];
+        sprintf (varname, CFG_PREFIX"%s", ctrl->name);
+
+        int64_t val = var_InheritInteger (obj, varname);
+        if (val == -1)
+            continue; /* the VLC default value: "do not modify" */
+        ControlSet (ctrl, val);
+    }
+
+    /* Set any control from the VLC configuration control string */
+    ControlsSetFromString (obj, list);
 
     /* Add a control to reset all controls to their default values */
-    vlc_value_t val, val2;
-    var_Create( p_obj, "controls-reset", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
-    val.psz_string = _( "Reset controls to default" );
-    var_Change( p_obj, "controls-reset", VLC_VAR_SETTEXT, &val, NULL );
-    val.i_int = -1;
-    val2.psz_string = (char *)"controls-reset";
-    var_Change( p_obj, "controls", VLC_VAR_ADDCHOICE, &val, &val2 );
-    if (b_demux)
-        var_AddCallback( p_obj, "controls-reset", DemuxControlResetCallback, NULL );
-    else
-        var_AddCallback( p_obj, "controls-reset", AccessControlResetCallback, NULL );
-
-    queryctrl.id = V4L2_CTRL_FLAG_NEXT_CTRL;
-    if( v4l2_ioctl( i_fd, VIDIOC_QUERYCTRL, &queryctrl ) >= 0 )
     {
-        msg_Dbg( p_obj, "Extended control API supported by v4l2 driver" );
+        vlc_value_t val, text;
 
-        /* List extended controls */
-        queryctrl.id = V4L2_CTRL_FLAG_NEXT_CTRL;
-        while( v4l2_ioctl( i_fd, VIDIOC_QUERYCTRL, &queryctrl ) >= 0 )
-        {
-            if( queryctrl.type == V4L2_CTRL_TYPE_CTRL_CLASS )
-            {
-                msg_Dbg( p_obj, "%s", queryctrl.name );
-                queryctrl.id |= V4L2_CTRL_FLAG_NEXT_CTRL;
-                continue;
-            }
-            switch( V4L2_CTRL_ID2CLASS( queryctrl.id ) )
-            {
-                case V4L2_CTRL_CLASS_USER:
-                    msg_Dbg( p_obj, "Available control: %s (%x)",
-                             queryctrl.name, queryctrl.id );
-                    break;
-                case V4L2_CTRL_CLASS_MPEG:
-                    name2var( queryctrl.name );
-                    msg_Dbg( p_obj, "Available MPEG control: %s (%x)",
-                             queryctrl.name, queryctrl.id );
-                    break;
-                default:
-                    msg_Dbg( p_obj, "Available private control: %s (%x)",
-                             queryctrl.name, queryctrl.id );
-                    break;
-            }
-            ControlListPrint( p_obj, i_fd, queryctrl, b_reset, b_demux );
-            queryctrl.id |= V4L2_CTRL_FLAG_NEXT_CTRL;
-        }
+        var_Create (obj, "reset", VLC_VAR_VOID | VLC_VAR_ISCOMMAND);
+        val.psz_string = _("Reset defaults");
+        var_Change (obj, "reset", VLC_VAR_SETTEXT, &val, NULL);
+        val.i_int = -1;
+
+        text.psz_string = (char *)"reset";
+        var_Change (obj, "controls", VLC_VAR_ADDCHOICE, &val, &text);
+        var_AddCallback (obj, "reset", ControlsResetCallback, list);
     }
-    else
+    if (var_InheritBool (obj, CFG_PREFIX"controls-reset"))
+        ControlsReset (list);
+
+    return list;
+}
+
+void ControlsDeinit (vlc_object_t *obj, vlc_v4l2_ctrl_t *list)
+{
+    var_DelCallback (obj, "reset", ControlsResetCallback, list);
+    var_Destroy (obj, "reset");
+
+    while (list != NULL)
     {
-        msg_Dbg( p_obj, "Extended control API not supported by v4l2 driver" );
+        vlc_v4l2_ctrl_t *next = list->next;
 
-        /* List public controls */
-        for( i_cid = V4L2_CID_BASE;
-             i_cid < V4L2_CID_LASTP1;
-             i_cid ++ )
-        {
-            queryctrl.id = i_cid;
-            if( v4l2_ioctl( i_fd, VIDIOC_QUERYCTRL, &queryctrl ) >= 0 )
-            {
-                if( queryctrl.flags & V4L2_CTRL_FLAG_DISABLED )
-                    continue;
-                msg_Dbg( p_obj, "Available control: %s (%x)",
-                         queryctrl.name, queryctrl.id );
-                ControlListPrint( p_obj, i_fd, queryctrl, b_reset, b_demux );
-            }
-        }
-
-        /* List private controls */
-        for( i_cid = V4L2_CID_PRIVATE_BASE;
-             ;
-             i_cid ++ )
-        {
-            queryctrl.id = i_cid;
-            if( v4l2_ioctl( i_fd, VIDIOC_QUERYCTRL, &queryctrl ) >= 0 )
-            {
-                if( queryctrl.flags & V4L2_CTRL_FLAG_DISABLED )
-                    continue;
-                msg_Dbg( p_obj, "Available private control: %s (%x)",
-                         queryctrl.name, queryctrl.id );
-                ControlListPrint( p_obj, i_fd, queryctrl, b_reset, b_demux );
-            }
-            else
-                break;
-        }
+        var_DelCallback (obj, list->name, ControlSetCallback, list);
+        var_Destroy (obj, list->name);
+        free (list);
+        list = next;
     }
 
-    SetAvailControlsByString( p_obj, i_fd );
-    return VLC_SUCCESS;
+    var_Destroy (obj, "controls");
 }

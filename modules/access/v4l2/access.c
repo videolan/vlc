@@ -73,6 +73,7 @@ void AccessClose( vlc_object_t *obj )
     access_t *access = (access_t *)obj;
     demux_sys_t *sys = (demux_sys_t *)access->p_sys;
 
+    ControlsDeinit( obj, sys->controls );
     v4l2_close( sys->i_fd );
     free( sys );
 }

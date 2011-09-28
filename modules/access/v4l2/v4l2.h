@@ -41,8 +41,6 @@
 
 #define CFG_PREFIX "v4l2-"
 
-int ControlList(vlc_object_t *, int fd, bool b_demux);
-
 /* TODO: remove this, use callbacks */
 typedef enum {
     IO_METHOD_READ=1,
@@ -50,7 +48,9 @@ typedef enum {
     IO_METHOD_USERPTR,
 } io_method;
 
-/* TODO: move this to .c */
+typedef struct vlc_v4l2_ctrl vlc_v4l2_ctrl_t;
+
+/* TODO: move this to access.c and demux.c (separately) */
 struct demux_sys_t
 {
     int  i_fd;
@@ -66,6 +66,8 @@ struct demux_sys_t
     uint32_t i_block_flags;
 
     es_out_id_t *p_es;
+
+    vlc_v4l2_ctrl_t *controls;
 
 #ifdef HAVE_LIBV4L2
     bool b_libv4l2;
@@ -93,3 +95,7 @@ void GetMaxDimensions(vlc_object_t *, int fd, uint32_t fmt, float fps_min,
 /* access.c */
 int AccessOpen(vlc_object_t *);
 void AccessClose(vlc_object_t *);
+
+/* controls.c */
+vlc_v4l2_ctrl_t *ControlsInit(vlc_object_t *, int fd);
+void ControlsDeinit(vlc_object_t *, vlc_v4l2_ctrl_t *);

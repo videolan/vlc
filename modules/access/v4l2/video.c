@@ -1036,7 +1036,7 @@ static int InitVideo( vlc_object_t *p_obj, int i_fd, demux_sys_t *p_sys,
 
     /* TODO: Move the resolution stuff up here */
     /* if MPEG encoder card, no need to do anything else after this */
-    ControlList( p_obj, i_fd, b_demux );
+    p_sys->controls = ControlsInit( p_obj, i_fd );
 
     /* Reset Cropping */
     memset( &cropcap, 0, sizeof(cropcap) );
