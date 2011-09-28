@@ -84,11 +84,11 @@ static void RtspClientDel( rtsp_stream_t *rtsp, rtsp_session_t *session );
 static void RtspTimeOut( void *data );
 
 rtsp_stream_t *RtspSetup( vlc_object_t *owner, vod_media_t *media,
-                          const vlc_url_t *url )
+                          const char *path )
 {
     rtsp_stream_t *rtsp = malloc( sizeof( *rtsp ) );
 
-    if( rtsp == NULL || ( url->i_port > 99999 ) )
+    if( rtsp == NULL )
     {
         free( rtsp );
         return NULL;
@@ -111,7 +111,7 @@ rtsp_stream_t *RtspSetup( vlc_object_t *owner, vod_media_t *media,
             goto error;
     }
 
-    rtsp->psz_path = strdup( ( url->psz_path != NULL ) ? url->psz_path : "/" );
+    rtsp->psz_path = strdup( (path != NULL) ? path : "/" );
     if( rtsp->psz_path == NULL )
         goto error;
 

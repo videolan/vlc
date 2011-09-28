@@ -26,7 +26,7 @@ typedef struct rtsp_stream_t rtsp_stream_t;
 typedef struct rtsp_stream_id_t rtsp_stream_id_t;
 
 rtsp_stream_t *RtspSetup( vlc_object_t *owner, vod_media_t *media,
-                          const vlc_url_t *url );
+                          const char *path );
 void RtspUnsetup( rtsp_stream_t *rtsp );
 
 rtsp_stream_id_t *RtspAddId( rtsp_stream_t *rtsp, sout_stream_id_t *sid,

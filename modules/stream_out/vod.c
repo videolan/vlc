@@ -272,7 +272,7 @@ static void MediaSetup( vod_t *p_vod, vod_media_t *p_media,
     vlc_UrlParse( &url, psz_url, 0 );
     free( psz_url );
 
-    p_media->rtsp = RtspSetup(VLC_OBJECT(p_vod), p_media, &url);
+    p_media->rtsp = RtspSetup(VLC_OBJECT(p_vod), p_media, url.psz_path);
 
     vlc_UrlClean( &url );
 
