@@ -353,7 +353,11 @@ getbrowsetable = function ()
 
 	if dir then
 		if dir == "~" then dir = vlc.misc.homedir() end
-			dir = common.realpath(dir.."/")
+            -- FIXME: hack for Win32 drive list
+			if dir~="" then
+				dir = common.realpath(dir.."/")
+			end
+
 			local d = vlc.net.opendir(dir)
 			table.sort(d)
 
