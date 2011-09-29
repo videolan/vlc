@@ -27,7 +27,7 @@ export VLC_PLUGIN_PATH
 
 function find_libvlc {
     [ -z "$SUFFIX" ] && return 0 # linking will fail if lib isn't found
-    for i in $BUILDDIR/src/.libs/libvlc.$SUFFIX $BUILDDIR/src/libvlc.$SUFFIX; do
+    for i in $BUILDDIR/lib/.libs/libvlc.$SUFFIX $BUILDDIR/lib/libvlc.$SUFFIX; do
         [ -e $i ] && LIBVLC=$i && return 0
     done
     return 1
@@ -54,6 +54,7 @@ if ! find_libvlccore; then
 fi
 
 export LD_LIBRARY_PATH=$BUILDDIR/src/.libs
+CXXFLAGS="$CXXFLAGS -g -O0"
 
 if [ -e ../../extras/contrib/config.mak -a ! "`grep HOST ../../extras/contrib/config.mak 2>/dev/null|awk '{print $3}'`" != "$HOST" ]; then
     CXXFLAGS="-I../../extras/contrib/include"
@@ -77,7 +78,7 @@ Please press enter to verify that all the VLC modules are shown"
     ./zsh_gen -vv --list
     echo "
 If they are shown, press enter to see if you can debug the problem
-It will be reproduced by running \"./zsh_gen -vvv\""
+It will be reproduced by running \"./zsh_gen -vv\""
     read i
     ./zsh_gen --plugin-path=$BUILDDIR -vv
     exit 1
