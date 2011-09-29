@@ -926,8 +926,7 @@ static int OpenGeneric( vlc_object_t *p_this, bool b_encode )
             p_header->nFilledLen = 0;
             convert_sps_pps( p_dec, p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra,
                              p_header->pBuffer, p_header->nAllocLen,
-                             (uint32_t*) &p_header->nFilledLen,
-                             &p_sys->i_nal_size_length );
+                             (uint32_t*) &p_header->nFilledLen, NULL );
         }
         else if(p_sys->in.b_direct)
         {
