@@ -155,7 +155,7 @@ int GetVlcVideoFormat( OMX_VIDEO_CODINGTYPE i_omx_codec,
 int GetOmxAudioFormat( vlc_fourcc_t i_fourcc,
                        OMX_AUDIO_CODINGTYPE *pi_omx_codec,
                        const char **ppsz_name );
-int GetVlcAudioFormat( OMX_AUDIO_CODINGTYPE i_omx_codec,
+int OmxToVlcAudioFormat( OMX_AUDIO_CODINGTYPE i_omx_codec,
                        vlc_fourcc_t *pi_fourcc, const char **ppsz_name );
 const char *GetOmxRole( vlc_fourcc_t i_fourcc, int i_cat, bool b_enc );
 int GetOmxChromaFormat( vlc_fourcc_t i_fourcc,
