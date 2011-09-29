@@ -37,7 +37,8 @@ static int convert_sps_pps( decoder_t *p_dec, const uint8_t *p_buf,
 
     /* Read infos in first 6 bytes */
     i_profile    = (p_buf[1] << 16) | (p_buf[2] << 8) | p_buf[3];
-    *p_nal_size  = (p_buf[4] & 0x03) + 1;
+    if (p_nal_size)
+        *p_nal_size  = (p_buf[4] & 0x03) + 1;
     p_buf       += 5;
     i_data_size -= 5;
 
