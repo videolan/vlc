@@ -68,7 +68,7 @@ public:
         node = n;
     }
     void onMessage(const omx_message &msg);
-    void registerBuffers(const sp<IMemoryHeap> &mem) {
+    void registerBuffers(const sp<IMemoryHeap> &) {
     }
 private:
     OMXNode *node;
@@ -157,7 +157,7 @@ static int get_param_size(OMX_INDEXTYPE param_index)
     }
 }
 
-static OMX_ERRORTYPE iomx_send_command(OMX_HANDLETYPE component, OMX_COMMANDTYPE command, OMX_U32 param1, OMX_PTR cmd_data)
+static OMX_ERRORTYPE iomx_send_command(OMX_HANDLETYPE component, OMX_COMMANDTYPE command, OMX_U32 param1, OMX_PTR)
 {
     OMXNode* node = (OMXNode*) ((OMX_COMPONENTTYPE*)component)->pComponentPrivate;
     return get_error(ctx->iomx->sendCommand(node->node, command, param1));
@@ -368,7 +368,7 @@ static OMX_ERRORTYPE iomx_get_roles_of_component(OMX_STRING component_name, OMX_
     return OMX_ErrorInvalidComponentName;
 }
 
-void* iomx_dlopen(const char *name)
+void* iomx_dlopen(const char *)
 {
     if (!ctx)
         ctx = new IOMXContext();
@@ -386,7 +386,7 @@ void iomx_dlclose(void *handle)
     }
 }
 
-void *iomx_dlsym(void *handle, const char *name)
+void *iomx_dlsym(void *, const char *name)
 {
     if (!strcmp(name, "OMX_Init"))
         return (void*) iomx_init;
