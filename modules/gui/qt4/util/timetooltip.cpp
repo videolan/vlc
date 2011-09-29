@@ -40,7 +40,14 @@ TimeTooltip::TimeTooltip( QWidget *parent ) :
     // Tell Qt that it doesn't need to erase the background before
     // a paintEvent occurs. This should save some CPU cycles.
     setAttribute( Qt::WA_OpaquePaintEvent );
+
+#ifdef Q_WS_WIN
+    /*
+    - This attribute is required on Windows to avoid focus stealing of other windows.
+    - When set on Linux the TimeTooltip appears behind the FSController in fullscreen.
+    */
     setAttribute( Qt::WA_ShowWithoutActivating );
+#endif
 
     // Inherit from the system default font size -5
     mFont = QFont( "Verdana", qMax( qApp->font().pointSize() - 5, 7 ) );
