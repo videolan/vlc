@@ -29,6 +29,11 @@ fi
 CPPFLAGS="-I${ANDROID_NDK}/sources/cxx-stl/gnu-libstdc++/include -I${ANDROID_NDK}/sources/cxx-stl/gnu-libstdc++/libs/${CXX_TARGET}/include"
 LDFLAGS="$LDFLAGS -L${ANDROID_NDK}/sources/cxx-stl/gnu-libstdc++/libs/${CXX_TARGET}/lib"
 
+if [ -n "$ANDROID_SYS_HEADERS" ]; then
+    CPPFLAGS="$CPPFLAGS -I${ANDROID_SYS_HEADERS}/frameworks/base/include -I${ANDROID_SYS_HEADERS}/system/core/include"
+    LDFLAGS="$LDFLAGS -L${ANDROID_LIBS}"
+fi
+
 SYSROOT=$ANDROID_NDK/platforms/$ANDROID_API/arch-arm
 ANDROID_BIN=$ANDROID_NDK/toolchains/arm-linux-androideabi-4.4.3/prebuilt/*-x86/bin/
 CROSS_COMPILE=${ANDROID_BIN}/arm-linux-androideabi-
@@ -101,4 +106,5 @@ sh $VLC_SOURCEDIR/configure --host=arm-eabi-linux --build=x86_64-unknown-linux $
                 --disable-gl \
                 --disable-gles1 --disable-gles2 \
                 --disable-goom \
-                --disable-projectm
+                --disable-projectm \
+                --enable-iomx
