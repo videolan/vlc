@@ -195,7 +195,6 @@ static block_t *DoWork( filter_t *p_filter, block_t *p_in_buf )
     ValueDate_t* current = NULL;
     float sum;
     int count = 0;
-    int i_ret;
 
     nbChannels = aout_FormatNbChannels( &p_filter->fmt_in.audio );
     p_sys->nbChannels = nbChannels;
@@ -293,7 +292,7 @@ static block_t *DoWork( filter_t *p_filter, block_t *p_in_buf )
             //test = send(p_sys->TCPconnection,message,strlen(message),0);
             //net_Write(p_filter, p_sys->TCPconnection, NULL, message, strlen(message));
 
-            i_ret= net_Write(p_filter, p_sys->TCPconnection, NULL, message, strlen(message));
+            net_Write(p_filter, p_sys->TCPconnection, NULL, message, strlen(message));
 
         }
     }
