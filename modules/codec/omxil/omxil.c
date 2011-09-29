@@ -649,7 +649,7 @@ static OMX_ERRORTYPE InitialiseComponent(decoder_t *p_dec,
     if(!strncmp(p_sys->psz_component, "OMX.SEC.", 8))
     {
         OMX_INDEXTYPE index;
-        omx_error = OMX_GetExtensionIndex(omx_handle, "OMX.SEC.index.ThumbnailMode", &index);
+        omx_error = OMX_GetExtensionIndex(omx_handle, (OMX_STRING) "OMX.SEC.index.ThumbnailMode", &index);
         if(omx_error == OMX_ErrorNone)
         {
             OMX_BOOL enable = OMX_TRUE;
