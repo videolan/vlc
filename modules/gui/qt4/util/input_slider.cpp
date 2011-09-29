@@ -47,6 +47,7 @@
 #include <QColor>
 #include <QPoint>
 #include <QPropertyAnimation>
+#include <QApplication>
 
 #define MINIMUM 0
 #define MAXIMUM 1000
@@ -291,16 +292,23 @@ void SeekSlider::enterEvent( QEvent * )
         animHandle->setDirection( QAbstractAnimation::Forward );
         animHandle->start();
     }
-    /* Don't show the tooltip if the slider is disabled */
-    if( isEnabled() && inputLength > 0 )
+    /* Don't show the tooltip if the slider is disabled or a menu is open */
+    if( isEnabled() && inputLength > 0 && !qApp->activePopupWidget() )
         mTimeTooltip->show();
 }
 
 void SeekSlider::leaveEvent( QEvent * )
 {
     hideHandleTimer->start();
-    if( !rect().contains( mapFromGlobal( QCursor::pos() ) ) )
+    /* Hide the tooltip
+       - if the mouse leave the slider rect (Note: it can still be
+         over the tooltip!)
+       - if another window is on the way of the cursor */
+    if( !rect().contains( mapFromGlobal( QCursor::pos() ) ) ||
+      ( !isActiveWindow() && !mTimeTooltip->isActiveWindow() ) )
+    {
         mTimeTooltip->hide();
+    }
 }
 
 void SeekSlider::hideEvent( QHideEvent * )
