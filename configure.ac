@@ -3011,37 +3011,13 @@ AS_IF( [test "${enable_libass}" != "no"], [
 dnl
 dnl  kate decoder plugin
 dnl
-AC_ARG_ENABLE(kate,
-[  --enable-kate           kate codec (default enabled)])
-AS_IF([test "${enable_kate}" != "no"], [
-  PKG_CHECK_MODULES(KATE,[kate >= 0.1.5], [
-      VLC_ADD_PLUGIN([kate])
-      VLC_ADD_CFLAGS([kate],[$KATE_CFLAGS])
-      VLC_ADD_LIBS([kate],[$KATE_LIBS]) ],[
-        AC_CHECK_HEADERS(kate/kate.h, [
-          AC_CHECK_LIB(kate, kate_decode_init, [
-            VLC_ADD_PLUGIN([kate])
-            VLC_ADD_LIBS([kate],[-lkate -logg]) ],[
-            AS_IF([test "x${enable_kate}" != "x"], [
-              AC_MSG_ERROR([libkate doesn't appear to be installed on your system.
-              You also need to check that you have a libogg posterior to the 1.0 release.])
-            ])
-      ], [-lkate -logg])
-        ],[
-          AS_IF([test "x${enable_kate}" != "x"], [
-            AC_MSG_ERROR([libkate headers do not appear to be installed on your system.
-            You also need to check that you have a libogg posterior to the 1.0 release.])
-          ])
-        ])
-  ])
-])
-
+PKG_ENABLE_MODULES_VLC([KATE], [], [kate >= 0.3.0], [kate codec], [auto])
 
 dnl
 dnl  tiger rendering for kate decoder plugin
 dnl
 AC_ARG_ENABLE(tiger,
-[  --enable-tiger          Tiger rendering library for Kate streams (default enabled)])
+[  --enable-tiger          Tiger rendering library for Kate streams (default auto)])
 AS_IF([test "${enable_tiger}" != "no"], [
   PKG_CHECK_MODULES(TIGER,[tiger >= 0.3.1], [
       AC_DEFINE(HAVE_TIGER, 1, [Define if libtiger is available.])
@@ -3052,7 +3028,6 @@ AS_IF([test "${enable_tiger}" != "no"], [
         ])
   ])
 ])
-
 
 
 dnl
