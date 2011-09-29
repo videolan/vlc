@@ -924,6 +924,9 @@ int dvb_set_isdbs (dvb_device_t *d, uint64_t freq_Hz, uint16_t ts_id)
                           DTV_ISDBS_TS_ID, (uint32_t)ts_id);
 #else
 # warning ISDB-S needs Linux DVB version 5.1 or later.
+    msg_Err (d->obj, "ISDB-S support not compiled-in");
+    (void) freq_Hz; (void) ts_id;
+    return -1;
 #endif
 }
 
