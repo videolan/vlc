@@ -116,6 +116,9 @@ vlc_module_end ()
  * Local prototypes, constants, structures
  *****************************************************************************/
 
+/* minimum chapter size in seconds */
+#define MIN_CHAPTER_SIZE 5
+
 TYPEDEF_ARRAY( uint64_t, size_array_t );
 
 struct access_sys_t
@@ -831,6 +834,16 @@ static void ImportMarks( access_t *p_access )
         return;
     }
 
+    /* get the length of this recording (index stores 8 bytes per frame) */
+    struct stat st;
+    if( fstat( fileno( indexfile ), &st ) )
+    {
+        fclose( marksfile );
+        fclose( indexfile );
+        return;
+    }
+    int64_t i_frame_count = st.st_size / 8;
+
     /* Put all cut marks in a "dummy" title */
     input_title_t *p_marks = vlc_input_title_New();
     if( !p_marks )
@@ -845,12 +858,25 @@ static void ImportMarks( access_t *p_access )
     int i_chapter_offset = p_sys->fps / 1000 *
         var_InheritInteger( p_access, "vdr-chapter-offset" );
 
+    /* minimum chapter size in frames */
+    int i_min_chapter_size = p_sys->fps * MIN_CHAPTER_SIZE;
+
+    /* the last chapter started at this frame (init to 0 so
+     * we skip useless chapters near the beginning as well) */
+    int64_t i_prev_chapter = 0;
+
     /* parse lines of the form "0:00:00.00 foobar" */
     char *line = NULL;
     size_t line_len;
     while( ReadLine( &line, &line_len, marksfile ) )
     {
         int64_t i_frame = ParseFrameNumber( line, p_sys->fps );
+
+        /* skip chapters which are near the end or too close to each other */
+        if( i_frame - i_prev_chapter < i_min_chapter_size ||
+            i_frame >= i_frame_count - i_min_chapter_size )
+            continue;
+        i_prev_chapter = i_frame;
 
         /* move chapters (simple workaround for inaccurate cut marks) */
         if( i_frame > -i_chapter_offset )
@@ -879,7 +905,8 @@ static void ImportMarks( access_t *p_access )
         TAB_APPEND( p_marks->i_seekpoint, p_marks->seekpoint, sp );
     }
 
-    if( p_marks->i_seekpoint > 0 )
+    /* add a chapter at the beginning if missing */
+    if( p_marks->i_seekpoint > 0 && p_marks->seekpoint[0]->i_byte_offset > 0 )
     {
         seekpoint_t *sp = vlc_seekpoint_New();
         if( sp )
@@ -889,12 +916,12 @@ static void ImportMarks( access_t *p_access )
             sp->psz_name = strdup( _("Start") );
             TAB_INSERT( p_marks->i_seekpoint, p_marks->seekpoint, sp, 0 );
         }
+    }
+
+    if( p_marks->i_seekpoint > 0 )
         p_sys->p_marks = p_marks;
-    }
     else
-    {
         vlc_input_title_Delete( p_marks );
-    }
 
     fclose( marksfile );
     fclose( indexfile );
