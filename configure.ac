@@ -1622,6 +1622,7 @@ then
 fi
 AM_CONDITIONAL(BUILD_LUA, [test "${have_lua}" = "yes"])
 
+
 dnl
 dnl HTTP daemon
 dnl
@@ -1633,6 +1634,7 @@ then
   AC_DEFINE(ENABLE_HTTPD, 1, Define if you want the HTTP dameon support)
 fi
 AM_CONDITIONAL(BUILD_HTTPD, [test "${enable_httpd}" != "no"])
+
 
 dnl
 dnl VideoLAN manager
@@ -1649,41 +1651,22 @@ AS_IF([test "${enable_vlm}" != "no"], [
 ])
 AM_CONDITIONAL([ENABLE_VLM], [test "${enable_vlm}" != "no"])
 
-dnl
-dnl Growl notification plugin
-dnl
-AC_ARG_ENABLE(growl,
-  [  --enable-growl          growl notification plugin (default disabled)],,
-  [enable_growl=no])
-AS_IF([test "${enable_growl}" != "no"], [
-    AC_CHECK_HEADERS(${CONTRIB_DIR}/Growl/Growl.framework/Versions/A/Headers/GrowlDefines.h, [
-      VLC_ADD_PLUGIN([growl])
-      VLC_ADD_LIBS([growl], [-F${CONTRIB_DIR}/Growl -Wl,-framework,Growl,-framework,CoreFoundation])
-      VLC_ADD_OBJCFLAGS([growl], [-F${CONTRIB_DIR}/Growl])
-      VLC_ADD_OBJCFLAGS([growl], [-fobjc-exceptions] )
-    ])
-  ]
-)
 
 dnl
-dnl Libnotify notification plugin
+dnl  ipv6 support
 dnl
-PKG_ENABLE_MODULES_VLC([NOTIFY], [], [libnotify gtk+-2.0], [libnotify notification], [auto])
-
-dnl
-dnl Taglib plugin
-dnl
-AC_ARG_ENABLE(taglib,
-  [AS_HELP_STRING([--disable-taglib],
-    [do not use TagLib (default enabled)])])
-AS_IF([test "${enable_taglib}" != "no"], [
-  PKG_CHECK_MODULES(TAGLIB, taglib >= 1.5, [
-    VLC_ADD_PLUGIN([taglib])
-    VLC_ADD_LIBS([taglib],[$TAGLIB_LIBS -lz])
-    VLC_ADD_CXXFLAGS([taglib],[$TAGLIB_CFLAGS])
-  ], [
-    AC_MSG_WARN(TagLib library not found)])
+have_ipv6=no
+AC_CHECK_FUNCS(inet_pton,[have_ipv6=yes],[
+  AC_CHECK_LIB(nsl,inet_pton, [have_ipv6=yes])
 ])
+
+AS_IF([test "${have_ipv6}" = "yes"], [
+  AC_DEFINE(HAVE_INET_PTON, 1, [Define to 1 if you have inet_pton().])])
+
+
+AC_CHECK_FUNCS(inet_ntop,[
+  AC_DEFINE(HAVE_INET_NTOP, 1, [Define to 1 if you have inet_ntop().])])
+
 
 dnl
 dnl  Input plugins
@@ -1979,7 +1962,7 @@ AC_ARG_ENABLE(decklink,
     [disable Blackmagic DeckLink SDI input (default auto)])])
 AC_ARG_WITH(decklink_sdk,
   [AS_HELP_STRING[--with-decklink-sdk=DIR],
-    [location of Blackmagic DeckLink SDI SDK])])
+    [                        location of Blackmagic DeckLink SDI SDK])])
 if test "${enable_decklink}" != "no"
 then
   if test "${with_decklink_sdk}" != "no" -a -n "${with_decklink_sdk}"
@@ -2099,13 +2082,6 @@ EXPLODE
 AM_CONDITIONAL([HAVE_LINUX_DVB], [test "$ac_cv_linux_s2api" = "yes"])
 
 dnl
-dnl  libdvbpsi check for ts mux/demux
-dnl
-have_dvbpsi="no"
-PKG_WITH_MODULES([DVBPSI], [libdvbpsi], [have_dvbpsi="yes"])
-AM_CONDITIONAL(HAVE_DVBPSI, [test "${have_dvbpsi}" = "yes"])
-
-dnl
 dnl  Screen capture module
 dnl
 AC_ARG_ENABLE(screen,
@@ -2128,19 +2104,53 @@ if test "${enable_screen}" != "no"; then
 fi
 
 dnl
-dnl  ipv6 support
+dnl  Real RTSP plugin
 dnl
-have_ipv6=no
-AC_CHECK_FUNCS(inet_pton,[have_ipv6=yes],[
-  AC_CHECK_LIB(nsl,inet_pton, [have_ipv6=yes])
-])
+AC_ARG_ENABLE(realrtsp,
+  [  --enable-realrtsp       Real RTSP module (default disabled)])
+if test "${enable_realrtsp}" = "yes"; then
+  VLC_ADD_PLUGIN([access_realrtsp])
+fi
 
-AS_IF([test "${have_ipv6}" = "yes"], [
-  AC_DEFINE(HAVE_INET_PTON, 1, [Define to 1 if you have inet_pton().])])
+dnl
+dnl MacOS eyeTV
+AC_ARG_ENABLE(macosx-eyetv,
+  [  --enable-macosx-eyetv   Mac OS X EyeTV (TNT Tuner) module (default enabled on Mac OS X)])
+if test "x${enable_macosx_eyetv}" != "xno" &&
+  (test "${SYS}" = "darwin" || test "${enable_macosx_eyetv}" = "yes")
+then
+  VLC_ADD_LIBS([access_eyetv], [-Wl,-framework,Foundation])
+  VLC_ADD_PLUGIN([access_eyetv])
+fi
+
+dnl
+dnl QTCapture
+AC_ARG_ENABLE(macosx-qtcapture,
+  [  --enable-macosx-qtcapture Mac OS X qtcapture (iSight) module (default enabled on Mac OS X)])
+if test "x${enable_macosx_qtcapture}" != "xno" &&
+  (test "${SYS}" = "darwin" || test "${enable_macosx_qtcapture}" = "yes")
+then
+  VLC_ADD_LIBS([qtcapture], [-Wl,-framework,Cocoa])
+  VLC_ADD_LIBS([qtcapture], [-Wl,-framework,QTKit])
+  VLC_ADD_LIBS([qtcapture], [-Wl,-framework,CoreAudio])
+  VLC_ADD_LIBS([qtcapture], [-Wl,-framework,QuartzCore])
+  VLC_ADD_LIBS([qtcapture], [-Wl,-framework,CoreVideo])
+  VLC_ADD_PLUGIN([qtcapture])
+fi
 
 
-AC_CHECK_FUNCS(inet_ntop,[
-  AC_DEFINE(HAVE_INET_NTOP, 1, [Define to 1 if you have inet_ntop().])])
+dnl
+dnl  Demux plugins
+dnl
+
+EXTEND_HELP_STRING([Mux/Demux plugins:])
+
+dnl
+dnl  libdvbpsi check for ts mux/demux
+dnl
+have_dvbpsi="no"
+PKG_WITH_MODULES([DVBPSI], [libdvbpsi], [have_dvbpsi="yes"])
+AM_CONDITIONAL(HAVE_DVBPSI, [test "${have_dvbpsi}" = "yes"])
 
 
 dnl
@@ -2352,7 +2362,7 @@ dnl
 dnl CrystalHD codec plugin
 dnl
 AC_ARG_ENABLE(crystalhd,
-  [  --enable-crystalhd       crystalhd codec plugin (default auto)])
+  [  --enable-crystalhd      crystalhd codec plugin (default auto)])
 if test "${enable_crystalhd}" != "no"; then
     AC_CHECK_HEADER(libcrystalhd/libcrystalhd_if.h, [
       VLC_ADD_PLUGIN([crystalhd])
@@ -2481,7 +2491,7 @@ dnl
 dnl libva needs avcodec
 dnl
 AC_ARG_ENABLE(libva,
-  [  --enable-libva          libva VAAPI support (default auto)])
+  [  --enable-libva          VAAPI GPU decoding support (libVA) (default auto)])
 
 AS_IF([test "${enable_libva}" != "no"], [
   AS_IF([test "x${have_avcodec}" = "xyes"], [
@@ -2517,7 +2527,7 @@ dnl
 dnl dxva2 needs avcodec
 dnl
 AC_ARG_ENABLE(dxva2,
-  [  --enable-dxva2          DxVA2  support (default auto)])
+  [  --enable-dxva2          DxVA2 GPU decoding support (default auto)])
 
 AS_IF([test "${enable_dxva2}" != "no"], [
   if test "${SYS}" = "mingw32"; then
@@ -2719,18 +2729,9 @@ dnl
 dnl  Real plugin
 dnl
 AC_ARG_ENABLE(real,
-  [  --enable-real           Real media module (default disabled)])
+  [  --enable-real           Real video decoder module (default disabled)])
 if test "${enable_real}" = "yes"; then
   VLC_ADD_PLUGIN([realvideo])
-fi
-
-dnl
-dnl  Real RTSP plugin
-dnl
-AC_ARG_ENABLE(realrtsp,
-  [  --enable-realrtsp       Real RTSP module (default disabled)])
-if test "${enable_realrtsp}" = "yes"; then
-  VLC_ADD_PLUGIN([access_realrtsp])
 fi
 
 dnl
@@ -2947,11 +2948,6 @@ dnl
 PKG_ENABLE_MODULES_VLC([FLUIDSYNTH], [], [fluidsynth], [MIDI synthetiser with libfluidsynth], [auto])
 
 dnl
-dnl libsamplerate plugin
-dnl
-PKG_ENABLE_MODULES_VLC([SAMPLERATE], [], [samplerate], [Resampler with libsamplerate], [auto])
-
-dnl
 dnl Teletext Modules
 dnl vbi decoder plugin (using libzbvi)
 dnl telx module
@@ -3156,6 +3152,20 @@ then
    ])
 fi
 
+
+dnl
+dnl Mac Vout
+AC_ARG_ENABLE(macosx-vout,
+  [  --enable-macosx-vout    Mac OS X video output module (default enabled on Mac OS X)])
+if test "x${enable_macosx_vout}" != "xno" &&
+  (test "${SYS}" = "darwin" || test "${enable_macosx_vout}" = "yes")
+then
+  VLC_ADD_LIBS([vout_macosx],[-Wl,-framework,Cocoa])
+  VLC_ADD_LIBS([vout_macosx],[-Wl,-framework,OpenGL])
+  VLC_ADD_PLUGIN([vout_macosx])
+fi
+
+
 dnl
 dnl  freetype module
 dnl
@@ -3207,10 +3217,18 @@ if test "${enable_freetype}" != "no"; then
   ])
 fi
 
+
 dnl
-dnl  libxml2 module
+dnl  QuartzText vout module (iOS/Mac OS)
 dnl
-PKG_ENABLE_MODULES_VLC([LIBXML2], [xml], [libxml-2.0 >= 2.5], [libxml2 support],[auto])
+AC_ARG_ENABLE(macosx-quartztext,
+  [  --enable-macosx-quartztext   Mac OS X quartz text module (default enabled on Mac OS X)])
+if test "x${enable_macosx_quartztext}" != "xno" &&
+  (test "${SYS}" = "darwin" || test "${enable_macosx_quartztext}" = "yes")
+then
+  VLC_ADD_PLUGIN([quartztext])
+  VLC_ADD_LIBS([quartztext],[-Wl,-framework,ApplicationServices])
+fi
 
 dnl
 dnl  SVG module
@@ -3240,18 +3258,6 @@ then
   VLC_ADD_PLUGIN([vout_ios])
   VLC_ADD_CFLAGS([vout_ios], [-DUSE_OPENGL_ES=1])
   VLC_ADD_LIBS([vout_ios], [-Wl,-framework,OpenGLES,-framework,QuartzCore,-framework,UIKit,-framework,Foundation])
-fi
-
-dnl
-dnl  QuartzText vout module (iOS/Mac OS)
-dnl
-AC_ARG_ENABLE(macosx-quartztext,
-  [  --enable-macosx-quartztext   Mac OS X quartz text module (default enabled on Mac OS X)])
-if test "x${enable_macosx_quartztext}" != "xno" &&
-  (test "${SYS}" = "darwin" || test "${enable_macosx_quartztext}" = "yes")
-then
-  VLC_ADD_PLUGIN([quartztext])
-  VLC_ADD_LIBS([quartztext],[-Wl,-framework,ApplicationServices])
 fi
 
 dnl
@@ -3291,7 +3297,7 @@ dnl
 dnl  Windows Direct2D plugin
 dnl
 AC_ARG_ENABLE(direct2d,
-  [  --enable-direct2d         Win7/VistaPU Direct2D support (default auto on Win32)],, [
+  [  --enable-direct2d       Win7/VistaPU Direct2D support (default auto on Win32)],, [
   AS_IF([test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"], [
     enable_direct2d="no"
   ])
@@ -3541,7 +3547,7 @@ dnl
 dnl  AudioQueue plugin
 dnl
 AC_ARG_ENABLE(audioqueue,
-  [  --enable-audioqueue       AudioQueue audio module (default disabled)])
+  [  --enable-audioqueue     AudioQueue audio module (default disabled)])
 if test "${enable_audioqueue}" = "yes"
 then
   VLC_ADD_PLUGIN([audioqueue])
@@ -3567,10 +3573,9 @@ if test "${HAVE_ANDROID}" = "1"; then
 fi
 
 dnl
-dnl UPnP Plugin (Intel SDK)
+dnl libsamplerate plugin
 dnl
-PKG_ENABLE_MODULES_VLC([UPNP], [upnp], [libupnp], [Intel UPnp SDK],[auto])
-VLC_ADD_CXXFLAGS([upnp],[${UPNP_CFLAGS}])
+PKG_ENABLE_MODULES_VLC([SAMPLERATE], [], [samplerate], [Resampler with libsamplerate], [auto])
 
 dnl
 dnl  Interface plugins
@@ -3719,7 +3724,7 @@ AS_IF([test "${enable_skins2}" != "no" && test "x$enable_qt4" = "xno"], [
 ])
 
 dnl
-dnl  MacOS X video output/gui modules
+dnl  MacOS X gui module
 dnl
 AC_ARG_ENABLE(macosx,
   [  --enable-macosx         Mac OS X gui support (default enabled on Mac OS X)])
@@ -3746,19 +3751,8 @@ then
 fi
 
 dnl
-dnl  MacOS X related modules
+dnl  MacOS X dialor provider
 dnl
-
-AC_ARG_ENABLE(macosx-vout,
-  [  --enable-macosx-vout    Mac OS X video output module (default enabled on Mac OS X)])
-if test "x${enable_macosx_vout}" != "xno" &&
-  (test "${SYS}" = "darwin" || test "${enable_macosx_vout}" = "yes")
-then
-  VLC_ADD_LIBS([vout_macosx],[-Wl,-framework,Cocoa])
-  VLC_ADD_LIBS([vout_macosx],[-Wl,-framework,OpenGL])
-  VLC_ADD_PLUGIN([vout_macosx])
-fi
-
 AC_ARG_ENABLE(macosx-dialog-provider,
   [  --enable-macosx-dialog-provider Mac OS X dialog module (default enabled on Mac OS X)])
 if test "x${enable_macosx_dialog_provider}" != "xno" &&
@@ -3767,33 +3761,6 @@ then
   VLC_ADD_LIBS([macosx_dialog_provider],[-Wl,-framework,Cocoa])
   VLC_ADD_PLUGIN([macosx_dialog_provider])
 fi
-
-AC_ARG_ENABLE(macosx-qtcapture,
-  [  --enable-macosx-qtcapture Mac OS X qtcapture (iSight) module (default enabled on Mac OS X)])
-if test "x${enable_macosx_qtcapture}" != "xno" &&
-  (test "${SYS}" = "darwin" || test "${enable_macosx_qtcapture}" = "yes")
-then
-  VLC_ADD_LIBS([qtcapture], [-Wl,-framework,Cocoa])
-  VLC_ADD_LIBS([qtcapture], [-Wl,-framework,QTKit])
-  VLC_ADD_LIBS([qtcapture], [-Wl,-framework,CoreAudio])
-  VLC_ADD_LIBS([qtcapture], [-Wl,-framework,QuartzCore])
-  VLC_ADD_LIBS([qtcapture], [-Wl,-framework,CoreVideo])
-  VLC_ADD_PLUGIN([qtcapture])
-fi
-
-AC_ARG_ENABLE(macosx-eyetv,
-  [  --enable-macosx-eyetv   Mac OS X EyeTV (TNT Tuner) module (default enabled on Mac OS X)])
-if test "x${enable_macosx_eyetv}" != "xno" &&
-  (test "${SYS}" = "darwin" || test "${enable_macosx_eyetv}" = "yes")
-then
-  VLC_ADD_LIBS([access_eyetv], [-Wl,-framework,Foundation])
-  VLC_ADD_PLUGIN([access_eyetv])
-fi
-
-AC_ARG_ENABLE(macosx-vlc-app,
-  [  --enable-macosx-vlc-app build the VLC media player (default enabled on Mac OS X)])
-AM_CONDITIONAL(BUILD_MACOSX_VLC_APP, [test "${enable_macosx_vlc_app}" != "no" &&
-    (test "${SYS}" = "darwin" || test "${enable_macosx_vlc_app}" = "yes") ])
 
 dnl
 dnl  ncurses module
@@ -3853,6 +3820,22 @@ then
 fi
 
 dnl
+dnl  Lirc plugin
+dnl
+AC_ARG_ENABLE(lirc,
+  [  --enable-lirc           lirc support (default disabled)])
+if test "${enable_lirc}" = "yes"
+then
+  AC_CHECK_HEADER(lirc/lirc_client.h, AC_CHECK_LIB(lirc_client, lirc_init, have_lirc="true", have_lirc="false"),have_lirc="false")
+  if test "${have_lirc}" = "true"
+  then
+    VLC_ADD_PLUGIN([lirc])
+    VLC_ADD_LIBS([lirc],[-llirc_client])
+  fi
+fi
+
+EXTEND_HELP_STRING([Visualisations and Video filter plugins:])
+dnl
 dnl Visualisation plugin
 dnl
 AC_ARG_ENABLE(visual,
@@ -3871,7 +3854,7 @@ dnl
 dnl libprojectM visualization plugin
 dnl
 AC_ARG_ENABLE(projectm,
-  [  --enable-projectm          projectM visualization plugin (default enabled)])
+  [  --enable-projectm       projectM visualization plugin (default enabled)])
 AS_IF([test "${enable_projectm}" != "no"],
   [
     PKG_CHECK_MODULES(PROJECTM, libprojectM,
@@ -3902,6 +3885,7 @@ AS_IF([test "${enable_atmo}" != no], [
   ])
 ])
 
+EXTEND_HELP_STRING([Service Discovery plugins:])
 dnl
 dnl  Bonjour services discovery
 PKG_ENABLE_MODULES_VLC([BONJOUR], [], [avahi-client >= 0.6], [Bonjour services discovery], [auto])
@@ -3915,21 +3899,18 @@ dnl MTP devices services discovery
 PKG_ENABLE_MODULES_VLC([MTP], [mtp access_mtp], [libmtp >= 1.0.0], [MTP devices support], [auto])
 
 dnl
-dnl  Lirc plugin
+dnl UPnP Plugin (Intel SDK)
 dnl
-AC_ARG_ENABLE(lirc,
-  [  --enable-lirc           lirc support (default disabled)])
-if test "${enable_lirc}" = "yes"
-then
-  AC_CHECK_HEADER(lirc/lirc_client.h, AC_CHECK_LIB(lirc_client, lirc_init, have_lirc="true", have_lirc="false"),have_lirc="false")
-  if test "${have_lirc}" = "true"
-  then
-    VLC_ADD_PLUGIN([lirc])
-    VLC_ADD_LIBS([lirc],[-llirc_client])
-  fi
-fi
+PKG_ENABLE_MODULES_VLC([UPNP], [upnp], [libupnp], [Intel UPNP SDK],[auto])
+VLC_ADD_CXXFLAGS([upnp],[${UPNP_CFLAGS}])
 
 EXTEND_HELP_STRING([Misc options:])
+
+dnl
+dnl  libxml2 module
+dnl
+PKG_ENABLE_MODULES_VLC([LIBXML2], [xml], [libxml-2.0 >= 2.5], [libxml2 support],[auto])
+
 
 dnl
 dnl libgcrypt
@@ -4034,6 +4015,22 @@ AS_IF([test -f "/etc/maemo_version"], [
 
 
 dnl
+dnl Taglib plugin
+dnl
+AC_ARG_ENABLE(taglib,
+  [AS_HELP_STRING([--disable-taglib],
+    [do not use TagLib (default enabled)])])
+AS_IF([test "${enable_taglib}" != "no"], [
+  PKG_CHECK_MODULES(TAGLIB, taglib >= 1.5, [
+    VLC_ADD_PLUGIN([taglib])
+    VLC_ADD_LIBS([taglib],[$TAGLIB_LIBS -lz])
+    VLC_ADD_CXXFLAGS([taglib],[$TAGLIB_CFLAGS])
+  ], [
+    AC_MSG_WARN(TagLib library not found)])
+])
+
+
+dnl
 dnl update checking system
 dnl
 AC_ARG_ENABLE(update-check,
@@ -4083,9 +4080,31 @@ fi
 AM_CONDITIONAL([HAVE_SQLITE], [test "${enable_sqlite}" != "no"])
 
 dnl
+dnl Growl notification plugin
+dnl
+AC_ARG_ENABLE(growl,
+  [  --enable-growl          growl notification plugin (default disabled)],,
+  [enable_growl=no])
+AS_IF([test "${enable_growl}" != "no"], [
+    AC_CHECK_HEADERS(${CONTRIB_DIR}/Growl/Growl.framework/Versions/A/Headers/GrowlDefines.h, [
+      VLC_ADD_PLUGIN([growl])
+      VLC_ADD_LIBS([growl], [-F${CONTRIB_DIR}/Growl -Wl,-framework,Growl,-framework,CoreFoundation])
+      VLC_ADD_OBJCFLAGS([growl], [-F${CONTRIB_DIR}/Growl])
+      VLC_ADD_OBJCFLAGS([growl], [-fobjc-exceptions] )
+    ])
+  ]
+)
+
+dnl
+dnl Libnotify notification plugin
+dnl
+PKG_ENABLE_MODULES_VLC([NOTIFY], [], [libnotify gtk+-2.0], [libnotify notification], [auto])
+
+dnl
 dnl media library
 dnl
-AC_ARG_ENABLE(media-library, [--enable-media-library media library (default disabled)])
+AC_ARG_ENABLE(media-library,
+    [  --enable-media-library  media library (default disabled)])
 if test "${enable_media_library}" = "yes"; then
     if test "${enable_sqlite}" != "yes"; then
        AC_MSG_ERROR([SQLite module is required for the media library])
@@ -4161,6 +4180,11 @@ dnl
 AC_ARG_ENABLE(vlc,
   [  --enable-vlc            build the VLC media player (default enabled)])
 AM_CONDITIONAL(BUILD_VLC, [test "${enable_vlc}" != "no"])
+
+AC_ARG_ENABLE(macosx-vlc-app,
+  [  --enable-macosx-vlc-app build the VLC media player (default enabled on Mac OS X)])
+AM_CONDITIONAL(BUILD_MACOSX_VLC_APP, [test "${enable_macosx_vlc_app}" != "no" &&
+    (test "${SYS}" = "darwin" || test "${enable_macosx_vlc_app}" = "yes") ])
 
 
 dnl
