@@ -891,6 +891,7 @@ static const entry_t p_list_video[] = {
         A("MJP2"),
         A("MJ2C"),
         A("LJ2C"),
+        A("LJ2K"),
 
     B(VLC_CODEC_LAGARITH, "Lagarith Lossless"),
         A("LAGS"),
