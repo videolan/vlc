@@ -860,8 +860,14 @@ static int OpenGeneric( vlc_object_t *p_this, bool b_encode )
     }
 
     /* Try to load and initialise a component */
+    omx_error = OMX_ErrorUndefined;
     for(i = 0; i < p_sys->components; i++)
     {
+#ifdef __ANDROID__
+        /* ignore OpenCore software codecs */
+        if (!strncmp(p_sys->ppsz_components[i], "OMX.PV.", 7))
+            continue;
+#endif
         omx_error = InitialiseComponent(p_dec, p_sys->ppsz_components[i],
                                         &p_sys->omx_handle);
         if(omx_error == OMX_ErrorNone) break;
