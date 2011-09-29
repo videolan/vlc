@@ -696,7 +696,7 @@ void ExtV4l2::Refresh( void )
     }
     if( p_obj )
     {
-        vlc_value_t val, text, name;
+        vlc_value_t val, text;
         int i_ret = var_Change( p_obj, "controls", VLC_VAR_GETCHOICES,
                                 &val, &text );
         if( i_ret < 0 )
@@ -714,18 +714,23 @@ void ExtV4l2::Refresh( void )
 
         for( int i = 0; i < val.p_list->i_count; i++ )
         {
+            vlc_value_t vartext;
             const char *psz_var = text.p_list->p_values[i].psz_string;
-            var_Change( p_obj, psz_var, VLC_VAR_GETTEXT, &name, NULL );
-            const char *psz_label = name.psz_string;
+
+            if( var_Change( p_obj, psz_var, VLC_VAR_GETTEXT, &vartext, NULL ) )
+                continue;
+
+            QString name = qtr( vartext.psz_string );
+            free( vartext.psz_string );
             msg_Dbg( p_intf, "v4l2 control \"%"PRIx64"\": %s (%s)",
-                     val.p_list->p_values[i].i_int, psz_var, name.psz_string );
+                     val.p_list->p_values[i].i_int, psz_var, qtu( name ) );
 
             int i_type = var_Type( p_obj, psz_var );
             switch( i_type & VLC_VAR_TYPE )
             {
                 case VLC_VAR_INTEGER:
                 {
-                    QLabel *label = new QLabel( qtr( psz_label ), box );
+                    QLabel *label = new QLabel( name, box );
                     QHBoxLayout *hlayout = new QHBoxLayout();
                     hlayout->addWidget( label );
                     int i_val = var_GetInteger( p_obj, psz_var );
@@ -777,7 +782,7 @@ void ExtV4l2::Refresh( void )
                 }
                 case VLC_VAR_BOOL:
                 {
-                    QCheckBox *button = new QCheckBox( qtr( psz_label ), box );
+                    QCheckBox *button = new QCheckBox( name, box );
                     button->setObjectName( qtr( psz_var ) );
                     button->setChecked( var_GetBool( p_obj, psz_var ) );
 
@@ -790,7 +795,7 @@ void ExtV4l2::Refresh( void )
                 {
                     if( i_type & VLC_VAR_ISCOMMAND )
                     {
-                        QPushButton *button = new QPushButton( qtr( psz_label ), box );
+                        QPushButton *button = new QPushButton( name, box );
                         button->setObjectName( qtr( psz_var ) );
 
                         CONNECT( button, clicked( bool ), this,
@@ -799,7 +804,7 @@ void ExtV4l2::Refresh( void )
                     }
                     else
                     {
-                        QLabel *label = new QLabel( qtr( psz_label ), box );
+                        QLabel *label = new QLabel( name, box );
                         layout->addWidget( label );
                     }
                     break;
@@ -808,7 +813,6 @@ void ExtV4l2::Refresh( void )
                     msg_Warn( p_intf, "Unhandled var type for %s", psz_var );
                     break;
             }
-            free( name.psz_string );
         }
         var_FreeList( &val, &text );
         vlc_object_release( p_obj );
