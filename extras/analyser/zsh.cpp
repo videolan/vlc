@@ -29,26 +29,19 @@
 #include <map>
 #include <string>
 #include <sstream>
-#include <utility>
-#include <iostream>
-#include <algorithm>
+
+#include <vlc/vlc.h>
+#include <vlc_common.h>
+#include <vlc_modules.h>
+#include "../src/modules/modules.h" /* evil hack */
 
 typedef std::pair<std::string, std::string> mpair;
 typedef std::multimap<std::string, std::string> mumap;
-mumap mods;
+mumap capabilities;
 
 typedef std::pair<int, std::string> mcpair;
 typedef std::multimap<int, std::string> mcmap;
-mcmap mods2;
-
-
-#include <vlc_common.h>
-#include <vlc/vlc.h>
-#include <vlc_modules.h>
-
-/* evil hack */
-#undef __PLUGIN__
-#include <../src/modules/modules.h>
+mcmap categories;
 
 static void ReplaceChars(char *str)
 {
@@ -114,27 +107,23 @@ static void ParseOption(const module_config_t *item)
     switch(item->i_type)
     {
     case CONFIG_ITEM_MODULE:
-        range_mod = mods.equal_range(item->psz_type);
-        list = (*range_mod.first).second;
-        if (range_mod.first != range_mod.second) {
-            while (range_mod.first++ != range_mod.second)
-                list += " " + range_mod.first->second;
-            args = std::string("(") + list + ")";
-        }
+        range_mod = capabilities.equal_range(item->psz_type);
+        args = "(" + (*range_mod.first).second;
+        while (range_mod.first++ != range_mod.second)
+            args += " " + range_mod.first->second;
+        args += ")";
     break;
 
     case CONFIG_ITEM_MODULE_CAT:
-        range = mods2.equal_range(item->min.i);
-        list = (*range.first).second;
-        if (range.first != range.second) {
-            while (range.first++ != range.second)
-                list += " " + range.first->second;
-            args = std::string("(") + list + ")";
-        }
+        range = categories.equal_range(item->min.i);
+        args = "(" + (*range.first).second;
+        while (range.first++ != range.second)
+            args += " " + range.first->second;
+        args += ")";
     break;
 
     case CONFIG_ITEM_MODULE_LIST_CAT:
-        range = mods2.equal_range(item->min.i);
+        range = categories.equal_range(item->min.i);
         args = std::string("_values -s , ") + item->psz_name;
         while (range.first != range.second)
             args += " '*" + range.first++->second + "'";
@@ -200,60 +189,33 @@ static void ParseOption(const module_config_t *item)
     PrintOption(item, item->psz_name, "", args);
 }
 
-static void PrintModuleList()
+static void PrintModule(const module_t *mod)
 {
-    printf("vlc_modules=\"");
-
-    size_t modules = 0;
-    module_t **list = module_list_get(&modules);
-
-    if (!list || modules == 0)
+    const char *name = mod->pp_shortcuts[0];
+    if (!strcmp(name, "main"))
         return;
 
-    for (module_t **pmod = list; pmod < &list[modules]; pmod++) {
-        /* Exclude empty plugins (submodules don't have config options, they
-         * are stored in the parent module) */
+    if (mod->psz_capability)
+        capabilities.insert(mpair(mod->psz_capability, name));
 
-        module_t *mod = *pmod;
-        if (!strcmp(mod->pp_shortcuts[0], "main"))
-            continue;
+    module_config_t *max = &mod->p_config[mod->i_config_items];
+    for (module_config_t *cfg = mod->p_config; cfg && cfg < max; cfg++)
+        if (cfg->i_type == CONFIG_SUBCATEGORY)
+            categories.insert(mcpair(cfg->value.i, name));
 
-        const char *capability = mod->psz_capability ? mod->psz_capability : "";
-        mods.insert(mpair(capability, mod->pp_shortcuts[0]));
-
-        module_config_t *max = &mod->p_config[mod->i_config_items];
-        for (module_config_t *cfg = mod->p_config; cfg && cfg < max; cfg++)
-            if (cfg->i_type == CONFIG_SUBCATEGORY)
-                mods2.insert(mcpair(cfg->value.i, mod->pp_shortcuts[0]));
-
-        if (!mod->parent)
-            printf("%s ", mod->pp_shortcuts[0]);
-    }
-    puts("\"\n");
-    module_list_free(list);
+    if (!mod->parent)
+        printf("%s ", name);
 }
 
-static void ParseModules()
+static void ParseModule(const module_t *mod)
 {
-    size_t modules = 0;
-    module_t **list = module_list_get(&modules);
-
-    if (!list || modules == 0)
+    if (mod->parent)
         return;
 
-    for (module_t **pmod = list; pmod < &list[modules]; pmod++) {
-        /* Exclude empty plugins (submodules don't have config options, they
-         * are stored in the parent module) */
-        module_t *mod = *pmod;
-        if (mod->parent)
-            continue;
-
-        module_config_t *max = mod->p_config + mod->confsize;
-        for (module_config_t *cfg = mod->p_config; cfg && cfg < max; cfg++)
-            if (CONFIG_ITEM(cfg->i_type))
-                ParseOption(cfg);
-    }
-    module_list_free(list);
+    module_config_t *max = mod->p_config + mod->confsize;
+    for (module_config_t *cfg = mod->p_config; cfg && cfg < max; cfg++)
+        if (CONFIG_ITEM(cfg->i_type))
+            ParseOption(cfg);
 }
 
 int main(int argc, const char **argv)
@@ -262,16 +224,29 @@ int main(int argc, const char **argv)
     if (!libvlc)
         return 1;
 
+    size_t modules = 0;
+    module_t **mod_list;
+
+    mod_list = module_list_get(&modules);
+    if (!mod_list || modules == 0)
+        return 2;
+
+    module_t **max = &mod_list[modules];
+
     puts("#compdef vlc cvlc rvlc svlc mvlc qvlc nvlc\n"
            "#This file is autogenerated by zsh.cpp"
            "typeset -A opt_args"
            "local context state line ret=1"
            "local modules\n");
 
-    PrintModuleList();
+    printf("vlc_modules=\"");
+    for (module_t **mod = mod_list; mod < max; mod++)
+        PrintModule(*mod);
+    puts("\"\n");
 
     puts("_arguments -S -s \\");
-    ParseModules();
+    for (module_t **mod = mod_list; mod < max; mod++)
+        ParseModule(*mod);
     puts("  \"(--module)-p[print help on module]:print help on module:($vlc_modules)\"\\");
     puts("  \"(-p)--module[print help on module]:print help on module:($vlc_modules)\"\\");
     puts("  \"(--help)-h[print help]\"\\");
@@ -294,7 +269,7 @@ int main(int argc, const char **argv)
 
     puts("return ret");
 
+    module_list_free(mod_list);
     libvlc_release(libvlc);
-
     return 0;
 }
