@@ -929,6 +929,7 @@ int dvb_set_isdbs (dvb_device_t *d, uint64_t freq_Hz, uint16_t ts_id)
 
 
 /*** ISDB-T ***/
+#if DVBv5(1)
 static int dvb_set_isdbt_layer (dvb_device_t *d, unsigned num,
                                 const isdbt_layer_t *l)
 {
@@ -945,6 +946,7 @@ static int dvb_set_isdbt_layer (dvb_device_t *d, unsigned num,
                           DTV_ISDBT_LAYERA_SEGMENT_COUNT + num, count,
                           DTV_ISDBT_LAYERA_TIME_INTERLEAVING + num, ti);
 }
+#endif
 
 int dvb_set_isdbt (dvb_device_t *d, uint32_t freq, uint32_t bandwidth,
                    int transmit_mode, uint32_t guard,
@@ -967,6 +969,10 @@ int dvb_set_isdbt (dvb_device_t *d, uint32_t freq, uint32_t bandwidth,
     return 0;
 #else
 # warning ISDB-T needs Linux DVB version 5.1 or later.
+    msg_Err (d->obj, "ISDB-T support not compiled-in");
+    (void) freq; (void) bandwidth; (void) transmit_mode; (void) guard;
+    (void) layers;
+    return -1;
 #endif
 }
 
