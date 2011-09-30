@@ -28,6 +28,13 @@ libvlc_LTLIBRARIES += \
 	libxscreensaver_plugin.la
 endif
 
+libmce_plugin_la_SOURCES = inhibit/mce.c
+libmce_plugin_la_CFLAGS = $(AM_CLFAGS) $(DBUS_CFLAGS) $(MCE_CFLAGS)
+libmce_plugin_la_LIBADD = $(AM_LIBADD) $(DBUS_LIBS) $(MCE_LIBS)
+libmce_plugin_la_DEPENDENCIES =
+EXTRA_LTLIBRARIES += libmce_plugin.la
+libvlc_LTLIBRARIES += $(LTLIBmce)
+
 SOURCES_osso_screensaver = inhibit/osso.c
 
 libvlc_LTLIBRARIES += \

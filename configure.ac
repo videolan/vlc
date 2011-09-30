@@ -4009,6 +4009,12 @@ AS_IF([test "${have_libgcrypt}" = "yes"], [
 
 
 dnl
+dnl Nokia MCE plugin (Maemo screen unblanking)
+dnl
+PKG_CHECK_MODULES([MCE], [dbus-1 mce], [VLC_ADD_PLUGIN([mce])], [true])
+
+
+dnl
 dnl OSSO (Maemo screen blanking) plugin
 dnl
 PKG_ENABLE_MODULES_VLC([OSSO_SCREENSAVER], [], [libosso], [Maemo support], [auto])
