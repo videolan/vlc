@@ -182,8 +182,12 @@ download_git = \
 	(cd $(dir $@) && \
 	 tar cvJ $(notdir $(@:.tar.xz=))) > $@ && \
 	rm -Rf $(@:.tar.xz=)
-checksum = (cd $(TARBALLS) && $(1) --check /dev/stdin) < \
-		$(SRC)/$(patsubst .sum-%,%,$@)/$(2)SUMS
+checksum = \
+	$(foreach f,$(filter $(TARBALLS)/%,$^), \
+		grep -- " $(f:$(TARBALLS)/%=%)$$" \
+			"$(SRC)/$(patsubst .sum-%,%,$@)/$(2)SUMS" &&) \
+	(cd $(TARBALLS) && $(1) --check /dev/stdin) < \
+		"$(SRC)/$(patsubst .sum-%,%,$@)/$(2)SUMS"
 CHECK_SHA512 = $(call checksum,$(SHA512SUM),SHA512)
 UNPACK = $(RM) -R $@ \
 	$(foreach f,$(filter %.tar.gz %.tgz,$^), && tar xvzf $(f)) \
