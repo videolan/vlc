@@ -914,7 +914,6 @@ modules/misc/dhparams.h
 modules/misc/gnutls.c
 modules/misc/inhibit.c
 modules/misc/inhibit/mce.c
-modules/misc/inhibit/osso.c
 modules/misc/inhibit/xdg.c
 modules/misc/inhibit/xscreensaver.c
 modules/misc/logger.c

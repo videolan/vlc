@@ -4014,11 +4014,6 @@ dnl
 PKG_CHECK_MODULES([MCE], [dbus-1 mce], [VLC_ADD_PLUGIN([mce])], [true])
 
 
-dnl
-dnl OSSO (Maemo screen blanking) plugin
-dnl
-PKG_ENABLE_MODULES_VLC([OSSO_SCREENSAVER], [], [libosso], [Maemo support], [auto])
-
 AS_IF([test -f "/etc/maemo_version"], [
   AC_DEFINE([HAVE_MAEMO], 1, [Define to 1 if building for the Maemo platform.])
 ])

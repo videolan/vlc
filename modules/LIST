@@ -235,7 +235,6 @@ $Id$
  * osd_parser: OSD import module
  * osdmenu: video_filter for displaying and streaming a On Screen Display menu
  * oss: audio output module using the OSS /dev/dsp interface
- * osso_screensaver: Maemo screen unblanking module
  * packetizer_copy: Simple copy packetizer
  * packetizer_dirac: Dirac video packetizer
  * packetizer_flac: FLAC audio packetizer

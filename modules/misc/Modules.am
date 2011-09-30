@@ -35,8 +35,6 @@ libmce_plugin_la_DEPENDENCIES =
 EXTRA_LTLIBRARIES += libmce_plugin.la
 libvlc_LTLIBRARIES += $(LTLIBmce)
 
-SOURCES_osso_screensaver = inhibit/osso.c
-
 libvlc_LTLIBRARIES += \
 	libaudioscrobbler_plugin.la \
 	liblogger_plugin.la
