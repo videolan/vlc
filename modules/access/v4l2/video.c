@@ -107,10 +107,6 @@
 #define AUTOWHITEBALANCE_LONGTEXT N_( \
     "Automatically set the white balance of the video input " \
     "(if supported by the v4l2 driver)." )
-#define DOWHITEBALANCE_TEXT N_( "Do white balance" )
-#define DOWHITEBALANCE_LONGTEXT N_( \
-    "Trigger a white balancing action, useless if auto white balance is " \
-    "activated (if supported by the v4l2 driver)." )
 #define REDBALANCE_TEXT N_( "Red balance" )
 #define REDBALANCE_LONGTEXT N_( \
     "Red balance of the video input (if supported by the v4l2 driver)." )
@@ -335,8 +331,7 @@ vlc_module_begin ()
     add_integer( CFG_PREFIX "auto-white-balance", -1,
                  AUTOWHITEBALANCE_TEXT, AUTOWHITEBALANCE_LONGTEXT, true )
         change_integer_list( tristate_vlc, tristate_user )
-    add_integer( CFG_PREFIX "do-white-balance", -1, DOWHITEBALANCE_TEXT,
-                 DOWHITEBALANCE_LONGTEXT, true )
+    add_obsolete_integer( CFG_PREFIX"do-white-balance" ) /* since 1.2.0 */
     add_integer( CFG_PREFIX "red-balance", -1, REDBALANCE_TEXT,
                  REDBALANCE_LONGTEXT, true )
     add_integer( CFG_PREFIX "blue-balance", -1, BLUEBALANCE_TEXT,
