@@ -62,8 +62,6 @@ static const vlc_v4l2_ctrl_name_t controls[] =
     { "gain", V4L2_CID_GAIN },
     { "hflip", V4L2_CID_HFLIP },
     { "vflip", V4L2_CID_VFLIP },
-    { "hcenter", V4L2_CID_HCENTER },
-    { "vcenter", V4L2_CID_VCENTER },
     /* TODO: add more standardized controls */
 #define CTRL_CID_KNOWN(cid) \
     ((((uint32_t)cid) - V4L2_CID_BRIGHTNESS) \

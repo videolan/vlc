@@ -139,12 +139,6 @@
 #define VFLIP_TEXT N_( "Vertical flip" )
 #define VFLIP_LONGTEXT N_( \
     "Flip the video vertically (if supported by the v4l2 driver)." )
-#define HCENTER_TEXT N_( "Horizontal centering" )
-#define HCENTER_LONGTEXT N_( \
-    "Set the camera's horizontal centering (if supported by the v4l2 driver)." )
-#define VCENTER_TEXT N_( "Vertical centering" )
-#define VCENTER_LONGTEXT N_( \
-    "Set the camera's vertical centering (if supported by the v4l2 driver)." )
 
 #define AUDIO_VOLUME_TEXT N_( "Volume" )
 #define AUDIO_VOLUME_LONGTEXT N_( \
@@ -362,10 +356,8 @@ vlc_module_begin ()
                  GAIN_LONGTEXT, true )
     add_bool( CFG_PREFIX "hflip", false, HFLIP_TEXT, HFLIP_LONGTEXT, true )
     add_bool( CFG_PREFIX "vflip", false, VFLIP_TEXT, VFLIP_LONGTEXT, true )
-    add_integer( CFG_PREFIX "hcenter", -1, HCENTER_TEXT,
-                 HCENTER_LONGTEXT, true )
-    add_integer( CFG_PREFIX "vcenter", -1, VCENTER_TEXT,
-                 VCENTER_LONGTEXT, true )
+    add_obsolete_integer( CFG_PREFIX "hcenter" ) /* since Linux 2.6.26 */
+    add_obsolete_integer( CFG_PREFIX "vcenter" ) /* since Linux 2.6.26 */
     add_integer( CFG_PREFIX "audio-volume", -1, AUDIO_VOLUME_TEXT,
                 AUDIO_VOLUME_LONGTEXT, true )
     add_integer( CFG_PREFIX "audio-balance", -1, AUDIO_BALANCE_TEXT,
