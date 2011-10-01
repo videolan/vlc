@@ -126,9 +126,9 @@
 #define EXPOSURE_TEXT N_( "Exposure" )
 #define EXPOSURE_LONGTEXT N_( \
     "Exposure of the video input (if supported by the v4L2 driver)." )
-#define AUTOGAIN_TEXT N_( "Auto gain" )
+#define AUTOGAIN_TEXT N_( "Automatic gain/exposure" )
 #define AUTOGAIN_LONGTEXT N_( \
-    "Automatically set the video input's gain (if supported by the " \
+    "Automatically set the video gain/exposure (if supported by the " \
     "v4l2 driver)." )
 #define GAIN_TEXT N_( "Gain" )
 #define GAIN_LONGTEXT N_( \
@@ -161,9 +161,9 @@
 #define AUDIO_TREBLE_TEXT N_( "Treble" )
 #define AUDIO_TREBLE_LONGTEXT N_( \
     "Treble level of the audio input (if supported by the v4l2 driver)." )
-#define AUDIO_LOUDNESS_TEXT N_( "Loudness" )
+#define AUDIO_LOUDNESS_TEXT N_( "Loudness mode" )
 #define AUDIO_LOUDNESS_LONGTEXT N_( \
-    "Loudness of the audio input (if supported by the v4l2 driver)." )
+    "Loudness mode a.k.a. bass boost (if supported by the v4l2 driver)." )
 
 #define S_CTRLS_TEXT N_("v4l2 driver controls")
 #define S_CTRLS_LONGTEXT N_( \
@@ -360,10 +360,8 @@ vlc_module_begin ()
         change_integer_list( tristate_vlc, tristate_user )
     add_integer( CFG_PREFIX "gain", -1, GAIN_TEXT,
                  GAIN_LONGTEXT, true )
-    add_integer( CFG_PREFIX "hflip", -1, HFLIP_TEXT,
-                 HFLIP_LONGTEXT, true )
-    add_integer( CFG_PREFIX "vflip", -1, VFLIP_TEXT,
-                 VFLIP_LONGTEXT, true )
+    add_bool( CFG_PREFIX "hflip", false, HFLIP_TEXT, HFLIP_LONGTEXT, true )
+    add_bool( CFG_PREFIX "vflip", false, VFLIP_TEXT, VFLIP_LONGTEXT, true )
     add_integer( CFG_PREFIX "hcenter", -1, HCENTER_TEXT,
                  HCENTER_LONGTEXT, true )
     add_integer( CFG_PREFIX "vcenter", -1, VCENTER_TEXT,
@@ -378,8 +376,8 @@ vlc_module_begin ()
                 AUDIO_BASS_LONGTEXT, true )
     add_integer( CFG_PREFIX "audio-treble", -1, AUDIO_TREBLE_TEXT,
                 AUDIO_TREBLE_LONGTEXT, true )
-    add_integer( CFG_PREFIX "audio-loudness", -1, AUDIO_LOUDNESS_TEXT,
-                AUDIO_LOUDNESS_LONGTEXT, true )
+    add_bool( CFG_PREFIX "audio-loudness", false, AUDIO_LOUDNESS_TEXT,
+              AUDIO_LOUDNESS_LONGTEXT, true )
     add_string( CFG_PREFIX "set-ctrls", NULL, S_CTRLS_TEXT,
               S_CTRLS_LONGTEXT, true )
         change_safe()
