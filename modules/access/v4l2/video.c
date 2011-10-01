@@ -88,69 +88,62 @@
     "Force usage of the libv4l2 wrapper." )
 #endif
 
-#define CTRL_RESET_TEXT N_( "Reset v4l2 controls" )
-#define CTRL_RESET_LONGTEXT N_( \
-    "Reset controls to defaults provided by the v4l2 driver." )
+#define CTRL_RESET_TEXT N_( "Reset controls" )
+#define CTRL_RESET_LONGTEXT N_( "Reset controls to defaults." )
 #define BRIGHTNESS_TEXT N_( "Brightness" )
-#define BRIGHTNESS_LONGTEXT N_( \
-    "Brightness of the video input (if supported by the v4l2 driver)." )
+#define BRIGHTNESS_LONGTEXT N_( "Picture brightness or black level." )
 #define CONTRAST_TEXT N_( "Contrast" )
-#define CONTRAST_LONGTEXT N_( \
-    "Contrast of the video input (if supported by the v4l2 driver)." )
+#define CONTRAST_LONGTEXT N_( "Picture contrast or luma gain." )
 #define SATURATION_TEXT N_( "Saturation" )
-#define SATURATION_LONGTEXT N_( \
-    "Saturation of the video input (if supported by the v4l2 driver)." )
+#define SATURATION_LONGTEXT N_( "Picture saturation or chroma gain." )
 #define HUE_TEXT N_( "Hue" )
-#define HUE_LONGTEXT N_( \
-    "Hue of the video input (if supported by the v4l2 driver)." )
-#define AUTOWHITEBALANCE_TEXT N_( "Auto white balance" )
+#define HUE_LONGTEXT N_( "Hue or color balance." )
+#define AUTOWHITEBALANCE_TEXT N_( "Automatic white balance" )
 #define AUTOWHITEBALANCE_LONGTEXT N_( \
-    "Automatically set the white balance of the video input " \
-    "(if supported by the v4l2 driver)." )
+    "Automatically adjust the picture white balance." )
 #define REDBALANCE_TEXT N_( "Red balance" )
 #define REDBALANCE_LONGTEXT N_( \
-    "Red balance of the video input (if supported by the v4l2 driver)." )
+    "Red chroma balance." )
 #define BLUEBALANCE_TEXT N_( "Blue balance" )
 #define BLUEBALANCE_LONGTEXT N_( \
-    "Blue balance of the video input (if supported by the v4l2 driver)." )
+    "Blue chroma balance." )
 #define GAMMA_TEXT N_( "Gamma" )
 #define GAMMA_LONGTEXT N_( \
-    "Gamma of the video input (if supported by the v4l2 driver)." )
+    "Gamma adjust." )
 #define EXPOSURE_TEXT N_( "Exposure" )
 #define EXPOSURE_LONGTEXT N_( \
-    "Exposure of the video input (if supported by the v4L2 driver)." )
+    "Exposure." )
 #define AUTOGAIN_TEXT N_( "Automatic gain/exposure" )
 #define AUTOGAIN_LONGTEXT N_( \
-    "Automatically set the video gain/exposure (if supported by the " \
-    "v4l2 driver)." )
+    "Automatically set the video gain or exposure." )
 #define GAIN_TEXT N_( "Gain" )
 #define GAIN_LONGTEXT N_( \
-    "Video input's gain (if supported by the v4l2 driver)." )
+    "Picture gain." )
 #define HFLIP_TEXT N_( "Horizontal flip" )
 #define HFLIP_LONGTEXT N_( \
-    "Flip the video horizontally (if supported by the v4l2 driver)." )
+    "Flip the picture horizontally." )
 #define VFLIP_TEXT N_( "Vertical flip" )
 #define VFLIP_LONGTEXT N_( \
-    "Flip the video vertically (if supported by the v4l2 driver)." )
+    "Flip the picture vertically." )
 
-#define AUDIO_VOLUME_TEXT N_( "Volume" )
+#define AUDIO_VOLUME_TEXT N_( "Audio volume" )
 #define AUDIO_VOLUME_LONGTEXT N_( \
-    "Volume of the audio input (if supported by the v4l2 driver)." )
-#define AUDIO_BALANCE_TEXT N_( "Balance" )
+    "Volume of the audio input." )
+#define AUDIO_BALANCE_TEXT N_( "Audio balance" )
 #define AUDIO_BALANCE_LONGTEXT N_( \
-    "Balance of the audio input (if supported by the v4l2 driver)." )
+    "Balance of the audio input." )
+#define AUDIO_BASS_TEXT N_( "Bass level" )
+#define AUDIO_BASS_LONGTEXT N_( \
+    "Bass adjustment of the audio input." )
+#define AUDIO_TREBLE_TEXT N_( "Treble level" )
+#define AUDIO_TREBLE_LONGTEXT N_( \
+    "Treble adjustment of the audio input." )
 #define AUDIO_MUTE_TEXT N_( "Mute" )
 #define AUDIO_MUTE_LONGTEXT N_( \
-    "Mute audio input (if supported by the v4l2 driver)." )
-#define AUDIO_BASS_TEXT N_( "Bass" )
-#define AUDIO_BASS_LONGTEXT N_( \
-    "Bass level of the audio input (if supported by the v4l2 driver)." )
-#define AUDIO_TREBLE_TEXT N_( "Treble" )
-#define AUDIO_TREBLE_LONGTEXT N_( \
-    "Treble level of the audio input (if supported by the v4l2 driver)." )
+    "Mute the audio." )
 #define AUDIO_LOUDNESS_TEXT N_( "Loudness mode" )
 #define AUDIO_LOUDNESS_LONGTEXT N_( \
-    "Loudness mode a.k.a. bass boost (if supported by the v4l2 driver)." )
+    "Loudness mode a.k.a. bass boost." )
 
 #define S_CTRLS_TEXT N_("v4l2 driver controls")
 #define S_CTRLS_LONGTEXT N_( \
@@ -315,7 +308,7 @@ vlc_module_begin ()
         change_safe()
 
     set_section( N_( "Controls" ),
-                 N_( "v4l2 driver controls, if supported by your v4l2 driver." ) )
+                 N_( "Video capture controls (if supported by the device)" ) )
     add_bool( CFG_PREFIX "controls-reset", false, CTRL_RESET_TEXT,
               CTRL_RESET_LONGTEXT, true )
         change_safe()
