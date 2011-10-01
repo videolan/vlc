@@ -765,15 +765,18 @@ void ExtV4l2::Refresh( void )
                         vlc_value_t val2;
                         var_Change( p_obj, psz_var, VLC_VAR_GETMIN,
                                     &val2, NULL );
+                        if( val2.i_int < INT_MIN )
+                            val2.i_int = INT_MIN; /* FIXME */
                         slider->setMinimum( val2.i_int );
                         var_Change( p_obj, psz_var, VLC_VAR_GETMAX,
                                     &val2, NULL );
+                        if( val2.i_int > INT_MAX )
+                            val2.i_int = INT_MAX; /* FIXME */
                         slider->setMaximum( val2.i_int );
                         if( !var_Change( p_obj, psz_var, VLC_VAR_GETSTEP,
                                          &val2, NULL ) )
                             slider->setSingleStep( val2.i_int );
                         slider->setValue( i_val );
-
                         CONNECT( slider, valueChanged( int ), this,
                                  ValueChange( int ) );
                         hlayout->addWidget( slider );
