@@ -51,7 +51,6 @@ static const vlc_v4l2_ctrl_name_t controls[] =
     { "audio-treble", V4L2_CID_AUDIO_TREBLE },
     { "audio-mute", V4L2_CID_AUDIO_MUTE },
     { "audio-loudness", V4L2_CID_AUDIO_LOUDNESS },
-    { "black-level", V4L2_CID_BLACK_LEVEL },
     { "auto-white-balance", V4L2_CID_AUTO_WHITE_BALANCE },
     { "do-white-balance", V4L2_CID_DO_WHITE_BALANCE },
     { "red-balance", V4L2_CID_RED_BALANCE },

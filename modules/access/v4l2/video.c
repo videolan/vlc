@@ -103,9 +103,6 @@
 #define HUE_TEXT N_( "Hue" )
 #define HUE_LONGTEXT N_( \
     "Hue of the video input (if supported by the v4l2 driver)." )
-#define BLACKLEVEL_TEXT N_( "Black level" )
-#define BLACKLEVEL_LONGTEXT N_( \
-    "Black level of the video input (if supported by the v4l2 driver)." )
 #define AUTOWHITEBALANCE_TEXT N_( "Auto white balance" )
 #define AUTOWHITEBALANCE_LONGTEXT N_( \
     "Automatically set the white balance of the video input " \
@@ -334,8 +331,7 @@ vlc_module_begin ()
                  SATURATION_LONGTEXT, true )
     add_integer( CFG_PREFIX "hue", -1, HUE_TEXT,
                  HUE_LONGTEXT, true )
-    add_integer( CFG_PREFIX "black-level", -1, BLACKLEVEL_TEXT,
-                 BLACKLEVEL_LONGTEXT, true )
+    add_obsolete_integer( CFG_PREFIX "black-level" ) /* since Linux 2.6.26 */
     add_integer( CFG_PREFIX "auto-white-balance", -1,
                  AUTOWHITEBALANCE_TEXT, AUTOWHITEBALANCE_LONGTEXT, true )
         change_integer_list( tristate_vlc, tristate_user )
