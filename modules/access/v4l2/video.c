@@ -186,6 +186,10 @@
 #define ASPECT_TEXT N_("Picture aspect-ratio n:m")
 #define ASPECT_LONGTEXT N_("Define input picture aspect-ratio to use. Default is 4:3" )
 
+static const int tristate_vlc[] = { -1, 0, 1 };
+static const char *const tristate_user[] = {
+    N_("Unspecified"), N_("Off"), N_("On") };
+
 static const v4l2_std_id standards_v4l2[] = { V4L2_STD_UNKNOWN, V4L2_STD_ALL,
     V4L2_STD_PAL,     V4L2_STD_PAL_BG,   V4L2_STD_PAL_DK,
     V4L2_STD_NTSC,
@@ -340,6 +344,7 @@ vlc_module_begin ()
                  BLACKLEVEL_LONGTEXT, true )
     add_integer( CFG_PREFIX "auto-white-balance", -1,
                  AUTOWHITEBALANCE_TEXT, AUTOWHITEBALANCE_LONGTEXT, true )
+        change_integer_list( tristate_vlc, tristate_user )
     add_integer( CFG_PREFIX "do-white-balance", -1, DOWHITEBALANCE_TEXT,
                  DOWHITEBALANCE_LONGTEXT, true )
     add_integer( CFG_PREFIX "red-balance", -1, REDBALANCE_TEXT,
@@ -352,6 +357,7 @@ vlc_module_begin ()
                  EXPOSURE_LONGTEXT, true )
     add_integer( CFG_PREFIX "autogain", -1, AUTOGAIN_TEXT,
                  AUTOGAIN_LONGTEXT, true )
+        change_integer_list( tristate_vlc, tristate_user )
     add_integer( CFG_PREFIX "gain", -1, GAIN_TEXT,
                  GAIN_LONGTEXT, true )
     add_integer( CFG_PREFIX "hflip", -1, HFLIP_TEXT,
