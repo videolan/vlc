@@ -104,12 +104,21 @@ static int ControlSetCallback (vlc_object_t *obj, const char *var,
     return VLC_SUCCESS;
 }
 
-static void ControlsReset (vlc_v4l2_ctrl_t *list)
+static void ControlsReset (vlc_object_t *obj, vlc_v4l2_ctrl_t *list)
 {
     while (list != NULL)
     {
-        if (list->type != V4L2_CTRL_TYPE_BUTTON)
-            ControlSet (list, list->default_value);
+        switch (list->type)
+        {
+            case V4L2_CTRL_TYPE_INTEGER:
+            case V4L2_CTRL_TYPE_MENU:
+                var_SetInteger (obj, list->name, list->default_value);
+                break;
+            case V4L2_CTRL_TYPE_BOOLEAN:
+                var_SetBool (obj, list->name, list->default_value);
+                break;
+            default:;
+        }
         list = list->next;
     }
 }
@@ -117,8 +126,8 @@ static void ControlsReset (vlc_v4l2_ctrl_t *list)
 static int ControlsResetCallback (vlc_object_t *obj, const char *var,
                                   vlc_value_t old, vlc_value_t cur, void *data)
 {
-    ControlsReset (data);
-    (void) obj; (void) var; (void) old; (void) cur;
+    ControlsReset (obj, data);
+    (void) var; (void) old; (void) cur;
     return VLC_SUCCESS;
 }
 
@@ -517,7 +526,7 @@ vlc_v4l2_ctrl_t *ControlsInit (vlc_object_t *obj, int fd)
         var_AddCallback (obj, "reset", ControlsResetCallback, list);
     }
     if (var_InheritBool (obj, CFG_PREFIX"controls-reset"))
-        ControlsReset (list);
+        ControlsReset (obj, list);
 
     return list;
 }
