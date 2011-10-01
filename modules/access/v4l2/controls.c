@@ -80,7 +80,7 @@ static const vlc_v4l2_ctrl_name_t controls[] =
         <= (V4L2_CID_VCENTER - V4L2_CID_BRIGHTNESS))
 };
 
-typedef struct vlc_v4l2_ctrl
+struct vlc_v4l2_ctrl
 {
     int                   fd;
     uint32_t              id;
@@ -88,7 +88,7 @@ typedef struct vlc_v4l2_ctrl
     char                  name[32];
     int32_t               default_value;
     struct vlc_v4l2_ctrl *next;
-} vlc_v4l2_ctrl_t;
+};
 
 static int ControlSet (const vlc_v4l2_ctrl_t *c, int_fast32_t value)
 {
