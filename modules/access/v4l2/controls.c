@@ -29,6 +29,7 @@
 
 #include "v4l2.h"
 #include <ctype.h>
+#include <assert.h>
 #include <sys/ioctl.h>
 
 typedef struct vlc_v4l2_ctrl_name
@@ -90,12 +91,52 @@ static int ControlSet (const vlc_v4l2_ctrl_t *c, int_fast32_t value)
     return 0;
 }
 
+static int ControlSet64 (const vlc_v4l2_ctrl_t *c, int64_t value)
+{
+    struct v4l2_ext_control ext_ctrl = {
+        .id = c->id,
+        .size = 0,
+        .value64 = value,
+    };
+    struct v4l2_ext_controls ext_ctrls = {
+        .ctrl_class = V4L2_CTRL_ID2CLASS(c->id),
+        .count = 1,
+        .error_idx = 0,
+        .controls = &ext_ctrl,
+    };
+
+    if (v4l2_ioctl (c->fd, VIDIOC_S_EXT_CTRLS, &ext_ctrls) < 0)
+        return -1;
+    return 0;
+}
+
 static int ControlSetCallback (vlc_object_t *obj, const char *var,
                                vlc_value_t old, vlc_value_t cur, void *data)
 {
     const vlc_v4l2_ctrl_t *ctrl = data;
+    int ret;
 
-    if (ControlSet (ctrl, cur.i_int))
+    switch (ctrl->type)
+    {
+        case V4L2_CTRL_TYPE_INTEGER:
+        case V4L2_CTRL_TYPE_MENU:
+        case V4L2_CTRL_TYPE_BITMASK:
+            ret = ControlSet (ctrl, cur.i_int);
+            break;
+        case V4L2_CTRL_TYPE_BOOLEAN:
+            ret = ControlSet (ctrl, cur.b_bool);
+            break;
+        case V4L2_CTRL_TYPE_BUTTON:
+            ret = ControlSet (ctrl, 0);
+            break;
+        case V4L2_CTRL_TYPE_INTEGER64:
+            ret = ControlSet64 (ctrl, cur.i_int);
+            break;
+        default:
+            assert (0);
+    }
+
+    if (ret)
     {
         msg_Err (obj, "cannot set control %s: %m", var);
         return VLC_EGENERIC;
@@ -167,19 +208,55 @@ next:
         *(end++) = '\0';
         value = end;
 
-        long val = strtol (value, &end, 0);
-        if (*end)
-        {
-            msg_Err (obj, "syntax error in \"%s\": not an integer", value);
-            continue;
-        }
-
         for (const vlc_v4l2_ctrl_t *c = list; c != NULL; c = c->next)
             if (!strcasecmp (name, c->name))
-            {
-                ControlSet (c, val);
-                goto next;
-            }
+                switch (c->type)
+                {
+                    case V4L2_CTRL_TYPE_INTEGER:
+                    case V4L2_CTRL_TYPE_BOOLEAN:
+                    case V4L2_CTRL_TYPE_MENU:
+                    {
+                        long val = strtol (value, &end, 0);
+                        if (*end)
+                        {
+                            msg_Err (obj, "syntax error in \"%s\": "
+                                     " not an integer", value);
+                            goto next;
+                        }
+                        ControlSet (c, val);
+                        break;
+                    }
+
+                    case V4L2_CTRL_TYPE_INTEGER64:
+                    {
+                        long long val = strtoll (value, &end, 0);
+                        if (*end)
+                        {
+                            msg_Err (obj, "syntax error in \"%s\": "
+                                     " not an integer", value);
+                            goto next;
+                        }
+                        ControlSet64 (c, val);
+                        break;
+                    }
+
+                    case V4L2_CTRL_TYPE_BITMASK:
+                    {
+                        unsigned long val = strtoul (value, &end, 0);
+                        if (*end)
+                        {
+                            msg_Err (obj, "syntax error in \"%s\": "
+                                     " not an integer", value);
+                            goto next;
+                        }
+                        ControlSet (c, val);
+                        break;
+                    }
+
+                    default:
+                        msg_Err (obj, "setting \"%s\" not supported", name);
+                        goto next;
+                }
 
         msg_Err (obj, "control \"%s\" not available", name);
     }
@@ -388,6 +465,26 @@ static vlc_v4l2_ctrl_t *ControlAddButton (vlc_object_t *obj, int fd,
     return c;
 }
 
+static vlc_v4l2_ctrl_t *ControlAddInteger64 (vlc_object_t *obj, int fd,
+                                            const struct v4l2_queryctrl *query)
+{
+    msg_Dbg (obj, " 64-bits  %s (%08"PRIX32")", query->name, query->id);
+    if (query->flags & (CTRL_FLAGS_IGNORE | V4L2_CTRL_FLAG_WRITE_ONLY))
+        return NULL;
+
+    vlc_v4l2_ctrl_t *c = ControlCreate (fd, query);
+    if (unlikely(c == NULL))
+        return NULL;
+
+    if (var_Create (obj, c->name, VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND))
+    {
+        free (c);
+        return NULL;
+    }
+
+    return c;
+}
+
 static vlc_v4l2_ctrl_t *ControlAddClass (vlc_object_t *obj, int fd,
                                          const struct v4l2_queryctrl *query)
 {
@@ -460,6 +557,7 @@ vlc_v4l2_ctrl_t *ControlsInit (vlc_object_t *obj, int fd)
         [V4L2_CTRL_TYPE_BOOLEAN] = ControlAddBoolean,
         [V4L2_CTRL_TYPE_MENU] = ControlAddMenu,
         [V4L2_CTRL_TYPE_BUTTON] = ControlAddButton,
+        [V4L2_CTRL_TYPE_INTEGER64] = ControlAddInteger64,
         [V4L2_CTRL_TYPE_CTRL_CLASS] = ControlAddClass,
         [V4L2_CTRL_TYPE_BITMASK] = ControlAddBitMask,
     };
@@ -506,7 +604,7 @@ vlc_v4l2_ctrl_t *ControlsInit (vlc_object_t *obj, int fd)
         int64_t val = var_InheritInteger (obj, varname);
         if (val == -1)
             continue; /* the VLC default value: "do not modify" */
-        ControlSet (ctrl, val);
+        ControlSet (ctrl, val); /* NOTE: all known are integers or booleans */
     }
 
     /* Set any control from the VLC configuration control string */
