@@ -27,7 +27,7 @@ else
 fi
 
 CPPFLAGS="-I${ANDROID_NDK}/sources/cxx-stl/gnu-libstdc++/include -I${ANDROID_NDK}/sources/cxx-stl/gnu-libstdc++/libs/${CXX_TARGET}/include"
-LDFLAGS="$LDFLAGS -L${ANDROID_NDK}/sources/cxx-stl/gnu-libstdc++/libs/${CXX_TARGET}/lib"
+LDFLAGS="$LDFLAGS -L${ANDROID_NDK}/sources/cxx-stl/gnu-libstdc++/libs/${CXX_TARGET}"
 
 if [ -n "$ANDROID_SYS_HEADERS" ]; then
     CPPFLAGS="$CPPFLAGS -I${ANDROID_SYS_HEADERS}/frameworks/base/include -I${ANDROID_SYS_HEADERS}/system/core/include"
