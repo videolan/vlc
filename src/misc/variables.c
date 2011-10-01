@@ -391,6 +391,7 @@ int var_Change( vlc_object_t *p_this, const char *psz_name,
                 int i_action, vlc_value_t *p_val, vlc_value_t *p_val2 )
 {
     int i;
+    int ret = VLC_SUCCESS;
     variable_t *p_var;
     vlc_value_t oldval;
     vlc_value_t newval;
@@ -422,9 +423,9 @@ int var_Change( vlc_object_t *p_this, const char *psz_name,
             break;
         case VLC_VAR_GETMIN:
             if( p_var->i_type & VLC_VAR_HASMIN )
-            {
                 *p_val = p_var->min;
-            }
+            else
+                ret = VLC_EGENERIC;
             break;
         case VLC_VAR_SETMAX:
             if( p_var->i_type & VLC_VAR_HASMAX )
@@ -438,9 +439,9 @@ int var_Change( vlc_object_t *p_this, const char *psz_name,
             break;
         case VLC_VAR_GETMAX:
             if( p_var->i_type & VLC_VAR_HASMAX )
-            {
                 *p_val = p_var->max;
-            }
+            else
+                ret = VLC_EGENERIC;
             break;
         case VLC_VAR_SETSTEP:
             if( p_var->i_type & VLC_VAR_HASSTEP )
@@ -454,9 +455,9 @@ int var_Change( vlc_object_t *p_this, const char *psz_name,
             break;
         case VLC_VAR_GETSTEP:
             if( p_var->i_type & VLC_VAR_HASSTEP )
-            {
                 *p_val = p_var->step;
-            }
+            else
+                ret = VLC_EGENERIC;
             break;
         case VLC_VAR_ADDCHOICE:
             i = p_var->choices.i_count;
@@ -612,7 +613,7 @@ int var_Change( vlc_object_t *p_this, const char *psz_name,
 
     vlc_mutex_unlock( &p_priv->var_lock );
 
-    return VLC_SUCCESS;
+    return ret;
 }
 
 #undef var_GetAndSet
