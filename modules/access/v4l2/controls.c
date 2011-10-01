@@ -229,11 +229,6 @@ static vlc_v4l2_ctrl_t *ControlCreate (int fd,
 }
 
 
-#ifndef V4L2_CTRL_FLAG_VOLATILE
-# define V4L2_CTRL_FLAG_VOLATILE 0x0080
-# warning Please update V4L2 kernel headers!
-#endif
-
 #define CTRL_FLAGS_IGNORE \
     (V4L2_CTRL_FLAG_DISABLED /* not implemented at all */ \
     |V4L2_CTRL_FLAG_READ_ONLY /* value is constant */ \
@@ -392,6 +387,42 @@ static vlc_v4l2_ctrl_t *ControlAddClass (vlc_object_t *obj, int fd,
     return NULL;
 }
 
+static vlc_v4l2_ctrl_t *ControlAddBitMask (vlc_object_t *obj, int fd,
+                                           const struct v4l2_queryctrl *query)
+{
+    msg_Dbg (obj, " bit mask %s (%08"PRIX32")", query->name, query->id);
+    if (query->flags & (CTRL_FLAGS_IGNORE | V4L2_CTRL_FLAG_WRITE_ONLY))
+        return NULL;
+
+    vlc_v4l2_ctrl_t *c = ControlCreate (fd, query);
+    if (unlikely(c == NULL))
+        return NULL;
+
+    if (var_Create (obj, c->name, VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND))
+    {
+        free (c);
+        return NULL;
+    }
+
+    vlc_value_t val;
+    struct v4l2_control ctrl = { .id = query->id };
+
+    if (v4l2_ioctl (fd, VIDIOC_G_CTRL, &ctrl) >= 0)
+    {
+        msg_Dbg (obj, "  current: 0x%08"PRIX32", default: 0x%08"PRIX32,
+                 ctrl.value, query->default_value);
+        val.i_int = ctrl.value;
+        var_Change (obj, c->name, VLC_VAR_SETVALUE, &val, NULL);
+    }
+    val.i_int = 0;
+    var_Change (obj, c->name, VLC_VAR_SETMIN, &val, NULL);
+    val.i_int = (uint32_t)query->maximum;
+    var_Change (obj, c->name, VLC_VAR_SETMAX, &val, NULL);
+    val.i_int = query->default_value;
+    var_Change (obj, c->name, VLC_VAR_SETDEFAULT, &val, NULL);
+    return c;
+}
+
 static vlc_v4l2_ctrl_t *ControlAddUnknown (vlc_object_t *obj, int fd,
                                            const struct v4l2_queryctrl *query)
 {
@@ -421,6 +452,7 @@ vlc_v4l2_ctrl_t *ControlsInit (vlc_object_t *obj, int fd)
         [V4L2_CTRL_TYPE_MENU] = ControlAddMenu,
         [V4L2_CTRL_TYPE_BUTTON] = ControlAddButton,
         [V4L2_CTRL_TYPE_CTRL_CLASS] = ControlAddClass,
+        [V4L2_CTRL_TYPE_BITMASK] = ControlAddBitMask,
     };
 
     vlc_v4l2_ctrl_t *list = NULL;

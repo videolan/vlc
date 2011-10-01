@@ -28,6 +28,16 @@
 #   error "No Video4Linux2 headers found."
 #endif
 
+/* Hacks to compile with old headers */
+#ifdef __linux__
+# include <linux/version.h>
+# if LINUX_VERSION_CODE < KERNEL_VERSION(3,1,0)
+#  warning Please update Video4Linux2 headers!
+#  define V4L2_CTRL_TYPE_BITMASK 8
+#  define V4L2_CTRL_FLAG_VOLATILE 0x0080
+# endif
+#endif
+
 #ifdef HAVE_LIBV4L2
 #   include <libv4l2.h>
 #else
