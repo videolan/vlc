@@ -757,6 +757,7 @@ void ExtV4l2::Refresh( void )
                         hlayout->addWidget( combobox );
                     }
                     else
+                    if( (i_type & VLC_VAR_HASMIN) && (i_type & VLC_VAR_HASMAX) )
                     {
                         QSlider *slider = new QSlider( box );
                         slider->setObjectName( qfu( psz_var ) );
@@ -776,6 +777,17 @@ void ExtV4l2::Refresh( void )
                         CONNECT( slider, valueChanged( int ), this,
                                  ValueChange( int ) );
                         hlayout->addWidget( slider );
+                    }
+                    else
+                    {
+                        QSpinBox *spinBox = new QSpinBox( box );
+                        spinBox->setObjectName( qfu( psz_var ) );
+                        spinBox->setMinimum( INT_MIN );
+                        spinBox->setMaximum( INT_MAX );
+                        spinBox->setValue( i_val );
+                        CONNECT( spinBox, valueChanged( int ), this,
+                                 ValueChange( int ) );
+                        hlayout->addWidget( spinBox );
                     }
                     layout->addLayout( hlayout );
                     break;
