@@ -737,7 +737,7 @@ void ExtV4l2::Refresh( void )
                     if( i_type & VLC_VAR_HASCHOICE )
                     {
                         QComboBox *combobox = new QComboBox( box );
-                        combobox->setObjectName( qtr( psz_var ) );
+                        combobox->setObjectName( qfu( psz_var ) );
 
                         vlc_value_t val2, text2;
                         var_Change( p_obj, psz_var, VLC_VAR_GETCHOICES,
@@ -759,7 +759,7 @@ void ExtV4l2::Refresh( void )
                     else
                     {
                         QSlider *slider = new QSlider( box );
-                        slider->setObjectName( qtr( psz_var ) );
+                        slider->setObjectName( qfu( psz_var ) );
                         slider->setOrientation( Qt::Horizontal );
                         vlc_value_t val2;
                         var_Change( p_obj, psz_var, VLC_VAR_GETMIN,
@@ -783,7 +783,7 @@ void ExtV4l2::Refresh( void )
                 case VLC_VAR_BOOL:
                 {
                     QCheckBox *button = new QCheckBox( name, box );
-                    button->setObjectName( qtr( psz_var ) );
+                    button->setObjectName( qfu( psz_var ) );
                     button->setChecked( var_GetBool( p_obj, psz_var ) );
 
                     CONNECT( button, clicked( bool ), this,
@@ -796,7 +796,7 @@ void ExtV4l2::Refresh( void )
                     if( i_type & VLC_VAR_ISCOMMAND )
                     {
                         QPushButton *button = new QPushButton( name, box );
-                        button->setObjectName( qtr( psz_var ) );
+                        button->setObjectName( qfu( psz_var ) );
 
                         CONNECT( button, clicked( bool ), this,
                                  ValueChange( bool ) );
