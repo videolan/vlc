@@ -98,6 +98,13 @@
 #define SATURATION_LONGTEXT N_( "Picture saturation or chroma gain." )
 #define HUE_TEXT N_( "Hue" )
 #define HUE_LONGTEXT N_( "Hue or color balance." )
+#define HUE_AUTO_TEXT N_( "Automatic hue" )
+#define HUE_AUTO_LONGTEXT N_( \
+    "Automatically adjust the picture hue." )
+#define WHITE_BALANCE_TEMP_TEXT N_( "White balance temperature (K)" )
+#define WHITE_BALANCE_TEMP_LONGTEXT N_( \
+    "White balance temperature as a color temperation in Kelvin " \
+    "(2800 is minimum incandescence, 6500 is maximum daylight)." )
 #define AUTOWHITEBALANCE_TEXT N_( "Automatic white balance" )
 #define AUTOWHITEBALANCE_LONGTEXT N_( \
     "Automatically adjust the picture white balance." )
@@ -119,12 +126,50 @@
 #define GAIN_TEXT N_( "Gain" )
 #define GAIN_LONGTEXT N_( \
     "Picture gain." )
+#define SHARPNESS_TEXT N_( "Sharpness" )
+#define SHARPNESS_LONGTEXT N_( "Sharpness filter adjust." )
+#define CHROMA_GAIN_TEXT N_( "Chroma gain" )
+#define CHROMA_GAIN_LONGTEXT N_( "Chroma gain control." )
+#define CHROMA_GAIN_AUTO_TEXT N_( "Automatic chroma gain" )
+#define CHROMA_GAIN_AUTO_LONGTEXT N_( \
+    "Automatically control the chroma gain." )
+#define POWER_FREQ_TEXT N_( "Power line frequency" )
+#define POWER_FREQ_LONGTEXT N_( \
+    "Power line frequency anti-flicker filter." )
+static const int power_freq_vlc[] = { -1,
+    V4L2_CID_POWER_LINE_FREQUENCY_DISABLED,
+    V4L2_CID_POWER_LINE_FREQUENCY_50HZ,
+    V4L2_CID_POWER_LINE_FREQUENCY_60HZ,
+};
+static const char *const power_freq_user[] = { N_("Unspecified"),
+    N_("Off"), N_("50 Hz"), N_("60 Hz"),
+};
+#define BKLT_COMPENSATE_TEXT N_( "Backlight compensation" )
+#define BKLT_COMPENSATE_LONGTEXT N_( "Backlight compensation." )
 #define HFLIP_TEXT N_( "Horizontal flip" )
 #define HFLIP_LONGTEXT N_( \
     "Flip the picture horizontally." )
 #define VFLIP_TEXT N_( "Vertical flip" )
 #define VFLIP_LONGTEXT N_( \
     "Flip the picture vertically." )
+#define ROTATE_TEXT N_( "Rotate (degrees)" )
+#define ROTATE_LONGTEXT N_( "Picture rotation angle (in degrees)." )
+#define COLOR_KILLER_TEXT N_( "Color killer" )
+#define COLOR_KILLER_LONGTEXT N_( \
+    "Enable the color killer, i.e. switch to black & white picture " \
+    "whenever the signal is weak." )
+#define COLOR_EFFECT_TEXT N_( "Color effect" )
+#define COLOR_EFFECT_LONGTEXT N_( "Select a color effect." )
+static const int colorfx_vlc[] = { -1, V4L2_COLORFX_NONE,
+    V4L2_COLORFX_BW, V4L2_COLORFX_SEPIA, V4L2_COLORFX_NEGATIVE,
+    V4L2_COLORFX_EMBOSS, V4L2_COLORFX_SKETCH, V4L2_COLORFX_SKY_BLUE,
+    V4L2_COLORFX_GRASS_GREEN, V4L2_COLORFX_SKIN_WHITEN, V4L2_COLORFX_VIVID,
+};
+static const char *const colorfx_user[] = { N_("Unspecified"), N_("None"),
+    N_("Black & white"), N_("Sepia"), N_("Negative"),
+    N_("Emboss"), N_("Sketch"), N_("Sky blue"),
+    N_("Grass green"), N_("Skin whithen"), N_("Vivid"),
+};
 
 #define AUDIO_VOLUME_TEXT N_( "Audio volume" )
 #define AUDIO_VOLUME_LONGTEXT N_( \
@@ -320,7 +365,14 @@ vlc_module_begin ()
                  SATURATION_LONGTEXT, true )
     add_integer( CFG_PREFIX "hue", -1, HUE_TEXT,
                  HUE_LONGTEXT, true )
+    add_integer( CFG_PREFIX "auto-hue", -1,
+                 HUE_AUTO_TEXT, HUE_AUTO_LONGTEXT, true )
+        change_integer_list( tristate_vlc, tristate_user )
     add_obsolete_integer( CFG_PREFIX "black-level" ) /* since Linux 2.6.26 */
+    add_integer( CFG_PREFIX "white-balance-temperature", -1,
+                 WHITE_BALANCE_TEMP_TEXT, WHITE_BALANCE_TEMP_LONGTEXT, true )
+        /* Ideally, the range should be 2800-6500 */
+        change_integer_range( -1, 6500 )
     add_integer( CFG_PREFIX "auto-white-balance", -1,
                  AUTOWHITEBALANCE_TEXT, AUTOWHITEBALANCE_LONGTEXT, true )
         change_integer_list( tristate_vlc, tristate_user )
@@ -338,10 +390,30 @@ vlc_module_begin ()
         change_integer_list( tristate_vlc, tristate_user )
     add_integer( CFG_PREFIX "gain", -1, GAIN_TEXT,
                  GAIN_LONGTEXT, true )
+    add_integer( CFG_PREFIX "sharpness", -1,
+                 SHARPNESS_TEXT, SHARPNESS_LONGTEXT, true )
+    add_integer( CFG_PREFIX "chroma-gain", -1,
+                 CHROMA_GAIN_TEXT, CHROMA_GAIN_LONGTEXT, true )
+    add_integer( CFG_PREFIX "chroma-gain-auto", -1,
+                 CHROMA_GAIN_AUTO_TEXT, CHROMA_GAIN_AUTO_LONGTEXT, true )
+    add_integer( CFG_PREFIX"power-line-frequency", -1,
+                 POWER_FREQ_TEXT, POWER_FREQ_LONGTEXT, true )
+        change_integer_list( power_freq_vlc, power_freq_user )
+    add_integer( CFG_PREFIX"backlight-compensation", -1,
+                 BKLT_COMPENSATE_TEXT, BKLT_COMPENSATE_LONGTEXT, true )
     add_bool( CFG_PREFIX "hflip", false, HFLIP_TEXT, HFLIP_LONGTEXT, true )
     add_bool( CFG_PREFIX "vflip", false, VFLIP_TEXT, VFLIP_LONGTEXT, true )
+    add_integer( CFG_PREFIX "rotate", -1, ROTATE_TEXT, ROTATE_LONGTEXT, true )
+        change_integer_range( -1, 359 )
     add_obsolete_integer( CFG_PREFIX "hcenter" ) /* since Linux 2.6.26 */
     add_obsolete_integer( CFG_PREFIX "vcenter" ) /* since Linux 2.6.26 */
+    add_integer( CFG_PREFIX"color-killer", -1,
+                 COLOR_KILLER_TEXT, COLOR_KILLER_LONGTEXT, true )
+        change_integer_list( tristate_vlc, tristate_user )
+    add_integer( CFG_PREFIX"color-effect", -1,
+                 COLOR_EFFECT_TEXT, COLOR_EFFECT_LONGTEXT, true )
+        change_integer_list( colorfx_vlc, colorfx_user )
+
     add_integer( CFG_PREFIX "audio-volume", -1, AUDIO_VOLUME_TEXT,
                 AUDIO_VOLUME_LONGTEXT, true )
     add_integer( CFG_PREFIX "audio-balance", -1, AUDIO_BALANCE_TEXT,

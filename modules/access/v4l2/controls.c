@@ -34,7 +34,7 @@
 
 typedef struct vlc_v4l2_ctrl_name
 {
-    const char name[20];
+    const char name[28];
     uint32_t cid;
 } vlc_v4l2_ctrl_name_t;
 
@@ -61,7 +61,20 @@ static const vlc_v4l2_ctrl_name_t controls[] =
     { "gain", V4L2_CID_GAIN },
     { "hflip", V4L2_CID_HFLIP },
     { "vflip", V4L2_CID_VFLIP },
-    /* TODO: add more standardized controls */
+    { "power-line-frequency", V4L2_CID_POWER_LINE_FREQUENCY },
+    { "hue-auto", V4L2_CID_HUE_AUTO },
+    { "white-balance-temperature", V4L2_CID_WHITE_BALANCE_TEMPERATURE },
+    { "sharpness", V4L2_CID_SHARPNESS },
+    { "backlight-compensation", V4L2_CID_BACKLIGHT_COMPENSATION },
+    { "chroma-gain-auto", V4L2_CID_CHROMA_AGC },
+    { "color-killer", V4L2_CID_COLOR_KILLER },
+    { "color-effect", V4L2_CID_COLORFX },
+    { "rotate", V4L2_CID_ROTATE },
+    { "bg-color", V4L2_CID_BG_COLOR }, // NOTE: output only
+    { "chroma-gain", V4L2_CID_CHROMA_GAIN },
+
+    { "illuminators-1", V4L2_CID_ILLUMINATORS_1 }, // NOTE: don't care?
+    { "illuminators-2", V4L2_CID_ILLUMINATORS_2 },
 #define CTRL_CID_KNOWN(cid) \
     ((((uint32_t)cid) - V4L2_CID_BRIGHTNESS) \
         <= (V4L2_CID_VCENTER - V4L2_CID_BRIGHTNESS))
