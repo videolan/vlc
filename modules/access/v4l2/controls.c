@@ -120,6 +120,25 @@ static int ControlSet64 (const vlc_v4l2_ctrl_t *c, int64_t value)
     return 0;
 }
 
+static int ControlSetStr (const vlc_v4l2_ctrl_t *c, const char *restrict value)
+{
+    struct v4l2_ext_control ext_ctrl = {
+        .id = c->id,
+        .size = strlen (value) + 1,
+    };
+    ext_ctrl.string = (char *)value;
+    struct v4l2_ext_controls ext_ctrls = {
+        .ctrl_class = V4L2_CTRL_ID2CLASS(c->id),
+        .count = 1,
+        .error_idx = 0,
+        .controls = &ext_ctrl,
+    };
+
+    if (v4l2_ioctl (c->fd, VIDIOC_S_EXT_CTRLS, &ext_ctrls) < 0)
+        return -1;
+    return 0;
+}
+
 static int ControlSetCallback (vlc_object_t *obj, const char *var,
                                vlc_value_t old, vlc_value_t cur, void *data)
 {
@@ -141,6 +160,9 @@ static int ControlSetCallback (vlc_object_t *obj, const char *var,
             break;
         case V4L2_CTRL_TYPE_INTEGER64:
             ret = ControlSet64 (ctrl, cur.i_int);
+            break;
+        case V4L2_CTRL_TYPE_STRING:
+            ret = ControlSetStr (ctrl, cur.psz_string);
             break;
         default:
             assert (0);
@@ -249,6 +271,10 @@ next:
                         ControlSet64 (c, val);
                         break;
                     }
+
+                    case V4L2_CTRL_TYPE_STRING:
+                        ControlSetStr (c, value);
+                        break;
 
                     case V4L2_CTRL_TYPE_BITMASK:
                     {
@@ -521,6 +547,53 @@ static vlc_v4l2_ctrl_t *ControlAddClass (vlc_object_t *obj, int fd,
     return NULL;
 }
 
+static vlc_v4l2_ctrl_t *ControlAddString (vlc_object_t *obj, int fd,
+                                          const struct v4l2_queryctrl *query)
+{
+    msg_Dbg (obj, " string   %s (%08"PRIX32")", query->name, query->id);
+    if (query->flags & (CTRL_FLAGS_IGNORE | V4L2_CTRL_FLAG_WRITE_ONLY)
+     || query->maximum > 65535)
+        return NULL;
+
+    vlc_v4l2_ctrl_t *c = ControlCreate (fd, query);
+    if (unlikely(c == NULL))
+        return NULL;
+
+    if (var_Create (obj, c->name, VLC_VAR_STRING | VLC_VAR_ISCOMMAND))
+    {
+        free (c);
+        return NULL;
+    }
+
+    /* Get current value */
+    char *buf = malloc (query->maximum + 1);
+    if (likely(buf != NULL))
+    {
+        struct v4l2_ext_control ext_ctrl = {
+            .id = c->id,
+            .size = query->maximum + 1,
+        };
+        ext_ctrl.string = buf;
+        struct v4l2_ext_controls ext_ctrls = {
+            .ctrl_class = V4L2_CTRL_ID2CLASS(c->id),
+            .count = 1,
+            .error_idx = 0,
+            .controls = &ext_ctrl,
+        };
+
+        if (v4l2_ioctl (c->fd, VIDIOC_G_EXT_CTRLS, &ext_ctrls) >= 0)
+        {
+            vlc_value_t val = { .psz_string = buf };
+
+            msg_Dbg (obj, "  current: \"%s\"", buf);
+            var_Change (obj, c->name, VLC_VAR_SETVALUE, &val, NULL);
+        }
+        free (buf);
+    }
+
+    return c;
+}
+
 static vlc_v4l2_ctrl_t *ControlAddBitMask (vlc_object_t *obj, int fd,
                                            const struct v4l2_queryctrl *query)
 {
@@ -587,6 +660,7 @@ vlc_v4l2_ctrl_t *ControlsInit (vlc_object_t *obj, int fd)
         [V4L2_CTRL_TYPE_BUTTON] = ControlAddButton,
         [V4L2_CTRL_TYPE_INTEGER64] = ControlAddInteger64,
         [V4L2_CTRL_TYPE_CTRL_CLASS] = ControlAddClass,
+        [V4L2_CTRL_TYPE_STRING] = ControlAddString,
         [V4L2_CTRL_TYPE_BITMASK] = ControlAddBitMask,
     };
 
