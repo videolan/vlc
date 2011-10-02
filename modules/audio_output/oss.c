@@ -487,6 +487,7 @@ static int Open( vlc_object_t *p_this )
 
     return VLC_SUCCESS;
 
+error:
     var_DelCallback( p_aout, "audio-device", aout_ChannelsRestart, NULL );
     close( p_sys->i_fd );
     free( p_sys );
