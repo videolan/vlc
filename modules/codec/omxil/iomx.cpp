@@ -44,15 +44,10 @@ using namespace android;
 class IOMXContext {
 public:
     IOMXContext() {
-        refcount = 0;
-        init_refcount = 0;
     }
 
     sp<IOMX> iomx;
     List<IOMX::ComponentInfo> components;
-    int refcount;
-
-    int init_refcount;
 };
 
 static IOMXContext *ctx;
@@ -311,26 +306,18 @@ static OMX_ERRORTYPE iomx_free_handle(OMX_HANDLETYPE handle)
 
 static OMX_ERRORTYPE iomx_init()
 {
-    if (ctx->init_refcount > 0) {
-        ctx->init_refcount++;
-        return OMX_ErrorNone;
-    }
     OMXClient client;
     if (client.connect() != OK)
         return OMX_ErrorUndefined;
 
     ctx->iomx = client.interface();
-    ctx->init_refcount = 1;
     ctx->iomx->listNodes(&ctx->components);
     return OMX_ErrorNone;
 }
 
 static OMX_ERRORTYPE iomx_deinit()
 {
-    ctx->init_refcount--;
-    if (ctx->init_refcount == 0) {
-        ctx->iomx = NULL;
-    }
+    ctx->iomx = NULL;
     return OMX_ErrorNone;
 }
 
@@ -372,18 +359,14 @@ void* iomx_dlopen(const char *)
 {
     if (!ctx)
         ctx = new IOMXContext();
-    ctx->refcount++;
     return ctx;
 }
 
 void iomx_dlclose(void *handle)
 {
     IOMXContext *ctx = (IOMXContext*) handle;
-    ctx->refcount--;
-    if (!ctx->refcount) {
-        delete ctx;
-        ::ctx = NULL;
-    }
+    delete ctx;
+    ::ctx = NULL;
 }
 
 void *iomx_dlsym(void *, const char *name)
