@@ -65,6 +65,20 @@ static const char *ppsz_dll_list[] =
 };
 
 /*****************************************************************************
+ * Global OMX Core instance, shared between module instances
+ *****************************************************************************/
+static vlc_mutex_t omx_core_mutex = VLC_STATIC_MUTEX;
+static unsigned int omx_refcount = 0;
+static void *dll_handle;
+static OMX_ERRORTYPE (*pf_init) (void);
+static OMX_ERRORTYPE (*pf_deinit) (void);
+static OMX_ERRORTYPE (*pf_get_handle) (OMX_HANDLETYPE *, OMX_STRING,
+                                       OMX_PTR, OMX_CALLBACKTYPE *);
+static OMX_ERRORTYPE (*pf_free_handle) (OMX_HANDLETYPE);
+static OMX_ERRORTYPE (*pf_component_enum)(OMX_STRING, OMX_U32, OMX_U32);
+static OMX_ERRORTYPE (*pf_get_roles_of_component)(OMX_STRING, OMX_U32 *, OMX_U8 **);
+
+/*****************************************************************************
  * Local prototypes
  *****************************************************************************/
 static int  OpenDecoder( vlc_object_t * );
@@ -124,12 +138,12 @@ static int CreateComponentsList(decoder_t *p_dec, const char *psz_role)
     {
         bool b_found = false;
 
-        omx_error = p_sys->pf_component_enum(psz_name, OMX_MAX_STRINGNAME_SIZE, i);
+        omx_error = pf_component_enum(psz_name, OMX_MAX_STRINGNAME_SIZE, i);
         if(omx_error != OMX_ErrorNone) break;
 
         msg_Dbg(p_dec, "component %s", psz_name);
 
-        omx_error = p_sys->pf_get_roles_of_component(psz_name, &roles, 0);
+        omx_error = pf_get_roles_of_component(psz_name, &roles, 0);
         if(omx_error != OMX_ErrorNone || !roles) continue;
 
         ppsz_roles = malloc(roles * (sizeof(OMX_U8*) + OMX_MAX_STRINGNAME_SIZE));
@@ -139,7 +153,7 @@ static int CreateComponentsList(decoder_t *p_dec, const char *psz_role)
             ppsz_roles[j] = ((OMX_U8 *)(&ppsz_roles[roles])) +
                 j * OMX_MAX_STRINGNAME_SIZE;
 
-        omx_error = p_sys->pf_get_roles_of_component(psz_name, &roles, ppsz_roles);
+        omx_error = pf_get_roles_of_component(psz_name, &roles, ppsz_roles);
         if(omx_error != OMX_ErrorNone) roles = 0;
 
         for(j = 0; j < roles; j++)
@@ -564,7 +578,7 @@ static OMX_ERRORTYPE DeinitialiseComponent(decoder_t *p_dec,
         free(p_port->pp_buffers);
         p_port->pp_buffers = 0;
     }
-    omx_error = p_sys->pf_free_handle( omx_handle );
+    omx_error = pf_free_handle( omx_handle );
     return omx_error;
 }
 
@@ -586,8 +600,7 @@ static OMX_ERRORTYPE InitialiseComponent(decoder_t *p_dec,
     OMX_PORT_PARAM_TYPE param;
 
     /* Load component */
-    omx_error = p_sys->pf_get_handle( &omx_handle, psz_component,
-                                      p_dec, &callbacks );
+    omx_error = pf_get_handle( &omx_handle, psz_component, p_dec, &callbacks );
     if(omx_error != OMX_ErrorNone)
     {
         msg_Warn( p_dec, "OMX_GetHandle(%s) failed (%x: %s)", psz_component,
@@ -754,14 +767,15 @@ static int OpenEncoder( vlc_object_t *p_this )
  *****************************************************************************/
 static int OpenGeneric( vlc_object_t *p_this, bool b_encode )
 {
-    void *dll_handle = 0, *pf_init = 0, *pf_deinit = 0;
-    void *pf_get_handle = 0, *pf_free_handle = 0, *pf_component_enum = 0;
-    void *pf_get_roles_of_component = 0;
     decoder_t *p_dec = (decoder_t*)p_this;
     decoder_sys_t *p_sys;
     OMX_ERRORTYPE omx_error;
     OMX_BUFFERHEADERTYPE *p_header;
     unsigned int i, j;
+
+    vlc_mutex_lock( &omx_core_mutex );
+    if( omx_refcount > 0 )
+        goto loaded;
 
     /* Load the OMX core */
     for( i = 0; ppsz_dll_list[i]; i++ )
@@ -769,7 +783,11 @@ static int OpenGeneric( vlc_object_t *p_this, bool b_encode )
         dll_handle = dll_open( ppsz_dll_list[i] );
         if( dll_handle ) break;
     }
-    if( !dll_handle ) return VLC_EGENERIC;
+    if( !dll_handle )
+    {
+        vlc_mutex_unlock( &omx_core_mutex );
+        return VLC_EGENERIC;
+    }
 
     pf_init = dlsym( dll_handle, "OMX_Init" );
     pf_deinit = dlsym( dll_handle, "OMX_Deinit" );
@@ -783,13 +801,17 @@ static int OpenGeneric( vlc_object_t *p_this, bool b_encode )
         msg_Warn( p_this, "cannot find OMX_* symbols in `%s' (%s)",
                   ppsz_dll_list[i], dlerror() );
         dll_close(dll_handle);
+        vlc_mutex_unlock( &omx_core_mutex );
         return VLC_EGENERIC;
     }
 
+loaded:
     /* Allocate the memory needed to store the decoder's structure */
     if( ( p_dec->p_sys = p_sys = calloc( 1, sizeof(*p_sys)) ) == NULL )
     {
-        dll_close(dll_handle);
+        if( omx_refcount == 0 )
+            dll_close(dll_handle);
+        vlc_mutex_unlock( &omx_core_mutex );
         return VLC_ENOMEM;
     }
 
@@ -802,13 +824,6 @@ static int OpenGeneric( vlc_object_t *p_this, bool b_encode )
         p_dec->fmt_out.i_codec = 0;
     }
     p_sys->b_enc = b_encode;
-    p_sys->dll_handle = dll_handle;
-    p_sys->pf_init = pf_init;
-    p_sys->pf_deinit = pf_deinit;
-    p_sys->pf_get_handle = pf_get_handle;
-    p_sys->pf_free_handle = pf_free_handle;
-    p_sys->pf_component_enum = pf_component_enum;
-    p_sys->pf_get_roles_of_component = pf_get_roles_of_component;
     p_sys->pp_last_event = &p_sys->p_events;
     vlc_mutex_init (&p_sys->mutex);
     vlc_cond_init (&p_sys->cond);
@@ -834,15 +849,18 @@ static int OpenGeneric( vlc_object_t *p_this, bool b_encode )
             (char *)&p_dec->fmt_out.i_codec);
 
     /* Initialise the OMX core */
-    omx_error = p_sys->pf_init();
+    omx_error = omx_refcount > 0 ? OMX_ErrorNone : pf_init();
+    omx_refcount++;
     if(omx_error != OMX_ErrorNone)
     {
         msg_Warn( p_this, "OMX_Init failed (%x: %s)", omx_error,
                   ErrorToString(omx_error) );
+        vlc_mutex_unlock( &omx_core_mutex );
         CloseGeneric(p_this);
         return VLC_EGENERIC;
     }
     p_sys->b_init = true;
+    vlc_mutex_unlock( &omx_core_mutex );
 
     /* Enumerate components and build a list of the one we want to try */
     if( !CreateComponentsList(p_dec,
@@ -1463,8 +1481,14 @@ static void CloseGeneric( vlc_object_t *p_this )
     decoder_sys_t *p_sys = p_dec->p_sys;
 
     if(p_sys->omx_handle) DeinitialiseComponent(p_dec, p_sys->omx_handle);
-    if(p_sys->b_init) p_sys->pf_deinit();
-    dll_close( p_sys->dll_handle );
+    vlc_mutex_lock( &omx_core_mutex );
+    omx_refcount--;
+    if( omx_refcount == 0 )
+    {
+        if( p_sys->b_init ) pf_deinit();
+        dll_close( dll_handle );
+    }
+    vlc_mutex_unlock( &omx_core_mutex );
 
     vlc_mutex_destroy (&p_sys->mutex);
     vlc_cond_destroy (&p_sys->cond);
