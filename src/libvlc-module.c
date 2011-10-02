@@ -1931,25 +1931,48 @@ vlc_module_begin ()
                  CACHING_TEXT, CACHING_LONGTEXT, true )
         change_integer_range( 0, 60000 )
         change_safe()
+    add_obsolete_integer( "vdr-caching" ) /* 1.2.0 */
     add_integer( "live-caching", DEFAULT_PTS_DELAY / 1000,
                  CAPTURE_CACHING_TEXT, CAPTURE_CACHING_LONGTEXT, true )
         change_integer_range( 0, 60000 )
         change_safe()
-#if defined (__linux__)
-        add_deprecated_alias( "v4l2-caching" ) /* 1.2.0 */
-#elif defined (WIN32)
-        add_deprecated_alias( "dshow-caching" ) /* 1.2.0 */
-#endif
+    add_obsolete_integer( "alsa-caching" ) /* 1.2.0 */
+    add_obsolete_integer( "dshow-caching" ) /* 1.2.0 */
+    add_obsolete_integer( "dv-caching" ) /* 1.2.0 */
+    add_obsolete_integer( "dvb-caching" ) /* 1.2.0 */
+    add_obsolete_integer( "eyetv-caching" ) /* 1.2.0 */
+    add_obsolete_integer( "gnomevfs-caching" ) /* 1.2.0 */
+    add_obsolete_integer( "jack-input-caching" ) /* 1.2.0 */
+    add_obsolete_integer( "linsys-hdsdi-caching" ) /* 1.2.0 */
+    add_obsolete_integer( "linsys-sdi-caching" ) /* 1.2.0 */
+    add_obsolete_integer( "oss-caching" ) /* 1.2.0 */
+    add_obsolete_integer( "pvr-caching" ) /* 1.2.0 */
+    add_obsolete_integer( "screen-caching" ) /* 1.2.0 */
+    add_obsolete_integer( "v4l2-caching" ) /* 1.2.0 */
     add_integer( "disc-caching", DEFAULT_PTS_DELAY / 1000,
                  DISC_CACHING_TEXT, DISC_CACHING_LONGTEXT, true )
         change_integer_range( 0, 60000 )
         change_safe()
-        add_deprecated_alias( "dvdnav-caching" ) /* 1.2.0 */
+    add_obsolete_integer( "bd-caching" ) /* 1.2.0 */
+    add_obsolete_integer( "bluray-caching" ) /* 1.2.0 */
+    add_obsolete_integer( "cdda-caching" ) /* 1.2.0 */
+    add_obsolete_integer( "dvdnav-caching" ) /* 1.2.0 */
+    add_obsolete_integer( "dvdread-caching" ) /* 1.2.0 */
+    add_obsolete_integer( "vcd-caching" ) /* 1.2.0 */
     add_integer( "network-caching", CLOCK_FREQ / 1000,
                  NETWORK_CACHING_TEXT, NETWORK_CACHING_LONGTEXT, true )
         change_integer_range( 0, 60000 )
         change_safe()
-        add_deprecated_alias( "http-caching" ) /* 1.2.0 */
+    add_obsolete_integer( "ftp-caching" ) /* 1.2.0 */
+    add_obsolete_integer( "http-caching" ) /* 1.2.0 */
+    add_obsolete_integer( "mms-caching" ) /* 1.2.0 */
+    add_obsolete_integer( "realrtsp-caching" ) /* 1.2.0 */
+    add_obsolete_integer( "rtp-caching" ) /* 1.2.0 */
+    add_obsolete_integer( "rtsp-caching" ) /* 1.2.0 */
+    add_obsolete_integer( "sftp-caching" ) /* 1.2.0 */
+    add_obsolete_integer( "smb-caching" ) /* 1.2.0 */
+    add_obsolete_integer( "tcp-caching" ) /* 1.2.0 */
+    add_obsolete_integer( "udp-caching" ) /* 1.2.0 */
 
     add_integer( "cr-average", 40, CR_AVERAGE_TEXT,
                  CR_AVERAGE_LONGTEXT, true )
