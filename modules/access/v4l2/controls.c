@@ -106,8 +106,8 @@ static int ControlSet64 (const vlc_v4l2_ctrl_t *c, int64_t value)
     struct v4l2_ext_control ext_ctrl = {
         .id = c->id,
         .size = 0,
-        .value64 = value,
     };
+    ext_ctrl.value64 = value;
     struct v4l2_ext_controls ext_ctrls = {
         .ctrl_class = V4L2_CTRL_ID2CLASS(c->id),
         .count = 1,
