@@ -171,7 +171,7 @@ int aout_OutputNew( audio_output_t *p_aout,
     else
     /* Otherwise, audio filters will not work. Use fixed-point if the input has
      * more than 16-bits depth. */
-    if( p_format->i_bitspersample > 16 )
+    if( p_format->i_bitspersample > 16 || !AOUT_FMT_LINEAR(p_format))
         owner->mixer_format.i_format = VLC_CODEC_FI32;
     else
     /* Fallback to 16-bits. This avoids pointless conversion to and from
