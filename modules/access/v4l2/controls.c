@@ -84,7 +84,7 @@ struct vlc_v4l2_ctrl
 {
     int                   fd;
     uint32_t              id;
-    enum v4l2_ctrl_type   type;
+    uint8_t               type;
     char                  name[32];
     int32_t               default_value;
     struct vlc_v4l2_ctrl *next;
