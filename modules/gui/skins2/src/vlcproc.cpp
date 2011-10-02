@@ -153,7 +153,7 @@ VlcProc::VlcProc( intf_thread_t *pIntf ): SkinObject( pIntf ),
     var_AddCallback( p_object, var, onGenericCallback, this );
 
     ADD_CALLBACK( pIntf->p_sys->p_playlist, "volume" )
-    ADD_CALLBACK( pIntf->p_libvlc, "intf-show" )
+    ADD_CALLBACK( pIntf->p_libvlc, "intf-toggle-fscontrol" )
 
     ADD_CALLBACK( pIntf->p_sys->p_playlist, "item-current" )
     ADD_CALLBACK( pIntf->p_sys->p_playlist, "random" )
@@ -205,7 +205,7 @@ VlcProc::~VlcProc()
 
     var_DelCallback( getIntf()->p_sys->p_playlist, "volume",
                      onGenericCallback, this );
-    var_DelCallback( getIntf()->p_libvlc, "intf-show",
+    var_DelCallback( getIntf()->p_libvlc, "intf-toggle-fscontrol",
                      onGenericCallback, this );
 
     var_DelCallback( getIntf()->p_sys->p_playlist, "item-current",
@@ -405,7 +405,7 @@ int VlcProc::onGenericCallback( vlc_object_t *pObj, const char *pVariable,
 
     ADD_CALLBACK_ENTRY( "audio-filter", on_audio_filter_changed, false )
 
-    ADD_CALLBACK_ENTRY( "intf-show", on_intf_show_changed, false )
+    ADD_CALLBACK_ENTRY( "intf-toggle-fscontrol", on_intf_show_changed, false )
 
     ADD_CALLBACK_ENTRY( "mouse-moved", on_mouse_moved_changed, false )
 

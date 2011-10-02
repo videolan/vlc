@@ -218,12 +218,9 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
         }
 
         /* Interface showing */
-        case ACTIONID_INTF_SHOW:
-            var_SetBool( p_intf->p_libvlc, "intf-show", true );
-            break;
-
+        case ACTIONID_INTF_TOGGLE_FSC:
         case ACTIONID_INTF_HIDE:
-            var_SetBool( p_intf->p_libvlc, "intf-show", false );
+            var_TriggerCallback( p_intf->p_libvlc, "intf-toggle-fscontrol" );
             break;
 
         case ACTIONID_INTF_BOSS:

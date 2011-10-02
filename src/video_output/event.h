@@ -71,7 +71,7 @@ static inline void vout_SendEventMousePressed(vout_thread_t *vout, int button)
         return;
     }
     case MOUSE_BUTTON_CENTER:
-        var_ToggleBool(vout->p_libvlc, "intf-show");
+        var_ToggleBool(vout->p_libvlc, "intf-toggle-fscontrol");
         return;
     case MOUSE_BUTTON_RIGHT:
         var_SetBool(vout->p_libvlc, "intf-popupmenu", true);

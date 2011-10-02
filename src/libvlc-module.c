@@ -1483,6 +1483,7 @@ static const char *const ppsz_albumart_descriptions[] =
 #define SCALE_DOWN_KEY_LONGTEXT N_("Decrease scale factor.")
 #define DEINTERLACE_KEY_TEXT N_("Cycle deinterlace modes")
 #define DEINTERLACE_KEY_LONGTEXT N_("Cycle through deinterlace modes.")
+#define INTF_TOGGLE_FSC_KEY_TEXT N_("Show controller in fullscreen")
 #define INTF_SHOW_KEY_TEXT N_("Show interface")
 #define INTF_SHOW_KEY_LONGTEXT N_("Raise the interface above all other windows.")
 #define INTF_HIDE_KEY_TEXT N_("Hide interface")
@@ -2311,8 +2312,7 @@ vlc_module_begin ()
 #   define KEY_SCALE_UP           "Alt+o"
 #   define KEY_SCALE_DOWN         "Shift+Alt+o"
 #   define KEY_DEINTERLACE        "d"
-#   define KEY_INTF_SHOW          "i"
-#   define KEY_INTF_HIDE          "Shift+i"
+#   define KEY_INTF_TOGGLE_FSC    "i"
 #   define KEY_INTF_BOSS          NULL
 #   define KEY_DISC_MENU          "Ctrl+m"
 #   define KEY_TITLE_PREV         "Ctrl+p"
@@ -2429,8 +2429,7 @@ vlc_module_begin ()
 #   define KEY_SCALE_UP           "Alt+o"
 #   define KEY_SCALE_DOWN         "Alt+Shift+o"
 #   define KEY_DEINTERLACE        "d"
-#   define KEY_INTF_SHOW          "i"
-#   define KEY_INTF_HIDE          "Shift+i"
+#   define KEY_INTF_TOGGLE_FSC    "i"
 #   define KEY_INTF_BOSS          NULL
 #   define KEY_DISC_MENU          "Shift+m"
 #   define KEY_TITLE_PREV         "Shift+o"
@@ -2600,10 +2599,10 @@ vlc_module_begin ()
              SCALE_DOWN_KEY_TEXT, SCALE_DOWN_KEY_LONGTEXT, false )
     add_key( "key-deinterlace", KEY_DEINTERLACE,
              DEINTERLACE_KEY_TEXT, DEINTERLACE_KEY_LONGTEXT, false )
-    add_key( "key-intf-show", KEY_INTF_SHOW,
-             INTF_SHOW_KEY_TEXT, INTF_SHOW_KEY_LONGTEXT, true )
-    add_key( "key-intf-hide", KEY_INTF_HIDE,
-             INTF_HIDE_KEY_TEXT, INTF_HIDE_KEY_LONGTEXT, true )
+    add_key( "key-intf-show", KEY_INTF_TOGGLE_FSC,
+             INTF_TOGGLE_FSC_KEY_TEXT, INTF_TOGGLE_FSC_KEY_TEXT, false )
+    add_obsolete_inner( "key-intf-hide", CONFIG_ITEM_KEY )
+
     add_key( "key-intf-boss", KEY_INTF_BOSS,
              INTF_BOSS_KEY_TEXT, INTF_BOSS_KEY_LONGTEXT, true )
     add_key( "key-snapshot", KEY_SNAPSHOT,

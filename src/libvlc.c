@@ -530,8 +530,8 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     priv->actions = vlc_InitActions( p_libvlc );
 
     /* Create a variable for showing the fullscreen interface */
-    var_Create( p_libvlc, "intf-show", VLC_VAR_BOOL );
-    var_SetBool( p_libvlc, "intf-show", true );
+    var_Create( p_libvlc, "intf-toggle-fscontrol", VLC_VAR_BOOL );
+    var_SetBool( p_libvlc, "intf-toggle-fscontrol", true );
 
     /* Create a variable for the Boss Key */
     var_Create( p_libvlc, "intf-boss", VLC_VAR_VOID );

@@ -228,7 +228,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     /************
      * Callbacks
      ************/
-    var_AddCallback( p_intf->p_libvlc, "intf-show", IntfShowCB, p_intf );
+    var_AddCallback( p_intf->p_libvlc, "intf-toggle-fscontrol", IntfShowCB, p_intf );
     var_AddCallback( p_intf->p_libvlc, "intf-boss", IntfBossCB, p_intf );
 
     /* Register callback for the intf-popupmenu variable */
@@ -315,7 +315,7 @@ MainInterface::~MainInterface()
 
     /* Unregister callbacks */
     var_DelCallback( p_intf->p_libvlc, "intf-boss", IntfBossCB, p_intf );
-    var_DelCallback( p_intf->p_libvlc, "intf-show", IntfShowCB, p_intf );
+    var_DelCallback( p_intf->p_libvlc, "intf-toggle-fscontrol", IntfShowCB, p_intf );
     var_DelCallback( p_intf->p_libvlc, "intf-popupmenu", PopupMenuCB, p_intf );
 
     p_intf->p_sys->p_mi = NULL;
@@ -1321,7 +1321,7 @@ static int PopupMenuCB( vlc_object_t *p_this, const char *psz_variable,
 }
 
 /*****************************************************************************
- * IntfShowCB: callback triggered by the intf-show libvlc variable.
+ * IntfShowCB: callback triggered by the intf-toggle-fscontrol libvlc variable.
  *****************************************************************************/
 static int IntfShowCB( vlc_object_t *p_this, const char *psz_variable,
                        vlc_value_t old_val, vlc_value_t new_val, void *param )

@@ -558,7 +558,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     val.b_bool = false;
 
     var_AddCallback( p_playlist, "fullscreen", FullscreenChanged, self);
-    var_AddCallback( p_intf->p_libvlc, "intf-show", ShowController, self);
+    var_AddCallback( p_intf->p_libvlc, "intf-toggle-fscontrol", ShowController, self);
 //    var_AddCallback(p_playlist, "item-change", PLItemChanged, self);
     var_AddCallback(p_playlist, "item-current", PLItemChanged, self);
     var_AddCallback(p_playlist, "activity", PLItemChanged, self);
