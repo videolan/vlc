@@ -25,6 +25,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_aout.h>
+#include <assert.h>
 
 static int Open (vlc_object_t *);
 static void Close (vlc_object_t *);
@@ -143,14 +144,60 @@ static int Open (vlc_object_t *obj)
         goto error;
 
     /* TODO: amem-format */
-    /* FIXME/TODO channel mapping */
-    if (strcmp(format, "S16N") || aout->format.i_channels != channels)
+    if (strcmp(format, "S16N"))
     {
         msg_Err (aout, "format not supported");
         goto error;
     }
+
+    /* channel mapping */
+    switch (channels)
+    {
+        case 1:
+            aout->format.i_physical_channels = AOUT_CHAN_CENTER;
+            break;
+        case 2:
+            aout->format.i_physical_channels =
+                AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
+            break;
+        case 3:
+            aout->format.i_physical_channels =
+                AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_LFE;
+            break;
+        case 4:
+            aout->format.i_physical_channels =
+                AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT |
+                AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT;
+            break;
+        case 5:
+            aout->format.i_physical_channels =
+                AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER |
+                AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT;
+            break;
+        case 6:
+            aout->format.i_physical_channels =
+                AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER |
+                AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT | AOUT_CHAN_LFE;
+            break;
+        case 7:
+            aout->format.i_physical_channels =
+                AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER |
+                AOUT_CHAN_REARCENTER | AOUT_CHAN_MIDDLELEFT |
+                AOUT_CHAN_MIDDLERIGHT | AOUT_CHAN_LFE;
+            break;
+        case 8:
+            aout->format.i_physical_channels =
+                AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER |
+                AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT |
+                AOUT_CHAN_MIDDLELEFT | AOUT_CHAN_MIDDLERIGHT | AOUT_CHAN_LFE;
+            break;
+        default:
+            assert(0);
+    }
+
     aout->format.i_format = VLC_CODEC_S16N;
     aout->format.i_rate = rate;
+    aout->format.i_original_channels = aout->format.i_physical_channels;
 
     aout->pf_play = Play;
     aout->pf_pause = Pause;
