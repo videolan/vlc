@@ -59,7 +59,7 @@ static int    CacheLoadConfig  ( module_t *, FILE * );
 
 /* Sub-version number
  * (only used to avoid breakage in dev version when cache structure changes) */
-#define CACHE_SUBVERSION_NUM 17
+#define CACHE_SUBVERSION_NUM 18
 
 /* Cache filename */
 #define CACHE_NAME "plugins.dat"
@@ -314,7 +314,6 @@ static int CacheLoadConfig( module_t *p_module, FILE *file )
         LOAD_STRING( p_module->p_config[i].psz_name );
         LOAD_STRING( p_module->p_config[i].psz_text );
         LOAD_STRING( p_module->p_config[i].psz_longtext );
-        LOAD_STRING( p_module->p_config[i].psz_oldname );
 
         if (IsConfigStringType (p_module->p_config[i].i_type))
         {
@@ -561,7 +560,6 @@ static int CacheSaveConfig (FILE *file, const module_t *p_module)
         SAVE_STRING( p_module->p_config[i].psz_name );
         SAVE_STRING( p_module->p_config[i].psz_text );
         SAVE_STRING( p_module->p_config[i].psz_longtext );
-        SAVE_STRING( p_module->p_config[i].psz_oldname );
 
         if (IsConfigStringType (p_module->p_config[i].i_type))
             SAVE_STRING( p_module->p_config[i].orig.psz );

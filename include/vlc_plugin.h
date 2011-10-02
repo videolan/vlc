@@ -82,8 +82,8 @@ enum vlc_module_properties
     VLC_CONFIG_SHORTCUT,
     /* one-character (short) command line option name (args=char) */
 
-    VLC_CONFIG_OLDNAME,
-    /* former option name (args=const char *) */
+    VLC_CONFIG_OLDNAME_OBSOLETE,
+    /* unused (ignored) */
 
     VLC_CONFIG_SAFE,
     /* tag as modifiable by untrusted input item "sources" (args=none) */
@@ -382,9 +382,6 @@ VLC_METADATA_EXPORTS
         add_obsolete_inner( name, CONFIG_ITEM_STRING )
 
 /* Modifier macros for the config options (used for fine tuning) */
-
-#define add_deprecated_alias( name ) \
-    vlc_config_set (VLC_CONFIG_OLDNAME, (const char *)(name));
 
 #define change_short( ch ) \
     vlc_config_set (VLC_CONFIG_SHORTCUT, (int)(ch));

@@ -225,20 +225,6 @@ int config_LoadCmdLine( vlc_object_t *p_this, int i_argc,
                     continue;
                 }
 
-                if( p_conf->psz_oldname
-                 && !strcmp( p_conf->psz_oldname, psz_name) )
-                {
-                    if( !b_ignore_errors )
-                    {
-                        fprintf( stderr, "Error: option --%s is deprecated. "
-                                 "Use --%s instead.\n",
-                                 psz_name, p_conf->psz_name );
-                        goto out;
-                    }
-
-                    psz_name = p_conf->psz_name;
-                }
-
                 switch( CONFIG_CLASS(p_conf->i_type) )
                 {
                     case CONFIG_ITEM_STRING:

@@ -342,13 +342,6 @@ void config_ChainParse( vlc_object_t *p_this, const char *psz_prefix,
                  * modules so i'll do it later */
                 continue;
             }
-            if( p_conf->psz_oldname
-             && !strcmp( p_conf->psz_oldname, name ) )
-            {
-                 psz_name = p_conf->psz_name;
-                 msg_Warn( p_this, "Option %s is obsolete. Use %s instead.",
-                           name, psz_name );
-            }
         }
         /* </Check if the option is deprecated> */
 

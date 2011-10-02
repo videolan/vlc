@@ -359,14 +359,6 @@ static int vlc_plugin_setter (void *plugin, void *tgt, int propid, ...)
             item->i_short = va_arg (ap, int);
             break;
 
-        case VLC_CONFIG_OLDNAME:
-        {
-            const char *oldname = va_arg (ap, const char *);
-            assert (item->psz_oldname == NULL);
-            item->psz_oldname = oldname ? strdup (oldname) : NULL;
-            break;
-        }
-
         case VLC_CONFIG_SAFE:
             item->b_safe = true;
             break;
