@@ -1667,9 +1667,6 @@ vlc_module_begin ()
               VIDEO_ON_TOP_LONGTEXT, false )
     add_bool( "video-wallpaper", false, WALLPAPER_TEXT,
               WALLPAPER_LONGTEXT, false )
-#ifdef WIN32
-        add_deprecated_alias( "directx-wallpaper" ) /* since 1.1.0 */
-#endif
     add_bool( "disable-screensaver", true, SS_TEXT, SS_LONGTEXT,
               true )
 
@@ -1882,13 +1879,13 @@ vlc_module_begin ()
     add_integer( "rtsp-port", 8554, RTSP_PORT_TEXT, RTSP_PORT_LONGTEXT, true )
         change_integer_range( 1, 65535 )
     add_loadfile( "http-cert", NULL, HTTP_CERT_TEXT, CERT_LONGTEXT, true )
-        add_deprecated_alias( "sout-http-cert" ) /* since 1.2.0 */
+    add_obsolete_string( "sout-http-cert" ) /* since 1.2.0 */
     add_loadfile( "http-key", NULL, HTTP_KEY_TEXT, KEY_LONGTEXT, true )
-        add_deprecated_alias( "sout-http-key" ) /* since 1.2.0 */
+    add_obsolete_string( "sout-http-key" ) /* since 1.2.0 */
     add_loadfile( "http-ca", NULL, HTTP_CA_TEXT, CA_LONGTEXT, true )
-        add_deprecated_alias( "sout-http-ca" ) /* since 1.2.0 */
+    add_obsolete_string( "sout-http-ca" ) /* since 1.2.0 */
     add_loadfile( "http-crl", NULL, HTTP_CRL_TEXT, CRL_LONGTEXT, true )
-        add_deprecated_alias( "sout-http-crl" ) /* since 1.2.0 */
+    add_obsolete_string( "sout-http-crl" ) /* since 1.2.0 */
 
     set_section( N_( "Socks proxy") , NULL )
     add_string( "socks", NULL,

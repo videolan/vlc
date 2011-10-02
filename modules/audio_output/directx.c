@@ -133,7 +133,6 @@ vlc_module_begin ()
 
     add_string( "directx-audio-device-name", "default",
              DEVICE_TEXT, DEVICE_LONGTEXT, false )
-        add_deprecated_alias( "directx-audio-device" ) /* Since 1.1.0 */
         change_string_list( ppsz_adev, ppsz_adev_text, ReloadDirectXDevices )
         change_action_add( ReloadDirectXDevices, N_("Refresh list") )
     add_bool( "directx-audio-float32", false, FLOAT_TEXT,
