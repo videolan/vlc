@@ -913,7 +913,7 @@ int ExecuteCommand( vlm_t *p_vlm, const char *psz_command,
     else IF_EXECUTE( "setup",   (i_command < 2),    ExecuteSetup(p_vlm, ppsz_command[1], i_command-2, &ppsz_command[2], &p_message) )
     else
     {
-        p_message = vlm_MessageNew( ppsz_command[0], "Unknown command" );
+        p_message = vlm_MessageNew( ppsz_command[0], "Unknown VLM command" );
         goto error;
     }
 #undef IF_EXECUTE
