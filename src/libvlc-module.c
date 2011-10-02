@@ -1753,7 +1753,7 @@ vlc_module_begin ()
                 VIDEO_FILTER_TEXT, VIDEO_FILTER_LONGTEXT, false )
     add_module_list_cat( "video-splitter", SUBCAT_VIDEO_VFILTER, NULL,
                         VIDEO_SPLITTER_TEXT, VIDEO_SPLITTER_LONGTEXT, false )
-    add_deprecated_alias( "vout-filter" ) /* since 1.2.0 */
+    add_obsolete_string( "vout-filter" ) /* since 1.2.0 */
 #if 0
     add_string( "pixel-ratio", "1", PIXEL_RATIO_TEXT, PIXEL_RATIO_TEXT )
 #endif
