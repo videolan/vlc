@@ -783,11 +783,6 @@ static int OpenGeneric( vlc_object_t *p_this, bool b_encode )
         msg_Warn( p_this, "cannot find OMX_* symbols in `%s' (%s)",
                   ppsz_dll_list[i], dlerror() );
         dll_close(dll_handle);
-    }
-
-    if( !pf_init || !pf_deinit || !pf_get_handle || !pf_free_handle || !pf_component_enum )
-    {
-        dll_close(dll_handle);
         return VLC_EGENERIC;
     }
 
