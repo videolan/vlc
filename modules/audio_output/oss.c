@@ -247,9 +247,6 @@ static void Probe( audio_output_t * p_aout )
             msg_Warn( p_aout, "S/PDIF not supported by card" );
         }
     }
-
-    var_AddCallback( p_aout, "audio-device", aout_ChannelsRestart,
-                     NULL );
 }
 
 /*****************************************************************************
@@ -303,17 +300,12 @@ static int Open( vlc_object_t *p_this )
     p_aout->pf_flush = aout_PacketFlush;
 
     if ( var_Type( p_aout, "audio-device" ) == 0 )
-    {
         Probe( p_aout );
-    }
+    var_AddCallback( p_aout, "audio-device", aout_ChannelsRestart, NULL );
 
     if ( var_Get( p_aout, "audio-device", &val ) < 0 )
-    {
         /* Probe() has failed. */
-        close( p_sys->i_fd );
-        free( p_sys );
-        return VLC_EGENERIC;
-    }
+        goto error;
 
     if ( val.i_int == AOUT_VAR_SPDIF )
     {
@@ -350,9 +342,7 @@ static int Open( vlc_object_t *p_this )
         /* This should not happen ! */
         msg_Err( p_aout, "internal: can't find audio-device (%"PRId64")",
                  val.i_int );
-        close( p_sys->i_fd );
-        free( p_sys );
-        return VLC_EGENERIC;
+        goto error;
     }
 
     var_TriggerCallback( p_aout, "intf-change" );
@@ -361,9 +351,7 @@ static int Open( vlc_object_t *p_this )
     if( ioctl( p_sys->i_fd, SNDCTL_DSP_RESET, NULL ) < 0 )
     {
         msg_Err( p_aout, "cannot reset OSS audio device" );
-        close( p_sys->i_fd );
-        free( p_sys );
-        return VLC_EGENERIC;
+        goto error;
     }
 
     /* Set the output format */
@@ -375,9 +363,7 @@ static int Open( vlc_object_t *p_this )
              || i_format != AFMT_AC3 )
         {
             msg_Err( p_aout, "cannot reset OSS audio device" );
-            close( p_sys->i_fd );
-            free( p_sys );
-            return VLC_EGENERIC;
+            goto error;
         }
 
         p_aout->format.i_format = VLC_CODEC_SPDIFL;
@@ -398,9 +384,7 @@ static int Open( vlc_object_t *p_this )
         if( ioctl( p_sys->i_fd, SNDCTL_DSP_SETFMT, &i_format ) < 0 )
         {
             msg_Err( p_aout, "cannot set audio output format" );
-            close( p_sys->i_fd );
-            free( p_sys );
-            return VLC_EGENERIC;
+            goto error;
         }
 
         switch ( i_format )
@@ -426,9 +410,7 @@ static int Open( vlc_object_t *p_this )
         default:
             msg_Err( p_aout, "OSS fell back to an unknown format (%d)",
                      i_format );
-            close( p_sys->i_fd );
-            free( p_sys );
-            return VLC_EGENERIC;
+            goto error;
         }
 
         i_nb_channels = aout_FormatNbChannels( &p_aout->format );
@@ -439,9 +421,7 @@ static int Open( vlc_object_t *p_this )
         {
             msg_Err( p_aout, "cannot set number of audio channels (%s)",
                      aout_FormatPrintChannels( &p_aout->format) );
-            close( p_sys->i_fd );
-            free( p_sys );
-            return VLC_EGENERIC;
+            goto error;
         }
 
         /* Set the output rate */
@@ -450,9 +430,7 @@ static int Open( vlc_object_t *p_this )
         {
             msg_Err( p_aout, "cannot set audio output rate (%i)",
                              p_aout->format.i_rate );
-            close( p_sys->i_fd );
-            free( p_sys );
-            return VLC_EGENERIC;
+            goto error;
         }
 
         if( i_rate != p_aout->format.i_rate )
@@ -480,9 +458,7 @@ static int Open( vlc_object_t *p_this )
         if( ioctl( p_sys->i_fd, SNDCTL_DSP_GETOSPACE, &audio_buf ) < 0 )
         {
             msg_Err( p_aout, "cannot get fragment size" );
-            close( p_sys->i_fd );
-            free( p_sys );
-            return VLC_EGENERIC;
+            goto error;
         }
 
         /* Number of fragments actually allocated */
@@ -505,13 +481,16 @@ static int Open( vlc_object_t *p_this )
                    VLC_THREAD_PRIORITY_OUTPUT ) )
     {
         msg_Err( p_aout, "cannot create OSS thread (%m)" );
-        close( p_sys->i_fd );
         aout_PacketDestroy( p_aout );
-        free( p_sys );
-        return VLC_ENOMEM;
+        goto error;
     }
 
     return VLC_SUCCESS;
+
+    var_DelCallback( p_aout, "audio-device", aout_ChannelsRestart, NULL );
+    close( p_sys->i_fd );
+    free( p_sys );
+    return VLC_EGENERIC;
 }
 
 /*****************************************************************************
@@ -525,6 +504,7 @@ static void Close( vlc_object_t * p_this )
     vlc_cancel( p_sys->thread );
     vlc_join( p_sys->thread, NULL );
     p_aout->b_die = false;
+    var_DelCallback( p_aout, "audio-device", aout_ChannelsRestart, NULL );
 
     ioctl( p_sys->i_fd, SNDCTL_DSP_RESET, NULL );
     close( p_sys->i_fd );
