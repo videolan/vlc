@@ -337,7 +337,7 @@ static vlc_v4l2_ctrl_t *ControlCreate (int fd,
         for (i = 0; query->name[i]; i++)
         {
             unsigned char c = query->name[i];
-            if (c == ' ')
+            if (c == ' ' || c == ',')
                 c = '_';
             if (c < 128)
                 c = tolower (c);
