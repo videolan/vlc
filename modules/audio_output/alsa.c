@@ -82,7 +82,6 @@ vlc_module_begin ()
     set_category( CAT_AUDIO )
     set_subcategory( SUBCAT_AUDIO_AOUT )
     add_string ("alsa-audio-device", "default", N_("ALSA device"), NULL, false)
-        add_deprecated_alias( "alsadev" )   /* deprecated since 0.9.3 */
         change_string_list( ppsz_devices, ppsz_devices_text, FindDevicesCallback )
         change_action_add( FindDevicesCallback, N_("Refresh list") )
 

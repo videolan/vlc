@@ -95,7 +95,6 @@ vlc_module_begin ()
 
     add_string( "waveout-audio-device", "wavemapper",
                  DEVICE_TEXT, DEVICE_LONG, false )
-       add_deprecated_alias( "waveout-dev" )   /* deprecated since 0.9.3 */
        change_string_list( ppsz_adev, ppsz_adev_text, ReloadWaveoutDevices )
        change_action_add( ReloadWaveoutDevices, N_("Refresh list") )
 

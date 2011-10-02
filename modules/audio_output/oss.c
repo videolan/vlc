@@ -103,7 +103,6 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_AUDIO_AOUT )
     add_loadfile( "oss-audio-device", "/dev/dsp",
                   N_("OSS DSP device"), NULL, false )
-        add_deprecated_alias( "dspdev" )   /* deprecated since 0.9.3 */
 
     set_capability( "audio output", 100 )
     add_shortcut( "oss" )

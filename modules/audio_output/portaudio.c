@@ -114,7 +114,6 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_AUDIO_AOUT )
     add_integer( "portaudio-audio-device", 0,
                  DEVICE_TEXT, DEVICE_LONGTEXT, false )
-        add_deprecated_alias( "portaudio-device" )   /* deprecated since 0.9.3 */
     set_capability( "audio output", 0 )
     set_callbacks( Open, Close )
 vlc_module_end ()

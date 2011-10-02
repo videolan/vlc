@@ -85,11 +85,9 @@ vlc_module_begin ()
 
     add_integer_with_range( FILTER_PREFIX "q", PP_QUALITY_MAX, 0,
                             PP_QUALITY_MAX, Q_TEXT, Q_LONGTEXT, false )
-        add_deprecated_alias( "ffmpeg-pp-q" )
         change_safe()
     add_string( FILTER_PREFIX "name", "default", NAME_TEXT,
                 NAME_LONGTEXT, true )
-        add_deprecated_alias( "ffmpeg-pp-name" )
 vlc_module_end ()
 
 static const char *const ppsz_filter_options[] = {

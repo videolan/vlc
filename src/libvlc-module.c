@@ -1644,9 +1644,6 @@ vlc_module_begin ()
         change_safe ()
     add_bool( "embedded-video", 1, EMBEDDED_TEXT, EMBEDDED_LONGTEXT,
               true )
-#ifdef __APPLE__
-       add_deprecated_alias( "macosx-embedded" ) /*deprecated since 0.9.0 */
-#endif
     add_bool( "xlib", true, "", "", true )
         change_private ()
     add_bool( "drop-late-frames", 1, DROP_LATE_FRAMES_TEXT,
@@ -1671,7 +1668,7 @@ vlc_module_begin ()
     add_bool( "video-wallpaper", false, WALLPAPER_TEXT,
               WALLPAPER_LONGTEXT, false )
 #ifdef WIN32
-        add_deprecated_alias( "directx-wallpaper" )
+        add_deprecated_alias( "directx-wallpaper" ) /* since 1.1.0 */
 #endif
     add_bool( "disable-screensaver", true, SS_TEXT, SS_LONGTEXT,
               true )
@@ -1756,7 +1753,7 @@ vlc_module_begin ()
                 VIDEO_FILTER_TEXT, VIDEO_FILTER_LONGTEXT, false )
     add_module_list_cat( "video-splitter", SUBCAT_VIDEO_VFILTER, NULL,
                         VIDEO_SPLITTER_TEXT, VIDEO_SPLITTER_LONGTEXT, false )
-    add_deprecated_alias( "vout-filter" )
+    add_deprecated_alias( "vout-filter" ) /* since 1.2.0 */
 #if 0
     add_string( "pixel-ratio", "1", PIXEL_RATIO_TEXT, PIXEL_RATIO_TEXT )
 #endif
@@ -2480,7 +2477,6 @@ vlc_module_begin ()
 
     add_key( "key-toggle-fullscreen", KEY_TOGGLE_FULLSCREEN, TOGGLE_FULLSCREEN_KEY_TEXT,
              TOGGLE_FULLSCREEN_KEY_LONGTEXT, false )
-       add_deprecated_alias( "key-fullscreen" ) /*deprecated since 0.9.0 */
     add_key( "key-leave-fullscreen", KEY_LEAVE_FULLSCREEN, LEAVE_FULLSCREEN_KEY_TEXT,
              LEAVE_FULLSCREEN_KEY_LONGTEXT, false )
     add_key( "key-play-pause", KEY_PLAY_PAUSE, PLAY_PAUSE_KEY_TEXT,

@@ -199,10 +199,8 @@ vlc_module_begin ()
 
     add_integer( CFG_PREFIX "borderw", 0,
                  BORDERW_TEXT, BORDERW_LONGTEXT, true )
-        add_deprecated_alias( CFG_PREFIX "vborder" )
     add_integer( CFG_PREFIX "borderh", 0,
                  BORDERH_TEXT, BORDERH_LONGTEXT, true )
-        add_deprecated_alias( CFG_PREFIX "hborder" )
 
     add_integer( CFG_PREFIX "position", 0,
                  POS_TEXT, POS_LONGTEXT, false )
