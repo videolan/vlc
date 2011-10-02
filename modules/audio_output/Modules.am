@@ -23,6 +23,7 @@ libvlc_LTLIBRARIES += \
 	libaout_file_plugin.la
 
 liboss_plugin_la_SOURCES = oss.c
+liboss_plugin_la_CFLAGS = $(AM_CFLAGS)
 liboss_plugin_la_LIBADD = $(AM_LIBADD) $(OSS_LIBS)
 liboss_plugin_la_DEPENDENCIES =
 if HAVE_OSS
