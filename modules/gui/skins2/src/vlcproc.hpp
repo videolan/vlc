@@ -65,6 +65,10 @@ public:
     /// Getter for the volume variable
     Volume &getVolumeVar() { return *((Volume*)(m_cVarVolume.get())); }
 
+    /// Getter for the current playback speed
+    VarText &getSpeedVar()
+       { return *((VarText*)(m_cVarSpeed.get())); }
+
     /// Getter for the stream name variable
     VarText &getStreamNameVar()
        { return *((VarText*)(m_cVarStreamName.get())); }
@@ -129,6 +133,8 @@ private:
     VariablePtr m_cVarTime;
     /// Variable for audio volume
     VariablePtr m_cVarVolume;
+    /// Variable for speed playback
+    VariablePtr m_cVarSpeed;
     /// Variable for current stream properties
     VariablePtr m_cVarStreamName;
     VariablePtr m_cVarStreamURI;

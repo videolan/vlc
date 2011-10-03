@@ -123,6 +123,10 @@ const UString VarText::get() const
     {
         temp.replace( pos, 2, pVlcProc->getStreamSampleRateVar().get() );
     }
+    while( (pos = temp.find( "$R" )) != UString::npos )
+    {
+        temp.replace( pos, 2, pVlcProc->getSpeedVar().get() );
+    }
 
     return temp;
 }
@@ -180,6 +184,10 @@ void VarText::set( const UString &rText )
         {
             pVlcProc->getStreamSampleRateVar().addObserver( this );
         }
+        if( m_text.find( "$R" ) != UString::npos )
+        {
+            pVlcProc->getSpeedVar().addObserver( this );
+        }
     }
 
     notify();
@@ -223,6 +231,7 @@ void VarText::delObservers()
     {
         pVlcProc->getTimeVar().delObserver( this );
         pVlcProc->getVolumeVar().delObserver( this );
+        pVlcProc->getSpeedVar().delObserver( this );
         pVlcProc->getStreamNameVar().delObserver( this );
         pVlcProc->getStreamURIVar().delObserver( this );
         pVlcProc->getStreamBitRateVar().delObserver( this );
