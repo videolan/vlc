@@ -35,6 +35,8 @@ VLC_API void vlc_pa_disconnect (vlc_object_t *obj, pa_context *ctx);
 VLC_API void vlc_pa_error (vlc_object_t *, const char *msg, pa_context *);
 #define vlc_pa_error(o, m, c) vlc_pa_error(VLC_OBJECT(o), m, c)
 
+VLC_API void vlc_pa_rttime_free (pa_time_event *);
+
 # ifdef __cplusplus
 }
 # endif

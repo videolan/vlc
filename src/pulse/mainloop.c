@@ -255,3 +255,14 @@ void vlc_pa_disconnect (vlc_object_t *obj, pa_context *ctx)
     vlc_pa_mainloop_deinit ();
     (void) obj;
 }
+
+/**
+ * Frees a timer event.
+ * \note Timer events can be created with pa_context_rttime_new().
+ * \warning This function must be called from the mainloop,
+ * or with the mainloop lock held.
+ */
+void vlc_pa_rttime_free(pa_time_event *e)
+{
+    (pa_threaded_mainloop_get_api (vlc_pa_mainloop))->time_free (e);
+}
