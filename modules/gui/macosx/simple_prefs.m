@@ -79,16 +79,22 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
 - (NSString *)OSXStringKeyToString:(NSString *)theString
 {
     if (![theString isEqualToString:@""]) {
+        /* modifiers */
         theString = [theString stringByReplacingOccurrencesOfString:@"Command" withString: [NSString stringWithUTF8String: "\xE2\x8C\x98"]];
         theString = [theString stringByReplacingOccurrencesOfString:@"Alt" withString: [NSString stringWithUTF8String: "\xE2\x8C\xA5"]];
         theString = [theString stringByReplacingOccurrencesOfString:@"Shift" withString: [NSString stringWithUTF8String: "\xE2\x87\xA7"]];
         theString = [theString stringByReplacingOccurrencesOfString:@"Ctrl" withString: [NSString stringWithUTF8String: "\xE2\x8C\x83"]];
+        /* remove cruft */
         theString = [theString stringByReplacingOccurrencesOfString:@"+" withString:@""];
         theString = [theString stringByReplacingOccurrencesOfString:@"-" withString:@""];
+        /* show non-character keys correctly */
         theString = [theString stringByReplacingOccurrencesOfString:@"Right" withString:[NSString stringWithUTF8String:"\xE2\x86\x92"]];
         theString = [theString stringByReplacingOccurrencesOfString:@"Left" withString:[NSString stringWithUTF8String:"\xE2\x86\x90"]];
         theString = [theString stringByReplacingOccurrencesOfString:@"Up" withString:[NSString stringWithUTF8String:"\xE2\x86\x91"]];
         theString = [theString stringByReplacingOccurrencesOfString:@"Down" withString:[NSString stringWithUTF8String:"\xE2\x86\x93"]];
+        theString = [theString stringByReplacingOccurrencesOfString:@"Enter" withString:[NSString stringWithUTF8String:"\xe2\x86\xb5"]];
+        theString = [theString stringByReplacingOccurrencesOfString:@"Tab" withString:[NSString stringWithUTF8String:"\xe2\x87\xa5"]];
+        theString = [theString stringByReplacingOccurrencesOfString:@"Delete" withString:[NSString stringWithUTF8String:"\xe2\x8c\xab"]];        /* capitalize plain characters to suit the menubar's look */
         theString = [theString capitalizedString];
     }
     else
@@ -1263,18 +1269,17 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
     NSString *keyString = [o_theEvent characters];
 	unichar key = [keyString characterAtIndex:0];
 
+    /* modifiers */
     if( [o_theEvent modifierFlags] & NSControlKeyMask )
         [tempString appendString:@"Ctrl-"];
-    
     if( [o_theEvent modifierFlags] & NSAlternateKeyMask  )
         [tempString appendString:@"Alt-"];
-    
     if( [o_theEvent modifierFlags] & NSShiftKeyMask )
         [tempString appendString:@"Shift-"];
-    
     if( [o_theEvent modifierFlags] & NSCommandKeyMask )
         [tempString appendString:@"Command-"];
 
+    /* non character keys */
     if( key == NSUpArrowFunctionKey )
         [tempString appendString:@"Up"];
     else if( key == NSDownArrowFunctionKey )
@@ -1283,7 +1288,53 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
         [tempString appendString:@"Left"];
     else if( key == NSRightArrowFunctionKey )
         [tempString appendString:@"Right"];
-    else if (![[[o_theEvent charactersIgnoringModifiers] lowercaseString] isEqualToString:@""])
+    else if( key == NSF1FunctionKey )
+        [tempString appendString:@"F1"];
+    else if( key == NSF2FunctionKey )
+        [tempString appendString:@"F2"];
+    else if( key == NSF3FunctionKey )
+        [tempString appendString:@"F3"];
+    else if( key == NSF4FunctionKey )
+        [tempString appendString:@"F4"];
+    else if( key == NSF5FunctionKey )
+        [tempString appendString:@"F5"];
+    else if( key == NSF6FunctionKey )
+        [tempString appendString:@"F6"];
+    else if( key == NSF7FunctionKey )
+        [tempString appendString:@"F7"];
+    else if( key == NSF8FunctionKey )
+        [tempString appendString:@"F8"];
+    else if( key == NSF9FunctionKey )
+        [tempString appendString:@"F9"];
+    else if( key == NSF10FunctionKey )
+        [tempString appendString:@"F10"];
+    else if( key == NSF11FunctionKey )
+        [tempString appendString:@"F11"];
+    else if( key == NSF12FunctionKey )
+        [tempString appendString:@"F12"];
+    else if( key == NSInsertFunctionKey )
+        [tempString appendString:@"Insert"];
+    else if( key == NSHomeFunctionKey )
+        [tempString appendString:@"Home"];
+    else if( key == NSEndFunctionKey )
+        [tempString appendString:@"End"];
+    else if( key == NSPageUpFunctionKey )
+        [tempString appendString:@"Pageup"];
+    else if( key == NSPageDownFunctionKey )
+        [tempString appendString:@"Pagedown"];
+    else if( key == NSMenuFunctionKey )
+        [tempString appendString:@"Menu"];
+    else if( key == NSTabCharacter )
+        [tempString appendString:@"Tab"];
+    else if( key == NSCarriageReturnCharacter )
+        [tempString appendString:@"Enter"];
+    else if( key == NSEnterCharacter )
+        [tempString appendString:@"Enter"];
+    else if( key == NSDeleteCharacter )
+        [tempString appendString:@"Delete"];
+    else if( key == NSBackspaceCharacter )
+        [tempString appendString:@"Backspace"];
+    else if (![[[o_theEvent charactersIgnoringModifiers] lowercaseString] isEqualToString:@""]) //plain characters
         [tempString appendString:[[o_theEvent charactersIgnoringModifiers] lowercaseString]];
     else
         return NO;

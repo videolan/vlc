@@ -1095,6 +1095,7 @@ static struct
     { NSCarriageReturnCharacter, KEY_ENTER },
     { NSEnterCharacter, KEY_ENTER },
     { NSBackspaceCharacter, KEY_BACKSPACE },
+    { NSDeleteCharacter, KEY_DELETE },
     {0,0}
 };
 
@@ -1147,6 +1148,51 @@ unsigned int CocoaKeyToVLC( unichar i_key )
             return [NSString stringWithFormat:@"%C", NSRightArrowFunctionKey];
         else if([theString rangeOfString:@"Left"].location != NSNotFound)
             return [NSString stringWithFormat:@"%C", NSLeftArrowFunctionKey];
+        else if([theString rangeOfString:@"Enter"].location != NSNotFound)
+            return [NSString stringWithFormat:@"%C", NSEnterCharacter]; // we treat NSCarriageReturnCharacter as aquivalent
+        else if([theString rangeOfString:@"Insert"].location != NSNotFound)
+            return [NSString stringWithFormat:@"%C", NSInsertFunctionKey];
+        else if([theString rangeOfString:@"Home"].location != NSNotFound)
+            return [NSString stringWithFormat:@"%C", NSHomeFunctionKey];
+        else if([theString rangeOfString:@"End"].location != NSNotFound)
+            return [NSString stringWithFormat:@"%C", NSEndFunctionKey];
+        else if([theString rangeOfString:@"Pageup"].location != NSNotFound)
+            return [NSString stringWithFormat:@"%C", NSPageUpFunctionKey];
+        else if([theString rangeOfString:@"Pagedown"].location != NSNotFound)
+            return [NSString stringWithFormat:@"%C", NSPageDownFunctionKey];
+        else if([theString rangeOfString:@"Menu"].location != NSNotFound)
+            return [NSString stringWithFormat:@"%C", NSMenuFunctionKey];
+        else if([theString rangeOfString:@"Tab"].location != NSNotFound)
+            return [NSString stringWithFormat:@"%C", NSTabCharacter];
+        else if([theString rangeOfString:@"Backspace"].location != NSNotFound)
+            return [NSString stringWithFormat:@"%C", NSBackspaceCharacter];
+        else if([theString rangeOfString:@"Delete"].location != NSNotFound)
+            return [NSString stringWithFormat:@"%C", NSDeleteCharacter];
+        else if([theString rangeOfString:@"F12"].location != NSNotFound)
+            return [NSString stringWithFormat:@"%C", NSF12FunctionKey];
+        else if([theString rangeOfString:@"F11"].location != NSNotFound)
+            return [NSString stringWithFormat:@"%C", NSF11FunctionKey];
+        else if([theString rangeOfString:@"F10"].location != NSNotFound)
+            return [NSString stringWithFormat:@"%C", NSF10FunctionKey];
+        else if([theString rangeOfString:@"F9"].location != NSNotFound)
+            return [NSString stringWithFormat:@"%C", NSF9FunctionKey];
+        else if([theString rangeOfString:@"F8"].location != NSNotFound)
+            return [NSString stringWithFormat:@"%C", NSF8FunctionKey];
+        else if([theString rangeOfString:@"F7"].location != NSNotFound)
+            return [NSString stringWithFormat:@"%C", NSF7FunctionKey];
+        else if([theString rangeOfString:@"F6"].location != NSNotFound)
+            return [NSString stringWithFormat:@"%C", NSF6FunctionKey];
+        else if([theString rangeOfString:@"F5"].location != NSNotFound)
+            return [NSString stringWithFormat:@"%C", NSF5FunctionKey];
+        else if([theString rangeOfString:@"F4"].location != NSNotFound)
+            return [NSString stringWithFormat:@"%C", NSF4FunctionKey];
+        else if([theString rangeOfString:@"F3"].location != NSNotFound)
+            return [NSString stringWithFormat:@"%C", NSF3FunctionKey];
+        else if([theString rangeOfString:@"F2"].location != NSNotFound)
+            return [NSString stringWithFormat:@"%C", NSF2FunctionKey];
+        else if([theString rangeOfString:@"F1"].location != NSNotFound)
+            return [NSString stringWithFormat:@"%C", NSF1FunctionKey];
+        /* note that we don't support esc here, since it is reserved for leaving fullscreen */
     }
 
     return theString;
