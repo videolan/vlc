@@ -79,14 +79,26 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
 - (NSString *)OSXStringKeyToString:(NSString *)theString
 {
     if (![theString isEqualToString:@""]) {
+        /* remove cruft */
+        if ([theString characterAtIndex:([theString length] - 1)] != 0x2b)
+            theString = [theString stringByReplacingOccurrencesOfString:@"+" withString:@""];
+        else
+        {
+            theString = [theString stringByReplacingOccurrencesOfString:@"+" withString:@""];
+            theString = [NSString stringWithFormat:@"%@+", theString];
+        }
+        if ([theString characterAtIndex:([theString length] - 1)] != 0x2d)
+            theString = [theString stringByReplacingOccurrencesOfString:@"-" withString:@""];
+        else
+        {
+            theString = [theString stringByReplacingOccurrencesOfString:@"-" withString:@""];
+            theString = [NSString stringWithFormat:@"%@-", theString];
+        }
         /* modifiers */
         theString = [theString stringByReplacingOccurrencesOfString:@"Command" withString: [NSString stringWithUTF8String: "\xE2\x8C\x98"]];
         theString = [theString stringByReplacingOccurrencesOfString:@"Alt" withString: [NSString stringWithUTF8String: "\xE2\x8C\xA5"]];
         theString = [theString stringByReplacingOccurrencesOfString:@"Shift" withString: [NSString stringWithUTF8String: "\xE2\x87\xA7"]];
         theString = [theString stringByReplacingOccurrencesOfString:@"Ctrl" withString: [NSString stringWithUTF8String: "\xE2\x8C\x83"]];
-        /* remove cruft */
-        theString = [theString stringByReplacingOccurrencesOfString:@"+" withString:@""];
-        theString = [theString stringByReplacingOccurrencesOfString:@"-" withString:@""];
         /* show non-character keys correctly */
         theString = [theString stringByReplacingOccurrencesOfString:@"Right" withString:[NSString stringWithUTF8String:"\xE2\x86\x92"]];
         theString = [theString stringByReplacingOccurrencesOfString:@"Left" withString:[NSString stringWithUTF8String:"\xE2\x86\x90"]];
