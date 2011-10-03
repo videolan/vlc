@@ -355,6 +355,26 @@ static void stream_state_cb(pa_stream *s, void *userdata)
     (void) userdata;
 }
 
+static void stream_event_cb(pa_stream *s, const char *name, pa_proplist *pl,
+                            void *userdata)
+{
+    audio_output_t *aout = userdata;
+
+#if PA_CHECK_VERSION(1,0,0)
+    /* FIXME: expose aout_Restart() directly */
+    if (!strcmp(name, PA_STREAM_EVENT_FORMAT_LOST)) {
+        vlc_value_t dummy = { .i_int = 0 };
+
+        msg_Dbg (aout, "format lost");
+        aout_ChannelsRestart (VLC_OBJECT(aout), "audio-device",
+                              dummy, dummy, NULL);
+    } else
+#endif
+        msg_Warn (aout, "unhandled event %s", name);
+    (void) s;
+    (void) pl;
+}
+
 static void stream_moved_cb(pa_stream *s, void *userdata)
 {
     audio_output_t *aout = userdata;
@@ -791,6 +811,7 @@ static int Open(vlc_object_t *obj)
     }
     sys->stream = s;
     pa_stream_set_state_callback(s, stream_state_cb, NULL);
+    pa_stream_set_event_callback(s, stream_event_cb, aout);
     pa_stream_set_latency_update_callback(s, stream_latency_cb, aout);
     pa_stream_set_moved_callback(s, stream_moved_cb, aout);
     pa_stream_set_overflow_callback(s, stream_overflow_cb, aout);
@@ -856,6 +877,7 @@ static void Close (vlc_object_t *obj)
 
         /* Clear all callbacks */
         pa_stream_set_state_callback(s, NULL, NULL);
+        pa_stream_set_event_callback(s, NULL, NULL);
         pa_stream_set_latency_update_callback(s, NULL, NULL);
         pa_stream_set_moved_callback(s, NULL, NULL);
         pa_stream_set_overflow_callback(s, NULL, NULL);
