@@ -193,7 +193,7 @@ pa_context *vlc_pa_connect (vlc_object_t *obj)
                               pw->pw_name);
 
         char hostname[sysconf (_SC_HOST_NAME_MAX)];
-        if (gethostname (hostname, sizeof (hostname) == 0))
+        if (gethostname (hostname, sizeof (hostname)) == 0)
             pa_proplist_sets (props, PA_PROP_APPLICATION_PROCESS_HOST,
                               hostname);
 
