@@ -68,6 +68,7 @@ struct aout_sys_t
 {
     pa_stream *stream; /**< PulseAudio playback stream object */
     pa_context *context; /**< PulseAudio connection context */
+    pa_time_event *trigger; /**< Deferred stream trigger */
     pa_volume_t base_volume; /**< 0dB reference volume */
     pa_cvolume cvolume; /**< actual sink input volume */
     mtime_t paused; /**< Time when (last) paused */
@@ -185,6 +186,51 @@ static void stream_reset_sync(pa_stream *s, audio_output_t *aout)
     sys->rate = rate;
 }
 
+static void stream_start(pa_stream *s, audio_output_t *aout)
+{
+    aout_sys_t *sys = aout->sys;
+    pa_operation *op;
+
+    if (sys->trigger != NULL) {
+        vlc_pa_rttime_free(sys->trigger);
+        sys->trigger = NULL;
+    }
+
+    op = pa_stream_cork(s, 0, NULL, NULL);
+    if (op != NULL)
+        pa_operation_unref(op);
+    op = pa_stream_trigger(s, NULL, NULL);
+    if (likely(op != NULL))
+        pa_operation_unref(op);
+}
+
+static void stream_stop(pa_stream *s, audio_output_t *aout)
+{
+    aout_sys_t *sys = aout->sys;
+    pa_operation *op;
+
+    if (sys->trigger != NULL) {
+        vlc_pa_rttime_free(sys->trigger);
+        sys->trigger = NULL;
+    }
+
+    op = pa_stream_cork(s, 1, NULL, NULL);
+    if (op != NULL)
+        pa_operation_unref(op);
+}
+
+static void stream_trigger_cb(pa_mainloop_api *api, pa_time_event *e,
+                              const struct timeval *tv, void *userdata)
+{
+    audio_output_t *aout = userdata;
+    aout_sys_t *sys = aout->sys;
+
+    msg_Dbg(aout, "starting deferred");
+    assert (sys->trigger == e);
+    stream_start(sys->stream, aout);
+    (void) api; (void) e; (void) tv;
+}
+
 /**
  * Starts or resumes the playback stream.
  * Tries start playing back audio samples at the most accurate time
@@ -194,7 +240,6 @@ static void stream_reset_sync(pa_stream *s, audio_output_t *aout)
 static void stream_resync(audio_output_t *aout, pa_stream *s)
 {
     aout_sys_t *sys = aout->sys;
-    pa_operation *op;
     mtime_t delta;
 
     assert (pa_stream_is_corked(s) > 0);
@@ -205,32 +250,17 @@ static void stream_resync(audio_output_t *aout, pa_stream *s)
         delta = 0; /* screwed */
 
     delta = (sys->pts - mdate()) - delta;
-
-    /* TODO: adjust prebuf instead of padding? */
     if (delta > 0) {
-        size_t nb = (delta * sys->rate) / CLOCK_FREQ;
-        size_t size = aout->format.i_bytes_per_frame;
-        float *zeroes = calloc (nb, size);
-
-        msg_Dbg(aout, "starting with %zu zeroes (%"PRId64" us)", nb,
-                delta);
-#if 0 /* Fault injector: add delay */
-        pa_stream_write(s, zeroes, nb * size, NULL, 0, PA_SEEK_RELATIVE);
-        pa_stream_write(s, zeroes, nb * size, NULL, 0, PA_SEEK_RELATIVE);
-#endif
-        if (likely(zeroes != NULL))
-            if (pa_stream_write(s, zeroes, nb * size, free, 0,
-                                PA_SEEK_RELATIVE) < 0)
-                free(zeroes);
-    } else
+        if (sys->trigger == NULL) {
+            msg_Dbg(aout, "deferring start (%"PRId64" us)", delta);
+            delta += pa_rtclock_now();
+            sys->trigger = pa_context_rttime_new(sys->context, delta,
+                                                 stream_trigger_cb, aout);
+        }
+    } else {
         msg_Warn(aout, "starting late (%"PRId64" us)", delta);
-
-    op = pa_stream_cork(s, 0, NULL, NULL);
-    if (op != NULL)
-        pa_operation_unref(op);
-    op = pa_stream_trigger(s, NULL, NULL);
-    if (op != NULL)
-        pa_operation_unref(op);
+        stream_start(s, aout);
+    }
 }
 
 static void stream_latency_cb(pa_stream *s, void *userdata)
@@ -371,12 +401,9 @@ static void stream_suspended_cb(pa_stream *s, void *userdata)
 static void stream_underflow_cb(pa_stream *s, void *userdata)
 {
     audio_output_t *aout = userdata;
-    pa_operation *op;
 
     msg_Warn(aout, "underflow");
-    op = pa_stream_cork(s, 1, NULL, NULL);
-    if (op != NULL)
-        pa_operation_unref(op);
+    stream_stop(s, aout);
     stream_reset_sync(s, aout);
 }
 
@@ -486,15 +513,12 @@ static void Pause(audio_output_t *aout, bool paused, mtime_t date)
 {
     aout_sys_t *sys = aout->sys;
     pa_stream *s = sys->stream;
-    pa_operation *op;
 
     vlc_pa_lock();
 
     if (paused) {
         sys->paused = date;
-        op = pa_stream_cork(s, paused, NULL, NULL);
-        if (op != NULL)
-            pa_operation_unref(op);
+        stream_stop(s, aout);
     } else {
         assert (sys->paused != VLC_TS_INVALID);
         date -= sys->paused;
@@ -740,6 +764,7 @@ static int Open(vlc_object_t *obj)
     aout->sys = sys;
     sys->stream = NULL;
     sys->context = ctx;
+    sys->trigger = NULL;
     sys->paused = VLC_TS_INVALID;
     sys->pts = VLC_TS_INVALID;
     sys->desync = 0;
@@ -825,6 +850,8 @@ static void Close (vlc_object_t *obj)
         var_Destroy (aout, "audio-device");
 
         vlc_pa_lock ();
+        if (unlikely(sys->trigger != NULL))
+            vlc_pa_rttime_free(sys->trigger);
         pa_stream_disconnect(s);
 
         /* Clear all callbacks */
