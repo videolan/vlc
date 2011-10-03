@@ -29,23 +29,28 @@
 #endif
 
 /* Hacks to compile with old headers */
+#ifndef V4L2_CTRL_FLAG_VOLATILE /* 3.2 */
+# warning Please update Video4Linux2 headers!
+# define V4L2_CTRL_FLAG_VOLATILE 0x0080
+#endif
 #ifdef __linux__
 # include <linux/version.h>
-# if LINUX_VERSION_CODE < KERNEL_VERSION(3,2,0)
-#  warning Please update Video4Linux2 headers!
-#  define V4L2_CTRL_FLAG_VOLATILE 0x0080
-# endif
 # if LINUX_VERSION_CODE < KERNEL_VERSION(3,1,0)
 #  define V4L2_CTRL_TYPE_BITMASK 8
 # endif
-# if LINUX_VERSION_CODE < KERNEL_VERSION(2,6,35)
-#  define V4L2_CID_CHROMA_GAIN (V4L2_CID_BASE+36)
-# endif
-# if LINUX_VERSION_CODE < KERNEL_VERSION(2,6,33)
-#  define V4L2_CID_ROTATE (V4L2_CID_BASE+34)
-#  define V4L2_CID_BG_COLOR (V4L2_CID_BASE+35)
-# endif
 #endif
+#ifndef V4L2_CID_ILLUMINATORS_1 /* 2.6.37 */
+# define V4L2_CID_ILLUMINATORS_1 (V4L2_CID_BASE+38)
+# define V4L2_CID_ILLUMINATORS_2 (V4L2_CID_BASE+37)
+#endif
+#ifndef V4L2_CID_CHROMA_GAIN /* 2.6.35 */
+# define V4L2_CID_CHROMA_GAIN (V4L2_CID_BASE+36)
+#endif
+#ifndef V4L2_CID_ROTATE /* 2.6.33 */
+# define V4L2_CID_BG_COLOR (V4L2_CID_BASE+35)
+# define V4L2_CID_ROTATE (V4L2_CID_BASE+34)
+#endif
+
 
 #ifdef HAVE_LIBV4L2
 #   include <libv4l2.h>
