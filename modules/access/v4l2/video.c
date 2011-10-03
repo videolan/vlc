@@ -92,6 +92,9 @@
 #define CTRL_RESET_LONGTEXT N_( "Reset controls to defaults." )
 #define BRIGHTNESS_TEXT N_( "Brightness" )
 #define BRIGHTNESS_LONGTEXT N_( "Picture brightness or black level." )
+#define BRIGHTNESS_AUTO_TEXT N_( "Automatic brightness" )
+#define BRIGHTNESS_AUTO_LONGTEXT N_( \
+    "Automatically adjust the picture brightness." )
 #define CONTRAST_TEXT N_( "Contrast" )
 #define CONTRAST_LONGTEXT N_( "Picture contrast or luma gain." )
 #define SATURATION_TEXT N_( "Saturation" )
@@ -146,6 +149,9 @@ static const char *const power_freq_user[] = { N_("Unspecified"),
 };
 #define BKLT_COMPENSATE_TEXT N_( "Backlight compensation" )
 #define BKLT_COMPENSATE_LONGTEXT N_( "Backlight compensation." )
+#define BAND_STOP_FILTER_TEXT N_( "Band-stop filter" )
+#define BAND_STOP_FILTER_LONGTEXT N_(  \
+    "Cut a light band induced by fluorescent lighting (unit undocumented)." )
 #define HFLIP_TEXT N_( "Horizontal flip" )
 #define HFLIP_LONGTEXT N_( \
     "Flip the picture horizontally." )
@@ -359,13 +365,16 @@ vlc_module_begin ()
         change_safe()
     add_integer( CFG_PREFIX "brightness", -1, BRIGHTNESS_TEXT,
                  BRIGHTNESS_LONGTEXT, true )
+    add_integer( CFG_PREFIX "brightness-auto", -1,
+                 BRIGHTNESS_AUTO_TEXT, BRIGHTNESS_AUTO_LONGTEXT, true )
+        change_integer_list( tristate_vlc, tristate_user )
     add_integer( CFG_PREFIX "contrast", -1, CONTRAST_TEXT,
                  CONTRAST_LONGTEXT, true )
     add_integer( CFG_PREFIX "saturation", -1, SATURATION_TEXT,
                  SATURATION_LONGTEXT, true )
     add_integer( CFG_PREFIX "hue", -1, HUE_TEXT,
                  HUE_LONGTEXT, true )
-    add_integer( CFG_PREFIX "auto-hue", -1,
+    add_integer( CFG_PREFIX "hue-auto", -1,
                  HUE_AUTO_TEXT, HUE_AUTO_LONGTEXT, true )
         change_integer_list( tristate_vlc, tristate_user )
     add_obsolete_integer( CFG_PREFIX "black-level" ) /* since Linux 2.6.26 */
@@ -401,6 +410,8 @@ vlc_module_begin ()
         change_integer_list( power_freq_vlc, power_freq_user )
     add_integer( CFG_PREFIX"backlight-compensation", -1,
                  BKLT_COMPENSATE_TEXT, BKLT_COMPENSATE_LONGTEXT, true )
+    add_integer( CFG_PREFIX "band-stop-filter", -1,
+                 BAND_STOP_FILTER_TEXT, BAND_STOP_FILTER_LONGTEXT, true )
     add_bool( CFG_PREFIX "hflip", false, HFLIP_TEXT, HFLIP_LONGTEXT, true )
     add_bool( CFG_PREFIX "vflip", false, VFLIP_TEXT, VFLIP_LONGTEXT, true )
     add_integer( CFG_PREFIX "rotate", -1, ROTATE_TEXT, ROTATE_LONGTEXT, true )

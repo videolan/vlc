@@ -72,12 +72,14 @@ static const vlc_v4l2_ctrl_name_t controls[] =
     { "rotate", V4L2_CID_ROTATE },
     { "bg-color", V4L2_CID_BG_COLOR }, // NOTE: output only
     { "chroma-gain", V4L2_CID_CHROMA_GAIN },
+    { "brightness-auto", V4L2_CID_AUTOBRIGHTNESS },
+    { "band-stop-filter", V4L2_CID_BAND_STOP_FILTER },
 
     { "illuminators-1", V4L2_CID_ILLUMINATORS_1 }, // NOTE: don't care?
     { "illuminators-2", V4L2_CID_ILLUMINATORS_2 },
 #define CTRL_CID_KNOWN(cid) \
     ((((uint32_t)cid) - V4L2_CID_BRIGHTNESS) \
-        <= (V4L2_CID_VCENTER - V4L2_CID_BRIGHTNESS))
+        <= (V4L2_CID_BAND_STOP_FILTER - V4L2_CID_BRIGHTNESS))
 };
 
 struct vlc_v4l2_ctrl
