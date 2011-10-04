@@ -64,3 +64,15 @@ void yuyv_i422_neon (struct yuv_planes *const out,
 /* UYVY to I422 conversion. */
 void uyvy_i422_neon (struct yuv_planes *const out,
                      const struct yuv_pack *const in, int width, int height);
+
+/* I420 to RGBA conversion. */
+void i420_rgb_neon (struct yuv_pack *const out,
+                    const struct yuv_planes *const in, int width, int height);
+
+/* NV21 to RGBA conversion. */
+void nv21_rgb_neon (struct yuv_pack *const out,
+                    const struct yuv_planes *const in, int width, int height);
+
+/* NV12 to RGBA conversion. */
+void nv12_rgb_neon (struct yuv_pack *const out,
+                    const struct yuv_planes *const in, int width, int height);

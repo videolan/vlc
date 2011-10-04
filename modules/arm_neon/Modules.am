@@ -18,7 +18,17 @@ libchroma_yuv_neon_plugin_la_CFLAGS = $(AM_CFLAGS)
 libchroma_yuv_neon_plugin_la_LIBADD = $(AM_LIBADD)
 libchroma_yuv_neon_plugin_la_DEPENDENCIES =
 
+libyuv_rgb_neon_plugin_la_SOURCES = \
+	i420_rgb.S \
+	nv21_rgb.S \
+	nv12_rgb.S \
+	yuv_rgb.c
+libyuv_rgb_neon_plugin_la_CFLAGS = $(AM_CFLAGS)
+libyuv_rgb_neon_plugin_la_LIBADD = $(AM_LIBADD)
+libyuv_rgb_neon_plugin_la_DEPENDENCIES =
+
 libvlc_LTLIBRARIES += \
 	libaudio_format_neon_plugin.la \
 	libchroma_yuv_neon_plugin.la \
+	libyuv_rgb_neon_plugin.la \
 	$(NULL)
