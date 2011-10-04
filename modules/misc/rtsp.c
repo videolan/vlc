@@ -164,6 +164,7 @@ struct vod_sys_t
 {
     /* RTSP server */
     httpd_host_t *p_rtsp_host;
+    char *psz_path;
     int i_throttle_users;
     int i_connections;
 
@@ -250,6 +251,12 @@ static int Open( vlc_object_t *p_this )
 {
     vod_t *p_vod = (vod_t *)p_this;
     vod_sys_t *p_sys = NULL;
+    char *psz_url = NULL;
+    vlc_url_t url;
+
+    psz_url = var_InheritString( p_vod, "rtsp-host" );
+    vlc_UrlParse( &url, psz_url, 0 );
+    free( psz_url );
 
     p_vod->p_sys = p_sys = malloc( sizeof( vod_sys_t ) );
     if( !p_sys ) goto error;
@@ -263,12 +270,23 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->psz_raw_mux = var_CreateGetString( p_this, "rtsp-raw-mux" );
 
+    var_Create( p_vod, "rtsp-host", VLC_VAR_STRING );
+    var_SetString( p_vod, "rtsp-host", url.psz_host );
+
+    if( url.i_port <= 0 ) url.i_port = 554;
+    var_Create( p_vod, "rtsp-port", VLC_VAR_INTEGER );
+    var_SetInteger( p_vod, "rtsp-port", url.i_port );
+
     p_sys->p_rtsp_host = vlc_rtsp_HostNew( VLC_OBJECT(p_vod) );
     if( !p_sys->p_rtsp_host )
     {
         msg_Err( p_vod, "cannot create RTSP server" );
         goto error;
     }
+
+    p_sys->psz_path = strdup( url.psz_path ? url.psz_path : "/" );
+
+    vlc_UrlClean( &url );
 
     TAB_INIT( p_sys->i_media, p_sys->media );
     p_sys->i_media_id = 0;
@@ -281,6 +299,7 @@ static int Open( vlc_object_t *p_this )
     {
         msg_Err( p_vod, "cannot spawn rtsp vod thread" );
         block_FifoRelease( p_sys->p_fifo_cmd );
+        free( p_sys->psz_path );
         goto error;
     }
 
@@ -293,6 +312,8 @@ error:
         free( p_sys->psz_raw_mux );
         free( p_sys );
     }
+    vlc_UrlClean( &url );
+
     return VLC_EGENERIC;
 }
 
@@ -331,6 +352,7 @@ static void Close( vlc_object_t * p_this )
         msg_Err( p_vod, "rtsp vod leaking %d medias", p_sys->i_media );
     TAB_CLEAN( p_sys->i_media, p_sys->media );
 
+    free( p_sys->psz_path );
     free( p_sys->psz_raw_mux );
     free( p_sys );
 }
@@ -353,15 +375,16 @@ static vod_media_t *MediaNew( vod_t *p_vod, const char *psz_name,
     TAB_INIT( p_media->i_rtsp, p_media->rtsp );
     p_media->b_raw = false;
 
-    p_media->psz_rtsp_path = strdup( psz_name );
+    if( asprintf( &p_media->psz_rtsp_path, "%s%s",
+                  p_sys->psz_path, psz_name ) <0 )
+        return NULL;
     p_media->p_rtsp_url =
-        httpd_UrlNewUnique( p_sys->p_rtsp_host, psz_name, NULL, NULL, NULL );
+        httpd_UrlNewUnique( p_sys->p_rtsp_host, p_media->psz_rtsp_path, NULL,
+                            NULL, NULL );
 
-    if( !p_media->psz_rtsp_path || !p_media->p_rtsp_url )
+    if( !p_media->p_rtsp_url )
     {
-        msg_Err( p_vod, "cannot create RTSP url (%s)", psz_name );
-        if( p_media->p_rtsp_url )
-            httpd_UrlDelete( p_media->p_rtsp_url );
+        msg_Err( p_vod, "cannot create RTSP url (%s)", p_media->psz_rtsp_path);
         free( p_media->psz_rtsp_path );
         free( p_media );
         return NULL;
