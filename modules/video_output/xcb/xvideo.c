@@ -362,7 +362,8 @@ static int Open (vlc_object_t *obj)
             continue;
         }
 
-        if (!(a->type & XCB_XV_TYPE_IMAGE_MASK))
+        if (!(a->type & XCB_XV_TYPE_INPUT_MASK)
+         || !(a->type & XCB_XV_TYPE_IMAGE_MASK))
             continue;
 
         xcb_xv_list_image_formats_reply_t *r =
