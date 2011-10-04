@@ -152,8 +152,7 @@ static int Open( vlc_object_t *p_this )
             port = NULL; /* IPv6 numeral */
         if( port != p_access->psz_path )
         {
-            int len = port ? (port - p_access->psz_path)
-                           : (int)strlen( p_access->psz_path );
+            int len = (port ? port : path) - p_access->psz_path;
             msg_Err( p_access, "\"%.*s\" HTTP host ignored", len,
                      p_access->psz_path );
             msg_Info( p_access,
