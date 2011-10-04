@@ -399,7 +399,6 @@ static vod_media_t *MediaNew( vod_t *p_vod, const char *psz_name,
     httpd_UrlCatch( p_media->p_rtsp_url, HTTPD_MSG_GETPARAMETER,
                     RtspCallback, (void*)p_media );
     httpd_UrlCatch( p_media->p_rtsp_url, HTTPD_MSG_TEARDOWN,
-
                     RtspCallback, (void*)p_media );
 
     p_media->p_vod = p_vod;
