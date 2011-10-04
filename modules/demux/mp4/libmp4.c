@@ -3203,17 +3203,12 @@ static void get_token( char **ppsz_path, char **ppsz_token, int *pi_number )
         *pi_number = 0;
         return;
     }
-    i_len = 0;
-    while(  (*ppsz_path)[i_len] &&
-            (*ppsz_path)[i_len] != '/' && (*ppsz_path)[i_len] != '[' )
-    {
-        i_len++;
-    }
+    i_len = strcspn( *ppsz_path, "/[" );
     if( !i_len && **ppsz_path == '/' )
     {
         i_len = 1;
     }
-    *ppsz_token = malloc( i_len + 1 );
+    *ppsz_token = xmalloc( i_len + 1 );
 
     memcpy( *ppsz_token, *ppsz_path, i_len );
 
