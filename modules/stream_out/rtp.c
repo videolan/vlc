@@ -717,7 +717,7 @@ static void SDPHandleUrl( sout_stream_t *p_stream, const char *psz_url )
             goto out;
         }
 
-        if( url.psz_host != NULL )
+        if( url.psz_host != NULL && *url.psz_host )
         {
             msg_Err( p_stream, "\"%s\" RTSP host ignored", url.psz_host );
             msg_Info( p_stream, "Pass --rtsp-host=%s on the command line "
