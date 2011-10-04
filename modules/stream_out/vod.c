@@ -272,7 +272,7 @@ static void MediaSetup( vod_t *p_vod, vod_media_t *p_media,
     vlc_UrlParse( &url, psz_url, 0 );
     free( psz_url );
 
-    if( url.psz_host != NULL )
+    if( url.psz_host != NULL && *url.psz_host )
     {
         msg_Err( p_vod, "\"%s\" RTSP host ignored", url.psz_host );
         msg_Info( p_vod, "Pass --rtsp-host=%s on the command line "
