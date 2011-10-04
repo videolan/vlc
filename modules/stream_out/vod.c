@@ -77,7 +77,7 @@ struct vod_media_t
 
 struct vod_sys_t
 {
-    char *psz_rtsp_url;
+    char *psz_rtsp_path;
 
     /* */
     vlc_thread_t thread;
@@ -123,20 +123,52 @@ int OpenVoD( vlc_object_t *p_this )
     psz_url = var_InheritString( p_vod, "rtsp-host" );
 
     if( psz_url == NULL )
-        p_sys->psz_rtsp_url = strdup( "/" );
+        p_sys->psz_rtsp_path = strdup( "/" );
     else
-    if( !( strlen( psz_url ) > 0 && psz_url[strlen( psz_url ) - 1] == '/' ) )
     {
-         if( asprintf( &p_sys->psz_rtsp_url, "%s/", psz_url ) == -1 )
-         {
-             p_sys->psz_rtsp_url = NULL;
-             free( psz_url );
-             goto error;
-         }
-         free( psz_url );
+        vlc_url_t url;
+        vlc_UrlParse( &url, psz_url, 0 );
+        free( psz_url );
+
+        if( url.psz_path == NULL )
+            p_sys->psz_rtsp_path = strdup( "/" );
+        else
+        if( !( strlen( url.psz_path ) > 0
+               && url.psz_path[strlen( url.psz_path ) - 1] == '/' ) )
+        {
+            if( asprintf( &p_sys->psz_rtsp_path, "%s/", url.psz_path ) == -1 )
+            {
+                p_sys->psz_rtsp_path = NULL;
+                vlc_UrlClean( &url );
+                goto error;
+            }
+        }
+        else
+            p_sys->psz_rtsp_path = strdup( url.psz_path );
+
+        /* if( url.psz_host != NULL && *url.psz_host )
+        {
+            msg_Err( p_vod, "\"%s\" RTSP host ignored", url.psz_host );
+            msg_Info( p_vod, "Pass --rtsp-host=%s on the command line "
+                      "instead.", url.psz_host );
+        } */
+
+        var_Create( p_vod, "rtsp-host", VLC_VAR_STRING );
+        var_SetString( p_vod, "rtsp-host", url.psz_host );
+
+        /* if( url.i_port != 0 )
+        {
+            msg_Err( p_vod, "\"%u\" RTSP port ignored", url.i_port );
+            msg_Info( p_vod, "Pass --rtsp-port=%u on the command line "
+                      "instead.", url.i_port );
+        } */
+
+        if( url.i_port <= 0 ) url.i_port = 554;
+        var_Create( p_vod, "rtsp-port", VLC_VAR_INTEGER );
+        var_SetInteger( p_vod, "rtsp-port", url.i_port );
+
+        vlc_UrlClean( &url );
     }
-    else
-        p_sys->psz_rtsp_url = psz_url;
 
     p_vod->pf_media_new = MediaNew;
     p_vod->pf_media_del = MediaAskDel;
@@ -154,7 +186,7 @@ int OpenVoD( vlc_object_t *p_this )
 error:
     if( p_sys )
     {
-        free( p_sys->psz_rtsp_url );
+        free( p_sys->psz_rtsp_path );
         free( p_sys );
     }
 
@@ -185,7 +217,7 @@ void CloseVoD( vlc_object_t * p_this )
     }
     block_FifoRelease( p_sys->p_fifo_cmd );
 
-    free( p_sys->psz_rtsp_url );
+    free( p_sys->psz_rtsp_path );
     free( p_sys );
 }
 
@@ -263,30 +295,13 @@ static void MediaSetup( vod_t *p_vod, vod_media_t *p_media,
                         const char *psz_name )
 {
     vod_sys_t *p_sys = p_vod->p_sys;
-    char *psz_url;
+    char *psz_path;
 
-    if( asprintf( &psz_url, "%s%s", p_sys->psz_rtsp_url, psz_name ) < 0 )
+    if( asprintf( &psz_path, "%s%s", p_sys->psz_rtsp_path, psz_name ) < 0 )
         return;
 
-    vlc_url_t url;
-    vlc_UrlParse( &url, psz_url, 0 );
-    free( psz_url );
-
-    if( url.psz_host != NULL && *url.psz_host )
-    {
-        msg_Err( p_vod, "\"%s\" RTSP host ignored", url.psz_host );
-        msg_Info( p_vod, "Pass --rtsp-host=%s on the command line "
-                  "instead.", url.psz_host );
-    }
-    if( url.i_port != 0 )
-    {
-        msg_Err( p_vod, "\"%u\" RTSP port ignored", url.i_port );
-        msg_Info( p_vod, "Pass --rtsp-port=%u on the command line "
-                  "instead.", url.i_port );
-    }
-    p_media->rtsp = RtspSetup(VLC_OBJECT(p_vod), p_media, url.psz_path);
-
-    vlc_UrlClean( &url );
+    p_media->rtsp = RtspSetup(VLC_OBJECT(p_vod), p_media, psz_path);
+    free( psz_path );
 
     if (p_media->rtsp == NULL)
         return;
