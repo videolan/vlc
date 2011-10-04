@@ -142,7 +142,6 @@ static int Open( vlc_object_t *p_this )
     config_ChainParse( p_access, SOUT_CFG_PREFIX, ppsz_sout_options, p_access->p_cfg );
 
     const char *path = p_access->psz_path;
-#if 1
     /* Skip everything before / - backward compatibiltiy with VLC 1.1 */
     path += strcspn( path, "/" );
     if( path > p_access->psz_path )
@@ -153,21 +152,37 @@ static int Open( vlc_object_t *p_this )
         if( port != p_access->psz_path )
         {
             int len = (port ? port : path) - p_access->psz_path;
-            msg_Err( p_access, "\"%.*s\" HTTP host ignored", len,
+            /* msg_Err( p_access, "\"%.*s\" HTTP host ignored", len,
                      p_access->psz_path );
             msg_Info( p_access,
-                      "Pass --http-host=IP on the command line instead." );
+                      "Pass --http-host=IP on the command line instead." ); */
+
+            char host[len + 1];
+            strncpy( host, p_access->psz_path, len );
+            host[len] = '\0';
+
+            var_Create( p_access, "http-host", VLC_VAR_STRING );
+            var_SetString( p_access, "http-host", host );
         }
         if( port != NULL )
         {
-            int len = path - ++port;
+            /* int len = path - ++port;
             msg_Err( p_access, "\"%.*s\" HTTP port ignored", len, port );
             msg_Info( p_access, "Pass --%s-port=%.*s on the command line "
                       "instead.", strcasecmp( p_access->psz_access, "https" )
-                      ? "http" : "https", len, port );
+                      ? "http" : "https", len, port ); */
+            port++;
+
+            int bind_port = atoi( port );
+            if( bind_port > 0 )
+            {
+                const char *var = strcasecmp( p_access->psz_access, "https" )
+                                  ? "http-port" : "https-port";
+                var_Create( p_access, var, VLC_VAR_INTEGER );
+                var_SetInteger( p_access, var, bind_port );
+            }
         }
     }
-#endif
     if( !*path )
         path = "/";
 
