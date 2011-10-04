@@ -1,0 +1,11 @@
+--- gettext/gettext-tools/src/msgmerge.c.orig	2007-10-21 03:25:52.000000000 +0200
++++ gettext/gettext-tools/src/msgmerge.c	2008-03-23 19:54:36.000000000 +0100
+@@ -96,7 +96,7 @@
+ 
+ /* Update mode.  */
+ static bool update_mode = false;
+-static const char *version_control_string;
++static const char *version_control_string = "none";
+ static const char *backup_suffix_string;
+ 
+ /* Long options.  */
