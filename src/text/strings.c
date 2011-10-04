@@ -968,62 +968,60 @@ char *str_format( vlc_object_t *p_this, const char *psz_src )
 }
 
 /**
- * Remove forbidden characters from filenames (including slashes)
+ * Remove forbidden, potentially forbidden and otherwise evil characters from
+ * filenames. This includes slashes, and popular characters like colon
+ * (on Unix anyway), so this should only be used for automatically generated
+ * filenames.
+ * \warning Do not use this on full paths,
+ * only single file names without any directory separator!
  */
 void filename_sanitize( char *str )
 {
-#if defined( WIN32 ) || defined( __OS2__ )
-    char *str_base = str;
-#endif
+    unsigned char c;
 
-    if( *str == '.' && (str[1] == '\0' || (str[1] == '.' && str[2] == '\0' ) ) )
+    /* Special file names, not allowed */
+    if( !strcmp( str, "." ) || !strcmp( str, ".." ) )
     {
         while( *str )
-        {
-            *str = '_';
-            str++;
-        }
+            *(str++) = '_';
         return;
     }
 
-#if defined( WIN32 ) || defined( __OS2__ )
-    // Change leading spaces into underscores
-    while( *str && *str == ' ' )
-        *str++ = '_';
-#endif
+    /* On platforms not using UTF-7, VLC cannot access non-Unicode paths.
+     * Also, some file systems require Unicode file names.
+     * NOTE: This may inserts '?' thus is done replacing '?' with '_'. */
+    EnsureUTF8( str );
 
-    while( *str )
+    /* Avoid leading spaces to please Windows. */
+    while( (c = *str) != '\0' )
     {
-        switch( *str )
-        {
-            case '/':
-#if defined( __APPLE__ )
-            case ':':
-#elif defined( WIN32 ) || defined( __OS2__ )
-            case '\\':
-            case '*':
-            case '"':
-            case '?':
-            case ':':
-            case '|':
-            case '<':
-            case '>':
-#endif
-                *str = '_';
-        }
+        if( c != ' ' )
+            break;
+        *(str++) = '_';
+    }
+
+    char *start = str;
+
+    while( (c = *str) != '\0' )
+    {
+        /* Non-printable characters are not a good idea */
+        if( c < 32 )
+            *str = '_';
+        /* This is the list of characters not allowed by Microsoft.
+         * We also black-list them on Unix as they may be confusing, and are
+         * not supported by some file system types (notably CIFS). */
+        else if( strchr( "/:\\*\"?|<>", c ) != NULL )
+            *str = '_';
         str++;
     }
 
-#if defined( WIN32 ) || defined( __OS2__ )
-    // Change trailing spaces into underscores
-    str--;
-    while( str != str_base )
+    /* Avoid trailing spaces also to please Windows. */
+    while( str > start )
     {
-        if( *str != ' ' )
+        if( *(--str) != ' ' )
             break;
-        *str-- = '_';
+        *str = '_';
     }
-#endif
 }
 
 /**
