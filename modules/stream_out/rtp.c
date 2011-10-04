@@ -175,6 +175,13 @@ static const char *const ppsz_protocols[] = {
     "negative value or zero disables timeouts. The default is 60 (one " \
     "minute)." )
 
+#define RTSP_USER_TEXT N_("Username")
+#define RTSP_USER_LONGTEXT N_("User name that will be " \
+                              "requested to access the stream." )
+#define RTSP_PASS_TEXT N_("Password")
+#define RTSP_PASS_LONGTEXT N_("Password that will be " \
+                              "requested to access the stream." )
+
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
@@ -250,6 +257,10 @@ vlc_module_begin ()
                  RTSP_HOST_LONGTEXT, true )
     add_integer( "rtsp-timeout", 60, RTSP_TIMEOUT_TEXT,
                  RTSP_TIMEOUT_LONGTEXT, true )
+    add_string( SOUT_CFG_PREFIX "user", "",
+                RTSP_USER_TEXT, RTSP_USER_LONGTEXT, true )
+    add_password( SOUT_CFG_PREFIX "pwd", "",
+                  RTSP_PASS_TEXT, RTSP_PASS_LONGTEXT, true )
 
 vlc_module_end ()
 

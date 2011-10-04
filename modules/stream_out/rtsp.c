@@ -121,8 +121,13 @@ rtsp_stream_t *RtspSetup( vlc_object_t *owner, vod_media_t *media,
     if( rtsp->host == NULL )
         goto error;
 
+    char *user = var_InheritString(owner, "rtsp-user");
+    char *pwd = var_InheritString(owner, "rtsp-pwd");
+
     rtsp->url = httpd_UrlNewUnique( rtsp->host, rtsp->psz_path,
-                                    NULL, NULL, NULL );
+                                    user, pwd, NULL );
+    free(user);
+    free(pwd);
     if( rtsp->url == NULL )
         goto error;
 
@@ -248,7 +253,13 @@ rtsp_stream_id_t *RtspAddId( rtsp_stream_t *rtsp, sout_stream_id_t *sid,
     }
 
     msg_Dbg( rtsp->owner, "RTSP: adding %s", urlbuf );
-    url = id->url = httpd_UrlNewUnique( rtsp->host, urlbuf, NULL, NULL, NULL );
+
+    char *user = var_InheritString(rtsp->owner, "rtsp-user");
+    char *pwd = var_InheritString(rtsp->owner, "rtsp-pwd");
+
+    url = id->url = httpd_UrlNewUnique( rtsp->host, urlbuf, user, pwd, NULL );
+    free( user );
+    free( pwd );
     free( urlbuf );
 
     if( url == NULL )
