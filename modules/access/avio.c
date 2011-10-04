@@ -29,6 +29,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_access.h>
+#include <vlc_sout.h>
 #include <vlc_avcodec.h>
 
 #include "avio.h"
@@ -48,10 +49,17 @@ vlc_module_end()
 static ssize_t Read   (access_t *, uint8_t *, size_t);
 static int     Seek   (access_t *, uint64_t);
 static int     Control(access_t *, int, va_list);
+static ssize_t Write( sout_access_out_t *, block_t * );
+static int     OutControl(sout_access_out_t *, int, va_list);
+static int     OutSeek ( sout_access_out_t *, off_t  );
 
-static int     SetupAvio(access_t *);
+static int     SetupAvio(vlc_object_t *);
 
 struct access_sys_t {
+    URLContext *context;
+};
+
+struct sout_access_out_sys_t {
     URLContext *context;
 };
 
@@ -68,7 +76,7 @@ int OpenAvio(vlc_object_t *object)
 
     /* We can either accept only one user (actually) or multiple ones
      * with an exclusive lock */
-    if (SetupAvio(access)) {
+    if (SetupAvio(VLC_OBJECT(access))) {
         msg_Err(access, "Module aready in use");
         return VLC_EGENERIC;
     }
@@ -122,6 +130,58 @@ error:
     return VLC_EGENERIC;
 }
 
+/* */
+int OutOpenAvio(vlc_object_t *object)
+{
+    sout_access_out_t *access = (sout_access_out_t*)object;
+    sout_access_out_sys_t *sys;
+
+    /* */
+    access->p_sys = sys = malloc(sizeof(*sys));
+    if (!sys)
+        return VLC_ENOMEM;
+
+    /* We can either accept only one user (actually) or multiple ones
+     * with an exclusive lock */
+    if (SetupAvio(VLC_OBJECT(access))) {
+        msg_Err(access, "Module aready in use");
+        return VLC_EGENERIC;
+    }
+
+    /* */
+    vlc_avcodec_lock();
+    av_register_all();
+    vlc_avcodec_unlock();
+
+    char *url = NULL;
+    if (access->psz_path)
+        url = strdup(access->psz_path);
+
+    if (!url)
+        goto error;
+
+    msg_Dbg(access, "avio_output Opening '%s'", url);
+    if (url_open(&sys->context, url, URL_WRONLY) < 0 )
+        sys->context = NULL;
+    free(url);
+
+    if (!sys->context) {
+        msg_Err(access, "Failed to open url using libavformat");
+        goto error;
+    }
+
+    access->pf_write = Write;
+    access->pf_control = OutControl;
+    access->pf_seek = OutSeek;
+    access->p_sys = sys;
+
+    return VLC_SUCCESS;
+
+error:
+    SetupAvio(NULL);
+    free(sys);
+    return VLC_EGENERIC;
+}
 
 void CloseAvio(vlc_object_t *object)
 {
@@ -135,6 +195,17 @@ void CloseAvio(vlc_object_t *object)
     free(sys);
 }
 
+void OutCloseAvio(vlc_object_t *object)
+{
+    sout_access_out_t *access = (sout_access_out_t*)object;
+    sout_access_out_sys_t *sys = access->p_sys;
+
+    url_close(sys->context);
+
+    SetupAvio(NULL);
+
+    free(sys);
+}
 
 static ssize_t Read(access_t *access, uint8_t *data, size_t size)
 {
@@ -149,6 +220,26 @@ static ssize_t Read(access_t *access, uint8_t *data, size_t size)
     return r;
 }
 
+/*****************************************************************************
+ * Write:
+ *****************************************************************************/
+static ssize_t Write( sout_access_out_t *p_access, block_t *p_buffer )
+{
+    access_sys_t *p_sys = (access_sys_t*)p_access->p_sys;
+    size_t i_write = 0;
+
+    while( p_buffer != NULL )
+    {
+        block_t *p_next = p_buffer->p_next;;
+
+        i_write += url_write(p_sys->context, p_buffer->p_buffer, p_buffer->i_buffer);
+        block_Release( p_buffer );
+
+        p_buffer = p_next;
+    }
+
+    return i_write;
+}
 
 static int Seek(access_t *access, uint64_t position)
 {
@@ -165,6 +256,35 @@ static int Seek(access_t *access, uint64_t position)
     return VLC_SUCCESS;
 }
 
+static int OutSeek( sout_access_out_t *p_access, off_t i_pos )
+{
+    sout_access_out_sys_t *sys = p_access->p_sys;
+
+    if (url_seek(sys->context, i_pos, SEEK_SET) < 0)
+        return VLC_EGENERIC;
+    return VLC_SUCCESS;
+}
+
+static int OutControl( sout_access_out_t *p_access, int i_query, va_list args )
+{
+    sout_access_out_sys_t *p_sys = p_access->p_sys;
+
+    VLC_UNUSED(p_sys);
+    switch( i_query )
+    {
+        case ACCESS_OUT_CONTROLS_PACE:
+        {
+            bool *pb = va_arg( args, bool * );
+            //*pb = strcmp( p_access->psz_access, "stream" );
+            *pb = false;
+            break;
+        }
+
+        default:
+            return VLC_EGENERIC;
+    }
+    return VLC_SUCCESS;
+}
 
 static int Control(access_t *access, int query, va_list args)
 {
@@ -213,7 +333,7 @@ static int Control(access_t *access, int query, va_list args)
 
 /* */
 static vlc_mutex_t avio_lock = VLC_STATIC_MUTEX;
-static access_t *current_access = NULL;
+static vlc_object_t *current_access = NULL;
 
 
 static int UrlInterruptCallback(void)
@@ -223,7 +343,7 @@ static int UrlInterruptCallback(void)
 }
 
 
-static int SetupAvio(access_t *access)
+static int SetupAvio(vlc_object_t *access)
 {
     vlc_mutex_lock(&avio_lock);
     assert(!access != !current_access);

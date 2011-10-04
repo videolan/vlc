@@ -32,6 +32,8 @@
 #endif
 int  OpenAvio (vlc_object_t *);
 void CloseAvio(vlc_object_t *);
+int  OutOpenAvio (vlc_object_t *);
+void OutCloseAvio(vlc_object_t *);
 
 #define AVIO_MODULE \
     set_shortname(N_("FFmpeg"))             \
@@ -40,5 +42,12 @@ void CloseAvio(vlc_object_t *);
     set_subcategory(SUBCAT_INPUT_ACCESS)    \
     set_capability("access", -1)            \
     add_shortcut("avio", "rtmp")            \
-    set_callbacks(OpenAvio, CloseAvio)
-
+    set_callbacks(OpenAvio, CloseAvio) \
+    add_submodule () \
+        set_shortname( "libavformat" ) \
+        set_description( N_("libavformat access output") ) \
+        set_capability( "sout access", -1 ) \
+        set_category( CAT_SOUT ) \
+        set_subcategory( SUBCAT_SOUT_ACO ) \
+        add_shortcut( "avio", "rtmp" ) \
+        set_callbacks( OutOpenAvio, OutCloseAvio)
