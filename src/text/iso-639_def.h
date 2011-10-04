@@ -144,7 +144,7 @@ static const iso639_lang_t p_languages[] =
     { N_( "Oromo" ),            "",            "om", "orm", "orm" },
     { N_( "On Screen Display" ),"On Screen Display", "od", "osd", "osd" },
     { N_( "Ossetian; Ossetic" ), "",           "os", "oss", "oss" },
-    { N_( "Panjabi" ),          "ਪਜਾਬੀ",         "pa", "pan", "pan" },
+    { N_( "Panjabi" ),          "ਪੰਜਾਬੀ",         "pa", "pan", "pan" },
     { N_( "Persian" ),          "ﻑﺍﺮﺳی",       "fa", "fas", "per" },
     { N_( "Pali" ),             "",            "pi", "pli", "pli" },
     { N_( "Polish" ),           "Polski",      "pl", "pol", "pol" },
