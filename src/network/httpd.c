@@ -1068,8 +1068,8 @@ static httpd_host_t *httpd_HostCreate( vlc_object_t *p_this,
     vlc_cond_init( &host->wait );
     host->i_ref = 1;
 
-    char *hostname = var_InheritString( p_this->p_libvlc, hostvar );
-    unsigned port = var_InheritInteger( p_this->p_libvlc, portvar );
+    char *hostname = var_InheritString( p_this, hostvar );
+    unsigned port = var_InheritInteger( p_this, portvar );
     host->fds = net_ListenTCP( p_this, hostname, port );
     free( hostname );
     if( host->fds == NULL )
