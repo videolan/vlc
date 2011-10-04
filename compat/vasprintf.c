@@ -1,7 +1,7 @@
 /*****************************************************************************
  * vasprintf.c: GNU vasprintf() replacement
  *****************************************************************************
- * Copyright © 1998-2008 the VideoLAN project
+ * Copyright © 1998-2009 VLC authors and VideoLAN
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
