@@ -218,7 +218,7 @@ static int CreateFilter( vlc_object_t *p_this )
     var_AddCallback( p_filter, "marq-refresh", MarqueeCallback, p_sys );
     CREATE_VAR( i_pos, Integer, "marq-position" );
     CREATE_VAR( psz_marquee, String, "marq-marquee" );
-    p_sys->p_style->i_font_alpha = 255 - var_CreateGetIntegerCommand( p_filter,
+    p_sys->p_style->i_font_alpha = var_CreateGetIntegerCommand( p_filter,
                                                             "marq-opacity" );
     var_AddCallback( p_filter, "marq-opacity", MarqueeCallback, p_sys );
     CREATE_VAR( p_style->i_font_color, Integer, "marq-color" );
@@ -357,7 +357,7 @@ static int MarqueeCallback( vlc_object_t *p_this, char const *psz_var,
     }
     else if ( !strcmp( psz_var, "marq-opacity" ) )
     {
-        p_sys->p_style->i_font_alpha = 255 - newval.i_int;
+        p_sys->p_style->i_font_alpha = newval.i_int;
     }
     else if ( !strcmp( psz_var, "marq-size" ) )
     {
