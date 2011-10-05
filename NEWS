@@ -115,7 +115,8 @@ Video Output:
    chroma conversion
  * New video output for Android platform, based on Surface
  * Support for 9/10bits output in the OpenGL output
- * Updated OpenGL video output for Mac, which requires a Quartz Extreme capable Mac
+ * Updated OpenGL video output for Mac, which now requires a
+   Quartz Extreme capable machine
 
 Audio Output:
  * New audio output based on AudioQueue API for iOS
@@ -157,8 +158,9 @@ Stream output:
  * New langfromtelx module, to change lang of one ES, when streaming, based on
    a telextex page: #langfromtelx{id=12,magazine=7,page=0x99,row=1}:std...
  * New select module, to replace an existing ES with another ES in the same track
-      #duplicate{dst=bridge-out{id=1},select=video,dst=bridge-out{id=0xa3},select=audio}
-      #transcode{...}:bridge-in{id-offset=0}:select{disable=0}:setid{id=0,newid=0xa3}:autodel:std{...}
+   #duplicate{dst=bridge-out{id=1},select=video,dst=bridge-out{id=0xa3},select=audio}
+   #transcode{...}:bridge-in{id-offset=0}:select{disable=0}:setid{id=0,newid=0xa3}:autodel:std{...}
+ * New libavformat/avio access_output module for network streaming
 
 Services Discovery:
  * Search API to be able to query distant search APIs from the interfaces
@@ -169,7 +171,8 @@ libVLC:
   ** libvlc_media_player_navigate for DVD navigation
   ** libvlc_audio_filter_list_get, libvlc_video_filter_list_get to get the
      list of available audio and video filters
-  ** libvlc_audio_set_format, libvlc_audio_set_format_callbacks, libvlc_audio_set_callbacks
+  ** libvlc_audio_set_format, libvlc_audio_set_format_callbacks,
+     libvlc_audio_set_callbacks
      allow grabbing audio data from a chosen memory location in real-time.
 
 Removed modules:
@@ -185,6 +188,7 @@ Removed modules:
  * removal of the SDL audio output, use the native outputs
  * growl_udp: use Growl for local notifications on the Mac. UDP support will be
               removed in Growl's next release, too.
+ * removal of the OSSO screensave module, use the MCE one
 
 
 Changes between 1.1.10 and 1.1.11:

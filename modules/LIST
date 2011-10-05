@@ -1,4 +1,4 @@
-List of vlc plugins (379)
+List of vlc plugins (384)
 $Id$
  * a52: A/52 basic parser/packetizer
  * a52tofloat32: A/52 audio converter & decoder plugin, using liba52
@@ -6,7 +6,7 @@ $Id$
  * aa: Ascii art video output
  * access_alsa: Alsa access module
  * access_attachment: Attachment access module
- * access_avio: Access module using FFmpeg libavformat network
+ * access_avio: Access and Stream output module using libavformat network
  * access_bd: Blu-Ray Disc access
  * access_directory: Access module to read files in a directory
  * access_dv: Raw1394 Digital Video (Firewire/IEEE1394/I-Link) access module
@@ -58,9 +58,9 @@ $Id$
  * audioqueue: Audio Output based on AudioQueue API for iOS
  * audioscrobbler: AudioScrobbler/Last.fm submission plugin
  * auhal: Audio output for MacOS X based on the AUHAL API
- * avcodec: FFmpeg audio/video decoder
- * avformat: FFmpeg demuxer
- * avi: AVI File stream demuxer
+ * avcodec: libavcodec audio/video decoder
+ * avformat: libavformat demuxer
+ * avi: AVI file stream demuxer
  * ball: Augmented reality ball video filter module
  * bandlimited_resampler: Bandlimited interpolation audio resampler
  * blend: a picture filter that blends two pictures
@@ -319,7 +319,7 @@ $Id$
  * stream_out_smem: stream output module to a memory buffer
  * stream_out_standard: standard stream output module
  * stream_out_switcher: stream output module to display backgrounds
- * stream_out_transcode: audio & video transcoder using FFmpeg
+ * stream_out_transcode: audio & video transcoder
  * subsdec: a codec to output textual subtitles
  * subsdelay: subtitles delay filter
  * subsusf: a demuxer for USF subtitles
