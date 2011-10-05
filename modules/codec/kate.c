@@ -404,14 +404,15 @@ static int OpenDecoder( vlc_object_t *p_this )
             p_sys->p_tr = NULL;
             p_sys->b_use_tiger = false;
         }
+        else {
+            CHECK_TIGER_RET( tiger_renderer_set_surface_clear_color( p_sys->p_tr, 1, 0, 0, 0, 0 ) );
 
-        CHECK_TIGER_RET( tiger_renderer_set_surface_clear_color( p_sys->p_tr, 1, 0, 0, 0, 0 ) );
-
-        UpdateTigerFontEffect( p_dec );
-        UpdateTigerFontColor( p_dec );
-        UpdateTigerBackgroundColor( p_dec );
-        UpdateTigerQuality( p_dec );
-        UpdateTigerFontDesc( p_dec );
+            UpdateTigerFontEffect( p_dec );
+            UpdateTigerFontColor( p_dec );
+            UpdateTigerBackgroundColor( p_dec );
+            UpdateTigerQuality( p_dec );
+            UpdateTigerFontDesc( p_dec );
+        }
     }
 
 #else
