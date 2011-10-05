@@ -1,4 +1,4 @@
-# Email and names Fixes
+# Bad (and bouncing) emails and names
 Jean-Baptiste Kempf <jb@videolan.org>
 <jb@videolan.org> <jb@altair.videolan.org>
 <jb@videolan.org> <jb@ambre.(none)>
@@ -54,7 +54,34 @@ Basos G <noxelia@gmail.com> <noxelia 4t gmail c0m>
 <dmenest-vlc@ofb.net> <dmenest-vlc at ofb dot net>
 <kelemeng@gnome.hu> <kelemeng at gnome dot hu>
 <tkrotoff@gmail.com> <tkrotoff at>
-<aurelien@sitadelle.com> <aurelien sitadelle.com>
+Aurélien Nephtali <aurelien@sitadelle.com> <aurelien sitadelle.com>
+Konstanty Bialkowski <konstanty@ieee.org> <konstanty@gmail.com>
+Pavlov Konstantin <thresh@videolan.org>
+<thresh@videolan.org> <thresh@altlinux.ru>
+Pavlov Konstantin <thresh@videolan.org> <thresh@altlinux.org>
+<videolan@videolan.org> <videolan@jones.via.ecp.fr>
+<videolan@videolan.org> <noreply@videolan.org>
+<jpountz@jpountz.net> <jpountz@videolan.org>
+<atmo@videolan.org> <WeberAndre@gmx.de>
+Bill C. Riemers <briemers+git@redhat.com> <docbill@hartnell.local>
+Brad Smith <brad@comstyle.com>
+<cristi@secarica.ro> <cristi.secarica.ro>
+<davidf@rd.bbc.co.uk> <davidf+nntp@woaf.net>
+<davidf@rd.bbc.co.uk> <davidf@woaf.net>
+Hugo Beauzée-Luyssen <beauze.h@gmail.com>
+<markfm@videolan.org> <mfmbusiness@earthlink.net>
+<markfm@videolan.org> <mfmori@hotmail.com>
+Nicolas Chauvet <kwizart@gmail.com>
+Rob Jonson <rob@hobbyistsoftware.com>
+Sigmund Augdal Helberg <sigmunau@videolan.org>
+Vincent Penquerc'h <ogg.k.ogg.k@googlemail.com>
+Anthony Loiseau <thannoy@actech-innovation.com>
+FUJISAWA Tooru <arai_a@mac.com>
+Ken Self <kenself@optusnet.com.au>
+Tony Gaillard <tony.gaillard@supinfo.com> <Tony.GAILLARD@supinfo.com>
+Przemyslaw Fiala <bl4@playker.info>
 #
 # Preferred emails
 <malte@tancred.com.> <malte@frontbase.com>
+<xtophe@videolan.org> <xtophe@chewa.net>
+<hartman@videolan.org> <hartman@veda.student.utwente.nl>
