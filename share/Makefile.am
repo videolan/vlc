@@ -2,13 +2,6 @@ CLEANFILES = skins2/default.vlt
 MOSTLYCLEANFILES =
 EXTRA_DIST =
 
-iconsdatadir = $(datadir)/icons/hicolor/
-icons16dir = $(iconsdatadir)/16x16/apps/
-icons32dir = $(iconsdatadir)/32x32/apps/
-icons48dir = $(iconsdatadir)/48x48/apps/
-icons128dir = $(iconsdatadir)/128x128/apps/
-icons256dir = $(iconsdatadir)/256x256/apps/
-
 appdatadir = /usr/share/applications
 appdata_DATA = vlc.desktop
 EXTRA_DIST += vlc.desktop.in
@@ -17,6 +10,13 @@ CLEANFILES += $(appdata_DATA)
 vlc.desktop: vlc.desktop.in $(top_builddir)/config.status
 	$(AM_V_GEN)sed -e 's,\@bindir\@,$(bindir),g' < "$<" > $@.tmp
 	$(AM_V_at)mv -f $@.tmp $@
+
+iconsdatadir = /usr/share/icons/hicolor
+icons16dir = $(iconsdatadir)/16x16/apps
+icons32dir = $(iconsdatadir)/32x32/apps
+icons48dir = $(iconsdatadir)/48x48/apps
+icons128dir = $(iconsdatadir)/128x128/apps
+icons256dir = $(iconsdatadir)/256x256/apps
 
 dist_vlcdata_DATA = icons/vlc.ico
 dist_icons16_DATA = icons/16x16/vlc.png icons/16x16/vlc.xpm
