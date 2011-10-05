@@ -1453,7 +1453,8 @@ static int ProcessNodes( filter_t *p_filter,
     {
         rv = PushFont( &p_fonts,
                p_font_style->psz_fontname,
-               p_font_style->i_font_size,
+               p_font_style->i_font_size > 0 ? p_font_style->i_font_size
+                                             : p_sys->i_font_size,
                (p_font_style->i_font_color & 0xffffff) |
                    ((p_font_style->i_font_alpha & 0xff) << 24),
                (p_font_style->i_karaoke_background_color & 0xffffff) |
@@ -2349,7 +2350,8 @@ static int RenderCommon( filter_t *p_filter, subpicture_region_t *p_region_out,
         text_style_t *p_style;
         if( p_region_in->p_style )
             p_style = CreateStyle( p_region_in->p_style->psz_fontname,
-                                   p_region_in->p_style->i_font_size,
+                                   p_region_in->p_style->i_font_size > 0 ? p_region_in->p_style->i_font_size
+                                                                         : p_sys->i_font_size,
                                    (p_region_in->p_style->i_font_color & 0xffffff) |
                                    ((p_region_in->p_style->i_font_alpha & 0xff) << 24),
                                    0x00ffffff,
