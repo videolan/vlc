@@ -745,6 +745,7 @@ static int FindDevicesCallback( vlc_object_t *p_this, char const *psz_name,
 static void GetDevices (vlc_object_t *obj, module_config_t *item)
 {
     void **hints;
+    bool hinted_default = false;
 
     msg_Dbg(obj, "Available ALSA PCM devices:");
 
@@ -770,6 +771,9 @@ static void GetDevices (vlc_object_t *obj, module_config_t *item)
             for (char *lf = strchr(desc, '\n'); lf; lf = strchr(lf, '\n'))
                  *lf = ' ';
         msg_Dbg(obj, "%s (%s)", (desc != NULL) ? desc : name, name);
+
+        if (!strcmp (name, "default"))
+            hinted_default = true;
 
         if (item != NULL)
         {
@@ -802,5 +806,26 @@ static void GetDevices (vlc_object_t *obj, module_config_t *item)
     {
         item->ppsz_list[item->i_list] = NULL;
         item->ppsz_list_text[item->i_list] = NULL;
+    }
+    else
+    {
+        vlc_value_t val, text;
+
+        if (!hinted_default)
+        {
+            val.psz_string = (char *)"default";
+            text.psz_string = (char *)N_("Default");
+            var_Change(obj, "audio-device", VLC_VAR_ADDCHOICE, &val, &text);
+        }
+
+        val.psz_string = var_InheritString (obj, "alsa-audio-device");
+        if (likely(val.psz_string != NULL)
+         && strcmp (val.psz_string, "default"))
+        {
+            text.psz_string = (char *)N_("VLC preferences");
+            var_Change(obj, "audio-device", VLC_VAR_ADDCHOICE, &val, &text);
+        }
+        var_Change(obj, "audio-device", VLC_VAR_SETVALUE, &val, NULL);
+        free (val.psz_string);
     }
 }
