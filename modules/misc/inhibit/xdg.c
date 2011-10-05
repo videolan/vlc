@@ -46,6 +46,7 @@ struct vlc_inhibit_sys
     vlc_thread_t thread;
     vlc_cond_t update, inactive;
     vlc_mutex_t lock;
+    posix_spawnattr_t attr;
     bool suspend, suspended;
 };
 
@@ -65,6 +66,18 @@ static int Open (vlc_object_t *obj)
     vlc_mutex_init (&p_sys->lock);
     vlc_cond_init (&p_sys->update);
     vlc_cond_init (&p_sys->inactive);
+    posix_spawnattr_init (&p_sys->attr);
+    /* Reset signal handlers to default and clear mask in the child process */
+    {
+        sigset_t set;
+
+        sigemptyset (&set);
+        posix_spawnattr_setsigmask (&p_sys->attr, &set);
+        sigaddset (&set, SIGPIPE);
+        posix_spawnattr_setsigdefault (&p_sys->attr, &set);
+        posix_spawnattr_setflags (&p_sys->attr, POSIX_SPAWN_SETSIGDEF
+                                              | POSIX_SPAWN_SETSIGMASK);
+    }
     p_sys->suspend = false;
     p_sys->suspended = false;
 
@@ -92,6 +105,7 @@ static void Close (vlc_object_t *obj)
 
     vlc_cancel (p_sys->thread);
     vlc_join (p_sys->thread, NULL);
+    posix_spawnattr_destroy (&p_sys->attr);
     vlc_cond_destroy (&p_sys->inactive);
     vlc_cond_destroy (&p_sys->update);
     vlc_mutex_destroy (&p_sys->lock);
@@ -138,7 +152,8 @@ static void *Thread (void *data)
         pid_t pid;
 
         vlc_mutex_unlock (&p_sys->lock);
-        if (!posix_spawnp (&pid, "xdg-screensaver", NULL, NULL, argv, environ))
+        if (!posix_spawnp (&pid, "xdg-screensaver", NULL, &p_sys->attr,
+                           argv, environ))
         {
             int status;
 
