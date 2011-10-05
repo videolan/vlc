@@ -382,7 +382,7 @@ static int Open(vlc_object_t *object)
 
     const vlc_chroma_description_t *chroma =
         vlc_fourcc_GetChromaDescription(filter->fmt_in.video.i_chroma);
-    if (!chroma || chroma->plane_count < 3) {
+    if (!chroma || chroma->plane_count < 3 || chroma->pixel_size != 1) {
         msg_Err(filter, "Unsupported chroma (%4.4s)",
                 (char*)&(filter->fmt_in.video.i_chroma));
         return VLC_EGENERIC;
