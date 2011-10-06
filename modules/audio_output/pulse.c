@@ -392,6 +392,16 @@ static void stream_moved_cb(pa_stream *s, void *userdata)
     /* Update the variable if someone else moved our stream */
     var_Change(aout, "audio-device", VLC_VAR_SETVALUE,
                &(vlc_value_t){ .i_int = idx }, NULL);
+
+    /* Sink unknown as yet, create stub choice for it */
+    if (var_GetInteger(aout, "audio-device") != idx)
+    {
+        var_Change(aout, "audio-device", VLC_VAR_ADDCHOICE,
+                   &(vlc_value_t){ .i_int = idx },
+                   &(vlc_value_t){ .psz_string = (char *)"?" });
+        var_Change(aout, "audio-device", VLC_VAR_SETVALUE,
+                   &(vlc_value_t){ .i_int = idx }, NULL);
+    }
 }
 
 static void stream_overflow_cb(pa_stream *s, void *userdata)
