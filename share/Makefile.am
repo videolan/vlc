@@ -3,7 +3,9 @@ MOSTLYCLEANFILES =
 EXTRA_DIST =
 
 appdatadir = /usr/share/applications
+if !HAVE_WIN32
 appdata_DATA = vlc.desktop
+endif
 EXTRA_DIST += vlc.desktop.in
 CLEANFILES += $(appdata_DATA)
 
