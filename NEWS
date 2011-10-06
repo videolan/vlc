@@ -192,6 +192,27 @@ Removed modules:
  * removal of the OSSO screensave module, use the MCE one
 
 
+Changes between 1.1.11 and 1.1.12:
+----------------------------------
+
+Audio outputs:
+ * Mac OS X / auhal: multiple fixes for the Digital Audio output (S/PDIF)
+                     including support for OS X Lion
+ * Multiple fixes and improved synchronization for PulseAudio support
+ * Support for AC-3 and DTS passthrough with PulseAudio 1.0
+
+Unix port:
+ * Fix build compatibility with taglib < 1.6 and Xulrunner 1.9.1
+
+Misc:
+ * Fix crashes with Japanese locale on OS X
+ * Minor fixes for Webplugin under Win32, AVI demuxer, smem and AudioScrobbler
+ * Fix crash in HTTP and RTSP server (stream output or Web interface)
+
+Translations:
+ * Update of Breton, Chinese Simplified and Basque
+
+
 Changes between 1.1.10 and 1.1.11:
 ----------------------------------
 
