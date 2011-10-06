@@ -205,6 +205,7 @@ public slots:
     void releaseVideoSlot( void );
 
     void emitBoss();
+    void emitRaise();
 
     void reloadPrefs();
 
@@ -246,6 +247,7 @@ private slots:
     void setVideoFullScreen( bool );
     void setVideoOnTop( bool );
     void setBoss();
+    void setRaise();
 
 signals:
     void askGetVideo( WId *p_id, int *pi_x, int *pi_y,
@@ -258,6 +260,7 @@ signals:
     void fullscreenInterfaceToggled( bool );
     void askToQuit();
     void askBoss();
+    void askRaise();
 
 };
 

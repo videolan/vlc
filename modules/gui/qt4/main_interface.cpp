@@ -70,6 +70,9 @@ static int IntfShowCB( vlc_object_t *p_this, const char *psz_variable,
                        vlc_value_t old_val, vlc_value_t new_val, void *param );
 static int IntfBossCB( vlc_object_t *p_this, const char *psz_variable,
                        vlc_value_t old_val, vlc_value_t new_val, void *param );
+static int IntfRaiseMainCB( vlc_object_t *p_this, const char *psz_variable,
+                           vlc_value_t old_val, vlc_value_t new_val,
+                           void *param );
 
 MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 {
@@ -221,6 +224,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     CONNECT( this, askToQuit(), THEDP, quit() );
 
     CONNECT( this, askBoss(), this, setBoss() );
+    CONNECT( this, askRaise(), this, setRaise() );
 
     /** END of CONNECTS**/
 
@@ -230,6 +234,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
      ************/
     var_AddCallback( p_intf->p_libvlc, "intf-toggle-fscontrol", IntfShowCB, p_intf );
     var_AddCallback( p_intf->p_libvlc, "intf-boss", IntfBossCB, p_intf );
+    var_AddCallback( p_intf->p_libvlc,"intf-show", IntfRaiseMainCB, p_intf );
 
     /* Register callback for the intf-popupmenu variable */
     var_AddCallback( p_intf->p_libvlc, "intf-popupmenu", PopupMenuCB, p_intf );
@@ -1299,6 +1304,16 @@ void MainInterface::setBoss()
     }
 }
 
+void MainInterface::emitRaise()
+{
+    emit askRaise();
+}
+void MainInterface::setRaise()
+{
+    activateWindow();
+    raise();
+}
+
 /*****************************************************************************
  * PopupMenuCB: callback triggered by the intf-popupmenu playlist variable.
  *  We don't show the menu directly here because we don't want the
@@ -1334,6 +1349,21 @@ static int IntfShowCB( vlc_object_t *p_this, const char *psz_variable,
 
     /* Show event */
      return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * IntfRaiseMainCB: callback triggered by the intf-show-main libvlc variable.
+ *****************************************************************************/
+static int IntfRaiseMainCB( vlc_object_t *p_this, const char *psz_variable,
+                       vlc_value_t old_val, vlc_value_t new_val, void *param )
+{
+    VLC_UNUSED( p_this ); VLC_UNUSED( psz_variable ); VLC_UNUSED( old_val );
+    VLC_UNUSED( new_val );
+
+    intf_thread_t *p_intf = (intf_thread_t *)param;
+    p_intf->p_sys->p_mi->emitRaise();
+
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
