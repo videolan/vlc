@@ -2352,11 +2352,15 @@ static picture_t *vout_new_buffer( decoder_t *p_dec )
             {
                 fmt.i_visible_width  = p_dec->fmt_in.video.i_visible_width;
                 fmt.i_visible_height = p_dec->fmt_in.video.i_visible_height;
+                fmt.i_x_offset       = p_dec->fmt_in.video.i_x_offset;
+                fmt.i_y_offset       = p_dec->fmt_in.video.i_y_offset;
             }
             else
             {
                 fmt.i_visible_width  = fmt.i_width;
                 fmt.i_visible_height = fmt.i_height;
+                fmt.i_x_offset       = 0;
+                fmt.i_y_offset       = 0;
             }
         }
 
