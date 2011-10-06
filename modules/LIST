@@ -256,7 +256,8 @@ $Id$
  * projectm: visualisation using libprojectM
  * ps: input module for MPEG PS decapsulation
  * psychedelic: Psychedelic video filter
- * pulse: PulseAudio audio output module
+ * pulse: PulseAudio audio output
+ * pulsesrc: PulseAudio audio input
  * puzzle: puzzle video filter
  * pva: PVA demuxer
  * pvr: input module to read from a PVR card

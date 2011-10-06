@@ -226,6 +226,7 @@ modules/access/mms/mmstu.c
 modules/access/mms/mmstu.h
 modules/access/mtp.c
 modules/access/oss.c
+modules/access/pulsesrc.c
 modules/access/pvr.c
 modules/access/qtcapture.m
 modules/access/rar/access.c
