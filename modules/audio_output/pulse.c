@@ -77,6 +77,7 @@ struct aout_sys_t
     unsigned rate; /**< Current stream sample rate */
 };
 
+static void sink_list_cb(pa_context *, const pa_sink_info *, int, void *);
 static void sink_input_info_cb(pa_context *, const pa_sink_input_info *,
                                int, void *);
 
@@ -90,6 +91,23 @@ static void context_cb(pa_context *ctx, pa_subscription_event_type_t type,
 
     switch (type & PA_SUBSCRIPTION_EVENT_FACILITY_MASK)
     {
+      case PA_SUBSCRIPTION_EVENT_SINK:
+        switch (type & PA_SUBSCRIPTION_EVENT_TYPE_MASK)
+        {
+          case PA_SUBSCRIPTION_EVENT_NEW:
+          case PA_SUBSCRIPTION_EVENT_CHANGE:
+            op = pa_context_get_sink_info_by_index(ctx, idx, sink_list_cb, aout);
+            if (likely(op != NULL))
+                pa_operation_unref(op);
+            break;
+
+          case PA_SUBSCRIPTION_EVENT_REMOVE:
+            var_Change(aout, "audio-device", VLC_VAR_DELCHOICE,
+                       &(vlc_value_t){ .i_int = idx }, NULL);
+            break;
+        }
+        break;
+
       case PA_SUBSCRIPTION_EVENT_SINK_INPUT:
         if (idx != pa_stream_get_index(sys->stream))
             break; /* only interested in our sink input */
@@ -131,6 +149,7 @@ static void sink_list_cb(pa_context *c, const pa_sink_info *i, int eol,
             i->description);
     val.i_int = i->index;
     text.psz_string = (char *)i->description;
+    var_Change(aout, "audio-device", VLC_VAR_DELCHOICE, &val, NULL);
     var_Change(aout, "audio-device", VLC_VAR_ADDCHOICE, &val, &text);
 }
 
@@ -826,7 +845,8 @@ static int Open(vlc_object_t *obj)
     sys->rate = ss.rate;
 
     /* Context events */
-    const pa_subscription_mask_t mask = PA_SUBSCRIPTION_MASK_SINK_INPUT;
+    const pa_subscription_mask_t mask = PA_SUBSCRIPTION_MASK_SINK
+                                      | PA_SUBSCRIPTION_MASK_SINK_INPUT;
 
     pa_context_set_subscribe_callback(ctx, context_cb, aout);
     op = pa_context_subscribe(ctx, mask, NULL, NULL);
