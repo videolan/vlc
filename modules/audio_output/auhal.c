@@ -902,6 +902,8 @@ static void Close( vlc_object_t * p_this )
         if( err != noErr ) msg_Err( p_aout, "Could not release hogmode: [%4.4s]", (char *)&err );
     }
 
+    var_DelCallback( p_aout, "audio-device", AudioDeviceCallback, NULL );
+
     aout_PacketDestroy( p_aout );
     free( p_sys );
 }
