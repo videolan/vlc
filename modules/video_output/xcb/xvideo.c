@@ -513,7 +513,7 @@ static int Open (vlc_object_t *obj)
         msg_Err (vd, "no available XVideo adaptor");
         goto error;
     }
-    else
+    /* Compute video (window) placement within the parent window */
     {
         xcb_map_window (conn, p_sys->window);
 
@@ -538,6 +538,15 @@ static int Open (vlc_object_t *obj)
     p_sys->gc = xcb_generate_id (conn);
     xcb_create_gc (conn, p_sys->gc, p_sys->window, 0, NULL);
     msg_Dbg (vd, "using X11 graphic context 0x%08"PRIx32, p_sys->gc);
+
+    /* Disable color keying if applicable */
+    {
+        xcb_intern_atom_reply_t *r =
+            xcb_intern_atom_reply (conn,
+                xcb_intern_atom (conn, 1, 21, "XV_AUTOPAINT_COLORKEY"), NULL);
+        if (r != NULL && r->atom != 0)
+            xcb_xv_set_port_attribute(conn, p_sys->port, r->atom, 1);
+    }
 
     /* Create cursor */
     p_sys->cursor = CreateBlankCursor (conn, screen);
