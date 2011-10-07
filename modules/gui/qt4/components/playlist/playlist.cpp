@@ -94,7 +94,7 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QWidget *_par )
 
     setMinimumWidth( 400 );
 
-    PLModel *model = new PLModel( p_playlist, p_intf, p_root, this );
+    PLModel *model = PLModel::getPLModel( p_intf );
 #ifdef MEDIA_LIBRARY
     MLModel *mlmodel = new MLModel( p_intf, this );
     mainView = new StandardPLPanel( this, p_intf, p_root, selector, model, mlmodel );

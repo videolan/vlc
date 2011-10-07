@@ -356,6 +356,7 @@ static int Open( vlc_object_t *p_this, bool isDialogProvider )
     intf_sys_t *p_sys = p_intf->p_sys = new intf_sys_t;
     p_intf->p_sys->b_isDialogProvider = isDialogProvider;
     p_sys->p_mi = NULL;
+    p_sys->pl_model = NULL;
 
     /* */
     vlc_sem_init (&ready, 0);
@@ -554,6 +555,9 @@ static void *Thread( void *obj )
 
     /* Delete the configuration. Application has to be deleted after that. */
     delete p_intf->p_sys->mainSettings;
+
+    /* */
+    delete p_intf->p_sys->pl_model;
 
     /* Destroy the MainInputManager */
     MainInputManager::killInstance();

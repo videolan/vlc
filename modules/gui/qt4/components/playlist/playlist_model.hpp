@@ -56,6 +56,19 @@ public:
              playlist_item_t *, QObject *parent = 0 );
     virtual ~PLModel();
 
+    static PLModel* getPLModel( intf_thread_t *p_intf )
+    {
+        if(!p_intf->p_sys->pl_model )
+        {
+            playlist_Lock( THEPL );
+            playlist_item_t *p_root = THEPL->p_playing;
+            playlist_Unlock( THEPL );
+            p_intf->p_sys->pl_model = new PLModel( THEPL, p_intf, p_root, NULL );
+        }
+
+        return p_intf->p_sys->pl_model;
+    }
+
     /*** QModel subclassing ***/
 
     /* Data structure */

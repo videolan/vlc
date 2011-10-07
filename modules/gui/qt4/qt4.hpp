@@ -53,22 +53,25 @@ class QVLCApp;
 class QMenu;
 class MainInterface;
 class QSettings;
+class PLModel;
 
 struct intf_sys_t
 {
     vlc_thread_t thread;
 
     QVLCApp *p_app;          /* Main Qt Application */
+
     MainInterface *p_mi;     /* Main Interface, NULL if DialogProvider Mode */
 
     QSettings *mainSettings; /* Qt State settings not messing main VLC ones */
 
-    bool b_isDialogProvider; /* Qt mode or Skins mode */
-
-    int  i_screenHeight;     /* Detection of Small screens */
+    PLModel *pl_model;
 
     QString filepath;        /* Last path used in dialogs */
 
+    int  i_screenHeight;     /* Detection of Small screens */
+
+    bool b_isDialogProvider; /* Qt mode or Skins mode */
 #ifdef WIN32
     bool disable_volume_keys;
 #endif
