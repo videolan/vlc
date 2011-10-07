@@ -492,6 +492,8 @@ static int AllocatePluginFile (module_bank_t *bank, const char *abspath,
              /* !unloadable not allowed for plugins with callbacks */
              vlc_module_destroy (module);
              module = module_InitDynamic (bank->obj, abspath, false);
+             if (unlikely(module == NULL))
+                 return -1;
              break;
          }
 
