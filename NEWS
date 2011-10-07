@@ -6,6 +6,12 @@ Important notes:
    conflicts with some URLs and file names. For instance, this plays a DVD
    from the 2nd chapter of the 1st title up to the 4th chapter of the 3rd
    title:  vlc dvd://#1:2-3:4
+ * The 40+ --*-caching options were simplified and dumbed down to 4 options:
+   - --file-caching specifies caching for local files,
+   - --network-caching specifies caching for network resources,
+   - --live-caching specifies caching for capture devices and
+   - --disc-caching specifies caching for local optical media.
+   All values are expressed in milliseconds as in previous versions.
  * HTTP server IP address, port, and TLS configuration is now centralized:
    - The --http-host option sets the address, e.g. "--http-host=2001:db8::1".
      By default, both :: and 0.0.0.0 are used.
