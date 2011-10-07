@@ -36,17 +36,19 @@
 
 #include <vlc_common.h>
 #include <vlc_intf_strings.h>
-#include <vlc_vout.h>              /* vout_thread_t */
-#include <vlc_aout.h>
+#include <vlc_vout.h>                             /* vout_thread_t */
+#include <vlc_aout.h>                             /* audio_output_t */
 
 #include "menus.hpp"
 
-#include "main_interface.hpp"      /* View modifications */
-#include "dialogs_provider.hpp"    /* Dialogs display */
-#include "input_manager.hpp"       /* Input Management */
-#include "recents.hpp"             /* Recent Items */
-#include "actions_manager.hpp"     /* Actions Management: play+volume */
-#include "extensions_manager.hpp"  /* Extensions menu*/
+#include "main_interface.hpp"                     /* View modifications */
+#include "dialogs_provider.hpp"                   /* Dialogs display */
+#include "input_manager.hpp"                      /* Input Management */
+#include "recents.hpp"                            /* Recent Items */
+#include "actions_manager.hpp"                    /* Actions Management: play+volume */
+#include "extensions_manager.hpp"                 /* Extensions menu */
+#include "util/qmenuview.hpp"                     /* Simple Playlist menu */
+#include "components/playlist/playlist_model.hpp" /* PLModel getter */
 
 #include <QMenu>
 #include <QMenuBar>
@@ -1061,6 +1063,15 @@ void QVLCMenu::PopupMenu( intf_thread_t *p_intf, bool show )
 
         menu->addMenu( submenu );
     }
+
+    /* */
+    QMenuView *plMenu = new QMenuView( menu );
+    plMenu->setTitle( qtr("Playlist") );
+    PLModel *model = PLModel::getPLModel( p_intf );
+    plMenu->setModel( model );
+    CONNECT( plMenu, activated(const QModelIndex&),
+             model, activateItem(const QModelIndex&));
+    menu->addMenu( plMenu );
 
     /* Static entries for ending, like open */
     PopupMenuStaticEntries( menu );
