@@ -139,6 +139,8 @@ Video Filter:
  * New OpenMAX DL IPCS filter for color space conversion and resizing
  * Major improvements in the freetype text-rendering module, notably supporting
    blackbox and customizable shadow
+   - The freetype module is used by default on the Mac now in favor of
+     quartztext, which can still be enabled manually
 
 Audio Filter:
  * New Compressor filter, a dynamic range compressor

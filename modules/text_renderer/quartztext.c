@@ -127,7 +127,7 @@ vlc_module_begin ()
     add_integer( "quartztext-color", 0x00FFFFFF, COLOR_TEXT,
                  COLOR_LONGTEXT, false )
         change_integer_list( pi_color_values, ppsz_color_descriptions )
-    set_capability( "text renderer", 150 )
+    set_capability( "text renderer", 50 )
     add_shortcut( "text" )
     set_callbacks( Create, Destroy )
 vlc_module_end ()
