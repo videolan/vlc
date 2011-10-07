@@ -22,6 +22,8 @@ Important notes:
      --http-crl (optional CRL).
  * RTSP server IP address and port are updated similarly.
    Use --rtsp-host and --rtsp-port respectively.
+ * The --miface-addr option does not exist anymore. To select the multicast
+   output interface, use --miface instead, e.g. --miface=eth0.
 
 Important changes for packagers:
  * The default builds now assume that the operating system uses UTF-8 for
