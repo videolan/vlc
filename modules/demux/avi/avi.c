@@ -95,6 +95,8 @@ static char *FromACP( const char *str )
     return FromCharset(vlc_pgettext("GetACP", "CP1252"), str, strlen(str));
 }
 
+#define IGNORE_ES NAV_ES
+
 typedef struct
 {
     vlc_fourcc_t i_fourcc;
@@ -1951,6 +1953,9 @@ static void AVI_ParseStreamHeader( vlc_fourcc_t i_id,
             case AVITWOCC_sb:
                 SET_PTR( pi_type, SPU_ES );
                 break;
+            case AVITWOCC_pc:
+                SET_PTR( pi_type, IGNORE_ES );
+                break;
             default:
                 SET_PTR( pi_type, UNKNOWN_ES );
                 break;
@@ -2181,7 +2186,7 @@ static int AVI_IndexLoad_idx1( demux_t *p_demux,
                                &i_stream,
                                &i_cat );
         if( i_stream < p_sys->i_track &&
-            i_cat == p_sys->track[i_stream]->i_cat )
+            (i_cat == p_sys->track[i_stream]->i_cat || i_cat == UNKNOWN_ES ) )
         {
             avi_entry_t index;
             index.i_id     = p_idx1->entry[i_index].i_fourcc;
