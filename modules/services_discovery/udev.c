@@ -398,18 +398,26 @@ static char *decode_property (struct udev_device *dev, const char *name)
 
 
 /*** Video4Linux support ***/
-static bool is_v4l_legacy (struct udev_device *dev)
+static bool v4l_is_legacy (struct udev_device *dev)
 {
     const char *version;
 
     version = udev_device_get_property_value (dev, "ID_V4L_VERSION");
-    return version && !strcmp (version, "1");
+    return (version != NULL) && !strcmp (version, "1");
+}
+
+static bool v4l_can_capture (struct udev_device *dev)
+{
+    const char *caps;
+
+    caps = udev_device_get_property_value (dev, "ID_V4L_CAPABILITIES");
+    return (caps != NULL) && (strstr (caps, ":capture:") != NULL);
 }
 
 static char *v4l_get_mrl (struct udev_device *dev)
 {
     /* Determine media location */
-    if (is_v4l_legacy (dev))
+    if (v4l_is_legacy (dev) || !v4l_can_capture (dev))
         return NULL;
 
     const char *node = udev_device_get_devnode (dev);
