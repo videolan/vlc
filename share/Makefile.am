@@ -20,6 +20,7 @@ icons48dir = $(iconsdatadir)/48x48/apps
 icons128dir = $(iconsdatadir)/128x128/apps
 icons256dir = $(iconsdatadir)/256x256/apps
 
+if !HAVE_WIN32
 dist_vlcdata_DATA = icons/vlc.ico
 dist_icons16_DATA = icons/16x16/vlc.png icons/16x16/vlc.xpm
 dist_icons32_DATA = icons/32x32/vlc.png icons/32x32/vlc.xpm \
@@ -33,6 +34,7 @@ nobase_dist_vlcdata_SCRIPTS = \
 	utils/audio-vlc-default.sh \
 	utils/video-vlc-default.sh \
 	$(NULL)
+endif
 
 EXTRA_DIST += \
 	$(skins2_default_vlt_FILES) \
