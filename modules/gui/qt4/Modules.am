@@ -70,6 +70,7 @@ nodist_SOURCES_qt4 = \
 		util/timetooltip.moc.cpp \
 		util/customwidgets.moc.cpp \
 		util/searchlineedit.moc.cpp \
+		util/qmenuview.moc.cpp \
 		util/qvlcapp.moc.cpp \
 		util/pictureflow.moc.cpp \
 		util/buttons/RoundButton.moc.cpp \
@@ -309,6 +310,7 @@ SOURCES_qt4 = 	qt4.cpp \
 		util/customwidgets.cpp \
 		util/searchlineedit.cpp \
 		util/registry.cpp \
+		util/qmenuview.cpp \
 		util/qt_dirs.cpp \
 		util/pictureflow.cpp \
 		util/buttons/BrowseButton.cpp \
@@ -389,6 +391,7 @@ noinst_HEADERS = \
 	util/searchlineedit.hpp \
 	util/qvlcframe.hpp \
 	util/qvlcapp.hpp \
+	util/qmenuview.hpp \
 	util/qt_dirs.hpp \
 	util/registry.hpp \
 	util/pictureflow.hpp \
