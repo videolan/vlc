@@ -1507,6 +1507,7 @@ void SyncWidget::valueChangedHandler( double d )
         spinLabel.setText( qtr("(Delayed)") );
     else
         spinLabel.setText( "" );
+    emit valueChanged( d );
 }
 
 void SyncWidget::setValue( double d )
