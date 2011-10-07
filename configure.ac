@@ -4311,6 +4311,7 @@ AC_CONFIG_FILES([
   modules/packetizer/Makefile
   modules/services_discovery/Makefile
   modules/stream_filter/Makefile
+  modules/stream_filter/dash/Makefile
   modules/stream_out/Makefile
   modules/stream_out/transcode/Makefile
   modules/text_renderer/Makefile
