@@ -60,6 +60,7 @@ Access:
  * HTTP Live Streaming (IETF draft) playback support
  * Blackmagic DeckLink SDI cards input support (Linux only currently)
  * Linear Systems (HD-)SDI cards input support (Linux)
+ * PulseAudio audio input support
  * RTP: support for dynamic payload types by specifying the payload format
    in an option (no autodetection): only Theora supported for now
  * Basic HTCPCP implementation for Coffee Pot control
