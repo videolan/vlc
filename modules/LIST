@@ -257,6 +257,7 @@ $Id$
  * ps: input module for MPEG PS decapsulation
  * psychedelic: Psychedelic video filter
  * pulse: PulseAudio audio output
+ * pulselist: PulseAudio audio input services discovery
  * pulsesrc: PulseAudio audio input
  * puzzle: puzzle video filter
  * pva: PVA demuxer

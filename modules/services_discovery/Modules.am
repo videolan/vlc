@@ -5,6 +5,16 @@ SOURCES_podcast = podcast.c
 SOURCES_mtp = mtp.c
 SOURCES_mediadirs = mediadirs.c
 
+libpulselist_plugin_la_SOURCES = \
+	../audio_output/vlcpulse.c ../audio_output/vlcpulse.h \
+	pulse.c
+libpulselist_plugin_la_CFLAGS = $(AM_CFLAGS) $(PULSE_CFLAGS)
+libpulselist_plugin_la_LIBADD = $(AM_LIBADD) $(PULSE_LIBS)
+lubpulselist_plugin_la_DEPENDENCIES =
+if HAVE_PULSE
+libvlc_LTLIBRARIES += libpulselist_plugin.la
+endif
+
 libudev_plugin_la_SOURCES = udev.c
 libudev_plugin_la_CFLAGS = $(AM_CFLAGS) $(UDEV_CFLAGS)
 libudev_plugin_la_LIBADD = $(AM_LIBADD) $(UDEV_LIBS)
