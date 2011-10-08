@@ -467,19 +467,6 @@ SOURCES_libvlc = \
 	$(NULL)
 
 ###############################################################################
-# libvlc pulse
-###############################################################################
-
-if HAVE_PULSE
-pkglib_LTLIBRARIES = libvlcpulse.la
-endif
-
-libvlcpulse_la_SOURCES = pulse/mainloop.c ../include/vlc_pulse.h
-libvlcpulse_la_CPPFLAGS = $(PULSE_CFLAGS)
-libvlcpulse_la_LIBADD = $(PULSE_LIBS) libvlccore.la
-libvlcpulse_la_LDFLAGS = -export-symbols-regex ^vlc_pa_ -no-undefined
-
-###############################################################################
 # GIT revision
 ###############################################################################
 

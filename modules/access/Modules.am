@@ -124,10 +124,12 @@ if HAVE_ALSA
 libvlc_LTLIBRARIES += libaccess_alsa_plugin.la
 endif
 
-libpulsesrc_plugin_la_SOURCES = pulse.c
+libpulsesrc_plugin_la_SOURCES = \
+	../audio_output/vlcpulse.c \
+	../audio_output/vlcpulse.h \
+	pulse.c
 libpulsesrc_plugin_la_CFLAGS= $(AM_CFLAGS) $(PULSE_CFLAGS)
-libpulsesrc_plugin_la_LIBADD = $(AM_LIBADD) $(PULSE_LIBS) \
-	../../src/libvlcpulse.la
+libpulsesrc_plugin_la_LIBADD = $(AM_LIBADD) $(PULSE_LIBS)
 libpulsesrc_plugin_la_DEPENDENCIES =
 if HAVE_PULSE
 libvlc_LTLIBRARIES += libpulsesrc_plugin.la

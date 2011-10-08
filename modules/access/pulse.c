@@ -28,7 +28,7 @@
 #include <vlc_demux.h>
 #include <vlc_plugin.h>
 #include <pulse/pulseaudio.h>
-#include <vlc_pulse.h>
+#include "../audio_output/vlcpulse.h"
 
 static int Open(vlc_object_t *);
 static void Close(vlc_object_t *);
@@ -47,6 +47,7 @@ struct demux_sys_t
 {
     pa_stream *stream; /**< PulseAudio playback stream object */
     pa_context *context; /**< PulseAudio connection context */
+    pa_threaded_mainloop *mainloop; /**< PulseAudio thread */
 
     es_out_id_t *es;
     bool discontinuity; /**< The next block will not follow the last one */
@@ -57,15 +58,16 @@ struct demux_sys_t
 /* Stream helpers */
 static void stream_state_cb(pa_stream *s, void *userdata)
 {
+    pa_threaded_mainloop *mainloop = userdata;
+
     switch (pa_stream_get_state(s)) {
         case PA_STREAM_READY:
         case PA_STREAM_FAILED:
         case PA_STREAM_TERMINATED:
-            vlc_pa_signal(0);
+            pa_threaded_mainloop_signal(mainloop, 0);
         default:
             break;
     }
-    (void) userdata;
 }
 
 static void stream_moved_cb(pa_stream *s, void *userdata)
@@ -109,14 +111,14 @@ static void stream_underflow_cb(pa_stream *s, void *userdata)
     (void) s;
 }
 
-static int stream_wait(pa_stream *stream)
+static int stream_wait(pa_stream *stream, pa_threaded_mainloop *mainloop)
 {
     pa_stream_state_t state;
 
     while ((state = pa_stream_get_state(stream)) != PA_STREAM_READY) {
         if (state == PA_STREAM_FAILED || state == PA_STREAM_TERMINATED)
             return -1;
-        vlc_pa_wait();
+        pa_threaded_mainloop_wait(mainloop);
     }
     return 0;
 }
@@ -210,17 +212,17 @@ static int Open(vlc_object_t *obj)
 {
     demux_t *demux = (demux_t *)obj;
 
-    pa_context *ctx = vlc_pa_connect(obj);
-    if (ctx == NULL)
-        return VLC_EGENERIC;
-
     demux_sys_t *sys = malloc(sizeof (*sys));
-    if (unlikely(sys == NULL)) {
-        vlc_pa_disconnect (obj, ctx);
+    if (unlikely(sys == NULL))
         return VLC_ENOMEM;
+
+    sys->context = vlc_pa_connect(obj, &sys->mainloop);
+    if (sys->context == NULL) {
+        free(sys);
+        return VLC_EGENERIC;
     }
+
     sys->stream = NULL;
-    sys->context = ctx;
     sys->es = NULL;
     sys->discontinuity = false;
     sys->caching = INT64_C(1000) * var_InheritInteger(obj, "live-caching");
@@ -254,13 +256,13 @@ static int Open(vlc_object_t *obj)
     /* Create record stream */
     pa_stream *s;
 
-    vlc_pa_lock();
-    s = pa_stream_new(ctx, "audio stream", &ss, &map);
+    pa_threaded_mainloop_lock(sys->mainloop);
+    s = pa_stream_new(sys->context, "audio stream", &ss, &map);
     if (s == NULL)
         goto error;
 
     sys->stream = s;
-    pa_stream_set_state_callback(s, stream_state_cb, NULL);
+    pa_stream_set_state_callback(s, stream_state_cb, sys->mainloop);
     pa_stream_set_read_callback(s, stream_read_cb, demux);
     pa_stream_set_moved_callback(s, stream_moved_cb, demux);
     pa_stream_set_overflow_callback(s, stream_overflow_cb, demux);
@@ -269,8 +271,8 @@ static int Open(vlc_object_t *obj)
     pa_stream_set_underflow_callback(s, stream_underflow_cb, demux);
 
     if (pa_stream_connect_record(s, NULL, &attr, flags) < 0
-     || stream_wait(s)) {
-        vlc_pa_error(obj, "cannot connect record stream", ctx);
+     || stream_wait(s, sys->mainloop)) {
+        vlc_pa_error(obj, "cannot connect record stream", sys->context);
         goto error;
     }
 
@@ -289,14 +291,14 @@ static int Open(vlc_object_t *obj)
     const struct pa_buffer_attr *pba = pa_stream_get_buffer_attr(s);
     msg_Dbg(obj, "using buffer metrics: maxlength=%"PRIu32", fragsize=%"PRIu32,
             pba->maxlength, pba->fragsize);
-    vlc_pa_unlock();
+    pa_threaded_mainloop_unlock(sys->mainloop);
 
     demux->pf_demux = NULL;
     demux->pf_control = Control;
     return VLC_SUCCESS;
 
 error:
-    vlc_pa_unlock();
+    pa_threaded_mainloop_unlock(sys->mainloop);
     Close(obj);
     return VLC_EGENERIC;
 }
@@ -305,11 +307,10 @@ static void Close (vlc_object_t *obj)
 {
     demux_t *demux = (demux_t *)obj;
     demux_sys_t *sys = demux->p_sys;
-    pa_context *ctx = sys->context;
     pa_stream *s = sys->stream;
 
     if (likely(s != NULL)) {
-        vlc_pa_lock();
+        pa_threaded_mainloop_lock(sys->mainloop);
         pa_stream_disconnect(s);
         pa_stream_set_state_callback(s, NULL, NULL);
         pa_stream_set_read_callback(s, NULL, NULL);
@@ -319,9 +320,9 @@ static void Close (vlc_object_t *obj)
         pa_stream_set_suspended_callback(s, NULL, NULL);
         pa_stream_set_underflow_callback(s, NULL, NULL);
         pa_stream_unref(s);
-        vlc_pa_unlock();
+        pa_threaded_mainloop_unlock(sys->mainloop);
     }
 
-    vlc_pa_disconnect(obj, ctx);
+    vlc_pa_disconnect(obj, sys->context, sys->mainloop);
     free(sys);
 }
