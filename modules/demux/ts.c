@@ -1200,7 +1200,6 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         if( p_sys->b_force_seek_per_percent ||
             (p_sys->b_dvb_meta && p_sys->b_access_control) ||
-            p_sys->i_first_pcr < 0 ||
             p_sys->i_current_pcr - p_sys->i_first_pcr < 0 ||
             p_sys->i_last_pcr - p_sys->i_first_pcr <= 0 )
         {
@@ -1223,7 +1222,6 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         if( p_sys->b_force_seek_per_percent ||
             (p_sys->b_dvb_meta && p_sys->b_access_control) ||
-            p_sys->i_first_pcr < 0 ||
             p_sys->i_last_pcr - p_sys->i_first_pcr <= 0 )
         {
             i64 = stream_Size( p_demux->s );
@@ -1243,7 +1241,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     case DEMUX_GET_TIME:
         pi64 = (int64_t*)va_arg( args, int64_t * );
         if( (p_sys->b_dvb_meta && p_sys->b_access_control) ||
-            p_sys->i_first_pcr < 0 ||
+            p_sys->b_force_seek_per_percent ||
             p_sys->i_current_pcr - p_sys->i_first_pcr < 0 )
         {
             if( DVBEventInformation( p_demux, pi64, NULL ) )
@@ -1260,7 +1258,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     case DEMUX_GET_LENGTH:
         pi64 = (int64_t*)va_arg( args, int64_t * );
         if( (p_sys->b_dvb_meta && p_sys->b_access_control) ||
-            p_sys->i_first_pcr < 0 ||
+            p_sys->b_force_seek_per_percent ||
             p_sys->i_last_pcr - p_sys->i_first_pcr <= 0 )
         {
             if( DVBEventInformation( p_demux, NULL, pi64 ) )
