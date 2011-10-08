@@ -25,6 +25,7 @@
 
 #include <vlc_common.h>
 #include <vlc_aout.h>
+#include <vlc_cpu.h>
 #include <vlc_demux.h>
 #include <vlc_plugin.h>
 #include <pulse/pulseaudio.h>
@@ -208,6 +209,23 @@ static int Control(demux_t *demux, int query, va_list ap)
     return VLC_SUCCESS;
 }
 
+/** PulseAudio sample (PCM) format to VLC codec */
+static const vlc_fourcc_t fourccs[] = {
+    [PA_SAMPLE_U8] =        VLC_CODEC_U8,
+    [PA_SAMPLE_ALAW] =      VLC_CODEC_ALAW,
+    [PA_SAMPLE_ULAW] =      VLC_CODEC_MULAW,
+    [PA_SAMPLE_S16LE] =     VLC_CODEC_S16L,
+    [PA_SAMPLE_S16BE] =     VLC_CODEC_S16B,
+    [PA_SAMPLE_FLOAT32LE] = VLC_CODEC_F32L,
+    [PA_SAMPLE_FLOAT32BE] = VLC_CODEC_F32B,
+    [PA_SAMPLE_S32LE] =     VLC_CODEC_S32L,
+    [PA_SAMPLE_S32BE] =     VLC_CODEC_S32B,
+    [PA_SAMPLE_S24LE] =     VLC_CODEC_S24L,
+    [PA_SAMPLE_S24BE] =     VLC_CODEC_S24B,
+    [PA_SAMPLE_S24_32LE] =  0,
+    [PA_SAMPLE_S24_32BE] =  0,
+};
+
 static int Open(vlc_object_t *obj)
 {
     demux_t *demux = (demux_t *)obj;
@@ -230,7 +248,7 @@ static int Open(vlc_object_t *obj)
 
     /* Stream parameters */
     struct pa_sample_spec ss;
-    ss.format = PA_SAMPLE_S16NE;
+    ss.format = HAVE_FPU ? PA_SAMPLE_FLOAT32NE : PA_SAMPLE_S16NE;
     ss.rate = 48000;
     ss.channels = 2;
     assert(pa_sample_spec_valid(&ss));
@@ -243,8 +261,8 @@ static int Open(vlc_object_t *obj)
 
     const pa_stream_flags_t flags = PA_STREAM_INTERPOLATE_TIMING
                                   | PA_STREAM_AUTO_TIMING_UPDATE
-                                  /*| PA_STREAM_FIX_FORMAT
-                                  | PA_STREAM_FIX_RATE
+                                  | PA_STREAM_FIX_FORMAT
+                                  /*| PA_STREAM_FIX_RATE
                                   | PA_STREAM_FIX_CHANNELS*/;
     const struct pa_buffer_attr attr = {
         .maxlength = -1,
@@ -277,14 +295,28 @@ static int Open(vlc_object_t *obj)
     }
 
     /* The ES should be initialized before stream_read_cb(), but how? */
-    es_format_Init(&fmt, AUDIO_ES, VLC_CODEC_S16N);
+    const struct pa_sample_spec *pss = pa_stream_get_sample_spec(s);
+    if ((unsigned)pss->format >= sizeof (fourccs) / sizeof (fourccs[0])) {
+        msg_Err(obj, "unknown PulseAudio sample format %u",
+                (unsigned)pss->format);
+        goto error;
+    }
+
+    vlc_fourcc_t format = fourccs[pss->format];
+    if (format == 0) { /* FIXME: should renegotiate something else */
+        msg_Err(obj, "unsupported PulseAudio sample format %u",
+                (unsigned)pss->format);
+        goto error;
+    }
+
+    es_format_Init(&fmt, AUDIO_ES, format);
     fmt.audio.i_physical_channels = fmt.audio.i_original_channels =
         AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
     fmt.audio.i_channels = ss.channels;
     fmt.audio.i_rate = ss.rate;
-    fmt.audio.i_bitspersample = 16;
-    fmt.audio.i_blockalign = 2 * ss.channels;
-    fmt.i_bitrate = ss.channels * ss.rate * fmt.audio.i_bitspersample;
+    fmt.audio.i_bitspersample = aout_BitsPerSample(format);
+    fmt.audio.i_blockalign = fmt.audio.i_bitspersample * ss.channels / 8;
+    fmt.i_bitrate = fmt.audio.i_bitspersample * ss.channels * ss.rate;
     sys->framesize = fmt.audio.i_blockalign;
     sys->es = es_out_Add (demux->out, &fmt);
 
