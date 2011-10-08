@@ -31,6 +31,10 @@
 #include <pulse/pulseaudio.h>
 #include "../audio_output/vlcpulse.h"
 
+#define HELP_TEXT N_( \
+    "Pass pulse:// to open the default PulseAudio source, " \
+    "or pulse://SOURCE to open a specific source named SOURCE.")
+
 static int Open(vlc_object_t *);
 static void Close(vlc_object_t *);
 
@@ -40,6 +44,8 @@ vlc_module_begin ()
     set_capability ("access_demux", 0)
     set_category (CAT_INPUT)
     set_subcategory (SUBCAT_INPUT_ACCESS)
+    set_help (HELP_TEXT)
+
     add_shortcut ("pulse", "pulseaudio", "pa")
     set_callbacks (Open, Close)
 vlc_module_end ()
@@ -264,6 +270,11 @@ static int Open(vlc_object_t *obj)
                                   | PA_STREAM_FIX_FORMAT
                                   | PA_STREAM_FIX_RATE
                                   /*| PA_STREAM_FIX_CHANNELS*/;
+
+    const char *dev = NULL;
+    if (demux->psz_location != NULL && demux->psz_location[0] != '\0')
+        dev = demux->psz_location;
+
     const struct pa_buffer_attr attr = {
         .maxlength = -1,
         .fragsize = pa_usec_to_bytes(sys->caching, &ss) / 2,
@@ -288,7 +299,7 @@ static int Open(vlc_object_t *obj)
     pa_stream_set_suspended_callback(s, stream_suspended_cb, demux);
     pa_stream_set_underflow_callback(s, stream_underflow_cb, demux);
 
-    if (pa_stream_connect_record(s, NULL, &attr, flags) < 0
+    if (pa_stream_connect_record(s, dev, &attr, flags) < 0
      || stream_wait(s, sys->mainloop)) {
         vlc_pa_error(obj, "cannot connect record stream", sys->context);
         goto error;
