@@ -152,6 +152,7 @@ Video Filter:
 
 Audio Filter:
  * New Compressor filter, a dynamic range compressor
+ * New simplistic Karaoke filter
 
 Stream output:
  * New livehttp-module for HTTP Live Streaming (IETF draft) output
