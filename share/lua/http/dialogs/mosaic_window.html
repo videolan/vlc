@@ -9,10 +9,10 @@
 			minHeight: 500,
 			modal: true,
 			buttons: {
-				"Create": function() {
+				"<?vlc gettext("Create") ?>": function() {
 					$(this).dialog("close");
 				},
-				"Cancel" : function(){
+				"<?vlc gettext("Cancel") ?>" : function(){
 					$(this).dialog("close")
 				}
 			}
@@ -40,7 +40,7 @@
 		var cols	=	Number($('#mosaic_cols').val());
 		var n		=	0;
 		$('#mosaic_tiles').empty()
-		$('#mosaic_tiles').append('<tr><td colspan="99"><h3 style="margin:0px;cursor:move; font-weight:normal" class="ui-widget-header">Mosaic Tiles</h3></td></tr>');
+		$('#mosaic_tiles').append('<tr><td colspan="99"><h3 style="margin:0px;cursor:move; font-weight:normal" class="ui-widget-header"><?vlc gettext("Mosaic Tiles") ?></h3></td></tr>');
 		for(var i=0;i<rows;i++){
 			$('#mosaic_tiles').append('<tr>');
 			for(var j=0;j<cols;j++){
@@ -90,49 +90,49 @@
 //]]>
 </script>
 
-<div id="window_mosaic" title="Create Mosaic">
+<div id="window_mosaic" title="<?vlc gettext("Create Mosaic") ?>">
 	<table id="mosaic_options">
 		<tr>
-			<td style="text-align:right">Rows:</td>
+			<td style="text-align:right"><?vlc gettext("Rows:") ?></td>
 			<td>
 				<input type="text" name="mosaic_rows" id="mosaic_rows" size="3" value="2"/>
 			</td>
-			<td style="text-align:right">x offset</td>
+			<td style="text-align:right"><?vlc gettext("x offset") ?></td>
 			<td>
 				<input type="text" name="mosaic_xoff" id="mosaic_xoff" size="3" value="0" disabled="disabled"/>
 			</td>
-			<td style="text-align:right">row border</td>
+			<td style="text-align:right"><?vlc gettext("row border") ?></td>
 			<td>
 				<input type="text" name="mosaic_rbord" id="mosaic_rbord" size="3" value="5"/>
 			</td>
-			<td style="text-align:right">width</td>
+			<td style="text-align:right"><?vlc gettext("width") ?></td>
 			<td>
 				<input type="text" name="mosaic_width" id="mosaic_width" size="3" value="100" disabled="disabled"/>
 			</td>
 		</tr>
 		<tr>
-			<td style="text-align:right">Columns:</td>
+			<td style="text-align:right"><?vlc gettext("Columns:") ?></td>
 			<td>
 				<input type="text" name="mosaic_cols" id="mosaic_cols" size="3" value="2"/>
 			</td>
-			<td style="text-align:right">y offset</td>
+			<td style="text-align:right"><?vlc gettext("y offset") ?></td>
 			<td>
 				<input type="text" name="mosaic_yoff" id="mosaic_yoff" size="3" value="0" disabled="disabled"/>
 			</td>
-			<td style="text-align:right">column border</td>
+			<td style="text-align:right"><?vlc gettext("column border") ?></td>
 			<td>
 				<input type="text" name="mosaic_cbord" id="mosaic_cbord" size="3" value="5"/>
 			</td>
-			<td style="text-align:right">height</td>
+			<td style="text-align:right"><?vlc gettext("height") ?></td>
 			<td>
 				<input type="text" name="mosaic_height" id="mosaic_height" size="3" value="100" disabled="disabled"/>
 			</td>
 		</tr>
 	</table>
 	<div id="mosaic_bg" class="ui-widget-content" style="background: #3333FF;width:400px; height:300px;text-align: center; vertical-align: middle;">
-		<h3 style="margin:0px;font-weight:normal" class="ui-widget-header">Background</h3>
+		<h3 style="margin:0px;font-weight:normal" class="ui-widget-header"><?vlc gettext("Background") ?></h3>
 		<table id="mosaic_tiles" class="ui-widget-content" cellpadding="0" cellspacing="0">
-			<tr><td colspan="99"><h3 style="margin:0px;cursor:move; font-weight:normal" class="ui-widget-header">Mosaic Tiles</h3></td></tr>
+			<tr><td colspan="99"><h3 style="margin:0px;cursor:move; font-weight:normal" class="ui-widget-header"><?vlc gettext("Mosaic Tiles") ?></h3></td></tr>
 			<tr>
 				<td class="mosaic"></td>
 				<td class="mosaic"></td>

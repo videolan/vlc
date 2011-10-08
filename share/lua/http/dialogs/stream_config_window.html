@@ -5,35 +5,35 @@
 			width:400,
 			modal: true,
 			buttons:{
-				"Okay":function(){
+				"<?vlc gettext("Okay") ?>":function(){
 					$('#player').empty();
 					$('#player').attr('href',$('#stream_protocol').val()+'://'+$('#stream_host').val()+':'+$('#stream_port').val()+'/'+$('#stream_file').val());
 					flowplayer("player", "http://releases.flowplayer.org/swf/flowplayer-3.2.7.swf");
 					$(this).dialog('close');
 				},
-				"Cancel":function(){
+				"<?vlc gettext("Cancel") ?>":function(){
 					$(this).dialog('close');
 				}
 			}
 		});
 	})
 </script>
-<div id="window_stream_config" title="Stream Input Configuration">
+<div id="window_stream_config" title="<?vlc gettext("Stream Input Configuration") ?>">
 	<table>
 		<tr>
-			<td>Protocol</td>
+			<td><?vlc gettext("Protocol") ?></td>
 			<td><input type="text" name="stream_protocol" id="stream_protocol" value="http" /></td>
 		</tr>
 		<tr>
-			<td>Host</td>
+			<td><?vlc gettext("Host") ?></td>
 			<td><input type="text" name="stream_host" id="stream_host" value="" /></td>
 		</tr>
 		<tr>
-			<td>Port</td>
+			<td><?vlc gettext("Port") ?></td>
 			<td><input type="text" name="stream_port" id="stream_port" value="8081" /></td>
 		</tr>
 		<tr>
-			<td>File</td>
+			<td><?vlc gettext("File") ?></td>
 			<td><input type="text" name="stream_file" id="stream_file" value="stream.flv" /></td>
 		</tr>
 	</table>

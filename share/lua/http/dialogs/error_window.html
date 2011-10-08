@@ -5,7 +5,7 @@
 			width:400,
 			modal: true,
 			buttons:{
-				"Close":function(){
+				"<?vlc gettext("Close") ?>":function(){
 					$('#error_container').empty();
 					$(this).dialog('close');
 				}
@@ -13,7 +13,7 @@
 			});
 	})
 </script>
-<div id="window_error" title="Error!">
+<div id="window_error" title="<?vlc gettext("Error!") ?>">
 	<div class="ui-state-error"><div class="ui-icon ui-icon-alert"></div></div>
 	<div id="error_container" class="ui-state-error"></div>
 </div>

@@ -23,7 +23,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 
 <head>
-	<title>VLC media player - Flash Viewer</title>
+	<title><?vlc gettext("VLC media player - Flash Viewer") ?></title>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<link href="favicon.ico" type="image/x-icon" rel="shortcut icon"/>
 	<link type="text/css" href="css/ui-lightness/jquery-ui-1.8.13.custom.css" rel="stylesheet" />
@@ -62,9 +62,9 @@
 
 <body>
 	<div id="window_stream" class="ui-widget-content">
-		<h3 class="ui-widget-header">Streaming Output</h3>
+		<h3 class="ui-widget-header"><?vlc gettext("Streaming Output") ?></h3>
 		<div class="ui-widget-content">
-			<div id="button_stream_config" class="button icon ui-widget ui-state-default" title="Configure" opendialog="window_stream_config"><span class="ui-icon ui-icon-wrench"></span></div>
+			<div id="button_stream_config" class="button icon ui-widget ui-state-default" title="<?vlc gettext("Configure") ?>" opendialog="window_stream_config"><span class="ui-icon ui-icon-wrench"></span></div>
 			<div align="center">
 				<div href="http://localhost:8081/stream.flv" style="display:block;width:720px;height:500px" id="player"></div>
 			</div>

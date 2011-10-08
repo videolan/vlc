@@ -8,7 +8,7 @@
 			width: 500,
 			resizable: false,
 			buttons:{
-				"Reset":function(){
+				"<?vlc gettext("Reset") ?>":function(){
 					$('.eqBand').each(function(){
 						$(this).slider('value',0);
 						sendEQCmd({
@@ -19,7 +19,7 @@
 					});
 
 				},
-				"Close":function(){
+				"<?vlc gettext("Close") ?>":function(){
 					$(this).dialog("close");
 				}
 			}
@@ -44,9 +44,9 @@
 	});
 //]]>
 </script>
-<div id="window_equalizer" title="Graphical Equalizer">
+<div id="window_equalizer" title="<?vlc gettext("Graphical Equalizer") ?>">
 	<div style="margin: 5px 5px 5px 5px;">
-		<div>Preamp: <span id="preamp_txt">0dB</span></div>
+		<div><?vlc gettext("Preamp:") ?> <span id="preamp_txt">0dB</span></div>
 	</div>
 	<div style="margin: 5px 5px 10px 5px;">
 		<div id="preamp" style="font-size: 18px;"></div>

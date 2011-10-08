@@ -1137,6 +1137,20 @@ modules/visualization/visual/fft.c
 modules/visualization/visual/fft.h
 modules/visualization/visual/visual.c
 modules/visualization/visual/visual.h
+share/lua/http/index.html
+share/lua/http/dialogs/batch_window.html
+share/lua/http/dialogs/browse_window.html
+share/lua/http/dialogs/create_stream.html
+share/lua/http/dialogs/equalizer_window.html
+share/lua/http/dialogs/error_window.html
+share/lua/http/dialogs/mosaic_window.html
+share/lua/http/dialogs/offset_window.html
+share/lua/http/dialogs/stream_config_window.html
+share/lua/http/dialogs/stream_window.html
+share/lua/http/mobile_browse.html
+share/lua/http/mobile_equalizer.html
+share/lua/http/mobile.html
+share/lua/http/mobile_view.html
 
 # Qt4 .ui files
 # uncomment (and prepend $builddir} if you want to generate a proper vlc.pot 

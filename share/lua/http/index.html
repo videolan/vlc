@@ -23,7 +23,7 @@
 < - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
 <html>
 	<head>
-		<title>VLC media player - Web Interface</title>
+		<title><?vlc gettext("VLC media player - Web Interface") ?></title>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<link href="favicon.ico" type="image/x-icon" rel="shortcut icon" />
 		<script type="text/javascript" src="js/common.js"></script>
@@ -160,7 +160,7 @@
 					width:600,
 					modal: true,
 					buttons:{
-						"Yes":function(){
+						"<?vlc gettext("Yes") ?>":function(){
 							var file			=	$('[current="current"]','#libraryTree').length>0 ? decodeURIComponent($('[current="current"]','#libraryTree').first().attr('uri').substr(7)) : ($('.jstree-clicked','#libraryTree').length>0 ? decodeURIComponent($('.jstree-clicked','#libraryTree').first().parents().first().attr('uri').substr(7)) : ($('#plid_'+current_id).attr('uri') ? decodeURIComponent($('#plid_'+current_id).attr('uri').substr(7)) : false));
 							if(file){
 								if($('#viewContainer').css('display')=='none'){
@@ -174,7 +174,7 @@
 							}
 							$(this).dialog('close');
 						},
-						"No":function(){
+						"<?vlc gettext("No") ?>":function(){
 							$(this).dialog('close');
 						}
 					}
@@ -195,25 +195,25 @@
 			<div id="mainContainer" class="centered">
 			<div id="controlContainer" class="ui-widget">
 				<div class="ui-widget-header" style="text-align: left;">
-					<img src="images/vlc16x16.png" alt="VLC" width="16" height="16"/> Controls
+					<img src="images/vlc16x16.png" alt="VLC" width="16" height="16"/><?vlc gettext("Controls") ?>
 				</div>
 				<div id="controlTable" class="ui-widget-content">
 					<ul id="controlButtons">
-						<li id="buttonPrev" class="button48  ui-corner-all" title="Previous"></li>
-						<li id="buttonPlay" class="button48  ui-corner-all paused" title="Play"></li>
-						<li id="buttonNext" class="button48  ui-corner-all" title="Next"></li>
-						<li id="buttonOpen" class="button48  ui-corner-all" title="Open Media"></li>
-						<li id="buttonStop" class="button48  ui-corner-all" title="Stop"></li>
-						<li id="buttonFull" class="button48  ui-corner-all" title="Full Screen"></li>
-						<li id="buttonSout" class="button48  ui-corner-all" title="Easy Stream"></li>
+						<li id="buttonPrev" class="button48  ui-corner-all" title="<?vlc gettext("Previous") ?>"></li>
+						<li id="buttonPlay" class="button48  ui-corner-all paused" title="<?vlc gettext("Play") ?>"></li>
+						<li id="buttonNext" class="button48  ui-corner-all" title="<?vlc gettext("Next") ?>"></li>
+						<li id="buttonOpen" class="button48  ui-corner-all" title="<?vlc gettext("Open Media") ?>"></li>
+						<li id="buttonStop" class="button48  ui-corner-all" title="<?vlc gettext("Stop") ?>"></li>
+						<li id="buttonFull" class="button48  ui-corner-all" title="<?vlc gettext("Full Screen") ?>"></li>
+						<li id="buttonSout" class="button48  ui-corner-all" title="<?vlc gettext("Easy Stream") ?>"></li>
 					</ul>
 					<ul id="buttonszone">
-						<li id="buttonPlayList" class="button ui-widget ui-state-default ui-corner-all" title="Hide / Show Library"><span class="ui-icon ui-icon-note"></span></li>
-						<li id="buttonViewer" class="button ui-widget ui-state-default ui-corner-all" title="Hide / Show Viewer"><span class="ui-icon ui-icon-video"></span></li>
-						<li id="buttonStreams" class="button ui-widget ui-state-default ui-corner-all" title="Manage Streams"><span class="ui-icon ui-icon-script"></span></li>
-						<li id="buttonOffsets" class="button ui-widget ui-state-default ui-corner-all" title="Track Synchronisation"><span class="ui-icon ui-icon-transfer-e-w"></span></li>
-						<li id="buttonEqualizer" class="button ui-widget ui-state-default ui-corner-all" title="Equalizer"><span class="ui-icon ui-icon-signal"></span></li>
-						<li id="buttonBatch" class="button ui-widget ui-state-default ui-corner-all" title="VLM Batch Commands"><span class="ui-icon ui-icon-suitcase"></span></li>
+						<li id="buttonPlayList" class="button ui-widget ui-state-default ui-corner-all" title="<?vlc gettext("Hide / Show Library") ?>"><span class="ui-icon ui-icon-note"></span></li>
+						<li id="buttonViewer" class="button ui-widget ui-state-default ui-corner-all" title="<?vlc gettext("Hide / Show Viewer") ?>"><span class="ui-icon ui-icon-video"></span></li>
+						<li id="buttonStreams" class="button ui-widget ui-state-default ui-corner-all" title="<?vlc gettext("Manage Streams") ?>"><span class="ui-icon ui-icon-script"></span></li>
+						<li id="buttonOffsets" class="button ui-widget ui-state-default ui-corner-all" title="<?vlc gettext("Track Synchronisation") ?>"><span class="ui-icon ui-icon-transfer-e-w"></span></li>
+						<li id="buttonEqualizer" class="button ui-widget ui-state-default ui-corner-all" title="<?vlc gettext("Equalizer") ?>"><span class="ui-icon ui-icon-signal"></span></li>
+						<li id="buttonBatch" class="button ui-widget ui-state-default ui-corner-all" title="<?vlc gettext("VLM Batch Commands") ?>"><span class="ui-icon ui-icon-suitcase"></span></li>
 					</ul>
 					<div id="volumesliderzone">
 						<div id="volumeSlider" title="Volume"><img src="images/speaker-32.png" class="ui-slider-handle" alt="volume"/></div>
@@ -224,32 +224,32 @@
 					</div>
 					<div id="mediaTitle" class="dynamic"></div>
 					<div id="seekContainer">
-						<div id="seekSlider" title="Seek Time"></div>
+						<div id="seekSlider" title="<?vlc gettext("Seek Time") ?>"></div>
 						<div id="currentTime" class="dynamic">00:00:00</div>
 						<div id="totalTime" class="dynamic">00:00:00</div>
 					</div>
 				</div>
 			</div>
 			<div id="viewContainer" class="ui-widget">
-				<div class="ui-widget-header" style="text-align: left;"><img src="images/vlc16x16.png" alt="VLC" width="16" height="16"/> Viewer</div>
+				<div class="ui-widget-header" style="text-align: left;"><img src="images/vlc16x16.png" alt="VLC" width="16" height="16"/><?vlc gettext("Viewer") ?></div>
 				<div id="mediaViewer" class="ui-widget-content">
 					<div href="http://localhost:8081/stream.flv" style="display:block; width:100%" id="player">
-						<p>Loading flowplayer...<br/>If nothing appears, check your internet connection.</p>
+						<p><?vlc gettext("Loading flowplayer...") ?><br/><?vlc gettext("If nothing appears, check your internet connection.") ?></p>
 					</div>
 				</div>
 			</div>
 			<div id="libraryContainer" class="ui-widget">
 				<div class="ui-widget-header" style="text-align: left;">
-					<img src="images/vlc16x16.png" alt="VLC" width="16" height="16"/> Library
+					<img src="images/vlc16x16.png" alt="VLC" width="16" height="16"/><?vlc gettext("Library") ?>
 				</div>
 				<div align="left" class="ui-widget-content" style="overflow:hidden; white-space: nowrap;">
-					<div id="buttonShuffle" class="button ui-widget ui-state-default ui-corner-all" title="Shuffle"><span class="ui-icon ui-icon-shuffle"></span></div>
-					<div id="buttonLoop" class="button ui-widget ui-state-default ui-corner-all" title="Loop"><span class="ui-icon ui-icon-refresh"></span></div>
-					<div id="buttonRepeat" class="button ui-widget ui-state-default ui-corner-all" title="Repeat"><span class="ui-icon ui-icon-arrowreturnthick-1-w"></span></div>
-					<div id="buttonPlEmpty" class="button ui-widget ui-state-default ui-corner-all" title="Empty Playlist"><span class="ui-icon ui-icon-trash"></span></div>
-					<div id="buttonPlAdd" class="button ui-widget ui-state-default ui-corner-all" title="Queue Selected"><span class="ui-icon ui-icon-plus"></span></div>
-					<div id="buttonPlPlay" class="button ui-widget ui-state-default ui-corner-all" title="Play Selected"><span class="ui-icon ui-icon-play"></span></div>
-					<div id="buttonRefresh" class="button ui-widget ui-state-default ui-corner-all" title="Refresh List"><span class="ui-icon ui-icon-arrowrefresh-1-n"></span></div>
+					<div id="buttonShuffle" class="button ui-widget ui-state-default ui-corner-all" title="<?vlc gettext("Shuffle") ?>"><span class="ui-icon ui-icon-shuffle"></span></div>
+					<div id="buttonLoop" class="button ui-widget ui-state-default ui-corner-all" title="<?vlc gettext("Loop") ?>"><span class="ui-icon ui-icon-refresh"></span></div>
+					<div id="buttonRepeat" class="button ui-widget ui-state-default ui-corner-all" title="<?vlc gettext("Repeat") ?>"><span class="ui-icon ui-icon-arrowreturnthick-1-w"></span></div>
+					<div id="buttonPlEmpty" class="button ui-widget ui-state-default ui-corner-all" title="<?vlc gettext("Empty Playlist") ?>"><span class="ui-icon ui-icon-trash"></span></div>
+					<div id="buttonPlAdd" class="button ui-widget ui-state-default ui-corner-all" title="<?vlc gettext("Queue Selected") ?>"><span class="ui-icon ui-icon-plus"></span></div>
+					<div id="buttonPlPlay" class="button ui-widget ui-state-default ui-corner-all" title="<?vlc gettext("Play Selected") ?>"><span class="ui-icon ui-icon-play"></span></div>
+					<div id="buttonRefresh" class="button ui-widget ui-state-default ui-corner-all" title="<?vlc gettext("Refresh List") ?>"><span class="ui-icon ui-icon-arrowrefresh-1-n"></span></div>
 				</div>
 				<div id="libraryTree" class="ui-widget-content"></div>
 			</div>
@@ -261,24 +261,22 @@
 		</div>
 		<div id="windowStreamConfirm" title="Confirm Stream Settings">
 			<p>
-				By creating a stream, the <i>Main Controls</i> will operate the stream instead of the main interface.
-				The stream will be created using default settings, for more advanced configuration, or to modify the default settings,
-				select the <i>Manage Streams</i>
-				<span id="buttonStreams2" class="button ui-widget ui-state-default ui-corner-all" title="Manage Streams"><span class="ui-icon ui-icon-script"></span></span>
-				button to the right. 
+				<?vlc gettext("By creating a stream, the <i>Main Controls</i> will operate the stream instead of the main interface.") ?>
+				<?vlc gettext("The stream will be created using default settings, for more advanced configuration, or to modify the default settings, select the button to the right: <i>Manage Streams</i>") ?>
+				<span id="buttonStreams2" class="button ui-widget ui-state-default ui-corner-all" title="<?vlc gettext("Manage Streams") ?>"><span class="ui-icon ui-icon-script"></span></span>
 			</p>
 			<p>
-				Once the stream is created, the <i>Media Viewer</i> window will display the stream.
-				Volume will be controlled by the player, and not the <i>Main Controls</i>.
+				<?vlc gettext("Once the stream is created, the <i>Media Viewer</i> window will display the stream.") ?>
+				<?vlc gettext("Volume will be controlled by the player, and not the <i>Main Controls</i>.") ?>
 			</p>
 			<p>
-				The current playing item will be streamed. If there is no currently playing item, the first selected item from the <i>Library</i> will be the subject of the stream.
+				<?vlc gettext("The current playing item will be streamed. If there is no currently playing item, the first selected item from the <i>Library</i> will be the subject of the stream.") ?>
 			</p>
 			<p>
-				To stop the stream and resume normal controls, click the <i>Open Stream</i> button again.
+				<?vlc gettext("To stop the stream and resume normal controls, click the <i>Open Stream</i> button again.") ?>
 			</p>
 			<p>
-				Are you sure you wish to create the stream?
+				<?vlc gettext("Are you sure you wish to create the stream ?") ?>
 			</p>
 		</div>
 		<?vlc

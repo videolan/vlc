@@ -22,7 +22,7 @@
 < - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
 <html>
 	<head>
-		<title>VLC media player - Web Interface</title>
+		<title><?vlc gettext("VLC media player - Web Interface") ?></title>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<meta name="viewport" content="width=device-width; user-scalable=no" />
 		<link href="favicon.ico" type="image/x-icon" rel="shortcut icon" />
@@ -42,10 +42,10 @@
 		</script>
 	</head>
 	<body>
-		<div id="window_browse" title="Media Browser">
+		<div id="window_browse" title="<?vlc gettext("Media Browser") ?>">
 			<div>
 				<ol id='browse_elements' selectable="selectable">
-					<li>Play List</li>
+					<li><?vlc gettext("Play List") ?></li>
 				</ol>
 			</div>
 		</div>

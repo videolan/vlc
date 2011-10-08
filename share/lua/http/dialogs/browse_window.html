@@ -9,12 +9,12 @@
 			modal: true,
 			resizable: false,
 			buttons: {
-				"Open":function(){
+				"<?vlc gettext("Open") ?>":function(){
 					$('li.ui-selected','#browse_elements').each(function(){
 						$(this).dblclick();
 					});
 				},
-				"Enqueue": function() {
+				"<?vlc gettext("Enqueue") ?>": function() {
 					$('li.ui-selected','#browse_elements').each(function(){
 						var path	=	this.getAttribute('opendir') ? this.getAttribute('opendir') : this.getAttribute('openfile');
 						switch(browse_target){
@@ -25,7 +25,7 @@
 					});
 					$(this).dialog("close");
 				},
-				"Cancel" : function(){
+				"<?vlc gettext("Cancel") ?>" : function(){
 					$(this).dialog("close")
 				}
 			}
@@ -34,10 +34,10 @@
 //]]>
 </script>
 
-<div id="window_browse" title="Media Browser">
+<div id="window_browse" title="<?vlc gettext("Media Browser") ?>">
 	<div style="height:500px;overflow: scroll;">
 		<ol id='browse_elements' selectable="selectable">
-			<li>Play List</li>
+			<li><?vlc gettext("Play List") ?></li>
 		</ol>
 	</div>
 </div>
