@@ -262,8 +262,8 @@ static int Open(vlc_object_t *obj)
     const pa_stream_flags_t flags = PA_STREAM_INTERPOLATE_TIMING
                                   | PA_STREAM_AUTO_TIMING_UPDATE
                                   | PA_STREAM_FIX_FORMAT
-                                  /*| PA_STREAM_FIX_RATE
-                                  | PA_STREAM_FIX_CHANNELS*/;
+                                  | PA_STREAM_FIX_RATE
+                                  /*| PA_STREAM_FIX_CHANNELS*/;
     const struct pa_buffer_attr attr = {
         .maxlength = -1,
         .fragsize = pa_usec_to_bytes(sys->caching, &ss) / 2,
@@ -313,10 +313,10 @@ static int Open(vlc_object_t *obj)
     fmt.audio.i_physical_channels = fmt.audio.i_original_channels =
         AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
     fmt.audio.i_channels = ss.channels;
-    fmt.audio.i_rate = ss.rate;
+    fmt.audio.i_rate = pss->rate;
     fmt.audio.i_bitspersample = aout_BitsPerSample(format);
     fmt.audio.i_blockalign = fmt.audio.i_bitspersample * ss.channels / 8;
-    fmt.i_bitrate = fmt.audio.i_bitspersample * ss.channels * ss.rate;
+    fmt.i_bitrate = fmt.audio.i_bitspersample * ss.channels * pss->rate;
     sys->framesize = fmt.audio.i_blockalign;
     sys->es = es_out_Add (demux->out, &fmt);
 
