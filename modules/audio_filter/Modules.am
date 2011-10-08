@@ -1,5 +1,6 @@
 SOURCES_equalizer = equalizer.c equalizer_presets.h
 SOURCES_compressor = compressor.c
+SOURCES_karaoke = karaoke.c
 SOURCES_normvol = normvol.c
 SOURCES_audiobargraph_a = audiobargraph_a.c
 SOURCES_param_eq = param_eq.c
@@ -18,6 +19,7 @@ libvlc_LTLIBRARIES += \
 	libchorus_flanger_plugin.la \
 	libcompressor_plugin.la \
 	libequalizer_plugin.la \
+	libkaraoke_plugin.la \
 	libnormvol_plugin.la \
 	libparam_eq_plugin.la \
 	libscaletempo_plugin.la \

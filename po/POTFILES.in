@@ -300,6 +300,7 @@ modules/audio_filter/converter/format.c
 modules/audio_filter/converter/mpgatofixed32.c
 modules/audio_filter/equalizer.c
 modules/audio_filter/equalizer_presets.h
+modules/audio_filter/karaoke.c
 modules/audio_filter/normvol.c
 modules/audio_filter/param_eq.c
 modules/audio_filter/resampler/bandlimited.c
