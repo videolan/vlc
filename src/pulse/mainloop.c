@@ -83,7 +83,7 @@ static void vlc_pa_mainloop_deinit (void)
 {
     vlc_mutex_lock (&lock);
     assert (refs > 0);
-    if (--refs > 0)
+    if (--refs == 0)
     {
         pa_threaded_mainloop_stop (vlc_pa_mainloop);
         pa_threaded_mainloop_free (vlc_pa_mainloop);
