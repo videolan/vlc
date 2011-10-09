@@ -1,5 +1,5 @@
 # German translation of VLC
-# (c) 2002-2010 the VideoLAN team
+# (c) 2002-2011 the VideoLAN team
 # $Id$
 #
 # Thanks to Thomas Graf <tgr at reeler.org> for starting a translation in 2002.
@@ -17,10 +17,10 @@ msgstr ""
 "Project-Id-Version: VLC 1.1.x\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2011-10-09 17:15+0100\n"
-"PO-Revision-Date: 2011-05-20 22:29+0100\n"
+"PO-Revision-Date: 2011-10-06 21:25+0100\n"
 "Last-Translator: Mario Siegmann <mario_siegmann@web.de>\n"
 "Language-Team: German\n"
-"Language: de\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -16552,17 +16552,19 @@ msgstr "VLC Debug-Protokoll (%s).rtfd"
 
 #: modules/gui/macosx/intf.m:1955
 msgid "Relaunch required"
-msgstr ""
+msgstr "Neustart erforderlich"
 
 #: modules/gui/macosx/intf.m:1956
 msgid ""
 "To make sure that VLC no longer listens to your media key events, it needs "
 "to be restarted."
 msgstr ""
+"Um sicher zu gehen, dass der VLC nicht länger auf Ereignisse der "
+"Medientasten wartet, ist ein Neustart notwendig."
 
 #: modules/gui/macosx/intf.m:1957
 msgid "Relaunch VLC"
-msgstr ""
+msgstr "VLC Neustarten"
 
 #: modules/gui/macosx/macosx.m:55
 msgid "Video device"
@@ -17404,8 +17406,7 @@ msgstr "Automatisch nach Updates suchen"
 
 #: modules/gui/macosx/simple_prefs.m:268
 msgid "Enable Growl notifications (on playlist item change)"
-msgstr ""
-"Growl-Benachrichtigungen aktivieren (nach Wechsel des Wiedergabeobjekts)"
+msgstr "Growl-Nachrichten aktivieren (nach Wechsel des Wiedergabeobjekts)"
 
 #: modules/gui/macosx/simple_prefs.m:271
 msgid "Default Encoding"
@@ -26799,9 +26800,9 @@ msgid ""
 "requires YV12/I420 fourcc. By default vlc writes the fourcc of the picture "
 "frame into the output destination."
 msgstr ""
-"Der YUV4MPEG2 Header ist kompatibel mit der mplayer yuv Video Ausgabe und "
-"benötigt YV12/I420 fourcc. Standardmäßig schreibt VLC den fourcc des Picture "
-"Frames in das Ausgabeziel. "
+"Der YUV4MPEG2-Header ist kompatibel mit der mplayer yuv Video-Ausgabe und "
+"benötigt YV12/I420 fourcc. Standardmäßig schreibt VLC den fourcc des Picture-"
+"Frames in das Ausgabeziel."
 
 #: modules/video_output/yuv.c:59
 msgid "YUV output"
