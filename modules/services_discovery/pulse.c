@@ -39,8 +39,8 @@ static void Close (vlc_object_t *);
 VLC_SD_PROBE_HELPER("pulse", "Audio capture", SD_CAT_DEVICES);
 
 vlc_module_begin ()
-    set_shortname (N_("Video capture"))
-    set_description (N_("Video capture (Video4Linux)"))
+    set_shortname (N_("Audio capture"))
+    set_description (N_("Audio capture (PulseAudio)"))
     set_category (CAT_PLAYLIST)
     set_subcategory (SUBCAT_PLAYLIST_SD)
     set_capability ("services_discovery", 0)
