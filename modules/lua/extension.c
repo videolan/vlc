@@ -99,7 +99,7 @@ static void inputItemMetaChanged( const vlc_event_t *p_event,
  **/
 int Open_Extension( vlc_object_t *p_this )
 {
-    msg_Dbg( p_this, "Opening EXPERIMENTAL Lua Extension module" );
+    msg_Dbg( p_this, "Opening Lua Extension module" );
 
     extensions_manager_t *p_mgr = ( extensions_manager_t* ) p_this;
 
@@ -189,6 +189,9 @@ void Close_Extension( vlc_object_t *p_this )
     FOREACH_END()
 
     ARRAY_RESET( p_mgr->extensions );
+
+    var_DelCallback( p_this, "dialog-event",
+                     vlclua_extension_dialog_callback, NULL );
 }
 
 /**
