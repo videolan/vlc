@@ -557,7 +557,7 @@ static VLCMain *_o_sharedMainInstance = nil;
 
     val.b_bool = false;
 
-    var_AddCallback( p_playlist, "fullscreen", FullscreenChanged, self);
+    var_AddCallback(p_playlist, "fullscreen", FullscreenChanged, self);
     var_AddCallback( p_intf->p_libvlc, "intf-toggle-fscontrol", ShowController, self);
 //    var_AddCallback(p_playlist, "item-change", PLItemChanged, self);
     var_AddCallback(p_playlist, "item-current", PLItemChanged, self);
@@ -701,6 +701,8 @@ static VLCMain *_o_sharedMainInstance = nil;
     var_DelCallback(p_playlist, "loop", PlaybackModeUpdated, self);
     var_DelCallback(p_playlist, "volume", VolumeUpdated, self);
     var_DelCallback(p_playlist, "mute", VolumeUpdated, self);
+    var_DelCallback(p_playlist, "fullscreen", FullscreenChanged, self);
+    var_DelCallback(p_intf->p_libvlc, "intf-toggle-fscontrol", ShowController, self);
 
     /* remove global observer watching for vout device changes correctly */
     [[NSNotificationCenter defaultCenter] removeObserver: self];
