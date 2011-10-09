@@ -1156,6 +1156,5 @@ modules/visualization/visual/visual.h
 #modules/gui/qt4/ui/sprefs_subtitles.h
 #modules/gui/qt4/ui/sprefs_video.h
 #modules/gui/qt4/ui/streampanel.h
-#modules/gui/qt4/ui/v4l2.h
 #modules/gui/qt4/ui/video_effects.h
 #modules/gui/qt4/ui/vlm.h
