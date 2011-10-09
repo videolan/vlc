@@ -554,11 +554,11 @@ static void *Thread( void *obj )
     else
         getSettings()->remove( "filedialog-path" );
 
-    /* Delete the configuration. Application has to be deleted after that. */
-    delete p_intf->p_sys->mainSettings;
-
     /* */
     delete p_intf->p_sys->pl_model;
+
+    /* Delete the configuration. Application has to be deleted after that. */
+    delete p_intf->p_sys->mainSettings;
 
     /* Destroy the MainInputManager */
     MainInputManager::killInstance();
