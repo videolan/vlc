@@ -24,6 +24,8 @@ Important notes:
    Use --rtsp-host and --rtsp-port respectively.
  * The --miface-addr option does not exist anymore. To select the multicast
    output interface, use --miface instead, e.g. --miface=eth0.
+ * The Windows version will only work with Windows XP SP2 or later.
+   Windows 2000 SP4, Windows XP < SP2, Windows 2003 SP0 are now unsupported.
 
 Important changes for packagers:
  * The default builds now assume that the operating system uses UTF-8 for
@@ -35,8 +37,6 @@ Important changes for packagers:
  * The default tarballs are now compressed with XZ/LZMA: .tar.xz
  * OSS support is not compiled on Linux by default, pass --enable-oss to the
    configure script if you use OSSv4 or really want to use OSS emulation.
- * The Windows version will only work with Windows XP SP2 or later.
-   Windows 2000 SP4, Windows XP < SP2, Windows 2003 SP0 are now unsupported.
 
  * The NPAPI webplugin has moved to git://git.videolan.org/npapi-vlc.git
  * The ActiveX webplugin has moved to git://git.videolan.org/activex-vlc.git
@@ -92,16 +92,17 @@ Demuxers:
  * Support for caf, mtv, awb, f4v, amr, vro (DVD-VR) files
  * Ogg, flv, mxf, amr seeking improvements
  * Major improvements in Matroska (mkv) chapters/segments handling
+ * Support for duration and better seeking in Mpeg-TS files (.ts, .m2ts, .mts)
 
 Interfaces:
- * Skins2 / Qt: misc improvements and usability fixes
  * Qt: effects dialogs rework
  * Qt: new CoverFlow-like view of the playlist
  * Qt: port to MacOS X platform
+ * Qt: small look improvements
+ * Skins2 / Qt: misc improvements and usability fixes
  * Skins2: fullscreen controller support, relative placement support
    and important cleanups and optimisations
- * ncurses: heavy refactor of the complete interface
- * Mac OS X: re-written Main Window, which also includes the Video Output
+ * Mac OS X: re-written Main Window, which also includes the Video Windows
  * Mac OS X: new Audio Effects panel adding Compressor and Spatializer filters
  * Mac OS X: new Track Synchronization panel
  * Mac OS X: new Video Effects panel for color and geometry adjustments
@@ -109,6 +110,7 @@ Interfaces:
  * Mac OS X: support for the native fullscreen mode on OS X Lion
  * Mac OS X: enhanced AppleScript support
  * The rc and telnet lua interfaces were merged into a new "cli" interface
+ * ncurses: heavy refactor of the complete interface
  * dbus: Rewrite of the main loop to use a more efficient poll-based model
  * dbus: Upgrade to an mpris2 compliant interface, see http://www.mpris.org
  * webUI/http: Rewrite of the web interface, using jQuery
@@ -125,15 +127,16 @@ Video Output:
    chroma conversion
  * New video output for Android platform, based on Surface
  * Support for 9/10bits output in the OpenGL output
- * Updated OpenGL video output for Mac, which now requires a
-   Quartz Extreme capable machine
+ * Updated OpenGL video output for Mac, requires a Quartz Extreme capable machine
 
-Audio Output:
+Audio Output and Filters:
  * New audio output based on AudioQueue API for iOS
  * New audio output in memory (amem)
  * Important simplification and improvements in the core audio output
  * New audio output based on OpenSL ES API for Android
  * New audio resampler using the Secret Rabbit Code (a.k.a. libsamplerate)
+ * New Compressor filter, a dynamic range compressor
+ * New simplistic Karaoke filter
 
 Video Filter:
  * New gradfun filter for debanding videos using dithering
@@ -148,12 +151,8 @@ Video Filter:
  * New OpenMAX DL IPCS filter for color space conversion and resizing
  * Major improvements in the freetype text-rendering module, notably supporting
    blackbox and customizable shadow
-   - The freetype module is used by default on the Mac now in favor of
-     quartztext, which can still be enabled manually
-
-Audio Filter:
- * New Compressor filter, a dynamic range compressor
- * New simplistic Karaoke filter
+   NB: The freetype module is now used by default on the Mac OS X instead of
+   the quartztext module, which can still be enabled manually.
 
 Stream output:
  * New livehttp-module for HTTP Live Streaming (IETF draft) output
@@ -995,7 +994,8 @@ Demuxers:
 
 Access:
  * Add extra caching for files on network shares
- * Prevent integer underflow in Real pseudo-RTSP module, discovered by tixxDZ, DZCORE Labs, Algeria
+ * Prevent integer underflow in Real pseudo-RTSP module, discovered by tixxDZ,
+   DZCORE Labs, Algeria
 
 Decoders:
  * Fix seeking in mpeg2 video files
@@ -1020,7 +1020,8 @@ Mac OS X Interface:
 Windows port:
  * The ZVBI module is now available for Windows, for complete teletext support
 
-Translations updates for Brazillian, French, German, Korean, Norwegian Nynorsk, Lithuanian
+Translations updates for Brazillian, French, German, Korean, Norwegian Nynorsk,
+Lithuanian
 
 
 Changes between 0.9.10 and 1.0.0:
@@ -2744,7 +2745,8 @@ Core Support:
  * Channel Server support was removed (was deprecated)
 
 Input access:
- * Fixed a big bug in ftp and http access that prevented many platforms (OSX most prominently) to view ftp and http streams.
+ * Fixed a big bug in ftp and http access that prevented many platforms
+   (OSX most prominently) to view ftp and http streams.
  * Fixed large file support on Windows
  * Video 4 Linux support
  * CD Digital Audio support
@@ -2770,7 +2772,8 @@ Interfaces:
  * New HTTP remote control interface
 
 Stream output:
- * New stream output scheme. It is now possible to build a chain of stream outputs allowing for instance to stream and display some content at the same time.
+ * New stream output scheme. It is now possible to build a chain of stream outputs
+   allowing for instance to stream and display some content at the same time.
  * The stream output now allows to transcode content on the fly.
  * Fixed major bug that prevented streaming mpeg 1/2 video with pulldown content.
  * SAP/SDP announcing support. (both IPv4 and IPv6)
