@@ -9,6 +9,7 @@ msgstr ""
 "POT-Creation-Date: 2008-12-07 17:24+0000\n"
 "PO-Revision-Date: 2008-12-17 09:01+0200\n"
 "Language-Team: Kurmanji\n"
+"Language: kur\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -1238,7 +1239,7 @@ msgstr "Tevgerên Mişkê"
 #: src/modules/cache.c:213
 #: src/modules/cache.c:532
 msgid "C"
-msgstr "C"
+msgstr "kur"
 
 #: src/libvlc.c:1138
 msgid "Running vlc with the default interface. Use 'cvlc' to use vlc without interface."
@@ -2092,7 +2093,7 @@ msgid "Custom crop ratios list"
 msgstr ""
 
 #: src/libvlc-module.c:502
-msgid "Comma seperated list of crop ratios which will be added in the interface's crop ratios list."
+msgid "Comma separated list of crop ratios which will be added in the interface's crop ratios list."
 msgstr ""
 
 #: src/libvlc-module.c:505
@@ -2100,7 +2101,7 @@ msgid "Custom aspect ratios list"
 msgstr ""
 
 #: src/libvlc-module.c:507
-msgid "Comma seperated list of aspect ratios which will be added in the interface's aspect ratio list."
+msgid "Comma separated list of aspect ratios which will be added in the interface's aspect ratio list."
 msgstr ""
 
 #: src/libvlc-module.c:510
@@ -14906,7 +14907,7 @@ msgid "Use VLC pace"
 msgstr ""
 
 #: modules/gui/qt4/components/open_panels.cpp:818
-msgid "Auto connnection"
+msgid "Auto connection"
 msgstr ""
 
 #: modules/gui/qt4/components/open_panels.cpp:842
@@ -15439,7 +15440,7 @@ msgstr ""
 
 #: modules/gui/qt4/dialogs/vlm.cpp:267
 #: modules/gui/qt4/dialogs/vlm.cpp:337
-msgid "VLM conf (*.vlm) ;; All (*.*)"
+msgid "VLM conf (*.vlm);;All (*.*)"
 msgstr ""
 
 #: modules/gui/qt4/dialogs/vlm.cpp:335
@@ -20329,7 +20330,7 @@ msgid "Feed URLs"
 msgstr ""
 
 #: modules/video_filter/rss.c:130
-msgid "RSS/Atom feed '|' (pipe) seperated URLs."
+msgid "RSS/Atom feed '|' (pipe) separated URLs."
 msgstr ""
 
 #: modules/video_filter/rss.c:131
