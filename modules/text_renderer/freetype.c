@@ -2594,9 +2594,6 @@ static int Create( vlc_object_t *p_this )
                  psz_fontfile ? psz_fontfile : "(null)" );
         goto error;
     }
-#ifdef HAVE_STYLES
-    free( psz_fontfile );
-#endif
 
     i_error = FT_Select_Charmap( p_sys->p_face, ft_encoding_unicode );
     if( i_error )
@@ -2626,6 +2623,10 @@ static int Create( vlc_object_t *p_this )
 #endif
 
     LoadFontsFromAttachments( p_filter );
+
+#ifdef HAVE_STYLES
+    free( psz_fontfile );
+#endif
 
     return VLC_SUCCESS;
 
