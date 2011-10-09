@@ -1139,7 +1139,9 @@ modules/visualization/visual/visual.h
 # Qt4 .ui files
 # uncomment (and prepend $builddir} if you want to generate a proper vlc.pot 
 
+#modules/gui/qt4/ui/about.h
 #modules/gui/qt4/ui/equalizer.h
+#modules/gui/qt4/ui/messages_panel.h
 #modules/gui/qt4/ui/open.h
 #modules/gui/qt4/ui/open_capture.h
 #modules/gui/qt4/ui/open_disk.h
