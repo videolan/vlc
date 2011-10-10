@@ -49,9 +49,9 @@ vlc_module_end()
 static ssize_t Read   (access_t *, uint8_t *, size_t);
 static int     Seek   (access_t *, uint64_t);
 static int     Control(access_t *, int, va_list);
-static ssize_t Write( sout_access_out_t *, block_t * );
+static ssize_t Write(sout_access_out_t *, block_t *);
 static int     OutControl(sout_access_out_t *, int, va_list);
-static int     OutSeek ( sout_access_out_t *, off_t  );
+static int     OutSeek (sout_access_out_t *, off_t);
 
 static int     SetupAvio(vlc_object_t *);
 
@@ -101,7 +101,7 @@ int OpenAvio(vlc_object_t *object)
         goto error;
 
     msg_Dbg(access, "Opening '%s'", url);
-    if (url_open(&sys->context, url, URL_RDONLY) < 0 )
+    if (url_open(&sys->context, url, URL_RDONLY) < 0)
         sys->context = NULL;
     free(url);
 
@@ -161,7 +161,7 @@ int OutOpenAvio(vlc_object_t *object)
         goto error;
 
     msg_Dbg(access, "avio_output Opening '%s'", url);
-    if (url_open(&sys->context, url, URL_WRONLY) < 0 )
+    if (url_open(&sys->context, url, URL_WRONLY) < 0)
         sys->context = NULL;
     free(url);
 
@@ -223,17 +223,16 @@ static ssize_t Read(access_t *access, uint8_t *data, size_t size)
 /*****************************************************************************
  * Write:
  *****************************************************************************/
-static ssize_t Write( sout_access_out_t *p_access, block_t *p_buffer )
+static ssize_t Write(sout_access_out_t *p_access, block_t *p_buffer)
 {
     access_sys_t *p_sys = (access_sys_t*)p_access->p_sys;
     size_t i_write = 0;
 
-    while( p_buffer != NULL )
-    {
+    while (p_buffer != NULL) {
         block_t *p_next = p_buffer->p_next;;
 
         i_write += url_write(p_sys->context, p_buffer->p_buffer, p_buffer->i_buffer);
-        block_Release( p_buffer );
+        block_Release(p_buffer);
 
         p_buffer = p_next;
     }
@@ -256,7 +255,7 @@ static int Seek(access_t *access, uint64_t position)
     return VLC_SUCCESS;
 }
 
-static int OutSeek( sout_access_out_t *p_access, off_t i_pos )
+static int OutSeek(sout_access_out_t *p_access, off_t i_pos)
 {
     sout_access_out_sys_t *sys = p_access->p_sys;
 
@@ -265,23 +264,21 @@ static int OutSeek( sout_access_out_t *p_access, off_t i_pos )
     return VLC_SUCCESS;
 }
 
-static int OutControl( sout_access_out_t *p_access, int i_query, va_list args )
+static int OutControl(sout_access_out_t *p_access, int i_query, va_list args)
 {
     sout_access_out_sys_t *p_sys = p_access->p_sys;
 
     VLC_UNUSED(p_sys);
-    switch( i_query )
-    {
-        case ACCESS_OUT_CONTROLS_PACE:
-        {
-            bool *pb = va_arg( args, bool * );
-            //*pb = strcmp( p_access->psz_access, "stream" );
-            *pb = false;
-            break;
-        }
+    switch (i_query) {
+    case ACCESS_OUT_CONTROLS_PACE: {
+        bool *pb = va_arg(args, bool *);
+        //*pb = strcmp(p_access->psz_access, "stream");
+        *pb = false;
+        break;
+    }
 
-        default:
-            return VLC_EGENERIC;
+    default:
+        return VLC_EGENERIC;
     }
     return VLC_SUCCESS;
 }
@@ -357,4 +354,3 @@ static int SetupAvio(vlc_object_t *access)
 
     return VLC_SUCCESS;
 }
-
