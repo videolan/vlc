@@ -1090,21 +1090,9 @@ static int hls_ReloadPlaylist(stream_t *s)
             msg_Info(s, "new HLS stream appended (id=%d, bandwidth=%"PRIu64")",
                      hls_new->id, hls_new->bandwidth);
         }
-        else
-        {
-            if ((hls_UpdatePlaylist(s, hls_new, &hls_old) == VLC_SUCCESS) &&
-                    (s->p_sys->download.stream == n))
-            {
-                /* wake up download thread */
-                msg_Err(s, "WAKING UP DOWNLOAD THREAD");
-                vlc_mutex_lock(&s->p_sys->download.lock_wait);
-                vlc_cond_signal(&s->p_sys->download.wait);
-                vlc_mutex_unlock(&s->p_sys->download.lock_wait);
-            }
-            else
-                msg_Info(s, "failed updating HLS stream (id=%d, bandwidth=%"PRIu64")",
-                             hls_new->id, hls_new->bandwidth);
-        }
+        else if (hls_UpdatePlaylist(s, hls_new, &hls_old) != VLC_SUCCESS)
+            msg_Info(s, "failed updating HLS stream (id=%d, bandwidth=%"PRIu64")",
+                     hls_new->id, hls_new->bandwidth);
     }
     vlc_array_destroy(hls_streams);
     return VLC_SUCCESS;
