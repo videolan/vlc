@@ -841,7 +841,7 @@ dnl Manual switch for UTF-8
 AC_ARG_ENABLE(non-utf8,
   [AS_HELP_STRING([--enable-non-utf8],
     [support legacy non-UTF-8 systems (default disabled)])],, [
-  AS_IF([test "${SYS}" = "mingw32" -o "${SYS}" = "mingwce"], [
+  AS_IF([test "${SYS}" = "mingw32" -o "${SYS}" = "mingwce" -o "${SYS}" = "os2"], [
     enable_non_utf8="no"
   ])
 ])
