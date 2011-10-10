@@ -67,6 +67,9 @@ void QMenuView::rebuild()
 
     /* Rebuild from root */
     build( QModelIndex() );
+
+    if( isEmpty() )
+        addAction( qtr( "Empty" ) )->setDisabled( true );
 }
 
 /* */
