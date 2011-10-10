@@ -95,7 +95,7 @@
  * The evil global variables. We handle them with care, don't worry.
  *****************************************************************************/
 
-#ifndef WIN32
+#if !defined(WIN32) && !defined(__OS2__)
 static bool b_daemon = false;
 #endif
 
@@ -777,7 +777,7 @@ void libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
 
     msg_Dbg( p_libvlc, "removing stats" );
 
-#ifndef WIN32
+#if !defined( WIN32 ) && !defined( __OS2__ )
     char* psz_pidfile = NULL;
 
     if( b_daemon )
@@ -853,7 +853,7 @@ int libvlc_InternalAddIntf( libvlc_int_t *p_libvlc, char const *psz_module )
         char *psz_interface = var_CreateGetNonEmptyString( p_libvlc, "intf" );
         if( !psz_interface ) /* "intf" has not been set */
         {
-#ifndef WIN32
+#if !defined( WIN32 ) && !defined( __OS2__ )
             if( b_daemon )
                  /* Daemon mode hack.
                   * We prefer the dummy interface if none is specified. */

@@ -2188,7 +2188,7 @@ vlc_module_begin ()
     add_bool( "quiet", 0, QUIET_TEXT, QUIET_LONGTEXT, false )
         change_short('q')
 
-#if !defined(WIN32)
+#if !defined(WIN32) && !defined(__OS2__)
     add_bool( "daemon", 0, DAEMON_TEXT, DAEMON_LONGTEXT, true )
         change_short('d')
 
