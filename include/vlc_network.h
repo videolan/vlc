@@ -177,6 +177,11 @@ VLC_API int vlc_poll(struct pollfd *fds, unsigned nfds, int timeout);
 # define SHUT_RDWR SD_BOTH
 # define net_Close( fd ) closesocket ((SOCKET)fd)
 #else
+# ifdef __OS2__
+#  define SHUT_RD    0
+#  define SHUT_WR    1
+#  define SHUT_RDWR  2
+# endif
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>
 #endif
