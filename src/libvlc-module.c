@@ -2131,7 +2131,7 @@ vlc_module_begin ()
               PLAYLISTENQUEUE_LONGTEXT, true )
 #endif
 
-#if defined(WIN32)
+#if defined(WIN32) || defined(__OS2__)
     add_bool( "high-priority", 0, HPRIORITY_TEXT,
               HPRIORITY_LONGTEXT, false )
 #endif
