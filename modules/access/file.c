@@ -86,7 +86,7 @@ struct access_sys_t
     bool b_pace_control;
 };
 
-#ifndef WIN32
+#if !defined (WIN32) && !defined (__OS2__)
 static bool IsRemote (int fd)
 {
 #if defined (HAVE_FSTATVFS) && defined (MNT_LOCAL)
