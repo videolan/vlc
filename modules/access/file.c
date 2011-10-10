@@ -123,10 +123,10 @@ static bool IsRemote (int fd)
 }
 # define IsRemote(fd,path) IsRemote(fd)
 
-#else /* WIN32 */
+#else /* WIN32 || __OS2__ */
 static bool IsRemote (const char *path)
 {
-# ifndef UNDER_CE
+# if !defined(UNDER_CE) && !defined(__OS2__)
     wchar_t *wpath = ToWide (path);
     bool is_remote = (wpath != NULL && PathIsNetworkPathW (wpath));
     free (wpath);
