@@ -45,34 +45,25 @@
 
 enum { RED, GREEN, BLUE, WHITE };
 
-typedef struct
-{
-    uint8_t comp1;
-    uint8_t comp2;
-    uint8_t comp3;
-}COLOR;
-
-static COLOR colorList[4];
-
 #define COLORS_RGB \
-    colorList[RED].comp1 = 255; colorList[RED].comp2 = 0;        \
-                                colorList[RED].comp3 = 0;        \
-    colorList[GREEN].comp1 = 0; colorList[GREEN].comp2 = 255;    \
-                               colorList[GREEN].comp3 = 0;       \
-    colorList[BLUE].comp1 = 0; colorList[BLUE].comp2 = 0;        \
-                               colorList[BLUE].comp3 = 255;      \
-    colorList[WHITE].comp1 = 255; colorList[WHITE].comp2 = 255;  \
-                                  colorList[WHITE].comp3 = 255;
+    p_filter->p_sys->colorList[RED].comp1 = 255; p_filter->p_sys->colorList[RED].comp2 = 0;        \
+                                p_filter->p_sys->colorList[RED].comp3 = 0;        \
+    p_filter->p_sys->colorList[GREEN].comp1 = 0; p_filter->p_sys->colorList[GREEN].comp2 = 255;    \
+                               p_filter->p_sys->colorList[GREEN].comp3 = 0;       \
+    p_filter->p_sys->colorList[BLUE].comp1 = 0; p_filter->p_sys->colorList[BLUE].comp2 = 0;        \
+                               p_filter->p_sys->colorList[BLUE].comp3 = 255;      \
+    p_filter->p_sys->colorList[WHITE].comp1 = 255; p_filter->p_sys->colorList[WHITE].comp2 = 255;  \
+                                  p_filter->p_sys->colorList[WHITE].comp3 = 255;
 
 #define COLORS_YUV \
-    colorList[RED].comp1 = 82; colorList[RED].comp2 = 240;        \
-                                colorList[RED].comp3 = 90;        \
-    colorList[GREEN].comp1 = 145; colorList[GREEN].comp2 = 34;    \
-                               colorList[GREEN].comp3 = 54 ;      \
-    colorList[BLUE].comp1 = 41; colorList[BLUE].comp2 = 146;      \
-                               colorList[BLUE].comp3 = 240;       \
-    colorList[WHITE].comp1 = 255; colorList[WHITE].comp2 = 128;   \
-                                  colorList[WHITE].comp3 = 128;
+    p_filter->p_sys->colorList[RED].comp1 = 82; p_filter->p_sys->colorList[RED].comp2 = 240;        \
+                                p_filter->p_sys->colorList[RED].comp3 = 90;        \
+    p_filter->p_sys->colorList[GREEN].comp1 = 145; p_filter->p_sys->colorList[GREEN].comp2 = 34;    \
+                               p_filter->p_sys->colorList[GREEN].comp3 = 54 ;      \
+    p_filter->p_sys->colorList[BLUE].comp1 = 41; p_filter->p_sys->colorList[BLUE].comp2 = 146;      \
+                               p_filter->p_sys->colorList[BLUE].comp3 = 240;       \
+    p_filter->p_sys->colorList[WHITE].comp1 = 255; p_filter->p_sys->colorList[WHITE].comp2 = 128;   \
+                                  p_filter->p_sys->colorList[WHITE].comp3 = 128;
 
 
 /*****************************************************************************
@@ -214,6 +205,12 @@ struct filter_sys_t
     void ( *drawingPixelFunction )( filter_sys_t *, picture_t *,
                                     uint8_t, uint8_t, uint8_t,
                                     int, int, bool );
+    struct
+    {
+        uint8_t comp1;
+        uint8_t comp2;
+        uint8_t comp3;
+    } colorList[4];
 };
 
 
@@ -397,9 +394,9 @@ static void drawBall( filter_sys_t *p_sys, picture_t *p_outpic )
                 && j >= 0 && j < i_height )
             {
                 ( *p_sys->drawingPixelFunction )( p_sys, p_outpic,
-                                    colorList[ p_sys->ballColor ].comp1,
-                                    colorList[ p_sys->ballColor ].comp2,
-                                    colorList[ p_sys->ballColor ].comp3,
+                                    p_sys->colorList[ p_sys->ballColor ].comp1,
+                                    p_sys->colorList[ p_sys->ballColor ].comp2,
+                                    p_sys->colorList[ p_sys->ballColor ].comp3,
                                     i, j, b_skip );
             }
             b_skip = !b_skip;
@@ -646,9 +643,9 @@ static void FilterBall( filter_t *p_filter, picture_t *p_inpic,
                     > p_sys->i_gradThresh )
                 {
                     ( *p_sys->drawingPixelFunction )( p_sys, p_outpic,
-                                                      colorList[ WHITE ].comp1,
-                                                      colorList[ WHITE ].comp2,
-                                                      colorList[ WHITE ].comp3,
+                                                      p_filter->p_sys->colorList[ WHITE ].comp1,
+                                                      p_filter->p_sys->colorList[ WHITE ].comp2,
+                                                      p_filter->p_sys->colorList[ WHITE ].comp3,
                                                       x, y, 0 );
                 }
             }
