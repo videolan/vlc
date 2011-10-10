@@ -186,7 +186,8 @@ static int Open( vlc_object_t *p_this )
     if( b_strict )
     {
         const char *psz_ext = strrchr( p_access->psz_filepath, '.' );
-        if( !psz_ext || strcasecmp( psz_ext, ".rec" ) )
+        if( !psz_ext || ( strcasecmp( psz_ext, ".rec" )
+            && strcasecmp( psz_ext, ".rec" DIR_SEP ) ) )
             return VLC_EGENERIC;
     }
 
