@@ -280,6 +280,7 @@ SOURCES_libvlc_os2 = \
 	os2/dirs.c \
 	misc/atomic.c \
 	posix/filesystem.c \
+	posix/plugin.c \
 	os2/thread.c \
 	os2/specific.c \
 	$(NULL)
