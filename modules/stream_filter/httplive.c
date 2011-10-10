@@ -995,23 +995,34 @@ static int hls_UpdatePlaylist(stream_t *s, hls_stream_t *hls_new, hls_stream_t *
         segment_t *segment = segment_Find(*hls, p->sequence);
         if (segment)
         {
+            assert(p->url.psz_path);
+            assert(segment->url.psz_path);
+
             /* they should be the same */
             if ((p->sequence != segment->sequence) ||
                 (p->duration != segment->duration) ||
                 (strcmp(p->url.psz_path, segment->url.psz_path) != 0))
             {
-                msg_Err(s, "existing segment found with different content - resetting");
-                msg_Err(s, "- sequence: new=%d, old=%d", p->sequence, segment->sequence);
-                msg_Err(s, "- duration: new=%d, old=%d", p->duration, segment->duration);
-                msg_Err(s, "- file: new=%s", p->url.psz_path);
-                msg_Err(s, "        old=%s", segment->url.psz_path);
+                msg_Warn(s, "existing segment found with different content - resetting");
+                msg_Warn(s, "- sequence: new=%d, old=%d", p->sequence, segment->sequence);
+                msg_Warn(s, "- duration: new=%d, old=%d", p->duration, segment->duration);
+                msg_Warn(s, "- file: new=%s", p->url.psz_path);
+                msg_Warn(s, "        old=%s", segment->url.psz_path);
 
                 /* Resetting content */
+                char *psz_url = ConstructUrl(&p->url);
+                if (psz_url == NULL)
+                {
+                    msg_Err(s, "Failed updating segment %d - skipping it",  p->sequence);
+                    segment_Free(p);
+                    continue;
+                }
                 segment->sequence = p->sequence;
                 segment->duration = p->duration;
                 vlc_UrlClean(&segment->url);
-                vlc_UrlParse(&segment->url, p->url.psz_buffer, 0);
+                vlc_UrlParse(&segment->url, psz_url, 0);
                 segment_Free(p);
+                free(psz_url);
             }
         }
         else
@@ -1033,6 +1044,7 @@ static int hls_UpdatePlaylist(stream_t *s, hls_stream_t *hls_new, hls_stream_t *
     return VLC_SUCCESS;
 
 fail_and_unlock:
+    assert(0);
     vlc_mutex_unlock(&(*hls)->lock);
     return VLC_EGENERIC;
 }
@@ -1083,6 +1095,7 @@ static int hls_ReloadPlaylist(stream_t *s)
                     (s->p_sys->download.stream == n))
             {
                 /* wake up download thread */
+                msg_Err(s, "WAKING UP DOWNLOAD THREAD");
                 vlc_mutex_lock(&s->p_sys->download.lock_wait);
                 vlc_cond_signal(&s->p_sys->download.wait);
                 vlc_mutex_unlock(&s->p_sys->download.lock_wait);
@@ -1160,6 +1173,8 @@ static int Download(stream_t *s, hls_stream_t *hls, segment_t *segment, int *cur
     mtime_t start = mdate();
     if (hls_Download(s, segment) != VLC_SUCCESS)
     {
+        msg_Err(s, "downloaded segment %d from stream %d failed",
+                    segment->sequence, *cur_stream);
         vlc_mutex_unlock(&segment->lock);
         return VLC_EGENERIC;
     }
@@ -1292,7 +1307,14 @@ static void* hls_Reload(void *p_this)
                 p_sys->playlist.tries++;
                 if (p_sys->playlist.tries == 1) wait = 0.5;
                 else if (p_sys->playlist.tries == 2) wait = 1;
-                else if (p_sys->playlist.tries >= 3) wait = 3;
+                else if (p_sys->playlist.tries >= 3) wait = 2;
+
+                /* Can we afford to backoff? */
+                if (p_sys->download.segment - p_sys->playback.segment < 3)
+                {
+                    p_sys->playlist.tries = 0;
+                    wait = 0.5;
+                }
             }
             else
             {
