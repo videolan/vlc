@@ -822,7 +822,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->p_pos = (int64_t *)calloc( p_sys->i_pcrs_num, sizeof( int64_t ) );
 
     bool can_seek = false;
-    stream_Control( p_demux->s, STREAM_CAN_SEEK, &can_seek );
+    stream_Control( p_demux->s, STREAM_CAN_FASTSEEK, &can_seek );
     if( can_seek  )
     {
         GetFirstPCR( p_demux );
