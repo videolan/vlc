@@ -325,7 +325,9 @@ out:
  */
 unsigned vlc_CPU (void)
 {
-#ifndef WIN32 /* On Windows, initialized from DllMain() instead */
+/* On Windows and OS/2,
+ * initialized from DllMain() and _DLL_InitTerm() respectively, instead */
+#if !defined(WIN32) && !defined(__OS2__)
     static pthread_once_t once = PTHREAD_ONCE_INIT;
     pthread_once (&once, vlc_CPU_init);
 #endif
