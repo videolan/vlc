@@ -27,7 +27,7 @@
 
 #ifdef ENABLE_NLS
 # include <libintl.h>
-# if defined (__APPLE__) || defined (WIN32)
+# if defined (__APPLE__) || defined (WIN32) || defined(__OS2__)
 #  include "config/configuration.h"
 #  include <vlc_charset.h>
 # endif
@@ -37,7 +37,7 @@ int vlc_bindtextdomain (const char *domain)
 {
 #if defined (ENABLE_NLS)
     /* Specify where to find the locales for current domain */
-# if !defined (__APPLE__) && !defined (WIN32)
+# if !defined (__APPLE__) && !defined (WIN32) && !defined(__OS2__)
     static const char path[] = LOCALEDIR;
 
     if (bindtextdomain (domain, path) == NULL)
