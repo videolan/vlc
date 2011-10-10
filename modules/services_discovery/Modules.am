@@ -10,7 +10,7 @@ libpulselist_plugin_la_SOURCES = \
 	pulse.c
 libpulselist_plugin_la_CFLAGS = $(AM_CFLAGS) $(PULSE_CFLAGS)
 libpulselist_plugin_la_LIBADD = $(AM_LIBADD) $(PULSE_LIBS)
-lubpulselist_plugin_la_DEPENDENCIES =
+libpulselist_plugin_la_DEPENDENCIES =
 if HAVE_PULSE
 libvlc_LTLIBRARIES += libpulselist_plugin.la
 endif
