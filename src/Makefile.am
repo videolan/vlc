@@ -277,7 +277,7 @@ SOURCES_libvlc_symbian = \
 	$(NULL)
 
 SOURCES_libvlc_os2 = \
-	posix/dirs.c \
+	os2/dirs.c \
 	misc/atomic.c \
 	posix/filesystem.c \
 	os2/thread.c \
