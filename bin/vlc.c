@@ -67,9 +67,14 @@ static bool signal_ignored (int signum)
 
 static void vlc_kill (void *data)
 {
+#ifndef __OS2__
     pthread_t *ps = data;
 
     pthread_kill (*ps, SIGTERM);
+#else
+    // send a signal to the main thread
+    kill (getpid(), SIGTERM);
+#endif
 }
 
 static void exit_timeout (int signum)
