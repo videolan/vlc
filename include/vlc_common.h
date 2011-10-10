@@ -630,6 +630,12 @@ static inline unsigned popcount (unsigned x)
 #endif
 }
 
+#ifdef __OS2__
+#   undef bswap16
+#   undef bswap32
+#   undef bswap64
+#endif
+
 /** Byte swap (16 bits) */
 VLC_USED
 static inline uint16_t bswap16 (uint16_t x)
