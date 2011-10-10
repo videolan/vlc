@@ -986,6 +986,7 @@ static int hls_UpdatePlaylist(stream_t *s, hls_stream_t *hls_new, hls_stream_t *
 
     msg_Info(s, "updating hls stream (program-id=%d, bandwidth=%"PRIu64") has %d segments",
              hls_new->id, hls_new->bandwidth, count);
+
     for (int n = 0; n < count; n++)
     {
         segment_t *p = segment_GetSegment(hls_new, n);
@@ -1105,7 +1106,6 @@ static int hls_ReloadPlaylist(stream_t *s)
                              hls_new->id, hls_new->bandwidth);
         }
     }
-
     vlc_array_destroy(hls_streams);
     return VLC_SUCCESS;
 }
@@ -1432,14 +1432,18 @@ static int hls_Download(stream_t *s, segment_t *segment)
         if (size > segment->size)
         {
             msg_Dbg(s, "size changed %"PRIu64, segment->size);
-            segment->data = block_Realloc(segment->data, 0, size);
-            if (segment->data == NULL)
+            block_t *p_block = block_Realloc(segment->data, 0, size);
+            if (p_block == NULL)
             {
                 stream_Delete(p_ts);
+                block_Release(segment->data);
+                segment->data = NULL;
                 return VLC_ENOMEM;
             }
+            segment->data = p_block;
             segment->size = size;
             assert(segment->data->i_buffer == segment->size);
+            p_block = NULL;
         }
         length = stream_Read(p_ts, segment->data->p_buffer + curlen, segment->size - curlen);
         if (length <= 0)
