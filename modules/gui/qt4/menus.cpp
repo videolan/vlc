@@ -1514,8 +1514,7 @@ void QVLCMenu::updateRecents( intf_thread_t *p_intf )
 
         if( !l.count() )
         {
-            action = recentsMenu->addAction( qtr(" - Empty - ") );
-            action->setEnabled( false );
+            recentsMenu->setEnabled( false );
         }
         else
         {
