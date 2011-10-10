@@ -145,6 +145,7 @@ int OutOpenAvio(vlc_object_t *object)
      * with an exclusive lock */
     if (SetupAvio(VLC_OBJECT(access))) {
         msg_Err(access, "Module aready in use");
+        free(sys);
         return VLC_EGENERIC;
     }
 
