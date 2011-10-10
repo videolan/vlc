@@ -284,14 +284,10 @@ static int Control( access_t *p_access, int i_query, va_list args )
     switch( i_query )
     {
         case ACCESS_CAN_SEEK:
+        case ACCESS_CAN_FASTSEEK:
         case ACCESS_CAN_PAUSE:
         case ACCESS_CAN_CONTROL_PACE:
             *va_arg( args, bool* ) = true;
-            break;
-
-        case ACCESS_CAN_FASTSEEK:
-            /* Seek() can open files, so it might be "too slow" */
-            *va_arg( args, bool* ) = false;
             break;
 
         case ACCESS_GET_PTS_DELAY:
