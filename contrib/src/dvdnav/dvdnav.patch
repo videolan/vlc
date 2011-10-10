@@ -1,6 +1,6 @@
-diff -ruN dvdnav-svn/Makefile.am dvdnav/Makefile.am
---- dvdnav-svn/Makefile.am	2008-06-18 17:06:33.000000000 +0200
-+++ dvdnav/Makefile.am	2011-08-06 18:38:10.243875945 +0200
+diff -ruN libdvdnav/Makefile.am libdvdnav.new/Makefile.am
+--- libdvdnav/Makefile.am	2008-06-18 17:06:33.000000000 +0200
++++ libdvdnav.new/Makefile.am	2011-10-11 01:02:18.768524699 +0200
 @@ -1,7 +1,7 @@
  include $(top_srcdir)/misc/Makefile.common
  
@@ -10,9 +10,9 @@ diff -ruN dvdnav-svn/Makefile.am dvdnav/Makefile.am
  
  EXTRA_DIST = autogen.sh \
  	     AUTHORS \
-diff -ruN dvdnav-svn/src/vm/vm.c dvdnav/src/vm/vm.c
---- dvdnav-svn/src/vm/vm.c	2010-11-22 00:59:43.000000000 +0100
-+++ dvdnav/src/vm/vm.c	2011-08-06 18:38:03.263841341 +0200
+diff -ruN libdvdnav/src/vm/vm.c libdvdnav.new/src/vm/vm.c
+--- libdvdnav/src/vm/vm.c	2010-11-22 00:59:43.000000000 +0100
++++ libdvdnav.new/src/vm/vm.c	2011-10-11 01:02:07.852470536 +0200
 @@ -174,12 +174,11 @@
      fd = open(device, O_RDONLY);
      if (fd > 0) {

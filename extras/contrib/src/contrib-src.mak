@@ -1169,8 +1169,11 @@ DISTCLEAN_PKG += libdvdcss-$(LIBDVDCSS_VERSION).tar.bz2
 # ***************************************************************************
 # libdvdread: We use dvdnav's dvdread
 # ***************************************************************************
-libdvdread:
-	$(SVN) co -r $(LIBDVDREAD_SVN_REV) $(LIBDVDREAD_SVN)  libdvdread
+libdvdread-$(LIBDVDREAD_VERSION).tar.bz2:
+	$(WGET) $(LIBDVDREAD_URL)
+
+libdvdread: libdvdread-$(LIBDVDREAD_VERSION).tar.bz2
+	$(EXTRACT_BZ2)
 	(cd $@; patch  -p 0 < ../Patches/libdvdread-dvdcss-static.patch)
 ifdef HAVE_WIN32
 	(cd $@; patch  -p 0 < ../Patches/libdvdread-win32.patch)
@@ -1184,29 +1187,19 @@ endif
 
 CLEAN_FILE += .libdvdread
 CLEAN_PKG += libdvdread
-#DISTCLEAN_PKG += libdvdread-$(LIBDVDREAD_VERSION).tar.gz
+DISTCLEAN_PKG += libdvdread-$(LIBDVDREAD_VERSION).tar.bz2
 
 # ***************************************************************************
 # libdvdnav
 # ***************************************************************************
 
-ifdef SVN
-libdvdnav:
-	$(SVN) co -r $(LIBDVDNAV_SVN_REV) $(LIBDVDNAV_SVN)  libdvdnav
-	patch -d libdvdnav -p0 < Patches/libdvdnav.patch
-	(cd $@; ./autogen.sh noconfig)
-else
-libdvdnav-$(LIBDVDNAV_VERSION).tar.gz:
+libdvdnav-$(LIBDVDNAV_VERSION).tar.bz2:
 	$(WGET) $(LIBDVDNAV_URL)
 
-libdvdnav: libdvdnav-$(LIBDVDNAV_VERSION).tar.gz
-	$(EXTRACT_GZ)
+libdvdnav: libdvdnav-$(LIBDVDNAV_VERSION).tar.bz2
+	$(EXTRACT_BZ2)
 	patch -p0 < Patches/libdvdnav.patch
-ifdef HAVE_WIN32
-	patch -p0 < Patches/libdvdnav-win32.patch
-endif
 	(cd $@; ./autogen.sh noconfig)
-endif
 
 .dvdnav: libdvdnav .libdvdread
 ifdef HAVE_WIN32

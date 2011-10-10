@@ -1,8 +1,19 @@
-Index: src/vm/vm.c
-===================================================================
---- src/vm/vm.c	(revision 1199)
-+++ src/vm/vm.c	(working copy)
-@@ -172,12 +172,11 @@
+diff -ruN libdvdnav/Makefile.am libdvdnav.new/Makefile.am
+--- libdvdnav/Makefile.am	2008-06-18 17:06:33.000000000 +0200
++++ libdvdnav.new/Makefile.am	2011-10-11 01:02:18.768524699 +0200
+@@ -1,7 +1,7 @@
+ include $(top_srcdir)/misc/Makefile.common
+ 
+ 
+-SUBDIRS = src examples doc misc m4
++SUBDIRS = src misc m4
+ 
+ EXTRA_DIST = autogen.sh \
+ 	     AUTHORS \
+diff -ruN libdvdnav/src/vm/vm.c libdvdnav.new/src/vm/vm.c
+--- libdvdnav/src/vm/vm.c	2010-11-22 00:59:43.000000000 +0100
++++ libdvdnav.new/src/vm/vm.c	2011-10-11 01:02:07.852470536 +0200
+@@ -174,12 +174,11 @@
      fd = open(device, O_RDONLY);
      if (fd > 0) {
        off = lseek( fd, 32 * (off_t) DVD_VIDEO_LB_LEN, SEEK_SET );
@@ -17,7 +28,7 @@ Index: src/vm/vm.c
              if((data[i] == 0)) break;
              if((data[i] > 32) && (data[i] < 127)) {
                fprintf(MSG_OUT, "%c", data[i]);
-@@ -185,10 +184,12 @@
+@@ -187,10 +186,12 @@
                fprintf(MSG_OUT, " ");
              }
            }
@@ -33,16 +44,3 @@ Index: src/vm/vm.c
              if((data[i] == 0)) break;
              if((data[i] > 32) && (data[i] < 127)) {
                fprintf(MSG_OUT, "%c", data[i]);
-Index: Makefile.am
-===================================================================
---- Makefile.am	(revision 1199)
-+++ Makefile.am	(working copy)
-@@ -1,7 +1,7 @@
- include $(top_srcdir)/misc/Makefile.common
- 
- 
--SUBDIRS = src examples doc misc m4
-+SUBDIRS = src misc m4
- 
- EXTRA_DIST = autogen.sh \
- 	     AUTHORS \

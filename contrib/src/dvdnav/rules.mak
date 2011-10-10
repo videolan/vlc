@@ -1,5 +1,8 @@
 # DVDNAV
 
+LIBDVDNAV_VERSION := 4.2.0
+LIBDVDNAV_URL := http://dvdnav.mplayerhq.hu/releases/libdvdnav-$(LIBDVDNAV_VERSION).tar.bz2
+
 ifdef BUILD_DISCS
 PKGS += dvdnav
 endif
@@ -7,16 +10,12 @@ ifeq ($(call need_pkg,"dvdnav"),)
 PKGS_FOUND += dvdnav
 endif
 
-$(TARBALLS)/dvdnav-svn.tar.xz:
-	rm -Rf dvdnav-svn
-	$(SVN) export svn://svn.mplayerhq.hu/dvdnav/trunk/libdvdnav dvdnav-svn
-	tar cvJ dvdnav-svn > $@
+$(TARBALLS)/libdvdnav-$(LIBDVDNAV_VERSION).tar.bz2:
+	$(call download,$(LIBDVDNAV_URL))
 
-.sum-dvdnav: dvdnav-svn.tar.xz
-	$(warning Integrity check skipped.)
-	touch $@
+.sum-dvdnav: libdvdnav-$(LIBDVDNAV_VERSION).tar.bz2
 
-dvdnav: dvdnav-svn.tar.xz .sum-dvdnav
+dvdnav: libdvdnav-$(LIBDVDNAV_VERSION).tar.bz2 .sum-dvdnav
 	$(UNPACK)
 	$(APPLY) $(SRC)/dvdnav/dvdnav.patch
 	$(MOVE)

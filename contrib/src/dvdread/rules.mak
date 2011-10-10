@@ -1,5 +1,8 @@
 # DVDREAD
 
+LIBDVDREAD_VERSION := 4.2.0
+LIBDVDREAD_URL := http://dvdnav.mplayerhq.hu/releases/libdvdread-$(LIBDVDREAD_VERSION).tar.bz2
+
 ifdef BUILD_DISCS
 PKGS += dvdread
 endif
@@ -7,16 +10,12 @@ ifeq ($(call need_pkg,"dvdread"),)
 PKGS_FOUND += dvdread
 endif
 
-$(TARBALLS)/dvdread-svn.tar.xz:
-	rm -Rf dvdread-svn
-	$(SVN) export svn://svn.mplayerhq.hu/dvdnav/trunk/libdvdread dvdread-svn
-	tar cvJ dvdread-svn > $@
+$(TARBALLS)/libdvdread-$(LIBDVDREAD_VERSION).tar.bz2:
+	$(call download,$(LIBDVDREAD_URL))
 
-.sum-dvdread: dvdread-svn.tar.xz
-	$(warning Integrity check skipped.)
-	touch $@
+.sum-dvdread: libdvdread-$(LIBDVDREAD_VERSION).tar.bz2
 
-dvdread: dvdread-svn.tar.xz .sum-dvdread
+dvdread: libdvdread-$(LIBDVDREAD_VERSION).tar.bz2 .sum-dvdread
 	$(UNPACK)
 	$(APPLY) $(SRC)/dvdread/dvdread-css-static.patch
 ifdef HAVE_WIN32
