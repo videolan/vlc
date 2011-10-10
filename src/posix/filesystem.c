@@ -191,15 +191,15 @@ char *vlc_readdir( DIR *dir )
     char *path = NULL;
 
     long len = fpathconf (dirfd (dir), _PC_NAME_MAX);
-    if (len == -1)
-    {
 #ifdef NAME_MAX
+    /* POSIX says there shall we room for NAME_MAX bytes at all times */
+    if (/*len == -1 ||*/ len < NAME_MAX)
         len = NAME_MAX;
 #else
-        errno = ENOMEM;
-        return NULL; // OS is broken. There is no sane way to fix this.
+    /* OS is broken. Lets assume there is no files left. */
+    if (len == -1)
+        return NULL;
 #endif
-    }
     len += offsetof (struct dirent, d_name) + 1;
 
     struct dirent *buf = malloc (len);
