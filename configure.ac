@@ -1164,7 +1164,9 @@ ALIASES="${ALIASES} cvlc rvlc"
 dnl
 dnl Some plugins aren't useful on some platforms
 dnl
-if test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"; then
+if test "${SYS}" = "os2"; then
+    VLC_ADD_PLUGIN([dynamicoverlay])
+elif test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"; then
     VLC_ADD_PLUGIN([dynamicoverlay access_shm])
 elif test "${SYS}" != "mingwce"; then
     VLC_ADD_PLUGIN([access_smb dmo globalhotkeys])
