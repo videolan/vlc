@@ -4052,39 +4052,6 @@ then
 fi
 
 dnl
-dnl SQLite
-dnl
-AC_ARG_WITH(sqlite,
-  [  --with-sqlite=PATH      sqlite path linking])
-if test "${SYS}" != "darwin"; then
-  PKG_ENABLE_MODULES_VLC([SQLITE], [], [sqlite3 >= 3.6.0], [sqlite3], [auto])
-else
-  if test "${enable_sqlite}" != "no"
-  then
-    AC_CHECK_HEADERS(sqlite3.h, [
-        VLC_ADD_PLUGIN([sqlite])
-        if test "${with_sqlite}" != "no" -a -n "${with_sqlite}"; then
-          AC_MSG_CHECKING(existence of sqlite directory in ${with_sqlite})
-          real_sqlite="`cd ${with_sqlite} 2>/dev/null && pwd`"
-          if test -z "${real_sqlite}"
-          then
-            dnl  The given directory can't be found
-            AC_MSG_RESULT(no)
-            AC_MSG_ERROR([cannot cd to ${with_sqlite}])
-          fi
-          VLC_ADD_CFLAGS([sqlite],[-I${with_sqlite}/include])
-          VLC_ADD_LIBS([sqlite], [-L${with_sqlite}/lib -lsqlite3])
-          AC_MSG_RESULT(yes)
-        else
-          VLC_ADD_LIBS([sqlite], [-lsqlite3])
-        fi
-        AC_DEFINE([SQLITE_MODULE], 1, [Define if you want to use SQLite module]) ],
-        AC_MSG_ERROR([sqlite3 is required for sqlite module]) )
-  fi
-fi
-AM_CONDITIONAL([HAVE_SQLITE], [test "${enable_sqlite}" != "no"])
-
-dnl
 dnl Growl notification plugin
 dnl
 AC_ARG_ENABLE(growl,
@@ -4110,16 +4077,28 @@ dnl media library
 dnl
 AC_ARG_ENABLE(media-library,
     [  --enable-media-library  media library (default disabled)])
-if test "${enable_media_library}" = "yes"; then
-    if test "${enable_sqlite}" != "yes"; then
-       AC_MSG_ERROR([SQLite module is required for the media library])
-    else
-       AC_DEFINE([MEDIA_LIBRARY], 1, [Define if you want to use the VLC media library])
-       VLC_ADD_CPPFLAGS([qt4],"-DMEDIA_LIBRARY")
-       VLC_ADD_PLUGIN([media_library])
-    fi
-fi
-AM_CONDITIONAL([ENABLE_MEDIA_LIBRARY], [test "${enable_media_library}" = "yes"])
+AS_IF([test "${enable_media_library}" = "yes"], [
+  AC_DEFINE([MEDIA_LIBRARY], 1, [Define if you want to use the VLC media library])
+  VLC_ADD_CPPFLAGS([qt4],"-DMEDIA_LIBRARY")
+  VLC_ADD_PLUGIN([media_library])
+
+dnl
+dnl SQLite
+dnl
+  AS_IF([test "${SYS}" != "darwin"], [
+    PKG_ENABLE_MODULES_VLC([SQLITE], [], [sqlite3 >= 3.6.0], [sqlite3], [auto])
+  ], [
+    AS_IF([test "${enable_sqlite}" != "no"], [
+      AC_CHECK_HEADERS(sqlite3.h, [
+        VLC_ADD_PLUGIN([sqlite])
+        VLC_ADD_LIBS([sqlite], [-lsqlite3])
+      ], [
+        AC_MSG_ERROR([sqlite3 is required for the media library])
+      ])
+    ])
+  ])
+])
+
 
 dnl
 dnl  Endianness check
