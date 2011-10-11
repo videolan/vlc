@@ -52,10 +52,15 @@
 # include <search.h>
 #endif
 
-#ifndef WIN32
-# include <vlc_fs.h>
-# include <unistd.h>
-#else
+#ifdef __OS2__
+# include <sys/socket.h>
+# include <netinet/in.h>
+
+typedef struct sockaddr_in SOCKADDR_IN;
+typedef struct sockaddr *PSOCKADDR;
+
+# define closesocket    soclose
+#elif defined(WIN32)
 # include <io.h>
 # include <winsock2.h>
 # include <ws2tcpip.h>
@@ -65,6 +70,9 @@
 # define write( a, b, c ) send (a, b, c, 0)
 # undef  close
 # define close( a )       closesocket (a)
+#else
+# include <vlc_fs.h>
+# include <unistd.h>
 #endif
 
 #include <limits.h>
@@ -287,7 +295,7 @@ static void vlc_object_destroy( vlc_object_t *p_this )
 }
 
 
-#ifdef WIN32
+#if defined(WIN32) || defined(__OS2__)
 /**
  * select()-able pipes emulated using Winsock
  */
@@ -297,9 +305,9 @@ static int selectable_pipe (int fd[2])
     SOCKADDR_IN addr;
     int addrlen = sizeof (addr);
 
-    SOCKET l = socket (PF_INET, SOCK_STREAM, IPPROTO_TCP), a,
-           c = socket (PF_INET, SOCK_STREAM, IPPROTO_TCP);
-    if ((l == INVALID_SOCKET) || (c == INVALID_SOCKET))
+    int l = socket (PF_INET, SOCK_STREAM, IPPROTO_TCP), a,
+        c = socket (PF_INET, SOCK_STREAM, IPPROTO_TCP);
+    if ((l == -1) || (c == -1))
         goto error;
 
     memset (&addr, 0, sizeof (addr));
@@ -312,7 +320,7 @@ static int selectable_pipe (int fd[2])
         goto error;
 
     a = accept (l, NULL, NULL);
-    if (a == INVALID_SOCKET)
+    if (a == -1)
         goto error;
 
     closesocket (l);
@@ -323,13 +331,13 @@ static int selectable_pipe (int fd[2])
     return 0;
 
 error:
-    if (l != INVALID_SOCKET)
+    if (l != -1)
         closesocket (l);
-    if (c != INVALID_SOCKET)
+    if (c != -1)
         closesocket (c);
     return -1;
 }
-#endif /* WIN32 */
+#endif /* WIN32 || __OS2__ */
 
 static vlc_mutex_t pipe_lock = VLC_STATIC_MUTEX;
 
