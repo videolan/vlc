@@ -70,13 +70,6 @@ AC_PROG_MAKE_SET
 AC_PROG_INSTALL
 AM_PROG_AS
 
-dnl Find the right ranlib, even when cross-compiling
-AC_CHECK_TOOL(RANLIB, ranlib, :)
-AC_CHECK_TOOL(STRIP, strip, :)
-AC_CHECK_TOOL(AR, ar, :)
-AC_CHECK_TOOL(LD, ld, :)
-AC_CHECK_TOOL(DLLTOOL, dlltool, :)
-
 AC_ARG_VAR([DESKTOP_FILE_VALIDATE], [Validator for desktop entry files])
 AC_CHECK_PROGS(DESKTOP_FILE_VALIDATE, [${DESKTOP_FILE_VALIDATE} desktop-file-validate], :)
 
