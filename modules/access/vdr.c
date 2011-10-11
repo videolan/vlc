@@ -407,8 +407,8 @@ static int Seek( access_t *p_access, uint64_t i_pos )
 
     /* find correct file */
     unsigned i_file = 0;
-    while( i_pos >= FILE_SIZE( i_file ) &&
-        i_file < FILE_COUNT - 1 )
+    while( i_file < FILE_COUNT - 1 &&
+           i_pos >= FILE_SIZE( i_file ) )
     {
         i_pos -= FILE_SIZE( i_file );
         i_file++;
