@@ -264,6 +264,16 @@ static OMX_ERRORTYPE ImplementationSpecificWorkarounds(decoder_t *p_dec,
             def->format.video.xFramerate >>= 16;
         }
     }
+    else if (!strncmp(p_sys->psz_component, "OMX.qcom.video.decoder.",
+                      strlen("OMX.qcom.video.decoder")))
+    {
+        /* qdsp6 refuses buffer size larger than 450K on input port */
+        if (def->nBufferSize > 450 * 1024)
+        {
+            def->nBufferSize = 450 * 1024;
+            p_port->i_frame_size = def->nBufferSize;
+        }
+    }
 
     return OMX_ErrorNone;
 }
