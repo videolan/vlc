@@ -10,8 +10,9 @@ EXTRA_DIST += vlc.desktop.in
 CLEANFILES += $(appdata_DATA)
 
 vlc.desktop: vlc.desktop.in $(top_builddir)/config.status
-	$(AM_V_GEN)sed -e 's,\@bindir\@,$(bindir),g' < "$<" > $@.tmp
-	$(AM_V_at)mv -f $@.tmp $@
+	$(AM_V_GEN)sed -e 's,\@bindir\@,$(bindir),g' < "$<" > tmp-$@
+	$(AM_V_at)$(DESKTOP_FILE_VALIDATE) tmp-$@
+	$(AM_V_at)mv -f tmp-$@ $@
 
 iconsdatadir = $(datadir)/icons/hicolor
 icons16dir = $(iconsdatadir)/16x16/apps

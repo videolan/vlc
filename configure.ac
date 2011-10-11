@@ -77,6 +77,9 @@ AC_CHECK_TOOL(AR, ar, :)
 AC_CHECK_TOOL(LD, ld, :)
 AC_CHECK_TOOL(DLLTOOL, dlltool, :)
 
+AC_ARG_VAR([DESKTOP_FILE_VALIDATE], [Validator for desktop entry files])
+AC_CHECK_PROGS(DESKTOP_FILE_VALIDATE, [${DESKTOP_FILE_VALIDATE} desktop-file-validate], :)
+
 dnl Check for compiler properties
 AC_C_CONST
 AC_C_INLINE
