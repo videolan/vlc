@@ -78,6 +78,24 @@ static void stream_state_cb(pa_stream *s, void *userdata)
     }
 }
 
+static void stream_success_cb (pa_stream *s, int success, void *userdata)
+{
+    pa_threaded_mainloop *mainloop = userdata;
+
+    pa_threaded_mainloop_signal(mainloop, 0);
+    (void) s;
+    (void) success;
+}
+
+static void stream_buffer_attr_cb(pa_stream *s, void *userdata)
+{
+    demux_t *demux = userdata;
+    const struct pa_buffer_attr *pba = pa_stream_get_buffer_attr(s);
+
+    msg_Dbg(demux, "using buffer metrics: maxlength=%"PRIu32", "
+            "fragsize=%"PRIu32, pba->maxlength, pba->fragsize);
+}
+
 static void stream_moved_cb(pa_stream *s, void *userdata)
 {
     demux_t *demux = userdata;
@@ -85,6 +103,7 @@ static void stream_moved_cb(pa_stream *s, void *userdata)
 
     msg_Dbg(demux, "connected to source %"PRIu32": %s", idx,
                   pa_stream_get_device_name(s));
+    stream_buffer_attr_cb(s, userdata);
 }
 
 static void stream_overflow_cb(pa_stream *s, void *userdata)
@@ -276,7 +295,7 @@ static int Open(vlc_object_t *obj)
     if (demux->psz_location != NULL && demux->psz_location[0] != '\0')
         dev = demux->psz_location;
 
-    const struct pa_buffer_attr attr = {
+    struct pa_buffer_attr attr = {
         .maxlength = -1,
         .fragsize = pa_usec_to_bytes(sys->caching, &ss) / 2,
     };
@@ -285,6 +304,7 @@ static int Open(vlc_object_t *obj)
 
     /* Create record stream */
     pa_stream *s;
+    pa_operation *op;
 
     pa_threaded_mainloop_lock(sys->mainloop);
     s = pa_stream_new(sys->context, "audio stream", &ss, &map);
@@ -294,6 +314,7 @@ static int Open(vlc_object_t *obj)
     sys->stream = s;
     pa_stream_set_state_callback(s, stream_state_cb, sys->mainloop);
     pa_stream_set_read_callback(s, stream_read_cb, demux);
+    pa_stream_set_buffer_attr_callback(s, stream_buffer_attr_cb, demux);
     pa_stream_set_moved_callback(s, stream_moved_cb, demux);
     pa_stream_set_overflow_callback(s, stream_overflow_cb, demux);
     pa_stream_set_started_callback(s, stream_started_cb, demux);
@@ -332,9 +353,15 @@ static int Open(vlc_object_t *obj)
     sys->framesize = fmt.audio.i_blockalign;
     sys->es = es_out_Add (demux->out, &fmt);
 
-    const struct pa_buffer_attr *pba = pa_stream_get_buffer_attr(s);
-    msg_Dbg(obj, "using buffer metrics: maxlength=%"PRIu32", fragsize=%"PRIu32,
-            pba->maxlength, pba->fragsize);
+    /* Update the buffer attributes according to actual format */
+    attr.fragsize = pa_usec_to_bytes(sys->caching, pss) / 2;
+    op = pa_stream_set_buffer_attr(s, &attr, stream_success_cb, sys->mainloop);
+    if (likely(op != NULL)) {
+        while (pa_operation_get_state(op) == PA_OPERATION_RUNNING)
+            pa_threaded_mainloop_wait(sys->mainloop);
+        pa_operation_unref(op);
+    }
+    stream_buffer_attr_cb(s, demux);
     pa_threaded_mainloop_unlock(sys->mainloop);
 
     demux->pf_demux = NULL;
@@ -358,6 +385,7 @@ static void Close (vlc_object_t *obj)
         pa_stream_disconnect(s);
         pa_stream_set_state_callback(s, NULL, NULL);
         pa_stream_set_read_callback(s, NULL, NULL);
+        pa_stream_set_buffer_attr_callback(s, NULL, NULL);
         pa_stream_set_moved_callback(s, NULL, NULL);
         pa_stream_set_overflow_callback(s, NULL, NULL);
         pa_stream_set_started_callback(s, NULL, NULL);
