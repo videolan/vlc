@@ -56,6 +56,7 @@ public:
              playlist_item_t *, QObject *parent = 0 );
     virtual ~PLModel();
 
+    /* Qt4 main PLModel */
     static PLModel* getPLModel( intf_thread_t *p_intf )
     {
         if(!p_intf->p_sys->pl_model )
@@ -69,7 +70,7 @@ public:
         return p_intf->p_sys->pl_model;
     }
 
-    /*** QModel subclassing ***/
+    /*** QAbstractItemModel subclassing ***/
 
     /* Data structure */
     virtual QVariant data( const QModelIndex &index, const int role ) const;
@@ -88,36 +89,31 @@ public:
                       int row, int column, const QModelIndex &target );
     virtual QStringList mimeTypes() const;
 
+    /* Sort */
+    virtual void sort( const int column, Qt::SortOrder order = Qt::AscendingOrder );
+
     /**** Custom ****/
 
     /* Lookups */
-    QStringList selectedURIs();
-    QModelIndex index( PLItem *, const int c ) const;
     QModelIndex index( const int i_id, const int c );
     virtual QModelIndex currentIndex() const;
-    bool isParent( const QModelIndex &index, const QModelIndex &current) const;
-    bool isCurrent( const QModelIndex &index ) const;
     int itemId( const QModelIndex &index ) const;
 
-    /* Actions */
-    virtual bool popup( const QModelIndex & index, const QPoint &point, const QModelIndexList &list );
-    virtual void doDelete( QModelIndexList selected );
+    /* */
     void search( const QString& search_text, const QModelIndex & root, bool b_recursive );
-    void sort( const int column, Qt::SortOrder order );
-    void sort( const int i_root_id, const int column, Qt::SortOrder order );
     void rebuild( playlist_item_t * p = NULL );
 
-    inline PLItem *getItem( QModelIndex index ) const
+    /* Popup Actions */
+    virtual bool popup( const QModelIndex & index, const QPoint &point, const QModelIndexList &list );
+    virtual void doDelete( QModelIndexList selected );
+
+    PLItem *getItem( const QModelIndex & index ) const
     {
         if( index.isValid() )
             return static_cast<PLItem*>( index.internalPointer() );
         else return rootItem;
     }
-    virtual int getId( QModelIndex index ) const
-    {
-        return getItem( index )->id();
-    }
-    inline int getZoom() const
+    int getZoom() const
     {
         return i_zoom;
     }
@@ -128,8 +124,7 @@ signals:
 
 public slots:
     virtual void activateItem( const QModelIndex &index );
-    void activateItem( playlist_item_t *p_item );
-    inline void changeZoom( const int zoom )
+    void changeZoom( const int zoom )
     {
         i_zoom = zoom;
         emit layoutChanged();
@@ -142,6 +137,13 @@ private:
     playlist_t *p_playlist;
 
     static QIcon icons[ITEM_TYPE_NUMBER];
+
+    /* Custom model private methods */
+    /* Lookups */
+    QStringList selectedURIs();
+    QModelIndex index( PLItem *, const int c ) const;
+    bool isCurrent( const QModelIndex &index ) const;
+    bool isParent( const QModelIndex &index, const QModelIndex &current) const;
 
     /* Shallow actions (do not affect core playlist) */
     void updateTreeItem( PLItem * );
@@ -158,8 +160,11 @@ private:
     void dropAppendCopy( const PlMimeData * data, PLItem *target, int pos );
     void dropMove( const PlMimeData * data, PLItem *target, int new_pos );
 
+    /* */
+    void sort( const int i_root_id, const int column, Qt::SortOrder order );
+
     /* Popup */
-    int i_popup_item, i_popup_parent, i_popup_column;
+    int i_popup_item, i_popup_parent;
     QModelIndexList current_selection;
     QMenu *sortingMenu;
     QSignalMapper *sortingMapper;
@@ -192,6 +197,7 @@ private slots:
     void processInputItemUpdate( input_thread_t* p_input );
     void processItemRemoval( int i_id );
     void processItemAppend( int item, int parent );
+    void activateItem( playlist_item_t *p_item );
 };
 
 class PlMimeData : public QMimeData

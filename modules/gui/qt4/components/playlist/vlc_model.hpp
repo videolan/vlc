@@ -50,7 +50,7 @@ public:
     };
 
     VLCModel( intf_thread_t *_p_intf, QObject *parent = 0 );
-    virtual int getId( QModelIndex index ) const = 0;
+    virtual int itemId( const QModelIndex & ) const = 0;
     virtual QModelIndex currentIndex() const = 0;
     virtual bool popup( const QModelIndex & index,
             const QPoint &point, const QModelIndexList &list ) = 0;
@@ -61,8 +61,7 @@ public:
 
     static int columnToMeta( int _column )
     {
-        int meta = 1;
-        int column = 0;
+        int meta = 1, column = 0;
 
         while( column != _column && meta != COLUMN_END )
         {
@@ -75,8 +74,7 @@ public:
 
     static int columnFromMeta( int meta_col )
     {
-        int meta = 1;
-        int column = 0;
+        int meta = 1, column = 0;
 
         while( meta != meta_col && meta != COLUMN_END )
         {
