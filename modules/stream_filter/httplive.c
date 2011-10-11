@@ -150,6 +150,8 @@ static void* hls_Reload(void *);
 static segment_t *segment_GetSegment(hls_stream_t *hls, int wanted);
 static void segment_Free(segment_t *segment);
 
+static char *ConstructUrl(vlc_url_t *url);
+
 /****************************************************************************
  *
  ****************************************************************************/
@@ -233,6 +235,34 @@ static void hls_Free(hls_stream_t *hls)
     vlc_UrlClean(&hls->url);
     free(hls);
     hls = NULL;
+}
+
+static hls_stream_t *hls_Copy(hls_stream_t *src, const bool b_cp_segments)
+{
+    assert(src);
+    assert(!b_cp_segments); /* FIXME: copying segments is not implemented */
+
+    hls_stream_t *dst = (hls_stream_t *)malloc(sizeof(hls_stream_t));
+    if (dst == NULL) return NULL;
+
+    dst->id = src->id;
+    dst->bandwidth = src->bandwidth;
+    dst->duration = src->duration;
+    dst->size = src->size;
+    dst->sequence = src->sequence;
+    dst->version = src->version;
+    dst->b_cache = src->b_cache;
+    char *uri = ConstructUrl(&src->url);
+    if (uri == NULL)
+    {
+        free(dst);
+        return NULL;
+    }
+    vlc_UrlParse(&dst->url, uri, 0);
+    if (!b_cp_segments)
+        dst->segments = vlc_array_new();
+    vlc_mutex_init(&dst->lock);
+    return dst;
 }
 
 static hls_stream_t *hls_Get(vlc_array_t *hls_stream, const int wanted)
@@ -965,17 +995,43 @@ static int get_HTTPLiveMetaPlaylist(stream_t *s, vlc_array_t **streams)
 {
     stream_sys_t *p_sys = s->p_sys;
     assert(*streams);
+    int err = VLC_EGENERIC;
+
+    /* Duplicate HLS stream META information */
+    for (int i = 0; i < vlc_array_count(p_sys->hls_stream); i++)
+    {
+        hls_stream_t *src, *dst;
+        src = (hls_stream_t *)vlc_array_item_at_index(p_sys->hls_stream, i);
+        if (src == NULL)
+            return VLC_EGENERIC;
+
+        dst = hls_Copy(src, false);
+        if (dst == NULL)
+            return VLC_ENOMEM;
+
+        vlc_array_append(*streams, dst);
+    }
 
     /* Download new playlist file from server */
-    uint8_t *buffer = NULL;
-    ssize_t len = read_M3U8_from_url(s, &p_sys->m3u8, &buffer);
-    if (len < 0)
-        return VLC_EGENERIC;
+    for (int i = 0; i < vlc_array_count(*streams); i++)
+    {
+        hls_stream_t *hls;
+        hls = (hls_stream_t *)vlc_array_item_at_index(*streams, i);
+        if (hls == NULL)
+            return VLC_EGENERIC;
 
-    /* Parse HLS m3u8 content. */
-    int err = parse_M3U8(s, *streams, buffer, len);
-    free(buffer);
-
+        /* Download playlist file from server */
+        uint8_t *buf = NULL;
+        ssize_t len = read_M3U8_from_url(s, &hls->url, &buf);
+        if (len < 0)
+            err = VLC_EGENERIC;
+        else
+        {
+            /* Parse HLS m3u8 content. */
+            err = parse_M3U8(s, *streams, buf, len);
+            free(buf);
+        }
+    }
     return err;
 }
 
