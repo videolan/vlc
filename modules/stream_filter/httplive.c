@@ -2117,7 +2117,6 @@ static int Control(stream_t *s, int i_query, va_list args)
     switch (i_query)
     {
         case STREAM_CAN_SEEK:
-        case STREAM_CAN_FASTSEEK:
             *(va_arg (args, bool *)) = hls_MaySeek(s);
             break;
         case STREAM_GET_POSITION:
