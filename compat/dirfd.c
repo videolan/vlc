@@ -29,6 +29,8 @@ int dirfd (DIR *dir)
 {
 #if defined (__sun__)
     return dir->dd_fd;
+#elif defined (__APPLE__)
+    return dir->__dd_fd;
 #else
     (void) dir;
 # ifdef ENOTSUP
