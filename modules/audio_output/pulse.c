@@ -855,6 +855,7 @@ static int Open(vlc_object_t *obj)
         formatv[formatc]->encoding = encoding;
         pa_format_info_set_rate(formatv[formatc], ss.rate);
         pa_format_info_set_channels(formatv[formatc], ss.channels);
+        pa_format_info_set_channel_map(formatv[formatc], &map);
         formatc++;
     }
 
@@ -864,6 +865,7 @@ static int Open(vlc_object_t *obj)
     pa_format_info_set_sample_format(formatv[formatc], ss.format);
     pa_format_info_set_rate(formatv[formatc], ss.rate);
     pa_format_info_set_channels(formatv[formatc], ss.channels);
+    pa_format_info_set_channel_map(formatv[formatc], &map);
     formatc++;
 
     /* Create a playback stream */
