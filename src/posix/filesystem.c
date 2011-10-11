@@ -211,7 +211,7 @@ char *vlc_readdir( DIR *dir )
         errno = val;
     else if (ent != NULL)
 #ifndef __APPLE__
-        path = strdup (ent->d_name);
+        path = FromLocaleDup (ent->d_name);
 #else
         path = FromCharset ("UTF-8-MAC", ent->d_name, strlen (ent->d_name));
 #endif
