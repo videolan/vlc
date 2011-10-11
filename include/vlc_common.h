@@ -476,6 +476,13 @@ typedef int ( * vlc_callback_t ) ( vlc_object_t *,      /* variable's object */
 # include <windows.h>
 #endif
 
+#ifdef __OS2__
+#   define OS2EMX_PLAIN_CHAR
+#   define INCL_BASE
+#   define INCL_PM
+#   include <os2.h>
+#endif
+
 #include "vlc_mtime.h"
 #include "vlc_threads.h"
 

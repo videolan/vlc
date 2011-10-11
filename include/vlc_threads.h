@@ -38,6 +38,11 @@
 #elif defined( WIN32 )
 #   include <process.h>                                         /* Win32 API */
 
+#elif defined( __OS2__ )                                        /* OS/2 API  */
+#   include <errno.h>
+
+#   define pthread_sigmask  sigprocmask
+
 #else                                         /* pthreads (like Linux & BSD) */
 #   define LIBVLC_USE_PTHREAD 1
 #   define LIBVLC_USE_PTHREAD_CANCEL 1
@@ -89,6 +94,14 @@
         THREAD_PRIORITY_ABOVE_NORMAL
 #   define VLC_THREAD_PRIORITY_HIGHEST \
         THREAD_PRIORITY_TIME_CRITICAL
+
+#elif defined(__OS2__)
+#   define VLC_THREAD_PRIORITY_LOW      0
+#   define VLC_THREAD_PRIORITY_INPUT    MAKESHORT( PRTYD_MAXIMUM / 2, PRTYC_REGULAR )
+#   define VLC_THREAD_PRIORITY_AUDIO    MAKESHORT( PRTYD_MAXIMUM, PRTYC_REGULAR )
+#   define VLC_THREAD_PRIORITY_VIDEO    0
+#   define VLC_THREAD_PRIORITY_OUTPUT   MAKESHORT( PRTYD_MAXIMUM / 2, PRTYC_REGULAR )
+#   define VLC_THREAD_PRIORITY_HIGHEST  MAKESHORT( 0, PRTYC_TIMECRITICAL )
 
 #else
 #   define VLC_THREAD_PRIORITY_LOW 0
@@ -161,6 +174,56 @@ typedef struct
 
 typedef struct vlc_threadvar *vlc_threadvar_t;
 typedef struct vlc_timer *vlc_timer_t;
+
+#elif defined( __OS2__ )
+typedef struct vlc_thread *vlc_thread_t;
+
+typedef struct
+{
+    bool dynamic;
+    union
+    {
+        struct
+        {
+            bool locked;
+            unsigned long contention;
+        };
+        HMTX hmtx;
+    };
+} vlc_mutex_t;
+
+#define VLC_STATIC_MUTEX { false, { { false, 0 } } }
+
+typedef struct
+{
+    HEV      hev;
+    unsigned clock;
+} vlc_cond_t;
+
+#define VLC_STATIC_COND { 0, 0 }
+
+typedef struct
+{
+    HEV  hev;
+    HMTX wait_mutex;
+    HMTX count_mutex;
+    int  count;
+} vlc_sem_t;
+
+typedef struct
+{
+    vlc_mutex_t   mutex;
+    vlc_cond_t    wait;
+    unsigned long readers;
+    unsigned long writers;
+    int           writer;
+} vlc_rwlock_t;
+#define VLC_STATIC_RWLOCK \
+    { VLC_STATIC_MUTEX, VLC_STATIC_COND, 0, 0, 0 }
+
+typedef struct vlc_threadvar *vlc_threadvar_t;
+typedef struct vlc_timer *vlc_timer_t;
+
 #endif
 
 #if defined( WIN32 ) && !defined ETIMEDOUT
