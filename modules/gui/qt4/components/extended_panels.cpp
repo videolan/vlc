@@ -406,19 +406,29 @@ void ExtVideo::updateFilters()
                                    : groupbox->isChecked() );
 }
 
+#define UPDATE_AND_APPLY_TEXT( widget, file ) \
+    CONNECT( ui.widget, textChanged( const QString& ), \
+             this, updateFilterOptions() ); \
+    ui.widget->setText( toNativeSeparators( file ) ); \
+    ui.widget->disconnect( SIGNAL( textChanged( const QString& ) ) );
+
 void ExtVideo::browseLogo()
 {
     QString file = QFileDialog::getOpenFileName( NULL, qtr( "Logo filenames" ),
                    p_intf->p_sys->filepath, "Images (*.png *.jpg);;All (*)" );
-    ui.logoFileText->setText( toNativeSeparators( file ) );
+
+    UPDATE_AND_APPLY_TEXT( logoFileText, file );
 }
 
 void ExtVideo::browseEraseFile()
 {
     QString file = QFileDialog::getOpenFileName( NULL, qtr( "Image mask" ),
                    p_intf->p_sys->filepath, "Images (*.png *.jpg);;All (*)" );
-    ui.eraseMaskText->setText( toNativeSeparators( file ) );
+
+    UPDATE_AND_APPLY_TEXT( eraseMaskText, file );
 }
+
+#undef UPDATE_AND_APPLY_TEXT
 
 void ExtVideo::initComboBoxItems( QObject *widget )
 {
