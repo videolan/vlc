@@ -9,7 +9,7 @@ StrCpy $Name_SectionGroupAudio "Pliki audio"
 StrCpy $Name_SectionGroupVideo "Pliki wideo"
 StrCpy $Name_SectionGroupOther "Inne"
 StrCpy $Name_Section07 "Menu kontekstowe"
-StrCpy $Name_Section08 "Wyczy¶ciæ pamiêæ podrêczn± i ustawienia"
+StrCpy $Name_Section08 "Wyczyœciæ pamiêæ podrêczn¹ i usun¹æ ustawienia"
 
 StrCpy $Desc_Section01 \
     "Pliki samego odtwarzacza"
@@ -24,17 +24,17 @@ StrCpy $Desc_Section04 \
 StrCpy $Desc_Section05 \
     "Rejestracja VLC do odtwarzania p³yt DVD i CD"
 StrCpy $Desc_Section06 \
-    "Ustawia VLC media player jako domy¶ln± aplikacjê dla poszczególnych typów pliku"
+    "Ustawia VLC media player jako domyœln¹ aplikacjê dla poszczególnych typów pliku"
 StrCpy $Desc_Section07 \
     "Dodaje nowe pozycje do menu kontekstowego ('Odtwórz w VLC' i 'Dodaj do listy odtwarzania VLC')"
 StrCpy $Desc_Section08 \
     "Usuwa ustawienia odtwarzacza VLC media player i pamiêci podrêcznej poprzednich instalacji"
 StrCpy $Message_AlreadyInstalled  \
-"VLC media player zosta³ ju¿ zainstalowany. $\nCzy chcesz usun±æ \
-poprzedni± wersjê przed zainstalowaniem $(^Name) ?"
+"VLC media player zosta³ ju¿ zainstalowany. $\nCzy chcesz usun¹æ \
+poprzedni¹ wersjê przed zainstalowaniem $(^Name) ?"
 
 StrCpy $Name_Section91 "Odinstaluj"
-StrCpy $Name_Section92 "Wyczy¶ciæ pamiêæ podrêczn± i ustawienia"
+StrCpy $Name_Section92 "Wyczyœciæ pamiêæ podrêczn¹ i usun¹æ ustawienia"
 
 StrCpy $Desc_Section91 \
 "Odinstaluj VLC media player i wszystkie jego sk³adniki"
@@ -45,7 +45,7 @@ StrCpy $ShellAssociation_Play "Odtwórz"
 StrCpy $ContextMenuEntry_PlayWith "Odtwórz w VLC media player"
 StrCpy $ContextMenuEntry_AddToPlaylist "Dodaj do listy odtwarzania VLC media player"
 
-StrCpy $Link_VisitWebsite "Odwied¼ witrynê VideoLAN VLC media player"
+StrCpy $Link_VisitWebsite "OdwiedŸ witrynê VideoLAN VLC media player"
 
 StrCpy $Name_InstTypeRecommended "Zalecana"
 StrCpy $Name_InstTypeMinimum "Minimalna"
