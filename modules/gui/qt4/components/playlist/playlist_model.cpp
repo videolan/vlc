@@ -961,13 +961,15 @@ bool PLModel::popup( const QModelIndex & index, const QPoint &point, const QMode
     {
         sortingMenu = new QMenu( qtr( "Sort by" ) );
         sortingMapper = new QSignalMapper( this );
-        for( int i = 1, j = 1; i < COLUMN_ALBUM; i <<= 1, j++ )
+        /* Choose what columns to show in sorting menu, not sure if this should be configurable*/
+        QList<int> sortingColumns;
+        sortingColumns << COLUMN_TITLE << COLUMN_ARTIST << COLUMN_ALBUM << COLUMN_TRACK_NUMBER << COLUMN_URI;
+        foreach( int Column, sortingColumns )
         {
-            if( i == COLUMN_NUMBER ) continue;
-            QAction *asc  = sortingMenu->addAction( qfu( psz_column_title( i ) ) + " " + qtr("Ascending") );
-            QAction *desc = sortingMenu->addAction( qfu( psz_column_title( i ) ) + " " + qtr("Descending") );
-            sortingMapper->setMapping( asc, j );
-            sortingMapper->setMapping( desc, -j );
+            QAction *asc  = sortingMenu->addAction( qfu( psz_column_title( Column ) ) + " " + qtr("Ascending") );
+            QAction *desc = sortingMenu->addAction( qfu( psz_column_title( Column ) ) + " " + qtr("Descending") );
+            sortingMapper->setMapping( asc, columnFromMeta(Column) + 1 );
+            sortingMapper->setMapping( desc, -1 * (columnFromMeta(Column)+1) );
             CONNECT( asc, triggered(), sortingMapper, map() );
             CONNECT( desc, triggered(), sortingMapper, map() );
         }
