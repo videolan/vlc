@@ -937,7 +937,7 @@ static const char *const ppsz_prefres[] = {
 
 #define RTSP_PORT_TEXT N_( "RTSP server port" )
 #define RTSP_PORT_LONGTEXT N_( \
-    "The HTTPS server will listen on this TCP port. " \
+    "The RTSP server will listen on this TCP port. " \
     "The standard RTSP port number is 554. " \
     "However allocation of port numbers below 1025 is usually restricted " \
     "by the operating system." )
