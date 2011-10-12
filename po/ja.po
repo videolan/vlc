@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: vlc 1.1.0\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2011-10-09 17:15+0100\n"
-"PO-Revision-Date: 2011-07-19 18:42+0900\n"
+"PO-Revision-Date: 2011-10-12 00:04+0900\n"
 "Last-Translator: Fumio Nakayama <fumio.n6a@gmail.com>\n"
 "Language-Team: VideoLAN's Translators <translators@videolan.org>\n"
 "Language: ja\n"
@@ -16333,17 +16333,17 @@ msgstr "VLCデバッグログ(%s).rtfd"
 
 #: modules/gui/macosx/intf.m:1955
 msgid "Relaunch required"
-msgstr ""
+msgstr "再起動が必要です"
 
 #: modules/gui/macosx/intf.m:1956
 msgid ""
 "To make sure that VLC no longer listens to your media key events, it needs "
 "to be restarted."
-msgstr ""
+msgstr "VLCはメディアのキー イベントを読み込んでいません。再起動が必要です。"
 
 #: modules/gui/macosx/intf.m:1957
 msgid "Relaunch VLC"
-msgstr ""
+msgstr "VLCの再起動"
 
 #: modules/gui/macosx/macosx.m:55
 msgid "Video device"
