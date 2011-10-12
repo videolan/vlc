@@ -93,6 +93,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     playlistVisible      = false;
     input_name           = "";
     b_interfaceFullScreen= false;
+    b_hasPausedWhenMinimized = false;
 
 
     /* Ask for Privacy */
@@ -239,19 +240,18 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     /* Register callback for the intf-popupmenu variable */
     var_AddCallback( p_intf->p_libvlc, "intf-popupmenu", PopupMenuCB, p_intf );
 
-    /* Playlist */
-    int i_plVis = settings->value( "MainWindow/playlist-visible", false ).toBool();
 
-    if( i_plVis ) togglePlaylist();
-
-    /**** FINAL SIZING and placement of interface */
+    /* Final Sizing, restoration and placement of the interface */
     settings->beginGroup( "MainWindow" );
+
+    if( settings->value( "playlist-visible", false ).toBool() )
+        togglePlaylist();
+
     QVLCTools::restoreWidgetPosition( settings, this, QSize(600, 420) );
     settings->endGroup();
 
     b_interfaceFullScreen = isFullScreen();
 
-    /* Final sizing and showing */
     setVisible( !b_hideAfterCreation );
 
     computeMinimumSize();
@@ -259,8 +259,6 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     /* Switch to minimal view if needed, must be called after the show() */
     if( b_minimalView )
         toggleMinimalView( true );
-
-    b_hasPausedWhenMinimized = false;
 }
 
 MainInterface::~MainInterface()
@@ -349,6 +347,9 @@ void MainInterface::recreateToolbars()
 
     controls = new ControlsWidget( p_intf, b_adv, this );
     inputC = new InputControlsWidget( p_intf, this );
+    mainLayout->insertWidget( 2, inputC );
+    mainLayout->insertWidget( settings->value( "ToolbarPos", 0 ).toInt() ? 0: 3,
+                              controls );
 
     if( fullscreenControls )
     {
@@ -357,9 +358,6 @@ void MainInterface::recreateToolbars()
         CONNECT( fullscreenControls, keyPressed( QKeyEvent * ),
                  this, handleKeyPress( QKeyEvent * ) );
     }
-    mainLayout->insertWidget( 2, inputC );
-    mainLayout->insertWidget( settings->value( "ToolbarPos", 0 ).toInt() ? 0: 3,
-                              controls );
     settings->endGroup();
 }
 
