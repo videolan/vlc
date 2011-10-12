@@ -54,3 +54,10 @@ StrCpy $Name_InstTypeFull "Completa"
 
 StrCpy $Action_OnArrivalDVD "Reproducir película DVD"
 StrCpy $Action_OnArrivalAudioCD "Reproducir CD de audio"
+StrCpy $Action_OnArrivalVCDMovie "Reproducir película VCD"
+StrCpy $Action_OnArrivalSVCDMovie "Reproducir película SVCD"
+StrCpy $Action_OnArrivalVideoFiles "Reproducir archivos de vídeo"
+StrCpy $Action_OnArrivalMusicFiles "Reproducir archivos de audio"
+StrCpy $Action_OnArrivalDVDAudio "Reproducir DVD de audio"
+
+StrCpy $License_NextText "Ahora conoce sus derechos. Pulse Siguiente para continuar."
