@@ -31,8 +31,8 @@ StrCpy $Desc_Section08 \
     "Kustutab VLC meediaesitaja eelistused ja puhverfailid eelmisest paigaldusest"
 
 StrCpy $Message_AlreadyInstalled  \
-"VLC meediaesitaja on juba paigaldatud. $\n Kas soovid eelmise \
-versiooni eemaldada enne $(^Name) paigaldamist ?"
+"VLC meediaesitaja on juba paigaldatud. $\nKas soovid eelmise \
+versiooni eemaldada enne $(^Name) paigaldamist?"
 
 StrCpy $Name_Section91 "Eemalda"
 StrCpy $Name_Section92 "Kustuta eelistused ja puhver"
@@ -54,3 +54,10 @@ StrCpy $Name_InstTypeFull "Täielik"
 
 StrCpy $Action_OnArrivalDVD "DVD filmi esitamine"
 StrCpy $Action_OnArrivalAudioCD "Audio-CD esitamine"
+StrCpy $Action_OnArrivalVCDMovie "VCD filmi esitamine"
+StrCpy $Action_OnArrivalSVCDMovie "SVCD filmi esitamine"
+StrCpy $Action_OnArrivalVideoFiles "Videofailide esitamine"
+StrCpy $Action_OnArrivalMusicFiles "Audiofailide esitamine"
+StrCpy $Action_OnArrivalDVDAudio "Audio-DVD esitamine"
+
+StrCpy $License_NextText "Oled nüüd teadlik oma õigustest. Jätkamiseks klõpsa Edasi."
