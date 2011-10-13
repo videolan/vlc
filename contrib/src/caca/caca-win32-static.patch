@@ -1,0 +1,11 @@
+--- libcaca/caca/caca.h	2010-02-08 13:34:28.000000000 +0100
++++ libcaca.new/caca/caca.h	2010-08-24 19:27:39.000000000 +0200
+@@ -31,7 +31,7 @@
+ #if defined _DOXYGEN_SKIP_ME
+ #elif defined _WIN32 && defined __LIBCACA__ && defined DLL_EXPORT
+ #   define __extern extern __declspec(dllexport)
+-#elif defined _WIN32 && !defined __LIBCACA__
++#elif defined _WIN32 && !defined __LIBCACA__ && defined __NULL
+ #   define __extern extern __declspec(dllimport)
+ #else
+ #   define __extern extern

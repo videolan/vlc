@@ -1,0 +1,39 @@
+--- libcaca/configure.orig	2010-02-08 14:46:58.000000000 +0100
++++ libcaca/configure	2010-08-09 17:46:59.000000000 +0200
+@@ -16785,33 +16785,9 @@
+ done
+ 
+   if test "${ac_cv_my_have_cocoa}" = "yes"; then
+-    case x${target} in
+-    xpowerpc*darwin*)
+-      # 10.3 needed to link with X11
+-      MACOSX_SDK="${MACOSX_SDK:-/Developer/SDKs/MacOSX10.3.9.sdk}"
+-      GCC_VERSION="${GCC_VERSION:-3.3}"
+-      ARCH="${ARCH:--arch ppc}"
+-      MACOSX_SDK_CFLAGS="${MACOSX_SDK_CFLAGS:--nostdinc -isystem ${MACOSX_SDK}/usr/include/gcc/darwin/${GCC_VERSION} -isystem ${MACOSX_SDK}/usr/include}"
+-      MACOSX_SDK_CXXFLAGS="${MACOSX_SDK_CXXFLAGS:--nostdinc++ -I${MACOSX_SDK}/usr/include/gcc/darwin/${GCC_VERSION}/c++ -I${MACOSX_SDK}/usr/include/gcc/darwin/${GCC_VERSION}/c++/ppc-darwin -I${MACOSX_SDK}/usr/include/gcc/darwin/${GCC_VERSION}/c++/backward}"
+-      MACOSX_SDK_LDFLAGS="${MACOSX_SDK_LDFLAGS:--L${MACOSX_SDK}/usr/lib/gcc/darwin -L${MACOSX_SDK}/usr/lib/gcc/darwin/${GCC_VERSION} -L${MACOSX_SDK}/usr/lib}"
+-      ;;
+-    x*86_64*darwin*)
+-      MACOSX_SDK="${MACOSX_SDK:-/Developer/SDKs/MacOSX10.5.sdk}"
+-      GCC_VERSION="${GCC_VERSION:-4.0}"
+-      ARCH="${ARCH:--arch i386}"
+-      MACOSX_SDK_CFLAGS="${MACOSX_SDK_CFLAGS:--isysroot ${MACOSX_SDK}}"
+-      MACOSX_SDK_CXXFLAGS="${MACOSX_SDK_CXXFLAGS:-${MACOSX_SDK_CFLAGS}}"
+-      ;;
+-    x*86*darwin*)
+-      MACOSX_SDK="${MACOSX_SDK:-/Developer/SDKs/MacOSX10.6.sdk}"
+-      GCC_VERSION="${GCC_VERSION:-4.0}"
+-      ARCH="${ARCH:--arch i386}"
+-      MACOSX_SDK_CFLAGS="${MACOSX_SDK_CFLAGS:--isysroot ${MACOSX_SDK}}"
+-      MACOSX_SDK_CXXFLAGS="${MACOSX_SDK_CXXFLAGS:-${MACOSX_SDK_CFLAGS}}"
+-      ;;
+-    esac
+-    CC="${CC:-gcc-${GCC_VERSION}}"
+-    CXX="${CXX:-g++-${GCC_VERSION}}"
++    MACOSX_SDK=/Developer/SDKs/MacOSX10.5.sdk
++    MACOSX_SDK_CFLAGS="-isysroot ${MACOSX_SDK}"
++    MACOSX_SDK_CXXFLAGS="${MACOSX_SDK_CFLAGS}"
+     MACOSX_SDK_FRAMEWORKS="${MACOSX_SDK_FRAMEWORKS:--F${MACOSX_SDK}/System/Library/Frameworks}"
+     CPPFLAGS="${CPPFLAGS} ${ARCH} ${MACOSX_SDK_FRAMEWORKS}"
+     CFLAGS="${CFLAGS} ${MACOSX_SDK_CFLAGS}"
