@@ -882,7 +882,7 @@ void InputManager::setRate( int new_rate )
 void InputManager::jumpFwd()
 {
     int i_interval = var_InheritInteger( p_input, "short-jump-size" );
-    if( i_interval > 0 )
+    if( i_interval > 0 && hasInput() )
     {
         mtime_t val = CLOCK_FREQ * i_interval;
         var_SetTime( p_input, "time-offset", val );
@@ -892,7 +892,7 @@ void InputManager::jumpFwd()
 void InputManager::jumpBwd()
 {
     int i_interval = var_InheritInteger( p_input, "short-jump-size" );
-    if( i_interval > 0 )
+    if( i_interval > 0 && hasInput() )
     {
         mtime_t val = -CLOCK_FREQ * i_interval;
         var_SetTime( p_input, "time-offset", val );
