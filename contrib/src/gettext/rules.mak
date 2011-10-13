@@ -2,10 +2,6 @@
 GETTEXT_VERSION=0.18.1.1
 GETTEXT_URL=$(GNU)/gettext/gettext-$(GETTEXT_VERSION).tar.gz
 
-ifeq ($(call need_pkg,"gettext"),)
-PKGS_FOUND += gettext
-endif
-
 $(TARBALLS)/gettext-$(GETTEXT_VERSION).tar.gz:
 	$(call download,$(GETTEXT_URL))
 
