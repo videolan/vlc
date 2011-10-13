@@ -367,13 +367,19 @@ void aout_DecFlush (audio_output_t *aout)
 bool aout_DecIsEmpty (audio_output_t *aout)
 {
     aout_owner_t *owner = aout_owner (aout);
-    mtime_t end_date;
+    mtime_t end_date, now = mdate ();
+    bool empty;
 
     aout_lock (aout);
-    /* FIXME: tell output to drain */
     end_date = date_Get (&owner->sync.date);
+    empty = end_date == VLC_TS_INVALID || end_date <= now;
+    if (empty)
+        /* The last PTS has elapsed already. So the underlying audio output
+         * buffer should be empty or almost. Thus draining should be fast
+         * and will not block the caller too long. */
+        aout_OutputFlush (aout, true);
     aout_unlock (aout);
-    return end_date == VLC_TS_INVALID || end_date <= mdate();
+    return empty;
 }
 
 /**
