@@ -1,6 +1,6 @@
 # orc
 
-ORC_VERSION := 0.4.14
+ORC_VERSION := 0.4.16
 
 ORC_URL := http://code.entropywave.com/download/orc/orc-$(ORC_VERSION).tar.gz
 
