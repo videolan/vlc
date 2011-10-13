@@ -474,12 +474,17 @@ void DialogsProvider::openUrlDialog()
         QString url = oud->url();
         if( !url.isEmpty() )
         {
-            playlist_Add( THEPL, qtu( url ),
-                          NULL, !oud->shouldEnqueue() ?
-                                  ( PLAYLIST_APPEND | PLAYLIST_GO )
-                                : ( PLAYLIST_APPEND | PLAYLIST_PREPARSE ),
-                          PLAYLIST_END, true, false );
-            RecentsMRL::getInstance( p_intf )->addRecent( url );
+            char *uri = make_URI( qtu( url ), NULL );
+            if( likely( uri != NULL ) )
+            {
+                playlist_Add( THEPL, uri,
+                              NULL, !oud->shouldEnqueue() ?
+                                      ( PLAYLIST_APPEND | PLAYLIST_GO )
+                                    : ( PLAYLIST_APPEND | PLAYLIST_PREPARSE ),
+                              PLAYLIST_END, true, false );
+                RecentsMRL::getInstance( p_intf )->addRecent( url );
+                free( uri );
+            }
         }
     }
     delete oud;
@@ -739,7 +744,12 @@ void DialogsProvider::SDMenuAction( const QString& data )
  **/
 void DialogsProvider::playMRL( const QString &mrl )
 {
-    playlist_Add( THEPL, qtu(mrl), NULL,
+    char *uri = make_URI( qtu( mrl ), NULL );
+    if( unlikely( uri == NULL ) )
+        return;
+
+    playlist_Add( THEPL, uri, NULL,
            PLAYLIST_APPEND | PLAYLIST_GO , PLAYLIST_END, true, false );
     RecentsMRL::getInstance( p_intf )->addRecent( mrl );
+    free( uri );
 }
