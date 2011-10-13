@@ -1,9 +1,9 @@
 # schroedinger
 
 SCHROEDINGER_VERSION := 1.0.10
-
 SCHROEDINGER_URL := http://diracvideo.org/download/schroedinger/schroedinger-$(SCHROEDINGER_VERSION).tar.gz
 
+PKGS += schroedinger
 ifeq ($(call need_pkg,"schroedinger-1.0"),)
 PKGS_FOUND += schroedinger
 endif
