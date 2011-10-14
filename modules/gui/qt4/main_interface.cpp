@@ -545,6 +545,25 @@ inline void MainInterface::showTab( QWidget *widget )
     stackCentralOldWidget = stackCentralW->currentWidget();
     stackWidgetsSizes[stackCentralOldWidget] = stackCentralW->size();
 
+    /* If we are playing video, embedded */
+    if( videoWidget && THEMIM->getIM()->hasVideo() )
+    {
+        /* Video -> Playlist */
+        if( videoWidget == stackCentralOldWidget && widget == playlistWidget )
+        {
+            stackCentralW->removeWidget( videoWidget );
+            videoWidget->show(); videoWidget->raise();
+        }
+
+        /* Playlist -> Video */
+        if( playlistWidget == stackCentralOldWidget && widget == videoWidget )
+        {
+            playlistWidget->artContainer->removeWidget( videoWidget );
+            videoWidget->show(); videoWidget->raise();
+            stackCentralW->addWidget( videoWidget );
+        }
+    }
+
     stackCentralW->setCurrentWidget( widget );
     if( b_autoresize )
         resizeStack( stackWidgetsSizes[widget].width(), stackWidgetsSizes[widget].height() );
@@ -553,6 +572,14 @@ inline void MainInterface::showTab( QWidget *widget )
     msg_Warn( p_intf, "State change %i",  stackCentralW->currentIndex() );
     msg_Warn( p_intf, "New stackCentralOldWidget %i", stackCentralW->indexOf( stackCentralOldWidget ) );
 #endif
+
+    /* This part is done later, to account for the new pl size */
+    if( videoWidget && THEMIM->getIM()->hasVideo() &&
+        videoWidget == stackCentralOldWidget && widget == playlistWidget )
+    {
+        playlistWidget->artContainer->addWidget( videoWidget );
+        playlistWidget->artContainer->setCurrentWidget( videoWidget );
+    }
 }
 
 void MainInterface::destroyPopupMenu()
@@ -638,6 +665,11 @@ void MainInterface::releaseVideoSlot( void )
 
     if( stackCentralW->currentWidget() == videoWidget )
         restoreStackOldWidget();
+    else if( playlistWidget->artContainer->currentWidget() == videoWidget )
+    {
+        playlistWidget->artContainer->setCurrentIndex( 0 );
+        stackCentralW->addWidget( videoWidget );
+    }
 
     /* We don't want to have a blank video to popup */
     stackCentralOldWidget = bgWidget;
