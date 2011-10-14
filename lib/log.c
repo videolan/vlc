@@ -30,11 +30,6 @@
 #include <vlc/libvlc.h>
 #include <assert.h>
 
-struct libvlc_log_t
-{
-    libvlc_instance_t  *p_instance;
-};
-
 unsigned libvlc_get_log_verbosity( const libvlc_instance_t *p_instance )
 {
     (void) p_instance;
