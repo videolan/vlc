@@ -108,6 +108,11 @@ if HAVE_WIN32
 libvlc_LTLIBRARIES += libdrawable_plugin.la
 endif
 
+### OS/2 ###
+if HAVE_OS2
+libvlc_LTLIBRARIES += libdrawable_plugin.la
+endif
+
 ### EGL ###
 libegl_plugin_la_SOURCES = egl.c
 libegl_plugin_la_CFLAGS = $(AM_CFLAGS) $(EGL_CFLAGS)
