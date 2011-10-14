@@ -45,6 +45,7 @@ class LocationBar;
 class QSignalMapper;
 class SearchLineEdit;
 class QModelIndex;
+class QStackedWidget;
 
 class PlaylistWidget : public QWidget
 {
@@ -55,7 +56,7 @@ public:
 
     void forceHide();
     void forceShow();
-
+    QStackedWidget *artContainer;
 private:
     QSplitter            *leftSplitter;
     QSplitter            *split;

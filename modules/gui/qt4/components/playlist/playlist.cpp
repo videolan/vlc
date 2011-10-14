@@ -41,6 +41,7 @@
 #include <QMenu>
 #include <QSignalMapper>
 #include <QSlider>
+#include <QStackedWidget>
 
 /**********************************************************************
  * Playlist Widget. The embedded playlist
@@ -67,16 +68,13 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QWidget *_par )
 
     /* Create a Container for the Art Label
        in order to have a beautiful resizing for the selector above it */
-    QWidget *artContainer = new QWidget;
-    QHBoxLayout *artContLay = new QHBoxLayout( artContainer );
-    artContLay->setMargin( 0 );
-    artContLay->setSpacing( 0 );
+    artContainer = new QStackedWidget;
     artContainer->setMaximumHeight( 128 );
 
     /* Art label */
     CoverArtLabel *art = new CoverArtLabel( artContainer, p_intf );
     art->setToolTip( qtr( "Double click to get media information" ) );
-    artContLay->addWidget( art, 1 );
+    artContainer->addWidget( art );
 
     CONNECT( THEMIM->getIM(), artChanged( QString ),
              art, showArtUpdate( const QString& ) );
