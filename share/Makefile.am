@@ -4,7 +4,9 @@ EXTRA_DIST =
 
 appdatadir = $(datadir)/applications
 if !HAVE_WIN32
+if !HAVE_WINCE
 appdata_DATA = vlc.desktop
+endif
 endif
 EXTRA_DIST += vlc.desktop.in
 CLEANFILES += $(appdata_DATA)
@@ -22,6 +24,7 @@ icons128dir = $(iconsdatadir)/128x128/apps
 icons256dir = $(iconsdatadir)/256x256/apps
 
 if !HAVE_WIN32
+if !HAVE_WINCE
 dist_vlcdata_DATA = icons/vlc.ico
 dist_icons16_DATA = icons/16x16/vlc.png icons/16x16/vlc.xpm
 dist_icons32_DATA = icons/32x32/vlc.png icons/32x32/vlc.xpm \
@@ -35,6 +38,7 @@ nobase_dist_vlcdata_SCRIPTS = \
 	utils/audio-vlc-default.sh \
 	utils/video-vlc-default.sh \
 	$(NULL)
+endif
 endif
 
 EXTRA_DIST += \
