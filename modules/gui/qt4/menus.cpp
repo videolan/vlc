@@ -1083,7 +1083,6 @@ void QVLCMenu::PopupMenu( intf_thread_t *p_intf, bool show )
 #undef POPUP_BOILERPLATE
 #undef BAR_DADD
 
-#ifndef HAVE_MAEMO
 /************************************************************************
  * Systray Menu                                                         *
  ************************************************************************/
@@ -1129,7 +1128,6 @@ void QVLCMenu::updateSystrayMenu( MainInterface *mi,
     /* Set the menu */
     mi->getSysTray()->setContextMenu( sysMenu );
 }
-#endif
 
 
 #undef PUSH_VAR

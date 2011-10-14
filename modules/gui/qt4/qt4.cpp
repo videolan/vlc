@@ -197,8 +197,13 @@ vlc_module_begin ()
     add_bool( "qt-minimal-view", false, QT_MINIMAL_MODE_TEXT,
               QT_MINIMAL_MODE_TEXT, false );
 
-    add_bool( "qt-system-tray", true, SYSTRAY_TEXT,
-          SYSTRAY_LONGTEXT, false)
+    add_bool( "qt-system-tray",
+#ifdef HAVE_MAEMO
+            false,
+#else
+            true,
+#endif
+            SYSTRAY_TEXT, SYSTRAY_LONGTEXT, false)
     add_bool( "qt-notification", true, NOTIFICATION_TEXT,
               NOTIFICATION_LONGTEXT, false )
     add_bool( "qt-start-minimized", false, MINIMIZED_TEXT,

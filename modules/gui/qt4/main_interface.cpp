@@ -81,9 +81,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     videoWidget          = NULL;
     playlistWidget       = NULL;
     stackCentralOldWidget= NULL;
-#ifndef HAVE_MAEMO
     sysTray              = NULL;
-#endif
     fullscreenControls   = NULL;
     cryptedLabel         = NULL;
     controls             = NULL;
@@ -444,7 +442,6 @@ void MainInterface::createMainWidget( QSettings *settings )
 
 inline void MainInterface::initSystray()
 {
-#ifndef HAVE_MAEMO
     bool b_systrayAvailable = QSystemTrayIcon::isSystemTrayAvailable();
     bool b_systrayWanted = var_InheritBool( p_intf, "qt-system-tray" );
 
@@ -461,7 +458,6 @@ inline void MainInterface::initSystray()
 
     if( b_systrayAvailable && b_systrayWanted )
         createSystray();
-#endif
 }
 
 inline void MainInterface::createStatusBar()
@@ -990,7 +986,6 @@ void MainInterface::showBuffering( float f_cache )
 /*****************************************************************************
  * Systray Icon and Systray Menu
  *****************************************************************************/
-#ifndef HAVE_MAEMO
 /**
  * Create a SystemTray icon and a menu that would go with it.
  * Connects to a click handler on the icon.
@@ -1157,7 +1152,6 @@ void MainInterface::updateSystrayTooltipStatus( int i_status )
     }
     QVLCMenu::updateSystrayMenu( this, p_intf );
 }
-#endif
 
 void MainInterface::changeEvent(QEvent *event)
 {
@@ -1323,13 +1317,11 @@ void MainInterface::emitBoss()
 void MainInterface::setBoss()
 {
     THEMIM->pause();
-#ifndef HAVE_MAEMO
     if( sysTray )
     {
         hide();
     }
     else
-#endif
     {
         showMinimized();
     }
