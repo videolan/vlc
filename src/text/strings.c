@@ -1075,6 +1075,17 @@ char *make_URI (const char *path, const char *scheme)
      * scheme name (such as mailto: or news:). */
 
     char *buf;
+
+#ifdef __OS2__
+    char p[strlen (path) + 1];
+
+    for (buf = p; *path; buf++, path++)
+        *buf = (*path == '/') ? DIR_SEP_CHAR : *path;
+    *buf = '\0';
+
+    path = p;
+#endif
+
 #if defined( WIN32 ) || defined( __OS2__ )
     /* Drive letter */
     if (isalpha ((unsigned char)path[0]) && (path[1] == ':'))
