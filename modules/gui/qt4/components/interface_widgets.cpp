@@ -473,7 +473,6 @@ CoverArtLabel::CoverArtLabel( QWidget *parent, intf_thread_t *_p_i )
     setMinimumHeight( 128 );
     setMinimumWidth( 128 );
     setMaximumHeight( 128 );
-    setMaximumWidth( 128 );
     setScaledContents( false );
     setAlignment( Qt::AlignCenter );
 
