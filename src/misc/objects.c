@@ -55,11 +55,6 @@
 #ifdef __OS2__
 # include <sys/socket.h>
 # include <netinet/in.h>
-
-typedef struct sockaddr_in SOCKADDR_IN;
-typedef struct sockaddr *PSOCKADDR;
-
-# define closesocket    soclose
 #elif defined(WIN32)
 # include <io.h>
 # include <winsock2.h>
@@ -302,28 +297,28 @@ static void vlc_object_destroy( vlc_object_t *p_this )
 # define vlc_pipe selectable_pipe
 static int selectable_pipe (int fd[2])
 {
-    SOCKADDR_IN addr;
+    struct sockaddr_in addr;
     int addrlen = sizeof (addr);
 
-    int l = socket (PF_INET, SOCK_STREAM, IPPROTO_TCP), a,
+    int l = socket (PF_INET, SOCK_STREAM, IPPROTO_TCP),
         c = socket (PF_INET, SOCK_STREAM, IPPROTO_TCP);
-    if ((l == -1) || (c == -1))
+    if (l == -1 || c == -1)
         goto error;
 
     memset (&addr, 0, sizeof (addr));
     addr.sin_family = AF_INET;
     addr.sin_addr.s_addr = htonl (INADDR_LOOPBACK);
-    if (bind (l, (PSOCKADDR)&addr, sizeof (addr))
-     || getsockname (l, (PSOCKADDR)&addr, &addrlen)
+    if (bind (l, (struct sockaddr *)&addr, sizeof (addr))
+     || getsockname (l, (struct sockaddr *)&addr, &addrlen)
      || listen (l, 1)
-     || connect (c, (PSOCKADDR)&addr, addrlen))
+     || connect (c, (struct sockaddr *)&addr, addrlen))
         goto error;
 
-    a = accept (l, NULL, NULL);
+    int a = accept (l, NULL, NULL);
     if (a == -1)
         goto error;
 
-    closesocket (l);
+    close (l);
     //shutdown (a, 0);
     //shutdown (c, 1);
     fd[0] = c;
@@ -332,9 +327,9 @@ static int selectable_pipe (int fd[2])
 
 error:
     if (l != -1)
-        closesocket (l);
+        close (l);
     if (c != -1)
-        closesocket (c);
+        close (c);
     return -1;
 }
 #endif /* WIN32 || __OS2__ */
