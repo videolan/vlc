@@ -33,6 +33,9 @@
 #include <time.h>
 #include <fcntl.h>
 #include <errno.h>
+#ifdef HAVE_UNISTD_H
+# include <unistd.h>
+#endif
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>

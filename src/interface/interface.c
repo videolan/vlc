@@ -38,6 +38,10 @@
 #endif
 
 #include <assert.h>
+#ifdef HAVE_UNISTD_H
+# include <unistd.h>
+#endif
+
 #include <vlc_common.h>
 #include <vlc_modules.h>
 #include <vlc_interface.h>

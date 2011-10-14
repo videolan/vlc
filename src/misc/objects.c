@@ -55,6 +55,7 @@
 #ifdef __OS2__
 # include <sys/socket.h>
 # include <netinet/in.h>
+# include <unistd.h>    // close(), write()
 #elif defined(WIN32)
 # include <io.h>
 # include <winsock2.h>

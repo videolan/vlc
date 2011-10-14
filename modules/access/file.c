@@ -59,8 +59,6 @@
 #   include <ctype.h>
 #   include <shlwapi.h>
 #   include <vlc_charset.h>
-#elif defined( __OS2__ )
-#   include <ctype.h>
 #else
 #   include <unistd.h>
 #endif

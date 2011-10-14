@@ -43,6 +43,7 @@
 #include <assert.h>
 #include <errno.h>
 #include <stdlib.h>
+#include <time.h>
 
 #ifndef WIN32
 # include <locale.h>
