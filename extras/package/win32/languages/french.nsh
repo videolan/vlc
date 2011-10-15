@@ -1,4 +1,4 @@
-StrCpy $Name_Section01 "Lecteur Média (requis)"
+StrCpy $Name_Section01 "Lecteur de médias (requis)"
 StrCpy $Name_Section02a "Ajouter au menu Démarrer"
 StrCpy $Name_Section02b "Placer un raccourci sur le bureau"
 StrCpy $Name_Section03 "Plugin Mozilla"
@@ -9,7 +9,7 @@ StrCpy $Name_SectionGroupAudio "Fichiers Audio"
 StrCpy $Name_SectionGroupVideo "Fichiers Video"
 StrCpy $Name_SectionGroupOther "Autres"
 StrCpy $Name_Section07 "Menus contextuels"
-StrCpy $Name_Section08 "Effacer les preferences et le cache"
+StrCpy $Name_Section08 "Effacer les préférences et le cache"
 
 StrCpy $Desc_Section01 \
     "Le lecteur multimédia"
@@ -46,7 +46,7 @@ StrCpy $ShellAssociation_Play "Lire"
 StrCpy $ContextMenuEntry_PlayWith "Lire avec VLC"
 StrCpy $ContextMenuEntry_AddToPlaylist "Ajouter à la liste de lecture de VLC"
 
-StrCpy $Link_VisitWebsite "Visitez le site de VideoLAN"
+StrCpy $Link_VisitWebsite "Visitez le site du lecteur de médias VLC"
 
 StrCpy $Name_InstTypeRecommended "Recommandée"
 StrCpy $Name_InstTypeMinimum "Minimale"
@@ -54,3 +54,10 @@ StrCpy $Name_InstTypeFull "Complète"
 
 StrCpy $Action_OnArrivalDVD "Lecture DVD"
 StrCpy $Action_OnArrivalAudioCD "Lecture CD Audio"
+StrCpy $Action_OnArrivalVCDMovie "Lecture VCD"
+StrCpy $Action_OnArrivalSVCDMovie "Lecture SVCD"
+StrCpy $Action_OnArrivalVideoFiles "Lecture des fichiers vidéo"
+StrCpy $Action_OnArrivalMusicFiles "Lecture des fichiers audio"
+StrCpy $Action_OnArrivalDVDAudio "Lecture DVD audio"
+
+StrCpy $License_NextText "Vous connnaissez  maintenant vos droits. Cliquez sur Suivant pour continuer."
