@@ -1,7 +1,7 @@
 /*****************************************************************************
 * eyetv.h: small class to control the notification parts of the EyeTV plugin
 *****************************************************************************
-* Copyright (C) 2006-2007 the VideoLAN team
+* Copyright (C) 2006-2007 VLC authors and VideoLAN
 * $Id$
 *
 * Authors: Felix Kühne <fkuehne at videolan dot org>

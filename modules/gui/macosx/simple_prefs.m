@@ -1,7 +1,7 @@
 /*****************************************************************************
 * simple_prefs.m: Simple Preferences for Mac OS X
 *****************************************************************************
-* Copyright (C) 2008-2011 the VideoLAN team
+* Copyright (C) 2008-2011 VLC authors and VideoLAN
 * $Id$
 *
 * Authors: Felix Paul Kühne <fkuehne at videolan dot org>

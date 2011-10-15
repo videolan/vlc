@@ -1,7 +1,7 @@
 /*****************************************************************************
  * intf.h: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2002-2011 the VideoLAN team
+ * Copyright (C) 2002-2011 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>

@@ -1,7 +1,7 @@
 /*****************************************************************************
  * macosx.m: Mac OS X module for vlc
  *****************************************************************************
- * Copyright (C) 2001-2011 the VideoLAN team
+ * Copyright (C) 2001-2011 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Colin Delacroix <colin@zoy.org>

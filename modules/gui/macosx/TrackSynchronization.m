@@ -1,7 +1,7 @@
 /*****************************************************************************
  * TrackSynchronization.m: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2011 VideoLAN
+ * Copyright (C) 2011 VLC authors and VideoLAN
  * Copyright (C) 2011 Felix Paul Kühne
  * $Id$
  *

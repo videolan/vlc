@@ -1,7 +1,7 @@
 /*****************************************************************************
  * playlistinfo.h: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2002-2008 the VideoLAN team
+ * Copyright (C) 2002-2008 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Benjamin Pracht <bigben at videolan dot org>

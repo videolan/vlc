@@ -1,7 +1,7 @@
 /*****************************************************************************
  * AudioEffects.h: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2004-2011 the VideoLAN team
+ * Copyright (C) 2004-2011 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Felix Paul Kühne <fkuehne -at- videolan -dot- org>
@@ -47,6 +47,22 @@
     IBOutlet id o_eq_band9_sld;
     IBOutlet id o_eq_band10_sld;
     IBOutlet id o_eq_preamp_sld;
+
+    /* equalizer presets */
+    IBOutlet id o_eqp_panel;
+    IBOutlet id o_eqp_ok_btn;
+    IBOutlet id o_eqp_cancel_btn;
+    IBOutlet id o_eqp_new_lbl;
+    IBOutlet id o_eqp_new_fld;
+    IBOutlet id o_eq_manage_panel;
+    IBOutlet id o_eq_manage_ok_btn;
+    IBOutlet id o_eq_manage_cancel_btn;
+    IBOutlet id o_eq_manage_rename_btn;
+    IBOutlet id o_eq_manage_delete_btn;
+    IBOutlet id o_eq_manage_table;
+    NSMutableArray *o_eq_custom_presets;
+    NSMutableArray *o_eq_custom_presetnames;
+    NSInteger i_to_be_renamed_preset;
 
     /* Compressor */
     IBOutlet id o_comp_enable_ckb;
@@ -106,6 +122,7 @@
 
 /* Equalizer */
 - (void)setupEqualizer;
+- (void)rebuildEqMenu;
 - (void)equalizerUpdated;
 - (void)setBandSlidersValues:(float *)values;
 - (void)initBandSliders;
@@ -115,6 +132,10 @@
 - (IBAction)eq_enable:(id)sender;
 - (IBAction)eq_preampSliderUpdated:(id)sender;
 - (IBAction)eq_twopass:(id)sender;
+- (IBAction)eq_nameButtonAction:(id)sender;
+- (IBAction)eq_manageAction:(id)sender;
+- (NSInteger)numberOfRowsInTableView:(NSTableView *)aTableView;
+- (id)tableView:(NSTableView *)aTableView objectValueForTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex;
 
 /* Compressor */
 - (void)resetCompressor;

@@ -1,7 +1,7 @@
 /*****************************************************************************
  * MainWindow.h: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2002-2011 VideoLAN
+ * Copyright (C) 2002-2011 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Felix Paul Kühne <fkuehne -at- videolan -dot- org>

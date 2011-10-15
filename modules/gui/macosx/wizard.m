@@ -1,7 +1,7 @@
 /*****************************************************************************
  * wizard.m: MacOS X Streaming Wizard
  *****************************************************************************
- * Copyright (C) 2005-2009 the VideoLAN team
+ * Copyright (C) 2005-2009 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Felix Kühne <fkuehne at videolan dot org>

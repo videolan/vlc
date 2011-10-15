@@ -1,7 +1,7 @@
 /*****************************************************************************
  * coredialogs.m: Mac OS X Core Dialogs
  *****************************************************************************
- * Copyright (C) 2005-2009 the VideoLAN team
+ * Copyright (C) 2005-2009 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Derk-Jan Hartman <hartman at videolan dot org>
