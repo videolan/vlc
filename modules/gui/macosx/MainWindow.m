@@ -1410,6 +1410,18 @@ static VLCMainWindow *_o_sharedInstance = nil;
 }
 
 #pragma mark -
+#pragma mark Lion's native fullscreen handling
+- (void)windowWillEnterFullScreen:(NSNotification *)notification
+{
+    [NSCursor setHiddenUntilMouseMoves: YES];
+}
+
+- (void)windowWillExitFullScreen:(NSNotification *)notification
+{
+    [NSCursor setHiddenUntilMouseMoves: NO];
+}
+
+#pragma mark -
 #pragma mark Side Bar Data handling
 /* taken under BSD-new from the PXSourceList sample project, adapted for VLC */
 - (NSUInteger)sourceList:(PXSourceList*)sourceList numberOfChildrenOfItem:(id)item

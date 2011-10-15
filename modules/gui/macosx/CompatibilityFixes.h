@@ -77,6 +77,8 @@ enum {
 @interface NSWindow (IntroducedInLion)
 - (void)setRestorable:(BOOL)b_value;
 - (void)toggleFullScreen:(id)id_value;
+- (void)windowWillEnterFullScreen:(NSNotification *)notification;
+- (void)windowWillExitFullScreen:(NSNotification *)notification;
 @end
 
 @interface NSEvent (IntroducedInLion)

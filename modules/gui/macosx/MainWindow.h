@@ -160,6 +160,10 @@
 - (void)hasBecomeFullscreen;
 - (void)setFrameOnMainThread:(NSData*)packedargs;
 
+/* lion's native fullscreen handling */
+- (void)windowWillEnterFullScreen:(NSNotification *)notification;
+- (void)windowWillExitFullScreen:(NSNotification *)notification;
+
 @end
 
 @interface VLCProgressBarGradientEffect : NSView {
