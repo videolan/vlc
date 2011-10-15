@@ -1440,7 +1440,10 @@ unsigned int CocoaKeyToVLC( unichar i_key )
         else
         {
             if (state == END_S)
+            {
+                var_DelCallback( p_input, "intf-event", InputEvent, [VLCMain sharedInstance] );
                 [o_mainmenu setSubmenusEnabled: FALSE];
+            }
             [[self mainMenu] setPlay];
             [o_mainwindow setPlay];
         }
