@@ -6,7 +6,6 @@
  *
  * Authors: Felix Paul Kühne <fkuehne -at- videolan -dot- org>
  *          Jérôme Decoodt <djc@videolan.org>
- *          
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -54,20 +53,10 @@ static VLCAudioEffects *_o_sharedInstance = nil;
         [self dealloc];
     } else {
         p_intf = VLCIntf;
-        o_eq_custom_presets = [[NSMutableArray alloc] init];
-        o_eq_custom_presetnames = [[NSMutableArray alloc] init];
         _o_sharedInstance = [super init];
     }
     
     return _o_sharedInstance;
-}
-
-- (void)dealloc
-{
-    [o_eq_custom_presets release];
-    [o_eq_custom_presetnames release];
-
-    [super dealloc];
 }
 
 - (void)awakeFromNib
@@ -77,16 +66,12 @@ static VLCAudioEffects *_o_sharedInstance = nil;
     [o_eq_enable_ckb setTitle:_NS("Enable")];
     [o_eq_twopass_ckb setTitle:_NS("2 Pass")];
     [o_eq_preamp_lbl setStringValue:_NS("Preamp")];
-    [self rebuildEqMenu];
-    [o_eqp_panel setTitle: _NS("New Preset Name")];
-    [o_eqp_ok_btn setTitle: _NS("OK")];
-    [o_eqp_cancel_btn setTitle: _NS("Cancel")];
-    [o_eqp_new_lbl setStringValue: _NS("New Preset Name")];
-    [o_eq_manage_panel setTitle: _NS("Manage Presets")];
-    [o_eq_manage_ok_btn setTitle: _NS("OK")];
-    [o_eq_manage_cancel_btn setTitle: _NS("Cancel")];
-    [o_eq_manage_rename_btn setTitle: _NS("Rename")];
-    [o_eq_manage_delete_btn setTitle: _NS("Delete")];
+    [o_eq_presets_popup removeAllItems];
+    for( int i = 0; i < NB_PRESETS ; i++ )
+    {
+        [o_eq_presets_popup addItemWithTitle: _NS(preset_list_text[i])];
+        [[o_eq_presets_popup lastItem] setTag: i];
+    }
 
     /* Compressor */
     [o_comp_enable_ckb setTitle:_NS("Enable dynamic range compressor")];
@@ -204,7 +189,7 @@ static bool GetEqualizerStatus( intf_thread_t *p_custom_intf,
 {
     vlc_object_t *p_object= VLC_OBJECT(getAout());
     if( p_object == NULL )
-        p_object = vlc_object_hold(pl_Get( VLCIntf ));
+        p_object = pl_Get( VLCIntf );
 
     if( p_object )
     {
@@ -248,35 +233,9 @@ static bool GetEqualizerStatus( intf_thread_t *p_custom_intf,
             }
         }
         free( psz_preset );
-        vlc_object_release( p_object );
     }
 
     [self equalizerUpdated];
-}
-
-- (void)rebuildEqMenu
-{
-    [o_eq_presets_popup removeAllItems];
-    [o_eq_presets_popup addItemWithTitle: _NS("Add Preset")];
-    [[o_eq_presets_popup lastItem] setTag: 300];
-    [o_eq_presets_popup addItemWithTitle: _NS("Manage Presets")];
-    [[o_eq_presets_popup lastItem] setTag: 301];
-    [[o_eq_presets_popup menu] addItem: [NSMenuItem separatorItem]];
-    for (int i = 0; i < NB_PRESETS ; i++)
-    {
-        [o_eq_presets_popup addItemWithTitle: _NS(preset_list_text[i])];
-        [[o_eq_presets_popup lastItem] setTag: i];
-    }
-    if ([o_eq_custom_presetnames count] > 0)
-    {
-        [[o_eq_presets_popup menu] addItem: [NSMenuItem separatorItem]];
-        NSUInteger count = [o_eq_custom_presetnames count];
-        for (unsigned int i = 0; i < count; i++)
-        {
-            [o_eq_presets_popup addItemWithTitle: [o_eq_custom_presetnames objectAtIndex:i]];
-            [[o_eq_presets_popup lastItem] setTag: i + 200];
-        }
-    }
 }
 
 - (void)equalizerUpdated
@@ -400,52 +359,33 @@ static bool GetEqualizerStatus( intf_thread_t *p_custom_intf,
 }
 - (IBAction)eq_changePreset:(id)sender
 {
+    vlc_object_t *p_object= VLC_OBJECT(getAout());
+    if( p_object == NULL )
+        p_object = vlc_object_hold(pl_Get( p_intf ));
     NSInteger numberOfChosenPreset = [[sender selectedItem] tag];
-    if (numberOfChosenPreset == 300)
+
+    var_SetString( p_object , "equalizer-preset" , preset_list[numberOfChosenPreset] );
+
+    NSString *preset = @"";
+    const char *psz_values;
+    for( int i = 0; i < EQZ_BANDS_MAX; i++ )
     {
-        // add new preset
-        i_to_be_renamed_preset = -1;
-        [NSApp runModalForWindow: o_eqp_panel];
+        preset = [preset stringByAppendingFormat:@"%.1f ", eqz_preset_10b[numberOfChosenPreset].f_amp[i] ];
     }
-    else if(numberOfChosenPreset == 301)
-    {
-        // manage presets
-        [o_eq_manage_table reloadData];
-        [NSApp runModalForWindow: o_eq_manage_panel];
-    }
-    else if(numberOfChosenPreset >= 200)
-    {
-        // custom preset, TODO
-    }
-    else
-    {
-        vlc_object_t *p_object= VLC_OBJECT(getAout());
-        if( p_object == NULL )
-            p_object = vlc_object_hold(pl_Get( p_intf ));
+    psz_values = [preset UTF8String];
+    var_SetString( p_object, "equalizer-bands", psz_values );
+    var_SetFloat( p_object, "equalizer-preamp", eqz_preset_10b[[[sender selectedItem] tag]].f_preamp);
 
-        var_SetString( p_object , "equalizer-preset" , preset_list[numberOfChosenPreset] );
+    [o_eq_preamp_sld setFloatValue: eqz_preset_10b[numberOfChosenPreset].f_preamp];
 
-        NSString *preset = @"";
-        const char *psz_values;
-        for( int i = 0; i < EQZ_BANDS_MAX; i++ )
-        {
-            preset = [preset stringByAppendingFormat:@"%.1f ", eqz_preset_10b[numberOfChosenPreset].f_amp[i] ];
-        }
-        psz_values = [preset UTF8String];
-        var_SetString( p_object, "equalizer-bands", psz_values );
-        var_SetFloat( p_object, "equalizer-preamp", eqz_preset_10b[numberOfChosenPreset].f_preamp);
+    [self setBandSlidersValues:(float *)eqz_preset_10b[numberOfChosenPreset].f_amp];
 
-        [o_eq_preamp_sld setFloatValue: eqz_preset_10b[numberOfChosenPreset].f_preamp];
+    /* save changed to config */
+    config_PutPsz( p_intf, "equalizer-bands", psz_values );
+    config_PutFloat( p_intf, "equalizer-preamp", eqz_preset_10b[numberOfChosenPreset].f_preamp );
+    config_PutPsz( p_intf, "equalizer-preset", preset_list[numberOfChosenPreset] );
 
-        [self setBandSlidersValues:(float *)eqz_preset_10b[numberOfChosenPreset].f_amp];
-
-        /* save changed to config */
-        config_PutPsz( p_intf, "equalizer-bands", psz_values );
-        config_PutFloat( p_intf, "equalizer-preamp", eqz_preset_10b[numberOfChosenPreset].f_preamp );
-        config_PutPsz( p_intf, "equalizer-preset", preset_list[numberOfChosenPreset] );
-
-        vlc_object_release( p_object );
-    }
+    vlc_object_release( p_object );
 }
 - (IBAction)eq_preampSliderUpdated:(id)sender
 {
@@ -476,64 +416,6 @@ static bool GetEqualizerStatus( intf_thread_t *p_custom_intf,
     config_PutInt( p_intf, "equalizer-2pass", (int)b_2p );
 
     vlc_object_release( p_object );
-}
-
-- (IBAction)eq_nameButtonAction:(id)sender
-{
-    [NSApp stopModal];
-    [[sender window] orderOut:sender];
-
-    if (sender == o_eqp_ok_btn)
-    {
-        if (i_to_be_renamed_preset != -1)
-        {
-            // rename existing preset
-            [o_eq_custom_presetnames replaceObjectAtIndex:i_to_be_renamed_preset withObject:[o_eqp_new_fld stringValue]];
-            [o_eq_manage_table reloadData];
-            [self rebuildEqMenu];
-        }
-        else
-        {
-            // add new preset
-            [o_eq_custom_presetnames addObject: [o_eqp_new_fld stringValue]];
-            [self rebuildEqMenu];
-
-            // TODO
-        }
-    }
-}
-
-- (IBAction)eq_manageAction:(id)sender
-{
-    if (sender == o_eq_manage_cancel_btn || sender == o_eq_manage_ok_btn) {
-        [NSApp stopModal];
-        [[sender window] orderOut:sender];
-    }
-    else if( sender == o_eq_manage_delete_btn )
-    {
-        [o_eq_custom_presets removeObjectAtIndex: [o_eq_manage_table selectedRow]];
-        [o_eq_custom_presetnames removeObjectAtIndex: [o_eq_manage_table selectedRow]];
-        [o_eq_manage_table reloadData];
-        [self rebuildEqMenu];
-    }
-    else
-    {
-        i_to_be_renamed_preset = [o_eq_manage_table selectedRow];
-        [o_eqp_new_fld setStringValue: [o_eq_custom_presetnames objectAtIndex: i_to_be_renamed_preset]];
-        [NSApp stopModal];
-        [[sender window] orderOut:sender];
-        [NSApp runModalForWindow: o_eqp_panel];
-    }
-}
-
-- (NSInteger)numberOfRowsInTableView:(NSTableView *)aTableView
-{
-    return [o_eq_custom_presets count];
-}
-
-- (id)tableView:(NSTableView *)aTableView objectValueForTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
-{
-    return [o_eq_custom_presetnames objectAtIndex:rowIndex];
 }
 
 #pragma mark -
