@@ -661,7 +661,8 @@ void MainInterface::releaseVideoSlot( void )
 
     if( stackCentralW->currentWidget() == videoWidget )
         restoreStackOldWidget();
-    else if( playlistWidget->artContainer->currentWidget() == videoWidget )
+    else if( playlistWidget &&
+             playlistWidget->artContainer->currentWidget() == videoWidget )
     {
         playlistWidget->artContainer->setCurrentIndex( 0 );
         stackCentralW->addWidget( videoWidget );
