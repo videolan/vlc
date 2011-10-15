@@ -1,7 +1,7 @@
 /*****************************************************************************
  * fspanel.m: MacOS X full screen panel
  *****************************************************************************
- * Copyright (C) 2006-2008 the VideoLAN team
+ * Copyright (C) 2006-2011 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Jérôme Decoodt <djc at videolan dot org>
@@ -56,7 +56,6 @@
     /* let the window sit on top of everything else and start out completely transparent */
     [win setLevel:NSModalPanelWindowLevel];
     i_device = 0;
-    [win center];
     hideAgainTimer = fadeTimer = nil;
     [self setNonActive:nil];
     return win;
@@ -71,6 +70,8 @@
         [self mouseEntered:NULL];
     if (!isInside)
         [self mouseExited:NULL];
+
+    [self center];
     
     /* get a notification if VLC isn't the active app anymore */
     [[NSNotificationCenter defaultCenter]
@@ -129,9 +130,14 @@
     }
 
     theScreensFrame = [screen frame];
-
     theWindowsFrame = [self frame];
     
+    if( theScreensFrame.size.width >= 1920 ) //  17" MBP, 24"/27" iMacs, external displays
+        b_usingBigScreen = YES;
+
+    if( (b_usingBigScreen && theWindowsFrame.size.width < 820) || (!b_usingBigScreen && theWindowsFrame.size.width > 550) )
+        [self adaptWindowSizeToScreen];
+
     theCoordinate.x = (theScreensFrame.size.width - theWindowsFrame.size.width) / 2 + theScreensFrame.origin.x;
     theCoordinate.y = (theScreensFrame.size.height / 3) - theWindowsFrame.size.height + theScreensFrame.origin.y;
     [self setFrameTopLeftPoint: theCoordinate];
@@ -380,6 +386,25 @@
         [self center];
     }
 }
+
+- (void)adaptWindowSizeToScreen
+{
+    NSRect theWindowsFrame = [self frame];
+    if( b_usingBigScreen )
+    {
+        theWindowsFrame.size.width = 824;
+        theWindowsFrame.size.height = 131;
+    }
+    else
+    {
+        theWindowsFrame.size.width = 549;
+        theWindowsFrame.size.height = 87;
+    }
+
+    [[self contentView] adaptViewSizeToScreen: b_usingBigScreen];
+
+    [self setFrame:theWindowsFrame display:YES animate:YES];
+}
 @end
 
 /*****************************************************************************
@@ -402,7 +427,7 @@
     [o_button setAction: @selector(action:)];                                                   \
     [self addSubview:o_button];
 
-#define addTextfield( class, o_text, align, font, color, size )                                    \
+#define addTextfield( class, o_text, align, font, color )                                    \
     o_text = [[class alloc] initWithFrame: s_rc];                            \
     [o_text setDrawsBackground: NO];                                                        \
     [o_text setBordered: NO];                                                               \
@@ -411,8 +436,21 @@
     [o_text setStringValue: _NS("(no item is being played)")];                                                    \
     [o_text setAlignment: align];                                                           \
     [o_text setTextColor: [NSColor color]];                                                 \
-    [o_text setFont:[NSFont font:[NSFont smallSystemFontSize] - size]];                     \
+    [o_text setFont:[NSFont font:[NSFont smallSystemFontSize]]];                     \
     [self addSubview:o_text];
+
+#define restyleButton( o_button, imageOff, imageOn, _x, _y ) \
+    [o_button setFrameOrigin: NSMakePoint( _x, _y )]; \
+    [o_button setImage: [NSImage imageNamed: imageOff]]; \
+    [o_button setAlternateImage: [NSImage imageNamed: imageOn]]; \
+    [o_button sizeToFit]; \
+    [o_button setNeedsDisplay: YES]
+
+#define restyleTextfieldOrSlider( o_field, _x, _y, _w, _h ) \
+    [o_field setFrameOrigin: NSMakePoint( _x, _y )]; \
+    [o_field setFrameSize: NSMakeSize( _w, _h )]; \
+    [o_field setNeedsDisplay: YES]
+
 
 - (id)initWithFrame:(NSRect)frameRect
 {
@@ -447,7 +485,7 @@
     /* volume slider */
     s_rc = [self frame];
     s_rc.origin.x = 26;
-    s_rc.origin.y = 18.5;
+    s_rc.origin.y = 20;
     s_rc.size.width = 95;
     s_rc.size.height = 10;
     o_fs_volumeSlider = [[VLCFSVolumeSlider alloc] initWithFrame: s_rc];
@@ -465,11 +503,11 @@
     s_rc.origin.y = 64;
     s_rc.size.width = 352;
     s_rc.size.height = 14;
-    addTextfield( NSTextField, o_streamTitle_txt, NSCenterTextAlignment, systemFontOfSize, whiteColor, 0 );
+    addTextfield( NSTextField, o_streamTitle_txt, NSCenterTextAlignment, systemFontOfSize, whiteColor );
     s_rc.origin.x = 481;
     s_rc.origin.y = 64;
     s_rc.size.width = 55;
-    addTextfield( VLCTimeField, o_streamPosition_txt, NSRightTextAlignment, systemFontOfSize, whiteColor, 0 );
+    addTextfield( VLCTimeField, o_streamPosition_txt, NSRightTextAlignment, systemFontOfSize, whiteColor );
 
     return view;
 }
@@ -491,14 +529,30 @@
 
 - (void)setPlay
 {
-    [o_play setImage:[NSImage imageNamed:@"fs_play"]];
-    [o_play setAlternateImage: [NSImage imageNamed:@"fs_play_highlight"]];
+    if( b_usingBigScreen )
+    {
+        [o_play setImage:[NSImage imageNamed:@"fs_play@x1.5"]];
+        [o_play setAlternateImage: [NSImage imageNamed:@"fs_play_highlight@x1.5"]];
+    }
+    else
+    {
+        [o_play setImage:[NSImage imageNamed:@"fs_play"]];
+        [o_play setAlternateImage: [NSImage imageNamed:@"fs_play_highlight"]];
+    }
 }
 
 - (void)setPause
 {
-    [o_play setImage: [NSImage imageNamed:@"fs_pause"]];
-    [o_play setAlternateImage: [NSImage imageNamed:@"fs_pause_highlight"]];
+    if( b_usingBigScreen )
+    {
+        [o_play setImage: [NSImage imageNamed:@"fs_pause@x1.5"]];
+        [o_play setAlternateImage: [NSImage imageNamed:@"fs_pause_highlight@x1.5"]];
+    }
+    else
+    {
+        [o_play setImage: [NSImage imageNamed:@"fs_pause"]];
+        [o_play setAlternateImage: [NSImage imageNamed:@"fs_pause_highlight"]];
+    }
 }
 
 - (void)setStreamTitle:(NSString *)o_title
@@ -590,11 +644,58 @@
     NSRect frame = [self frame];
     NSRect image_rect;
     NSImage *img;
-    addImage( @"fs_background", 0, 0, NSCompositeCopy, 0 );
-    addImage( @"fs_volume_slider_bar", 26, 22, NSCompositeSourceOver, 0 );
-    addImage( @"fs_volume_mute", 16, 18, NSCompositeSourceOver, 0 );
-    addImage( @"fs_volume_max", 124, 17, NSCompositeSourceOver, 0 );
-    addImage( @"fs_time_slider", 15, 53, NSCompositeSourceOver, 0);
+    if (b_usingBigScreen)
+    {
+        addImage( @"fs_background@x1.5", 0, 0, NSCompositeCopy, 0 );
+        addImage( @"fs_volume_slider_bar@x1.5", 39, 35.5, NSCompositeSourceOver, 0 );
+        addImage( @"fs_volume_mute@x1.5", 24, 27, NSCompositeSourceOver, 0 );
+        addImage( @"fs_volume_max@x1.5", 186, 27, NSCompositeSourceOver, 0 );
+        addImage( @"fs_time_slider@x1.5", 22.5, 79.5, NSCompositeSourceOver, 0);
+    }
+    else
+    {
+        addImage( @"fs_background", 0, 0, NSCompositeCopy, 0 );
+        addImage( @"fs_volume_slider_bar", 26, 23, NSCompositeSourceOver, 0 );
+        addImage( @"fs_volume_mute", 16, 18, NSCompositeSourceOver, 0 );
+        addImage( @"fs_volume_max", 124, 18, NSCompositeSourceOver, 0 );
+        addImage( @"fs_time_slider", 15, 53, NSCompositeSourceOver, 0);
+    }
+}
+
+- (void)adaptViewSizeToScreen:(BOOL)b_value
+{
+    b_usingBigScreen = b_value;
+
+    if (b_usingBigScreen)
+    {
+        restyleButton( o_prev, @"fs_skip_previous@x1.5", @"fs_skip_previous_highlight@x1.5", 261, 22.5 );
+        restyleButton( o_bwd, @"fs_rewind@x1.5", @"fs_rewind_highlight@x1.5", 316.5, 21 );
+        restyleButton( o_play, @"fs_play@x1.5", @"fs_play_highlight@x1.5", 400.5, 15 );
+        restyleButton( o_fwd, @"fs_forward@x1.5", @"fs_forward_highlight@x1.5", 469.5, 21 );
+        restyleButton( o_next, @"fs_skip_next@x1.5", @"fs_skip_next_highlight@x1.5", 547.5, 22.5 );
+        restyleButton( o_fullscreen, @"fs_exit_fullscreen@x1.5", @"fs_exit_fullscreen_hightlight@x1.5", 765.5, 19.5 );
+        restyleTextfieldOrSlider( o_streamTitle_txt, 148, 96, 528, 21 );
+        [o_streamTitle_txt setFont:[NSFont systemFontOfSize:[NSFont systemFontSize]]];
+        restyleTextfieldOrSlider( o_streamPosition_txt, 718, 96, 82.5, 21 );
+        [o_streamPosition_txt setFont:[NSFont systemFontOfSize:[NSFont systemFontSize]]];
+        restyleTextfieldOrSlider( o_fs_timeSlider, 22.5, 82.5, 777, 13.5 );
+        restyleTextfieldOrSlider( o_fs_volumeSlider, 39, 32, 142.5, 15);
+    }
+    else
+    {
+        restyleButton( o_prev, @"fs_skip_previous", @"fs_skip_previous_highlight", 174, 15 );
+        restyleButton( o_bwd, @"fs_rewind", @"fs_rewind_highlight", 211, 14 );
+        restyleButton( o_play, @"fs_play", @"fs_play_highlight", 267, 10 );
+        restyleButton( o_fwd, @"fs_forward", @"fs_forward_highlight", 313, 14 );
+        restyleButton( o_next, @"fs_skip_next", @"fs_skip_next_highlight", 365, 15 );
+        restyleButton( o_fullscreen, @"fs_exit_fullscreen", @"fs_exit_fullscreen_hightlight", 507, 13 );
+        restyleTextfieldOrSlider( o_streamTitle_txt, 98, 64, 352, 14 );
+        [o_streamTitle_txt setFont:[NSFont systemFontOfSize:[NSFont smallSystemFontSize]]];
+        restyleTextfieldOrSlider( o_streamPosition_txt, 481, 64, 55, 14);
+        [o_streamPosition_txt setFont:[NSFont systemFontOfSize:[NSFont smallSystemFontSize]]];
+        restyleTextfieldOrSlider( o_fs_timeSlider, 15, 55, 518, 9 );
+        restyleTextfieldOrSlider( o_fs_volumeSlider, 26, 20, 95, 10);
+    }
 }
 
 @end
