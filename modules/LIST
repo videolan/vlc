@@ -296,6 +296,7 @@ $Id$
  * smf: Standard MIDI file demuxer
  * spatializer: A spatializer audio filter
  * speex: a speex audio decoder/packetizer using the libspeex library
+ * speex_resampler: audio resampler using the libspeexdsp library
  * spudec: RLE DVD subtitles decoder
  * sqlite: manage an SQLite database
  * stats: Stats encoder function

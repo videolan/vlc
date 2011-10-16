@@ -306,6 +306,7 @@ modules/audio_filter/normvol.c
 modules/audio_filter/param_eq.c
 modules/audio_filter/resampler/bandlimited.c
 modules/audio_filter/resampler/bandlimited.h
+modules/audio_filter/resampler/speex.c
 modules/audio_filter/resampler/src.c
 modules/audio_filter/resampler/ugly.c
 modules/audio_filter/scaletempo.c

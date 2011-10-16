@@ -134,6 +134,7 @@ Audio Output and Filters:
  * New audio output in memory (amem)
  * Important simplification and improvements in the core audio output
  * New audio output based on OpenSL ES API for Android
+ * New audio resampler using Speex (DSP)
  * New audio resampler using the Secret Rabbit Code (a.k.a. libsamplerate)
  * New Compressor filter, a dynamic range compressor
  * New simplistic Karaoke filter

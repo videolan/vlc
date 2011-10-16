@@ -2843,9 +2843,20 @@ then
 fi
 
 dnl
-dnl  Speex plugin
+dnl  Speex plugins
 dnl
-PKG_ENABLE_MODULES_VLC([SPEEX], [], [ogg speex >= 1.0.5], [Speex decoder support], [auto])
+PKG_ENABLE_MODULES_VLC([SPEEX], [], [ogg speex >= 1.0.5], [Speex support], [auto])
+have_speexdsp="no"
+AS_IF([test "${enable_speex}" != "no"], [
+  PKG_CHECK_MODULES([SPEEXDSP], [speexdsp], [
+    have_speexdsp="yes"
+  ], [
+    AS_IF([test "${enable_speex}" = "yes"], [
+      AC_MSG_ERROR([${SPEEXDSP_PKG_ERRORS}.])
+    ])
+  ])
+])
+AM_CONDITIONAL([HAVE_SPEEXDSP], [test "$have_speexdsp" = "yes"])
 
 dnl
 dnl  theora decoder plugin
