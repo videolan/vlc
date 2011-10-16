@@ -697,10 +697,10 @@ function client_command( client )
     elseif string.sub(cmd,0,1)=='@'
     and call_object_command(string.sub(cmd,2,#cmd),client,arg) == 0 then
         --
+    elseif call_vlm_command(cmd,client,arg) == 0 then
+        --
     elseif client.type == host.client_type.stdio
     and call_libvlc_command(cmd,client,arg) == 0 then
-        --
-    elseif call_vlm_command(cmd,client,arg) == 0 then
         --
     else
         local choices = {}
