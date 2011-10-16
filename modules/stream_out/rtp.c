@@ -257,9 +257,9 @@ vlc_module_begin ()
                  RTSP_HOST_LONGTEXT, true )
     add_integer( "rtsp-timeout", 60, RTSP_TIMEOUT_TEXT,
                  RTSP_TIMEOUT_LONGTEXT, true )
-    add_string( SOUT_CFG_PREFIX "user", "",
+    add_string( "sout-rtsp-user", "",
                 RTSP_USER_TEXT, RTSP_USER_LONGTEXT, true )
-    add_password( SOUT_CFG_PREFIX "pwd", "",
+    add_password( "sout-rtsp-pwd", "",
                   RTSP_PASS_TEXT, RTSP_PASS_LONGTEXT, true )
 
 vlc_module_end ()
