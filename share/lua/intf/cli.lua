@@ -658,8 +658,13 @@ function call_vlm_command(cmd,client,arg)
         cmd = cmd.." "..arg
     end
     local message, vlc_err = vlm:execute_command( cmd )
+    -- the VLM doesn't let us know if the command exists,
+    -- so we need this ugly hack
+    if vlc_err ~= 0 and message.value == "Unknown VLM command" then
+        return vlc_err
+    end
     vlm_message_to_string( client, message )
-    return vlc_err
+    return 0
 end
 
 function call_libvlc_command(cmd,client,arg)
