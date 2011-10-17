@@ -856,7 +856,7 @@ case "${SYS}" in
 if test "${enable_dbus}" != "no" -a "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"
 then
   dnl api stable dbus
-  PKG_CHECK_MODULES(DBUS, dbus-1 >= 1.0.0,
+  PKG_CHECK_MODULES(DBUS, [dbus-1 >= 1.0.0],
     [ AC_DEFINE( HAVE_DBUS, 1, [Define if you have the D-BUS library] )
       VLC_ADD_LIBS([libvlccore],[$DBUS_LIBS])
       VLC_ADD_CFLAGS([libvlccore],[$DBUS_CFLAGS])
@@ -883,7 +883,7 @@ then
         VLC_ADD_LIBS([inhibit],[$DBUS_LIBS])
         VLC_ADD_CFLAGS([inhibit],[$DBUS_CFLAGS])
     ],
-    [AC_MSG_ERROR([Couldn't find DBus >= 1.0.0, install libdbus-dev ?])]
+    [AC_MSG_ERROR([${DBUS_PKG_ERRORS}.])]
   )
 fi
 ;;
@@ -1586,10 +1586,11 @@ then
   PKG_CHECK_MODULES(LUA, lua5.1,
     [ have_lua=yes ],
     [
-    AC_MSG_WARN([lua5.1 not found, trying lua >= 5.1 instead])
+    AC_MSG_WARN([${LUA_PKG_ERRORS}, trying lua >= 5.1 instead])
     PKG_CHECK_MODULES(LUA, lua >= 5.1,
       [ have_lua=yes ],
       [
+        AC_MSG_WARN([${LUA_PKG_ERRORS}, trying manual detection instead])
         have_lua=yes
         AC_CHECK_HEADERS([lua.h lauxlib.h lualib.h],
           [],
@@ -1683,8 +1684,8 @@ AS_IF([test "${enable_libproxy}" != "no"], [
     VLC_ADD_CFLAGS([access_http],[$LIBPROXY_CFLAGS])
     VLC_ADD_LIBS([access_http],[$LIBPROXY_LIBS])
   ], [
-    AS_IF([test "x${enable_libproxy}" != "x"], [
-      AC_MSG_ERROR([libproxy could not be found on your system])
+    AS_IF([test -n "${enable_libproxy}"], [
+      AC_MSG_ERROR([${LIBPROXY_PKG_ERRORS}.])
     ])
   ])
 ])
@@ -1830,11 +1831,11 @@ AC_ARG_ENABLE(linsys,
     [Linux Linear Systems Ltd. SDI and HD-SDI input cards (default enabled)])])
 if test "$SYS" = "linux" -a "${enable_linsys}" != "no"; then
   VLC_ADD_PLUGIN([linsys_hdsdi])
-  PKG_CHECK_MODULES(LINSYS_SDI, zvbi-0.2 >= 0.2.28,
+  PKG_CHECK_MODULES(LINSYS_SDI, [zvbi-0.2 >= 0.2.28],
     [ VLC_ADD_LIBS([linsys_sdi],[$LINSYS_SDI_LIBS])
       VLC_ADD_CFLAGS([linsys_sdi],[$LINSYS_SDI_CFLAGS])
       VLC_ADD_PLUGIN([linsys_sdi]) ],
-    [AC_MSG_WARN([Could not find zvbi >= 0.2.28, install libzvbi-dev ?])]
+    [AC_MSG_WARN([${LINSYS_SDI_PKG_ERRORS}.])]
   )
 fi
 
@@ -1866,7 +1867,7 @@ then
     AC_CHECK_LIB(dvdnav, dvdnav_describe_title_chapters,
       AC_DEFINE(HAVE_DVDNAV_DESCRIBE_TITLE_CHAPTERS, 1, [Define if you have dvdnav_describe_title_chapters.]),
         [], [${LIBS_dvdnav}])],
-      [AC_MSG_WARN(dvdnav library not found)])
+      [AC_MSG_WARN([${DVDNAV_PKG_ERRORS}.])])
 fi
 
 dnl
@@ -1943,7 +1944,7 @@ AS_IF([test "$have_v4l2" = "yes"], [
     PKG_CHECK_MODULES(LIBV4L2, libv4l2, [
       AC_DEFINE(HAVE_LIBV4L2, 1, [Define to 1 if libv4l2 is available])
     ], [
-      AC_MSG_WARN([${LIBV4L2_PKG_ERRORS}])
+      AC_MSG_WARN([${LIBV4L2_PKG_ERRORS}.])
     ])
   ])
   AS_IF([test "${enable_pvr}" = "yes"], [
@@ -1993,12 +1994,12 @@ then
     PKG_CHECK_MODULES(LIBCDIO, [libcdio >= 0.78.2 libiso9660 >= 0.72],
       [VLC_ADD_LIBS([vcdx],[$LIBCDIO_LIBS])
          VLC_ADD_CFLAGS([vcdx],[$LIBCDIO_CFLAGS])],
-        [AC_MSG_ERROR([vcdx plugin requires libcdio >= 0.78.2 and libiso9660 >= 0.72])])
+        [AC_MSG_ERROR([${LIBCDIO_PKG_ERRORS} (required for vcdx plugin).])])
     PKG_CHECK_MODULES(LIBVCDINFO, libvcdinfo >= 0.7.22,
         [VLC_ADD_LIBS([vcdx],[$LIBVCDINFO_LIBS])
          VLC_ADD_CFLAGS([vcdx],[$LIBVCDINFO_CFLAGS])],
-      [AC_MSG_ERROR([vcdx plugin requires libvcdinfo library >= 0.7.22])])
-        VLC_ADD_PLUGIN([vcdx])
+      [AC_MSG_ERROR([${LIBVCDINFO_PKG_ERRORS} (required for vcdx plugin).])])
+    VLC_ADD_PLUGIN([vcdx])
 fi
 
 dnl
@@ -2053,13 +2054,13 @@ then
   fi
 
   if test "$enable_libcddb" != "no"; then
-    PKG_CHECK_MODULES(LIBCDDB, libcddb >= 0.9.5, [
+    PKG_CHECK_MODULES(LIBCDDB, [libcddb >= 0.9.5], [
       HAVE_LIBCDDB=yes
       AC_DEFINE(HAVE_LIBCDDB, 1, [Define this if you have libcddb installed])
       VLC_ADD_LIBS([cdda],[$LIBCDDB_LIBS])
       VLC_ADD_CFLAGS([cdda],[$LIBCDDB_CFLAGS])
       ],:
-      [AC_MSG_WARN(new enough libcddb not found. CDDB access disabled)
+      [AC_MSG_WARN([${LIBCDDB_PKG_ERRORS}: CDDB access disabled.])
       HAVE_LIBCDDB=no])
   fi
 fi
@@ -2184,17 +2185,17 @@ AS_IF([test "${enable_sid}" != "no"], [
             VLC_ADD_CFLAGS([sid], [$SID_CFLAGS])
             VLC_ADD_LIBS([sid], [$SID_LIBS] [-lresid-builder])
         ], [
-            AS_IF([test "x${enable_sid}" = "xyes"],
-                [AC_MSG_ERROR(Library libresid-builder needed for sid was not found)],
-                [AC_MSG_WARN(Library libresid-builder needed for sid was not found)]
+            AS_IF([test -n "${enable_sid}"],
+                [AC_MSG_ERROR([${SID_PKG_ERRORS} (required for sid).])],
+                [AC_MSG_WARN([${SID_PKG_ERRORS} (required for sid).])]
                 )
         ])
         CPPFLAGS="$oldCPPFLAGS"
         AC_LANG_POP(C++)
     ], [
         AS_IF([test "x${enable_sid}" = "xyes"],
-            [AC_MSG_ERROR(Library libsidplay2 needed for sid was not found)],
-            [AC_MSG_WARN(Library libsidplay2 needed for sid was not found)]
+            [AC_MSG_ERROR([${SID_PKG_ERRORS} (required for sid).])],
+            [AC_MSG_WARN([${SID_PKG_ERRORS} (required for sid).])]
             )
     ])
 ])
@@ -2277,9 +2278,9 @@ if test "${enable_mod}" != "no" ; then
           VLC_ADD_CXXFLAGS([mod],[$LIBMODPLUG_CFLAGS])
           VLC_ADD_LIBS([mod],[$LIBMODPLUG_LIBS])
     ],[
-       AS_IF([test x"${enable_mod}" = "xyes"],
-         [AC_MSG_ERROR(libmodplug not found or a broken version (0.8.8.0) was found!)],
-         [AC_MSG_WARN(libmodplug not found or a broken version (0.8.8.0) was found!)])
+       AS_IF([test -n "${enable_mod}"],
+         [AC_MSG_ERROR([${LIBMODPLUG_PKG_ERRORS}.])],
+         [AC_MSG_WARN([${LIBMODPLUG_PKG_ERRORS}.])])
     ])
 fi
 
@@ -2479,7 +2480,7 @@ AS_IF([test "${enable_avcodec}" != "no"], [
       VLC_RESTORE_FLAGS
       have_avcodec="yes"
     ],[
-      AC_MSG_ERROR([Could not find libavcodec or libavutil. Use --disable-avcodec to ignore this error.])
+      AC_MSG_ERROR([${AVCODEC_PKG_ERRORS}. Pass --disable-avcodec to ignore this error.])
   ])
 ], [
   have_avcodec="no"
@@ -2492,31 +2493,32 @@ AC_ARG_ENABLE(libva,
   [  --enable-libva          VAAPI GPU decoding support (libVA) (default auto)])
 
 AS_IF([test "${enable_libva}" != "no"], [
-  AS_IF([test "x${have_avcodec}" = "xyes"], [
-    PKG_CHECK_MODULES(LIBVA, [libva libva-x11],
-      [
-        VLC_SAVE_FLAGS
-        CPPFLAGS="${CPPFLAGS} ${AVCODEC_CFLAGS}"
-        CFLAGS="${CFLAGS} ${AVCODEC_CFLAGS}"
-        AC_CHECK_HEADERS(libavcodec/vaapi.h, [
-           VLC_ADD_LIBS([avcodec],[$LIBVA_LIBS ${X_LIBS} ${X_PRE_LIBS} -lX11])
-           VLC_ADD_CFLAGS([avcodec],[$LIBVA_CFLAGS ${X_CFLAGS}])
-           AC_DEFINE(HAVE_AVCODEC_VAAPI, 1, [Define if avcodec has to be built with VAAPI support.])
-           echo "VAAPI acceleration activated"
-        ],[
-    AS_IF([test "${enable_libva}" = "yes"],
-          [AC_MSG_ERROR([libva is present but libavcodec/vaapi.h is missing])],
-              [AC_MSG_WARN([libva is present but libavcodec/vaapi.h is missing ])])
-        ])
-        VLC_RESTORE_FLAGS
-      ],[
-    AS_IF([test "${enable_libva}" = "yes"],
-              [AC_MSG_ERROR([Could not find required libva.])],
-              [AC_MSG_WARN([libva not found  ])])
+  AS_IF([test "${have_avcodec}" != "yes"], [
+    AC_MSG_ERROR([--enable-libva and --disable-avcodec options are mutually exclusive.])
+  ])
+
+  PKG_CHECK_MODULES(LIBVA, [libva libva-x11], [
+    VLC_SAVE_FLAGS
+    CPPFLAGS="${CPPFLAGS} ${AVCODEC_CFLAGS}"
+    CFLAGS="${CFLAGS} ${AVCODEC_CFLAGS}"
+    AC_CHECK_HEADERS(libavcodec/vaapi.h, [
+      VLC_ADD_LIBS([avcodec],[$LIBVA_LIBS ${X_LIBS} ${X_PRE_LIBS} -lX11])
+      VLC_ADD_CFLAGS([avcodec],[$LIBVA_CFLAGS ${X_CFLAGS}])
+      AC_DEFINE(HAVE_AVCODEC_VAAPI, 1, [Define if avcodec has to be built with VAAPI support.])
+      AC_MSG_NOTICE([VAAPI acceleration activated])
+    ],[
+      AS_IF([test -n "${enable_libva}"], [
+        AC_MSG_ERROR([libva is present but libavcodec/vaapi.h is missing])
+      ], [
+        AC_MSG_WARN([libva is present but libavcodec/vaapi.h is missing ])
       ])
+    ])
+    VLC_RESTORE_FLAGS
   ],[
-    AS_IF([test "x${enable_libva}" != "x"], [
-      AC_MSG_ERROR([--enable-libva and --disable-avcodec options are mutually exclusive.])
+    AS_IF([test -n "${enable_libva}"], [
+      AC_MSG_ERROR([${LIBVA_PKG_ERRORS}.])
+    ], [
+      AC_MSG_WARN([${LIBVA_PKG_ERRORS}.])
     ])
   ])
 ])
@@ -2600,7 +2602,7 @@ then
       ])
       VLC_RESTORE_FLAGS
     ],[
-      AC_MSG_ERROR([Could not find libavformat or libavutil. Use --disable-avformat to ignore this error.])
+      AC_MSG_ERROR([${AVFORMAT_PKG_ERRORS}. Pass --disable-avformat to ignore this error.])
   ])
 fi
 
@@ -2627,7 +2629,7 @@ then
       ])
       VLC_RESTORE_FLAGS
     ],[
-      AC_MSG_ERROR([Could not find libswscale. Use --disable-swscale to ignore this error. Proper software scaling and some video chroma conversion will be missing.])
+      AC_MSG_ERROR([${SWSCALE_PKG_ERRORS}. Pass --disable-swscale to ignore this error. Proper software scaling and some video chroma conversion will be missing.])
   ])
 fi
 
@@ -2650,7 +2652,7 @@ then
       VLC_ADD_CFLAGS([postproc],[$POSTPROC_CFLAGS $AVUTIL_CFLAGS])
       VLC_RESTORE_FLAGS
     ],[
-      AC_MSG_ERROR([Could not find libpostproc. Use --disable-postproc to ignore this error.])
+      AC_MSG_ERROR([${POSTPROC_PKG_ERRORS}. Pass --disable-postproc to ignore this error.])
   ])
 fi
 
@@ -2853,6 +2855,8 @@ AS_IF([test "${enable_speex}" != "no"], [
   ], [
     AS_IF([test -n "${enable_speex}"], [
       AC_MSG_ERROR([${SPEEXDSP_PKG_ERRORS}.])
+    ], [
+      AC_MSG_WARN([${SPEEXDSP_PKG_ERRORS}.])
     ])
   ])
 ])
@@ -2944,7 +2948,7 @@ if test "${enable_x264}" != "no"; then
         fi
       ],[
         if test "${enable_x264}" = "yes"; then
-            AC_MSG_ERROR([Could not find libx264 >= 0.86 on your system: you may get it from http://www.videolan.org/x264.html])
+            AC_MSG_ERROR([${X264_PKG_ERRORS}: you may get it from http://www.videolan.org/x264.html])
           fi
       ])
     LDFLAGS="${LDFLAGS_save}"
@@ -2970,8 +2974,7 @@ AC_ARG_ENABLE(telx,
                   zvbi) (default enabled if zvbi is absent)]))
 
 AS_IF( [test "${enable_zvbi}" != "no"],[
-    PKG_CHECK_MODULES(ZVBI,
-        zvbi-0.2 >= 0.2.28,
+    PKG_CHECK_MODULES(ZVBI, [zvbi-0.2 >= 0.2.28],
         [
           VLC_ADD_LIBS([zvbi],[$ZVBI_LIBS])
           if test "${SYS}" = "mingw32"; then
@@ -2981,11 +2984,10 @@ AS_IF( [test "${enable_zvbi}" != "no"],[
           VLC_ADD_PLUGIN([zvbi])
           AC_DEFINE(ZVBI_COMPILED, 1, [Define if the zvbi module is built])
           AS_IF( [test "${enable_telx}" = "yes"],[
-                  AC_MSG_WARN([The zvbi and telx modules are uncompatibles.
-                               Using zvbi.])
+                  AC_MSG_WARN([The zvbi and telx modules are incompatible. Using zvbi.])
                   ])
         ],[
-          AC_MSG_WARN(ZVBI library not found. Enabling the telx module instead)
+          AC_MSG_WARN([${ZVBI_PKG_ERRORS}. Enabling the telx module instead.])
         ])
     ])
 AS_IF( [test "${enable_telx}" != "no" ],[
@@ -2998,7 +3000,7 @@ dnl
 AC_ARG_ENABLE(libass,
   [  --enable-libass         Subtitle support using libass (default enabled)])
 AS_IF( [test "${enable_libass}" != "no"], [
-  PKG_CHECK_MODULES(LIBASS, libass >= 0.9.8,
+  PKG_CHECK_MODULES(LIBASS, [libass >= 0.9.8],
       [
         VLC_ADD_LIBS([libass],[$LIBASS_LIBS])
         VLC_ADD_CFLAGS([libass],[$LIBASS_CFLAGS])
@@ -3009,7 +3011,7 @@ AS_IF( [test "${enable_libass}" != "no"], [
            VLC_ADD_LIBS([libass],[-lfontconfig])
        ])
       ],[
-        AC_MSG_WARN([LIBASS library not found])
+        AC_MSG_WARN([${LIBASS_PKG_ERRORS}.])
       ])
   ])
 
@@ -3028,8 +3030,8 @@ AS_IF([test "${enable_tiger}" != "no"], [
       AC_DEFINE(HAVE_TIGER, 1, [Define if libtiger is available.])
       VLC_ADD_CFLAGS([kate],[$TIGER_CFLAGS])
       VLC_ADD_LIBS([kate],[$TIGER_LIBS]) ],[
-        AS_IF([test "x${enable_tiger}" != "x"], [
-          AC_MSG_ERROR([libtiger does not appear to be installed on your system.])
+        AS_IF([test -n "${enable_tiger}"], [
+          AC_MSG_ERROR([${TIGER_PKG_ERRORS}.])
         ])
   ])
 ])
@@ -3083,7 +3085,7 @@ AS_IF([test "${enable_xcb}" != "no"], [
     VLC_ADD_LIBS([panoramix],[${XCB_RANDR_LIBS} ${XCB_LIBS}])
     VLC_ADD_CFLAGS([panoramix],[${XCB_RANDR_CFLAGS} ${XCB_CFLAGS}])
   ], [
-    AC_MSG_WARN([libxcb-randr not found. Panoramix filter will not be supported.])
+    AC_MSG_WARN([${XCB_RANDR_PKG_ERRORS}. Panoramix filter will not be supported.])
   ])
 
   dnl xcb-utils
@@ -3094,7 +3096,7 @@ AS_IF([test "${enable_xcb}" != "no"], [
     VLC_ADD_LIBS([globalhotkeys], [${XCB_KEYSYMS_LIBS} ${XCB_LIBS}])
     VLC_ADD_CFLAGS([xcb_window], [-DHAVE_XCB_KEYSYMS])
   ], [
-    AC_MSG_WARN([libxcb-keysyms (0.3.4 or later) not found. Hotkeys will not work.])
+    AC_MSG_WARN([${XCB_KEYSYMS_PKG_ERRORS}. Hotkeys will not work.])
   ])
 ])
 AM_CONDITIONAL([HAVE_XCB], [test "${have_xcb}" = "yes"])
@@ -3110,7 +3112,7 @@ AS_IF([test "${enable_glx}" != "no"], [
       GL_CFLAGS=""
       GL_LIBS="-lGL"
     ], [
-      AC_MSG_ERROR([GLX (libGL) cannot be found. If you do not need OpenGL with X11, use --disable-glx.])
+      AC_MSG_ERROR([${GL_PKG_ERRORS}. If you do not need OpenGL with X11, pass --disable-glx.])
     ])
   ])
   VLC_ADD_PLUGIN([xcb_glx])
@@ -3150,14 +3152,11 @@ then
           VLC_ADD_PLUGIN([sdl_image])
           VLC_ADD_LIBS([sdl_image],[${SDL_IMAGE_LIBS}])
           VLC_ADD_CFLAGS([sdl_image], [${SDL_IMAGE_CFLAGS}])],
-          [ AC_MSG_WARN([The development package for SDL_image is not installed.
-    You should install it alongside your SDL package.])
+          [ AC_MSG_WARN([${SDL_IMAGE_PKG_ERRORS}. You should install it alongside your SDL package.])
           ])
       ])
    ],[
-     AC_MSG_WARN([The development package for SDL is not present or too old.
-                  You need 1.2.10. Alternatively you can also configure with
-                  --disable-sdl.])
+     AC_MSG_WARN([${SDL_PKG_ERRORS}.])
    ])
 fi
 
@@ -3215,13 +3214,13 @@ if test "${enable_freetype}" != "no"; then
         PKG_CHECK_MODULES(FRIBIDI, fribidi, [
           VLC_ADD_CPPFLAGS([freetype skins2], [${FRIBIDI_CFLAGS} -DHAVE_FRIBIDI])
           VLC_ADD_LIBS([freetype skins2], [${FRIBIDI_LIBS}])
-        ],[AC_MSG_WARN([library fribidi not found. Bidirectional support will be disabled in freetype])])
+        ],[AC_MSG_WARN([${FRIBIDI_PKG_ERRORS}. Bidirectional support will be disabled in FreeType.])])
       fi
 
   ],[
   have_freetype=no
-  AS_IF([ test "${enable_freetype}" = "yes"],[
-    AC_MSG_ERROR([Freetype2 package cannot be detected. Install Freetype2 development or configure with --disable-freetype.])
+  AS_IF([test -n "${enable_freetype}"],[
+    AC_MSG_ERROR([${FREETYPE_PKG_ERRORS}. Install FreeType2 development or configure with --disable-freetype.])
     ])
   ])
 fi
@@ -3414,7 +3413,7 @@ if test "${enable_directfb}" = "yes"; then
         VLC_ADD_CPPFLAGS([directfb],[${CPPFLAGS_mydirectfb}])
         VLC_ADD_LIBS([directfb],[${LIBS_mydirectfb}])
     else
-        AC_MSG_ERROR([cannot find directfb headers and/or libraries ])
+        AC_MSG_ERROR([${DIRECTFB_PKG_ERRORS}.])
     fi
 fi
 
@@ -3659,7 +3658,7 @@ AS_IF([test "${enable_hildon}" = "yes"], [
       VLC_ADD_CFLAGS([hildon],[${HILDON_FM_CFLAGS} -DHAVE_HILDON_FM])
       VLC_ADD_LIBS([hildon],[${HILDON_FM_LIBS}])
     ], [
-      AC_MSG_WARN(hildon-fm-2 not found)
+      AC_MSG_WARN([${HILDON_FM_PKG_ERRORS}.])
     ])
     VLC_ADD_CFLAGS([hildon],[${HILDON_CFLAGS} ${X_CFLAGS}])
     VLC_ADD_LIBS([hildon],[${HILDON_LIBS} ${X_LIBS} ${X_PRE_LIBS} -lX11])
@@ -3667,7 +3666,7 @@ AS_IF([test "${enable_hildon}" = "yes"], [
     ALIASES="${ALIASES} mvlc"
   ], [
     AS_IF([test "${enable_hildon}" = "yes"],[
-      AC_MSG_ERROR([Hildon libraries not found])
+      AC_MSG_ERROR([${HILDON_PKG_ERRORS}.])
     ])
     enable_hildon="no"
   ])
@@ -3719,10 +3718,10 @@ AS_IF([test "${enable_qt4}" != "no"], [
     AC_PATH_PROG(RCC, rcc, rcc,`eval $PKG_CONFIG --variable=exec_prefix QtCore`/bin)
     AC_PATH_PROGS(UIC, [uic-qt4 uic], uic,`eval $PKG_CONFIG --variable=exec_prefix QtCore`/bin)
   ], [
-    AS_IF([test "${enable_qt4}" = "yes"],[
-      AC_MSG_ERROR([Qt 4 library not found])
+    AS_IF([test -n "${enable_qt4}"],[
+      AC_MSG_ERROR([${QT4_PKG_ERRORS}.])
     ],[
-      AC_MSG_WARN([Qt 4 library not found])
+      AC_MSG_WARN([${QT4_PKG_ERRORS}.])
     ])
     enable_qt4="no"
   ])
@@ -3880,7 +3879,7 @@ AS_IF([test "${enable_projectm}" != "no"],
         [ AC_MSG_WARN( [Using libprojectM version 1] )
       ])
     ],[
-      AC_MSG_WARN([libprojectM library not found])
+      AC_MSG_WARN([${PROJECTM_PKG_ERRORS}.])
     ])
   ])
 
@@ -3980,8 +3979,8 @@ AS_IF([test "${enable_gnutls}" != "no"], [
     VLC_ADD_CFLAGS([gnutls], [${GCRYPT_CFLAGS}])
     VLC_ADD_LIBS([gnutls], [$GNUTLS_LIBS])
   ], [
-    AS_IF([test "${enable_gnutls}" = "yes"], [
-      AC_MSG_ERROR([GNU TLS not present or too old (version 2.0.0 required)])
+    AS_IF([test -n "${enable_gnutls}"], [
+      AC_MSG_ERROR([${GNUTLS_PKG_ERRORS}.)])
     ])
   ])
 ])
@@ -4040,7 +4039,7 @@ AS_IF([test "${enable_taglib}" != "no"], [
     VLC_ADD_LIBS([taglib],[$TAGLIB_LIBS -lz])
     VLC_ADD_CXXFLAGS([taglib],[$TAGLIB_CFLAGS])
   ], [
-    AC_MSG_WARN(TagLib library not found)])
+    AC_MSG_WARN([${TAGLIB_PKG_ERRORS}.])])
 ])
 
 
