@@ -164,7 +164,8 @@ EbmlElement *EbmlParser::Get( void )
     }
     vlc_stream_io_callback & io_stream = (vlc_stream_io_callback &) m_es->I_O();
     uint64 i_size = io_stream.toRead();
-    m_el[mi_level] = m_es->FindNextElement( EBML_CONTEXT(m_el[mi_level - 1]), i_ulev, i_size, mb_dummy != 0, 1 );
+    m_el[mi_level] = m_es->FindNextElement( EBML_CONTEXT(m_el[mi_level - 1]),
+                                            i_ulev, i_size, mb_dummy, 1 );
 //    mi_remain_size[mi_level] = m_el[mi_level]->GetSize();
     if( i_ulev > 0 )
     {
