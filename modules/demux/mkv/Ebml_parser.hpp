@@ -34,7 +34,7 @@ class EbmlParser
 {
   public:
     EbmlParser( EbmlStream *es, EbmlElement *el_start, demux_t *p_demux );
-    virtual ~EbmlParser( void );
+    ~EbmlParser( void );
 
     void Up( void );
     void Down( void );
