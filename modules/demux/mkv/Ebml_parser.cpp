@@ -77,7 +77,7 @@ EbmlElement* EbmlParser::UnGet( uint64 i_block_pos, uint64 i_cluster_pos )
     if ( m_el[1] && m_el[1]->GetElementPosition() == i_cluster_pos )
     {
         m_es->I_O().setFilePointer( i_block_pos, seek_beginning );
-        return (EbmlMaster*) m_el[1];
+        return m_el[1];
     }
     else
     {
