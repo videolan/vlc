@@ -155,9 +155,8 @@ private:
 };
 
 class matroska_segment_c;
-class matroska_stream_c
+struct matroska_stream_c
 {
-public:
     matroska_stream_c() :p_io_callback(NULL) ,p_estream(NULL) {}
     ~matroska_stream_c()
     {
