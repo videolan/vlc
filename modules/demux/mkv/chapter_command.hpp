@@ -49,24 +49,9 @@ public:
     virtual ~chapter_codec_cmds_c()
     {
         delete p_private_data;
-        std::vector<KaxChapterProcessData*>::iterator indexe = enter_cmds.begin();
-        while ( indexe != enter_cmds.end() )
-        {
-            delete (*indexe);
-            ++indexe;
-        }
-        std::vector<KaxChapterProcessData*>::iterator indexl = leave_cmds.begin();
-        while ( indexl != leave_cmds.end() )
-        {
-            delete (*indexl);
-            ++indexl;
-        }
-        std::vector<KaxChapterProcessData*>::iterator indexd = during_cmds.begin();
-        while ( indexd != during_cmds.end() )
-        {
-            delete (*indexd);
-            ++indexd;
-        }
+        vlc_delete_all( enter_cmds );
+        vlc_delete_all( leave_cmds );
+        vlc_delete_all( during_cmds );
     }
 
     void SetPrivate( const KaxChapterProcessPrivate & private_data )
