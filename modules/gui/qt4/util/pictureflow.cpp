@@ -631,9 +631,9 @@ QRect PictureFlowSoftwareRenderer::renderSlide(const SlideInfo &slide, int col1,
 
     QString artURL;
 
-    PLModel* plm = dynamic_cast<PLModel*>( state->model );
+    PLModel* plm = qobject_cast<PLModel*>( state->model );
 #ifdef MEDIA_LIBRARY
-    MLModel* mlm = dynamic_cast<MLModel*>( state->model );
+    MLModel* mlm = qobject_cast<MLModel*>( state->model );
 #endif
     if( plm != 0 )
     {

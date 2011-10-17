@@ -245,7 +245,7 @@ void OpenDialog::showTab( int i_tab )
     show();
     if( ui.Tab->currentWidget() != NULL )
     {
-        OpenPanel *panel = dynamic_cast<OpenPanel *>( ui.Tab->currentWidget() );
+        OpenPanel *panel = qobject_cast<OpenPanel *>( ui.Tab->currentWidget() );
         assert( panel );
         panel->onFocus();
     }
@@ -285,7 +285,7 @@ void OpenDialog::signalCurrent( int i_tab )
     if( i_tab == OPEN_CAPTURE_TAB ) captureOpenPanel->initialize();
     if( ui.Tab->currentWidget() != NULL )
     {
-        OpenPanel *panel = dynamic_cast<OpenPanel *>( ui.Tab->currentWidget() );
+        OpenPanel *panel = qobject_cast<OpenPanel *>( ui.Tab->currentWidget() );
         assert( panel );
         panel->onFocus();
         panel->updateMRL();
@@ -300,7 +300,7 @@ void OpenDialog::cancel()
 {
     /* Clear the panels */
     for( int i = 0; i < OPEN_TAB_MAX; i++ )
-        dynamic_cast<OpenPanel*>( ui.Tab->widget( i ) )->clear();
+        qobject_cast<OpenPanel*>( ui.Tab->widget( i ) )->clear();
 
     /* Clear the variables */
     itemsMRL.clear();
@@ -359,7 +359,7 @@ void OpenDialog::enqueue( bool b_enqueue )
     }
 
     for( int i = 0; i < OPEN_TAB_MAX; i++ )
-        dynamic_cast<OpenPanel*>( ui.Tab->widget( i ) )->onAccept();
+        qobject_cast<OpenPanel*>( ui.Tab->widget( i ) )->onAccept();
 
     /* Sort alphabetically */
     itemsMRL.sort();
