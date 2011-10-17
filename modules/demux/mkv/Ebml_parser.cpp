@@ -116,7 +116,7 @@ void EbmlParser::Keep( void )
     mb_keep = true;
 }
 
-int EbmlParser::GetLevel( void )
+int EbmlParser::GetLevel( void ) const
 {
     return mi_user_level;
 }
@@ -193,7 +193,7 @@ EbmlElement *EbmlParser::Get( void )
     return m_el[mi_level];
 }
 
-bool EbmlParser::IsTopPresent( EbmlElement *el )
+bool EbmlParser::IsTopPresent( EbmlElement *el ) const
 {
     for( int i = 0; i < mi_level; i++ )
     {

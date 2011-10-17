@@ -43,10 +43,10 @@ class EbmlParser
     void        Keep( void );
     EbmlElement *UnGet( uint64 i_block_pos, uint64 i_cluster_pos );
 
-    int  GetLevel( void );
+    int  GetLevel( void ) const;
 
     /* Is the provided element presents in our upper elements */
-    bool IsTopPresent( EbmlElement * );
+    bool IsTopPresent( EbmlElement * ) const;
 
   private:
     EbmlStream  *m_es;
