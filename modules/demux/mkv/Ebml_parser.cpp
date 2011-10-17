@@ -29,20 +29,16 @@
 /*****************************************************************************
  * Ebml Stream parser
  *****************************************************************************/
-EbmlParser::EbmlParser( EbmlStream *es, EbmlElement *el_start, demux_t *p_demux )
+EbmlParser::EbmlParser( EbmlStream *es, EbmlElement *el_start, demux_t *p_demux ) :
+    m_es( es ),
+    mi_level( 1 ),
+    m_got( NULL ),
+    mi_user_level( 1 ),
+    mb_keep( false )
 {
-    m_es = es;
-    m_got = NULL;
-    m_el[0] = el_start;
     mi_remain_size[0] = el_start->GetSize();
-
-    for( int i = 1; i < 6; i++ )
-    {
-        m_el[i] = NULL;
-    }
-    mi_level = 1;
-    mi_user_level = 1;
-    mb_keep = false;
+    memset( m_el, 0, 6 * sizeof( *m_el ) );
+    m_el[0] = el_start;
     mb_dummy = var_InheritBool( p_demux, "mkv-use-dummy" );
 }
 
