@@ -2851,7 +2851,7 @@ AS_IF([test "${enable_speex}" != "no"], [
   PKG_CHECK_MODULES([SPEEXDSP], [speexdsp], [
     have_speexdsp="yes"
   ], [
-    AS_IF([test "${enable_speex}" = "yes"], [
+    AS_IF([test -n "${enable_speex}"], [
       AC_MSG_ERROR([${SPEEXDSP_PKG_ERRORS}.])
     ])
   ])
