@@ -174,7 +174,7 @@ struct matroska_stream_c
 /*****************************************************************************
  * definitions of structures and functions used by this plugins
  *****************************************************************************/
-typedef struct
+struct mkv_track_t
 {
 //    ~mkv_track_t();
 
@@ -220,9 +220,9 @@ typedef struct
     int                    i_compression_type;
     KaxContentCompSettings *p_compression_data;
 
-} mkv_track_t;
+};
 
-typedef struct
+struct mkv_index_t
 {
     int     i_track;
     int     i_block_number;
@@ -231,7 +231,7 @@ typedef struct
     int64_t i_time;
 
     bool       b_key;
-} mkv_index_t;
+};
 
 
 #endif /* _MKV_HPP_ */
