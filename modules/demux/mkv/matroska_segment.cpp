@@ -28,6 +28,8 @@
 
 #include "demux.hpp"
 
+#include "Ebml_parser.hpp"
+
 extern "C" {
 #include "../vobsub.h"
 }
