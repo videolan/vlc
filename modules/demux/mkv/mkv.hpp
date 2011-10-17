@@ -127,7 +127,7 @@ void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock
 class attachment_c
 {
 public:
-    attachment_c( std::string _psz_file_name, std::string _psz_mime_type, int _i_size )
+    attachment_c( const std::string& _psz_file_name, const std::string& _psz_mime_type, int _i_size )
         :i_size(_i_size)
         ,psz_file_name( _psz_file_name)
         ,psz_mime_type( _psz_mime_type)
@@ -143,9 +143,9 @@ public:
         return (p_data != NULL);
     }
 
-    const char* fileName() { return psz_file_name.c_str(); }
-    const char* mimeType() { return psz_mime_type.c_str(); }
-    int         size()     { return i_size; }
+    const char* fileName() const { return psz_file_name.c_str(); }
+    const char* mimeType() const { return psz_mime_type.c_str(); }
+    int         size() const    { return i_size; }
 
     void          *p_data;
 private:
