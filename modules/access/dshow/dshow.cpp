@@ -2024,8 +2024,8 @@ static int FindDevicesCallback( vlc_object_t *p_this, char const *psz_name,
         /* Keep the 2 first entries */
         for( i = 2; i < p_item->i_list; i++ )
         {
-            free( const_cast<char *>(p_item->ppsz_list[i]) );
-            free( const_cast<char *>(p_item->ppsz_list_text[i]) );
+            free( p_item->ppsz_list[i] );
+            free( p_item->ppsz_list_text[i] );
         }
         /* TODO: Remove when no more needed */
         p_item->ppsz_list[i] = NULL;
