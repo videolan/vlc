@@ -134,7 +134,7 @@ public:
     {
         p_data = NULL;
     }
-    virtual ~attachment_c() { free( p_data ); }
+    ~attachment_c() { free( p_data ); }
 
     /* Allocs the data space. Returns true if allocation went ok */
     bool init()
@@ -159,7 +159,7 @@ class matroska_stream_c
 {
 public:
     matroska_stream_c() :p_io_callback(NULL) ,p_estream(NULL) {}
-    virtual ~matroska_stream_c()
+    ~matroska_stream_c()
     {
         delete p_io_callback;
         delete p_estream;
