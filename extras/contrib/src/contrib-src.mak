@@ -1820,8 +1820,8 @@ libgpg-error-$(GPGERROR_VERSION).tar.bz2:
 libgpg-error: libgpg-error-$(GPGERROR_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
 ifdef HAVE_WIN32
-#	patch -p 0 < Patches/libgpg-error-win32.patch
-#	(cd $@; ./autogen.sh)
+	patch -p 0 < Patches/libgpg-error-win32.patch
+	(cd $@; autoreconf -ivf)
 endif
 
 .gpg-error: libgpg-error

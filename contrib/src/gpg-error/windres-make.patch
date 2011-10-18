@@ -1,0 +1,11 @@
+--- libgpg-error/src/Makefile.am	2010-04-14 11:16:44.000000000 +0200
++++ libgpg-error.new/src/Makefile.am	2010-08-09 11:21:56.000000000 +0200
+@@ -60,7 +60,7 @@
+ arch_sources = w32-gettext.c
+ 
+ RCCOMPILE = $(RC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+-            -DLOCALEDIR=\"$(localedir)\" $(AM_CPPFLAGS) $(CPPFLAGS)
++            -DLOCALEDIR=\"$(localedir)\" $(AM_CPPFLAGS)
+ LTRCCOMPILE = $(LIBTOOL) --mode=compile --tag=RC $(RCCOMPILE)
+ 
+ SUFFIXES = .rc .lo
