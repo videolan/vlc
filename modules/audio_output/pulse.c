@@ -150,8 +150,14 @@ static void sink_list_cb(pa_context *c, const pa_sink_info *i, int eol,
             i->description);
     val.i_int = i->index;
     text.psz_string = (char *)i->description;
+    /* FIXME: There is no way to replace a choice explicitly. */
     var_Change(aout, "audio-device", VLC_VAR_DELCHOICE, &val, NULL);
     var_Change(aout, "audio-device", VLC_VAR_ADDCHOICE, &val, &text);
+    /* FIXME: var_Change() can change the variable value if we remove the
+     * current value from the choice list, or if we add a choice while there
+     * was none. So force the correct value back. */
+    val.i_int = pa_stream_get_device_index(aout->sys->stream);
+    var_Change(aout, "audio-device", VLC_VAR_SETVALUE, &val, NULL);
 }
 
 static void sink_info_cb(pa_context *c, const pa_sink_info *i, int eol,
