@@ -23,3 +23,19 @@ speex: speex-$(SPEEX_VERSION).tar.gz .sum-speex
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) --without-ogg
 	cd $< && $(MAKE) install
 	touch $@
+
+# Speex DSP
+
+PKGS += speexdsp
+PKGS_ALL += speexdsp
+ifeq ($(call need_pkg,"speexdsp"),)
+PKGS_FOUND += speexdsp
+endif
+
+.sum-speexdsp: .sum-speex
+	touch -r $< $@
+
+DEPS_speexdsp = speex $(DEPS_speex)
+
+.speexdsp:
+	touch $@
