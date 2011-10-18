@@ -728,12 +728,7 @@ void CaptureOpenPanel::initialize()
         "video*"
     };
 
-    char const * const ppsz_v4ladevices[] = {
-        "dsp*",
-        "radio*"
-    };
-
-    /* V4l Main panel */
+    /* V4L2 main panel */
     QLabel *v4l2VideoDeviceLabel = new QLabel( qtr( "Video device name" ) );
     v4l2DevLayout->addWidget( v4l2VideoDeviceLabel, 0, 0 );
 
@@ -748,7 +743,17 @@ void CaptureOpenPanel::initialize()
 
     v4l2AudioDevice = new QComboBox( this );
     v4l2AudioDevice->setEditable( true );
-    POPULATE_WITH_DEVS( ppsz_v4ladevices, v4l2AudioDevice );
+    {
+        QStringList patterns = QStringList();
+        patterns << QString( "pcmC*D*c" );
+
+        QStringList nodes = QDir( "/dev/snd" ).entryList( patterns,
+                                                          QDir::System );
+        QStringList names = nodes.replaceInStrings( QRegExp("^pcmC"), "hw:" )
+                                 .replaceInStrings( QRegExp("c$"), "" )
+                                 .replaceInStrings( QRegExp("D"), "," );
+        v4l2AudioDevice->addItems( names );
+    }
     v4l2AudioDevice->clearEditText();
     v4l2DevLayout->addWidget( v4l2AudioDevice, 1, 1 );
 
