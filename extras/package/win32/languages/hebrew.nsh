@@ -1,0 +1,61 @@
+StrCpy $Name_Section01 "נגן המדיה (הכרחי)"
+StrCpy $Name_Section02a "קיצורי דרך בתפריט ההתחלה"
+StrCpy $Name_Section02b "קיצורי דרך על שולחן העבודה"
+StrCpy $Name_Section03 "תוסף Mozilla"
+StrCpy $Name_Section04 "תוסף ActiveX"
+StrCpy $Name_Section05 "השמעה של דיסקים"
+StrCpy $Name_Section06 "שיוך קבצים"
+StrCpy $Name_SectionGroupAudio "קובצי שמע"
+StrCpy $Name_SectionGroupVideo "קובצי וידאו"
+StrCpy $Name_SectionGroupOther "אחר"
+StrCpy $Name_Section07 "תפריטי הקשר"
+StrCpy $Name_Section08 "מחיקת העדפות ומטמון"
+
+StrCpy $Desc_Section01 \
+    "נגן המדיה בכבודו ובעצמו"
+StrCpy $Desc_Section02a \
+    "הוספת סמלים לתפריט ההתחלה שלך לגישה נוחה"
+    StrCpy $Desc_Section02b \
+    "הוספת סמל לשולחן העבודה שלך לגישה נוחה"
+StrCpy $Desc_Section03 \
+    "התוסף של עבור VLC Mozilla ו־Mozilla Firefox"
+StrCpy $Desc_Section04 \
+    "תוסף ה־ActiveX של VLC"
+StrCpy $Desc_Section05 \
+    "רישום בתור נגן לתקליטורי מסוג CD ו־DVD"
+StrCpy $Desc_Section06 \
+    "הגדרת נגן המדיה כיישום בררת המחדל לטיפול בסוג הקובץ האמור"
+StrCpy $Desc_Section07 \
+    "הוספת פריטים לתפריט ההקשר ('נגינה עם VLC' ו־'הוספה לרשימת ההשמעה של VLC')"
+StrCpy $Desc_Section08 \
+    "מחיקת ההעדפות וקובצי המטמון של נגן המדיה VLC שנשארו מהתקנות קודמות"
+
+StrCpy $Message_AlreadyInstalled  \
+"נגן המדיה VLC כבר מותקן. $\nהאם ברצונך להסיר את הגרסה הקודמת בטרם \
+התקנת $(^Name) ?"
+
+StrCpy $Name_Section91 "הסרה"
+StrCpy $Name_Section92 "מחיקת ההעדפות והמטמון"
+
+StrCpy $Desc_Section91 \
+"הסרת נגן המדיה VLC על כל רכיביו"
+StrCpy $Desc_Section92 \
+"מחיקת ההעדפות וקובצי המטמון של נגן המדיה VLC"
+
+StrCpy $ShellAssociation_Play "נגינה"
+StrCpy $ContextMenuEntry_PlayWith "נגינה עם נגן המדיה VLC"
+StrCpy $ContextMenuEntry_AddToPlaylist "הוספה לרשימת ההשמעה של נגן המדיה VLC"
+
+StrCpy $Link_VisitWebsite "ביקור באתר של נגן המדיה VLC מבית VideoLAN"
+
+StrCpy $Name_InstTypeRecommended "מומלצת"
+StrCpy $Name_InstTypeMinimum "מזערית"
+StrCpy $Name_InstTypeFull "מלאה"
+
+StrCpy $Action_OnArrivalDVD "ניגון סרט מ־DVD"
+StrCpy $Action_OnArrivalAudioCD "השמעת תקליטור שמע"
+StrCpy $Action_OnArrivalVCDMovie "נגינת סרט מ־VCD"
+StrCpy $Action_OnArrivalSVCDMovie "נגינת סרט מ־SVCD"
+StrCpy $Action_OnArrivalVideoFiles "נגינת קובצי וידאו"
+StrCpy $Action_OnArrivalMusicFiles "השמעת קובצי שמע"
+StrCpy $Action_OnArrivalDVDAudio "השמעת DVD שמע"
