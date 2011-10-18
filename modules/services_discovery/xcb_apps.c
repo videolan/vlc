@@ -52,7 +52,7 @@ vlc_module_begin ()
     set_capability ("services_discovery", 0)
     set_callbacks (Open, Close)
 
-    add_shortcut ("apps")
+    add_shortcut ("apps", "screen")
 
     VLC_SD_PROBE_SUBMODULE
 vlc_module_end ()
