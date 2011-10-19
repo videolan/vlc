@@ -499,7 +499,7 @@ static int DecOpen( decoder_t *p_dec )
         BITMAPINFOHEADER *p_bih;
         DMO_MEDIA_TYPE mt;
         unsigned i_chroma = VLC_CODEC_YUYV;
-        int i_planes = 1, i_bpp = 16;
+        int i_bpp = 16;
         int i = 0;
 
         /* Find out which chroma to use */
@@ -508,7 +508,7 @@ static int DecOpen( decoder_t *p_dec )
             if( mt.subtype.Data1 == VLC_CODEC_YV12 )
             {
                 i_chroma = mt.subtype.Data1;
-                i_planes = 3; i_bpp = 12;
+                i_bpp = 12;
             }
 
             DMOFreeMediaType( &mt );
@@ -541,7 +541,7 @@ static int DecOpen( decoder_t *p_dec )
             p_dec->fmt_in.video.i_height *
             (p_dec->fmt_in.video.i_bits_per_pixel + 7) / 8;
 
-        p_bih->biPlanes = i_planes;
+        p_bih->biPlanes = 1; /* http://msdn.microsoft.com/en-us/library/dd183376%28v=vs.85%29.aspx */
         p_bih->biSize = sizeof(BITMAPINFOHEADER);
 
         dmo_output_type.majortype = MEDIATYPE_Video;
