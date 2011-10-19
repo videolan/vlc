@@ -128,7 +128,6 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 
     /* Set the other interface settings */
     settings = getSettings();
-    settings->beginGroup( "MainWindow" );
 
 #ifdef WIN32
     /* Volume keys */
@@ -136,9 +135,8 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 #endif
 
     /* */
-    b_plDocked = getSettings()->value( "pl-dock-status", true ).toBool();
+    b_plDocked = getSettings()->value( "MainWindow/pl-dock-status", true ).toBool();
 
-    settings->endGroup( );
 
     /**************************
      *  UI and Widgets design
@@ -240,13 +238,10 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 
 
     /* Final Sizing, restoration and placement of the interface */
-    settings->beginGroup( "MainWindow" );
-
-    if( settings->value( "playlist-visible", false ).toBool() )
+    if( settings->value( "MainWindow/playlist-visible", false ).toBool() )
         togglePlaylist();
 
     QVLCTools::restoreWidgetPosition( settings, this, QSize(600, 420) );
-    settings->endGroup();
 
     b_interfaceFullScreen = isFullScreen();
 
@@ -286,8 +281,8 @@ MainInterface::~MainInterface()
     delete fullscreenControls;
 
     /* Save states */
-    settings->beginGroup( "MainWindow" );
 
+    settings->beginGroup("MainWindow");
     settings->setValue( "pl-dock-status", b_plDocked );
     /* Save playlist state */
     if( playlistWidget )
@@ -300,11 +295,10 @@ MainInterface::~MainInterface()
     /* Save the stackCentralW sizes */
     settings->setValue( "bgSize", stackWidgetsSizes[bgWidget] );
     settings->setValue( "playlistSize", stackWidgetsSizes[playlistWidget] );
+    settings->endGroup();
 
     /* Save this size */
     QVLCTools::saveWidgetPosition(settings, this);
-
-    settings->endGroup();
 
     /* Save undocked playlist size */
     if( playlistWidget && !isPlDocked() )
@@ -339,14 +333,13 @@ void MainInterface::recreateToolbars()
 {
     bool b_adv = getControlsVisibilityStatus() & CONTROLS_ADVANCED;
 
-    settings->beginGroup( "MainWindow" );
     delete controls;
     delete inputC;
 
     controls = new ControlsWidget( p_intf, b_adv, this );
     inputC = new InputControlsWidget( p_intf, this );
     mainLayout->insertWidget( 2, inputC );
-    mainLayout->insertWidget( settings->value( "ToolbarPos", 0 ).toInt() ? 0: 3,
+    mainLayout->insertWidget( settings->value( "MainWindow/ToolbarPos", 0 ).toInt() ? 0: 3,
                               controls );
 
     if( fullscreenControls )
@@ -356,7 +349,6 @@ void MainInterface::recreateToolbars()
         CONNECT( fullscreenControls, keyPressed( QKeyEvent * ),
                  this, handleKeyPress( QKeyEvent * ) );
     }
-    settings->endGroup();
 }
 
 void MainInterface::reloadPrefs()
@@ -402,14 +394,13 @@ void MainInterface::createMainWidget( QSettings *settings )
     }
     mainLayout->insertWidget( 1, stackCentralW );
 
-    settings->beginGroup( "MainWindow" );
-    stackWidgetsSizes[bgWidget] = settings->value( "bgSize", QSize( 600, 0 ) ).toSize();
+    stackWidgetsSizes[bgWidget] = settings->value( "MainWindow/bgSize", QSize( 600, 0 ) ).toSize();
     /* Resize even if no-auto-resize, because we are at creation */
     resizeStack( stackWidgetsSizes[bgWidget].width(), stackWidgetsSizes[bgWidget].height() );
 
     /* Create the CONTROLS Widget */
     controls = new ControlsWidget( p_intf,
-                   settings->value( "adv-controls", false ).toBool(), this );
+                   settings->value( "MainWindow/adv-controls", false ).toBool(), this );
     inputC = new InputControlsWidget( p_intf, this );
 
     mainLayout->insertWidget( 2, inputC );
@@ -423,7 +414,6 @@ void MainInterface::createMainWidget( QSettings *settings )
     visualSelector->hide();
     #endif
 
-    settings->endGroup();
 
     /* Enable the popup menu in the MI */
     main->setContextMenuPolicy( Qt::CustomContextMenu );
