@@ -139,8 +139,8 @@ static block_t *Resample (filter_t *filter, block_t *in)
     }
 
     if (src.input_frames_used < src.input_frames)
-        msg_Warn (filter, "lost %ld of %ld input frames",
-                  src.input_frames - src.input_frames_used, src.input_frames);
+        msg_Err (filter, "lost %ld of %ld input frames",
+                 src.input_frames - src.input_frames_used, src.input_frames);
 
     out->i_buffer = src.output_frames_gen * framesize;
     out->i_nb_samples = src.output_frames_gen;
