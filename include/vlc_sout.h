@@ -37,6 +37,7 @@
 extern "C" {
 #endif
 
+#include <sys/types.h>
 #include <vlc_es.h>
 
 /** Stream output instance */
