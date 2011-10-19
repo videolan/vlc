@@ -664,6 +664,17 @@ bool matroska_segment_c::LoadSeekHeadItem( const EbmlCallbacks & ClassInfos, int
     return true;
 }
 
+struct spoint
+{
+    spoint(unsigned int tk): i_track(tk),i_date(0), i_seek_pos(0), i_cluster_pos(0),
+                             p_next(NULL){}
+    unsigned int     i_track;
+    mtime_t i_date;
+    int64_t i_seek_pos;
+    int64_t i_cluster_pos;
+    spoint * p_next;
+};
+
 void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset, int64_t i_global_position )
 {
     KaxBlock    *block;
@@ -673,6 +684,9 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset, int64_t i_
     size_t      i_track;
     int64_t     i_seek_position = i_start_pos;
     int64_t     i_seek_time = i_start_time;
+    mtime_t     i_pts = 0;
+    spoint *p_first = NULL;
+    spoint *p_last = NULL;
 
     if( i_global_position >= 0 )
     {
@@ -706,22 +720,28 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset, int64_t i_
         return;
     }
 
+    /* Don't try complex seek if we seek to 0 */
+    if( i_date == 0 )
+    {
+        es_out_Control( sys.demuxer.out, ES_OUT_SET_NEXT_DISPLAY_TIME, 0 );
+        es.I_O().setFilePointer( i_start_pos );
+
+        delete ep;
+        ep = new EbmlParser( &es, segment, &sys.demuxer );
+        cluster = NULL;
+        return;       
+    }
+
     if ( i_index > 0 )
     {
         int i_idx = 0;
 
         for( ; i_idx < i_index; i_idx++ )
-        {
             if( p_indexes[i_idx].i_time + i_time_offset > i_date )
-            {
                 break;
-            }
-        }
 
         if( i_idx > 0 )
-        {
             i_idx--;
-        }
 
         i_seek_position = p_indexes[i_idx].i_position;
         i_seek_time = p_indexes[i_idx].i_time;
@@ -738,19 +758,38 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset, int64_t i_
 
     sys.i_start_pts = i_date;
 
+    es_out_Control( sys.demuxer.out, ES_OUT_SET_NEXT_DISPLAY_TIME, i_date );
     /* now parse until key frame */
     i_track_skipping = 0;
     for( i_track = 0; i_track < tracks.size(); i_track++ )
     {
         if( tracks[i_track]->fmt.i_cat == VIDEO_ES )
         {
-            tracks[i_track]->b_search_keyframe = true;
-            i_track_skipping++;
+            spoint * seekpoint = new spoint(i_track);
+            if( unlikely( !seekpoint ) )
+            {
+                for( spoint * sp = p_first; sp; )
+                {
+                    spoint * tmp = sp;
+                    sp = sp->p_next;
+                    delete tmp;                    
+                }
+                return;
+            }
+            if( unlikely( !p_first ) )
+            {
+                p_first = seekpoint;
+                p_last = seekpoint;
+            }
+            else
+            {
+                p_last->p_next = seekpoint;
+                p_last = seekpoint;
+            }
         }
     }
-    es_out_Control( sys.demuxer.out, ES_OUT_SET_NEXT_DISPLAY_TIME, i_date );
 
-    while( i_track_skipping > 0 )
+    while( i_pts < i_date )
     {
         bool b_key_picture;
         bool b_discardable_picture;
@@ -761,51 +800,65 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset, int64_t i_
             return;
         }
 
+        /* check if block's track is in our list */
         for( i_track = 0; i_track < tracks.size(); i_track++ )
         {
             if( (simpleblock && tracks[i_track]->i_number == simpleblock->TrackNum()) ||
                 (block && tracks[i_track]->i_number == block->TrackNum()) )
-            {
                 break;
-            }
         }
 
         if( simpleblock )
-            sys.i_pts = sys.i_chapter_time + simpleblock->GlobalTimecode() / (mtime_t) 1000;
+            i_pts = sys.i_chapter_time + simpleblock->GlobalTimecode() / (mtime_t) 1000;
         else
-            sys.i_pts = sys.i_chapter_time + block->GlobalTimecode() / (mtime_t) 1000;
+            i_pts = sys.i_chapter_time + block->GlobalTimecode() / (mtime_t) 1000;
 
         if( i_track < tracks.size() )
         {
-            if( sys.i_pts > sys.i_start_pts )
+            if( tracks[i_track]->fmt.i_cat == VIDEO_ES && b_key_picture )
             {
-                cluster = static_cast<KaxCluster*>(ep->UnGet( i_block_pos, i_cluster_pos ));
-                i_track_skipping = 0;
-            }
-            else if( tracks[i_track]->fmt.i_cat == VIDEO_ES )
-            {
-                if( b_key_picture && tracks[i_track]->b_search_keyframe )
-                {
-                    tracks[i_track]->b_search_keyframe = false;
-                    i_track_skipping--;
-                }
-                if( !tracks[i_track]->b_search_keyframe )
-                {
-                    BlockDecode( &sys.demuxer, block, simpleblock, sys.i_pts, 0, b_key_picture || b_discardable_picture );
-                }
+                /* get the seekpoint */
+                spoint * sp;
+                for( sp =  p_first; sp; sp = sp->p_next )
+                    if( sp->i_track == i_track )
+                        break;
+
+                sp->i_date = i_pts;
+                if( simpleblock )
+                    sp->i_seek_pos = simpleblock->GetElementPosition();
+                else
+                    sp->i_seek_pos = i_block_pos;
+                sp->i_cluster_pos = i_cluster_pos;
             }
         }
 
         delete block;
     }
 
-    /* FIXME current ES_OUT_SET_NEXT_DISPLAY_TIME does not work that well if
-     * the delay is too high. */
-    if( sys.i_pts + 500*1000 < sys.i_start_pts )
-    {
-        sys.i_start_pts = sys.i_pts;
+    /* rewind to the last I img */
+    spoint * p_min;
+    for( p_min  = p_first, p_last = p_first; p_last; p_last = p_last->p_next )
+        if( p_last->i_date < p_min->i_date )
+            p_min = p_last;
 
-        es_out_Control( sys.demuxer.out, ES_OUT_SET_NEXT_DISPLAY_TIME, sys.i_start_pts );
+    sys.i_pts = p_min->i_date;
+    cluster = (KaxCluster *) ep->UnGet( p_min->i_seek_pos, p_min->i_cluster_pos );
+
+    /* hack use BlockGet to get the cluster then goto the wanted block */
+    if ( !cluster )
+    {
+        bool b_key_picture;
+        bool b_discardable_picture;
+        BlockGet( block, simpleblock, &b_key_picture, &b_discardable_picture, &i_block_duration );
+        delete block;
+        cluster = (KaxCluster *) ep->UnGet( p_min->i_seek_pos, p_min->i_cluster_pos );
+    }
+
+    while( p_first )
+    {
+        p_min = p_first;
+        p_first = p_first->p_next;
+        delete p_min;
     }
 }
 

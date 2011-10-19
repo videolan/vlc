@@ -72,6 +72,11 @@ EbmlElement* EbmlParser::UnGet( uint64 i_block_pos, uint64 i_cluster_pos )
             mi_user_level--;
         }
     }
+
+    /* Avoid data skip in BlockGet */
+    delete m_el[mi_level];
+    m_el[mi_level] = NULL;
+
     m_got = NULL;
     mb_keep = false;
     if ( m_el[1] && m_el[1]->GetElementPosition() == i_cluster_pos )
