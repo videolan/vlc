@@ -496,7 +496,7 @@ void CoverArtLabel::showArtUpdate( const QString& url )
     QPixmap pix;
     if( !url.isEmpty() && pix.load( url ) )
     {
-        pix = pix.scaled( maximumWidth(), maximumHeight(),
+        pix = pix.scaled( minimumWidth(), maximumHeight(),
                           Qt::KeepAspectRatioByExpanding,
                           Qt::SmoothTransformation );
     }
