@@ -46,7 +46,7 @@ enum {
     VOUT_WINDOW_TYPE_NSOBJECT,
 };
 
-#if defined (WIN32)
+#if defined (WIN32) || defined (__OS2__)
 # define VOUT_WINDOW_TYPE_NATIVE VOUT_WINDOW_TYPE_HWND
 #elif defined (__unix__)
 # define VOUT_WINDOW_TYPE_NATIVE VOUT_WINDOW_TYPE_XID
@@ -113,7 +113,7 @@ struct vout_window_t {
     vout_window_sys_t *sys;
 };
 
-/** 
+/**
  * Creates a new window.
  *
  * @param module plugin name (usually "$window")

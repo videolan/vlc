@@ -413,7 +413,7 @@ libvlc_media_player_new( libvlc_instance_t *instance )
     var_Create (mp, "vmem-height", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT);
     var_Create (mp, "vmem-pitch", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT);
     var_Create (mp, "drawable-xid", VLC_VAR_INTEGER);
-#ifdef WIN32
+#if defined (WIN32) || defined (__OS2__)
     var_Create (mp, "drawable-hwnd", VLC_VAR_INTEGER);
 #endif
 #ifdef __APPLE__
@@ -935,7 +935,7 @@ void libvlc_media_player_set_hwnd( libvlc_media_player_t *p_mi,
                                    void *drawable )
 {
     assert (p_mi != NULL);
-#ifdef WIN32
+#if defined (WIN32) || defined (__OS2__)
     var_SetString (p_mi, "window",
                    (drawable != NULL) ? "embed-hwnd,any" : "");
     var_SetInteger (p_mi, "drawable-hwnd", (uintptr_t)drawable);
@@ -950,7 +950,7 @@ void libvlc_media_player_set_hwnd( libvlc_media_player_t *p_mi,
 void *libvlc_media_player_get_hwnd( libvlc_media_player_t *p_mi )
 {
     assert (p_mi != NULL);
-#ifdef WIN32
+#if defined (WIN32) || defined (__OS2__)
     return (void *)(uintptr_t)var_GetInteger (p_mi, "drawable-hwnd");
 #else
     return NULL;
