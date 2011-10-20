@@ -38,6 +38,8 @@ struct vcddev_s
 
 #ifdef WIN32
     HANDLE h_device_handle;                         /* vcd device descriptor */
+#elif defined( __OS2__ )
+    HFILE  hcd;                                     /* vcd device descriptor */
 #else
     int    i_device_handle;                         /* vcd device descriptor */
 #endif
@@ -127,6 +129,54 @@ typedef struct _CDROM_READ_TOC_EX {
 
 #endif /* WIN32 */
 
+#ifdef __OS2__
+#pragma pack( push, 1 )
+typedef struct os2_msf_s
+{
+    unsigned char frame;
+    unsigned char second;
+    unsigned char minute;
+    unsigned char reserved;
+} os2_msf_t;
+
+typedef struct cdrom_get_tochdr_s
+{
+    unsigned char sign[4];
+} cdrom_get_tochdr_t;
+
+typedef struct cdrom_tochdr_s
+{
+    unsigned char first_track;
+    unsigned char last_track;
+    os2_msf_t     lead_out;
+} cdrom_tochdr_t;
+
+typedef struct cdrom_get_track_s
+{
+    unsigned char sign[4];
+    unsigned char track;
+} cdrom_get_track_t;
+
+typedef struct cdrom_track_s
+{
+    os2_msf_t     start;
+    unsigned char adr:4;
+    unsigned char control:4;
+} cdrom_track_t;
+
+typedef struct cdrom_readlong_s
+{
+    unsigned char  sign[4];
+    unsigned char  addr_mode;
+    unsigned short sectors;
+    unsigned long  start;
+    unsigned char  reserved;
+    unsigned char  interleaved_size;
+} cdrom_readlong_t;
+
+#pragma pack( pop )
+#endif
+
 #define SECTOR_TYPE_MODE2_FORM2 0x14
 #define SECTOR_TYPE_CDDA 0x04
 #define READ_CD_RAW_MODE2 0xF0
@@ -144,4 +194,7 @@ static int    darwin_getNumberOfTracks( CDTOC *, int );
 
 #elif defined( WIN32 )
 static int    win32_vcd_open( vlc_object_t *, const char *, struct vcddev_s *);
+
+#elif defined( __OS2__ )
+static int    os2_vcd_open( vlc_object_t *, const char *, struct vcddev_s *);
 #endif

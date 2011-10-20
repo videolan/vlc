@@ -2041,7 +2041,7 @@ then
     AC_MSG_RESULT(no)
   ])
 
-  if test "${SYS}" = "bsdi" -o "${SYS}" = "mingw32"
+  if test "${SYS}" = "bsdi" -o "${SYS}" = "mingw32" -o "${SYS}" = "os2"
   then
     VLC_ADD_PLUGIN([vcd cdda])
   fi
