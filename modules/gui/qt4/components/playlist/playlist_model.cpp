@@ -380,7 +380,10 @@ QVariant PLModel::data( const QModelIndex &index, const int role ) const
     {
         return QVariant( QBrush( Qt::gray ) );
     }
-    else if( role == IsCurrentRole ) return QVariant( isCurrent( index ) );
+    else if( role == IsCurrentRole )
+    {
+        return QVariant( isCurrent( index ) );
+    }
     else if( role == IsLeafNodeRole )
     {
         QVariant isLeaf;
@@ -977,6 +980,12 @@ bool PLModel::popup( const QModelIndex & index, const QPoint &point, const QMode
     }
     menu.addMenu( sortingMenu );
 
+    /* Zoom */
+    QMenu *zoomMenu = new QMenu( qtr( "Display size" ) );
+    zoomMenu->addAction( qtr( "Increase" ), this, SLOT( increaseZoom() ) );
+    zoomMenu->addAction( qtr( "Decrease" ), this, SLOT( decreaseZoom() ) );
+    menu.addMenu( zoomMenu );
+
     /* Store the current selected item for popup*() methods */
     current_selection = list;
 
@@ -1101,6 +1110,19 @@ void PLModel::popupSort( int column )
     sort( i_popup_parent,
           column > 0 ? column - 1 : -column - 1,
           column > 0 ? Qt::AscendingOrder : Qt::DescendingOrder );
+}
+
+/* */
+void PLModel::increaseZoom()
+{
+    i_zoom++;
+    emit layoutChanged();
+}
+
+void PLModel::decreaseZoom()
+{
+    i_zoom--;
+    emit layoutChanged();
 }
 
 /******************* Drag and Drop helper class ******************/

@@ -113,10 +113,6 @@ public:
             return static_cast<PLItem*>( index.internalPointer() );
         else return rootItem;
     }
-    int getZoom() const
-    {
-        return i_zoom;
-    }
 
 signals:
     void currentChanged( const QModelIndex& );
@@ -124,11 +120,6 @@ signals:
 
 public slots:
     virtual void activateItem( const QModelIndex &index );
-    void changeZoom( const int zoom )
-    {
-        i_zoom = zoom;
-        emit layoutChanged();
-    }
 
 private:
     /* General */
@@ -198,6 +189,8 @@ private slots:
     void processItemRemoval( int i_id );
     void processItemAppend( int item, int parent );
     void activateItem( playlist_item_t *p_item );
+    void increaseZoom();
+    void decreaseZoom();
 };
 
 class PlMimeData : public QMimeData

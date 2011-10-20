@@ -157,15 +157,6 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QWidget *_par )
     CONNECT( mainView, viewChanged( const QModelIndex& ),
              this, changeView( const QModelIndex &) );
 
-    /* Zoom */
-    QSlider *zoomSlider = new QSlider( Qt::Horizontal, this );
-    zoomSlider->setRange( -10, 10);
-    zoomSlider->setPageStep( 3 );
-    zoomSlider->setValue( model->getZoom() );
-    zoomSlider->setToolTip( qtr("Zoom playlist") );
-    CONNECT( zoomSlider, valueChanged( int ), model, changeZoom( int ) );
-    topbarLayout->addWidget( zoomSlider );
-
     /* Connect the activation of the selector to a redefining of the PL */
     DCONNECT( selector, categoryActivated( playlist_item_t *, bool ),
               mainView, setRoot( playlist_item_t *, bool ) );
