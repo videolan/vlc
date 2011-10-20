@@ -956,9 +956,9 @@ bool PLModel::popup( const QModelIndex & index, const QPoint &point, const QMode
             menu.addAction( qtr( "Add to playlist"), this, SLOT( popupAddToPlaylist() ) );
         menu.addAction( QIcon( ":/buttons/playlist/playlist_remove" ),
                         qtr(I_POP_DEL), this, SLOT( popupDel() ) );
-        menu.addSeparator();
     }
 
+    menu.addSeparator();
     /* Playlist sorting */
     if( !sortingMenu )
     {
