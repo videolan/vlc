@@ -116,7 +116,7 @@ public:
 
 signals:
     void currentIndexChanged( const QModelIndex& );
-    void rootChanged();
+    void rootIndexChanged();
 
 public slots:
     virtual void activateItem( const QModelIndex &index );

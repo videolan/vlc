@@ -159,8 +159,8 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QWidget *_par )
 
     /* Connect the activation of the selector to a redefining of the PL */
     DCONNECT( selector, categoryActivated( playlist_item_t *, bool ),
-              mainView, setRoot( playlist_item_t *, bool ) );
-    mainView->setRoot( p_root, false );
+              mainView, setRootItem( playlist_item_t *, bool ) );
+    mainView->setRootItem( p_root, false );
 
     /* */
     split = new PlaylistSplitter( this );

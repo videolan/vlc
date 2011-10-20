@@ -676,7 +676,7 @@ void PLModel::rebuild( playlist_item_t *p_root )
     /* And signal the view */
     reset();
 
-    if( p_root ) emit rootChanged();
+    if( p_root ) emit rootIndexChanged();
 }
 
 void PLModel::takeItem( PLItem *item )
