@@ -66,6 +66,8 @@ enum {
 enum {
 #ifdef WIN32
        directxW,
+#elif defined( __OS2__)
+       kaiW,
 #else
        alsaW,
        ossW,

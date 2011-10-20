@@ -290,6 +290,11 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             optionWidgets.append( DirectXControl );
             CONFIG_GENERIC_NO_UI( "directx-audio-device-name", StringList,
                     DirectXLabel, DirectXDevice );
+#elif defined( __OS2__ )
+            audioControl( kai );
+            optionWidgets.append( kaiControl );
+            CONFIG_GENERIC_NO_UI( "kai-audio-device", StringList, kaiLabel,
+                    kaiDevice );
 #else
             if( module_exists( "alsa" ) )
             {
@@ -719,6 +724,8 @@ void SPrefsPanel::updateAudioOptions( int number)
                                             ->itemData( number ).toString();
 #ifdef WIN32
     optionWidgets[directxW]->setVisible( ( value == "aout_directx" ) );
+#elif defined( __OS2__ )
+    optionWidgets[kaiW]->setVisible( ( value == "kai" ) );
 #else
     /* optionWidgets[ossW] can be NULL */
     if( optionWidgets[ossW] )
