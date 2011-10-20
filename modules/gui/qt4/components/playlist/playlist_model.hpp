@@ -115,7 +115,7 @@ public:
     }
 
 signals:
-    void currentChanged( const QModelIndex& );
+    void currentIndexChanged( const QModelIndex& );
     void rootChanged();
 
 public slots:

@@ -599,7 +599,7 @@ void PLModel::processInputItemUpdate( input_thread_t *p_input )
     if( p_input && !( p_input->b_dead || !vlc_object_alive( p_input ) ) )
     {
         PLItem *item = findByInput( rootItem, input_GetItem( p_input )->i_id );
-        if( item ) emit currentChanged( index( item, 0 ) );
+        if( item ) emit currentIndexChanged( index( item, 0 ) );
     }
     processInputItemUpdate( input_GetItem( p_input ) );
 }
@@ -652,7 +652,7 @@ void PLModel::processItemAppend( int i_item, int i_parent )
     endInsertRows();
 
     if( newItem->inputItem() == THEMIM->currentInputItem() )
-        emit currentChanged( index( newItem, 0 ) );
+        emit currentIndexChanged( index( newItem, 0 ) );
 }
 
 void PLModel::rebuild( playlist_item_t *p_root )
@@ -846,11 +846,11 @@ void PLModel::sort( const int i_root_id, const int column, Qt::SortOrder order )
     if( i_popup_item > -1 )
     {
         PLItem *popupitem = findById( rootItem, i_popup_item );
-        if( popupitem ) emit currentChanged( index( popupitem, 0 ) );
+        if( popupitem ) emit currentIndexChanged( index( popupitem, 0 ) );
         /* reset i_popup_item as we don't show it as selected anymore anyway */
         i_popup_item = -1;
     }
-    else if( currentIndex().isValid() ) emit currentChanged( currentIndex() );
+    else if( currentIndex().isValid() ) emit currentIndexChanged( currentIndex() );
 }
 
 void PLModel::search( const QString& search_text, const QModelIndex & idx, bool b_recursive )
