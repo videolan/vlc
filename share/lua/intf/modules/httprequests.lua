@@ -341,15 +341,21 @@ getbrowsetable = function ()
     local uri = _GET["uri"]
     --uri takes precedence, but fall back to dir
     if uri then
-        dir = vlc.strings.make_path(uri)
+        if uri == "file://~" then
+            dir = uri
+        else
+            dir = vlc.strings.make_path(uri)
+        end
     else
         dir = _GET["dir"]
     end
 
     --backwards compatibility with old format driveLetter:\\..
     --this is forgiving with the slash type and number
-    local position=string.find(dir, '%a:[\\/]*%.%.',0)
-    if position==1 then dir="" end
+    if dir then
+        local position=string.find(dir, '%a:[\\/]*%.%.',0)
+        if position==1 then dir="" end
+    end
 
     local result={}
     --paths are returned as an array of elements
@@ -357,7 +363,7 @@ getbrowsetable = function ()
     result.element._array={}
 
     if dir then
-        if dir == "~" then dir = vlc.misc.homedir() end
+        if dir == "~" or dir == "file://~" then dir = vlc.misc.homedir() end
         -- FIXME: hack for Win32 drive list
         if dir~="" then
             dir = common.realpath(dir.."/")

@@ -163,16 +163,16 @@ function sendCommand(params,append){
 	}
 }
 function browse(dir){
-	dir	=	dir==undefined ? '~' : dir;
+	dir	=	dir==undefined ? 'file://~' : dir;
 	$.ajax({
 		url: 'requests/browse.xml',
-		data:'dir='+encodeURIComponent(dir),
+		data:'uri='+encodeURIComponent(dir),
 		success: function(data,status,jqXHR){
 			var tgt	=	browse_target.indexOf('__')==-1 ? browse_target : browse_target.substr(0,browse_target.indexOf('__'));
 			$('#browse_elements').empty();
             $('element',data).each(function(){
 				if($(this).attr('type')=='dir' || $.inArray($(this).attr('name').substr(-3),video_types)!=-1 || $.inArray($(this).attr('name').substr(-3),audio_types)!=-1){
-					$('#browse_elements').append(createElementLi($(this).attr('name'),$(this).attr('type'),$(this).attr('path'),$(this).attr('name').substr(-3)));
+					$('#browse_elements').append(createElementLi($(this).attr('name'),$(this).attr('type'),$(this).attr('uri'),$(this).attr('name').substr(-3)));
 				}
 			});
 			$('[opendir]').dblclick(function(){
@@ -195,7 +195,7 @@ function browse(dir){
 					case '#mobile':
 						break;
 					default:
-						sendCommand('command=in_play&input=file://'+encodeURIComponent($(this).attr('openfile')));
+						sendCommand('command=in_play&input='+encodeURIComponent($(this).attr('openfile')));
 						break;
 				}
 				$('#window_browse').dialog('close');
@@ -212,7 +212,7 @@ function browse(dir){
 			$('[openfile]').click(function(){
 				switch(tgt){
 					case '#mobile':
-						sendCommand('command=in_play&input=file://'+encodeURIComponent($(this).attr('openfile')),"window.location='mobile.html'");
+						sendCommand('command=in_play&input='+encodeURIComponent($(this).attr('openfile')),"window.location='mobile.html'");
 						break;
 					default:
 						break;
