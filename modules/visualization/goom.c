@@ -61,7 +61,7 @@ vlc_module_begin ()
     set_capability( "visualization2", 0 )
     add_integer( "goom-width", 800,
                  WIDTH_TEXT, RES_LONGTEXT, false )
-    add_integer( "goom-height", 640,
+    add_integer( "goom-height", 500,
                  HEIGHT_TEXT, RES_LONGTEXT, false )
     add_integer_with_range( "goom-speed", 6, 1, 10,
                  SPEED_TEXT, SPEED_LONGTEXT, false )

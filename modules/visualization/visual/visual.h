@@ -87,5 +87,5 @@ int spectrometer_Run
         (visual_effect_t * , vlc_object_t *, const block_t *, picture_t *);
 
 /* Default vout size */
-#define VOUT_WIDTH 800
-#define VOUT_HEIGHT 640
+#define VOUT_WIDTH  800
+#define VOUT_HEIGHT 500

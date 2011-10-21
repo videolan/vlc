@@ -105,7 +105,7 @@ vlc_module_begin ()
 #endif
     add_integer( "projectm-width", 800, WIDTH_TEXT, WIDTH_LONGTEXT,
                  false )
-    add_integer( "projectm-height", 640, HEIGHT_TEXT, HEIGHT_LONGTEXT,
+    add_integer( "projectm-height", 500, HEIGHT_TEXT, HEIGHT_LONGTEXT,
                  false )
     add_integer( "projectm-meshx", 32, MESHX_TEXT, MESHX_LONGTEXT,
                  false )
