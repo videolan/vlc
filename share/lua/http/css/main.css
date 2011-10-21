@@ -3,6 +3,7 @@ root {
 }
 body{
 }
+
 #mainContainer{
 	text-align: center;
 	width: 800px;
@@ -40,15 +41,23 @@ body{
 #currentVolume{
 	display: inline-block;
 }
+
 #mediaTitle{
+	overflow: hidden;
+	padding: 5px;
+}
+
+#regular_layout #mediaTitle{
 	position: absolute;
 	top: 60px;
 	left: 0px;
 	width: 500px;
 	text-align: left;
-	padding: 5px;
-	overflow: hidden;
 }
+
+#mobile_layout #mediaTitle{
+}
+
 #currentTime{
 	float: left;
 	text-align: left;
@@ -61,14 +70,24 @@ body{
 	position:relative;
 	height: 150px;
 }
+
+
 #controlButtons{
+	text-align: left;
+	width: 380px;
+}
+
+/* div layout */
+#regular_layout #controlButtons{
 	position: absolute;
 	top: 0;
 	left: 0;
 	padding: 0;
 	margin: 0;
-	text-align: left;
-	width: 380px;
+}
+
+/* still on table layout */
+#mobile_layout #controlButtons{
 }
 
 #buttonszone{
