@@ -1,7 +1,7 @@
 /*****************************************************************************
  * audiobargraph_a.c : audiobargraph audio plugin for vlc
  *****************************************************************************
- * Copyright (C) 2002-2006 the VideoLAN team
+ * Copyright (C) 2002-2009 the VideoLAN team
  * $Id$
  *
  * Authors: Clement CHESNIN <clement.chesnin@gmail.com>
@@ -36,8 +36,6 @@
 
 #include <vlc_network.h>
 #include <math.h>
-
-
 
 #define ADDRESS_TEXT N_("TCP address to use (default localhost)")
 #define ADDRESS_LONGTEXT N_("TCP address to use to communicate with the video "\
@@ -82,7 +80,7 @@ static block_t *DoWork( filter_t *, block_t * );
 
 vlc_module_begin ()
     set_description( N_("Audio part of the BarGraph function") )
-    set_shortname( N_("audiobargraph_a") )
+    set_shortname( N_("Audiobar Graph") )
     set_capability( "audio filter", 0 )
     set_category( CAT_AUDIO )
     set_subcategory( SUBCAT_AUDIO_AFILTER )
