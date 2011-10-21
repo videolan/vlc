@@ -32,15 +32,16 @@
 		<script type="text/javascript" src="js/jquery-1.5.1.min.js"></script>
 		<script type="text/javascript" src="js/jquery-ui-1.8.13.custom.min.js"></script>
 		<script type="text/javascript" src="js/jquery.jstree.js"></script>
-		<script type="text/javascript" src="http://static.flowplayer.org/js/flowplayer-3.2.6.min.js"></script>
 		<script type="text/javascript" src="js/controlers.js"></script>
 		<script type="text/javascript" src="js/ui.js"></script>
 		<script type="text/javascript">
 			var pollStatus	=	false;
-			$(function(){
+			/* delay script loading so we won't block if we have no net access */
+			$.getScript('http://static.flowplayer.org/js/flowplayer-3.2.6.min.js', function(data, textStatus){
 				$('#player').empty();
 				$('#player').attr('href',$('#stream_protocol').val()+'://'+$('#stream_host').val()+':'+$('#stream_port').val()+'/'+$('#stream_file').val());
 				flowplayer("player", "http://releases.flowplayer.org/swf/flowplayer-3.2.7.swf");
+				/* .getScript only handles success() */
 			});
 		</script>
 	</head>
