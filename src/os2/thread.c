@@ -72,8 +72,13 @@ static ULONG vlc_DosWaitEventSemEx( HEV hev, ULONG ulTimeout, BOOL fCancelable )
     struct vlc_thread *th = vlc_threadvar_get( thread_key );
     if( th == NULL || !fCancelable )
     {
-        /* Main thread - cannot be cancelled anyway */
-        return DosWaitEventSem( hev, ulTimeout );
+        /* Main thread - cannot be cancelled anyway
+         * Alien thread - out of our control
+         */
+        if( hev != NULLHANDLE )
+            return DosWaitEventSem( hev, ulTimeout );
+
+        return DosSleep( ulTimeout );
     }
 
     n = 0;
