@@ -59,8 +59,8 @@ enum {
     CachingLowest = 100,
     CachingLow    = 200,
     CachingNormal = 300,
-    CachingHigh   = 750,
-    CachingHigher = 2500
+    CachingHigh   = 500,
+    CachingHigher = 1000
 };
 
 enum {

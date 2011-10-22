@@ -490,16 +490,16 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             addToCachingBox( N_("Higher latency"), CachingHigher );
             #undef addToCachingBox
 
-#define TestCaC( name ) \
+#define TestCaC( name, factor ) \
     b_cache_equal =  b_cache_equal && \
-     ( i_cache == config_GetInt( p_intf, name ) )
+     ( i_cache * factor == config_GetInt( p_intf, name ) );
             /* Select the accurate value of the ComboBox */
             bool b_cache_equal = true;
-            int i_cache = config_GetInt( p_intf, "file-caching");
+            int i_cache = config_GetInt( p_intf, "file-caching" );
 
-            TestCaC( "network-caching" );
-            TestCaC( "disc-caching" );
-            TestCaC( "live-caching" );
+            TestCaC( "network-caching", 10/3 );
+            TestCaC( "disc-caching", 1);
+            TestCaC( "live-caching", 1 );
             if( b_cache_equal == 1 )
                 ui.cachingCombo->setCurrentIndex(
                 ui.cachingCombo->findData( QVariant( i_cache ) ) );
@@ -770,15 +770,16 @@ void SPrefsPanel::apply()
             config_PutPsz( p_intf, "cd-audio", devicepath );
         }
 
-#define CaC( name ) config_PutInt( p_intf, name, i_comboValue )
+#define CaC( name, factor ) config_PutInt( p_intf, name, i_comboValue * factor )
         /* Caching */
         QComboBox *cachingCombo = qobject_cast<QComboBox *>(optionWidgets[cachingCoB]);
         int i_comboValue = cachingCombo->itemData( cachingCombo->currentIndex() ).toInt();
         if( i_comboValue )
         {
-            CaC( "network-caching" );
-            CaC( "disc-caching" );
-            CaC( "live-caching" );
+            CaC( "file-caching", 1 );
+            CaC( "network-caching", 10/3 );
+            CaC( "disc-caching", 1 );
+            CaC( "live-caching", 1 );
         }
         break;
 #undef CaC
