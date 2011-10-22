@@ -50,6 +50,6 @@
 /** LibVLC full version as a single integer (for comparison) */
 # define LIBVLC_VERSION_INT \
          LIBVLC_VERSION(LIBVLC_VERSION_MAJOR, LIBVLC_VERSION_MINOR, \
-                        LIBVLC_VERSION_EXTRA, LIBVLC_VERSION_EXTRA)
+                        LIBVLC_VERSION_REVISION, LIBVLC_VERSION_EXTRA)
 
 #endif
