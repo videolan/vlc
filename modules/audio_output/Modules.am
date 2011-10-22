@@ -45,3 +45,11 @@ libpulse_plugin_la_DEPENDENCIES =
 if HAVE_PULSE
 libvlc_LTLIBRARIES += libpulse_plugin.la
 endif
+
+libkai_plugin_la_SOURCES = kai.c
+libkai_plugin_la_CFLAGS = $(AM_CFLAGS)
+libkai_plugin_la_LIBADD = $(AM_LIBADD) $(KAI_LIBS)
+libkai_plugin_la_DEPENDENCIES =
+if HAVE_KAI
+libvlc_LTLIBRARIES += libkai_plugin.la
+endif

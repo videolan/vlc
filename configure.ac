@@ -3590,6 +3590,29 @@ dnl
 PKG_ENABLE_MODULES_VLC([SAMPLERATE], [], [samplerate], [Resampler with libsamplerate], [auto])
 
 dnl
+dnl  OS/2 KAI plugin
+dnl
+AC_ARG_ENABLE(kai,
+  [AS_HELP_STRING([--enable-kai],
+    [support the K Audio Interface KAI (default enabled on OS/2)])],, [
+  AS_IF([test "$SYS" = "os2"], [
+    enable_kai="yes"
+  ])
+])
+have_kai="no"
+KAI_LIBS=""
+AS_IF([test "$enable_kai" != "no"], [
+  AC_CHECK_HEADERS([kai.h], [
+    have_kai="yes"
+    AC_CHECK_LIB(kai, main, [
+      KAI_LIBS="-lkai"
+    ])
+  ])
+])
+AC_SUBST(KAI_LIBS)
+AM_CONDITIONAL([HAVE_KAI], [test "${have_kai}" = "yes"])
+
+dnl
 dnl  Interface plugins
 dnl
 
