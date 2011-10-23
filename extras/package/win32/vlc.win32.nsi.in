@@ -819,6 +819,9 @@ UAC_Success:
   StrCmp $LANGUAGE ${LANG_BASQUE} Basque 0
   StrCmp $LANGUAGE ${LANG_SERBIAN} Serbian 0
   StrCmp $LANGUAGE ${LANG_RUSSIAN} Russian 0
+  StrCmp $LANGUAGE ${LANG_HEBREW} Hebrew 0
+  StrCmp $LANGUAGE ${LANG_GALICIAN} Galician 0
+  StrCmp $LANGUAGE ${LANG_SWEDISH} Swedish 0
   StrCmp $LANGUAGE ${LANG_PORTUGUESEBR} Brazilian EndLanguageCmp
   French:
   !include "languages\french.nsh"
@@ -888,6 +891,15 @@ UAC_Success:
   Goto EndLanguageCmp
   Russian:
   !include "languages\Russian.nsh"
+  Goto EndLanguageCmp
+  Hebrew:
+  !include "languages\hebrew.nsh"
+  Goto EndLanguageCmp
+  Galician:
+  !include "languages\galician.nsh"
+  Goto EndLanguageCmp
+  Swedish:
+  !include "languages\swedish.nsh"
   Goto EndLanguageCmp
   Brazilian:
   !include "languages\brazilian_portuguese.nsh"
@@ -1173,6 +1185,9 @@ UAC_Success:
   StrCmp $LANGUAGE ${LANG_BASQUE} Basque 0
   StrCmp $LANGUAGE ${LANG_SERBIAN} Serbian 0
   StrCmp $LANGUAGE ${LANG_RUSSIAN} Russian 0
+  StrCmp $LANGUAGE ${LANG_HEBREW} Hebrew 0
+  StrCmp $LANGUAGE ${LANG_GALICIAN} Galician 0
+  StrCmp $LANGUAGE ${LANG_SWEDISH} Swedish 0
   StrCmp $LANGUAGE ${LANG_PORTUGUESEBR} Brazilian EndLanguageCmp
   French:
   !include "languages\french.nsh"
@@ -1242,6 +1257,15 @@ UAC_Success:
   Goto EndLanguageCmp
   Russian:
   !include "languages\russian.nsh"
+  Goto EndLanguageCmp
+  Hebrew:
+  !include "languages\hebrew.nsh"
+  Goto EndLanguageCmp
+  Galician:
+  !include "languages\galician.nsh"
+  Goto EndLanguageCmp
+  Swedish:
+  !include "languages\swedish.nsh"
   Goto EndLanguageCmp
   Brazilian:
   !include "languages\brazilian_portuguese.nsh"
