@@ -120,12 +120,9 @@
 #define GAMMA_TEXT N_( "Gamma" )
 #define GAMMA_LONGTEXT N_( \
     "Gamma adjust." )
-#define EXPOSURE_TEXT N_( "Exposure" )
-#define EXPOSURE_LONGTEXT N_( \
-    "Exposure." )
-#define AUTOGAIN_TEXT N_( "Automatic gain/exposure" )
+#define AUTOGAIN_TEXT N_( "Automatic gain" )
 #define AUTOGAIN_LONGTEXT N_( \
-    "Automatically set the video gain or exposure." )
+    "Automatically set the video gain." )
 #define GAIN_TEXT N_( "Gain" )
 #define GAIN_LONGTEXT N_( \
     "Picture gain." )
@@ -392,8 +389,6 @@ vlc_module_begin ()
                  BLUEBALANCE_LONGTEXT, true )
     add_integer( CFG_PREFIX "gamma", -1, GAMMA_TEXT,
                  GAMMA_LONGTEXT, true )
-    add_integer( CFG_PREFIX "exposure", -1, EXPOSURE_TEXT,
-                 EXPOSURE_LONGTEXT, true )
     add_integer( CFG_PREFIX "autogain", -1, AUTOGAIN_TEXT,
                  AUTOGAIN_LONGTEXT, true )
         change_integer_list( tristate_vlc, tristate_user )

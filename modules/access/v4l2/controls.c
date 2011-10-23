@@ -56,7 +56,6 @@ static const vlc_v4l2_ctrl_name_t controls[] =
     { "red-balance", V4L2_CID_RED_BALANCE },
     { "blue-balance", V4L2_CID_BLUE_BALANCE },
     { "gamma", V4L2_CID_GAMMA },
-    { "exposure", V4L2_CID_EXPOSURE },
     { "autogain", V4L2_CID_AUTOGAIN },
     { "gain", V4L2_CID_GAIN },
     { "hflip", V4L2_CID_HFLIP },
