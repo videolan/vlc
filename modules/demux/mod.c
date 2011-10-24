@@ -126,14 +126,6 @@ static int Control( demux_t *p_demux, int i_query, va_list args );
 
 static int Validate( demux_t *p_demux, const char *psz_ext );
 
-static const char *ppsz_mod_ext[] =
-{
-    "mod", "s3m", "xm",  "it",  "669", "amf", "ams", "dbm", "dmf", "dsm",
-    "far", "mdl", "med", "mtm", "okt", "ptm", "stm", "ult", "umx", "mt2",
-    "psm", "abc", NULL
-};
-
-
 /* We load the complete file in memory, put a higher bound
  * of 500 Mo (which is really big anyway) */
 #define MOD_MAX_FILE_SIZE (500*1000*1000)
@@ -150,28 +142,16 @@ static int Open( vlc_object_t *p_this )
     /* We accept file based on extension match */
     if( !p_demux->b_force )
     {
-        if( !p_demux->psz_file )
-            return VLC_EGENERIC;
-        const char *psz_ext = strrchr( p_demux->psz_file, '.' );
-        int i;
+        const char *psz_ext = p_demux->psz_file ? strrchr( p_demux->psz_file, '.' )
+                                                : NULL;
+        if( psz_ext )
+            psz_ext++;
 
-        if( !psz_ext )
-            return VLC_EGENERIC;
-
-        psz_ext++;  /* skip . */
-        for( i = 0; ppsz_mod_ext[i] != NULL; i++ )
+        if( Validate( p_demux, psz_ext ) )
         {
-            if( !strcasecmp( psz_ext, ppsz_mod_ext[i] ) )
-                break;
-        }
-        if( ppsz_mod_ext[i] == NULL )
-            return VLC_EGENERIC;
-        if( Validate( p_demux, ppsz_mod_ext[i] ) )
-        {
-            msg_Warn( p_demux, "MOD validation failed (ext=%s)", ppsz_mod_ext[i]);
+            msg_Warn( p_demux, "MOD validation failed (ext=%s)", psz_ext ? psz_ext : "");
             return VLC_EGENERIC;
         }
-        msg_Dbg( p_demux, "running MOD demuxer (ext=%s)", ppsz_mod_ext[i] );
     }
 
     const int64_t i_size = stream_Size( p_demux->s );
@@ -503,6 +483,10 @@ static int Validate( demux_t *p_demux, const char *psz_ext )
         { 1080, "OKTA" },
         { 1080, "16CN" },
         { 1080, "32CN" },
+        { 1080, "FLT4" },
+        { 1080, "FLT8" },
+        { 1080, "6CHN" },
+        { 1080, "8CHN" },
         { 1080, "FLT" },
         { 1080, "TDZ" },
         { 1081, "CHN" },
@@ -510,6 +494,22 @@ static int Validate( demux_t *p_demux, const char *psz_ext )
 
         {  -1, NULL }
     };
+    static const char *ppsz_mod_ext[] =
+    {
+        "mod", "s3m", "xm",  "it",  "669", "amf", "ams", "dbm", "dmf", "dsm",
+        "far", "mdl", "med", "mtm", "okt", "ptm", "stm", "ult", "umx", "mt2",
+        "psm", "abc", NULL
+    };
+    bool has_valid_extension = false;
+    if( psz_ext )
+    {
+        for( int i = 0; ppsz_mod_ext[i] != NULL; i++ )
+        {
+            has_valid_extension |= !strcasecmp( psz_ext, ppsz_mod_ext[i] );
+            if( has_valid_extension )
+                break;
+        }
+    }
 
     const uint8_t *p_peek;
     const int i_peek = stream_Peek( p_demux->s, &p_peek, 2048 );
@@ -526,7 +526,10 @@ static int Validate( demux_t *p_demux, const char *psz_ext )
             continue;
 
         if( !memcmp( &p_peek[i_offset], psz_marker, i_size ) )
-            return VLC_SUCCESS;
+        {
+            if( i_size >= 4 || has_valid_extension )
+                return VLC_SUCCESS;
+        }
     }
 
     /* The only two format left untested are ABC and MOD(old version)
@@ -534,7 +537,7 @@ static int Validate( demux_t *p_demux, const char *psz_ext )
 
     /* Check for ABC
      * TODO i_peek = 2048 is too big for such files */
-    if( !strcasecmp( psz_ext, "abc" ) )
+    if( psz_ext && !strcasecmp( psz_ext, "abc" ) )
     {
         bool b_k = false;
         bool b_tx = false;
@@ -550,7 +553,7 @@ static int Validate( demux_t *p_demux, const char *psz_ext )
     }
 
     /* Check for MOD */
-    if( !strcasecmp( psz_ext, "mod" ) && i_peek >= 20 + 15 * 30 )
+    if( psz_ext && !strcasecmp( psz_ext, "mod" ) && i_peek >= 20 + 15 * 30 )
     {
         /* Check that the name is correctly null padded */
         const uint8_t *p = memchr( p_peek, '\0', 20 );
