@@ -28,6 +28,7 @@
 # include "config.h"
 #endif
 #include <assert.h>
+#include <ctype.h>
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
@@ -2151,18 +2152,35 @@ static int AVI_IndexFind_idx1( demux_t *p_demux,
     }
     *pp_idx1 = p_idx1;
 
-    /* *** calculate offset *** */
-    /* Well, avi is __SHIT__ so test more than one entry
-     * (needed for some avi files) */
+    /* The offset in the index should be from the start of the movi content,
+     * but some broken files use offset from the start of the file. Just
+     * checking the offset of the first packet is not enough as some files
+     * has unused chunk at the beginning of the movi content.
+     */
     avi_chunk_list_t *p_movi = AVI_ChunkFind( p_riff, AVIFOURCC_movi, 0);
-    *pi_offset = 0;
-    for( unsigned i = 0; i < __MIN( p_idx1->i_entry_count, 10 ); i++ )
+    uint64_t i_first_pos = UINT64_MAX;
+    for( unsigned i = 0; i < __MIN( p_idx1->i_entry_count, 100 ); i++ )
+        i_first_pos = __MIN( i_first_pos, p_idx1->entry[i].i_pos );
+
+    const uint64_t i_movi_content = p_movi->i_chunk_pos + 8;
+    if( i_first_pos < i_movi_content )
     {
-        if( p_idx1->entry[i].i_pos < p_movi->i_chunk_pos )
-        {
-            *pi_offset = p_movi->i_chunk_pos + 8;
-            break;
-        }
+        *pi_offset = i_movi_content;
+    }
+    else if( p_sys->b_seekable && i_first_pos < UINT64_MAX )
+    {
+        const uint8_t *p_peek;
+        if( !stream_Seek( p_demux->s, i_movi_content + i_first_pos ) &&
+            stream_Peek( p_demux->s, &p_peek, 4 ) >= 4 &&
+            ( !isdigit( p_peek[0] ) || !isdigit( p_peek[1] ) ||
+              !isalpha( p_peek[2] ) || !isalpha( p_peek[3] ) ) )
+            *pi_offset = 0;
+        else
+            *pi_offset = i_movi_content;
+    }
+    else
+    {
+        *pi_offset = 0;
     }
     return VLC_SUCCESS;
 }
