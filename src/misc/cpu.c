@@ -105,28 +105,21 @@ void vlc_CPU_init (void)
      bool b_amd;
 
     /* Needed for x86 CPU capabilities detection */
-#   if defined( __x86_64__ )
-#       define cpuid( reg )                    \
-            asm volatile ( "cpuid\n\t"         \
-                         : "=a" ( i_eax ),     \
-                           "=b" ( i_ebx ),     \
-                           "=c" ( i_ecx ),     \
-                           "=d" ( i_edx )      \
-                         : "a"  ( reg )        \
-                         : "cc" );
-#   else
-#       define cpuid( reg )                    \
-            asm volatile ( "push %%ebx\n\t"    \
-                           "cpuid\n\t"         \
-                           "movl %%ebx,%1\n\t" \
-                           "pop %%ebx\n\t"     \
-                         : "=a" ( i_eax ),     \
-                           "=r" ( i_ebx ),     \
-                           "=c" ( i_ecx ),     \
-                           "=d" ( i_edx )      \
-                         : "a"  ( reg )        \
-                         : "cc" );
-#   endif
+# if defined (__i386__) && defined (__PIC__)
+#  define cpuid(reg) \
+     asm volatile ("xchgl %%ebx,%1\n\t" \
+                   "cpuid\n\t" \
+                   "xchgl %%ebx,%1\n\t" \
+                   : "=a" (i_eax), "=r" (i_ebx), "=c" (i_ecx), "=d" (i_edx) \
+                   : "a" (reg) \
+                   : "cc");
+# else
+#  define cpuid(reg) \
+     asm volatile ("cpuid\n\t" \
+                   : "=a" (i_eax), "=b" (i_ebx), "=c" (i_ecx), "=d" (i_edx) \
+                   : "a" (reg) \
+                   : "cc");
+# endif
      /* Check if the OS really supports the requested instructions */
 # if defined (__i386__) && !defined (__i486__) && !defined (__i586__) \
   && !defined (__i686__) && !defined (__pentium4__) \
