@@ -108,7 +108,6 @@ void vlc_CPU_init (void)
 #   if defined( __x86_64__ )
 #       define cpuid( reg )                    \
             asm volatile ( "cpuid\n\t"         \
-                           "movl %%ebx,%1\n\t" \
                          : "=a" ( i_eax ),     \
                            "=b" ( i_ebx ),     \
                            "=c" ( i_ecx ),     \
