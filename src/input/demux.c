@@ -133,7 +133,7 @@ demux_t *demux_New( vlc_object_t *p_obj, input_thread_t *p_parent_input,
             { "oga",  "ogg" }, { "spx",  "ogg" }, { "ogv", "ogg" },
             { "ogx",  "ogg" }, /*RFC5334*/
             { "pva",  "pva" },
-            { "rm",   "rm" },
+            { "rm",   "avformat" },
             { "m4v",  "m4v" },
             { "h264", "h264" },
             { "voc",  "voc" },
