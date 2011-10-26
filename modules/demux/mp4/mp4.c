@@ -2647,7 +2647,7 @@ static uint64_t MP4_TrackGetPos( mp4_track_t *p_track )
         MP4_Box_data_sample_soun_t *p_soun =
             p_track->p_sample->data.p_sample_soun;
 
-        if( p_soun->i_qt_version == 0 )
+        if( p_track->fmt.i_cat != AUDIO_ES || p_soun->i_qt_version == 0 )
         {
             i_pos += ( p_track->i_sample -
                        p_track->chunk[p_track->i_chunk].i_sample_first ) *
