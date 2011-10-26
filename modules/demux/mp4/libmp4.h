@@ -80,6 +80,7 @@
 #define ATOM_trun VLC_FOURCC( 't', 'r', 'u', 'n' )
 #define ATOM_cprt VLC_FOURCC( 'c', 'p', 'r', 't' )
 #define ATOM_iods VLC_FOURCC( 'i', 'o', 'd', 's' )
+#define ATOM_pasp VLC_FOURCC( 'p', 'a', 's', 'p' )
 
 #define ATOM_nmhd VLC_FOURCC( 'n', 'm', 'h', 'd' )
 #define ATOM_mp2v VLC_FOURCC( 'm', 'p', '2', 'v' )
@@ -981,6 +982,12 @@ typedef struct
 
 } MP4_Box_data_iods_t;
 
+typedef struct
+{
+    uint32_t i_horizontal_spacing;
+    uint32_t i_vertical_spacing;
+} MP4_Box_data_pasp_t;
+
 /*
 typedef struct MP4_Box_data__s
 {
@@ -1022,6 +1029,7 @@ typedef union MP4_Box_data_s
     MP4_Box_data_gnre_t *p_gnre;
     MP4_Box_data_trkn_t *p_trkn;
     MP4_Box_data_iods_t *p_iods;
+    MP4_Box_data_pasp_t *p_pasp;
 
     MP4_Box_data_stsz_t *p_stsz;
     MP4_Box_data_stz2_t *p_stz2;

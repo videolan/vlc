@@ -1506,6 +1506,7 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
     MP4_Box_t   *p_esds;
     MP4_Box_t   *p_frma;
     MP4_Box_t   *p_enda;
+    MP4_Box_t   *p_pasp;
 
     if( pp_es )
         *pp_es = NULL;
@@ -1540,6 +1541,8 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
     p_enda = MP4_BoxGet( p_sample, "wave/enda" );
     if( !p_enda )
         p_enda = MP4_BoxGet( p_sample, "enda" );
+
+    p_pasp = MP4_BoxGet( p_sample, "pasp" );
 
     if( p_track->fmt.i_cat == AUDIO_ES && ( p_track->i_sample_size == 1 || p_track->i_sample_size == 2 ) )
     {
@@ -1639,6 +1642,12 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
         {
             p_track->fmt.video.i_sar_num = p_track->i_width  * p_track->fmt.video.i_height;
             p_track->fmt.video.i_sar_den = p_track->i_height * p_track->fmt.video.i_width;
+        }
+        if( p_pasp && p_pasp->data.p_pasp->i_horizontal_spacing > 0 &&
+                      p_pasp->data.p_pasp->i_vertical_spacing > 0 )
+        {
+            p_track->fmt.video.i_sar_num = p_pasp->data.p_pasp->i_horizontal_spacing;
+            p_track->fmt.video.i_sar_den = p_pasp->data.p_pasp->i_vertical_spacing;
         }
 
         /* Support for cropping (eg. in H263 files) */
