@@ -1,7 +1,7 @@
 /*****************************************************************************
  * dash.cpp: DASH module
  *****************************************************************************
- * Copyright (C) 2010 - 2011 Klagenfurt University
+ * Copyright © 2010 - 2011 Klagenfurt University
  *
  * Created on: Aug 10, 2010
  * Authors: Christopher Mueller <christopher.mueller@itec.uni-klu.ac.at>
@@ -15,7 +15,7 @@
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program; if not, write to the Free Software
@@ -29,21 +29,10 @@
 # include "config.h"
 #endif
 
-#include <limits.h>
-
 #include <vlc_common.h>
 #include <vlc_plugin.h>
-#include <vlc_demux.h>
-#include <vlc_stream.h>
-#include <vlc_modules.h>
-#include <vlc_input.h>
 
 #include <errno.h>
-#include <string>
-#include <map>
-#include <fcntl.h>
-#include <iostream>
-#include <stdio.h>
 
 #include "DASHManager.h"
 #include "xml/DOMParser.h"
@@ -66,6 +55,7 @@ vlc_module_begin ()
         set_subcategory( SUBCAT_INPUT_STREAM_FILTER )
         set_callbacks( Open, Close )
 vlc_module_end ()
+
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
@@ -82,6 +72,7 @@ static int  Read            (stream_t *p_stream, void *p_buffer, unsigned int i_
 static int  Peek            (stream_t *p_stream, const uint8_t **pp_peek, unsigned int i_peek);
 static int  Control         (stream_t *p_stream, int i_query, va_list args);
 static bool IsDash          (stream_t *p_stream, dash::xml::DOMParser *p_parser);
+
 /*****************************************************************************
  * Open:
  *****************************************************************************/
