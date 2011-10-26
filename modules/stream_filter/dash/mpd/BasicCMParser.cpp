@@ -53,7 +53,7 @@ void    BasicCMParser::setMPDBaseUrl        (Node *root)
 {
     std::vector<Node *> baseUrls = DOMHelper::getChildElementByTagName(root, "BaseURL");
 
-    for(int i = 0; i < baseUrls.size(); i++)
+    for(size_t i = 0; i < baseUrls.size(); i++)
     {
         BaseUrl *url = new BaseUrl(baseUrls.at(i)->getText());
         this->mpd->addBaseUrl(url);
@@ -63,7 +63,7 @@ void    BasicCMParser::setPeriods           (Node *root)
 {
     std::vector<Node *> periods = DOMHelper::getElementByTagName(root, "Period", false);
 
-    for(int i = 0; i < periods.size(); i++)
+    for(size_t i = 0; i < periods.size(); i++)
     {
         Period *period = new Period(periods.at(i)->getAttributes());
         this->setGroups(periods.at(i), period);
@@ -74,7 +74,7 @@ void    BasicCMParser::setGroups            (Node *root, Period *period)
 {
     std::vector<Node *> groups = DOMHelper::getElementByTagName(root, "Group", false);
 
-    for(int i = 0; i < groups.size(); i++)
+    for(size_t i = 0; i < groups.size(); i++)
     {
         Group *group = new Group(groups.at(i)->getAttributes());
         this->setRepresentations(groups.at(i), group);
@@ -85,7 +85,7 @@ void    BasicCMParser::setRepresentations   (Node *root, Group *group)
 {
     std::vector<Node *> representations = DOMHelper::getElementByTagName(root, "Representation", false);
 
-    for(int i = 0; i < representations.size(); i++)
+    for(size_t i = 0; i < representations.size(); i++)
     {
         Representation *rep = new Representation(representations.at(i)->getAttributes());
         this->setSegmentInfo(representations.at(i), rep);
@@ -96,7 +96,7 @@ void    BasicCMParser::setSegmentInfo       (Node *root, Representation *rep)
 {
     std::vector<Node *> segmentInfo = DOMHelper::getChildElementByTagName(root, "SegmentInfo");
 
-    for(int i = 0; i < segmentInfo.size(); i++)
+    for(size_t i = 0; i < segmentInfo.size(); i++)
     {
         SegmentInfo *info = new SegmentInfo(segmentInfo.at(i)->getAttributes());
         this->setInitSegment(segmentInfo.at(i), info);
@@ -109,7 +109,7 @@ void    BasicCMParser::setInitSegment       (Node *root, SegmentInfo *info)
 {
     std::vector<Node *> initSeg = DOMHelper::getChildElementByTagName(root, "InitialisationSegmentURL");
 
-    for(int i = 0; i < initSeg.size(); i++)
+    for(size_t i = 0; i < initSeg.size(); i++)
     {
         InitSegment *seg = new InitSegment(initSeg.at(i)->getAttributes());
         info->setInitSegment(seg);
@@ -120,7 +120,7 @@ void    BasicCMParser::setSegments          (Node *root, SegmentInfo *info)
 {
     std::vector<Node *> segments = DOMHelper::getElementByTagName(root, "Url", false);
 
-    for(int i = 0; i < segments.size(); i++)
+    for(size_t i = 0; i < segments.size(); i++)
     {
         Segment *seg = new Segment(segments.at(i)->getAttributes());
         info->addSegment(seg);

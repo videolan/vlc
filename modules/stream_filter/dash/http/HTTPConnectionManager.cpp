@@ -75,7 +75,7 @@ bool                HTTPConnectionManager::closeConnection          (Chunk *chun
     delete(chunk);
     return ret;
 }
-bool                HTTPConnectionManager::closeAllConnections      ()
+void                HTTPConnectionManager::closeAllConnections      ()
 {
     for(std::vector<HTTPConnection *>::iterator it = this->connections.begin(); it != this->connections.end(); ++it)
     {
@@ -134,7 +134,7 @@ int                 HTTPConnectionManager::read                     (Chunk *chun
         this->bytesReadChunk    = 0;
         this->timeSecChunk      = 0;
 
-        HTTPConnection *con = this->initConnection(chunk);
+        this->initConnection(chunk);
         return this->read(chunk, p_buffer, len);
     }
 }
@@ -143,7 +143,7 @@ int                 HTTPConnectionManager::peek                     (Chunk *chun
     if(this->chunkMap.find(chunk) != this->chunkMap.end())
         return this->chunkMap[chunk]->peek(pp_peek, i_peek);
 
-    HTTPConnection *con = this->initConnection(chunk);
+    this->initConnection(chunk);
     return this->peek(chunk, pp_peek, i_peek);
 }
 HTTPConnection*     HTTPConnectionManager::initConnection           (Chunk *chunk)
@@ -161,6 +161,6 @@ void                HTTPConnectionManager::attach                   (IDownloadRa
 }
 void                HTTPConnectionManager::notify                   ()
 {
-    for(int i = 0; i < this->rateObservers.size(); i++)
+    for(size_t i = 0; i < this->rateObservers.size(); i++)
         this->rateObservers.at(i)->downloadRateChanged(this->bpsAvg, this->bpsLastChunk);
 }

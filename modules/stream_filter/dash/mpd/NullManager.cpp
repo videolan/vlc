@@ -45,19 +45,19 @@ Period*                 NullManager::getFirstPeriod          ()
 {
     return NULL;
 }
-Period*                 NullManager::getNextPeriod           (Period *period)
+Period*                 NullManager::getNextPeriod           (Period *)
 {
     return NULL;
 }
-Representation*         NullManager::getBestRepresentation   (Period *period)
+Representation*         NullManager::getBestRepresentation   (Period *)
 {
     return NULL;
 }
-std::vector<ISegment *> NullManager::getSegments             (Representation *rep)
+std::vector<ISegment *> NullManager::getSegments             (Representation *)
 {
     return std::vector<ISegment *>();
 }
-Representation*         NullManager::getRepresentation       (Period *period, long bitrate)
+Representation*         NullManager::getRepresentation       (Period *, long )
 {
     return NULL;
 }

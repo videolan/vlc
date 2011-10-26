@@ -41,10 +41,10 @@ MPD::MPD    ()
 }
 MPD::~MPD   ()
 {
-    for(int i = 0; i < this->periods.size(); i++)
+    for(size_t i = 0; i < this->periods.size(); i++)
         delete(this->periods.at(i));
 
-    for(int i = 0; i < this->baseUrls.size(); i++)
+    for(size_t i = 0; i < this->baseUrls.size(); i++)
         delete(this->baseUrls.at(i));
 
     delete(this->programInfo);

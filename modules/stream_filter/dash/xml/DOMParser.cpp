@@ -109,14 +109,14 @@ void    DOMParser::print                    (Node *node, int offset)
 
     std::vector<std::string> keys = node->getAttributeKeys();
 
-    for(int i = 0; i < keys.size(); i++)
+    for(size_t i = 0; i < keys.size(); i++)
         msg_Dbg(this->stream, " %s=%s", keys.at(i).c_str(), node->getAttributeValue(keys.at(i)).c_str());
 
     msg_Dbg(this->stream, "\n");
 
     offset++;
 
-    for(int i = 0; i < node->getSubNodes().size(); i++)
+    for(size_t i = 0; i < node->getSubNodes().size(); i++)
     {
         this->print(node->getSubNodes().at(i), offset);
     }

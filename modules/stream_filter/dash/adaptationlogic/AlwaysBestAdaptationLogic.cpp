@@ -51,7 +51,7 @@ Chunk*  AlwaysBestAdaptationLogic::getNextChunk () throw(EOFException)
     if(this->count == this->schedule.size())
         throw EOFException();
 
-    for(int i = 0; i < this->schedule.size(); i++)
+    for(size_t i = 0; i < this->schedule.size(); i++)
     {
         if(this->count == i)
         {
@@ -69,14 +69,14 @@ void    AlwaysBestAdaptationLogic::initSchedule ()
     {
         std::vector<Period *> periods = this->mpdManager->getPeriods();
 
-        for(int i = 0; i < periods.size(); i++)
+        for(size_t i = 0; i < periods.size(); i++)
         {
             Representation *best = this->mpdManager->getBestRepresentation(periods.at(i));
 
             if(best != NULL)
             {
                 std::vector<ISegment *> segments = this->mpdManager->getSegments(best);
-                for(int j = 0; j < segments.size(); j++)
+                for(size_t j = 0; j < segments.size(); j++)
                 {
                     this->schedule.push_back(segments.at(j));
                 }

@@ -51,7 +51,7 @@ namespace dash
             private:
                 std::vector<dash::mpd::ISegment *>  schedule;
                 dash::mpd::IMPDManager              *mpdManager;
-                int                                 count;
+                size_t                              count;
 
                 void initSchedule();
         };

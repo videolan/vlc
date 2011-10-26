@@ -48,7 +48,7 @@ namespace dash
                 HTTPConnectionManager           (stream_t *stream);
                 virtual ~HTTPConnectionManager  ();
 
-                bool                closeAllConnections ();
+                void                closeAllConnections ();
                 bool                closeConnection     (IHTTPConnection *con);
                 IHTTPConnection*    getConnection       (std::string url);
                 int                 read                (Chunk *chunk, void *p_buffer, size_t len);

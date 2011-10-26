@@ -109,13 +109,12 @@ std::string     HTTPConnection::readLine        ()
 }
 bool            HTTPConnection::sendData        (std::string data)
 {
-    size_t size = 0;
-    size = net_Write(this->stream, this->httpSocket, NULL, data.c_str(), data.size());
+    ssize_t size = net_Write(this->stream, this->httpSocket, NULL, data.c_str(), data.size());
     if (size == -1)
     {
         return false;
     }
-    if (size != data.length())
+    if ((size_t)size != data.length())
     {
         this->sendData(data.substr(size, data.size()));
     }

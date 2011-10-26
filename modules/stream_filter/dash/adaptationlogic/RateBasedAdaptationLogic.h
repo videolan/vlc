@@ -46,7 +46,7 @@ namespace dash
 
             private:
                 dash::mpd::IMPDManager  *mpdManager;
-                int                     count;
+                size_t                  count;
                 dash::mpd::Period       *currentPeriod;
         };
     }

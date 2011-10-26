@@ -67,7 +67,7 @@ Chunk*  RateBasedAdaptationLogic::getNextChunk () throw(EOFException)
         return this->getNextChunk();
     }
 
-    for(int i = 0; i < segments.size(); i++)
+    for(size_t i = 0; i < segments.size(); i++)
     {
         if(i == this->count)
         {
@@ -77,4 +77,5 @@ Chunk*  RateBasedAdaptationLogic::getNextChunk () throw(EOFException)
             return chunk;
         }
     }
+    return NULL;
 }

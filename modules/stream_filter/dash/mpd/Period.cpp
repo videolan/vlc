@@ -35,7 +35,7 @@ Period::Period  (std::map<std::string, std::string> attributes)
 }
 Period::~Period ()
 {
-    for(int i = 0; i < this->groups.size(); i++)
+    for(size_t i = 0; i < this->groups.size(); i++)
         delete(this->groups.at(i));
 }
 

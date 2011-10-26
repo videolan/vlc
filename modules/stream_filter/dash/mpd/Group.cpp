@@ -37,7 +37,7 @@ Group::Group    (std::map<std::string, std::string>  attributes)
 }
 Group::~Group   ()
 {
-    for(int i = 0; i < this->representations.size(); i++)
+    for(size_t i = 1; i < this->representations.size(); i++)
         delete(this->representations.at(i));
 
     delete(this->contentProtection);

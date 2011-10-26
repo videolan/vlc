@@ -37,7 +37,7 @@ SegmentInfo::SegmentInfo(std::map<std::string,std::string> attr)
 }
 SegmentInfo::~SegmentInfo   ()
 {
-    for(int i = 0; i < this->segments.size(); i++)
+    for(size_t i = 0; i < this->segments.size(); i++)
         delete(this->segments.at(i));
 
     delete(this->initSeg);

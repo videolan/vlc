@@ -50,7 +50,7 @@ std::vector<ISegment*>  BasicCMManager::getSegments             (Representation 
 
         std::vector<Segment *> segments = info->getSegments();
 
-        for(int i = 0; i < segments.size(); i++)
+        for(size_t i = 0; i < segments.size(); i++)
             retSegments.push_back(segments.at(i));
     }
     catch(ElementNotPresentException &e)
@@ -71,10 +71,10 @@ Representation*         BasicCMManager::getBestRepresentation   (Period *period)
     long            bitrate  = 0;
     Representation  *best    = NULL;
 
-    for(int i = 0; i < groups.size(); i++)
+    for(size_t i = 0; i < groups.size(); i++)
     {
         std::vector<Representation *> reps = groups.at(i)->getRepresentations();
-        for(int j = 0; j < reps.size(); j++)
+        for(size_t j = 0; j < reps.size(); j++)
         {
             try
             {
@@ -110,10 +110,10 @@ Representation*         BasicCMManager::getRepresentation       (Period *period,
     Representation  *best       = NULL;
     long            bestDif  = -1;
 
-    for(int i = 0; i < groups.size(); i++)
+    for(size_t i = 0; i < groups.size(); i++)
     {
         std::vector<Representation *> reps = groups.at(i)->getRepresentations();
-        for(int j = 0; j < reps.size(); j++)
+        for(size_t j = 0; j < reps.size(); j++)
         {
             try
             {
@@ -148,7 +148,7 @@ Period*                 BasicCMManager::getNextPeriod           (Period *period)
 {
     std::vector<Period *> periods = this->mpd->getPeriods();
 
-    for(int i = 0; i < periods.size(); i++)
+    for(size_t i = 0; i < periods.size(); i++)
     {
         if(periods.at(i) == period && (i + 1) < periods.size())
             return periods.at(i + 1);
