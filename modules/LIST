@@ -301,6 +301,7 @@ $Id$
  * sqlite: manage an SQLite database
  * stats: Stats encoder function
  * stl: EBU STL decoder
+ * stream_filter_dash: MPEG DASH playback
  * stream_filter_httplive: HTTP Live streaming for playback
  * stream_filter_rar: Stream filter to read inside Rar files
  * stream_filter_record: record any stream instantly

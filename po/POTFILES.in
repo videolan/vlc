@@ -980,6 +980,7 @@ modules/services_discovery/windrive.c
 modules/services_discovery/xcb_apps.c
 modules/stream_filter/decomp.c
 modules/stream_filter/record.c
+modules/stream_filter/dash/dash.cpp
 modules/stream_out/autodel.c
 modules/stream_out/bridge.c
 modules/stream_out/delay.c
