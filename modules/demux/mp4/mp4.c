@@ -708,7 +708,7 @@ static int Demux( demux_t *p_demux )
                     if( tk->fmt.i_codec == VLC_FOURCC( 's', 'u', 'b', 't' ) &&
                         p_block->i_buffer >= 2 )
                     {
-                        uint16_t i_size = GetWBE( p_block->p_buffer );
+                        size_t i_size = GetWBE( p_block->p_buffer );
 
                         if( i_size + 2 <= p_block->i_buffer )
                         {
