@@ -214,7 +214,6 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
 static block_t *Reassemble( decoder_t *p_dec, block_t *p_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    uint8_t *p_buffer;
 
     if( p_block->i_buffer < SPU_HEADER_LEN )
     {
@@ -223,8 +222,6 @@ static block_t *Reassemble( decoder_t *p_dec, block_t *p_block )
         block_Release( p_block );
         return NULL;
     }
-
-    p_buffer = p_block->p_buffer;
 
     /* From the scant data on the format, there is only only way known
      * to detect the first packet in a subtitle.  The first packet
