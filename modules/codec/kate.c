@@ -797,6 +797,8 @@ static int TigerValidateSubpicture( subpicture_t *p_subpic,
                                     bool b_fmt_dst, const video_format_t *p_fmt_dst,
                                     mtime_t ts )
 {
+    VLC_UNUSED(p_fmt_src); VLC_UNUSED(p_fmt_dst);
+
     decoder_sys_t *p_sys = p_subpic->updater.p_sys->p_dec_sys;
 
     if( b_fmt_src || b_fmt_dst )
