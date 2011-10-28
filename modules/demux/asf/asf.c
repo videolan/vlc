@@ -570,7 +570,7 @@ static int DemuxPacket( demux_t *p_demux )
         {
             break;
         }
-#if 0
+#ifdef ASF_DEBUG
          msg_Dbg( p_demux,
                   "payload(%d/%d) stream_number:%d media_object_number:%d media_object_offset:%d replicated_data_length:%d payload_data_length %d",
                   i_payload + 1, i_payload_count, i_stream_number, i_media_object_number,
