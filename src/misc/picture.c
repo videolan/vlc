@@ -62,7 +62,7 @@ static int vout_AllocatePicture( picture_t *p_pic,
         const plane_t *p = &p_pic->p[i];
 
         if( p->i_pitch <= 0 || p->i_lines <= 0 ||
-            p->i_pitch > (SIZE_MAX - i_bytes)/p->i_lines )
+            (size_t)p->i_pitch > (SIZE_MAX - i_bytes)/p->i_lines )
         {
             p_pic->i_planes = 0;
             return VLC_ENOMEM;
@@ -362,9 +362,9 @@ int picture_Export( vlc_object_t *p_obj,
 
     /* */
     fmt_out.i_width  = ( i_override_width < 0 ) ?
-                       i_original_width : i_override_width;
+                       i_original_width : (unsigned)i_override_width;
     fmt_out.i_height = ( i_override_height < 0 ) ?
-                       i_original_height : i_override_height;
+                       i_original_height : (unsigned)i_override_height;
 
     /* scale if only one direction is provided */
     if( fmt_out.i_height == 0 && fmt_out.i_width > 0 )
