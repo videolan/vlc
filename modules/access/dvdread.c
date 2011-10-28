@@ -660,6 +660,7 @@ static void ESNew( demux_t *p_demux, int i_id, int i_lang )
     }
     else if( tk->fmt.i_cat == AUDIO_ES )
     {
+#if 0
         int i_audio = -1;
         /* find the audio number PLEASE find another way */
         if( (i_id&0xbdf8) == 0xbd88 )       /* dts */
@@ -678,6 +679,7 @@ static void ESNew( demux_t *p_demux, int i_id, int i_lang )
         {
             i_audio = i_id&0x1f;
         }
+#endif
 
         if( psz_language[0] ) tk->fmt.psz_language = strdup( psz_language );
     }
