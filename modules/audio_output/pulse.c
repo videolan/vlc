@@ -842,15 +842,6 @@ static int Open(vlc_object_t *obj)
     sys->desync = 0;
     sys->rate = ss.rate;
 
-    /* Context events */
-    const pa_subscription_mask_t mask = PA_SUBSCRIPTION_MASK_SINK
-                                      | PA_SUBSCRIPTION_MASK_SINK_INPUT;
-
-    pa_context_set_subscribe_callback(ctx, context_cb, aout);
-    op = pa_context_subscribe(ctx, mask, NULL, NULL);
-    if (likely(op != NULL))
-       pa_operation_unref(op);
-
     /* Channel volume */
     sys->base_volume = PA_VOLUME_NORM;
     pa_cvolume_set(&sys->cvolume, ss.channels, PA_VOLUME_NORM);
@@ -940,6 +931,14 @@ static int Open(vlc_object_t *obj)
     if (op != NULL)
         pa_operation_unref(op);
     stream_moved_cb(s, aout);
+
+    /* Context events */
+    const pa_subscription_mask_t mask = PA_SUBSCRIPTION_MASK_SINK
+                                      | PA_SUBSCRIPTION_MASK_SINK_INPUT;
+    pa_context_set_subscribe_callback(ctx, context_cb, aout);
+    op = pa_context_subscribe(ctx, mask, NULL, NULL);
+    if (likely(op != NULL))
+       pa_operation_unref(op);
     pa_threaded_mainloop_unlock(sys->mainloop);
 
     aout->format.i_format = format;
@@ -984,6 +983,7 @@ static void Close (vlc_object_t *obj)
         pa_stream_set_started_callback(s, NULL, NULL);
         pa_stream_set_suspended_callback(s, NULL, NULL);
         pa_stream_set_underflow_callback(s, NULL, NULL);
+        pa_context_set_subscribe_callback(ctx, NULL, NULL);
 
         pa_stream_unref(s);
         pa_threaded_mainloop_unlock(sys->mainloop);
