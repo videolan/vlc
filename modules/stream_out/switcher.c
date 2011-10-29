@@ -509,8 +509,7 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
 
         while ( id->p_queued != NULL )
         {
-            mtime_t i_dts;
-            int i;
+            mtime_t i_dts = 0;
 
             if ( p_sys->i_old_cmd != p_sys->i_cmd )
             {
@@ -519,7 +518,7 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
 
             i_dts = Process( p_stream, id, i_dts );
 
-            for ( i = 0; i < MAX_AUDIO; i++ )
+            for ( int i = 0; i < MAX_AUDIO; i++ )
             {
                 if ( p_sys->pp_audio_ids[i] != NULL )
                     Process( p_stream, p_sys->pp_audio_ids[i], i_dts );
