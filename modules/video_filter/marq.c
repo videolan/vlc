@@ -164,7 +164,7 @@ vlc_module_begin ()
     /* 5 sets the default to top [1] left [4] */
     add_integer_with_range( CFG_PREFIX "opacity", 255, 0, 255,
         OPACITY_TEXT, OPACITY_LONGTEXT, false )
-    add_integer( CFG_PREFIX "color", 0xFFFFFF, COLOR_TEXT, COLOR_LONGTEXT,
+    add_rgb( CFG_PREFIX "color", 0xFFFFFF, COLOR_TEXT, COLOR_LONGTEXT,
                  false )
         change_integer_list( pi_color_values, ppsz_color_descriptions )
     add_integer( CFG_PREFIX "size", -1, SIZE_TEXT, SIZE_LONGTEXT,
