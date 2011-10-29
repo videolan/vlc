@@ -1,7 +1,7 @@
 /*****************************************************************************
  * preferences_widgets.hpp : Widgets for preferences panels
  ****************************************************************************
- * Copyright (C) 2006-2007 the VideoLAN team
+ * Copyright (C) 2006-2011 the VideoLAN team
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
@@ -75,7 +75,7 @@ public slots:
  * Variable controls
  *******************************************************/
 
-class   ConfigControl : public QObject
+class ConfigControl : public QObject
 {
     Q_OBJECT
 public:
@@ -167,10 +167,10 @@ public:
                                 QLabel *, QSlider * );
     virtual int getValue() const;
 protected:
-         QSlider *slider;
+    QSlider *slider;
 private:
-         QLabel *label;
-         void finish();
+    QLabel *label;
+    void finish();
 };
 
 class IntegerListConfigControl : public VIntConfigControl
@@ -207,6 +207,26 @@ public:
 private:
     QAbstractButton *checkbox;
     void finish();
+};
+
+class ColorConfigControl : public VIntConfigControl
+{
+Q_OBJECT
+public:
+    ColorConfigControl( vlc_object_t *, module_config_t *, QWidget *,
+                        QGridLayout *, int );
+    ColorConfigControl( vlc_object_t *, module_config_t *,
+                        QLabel *, QAbstractButton* );
+    virtual ~ColorConfigControl() { delete color_px; }
+    virtual int getValue() const;
+private:
+    QLabel *label;
+    QAbstractButton *color_but;
+    QPixmap *color_px;
+    int i_color;
+    void finish();
+private slots:
+    void selectColor();
 };
 
 /*******************************************************

@@ -1,7 +1,7 @@
 /*****************************************************************************
  * preferences_widgets.cpp : Widgets for preferences displays
  ****************************************************************************
- * Copyright (C) 2006-2007 the VideoLAN team
+ * Copyright (C) 2006-2011 the VideoLAN team
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
@@ -52,6 +52,7 @@
 #include <QSignalMapper>
 #include <QDialogButtonBox>
 #include <QKeyEvent>
+#include <QColorDialog>
 
 #define MINWIDTH_BOX 90
 #define LAST_COLUMN 10
@@ -113,6 +114,9 @@ ConfigControl *ConfigControl::createControl( vlc_object_t *p_this,
             p_control = new StringListConfigControl( p_this, p_item,
                                             parent, l, line );
         break;
+    case CONFIG_ITEM_RGB:
+        p_control = new ColorConfigControl( p_this, p_item, parent, l, line );
+        break;
     case CONFIG_ITEM_INTEGER:
         if( p_item->i_list )
             p_control = new IntegerListConfigControl( p_this, p_item,
@@ -167,7 +171,7 @@ InterfacePreviewWidget::InterfacePreviewWidget ( QWidget *parent ) : QLabel( par
 
 void InterfacePreviewWidget::setNormalPreview( bool b_minimal )
 {
-    setPreview( ( b_minimal )?MINIMAL:COMPLETE );
+    setPreview( ( b_minimal ) ? MINIMAL : COMPLETE );
 }
 
 void InterfacePreviewWidget::setPreview( enum_style e_style )
@@ -191,7 +195,6 @@ void InterfacePreviewWidget::setPreview( enum_style e_style )
     setPixmap( QPixmap( pixmapLocationString ) );
     update();
 }
-
 
 
 /**************************************************************************
@@ -1112,6 +1115,74 @@ int BoolConfigControl::getValue() const
 {
     return checkbox->isChecked();
 }
+
+/************* Color *************/
+ColorConfigControl::ColorConfigControl( vlc_object_t *_p_this,
+                                            module_config_t *_p_item,
+                                            QWidget *_parent, QGridLayout *l,
+                                            int line ) :
+                           VIntConfigControl( _p_this, _p_item, _parent )
+{
+    label = new QLabel;
+    color_but = new QToolButton;
+    finish();
+
+    if( !l )
+    {
+        QHBoxLayout *layout = new QHBoxLayout();
+        layout->addWidget( label, 0 ); layout->addWidget( color_but, LAST_COLUMN );
+        widget->setLayout( layout );
+    }
+    else
+    {
+        l->addWidget( label, line, 0 );
+        l->addWidget( color_but, line, LAST_COLUMN, Qt::AlignRight );
+    }
+}
+
+ColorConfigControl::ColorConfigControl( vlc_object_t *_p_this,
+                                            module_config_t *_p_item,
+                                            QLabel *_label, QAbstractButton *_color ):
+                                      VIntConfigControl( _p_this, _p_item )
+{
+    label = _label;
+    color_but = _color;
+    finish();
+}
+
+void ColorConfigControl::finish()
+{
+    i_color = p_item->value.i;
+
+    color_px = new QPixmap( 34, 20 );
+    color_px->fill( QColor( i_color ) );
+    color_but->setIcon( QIcon( *color_px ) );
+    color_but->setMinimumWidth( 40 );
+
+    label->setText( qtr(p_item->psz_text) );
+    if( p_item->psz_longtext )
+    {
+        label->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
+        color_but->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
+    }
+
+    BUTTONACT( color_but, selectColor() );
+}
+
+int ColorConfigControl::getValue() const
+{
+    return i_color;
+}
+
+void ColorConfigControl::selectColor()
+{
+    QColor color = QColorDialog::getColor( QColor( i_color ) );
+    i_color = (color.red() << 16) + (color.green() << 8) + color.blue();
+
+    color_px->fill( QColor( i_color ) );
+    color_but->setIcon( QIcon( *color_px ) );
+}
+
 
 /**************************************************************************
  * Float-based controls
