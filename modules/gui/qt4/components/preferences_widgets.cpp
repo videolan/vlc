@@ -382,6 +382,11 @@ FontConfigControl::FontConfigControl( vlc_object_t *_p_this,
         _p_layout->addWidget( label, line, 0 );
         _p_layout->addWidget( font, line, 1, 1, -1 );
     }
+
+    if( p_item->psz_longtext )
+    {
+        label->setToolTip( formatTooltip( qtr(p_item->psz_longtext) ) );
+    }
 }
 
 FontConfigControl::FontConfigControl( vlc_object_t *_p_this,
@@ -392,6 +397,11 @@ FontConfigControl::FontConfigControl( vlc_object_t *_p_this,
     label = _p_label;
     font = _p_font;
     font->setCurrentFont( QFont( qfu( p_item->value.psz) ) );
+
+    if( p_item->psz_longtext )
+    {
+        label->setToolTip( formatTooltip( qtr(p_item->psz_longtext) ) );
+    }
 }
 
 /********* String / choice list **********/
