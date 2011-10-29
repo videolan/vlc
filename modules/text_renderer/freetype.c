@@ -108,7 +108,7 @@ static void Destroy( vlc_object_t * );
     "that will be rendered on the video. " \
     "If set to something different than 0 this option will override the " \
     "relative font size." )
-#define OPACITY_TEXT N_("Opacity")
+#define OPACITY_TEXT N_("Text opacity")
 #define OPACITY_LONGTEXT N_("The opacity (inverse of transparency) of the " \
     "text that will be rendered on the video. 0 = transparent, " \
     "255 = totally opaque. " )
