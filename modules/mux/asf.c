@@ -638,7 +638,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
  *****************************************************************************/
 static int DelStream( sout_mux_t *p_mux, sout_input_t *p_input )
 {
-    /* if bitrate ain't defined in commanline, reduce it when tracks are deleted
+    /* if bitrate ain't defined in commandline, reduce it when tracks are deleted
      */
     sout_mux_sys_t   *p_sys = p_mux->p_sys;
     asf_track_t      *tk = p_input->p_sys;
