@@ -30,7 +30,7 @@
  *****************************************************************************/
 #define GUID_FMT "0x%x-0x%x-0x%x-0x%2.2x%2.2x%2.2x%2.2x%2.2x%2.2x%2.2x%2.2x"
 #define GUID_PRINT( guid )  \
-    (guid).Data1,              \
+    (unsigned)(guid).Data1,              \
     (guid).Data2,              \
     (guid).Data3,              \
     (guid).Data4[0],(guid).Data4[1],(guid).Data4[2],(guid).Data4[3],    \
