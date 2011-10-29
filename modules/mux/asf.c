@@ -943,7 +943,10 @@ static block_t *asf_header_create( sout_mux_t *p_mux, bool b_broadcast )
     bo_addle_u32( &bo, b_broadcast ? 0x01 : 0x02 /* seekable */ ); /* flags */
     bo_addle_u32( &bo, p_sys->i_packet_size );  /* packet size min */
     bo_addle_u32( &bo, p_sys->i_packet_size );  /* packet size max */
-    bo_addle_u32( &bo, p_sys->i_bitrate );      /* maxbitrate */
+    /* NOTE: According to p6-9 of the ASF specification the bitrate cannot be 0,
+     * therefor apply this workaround to make sure it is not 0. If the bitrate is
+     * 0 the file will play in WMP11, but not in Sliverlight and WMP12 */
+    bo_addle_u32( &bo, p_sys->i_bitrate > 0 ? p_sys->i_bitrate : 1 ); /* maxbitrate */
 
     /* header extension */
     bo_add_guid ( &bo, &asf_object_header_extension_guid );
