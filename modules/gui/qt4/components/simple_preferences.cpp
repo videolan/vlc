@@ -640,8 +640,8 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                             fontColor );
             CONFIG_GENERIC( "freetype-rel-fontsize", IntegerList,
                             ui.fontSizeLabel, fontSize );
-            CONFIG_GENERIC( "freetype-effect", IntegerList, ui.fontEffectLabel,
-                            effect );
+            CONFIG_GENERIC( "freetype-outline-thickness", IntegerList,
+                            ui.fontEffectLabel, effect );
             CONFIG_GENERIC_NO_BOOL( "sub-margin", Integer, ui.subsPosLabel, subsPosition );
 
         END_SPREFS_CAT;
