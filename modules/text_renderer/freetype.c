@@ -192,41 +192,41 @@ vlc_module_begin ()
         change_integer_list( pi_color_values, ppsz_color_descriptions )
         change_safe()
 
-    add_bool( "freetype-bold", false, BOLD_TEXT, "", false )
+    add_bool( "freetype-bold", false, BOLD_TEXT, NULL, false )
         change_safe()
 
     add_integer_with_range( "freetype-background-opacity", 0, 0, 255,
-                            BG_OPACITY_TEXT, "", false )
+                            BG_OPACITY_TEXT, NULL, false )
         change_safe()
     add_rgb( "freetype-background-color", 0x00000000, BG_COLOR_TEXT,
-                 "", false )
+             NULL, false )
         change_integer_list( pi_color_values, ppsz_color_descriptions )
         change_safe()
 
     add_integer_with_range( "freetype-outline-opacity", 255, 0, 255,
-                            OUTLINE_OPACITY_TEXT, "", false )
+                            OUTLINE_OPACITY_TEXT, NULL, false )
         change_safe()
     add_rgb( "freetype-outline-color", 0x00000000, OUTLINE_COLOR_TEXT,
-                 "", false )
+             NULL, false )
         change_integer_list( pi_color_values, ppsz_color_descriptions )
         change_safe()
     add_integer_with_range( "freetype-outline-thickness", 4, 0, 50, OUTLINE_THICKNESS_TEXT,
-                 "", false )
+             NULL, false )
         change_integer_list( pi_outline_thickness, ppsz_outline_thickness )
         change_safe()
 
     add_integer_with_range( "freetype-shadow-opacity", 128, 0, 255,
-                            SHADOW_OPACITY_TEXT, "", false )
+                            SHADOW_OPACITY_TEXT, NULL, false )
         change_safe()
     add_rgb( "freetype-shadow-color", 0x00000000, SHADOW_COLOR_TEXT,
-                 "", false )
+             NULL, false )
         change_integer_list( pi_color_values, ppsz_color_descriptions )
         change_safe()
     add_float_with_range( "freetype-shadow-angle", -45, -360, 360,
-                          SHADOW_ANGLE_TEXT, "", false )
+                          SHADOW_ANGLE_TEXT, NULL, false )
         change_safe()
     add_float_with_range( "freetype-shadow-distance", 0.06, 0.0, 1.0,
-                          SHADOW_DISTANCE_TEXT, "", false )
+                          SHADOW_DISTANCE_TEXT, NULL, false )
         change_safe()
 
     add_obsolete_integer( "freetype-effect" );
