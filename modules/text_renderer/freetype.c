@@ -187,7 +187,7 @@ vlc_module_begin ()
         change_safe()
 
     /* hook to the color values list, with default 0x00ffffff = white */
-    add_integer( "freetype-color", 0x00FFFFFF, COLOR_TEXT,
+    add_rgb( "freetype-color", 0x00FFFFFF, COLOR_TEXT,
                  COLOR_LONGTEXT, false )
         change_integer_list( pi_color_values, ppsz_color_descriptions )
         change_safe()
@@ -198,7 +198,7 @@ vlc_module_begin ()
     add_integer_with_range( "freetype-background-opacity", 0, 0, 255,
                             BG_OPACITY_TEXT, "", false )
         change_safe()
-    add_integer( "freetype-background-color", 0x00000000, BG_COLOR_TEXT,
+    add_rgb( "freetype-background-color", 0x00000000, BG_COLOR_TEXT,
                  "", false )
         change_integer_list( pi_color_values, ppsz_color_descriptions )
         change_safe()
@@ -206,7 +206,7 @@ vlc_module_begin ()
     add_integer_with_range( "freetype-outline-opacity", 255, 0, 255,
                             OUTLINE_OPACITY_TEXT, "", false )
         change_safe()
-    add_integer( "freetype-outline-color", 0x00000000, OUTLINE_COLOR_TEXT,
+    add_rgb( "freetype-outline-color", 0x00000000, OUTLINE_COLOR_TEXT,
                  "", false )
         change_integer_list( pi_color_values, ppsz_color_descriptions )
         change_safe()
@@ -218,7 +218,7 @@ vlc_module_begin ()
     add_integer_with_range( "freetype-shadow-opacity", 128, 0, 255,
                             SHADOW_OPACITY_TEXT, "", false )
         change_safe()
-    add_integer( "freetype-shadow-color", 0x00000000, SHADOW_COLOR_TEXT,
+    add_rgb( "freetype-shadow-color", 0x00000000, SHADOW_COLOR_TEXT,
                  "", false )
         change_integer_list( pi_color_values, ppsz_color_descriptions )
         change_safe()
