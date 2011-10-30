@@ -38,7 +38,8 @@
 #endif
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
-#elif defined( _WIN64 )
+#endif
+#if defined( _WIN64 )
 #   include <direct.h>
 #endif
 
