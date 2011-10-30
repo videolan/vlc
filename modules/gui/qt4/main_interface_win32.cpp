@@ -81,7 +81,7 @@ void MainInterface::createTaskBarButtons()
 
     if( S_OK == CoCreateInstance( &clsid_ITaskbarList,
                 NULL, CLSCTX_INPROC_SERVER,
-                &IID_ITaskbarList3,
+                IID_ITaskbarList3,
                 (void **)&p_taskbl) )
     {
         p_taskbl->vt->HrInit(p_taskbl);

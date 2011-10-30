@@ -888,7 +888,7 @@ void SPrefsPanel::assoDialog()
 
     if( S_OK == CoCreateInstance( &clsid_IApplication2,
                 NULL, CLSCTX_INPROC_SERVER,
-                &IID_IApplicationAssociationRegistrationUI,
+                IID_IApplicationAssociationRegistrationUI,
                 (void **)&p_appassoc) )
     {
         if(S_OK == p_appassoc->vt->LaunchAdvancedAssociationUI(p_appassoc, L"VLC" ) )
