@@ -1397,12 +1397,13 @@ static VLCMainWindow *_o_sharedInstance = nil;
                                [NSValue valueWithRect:args->frame], NSViewAnimationEndFrameKey, nil];
 
         NSViewAnimation * anim = [[NSViewAnimation alloc] initWithViewAnimations:[NSArray arrayWithObject:dict]];
-        [dict release];
 
         [anim setAnimationBlockingMode: NSAnimationNonblocking];
         [anim setDuration: 0.4];
         [anim setFrameRate: 30];
         [anim startAnimation];
+
+        [anim release];
     }
     else {
         [super setFrame:args->frame display:args->display animate:args->animate];
