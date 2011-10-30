@@ -2101,19 +2101,16 @@ then
 fi
 
 dnl
-dnl QTCapture
-AC_ARG_ENABLE(macosx-qtcapture,
-  [  --enable-macosx-qtcapture Mac OS X qtcapture (iSight) module (default enabled on Mac OS X)])
-if test "x${enable_macosx_qtcapture}" != "xno" &&
-  (test "${SYS}" = "darwin" || test "${enable_macosx_qtcapture}" = "yes")
+dnl QTKit
+AC_ARG_ENABLE(macosx-qtkit,
+  [  --enable-macosx-qtkit Mac OS X qtcapture (video) and qtsound (audio) module (default enabled on Mac OS X)])
+if test "x${enable_macosx_qtkit}" != "xno" &&
+  (test "${SYS}" = "darwin" || test "${enable_macosx_qtkit}" = "yes")
 then
-  VLC_ADD_LIBS([qtcapture], [-Wl,-framework,Cocoa])
-  VLC_ADD_LIBS([qtcapture], [-Wl,-framework,QTKit])
-  VLC_ADD_LIBS([qtcapture], [-Wl,-framework,CoreAudio])
-  VLC_ADD_LIBS([qtcapture], [-Wl,-framework,QuartzCore])
-  VLC_ADD_LIBS([qtcapture], [-Wl,-framework,CoreVideo])
   VLC_ADD_PLUGIN([qtcapture])
+  VLC_ADD_PLUGIN([qtsound])
 fi
+AM_CONDITIONAL(HAVE_QTKIT, [test "${SYS}" = "darwin" && "x${enable_macosx_qtkit}" != "xno"])
 
 
 dnl
