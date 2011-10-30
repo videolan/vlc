@@ -264,7 +264,8 @@ $Id$
  * pva: PVA demuxer
  * pvr: input module to read from a PVR card
  * qt4: interface module using the cross-platform Qt4 library
- * qtcapture: Quicktime Capture
+ * qtcapture: Quicktime Video Capture
+ * qtsound: Quicktime Audio Capture
  * quartztext: Text renderer using native Mac OS X API
  * quicktime: Quicktime decoder that uses the QT library
  * rawaud: raw audio input module for vlc

@@ -65,6 +65,7 @@ Access:
    in an option (no autodetection): only Theora supported for now
  * Basic HTCPCP implementation for Coffee Pot control
  * QTCapture: added support for all QTKit-compatible video input devices
+ * QTSound: added support for all QTKit-compatible audio input devices
  * X11 Screen: support for capturing partially hidden windows
  * MPEG DASH (Dynamic Adaptive Streaming over HTTP) support
 
