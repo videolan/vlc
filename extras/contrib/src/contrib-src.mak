@@ -122,19 +122,6 @@ HOSTCONF+= --without-pic --disable-shared
 endif
 
 
-ifdef HAVE_LINUX
-ifdef HAVE_MAEMO
-# Really, this could be done on all Linux platforms, not just Maemo.
-# Installing statically-linked VLC plugins is so much simpler.
-HOSTCONF += --with-pic --disable-shared
-endif
-endif
-
-
-ifdef HAVE_ISA_THUMB
-NOTHUMB ?= -mno-thumb
-endif
-
 DATE=`date +%Y-%m-%d`
 
 # ***************************************************************************
@@ -1029,12 +1016,6 @@ ifdef HAVE_LINUX
 FFMPEGCONF += --target-os=linux --enable-pic
 endif
 
-ifdef HAVE_MAEMO
-ifneq ($(filter -m%=cortex-a8, $(EXTRA_CFLAGS)),)
-FFMPEGCONF += $(FFMPEGCONFNEON)
-endif
-endif
-
 ifdef HAVE_ANDROID
 ifdef HAVE_NEON
 FFMPEGCONF += $(FFMPEGCONFNEON)
@@ -1084,9 +1065,6 @@ ifdef GIT
 
 ffmpeg:
 	$(GIT) clone $(FFMPEG_GIT)
-ifdef HAVE_ISA_THUMB
-	patch -p0 < Patches/ffmpeg-avcodec-no-thumb.patch
-endif
 ifdef HAVE_UCLIBC
 	patch -p0 < Patches/ffmpeg-svn-uclibc.patch
 	patch -p0 < Patches/ffmpeg-svn-internal-define.patch
@@ -1275,7 +1253,7 @@ LIVE_TARGET-$(HAVE_WIN32)     = mingw
 LIVE_TARGET-$(HAVE_WINCE)     = mingw
 LIVE_TARGET-$(HAVE_DARWIN_OS) = macosx
 
-ifeq ($(ARCH)$(HAVE_MAEMO),armel)
+ifeq ($(ARCH),armel)
 LIVE_TARGET-$(ENABLED)        = armlinux
 endif
 
@@ -1289,7 +1267,7 @@ LIVE_PATCH-$(HAVE_DARWIN_OS) = sed -e 's%-DBSD=1%-DBSD=1\ $(EXTRA_CFLAGS)\ $(EXT
 LIVE_PATCH-$(HAVE_LINUX)     = sed -e 's/=/= EXTRA_CPPFLAGS/' -e 's%EXTRA_CPPFLAGS%-I/include%' -i.orig groupsock/Makefile.head
 
 ifndef HAVE_UCLIBC
-ifneq ($(ARCH)$(HAVE_MAEMO),armel)
+ifneq ($(ARCH),armel)
 LIVE_PATCH-$(HAVE_LINUX)    += ; sed -e 's%-D_FILE_OFFSET_BITS=64%-D_FILE_OFFSET_BITS=64\ -fPIC\ -DPIC%' -i.orig config.linux
 endif
 endif
