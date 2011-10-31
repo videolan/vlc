@@ -3115,6 +3115,9 @@ static void MRLSections( const char *p,
 
     int title_start, chapter_start, title_end, chapter_end;
 
+    if( !p )
+        return;
+
     if( *p != '-' )
         p = MRLSeekPoint( p, &title_start, &chapter_start );
     else
