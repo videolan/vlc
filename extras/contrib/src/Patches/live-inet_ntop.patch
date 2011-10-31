@@ -158,7 +158,7 @@ diff -ru live.orig/liveMedia/RTSPClient.cpp live/liveMedia/RTSPClient.cpp
 diff -ru live.orig/liveMedia/RTSPServer.cpp live/liveMedia/RTSPServer.cpp
 --- live.orig/liveMedia/RTSPServer.cpp	2010-10-20 10:31:13.000000000 +0200
 +++ live/liveMedia/RTSPServer.cpp	2010-10-20 12:34:04.772177998 +0200
-@@ -111,11 +111,12 @@
+@@ -114,11 +114,12 @@
    char urlBuffer[100]; // more than big enough for "rtsp://<ip-address>:<port>/"
  
    portNumBits portNumHostOrder = ntohs(fRTSPServerPort.num());
@@ -173,7 +173,7 @@ diff -ru live.orig/liveMedia/RTSPServer.cpp live/liveMedia/RTSPServer.cpp
    }
  
    return strDup(urlBuffer);
-@@ -264,7 +265,8 @@
+@@ -262,7 +263,8 @@
    increaseSendBufferTo(envir(), clientSocket, 50*1024);
  
  #ifdef DEBUG
@@ -183,29 +183,29 @@ diff -ru live.orig/liveMedia/RTSPServer.cpp live/liveMedia/RTSPServer.cpp
  #endif
  
    // Create a new object for this RTSP session.
-@@ -860,8 +862,10 @@
-   ReceivingInterfaceAddr = origReceivingInterfaceAddr;
- 
-   struct in_addr destinationAddr; destinationAddr.s_addr = destinationAddress;
--  char* destAddrStr = strDup(our_inet_ntoa(destinationAddr));
--  char* sourceAddrStr = strDup(our_inet_ntoa(sourceAddr.sin_addr));
-+  char destAddrStr[16];
-+  our_inet_ntoa(destinationAddr, destAddrStr);
-+  char sourceAddrStr[16];
-+  our_inet_ntoa(sourceAddr.sin_addr, sourceAddrStr);
-   if (fIsMulticast) {
-     switch (streamingMode) {
-     case RTP_UDP:
-@@ -936,7 +940,7 @@
+@@ -881,8 +883,10 @@
+     ReceivingInterfaceAddr = origReceivingInterfaceAddr;
+     
+     struct in_addr destinationAddr; destinationAddr.s_addr = destinationAddress;
+-    char* destAddrStr = strDup(our_inet_ntoa(destinationAddr));
+-    char* sourceAddrStr = strDup(our_inet_ntoa(sourceAddr.sin_addr));
++    char destAddrStr[16];
++    our_inet_ntoa(destinationAddr, destAddrStr);
++    char sourceAddrStr[16];
++    our_inet_ntoa(sourceAddr.sin_addr, sourceAddrStr);
+     if (fIsMulticast) {
+       switch (streamingMode) {
+         case RTP_UDP:
+@@ -957,7 +961,7 @@
+ 	}
+       }
      }
-     }
-   }
--  delete[] destAddrStr; delete[] sourceAddrStr; delete[] streamingModeString;
-+  delete[] streamingModeString;
- }
+-    delete[] destAddrStr; delete[] sourceAddrStr; delete[] streamingModeString;
++    delete[] streamingModeString;
+   } while (0);
  
- void RTSPServer::RTSPClientSession
-@@ -1446,7 +1450,8 @@
+   delete[] concatenatedStreamName;
+@@ -1540,7 +1544,8 @@
    // If this gets called, the client session is assumed to have timed out,
    // so delete it:
  #ifdef DEBUG
