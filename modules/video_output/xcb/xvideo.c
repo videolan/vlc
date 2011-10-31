@@ -131,7 +131,7 @@ static bool CheckXVideo (vout_display_t *vd, xcb_connection_t *conn)
     return ok;
 }
 
-static vlc_fourcc_t ParseFormat (vout_display_t *vd,
+static vlc_fourcc_t ParseFormat (vlc_object_t *obj,
                                  const xcb_xv_image_format_info_t *restrict f)
 {
     if (f->byte_order != ORDER && f->bpp != 8)
@@ -175,9 +175,9 @@ static vlc_fourcc_t ParseFormat (vout_display_t *vd,
             }
             break;
         }
-        msg_Err (vd, "unknown XVideo RGB format %"PRIx32" (%.4s)",
+        msg_Err (obj, "unknown XVideo RGB format %"PRIx32" (%.4s)",
                  f->id, f->guid);
-        msg_Dbg (vd, " %"PRIu8" planes, %"PRIu8" bits/pixel, "
+        msg_Dbg (obj, " %"PRIu8" planes, %"PRIu8" bits/pixel, "
                  "depth %"PRIu8, f->num_planes, f->bpp, f->depth);
         break;
 
@@ -223,16 +223,16 @@ static vlc_fourcc_t ParseFormat (vout_display_t *vd,
             break;
         }
     bad:
-        msg_Err (vd, "unknown XVideo YUV format %"PRIx32" (%.4s)", f->id,
+        msg_Err (obj, "unknown XVideo YUV format %"PRIx32" (%.4s)", f->id,
                  f->guid);
-        msg_Dbg (vd, " %"PRIu8" planes, %"PRIu32" bits/pixel, "
+        msg_Dbg (obj, " %"PRIu8" planes, %"PRIu32" bits/pixel, "
                  "%"PRIu32"/%"PRIu32"/%"PRIu32" bits/sample", f->num_planes,
                  f->bpp, f->y_sample_bits, f->u_sample_bits, f->v_sample_bits);
-        msg_Dbg (vd, " period: %"PRIu32"/%"PRIu32"/%"PRIu32"x"
+        msg_Dbg (obj, " period: %"PRIu32"/%"PRIu32"/%"PRIu32"x"
                  "%"PRIu32"/%"PRIu32"/%"PRIu32,
                  f->vhorz_y_period, f->vhorz_u_period, f->vhorz_v_period,
                  f->vvert_y_period, f->vvert_u_period, f->vvert_v_period);
-        msg_Warn (vd, " order: %.32s", f->vcomp_order);
+        msg_Warn (obj, " order: %.32s", f->vcomp_order);
         break;
     }
     return 0;
@@ -253,7 +253,7 @@ FindFormat (vout_display_t *vd,
     end = f + xcb_xv_list_image_formats_format_length (list);
     for (; f < end; f++)
     {
-        if (chroma != ParseFormat (vd, f))
+        if (chroma != ParseFormat (VLC_OBJECT(vd), f))
             continue;
 
         /* VLC pads scanline to 16 pixels internally */
