@@ -8,7 +8,8 @@ all: .iconv .intl .freetype .fribidi .zlib \
         .dca .kate .libass .SDL_image  \
         .libbluray .dvdcss .libupnp .dvdnav .qt4_win32 \
         .dx_headers .dshow_headers .portaudio .gecko \
-        .lua .peflags .sqlite3 .tag .live
+        .lua .peflags .sqlite3 .tag
+# .live ## XXX: disabled temporarily
 
 # .libprojectM
 # .pthreads
