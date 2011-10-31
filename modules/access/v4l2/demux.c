@@ -235,7 +235,7 @@ static float GetMaxFPS( vlc_object_t *obj, int fd, uint32_t pixel_format,
                           / (float)fie.discrete.numerator;
                 if( fps > max )
                     max = fps;
-                msg_Dbg( obj, " discrete frame interval %"PRIu32"/%"PRIu32
+                msg_Dbg( obj, "  discrete frame interval %"PRIu32"/%"PRIu32
                          " supported",
                          fie.discrete.numerator, fie.discrete.denominator );
                 fie.index++;
@@ -245,7 +245,7 @@ static float GetMaxFPS( vlc_object_t *obj, int fd, uint32_t pixel_format,
 
         case V4L2_FRMIVAL_TYPE_STEPWISE:
         case V4L2_FRMIVAL_TYPE_CONTINUOUS:
-            msg_Dbg( obj, " frame intervals from %"PRIu32"/%"PRIu32
+            msg_Dbg( obj, "  frame intervals from %"PRIu32"/%"PRIu32
                     "to %"PRIu32"/%"PRIu32" supported",
                     fie.stepwise.min.numerator, fie.stepwise.min.denominator,
                     fie.stepwise.max.numerator, fie.stepwise.max.denominator );
@@ -277,48 +277,39 @@ float GetAbsoluteMaxFrameRate( vlc_object_t *obj, int fd,
     float max = -1.;
     switch( fse.type )
     {
-        case V4L2_FRMSIZE_TYPE_DISCRETE:
-            do
-            {
-                float fps = GetMaxFPS( obj, fd, pixel_format,
-                                     fse.discrete.width, fse.discrete.height );
-                if( fps > max )
-                    max = fps;
-                msg_Dbg( obj, " discrete size %"PRIu32"x%"PRIu32" supported",
-                         fse.discrete.width, fse.discrete.height );
-                fse.index++;
-            } while( v4l2_ioctl( fd, VIDIOC_ENUM_FRAMESIZES, &fse ) >= 0 );
-            break;
+      case V4L2_FRMSIZE_TYPE_DISCRETE:
+        do
+        {
+            float fps = GetMaxFPS( obj, fd, pixel_format,
+                                   fse.discrete.width, fse.discrete.height );
+            if( fps > max )
+                max = fps;
+            fse.index++;
+        } while( v4l2_ioctl( fd, VIDIOC_ENUM_FRAMESIZES, &fse ) >= 0 );
+        break;
 
-        case V4L2_FRMSIZE_TYPE_STEPWISE:
-            for( uint32_t width = fse.stepwise.min_width,
-                          height = fse.stepwise.min_height;
-                 width <= fse.stepwise.max_width
-              && height <= fse.stepwise.max_width;
-                 width += fse.stepwise.step_width,
-                 height += fse.stepwise.step_height )
+      case V4L2_FRMSIZE_TYPE_STEPWISE:
+      case V4L2_FRMSIZE_TYPE_CONTINUOUS:
+        msg_Dbg( obj, " sizes from %"PRIu32"x%"PRIu32" "
+                 "to %"PRIu32"x%"PRIu32" supported",
+                 fse.stepwise.min_width, fse.stepwise.min_height,
+                 fse.stepwise.max_width, fse.stepwise.max_height );
+        if( fse.type == V4L2_FRMSIZE_TYPE_STEPWISE )
+            msg_Dbg( obj, "  with %"PRIu32"x%"PRIu32" steps",
+                     fse.stepwise.step_width, fse.stepwise.step_height );
+
+        for( uint32_t width =  fse.stepwise.min_width;
+                      width <= fse.stepwise.max_width;
+                      width += fse.stepwise.step_width )
+            for( uint32_t height =  fse.stepwise.min_height;
+                          height <= fse.stepwise.max_width;
+                          height += fse.stepwise.step_height )
             {
                 float fps = GetMaxFPS( obj, fd, pixel_format, width, height );
                 if( fps > max )
                     max = fps;
             }
-            msg_Dbg( obj, " sizes from %"PRIu32"x%"PRIu32" to %"PRIu32
-                     "x%"PRIu32" supported with %"PRIu32"x%"PRIu32" steps",
-                     fse.stepwise.min_width, fse.stepwise.min_height,
-                     fse.stepwise.max_width, fse.stepwise.max_height,
-                     fse.stepwise.step_width, fse.stepwise.step_height );
-            break;
-
-        case V4L2_FRMSIZE_TYPE_CONTINUOUS:
-            /* FIXME */
-            msg_Err( obj, "V4L2_FRMSIZE_TYPE_CONTINUOUS support incorrect" );
-            max = GetMaxFPS( obj, fd, pixel_format, fse.stepwise.max_width,
-                             fse.stepwise.max_height );
-            msg_Dbg( obj, " sizes from %"PRIu32"x%"PRIu32" to %"PRIu32
-                     "x%"PRIu32" all supported",
-                     fse.stepwise.min_width, fse.stepwise.min_height,
-                     fse.stepwise.max_width, fse.stepwise.max_height );
-            break;
+        break;
     }
     return max;
 #else
@@ -343,27 +334,40 @@ void GetMaxDimensions( vlc_object_t *obj, int fd, uint32_t pixel_format,
 
     switch( fse.type )
     {
-        case V4L2_FRMSIZE_TYPE_DISCRETE:
-            do
-            {
-                float fps = GetMaxFPS( obj, fd, pixel_format,
-                                     fse.discrete.width, fse.discrete.height );
-                if( fps >= fps_min && fse.discrete.width > *pwidth )
-                {
-                    *pwidth = fse.discrete.width;
-                    *pheight = fse.discrete.height;
-                }
-                fse.index++;
-            } while( v4l2_ioctl( fd, VIDIOC_ENUM_FRAMESIZES, &fse ) >= 0 );
-            break;
+      case V4L2_FRMSIZE_TYPE_DISCRETE:
+        do
+        {
+            msg_Dbg( obj, " discrete size %"PRIu32"x%"PRIu32" supported",
+                     fse.discrete.width, fse.discrete.height );
 
-        case V4L2_FRMSIZE_TYPE_STEPWISE:
-            for( uint32_t width = fse.stepwise.min_width,
-                          height = fse.stepwise.min_height;
-                 width <= fse.stepwise.max_width
-              && height <= fse.stepwise.max_width;
-                 width += fse.stepwise.step_width,
-                 height += fse.stepwise.step_height )
+            float fps = GetMaxFPS( obj, fd, pixel_format,
+                                   fse.discrete.width, fse.discrete.height );
+            if( fps >= fps_min && fse.discrete.width > *pwidth )
+            {
+                *pwidth = fse.discrete.width;
+                *pheight = fse.discrete.height;
+            }
+            fse.index++;
+        }
+        while( v4l2_ioctl( fd, VIDIOC_ENUM_FRAMESIZES, &fse ) >= 0 );
+        break;
+
+      case V4L2_FRMSIZE_TYPE_STEPWISE:
+      case V4L2_FRMSIZE_TYPE_CONTINUOUS:
+        msg_Dbg( obj, " sizes from %"PRIu32"x%"PRIu32" "
+                 "to %"PRIu32"x%"PRIu32" supported",
+                 fse.stepwise.min_width, fse.stepwise.min_height,
+                 fse.stepwise.max_width, fse.stepwise.max_height );
+        if( fse.type == V4L2_FRMSIZE_TYPE_STEPWISE )
+            msg_Dbg( obj, "  with %"PRIu32"x%"PRIu32" steps",
+                     fse.stepwise.step_width, fse.stepwise.step_height );
+
+        for( uint32_t width =  fse.stepwise.min_width;
+                      width <= fse.stepwise.max_width;
+                      width += fse.stepwise.step_width )
+            for( uint32_t height = fse.stepwise.min_height;
+                          height <= fse.stepwise.max_width;
+                          height += fse.stepwise.step_height )
             {
                 float fps = GetMaxFPS( obj, fd, pixel_format, width, height );
                 if( fps >= fps_min && width > *pwidth )
@@ -372,20 +376,7 @@ void GetMaxDimensions( vlc_object_t *obj, int fd, uint32_t pixel_format,
                     *pheight = height;
                 }
             }
-            break;
-
-        case V4L2_FRMSIZE_TYPE_CONTINUOUS:
-        {
-            float fps = GetMaxFPS( obj, fd, pixel_format,
-                             fse.stepwise.max_width, fse.stepwise.max_height );
-            msg_Err( obj, "V4L2_FRMSIZE_TYPE_CONTINUOUS support incorrect" );
-            if( fps >= fps_min && fse.stepwise.max_width > *pwidth )
-            {
-                *pwidth = fse.stepwise.max_width;
-                *pheight = fse.stepwise.max_height;
-            }
-            break;
-        }
+        break;
     }
 #endif
 }
