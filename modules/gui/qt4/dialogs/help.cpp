@@ -43,7 +43,6 @@
 #include <QString>
 #include <QDialogButtonBox>
 #include <QEvent>
-#include <QFileDialog>
 #include <QDate>
 #include <QPushButton>
 
@@ -201,10 +200,7 @@ void UpdateDialog::UpdateOrDownload()
     }
     else
     {
-        QString dest_dir = QFileDialog::getExistingDirectory( this,
-                                 qtr( I_OP_SEL_DIR ),
-                                 QVLCUserDir( VLC_DOWNLOAD_DIR ) );
-
+        QString dest_dir = QDir::tempPath();
         if( !dest_dir.isEmpty() )
         {
             dest_dir = toNativeSepNoSlash( dest_dir ) + DIR_SEP;
