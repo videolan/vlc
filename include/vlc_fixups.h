@@ -280,7 +280,6 @@ struct pollfd
 #elif defined (HAVE_MAEMO)
 # include <poll.h>
 # define poll(a, b, c) vlc_poll(a, b, c)
-int vlc_poll (struct pollfd *, unsigned, int);
 #endif
 
 #ifndef HAVE_IF_NAMEINDEX
