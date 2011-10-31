@@ -167,6 +167,7 @@ $Id$
  * invert: inverse video filter
  * iomx: IPC/OpenMaxIL for Android
  * jack: jack server audio output
+ * kai: OS/2 audio output
  * karaoke: simple karaoke audio filter
  * kate: kate text bitstream decoder
  * libass: Subtitle renderers using libass
