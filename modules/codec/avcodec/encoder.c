@@ -203,7 +203,19 @@ int OpenEncoder( vlc_object_t *p_this )
     char *psz_val;
     int i_val;
 
-    if( !GetFfmpegCodec( p_enc->fmt_out.i_codec, &i_cat, &i_codec_id,
+    if( p_enc->fmt_out.i_codec == VLC_CODEC_MP3 )
+    {
+        i_cat = AUDIO_ES;
+        i_codec_id = CODEC_ID_MP3;
+        psz_namecodec = "MPEG I/II Layer 3";
+    }
+    else if( p_enc->fmt_out.i_codec == VLC_CODEC_MP2 )
+    {
+        i_cat = AUDIO_ES;
+        i_codec_id = CODEC_ID_MP2;
+        psz_namecodec = "MPEG I/II Layer 2";
+    }
+    else if( !GetFfmpegCodec( p_enc->fmt_out.i_codec, &i_cat, &i_codec_id,
                              &psz_namecodec ) )
     {
         if( TestFfmpegChroma( -1, p_enc->fmt_out.i_codec ) != VLC_SUCCESS )

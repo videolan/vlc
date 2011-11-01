@@ -374,6 +374,8 @@
 #define VLC_CODEC_MP1V      VLC_FOURCC('m','p','1','v')
 /* MPEG-2 video */
 #define VLC_CODEC_MP2V      VLC_FOURCC('m','p','2','v')
+/* MPEG-I/II layer 2 audio */
+#define VLC_CODEC_MP2       VLC_FOURCC('m','p','2',' ')
 /* MPEG-I/II layer 3 audio */
 #define VLC_CODEC_MP3       VLC_FOURCC('m','p','3',' ')
 
