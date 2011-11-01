@@ -616,10 +616,19 @@ static char* Win32_Select( filter_t *p_filter, const char* family,
     i_idx = 0;
 
     /* */
-    char *psz_tmp;
-    if( asprintf( &psz_tmp, "%s\\%s", p_filter->p_sys->psz_win_fonts_path, psz_filename ) == -1 )
-        return NULL;
-    return psz_tmp;
+    if( strchr( psz_filename, DIR_SEP_CHAR ) )
+        return psz_filename;
+    else
+    {
+        char *psz_tmp;
+        if( asprintf( &psz_tmp, "%s\\%s", p_filter->p_sys->psz_win_fonts_path, psz_filename ) == -1 )
+        {
+            free( psz_filename );
+            return NULL;
+        }
+        free( psz_filename );
+        return psz_tmp;
+    }
 }
 #endif
 
