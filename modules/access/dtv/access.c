@@ -233,11 +233,6 @@ vlc_module_begin ()
                   "satellite", "dvb-s", "dvb-s2", "isdb-s",
                   "terrestrial", "dvb-t", "dvb-t2", "isdb-t", "atsc")
 
-    /* All options starting with dvb- can be overridden in the MRL, so they
-     * must all be "safe". Nevertheless, we do not mark as safe those that are
-     * really specific to the local system (e.g. device ID...).
-     * It wouldn't make sense to deliver those through a playlist. */
-
 #ifdef __linux__
     add_integer ("dvb-adapter", 0, ADAPTER_TEXT, ADAPTER_LONGTEXT, false)
         change_integer_range (0, 255)
