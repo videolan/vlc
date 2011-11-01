@@ -545,7 +545,10 @@ static int GetFileFontByName( const char *font_name, char **psz_filename )
     wchar_t vbuffer[MAX_PATH];
     wchar_t dbuffer[256];
 
-    if( RegOpenKeyEx(HKEY_LOCAL_MACHINE, FONT_DIR_NT, 0, KEY_READ, &hKey) != ERROR_SUCCESS )
+    size_t fontname_len = strlen( font_name );
+
+    if( RegOpenKeyEx(HKEY_LOCAL_MACHINE, FONT_DIR_NT, 0, KEY_READ, &hKey)
+            != ERROR_SUCCESS )
         return 1;
 
     for( int index = 0;; index++ )
@@ -553,9 +556,10 @@ static int GetFileFontByName( const char *font_name, char **psz_filename )
         DWORD vbuflen = MAX_PATH - 1;
         DWORD dbuflen = 255;
 
-        if( RegEnumValueW( hKey, index, vbuffer, &vbuflen,
-                           NULL, NULL, (LPBYTE)dbuffer, &dbuflen) != ERROR_SUCCESS )
-            return 2;
+        LONG i_result = RegEnumValueW( hKey, index, vbuffer, &vbuflen,
+                                       NULL, NULL, (LPBYTE)dbuffer, &dbuflen);
+        if( i_result != ERROR_SUCCESS )
+            return i_result;
 
         char *psz_value = FromWide( vbuffer );
 
@@ -568,7 +572,7 @@ static int GetFileFontByName( const char *font_name, char **psz_filename )
                 break;
         }
         else {
-            if( strcasecmp( psz_value, font_name ) == 0 )
+            if( strncasecmp( psz_value, font_name, fontname_len ) == 0 )
                 break;
         }
     }
@@ -592,6 +596,9 @@ static char* Win32_Select( filter_t *p_filter, const char* family,
                            bool b_bold, bool b_italic, int i_size, int *i_idx )
 {
     VLC_UNUSED( i_size );
+
+    if( strlen( family ) < 1 )
+        goto fail;
 
     /* */
     LOGFONT lf;
@@ -630,6 +637,7 @@ static char* Win32_Select( filter_t *p_filter, const char* family,
         }
     }
     else /* Let's take any font we can */
+fail:
     {
         char *psz_tmp;
         if( asprintf( &psz_tmp, "%s\\%s", p_filter->p_sys->psz_win_fonts_path, "arial.ttf" ) == -1 )
