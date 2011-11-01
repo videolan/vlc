@@ -7,17 +7,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>758</width>
-    <height>446</height>
+    <width>778</width>
+    <height>614</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout">
-   <property name="spacing">
-    <number>10</number>
-   </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QGroupBox" name="groupBox_3">
      <property name="title">
@@ -125,19 +122,9 @@
      <property name="title">
       <string>Subtitles effects</string>
      </property>
-     <layout class="QGridLayout" rowstretch="0,0,0,0,0" columnstretch="0,0">
-      <item row="3" column="1">
-       <widget class="QComboBox" name="effect">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="0">
-       <widget class="QLabel" name="fontEffectLabel">
+     <layout class="QGridLayout" name="gridLayout_2">
+      <item row="0" column="0">
+       <widget class="QLabel" name="fontLabel">
         <property name="minimumSize">
          <size>
           <width>250</width>
@@ -145,42 +132,15 @@
          </size>
         </property>
         <property name="text">
-         <string>Outline thickness</string>
+         <string>Font</string>
         </property>
         <property name="buddy">
-         <cstring>effect</cstring>
+         <cstring>font</cstring>
         </property>
        </widget>
       </item>
-      <item row="2" column="1">
-       <widget class="QPushButton" name="fontColor">
-       </widget>
-      </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="fontColorLabel">
-        <property name="minimumSize">
-         <size>
-          <width>250</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="text">
-         <string>Font color</string>
-        </property>
-        <property name="buddy">
-         <cstring>fontColor</cstring>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QComboBox" name="fontSize">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-       </widget>
+      <item row="0" column="1" colspan="3">
+       <widget class="QFontComboBox" name="font"/>
       </item>
       <item row="1" column="0">
        <widget class="QLabel" name="fontSizeLabel">
@@ -198,8 +158,47 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="0">
-       <widget class="QLabel" name="fontLabel">
+      <item row="1" column="1">
+       <widget class="QComboBox" name="fontSize">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="2">
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeType">
+         <enum>QSizePolicy::Preferred</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="1" column="3">
+       <widget class="QLabel" name="fontColorLabel">
+        <property name="text">
+         <string>Font color</string>
+        </property>
+        <property name="buddy">
+         <cstring>fontColor</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="4">
+       <widget class="QPushButton" name="fontColor"/>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="fontEffectLabel">
         <property name="minimumSize">
          <size>
           <width>250</width>
@@ -207,10 +206,47 @@
          </size>
         </property>
         <property name="text">
-         <string>Font</string>
+         <string>Outline thickness</string>
         </property>
         <property name="buddy">
-         <cstring>font</cstring>
+         <cstring>effect</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QComboBox" name="effect">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="3">
+       <widget class="QLabel" name="outlineColorLabel">
+        <property name="text">
+         <string>Outline color</string>
+        </property>
+        <property name="buddy">
+         <cstring>outlineColor</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="4">
+       <widget class="QPushButton" name="outlineColor"/>
+      </item>
+      <item row="3" column="0">
+       <widget class="QCheckBox" name="shadowCheck">
+        <property name="text">
+         <string>Add a shadow</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="3">
+       <widget class="QCheckBox" name="backgroundCheck">
+        <property name="text">
+         <string>Add a background</string>
         </property>
        </widget>
       </item>
@@ -229,9 +265,6 @@
          <cstring>subsPosition</cstring>
         </property>
        </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QFontComboBox" name="font"/>
       </item>
       <item row="4" column="1">
        <widget class="QSpinBox" name="subsPosition">
@@ -270,6 +303,9 @@
   <tabstop>fontSize</tabstop>
   <tabstop>fontColor</tabstop>
   <tabstop>effect</tabstop>
+  <tabstop>outlineColor</tabstop>
+  <tabstop>shadowCheck</tabstop>
+  <tabstop>backgroundCheck</tabstop>
   <tabstop>subsPosition</tabstop>
  </tabstops>
  <resources/>

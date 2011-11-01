@@ -81,6 +81,7 @@ enum {
 };
 enum { inputLE, cachingCoB };
 enum { skinRB, qtRB, styleCB };
+enum { shadowCB, backgroundCB };
 
 class ConfigControl;
 class QComboBox;
@@ -115,6 +116,7 @@ public:
     virtual ~SPrefsPanel();
     void apply();
     void clean();
+
 private:
     intf_thread_t *p_intf;
     QList<ConfigControl *> controls;

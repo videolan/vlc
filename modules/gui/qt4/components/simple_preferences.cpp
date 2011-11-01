@@ -640,14 +640,24 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                             encoding );
             CONFIG_GENERIC( "sub-language", String, ui.subLangLabel,
                             preferredLanguage );
+
+            CONFIG_GENERIC( "freetype-rel-fontsize", IntegerList,
+                            ui.fontSizeLabel, fontSize );
+
             CONFIG_GENERIC_NO_BOOL( "freetype-font", Font, ui.fontLabel, font );
             CONFIG_GENERIC_NO_BOOL( "freetype-color", Color, ui.fontColorLabel,
                             fontColor );
-            CONFIG_GENERIC( "freetype-rel-fontsize", IntegerList,
-                            ui.fontSizeLabel, fontSize );
             CONFIG_GENERIC( "freetype-outline-thickness", IntegerList,
                             ui.fontEffectLabel, effect );
+            CONFIG_GENERIC_NO_BOOL( "freetype-outline-color", Color, ui.outlineColorLabel,
+                            outlineColor );
+
             CONFIG_GENERIC_NO_BOOL( "sub-margin", Integer, ui.subsPosLabel, subsPosition );
+
+            ui.shadowCheck->setChecked( config_GetInt( p_intf, "freetype-shadow-opacity" ) > 0 );
+            ui.backgroundCheck->setChecked( config_GetInt( p_intf, "freetype-background-opacity" ) > 0 );
+            optionWidgets.append( ui.shadowCheck );
+            optionWidgets.append( ui.backgroundCheck );
 
         END_SPREFS_CAT;
 
@@ -826,6 +836,25 @@ void SPrefsPanel::apply()
 
         config_PutPsz( p_intf, "audio-filter", qtu( qs_filter.join( ":" ) ) );
         break;
+    }
+    case SPrefsSubtitles:
+    {
+        bool b_checked = qobject_cast<QCheckBox *>(optionWidgets[shadowCB])->isChecked();
+        if( b_checked && config_GetInt( p_intf, "freetype-shadow-opacity" ) == 0 ) {
+            config_PutInt( p_intf, "freetype-shadow-opacity", 128 );
+        }
+        else if (!b_checked ) {
+            config_PutInt( p_intf, "freetype-shadow-opacity", 0 );
+        }
+
+        b_checked = qobject_cast<QCheckBox *>(optionWidgets[backgroundCB])->isChecked();
+        if( b_checked && config_GetInt( p_intf, "freetype-background-opacity" ) == 0 ) {
+            config_PutInt( p_intf, "freetype-background-opacity", 128 );
+        }
+        else if (!b_checked ) {
+            config_PutInt( p_intf, "freetype-background-opacity", 0 );
+        }
+
     }
     }
 }
