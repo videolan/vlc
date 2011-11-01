@@ -241,11 +241,13 @@ vlc_module_begin ()
 #ifdef __linux__
     add_integer ("dvb-adapter", 0, ADAPTER_TEXT, ADAPTER_LONGTEXT, false)
         change_integer_range (0, 255)
+        change_safe ()
     add_obsolete_integer ("dvb-device")
     add_bool ("dvb-budget-mode", false, BUDGET_TEXT, BUDGET_LONGTEXT, true)
 #endif
 #ifdef WIN32
     add_integer ("dvb-adapter", -1, ADAPTER_TEXT, ADAPTER_LONGTEXT, true)
+        change_safe ()
     add_string ("dvb-network-name", "", NAME_TEXT, NAME_LONGTEXT, true)
     /* Hmm: is this one really safe??: */
     add_string ("dvb-create-name", "", CREATE_TEXT, CREATE_LONGTEXT, true)
