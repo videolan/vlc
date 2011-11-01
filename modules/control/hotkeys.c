@@ -105,8 +105,8 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_INTERFACE_HOTKEYS )
 
     add_integer( "hotkeys-mousewheel-mode", MOUSEWHEEL_VOLUME,
-                 N_("MouseWheel x-axis Control"),
-                 N_("MouseWheel x-axis can control volume, position or "
+                 N_("MouseWheel up-down axis Control"),
+                 N_("The MouseWheel up-down (vertical) axis can control volume, position or "
                     "mousewheel event can be ignored"), false )
             change_integer_list( i_mode_list, psz_mode_list_text )
 
