@@ -1,8 +1,8 @@
 /*****************************************************************************
  * opengl.c: OpenGL and OpenGL ES output common code
  *****************************************************************************
- * Copyright (C) 2004 the VideoLAN team
- * Copyright (C) 2009 Laurent Aimar
+ * Copyright (C) 2004-2011 VLC authors and VideoLAN
+ * Copyright (C) 2009, 2011 Laurent Aimar
  *
  * Authors: Cyril Deguet <asmax@videolan.org>
  *          Gildas Bazin <gbazin@videolan.org>
@@ -57,9 +57,6 @@
 #if USE_OPENGL_ES
 #   define VLCGL_TEXTURE_COUNT 1
 #   define VLCGL_PICTURE_MAX 1
-#elif defined(MACOS_OPENGL)
-#   define VLCGL_TEXTURE_COUNT 2
-#   define VLCGL_PICTURE_MAX 2
 #else
 #   define VLCGL_TEXTURE_COUNT 1
 #   define VLCGL_PICTURE_MAX 128
