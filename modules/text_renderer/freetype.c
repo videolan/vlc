@@ -592,7 +592,6 @@ static char* Win32_Select( filter_t *p_filter, const char* family,
                            bool b_bold, bool b_italic, int i_size, int *i_idx )
 {
     VLC_UNUSED( i_size );
-    // msg_Dbg( p_filter, "Here in Win32_Select, asking for %s", family );
 
     /* */
     LOGFONT lf;
@@ -609,30 +608,39 @@ static char* Win32_Select( filter_t *p_filter, const char* family,
     EnumFontFamiliesEx(hDC, &lf, (FONTENUMPROC)&EnumFontCallback, (LPARAM)&psz_filename, 0);
     ReleaseDC(NULL, hDC);
 
-    if( psz_filename == NULL )
-        return NULL;
-
-    /* FIXME: increase i_idx, when concatenated strings  */
-    i_idx = 0;
-
     /* */
-    if( strchr( psz_filename, DIR_SEP_CHAR ) )
-        return psz_filename;
-    else
+    if( psz_filename != NULL )
+    {
+        /* FIXME: increase i_idx, when concatenated strings  */
+        i_idx = 0;
+
+        /* Prepend the Windows Font path, when only a filename was provided */
+        if( strchr( psz_filename, DIR_SEP_CHAR ) )
+            return psz_filename;
+        else
+        {
+            char *psz_tmp;
+            if( asprintf( &psz_tmp, "%s\\%s", p_filter->p_sys->psz_win_fonts_path, psz_filename ) == -1 )
+            {
+                free( psz_filename );
+                return NULL;
+            }
+            free( psz_filename );
+            return psz_tmp;
+        }
+    }
+    else /* Let's take any font we can */
     {
         char *psz_tmp;
-        if( asprintf( &psz_tmp, "%s\\%s", p_filter->p_sys->psz_win_fonts_path, psz_filename ) == -1 )
-        {
-            free( psz_filename );
+        if( asprintf( &psz_tmp, "%s\\%s", p_filter->p_sys->psz_win_fonts_path, "arial.ttf" ) == -1 )
             return NULL;
-        }
-        free( psz_filename );
-        return psz_tmp;
+        else
+            return psz_tmp;
     }
 }
-#endif
+#endif /* HAVE_WIN32 */
 
-#endif
+#endif /* HAVE_STYLES */
 
 
 /*****************************************************************************
