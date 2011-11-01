@@ -351,7 +351,9 @@ virtual_chapter_c* virtual_edition_c::getChapterbyTimecode( int64_t time )
 {
     for( size_t i = 0; i < chapters.size(); i++ )
     {
-        if( time >= chapters[i]->i_virtual_start_time && time < chapters[i]->i_virtual_stop_time )
+        if( time >= chapters[i]->i_virtual_start_time &&
+            ( chapters[i]->i_virtual_stop_time < 0 || time < chapters[i]->i_virtual_stop_time ) )
+            /*with the current implementation only the last chapter can have a negative virtual_stop_time*/
             return chapters[i]->getSubChapterbyTimecode( time );
     }
 
