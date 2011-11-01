@@ -71,7 +71,6 @@ struct stream_sys_t
 static int  Read            (stream_t *p_stream, void *p_buffer, unsigned int i_len);
 static int  Peek            (stream_t *p_stream, const uint8_t **pp_peek, unsigned int i_peek);
 static int  Control         (stream_t *p_stream, int i_query, va_list args);
-static bool IsDash          (stream_t *p_stream, dash::xml::DOMParser *p_parser);
 
 /*****************************************************************************
  * Open:
@@ -80,11 +79,12 @@ static int Open(vlc_object_t *p_this)
 {
     stream_t *p_stream = (stream_t*) p_this;
 
-    dash::xml::DOMParser *p_parser = new dash::xml::DOMParser(p_stream->p_source);
-
-    if(!IsDash(p_stream, p_parser))
+    dash::xml::DOMParser parser(p_stream->p_source);
+    if(!parser.isDash())
+        return VLC_EGENERIC;
+    if(!parser.parse())
     {
-        delete(p_parser);
+        msg_Dbg(p_stream, "could not parse file");
         return VLC_EGENERIC;
     }
 
@@ -93,13 +93,13 @@ static int Open(vlc_object_t *p_this)
     if (unlikely(p_sys == NULL))
         return VLC_ENOMEM;
 
-    dash::http::HTTPConnectionManager   *p_conManager   = new dash::http::HTTPConnectionManager(p_stream);
-    dash::xml::Node                     *p_node         = p_parser->getRootNode();
-    dash::DASHManager                   *p_dashManager  = new dash::DASHManager(p_conManager,
-                                                                                p_node,
-                                                                                dash::logic::IAdaptationLogic::RateBased,
-                                                                                p_parser->getProfile(p_node));
-    delete(p_parser);
+    dash::http::HTTPConnectionManager *p_conManager =
+        new dash::http::HTTPConnectionManager(p_stream);
+    dash::xml::Node *p_node = parser.getRootNode();
+    dash::DASHManager*p_dashManager =
+        new dash::DASHManager(p_conManager, p_node,
+                              dash::logic::IAdaptationLogic::RateBased,
+                              parser.getProfile(p_node));
 
     p_sys->p_dashManager    = p_dashManager;
     p_sys->p_node           = p_node;
@@ -191,23 +191,4 @@ static int  Control         (stream_t *p_stream, int i_query, va_list args)
             return VLC_EGENERIC;
     }
     return VLC_SUCCESS;
-}
-/*****************************************************************************
- * Helpers:
- *****************************************************************************/
-static bool IsDash          (stream_t *p_stream, dash::xml::DOMParser *p_parser)
-{
-    if(!p_parser->isDash())
-    {
-        msg_Dbg(p_stream,"DASH filter: file is no mpd");
-        return false;
-    }
-
-    if(!p_parser->parse())
-    {
-        msg_Dbg(p_stream,"DASH filter: could not parse file");
-        return false;
-    }
-
-    return true;
 }
