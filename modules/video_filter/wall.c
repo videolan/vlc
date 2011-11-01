@@ -72,7 +72,7 @@ vlc_module_begin()
     add_integer( CFG_PREFIX "rows", 3, ROWS_TEXT, ROWS_LONGTEXT, false )
     add_string( CFG_PREFIX "active", NULL, ACTIVE_TEXT, ACTIVE_LONGTEXT,
                  true )
-    add_string( CFG_PREFIX "element-aspect", "4:3", ASPECT_TEXT, ASPECT_LONGTEXT, false )
+    add_string( CFG_PREFIX "element-aspect", "16:9", ASPECT_TEXT, ASPECT_LONGTEXT, false )
 
     add_shortcut( "wall" )
     set_callbacks( Open, Close )
