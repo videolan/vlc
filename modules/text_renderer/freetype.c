@@ -434,7 +434,7 @@ static void FontConfig_BuildCache( filter_t *p_filter )
     mtime_t t1, t2;
     t1 = mdate();
 
-#ifdef WIN32
+#if defined( WIN32 ) || defined( __APPLE__ )
     dialog_progress_bar_t *p_dialog = NULL;
     FcConfig *fcConfig = FcInitLoadConfig();
 
@@ -447,6 +447,15 @@ static void FontConfig_BuildCache( filter_t *p_filter )
         dialog_ProgressSet( p_dialog, NULL, 0.5 ); */
 
     FcConfigBuildFonts( fcConfig );
+#if defined( __APPLE__ )
+    // By default, scan only the directory /System/Library/Fonts.
+    // So build the set of available fonts under another directories,
+    // and add the set to the current configuration.
+    FcConfigAppFontAddDir( NULL, "~/Library/Fonts" );
+    FcConfigAppFontAddDir( NULL, "/Library/Fonts" );
+    FcConfigAppFontAddDir( NULL, "/Network/Library/Fonts" );
+    //FcConfigAppFontAddDir( NULL, "/System/Library/Fonts" );
+#endif
     if( p_dialog )
     {
 //        dialog_ProgressSet( p_dialog, NULL, 1.0 );
