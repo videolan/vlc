@@ -320,12 +320,12 @@ case "$DISTRO" in
     add_makefile_cfg "IOS_SDK_ROOT = ${IOS_SDK_ROOT}"
     ;;
   macosx*)
-    SDK_TARGET=10.5
+    SDK_TARGET=10.6
     HAVE_MACOSX_DARWIN_9=1
     EXTRA_LDFLAGS="${EXTRA_LDFLAGS} -isysroot \${MACOSX_SDK} -Wl,-syslibroot,\${MACOSX_SDK} -mmacosx-version-min=\${SDK_TARGET}"
     EXTRA_CFLAGS="${EXTRA_CFLAGS} -D\${ENVP} -isysroot \${MACOSX_SDK} -mmacosx-version-min=\${SDK_TARGET}"
-    CC="/usr/bin/gcc"
-    CXX="/usr/bin/g++"
+    CC="/usr/bin/clang"
+    CXX="/usr/bin/clang++"
     LD="ld"
     RANLIB="ranlib"
     AR=

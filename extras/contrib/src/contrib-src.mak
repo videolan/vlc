@@ -847,8 +847,8 @@ VPX_TARGET-$(ENABLED)              = --target=FIXME
 VPX_TARGET-$(HAVE_LINUX)           =
 VPX_TARGET-$(HAVE_WIN32)           = --target=x86-win32-gcc
 VPX_TARGET-$(HAVE_DARWIN_OS)       = --target=ppc32-darwin9-gcc
-VPX_TARGET-$(HAVE_MACOSX_ON_INTEL) = --target=x86-darwin9-gcc
-VPX_TARGET-$(HAVE_MACOSX64)        = --target=x86_64-darwin9-gcc
+VPX_TARGET-$(HAVE_MACOSX_ON_INTEL) = --target=x86-darwin10-gcc
+VPX_TARGET-$(HAVE_MACOSX64)        = --target=x86_64-darwin10-gcc
 VPX_DEPS-$(ENABLED)                =
 VPX_DEPS-$(HAVE_MACOSX_ON_INTEL) += .yasm
 
@@ -948,6 +948,7 @@ FFMPEGCONF += --enable-cross-compile
 endif
 
 ifdef HAVE_CROSS_COMPILE_NEEDS_CROSS_PREFIX
+ifndef HAVE_MACOSX
 ifndef HAVE_ANDROID
 ifndef HAVE_SYMBIAN
 FFMPEGCONF += --cross-prefix=$(HOST)-
@@ -958,6 +959,7 @@ endif
 else
 FFMPEGCONF += --cross-prefix=arm-linux-androideabi- --arch=armv6
 FFMPEGCONF += $(FFMPEGCONFSMALL)
+endif
 endif
 endif
 
@@ -989,12 +991,12 @@ endif
 
 ifdef HAVE_MACOSX32
 FFMPEGCONF += --enable-libvpx
-FFMPEGCONF += --cc=gcc-4.2
+FFMPEGCONF += --cc=clang
 endif
 
 ifdef HAVE_MACOSX64
 FFMPEGCONF += --enable-libvpx
-FFMPEGCONF += --cc=gcc-4.2
+FFMPEGCONF += --cc=clang
 FFMPEGCONF += --cpu=core2
 endif
 
