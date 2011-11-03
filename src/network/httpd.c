@@ -140,7 +140,6 @@ enum
 {
     HTTPD_CLIENT_FILE,      /* default */
     HTTPD_CLIENT_STREAM,    /* regulary get data from cb */
-    HTTPD_CLIENT_BIDIR,     /* check for reading and get data from cb */
 };
 
 struct httpd_client_t
@@ -151,9 +150,8 @@ struct httpd_client_t
 
     int     fd;
 
-    int     i_mode;
-    int     i_state;
-    int     b_read_waiting; /* stop as soon as possible sending */
+    bool    b_stream_mode;
+    uint8_t i_state;
 
     mtime_t i_activity_date;
     mtime_t i_activity_timeout;
@@ -788,7 +786,7 @@ static int httpd_StreamCallBack( httpd_callback_sys_t *p_sys,
 
         if( query->i_type != HTTPD_MSG_HEAD )
         {
-            httpd_ClientModeStream( cl );
+            cl->b_stream_mode = true;
             vlc_mutex_lock( &stream->lock );
             /* Send the header */
             if( stream->i_header > 0 )
@@ -1303,8 +1301,6 @@ static void httpd_MsgInit( httpd_message_t *msg )
     msg->psz_url    = NULL;
     msg->psz_args   = NULL;
 
-    msg->i_channel  = -1;
-
     msg->i_name     = 0;
     msg->name       = NULL;
     msg->i_value    = 0;
@@ -1378,21 +1374,10 @@ static void httpd_ClientInit( httpd_client_t *cl, mtime_t now )
     cl->i_buffer_size = HTTPD_CL_BUFSIZE;
     cl->i_buffer = 0;
     cl->p_buffer = xmalloc( cl->i_buffer_size );
-    cl->i_mode   = HTTPD_CLIENT_FILE;
-    cl->b_read_waiting = false;
+    cl->b_stream_mode = false;
 
     httpd_MsgInit( &cl->query );
     httpd_MsgInit( &cl->answer );
-}
-
-void httpd_ClientModeStream( httpd_client_t *cl )
-{
-    cl->i_mode   = HTTPD_CLIENT_STREAM;
-}
-
-void httpd_ClientModeBidir( httpd_client_t *cl )
-{
-    cl->i_mode   = HTTPD_CLIENT_BIDIR;
 }
 
 char* httpd_ClientIP( const httpd_client_t *cl, char *ip, int *port )
@@ -1518,18 +1503,6 @@ static void httpd_ClientRecv( httpd_client_t *cl )
             cl->i_buffer += i_len;
         }
 
-        if( ( cl->i_buffer >= 4 ) && ( cl->p_buffer[0] == '$' ) )
-        {
-            /* Interleaved RTP over RTSP */
-            cl->query.i_proto = HTTPD_PROTO_RTSP;
-            cl->query.i_type  = HTTPD_MSG_CHANNEL;
-            cl->query.i_channel = cl->p_buffer[1];
-            cl->query.i_body  = (cl->p_buffer[2] << 8)|cl->p_buffer[3];
-            cl->query.p_body  = xmalloc( cl->query.i_body );
-            cl->i_buffer      -= 4;
-            memcpy( cl->query.p_body, cl->p_buffer + 4, cl->i_buffer );
-        }
-        else
         /* The smallest legal request is 7 bytes ("GET /\r\n"),
          * this is the maximum we can ask at this point. */
         if( cl->i_buffer >= 7 )
@@ -1959,8 +1932,7 @@ static void httpd_ClientSend( httpd_client_t *cl )
 
         if( cl->i_buffer >= cl->i_buffer_size )
         {
-            if( cl->answer.i_body == 0  && cl->answer.i_body_offset > 0 &&
-                !cl->b_read_waiting )
+            if( cl->answer.i_body == 0  && cl->answer.i_body_offset > 0 )
             {
                 /* catch more body data */
                 int     i_msg = cl->query.i_type;
@@ -2109,35 +2081,10 @@ static void* httpd_HostThread( void *data )
                 httpd_MsgInit( answer );
 
                 /* Handle what we received */
-                if( (cl->i_mode != HTTPD_CLIENT_BIDIR) &&
-                    (i_msg == HTTPD_MSG_ANSWER || i_msg == HTTPD_MSG_CHANNEL) )
+                if( i_msg == HTTPD_MSG_ANSWER )
                 {
-                    /* we can only receive request from client when not
-                     * in BIDIR mode */
                     cl->url     = NULL;
                     cl->i_state = HTTPD_CLIENT_DEAD;
-                }
-                else if( i_msg == HTTPD_MSG_ANSWER )
-                {
-                    /* We are in BIDIR mode, trigger the callback and then
-                     * check for new data */
-                    if( cl->url && cl->url->catch[i_msg].cb )
-                    {
-                        cl->url->catch[i_msg].cb( cl->url->catch[i_msg].p_sys,
-                                                  cl, NULL, query );
-                    }
-                    cl->i_state = HTTPD_CLIENT_WAITING;
-                }
-                else if( i_msg == HTTPD_MSG_CHANNEL )
-                {
-                    /* We are in BIDIR mode, trigger the callback and then
-                     * check for new data */
-                    if( cl->url && cl->url->catch[i_msg].cb )
-                    {
-                        cl->url->catch[i_msg].cb( cl->url->catch[i_msg].p_sys,
-                                                  cl, NULL, query );
-                    }
-                    cl->i_state = HTTPD_CLIENT_WAITING;
                 }
                 else if( i_msg == HTTPD_MSG_OPTIONS )
                 {
@@ -2335,7 +2282,7 @@ static void* httpd_HostThread( void *data )
             }
             else if( cl->i_state == HTTPD_CLIENT_SEND_DONE )
             {
-                if( cl->i_mode == HTTPD_CLIENT_FILE || cl->answer.i_body_offset == 0 )
+                if( !cl->b_stream_mode || cl->answer.i_body_offset == 0 )
                 {
                     const char *psz_connection = httpd_MsgGet( &cl->answer, "Connection" );
                     const char *psz_query = httpd_MsgGet( &cl->query, "Connection" );
@@ -2376,19 +2323,6 @@ static void* httpd_HostThread( void *data )
                     }
                     httpd_MsgClean( &cl->answer );
                 }
-                else if( cl->b_read_waiting )
-                {
-                    /* we have a message waiting for us to read it */
-                    httpd_MsgClean( &cl->answer );
-                    httpd_MsgClean( &cl->query );
-
-                    cl->i_buffer = 0;
-                    cl->i_buffer_size = 1000;
-                    free( cl->p_buffer );
-                    cl->p_buffer = xmalloc( cl->i_buffer_size );
-                    cl->i_state = HTTPD_CLIENT_RECEIVING;
-                    cl->b_read_waiting = false;
-                }
                 else
                 {
                     int64_t i_offset = cl->answer.i_body_offset;
@@ -2423,13 +2357,6 @@ static void* httpd_HostThread( void *data )
                     cl->answer.i_body = 0;
                     cl->i_state = HTTPD_CLIENT_SENDING;
                 }
-            }
-
-            /* Special for BIDIR mode we also check reading */
-            if( cl->i_mode == HTTPD_CLIENT_BIDIR &&
-                cl->i_state == HTTPD_CLIENT_SENDING )
-            {
-                pufd->events |= POLLIN;
             }
 
             if (pufd->events != 0)
@@ -2495,13 +2422,6 @@ static void* httpd_HostThread( void *data )
             else if( cl->i_state == HTTPD_CLIENT_TLS_HS_OUT )
             {
                 httpd_ClientTlsHsOut( cl );
-            }
-
-            if( cl->i_mode == HTTPD_CLIENT_BIDIR &&
-                cl->i_state == HTTPD_CLIENT_SENDING &&
-                (pufd->revents & POLLIN) )
-            {
-                cl->b_read_waiting = true;
             }
         }
         vlc_mutex_unlock( &host->lock );

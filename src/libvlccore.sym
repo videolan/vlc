@@ -155,8 +155,6 @@ http_auth_ParseWwwAuthenticateHeader
 http_auth_ParseAuthenticationInfoHeader
 http_auth_FormatAuthorizationHeader
 httpd_ClientIP
-httpd_ClientModeBidir
-httpd_ClientModeStream
 httpd_FileDelete
 httpd_FileNew
 httpd_HandlerDelete
