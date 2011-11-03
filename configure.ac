@@ -656,12 +656,6 @@ LIBS_save="${LIBS}"
 AC_SEARCH_LIBS([getaddrinfo], [nsl],,, [${SOCKET_LIBS}])
 LIBS="${LIBS_save}"
 
-AC_CHECK_FUNCS(inet_aton,,[
-  AC_CHECK_LIB(resolv,inet_aton,[
-    VLC_ADD_LIBS([libvlccore],[-lresolv])
-  ])
-])
-
 dnl FreeBSD has a gnugetopt library for this:
 GNUGETOPT_LIBS=""
 AC_CHECK_FUNC(getopt_long,, [
