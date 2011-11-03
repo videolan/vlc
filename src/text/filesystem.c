@@ -51,7 +51,6 @@
 FILE *vlc_fopen (const char *filename, const char *mode)
 {
     int rwflags = 0, oflags = 0;
-    bool append = false;
 
     for (const char *ptr = mode; *ptr; ptr++)
     {
@@ -63,8 +62,7 @@ FILE *vlc_fopen (const char *filename, const char *mode)
 
             case 'a':
                 rwflags = O_WRONLY;
-                oflags |= O_CREAT;
-                append = true;
+                oflags |= O_CREAT | O_APPEND;
                 break;
 
             case 'w':
@@ -91,12 +89,6 @@ FILE *vlc_fopen (const char *filename, const char *mode)
     int fd = vlc_open (filename, rwflags | oflags, 0666);
     if (fd == -1)
         return NULL;
-
-    if (append && (lseek (fd, 0, SEEK_END) == -1))
-    {
-        close (fd);
-        return NULL;
-    }
 
     FILE *stream = fdopen (fd, mode);
     if (stream == NULL)
