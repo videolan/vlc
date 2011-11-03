@@ -77,8 +77,12 @@ FILE *vlc_fopen (const char *filename, const char *mode)
                 break;
 
 #ifdef O_TEXT
+            case 'b':
+                oflags = (oflags & ~O_TEXT) | O_BINARY;
+                break;
+
             case 't':
-                oflags |= O_TEXT;
+                oflags = (oflags & ~O_BINARY) | O_TEXT;
                 break;
 #endif
         }
