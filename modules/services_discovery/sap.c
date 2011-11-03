@@ -43,6 +43,9 @@
 #ifdef HAVE_UNISTD_H
 #    include <unistd.h>
 #endif
+#ifdef HAVE_ARPA_INET_H
+# include <arpa/inet.h>
+#endif
 #ifdef HAVE_POLL
 # include <poll.h>
 #endif
