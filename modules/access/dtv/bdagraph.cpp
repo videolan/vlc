@@ -167,6 +167,7 @@ void dvb_remove_pid (dvb_device_t *, uint16_t)
 unsigned dvb_enum_systems (dvb_device_t *)
 {
 #warning TODO
+    return 0;
 }
 
 float dvb_get_signal_strength (dvb_device_t *)
