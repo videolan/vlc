@@ -65,12 +65,7 @@ struct msghdr
 #   endif
 #else
 #   include <sys/socket.h>
-#   ifdef HAVE_NETINET_IN_H
-#      include <netinet/in.h>
-#   endif
-#   ifdef HAVE_ARPA_INET_H
-#      include <arpa/inet.h>
-#   endif
+#   include <netinet/in.h>
 #   include <netdb.h>
 #   define net_errno errno
 #endif
@@ -179,9 +174,6 @@ VLC_API int vlc_poll(struct pollfd *fds, unsigned nfds, int timeout);
 #  define SHUT_WR    1
 #  define SHUT_RDWR  2
 # endif
-#ifdef HAVE_UNISTD_H
-#include <unistd.h>
-#endif
 # define net_Close( fd ) (void)close (fd)
 #endif
 

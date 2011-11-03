@@ -759,7 +759,7 @@ dnl Check for headers
 AC_CHECK_HEADERS([search.h])
 AC_CHECK_HEADERS(getopt.h strings.h locale.h xlocale.h)
 AC_CHECK_HEADERS(fcntl.h sys/time.h sys/ioctl.h sys/stat.h)
-AC_CHECK_HEADERS([arpa/inet.h netinet/in.h netinet/udplite.h sys/eventfd.h])
+AC_CHECK_HEADERS([arpa/inet.h netinet/udplite.h sys/eventfd.h])
 AC_CHECK_HEADERS([net/if.h], [], [],
   [
     #include <sys/types.h>
