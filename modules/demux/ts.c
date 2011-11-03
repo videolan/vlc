@@ -442,85 +442,15 @@ static void SetPrgFilter( demux_t *, int i_prg, bool b_selected );
 #define TS_PACKET_SIZE_MAX 204
 #define TS_TOPFIELD_HEADER 1320
 
-/*****************************************************************************
- * Open
- *****************************************************************************/
-static int Open( vlc_object_t *p_this )
+static int DetectPacketSize( demux_t *p_demux )
 {
-    demux_t     *p_demux = (demux_t*)p_this;
-    demux_sys_t *p_sys;
-
     const uint8_t *p_peek;
-    int          i_sync, i_peek, i;
-    int          i_packet_size;
-
-    ts_pid_t    *pat;
-    const char  *psz_mode;
-    bool         b_append;
-    bool         b_topfield = false;
-
-    if( stream_Peek( p_demux->s, &p_peek, TS_PACKET_SIZE_MAX ) <
-        TS_PACKET_SIZE_MAX ) return VLC_EGENERIC;
+    if( stream_Peek( p_demux->s,
+                     &p_peek, TS_PACKET_SIZE_MAX ) < TS_PACKET_SIZE_MAX )
+        return -1;
 
     if( memcmp( p_peek, "TFrc", 4 ) == 0 )
     {
-        b_topfield = true;
-        msg_Dbg( p_demux, "this is a topfield file" );
-    }
-
-    /* Search first sync byte */
-    for( i_sync = 0; i_sync < TS_PACKET_SIZE_MAX; i_sync++ )
-    {
-        if( p_peek[i_sync] == 0x47 ) break;
-    }
-    if( i_sync >= TS_PACKET_SIZE_MAX && !b_topfield )
-    {
-        if( !p_demux->b_force )
-            return VLC_EGENERIC;
-        msg_Warn( p_demux, "this does not look like a TS stream, continuing" );
-    }
-
-    if( b_topfield )
-    {
-        /* Read the entire Topfield header */
-        i_peek = TS_TOPFIELD_HEADER;
-    }
-    else
-    {
-        /* Check next 3 sync bytes */
-        i_peek = TS_PACKET_SIZE_MAX * 3 + i_sync + 1;
-    }
-
-    if( ( stream_Peek( p_demux->s, &p_peek, i_peek ) ) < i_peek )
-    {
-        msg_Err( p_demux, "cannot peek" );
-        return VLC_EGENERIC;
-    }
-    if( p_peek[i_sync + TS_PACKET_SIZE_188] == 0x47 &&
-        p_peek[i_sync + 2 * TS_PACKET_SIZE_188] == 0x47 &&
-        p_peek[i_sync + 3 * TS_PACKET_SIZE_188] == 0x47 )
-    {
-        i_packet_size = TS_PACKET_SIZE_188;
-    }
-    else if( p_peek[i_sync + TS_PACKET_SIZE_192] == 0x47 &&
-             p_peek[i_sync + 2 * TS_PACKET_SIZE_192] == 0x47 &&
-             p_peek[i_sync + 3 * TS_PACKET_SIZE_192] == 0x47 )
-    {
-        i_packet_size = TS_PACKET_SIZE_192;
-    }
-    else if( p_peek[i_sync + TS_PACKET_SIZE_204] == 0x47 &&
-             p_peek[i_sync + 2 * TS_PACKET_SIZE_204] == 0x47 &&
-             p_peek[i_sync + 3 * TS_PACKET_SIZE_204] == 0x47 )
-    {
-        i_packet_size = TS_PACKET_SIZE_204;
-    }
-    else if( p_demux->b_force )
-    {
-        i_packet_size = TS_PACKET_SIZE_188;
-    }
-    else if( b_topfield )
-    {
-        i_packet_size = TS_PACKET_SIZE_188;
 #if 0
         /* I used the TF5000PVR 2004 Firmware .doc header documentation,
          * http://www.i-topfield.com/data/product/firmware/Structure%20of%20Recorded%20File%20in%20TF5000PVR%20(Feb%2021%202004).doc
@@ -584,12 +514,69 @@ static int Open( vlc_object_t *p_this )
         msg_Dbg( p_demux, "extended event text=%s", psz_ext_text );
         // 52 bytes reserved Bslbf
 #endif
+        msg_Dbg( p_demux, "this is a topfield file" );
+        return TS_PACKET_SIZE_188;
     }
-    else
+
+    for( int i_sync = 0; i_sync < TS_PACKET_SIZE_MAX; i_sync++ )
     {
-        msg_Warn( p_demux, "TS module discarded (lost sync)" );
-        return VLC_EGENERIC;
+        if( p_peek[i_sync] != 0x47 )
+            continue;
+
+        /* Check next 3 sync bytes */
+        int i_peek = TS_PACKET_SIZE_MAX * 3 + i_sync + 1;
+        if( ( stream_Peek( p_demux->s, &p_peek, i_peek ) ) < i_peek )
+        {
+            msg_Err( p_demux, "cannot peek" );
+            return -1;
+        }
+        if( p_peek[i_sync + 1 * TS_PACKET_SIZE_188] == 0x47 &&
+            p_peek[i_sync + 2 * TS_PACKET_SIZE_188] == 0x47 &&
+            p_peek[i_sync + 3 * TS_PACKET_SIZE_188] == 0x47 )
+        {
+            return TS_PACKET_SIZE_188;
+        }
+        else if( p_peek[i_sync + 1 * TS_PACKET_SIZE_192] == 0x47 &&
+                 p_peek[i_sync + 2 * TS_PACKET_SIZE_192] == 0x47 &&
+                 p_peek[i_sync + 3 * TS_PACKET_SIZE_192] == 0x47 )
+        {
+            return TS_PACKET_SIZE_192;
+        }
+        else if( p_peek[i_sync + 1 * TS_PACKET_SIZE_204] == 0x47 &&
+                 p_peek[i_sync + 2 * TS_PACKET_SIZE_204] == 0x47 &&
+                 p_peek[i_sync + 3 * TS_PACKET_SIZE_204] == 0x47 )
+        {
+            return TS_PACKET_SIZE_204;
+        }
     }
+
+    if( p_demux->b_force )
+    {
+        msg_Warn( p_demux, "this does not look like a TS stream, continuing" );
+        return TS_PACKET_SIZE_188;
+    }
+    msg_Warn( p_demux, "TS module discarded (lost sync)" );
+    return -1;
+}
+
+/*****************************************************************************
+ * Open
+ *****************************************************************************/
+static int Open( vlc_object_t *p_this )
+{
+    demux_t     *p_demux = (demux_t*)p_this;
+    demux_sys_t *p_sys;
+
+    int          i_packet_size;
+
+    ts_pid_t    *pat;
+    const char  *psz_mode;
+    bool         b_append;
+
+    /* Search first sync byte */
+    i_packet_size = DetectPacketSize( p_demux );
+    if( i_packet_size < 0 )
+        return VLC_EGENERIC;
 
     p_demux->p_sys = p_sys = malloc( sizeof( demux_sys_t ) );
     if( !p_sys )
@@ -660,7 +647,7 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->b_broken_charset = false;
 
-    for( i = 0; i < 8192; i++ )
+    for( int i = 0; i < 8192; i++ )
     {
         ts_pid_t *pid = &p_sys->pid[i];
 
