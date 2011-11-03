@@ -1,0 +1,14 @@
+--- lame/libmp3lame/vbrquantize.c.orig	2011-11-03 10:26:28.414360800 -0400
++++ lame/libmp3lame/vbrquantize.c	2011-11-03 10:26:30.478371043 -0400
+@@ -81,6 +81,11 @@
+ #define FORCEINLINE
+ #endif
+ 
++#ifdef WIN64
++#undef FORCEINLINE
++#define FORCEINLINE __inline__ __attribute__((always_inline))
++#endif
++
+ typedef VOLATILE union {
+     float   f;
+     int     i;

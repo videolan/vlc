@@ -10,6 +10,9 @@ $(TARBALLS)/lame-$(LAME_VERSION).tar.gz:
 
 lame: lame-$(LAME_VERSION).tar.gz .sum-lame
 	$(UNPACK)
+ifdef HAVE_WIN64
+	$(APPLY) $(SRC)/lame/lame-win64.patch
+endif
 	$(MOVE)
 
 .lame: lame
