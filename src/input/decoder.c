@@ -2345,6 +2345,18 @@ static picture_t *vout_new_buffer( decoder_t *p_dec )
         fmt.i_chroma = p_dec->fmt_out.i_codec;
         p_owner->video = fmt;
 
+        if( vlc_fourcc_IsYUV( fmt.i_chroma ) )
+        {
+            vlc_chroma_description_t *dsc = vlc_fourcc_GetChromaDescription( fmt.i_chroma );
+            for( int i = 0; dsc && i < dsc->plane_count; i++ )
+            {
+                while( fmt.i_width % dsc->p[i].w.den )
+                    fmt.i_width++;
+                while( fmt.i_height % dsc->p[i].h.den )
+                    fmt.i_height++;
+            }
+        }
+
         if( !fmt.i_visible_width || !fmt.i_visible_height )
         {
             if( p_dec->fmt_in.video.i_visible_width &&
