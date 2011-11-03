@@ -250,11 +250,8 @@ void swab (const void *, void *, ssize_t);
 
 /* Socket stuff */
 #ifndef HAVE_INET_PTON
-# define inet_pton vlc_inet_pton
-#endif
-
-#ifndef HAVE_INET_NTOP
-# define inet_ntop vlc_inet_ntop
+int inet_pton(int, const char *, void *);
+const char *inet_ntop(int, const void *, char *, int);
 #endif
 
 #ifndef HAVE_STRUCT_POLLFD

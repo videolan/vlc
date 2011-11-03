@@ -559,7 +559,7 @@ need_libc=false
 dnl Check for usual libc functions
 AC_CHECK_DECLS([nanosleep],,,[#include <time.h>])
 AC_CHECK_FUNCS([daemon fcntl fstatvfs fork getenv getpwuid_r if_nameindex if_nametoindex isatty lstat memalign mmap openat pread posix_fadvise posix_madvise setlocale stricmp strnicmp uselocale])
-AC_REPLACE_FUNCS([asprintf atof atoll dirfd fdopendir flockfile fsync getdelim getpid gmtime_r lldiv localtime_r nrand48 rewind setenv strcasecmp strcasestr strdup strlcpy strncasecmp strndup strnlen strsep strtof strtok_r strtoll swab tdestroy vasprintf])
+AC_REPLACE_FUNCS([asprintf atof atoll dirfd fdopendir flockfile fsync getdelim getpid gmtime_r inet_pton lldiv localtime_r nrand48 rewind setenv strcasecmp strcasestr strdup strlcpy strncasecmp strndup strnlen strsep strtof strtok_r strtoll swab tdestroy vasprintf])
 AC_CHECK_FUNCS(fdatasync,,
   [AC_DEFINE(fdatasync, fsync, [Alias fdatasync() to fsync() if missing.])
 ])
@@ -1643,22 +1643,6 @@ AS_IF([test "${enable_vlm}" != "no"], [
   AC_DEFINE(ENABLE_VLM, 1, [Define if you want the VideoLAN manager support])
 ])
 AM_CONDITIONAL([ENABLE_VLM], [test "${enable_vlm}" != "no"])
-
-
-dnl
-dnl  ipv6 support
-dnl
-have_ipv6=no
-AC_CHECK_FUNCS(inet_pton,[have_ipv6=yes],[
-  AC_CHECK_LIB(nsl,inet_pton, [have_ipv6=yes])
-])
-
-AS_IF([test "${have_ipv6}" = "yes"], [
-  AC_DEFINE(HAVE_INET_PTON, 1, [Define to 1 if you have inet_pton().])])
-
-
-AC_CHECK_FUNCS(inet_ntop,[
-  AC_DEFINE(HAVE_INET_NTOP, 1, [Define to 1 if you have inet_ntop().])])
 
 
 dnl

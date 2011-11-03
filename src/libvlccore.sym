@@ -549,8 +549,6 @@ vlc_hold
 vlc_iconv
 vlc_iconv_close
 vlc_iconv_open
-vlc_inet_ntop
-vlc_inet_pton
 vlc_join
 vlc_list_children
 vlc_list_release
