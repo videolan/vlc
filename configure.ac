@@ -2470,11 +2470,10 @@ dnl
 AC_ARG_ENABLE(libva,
   [  --enable-libva          VAAPI GPU decoding support (libVA) (default auto)])
 
+AS_IF([test "${enable_libva}" = "yes" -a "${have_avcodec}" != "yes" ], [
+  AC_MSG_ERROR([--enable-libva and --disable-avcodec options are mutually exclusive. Use --enable-avcodec.])
+])
 AS_IF([test "${enable_libva}" != "no"], [
-  AS_IF([test "${have_avcodec}" != "yes"], [
-    AC_MSG_ERROR([--enable-libva and --disable-avcodec options are mutually exclusive.])
-  ])
-
   PKG_CHECK_MODULES(LIBVA, [libva libva-x11], [
     VLC_SAVE_FLAGS
     CPPFLAGS="${CPPFLAGS} ${AVCODEC_CFLAGS}"
