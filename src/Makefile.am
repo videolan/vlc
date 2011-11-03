@@ -67,6 +67,7 @@ pluginsinclude_HEADERS = \
 	../include/vlc_modules.h \
 	../include/vlc_mouse.h \
 	../include/vlc_mtime.h \
+	../include/vlc_network.h \
 	../include/vlc_objects.h \
 	../include/vlc_picture.h \
 	../include/vlc_picture_fifo.h \
@@ -84,6 +85,7 @@ pluginsinclude_HEADERS = \
 	../include/vlc_subpicture.h \
 	../include/vlc_text_style.h \
 	../include/vlc_threads.h \
+	../include/vlc_tls.h \
 	../include/vlc_url.h \
 	../include/vlc_variables.h \
 	../include/vlc_vlm.h \
@@ -107,10 +109,8 @@ noinst_HEADERS = \
 	../include/vlc_iso_lang.h \
 	../include/vlc_keys.h \
 	../include/vlc_memory.h \
-	../include/vlc_network.h \
 	../include/vlc_osd.h \
 	../include/vlc_pgpkey.h \
-	../include/vlc_tls.h \
 	../include/vlc_update.h \
 	../include/vlc_vod.h \
 	../include/vlc_vout_wrapper.h \
