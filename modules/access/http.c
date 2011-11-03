@@ -1608,6 +1608,11 @@ static int Request( access_t *p_access, uint64_t i_tell )
             if( AuthCheckReply( p_access, p, &p_sys->proxy, &p_sys->proxy_auth ) )
                 goto error;
         }
+        else if( !strcasecmp( psz, "Accept-Ranges" ) )
+        {
+            if( !strcasecmp( p, "bytes" ) )
+                p_sys->b_seekable = true;
+        }
 
         free( psz );
     }
