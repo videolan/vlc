@@ -1,0 +1,69 @@
+#!/bin/sh
+# Copyright © 2011 Rafaël Carré
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+
+export LC_ALL=
+NEEDED=
+
+if [ ! -f tools.mak ]
+then
+	echo "You must run me in ./extras/tools !"
+	exit 1
+fi
+
+check() {
+# FIXME : add version check
+if [ ! $1 --version 2>/dev/null ]
+then
+    echo "$1 not found"
+    NEEDED="$NEEDED .$1"
+fi
+}
+
+check autoconf
+check automake
+check libtool
+check pkg-config
+check xz
+check cmake
+
+[ -n "$NEEDED" ] && mkdir -p build/
+
+CPUS=
+case `uname` in
+    Linux)
+        CPUS=`grep -c ^processor /proc/cpuinfo`
+     ;;
+    Darwin)
+        CPUS=`sysctl hw.ncpu|cut -d: -f2`
+    ;;
+    *)
+        CPUS=1  # default
+     ;;
+esac
+
+
+cat > Makefile << EOF
+MAKEFLAGS += -j$CPUS
+PREFIX=\$(abspath ./build)
+
+all: $NEEDED
+	@echo "You are ready to build VLC and its contribs"
+
+automake: .autoconf
+
+include tools.mak
+EOF
