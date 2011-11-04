@@ -690,20 +690,22 @@ int rtp_autodetect (demux_t *demux, rtp_session_t *session,
         /*
          * If the rtp payload type is unknown then check demux if it is specified
          */
-        if ((strcmp(demux->psz_demux, "h264") == 0) || (strcmp(demux->psz_demux, "ts") == 0))
+        if (!strcmp(demux->psz_demux, "h264")
+         || !strcmp(demux->psz_demux, "ts"))
         {
-          msg_Dbg (demux, "rtp autodetect specified demux=%s", demux->psz_demux);
-          pt.init = demux_init;
-          pt.destroy = stream_destroy;
-          pt.decode = stream_decode;
-          pt.frequency = 90000;
-          break;
+            msg_Dbg (demux, "dynamic payload format %s specified by demux",
+                     demux->psz_demux);
+            pt.init = demux_init;
+            pt.destroy = stream_destroy;
+            pt.decode = stream_decode;
+            pt.frequency = 90000;
+            break;
         }
-        else if (ptype >= 96)
+        if (ptype >= 96)
         {
             char *dynamic = var_InheritString(demux, "rtp-dynamic-pt");
             if (dynamic == NULL)
-                return -1;
+                ;
             else if (!strcmp(dynamic, "theora"))
             {
                 msg_Dbg (demux, "assuming Theora Encoded Video");
@@ -713,18 +715,11 @@ int rtp_autodetect (demux_t *demux, rtp_session_t *session,
                 pt.frequency = 90000;
             }
             else
-            {
                 msg_Err (demux, "invalid dynamic payload format `%s' "
                                 "specified", dynamic);
-                free(dynamic);
-                return -1;
-            }
-            free(dynamic);
+            free (dynamic);
         }
-        else
-        {
-          return -1;
-        }
+        return -1;
     }
     rtp_add_type (demux, session, &pt);
     return 0;
