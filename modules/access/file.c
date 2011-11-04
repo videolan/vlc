@@ -298,8 +298,8 @@ ssize_t FileRead( access_t *p_access, uint8_t *p_buffer, size_t i_len )
 
             default:
                 msg_Err (p_access, "failed to read (%m)");
-                dialog_Fatal (p_access, _("File reading failed"), "%s (%m)",
-                              _("VLC could not read the file."));
+                dialog_Fatal (p_access, _("File reading failed"),
+                              _("VLC could not read the file (%m)."));
                 p_access->info.b_eof = true;
                 return 0;
         }
