@@ -32,6 +32,7 @@
 #include <vlc_demux.h>
 #include <vlc_network.h>
 #include <vlc_plugin.h>
+#include <vlc_dialog.h>
 
 #include "rtp.h"
 #ifdef HAVE_SRTP
@@ -613,8 +614,8 @@ static void *ts_init (demux_t *demux)
 
 /* Not using SDP, we need to guess the payload format used */
 /* see http://www.iana.org/assignments/rtp-parameters */
-int rtp_autodetect (demux_t *demux, rtp_session_t *session,
-                    const block_t *block)
+void rtp_autodetect (demux_t *demux, rtp_session_t *session,
+                     const block_t *block)
 {
     uint8_t ptype = rtp_ptype (block);
     rtp_pt_t pt = {
@@ -715,14 +716,20 @@ int rtp_autodetect (demux_t *demux, rtp_session_t *session,
                 pt.frequency = 90000;
             }
             else
-                msg_Err (demux, "invalid dynamic payload format `%s' "
+                msg_Err (demux, "unknown dynamic payload format `%s' "
                                 "specified", dynamic);
             free (dynamic);
         }
-        return -1;
+
+        msg_Err (demux, "unspecified payload format (type %"PRIu8")", ptype);
+        msg_Info (demux, "A valid SDP is needed to parse this RTP stream.");
+        dialog_Fatal (demux, N_("SDP required"),
+             N_("A description in SDP format is required to receive the RTP "
+                "stream. Note that rtp:// URIs cannot work with dynamic "
+                "RTP payload format (%"PRIu8")."), ptype);
+        return;
     }
     rtp_add_type (demux, session, &pt);
-    return 0;
 }
 
 /*

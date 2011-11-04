@@ -32,7 +32,7 @@ struct rtp_pt_t
     uint32_t  frequency; /* RTP clock rate (Hz) */
     uint8_t   number;
 };
-int rtp_autodetect (demux_t *, rtp_session_t *, const block_t *);
+void rtp_autodetect (demux_t *, rtp_session_t *, const block_t *);
 
 static inline uint8_t rtp_ptype (const block_t *block)
 {

@@ -69,8 +69,7 @@ static void rtp_process (demux_t *demux, block_t *block)
     /* TODO: use SDP and get rid of this hack */
     if (unlikely(sys->autodetect))
     {   /* Autodetect payload type, _before_ rtp_queue() */
-        if (rtp_autodetect (demux, sys->session, block))
-            goto drop;
+        rtp_autodetect (demux, sys->session, block);
         sys->autodetect = false;
     }
 
