@@ -485,6 +485,7 @@ SOURCES_libvlc = \
 ###############################################################################
 
 BUILT_SOURCES += stamp-revision
+MAINTAINERCLEANFILES = $(srcdir)/revision.txt $(srcdir)/revision.c
 
 $(srcdir)/revision.c: $(srcdir)/revision.txt
 	$(AM_V_at)rm -f -- $@
