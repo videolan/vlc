@@ -48,6 +48,7 @@ Core:
  * Almost every video filter can now be transcoded
  * Playback rate doesn't get resetted to 1 between items anymore
  * Option --sub-filter was renamed --sub-source
+ * Port to Android, iOS, OS/2 and Win64
 
 Access:
  * Multiple files are now supported inside RAR files
@@ -84,6 +85,7 @@ Codecs:
  * EIA-608 closed captions improvements
  * Support for JPEG 2000 and Motion JPEG 2000 in the Windows and Mac binaries
  * Experimental support of IOMX for OpenMAX IL codecs on Android
+ * One can use "mp2 " fourcc to encode in mpeg1/2 layer 2
 
 Demuxers:
  * New images demuxer supporting jpeg, png, targa, xcf, git, tiff, bmp, pcx, lbm
@@ -93,8 +95,10 @@ Demuxers:
  * New demuxer module for EBU subtitles (.stl)
  * Support for caf, mtv, awb, f4v, amr, vro (DVD-VR) files
  * Ogg, flv, mxf, amr seeking improvements
- * Major improvements in Matroska (mkv) chapters/segments handling
+ * Major improvements in Matroska (mkv) chapters/segments handling and seeking
  * Support for duration and better seeking in Mpeg-TS files (.ts, .m2ts, .mts)
+ * Mov improvements, notably for aspect-ratio handling and Audio DV tracks
+ * Improved support of tracker files
 
 Interfaces:
  * Qt: effects dialogs rework
@@ -118,6 +122,8 @@ Interfaces:
  * webUI/http: Rewrite of the web interface, using jQuery
  * webUI/http: some requests are now supported in JSON in addition to XML
  * webUI/http: path values for input and output are deprecated in favour of uri
+ * Qt/Win32: the update system now downloads the updates in the temp folder
+ * Qt: preferences are now searchable
 
 Video Output:
  * New video output based on Direct2D for Windows 7 and Vista (with Platform Update)
@@ -140,6 +146,7 @@ Audio Output and Filters:
  * New audio resampler using the Secret Rabbit Code (a.k.a. libsamplerate)
  * New Compressor filter, a dynamic range compressor
  * New simplistic Karaoke filter
+ * New audio output based on kai API for OS/2
 
 Video Filter:
  * New gradfun filter for debanding videos using dithering
@@ -153,9 +160,10 @@ Video Filter:
  * New anti-flickering filter
  * New OpenMAX DL IPCS filter for color space conversion and resizing
  * Major improvements in the freetype text-rendering module, notably supporting
-   blackbox and customizable shadow
+   blackbox and customizable shadow.
    NB: The freetype module is now used by default on the Mac OS X instead of
    the quartztext module, which can still be enabled manually.
+   The Win32 font selection was improved too.
 
 Stream output:
  * New livehttp-module for HTTP Live Streaming (IETF draft) output
