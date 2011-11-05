@@ -26,6 +26,6 @@ endif
 
 .cddb: cddb .regex
 	$(RECONF)
-	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) --without-iconv CFLAGS="$(CFLAGS) -D_BSD_SOCKLEN_T_=int"
+	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) --without-iconv CFLAGS="$(CFLAGS) -D_BSD_SOCKLEN_T_=int -DWIN32_LEAN_AND_MEAN"
 	cd $< && $(MAKE) install
 	touch $@
