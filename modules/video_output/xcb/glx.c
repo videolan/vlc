@@ -50,7 +50,7 @@ static void Close (vlc_object_t *);
  */
 vlc_module_begin ()
     set_shortname (N_("GLX"))
-    set_description (N_("GLX video output (XCB)"))
+    set_description (N_("OpenGL GLX video output (XCB)"))
     set_category (CAT_VIDEO)
     set_subcategory (SUBCAT_VIDEO_VOUT)
     set_capability ("vout display", 150)
