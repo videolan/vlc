@@ -1,0 +1,50 @@
+diff -ru cddb.orig/lib/cddb_net.c cddb/lib/cddb_net.c
+--- cddb.orig/lib/cddb_net.c	2011-11-05 18:21:42.000000000 +0200
++++ cddb/lib/cddb_net.c	2011-11-05 18:22:11.000000000 +0200
+@@ -228,46 +228,9 @@
+ 
+ /* Time-out enabled work-alikes */
+ 
+-#ifdef HAVE_ALARM
+-/* time-out jump buffer */
+-static jmp_buf timeout_expired;
+-
+-/* time-out signal handler */
+-static void alarm_handler(int signum)
+-{
+-    longjmp(timeout_expired, 1);
+-}
+-#endif
+-
+ struct hostent *timeout_gethostbyname(const char *hostname, int timeout)
+ {
+-#ifdef HAVE_ALARM
+-    struct hostent *he = NULL;
+-    struct sigaction action;
+-    struct sigaction old;
+-
+-    /* no signal before setjmp */
+-    alarm(0);
+-
+-    /* register signal handler */
+-    memset(&action, 0, sizeof(action));
+-    action.sa_handler = alarm_handler;
+-    sigaction(SIGALRM, &action, &old);
+-
+-    /* save stack state */
+-    if (!setjmp(timeout_expired)) {
+-        alarm(timeout);         /* set time-out alarm */
+-        he = gethostbyname(hostname); /* execute DNS query */
+-        alarm(0);               /* reset alarm timer */
+-    } else {
+-        errno = ETIMEDOUT;
+-    }
+-    sigaction(SIGALRM, &old, NULL); /* restore previous signal handler */
+-
+-    return he;
+-#else
+     return gethostbyname(hostname); /* execute DNS query directly */
+-#endif
+ }
+ 
+ int timeout_connect(int sockfd, const struct sockaddr *addr, 
