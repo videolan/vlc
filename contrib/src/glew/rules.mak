@@ -10,7 +10,9 @@ $(TARBALLS)/glew-$(GLEW_VERSION)-src.tar.gz:
 glew: glew-$(GLEW_VERSION)-src.tar.gz .sum-glew
 	$(UNPACK)
 	mv glew glew-$(GLEW_VERSION)-src
+ifdef HAVE_WIN32
 	$(APPLY) $(SRC)/glew/win32.patch
+endif
 	$(MOVE)
 
 .glew: glew
