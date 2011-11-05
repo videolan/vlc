@@ -18,6 +18,15 @@ sdl: SDL-$(SDL_VERSION).tar.gz .sum-sdl
 	$(MOVE)
 
 SDLCONF := $(HOSTCONF) \
+	--disable-audio \
+	--enable-video \
+	--enable-events \
+	--disable-joystick \
+	--disable-cdrom \
+	--disable-threads \
+	--disable-timers \
+	--disable-file \
+	--disable-assembly \
 	--disable-video-x11 \
 	--disable-video-aalib \
 	--disable-video-dga \
@@ -26,9 +35,6 @@ SDLCONF := $(HOSTCONF) \
 	--disable-video-ggi \
 	--disable-video-svga \
 	--disable-directx \
-	--disable-joystick \
-	--disable-cdrom \
-	--disable-threads \
 	--disable-sdl-dlopen
 
 .sdl: sdl
