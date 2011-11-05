@@ -20,7 +20,7 @@ ifdef HAVE_WIN32
 endif
 	$(MOVE)
 
-DEPS_zvbi = pthreads
+DEPS_zvbi = pthreads iconv $(DEPS_iconv)
 
 ZVBI_CFLAGS := $(CFLAGS)
 ZVBICONF := \
