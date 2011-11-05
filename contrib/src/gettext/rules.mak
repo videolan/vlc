@@ -2,6 +2,12 @@
 GETTEXT_VERSION=0.18.1.1
 GETTEXT_URL=$(GNU)/gettext/gettext-$(GETTEXT_VERSION).tar.gz
 
+PKGS += gettext
+ifneq ($(filter gnu%,$(subst -, ,$(HOST))),)
+# GNU platform should have gettext (?)
+PKGS_FOUND += gettext
+endif
+
 $(TARBALLS)/gettext-$(GETTEXT_VERSION).tar.gz:
 	$(call download,$(GETTEXT_URL))
 
