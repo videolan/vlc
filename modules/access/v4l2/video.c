@@ -171,7 +171,7 @@ static const int colorfx_vlc[] = { -1, V4L2_COLORFX_NONE,
 static const char *const colorfx_user[] = { N_("Unspecified"), N_("None"),
     N_("Black & white"), N_("Sepia"), N_("Negative"),
     N_("Emboss"), N_("Sketch"), N_("Sky blue"),
-    N_("Grass green"), N_("Skin whithen"), N_("Vivid"),
+    N_("Grass green"), N_("Skin whiten"), N_("Vivid"),
 };
 
 #define AUDIO_VOLUME_TEXT N_( "Audio volume" )
