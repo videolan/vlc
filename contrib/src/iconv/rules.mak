@@ -17,7 +17,7 @@ $(TARBALLS)/libiconv-$(LIBICONV_VERSION).tar.gz:
 iconv: libiconv-$(LIBICONV_VERSION).tar.gz .sum-iconv
 	$(UNPACK)
 ifdef HAVE_WIN64
-    $(APPLY) $(SRC)/iconv/libiconv-win64.patch
+	$(APPLY) $(SRC)/iconv/libiconv-win64.patch
 endif
 ifdef HAVE_WINCE
 	$(APPLY) $(SRC)/iconv/libiconv-wince.patch
