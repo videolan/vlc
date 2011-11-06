@@ -566,7 +566,7 @@ dnl Check for poll
 AC_SEARCH_LIBS(poll, [poll], [
   AC_DEFINE(HAVE_POLL, 1, [Define to 1 if the OS has poll().])
 ], [
-  AS_IF([test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"], [
+  AS_IF([test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce" -a "${SYS}" != "os2"], [
     AC_MSG_ERROR([poll() is required.])
   ])
 ])
