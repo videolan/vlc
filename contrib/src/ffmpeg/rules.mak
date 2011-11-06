@@ -69,19 +69,16 @@ endif
 
 # Windows
 ifdef HAVE_WIN32
+DEPS_ffmpeg += directx
 FFMPEGCONF += --target-os=mingw32 --enable-memalign-hack
 FFMPEGCONF += --enable-w32threads \
 	--disable-bzlib --disable-bsfs \
-	--disable-decoder=dca --disable-encoder=vorbis
+	--disable-decoder=dca --disable-encoder=vorbis \
+	--enable-dxva2
 
 ifdef HAVE_WIN64
-FFMPEGCONF += --disable-dxva2
-
 FFMPEGCONF += --cpu=athlon64 --arch=x86_64
 else # !WIN64
-FFMPEGCONF += --enable-dxva2
-DEPS_ffmpeg += directx
-
 FFMPEGCONF+= --cpu=i686 --arch=x86
 endif
 else
