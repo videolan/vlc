@@ -1042,13 +1042,11 @@ endif
 ifdef HAVE_WIN32
 FFMPEGCONF+= --target-os=mingw32 --arch=x86 --enable-memalign-hack
 FFMPEGCONF += --disable-bzlib --disable-decoder=dca --disable-encoder=vorbis \
-			--enable-libmp3lame --enable-w32threads --disable-bsfs
+			--enable-libmp3lame --enable-w32threads --disable-bsfs --enable-dxva2
 ifdef HAVE_WIN64
-FFMPEGCONF += --disable-dxva2
 FFMPEGCONF+= --cpu=athlon64 --arch=x86_64
 else # !WIN64
-FFMPEGCONF += --enable-dxva2 --enable-libvpx
-FFMPEGCONF+= --cpu=i686
+FFMPEGCONF+= --cpu=i686 --enable-libvpx
 endif
 endif
 
