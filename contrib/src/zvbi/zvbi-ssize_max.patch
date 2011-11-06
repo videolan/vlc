@@ -1,0 +1,28 @@
+Linear memory extents over SSIZE_MAX are undefined, so there is no
+point in protecting against them.
+diff -ru zvbi.orig/src/export.c zvbi/src/export.c
+--- zvbi.orig/src/export.c	2011-11-06 11:22:47.000000000 +0200
++++ zvbi/src/export.c	2011-11-06 11:27:39.000000000 +0200
+@@ -1076,8 +1076,6 @@
+ 		size_t count;
+ 
+ 		count = src_size;
+-		if (unlikely (src_size > SSIZE_MAX))
+-			count = SSIZE_MAX & -4096;
+ 
+ 		for (retry = 10;; --retry) {
+ 			actual = write (e->_handle.fd, src, count);
+@@ -1632,12 +1630,7 @@
+ 			free (e->buffer.data);
+ 		}
+ 
+-		if (unlikely (e->buffer.offset > (size_t) SSIZE_MAX)) {
+-			errno = EOVERFLOW;
+-			actual = -1; /* failed */
+-		} else {
+-			actual = e->buffer.offset;
+-		}
++		actual = e->buffer.offset;
+ 	} else {
+ 		if (VBI_EXPORT_TARGET_ALLOC == e->target)
+ 			free (e->buffer.data);

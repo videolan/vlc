@@ -1,0 +1,19 @@
+diff -ru zvbi.orig/contrib/ntsc-cc.c zvbi/contrib/ntsc-cc.c
+--- zvbi.orig/contrib/ntsc-cc.c	2011-11-06 11:22:47.000000000 +0200
++++ zvbi/contrib/ntsc-cc.c	2011-11-06 11:29:04.000000000 +0200
+@@ -32,7 +32,6 @@
+ #include <fcntl.h>
+ #include <errno.h>
+ #include <locale.h>
+-#include <sys/ioctl.h>
+ #include <sys/types.h>
+ #include <sys/time.h>
+ #ifdef HAVE_GETOPT_LONG
+@@ -44,6 +43,7 @@
+ #include "src/libzvbi.h"
+ 
+ #ifdef ENABLE_V4L2
++#  include <sys/ioctl.h>
+ #  include <asm/types.h>
+ #  include "src/videodev2k.h"
+ #endif
