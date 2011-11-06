@@ -1,0 +1,15 @@
+diff -ru lame.orig/libmp3lame/vbrquantize.c lame/libmp3lame/vbrquantize.c
+--- lame.orig/libmp3lame/vbrquantize.c	2011-11-06 11:12:40.000000000 +0200
++++ lame/libmp3lame/vbrquantize.c	2011-11-06 11:14:52.000000000 +0200
+@@ -73,6 +73,11 @@
+ #    define FORCEINLINE __forceinline
+ #  endif
+ #  endif
++#elif defined (WIN32)
++#  define VOLATILE
++/* Make sure FORCEINLINE does not include "extern" */
++#  undef FORCEINLINE
++#  define FORCEINLINE __inline__ __attribute__((always_inline))
+ #else
+ #  define VOLATILE
+ #endif
