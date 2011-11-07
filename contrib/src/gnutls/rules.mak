@@ -26,7 +26,6 @@ GNUTLS_CONF := \
 	--disable-psk-authentication-FIXME \
 	--disable-anon-authentication \
 	--disable-camellia \
-	--disable-extra-pki \
 	--disable-openpgp-authentication \
 	--disable-session-ticket \
 	--disable-openssl-compatibility \
