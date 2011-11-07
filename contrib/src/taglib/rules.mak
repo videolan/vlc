@@ -13,6 +13,9 @@ $(TARBALLS)/taglib-$(TAGLIB_VERSION).tar.gz:
 taglib: taglib-$(TAGLIB_VERSION).tar.gz .sum-taglib
 	$(UNPACK)
 	$(APPLY) $(SRC)/taglib/taglib-static.patch
+ifdef HAVE_WIN32
+	$(APPLY) $(SRC)/taglib/taglib-win32.patch
+endif
 	# FIXME: implement HAVE_CYGWIN
 ifdef HAVE_CYGWIN
 	$(APPLY) $(SRC)/taglib/taglib-cygwin.patch
