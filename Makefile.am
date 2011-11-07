@@ -668,8 +668,7 @@ win32_debugdir=$(top_builddir)/symbols-$(VERSION)
 win32_xpi_destdir=$(win32_destdir)/vlc-plugin
 
 if HAVE_WIN64
-build-npapi:
-	touch $@
+include extras/package/npapi.am
 
 build-activex:
 	touch $@
