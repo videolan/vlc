@@ -3,7 +3,9 @@
 NCURSES_VERSION := 5.9
 NCURSES_URL := $(GNU)/ncurses/ncurses-$(NCURSES_VERSION).tar.gz
 
+ifdef HAVE_MACOSX
 PKGS += ncurses
+endif
 
 ifeq ($(call need_pkg,"ncursesw"),)
 PKGS_FOUND += ncurses
