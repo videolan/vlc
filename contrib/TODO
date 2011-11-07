@@ -1,0 +1,18 @@
+### Missing software (present in old extras/contrib)
+
+qt4             -- needs automating, see http://people.videolan.org/~funman/win64/qt4-4.7.4-win64-bin.tar.bz2
+
+# Mac OSX
+
+# These 3 are binary framework downloads : no source code is used
+BGHUDAppKit
+Growl           -- last free version: 1.3.0: http://code.google.com/p/growl/source/list http://itunes.apple.com/us/app/growl/id467939042
+Sparkle
+
+vcdimager, cdio -- why are they used only in osx binaries, do we really need them?
+
+build tools     -- (autotools, libtool, yasm...) see extras/tools
+
+# Windows
+
+peflags         -- a build tool, only a single .c file; we should rather put it in git
