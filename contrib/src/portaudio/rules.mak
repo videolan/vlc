@@ -3,7 +3,9 @@
 PORTAUDIO_VERSION := 19_20110326
 PORTAUDIO_URL := http://www.portaudio.com/archives/pa_stable_v$(PORTAUDIO_VERSION).tgz
 
+ifdef HAVE_WIN32
 PKGS += portaudio
+endif
 
 ifeq ($(call need_pkg,"portaudio"),)
 PKGS_FOUND += portaudio
