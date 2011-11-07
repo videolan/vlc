@@ -16,10 +16,6 @@ taglib: taglib-$(TAGLIB_VERSION).tar.gz .sum-taglib
 ifdef HAVE_WIN32
 	$(APPLY) $(SRC)/taglib/taglib-win32.patch
 endif
-	# FIXME: implement HAVE_CYGWIN
-ifdef HAVE_CYGWIN
-	$(APPLY) $(SRC)/taglib/taglib-cygwin.patch
-endif
 	$(MOVE)
 
 .taglib: taglib toolchain.cmake
