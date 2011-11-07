@@ -1,0 +1,20 @@
+diff -urNp libmpeg2.orig/libmpeg2/motion_comp_arm_s.S libmpeg2/libmpeg2/motion_comp_arm_s.S
+--- libmpeg2.orig/libmpeg2/motion_comp_arm_s.S	2008-07-09 21:16:05.000000000 +0200
++++ libmpeg2/libmpeg2/motion_comp_arm_s.S	2009-11-20 19:55:22.000000000 +0100
+@@ -19,6 +19,16 @@
+ @ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ 
+ 
++@ Data preload is supported only by ARM V5TE and above
++
++#if (defined (__ARM_ARCH_2__) || defined (__ARM_ARCH_3__) \
++     || defined (__ARM_ARCH_3M__) || defined (__ARM_ARCH_4__) \
++     || defined (__ARM_ARCH_4T__) || defined (__ARM_ARCH_5__) \
++     || defined (__ARM_ARCH_5T__))
++.macro pld reg
++.endm
++#endif
++
+ 	.text
+ 
+ @ ----------------------------------------------------------------
