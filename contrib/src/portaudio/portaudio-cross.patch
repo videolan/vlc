@@ -1,0 +1,12 @@
+diff -ruN portaudio/Makefile.in portaudio.n/Makefile.in
+--- portaudio/Makefile.in	2007-10-24 17:29:04.000000000 +0200
++++ portaudio.n/Makefile.in	2007-12-18 05:43:27.000000000 +0100
+@@ -120,7 +120,7 @@
+ SUBDIRS =
+ @ENABLE_CXX_TRUE@SUBDIRS += bindings/cpp
+ 
+-all: lib/$(PALIB) all-recursive tests
++all: lib/$(PALIB) all-recursive
+ 
+ tests: bin-stamp $(TESTS)
+ 
