@@ -343,15 +343,6 @@ case "${host_os}" in
         VLC_ADD_LDFLAGS([vlc],[-mwindows])
         VLC_ADD_LIBS([win32text],[-lgdi32])
         VLC_ADD_LIBS([cdda vcdx sdl_image vout_sdl],[-lwinmm])
-        dnl
-        dnl DEP and ASLR options
-        dnl
-        AC_ARG_WITH(peflags,
-          [AS_HELP_STRING([--with-peflags],
-            [use peflags (default enabled on Windows)])])
-        if test "${with_peflags}" != "no" ; then
-          AC_PATH_TOOL(PEFLAGS, peflags, :)
-        fi
         AC_CHECK_PROGS(U2D, [unix2dos todos], unix2dos)
         ac_default_prefix="`pwd`/_win32"
         DESTDIR="`pwd`/_win32/"
@@ -405,7 +396,6 @@ AM_CONDITIONAL(HAVE_WIN32,   test "${SYS}" = "mingw32")
 AM_CONDITIONAL(HAVE_WIN64,   test "${HAVE_WIN64}" = "1")
 AM_CONDITIONAL(HAVE_WINCE,   test "${SYS}" = "mingwce")
 AM_CONDITIONAL(HAVE_SYMBIAN, test "${SYS}" = "symbian")
-AM_CONDITIONAL(USE_PEFLAGS,  test "${with_peflags}" = "yes")
 
 dnl
 dnl Sadly autoconf doesn't think about testing foo.exe when ask to test

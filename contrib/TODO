@@ -12,7 +12,3 @@ Sparkle
 vcdimager, cdio -- why are they used only in osx binaries, do we really need them?
 
 build tools     -- (autotools, libtool, yasm...) see extras/tools
-
-# Windows
-
-peflags         -- a build tool, only a single .c file; we should rather put it in git
