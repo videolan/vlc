@@ -3,7 +3,7 @@
 SQLITE_VERSION := 3.6.20
 SQLITE_URL := http://www.sqlite.org/sqlite-amalgamation-$(SQLITE_VERSION).tar.gz
 
-PKGS += sqlite
+# PKGS += sqlite
 
 ifeq ($(call need_pkg,"sqlite3"),)
 PKGS_FOUND += sqlite
