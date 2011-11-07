@@ -17,6 +17,9 @@ $(TARBALLS)/projectM-$(PROJECTM_VERSION)-Source.tar.gz:
 
 projectM: projectM-$(PROJECTM_VERSION)-Source.tar.gz .sum-projectM
 	$(UNPACK)
+ifdef HAVE_WIN64
+	$(APPLY) $(SRC)/projectM/win64.patch
+endif
 ifdef HAVE_WIN32
 	$(APPLY) $(SRC)/projectM/win32.patch
 endif
