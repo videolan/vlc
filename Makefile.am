@@ -739,13 +739,14 @@ if BUILD_OSDMENU
 		rm -f -- "$$file.tmp"; \
 	done
 endif
-if !HAVE_WIN64
+
 if !HAVE_WINCE
+if !HAVE_WIN64
 	cp "$(top_builddir)/activex-vlc/src/axvlc.dll.manifest" "$(win32_destdir)/"
 	cp "$(top_builddir)/activex-vlc/installed/lib/axvlc.dll" "$(win32_destdir)/"
+endif
 	cp "$(top_builddir)/npapi-vlc/npapi/npvlc.dll.manifest" "$(win32_destdir)/"
 	cp "$(top_builddir)/npapi-vlc/installed/lib/npvlc.dll" "$(win32_destdir)/"
-endif
 endif
 
 # Compiler shared DLLs
@@ -789,26 +790,20 @@ package-win-base: package-win-common
 package-win32-webplugin-common: package-win-base
 	mkdir -p "$(win32_xpi_destdir)/plugins"
 	find $(destdir) -maxdepth 4 -name "*$(LIBEXT)" -exec cp {} "$(win32_xpi_destdir)/" \;
-if !HAVE_WIN64
 	cp $(top_builddir)/npapi-vlc/npapi/npvlc.dll.manifest "$(win32_xpi_destdir)/plugins"
-endif
 	cp "$(top_srcdir)/extras/package/win32/libvlc.dll.manifest" "$(win32_xpi_destdir)/plugins"
 	cp -r $(win32_destdir)/plugins/ "$(win32_xpi_destdir)/plugins"
 	rm -rf "$(win32_xpi_destdir)/plugins/plugins/*qt*"
 	rm -rf "$(win32_xpi_destdir)/plugins/plugins/*skins*"
 
 package-win32-xpi: package-win32-webplugin-common
-if !HAVE_WIN64
 	cp $(top_builddir)/npapi-vlc/npapi/install.rdf "$(win32_xpi_destdir)"
 	cd $(win32_xpi_destdir) && zip -r "../vlc-$(VERSION).xpi" install.rdf plugins
-endif
 
 package-win32-crx: package-win32-webplugin-common
-if !HAVE_WIN64
 	cp $(top_builddir)/npapi-vlc/npapi/manifest.json "$(win32_xpi_destdir)"
 	crxmake --pack-extension "$(win32_xpi_destdir)" \
 		--extension-output "$(win32_destdir)/vlc-$(VERSION).crx" --ignore-file install.rdf
-endif
 
 package-win32-base-exe: package-win-base
 # Script installer
