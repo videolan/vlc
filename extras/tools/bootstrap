@@ -26,7 +26,7 @@ fi
 
 check() {
 # FIXME : add version check
-if [ ! $1 --version 2>/dev/null ]
+if ! $1 --version >/dev/null 2>&1
 then
     echo "$1 not found"
     NEEDED="$NEEDED .$1"
