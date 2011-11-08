@@ -4,8 +4,11 @@ QT4_VERSION = 4.7.4
 QT4_URL := http://download.qt.nokia.com/qt/source/qt-everywhere-opensource-src-$(QT4_VERSION).tar.gz
 
 # FIXME : OSX build
+# FIXME : native win32 build
+ifdef HAVE_CROSS_COMPILE
 ifdef HAVE_WIN32
 PKGS += qt4
+endif
 endif
 
 ifeq ($(call need_pkg,"QtCore QtGui"),)
