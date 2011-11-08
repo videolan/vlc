@@ -374,7 +374,6 @@ static void Close( vlc_object_t * );
     "the actual encoding quality." )
 
 #define QUIET_TEXT N_("Quiet mode")
-#define QUIET_LONGTEXT N_( "Quiet mode.")
 
 #define VERBOSE_TEXT N_("Statistics")
 #define VERBOSE_LONGTEXT N_( "Print stats for each frame.")
@@ -676,7 +675,7 @@ vlc_module_begin ()
               SSIM_LONGTEXT, true )
 
     add_bool( SOUT_CFG_PREFIX "quiet", false, QUIET_TEXT,
-              QUIET_LONGTEXT, true )
+              QUIET_TEXT, true )
 
     add_integer( SOUT_CFG_PREFIX "sps-id", 0, SPS_ID_TEXT,
                  SPS_ID_LONGTEXT, true )
