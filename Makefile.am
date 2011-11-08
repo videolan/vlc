@@ -669,26 +669,19 @@ win32_xpi_destdir=$(win32_destdir)/vlc-plugin
 
 if HAVE_WIN64
 include extras/package/npapi.am
-
-build-activex:
-	touch $@
 else
 if HAVE_WINCE
 build-npapi:
 	touch $@
-
-build-activex:
-	touch $@
 else
 if HAVE_WIN32
 include extras/package/npapi.am
-include extras/package/activex.am
 endif
 endif
 endif
 
 #Win-common is for win32 and wince
-package-win-common: install build-npapi build-activex
+package-win-common: install build-npapi
 # Check that tmp isn't in the way
 	@if test -e "$(win32_destdir)"; then \
 	    echo "Error: please remove $(win32_destdir), it is in the way"; \
@@ -742,8 +735,8 @@ endif
 
 if !HAVE_WINCE
 if !HAVE_WIN64
-	cp "$(top_builddir)/activex-vlc/src/axvlc.dll.manifest" "$(win32_destdir)/"
-	cp "$(top_builddir)/activex-vlc/installed/lib/axvlc.dll" "$(win32_destdir)/"
+	cp "$(top_builddir)/npapi-vlc/activex/axvlc.dll.manifest" "$(win32_destdir)/"
+	cp "$(top_builddir)/npapi-vlc/installed/lib/axvlc.dll" "$(win32_destdir)/"
 endif
 	cp "$(top_builddir)/npapi-vlc/npapi/npvlc.dll.manifest" "$(win32_destdir)/"
 	cp "$(top_builddir)/npapi-vlc/installed/lib/npvlc.dll" "$(win32_destdir)/"
@@ -766,8 +759,8 @@ endif
 if !HAVE_WIN64
 if !HAVE_WINCE
 	mkdir -p "$(win32_destdir)/sdk/activex"
-	cp $(top_builddir)/activex-vlc/README $(win32_destdir)/sdk/activex/README.TXT
-	cp $(top_builddir)/activex-vlc/src/test.html $(win32_destdir)/sdk/activex/
+	cp $(top_builddir)/npapi-vlc/activex/README.TXT $(win32_destdir)/sdk/activex/README.TXT
+	cp $(top_builddir)/npapi-vlc/share/test.html $(win32_destdir)/sdk/activex/
 endif
 endif
 
