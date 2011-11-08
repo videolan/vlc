@@ -59,7 +59,6 @@ endif
 ifeq ($(ARCH),x86_64)
 FFMPEGCONF += --cpu=core2
 endif
-DEPS_ffmpeg += yasm $(DEPS_yasm)
 endif
 
 # Linux

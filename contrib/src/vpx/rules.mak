@@ -27,7 +27,6 @@ ifeq ($(ARCH),arm)
 VPX_ARCH := armv7
 else ifeq ($(ARCH),i386)
 VPX_ARCH := x86
-#DEPS_vpx += yasm $(DEPS_yasm)
 else ifeq ($(ARCH),mips)
 VPX_ARCH := mips32
 else ifeq ($(ARCH),ppc)
@@ -38,7 +37,6 @@ else ifeq ($(ARCH),sparc)
 VPX_ARCH := sparch
 else ifeq ($(ARCH),x86_64)
 VPX_ARCH := x86_64
-#DEPS_vpx += yasm $(DEPS_yasm)
 endif
 
 ifdef HAVE_LINUX

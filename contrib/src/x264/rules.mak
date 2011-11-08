@@ -25,12 +25,6 @@ else
 X264CONF += --enable-win32thread
 endif
 
-ifdef HAVE_MACOSX
-ifneq ($(findstring $(ARCH),i386 x86_64),)
-DEPS_x264 += yasm
-endif
-endif
-
 $(TARBALLS)/x264-$(X264_VERSION).tar.gz:
 	$(call download,$(X264_URL))
 
