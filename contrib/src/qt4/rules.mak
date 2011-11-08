@@ -35,7 +35,7 @@ qt4: qt-$(QT4_VERSION).tar.gz .sum-qt4
 	install -D -- $</plugins/imageformats/libqjpeg.a "$(PREFIX)/lib/libqjpeg.a"
 	install -D -- $</plugins/accessible/libqtaccessiblewidgets.a "$(PREFIX)/lib/libqtaccessiblewidgets.a"
 	for codec in cn jp kr tw; \
-		do install -D -- $</plugins/codecs/libq$${codec}codecs.a "$(PREFIX)/lib/libq${codec}codecs.a"; \
+		do install -D -- $</plugins/codecs/libq$${codec}codecs.a "$(PREFIX)/lib/libq$${codec}codecs.a"; \
 	done
 	# INSTALLING CORE HEADERS
 	cd $</src/corelib;    find . -type f -name '*.h' -exec install -D -- "{}" "$(PREFIX)/include/qt4/src/corelib/{}" \;
