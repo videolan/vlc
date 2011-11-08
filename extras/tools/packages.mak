@@ -16,5 +16,8 @@ PKGCFG_VERSION=0.23
 #PKGCFG_URL=http://downloads.videolan.org/pub/videolan/testing/contrib/pkg-config-$(PKGCFG_VERSION).tar.gz
 PKGCFG_URL=http://pkgconfig.freedesktop.org/releases/pkg-config-$(PKGCFG_VERSION).tar.gz
 
+TAR_VERSION=1.26
+TAR_URL=$(GNU)/tar/tar-$(TAR_VERSION).tar.bz2
+
 XZ_VERSION=5.0.3
 XZ_URL=http://tukaani.org/xz/xz-$(XZ_VERSION).tar.bz2

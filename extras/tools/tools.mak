@@ -69,6 +69,23 @@ CLEAN_PKG += libtool
 DISTCLEAN_PKG += libtool-$(LIBTOOL_VERSION).tar.gz
 CLEAN_FILE += .libtool
 
+# GNU tar (with xz support)
+
+tar-$(TAR_VERSION).tar.bz2:
+	$(download) $(TAR_URL)
+
+tar: tar-$(TAR_VERSION).tar.bz2
+	$(UNPACK)
+	$(MOVE)
+
+.tar: tar .tar
+	(cd $<; ./configure --prefix=$(PREFIX) && make && make install)
+	touch $@
+
+CLEAN_PKG += tar
+DISTCLEAN_PKG += tar-$(tar_VERSION).tar.bz2
+CLEAN_FILE += .tar
+
 # xz
 
 xz-$(XZ_VERSION).tar.bz2:
@@ -78,7 +95,7 @@ xz: xz-$(XZ_VERSION).tar.bz2
 	$(UNPACK)
 	$(MOVE)
 
-.xz: xz
+.xz: xz .tar
 	(cd $<; ./configure --prefix=$(PREFIX) && make && make install)
 	touch $@
 
