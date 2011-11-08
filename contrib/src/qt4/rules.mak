@@ -3,8 +3,8 @@
 QT4_VERSION = 4.7.4
 QT4_URL := http://download.qt.nokia.com/qt/source/qt-everywhere-opensource-src-$(QT4_VERSION).tar.gz
 
-# FIXME : OSX and win32 build
-ifdef HAVE_WIN64
+# FIXME : OSX build
+ifdef HAVE_WIN32
 PKGS += qt4
 endif
 
@@ -19,7 +19,14 @@ $(TARBALLS)/qt-$(QT4_VERSION).tar.gz:
 
 qt4: qt-$(QT4_VERSION).tar.gz .sum-qt4
 	$(UNPACK)
-	patch -p0 < $(SRC)/qt4/cross-x64.diff # FIXME : add new target, fix/add mingw32 target
+	patch -p0 < $(SRC)/qt4/tools.diff
+ifdef HAVE_WIN32
+ifdef HAVE_WIN64
+	patch -p0 < $(SRC)/qt4/cross-win64.diff
+else
+	patch -p0 < $(SRC)/qt4/cross-win32.diff
+endif
+endif
 	mv qt-everywhere-opensource-src-4.7.4 $@ && touch $@
 
 .qt4: qt4
