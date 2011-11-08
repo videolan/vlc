@@ -38,8 +38,7 @@ Important changes for packagers:
  * OSS support is not compiled on Linux by default, pass --enable-oss to the
    configure script if you use OSSv4 or really want to use OSS emulation.
 
- * The NPAPI webplugin has moved to git://git.videolan.org/npapi-vlc.git
- * The ActiveX webplugin has moved to git://git.videolan.org/activex-vlc.git
+ * The webplugins has moved to git://git.videolan.org/npapi-vlc.git
 
 Core:
  * Major Video Core and Outputs rework and rewrite:
