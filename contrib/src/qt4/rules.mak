@@ -34,7 +34,7 @@ endif
 
 .qt4: qt4
 	for i in qmake moc uic rcc; do ln -sf `which $$i` $</bin/; done # FIXME : we probably need the exact same version of those tools on the host
-	cd $< && ./configure -platform win32-g++ -static -release -fast -no-exceptions -no-stl -no-sql-sqlite -no-qt3support -no-gif -no-libmng -qt-libjpeg -no-libtiff -no-qdbus -no-openssl -no-webkit -sse -no-script -no-multimedia -opensource -no-scripttools -no-opengl -no-script -no-scripttools -no-declarative -no-declarative-debug -opensource -no-s60 -host-little-endian -confirm-license
+	cd $< && ./configure -platform win32-g++ -static -release -fast -no-exceptions -no-stl -no-sql-sqlite -no-qt3support -no-gif -no-libmng -qt-libjpeg -no-libtiff -no-qdbus -no-openssl -no-webkit -sse -no-script -no-multimedia -no-phonon -opensource -no-scripttools -no-opengl -no-script -no-scripttools -no-declarative -no-declarative-debug -opensource -no-s60 -host-little-endian -confirm-license
 	cd $< && make sub-src
 	cd $</src/plugins/imageformats/jpeg && make # FIXME
 	# INSTALLING LIBRARIES
