@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc 1.0.0\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
-"POT-Creation-Date: 2011-10-09 17:15+0100\n"
+"POT-Creation-Date: 2011-11-06 22:46+0000\n"
 "PO-Revision-Date: 2011-01-23 21:42+0200\n"
 "Last-Translator: Juha Jeronen <juha.jeronen@jyu.fi>\n"
 "Language-Team: Finnish <fi@li.org>\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 # TOCHECK: is there a standard Finnish GNU disclaimer?
-#: include/vlc_common.h:1006
+#: include/vlc_common.h:1021
 msgid ""
 "This program comes with NO WARRANTY, to the extent permitted by law.\n"
 "You may redistribute it under the terms of the GNU General Public License;\n"
@@ -31,7 +31,7 @@ msgstr ""
 "ks. yksityiskohdat COPYING-tiedostossa.\n"
 "Ohjelman on kirjoittanut VideoLAN-tiimi; ks. AUTHORS-tiedosto.\n"
 
-#: include/vlc_config_cat.h:32 modules/audio_output/alsa.c:825
+#: include/vlc_config_cat.h:32 modules/audio_output/alsa.c:822
 msgid "VLC preferences"
 msgstr "VLC:n asetukset"
 
@@ -41,7 +41,7 @@ msgstr "Valitse \"Lisäasetukset\" nähdäksesi kaikki asetukset."
 
 #: include/vlc_config_cat.h:37 modules/gui/macosx/simple_prefs.m:169
 #: modules/gui/qt4/components/simple_preferences.cpp:86
-#: modules/gui/qt4/menus.cpp:1038
+#: modules/gui/qt4/menus.cpp:1040
 msgid "Interface"
 msgstr "Käyttöliittymä"
 
@@ -83,6 +83,7 @@ msgstr "Pikanäppäinten asetukset"
 #: modules/gui/qt4/components/simple_preferences.cpp:88
 #: modules/services_discovery/mediadirs.c:77 modules/stream_out/es.c:93
 #: modules/stream_out/transcode/transcode.c:191
+#: share/lua/http/dialogs/create_stream.html:150
 #: modules/gui/qt4/ui/profiles.h:494
 msgid "Audio"
 msgstr "Ääni"
@@ -139,6 +140,7 @@ msgstr "Muut ääniasetukset ja -moduulit."
 #: modules/gui/qt4/components/simple_preferences.cpp:90
 #: modules/services_discovery/mediadirs.c:70 modules/stream_out/es.c:101
 #: modules/stream_out/transcode/transcode.c:161
+#: share/lua/http/dialogs/create_stream.html:147
 #: modules/gui/qt4/ui/profiles.h:476 modules/gui/qt4/ui/sprefs_video.h:317
 msgid "Video"
 msgstr "Video"
@@ -340,7 +342,7 @@ msgstr ""
 "\"-dokumentissa. Voit myös määrätä jokaisen suoratoistomoduulin "
 "oletusasetukset täällä."
 
-#: include/vlc_config_cat.h:165 modules/services_discovery/sap.c:106
+#: include/vlc_config_cat.h:165 modules/services_discovery/sap.c:109
 msgid "SAP"
 msgstr "SAP"
 
@@ -364,9 +366,9 @@ msgstr "VLC:n toteutus Video On Demand -palveluille"
 #: src/playlist/engine.c:217 modules/demux/playlist/playlist.c:63
 #: modules/demux/playlist/playlist.c:64 modules/gui/macosx/MainWindow.m:277
 #: modules/gui/qt4/components/controller.hpp:111
-#: modules/gui/qt4/components/playlist/playlist.cpp:202
+#: modules/gui/qt4/components/playlist/playlist.cpp:191
 #: modules/gui/qt4/components/playlist/selector.cpp:188
-#: modules/gui/qt4/dialogs/playlist.cpp:41
+#: modules/gui/qt4/dialogs/playlist.cpp:41 modules/gui/qt4/menus.cpp:1069
 #: modules/gui/qt4/ui/sprefs_interface.h:529
 msgid "Playlist"
 msgstr "Soittolista"
@@ -556,7 +558,7 @@ msgstr "Tietoj&a"
 #: modules/gui/macosx/MainMenu.m:808 modules/gui/macosx/MainMenu.m:809
 #: modules/gui/macosx/MainWindow.m:823 modules/gui/macosx/playlist.m:466
 #: modules/gui/qt4/components/controller.hpp:109
-#: modules/gui/qt4/dialogs/vlm.cpp:546 modules/gui/qt4/menus.cpp:781
+#: modules/gui/qt4/dialogs/vlm.cpp:546 modules/gui/qt4/menus.cpp:783
 #: modules/gui/qt4/ui/open.h:253
 msgid "Play"
 msgstr "Toista"
@@ -659,7 +661,7 @@ msgid "Open Play&list..."
 msgstr "Avaa soitto&lista..."
 
 #: include/vlc_intf_strings.h:98 modules/gui/macosx/MainWindow.m:122
-#: modules/gui/qt4/components/preferences_widgets.cpp:1218
+#: modules/gui/qt4/components/preferences_widgets.cpp:1299
 msgid "Search"
 msgstr "Hae"
 
@@ -834,7 +836,7 @@ msgid "Vu meter"
 msgstr "VU-mittari"
 
 #: src/audio_output/common.c:122 modules/audio_filter/equalizer.c:76
-#: modules/gui/macosx/AudioEffects.m:103
+#: modules/gui/macosx/AudioEffects.m:102
 msgid "Equalizer"
 msgstr "Taajuuskorjain"
 
@@ -858,14 +860,16 @@ msgstr "Suodattimia on jo käytössä enimmäismäärä (%d)."
 #: src/audio_output/output.c:100 src/audio_output/output.c:128
 #: modules/access/vcdx/info.c:86 modules/gui/macosx/MainMenu.m:288
 #: modules/gui/macosx/MainMenu.m:289
+#: share/lua/http/dialogs/create_stream.html:316
 msgid "Audio Channels"
 msgstr "Äänikanavat"
 
 #: src/audio_output/output.c:103 src/audio_output/output.c:139
 #: modules/access/alsa.c:69 modules/access/oss.c:64
-#: modules/access/v4l2/video.c:287 modules/audio_output/directx.c:439
-#: modules/audio_output/oss.c:194 modules/audio_output/portaudio.c:400
-#: modules/audio_output/waveout.c:419 modules/codec/twolame.c:71
+#: modules/access/v4l2/video.c:284 modules/audio_output/directx.c:439
+#: modules/audio_output/kai.c:219 modules/audio_output/oss.c:194
+#: modules/audio_output/portaudio.c:400 modules/audio_output/waveout.c:419
+#: modules/codec/twolame.c:70
 msgid "Stereo"
 msgstr "Stereo"
 
@@ -906,19 +910,19 @@ msgstr "Dolby Surround"
 msgid "Reverse stereo"
 msgstr "Käänteinen stereo"
 
-#: src/config/file.c:528
+#: src/config/file.c:531
 msgid "boolean"
 msgstr "totuusarvo"
 
-#: src/config/file.c:528 src/config/help.c:471
+#: src/config/file.c:531 src/config/help.c:471
 msgid "integer"
 msgstr "kokonaisluku"
 
-#: src/config/file.c:536 src/config/help.c:501
+#: src/config/file.c:539 src/config/help.c:501
 msgid "float"
 msgstr "liukuluku"
 
-#: src/config/file.c:549 src/config/help.c:450
+#: src/config/file.c:552 src/config/help.c:450
 msgid "string"
 msgstr "merkkijono"
 
@@ -1075,9 +1079,9 @@ msgid "decoder"
 msgstr "pakkauksenpurku"
 
 #: src/input/decoder.c:276 src/input/decoder.c:467
-#: modules/codec/avcodec/encoder.c:222 modules/codec/avcodec/encoder.c:230
-#: modules/codec/avcodec/encoder.c:252 modules/codec/avcodec/encoder.c:728
-#: modules/codec/avcodec/encoder.c:737 modules/stream_out/es.c:363
+#: modules/codec/avcodec/encoder.c:234 modules/codec/avcodec/encoder.c:242
+#: modules/codec/avcodec/encoder.c:264 modules/codec/avcodec/encoder.c:740
+#: modules/codec/avcodec/encoder.c:749 modules/stream_out/es.c:363
 #: modules/stream_out/es.c:378
 msgid "Streaming / Transcoding failed"
 msgstr "Lähetys tai transkoodaus epäonnistui"
@@ -1190,7 +1194,7 @@ msgstr "Bittejä näytettä kohti"
 
 #: src/input/es_out.c:2961 modules/access/pvr.c:90
 #: modules/access_output/shout.c:92 modules/demux/playlist/shoutcast.c:334
-#: modules/gui/qt4/components/open_panels.cpp:853
+#: modules/gui/qt4/components/open_panels.cpp:858
 #: modules/gui/qt4/ui/profiles.h:478 modules/gui/qt4/ui/profiles.h:497
 msgid "Bitrate"
 msgstr "Bittinopeus"
@@ -1384,30 +1388,30 @@ msgstr "Edellinen luku"
 msgid "Media: %s"
 msgstr "Media: %s"
 
-#: src/interface/interface.c:80 modules/gui/macosx/MainMenu.m:230
+#: src/interface/interface.c:84 modules/gui/macosx/MainMenu.m:230
 #: modules/gui/macosx/MainMenu.m:231
 msgid "Add Interface"
 msgstr "Lisää käyttöliittymä"
 
-#: src/interface/interface.c:87
+#: src/interface/interface.c:91
 msgid "Console"
 msgstr "Konsoli"
 
-#: src/interface/interface.c:91
+#: src/interface/interface.c:95
 #, fuzzy
 msgid "Telnet"
 msgstr "Lua Telnet"
 
-#: src/interface/interface.c:94
+#: src/interface/interface.c:98
 #, fuzzy
 msgid "Web"
 msgstr "Webm"
 
-#: src/interface/interface.c:97
+#: src/interface/interface.c:101
 msgid "Debug logging"
 msgstr "Virheenjäljitysloki"
 
-#: src/interface/interface.c:100
+#: src/interface/interface.c:104
 msgid "Mouse Gestures"
 msgstr "Hiirieleet"
 
@@ -1447,6 +1451,7 @@ msgid "2:1 Double"
 msgstr "2:1 Kaksinkertainen"
 
 #: src/libvlc-module.c:105 src/libvlc-module.c:318
+#: modules/audio_output/kai.c:78
 msgid "Auto"
 msgstr "Automaattinen"
 
@@ -1741,12 +1746,12 @@ msgstr ""
 "parantaa kokemusta jos käytetään myös kuulokekanavamikseriä."
 
 #: src/libvlc-module.c:318 modules/access/dtv/access.c:87
-#: modules/access/v4l2/video.c:222
+#: modules/access/v4l2/video.c:219
 msgid "On"
 msgstr "Päällä"
 
 #: src/libvlc-module.c:318 modules/access/dtv/access.c:87
-#: modules/access/v4l2/video.c:148 modules/access/v4l2/video.c:222
+#: modules/access/v4l2/video.c:145 modules/access/v4l2/video.c:219
 #: modules/video_filter/deinterlace/algo_phosphor.h:55
 msgid "Off"
 msgstr "Pois päältä"
@@ -1819,7 +1824,7 @@ msgstr ""
 
 #: src/libvlc-module.c:359 modules/access/dshow/dshow.cpp:88
 #: modules/access/dshow/dshow.cpp:91 modules/access/dtv/access.c:102
-#: modules/access/dtv/access.c:136 modules/access/v4l2/video.c:174
+#: modules/access/dtv/access.c:136 modules/access/v4l2/video.c:171
 #: modules/codec/avcodec/avcodec.c:71 modules/codec/kate.c:202
 #: modules/gui/macosx/open.m:214
 #: modules/gui/qt4/components/interface_widgets.cpp:299
@@ -2120,6 +2125,7 @@ msgstr "Piilota hiiri ja ohjauspaneeli x millisekunnin jälkeen"
 #: modules/gui/macosx/MainMenu.m:314 modules/gui/macosx/MainMenu.m:315
 #: modules/gui/qt4/dialogs/convert.cpp:86
 #: modules/video_filter/deinterlace/deinterlace.c:98
+#: share/lua/http/dialogs/create_stream.html:346
 msgid "Deinterlace"
 msgstr "Lomituksenpoisto"
 
@@ -2552,17 +2558,17 @@ msgstr ""
 #: src/video_output/vout_intf.c:112 modules/access/dshow/dshow.cpp:88
 #: modules/access/dshow/dshow.cpp:91 modules/access/dshow/dshow.cpp:95
 #: modules/access/dshow/dshow.cpp:102 modules/access/dshow/dshow.cpp:122
-#: modules/audio_output/alsa.c:71 modules/audio_output/alsa.c:817
+#: modules/audio_output/alsa.c:71 modules/audio_output/alsa.c:815
 #: modules/gui/fbosd.c:172 modules/gui/macosx/prefs_widgets.m:1324
 #: modules/gui/macosx/simple_prefs.m:410 modules/gui/macosx/simple_prefs.m:531
 #: modules/gui/macosx/simple_prefs.m:759 modules/gui/macosx/VideoView.m:105
-#: modules/gui/qt4/components/preferences_widgets.cpp:615
+#: modules/gui/qt4/components/preferences_widgets.cpp:628
 #: modules/video_filter/marq.c:59 modules/video_filter/rss.c:71
 #: modules/video_filter/rss.c:184 modules/video_output/msw/directx.c:88
 msgid "Default"
 msgstr "Oletusarvo"
 
-#: src/libvlc-module.c:669 modules/gui/macosx/AudioEffects.m:67
+#: src/libvlc-module.c:669 modules/gui/macosx/AudioEffects.m:66
 #: modules/gui/macosx/wizard.m:356 modules/gui/qt4/ui/equalizer.h:133
 #: modules/gui/qt4/ui/vlm.h:290
 msgid "Enable"
@@ -3137,7 +3143,7 @@ msgstr "CDDB-palvelin"
 
 #: src/libvlc-module.c:940
 msgid ""
-"The HTTPS server will listen on this TCP port. The standard RTSP port number "
+"The RTSP server will listen on this TCP port. The standard RTSP port number "
 "is 554. However allocation of port numbers below 1025 is usually restricted "
 "by the operating system."
 msgstr ""
@@ -3972,11 +3978,11 @@ msgstr "Normaali nopeus"
 msgid "Select the hotkey to set the playback rate back to normal."
 msgstr "Valitse pikanäppäin, joka palauttaa toistonopeuden normaaliksi."
 
-#: src/libvlc-module.c:1337 modules/gui/qt4/menus.cpp:810
+#: src/libvlc-module.c:1337 modules/gui/qt4/menus.cpp:812
 msgid "Faster (fine)"
 msgstr "Nopeammin (hivenen)"
 
-#: src/libvlc-module.c:1339 modules/gui/qt4/menus.cpp:818
+#: src/libvlc-module.c:1339 modules/gui/qt4/menus.cpp:820
 msgid "Slower (fine)"
 msgstr "Hitaammin (hivenen)"
 
@@ -4143,7 +4149,7 @@ msgstr "Kelaukseen käytetyn \"pitkän\" ajan pituus, sekunteina."
 
 #: src/libvlc-module.c:1388 modules/control/hotkeys.c:183
 #: modules/gui/qt4/components/controller.hpp:113
-#: modules/gui/qt4/components/controller.hpp:124 modules/gui/qt4/menus.cpp:897
+#: modules/gui/qt4/components/controller.hpp:124 modules/gui/qt4/menus.cpp:899
 #: modules/gui/skins2/commands/cmd_quit.cpp:44
 msgid "Quit"
 msgstr "Lopeta"
@@ -4248,10 +4254,10 @@ msgstr "Vähennä äänenvoimakkuutta"
 msgid "Select the key to decrease audio volume."
 msgstr "Valitse näppäin, joka vähentää äänenvoimakkuutta."
 
-#: src/libvlc-module.c:1414 modules/access/v4l2/video.c:192
+#: src/libvlc-module.c:1414 modules/access/v4l2/video.c:189
 #: modules/gui/macosx/MainMenu.m:285 modules/gui/macosx/MainMenu.m:357
 #: modules/gui/macosx/MainMenu.m:366 modules/gui/macosx/MainMenu.m:1207
-#: modules/gui/macosx/MainWindow.m:124 modules/gui/qt4/menus.cpp:573
+#: modules/gui/macosx/MainWindow.m:124 modules/gui/qt4/menus.cpp:575
 msgid "Mute"
 msgstr "Vaimenna"
 
@@ -4699,8 +4705,8 @@ msgstr "Alikuvat"
 
 #: src/libvlc-module.c:1770 modules/codec/subsdec.c:177
 #: modules/demux/kate_categories.c:41 modules/demux/kate_categories.c:54
-#: modules/demux/subtitle.c:73 modules/gui/qt4/ui/profiles.h:502
-#: modules/gui/qt4/ui/profiles.h:504
+#: modules/demux/subtitle.c:73 share/lua/http/dialogs/create_stream.html:153
+#: modules/gui/qt4/ui/profiles.h:502 modules/gui/qt4/ui/profiles.h:504
 msgid "Subtitles"
 msgstr "Tekstitykset"
 
@@ -4873,7 +4879,7 @@ msgstr ""
 msgid "Downloading ..."
 msgstr "Ladataan ..."
 
-#: src/misc/update.c:585 src/misc/update.c:710 modules/demux/avi/avi.c:2389
+#: src/misc/update.c:585 src/misc/update.c:710 modules/demux/avi/avi.c:2407
 #: modules/gui/macosx/bookmarks.m:99 modules/gui/macosx/controls.m:52
 #: modules/gui/macosx/coredialogs.m:62 modules/gui/macosx/coredialogs.m:64
 #: modules/gui/macosx/coredialogs.m:181 modules/gui/macosx/open.m:118
@@ -4881,8 +4887,8 @@ msgstr "Ladataan ..."
 #: modules/gui/macosx/prefs.m:226 modules/gui/macosx/simple_prefs.m:231
 #: modules/gui/macosx/simple_prefs.m:303 modules/gui/macosx/simple_prefs.m:688
 #: modules/gui/macosx/wizard.m:322
-#: modules/gui/qt4/components/open_panels.cpp:1240
-#: modules/gui/qt4/components/preferences_widgets.cpp:1453
+#: modules/gui/qt4/components/open_panels.cpp:1245
+#: modules/gui/qt4/components/preferences_widgets.cpp:1534
 #: modules/gui/qt4/components/sout/profile_selector.cpp:253
 msgid "Cancel"
 msgstr "Peruuta"
@@ -4966,7 +4972,7 @@ msgid "Media Library"
 msgstr "Mediakirjasto"
 
 #: src/playlist/tree.c:67 modules/access/dtv/access.c:70
-#: modules/access/v4l2/video.c:261
+#: modules/access/v4l2/video.c:258
 msgid "Undefined"
 msgstr "Määrittelemätön"
 
@@ -5998,7 +6004,7 @@ msgid "DSS"
 msgstr "DSS"
 
 #: modules/access/dshow/dshow.cpp:133
-#: modules/gui/qt4/components/open_panels.cpp:737
+#: modules/gui/qt4/components/open_panels.cpp:732
 msgid "Video device name"
 msgstr "Videolaitteen nimi"
 
@@ -6011,7 +6017,7 @@ msgstr ""
 "jätetään tyhjäksi, käytetään oletuslaitetta."
 
 #: modules/access/dshow/dshow.cpp:138
-#: modules/gui/qt4/components/open_panels.cpp:746
+#: modules/gui/qt4/components/open_panels.cpp:741
 msgid "Audio device name"
 msgstr "Äänilaitteen nimi"
 
@@ -6038,11 +6044,11 @@ msgstr ""
 "tyhjäksi, käytetään laitteen määräämää oletusarvoa. Tähän voi laittaa "
 "standardikoon (cif, d1, ...) tai <leveys>x<korkeus>."
 
-#: modules/access/dshow/dshow.cpp:148 modules/access/v4l2/video.c:217
+#: modules/access/dshow/dshow.cpp:148 modules/access/v4l2/video.c:214
 msgid "Picture aspect-ratio n:m"
 msgstr "Kuvasuhde n:m"
 
-#: modules/access/dshow/dshow.cpp:149 modules/access/v4l2/video.c:218
+#: modules/access/dshow/dshow.cpp:149 modules/access/v4l2/video.c:215
 msgid "Define input picture aspect-ratio to use. Default is 4:3"
 msgstr "Määrää käytettävä kuvasuhde. Oletusarvo on 4:3"
 
@@ -6314,7 +6320,7 @@ msgid ""
 msgstr ""
 
 #: modules/access/dtv/access.c:56
-#: modules/gui/qt4/components/open_panels.cpp:930
+#: modules/gui/qt4/components/open_panels.cpp:935
 #, fuzzy
 msgid "Modulation / Constellation"
 msgstr "Modulaation tyyppi"
@@ -6366,7 +6372,7 @@ msgstr ""
 #: modules/access/dtv/access.c:110 modules/access/dtv/access.c:118
 #: modules/access/dtv/access.c:127 modules/access/dtv/access.c:135
 #: modules/access/dtv/access.c:153 modules/access/pvr.c:113
-#: modules/gui/qt4/components/open_panels.cpp:934
+#: modules/gui/qt4/components/open_panels.cpp:939
 msgid "Automatic"
 msgstr "Automaattinen"
 
@@ -6593,9 +6599,9 @@ msgid ""
 "selected (1 to 4). If there is no switch, this parameter should be 0."
 msgstr ""
 
-#: modules/access/dtv/access.c:198 modules/access/v4l2/video.c:147
-#: modules/access/v4l2/video.c:174 modules/access/v4l2/video.c:222
-#: modules/access/v4l2/video.c:285
+#: modules/access/dtv/access.c:198 modules/access/v4l2/video.c:144
+#: modules/access/v4l2/video.c:171 modules/access/v4l2/video.c:219
+#: modules/access/v4l2/video.c:282
 msgid "Unspecified"
 msgstr ""
 
@@ -6671,48 +6677,48 @@ msgstr "TV"
 msgid "Digital Television and Radio"
 msgstr ""
 
-#: modules/access/dtv/access.c:261
+#: modules/access/dtv/access.c:258
 #, fuzzy
 msgid "Terrestrial reception parameters"
 msgstr "DVB-T lähetystila (transmission mode)"
 
-#: modules/access/dtv/access.c:273
+#: modules/access/dtv/access.c:270
 #, fuzzy
 msgid "DVB-T reception parameters"
 msgstr "SDP-kuvausten jäsennin"
 
-#: modules/access/dtv/access.c:286
+#: modules/access/dtv/access.c:283
 #, fuzzy
 msgid "ISDB-T reception parameters"
 msgstr "SDP-kuvausten jäsennin"
 
-#: modules/access/dtv/access.c:327
+#: modules/access/dtv/access.c:324
 msgid "Cable and satellite reception parameters"
 msgstr ""
 
-#: modules/access/dtv/access.c:339
+#: modules/access/dtv/access.c:336
 msgid "DVB-S2 parameters"
 msgstr ""
 
-#: modules/access/dtv/access.c:347
+#: modules/access/dtv/access.c:344
 msgid "ISDB-S parameters"
 msgstr ""
 
-#: modules/access/dtv/access.c:352
+#: modules/access/dtv/access.c:349
 #, fuzzy
 msgid "Satellite equipment control"
 msgstr "Satelliitin korkeus"
 
-#: modules/access/dtv/access.c:390
+#: modules/access/dtv/access.c:387
 #, fuzzy
 msgid "ATSC reception parameters"
 msgstr "SDP-kuvausten jäsennin"
 
-#: modules/access/dtv/access.c:444
+#: modules/access/dtv/access.c:441
 msgid "Digital broadcasting"
 msgstr ""
 
-#: modules/access/dtv/access.c:445
+#: modules/access/dtv/access.c:442
 msgid ""
 "The selected digital tuner does not support the specified parameters.\n"
 "Please check the preferences."
@@ -6805,18 +6811,19 @@ msgstr ""
 msgid "EyeTV input"
 msgstr "EyeTV-lähde"
 
-#: modules/access/file.c:182 modules/access/file.c:303
+#: modules/access/file.c:180 modules/access/file.c:301
 #: modules/access/mtp.c:213 modules/access/mtp.c:302
 msgid "File reading failed"
 msgstr "Tiedoston lukeminen epäonnistui"
 
-#: modules/access/file.c:183 modules/access/mtp.c:303
+#: modules/access/file.c:181 modules/access/mtp.c:303
 #, fuzzy, c-format
 msgid "VLC could not open the file \"%s\". (%m)"
 msgstr "VLC ei voinut avata tiedostoa \"%s\"."
 
-#: modules/access/file.c:304 modules/access/mtp.c:214
-msgid "VLC could not read the file."
+#: modules/access/file.c:302
+#, fuzzy, c-format
+msgid "VLC could not read the file (%m)."
 msgstr "VLC ei voinut lukea tiedostoa."
 
 #: modules/access/fs.c:33
@@ -6838,7 +6845,8 @@ msgstr ""
 "Laajenna: kaikki alihakemistot näytetään heti.\n"
 
 #: modules/access/fs.c:42 modules/codec/dirac.c:79 modules/codec/x264.c:414
-#: modules/codec/x264.c:419 modules/gui/qt4/ui/video_effects.h:1360
+#: modules/codec/x264.c:419 share/lua/http/dialogs/create_stream.html:196
+#: modules/gui/qt4/ui/video_effects.h:1360
 msgid "none"
 msgstr "Ei mikään"
 
@@ -6877,6 +6885,9 @@ msgstr "Tiedostolähde"
 #: modules/gui/macosx/output.m:230 modules/gui/macosx/output.m:369
 #: modules/gui/qt4/dialogs/plugins.cpp:555 modules/gui/qt4/dialogs/sout.cpp:76
 #: modules/gui/qt4/dialogs/sout.cpp:154
+#: share/lua/http/dialogs/create_stream.html:204
+#: share/lua/http/dialogs/stream_config_window.html:36
+#: share/lua/http/dialogs/stream_window.html:95
 msgid "File"
 msgstr "Tiedosto"
 
@@ -7103,7 +7114,7 @@ msgstr "Äänikanavien määrä äänialkeisvirrassa"
 
 #: modules/access/imem.c:83 modules/access/pvr.c:68
 #: modules/access/v4l2/video.c:75 modules/demux/rawvid.c:48
-#: modules/gui/macosx/AudioEffects.m:92
+#: modules/gui/macosx/AudioEffects.m:91
 #: modules/gui/qt4/components/extended_panels.cpp:1338
 #: modules/video_filter/mosaic.c:94 modules/video_output/vmem.c:42
 #: modules/gui/qt4/ui/profiles.h:486
@@ -7170,7 +7181,7 @@ msgstr "Release-funktio"
 msgid "Address of the release callback function"
 msgstr "Release-takaisinkutsufunktion muistiosoite"
 
-#: modules/access/imem.c:113 modules/gui/macosx/AudioEffects.m:91
+#: modules/access/imem.c:113 modules/gui/macosx/AudioEffects.m:90
 #: modules/gui/qt4/components/extended_panels.cpp:1337
 msgid "Size"
 msgstr "Koko"
@@ -7343,6 +7354,10 @@ msgstr "MTP-lähde"
 msgid "MTP"
 msgstr "MTP"
 
+#: modules/access/mtp.c:214
+msgid "VLC could not read the file."
+msgstr "VLC ei voinut lukea tiedostoa."
+
 #: modules/access/oss.c:76
 msgid "OSS"
 msgstr "OSS"
@@ -7368,6 +7383,7 @@ msgid "PulseAudio input"
 msgstr "Äänitulo"
 
 #: modules/access/pvr.c:58 modules/access/v4l2/video.c:57
+#: modules/audio_output/kai.c:65
 msgid "Device"
 msgstr "Laite"
 
@@ -7384,7 +7400,7 @@ msgid "PVR radio device"
 msgstr "PVR:n radiolaite"
 
 # "norm" as in "television standard"...
-#: modules/access/pvr.c:64 modules/gui/qt4/components/open_panels.cpp:837
+#: modules/access/pvr.c:64 modules/gui/qt4/components/open_panels.cpp:842
 msgid "Norm"
 msgstr "Videostandardi"
 
@@ -7400,8 +7416,8 @@ msgstr "Kaapattavan videovirran leveys (-1 = automaattinen)."
 msgid "Height of the stream to capture (-1 for autodetection)."
 msgstr "Kaapattavan videovirran korkeus (-1 = automaattinen)."
 
-#: modules/access/pvr.c:76 modules/access/v4l2/video.c:210
-#: modules/gui/qt4/components/open_panels.cpp:844
+#: modules/access/pvr.c:76 modules/access/v4l2/video.c:207
+#: modules/gui/qt4/components/open_panels.cpp:849
 msgid "Frequency"
 msgstr "Taajuus"
 
@@ -7586,11 +7602,11 @@ msgstr "RTMP-lähde"
 msgid "RTMP"
 msgstr "RTMP"
 
-#: modules/access/rtp/rtp.c:43
+#: modules/access/rtp/rtp.c:44
 msgid "RTCP (local) port"
 msgstr "RTCP (paikallinen) portti"
 
-#: modules/access/rtp/rtp.c:45
+#: modules/access/rtp/rtp.c:46
 msgid ""
 "RTCP packets will be received on this transport protocol port. If zero, "
 "multiplexed RTP/RTCP is used."
@@ -7598,11 +7614,11 @@ msgstr ""
 "RTCP-paketteja otetaan vastaan tässä siirtoprotokollan portissa. Jos 0, niin "
 "käytetään yhdistettyä (multiplexed) RTP/RTCP:tä."
 
-#: modules/access/rtp/rtp.c:48 modules/stream_out/rtp.c:144
+#: modules/access/rtp/rtp.c:49 modules/stream_out/rtp.c:144
 msgid "SRTP key (hexadecimal)"
 msgstr "SRTP-avain (heksaluku)"
 
-#: modules/access/rtp/rtp.c:50
+#: modules/access/rtp/rtp.c:51
 msgid ""
 "RTP packets will be authenticated and deciphered with this Secure RTP master "
 "shared secret key."
@@ -7610,35 +7626,35 @@ msgstr ""
 "RTP-paketit todennetaan ja dekryptataan tällä Secure RTP master shared "
 "secret -avaimella."
 
-#: modules/access/rtp/rtp.c:53 modules/stream_out/rtp.c:149
+#: modules/access/rtp/rtp.c:54 modules/stream_out/rtp.c:149
 msgid "SRTP salt (hexadecimal)"
 msgstr "SRTP-suola (heksaluku)"
 
-#: modules/access/rtp/rtp.c:55 modules/stream_out/rtp.c:151
+#: modules/access/rtp/rtp.c:56 modules/stream_out/rtp.c:151
 msgid "Secure RTP requires a (non-secret) master salt value."
 msgstr "Secure RTP vaatii (ei-salaisen) master-suola-arvon."
 
-#: modules/access/rtp/rtp.c:57
+#: modules/access/rtp/rtp.c:58
 msgid "Maximum RTP sources"
 msgstr "RTP-lähteiden maksimi"
 
-#: modules/access/rtp/rtp.c:59
+#: modules/access/rtp/rtp.c:60
 msgid "How many distinct active RTP sources are allowed at a time."
 msgstr "Montako erillistä aktiivista RTP-lähdettä sallitaan kerrallaan."
 
-#: modules/access/rtp/rtp.c:61
+#: modules/access/rtp/rtp.c:62
 msgid "RTP source timeout (sec)"
 msgstr "RTP-lähteen aikakatkaisu (sekuntia)"
 
-#: modules/access/rtp/rtp.c:63
+#: modules/access/rtp/rtp.c:64
 msgid "How long to wait for any packet before a source is expired."
 msgstr "Kuinka kauan odotetaan paketteja ennen kuin lähde vanhenee."
 
-#: modules/access/rtp/rtp.c:65
+#: modules/access/rtp/rtp.c:66
 msgid "Maximum RTP sequence number dropout"
 msgstr "Maksimi RTP-sekvenssinumeroero"
 
-#: modules/access/rtp/rtp.c:67
+#: modules/access/rtp/rtp.c:68
 msgid ""
 "RTP packets will be discarded if they are too much ahead (i.e. in the "
 "future) by this many packets from the last received packet."
@@ -7647,11 +7663,11 @@ msgstr ""
 "Paketti on liikaa edellä, jos se on näin monta pakettia edellä edellisestä "
 "saapuneesta paketista."
 
-#: modules/access/rtp/rtp.c:70
+#: modules/access/rtp/rtp.c:71
 msgid "Maximum RTP sequence number misordering"
 msgstr "Maksimi RTP-sekvenssinumeroepäjärjestys"
 
-#: modules/access/rtp/rtp.c:72
+#: modules/access/rtp/rtp.c:73
 msgid ""
 "RTP packets will be discarded if they are too far behind (i.e. in the past) "
 "by this many packets from the last received packet."
@@ -7660,23 +7676,34 @@ msgstr ""
 "Paketti on liikaa jäljessä, jos se on näin monta pakettia jäljessä "
 "edellisestä saapuneesta paketista."
 
-#: modules/access/rtp/rtp.c:75
+#: modules/access/rtp/rtp.c:76
 msgid "RTP payload format assumed for dynamic payloads"
 msgstr ""
 
-#: modules/access/rtp/rtp.c:78
+#: modules/access/rtp/rtp.c:79
 msgid ""
 "This payload format will be assumed for dynamic payload types (between 96 "
 "and 127) if it can't be determined otherwise with out-of-band mappings (SDP)"
 msgstr ""
 
-#: modules/access/rtp/rtp.c:92 modules/stream_out/rtp.c:192
+#: modules/access/rtp/rtp.c:93 modules/stream_out/rtp.c:192
 msgid "RTP"
 msgstr "RTP"
 
-#: modules/access/rtp/rtp.c:93
+#: modules/access/rtp/rtp.c:94
 msgid "Real-Time Protocol (RTP) input"
 msgstr "Reaaliaikaprotokolla (RTP) -lähde"
+
+#: modules/access/rtp/rtp.c:726
+msgid "SDP required"
+msgstr ""
+
+#: modules/access/rtp/rtp.c:727
+#, c-format
+msgid ""
+"A description in SDP format is required to receive the RTP stream. Note that "
+"rtp:// URIs cannot work with dynamic RTP payload format (%<PRIu8>)."
+msgstr ""
 
 # Real as in RealNetworks... no translation needed
 #: modules/access/rtsp/access.c:47 modules/access/rtsp/access.c:48
@@ -7701,7 +7728,7 @@ msgid "The requested RTSP session could not be established."
 msgstr "Pyydettyä RTSP-istuntoa ei voitu muodostaa."
 
 #: modules/access/screen/screen.c:43
-#: modules/gui/qt4/components/open_panels.cpp:1001
+#: modules/gui/qt4/components/open_panels.cpp:1006
 msgid "Desired frame rate for the capture."
 msgstr "Kaappauksen haluttu ruutunopeus."
 
@@ -7972,7 +7999,7 @@ msgstr "UDP"
 msgid "UDP input"
 msgstr "UDP-lähde"
 
-#: modules/access/v4l2/controls.c:722
+#: modules/access/v4l2/controls.c:721
 #, fuzzy
 msgid "Reset defaults"
 msgstr "Palauta oletusarvot"
@@ -8148,246 +8175,238 @@ msgid "Gamma adjust."
 msgstr "Kuvan säätö"
 
 #: modules/access/v4l2/video.c:123
-msgid "Exposure"
-msgstr "Valotus"
+#, fuzzy
+msgid "Automatic gain"
+msgstr "Automaattirajaus"
 
 #: modules/access/v4l2/video.c:125
 #, fuzzy
-msgid "Exposure."
-msgstr "Valotus"
-
-#: modules/access/v4l2/video.c:126
-msgid "Automatic gain/exposure"
-msgstr ""
-
-#: modules/access/v4l2/video.c:128
-#, fuzzy
-msgid "Automatically set the video gain or exposure."
+msgid "Automatically set the video gain."
 msgstr "Tallenna äänenvoimakkuus automaattisesti lopetettaessa"
 
-#: modules/access/v4l2/video.c:129
+#: modules/access/v4l2/video.c:126
 msgid "Gain"
 msgstr "Vahvistus"
 
-#: modules/access/v4l2/video.c:131
+#: modules/access/v4l2/video.c:128
 #, fuzzy
 msgid "Picture gain."
 msgstr "Kuva"
 
-#: modules/access/v4l2/video.c:132
+#: modules/access/v4l2/video.c:129
 #, fuzzy
 msgid "Sharpness"
 msgstr "Terävoitä"
 
-#: modules/access/v4l2/video.c:133
+#: modules/access/v4l2/video.c:130
 #, fuzzy
 msgid "Sharpness filter adjust."
 msgstr "Terävöitys-videosuodin"
 
-#: modules/access/v4l2/video.c:134
+#: modules/access/v4l2/video.c:131
 #, fuzzy
 msgid "Chroma gain"
 msgstr "Väriformaatti"
 
-#: modules/access/v4l2/video.c:135
+#: modules/access/v4l2/video.c:132
 msgid "Chroma gain control."
 msgstr ""
 
-#: modules/access/v4l2/video.c:136
+#: modules/access/v4l2/video.c:133
 #, fuzzy
 msgid "Automatic chroma gain"
 msgstr "Automaattirajaus"
 
-#: modules/access/v4l2/video.c:138
+#: modules/access/v4l2/video.c:135
 #, fuzzy
 msgid "Automatically control the chroma gain."
 msgstr "Yhdistä JACK-äänilähtö automaattisesti"
 
-#: modules/access/v4l2/video.c:139
+#: modules/access/v4l2/video.c:136
 #, fuzzy
 msgid "Power line frequency"
 msgstr "Lähettimen/kanavanipun taajuus"
 
-#: modules/access/v4l2/video.c:141
+#: modules/access/v4l2/video.c:138
 msgid "Power line frequency anti-flicker filter."
 msgstr ""
 
-#: modules/access/v4l2/video.c:148
+#: modules/access/v4l2/video.c:145
 msgid "50 Hz"
 msgstr ""
 
-#: modules/access/v4l2/video.c:148
+#: modules/access/v4l2/video.c:145
 msgid "60 Hz"
 msgstr ""
 
-#: modules/access/v4l2/video.c:150
+#: modules/access/v4l2/video.c:147
 #, fuzzy
 msgid "Backlight compensation"
 msgstr "Virheellinen näppäinyhdistelmä"
 
-#: modules/access/v4l2/video.c:151
+#: modules/access/v4l2/video.c:148
 #, fuzzy
 msgid "Backlight compensation."
 msgstr "Virheellinen näppäinyhdistelmä"
 
-#: modules/access/v4l2/video.c:152
+#: modules/access/v4l2/video.c:149
 #, fuzzy
 msgid "Band-stop filter"
 msgstr "\"Pallo\" -videosuodin"
 
-#: modules/access/v4l2/video.c:154
+#: modules/access/v4l2/video.c:151
 msgid "Cut a light band induced by fluorescent lighting (unit undocumented)."
 msgstr ""
 
-#: modules/access/v4l2/video.c:155
+#: modules/access/v4l2/video.c:152
 msgid "Horizontal flip"
 msgstr "Vaakapeilaus"
 
-#: modules/access/v4l2/video.c:157
+#: modules/access/v4l2/video.c:154
 #, fuzzy
 msgid "Flip the picture horizontally."
 msgstr "Peilaa vaakasuunnassa"
 
-#: modules/access/v4l2/video.c:158
+#: modules/access/v4l2/video.c:155
 msgid "Vertical flip"
 msgstr "Pystypeilaus"
 
-#: modules/access/v4l2/video.c:160
+#: modules/access/v4l2/video.c:157
 #, fuzzy
 msgid "Flip the picture vertically."
 msgstr "Peilaa pystysuunnassa"
 
-#: modules/access/v4l2/video.c:161
+#: modules/access/v4l2/video.c:158
 #, fuzzy
 msgid "Rotate (degrees)"
 msgstr "Käännä 90 astetta"
 
-#: modules/access/v4l2/video.c:162
+#: modules/access/v4l2/video.c:159
 msgid "Picture rotation angle (in degrees)."
 msgstr ""
 
-#: modules/access/v4l2/video.c:163
+#: modules/access/v4l2/video.c:160
 #, fuzzy
 msgid "Color killer"
 msgstr "Värinkääntö"
 
-#: modules/access/v4l2/video.c:165
+#: modules/access/v4l2/video.c:162
 msgid ""
 "Enable the color killer, i.e. switch to black & white picture whenever the "
 "signal is weak."
 msgstr ""
 
-#: modules/access/v4l2/video.c:167
+#: modules/access/v4l2/video.c:164
 #, fuzzy
 msgid "Color effect"
 msgstr "Goom-tehoste"
 
-#: modules/access/v4l2/video.c:168
+#: modules/access/v4l2/video.c:165
 #, fuzzy
 msgid "Select a color effect."
 msgstr "Valitse kansio..."
 
 # NOTE: for the sliding puzzle game, so it's more obviously a "blank tile"
-#: modules/access/v4l2/video.c:175
+#: modules/access/v4l2/video.c:172
 #, fuzzy
 msgid "Black & white"
 msgstr "Tyhjä laatta"
 
-#: modules/access/v4l2/video.c:175 modules/gui/macosx/VideoEffects.m:116
+#: modules/access/v4l2/video.c:172 modules/gui/macosx/VideoEffects.m:116
 #: modules/video_filter/sepia.c:64 modules/gui/qt4/ui/video_effects.h:1336
 msgid "Sepia"
 msgstr ""
 
-#: modules/access/v4l2/video.c:175
+#: modules/access/v4l2/video.c:172
 #, fuzzy
 msgid "Negative"
 msgstr "Natiivi"
 
-#: modules/access/v4l2/video.c:176
+#: modules/access/v4l2/video.c:173
 msgid "Emboss"
 msgstr ""
 
-#: modules/access/v4l2/video.c:176
+#: modules/access/v4l2/video.c:173
 msgid "Sketch"
 msgstr ""
 
-#: modules/access/v4l2/video.c:176
+#: modules/access/v4l2/video.c:173
 msgid "Sky blue"
 msgstr ""
 
-#: modules/access/v4l2/video.c:177
+#: modules/access/v4l2/video.c:174
 #, fuzzy
 msgid "Grass green"
 msgstr "Vihreä"
 
-#: modules/access/v4l2/video.c:177
+#: modules/access/v4l2/video.c:174
 #, fuzzy
-msgid "Skin whithen"
+msgid "Skin whiten"
 msgstr "Avaa tiedosto"
 
-#: modules/access/v4l2/video.c:177
+#: modules/access/v4l2/video.c:174
 msgid "Vivid"
 msgstr ""
 
-#: modules/access/v4l2/video.c:180
+#: modules/access/v4l2/video.c:177
 #, fuzzy
 msgid "Audio volume"
 msgstr "Äänimoodi"
 
-#: modules/access/v4l2/video.c:182
+#: modules/access/v4l2/video.c:179
 #, fuzzy
 msgid "Volume of the audio input."
 msgstr "Videotulon värisävy (hue)."
 
-#: modules/access/v4l2/video.c:183
+#: modules/access/v4l2/video.c:180
 #, fuzzy
 msgid "Audio balance"
 msgstr "Punabalanssi"
 
-#: modules/access/v4l2/video.c:185
+#: modules/access/v4l2/video.c:182
 #, fuzzy
 msgid "Balance of the audio input."
 msgstr "Videotulon värisävy (hue)."
 
-#: modules/access/v4l2/video.c:186
+#: modules/access/v4l2/video.c:183
 #, fuzzy
 msgid "Bass level"
 msgstr "Mustataso"
 
-#: modules/access/v4l2/video.c:188
+#: modules/access/v4l2/video.c:185
 #, fuzzy
 msgid "Bass adjustment of the audio input."
 msgstr "Videotulon värisävy (hue)."
 
-#: modules/access/v4l2/video.c:189
+#: modules/access/v4l2/video.c:186
 #, fuzzy
 msgid "Treble level"
 msgstr "Yksi taso"
 
-#: modules/access/v4l2/video.c:191
+#: modules/access/v4l2/video.c:188
 #, fuzzy
 msgid "Treble adjustment of the audio input."
 msgstr "Videotulon kontrasti."
 
-#: modules/access/v4l2/video.c:194
+#: modules/access/v4l2/video.c:191
 #, fuzzy
 msgid "Mute the audio."
 msgstr "Vaimenna ääni"
 
-#: modules/access/v4l2/video.c:195
+#: modules/access/v4l2/video.c:192
 #, fuzzy
 msgid "Loudness mode"
 msgstr "Loudness"
 
-#: modules/access/v4l2/video.c:197
+#: modules/access/v4l2/video.c:194
 msgid "Loudness mode a.k.a. bass boost."
 msgstr ""
 
-#: modules/access/v4l2/video.c:199
+#: modules/access/v4l2/video.c:196
 msgid "v4l2 driver controls"
 msgstr "v4l2-ajurin kontrollit"
 
-#: modules/access/v4l2/video.c:201
+#: modules/access/v4l2/video.c:198
 msgid ""
 "Set the v4l2 driver controls to the values specified using a comma separated "
 "list optionally encapsulated by curly braces (e.g.: {video_bitrate=6000000,"
@@ -8399,99 +8418,99 @@ msgstr ""
 "{video_bitrate=6000000,audio_crc=0,stream_type=3}). Listataksesi saatavilla "
 "olevat kontrollit, lisää sanaisuutta (-vvv) tai käytä v4l2-ctl -ohjelmaa."
 
-#: modules/access/v4l2/video.c:207
+#: modules/access/v4l2/video.c:204
 msgid "Tuner id"
 msgstr "Virittimen tunniste"
 
-#: modules/access/v4l2/video.c:209
+#: modules/access/v4l2/video.c:206
 msgid "Tuner id (see debug output)."
 msgstr "Virittimen tunniste (ID). Ks. debug."
 
-#: modules/access/v4l2/video.c:212
+#: modules/access/v4l2/video.c:209
 msgid "Tuner frequency in Hz or kHz (see debug output)"
 msgstr "Virittimen taajuus, Hz tai kHz (ks. debug)"
 
-#: modules/access/v4l2/video.c:213
+#: modules/access/v4l2/video.c:210
 msgid "Audio mode"
 msgstr "Äänimoodi"
 
-#: modules/access/v4l2/video.c:215
+#: modules/access/v4l2/video.c:212
 msgid "Tuner audio mono/stereo and track selection."
 msgstr "Virittimen äänen mono/stereo sekä raidan valinta."
 
-#: modules/access/v4l2/video.c:261 modules/codec/avcodec/avcodec.c:71
+#: modules/access/v4l2/video.c:258 modules/codec/avcodec/avcodec.c:71
 #: modules/gui/qt4/dialogs/preferences.cpp:73
 msgid "All"
 msgstr "Kaikki"
 
-#: modules/access/v4l2/video.c:265
+#: modules/access/v4l2/video.c:262
 msgid "525 lines / 60 Hz"
 msgstr ""
 
-#: modules/access/v4l2/video.c:265
+#: modules/access/v4l2/video.c:262
 msgid "625 lines / 50 Hz"
 msgstr ""
 
-#: modules/access/v4l2/video.c:273
+#: modules/access/v4l2/video.c:270
 msgid "PAL N Argentina"
 msgstr ""
 
-#: modules/access/v4l2/video.c:274
+#: modules/access/v4l2/video.c:271
 msgid "NTSC M Japan"
 msgstr ""
 
-#: modules/access/v4l2/video.c:274
+#: modules/access/v4l2/video.c:271
 msgid "NTSC M South Korea"
 msgstr ""
 
-#: modules/access/v4l2/video.c:286 modules/audio_output/directx.c:457
-#: modules/audio_output/oss.c:214 modules/audio_output/portaudio.c:392
-#: modules/audio_output/waveout.c:434
+#: modules/access/v4l2/video.c:283 modules/audio_output/directx.c:457
+#: modules/audio_output/kai.c:222 modules/audio_output/oss.c:214
+#: modules/audio_output/portaudio.c:392 modules/audio_output/waveout.c:434
 msgid "Mono"
 msgstr "Mono"
 
-#: modules/access/v4l2/video.c:288
+#: modules/access/v4l2/video.c:285
 msgid "Primary language (Analog TV tuners only)"
 msgstr "Ensisijainen kieli (vain analogi-TV-virittimet)"
 
-#: modules/access/v4l2/video.c:289
+#: modules/access/v4l2/video.c:286
 msgid "Secondary language (Analog TV tuners only)"
 msgstr "Toissijainen kieli (vain analogi-TV-virittimet)"
 
-#: modules/access/v4l2/video.c:290
+#: modules/access/v4l2/video.c:287
 msgid "Second audio program (Analog TV tuners only)"
 msgstr "Toinen ääniohjelma (vain analogi-TV-virittimet)"
 
-#: modules/access/v4l2/video.c:291
+#: modules/access/v4l2/video.c:288
 msgid "Primary language left, Secondary language right"
 msgstr "Ensisijainen kieli vasen, toissijainen kieli oikea"
 
-#: modules/access/v4l2/video.c:306
+#: modules/access/v4l2/video.c:303
 msgid "Video4Linux2"
 msgstr "Video4Linux2"
 
-#: modules/access/v4l2/video.c:307
+#: modules/access/v4l2/video.c:304
 msgid "Video4Linux2 input"
 msgstr "Video4Linux2-lähde"
 
-#: modules/access/v4l2/video.c:311
+#: modules/access/v4l2/video.c:308
 msgid "Video input"
 msgstr "Videotulo"
 
-#: modules/access/v4l2/video.c:346
+#: modules/access/v4l2/video.c:343
 msgid "Tuner"
 msgstr "Viritin"
 
-#: modules/access/v4l2/video.c:361
+#: modules/access/v4l2/video.c:358 share/lua/http/index.html:198
 msgid "Controls"
 msgstr "Kontrollit"
 
-#: modules/access/v4l2/video.c:362
+#: modules/access/v4l2/video.c:359
 #, fuzzy
 msgid "Video capture controls (if supported by the device)"
 msgstr "Videotulon vahvistus (gain) (jos v4l2-ajuri tukee)."
 
-#: modules/access/v4l2/video.c:455
+#: modules/access/v4l2/video.c:450
 msgid "Video4Linux2 Compressed A/V"
 msgstr "Video4Linux2 pakattu A/V"
 
@@ -8720,7 +8739,7 @@ msgstr ""
 msgid "File stream output"
 msgstr "Tiedostokäyttölähtö"
 
-#: modules/access_output/http.c:62 modules/misc/audioscrobbler.c:113
+#: modules/access_output/http.c:62 modules/misc/audioscrobbler.c:115
 #: modules/stream_out/rtp.c:178
 msgid "Username"
 msgstr "Käyttäjätunnus"
@@ -8732,7 +8751,7 @@ msgstr "Tietovirran käyttämiseen tarvittava käyttäjätunnus."
 #: modules/access_output/http.c:65 modules/gui/macosx/coredialogs.m:61
 #: modules/gui/macosx/simple_prefs.m:222
 #: modules/gui/qt4/dialogs/external.cpp:125 modules/lua/vlc.c:75
-#: modules/misc/audioscrobbler.c:115 modules/stream_out/raop.c:154
+#: modules/misc/audioscrobbler.c:117 modules/stream_out/raop.c:154
 #: modules/stream_out/rtp.c:181
 msgid "Password"
 msgstr "Salasana"
@@ -8916,12 +8935,12 @@ msgstr "ARM NEON äänimuotojen muunnos"
 msgid "ARM NEON video chroma conversions"
 msgstr "ARM NEON videon värimuunnos"
 
-#: modules/audio_filter/audiobargraph_a.c:42
+#: modules/audio_filter/audiobargraph_a.c:40
 msgid "TCP address to use (default localhost)"
 msgstr "TCP-osoite (oletus: localhost)"
 
 # TOCHECK
-#: modules/audio_filter/audiobargraph_a.c:43
+#: modules/audio_filter/audiobargraph_a.c:41
 msgid ""
 "TCP address to use to communicate with the video part of the Bar Graph "
 "(default localhost).In the case of bargraph incrustation, use localhost."
@@ -8929,11 +8948,11 @@ msgstr ""
 "TCP-osoite, jota käytetään BarGraph -suotimen video-osan kanssa "
 "kommunikointiin (oletus localhost)."
 
-#: modules/audio_filter/audiobargraph_a.c:46
+#: modules/audio_filter/audiobargraph_a.c:44
 msgid "TCP port to use (default 12345)"
 msgstr "TCP-portti (oletus 12345)"
 
-#: modules/audio_filter/audiobargraph_a.c:47
+#: modules/audio_filter/audiobargraph_a.c:45
 msgid ""
 "TCP port to use to communicate with the video part of the Bar Graph (default "
 "12345).Use the same port as the one used in the rc interface."
@@ -8942,22 +8961,22 @@ msgstr ""
 "kommunikointiin (oletus 12345). Käytä tässä samaa porttia kuin rc-"
 "käyttöliittymässä."
 
-#: modules/audio_filter/audiobargraph_a.c:50
+#: modules/audio_filter/audiobargraph_a.c:48
 msgid "Defines if BarGraph information should be sent (default 1)"
 msgstr "Määrää, lähetetäänkö BarGraph-tietoa (oletus: 1)"
 
-#: modules/audio_filter/audiobargraph_a.c:51
+#: modules/audio_filter/audiobargraph_a.c:49
 msgid ""
 "Defines if BarGraph information should be sent. 1 if the information should "
 "be sent, 0 otherwise (default 1)."
 msgstr ""
 "Määrää, lähetetäänkö BarGraph-tietoa. 1 jos lähetetään (oletus), 0 jos ei."
 
-#: modules/audio_filter/audiobargraph_a.c:53
+#: modules/audio_filter/audiobargraph_a.c:51
 msgid "Sends the barGraph information every n audio packets (default 4)"
 msgstr "Lähettää BarGraph-tiedon joka n:nnen äänipaketin jälkeen (oletus 4)"
 
-#: modules/audio_filter/audiobargraph_a.c:54
+#: modules/audio_filter/audiobargraph_a.c:52
 msgid ""
 "Defines how often the barGraph information should be sent. Sends the "
 "barGraph information every n audio packets (default 4)."
@@ -8965,11 +8984,11 @@ msgstr ""
 "Määrää, kuinka usein BarGraph-tietoa lähetetään. Tieto lähetetään joka n:"
 "nnen äänipaketin jälkeen (oletus 4)."
 
-#: modules/audio_filter/audiobargraph_a.c:56
+#: modules/audio_filter/audiobargraph_a.c:54
 msgid "Defines if silence alarm information should be sent (default 1)"
 msgstr "Määrää, lähetetäänkö hiljaisuushälytystä (oletus 1)"
 
-#: modules/audio_filter/audiobargraph_a.c:57
+#: modules/audio_filter/audiobargraph_a.c:55
 msgid ""
 "Defines if silence alarm information should be sent. 1 if the information "
 "should be sent, 0 otherwise (default 1)."
@@ -8977,11 +8996,11 @@ msgstr ""
 "Määrää, lähetetäänkö hiljaisuushälytystä. 1 jos lähetetään (oletus), 0 jos "
 "ei."
 
-#: modules/audio_filter/audiobargraph_a.c:59
+#: modules/audio_filter/audiobargraph_a.c:57
 msgid "Time window to use in ms (default 5000)"
 msgstr "Aikaikkuna (ms; oletus 5000)"
 
-#: modules/audio_filter/audiobargraph_a.c:60
+#: modules/audio_filter/audiobargraph_a.c:58
 msgid ""
 "Time Window during when the audio level is measured in ms for silence "
 "detection. If the audio level is under the threshold during this time, an "
@@ -8991,11 +9010,11 @@ msgstr ""
 "havaitsemiseksi. Jos äänen taso on kynnystä matalampi koko ikkunan ajan, "
 "lähetetään hiljaisuushälytys (oletus 5000)."
 
-#: modules/audio_filter/audiobargraph_a.c:63
+#: modules/audio_filter/audiobargraph_a.c:61
 msgid "Minimum Audio level to raise the alarm (default 0.1)"
 msgstr "Pienin äänitaso, joka hälyttää (oletus 0.1)"
 
-#: modules/audio_filter/audiobargraph_a.c:64
+#: modules/audio_filter/audiobargraph_a.c:62
 msgid ""
 "Threshold to be attained to raise an alarm. If the audio level is under the "
 "threshold during this time, an alarm is sent (default 0.1)."
@@ -9003,11 +9022,11 @@ msgstr ""
 "Kynnys, joka lähettää hiljaisuushälytyksen. Jos äänen taso on tätä alempi "
 "aikaikkunan ajan, lähetetään hälytys (oletus 0.1)."
 
-#: modules/audio_filter/audiobargraph_a.c:67
+#: modules/audio_filter/audiobargraph_a.c:65
 msgid "Time between two alarm messages in ms (default 2000)"
 msgstr "Hälytysviestien väli (ms; oletus 2000)"
 
-#: modules/audio_filter/audiobargraph_a.c:68
+#: modules/audio_filter/audiobargraph_a.c:66
 msgid ""
 "Time between two alarm messages in ms. This value is used to avoid alarm "
 "saturation (default 2000)."
@@ -9015,11 +9034,11 @@ msgstr ""
 "Kahden hälytysviestin väli millisekunteina. Tätä käytetään estämään "
 "hälytyksen saturaatio (oletus 2000)."
 
-#: modules/audio_filter/audiobargraph_a.c:70
+#: modules/audio_filter/audiobargraph_a.c:68
 msgid "Force connection reset regularly (default 1)"
 msgstr "Pakota yhteyden nollaus (oletus 1)"
 
-#: modules/audio_filter/audiobargraph_a.c:71
+#: modules/audio_filter/audiobargraph_a.c:69
 msgid ""
 "Defines if the TCP connection should be reset. This is to be used when using "
 "with audiobargraph_v (default 1)."
@@ -9027,13 +9046,14 @@ msgstr ""
 "Määrää, nollataanko TCP-yhteys. Tätä käytetään audiobargraph_v:n kanssa "
 "(oletus 1)."
 
-#: modules/audio_filter/audiobargraph_a.c:84
+#: modules/audio_filter/audiobargraph_a.c:82
 msgid "Audio part of the BarGraph function"
 msgstr "Audio Bar Graph -suotimen ääniosa"
 
 # NOTE: for consistency with video part. This gets listed in the filter list.
-#: modules/audio_filter/audiobargraph_a.c:85
-msgid "audiobargraph_a"
+#: modules/audio_filter/audiobargraph_a.c:83
+#, fuzzy
+msgid "Audiobar Graph"
 msgstr "Audio Bar Graph Audio"
 
 #: modules/audio_filter/channel_mixer/dolby.c:49
@@ -9499,6 +9519,21 @@ msgstr "Taajuuden 3 Q-arvo (leveys)"
 msgid "Audio filter for band-limited interpolation resampling"
 msgstr "Kaistarajoitetun interpoloivan uudelleennäytteistyksen äänisuodin"
 
+#: modules/audio_filter/resampler/speex.c:32
+#, fuzzy
+msgid "Resampling quality"
+msgstr "Renderöinnin laatu"
+
+#: modules/audio_filter/resampler/speex.c:34
+msgid "Resampling quality (0 = worst and fastest, 10 = best and slowest)."
+msgstr ""
+
+#: modules/audio_filter/resampler/speex.c:40
+#: modules/audio_filter/resampler/speex.c:41
+#, fuzzy
+msgid "Speex resampler"
+msgstr "Näytteistystaajuus"
+
 #: modules/audio_filter/resampler/src.c:32
 msgid "Sample rate converter type"
 msgstr ""
@@ -9572,13 +9607,13 @@ msgid "Width of the virtual room"
 msgstr "Virtuaalihuoneen leveys"
 
 #: modules/audio_filter/spatializer/spatializer.cpp:61
-#: modules/gui/macosx/AudioEffects.m:93
+#: modules/gui/macosx/AudioEffects.m:92
 #: modules/gui/qt4/components/extended_panels.cpp:1339
 msgid "Wet"
 msgstr "Märkä"
 
 #: modules/audio_filter/spatializer/spatializer.cpp:64
-#: modules/gui/macosx/AudioEffects.m:94
+#: modules/gui/macosx/AudioEffects.m:93
 #: modules/gui/qt4/components/extended_panels.cpp:1340
 msgid "Dry"
 msgstr "Kuiva"
@@ -9593,7 +9628,7 @@ msgid "Audio Spatializer"
 msgstr "Äänen tilaluonti"
 
 #: modules/audio_filter/spatializer/spatializer.cpp:72
-#: modules/gui/macosx/AudioEffects.m:105
+#: modules/gui/macosx/AudioEffects.m:104
 #: modules/gui/qt4/dialogs/extended.cpp:69
 msgid "Spatializer"
 msgstr "Tilaluonti"
@@ -9669,9 +9704,9 @@ msgstr "ALSA-laitteen nimi"
 
 #: modules/audio_output/alsa.c:156 modules/audio_output/auhal.c:126
 #: modules/audio_output/auhal.c:967 modules/audio_output/directx.c:342
-#: modules/audio_output/oss.c:121 modules/audio_output/portaudio.c:386
-#: modules/audio_output/waveout.c:364 modules/gui/macosx/MainMenu.m:290
-#: modules/gui/macosx/MainMenu.m:291
+#: modules/audio_output/kai.c:215 modules/audio_output/oss.c:121
+#: modules/audio_output/portaudio.c:386 modules/audio_output/waveout.c:364
+#: modules/gui/macosx/MainMenu.m:290 modules/gui/macosx/MainMenu.m:291
 msgid "Audio Device"
 msgstr "Äänilaite"
 
@@ -9854,6 +9889,25 @@ msgstr ""
 msgid "JACK audio output"
 msgstr "JACK-äänilähtö"
 
+#: modules/audio_output/kai.c:67
+msgid "Select a proper audio device to be used by KAI."
+msgstr ""
+
+#: modules/audio_output/kai.c:70
+msgid "Open audio in exclusive mode."
+msgstr ""
+
+#: modules/audio_output/kai.c:72
+msgid ""
+"Enable this option if you want your audio not to be interrupted by the other "
+"audio."
+msgstr ""
+
+#: modules/audio_output/kai.c:82
+#, fuzzy
+msgid "K Audio Interface audio output"
+msgstr "Pulseaudio-äänilähtö"
+
 # NOTE: "open source" as in "open a media source...", not as in "free/libre software"
 #: modules/audio_output/oss.c:99
 #, fuzzy
@@ -9880,7 +9934,7 @@ msgstr "5.1"
 msgid "Pulseaudio audio output"
 msgstr "Pulseaudio-äänilähtö"
 
-#: modules/audio_output/pulse.c:923
+#: modules/audio_output/pulse.c:926
 #, fuzzy
 msgid "Audio device"
 msgstr "Äänilaite"
@@ -9994,7 +10048,7 @@ msgstr "FFmpeg ääni- ja videopurkaja"
 msgid "Decoding"
 msgstr "Purku"
 
-#: modules/codec/avcodec/avcodec.c:142 modules/codec/omxil/omxil.c:116
+#: modules/codec/avcodec/avcodec.c:142 modules/codec/omxil/omxil.c:112
 #: modules/codec/schroedinger.c:370
 msgid "Encoding"
 msgstr "Pakkaus"
@@ -10440,17 +10494,17 @@ msgstr ""
 "Määrää AAC-ääniprofiili, jota käytetään äänivirran pakkaamiseen. Seuraavat "
 "arvot ovat mahdollisia: main, low, ssr (ei tuettu) ja ltp (oletus: main)."
 
-#: modules/codec/avcodec/encoder.c:223
+#: modules/codec/avcodec/encoder.c:235
 #, c-format
 msgid "\"%s\" is no video encoder."
 msgstr "\"%s\" ei ole videonpakkausmuoto."
 
-#: modules/codec/avcodec/encoder.c:231
+#: modules/codec/avcodec/encoder.c:243
 #, c-format
 msgid "\"%s\" is no audio encoder."
 msgstr "\"%s\" ei ole äänenpakkausmuoto."
 
-#: modules/codec/avcodec/encoder.c:257
+#: modules/codec/avcodec/encoder.c:269
 #, c-format
 msgid ""
 "It seems your FFMPEG (libavcodec) installation lacks the following encoder:\n"
@@ -10468,7 +10522,7 @@ msgstr ""
 "Tämä ei ole virhe VLC-mediasoittimessa.\n"
 "Älä ota yhteyttä VideoLAN-projektiin tästä asiasta.\n"
 
-#: modules/codec/avcodec/encoder.c:729 modules/codec/avcodec/encoder.c:738
+#: modules/codec/avcodec/encoder.c:741 modules/codec/avcodec/encoder.c:750
 msgid "VLC could not open the encoder."
 msgstr "VLC ei voinut avata pakkausohjelmaa."
 
@@ -10800,7 +10854,7 @@ msgstr "Pakatun tekstityksen Y-koordinaatti"
 msgid "DVB subtitles decoder"
 msgstr "DVB-tekstityksen purkaja"
 
-#: modules/codec/dvbsub.c:119 modules/demux/ts.c:3665 modules/demux/ts.c:3723
+#: modules/codec/dvbsub.c:119 modules/demux/ts.c:3652 modules/demux/ts.c:3710
 msgid "DVB subtitles"
 msgstr "DVB-tekstitys"
 
@@ -10919,7 +10973,7 @@ msgstr "Hopea"
 
 #: modules/codec/kate.c:210 modules/gui/fbosd.c:173
 #: modules/text_renderer/freetype.c:152 modules/text_renderer/quartztext.c:108
-#: modules/text_renderer/win32text.c:89 modules/video_filter/ball.c:130
+#: modules/text_renderer/win32text.c:89 modules/video_filter/ball.c:121
 #: modules/video_filter/marq.c:60 modules/video_filter/rss.c:72
 msgid "White"
 msgstr "Valkoinen"
@@ -10934,7 +10988,7 @@ msgstr "Ruskeanpunainen"
 #: modules/codec/kate.c:211 modules/gui/fbosd.c:173
 #: modules/gui/macosx/MainMenu.m:323 modules/gui/macosx/controls.m:189
 #: modules/text_renderer/freetype.c:153 modules/text_renderer/quartztext.c:109
-#: modules/text_renderer/win32text.c:90 modules/video_filter/ball.c:129
+#: modules/text_renderer/win32text.c:90 modules/video_filter/ball.c:120
 #: modules/video_filter/colorthres.c:64 modules/video_filter/marq.c:60
 #: modules/video_filter/rss.c:72
 msgid "Red"
@@ -10965,7 +11019,7 @@ msgstr "Oliivi"
 #: modules/codec/kate.c:211 modules/gui/fbosd.c:174
 #: modules/gui/macosx/MainMenu.m:324 modules/gui/macosx/controls.m:191
 #: modules/text_renderer/freetype.c:153 modules/text_renderer/quartztext.c:109
-#: modules/text_renderer/win32text.c:90 modules/video_filter/ball.c:129
+#: modules/text_renderer/win32text.c:90 modules/video_filter/ball.c:120
 #: modules/video_filter/marq.c:61 modules/video_filter/rss.c:73
 msgid "Green"
 msgstr "Vihreä"
@@ -11001,7 +11055,7 @@ msgstr "Laivastonsininen"
 #: modules/codec/kate.c:212 modules/gui/fbosd.c:175
 #: modules/gui/macosx/MainMenu.m:326 modules/gui/macosx/controls.m:195
 #: modules/text_renderer/freetype.c:154 modules/text_renderer/quartztext.c:110
-#: modules/text_renderer/win32text.c:91 modules/video_filter/ball.c:130
+#: modules/text_renderer/win32text.c:91 modules/video_filter/ball.c:121
 #: modules/video_filter/colorthres.c:64 modules/video_filter/marq.c:62
 #: modules/video_filter/rss.c:74
 msgid "Blue"
@@ -11208,7 +11262,7 @@ msgstr "MPEG-ääni layer I/II/III -paketoija"
 msgid "Audio/Video decoder (using OpenMAX IL)"
 msgstr "Ääni-/videopurkaja (käyttäen OpenMAX IL:ää)"
 
-#: modules/codec/omxil/omxil.c:117
+#: modules/codec/omxil/omxil.c:113
 msgid "Video encoder (using OpenMAX IL)"
 msgstr "Videopakkaaja (käyttäen OpenMAX IL:ää)"
 
@@ -11575,7 +11629,7 @@ msgid "Enforce the mode of the encoder."
 msgstr "Voit pakottaa pakkaajan haluamaasi tilaan."
 
 #: modules/codec/speex.c:61 modules/codec/theora.c:96
-#: modules/codec/twolame.c:55 modules/codec/vorbis.c:171
+#: modules/codec/twolame.c:54 modules/codec/vorbis.c:171
 msgid "Encoding quality"
 msgstr "Pakkauksen laatu"
 
@@ -11905,7 +11959,7 @@ msgstr "Tekstimuotoisen tekstityksen purkaja"
 #.
 #. This MUST be a valid iconv character set. If unsure, please refer
 #. the VideoLAN translators mailing list.
-#: modules/codec/subsdec.c:290 modules/demux/avi/avi.c:95
+#: modules/codec/subsdec.c:290 modules/demux/avi/avi.c:96
 msgctxt "GetACP"
 msgid "CP1252"
 msgstr "CP1252"
@@ -11996,7 +12050,7 @@ msgstr "Theora-videopaketoija"
 msgid "Theora video encoder"
 msgstr "Theora-videopakkaaja"
 
-#: modules/codec/twolame.c:57
+#: modules/codec/twolame.c:56
 msgid ""
 "Force a specific encoding quality between 0.0 (high) and 50.0 (low), instead "
 "of specifying a particular bitrate. This will produce a VBR stream."
@@ -12004,42 +12058,42 @@ msgstr ""
 "Voit valita pakkauksen laadun väliltä 0.0 (korkea) ja 50.0 (matala), sen "
 "sijaan että asettaisit bittinopeuden. Tämä tuottaa VBR-tietovirran."
 
-#: modules/codec/twolame.c:60
+#: modules/codec/twolame.c:59
 msgid "Stereo mode"
 msgstr "Stereotila"
 
-#: modules/codec/twolame.c:61
+#: modules/codec/twolame.c:60
 msgid "Handling mode for stereo streams"
 msgstr "Stereoäänivirtojen käsittelytila"
 
-#: modules/codec/twolame.c:62
+#: modules/codec/twolame.c:61
 msgid "VBR mode"
 msgstr "VBR-tila"
 
-#: modules/codec/twolame.c:64
+#: modules/codec/twolame.c:63
 msgid "Use Variable BitRate. Default is to use Constant BitRate (CBR)."
 msgstr ""
 "Käytä vaihtelevaa bittinopeutta (variable bit rate; VBR). Oletusarvoisesti "
 "käytetään vakiobittinopeutta (constant bit rate; CBR)."
 
-#: modules/codec/twolame.c:65
+#: modules/codec/twolame.c:64
 msgid "Psycho-acoustic model"
 msgstr "Psykoakustinen malli"
 
-#: modules/codec/twolame.c:67
+#: modules/codec/twolame.c:66
 msgid "Integer from -1 (no model) to 4."
 msgstr "Kokonaisluku väliltä -1 (ei mallia) ja 4."
 
-#: modules/codec/twolame.c:71
+#: modules/codec/twolame.c:70
 msgid "Dual mono"
 msgstr "Kaksi monokanavaa"
 
 # TOCHECK: "Joint-stereo", or "Yhdistetty stereo"? Which is better?
-#: modules/codec/twolame.c:71
+#: modules/codec/twolame.c:70
 msgid "Joint stereo"
 msgstr "Joint-stereo"
 
-#: modules/codec/twolame.c:76
+#: modules/codec/twolame.c:75
 msgid "Libtwolame audio encoder"
 msgstr "Libtwolame-äänenpakkaaja"
 
@@ -13086,15 +13140,15 @@ msgid "D-Bus control interface"
 msgstr "D-Bus -etäohjauskäyttöliittymä"
 
 #: modules/control/dbus/dbus_root.c:77 modules/gui/macosx/MainWindow.m:233
-#: modules/gui/macosx/MainWindow.m:741 modules/gui/qt4/dialogs/help.cpp:100
-#: modules/gui/qt4/main_interface.cpp:931
-#: modules/gui/qt4/main_interface.cpp:935
-#: modules/gui/qt4/main_interface.cpp:975
-#: modules/gui/qt4/main_interface.cpp:977
-#: modules/gui/qt4/main_interface.cpp:1077
+#: modules/gui/macosx/MainWindow.m:741 modules/gui/qt4/dialogs/help.cpp:99
+#: modules/gui/qt4/main_interface.cpp:949
+#: modules/gui/qt4/main_interface.cpp:953
+#: modules/gui/qt4/main_interface.cpp:992
+#: modules/gui/qt4/main_interface.cpp:994
 #: modules/gui/qt4/main_interface.cpp:1094
-#: modules/gui/qt4/main_interface.cpp:1101
-#: modules/gui/qt4/main_interface.cpp:1124
+#: modules/gui/qt4/main_interface.cpp:1111
+#: modules/gui/qt4/main_interface.cpp:1118
+#: modules/gui/qt4/main_interface.cpp:1141
 #: modules/video_output/xcb/window.c:313
 msgid "VLC media player"
 msgstr "VLC-mediasoitin"
@@ -13164,8 +13218,8 @@ msgstr "Äänen voimakkuuden hallinta"
 msgid "Position Control"
 msgstr "Sijainnin hallinta"
 
-#: modules/control/hotkeys.c:97 modules/gui/macosx/intf.m:1786
-#: modules/gui/macosx/intf.m:1957
+#: modules/control/hotkeys.c:97 modules/gui/macosx/intf.m:1791
+#: modules/gui/macosx/intf.m:1962
 msgid "Ignore"
 msgstr "Älä huomioi"
 
@@ -13179,13 +13233,15 @@ msgid "Hotkeys management interface"
 msgstr "Pikanäppäinten hallintaliittymä"
 
 #: modules/control/hotkeys.c:108
-msgid "MouseWheel x-axis Control"
+#, fuzzy
+msgid "MouseWheel up-down axis Control"
 msgstr "Hiiren rulla (x-akseli)"
 
 #: modules/control/hotkeys.c:109
+#, fuzzy
 msgid ""
-"MouseWheel x-axis can control volume, position or mousewheel event can be "
-"ignored"
+"The MouseWheel up-down (vertical) axis can control volume, position or "
+"mousewheel event can be ignored"
 msgstr ""
 "Hiiren rullan x-akseli voi kontrolloida äänen voimakkuutta, sijaintia tai "
 "sen toiminta voidaan jättää huomiotta."
@@ -13298,19 +13354,19 @@ msgstr "Infrapuna"
 msgid "Infrared remote control interface"
 msgstr "Infrapunakauko-ohjaimien käyttöliittymä"
 
-#: modules/control/motion.c:76
+#: modules/control/motion.c:77
 msgid "Use the rotate video filter instead of transform"
 msgstr "Käytä erillistä videokuvan kiertosuodinta sisäisen muunnoksen sijaan"
 
-#: modules/control/motion.c:82
+#: modules/control/motion.c:83
 msgid "motion"
 msgstr "Liike"
 
-#: modules/control/motion.c:85
+#: modules/control/motion.c:86
 msgid "motion control interface"
 msgstr "Liikeohjauskäyttöliittymä"
 
-#: modules/control/motion.c:86
+#: modules/control/motion.c:87
 msgid ""
 "Use HDAPS, AMS, APPLESMC or UNIMOTION motion sensors to rotate the video"
 msgstr ""
@@ -13429,7 +13485,7 @@ msgstr "Avataan"
 
 #: modules/control/rc.c:73 modules/gui/macosx/MainMenu.m:814
 #: modules/gui/macosx/MainMenu.m:815 modules/gui/macosx/MainMenu.m:816
-#: modules/gui/macosx/MainWindow.m:815 modules/gui/qt4/menus.cpp:789
+#: modules/gui/macosx/MainWindow.m:815 modules/gui/qt4/menus.cpp:791
 #: modules/notify/xosd.c:234
 msgid "Pause"
 msgstr "Tauko"
@@ -14003,12 +14059,12 @@ msgstr "Avformat"
 msgid "Force use of a specific avformat muxer."
 msgstr "Pakota käyttämään ffmpeg-kanavoijaa."
 
-#: modules/demux/avi/avi.c:50
+#: modules/demux/avi/avi.c:51
 msgid "Force interleaved method"
 msgstr "Pakota lomitettu tapa"
 
 # NOTE: added confusion warning about interleaved vs. interlaced, since both are the same word in Finnish.
-#: modules/demux/avi/avi.c:51
+#: modules/demux/avi/avi.c:52
 msgid "Force interleaved method."
 msgstr ""
 "Pakota käyttämään lomitettua (interleaved) tapaa. Huomaa, että tällä "
@@ -14016,11 +14072,11 @@ msgstr ""
 "kanssa, vaan tämä liittyy siihen, missä järjestyksessä video ja ääni on "
 "tallennettu tiedostoon."
 
-#: modules/demux/avi/avi.c:53
+#: modules/demux/avi/avi.c:54
 msgid "Force index creation"
 msgstr "Indeksin luonnin pakotus"
 
-#: modules/demux/avi/avi.c:55
+#: modules/demux/avi/avi.c:56
 msgid ""
 "Recreate a index for the AVI file. Use this if your AVI file is damaged or "
 "incomplete (not seekable)."
@@ -14028,28 +14084,28 @@ msgstr ""
 "Valitse, luodaanko AVI-tiedoston indeksi uudelleen. Voit käyttää tätä, jos "
 "AVI-tiedostosi on vioittunut tai keskeneräinen (jos sitä ei pysty kelaamaan)."
 
-#: modules/demux/avi/avi.c:63
+#: modules/demux/avi/avi.c:64
 msgid "Ask for action"
 msgstr "Kysy"
 
-#: modules/demux/avi/avi.c:64
+#: modules/demux/avi/avi.c:65
 msgid "Always fix"
 msgstr "Korjaa"
 
-#: modules/demux/avi/avi.c:65
+#: modules/demux/avi/avi.c:66
 msgid "Never fix"
 msgstr "Älä korjaa"
 
-#: modules/demux/avi/avi.c:69
+#: modules/demux/avi/avi.c:70
 msgid "AVI demuxer"
 msgstr "AVI-kanavoinninpurkaja"
 
-#: modules/demux/avi/avi.c:674
+#: modules/demux/avi/avi.c:675
 #, fuzzy
 msgid "Broken or missing AVI Index"
 msgstr "Korjataan AVI-indeksiä..."
 
-#: modules/demux/avi/avi.c:675
+#: modules/demux/avi/avi.c:676
 msgid ""
 "Because this AVI file index is broken or missing, seeking will not work "
 "correctly.\n"
@@ -14059,22 +14115,22 @@ msgid ""
 "What do you want to do ?"
 msgstr ""
 
-#: modules/demux/avi/avi.c:681
+#: modules/demux/avi/avi.c:682
 #, fuzzy
 msgid "Build index then play"
 msgstr "1 kohde soittolistassa"
 
-#: modules/demux/avi/avi.c:681
+#: modules/demux/avi/avi.c:682
 #, fuzzy
 msgid "Play as is"
 msgstr "Toista ja pysäytä"
 
-#: modules/demux/avi/avi.c:681
+#: modules/demux/avi/avi.c:682
 #, fuzzy
 msgid "Do not play"
 msgstr "Raahaa toistettavat tiedostot"
 
-#: modules/demux/avi/avi.c:2388
+#: modules/demux/avi/avi.c:2406
 msgid "Fixing AVI Index..."
 msgstr "Korjataan AVI-indeksiä..."
 
@@ -15448,22 +15504,22 @@ msgstr "Teksti-TV: ohjelma-aikataulu"
 msgid "Teletext subtitles: hearing impaired"
 msgstr "Teksti-TV-tekstitys: kuulovammaisille"
 
-#: modules/demux/ts.c:3730
+#: modules/demux/ts.c:3717
 msgid "DVB subtitles: hearing impaired"
 msgstr "DVB-tekstitys: kuulovammaisille"
 
 # audio types
 #
 # TOCHECK
-#: modules/demux/ts.c:4023 modules/demux/ts.c:4065
+#: modules/demux/ts.c:4010 modules/demux/ts.c:4052
 msgid "clean effects"
 msgstr "vain tehosteet"
 
-#: modules/demux/ts.c:4027 modules/demux/ts.c:4069
+#: modules/demux/ts.c:4014 modules/demux/ts.c:4056
 msgid "hearing impaired"
 msgstr "kuulovammaisille"
 
-#: modules/demux/ts.c:4031 modules/demux/ts.c:4073
+#: modules/demux/ts.c:4018 modules/demux/ts.c:4060
 msgid "visual impaired commentary"
 msgstr "kommenttiraita näkövammaisille"
 
@@ -15599,8 +15655,8 @@ msgstr ""
 
 # NOTE: no word in Finnish for "opacity". Better to call it "transparency" and explain the value range.
 #: modules/gui/fbosd.c:134 modules/gui/macosx/simple_prefs.m:281
-#: modules/text_renderer/freetype.c:111 modules/text_renderer/win32text.c:66
-#: modules/video_filter/marq.c:115 modules/video_filter/rss.c:146
+#: modules/text_renderer/win32text.c:66 modules/video_filter/marq.c:115
+#: modules/video_filter/rss.c:146
 msgid "Opacity"
 msgstr "Läpinäkyvyys"
 
@@ -15693,97 +15749,97 @@ msgstr "Komennot"
 msgid "GNU/Linux osd/overlay framebuffer interface"
 msgstr "GNU/Linux osd/ylipiirto-framebuffer -käyttöliittymä"
 
-#: modules/gui/macosx/AudioEffects.m:68 modules/gui/qt4/ui/equalizer.h:134
+#: modules/gui/macosx/AudioEffects.m:67 modules/gui/qt4/ui/equalizer.h:134
 msgid "2 Pass"
 msgstr "Kaksi kierrosta"
 
-#: modules/gui/macosx/AudioEffects.m:69 modules/gui/qt4/ui/equalizer.h:136
+#: modules/gui/macosx/AudioEffects.m:68 modules/gui/qt4/ui/equalizer.h:136
 msgid "Preamp"
 msgstr "Esivahvistus"
 
-#: modules/gui/macosx/AudioEffects.m:78
+#: modules/gui/macosx/AudioEffects.m:77
 #: modules/gui/qt4/components/extended_panels.cpp:1198
 #, fuzzy
 msgid "Enable dynamic range compressor"
 msgstr "DTS-dynamiikkakompressori"
 
-#: modules/gui/macosx/AudioEffects.m:79 modules/gui/macosx/AudioEffects.m:90
+#: modules/gui/macosx/AudioEffects.m:78 modules/gui/macosx/AudioEffects.m:89
 #: modules/gui/macosx/TrackSynchronization.m:53
 msgid "Reset"
 msgstr "Nollaa"
 
-#: modules/gui/macosx/AudioEffects.m:80
+#: modules/gui/macosx/AudioEffects.m:79
 #: modules/gui/qt4/components/extended_panels.cpp:1181
 msgid "RMS/peak"
 msgstr ""
 
 # TOCHECK: what does this module do?
-#: modules/gui/macosx/AudioEffects.m:81
+#: modules/gui/macosx/AudioEffects.m:80
 #: modules/gui/qt4/components/extended_panels.cpp:1182
 #, fuzzy
 msgid "Attack"
 msgstr "Liite"
 
-#: modules/gui/macosx/AudioEffects.m:82
+#: modules/gui/macosx/AudioEffects.m:81
 #: modules/gui/qt4/components/extended_panels.cpp:1183
 #, fuzzy
 msgid "Release"
 msgstr "Release-funktio"
 
-#: modules/gui/macosx/AudioEffects.m:83
+#: modules/gui/macosx/AudioEffects.m:82
 #: modules/gui/qt4/components/extended_panels.cpp:1184
 msgid "Threshold"
 msgstr "Kynnysarvo"
 
-#: modules/gui/macosx/AudioEffects.m:84
+#: modules/gui/macosx/AudioEffects.m:83
 #: modules/gui/qt4/components/extended_panels.cpp:1185
 #, fuzzy
 msgid "Ratio"
 msgstr "Arvostelu"
 
-#: modules/gui/macosx/AudioEffects.m:85
+#: modules/gui/macosx/AudioEffects.m:84
 #, fuzzy
 msgid "Knee radius"
 msgstr "Kannan pikselisäde"
 
-#: modules/gui/macosx/AudioEffects.m:86
+#: modules/gui/macosx/AudioEffects.m:85
 #, fuzzy
 msgid "Makeup gain"
 msgstr "Raidan toistonvahvistus"
 
-#: modules/gui/macosx/AudioEffects.m:89
+#: modules/gui/macosx/AudioEffects.m:88
 #, fuzzy
 msgid "Enable Spatializer"
 msgstr "Käytä äänen tilaluontia"
 
 # NOTE: name of demux dump module
-#: modules/gui/macosx/AudioEffects.m:95
+#: modules/gui/macosx/AudioEffects.m:94
 msgid "Dump"
 msgstr "Vedostaja"
 
-#: modules/gui/macosx/AudioEffects.m:98
+#: modules/gui/macosx/AudioEffects.m:97
 msgid "Headphone virtualization"
 msgstr "Korvakuulokkeiden virtualisointi"
 
-#: modules/gui/macosx/AudioEffects.m:99
+#: modules/gui/macosx/AudioEffects.m:98
 msgid "Volume normalization"
 msgstr "Äänenvoimakkuuden normalisointi"
 
-#: modules/gui/macosx/AudioEffects.m:100
+#: modules/gui/macosx/AudioEffects.m:99
 msgid "Maximum level"
 msgstr "Enimmäistaso"
 
-#: modules/gui/macosx/AudioEffects.m:104
+#: modules/gui/macosx/AudioEffects.m:103
 #: modules/gui/qt4/dialogs/extended.cpp:66
 #, fuzzy
 msgid "Compressor"
 msgstr "Purku (Decompression)"
 
-#: modules/gui/macosx/AudioEffects.m:106
+#: modules/gui/macosx/AudioEffects.m:105
 msgid "Filter"
 msgstr "Suodin"
 
-#: modules/gui/macosx/AudioEffects.m:107
+#: modules/gui/macosx/AudioEffects.m:106
 #: modules/gui/qt4/dialogs/extended.cpp:72
 msgid "Audio Effects"
 msgstr "Äänitehosteet"
@@ -15829,7 +15885,7 @@ msgid "Advanced Open File..."
 msgstr "Avaa lisäasetuksilla..."
 
 #: modules/gui/macosx/MainMenu.m:240 modules/gui/macosx/MainMenu.m:313
-#: modules/gui/macosx/MainMenu.m:996 modules/gui/qt4/menus.cpp:618
+#: modules/gui/macosx/MainMenu.m:996 modules/gui/qt4/menus.cpp:620
 msgid "Open File..."
 msgstr "Avaa tiedosto..."
 
@@ -15875,7 +15931,7 @@ msgstr "Liitä"
 
 #: modules/gui/macosx/MainMenu.m:252 modules/gui/macosx/bookmarks.m:86
 #: modules/gui/macosx/simple_prefs.m:233
-#: modules/gui/qt4/components/preferences_widgets.cpp:1232
+#: modules/gui/qt4/components/preferences_widgets.cpp:1313
 #: modules/gui/qt4/dialogs/bookmarks.cpp:51
 #: modules/gui/qt4/dialogs/sout.cpp:70 modules/gui/qt4/ui/vlm.h:301
 msgid "Clear"
@@ -15896,7 +15952,7 @@ msgid "Playback Speed"
 msgstr "Toiston nopeus"
 
 #: modules/gui/macosx/MainMenu.m:263 modules/gui/macosx/simple_prefs.m:566
-#: modules/gui/qt4/components/simple_preferences.cpp:488
+#: modules/gui/qt4/components/simple_preferences.cpp:493
 #: modules/misc/gnutls.c:83 modules/text_renderer/freetype.c:141
 #: modules/text_renderer/freetype.c:160 modules/text_renderer/quartztext.c:114
 #: modules/text_renderer/win32text.c:82
@@ -15922,11 +15978,11 @@ msgstr "Siirry eteenpäin"
 msgid "Step Backward"
 msgstr "Siirry taaksepäin"
 
-#: modules/gui/macosx/MainMenu.m:283 modules/gui/qt4/menus.cpp:567
+#: modules/gui/macosx/MainMenu.m:283 modules/gui/qt4/menus.cpp:569
 msgid "Increase Volume"
 msgstr "Lisää äänenvoimakkuutta"
 
-#: modules/gui/macosx/MainMenu.m:284 modules/gui/qt4/menus.cpp:570
+#: modules/gui/macosx/MainMenu.m:284 modules/gui/qt4/menus.cpp:572
 msgid "Decrease Volume"
 msgstr "Vähennä äänenvoimakkuutta"
 
@@ -16027,8 +16083,8 @@ msgstr "Virheet ja huomautukset..."
 msgid "Bring All to Front"
 msgstr "Tuo kaikki eteen"
 
-#: modules/gui/macosx/MainMenu.m:343 modules/gui/qt4/dialogs/help.cpp:55
-#: modules/gui/qt4/menus.cpp:893
+#: modules/gui/macosx/MainMenu.m:343 modules/gui/qt4/dialogs/help.cpp:54
+#: modules/gui/qt4/menus.cpp:895
 msgid "Help"
 msgstr "Ohje"
 
@@ -16462,8 +16518,8 @@ msgstr "Aika"
 #: modules/gui/macosx/wizard.m:1656 modules/gui/macosx/wizard.m:1664
 #: modules/gui/macosx/wizard.m:1844 modules/gui/macosx/wizard.m:1855
 #: modules/gui/macosx/wizard.m:1868
-#: modules/gui/qt4/components/open_panels.cpp:1239
-#: modules/gui/qt4/components/preferences_widgets.cpp:1452
+#: modules/gui/qt4/components/open_panels.cpp:1244
+#: modules/gui/qt4/components/preferences_widgets.cpp:1533
 msgid "OK"
 msgstr "OK"
 
@@ -16550,7 +16606,7 @@ msgstr "Satunnaistoisto päälle"
 msgid "Repeat Off"
 msgstr "Toisto pois"
 
-#: modules/gui/macosx/fspanel.m:411
+#: modules/gui/macosx/fspanel.m:436
 msgid "(no item is being played)"
 msgstr "(ei toistettavaa kohdetta)"
 
@@ -16604,51 +16660,51 @@ msgid ""
 "information."
 msgstr "Vain oletussähköpostiosoitteesi lähetetään. Muuta tietoa ei."
 
-#: modules/gui/macosx/intf.m:1666
+#: modules/gui/macosx/intf.m:1671
 msgid "Error when sending the Crash Report"
 msgstr "Virhe tapahtui kaatumisraporttia lähettäessä"
 
-#: modules/gui/macosx/intf.m:1757
+#: modules/gui/macosx/intf.m:1762
 msgid "No CrashLog found"
 msgstr "Kaatumislokia ei löydy"
 
-#: modules/gui/macosx/intf.m:1757 modules/gui/macosx/prefs.m:227
+#: modules/gui/macosx/intf.m:1762 modules/gui/macosx/prefs.m:227
 #: modules/gui/macosx/simple_prefs.m:689
 msgid "Continue"
 msgstr "Jatka"
 
-#: modules/gui/macosx/intf.m:1757
+#: modules/gui/macosx/intf.m:1762
 msgid "Couldn't find any trace of a previous crash."
 msgstr "Edellisestä kaatumisesta ei löydy mitään jälkeä."
 
-#: modules/gui/macosx/intf.m:1784
+#: modules/gui/macosx/intf.m:1789
 msgid "Remove old preferences?"
 msgstr "Nollaa asetukset?"
 
-#: modules/gui/macosx/intf.m:1785
+#: modules/gui/macosx/intf.m:1790
 msgid "We just found an older version of VLC's preferences files."
 msgstr "Löytyi vanha versio VLC:n asetustiedostoista."
 
-#: modules/gui/macosx/intf.m:1786
+#: modules/gui/macosx/intf.m:1791
 msgid "Move To Trash and Relaunch VLC"
 msgstr "Siirrä roskakoriin ja käynnistä VLC uudelleen"
 
-#: modules/gui/macosx/intf.m:1894
+#: modules/gui/macosx/intf.m:1899
 #, c-format
 msgid "VLC Debug Log (%s).rtfd"
 msgstr "VLC Debug Log (%s).rtfd"
 
-#: modules/gui/macosx/intf.m:1955
+#: modules/gui/macosx/intf.m:1960
 msgid "Relaunch required"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:1956
+#: modules/gui/macosx/intf.m:1961
 msgid ""
 "To make sure that VLC no longer listens to your media key events, it needs "
 "to be restarted."
 msgstr ""
 
-#: modules/gui/macosx/intf.m:1957
+#: modules/gui/macosx/intf.m:1962
 msgid "Relaunch VLC"
 msgstr ""
 
@@ -16795,7 +16851,7 @@ msgstr "Valitse tiedosto"
 #: modules/gui/macosx/open.m:128 modules/gui/macosx/open.m:306
 #: modules/gui/macosx/output.m:145 modules/gui/macosx/prefs_widgets.m:1208
 #: modules/gui/macosx/simple_prefs.m:240 modules/gui/macosx/simple_prefs.m:295
-#: modules/gui/qt4/components/preferences_widgets.cpp:268
+#: modules/gui/qt4/components/preferences_widgets.cpp:271
 #: modules/gui/qt4/components/simple_preferences.cpp:282
 #: modules/gui/qt4/components/sout/sout_widgets.cpp:102
 #: modules/gui/qt4/ui/open.h:243 modules/gui/qt4/ui/open_disk.h:300
@@ -16851,6 +16907,8 @@ msgstr "Käytä DVD-valikkoja"
 #: modules/gui/qt4/components/sout/sout_widgets.cpp:310
 #: modules/gui/qt4/components/sout/sout_widgets.cpp:404 modules/lua/vlc.c:72
 #: modules/stream_out/rtp.c:114
+#: share/lua/http/dialogs/stream_config_window.html:32
+#: share/lua/http/dialogs/stream_window.html:91
 msgid "Port"
 msgstr "Portti"
 
@@ -16889,6 +16947,8 @@ msgid "Open RTP/UDP Stream"
 msgstr "Avaa RTP/UDP -mediavirta"
 
 #: modules/gui/macosx/open.m:176
+#: share/lua/http/dialogs/stream_config_window.html:24
+#: share/lua/http/dialogs/stream_window.html:83
 msgid "Protocol"
 msgstr "Protokolla"
 
@@ -17126,7 +17186,7 @@ msgid "SDP URL"
 msgstr "SDP:n osoite"
 
 #: modules/gui/macosx/output.m:519
-#: modules/gui/qt4/components/preferences_widgets.cpp:315
+#: modules/gui/qt4/components/preferences_widgets.cpp:318
 msgid "Save File"
 msgstr "Tallenna tiedosto"
 
@@ -17264,7 +17324,7 @@ msgid "Lost frames"
 msgstr "Hukkaruutuja"
 
 #: modules/gui/macosx/playlistinfo.m:111 modules/gui/macosx/wizard.m:365
-#: modules/gui/qt4/dialogs_provider.cpp:642
+#: modules/gui/qt4/dialogs_provider.cpp:647
 msgid "Streaming"
 msgstr "Suoratoisto"
 
@@ -17339,7 +17399,7 @@ msgid "Not Set"
 msgstr "Ei asetettu"
 
 #: modules/gui/macosx/simple_prefs.m:169
-#: modules/gui/qt4/components/simple_preferences.cpp:512
+#: modules/gui/qt4/components/simple_preferences.cpp:517
 msgid "Interface Settings"
 msgstr "Käyttöliittymän asetukset"
 
@@ -17356,7 +17416,7 @@ msgid "Subtitles & OSD"
 msgstr "Tekstitys ja OSD"
 
 #: modules/gui/macosx/simple_prefs.m:181
-#: modules/gui/qt4/components/simple_preferences.cpp:628
+#: modules/gui/qt4/components/simple_preferences.cpp:633
 msgid "Subtitles & On Screen Display Settings"
 msgstr "Tekstitys- ja OSD-asetukset"
 
@@ -17405,7 +17465,7 @@ msgid "Select an action to change the associated hotkey:"
 msgstr "Valitse toiminto, jonka pikanäppäintä haluat muuttaa"
 
 #: modules/gui/macosx/simple_prefs.m:235
-#: modules/gui/qt4/components/preferences_widgets.cpp:1223
+#: modules/gui/qt4/components/preferences_widgets.cpp:1304
 msgid "Action"
 msgstr "Toiminto"
 
@@ -17577,27 +17637,27 @@ msgstr "Ei ole vielä tarkistettu."
 
 #: modules/gui/macosx/simple_prefs.m:566 modules/gui/macosx/simple_prefs.m:597
 #: modules/gui/macosx/simple_prefs.m:1105
-#: modules/gui/qt4/components/simple_preferences.cpp:485
+#: modules/gui/qt4/components/simple_preferences.cpp:490
 msgid "Custom"
 msgstr "Mukauta"
 
 #: modules/gui/macosx/simple_prefs.m:566
-#: modules/gui/qt4/components/simple_preferences.cpp:486
+#: modules/gui/qt4/components/simple_preferences.cpp:491
 msgid "Lowest latency"
 msgstr "Alhaisin latenssi"
 
 #: modules/gui/macosx/simple_prefs.m:566
-#: modules/gui/qt4/components/simple_preferences.cpp:487
+#: modules/gui/qt4/components/simple_preferences.cpp:492
 msgid "Low latency"
 msgstr "Alhainen latenssi"
 
 #: modules/gui/macosx/simple_prefs.m:567
-#: modules/gui/qt4/components/simple_preferences.cpp:489
+#: modules/gui/qt4/components/simple_preferences.cpp:494
 msgid "High latency"
 msgstr "Korkea latenssi"
 
 #: modules/gui/macosx/simple_prefs.m:567
-#: modules/gui/qt4/components/simple_preferences.cpp:490
+#: modules/gui/qt4/components/simple_preferences.cpp:495
 msgid "Higher latency"
 msgstr "Korkein latenssi"
 
@@ -19076,15 +19136,15 @@ msgstr ""
 msgid "Revert to normal play speed"
 msgstr "Palaa normaaliin soittonopeuteen"
 
-#: modules/gui/qt4/components/interface_widgets.cpp:481
+#: modules/gui/qt4/components/interface_widgets.cpp:480
 msgid "Download cover art"
 msgstr "Lataa albumin kansikuva"
 
-#: modules/gui/qt4/components/interface_widgets.cpp:524
+#: modules/gui/qt4/components/interface_widgets.cpp:523
 msgid "Click to toggle between elapsed and remaining time"
 msgstr "Napsauta vaihtaaksesi kuluneen ja jäljellä olevan ajan näytön välillä"
 
-#: modules/gui/qt4/components/interface_widgets.cpp:526
+#: modules/gui/qt4/components/interface_widgets.cpp:525
 msgid "Double click to jump to a chosen time position"
 msgstr "Kaksoisnapsauta hypätäksesi tiettyyn aikakohtaan"
 
@@ -19115,94 +19175,89 @@ msgstr "Suodin"
 msgid "Eject the disc"
 msgstr "Poista levy asemasta"
 
-#: modules/gui/qt4/components/open_panels.cpp:756
+#: modules/gui/qt4/components/open_panels.cpp:761
 #, fuzzy
 msgid "Video standard"
 msgstr "Videonhallinta"
 
-#: modules/gui/qt4/components/open_panels.cpp:782
+#: modules/gui/qt4/components/open_panels.cpp:787
 msgid "Channels:"
 msgstr "Kanavat"
 
-#: modules/gui/qt4/components/open_panels.cpp:793
+#: modules/gui/qt4/components/open_panels.cpp:798
 msgid "Selected ports:"
 msgstr "Valitut portit"
 
-#: modules/gui/qt4/components/open_panels.cpp:796
+#: modules/gui/qt4/components/open_panels.cpp:801
 msgid ".*"
 msgstr ".*"
 
-#: modules/gui/qt4/components/open_panels.cpp:803
+#: modules/gui/qt4/components/open_panels.cpp:808
 msgid "Use VLC pace"
 msgstr "Käytä VLC:n tahtia"
 
-#: modules/gui/qt4/components/open_panels.cpp:807
+#: modules/gui/qt4/components/open_panels.cpp:812
 msgid "Auto connection"
 msgstr "Automaattiyhteys"
 
-#: modules/gui/qt4/components/open_panels.cpp:824
+#: modules/gui/qt4/components/open_panels.cpp:829
 msgid "Device name"
 msgstr "Laitenimi"
 
-#: modules/gui/qt4/components/open_panels.cpp:830
+#: modules/gui/qt4/components/open_panels.cpp:835
 msgid "Radio device name"
 msgstr "Radiolaitteen nimi"
 
-#: modules/gui/qt4/components/open_panels.cpp:877
+#: modules/gui/qt4/components/open_panels.cpp:882
 msgid "TV (digital)"
 msgstr ""
 
-#: modules/gui/qt4/components/open_panels.cpp:880
+#: modules/gui/qt4/components/open_panels.cpp:885
 #, fuzzy
 msgid "Tuner card"
 msgstr "Virittimen tunniste"
 
-#: modules/gui/qt4/components/open_panels.cpp:881
+#: modules/gui/qt4/components/open_panels.cpp:886
 msgid "Delivery system"
 msgstr ""
 
-#: modules/gui/qt4/components/open_panels.cpp:911
+#: modules/gui/qt4/components/open_panels.cpp:916
 msgid "Transponder/multiplex frequency"
 msgstr "Lähettimen/kanavanipun taajuus"
 
-#: modules/gui/qt4/components/open_panels.cpp:921
+#: modules/gui/qt4/components/open_panels.cpp:926
 msgid "Transponder symbol rate"
 msgstr "Keskimääräinen lähettimen symbolinopeus"
 
-#: modules/gui/qt4/components/open_panels.cpp:954
+#: modules/gui/qt4/components/open_panels.cpp:959
 msgid "Bandwidth"
 msgstr "Kaistanleveys"
 
-#: modules/gui/qt4/components/open_panels.cpp:995
+#: modules/gui/qt4/components/open_panels.cpp:1000
 msgid "Your display will be opened and played in order to stream or save it."
 msgstr "Näyttösi sisältö luetaan ja voit ohjata sen muualle tai tallentaa sen."
 
 #. xgettext: frames per second
-#: modules/gui/qt4/components/open_panels.cpp:1009
+#: modules/gui/qt4/components/open_panels.cpp:1014
 msgid " f/s"
 msgstr " fps"
 
-#: modules/gui/qt4/components/open_panels.cpp:1212
+#: modules/gui/qt4/components/open_panels.cpp:1217
 msgid "Advanced Options"
 msgstr "Lisäasetukset"
 
-#: modules/gui/qt4/components/playlist/playlist.cpp:78
+#: modules/gui/qt4/components/playlist/playlist.cpp:76
 msgid "Double click to get media information"
 msgstr "Kaksoisnapsautus antaa mediatiedot"
 
-#: modules/gui/qt4/components/playlist/playlist.cpp:120
+#: modules/gui/qt4/components/playlist/playlist.cpp:118
 msgid "Change playlistview"
 msgstr "Vaihda soittolistan näkymää"
 
-#: modules/gui/qt4/components/playlist/playlist.cpp:152
+#: modules/gui/qt4/components/playlist/playlist.cpp:150
 #, fuzzy
 msgid "Search the playlist"
 msgstr "Hae soittolistasta"
-
-#: modules/gui/qt4/components/playlist/playlist.cpp:167
-#, fuzzy
-msgid "Zoom playlist"
-msgstr "Näytä soittolista"
 
 #: modules/gui/qt4/components/playlist/playlist_model.cpp:53
 msgid "Create Directory"
@@ -19220,21 +19275,36 @@ msgstr "Uuden hakemiston nimi"
 msgid "Enter name for new folder:"
 msgstr "Uuden kansion nimi"
 
-#: modules/gui/qt4/components/playlist/playlist_model.cpp:950
+#: modules/gui/qt4/components/playlist/playlist_model.cpp:956
 msgid "Add to playlist"
 msgstr "Lisää soittolistaan"
 
-#: modules/gui/qt4/components/playlist/playlist_model.cpp:956
+#: modules/gui/qt4/components/playlist/playlist_model.cpp:965
 msgid "Sort by"
 msgstr "Järjestä"
 
-#: modules/gui/qt4/components/playlist/playlist_model.cpp:962
+#: modules/gui/qt4/components/playlist/playlist_model.cpp:972
 msgid "Ascending"
 msgstr "Nouseva"
 
-#: modules/gui/qt4/components/playlist/playlist_model.cpp:963
+#: modules/gui/qt4/components/playlist/playlist_model.cpp:973
 msgid "Descending"
 msgstr "Laskeva"
+
+#: modules/gui/qt4/components/playlist/playlist_model.cpp:984
+#, fuzzy
+msgid "Display size"
+msgstr "Näyttölaite"
+
+#: modules/gui/qt4/components/playlist/playlist_model.cpp:985
+#, fuzzy
+msgid "Increase"
+msgstr "Lisää äänenvoimakkuutta"
+
+#: modules/gui/qt4/components/playlist/playlist_model.cpp:986
+#, fuzzy
+msgid "Decrease"
+msgstr "Vähennä äänenvoimakkuutta"
 
 #: modules/gui/qt4/components/playlist/selector.cpp:201
 msgid "My Computer"
@@ -19296,46 +19366,46 @@ msgstr "Luettelonäkymä"
 msgid "PictureFlow View "
 msgstr ""
 
-#: modules/gui/qt4/components/preferences_widgets.cpp:318
+#: modules/gui/qt4/components/preferences_widgets.cpp:321
 msgid "Select File"
 msgstr "Valitse tiedosto"
 
-#: modules/gui/qt4/components/preferences_widgets.cpp:1216
+#: modules/gui/qt4/components/preferences_widgets.cpp:1297
 msgid "Select an action to change the associated hotkey"
 msgstr "Valitse toiminto, jonka pikanäppäintä haluat muuttaa"
 
-#: modules/gui/qt4/components/preferences_widgets.cpp:1224
+#: modules/gui/qt4/components/preferences_widgets.cpp:1305
 msgid "Hotkey"
 msgstr "Pikanäppäin"
 
-#: modules/gui/qt4/components/preferences_widgets.cpp:1225
-#: modules/gui/qt4/components/preferences_widgets.cpp:1439
+#: modules/gui/qt4/components/preferences_widgets.cpp:1306
+#: modules/gui/qt4/components/preferences_widgets.cpp:1520
 msgid "Global"
 msgstr "Globaali"
 
-#: modules/gui/qt4/components/preferences_widgets.cpp:1233
+#: modules/gui/qt4/components/preferences_widgets.cpp:1314
 msgid "Apply"
 msgstr "Käytä"
 
-#: modules/gui/qt4/components/preferences_widgets.cpp:1389
+#: modules/gui/qt4/components/preferences_widgets.cpp:1470
 #: modules/gui/qt4/util/customwidgets.cpp:293
 msgid "Unset"
 msgstr "Ei asetettu"
 
-#: modules/gui/qt4/components/preferences_widgets.cpp:1440
+#: modules/gui/qt4/components/preferences_widgets.cpp:1521
 msgid "Hotkey for "
 msgstr "Pikanäppäin toiminnolle "
 
-#: modules/gui/qt4/components/preferences_widgets.cpp:1444
+#: modules/gui/qt4/components/preferences_widgets.cpp:1525
 msgid "Press the new keys for "
 msgstr "Paina uusia näppäimiä toiminnolle "
 
-#: modules/gui/qt4/components/preferences_widgets.cpp:1475
+#: modules/gui/qt4/components/preferences_widgets.cpp:1556
 msgid "Warning: the key is already assigned to \""
 msgstr "Varoitus: näppäin on jo liitetty toimintoon \""
 
-#: modules/gui/qt4/components/preferences_widgets.cpp:1495
-#: modules/gui/qt4/components/preferences_widgets.cpp:1503
+#: modules/gui/qt4/components/preferences_widgets.cpp:1576
+#: modules/gui/qt4/components/preferences_widgets.cpp:1584
 msgid "Key: "
 msgstr "Näppäin: "
 
@@ -19359,11 +19429,11 @@ msgstr "Ääniasetukset"
 msgid "Device:"
 msgstr "Laite"
 
-#: modules/gui/qt4/components/simple_preferences.cpp:412
+#: modules/gui/qt4/components/simple_preferences.cpp:417
 msgid "Input & Codecs Settings"
 msgstr "Lähde- ja koodekkiasetukset"
 
-#: modules/gui/qt4/components/simple_preferences.cpp:417
+#: modules/gui/qt4/components/simple_preferences.cpp:422
 msgid ""
 "If this property is blank, different values\n"
 "for DVD, VCD, and CDDA are set.\n"
@@ -19376,43 +19446,43 @@ msgstr ""
 "yksitellen lisäasetustilassa."
 
 # NOTE: this and the "VLC skins website" make a pair.
-#: modules/gui/qt4/components/simple_preferences.cpp:515
+#: modules/gui/qt4/components/simple_preferences.cpp:520
 msgid "This is VLC's skinnable interface. You can download other skins at"
 msgstr "Tämä on VLC:n teemattava käyttöliittymä. Voit ladata ulkoasuja"
 
-#: modules/gui/qt4/components/simple_preferences.cpp:517
+#: modules/gui/qt4/components/simple_preferences.cpp:522
 msgid "VLC skins website"
 msgstr "VLC:n ulkoasusivustolta"
 
-#: modules/gui/qt4/components/simple_preferences.cpp:547
+#: modules/gui/qt4/components/simple_preferences.cpp:552
 msgid "System's default"
 msgstr "Järjestelmän oletus"
 
-#: modules/gui/qt4/components/simple_preferences.cpp:657
+#: modules/gui/qt4/components/simple_preferences.cpp:672
 msgid "Configure Hotkeys"
 msgstr "Määritä pikanäppäimet"
 
-#: modules/gui/qt4/components/simple_preferences.cpp:911
+#: modules/gui/qt4/components/simple_preferences.cpp:948
 #: modules/gui/qt4/dialogs_provider.hpp:51
 msgid "Audio Files"
 msgstr "Äänitiedostot"
 
-#: modules/gui/qt4/components/simple_preferences.cpp:912
+#: modules/gui/qt4/components/simple_preferences.cpp:949
 #: modules/gui/qt4/dialogs_provider.hpp:46
 msgid "Video Files"
 msgstr "Videotiedostot"
 
-#: modules/gui/qt4/components/simple_preferences.cpp:913
+#: modules/gui/qt4/components/simple_preferences.cpp:950
 #: modules/gui/qt4/dialogs_provider.hpp:56
 msgid "Playlist Files"
 msgstr "Soittolistat"
 
 # TOCHECK: unique access key?
-#: modules/gui/qt4/components/simple_preferences.cpp:965
+#: modules/gui/qt4/components/simple_preferences.cpp:1002
 msgid "&Apply"
 msgstr "K&äytä"
 
-#: modules/gui/qt4/components/simple_preferences.cpp:966
+#: modules/gui/qt4/components/simple_preferences.cpp:1003
 #: modules/gui/qt4/dialogs/convert.cpp:96
 #: modules/gui/qt4/dialogs/gototime.cpp:49
 #: modules/gui/qt4/dialogs/open.cpp:109 modules/gui/qt4/dialogs/openurl.cpp:60
@@ -19563,8 +19633,8 @@ msgstr "Poista kaikki kirjanmerkit"
 
 #: modules/gui/qt4/dialogs/bookmarks.cpp:60
 #: modules/gui/qt4/dialogs/errors.cpp:49
-#: modules/gui/qt4/dialogs/extended.cpp:98 modules/gui/qt4/dialogs/help.cpp:67
-#: modules/gui/qt4/dialogs/help.cpp:88 modules/gui/qt4/dialogs/help.cpp:156
+#: modules/gui/qt4/dialogs/extended.cpp:98 modules/gui/qt4/dialogs/help.cpp:66
+#: modules/gui/qt4/dialogs/help.cpp:87 modules/gui/qt4/dialogs/help.cpp:155
 #: modules/gui/qt4/dialogs/mediainfo.cpp:76
 #: modules/gui/qt4/dialogs/messages.cpp:79
 #: modules/gui/qt4/dialogs/plugins.cpp:74
@@ -19684,12 +19754,12 @@ msgstr "&Siirry"
 msgid "Go to time"
 msgstr "Siirry ajankohtaan"
 
-#: modules/gui/qt4/dialogs/help.cpp:90 modules/gui/qt4/dialogs/plugins.cpp:493
+#: modules/gui/qt4/dialogs/help.cpp:89 modules/gui/qt4/dialogs/plugins.cpp:493
 #: modules/gui/qt4/ui/about.h:183
 msgid "About"
 msgstr "Tietoja"
 
-#: modules/gui/qt4/dialogs/help.cpp:109
+#: modules/gui/qt4/dialogs/help.cpp:108
 msgid ""
 "VLC media player is a free media player, encoder and streamer that can read "
 "from files, CDs, DVDs, network streams, capture cards and even more!\n"
@@ -19704,7 +19774,7 @@ msgstr ""
 "suosituilla käyttöjärjestelmillä.\n"
 "\n"
 
-#: modules/gui/qt4/dialogs/help.cpp:114
+#: modules/gui/qt4/dialogs/help.cpp:113
 msgid ""
 "This version of VLC was compiled by:\n"
 " "
@@ -19712,11 +19782,11 @@ msgstr ""
 "Tämän VLC:n version on kääntänyt:\n"
 " "
 
-#: modules/gui/qt4/dialogs/help.cpp:117
+#: modules/gui/qt4/dialogs/help.cpp:116
 msgid "Compiler: "
 msgstr "Kääntäjä: "
 
-#: modules/gui/qt4/dialogs/help.cpp:118
+#: modules/gui/qt4/dialogs/help.cpp:117
 msgid ""
 "You are using the Qt4 Interface.\n"
 "\n"
@@ -19724,40 +19794,40 @@ msgstr ""
 "Käytät Qt4-käyttöliittymää.\n"
 "\n"
 
-#: modules/gui/qt4/dialogs/help.cpp:119
+#: modules/gui/qt4/dialogs/help.cpp:118
 msgid "Copyright (C) "
 msgstr "Tekijänoikeus (C) "
 
-#: modules/gui/qt4/dialogs/help.cpp:120
+#: modules/gui/qt4/dialogs/help.cpp:119
 msgid " by the VideoLAN Team.\n"
 msgstr " VideoLAN Team.\n"
 
-#: modules/gui/qt4/dialogs/help.cpp:158
+#: modules/gui/qt4/dialogs/help.cpp:157
 msgid "&Recheck version"
 msgstr "Ta&rkista uudelleen"
 
-#: modules/gui/qt4/dialogs/help.cpp:161
+#: modules/gui/qt4/dialogs/help.cpp:160
 msgid "&Yes"
 msgstr "&Kyllä"
 
-#: modules/gui/qt4/dialogs/help.cpp:163
+#: modules/gui/qt4/dialogs/help.cpp:162
 msgid "&No"
 msgstr "&Ei"
 
-#: modules/gui/qt4/dialogs/help.cpp:166
+#: modules/gui/qt4/dialogs/help.cpp:165
 msgid "VLC media player updates"
 msgstr "VLC-mediasoittimen päivitykset"
 
-#: modules/gui/qt4/dialogs/help.cpp:241
+#: modules/gui/qt4/dialogs/help.cpp:237
 #, fuzzy
 msgid "A new version of VLC (%1.%2.%3%4) is available."
 msgstr "Käytössäsi on uusin VLC-versio."
 
-#: modules/gui/qt4/dialogs/help.cpp:257
+#: modules/gui/qt4/dialogs/help.cpp:253
 msgid "You have the latest version of VLC media player."
 msgstr "Sinulla on uusin versio VLC-mediasoittimesta."
 
-#: modules/gui/qt4/dialogs/help.cpp:264
+#: modules/gui/qt4/dialogs/help.cpp:260
 msgid "An error occurred while checking for updates..."
 msgstr "Päivitysten etsintä törmäsi virheeseen..."
 
@@ -20180,34 +20250,34 @@ msgstr "Avaa hakemisto"
 msgid "Open Folder"
 msgstr "Avaa kansio"
 
-#: modules/gui/qt4/dialogs_provider.cpp:543
+#: modules/gui/qt4/dialogs_provider.cpp:548
 msgid "Open playlist..."
 msgstr "Avaa soittolista..."
 
-#: modules/gui/qt4/dialogs_provider.cpp:559
+#: modules/gui/qt4/dialogs_provider.cpp:564
 msgid "XSPF playlist"
 msgstr "XSPF-soittolista"
 
-#: modules/gui/qt4/dialogs_provider.cpp:560
+#: modules/gui/qt4/dialogs_provider.cpp:565
 #, fuzzy
 msgid "M3U playlist"
 msgstr "soittolista"
 
-#: modules/gui/qt4/dialogs_provider.cpp:561
+#: modules/gui/qt4/dialogs_provider.cpp:566
 #, fuzzy
 msgid "M3U8 playlist"
 msgstr "M3U8-soittolistavienti"
 
-#: modules/gui/qt4/dialogs_provider.cpp:562
+#: modules/gui/qt4/dialogs_provider.cpp:567
 #, fuzzy
 msgid "HTML playlist"
 msgstr "HTML-soittolista"
 
-#: modules/gui/qt4/dialogs_provider.cpp:579
+#: modules/gui/qt4/dialogs_provider.cpp:584
 msgid "Save playlist as..."
 msgstr "Tallenna soittolista nimellä..."
 
-#: modules/gui/qt4/dialogs_provider.cpp:699
+#: modules/gui/qt4/dialogs_provider.cpp:704
 msgid "Open subtitles..."
 msgstr "Avaa tekstitykset..."
 
@@ -20223,361 +20293,357 @@ msgstr "Tekstitystiedostot"
 msgid "All Files"
 msgstr "Kaikki tiedostot"
 
-#: modules/gui/qt4/main_interface.cpp:1078
+#: modules/gui/qt4/main_interface.cpp:1095
 msgid "Control menu for the player"
 msgstr "Soittimen säädinvalikko"
 
-#: modules/gui/qt4/main_interface.cpp:1121
+#: modules/gui/qt4/main_interface.cpp:1138
 msgid "Paused"
 msgstr "Tauko"
 
-#: modules/gui/qt4/menus.cpp:312
+#: modules/gui/qt4/menus.cpp:314
 msgid "&Media"
 msgstr "&Media"
 
-#: modules/gui/qt4/menus.cpp:315
+#: modules/gui/qt4/menus.cpp:317
 msgid "P&layback"
 msgstr "T&oisto"
 
-#: modules/gui/qt4/menus.cpp:316 modules/gui/qt4/menus.cpp:1003
+#: modules/gui/qt4/menus.cpp:318 modules/gui/qt4/menus.cpp:1005
 msgid "&Audio"
 msgstr "&Ääni"
 
-#: modules/gui/qt4/menus.cpp:317 modules/gui/qt4/menus.cpp:1010
+#: modules/gui/qt4/menus.cpp:319 modules/gui/qt4/menus.cpp:1012
 msgid "&Video"
 msgstr "&Video"
 
-#: modules/gui/qt4/menus.cpp:319
+#: modules/gui/qt4/menus.cpp:321
 msgid "&Tools"
 msgstr "&Työkalut"
 
-#: modules/gui/qt4/menus.cpp:322 modules/gui/qt4/menus.cpp:1059
+#: modules/gui/qt4/menus.cpp:324 modules/gui/qt4/menus.cpp:1061
 msgid "V&iew"
 msgstr "&Näkymä"
 
-#: modules/gui/qt4/menus.cpp:324
+#: modules/gui/qt4/menus.cpp:326
 msgid "&Help"
 msgstr "O&hje"
 
-#: modules/gui/qt4/menus.cpp:337
+#: modules/gui/qt4/menus.cpp:339
 msgid "Open &File..."
 msgstr "Avaa &tiedosto"
 
-#: modules/gui/qt4/menus.cpp:341 modules/gui/qt4/menus.cpp:882
+#: modules/gui/qt4/menus.cpp:343 modules/gui/qt4/menus.cpp:884
 msgid "Open &Disc..."
 msgstr "Avaa &levy..."
 
-#: modules/gui/qt4/menus.cpp:343
+#: modules/gui/qt4/menus.cpp:345
 msgid "Open &Network Stream..."
 msgstr "Avaa suoratoisto &verkosta..."
 
-#: modules/gui/qt4/menus.cpp:345 modules/gui/qt4/menus.cpp:886
+#: modules/gui/qt4/menus.cpp:347 modules/gui/qt4/menus.cpp:888
 msgid "Open &Capture Device..."
 msgstr "Avaa &kaappauslaite..."
 
-#: modules/gui/qt4/menus.cpp:350
+#: modules/gui/qt4/menus.cpp:352
 #, fuzzy
 msgid "&Open (advanced)..."
 msgstr "Avaa &tiedosto..."
 
-#: modules/gui/qt4/menus.cpp:354
+#: modules/gui/qt4/menus.cpp:356
 msgid "Open &Location from clipboard"
 msgstr "Avaa sijainti leikep&öydältä"
 
-#: modules/gui/qt4/menus.cpp:359
+#: modules/gui/qt4/menus.cpp:361
 #, fuzzy
 msgid "Open &Recent Media"
 msgstr "V&iimeisimmät mediat"
 
-#: modules/gui/qt4/menus.cpp:370
+#: modules/gui/qt4/menus.cpp:372
 msgid "Conve&rt / Save..."
 msgstr "&Muunna / Tallenna..."
 
-#: modules/gui/qt4/menus.cpp:372
+#: modules/gui/qt4/menus.cpp:374
 #, fuzzy
 msgid "&Stream..."
 msgstr "Lähetä verkkoon..."
 
-#: modules/gui/qt4/menus.cpp:377
+#: modules/gui/qt4/menus.cpp:379
 #, fuzzy
 msgid "Quit at the end of playlist"
 msgstr "1 kohde soittolistassa"
 
-#: modules/gui/qt4/menus.cpp:384
+#: modules/gui/qt4/menus.cpp:386
 msgid "Close to systray"
 msgstr ""
 
-#: modules/gui/qt4/menus.cpp:388 modules/gui/qt4/menus.cpp:1115
+#: modules/gui/qt4/menus.cpp:390 modules/gui/qt4/menus.cpp:1125
 msgid "&Quit"
 msgstr "Lo&peta"
 
-#: modules/gui/qt4/menus.cpp:398
+#: modules/gui/qt4/menus.cpp:400
 msgid "&Effects and Filters"
 msgstr "T&ehosteet ja suotimet"
 
-#: modules/gui/qt4/menus.cpp:401
+#: modules/gui/qt4/menus.cpp:403
 msgid "&Track Synchronization"
 msgstr "Synkronoin&ti"
 
-#: modules/gui/qt4/menus.cpp:414
+#: modules/gui/qt4/menus.cpp:416
 msgid "Program Guide"
 msgstr "Ohjelmaopas"
 
-#: modules/gui/qt4/menus.cpp:420
+#: modules/gui/qt4/menus.cpp:422
 msgid "Plu&gins and extensions"
 msgstr "&Liitännäiset ja laajennukset"
 
-#: modules/gui/qt4/menus.cpp:424
+#: modules/gui/qt4/menus.cpp:426
 msgid "Customi&ze Interface..."
 msgstr "Mukauta k&äyttöliittymää..."
 
-#: modules/gui/qt4/menus.cpp:427
+#: modules/gui/qt4/menus.cpp:429
 msgid "&Preferences"
 msgstr "&Asetukset"
 
-#: modules/gui/qt4/menus.cpp:448
+#: modules/gui/qt4/menus.cpp:450
 msgid "&View"
 msgstr "&Näytä"
 
 # TOCHECK: unique access key?
-#: modules/gui/qt4/menus.cpp:469
+#: modules/gui/qt4/menus.cpp:471
 msgid "Play&list"
 msgstr "Soitto&lista"
 
-#: modules/gui/qt4/menus.cpp:470
+#: modules/gui/qt4/menus.cpp:472
 msgid "Ctrl+L"
 msgstr "Ctlr+L"
 
-#: modules/gui/qt4/menus.cpp:475
+#: modules/gui/qt4/menus.cpp:477
 #, fuzzy
 msgid "Mi&nimal Interface"
 msgstr "Teemattava käyttöliittymä"
 
-#: modules/gui/qt4/menus.cpp:476
+#: modules/gui/qt4/menus.cpp:478
 msgid "Ctrl+H"
 msgstr "Ctrl+H"
 
-#: modules/gui/qt4/menus.cpp:484
+#: modules/gui/qt4/menus.cpp:486
 msgid "&Fullscreen Interface"
 msgstr "&Kokoruututila"
 
-#: modules/gui/qt4/menus.cpp:492
+#: modules/gui/qt4/menus.cpp:494
 msgid "&Advanced Controls"
 msgstr "Lisä&säätimet"
 
-#: modules/gui/qt4/menus.cpp:499
+#: modules/gui/qt4/menus.cpp:501
 msgid "Docked Playlist"
 msgstr "&Telakoitu soittolista"
 
 # TOCHECK: "Tilanne" or "Tila"?
-#: modules/gui/qt4/menus.cpp:504
+#: modules/gui/qt4/menus.cpp:506
 #, fuzzy
 msgid "Status Bar"
 msgstr "Tilanne"
 
-#: modules/gui/qt4/menus.cpp:509
+#: modules/gui/qt4/menus.cpp:511
 msgid "Visualizations selector"
 msgstr "Visualisoinnin valinta"
 
-#: modules/gui/qt4/menus.cpp:590
+#: modules/gui/qt4/menus.cpp:592
 msgid "Audio &Track"
 msgstr "Ääni&raita"
 
-#: modules/gui/qt4/menus.cpp:591
+#: modules/gui/qt4/menus.cpp:593
 msgid "Audio &Channels"
 msgstr "Ääni&kanavat"
 
-#: modules/gui/qt4/menus.cpp:592
+#: modules/gui/qt4/menus.cpp:594
 msgid "Audio &Device"
 msgstr "Ääni&laite"
 
-#: modules/gui/qt4/menus.cpp:595
+#: modules/gui/qt4/menus.cpp:597
 msgid "&Visualizations"
 msgstr "&Visualisointi"
 
-#: modules/gui/qt4/menus.cpp:615
+#: modules/gui/qt4/menus.cpp:617
 msgid "&Subtitles Track"
 msgstr "&Tekstitysraita"
 
-#: modules/gui/qt4/menus.cpp:637
+#: modules/gui/qt4/menus.cpp:639
 msgid "Video &Track"
 msgstr "Video&raita"
 
-#: modules/gui/qt4/menus.cpp:643
+#: modules/gui/qt4/menus.cpp:645
 msgid "&Fullscreen"
 msgstr "&Koko näyttö"
 
-#: modules/gui/qt4/menus.cpp:644
+#: modules/gui/qt4/menus.cpp:646
 #, fuzzy
 msgid "Always Fit &Window"
 msgstr "Aina &päällimmäisenä"
 
-#: modules/gui/qt4/menus.cpp:645
+#: modules/gui/qt4/menus.cpp:647
 #, fuzzy
 msgid "Always &on Top"
 msgstr "Aina &päällimmäisenä"
 
-#: modules/gui/qt4/menus.cpp:647
+#: modules/gui/qt4/menus.cpp:649
 #, fuzzy
 msgid "Display on &Desktop"
 msgstr "Näytön tarkkuus"
 
-#: modules/gui/qt4/menus.cpp:651
+#: modules/gui/qt4/menus.cpp:653
 #, fuzzy
 msgid "Set as Wall&paper"
 msgstr "Direct&X-taustakuva"
 
-#: modules/gui/qt4/menus.cpp:655
+#: modules/gui/qt4/menus.cpp:657
 msgid "&Zoom"
 msgstr "&Suurenna"
 
-#: modules/gui/qt4/menus.cpp:656
+#: modules/gui/qt4/menus.cpp:658
 msgid "&Aspect Ratio"
 msgstr "K&uvasuhde"
 
-#: modules/gui/qt4/menus.cpp:657
+#: modules/gui/qt4/menus.cpp:659
 msgid "&Crop"
 msgstr "Ra&jaa"
 
-#: modules/gui/qt4/menus.cpp:661
+#: modules/gui/qt4/menus.cpp:663
 msgid "&Deinterlace"
 msgstr "Lom&ituksenpoisto"
 
-#: modules/gui/qt4/menus.cpp:662
+#: modules/gui/qt4/menus.cpp:664
 msgid "&Deinterlace mode"
 msgstr "Lo&mituksenpoistotila"
 
-#: modules/gui/qt4/menus.cpp:663
+#: modules/gui/qt4/menus.cpp:665
 msgid "&Post processing"
 msgstr "J&älkikäsittely"
 
-#: modules/gui/qt4/menus.cpp:667
+#: modules/gui/qt4/menus.cpp:669
 #, fuzzy
 msgid "Take &Snapshot"
 msgstr "Tallenna ruutukaappaus"
 
-#: modules/gui/qt4/menus.cpp:690
+#: modules/gui/qt4/menus.cpp:692
 msgid "T&itle"
 msgstr "N&imi"
 
-#: modules/gui/qt4/menus.cpp:691
+#: modules/gui/qt4/menus.cpp:693
 msgid "&Chapter"
 msgstr "&Luku"
 
-#: modules/gui/qt4/menus.cpp:692
+#: modules/gui/qt4/menus.cpp:694
 msgid "&Navigation"
 msgstr "&Ohjaus"
 
-#: modules/gui/qt4/menus.cpp:694
+#: modules/gui/qt4/menus.cpp:696
 msgid "&Program"
 msgstr "Oh&jelma"
 
-#: modules/gui/qt4/menus.cpp:697
+#: modules/gui/qt4/menus.cpp:699
 #, fuzzy
 msgid "Custom &Bookmarks"
 msgstr "Kirjan&merkit"
 
-#: modules/gui/qt4/menus.cpp:699
+#: modules/gui/qt4/menus.cpp:701
 msgid "&Manage"
 msgstr "&Hallitse"
 
-#: modules/gui/qt4/menus.cpp:743
+#: modules/gui/qt4/menus.cpp:745
 msgid "&Help..."
 msgstr "O&hje..."
 
-#: modules/gui/qt4/menus.cpp:746
+#: modules/gui/qt4/menus.cpp:748
 msgid "Check for &Updates..."
 msgstr "&Tarkista päivitykset..."
 
-#: modules/gui/qt4/menus.cpp:802
+#: modules/gui/qt4/menus.cpp:804
 msgid "&Faster"
 msgstr "&Nopeammin"
 
-#: modules/gui/qt4/menus.cpp:814
+#: modules/gui/qt4/menus.cpp:816
 msgid "N&ormal Speed"
 msgstr "N&ormaali nopeus"
 
-#: modules/gui/qt4/menus.cpp:824
+#: modules/gui/qt4/menus.cpp:826
 msgid "Slo&wer"
 msgstr "&Hitaammin"
 
-#: modules/gui/qt4/menus.cpp:836
+#: modules/gui/qt4/menus.cpp:838
 msgid "&Jump Forward"
 msgstr "Siirry &eteenpäin"
 
-#: modules/gui/qt4/menus.cpp:843
+#: modules/gui/qt4/menus.cpp:845
 msgid "Jump Bac&kward"
 msgstr "Siirry taa&ksepäin"
 
-#: modules/gui/qt4/menus.cpp:860
+#: modules/gui/qt4/menus.cpp:862
 msgid "&Stop"
 msgstr "Py&säytä"
 
-#: modules/gui/qt4/menus.cpp:867
+#: modules/gui/qt4/menus.cpp:869
 msgid "Pre&vious"
 msgstr "E&dellinen"
 
-#: modules/gui/qt4/menus.cpp:869
+#: modules/gui/qt4/menus.cpp:871
 msgid "Ne&xt"
 msgstr "Se&uraava"
 
-#: modules/gui/qt4/menus.cpp:877
+#: modules/gui/qt4/menus.cpp:879
 #, fuzzy
 msgid "Open a Media"
 msgstr "Avaa media"
 
-#: modules/gui/qt4/menus.cpp:878
+#: modules/gui/qt4/menus.cpp:880
 msgid "&Open File..."
 msgstr "Avaa &tiedosto..."
 
-#: modules/gui/qt4/menus.cpp:884
+#: modules/gui/qt4/menus.cpp:886
 msgid "Open &Network..."
 msgstr "Avaa &verkko..."
 
-#: modules/gui/qt4/menus.cpp:989
+#: modules/gui/qt4/menus.cpp:991
 msgid "Leave Fullscreen"
 msgstr "Poistu kokoruututilasta"
 
-#: modules/gui/qt4/menus.cpp:1015
+#: modules/gui/qt4/menus.cpp:1017
 #, fuzzy
 msgid "Subti&tle"
 msgstr "Tekstitys"
 
 # NOTE: playback menu for chapters
-#: modules/gui/qt4/menus.cpp:1021
+#: modules/gui/qt4/menus.cpp:1023
 msgid "&Playback"
 msgstr "&Toisto"
 
-#: modules/gui/qt4/menus.cpp:1031
+#: modules/gui/qt4/menus.cpp:1033
 msgid "Tools"
 msgstr "Työkalut"
 
-#: modules/gui/qt4/menus.cpp:1095
+#: modules/gui/qt4/menus.cpp:1105
 msgid "Hide VLC media player in taskbar"
 msgstr "Piilota VLC-mediasoitin tehtäväpalkista"
 
-#: modules/gui/qt4/menus.cpp:1101
+#: modules/gui/qt4/menus.cpp:1111
 msgid "Show VLC media player"
 msgstr "Näytä VLC-mediasoitin"
 
-#: modules/gui/qt4/menus.cpp:1113
+#: modules/gui/qt4/menus.cpp:1123
 #, fuzzy
 msgid "&Open a Media"
 msgstr "&Avaa media"
 
-#: modules/gui/qt4/menus.cpp:1506
-msgid " - Empty - "
-msgstr " - Tyhjä - "
-
-#: modules/gui/qt4/menus.cpp:1526 modules/gui/qt4/ui/messages_panel.h:143
+#: modules/gui/qt4/menus.cpp:1534 modules/gui/qt4/ui/messages_panel.h:143
 msgid "&Clear"
 msgstr "&Tyhjennä"
 
-#: modules/gui/qt4/qt4.cpp:73
+#: modules/gui/qt4/qt4.cpp:74
 msgid "Show advanced preferences over simple ones"
 msgstr "Näytä täysi asetustila heti"
 
-#: modules/gui/qt4/qt4.cpp:74
+#: modules/gui/qt4/qt4.cpp:75
 msgid ""
 "Show advanced preferences and not simple preferences when opening the "
 "preferences dialog."
@@ -20585,11 +20651,11 @@ msgstr ""
 "Näytä täysi asetustila yksinkertaisten asetusten sijaan, kun asetusikkuna "
 "avataan."
 
-#: modules/gui/qt4/qt4.cpp:78 modules/gui/skins2/src/skin_main.cpp:455
+#: modules/gui/qt4/qt4.cpp:79 modules/gui/skins2/src/skin_main.cpp:455
 msgid "Systray icon"
 msgstr "Kuvake tehtäväpalkissa"
 
-#: modules/gui/qt4/qt4.cpp:79
+#: modules/gui/qt4/qt4.cpp:80
 msgid ""
 "Show an icon in the systray allowing you to control VLC media player for "
 "basic actions."
@@ -20597,20 +20663,20 @@ msgstr ""
 "Näytä tehtäväpalkissa kuvake, jonka kautta voit kontrolloida VLC-"
 "mediasoittimen perustoimintoja."
 
-#: modules/gui/qt4/qt4.cpp:83
+#: modules/gui/qt4/qt4.cpp:84
 msgid "Start VLC with only a systray icon"
 msgstr "Käynnistettäessä VLC näytä vain tehtäväpalkin kuvake"
 
-#: modules/gui/qt4/qt4.cpp:84
+#: modules/gui/qt4/qt4.cpp:85
 msgid "VLC will start with just an icon in your taskbar"
 msgstr "VLC käynnistyy vain kuvakkeena tehtäväpalkissa"
 
-#: modules/gui/qt4/qt4.cpp:87
+#: modules/gui/qt4/qt4.cpp:88
 msgid "Resize interface to the native video size"
 msgstr "Muuta käyttöliittymä natiiviin videokokoon"
 
 # NOTE: Tooltips don't like linefeeds. Punctuate correctly to work even without them.
-#: modules/gui/qt4/qt4.cpp:88
+#: modules/gui/qt4/qt4.cpp:89
 msgid ""
 "You have two choices:\n"
 " - The interface will resize to the native video size\n"
@@ -20622,20 +20688,20 @@ msgstr ""
 " - Video mukautuu käyttöliittymän kokoon. \n"
 "Oletusarvoisesti käyttöliittymä mukautuu videon kokoon."
 
-#: modules/gui/qt4/qt4.cpp:93
+#: modules/gui/qt4/qt4.cpp:94
 msgid "Show playing item name in window title"
 msgstr "Näytä toistettavan kohteen nimi ikkunan otsikossa"
 
-#: modules/gui/qt4/qt4.cpp:94
+#: modules/gui/qt4/qt4.cpp:95
 #, fuzzy
 msgid "Show the name of the song or video in the controller window title."
 msgstr "Näytä musiikkikappaleen tai videon nimi ikkunan otsikossa"
 
-#: modules/gui/qt4/qt4.cpp:97
+#: modules/gui/qt4/qt4.cpp:98
 msgid "Show notification popup on track change"
 msgstr "Näytä popup raidan vaihtuessa"
 
-#: modules/gui/qt4/qt4.cpp:99
+#: modules/gui/qt4/qt4.cpp:100
 msgid ""
 "Show a notification popup with the artist and track name when the current "
 "playlist item changes, when VLC is minimized or hidden."
@@ -20643,19 +20709,19 @@ msgstr ""
 "Kappaleen vaihtuessa näytä popup, jossa on artistin ja kappaleen nimi. "
 "Näytetään vain, kun VLC:n ikkuna on piilotettu."
 
-#: modules/gui/qt4/qt4.cpp:102
+#: modules/gui/qt4/qt4.cpp:103
 msgid "Advanced options"
 msgstr "Lisäasetukset"
 
-#: modules/gui/qt4/qt4.cpp:103
+#: modules/gui/qt4/qt4.cpp:104
 msgid "Show all the advanced options in the dialogs."
 msgstr "Näytä kaikki lisäasetukset dialogeissa."
 
-#: modules/gui/qt4/qt4.cpp:106
+#: modules/gui/qt4/qt4.cpp:107
 msgid "Windows opacity between 0.1 and 1"
 msgstr "Ikkunan läpinäkyvyys väliltä 0.1 ja 1"
 
-#: modules/gui/qt4/qt4.cpp:107
+#: modules/gui/qt4/qt4.cpp:108
 msgid ""
 "Sets the windows opacity between 0.1 and 1 for main interface, playlist and "
 "extended panel. This option only works with Windows and X11 with composite "
@@ -20666,11 +20732,11 @@ msgstr ""
 "toiminto toimii vain Windowsissa, sekä X11:ssä jossa on "
 "kompositointilaajennus (composite extensions)."
 
-#: modules/gui/qt4/qt4.cpp:112
+#: modules/gui/qt4/qt4.cpp:113
 msgid "Fullscreen controller opacity between 0.1 and 1"
 msgstr "Koko näytön säädinten läpinäkyvyys väliltä 0.1 ja 1"
 
-#: modules/gui/qt4/qt4.cpp:113
+#: modules/gui/qt4/qt4.cpp:114
 msgid ""
 "Sets the fullscreen controller opacity between 0.1 and 1 for main interface, "
 "playlist and extended panel. This option only works with Windows and X11 "
@@ -20681,15 +20747,15 @@ msgstr ""
 "paneelille. Tämä toiminto toimii vain Windowsissa, sekä X11:ssä jossa on "
 "kompositointilaajennus (composite extensions)."
 
-#: modules/gui/qt4/qt4.cpp:119
+#: modules/gui/qt4/qt4.cpp:120
 msgid "Show unimportant error and warnings dialogs"
 msgstr "Näytä vähemmän tärkeät virhe- ja huomautusikkunat"
 
-#: modules/gui/qt4/qt4.cpp:121
+#: modules/gui/qt4/qt4.cpp:122
 msgid "Activate the updates availability notification"
 msgstr "Aktivoi ilmoitukset uusista päivityksistä"
 
-#: modules/gui/qt4/qt4.cpp:122
+#: modules/gui/qt4/qt4.cpp:123
 msgid ""
 "Activate the automatic notification of new versions of the software. It runs "
 "once every two weeks."
@@ -20697,36 +20763,36 @@ msgstr ""
 "Aktivoi ilmoitukset uusista ohjelmaversioista. Tarkistus suoritetaan kahden "
 "viikon välein."
 
-#: modules/gui/qt4/qt4.cpp:125
+#: modules/gui/qt4/qt4.cpp:126
 msgid "Number of days between two update checks"
 msgstr "Päivitystarkistusten välinen aika päivinä"
 
-#: modules/gui/qt4/qt4.cpp:127
+#: modules/gui/qt4/qt4.cpp:128
 msgid "Automatically save the volume on exit"
 msgstr "Tallenna äänenvoimakkuus automaattisesti lopetettaessa"
 
-#: modules/gui/qt4/qt4.cpp:129
+#: modules/gui/qt4/qt4.cpp:130
 msgid "Ask for network policy at start"
 msgstr "Kysy verkon käytäntö käynnistyksen yhteydessä"
 
-#: modules/gui/qt4/qt4.cpp:131
+#: modules/gui/qt4/qt4.cpp:132
 msgid "Save the recently played items in the menu"
 msgstr "Muista viimeksi toistetut mediat ja listaa ne valikossa"
 
-#: modules/gui/qt4/qt4.cpp:133
+#: modules/gui/qt4/qt4.cpp:134
 msgid "List of words separated by | to filter"
 msgstr "Luettelo sanoja |-merkillä erotettuna"
 
-#: modules/gui/qt4/qt4.cpp:134
+#: modules/gui/qt4/qt4.cpp:135
 msgid "Regular expression used to filter the recent items played in the player"
 msgstr "Regexp-valitsin, jolla suodatetaan viimeisimpien kohteiden listaa"
 
-#: modules/gui/qt4/qt4.cpp:137
+#: modules/gui/qt4/qt4.cpp:138
 msgid "Define the colors of the volume slider "
 msgstr "Määritä äänen liukusäätimen värit "
 
 # NOTE: tooltip, linefeeds...
-#: modules/gui/qt4/qt4.cpp:138
+#: modules/gui/qt4/qt4.cpp:139
 msgid ""
 "Define the colors of the volume slider\n"
 "By specifying the 12 numbers separated by a ';'\n"
@@ -20738,11 +20804,11 @@ msgstr ""
 "Oletus on '255;255;255;20;226;20;255;176;15;235;30;20'\n"
 "Vaihtoehto voisi olla '30;30;50;40;40;100;50;50;160;150;150;255'. "
 
-#: modules/gui/qt4/qt4.cpp:143
+#: modules/gui/qt4/qt4.cpp:144
 msgid "Selection of the starting mode and look "
 msgstr "Aloitusnäkymän tyyppi "
 
-#: modules/gui/qt4/qt4.cpp:144
+#: modules/gui/qt4/qt4.cpp:145
 msgid ""
 "Start VLC with:\n"
 " - normal mode\n"
@@ -20754,62 +20820,62 @@ msgstr ""
 " - jatkuvasti näkyvissä inforuutu, jossa mm. albumin kansikuva, sanat, yms.\n"
 " - minimaalinen näkymä rajoitetuilla kontrolleilla"
 
-#: modules/gui/qt4/qt4.cpp:150
+#: modules/gui/qt4/qt4.cpp:151
 msgid "Show a controller in fullscreen mode"
 msgstr "Näytä kontrollit kokoruututilassa"
 
-#: modules/gui/qt4/qt4.cpp:151
+#: modules/gui/qt4/qt4.cpp:152
 msgid "Embed the file browser in open dialog"
 msgstr "Sisällytä tiedostoselain avausdialogiin"
 
-#: modules/gui/qt4/qt4.cpp:153
+#: modules/gui/qt4/qt4.cpp:154
 msgid "Define which screen fullscreen goes"
 msgstr "Mille näytölle koko näytön tila menee"
 
-#: modules/gui/qt4/qt4.cpp:154
+#: modules/gui/qt4/qt4.cpp:155
 #, fuzzy
 msgid "Screennumber of fullscreen, instead of same screen where interface is"
 msgstr ""
 "Koko näytön tilan näytön numero, sen sijaan että käytettäisiin samaa "
 "näyttöä, jolla käyttöliittymä on."
 
-#: modules/gui/qt4/qt4.cpp:157
+#: modules/gui/qt4/qt4.cpp:158
 msgid "Load extensions on startup"
 msgstr "Lataa laajennukset käynnistyessä"
 
-#: modules/gui/qt4/qt4.cpp:158
+#: modules/gui/qt4/qt4.cpp:159
 msgid "Automatically load the extensions module on startup"
 msgstr "Lataa automaattisesti laajennusmoduuli käynnistyksessä"
 
-#: modules/gui/qt4/qt4.cpp:161
+#: modules/gui/qt4/qt4.cpp:162
 msgid "Start in minimal view (without menus)"
 msgstr "Käynnistä minimaalitilassa (ilman valikoita)"
 
-#: modules/gui/qt4/qt4.cpp:163
+#: modules/gui/qt4/qt4.cpp:164
 #, fuzzy
 msgid "Display background cone or art"
 msgstr "Oletustaustaväri"
 
-#: modules/gui/qt4/qt4.cpp:164
+#: modules/gui/qt4/qt4.cpp:165
 msgid ""
 "Display background cone or current album art when not playing.Can be "
 "disabled to prevent burning screen."
 msgstr ""
 
-#: modules/gui/qt4/qt4.cpp:167
+#: modules/gui/qt4/qt4.cpp:168
 msgid "Expanding background cone or art."
 msgstr ""
 
-#: modules/gui/qt4/qt4.cpp:168
+#: modules/gui/qt4/qt4.cpp:169
 #, fuzzy
 msgid "Background art fits window's size"
 msgstr "Taustakuvan kuvasuhde"
 
-#: modules/gui/qt4/qt4.cpp:170
+#: modules/gui/qt4/qt4.cpp:171
 msgid "Ignore keyboard volume buttons."
 msgstr ""
 
-#: modules/gui/qt4/qt4.cpp:172
+#: modules/gui/qt4/qt4.cpp:173
 msgid ""
 "With this option checked, the volume up, volume down and mute buttons on "
 "your keyboard will always change your system volume. With this option "
@@ -20817,28 +20883,28 @@ msgid ""
 "and change the system volume when VLC is not selected."
 msgstr ""
 
-#: modules/gui/qt4/qt4.cpp:177
+#: modules/gui/qt4/qt4.cpp:178
 #, fuzzy
 msgid "Pause the video playback when minimized"
 msgstr "Toisto tauolle"
 
-#: modules/gui/qt4/qt4.cpp:179
+#: modules/gui/qt4/qt4.cpp:180
 msgid ""
 "With this option enabled, the playback will be automatically paused when "
 "minimizing the window."
 msgstr ""
 
-#: modules/gui/qt4/qt4.cpp:181
+#: modules/gui/qt4/qt4.cpp:182
 #, fuzzy
 msgid "Allow automatic icon changes"
 msgstr "Automaattirajaus"
 
-#: modules/gui/qt4/qt4.cpp:183
+#: modules/gui/qt4/qt4.cpp:184
 msgid ""
 "This option allows the interface to change its icon on various occasions."
 msgstr ""
 
-#: modules/gui/qt4/qt4.cpp:188
+#: modules/gui/qt4/qt4.cpp:189
 msgid "Qt interface"
 msgstr "Qt-käyttöliittymä"
 
@@ -20987,6 +21053,8 @@ msgid "Allow to build directory index"
 msgstr "Salli VLC:n rakentaa hakemistoindeksi."
 
 #: modules/lua/vlc.c:67 modules/stream_out/raop.c:147
+#: share/lua/http/dialogs/stream_config_window.html:28
+#: share/lua/http/dialogs/stream_window.html:87
 msgid "Host"
 msgstr "Isäntä"
 
@@ -21113,35 +21181,35 @@ msgid "Filename to look for album art in current directory"
 msgstr ""
 "Tiedostonimi, jolla etsitään albumin kansikuvaa nykyisestä hakemistosta"
 
-#: modules/misc/audioscrobbler.c:114
+#: modules/misc/audioscrobbler.c:116
 msgid "The username of your last.fm account"
 msgstr "last.fm-tilisi käyttäjätunnus"
 
-#: modules/misc/audioscrobbler.c:116
+#: modules/misc/audioscrobbler.c:118
 msgid "The password of your last.fm account"
 msgstr "last.fm-tilisi salasana"
 
-#: modules/misc/audioscrobbler.c:117
+#: modules/misc/audioscrobbler.c:119
 msgid "Scrobbler URL"
 msgstr "Scrobblerin URL-osoite"
 
-#: modules/misc/audioscrobbler.c:118
+#: modules/misc/audioscrobbler.c:120
 msgid "The URL set for an alternative scrobbler engine"
 msgstr "Vaihtoehtoisen Scrobbler-moottorin URL-osoite"
 
-#: modules/misc/audioscrobbler.c:130
+#: modules/misc/audioscrobbler.c:132
 msgid "Audioscrobbler"
 msgstr "Audioscrobbler"
 
-#: modules/misc/audioscrobbler.c:131
+#: modules/misc/audioscrobbler.c:133
 msgid "Submission of played songs to last.fm"
 msgstr "Lähetä tiedot soitetuista kappaleista last.fm:ään"
 
-#: modules/misc/audioscrobbler.c:649
+#: modules/misc/audioscrobbler.c:651
 msgid "last.fm: Authentication failed"
 msgstr "last.fm: Todentaminen epäonnistui"
 
-#: modules/misc/audioscrobbler.c:650
+#: modules/misc/audioscrobbler.c:652
 msgid ""
 "last.fm username or password is incorrect. Please verify your settings and "
 "relaunch VLC."
@@ -21149,11 +21217,11 @@ msgstr ""
 "last.fm:n käyttäjänimi tai salasana ei kelpaa. Varmista, että asetukset ovat "
 "oikein ja käynnistä VLC uudelleen."
 
-#: modules/misc/audioscrobbler.c:801
+#: modules/misc/audioscrobbler.c:803
 msgid "Last.fm username not set"
 msgstr "last.fm-käyttäjätunnusta ei asetettu"
 
-#: modules/misc/audioscrobbler.c:802
+#: modules/misc/audioscrobbler.c:804
 msgid ""
 "Please set a username or disable the audioscrobbler plugin, and restart "
 "VLC.\n"
@@ -21933,14 +22001,15 @@ msgstr ""
 msgid "Podcasts"
 msgstr "Podcast-lähetykset"
 
-#: modules/services_discovery/pulse.c:42 modules/services_discovery/udev.c:50
-#: modules/services_discovery/udev.c:92
-msgid "Video capture"
-msgstr "Videokaappaus"
+#: modules/services_discovery/pulse.c:42 modules/services_discovery/udev.c:59
+#: modules/services_discovery/udev.c:95
+msgid "Audio capture"
+msgstr "Äänikaappaus"
 
-#: modules/services_discovery/pulse.c:43 modules/services_discovery/udev.c:51
-msgid "Video capture (Video4Linux)"
-msgstr "Videokaappaus (Video4Linux)"
+#: modules/services_discovery/pulse.c:43
+#, fuzzy
+msgid "Audio capture (PulseAudio)"
+msgstr "Äänikaappaus (ALSA)"
 
 #: modules/services_discovery/pulse.c:183
 #, c-format
@@ -21951,11 +22020,11 @@ msgstr ""
 msgid "Generic"
 msgstr "Yleiset"
 
-#: modules/services_discovery/sap.c:79
+#: modules/services_discovery/sap.c:82
 msgid "SAP multicast address"
 msgstr "SAP multicast -osoite"
 
-#: modules/services_discovery/sap.c:80
+#: modules/services_discovery/sap.c:83
 msgid ""
 "The SAP module normally chooses itself the right addresses to listen to. "
 "However, you can specify a specific address."
@@ -21963,22 +22032,22 @@ msgstr ""
 "SAP-moduuli valitsee normaalisti kuunteluosoitteensa itse. Voit kuitenkin "
 "halutessasi pakottaa kuunteluosoitteen tästä."
 
-#: modules/services_discovery/sap.c:83
+#: modules/services_discovery/sap.c:86
 msgid "SAP timeout (seconds)"
 msgstr "SAP-aikakatkaisu (sek.)"
 
-#: modules/services_discovery/sap.c:85
+#: modules/services_discovery/sap.c:88
 msgid ""
 "Delay after which SAP items get deleted if no new announcement is received."
 msgstr ""
 "Viive, jonka jälkeen SAP-kohteet poistetaan, jos niistä ei ole vastaanotettu "
 "uutta julkaisua."
 
-#: modules/services_discovery/sap.c:87
+#: modules/services_discovery/sap.c:90
 msgid "Try to parse the announce"
 msgstr "Yritä jäsentää julkaisu itse"
 
-#: modules/services_discovery/sap.c:89
+#: modules/services_discovery/sap.c:92
 msgid ""
 "This enables actual parsing of the announces by the SAP module. Otherwise, "
 "all announcements are parsed by the \"live555\" (RTP/RTSP) module."
@@ -21987,11 +22056,11 @@ msgstr ""
 "Jos tämä on pois päältä, kaikki julkaisut menevät \"live555\" (RTP/RTSP) -"
 "moduulille jäsennettäviksi."
 
-#: modules/services_discovery/sap.c:92
+#: modules/services_discovery/sap.c:95
 msgid "SAP Strict mode"
 msgstr "Tarkka SAP-tila"
 
-#: modules/services_discovery/sap.c:94
+#: modules/services_discovery/sap.c:97
 msgid ""
 "When this is set, the SAP parser will discard some non-compliant "
 "announcements."
@@ -21999,29 +22068,33 @@ msgstr ""
 "Kun tämä on päällä, SAP-jäsennin jättää huomiotta tietyillä tavoilla "
 "standardeja rikkovat julkaisut."
 
-#: modules/services_discovery/sap.c:107
+#: modules/services_discovery/sap.c:110
 msgid "Network streams (SAP)"
 msgstr "Verkkotietovirrat (SAP)"
 
-#: modules/services_discovery/sap.c:129
+#: modules/services_discovery/sap.c:132
 msgid "SDP Descriptions parser"
 msgstr "SDP-kuvausten jäsennin"
 
-#: modules/services_discovery/sap.c:853 modules/services_discovery/sap.c:857
+#: modules/services_discovery/sap.c:856 modules/services_discovery/sap.c:860
 msgid "Session"
 msgstr "Istunto"
 
-#: modules/services_discovery/sap.c:853
+#: modules/services_discovery/sap.c:856
 msgid "Tool"
 msgstr "Työkalu"
 
-#: modules/services_discovery/sap.c:857
+#: modules/services_discovery/sap.c:860
 msgid "User"
 msgstr "Käyttäjänimi"
 
-#: modules/services_discovery/udev.c:59 modules/services_discovery/udev.c:95
-msgid "Audio capture"
-msgstr "Äänikaappaus"
+#: modules/services_discovery/udev.c:50 modules/services_discovery/udev.c:92
+msgid "Video capture"
+msgstr "Videokaappaus"
+
+#: modules/services_discovery/udev.c:51
+msgid "Video capture (Video4Linux)"
+msgstr "Videokaappaus (Video4Linux)"
 
 #: modules/services_discovery/udev.c:60
 msgid "Audio capture (ALSA)"
@@ -22090,6 +22163,14 @@ msgstr "Purku (Decompression)"
 #: modules/stream_filter/record.c:49
 msgid "Internal stream record"
 msgstr "Sisäinen tietovirran tallennus"
+
+#: modules/stream_filter/dash/dash.cpp:51
+msgid "DASH"
+msgstr ""
+
+#: modules/stream_filter/dash/dash.cpp:52
+msgid "Dynamic Adaptive Streaming over HTTP"
+msgstr ""
 
 #: modules/stream_out/autodel.c:46
 msgid "Autodel"
@@ -23248,6 +23329,11 @@ msgstr ""
 "Tämä on videon päälle renderöitävän kirjasimen oletuskoko. Ollessaan jotain "
 "muuta kuin 0, tämä yliajaa suhtellisen fontin koon."
 
+#: modules/text_renderer/freetype.c:111
+#, fuzzy
+msgid "Text opacity"
+msgstr "Reunus"
+
 #: modules/text_renderer/freetype.c:112 modules/text_renderer/win32text.c:67
 msgid ""
 "The opacity (inverse of transparency) of the text that will be rendered on "
@@ -24248,62 +24334,62 @@ msgstr "Audio Bar Graph -suotimen video-osa"
 msgid "Audio Bar Graph Video"
 msgstr "Audio Bar Graph Video"
 
-#: modules/video_filter/ball.c:107
+#: modules/video_filter/ball.c:98
 msgid "Ball color"
 msgstr "Pallon väri"
 
-#: modules/video_filter/ball.c:108
+#: modules/video_filter/ball.c:99
 msgid "Ball color, one of \"red\", \"blue\" and \"green\"."
 msgstr ""
 "Pallon väri, yksi seuraavista: \"red\" (punainen), \"blue\" (sininen) tai "
 "\"green\" (vihreä)."
 
-#: modules/video_filter/ball.c:110
+#: modules/video_filter/ball.c:101
 msgid "Edge visible"
 msgstr "Reuna näkyvissä"
 
-#: modules/video_filter/ball.c:111
+#: modules/video_filter/ball.c:102
 msgid "Set edge visibility."
 msgstr "Aseta, näkyvätkö reunat."
 
-#: modules/video_filter/ball.c:113
+#: modules/video_filter/ball.c:104
 msgid "Ball speed"
 msgstr "Pallon nopeus"
 
-#: modules/video_filter/ball.c:114
+#: modules/video_filter/ball.c:105
 msgid ""
 "Set ball speed, the displacement value                                 in "
 "number of pixels by frame."
 msgstr "Aseta pallon nopeus (siirtymä per videoruutu)."
 
-#: modules/video_filter/ball.c:117
+#: modules/video_filter/ball.c:108
 msgid "Ball size"
 msgstr "Pallon koko"
 
-#: modules/video_filter/ball.c:118
+#: modules/video_filter/ball.c:109
 msgid ""
 "Set ball size giving its radius in number                                 of "
 "pixels"
 msgstr "Pallon säde pikseleinä."
 
-#: modules/video_filter/ball.c:121
+#: modules/video_filter/ball.c:112
 msgid "Gradient threshold"
 msgstr "Gradienttikynnys"
 
-#: modules/video_filter/ball.c:122
+#: modules/video_filter/ball.c:113
 msgid "Set gradient threshold for edge computation."
 msgstr "Aseta gradienttikynnys reunojen tunnistukseen."
 
 # TOCHECK: find standard translation for "augmented reality"...
-#: modules/video_filter/ball.c:124
+#: modules/video_filter/ball.c:115
 msgid "Augmented reality ball game"
 msgstr "Täydennetty todellisuus -pallopeli"
 
-#: modules/video_filter/ball.c:133
+#: modules/video_filter/ball.c:124
 msgid "Ball video filter"
 msgstr "\"Pallo\" -videosuodin"
 
-#: modules/video_filter/ball.c:134
+#: modules/video_filter/ball.c:125
 msgid "Ball"
 msgstr "Pallo"
 
@@ -24842,27 +24928,28 @@ msgstr ""
 msgid "Deinterlacing video filter"
 msgstr "Lomituksen poiston videosuodin"
 
-#: modules/video_filter/dynamicoverlay/dynamicoverlay.c:60
+#: modules/video_filter/dynamicoverlay/dynamicoverlay.c:61
 msgid "Input FIFO"
 msgstr "Syöte-FIFO"
 
-#: modules/video_filter/dynamicoverlay/dynamicoverlay.c:61
+#: modules/video_filter/dynamicoverlay/dynamicoverlay.c:62
 msgid "FIFO which will be read for commands"
 msgstr "FIFO, josta komennot luetaan"
 
-#: modules/video_filter/dynamicoverlay/dynamicoverlay.c:63
+#: modules/video_filter/dynamicoverlay/dynamicoverlay.c:64
 msgid "Output FIFO"
 msgstr "Lähtö-FIFO"
 
-#: modules/video_filter/dynamicoverlay/dynamicoverlay.c:64
+#: modules/video_filter/dynamicoverlay/dynamicoverlay.c:65
 msgid "FIFO which will be written to for responses"
 msgstr "FIFO, johon komentojen vastaukset kirjoitetaan"
 
-#: modules/video_filter/dynamicoverlay/dynamicoverlay.c:67
+#: modules/video_filter/dynamicoverlay/dynamicoverlay.c:68
 msgid "Dynamic video overlay"
 msgstr "Dynaaminen videoylipiirto"
 
-#: modules/video_filter/dynamicoverlay/dynamicoverlay.c:68
+#: modules/video_filter/dynamicoverlay/dynamicoverlay.c:69
+#: share/lua/http/dialogs/create_stream.html:245
 #: modules/gui/qt4/ui/video_effects.h:1371
 msgid "Overlay"
 msgstr "Overlay"
@@ -26715,7 +26802,8 @@ msgid "GLX"
 msgstr "GLX"
 
 #: modules/video_output/xcb/glx.c:53
-msgid "GLX video output (XCB)"
+#, fuzzy
+msgid "OpenGL GLX video output (XCB)"
 msgstr "GLX-videolähtö (XCB)"
 
 #: modules/video_output/xcb/window.c:43
@@ -26770,11 +26858,11 @@ msgstr "X11"
 msgid "X11 video output (XCB)"
 msgstr "X11-videolähtö (XCB)"
 
-#: modules/video_output/xcb/xvideo.c:42
+#: modules/video_output/xcb/xvideo.c:43
 msgid "XVideo adaptor number"
 msgstr "XVideo-laitenumero"
 
-#: modules/video_output/xcb/xvideo.c:44
+#: modules/video_output/xcb/xvideo.c:45
 msgid ""
 "XVideo hardware adaptor to use. By default, VLC will use the first "
 "functional adaptor."
@@ -26782,12 +26870,12 @@ msgstr ""
 "Käytettävän XVideo-laitteen numero. Oletuksena VLC käyttää ensimmäistä "
 "toimivaa."
 
-#: modules/video_output/xcb/xvideo.c:47
+#: modules/video_output/xcb/xvideo.c:48
 #, fuzzy
 msgid "XVideo format id"
 msgstr "Videoportti"
 
-#: modules/video_output/xcb/xvideo.c:49
+#: modules/video_output/xcb/xvideo.c:50
 #, fuzzy
 msgid ""
 "XVideo image format id to use. By default, VLC will try to use the best "
@@ -26796,19 +26884,19 @@ msgstr ""
 "Käytettävän XVideo-laitteen numero. Oletuksena VLC käyttää ensimmäistä "
 "toimivaa."
 
-#: modules/video_output/xcb/xvideo.c:59
+#: modules/video_output/xcb/xvideo.c:60
 msgid "XVideo"
 msgstr "XVideo"
 
-#: modules/video_output/xcb/xvideo.c:60
+#: modules/video_output/xcb/xvideo.c:61
 msgid "XVideo output (XCB)"
 msgstr "XVideo-lähtö (XCB)"
 
-#: modules/video_output/xcb/xvideo.c:277
+#: modules/video_output/xcb/xvideo.c:336
 msgid "Video acceleration not available"
 msgstr "Videokiihdytystä ei saatavilla"
 
-#: modules/video_output/xcb/xvideo.c:278
+#: modules/video_output/xcb/xvideo.c:337
 #, c-format
 msgid ""
 "Your video output acceleration driver does not support the required "
@@ -27081,6 +27169,268 @@ msgstr "Visualisoinnin suodatin"
 #: modules/visualization/visual/visual.c:111
 msgid "Spectrum analyser"
 msgstr "Spektrin tarkastelu"
+
+#: share/lua/http/index.html:26 share/lua/http/mobile_browse.html:25
+#: share/lua/http/mobile_equalizer.html:25 share/lua/http/mobile.html:25
+#: share/lua/http/mobile_view.html:25
+#, fuzzy
+msgid "VLC media player - Web Interface"
+msgstr "VLC-mediasoitin"
+
+#: share/lua/http/index.html:234
+#, fuzzy
+msgid "Viewer"
+msgstr "&Näytä"
+
+#: share/lua/http/index.html:237
+#, fuzzy
+msgid "Loading flowplayer..."
+msgstr "Lataa tiedosto..."
+
+#: share/lua/http/index.html:237
+msgid "If nothing appears, check your internet connection."
+msgstr ""
+
+#: share/lua/http/index.html:243
+#, fuzzy
+msgid "Library"
+msgstr "Mediakirjasto"
+
+#: share/lua/http/index.html:264
+msgid ""
+"By creating a stream, the <i>Main Controls</i> will operate the stream "
+"instead of the main interface."
+msgstr ""
+
+#: share/lua/http/index.html:265
+msgid ""
+"The stream will be created using default settings, for more advanced "
+"configuration, or to modify the default settings, select the button to the "
+"right: <i>Manage Streams</i>"
+msgstr ""
+
+#: share/lua/http/index.html:269
+msgid ""
+"Once the stream is created, the <i>Media Viewer</i> window will display the "
+"stream."
+msgstr ""
+
+#: share/lua/http/index.html:270
+msgid ""
+"Volume will be controlled by the player, and not the <i>Main Controls</i>."
+msgstr ""
+
+#: share/lua/http/index.html:273
+msgid ""
+"The current playing item will be streamed. If there is no currently playing "
+"item, the first selected item from the <i>Library</i> will be the subject of "
+"the stream."
+msgstr ""
+
+#: share/lua/http/index.html:276
+msgid ""
+"To stop the stream and resume normal controls, click the <i>Open Stream</i> "
+"button again."
+msgstr ""
+
+#: share/lua/http/index.html:279
+msgid "Are you sure you wish to create the stream ?"
+msgstr ""
+
+#: share/lua/http/dialogs/batch_window.html:28
+msgid "#paste your VLM commands here"
+msgstr ""
+
+#: share/lua/http/dialogs/batch_window.html:30
+msgid "#separate commands with a new line or a semi-colon"
+msgstr ""
+
+#: share/lua/http/dialogs/browse_window.html:40
+#: share/lua/http/mobile_browse.html:48
+#, fuzzy
+msgid "Play List"
+msgstr "Soittolista"
+
+#: share/lua/http/dialogs/create_stream.html:139
+#, fuzzy
+msgid "Stream Name"
+msgstr "Suoratoiston nimi"
+
+#: share/lua/http/dialogs/create_stream.html:156
+#: modules/gui/qt4/ui/sprefs_audio.h:435 modules/gui/qt4/ui/sprefs_video.h:310
+msgid "Output"
+msgstr "Lähtö"
+
+#: share/lua/http/dialogs/create_stream.html:160
+#, fuzzy
+msgid "Video Codec"
+msgstr "Videokoodekki"
+
+#: share/lua/http/dialogs/create_stream.html:178
+#, fuzzy
+msgid "Audio Codec"
+msgstr "Äänikoodekki"
+
+#: share/lua/http/dialogs/create_stream.html:193
+#, fuzzy
+msgid "Subtitle Codec"
+msgstr "Tekstityskoodekit"
+
+#: share/lua/http/dialogs/create_stream.html:200
+#, fuzzy
+msgid "Output Method"
+msgstr "Lähtöpääsymetodi"
+
+#: share/lua/http/dialogs/create_stream.html:212
+#, fuzzy
+msgid "Video Bit Rate"
+msgstr "Videon bittinop."
+
+#: share/lua/http/dialogs/create_stream.html:231
+#, fuzzy
+msgid "Audio Bit Rate"
+msgstr "Äänen bittinop. "
+
+#: share/lua/http/dialogs/create_stream.html:249
+msgid "Multiplexer"
+msgstr ""
+
+#: share/lua/http/dialogs/create_stream.html:266
+#, fuzzy
+msgid "Video FPS"
+msgstr "Videon PID"
+
+#: share/lua/http/dialogs/create_stream.html:281
+#, fuzzy
+msgid "Audio Sample Rate"
+msgstr "Äänen näytteenottotaajuus"
+
+#: share/lua/http/dialogs/create_stream.html:297
+#, fuzzy
+msgid "MUX Options"
+msgstr "DMX-asetukset"
+
+#: share/lua/http/dialogs/create_stream.html:303
+#, fuzzy
+msgid "Video Scale"
+msgstr "Videokaappaus"
+
+#: share/lua/http/dialogs/create_stream.html:330
+#: share/lua/http/dialogs/create_stream.html:374
+#, fuzzy
+msgid "Output Port"
+msgstr "Äänilähdön formaatti"
+
+#: share/lua/http/dialogs/create_stream.html:334
+#: share/lua/http/dialogs/create_stream.html:378
+#, fuzzy
+msgid "Output Destination"
+msgstr "Lähdön kohdesijainti"
+
+#: share/lua/http/dialogs/create_stream.html:338
+#: share/lua/http/dialogs/create_stream.html:382
+#, fuzzy
+msgid "Output File"
+msgstr "Kohdetiedosto"
+
+#: share/lua/http/dialogs/create_stream.html:355
+#, fuzzy
+msgid "Input Media"
+msgstr "Lähetys"
+
+#: share/lua/http/dialogs/create_stream.html:367
+#, fuzzy
+msgid "Error:"
+msgstr "Virhe"
+
+#: share/lua/http/dialogs/create_stream.html:367
+msgid "Sample ui-state-error style."
+msgstr ""
+
+#: share/lua/http/dialogs/create_stream.html:390
+#, fuzzy
+msgid "File Name"
+msgstr "Tiedostonimi"
+
+#: share/lua/http/dialogs/equalizer_window.html:49
+#, fuzzy
+msgid "Preamp:"
+msgstr "Esivahvistus"
+
+#: share/lua/http/dialogs/mosaic_window.html:96
+#, fuzzy
+msgid "Rows:"
+msgstr "Rivit"
+
+#: share/lua/http/dialogs/mosaic_window.html:100
+#, fuzzy
+msgid "x offset"
+msgstr "X-siirtymä"
+
+#: share/lua/http/dialogs/mosaic_window.html:104
+msgid "row border"
+msgstr ""
+
+#: share/lua/http/dialogs/mosaic_window.html:108
+#, fuzzy
+msgid "width"
+msgstr "Leveys"
+
+#: share/lua/http/dialogs/mosaic_window.html:114
+#, fuzzy
+msgid "Columns:"
+msgstr "Sarakkeet"
+
+#: share/lua/http/dialogs/mosaic_window.html:118
+#, fuzzy
+msgid "y offset"
+msgstr "X-siirtymä"
+
+#: share/lua/http/dialogs/mosaic_window.html:122
+#, fuzzy
+msgid "column border"
+msgstr "Osakuvien järjestys"
+
+#: share/lua/http/dialogs/mosaic_window.html:126
+#, fuzzy
+msgid "height"
+msgstr "Korkeus"
+
+#: share/lua/http/dialogs/mosaic_window.html:133
+#, fuzzy
+msgid "Background"
+msgstr "Tausta"
+
+#: share/lua/http/dialogs/mosaic_window.html:135
+#, fuzzy
+msgid "Mosaic Tiles"
+msgstr "Mosaiikkisilta"
+
+# NOTE: title of controls section.
+#: share/lua/http/dialogs/offset_window.html:68
+#, fuzzy
+msgid "Playback Rate"
+msgstr "Toisto"
+
+#: share/lua/http/dialogs/offset_window.html:72
+#, fuzzy
+msgid "Audio Delay"
+msgstr "Lisää äänen viivettä"
+
+#: share/lua/http/dialogs/offset_window.html:76
+#, fuzzy
+msgid "Subtitle Delay"
+msgstr "Tekstityksen viive"
+
+#: share/lua/http/dialogs/stream_window.html:65
+#, fuzzy
+msgid "Time:"
+msgstr "Aika"
+
+#: share/lua/http/mobile_equalizer.html:62
+#, fuzzy
+msgid "Preamp: "
+msgstr "Esivahvistus"
 
 #: modules/gui/qt4/ui/about.h:185
 msgid "Authors"
@@ -27455,10 +27805,6 @@ msgstr "Nollaa äänen aloitusvoimakkuus arvoon"
 #: modules/gui/qt4/ui/sprefs_audio.h:434
 msgid " %"
 msgstr " %"
-
-#: modules/gui/qt4/ui/sprefs_audio.h:435 modules/gui/qt4/ui/sprefs_video.h:310
-msgid "Output"
-msgstr "Lähtö"
 
 #: modules/gui/qt4/ui/sprefs_audio.h:436
 msgid "Output module:"
@@ -27966,6 +28312,20 @@ msgstr "Toista"
 #: modules/gui/qt4/ui/vlm.h:303
 msgid "Media Manager List"
 msgstr "Mediahallinnan lista"
+
+#~ msgid "Exposure"
+#~ msgstr "Valotus"
+
+#, fuzzy
+#~ msgid "Exposure."
+#~ msgstr "Valotus"
+
+#, fuzzy
+#~ msgid "Zoom playlist"
+#~ msgstr "Näytä soittolista"
+
+#~ msgid " - Empty - "
+#~ msgstr " - Tyhjä - "
 
 #~ msgid "key"
 #~ msgstr "avain"
@@ -30489,9 +30849,6 @@ msgstr "Mediahallinnan lista"
 #~ msgid "Camera"
 #~ msgstr "Kamera"
 
-#~ msgid "Video Codec:"
-#~ msgstr "Videokoodekki"
-
 #~ msgid "huffyuv"
 #~ msgstr "huffyuv"
 
@@ -30513,17 +30870,11 @@ msgstr "Mediahallinnan lista"
 #~ msgid "WMV2"
 #~ msgstr "WMV2"
 
-#~ msgid "Video Bitrate:"
-#~ msgstr "Videon bittinop."
-
 #~ msgid "Bitrate Tolerance:"
 #~ msgstr "Bittinop. toleranssi"
 
 #~ msgid "Keyframe Interval:"
 #~ msgstr "Avainruutujen väli"
-
-#~ msgid "Audio Codec:"
-#~ msgstr "Äänikoodekki"
 
 #~ msgid "Deinterlace:"
 #~ msgstr "Lomituksenpoisto"
@@ -30587,9 +30938,6 @@ msgstr "Mediahallinnan lista"
 
 #~ msgid "bits/s"
 #~ msgstr "bittiä/s"
-
-#~ msgid "Audio Bitrate :"
-#~ msgstr "Äänen bittinop. "
 
 #~ msgid "SAP Announce:"
 #~ msgstr "SAP-julkaisu"
@@ -30868,9 +31216,6 @@ msgstr "Mediahallinnan lista"
 #, fuzzy
 #~ msgid "Video On Demand"
 #~ msgstr "Video On Demand -palvelu (VOD)"
-
-#~ msgid "VLC media player "
-#~ msgstr "VLC-mediasoitin"
 
 #~ msgid "FFmpeg video filter"
 #~ msgstr "FFmpeg-videosuodin"
@@ -31154,9 +31499,6 @@ msgstr "Mediahallinnan lista"
 
 #~ msgid "&Preferences..."
 #~ msgstr "&Asetukset..."
-
-#~ msgid "Load File..."
-#~ msgstr "Lataa tiedosto..."
 
 #~ msgid "Minimal View..."
 #~ msgstr "Pienennetty näkymä..."
