@@ -210,9 +210,9 @@ static void create_SDP(sout_stream_t *p_stream, sout_access_out_t *p_access)
     free (dhost);
 }
 
-static const char *getMuxFromExt( const char *psz_url )
+static const char *getMuxFromAlias( const char *psz_alias )
 {
-    static struct { const char ext[6]; const char mux[32]; } exttomux[] =
+    static struct { const char alias[6]; const char mux[32]; } mux_alias[] =
     {
         { "avi", "avi" },
         { "ogg", "ogg" },
@@ -238,16 +238,12 @@ static const char *getMuxFromExt( const char *psz_url )
         { "webm", "ffmpeg{mux=webm}"},
     };
 
-    if( !psz_url )
+    if( !psz_alias )
         return NULL;
-    const char *psz_ext = strrchr( psz_url, '.' );
-    if( !psz_ext )
-        return NULL;
-    psz_ext++;
 
-    for( size_t i = 0; i < sizeof exttomux / sizeof *exttomux; i++ )
-        if( !strcasecmp( psz_ext, exttomux[i].ext ) )
-            return exttomux[i].mux;
+    for( size_t i = 0; i < sizeof mux_alias / sizeof *mux_alias; i++ )
+        if( !strcasecmp( psz_alias, mux_alias[i].alias ) )
+            return mux_alias[i].mux;
 
     return NULL;
 }
@@ -259,7 +255,10 @@ static int fixAccessMux( sout_stream_t *p_stream, char **ppsz_mux,
     char *psz_access = *ppsz_access;
     if( !psz_mux )
     {
-        const char *psz_mux_byext = getMuxFromExt( psz_url );
+        const char *psz_ext = strrchr( psz_url, '.' );
+        if( psz_ext )
+            psz_ext++; /* use extension */
+        const char *psz_mux_byext = getMuxFromAlias( psz_ext );
 
         if( !psz_access )
         {
@@ -393,11 +392,22 @@ static int Open( vlc_object_t *p_this )
     p_sys->p_mux = sout_MuxNew( p_sout, psz_mux, p_access );
     if( !p_sys->p_mux )
     {
-        msg_Err( p_stream, "no suitable sout mux module for `%s/%s://%s'",
-                 psz_access, psz_mux, psz_url );
+        const char *psz_mux_guess = getMuxFromAlias( psz_mux );
+        if( psz_mux_guess && strcmp( psz_mux_guess, psz_mux ) )
+        {
+            msg_Dbg( p_stream, "Couldn't open mux `%s', trying `%s' instead",
+                psz_mux, psz_mux_guess );
+            p_sys->p_mux = sout_MuxNew( p_sout, psz_mux_guess, p_access );
+        }
 
-        sout_AccessOutDelete( p_access );
-        goto end;
+        if( !p_sys->p_mux )
+        {
+            msg_Err( p_stream, "no suitable sout mux module for `%s/%s://%s'",
+                psz_access, psz_mux, psz_url );
+
+            sout_AccessOutDelete( p_access );
+            goto end;
+        }
     }
 
     if( var_GetBool( p_stream, SOUT_CFG_PREFIX"sap" ) )
