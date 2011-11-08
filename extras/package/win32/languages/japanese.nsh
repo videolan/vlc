@@ -20,7 +20,7 @@ StrCpy $Desc_Section02b \
 StrCpy $Desc_Section03 \
     "モジラとモジラFirefoxのプラグイン"
 StrCpy $Desc_Section04 \
-    "ActiveXプラグイン"
+    "VLC ActiveXプラグイン"
 StrCpy $Desc_Section05 \
     "DVDとCD再生の登録"
 StrCpy $Desc_Section06 \
@@ -54,3 +54,10 @@ StrCpy $Name_InstTypeFull "すべて"
 
 StrCpy $Action_OnArrivalDVD "DVDムービー再生"
 StrCpy $Action_OnArrivalAudioCD "オーディオCD再生"
+StrCpy $Action_OnArrivalVCDMovie "VCDムービー再生"
+StrCpy $Action_OnArrivalSVCDMovie "SVCDムービー再生"
+StrCpy $Action_OnArrivalVideoFiles "ビデオファイル再生"
+StrCpy $Action_OnArrivalMusicFiles "オーディオファイル再生"
+StrCpy $Action_OnArrivalDVDAudio "オーディオDVD再生"
+
+StrCpy $License_NextText "あなたはあなたの権利について確認しました。次をクリックして継続してください。"
