@@ -1,5 +1,9 @@
 GNU=http://ftp.gnu.org/gnu
 
+YASM_VERSION=1.2.0
+#YASM_URL=$(CONTRIB_VIDEOLAN)/yasm-$(YASM_VERSION).tar.gz
+YASM_URL=http://www.tortall.net/projects/yasm/releases/yasm-$(YASM_VERSION).tar.gz
+
 CMAKE_VERSION=2.8.3
 CMAKE_URL=http://www.cmake.org/files/v2.8/cmake-$(CMAKE_VERSION).tar.gz
 

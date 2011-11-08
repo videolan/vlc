@@ -39,6 +39,7 @@ check libtool
 check pkg-config
 check xz
 check cmake
+check yasm
 
 [ -n "$NEEDED" ] && mkdir -p build/
 
