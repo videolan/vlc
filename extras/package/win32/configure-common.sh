@@ -31,5 +31,4 @@
       --enable-zvbi --disable-telx \
       --enable-sqlite \
       --disable-dirac \
-      --with-peflags \
       $CONFIGOPTS
