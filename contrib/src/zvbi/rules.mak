@@ -42,4 +42,6 @@ endif
 	cd $< && $(HOSTVARS) CFLAGS="$(ZVBI_CFLAGS)" ./configure $(ZVBICONF)
 	cd $</src && $(MAKE) install
 	cd $< && $(MAKE) SUBDIRS=. install
+	cat "$(PREFIX)/lib/pkgconfig/zvbi-0.2.pc" | sed -e s/'[^ ]*iconv.a'/-liconv/ > $</zvbi-iconv-fixed.pc
+	mv $</zvbi-iconv-fixed.pc "$(PREFIX)/lib/pkgconfig/zvbi-0.2.pc"
 	touch $@
