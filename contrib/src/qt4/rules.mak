@@ -31,6 +31,15 @@ XTOOLS := XCC="$(CC)" XCXX="$(CXX)" XSTRIP="$(STRIP)" XAR="$(AR)"
 	cd $< && $(XTOOLS) ./configure -xplatform win32-g++ -static -release -fast -no-exceptions -no-stl -no-sql-sqlite -no-qt3support -no-gif -no-libmng -qt-libjpeg -no-libtiff -no-qdbus -no-openssl -no-webkit -sse -no-script -no-multimedia -no-phonon -opensource -no-scripttools -no-opengl -no-script -no-scripttools -no-declarative -no-declarative-debug -opensource -no-s60 -host-little-endian -confirm-license
 	cd $< && $(MAKE) $(XTOOLS) sub-src
 	cd $</src/plugins/imageformats/jpeg && $(MAKE) $(XTOOLS) # FIXME
+	# BUILDING QT BUILD TOOLS
+ifdef HAVE_CROSS_COMPILE
+	cd $</src/tools; $(MAKE) clean; \
+		for i in bootstrap uic rcc moc; \
+			do (cd $$i; ../../../bin/qmake); \
+		done; \
+		../../../bin/qmake; \
+		$(MAKE) $(XTOOLS)
+endif
 	# INSTALLING LIBRARIES
 	for lib in QtGui QtCore; \
 		do install -D -- $</lib/lib$${lib}.a "$(PREFIX)/lib/lib$${lib}.a"; \
@@ -51,4 +60,9 @@ XTOOLS := XCC="$(CC)" XCXX="$(CXX)" XSTRIP="$(STRIP)" XAR="$(AR)"
 	install -d "$(PREFIX)/lib/pkgconfig"
 	cat $(SRC)/qt4/QtCore.pc.in | sed -e s/@@VERSION@@/$(QT4_VERSION)/ | sed -e 's|@@PREFIX@@|$(PREFIX)|' > "$(PREFIX)/lib/pkgconfig/QtCore.pc"
 	cat $(SRC)/qt4/QtGui.pc.in | sed -e s/@@VERSION@@/$(QT4_VERSION)/ | sed -e 's|@@PREFIX@@|$(PREFIX)|' > "$(PREFIX)/lib/pkgconfig/QtGui.pc"
+	# INSTALLING QT BUILD TOOLS
+	install -d "$(PREFIX)/bin/"
+	for i in rcc moc uic; \
+		do cp $</bin/$$i* "$(PREFIX)/bin"; \
+	done
 	touch $@
