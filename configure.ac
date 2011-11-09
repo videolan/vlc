@@ -2761,7 +2761,7 @@ then
         VLC_ADD_CPPFLAGS([a52tofloat32],[${CPPFLAGS_test}])
       ],[
         AC_MSG_ERROR([Could not find liba52 on your system: you may get it from http://liba52.sf.net/. Alternatively you can use --disable-a52 to disable the a52 plugin.])
-        ])
+        ], [$LIBM])
     ],[
       AC_MSG_ERROR([Could not find liba52 on your system: you may get it from http://liba52.sf.net/. Alternatively you can use --disable-a52 to disable the a52 plugin.])
     ])
