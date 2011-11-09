@@ -199,3 +199,29 @@ diff -ruN libprojectM/Renderer/TextureManager.cpp libprojectM.new/Renderer/Textu
  
  TextureManager::TextureManager(const std::string _presetURL): presetURL(_presetURL)
  {
+--- projectM/projectM.hpp	2011-11-09 22:33:29.997034349 +0100
++++ projectM.new/projectM.hpp	2011-11-09 22:32:27.064722289 +0100
+@@ -57,7 +57,9 @@
+ #include "event.h"
+ #include "fatal.h"
+ #include "PCM.hpp"
+-#include "pthread.h"
++#ifdef USE_THREADS
++# include "pthread.h"
++#endif
+ class PipelineContext;
+ 
+ class BeatDetect;
+@@ -309,10 +311,12 @@
+ 
+   RenderItemMatcher * _matcher;
+   MasterRenderItemMerge * _merger;
++#ifdef USE_THREADS
+   pthread_mutex_t mutex;
+ 
+   pthread_cond_t  condition;
+   pthread_t thread;
++#endif
+   bool running;
+ 
+   Pipeline* currentPipe;

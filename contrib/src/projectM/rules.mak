@@ -27,7 +27,7 @@ endif
 
 DEPS_projectM = glew $(DEPS_glew)
 
-.projectM: projectM .glew .pthreads
+.projectM: projectM .glew
 	-cd $< && rm CMakeCache.txt
 	cd $< && $(HOSTVARS) $(CMAKE) \
 		-DINCLUDE-PROJECTM-LIBVISUAL:BOOL=OFF \
