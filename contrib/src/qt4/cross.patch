@@ -1,0 +1,44 @@
+--- qt-everywhere-opensource-src-4.7.4/mkspecs/win32-g++/qmake.conf.orig    2011-09-28 14:32:02.709958498 -0400
++++ qt-everywhere-opensource-src-4.7.4/mkspecs/win32-g++/qmake.conf 2011-09-28 14:36:32.529954583 -0400
+@@ -14,7 +14,7 @@
+ QMAKE_EXT_OBJ           = .o
+ QMAKE_EXT_RES           = _res.o
+ 
+-QMAKE_CC		= gcc
++QMAKE_CC		= $(XCC)
+ QMAKE_LEX		= flex
+ QMAKE_LEXFLAGS		=
+ QMAKE_YACC		= byacc
+@@ -27,7 +27,7 @@
+ QMAKE_CFLAGS_DEBUG	= -g
+ QMAKE_CFLAGS_YACC	= -Wno-unused -Wno-parentheses
+ 
+-QMAKE_CXX		= g++
++QMAKE_CXX		= $(XCXX)
+ QMAKE_CXXFLAGS		= $$QMAKE_CFLAGS
+ QMAKE_CXXFLAGS_DEPS	= $$QMAKE_CFLAGS_DEPS
+ QMAKE_CXXFLAGS_WARN_ON	= $$QMAKE_CFLAGS_WARN_ON
+@@ -50,8 +50,8 @@
+ QMAKE_RUN_CXX		= $(CXX) -c $(CXXFLAGS) $(INCPATH) -o $obj $src
+ QMAKE_RUN_CXX_IMP	= $(CXX) -c $(CXXFLAGS) $(INCPATH) -o $@ $<
+ 
+-QMAKE_LINK		= g++
+-QMAKE_LINK_C		= gcc
++QMAKE_LINK		= $(XCXX)
++QMAKE_LINK_C		= $(XCC)
+ QMAKE_LFLAGS		=
+ QMAKE_LFLAGS_EXCEPTIONS_ON = -mthreads
+ QMAKE_LFLAGS_EXCEPTIONS_OFF =
+@@ -100,10 +100,10 @@
+ QMAKE_IDC		= $$[QT_INSTALL_BINS]$${DIR_SEPARATOR}idc.exe
+ 
+ QMAKE_IDL		= midl
+-QMAKE_LIB		= ar -ru
++QMAKE_LIB		= $(XAR) -ru
+ QMAKE_RC		= windres
+ QMAKE_ZIP		= zip -r -9
+ 
+-QMAKE_STRIP		= strip
++QMAKE_STRIP		= $(XSTRIP)
+ QMAKE_STRIPFLAGS_LIB 	+= --strip-unneeded
+ load(qt_config)

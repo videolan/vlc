@@ -22,19 +22,15 @@ $(TARBALLS)/qt-$(QT4_VERSION).tar.gz:
 
 qt4: qt-$(QT4_VERSION).tar.gz .sum-qt4
 	$(UNPACK)
-ifdef HAVE_WIN32
-ifdef HAVE_WIN64
-	patch -p0 < $(SRC)/qt4/cross-win64.diff
-else
-	patch -p0 < $(SRC)/qt4/cross-win32.diff
-endif
-endif
+	patch -p0 < $(SRC)/qt4/cross.patch
 	mv qt-everywhere-opensource-src-4.7.4 $@ && touch $@
 
+XTOOLS := XCC="$(CC)" XCXX="$(CXX)" XSTRIP="$(STRIP)" XAR="$(AR)"
+
 .qt4: qt4
-	cd $< && ./configure -xplatform win32-g++ -static -release -fast -no-exceptions -no-stl -no-sql-sqlite -no-qt3support -no-gif -no-libmng -qt-libjpeg -no-libtiff -no-qdbus -no-openssl -no-webkit -sse -no-script -no-multimedia -no-phonon -opensource -no-scripttools -no-opengl -no-script -no-scripttools -no-declarative -no-declarative-debug -opensource -no-s60 -host-little-endian -confirm-license
-	cd $< && make sub-src
-	cd $</src/plugins/imageformats/jpeg && make # FIXME
+	cd $< && $(XTOOLS) ./configure -xplatform win32-g++ -static -release -fast -no-exceptions -no-stl -no-sql-sqlite -no-qt3support -no-gif -no-libmng -qt-libjpeg -no-libtiff -no-qdbus -no-openssl -no-webkit -sse -no-script -no-multimedia -no-phonon -opensource -no-scripttools -no-opengl -no-script -no-scripttools -no-declarative -no-declarative-debug -opensource -no-s60 -host-little-endian -confirm-license
+	cd $< && $(MAKE) $(XTOOLS) sub-src
+	cd $</src/plugins/imageformats/jpeg && $(MAKE) $(XTOOLS) # FIXME
 	# INSTALLING LIBRARIES
 	for lib in QtGui QtCore; \
 		do install -D -- $</lib/lib$${lib}.a "$(PREFIX)/lib/lib$${lib}.a"; \
@@ -52,6 +48,7 @@ endif
 	cd $</src/gui; find . -type f -name '*.h' -exec install -D -- "{}" "$(PREFIX)/include/qt4/src/gui/{}" \;
 	cd $</include/QtGui; find . -maxdepth 1 -type f \( -name '*.h' -o -name 'Q*' \) -exec install -D -s --strip-program="$(abspath $(SRC)/qt4/fix_header.sh)" -- "{}" "$(PREFIX)/include/qt4/QtGui/{}" \;
 	# INSTALLING PKGCONFIG FILES
+	install -d "$(PREFIX)/lib/pkgconfig"
 	cat $(SRC)/qt4/QtCore.pc.in | sed -e s/@@VERSION@@/$(QT4_VERSION)/ | sed -e 's|@@PREFIX@@|$(PREFIX)|' > "$(PREFIX)/lib/pkgconfig/QtCore.pc"
 	cat $(SRC)/qt4/QtGui.pc.in | sed -e s/@@VERSION@@/$(QT4_VERSION)/ | sed -e 's|@@PREFIX@@|$(PREFIX)|' > "$(PREFIX)/lib/pkgconfig/QtGui.pc"
 	touch $@
