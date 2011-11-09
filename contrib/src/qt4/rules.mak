@@ -38,7 +38,7 @@ ifdef HAVE_CROSS_COMPILE
 		$(MAKE) $(XTOOLS)
 endif
 	# INSTALLING LIBRARIES
-	for lib in QtGui QtCore; \
+	for lib in QtGui QtCore QtNetwork QtXml; \
 		do install -D -- $</lib/lib$${lib}.a "$(PREFIX)/lib/lib$${lib}.a"; \
 	done
 	# INSTALLING PLUGINS
@@ -53,6 +53,12 @@ endif
 	# INSTALLING GUI HEADERS
 	cd $</src/gui; find . -type f -name '*.h' -exec install -D -- "{}" "$(PREFIX)/include/qt4/src/gui/{}" \;
 	cd $</include/QtGui; find . -maxdepth 1 -type f \( -name '*.h' -o -name 'Q*' \) -exec install -D -s --strip-program="$(abspath $(SRC)/qt4/fix_header.sh)" -- "{}" "$(PREFIX)/include/qt4/QtGui/{}" \;
+	# INSTALLING XML HEADERS
+	cd $</src/xml;    find . -type f -name '*.h' -exec install -D -- "{}" "$(PREFIX)/include/qt4/src/xml/{}" \;
+	cd $</include/QtXml; find . -maxdepth 1 -type f \( -name '*.h' -o -name 'Q*' \) -exec install -D -s --strip-program="$(abspath $(SRC)/qt4/fix_header.sh)" -- "{}" "$(PREFIX)/include/qt4/QtXml/{}" \;
+	# INSTALLING NETWORK HEADERS
+	cd $</src/network;    find . -type f -name '*.h' -exec install -D -- "{}" "$(PREFIX)/include/qt4/src/network/{}" \;
+	cd $</include/QtNetwork; find . -maxdepth 1 -type f \( -name '*.h' -o -name 'Q*' \) -exec install -D -s --strip-program="$(abspath $(SRC)/qt4/fix_header.sh)" -- "{}" "$(PREFIX)/include/qt4/QtNetwork/{}" \;
 	# INSTALLING PKGCONFIG FILES
 	install -d "$(PREFIX)/lib/pkgconfig"
 	cat $(SRC)/qt4/QtCore.pc.in | sed -e s/@@VERSION@@/$(QT4_VERSION)/ | sed -e 's|@@PREFIX@@|$(PREFIX)|' > "$(PREFIX)/lib/pkgconfig/QtCore.pc"
