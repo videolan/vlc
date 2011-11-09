@@ -194,8 +194,10 @@ void PLSelector::createItems()
                               THEPL->p_media_library );
     ml->treeItem()->setData( 0, SPECIAL_ROLE, QVariant( IS_ML ) );
 
+#ifdef MEDIA_LIBRARY
     /* SQL ML */
     addItem( SQL_ML_TYPE, "SQL Media Library" )->treeItem();
+#endif
 
     /* SD nodes */
     QTreeWidgetItem *mycomp = addItem( CATEGORY_TYPE, N_("My Computer") )->treeItem();
@@ -278,11 +280,13 @@ void PLSelector::setSource( QTreeWidgetItem *item )
         if( !sd_loaded )
             playlist_ServicesDiscoveryAdd( THEPL, qtu( qs ) );
     }
+#ifdef MEDIA_LIBRARY
     else if( i_type == SQL_ML_TYPE )
     {
         emit categoryActivated( NULL, true );
         return;
     }
+#endif
 
     /* */
     playlist_Lock( THEPL );
