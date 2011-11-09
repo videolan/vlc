@@ -95,6 +95,7 @@ static int blurayOpen( vlc_object_t *object )
     char *pos_title;
     int i_title = -1;
     char bd_path[PATH_MAX];
+    const char *error_msg = NULL;
 
     if (strcmp(p_demux->psz_access, "bluray")) {
         // TODO BDMV support, once we figure out what to do in libbluray
@@ -136,43 +137,34 @@ static int blurayOpen( vlc_object_t *object )
     /* AACS */
     if (disc_info->aacs_detected) {
         if (!disc_info->libaacs_detected) {
-            dialog_Fatal (p_demux, _("Blu-Ray error"),
-                    _("This Blu-Ray Disc needs a library for AACS decoding, "
-                      "and your system does not have it."));
-            blurayClose(object);
-            return VLC_EGENERIC;
+            error_msg = _("This Blu-Ray Disc needs a library for AACS decoding, "
+                      "and your system does not have it.");
+            goto error;
         }
         if (!disc_info->aacs_handled) {
-            dialog_Fatal (p_demux, _("Blu-Ray error"),
-                    _("Your system AACS decoding library does not work. "
-                      "Missing keys?"));
-            blurayClose(object);
-            return VLC_EGENERIC;
+            error_msg = _("Your system AACS decoding library does not work. "
+                      "Missing keys?");
+            goto error;
         }
     }
 
     /* BD+ */
     if (disc_info->bdplus_detected) {
         if (!disc_info->libbdplus_detected) {
-            dialog_Fatal (p_demux, _("Blu-Ray error"),
-                    _("This Blu-Ray Disc needs a library for BD+ decoding, "
-                      "and your system does not have it."));
-            blurayClose(object);
-            return VLC_EGENERIC;
+            error_msg = _("This Blu-Ray Disc needs a library for BD+ decoding, "
+                      "and your system does not have it.");
+            goto error;
         }
         if (!disc_info->bdplus_handled) {
-            dialog_Fatal (p_demux, _("Blu-Ray error"),
-                    _("Your system BD+ decoding library does not work. "
-                      "Missing configuration?"));
-            blurayClose(object);
-            return VLC_EGENERIC;
+            error_msg = _("Your system BD+ decoding library does not work. "
+                      "Missing configuration?");
+            goto error;
         }
     }
 
     /* Get titles and chapters */
     if (blurayInitTitles(p_demux) != VLC_SUCCESS) {
-        blurayClose(object);
-        return VLC_EGENERIC;
+        goto error;
     }
 
     /* get title request */
@@ -185,21 +177,25 @@ static int blurayOpen( vlc_object_t *object )
     /* set start title number */
     if (bluraySetTitle(p_demux, i_title) != VLC_SUCCESS) {
         msg_Err( p_demux, "Could not set the title %d", i_title );
-        blurayClose(object);
-        return VLC_EGENERIC;
+        goto error;
     }
 
     p_sys->p_parser   = stream_DemuxNew(p_demux, "ts", p_demux->out);
     if (!p_sys->p_parser) {
         msg_Err(p_demux, "Failed to create TS demuxer");
-        blurayClose(object);
-        return VLC_EGENERIC;
+        goto error;
     }
 
     p_demux->pf_control = blurayControl;
     p_demux->pf_demux   = blurayDemux;
 
     return VLC_SUCCESS;
+
+error:
+    if (error_msg)
+        dialog_Fatal(p_demux, _("Blu-Ray error"), "%s", error_msg);
+    blurayClose(object);
+    return VLC_EGENERIC;
 }
 
 
