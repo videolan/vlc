@@ -12,5 +12,5 @@ export CONTRIB_DIR
 
 CONFIGURE="${root}configure" \
 CONFIGOPTS="--host=x86_64-w64-mingw32 --build=i386-linux
- --enable-mkv --enable-taglib --enable-debug --disable-projectm" \
+ --enable-mkv --enable-taglib --enable-debug" \
 sh ${root}extras/package/win32/configure-common.sh
