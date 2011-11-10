@@ -436,6 +436,19 @@ void DiscOpenPanel::updateButtons()
         ui.diskOptionBox_2->show();
         ui.dvdsimple->setEnabled( true );
     }
+    if ( ui.bdRadioButton->isChecked() )
+    {
+        if( m_discType != BRD )
+        {
+            setDrive( psz_dvddiscpath );
+            m_discType = BRD;
+        }
+        ui.titleLabel->setText( qtr("Title") );
+        ui.chapterLabel->hide();
+        ui.chapterSpin->hide();
+        ui.diskOptionBox_2->hide();
+        ui.dvdsimple->setEnabled( true );
+    }
     else if ( ui.vcdRadioButton->isChecked() )
     {
         if( m_discType != Vcd )
@@ -500,6 +513,8 @@ void DiscOpenPanel::updateMRL()
                 mrl+= QString(":%1").arg( ui.chapterSpin->value() );
             }
         }
+    } else if ( ui.bdRadioButton->isChecked() ) {
+        mrl = "bluray://" LOCALHOST + discPath;
 
     /* VCD */
     } else if ( ui.vcdRadioButton->isChecked() ) {
