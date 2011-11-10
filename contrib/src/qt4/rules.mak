@@ -20,7 +20,7 @@ $(TARBALLS)/qt-$(QT4_VERSION).tar.gz:
 qt4: qt-$(QT4_VERSION).tar.gz .sum-qt4
 	$(UNPACK)
 	patch -p0 < $(SRC)/qt4/cross.patch
-	sed -i.orig s/'QMakeVar add styles "cde mac motif plastique cleanlooks windows"'// qt-everywhere-opensource-src-4.7.4/configure
+	patch -p0 < $(SRC)/qt4/styles.patch
 	mv qt-everywhere-opensource-src-4.7.4 $@ && touch $@
 
 XTOOLS := XCC="$(CC)" XCXX="$(CXX)" XSTRIP="$(STRIP)" XAR="$(AR)"
