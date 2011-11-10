@@ -174,10 +174,11 @@ public:
     virtual ~DiscOpenPanel();
     virtual void clear() ;
     virtual void accept() ;
+    void onFocus();
 private:
     Ui::OpenDisk ui;
     char *psz_dvddiscpath, *psz_vcddiscpath, *psz_cddadiscpath;
-    DiscType    m_discType;
+    DiscType m_discType;
 public slots:
     virtual void updateMRL() ;
 private slots:

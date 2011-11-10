@@ -336,6 +336,28 @@ DiscOpenPanel::DiscOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     ui.deviceCombo->setToolTip( qtr(I_DEVICE_TOOLTIP) );
     ui.deviceCombo->setInsertPolicy( QComboBox::InsertAtTop );
 
+    /* CONNECTs */
+    BUTTONACT( ui.dvdRadioButton, updateButtons() );
+    BUTTONACT( ui.vcdRadioButton, updateButtons() );
+    BUTTONACT( ui.audioCDRadioButton, updateButtons() );
+    BUTTONACT( ui.dvdsimple, updateButtons() );
+    BUTTONACT( ui.browseDiscButton, browseDevice() );
+    BUTTON_SET_ACT_I( ui.ejectButton, "", toolbar/eject, qtr( "Eject the disc" ),
+            eject() );
+
+    CONNECT( ui.deviceCombo, editTextChanged( QString ), this, updateMRL());
+    CONNECT( ui.deviceCombo, currentIndexChanged( QString ), this, updateMRL());
+    CONNECT( ui.titleSpin, valueChanged( int ), this, updateMRL());
+    CONNECT( ui.chapterSpin, valueChanged( int ), this, updateMRL());
+    CONNECT( ui.audioSpin, valueChanged( int ), this, updateMRL());
+    CONNECT( ui.subtitlesSpin, valueChanged( int ), this, updateMRL());
+
+    /* Run once the updateButtons function in order to fill correctly the comboBoxes */
+    updateButtons();
+}
+
+void DiscOpenPanel::onFocus()
+{
 #ifdef WIN32 /* Disc drives probing for Windows */
     wchar_t szDrives[512];
     szDrives[0] = '\0';
@@ -375,24 +397,7 @@ DiscOpenPanel::DiscOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     POPULATE_WITH_DEVS( ppsz_discdevices, discCombo );
 #endif
 
-    /* CONNECTs */
-    BUTTONACT( ui.dvdRadioButton, updateButtons() );
-    BUTTONACT( ui.vcdRadioButton, updateButtons() );
-    BUTTONACT( ui.audioCDRadioButton, updateButtons() );
-    BUTTONACT( ui.dvdsimple, updateButtons() );
-    BUTTONACT( ui.browseDiscButton, browseDevice() );
-    BUTTON_SET_ACT_I( ui.ejectButton, "", toolbar/eject, qtr( "Eject the disc" ),
-            eject() );
 
-    CONNECT( ui.deviceCombo, editTextChanged( QString ), this, updateMRL());
-    CONNECT( ui.deviceCombo, currentIndexChanged( QString ), this, updateMRL());
-    CONNECT( ui.titleSpin, valueChanged( int ), this, updateMRL());
-    CONNECT( ui.chapterSpin, valueChanged( int ), this, updateMRL());
-    CONNECT( ui.audioSpin, valueChanged( int ), this, updateMRL());
-    CONNECT( ui.subtitlesSpin, valueChanged( int ), this, updateMRL());
-
-    /* Run once the updateButtons function in order to fill correctly the comboBoxes */
-    updateButtons();
 }
 
 DiscOpenPanel::~DiscOpenPanel()
