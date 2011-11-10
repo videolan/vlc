@@ -22,6 +22,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
+#include <vlc_common.h>
+#include <vlc_fs.h>
+
 #include "theme_loader.hpp"
 #include "theme.hpp"
 #include "../parser/builder.hpp"
@@ -38,9 +45,6 @@
 #endif
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
-#endif
-#if defined( _WIN64 )
-#   include <direct.h>
 #endif
 
 #if defined( HAVE_ZLIB_H )
@@ -656,10 +660,6 @@ int getoct( char *p, int width )
 
 #endif
 
-#ifdef WIN32
-#  define mkdir(dirname,mode) _mkdir(dirname)
-#endif
-
 /* Recursive make directory
  * Abort if you get an ENOENT errno somewhere in the middle
  * e.g. ignore error "mkdir on existing directory"
@@ -682,7 +682,7 @@ int makedir( const char *newdir )
         buffer[len-1] = '\0';
     }
 
-    if( mkdir( buffer, 0775 ) == 0 )
+    if( vlc_mkdir( buffer, 0775 ) == 0 )
     {
         free( buffer );
         return 1;
@@ -696,7 +696,7 @@ int makedir( const char *newdir )
         while( *p && *p != '\\' && *p != '/' ) p++;
         hold = *p;
         *p = 0;
-        if( ( mkdir( buffer, 0775 ) == -1 ) && ( errno == ENOENT ) )
+        if( ( vlc_mkdir( buffer, 0775 ) == -1 ) && ( errno == ENOENT ) )
         {
             fprintf( stderr, "couldn't create directory %s\n", buffer );
             free( buffer );
