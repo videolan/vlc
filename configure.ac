@@ -3253,7 +3253,7 @@ if test "${enable_directx}" != "no"; then
       )
 
       dnl OpenGL
-      AC_CHECK_HEADERS(GL/glext.h,
+      AC_CHECK_HEADERS(GL/wglew.h,
       [ VLC_ADD_PLUGIN([glwin32])
         VLC_ADD_LIBS([glwin32],[-lopengl32 -lgdi32])
       ],[],[
