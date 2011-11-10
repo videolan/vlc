@@ -1401,7 +1401,7 @@ msgstr "Telnet"
 
 #: src/interface/interface.c:98
 msgid "Web"
-msgstr "Réseau"
+msgstr "Web"
 
 #: src/interface/interface.c:101
 msgid "Debug logging"
