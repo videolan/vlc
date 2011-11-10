@@ -146,6 +146,7 @@ Audio Output and Filters:
  * New Compressor filter, a dynamic range compressor
  * New simplistic Karaoke filter
  * New audio output based on kai API for OS/2
+ * Automatic handover from S/PDIF to PCM with PulseAudio 1.0
 
 Video Filter:
  * New gradfun filter for debanding videos using dithering
