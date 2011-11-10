@@ -571,8 +571,11 @@ static VLCMain *_o_sharedMainInstance = nil;
     var_AddCallback(p_playlist, "volume", VolumeUpdated, self);
     var_AddCallback(p_playlist, "mute", VolumeUpdated, self);
 
-    if ([NSApp currentSystemPresentationOptions] == NSApplicationPresentationFullScreen)
-        var_SetBool( p_playlist, "fullscreen", YES );
+    if (OSX_LION)
+    {
+        if ([NSApp currentSystemPresentationOptions] == NSApplicationPresentationFullScreen)
+            var_SetBool( p_playlist, "fullscreen", YES );
+    }
 
     /* load our Core Dialogs nib */
     nib_coredialogs_loaded = [NSBundle loadNibNamed:@"CoreDialogs" owner: NSApp];
