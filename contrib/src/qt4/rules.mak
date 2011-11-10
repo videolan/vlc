@@ -48,22 +48,18 @@ endif
 	for codec in cn jp kr tw; \
 		do install -D -- $</plugins/codecs/libq$${codec}codecs.a "$(PREFIX)/lib/libq$${codec}codecs.a"; \
 	done
-	# INSTALLING CORE HEADERS
-	cd $</src/corelib;    find . -type f -name '*.h' -exec install -D -- "{}" "$(PREFIX)/include/qt4/src/corelib/{}" \;
-	cd $</include/QtCore; find . -maxdepth 1 -type f \( -name '*.h' -o -name 'Q*' \) -exec install -D -s --strip-program="$(abspath $(SRC)/qt4/fix_header.sh)" -- "{}" "$(PREFIX)/include/qt4/QtCore/{}" \;
-	# INSTALLING GUI HEADERS
-	cd $</src/gui; find . -type f -name '*.h' -exec install -D -- "{}" "$(PREFIX)/include/qt4/src/gui/{}" \;
-	cd $</include/QtGui; find . -maxdepth 1 -type f \( -name '*.h' -o -name 'Q*' \) -exec install -D -s --strip-program="$(abspath $(SRC)/qt4/fix_header.sh)" -- "{}" "$(PREFIX)/include/qt4/QtGui/{}" \;
-	# INSTALLING XML HEADERS
-	cd $</src/xml;    find . -type f -name '*.h' -exec install -D -- "{}" "$(PREFIX)/include/qt4/src/xml/{}" \;
-	cd $</include/QtXml; find . -maxdepth 1 -type f \( -name '*.h' -o -name 'Q*' \) -exec install -D -s --strip-program="$(abspath $(SRC)/qt4/fix_header.sh)" -- "{}" "$(PREFIX)/include/qt4/QtXml/{}" \;
-	# INSTALLING NETWORK HEADERS
-	cd $</src/network;    find . -type f -name '*.h' -exec install -D -- "{}" "$(PREFIX)/include/qt4/src/network/{}" \;
-	cd $</include/QtNetwork; find . -maxdepth 1 -type f \( -name '*.h' -o -name 'Q*' \) -exec install -D -s --strip-program="$(abspath $(SRC)/qt4/fix_header.sh)" -- "{}" "$(PREFIX)/include/qt4/QtNetwork/{}" \;
+	# INSTALLING HEADERS
+	for h in corelib gui xml network; \
+		do find . -type f -name '*.h' -exec install -D -- "{}" "$(PREFIX)/include/qt4/src/$${h}/{}" \; ; \
+	done
+	for h in Core Gui Xml Network; \
+		do cd $</include/Qt$${h}; find . -maxdepth 1 -type f \( -name '*.h' -o -name 'Q*' \) -exec install -D -s --strip-program="$(abspath $(SRC)/qt4/fix_header.sh)" -- "{}" "$(PREFIX)/include/qt4/Qt$${h}/{}" \; ; \
+	done
 	# INSTALLING PKGCONFIG FILES
 	install -d "$(PREFIX)/lib/pkgconfig"
-	cat $(SRC)/qt4/QtCore.pc.in | sed -e s/@@VERSION@@/$(QT4_VERSION)/ | sed -e 's|@@PREFIX@@|$(PREFIX)|' > "$(PREFIX)/lib/pkgconfig/QtCore.pc"
-	cat $(SRC)/qt4/QtGui.pc.in | sed -e s/@@VERSION@@/$(QT4_VERSION)/ | sed -e 's|@@PREFIX@@|$(PREFIX)|' > "$(PREFIX)/lib/pkgconfig/QtGui.pc"
+	for i in Core Gui; \
+		do cat $(SRC)/qt4/Qt$${i}.pc.in | sed -e s/@@VERSION@@/$(QT4_VERSION)/ | sed -e 's|@@PREFIX@@|$(PREFIX)|' > "$(PREFIX)/lib/pkgconfig/Qt$${i}.pc"; \
+	done
 	# INSTALLING QT BUILD TOOLS
 	install -d "$(PREFIX)/bin/"
 	for i in rcc moc uic; \
