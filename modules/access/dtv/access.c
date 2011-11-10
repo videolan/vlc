@@ -26,6 +26,7 @@
 
 #include <vlc_common.h>
 #include <vlc_access.h>
+#include <vlc_input.h>
 #include <vlc_plugin.h>
 #include <vlc_dialog.h>
 #include <search.h>
@@ -394,6 +395,7 @@ vlc_module_end ()
 struct access_sys_t
 {
     dvb_device_t *dev;
+    uint8_t signal_poll;
 };
 
 typedef struct delsys
@@ -429,6 +431,7 @@ static int Open (vlc_object_t *obj)
     }
 
     sys->dev = dev;
+    sys->signal_poll = 0;
     access->p_sys = sys;
 
     uint64_t freq = var_InheritFrequency (obj);
@@ -490,6 +493,12 @@ static block_t *Read (access_t *access)
     }
 
     block->i_buffer = val;
+
+    /* Fetch the signal levels every so often. Some devices do not like this
+     * to be requested too frequently, e.g. due to low bandwidth I²C bus. */
+    if ((sys->signal_poll++) == 0)
+        access->info.i_update |= INPUT_UPDATE_SIGNAL;
+
     return block;
 }
 
