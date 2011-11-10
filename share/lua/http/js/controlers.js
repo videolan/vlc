@@ -88,7 +88,7 @@ function updateStatus() {
                         orientation: "vertical",
                         stop: function (event, ui) {
                             $('#' + $(this).attr('id') + '_txt').empty().append(ui.value + 'dB');
-                            sendCommad({
+                            sendCommand({
                                 command: 'equalizer',
                                 val: ui.value,
                                 band: $(this).attr('id').substr(2)
