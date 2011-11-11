@@ -45,8 +45,7 @@
         store " %%xmm2,   16(%[dst])\n" \
         store " %%xmm3,   32(%[dst])\n" \
         store " %%xmm4,   48(%[dst])\n" \
-        : : [dst]"r"(dstp), [src]"r"(srcp) \
-        : "xmm1", "xmm2", "xmm3", "xmm4", "memory")
+        : : [dst]"r"(dstp), [src]"r"(srcp) : "memory")
 
 /* Execute the instruction op only if SSE2 is supported. */
 #ifdef CAN_COMPILE_SSE2
@@ -185,8 +184,7 @@ static void SplitUV(uint8_t *dstu, size_t dstu_pitch,
                     "pshufb  %%xmm7, %%xmm2\n"
                     "pshufb  %%xmm7, %%xmm3\n"
                     STORE2X32
-                    : : [dst1]"r"(&dstu[x]), [dst2]"r"(&dstv[x]), [src]"r"(&src[2*x]), [shuffle]"r"(shuffle)
-                    : "xmm0", "xmm1", "xmm2", "xmm3", "xmm7", "memory");
+                    : : [dst1]"r"(&dstu[x]), [dst2]"r"(&dstv[x]), [src]"r"(&src[2*x]), [shuffle]"r"(shuffle) : "memory");
             }
         } else
 #endif
@@ -212,8 +210,7 @@ static void SplitUV(uint8_t *dstu, size_t dstu_pitch,
                     "packuswb %%xmm6, %%xmm2\n"
                     "packuswb %%xmm7, %%xmm3\n"
                     STORE2X32
-                    : : [dst2]"r"(&dstu[x]), [dst1]"r"(&dstv[x]), [src]"r"(&src[2*x]), [mask]"r"(mask)
-                    : "xmm0", "xmm1", "xmm2", "xmm3", "xmm4", "xmm5", "xmm6", "xmm7", "memory");
+                    : : [dst2]"r"(&dstu[x]), [dst1]"r"(&dstv[x]), [src]"r"(&src[2*x]), [mask]"r"(mask) : "memory");
             }
         }
 #endif
