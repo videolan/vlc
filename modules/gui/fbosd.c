@@ -1349,14 +1349,14 @@ static int OverlayCallback( vlc_object_t *p_this, char const *psz_cmd,
                 break;
         }
         /* No, then find first FREE slot */
-        if( p_sys->render[i].i_state != FBOSD_STATE_RESERVED )
+        if( i == FBOSD_RENDER_MAX )
         {
             for( i = 0; i < FBOSD_RENDER_MAX; i++ )
             {
                 if( p_sys->render[i].i_state == FBOSD_STATE_FREE )
                     break;
             }
-            if( p_sys->render[i].i_state != FBOSD_STATE_FREE )
+            if( i == FBOSD_RENDER_MAX )
             {
                 msg_Warn( p_this, "render space depleated" );
                 return VLC_SUCCESS;
