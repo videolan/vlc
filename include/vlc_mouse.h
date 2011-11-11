@@ -117,7 +117,7 @@ static inline void vlc_mouse_GetMotion( int *pi_x, int *pi_y,
 static inline bool vlc_mouse_HasChanged( const vlc_mouse_t *p_old,
                                          const vlc_mouse_t *p_new )
 {
-    return p_old->i_x != p_new->i_x || p_old->i_x != p_new->i_x ||
+    return p_old->i_x != p_new->i_x || p_old->i_y != p_new->i_y ||
            p_old->i_pressed != p_new->i_pressed;
 }
 static inline bool vlc_mouse_HasMoved( const vlc_mouse_t *p_old,
