@@ -4165,15 +4165,6 @@ AC_ARG_ENABLE(macosx-vlc-app,
 AM_CONDITIONAL(BUILD_MACOSX_VLC_APP, [test "${enable_macosx_vlc_app}" != "no" &&
     (test "${SYS}" = "darwin" || test "${enable_macosx_vlc_app}" = "yes") ])
 
-
-dnl
-dnl Pic and shared libvlc stuff
-dnl
-AS_IF([test "${SYS}" = "mingw32"], [
-  FILE_LIBVLCCORE_DLL="!define LIBVLCCORE_DLL libvlccore.dll"
-  FILE_LIBVLC_DLL="!define LIBVLC_DLL libvlc.dll"
-])
-
 dnl
 dnl  Stuff used by the program
 dnl

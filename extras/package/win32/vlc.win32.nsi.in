@@ -23,9 +23,6 @@
 @HAVE_WIN64_FALSE@ !define INSTALL_ACTIVEX
 !define INSTALL_MOZILLA
 
-@FILE_LIBVLCCORE_DLL@
-@FILE_LIBVLC_DLL@
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;
 ; General configuration ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;
