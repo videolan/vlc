@@ -3257,6 +3257,7 @@ if test "${enable_directx}" != "no"; then
       [ VLC_ADD_PLUGIN([glwin32])
         VLC_ADD_LIBS([glwin32],[-lopengl32 -lgdi32])
       ],[],[
+        #include <windows.h>
         #include <GL/gl.h>
       ])
 
