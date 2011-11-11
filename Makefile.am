@@ -17,6 +17,14 @@ SUBDIRS += test
 EXTRA_DIST = \
 	extras/package/win32/vlc.exe.manifest \
 	extras/package/win32/libvlc.dll.manifest \
+	extras/package/win32/peflags.pl \
+	extras/package/win32/change-contribs-directory.sh \
+	extras/package/win32/configure-common.sh \
+	extras/package/win32/configure-cygwin.sh \
+	extras/package/win32/configure-mingw64.sh \
+	extras/package/win32/configure-mingw-release.sh \
+	extras/package/win32/configure-mingw.sh \
+	extras/package/win32/configure-msys.sh \
 	extras/package/macosx/README.MacOSX.rtf \
 	extras/package/rpm/vlc.fedora.spec \
 	extras/package/rpm/vlc.altlinux.spec \
