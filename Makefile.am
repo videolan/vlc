@@ -758,7 +758,11 @@ endif
 	cp -r $(destdir)/include "$(win32_destdir)/sdk"
 	cp -r $(destdir)/lib/pkgconfig "$(win32_destdir)/sdk/lib"
 	for file in libvlc.dll.a libvlc.la libvlccore.dll.a libvlccore.la; do \
-        cp -rv $(destdir)/lib/$$file "$(win32_destdir)/sdk/lib"; done
+		cp -rv $(destdir)/lib/$$file "$(win32_destdir)/sdk/lib"; \
+	done
+	$(DLLTOOL) -l "$(win32_destdir)/sdk/lib/libvlc.lib" -d "$(top_builddir)/lib/.libs/libvlc.dll.def" "$(destdir)/bin/libvlc.dll"
+	$(DLLTOOL) -l "$(win32_destdir)/sdk/lib/libvlccore.lib" -d "$(top_builddir)/src/.libs/libvlccore.dll.def" "$(destdir)/bin/libvlccore.dll"
+
 if !HAVE_WIN64
 if !HAVE_WINCE
 	mkdir -p "$(win32_destdir)/sdk/activex"
