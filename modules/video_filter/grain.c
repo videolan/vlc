@@ -186,7 +186,7 @@ static void BlockBlendSse2(uint8_t *dst, size_t dst_pitch,
                 [src1]"r"(&src[(2*i+0) * src_pitch]),
                 [src2]"r"(&src[(2*i+1) * src_pitch]),
                 [noise]"r"(&noise[2*i * BANK_SIZE])
-            : "memory");
+            : "xmm0", "xmm1", "xmm2", "xmm3", "xmm4", "memory");
     }
 #else
 #   error "BLEND_SIZE unsupported"
