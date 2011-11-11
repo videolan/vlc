@@ -47,10 +47,10 @@ endif
 	install -D -- $</plugins/accessible/libqtaccessiblewidgets.a "$(PREFIX)/lib/libqtaccessiblewidgets.a"
 	# INSTALLING HEADERS
 	for h in corelib gui xml network; \
-		do find . -type f -name '*.h' -exec install -D -- "{}" "$(PREFIX)/include/qt4/src/$${h}/{}" \; ; \
+		do (cd $</src/$${h} && find . -type f -name '*.h' -exec install -D -- "{}" "$(PREFIX)/include/qt4/src/$${h}/{}" \;) ; \
 	done
 	for h in Core Gui Xml Network; \
-		do cd $</include/Qt$${h}; find . -maxdepth 1 -type f \( -name '*.h' -o -name 'Q*' \) -exec install -D -s --strip-program="$(abspath $(SRC)/qt4/fix_header.sh)" -- "{}" "$(PREFIX)/include/qt4/Qt$${h}/{}" \; ; \
+		do (cd $</include/Qt$${h} && find . -maxdepth 1 -type f \( -name '*.h' -o -name 'Q*' \) -exec install -D -s --strip-program="$(abspath $(SRC)/qt4/fix_header.sh)" -- "{}" "$(PREFIX)/include/qt4/Qt$${h}/{}" \;) ; \
 	done
 	# INSTALLING PKGCONFIG FILES
 	install -d "$(PREFIX)/lib/pkgconfig"
