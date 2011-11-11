@@ -4347,8 +4347,6 @@ AM_COND_IF([HAVE_DARWIN], [
 dnl Generate makefiles
 AC_OUTPUT
 
-/bin/echo -n "Enabled modules: ${PLUGINS}"
-
 dnl Do we have to use make or gmake ?
 USE_MAKE_OR_GMAKE=`case "${SYS}" in openbsd*) echo "gmake";; *) echo "make";; esac`
 dnl Shortcut to nice compile message
