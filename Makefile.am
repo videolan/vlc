@@ -59,13 +59,8 @@ if HAVE_WIN32
 BUILT_SOURCES_distclean += \
 	extras/package/win32/vlc.win32.nsi extras/package/win32/spad.nsi
 endif
-if HAVE_DARWIN
-BUILT_SOURCES_clean = macosx-sdk
-else
-BUILT_SOURCES_clean =
-endif
 
-BUILT_SOURCES = $(BUILT_SOURCES_distclean) $(BUILT_SOURCES_clean)
+BUILT_SOURCES = $(BUILT_SOURCES_distclean)
 
 SUFFIXES = 
 
@@ -347,7 +342,7 @@ EXTRA_DIST += \
 # Building libvlc
 ###############################################################################
 
-CLEANFILES = $(BUILT_SOURCES_clean)
+CLEANFILES =
 DISTCLEANFILES = $(BUILT_SOURCES_distclean) compile
 MAINTAINERCLEANFILES = ChangeLog
 
@@ -1009,10 +1004,3 @@ package-translations:
 
 update-po:
 	cd po && $(MAKE) POTFILES vlc.pot update-po
-
-
-###############################################################################
-# Enforce Mac OS X deployment target environment variable
-###############################################################################
-macosx-sdk: Makefile.in $(HEADERS_include)
-	export MACOSX_DEPLOYMENT_TARGET=$(MACOSX_DEPLOYMENT_TARGET)
