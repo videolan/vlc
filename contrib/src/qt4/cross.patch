@@ -42,3 +42,22 @@
 +QMAKE_STRIP		= $(XSTRIP)
  QMAKE_STRIPFLAGS_LIB 	+= --strip-unneeded
  load(qt_config)
+--- qt-everywhere-opensource-src-4.7.4/configure.orig	2011-11-10 18:48:29.351058392 -0500
++++ qt-everywhere-opensource-src-4.7.4/configure	2011-11-10 18:50:40.971711056 -0500
+@@ -7767,6 +7767,7 @@
+ fi
+ 
+ # X11/Unix/Mac only configs
++if [ "$XPLATFORM_MINGW" != "yes" ]; then
+ [ "$CFG_CUPS" = "no" ]       && QCONFIG_FLAGS="$QCONFIG_FLAGS QT_NO_CUPS"
+ [ "$CFG_ICONV" = "no" ]      && QCONFIG_FLAGS="$QCONFIG_FLAGS QT_NO_ICONV"
+ [ "$CFG_GLIB" != "yes" ]     && QCONFIG_FLAGS="$QCONFIG_FLAGS QT_NO_GLIB"
+@@ -7807,6 +7808,8 @@
+ [ "$CFG_COREWLAN" = "no" ]       && QCONFIG_FLAGS="$QCONFIG_FLAGS QT_NO_COREWLAN"
+ [ "$CFG_ICD" != "yes" ] && QCONFIG_FLAGS="$QCONFIG_FLAGS QT_NO_ICD"
+ 
++fi
++
+ # sort QCONFIG_FLAGS for neatness if we can
+ [ '!' -z "$AWK" ] && QCONFIG_FLAGS=`echo $QCONFIG_FLAGS | $AWK '{ gsub(" ", "\n"); print }' | sort | uniq`
+ QCONFIG_FLAGS=`echo $QCONFIG_FLAGS`

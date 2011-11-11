@@ -6,5 +6,5 @@ includedir=${prefix}/include/qt4/QtCore
 Name: Qtcore
 Description: Qtcore Library
 Version: @@VERSION@@
-Libs: -Wl,--subsystem,windows -mwindows -L${libdir} -lQtCore -lqcncodecs -lqjpcodecs -lqkrcodecs -lqtwcodecs -lrpcrt4 -loleaut32 -lole32 -luuid -lwinspool -lwinmm -lshell32 -lcomctl32 -ladvapi32 -lgdi32 -limm32 -lwsock32
+Libs: -Wl,--subsystem,windows -mwindows -L${libdir} -lQtCore -lrpcrt4 -loleaut32 -lole32 -luuid -lwinspool -lwinmm -lshell32 -lcomctl32 -ladvapi32 -lgdi32 -limm32 -lwsock32
 Cflags:  -I${prefix}/include/qt4 -I${includedir} -DQT_NODLL

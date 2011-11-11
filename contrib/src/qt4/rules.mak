@@ -45,9 +45,6 @@ endif
 	# INSTALLING PLUGINS
 	install -D -- $</plugins/imageformats/libqjpeg.a "$(PREFIX)/lib/libqjpeg.a"
 	install -D -- $</plugins/accessible/libqtaccessiblewidgets.a "$(PREFIX)/lib/libqtaccessiblewidgets.a"
-	for codec in cn jp kr tw; \
-		do install -D -- $</plugins/codecs/libq$${codec}codecs.a "$(PREFIX)/lib/libq$${codec}codecs.a"; \
-	done
 	# INSTALLING HEADERS
 	for h in corelib gui xml network; \
 		do find . -type f -name '*.h' -exec install -D -- "{}" "$(PREFIX)/include/qt4/src/$${h}/{}" \; ; \
