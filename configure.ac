@@ -1202,11 +1202,18 @@ AS_IF([test "${enable_mmx}" != "no"], [
               [Define to 1 if MMX intrinsics are available.])
   ])
 
-  AC_CACHE_CHECK([if $CC groks MMX inline assembly],
-    [ac_cv_mmx_inline],
-    [CFLAGS="${CFLAGS_save}"
-     AC_TRY_COMPILE(,[void *p;asm volatile("packuswb %%mm1,%%mm2"::"r"(p));],
-                    ac_cv_mmx_inline=yes, ac_cv_mmx_inline=no)])
+  AC_CACHE_CHECK([if $CC groks MMX inline assembly], [ac_cv_mmx_inline], [
+    CFLAGS="${CFLAGS_save} -mmmx"
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM(,[[
+void *p;
+asm volatile("packuswb %%mm1,%%mm2"::"r"(p):"mm1", "mm2");
+]])
+    ], [
+      ac_cv_mmx_inline=yes
+    ], [
+      ac_cv_mmx_inline=no
+    ])
+  ])
   AS_IF([test "${ac_cv_mmx_inline}" != "no"], [
     AC_DEFINE(CAN_COMPILE_MMX, 1,
               [Define to 1 inline MMX assembly is available.])
@@ -1214,10 +1221,18 @@ AS_IF([test "${enable_mmx}" != "no"], [
   ])
 
   AC_CACHE_CHECK([if $CC groks MMX EXT inline assembly],
-    [ac_cv_mmxext_inline],
-    [CFLAGS="${CFLAGS_save}"
-     AC_TRY_COMPILE(,[void *p;asm volatile("maskmovq %%mm1,%%mm2"::"r"(p));],
-                    ac_cv_mmxext_inline=yes, ac_cv_mmxext_inline=no)])
+                 [ac_cv_mmxext_inline], [
+    CFLAGS="${CFLAGS_save} -mmmx"
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM(,[[
+void *p;
+asm volatile("maskmovq %%mm1,%%mm2"::"r"(p):"mm1", "mm2");
+]])
+    ], [
+      ac_cv_mmxext_inline=yes
+    ], [
+      ac_cv_mmxext_inline=no
+    ])
+  ])
   AS_IF([test "${ac_cv_mmxext_inline}" != "no"], [
     AC_DEFINE(CAN_COMPILE_MMXEXT, 1,
               [Define to 1 if MMX EXT inline assembly is available.])
@@ -1268,21 +1283,35 @@ AS_IF([test "${enable_sse}" != "no"], [
               [Define to 1 if SSE2 intrinsics are available.])
   ])
 
-  AC_CACHE_CHECK([if $CC groks SSE inline assembly],
-    [ac_cv_sse_inline],
-    [CFLAGS="${CFLAGS_save}"
-     AC_TRY_COMPILE(,[void *p;asm volatile("xorps %%xmm1,%%xmm2"::"r"(p));],
-                    ac_cv_sse_inline=yes, ac_cv_sse_inline=no)])
+  AC_CACHE_CHECK([if $CC groks SSE inline assembly], [ac_cv_sse_inline], [
+    CFLAGS="${CFLAGS_save} -msse"
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM(,[[
+void *p;
+asm volatile("xorps %%xmm1,%%xmm2"::"r"(p):"xmm1", "xmm2");
+]])
+    ], [
+      ac_cv_sse_inline=yes
+    ], [
+      ac_cv_sse_inline=no
+    ])
+  ])
   AS_IF([test "${ac_cv_sse_inline}" != "no" -a "${SYS}" != "solaris"], [
     AC_DEFINE(CAN_COMPILE_SSE, 1,
               [Define to 1 if SSE inline assembly is available.])
   ])
 
-  AC_CACHE_CHECK([if $CC groks SSE2 inline assembly],
-    [ac_cv_sse2_inline],
-    [CFLAGS="${CFLAGS_save}"
-     AC_TRY_COMPILE(,[void *p;asm volatile("punpckhqdq %%xmm1,%%xmm2"::"r"(p));],
-                    ac_cv_sse2_inline=yes, ac_cv_sse2_inline=no)])
+  AC_CACHE_CHECK([if $CC groks SSE2 inline assembly], [ac_cv_sse2_inline], [
+    CFLAGS="${CFLAGS_save} -msse"
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM(,[[
+void *p;
+asm volatile("punpckhqdq %%xmm1,%%xmm2"::"r"(p):"xmm1", "xmm2");
+]])
+    ], [
+      ac_cv_sse2_inline=yes
+    ], [
+      ac_cv_sse2_inline=no
+    ])
+  ])
   AS_IF([test "${ac_cv_sse2_inline}" != "no" -a "${SYS}" != "solaris"], [
     AC_DEFINE(CAN_COMPILE_SSE2, 1,
               [Define to 1 if SSE2 inline assembly is available.])
@@ -1290,50 +1319,87 @@ AS_IF([test "${enable_sse}" != "no"], [
   ])
 
   # SSE3
-  AC_CACHE_CHECK([if $CC groks SSE3 inline assembly],
-    [ac_cv_sse3_inline],
-    [CFLAGS="${CFLAGS_save}"
-     AC_TRY_COMPILE(,[void *p;asm volatile("movsldup %%xmm1,%%xmm0"::"r"(p));],
-                    ac_cv_sse3_inline=yes, ac_cv_sse3_inline=no)])
+  AC_CACHE_CHECK([if $CC groks SSE3 inline assembly], [ac_cv_sse3_inline], [
+    CFLAGS="${CFLAGS_save} -msse"
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM(,[[
+void *p;
+asm volatile("movsldup %%xmm1,%%xmm0"::"r"(p):"xmm0", "xmm1");
+]])
+    ], [
+      ac_cv_sse3_inline=yes
+    ], [
+      ac_cv_sse3_inline=no
+    ])
+  ])
   AS_IF([test "${ac_cv_sse3_inline}" != "no"], [
     AC_DEFINE(CAN_COMPILE_SSE3, 1,
               [Define to 1 if SSE3 inline assembly is available.]) ])
   # SSSE3
-  AC_CACHE_CHECK([if $CC groks SSSE3 inline assembly],
-    [ac_cv_ssse3_inline],
-    [CFLAGS="${CFLAGS_save}"
-     AC_TRY_COMPILE(,[void *p;asm volatile("pabsw %%xmm0,%%xmm0"::"r"(p));],
-                    ac_cv_ssse3_inline=yes, ac_cv_ssse3_inline=no)])
+  AC_CACHE_CHECK([if $CC groks SSSE3 inline assembly], [ac_cv_ssse3_inline], [
+    CFLAGS="${CFLAGS_save} -msse"
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM(,[[
+void *p;
+asm volatile("pabsw %%xmm0,%%xmm0"::"r"(p):"xmm0");
+]])
+    ], [
+      ac_cv_ssse3_inline=yes
+    ], [
+      ac_cv_ssse3_inline=no
+    ])
+  ])
   AS_IF([test "${ac_cv_ssse3_inline}" != "no"], [
     AC_DEFINE(CAN_COMPILE_SSSE3, 1,
               [Define to 1 if SSSE3 inline assembly is available.]) ])
 
   # SSE4.1
   AC_CACHE_CHECK([if $CC groks SSE4.1 inline assembly],
-    [ac_cv_sse4_1_inline],
-    [CFLAGS="${CFLAGS_save}"
-     AC_TRY_COMPILE(,[void *p;asm volatile("pmaxsb %%xmm1,%%xmm0"::"r"(p));],
-                    ac_cv_sse4_1_inline=yes, ac_cv_sse4_1_inline=no)])
+                 [ac_cv_sse4_1_inline], [
+    CFLAGS="${CFLAGS_save} -msse"
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM(,[[
+void *p;
+asm volatile("pmaxsb %%xmm1,%%xmm0"::"r"(p):"xmm0", "xmm1");
+]])
+    ], [
+      ac_cv_sse4_1_inline=yes
+    ], [
+      ac_cv_sse4_1_inline=no
+    ])
+  ])
   AS_IF([test "${ac_cv_sse4_1_inline}" != "no"], [
     AC_DEFINE(CAN_COMPILE_SSE4_1, 1,
               [Define to 1 if SSE4_1 inline assembly is available.]) ])
 
   # SSE4.2
   AC_CACHE_CHECK([if $CC groks SSE4.2 inline assembly],
-    [ac_cv_sse4_2_inline],
-    [CFLAGS="${CFLAGS_save}"
-     AC_TRY_COMPILE(,[void *p;asm volatile("pcmpgtq %%xmm1,%%xmm0"::"r"(p));],
-                    ac_cv_sse4_2_inline=yes, ac_cv_sse4_2_inline=no)])
+                 [ac_cv_sse4_2_inline], [
+    CFLAGS="${CFLAGS_save} -msse"
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM(,[[
+void *p;
+asm volatile("pcmpgtq %%xmm1,%%xmm0"::"r"(p):"xmm0", "xmm1");
+]])
+    ], [
+      ac_cv_sse4_2_inline=yes
+    ], [
+      ac_cv_sse4_2_inline=no
+    ])
+  ])
   AS_IF([test "${ac_cv_sse4_2_inline}" != "no"], [
     AC_DEFINE(CAN_COMPILE_SSE4_2, 1,
               [Define to 1 if SSE4_2 inline assembly is available.]) ])
 
   # SSE4A
-  AC_CACHE_CHECK([if $CC groks SSE4A inline assembly],
-    [ac_cv_sse4a_inline],
-    [CFLAGS="${CFLAGS_save}"
-     AC_TRY_COMPILE(,[void *p;asm volatile("insertq %%xmm1,%%xmm0"::"r"(p));],
-                    ac_cv_sse4a_inline=yes, ac_cv_sse4a_inline=no)])
+  AC_CACHE_CHECK([if $CC groks SSE4A inline assembly], [ac_cv_sse4a_inline], [
+    CFLAGS="${CFLAGS_save} -msse"
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM(,[[
+void *p;
+asm volatile("insertq %%xmm1,%%xmm0"::"r"(p):"xmm0", "xmm1");
+]])
+    ], [
+      ac_cv_sse4a_inline=yes
+    ], [
+      ac_cv_sse4a_inline=no
+    ])
+  ])
   AS_IF([test "${ac_cv_sse4a_inline}" != "no"], [
     AC_DEFINE(CAN_COMPILE_SSE4A, 1,
               [Define to 1 if SSE4A inline assembly is available.]) ])
@@ -1341,11 +1407,18 @@ AS_IF([test "${enable_sse}" != "no"], [
 AM_CONDITIONAL([HAVE_SSE2], [test "$have_sse2" = "yes"])
 
 have_3dnow="no"
-AC_CACHE_CHECK([if $CC groks 3D Now! inline assembly],
-    [ac_cv_3dnow_inline],
-    [CFLAGS="${CFLAGS_save}"
-     AC_TRY_COMPILE(,[void *p;asm volatile("pfadd %%mm1,%%mm2"::"r"(p));],
-                    ac_cv_3dnow_inline=yes, ac_cv_3dnow_inline=no)])
+AC_CACHE_CHECK([if $CC groks 3D Now! inline assembly], [ac_cv_3dnow_inline], [
+  CFLAGS="${CFLAGS_save} -mmmx"
+  AC_COMPILE_IFELSE([AC_LANG_PROGRAM(,[[
+void *p;
+asm volatile("pfadd %%mm1,%%mm2"::"r"(p):"mm1", "mm2");
+]])
+  ], [
+    ac_cv_3dnow_inline=yes
+  ], [
+    ac_cv_3dnow_inline=no
+  ])
+])
 AS_IF([test "${ac_cv_3dnow_inline}" != "no"], [
   AC_DEFINE(CAN_COMPILE_3DNOW, 1,
             [Define to 1 if 3D Now! inline assembly is available.])
