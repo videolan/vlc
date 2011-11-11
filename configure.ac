@@ -3008,6 +3008,37 @@ dnl
 EXTEND_HELP_STRING([Video plugins:])
 
 dnl
+dnl  OpenGL
+dnl
+PKG_CHECK_MODULES([GL], [gl], [
+  have_gl="yes"
+], [
+  AC_CHECK_HEADER([GL/gl.h], [
+    have_gl="yes"
+    GL_CFLAGS=""
+    GL_LIBS="-lGL"
+  ], [
+    have_gl="no"
+  ])
+])
+
+dnl OpenGL ES 2: depends on EGL 1.1 and is currently unfinished
+dnl PKG_ENABLE_MODULES_VLC([GLES2], [], [glesv2], [OpenGL ES v2 support], [auto])
+dnl OpenGL ES 1: depends on EGL 1.0 and is currently broken
+dnl PKG_ENABLE_MODULES_VLC([GLES1], [], [glesv1_cm], [OpenGL ES v1 support], [auto])
+
+AC_ARG_ENABLE(egl,
+  [  --enable-egl            OpenGL support through EGL (default disabled)],, [
+  enable_egl="no"
+])
+AS_IF([test "$enable_egl" != "no"], [
+  PKG_CHECK_MODULES([EGL], [egl], [
+    VLC_ADD_PLUGIN([gl])
+    VLC_ADD_PLUGIN([egl])
+  ])
+])
+
+dnl
 dnl  Xlib
 dnl
 
@@ -3028,6 +3059,10 @@ AC_ARG_ENABLE(xcb,
 AC_ARG_ENABLE(xvideo,
   [  --enable-xvideo         XVideo support (default enabled)],, [
     enable_xvideo="$enable_xcb"
+])
+AC_ARG_ENABLE(glx,
+  [  --enable-glx            OpenGL support through GLX (default enabled)],, [
+  enable_glx="$enable_xcb"
 ])
 
 have_xcb="no"
@@ -3062,33 +3097,19 @@ AS_IF([test "${enable_xcb}" != "no"], [
   ], [
     AC_MSG_WARN([${XCB_KEYSYMS_PKG_ERRORS}. Hotkeys will not work.])
   ])
-])
-AM_CONDITIONAL([HAVE_XCB], [test "${have_xcb}" = "yes"])
 
-AC_ARG_ENABLE(glx,
-  [  --enable-glx            X11 OpenGL (GLX) support (default enabled)],, [
-  enable_glx="$enable_xcb"
-])
-AS_IF([test "${enable_glx}" != "no"], [
-  PKG_CHECK_MODULES(XLIB_XCB, [x11-xcb])
-  PKG_CHECK_MODULES(GL, [gl],, [
-    AC_CHECK_HEADER([GL/gl.h], [
-      GL_CFLAGS=""
-      GL_LIBS="-lGL"
+  AS_IF([test "${enable_glx}" != "no"], [
+    AS_IF([test "${have_gl}" != "yes"], [
+      AC_MSG_ERROR([${GL_PKG_ERRORS}. Pass --disable-glx if you do not need OpenGL X11 support.])
+    ])
+    PKG_CHECK_MODULES(XLIB_XCB, [x11-xcb], [
+      VLC_ADD_PLUGIN([xcb_glx])
     ], [
-      AC_MSG_ERROR([${GL_PKG_ERRORS}. If you do not need OpenGL with X11, pass --disable-glx.])
+      AC_MSG_ERROR([${XLIB_XCB_PKG_ERRORS}. Pass --disable-glx if you do not need OpenGL X11 support.])
     ])
   ])
-  VLC_ADD_PLUGIN([xcb_glx])
 ])
-
-dnl
-dnl  OpenGL
-dnl
-PKG_ENABLE_MODULES_VLC([GL], [], [gl], [OpenGL support], [auto])
-PKG_ENABLE_MODULES_VLC([GLES1], [], [glesv1_cm], [OpenGL ES v1 support], [auto])
-PKG_ENABLE_MODULES_VLC([GLES2], [], [glesv2], [OpenGL ES v2 support], [auto])
-PKG_ENABLE_MODULES_VLC([EGL], [], [egl], [EGL support], [auto])
+AM_CONDITIONAL([HAVE_XCB], [test "${have_xcb}" = "yes"])
 
 dnl
 dnl  SDL module
