@@ -157,8 +157,7 @@ void libvlc_event_send( libvlc_event_manager_t * p_em,
     /* Fill event with the sending object now */
     p_event->p_obj = p_em->p_obj;
 
-    /* Here a read/write lock would be nice */
-
+    vlc_mutex_lock( &p_em->event_sending_lock );
     vlc_mutex_lock( &p_em->object_lock );
     for( i = 0; i < vlc_array_count(&p_em->listeners_groups); i++)
     {
@@ -175,6 +174,7 @@ void libvlc_event_send( libvlc_event_manager_t * p_em,
             if( !array_listeners_cached )
             {
                 vlc_mutex_unlock( &p_em->object_lock );
+                vlc_mutex_unlock( &p_em->event_sending_lock );
                 fprintf(stderr, "Can't alloc memory in libvlc_event_send" );
                 return;
             }
@@ -194,14 +194,18 @@ void libvlc_event_send( libvlc_event_manager_t * p_em,
     {
         free( array_listeners_cached );
         vlc_mutex_unlock( &p_em->object_lock );
+        vlc_mutex_unlock( &p_em->event_sending_lock );
         return;
     }
 
+    /* Track item removed from *this* thread, with a simple flag. Indeed
+     * event_sending_lock is a recursive lock. This has the advantage of
+     * allowing to remove an event listener from within a callback */
+    listeners_group->b_sublistener_removed = false;
+
     vlc_mutex_unlock( &p_em->object_lock );
 
-    vlc_mutex_lock( &p_em->event_sending_lock );
     listener_cached = array_listeners_cached;
-    listeners_group->b_sublistener_removed = false;
     for( i = 0; i < i_cached_listeners; i++ )
     {
         if(listener_cached->is_asynchronous)
@@ -424,7 +428,7 @@ void libvlc_event_detach( libvlc_event_manager_t *p_event_manager,
 
                     /* Mark this group as edited so that libvlc_event_send
                      * will recheck what listener to call */
-                    listeners_group->b_sublistener_removed = false;
+                    listeners_group->b_sublistener_removed = true;
 
                     free( listener );
                     vlc_array_remove( &listeners_group->listeners, j );
