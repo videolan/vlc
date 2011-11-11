@@ -21,6 +21,7 @@ qt4: qt-$(QT4_VERSION).tar.gz .sum-qt4
 	$(UNPACK)
 	patch -p0 < $(SRC)/qt4/cross.patch
 	patch -p0 < $(SRC)/qt4/styles.patch
+	patch -p0 < $(SRC)/qt4/imageformats.patch
 	mv qt-everywhere-opensource-src-4.7.4 $@ && touch $@
 
 XTOOLS := XCC="$(CC)" XCXX="$(CXX)" XSTRIP="$(STRIP)" XAR="$(AR)"
@@ -28,7 +29,6 @@ XTOOLS := XCC="$(CC)" XCXX="$(CXX)" XSTRIP="$(STRIP)" XAR="$(AR)"
 .qt4: qt4
 	cd $< && $(XTOOLS) ./configure -xplatform win32-g++ -static -release -fast -no-exceptions -no-stl -no-sql-sqlite -no-qt3support -no-gif -no-libmng -qt-libjpeg -no-libtiff -no-qdbus -no-openssl -no-webkit -sse -no-script -no-multimedia -no-phonon -opensource -no-scripttools -no-opengl -no-script -no-scripttools -no-declarative -no-declarative-debug -opensource -no-s60 -host-little-endian -confirm-license
 	cd $< && $(MAKE) $(XTOOLS) sub-src
-	cd $</src/plugins/imageformats/jpeg && $(MAKE) $(XTOOLS) # FIXME
 	# BUILDING QT BUILD TOOLS
 ifdef HAVE_CROSS_COMPILE
 	cd $</src/tools; $(MAKE) clean; \
