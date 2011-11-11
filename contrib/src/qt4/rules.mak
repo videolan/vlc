@@ -21,6 +21,7 @@ qt4: qt-$(QT4_VERSION).tar.gz .sum-qt4
 	$(UNPACK)
 	patch -p0 < $(SRC)/qt4/cross.patch
 	patch -p0 < $(SRC)/qt4/styles.patch
+	patch -p0 < $(SRC)/qt4/chroot.patch
 	patch -p0 < $(SRC)/qt4/imageformats.patch
 	mv qt-everywhere-opensource-src-4.7.4 $@ && touch $@
 
