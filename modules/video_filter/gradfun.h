@@ -121,7 +121,7 @@ static void filter_line_mmx2(uint8_t *dst, uint8_t *src, uint16_t *dc,
         :"+r"(x)
         :"r"(dst+width), "r"(src+width), "r"(dc+width/2),
          "rm"(thresh), "m"(*dithers), "m"(*pw_7f)
-        :"mm0", "mm1", "mm2", "mm4", "mm5", "mm6", "memory"
+        :"memory"
     );
 }
 #endif
@@ -169,7 +169,7 @@ static void filter_line_ssse3(uint8_t *dst, uint8_t *src, uint16_t *dc,
         :"+&r"(x)
         :"r"(dst+width), "r"(src+width), "r"(dc+width/2),
          "rm"(thresh), "m"(*dithers), "m"(*pw_7f)
-        :"xmm0", "xmm1", "xmm2", "xmm4", "xmm5", "xmm6", "xmm7", "memory"
+        :"memory"
     );
 }
 #endif // HAVE_SSSE3
@@ -205,7 +205,7 @@ static void filter_line_ssse3(uint8_t *dst, uint8_t *src, uint16_t *dc,
          "r"(src+width*2),\
          "r"(src+width*2+sstride),\
          "m"(*pw_ff)\
-        :"xmm0", "xmm1", "xmm2", "xmm3", "xmm7", "memory"\
+        :"memory"\
     );
 
 static void blur_line_sse2(uint16_t *dc, uint16_t *buf, uint16_t *buf1,
