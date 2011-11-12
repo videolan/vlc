@@ -741,13 +741,10 @@ endif
 	cp "$(top_builddir)/npapi-vlc/installed/lib/npvlc.dll" "$(win32_destdir)/"
 endif
 
-# Compiler shared DLLs
-# For win64 only, Debian mingw32 compilers are built with --disable-shared
-if HAVE_WIN64
-#   if gcc_s_sjlj/stdc++ DLLs exist, our C++ modules were linked to them
-	gcc_lib_dir=`x86_64-w64-mingw32-gcc -v /dev/null 2>&1 | grep ^LIBRARY_PATH|cut -d= -f2|cut -d: -f1` ; \
+# Compiler shared DLLs, when using compilers built with --enable-shared
+# If gcc_s_sjlj/stdc++-6 DLLs exist, our C++ modules were linked to them
+	gcc_lib_dir=`$(CXX) -v /dev/null 2>&1 | grep ^LIBRARY_PATH|cut -d= -f2|cut -d: -f1` ; \
 	cp "$${gcc_lib_dir}/libstdc++-6.dll" "$${gcc_lib_dir}/libgcc_s_sjlj-1.dll" "$(win32_destdir)/" ; true
-endif
 
 # SDK
 	mkdir -p "$(win32_destdir)/sdk/lib"
