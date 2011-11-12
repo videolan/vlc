@@ -1277,6 +1277,12 @@ unsigned int CocoaKeyToVLC( unichar i_key )
             return NO;
     }
 
+    if( key == 0x0020 ) // space key
+    {
+        [[VLCCoreInteraction sharedInstance] play];
+        return YES;
+    }
+
     val.i_int |= CocoaKeyToVLC( key );
 
     if( [o_usedHotkeys indexOfObject: tempString] != NSNotFound || [o_usedHotkeys indexOfObject: tempStringPlus] != NSNotFound )
