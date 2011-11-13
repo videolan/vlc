@@ -289,11 +289,11 @@ vlc_module_begin ()
 
         set_callbacks( OpenDialogs, Close )
 
-#if defined(Q_WS_X11) || defined(Q_WS_WIN) || defined(Q_WS_MAC)
+#if defined(Q_WS_X11) || defined(Q_WS_WIN) || defined(Q_WS_MAC)  || defined(Q_WS_PM)
     add_submodule ()
 #if defined(Q_WS_X11)
         set_capability( "vout window xid", 0 )
-#elif defined(Q_WS_WIN)
+#elif defined(Q_WS_WIN) || defined(Q_WS_PM)
         set_capability( "vout window hwnd", 0 )
 #elif defined(Q_WS_MAC)
         set_capability( "vout window nsobject", 0 )
@@ -626,8 +626,8 @@ static int WindowOpen( vout_window_t *p_wnd, const vout_window_cfg_t *cfg )
         return VLC_EGENERIC;
     p_wnd->display.x11 = NULL;
 
-#elif defined (Q_WS_WIN)
-    p_wnd->handle.hwnd = p_mi->getVideo( &i_x, &i_y, &i_width, &i_height );
+#elif defined (Q_WS_WIN) || defined(Q_WS_PM)
+    p_wnd->handle.hwnd = (void *)p_mi->getVideo( &i_x, &i_y, &i_width, &i_height );
     if( !p_wnd->handle.hwnd )
         return VLC_EGENERIC;
 
