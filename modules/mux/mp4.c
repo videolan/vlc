@@ -676,18 +676,6 @@ static block_t *ConvertAVC1( block_t *p_block )
     return p_block;
 }
 
-static int GetDescrLength( int i_size )
-{
-    if( i_size < 0x00000080 )
-        return 2 + i_size;
-    else if( i_size < 0x00004000 )
-        return 3 + i_size;
-    else if( i_size < 0x00200000 )
-        return 4 + i_size;
-    else
-        return 5 + i_size;
-}
-
 static bo_t *GetESDS( mp4_stream_t *p_stream )
 {
     bo_t *esds;
@@ -718,22 +706,12 @@ static bo_t *GetESDS( mp4_stream_t *p_stream )
         i_bitrate_max = 0x7fffffff;
 
     /* */
-    if( p_stream->fmt.i_extra > 0 )
-    {
-        i_decoder_specific_info_size =
-            GetDescrLength( p_stream->fmt.i_extra );
-    }
-    else
-    {
-        i_decoder_specific_info_size = 0;
-    }
+    i_decoder_specific_info_size = ( p_stream->fmt.i_extra > 0 ) ? 5 + p_stream->fmt.i_extra : 0;
 
     esds = box_full_new( "esds", 0, 0 );
 
     /* ES_Descr */
-    bo_add_descr( esds, 0x03, 3 +
-                  GetDescrLength( 13 + i_decoder_specific_info_size ) +
-                  GetDescrLength( 1 ) );
+    bo_add_descr( esds, 0x03, 3 + 5 + 13 + i_decoder_specific_info_size + 5 + 1 );
     bo_add_16be( esds, p_stream->i_track_id );
     bo_add_8   ( esds, 0x1f );      // flags=0|streamPriority=0x1f
 
@@ -1989,62 +1967,22 @@ static void bo_add_fourcc( bo_t *p_bo, const char *fcc )
 
 static void bo_add_mem( bo_t *p_bo, int i_size, uint8_t *p_mem )
 {
-    int i;
-
-    for( i = 0; i < i_size; i++ )
-    {
+    for( int i = 0; i < i_size; i++ )
         bo_add_8( p_bo, p_mem[i] );
-    }
 }
 
-static void bo_add_descr( bo_t *p_bo, uint8_t tag, uint32_t i_size )
+static void bo_add_descr( bo_t *p_bo, uint8_t tag, uint32_t size )
 {
-    uint32_t i_length;
-    uint8_t  vals[4];
-
-    i_length = i_size;
-    vals[3] = (unsigned char)(i_length & 0x7f);
-    i_length >>= 7;
-    vals[2] = (unsigned char)((i_length & 0x7f) | 0x80);
-    i_length >>= 7;
-    vals[1] = (unsigned char)((i_length & 0x7f) | 0x80);
-    i_length >>= 7;
-    vals[0] = (unsigned char)((i_length & 0x7f) | 0x80);
-
     bo_add_8( p_bo, tag );
-
-    if( i_size < 0x00000080 )
-    {
-        bo_add_8( p_bo, vals[3] );
-    }
-    else if( i_size < 0x00004000 )
-    {
-        bo_add_8( p_bo, vals[2] );
-        bo_add_8( p_bo, vals[3] );
-    }
-    else if( i_size < 0x00200000 )
-    {
-        bo_add_8( p_bo, vals[1] );
-        bo_add_8( p_bo, vals[2] );
-        bo_add_8( p_bo, vals[3] );
-    }
-    else if( i_size < 0x10000000 )
-    {
-        bo_add_8( p_bo, vals[0] );
-        bo_add_8( p_bo, vals[1] );
-        bo_add_8( p_bo, vals[2] );
-        bo_add_8( p_bo, vals[3] );
-    }
+    for(int i = 3; i>0; i--)
+        bo_add_8( p_bo, (size>>(7*i)) | 0x80 );
+    bo_add_8(p_bo, size & 0x7F);
 }
 
 static void bo_add_bo( bo_t *p_bo, bo_t *p_bo2 )
 {
-    int i;
-
-    for( i = 0; i < p_bo2->i_buffer; i++ )
-    {
+    for( int i = 0; i < p_bo2->i_buffer; i++ )
         bo_add_8( p_bo, p_bo2->p_buffer[i] );
-    }
 }
 
 static bo_t * box_new( const char *fcc )
