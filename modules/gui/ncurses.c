@@ -417,10 +417,8 @@ static void PlaylistRebuild(intf_thread_t *intf)
     intf_sys_t *sys = intf->p_sys;
     playlist_t *p_playlist = pl_Get(intf);
 
-    PL_LOCK;
     PlaylistDestroy(sys);
     PlaylistAddNode(sys, p_playlist->p_root_onelevel, "");
-    PL_UNLOCK;
 }
 
 static int ItemChanged(vlc_object_t *p_this, const char *variable,
@@ -955,12 +953,14 @@ static int DrawPlaylist(intf_thread_t *intf)
     intf_sys_t *sys = intf->p_sys;
     playlist_t *p_playlist = pl_Get(intf);
 
+    PL_LOCK;
     vlc_mutex_lock(&sys->pl_lock);
     if (sys->need_update) {
         PlaylistRebuild(intf);
         sys->need_update = false;
     }
     vlc_mutex_unlock(&sys->pl_lock);
+    PL_UNLOCK;
 
     if (sys->plidx_follow)
         FindIndex(sys, p_playlist);
@@ -1795,6 +1795,7 @@ static int Open(vlc_object_t *p_this)
 {
     intf_thread_t *intf = (intf_thread_t *)p_this;
     intf_sys_t    *sys  = intf->p_sys = calloc(1, sizeof(intf_sys_t));
+    playlist_t    *p_playlist = pl_Get(p_this);
 
     if (!sys)
         return VLC_ENOMEM;
@@ -1831,7 +1832,9 @@ static int Open(vlc_object_t *p_this)
         msg_Err(intf, "Couldn't close stderr (%m)");
 
     ReadDir(intf);
+    PL_LOCK;
     PlaylistRebuild(intf),
+    PL_UNLOCK;
 
     intf->pf_run = Run;
     return VLC_SUCCESS;
