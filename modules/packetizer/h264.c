@@ -1034,7 +1034,7 @@ static void ParseSlice( decoder_t *p_dec, bool *pb_new_picture, slice_t *p_slice
     decoder_sys_t *p_sys = p_dec->p_sys;
     uint8_t *pb_dec;
     int i_dec;
-    int i_first_mb, i_slice_type;
+    int i_slice_type;
     slice_t slice;
     bs_t s;
 
@@ -1044,7 +1044,7 @@ static void ParseSlice( decoder_t *p_dec, bool *pb_new_picture, slice_t *p_slice
     bs_init( &s, pb_dec, i_dec );
 
     /* first_mb_in_slice */
-    i_first_mb = bs_read_ue( &s );
+    /* int i_first_mb = */ bs_read_ue( &s );
 
     /* slice_type */
     switch( (i_slice_type = bs_read_ue( &s )) )
