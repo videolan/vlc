@@ -25,10 +25,11 @@ stamp-npapi-configure: stamp-npapi-autogen
 		--prefix=/ \
 		--host=$(host_alias) --build=$(build_alias) \
 		$(CONF_ACTIVEX) \
-		CPP="$(CPP)" CPPFLAGS="$(CPPFLAGS) -I$(CONTRIB_DIR)/gecko-sdk" \
+		CPP="$(CPP)" CPPFLAGS="$(CPPFLAGS)" \
 		CC="$(CC)" CFLAGS="$(CFLAGS)" \
 		CXX="$(CXX)" CXXFLAGS="$(CXXFLAGS)" \
 		LD="$(LD)" LDFLAGS="$(LDFLAGS)" \
+		MOZILLA_CFLAGS="-I$(CONTRIB_DIR)/gecko-sdk" \
 		SHELL="$(SHELL)" \
 		PKG_CONFIG_LIBDIR="../$(srcdir)/extras/contrib/lib/pkgconfig:../lib"
 	touch $@
