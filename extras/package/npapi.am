@@ -24,9 +24,8 @@ stamp-npapi-configure: stamp-npapi-autogen
 	$(SHELL) ./configure \
 		--prefix=/ \
 		--host=$(host_alias) --build=$(build_alias) \
-		--with-mozilla-sdk-path="$(CONTRIB_DIR)/gecko-sdk" \
 		$(CONF_ACTIVEX) \
-		CPP="$(CPP)" CPPFLAGS="$(CPPFLAGS)" \
+		CPP="$(CPP)" CPPFLAGS="$(CPPFLAGS) -I$(CONTRIB_DIR)/gecko-sdk" \
 		CC="$(CC)" CFLAGS="$(CFLAGS)" \
 		CXX="$(CXX)" CXXFLAGS="$(CXXFLAGS)" \
 		LD="$(LD)" LDFLAGS="$(LDFLAGS)" \
