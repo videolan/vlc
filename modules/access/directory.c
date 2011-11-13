@@ -165,7 +165,7 @@ int DirInit (access_t *p_access, DIR *handle)
     p_sys->ignored_exts = var_InheritString (p_access, "ignore-filetypes");
     p_sys->header = true;
     p_sys->i_item_count = 0;
-    p_sys->xspf_ext = strdup ("");
+    p_sys->xspf_ext = NULL;
 
     /* Handle mode */
     char *psz = var_InheritString (p_access, "recursive");
