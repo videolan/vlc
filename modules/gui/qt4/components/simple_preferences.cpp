@@ -233,6 +233,13 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             ui.hwYUVBox->setVisible( false );
 #endif
 
+#ifdef __OS2__
+            CONFIG_BOOL( "kva-fixt23", kvaFixT23 );
+            CONFIG_GENERIC( "kva-video-mode", StringList, ui.kvaVideoModeLabel,
+                            kvaVideoMode );
+#else
+            ui.kvaBox->setVisible( false );
+#endif
 
             CONFIG_GENERIC( "deinterlace", IntegerList, ui.deinterLabel, deinterlaceBox );
             CONFIG_GENERIC( "deinterlace-mode", StringList, ui.deinterModeLabel, deinterlaceModeBox );
