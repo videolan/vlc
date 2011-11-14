@@ -1,7 +1,7 @@
 # live555
 
 #LIVEDOTCOM_URL := http://live555.com/liveMedia/public/live555-latest.tar.gz
-LIVE555_FILE := live.2011.07.08.tar.gz
+LIVE555_FILE := live.2011.11.08.tar.gz
 LIVEDOTCOM_URL := http://live555sourcecontrol.googlecode.com/files/$(LIVE555_FILE)
 
 PKGS += live555
