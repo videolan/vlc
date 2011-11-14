@@ -1737,29 +1737,22 @@ dnl
 AC_ARG_ENABLE(live555,
   [AS_HELP_STRING([--enable-live555],
     [enable RTSP input through live555 (default enabled)])])
-AC_ARG_WITH(live555-tree,
-  [AS_HELP_STRING([--with-live555-tree=PATH],
-    [live555 tree for static linking])])
 AS_IF([test "${enable_live555}" != "no" -a -n "${CXX}"], [
-  dnl
-  dnl test for --with-live555-tree
-  dnl
-  if test -z "${with_live555_tree}"; then
-    AC_LANG_PUSH(C++)
-    CPPFLAGS_save="${CPPFLAGS}"
-    if test -z "${CONTRIB_DIR}"; then
-        CPPFLAGS_live555="-I/usr/include/liveMedia -I/usr/include/groupsock -I/usr/include/BasicUsageEnvironment -I/usr/include/UsageEnvironment"
-    else
-        CPPFLAGS_live555="-I${CONTRIB_DIR}/include/liveMedia -I${CONTRIB_DIR}/include/groupsock -I${CONTRIB_DIR}/include/BasicUsageEnvironment -I${CONTRIB_DIR}/include/UsageEnvironment"
-    fi
-    if test "${SYS}" = "solaris"; then
-      CPPFLAGS_live555="${CPPFLAGS_live555} -DSOLARIS"
-    fi
-    CPPFLAGS="${CPPFLAGS} ${CPPFLAGS_live555}"
+  AC_LANG_PUSH(C++)
+  CPPFLAGS_save="${CPPFLAGS}"
+  AS_IF([test -z "${CONTRIB_DIR}"], [
+    CPPFLAGS_live555="-I/usr/include/liveMedia -I/usr/include/groupsock -I/usr/include/BasicUsageEnvironment -I/usr/include/UsageEnvironment"
+  ], [
+    CPPFLAGS_live555="-I${CONTRIB_DIR}/include/liveMedia -I${CONTRIB_DIR}/include/groupsock -I${CONTRIB_DIR}/include/BasicUsageEnvironment -I${CONTRIB_DIR}/include/UsageEnvironment"
+  ])
+  AS_IF([test "${SYS}" = "solaris"], [
+    CPPFLAGS_live555="${CPPFLAGS_live555} -DSOLARIS"
+  ])
+  CPPFLAGS="${CPPFLAGS} ${CPPFLAGS_live555}"
 
-    AC_CHECK_HEADERS(liveMedia_version.hh, [
-      AC_MSG_CHECKING(for liveMedia version >= 1275091200 )
-      AC_EGREP_CPP(yes,
+  AC_CHECK_HEADERS([liveMedia_version.hh], [
+    AC_MSG_CHECKING(for liveMedia version >= 1275091200 )
+    AC_EGREP_CPP(yes,
         [#include <liveMedia_version.hh>
          #ifdef LIVEMEDIA_LIBRARY_VERSION_INT
          #if LIVEMEDIA_LIBRARY_VERSION_INT < 1275091200
@@ -1773,89 +1766,33 @@ You can get an updated one from http://www.live555.com/liveMedia .])
           AS_IF([test "${enable_live555}" = "yes"], [
             AC_MSG_ERROR([Update live555 or pass --disable-live555 to disable the plugin.])
           ])
-        ],[
-          AC_MSG_RESULT([yes])
-          other_libs="-lgroupsock -lBasicUsageEnvironment -lUsageEnvironment"
-          other_libs_pic="-lgroupsock_pic -lBasicUsageEnvironment_pic -lUsageEnvironment_pic"
-          if test "${SYS}" = "mingw32"; then
-            # add ws2_32 for closesocket, select, recv
-            other_libs="$other_libs -lws2_32"
-          elif test "${SYS}" = "mingwce"; then
-            # add ws2 for closesocket, select, recv
-            other_libs="$other_libs -lws2"
-          fi
-
-          dnl We need to check for pic because live555 don't provide shared libs
-          dnl and we want to build a plugins so we need -fPIC on some arch.
-          VLC_ADD_CXXFLAGS([live555], [${CPPFLAGS_live555}])
-          AC_CHECK_LIB(liveMedia_pic, main, [
-            VLC_ADD_PLUGIN([live555])
-            VLC_ADD_LIBS([live555], [-lliveMedia_pic ${other_libs_pic}])
-          ],[
-            AC_CHECK_LIB(liveMedia, main, [
-            VLC_ADD_PLUGIN([live555])
-            VLC_ADD_LIBS([live555], [-lliveMedia ${other_libs}])
-          ],[],[${other_libs}]) ],[${other_libs_pic}])
-
-          CPPFLAGS="${CPPFLAGS_save}"
-          AC_LANG_POP(C++)
-        ])
-      ])
-  else
-    AC_MSG_CHECKING(for liveMedia/libliveMedia.a in ${with_live555_tree})
-    real_live555_tree="`cd ${with_live555_tree} 2>/dev/null && pwd`"
-    if test -z "${real_live555_tree}"; then
-      dnl  The given directory can't be found
-      AC_MSG_RESULT(no)
-      AC_MSG_ERROR([cannot cd to ${with_live555_tree}])
-    fi
-    if test -f "${real_live555_tree}/liveMedia/libliveMedia.a"; then
-      AC_MSG_RESULT(${real_live555_tree}/liveMedia/libliveMedia.a)
-
-      AC_CHECK_HEADERS(${real_live555_tree}/liveMedia/include/liveMedia_version.hh,[
-        AC_MSG_CHECKING(for liveMedia version >= 1275091200 )
-        AC_EGREP_CPP(yes,
-          [#include "${real_live555_tree}/liveMedia/include/liveMedia_version.hh"
-           #ifdef LIVEMEDIA_LIBRARY_VERSION_INT
-           #if LIVEMEDIA_LIBRARY_VERSION_INT < 1275091200
-           yes
-           #endif
-           #endif],
-          [AC_MSG_RESULT([no])
-           AC_MSG_ERROR([Your version of liveMedia is too old: you may get a more recent one from http://www.live555.com/liveMedia.
-lternatively you can use --disable-live555 to disable the liveMedia plugin.])
-        ],[
-       AC_MSG_RESULT([yes])
-       ])
-      ])
-
-      VLC_ADD_PLUGIN([live555])
-
-      if test "${SYS}" = "mingw32"; then
+    ], [
+      AC_MSG_RESULT([yes])
+      other_libs="-lgroupsock -lBasicUsageEnvironment -lUsageEnvironment"
+      other_libs_pic="-lgroupsock_pic -lBasicUsageEnvironment_pic -lUsageEnvironment_pic"
+      AS_IF([test "${SYS}" = "mingw32"], [
         # add ws2_32 for closesocket, select, recv
-        VLC_ADD_LIBS([live555],[-lws2_32])
-      fi
+        other_libs="$other_libs -lws2_32"
+      ], [test "${SYS}" = "mingwce"], [
+        # add ws2 for closesocket, select, recv
+        other_libs="$other_libs -lws2"
+      ])
 
-      VLC_ADD_LIBS([live555],[-L${real_live555_tree}/UsageEnvironment -lUsageEnvironment])
-      VLC_ADD_LIBS([live555],[-L${real_live555_tree}/BasicUsageEnvironment -lBasicUsageEnvironment])
-      VLC_ADD_LIBS([live555],[-L${real_live555_tree}/groupsock -lgroupsock])
-      VLC_ADD_LIBS([live555],[-L${real_live555_tree}/liveMedia -lliveMedia])
-
-      VLC_ADD_CXXFLAGS([live555],[-I${real_live555_tree}/BasicUsageEnvironment/include])
-      VLC_ADD_CXXFLAGS([live555],[-I${real_live555_tree}/groupsock/include])
-      VLC_ADD_CXXFLAGS([live555],[-I${real_live555_tree}/liveMedia/include])
-      VLC_ADD_CXXFLAGS([live555],[-I${real_live555_tree}/UsageEnvironment/include ])
-      if test "${SYS}" = "solaris"; then
-        VLC_ADD_CXXFLAGS([live555],[-DSOLARIS])
-      fi
-    else
-      dnl  The given live555 wasn't built
-        AC_MSG_RESULT(no)
-      if test "${enable_live555}" = "yes"; then
-        AC_MSG_ERROR([cannot find ${real_live555_tree}/liveMedia/libliveMedia.a, make sure you compiled live555 in ${with_live555_tree}])
-      fi
-    fi
-  fi
+      dnl We need to check for pic because live555 don't provide shared libs
+      dnl and we want to build a plugins so we need -fPIC on some arch.
+      VLC_ADD_CXXFLAGS([live555], [${CPPFLAGS_live555}])
+      AC_CHECK_LIB(liveMedia_pic, main, [
+        VLC_ADD_PLUGIN([live555])
+        VLC_ADD_LIBS([live555], [-lliveMedia_pic ${other_libs_pic}])
+      ],[
+        AC_CHECK_LIB(liveMedia, main, [
+          VLC_ADD_PLUGIN([live555])
+          VLC_ADD_LIBS([live555], [-lliveMedia ${other_libs}])
+      ],[],[${other_libs}])],[${other_libs_pic}])
+    ])
+  ])
+  CPPFLAGS="${CPPFLAGS_save}"
+  AC_LANG_POP(C++)
 ])
 
 dnl
