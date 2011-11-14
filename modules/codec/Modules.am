@@ -47,7 +47,7 @@ libvlc_LTLIBRARIES += \
 	libaes3_plugin.la \
 	libaraw_plugin.la \
 	libcc_plugin.la \
-        libcdg_plugin.la \
+	libcdg_plugin.la \
 	libcvdsub_plugin.la \
 	libddummy_plugin.la \
 	libdts_plugin.la \
