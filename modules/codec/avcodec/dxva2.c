@@ -754,7 +754,7 @@ static int DxCreateVideoService(vlc_va_dxva2_t *va)
     IDirectXVideoDecoderService *vs;
     hr = IDirect3DDeviceManager9_GetVideoService(va->devmng, device,
                                                  &IID_IDirectXVideoDecoderService,
-                                                 &vs);
+                                                 (void**)&vs);
     if (FAILED(hr)) {
         msg_Err(va->log, "GetVideoService failed");
         return VLC_EGENERIC;
