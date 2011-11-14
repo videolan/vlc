@@ -39,10 +39,8 @@
 # include <shlobj.h>
 # include <wininet.h>
 # define HeapEnableTerminationOnCorruption (HEAP_INFORMATION_CLASS)1
-# ifndef _WIN64
 static void check_crashdump(void);
 LONG WINAPI vlc_exception_filter(struct _EXCEPTION_POINTERS *lpExceptionInfo);
-# endif
 #endif
 
 #ifndef UNDER_CE
@@ -173,14 +171,11 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
     argv[argc] = NULL;
     LocalFree (wargv);
 
-# ifndef _WIN64
-    /* We don't know how to manage crashes on Win64 yet */
     if(crash_handling)
     {
         check_crashdump();
         SetUnhandledExceptionFilter(vlc_exception_filter);
     }
-# endif
 
 #else /* UNDER_CE */
     char **argv, psz_cmdline[wcslen(lpCmdLine) * 4];
@@ -210,7 +205,7 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
     return 0;
 }
 
-#if !defined( UNDER_CE ) && !defined( _WIN64 )
+#if !defined( UNDER_CE )
 /* Crashdumps handling */
 static void get_crashdump_path(wchar_t * wdir)
 {
@@ -321,46 +316,56 @@ LONG WINAPI vlc_exception_filter(struct _EXCEPTION_POINTERS *lpExceptionInfo)
         const CONTEXT *const pContext = (const CONTEXT *)lpExceptionInfo->ContextRecord;
         const EXCEPTION_RECORD *const pException = (const EXCEPTION_RECORD *)lpExceptionInfo->ExceptionRecord;
         /*No nested exceptions for now*/
-        fwprintf( fd, L"\n\n[exceptions]\n%08x at %08x",pException->ExceptionCode,
+        fwprintf( fd, L"\n\n[exceptions]\n%08x at %px",pException->ExceptionCode,
                                                 pException->ExceptionAddress );
-        if( pException->NumberParameters > 0 )
-        {
-            unsigned int i;
-            for( i = 0; i < pException->NumberParameters; i++ )
-                fwprintf( fd, L" | %08x", pException->ExceptionInformation[i] );
-        }
 
-        fwprintf( fd, L"\n\n[context]\nEDI:%08x\nESI:%08x\n" \
-                    "EBX:%08x\nEDX:%08x\nECX:%08x\nEAX:%08x\n" \
-                    "EBP:%08x\nEIP:%08x\nESP:%08x\n",
+        for( unsigned int i = 0; i < pException->NumberParameters; i++ )
+            fwprintf( fd, L" | %p", pException->ExceptionInformation[i] );
+
+#ifdef WIN64
+        fwprintf( fd, L"\n\n[context]\nRDI:%px\nRSI:%px\n" \
+                    "RBX:%px\nRDX:%px\nRCX:%px\nRAX:%px\n" \
+                    "RBP:%px\nRIP:%px\nRSP:%px\nR8:%px\n" \
+                    "R9:%px\nR10:%px\nR11:%px\nR12:%px\n" \
+                    "R13:%px\nR14:%px\nR15:%px\n",
+                        pContext->Rdi,pContext->Rsi,pContext->Rbx,
+                        pContext->Rdx,pContext->Rcx,pContext->Rax,
+                        pContext->Rbp,pContext->Rip,pContext->Rsp,
+                        pContext->R8,pContext->R9,pContext->R10,
+                        pContext->R11,pContext->R12,pContext->R13,
+                        pContext->R14,pContext->R15 );
+#else
+        fwprintf( fd, L"\n\n[context]\nEDI:%px\nESI:%px\n" \
+                    "EBX:%px\nEDX:%px\nECX:%px\nEAX:%px\n" \
+                    "EBP:%px\nEIP:%px\nESP:%px\n",
                         pContext->Edi,pContext->Esi,pContext->Ebx,
                         pContext->Edx,pContext->Ecx,pContext->Eax,
                         pContext->Ebp,pContext->Eip,pContext->Esp );
+#endif
 
         fwprintf( fd, L"\n[stacktrace]\n#EIP|base|module\n" );
 
-        wchar_t module[ 256 ];
-        MEMORY_BASIC_INFORMATION mbi ;
-        VirtualQuery( (DWORD *)pContext->Eip, &mbi, sizeof( mbi ) ) ;
-        HINSTANCE hInstance = mbi.AllocationBase;
-        GetModuleFileName( hInstance, module, 256 ) ;
-        fwprintf( fd, L"%08x|%s\n", pContext->Eip, module );
-
-        DWORD pEbp = pContext->Ebp;
-        DWORD caller = *((DWORD*)pEbp + 1);
-
-        unsigned i_line = 0;
-        do
+#ifdef WIN64
+        LPCVOID caller = (LPCVOID)pContext->Rip;
+        LPVOID *pBase  = (LPVOID*)pContext->Rbp;
+#else
+        LPVOID *pBase  = (LPVOID*)pContext->Ebp;
+        LPCVOID caller = (LPCVOID)pContext->Eip;
+#endif
+        for( unsigned frame = 0; frame <= 100; frame++ )
         {
-            VirtualQuery( (DWORD *)caller, &mbi, sizeof( mbi ) ) ;
-            HINSTANCE hInstance = mbi.AllocationBase;
-            GetModuleFileName( hInstance, module, 256 ) ;
-            fwprintf( fd, L"%08x|%s\n", caller, module );
-            pEbp = *(DWORD*)pEbp ;
-            caller = *((DWORD*)pEbp + 1) ;
-            i_line++;
-            /*The last EBP points to NULL!*/
-        }while(caller && i_line< 100);
+            MEMORY_BASIC_INFORMATION mbi;
+            wchar_t module[ 256 ];
+            VirtualQuery( caller, &mbi, sizeof( mbi ) ) ;
+            GetModuleFileName( mbi.AllocationBase, module, 256 );
+            fwprintf( fd, L"%p|%s\n", caller, module );
+
+            /*The last BP points to NULL!*/
+            caller = *(pBase + 1);
+            if( !caller )
+                break;
+            pBase = *pBase;
+        }
 
         fclose( fd );
         fflush( stderr );
