@@ -461,7 +461,7 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
         dp_hdr_t dp_hdr;
         transform_in_t transform_in;
         uint32_t pkg_len = ((uint32_t*)p_block->p_buffer)[0];
-        unsigned char* dp_data=((unsigned char*)p_block->p_buffer)+8;
+        char* dp_data=((char*)p_block->p_buffer)+8;
         uint32_t* extra=(uint32_t*)(((char*)p_block->p_buffer)+8+pkg_len);
         uint32_t img_size;
 
