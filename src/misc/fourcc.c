@@ -966,6 +966,8 @@ static const entry_t p_list_audio[] = {
     /* MPEG Audio layer 1/2/3 */
     B(VLC_CODEC_MPGA, "MPEG Audio layer 1/2/3"),
         A("mpga"),
+        A(".mp1"),
+        A(".mp2"),
         A("mp3 "),
         A(".mp3"),
         A("MP3 "),
@@ -978,6 +980,7 @@ static const entry_t p_list_audio[] = {
         A("a52 "),
         A("a52b"),
         A("ac-3"),
+        A("sac3"),
         A("ms\x20\x00"),
 
     B(VLC_CODEC_EAC3, "A/52 B Audio (aka E-AC3)"),
@@ -988,6 +991,7 @@ static const entry_t p_list_audio[] = {
         A("dts "),
         A("DTS "),
         A("dtsb"),
+        A("dtsc"),
         A("ms\x20\x01"),
 
     /* AAC audio */
@@ -1130,6 +1134,8 @@ static const entry_t p_list_audio[] = {
 
     B(VLC_CODEC_QCELP, "QCELP Audio"),
         A("Qclp"),
+        A("Qclq"),
+        A("sqcp"),
 
     B(VLC_CODEC_SPEEX, "Speex Audio"),
         A("spx "),
