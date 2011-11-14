@@ -29,7 +29,7 @@ stamp-npapi-configure: stamp-npapi-autogen
 		CC="$(CC)" CFLAGS="$(CFLAGS)" \
 		CXX="$(CXX)" CXXFLAGS="$(CXXFLAGS)" \
 		LD="$(LD)" LDFLAGS="$(LDFLAGS)" \
-		MOZILLA_CFLAGS="-I$(CONTRIB_DIR)/gecko-sdk" \
+		MOZILLA_CFLAGS="-I$(CONTRIB_DIR)/gecko-sdk/include" \
 		SHELL="$(SHELL)" \
 		PKG_CONFIG_LIBDIR="../$(srcdir)/extras/contrib/lib/pkgconfig:../lib"
 	touch $@
