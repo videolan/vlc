@@ -1740,12 +1740,11 @@ AC_ARG_ENABLE(live555,
 AC_ARG_WITH(live555-tree,
   [AS_HELP_STRING([--with-live555-tree=PATH],
     [live555 tree for static linking])])
-if test "${enable_live555}" != "no"; then
-
+AS_IF([test "${enable_live555}" != "no" -a -n "${CXX}"], [
   dnl
   dnl test for --with-live555-tree
   dnl
-  if test -z "${with_live555_tree}" -a "${CXX}" != ""; then
+  if test -z "${with_live555_tree}"; then
     AC_LANG_PUSH(C++)
     CPPFLAGS_save="${CPPFLAGS}"
     if test -z "${CONTRIB_DIR}"; then
@@ -1857,7 +1856,7 @@ lternatively you can use --disable-live555 to disable the liveMedia plugin.])
       fi
     fi
   fi
-fi
+])
 
 dnl
 dnl - special access module for dc1394 input
