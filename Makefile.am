@@ -670,11 +670,11 @@ win32_destdir=$(top_builddir)/vlc-$(VERSION)
 win32_debugdir=$(top_builddir)/symbols-$(VERSION)
 win32_xpi_destdir=$(win32_destdir)/vlc-plugin
 
-if HAVE_WIN32
 if HAVE_WINCE
 build-npapi:
 	touch $@
 else
+if HAVE_WIN32
 include extras/package/npapi.am
 endif
 endif
