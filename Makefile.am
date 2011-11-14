@@ -753,11 +753,11 @@ endif
 	for file in libvlc.dll.a libvlc.la libvlccore.dll.a libvlccore.la; do \
 		cp -rv $(destdir)/lib/$$file "$(win32_destdir)/sdk/lib"; \
 	done
+if !HAVE_WINCE
 	$(DLLTOOL) -D libvlc.dll -l "$(win32_destdir)/sdk/lib/libvlc.lib" -d "$(top_builddir)/lib/.libs/libvlc.dll.def" "$(destdir)/bin/libvlc.dll"
 	$(DLLTOOL) -D libvlccore.dll -l "$(win32_destdir)/sdk/lib/libvlccore.lib" -d "$(top_builddir)/src/.libs/libvlccore.dll.def" "$(destdir)/bin/libvlccore.dll"
 
 if !HAVE_WIN64
-if !HAVE_WINCE
 	mkdir -p "$(win32_destdir)/sdk/activex"
 	cp $(top_builddir)/npapi-vlc/activex/README.TXT $(win32_destdir)/sdk/activex/README.TXT
 	cp $(top_builddir)/npapi-vlc/share/test.html $(win32_destdir)/sdk/activex/
