@@ -127,6 +127,7 @@ vlc_module_begin ()
 
     add_integer( "ffmpeg-debug", 0, DEBUG_TEXT, DEBUG_LONGTEXT,
                  true )
+    add_string( "ffmpeg-codec", NULL, CODEC_TEXT, CODEC_LONGTEXT, true )
 #if defined(HAVE_AVCODEC_VAAPI) || defined(HAVE_AVCODEC_DXVA2)
     add_bool( "ffmpeg-hw", false, HW_TEXT, HW_LONGTEXT, false )
 #endif
@@ -144,6 +145,7 @@ vlc_module_begin ()
     set_capability( "encoder", 100 )
     set_callbacks( OpenEncoder, CloseEncoder )
 
+    add_string( ENC_CFG_PREFIX "codec", NULL, CODEC_TEXT, CODEC_LONGTEXT, true )
     add_string( ENC_CFG_PREFIX "hq", "simple", ENC_HQ_TEXT,
                 ENC_HQ_LONGTEXT, false )
         change_string_list( enc_hq_list, enc_hq_list_text, 0 )
@@ -237,7 +239,22 @@ static int OpenDecoder( vlc_object_t *p_this )
     InitLibavcodec(p_this);
 
     /* *** ask ffmpeg for a decoder *** */
-    p_codec = avcodec_find_decoder( i_codec_id );
+    char *psz_decoder = var_CreateGetString( p_this, "ffmpeg-codec" );
+    if( psz_decoder && *psz_decoder )
+    {
+        p_codec = avcodec_find_decoder_by_name( psz_decoder );
+        if( !p_codec )
+            msg_Err( p_this, "Decoder `%s' not found", psz_decoder );
+        else if( p_codec->id != i_codec_id )
+        {
+            msg_Err( p_this, "Decoder `%s' can't handle %4.4s",
+                    psz_decoder, (char*)&p_dec->fmt_in.i_codec );
+            p_codec = NULL;
+        }
+    }
+    free( psz_decoder );
+    if( !p_codec )
+        p_codec = avcodec_find_decoder( i_codec_id );
     if( !p_codec )
     {
         msg_Dbg( p_dec, "codec not found (%s)", psz_namecodec );

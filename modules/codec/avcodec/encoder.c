@@ -146,7 +146,7 @@ struct encoder_sys_t
 };
 
 static const char *const ppsz_enc_options[] = {
-    "keyint", "bframes", "vt", "qmin", "qmax", "hq",
+    "keyint", "bframes", "vt", "qmin", "qmax", "codec", "hq",
     "rc-buffer-size", "rc-buffer-aggressivity", "pre-me", "hurry-up",
     "interlace", "interlace-me", "i-quant-factor", "noise-reduction", "mpeg4-matrix",
     "trellis", "qscale", "strict", "lumi-masking", "dark-masking",
@@ -196,7 +196,7 @@ int OpenEncoder( vlc_object_t *p_this )
     encoder_t *p_enc = (encoder_t *)p_this;
     encoder_sys_t *p_sys;
     AVCodecContext *p_context;
-    AVCodec *p_codec;
+    AVCodec *p_codec = NULL;
     int i_codec_id, i_cat;
     const char *psz_namecodec;
     float f_val;
@@ -253,7 +253,22 @@ int OpenEncoder( vlc_object_t *p_this )
     /* Initialization must be done before avcodec_find_encoder() */
     InitLibavcodec( p_this );
 
-    p_codec = avcodec_find_encoder( i_codec_id );
+    char *psz_encoder = var_GetString( p_this, ENC_CFG_PREFIX "codec" );
+    if( psz_encoder && *psz_encoder )
+    {
+        p_codec = avcodec_find_encoder_by_name( psz_encoder );
+        if( !p_codec )
+            msg_Err( p_this, "Encoder `%s' not found", psz_encoder );
+        else if( p_codec->id != i_codec_id )
+        {
+            msg_Err( p_this, "Encoder `%s' can't handle %4.4s",
+                    psz_encoder, (char*)&p_enc->fmt_out.i_codec );
+            p_codec = NULL;
+        }
+    }
+    free( psz_encoder );
+    if( !p_codec )
+        p_codec = avcodec_find_encoder( i_codec_id );
     if( !p_codec )
     {
         msg_Err( p_enc, "cannot find encoder %s\n"

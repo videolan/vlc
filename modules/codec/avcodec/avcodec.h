@@ -115,6 +115,9 @@ int ffmpeg_OpenCodec( decoder_t *p_dec );
 #define DEBUG_TEXT N_( "Debug mask" )
 #define DEBUG_LONGTEXT N_( "Set FFmpeg debug mask" )
 
+#define CODEC_TEXT N_( "Codec name" )
+#define CODEC_LONGTEXT N_( "Internal libavcodec codec name" )
+
 /* TODO: Use a predefined list, with 0,1,2,4,7 */
 #define VISMV_TEXT N_( "Visualize motion vectors" )
 #define VISMV_LONGTEXT N_( \
