@@ -951,8 +951,8 @@ unsigned vlc_timer_getoverrun (vlc_timer_t timer)
 unsigned vlc_GetCPUCount (void)
 {
 #ifndef UNDER_CE
-    DWORD process;
-    DWORD system;
+    DWORD_PTR process;
+    DWORD_PTR system;
 
     if (GetProcessAffinityMask (GetCurrentProcess(), &process, &system))
         return popcount (system);
