@@ -62,6 +62,11 @@ static const char *dbus_interface[] = {
     [GNOME]         = "org.gnome.SessionManager",
 };
 
+static const char *dbus_uninhibit_method[] = {
+    [FREEDESKTOP]   = "UnInhibit",
+    [GNOME]         = "Uninhibit",
+};
+
 
 /*****************************************************************************
  * Local prototypes
@@ -232,7 +237,7 @@ static void UnInhibit( intf_thread_t *p_intf, int type )
     intf_sys_t *p_sys = p_intf->p_sys;
 
     DBusMessage *msg = dbus_message_new_method_call( dbus_service[type],
-            dbus_path[type], dbus_interface[type], "UnInhibit" );
+            dbus_path[type], dbus_interface[type], dbus_uninhibit_method[type] );
     if( unlikely(msg == NULL) )
         return;
 
