@@ -528,6 +528,7 @@ Section $Name_Section01 SEC01
   ; Subfolders
   !insertmacro InstallFolder plugins
   !insertmacro InstallFolder locale
+  !insertmacro InstallFolder sdk
 @BUILD_OSDMENU_TRUE@ !insertmacro InstallFolder osdmenu
 @BUILD_SKINS_TRUE@   !insertmacro InstallFolder skins
 @BUILD_LUA_TRUE@     !insertmacro InstallFolder lua
