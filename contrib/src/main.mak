@@ -272,7 +272,7 @@ endif
 ifdef HAVE_MACOSX
 	echo "set(CMAKE_SYSTEM_NAME Darwin)" >> $@
 	echo "set(CMAKE_C_FLAGS $(CFLAGS))" >> $@
-	echo "set(CMAKE_CXX_FLAGS $(CFLAGS)" >> $@
+	echo "set(CMAKE_CXX_FLAGS $(CFLAGS))" >> $@
 	echo "set(CMAKE_LD_FLAGS $(LDFLAGS))" >> $@
 endif
 	echo "set(CMAKE_C_COMPILER $(CC))" >> $@
