@@ -654,14 +654,6 @@ VLC.app: vlc $(top_builddir)/src/.libs/libvlccore.dylib $(top_builddir)/lib/.lib
 	done
 	printf "APPLVLC#" >| $(top_builddir)/VLC.app/Contents/PkgInfo
 
-###############################################################################
-# Building architecture-specific binary packages
-###############################################################################
-
-# XXX: this rule is probably only useful to you if you have exactly
-# the same setup as the maintaner(s).
-#
-
 ############################################################################
 ## Win                                                                    ##
 ############################################################################
@@ -679,19 +671,14 @@ include extras/package/npapi.am
 endif
 endif
 
+package-win-install:
+	$(MAKE) install
+	touch $@
+
 #Win-common is for win32 and wince
-package-win-common: install build-npapi
-# Check that tmp isn't in the way
-	@if test -e "$(win32_destdir)"; then \
-	    echo "Error: please remove $(win32_destdir), it is in the way"; \
-	    false; \
-	elif test -e "$(win32_debugdir)"; then \
-	    echo "Error: please remove $(win32_debugdir), it is in the way"; \
-	    false; \
-	else \
-	    echo "Debug dir OK."; mkdir -p "$(win32_debugdir)"; \
-	    echo "Dest dir OK."; mkdir -p "$(win32_destdir)"; \
-	fi
+package-win-common: package-win-install build-npapi
+	mkdir -p "$(win32_debugdir)"
+	mkdir -p "$(win32_destdir)"
 
 # Executables, major libs+manifests
 	find $(destdir) -maxdepth 4 \( -name "*$(LIBEXT)" -o -name "*$(EXEEXT)" \) -exec cp {} "$(win32_destdir)/" \;
@@ -709,7 +696,7 @@ package-win-common: install build-npapi
 	cp $(srcdir)/share/icons/vlc.ico $(win32_destdir)
 
 # Locales
-	-cp -r $(destdir)/share/locale $(win32_destdir)
+	cp -r $(destdir)/share/locale $(win32_destdir)
 
 # Plugins
 	cp -r $(destdir)/lib/vlc/plugins $(win32_destdir)
@@ -770,7 +757,7 @@ endif
 	find $(win32_destdir) -type f \( -name '*$(LIBEXT)' -print -o -name '*$(EXEEXT)' -print \) -exec $(top_srcdir)/extras/package/win32/peflags.pl {} \;
 	find $(win32_destdir)/plugins/ -type f \( -name '*.a' -or -name '*.la' \) -exec rm -rvf {} \;
 
-package-win-base: package-win-common
+package-win-strip: package-win-common
 	find $(win32_destdir) -type f \( -name '*$(LIBEXT)' -or -name '*$(EXEEXT)' \) | while read i; \
 	do if test -n "$$i" ; then \
 	    $(OBJCOPY) --only-keep-debug "$$i" "$$i.dbg"; \
@@ -780,7 +767,7 @@ package-win-base: package-win-common
 	  fi ; \
 	done
 
-package-win32-webplugin-common: package-win-base
+package-win32-webplugin-common: package-win-strip
 	mkdir -p "$(win32_xpi_destdir)/plugins"
 	find $(destdir) -maxdepth 4 -name "*$(LIBEXT)" -exec cp {} "$(win32_xpi_destdir)/" \;
 	cp $(top_builddir)/npapi-vlc/npapi/npvlc.dll.manifest "$(win32_xpi_destdir)/plugins"
@@ -798,7 +785,7 @@ package-win32-crx: package-win32-webplugin-common
 	crxmake --pack-extension "$(win32_xpi_destdir)" \
 		--extension-output "$(win32_destdir)/vlc-$(VERSION).crx" --ignore-file install.rdf
 
-package-win32-base-exe: package-win-base
+package-win32-exe: package-win-strip
 # Script installer
 	cp "$(top_builddir)/extras/package/win32/vlc.win32.nsi" "$(win32_destdir)/"
 	cp "$(top_builddir)/extras/package/win32/spad.nsi" "$(win32_destdir)/"
@@ -824,131 +811,65 @@ package-win32-base-exe: package-win-base
 	eval "$$MAKENSIS $(win32_destdir)/spad.nsi"; \
 	eval "$$MAKENSIS $(win32_destdir)/vlc.win32.nsi"
 
-package-win32-base-zip: package-win-base
-# Create package
+package-win32-zip: package-win-strip
 	rm -f -- vlc-$(VERSION)-win32.zip
 	zip -r -9 vlc-$(VERSION)-win32.zip vlc-$(VERSION)
 
-package-win32-base-debug-zip: package-win-common
-# Create package
+package-win32-debug-zip: package-win-common
 	rm -f -- vlc-$(VERSION)-win32-debug.zip
 	zip -r -9 vlc-$(VERSION)-win32-debug.zip vlc-$(VERSION)
 
-package-win32-base-7zip: package-win-base
-# Create package
+package-win32-7zip: package-win-strip
 	7z a -t7z -m0=lzma -mx=9 -mfb=64 -md=32m -ms=on vlc-$(VERSION)-win32.7z vlc-$(VERSION)
 
-package-win32-base-debug-7zip: package-win-common
-# Create package
+package-win32-debug-7zip: package-win-common
 	7z a -t7z -m0=lzma -mx=9 -mfb=64 -md=32m -ms=on vlc-$(VERSION)-win32-debug.7z vlc-$(VERSION)
 
 package-win32-cleanup:
 	rm -Rf $(win32_destdir) $(win32_debugdir)
 
-package-win32-exe: package-win-base package-win32-base-exe package-win32-cleanup
+package-win32: package-win32-zip package-win32-7zip package-win32-exe package-win32-xpi
 
-package-win32-zip: package-win32-base-zip package-win32-cleanup
-
-package-win32-debug-zip: package-win32-base-debug-zip package-win32-cleanup
-
-package-win32-7zip: package-win32-base-7zip package-win32-cleanup
-
-package-win32-debug-7zip: package-win32-base-debug-7zip package-win32-cleanup
-
-package-win32-no-clean: package-win32-base-zip package-win32-base-7zip package-win32-base-exe package-win32-xpi
-
-package-win32: package-win32-no-clean package-win32-cleanup
-
-package-win32-debug: package-win32-base-debug-zip package-win32-base-debug-7zip package-win32-cleanup
+package-win32-debug: package-win32-debug-zip package-win32-debug-7zip
 
 
 #######
 # WinCE
 #######
-package-wince-base: package-win-base
-
-package-wince-base-zip: package-wince-base
-# Create package
+package-wince: package-win-strip
 	rm -f -- vlc-$(VERSION)-wince.zip
 	zip -r -9 vlc-$(VERSION)-wince.zip vlc-$(VERSION)
 
-package-wince: package-wince-base-zip package-win32-cleanup
-
+.PHONY: package-win-install package-win-common package-win-strip package-win32-webplugin-common package-win32-xpi package-win32-crx package-win32-exe package-win32-zip package-win32-debug-zip package-win32-7zip package-win32-debug-7zip package-win32-cleanup package-win32 package-win32-debug package-wince
 
 #########################################################################
 ## MacOS X                                                             ##
 #########################################################################
 package-macosx: VLC-release.app ChangeLog
-# Check that the temporary location isn't in the way
-	@if test -e "$(top_builddir)/vlc-$(VERSION)/"; then \
-	  rm -Rf "$(top_builddir)/vlc-$(VERSION)/" ; \
-	fi
-
-	echo "Create package directory: vlc-$(VERSION)/";
-	mkdir -p "$(top_builddir)/vlc-$(VERSION)/";
-
-# Copy relevant files 
+	mkdir -p "$(top_builddir)/vlc-$(VERSION)/"
 	@if test -e "$(top_builddir)/VLC-release.app/"; then \
 	  cp -R "$(top_builddir)/VLC-release.app" "$(top_builddir)/vlc-$(VERSION)/VLC.app"; \
 	else \
 	  cp -R "$(top_builddir)/VLC.app" "$(top_builddir)/vlc-$(VERSION)/VLC.app"; \
 	fi
-	mkdir -p $(top_builddir)/vlc-$(VERSION)/Goodies/ && \
-          mkdir -p $(top_builddir)/vlc-$(VERSION)/.background/ && \
-          cp $(srcdir)/AUTHORS $(srcdir)/COPYING $(srcdir)/README $(srcdir)/THANKS $(srcdir)/NEWS $(top_builddir)/vlc-$(VERSION)/Goodies/ && \
-          cp -R  $(srcdir)/extras/package/macosx/Delete_Preferences.app $(top_builddir)/vlc-$(VERSION)/Goodies/Delete\ VLC\ Preferences.app && \
-	  cp $(srcdir)/extras/package/macosx/README.MacOSX.rtf $(top_builddir)/vlc-$(VERSION)/Read\ Me.rtf && \
-	  cp $(srcdir)/extras/package/macosx/Resources/about_bg.png $(top_builddir)/vlc-$(VERSION)/.background/background.png
-	cp -L $(top_builddir)/ChangeLog $(top_builddir)/vlc-$(VERSION)/Goodies/
-
-# Place a link to the application folder
-	$(LN_S) /Applications $(top_builddir)/vlc-$(VERSION)/Applications
-
-# Create disk image (temporarily taken from the 0.8.6-bugfix branch to provide reliable NBs)
-	echo "Creating disk image"
-	rm -f "$(top_builddir)/vlc-$(VERSION).dmg"
-	hdiutil create -verbose -srcfolder "$(top_builddir)/vlc-$(VERSION)" \
-	  "$(top_builddir)/vlc-$(VERSION).dmg" -scrub
-	echo "Disk image creation completed:"
-	ls -la "$(top_builddir)/vlc-$(VERSION).dmg" ; echo
-
-# Create disk image 
-#	echo "Creating disk image"
-#	rm -f "$(top_builddir)/vlc-$(VERSION).dmg"
-#	hdiutil create -verbose -srcfolder "$(top_builddir)/vlc-$(VERSION)" \
-#	  "$(top_builddir)/vlc-$(VERSION).dmg" -format UDRW \
-#	  -scrub -imagekey zlib-level=9 -attach
-
-# Make sure the root window of the dmg will pop up when the dmg is mounted.
-# Note: We dont mount in /Volumes to be sure we won't collide with an other
-# finder mounted dmg with the same name.
-#	echo "Make sure the root window of the dmg will pop up when the dmg is mounted"
-#	mkdir -p $(top_builddir)/vlcmnt
-#	hdiutil attach -nokernel -readwrite -noverify -noautoopen -private "$(top_builddir)/vlc-$(VERSION).dmg" -mountpoint "$(top_builddir)/vlcmnt/vlc-$(VERSION)"
-#	bless --folder "$(top_builddir)/vlcmnt/vlc-$(VERSION)/" --openfolder "$(top_builddir)/vlcmnt/vlc-$(VERSION)"
-#	sleep 1 # Make sure operation completes
-#	cd "$(srcdir)"
-
-# Unmount the image now
-#	hdiutil detach "$(top_builddir)/vlcmnt/vlc-$(VERSION)"
-#	rm -R $(top_builddir)/vlcmnt
-
+	mkdir -p $(top_builddir)/vlc-$(VERSION)/Goodies/
+	for i in AUTHORS COPYING README THANKS NEWS; do \
+	  cp $(srcdir)/$$i $(top_builddir)/vlckit-$(VERSION)/Goodies/; \
+	done
+	cp $(top_builddir)/ChangeLog $(top_builddir)/vlc-$(VERSION)/Goodies/
+	cp -R  $(srcdir)/extras/package/macosx/Delete_Preferences.app $(top_builddir)/vlc-$(VERSION)/Goodies/Delete\ VLC\ Preferences.app
+	cp $(srcdir)/extras/package/macosx/README.MacOSX.rtf $(top_builddir)/vlc-$(VERSION)/Read\ Me.rtf
+	mkdir -p $(top_builddir)/vlc-$(VERSION)/.background/
+	cp $(srcdir)/extras/package/macosx/Resources/about_bg.png $(top_builddir)/vlc-$(VERSION)/.background/background.png
+	$(LN_S) /Applications $(top_builddir)/vlc-$(VERSION)/
+	rm -f "$(top_builddir)/vlc-$(VERSION)-rw.dmg"
+	hdiutil create -verbose -srcfolder "$(top_builddir)/vlc-$(VERSION)" "$(top_builddir)/vlc-$(VERSION)-rw.dmg" -scrub
 # Make sure the image is not writable
 # Note: We can't directly create a read only dmg as we do the bless stuff
-	echo "Make the disk image read-only"
-	mv "$(top_builddir)/vlc-$(VERSION).dmg" "$(top_builddir)/vlc-$(VERSION)-rw.dmg"
 	hdiutil convert "$(top_builddir)/vlc-$(VERSION)-rw.dmg" -format UDBZ -o "$(top_builddir)/vlc-$(VERSION).dmg"
-	rm "$(top_builddir)/vlc-$(VERSION)-rw.dmg"
-
-# We are done
-	echo "Disk image creation completed:"
-	ls -la "$(top_builddir)/vlc-$(VERSION).dmg" ; echo
-
-# Clean up
-	rm -Rf "$(top_builddir)/vlc-$(VERSION)"
+	ls -l "$(top_builddir)/vlc-$(VERSION).dmg"
 
 package-macosx-zip: VLC-release.app
-	rm -Rf $(top_builddir)/vlc-$(VERSION)
 	mkdir -p $(top_builddir)/vlc-$(VERSION)
 	cp -R $(top_builddir)/VLC-release.app $(top_builddir)/vlc-$(VERSION)/VLC.app
 	mkdir -p $(top_builddir)/vlc-$(VERSION)/Goodies
@@ -960,28 +881,18 @@ package-macosx-zip: VLC-release.app
 	cp $(srcdir)/extras/package/macosx/README.MacOSX.rtf \
 	   $(top_builddir)/vlc-$(VERSION)/Read\ Me.rtf
 	zip -r -y -9 $(top_builddir)/vlc-$(VERSION).zip $(top_builddir)/vlc-$(VERSION)
-	rm -Rf $(top_builddir)/vlc-$(VERSION)
 
 package-macosx-framework-zip:
-	rm -Rf $(top_builddir)/vlckit-$(VERSION)
 	mkdir -p $(top_builddir)/vlckit-$(VERSION)
-	cp -R $(srcdir)/projects/macosx/framework/build/Debug/VLCKit.framework \
-	  $(top_builddir)/vlckit-$(VERSION)/VLCKit.framework
+	cp -R $(srcdir)/projects/macosx/framework/build/Debug/VLCKit.framework $(top_builddir)/vlckit-$(VERSION)/
 	mkdir -p $(top_builddir)/vlc-$(VERSION)/Goodies
 	for i in AUTHORS COPYING ChangeLog README THANKS NEWS; do \
 	  cp $(srcdir)/$$i $(top_builddir)/vlckit-$(VERSION)/Goodies; \
 	done
 	zip -r -y -9 $(top_builddir)/vlckit-$(VERSION).zip $(top_builddir)/vlckit-$(VERSION)
-	rm -Rf $(top_builddir)/vlc-$(VERSION)
 
 package-translations:
-	@if test -e "$(srcdir)/vlc-translations-$(VERSION)"; then \
-	  echo "Error: please remove $(srcdir)/vlc-translations-$(VERSION), it is in the way"; \
-	  false; \
-	else \
-	  echo "OK."; mkdir -p "$(srcdir)/vlc-translations-$(VERSION)"; \
-	fi
-# Copy translations
+	mkdir -p "$(srcdir)/vlc-translations-$(VERSION)"
 	cat $(top_srcdir)/po/LINGUAS | while read i; do \
 	  cp "$(srcdir)/po/$${i}.po" \
 	    "$(srcdir)/vlc-translations-$(VERSION)/$${i}.po" \
@@ -1002,6 +913,7 @@ package-translations:
 	$(AMTAR) chof - $(srcdir)/vlc-translations-$(VERSION) \
 	  | GZIP=$(GZIP_ENV) gzip -c >$(srcdir)/vlc-translations-$(VERSION).tar.gz
 
+.PHONY: package-macosx package-macosx-zip package-macosx-framework-zip package-translations
 ###############################################################################
 # PO translation files update
 ###############################################################################
