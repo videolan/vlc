@@ -38,6 +38,8 @@
 # endif
 # include <shlobj.h>
 # include <wininet.h>
+# define PSAPI_VERSION 1
+# include <psapi.h>
 # define HeapEnableTerminationOnCorruption (HEAP_INFORMATION_CLASS)1
 static void check_crashdump(void);
 LONG WINAPI vlc_exception_filter(struct _EXCEPTION_POINTERS *lpExceptionInfo);
@@ -342,6 +344,23 @@ LONG WINAPI vlc_exception_filter(struct _EXCEPTION_POINTERS *lpExceptionInfo)
                         pContext->Edx,pContext->Ecx,pContext->Eax,
                         pContext->Ebp,pContext->Eip,pContext->Esp );
 #endif
+
+        HANDLE hpid = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ,
+                                        FALSE, GetCurrentProcessId());
+        if (hpid) {
+            HMODULE mods[1024];
+            DWORD size;
+            if (EnumProcessModules(hpid, mods, sizeof(mods), &size)) {
+                fwprintf( fd, L"\n\n[modules]\n" );
+                for (unsigned int i = 0; i < size / sizeof(HMODULE); i++) {
+                    wchar_t module[ 256 ];
+                    GetModuleFileName(mods[i], module, 256);
+                    fwprintf( fd, L"%p|%s\n", mods[i], module);
+                }
+            }
+            CloseHandle(hpid);
+        }
+
 
         fwprintf( fd, L"\n[stacktrace]\n#EIP|base|module\n" );
 

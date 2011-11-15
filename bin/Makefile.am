@@ -45,7 +45,7 @@ vlc_static_LDADD = $(vlc_LDADD)
 vlc_static_LDFLAGS = $(vlc_LDFLAGS)
 
 if HAVE_WIN32
-vlc_LDADD += -lwininet vlc_win32_rc.$(OBJEXT)
+vlc_LDADD += -lpsapi -lwininet vlc_win32_rc.$(OBJEXT)
 vlc_DEPENDENCIES = vlc_win32_rc.$(OBJEXT)
 else
 vlc_LDADD += $(LIBDL)
