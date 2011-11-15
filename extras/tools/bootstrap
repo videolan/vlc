@@ -25,7 +25,7 @@ then
 fi
 
 check() {
-# FIXME : add version check
+# FIXME : add version check: automake 1.11, autoconf 2.67 libtool 2.2
 if ! $1 --version >/dev/null 2>&1
 then
     echo "$1 not found"
