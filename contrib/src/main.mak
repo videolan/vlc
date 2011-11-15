@@ -136,6 +136,14 @@ else
 download = $(error Neither curl nor wget found!)
 endif
 
+ifeq ($(shell gzcat --version >/dev/null 2>&1 || echo FAIL),)
+ZCAT = gzcat
+else ifeq ($(shell zcat --version >/dev/null 2>&1 || echo FAIL),)
+ZCAT = zcat
+else
+ZCAT ?= $(error Gunzip client (zcat) not found!)
+endif
+
 ifeq ($(shell sha512sum --version >/dev/null 2>&1 || echo FAIL),)
 SHA512SUM = sha512sum
 else ifeq ($(shell shasum --version >/dev/null 2>&1 || echo FAIL),)

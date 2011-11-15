@@ -43,7 +43,7 @@ X264_VERSION := git
 x264: x264-$(X264_VERSION).tar.gz .sum-x264
 	rm -Rf x264-git
 	mkdir -p x264-git
-	zcat "$<" | (cd x264-git && tar xv --strip-components=1)
+	$(ZCAT) "$<" | (cd x264-git && tar xv --strip-components=1)
 	$(MOVE)
 
 .x264: x264
