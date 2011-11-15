@@ -127,8 +127,8 @@ int main( int i_argc, const char *ppsz_argv[] )
     setlocale (LC_ALL, "");
 
     if (isatty (STDERR_FILENO))
-        /* This message clutters error logs. It is print it only on a TTY.
-         * Forunately, LibVLC prints version infos with -vv anyhow. */
+        /* This message clutters error logs. It is printed only on a TTY.
+         * Fortunately, LibVLC prints version info with -vv anyway. */
         fprintf (stderr, "VLC media player %s (revision %s)\n",
                  libvlc_get_version(), libvlc_get_changeset());
 
