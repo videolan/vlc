@@ -70,6 +70,7 @@ eval $ZSH_BUILD || exit 1
 
 printf "Generating zsh completion in _vlc ... "
 
+VLC_PLUGIN_PATH=$BUILDDIR/modules
 if ! ./zsh_gen >_vlc 2>/dev/null; then
     echo "
 ERROR: the generation failed.... :(
@@ -80,7 +81,7 @@ Please press enter to verify that all the VLC modules are shown"
 If they are shown, press enter to see if you can debug the problem
 It will be reproduced by running \"./zsh_gen -vv\""
     read i
-    ./zsh_gen --plugin-path=$BUILDDIR -vv
+    ./zsh_gen -vv
     exit 1
 fi
 
