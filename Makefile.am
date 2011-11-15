@@ -5,8 +5,7 @@
 # SUBDIRS stores the directories where a "make" is required when building
 # something. DIST_SUBDIRS stores the directories where nothing is built but
 # which have makefiles with distribution information.
-#  - src (libvlc) is nedeed by modules
-#  - libs/* are needed by modules
+#  - src (libvlccore) is nedeed by modules
 DIST_SUBDIRS = m4 compat doc po share src modules lib bin test
 SUBDIRS = compat doc po share src modules lib
 if BUILD_VLC
