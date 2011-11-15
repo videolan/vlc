@@ -25,17 +25,30 @@ then
 fi
 
 check() {
-# FIXME : add version check: automake 1.11, autoconf 2.67 libtool 2.2
 if ! $1 --version >/dev/null 2>&1
 then
     echo "$1 not found"
     NEEDED="$NEEDED .$1"
+else
+    # found, need to check version ?
+    [ -z "$2" ] && return # no
+    # we only check GNU tools, their version have the form MAJOR.MINOR
+    gotver=`$1 --version | head -1 | sed s/'.* '//`
+    gotmajor=`echo $gotver|cut -d. -f1`
+    gotminor=`echo $gotver|cut -d. -f2`
+    needmajor=`echo $2|cut -d. -f1`
+    needminor=`echo $2|cut -d. -f2`
+    if [ "$needmajor" -gt "$gotmajor" -o "$needmajor" -eq "$gotmajor" -a "$needminor" -gt "$gotminor" ]
+    then
+        echo "$1 too old"
+        NEEDED="$NEEDED .$1"
+    fi
 fi
 }
 
-check autoconf
-check automake
-check libtool
+check autoconf 2.67
+check automake 1.11
+check libtool 2.2
 check pkg-config
 check xz
 check cmake
