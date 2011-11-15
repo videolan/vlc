@@ -16,6 +16,7 @@ $(TARBALLS)/SDL_image-$(SDL_IMAGE_VERSION).tar.gz:
 SDL_image: SDL_image-$(SDL_IMAGE_VERSION).tar.gz .sum-SDL_image
 	$(UNPACK)
 	$(APPLY) $(SRC)/SDL_image/SDL_image.patch
+	$(APPLY) $(SRC)/SDL_image/pkg-config.patch
 	$(MOVE)
 
 DEPS_SDL_image = png $(DEPS_png) jpeg $(DEPS_jpeg) tiff $(DEPS_tiff) \
