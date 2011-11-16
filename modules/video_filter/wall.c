@@ -129,10 +129,10 @@ static int Open( vlc_object_t *p_this )
 
     /* */
     p_sys->i_col = var_CreateGetInteger( p_splitter, CFG_PREFIX "cols" );
-    p_sys->i_col = __MAX( 1, __MIN( COL_MAX, p_sys->i_col ) );
+    p_sys->i_col = VLC_CLIP( COL_MAX, 1, p_sys->i_col );
 
     p_sys->i_row = var_CreateGetInteger( p_splitter, CFG_PREFIX "rows" );
-    p_sys->i_row = __MAX( 1, __MIN( ROW_MAX, p_sys->i_row ) );
+    p_sys->i_row = VLC_CLIP( ROW_MAX, 1, p_sys->i_row );
 
     msg_Dbg( p_splitter, "opening a %i x %i wall",
              p_sys->i_col, p_sys->i_row );

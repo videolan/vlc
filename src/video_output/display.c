@@ -992,28 +992,26 @@ void vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
             }
             const int right_max  = osys->source.i_x_offset + osys->source.i_visible_width;
             const int bottom_max = osys->source.i_y_offset + osys->source.i_visible_height;
-#define __CLIP(v, a, b) __MAX(__MIN(v, b), a)
-            int left   = __CLIP((int)osys->source.i_x_offset + osys->crop.left,
+            int left   = VLC_CLIP((int)osys->source.i_x_offset + osys->crop.left,
                                 0, right_max - 1);
-            int top    = __CLIP((int)osys->source.i_y_offset + osys->crop.top,
+            int top    = VLC_CLIP((int)osys->source.i_y_offset + osys->crop.top,
                                 0, bottom_max - 1);
             int right, bottom;
             if (osys->crop.right <= 0)
                 right = (int)(osys->source.i_x_offset + osys->source.i_visible_width) + osys->crop.right;
             else
                 right = (int)osys->source.i_x_offset + osys->crop.right;
-            right = __CLIP(right, left + 1, right_max);
+            right = VLC_CLIP(right, left + 1, right_max);
             if (osys->crop.bottom <= 0)
                 bottom = (int)(osys->source.i_y_offset + osys->source.i_visible_height) + osys->crop.bottom;
             else
                 bottom = (int)osys->source.i_y_offset + osys->crop.bottom;
-            bottom = __CLIP(bottom, top + 1, bottom_max);
+            bottom = VLC_CLIP(bottom, top + 1, bottom_max);
 
             source.i_x_offset       = left;
             source.i_y_offset       = top;
             source.i_visible_width  = right - left;
             source.i_visible_height = bottom - top;
-#undef __CLIP
             video_format_Print(VLC_OBJECT(vd), "SOURCE ", &osys->source);
             video_format_Print(VLC_OBJECT(vd), "CROPPED", &source);
             if (vout_display_Control(vd, VOUT_DISPLAY_CHANGE_SOURCE_CROP, &source)) {

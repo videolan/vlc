@@ -299,7 +299,7 @@ static int CreateFilter( vlc_object_t *p_this )
 
 #define GET_VAR( name, min, max )                                           \
     i_command = var_CreateGetIntegerCommand( p_filter, CFG_PREFIX #name );  \
-    p_sys->i_##name = __MIN( max, __MAX( min, i_command ) );                \
+    p_sys->i_##name = VLC_CLIP( i_command, min, max );                \
     var_AddCallback( p_filter, CFG_PREFIX #name, MosaicCallback, p_sys );
 
     GET_VAR( width, 0, INT_MAX );
@@ -738,7 +738,7 @@ static int MosaicCallback( vlc_object_t *p_this, char const *psz_var,
         vlc_mutex_lock( &p_sys->lock );
         msg_Dbg( p_this, "changing alpha from %d/255 to %d/255",
                          p_sys->i_alpha, (int)newval.i_int);
-        p_sys->i_alpha = __MIN( __MAX( newval.i_int, 0 ), 255 );
+        p_sys->i_alpha = VLC_CLIP( newval.i_int, 0, 255 );
         vlc_mutex_unlock( &p_sys->lock );
     }
     else if( VAR_IS( "height" ) )
@@ -777,7 +777,7 @@ static int MosaicCallback( vlc_object_t *p_this, char const *psz_var,
     {
         int i_old = 0, i_new = 0;
         vlc_mutex_lock( &p_sys->lock );
-        newval.i_int = __MIN( __MAX( newval.i_int, 0 ), 10 );
+        newval.i_int = VLC_CLIP( newval.i_int, 0, 10 );
         if( newval.i_int == 3 || newval.i_int == 7 )
             newval.i_int = 5;
         while( pi_align_values[i_old] != p_sys->i_align ) i_old++;

@@ -244,8 +244,7 @@ static int Control(demux_t *demux, int query, va_list args)
         if (sys->duration < 0 || sys->is_realtime)
             return VLC_EGENERIC;
         int64_t time = va_arg(args, int64_t);
-        date_Set(&sys->pts, __MIN(__MAX(time - sys->pts_origin, 0),
-                                  sys->duration));
+        date_Set(&sys->pts, VLC_CLIP(time - sys->pts_origin, 0, sys->duration));
         return VLC_SUCCESS;
     }
     case DEMUX_SET_NEXT_DEMUX_TIME: {

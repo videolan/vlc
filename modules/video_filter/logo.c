@@ -269,7 +269,7 @@ static int OpenCommon( vlc_object_t *p_this, bool b_sub )
         msg_Warn( p_this, "no logo file specified" );
 
     p_list->i_alpha = var_CreateGetIntegerCommand( p_filter, "logo-opacity");
-    p_list->i_alpha = __MAX( __MIN( p_list->i_alpha, 255 ), 0 );
+    p_list->i_alpha = VLC_CLIP( p_list->i_alpha, 0, 255 );
     p_list->i_delay = var_CreateGetIntegerCommand( p_filter, "logo-delay" );
     p_list->i_repeat = var_CreateGetIntegerCommand( p_filter, "logo-repeat" );
 
@@ -529,9 +529,9 @@ static int Mouse( filter_t *p_filter, vlc_mouse_t *p_mouse,
         {
             int i_dx, i_dy;
             vlc_mouse_GetMotion( &i_dx, &i_dy, p_old, p_new );
-            p_sys->i_pos_x = __MIN( __MAX( p_sys->i_pos_x + i_dx, 0 ),
+            p_sys->i_pos_x = VLC_CLIP( p_sys->i_pos_x + i_dx, 0,
                                     p_filter->fmt_in.video.i_width  - i_logo_w );
-            p_sys->i_pos_y = __MIN( __MAX( p_sys->i_pos_y + i_dy, 0 ),
+            p_sys->i_pos_y = VLC_CLIP( p_sys->i_pos_y + i_dy, 0,
                                     p_filter->fmt_in.video.i_height - i_logo_h );
 
             /* object under mouse has moved */
@@ -585,7 +585,7 @@ static int LogoCallback( vlc_object_t *p_this, char const *psz_var,
     }
     else if ( !strcmp( psz_var, "logo-opacity" ) )
     {
-        p_list->i_alpha = __MAX( __MIN( newval.i_int, 255 ), 0 );
+        p_list->i_alpha = VLC_CLIP( newval.i_int, 0, 255 );
     }
     else if ( !strcmp( psz_var, "logo-repeat" ) )
     {

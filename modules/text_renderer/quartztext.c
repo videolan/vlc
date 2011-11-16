@@ -197,7 +197,7 @@ static int Create( vlc_object_t *p_this )
         return VLC_ENOMEM;
     p_sys->psz_font_name  = var_CreateGetString( p_this, "quartztext-font" );
     p_sys->i_font_opacity = 255;
-    p_sys->i_font_color = __MAX( __MIN( var_CreateGetInteger( p_this, "quartztext-color" ) , 0xFFFFFF ), 0 );
+    p_sys->i_font_color = VLC_CLIP( var_CreateGetInteger( p_this, "quartztext-color" ) , 0, 0xFFFFFF );
     p_sys->i_font_size    = GetFontSize( p_filter );
 
     p_filter->pf_render_text = RenderText;
@@ -330,9 +330,9 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
 
     if( p_region_in->p_style )
     {
-        i_font_color = __MAX( __MIN( p_region_in->p_style->i_font_color, 0xFFFFFF ), 0 );
-        i_font_alpha = __MAX( __MIN( p_region_in->p_style->i_font_alpha, 255 ), 0 );
-        i_font_size  = __MAX( __MIN( p_region_in->p_style->i_font_size, 255 ), 0 );
+        i_font_color = VLC_CLIP( p_region_in->p_style->i_font_color, 0, 0xFFFFFF );
+        i_font_alpha = VLC_CLIP( p_region_in->p_style->i_font_alpha, 0, 255 );
+        i_font_size  = VLC_CLIP( p_region_in->p_style->i_font_size, 0, 255 );
         if( p_region_in->p_style->i_style_flags )
         {
             if( p_region_in->p_style->i_style_flags & STYLE_BOLD )

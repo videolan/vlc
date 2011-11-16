@@ -175,7 +175,7 @@ void vout_InitInterlacingSupport(vout_thread_t *vout, bool is_interlaced)
     /* */
     var_Create(vout, "deinterlace", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT | VLC_VAR_HASCHOICE);
     int deinterlace_state = var_GetInteger(vout, "deinterlace");
-    deinterlace_state = __MAX(__MIN(deinterlace_state, 1), -1);
+    deinterlace_state = VLC_CLIP(deinterlace_state, -1, 1);
 
     text.psz_string = _("Deinterlace");
     var_Change(vout, "deinterlace", VLC_VAR_SETTEXT, &text, NULL);

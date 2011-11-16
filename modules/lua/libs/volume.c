@@ -52,7 +52,7 @@
 static int vlclua_volume_set( lua_State *L )
 {
     playlist_t *p_this = vlclua_get_playlist_internal( L );
-    int i_volume = __MAX(__MIN(luaL_checkint( L, 1 ), AOUT_VOLUME_MAX), 0);
+    int i_volume = VLC_CLIP( luaL_checkint( L, 1 ), 0, AOUT_VOLUME_MAX );
     int i_ret = aout_VolumeSet( p_this, i_volume );
     return vlclua_push_ret( L, i_ret );
 }

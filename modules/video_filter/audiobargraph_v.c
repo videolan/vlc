@@ -238,7 +238,7 @@ static int OpenCommon( vlc_object_t *p_this, bool b_sub )
     p_sys->i_pos_y = var_CreateGetIntegerCommand( p_filter, "audiobargraph_v-y" );
     p_BarGraph->i_alpha = var_CreateGetIntegerCommand( p_filter,
                                                         "audiobargraph_v-transparency" );
-    p_BarGraph->i_alpha = __MAX( __MIN( p_BarGraph->i_alpha, 255 ), 0 );
+    p_BarGraph->i_alpha = VLC_CLIP( p_BarGraph->i_alpha, 0, 255 );
     i_values = var_CreateGetStringCommand( p_filter, "audiobargraph_v-i_values" );
     //p_BarGraph->nbChannels = 0;
     //p_BarGraph->i_values = NULL;
@@ -479,7 +479,7 @@ static int BarGraphCallback( vlc_object_t *p_this, char const *psz_var,
     }
     else if ( !strcmp( psz_var, "audiobargraph_v-transparency" ) )
     {
-        p_BarGraph->i_alpha = __MAX( __MIN( newval.i_int, 255 ), 0 );
+        p_BarGraph->i_alpha = VLC_CLIP( newval.i_int, 0, 255 );
     }
     else if ( !strcmp( psz_var, "audiobargraph_v-i_values" ) )
     {
@@ -939,7 +939,7 @@ void parse_i_values( BarGraph_t *p_BarGraph, char *i_values)
         p_BarGraph->nbChannels++;
         p_BarGraph->i_values = xrealloc(p_BarGraph->i_values,
                                           p_BarGraph->nbChannels*sizeof(int));
-        p_BarGraph->i_values[p_BarGraph->nbChannels-1] = __MAX( __MIN( atof(res)*p_BarGraph->scale, p_BarGraph->scale ), 0 );
+        p_BarGraph->i_values[p_BarGraph->nbChannels-1] = VLC_CLIP( atof(res)*p_BarGraph->scale, 0, p_BarGraph->scale );
         res = strtok_r(NULL, delim, &tok);
     }
 

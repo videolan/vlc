@@ -71,7 +71,7 @@ static subpicture_region_t * vout_OSDEpgSlider(int x, int y,
 
     picture_t *picture = region->p_picture;
 
-    ratio = __MIN(__MAX(ratio, 0), 1);
+    ratio = VLC_CLIP(ratio, 0, 1);
     int filled_part_width = ratio * width;
 
     for (int j = 0; j < height; j++) {

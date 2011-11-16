@@ -579,6 +579,9 @@ VLC_API void vlc_release(gc_object_t *);
 #   define __MIN(a, b)   ( ((a) < (b)) ? (a) : (b) )
 #endif
 
+/* clip v in [min, max] */
+#define VLC_CLIP(v, min, max)    __MIN(__MAX((v), (min)), (max))
+
 VLC_USED
 static inline int64_t GCD ( int64_t a, int64_t b )
 {

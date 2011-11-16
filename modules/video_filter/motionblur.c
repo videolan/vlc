@@ -215,7 +215,7 @@ static int MotionBlurCallback( vlc_object_t *p_this, char const *psz_var,
     if( !strcmp( psz_var, FILTER_PREFIX "factor" ) )
     {
         vlc_spin_lock( &p_sys->lock );
-        p_sys->i_factor = __MIN( 127, __MAX( 1, newval.i_int ) );
+        p_sys->i_factor = VLC_CLIP( newval.i_int, 1, 127 );
         vlc_spin_unlock( &p_sys->lock );
     }
     return VLC_SUCCESS;

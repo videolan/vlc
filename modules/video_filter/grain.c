@@ -258,7 +258,7 @@ static picture_t *Filter(filter_t *filter, picture_t *src)
     }
 
     vlc_mutex_lock(&sys->cfg.lock);
-    const double variance = __MIN(__MAX(sys->cfg.variance, VARIANCE_MIN), VARIANCE_MAX);
+    const double variance = VLC_CLIP(sys->cfg.variance, VARIANCE_MIN, VARIANCE_MAX);
     vlc_mutex_unlock(&sys->cfg.lock);
 
     const int scale = 256 * sqrt(variance);
@@ -352,7 +352,7 @@ static int Generate(int16_t *bank, int h_min, int h_max, int v_min, int v_max)
                 vq =  (int)( v * correction * 127 + 0.5);
             else
                 vq = -(int)(-v * correction * 127 + 0.5);
-            bank[i * N + j] = __MIN(__MAX(vq, INT16_MIN), INT16_MAX);
+            bank[i * N + j] = VLC_CLIP(vq, INT16_MIN, INT16_MAX);
         }
     }
     //mtime_t mul_duration = mdate() - tmul_0;
@@ -397,8 +397,8 @@ static int Open(vlc_object_t *object)
 
     int cutoff_low = BANK_SIZE - var_InheritInteger(filter, CFG_PREFIX "period-max");
     int cutoff_high= BANK_SIZE - var_InheritInteger(filter, CFG_PREFIX "period-min");
-    cutoff_low  = __MIN(__MAX(cutoff_low,  1), BANK_SIZE - 1);
-    cutoff_high = __MIN(__MAX(cutoff_high, 1), BANK_SIZE - 1);
+    cutoff_low  = VLC_CLIP(cutoff_low, 1, BANK_SIZE - 1);
+    cutoff_high = VLC_CLIP(cutoff_high, 1, BANK_SIZE - 1);
     if (Generate(sys->bank, cutoff_low, cutoff_high, cutoff_low, cutoff_high)) {
         free(sys);
         return VLC_EGENERIC;

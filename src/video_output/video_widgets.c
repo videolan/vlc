@@ -293,7 +293,7 @@ static void OSDWidget(vout_thread_t *vout, int channel, int type, int position)
     if (!var_InheritBool(vout, "osd"))
         return;
     if (type == OSD_HOR_SLIDER || type == OSD_VERT_SLIDER)
-        position = __MIN(__MAX(position, 0), 100);
+        position = VLC_CLIP(position, 0, 100);
 
     subpicture_updater_sys_t *sys = malloc(sizeof(*sys));
     if (!sys)

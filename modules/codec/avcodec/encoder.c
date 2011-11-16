@@ -459,7 +459,7 @@ int OpenEncoder( vlc_object_t *p_this )
         if( p_sys->i_key_int > 0 )
             p_context->gop_size = p_sys->i_key_int;
         p_context->max_b_frames =
-            __MAX( __MIN( p_sys->i_b_frames, FF_MAX_B_FRAMES ), 0 );
+            VLC_CLIP( p_sys->i_b_frames, 0, FF_MAX_B_FRAMES );
         p_context->b_frame_strategy = 0;
         if( !p_context->max_b_frames  &&
             (  p_enc->fmt_out.i_codec == VLC_CODEC_MPGV ||

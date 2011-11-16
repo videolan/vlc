@@ -252,7 +252,7 @@ static void FindLength( demux_t *p_demux )
 
         /* Check end */
         i_size = stream_Size( p_demux->s );
-        i_end = __MAX( 0, __MIN( 200000, i_size ) );
+        i_end = VLC_CLIP( i_size, 0, 200000 );
         stream_Seek( p_demux->s, i_size - i_end );
 
         i = 0;

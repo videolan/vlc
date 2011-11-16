@@ -738,7 +738,7 @@ static int AStreamReadBlock( stream_t *s, void *p_read, unsigned int i_read )
     {
         int i_current =
             p_sys->block.p_current->i_buffer - p_sys->block.i_offset;
-        unsigned int i_copy = __MIN( (unsigned int)__MAX(i_current,0), i_read - i_data);
+        unsigned int i_copy = VLC_CLIP( (unsigned int)i_current, 0, i_read - i_data);
 
         /* Copy data */
         if( p_data )
@@ -1312,9 +1312,9 @@ static int AStreamReadNoSeekStream( stream_t *s, void *p_read, unsigned int i_re
 
         if( tk->i_end + i_data <= tk->i_start + p_sys->stream.i_offset + i_read )
         {
-            const unsigned i_read_requested = __MAX( __MIN( i_read - i_data,
-                                                            STREAM_READ_ATONCE * 10 ),
-                                                     STREAM_READ_ATONCE / 2 );
+            const unsigned i_read_requested = VLC_CLIP( i_read - i_data,
+                                                    STREAM_READ_ATONCE / 2,
+                                                    STREAM_READ_ATONCE * 10 );
 
             if( p_sys->stream.i_used < i_read_requested )
                 p_sys->stream.i_used = i_read_requested;

@@ -1215,7 +1215,7 @@ static int UpdateVolume( vlc_object_t *p_this )
     /* Our volume is 0..255, RAOP is -144..0 (-144 off, -30..0 on) */
 
     /* Limit range */
-    p_sys->i_volume = __MAX( 0, __MIN( p_sys->i_volume, 255 ) );
+    p_sys->i_volume = VLC_CLIP( p_sys->i_volume, 0, 255 );
 
     if ( p_sys->i_volume == 0 )
         d_volume = -144.0;

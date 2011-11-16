@@ -166,11 +166,11 @@ static int Create( vlc_object_t *p_this )
     var_Create( p_filter, "win32text-opacity",
                 VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Get( p_filter, "win32text-opacity", &val );
-    p_sys->i_font_opacity = __MAX( __MIN( val.i_int, 255 ), 0 );
+    p_sys->i_font_opacity = VLC_CLIP( val.i_int, 0, 255 );
     var_Create( p_filter, "win32text-color",
                 VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Get( p_filter, "win32text-color", &val );
-    p_sys->i_font_color = __MAX( __MIN( val.i_int, 0xFFFFFF ), 0 );
+    p_sys->i_font_color = VLC_CLIP( val.i_int, 0, 0xFFFFFF );
 
     p_sys->hfont = p_sys->hfont_bak = 0;
     hdc = GetDC( NULL );
@@ -335,9 +335,9 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
 
     if( p_region_in->p_style )
     {
-        i_font_color = __MAX( __MIN( p_region_in->p_style->i_font_color, 0xFFFFFF ), 0 );
-        i_font_alpha = __MAX( __MIN( p_region_in->p_style->i_font_alpha, 255 ), 0 );
-        i_font_size  = __MAX( __MIN( p_region_in->p_style->i_font_size, 255 ), 0 );
+        i_font_color = VLC_CLIP( p_region_in->p_style->i_font_color, 0, 0xFFFFFF );
+        i_font_alpha = VLC_CLIP( p_region_in->p_style->i_font_alpha, 0, 255 );
+        i_font_size  = VLC_CLIP( p_region_in->p_style->i_font_size, 0, 255 );
     }
     else
     {

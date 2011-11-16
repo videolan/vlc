@@ -2516,30 +2516,30 @@ static int Create( vlc_object_t *p_this )
     psz_fontfamily = var_InheritString( p_filter, "freetype-font" );
     p_sys->i_default_font_size = var_InheritInteger( p_filter, "freetype-fontsize" );
     p_sys->i_font_opacity = var_InheritInteger( p_filter,"freetype-opacity" );
-    p_sys->i_font_opacity = __MAX( __MIN( p_sys->i_font_opacity, 255 ), 0 );
+    p_sys->i_font_opacity = VLC_CLIP( p_sys->i_font_opacity, 0, 255 );
     p_sys->i_font_color = var_InheritInteger( p_filter, "freetype-color" );
-    p_sys->i_font_color = __MAX( __MIN( p_sys->i_font_color , 0xFFFFFF ), 0 );
+    p_sys->i_font_color = VLC_CLIP( p_sys->i_font_color, 0, 0xFFFFFF );
     p_sys->b_font_bold = var_InheritBool( p_filter, "freetype-bold" );
 
     p_sys->i_background_opacity = var_InheritInteger( p_filter,"freetype-background-opacity" );;
-    p_sys->i_background_opacity = __MAX( __MIN( p_sys->i_background_opacity, 255 ), 0 );
+    p_sys->i_background_opacity = VLC_CLIP( p_sys->i_background_opacity, 0, 255 );
     p_sys->i_background_color = var_InheritInteger( p_filter, "freetype-background-color" );
-    p_sys->i_background_color = __MAX( __MIN( p_sys->i_background_color, 0xFFFFFF ), 0 );
+    p_sys->i_background_color = VLC_CLIP( p_sys->i_background_color, 0, 0xFFFFFF );
 
     p_sys->f_outline_thickness = var_InheritInteger( p_filter, "freetype-outline-thickness" ) / 100.0;
-    p_sys->f_outline_thickness = __MAX( __MIN( p_sys->f_outline_thickness, 0.5 ), 0.0 );
+    p_sys->f_outline_thickness = VLC_CLIP( p_sys->f_outline_thickness, 0.0, 0.5 );
     p_sys->i_outline_opacity = var_InheritInteger( p_filter, "freetype-outline-opacity" );
-    p_sys->i_outline_opacity = __MAX( __MIN( p_sys->i_outline_opacity, 255 ), 0 );
+    p_sys->i_outline_opacity = VLC_CLIP( p_sys->i_outline_opacity, 0, 255 );
     p_sys->i_outline_color = var_InheritInteger( p_filter, "freetype-outline-color" );
-    p_sys->i_outline_color = __MAX( __MIN( p_sys->i_outline_color, 0xFFFFFF ), 0 );
+    p_sys->i_outline_color = VLC_CLIP( p_sys->i_outline_color, 0, 0xFFFFFF );
 
     p_sys->i_shadow_opacity = var_InheritInteger( p_filter, "freetype-shadow-opacity" );
-    p_sys->i_shadow_opacity = __MAX( __MIN( p_sys->i_shadow_opacity, 255 ), 0 );
+    p_sys->i_shadow_opacity = VLC_CLIP( p_sys->i_shadow_opacity, 0, 255 );
     p_sys->i_shadow_color = var_InheritInteger( p_filter, "freetype-shadow-color" );
-    p_sys->i_shadow_color = __MAX( __MIN( p_sys->i_shadow_color, 0xFFFFFF ), 0 );
+    p_sys->i_shadow_color = VLC_CLIP( p_sys->i_shadow_color, 0, 0xFFFFFF );
     float f_shadow_angle = var_InheritFloat( p_filter, "freetype-shadow-angle" );
     float f_shadow_distance = var_InheritFloat( p_filter, "freetype-shadow-distance" );
-    f_shadow_distance = __MAX( __MIN( f_shadow_distance, 1 ), 0 );
+    f_shadow_distance = VLC_CLIP( f_shadow_distance, 0, 1 );
     p_sys->f_shadow_vector_x = f_shadow_distance * cos(2 * M_PI * f_shadow_angle / 360);
     p_sys->f_shadow_vector_y = f_shadow_distance * sin(2 * M_PI * f_shadow_angle / 360);
 
