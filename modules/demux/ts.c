@@ -2405,6 +2405,9 @@ static int PIDFillFormat( ts_pid_t *pid, int i_stream_type )
     case 0x1B:  /* H264 <- check transport syntax/needed descriptor */
         es_format_Init( fmt, VIDEO_ES, VLC_CODEC_H264 );
         break;
+    case 0x42:  /* CAVS (Chinese AVS) */
+        es_format_Init( fmt, VIDEO_ES, VLC_CODEC_CAVS );
+        break;
 
     case 0x81:  /* A52 (audio) */
         es_format_Init( fmt, AUDIO_ES, VLC_CODEC_A52 );
