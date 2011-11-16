@@ -853,7 +853,7 @@ package-macosx: VLC-release.app ChangeLog
 	fi
 	mkdir -p $(top_builddir)/vlc-$(VERSION)/Goodies/
 	for i in AUTHORS COPYING README THANKS NEWS; do \
-	  cp $(srcdir)/$$i $(top_builddir)/vlckit-$(VERSION)/Goodies/; \
+	  cp $(srcdir)/$$i $(top_builddir)/vlc-$(VERSION)/Goodies/; \
 	done
 	cp $(top_builddir)/ChangeLog $(top_builddir)/vlc-$(VERSION)/Goodies/
 	cp -R  $(srcdir)/extras/package/macosx/Delete_Preferences.app $(top_builddir)/vlc-$(VERSION)/Goodies/Delete\ VLC\ Preferences.app
