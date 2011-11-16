@@ -1545,16 +1545,16 @@ KeyInputDialog::KeyInputDialog( QTreeWidget *_table,
 
 void KeyInputDialog::checkForConflicts( int i_vlckey )
 {
-     QList<QTreeWidgetItem *> conflictList =
-         table->findItems( VLCKeyToString( i_vlckey ), Qt::MatchExactly,
-                           b_global ? 2 : 1 );
+    QList<QTreeWidgetItem *> conflictList =
+        table->findItems( VLCKeyToString( i_vlckey ), Qt::MatchExactly,
+                          b_global ? 2 : 1 );
 
     if( conflictList.count() &&
-        conflictList[0]->data( b_global ? 2 : 1, Qt::UserRole ).toInt() > 1 )
-        /* Avoid 0 or -1 that are the "Unset" states */
+        !conflictList[0]->data( b_global ? 2 : 1, Qt::UserRole ).toString().isEmpty() &&
+         conflictList[0]->data( b_global ? 2 : 1, Qt::UserRole ).toString() != "Unset" )
     {
         warning->setText( qtr("Warning: the key is already assigned to \"") +
-                          conflictList[0]->text( 0 ) + "\"" );
+                conflictList[0]->text( 0 ) + "\"" );
         warning->show();
         buttonBox->show();
 
