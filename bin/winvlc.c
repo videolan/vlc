@@ -43,6 +43,7 @@
 # define HeapEnableTerminationOnCorruption (HEAP_INFORMATION_CLASS)1
 static void check_crashdump(void);
 LONG WINAPI vlc_exception_filter(struct _EXCEPTION_POINTERS *lpExceptionInfo);
+static const wchar_t *crashdump_path;
 #endif
 
 #ifndef UNDER_CE
@@ -175,6 +176,13 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
     if(crash_handling)
     {
+        static wchar_t path[MAX_PATH];
+        if( S_OK != SHGetFolderPathW( NULL, CSIDL_APPDATA | CSIDL_FLAG_CREATE,
+                    NULL, SHGFP_TYPE_CURRENT, path ) )
+            fprintf( stderr, "Can't open the vlc conf PATH\n" );
+        swprintf( path+wcslen( path ), L"%s", L"\\vlc\\crashdump" );
+        crashdump_path = &path[0];
+
         check_crashdump();
         SetUnhandledExceptionFilter(vlc_exception_filter);
     }
@@ -209,74 +217,60 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
 #if !defined( UNDER_CE )
 /* Crashdumps handling */
-static void get_crashdump_path(wchar_t * wdir)
+static void check_crashdump(void)
 {
-    if( S_OK != SHGetFolderPathW( NULL,
-                        CSIDL_APPDATA | CSIDL_FLAG_CREATE,
-                        NULL, SHGFP_TYPE_CURRENT, wdir ) )
-        fprintf( stderr, "Can't open the vlc conf PATH\n" );
+    FILE * fd = _wfopen ( crashdump_path, L"r, ccs=UTF-8" );
+    if( !fd )
+        return;
+    fclose( fd );
 
-    swprintf( wdir+wcslen( wdir ), L"%s", L"\\vlc\\crashdump" );
-}
+    int answer = MessageBox( NULL, L"VLC media player just crashed." \
+    " Do you want to send a bug report to the developers team?",
+    L"VLC crash reporting", MB_YESNO);
 
-static void check_crashdump()
-{
-    wchar_t * wdir = (wchar_t *)malloc(sizeof(wchar_t)*MAX_PATH);
-    get_crashdump_path(wdir);
-
-    FILE * fd = _wfopen ( wdir, L"r, ccs=UTF-8" );
-    if( fd )
+    if(answer == IDYES)
     {
-        fclose( fd );
-        int answer = MessageBox( NULL, L"VLC media player just crashed." \
-        " Do you want to send a bug report to the developers team?",
-        L"VLC crash reporting", MB_YESNO);
-
-        if(answer == IDYES)
+        HINTERNET Hint = InternetOpen(L"VLC Crash Reporter", INTERNET_OPEN_TYPE_PRECONFIG, NULL,NULL,0);
+        if(Hint)
         {
-            HINTERNET Hint = InternetOpen(L"VLC Crash Reporter", INTERNET_OPEN_TYPE_PRECONFIG, NULL,NULL,0);
-            if(Hint)
+            HINTERNET ftp = InternetConnect(Hint, L"crash.videolan.org", INTERNET_DEFAULT_FTP_PORT,
+                                            NULL, NULL, INTERNET_SERVICE_FTP, 0, 0);
+            if(ftp)
             {
-                HINTERNET ftp = InternetConnect(Hint, L"crash.videolan.org", INTERNET_DEFAULT_FTP_PORT,
-                                                NULL, NULL, INTERNET_SERVICE_FTP, 0, 0);
-                if(ftp)
-                {
-                    SYSTEMTIME now;
-                    GetSystemTime(&now);
-                    wchar_t remote_file[MAX_PATH];
-                    swprintf( remote_file, L"/crashes-win32/%04d%02d%02d%02d%02d%02d",
-                              now.wYear, now.wMonth, now.wDay, now.wHour, now.wMinute, now.wSecond );
+                SYSTEMTIME now;
+                GetSystemTime(&now);
+                wchar_t remote_file[MAX_PATH];
+                swprintf( remote_file, L"/crashes-win32/%04d%02d%02d%02d%02d%02d",
+                          now.wYear, now.wMonth, now.wDay, now.wHour, now.wMinute, now.wSecond );
 
-                    if( FtpPutFile( ftp, wdir, remote_file, FTP_TRANSFER_TYPE_BINARY, 0) )
-                        MessageBox( NULL, L"Report sent correctly. Thanks a lot for the help.",
-                                    L"Report sent", MB_OK);
-                    else
-                        MessageBox( NULL, L"There was an error while transferring to the FTP server. "\
-                                    "Thanks a lot for the help anyway.",
-                                    L"Report sending failed", MB_OK);
-                    InternetCloseHandle(ftp);
-                }
+                if( FtpPutFile( ftp, crashdump_path, remote_file, FTP_TRANSFER_TYPE_BINARY, 0) )
+                    MessageBox( NULL, L"Report sent correctly. Thanks a lot for the help.",
+                                L"Report sent", MB_OK);
                 else
-                {
-                    MessageBox( NULL, L"There was an error while connecting to the FTP server. "\
-                                    "Thanks a lot for the help anyway.",
-                                    L"Report sending failed", MB_OK);
-                    fprintf(stderr,"Can't connect to FTP server 0x%08lu\n",
-                            (unsigned long)GetLastError());
-                }
-                InternetCloseHandle(Hint);
+                    MessageBox( NULL, L"There was an error while transferring to the FTP server. "\
+                                "Thanks a lot for the help anyway.",
+                                L"Report sending failed", MB_OK);
+                InternetCloseHandle(ftp);
             }
             else
             {
-                  MessageBox( NULL, L"There was an error while connecting to Internet. "\
-                                    "Thanks a lot for the help anyway.",
-                                    L"Report sending failed", MB_OK);
+                MessageBox( NULL, L"There was an error while connecting to the FTP server. "\
+                                "Thanks a lot for the help anyway.",
+                                L"Report sending failed", MB_OK);
+                fprintf(stderr,"Can't connect to FTP server 0x%08lu\n",
+                        (unsigned long)GetLastError());
             }
+            InternetCloseHandle(Hint);
         }
-
-        _wremove(wdir);
+        else
+        {
+              MessageBox( NULL, L"There was an error while connecting to Internet. "\
+                                "Thanks a lot for the help anyway.",
+                                L"Report sending failed", MB_OK);
+        }
     }
-    free((void *)wdir);
+
+    _wremove(crashdump_path);
 }
 
 /*****************************************************************************
@@ -293,10 +287,7 @@ LONG WINAPI vlc_exception_filter(struct _EXCEPTION_POINTERS *lpExceptionInfo)
     {
         fprintf( stderr, "unhandled vlc exception\n" );
 
-        wchar_t * wdir = (wchar_t *)malloc(sizeof(wchar_t)*MAX_PATH);
-        get_crashdump_path(wdir);
-        FILE * fd = _wfopen ( wdir, L"w, ccs=UTF-8" );
-        free((void *)wdir);
+        FILE * fd = _wfopen ( crashdump_path, L"w, ccs=UTF-8" );
 
         if( !fd )
         {
