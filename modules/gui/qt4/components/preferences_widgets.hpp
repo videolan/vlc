@@ -446,26 +446,6 @@ private slot:
 /**********************************************************************
  * Key selector widget
  **********************************************************************/
-class KeyShortcutEdit: public QLineEdit
-{
-    Q_OBJECT
-public:
-    void setValue( const QString& value ){ this->value = value; }
-    QString getValue() const { return value; }
-
-    void setGlobal( bool _value ) { b_global = _value; }
-    bool getGlobal() const { return b_global; }
-public slots:
-    virtual void clear(void) { value = qfu(""); QLineEdit::clear(); }
-private:
-    QString value;
-    bool b_global;
-    virtual void mousePressEvent( QMouseEvent *event );
-signals:
-    void pressed();
-};
-
-class SearchLineEdit;
 class KeySelectorControl : public ConfigControl
 {
     Q_OBJECT
@@ -476,18 +456,15 @@ public:
     virtual void hide() { table->hide(); if( label ) label->hide(); }
     virtual void show() { table->show(); if( label ) label->show(); }
     virtual void doApply();
+protected:
+    virtual bool eventFilter( QObject *, QEvent * );
 private:
     void finish();
     QLabel *label;
     QTreeWidget *table;
-    KeyShortcutEdit *shortcutValue;
     QList<module_config_t *> values;
-    SearchLineEdit *actionSearch;
 private slots:
-    void setTheKey();
     void selectKey( QTreeWidgetItem * = NULL, int column = 1 );
-    void select( QTreeWidgetItem * = NULL, int column = 1 );
-    void select1Key();
     void filter( const QString & );
 };
 
@@ -497,14 +474,15 @@ public:
     KeyInputDialog( QTreeWidget *, const QString&, QWidget *, bool b_global = false);
     int keyValue;
     bool conflicts;
+
 private:
     QTreeWidget *table;
+    QLabel *selected, *warning;
+    QDialogButtonBox *buttonBox;
+
     void checkForConflicts( int i_vlckey );
     void keyPressEvent( QKeyEvent *);
     void wheelEvent( QWheelEvent *);
-    QLabel *selected, *warning;
-    QVBoxLayout *vLayout;
-    QDialogButtonBox *buttonBox;
     bool b_global;
 };
 #endif

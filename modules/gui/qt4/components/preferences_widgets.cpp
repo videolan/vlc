@@ -1297,7 +1297,7 @@ KeySelectorControl::KeySelectorControl( vlc_object_t *_p_this,
             qtr( "Select an action to change the associated hotkey") );
 
     QLabel *searchLabel = new QLabel( qtr( "Search" ) );
-    actionSearch = new SearchLineEdit( keyContainer );
+    SearchLineEdit *actionSearch = new SearchLineEdit( keyContainer );
 
     table = new QTreeWidget;
     table->setColumnCount(3);
@@ -1307,27 +1307,17 @@ KeySelectorControl::KeySelectorControl( vlc_object_t *_p_this,
     table->setAlternatingRowColors( true );
     table->setSelectionBehavior( QAbstractItemView::SelectItems );
 
-    shortcutValue = new KeyShortcutEdit;
-    shortcutValue->setReadOnly(true);
+    table->installEventFilter( this );
 
-    QPushButton *clearButton = new QPushButton( qtr( "Clear" ) );
-    QPushButton *setButton = new QPushButton( qtr( "Apply" ) );
-    setButton->setDefault( true );
     finish();
 
     gLayout->addWidget( label, 0, 0, 1, 4 );
     gLayout->addWidget( searchLabel, 1, 0, 1, 2 );
     gLayout->addWidget( actionSearch, 1, 2, 1, 2 );
     gLayout->addWidget( table, 2, 0, 1, 4 );
-    gLayout->addWidget( clearButton, 3, 0, 1, 1 );
-    gLayout->addWidget( shortcutValue, 3, 1, 1, 2 );
-    gLayout->addWidget( setButton, 3, 3, 1, 1 );
 
     l->addWidget( keyContainer, line, 0, 1, -1 );
 
-    CONNECT( clearButton, clicked(), shortcutValue, clear() );
-    CONNECT( clearButton, clicked(), this, setTheKey() );
-    BUTTONACT( setButton, setTheKey() );
     CONNECT( actionSearch, textChanged( const QString& ),
              this, filter( const QString& ) );
 }
@@ -1396,14 +1386,8 @@ void KeySelectorControl::finish()
 
     table->resizeColumnToContents( 0 );
 
-    CONNECT( table, itemDoubleClicked( QTreeWidgetItem *, int ),
+    CONNECT( table, itemActivated( QTreeWidgetItem *, int ),
              this, selectKey( QTreeWidgetItem *, int ) );
-    CONNECT( table, itemClicked( QTreeWidgetItem *, int ),
-             this, select( QTreeWidgetItem *, int) );
-    CONNECT( table, itemSelectionChanged(),
-             this, select1Key() );
-
-    CONNECT( shortcutValue, pressed(), this, selectKey() );
 }
 
 void KeySelectorControl::filter( const QString &qs_search )
@@ -1415,20 +1399,6 @@ void KeySelectorControl::filter( const QString &qs_search )
         table->topLevelItem( i )->setHidden(
                 !resultList.contains( table->topLevelItem( i ) ) );
     }
-}
-
-void KeySelectorControl::select( QTreeWidgetItem *, int column )
-{
-    shortcutValue->setGlobal( column == 2 );
-}
-
-/* Show the key selected from the table in the keySelector */
-void KeySelectorControl::select1Key()
-{
-    QTreeWidgetItem *keyItem = table->currentItem();
-    shortcutValue->setText( keyItem->text( 1 ) );
-    shortcutValue->setValue( keyItem->data( 1, Qt::UserRole ).toString() );
-    shortcutValue->setGlobal( false );
 }
 
 void KeySelectorControl::selectKey( QTreeWidgetItem *keyItem, int column )
@@ -1452,10 +1422,8 @@ void KeySelectorControl::selectKey( QTreeWidgetItem *keyItem, int column )
     if( d->result() == QDialog::Accepted )
     {
         QString newKey = VLCKeyToString( d->keyValue );
-        shortcutValue->setText( newKey );
-        shortcutValue->setValue( newKey );
-        shortcutValue->setGlobal( b_global );
 
+        /* In case of conflict, reset other keys*/
         if( d->conflicts )
         {
             QTreeWidgetItem *it;
@@ -1470,20 +1438,12 @@ void KeySelectorControl::selectKey( QTreeWidgetItem *keyItem, int column )
                     it->setText( 1 + b_global, qtr( "Unset" ) );
                 }
             }
-            /* We already made an OK once. */
-            setTheKey();
         }
+
+        keyItem->setText( column, newKey );
+        keyItem->setData( column, Qt::UserRole, newKey );
     }
     delete d;
-}
-
-void KeySelectorControl::setTheKey()
-{
-    if( !table->currentItem() ) return;
-    table->currentItem()->setText( shortcutValue->getGlobal() ? 2 : 1,
-                                   shortcutValue->text() );
-    table->currentItem()->setData( shortcutValue->getGlobal() ? 2 : 1,
-                                   Qt::UserRole, shortcutValue->getValue() );
 }
 
 void KeySelectorControl::doApply()
@@ -1504,6 +1464,29 @@ void KeySelectorControl::doApply()
     }
 }
 
+bool KeySelectorControl::eventFilter( QObject *obj, QEvent *e )
+{
+    if( obj != table || e->type() != QEvent::KeyPress )
+        return ConfigControl::eventFilter(obj, e);
+
+    QKeyEvent *keyEv = static_cast<QKeyEvent*>(e);
+    QTreeWidget *aTable = static_cast<QTreeWidget *>(obj);
+    if( keyEv->key() == Qt::Key_Escape )
+    {
+        aTable->clearFocus();
+        return true;
+    }
+    else if( keyEv->key() == Qt::Key_Return ||
+             keyEv->key() == Qt::Key_Enter )
+    {
+        selectKey( aTable->currentItem(), aTable->currentColumn() );
+        return true;
+    }
+    else
+        return false;
+}
+
+
 /**
  * Class KeyInputDialog
  **/
@@ -1521,7 +1504,7 @@ KeyInputDialog::KeyInputDialog( QTreeWidget *_table,
                     + qtr( "Hotkey for " ) + keyToChange );
     setWindowRole( "vlc-key-input" );
 
-    vLayout = new QVBoxLayout( this );
+    QVBoxLayout *vLayout = new QVBoxLayout( this );
     selected = new QLabel( qtr( "Press the new keys for " ) + keyToChange );
     vLayout->addWidget( selected , Qt::AlignCenter );
 
@@ -1584,10 +1567,5 @@ void KeyInputDialog::wheelEvent( QWheelEvent *e )
     selected->setText( qtr( "Key: " ) + VLCKeyToString( i_vlck ) );
     checkForConflicts( i_vlck );
     keyValue = i_vlck;
-}
-
-void KeyShortcutEdit::mousePressEvent( QMouseEvent *)
-{
-    emit pressed();
 }
 
