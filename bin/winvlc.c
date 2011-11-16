@@ -244,8 +244,8 @@ static void check_crashdump()
                     SYSTEMTIME now;
                     GetSystemTime(&now);
                     wchar_t remote_file[MAX_PATH];
-                    swprintf( remote_file, L"/crashs/%04d%02d%02d%02d%02d%02d",now.wYear,
-                            now.wMonth, now.wDay, now.wHour, now.wMinute, now.wSecond  );
+                    swprintf( remote_file, L"/crashes-win32/%04d%02d%02d%02d%02d%02d",
+                              now.wYear, now.wMonth, now.wDay, now.wHour, now.wMinute, now.wSecond );
 
                     if( FtpPutFile( ftp, wdir, remote_file, FTP_TRANSFER_TYPE_BINARY, 0) )
                         MessageBox( NULL, L"Report sent correctly. Thanks a lot for the help.",
