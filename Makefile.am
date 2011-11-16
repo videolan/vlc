@@ -734,7 +734,7 @@ endif
 
 # SDK
 	mkdir -p "$(win32_destdir)/sdk/lib"
-	cp -rT $(destdir)/include/vlc/ "$(win32_destdir)/sdk/include"
+	cp -r $(destdir)/include "$(win32_destdir)/sdk"
 	cp -r $(destdir)/lib/pkgconfig "$(win32_destdir)/sdk/lib"
 	for file in libvlc.dll.a libvlc.la libvlccore.dll.a libvlccore.la; do \
 		cp -rv $(destdir)/lib/$$file "$(win32_destdir)/sdk/lib"; \
