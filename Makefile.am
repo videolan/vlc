@@ -788,7 +788,7 @@ package-win32-exe: package-win-strip
 # Script installer
 	cp "$(top_builddir)/extras/package/win32/vlc.win32.nsi" "$(win32_destdir)/"
 	cp "$(top_builddir)/extras/package/win32/spad.nsi" "$(win32_destdir)/"
-	mkdir "$(win32_destdir)/languages"
+	mkdir -p "$(win32_destdir)/languages"
 	cp $(srcdir)/extras/package/win32/languages/*.nsh "$(win32_destdir)/languages/"
 # Copy the UAC NSIS plugin
 	mkdir -p "$(win32_destdir)/NSIS"
