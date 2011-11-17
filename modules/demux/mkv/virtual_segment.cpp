@@ -86,9 +86,8 @@ virtual_chapter_c * virtual_chapter_c::CreateVirtualChapter( chapter_item_c * p_
         *usertime_offset = tmp;
 
     msg_Dbg( &p_main_segment->sys.demuxer,
-             "Virtual chapter %s from %"PRId64" to %"PRId64" - segment 0x%x",
-             p_chap->psz_name.c_str(), p_vchap->i_virtual_start_time, p_vchap->i_virtual_stop_time,
-             *(uint32_t*)p_vchap->p_segment->p_segment_uid->GetBuffer() );
+             "Virtual chapter %s from %"PRId64" to %"PRId64" - " ,
+             p_chap->psz_name.c_str(), p_vchap->i_virtual_start_time, p_vchap->i_virtual_stop_time );
 
     return p_vchap;
 }
