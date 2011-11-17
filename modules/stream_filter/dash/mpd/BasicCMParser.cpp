@@ -30,9 +30,8 @@
 using namespace dash::mpd;
 using namespace dash::xml;
 
-BasicCMParser::BasicCMParser    (Node *root)
+BasicCMParser::BasicCMParser    (Node *root) : root(root), mpd(NULL)
 {
-    this->root = root;
 }
 BasicCMParser::~BasicCMParser   ()
 {

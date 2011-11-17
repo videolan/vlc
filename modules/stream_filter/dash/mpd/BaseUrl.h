@@ -34,10 +34,10 @@ namespace dash
         class BaseUrl
         {
             public:
-                BaseUrl         (std::string url)   { this->url = url; }
+            BaseUrl         (const std::string& url) : url(url) {}
                 virtual ~BaseUrl()                  {}
 
-                std::string getUrl() { return this->url; }
+                const std::string& getUrl() const { return this->url; }
 
             private:
                 std::string url;

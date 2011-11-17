@@ -36,6 +36,7 @@ namespace dash
             public:
                 virtual bool    parse  () = 0;
                 virtual MPD*    getMPD () = 0;
+                virtual ~IMPDParser(){}
         };
     }
 }

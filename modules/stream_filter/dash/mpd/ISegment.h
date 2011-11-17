@@ -37,6 +37,7 @@ namespace dash
         {
             public:
                 virtual std::string getSourceUrl() throw(dash::exception::AttributeNotPresentException) = 0;
+                virtual ~ISegment(){}
         };
     }
 }

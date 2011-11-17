@@ -29,9 +29,10 @@
 
 using namespace dash::http;
 
-Chunk::Chunk()
-{
+Chunk::Chunk() : url()
 
+{
+    startByte = endByte = 0;
 }
 Chunk::~Chunk()
 {

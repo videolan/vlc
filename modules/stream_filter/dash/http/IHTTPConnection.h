@@ -37,6 +37,7 @@ namespace dash
             public:
                 virtual int     read        (void *p_buffer, size_t len)              = 0;
                 virtual int     peek        (const uint8_t **pp_peek, size_t i_peek)  = 0;
+                virtual ~IHTTPConnection() {}
         };
     }
 }

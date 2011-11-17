@@ -33,6 +33,7 @@ namespace dash
         {
             public:
                 virtual void downloadRateChanged(long bpsAvg, long bpsLastChunk) = 0;
+                virtual ~IDownloadRateObserver(){}
         };
     }
 }
