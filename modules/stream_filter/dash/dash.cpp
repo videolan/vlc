@@ -85,7 +85,7 @@ static int Open(vlc_object_t *p_obj)
     dash::xml::DOMParser parser(p_stream->p_source);
     if(!parser.parse())
     {
-        msg_Dbg(p_stream, "could not parse file");
+        msg_Dbg(p_stream, "could not parse mpd file");
         return VLC_EGENERIC;
     }
 
@@ -112,7 +112,7 @@ static int Open(vlc_object_t *p_obj)
     p_stream->pf_peek       = Peek;
     p_stream->pf_control    = Control;
 
-    msg_Dbg(p_obj,"DASH filter: open (%s)", p_stream->psz_path);
+    msg_Dbg(p_obj,"opening mpd file (%s)", p_stream->psz_path);
 
     return VLC_SUCCESS;
 }
