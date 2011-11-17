@@ -636,13 +636,13 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
     QHBoxLayout *controlLayout1 = new QHBoxLayout;
     controlLayout1->setSpacing( 0 ); controlLayout1->setMargin( 0 );
 
-    QString line1 = getSettings()->value( "MainToolbar1", MAIN_TB1_DEFAULT )
+    QString line1 = getSettings()->value( "MainWindow/MainToolbar1", MAIN_TB1_DEFAULT )
                                         .toString();
     parseAndCreate( line1, controlLayout1 );
 
     QHBoxLayout *controlLayout2 = new QHBoxLayout;
     controlLayout2->setSpacing( 0 ); controlLayout2->setMargin( 0 );
-    QString line2 = getSettings()->value( "MainToolbar2", MAIN_TB2_DEFAULT )
+    QString line2 = getSettings()->value( "MainWindow/MainToolbar2", MAIN_TB2_DEFAULT )
                                         .toString();
     parseAndCreate( line2, controlLayout2 );
 
@@ -676,7 +676,7 @@ AdvControlsWidget::AdvControlsWidget( intf_thread_t *_p_i, QWidget *_parent ) :
 #endif
 
 
-    QString line = getSettings()->value( "AdvToolbar", ADV_TB_DEFAULT )
+    QString line = getSettings()->value( "MainWindow/AdvToolbar", ADV_TB_DEFAULT )
         .toString();
     parseAndCreate( line, controlLayout );
 }
@@ -692,7 +692,7 @@ InputControlsWidget::InputControlsWidget( intf_thread_t *_p_i, QWidget *_parent 
     setStyleSheet( "background: green ");
 #endif
 
-    QString line = getSettings()->value( "InputToolbar", INPT_TB_DEFAULT ).toString();
+    QString line = getSettings()->value( "MainWindow/InputToolbar", INPT_TB_DEFAULT ).toString();
     parseAndCreate( line, controlLayout );
 }
 /**********************************************************************
