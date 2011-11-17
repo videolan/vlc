@@ -861,7 +861,7 @@ void PLModel::search( const QString& search_text, const QModelIndex & idx, bool 
         playlist_item_t *p_root = playlist_ItemGetById( p_playlist,
                                                         itemId( idx ) );
         assert( p_root );
-        playlist_LiveSearchUpdate( p_playlist , p_root, qtu( search_text ),
+        playlist_LiveSearchUpdate( p_playlist, p_root, qtu( search_text ),
                                    b_recursive );
         if( idx.isValid() )
         {
@@ -869,7 +869,7 @@ void PLModel::search( const QString& search_text, const QModelIndex & idx, bool 
 
             beginRemoveRows( idx, 0, searchRoot->childCount() - 1 );
             searchRoot->removeChildren();
-            endRemoveRows( );
+            endRemoveRows();
 
             beginInsertRows( idx, 0, searchRoot->childCount() - 1 );
             updateChildren( searchRoot ); // The PL_LOCK is needed here
