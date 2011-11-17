@@ -25,10 +25,8 @@
 
 /**
  * Todo:
- *  - Finish implementation (see WX, there might be missing a
- *    i_action handler for IntegerLists, but I don't see any module using it...
- *  - Improvements over WX
- *      - Validator for modulelist
+ *  - i_action handler for IntegerLists, but I don't see any module using it...
+ *  - Validator for modulelist
  */
 #ifdef HAVE_CONFIG_H
 # include "config.h"
