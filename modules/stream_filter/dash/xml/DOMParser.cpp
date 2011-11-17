@@ -141,20 +141,13 @@ Profile DOMParser::getProfile               (dash::xml::Node *node)
 }
 bool    DOMParser::isDash                   (stream_t *stream)
 {
-    const uint8_t *peek, *peek_end;
+    const uint8_t *peek;
 
-    int64_t i_size = stream_Peek(stream, &peek, 2048);
-    if(i_size < 1)
+    const char* psz_namespace = "urn:mpeg:mpegB:schema:DASH:MPD:DIS2011";
+    if(stream_Peek(stream, &peek, 1024) < (int)strlen(psz_namespace))
         return false;
 
-    peek_end = peek + i_size;
-    while(peek <= peek_end)
-    {
-        const char *p = strstr((const char*)peek, "urn:mpeg:mpegB:schema:DASH:MPD:DIS2011");
-        if (p != NULL)
-            return true;
-        peek++;
-    };
+    const char *p = strstr((const char*)peek, psz_namespace );
 
-    return false;
+    return p != NULL;
 }
