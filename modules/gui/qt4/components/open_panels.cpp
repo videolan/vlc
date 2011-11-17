@@ -675,7 +675,6 @@ void CaptureOpenPanel::initialize()
 {
     if( isInitialized ) return;
 
-    msg_Dbg( p_intf, "Initialization of Capture device panel" );
     isInitialized = true;
 
     ui.setupUi( this );
@@ -736,6 +735,7 @@ void CaptureOpenPanel::initialize()
     CuMRL( vdevDshowW->combo, currentIndexChanged ( int ) );
     CuMRL( adevDshowW->combo, currentIndexChanged ( int ) );
     CuMRL( dshowVSizeLine, textChanged( const QString& ) );
+    configList << "dshow-vdev" << "dshow-adev" << "dshow-size";
     }
 #else /* WIN32 */
     /*******
@@ -793,6 +793,7 @@ void CaptureOpenPanel::initialize()
     CuMRL( v4l2AudioDevice->lineEdit(), textChanged( const QString& ) );
     CuMRL( v4l2AudioDevice,  currentIndexChanged ( int ) );
     CuMRL( v4l2StdBox,  currentIndexChanged ( int ) );
+    configList << "v4l2-standard" << "v4l2-dev";
     }
 
     /*******
@@ -837,6 +838,7 @@ void CaptureOpenPanel::initialize()
     CuMRL( jackPace, stateChanged( int ) );
     CuMRL( jackConnect, stateChanged( int ) );
     CuMRL( jackPortsSelected, textChanged( const QString& ) );
+    configList << "jack-input-use-vlc-pace" << "jack-input-auto-connect";
     }
 
     /************
@@ -893,6 +895,8 @@ void CaptureOpenPanel::initialize()
     CuMRL( pvrFreq, valueChanged ( int ) );
     CuMRL( pvrBitr, valueChanged ( int ) );
     CuMRL( pvrNormBox, currentIndexChanged ( int ) );
+    configList << "pvr-device" << "pvr-radio-device" << "pvr-norm"
+               << "pvr-frequency" << "pvr-bitrate";
     }
 #endif
     /*************
@@ -1011,6 +1015,8 @@ void CaptureOpenPanel::initialize()
     BUTTONACT( dvbs2, updateMRL() );
     BUTTONACT( atsc, updateMRL() );
     BUTTONACT( cqam, updateMRL() );
+    configList << "dvb-adapter" << "dvb-frequency" << "dvb-modulation"
+               << "dvb-bandwidth";
     }
 
     /**********
@@ -1253,9 +1259,15 @@ void CaptureOpenPanel::advancedDialog()
     for( int n = 0; n < (int)i_confsize; n++ )
     {
         module_config_t *p_item = p_config + n;
+        QString name = p_item->psz_name;
+
+        if( name.isEmpty() || configList.contains( name ) )
+            continue;
+
+        msg_Err( p_intf, "%s", p_item->psz_name);
         ConfigControl *config = ConfigControl::createControl(
                         VLC_OBJECT( p_intf ), p_item, advFrame, gLayout, n );
-        if ( config )
+        if( config )
             controls.append( config );
     }
 
@@ -1307,7 +1319,6 @@ void CaptureOpenPanel::advancedDialog()
         }
         advMRL = tempMRL;
         updateMRL();
-        msg_Dbg( p_intf, "%s", qtu( advMRL ) );
     }
     qDeleteAll( controls );
     delete adv;

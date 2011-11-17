@@ -200,6 +200,7 @@ private:
     bool isInitialized;
 
     QString advMRL;
+    QStringList configList;
     QDialog *adv;
 #ifdef WIN32
     StringListConfigControl *vdevDshowW, *adevDshowW;
