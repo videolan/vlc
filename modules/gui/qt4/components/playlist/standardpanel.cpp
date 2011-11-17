@@ -306,25 +306,6 @@ void StandardPLPanel::createTreeView()
 
     /* setModel after setSortingEnabled(true), or the model will sort immediately! */
 
-    getSettings()->beginGroup("Playlist");
-
-    if( getSettings()->contains( "headerStateV2" ) )
-    {
-        treeView->header()->restoreState(
-                getSettings()->value( "headerStateV2" ).toByteArray() );
-    }
-    else
-    {
-        for( int m = 1, c = 0; m != COLUMN_END; m <<= 1, c++ )
-        {
-            treeView->setColumnHidden( c, !( m & COLUMN_DEFAULT ) );
-            if( m == COLUMN_TITLE ) treeView->header()->resizeSection( c, 200 );
-            else if( m == COLUMN_DURATION ) treeView->header()->resizeSection( c, 80 );
-        }
-    }
-
-    getSettings()->endGroup();
-
     /* Connections for the TreeView */
     CONNECT( treeView, activated( const QModelIndex& ),
              this, activate( const QModelIndex& ) );
@@ -361,6 +342,7 @@ void StandardPLPanel::changeModel( bool b_ml )
 
 void StandardPLPanel::showView( int i_view )
 {
+    bool b_treeViewCreated = false;
 
     switch( i_view )
     {
@@ -389,13 +371,36 @@ void StandardPLPanel::showView( int i_view )
     case TREE_VIEW:
     {
         if( treeView == NULL )
+        {
             createTreeView();
+            b_treeViewCreated = true;
+        }
         currentView = treeView;
         break;
     }
     }
 
     changeModel( false );
+
+    /* Restoring the header Columns must come after changeModel */
+    if( b_treeViewCreated )
+    {
+        assert( treeView );
+        if( getSettings()->contains( "Playlist/headerStateV2" ) )
+        {
+            treeView->header()->restoreState(getSettings()
+                    ->value( "Playlist/headerStateV2" ).toByteArray() );
+        }
+        else
+        {
+            for( int m = 1, c = 0; m != COLUMN_END; m <<= 1, c++ )
+            {
+                treeView->setColumnHidden( c, !( m & COLUMN_DEFAULT ) );
+                if( m == COLUMN_TITLE ) treeView->header()->resizeSection( c, 200 );
+                else if( m == COLUMN_DURATION ) treeView->header()->resizeSection( c, 80 );
+            }
+        }
+    }
 
     viewStack->setCurrentWidget( currentView );
     browseInto();
