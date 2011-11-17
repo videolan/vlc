@@ -12,7 +12,7 @@ PKGS += mpcdec
 #$(TARBALLS)/musepack_src_r$(MUSE_REV).tar.gz:
 #	$(call download,$(MUSE_URL))
 
-MUSE_REV := 468
+MUSE_REV := 475
 MUSE_SVN := http://svn.musepack.net/libmpc/trunk/
 
 $(TARBALLS)/musepack_src_r$(MUSE_REV).tar.gz:
