@@ -166,7 +166,7 @@ OpenDialog::OpenDialog( QWidget *parent,
     BUTTONACT( cancelButton, cancel() );
 
     /* Hide the advancedPanel */
-    if( !getSettings()->value( "opendialog-advanced", false ).toBool())
+    if( !getSettings()->value( "OpenDialog/advanced", false ).toBool())
     {
         ui.advancedFrame->hide();
         ui.advancedFrame->setEnabled( false );
@@ -183,7 +183,7 @@ OpenDialog::OpenDialog( QWidget *parent,
 
     setMinimumSize( sizeHint() );
     setMaximumWidth( 900 );
-    resize( getSettings()->value( "opendialog-size", QSize( 500, 400 ) ).toSize() );
+    resize( getSettings()->value( "OpenDialog/size", QSize( 500, 400 ) ).toSize() );
 }
 
 /* Finish the dialog and decide if you open another one after */
@@ -219,10 +219,10 @@ void OpenDialog::setMenuAction()
 
 OpenDialog::~OpenDialog()
 {
-    getSettings()->setValue( "opendialog-size", size() -
+    getSettings()->setValue( "OpenDialog/size", size() -
                  ( ui.advancedFrame->isEnabled() ?
                    QSize(0, ui.advancedFrame->height()) : QSize(0, 0) ) );
-    getSettings()->setValue( "opendialog-advanced", ui.advancedFrame->isVisible() );
+    getSettings()->setValue( "OpenDialog/advanced", ui.advancedFrame->isVisible() );
 }
 
 /* Used by VLM dialog and inputSlave selection */

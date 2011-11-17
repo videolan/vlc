@@ -591,7 +591,7 @@ NetOpenPanel::NetOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     if( var_InheritBool( p_intf, "qt-recentplay" ) )
     {
         b_recentList = true;
-        ui.urlComboBox->addItems( getSettings()->value( "Open/netMRL" ).toStringList() );
+        ui.urlComboBox->addItems( getSettings()->value( "OpenDialog/netMRL" ).toStringList() );
         ui.urlComboBox->setMaxCount( 10 );
     }
     else
@@ -614,7 +614,7 @@ NetOpenPanel::~NetOpenPanel()
     /* Clean the list... */
     mrlList.removeDuplicates();
     /* ...and save the 8 last entries */
-    getSettings()->setValue( "Open/netMRL", mrlList );
+    getSettings()->setValue( "OpenDialog/netMRL", mrlList );
 }
 
 void NetOpenPanel::clear()
