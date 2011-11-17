@@ -174,6 +174,9 @@ private:
     /* Zoom factor for font-size */
     int i_zoom;
 
+    /* */
+    QString latestSearch;
+
 private slots:
     void popupPlay();
     void popupDel();

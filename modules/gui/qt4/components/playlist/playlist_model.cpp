@@ -74,6 +74,7 @@ PLModel::PLModel( playlist_t *_p_playlist,  /* THEPL */
     sortingMenu       = NULL;
 
     rootItem          = NULL; /* PLItem rootItem, will be set in rebuild( ) */
+    latestSearch      = QString();
 
     /* Icons initialization */
 #define ADD_ICON(type, x) icons[ITEM_TYPE_##type] = QIcon( x )
@@ -653,6 +654,8 @@ void PLModel::processItemAppend( int i_item, int i_parent )
 
     if( newItem->inputItem() == THEMIM->currentInputItem() )
         emit currentIndexChanged( index( newItem, 0 ) );
+
+    search( latestSearch, index( rootItem, 0), false /*FIXME*/ );
 }
 
 void PLModel::rebuild( playlist_item_t *p_root )
@@ -855,6 +858,8 @@ void PLModel::sort( const int i_root_id, const int column, Qt::SortOrder order )
 
 void PLModel::search( const QString& search_text, const QModelIndex & idx, bool b_recursive )
 {
+    latestSearch = search_text;
+
     /** \todo Fire the search with a small delay ? */
     PL_LOCK;
     {
