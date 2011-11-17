@@ -81,7 +81,7 @@ Node*   DOMParser::processNode              ()
 
         Node *subnode = NULL;
 
-        while(subnode = this->processNode())
+        while((subnode = this->processNode()) != NULL)
             node->addSubNode(subnode);
 
         return node;
