@@ -75,13 +75,14 @@ static int  Control         (stream_t *p_stream, int i_query, va_list args);
 /*****************************************************************************
  * Open:
  *****************************************************************************/
-static int Open(vlc_object_t *p_this)
+static int Open(vlc_object_t *p_obj)
 {
-    stream_t *p_stream = (stream_t*) p_this;
+    stream_t *p_stream = (stream_t*) p_obj;
+
+    if(!dash::xml::DOMParser::isDash(p_stream->p_source))
+        return VLC_EGENERIC;
 
     dash::xml::DOMParser parser(p_stream->p_source);
-    if(!parser.isDash())
-        return VLC_EGENERIC;
     if(!parser.parse())
     {
         msg_Dbg(p_stream, "could not parse file");
@@ -111,16 +112,16 @@ static int Open(vlc_object_t *p_this)
     p_stream->pf_peek       = Peek;
     p_stream->pf_control    = Control;
 
-    msg_Dbg(p_this,"DASH filter: open (%s)", p_stream->psz_path);
+    msg_Dbg(p_obj,"DASH filter: open (%s)", p_stream->psz_path);
 
     return VLC_SUCCESS;
 }
 /*****************************************************************************
  * Close:
  *****************************************************************************/
-static void Close(vlc_object_t *p_this)
+static void Close(vlc_object_t *p_obj)
 {
-    stream_t                            *p_stream       = (stream_t*) p_this;
+    stream_t                            *p_stream       = (stream_t*) p_obj;
     stream_sys_t                        *p_sys          = (stream_sys_t *) p_stream->p_sys;
     dash::DASHManager                   *p_dashManager  = p_sys->p_dashManager;
     dash::http::HTTPConnectionManager   *p_conManager   = p_sys->p_conManager;

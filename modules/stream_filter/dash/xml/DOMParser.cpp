@@ -139,11 +139,11 @@ Profile DOMParser::getProfile               (dash::xml::Node *node)
 
     return dash::mpd::NotValid;
 }
-bool    DOMParser::isDash                   ()
+bool    DOMParser::isDash                   (stream_t *stream)
 {
     const uint8_t *peek, *peek_end;
 
-    int64_t i_size = stream_Peek(this->stream, &peek, 2048);
+    int64_t i_size = stream_Peek(stream, &peek, 2048);
     if(i_size < 1)
         return false;
 
