@@ -162,7 +162,7 @@ VLMDialog::~VLMDialog()
 {
     delete vlmWrapper;
 
-    //writeSettings( "VLM" );
+    getSettings()->setValue("VLM/geometry", saveGeometry());
    /* TODO :you have to destroy vlm here to close
     * but we shouldn't destroy vlm here in case somebody else wants it */
     if( p_vlm )
