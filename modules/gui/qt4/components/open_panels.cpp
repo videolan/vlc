@@ -337,10 +337,11 @@ DiscOpenPanel::DiscOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     ui.deviceCombo->setInsertPolicy( QComboBox::InsertAtTop );
 
     /* CONNECTs */
-    BUTTONACT( ui.dvdRadioButton, updateButtons() );
-    BUTTONACT( ui.vcdRadioButton, updateButtons() );
+    BUTTONACT( ui.dvdRadioButton,     updateButtons() );
+    BUTTONACT( ui.bdRadioButton,      updateButtons() );
+    BUTTONACT( ui.vcdRadioButton,     updateButtons() );
     BUTTONACT( ui.audioCDRadioButton, updateButtons() );
-    BUTTONACT( ui.dvdsimple, updateButtons() );
+    BUTTONACT( ui.dvdsimple,          updateButtons() );
     BUTTONACT( ui.browseDiscButton, browseDevice() );
     BUTTON_SET_ACT_I( ui.ejectButton, "", toolbar/eject, qtr( "Eject the disc" ),
             eject() );
