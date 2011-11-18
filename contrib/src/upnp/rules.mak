@@ -1,5 +1,5 @@
 # UPNP
-UPNP_VERSION := 1.6.13
+UPNP_VERSION := 1.6.14
 UPNP_URL := $(SF)/pupnp/libupnp-$(UPNP_VERSION).tar.bz2
 
 PKGS += upnp

@@ -29,3 +29,17 @@
  	#else
  		#define max(a, b)   (((a)>(b))? (a):(b))
  		#define min(a, b)   (((a)<(b))? (a):(b))
+--- upnp/upnp/inc/UpnpInet.h	2011-04-03 04:50:36.000000000 +0200
++++ upnp.neww/upnp/inc/UpnpInet.h	2011-11-18 01:54:45.418529337 +0100
+@@ -15,11 +15,6 @@
+ 
+ #ifdef WIN32
+ 	#include <stdarg.h>
+-	#ifndef UPNP_USE_MSVCPP
+-		/* Removed: not required (and cause compilation issues) */
+-		#include <winbase.h>
+-		#include <windef.h>
+-	#endif
+ 	#include <winsock2.h>
+ 	#include <iphlpapi.h>
+ 	#include <ws2tcpip.h>
