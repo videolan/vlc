@@ -31,7 +31,7 @@
 
 class QTabWidget;
 
-class ExtendedDialog : public QVLCFrame, public Singleton<ExtendedDialog>
+class ExtendedDialog : public QVLCDialog, public Singleton<ExtendedDialog>
 {
     Q_OBJECT
 public:

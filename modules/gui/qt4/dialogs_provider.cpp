@@ -91,7 +91,6 @@ DialogsProvider::~DialogsProvider()
     PlaylistDialog::killInstance();
     MediaInfoDialog::killInstance();
     MessagesDialog::killInstance();
-    ExtendedDialog::killInstance();
     BookmarksDialog::killInstance();
     HelpDialog::killInstance();
 #ifdef UPDATE_CHECK
@@ -191,20 +190,24 @@ void DialogsProvider::prefsDialog()
 
 void DialogsProvider::extendedDialog()
 {
-    if( !ExtendedDialog::getInstance( p_intf )->isVisible() || /* Hidden */
-        ExtendedDialog::getInstance( p_intf )->currentTab() != 0 )  /* wrong tab */
-        ExtendedDialog::getInstance( p_intf )->showTab( 0 );
+    ExtendedDialog *extDialog = ExtendedDialog::getInstance(p_intf );
+
+    if( !extDialog->isVisible() || /* Hidden */
+        extDialog->currentTab() != 0 )  /* wrong tab */
+        extDialog->showTab( 0 );
     else
-        ExtendedDialog::getInstance( p_intf )->hide();
+        extDialog->hide();
 }
 
 void DialogsProvider::synchroDialog()
 {
-    if( !ExtendedDialog::getInstance( p_intf )->isVisible() || /* Hidden */
-        ExtendedDialog::getInstance( p_intf )->currentTab() != 2 )  /* wrong tab */
-        ExtendedDialog::getInstance( p_intf )->showTab( 2 );
+    ExtendedDialog *extDialog = ExtendedDialog::getInstance(p_intf );
+
+    if( !extDialog->isVisible() || /* Hidden */
+        extDialog->currentTab() != 2 )  /* wrong tab */
+        extDialog->showTab( 2 );
     else
-        ExtendedDialog::getInstance( p_intf )->hide();
+        extDialog->hide();
 }
 
 void DialogsProvider::messagesDialog()
