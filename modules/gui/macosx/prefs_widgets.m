@@ -1313,6 +1313,7 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
                                 localizedString: (char *)p_item->psz_text];
         else
             o_labelString = [NSString stringWithString:@""];
+
         ADD_LABEL( o_label, mainFrame, 0, -1, o_labelString, o_popupTooltip )
         [o_label setAutoresizingMask:NSViewNotSizable ];
         [self addSubview: o_label];
@@ -1378,18 +1379,17 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
         }
         else
         {
-            int i;
-
             if( module_is_main( p_parser) )
                 continue;
-            unsigned int confsize, unused;
+
+            unsigned int confsize;
             module_config_t *p_config = module_config_get( p_parser, &confsize );
-            for ( i = 0; i < confsize; i++ )
+            for ( size_t i = 0; i < confsize; i++ )
             {
-                module_config_t *p_item = p_config + i;
+                module_config_t *p_cfg = p_config + i;
                 /* Hack: required subcategory is stored in i_min */
-                if( p_item->i_type == CONFIG_SUBCATEGORY &&
-                    p_item->value.i == p_item->min.i )
+                if( p_cfg->i_type == CONFIG_SUBCATEGORY &&
+                    p_cfg->value.i == p_cfg->min.i )
                 {
                     NSString *o_description = [[VLCMain sharedInstance]
                         localizedString: module_get_name( p_parser, TRUE )];
@@ -1436,30 +1436,25 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
         }
         else
         {
-            int i;
-
             if( module_is_main( p_parser ) )
                 continue;
             unsigned int confsize;
-            unsigned int unused;
+
             module_config_t *p_configlist = module_config_get( p_parser, &confsize );
-            for ( i = 0; i < confsize; i++ )
+            for ( size_t i = 0; i < confsize; i++ )
             {
                 module_config_t *p_config = &p_configlist[i];
                 /* Hack: required subcategory is stored in i_min */
                 if( p_config->i_type == CONFIG_SUBCATEGORY &&
-                    config_GetInt( VLCIntf, p_item->psz_name) == p_item->min.i )
+                    p_config->value.i == p_item->min.i )
                 {
                     NSString *o_description = [[VLCMain sharedInstance]
                         localizedString: module_get_name( p_parser, TRUE )];
                     [o_popup addItemWithTitle: o_description];
-                    char *psz_value = config_GetPsz( VLCIntf, p_item->psz_name );
 
-                    if( psz_value && !strcmp(psz_value,
+                    if( p_item->value.psz && !strcmp(p_item->value.psz,
                                             module_get_object( p_parser )) )
                         [o_popup selectItem:[o_popup lastItem]];
-
-                    free( psz_value );
                 }
             }
             module_config_free( p_configlist );
