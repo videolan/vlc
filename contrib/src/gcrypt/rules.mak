@@ -21,6 +21,6 @@ CONFIGURE_OPTS += --disable-asm
 endif
 .gcrypt: libgcrypt
 	#$(RECONF)
-	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) --enable-ciphers=aes,des,rfc2268,arcfour --enable-digests=sha1,md5,rmd160 --enable-pubkey-ciphers=dsa $(CONFIGURE_OPTS)
+	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) --enable-ciphers=aes,des,rfc2268,arcfour --enable-digests=sha1,md5,rmd160 --enable-pubkey-ciphers=dsa,rsa $(CONFIGURE_OPTS)
 	cd $< && $(MAKE) install
 	touch $@
