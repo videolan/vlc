@@ -22,6 +22,6 @@ libbluray: libbluray-git.tar.xz .sum-libbluray
 
 .libbluray: libbluray 
 	cd $< && ./bootstrap
-	cd $< && $(HOSTVARS) ./configure $(HOSTCONF)
+	cd $< && $(HOSTVARS) ./configure --disable-examples --disable-debug $(HOSTCONF)
 	cd $< && $(MAKE) install
 	touch $@
