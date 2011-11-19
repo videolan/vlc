@@ -39,8 +39,11 @@ private:
 private slots:
     void close();
     void cancel();
+    void reset();
 
     friend class    Singleton<GotoTimeDialog>;
+public:
+    void toggleVisible();
 };
 
 #endif
