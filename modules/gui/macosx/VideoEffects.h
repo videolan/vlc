@@ -43,8 +43,6 @@
     IBOutlet id o_adjust_saturation_sld;
     IBOutlet id o_adjust_gamma_lbl;
     IBOutlet id o_adjust_gamma_sld;
-    IBOutlet id o_adjust_opaque_lbl;
-    IBOutlet id o_adjust_opaque_sld;
     IBOutlet id o_sharpen_ckb;
     IBOutlet id o_sharpen_lbl;
     IBOutlet id o_sharpen_sld;

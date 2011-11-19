@@ -24,6 +24,7 @@
 #import "CompatibilityFixes.h"
 #import "intf.h"
 #import <vlc_common.h>
+#import <vlc_modules.h>
 #import "VideoEffects.h"
 
 #pragma mark -
@@ -77,7 +78,6 @@ static VLCVideoEffects *_o_sharedInstance = nil;
     [o_adjust_brightness_ckb setTitle:_NS("Brightness Threshold")];
     [o_adjust_saturation_lbl setStringValue:_NS("Saturation")];
     [o_adjust_gamma_lbl setStringValue:_NS("Gamma")];
-    [o_adjust_opaque_lbl setStringValue:_NS("Opaqueness")];
     [o_sharpen_ckb setTitle:_NS("Sharpen")];
     [o_sharpen_lbl setStringValue:_NS("Sigma")];
     [o_banding_ckb setTitle:_NS("Banding removal")];
@@ -132,7 +132,7 @@ static VLCVideoEffects *_o_sharedInstance = nil;
     [o_invert_ckb setTitle:_NS("Invert colors")];
     [o_posterize_ckb setTitle:_NS("Posterize")];
     [o_posterize_lbl setStringValue:_NS("Posterize level")];
-    [o_blur_ckb setTitle:_NS("Motion blue")];
+    [o_blur_ckb setTitle:_NS("Motion blur")];
     [o_blur_lbl setStringValue:_NS("Factor")];
     [o_motiondetect_ckb setTitle:_NS("Motion Detect")];
     [o_watereffect_ckb setTitle:_NS("Water effect")];
@@ -223,9 +223,6 @@ static VLCVideoEffects *_o_sharedInstance = nil;
     [o_adjust_gamma_lbl setEnabled: [o_adjust_ckb state]];
     [o_adjust_hue_lbl setEnabled: [o_adjust_ckb state]];
     [o_adjust_saturation_lbl setEnabled: [o_adjust_ckb state]];
-    [o_adjust_opaque_sld setFloatValue: config_GetFloat( p_intf, "macosx-opaqueness" )];
-    [o_adjust_opaque_sld setEnabled: [o_adjust_ckb state]];
-    [o_adjust_opaque_lbl setEnabled: [o_adjust_ckb state]];
     [o_sharpen_sld setFloatValue: config_GetFloat( p_intf, "sharpen-sigma" )];
     [o_sharpen_sld setEnabled: [o_sharpen_ckb state]];
     [o_sharpen_lbl setEnabled: [o_sharpen_ckb state]];
@@ -335,35 +332,91 @@ static VLCVideoEffects *_o_sharedInstance = nil;
 
 - (void)setVideoFilter: (char *)psz_name on:(BOOL)b_on
 {
-    char *psz_tmp;
-    vout_thread_t * p_vout = getVout();
-    if( p_vout )
-        psz_tmp = var_GetNonEmptyString( p_vout, "video-filter" );
-    else
-        psz_tmp = config_GetPsz( p_intf, "video-filter" );
+    char *psz_string, *psz_parser;
+    const char *psz_filter_type;
 
-    if( b_on )
+    module_t *p_obj = module_find( psz_name );
+    if( !p_obj )
     {
-        if(! psz_tmp)
-            config_PutPsz( p_intf, "video-filter", psz_name );
-        else if( (NSInteger)strstr( psz_tmp, psz_name ) == NO )
-        {
-            psz_tmp = (char *)[[NSString stringWithFormat: @"%s:%s", psz_tmp, psz_name] UTF8String];
-            config_PutPsz( p_intf, "video-filter", psz_tmp );
-        }
-    } else {
-        if( psz_tmp )
-        {
-            psz_tmp = (char *)[[[NSString stringWithUTF8String: psz_tmp] stringByTrimmingCharactersInSet: [NSCharacterSet characterSetWithCharactersInString:[NSString stringWithFormat:@":%s",psz_name]]] UTF8String];
-            psz_tmp = (char *)[[[NSString stringWithUTF8String: psz_tmp] stringByTrimmingCharactersInSet: [NSCharacterSet characterSetWithCharactersInString:[NSString stringWithFormat:@"%s:",psz_name]]] UTF8String];
-            psz_tmp = (char *)[[[NSString stringWithUTF8String: psz_tmp] stringByTrimmingCharactersInSet: [NSCharacterSet characterSetWithCharactersInString:[NSString stringWithUTF8String:psz_name]]] UTF8String];
-            config_PutPsz( p_intf, "video-filter", psz_tmp );
-        }
+        msg_Err( p_intf, "Unable to find filter module \"%s\".", psz_name );
+        return;
+    }
+    msg_Dbg( p_intf, "will set filter %s", psz_name );
+
+    if( module_provides( p_obj, "video splitter" ) )
+    {
+        psz_filter_type = "video-splitter";
+    }
+    else if( module_provides( p_obj, "video filter2" ) )
+    {
+        psz_filter_type = "video-filter";
+    }
+    else if( module_provides( p_obj, "sub source" ) )
+    {
+        psz_filter_type = "sub-source";
+    }
+    else if( module_provides( p_obj, "sub filter" ) )
+    {
+        psz_filter_type = "sub-filter";
+    }
+    else
+    {
+        msg_Err( p_intf, "Unknown video filter type." );
+        return;
     }
 
-    if( p_vout ) {
-        var_SetString( p_vout, "video-filter", psz_tmp );
-        vlc_object_release( p_vout );
+    psz_string = config_GetPsz( p_intf, psz_filter_type );
+
+    if (b_on) {
+        if(! psz_string)
+            psz_string = psz_name;
+        else if( (NSInteger)strstr( psz_string, psz_name ) == NO )
+            psz_string = (char *)[[NSString stringWithFormat: @"%s:%s", psz_string, psz_name] UTF8String];
+    } else {
+        psz_parser = strstr( psz_string, psz_name );
+        if( psz_parser )
+        {
+            if( *( psz_parser + strlen( psz_name ) ) == ':' )
+            {
+                memmove( psz_parser, psz_parser + strlen( psz_name ) + 1,
+                        strlen( psz_parser + strlen( psz_name ) + 1 ) + 1 );
+            }
+            else
+            {
+                *psz_parser = '\0';
+            }
+
+            /* Remove trailing : : */
+            if( strlen( psz_string ) > 0 &&
+               *( psz_string + strlen( psz_string ) -1 ) == ':' )
+            {
+                *( psz_string + strlen( psz_string ) -1 ) = '\0';
+            }
+        }
+        else
+        {
+            free( psz_string );
+            return;
+        }
+    }
+    config_PutPsz( p_intf, psz_filter_type, psz_string );
+    msg_Dbg( p_intf, "set string '%s'", psz_string );
+
+    /* Try to set on the fly */
+    if( !strcmp( psz_filter_type, "video-splitter" ) )
+    {
+        playlist_t *p_playlist = pl_Get( p_intf );
+        var_SetString( p_playlist, psz_filter_type, psz_string );
+    }
+    else
+    {
+        vout_thread_t *p_vout = getVout();
+        if( p_vout )
+        {
+            NSLog( @"set on the fly" );
+            var_SetString( p_vout, psz_filter_type, psz_string );
+            vlc_object_release( p_vout );
+        }
     }
 }
 
@@ -382,8 +435,8 @@ static VLCVideoEffects *_o_sharedInstance = nil;
             vlc_object_release( p_vout );
             return;
         }
-        var_SetFloat( p_filter, psz_name, i_value );
-        config_PutFloat( p_intf, psz_name, i_value );
+        var_SetInteger( p_filter, psz_name, i_value );
+        config_PutInt( p_intf, psz_name, i_value );
         vlc_object_release( p_vout );
     }
 }
@@ -468,56 +521,20 @@ static VLCVideoEffects *_o_sharedInstance = nil;
     [o_adjust_hue_lbl setEnabled: state];
     [o_adjust_saturation_sld setEnabled: state];
     [o_adjust_saturation_lbl setEnabled: state];
-    [o_adjust_opaque_sld setEnabled: state];
-    [o_adjust_opaque_lbl setEnabled: state];
 }
 
 - (IBAction)adjustSliderChanged:(id)sender
 {
-    if( sender == o_adjust_opaque_sld ){
-        vlc_value_t val;
-        id o_tmpWindow = [NSApp keyWindow];
-        NSArray *o_windows = [NSApp orderedWindows];
-        NSEnumerator *o_enumerator = [o_windows objectEnumerator];
-        playlist_t * p_playlist = pl_Get( p_intf );
-        vout_thread_t *p_vout = getVout();
-        vout_thread_t *p_real_vout;
-
-        val.f_float = [o_adjust_opaque_sld floatValue];
-
-        if( p_vout != NULL )
-        {
-            //FIXME: update this implementation once the vout is fixed
-            #if 0
-                p_real_vout = [VLCVoutView realVout: p_vout];
-                var_Set( p_real_vout, "macosx-opaqueness", val );
-
-                while ((o_tmpWindow = [o_enumerator nextObject]))
-                {
-                    if( [[o_tmpWindow className] isEqualToString: @"VLCVoutWindow"] ||
-                       [[[VLCMain sharedInstance] embeddedList] windowContainsEmbedded: o_tmpWindow])
-                    {
-                        [o_tmpWindow setAlphaValue: val.f_float];
-                    }
-                    break;
-                }
-            #endif
-            vlc_object_release( p_vout );
-        }
-
-        config_PutFloat( p_playlist , "macosx-opaqueness" , val.f_float );
-    } else {
         if( sender == o_adjust_brightness_sld )
-            [self setVideoFilterProperty: "brightness" forFilter: "adjust" float: [o_adjust_brightness_sld floatValue]];
-        else if( sender == o_adjust_contrast_sld )
-            [self setVideoFilterProperty: "contrast" forFilter: "adjust" float: [o_adjust_contrast_sld floatValue]];
-        else if( sender == o_adjust_gamma_sld )
-            [self setVideoFilterProperty: "gamma" forFilter: "adjust" float: [o_adjust_gamma_sld floatValue]];
-        else if( sender == o_adjust_hue_sld )
-            [self setVideoFilterProperty: "hue" forFilter: "adjust" integer: [o_adjust_hue_sld intValue]];
-        else if( sender == o_adjust_saturation_sld )
-            [self setVideoFilterProperty: "saturation" forFilter: "adjust" float: [o_adjust_saturation_sld floatValue]];
-    }
+        [self setVideoFilterProperty: "brightness" forFilter: "adjust" float: [o_adjust_brightness_sld floatValue]];
+    else if( sender == o_adjust_contrast_sld )
+        [self setVideoFilterProperty: "contrast" forFilter: "adjust" float: [o_adjust_contrast_sld floatValue]];
+    else if( sender == o_adjust_gamma_sld )
+        [self setVideoFilterProperty: "gamma" forFilter: "adjust" float: [o_adjust_gamma_sld floatValue]];
+    else if( sender == o_adjust_hue_sld )
+        [self setVideoFilterProperty: "hue" forFilter: "adjust" integer: [o_adjust_hue_sld intValue]];
+    else if( sender == o_adjust_saturation_sld )
+        [self setVideoFilterProperty: "saturation" forFilter: "adjust" float: [o_adjust_saturation_sld floatValue]];
 }
 
 - (IBAction)enableAdjustBrightnessThreshold:(id)sender
