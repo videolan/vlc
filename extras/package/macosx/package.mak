@@ -92,7 +92,7 @@ VLC-tmp.app: vlc
 	  $(INSTALL) -d $@/Contents/MacOS/share/locale/$${i}/LC_MESSAGES ; \
 	  $(INSTALL) $(srcdir)/po/$${i}.gmo $@/Contents/MacOS/share/locale/$${i}/LC_MESSAGES/vlc.mo; \
 	  mkdir -p $@/Contents/Resources/$${i}.lproj/ ; \
-	  $(LN_S) -f ../English.lproj/InfoPlist.strings ../English.lproj/MainMenu.xib \
+	  $(LN_S) -f ../English.lproj/InfoPlist.strings ../English.lproj/MainMenu.nib \
 		$@/Contents/Resources/$${i}.lproj/ ; \
 	done
 	printf "APPLVLC#" >| $@/Contents/PkgInfo
@@ -111,6 +111,7 @@ package-macosx: VLC-release.app ChangeLog
 	hdiutil create -verbose -srcfolder "$(top_builddir)/vlc-$(VERSION)" "$(top_builddir)/vlc-$(VERSION)-rw.dmg" -scrub
 # Make sure the image is not writable
 # Note: We can't directly create a read only dmg as we do the bless stuff
+	rm -f "$(top_builddir)/vlc-$(VERSION).dmg"
 	hdiutil convert "$(top_builddir)/vlc-$(VERSION)-rw.dmg" -format UDBZ -o "$(top_builddir)/vlc-$(VERSION).dmg"
 	ls -l "$(top_builddir)/vlc-$(VERSION).dmg"
 
