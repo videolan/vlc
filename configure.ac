@@ -351,7 +351,7 @@ case "${host_os}" in
         dnl NSIS Installer prefix and WIN64
         dnl
         case "${host}" in
-            amd64*|i686-w64*|x86_64*)
+            amd64*|x86_64*)
                 HAVE_WIN64="1"
                 PROGRAMFILES="PROGRAMFILES64"
             ;;
