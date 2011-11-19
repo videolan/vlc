@@ -4,6 +4,6 @@
  Version: @VERSION@
  Requires: sdl >= @SDL_VERSION@
  Libs: -L${libdir} -lSDL_image
-+Libs.private:  -ljpeg -ltiff -lpng -lz
++Libs.private:  -ljpeg -ltiff
  Cflags: -I${includedir}/SDL
  
