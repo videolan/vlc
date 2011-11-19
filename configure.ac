@@ -976,9 +976,6 @@ AC_ARG_ENABLE(optimizations,
   [AS_HELP_STRING([--disable-optimizations],
     [disable compiler optimizations (default enabled)])],,
   [enable_optimizations="yes"])
-AS_IF([test "${enable_optimizations}" != "no"], [
-  enable_optimizations="speed"
-])
 
 dnl Check for various optimization flags
 AS_IF([test "${enable_optimizations}" != "no"], [
@@ -4417,15 +4414,13 @@ echo rm -f .error\$\$ >>compile
 echo exit \$ERROR >>compile
 chmod a+x compile
 
-printf "
+echo "
 libvlc configuration
 --------------------
 version               : ${VERSION}
 system                : ${SYS}
 architecture          : ${ARCH}
-build flavour         : "
-test "${enable_optimizations}" != "no" && printf ${enable_optimizations}
-echo ""
+optimizations         : ${enable_optimizations}"
 if test "${enable_vlc}" != "no"; then
 echo "vlc aliases           :${ALIASES}"
 else
