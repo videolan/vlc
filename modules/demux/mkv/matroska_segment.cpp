@@ -681,7 +681,6 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset, int64_t i_
 {
     KaxBlock    *block;
     KaxSimpleBlock *simpleblock;
-    int         i_track_skipping;
     int64_t     i_block_duration;
     size_t      i_track;
     int64_t     i_seek_position = i_start_pos;
@@ -761,8 +760,8 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset, int64_t i_
     sys.i_start_pts = i_date;
 
     es_out_Control( sys.demuxer.out, ES_OUT_SET_NEXT_DISPLAY_TIME, i_date );
+
     /* now parse until key frame */
-    i_track_skipping = 0;
     for( i_track = 0; i_track < tracks.size(); i_track++ )
     {
         if( tracks[i_track]->fmt.i_cat == VIDEO_ES )
