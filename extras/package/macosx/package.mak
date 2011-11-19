@@ -106,7 +106,7 @@ package-macosx: VLC-release.app ChangeLog
 	cp $(srcdir)/extras/package/macosx/README.MacOSX.rtf $(top_builddir)/vlc-$(VERSION)/Read\ Me.rtf
 	mkdir -p $(top_builddir)/vlc-$(VERSION)/.background/
 	cp $(srcdir)/extras/package/macosx/Resources/about_bg.png $(top_builddir)/vlc-$(VERSION)/.background/background.png
-	$(LN_S) /Applications $(top_builddir)/vlc-$(VERSION)/
+	$(LN_S) -f /Applications $(top_builddir)/vlc-$(VERSION)/
 	rm -f "$(top_builddir)/vlc-$(VERSION)-rw.dmg"
 	hdiutil create -verbose -srcfolder "$(top_builddir)/vlc-$(VERSION)" "$(top_builddir)/vlc-$(VERSION)-rw.dmg" -scrub
 # Make sure the image is not writable
