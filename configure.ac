@@ -78,11 +78,6 @@ AC_C_CONST
 AC_C_INLINE
 AC_C_RESTRICT
 
-dnl
-dnl  Save *FLAGS
-dnl
-VLC_SAVE_FLAGS
-
 dnl Extend the --help string at the current spot.
 AC_DEFUN([EXTEND_HELP_STRING], [m4_divert_once([HELP_ENABLE], [$1])])
 
@@ -109,24 +104,20 @@ case "${host_os}" in
     ;;
   bsdi*)
     SYS=bsdi
-    CFLAGS_save="${CFLAGS_save} -pthread"; CFLAGS="${CFLAGS_save}"
+    CFLAGS="${CFLAGS} -pthread"
     VLC_ADD_LIBS([vcd cdda vcdx],[-ldvd])
     ;;
   *bsd*)
     SYS="${host_os}"
-    CFLAGS_save="${CFLAGS_save} -pthread"; CFLAGS="${CFLAGS_save}"
+    CFLAGS="${CFLAGS} -pthread"
     case "${host_os}" in
       freebsd*)
-        CPPFLAGS_save="${CPPFLAGS_save} -I/usr/local/include"
-        CPPFLAGS="${CPPFLAGS_save}"
-        LDFLAGS_save="${LDFLAGS_save} -L/usr/local/lib"
-        LDFLAGS="${LDFLAGS_save}"
+        CPPFLAGS="${CPPFLAGS} -I/usr/local/include"
+        LDFLAGS="${LDFLAGS} -L/usr/local/lib"
         ;;
       openbsd*)
-        CPPFLAGS_save="${CPPFLAGS_save} -I/usr/local/include -I/usr/X11R6/include"
-        CPPFLAGS="${CPPFLAGS_save}"
-        LDFLAGS_save="${LDFLAGS_save} -L/usr/local/lib -L/usr/X11R6/lib/"
-        LDFLAGS="${LDFLAGS_save}"
+        CPPFLAGS="${CPPFLAGS} -I/usr/local/include -I/usr/X11R6/include"
+        LDFLAGS="${LDFLAGS} -L/usr/local/lib -L/usr/X11R6/lib/"
         ;;
     esac
     ;;
@@ -150,11 +141,11 @@ case "${host_os}" in
     esac
 
     SYS=darwin
-    CFLAGS_save="${CFLAGS_save} -D_INTL_REDIRECT_MACROS ${ARCH_flag}"; CFLAGS="${CFLAGS_save}"
-    CXXFLAGS_save="${CXXFLAGS_save} -D_INTL_REDIRECT_MACROS ${ARCH_flag}"; CXXFLAGS="${CXXFLAGS_save}"
-    CPPFLAGS_save="${CPPFLAGS_save} ${ARCH_flag}"; CPPFLAGS="${CPPFLAGS_save}"
-    OBJCFLAGS_save="${OBJCFLAGS_save} -D_INTL_REDIRECT_MACROS -std=gnu99 ${ARCH_flag}"; OBJCFLAGS="${OBJCFLAGS_save}"
-    LDFLAGS_save="${LDFLAGS_save} -Wl,-headerpad_max_install_names ${ARCH_flag}"; LDFLAGS="${LDFLAGS_save}"
+    CFLAGS="${CFLAGS} -D_INTL_REDIRECT_MACROS ${ARCH_flag}"
+    CXXFLAGS="${CXXFLAGS} -D_INTL_REDIRECT_MACROS ${ARCH_flag}"
+    CPPFLAGS="${CPPFLAGS} ${ARCH_flag}"
+    OBJCFLAGS="${OBJCFLAGS} -D_INTL_REDIRECT_MACROS -std=gnu99 ${ARCH_flag}"
+    LDFLAGS="${LDFLAGS} -Wl,-headerpad_max_install_names ${ARCH_flag}"
     VLC_ADD_LIBS([mkv mp4 motion], [-Wl,-framework,IOKit,-framework,CoreFoundation])
     VLC_ADD_LIBS([libvlc vlc],[-Wl,-undefined,dynamic_lookup])
     VLC_ADD_LIBS([avcodec avformat access_avio swscale postproc i420_rgb_mmx x264],[-Wl,-read_only_relocs,suppress])
@@ -183,9 +174,9 @@ case "${host_os}" in
         CXX="${CXX} -mmacosx-version-min=${with_macosx_version_min}"
         OBJC="${OBJC} -mmacosx-version-min=${with_macosx_version_min}"
         LD="${LD} -macosx_version_min=${with_macosx_version_min}"
-        CFLAGS_save="${CFLAGS_save} -DMACOSX_DEPLOYMENT_TARGET=${with_macosx_version_min}"; CFLAGS="${CFLAGS_save}"
-        CXXFLAGS_save="${CXXFLAGS_save} -DMACOSX_DEPLOYMENT_TARGET=${with_macosx_version_min}"; CXXFLAGS="${CXXFLAGS_save}"
-        OBJCFLAGS_save="${OBJCFLAGS_save} -DMACOSX_DEPLOYMENT_TARGET=${with_macosx_version_min}"; OBJCFLAGS="${OBJCFLAGS_save}"
+        CFLAGS="${CFLAGS} -DMACOSX_DEPLOYMENT_TARGET=${with_macosx_version_min}"
+        CXXFLAGS="${CXXFLAGS} -DMACOSX_DEPLOYMENT_TARGET=${with_macosx_version_min}"
+        OBJCFLAGS="${OBJCFLAGS} -DMACOSX_DEPLOYMENT_TARGET=${with_macosx_version_min}"
         MACOSX_DEPLOYMENT_TARGET=${with_macosx_version_min}
         export MACOSX_DEPLOYMENT_TARGET
     fi
@@ -260,7 +251,7 @@ case "${host_os}" in
     ;;
   *os2*)
     SYS=os2
-    LDFLAGS_save="${LDFLAGS_save} -Zomf -Zbin-files -Zargs-wild"; LDFLAGS="${LDFLAGS_save}"
+    LDFLAGS="${LDFLAGS} -Zomf -Zbin-files -Zargs-wild"
     ;;
   *)
     SYS="${host_os}"
@@ -323,20 +314,15 @@ AS_IF([test -n "${CONTRIB_DIR}"], [
   AC_MSG_RESULT([${CONTRIB_DIR}])
   export PATH=${CONTRIB_DIR}/bin:$PATH
   CPPFLAGS="${CPPFLAGS} -I${CONTRIB_DIR}/include"
-  CPPFLAGS_save="${CPPFLAGS_save} -I${CONTRIB_DIR}/include"
   CFLAGS="${CFLAGS} -I${CONTRIB_DIR}/include"
-  CFLAGS_save="${CFLAGS_save} -I${CONTRIB_DIR}/include"
   CXXFLAGS="${CXXFLAGS} -I${CONTRIB_DIR}/include"
-  CXXFLAGS_save="${CXXFLAGS_save} -I${CONTRIB_DIR}/include"
   OBJCFLAGS="${OBJCFLAGS} -I${CONTRIB_DIR}/include"
-  OBJCFLAGS_save="${OBJCFLAGS_save} -I${CONTRIB_DIR}/include"
   AS_IF([test "$build" = "$host" -o "$PKG_CONFIG_LIBDIR"], [
     export PKG_CONFIG_PATH="${CONTRIB_DIR}/lib/pkgconfig:$PKG_CONFIG_PATH"
   ], [
     export PKG_CONFIG_LIBDIR="${CONTRIB_DIR}/lib/pkgconfig"
   ])
   LDFLAGS="${LDFLAGS} -L${CONTRIB_DIR}/lib"
-  LDFLAGS_save="${LDFLAGS_save} -L${CONTRIB_DIR}/lib"
 
   AS_IF([test "${SYS}" = "darwin"], [
     export LD_LIBRARY_PATH="${CONTRIB_DIR}/lib:$LD_LIBRARY_PATH"
@@ -432,7 +418,6 @@ AS_IF([test "${SYS}" = "mingw32" -o "${SYS}" = "mingwce"], [
     ])
     dnl force use of mingw provided c99 *printf over msvcrt
     CPPFLAGS="${CPPFLAGS} -D__USE_MINGW_ANSI_STDIO=1"
-    CPPFLAGS_save="${CPPFLAGS_save} -D__USE_MINGW_ANSI_STDIO=1"
 ])
 
 dnl Check for the need to include the mingwex lib for mingw32
@@ -445,25 +430,21 @@ fi
 
 dnl Check for fnative-struct or mms-bitfields support for mingw32
 if test "${SYS}" = "mingw32" ; then
+    VLC_SAVE_FLAGS
+    CFLAGS="${CFLAGS} -mms-bitfields"
+    CXXFLAGS="${CXXFLAGS} -mms-bitfields"
     AC_CACHE_CHECK([if \$CC accepts -mms-bitfields],
         [ac_cv_c_mms_bitfields],
-        [CFLAGS="${CFLAGS_save} -mms-bitfields"
-         AC_TRY_COMPILE([],,ac_cv_c_mms_bitfields=yes, ac_cv_c_mms_bitfields=no)])
-    if test "${ac_cv_c_mms_bitfields}" != "no"; then
-        CFLAGS_save="${CFLAGS_save} -mms-bitfields";
-        CXXFLAGS_save="${CXXFLAGS_save} -mms-bitfields";
-    else
+        [AC_TRY_COMPILE([],,ac_cv_c_mms_bitfields=yes, ac_cv_c_mms_bitfields=no)])
+    if test "${ac_cv_c_mms_bitfields}" = "no"; then
+        VLC_RESTORE_FLAGS
+        CFLAGS="${CFLAGS} -fnative-struct"
+        CXXFLAGS="${CXXFLAGS} -fnative-struct"
         AC_CACHE_CHECK([if \$CC accepts -fnative-struct],
             [ac_cv_c_fnative_struct],
-            [CFLAGS="${CFLAGS_save} -fnative-struct"
-             AC_TRY_COMPILE([],,ac_cv_c_fnative_struct=yes, ac_cv_c_fnative_struct=no)])
-        if test "${ac_cv_c_fnative_struct}" != "no"; then
-            CFLAGS_save="${CFLAGS_save} -fnative-struct";
-            CXXFLAGS_save="${CXXFLAGS_save} -fnative-struct";
-        fi
+            [AC_TRY_COMPILE([],,ac_cv_c_fnative_struct=yes, ac_cv_c_fnative_struct=no)])
+        "${ac_cv_c_fnative_struct}" = "no" && VLC_RESTORE_FLAGS
     fi
-
-    CFLAGS="${CFLAGS_save}"; CXXFLAGS="${CXXFLAGS_save}"
 fi
 
 dnl
@@ -532,7 +513,7 @@ AC_CHECK_TYPES([struct pollfd],,,
 ])
 
 dnl Check for connect
-LIBS_save="$LIBS"
+VLC_SAVE_FLAGS
 SOCKET_LIBS=""
 AC_SEARCH_LIBS(connect, [socket], [
   AS_IF([test "$ac_cv_search_connect" != "none required"], [
@@ -546,7 +527,7 @@ AC_SEARCH_LIBS(connect, [socket], [
     SOCKET_LIBS="-lws2"
   ])
 ])
-LIBS="$LIBS_save"
+VLC_RESTORE_FLAGS
 AS_IF([test -n "$SOCKET_LIBS"], [
   VLC_ADD_LIBS([access_http access_mms access_udp access_tcp access_ftp access_rtmp access_output_udp access_output_shout sap stream_out_select stream_out_standard stream_out_rtp stream_out_raop vod_rtsp access_realrtsp rtp oldrc netsync gnutls flac ts audioscrobbler lua remoteosd zvbi audiobargraph_a netsync],[${SOCKET_LIBS}])
 ])
@@ -592,9 +573,9 @@ AS_IF([test "${ac_cv_struct_sockaddr_storage}" = no], [
 dnl getaddrinfo, getnameinfo and gai_strerror check
 dnl  -lnsl and -lsocket are needed on Solaris;
 dnl  we purposedly make the test fail on Windows
-LIBS_save="${LIBS}"
+VLC_SAVE_FLAGS
 AC_SEARCH_LIBS([getaddrinfo], [nsl],,, [${SOCKET_LIBS}])
-LIBS="${LIBS_save}"
+VLC_RESTORE_FLAGS
 
 dnl FreeBSD has a gnugetopt library for this:
 GNUGETOPT_LIBS=""
@@ -621,14 +602,14 @@ AC_CHECK_LIB(m,lrintf, [
 dnl Check for dynamic plugins
 LIBDL=""
 have_dynamic_objects="no"
-LIBS_save="$LIBS"
+VLC_SAVE_FLAGS
 AC_SEARCH_LIBS(dlopen, [dl svld], [
   AS_IF([test "$ac_cv_search_dlopen" != "none required"], [
     LIBDL="$ac_cv_search_dlopen"
   ])
   have_dynamic_objects="yes"
 ])
-LIBS="$LIBS_save"
+VLC_RESTORE_FLAGS
 
 # Windows
 AS_IF([test "${SYS}" = "mingw32" -o "${SYS}" = "mingwce"], [
@@ -824,18 +805,19 @@ fi
 esac
 
 dnl Check for ntohl, etc.
+VLC_SAVE_FLAGS
+CFLAGS="${CFLAGS} -Wall -Werror"
 AC_CACHE_CHECK([for ntohl in sys/param.h],
     [ac_cv_c_ntohl_sys_param_h],
-    [CFLAGS="${CFLAGS_save} -Wall -Werror"
-     AC_TRY_COMPILE([#include <sys/param.h>],
+    [     AC_TRY_COMPILE([#include <sys/param.h>],
         [int meuh; ntohl(meuh);],
         ac_cv_c_ntohl_sys_param_h=yes, ac_cv_c_ntohl_sys_param_h=no)])
 if test "${ac_cv_c_ntohl_sys_param_h}" != "no"; then
     AC_DEFINE(NTOHL_IN_SYS_PARAM_H, 1, Define if <sys/param.h> defines ntohl.)
 fi
+VLC_RESTORE_FLAGS
 
 EXTEND_HELP_STRING([Optimization options:])
-VLC_RESTORE_FLAGS
 dnl
 dnl  Compiler warnings
 dnl
@@ -898,24 +880,19 @@ AS_IF([test "${enable_coverage}" != "no"], [
 ])
 
 VLC_SAVE_FLAGS
-
+CFLAGS="${CFLAGS} -fvisibility=hidden"
+CXXFLAGS="${CXXFLAGS} -fvisibility=hidden"
+OBJCFLAGS="${OBJCFLAGS} -fvisibility=hidden"
 AS_IF([test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"], [
   AC_CACHE_CHECK([if $CC accepts -fvisibility=hidden],
                  [ac_cv_c_visibility_hidden], [
-    CFLAGS="${CFLAGS_save} -fvisibility=hidden"
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM()], [
       ac_cv_c_visibility_hidden=yes
     ], [
       ac_cv_c_visibility_hidden=no
     ])
   ])
-  AS_IF([test "${ac_cv_c_visibility_hidden}" != "no"], [
-    VLC_RESTORE_FLAGS
-    CFLAGS="${CFLAGS} -fvisibility=hidden"
-    CXXFLAGS="${CXXFLAGS} -fvisibility=hidden"
-    OBJCFLAGS="${OBJCFLAGS} -fvisibility=hidden"
-    VLC_SAVE_FLAGS
-  ])
+  AS_IF([test "${ac_cv_c_visibility_hidden}" = "no"], [VLC_RESTORE_FLAGS])
 ])
 
 
@@ -930,100 +907,87 @@ AC_ARG_ENABLE(optimizations,
 dnl Check for various optimization flags
 AS_IF([test "${enable_optimizations}" != "no"], [
 
-  C_O=""
   dnl -O4 and -O3 only in production builds
   AS_IF([test "{enable_debug}" = "no"], [
+    VLC_SAVE_FLAGS
+    CFLAGS="${CFLAGS} -O4"
+    CXXFLAGS="${CXXFLAGS} -O4"
+    OBJCFLAGS="${OBJCFLAGS} -O4"
     AC_CACHE_CHECK([if $CC accepts -O4], [ac_cv_c_o4], [
-      CFLAGS="${CFLAGS_save} -O4"
       AC_COMPILE_IFELSE([AC_LANG_PROGRAM()], [
         ac_cv_c_o4=yes
       ], [
         ac_cv_c_o4=no
       ])
     ])
-    AS_IF([test "${ac_cv_c_o4}" != "no"], [
-      C_O="-O4"
-    ], [
+    AS_IF([test "${ac_cv_c_o4}" = "no"], [
+      VLC_RESTORE_FLAGS
+      CFLAGS="${CFLAGS} -O3"
+      CXXFLAGS="${CXXFLAGS} -O3"
+      OBJCFLAGS="${OBJCFLAGS} -O3"
       AC_CACHE_CHECK([if $CC accepts -O3],  [ac_cv_c_o3], [
-        CFLAGS="${CFLAGS_save} -O3"
         AC_COMPILE_IFELSE([AC_LANG_PROGRAM()], [
           ac_cv_c_o3=yes
         ], [
           ac_cv_c_o3=no
         ])
       ])
-      AS_IF([test "${ac_cv_c_o3}" != "no"], [
-        C_O="-O3"
-      ])
+      AS_IF([test "${ac_cv_c_o3}" = "no"], [VLC_RESTORE_FLAGS])
     ])
   ])
 
-  VLC_RESTORE_FLAGS
-  CFLAGS="${CFLAGS} ${C_O}"
-  CXXFLAGS="${CXXFLAGS} ${C_O}"
-  OBJCFLAGS="${OBJCFLAGS} ${C_O}"
-  VLC_SAVE_FLAGS
-
   dnl Check for -ffast-math
+  VLC_SAVE_FLAGS
+  CFLAGS="${CFLAGS} -ffast-math"
+  CXXFLAGS="${CXXFLAGS} -ffast-math"
+  OBJCFLAGS="${OBJCFLAGS} -ffast-math"
   AC_CACHE_CHECK([if $CC accepts -ffast-math], [ac_cv_c_fast_math], [
-    CFLAGS="${CFLAGS_save} -ffast-math"
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM()], [
       ac_cv_c_fast_math=yes
     ], [
       ac_cv_c_fast_math=no
     ])
   ])
-  AS_IF([test "${ac_cv_c_fast_math}" != "no"], [
-    VLC_RESTORE_FLAGS
-    CFLAGS="${CFLAGS} -ffast-math"
-    CXXFLAGS="${CXXFLAGS} -ffast-math"
-    OBJCFLAGS="${OBJCFLAGS} -ffast-math"
-    VLC_SAVE_FLAGS
-  ])
+  AS_IF([test "${ac_cv_c_fast_math}" = "no"], [VLC_RESTORE_FLAGS])
 
   dnl Check for -funroll-loops
+  VLC_SAVE_FLAGS
+  CFLAGS="${CFLAGS} -funroll-loops"
+  CXXFLAGS="${CXXFLAGS} -funroll-loops"
+  OBJCFLAGS="${OBJCFLAGS} -funroll-loops"
   AC_CACHE_CHECK([if $CC accepts -funroll-loops], [ac_cv_c_unroll_loops], [
-    CFLAGS="${CFLAGS_save} -funroll-loops"
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM()], [
       ac_cv_c_unroll_loops=yes
     ], [
       ac_cv_c_unroll_loops=no
     ])
   ])
-  AS_IF([test "${ac_cv_c_unroll_loops}" != "no"], [
-    VLC_RESTORE_FLAGS
-    CFLAGS="${CFLAGS} -funroll-loops"
-    CXXFLAGS="${CXXFLAGS} -funroll-loops"
-    OBJCFLAGS="${OBJCFLAGS} -funroll-loops"
-    VLC_SAVE_FLAGS
-  ])
+  AS_IF([test "${ac_cv_c_unroll_loops}" = "no"], [VLC_RESTORE_FLAGS])
 
   AS_IF([test "$enable_debug" = "no"], [
     dnl Check for -fomit-frame-pointer
+    VLC_SAVE_FLAGS
+    CFLAGS="${CFLAGS} -fomit-frame-pointer"
+    CXXFLAGS="${CXXFLAGS} -fomit-frame-pointer"
+    OBJCFLAGS="${OBJCFLAGS} -fomit-frame-pointer"
     AC_CACHE_CHECK([if $CC accepts -fomit-frame-pointer],
       [ac_cv_c_omit_frame_pointer], [
-      CFLAGS="${CFLAGS_save} -fomit-frame-pointer"
       AC_COMPILE_IFELSE([AC_LANG_PROGRAM()], [
         ac_cv_c_omit_frame_pointer=yes
       ], [
         ac_cv_c_omit_frame_pointer=no
       ])
     ])
-    AS_IF([test "${ac_cv_c_omit_frame_pointer}" != "no"], [
-      VLC_RESTORE_FLAGS
-        CFLAGS="${CFLAGS} -fomit-frame-pointer"
-        CXXFLAGS="${CXXFLAGS} -fomit-frame-pointer"
-        OBJCFLAGS="${OBJCFLAGS} -fomit-frame-pointer"
-      VLC_SAVE_FLAGS
-    ])
+    AS_IF([test "${ac_cv_c_omit_frame_pointer}" = "no"], [VLC_RESTORE_FLAGS])
   ])
 ])
 
 dnl Check for Darwin plugin linking flags
 AS_IF([test "${SYS}" = "darwin"], [
+  VLC_SAVE_FLAGS
+  CFLAGS="${CFLAGS} -bundle -undefined error"
   AC_CACHE_CHECK([if $CC accepts -bundle -undefined error],
     [ac_cv_ld_darwin], [
-    CFLAGS="${CFLAGS_save} -bundle -undefined error"
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM()], [
       ac_cv_ld_darwin=yes
     ], [
@@ -1033,19 +997,21 @@ AS_IF([test "${SYS}" = "darwin"], [
   AS_IF([test "${ac_cv_ld_darwin}" != "no"], [
     VLC_ADD_LDFLAGS([plugin],[-bundle -undefined error])
   ])
+  VLC_RESTORE_FLAGS
 ])
 
 dnl Checks for __attribute__(aligned()) directive
+VLC_SAVE_FLAGS
+CFLAGS="${CFLAGS} -Werror"
 AC_CACHE_CHECK([__attribute__ ((aligned ())) support],
     [ac_cv_c_attribute_aligned],
     [ac_cv_c_attribute_aligned=0
-        CFLAGS="${CFLAGS_save} -Werror"
     for ac_cv_c_attr_align_try in 2 4 8 16 32 64; do
         AC_TRY_COMPILE([],
         [static char c __attribute__ ((aligned(${ac_cv_c_attr_align_try}))) = 0; return c;],
         [ac_cv_c_attribute_aligned="${ac_cv_c_attr_align_try}"])
-    done
-        CFLAGS="${CFLAGS_save}"])
+    done])
+VLC_RESTORE_FLAGS
 if test "${ac_cv_c_attribute_aligned}" != "0"; then
     AC_DEFINE_UNQUOTED([ATTRIBUTE_ALIGNED_MAX],
         [${ac_cv_c_attribute_aligned}],[Maximum supported data alignment])
@@ -1120,9 +1086,9 @@ have_mmx="no"
 have_mmxext="no"
 AS_IF([test "${enable_mmx}" != "no"], [
   ARCH="${ARCH} mmx"
-
+  VLC_SAVE_FLAGS
+  CFLAGS="${CFLAGS} -O -mmmx"
   AC_CACHE_CHECK([if $CC groks MMX intrinsics], [ac_cv_c_mmx_intrinsics], [
-    CFLAGS="${CFLAGS_save} -O -mmmx"
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM([
 [#include <mmintrin.h>
 #include <stdint.h>
@@ -1140,15 +1106,15 @@ frobzor = (uint64_t)a;]])], [
     ], [
       ac_cv_c_mmx_intrinsics=no
     ])
-    CFLAGS="${CFLAGS_save}"
   ])
+  VLC_RESTORE_FLAGS
   AS_IF([test "${ac_cv_c_mmx_intrinsics}" != "no"], [
-    AC_DEFINE(HAVE_MMX_INTRINSICS, 1,
-              [Define to 1 if MMX intrinsics are available.])
+    AC_DEFINE(HAVE_MMX_INTRINSICS, 1, [Define to 1 if MMX intrinsics are available.])
   ])
 
+  VLC_SAVE_FLAGS
+  CFLAGS="${CFLAGS} -mmmx"
   AC_CACHE_CHECK([if $CC groks MMX inline assembly], [ac_cv_mmx_inline], [
-    CFLAGS="${CFLAGS_save} -mmmx"
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM(,[[
 void *p;
 asm volatile("packuswb %%mm1,%%mm2"::"r"(p):"mm1", "mm2");
@@ -1158,17 +1124,14 @@ asm volatile("packuswb %%mm1,%%mm2"::"r"(p):"mm1", "mm2");
     ], [
       ac_cv_mmx_inline=no
     ])
-    CFLAGS="${CFLAGS_save}"
   ])
   AS_IF([test "${ac_cv_mmx_inline}" != "no"], [
-    AC_DEFINE(CAN_COMPILE_MMX, 1,
-              [Define to 1 inline MMX assembly is available.])
+    AC_DEFINE(CAN_COMPILE_MMX, 1, [Define to 1 inline MMX assembly is available.])
     have_mmx="yes"
   ])
 
   AC_CACHE_CHECK([if $CC groks MMX EXT inline assembly],
                  [ac_cv_mmxext_inline], [
-    CFLAGS="${CFLAGS_save} -mmmx"
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM(,[[
 void *p;
 asm volatile("maskmovq %%mm1,%%mm2"::"r"(p):"mm1", "mm2");
@@ -1178,11 +1141,10 @@ asm volatile("maskmovq %%mm1,%%mm2"::"r"(p):"mm1", "mm2");
     ], [
       ac_cv_mmxext_inline=no
     ])
-    CFLAGS="${CFLAGS_save}"
   ])
+  VLC_RESTORE_FLAGS
   AS_IF([test "${ac_cv_mmxext_inline}" != "no"], [
-    AC_DEFINE(CAN_COMPILE_MMXEXT, 1,
-              [Define to 1 if MMX EXT inline assembly is available.])
+    AC_DEFINE(CAN_COMPILE_MMXEXT, 1, [Define to 1 if MMX EXT inline assembly is available.])
     have_mmxext="yes"
   ])
 ])
@@ -1208,8 +1170,9 @@ have_sse2="no"
 AS_IF([test "${enable_sse}" != "no"], [
   ARCH="${ARCH} sse sse2"
 
+  VLC_SAVE_FLAGS
+  CFLAGS="${CFLAGS} -O -msse2"
   AC_CACHE_CHECK([if $CC groks SSE2 intrinsics], [ac_cv_c_sse2_intrinsics], [
-    CFLAGS="${CFLAGS_save} -O -msse2"
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM([
 [#include <emmintrin.h>
 #include <stdint.h>
@@ -1227,15 +1190,15 @@ frobzor = (uint64_t)_mm_movepi64_pi64(a);]])], [
     ], [
       ac_cv_c_sse2_intrinsics=no
     ])
-    CFLAGS="${CFLAGS_save}"
-])
+  ])
+  VLC_RESTORE_FLAGS
   AS_IF([test "${ac_cv_c_sse2_intrinsics}" != "no"], [
-    AC_DEFINE(HAVE_SSE2_INTRINSICS, 1,
-              [Define to 1 if SSE2 intrinsics are available.])
+    AC_DEFINE(HAVE_SSE2_INTRINSICS, 1, [Define to 1 if SSE2 intrinsics are available.])
   ])
 
+  VLC_SAVE_FLAGS
+  CFLAGS="${CFLAGS} -msse"
   AC_CACHE_CHECK([if $CC groks SSE inline assembly], [ac_cv_sse_inline], [
-    CFLAGS="${CFLAGS_save} -msse"
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM(,[[
 void *p;
 asm volatile("xorps %%xmm1,%%xmm2"::"r"(p):"xmm1", "xmm2");
@@ -1245,15 +1208,13 @@ asm volatile("xorps %%xmm1,%%xmm2"::"r"(p):"xmm1", "xmm2");
     ], [
       ac_cv_sse_inline=no
     ])
-    CFLAGS="${CFLAGS_save}"
   ])
+
   AS_IF([test "${ac_cv_sse_inline}" != "no" -a "${SYS}" != "solaris"], [
-    AC_DEFINE(CAN_COMPILE_SSE, 1,
-              [Define to 1 if SSE inline assembly is available.])
+    AC_DEFINE(CAN_COMPILE_SSE, 1, [Define to 1 if SSE inline assembly is available.])
   ])
 
   AC_CACHE_CHECK([if $CC groks SSE2 inline assembly], [ac_cv_sse2_inline], [
-    CFLAGS="${CFLAGS_save} -msse"
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM(,[[
 void *p;
 asm volatile("punpckhqdq %%xmm1,%%xmm2"::"r"(p):"xmm1", "xmm2");
@@ -1263,17 +1224,14 @@ asm volatile("punpckhqdq %%xmm1,%%xmm2"::"r"(p):"xmm1", "xmm2");
     ], [
       ac_cv_sse2_inline=no
     ])
-    CFLAGS="${CFLAGS_save}"
   ])
   AS_IF([test "${ac_cv_sse2_inline}" != "no" -a "${SYS}" != "solaris"], [
-    AC_DEFINE(CAN_COMPILE_SSE2, 1,
-              [Define to 1 if SSE2 inline assembly is available.])
+    AC_DEFINE(CAN_COMPILE_SSE2, 1, [Define to 1 if SSE2 inline assembly is available.])
     have_sse2="yes"
   ])
 
   # SSE3
   AC_CACHE_CHECK([if $CC groks SSE3 inline assembly], [ac_cv_sse3_inline], [
-    CFLAGS="${CFLAGS_save} -msse"
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM(,[[
 void *p;
 asm volatile("movsldup %%xmm1,%%xmm0"::"r"(p):"xmm0", "xmm1");
@@ -1283,14 +1241,12 @@ asm volatile("movsldup %%xmm1,%%xmm0"::"r"(p):"xmm0", "xmm1");
     ], [
       ac_cv_sse3_inline=no
     ])
-    CFLAGS="${CFLAGS_save}"
   ])
+
   AS_IF([test "${ac_cv_sse3_inline}" != "no"], [
-    AC_DEFINE(CAN_COMPILE_SSE3, 1,
-              [Define to 1 if SSE3 inline assembly is available.]) ])
+    AC_DEFINE(CAN_COMPILE_SSE3, 1, [Define to 1 if SSE3 inline assembly is available.]) ])
   # SSSE3
   AC_CACHE_CHECK([if $CC groks SSSE3 inline assembly], [ac_cv_ssse3_inline], [
-    CFLAGS="${CFLAGS_save} -msse"
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM(,[[
 void *p;
 asm volatile("pabsw %%xmm0,%%xmm0"::"r"(p):"xmm0");
@@ -1300,16 +1256,14 @@ asm volatile("pabsw %%xmm0,%%xmm0"::"r"(p):"xmm0");
     ], [
       ac_cv_ssse3_inline=no
     ])
-    CFLAGS="${CFLAGS_save}"
   ])
+
   AS_IF([test "${ac_cv_ssse3_inline}" != "no"], [
-    AC_DEFINE(CAN_COMPILE_SSSE3, 1,
-              [Define to 1 if SSSE3 inline assembly is available.]) ])
+    AC_DEFINE(CAN_COMPILE_SSSE3, 1, [Define to 1 if SSSE3 inline assembly is available.]) ])
 
   # SSE4.1
   AC_CACHE_CHECK([if $CC groks SSE4.1 inline assembly],
                  [ac_cv_sse4_1_inline], [
-    CFLAGS="${CFLAGS_save} -msse"
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM(,[[
 void *p;
 asm volatile("pmaxsb %%xmm1,%%xmm0"::"r"(p):"xmm0", "xmm1");
@@ -1319,16 +1273,14 @@ asm volatile("pmaxsb %%xmm1,%%xmm0"::"r"(p):"xmm0", "xmm1");
     ], [
       ac_cv_sse4_1_inline=no
     ])
-    CFLAGS="${CFLAGS_save}"
   ])
+
   AS_IF([test "${ac_cv_sse4_1_inline}" != "no"], [
-    AC_DEFINE(CAN_COMPILE_SSE4_1, 1,
-              [Define to 1 if SSE4_1 inline assembly is available.]) ])
+    AC_DEFINE(CAN_COMPILE_SSE4_1, 1, [Define to 1 if SSE4_1 inline assembly is available.]) ])
 
   # SSE4.2
   AC_CACHE_CHECK([if $CC groks SSE4.2 inline assembly],
                  [ac_cv_sse4_2_inline], [
-    CFLAGS="${CFLAGS_save} -msse"
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM(,[[
 void *p;
 asm volatile("pcmpgtq %%xmm1,%%xmm0"::"r"(p):"xmm0", "xmm1");
@@ -1338,15 +1290,13 @@ asm volatile("pcmpgtq %%xmm1,%%xmm0"::"r"(p):"xmm0", "xmm1");
     ], [
       ac_cv_sse4_2_inline=no
     ])
-    CFLAGS="${CFLAGS_save}"
   ])
+
   AS_IF([test "${ac_cv_sse4_2_inline}" != "no"], [
-    AC_DEFINE(CAN_COMPILE_SSE4_2, 1,
-              [Define to 1 if SSE4_2 inline assembly is available.]) ])
+    AC_DEFINE(CAN_COMPILE_SSE4_2, 1, [Define to 1 if SSE4_2 inline assembly is available.]) ])
 
   # SSE4A
   AC_CACHE_CHECK([if $CC groks SSE4A inline assembly], [ac_cv_sse4a_inline], [
-    CFLAGS="${CFLAGS_save} -msse"
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM(,[[
 void *p;
 asm volatile("insertq %%xmm1,%%xmm0"::"r"(p):"xmm0", "xmm1");
@@ -1356,17 +1306,17 @@ asm volatile("insertq %%xmm1,%%xmm0"::"r"(p):"xmm0", "xmm1");
     ], [
       ac_cv_sse4a_inline=no
     ])
-    CFLAGS="${CFLAGS_save}"
   ])
+  VLC_RESTORE_FLAGS
   AS_IF([test "${ac_cv_sse4a_inline}" != "no"], [
-    AC_DEFINE(CAN_COMPILE_SSE4A, 1,
-              [Define to 1 if SSE4A inline assembly is available.]) ])
+    AC_DEFINE(CAN_COMPILE_SSE4A, 1, [Define to 1 if SSE4A inline assembly is available.]) ])
 ])
 AM_CONDITIONAL([HAVE_SSE2], [test "$have_sse2" = "yes"])
 
+VLC_SAVE_FLAGS
+CFLAGS="${CFLAGS} -mmmx"
 have_3dnow="no"
 AC_CACHE_CHECK([if $CC groks 3D Now! inline assembly], [ac_cv_3dnow_inline], [
-  CFLAGS="${CFLAGS_save} -mmmx"
   AC_COMPILE_IFELSE([AC_LANG_PROGRAM(,[[
 void *p;
 asm volatile("pfadd %%mm1,%%mm2"::"r"(p):"mm1", "mm2");
@@ -1376,8 +1326,8 @@ asm volatile("pfadd %%mm1,%%mm2"::"r"(p):"mm1", "mm2");
   ], [
     ac_cv_3dnow_inline=no
   ])
-  CFLAGS="${CFLAGS_save}"
 ])
+VLC_RESTORE_FLAGS
 AS_IF([test "${ac_cv_3dnow_inline}" != "no"], [
   AC_DEFINE(CAN_COMPILE_3DNOW, 1,
             [Define to 1 if 3D Now! inline assembly is available.])
@@ -1392,8 +1342,9 @@ AC_ARG_ENABLE(neon,
   AS_IF([test "${host_cpu}" = "arm"], [enable_neon="yes"] ,[enable_neon="no"])
 ])
 AS_IF([test "${enable_neon}" != "no"], [
+  VLC_SAVE_FLAGS
+  CFLAGS="${CFLAGS} -mfpu=neon"
   AC_CACHE_CHECK([if $CC groks NEON inline assembly], [ac_cv_neon_inline], [
-    CFLAGS="${CFLAGS_save} -mfpu=neon"
     AC_COMPILE_IFELSE([
       AC_LANG_PROGRAM(,[[
 asm volatile("vqmovun.s64 d0, q1":::"d0");
@@ -1404,12 +1355,11 @@ asm volatile("ssat r0, #1, r0":::"r0"); /* assume ARMv6 */
     ], [
       ac_cv_neon_inline="no"
     ])
-    CFLAGS="${CFLAGS_save}"
   ])
+  VLC_RESTORE_FLAGS
   AS_IF([test "$ac_cv_neon_inline" != "no"], [
     NEON_CFLAGS="$ac_cv_neon_inline"
-    AC_DEFINE([CAN_COMPILE_NEON], 1,
-      [Define to 1 if NEON (and ARMv6) assembly is available with NEON_CFLAGS.])
+    AC_DEFINE([CAN_COMPILE_NEON], 1, [Define to 1 if NEON (and ARMv6) assembly is available with NEON_CFLAGS.])
   ])
 ], [
   ac_cv_neon_inline="no"
@@ -1427,16 +1377,17 @@ AC_ARG_ENABLE(altivec,
 have_altivec="no"
 AS_IF([test "${enable_altivec}" = "yes"], [
   ARCH="${ARCH} altivec";
+  VLC_SAVE_FLAGS
   AC_CACHE_CHECK([if $CC groks AltiVec inline assembly],
     [ac_cv_altivec_inline],
-    [CFLAGS="${CFLAGS_save}"
-     AC_TRY_COMPILE(,[asm volatile("vperm 0,1,2,3");],
+    [AC_TRY_COMPILE(,[asm volatile("vperm 0,1,2,3");],
          ac_cv_altivec_inline="yes",
-         [CFLAGS="${CFLAGS_save} -Wa,-m7400"
+         [CFLAGS="${CFLAGS} -Wa,-m7400"
           AC_TRY_COMPILE(,[asm volatile("vperm 0,1,2,3");],
             [ac_cv_altivec_inline="-Wa,-m7400"],
             ac_cv_altivec_inline=no)
          ])])
+  VLC_RESTORE_FLAGS
   AS_IF([test "${ac_cv_altivec_inline}" != "no"], [
     AC_DEFINE(CAN_COMPILE_ALTIVEC, 1,
               [Define to 1 if AltiVec inline assembly is available.])
@@ -1458,32 +1409,33 @@ dnl - Linux PPC, gcc 3.4, 4.x: need <altivec.h> which requires -maltivec
 dnl - Linux PPC, gcc 3.3: need <altivec.h> and -maltivec -mabi=altivec
 dnl - Linux PPC, gcc 3.x: need <altivec.h> and -fvec
 dnl - Others: test should fail
+  VLC_SAVE_FLAGS
   AC_CACHE_CHECK([if \$CC groks AltiVec C extensions],
   [ac_cv_c_altivec],
   [# OS X/PPC test (gcc 4.x)
-   CFLAGS="${CFLAGS_save} -mpim-altivec -force_cpusubtype_ALL"
+   CFLAGS="${CFLAGS} -mpim-altivec -force_cpusubtype_ALL"
    AC_TRY_COMPILE([vector unsigned char foo;],
      [vec_ld(0, (unsigned char *)0);],
      [ac_cv_c_altivec="-mpim-altivec -force_cpusubtype_ALL"],
      [# OS X/PPC test (gcc 3.x)
-      CFLAGS="${CFLAGS_save} -faltivec"
+      CFLAGS="${CFLAGS} -faltivec"
       AC_TRY_COMPILE([vector unsigned char foo;],
         [vec_ld(1 * sizeof(vector float), (unsigned char *)0);],
         [ac_cv_c_altivec="-faltivec"],
         dnl Below this are the Linux tests
         [# Linux/PPC test (gcc 4.x)
-         CFLAGS="${CFLAGS_save} -maltivec"
+         CFLAGS="${CFLAGS} -maltivec"
          AC_TRY_COMPILE([#include <altivec.h>],
            [vec_ld(0, (unsigned char *)0);],
            [ac_cv_c_altivec="-maltivec"],
            [# Linux/PPC test (gcc 3.3)
-            CFLAGS="${CFLAGS_save} -maltivec -mabi=altivec"
+            CFLAGS="${CFLAGS} -maltivec -mabi=altivec"
             AC_TRY_COMPILE([#include <altivec.h>],
               [vec_ld(0, (unsigned char *)0);],
               [ac_cv_c_altivec=""
                ac_cv_c_altivec_abi="-maltivec -mabi=altivec"],
               [# Linux/PPC test (gcc 3.3)
-               CFLAGS="${CFLAGS_save} -fvec"
+               CFLAGS="${CFLAGS} -fvec"
                AC_TRY_COMPILE([#include <altivec.h>],
                  [vec_ld(0, (unsigned char *)0);],
                  [ac_cv_c_altivec="-fvec"],
@@ -1492,29 +1444,24 @@ dnl - Others: test should fail
            ])
         ])
      ])
-   CFLAGS="${CFLAGS_save}"
-  ])
-  AS_IF([test "${ac_cv_c_altivec}" != "no"], [
-    CPPFLAGS="${CPPFLAGS_save} ${ac_cv_c_altivec}"
   ])
 
-  AC_CHECK_HEADERS(altivec.h)
-  CPPFLAGS="${CPPFLAGS_save}"
-
+  VLC_RESTORE_FLAGS
   AS_IF([test "${ac_cv_c_altivec}" != "no"], [
-    AC_DEFINE(CAN_COMPILE_C_ALTIVEC, 1,
-              [Define to 1 if C AltiVec extensions are available.])
+    CPPFLAGS="${CPPFLAGS} ${ac_cv_c_altivec}"
+    AC_DEFINE(CAN_COMPILE_C_ALTIVEC, 1, [Define to 1 if C AltiVec extensions are available.])
     VLC_ADD_CFLAGS([libvlccore],[${ac_cv_c_altivec}])
     VLC_ADD_CFLAGS([i420_yuy2_altivec memcpyaltivec deinterlace],[${ac_cv_c_altivec} ${ac_cv_c_altivec_abi}])
     have_altivec="yes"
   ])
+  AC_CHECK_HEADERS(altivec.h)
 
+  VLC_SAVE_FLAGS
+  LDFLAGS="${LDFLAGS} -Wl,-framework,vecLib"
   AC_CACHE_CHECK([if linker needs -framework vecLib],
     [ac_cv_ld_altivec],
-    [LDFLAGS="${LDFLAGS} -Wl,-framework,vecLib"
-     AC_TRY_LINK([],,ac_cv_ld_altivec=yes,ac_cv_ld_altivec=no)
-     LDFLAGS="${LDFLAGS_save}"
-    ])
+    [AC_TRY_LINK([],,ac_cv_ld_altivec=yes,ac_cv_ld_altivec=no)])
+  VLC_RESTORE_FLAGS
   AS_IF([test "${ac_cv_ld_altivec}" != "no"], [
     VLC_ADD_LIBS([libvlccore memcpyaltivec],[-Wl,-framework,vecLib])
   ])
@@ -1547,21 +1494,16 @@ fi
 
 dnl NOTE: this can't be cached cleanly
 AS_IF([test -n "${CFLAGS_TUNING}"], [
-  AC_MSG_CHECKING([whether $CC accepts ${CFLAGS_TUNING}])
-  CFLAGS="${CFLAGS_save} ${CFLAGS_TUNING}"
-  AC_COMPILE_IFELSE([AC_LANG_SOURCE([])], [
-    tuning="yes"
-  ], [
-    CFLAGS_TUNING=""; tuning="no"
-    AS_IF([test "${with_tuning}"], [
-      AC_MSG_ERROR([requested tuning not supported])
-    ])
-  ])
-  CFLAGS="${CFLAGS_save}"
-  AC_MSG_RESULT([$tuning])
-  VLC_RESTORE_FLAGS
-  CFLAGS="${CFLAGS} ${CFLAGS_TUNING}"
   VLC_SAVE_FLAGS
+  CFLAGS="${CFLAGS} ${CFLAGS_TUNING}"
+  AC_MSG_CHECKING([whether $CC accepts ${CFLAGS_TUNING}])
+  AC_COMPILE_IFELSE([AC_LANG_SOURCE([])], [
+    AC_MSG_RESULT([yes])
+  ], [
+    VLC_RESTORE_FLAGS
+    AC_MSG_RESULT([no])
+    AS_IF([test "${with_tuning}"], [AC_MSG_ERROR([requested tuning not supported])])
+  ])
 ])
 
 dnl
@@ -1701,7 +1643,7 @@ AC_ARG_ENABLE(live555,
     [enable RTSP input through live555 (default enabled)])])
 AS_IF([test "${enable_live555}" != "no" -a -n "${CXX}"], [
   AC_LANG_PUSH(C++)
-  CPPFLAGS_save="${CPPFLAGS}"
+  VLC_SAVE_FLAGS
   AS_IF([test -z "${CONTRIB_DIR}"], [
     CPPFLAGS_live555="-I/usr/include/liveMedia -I/usr/include/groupsock -I/usr/include/BasicUsageEnvironment -I/usr/include/UsageEnvironment"
   ], [
@@ -1781,7 +1723,7 @@ You can also disable RTSP input with --disable-live555. You were warned.])
         VLC_ADD_LIBS([live555], [-lliveMedia ${other_libs}])
       ],[],[${other_libs}])],[${other_libs_pic}])
   ])
-  CPPFLAGS="${CPPFLAGS_save}"
+  VLC_RESTORE_FLAGS
   AC_LANG_POP(C++)
 ])
 
@@ -1930,13 +1872,14 @@ then
   then
     VLC_ADD_CPPFLAGS([decklink],[-I${with_decklink_sdk}/include])
   fi
-  CPPFLAGS="${CPPFLAGS_save} ${CPPFLAGS_decklink}"
+  VLC_SAVE_FLAGS
+  CPPFLAGS="${CPPFLAGS} ${CPPFLAGS_decklink}"
   AC_LANG_PUSH(C++)
   AC_CHECK_HEADERS(DeckLinkAPIDispatch.cpp, [
     VLC_ADD_PLUGIN([decklink])
   ],[AC_MSG_WARN(Blackmagic DeckLink SDI include files not found, decklink disabled)])
   AC_LANG_POP(C++)
-  CPPFLAGS="${CPPFLAGS_save}"
+  VLC_RESTORE_FLAGS
 fi
 
 
@@ -2059,8 +2002,6 @@ if test "${enable_screen}" != "no"; then
   elif test "${SYS}" = "mingw32"; then
     VLC_ADD_PLUGIN([screen])
     VLC_ADD_LIBS([screen],[-lgdi32])
-  elif test "${SYS}" = "mingwce"; then
-    CPPFLAGS="${CPPFLAGS_save}"
   fi
 fi
 
@@ -2302,7 +2243,7 @@ AC_ARG_ENABLE(iomx,
   [  --enable-iomx           iomx codec module (default disabled)])
 if test "${enable_iomx}" = "yes"
 then
-  CPPFLAGS_save="${CPPFLAGS}"
+  VLC_SAVE_FLAGS
   CPPFLAGS="${CPPFLAGS} -I${srcdir}/modules/codec/omxil" # For the OMX headers
   AC_LANG_PUSH([C++])
   AC_CHECK_HEADER(media/stagefright/OMXClient.h, [
@@ -2313,7 +2254,7 @@ then
     AC_MSG_ERROR("Could not find IOMX headers")
   ])
   AC_LANG_POP([C++])
-  CPPFLAGS="${CPPFLAGS_save}"
+  VLC_RESTORE_FLAGS
 fi
 
 dnl
@@ -2378,28 +2319,29 @@ then
       AC_MSG_RESULT(yes)
       VLC_ADD_CPPFLAGS([mpgatofixed32],[-I${real_mad_tree}])
       VLC_ADD_LIBS([mpgatofixed32],[-L${real_mad_tree}/.libs])
-      LDFLAGS="${LDFLAGS_save} ${LIBS_mpgatofixed32}"
+      VLC_SAVE_FLAGS
+      LDFLAGS="${LDFLAGS} ${LIBS_mpgatofixed32}"
       AC_CHECK_LIB(mad, mad_bit_init, [
         VLC_ADD_PLUGIN([mpgatofixed32])
         VLC_ADD_LIBS([mpgatofixed32],[-lmad])
         ],[ AC_MSG_ERROR([the specified tree has not been compiled ])
       ],[])
-      LDFLAGS="${LDFLAGS_save}"
+      VLC_RESTORE_FLAGS
     else
       AC_MSG_RESULT(no)
       AC_MSG_ERROR([the specified tree does not have mad.h])
     fi
   else
-    CPPFLAGS="${CPPFLAGS_save} ${CPPFLAGS_mpgatofixed32}"
-    LDFLAGS="${LDFLAGS_save} ${LIBS_mpgatofixed32}"
+    VLC_SAVE_FLAGS
+    CPPFLAGS="${CPPFLAGS} ${CPPFLAGS_mpgatofixed32}"
+    LDFLAGS="${LDFLAGS} ${LIBS_mpgatofixed32}"
     AC_CHECK_HEADERS(mad.h, ,
       [ AC_MSG_ERROR([Could not find libmad on your system: you may get it from http://www.underbit.com/products/mad/. Alternatively you can use --disable-mad to disable the mad plugin.]) ])
     AC_CHECK_LIB(mad, mad_bit_init, [
       VLC_ADD_PLUGIN([mpgatofixed32])
       VLC_ADD_LIBS([mpgatofixed32],[-lmad])],
       [ AC_MSG_ERROR([Cannot find libmad library...]) ])
-    CPPFLAGS="${CPPFLAGS_save}"
-    LDFLAGS="${LDFLAGS_save}"
+    VLC_RESTORE_FLAGS
   fi
 fi
 
@@ -2410,12 +2352,12 @@ AC_ARG_ENABLE(merge-ffmpeg,
 ])
 AM_CONDITIONAL([MERGE_FFMPEG], [test "$enable_merge_ffmpeg" != "no"])
 
+VLC_SAVE_FLAGS
+LDFLAGS="${LDFLAGS} -Wl,-Bsymbolic"
 AC_CACHE_CHECK([if linker supports -Bsymbolic],
   [ac_cv_ld_bsymbolic],
-  [LDFLAGS="${LDFLAGS} -Wl,-Bsymbolic"
-    AC_TRY_LINK([],,ac_cv_ld_bsymbolic=yes,ac_cv_ld_bsymbolic=no)
-    LDFLAGS="${LDFLAGS_save}"
-  ])
+  [AC_TRY_LINK([],,ac_cv_ld_bsymbolic=yes,ac_cv_ld_bsymbolic=no)])
+VLC_RESTORE_FLAGS
 
 dnl
 dnl  avcodec decoder/encoder plugin
@@ -2646,8 +2588,9 @@ then
       AC_MSG_ERROR([cannot find ${real_faad_tree}/libfaad/.libs/libfaad.a, make sure you compiled libfaad in ${with_faad_tree}])
     fi
   else
-    CPPFLAGS="${CPPFLAGS_save} ${CPPFLAGS_faad}"
-    LDFLAGS="${LDFLAGS_save} ${LIBS_faad}"
+    VLC_SAVE_FLAGS
+    CPPFLAGS="${CPPFLAGS} ${CPPFLAGS_faad}"
+    LDFLAGS="${LDFLAGS} ${LIBS_faad}"
     AC_CHECK_HEADERS(faad.h, ,
       [ AC_MSG_ERROR([Cannot find development headers for libfaad...]) ])
     AC_CHECK_LIB(faad, faacDecOpen, [
@@ -2657,8 +2600,7 @@ then
         VLC_ADD_PLUGIN([faad])
         VLC_ADD_LIBS([faad],[-lfaad]) ],
         [ AC_MSG_ERROR([Cannot find libfaad library...]) ]))
-    LDFLAGS="${LDFLAGS_save}"
-    CPPFLAGS="${CPPFLAGS_save}"
+    VLC_RESTORE_FLAGS
   fi
 fi
 
@@ -2719,7 +2661,8 @@ then
       AC_MSG_RESULT(yes)
       VLC_ADD_CPPFLAGS([a52tofloat32],[-I${real_a52_tree}])
       VLC_ADD_LIBS([a52tofloat32],[-L${real_a52_tree}/liba52/.libs])
-      LDFLAGS="${LDFLAGS_save} ${LIBS_a52tofloat32}"
+      VLC_SAVE_FLAGS
+      LDFLAGS="${LDFLAGS} ${LIBS_a52tofloat32}"
       AC_CHECK_LIB(a52, a52_free, [
         VLC_ADD_PLUGIN([a52tofloat32])
         VLC_ADD_CPPFLAGS([a52tofloat32],[-DUSE_A52DEC_TREE])
@@ -2732,7 +2675,6 @@ then
           AC_MSG_ERROR([the specified tree has not been compiled])
         fi
       ])
-      LDFLAGS="${LDFLAGS_save}"
     else
       AC_MSG_RESULT(no)
       AC_MSG_ERROR([the specified tree does not have a52.h])
@@ -2746,8 +2688,9 @@ then
       LDFLAGS_test="-L${with_a52}/lib"
       CPPFLAGS_test="-I${with_a52}/include"
     fi
-    CPPFLAGS="${CPPFLAGS_save} ${CPPFLAGS_test} ${CPPFLAGS_a52tofloat32}"
-    LDFLAGS="${LDFLAGS_save} ${LDFLAGS_test} ${LIBS_a52tofloat32}"
+    VLC_SAVE_FLAGS
+    CPPFLAGS="${CPPFLAGS} ${CPPFLAGS_test} ${CPPFLAGS_a52tofloat32}"
+    LDFLAGS="${LDFLAGS} ${LDFLAGS_test} ${LIBS_a52tofloat32}"
     AC_CHECK_HEADERS(a52dec/a52.h, [
       AC_CHECK_LIB(a52, a52_free, [
         VLC_ADD_PLUGIN([a52tofloat32])
@@ -2759,8 +2702,7 @@ then
     ],[
       AC_MSG_ERROR([Could not find liba52 on your system: you may get it from http://liba52.sf.net/. Alternatively you can use --disable-a52 to disable the a52 plugin.])
     ])
-    CPPFLAGS="${CPPFLAGS_save}"
-    LDFLAGS="${LDFLAGS_save}"
+    VLC_RESTORE_FLAGS
   fi
 fi
 
@@ -2842,12 +2784,13 @@ AC_ARG_ENABLE(png,
   [  --enable-png            PNG support (default enabled)])
 if test "${enable_png}" != "no"; then
 AC_CHECK_HEADERS(png.h, [
-  LDFLAGS="${LDFLAGS_save} -lz"
+  VLC_SAVE_FLAGS
+  LDFLAGS="${LDFLAGS} -lz"
   AC_CHECK_LIB(png, png_set_rows, [
     VLC_ADD_LIBS([png],[-lpng -lz -lm])
     VLC_ADD_PLUGIN([png osdmenu osd_parser])],
     [],[-lz])
-    LDFLAGS="${LDFLAGS_save}"
+  VLC_RESTORE_FLAGS
   ])
 fi
 AM_CONDITIONAL(BUILD_OSDMENU, [test "${enable_png}" != "no"])
@@ -2886,7 +2829,6 @@ if test "${enable_x264}" != "no"; then
       ],[
         AC_MSG_ERROR([the specified tree has not been compiled])
       ])
-      LDFLAGS="${LDFLAGS_save}"
     else
       AC_MSG_RESULT(no)
       AC_MSG_ERROR([the specified tree does not have x264.h])
@@ -2909,7 +2851,6 @@ if test "${enable_x264}" != "no"; then
             AC_MSG_ERROR([${X264_PKG_ERRORS}: you may get it from http://www.videolan.org/x264.html])
           fi
       ])
-    LDFLAGS="${LDFLAGS_save}"
   fi
 fi
 
@@ -3345,12 +3286,10 @@ if test "${enable_directfb}" = "yes"; then
     LIBS_mydirectfb=
     if test "${with_directfb}" != "no" -a -n "${with_directfb}"; then
         dnl Trying the given location
-        CPPFLAGS_save="${CPPFLAGS}"
-        LIBS_save="${LIBS}"
+        VLC_SAVE_FLAGS
 
         CPPFLAGS_new="-I${with_directfb}/include -D_REENTRANT -D_GNU_SOURCE"
-        LIBS_new="-L${with_directfb}/lib/fusion/.libs/ -L${with_directfb}/lib/direct/.libs/"
-        LIBS_new="${LIBS_new} -L${with_directfb}/src/.libs/"
+        LIBS_new="-L${with_directfb}/lib/fusion/.libs/ -L${with_directfb}/lib/direct/.libs/ -L${with_directfb}/src/.libs/"
 
         CPPFLAGS="${CPPFLAGS} ${CPPFLAGS_new}"
         LIBS="${LIBS} ${LIBS_new}"
@@ -3364,9 +3303,7 @@ if test "${enable_directfb}" = "yes"; then
             ], have_directfb="false")
         ], have_directfb="false")
 
-        dnl Restore flags
-        CPPFLAGS="${CPPFLAGS_save}"
-        LIBS="${LIBS_save}"
+        VLC_RESTORE_FLAGS
 
         if test "${have_directfb}" = "true"; then
             LIBS_mydirectfb="${LIBS_new} -lz $LIBDL -ldirectfb -lfusion -ldirect -lpthread"
@@ -3718,7 +3655,7 @@ AS_IF([test "${enable_qt4}" != "no"], [
     ALIASES="${ALIASES} qvlc"
 
     AC_LANG_PUSH([C++])
-    CPPFLAGS_save="${CPPFLAGS}"
+    VLC_SAVE_FLAGS
 
     AC_MSG_CHECKING([whether Qt uses X11])
     CPPFLAGS="${CPPFLAGS} ${QT4_CFLAGS}"
@@ -3735,7 +3672,7 @@ AS_IF([test "${enable_qt4}" != "no"], [
       AC_MSG_RESULT([no])
     ])
 
-    CPPFLAGS="${CPPFLAGS_save}"
+    VLC_RESTORE_FLAGS
     AC_LANG_POP([C++])
 
     AS_IF([test "${SYS}" = "mingw32" -o "${SYS}" = "mingwce"], [
@@ -3778,11 +3715,13 @@ then
 
   VLC_ADD_LIBS([macosx], [-Wl,-framework,QTKit -Wl,-framework,IOKit -Wl,-framework,AddressBook -Wl,-framework,WebKit])
 
-  CFLAGS="-I${CONTRIB_DIR}/Sparkle.framework/Headers ${CFLAGS_saved}"
+  VLC_SAVE_FLAGS
+  CFLAGS="-I${CONTRIB_DIR}/Sparkle.framework/Headers ${CFLAGS}"
   AC_CHECK_HEADERS(Sparkle.h, [
     VLC_ADD_LIBS([macosx], [-F${CONTRIB_DIR} -Wl,-framework,Sparkle])
     VLC_ADD_OBJCFLAGS([macosx], [-F${CONTRIB_DIR}])
-  ])
+  ], VLC_RESTORE_FLAGS)
+
   if ! test -d ${CONTRIB_DIR}/BGHUDAppKit.framework
   then
     AC_MSG_ERROR([BGHUDAppKit framework is required and was not found in ${CONTRIB_DIR}])
@@ -4192,12 +4131,7 @@ AC_DEFINE_UNQUOTED(VLC_COMPILER, "`$CC -v 2>&1 | tail -n 1`", [compiler])
 dnl
 dnl  Handle substvars that use $(top_srcdir)
 dnl
-CPPFLAGS_save="-I\$(top_srcdir)/include -I\$(top_builddir)/include ${CPPFLAGS_save}"
-
-dnl
-dnl  Restore *FLAGS
-dnl
-VLC_RESTORE_FLAGS
+CPPFLAGS="-I\$(top_srcdir)/include -I\$(top_builddir)/include ${CPPFLAGS}"
 
 dnl
 dnl Sort the modules list
