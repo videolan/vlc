@@ -3651,7 +3651,7 @@ AS_IF([test "${enable_skins2}" != "no"], [
   AS_IF([test "${SYS}" = "mingw32"], [
     VLC_ADD_CPPFLAGS([skins2],[-U_OFF_T_ -U_off_t -Imodules/gui/skins2 -DWIN32_SKINS])
     VLC_ADD_CXXFLAGS([skins2],[-O2 -fno-rtti])
-    VLC_ADD_LIBS([skins2],[-loleaut32 -lwinspool -lwinmm -lshell32 -ladvapi32 -lwsock32 -lgdi32 -lcomdlg32 -lole32 -luuid -lcomctl32  -lmsimg32 -luser32])
+    VLC_ADD_LIBS([skins2],[-lgdi32 -lole32 -luuid -lmsimg32])
 
   ], [test "${SYS}" = "darwin"], [
     VLC_ADD_CPPFLAGS([skins2],[-Imodules/gui/skins2 -DMACOSX_SKINS])
