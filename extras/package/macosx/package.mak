@@ -10,6 +10,7 @@ endif
 VLC.app: VLC-tmp.app
 	rm -Rf $@
 	mv VLC-tmp.app $@
+	$(INSTALL) -m 0755 $(top_builddir)/bin/.libs/vlc $@/Contents/MacOS/VLC
 	$(LN_S) -f ../../../modules $@/Contents/MacOS/plugins
 
 # VLC-release.app for packaging and giving it to your friends
@@ -83,7 +84,6 @@ VLC-tmp.app: vlc
 		xcodebuild -target vlc SYMROOT=../../../build DSTROOT=../../../build $(silentstd)
 	cp -R -L $(top_builddir)/tmp/build/Default/VLC.bundle $@
 	$(INSTALL) -d $@/Contents/MacOS/
-	$(INSTALL) -m 0755 $(top_builddir)/bin/.libs/vlc $@/Contents/MacOS/VLC
 	$(INSTALL) -d $@/Contents/MacOS/share/
 	cp -r $(srcdir)/share/lua $@/Contents/MacOS/share/
 	$(INSTALL) -m 644 $(srcdir)/share/vlc512x512.png $@/Contents/MacOS/share/vlc512x512.png
