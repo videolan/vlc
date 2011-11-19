@@ -310,16 +310,29 @@ net_Read (vlc_object_t *restrict p_this, int fd, const v_socket_t *vs,
         assert (ufd[0].revents);
 
         ssize_t n;
+#if defined(WIN32) || defined(UNDER_CE)
+        int error;
+#endif
         if (vs != NULL)
         {
             int canc = vlc_savecancel ();
             n = vs->pf_recv (vs->p_sys, p_buf, i_buflen);
+#if defined(WIN32) || defined(UNDER_CE)
+            /* We must read last error immediately, because vlc_restorecancel()
+             * access thread local storage, and TlsGetValue() will call
+             * SetLastError() to indicate that the function succeeded, thus
+             * overwriting the error code coming from pf_recv().
+             * WSAGetLastError is just an alias for GetLastError these days.
+             */
+            error = WSAGetLastError();
+#endif
             vlc_restorecancel (canc);
         }
         else
         {
 #ifdef WIN32
             n = recv (fd, p_buf, i_buflen, 0);
+            error = WSAGetLastError();
 #else
             n = read (fd, p_buf, i_buflen);
 #endif
@@ -328,7 +341,7 @@ net_Read (vlc_object_t *restrict p_this, int fd, const v_socket_t *vs,
         if (n == -1)
         {
 #if defined(WIN32) || defined(UNDER_CE)
-            switch (WSAGetLastError ())
+            switch (error)
             {
                 case WSAEWOULDBLOCK:
                 case WSAEINTR:
