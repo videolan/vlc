@@ -1064,15 +1064,9 @@ AS_IF([test "${enable_optimizations}" != "no"], [
     ])
     AS_IF([test "${ac_cv_c_omit_frame_pointer}" != "no"], [
       VLC_RESTORE_FLAGS
-      AS_IF([test "${SYS}" != "darwin"], [
         CFLAGS="${CFLAGS} -fomit-frame-pointer"
         CXXFLAGS="${CXXFLAGS} -fomit-frame-pointer"
-      ], [
-        dnl On darwin we explicitely disable it.
-        CFLAGS="${CFLAGS} -fno-omit-frame-pointer"
-        CXXFLAGS="${CXXFLAGS} -fno-omit-frame-pointer"
-        OBJCFLAGS="${OBJCFLAGS} -fno-omit-frame-pointer"
-      ])
+        OBJCFLAGS="${OBJCFLAGS} -fomit-frame-pointer"
       VLC_SAVE_FLAGS
     ])
   ])
