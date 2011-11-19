@@ -1,7 +1,7 @@
 /*****************************************************************************
  * coredialogs.m: Mac OS X Core Dialogs
  *****************************************************************************
- * Copyright (C) 2005-2009 VLC authors and VideoLAN
+ * Copyright (C) 2005-2011 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Derk-Jan Hartman <hartman at videolan dot org>
@@ -184,6 +184,7 @@ static VLCCoreDialogProvider *_o_sharedInstance = nil;
     else
         [o_prog_description_txt setStringValue: @""];
     [o_prog_bar setDoubleValue: 0];
+    [o_prog_bar setIndeterminate: YES];
     [o_prog_bar startAnimation: self];
 
     [o_prog_win makeKeyAndOrderFront: self];
@@ -192,6 +193,8 @@ static VLCCoreDialogProvider *_o_sharedInstance = nil;
 -(void)updateProgressPanelWithText: (NSString *)string andNumber: (double)d_number
 {
     [o_prog_description_txt setStringValue: string];
+    if (d_number > 0)
+        [o_prog_bar setIndeterminate: NO];
     [o_prog_bar setDoubleValue: d_number];
 }
 
