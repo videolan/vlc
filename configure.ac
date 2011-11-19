@@ -1180,23 +1180,27 @@ have_mmxext="no"
 AS_IF([test "${enable_mmx}" != "no"], [
   ARCH="${ARCH} mmx"
 
-  AC_CACHE_CHECK([if $CC groks MMX intrinsics],
-    [ac_cv_c_mmx_intrinsics],
-    [CFLAGS="${CFLAGS_save} -O -mmmx"
-     AC_TRY_COMPILE([#include <mmintrin.h>
-                     #include <stdint.h>
-                     uint64_t frobzor;],
-                    [__m64 a, b, c;
-                     a = b = c = (__m64)frobzor;
-                     a = _mm_slli_pi16(a, 3);
-                     a = _mm_adds_pi16(a, b);
-                     c = _mm_srli_pi16(c, 8);
-                     c = _mm_slli_pi16(c, 3);
-                     b = _mm_adds_pi16(b, c);
-                     a = _mm_unpacklo_pi8(a, b);
-                     frobzor = (uint64_t)a;],
-                    [ac_cv_c_mmx_intrinsics=yes],
-                    [ac_cv_c_mmx_intrinsics=no])])
+  AC_CACHE_CHECK([if $CC groks MMX intrinsics], [ac_cv_c_mmx_intrinsics], [
+    CFLAGS="${CFLAGS_save} -O -mmmx"
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([
+[#include <mmintrin.h>
+#include <stdint.h>
+uint64_t frobzor;]], [
+[__m64 a, b, c;
+a = b = c = (__m64)frobzor;
+a = _mm_slli_pi16(a, 3);
+a = _mm_adds_pi16(a, b);
+c = _mm_srli_pi16(c, 8);
+c = _mm_slli_pi16(c, 3);
+b = _mm_adds_pi16(b, c);
+a = _mm_unpacklo_pi8(a, b);
+frobzor = (uint64_t)a;]])], [
+      ac_cv_c_mmx_intrinsics=yes
+    ], [
+      ac_cv_c_mmx_intrinsics=no
+    ])
+    CFLAGS="${CFLAGS_save}"
+  ])
   AS_IF([test "${ac_cv_c_mmx_intrinsics}" != "no"], [
     AC_DEFINE(HAVE_MMX_INTRINSICS, 1,
               [Define to 1 if MMX intrinsics are available.])
@@ -1213,6 +1217,7 @@ asm volatile("packuswb %%mm1,%%mm2"::"r"(p):"mm1", "mm2");
     ], [
       ac_cv_mmx_inline=no
     ])
+    CFLAGS="${CFLAGS_save}"
   ])
   AS_IF([test "${ac_cv_mmx_inline}" != "no"], [
     AC_DEFINE(CAN_COMPILE_MMX, 1,
@@ -1232,6 +1237,7 @@ asm volatile("maskmovq %%mm1,%%mm2"::"r"(p):"mm1", "mm2");
     ], [
       ac_cv_mmxext_inline=no
     ])
+    CFLAGS="${CFLAGS_save}"
   ])
   AS_IF([test "${ac_cv_mmxext_inline}" != "no"], [
     AC_DEFINE(CAN_COMPILE_MMXEXT, 1,
@@ -1261,23 +1267,27 @@ have_sse2="no"
 AS_IF([test "${enable_sse}" != "no"], [
   ARCH="${ARCH} sse sse2"
 
-  AC_CACHE_CHECK([if $CC groks SSE2 intrinsics],
-    [ac_cv_c_sse2_intrinsics],
-    [CFLAGS="${CFLAGS_save} -O -msse2"
-     AC_TRY_COMPILE([#include <emmintrin.h>
-                     #include <stdint.h>
-                     uint64_t frobzor;],
-                    [__m128i a, b, c;
-                     a = b = c = _mm_set1_epi64((__m64)frobzor);
-                     a = _mm_slli_epi16(a, 3);
-                     a = _mm_adds_epi16(a, b);
-                     c = _mm_srli_epi16(c, 8);
-                     c = _mm_slli_epi16(c, 3);
-                     b = _mm_adds_epi16(b, c);
-                     a = _mm_unpacklo_epi8(a, b);
-                     frobzor = (uint64_t)_mm_movepi64_pi64(a);],
-                    [ac_cv_c_sse2_intrinsics=yes],
-                    [ac_cv_c_sse2_intrinsics=no])])
+  AC_CACHE_CHECK([if $CC groks SSE2 intrinsics], [ac_cv_c_sse2_intrinsics], [
+    CFLAGS="${CFLAGS_save} -O -msse2"
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([
+[#include <emmintrin.h>
+#include <stdint.h>
+uint64_t frobzor;]], [
+[__m128i a, b, c;
+a = b = c = _mm_set1_epi64((__m64)frobzor);
+a = _mm_slli_epi16(a, 3);
+a = _mm_adds_epi16(a, b);
+c = _mm_srli_epi16(c, 8);
+c = _mm_slli_epi16(c, 3);
+b = _mm_adds_epi16(b, c);
+a = _mm_unpacklo_epi8(a, b);
+frobzor = (uint64_t)_mm_movepi64_pi64(a);]])], [
+      ac_cv_c_sse2_intrinsics=yes
+    ], [
+      ac_cv_c_sse2_intrinsics=no
+    ])
+    CFLAGS="${CFLAGS_save}"
+])
   AS_IF([test "${ac_cv_c_sse2_intrinsics}" != "no"], [
     AC_DEFINE(HAVE_SSE2_INTRINSICS, 1,
               [Define to 1 if SSE2 intrinsics are available.])
@@ -1294,6 +1304,7 @@ asm volatile("xorps %%xmm1,%%xmm2"::"r"(p):"xmm1", "xmm2");
     ], [
       ac_cv_sse_inline=no
     ])
+    CFLAGS="${CFLAGS_save}"
   ])
   AS_IF([test "${ac_cv_sse_inline}" != "no" -a "${SYS}" != "solaris"], [
     AC_DEFINE(CAN_COMPILE_SSE, 1,
@@ -1311,6 +1322,7 @@ asm volatile("punpckhqdq %%xmm1,%%xmm2"::"r"(p):"xmm1", "xmm2");
     ], [
       ac_cv_sse2_inline=no
     ])
+    CFLAGS="${CFLAGS_save}"
   ])
   AS_IF([test "${ac_cv_sse2_inline}" != "no" -a "${SYS}" != "solaris"], [
     AC_DEFINE(CAN_COMPILE_SSE2, 1,
@@ -1330,6 +1342,7 @@ asm volatile("movsldup %%xmm1,%%xmm0"::"r"(p):"xmm0", "xmm1");
     ], [
       ac_cv_sse3_inline=no
     ])
+    CFLAGS="${CFLAGS_save}"
   ])
   AS_IF([test "${ac_cv_sse3_inline}" != "no"], [
     AC_DEFINE(CAN_COMPILE_SSE3, 1,
@@ -1346,6 +1359,7 @@ asm volatile("pabsw %%xmm0,%%xmm0"::"r"(p):"xmm0");
     ], [
       ac_cv_ssse3_inline=no
     ])
+    CFLAGS="${CFLAGS_save}"
   ])
   AS_IF([test "${ac_cv_ssse3_inline}" != "no"], [
     AC_DEFINE(CAN_COMPILE_SSSE3, 1,
@@ -1364,6 +1378,7 @@ asm volatile("pmaxsb %%xmm1,%%xmm0"::"r"(p):"xmm0", "xmm1");
     ], [
       ac_cv_sse4_1_inline=no
     ])
+    CFLAGS="${CFLAGS_save}"
   ])
   AS_IF([test "${ac_cv_sse4_1_inline}" != "no"], [
     AC_DEFINE(CAN_COMPILE_SSE4_1, 1,
@@ -1382,6 +1397,7 @@ asm volatile("pcmpgtq %%xmm1,%%xmm0"::"r"(p):"xmm0", "xmm1");
     ], [
       ac_cv_sse4_2_inline=no
     ])
+    CFLAGS="${CFLAGS_save}"
   ])
   AS_IF([test "${ac_cv_sse4_2_inline}" != "no"], [
     AC_DEFINE(CAN_COMPILE_SSE4_2, 1,
@@ -1399,6 +1415,7 @@ asm volatile("insertq %%xmm1,%%xmm0"::"r"(p):"xmm0", "xmm1");
     ], [
       ac_cv_sse4a_inline=no
     ])
+    CFLAGS="${CFLAGS_save}"
   ])
   AS_IF([test "${ac_cv_sse4a_inline}" != "no"], [
     AC_DEFINE(CAN_COMPILE_SSE4A, 1,
@@ -1418,6 +1435,7 @@ asm volatile("pfadd %%mm1,%%mm2"::"r"(p):"mm1", "mm2");
   ], [
     ac_cv_3dnow_inline=no
   ])
+  CFLAGS="${CFLAGS_save}"
 ])
 AS_IF([test "${ac_cv_3dnow_inline}" != "no"], [
   AC_DEFINE(CAN_COMPILE_3DNOW, 1,
@@ -1587,19 +1605,22 @@ else
 fi
 
 dnl NOTE: this can't be cached cleanly
-AS_IF([test "${CFLAGS_TUNING}"],
-   [CFLAGS_save="${CFLAGS}"
-    CFLAGS="${CFLAGS} ${CFLAGS_TUNING}"
-
-    AC_MSG_CHECKING([whether $CC accepts ${CFLAGS_TUNING}])
-    AC_COMPILE_IFELSE([AC_LANG_SOURCE([])],
-                      [tuning="yes"],
-                      [CFLAGS_TUNING=""; tuning="no"
-                       AS_IF([test "${with_tuning}"],
-                             [AC_MSG_ERROR([requested tuning not supported])])])
-
-    AC_MSG_RESULT([$tuning])
-    CFLAGS="${CFLAGS_save}"
+AS_IF([test -n "${CFLAGS_TUNING}"], [
+  AC_MSG_CHECKING([whether $CC accepts ${CFLAGS_TUNING}])
+  CFLAGS="${CFLAGS_save} ${CFLAGS_TUNING}"
+  AC_COMPILE_IFELSE([AC_LANG_SOURCE([])], [
+    tuning="yes"
+  ], [
+    CFLAGS_TUNING=""; tuning="no"
+    AS_IF([test "${with_tuning}"], [
+      AC_MSG_ERROR([requested tuning not supported])
+    ])
+  ])
+  CFLAGS="${CFLAGS_save}"
+  AC_MSG_RESULT([$tuning])
+  VLC_RESTORE_FLAGS
+  CFLAGS="${CFLAGS} ${CFLAGS_TUNING}"
+  VLC_SAVE_FLAGS
 ])
 
 dnl
