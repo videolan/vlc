@@ -995,6 +995,8 @@ void matroska_segment_c::ParseAttachments( KaxAttachments *attachments )
                                                         GetChild<KaxMimeType>( *attachedFile ),
                                                         img_data.GetSize() );
 
+        msg_Dbg( &sys.demuxer, "|   |   - %s (%s)", new_attachment->fileName(), new_attachment->mimeType() );
+
         if( new_attachment->init() )
         {
              memcpy( new_attachment->p_data, img_data.GetBuffer(), img_data.GetSize() );
