@@ -49,6 +49,7 @@
 #include <vlc_fs.h>
 #include <vlc_url.h>
 #include <vlc_strings.h>
+#include <vlc_charset.h>
 
 enum
 {
@@ -375,10 +376,11 @@ block_t *DirBlock (access_t *p_access)
 
         /* Add node to XSPF extension */
         char *old_xspf_ext = p_sys->xspf_ext;
+        EnsureUTF8 (entry);
         char *title = convert_xml_special_chars (entry);
-        if (old_xspf_ext != NULL && title != NULL
+        if (old_xspf_ext != NULL
          && asprintf (&p_sys->xspf_ext, "%s  <vlc:node title=\"%s\">\n",
-                      old_xspf_ext, title) == -1)
+                      old_xspf_ext, title ? title : "?") == -1)
             p_sys->xspf_ext = NULL;
         free (old_xspf_ext);
         free (title);
