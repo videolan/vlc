@@ -37,6 +37,23 @@
 #  define CPU_CAPABILITY_SSE4_1  (1<<10)
 #  define CPU_CAPABILITY_SSE4_2  (1<<11)
 #  define CPU_CAPABILITY_SSE4A   (1<<12)
+
+# if defined (__MMX__)
+#  define VLC_MMX
+# elif VLC_GCC_VERSION(4, 4)
+#  define VLC_MMX __attribute__ ((__target__ ("mmx")))
+# else
+#  define VLC_MMX VLC_MMX_is_not_implemented_on_this_compiler
+# endif
+
+# if defined (__SSE__)
+#  define VLC_SSE
+# elif VLC_GCC_VERSION(4, 4)
+#  define VLC_SSE __attribute__ ((__target__ ("sse")))
+# else
+#  define VLC_SSE VLC_SSE_is_not_implemented_on_this_compiler
+# endif
+
 # else
 #  define CPU_CAPABILITY_MMX     (0)
 #  define CPU_CAPABILITY_3DNOW   (0)
