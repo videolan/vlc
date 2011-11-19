@@ -398,7 +398,7 @@ AM_CONDITIONAL(HAVE_WINCE,   test "${SYS}" = "mingwce")
 AM_CONDITIONAL(HAVE_SYMBIAN, test "${SYS}" = "symbian")
 
 dnl
-dnl Sadly autoconf doesn't think about testing foo.exe when ask to test
+dnl Sadly autoconf does not think about testing foo.exe when ask to test
 dnl for program foo on win32
 
 case "${build_os}" in
@@ -554,7 +554,7 @@ AC_CHECK_FUNCS(fdatasync,,
   [AC_DEFINE(fdatasync, fsync, [Alias fdatasync() to fsync() if missing.])
 ])
 
-# Windows CE doesn't have strcoll()
+# Windows CE does not have strcoll()
 AC_FUNC_STRCOLL
 
 dnl Check for non-standard system calls
@@ -2433,7 +2433,7 @@ then
     then
       dnl  The given directory can't be found
       AC_MSG_RESULT(no)
-      AC_MSG_ERROR([${with_mad_tree} directory doesn't exist])
+      AC_MSG_ERROR([${with_mad_tree} directory does not exist])
     fi
     dnl  Use a custom libmad
     AC_MSG_CHECKING(for mad.h in ${real_mad_tree})
@@ -2446,12 +2446,12 @@ then
       AC_CHECK_LIB(mad, mad_bit_init, [
         VLC_ADD_PLUGIN([mpgatofixed32])
         VLC_ADD_LIBS([mpgatofixed32],[-lmad])
-        ],[ AC_MSG_ERROR([the specified tree hasn't been compiled ])
+        ],[ AC_MSG_ERROR([the specified tree has not been compiled ])
       ],[])
       LDFLAGS="${LDFLAGS_save}"
     else
       AC_MSG_RESULT(no)
-      AC_MSG_ERROR([the specified tree doesn't have mad.h])
+      AC_MSG_ERROR([the specified tree does not have mad.h])
     fi
   else
     CPPFLAGS="${CPPFLAGS_save} ${CPPFLAGS_mpgatofixed32}"
@@ -2774,7 +2774,7 @@ then
     then
       dnl  The given directory can't be found
       AC_MSG_RESULT(no)
-      AC_MSG_ERROR([${with_a52_tree} directory doesn't exist])
+      AC_MSG_ERROR([${with_a52_tree} directory does not exist])
     fi
     dnl  Use a custom a52dec
     AC_MSG_CHECKING(for a52.h in ${real_a52_tree}/include)
@@ -2793,13 +2793,13 @@ then
         then
           AC_MSG_ERROR([make sure you have at least a52dec-0.7.3 ($real_a52_tree)])
         else
-          AC_MSG_ERROR([the specified tree hasn't been compiled])
+          AC_MSG_ERROR([the specified tree has not been compiled])
         fi
       ])
       LDFLAGS="${LDFLAGS_save}"
     else
       AC_MSG_RESULT(no)
-      AC_MSG_ERROR([the specified tree doesn't have a52.h])
+      AC_MSG_ERROR([the specified tree does not have a52.h])
     fi
   else
     if test -z "${with_a52}"
@@ -2931,7 +2931,7 @@ if test "${enable_x264}" != "no"; then
     then
       dnl  The given directory can't be found
       AC_MSG_RESULT(no)
-      AC_MSG_ERROR([${with_x264_tree} directory doesn't exist])
+      AC_MSG_ERROR([${with_x264_tree} directory does not exist])
     fi
     dnl  Use a custom libx264
     AC_MSG_CHECKING(for x264.h in ${real_x264_tree})
@@ -2948,12 +2948,12 @@ if test "${enable_x264}" != "no"; then
           VLC_ADD_CFLAGS([x264], [-DPTW32_STATIC_LIB])
         fi
       ],[
-        AC_MSG_ERROR([the specified tree hasn't been compiled])
+        AC_MSG_ERROR([the specified tree has not been compiled])
       ])
       LDFLAGS="${LDFLAGS_save}"
     else
       AC_MSG_RESULT(no)
-      AC_MSG_ERROR([the specified tree doesn't have x264.h])
+      AC_MSG_ERROR([the specified tree does not have x264.h])
     fi
   else
       PKG_CHECK_MODULES(X264,x264 >= 0.86, [
@@ -3799,7 +3799,7 @@ dnl
 dnl Simple test for skins2 dependency
 dnl
 AS_IF([test "${enable_skins2}" != "no" && test "x$enable_qt4" = "xno"], [
-  AC_MSG_ERROR([The skins2 module depends on a the Qt4 development package. Without it you won't be able to open any dialog box from the interface, which makes the skins2 interface rather useless. Install the Qt4 development package or alternatively you can also configure with: --disable-qt4 --disable-skins2.])
+  AC_MSG_ERROR([The skins2 module depends on a the Qt4 development package. Without it you will not be able to open any dialog box from the interface, which makes the skins2 interface rather useless. Install the Qt4 development package or alternatively you can also configure with: --disable-qt4 --disable-skins2.])
 ])
 
 dnl
