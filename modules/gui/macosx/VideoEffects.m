@@ -400,7 +400,6 @@ static VLCVideoEffects *_o_sharedInstance = nil;
         }
     }
     config_PutPsz( p_intf, psz_filter_type, psz_string );
-    msg_Dbg( p_intf, "set string '%s'", psz_string );
 
     /* Try to set on the fly */
     if( !strcmp( psz_filter_type, "video-splitter" ) )
@@ -413,11 +412,31 @@ static VLCVideoEffects *_o_sharedInstance = nil;
         vout_thread_t *p_vout = getVout();
         if( p_vout )
         {
-            NSLog( @"set on the fly" );
             var_SetString( p_vout, psz_filter_type, psz_string );
             vlc_object_release( p_vout );
         }
     }
+}
+
+- (void)restartFilterIfNeeded: (char *)psz_filter option: (char *)psz_name
+{
+    vlc_object_t *p_filter = vlc_object_find_name( pl_Get(p_intf), psz_filter );
+    int i_type;
+    i_type = var_Type( p_filter, psz_name );
+    if( i_type == 0 )
+        i_type = config_GetType( p_intf, psz_name );
+
+    if( !(i_type & VLC_VAR_ISCOMMAND) )
+    {
+        msg_Warn( p_intf, "Brute-restarting filter '%s', because the last changed option isn't a command", psz_name );
+        [self setVideoFilter: psz_filter on: NO];
+        [self setVideoFilter: psz_filter on: YES];
+    }
+    else
+        msg_Dbg( p_intf, "restart not needed" );
+
+    if( p_filter )
+        vlc_object_release( p_filter );
 }
 
 - (void)setVideoFilterProperty: (char *)psz_name forFilter: (char *)psz_filter integer: (int)i_value
@@ -438,7 +457,10 @@ static VLCVideoEffects *_o_sharedInstance = nil;
         var_SetInteger( p_filter, psz_name, i_value );
         config_PutInt( p_intf, psz_name, i_value );
         vlc_object_release( p_vout );
+        vlc_object_release( p_filter );
     }
+
+    [self restartFilterIfNeeded:psz_filter option: psz_name];
 }
 
 - (void)setVideoFilterProperty: (char *)psz_name forFilter: (char *)psz_filter float: (float)f_value
@@ -459,7 +481,10 @@ static VLCVideoEffects *_o_sharedInstance = nil;
         var_SetFloat( p_filter, psz_name, f_value );
         config_PutFloat( p_intf, psz_name, f_value );
         vlc_object_release( p_vout );
+        vlc_object_release( p_filter );
     }
+
+    [self restartFilterIfNeeded:psz_filter option: psz_name];
 }
 
 - (void)setVideoFilterProperty: (char *)psz_name forFilter: (char *)psz_filter string: (char *)psz_value
@@ -480,7 +505,10 @@ static VLCVideoEffects *_o_sharedInstance = nil;
         var_SetString( p_filter, psz_name, psz_value );
         config_PutPsz( p_intf, psz_name, psz_value );
         vlc_object_release( p_vout );
+        vlc_object_release( p_filter );
     }
+
+    [self restartFilterIfNeeded:psz_filter option: psz_name];
 }
 
 - (void)setVideoFilterProperty: (char *)psz_name forFilter: (char *)psz_filter boolean: (BOOL)b_value
@@ -642,12 +670,14 @@ static VLCVideoEffects *_o_sharedInstance = nil;
 
 - (IBAction)transformModifierChanged:(id)sender
 {
-    if( [[o_transform_pop selectedItem] tag] == 1 )
-        config_PutPsz( p_intf, "transform-type", "hflip" );
-    else if( [[o_transform_pop selectedItem] tag] == 2 )
-        config_PutPsz( p_intf, "transform-type", "vflip" );
-    else
-        config_PutPsz( p_intf, "transform-type", (char *)[o_transform_pop tag] );
+    NSInteger tag = [[o_transform_pop selectedItem] tag];
+    char * psz_string = (char *)[[NSString stringWithFormat:@"%i", tag] UTF8String];
+    if( tag == 1 )
+        psz_string = (char *)"hflip";
+    else if( tag == 2 )
+        psz_string = (char *)"vflip";
+
+    [self setVideoFilterProperty: "transform-type" forFilter: "transform" string: psz_string];
 }
 
 - (IBAction)enableZoom:(id)sender
