@@ -2332,7 +2332,7 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
 -(void)resetValues
 {
 #warning Reset prefs of the module selector is broken atm. 
-    NSLog( @"don't forget about modulelistconfig" );
+    msg_Err( VLCIntf, "don't forget about modulelistconfig" );
     [super resetValues];
 }
 

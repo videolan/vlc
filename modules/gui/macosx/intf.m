@@ -154,18 +154,17 @@ static int WindowControl( vout_window_t *p_wnd, int i_query, va_list args )
 {
     /* TODO */
     if( i_query == VOUT_WINDOW_SET_STATE )
-        NSLog( @"WindowControl:VOUT_WINDOW_SET_STATE" );
+        msg_Dbg( p_wnd, "WindowControl:VOUT_WINDOW_SET_STATE" );
     else if( i_query == VOUT_WINDOW_SET_SIZE )
     {
-        NSLog( @"WindowControl:VOUT_WINDOW_SET_SIZE" );
         unsigned int i_width  = va_arg( args, unsigned int );
         unsigned int i_height = va_arg( args, unsigned int );
         [[VLCMain sharedInstance] setNativeVideoSize:NSMakeSize( i_width, i_height )];
     }
     else if( i_query == VOUT_WINDOW_SET_FULLSCREEN )
-        NSLog( @"WindowControl:VOUT_WINDOW_SET_FULLSCREEN" );
+        msg_Dbg( p_wnd, "WindowControl:VOUT_WINDOW_SET_FULLSCREEN" );
     else
-        NSLog( @"WindowControl: unknown query" );
+        msg_Dbg( p_wnd, "WindowControl: unknown query" );
     return VLC_SUCCESS;
 }
 
@@ -173,8 +172,7 @@ void WindowClose( vout_window_t *p_wnd )
 {
     NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
     [[VLCMain sharedInstance] setActiveVideoPlayback:NO];
-    NSLog( @"Window Close" );
-    // tell the interface to get rid of the video, TODO
+
     [o_pool release];
 }
 
