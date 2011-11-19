@@ -564,12 +564,44 @@ static VLCVideoEffects *_o_sharedInstance = nil;
 
 #pragma mark -
 #pragma mark crop
+
+#define updateopposite( giver, taker ) \
+    if (sender == giver) \
+        [taker setIntValue: [giver intValue]]
+
 - (IBAction)cropObjectChanged:(id)sender
 {
-    if( [o_crop_sync_top_bottom_ckb state] )
-        [o_crop_bottom_fld setIntValue: [o_crop_top_fld intValue]];
-    if( [o_crop_sync_left_right_ckb state] )
-        [o_crop_right_fld setIntValue: [o_crop_left_fld intValue]];
+    updateopposite( o_crop_top_fld, o_crop_top_stp );
+    updateopposite( o_crop_top_stp, o_crop_top_fld );
+    updateopposite( o_crop_left_fld, o_crop_left_stp );
+    updateopposite( o_crop_left_stp, o_crop_left_fld );
+    updateopposite( o_crop_right_fld, o_crop_right_stp );
+    updateopposite( o_crop_right_stp, o_crop_right_fld );
+    updateopposite( o_crop_bottom_fld, o_crop_bottom_stp );
+    updateopposite( o_crop_bottom_stp, o_crop_bottom_fld );
+
+    if( [o_crop_sync_top_bottom_ckb state] ) {
+        if (sender == o_crop_top_fld || sender == o_crop_top_stp ) {
+            [o_crop_bottom_fld setIntValue: [o_crop_top_fld intValue]];
+            [o_crop_bottom_stp setIntValue: [o_crop_top_fld intValue]];
+        }
+        else
+        {
+            [o_crop_top_fld setIntValue: [o_crop_bottom_fld intValue]];
+            [o_crop_top_stp setIntValue: [o_crop_bottom_fld intValue]];
+        }
+    }
+    if( [o_crop_sync_left_right_ckb state] ) {
+        if (sender == o_crop_left_fld || sender == o_crop_left_stp ) {
+            [o_crop_right_fld setIntValue: [o_crop_left_fld intValue]];
+            [o_crop_right_stp setIntValue: [o_crop_left_fld intValue]];
+        }
+        else
+        {
+            [o_crop_left_fld setIntValue: [o_crop_right_fld intValue]];
+            [o_crop_left_stp setIntValue: [o_crop_right_fld intValue]];
+        }
+    }
 
     vout_thread_t *p_vout = getVout();
     if( p_vout ) {
@@ -580,6 +612,8 @@ static VLCVideoEffects *_o_sharedInstance = nil;
         vlc_object_release( p_vout );
     }
 }
+
+#undef updateopposite
 
 #pragma mark -
 #pragma mark geometry

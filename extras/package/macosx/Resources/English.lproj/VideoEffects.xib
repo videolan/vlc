@@ -717,7 +717,7 @@
                 <object class="BGHUDTabViewItem" id="52756061">
                   <string key="NSIdentifier">crop</string>
                   <object class="NSView" key="NSView" id="838226260">
-                    <nil key="NSNextResponder"/>
+                    <reference key="NSNextResponder" ref="898819366"/>
                     <int key="NSvFlags">256</int>
                     <object class="NSMutableArray" key="NSSubviews">
                       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -1220,6 +1220,7 @@
                       </object>
                     </object>
                     <string key="NSFrame">{{10, 33}, {638, 197}}</string>
+                    <reference key="NSSuperview" ref="898819366"/>
                   </object>
                   <string key="NSLabel">Crop</string>
                   <reference key="NSColor" ref="279270326"/>
@@ -1698,7 +1699,7 @@
                 <object class="NSTabViewItem" id="133975353">
                   <string key="NSIdentifier">color</string>
                   <object class="NSView" key="NSView" id="10628740">
-                    <reference key="NSNextResponder" ref="898819366"/>
+                    <nil key="NSNextResponder"/>
                     <int key="NSvFlags">256</int>
                     <object class="NSMutableArray" key="NSSubviews">
                       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -2743,7 +2744,6 @@
                       </object>
                     </object>
                     <string key="NSFrame">{{10, 33}, {638, 197}}</string>
-                    <reference key="NSSuperview" ref="898819366"/>
                   </object>
                   <string key="NSLabel">Color</string>
                   <reference key="NSColor" ref="279270326"/>
@@ -3457,7 +3457,7 @@
                   <reference key="NSTabView" ref="898819366"/>
                 </object>
               </object>
-              <reference key="NSSelectedTabViewItem" ref="133975353"/>
+              <reference key="NSSelectedTabViewItem" ref="52756061"/>
               <object class="NSFont" key="NSFont">
                 <string key="NSName">LucidaGrande</string>
                 <double key="NSSize">13</double>
@@ -3469,7 +3469,7 @@
               <nil key="themeKey"/>
               <object class="NSMutableArray" key="NSSubviews">
                 <bool key="EncodedWithXMLCoder">YES</bool>
-                <reference ref="10628740"/>
+                <reference ref="838226260"/>
               </object>
             </object>
           </object>
@@ -3488,38 +3488,6 @@
     <object class="IBObjectContainer" key="IBDocument.Objects">
       <object class="NSMutableArray" key="connectionRecords">
         <bool key="EncodedWithXMLCoder">YES</bool>
-        <object class="IBConnectionRecord">
-          <object class="IBActionConnection" key="connection">
-            <string key="label">takeIntegerValueFrom:</string>
-            <reference key="source" ref="411363183"/>
-            <reference key="destination" ref="726085921"/>
-          </object>
-          <int key="connectionID">82</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBActionConnection" key="connection">
-            <string key="label">takeIntegerValueFrom:</string>
-            <reference key="source" ref="190644777"/>
-            <reference key="destination" ref="308507287"/>
-          </object>
-          <int key="connectionID">91</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBActionConnection" key="connection">
-            <string key="label">takeIntegerValueFrom:</string>
-            <reference key="source" ref="950709956"/>
-            <reference key="destination" ref="1010555455"/>
-          </object>
-          <int key="connectionID">99</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBActionConnection" key="connection">
-            <string key="label">takeIntegerValueFrom:</string>
-            <reference key="source" ref="785525140"/>
-            <reference key="destination" ref="764981534"/>
-          </object>
-          <int key="connectionID">108</int>
-        </object>
         <object class="IBConnectionRecord">
           <object class="IBActionConnection" key="connection">
             <string key="label">takeIntegerValueFrom:</string>
@@ -4775,6 +4743,70 @@
             <reference key="destination" ref="20899909"/>
           </object>
           <int key="connectionID">683</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">cropObjectChanged:</string>
+            <reference key="source" ref="707254443"/>
+            <reference key="destination" ref="37947909"/>
+          </object>
+          <int key="connectionID">684</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">cropObjectChanged:</string>
+            <reference key="source" ref="707254443"/>
+            <reference key="destination" ref="726085921"/>
+          </object>
+          <int key="connectionID">685</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">cropObjectChanged:</string>
+            <reference key="source" ref="707254443"/>
+            <reference key="destination" ref="718775388"/>
+          </object>
+          <int key="connectionID">686</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">cropObjectChanged:</string>
+            <reference key="source" ref="707254443"/>
+            <reference key="destination" ref="147696409"/>
+          </object>
+          <int key="connectionID">687</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_crop_bottom_stp</string>
+            <reference key="source" ref="707254443"/>
+            <reference key="destination" ref="308507287"/>
+          </object>
+          <int key="connectionID">688</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_crop_left_stp</string>
+            <reference key="source" ref="707254443"/>
+            <reference key="destination" ref="764981534"/>
+          </object>
+          <int key="connectionID">689</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_crop_right_stp</string>
+            <reference key="source" ref="707254443"/>
+            <reference key="destination" ref="1010555455"/>
+          </object>
+          <int key="connectionID">690</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_crop_top_stp</string>
+            <reference key="source" ref="707254443"/>
+            <reference key="destination" ref="726085921"/>
+          </object>
+          <int key="connectionID">691</int>
         </object>
       </object>
       <object class="IBMutableOrderedSet" key="objectRecords">
@@ -7847,7 +7879,7 @@
         </object>
       </object>
       <nil key="sourceID"/>
-      <int key="maxID">683</int>
+      <int key="maxID">691</int>
     </object>
     <object class="IBClassDescriber" key="IBDocument.Classes">
       <object class="NSMutableArray" key="referencedPartialClassDescriptionsV3.1+">
@@ -7873,7 +7905,6 @@
               <string>enableBanding:</string>
               <string>enableBlur:</string>
               <string>enableClone:</string>
-              <string>enableEraseLogo:</string>
               <string>enableExtract:</string>
               <string>enableGradient:</string>
               <string>enableGrain:</string>
@@ -7890,7 +7921,6 @@
               <string>enableWaterEffect:</string>
               <string>enableWaves:</string>
               <string>enableZoom:</string>
-              <string>eraseLogoModifierChanged:</string>
               <string>extractModifierChanged:</string>
               <string>gradientModifierChanged:</string>
               <string>grainSliderChanged:</string>
@@ -7904,8 +7934,6 @@
             </object>
             <object class="NSMutableArray" key="dict.values">
               <bool key="EncodedWithXMLCoder">YES</bool>
-              <string>id</string>
-              <string>id</string>
               <string>id</string>
               <string>id</string>
               <string>id</string>
@@ -7966,7 +7994,6 @@
               <string>enableBanding:</string>
               <string>enableBlur:</string>
               <string>enableClone:</string>
-              <string>enableEraseLogo:</string>
               <string>enableExtract:</string>
               <string>enableGradient:</string>
               <string>enableGrain:</string>
@@ -7983,7 +8010,6 @@
               <string>enableWaterEffect:</string>
               <string>enableWaves:</string>
               <string>enableZoom:</string>
-              <string>eraseLogoModifierChanged:</string>
               <string>extractModifierChanged:</string>
               <string>gradientModifierChanged:</string>
               <string>grainSliderChanged:</string>
@@ -8054,10 +8080,6 @@
                 <string key="candidateClassName">id</string>
               </object>
               <object class="IBActionInfo">
-                <string key="name">enableEraseLogo:</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBActionInfo">
                 <string key="name">enableExtract:</string>
                 <string key="candidateClassName">id</string>
               </object>
@@ -8119,10 +8141,6 @@
               </object>
               <object class="IBActionInfo">
                 <string key="name">enableZoom:</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBActionInfo">
-                <string key="name">eraseLogoModifierChanged:</string>
                 <string key="candidateClassName">id</string>
               </object>
               <object class="IBActionInfo">
@@ -8210,21 +8228,18 @@
               <string>o_clone_lbl</string>
               <string>o_crop_bottom_fld</string>
               <string>o_crop_bottom_lbl</string>
+              <string>o_crop_bottom_stp</string>
               <string>o_crop_left_fld</string>
               <string>o_crop_left_lbl</string>
+              <string>o_crop_left_stp</string>
               <string>o_crop_right_fld</string>
               <string>o_crop_right_lbl</string>
+              <string>o_crop_right_stp</string>
               <string>o_crop_sync_left_right_ckb</string>
               <string>o_crop_sync_top_bottom_ckb</string>
               <string>o_crop_top_fld</string>
               <string>o_crop_top_lbl</string>
-              <string>o_eraselogo_ckb</string>
-              <string>o_eraselogo_left_fld</string>
-              <string>o_eraselogo_left_lbl</string>
-              <string>o_eraselogo_mask_fld</string>
-              <string>o_eraselogo_mask_lbl</string>
-              <string>o_eraselogo_top_fld</string>
-              <string>o_eraselogo_top_lbl</string>
+              <string>o_crop_top_stp</string>
               <string>o_extract_ckb</string>
               <string>o_extract_fld</string>
               <string>o_extract_lbl</string>
@@ -8367,9 +8382,6 @@
               <string>id</string>
               <string>id</string>
               <string>id</string>
-              <string>id</string>
-              <string>id</string>
-              <string>id</string>
             </object>
           </object>
           <object class="NSMutableDictionary" key="toOneOutletInfosByName">
@@ -8415,21 +8427,18 @@
               <string>o_clone_lbl</string>
               <string>o_crop_bottom_fld</string>
               <string>o_crop_bottom_lbl</string>
+              <string>o_crop_bottom_stp</string>
               <string>o_crop_left_fld</string>
               <string>o_crop_left_lbl</string>
+              <string>o_crop_left_stp</string>
               <string>o_crop_right_fld</string>
               <string>o_crop_right_lbl</string>
+              <string>o_crop_right_stp</string>
               <string>o_crop_sync_left_right_ckb</string>
               <string>o_crop_sync_top_bottom_ckb</string>
               <string>o_crop_top_fld</string>
               <string>o_crop_top_lbl</string>
-              <string>o_eraselogo_ckb</string>
-              <string>o_eraselogo_left_fld</string>
-              <string>o_eraselogo_left_lbl</string>
-              <string>o_eraselogo_mask_fld</string>
-              <string>o_eraselogo_mask_lbl</string>
-              <string>o_eraselogo_top_fld</string>
-              <string>o_eraselogo_top_lbl</string>
+              <string>o_crop_top_stp</string>
               <string>o_extract_ckb</string>
               <string>o_extract_fld</string>
               <string>o_extract_lbl</string>
@@ -8634,6 +8643,10 @@
                 <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
+                <string key="name">o_crop_bottom_stp</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
                 <string key="name">o_crop_left_fld</string>
                 <string key="candidateClassName">id</string>
               </object>
@@ -8642,11 +8655,19 @@
                 <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
+                <string key="name">o_crop_left_stp</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
                 <string key="name">o_crop_right_fld</string>
                 <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_crop_right_lbl</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_crop_right_stp</string>
                 <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
@@ -8666,31 +8687,7 @@
                 <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
-                <string key="name">o_eraselogo_ckb</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_eraselogo_left_fld</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_eraselogo_left_lbl</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_eraselogo_mask_fld</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_eraselogo_mask_lbl</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_eraselogo_top_fld</string>
-                <string key="candidateClassName">id</string>
-              </object>
-              <object class="IBToOneOutletInfo">
-                <string key="name">o_eraselogo_top_lbl</string>
+                <string key="name">o_crop_top_stp</string>
                 <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">

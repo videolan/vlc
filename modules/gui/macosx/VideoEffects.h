@@ -58,12 +58,16 @@
     /* crop */
     IBOutlet id o_crop_top_lbl;
     IBOutlet id o_crop_top_fld;
+    IBOutlet id o_crop_top_stp;
     IBOutlet id o_crop_left_lbl;
     IBOutlet id o_crop_left_fld;
+    IBOutlet id o_crop_left_stp;
     IBOutlet id o_crop_right_lbl;
     IBOutlet id o_crop_right_fld;
+    IBOutlet id o_crop_right_stp;
     IBOutlet id o_crop_bottom_lbl;
     IBOutlet id o_crop_bottom_fld;
+    IBOutlet id o_crop_bottom_stp;
     IBOutlet id o_crop_sync_top_bottom_ckb;
     IBOutlet id o_crop_sync_left_right_ckb;
 
