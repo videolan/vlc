@@ -97,81 +97,6 @@ AS_IF([test -n "${with_binary_version}"],[
 ])
 
 dnl
-dnl  Check for the contrib directory
-dnl
-AC_ARG_WITH(contrib,
-  [AS_HELP_STRING([--with-contrib[=DIR]],
-    [search for 3rd party libraries in DIR/include and DIR/lib])
-])
-AC_MSG_CHECKING([for 3rd party libraries path])
-AS_IF([test -z "${with_contrib}" || test "${with_contrib}" = "yes"], [
-  CONTRIB_DIR="${srcdir}/contrib/${host}"
-  AS_IF([test ! -d "${CONTRIB_DIR}"], [
-    echo "${CONTRIB_DIR} not found" >&AS_MESSAGE_LOG_FD
-    CONTRIB_DIR="${srcdir}/contrib/`$CC -dumpmachine`"
-    AS_IF([test ! -d "${CONTRIB_DIR}"], [
-      echo "${CONTRIB_DIR} not found" >&AS_MESSAGE_LOG_FD
-      CONTRIB_DIR="${srcdir}/extras/contrib/hosts/${host}"
-      AS_IF([test ! -d "${CONTRIB_DIR}"], [
-        echo "${CONTRIB_DIR} not found" >&AS_MESSAGE_LOG_FD
-        CONTRIB_DIR="${srcdir}/extras/contrib/hosts/`$CC -dumpmachine`"
-        AS_IF([test ! -d "${CONTRIB_DIR}"], [
-          echo "${CONTRIB_DIR} not found" >&AS_MESSAGE_LOG_FD
-          CONTRIB_DIR=""
-          AC_MSG_RESULT([not found])
-        ])
-      ])
-    ])
-  ])
-], [
-  AS_IF([test "${with_contrib}" != "no"], [
-    CONTRIB_DIR="${with_contrib}"
-  ], [
-    CONTRIB_DIR=""
-    AC_MSG_RESULT([disabled])
-  ])
-])
-AS_IF([test -n "${CONTRIB_DIR}"], [
-  AS_IF([test -d "${CONTRIB_DIR}/lib"],[
-    CONTRIB_DIR=`cd "${CONTRIB_DIR}" && pwd`
-  ], [
-    echo "${CONTRIB_DIR}/lib not found" >&AS_MESSAGE_LOG_FD
-    CONTRIB_DIR=""
-    AC_MSG_RESULT([not usable])
-  ])
-
-])
-AS_IF([test -n "${CONTRIB_DIR}"], [
-  AC_MSG_RESULT([${CONTRIB_DIR}])
-  export PATH=${CONTRIB_DIR}/bin:$PATH
-  CPPFLAGS="${CPPFLAGS} -I${CONTRIB_DIR}/include"
-  CPPFLAGS_save="${CPPFLAGS_save} -I${CONTRIB_DIR}/include"
-  CFLAGS="${CFLAGS} -I${CONTRIB_DIR}/include"
-  CFLAGS_save="${CFLAGS_save} -I${CONTRIB_DIR}/include"
-  CXXFLAGS="${CXXFLAGS} -I${CONTRIB_DIR}/include"
-  CXXFLAGS_save="${CXXFLAGS_save} -I${CONTRIB_DIR}/include"
-  OBJCFLAGS="${OBJCFLAGS} -I${CONTRIB_DIR}/include"
-  OBJCFLAGS_save="${OBJCFLAGS_save} -I${CONTRIB_DIR}/include"
-  AS_IF([test "$build" = "$host" -o "$PKG_CONFIG_LIBDIR"], [
-    export PKG_CONFIG_PATH="${CONTRIB_DIR}/lib/pkgconfig:$PKG_CONFIG_PATH"
-  ], [
-    export PKG_CONFIG_LIBDIR="${CONTRIB_DIR}/lib/pkgconfig"
-  ])
-  LDFLAGS="${LDFLAGS} -L${CONTRIB_DIR}/lib"
-  LDFLAGS_save="${LDFLAGS_save} -L${CONTRIB_DIR}/lib"
-
-  AS_IF([test "${SYS}" = "darwin"], [
-    export LD_LIBRARY_PATH="${CONTRIB_DIR}/lib:$LD_LIBRARY_PATH"
-    export DYLD_LIBRARY_PATH="${CONTRIB_DIR}/lib:$DYLD_LIBRARY_PATH"
-  ])
-], [
-  AS_IF([test -n "${with_contrib}" && test "${with_contrib}" != "no"], [
-    AC_MSG_ERROR([Third party libraries not found!])
-  ])
-])
-AC_SUBST(CONTRIB_DIR)
-
-dnl
 dnl  Check the operating system
 dnl
 HAVE_WIN64="0"
@@ -391,6 +316,81 @@ AM_CONDITIONAL(HAVE_WIN32,   test "${SYS}" = "mingw32")
 AM_CONDITIONAL(HAVE_WIN64,   test "${HAVE_WIN64}" = "1")
 AM_CONDITIONAL(HAVE_WINCE,   test "${SYS}" = "mingwce")
 AM_CONDITIONAL(HAVE_SYMBIAN, test "${SYS}" = "symbian")
+
+dnl
+dnl  Check for the contrib directory
+dnl
+AC_ARG_WITH(contrib,
+  [AS_HELP_STRING([--with-contrib[=DIR]],
+    [search for 3rd party libraries in DIR/include and DIR/lib])
+])
+AC_MSG_CHECKING([for 3rd party libraries path])
+AS_IF([test -z "${with_contrib}" || test "${with_contrib}" = "yes"], [
+  CONTRIB_DIR="${srcdir}/contrib/${host}"
+  AS_IF([test ! -d "${CONTRIB_DIR}"], [
+    echo "${CONTRIB_DIR} not found" >&AS_MESSAGE_LOG_FD
+    CONTRIB_DIR="${srcdir}/contrib/`$CC -dumpmachine`"
+    AS_IF([test ! -d "${CONTRIB_DIR}"], [
+      echo "${CONTRIB_DIR} not found" >&AS_MESSAGE_LOG_FD
+      CONTRIB_DIR="${srcdir}/extras/contrib/hosts/${host}"
+      AS_IF([test ! -d "${CONTRIB_DIR}"], [
+        echo "${CONTRIB_DIR} not found" >&AS_MESSAGE_LOG_FD
+        CONTRIB_DIR="${srcdir}/extras/contrib/hosts/`$CC -dumpmachine`"
+        AS_IF([test ! -d "${CONTRIB_DIR}"], [
+          echo "${CONTRIB_DIR} not found" >&AS_MESSAGE_LOG_FD
+          CONTRIB_DIR=""
+          AC_MSG_RESULT([not found])
+        ])
+      ])
+    ])
+  ])
+], [
+  AS_IF([test "${with_contrib}" != "no"], [
+    CONTRIB_DIR="${with_contrib}"
+  ], [
+    CONTRIB_DIR=""
+    AC_MSG_RESULT([disabled])
+  ])
+])
+AS_IF([test -n "${CONTRIB_DIR}"], [
+  AS_IF([test -d "${CONTRIB_DIR}/lib"],[
+    CONTRIB_DIR=`cd "${CONTRIB_DIR}" && pwd`
+  ], [
+    echo "${CONTRIB_DIR}/lib not found" >&AS_MESSAGE_LOG_FD
+    CONTRIB_DIR=""
+    AC_MSG_RESULT([not usable])
+  ])
+
+])
+AS_IF([test -n "${CONTRIB_DIR}"], [
+  AC_MSG_RESULT([${CONTRIB_DIR}])
+  export PATH=${CONTRIB_DIR}/bin:$PATH
+  CPPFLAGS="${CPPFLAGS} -I${CONTRIB_DIR}/include"
+  CPPFLAGS_save="${CPPFLAGS_save} -I${CONTRIB_DIR}/include"
+  CFLAGS="${CFLAGS} -I${CONTRIB_DIR}/include"
+  CFLAGS_save="${CFLAGS_save} -I${CONTRIB_DIR}/include"
+  CXXFLAGS="${CXXFLAGS} -I${CONTRIB_DIR}/include"
+  CXXFLAGS_save="${CXXFLAGS_save} -I${CONTRIB_DIR}/include"
+  OBJCFLAGS="${OBJCFLAGS} -I${CONTRIB_DIR}/include"
+  OBJCFLAGS_save="${OBJCFLAGS_save} -I${CONTRIB_DIR}/include"
+  AS_IF([test "$build" = "$host" -o "$PKG_CONFIG_LIBDIR"], [
+    export PKG_CONFIG_PATH="${CONTRIB_DIR}/lib/pkgconfig:$PKG_CONFIG_PATH"
+  ], [
+    export PKG_CONFIG_LIBDIR="${CONTRIB_DIR}/lib/pkgconfig"
+  ])
+  LDFLAGS="${LDFLAGS} -L${CONTRIB_DIR}/lib"
+  LDFLAGS_save="${LDFLAGS_save} -L${CONTRIB_DIR}/lib"
+
+  AS_IF([test "${SYS}" = "darwin"], [
+    export LD_LIBRARY_PATH="${CONTRIB_DIR}/lib:$LD_LIBRARY_PATH"
+    export DYLD_LIBRARY_PATH="${CONTRIB_DIR}/lib:$DYLD_LIBRARY_PATH"
+  ])
+], [
+  AS_IF([test -n "${with_contrib}" && test "${with_contrib}" != "no"], [
+    AC_MSG_ERROR([Third party libraries not found!])
+  ])
+])
+AC_SUBST(CONTRIB_DIR)
 
 dnl
 dnl Sadly autoconf does not think about testing foo.exe when ask to test
