@@ -112,6 +112,7 @@ package-win-strip: package-win-common
 
 
 package-win32-webplugin-common: package-win-strip
+	mkdir -p "$(win32_xpi_destdir)/"
 	cp -r $(win32_destdir)/plugins/ "$(win32_xpi_destdir)/"
 	find $(prefix) -maxdepth 4 -name "*$(LIBEXT)" -exec cp {} "$(win32_xpi_destdir)/" \;
 	cp $(top_builddir)/npapi-vlc/npapi/npvlc.dll.manifest "$(win32_xpi_destdir)/plugins/"
@@ -121,12 +122,12 @@ package-win32-webplugin-common: package-win-strip
 
 
 package-win32-xpi: package-win32-webplugin-common
-	cp $(top_builddir)/npapi-vlc/npapi/install.rdf "$(win32_xpi_destdir)"
+	cp $(top_builddir)/npapi-vlc/npapi/install.rdf "$(win32_xpi_destdir)/"
 	cd $(win32_xpi_destdir) && zip -r "../vlc-$(VERSION).xpi" install.rdf plugins
 
 
 package-win32-crx: package-win32-webplugin-common
-	cp $(top_builddir)/npapi-vlc/npapi/manifest.json "$(win32_xpi_destdir)"
+	cp $(top_builddir)/npapi-vlc/npapi/manifest.json "$(win32_xpi_destdir)/"
 	crxmake --pack-extension "$(win32_xpi_destdir)" \
 		--extension-output "$(win32_destdir)/vlc-$(VERSION).crx" --ignore-file install.rdf
 
