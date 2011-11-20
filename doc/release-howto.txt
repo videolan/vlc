@@ -33,7 +33,7 @@
   - Update developers.v.o/vlc and www.v.o/vlc/download-sources.html
 
  * Win32 Packages
-  - configure using the extras/package/win32/configure-mingw-release.sh script
+  - configure using the extras/package/win32/configure.sh script
   - move to altair and generate md5 plus SHA1 hashes and gpg signature of these files
     (c.f. Tarballs)
 
