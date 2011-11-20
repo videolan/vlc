@@ -172,11 +172,6 @@ AS_IF([test -n "${CONTRIB_DIR}"], [
 AC_SUBST(CONTRIB_DIR)
 
 dnl
-dnl  Set default values
-dnl
-LDFLAGS_vlc="${LDFLAGS}"
-
-dnl
 dnl  Check the operating system
 dnl
 HAVE_WIN64="0"
@@ -1561,7 +1556,7 @@ dnl - Others: test should fail
 
   AC_CACHE_CHECK([if linker needs -framework vecLib],
     [ac_cv_ld_altivec],
-    [LDFLAGS="${LDFLAGS_vlc} -Wl,-framework,vecLib"
+    [LDFLAGS="${LDFLAGS} -Wl,-framework,vecLib"
      AC_TRY_LINK([],,ac_cv_ld_altivec=yes,ac_cv_ld_altivec=no)
      LDFLAGS="${LDFLAGS_save}"
     ])
@@ -2467,7 +2462,7 @@ AM_CONDITIONAL([MERGE_FFMPEG], [test "$enable_merge_ffmpeg" != "no"])
 
 AC_CACHE_CHECK([if linker supports -Bsymbolic],
   [ac_cv_ld_bsymbolic],
-  [LDFLAGS="${LDFLAGS_vlc} -Wl,-Bsymbolic"
+  [LDFLAGS="${LDFLAGS} -Wl,-Bsymbolic"
     AC_TRY_LINK([],,ac_cv_ld_bsymbolic=yes,ac_cv_ld_bsymbolic=no)
     LDFLAGS="${LDFLAGS_save}"
   ])
