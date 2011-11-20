@@ -115,7 +115,7 @@ package-macosx: VLC-release.app ChangeLog
 	hdiutil convert "$(top_builddir)/vlc-$(VERSION)-rw.dmg" -format UDBZ -o "$(top_builddir)/vlc-$(VERSION).dmg"
 	ls -l "$(top_builddir)/vlc-$(VERSION).dmg"
 
-package-macosx-zip: VLC-release.app
+package-macosx-zip: VLC-release.app ChangeLog
 	mkdir -p $(top_builddir)/vlc-$(VERSION)/Goodies/
 	cp -R $(top_builddir)/VLC-release.app $(top_builddir)/vlc-$(VERSION)/VLC.app
 	cp $(top_builddir)/ChangeLog $(top_builddir)/vlc-$(VERSION)/Goodies/
@@ -124,10 +124,11 @@ package-macosx-zip: VLC-release.app
 	cp $(srcdir)/extras/package/macosx/README.MacOSX.rtf $(top_builddir)/vlc-$(VERSION)/Read\ Me.rtf
 	zip -r -y -9 $(top_builddir)/vlc-$(VERSION).zip $(top_builddir)/vlc-$(VERSION)
 
-package-macosx-framework-zip:
+package-macosx-framework-zip: ChangeLog
 	mkdir -p $(top_builddir)/vlckit-$(VERSION)/Goodies/
 	cp -R $(srcdir)/projects/macosx/framework/build/Debug/VLCKit.framework $(top_builddir)/vlckit-$(VERSION)/
-	cd $(srcdir); cp AUTHORS COPYING ChangeLog README THANKS NEWS $(abs_top_builddir)/vlckit-$(VERSION)/Goodies/
+	cp $(top_builddir)/ChangeLog $(top_builddir)/vlckit-$(VERSION)/Goodies/
+	cd $(srcdir); cp AUTHORS COPYING README THANKS NEWS $(abs_top_builddir)/vlckit-$(VERSION)/Goodies/
 	zip -r -y -9 $(top_builddir)/vlckit-$(VERSION).zip $(top_builddir)/vlckit-$(VERSION)
 
 package-translations:
