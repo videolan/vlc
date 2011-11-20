@@ -911,6 +911,22 @@ int dvb_set_dvbt2 (dvb_device_t *d, uint32_t freq, const char *modstr,
 }
 
 
+/*** ISDB-C ***/
+int dvb_set_isdbc (dvb_device_t *d, uint32_t freq, const char *modstr,
+                   uint32_t srate, uint32_t fec)
+{
+    unsigned mod = dvb_parse_modulation (modstr, QAM_AUTO);
+    fec = dvb_parse_fec (fec);
+
+    if (dvb_find_frontend (d, FE_QAM, FE_IS_STUPID))
+        return -1;
+    return dvb_set_props (d, 6, DTV_CLEAR, 0,
+                          DTV_DELIVERY_SYSTEM, SYS_DVBC_ANNEX_AC,
+                          DTV_FREQUENCY, freq, DTV_MODULATION, mod,
+                          DTV_SYMBOL_RATE, srate, DTV_INNER_FEC, fec);
+}
+
+
 /*** ISDB-S ***/
 int dvb_set_isdbs (dvb_device_t *d, uint64_t freq_Hz, uint16_t ts_id)
 {

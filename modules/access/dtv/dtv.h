@@ -90,6 +90,10 @@ int dvb_set_dvbt2 (dvb_device_t *, uint32_t freq, const char *mod,
 int dvb_set_atsc (dvb_device_t *, uint32_t freq, const char *mod);
 int dvb_set_cqam (dvb_device_t *, uint32_t freq, const char *mod);
 
+/* ISDB-C */
+int dvb_set_isdbc (dvb_device_t *, uint32_t freq, const char *mod,
+                   uint32_t srate, uint32_t fec);
+
 /* ISDB-S */
 /* TODO: modulation? */
 int dvb_set_isdbs (dvb_device_t *, uint64_t freq, uint16_t ts_id);

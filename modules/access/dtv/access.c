@@ -230,7 +230,7 @@ vlc_module_begin ()
     set_capability ("access", 0)
     set_callbacks (Open, Close)
     add_shortcut ("dtv", "tv", "dvb", /* "radio", "dab",*/
-                  "cable", "dvb-c", "cqam"
+                  "cable", "dvb-c", "cqam", "isdb-c",
                   "satellite", "dvb-s", "dvb-s2", "isdb-s",
                   "terrestrial", "dvb-t", "dvb-t2", "isdb-t", "atsc")
 
@@ -405,7 +405,7 @@ typedef struct delsys
 } delsys_t;
 
 static const delsys_t dvbc, dvbs, dvbs2, dvbt, dvbt2;
-static const delsys_t isdbs, isdbt;
+static const delsys_t isdbc, isdbs, isdbt;
 static const delsys_t atsc, cqam;
 
 static block_t *Read (access_t *);
@@ -621,6 +621,8 @@ static const delsys_t *GuessSystem (const char *scheme, dvb_device_t *dev)
         return &dvbt;
     if (!strcasecmp (scheme, "dvb-t2"))
         return &dvbt2;
+    if (!strcasecmp (scheme, "isdb-c"))
+        return &isdbc;
     if (!strcasecmp (scheme, "isdb-s"))
         return &isdbs;
     if (!strcasecmp (scheme, "isdb-t"))
@@ -884,6 +886,19 @@ static int dvbt2_setup (vlc_object_t *obj, dvb_device_t *dev, uint64_t freq)
 
 static const delsys_t dvbt = { .setup = dvbt_setup };
 static const delsys_t dvbt2 = { .setup = dvbt2_setup };
+
+
+/*** ISDB-C ***/
+static int isdbc_setup (vlc_object_t *obj, dvb_device_t *dev, uint64_t freq)
+{
+    const char *mod = var_InheritModulation (obj, "dvb-modulation");
+    uint32_t fec = var_InheritCodeRate (obj, "dvb-fec");
+    unsigned srate = var_InheritInteger (obj, "dvb-srate");
+
+    return dvb_set_isdbc (dev, freq, mod, srate, fec);
+}
+
+static const delsys_t isdbc = { .setup = isdbc_setup };
 
 
 /*** ISDB-S ***/
