@@ -85,5 +85,6 @@ endif
 	rm -f -- "$(PREFIX)/include/vpx/config.h"
 	$(RANLIB) $</libvpx.a
 	# Of course! Why the hell would it be listed or in make install?
-	install -D -- $</libvpx.a "$(PREFIX)/lib/libvpx.a"
+	mkdir -p -- "$(PREFIX)/lib"
+	install -- $</libvpx.a "$(PREFIX)/lib/libvpx.a"
 	touch $@
