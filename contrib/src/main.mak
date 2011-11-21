@@ -239,7 +239,7 @@ mostlyclean:
 	-$(RM) $(foreach p,$(PKGS_ALL),.$(p) .sum-$(p) .dep-$(p))
 	-$(RM) toolchain.cmake
 	-$(RM) -R "$(PREFIX)"
-	-find -maxdepth 1 -type d '!' -name . -exec $(RM) -R '{}' ';'
+	-$(RM) -R */
 
 clean: mostlyclean
 	-$(RM) $(TARBALLS)/*.*
