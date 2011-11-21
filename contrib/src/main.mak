@@ -89,6 +89,19 @@ STRIP := $(HOST)-strip
 endif
 endif
 
+ifdef HAVE_MACOSX
+OSX_VERSION=10.6
+MACOSX_SDK=/Developer/SDKs/MacOSX$(OSX_VERSION).sdk
+CC=gcc-4.2
+CXX=g++-4.2
+EXTRA_CFLAGS += -isysroot $(MACOSX_SDK) -mmacosx-version-min=$(OSX_VERSION)
+EXTRA_LDFLAGS += -Wl,-syslibroot $(MACOSX_SDK) -mmacosx-version-min=$(OSX_VERSION) -isysroot $(MACOSX_SDK)
+# FIXME
+EXTRA_CFLAGS += -m32
+EXTRA_LDFLAGS += -m32
+endif
+
+
 EXTRA_CFLAGS += -I$(PREFIX)/include
 CPPFLAGS := $(CPPFLAGS) $(EXTRA_CFLAGS)
 CFLAGS := $(CFLAGS) $(EXTRA_CFLAGS)
