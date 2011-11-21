@@ -119,7 +119,7 @@ package-macosx-zip: VLC-release.app ChangeLog
 	mkdir -p $(top_builddir)/vlc-$(VERSION)/Goodies/
 	cp -R $(top_builddir)/VLC-release.app $(top_builddir)/vlc-$(VERSION)/VLC.app
 	cp $(top_builddir)/ChangeLog $(top_builddir)/vlc-$(VERSION)/Goodies/
-	cd $(srcdir); cp AUTHORS COPYING README THANKS NEWS extras/package/macosx/Delete_Preferences.app \
+	cd $(srcdir); cp -R AUTHORS COPYING README THANKS NEWS extras/package/macosx/Delete_Preferences.app/ \
 		$(abs_top_builddir)/vlc-$(VERSION)/Goodies/
 	cp $(srcdir)/extras/package/macosx/README.MacOSX.rtf $(top_builddir)/vlc-$(VERSION)/Read\ Me.rtf
 	zip -r -y -9 $(top_builddir)/vlc-$(VERSION).zip $(top_builddir)/vlc-$(VERSION)
