@@ -1,24 +1,33 @@
 binary package creation/downloading/extraction (prebuilt contribs)
 
-### Software that fails to build on MacOSX
+### Software that fails to build on MacOSX intel
 
-SDL
-    Undefined symbol __dyld_func_lookup
-SDL_image
-    depends on SDL
+        for 64 bits only:
+nettle
+    undefined symbols when making lib
 
+
+        for 32 bits only:
 flac
     linker segfaults
 
 gcrypt
     rijndael.c:895: error: can't find a register in class 'GENERAL_REGS' while reloading 'asm'
 
+gmp
+    tmp-dive_1.s:108:junk `@GOT' after expression
+
+
+        for 32 and 64 bits
+
+SDL
+    Undefined symbol __dyld_func_lookup
+SDL_image
+    depends on SDL
+
 gnutls
     infrastructure mismatch between Makefile.in.in and autoconf macros (different gettext vers)
     if we don't run autoreconf => ld: library not found for -lhogweed
-
-gmp
-    tmp-dive_1.s:108:junk `@GOT' after expression
 
 live555
     use old libtool options (/usr/bin/libtool), we use GNU
