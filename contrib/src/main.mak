@@ -95,7 +95,7 @@ MACOSX_SDK=/Developer/SDKs/MacOSX$(OSX_VERSION).sdk
 CC=gcc-4.2
 CXX=g++-4.2
 EXTRA_CFLAGS += -isysroot $(MACOSX_SDK) -mmacosx-version-min=$(OSX_VERSION)
-EXTRA_LDFLAGS += -Wl,-syslibroot $(MACOSX_SDK) -mmacosx-version-min=$(OSX_VERSION) -isysroot $(MACOSX_SDK)
+EXTRA_LDFLAGS += -Wl,-syslibroot,$(MACOSX_SDK) -mmacosx-version-min=$(OSX_VERSION) -isysroot $(MACOSX_SDK)
 # FIXME
 EXTRA_CFLAGS += -m32
 EXTRA_LDFLAGS += -m32
