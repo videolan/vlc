@@ -1116,10 +1116,12 @@
         vlc_gc_decref( p_input );
     }
     PL_UNLOCK;
-    [o_outline_view selectRowIndexes:[NSIndexSet indexSetWithIndex:i_position] byExtendingSelection:YES];
-    [self playItem:nil];
+    if( i_position == -1 )
+        i_position = [o_outline_dict count] - 1;
 
     [self playlistUpdated];
+    [o_outline_view selectRowIndexes:[NSIndexSet indexSetWithIndex:i_position] byExtendingSelection:NO];
+    [self playItem:nil];
 }
 
 - (void)appendNodeArray:(NSArray*)o_array inNode:(playlist_item_t *)p_node atPos:(int)i_position enqueue:(BOOL)b_enqueue
