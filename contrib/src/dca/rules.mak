@@ -21,6 +21,7 @@ libdca: libdca-$(DCA_VERSION).tar.bz2 .sum-dca
 	$(MOVE)
 
 .dca: libdca
+	$(RECONF)
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF)
 	cd $< && $(MAKE) install
 	touch $@
