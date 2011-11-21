@@ -100,9 +100,14 @@ STRIP=strip
 RANLIB=ranlib
 EXTRA_CFLAGS += -isysroot $(MACOSX_SDK) -mmacosx-version-min=$(OSX_VERSION)
 EXTRA_LDFLAGS += -Wl,-syslibroot,$(MACOSX_SDK) -mmacosx-version-min=$(OSX_VERSION) -isysroot $(MACOSX_SDK)
-# FIXME
+#TODO ppc
+ifeq ($(ARCH),x86_64)
+EXTRA_CFLAGS += -m64
+EXTRA_LDFLAGS += -m64
+else
 EXTRA_CFLAGS += -m32
 EXTRA_LDFLAGS += -m32
+endif
 endif
 
 
