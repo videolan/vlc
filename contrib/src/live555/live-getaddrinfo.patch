@@ -44,7 +44,7 @@ diff -ru live.orig//groupsock/GroupsockHelper.cpp live//groupsock/GroupsockHelpe
 diff -ru live.orig//groupsock/inet.c live//groupsock/inet.c
 --- live.orig//groupsock/inet.c	2010-04-09 22:27:39.000000000 +0300
 +++ live//groupsock/inet.c	2010-04-17 20:14:07.000000000 +0300
-@@ -83,16 +83,6 @@
+@@ -76,16 +76,6 @@
  #define NULL 0
  #endif
  
@@ -58,7 +58,7 @@ diff -ru live.orig//groupsock/inet.c live//groupsock/inet.c
 -}
 -#endif
 -
- #ifndef USE_OUR_RANDOM
+ #ifdef USE_SYSTEM_RANDOM
  /* Use the system-supplied "random()" and "srandom()" functions */
  #include <stdlib.h>
 diff -ru live.orig//groupsock/NetAddress.cpp live//groupsock/NetAddress.cpp
