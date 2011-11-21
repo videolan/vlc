@@ -1,11 +1,33 @@
+binary package creation/downloading/extraction (prebuilt contribs)
+
+### Software that fails to build on MacOSX
+
+SDL
+    Undefined symbol __dyld_func_lookup
+SDL_image
+    depends on SDL
+
+flac
+    linker segfaults
+
+gcrypt
+    rijndael.c:895: error: can't find a register in class 'GENERAL_REGS' while reloading 'asm'
+
+gnutls
+    infrastructure mismatch between Makefile.in.in and autoconf macros (different gettext vers)
+    if we don't run autoreconf => ld: library not found for -lhogweed
+
+gmp
+    tmp-dive_1.s:108:junk `@GOT' after expression
+
+live555
+    use old libtool options (/usr/bin/libtool), we use GNU
+
+
 ### Missing software for MacOSX (was present in extras/contrib)
+
 
 # These 3 are binary framework downloads : no source code is used
 BGHUDAppKit
 Growl           -- last free version: 1.3.0: http://code.google.com/p/growl/source/list http://itunes.apple.com/us/app/growl/id467939042
 Sparkle
-
-# disabled in win32 builds, we could do the same for OSX
-vcdimager (and dependancy cdio)
-
-build tools     -- (autotools, libtool, yasm...) see extras/tools
