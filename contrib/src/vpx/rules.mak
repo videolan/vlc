@@ -13,6 +13,7 @@ libvpx: libvpx-$(VPX_VERSION).tar.bz2 .sum-vpx
 	$(APPLY) $(SRC)/vpx/libvpx-no-cross.patch
 	$(APPLY) $(SRC)/vpx/libvpx-no-abi.patch
 	$(APPLY) $(SRC)/vpx/libvpx-win64.patch
+	$(APPLY) $(SRC)/vpx/libvpx-darwin10.patch
 	$(MOVE)
 
 DEPS_vpx =
@@ -45,7 +46,7 @@ else ifdef HAVE_MACOSX
 ifeq ($(ARCH),arm)
 VPX_OS := darwin
 else
-VPX_OS := darwin9
+VPX_OS := darwin10
 endif
 else ifdef HAVE_SOLARIS
 VPX_OS := solaris
