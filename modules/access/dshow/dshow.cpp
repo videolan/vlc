@@ -942,7 +942,7 @@ static bool ConnectFilters( vlc_object_t *p_this, access_sys_t *p_sys,
             pins->Release();
             msg_Dbg( p_this, "ConnectFilters: graph_builder2 available.") ;
             if ( !Found )
-                msg_Warn( p_this, "ConnectFilters: No crossBar routes found (incobatible pin types)" ) ;
+                msg_Warn( p_this, "ConnectFilters: No crossBar routes found (incompatible pin types)" ) ;
         }
         return true;
     }
