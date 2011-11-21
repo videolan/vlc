@@ -159,7 +159,12 @@ HOSTCONF := --prefix="$(PREFIX)"
 HOSTCONF += --build="$(BUILD)" --host="$(HOST)" --target="$(HOST)"
 HOSTCONF += --program-prefix=""
 # libtool stuff:
-HOSTCONF += --enable-static --disable-shared --disable-dependency-tracking
+ifdef HAVE_MACOSX
+HOSTCONF += --enable-shared --disable-static
+else
+HOSTCONF += --enable-static --disable-shared
+endif
+HOSTCONF += --disable-dependency-tracking
 ifdef HAVE_WIN32
 HOSTCONF += --without-pic
 PIC :=
