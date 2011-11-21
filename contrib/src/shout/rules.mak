@@ -23,7 +23,6 @@ DEPS_shout = ogg $(DEPS_ogg) theora $(DEPS_theora) speex $(DEPS_speex)
 DEPS_shout += vorbis $(DEPS_vorbis)
 
 .shout: libshout
-	$(RECONF)
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF)
 	cd $< && $(MAKE) install
 	touch $@
