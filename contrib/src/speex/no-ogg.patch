@@ -1,0 +1,45 @@
+--- speex/configure.ac.orig	2011-11-20 22:56:33.351403106 -0500
++++ speex/configure.ac	2011-11-20 22:58:02.835846814 -0500
+@@ -112,7 +112,7 @@
+ 
+ AC_CHECK_HEADERS(sys/soundcard.h sys/audioio.h)
+ 
+-XIPH_PATH_OGG([src="src"], [src=""])
++src=
+ AC_SUBST(src)
+ 
+ AC_CHECK_LIB(m, sin)
+--- speex/src/Makefile.am.orig	2011-11-20 23:02:04.065043016 -0500
++++ speex/src/Makefile.am	2011-11-20 23:02:11.637080565 -0500
+@@ -5,7 +5,7 @@
+ # Disable automatic dependency tracking if using other tools than gcc and gmake
+ #AUTOMAKE_OPTIONS = no-dependencies
+ 
+-INCLUDES = -I$(top_srcdir)/include -I$(top_builddir)/include -I$(top_builddir) @OGG_CFLAGS@
++INCLUDES = -I$(top_srcdir)/include -I$(top_builddir)/include -I$(top_builddir)
+ 
+ man_MANS = speexenc.1 speexdec.1
+ 
+@@ -18,8 +18,8 @@
+ 
+ speexenc_SOURCES = speexenc.c wav_io.c skeleton.c
+ speexenc_LDADD = $(top_builddir)/libspeex/libspeex.la $(top_builddir)/libspeex/libspeexdsp.la \
+-	$(OGG_LIBS)  @FFT_LIBS@	
++	@FFT_LIBS@	
+ 
+ speexdec_SOURCES = speexdec.c wav_io.c
+ speexdec_LDADD = $(top_builddir)/libspeex/libspeex.la \
+-	$(OGG_LIBS)  @FFT_LIBS@
++	@FFT_LIBS@
+ 
+--- speex/libspeex/Makefile.am.orig	2011-11-20 23:04:54.033885844 -0500
++++ speex/libspeex/Makefile.am	2011-11-20 23:05:00.889919836 -0500
+@@ -4,7 +4,7 @@
+ 
+ EXTRA_DIST=echo_diagnostic.m
+ 
+-INCLUDES = -I$(top_srcdir)/include -I$(top_builddir)/include -I$(top_builddir) @OGG_CFLAGS@ @FFT_CFLAGS@
++INCLUDES = -I$(top_srcdir)/include -I$(top_builddir)/include -I$(top_builddir) @FFT_CFLAGS@
+ 
+ lib_LTLIBRARIES = libspeex.la libspeexdsp.la
+ 

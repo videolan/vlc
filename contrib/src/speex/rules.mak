@@ -15,11 +15,13 @@ $(TARBALLS)/speex-$(SPEEX_VERSION).tar.gz:
 
 speex: speex-$(SPEEX_VERSION).tar.gz .sum-speex
 	$(UNPACK)
+	$(APPLY) $(SRC)/speex/no-ogg.patch
 	$(MOVE)
 
 # TODO: fixed point and ASM opts
 
 .speex: speex
+	$(RECONF)
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) --without-ogg
 	cd $< && $(MAKE) install
 	touch $@
