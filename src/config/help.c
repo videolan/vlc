@@ -32,11 +32,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#ifdef HAVE_UNISTD_H
-# include <unistd.h>
-#elif defined( WIN32 ) && !defined( UNDER_CE )
-# include <io.h>
-#endif
 #if defined( WIN32 ) && !defined( UNDER_CE )
 static void ShowConsole (void);
 static void PauseConsole (void);

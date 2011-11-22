@@ -47,12 +47,6 @@
 #include <string.h>
 #include <stdlib.h>                                                /* free() */
 
-#ifdef HAVE_UNISTD_H
-#   include <unistd.h>
-#elif defined( WIN32 ) && !defined( UNDER_CE )
-#   include <io.h>
-#endif
-
 #include "config/vlc_getopt.h"
 
 #ifdef HAVE_LOCALE_H
