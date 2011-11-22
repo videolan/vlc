@@ -112,6 +112,13 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QWidget *_par )
     layout->addLayout( topbarLayout, 0, 1 );
     topbarLayout->setSpacing( 10 );
 
+    /* Button to clear playlist */
+    QToolButton *clearPlaylistButton = new QToolButton( this );
+    clearPlaylistButton->setIcon( style()->standardIcon( QStyle::SP_TrashIcon ) );
+    clearPlaylistButton->setToolTip( qtr("Clear playlist") );
+    topbarLayout->addWidget( clearPlaylistButton );
+    CONNECT( clearPlaylistButton, clicked(), this, clearPlaylist() );
+
     /* Button to switch views */
     QToolButton *viewButton = new QToolButton( this );
     viewButton->setIcon( style()->standardIcon( QStyle::SP_FileDialogDetailedView ) );
@@ -249,6 +256,19 @@ void PlaylistWidget::changeView( const QModelIndex& index )
     viewActions[i]->setChecked(true);
 }
 
+void PlaylistWidget::clearPlaylist()
+{
+    PLModel *model = PLModel::getPLModel( p_intf );
+    if( model->rowCount() < 1 ) return;
+
+    QModelIndexList* l = new QModelIndexList();
+    for( int i = 0; i < model->rowCount(); i++)
+    {
+        QModelIndex indexrecord = model->index( i, 0, QModelIndex() );
+        l->append( indexrecord );
+    }
+    model->doDelete(*l);
+}
 #include <QSignalMapper>
 #include <QMenu>
 #include <QPainter>

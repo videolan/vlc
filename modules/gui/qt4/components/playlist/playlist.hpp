@@ -75,6 +75,7 @@ protected:
     virtual void closeEvent( QCloseEvent * );
 private slots:
     void changeView( const QModelIndex& index );
+    void clearPlaylist();
 };
 
 #ifdef Q_WS_MAC
