@@ -114,7 +114,6 @@ struct es_out_sys_t
     /* all programs */
     int           i_pgrm;
     es_out_pgrm_t **pgrm;
-    es_out_pgrm_t **pp_selected_pgrm; /* --programs */
     es_out_pgrm_t *p_pgrm;  /* Master program */
 
     /* all es */
