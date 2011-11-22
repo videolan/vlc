@@ -26,6 +26,7 @@
 #include <vlc_plugin.h>
 #include <vlc_inhibit.h>
 #include <assert.h>
+#include <signal.h>
 #include <spawn.h>
 #include <sys/wait.h>
 
