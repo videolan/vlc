@@ -83,8 +83,6 @@ void system_Init( void )
     /* Set the default file-translation mode */
 #if !defined( UNDER_CE )
     _fmode = _O_BINARY;
-    _setmode( _fileno( stdin ), _O_BINARY ); /* Needed for pipes */
-
     timeBeginPeriod(5);
 #endif
 

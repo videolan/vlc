@@ -36,6 +36,8 @@
 # ifndef _WIN32_IE
 #   define  _WIN32_IE 0x501
 # endif
+# include <fcntl.h>
+# include <io.h>
 # include <shlobj.h>
 # include <wininet.h>
 # define PSAPI_VERSION 1
@@ -186,6 +188,8 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
         check_crashdump();
         SetUnhandledExceptionFilter(vlc_exception_filter);
     }
+
+    _setmode( _fileno( stdin ), _O_BINARY ); /* Needed for pipes */
 
 #else /* UNDER_CE */
     char **argv, psz_cmdline[wcslen(lpCmdLine) * 4];
