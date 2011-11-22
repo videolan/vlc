@@ -52,6 +52,10 @@ FILE *vlc_fopen (const char *filename, const char *mode)
 {
     int rwflags = 0, oflags = 0;
 
+#ifdef O_BINARY
+    /* Assume binary mode by default (i.e. no translation) */
+    oflags |= O_BINARY;
+#endif
     for (const char *ptr = mode; *ptr; ptr++)
     {
         switch (*ptr)
@@ -74,7 +78,7 @@ FILE *vlc_fopen (const char *filename, const char *mode)
                 rwflags = O_RDWR;
                 break;
 
-#ifdef O_TEXT
+#ifdef O_BINARY
             case 'b':
                 oflags = (oflags & ~O_TEXT) | O_BINARY;
                 break;
