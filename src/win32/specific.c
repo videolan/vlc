@@ -34,8 +34,6 @@
 #include "../config/vlc_getopt.h"
 
 #if !defined( UNDER_CE )
-#   include <io.h>
-#   include <fcntl.h>
 #   include  <mmsystem.h>
 #endif
 
@@ -82,7 +80,6 @@ void system_Init( void )
 
     /* Set the default file-translation mode */
 #if !defined( UNDER_CE )
-    _fmode = _O_BINARY;
     timeBeginPeriod(5);
 #endif
 
