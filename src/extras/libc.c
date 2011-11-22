@@ -2,14 +2,8 @@
  * libc.c: Extra libc function for some systems.
  *****************************************************************************
  * Copyright (C) 2002-2006 the VideoLAN team
- * $Id$
  *
- * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
- *          Samuel Hocevar <sam@zoy.org>
- *          Gildas Bazin <gbazin@videolan.org>
- *          Derk-Jan Hartman <hartman at videolan dot org>
- *          Christophe Massiot <massiot@via.ecp.fr>
- *          Rémi Denis-Courmont <rem à videolan.org>
+ * Authors: Gildas Bazin <gbazin@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
