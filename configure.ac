@@ -338,21 +338,8 @@ AS_IF([test -z "${with_contrib}" || test "${with_contrib}" = "yes"], [
         CONTRIB_DIR="${srcdir}/extras/contrib/hosts/`$CC -dumpmachine`"
         AS_IF([test ! -d "${CONTRIB_DIR}"], [
           echo "${CONTRIB_DIR} not found" >&AS_MESSAGE_LOG_FD
-          AS_IF([test "${SYS}" = "mingw32"], [
-            if test "${HAVE_WIN64}" = "1"
-            then
-              CONTRIB_DIR="/usr/win64"
-            else
-              CONTRIB_DIR="/usr/win32"
-            fi
-            AS_IF([test ! -d "${CONTRIB_DIR}"], [
-              echo "${CONTRIB_DIR} not found" >&AS_MESSAGE_LOG_FD
-              CONTRIB_DIR=""
-              AC_MSG_RESULT([not found])
-            ])], [
-            CONTRIB_DIR=""
-            AC_MSG_RESULT([not found])
-          ])
+          CONTRIB_DIR=""
+          AC_MSG_RESULT([not found])
         ])
       ])
     ])
@@ -365,7 +352,6 @@ AS_IF([test -z "${with_contrib}" || test "${with_contrib}" = "yes"], [
     AC_MSG_RESULT([disabled])
   ])
 ])
-
 AS_IF([test -n "${CONTRIB_DIR}"], [
   AS_IF([test -d "${CONTRIB_DIR}/lib"],[
     CONTRIB_DIR=`cd "${CONTRIB_DIR}" && pwd`
@@ -376,7 +362,6 @@ AS_IF([test -n "${CONTRIB_DIR}"], [
   ])
 
 ])
-
 AS_IF([test -n "${CONTRIB_DIR}"], [
   AC_MSG_RESULT([${CONTRIB_DIR}])
   export PATH=${CONTRIB_DIR}/bin:$PATH
