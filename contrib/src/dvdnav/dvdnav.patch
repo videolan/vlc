@@ -10,37 +10,3 @@ diff -ruN libdvdnav/Makefile.am libdvdnav.new/Makefile.am
  
  EXTRA_DIST = autogen.sh \
  	     AUTHORS \
-diff -ruN libdvdnav/src/vm/vm.c libdvdnav.new/src/vm/vm.c
---- libdvdnav/src/vm/vm.c	2010-11-22 00:59:43.000000000 +0100
-+++ libdvdnav.new/src/vm/vm.c	2011-10-11 01:02:07.852470536 +0200
-@@ -174,12 +174,11 @@
-     fd = open(device, O_RDONLY);
-     if (fd > 0) {
-       off = lseek( fd, 32 * (off_t) DVD_VIDEO_LB_LEN, SEEK_SET );
--      if( off == ( 32 * (off_t) DVD_VIDEO_LB_LEN ) ) {
-+      if (off == 16) {
-         off = read( fd, data, DVD_VIDEO_LB_LEN );
--        close(fd);
-         if (off == ( (off_t) DVD_VIDEO_LB_LEN )) {
-           fprintf(MSG_OUT, "libdvdnav: DVD Title: ");
--          for(i=25; i < 73; i++ ) {
-+          for(i=40; i < 73; i++ ) {
-             if((data[i] == 0)) break;
-             if((data[i] > 32) && (data[i] < 127)) {
-               fprintf(MSG_OUT, "%c", data[i]);
-@@ -187,10 +186,12 @@
-               fprintf(MSG_OUT, " ");
-             }
-           }
--          strncpy(name, (char*) &data[25], 48);
--          name[48] = 0;
-+          strncpy(name, (char*) &data[40], 32);
-+          i=31;
-+          while( (i>=0) && (name[i] <= ' ')) --i;
-+          name[i+1] = '\0';
-           fprintf(MSG_OUT, "\nlibdvdnav: DVD Serial Number: ");
--          for(i=73; i < 89; i++ ) {
-+          for(i=813; i < 829; i++ ) {
-             if((data[i] == 0)) break;
-             if((data[i] > 32) && (data[i] < 127)) {
-               fprintf(MSG_OUT, "%c", data[i]);
