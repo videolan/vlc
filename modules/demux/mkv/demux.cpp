@@ -460,7 +460,7 @@ matroska_stream_c *demux_sys_t::AnalyseAllSegmentsFound( demux_t *p_demux, EbmlS
 {
     int i_upper_lvl = 0;
     EbmlElement *p_l0, *p_l1, *p_l2;
-    bool b_keep_stream = false, b_keep_segment;
+    bool b_keep_stream = false, b_keep_segment = false;
 
     // verify the EBML Header
     p_l0 = p_estream->FindNextID(EBML_INFO(EbmlHead), 0xFFFFFFFFL);
@@ -505,7 +505,6 @@ matroska_stream_c *demux_sys_t::AnalyseAllSegmentsFound( demux_t *p_demux, EbmlS
         {
             EbmlParser  *ep;
             matroska_segment_c *p_segment1 = new matroska_segment_c( *this, *p_estream );
-            b_keep_segment = b_initial;
 
             ep = new EbmlParser(p_estream, p_l0, &demuxer );
             p_segment1->ep = ep;
@@ -517,6 +516,7 @@ matroska_stream_c *demux_sys_t::AnalyseAllSegmentsFound( demux_t *p_demux, EbmlS
                 {
                     // find the families of this segment
                     KaxInfo *p_info = static_cast<KaxInfo*>(p_l1);
+                    b_keep_segment = b_initial;
 
                     p_info->Read(*p_estream, EBML_CLASS_CONTEXT(KaxInfo), i_upper_lvl, p_l2, true);
                     for( size_t i = 0; i < p_info->ListSize(); i++ )
