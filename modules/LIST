@@ -149,6 +149,7 @@ $Id$
  * headphone_channel_mixer:  headphone channel mixer with virtual spatialization effect
  * hildon: Maemo interface based on Hildon
  * hotkeys: hotkeys control module
+ * hqdn3d: High Quality denoising filter
  * htcpcp: HTCPCP access module
  * i420_rgb: planar YUV to packed RGB conversion functions
  * i420_rgb_mmx: MMX accelerated version of i420_rgb

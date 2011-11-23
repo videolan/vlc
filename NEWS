@@ -159,6 +159,7 @@ Video Filter:
  * New subsdelay filter to change subtitles delay
  * New anti-flickering filter
  * New OpenMAX DL IPCS filter for color space conversion and resizing
+ * New video filter for denoising, based on the famous hqdn3d filter
  * Major improvements in the freetype text-rendering module, notably supporting
    blackbox and customizable shadow.
    NB: The freetype module is now used by default on the Mac OS X instead of

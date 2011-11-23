@@ -1080,6 +1080,7 @@ modules/video_filter/gaussianblur.c
 modules/video_filter/gradient.c
 modules/video_filter/gradfun.c
 modules/video_filter/grain.c
+modules/video_filter/hqdn3d.c
 modules/video_filter/invert.c
 modules/video_filter/logo.c
 modules/video_filter/magnify.c
