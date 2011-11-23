@@ -442,7 +442,7 @@ void DiscOpenPanel::updateButtons()
         ui.diskOptionBox_2->show();
         ui.dvdsimple->setEnabled( true );
     }
-    if ( ui.bdRadioButton->isChecked() )
+    else if ( ui.bdRadioButton->isChecked() )
     {
         if( m_discType != BRD )
         {
