@@ -1,6 +1,7 @@
 #!/bin/sh
 
 OPTIONS="
+        --prefix=`pwd`/vlc_install_dir
         --enable-faad
         --enable-flac
         --enable-theora

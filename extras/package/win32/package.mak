@@ -20,7 +20,7 @@ endif
 endif
 
 package-win-install:
-	$(MAKE) DESTDIR="`pwd`"/vlc_install_dir install
+	$(MAKE) install
 	touch $@
 
 
@@ -28,7 +28,7 @@ package-win-common: package-win-install build-npapi
 	mkdir -p "$(win32_destdir)"/
 
 # Executables, major libs+manifests
-	find vlc_install_dir -maxdepth 4 \( -name "*$(LIBEXT)" -o -name "*$(EXEEXT)" \) -exec cp {} "$(win32_destdir)/" \;
+	find $(prefix) -maxdepth 4 \( -name "*$(LIBEXT)" -o -name "*$(EXEEXT)" \) -exec cp {} "$(win32_destdir)/" \;
 	cd $(top_srcdir)/extras/package/win32 && cp vlc$(EXEEXT).manifest libvlc$(LIBEXT).manifest "$(win32_destdir)/"
 
 # Text files, clean them from mail addresses
@@ -40,21 +40,21 @@ package-win-common: package-win-install build-npapi
 	done
 
 	cp $(srcdir)/share/icons/vlc.ico $(win32_destdir)
-	cp -r vlc_install_dir/lib/vlc/plugins $(win32_destdir)
-	-cp -r vlc_install_dir/share/locale $(win32_destdir)
+	cp -r $(prefix)/lib/vlc/plugins $(win32_destdir)
+	-cp -r $(prefix)/share/locale $(win32_destdir)
 
 if BUILD_LUA
 	mkdir -p $(win32_destdir)/lua/
-	cp -r vlc_install_dir/lib/vlc/lua/* vlc_install_dir/share/vlc/lua/* $(win32_destdir)/lua/
+	cp -r $(prefix)/lib/vlc/lua/* $(prefix)/share/vlc/lua/* $(win32_destdir)/lua/
 endif
 
 if BUILD_SKINS
 	rm -fr $(win32_destdir)/skins
-	cp -r vlc_install_dir/share/vlc/skins2 $(win32_destdir)/skins
+	cp -r $(prefix)/share/vlc/skins2 $(win32_destdir)/skins
 endif
 
 if BUILD_OSDMENU
-	cp -r vlc_install_dir/share/vlc/osdmenu "$(win32_destdir)/"
+	cp -r $(prefix)/share/vlc/osdmenu "$(win32_destdir)/"
 	for file in $(win32_destdir)/osdmenu/*.cfg; do \
 		sed -i.orig -e 's%share/osdmenu%osdmenu%g' -e 's%/%\\%g' "$$file"; \
 		rm -f -- "$${file}.orig"; \
@@ -77,12 +77,12 @@ endif
 
 # SDK
 	mkdir -p "$(win32_destdir)/sdk/lib/"
-	cp -r vlc_install_dir/include "$(win32_destdir)/sdk"
-	cp -r vlc_install_dir/lib/pkgconfig "$(win32_destdir)/sdk/lib"
-	cd vlc_install_dir/lib && cp -rv libvlc.dll.a libvlc.la libvlccore.dll.a libvlccore.la "$(win32_destdir)/sdk/lib/"
+	cp -r $(prefix)/include "$(win32_destdir)/sdk"
+	cp -r $(prefix)/lib/pkgconfig "$(win32_destdir)/sdk/lib"
+	cd $(prefix)/lib && cp -rv libvlc.dll.a libvlc.la libvlccore.dll.a libvlccore.la "$(win32_destdir)/sdk/lib/"
 if !HAVE_WINCE
-	$(DLLTOOL) -D libvlc.dll -l "$(win32_destdir)/sdk/lib/libvlc.lib" -d "$(top_builddir)/lib/.libs/libvlc.dll.def" "vlc_install_dir/bin/libvlc.dll"
-	$(DLLTOOL) -D libvlccore.dll -l "$(win32_destdir)/sdk/lib/libvlccore.lib" -d "$(top_builddir)/src/.libs/libvlccore.dll.def" "vlc_install_dir/bin/libvlccore.dll"
+	$(DLLTOOL) -D libvlc.dll -l "$(win32_destdir)/sdk/lib/libvlc.lib" -d "$(top_builddir)/lib/.libs/libvlc.dll.def" "$(prefix)/bin/libvlc.dll"
+	$(DLLTOOL) -D libvlccore.dll -l "$(win32_destdir)/sdk/lib/libvlccore.lib" -d "$(top_builddir)/src/.libs/libvlccore.dll.def" "$(prefix)/bin/libvlccore.dll"
 
 if !HAVE_WIN64
 	mkdir -p "$(win32_destdir)/sdk/activex/"
@@ -114,7 +114,7 @@ package-win-strip: package-win-common
 package-win32-webplugin-common: package-win-strip
 	mkdir -p "$(win32_xpi_destdir)/"
 	cp -r $(win32_destdir)/plugins/ "$(win32_xpi_destdir)/"
-	find vlc_install_dir -maxdepth 4 -name "*$(LIBEXT)" -exec cp {} "$(win32_xpi_destdir)/" \;
+	find $(prefix) -maxdepth 4 -name "*$(LIBEXT)" -exec cp {} "$(win32_xpi_destdir)/" \;
 	cp $(top_builddir)/npapi-vlc/npapi/npvlc.dll.manifest "$(win32_xpi_destdir)/plugins/"
 	cp "$(top_srcdir)/extras/package/win32/libvlc.dll.manifest" "$(win32_xpi_destdir)/plugins/"
 	rm -rf "$(win32_xpi_destdir)/plugins/*qt*"

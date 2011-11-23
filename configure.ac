@@ -221,6 +221,8 @@ case "${host_os}" in
         VLC_ADD_LIBS([win32text],[-lgdi32])
         VLC_ADD_LIBS([cdda vcdx sdl_image vout_sdl],[-lwinmm])
         AC_CHECK_PROGS(U2D, [unix2dos todos], unix2dos)
+        ac_default_prefix="`pwd`/_win32"
+        DESTDIR="`pwd`/_win32/"
 
         dnl
         dnl NSIS Installer prefix and WIN64
@@ -240,6 +242,8 @@ case "${host_os}" in
     if test "${SYS}" = "mingwce"; then
         VLC_ADD_LIBS([libvlccore],[-lmmtimer])
         AC_CHECK_PROGS(U2D, [unix2dos todos], unix2dos)
+        ac_default_prefix="`pwd`/_wince"
+        DESTDIR="`pwd`/_wince/"
     fi
     ;;
   *nto*)
