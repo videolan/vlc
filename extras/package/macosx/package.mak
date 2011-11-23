@@ -25,8 +25,8 @@ VLC-release.app: VLC-tmp.app
 
 
 VLC-tmp.app: vlc
-	$(AM_V_GEN)(cd src && $(MAKE) $(AM_MAKEFLAGS) install $(silentstd))
-	(cd lib && $(MAKE) $(AM_MAKEFLAGS) install $(silentstd))
+	$(AM_V_GEN)(cd src && $(MAKE) $(AM_MAKEFLAGS) DESTDIR="`pwd`"/vlc_install_dir install $(silentstd))
+	(cd lib && $(MAKE) $(AM_MAKEFLAGS) DESTDIR="`pwd`"/vlc_install_dir install $(silentstd))
 	rm -Rf "$(top_builddir)/tmp" "$@"
 	mkdir -p "$(top_builddir)/tmp/extras/package/macosx"
 	cd $(srcdir)/extras/package/macosx; cp -R vlc.xcodeproj Resources README.MacOSX.rtf $(abs_top_builddir)/tmp/extras/package/macosx/
