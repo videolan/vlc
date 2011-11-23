@@ -505,38 +505,40 @@ void DiscOpenPanel::updateMRL()
     else
         discPath = ui.deviceCombo->currentText();
 
-    /* CDDAX and VCDX not implemented. TODO ? No. */
+    /* MRL scheme */
     /* DVD */
     if( ui.dvdRadioButton->isChecked() ) {
         if( !ui.dvdsimple->isChecked() )
-            mrl = "dvd://" LOCALHOST + discPath;
+            mrl = "dvd://" LOCALHOST;
         else
             mrl = "dvdsimple://" LOCALHOST + discPath;
-
-        if ( ui.titleSpin->value() > 0 ) {
-            mrl += QString("@%1").arg( ui.titleSpin->value() );
-            if ( ui.chapterSpin->value() > 0 ) {
-                mrl+= QString(":%1").arg( ui.chapterSpin->value() );
-            }
-        }
-    } else if ( ui.bdRadioButton->isChecked() ) {
-        mrl = "bluray://" LOCALHOST + discPath;
-
+    } else if ( ui.bdRadioButton->isChecked() )
+        mrl = "bluray://" LOCALHOST;
     /* VCD */
-    } else if ( ui.vcdRadioButton->isChecked() ) {
-        mrl = "vcd://" LOCALHOST + discPath;
-
-        if( ui.titleSpin->value() > 0 )
-            mrl += QString("@%1").arg( ui.titleSpin->value() );
-
+    else if ( ui.vcdRadioButton->isChecked() )
+        mrl = "vcd://" LOCALHOST;
     /* CDDA */
-    } else {
-        mrl = "cdda://" LOCALHOST + discPath;
+    else
+        mrl = "cdda://" LOCALHOST;
+
+    mrl += discPath;
+
+    /* Title/chapter encoded in MRL */
+    if( ui.titleSpin->value() > 0 ) {
+        if( ui.dvdRadioButton->isChecked() || ui.bdRadioButton->isChecked() ) {
+            mrl += QString("#%1").arg( ui.titleSpin->value() );
+            if ( ui.chapterSpin->value() > 0 )
+                mrl+= QString(":%1").arg( ui.chapterSpin->value() );
+        }
+        else if ( ui.vcdRadioButton->isChecked() )
+            mrl += QString("@%1").arg( ui.titleSpin->value() );
     }
+
     emit methodChanged( "disc-caching" );
 
     fileList << mrl; mrl = "";
 
+    /* Input item options */
     if ( ui.dvdRadioButton->isChecked() || ui.vcdRadioButton->isChecked() )
     {
         if ( ui.audioSpin->value() >= 0 ) {
