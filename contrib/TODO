@@ -1,14 +1,9 @@
 binary package downloading/extraction (prebuilt contribs)
 
-### Software that fails to build on MacOSX intel
+### Missing software for MacOSX
 
-SDL_image
-    Undefined symbols (missing OpenGL framework?)
-
-dvdcss
-    Undefined symbols (missing CF framework?)
-
-### Missing software for MacOSX (was present in extras/contrib)
+SDL_image fails to build : Undefined symbols (missing OpenGL framework?)
+    => we used r4444 of their SVN on OSX (only) for undocumented reasons
 
 # These 3 are binary framework downloads : no source code is used
 BGHUDAppKit

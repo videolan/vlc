@@ -14,6 +14,7 @@ $(TARBALLS)/libdvdcss-$(DVDCSS_VERSION).tar.bz2:
 
 dvdcss: libdvdcss-$(DVDCSS_VERSION).tar.bz2 .sum-dvdcss
 	$(UNPACK)
+	$(APPLY) $(SRC)/dvdcss/no-tests.patch
 	$(MOVE)
 
 .dvdcss: dvdcss
