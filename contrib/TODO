@@ -9,9 +9,6 @@ nettle
 
         for 32 bits only:
 
-gcrypt
-    rijndael.c:895: error: can't find a register in class 'GENERAL_REGS' while reloading 'asm'
-
 gmp
     tmp-dive_1.s:108:junk `@GOT' after expression
 

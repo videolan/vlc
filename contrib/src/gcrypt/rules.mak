@@ -19,6 +19,9 @@ CONFIGURE_OPTS =
 ifdef HAVE_WIN64
 CONFIGURE_OPTS += --disable-asm
 endif
+ifdef HAVE_MACOSX
+CONFIGURE_OPTS += --disable-aesni-support
+endif
 .gcrypt: libgcrypt
 	#$(RECONF)
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) --enable-ciphers=aes,des,rfc2268,arcfour --enable-digests=sha1,md5,rmd160,sha512 --enable-pubkey-ciphers=dsa,rsa,ecc $(CONFIGURE_OPTS)
