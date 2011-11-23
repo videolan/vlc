@@ -1,11 +1,12 @@
 /*****************************************************************************
- * mkv.cpp : matroska demuxer
+ * virtual_segment.cpp : virtual segment implementation in the MKV demuxer
  *****************************************************************************
- * Copyright (C) 2003-2004 the VideoLAN team
+ * Copyright © 2003-2011 VideoLAN and VLC authors
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Steve Lhomme <steve.lhomme@free.fr>
+ *          Denis Charmet <typx@dinauz.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
