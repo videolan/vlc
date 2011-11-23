@@ -16,5 +16,5 @@ openjpeg: openjpeg_v$(OPENJPEG_VERSION).tgz .sum-openjpeg
 .openjpeg: openjpeg
 	$(RECONF)
 	cd $< && $(HOSTVARS) ./configure --enable-png=no --enable-tiff=no $(HOSTCONF)
-	cd $< && $(MAKE) install
+	cd $< && $(MAKE) -j1 install
 	touch $@
