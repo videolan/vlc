@@ -90,6 +90,7 @@ SOURCES_atmo = atmo/atmo.cpp \
 	atmo/AtmoPacketQueue.cpp atmo/AtmoPacketQueue.h
 SOURCES_gradfun = gradfun.c gradfun.h
 SOURCES_subsdelay = subsdelay.c
+SOURCES_hqdn3d = hqdn3d.c hqdn3d.h
 noinst_HEADERS = filter_picture.h
 
 libvlc_LTLIBRARIES += \
@@ -135,4 +136,5 @@ libvlc_LTLIBRARIES += \
 	libwave_plugin.la \
 	libgradfun_plugin.la \
 	libyuvp_plugin.la \
-	libantiflicker_plugin.la
+	libantiflicker_plugin.la \
+	libhqdn3d_plugin.la
