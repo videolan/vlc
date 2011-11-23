@@ -201,22 +201,13 @@ case "${host_os}" in
     AC_ARG_WITH(macosx-sdk,
       [AS_HELP_STRING([--with-macosx-sdk=DIR],
         [compile using the SDK in DIR])])
-    if test "${with_macosx_sdk}" != "" ; then
-        CPP="${CPP} -isysroot ${with_macosx_sdk}"
-        CC="${CC} -isysroot ${with_macosx_sdk}"
-        CXX="${CXX} -isysroot ${with_macosx_sdk}"
-        OBJC="${OBJC} -isysroot ${with_macosx_sdk}"
-        LD="${LD} -syslibroot ${with_macosx_sdk}"
-    else
-        echo "  No desired SDK version given, falling back to 10.5"
-        CPP="${CPP} -isysroot /Developer/SDKs/MacOSX10.5.sdk"
-        CC="${CC} -isysroot /Developer/SDKs/MacOSX10.5.sdk"
-        CXX="${CXX} -isysroot /Developer/SDKs/MacOSX10.5.sdk"
-        OBJC="${OBJC} -isysroot /Developer/SDKs/MacOSX10.5.sdk"
-        LD="${LD} -syslibroot /Developer/SDKs/MacOSX10.5.sdk"
-        with_macosx_version_min="10.5"
-        echo "  Assuming --with-macosx-version-min=10.5"
-    fi
+    test "${with_macosx_sdk}" = "" && with_macosx_sdk=/Developer/SDKs/MacOSX10.5.sdk
+    ! test -d "${with_macosx_sdk}" && AC_MSG_ERROR([SDK "${with_macosx_sdk}" not found])
+    CPP="${CPP} -isysroot ${with_macosx_sdk}"
+    CC="${CC} -isysroot ${with_macosx_sdk}"
+    CXX="${CXX} -isysroot ${with_macosx_sdk}"
+    OBJC="${OBJC} -isysroot ${with_macosx_sdk}"
+    LD="${LD} -syslibroot ${with_macosx_sdk}"
     AC_ARG_WITH(macosx-version-min,
       [AS_HELP_STRING([--with-macosx-version-min=VERSION],
         [compile for MacOS X VERSION and above])])
