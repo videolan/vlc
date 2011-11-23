@@ -634,12 +634,14 @@ void demux_sys_t::PreloadFamily( const matroska_segment_c & of_segment )
 }
 
 // preload all the linked segments for all preloaded segments
-void demux_sys_t::PreloadLinked()
+bool demux_sys_t::PreloadLinked()
 {
     size_t i, j;
     virtual_segment_c *p_seg;
 
     p_current_segment = VirtualFromSegments( &opened_segments );
+    if ( !p_current_segment )
+        return false;
 
     used_segments.push_back( p_current_segment );
 
@@ -679,10 +681,14 @@ void demux_sys_t::PreloadLinked()
     }
 
     // TODO decide which segment should be first used (VMG for DVD)
+
+    return true;
 }
 
 virtual_segment_c *demux_sys_t::VirtualFromSegments( std::vector<matroska_segment_c*> *p_segments ) const
 {
+    if ( p_segments->empty() )
+        return NULL;
     virtual_segment_c *p_result = new virtual_segment_c( p_segments );
     return p_result;
 }

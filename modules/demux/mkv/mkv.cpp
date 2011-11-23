@@ -234,9 +234,8 @@ static int Open( vlc_object_t * p_this )
         p_sys->PreloadFamily( *p_segment );
     }
 
-    p_sys->PreloadLinked();
-
-    if ( !p_sys->PreparePlayback( NULL ) )
+    if ( !p_sys->PreloadLinked() ||
+         !p_sys->PreparePlayback( NULL ) )
     {
         msg_Err( p_demux, "cannot use the segment" );
         goto error;

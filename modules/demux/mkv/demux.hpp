@@ -379,7 +379,7 @@ public:
     virtual_chapter_c *FindChapter( int64_t i_find_uid, virtual_segment_c * & p_segment_found );
 
     void PreloadFamily( const matroska_segment_c & of_segment );
-    void PreloadLinked();
+    bool PreloadLinked();
     bool PreparePlayback( virtual_segment_c *p_new_segment );
     matroska_stream_c *AnalyseAllSegmentsFound( demux_t *p_demux, EbmlStream *p_estream, bool b_initial = false );
     void JumpTo( virtual_segment_c & p_segment, virtual_chapter_c * p_chapter );
