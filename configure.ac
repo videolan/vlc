@@ -160,41 +160,7 @@ case "${host_os}" in
     VLC_ADD_LIBS([avcodec avformat access_avio swscale postproc i420_rgb_mmx x264],[-Wl,-read_only_relocs,suppress])
     VLC_ADD_CFLAGS([motion],[-fconstant-cfstrings])
     VLC_ADD_LIBS([libvlccore],[-Wl,-framework,CoreFoundation])
-    AC_ARG_ENABLE(macosx-defaults,
-      AS_HELP_STRING([--enable-macosx-defaults],[Build the default configuration on Mac OS X (default enabled)]))
-    if test "x${enable_macosx_defaults}" != "xno"
-    then
-        echo ""
-        echo "Building with Mac OS X defaults:"
-        build_dir=`pwd`
-        echo "  Assuming --prefix=${build_dir}/vlc_install_dir"
-        ac_default_prefix="${build_dir}/vlc_install_dir"
-        enable_faad="yes"
-        echo "  Assuming --enable-faad"
-        enable_flac="yes"
-        echo "  Assuming --enable-flac"
-        enable_theora="yes"
-        echo "  Assuming --enable-theora"
-        enable_shout="yes"
-        echo "  Assuming --enable-shout"
-        enable_vcdx="yes"
-        echo "  Assuming --enable-vcdx"
-        enable_caca="yes"
-        echo "  Assuming --enable-caca"
-        enable_ncurses="yes"
-        echo "  Assuming --enable-ncurses"
-        enable_twolame="yes"
-        echo "  Assuming --enable-twolame"
-        enable_realrtsp="yes"
-        echo "  Assuming --enable-realrtsp"
-        enable_libass="yes"
-        echo "  Assuming --enable-libass"
 
-        enable_skins2="no"
-        echo "  Assuming --disable-skins2"
-        enable_xcb="no"
-        echo "  Assuming --disable-xcb"
-    fi
     dnl
     dnl  Check for Mac OS X SDK settings
     dnl
