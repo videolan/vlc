@@ -1518,16 +1518,18 @@ void QVLCMenu::updateRecents( intf_thread_t *p_intf )
         {
             for( int i = 0; i < l.count(); ++i )
             {
-                char *psz_temp = decode_URI_duplicate( qtu( l.at( i ) ) );
+                QString mrl = l.at( i );
+                char *psz = decode_URI_duplicate( qtu( mrl ) );
+                QString text = qfu( psz );
 
+                free( psz );
                 action = recentsMenu->addAction(
                         QString( i < 9 ? "&%1: ": "%1: " ).arg( i + 1 ) +
-                            QApplication::fontMetrics().elidedText( psz_temp, Qt::ElideLeft, 400 ),
+                            QApplication::fontMetrics().elidedText( text,
+                                                          Qt::ElideLeft, 400 ),
                         rmrl->signalMapper, SLOT( map() ),
                         i < 9 ? QString( "Ctrl+%1" ).arg( i + 1 ) : "" );
                 rmrl->signalMapper->setMapping( action, l.at( i ) );
-
-                free( psz_temp );
             }
 
             recentsMenu->addSeparator();
