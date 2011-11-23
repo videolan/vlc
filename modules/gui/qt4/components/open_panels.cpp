@@ -526,9 +526,8 @@ void DiscOpenPanel::updateMRL()
     } else if ( ui.vcdRadioButton->isChecked() ) {
         mrl = "vcd://" LOCALHOST + discPath;
 
-        if( ui.titleSpin->value() > 0 ) {
-            mrl += QString("@E%1").arg( ui.titleSpin->value() );
-        }
+        if( ui.titleSpin->value() > 0 )
+            mrl += QString("@%1").arg( ui.titleSpin->value() );
 
     /* CDDA */
     } else {
