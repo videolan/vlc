@@ -11,9 +11,6 @@ dvdcss
 gnutls, gpg-error
     infrastructure mismatch between Makefile.in.in and autoconf macros (different gettext vers)
 
-live555
-    use old libtool options (/usr/bin/libtool), we use GNU
-
 ### Missing software for MacOSX (was present in extras/contrib)
 
 # These 3 are binary framework downloads : no source code is used

@@ -45,6 +45,9 @@ endif
 ifdef HAVE_WINCE
 	cd $< && sed -e 's/-lws2_32/-lws2/g' -i.orig config.mingw
 endif
+ifdef HAVE_MACOSX
+	cd $< && sed -i.orig -e s/"libtool -s -o"/"ar cr"/g config.macosx*
+endif
 	cd $< && sed \
 		-e 's%-DBSD=1%-DBSD=1\ $(EXTRA_CFLAGS)\ $(EXTRA_LDFLAGS)%' \
 		-e 's%cc%$(CC)%' \
