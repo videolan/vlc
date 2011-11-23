@@ -32,7 +32,15 @@ GNUTLS_CONF := \
 	--disable-guile \
 	$(HOSTCONF)
 
+USE_GCRYPT=0
 ifdef HAVE_WIN32
+USE_GCRYPT=1
+endif
+ifdef HAVE_MACOSX
+USE_GCRYPT=1
+endif
+
+ifeq (1,$(USE_GCRYPT))
 GNUTLS_CONF += --with-libgcrypt
 DEPS_gnutls = gcrypt $(DEPS_gcrypt)
 else
