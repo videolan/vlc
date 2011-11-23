@@ -3750,26 +3750,23 @@ dnl  MacOS X gui module
 dnl
 AC_ARG_ENABLE(macosx,
   [  --enable-macosx         Mac OS X gui support (default enabled on Mac OS X)])
-if test "x${enable_macosx}" != "xno" &&
-(test "${SYS}" = "darwin" || test "${enable_macosx}" = "yes")
+if test "x${enable_macosx}" != "xno" -a "${SYS}" = "darwin"
 then
-  VLC_ADD_LIBS([macosx minimal_macosx],[-Wl,-framework,Cocoa])
-  VLC_ADD_LIBS([macosx minimal_macosx],[-Wl,-framework,OpenGL])
-  VLC_ADD_LIBS([macosx minimal_macosx],            [-Wl,-framework,Carbon])
-  VLC_ADD_LIBS([macosx minimal_macosx],            [-Wl,-framework,CoreServices])
-  VLC_ADD_LIBS([macosx minimal_macosx],            [-Wl,-framework,AGL])
-  VLC_ADD_LIBS([macosx],                           [-Wl,-framework,QTKit])
-  VLC_ADD_LIBS([macosx],                           [-Wl,-framework,IOKit])
-  VLC_ADD_LIBS([macosx],                           [-F${CONTRIB_DIR}/Sparkle -Wl,-framework,Sparkle])
-  VLC_ADD_OBJCFLAGS([macosx],                         [-F${CONTRIB_DIR}/Sparkle])
-  VLC_ADD_LIBS([macosx],                           [-F${CONTRIB_DIR}/BGHUDAppKit -Wl,-framework,BGHUDAppKit])
-  VLC_ADD_OBJCFLAGS([macosx],                         [-F${CONTRIB_DIR}/BGHUDAppKit])
-  dnl For bug report
-  VLC_ADD_LIBS([macosx],                           [-Wl,-framework,AddressBook])
-  VLC_ADD_LIBS([macosx],                           [-Wl,-framework,WebKit])
+  VLC_ADD_LIBS([macosx minimal_macosx], [-Wl,-framework,Cocoa -Wl,-framework,OpenGL -Wl,-framework,Carbon -Wl,-framework,CoreServices -Wl,-framework,AGL])
   VLC_ADD_OBJCFLAGS([macosx minimal_macosx], [-fobjc-exceptions] )
-
   VLC_ADD_PLUGIN([macosx minimal_macosx])
+
+  VLC_ADD_LIBS([macosx], [-Wl,-framework,QTKit -Wl,-framework,IOKit -Wl,-framework,AddressBook -Wl,-framework,WebKit])
+  AC_CHECK_HEADERS(Sparkle/Sparkle.h, [
+    VLC_ADD_LIBS([macosx], [-F${CONTRIB_DIR}/Sparkle -Wl,-framework,Sparkle])
+    VLC_ADD_OBJCFLAGS([macosx], [-F${CONTRIB_DIR}/Sparkle])
+  ])
+  if test -d ${CONTRIB_DIR}/BGHUDAppKit
+  then
+      VLC_ADD_LIBS([macosx], [-F${CONTRIB_DIR}/BGHUDAppKit -Wl,-framework,BGHUDAppKit])
+      VLC_ADD_OBJCFLAGS([macosx], [-F${CONTRIB_DIR}/BGHUDAppKit])
+  fi
+
 fi
 
 dnl

@@ -20,6 +20,9 @@
 * along with this program; if not, write to the Free Software
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
 *****************************************************************************/
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
 
 #import "CompatibilityFixes.h"
 #import "simple_prefs.h"
@@ -31,7 +34,10 @@
 #import "misc.h"
 #import "intf.h"
 #import "AppleRemote.h"
-#import <Sparkle/Sparkle.h>                        //for o_intf_last_update_lbl
+
+#ifdef HAVE_SPARKLE_SPARKLE_H
+# import <Sparkle/Sparkle.h>                        //for o_intf_last_update_lbl
+#endif
 
 static NSString* VLCSPrefsToolbarIdentifier = @"Our Simple Preferences Toolbar Identifier";
 static NSString* VLCIntfSettingToolbarIdentifier = @"Intf Settings Item Identifier";
@@ -453,9 +459,11 @@ static inline char * __config_GetLabel( vlc_object_t *p_this, const char *psz_na
     [self setupButton: o_intf_embedded_ckb forBoolValue: "embedded-video"];
 	[self setupButton: o_intf_appleremote_ckb forBoolValue: "macosx-appleremote"];
 	[self setupButton: o_intf_mediakeys_ckb forBoolValue: "macosx-mediakeys"];
+#ifdef HAVE_SPARKLE_SPARKLE_H
     if( [[SUUpdater sharedUpdater] lastUpdateCheckDate] != NULL )
         [o_intf_last_update_lbl setStringValue: [NSString stringWithFormat: _NS("Last check on: %@"), [[[SUUpdater sharedUpdater] lastUpdateCheckDate] descriptionWithLocale: [[NSUserDefaults standardUserDefaults] dictionaryRepresentation]]]];
     else
+#endif
         [o_intf_last_update_lbl setStringValue: _NS("No check was performed yet.")];
     psz_tmp = config_GetPsz( p_intf, "control" );
     if (psz_tmp) {

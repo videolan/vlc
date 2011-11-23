@@ -27,6 +27,10 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <sys/param.h>                                    /* for MAXPATHLEN */
 #include <string.h>
@@ -58,7 +62,9 @@
 #import "TrackSynchronization.h"
 
 #import <AddressBook/AddressBook.h>         /* for crashlog send mechanism */
-#import <Sparkle/Sparkle.h>                 /* we're the update delegate */
+#ifdef HAVE_SPARKLE_SPARKLE_H
+# import <Sparkle/Sparkle.h>                 /* we're the update delegate */
+#endif
 
 /*****************************************************************************
  * Local prototypes.
@@ -756,6 +762,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     [self setIntf:nil];
 }
 
+#ifdef HAVE_SPARKLE_SPARKLE_H
 #pragma mark -
 #pragma mark Sparkle delegate
 /* received directly before the update gets installed, so let's shut down a bit */
@@ -765,6 +772,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     [o_remote stopListening: self];
     var_SetInteger( p_intf->p_libvlc, "key-action", ACTIONID_STOP );
 }
+#endif
 
 #pragma mark -
 #pragma mark Media Key support
