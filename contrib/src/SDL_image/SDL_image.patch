@@ -1,7 +1,6 @@
-diff -ruN SDL_image/Makefile.am SDL_image_new/Makefile.am
---- SDL_image/Makefile.am	2007-07-21 07:26:34.000000000 +0200
-+++ SDL_image_new/Makefile.am	2007-08-04 12:08:51.000000000 +0200
-@@ -44,7 +44,6 @@
+--- SDL_image/Makefile.am.orig	2009-11-08 05:55:32.000000000 -0500
++++ SDL_image/Makefile.am	2011-11-22 22:17:14.234702385 -0500
+@@ -47,7 +47,6 @@
  else
  libSDL_image_la_LDFLAGS = 	\
  	-no-undefined		\
@@ -9,10 +8,27 @@ diff -ruN SDL_image/Makefile.am SDL_image_new/Makefile.am
  	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
  libSDL_image_la_LIBADD = $(IMG_LIBS)
  endif
-diff -ruN SDL_image/Makefile.in SDL_image_new/Makefile.in
---- SDL_image/Makefile.in	2007-07-21 07:27:57.000000000 +0200
-+++ SDL_image_new/Makefile.in	2007-08-04 12:12:00.000000000 +0200
-@@ -260,12 +260,10 @@
+@@ -58,7 +57,7 @@
+ %.o : %.rc
+ 	$(WINDRES) $< $@
+ 
+-noinst_PROGRAMS = showimage
++#noinst_PROGRAMS = showimage
+ 
+ showimage_LDADD = libSDL_image.la
+ 
+--- SDL_image/Makefile.in.orig	2009-11-12 01:42:10.000000000 -0500
++++ SDL_image/Makefile.in	2011-11-22 22:17:10.714684927 -0500
+@@ -41,7 +41,7 @@
+ host_triplet = @host@
+ @USE_VERSION_RC_FALSE@libSDL_image_la_DEPENDENCIES =  \
+ @USE_VERSION_RC_FALSE@	$(am__DEPENDENCIES_1)
+-noinst_PROGRAMS = showimage$(EXEEXT)
++#noinst_PROGRAMS = showimage$(EXEEXT)
+ subdir = .
+ DIST_COMMON = README $(am__configure_deps) \
+ 	$(libSDL_imageinclude_HEADERS) $(srcdir)/Makefile.am \
+@@ -297,12 +297,10 @@
  
  @USE_VERSION_RC_FALSE@libSDL_image_la_LDFLAGS = \
  @USE_VERSION_RC_FALSE@	-no-undefined		\
