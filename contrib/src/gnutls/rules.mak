@@ -48,7 +48,6 @@ DEPS_gnutls = nettle $(DEPS_nettle)
 endif
 
 .gnutls: gnutls
-	cd $< && automake
 	cd $< && $(HOSTVARS) ./configure $(GNUTLS_CONF)
 	cd $</lib && $(MAKE) install
 	touch $@
