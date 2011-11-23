@@ -15,7 +15,6 @@ endif
 	$(MOVE)
 
 .gpg-error: libgpg-error
-	cd $< && automake
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) --disable-nls --disable-shared --disable-languages
 	cd $< && $(MAKE) install
 	touch $@
