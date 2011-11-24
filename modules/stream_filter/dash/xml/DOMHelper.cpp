@@ -40,6 +40,7 @@ std::vector<Node *> DOMHelper::getElementByTagName      (Node *root, std::string
 
     return elements;
 }
+
 std::vector<Node *> DOMHelper::getChildElementByTagName (Node *root, std::string name)
 {
     std::vector<Node *> elements;
@@ -52,6 +53,7 @@ std::vector<Node *> DOMHelper::getChildElementByTagName (Node *root, std::string
 
     return elements;
 }
+
 void                DOMHelper::getElementsByTagName     (Node *root, std::string name, std::vector<Node*> *elements, bool selfContain)
 {
     if(!selfContain && !root->getName().compare(name))
@@ -67,4 +69,14 @@ void                DOMHelper::getElementsByTagName     (Node *root, std::string
     {
         getElementsByTagName(root->getSubNodes().at(i), name, elements, selfContain);
     }
+}
+
+Node*           DOMHelper::getFirstChildElementByName( Node *root, const std::string &name )
+{
+    for(size_t i = 0; i < root->getSubNodes().size(); i++)
+    {
+        if( !root->getSubNodes().at( i )->getName().compare( name ) )
+            return root->getSubNodes().at( i );
+    }
+    return NULL;
 }
