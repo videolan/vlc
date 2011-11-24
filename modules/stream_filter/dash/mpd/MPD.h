@@ -41,6 +41,8 @@ namespace dash
     {
         class MPD
         {
+            typedef std::map<std::string, std::string>      AttributesMap;
+
             public:
                 MPD         (std::map<std::string, std::string> attributes);
                 MPD         ();
@@ -58,7 +60,7 @@ namespace dash
                 void    setProgramInformation   (ProgramInformation *progInfo);
 
             private:
-                std::map<std::string, std::string>  attributes;
+                AttributesMap                       attributes;
                 std::vector<Period *>               periods;
                 std::vector<BaseUrl *>              baseUrls;
                 ProgramInformation                  *programInfo;

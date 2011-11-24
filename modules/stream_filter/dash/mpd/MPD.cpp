@@ -60,24 +60,28 @@ std::vector<BaseUrl*>   MPD::getBaseUrls            ()
 }
 std::string             MPD::getMinBufferTime       () throw(AttributeNotPresentException)
 {
-    if(this->attributes.find("minBufferTime") == this->attributes.end())
+    AttributesMap::iterator     it = this->attributes.find("minBufferTime");
+    if( it == this->attributes.end())
         throw AttributeNotPresentException();
 
-    return this->attributes["minBufferTime"];
+    return it->second;
 }
 std::string             MPD::getType                () throw(AttributeNotPresentException)
 {
-    if(this->attributes.find("type") == this->attributes.end())
+    AttributesMap::iterator     it = this->attributes.find( "type" );
+    if( it == this->attributes.end() )
         throw AttributeNotPresentException();
 
-    return this->attributes["type"];
+    return it->second;
 }
 std::string             MPD::getDuration            () throw(AttributeNotPresentException)
 {
-    if(this->attributes.find("mediaPresentationDuration") == this->attributes.end())
+    AttributesMap::iterator     it = this->attributes.find("mediaPresentationDuration");
+
+    if( it == this->attributes.end())
         throw AttributeNotPresentException();
 
-    return this->attributes["mediaPresentationDuration"];
+    return it->second;
 }
 ProgramInformation*     MPD::getProgramInformation  () throw(ElementNotPresentException)
 {
