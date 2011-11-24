@@ -62,7 +62,7 @@
 #import "TrackSynchronization.h"
 
 #import <AddressBook/AddressBook.h>         /* for crashlog send mechanism */
-#ifdef HAVE_SPARKLE_SPARKLE_H
+#ifdef HAVE_SPARKLE_H
 # import <Sparkle/Sparkle.h>                 /* we're the update delegate */
 #endif
 
@@ -762,7 +762,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     [self setIntf:nil];
 }
 
-#ifdef HAVE_SPARKLE_SPARKLE_H
+#ifdef HAVE_SPARKLE_H
 #pragma mark -
 #pragma mark Sparkle delegate
 /* received directly before the update gets installed, so let's shut down a bit */
