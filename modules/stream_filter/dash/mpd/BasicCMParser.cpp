@@ -94,16 +94,12 @@ void    BasicCMParser::setRepresentations   (Node *root, Group *group)
 }
 void    BasicCMParser::setSegmentInfo       (Node *root, Representation *rep)
 {
-    std::vector<Node *> segmentInfo = DOMHelper::getChildElementByTagName(root, "SegmentInfo");
+    Node    *segmentInfo = DOMHelper::getFirstChildElementByName( root, "SegmentInfo");
 
-    for(size_t i = 0; i < segmentInfo.size(); i++)
-    {
-        SegmentInfo *info = new SegmentInfo(segmentInfo.at(i)->getAttributes());
-        this->setInitSegment(segmentInfo.at(i), info);
-        this->setSegments(segmentInfo.at(i), info);
-        rep->setSegmentInfo(info);
-        return;
-    }
+    SegmentInfo *info = new SegmentInfo( segmentInfo->getAttributes() );
+    this->setInitSegment( segmentInfo, info );
+    this->setSegments(segmentInfo, info );
+    rep->setSegmentInfo(info);
 }
 void    BasicCMParser::setInitSegment       (Node *root, SegmentInfo *info)
 {
