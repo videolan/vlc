@@ -36,6 +36,7 @@ BasicCMManager::BasicCMManager  (MPD *mpd)
 }
 BasicCMManager::~BasicCMManager ()
 {
+    delete this->mpd;
 }
 
 std::vector<ISegment*>  BasicCMManager::getSegments             (Representation *rep)

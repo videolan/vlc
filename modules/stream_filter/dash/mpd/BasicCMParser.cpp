@@ -33,6 +33,7 @@ using namespace dash::xml;
 BasicCMParser::BasicCMParser    (Node *root) : root(root), mpd(NULL)
 {
 }
+
 BasicCMParser::~BasicCMParser   ()
 {
 }
