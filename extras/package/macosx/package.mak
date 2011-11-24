@@ -29,7 +29,9 @@ VLC-tmp.app: vlc
 	(cd lib && $(MAKE) $(AM_MAKEFLAGS) install $(silentstd))
 	rm -Rf "$(top_builddir)/tmp" "$@"
 	mkdir -p "$(top_builddir)/tmp/extras/package/macosx"
-	cd $(srcdir)/extras/package/macosx; cp -R vlc.xcodeproj Resources README.MacOSX.rtf $(abs_top_builddir)/tmp/extras/package/macosx/
+	cd $(srcdir)/extras/package/macosx; cp -R Resources README.MacOSX.rtf $(abs_top_builddir)/tmp/extras/package/macosx/
+	mkdir -p $(abs_top_builddir)/tmp/extras/package/macosx/vlc.xcodeproj/
+	sed -e s,../../../contrib,$(CONTRIB_DIR),g $(srcdir)/extras/package/macosx/vlc.xcodeproj/project.pbxproj > $(abs_top_builddir)/tmp/extras/package/macosx/vlc.xcodeproj/project.pbxproj
 	REVISION=`(git --git-dir=$(srcdir)/.git describe --always || echo exported)` && \
 	cat $(top_builddir)/extras/package/macosx/Info.plist | \
 	sed "s/#REVISION#/$$REVISION/g" > $(top_builddir)/tmp/extras/package/macosx/Info.plist
