@@ -37,9 +37,9 @@ NullManager::~NullManager   ()
 {
 }
 
-std::vector<Period *>   NullManager::getPeriods              ()
+const std::vector<Period *>&   NullManager::getPeriods              () const
 {
-    return std::vector<Period *>();
+    return this->periods;
 }
 Period*                 NullManager::getFirstPeriod          ()
 {
@@ -55,7 +55,7 @@ Representation*         NullManager::getBestRepresentation   (Period *)
 }
 std::vector<ISegment *> NullManager::getSegments             (Representation *)
 {
-    return std::vector<ISegment *>();
+    return this->segments;
 }
 Representation*         NullManager::getRepresentation       (Period *, long )
 {

@@ -60,10 +60,11 @@ std::vector<ISegment*>  BasicCMManager::getSegments             (Representation 
 
     return retSegments;
 }
-std::vector<Period*>    BasicCMManager::getPeriods              ()
+const std::vector<Period*>&    BasicCMManager::getPeriods              () const
 {
     return this->mpd->getPeriods();
 }
+
 Representation*         BasicCMManager::getBestRepresentation   (Period *period)
 {
     std::vector<Group *> groups = period->getGroups();

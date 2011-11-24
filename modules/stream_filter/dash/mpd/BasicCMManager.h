@@ -51,7 +51,7 @@ namespace dash
                 BasicCMManager          (MPD *mpd);
                 virtual ~BasicCMManager ();
 
-                std::vector<Period *>   getPeriods              ();
+                const std::vector<Period *>&   getPeriods              () const;
                 Period*                 getFirstPeriod          ();
                 Period*                 getNextPeriod           (Period *period);
                 Representation*         getBestRepresentation   (Period *period);

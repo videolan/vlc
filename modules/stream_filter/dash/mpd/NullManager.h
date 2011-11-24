@@ -42,12 +42,16 @@ namespace dash
                 NullManager         ();
                 virtual ~NullManager();
 
-                std::vector<Period *>   getPeriods              ();
+                const std::vector<Period *>&   getPeriods              () const;
                 Period*                 getFirstPeriod          ();
                 Period*                 getNextPeriod           (Period *period);
                 Representation*         getBestRepresentation   (Period *period);
                 std::vector<ISegment *> getSegments             (Representation *rep);
                 Representation*         getRepresentation       (Period *period, long bitrate);
+
+            private:
+                std::vector<Period *>   periods;
+                std::vector<ISegment *> segments;
         };
     }
 }

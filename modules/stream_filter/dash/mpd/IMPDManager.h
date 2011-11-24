@@ -26,7 +26,7 @@ namespace dash
         class IMPDManager
         {
             public:
-                virtual std::vector<Period *>   getPeriods              ()                              = 0;
+                virtual const std::vector<Period *>&   getPeriods              () const                 = 0;
                 virtual Period*                 getFirstPeriod          ()                              = 0;
                 virtual Period*                 getNextPeriod           (Period *period)                = 0;
                 virtual Representation*         getBestRepresentation   (Period *period)                = 0;
