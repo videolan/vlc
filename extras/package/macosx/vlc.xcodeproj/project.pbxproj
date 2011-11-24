@@ -419,9 +419,9 @@
 		CC1941240B9C1F8400635F6B /* QTKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QTKit.framework; path = /System/Library/Frameworks/QTKit.framework; sourceTree = "<absolute>"; };
 		CC1C41D00D9BAD7F002728FA /* noart.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = noart.png; path = Resources/noart.png; sourceTree = "<group>"; };
 		CC3DC89B0A7CDB9600B53F32 /* ApplicationServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ApplicationServices.framework; path = /System/Library/Frameworks/ApplicationServices.framework; sourceTree = "<absolute>"; };
-		CC3F9F851350B2A000B0E885 /* Growl.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Growl.framework; path = ../../../contrib/Growl.framework; sourceTree = "<group>"; };
+		CC3F9F851350B2A000B0E885 /* Growl.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Growl.framework; path = ../../../contrib/Growl.framework; sourceTree = "<absolute>"; };
 		CC402F4B0E00ABBB006A4BA4 /* VLC.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = VLC.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
-		CC426FD01020D44F00A32659 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sparkle.framework; path = ../../../contrib/Sparkle.framework; sourceTree = SOURCE_ROOT; };
+		CC426FD01020D44F00A32659 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sparkle.framework; path = ../../../contrib/Sparkle.framework; sourceTree = "<absolute>"; };
 		CC448A5A13B61D49009F72E0 /* MainMenu.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MainMenu.h; path = ../../../modules/gui/macosx/MainMenu.h; sourceTree = "<group>"; };
 		CC448A5B13B61D49009F72E0 /* MainMenu.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = MainMenu.m; path = ../../../modules/gui/macosx/MainMenu.m; sourceTree = "<group>"; };
 		CC448A6013B68A0B009F72E0 /* CoreInteraction.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CoreInteraction.h; path = ../../../modules/gui/macosx/CoreInteraction.h; sourceTree = "<group>"; };
@@ -488,7 +488,7 @@
 		CC79F66614014FC30015D89E /* opengl.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = opengl.h; path = ../../../modules/video_output/opengl.h; sourceTree = "<group>"; };
 		CC79F66714014FDC0015D89E /* quartztext.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = quartztext.c; path = ../../../modules/text_renderer/quartztext.c; sourceTree = "<group>"; };
 		CC8062631021F8790021EB9A /* dsa_pub.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = dsa_pub.pem; path = Resources/dsa_pub.pem; sourceTree = "<group>"; };
-		CC84FB2C130083BB00816D38 /* BGHUDAppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = BGHUDAppKit.framework; path = ../../../contrib/BGHUDAppKit.framework; sourceTree = SOURCE_ROOT; };
+		CC84FB2C130083BB00816D38 /* BGHUDAppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = BGHUDAppKit.framework; path = ../../../contrib/BGHUDAppKit.framework; sourceTree = "<absolute>"; };
 		CC962E2C0CC7992800A56695 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = /System/Library/Frameworks/WebKit.framework; sourceTree = "<absolute>"; };
 		CC9B43AE13B29C79000205AE /* bottom-background.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "bottom-background.png"; path = "Resources/mainwindow/bottom-background.png"; sourceTree = "<group>"; };
 		CC9B43B013B29FCF000205AE /* bottom-background_dark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "bottom-background_dark.png"; path = "Resources/mainwindow_dark/bottom-background_dark.png"; sourceTree = "<group>"; };
