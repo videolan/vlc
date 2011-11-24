@@ -82,6 +82,7 @@ public:
     /* Getters */
     QSystemTrayIcon *getSysTray() { return sysTray; }
     QMenu *getSysTrayMenu() { return systrayMenu; }
+    FullscreenControllerWidget* getFullscreenControllerWidget() { return fullscreenControls; }
     int getControlsVisibilityStatus();
     bool isPlDocked() { return ( b_plDocked != false ); }
     bool isInterfaceFullScreen() { return b_interfaceFullScreen; }

@@ -38,7 +38,7 @@
 #define MAIN_TB2_DEFAULT "0-2;64;3;1;4;64;7;9;64;10;20;19;64-4;37;65;35-4"
 #define ADV_TB_DEFAULT "12;11;13;14"
 #define INPT_TB_DEFAULT "5-1;15-1;33;6-1"
-#define FSC_TB_DEFAULT "0-2;64;3;1;4;64;37;64;38;64;8;65;35-4;34"
+#define FSC_TB_DEFAULT "0-2;64;3;1;4;64;37;64;38;64;8;65;25;35-4;34"
 
 #define I_PLAY_TOOLTIP N_("Play\nIf the playlist is empty, open a medium")
 
@@ -87,6 +87,7 @@ typedef enum buttonType_e
     PREVIOUS_BUTTON,
     NEXT_BUTTON,
     OPEN_SUB_BUTTON,
+    FULLWIDTH_BUTTON,
     BUTTON_MAX,
 
     SPLITTER = 0x20,
@@ -108,11 +109,12 @@ typedef enum buttonType_e
 
 static const char* const nameL[BUTTON_MAX] = { N_("Play"), N_("Stop"), N_("Open"),
     N_("Previous/Backward"), N_("Next/Forward"), N_("Slower"), N_("Faster"), N_("Fullscreen"),
-   N_("De-Fullscreen"), N_("Extended panel"), N_("Playlist"), N_("Snapshot"),
-   N_("Record"), N_("A->B Loop"), N_("Frame By Frame"), N_("Trickplay Reverse"),
-   N_("Step backward" ), N_("Step forward"), N_("Quit"), N_("Random"),
-   N_("Loop/Repeat mode"), N_("Information"), N_("Previous"), N_("Next"),
-   N_("Open subtitles file")};
+    N_("De-Fullscreen"), N_("Extended panel"), N_("Playlist"), N_("Snapshot"),
+    N_("Record"), N_("A->B Loop"), N_("Frame By Frame"), N_("Trickplay Reverse"),
+    N_("Step backward" ), N_("Step forward"), N_("Quit"), N_("Random"),
+    N_("Loop/Repeat mode"), N_("Information"), N_("Previous"), N_("Next"),
+    N_("Open subtitles file"), N_("Fullscreen controller width toggle")
+};
 static const char* const tooltipL[BUTTON_MAX] = { I_PLAY_TOOLTIP,
     N_("Stop playback"), N_("Open a medium"),
     N_("Previous media in the playlist, skip backward when keep-pressed"),
@@ -124,7 +126,9 @@ static const char* const tooltipL[BUTTON_MAX] = { I_PLAY_TOOLTIP,
     N_("Reverse"), N_("Step backward"), N_("Step forward"), N_("Quit"),
     N_("Random"), N_("Change the loop and repeat modes"), N_("Information"),
     N_("Previous media in the playlist"), N_("Next media in the playlist"),
-    N_("Open subtitles file")};
+    N_("Open subtitles file"),
+    N_("Dock/undock fullscreen controller to/from bottom of screen")
+};
 static const QString iconL[BUTTON_MAX] ={ ":/toolbar/play_b", ":/toolbar/stop_b",
     ":/toolbar/eject", ":/toolbar/previous_b", ":/toolbar/next_b",
     ":/toolbar/slower", ":/toolbar/faster", ":/toolbar/fullscreen",
@@ -133,7 +137,8 @@ static const QString iconL[BUTTON_MAX] ={ ":/toolbar/play_b", ":/toolbar/stop_b"
     ":/toolbar/frame", ":/toolbar/reverse", ":/toolbar/skip_back",
     ":/toolbar/skip_fw", ":/toolbar/clear", ":/buttons/playlist/shuffle_on",
     ":/buttons/playlist/repeat_all", ":/menu/info",
-    ":/toolbar/previous_b", ":/toolbar/next_b", "" };
+    ":/toolbar/previous_b", ":/toolbar/next_b", "", ":/toolbar/space"
+};
 
 enum
 {
@@ -249,6 +254,7 @@ public:
     /* Vout */
     void fullscreenChanged( vout_thread_t *, bool b_fs, int i_timeout );
     void mouseChanged( vout_thread_t *, int i_mousex, int i_mousey );
+    void toggleFullwidth();
 
 signals:
     void keyPressed( QKeyEvent * );
@@ -298,6 +304,8 @@ private:
     int         i_hide_timeout;  /* FSC hiding timeout, same as mouse hiding timeout */
     int i_mouse_last_move_x;
     int i_mouse_last_move_y;
+
+    bool isWideFSC;
 };
 
 #endif

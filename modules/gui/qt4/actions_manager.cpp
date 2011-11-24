@@ -34,6 +34,7 @@
 #include "dialogs_provider.hpp" /* Opening Dialogs */
 #include "input_manager.hpp"
 #include "main_interface.hpp" /* Show playlist */
+#include "components/controller.hpp" /* Toggle FSC controller width */
 
 ActionsManager * ActionsManager::instance = NULL;
 
@@ -93,6 +94,10 @@ void ActionsManager::doAction( int id_action )
             THEDP->mediaInfoDialog(); break;
         case OPEN_SUB_ACTION:
             THEDP->loadSubtitlesFile(); break;
+        case FULLWIDTH_ACTION:
+            if( p_intf->p_sys->p_mi )
+                p_intf->p_sys->p_mi->getFullscreenControllerWidget()->toggleFullwidth();
+            break;
         default:
             msg_Dbg( p_intf, "Action: %i", id_action );
             break;

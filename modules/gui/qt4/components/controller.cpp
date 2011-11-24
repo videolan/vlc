@@ -137,7 +137,8 @@ void AbstractController::parseAndCreate( const QString& config,
             {
                 msg_Warn( p_intf, "Parsing error 3. Please, report this." );
                 continue;
-            }        }
+            }
+        }
 
         createAndAddWidget( controlLayout, -1, i_type, i_option );
     }
@@ -301,6 +302,10 @@ QWidget *AbstractController::createWidget( buttonType_e button, int options )
         {
         NORMAL_BUTTON( FULLSCREEN );
         ENABLE_ON_VIDEO( FULLSCREENButton );
+        }
+        break;
+    case FULLWIDTH_BUTTON: {
+            NORMAL_BUTTON( FULLWIDTH );
         }
         break;
     case EXTENDED_BUTTON:{
@@ -719,6 +724,8 @@ FullscreenControllerWidget::FullscreenControllerWidget( intf_thread_t *_p_i, QWi
 
     setWindowFlags( Qt::ToolTip );
     setMinimumWidth( 600 );
+    setMinimumHeight( 72 );
+    isWideFSC = false;
 
     setFrameShape( QFrame::StyledPanel );
     setFrameStyle( QFrame::Sunken );
@@ -875,6 +882,23 @@ void FullscreenControllerWidget::slowHideFSC()
 #endif
 }
 
+void FullscreenControllerWidget::toggleFullwidth() {
+    int fswidth = QApplication::desktop()->screenGeometry( var_InheritInteger( p_intf, "qt-fullscreen-screennumber" ) ).width();
+    int fsheight = QApplication::desktop()->screenGeometry( var_InheritInteger( p_intf, "qt-fullscreen-screennumber" ) ).height();
+    if( !isWideFSC ) {
+        /* Dock at the bottom of the screen */
+        setMinimumWidth( fswidth );
+        setGeometry(0, fsheight-72, fswidth, 72);
+    } else {
+        /* Restore half-bar and re-centre */
+        setMinimumWidth( 600 );
+        setGeometry(fswidth/2 - 300, fsheight-72, 600, 72);
+    }
+
+    /* Toggle isWideFSC switch */
+    isWideFSC = !isWideFSC;
+}
+
 /**
  * event handling
  * events: show, hide, start timer for hiding
@@ -953,6 +977,7 @@ void FullscreenControllerWidget::mouseMoveEvent( QMouseEvent *event )
  */
 void FullscreenControllerWidget::mousePressEvent( QMouseEvent *event )
 {
+    if( isWideFSC ) return;
     i_mouse_last_x = event->globalX();
     i_mouse_last_y = event->globalY();
     event->accept();
@@ -960,6 +985,7 @@ void FullscreenControllerWidget::mousePressEvent( QMouseEvent *event )
 
 void FullscreenControllerWidget::mouseReleaseEvent( QMouseEvent *event )
 {
+    if( isWideFSC ) return;
     i_mouse_last_x = -1;
     i_mouse_last_y = -1;
     event->accept();
