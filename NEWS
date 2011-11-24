@@ -135,6 +135,7 @@ Video Output:
  * New video output for Android platform, based on Surface
  * Support for 9/10bits output in the OpenGL output
  * Updated OpenGL video output for Mac, requires a Quartz Extreme capable machine
+ * New video output based on kva API for OS/2
 
 Audio Output and Filters:
  * New audio output based on AudioQueue API for iOS
