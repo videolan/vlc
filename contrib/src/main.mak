@@ -278,6 +278,15 @@ ifdef HAVE_WIN32
 OS=win32
 endif
 
+PREBUILT_URL=ftp://ftp.videolan.org/pub/videolan/contrib/$(OS)/vlc-contrib-$(OS)-$(HOST)-latest.tar.bz2
+
+vlc-contrib-$(OS)-$(HOST)-latest.tar.bz2:
+	$(call download,$(PREBUILT_URL))
+
+prebuilt: vlc-contrib-$(OS)-$(HOST)-latest.tar.bz2
+	$(UNPACK) && mv $(HOST) $(TOPDST)
+	cd $(TOPDST)/$(HOST) && ./change_prefix.sh
+
 package: install
 	rm -Rf tmp/
 	mkdir -p tmp/
@@ -306,7 +315,7 @@ list:
 	@echo To-be-built packages:
 	@echo '  $(PKGS)' | fmt
 
-.PHONY: all fetch fetch-all install mostlyclean clean distclean package list
+.PHONY: all fetch fetch-all install mostlyclean clean distclean package list prebuilt
 
 # CMake toolchain
 toolchain.cmake:
