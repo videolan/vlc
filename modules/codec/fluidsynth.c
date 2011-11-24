@@ -81,13 +81,31 @@ static aout_buffer_t *DecodeBlock (decoder_t *p_dec, block_t **pp_block);
 static int Open (vlc_object_t *p_this)
 {
     decoder_t *p_dec = (decoder_t *)p_this;
-    decoder_sys_t *p_sys;
 
     if (p_dec->fmt_in.i_codec != VLC_CODEC_MIDI)
         return VLC_EGENERIC;
 
+    decoder_sys_t *p_sys = malloc (sizeof (*p_sys));
+    if (unlikely(p_sys == NULL))
+        return VLC_ENOMEM;
+
+    p_sys->settings = new_fluid_settings ();
+    p_sys->synth = new_fluid_synth (p_sys->settings);
+    p_sys->soundfont = -1;
+
     char *font_path = var_InheritString (p_this, "soundfont");
-    if (font_path == NULL)
+    if (font_path != NULL)
+    {
+        const char *lpath = ToLocale (font_path);
+
+        p_sys->soundfont = fluid_synth_sfload (p_sys->synth, font_path, 1);
+        LocaleFree (lpath);
+        if (p_sys->soundfont == -1)
+            msg_Err (p_this, "cannot load sound fonts file %s", font_path);
+        free (font_path);
+    }
+
+    if (p_sys->soundfont == -1)
     {
         msg_Err (p_this, "sound font file required for synthesis");
         dialog_Fatal (p_this, _("MIDI synthesis not set up"),
@@ -95,36 +113,11 @@ static int Open (vlc_object_t *p_this)
               "Please install a sound font and configure it "
               "from the VLC preferences "
               "(Input / Codecs > Audio codecs > FluidSynth).\n"));
+        delete_fluid_synth (p_sys->synth);
+        delete_fluid_settings (p_sys->settings);
+        free (p_sys);
         return VLC_EGENERIC;
     }
-
-    p_dec->pf_decode_audio = DecodeBlock;
-    p_sys = p_dec->p_sys = malloc (sizeof (*p_sys));
-    if (p_sys == NULL)
-    {
-        free (font_path);
-        return VLC_ENOMEM;
-    }
-
-    p_sys->settings = new_fluid_settings ();
-    p_sys->synth = new_fluid_synth (p_sys->settings);
-    /* FIXME: I bet this is not thread-safe */
-    const char *lpath = ToLocale (font_path);
-    p_sys->soundfont = fluid_synth_sfload (p_sys->synth, font_path, 1);
-    LocaleFree (lpath);
-    if (p_sys->soundfont == -1)
-    {
-        msg_Err (p_this, "cannot load sound fonts file %s", font_path);
-        Close (p_this);
-        dialog_Fatal (p_this, _("MIDI synthesis not set up"),
-            _("The specified sound font file (%s) is incorrect.\n"
-              "Please install a valid sound font and reconfigure it "
-              "from the VLC preferences (Codecs / Audio / FluidSynth).\n"),
-              font_path);
-        free (font_path);
-        return VLC_EGENERIC;
-    }
-    free (font_path);
 
     p_dec->fmt_out.i_cat = AUDIO_ES;
     p_dec->fmt_out.audio.i_rate = 44100;
@@ -147,6 +140,8 @@ static int Open (vlc_object_t *p_this)
     date_Init (&p_sys->end_date, p_dec->fmt_out.audio.i_rate, 1);
     date_Set (&p_sys->end_date, 0);
 
+    p_dec->p_sys = p_sys;
+    p_dec->pf_decode_audio = DecodeBlock;
     return VLC_SUCCESS;
 }
 
@@ -155,8 +150,7 @@ static void Close (vlc_object_t *p_this)
 {
     decoder_sys_t *p_sys = ((decoder_t *)p_this)->p_sys;
 
-    if (p_sys->soundfont != -1)
-        fluid_synth_sfunload (p_sys->synth, p_sys->soundfont, 1);
+    fluid_synth_sfunload (p_sys->synth, p_sys->soundfont, 1);
     delete_fluid_synth (p_sys->synth);
     delete_fluid_settings (p_sys->settings);
     free (p_sys);
