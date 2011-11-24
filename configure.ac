@@ -3428,6 +3428,29 @@ dnl
 PKG_ENABLE_MODULES_VLC([CACA], [], [caca >= 0.99.beta14], [libcaca output],[auto])
 
 dnl
+dnl  OS/2 KVA plugin
+dnl
+AC_ARG_ENABLE(kva,
+  [AS_HELP_STRING([--enable-kva],
+    [support the K Video Accelerator KVA (default enabled on OS/2)])],, [
+  AS_IF([test "$SYS" = "os2"], [
+    enable_kva="yes"
+  ])
+])
+have_kva="no"
+KVA_LIBS=""
+AS_IF([test "$enable_kva" != "no"], [
+  AC_CHECK_HEADERS([kva.h], [
+    have_kva="yes"
+    AC_CHECK_LIB(kva, main, [
+      KVA_LIBS="-lkva"
+    ])
+  ])
+])
+AC_SUBST(KVA_LIBS)
+AM_CONDITIONAL([HAVE_KVA], [test "${have_kva}" = "yes"])
+
+dnl
 dnl  Audio plugins
 dnl
 

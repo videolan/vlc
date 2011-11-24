@@ -113,6 +113,14 @@ if HAVE_OS2
 libvlc_LTLIBRARIES += libdrawable_plugin.la
 endif
 
+libkva_plugin_la_SOURCES = kva.c
+libkva_plugin_la_CFLAGS = $(AM_CFLAGS)
+libkva_plugin_la_LIBADD = $(AM_LIBADD) $(KVA_LIBS)
+libkva_plugin_la_DEPENDENCIES =
+if HAVE_KVA
+libvlc_LTLIBRARIES += libkva_plugin.la
+endif
+
 ### EGL ###
 libegl_plugin_la_SOURCES = egl.c
 libegl_plugin_la_CFLAGS = $(AM_CFLAGS) $(EGL_CFLAGS)
