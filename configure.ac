@@ -1811,9 +1811,20 @@ fi
 dnl
 dnl dvdread module: check for libdvdread
 dnl
-dnl prepend -ldvdcss on OS that need it
-AS_CASE(["${SYS}"], [mingw32|darwin], [VLC_ADD_LIBS([dvdread], [-ldvdcss])])
 PKG_ENABLE_MODULES_VLC([DVDREAD], [], [dvdread], [dvdread input module], [auto])
+
+dnl libdvdcss
+darwin_libdvdcss_extralibs="-Wl,-framework,CoreFoundation -Wl,-framework,IOKit"
+libdvdcss_extralibs=""
+test "${SYS}" = darwin && libdvdcss_extralibs="${darwin_libdvdcss_extralibs}"
+AC_CHECK_LIB(dvdcss, dvdcss_interface_2, [
+    VLC_ADD_LIBS([dvdread], [-ldvdcss])
+    VLC_ADD_LIBS([dvdnav], [-ldvdcss])
+    if test "${SYS}" = darwin; then
+        VLC_ADD_LIBS([dvdread], "${darwin_libdvdcss_extralibs}")
+        VLC_ADD_LIBS([dvdnav], "${darwin_libdvdcss_extralibs}")
+    fi
+    ],, "${darwin_libdvdcss_extralibs}")
 
 dnl
 dnl libdvdnav plugin
@@ -1823,9 +1834,6 @@ AC_ARG_ENABLE(dvdnav,
     [disable DVD navigation with libdvdnav (default auto)])])
 if test "${enable_dvdnav}" != "no"
 then
-  dnl prepend -ldvdcss on OS that need it
-  AS_CASE(["${SYS}"], [mingw32|darwin], [VLC_ADD_LIBS([dvdnav], [-ldvdcss])])
-
   PKG_CHECK_MODULES(DVDNAV, dvdnav, [
     VLC_ADD_PLUGIN([dvdnav])
     VLC_ADD_CFLAGS([dvdnav],[${DVDNAV_CFLAGS}])
