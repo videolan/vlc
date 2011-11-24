@@ -78,6 +78,10 @@ int vlc_open (const char *filename, int flags, ...)
         mode = va_arg (ap, unsigned int);
     va_end (ap);
 
+    /* Defaults to binary mode */
+    if ((flags & O_TEXT) == 0)
+        flags |= O_BINARY;
+
 #ifdef UNDER_CE
     /*_open translates to wchar internally on WinCE*/
     return _open (filename, flags, mode);
