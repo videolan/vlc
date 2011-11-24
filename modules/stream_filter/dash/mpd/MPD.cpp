@@ -50,33 +50,36 @@ MPD::~MPD   ()
     delete(this->programInfo);
 }
 
-std::vector<Period*>    MPD::getPeriods             ()
+const std::vector<Period*>&    MPD::getPeriods             () const
 {
     return this->periods;
 }
-std::vector<BaseUrl*>   MPD::getBaseUrls            ()
+
+const std::vector<BaseUrl*>&   MPD::getBaseUrls            () const
 {
     return this->baseUrls;
 }
-std::string             MPD::getMinBufferTime       () throw(AttributeNotPresentException)
+
+const std::string&             MPD::getMinBufferTime       () const throw(AttributeNotPresentException)
 {
-    AttributesMap::iterator     it = this->attributes.find("minBufferTime");
+    AttributesMap::const_iterator     it = this->attributes.find("minBufferTime");
     if( it == this->attributes.end())
         throw AttributeNotPresentException();
 
     return it->second;
 }
-std::string             MPD::getType                () throw(AttributeNotPresentException)
+
+const std::string&             MPD::getType                () const throw(AttributeNotPresentException)
 {
-    AttributesMap::iterator     it = this->attributes.find( "type" );
+    AttributesMap::const_iterator     it = this->attributes.find( "type" );
     if( it == this->attributes.end() )
         throw AttributeNotPresentException();
 
     return it->second;
 }
-std::string             MPD::getDuration            () throw(AttributeNotPresentException)
+const std::string&             MPD::getDuration            () const throw(AttributeNotPresentException)
 {
-    AttributesMap::iterator     it = this->attributes.find("mediaPresentationDuration");
+    AttributesMap::const_iterator     it = this->attributes.find("mediaPresentationDuration");
 
     if( it == this->attributes.end())
         throw AttributeNotPresentException();

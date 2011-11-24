@@ -48,11 +48,11 @@ namespace dash
                 MPD         ();
                 virtual ~MPD();
 
-                std::string             getType                 () throw(dash::exception::AttributeNotPresentException);
-                std::string             getDuration             () throw(dash::exception::AttributeNotPresentException);
-                std::string             getMinBufferTime        () throw(dash::exception::AttributeNotPresentException);
-                std::vector<BaseUrl *>  getBaseUrls             ();
-                std::vector<Period *>   getPeriods              ();
+                const std::string&             getType                 () const throw(dash::exception::AttributeNotPresentException);
+                const std::string&             getDuration             () const throw(dash::exception::AttributeNotPresentException);
+                const std::string&             getMinBufferTime        () const throw(dash::exception::AttributeNotPresentException);
+                const std::vector<BaseUrl *>&  getBaseUrls      () const;
+                const std::vector<Period *>&   getPeriods       () const;
                 ProgramInformation*     getProgramInformation   () throw(dash::exception::ElementNotPresentException);
 
                 void    addPeriod               (Period *period);
