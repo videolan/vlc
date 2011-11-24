@@ -204,11 +204,15 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
         }
         else if ( p_vout )
         {
-            if( key == ' ')
-                val.i_int = config_GetInt( p_vout, "key-play-pause" );
+            if( key == ' ' )
+            {
+                [[VLCCoreInteraction sharedInstance] play];
+            }
             else
+            {
                 val.i_int |= (int)CocoaKeyToVLC( key );
-            var_Set( p_vout->p_libvlc, "key-pressed", val );
+                var_Set( p_vout->p_libvlc, "key-pressed", val );
+            }
             vlc_object_release( p_vout );
         }
         else
