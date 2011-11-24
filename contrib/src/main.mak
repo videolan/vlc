@@ -270,7 +270,15 @@ distclean: clean
 	$(RM) config.mak
 	unlink Makefile
 
-package-%: install
+OS=
+ifdef HAVE_MACOSX
+OS=macosx
+endif
+ifdef HAVE_WIN32
+OS=win32
+endif
+
+package: install
 	rm -Rf tmp/
 	mkdir -p tmp/
 	cp -r $(PREFIX) tmp/
@@ -280,7 +288,7 @@ package-%: install
 		rm -Rf man sbin etc lib/lua lib/sidplay
 	cp $(SRC)/change_prefix.sh tmp/$(notdir $(PREFIX))/
 	cd tmp/$(notdir $(PREFIX)) && ./change_prefix.sh $(PREFIX) @@CONTRIB_PREFIX@@
-	(cd tmp && tar c $(notdir $(PREFIX))/) | bzip2 -c > ../vlc-contrib-$*-$(HOST)-$(DATE).tar.bz2
+	(cd tmp && tar c $(notdir $(PREFIX))/) | bzip2 -c > ../vlc-contrib-$(OS)-$(HOST)-$(DATE).tar.bz2
 
 list:
 	@echo All packages:
