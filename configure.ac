@@ -3761,11 +3761,12 @@ then
     VLC_ADD_LIBS([macosx], [-F${CONTRIB_DIR}/Sparkle -Wl,-framework,Sparkle])
     VLC_ADD_OBJCFLAGS([macosx], [-F${CONTRIB_DIR}/Sparkle])
   ])
-  if test -d ${CONTRIB_DIR}/BGHUDAppKit
+  if ! test -d ${CONTRIB_DIR}/BGHUDAppKit.framework
   then
-      VLC_ADD_LIBS([macosx], [-F${CONTRIB_DIR}/BGHUDAppKit -Wl,-framework,BGHUDAppKit])
-      VLC_ADD_OBJCFLAGS([macosx], [-F${CONTRIB_DIR}/BGHUDAppKit])
+    AC_MSG_ERROR([BGHUDAppKit framework is required and was not found in ${CONTRIB_DIR}])
   fi
+  VLC_ADD_LIBS([macosx], [-F${CONTRIB_DIR}/BGHUDAppKit -Wl,-framework,BGHUDAppKit])
+  VLC_ADD_OBJCFLAGS([macosx], [-F${CONTRIB_DIR}/BGHUDAppKit])
 
 fi
 
