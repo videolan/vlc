@@ -3,3 +3,4 @@ libs/loader/driver.c
 libs/loader/ldt_keeper.c
 modules/codec/wmafixed/bswap.h
 modules/video_output/xcb/window.c
+modules/access/dvb/scan.c
