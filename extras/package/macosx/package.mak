@@ -35,15 +35,15 @@ VLC-tmp.app: vlc
 	sed "s/#REVISION#/$$REVISION/g" > $(top_builddir)/tmp/extras/package/macosx/Info.plist
 	cp -R $(top_builddir)/extras/package/macosx/Resources $(top_builddir)/tmp/extras/package/macosx/
 	cd "$(srcdir)"; cp AUTHORS COPYING THANKS $(abs_top_builddir)/tmp/
-	if test -d $(CONTRIB_DIR)/Sparkle/Sparkle.framework; then; \
+	if test -d $(CONTRIB_DIR)/Sparkle/Sparkle.framework; then \
 		mkdir -p $(top_builddir)/tmp/extras/contrib/Sparkle; \
 		cp -R $(CONTRIB_DIR)/Sparkle/Sparkle.framework $(top_builddir)/tmp/extras/contrib/Sparkle; \
 	fi
-	if test -d $(CONTRIB_DIR)/BGHUDAppKit/BGHUDAppKit.framework; then; \
+	if test -d $(CONTRIB_DIR)/BGHUDAppKit/BGHUDAppKit.framework; then \
 		mkdir -p $(top_builddir)/tmp/extras/contrib/BGHUDAppKit; \
 		cp -R $(CONTRIB_DIR)/BGHUDAppKit/BGHUDAppKit.framework $(top_builddir)/tmp/extras/contrib/BGHUDAppKit; \
 	fi
-	if test -d $(CONTRIB_DIR)/Growl/Growl.framework; then; \
+	if test -d $(CONTRIB_DIR)/Growl/Growl.framework; then \
 		mkdir -p $(top_builddir)/tmp/extras/contrib/Growl; \
 		cp -R $(CONTRIB_DIR)/Growl/Growl.framework $(top_builddir)/tmp/extras/contrib/Growl; \
 	fi
