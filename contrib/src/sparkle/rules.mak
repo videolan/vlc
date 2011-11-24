@@ -13,7 +13,11 @@ $(TARBALLS)/sparkle-$(SPARKLE_VERSION).zip:
 .sum-sparkle: sparkle-$(SPARKLE_VERSION).zip
 
 sparkle: sparkle-$(SPARKLE_VERSION).zip .sum-sparkle
-	$(RM) -R $@ && mkdir -p $@ && cd $@ $(foreach f,$(filter %.zip,$^), && unzip ../$(f))
+	$(RM) -R $@ && mkdir -p $@ && cd $@ && unzip ../$<
+	cd $@/Extras/Source\ Code/Configurations && \
+		sed -i.orig -e s/"GCC_TREAT_WARNINGS_AS_ERRORS = YES"/"GCC_TREAT_WARNINGS_AS_ERRORS = NO"/g \
+			ConfigCommonRelease.xcconfig && \
+		sed -i.orig -e s/10\.4/$(OSX_VERSION)/g -e s/10\.5/$(OSX_VERSION)/g ConfigCommon.xcconfig
 	touch $@
 
 .sparkle: sparkle
