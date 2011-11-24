@@ -30,10 +30,9 @@
 using namespace dash::mpd;
 using namespace dash::exception;
 
-MPD::MPD    (std::map<std::string, std::string> attributes)
+MPD::MPD    (const AttributesMap& attributes) : attributes( attributes ),
+    programInfo( NULL )
 {
-    this->attributes    = attributes;
-    this->programInfo   = NULL;
 }
 
 MPD::~MPD   ()
