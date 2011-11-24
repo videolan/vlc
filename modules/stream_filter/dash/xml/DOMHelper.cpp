@@ -29,7 +29,7 @@
 
 using namespace dash::xml;
 
-std::vector<Node *> DOMHelper::getElementByTagName      (Node *root, std::string name, bool selfContain)
+std::vector<Node *> DOMHelper::getElementByTagName      (Node *root, const std::string& name, bool selfContain)
 {
     std::vector<Node *> elements;
 
@@ -41,20 +41,20 @@ std::vector<Node *> DOMHelper::getElementByTagName      (Node *root, std::string
     return elements;
 }
 
-std::vector<Node *> DOMHelper::getChildElementByTagName (Node *root, std::string name)
+std::vector<Node *> DOMHelper::getChildElementByTagName (Node *root, const std::string& name)
 {
     std::vector<Node *> elements;
 
     for(size_t i = 0; i < root->getSubNodes().size(); i++)
     {
-        if(!root->getSubNodes().at(i)->getName().compare(name))
+        if( root->getSubNodes().at(i)->getName() == name )
             elements.push_back(root->getSubNodes().at(i));
     }
 
     return elements;
 }
 
-void                DOMHelper::getElementsByTagName     (Node *root, std::string name, std::vector<Node*> *elements, bool selfContain)
+void                DOMHelper::getElementsByTagName     (Node *root, const std::string& name, std::vector<Node*> *elements, bool selfContain)
 {
     if(!selfContain && !root->getName().compare(name))
     {
@@ -75,7 +75,7 @@ Node*           DOMHelper::getFirstChildElementByName( Node *root, const std::st
 {
     for(size_t i = 0; i < root->getSubNodes().size(); i++)
     {
-        if( !root->getSubNodes().at( i )->getName().compare( name ) )
+        if( root->getSubNodes().at( i )->getName() == name )
             return root->getSubNodes().at( i );
     }
     return NULL;
