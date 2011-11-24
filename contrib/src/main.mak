@@ -270,20 +270,12 @@ distclean: clean
 	$(RM) config.mak
 	unlink Makefile
 
-OS=
-ifdef HAVE_MACOSX
-OS=macosx
-endif
-ifdef HAVE_WIN32
-OS=win32
-endif
+PREBUILT_URL=ftp://ftp.videolan.org/pub/videolan/contrib/vlc-contrib-$(HOST)-latest.tar.bz2
 
-PREBUILT_URL=ftp://ftp.videolan.org/pub/videolan/contrib/$(OS)/vlc-contrib-$(OS)-$(HOST)-latest.tar.bz2
-
-vlc-contrib-$(OS)-$(HOST)-latest.tar.bz2:
+vlc-contrib-$(HOST)-latest.tar.bz2:
 	$(call download,$(PREBUILT_URL))
 
-prebuilt: vlc-contrib-$(OS)-$(HOST)-latest.tar.bz2
+prebuilt: vlc-contrib-$(HOST)-latest.tar.bz2
 	$(UNPACK) && mv $(HOST) $(TOPDST)
 	cd $(TOPDST)/$(HOST) && ./change_prefix.sh
 
@@ -297,7 +289,7 @@ package: install
 		rm -Rf man sbin etc lib/lua lib/sidplay
 	cp $(SRC)/change_prefix.sh tmp/$(notdir $(PREFIX))/
 	cd tmp/$(notdir $(PREFIX)) && ./change_prefix.sh $(PREFIX) @@CONTRIB_PREFIX@@
-	(cd tmp && tar c $(notdir $(PREFIX))/) | bzip2 -c > ../vlc-contrib-$(OS)-$(HOST)-$(DATE).tar.bz2
+	(cd tmp && tar c $(notdir $(PREFIX))/) | bzip2 -c > ../vlc-contrib-$(HOST)-$(DATE).tar.bz2
 
 list:
 	@echo All packages:
