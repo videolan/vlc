@@ -51,7 +51,6 @@ namespace dash
             logic::IAdaptationLogic::LogicType  logicType;
             mpd::Profile                        profile;
             xml::Node                           *node;
-            mpd::MPDManagerFactory              *mpdManagerFactory;
             mpd::IMPDManager                    *mpdManager;
     };
 }

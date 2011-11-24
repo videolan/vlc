@@ -30,29 +30,19 @@
 using namespace dash::mpd;
 using namespace dash::xml;
 
-MPDManagerFactory::MPDManagerFactory()
-{
-    // TODO Auto-generated constructor stub
-
-}
-
-MPDManagerFactory::~MPDManagerFactory()
-{
-    // TODO Auto-generated destructor stub
-}
-
 IMPDManager* MPDManagerFactory::create                  (Profile profile, Node *root)
 {
     switch(profile)
     {
         case mpd::Basic:    return new NullManager();
-        case mpd::BasicCM:  return this->createBasicCMManager(root);
+        case mpd::BasicCM:  return createBasicCMManager(root);
         case mpd::Full2011: return new NullManager();
         case mpd::NotValid: return new NullManager();
 
         default:            return new NullManager();
     }
 }
+
 IMPDManager* MPDManagerFactory::createBasicCMManager    (Node *root)
 {
     BasicCMParser *parser = new BasicCMParser(root);

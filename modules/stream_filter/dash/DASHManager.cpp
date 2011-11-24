@@ -40,8 +40,7 @@ DASHManager::DASHManager    (HTTPConnectionManager *conManager, Node *node, IAda
     this->node              = node;
     this->logicType         = type;
     this->profile           = profile;
-    this->mpdManagerFactory = new MPDManagerFactory();
-    this->mpdManager        = this->mpdManagerFactory->create(this->profile, this->node);
+    this->mpdManager        = mpd::MPDManagerFactory::create(this->profile, this->node);
     this->adaptationLogic   = AdaptationLogicFactory::create( this->logicType, this->mpdManager );
     this->currentChunk      = NULL;
 
@@ -50,7 +49,6 @@ DASHManager::DASHManager    (HTTPConnectionManager *conManager, Node *node, IAda
 DASHManager::~DASHManager   ()
 {
     delete(this->adaptationLogic);
-    delete(this->mpdManager);
 }
 
 int DASHManager::read   (void *p_buffer, size_t len)

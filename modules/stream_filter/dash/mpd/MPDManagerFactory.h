@@ -38,13 +38,10 @@ namespace dash
         class MPDManagerFactory
         {
             public:
-                MPDManagerFactory           ();
-                virtual ~MPDManagerFactory  ();
-
-                IMPDManager* create(Profile profile, dash::xml::Node *root);
+                static IMPDManager* create(Profile profile, dash::xml::Node *root);
 
             private:
-                IMPDManager* createBasicCMManager(dash::xml::Node *root);
+                static IMPDManager* createBasicCMManager(dash::xml::Node *root);
         };
     }
 }
