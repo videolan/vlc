@@ -45,7 +45,6 @@ namespace dash
 
             public:
                 MPD         (std::map<std::string, std::string> attributes);
-                MPD         ();
                 virtual ~MPD();
 
                 const std::string&             getType                 () const throw(dash::exception::AttributeNotPresentException);

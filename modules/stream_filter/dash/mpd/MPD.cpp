@@ -35,10 +35,7 @@ MPD::MPD    (std::map<std::string, std::string> attributes)
     this->attributes    = attributes;
     this->programInfo   = NULL;
 }
-MPD::MPD    ()
-{
 
-}
 MPD::~MPD   ()
 {
     for(size_t i = 0; i < this->periods.size(); i++)
