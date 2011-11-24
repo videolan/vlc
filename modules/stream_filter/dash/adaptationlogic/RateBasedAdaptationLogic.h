@@ -40,7 +40,6 @@ namespace dash
         {
             public:
                 RateBasedAdaptationLogic            (dash::mpd::IMPDManager *mpdManager);
-                virtual ~RateBasedAdaptationLogic   ();
 
                 dash::http::Chunk* getNextChunk () throw(dash::exception::EOFException);
 

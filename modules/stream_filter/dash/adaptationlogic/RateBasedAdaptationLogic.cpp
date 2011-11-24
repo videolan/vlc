@@ -33,13 +33,11 @@ using namespace dash::http;
 using namespace dash::mpd;
 using namespace dash::exception;
 
-RateBasedAdaptationLogic::RateBasedAdaptationLogic  (IMPDManager *mpdManager) : AbstractAdaptationLogic(mpdManager)
-{
-    this->mpdManager    = mpdManager;
-    this->currentPeriod = this->mpdManager->getFirstPeriod();
-    this->count         = 0;
-}
-RateBasedAdaptationLogic::~RateBasedAdaptationLogic ()
+RateBasedAdaptationLogic::RateBasedAdaptationLogic  (IMPDManager *mpdManager) :
+    AbstractAdaptationLogic( mpdManager ),
+    mpdManager( mpdManager ),
+    count( 0 ),
+    currentPeriod( mpdManager->getFirstPeriod() )
 {
 }
 
