@@ -175,6 +175,7 @@ nobase_vlclib_DATA = \
 	lua/playlist/canalplus.luac \
 	lua/playlist/cue.luac \
 	lua/playlist/dailymotion.luac \
+	lua/playlist/extreme.luac \
 	lua/playlist/france2.luac \
 	lua/playlist/googlevideo.luac \
 	lua/playlist/jamendo.luac \
@@ -192,6 +193,7 @@ nobase_vlclib_DATA = \
 	lua/playlist/vimeo.luac \
 	lua/playlist/youtube.luac \
 	lua/playlist/youtube_homepage.luac \
+	lua/playlist/zapiks.luac \
 	lua/sd/fmc.luac \
 	lua/sd/freebox.luac \
 	lua/sd/icecast.luac \
@@ -244,6 +246,7 @@ EXTRA_DIST += \
 	lua/playlist/canalplus.lua \
 	lua/playlist/cue.lua \
 	lua/playlist/dailymotion.lua \
+	lua/playlist/extreme.lua \
 	lua/playlist/france2.lua \
 	lua/playlist/googlevideo.lua \
 	lua/playlist/jamendo.lua \
@@ -261,6 +264,7 @@ EXTRA_DIST += \
 	lua/playlist/vimeo.lua \
 	lua/playlist/youtube.lua \
 	lua/playlist/youtube_homepage.lua \
+	lua/playlist/zapiks.lua \
 	lua/sd/README.txt \
 	lua/sd/fmc.lua \
 	lua/sd/freebox.lua \
