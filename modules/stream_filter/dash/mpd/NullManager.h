@@ -39,9 +39,6 @@ namespace dash
         class NullManager : public IMPDManager
         {
             public:
-                NullManager         ();
-                virtual ~NullManager();
-
                 const std::vector<Period *>&   getPeriods              () const;
                 Period*                 getFirstPeriod          ();
                 Period*                 getNextPeriod           (Period *period);

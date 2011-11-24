@@ -29,14 +29,6 @@
 
 using namespace dash::mpd;
 
-NullManager::NullManager    ()
-{
-
-}
-NullManager::~NullManager   ()
-{
-}
-
 const std::vector<Period *>&   NullManager::getPeriods              () const
 {
     return this->periods;
