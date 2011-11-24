@@ -189,6 +189,7 @@ nobase_vlclib_DATA = \
 	lua/playlist/pinkbike.luac \
 	lua/playlist/pluzz.luac \
 	lua/playlist/rockbox_fm_presets.luac \
+	lua/playlist/vimeo.luac \
 	lua/playlist/youtube.luac \
 	lua/playlist/youtube_homepage.luac \
 	lua/sd/fmc.luac \
@@ -257,6 +258,7 @@ EXTRA_DIST += \
 	lua/playlist/pinkbike.lua \
 	lua/playlist/pluzz.lua \
 	lua/playlist/rockbox_fm_presets.lua \
+	lua/playlist/vimeo.lua \
 	lua/playlist/youtube.lua \
 	lua/playlist/youtube_homepage.lua \
 	lua/sd/README.txt \
