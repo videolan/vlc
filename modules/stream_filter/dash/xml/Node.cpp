@@ -29,6 +29,8 @@
 
 using namespace dash::xml;
 
+const std::string   Node::EmptyString = "";
+
 Node::Node  ()
 {
 }
@@ -38,7 +40,7 @@ Node::~Node ()
         delete(this->subNodes.at(i));
 }
 
-std::vector<Node*>                  Node::getSubNodes           ()
+const std::vector<Node*>&            Node::getSubNodes           () const
 {
     return this->subNodes;
 }
@@ -46,23 +48,29 @@ void                                Node::addSubNode            (Node *node)
 {
     this->subNodes.push_back(node);
 }
-std::string                         Node::getName               ()
+const std::string&                  Node::getName               () const
 {
     return this->name;
 }
-void                                Node::setName               (std::string name)
+void                                Node::setName               (const std::string& name)
 {
     this->name = name;
 }
-std::string                         Node::getAttributeValue     (std::string key)
+
+const std::string&                  Node::getAttributeValue     (const std::string& key) const
 {
-    return this->attributes[key];
+    std::map<std::string, std::string>::const_iterator  it = this->attributes.find( key );
+
+    if ( it != this->attributes.end() )
+        return it->second;
+    return EmptyString;
 }
-void                                Node::addAttribute          (std::string key, std::string value)
+
+void                                Node::addAttribute          ( const std::string& key, const std::string& value)
 {
     this->attributes[key] = value;
 }
-std::vector<std::string>            Node::getAttributeKeys      ()
+std::vector<std::string>            Node::getAttributeKeys      () const
 {
     std::vector<std::string> keys;
     std::map<std::string, std::string>::const_iterator it;
@@ -73,15 +81,17 @@ std::vector<std::string>            Node::getAttributeKeys      ()
     }
     return keys;
 }
-bool                                Node::hasText               ()
+
+bool                                Node::hasText               () const
 {
     return false;
 }
-std::string                         Node::getText               ()
+
+const std::string&                         Node::getText               () const
 {
-    return "";
+    return EmptyString;
 }
-std::map<std::string,std::string>   Node::getAttributes         ()
+const std::map<std::string,std::string>&   Node::getAttributes         () const
 {
     return this->attributes;
 }

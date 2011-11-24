@@ -40,18 +40,19 @@ namespace dash
                 Node            ();
                 virtual ~Node   ();
 
-                std::vector<Node *>                 getSubNodes         ();
+                const std::vector<Node *>&          getSubNodes         () const;
                 void                                addSubNode          (Node *node);
-                std::string                         getName             ();
-                void                                setName             (std::string name);
-                void                                addAttribute        (std::string key, std::string value);
-                std::string                         getAttributeValue   (std::string key);
-                std::vector<std::string>            getAttributeKeys    ();
-                bool                                hasText             ();
-                std::string                         getText             ();
-                std::map<std::string, std::string>  getAttributes       ();
+                const std::string&                  getName             () const;
+                void                                setName             (const std::string& name);
+                void                                addAttribute        (const std::string& key, const std::string& value);
+                const std::string&                  getAttributeValue   (const std::string& key) const;
+                std::vector<std::string>            getAttributeKeys    () const;
+                bool                                hasText             () const;
+                const std::string&                  getText             () const;
+                const std::map<std::string, std::string>& getAttributes () const;
 
             private:
+                static const std::string            EmptyString;
                 std::vector<Node *>                 subNodes;
                 std::map<std::string, std::string>  attributes;
                 std::string                         name;
