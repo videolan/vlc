@@ -550,7 +550,7 @@ static int MP4_ReadBox_trun(  stream_t *p_stream, MP4_Box_t *p_box )
     MP4_GET4BYTES( p_box->data.p_trun->i_sample_count );
 
     if( p_box->data.p_trun->i_flags & MP4_TRUN_DATA_OFFSET )
-        MP4_GET8BYTES( p_box->data.p_trun->i_data_offset );
+        MP4_GET4BYTES( p_box->data.p_trun->i_data_offset );
     if( p_box->data.p_trun->i_flags & MP4_TRUN_FIRST_FLAGS )
         MP4_GET4BYTES( p_box->data.p_trun->i_first_sample_flags );
 
