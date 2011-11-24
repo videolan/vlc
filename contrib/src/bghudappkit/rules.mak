@@ -20,5 +20,6 @@ bghudappkit: bghudappkit-git.tar.xz .sum-bghudappkit
 	$(MOVE)
 
 .bghudappkit: bghudappkit
-	cd $< && $(MAKE) && exit 1 #FIXME
+	cd $< && xcodebuild -arch $(ARCH)
+	cd $< && cp -R -L build/Release/BGHUDAppKit.framework "$(PREFIX)"
 	touch $@

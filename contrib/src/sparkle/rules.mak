@@ -17,5 +17,6 @@ sparkle: sparkle-$(SPARKLE_VERSION).zip .sum-sparkle
 	touch $@
 
 .sparkle: sparkle
-	cd $</Extras/Source\ Code && $(MAKE) && exit 1 #FIXME
+	cd $</Extras/Source\ Code && $(MAKE) && xcodebuild -arch $(ARCH)
+	cd $< && cp -R -L Extras/Source\ Code/build/release/Sparkle.framework "$(PREFIX)"
 	touch $@

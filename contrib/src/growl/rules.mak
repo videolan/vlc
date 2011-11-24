@@ -18,5 +18,6 @@ growl: growl-$(GROWL_VERSION).tar.bz2 .sum-growl
 	touch $@
 
 .growl: growl
-	cd $< && $(MAKE) && exit 1 #FIXME
+	cd $< && xcodebuild -sdk /Developer/SDKs/MacOSX10.6.sdk -arch $(ARCH)
+	cd $< && cp -R -L build/Release/Growl.framework "$(PREFIX)"
 	touch $@
