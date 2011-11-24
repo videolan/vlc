@@ -2,7 +2,7 @@
 
 OPTIONS="
         --prefix=`pwd`/vlc_install_dir
-        --enable-macos
+        --enable-macosx
         --enable-merge-ffmpeg
         --enable-growl
         --enable-faad
