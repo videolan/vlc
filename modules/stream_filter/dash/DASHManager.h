@@ -47,7 +47,6 @@ namespace dash
         private:
             http::HTTPConnectionManager         *conManager;
             http::Chunk                         *currentChunk;
-            logic::AdaptationLogicFactory       *logicFactory;
             logic::IAdaptationLogic             *adaptationLogic;
             logic::IAdaptationLogic::LogicType  logicType;
             mpd::Profile                        profile;

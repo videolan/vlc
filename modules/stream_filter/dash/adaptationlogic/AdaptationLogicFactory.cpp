@@ -31,15 +31,6 @@ using namespace dash::logic;
 using namespace dash::xml;
 using namespace dash::mpd;
 
-AdaptationLogicFactory::AdaptationLogicFactory  ()
-{
-
-}
-AdaptationLogicFactory::~AdaptationLogicFactory ()
-{
-
-}
-
 IAdaptationLogic* AdaptationLogicFactory::create (IAdaptationLogic::LogicType logic, IMPDManager *mpdManager)
 {
     switch(logic)

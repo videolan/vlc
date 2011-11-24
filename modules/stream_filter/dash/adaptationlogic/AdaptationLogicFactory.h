@@ -39,10 +39,7 @@ namespace dash
         class AdaptationLogicFactory
         {
             public:
-                AdaptationLogicFactory          ();
-                virtual ~AdaptationLogicFactory ();
-
-                IAdaptationLogic* create (IAdaptationLogic::LogicType logic, dash::mpd::IMPDManager *mpdManager);
+                static IAdaptationLogic* create (IAdaptationLogic::LogicType logic, dash::mpd::IMPDManager *mpdManager);
         };
     }
 }

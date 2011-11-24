@@ -42,15 +42,13 @@ DASHManager::DASHManager    (HTTPConnectionManager *conManager, Node *node, IAda
     this->profile           = profile;
     this->mpdManagerFactory = new MPDManagerFactory();
     this->mpdManager        = this->mpdManagerFactory->create(this->profile, this->node);
-    this->logicFactory      = new AdaptationLogicFactory();
-    this->adaptationLogic   = this->logicFactory->create(this->logicType, this->mpdManager);
+    this->adaptationLogic   = AdaptationLogicFactory::create( this->logicType, this->mpdManager );
     this->currentChunk      = NULL;
 
     this->conManager->attach(this->adaptationLogic);
 }
 DASHManager::~DASHManager   ()
 {
-    delete(this->logicFactory);
     delete(this->adaptationLogic);
     delete(this->mpdManager);
 }
