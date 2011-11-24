@@ -12,7 +12,7 @@ StrCpy $Name_Section07 "Contextmenu's"
 StrCpy $Name_Section08 "Voorkeuren en buffers wissen"
 
 StrCpy $Desc_Section01 \
-    "De mediaspeler zelf"
+    "De media player zelf"
 StrCpy $Desc_Section02a \
     "Pictogrammen aan het startmenu toevoegen voor eenvoudig starten"
 StrCpy $Desc_Section02b \
@@ -26,7 +26,7 @@ StrCpy $Desc_Section05 \
 StrCpy $Desc_Section06 \
     "Stelt VLC Media Player als de standaardtoepassing in voor de opgegeven bestandstypen"
 StrCpy $Desc_Section07 \
-    "Voeg contextmenu-ingangen toe ('Afspelen met VLC Media Player',...)"
+    "Contextmenu-ingangen toevoegen ('Afspelen met VLC Media Player',...)"
 StrCpy $Desc_Section08 \
     "Verwijdert voorkeuren en bufferbestanden die van vorige installaties van VLC Media Player overgebleven zijn"
 
@@ -43,8 +43,8 @@ StrCpy $Desc_Section92 \
 "Verwijdert de voorkeuren en bufferbestanden van VLC Media Player"
 
 StrCpy $ShellAssociation_Play "Afspelen"
-StrCpy $ContextMenuEntry_PlayWith "Afspelen met VLC Media Player"
-StrCpy $ContextMenuEntry_AddToPlaylist "Aan afspeellijst van VLC Media Player toevoegen"
+StrCpy $ContextMenuEntry_PlayWith "VLC Media Player - Afspelen"
+StrCpy $ContextMenuEntry_AddToPlaylist "VLC Media Player - Aan afspeellijst toevoegen"
 
 StrCpy $Link_VisitWebsite "Bezoek de website van VLC Media Player"
 
