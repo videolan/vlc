@@ -38,6 +38,7 @@ static void PauseConsole (void);
 #else
 # define ShowConsole() (void)0
 # define PauseConsole() (void)0
+# include <unistd.h>
 #endif
 
 static void Help (vlc_object_t *, const char *);

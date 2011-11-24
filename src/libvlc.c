@@ -52,6 +52,9 @@
 #ifdef HAVE_LOCALE_H
 #   include <locale.h>
 #endif
+#ifdef HAVE_UNISTD_H
+#   include <unistd.h> /* isatty() */
+#endif
 
 #ifdef HAVE_DBUS
 /* used for one-instance mode */
