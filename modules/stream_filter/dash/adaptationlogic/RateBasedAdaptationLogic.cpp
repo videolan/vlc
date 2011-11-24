@@ -67,15 +67,12 @@ Chunk*  RateBasedAdaptationLogic::getNextChunk () throw(EOFException)
         return this->getNextChunk();
     }
 
-    for(size_t i = 0; i < segments.size(); i++)
+    if ( segments.size() > this->count )
     {
-        if(i == this->count)
-        {
-            this->count++;
-            Chunk *chunk = new Chunk();
-            chunk->setUrl(segments.at(i)->getSourceUrl());
-            return chunk;
-        }
+        Chunk *chunk = new Chunk;
+        chunk->setUrl( segments.at( this->count )->getSourceUrl() );
+        this->count++;
+        return chunk;
     }
     return NULL;
 }
