@@ -31,6 +31,13 @@
 #include <vlc_dialog.h>
 #include <vlc_charset.h>
 
+#ifdef HAVE_UNISTD_H
+# include <unistd.h>
+#endif
+#ifdef _POSIX_VERSION
+# include <glob.h>
+#endif
+
 /* On Win32, we link statically */
 #ifdef WIN32
 # define FLUIDSYNTH_NOT_A_DLL
@@ -46,7 +53,7 @@
 # define fluid_synth_channel_pressure(synth, channel, p) (FLUID_FAILED)
 #endif
 
-#define SOUNDFONT_TEXT N_("Sound fonts (required)")
+#define SOUNDFONT_TEXT N_("Sound fonts")
 #define SOUNDFONT_LONGTEXT N_( \
     "A sound fonts file is required for software synthesis." )
 
@@ -104,6 +111,26 @@ static int Open (vlc_object_t *p_this)
             msg_Err (p_this, "cannot load sound fonts file %s", font_path);
         free (font_path);
     }
+#ifdef _POSIX_VERSION
+    else
+    {
+        glob_t gl;
+
+        if (!glob ("/usr/share/sounds/sf2/*.sf2", GLOB_NOESCAPE, NULL, &gl))
+        {
+            for (size_t i = 0; i < gl.gl_pathc; i++)
+            {
+                const char *path = gl.gl_pathv[i];
+
+                p_sys->soundfont = fluid_synth_sfload (p_sys->synth, path, 1);
+                if (p_sys->soundfont != -1)
+                    break; /* it worked! */
+                msg_Err (p_this, "cannot load sound fonts file %s", path);
+            }
+            globfree (&gl);
+        }
+    }
+#endif
 
     if (p_sys->soundfont == -1)
     {
