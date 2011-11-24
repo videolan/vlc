@@ -7,7 +7,7 @@ PKGS += bghudappkit
 endif
 
 $(TARBALLS)/bghudappkit-git.tar.xz:
-	$(call download_git,$(BGHUDAPPKIT_GITURL))
+	$(call download_git,$(BGHUDAPPKIT_GITURL),,79a560d)
 
 
 .sum-bghudappkit: bghudappkit-git.tar.xz
@@ -20,6 +20,6 @@ bghudappkit: bghudappkit-git.tar.xz .sum-bghudappkit
 	$(MOVE)
 
 .bghudappkit: bghudappkit
-	cd $< && xcodebuild -arch $(ARCH)
+	cd $< && xcodebuild -arch $(ARCH) -sdk macosx$(OSX_VERSION)
 	cd $< && cp -R -L build/Release/BGHUDAppKit.framework "$(PREFIX)"
 	touch $@
