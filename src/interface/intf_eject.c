@@ -34,53 +34,83 @@
 #endif
 
 #include <vlc_common.h>
+#include <vlc_fs.h>
+#include <vlc_interface.h>
 
-#ifdef HAVE_UNISTD_H
-#    include <unistd.h>
-#endif
-
-#ifdef HAVE_FCNTL_H
-#   include <fcntl.h>
-#endif
-
-#ifdef HAVE_DVD_H
-#   include <dvd.h>
-#endif
-
-#if defined(__linux__) && defined(HAVE_LINUX_VERSION_H)
-#   include <linux/version.h>
-    /* handy macro found in 2.1 kernels, but not in older ones */
-#   ifndef KERNEL_VERSION
-#       define KERNEL_VERSION(a,b,c) (((a) << 16) + ((b) << 8) + (c))
-#   endif
-
+#if defined( WIN32 ) && !defined( UNDER_CE )
+#   include <mmsystem.h>
+#elif defined(__linux__)
 #   include <sys/types.h>
-#   include <sys/ioctl.h>
-
+#   include <unistd.h>
+#   include <fcntl.h>
 #   include <sys/ioctl.h>
 #   include <sys/mount.h>
 
 #   include <linux/cdrom.h>
-#   if LINUX_VERSION_CODE < KERNEL_VERSION(2,1,0)
-#       include <linux/ucdrom.h>
-#   endif
 
 #   include <scsi/scsi.h>
 #   include <scsi/sg.h>
 #   include <scsi/scsi_ioctl.h>
+#elif defined (HAVE_DVD_H)
+#   include <unistd.h>
+#   include <fcntl.h>
+#   include <dvd.h>
 #endif
 
-#if defined( WIN32 ) && !defined( UNDER_CE )
-#   include <mmsystem.h>
-#endif
+#if defined(__linux__)
+/**
+ * \brief Ejects the CD /DVD using SCSI commands
+ * \ingroup vlc_interface
+ * This function is local
+ * \param i_fd a device nummber
+ * \return 0 on success, VLC_EGENERIC on failure
+ */
+static int EjectSCSI( int i_fd )
+{
+    struct sdata
+    {
+        int  inlen;
+        int  outlen;
+        char cmd[256];
+    } scsi_cmd;
 
-#include <vlc_interface.h>
+    scsi_cmd.inlen  = 0;
+    scsi_cmd.outlen = 0;
+    scsi_cmd.cmd[0] = ALLOW_MEDIUM_REMOVAL;
+    scsi_cmd.cmd[1] = 0;
+    scsi_cmd.cmd[2] = 0;
+    scsi_cmd.cmd[3] = 0;
+    scsi_cmd.cmd[4] = 0;
+    scsi_cmd.cmd[5] = 0;
+    if( ioctl( i_fd, SCSI_IOCTL_SEND_COMMAND, (void *)&scsi_cmd ) < 0 )
+        return VLC_EGENERIC;
 
-/*****************************************************************************
- * Local prototypes
- *****************************************************************************/
-#if defined(__linux__) && defined(HAVE_LINUX_VERSION_H)
-static int EjectSCSI ( int i_fd );
+    scsi_cmd.inlen  = 0;
+    scsi_cmd.outlen = 0;
+    scsi_cmd.cmd[0] = START_STOP;
+    scsi_cmd.cmd[1] = 0;
+    scsi_cmd.cmd[2] = 0;
+    scsi_cmd.cmd[3] = 0;
+    scsi_cmd.cmd[4] = 1;
+    scsi_cmd.cmd[5] = 0;
+    if( ioctl( i_fd, SCSI_IOCTL_SEND_COMMAND, (void *)&scsi_cmd ) < 0 )
+        return VLC_EGENERIC;
+
+    scsi_cmd.inlen  = 0;
+    scsi_cmd.outlen = 0;
+    scsi_cmd.cmd[0] = START_STOP;
+    scsi_cmd.cmd[1] = 0;
+    scsi_cmd.cmd[2] = 0;
+    scsi_cmd.cmd[3] = 0;
+    scsi_cmd.cmd[4] = 2;
+    scsi_cmd.cmd[5] = 0;
+    if( ioctl( i_fd, SCSI_IOCTL_SEND_COMMAND, (void *)&scsi_cmd ) < 0 )
+        return VLC_EGENERIC;
+
+    /* Force kernel to reread partition table when new disc inserted */
+    ioctl( i_fd, BLKRRPART );
+    return VLC_SUCCESS;
+}
 #endif
 
 #undef intf_Eject
@@ -94,12 +124,12 @@ static int EjectSCSI ( int i_fd );
 int intf_Eject( vlc_object_t *p_this, const char *psz_device )
 {
     VLC_UNUSED(p_this);
-    int i_ret = VLC_SUCCESS;
 
 #ifdef __APPLE__
     FILE *p_eject;
     char *psz_disk;
     char sz_cmd[32];
+    int i_ret;
 
     /*
      * The only way to cleanly unmount the disc under MacOS X
@@ -139,10 +169,6 @@ int intf_Eject( vlc_object_t *p_this, const char *psz_device )
 
     return VLC_EGENERIC;
 
-#elif defined(UNDER_CE)
-    msg_Warn( p_this, "CD-Rom ejection unsupported on this platform" );
-    return i_ret;
-
 #elif defined(WIN32)
     MCI_OPEN_PARMS op;
     DWORD i_flags;
@@ -159,128 +185,41 @@ int intf_Eject( vlc_object_t *p_this, const char *psz_device )
     i_flags = MCI_OPEN_TYPE | MCI_OPEN_TYPE_ID |
               MCI_OPEN_ELEMENT | MCI_OPEN_SHAREABLE;
 
-    if( !mciSendCommand( 0, MCI_OPEN, i_flags, (uintptr_t)&op ) )
-    {
-        /* Eject disc */
-        i_ret = mciSendCommand( op.wDeviceID, MCI_SET, MCI_SET_DOOR_OPEN, 0 );
-        /* Release access to the device */
-        mciSendCommand( op.wDeviceID, MCI_CLOSE, MCI_WAIT, 0 );
-    }
-    else i_ret = VLC_EGENERIC;
+    if( mciSendCommand( 0, MCI_OPEN, i_flags, (uintptr_t)&op ) )
+        return VLC_EGENERIC;
 
-    return i_ret;
-#else   /* WIN32 */
+    /* Eject disc */
+    mciSendCommand( op.wDeviceID, MCI_SET, MCI_SET_DOOR_OPEN, 0 );
+    /* Release access to the device */
+    mciSendCommand( op.wDeviceID, MCI_CLOSE, MCI_WAIT, 0 );
 
-    int i_fd;
+    return VLC_SUCCESS;
 
+#elif defined (__linux__) || defined (HAVE_DVD_H)
     /* This code could be extended to support CD/DVD-ROM chargers */
-
-    i_fd = open( psz_device, O_RDONLY | O_NONBLOCK );
-
-    if( i_fd == -1 )
+    int fd = vlc_open( psz_device, O_RDONLY | O_NONBLOCK );
+    if( fd == -1 )
     {
         msg_Err( p_this, "could not open device %s", psz_device );
         return VLC_EGENERIC;
     }
 
-#if defined(__linux__) && defined(HAVE_LINUX_VERSION_H)
+# if defined(__linux__)
     /* Try a simple ATAPI eject */
-    i_ret = ioctl( i_fd, CDROMEJECT, 0 );
-
-    if( i_ret != 0 )
-    {
-        i_ret = EjectSCSI( i_fd );
-    }
-
-    if( i_ret != 0 )
+    if( ioctl( fd, CDROMEJECT, 0 ) < 0
+     && EjectSCSI( fd ) )
+# else
+    if( ioctl( fd, CDROMEJECT, 0 ) < 0 )
+# endif
     {
         msg_Err( p_this, "could not eject %s", psz_device );
+        close( fd );
+        return VLC_EGENERIC;
     }
-
-#elif defined (HAVE_DVD_H)
-    i_ret = ioctl( i_fd, CDROMEJECT, 0 );
+    return VLC_SUCCESS;
 
 #else
-    msg_Warn( p_this, "CD-ROM ejection unsupported on this platform" );
-    i_ret = -1;
-
-#endif
-    close( i_fd );
-
-    return i_ret;
+    msg_Warn( p_this, "CD-Rom ejection unsupported on this platform" );
+    return VLC_EGENERIC;
 #endif
 }
-
-/* The following functions are local */
-
-#if defined(__linux__) && defined(HAVE_LINUX_VERSION_H)
-/*****************************************************************************
- * Eject using SCSI commands. Return 0 if successful
- *****************************************************************************/
-/**
- * \brief Ejects the CD /DVD using SCSI commands
- * \ingroup vlc_interface
- * This function is local
- * \param i_fd a device nummber
- * \return 0 on success, VLC_EGENERIC on failure
- */
-static int EjectSCSI( int i_fd )
-{
-    int i_status;
-
-    struct sdata
-    {
-        int  inlen;
-        int  outlen;
-        char cmd[256];
-    } scsi_cmd;
-
-    scsi_cmd.inlen  = 0;
-    scsi_cmd.outlen = 0;
-    scsi_cmd.cmd[0] = ALLOW_MEDIUM_REMOVAL;
-    scsi_cmd.cmd[1] = 0;
-    scsi_cmd.cmd[2] = 0;
-    scsi_cmd.cmd[3] = 0;
-    scsi_cmd.cmd[4] = 0;
-    scsi_cmd.cmd[5] = 0;
-    i_status = ioctl( i_fd, SCSI_IOCTL_SEND_COMMAND, (void *)&scsi_cmd );
-    if( i_status != 0 )
-    {
-        return VLC_EGENERIC;
-    }
-
-    scsi_cmd.inlen  = 0;
-    scsi_cmd.outlen = 0;
-    scsi_cmd.cmd[0] = START_STOP;
-    scsi_cmd.cmd[1] = 0;
-    scsi_cmd.cmd[2] = 0;
-    scsi_cmd.cmd[3] = 0;
-    scsi_cmd.cmd[4] = 1;
-    scsi_cmd.cmd[5] = 0;
-    i_status = ioctl( i_fd, SCSI_IOCTL_SEND_COMMAND, (void *)&scsi_cmd );
-    if( i_status != 0 )
-    {
-        return VLC_EGENERIC;
-    }
-
-    scsi_cmd.inlen  = 0;
-    scsi_cmd.outlen = 0;
-    scsi_cmd.cmd[0] = START_STOP;
-    scsi_cmd.cmd[1] = 0;
-    scsi_cmd.cmd[2] = 0;
-    scsi_cmd.cmd[3] = 0;
-    scsi_cmd.cmd[4] = 2;
-    scsi_cmd.cmd[5] = 0;
-    i_status = ioctl( i_fd, SCSI_IOCTL_SEND_COMMAND, (void *)&scsi_cmd );
-    if( i_status != 0 )
-    {
-        return VLC_EGENERIC;
-    }
-
-    /* Force kernel to reread partition table when new disc inserted */
-    i_status = ioctl( i_fd, BLKRRPART );
-
-    return i_status;
-}
-#endif
-
