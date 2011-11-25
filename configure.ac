@@ -1818,13 +1818,9 @@ darwin_libdvdcss_extralibs="-Wl,-framework,CoreFoundation -Wl,-framework,IOKit"
 libdvdcss_extralibs=""
 test "${SYS}" = darwin && libdvdcss_extralibs="${darwin_libdvdcss_extralibs}"
 AC_CHECK_LIB(dvdcss, dvdcss_interface_2, [
-    VLC_ADD_LIBS([dvdread], [-ldvdcss])
-    VLC_ADD_LIBS([dvdnav], [-ldvdcss])
-    if test "${SYS}" = darwin; then
-        VLC_ADD_LIBS([dvdread], "${darwin_libdvdcss_extralibs}")
-        VLC_ADD_LIBS([dvdnav], "${darwin_libdvdcss_extralibs}")
-    fi
-    ],, "${darwin_libdvdcss_extralibs}")
+    VLC_ADD_LIBS([dvdread], -ldvdcss "${libdvdcss_extralibs}")
+    VLC_ADD_LIBS([dvdnav], -ldvdcss "${libdvdcss_extralibs}")
+    ],, "${libdvdcss_extralibs}")
 
 dnl
 dnl libdvdnav plugin
