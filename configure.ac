@@ -3983,11 +3983,6 @@ AS_IF([test "${enable_libgcrypt}" != "no"], [
   )
 ])
 
-if test "${SYS}" = "mingw32" -o "${SYS}" = "mingwce"; then
-  AS_IF([test "${have_libgcrypt}" = "yes"],[
-    VLC_ADD_LIBS([rtp stream_out_rtp], [${GCRYPT_LIBS}])
-  ])
-fi
 AC_SUBST(GCRYPT_CFLAGS)
 AC_SUBST(GCRYPT_LIBS)
 AM_CONDITIONAL([HAVE_GCRYPT], [test "${have_libgcrypt}" = "yes"])
@@ -4007,49 +4002,11 @@ AS_IF([test "${have_libgcrypt}" != "yes"], [
 AS_IF([test "${enable_gnutls}" != "no"], [
   PKG_CHECK_MODULES(GNUTLS, [gnutls >= 2.0.0], [
     VLC_ADD_PLUGIN([gnutls])
-    VLC_ADD_CFLAGS([gnutls], [$GNUTLS_CFLAGS])
-    AS_IF([test "${SYS}" = "mingw32"], [
-      dnl pkg-config --libs gnutls omits these
-      VLC_ADD_LIBS([gnutls], [-lz ${LTLIBINTL} -lcrypt32])
-    ])
-    VLC_ADD_LIBS([gnutls], [${GCRYPT_LIBS}])
-    VLC_ADD_CFLAGS([gnutls], [${GCRYPT_CFLAGS}])
-    VLC_ADD_LIBS([gnutls], [$GNUTLS_LIBS])
   ], [
     AS_IF([test -n "${enable_gnutls}"], [
       AC_MSG_ERROR([${GNUTLS_PKG_ERRORS}.)])
     ])
   ])
-])
-
-
-dnl
-dnl RemoteOSD plugin (VNC client as video filter)
-dnl
-AC_MSG_CHECKING([whether to enable the RemoteOSD plugin])
-AS_IF([test "${have_libgcrypt}" = "yes"],[
-  AC_MSG_RESULT(yes)
-  VLC_ADD_PLUGIN([remoteosd])
-  VLC_ADD_LIBS([remoteosd], ${GCRYPT_LIBS})
-  VLC_ADD_CFLAGS([remoteosd], ${GCRYPT_CFLAGS})
-], [
-  AC_MSG_RESULT(no)
-  AC_MSG_WARN([libgcrypt support required for RemoteOSD plugin])
-])
-
-
-dnl
-dnl RAOP plugin
-dnl
-AC_MSG_CHECKING([whether to enable the RAOP plugin])
-AS_IF([test "${have_libgcrypt}" = "yes"], [
-  AC_MSG_RESULT(yes)
-  VLC_ADD_PLUGIN([stream_out_raop])
-  VLC_ADD_LIBS([stream_out_raop], [${GCRYPT_LIBS} -lgpg-error])
-  VLC_ADD_CFLAGS([stream_out_raop], [${GCRYPT_CFLAGS}])
-], [
-  AC_MSG_RESULT(no)
-  AC_MSG_WARN([libgcrypt support required for RAOP plugin])
 ])
 
 

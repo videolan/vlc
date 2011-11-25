@@ -5,7 +5,6 @@ DIST_SUBDIRS = $(BASE_SUBDIRS)
 
 SOURCES_logger = logger.c
 SOURCES_vod_rtsp = rtsp.c
-SOURCES_gnutls = gnutls.c dhparams.h
 SOURCES_audioscrobbler = audioscrobbler.c
 SOURCES_inhibit = inhibit.c
 SOURCES_sqlite = sqlite.c
@@ -13,6 +12,13 @@ SOURCES_xml = xml/libxml.c
 
 SOURCES_memcpy = memcpy.c
 libvlc_LTLIBRARIES += libmemcpy_plugin.la
+
+libgnutls_plugin_la_SOURCES = gnutls.c dhparams.h
+libgnutls_plugin_la_CFLAGS = $(AM_CFLAGS) $(GNUTLS_CFLAGS) $(GCRYPT_CFLAGS)
+libgnutls_plugin_la_LIBADD = $(AM_LIBADD) $(GNUTLS_LIBS) $(GCRYPT_LIBS)
+libgnutls_plugin_la_DEPENDENCIES =
+EXTRA_LTLIBRARIES += libgnutls_plugin.la
+libvlc_LTLIBRARIES += $(LTLIBgnutls)
 
 libxdg_screensaver_plugin_la_SOURCES = inhibit/xdg.c
 libxdg_screensaver_plugin_la_CFLAGS = $(AM_CFLAGS)
