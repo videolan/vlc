@@ -125,51 +125,7 @@ int intf_Eject( vlc_object_t *p_this, const char *psz_device )
 {
     VLC_UNUSED(p_this);
 
-#ifdef __APPLE__
-    FILE *p_eject;
-    char *psz_disk;
-    char sz_cmd[32];
-    int i_ret;
-
-    /*
-     * The only way to cleanly unmount the disc under MacOS X
-     * is to use the 'disktool' command line utility. It uses
-     * the non-public Disk Arbitration API, which can not be
-     * used by Cocoa or Carbon applications.
-     */
-
-    if( ( psz_disk = (char *)strstr( psz_device, "disk" ) ) != NULL &&
-        strlen( psz_disk ) > 4 )
-    {
-#define EJECT_CMD "/usr/sbin/disktool -e %s 0"
-        snprintf( sz_cmd, sizeof(sz_cmd), EJECT_CMD, psz_disk );
-#undef EJECT_CMD
-
-        if( ( p_eject = popen( sz_cmd, "r" ) ) != NULL )
-        {
-            char psz_result[0x200];
-            i_ret = fread( psz_result, 1, sizeof(psz_result) - 1, p_eject );
-
-            if( i_ret == 0 && ferror( p_eject ) != 0 )
-            {
-                pclose( p_eject );
-                return VLC_EGENERIC;
-            }
-
-            pclose( p_eject );
-
-            psz_result[ i_ret ] = 0;
-
-            if( strstr( psz_result, "Disk Ejected" ) != NULL )
-            {
-                return VLC_SUCCESS;
-            }
-        }
-    }
-
-    return VLC_EGENERIC;
-
-#elif defined(WIN32)
+#if defined(WIN32)
     MCI_OPEN_PARMS op;
     DWORD i_flags;
     char psz_drive[4];
