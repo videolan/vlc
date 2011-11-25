@@ -1,84 +1,59 @@
-Index: dvdread/configure.ac
-===================================================================
---- dvdread/configure.ac	(revision 1162)
-+++ dvdread/configure.ac	(working copy)
-@@ -137,27 +137,59 @@
+--- dvdread/misc/dvdread.pc.in.orig	2011-11-25 11:13:16.573585109 -0500
++++ dvdread/misc/dvdread.pc.in	2011-11-25 11:01:31.390088283 -0500
+@@ -8,4 +8,4 @@
+ Version: @VERSION@
+ 
+ Cflags: -I${includedir}
+-Libs: -L${libdir} -ldvdread
++Libs: -L${libdir} -ldvdread @CSS_LIBS@
+--- dvdread/src/Makefile.am.orig	2011-11-25 11:20:16.287666356 -0500
++++ dvdread/src/Makefile.am	2011-11-25 11:20:24.147705328 -0500
+@@ -10,7 +10,7 @@
+ 	dvd_input.c dvd_udf.c md5.c nav_print.c ifo_print.c bitreader.c \
+ 	bswap.h dvd_input.h dvdread_internal.h dvd_udf.h md5.h bitreader.h
+ 
+-libdvdread_la_LIBADD = $(DYNAMIC_LD_LIBS)
++libdvdread_la_LIBADD = $(DYNAMIC_LD_LIBS) @CSS_LIBS@
+ 
+ libdvdread_la_LDFLAGS = -version-info $(DVDREAD_LT_CURRENT):$(DVDREAD_LT_REVISION):$(DVDREAD_LT_AGE) \
+ 	-export-symbols-regex "(^dvd.*|^nav.*|^ifo.*|^DVD.*|^UDF.*)"
+--- dvdread/configure.ac.orig	2011-11-25 10:59:00.953342325 -0500
++++ dvdread/configure.ac	2011-11-25 11:21:26.732015667 -0500
+@@ -137,12 +137,13 @@
  dnl ---------------------------------------------
  dnl dynamic linker
  dnl ---------------------------------------------
--case $host in
++AC_ARG_ENABLE([libdvdcss], [  --enable-libdvdcss    force linking against libdvdcss])
++
++CSS_LIBS=""
++if test x"$enable_libdvdcss" != xyes; then
++dnl dlopen libdvdcss
+ case $host in
 -  *mingw32*)
 -    CFLAGS="-idirafter \$(top_srcdir)/msvc/include $CFLAGS"
 -    LDFLAGS="-no-undefined $LDFLAGS"
 -    ;;
 -  *cygwin*)
--    LDFLAGS="-no-undefined $LDFLAGS"
--    ;;
--  *os2*)
--    LDFLAGS="-no-undefined -Zbin-files $LDFLAGS"
--    ;;
--  *)
--    AC_CHECK_LIB(c, dlopen,
--                 DYNAMIC_LD_LIBS="",
--                 AC_CHECK_LIB(dl, dlopen,
--                              DYNAMIC_LD_LIBS="-ldl",
--                              AC_MSG_ERROR(dynamic linker needed)))
--    AC_SUBST(DYNAMIC_LD_LIBS)
--    ;;
--esac
-+AC_ARG_WITH( [libdvdcss],
-+    [  --with-libdvdcss[=PATH]    force linking against libdvdcss],
-+    [if test x"$withval" != xno; then
-+       link_dvdcss=yes
-+     fi
-+     if test x"$withval" != xyes; then
-+       dvdcss_path=$withval
-+     fi])
- 
-+if test x"$link_dvdcss" != xyes; then
-+dnl dlopen libdvdcss
-+  AC_CHECK_FUNC( dlopen,
-+    [DL_LIBS="" ],
-+    AC_CHECK_LIB( dl, dlopen,
-+      [DL_LIBS=-ld ],
-+      AC_MSG_ERROR(You need libdl (dlopen))
-+    )
-+  )
++  *mingw32* | *cygwin*)
+     LDFLAGS="-no-undefined $LDFLAGS"
+     ;;
+   *os2*)
+@@ -157,6 +158,18 @@
+     AC_SUBST(DYNAMIC_LD_LIBS)
+     ;;
+ esac
 +else
 +dnl link with libdvdcss
-+  if test -z "$dvdcss_path"; then
-+    AC_CHECK_LIB(dvdcss, dvdcss_interface_2,
-+      [ CSS_LIBS=-ldvdcss ],
-+      AC_MSG_ERROR(You need libdvdcss.so.2 or later)
-+    )
-+    AC_CHECK_HEADERS(dvdcss/dvdcss.h,
-+      [ ],
-+      AC_MSG_ERROR(You need libdvdcss (dvdcss.h))
-+    )
-+  else
-+    saved_CFLAGS=$CFLAGS
-+    CFLAGS="$CFLAGS -L$dvdcss_path/lib"
-+    AC_CHECK_LIB(dvdcss, dvdcss_interface_2,
-+      [ CSS_LIBS="-L$dvdcss_path/lib -R$dvdcss_path/lib -ldvdcss"
-+        CSS_CFLAGS=-I$dvdcss_path/include ],
-+      AC_MSG_ERROR(You need libdvdcss.so.2 or later)
-+    )
-+    CFLAGS=$saved_CFLAGS
-+    dnl -w added to shutup GCC3.1's cpp warning about -I/usr/local
-+    saved_CPPFLAGS=$CPPFLAGS
-+    CPPFLAGS="-w $CPPFLAGS -I$dvdcss_path/include"
-+    AC_CHECK_HEADERS(dvdcss/dvdcss.h,
-+      [ ],
-+      AC_MSG_ERROR(You need libdvdcss (dvdcss.h))
-+    )
-+    CPPFLAGS=$saved_CPPFLAGS
-+  fi
++  CSS_LIBS=-ldvdcss
++  case "${host}" in
++    *darwin*) CSS_LIBS="${CSS_LIBS} -Wl,-framework,CoreFoundation -Wl,-framework,IOKit"
++    ;;
++  esac
++  AC_CHECK_LIB(dvdcss, dvdcss_interface_2,, AC_MSG_ERROR(You need libdvdcss.so.2 or later))
++  AC_CHECK_HEADERS(dvdcss/dvdcss.h,, AC_MSG_ERROR(You need libdvdcss (dvdcss.h)))
 +fi
 +
-+AC_SUBST(DL_LIBS)
 +AC_SUBST(CSS_LIBS)
-+AC_SUBST(CSS_CFLAGS)
-+
+ 
  dnl ---------------------------------------------
  dnl cflags
- dnl ---------------------------------------------
