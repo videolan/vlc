@@ -9,7 +9,6 @@ OPTIONS="
         --enable-flac
         --enable-theora
         --enable-shout
-        --enable-vcdx
         --enable-caca
         --enable-ncurses
         --enable-twolame
