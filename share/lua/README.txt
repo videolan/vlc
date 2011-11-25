@@ -133,14 +133,6 @@ input.item(): Get the current input item. Input item methods are:
     .played_abuffers
     .lost_abuffers
 
-MD5
----
-md5( str ): return the string's hash
-md5(): create an md5 object with the following methods:
-  :add( str ): add a string to the hash
-  :end_(): finish hashing
-  :hash(): return the hash
-
 Messages
 --------
 msg.dbg( [str1, [str2, [...]]] ): Output debug messages (-vv).
