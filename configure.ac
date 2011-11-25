@@ -1813,15 +1813,6 @@ dnl dvdread module: check for libdvdread
 dnl
 PKG_ENABLE_MODULES_VLC([DVDREAD], [], [dvdread], [dvdread input module], [auto])
 
-dnl libdvdcss
-darwin_libdvdcss_extralibs="-Wl,-framework,CoreFoundation -Wl,-framework,IOKit"
-libdvdcss_extralibs=""
-test "${SYS}" = darwin && libdvdcss_extralibs="${darwin_libdvdcss_extralibs}"
-AC_CHECK_LIB(dvdcss, dvdcss_interface_2, [
-    VLC_ADD_LIBS([dvdread], -ldvdcss "${libdvdcss_extralibs}")
-    VLC_ADD_LIBS([dvdnav], -ldvdcss "${libdvdcss_extralibs}")
-    ],, "${libdvdcss_extralibs}")
-
 dnl
 dnl libdvdnav plugin
 dnl
@@ -1842,6 +1833,15 @@ then
         [], [${LIBS_dvdnav}])],
       [AC_MSG_WARN([${DVDNAV_PKG_ERRORS}.])])
 fi
+
+dnl libdvdcss
+darwin_libdvdcss_extralibs="-Wl,-framework,CoreFoundation -Wl,-framework,IOKit"
+libdvdcss_extralibs=""
+test "${SYS}" = darwin && libdvdcss_extralibs="${darwin_libdvdcss_extralibs}"
+AC_CHECK_LIB(dvdcss, dvdcss_interface_2, [
+    VLC_ADD_LIBS([dvdread], -ldvdcss "${libdvdcss_extralibs}")
+    VLC_ADD_LIBS([dvdnav], -ldvdcss "${libdvdcss_extralibs}")
+    ],, "${libdvdcss_extralibs}")
 
 dnl
 dnl  Windows DirectShow access module
