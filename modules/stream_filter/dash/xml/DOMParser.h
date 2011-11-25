@@ -64,7 +64,6 @@ namespace dash
                 xml_t               *vlc_xml;
                 xml_reader_t        *vlc_reader;
 
-                void    init                    ();
                 Node*   processNode             ();
                 void    addAttributesToNode     (Node *node);
                 void    print                   (Node *node, int offset);

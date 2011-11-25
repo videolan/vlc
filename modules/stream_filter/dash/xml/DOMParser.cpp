@@ -31,11 +31,14 @@ using namespace dash::xml;
 using namespace dash::http;
 using namespace dash::mpd;
 
-DOMParser::DOMParser    (stream_t *stream)
+DOMParser::DOMParser    (stream_t *stream) :
+    root( NULL ),
+    stream( stream ),
+    vlc_xml( NULL ),
+    vlc_reader( NULL )
 {
-    this->stream = stream;
-    this->init();
 }
+
 DOMParser::~DOMParser   ()
 {
     if(this->vlc_reader)
@@ -123,11 +126,7 @@ void    DOMParser::print                    (Node *node, int offset)
         this->print(node->getSubNodes().at(i), offset);
     }
 }
-void    DOMParser::init                     ()
-{
-    this->root          = NULL;
-    this->vlc_reader    = NULL;
-}
+
 void    DOMParser::print                    ()
 {
     this->print(this->root, 0);
