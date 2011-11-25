@@ -31,7 +31,7 @@ FLACCONF := $(HOSTCONF) \
 # TODO? --enable-sse
 ifdef HAVE_MACOSX
 ifneq ($(findstring $(ARCH),i386 x86_64),)
-FLAC_DISABLE_FLAGS += --disable-asm-optimizations
+FLACCONF += --disable-asm-optimizations
 endif
 endif
 
