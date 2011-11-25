@@ -40,6 +40,8 @@ DOMParser::~DOMParser   ()
 {
     if(this->vlc_reader)
         xml_ReaderDelete(this->vlc_reader);
+    if ( this->vlc_xml )
+        xml_Delete( this->vlc_xml );
 }
 
 Node*   DOMParser::getRootNode              ()
