@@ -1808,15 +1808,6 @@ if test "$SYS" = "linux" -a "${enable_linsys}" != "no"; then
   )
 fi
 
-dnl libdvdcss
-darwin_libdvdcss_extralibs="-Wl,-framework,CoreFoundation -Wl,-framework,IOKit"
-libdvdcss_extralibs=""
-test "${SYS}" = darwin && libdvdcss_extralibs="${darwin_libdvdcss_extralibs}"
-AC_CHECK_LIB(dvdcss, dvdcss_interface_2, [
-    VLC_ADD_LIBS([dvdread], -ldvdcss "${libdvdcss_extralibs}")
-    VLC_ADD_LIBS([dvdnav], -ldvdcss "${libdvdcss_extralibs}")
-    ],, "${libdvdcss_extralibs}")
-
 dnl
 dnl dvdread module: check for libdvdread
 dnl
