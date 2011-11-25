@@ -95,7 +95,7 @@ tar: tar-$(TAR_VERSION).tar.bz2
 	$(UNPACK)
 	$(MOVE)
 
-.tar: tar .tar
+.tar: tar .xz
 	(cd $<; ./configure --prefix=$(PREFIX) && make && make install)
 	touch $@
 
