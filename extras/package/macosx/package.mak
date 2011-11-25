@@ -9,7 +9,7 @@ endif
 # The resulting VLC.app will only run in this tree.
 VLC.app: VLC-tmp.app
 	rm -Rf $@
-	mv VLC-tmp.app $@
+	cp -R VLC-tmp.app $@
 	$(INSTALL) -m 0755 $(top_builddir)/bin/.libs/vlc $@/Contents/MacOS/VLC
 	$(LN_S) -f ../../../modules $@/Contents/MacOS/plugins
 
@@ -17,7 +17,7 @@ VLC.app: VLC-tmp.app
 # use package-macosx to get a nice dmg
 VLC-release.app: VLC-tmp.app
 	rm -Rf $@
-	mv VLC-tmp.app $@
+	cp -R VLC-tmp.app $@
 	PRODUCT="$@" ACTION="release-makefile" src_dir=$(srcdir) build_dir=$(top_builddir) sh $(srcdir)/projects/macosx/framework/Pre-Compile.sh
 	find $@ -type d -exec chmod ugo+rx '{}' \;
 	find $@ -type f -exec chmod ugo+r '{}' \;
@@ -31,71 +31,22 @@ VLC-tmp.app: vlc
 	mkdir -p "$(top_builddir)/tmp/extras/package/macosx"
 	cd $(srcdir)/extras/package/macosx; cp -R Resources README.MacOSX.rtf $(abs_top_builddir)/tmp/extras/package/macosx/
 	mkdir -p $(abs_top_builddir)/tmp/extras/package/macosx/vlc.xcodeproj/
-	sed -e s,../../../contrib,$(CONTRIB_DIR),g $(srcdir)/extras/package/macosx/vlc.xcodeproj/project.pbxproj > $(abs_top_builddir)/tmp/extras/package/macosx/vlc.xcodeproj/project.pbxproj
+	sed -e s,../../../contrib,$(CONTRIB_DIR),g $(srcdir)/extras/package/macosx/vlc.xcodeproj/project.pbxproj \
+        > $(abs_top_builddir)/tmp/extras/package/macosx/vlc.xcodeproj/project.pbxproj
 	REVISION=`(git --git-dir=$(srcdir)/.git describe --always || echo exported)` && \
-	cat $(top_builddir)/extras/package/macosx/Info.plist | \
-	sed "s/#REVISION#/$$REVISION/g" > $(top_builddir)/tmp/extras/package/macosx/Info.plist
+	    sed "s/#REVISION#/$$REVISION/g" $(top_builddir)/extras/package/macosx/Info.plist \
+        > $(top_builddir)/tmp/extras/package/macosx/Info.plist
 	cp -R $(top_builddir)/extras/package/macosx/Resources $(top_builddir)/tmp/extras/package/macosx/
 	cd "$(srcdir)"; cp AUTHORS COPYING THANKS $(abs_top_builddir)/tmp/
-	if test -d $(CONTRIB_DIR)/Sparkle/Sparkle.framework; then \
-		mkdir -p $(top_builddir)/tmp/extras/contrib/Sparkle; \
-		cp -R $(CONTRIB_DIR)/Sparkle/Sparkle.framework $(top_builddir)/tmp/extras/contrib/Sparkle; \
-	fi
-	if test -d $(CONTRIB_DIR)/BGHUDAppKit/BGHUDAppKit.framework; then \
-		mkdir -p $(top_builddir)/tmp/extras/contrib/BGHUDAppKit; \
-		cp -R $(CONTRIB_DIR)/BGHUDAppKit/BGHUDAppKit.framework $(top_builddir)/tmp/extras/contrib/BGHUDAppKit; \
-	fi
-	if test -d $(CONTRIB_DIR)/Growl/Growl.framework; then \
-		mkdir -p $(top_builddir)/tmp/extras/contrib/Growl; \
-		cp -R $(CONTRIB_DIR)/Growl/Growl.framework $(top_builddir)/tmp/extras/contrib/Growl; \
-	fi
 	mkdir -p $(top_builddir)/tmp/modules/audio_output
 	mkdir -p $(top_builddir)/tmp/modules/gui/macosx
-	cd "$(srcdir)/modules/gui/macosx/" && cp \
-	    AppleRemote.h \
-	    AppleRemote.m \
-	    about.h \
-	    about.m \
-	    applescript.h \
-	    applescript.m \
-	    controls.h \
-	    controls.m \
-	    intf.h \
-	    intf.m \
-	    macosx.m \
-	    misc.h \
-	    misc.m \
-	    open.h \
-	    open.m \
-	    output.h \
-	    output.m \
-	    playlist.h \
-	    playlist.m \
-	    playlistinfo.h \
-	    playlistinfo.m \
-	    prefs_widgets.h \
-	    prefs_widgets.m \
-	    prefs.h \
-	    prefs.m \
-	    simple_prefs.h \
-	    simple_prefs.m \
-	    wizard.h \
-	    wizard.m \
-	    bookmarks.h \
-	    bookmarks.m \
-	    coredialogs.h \
-	    coredialogs.m \
-	    fspanel.h \
-	    fspanel.m \
-		 $(abs_top_builddir)/tmp/modules/gui/macosx/
+	cd "$(srcdir)/modules/gui/macosx/" && cp *.h *.m $(abs_top_builddir)/tmp/modules/gui/macosx/
 	cd $(top_builddir)/tmp/extras/package/macosx && \
 		xcodebuild -target vlc SYMROOT=../../../build DSTROOT=../../../build $(silentstd)
 	cp -R -L $(top_builddir)/tmp/build/Default/VLC.bundle $@
-	$(INSTALL) -d $@/Contents/MacOS/
-	$(INSTALL) -d $@/Contents/MacOS/share/
+	mkdir -p $@/Contents/MacOS/share/locale/
 	cp -r $(srcdir)/share/lua $@/Contents/MacOS/share/
 	$(INSTALL) -m 644 $(srcdir)/share/vlc512x512.png $@/Contents/MacOS/share/vlc512x512.png
-	$(INSTALL) -d $@/Contents/MacOS/share/locale
 	cat $(top_srcdir)/po/LINGUAS | while read i; do \
 	  $(INSTALL) -d $@/Contents/MacOS/share/locale/$${i}/LC_MESSAGES ; \
 	  $(INSTALL) $(srcdir)/po/$${i}.gmo $@/Contents/MacOS/share/locale/$${i}/LC_MESSAGES/vlc.mo; \
