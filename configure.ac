@@ -2105,7 +2105,7 @@ then
   VLC_ADD_PLUGIN([qtcapture])
   VLC_ADD_PLUGIN([qtsound])
 fi
-AM_CONDITIONAL(HAVE_QTKIT, [test "${SYS}" = "darwin" && "x${enable_macosx_qtkit}" != "xno"])
+AM_CONDITIONAL(HAVE_QTKIT, [test "${SYS}" = "darwin" -a "x${enable_macosx_qtkit}" != "xno"])
 
 
 dnl
