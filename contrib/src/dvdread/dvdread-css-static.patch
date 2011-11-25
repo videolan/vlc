@@ -49,7 +49,7 @@
 +    *darwin*) CSS_LIBS="${CSS_LIBS} -Wl,-framework,CoreFoundation -Wl,-framework,IOKit"
 +    ;;
 +  esac
-+  AC_CHECK_LIB(dvdcss, dvdcss_interface_2,, AC_MSG_ERROR(You need libdvdcss.so.2 or later))
++  AC_CHECK_LIB(dvdcss, dvdcss_interface_2,, AC_MSG_ERROR(You need libdvdcss.so.2 or later), "${CSS_LIBS}")
 +  AC_CHECK_HEADERS(dvdcss/dvdcss.h,, AC_MSG_ERROR(You need libdvdcss (dvdcss.h)))
 +fi
 +
