@@ -85,6 +85,8 @@ vlc_module_begin ()
     add_directory("browse-dir", NULL, BROWSE_TEXT, BROWSE_LONGTEXT, false)
 vlc_module_end ()
 
+#include "eject.c"
+
 /*****************************************************************************
  * intf_sys_t: description and status of ncurses interface
  *****************************************************************************/

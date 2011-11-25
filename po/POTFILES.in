@@ -105,7 +105,6 @@ src/input/vlm.c
 src/input/vlm_internal.h
 src/input/vlmshell.c
 src/interface/interface.c
-src/interface/intf_eject.c
 src/libvlc.c
 src/libvlc.h
 src/libvlc-module.c

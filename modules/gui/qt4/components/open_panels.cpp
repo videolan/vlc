@@ -57,6 +57,8 @@
     I_DIR_OR_FOLDER( N_("Select a device or a VIDEO_TS directory"), \
                      N_("Select a device or a VIDEO_TS folder") )
 
+#include "../../eject.c"
+
 /* Populate a combobox with the devices matching a pattern.
    Combobox will automatically do autocompletion on the edit zone */
 #define POPULATE_WITH_DEVS(ppsz_devlist, targetCombo) \

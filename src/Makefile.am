@@ -304,7 +304,6 @@ SOURCES_libvlc_common = \
 	version.c \
 	interface/dialog.c \
 	interface/interface.c \
-	interface/intf_eject.c \
 	playlist/playlist_internal.h \
 	playlist/art.c \
 	playlist/art.h \

@@ -1,8 +1,7 @@
 /*****************************************************************************
- * intf_eject.c: CD/DVD-ROM ejection handling functions
+ * eject.c: CD/DVD-ROM ejection handling functions
  *****************************************************************************
- * Copyright (C) 2001-2004 the VideoLAN team
- * $Id$
+ * Copyright (C) 2001-2011 the VideoLAN team
  *
  * Authors: Julien Blache <jb@technologeek.org> for the Linux part
  *                with code taken from the Linux "eject" command
@@ -29,13 +28,12 @@
  *  This file contain functions to eject CD and DVD drives
  */
 
-#ifdef HAVE_CONFIG_H
+/*#ifdef HAVE_CONFIG_H
 # include "config.h"
-#endif
+#endif*/
 
 #include <vlc_common.h>
 #include <vlc_fs.h>
-#include <vlc_interface.h>
 
 #if defined( WIN32 ) && !defined( UNDER_CE )
 #   include <mmsystem.h>
@@ -115,13 +113,12 @@ static int EjectSCSI( int i_fd )
 
 #undef intf_Eject
 /**
- * \brief Ejects the CD /DVD
- * \ingroup vlc_interface
+ * Ejects the optical disc in a device
  * \param p_this the calling vlc_object_t
  * \param psz_device the CD/DVD to eject
- * \return 0 on success, 1 on failure, -1 if not implemented
+ * \return VLC_SUCCESS or VLC_EGENERIC
  */
-int intf_Eject( vlc_object_t *p_this, const char *psz_device )
+static int intf_Eject( vlc_object_t *p_this, const char *psz_device )
 {
     VLC_UNUSED(p_this);
 
@@ -179,3 +176,5 @@ int intf_Eject( vlc_object_t *p_this, const char *psz_device )
     return VLC_EGENERIC;
 #endif
 }
+
+#define intf_Eject(o, p) intf_Eject(VLC_OBJECT(o), p)

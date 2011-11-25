@@ -16,3 +16,4 @@ endif
 
 SOURCES_ncurses = ncurses.c
 SOURCES_fbosd = fbosd.c
+EXTRA_DIST += eject.c

@@ -230,7 +230,6 @@ input_Stop
 input_vaControl
 input_Close
 intf_Create
-intf_Eject
 IsUTF8
 libvlc_InternalAddIntf
 libvlc_InternalCleanup
