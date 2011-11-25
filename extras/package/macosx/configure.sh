@@ -16,6 +16,7 @@ OPTIONS="
         --enable-libass
         --disable-skins2
         --disable-xcb
+        --disable-sdl
 "
 
 sh "$(dirname $0)"/../../../configure ${OPTIONS} $*
