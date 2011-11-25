@@ -48,7 +48,8 @@ DASHManager::DASHManager    (HTTPConnectionManager *conManager, Node *node, IAda
 }
 DASHManager::~DASHManager   ()
 {
-    delete(this->adaptationLogic);
+    delete this->adaptationLogic;
+    delete this->mpdManager;
 }
 
 int DASHManager::read   (void *p_buffer, size_t len)
