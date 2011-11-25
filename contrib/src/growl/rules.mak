@@ -23,6 +23,6 @@ growl: growl-$(GROWL_VERSION).tar.bz2 .sum-growl
 	touch $@
 
 .growl: growl
-	cd $< && xcodebuild -target Growl.framework -configuration Release -arch $(ARCH)
+	cd $< && xcodebuild -target Growl.framework -configuration Release
 	cd $< && cp -R -L build/Release/Growl.framework "$(PREFIX)"
 	touch $@

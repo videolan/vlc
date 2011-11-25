@@ -20,7 +20,7 @@ bghudappkit: bghudappkit-git.tar.xz .sum-bghudappkit
 	$(MOVE)
 
 .bghudappkit: bghudappkit
-	cd $< && xcodebuild -arch $(ARCH) -sdk macosx$(OSX_VERSION)
+	cd $< && xcodebuild -sdk macosx$(OSX_VERSION)
 	install_name_tool -change @loader_path/../../../../../../../BGHUDAppKit.framework/Versions/A/BGHUDAppKit \
 								@loader_path/../../../../Versions/A/BGHUDAppKit \
 		$</build/Release/BGHUDAppKit.framework/Resources/BGHUDAppKitPlugin.ibplugin/Contents/MacOS/BGHUDAppKitPlugin
