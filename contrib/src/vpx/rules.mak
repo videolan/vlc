@@ -46,7 +46,11 @@ else ifdef HAVE_MACOSX
 ifeq ($(ARCH),arm)
 VPX_OS := darwin
 else
+ifeq ($(OSX_VERSION),10.5)
+VPX_OS := darwin9
+else
 VPX_OS := darwin10
+endif
 endif
 else ifdef HAVE_SOLARIS
 VPX_OS := solaris
