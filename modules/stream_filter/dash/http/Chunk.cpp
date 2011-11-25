@@ -29,24 +29,21 @@
 
 using namespace dash::http;
 
-Chunk::Chunk() : url()
-
-{
-    startByte = endByte = 0;
-}
-Chunk::~Chunk()
+Chunk::Chunk() : startByte( 0 ),
+    endByte( 0 )
 {
 }
 
-int         Chunk::getEndByte   ()
+int         Chunk::getEndByte   () const
 {
     return endByte;
 }
-int         Chunk::getStartByte ()
+int         Chunk::getStartByte () const
 {
     return startByte;
 }
-std::string Chunk::getUrl       ()
+
+const std::string& Chunk::getUrl       () const
 {
     return url;
 }
@@ -58,7 +55,7 @@ void        Chunk::setStartByte (int startByte)
 {
     this->startByte = startByte;
 }
-void        Chunk::setUrl       (std::string url)
+void        Chunk::setUrl       ( const std::string& url )
 {
     this->url = url;
 }

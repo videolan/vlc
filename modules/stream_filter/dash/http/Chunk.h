@@ -36,14 +36,13 @@ namespace dash
         {
             public:
                 Chunk           ();
-                virtual ~Chunk  ();
 
-                int         getEndByte      ();
-                int         getStartByte    ();
-                std::string getUrl          ();
-                void        setEndByte      (int endByte);
-                void        setStartByte    (int startByte);
-                void        setUrl          (std::string url);
+                int                 getEndByte      () const;
+                int                 getStartByte    () const;
+                const std::string&  getUrl          () const;
+                void                setEndByte      (int endByte);
+                void                setStartByte    (int startByte);
+                void                setUrl          (const std::string& url);
 
             private:
                 std::string                 url;
