@@ -24,6 +24,11 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
 # ***************************************************************************
 
+echo "This method to build 3rd party libraries has been deprecated.
+Please use the /contrib folder instead of /extras/contrib.
+"
+exit 1
+
 LANG=C
 export LANG
 set -e
