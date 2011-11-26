@@ -1,4 +1,4 @@
-DIST_SUBDIRS = dash
+SUBDIRS = dash
 
 SOURCES_decomp = decomp.c
 SOURCES_stream_filter_record = record.c
