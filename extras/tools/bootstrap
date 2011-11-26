@@ -24,17 +24,20 @@ then
 	exit 1
 fi
 
+check_tar() {
+if ! tar PcJ /dev/null >/dev/null 2>&1
+then
+    echo "tar doesn't support xz (J option)"
+    NEEDED="$NEEDED .tar .xz"
+fi
+}
+
 check() {
 if ! $1 --version >/dev/null 2>&1
 then
     echo "$1 not found"
     NEEDED="$NEEDED .$1"
 else
-    if [ "$1" = "xz" ] && ! tar PcJ /dev/null >/dev/null
-    then
-        echo "tar doesn't support xz (J option)"
-        NEEDED="$NEEDED .tar"
-    fi
     # found, need to check version ?
     [ -z "$2" ] && return # no
     # we only check GNU tools, their version have the form MAJOR.MINOR
@@ -55,9 +58,9 @@ check autoconf 2.67
 check automake 1.11
 check libtool 2.2
 check pkg-config
-check xz
 check cmake
 check yasm
+check_tar
 
 [ -n "$NEEDED" ] && mkdir -p build/
 
