@@ -22,6 +22,6 @@ ncurses: ncurses-$(NCURSES_VERSION).tar.gz .sum-ncurses
 
 .ncurses: ncurses
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) --without-debug --enable-widec --without-develop --without-shared --with-terminfo-dirs=/usr/share/terminfo
-	cd $</ncurses && make && make install
-	cd $</include && make && make install
+	cd $</ncurses && make -j1 && make install
+	cd $</include && make -j1 && make install
 	touch $@
