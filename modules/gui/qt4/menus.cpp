@@ -797,11 +797,13 @@ void QVLCMenu::PopupMenuControlEntries( QMenu *menu, intf_thread_t *p_intf,
                                         bool b_normal )
 {
     QAction *action;
+    QMenu *rateMenu = new QMenu( "Sp&eed" );
+    rateMenu->setTearOffEnabled( true );
 
     if( b_normal )
     {
         /* Faster/Slower */
-        action = menu->addAction( qtr( "&Faster" ), THEMIM->getIM(),
+        action = rateMenu->addAction( qtr( "&Faster" ), THEMIM->getIM(),
                                   SLOT( faster() ) );
 #ifndef __APPLE__ /* No icons in menus in Mac */
         action->setIcon( QIcon( ":/toolbar/faster2") );
@@ -809,27 +811,30 @@ void QVLCMenu::PopupMenuControlEntries( QMenu *menu, intf_thread_t *p_intf,
         action->setData( STATIC_ENTRY );
     }
 
-    action = menu->addAction( qtr( "Faster (fine)" ), THEMIM->getIM(),
+    action = rateMenu->addAction( qtr( "Faster (fine)" ), THEMIM->getIM(),
                               SLOT( littlefaster() ) );
     action->setData( STATIC_ENTRY );
 
-    action = menu->addAction( qtr( "N&ormal Speed" ), THEMIM->getIM(),
+    action = rateMenu->addAction( qtr( "N&ormal Speed" ), THEMIM->getIM(),
                               SLOT( normalRate() ) );
     action->setData( STATIC_ENTRY );
 
-    action = menu->addAction( qtr( "Slower (fine)" ), THEMIM->getIM(),
+    action = rateMenu->addAction( qtr( "Slower (fine)" ), THEMIM->getIM(),
                               SLOT( littleslower() ) );
     action->setData( STATIC_ENTRY );
 
     if( b_normal )
     {
-        action = menu->addAction( qtr( "Slo&wer" ), THEMIM->getIM(),
+        action = rateMenu->addAction( qtr( "Slo&wer" ), THEMIM->getIM(),
                                   SLOT( slower() ) );
 #ifndef __APPLE__ /* No icons in menus in Mac */
         action->setIcon( QIcon( ":/toolbar/slower2") );
 #endif
         action->setData( STATIC_ENTRY );
     }
+
+    action = menu->addMenu( rateMenu );
+    action->setData( STATIC_ENTRY );
 
     menu->addSeparator();
 
