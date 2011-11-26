@@ -137,6 +137,20 @@ add_make_enabled()
 	done
 }
 
+check_macosx_sdk()
+{
+   [ -z "${OSX_VERSION}" ] && echo "OSX_VERSION not specified, assuming 10.5" && OSX_VERSION=10.5
+   SDK="/Developer/SDKs/MacOSX${OSX_VERSION}.sdk"
+   if [ ! -d "${SDK}" ]
+   then
+	   echo "
+*** ${SDK} does not exist, please install required SDK, or use export OSX_VERSION=10.6 ***
+"
+	   exit 1
+   fi
+   add_make "OSX_VERSION ?= ${OSX_VERSION}"
+}
+
 test -z "$PREFIX" || add_make "PREFIX := $PREFIX"
 test -z "$BUILD_DISCS" || add_make_enabled "BUILD_DISCS"
 test -z "$BUILD_ENCODERS" || add_make_enabled "BUILD_ENCODERS"
@@ -147,6 +161,7 @@ test -z "$BUILD_ENCODERS" || add_make_enabled "BUILD_ENCODERS"
 OS="${HOST#*-}" # strip architecture
 case "${OS}" in
 	apple-darwin*)
+		check_macosx_sdk
 		add_make_enabled "HAVE_MACOSX" "HAVE_DARWIN_OS" "HAVE_BSD"
 		;;
 	*darwin*)

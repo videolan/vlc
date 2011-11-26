@@ -90,7 +90,6 @@ endif
 endif
 
 ifdef HAVE_MACOSX
-OSX_VERSION?=10.5
 MACOSX_SDK=/Developer/SDKs/MacOSX$(OSX_VERSION).sdk
 CC=gcc-4.2
 CXX=g++-4.2
