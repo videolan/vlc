@@ -51,6 +51,9 @@
 #elif defined( WIN32 )
 # define DEFAULT_FONT_FILE "arial.ttf" /* Default path font found at run-time */
 # define DEFAULT_FAMILY "Arial"
+#elif defined( __OS2__ )
+# define DEFAULT_FONT_FILE "/psfonts/tnrwt_k.ttf"
+# define DEFAULT_FAMILY "Times New Roman WT K"
 #elif defined( HAVE_MAEMO )
 # define DEFAULT_FONT_FILE "/usr/share/fonts/nokia/nosnb.ttf"
 # define DEFAULT_FAMILY "Nokia Sans Bold"
@@ -91,6 +94,18 @@
 #endif
 
 #include <assert.h>
+
+#ifdef __OS2__
+typedef uint16_t uni_char_t;
+# define FREETYPE_TO_UCS    "UCS-2LE"
+#else
+typedef uint32_t uni_char_t;
+# if defined(WORDS_BIGENDIAN)
+#  define FREETYPE_TO_UCS   "UCS-4BE"
+# else
+#  define FREETYPE_TO_UCS   "UCS-4LE"
+# endif
+#endif
 
 /*****************************************************************************
  * Module descriptor
@@ -433,6 +448,10 @@ static void FontConfig_BuildCache( filter_t *p_filter )
     msg_Dbg( p_filter, "Building font databases.");
     mtime_t t1, t2;
     t1 = mdate();
+
+#ifdef __OS2__
+    FcInit();
+#endif
 
 #if defined( WIN32 ) || defined( __APPLE__ )
     dialog_progress_bar_t *p_dialog = NULL;
@@ -1422,7 +1441,7 @@ static text_style_t *GetStyleFromFontStack( filter_sys_t *p_sys,
 }
 
 static unsigned SetupText( filter_t *p_filter,
-                           uint32_t *psz_text_out,
+                           uni_char_t *psz_text_out,
                            text_style_t **pp_styles,
                            uint32_t *pi_k_dates,
 
@@ -1433,15 +1452,11 @@ static unsigned SetupText( filter_t *p_filter,
     size_t i_string_length;
 
     size_t i_string_bytes;
-#if defined(WORDS_BIGENDIAN)
-    uint32_t *psz_tmp = ToCharset( "UCS-4BE", psz_text_in, &i_string_bytes );
-#else
-    uint32_t *psz_tmp = ToCharset( "UCS-4LE", psz_text_in, &i_string_bytes );
-#endif
+    uni_char_t *psz_tmp = ToCharset( FREETYPE_TO_UCS, psz_text_in, &i_string_bytes );
     if( psz_tmp )
     {
         memcpy( psz_text_out, psz_tmp, i_string_bytes );
-        i_string_length = i_string_bytes / 4;
+        i_string_length = i_string_bytes / sizeof( *psz_tmp );
         free( psz_tmp );
     }
     else
@@ -1468,7 +1483,7 @@ static unsigned SetupText( filter_t *p_filter,
 }
 
 static int ProcessNodes( filter_t *p_filter,
-                         uint32_t *psz_text,
+                         uni_char_t *psz_text,
                          text_style_t **pp_styles,
                          uint32_t *pi_k_dates,
                          int *pi_len,
@@ -1865,13 +1880,13 @@ static int ProcessLines( filter_t *p_filter,
                          FT_BBox     *p_bbox,
                          int         *pi_max_face_height,
 
-                         uint32_t *psz_text,
+                         uni_char_t *psz_text,
                          text_style_t **pp_styles,
                          uint32_t *pi_k_dates,
                          int i_len )
 {
     filter_sys_t   *p_sys = p_filter->p_sys;
-    uint32_t       *p_fribidi_string = NULL;
+    uni_char_t     *p_fribidi_string = NULL;
     text_style_t   **pp_fribidi_styles = NULL;
     int            *p_new_positions = NULL;
 
@@ -2067,7 +2082,7 @@ static int ProcessLines( filter_t *p_filter,
             while( i_part_length > 0 )
             {
                 const text_style_t *p_glyph_style = pp_styles[i_index];
-                uint32_t character = psz_text[i_index];
+                uni_char_t character = psz_text[i_index];
                 int i_glyph_index = FT_Get_Char_Index( p_current_face, character );
 
                 /* Get kerning vector */
@@ -2300,7 +2315,7 @@ static int RenderCommon( filter_t *p_filter, subpicture_region_t *p_region_out,
     const size_t i_text_max = strlen( b_html ? p_region_in->psz_html
                                              : p_region_in->psz_text );
 
-    uint32_t *psz_text = calloc( i_text_max, sizeof( *psz_text ) );
+    uni_char_t *psz_text = calloc( i_text_max, sizeof( *psz_text ) );
     text_style_t **pp_styles = calloc( i_text_max, sizeof( *pp_styles ) );
     if( !psz_text || !pp_styles )
     {
