@@ -73,9 +73,6 @@
   Just before one of those menus are aboutToShow(), they are rebuild.
   */
 
-#define STATIC_ENTRY "__static__"
-#define ENTRY_ALWAYS_ENABLED "__ignore__"
-
 enum
 {
     ITEM_NORMAL, /* not a checkbox, nor a radio */
@@ -116,7 +113,7 @@ QAction *addDPStaticEntry( QMenu *menu,
         else
             action = menu->addAction( text, THEDP, member );
     }
-    action->setData( STATIC_ENTRY );
+    action->setData( QVLCMenuManager::ACTION_STATIC );
     return action;
 }
 
@@ -142,7 +139,10 @@ QAction* addMIMStaticEntry( intf_thread_t *p_intf,
     {
         action = menu->addAction( text, THEMIM, member );
     }
-    action->setData( bStatic ? STATIC_ENTRY : ENTRY_ALWAYS_ENABLED );
+    action->setData( QVLCMenuManager::ACTION_STATIC |
+                     ( bStatic ) ? QVLCMenuManager::ACTION_ALWAYS_ENABLED
+                                 : QVLCMenuManager::ACTION_NONE
+                   );
     return action;
 }
 
@@ -151,17 +151,20 @@ QAction* addMIMStaticEntry( intf_thread_t *p_intf,
  * @param menu the menu in which the entries will be disabled
  * @param enable if false, disable all entries
  **/
-void EnableStaticEntries( QMenu *menu, bool enable = true )
+void QVLCMenuManager::EnableStaticEntries( QMenu *menu, bool enable = true )
 {
     if( !menu ) return;
 
     QList< QAction* > actions = menu->actions();
     for( int i = 0; i < actions.count(); ++i )
     {
-        actions[i]->setEnabled( actions[i]->data().toString()
-                                == ENTRY_ALWAYS_ENABLED ||
-            /* Be careful here, because data("string").toBool is true */
-            ( enable && (actions[i]->data().toString() == STATIC_ENTRY ) ) );
+        int actionflags = actions[i]->data().toInt();
+        if ( actionflags & ACTION_MANAGED )
+            actions[i]->setEnabled(
+                ( actionflags & ACTION_ALWAYS_ENABLED )
+                ||
+                enable
+            );
     }
 }
 
@@ -177,10 +180,10 @@ inline int DeleteNonStaticEntries( QMenu *menu )
     QList< QAction* > actions = menu->actions();
     for( int i = 0; i < actions.count(); ++i )
     {
-        if( actions[i]->data().toString() != STATIC_ENTRY )
-            delete actions[i];
-        else
+        if( actions[i]->data().toInt() & QVLCMenuManager::ACTION_NO_CLEANUP )
             i_ret++;
+        else
+            delete actions[i];
     }
     return i_ret;
 }
@@ -568,13 +571,13 @@ static inline void VolumeEntries( intf_thread_t *p_intf, QMenu *current )
 
         QAction *action = current->addAction( qtr( "Increase Volume" ),
                 ActionsManager::getInstance( p_intf ), SLOT( AudioUp() ) );
-        action->setData( STATIC_ENTRY );
+        action->setData( QVLCMenuManager::ACTION_STATIC );
         action = current->addAction( qtr( "Decrease Volume" ),
                 ActionsManager::getInstance( p_intf ), SLOT( AudioDown() ) );
-        action->setData( STATIC_ENTRY );
+        action->setData( QVLCMenuManager::ACTION_STATIC );
         action = current->addAction( qtr( "Mute" ),
                 ActionsManager::getInstance( p_intf ), SLOT( toggleMuteAudio() ) );
-        action->setData( STATIC_ENTRY );
+        action->setData( QVLCMenuManager::ACTION_STATIC );
 }
 
 /**
@@ -808,20 +811,20 @@ void QVLCMenuManager::PopupMenuControlEntries( QMenu *menu, intf_thread_t *p_int
 #ifndef __APPLE__ /* No icons in menus in Mac */
         action->setIcon( QIcon( ":/toolbar/faster2") );
 #endif
-        action->setData( STATIC_ENTRY );
+        action->setData( ACTION_STATIC );
     }
 
     action = rateMenu->addAction( qtr( "Faster (fine)" ), THEMIM->getIM(),
                               SLOT( littlefaster() ) );
-    action->setData( STATIC_ENTRY );
+    action->setData( ACTION_STATIC );
 
     action = rateMenu->addAction( qtr( "N&ormal Speed" ), THEMIM->getIM(),
                               SLOT( normalRate() ) );
-    action->setData( STATIC_ENTRY );
+    action->setData( ACTION_STATIC );
 
     action = rateMenu->addAction( qtr( "Slower (fine)" ), THEMIM->getIM(),
                               SLOT( littleslower() ) );
-    action->setData( STATIC_ENTRY );
+    action->setData( ACTION_STATIC );
 
     if( b_normal )
     {
@@ -830,11 +833,11 @@ void QVLCMenuManager::PopupMenuControlEntries( QMenu *menu, intf_thread_t *p_int
 #ifndef __APPLE__ /* No icons in menus in Mac */
         action->setIcon( QIcon( ":/toolbar/slower2") );
 #endif
-        action->setData( STATIC_ENTRY );
+        action->setData( ACTION_STATIC );
     }
 
     action = menu->addMenu( rateMenu );
-    action->setData( STATIC_ENTRY );
+    action->setData( ACTION_STATIC );
 
     menu->addSeparator();
 
@@ -845,14 +848,14 @@ void QVLCMenuManager::PopupMenuControlEntries( QMenu *menu, intf_thread_t *p_int
 #ifndef __APPLE__ /* No icons in menus in Mac */
     action->setIcon( QIcon( ":/toolbar/skip_fw") );
 #endif
-    action->setData( STATIC_ENTRY );
+    action->setData( ACTION_STATIC );
 
     action = menu->addAction( qtr( "Jump Bac&kward" ), THEMIM->getIM(),
              SLOT( jumpBwd() ) );
 #ifndef __APPLE__ /* No icons in menus in Mac */
     action->setIcon( QIcon( ":/toolbar/skip_back") );
 #endif
-    action->setData( STATIC_ENTRY );
+    action->setData( ACTION_STATIC );
     addDPStaticEntry( menu, qtr( I_MENU_GOTOTIME ),"",
                       SLOT( gotoTimeDialog() ), "Ctrl+T" );
     menu->addSeparator();
@@ -862,6 +865,7 @@ void QVLCMenuManager::PopupMenuPlaylistControlEntries( QMenu *menu,
                                                 intf_thread_t *p_intf )
 {
     bool bEnable = THEMIM->getInput() != NULL;
+    bool bPlaylistEmpty = THEMIM->hasEmptyPlaylist();
     QAction *action =
             addMIMStaticEntry( p_intf, menu, qtr( "&Stop" ), ":/menu/stop",
                                SLOT( stop() ), true );
@@ -870,10 +874,17 @@ void QVLCMenuManager::PopupMenuPlaylistControlEntries( QMenu *menu,
         action->setEnabled( false );
 
     /* Next / Previous */
-    addMIMStaticEntry( p_intf, menu, qtr( "Pre&vious" ),
-        ":/menu/previous", SLOT( prev() ) );
-    addMIMStaticEntry( p_intf, menu, qtr( "Ne&xt" ),
-        ":/menu/next", SLOT( next() ) );
+    action = addMIMStaticEntry( p_intf, menu, qtr( "Pre&vious" ),
+        ":/menu/previous", SLOT( prev() ), true );
+    action->setEnabled( !bPlaylistEmpty );
+    action->setData( ACTION_NO_CLEANUP );
+    CONNECT( THEMIM, playlistNotEmpty(bool), action, setEnabled(bool) );
+
+    action = addMIMStaticEntry( p_intf, menu, qtr( "Ne&xt" ),
+        ":/menu/next", SLOT( next() ), true );
+    action->setEnabled( !bPlaylistEmpty );
+    action->setData( ACTION_NO_CLEANUP );
+    CONNECT( THEMIM, playlistNotEmpty(bool), action, setEnabled(bool) );
 
     menu->addSeparator();
 }

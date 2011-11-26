@@ -101,7 +101,8 @@ private:
 enum PLEventTypes
 {
     PLItemAppended_Type = QEvent::User + PLEventType + 1,
-    PLItemRemoved_Type
+    PLItemRemoved_Type,
+    PLEmpty_Type
 };
 
 class PLEvent : public QEvent
@@ -262,6 +263,7 @@ public:
     audio_output_t *getAout();
 
     bool getPlayExitState();
+    bool hasEmptyPlaylist();
 private:
     MainInputManager( intf_thread_t * );
     virtual ~MainInputManager();
@@ -292,6 +294,7 @@ signals:
     void soundMuteChanged();
     void playlistItemAppended( int itemId, int parentId );
     void playlistItemRemoved( int itemId );
+    void playlistNotEmpty( bool );
     void randomChanged( bool );
     void repeatLoopChanged( int );
     void leafBecameParent( int );

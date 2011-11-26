@@ -90,6 +90,14 @@ public:
 
     /* Actions */
     static void DoAction( QObject * );
+    enum actionflag {
+        ACTION_NONE = 0x0,
+        ACTION_ALWAYS_ENABLED = 0x1,
+        ACTION_MANAGED = 0x2, /* managed using EnableStatic(bool)? */
+        ACTION_NO_CLEANUP = 0x4,
+        ACTION_STATIC = 0x6 /* legacy shortcut */
+    };
+    Q_DECLARE_FLAGS(actionflags, actionflag)
 
 private:
     /* All main Menus */
@@ -139,6 +147,7 @@ private:
     static void UpdateItem( intf_thread_t *, QMenu *, const char *,
                             vlc_object_t *, bool );
     static int CreateChoicesMenu( QMenu *,const char *, vlc_object_t *, bool );
+    static void EnableStaticEntries( QMenu *, bool );
 
     /* recentMRL menu */
     static QMenu *recentsMenu;
@@ -146,6 +155,7 @@ private:
 public slots:
     static void updateRecents( intf_thread_t * );
 };
+Q_DECLARE_OPERATORS_FOR_FLAGS(QVLCMenuManager::actionflags)
 
 class MenuFunc : public QObject
 {

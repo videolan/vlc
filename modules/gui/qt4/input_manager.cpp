@@ -1033,6 +1033,10 @@ void MainInputManager::customEvent( QEvent *event )
         plEv = static_cast<PLEvent*>( event );
         emit playlistItemRemoved( plEv->i_item );
         return;
+    case PLEmpty_Type:
+        plEv = static_cast<PLEvent*>( event );
+        emit playlistNotEmpty( plEv->i_item >= 0 );
+        return;
     case RandomChanged_Type:
         emit randomChanged( var_GetBool( THEPL, "random" ) );
         return;
@@ -1179,6 +1183,14 @@ bool MainInputManager::getPlayExitState()
     return var_GetBool( THEPL, "play-and-exit" );
 }
 
+bool MainInputManager::hasEmptyPlaylist()
+{
+    playlist_Lock( THEPL );
+    bool b_empty = playlist_IsEmpty( THEPL );
+    playlist_Unlock( THEPL );
+    return b_empty;
+}
+
 /****************************
  * Static callbacks for MIM *
  ****************************/
@@ -1234,23 +1246,31 @@ static int PLItemAppended
 ( vlc_object_t * obj, const char *var, vlc_value_t old, vlc_value_t cur, void *data )
 {
     VLC_UNUSED( obj ); VLC_UNUSED( var ); VLC_UNUSED( old );
-
     MainInputManager *mim = static_cast<MainInputManager*>(data);
     playlist_add_t *p_add = static_cast<playlist_add_t*>( cur.p_address );
 
     PLEvent *event = new PLEvent( PLItemAppended_Type, p_add->i_item, p_add->i_node  );
+    QApplication::postEvent( mim, event );
+    event = new PLEvent( PLEmpty_Type, p_add->i_item, 0  );
     QApplication::postEvent( mim, event );
     return VLC_SUCCESS;
 }
 static int PLItemRemoved
 ( vlc_object_t * obj, const char *var, vlc_value_t old, vlc_value_t cur, void *data )
 {
-    VLC_UNUSED( obj ); VLC_UNUSED( var ); VLC_UNUSED( old );
+    VLC_UNUSED( var ); VLC_UNUSED( old );
 
+    playlist_t *pl = (playlist_t *) obj;
     MainInputManager *mim = static_cast<MainInputManager*>(data);
 
     PLEvent *event = new PLEvent( PLItemRemoved_Type, cur.i_int, 0  );
     QApplication::postEvent( mim, event );
+    // can't use playlist_IsEmpty(  ) as it isn't true yet
+    if ( pl->items.i_size == 1 ) // lock is held
+    {
+        event = new PLEvent( PLEmpty_Type, -1, 0 );
+        QApplication::postEvent( mim, event );
+    }
     return VLC_SUCCESS;
 }
 
