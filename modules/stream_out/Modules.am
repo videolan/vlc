@@ -57,7 +57,7 @@ endif
 # RAOP plugin
 libstream_out_raop_plugin_la_SOURCES = raop.c
 libstream_out_raop_plugin_la_CFLAGS = $(AM_CFLAGS) $(GCRYPT_CFLAGS)
-libstream_out_raop_plugin_la_LIBADD = $(AM_LIBADD) $(GCRYPT_LIBS) -lgpg-error
+libstream_out_raop_plugin_la_LIBADD = $(AM_LIBADD) $(GCRYPT_LIBS) -lgpg-error $(LIBS_stream_out_raop)
 libstream_out_raop_plugin_la_DEPENDENCIES =
 if HAVE_GCRYPT
 libvlc_LTLIBRARIES += libstream_out_raop_plugin.la
