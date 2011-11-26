@@ -15,7 +15,9 @@ $(TARBALLS)/gnutls-$(GNUTLS_VERSION).tar.bz2:
 
 gnutls: gnutls-$(GNUTLS_VERSION).tar.bz2 .sum-gnutls
 	$(UNPACK)
+ifdef HAVE_WIN32
 	$(APPLY) $(SRC)/gnutls/gnutls-win32.patch
+endif
 	$(APPLY) $(SRC)/gnutls/gnutls-no-egd.patch
 	$(MOVE)
 

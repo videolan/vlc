@@ -18,3 +18,14 @@
  libc_hidden_def (gai_strerror)
  #endif
 
+--- gnutls/lib/gnutls.pc.in.orig	2011-11-26 14:40:52.343740836 -0500
++++ gnutls/lib/gnutls.pc.in	2011-11-26 14:41:49.456024042 -0500
+@@ -19,7 +19,7 @@
+ Description: Transport Security Layer implementation for the GNU system
+ URL: http://www.gnu.org/software/gnutls/
+ Version: @VERSION@
+-Libs: -L${libdir} -lgnutls
++Libs: -L${libdir} -lgnutls -lws2_32 -lcrypt32 @LTLIBINTL@
+ Libs.private: @LTLIBGCRYPT@ @NETTLE_LIBS@
+ @GNUTLS_REQUIRES_PRIVATE@
+ Cflags: -I${includedir}
