@@ -35,7 +35,8 @@
         MMX_INSTRUCTIONS                    \
         :                                   \
         : "r" (p_line), "r" (p_y),          \
-          "r" (p_u), "r" (p_v) );           \
+          "r" (p_u), "r" (p_v)              \
+        : "mm0", "mm1", "mm2" );            \
         p_line += 16; p_y += 8;             \
         p_u += 4; p_v += 4;                 \
     } while(0)
@@ -145,7 +146,8 @@ movq      %%mm1, 8(%0)  # Store high UYVY                                 \n\
         MMX_INSTRUCTIONS                    \
         :                                   \
         : "r" (p_line), "r" (p_y),          \
-          "r" (p_u), "r" (p_v) );           \
+          "r" (p_u), "r" (p_v)              \
+        : "xmm0", "xmm1", "xmm2" );         \
         p_line += 32; p_y += 16;            \
         p_u += 8; p_v += 8;                 \
     } while(0)
