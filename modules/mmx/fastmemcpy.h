@@ -153,6 +153,11 @@ __asm__ __volatile__(\
 #define MIN_LEN 0x40  /* 64-byte blocks */
 #endif
 
+#ifdef HAVE_SSE
+VLC_SSE
+#else
+VLC_MMX
+#endif
 static void * fast_memcpy(void * to, const void * from, size_t len)
 {
     void *retval;
@@ -218,7 +223,7 @@ static void * fast_memcpy(void * to, const void * from, size_t len)
         "movntps %%xmm1, 16(%1)\n"
         "movntps %%xmm2, 32(%1)\n"
         "movntps %%xmm3, 48(%1)\n"
-        :: "r" (from), "r" (to) : "memory");
+        :: "r" (from), "r" (to) : "memory", "xmm0", "xmm1", "xmm2", "xmm3");
         ((const unsigned char *)from)+=64;
         ((unsigned char *)to)+=64;
     }
@@ -240,7 +245,7 @@ static void * fast_memcpy(void * to, const void * from, size_t len)
         "movntps %%xmm1, 16(%1)\n"
         "movntps %%xmm2, 32(%1)\n"
         "movntps %%xmm3, 48(%1)\n"
-        :: "r" (from), "r" (to) : "memory");
+        :: "r" (from), "r" (to) : "memory", "xmm0", "xmm1", "xmm2", "xmm3");
         ((const unsigned char *)from)+=64;
         ((unsigned char *)to)+=64;
     }
@@ -268,7 +273,8 @@ static void * fast_memcpy(void * to, const void * from, size_t len)
         MOVNTQ" %%mm5, 40(%1)\n"
         MOVNTQ" %%mm6, 48(%1)\n"
         MOVNTQ" %%mm7, 56(%1)\n"
-        :: "r" (from), "r" (to) : "memory");
+        :: "r" (from), "r" (to) : "memory", "mm0", "mm1", "mm2", "mm3",
+                                            "mm4", "mm5", "mm6", "mm7");
                 from = (const void *) (((const unsigned char *)from)+64);
         to = (void *) (((unsigned char *)to)+64);
     }
@@ -333,7 +339,8 @@ static void * fast_memcpy(void * to, const void * from, size_t len)
             " jae 1b        \n\t"
                 : "+r" (from), "+r" (to), "+r" (i)
                 : "r" (BLOCK_SIZE), "i" (BLOCK_SIZE/64), "i" (CONFUSION_FACTOR)
-                : "%eax", "%ebx"
+                : "%eax", "%ebx", "mm0", "mm1", "mm2", "mm3",
+                                  "mm4", "mm5", "mm6", "mm7"
         );
 #endif
 
@@ -359,7 +366,8 @@ static void * fast_memcpy(void * to, const void * from, size_t len)
         MOVNTQ" %%mm5, 40(%1)\n"
         MOVNTQ" %%mm6, 48(%1)\n"
         MOVNTQ" %%mm7, 56(%1)\n"
-        :: "r" (from), "r" (to) : "memory");
+        :: "r" (from), "r" (to) : "memory", "mm0", "mm1", "mm2", "mm3",
+                                            "mm4", "mm5", "mm6", "mm7");
         from = (const void *) (((const unsigned char *)from)+64);
         to = (void *) (((unsigned char *)to)+64);
     }
