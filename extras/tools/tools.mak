@@ -8,6 +8,9 @@ include packages.mak
 # common rules
 #
 
+AUTOCONF=$(PREFIX)/bin/autoconf
+export AUTOCONF
+
 ifeq ($(shell curl --version >/dev/null 2>&1 || echo FAIL),)
 download = curl -f -L -- "$(1)" > "$@"
 else ifeq ($(shell wget --version >/dev/null 2>&1 || echo FAIL),)
@@ -159,10 +162,10 @@ DISTCLEAN_PKG += automake-$(AUTOMAKE_VERSION).tar.gz
 pkg-config-$(PKGCFG_VERSION).tar.gz:
 	$(download) $(PKGCFG_URL)
 
-pkgconfig: pkg-config-$(PKGCFG_VERSION).tar.gz
+pkgconfig: pkg-config-$(PKGCFG_VERSION).tar.gz .autoconf
 	$(UNPACK)
 	$(MOVE)
-	(cd $@; autoconf)
+	(cd $@; $(AUTOCONF))
 
 .pkg-config: pkgconfig
 	(cd pkgconfig; ./configure --prefix=$(PREFIX) --disable-shared --enable-static && make && make install)
