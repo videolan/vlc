@@ -148,6 +148,11 @@ endif
 endif
 GIT ?= $(error git not found!)
 
+ifndef AUTOPOINT
+AUTOPOINT := "$(PREFIX)/bin/autopoint"
+export AUTOPOINT
+endif
+
 ifndef SVN
 ifeq ($(shell svn --version >/dev/null 2>&1 || echo FAIL),)
 SVN = svn
