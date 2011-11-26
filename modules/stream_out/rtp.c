@@ -144,11 +144,13 @@
 #define SRTP_KEY_TEXT N_("SRTP key (hexadecimal)")
 #define SRTP_KEY_LONGTEXT N_( \
     "RTP packets will be integrity-protected and ciphered "\
-    "with this Secure RTP master shared secret key.")
+    "with this Secure RTP master shared secret key. "\
+    "This must be a 32-character-long hexadecimal string.")
 
 #define SRTP_SALT_TEXT N_("SRTP salt (hexadecimal)")
 #define SRTP_SALT_LONGTEXT N_( \
-    "Secure RTP requires a (non-secret) master salt value.")
+    "Secure RTP requires a (non-secret) master salt value. " \
+    "This must be a 28-character-long hexadecimal string.")
 
 static const char *const ppsz_protos[] = {
     "dccp", "sctp", "tcp", "udp", "udplite",
