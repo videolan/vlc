@@ -489,7 +489,7 @@ void DiscOpenPanel::updateButtons()
 
 #undef setDrive
 
-#ifndef WIN32
+#if !defined( WIN32 ) && !defined( __OS2__ )
 # define LOCALHOST ""
 #else
 # define LOCALHOST "/"
