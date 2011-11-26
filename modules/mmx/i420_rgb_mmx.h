@@ -56,7 +56,8 @@ static const uint64_t mmx_mask_fc = 0xfcfcfcfcfcfcfcfcULL; /* -- as %13 */
 	  "m" (mmx_00ffw), "m" (mmx_Y_coeff), \
 	  "m" (mmx_U_green), "m" (mmx_U_blue), \
 	  "m" (mmx_V_red), "m" (mmx_V_green), \
-	  "m" (mmx_mask_f8), "m" (mmx_mask_fc) );  \
+	  "m" (mmx_mask_f8), "m" (mmx_mask_fc) \
+        : "mm0", "mm1", "mm2", "mm3", "mm4", "mm5", "mm6", "mm7" );  \
     } while(0)
 
 #define MMX_END __asm__ __volatile__ ( "emms" )
@@ -566,7 +567,8 @@ movq      %%mm2, 24(%3) # Store ABGR7 ABGR6                                 \n\
         :                               \
         : "r" (p_y), "r" (p_u),         \
           "r" (p_v), "r" (p_buffer)     \
-        : "eax" );                      \
+        : "eax", "xmm0", "xmm1", "xmm2", "xmm3", \
+                 "xmm4", "xmm5", "xmm6", "xmm7" ); \
     } while(0)
 
 #define SSE2_END  __asm__ __volatile__ ( "sfence" ::: "memory" )

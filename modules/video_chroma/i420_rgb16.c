@@ -32,14 +32,18 @@
 
 #include <vlc_common.h>
 #include <vlc_filter.h>
+#include <vlc_cpu.h>
 
 #include "i420_rgb.h"
 #if defined (MODULE_NAME_IS_i420_rgb)
 #   include "i420_rgb_c.h"
+#   define VLC_TARGET
 #elif defined (MODULE_NAME_IS_i420_rgb_mmx)
 #   include "../mmx/i420_rgb_mmx.h"
+#   define VLC_TARGET VLC_MMX
 #elif defined (MODULE_NAME_IS_i420_rgb_sse2)
 #   include "../mmx/i420_rgb_mmx.h"
+#   define VLC_TARGET VLC_SSE
 #endif
 
 static void SetOffset( int, int, int, int, bool *,
@@ -202,8 +206,7 @@ void I420_RGB16_dither( filter_t *p_filter, picture_t *p_src,
 
 #if defined (MODULE_NAME_IS_i420_rgb)
 
-void I420_RGB16( filter_t *p_filter, picture_t *p_src,
-                                         picture_t *p_dest )
+void I420_RGB16( filter_t *p_filter, picture_t *p_src, picture_t *p_dest )
 {
     /* We got this one from the old arguments */
     uint16_t *p_pic = (uint16_t*)p_dest->p->p_pixels;
@@ -297,8 +300,8 @@ void I420_RGB16( filter_t *p_filter, picture_t *p_src,
 
 #else // ! defined (MODULE_NAME_IS_i420_rgb)
 
-void I420_R5G5B5( filter_t *p_filter, picture_t *p_src,
-                                          picture_t *p_dest )
+VLC_TARGET
+void I420_R5G5B5( filter_t *p_filter, picture_t *p_src, picture_t *p_dest )
 {
     /* We got this one from the old arguments */
     uint16_t *p_pic = (uint16_t*)p_dest->p->p_pixels;
@@ -527,8 +530,8 @@ void I420_R5G5B5( filter_t *p_filter, picture_t *p_src,
 #endif
 }
 
-void I420_R5G6B5( filter_t *p_filter, picture_t *p_src,
-                                          picture_t *p_dest )
+VLC_TARGET
+void I420_R5G6B5( filter_t *p_filter, picture_t *p_src, picture_t *p_dest )
 {
     /* We got this one from the old arguments */
     uint16_t *p_pic = (uint16_t*)p_dest->p->p_pixels;
@@ -772,8 +775,7 @@ void I420_R5G6B5( filter_t *p_filter, picture_t *p_src,
 
 #if defined (MODULE_NAME_IS_i420_rgb)
 
-void I420_RGB32( filter_t *p_filter, picture_t *p_src,
-                                         picture_t *p_dest )
+void I420_RGB32( filter_t *p_filter, picture_t *p_src, picture_t *p_dest )
 {
     /* We got this one from the old arguments */
     uint32_t *p_pic = (uint32_t*)p_dest->p->p_pixels;
@@ -866,6 +868,7 @@ void I420_RGB32( filter_t *p_filter, picture_t *p_src,
 
 #else // defined (MODULE_NAME_IS_i420_rgb_mmx) || defined (MODULE_NAME_IS_i420_rgb_sse2)
 
+VLC_TARGET
 void I420_A8R8G8B8( filter_t *p_filter, picture_t *p_src,
                                             picture_t *p_dest )
 {
@@ -1094,8 +1097,8 @@ void I420_A8R8G8B8( filter_t *p_filter, picture_t *p_src,
 #endif
 }
 
-void I420_R8G8B8A8( filter_t *p_filter, picture_t *p_src,
-                                            picture_t *p_dest )
+VLC_TARGET
+void I420_R8G8B8A8( filter_t *p_filter, picture_t *p_src, picture_t *p_dest )
 {
     /* We got this one from the old arguments */
     uint32_t *p_pic = (uint32_t*)p_dest->p->p_pixels;
@@ -1322,8 +1325,8 @@ void I420_R8G8B8A8( filter_t *p_filter, picture_t *p_src,
 #endif
 }
 
-void I420_B8G8R8A8( filter_t *p_filter, picture_t *p_src,
-                                            picture_t *p_dest )
+VLC_TARGET
+void I420_B8G8R8A8( filter_t *p_filter, picture_t *p_src, picture_t *p_dest )
 {
     /* We got this one from the old arguments */
     uint32_t *p_pic = (uint32_t*)p_dest->p->p_pixels;
@@ -1547,8 +1550,8 @@ void I420_B8G8R8A8( filter_t *p_filter, picture_t *p_src,
 #endif
 }
 
-void I420_A8B8G8R8( filter_t *p_filter, picture_t *p_src,
-                                            picture_t *p_dest )
+VLC_TARGET
+void I420_A8B8G8R8( filter_t *p_filter, picture_t *p_src, picture_t *p_dest )
 {
     /* We got this one from the old arguments */
     uint32_t *p_pic = (uint32_t*)p_dest->p->p_pixels;
