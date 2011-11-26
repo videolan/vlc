@@ -116,7 +116,6 @@ ffmpeg: ffmpeg-$(FFMPEG_VERSION).tar.gz .sum-ffmpeg
 ifdef HAVE_WIN32
 	sed -i "s/std=c99/std=gnu99/" $@-$(FFMPEG_VERSION)/configure
 endif
-	$(APPLY) $(SRC)/ffmpeg/vda.patch
 	$(MOVE)
 
 .ffmpeg: ffmpeg
