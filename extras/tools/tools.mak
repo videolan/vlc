@@ -100,7 +100,7 @@ tar: tar-$(TAR_VERSION).tar.bz2
 	touch $@
 
 CLEAN_PKG += tar
-DISTCLEAN_PKG += tar-$(tar_VERSION).tar.bz2
+DISTCLEAN_PKG += tar-$(TAR_VERSION).tar.bz2
 CLEAN_FILE += .tar
 
 # xz
