@@ -37,7 +37,7 @@ endif
 
 libremoteosd_plugin_la_SOURCES = remoteosd.c remoteosd_rfbproto.h
 libremoteosd_plugin_la_CFLAGS = $(AM_CFLAGS) $(GCRYPT_CFLAGS)
-libremoteosd_plugin_la_LIBADD = $(AM_LIBADD) $(GCRYPT_LIBS)
+libremoteosd_plugin_la_LIBADD = $(AM_LIBADD) $(GCRYPT_LIBS) $(LIBS_remoteosd)
 libremoteosd_plugin_la_DEPENDENCIES =
 if HAVE_GCRYPT
 libvlc_LTLIBRARIES += libremoteosd_plugin.la
