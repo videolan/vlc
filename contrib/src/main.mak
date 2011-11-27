@@ -104,9 +104,6 @@ ifdef HAVE_NEON
 else
     EXTRA_CFLAGS += -I$(ANDROID_NDK)/sources/cxx-stl/gnu-libstdc++/libs/armeabi/include
 endif
-
-# Change HOST to not confuse autotools
-HOST=arm-eabi
 endif
 
 ifdef HAVE_MACOSX
