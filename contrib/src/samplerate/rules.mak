@@ -17,6 +17,7 @@ samplerate: libsamplerate-$(SAMPLERATE_VERSION).tar.gz .sum-samplerate
 	$(MOVE)
 
 .samplerate: samplerate
+	$(RECONF) -I M4
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF)
 	cd $< && $(MAKE) install
 	touch $@

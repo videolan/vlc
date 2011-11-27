@@ -18,6 +18,7 @@ libdvbpsi: libdvbpsi-$(DVBPSI_VERSION).tar.bz2 .sum-dvbpsi
 	$(MOVE)
 
 .dvbpsi: libdvbpsi
+	$(RECONF)
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) --enable-release
 	cd $< && $(MAKE) install
 	touch $@

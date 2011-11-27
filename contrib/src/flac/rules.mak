@@ -23,7 +23,7 @@ endif
 	$(MOVE)
 
 FLACCONF := $(HOSTCONF) \
-	--disable--thorough-tests \
+	--disable-thorough-tests \
 	--disable-doxygen-docs \
 	--disable-xmms-plugin \
 	--disable-cpplibs \
@@ -38,6 +38,7 @@ endif
 DEPS_flac = ogg $(DEPS_ogg)
 
 .flac: flac
+	$(RECONF) -I m4
 	cd $< && $(HOSTVARS) ./configure $(FLACCONF)
 	cd $</src && $(MAKE) -C libFLAC install
 	cd $< && $(MAKE) -C include install
