@@ -8,7 +8,6 @@ FFMPEGCONF = \
 	--disable-doc \
 	--disable-decoder=libvpx \
 	--enable-libgsm \
-	--enable-libvpx \
 	--enable-libopenjpeg \
 	--disable-debug \
 	--enable-gpl \
@@ -22,12 +21,12 @@ FFMPEGCONF = \
 	--disable-protocols \
 	--disable-avfilter \
 	--disable-network
-DEPS_ffmpeg = zlib gsm vpx $(DEPS_vpx) openjpeg
+DEPS_ffmpeg = zlib gsm openjpeg
 
 # Optional dependencies
 ifdef BUILD_ENCODERS
-FFMPEGCONF += --enable-libmp3lame
-DEPS_ffmpeg += lame $(DEPS_lame)
+FFMPEGCONF += --enable-libmp3lame --enable-libvpx
+DEPS_ffmpeg += lame $(DEPS_lame) vpx $(DEPS_vpx)
 else
 FFMPEGCONF += --disable-encoders --disable-muxers
 # XXX: REVISIT --enable-small ?
