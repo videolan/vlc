@@ -101,9 +101,6 @@ void system_Init (void)
         fputs ("LibVLC has detected an unusable buggy GNU/libc version.\n"
                "Please update to version 2.8 or newer.\n", stderr);
         fflush (stderr);
-#ifndef DISABLE_BUGGY_GLIBC_CHECK
-        abort ();
-#endif
     }
 #endif
 

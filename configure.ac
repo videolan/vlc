@@ -486,8 +486,6 @@ AC_PREPROC_IFELSE([AC_LANG_SOURCE([
     AC_MSG_ERROR([Buggy GNU/libc (version 2.5 - 2.7) present. VLC would crash; there is no viable
 work-around for this. Check with your distribution vendor on how to update the
 glibc run-time. Alternatively, build with --disable-nls.])
-  ], [
-    AC_DEFINE(DISABLE_BUGGY_GLIBC_CHECK, 1, [Disables runtime check for buggy glibc.])
   ])
 ])
 
