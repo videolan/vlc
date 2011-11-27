@@ -354,7 +354,7 @@ int drms_init( void *_p_drms, uint32_t i_type,
             InitAES( &p_drms->aes, p_drms->p_key );
 
             memcpy( p_priv, p_info, 64 );
-            memcpy( p_drms->p_key, md5.p_digest, 16 );
+            memcpy( p_drms->p_key, md5.buf, 16 );
             drms_decrypt( p_drms, p_priv, 64, NULL );
             REVERSE( p_priv, 64 );
 
@@ -511,8 +511,8 @@ static void InitShuffle( struct shuffle_s *p_shuffle, uint32_t *p_sys_key,
 
         p_secret1[ 3 ]++;
 
-        REVERSE( md5.p_digest, 1 );
-        i_hash = ((int32_t)U32_AT(md5.p_digest)) % 1024;
+        REVERSE( (void *)md5.buf, 1 ); /* FIXME */
+        i_hash = ((int32_t)U32_AT(md5.buf)) % 1024;
 
         p_shuffle->p_commands[ i ] = i_hash < 0 ? i_hash * -1 : i_hash;
     }
@@ -624,7 +624,7 @@ static void DoShuffle( struct shuffle_s *p_shuffle,
     /* XOR our buffer with the computed checksum */
     for( i = 0; i < i_size; i++ )
     {
-        p_buffer[ i ] ^= md5.p_digest[ i ];
+        p_buffer[ i ] ^= U32_AT(md5.buf + (4 * i));
     }
 }
 
@@ -1330,7 +1330,7 @@ static int GetSystemKey( uint32_t *p_sys_key, bool b_ipod )
 
     EndMD5( &md5 );
 
-    memcpy( p_sys_key, md5.p_digest, 16 );
+    memcpy( p_sys_key, md5.buf, 16 );
 
     return 0;
 }
@@ -1707,7 +1707,7 @@ static int HashSystemInfo( uint32_t *p_system_hash )
 #endif
 
     EndMD5( &md5 );
-    memcpy( p_system_hash, md5.p_digest, 16 );
+    memcpy( p_system_hash, md5.buf, 16 );
 
     return i_ret;
 }

@@ -107,18 +107,18 @@ void vlc_rand_bytes (void *buf, size_t len)
         AddMD5 (&mdi, &stamp, sizeof (stamp));
         AddMD5 (&mdi, &val, sizeof (val));
         EndMD5 (&mdi);
-        AddMD5 (&mdo, mdi.p_digest, sizeof (mdi.p_digest));
+        AddMD5 (&mdo, mdi.buf, 16);
         EndMD5 (&mdo);
 
-        if (len < sizeof (mdo.p_digest))
+        if (len < 16)
         {
-            memcpy (buf, mdo.p_digest, len);
+            memcpy (buf, mdo.buf, len);
             break;
         }
 
-        memcpy (buf, mdo.p_digest, sizeof (mdo.p_digest));
-        len -= sizeof (mdo.p_digest);
-        buf = ((uint8_t *)buf) + sizeof (mdo.p_digest);
+        memcpy (buf, mdo.buf, 16);
+        len -= 16;
+        buf = ((uint8_t *)buf) + 16;
     }
 }
 
