@@ -24,7 +24,9 @@ ifdef HAVE_WIN32
 endif
 	$(MOVE)
 
-.cddb: cddb .regex
+DEPS_cddb = regex $(DEPS_regex)
+
+.cddb: cddb
 	$(RECONF)
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) --without-iconv CFLAGS="$(CFLAGS) -D_BSD_SOCKLEN_T_=int -DWIN32_LEAN_AND_MEAN"
 	cd $< && $(MAKE) install
