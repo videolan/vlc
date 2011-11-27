@@ -43,7 +43,11 @@ endif
 
 # ARM stuff
 ifeq ($(ARCH),arm)
-FFMPEGCONF += --disable-runtime-cpudetect
+FFMPEGCONF += --disable-runtime-cpudetect --arch=arm
+ifdef HAVE_NEON
+FFMPEGCONF += --cpu=cortex-a8 --enable-neon
+FFMPEG_CFLAGS +=-mfloat-abi=softfp -mfpu=neon
+endif
 endif
 
 # Darwin
