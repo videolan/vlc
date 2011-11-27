@@ -189,9 +189,6 @@ ln -sf ../../contrib/src/main.mak Makefile
 cat << EOF
 Bootstrap completed.
 
-The following packages were selected:
-$PKGS
-
 Run "make" to start compilation.
 
 Other targets:
