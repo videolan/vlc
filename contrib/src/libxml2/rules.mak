@@ -21,7 +21,5 @@ libxml2: libxml2-$(LIBXML2_VERSION).tar.gz .sum-libxml2
 
 .libxml2: libxml2
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) CFLAGS="-DLIBXML_STATIC" $(XMLCONF)
-ifndef HAVE_MACOSX
 	cd $< && $(MAKE) install
-endif
 	touch $@
