@@ -296,13 +296,8 @@ if test -z "${DISTRO}" -a "$TARGET" = "$BUILD"; then
         fi
     fi
     # Try to match distribution
-    if test -f /etc/fedora-release; then
-        hint_distro fedora
-    elif test -f /etc/maemo_version; then
+    if test -f /etc/maemo_version; then
         hint_distro maemo5
-    elif test -f /etc/debian_version; then
-        # NOTE: check for Debian *after* its derivatives
-        hint_distro debian
     fi
 fi
 
