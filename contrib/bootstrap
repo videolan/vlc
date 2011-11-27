@@ -151,6 +151,13 @@ check_macosx_sdk()
    add_make "OSX_VERSION ?= ${OSX_VERSION}"
 }
 
+check_android_sdk()
+{
+	[ -z "${ANDROID_NDK}" ] && echo "You must set ANDROID_NDK environment variable" && exit 1
+	add_make "ANDROID_NDK := ${ANDROID_NDK}"
+	test -z "${NO_NEON}" && add_make_enabled "HAVE_NEON"
+}
+
 test -z "$PREFIX" || add_make "PREFIX := $PREFIX"
 test -z "$BUILD_DISCS" || add_make_enabled "BUILD_DISCS"
 test -z "$BUILD_ENCODERS" || add_make_enabled "BUILD_ENCODERS"
@@ -169,6 +176,10 @@ case "${OS}" in
 		;;
 	*bsd*)
 		add_make_enabled "HAVE_BSD"
+		;;
+	linux-androideabi)
+		check_android_sdk
+		add_make_enabled "HAVE_LINUX" "HAVE_ANDROID"
 		;;
 	*linux*)
 		add_make_enabled "HAVE_LINUX"

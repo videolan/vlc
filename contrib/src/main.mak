@@ -92,6 +92,23 @@ STRIP := $(HOST)-strip
 endif
 endif
 
+ifdef HAVE_ANDROID
+CC :=  $(HOST)-gcc --sysroot=$(ANDROID_NDK)/platforms/android-9/arch-arm
+CXX := $(HOST)-g++ --sysroot=$(ANDROID_NDK)/platforms/android-9/arch-arm
+
+# Kludge for C++ prebuilt compiler
+EXTRA_CFLAGS += -D__STDC_VERSION__=199901L
+EXTRA_CFLAGS += -I$(ANDROID_NDK)/sources/cxx-stl/gnu-libstdc++/include
+ifdef HAVE_NEON
+    EXTRA_CFLAGS += -I$(ANDROID_NDK)/sources/cxx-stl/gnu-libstdc++/libs/armeabi-v7a/include
+else
+    EXTRA_CFLAGS += -I$(ANDROID_NDK)/sources/cxx-stl/gnu-libstdc++/libs/armeabi/include
+endif
+
+# Change HOST to not confuse autotools
+HOST=arm-eabi
+endif
+
 ifdef HAVE_MACOSX
 MACOSX_SDK=/Developer/SDKs/MacOSX$(OSX_VERSION).sdk
 CC=gcc-4.2
