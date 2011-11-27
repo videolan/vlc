@@ -4,6 +4,7 @@ check_PROGRAMS = \
 	test_block \
 	test_dictionary \
 	test_i18n_atof \
+	test_md5 \
 	test_timer \
 	test_url \
 	test_utf8 \
@@ -22,6 +23,7 @@ test_block_DEPENDENCIES =
 
 test_dictionary_SOURCES = dictionary.c
 test_i18n_atof_SOURCES = i18n_atof.c
+test_md5_SOURCES = md5.c
 test_timer_SOURCES = timer.c
 test_url_SOURCES = url.c
 test_utf8_SOURCES = utf8.c

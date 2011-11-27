@@ -21,10 +21,12 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#ifdef HAVE_CONFIG_H
+# include <config.h>
+#endif
+
 #include <stdlib.h>
 #include <string.h>
-
-#include "../../libvlc/test.h"
 
 #include <vlc_common.h>
 #include <vlc_md5.h>
@@ -60,15 +62,18 @@ static void test_config_StringEscape()
         EndMD5( &md5 );
         char * psz_hash = psz_md5_hash( &md5 );
 
-        printf( "Output: %s, Expected: %s\n", psz_hash, md5_samples[i].psz_md5 );
-        assert( !strcmp( psz_hash, md5_samples[i].psz_md5 ) );
+        if( strcmp( psz_hash, md5_samples[i].psz_md5 ) )
+        {
+            printf( "Output: %s\nExpected: %s\n", psz_hash,
+                    md5_samples[i].psz_md5 );
+            abort();
+        }
         free( psz_hash );
     }
 }
 
 int main( void )
 {
-    log( "Testing md5 calculation\n" );
     test_config_StringEscape();
 
     return 0;

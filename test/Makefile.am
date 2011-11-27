@@ -18,7 +18,6 @@ check_PROGRAMS = \
 	test_libvlc_media_list \
 	test_libvlc_media_player \
 	test_src_config_chain \
-	test_src_misc_md5 \
 	test_src_misc_variables \
         $(NULL)
 
@@ -73,8 +72,6 @@ test_src_misc_variables_SOURCES = src/misc/variables.c
 test_src_misc_variables_LDADD = $(LIBVLCCORE) $(LIBVLC)
 test_src_config_chain_SOURCES = src/config/chain.c
 test_src_config_chain_LDADD = $(LIBVLCCORE)
-test_src_misc_md5_SOURCES = src/misc/md5.c
-test_src_misc_md5_LDADD = $(LIBVLCCORE)
 
 checkall:
 	$(MAKE) check_PROGRAMS="$(check_PROGRAMS) $(EXTRA_PROGRAMS)" check
