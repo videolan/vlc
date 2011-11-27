@@ -24,9 +24,12 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
 # ***************************************************************************
 
-echo "WARNING: This method to build 3rd party libraries has been deprecated.
-Please use the /contrib folder instead of /extras/contrib.
-"
+cat >&2 << EOF
+WARNING: This method of building third party libraries has been deprecated,
+         and is not supported anymore.
+
+Building from the /contrib folder is recommended instead of /extras/contrib.
+EOF
 
 LANG=C
 export LANG
