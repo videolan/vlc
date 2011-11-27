@@ -16,6 +16,9 @@ libvlc_LTLIBRARIES += libmemcpy_plugin.la
 libgnutls_plugin_la_SOURCES = gnutls.c dhparams.h
 libgnutls_plugin_la_CFLAGS = $(AM_CFLAGS) $(GNUTLS_CFLAGS) $(GCRYPT_CFLAGS)
 libgnutls_plugin_la_LIBADD = $(AM_LIBADD) $(GNUTLS_LIBS) $(GCRYPT_LIBS)
+if HAVE_WIN32
+libgnutls_plugin_la_LIBADD += -lcrypt32
+endif
 libgnutls_plugin_la_DEPENDENCIES =
 EXTRA_LTLIBRARIES += libgnutls_plugin.la
 libvlc_LTLIBRARIES += $(LTLIBgnutls)
