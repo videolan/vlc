@@ -17,9 +17,11 @@ XMLCONF = --with-minimal --with-catalog --with-reader --with-tree --with-push --
 
 libxml2: libxml2-$(LIBXML2_VERSION).tar.gz .sum-libxml2
 	$(UNPACK)
+	$(APPLY) $(SRC)/libxml2/no-tests.patch
 	$(MOVE)
 
 .libxml2: libxml2
+	$(RECONF)
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) CFLAGS="-DLIBXML_STATIC" $(XMLCONF)
 	cd $< && $(MAKE) install
 	touch $@
