@@ -18,6 +18,7 @@ $(TARBALLS)/libbluray-git.tar.xz:
 
 libbluray: libbluray-git.tar.xz .sum-libbluray
 	$(UNPACK)
+	$(APPLY) $(SRC)/bluray/pkg-static.patch
 	$(MOVE)
 
 .libbluray: libbluray 
