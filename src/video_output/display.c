@@ -778,7 +778,7 @@ void vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
 
     if (hide_mouse) {
         if (!vd->info.has_hide_mouse) {
-            msg_Dbg(vd, "auto hiding mouse");
+            msg_Dbg(vd, "auto hiding mouse cursor");
             vout_display_Control(vd, VOUT_DISPLAY_HIDE_MOUSE);
         }
         vout_SendEventMouseHidden(osys->vout);
