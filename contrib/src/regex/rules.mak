@@ -2,6 +2,11 @@
 REGEX_VERSION := 0.12
 REGEX_URL := http://ftp.gnu.org/old-gnu/regex/regex-$(REGEX_VERSION).tar.gz
 
+ifndef HAVE_WIN32
+# Part of POSIX.2001
+PKGS_FOUND += regex
+endif
+
 $(TARBALLS)/regex-$(REGEX_VERSION).tar.gz:
 	$(call download,$(REGEX_URL))
 
