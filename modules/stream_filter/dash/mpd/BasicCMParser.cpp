@@ -96,11 +96,15 @@ void    BasicCMParser::setSegmentInfo       (Node *root, Representation *rep)
 {
     Node    *segmentInfo = DOMHelper::getFirstChildElementByName( root, "SegmentInfo");
 
-    SegmentInfo *info = new SegmentInfo( segmentInfo->getAttributes() );
-    this->setInitSegment( segmentInfo, info );
-    this->setSegments(segmentInfo, info );
-    rep->setSegmentInfo(info);
+    if ( segmentInfo )
+    {
+        SegmentInfo *info = new SegmentInfo( segmentInfo->getAttributes() );
+        this->setInitSegment( segmentInfo, info );
+        this->setSegments(segmentInfo, info );
+        rep->setSegmentInfo(info);
+    }
 }
+
 void    BasicCMParser::setInitSegment       (Node *root, SegmentInfo *info)
 {
     std::vector<Node *> initSeg = DOMHelper::getChildElementByTagName(root, "InitialisationSegmentURL");
