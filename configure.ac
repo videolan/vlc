@@ -879,11 +879,11 @@ AS_IF([test "${enable_coverage}" != "no"], [
   LDFLAGS="-lgcov ${LDFLAGS}"
 ])
 
-VLC_SAVE_FLAGS
-CFLAGS="${CFLAGS} -fvisibility=hidden"
-CXXFLAGS="${CXXFLAGS} -fvisibility=hidden"
-OBJCFLAGS="${OBJCFLAGS} -fvisibility=hidden"
 AS_IF([test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"], [
+  VLC_SAVE_FLAGS
+  CFLAGS="${CFLAGS} -fvisibility=hidden"
+  CXXFLAGS="${CXXFLAGS} -fvisibility=hidden"
+  OBJCFLAGS="${OBJCFLAGS} -fvisibility=hidden"
   AC_CACHE_CHECK([if $CC accepts -fvisibility=hidden],
                  [ac_cv_c_visibility_hidden], [
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM()], [
