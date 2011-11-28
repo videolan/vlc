@@ -65,14 +65,6 @@ const std::string&             MPD::getMinBufferTime       () const throw(Attrib
     return it->second;
 }
 
-const std::string&             MPD::getType                () const throw(AttributeNotPresentException)
-{
-    AttributesMap::const_iterator     it = this->attributes.find( "type" );
-    if( it == this->attributes.end() )
-        throw AttributeNotPresentException();
-
-    return it->second;
-}
 const std::string&             MPD::getDuration            () const throw(AttributeNotPresentException)
 {
     AttributesMap::const_iterator     it = this->attributes.find("mediaPresentationDuration");
@@ -100,4 +92,15 @@ void                    MPD::addPeriod              (Period *period)
 void                    MPD::setProgramInformation  (ProgramInformation *progInfo)
 {
     this->programInfo = progInfo;
+}
+
+bool                    MPD::isLive() const
+{
+    AttributesMap::const_iterator     it = this->attributes.find("mediaPresentationDuration");
+
+    /*
+        Standard specifies a default of "On-Demand",
+        so anything that is not "Live" is "On-Demand"
+    */
+    return ( it != this->attributes.end() && it->second == "Live" );
 }

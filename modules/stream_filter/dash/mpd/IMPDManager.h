@@ -16,6 +16,8 @@ namespace dash
 {
     namespace mpd
     {
+        class MPD;
+
         enum Profile
         {
             NotValid,
@@ -32,6 +34,7 @@ namespace dash
                 virtual Representation*         getBestRepresentation   (Period *period)                = 0;
                 virtual std::vector<ISegment *> getSegments             (Representation *rep)           = 0;
                 virtual Representation*         getRepresentation       (Period *period, long bitrate)  = 0;
+                virtual const MPD*              getMPD                  () const = 0;
                 virtual ~IMPDManager(){}
         };
     }

@@ -106,7 +106,7 @@ static int Open(vlc_object_t *p_obj)
     p_sys->p_node           = p_node;
     p_sys->p_conManager     = p_conManager;
     p_sys->position         = 0;
-    p_sys->isLive           = true;
+    p_sys->isLive           = p_dashManager->getMpdManager()->getMPD()->isLive();
     p_stream->p_sys         = p_sys;
     p_stream->pf_read       = Read;
     p_stream->pf_peek       = Peek;

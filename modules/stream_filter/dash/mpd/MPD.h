@@ -47,7 +47,7 @@ namespace dash
                 MPD         (const AttributesMap& attributes);
                 virtual ~MPD();
 
-                const std::string&             getType                 () const throw(dash::exception::AttributeNotPresentException);
+                bool                           isLive() const;
                 const std::string&             getDuration             () const throw(dash::exception::AttributeNotPresentException);
                 const std::string&             getMinBufferTime        () const throw(dash::exception::AttributeNotPresentException);
                 const std::vector<BaseUrl *>&  getBaseUrls      () const;

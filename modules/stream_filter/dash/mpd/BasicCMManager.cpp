@@ -158,3 +158,8 @@ Period*                 BasicCMManager::getNextPeriod           (Period *period)
 
     return NULL;
 }
+
+const MPD*      BasicCMManager::getMPD() const
+{
+    return this->mpd;
+}
