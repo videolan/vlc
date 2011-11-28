@@ -89,7 +89,8 @@ void    BasicCMParser::setRepresentations   (Node *root, Group *group)
     {
         Representation *rep = new Representation(representations.at(i)->getAttributes());
         this->setSegmentInfo(representations.at(i), rep);
-        group->addRepresentation(rep);
+        if ( rep->getSegmentInfo() && rep->getSegmentInfo()->getSegments().size() > 0 )
+            group->addRepresentation(rep);
     }
 }
 void    BasicCMParser::setSegmentInfo       (Node *root, Representation *rep)
