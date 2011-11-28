@@ -535,7 +535,7 @@ AC_SUBST(SOCKET_LIBS)
 
 dnl Check for socklen_t
 AH_TEMPLATE(socklen_t, [Define to `int' if <sys/socket.h> does not define.])
-AC_CACHE_CHECK([for socklen_t in sys/socket.h],
+AC_CACHE_CHECK([for socklen_t in sys/socket.h], dnl ` (fix VIM syntax highlight
 ac_cv_type_socklen_t,
 [AC_COMPILE_IFELSE([AC_LANG_PROGRAM([
 [#include <sys/types.h>
@@ -698,7 +698,7 @@ if test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"; then
 fi # end "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"
 
 dnl LP64 and LLP64 architectures had better define ssize_t by themselves...
-AH_TEMPLATE(ssize_t, [Define to `int' if <stddef.h> does not define.])
+AH_TEMPLATE(ssize_t, [Define to `int' if <stddef.h> does not define.]) dnl ` (fix VIM syntax highlight
 AC_CHECK_TYPE(ssize_t,, [
   AC_DEFINE(ssize_t, int)
 ])
