@@ -48,7 +48,7 @@ namespace dash
         class HTTPConnection : public IHTTPConnection
         {
             public:
-                HTTPConnection          (std::string url, stream_t *stream);
+                HTTPConnection          ( const std::string& url, stream_t *stream );
                 virtual ~HTTPConnection ();
 
                 bool        init            ();
@@ -67,7 +67,7 @@ namespace dash
                 stream_t                *urlStream;
 
                 void            parseURL        ();
-                bool            sendData        (std::string data);
+                bool            sendData        (const std::string& data);
                 bool            parseHeader     ();
                 std::string     readLine        ();
         };

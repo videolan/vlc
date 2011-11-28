@@ -29,7 +29,7 @@
 
 using namespace dash::http;
 
-HTTPConnection::HTTPConnection  (std::string url, stream_t *stream)
+HTTPConnection::HTTPConnection  (const std::string& url, stream_t *stream)
 {
     this->url       = url;
     this->stream    = stream;
@@ -107,7 +107,7 @@ std::string     HTTPConnection::readLine        ()
 
     return "\r\n";
 }
-bool            HTTPConnection::sendData        (std::string data)
+bool            HTTPConnection::sendData        (const std::string& data)
 {
     ssize_t size = net_Write(this->stream, this->httpSocket, NULL, data.c_str(), data.size());
     if (size == -1)
