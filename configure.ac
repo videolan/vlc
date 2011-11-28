@@ -551,8 +551,8 @@ AS_IF([test "$ac_cv_type_socklen_t" = no],
  [AC_DEFINE(socklen_t, int)])
 
 dnl Check for struct sockaddr_storage
-AH_TEMPLATE(sockaddr_storage, [Define to `sockaddr' if <sys/socket.h> does not define.])
-AH_TEMPLATE(ss_family, [Define to `sa_family' if <sys/socket.h> does not define.])
+AH_TEMPLATE(sockaddr_storage, [Define to `sockaddr' if <sys/socket.h> does not define.]) dnl ` (fix VIM syntax highlight
+AH_TEMPLATE(ss_family, [Define to `sa_family' if <sys/socket.h> does not define.]) dnl ` (fix VIM syntax highlight
 AC_CACHE_CHECK([for struct sockaddr_storage], ac_cv_struct_sockaddr_storage,
   [AC_TRY_COMPILE(
     [#include <sys/types.h>
