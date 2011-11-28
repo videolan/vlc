@@ -49,5 +49,9 @@ endif
 ifdef HAVE_WIN32
 	(cd $(PREFIX)/include; sed -i.orig '314 c #if 0' libintl.h)
 endif
+ifdef HAVE_MACOSX
+	# detect libintl correctly in configure for static library
+	(cd $(PREFIX)/share/aclocal; sed -i.orig  '184s/$$LIBINTL/$$LIBINTL $$INTL_MACOSX_LIBS/' gettext.m4)
+endif
 	touch $@
 
