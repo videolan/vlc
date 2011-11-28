@@ -30,11 +30,12 @@
 using namespace dash::mpd;
 using namespace dash::exception;
 
-SegmentInfo::SegmentInfo(std::map<std::string,std::string> attr)
+SegmentInfo::SegmentInfo( const std::map<std::string,std::string>& attr) :
+    attributes( attr ),
+    initSeg( NULL )
 {
-    this->attributes    = attr;
-    this->initSeg       = NULL;
 }
+
 SegmentInfo::~SegmentInfo   ()
 {
     for(size_t i = 0; i < this->segments.size(); i++)
@@ -50,14 +51,17 @@ InitSegment*            SegmentInfo::getInitSegment     () throw(ElementNotPrese
 
     return this->initSeg;
 }
-std::vector<Segment*>   SegmentInfo::getSegments        ()
+
+const std::vector<Segment*>&   SegmentInfo::getSegments        () const
 {
     return this->segments;
 }
+
 void                    SegmentInfo::addSegment         (Segment *seg)
 {
     this->segments.push_back(seg);
 }
+
 void                    SegmentInfo::setInitSegment     (InitSegment *initSeg)
 {
     this->initSeg = initSeg;

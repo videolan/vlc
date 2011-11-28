@@ -40,11 +40,11 @@ namespace dash
         class SegmentInfo
         {
             public:
-                SegmentInfo             (std::map<std::string, std::string> attr);
+                SegmentInfo             ( const std::map<std::string, std::string>& attr);
                 virtual ~SegmentInfo    ();
 
                 InitSegment*            getInitSegment  () throw(dash::exception::ElementNotPresentException);
-                std::vector<Segment *>  getSegments     ();
+                const std::vector<Segment *>&   getSegments () const;
                 void                    setInitSegment  (InitSegment *initSeg);
                 void                    addSegment      (Segment *seg);
 
