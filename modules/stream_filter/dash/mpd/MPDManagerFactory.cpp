@@ -45,14 +45,12 @@ IMPDManager* MPDManagerFactory::create                  (Profile profile, Node *
 
 IMPDManager* MPDManagerFactory::createBasicCMManager    (Node *root)
 {
-    BasicCMParser *parser = new BasicCMParser(root);
+    BasicCMParser parser(root);
 
-    if(!parser->parse())
+    if(!parser.parse())
         return new NullManager();
 
-    BasicCMManager *manager =  new BasicCMManager(parser->getMPD());
-
-    delete(parser);
+    BasicCMManager *manager =  new BasicCMManager(parser.getMPD());
 
     return manager;
 }
