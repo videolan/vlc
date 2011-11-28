@@ -1,5 +1,10 @@
-Changes between 1.1.x and 1.2.0-pre2:
-------------------------------------
+Changes between 1.2.x and 1.3.0:
+--------------------------------
+
+
+
+Changes between 1.1.12 and 1.2.0:
+---------------------------------
 
 Important notes:
  * Start/end titles/chapters are now specified with # rather than @ to fix
