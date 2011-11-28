@@ -41,6 +41,7 @@ DOMParser::DOMParser    (stream_t *stream) :
 
 DOMParser::~DOMParser   ()
 {
+    delete this->root;
     if(this->vlc_reader)
         xml_ReaderDelete(this->vlc_reader);
     if ( this->vlc_xml )

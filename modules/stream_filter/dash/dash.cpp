@@ -125,11 +125,9 @@ static void Close(vlc_object_t *p_obj)
     stream_sys_t                        *p_sys          = (stream_sys_t *) p_stream->p_sys;
     dash::DASHManager                   *p_dashManager  = p_sys->p_dashManager;
     dash::http::HTTPConnectionManager   *p_conManager   = p_sys->p_conManager;
-    dash::xml::Node                     *p_node         = p_sys->p_node;
 
     delete(p_conManager);
     delete(p_dashManager);
-    delete(p_node);
     free(p_sys);
 }
 /*****************************************************************************
