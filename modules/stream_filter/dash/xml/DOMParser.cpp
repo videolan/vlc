@@ -71,7 +71,7 @@ Node*   DOMParser::processNode              ()
 {
     const char *data;
     int type = xml_ReaderNextNode(this->vlc_reader, &data);
-    if(type != XML_READER_TEXT && type != XML_READER_NONE && type != XML_READER_ENDELEM)
+    if(type != -1 && type != XML_READER_TEXT && type != XML_READER_NONE && type != XML_READER_ENDELEM)
     {
         Node *node = new Node();
 
