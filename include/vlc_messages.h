@@ -122,10 +122,7 @@ struct counter_sample_t
 
 struct counter_t
 {
-    unsigned int        i_id;
-    char              * psz_name;
     int                 i_type;
-    void              * p_obj;
     int                 i_compute_type;
     int                 i_samples;
     counter_sample_t ** pp_samples;

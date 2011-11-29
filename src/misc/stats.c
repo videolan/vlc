@@ -67,7 +67,6 @@ counter_t * stats_CounterCreate( vlc_object_t *p_this,
     p_counter->i_type = i_type;
     p_counter->i_samples = 0;
     p_counter->pp_samples = NULL;
-    p_counter->psz_name = NULL;
 
     p_counter->update_interval = 0;
     p_counter->last_update = 0;
@@ -235,7 +234,6 @@ void stats_CounterClean( counter_t *p_c )
             free( p_s );
             i--;
         }
-        free( p_c->psz_name );
         free( p_c );
     }
 }
@@ -317,10 +315,6 @@ static int CounterUpdate( vlc_object_t *p_handler,
                 p_counter->pp_samples[0]->value.f_float += val.f_float;
                 if( new_val )
                     new_val->f_float = p_counter->pp_samples[0]->value.f_float;
-            default:
-                msg_Err( p_handler, "Trying to increment invalid variable %s",
-                         p_counter->psz_name );
-                return VLC_EGENERIC;
             }
         }
         break;
