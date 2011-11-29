@@ -3647,8 +3647,13 @@ AM_CONDITIONAL(ENABLE_QT4, [test "x$enable_qt4" != "xno"])
 dnl
 dnl Simple test for skins2 dependency
 dnl
-AS_IF([test "${enable_skins2}" != "no" && test "x$enable_qt4" = "xno"], [
-  AC_MSG_ERROR([The skins2 module depends on a the Qt4 development package. Without it you will not be able to open any dialog box from the interface, which makes the skins2 interface rather useless. Install the Qt4 development package or alternatively you can also configure with: --disable-qt4 --disable-skins2.])
+AS_IF([test "x$enable_qt4" = "xno"], [
+  AS_IF([test "${enable_skins2}" = "yes"], [
+    AC_MSG_ERROR([The skins2 module depends on the Qt4 interface. Without it you will not be able to open any dialog box from the interface, which makes the skins2 interface rather useless. Install the Qt4 development package or alternatively you can also configure with: --disable-qt4 --disable-skins2.])
+  ], [
+    enable_skins2="no"
+    AC_MSG_WARN([The skins2 module depends on the Qt4 interface, Qt4 is not built so skins2 is disabled.])
+  ])
 ])
 
 dnl
