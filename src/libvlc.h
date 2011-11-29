@@ -222,6 +222,52 @@ void var_OptionParse (vlc_object_t *, const char *, bool trusted);
 /*
  * Stats stuff
  */
+enum
+{
+    STATS_COUNTER,
+    STATS_DERIVATIVE,
+};
+
+typedef struct counter_sample_t
+{
+    vlc_value_t value;
+    mtime_t     date;
+} counter_sample_t;
+
+typedef struct counter_t
+{
+    int                 i_type;
+    int                 i_compute_type;
+    int                 i_samples;
+    counter_sample_t ** pp_samples;
+
+    mtime_t             update_interval;
+    mtime_t             last_update;
+} counter_t;
+
+enum
+{
+    STATS_INPUT_BITRATE,
+    STATS_READ_BYTES,
+    STATS_READ_PACKETS,
+    STATS_DEMUX_READ,
+    STATS_DEMUX_BITRATE,
+    STATS_DEMUX_CORRUPTED,
+    STATS_DEMUX_DISCONTINUITY,
+    STATS_PLAYED_ABUFFERS,
+    STATS_LOST_ABUFFERS,
+    STATS_DECODED_AUDIO,
+    STATS_DECODED_VIDEO,
+    STATS_DECODED_SUB,
+    STATS_CLIENT_CONNECTIONS,
+    STATS_ACTIVE_CONNECTIONS,
+    STATS_SOUT_SENT_PACKETS,
+    STATS_SOUT_SENT_BYTES,
+    STATS_SOUT_SEND_BITRATE,
+    STATS_DISPLAYED_PICTURES,
+    STATS_LOST_PICTURES,
+};
+
 int stats_Update (counter_t *, vlc_value_t, vlc_value_t *);
 counter_t * stats_CounterCreate (int, int);
 int stats_Get (counter_t *, vlc_value_t*);
