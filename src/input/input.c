@@ -852,7 +852,7 @@ static void InitStatistics( input_thread_t * p_input )
 
     /* Prepare statistics */
 #define INIT_COUNTER( c, type, compute ) p_input->p->counters.p_##c = \
- stats_CounterCreate( p_input, VLC_VAR_##type, STATS_##compute);
+ stats_CounterCreate( VLC_VAR_##type, STATS_##compute);
     if( libvlc_stats( p_input ) )
     {
         INIT_COUNTER( read_bytes, INTEGER, COUNTER );
@@ -3202,7 +3202,7 @@ void input_UpdateStatistic( input_thread_t *p_input,
     vlc_mutex_lock( &p_input->p->counters.counters_lock);
     switch( i_type )
     {
-#define I(c) stats_UpdateInteger( p_input, p_input->p->counters.c, i_delta, NULL )
+#define I(c) stats_UpdateInteger( p_input->p->counters.c, i_delta, NULL )
     case INPUT_STATISTIC_DECODED_VIDEO:
         I(p_decoded_video);
         break;
@@ -3220,8 +3220,8 @@ void input_UpdateStatistic( input_thread_t *p_input,
     {
         int i_bytes; /* That's pretty stupid to define it as an integer, it will overflow
                         really fast ... */
-        if( !stats_UpdateInteger( p_input, p_input->p->counters.p_sout_sent_bytes, i_delta, &i_bytes ) )
-            stats_UpdateFloat( p_input, p_input->p->counters.p_sout_send_bitrate, i_bytes, NULL );
+        if( !stats_UpdateInteger( p_input->p->counters.p_sout_sent_bytes, i_delta, &i_bytes ) )
+            stats_UpdateFloat( p_input->p->counters.p_sout_send_bitrate, i_bytes, NULL );
         break;
     }
     default:

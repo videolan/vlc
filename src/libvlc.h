@@ -222,67 +222,57 @@ void var_OptionParse (vlc_object_t *, const char *, bool trusted);
 /*
  * Stats stuff
  */
-int stats_Update (vlc_object_t*, counter_t *, vlc_value_t, vlc_value_t *);
-counter_t * stats_CounterCreate (vlc_object_t*, int, int);
-#define stats_CounterCreate(a,b,c) stats_CounterCreate( VLC_OBJECT(a), b, c )
-int stats_Get (vlc_object_t*, counter_t *, vlc_value_t*);
-#define stats_Get(a,b,c) stats_Get( VLC_OBJECT(a), b, c)
+int stats_Update (counter_t *, vlc_value_t, vlc_value_t *);
+counter_t * stats_CounterCreate (int, int);
+int stats_Get (counter_t *, vlc_value_t*);
 
 void stats_CounterClean (counter_t * );
 
-static inline int stats_GetInteger( vlc_object_t *p_obj, counter_t *p_counter,
-                                    int64_t *value )
+static inline int stats_GetInteger( counter_t *p_counter, int64_t *value )
 {
     int i_ret;
     vlc_value_t val; val.i_int = 0;
     if( !p_counter ) return VLC_EGENERIC;
-    i_ret = stats_Get( p_obj, p_counter, &val );
+    i_ret = stats_Get( p_counter, &val );
     *value = val.i_int;
     return i_ret;
 }
-#define stats_GetInteger(a,b,c) stats_GetInteger( VLC_OBJECT(a), b, c )
 
-static inline int stats_GetFloat( vlc_object_t *p_obj, counter_t *p_counter,
-                                    float *value )
+static inline int stats_GetFloat( counter_t *p_counter, float *value )
 {
     int i_ret;
     vlc_value_t val; val.f_float = 0.0;
     if( !p_counter ) return VLC_EGENERIC;
-    i_ret = stats_Get( p_obj, p_counter, &val );
+    i_ret = stats_Get( p_counter, &val );
     *value = val.f_float;
     return i_ret;
 }
-#define stats_GetFloat(a,b,c) stats_GetFloat( VLC_OBJECT(a), b, c )
 
-static inline int stats_UpdateInteger( vlc_object_t *p_obj,counter_t *p_co,
-                                         int i, int *pi_new )
+static inline int stats_UpdateInteger( counter_t *p_co, int i, int *pi_new )
 {
     int i_ret;
     vlc_value_t val;
     vlc_value_t new_val; new_val.i_int = 0;
     if( !p_co ) return VLC_EGENERIC;
     val.i_int = i;
-    i_ret = stats_Update( p_obj, p_co, val, &new_val );
+    i_ret = stats_Update( p_co, val, &new_val );
     if( pi_new )
         *pi_new = new_val.i_int;
     return i_ret;
 }
-#define stats_UpdateInteger(a,b,c,d) stats_UpdateInteger( VLC_OBJECT(a),b,c,d )
 
-static inline int stats_UpdateFloat( vlc_object_t *p_obj, counter_t *p_co,
-                                       float f, float *pf_new )
+static inline int stats_UpdateFloat( counter_t *p_co, float f, float *pf_new )
 {
     vlc_value_t val;
     int i_ret;
     vlc_value_t new_val;new_val.f_float = 0.0;
     if( !p_co ) return VLC_EGENERIC;
     val.f_float = f;
-    i_ret =  stats_Update( p_obj, p_co, val, &new_val );
+    i_ret =  stats_Update( p_co, val, &new_val );
     if( pf_new )
         *pf_new = new_val.f_float;
     return i_ret;
 }
-#define stats_UpdateFloat(a,b,c,d) stats_UpdateFloat( VLC_OBJECT(a),b,c,d )
 
 void stats_ComputeInputStats(input_thread_t*, input_stats_t*);
 void stats_ReinitInputStats(input_stats_t *);

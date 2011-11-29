@@ -2017,8 +2017,8 @@ static void httpd_ClientTlsHsOut( httpd_client_t *cl )
 static void* httpd_HostThread( void *data )
 {
     httpd_host_t *host = data;
-    counter_t *p_total_counter = stats_CounterCreate( host, VLC_VAR_INTEGER, STATS_COUNTER );
-    counter_t *p_active_counter = stats_CounterCreate( host, VLC_VAR_INTEGER, STATS_COUNTER );
+    counter_t *p_total_counter = stats_CounterCreate( VLC_VAR_INTEGER, STATS_COUNTER );
+    counter_t *p_active_counter = stats_CounterCreate( VLC_VAR_INTEGER, STATS_COUNTER );
     int evfd = vlc_object_waitpipe( VLC_OBJECT( host ) );
 
     for( ;; )
@@ -2049,7 +2049,7 @@ static void* httpd_HostThread( void *data )
                     cl->i_activity_date+cl->i_activity_timeout < now) ) ) )
             {
                 httpd_ClientClean( cl );
-                stats_UpdateInteger( host, p_active_counter, -1, NULL );
+                stats_UpdateInteger( p_active_counter, -1, NULL );
                 TAB_REMOVE( host->i_client, host->client, cl );
                 free( cl );
                 i_client--;
@@ -2472,8 +2472,8 @@ static void* httpd_HostThread( void *data )
             else
                 p_tls = NULL;
 
-            stats_UpdateInteger( host, p_total_counter, 1, NULL );
-            stats_UpdateInteger( host, p_active_counter, 1, NULL );
+            stats_UpdateInteger( p_total_counter, 1, NULL );
+            stats_UpdateInteger( p_active_counter, 1, NULL );
             cl = httpd_ClientNew( fd, p_tls, now );
             vlc_mutex_lock( &host->lock );
             TAB_APPEND( host->i_client, host->client, cl );
