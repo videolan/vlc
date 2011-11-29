@@ -126,7 +126,7 @@ case "${host_os}" in
     dnl Force gcc "-arch" flag
     ARCH_flag=""
     case "${host}" in
-      i386*)
+      i?86*)
         ARCH_flag="-arch i386"
       ;;
       ppc64*)
