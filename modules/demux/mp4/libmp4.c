@@ -2721,6 +2721,81 @@ static int MP4_ReadBox_pasp( stream_t *p_stream, MP4_Box_t *p_box )
     MP4_READBOX_EXIT( 1 );
 }
 
+static int MP4_ReadBox_mehd( stream_t *p_stream, MP4_Box_t *p_box )
+{
+    MP4_READBOX_ENTER( MP4_Box_data_mehd_t );
+
+    MP4_GETVERSIONFLAGS( p_box->data.p_mehd );
+    if( p_box->data.p_mehd->i_version == 1 )
+        MP4_GET8BYTES( p_box->data.p_mehd->i_fragment_duration );
+    else /* version == 0 */
+        MP4_GET4BYTES( p_box->data.p_mehd->i_fragment_duration );
+
+#ifdef MP4_VERBOSE
+    msg_Dbg( p_stream,
+             "read box: \"mehd\" frag dur. %"PRIu64"",
+             p_box->data.p_mehd->i_fragment_duration );
+#endif
+
+    MP4_READBOX_EXIT( 1 );
+}
+
+static int MP4_ReadBox_trex( stream_t *p_stream, MP4_Box_t *p_box )
+{
+    MP4_READBOX_ENTER( MP4_Box_data_trex_t );
+    MP4_GETVERSIONFLAGS( p_box->data.p_trex );
+
+    MP4_GET4BYTES( p_box->data.p_trex->i_track_ID );
+    MP4_GET4BYTES( p_box->data.p_trex->i_default_sample_description_index );
+    MP4_GET4BYTES( p_box->data.p_trex->i_default_sample_duration );
+    MP4_GET4BYTES( p_box->data.p_trex->i_default_sample_size );
+    MP4_GET4BYTES( p_box->data.p_trex->i_default_sample_flags );
+
+#ifdef MP4_VERBOSE
+    msg_Dbg( p_stream,
+             "read box: \"trex\" trackID: %"PRIu32"",
+             p_box->data.p_trex->i_track_ID );
+#endif
+
+    MP4_READBOX_EXIT( 1 );
+}
+
+static int MP4_ReadBox_sdtp( stream_t *p_stream, MP4_Box_t *p_box )
+{
+    uint32_t i_sample_count;
+    MP4_READBOX_ENTER( MP4_Box_data_sdtp_t );
+    MP4_Box_data_sdtp_t *p_sdtp = p_box->data.p_sdtp;
+    MP4_GETVERSIONFLAGS( p_box->data.p_sdtp );
+    i_sample_count = i_read;
+
+    p_sdtp->p_sample_table = calloc( i_sample_count, 1 );
+
+    if( !p_sdtp->p_sample_table )
+        goto error;
+
+    for( uint32_t i=0; i < i_sample_count; i++ )
+        MP4_GET1BYTE( p_sdtp->p_sample_table[i] );
+
+#ifdef MP4_VERBOSE
+    msg_Info( p_stream, "i_sample_count is %"PRIu32"", i_sample_count );
+    msg_Dbg( p_stream,
+             "read box: \"sdtp\" head: %"PRIx8" %"PRIx8" %"PRIx8" %"PRIx8"",
+                 p_sdtp->p_sample_table[0],
+                 p_sdtp->p_sample_table[1],
+                 p_sdtp->p_sample_table[2],
+                 p_sdtp->p_sample_table[3] );
+#endif
+
+    MP4_READBOX_EXIT( 1 );
+error:
+    MP4_READBOX_EXIT( 0 );
+}
+
+static void MP4_FreeBox_sdtp( MP4_Box_t *p_box )
+{
+    FREENULL( p_box->data.p_sdtp->p_sample_table );
+}
+
 
 /* For generic */
 static int MP4_ReadBox_default( stream_t *p_stream, MP4_Box_t *p_box )
@@ -2799,6 +2874,7 @@ static const struct
     { ATOM_gmhd,    MP4_ReadBoxContainer,     MP4_FreeBox_Common },
     { ATOM_wave,    MP4_ReadBoxContainer,     MP4_FreeBox_Common },
     { ATOM_ilst,    MP4_ReadBoxContainer,     MP4_FreeBox_Common },
+    { ATOM_mvex,    MP4_ReadBoxContainer,     MP4_FreeBox_Common },
 
     /* specific box */
     { ATOM_ftyp,    MP4_ReadBox_ftyp,         MP4_FreeBox_ftyp },
@@ -2986,6 +3062,9 @@ static const struct
     { ATOM_mfhd,    MP4_ReadBox_mfhd,         MP4_FreeBox_Common },
     { ATOM_tfhd,    MP4_ReadBox_tfhd,         MP4_FreeBox_Common },
     { ATOM_trun,    MP4_ReadBox_trun,         MP4_FreeBox_trun },
+    { ATOM_trex,    MP4_ReadBox_trex,         MP4_FreeBox_Common },
+    { ATOM_mehd,    MP4_ReadBox_mehd,         MP4_FreeBox_Common },
+    { ATOM_sdtp,    MP4_ReadBox_sdtp,         MP4_FreeBox_sdtp },
 
     /* Last entry */
     { 0,              MP4_ReadBox_default,      NULL }

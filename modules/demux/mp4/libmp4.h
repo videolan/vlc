@@ -73,7 +73,9 @@
 #define ATOM_edts VLC_FOURCC( 'e', 'd', 't', 's' )
 #define ATOM_elst VLC_FOURCC( 'e', 'l', 's', 't' )
 #define ATOM_mvex VLC_FOURCC( 'm', 'v', 'e', 'x' )
+#define ATOM_sdtp VLC_FOURCC( 's', 'd', 't', 'p' )
 #define ATOM_trex VLC_FOURCC( 't', 'r', 'e', 'x' )
+#define ATOM_mehd VLC_FOURCC( 'm', 'e', 'h', 'd' )
 #define ATOM_mfhd VLC_FOURCC( 'm', 'f', 'h', 'd' )
 #define ATOM_traf VLC_FOURCC( 't', 'r', 'a', 'f' )
 #define ATOM_tfhd VLC_FOURCC( 't', 'f', 'h', 'd' )
@@ -988,6 +990,34 @@ typedef struct
     uint32_t i_vertical_spacing;
 } MP4_Box_data_pasp_t;
 
+typedef struct
+{
+    uint8_t  i_version;
+    uint32_t i_flags;
+
+    uint64_t i_fragment_duration;
+} MP4_Box_data_mehd_t;
+
+typedef struct
+{
+    uint8_t  i_version;
+    uint32_t i_flags;
+
+    uint32_t i_track_ID;
+    uint32_t i_default_sample_description_index;
+    uint32_t i_default_sample_duration;
+    uint32_t i_default_sample_size;
+    uint32_t i_default_sample_flags;
+} MP4_Box_data_trex_t;
+
+typedef struct
+{
+    uint8_t  i_version;
+    uint32_t i_flags;
+
+    uint8_t *p_sample_table;
+} MP4_Box_data_sdtp_t;
+
 /*
 typedef struct MP4_Box_data__s
 {
@@ -1030,6 +1060,9 @@ typedef union MP4_Box_data_s
     MP4_Box_data_trkn_t *p_trkn;
     MP4_Box_data_iods_t *p_iods;
     MP4_Box_data_pasp_t *p_pasp;
+    MP4_Box_data_trex_t *p_trex;
+    MP4_Box_data_mehd_t *p_mehd;
+    MP4_Box_data_sdtp_t *p_sdtp;
 
     MP4_Box_data_stsz_t *p_stsz;
     MP4_Box_data_stz2_t *p_stz2;

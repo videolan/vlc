@@ -346,6 +346,9 @@ static int Open( vlc_object_t * p_this )
             case( VLC_FOURCC( 'q', 't', ' ', ' ') ):
                 msg_Dbg( p_demux, "Apple QuickTime file" );
                 break;
+            case( VLC_FOURCC( 'i', 's', 'm', 'l') ):
+                msg_Dbg( p_demux, "PIFF (= isml = fMP4) file" );
+                break;
             default:
                 msg_Dbg( p_demux,
                          "unrecognized major file specification (%4.4s).",
