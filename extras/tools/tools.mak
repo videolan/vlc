@@ -132,7 +132,7 @@ autoconf: autoconf-$(AUTOCONF_VERSION).tar.bz2
 	$(UNPACK)
 	$(MOVE)
 
-.autoconf: autoconf
+.autoconf: autoconf .pkg-config
 	(cd $<; ./configure --prefix=$(PREFIX) && make && make install)
 	touch $@
 
