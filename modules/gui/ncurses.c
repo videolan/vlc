@@ -206,7 +206,6 @@ struct intf_sys_t
 
     /* Search Box context */
     char            search_chain[20];
-    int             before_search;
 
     /* Open Box Context */
     char            open_chain[50];
@@ -465,16 +464,15 @@ static int SubSearchPlaylist(intf_sys_t *sys, char *searchstring,
     return -1;
 }
 
-static void SearchPlaylist(intf_sys_t *sys, char *str)
+static void SearchPlaylist(intf_sys_t *sys)
 {
-    int i_first = sys->before_search;
+    char *str = sys->search_chain;
+    int i_first = sys->box_idx;
     if (i_first < 0)
         i_first = 0;
 
-    if (!str || !*str) {
-        sys->box_idx = sys->before_search;
+    if (!str || !*str)
         return;
-    }
 
     int i_item = SubSearchPlaylist(sys, str, i_first + 1, sys->plist_entries);
     if (i_item < 0)
@@ -909,6 +907,7 @@ static int DrawHelp(intf_thread_t *intf)
     H(_(" O                      Reverse order Playlist by title"));
     H(_(" g                      Go to the current playing item"));
     H(_(" /                      Look for an item"));
+    H(_(" ;                      Look for the next item"));
     H(_(" A                      Add an entry"));
     /* xgettext: You can use ⌫ character to translate <backspace> */
     H(_(" D, <backspace>, <del>  Delete an entry"));
@@ -1311,6 +1310,10 @@ static bool HandlePlaylistKey(intf_thread_t *intf, int key)
         vlc_mutex_unlock(&sys->pl_lock);
         return true;
 
+    case ';':
+        SearchPlaylist(sys);
+        return true;
+
     case 'g':
         FindIndex(sys, p_playlist);
         return true;
@@ -1491,7 +1494,7 @@ static void HandleEditBoxKey(intf_thread_t *intf, int key, int box)
     case '\r':
     case '\n':
         if (search)
-            SearchPlaylist(sys, sys->search_chain);
+            SearchPlaylist(sys);
         else
             OpenSelection(intf);
 
@@ -1513,11 +1516,8 @@ static void HandleEditBoxKey(intf_thread_t *intf, int key, int box)
          * following function-key sequence.
          *
          */
-        if (getch() != ERR)
-            return;
-
-        if (search) sys->box_idx = sys->before_search;
-        sys->box_type = BOX_PLAYLIST;
+        if (getch() == ERR)
+            sys->box_type = BOX_PLAYLIST;
         return;
 
     case KEY_BACKSPACE:
@@ -1534,7 +1534,7 @@ static void HandleEditBoxKey(intf_thread_t *intf, int key, int box)
     }
 
     if (search)
-        SearchPlaylist(sys, str);
+        SearchPlaylist(sys);
 }
 
 static void InputNavigate(input_thread_t* p_input, const char *var)
@@ -1572,21 +1572,12 @@ static void HandleCommonKey(intf_thread_t *intf, int key)
 
     case '/': /* Search */
         sys->plidx_follow = false;
-        if (sys->box_type == BOX_PLAYLIST) {
-            sys->before_search = sys->box_idx;
-            sys->box_type = BOX_SEARCH;
-        } else {
-            sys->before_search = 0;
-            BoxSwitch(sys, BOX_SEARCH);
-        }
+        BoxSwitch(sys, BOX_SEARCH);
         return;
 
     case 'A': /* Open */
         sys->open_chain[0] = '\0';
-        if (sys->box_type == BOX_PLAYLIST)
-            sys->box_type = BOX_OPEN;
-        else
-            BoxSwitch(sys, BOX_OPEN);
+        BoxSwitch(sys, BOX_OPEN);
         return;
 
     /* Navigation */
