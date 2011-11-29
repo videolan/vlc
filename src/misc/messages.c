@@ -255,7 +255,7 @@ static const char msg_color[4][8] = { WHITE, RED, YELLOW, GRAY };
 static void PrintColorMsg (void *d, int type, const msg_item_t *p_item,
                            const char *format, va_list ap)
 {
-    const int *pverbose = d;
+    const signed char *pverbose = d;
     FILE *stream = stderr;
 
     if (*pverbose < 0 || *pverbose < (type - VLC_MSG_ERR))
@@ -281,7 +281,7 @@ static void PrintColorMsg (void *d, int type, const msg_item_t *p_item,
 static void PrintMsg (void *d, int type, const msg_item_t *p_item,
                       const char *format, va_list ap)
 {
-    const int *pverbose = d;
+    const signed char *pverbose = d;
     FILE *stream = stderr;
 
     if (*pverbose < 0 || *pverbose < (type - VLC_MSG_ERR))

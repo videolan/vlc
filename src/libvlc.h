@@ -172,7 +172,7 @@ typedef struct libvlc_priv_t
     bool               playlist_active;
 
     /* Messages */
-    int                i_verbose;   ///< info messages
+    signed char        i_verbose;   ///< info messages
     bool               b_color;     ///< color messages?
     bool               b_stats;     ///< Whether to collect stats
 
