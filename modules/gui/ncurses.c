@@ -802,49 +802,49 @@ static int DrawStats(intf_thread_t *intf)
 
     /* Input */
     if (sys->color) color_set(C_CATEGORY, NULL);
-    MainBoxWrite(sys, l++, _("  [Incoming]"));
+    MainBoxWrite(sys, l++, _("+-[Incoming]"));
     if (sys->color) color_set(C_DEFAULT, NULL);
-    MainBoxWrite(sys, l++, _("      input bytes read : %8.0f KiB"),
+    MainBoxWrite(sys, l++, _("| input bytes read : %8.0f KiB"),
             (float)(p_stats->i_read_bytes)/1024);
-    MainBoxWrite(sys, l++, _("      input bitrate    :   %6.0f kb/s"),
+    MainBoxWrite(sys, l++, _("| input bitrate    :   %6.0f kb/s"),
             p_stats->f_input_bitrate*8000);
-    MainBoxWrite(sys, l++, _("      demux bytes read : %8.0f KiB"),
+    MainBoxWrite(sys, l++, _("| demux bytes read : %8.0f KiB"),
             (float)(p_stats->i_demux_read_bytes)/1024);
-    MainBoxWrite(sys, l++, _("      demux bitrate    :   %6.0f kb/s"),
+    MainBoxWrite(sys, l++, _("| demux bitrate    :   %6.0f kb/s"),
             p_stats->f_demux_bitrate*8000);
 
     /* Video */
     if (i_video) {
         if (sys->color) color_set(C_CATEGORY, NULL);
-        MainBoxWrite(sys, l++, _("  [Video Decoding]"));
+        MainBoxWrite(sys, l++, _("+-[Video Decoding]"));
         if (sys->color) color_set(C_DEFAULT, NULL);
-        MainBoxWrite(sys, l++, _("      video decoded    :    %"PRId64),
+        MainBoxWrite(sys, l++, _("| video decoded    :    %5"PRIi64),
                 p_stats->i_decoded_video);
-        MainBoxWrite(sys, l++, _("      frames displayed :    %"PRId64),
+        MainBoxWrite(sys, l++, _("| frames displayed :    %5"PRIi64),
                 p_stats->i_displayed_pictures);
-        MainBoxWrite(sys, l++, _("      frames lost      :    %"PRId64),
+        MainBoxWrite(sys, l++, _("| frames lost      :    %5"PRIi64),
                 p_stats->i_lost_pictures);
     }
     /* Audio*/
     if (i_audio) {
         if (sys->color) color_set(C_CATEGORY, NULL);
-        MainBoxWrite(sys, l++, _("  [Audio Decoding]"));
+        MainBoxWrite(sys, l++, _("+-[Audio Decoding]"));
         if (sys->color) color_set(C_DEFAULT, NULL);
-        MainBoxWrite(sys, l++, _("      audio decoded    :    %"PRId64),
+        MainBoxWrite(sys, l++, _("| audio decoded    :    %5"PRIi64),
                 p_stats->i_decoded_audio);
-        MainBoxWrite(sys, l++, _("      buffers played   :    %"PRId64),
+        MainBoxWrite(sys, l++, _("| buffers played   :    %5"PRIi64),
                 p_stats->i_played_abuffers);
-        MainBoxWrite(sys, l++, _("      buffers lost     :    %"PRId64),
+        MainBoxWrite(sys, l++, _("| buffers lost     :    %5"PRIi64),
                 p_stats->i_lost_abuffers);
     }
     /* Sout */
     if (sys->color) color_set(C_CATEGORY, NULL);
-    MainBoxWrite(sys, l++, _("  [Streaming]"));
+    MainBoxWrite(sys, l++, _("+-[Streaming]"));
     if (sys->color) color_set(C_DEFAULT, NULL);
-    MainBoxWrite(sys, l++, _("      packets sent     :    %5i"), p_stats->i_sent_packets);
-    MainBoxWrite(sys, l++, _("      bytes sent       : %8.0f KiB"),
+    MainBoxWrite(sys, l++, _("| packets sent     :    %5"PRIi64), p_stats->i_sent_packets);
+    MainBoxWrite(sys, l++, _("| bytes sent       : %8.0f KiB"),
             (float)(p_stats->i_sent_bytes)/1025);
-    MainBoxWrite(sys, l++, _("      sending bitrate  :   %6.0f kb/s"),
+    MainBoxWrite(sys, l++, _("| sending bitrate  :   %6.0f kb/s"),
             p_stats->f_send_bitrate*8000);
     if (sys->color) color_set(C_DEFAULT, NULL);
 
