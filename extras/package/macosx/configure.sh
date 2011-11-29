@@ -14,6 +14,11 @@ OPTIONS="
         --enable-twolame
         --enable-realrtsp
         --enable-libass
+        --enable-macosx-audio
+        --enable-macosx-dialog-provider
+        --enable-macosx-eyetv
+        --enable-macosx-qtkit
+        --enable-macosx-vout
         --disable-skins2
         --disable-xcb
         --disable-sdl
