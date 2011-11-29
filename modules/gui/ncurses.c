@@ -206,7 +206,6 @@ struct intf_sys_t
 
     /* Search Box context */
     char            search_chain[20];
-    char            *old_search;
     int             before_search;
 
     /* Open Box Context */
@@ -1132,13 +1131,12 @@ static int DrawStatus(intf_thread_t *intf)
 static void FillTextBox(intf_sys_t *sys)
 {
     int width = COLS - 2;
-    const char *title = sys->box_type == BOX_OPEN ? "Open: %s" : "Find: %s";
-    char *chain = sys->box_type == BOX_OPEN ? sys->open_chain :
-                    sys->old_search ?  sys->old_search :
-                     sys->search_chain;
 
     DrawEmptyLine(7, 1, width);
-    mvnprintw(7, 1, width, _(title), chain);
+    if (sys->box_type == BOX_OPEN)
+        mvnprintw(7, 1, width, _("Open: %s"), sys->open_chain);
+    else
+        mvnprintw(7, 1, width, _("Find: %s"), sys->search_chain);
 }
 
 static void FillBox(intf_thread_t *intf)
@@ -1441,6 +1439,40 @@ static bool HandleBrowseKey(intf_thread_t *intf, int key)
     return false;
 }
 
+static void OpenSelection(intf_thread_t *intf)
+{
+    intf_sys_t *sys = intf->p_sys;
+    char *uri = make_URI(sys->open_chain, NULL);
+    if (uri == NULL)
+        return;
+
+    playlist_t *p_playlist = pl_Get(intf);
+    vlc_mutex_lock(&sys->pl_lock);
+    playlist_item_t *p_parent = sys->node;
+    vlc_mutex_unlock(&sys->pl_lock);
+
+    PL_LOCK;
+    if (!p_parent) {
+        playlist_item_t *current;
+        current= playlist_CurrentPlayingItem(p_playlist);
+        p_parent = current ? current->p_parent : NULL;
+        if (!p_parent)
+            p_parent = p_playlist->p_local_onelevel;
+    }
+
+    while (p_parent->p_parent && p_parent->p_parent->p_parent)
+        p_parent = p_parent->p_parent;
+    PL_UNLOCK;
+
+    playlist_Add(p_playlist, uri, NULL,
+            PLAYLIST_APPEND|PLAYLIST_GO, PLAYLIST_END,
+            p_parent->p_input == p_playlist->p_local_onelevel->p_input,
+            false);
+
+    sys->plidx_follow = true;
+    free(uri);
+}
+
 static void HandleEditBoxKey(intf_thread_t *intf, int key, int box)
 {
     intf_sys_t *sys = intf->p_sys;
@@ -1458,44 +1490,11 @@ static void HandleEditBoxKey(intf_thread_t *intf, int key, int box)
     case KEY_ENTER:
     case '\r':
     case '\n':
-        if (search) {
-            if (len)
-                sys->old_search = strdup(sys->search_chain);
-            else if (sys->old_search)
-                SearchPlaylist(sys, sys->old_search);
-        } else if (len) {
-            char *uri = make_URI(sys->open_chain, NULL);
-            if (uri == NULL) {
-                sys->box_type = BOX_PLAYLIST;
-                return;
-            }
+        if (search)
+            SearchPlaylist(sys, sys->search_chain);
+        else
+            OpenSelection(intf);
 
-            playlist_t *p_playlist = pl_Get(intf);
-            vlc_mutex_lock(&sys->pl_lock);
-            playlist_item_t *p_parent = sys->node;
-            vlc_mutex_unlock(&sys->pl_lock);
-
-            PL_LOCK;
-            if (!p_parent) {
-                playlist_item_t *current;
-                current= playlist_CurrentPlayingItem(p_playlist);
-                p_parent = current ? current->p_parent : NULL;
-                if (!p_parent)
-                    p_parent = p_playlist->p_local_onelevel;
-            }
-
-            while (p_parent->p_parent && p_parent->p_parent->p_parent)
-                p_parent = p_parent->p_parent;
-            PL_UNLOCK;
-
-            playlist_Add(p_playlist, uri, NULL,
-                  PLAYLIST_APPEND|PLAYLIST_GO, PLAYLIST_END,
-                  p_parent->p_input == p_playlist->p_local_onelevel->p_input,
-                  false);
-
-            free(uri);
-            sys->plidx_follow = true;
-        }
         sys->box_type = BOX_PLAYLIST;
         return;
 
@@ -1534,11 +1533,8 @@ static void HandleEditBoxKey(intf_thread_t *intf, int key, int box)
         }
     }
 
-    if (search) {
-        free(sys->old_search);
-        sys->old_search = NULL;
+    if (search)
         SearchPlaylist(sys, str);
-    }
 }
 
 static void InputNavigate(input_thread_t* p_input, const char *var)
@@ -1575,7 +1571,6 @@ static void HandleCommonKey(intf_thread_t *intf, int key)
     case 'S': BoxSwitch(sys, BOX_STATS);      return;
 
     case '/': /* Search */
-        sys->search_chain[0] = '\0';
         sys->plidx_follow = false;
         if (sys->box_type == BOX_PLAYLIST) {
             sys->before_search = sys->box_idx;
@@ -1853,7 +1848,6 @@ static void Close(vlc_object_t *p_this)
     DirsDestroy(sys);
 
     free(sys->current_dir);
-    free(sys->old_search);
 
     if (sys->p_input)
         vlc_object_release(sys->p_input);
