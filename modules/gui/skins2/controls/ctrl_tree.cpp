@@ -563,17 +563,12 @@ void CtrlTree::draw( OSGraphics &rImage, int xDest, int yDest, int w, int h)
 
 void CtrlTree::makeImage()
 {
-    stats_TimerStart( getIntf(), "[Skins] Playlist image",
-                      STATS_TIMER_SKINS_PLAYTREE_IMAGE );
     delete m_pImage;
 
     // Get the size of the control
     const Position *pPos = getPosition();
     if( !pPos )
-    {
-        stats_TimerStop( getIntf(), STATS_TIMER_SKINS_PLAYTREE_IMAGE );
         return;
-    }
     int width = pPos->getWidth();
     int height = pPos->getHeight();
 
@@ -645,7 +640,6 @@ void CtrlTree::makeImage()
                 m_rFont.drawString( *pStr, color, width-bitmapWidth*depth );
             if( !pText )
             {
-                stats_TimerStop( getIntf(), STATS_TIMER_SKINS_PLAYTREE_IMAGE );
                 return;
             }
             if( it->size() )
@@ -695,7 +689,6 @@ void CtrlTree::makeImage()
             delete pText;
         }
     }
-    stats_TimerStop( getIntf(), STATS_TIMER_SKINS_PLAYTREE_IMAGE );
 }
 
 CtrlTree::Iterator CtrlTree::findItemAtPos( int pos )

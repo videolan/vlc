@@ -115,7 +115,6 @@ enum
     STATS_MAX,
     STATS_MIN,
     STATS_DERIVATIVE,
-    STATS_TIMER
 };
 
 struct counter_sample_t
@@ -159,37 +158,7 @@ enum
     STATS_SOUT_SEND_BITRATE,
     STATS_DISPLAYED_PICTURES,
     STATS_LOST_PICTURES,
-
-    STATS_TIMER_PLAYLIST_BUILD,
-    STATS_TIMER_ML_LOAD,
-    STATS_TIMER_ML_DUMP,
-    STATS_TIMER_INTERACTION,
-    STATS_TIMER_PREPARSE,
-    STATS_TIMER_INPUT_LAUNCHING,
-    STATS_TIMER_MODULE_NEED,
-    STATS_TIMER_VIDEO_FRAME_ENCODING,
-    STATS_TIMER_AUDIO_FRAME_ENCODING,
-
-    STATS_TIMER_SKINS_PLAYTREE_IMAGE,
 };
-
-/*********
- * Timing
- ********/
-VLC_API void stats_TimerStart(vlc_object_t*, const char *, unsigned int );
-VLC_API void stats_TimerStop(vlc_object_t*, unsigned int);
-VLC_API void stats_TimerDump(vlc_object_t*, unsigned int);
-VLC_API void stats_TimersDumpAll(vlc_object_t*);
-#define stats_TimerStart(a,b,c) stats_TimerStart( VLC_OBJECT(a), b,c )
-#define stats_TimerStop(a,b) stats_TimerStop( VLC_OBJECT(a), b )
-#define stats_TimerDump(a,b) stats_TimerDump( VLC_OBJECT(a), b )
-#define stats_TimersDumpAll(a) stats_TimersDumpAll( VLC_OBJECT(a) )
-
-VLC_API void stats_TimersCleanAll(vlc_object_t * );
-#define stats_TimersCleanAll(a) stats_TimersCleanAll( VLC_OBJECT(a) )
-
-VLC_API void stats_TimerClean(vlc_object_t *, unsigned int );
-#define stats_TimerClean(a,b) stats_TimerClean( VLC_OBJECT(a), b )
 
 /**
  * @}

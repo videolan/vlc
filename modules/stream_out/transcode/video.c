@@ -42,23 +42,6 @@ struct decoder_owner_sys_t
     sout_stream_sys_t *p_sys;
 };
 
-static inline void video_timer_start( encoder_t * p_encoder )
-{
-    stats_TimerStart( p_encoder, "encoding video frame",
-                      STATS_TIMER_VIDEO_FRAME_ENCODING );
-}
-
-static inline void video_timer_stop( encoder_t * p_encoder )
-{
-    stats_TimerStop( p_encoder, STATS_TIMER_VIDEO_FRAME_ENCODING );
-}
-
-static inline void video_timer_close( encoder_t * p_encoder )
-{
-    stats_TimerDump(  p_encoder, STATS_TIMER_VIDEO_FRAME_ENCODING );
-    stats_TimerClean( p_encoder, STATS_TIMER_VIDEO_FRAME_ENCODING );
-}
-
 static void video_del_buffer_decoder( decoder_t *p_decoder, picture_t *p_pic )
 {
     VLC_UNUSED(p_decoder);
@@ -150,9 +133,7 @@ static void* EncoderThread( void *obj )
         p_sys->i_first_pic %= PICTURE_RING_SIZE;
         vlc_mutex_unlock( &p_sys->lock_out );
 
-        video_timer_start( id->p_encoder );
         p_block = id->p_encoder->pf_encode_video( id->p_encoder, p_pic );
-        video_timer_stop( id->p_encoder );
 
         vlc_mutex_lock( &p_sys->lock_out );
         block_ChainAppend( &p_sys->p_buffers, p_block );
@@ -571,8 +552,6 @@ void transcode_video_close( sout_stream_t *p_stream,
         vlc_cond_destroy( &p_stream->p_sys->cond );
     }
 
-    video_timer_close( id->p_encoder );
-
     /* Close decoder */
     if( id->p_decoder->p_module )
         module_unneed( id->p_decoder, id->p_decoder->p_module );
@@ -606,9 +585,7 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_t *id,
         {
             block_t *p_block;
             do {
-                video_timer_start( id->p_encoder );
                 p_block = id->p_encoder->pf_encode_video(id->p_encoder, NULL );
-                video_timer_stop( id->p_encoder );
                 block_ChainAppend( out, p_block );
             } while( p_block );
         }
@@ -742,10 +719,7 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_t *id,
         {
             block_t *p_block;
 
-            video_timer_start( id->p_encoder );
             p_block = id->p_encoder->pf_encode_video( id->p_encoder, p_pic );
-            video_timer_stop( id->p_encoder );
-
             block_ChainAppend( out, p_block );
         }
 
@@ -778,9 +752,7 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_t *id,
                {
                    block_t *p_block;
                    p_pic->date = i_pts;
-                   video_timer_start( id->p_encoder );
                    p_block = id->p_encoder->pf_encode_video(id->p_encoder, p_pic);
-                   video_timer_stop( id->p_encoder );
                    block_ChainAppend( out, p_block );
                }
            }

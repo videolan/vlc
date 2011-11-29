@@ -199,8 +199,6 @@ module_t *vlc_module_load(vlc_object_t *p_this, const char *psz_capability,
                           const char *psz_name, bool b_strict,
                           vlc_activate_t probe, ...)
 {
-    stats_TimerStart( p_this, "module_need()", STATS_TIMER_MODULE_NEED );
-
     module_list_t *p_list;
     module_t *p_module;
     int i_shortcuts = 0;
@@ -222,9 +220,6 @@ module_t *vlc_module_load(vlc_object_t *p_this, const char *psz_capability,
         if( !strcmp( psz_name, "none" ) )
         {
             free( psz_var );
-            stats_TimerStop( p_this, STATS_TIMER_MODULE_NEED );
-            stats_TimerDump( p_this, STATS_TIMER_MODULE_NEED );
-            stats_TimerClean( p_this, STATS_TIMER_MODULE_NEED );
             return NULL;
         }
 
@@ -386,10 +381,6 @@ found_shortcut:
 
     free( psz_shortcuts );
     free( psz_var );
-
-    stats_TimerStop( p_this, STATS_TIMER_MODULE_NEED );
-    stats_TimerDump( p_this, STATS_TIMER_MODULE_NEED );
-    stats_TimerClean( p_this, STATS_TIMER_MODULE_NEED );
 
     /* Don't forget that the module is still locked */
     return p_module;

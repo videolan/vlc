@@ -404,12 +404,6 @@ spu_RegisterChannel
 spu_ClearChannel
 sql_Create
 sql_Destroy
-stats_TimerClean
-stats_TimerDump
-stats_TimersCleanAll
-stats_TimersDumpAll
-stats_TimerStart
-stats_TimerStop
 stream_Block
 stream_Control
 stream_Delete

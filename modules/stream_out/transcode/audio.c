@@ -45,23 +45,6 @@ static const int pi_channels_maps[6] =
      | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT
 };
 
-static inline void audio_timer_start( encoder_t * p_encoder )
-{
-    stats_TimerStart( p_encoder, "encoding audio frame",
-                      STATS_TIMER_AUDIO_FRAME_ENCODING );
-}
-
-static inline void audio_timer_stop( encoder_t * p_encoder )
-{
-    stats_TimerStop( p_encoder, STATS_TIMER_AUDIO_FRAME_ENCODING );
-}
-
-static inline void audio_timer_close( encoder_t * p_encoder )
-{
-    stats_TimerDump(  p_encoder, STATS_TIMER_AUDIO_FRAME_ENCODING );
-    stats_TimerClean( p_encoder, STATS_TIMER_AUDIO_FRAME_ENCODING );
-}
-
 static aout_buffer_t *audio_new_buffer( decoder_t *p_dec, int i_samples )
 {
     block_t *p_block;
@@ -311,8 +294,6 @@ int transcode_audio_new( sout_stream_t *p_stream,
 
 void transcode_audio_close( sout_stream_id_t *id )
 {
-    audio_timer_close( id->p_encoder );
-
     /* Close decoder */
     if( id->p_decoder->p_module )
         module_unneed( id->p_decoder, id->p_decoder->p_module );
@@ -377,9 +358,7 @@ int transcode_audio_process( sout_stream_t *p_stream,
 
         p_audio_buf->i_dts = p_audio_buf->i_pts;
 
-        audio_timer_start( id->p_encoder );
         p_block = id->p_encoder->pf_encode_audio( id->p_encoder, p_audio_buf );
-        audio_timer_stop( id->p_encoder );
 
         block_ChainAppend( out, p_block );
         block_Release( p_audio_buf );

@@ -168,8 +168,6 @@ static void ResetCurrentlyPlaying( playlist_t *p_playlist,
 {
     playlist_private_t *p_sys = pl_priv(p_playlist);
 
-    stats_TimerStart( p_playlist, "Items array build",
-                      STATS_TIMER_PLAYLIST_BUILD );
     PL_DEBUG( "rebuilding array of current - root %s",
               PLI_NAME( p_sys->status.p_node ) );
     ARRAY_RESET( p_playlist->current );
@@ -204,7 +202,6 @@ static void ResetCurrentlyPlaying( playlist_t *p_playlist,
         }
     }
     p_sys->b_reset_currently_playing = false;
-    stats_TimerStop( p_playlist, STATS_TIMER_PLAYLIST_BUILD );
 }
 
 

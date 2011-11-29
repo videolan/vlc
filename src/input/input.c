@@ -333,11 +333,6 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
 
     free( psz_name );
 
-    /* Start a timer to mesure how long it takes
-     * to launch an input */
-    stats_TimerStart( p_input, psz_timer_name,
-        STATS_TIMER_INPUT_LAUNCHING );
-
     p_input->p = calloc( 1, sizeof( input_thread_private_t ) );
     if( !p_input->p )
         return NULL;
@@ -510,9 +505,6 @@ static void Destructor( input_thread_t * p_input )
     msg_Dbg( p_input, "Destroying the input for '%s'", psz_name);
     free( psz_name );
 #endif
-
-    stats_TimerDump( p_input, STATS_TIMER_INPUT_LAUNCHING );
-    stats_TimerClean( p_input, STATS_TIMER_INPUT_LAUNCHING );
 
     if( p_input->p->p_es_out_display )
         es_out_Delete( p_input->p->p_es_out_display );
@@ -735,9 +727,6 @@ static void MainLoop( input_thread_t *p_input, bool b_interactive )
     mtime_t i_last_seek_mdate = 0;
     bool b_pause_after_eof = b_interactive &&
                              var_CreateGetBool( p_input, "play-and-pause" );
-
-    /* Start the timer */
-    stats_TimerStop( p_input, STATS_TIMER_INPUT_LAUNCHING );
 
     while( vlc_object_alive( p_input ) && !p_input->b_error )
     {

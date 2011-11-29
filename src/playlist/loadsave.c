@@ -167,9 +167,7 @@ int playlist_MLLoad( playlist_t *p_playlist )
     pl_priv(p_playlist)->b_doing_ml = true;
     PL_UNLOCK;
 
-    stats_TimerStart( p_playlist, "ML Load", STATS_TIMER_ML_LOAD );
     input_Read( p_playlist, p_input );
-    stats_TimerStop( p_playlist,STATS_TIMER_ML_LOAD );
 
     PL_LOCK;
     pl_priv(p_playlist)->b_doing_ml = false;
@@ -203,10 +201,8 @@ int playlist_MLDump( playlist_t *p_playlist )
 
     strcat( psz_dirname, DIR_SEP "ml.xspf" );
 
-    stats_TimerStart( p_playlist, "ML Dump", STATS_TIMER_ML_DUMP );
     playlist_Export( p_playlist, psz_dirname, p_playlist->p_media_library,
                      "export-xspf" );
-    stats_TimerStop( p_playlist, STATS_TIMER_ML_DUMP );
 
     return VLC_SUCCESS;
 }

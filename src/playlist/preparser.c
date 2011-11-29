@@ -131,8 +131,6 @@ static void Preparse( playlist_t *p_playlist, input_item_t *p_item )
         return;
     }
 
-    stats_TimerStart( p_playlist, "Preparse run", STATS_TIMER_PREPARSE );
-
     /* Do not preparse if it is already done (like by playing it) */
     if( !input_item_IsPreparsed( p_item ) )
     {
@@ -141,8 +139,6 @@ static void Preparse( playlist_t *p_playlist, input_item_t *p_item )
 
         var_SetAddress( p_playlist, "item-change", p_item );
     }
-
-    stats_TimerStop( p_playlist, STATS_TIMER_PREPARSE );
 }
 
 /**
