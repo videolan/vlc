@@ -348,6 +348,7 @@ SOURCES_libvlc_common = \
 	input/vlm_event.h \
 	input/resource.h \
 	input/resource.c \
+	input/stats.c \
 	input/stream.c \
 	input/stream_demux.c \
 	input/stream_filter.c \
@@ -420,7 +421,6 @@ SOURCES_libvlc_common = \
 	modules/entry.c \
 	modules/textdomain.c \
 	misc/threads.c \
-	misc/stats.c \
 	misc/cpu.c \
 	misc/epg.c \
 	misc/exit.c \

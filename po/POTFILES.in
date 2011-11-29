@@ -120,7 +120,6 @@ src/misc/messages.c
 src/misc/mtime.c
 src/misc/objects.c
 src/misc/rand.c
-src/misc/stats.c
 src/misc/threads.c
 src/misc/update.c
 src/misc/update.h
