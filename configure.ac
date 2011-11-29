@@ -491,14 +491,14 @@ AC_LINK_IFELSE([
         char *c;
         if (asprintf(&c, "%s %d", "string", 1) == -1)
             c = NULL;
-    ])],,[AC_LIBOBJ([asprintf])])
+    ])],[AC_DEFINE([HAVE_ASPRINTF],[1],[Define to 1 if you have asprintf function])],[AC_LIBOBJ([asprintf])])
 AC_LINK_IFELSE([
     AC_LANG_PROGRAM([#include <stdio.h>], [
         char *c;
         va_list ap;
         if (vasprintf(&c, "%s %d", ap) == -1)
             c = NULL;
-    ])],,[AC_LIBOBJ([vasprintf])])
+    ])],[AC_DEFINE([HAVE_VASPRINTF],[1],[Define to 1 if you have asprintf function])],[AC_LIBOBJ([vasprintf])])
 
 # Windows CE does not have strcoll()
 AC_FUNC_STRCOLL
