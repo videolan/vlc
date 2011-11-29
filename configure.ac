@@ -633,11 +633,11 @@ VLC_ADD_LIBS([realvideo lua],[$LIBDL])
 
 dnl Check for thread library
 if test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"; then
+
   VLC_SAVE_FLAGS
-  AC_SEARCH_LIBS(main, pthread pthreads c_r, [
-    VLC_ADD_LIBS([libvlccore libvlc vlc plugin],[${ac_cv_search_main}])
-  ], [
-    AC_CHECK_FUNCS(pthread_mutex_lock)
+  LIBS=""
+  AC_SEARCH_LIBS(pthread_rwlock_init, pthread pthreads c_r, [
+    VLC_ADD_LIBS([libvlccore libvlc vlc plugin],[${LIBS}])
   ])
   VLC_RESTORE_FLAGS
 
