@@ -193,7 +193,6 @@ libvlc_int_t * libvlc_InternalCreate( void )
 
     /* Initialize mutexes */
     vlc_mutex_init( &priv->ml_lock );
-    vlc_mutex_init( &priv->timer_lock );
     vlc_ExitInit( &priv->exit );
 
     return p_libvlc;
@@ -518,8 +517,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     vlc_object_set_name( p_libvlc, "main" );
 
     priv->b_stats = var_InheritBool( p_libvlc, "stats" );
-    priv->i_timers = 0;
-    priv->pp_timers = NULL;
 
     /*
      * Initialize hotkey handling
@@ -822,7 +819,6 @@ void libvlc_InternalDestroy( libvlc_int_t *p_libvlc )
 
     /* Destroy mutexes */
     vlc_ExitDestroy( &priv->exit );
-    vlc_mutex_destroy( &priv->timer_lock );
     vlc_mutex_destroy( &priv->ml_lock );
 
 #ifndef NDEBUG /* Hack to dump leaked objects tree */

@@ -174,12 +174,7 @@ typedef struct libvlc_priv_t
     /* Messages */
     int                i_verbose;   ///< info messages
     bool               b_color;     ///< color messages?
-
-    /* Timer stats */
     bool               b_stats;     ///< Whether to collect stats
-    vlc_mutex_t        timer_lock;  ///< Lock to protect timers
-    counter_t        **pp_timers;   ///< Array of all timers
-    int                i_timers;    ///< Number of timers
 
     /* Singleton objects */
     module_t          *p_memcpy_module;  ///< Fast memcpy plugin used
