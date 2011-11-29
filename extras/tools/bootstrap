@@ -65,12 +65,16 @@ check_tar
 [ -n "$NEEDED" ] && mkdir -p build/
 
 CPUS=
+CC=
+CXX=
 case `uname` in
     Linux)
         CPUS=`grep -c ^processor /proc/cpuinfo`
      ;;
     Darwin)
         CPUS=`sysctl hw.ncpu|cut -d: -f2`
+        gcc-4.2 --version >/dev/null 2>&1 && CC=CC=gcc-4.2
+        g++-4.2 --version >/dev/null 2>&1 && CXX=CXX=g++-4.2
     ;;
     *)
         CPUS=1  # default
@@ -80,6 +84,8 @@ esac
 
 cat > Makefile << EOF
 MAKEFLAGS += -j$CPUS
+$CC
+$CXX
 PREFIX=\$(abspath ./build)
 
 all: $NEEDED
