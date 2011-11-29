@@ -1327,14 +1327,9 @@ static void DecoderDecodeAudio( decoder_t *p_dec, block_t *p_block )
     if( p_input != NULL && (i_decoded > 0 || i_lost > 0 || i_played > 0) )
     {
         vlc_mutex_lock( &p_input->p->counters.counters_lock);
-
-        stats_UpdateInteger( p_input->p->counters.p_lost_abuffers,
-                             i_lost, NULL );
-        stats_UpdateInteger( p_input->p->counters.p_played_abuffers,
-                             i_played, NULL );
-        stats_UpdateInteger( p_input->p->counters.p_decoded_audio,
-                             i_decoded, NULL );
-
+        stats_Update( p_input->p->counters.p_lost_abuffers, i_lost, NULL );
+        stats_Update( p_input->p->counters.p_played_abuffers, i_played, NULL );
+        stats_Update( p_input->p->counters.p_decoded_audio, i_decoded, NULL );
         vlc_mutex_unlock( &p_input->p->counters.counters_lock);
     }
 }
@@ -1556,15 +1551,10 @@ static void DecoderDecodeVideo( decoder_t *p_dec, block_t *p_block )
     if( p_input != NULL && (i_decoded > 0 || i_lost > 0 || i_displayed > 0) )
     {
         vlc_mutex_lock( &p_input->p->counters.counters_lock );
-
-        stats_UpdateInteger( p_input->p->counters.p_decoded_video,
-                             i_decoded, NULL );
-        stats_UpdateInteger( p_input->p->counters.p_lost_pictures,
-                             i_lost , NULL);
-
-        stats_UpdateInteger( p_input->p->counters.p_displayed_pictures,
-                             i_displayed, NULL);
-
+        stats_Update( p_input->p->counters.p_decoded_video, i_decoded, NULL );
+        stats_Update( p_input->p->counters.p_lost_pictures, i_lost , NULL);
+        stats_Update( p_input->p->counters.p_displayed_pictures,
+                      i_displayed, NULL);
         vlc_mutex_unlock( &p_input->p->counters.counters_lock );
     }
 }
@@ -1956,7 +1946,7 @@ static void DecoderProcessSpu( decoder_t *p_dec, block_t *p_block, bool b_flush 
         if( p_input != NULL )
         {
             vlc_mutex_lock( &p_input->p->counters.counters_lock );
-            stats_UpdateInteger( p_input->p->counters.p_decoded_sub, 1, NULL );
+            stats_Update( p_input->p->counters.p_decoded_sub, 1, NULL );
             vlc_mutex_unlock( &p_input->p->counters.counters_lock );
         }
 

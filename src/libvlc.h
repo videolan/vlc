@@ -230,13 +230,12 @@ enum
 
 typedef struct counter_sample_t
 {
-    vlc_value_t value;
-    mtime_t     date;
+    uint64_t value;
+    mtime_t  date;
 } counter_sample_t;
 
 typedef struct counter_t
 {
-    int                 i_type;
     int                 i_compute_type;
     int                 i_samples;
     counter_sample_t ** pp_samples;
@@ -267,57 +266,9 @@ enum
     STATS_LOST_PICTURES,
 };
 
-int stats_Update (counter_t *, vlc_value_t, vlc_value_t *);
-counter_t * stats_CounterCreate (int, int);
-int stats_Get (counter_t *, vlc_value_t*);
-
+counter_t * stats_CounterCreate (int);
+void stats_Update (counter_t *, uint64_t, uint64_t *);
 void stats_CounterClean (counter_t * );
-
-static inline int stats_GetInteger( counter_t *p_counter, int64_t *value )
-{
-    int i_ret;
-    vlc_value_t val; val.i_int = 0;
-    if( !p_counter ) return VLC_EGENERIC;
-    i_ret = stats_Get( p_counter, &val );
-    *value = val.i_int;
-    return i_ret;
-}
-
-static inline int stats_GetFloat( counter_t *p_counter, float *value )
-{
-    int i_ret;
-    vlc_value_t val; val.f_float = 0.0;
-    if( !p_counter ) return VLC_EGENERIC;
-    i_ret = stats_Get( p_counter, &val );
-    *value = val.f_float;
-    return i_ret;
-}
-
-static inline int stats_UpdateInteger( counter_t *p_co, int i, int *pi_new )
-{
-    int i_ret;
-    vlc_value_t val;
-    vlc_value_t new_val; new_val.i_int = 0;
-    if( !p_co ) return VLC_EGENERIC;
-    val.i_int = i;
-    i_ret = stats_Update( p_co, val, &new_val );
-    if( pi_new )
-        *pi_new = new_val.i_int;
-    return i_ret;
-}
-
-static inline int stats_UpdateFloat( counter_t *p_co, float f, float *pf_new )
-{
-    vlc_value_t val;
-    int i_ret;
-    vlc_value_t new_val;new_val.f_float = 0.0;
-    if( !p_co ) return VLC_EGENERIC;
-    val.f_float = f;
-    i_ret =  stats_Update( p_co, val, &new_val );
-    if( pf_new )
-        *pf_new = new_val.f_float;
-    return i_ret;
-}
 
 void stats_ComputeInputStats(input_thread_t*, input_stats_t*);
 void stats_ReinitInputStats(input_stats_t *);

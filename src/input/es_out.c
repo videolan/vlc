@@ -1920,27 +1920,25 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
 {
     es_out_sys_t   *p_sys = out->p_sys;
     input_thread_t *p_input = p_sys->p_input;
-    int i_total = 0;
 
     if( libvlc_stats( p_input ) )
     {
+        uint64_t i_total;
+
         vlc_mutex_lock( &p_input->p->counters.counters_lock );
-        stats_UpdateInteger( p_input->p->counters.p_demux_read,
-                             p_block->i_buffer, &i_total );
-        stats_UpdateFloat( p_input->p->counters.p_demux_bitrate,
-                           (float)i_total, NULL );
+        stats_Update( p_input->p->counters.p_demux_read,
+                      p_block->i_buffer, &i_total );
+        stats_Update( p_input->p->counters.p_demux_bitrate, i_total, NULL );
 
         /* Update number of corrupted data packats */
         if( p_block->i_flags & BLOCK_FLAG_CORRUPTED )
         {
-            stats_UpdateInteger( p_input->p->counters.p_demux_corrupted,
-                                 1, NULL );
+            stats_Update( p_input->p->counters.p_demux_corrupted, 1, NULL );
         }
         /* Update number of discontinuities */
         if( p_block->i_flags & BLOCK_FLAG_DISCONTINUITY )
         {
-            stats_UpdateInteger( p_input->p->counters.p_demux_discontinuity,
-                                 1, NULL );
+            stats_Update( p_input->p->counters.p_demux_discontinuity, 1, NULL );
         }
         vlc_mutex_unlock( &p_input->p->counters.counters_lock );
     }

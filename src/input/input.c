@@ -851,24 +851,24 @@ static void InitStatistics( input_thread_t * p_input )
     if( p_input->b_preparsing ) return;
 
     /* Prepare statistics */
-#define INIT_COUNTER( c, type, compute ) p_input->p->counters.p_##c = \
- stats_CounterCreate( VLC_VAR_##type, STATS_##compute);
+#define INIT_COUNTER( c, compute ) p_input->p->counters.p_##c = \
+ stats_CounterCreate( STATS_##compute);
     if( libvlc_stats( p_input ) )
     {
-        INIT_COUNTER( read_bytes, INTEGER, COUNTER );
-        INIT_COUNTER( read_packets, INTEGER, COUNTER );
-        INIT_COUNTER( demux_read, INTEGER, COUNTER );
-        INIT_COUNTER( input_bitrate, FLOAT, DERIVATIVE );
-        INIT_COUNTER( demux_bitrate, FLOAT, DERIVATIVE );
-        INIT_COUNTER( demux_corrupted, INTEGER, COUNTER );
-        INIT_COUNTER( demux_discontinuity, INTEGER, COUNTER );
-        INIT_COUNTER( played_abuffers, INTEGER, COUNTER );
-        INIT_COUNTER( lost_abuffers, INTEGER, COUNTER );
-        INIT_COUNTER( displayed_pictures, INTEGER, COUNTER );
-        INIT_COUNTER( lost_pictures, INTEGER, COUNTER );
-        INIT_COUNTER( decoded_audio, INTEGER, COUNTER );
-        INIT_COUNTER( decoded_video, INTEGER, COUNTER );
-        INIT_COUNTER( decoded_sub, INTEGER, COUNTER );
+        INIT_COUNTER( read_bytes, COUNTER );
+        INIT_COUNTER( read_packets, COUNTER );
+        INIT_COUNTER( demux_read, COUNTER );
+        INIT_COUNTER( input_bitrate, DERIVATIVE );
+        INIT_COUNTER( demux_bitrate, DERIVATIVE );
+        INIT_COUNTER( demux_corrupted, COUNTER );
+        INIT_COUNTER( demux_discontinuity, COUNTER );
+        INIT_COUNTER( played_abuffers, COUNTER );
+        INIT_COUNTER( lost_abuffers, COUNTER );
+        INIT_COUNTER( displayed_pictures, COUNTER );
+        INIT_COUNTER( lost_pictures, COUNTER );
+        INIT_COUNTER( decoded_audio, COUNTER );
+        INIT_COUNTER( decoded_video, COUNTER );
+        INIT_COUNTER( decoded_sub, COUNTER );
         p_input->p->counters.p_sout_send_bitrate = NULL;
         p_input->p->counters.p_sout_sent_packets = NULL;
         p_input->p->counters.p_sout_sent_bytes = NULL;
@@ -896,9 +896,9 @@ static int InitSout( input_thread_t * p_input )
         }
         if( libvlc_stats( p_input ) )
         {
-            INIT_COUNTER( sout_sent_packets, INTEGER, COUNTER );
-            INIT_COUNTER( sout_sent_bytes, INTEGER, COUNTER );
-            INIT_COUNTER( sout_send_bitrate, FLOAT, DERIVATIVE );
+            INIT_COUNTER( sout_sent_packets, COUNTER );
+            INIT_COUNTER( sout_sent_bytes, COUNTER );
+            INIT_COUNTER( sout_send_bitrate, DERIVATIVE );
         }
     }
     else
@@ -3195,7 +3195,7 @@ void input_UpdateStatistic( input_thread_t *p_input,
     vlc_mutex_lock( &p_input->p->counters.counters_lock);
     switch( i_type )
     {
-#define I(c) stats_UpdateInteger( p_input->p->counters.c, i_delta, NULL )
+#define I(c) stats_Update( p_input->p->counters.c, i_delta, NULL )
     case INPUT_STATISTIC_DECODED_VIDEO:
         I(p_decoded_video);
         break;
@@ -3211,10 +3211,10 @@ void input_UpdateStatistic( input_thread_t *p_input,
 #undef I
     case INPUT_STATISTIC_SENT_BYTE:
     {
-        int i_bytes; /* That's pretty stupid to define it as an integer, it will overflow
-                        really fast ... */
-        if( !stats_UpdateInteger( p_input->p->counters.p_sout_sent_bytes, i_delta, &i_bytes ) )
-            stats_UpdateFloat( p_input->p->counters.p_sout_send_bitrate, i_bytes, NULL );
+        uint64_t bytes;
+
+        stats_Update( p_input->p->counters.p_sout_sent_bytes, i_delta, &bytes );
+        stats_Update( p_input->p->counters.p_sout_send_bitrate, bytes, NULL );
         break;
     }
     default:

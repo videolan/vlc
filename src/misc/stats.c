@@ -21,45 +21,26 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-/*****************************************************************************
- * Preamble
- *****************************************************************************/
-
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
 #include <vlc_common.h>
-#include <stdio.h>                                               /* required */
-
 #include "input/input_internal.h"
-
-/*****************************************************************************
- * Local prototypes
- *****************************************************************************/
-static int CounterUpdate( counter_t *p_counter,
-                          vlc_value_t val, vlc_value_t * );
-
-/*****************************************************************************
- * Exported functions
- *****************************************************************************/
 
 /**
  * Create a statistics counter
- * \param i_type the type of stored data. One of VLC_VAR_STRING,
- * VLC_VAR_INTEGER, VLC_VAR_FLOAT
  * \param i_compute_type the aggregation type. One of STATS_LAST (always
  * keep the last value), STATS_COUNTER (increment by the passed value),
  * STATS_MAX (keep the maximum passed value), STATS_MIN, or STATS_DERIVATIVE
  * (keep a time derivative of the value)
  */
-counter_t * stats_CounterCreate( int i_type, int i_compute_type )
+counter_t * stats_CounterCreate( int i_compute_type )
 {
     counter_t *p_counter = (counter_t*) malloc( sizeof( counter_t ) ) ;
 
     if( !p_counter ) return NULL;
     p_counter->i_compute_type = i_compute_type;
-    p_counter->i_type = i_type;
     p_counter->i_samples = 0;
     p_counter->pp_samples = NULL;
 
@@ -68,65 +49,20 @@ counter_t * stats_CounterCreate( int i_type, int i_compute_type )
     return p_counter;
 }
 
-/** Update a counter element with new values
- * \param p_counter the counter to update
- * \param val the vlc_value union containing the new value to aggregate. For
- * more information on how data is aggregated, \see stats_Create
- * \param val_new a pointer that will be filled with new data
- */
-int stats_Update( counter_t *p_counter,
-                  vlc_value_t val, vlc_value_t *val_new )
+static inline int64_t stats_GetTotal(const counter_t *counter)
 {
-    if( !p_counter ) return VLC_EGENERIC;
-    return CounterUpdate( p_counter, val, val_new );
+    if (counter == NULL || counter->i_samples == 0)
+        return 0;
+    return counter->pp_samples[0]->value;
 }
 
-/** Get the aggregated value for a counter
- * \param p_this an object
- * \param p_counter the counter
- * \param val a pointer to an initialized vlc_value union. It will contain the
- * retrieved value
- * \return an error code
- */
-int stats_Get( counter_t *p_counter, vlc_value_t *val )
+static inline float stats_GetRate(const counter_t *counter)
 {
-    if( !p_counter || p_counter->i_samples == 0 )
-    {
-        val->i_int = 0;
-        return VLC_EGENERIC;
-    }
+    if (counter == NULL || counter->i_samples < 2)
+        return 0.;
 
-    switch( p_counter->i_compute_type )
-    {
-    case STATS_COUNTER:
-        *val = p_counter->pp_samples[0]->value;
-        break;
-    case STATS_DERIVATIVE:
-        /* Not ready yet */
-        if( p_counter->i_samples < 2 )
-        {
-            val->i_int = 0;
-            return VLC_EGENERIC;
-        }
-        if( p_counter->i_type == VLC_VAR_INTEGER )
-        {
-            float f = ( p_counter->pp_samples[0]->value.i_int -
-                        p_counter->pp_samples[1]->value.i_int ) /
-                    (float)(  p_counter->pp_samples[0]->date -
-                              p_counter->pp_samples[1]->date );
-            val->i_int = (int64_t)f;
-        }
-        else
-        {
-            float f = (float)( p_counter->pp_samples[0]->value.f_float -
-                               p_counter->pp_samples[1]->value.f_float ) /
-                      (float)( p_counter->pp_samples[0]->date -
-                               p_counter->pp_samples[1]->date );
-            val->f_float = f;
-        }
-        break;
-    }
-    return VLC_SUCCESS;;
+    return (counter->pp_samples[0]->value - counter->pp_samples[1]->value)
+        / (float)(counter->pp_samples[0]->date - counter->pp_samples[1]->date);
 }
 
 input_stats_t *stats_NewInputStats( input_thread_t *p_input )
@@ -142,60 +78,45 @@ input_stats_t *stats_NewInputStats( input_thread_t *p_input )
     return p_stats;
 }
 
-void stats_ComputeInputStats( input_thread_t *p_input, input_stats_t *p_stats )
+void stats_ComputeInputStats(input_thread_t *input, input_stats_t *st)
 {
-    if( !libvlc_stats (p_input) ) return;
+    if (!libvlc_stats(input))
+        return;
 
-    vlc_mutex_lock( &p_input->p->counters.counters_lock );
-    vlc_mutex_lock( &p_stats->lock );
+    vlc_mutex_lock(&input->p->counters.counters_lock);
+    vlc_mutex_lock(&st->lock);
 
     /* Input */
-    stats_GetInteger( p_input->p->counters.p_read_packets,
-                      &p_stats->i_read_packets );
-    stats_GetInteger( p_input->p->counters.p_read_bytes,
-                      &p_stats->i_read_bytes );
-    stats_GetFloat( p_input->p->counters.p_input_bitrate,
-                    &p_stats->f_input_bitrate );
-    stats_GetInteger( p_input->p->counters.p_demux_read,
-                      &p_stats->i_demux_read_bytes );
-    stats_GetFloat( p_input->p->counters.p_demux_bitrate,
-                    &p_stats->f_demux_bitrate );
-    stats_GetInteger( p_input->p->counters.p_demux_corrupted,
-                      &p_stats->i_demux_corrupted );
-    stats_GetInteger( p_input->p->counters.p_demux_discontinuity,
-                      &p_stats->i_demux_discontinuity );
+    st->i_read_packets = stats_GetTotal(input->p->counters.p_read_packets);
+    st->i_read_bytes = stats_GetTotal(input->p->counters.p_read_bytes);
+    st->f_input_bitrate = stats_GetRate(input->p->counters.p_input_bitrate);
+    st->i_demux_read_bytes = stats_GetTotal(input->p->counters.p_demux_read);
+    st->f_demux_bitrate = stats_GetRate(input->p->counters.p_demux_bitrate);
+    st->i_demux_corrupted = stats_GetTotal(input->p->counters.p_demux_corrupted);
+    st->i_demux_discontinuity = stats_GetTotal(input->p->counters.p_demux_discontinuity);
 
     /* Decoders */
-    stats_GetInteger( p_input->p->counters.p_decoded_video,
-                      &p_stats->i_decoded_video );
-    stats_GetInteger( p_input->p->counters.p_decoded_audio,
-                      &p_stats->i_decoded_audio );
+    st->i_decoded_video = stats_GetTotal(input->p->counters.p_decoded_video);
+    st->i_decoded_audio = stats_GetTotal(input->p->counters.p_decoded_audio);
 
     /* Sout */
-    if( p_input->p->counters.p_sout_send_bitrate )
+    if (input->p->counters.p_sout_send_bitrate)
     {
-        stats_GetInteger( p_input->p->counters.p_sout_sent_packets,
-                          &p_stats->i_sent_packets );
-        stats_GetInteger( p_input->p->counters.p_sout_sent_bytes,
-                          &p_stats->i_sent_bytes );
-        stats_GetFloat  ( p_input->p->counters.p_sout_send_bitrate,
-                          &p_stats->f_send_bitrate );
+        st->i_sent_packets = stats_GetTotal(input->p->counters.p_sout_sent_packets);
+        st->i_sent_bytes = stats_GetTotal(input->p->counters.p_sout_sent_bytes);
+        st->f_send_bitrate = stats_GetRate(input->p->counters.p_sout_send_bitrate);
     }
 
     /* Aout */
-    stats_GetInteger( p_input->p->counters.p_played_abuffers,
-                      &p_stats->i_played_abuffers );
-    stats_GetInteger( p_input->p->counters.p_lost_abuffers,
-                      &p_stats->i_lost_abuffers );
+    st->i_played_abuffers = stats_GetTotal(input->p->counters.p_played_abuffers);
+    st->i_lost_abuffers = stats_GetTotal(input->p->counters.p_lost_abuffers);
 
     /* Vouts */
-    stats_GetInteger( p_input->p->counters.p_displayed_pictures,
-                      &p_stats->i_displayed_pictures );
-    stats_GetInteger( p_input->p->counters.p_lost_pictures,
-                      &p_stats->i_lost_pictures );
+    st->i_displayed_pictures = stats_GetTotal(input->p->counters.p_displayed_pictures);
+    st->i_lost_pictures = stats_GetTotal(input->p->counters.p_lost_pictures);
 
-    vlc_mutex_unlock( &p_stats->lock );
-    vlc_mutex_unlock( &p_input->p->counters.counters_lock );
+    vlc_mutex_unlock(&st->lock);
+    vlc_mutex_unlock(&input->p->counters.counters_lock);
 }
 
 void stats_ReinitInputStats( input_stats_t *p_stats )
@@ -231,21 +152,17 @@ void stats_CounterClean( counter_t *p_c )
 }
 
 
-/********************************************************************
- * Following functions are local
- ********************************************************************/
-
-/**
- * Update a statistics counter, according to its type
- * If needed, perform a bit of computation (derivative, mostly)
- * This function must be entered with stats handler lock
+/** Update a counter element with new values
  * \param p_counter the counter to update
- * \param val the "new" value
- * \return an error code
+ * \param val the vlc_value union containing the new value to aggregate. For
+ * more information on how data is aggregated, \see stats_Create
+ * \param val_new a pointer that will be filled with new data
  */
-static int CounterUpdate( counter_t *p_counter,
-                          vlc_value_t val, vlc_value_t *new_val )
+void stats_Update( counter_t *p_counter, uint64_t val, uint64_t *new_val )
 {
+    if( !p_counter )
+        return;
+
     switch( p_counter->i_compute_type )
     {
     case STATS_DERIVATIVE:
@@ -253,9 +170,7 @@ static int CounterUpdate( counter_t *p_counter,
         counter_sample_t *p_new, *p_old;
         mtime_t now = mdate();
         if( now - p_counter->last_update < CLOCK_FREQ )
-        {
-            return VLC_EGENERIC;
-        }
+            return;
         p_counter->last_update = now;
         /* Insert the new one at the beginning */
         p_new = (counter_sample_t*)malloc( sizeof( counter_sample_t ) );
@@ -277,27 +192,17 @@ static int CounterUpdate( counter_t *p_counter,
         {
             counter_sample_t *p_new = (counter_sample_t*)malloc(
                                                sizeof( counter_sample_t ) );
-            p_new->value.i_int = 0;
+            p_new->value = 0;
 
             INSERT_ELEM( p_counter->pp_samples, p_counter->i_samples,
                          p_counter->i_samples, p_new );
         }
         if( p_counter->i_samples == 1 )
         {
-            switch( p_counter->i_type )
-            {
-            case VLC_VAR_INTEGER:
-                p_counter->pp_samples[0]->value.i_int += val.i_int;
-                if( new_val )
-                    new_val->i_int = p_counter->pp_samples[0]->value.i_int;
-                break;
-            case VLC_VAR_FLOAT:
-                p_counter->pp_samples[0]->value.f_float += val.f_float;
-                if( new_val )
-                    new_val->f_float = p_counter->pp_samples[0]->value.f_float;
-            }
+            p_counter->pp_samples[0]->value += val;
+            if( new_val )
+                *new_val = p_counter->pp_samples[0]->value;
         }
         break;
     }
-    return VLC_SUCCESS;
 }

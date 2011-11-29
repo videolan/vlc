@@ -1680,7 +1680,6 @@ static int AReadStream( stream_t *s, void *p_read, unsigned int i_read )
     access_t *p_access = p_sys->p_access;
     input_thread_t *p_input = s->p_input;
     int i_read_orig = i_read;
-    int i_total = 0;
 
     if( !p_sys->i_list )
     {
@@ -1689,12 +1688,12 @@ static int AReadStream( stream_t *s, void *p_read, unsigned int i_read )
             vlc_object_kill( s );
         if( p_input )
         {
+            uint64_t total;
+
             vlc_mutex_lock( &p_input->p->counters.counters_lock );
-            stats_UpdateInteger( p_input->p->counters.p_read_bytes, i_read,
-                             &i_total );
-            stats_UpdateFloat( p_input->p->counters.p_input_bitrate,
-                           (float)i_total, NULL );
-            stats_UpdateInteger( p_input->p->counters.p_read_packets, 1, NULL );
+            stats_Update( p_input->p->counters.p_read_bytes, i_read, &total );
+            stats_Update( p_input->p->counters.p_input_bitrate, total, NULL );
+            stats_Update( p_input->p->counters.p_read_packets, 1, NULL );
             vlc_mutex_unlock( &p_input->p->counters.counters_lock );
         }
         return i_read;
@@ -1729,11 +1728,12 @@ static int AReadStream( stream_t *s, void *p_read, unsigned int i_read )
     /* Update read bytes in input */
     if( p_input )
     {
+        uint64_t total;
+
         vlc_mutex_lock( &p_input->p->counters.counters_lock );
-        stats_UpdateInteger( p_input->p->counters.p_read_bytes, i_read, &i_total );
-        stats_UpdateFloat( p_input->p->counters.p_input_bitrate,
-                       (float)i_total, NULL );
-        stats_UpdateInteger( p_input->p->counters.p_read_packets, 1, NULL );
+        stats_Update( p_input->p->counters.p_read_bytes, i_read, &total );
+        stats_Update( p_input->p->counters.p_input_bitrate, total, NULL );
+        stats_Update( p_input->p->counters.p_read_packets, 1, NULL );
         vlc_mutex_unlock( &p_input->p->counters.counters_lock );
     }
     return i_read;
@@ -1746,7 +1746,6 @@ static block_t *AReadBlock( stream_t *s, bool *pb_eof )
     input_thread_t *p_input = s->p_input;
     block_t *p_block;
     bool b_eof;
-    int i_total = 0;
 
     if( !p_sys->i_list )
     {
@@ -1756,12 +1755,14 @@ static block_t *AReadBlock( stream_t *s, bool *pb_eof )
         if( pb_eof ) *pb_eof = p_access->info.b_eof;
         if( p_input && p_block && libvlc_stats (p_access) )
         {
+            uint64_t total;
+
             vlc_mutex_lock( &p_input->p->counters.counters_lock );
-            stats_UpdateInteger( p_input->p->counters.p_read_bytes,
-                                 p_block->i_buffer, &i_total );
-            stats_UpdateFloat( p_input->p->counters.p_input_bitrate,
-                              (float)i_total, NULL );
-            stats_UpdateInteger( p_input->p->counters.p_read_packets, 1, NULL );
+            stats_Update( p_input->p->counters.p_read_bytes,
+                          p_block->i_buffer, &total );
+            stats_Update( p_input->p->counters.p_input_bitrate,
+                          total, NULL );
+            stats_Update( p_input->p->counters.p_read_packets, 1, NULL );
             vlc_mutex_unlock( &p_input->p->counters.counters_lock );
         }
         return p_block;
@@ -1797,13 +1798,13 @@ static block_t *AReadBlock( stream_t *s, bool *pb_eof )
     {
         if( p_input )
         {
+            uint64_t total;
+
             vlc_mutex_lock( &p_input->p->counters.counters_lock );
-            stats_UpdateInteger( p_input->p->counters.p_read_bytes,
-                                 p_block->i_buffer, &i_total );
-            stats_UpdateFloat( p_input->p->counters.p_input_bitrate,
-                              (float)i_total, NULL );
-            stats_UpdateInteger( p_input->p->counters.p_read_packets,
-                                 1 , NULL);
+            stats_Update( p_input->p->counters.p_read_bytes,
+                          p_block->i_buffer, &total );
+            stats_Update( p_input->p->counters.p_input_bitrate, total, NULL );
+            stats_Update( p_input->p->counters.p_read_packets, 1 , NULL);
             vlc_mutex_unlock( &p_input->p->counters.counters_lock );
         }
     }
