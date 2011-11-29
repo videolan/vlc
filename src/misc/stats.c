@@ -107,9 +107,6 @@ int stats_Get( vlc_object_t *p_this, counter_t *p_counter, vlc_value_t *val )
 
     switch( p_counter->i_compute_type )
     {
-    case STATS_LAST:
-    case STATS_MIN:
-    case STATS_MAX:
     case STATS_COUNTER:
         *val = p_counter->pp_samples[0]->value;
         break;
@@ -280,58 +277,6 @@ static int CounterUpdate( vlc_object_t *p_handler,
 {
     switch( p_counter->i_compute_type )
     {
-    case STATS_LAST:
-    case STATS_MIN:
-    case STATS_MAX:
-        if( p_counter->i_samples > 1)
-        {
-            msg_Err( p_handler, "LAST counter has several samples !" );
-            return VLC_EGENERIC;
-        }
-        if( p_counter->i_type != VLC_VAR_FLOAT &&
-            p_counter->i_type != VLC_VAR_INTEGER &&
-            p_counter->i_compute_type != STATS_LAST )
-        {
-            msg_Err( p_handler, "unable to compute MIN or MAX for this type");
-            return VLC_EGENERIC;
-        }
-
-        if( p_counter->i_samples == 0 )
-        {
-            counter_sample_t *p_new = (counter_sample_t*)malloc(
-                                               sizeof( counter_sample_t ) );
-            p_new->value.i_int = 0;
-
-            INSERT_ELEM( p_counter->pp_samples, p_counter->i_samples,
-                         p_counter->i_samples, p_new );
-        }
-        if( p_counter->i_samples == 1 )
-        {
-            /* Update if : LAST or (MAX and bigger) or (MIN and bigger) */
-            if( p_counter->i_compute_type == STATS_LAST ||
-                ( p_counter->i_compute_type == STATS_MAX &&
-                   ( ( p_counter->i_type == VLC_VAR_INTEGER &&
-                       p_counter->pp_samples[0]->value.i_int > val.i_int ) ||
-                     ( p_counter->i_type == VLC_VAR_FLOAT &&
-                       p_counter->pp_samples[0]->value.f_float > val.f_float )
-                   ) ) ||
-                ( p_counter->i_compute_type == STATS_MIN &&
-                   ( ( p_counter->i_type == VLC_VAR_INTEGER &&
-                       p_counter->pp_samples[0]->value.i_int < val.i_int ) ||
-                     ( p_counter->i_type == VLC_VAR_FLOAT &&
-                       p_counter->pp_samples[0]->value.f_float < val.f_float )
-                   ) ) )
-            {
-                if( p_counter->i_type == VLC_VAR_STRING &&
-                    p_counter->pp_samples[0]->value.psz_string )
-                {
-                    free( p_counter->pp_samples[0]->value.psz_string );
-                }
-                p_counter->pp_samples[0]->value = val;
-                *new_val = p_counter->pp_samples[0]->value;
-            }
-        }
-        break;
     case STATS_DERIVATIVE:
     {
         counter_sample_t *p_new, *p_old;

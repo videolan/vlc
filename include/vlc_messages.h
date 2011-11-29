@@ -110,10 +110,7 @@ VLC_API void vlc_Unsubscribe(msg_subscription_t *);
  ****************************/
 enum
 {
-    STATS_LAST,
     STATS_COUNTER,
-    STATS_MAX,
-    STATS_MIN,
     STATS_DERIVATIVE,
 };
 
