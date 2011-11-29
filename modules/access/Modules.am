@@ -36,7 +36,7 @@ libsdp_plugin_la_DEPENDENCIES =
 
 libaccess_smb_plugin_la_SOURCES = smb.c
 libaccess_smb_plugin_la_CFLAGS = $(AM_CFLAGS)
-libaccess_smb_plugin_la_LIBADD = $(AM_LIBADD)
+libaccess_smb_plugin_la_LIBADD = $(AM_LIBADD) $(LIBS_access_smb)
 if HAVE_WIN32
 libaccess_smb_plugin_la_LIBADD += -lmpr
 endif
