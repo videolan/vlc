@@ -1186,7 +1186,7 @@ void MainInterface::dropEvent(QDropEvent *event)
 
 void MainInterface::dropEventPlay( QDropEvent *event, bool b_play )
 {
-    if( event->possibleActions() & Qt::CopyAction )
+    if( event->possibleActions() & ( Qt::CopyAction | Qt::MoveAction ) )
        event->setDropAction( Qt::CopyAction );
     else
         return;
