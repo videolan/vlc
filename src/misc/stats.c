@@ -223,24 +223,6 @@ void stats_ReinitInputStats( input_stats_t *p_stats )
     vlc_mutex_unlock( &p_stats->lock );
 }
 
-void stats_DumpInputStats( input_stats_t *p_stats  )
-{
-    vlc_mutex_lock( &p_stats->lock );
-    /* f_bitrate is in bytes / microsecond
-     * *1000 => bytes / millisecond => kbytes / seconds */
-    fprintf( stderr, "Input : %"PRId64" (%"PRId64" bytes) - %f kB/s - "
-                     "Demux : %"PRId64" (%"PRId64" bytes) - %f kB/s\n"
-                     " - Vout : %"PRId64"/%"PRId64" - Aout : %"PRId64"/%"PRId64" - Sout : %f\n",
-                    p_stats->i_read_packets, p_stats->i_read_bytes,
-                    p_stats->f_input_bitrate * 1000,
-                    p_stats->i_demux_read_packets, p_stats->i_demux_read_bytes,
-                    p_stats->f_demux_bitrate * 1000,
-                    p_stats->i_displayed_pictures, p_stats->i_lost_pictures,
-                    p_stats->i_played_abuffers, p_stats->i_lost_abuffers,
-                    p_stats->f_send_bitrate );
-    vlc_mutex_unlock( &p_stats->lock );
-}
-
 void stats_CounterClean( counter_t *p_c )
 {
     if( p_c )

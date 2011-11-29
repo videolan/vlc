@@ -291,6 +291,5 @@ static inline int stats_UpdateFloat( vlc_object_t *p_obj, counter_t *p_co,
 
 void stats_ComputeInputStats(input_thread_t*, input_stats_t*);
 void stats_ReinitInputStats(input_stats_t *);
-void stats_DumpInputStats(input_stats_t *);
 
 #endif
