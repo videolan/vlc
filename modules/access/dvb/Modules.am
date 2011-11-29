@@ -1,7 +1,7 @@
-SOURCES_dvb = \
+EXTRA_DIST += \
 	access.c \
+	http.c \
 	linux_dvb.c \
 	scan.c scan.h \
-	../../demux/dvb-text.h \
 	dvb.h \
 	$(NULL)
