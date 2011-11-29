@@ -241,7 +241,6 @@ typedef struct counter_t
     int                 i_samples;
     counter_sample_t ** pp_samples;
 
-    mtime_t             update_interval;
     mtime_t             last_update;
 } counter_t;
 

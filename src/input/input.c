@@ -872,10 +872,6 @@ static void InitStatistics( input_thread_t * p_input )
         p_input->p->counters.p_sout_send_bitrate = NULL;
         p_input->p->counters.p_sout_sent_packets = NULL;
         p_input->p->counters.p_sout_sent_bytes = NULL;
-        if( p_input->p->counters.p_demux_bitrate )
-            p_input->p->counters.p_demux_bitrate->update_interval = 1000000;
-        if( p_input->p->counters.p_input_bitrate )
-            p_input->p->counters.p_input_bitrate->update_interval = 1000000;
     }
 }
 
@@ -903,9 +899,6 @@ static int InitSout( input_thread_t * p_input )
             INIT_COUNTER( sout_sent_packets, INTEGER, COUNTER );
             INIT_COUNTER( sout_sent_bytes, INTEGER, COUNTER );
             INIT_COUNTER( sout_send_bitrate, FLOAT, DERIVATIVE );
-            if( p_input->p->counters.p_sout_send_bitrate )
-                 p_input->p->counters.p_sout_send_bitrate->update_interval =
-                         1000000;
         }
     }
     else

@@ -63,7 +63,6 @@ counter_t * stats_CounterCreate( int i_type, int i_compute_type )
     p_counter->i_samples = 0;
     p_counter->pp_samples = NULL;
 
-    p_counter->update_interval = 0;
     p_counter->last_update = 0;
 
     return p_counter;
@@ -253,7 +252,7 @@ static int CounterUpdate( counter_t *p_counter,
     {
         counter_sample_t *p_new, *p_old;
         mtime_t now = mdate();
-        if( now - p_counter->last_update < p_counter->update_interval )
+        if( now - p_counter->last_update < CLOCK_FREQ )
         {
             return VLC_EGENERIC;
         }
