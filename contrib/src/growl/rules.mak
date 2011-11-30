@@ -16,8 +16,8 @@ growl: growl-$(GROWL_VERSION).tar.bz2 .sum-growl
 	$(UNPACK)
 	mv Growl-1.2.2-src $@
 	sed -i.orig -e s/"SDKROOT = macosx10.5"/"SDKROOT = macosx$(OSX_VERSION)"/g \
-		-e s/"GCC_VERSION = 4.0"/"GCC_VERSION = 4.2"/g \
-		-e s/com.apple.compilers.gcc.4_0/com.apple.compilers.gcc.4_2/g \
+		-e s/"GCC_VERSION = 4.0"/"GCC_VERSION = com.apple.compilers.llvm.clang.1_0"/g \
+		-e s/com.apple.compilers.gcc.4_0/com.apple.compilers.llvm.clang.1_0/g \
 		$@/Growl.xcodeproj/project.pbxproj
 	sed -i.orig -e s/"REVISION \$$REV"/"REVISION 0x\$$REV"/g $@/generateHgRevision.sh
 	touch $@
