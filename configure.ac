@@ -168,6 +168,9 @@ case "${host_os}" in
     AC_ARG_WITH(macosx-version-min,
       [AS_HELP_STRING([--with-macosx-version-min=VERSION],
         [compile for MacOS X VERSION and above])])
+    if test "${with_macosx_version_min}" = "" ; then
+       with_macosx_version_min=10.5
+    fi 
     if test "${with_macosx_version_min}" != "" ; then
         CPP="${CPP} -mmacosx-version-min=${with_macosx_version_min}"
         CC="${CC} -mmacosx-version-min=${with_macosx_version_min}"
