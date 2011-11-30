@@ -3,26 +3,25 @@
 ifdef BUILD_DISCS
 PKGS += libbluray
 endif
-ifeq ($(call need_pkg,"libbluray"),)
+ifeq ($(call need_pkg,"libbluray >= 0.2.1"),)
 PKGS_FOUND += libbluray
 endif
 
-BLURAY_GITURL := git://git.videolan.org/libbluray.git
+BLURAY_VERSION := 0.2.1
+BLURAY_URL := http://ftp.videolan.org/pub/videolan/libbluray/0.2.1/libbluray-0.2.1.tar.bz2
 
-$(TARBALLS)/libbluray-git.tar.xz:
-	$(call download_git,$(BLURAY_GITURL))
+$(TARBALLS)/libbluray-0.2.1.tar.bz2:
+	$(call download,$(BLURAY_URL))
 
-.sum-libbluray: libbluray-git.tar.xz
-	$(warning Integrity check skipped.)
-	touch $@
+.sum-bluray: libbluray-0.2.1.tar.bz2
 
-libbluray: libbluray-git.tar.xz .sum-libbluray
+libbluray: libbluray-0.2.1.tar.bz2 .sum-bluray
 	$(UNPACK)
 	$(APPLY) $(SRC)/bluray/pkg-static.patch
 	$(MOVE)
 
 .libbluray: libbluray 
 	cd $< && ./bootstrap
-	cd $< && $(HOSTVARS) ./configure --disable-examples --disable-debug $(HOSTCONF)
+	cd $< && $(HOSTVARS) ./configure --disable-examples --disable-debug --disable-libxml2 $(HOSTCONF)
 	cd $< && $(MAKE) install
 	touch $@
