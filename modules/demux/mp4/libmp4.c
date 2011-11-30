@@ -2796,6 +2796,158 @@ static void MP4_FreeBox_sdtp( MP4_Box_t *p_box )
     FREENULL( p_box->data.p_sdtp->p_sample_table );
 }
 
+static int MP4_ReadBox_mfro( stream_t *p_stream, MP4_Box_t *p_box )
+{
+    MP4_READBOX_ENTER( MP4_Box_data_mfro_t );
+
+    MP4_GETVERSIONFLAGS( p_box->data.p_mfro );
+    MP4_GET4BYTES( p_box->data.p_mfro->i_size );
+
+#ifdef MP4_VERBOSE
+    msg_Dbg( p_stream,
+             "read box: \"mfro\" size: %"PRIu32"",
+             p_box->data.p_mfro->i_size);
+#endif
+
+    MP4_READBOX_EXIT( 1 );
+}
+
+static int MP4_ReadBox_tfra( stream_t *p_stream, MP4_Box_t *p_box )
+{
+    uint32_t i_number_of_entries;
+    MP4_READBOX_ENTER( MP4_Box_data_tfra_t );
+    MP4_Box_data_tfra_t *p_tfra = p_box->data.p_tfra;
+    MP4_GETVERSIONFLAGS( p_box->data.p_tfra );
+
+    MP4_GET4BYTES( p_tfra->i_track_ID );
+    uint32_t i_lengths = 0;
+    MP4_GET4BYTES( i_lengths );
+    MP4_GET4BYTES( p_tfra->i_number_of_entries );
+    i_number_of_entries = p_tfra->i_number_of_entries;
+    p_tfra->i_length_size_of_traf_num = i_lengths >> 4;
+    p_tfra->i_length_size_of_trun_num = ( i_lengths & 0x0c ) >> 2;
+    p_tfra->i_length_size_of_sample_num = i_lengths & 0x03;
+
+    size_t size = 4 + 4*p_tfra->i_version; /* size in {4, 8} */
+    p_tfra->p_time = calloc( i_number_of_entries, size );
+    p_tfra->p_moof_offset = calloc( i_number_of_entries, size );
+
+    size = 1 + p_tfra->i_length_size_of_traf_num; /* size in [|1, 4|] */
+    p_tfra->p_traf_number = calloc( i_number_of_entries, size );
+    size = 1 + p_tfra->i_length_size_of_trun_num;
+    p_tfra->p_trun_number = calloc( i_number_of_entries, size );
+    size = 1 + p_tfra->i_length_size_of_sample_num;
+    p_tfra->p_sample_number = calloc( i_number_of_entries, size );
+
+    if( !p_tfra->p_time || !p_tfra->p_moof_offset || !p_tfra->p_traf_number
+                        || !p_tfra->p_trun_number || !p_tfra->p_sample_number )
+        goto error;
+
+    for( uint32_t i=0; i < i_number_of_entries; i++ )
+    {
+        if( p_tfra->i_version == 1 )
+        {
+            MP4_GET8BYTES( p_tfra->p_time[i*2] );
+            MP4_GET8BYTES( p_tfra->p_moof_offset[i*2] );
+        }
+        else
+        {
+            MP4_GET4BYTES( p_tfra->p_time[i] );
+            MP4_GET4BYTES( p_tfra->p_moof_offset[i] );
+        }
+        switch (p_tfra->i_length_size_of_traf_num)
+        {
+            case 0:
+                MP4_GET1BYTE( p_tfra->p_traf_number[i] );
+                break;
+            case 1:
+                MP4_GET2BYTES( p_tfra->p_traf_number[i*2] );
+                break;
+            case 2:
+                MP4_GET3BYTES( p_tfra->p_traf_number[i*3] );
+                break;
+            case 3:
+                MP4_GET4BYTES( p_tfra->p_traf_number[i*4] );
+                break;
+            default:
+                goto error;
+        }
+
+        switch (p_tfra->i_length_size_of_trun_num)
+        {
+            case 0:
+                MP4_GET1BYTE( p_tfra->p_trun_number[i] );
+                break;
+            case 1:
+                MP4_GET2BYTES( p_tfra->p_trun_number[i*2] );
+                break;
+            case 2:
+                MP4_GET3BYTES( p_tfra->p_trun_number[i*3] );
+                break;
+            case 3:
+                MP4_GET4BYTES( p_tfra->p_trun_number[i*4] );
+                break;
+            default:
+                goto error;
+        }
+
+        switch (p_tfra->i_length_size_of_sample_num)
+        {
+            case 0:
+                MP4_GET1BYTE( p_tfra->p_sample_number[i] );
+                break;
+            case 1:
+                MP4_GET2BYTES( p_tfra->p_sample_number[i*2] );
+                break;
+            case 2:
+                MP4_GET3BYTES( p_tfra->p_sample_number[i*3] );
+                break;
+            case 3:
+                MP4_GET4BYTES( p_tfra->p_sample_number[i*4] );
+                break;
+            default:
+                goto error;
+        }
+    }
+
+#ifdef MP4_VERBOSE
+    if( p_tfra->i_version == 0 )
+    {
+        msg_Dbg( p_stream, "time[0]: %"PRIu32", moof_offset[0]: %"PRIx32"",
+                         p_tfra->p_time[0], p_tfra->p_moof_offset[0] );
+
+        msg_Dbg( p_stream, "time[1]: %"PRIu32", moof_offset[1]: %"PRIx32"",
+                         p_tfra->p_time[1], p_tfra->p_moof_offset[1] );
+    }
+    else
+    {
+        msg_Dbg( p_stream, "time[0]: %"PRIu64", moof_offset[0]: %"PRIx64"",
+                ((uint64_t *)(p_tfra->p_time))[0],
+                ((uint64_t *)(p_tfra->p_moof_offset))[0] );
+
+        msg_Dbg( p_stream, "time[1]: %"PRIu64", moof_offset[1]: %"PRIx64"",
+                ((uint64_t *)(p_tfra->p_time))[1],
+                ((uint64_t *)(p_tfra->p_moof_offset))[1] );
+    }
+
+    msg_Info( p_stream, "number_of_entries is %"PRIu32"", i_number_of_entries );
+    msg_Info( p_stream, "track ID is: %"PRIu32"", p_tfra->i_track_ID );
+#endif
+
+    MP4_READBOX_EXIT( 1 );
+error:
+    MP4_READBOX_EXIT( 0 );
+}
+
+static void MP4_FreeBox_tfra( MP4_Box_t *p_box )
+{
+    FREENULL( p_box->data.p_tfra->p_time );
+    FREENULL( p_box->data.p_tfra->p_moof_offset );
+    FREENULL( p_box->data.p_tfra->p_traf_number );
+    FREENULL( p_box->data.p_tfra->p_trun_number );
+    FREENULL( p_box->data.p_tfra->p_sample_number );
+}
+
 
 /* For generic */
 static int MP4_ReadBox_default( stream_t *p_stream, MP4_Box_t *p_box )
@@ -3059,12 +3211,15 @@ static const struct
 
     /* found in smoothstreaming */
     { ATOM_traf,    MP4_ReadBoxContainer,     MP4_FreeBox_Common },
+    { ATOM_mfra,    MP4_ReadBoxContainer,     MP4_FreeBox_Common },
     { ATOM_mfhd,    MP4_ReadBox_mfhd,         MP4_FreeBox_Common },
     { ATOM_tfhd,    MP4_ReadBox_tfhd,         MP4_FreeBox_Common },
     { ATOM_trun,    MP4_ReadBox_trun,         MP4_FreeBox_trun },
     { ATOM_trex,    MP4_ReadBox_trex,         MP4_FreeBox_Common },
     { ATOM_mehd,    MP4_ReadBox_mehd,         MP4_FreeBox_Common },
     { ATOM_sdtp,    MP4_ReadBox_sdtp,         MP4_FreeBox_sdtp },
+    { ATOM_tfra,    MP4_ReadBox_tfra,         MP4_FreeBox_tfra },
+    { ATOM_mfro,    MP4_ReadBox_mfro,         MP4_FreeBox_Common },
 
     /* Last entry */
     { 0,              MP4_ReadBox_default,      NULL }

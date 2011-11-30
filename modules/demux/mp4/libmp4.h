@@ -83,6 +83,9 @@
 #define ATOM_cprt VLC_FOURCC( 'c', 'p', 'r', 't' )
 #define ATOM_iods VLC_FOURCC( 'i', 'o', 'd', 's' )
 #define ATOM_pasp VLC_FOURCC( 'p', 'a', 's', 'p' )
+#define ATOM_mfra VLC_FOURCC( 'm', 'f', 'r', 'a' )
+#define ATOM_mfro VLC_FOURCC( 'm', 'f', 'r', 'o' )
+#define ATOM_tfra VLC_FOURCC( 't', 'f', 'r', 'a' )
 
 #define ATOM_nmhd VLC_FOURCC( 'n', 'm', 'h', 'd' )
 #define ATOM_mp2v VLC_FOURCC( 'm', 'p', '2', 'v' )
@@ -1018,6 +1021,33 @@ typedef struct
     uint8_t *p_sample_table;
 } MP4_Box_data_sdtp_t;
 
+typedef struct
+{
+    uint8_t  i_version;
+    uint32_t i_flags;
+
+    uint32_t i_size;
+} MP4_Box_data_mfro_t;
+
+typedef struct
+{
+    uint8_t  i_version;
+    uint32_t i_flags;
+
+    uint32_t i_track_ID;
+    uint32_t i_number_of_entries;
+
+    uint8_t i_length_size_of_traf_num;
+    uint8_t i_length_size_of_trun_num;
+    uint8_t i_length_size_of_sample_num;
+
+    uint32_t *p_time;
+    uint32_t *p_moof_offset;
+    uint8_t *p_traf_number;
+    uint8_t *p_trun_number;
+    uint8_t *p_sample_number;
+} MP4_Box_data_tfra_t;
+
 /*
 typedef struct MP4_Box_data__s
 {
@@ -1063,6 +1093,9 @@ typedef union MP4_Box_data_s
     MP4_Box_data_trex_t *p_trex;
     MP4_Box_data_mehd_t *p_mehd;
     MP4_Box_data_sdtp_t *p_sdtp;
+
+    MP4_Box_data_tfra_t *p_tfra;
+    MP4_Box_data_mfro_t *p_mfro;
 
     MP4_Box_data_stsz_t *p_stsz;
     MP4_Box_data_stz2_t *p_stz2;
