@@ -57,6 +57,10 @@ enum {
     NSApplicationPresentationDisableMenuBarTransparency = (1 <<  9)
 };
 
+#if defined( __LP64__) && !defined(__POWER__) /* Bug in the 10.5.sdk in 64bits */
+extern OSErr UpdateSystemActivity(UInt8 activity);
+#define UsrActivity 1
+#endif
 #endif
 
 #pragma mark -
