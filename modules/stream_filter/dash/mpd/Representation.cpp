@@ -30,13 +30,14 @@
 using namespace dash::mpd;
 using namespace dash::exception;
 
-Representation::Representation  (std::map<std::string, std::string>  attributes)
+Representation::Representation  (const std::map<std::string, std::string>&  attributes) :
+    attributes( attributes ),
+    segmentInfo( NULL ),
+    trickModeType( NULL ),
+    contentProtection( NULL )
 {
-    this->attributes        = attributes;
-    this->contentProtection = NULL;
-    this->trickModeType     = NULL;
-    this->segmentInfo       = NULL;
 }
+
 Representation::~Representation ()
 {
     delete(this->segmentInfo);
@@ -44,109 +45,120 @@ Representation::~Representation ()
     delete(this->trickModeType);
 }
 
-std::string         Representation::getFrameRate            () throw(AttributeNotPresentException)
+std::string         Representation::getFrameRate            () const throw(AttributeNotPresentException)
 {
-    if(this->attributes.find("frameRate") == this->attributes.end())
+    std::map<std::string, std::string>::const_iterator  it = this->attributes.find("frameRate");
+    if ( it == this->attributes.end())
         throw AttributeNotPresentException();
 
-    return this->attributes["frameRate"];
+    return it->second;
 
 }
-std::string         Representation::getSamplingRate         () throw(AttributeNotPresentException)
+std::string         Representation::getSamplingRate         () const throw(AttributeNotPresentException)
 {
-    if(this->attributes.find("samplingRate") == this->attributes.end())
+    std::map<std::string, std::string>::const_iterator  it = this->attributes.find("samplingRate");
+    if ( it == this->attributes.end() )
         throw AttributeNotPresentException();
 
-    return this->attributes["samplingRate"];
+    return it->second;
 
 }
-std::string         Representation::getDependencyId         () throw(AttributeNotPresentException)
+std::string         Representation::getDependencyId         () const throw(AttributeNotPresentException)
 {
-    if(this->attributes.find("dependencyId") == this->attributes.end())
+    std::map<std::string, std::string>::const_iterator  it = this->attributes.find("dependencyId");
+    if ( it == this->attributes.end() )
         throw AttributeNotPresentException();
 
-    return this->attributes["dependencyId"];
+    return it->second;
 
 }
-std::string         Representation::getId                   () throw(AttributeNotPresentException)
+std::string         Representation::getId                   () const throw(AttributeNotPresentException)
 {
-    if(this->attributes.find("id") == this->attributes.end())
+    std::map<std::string, std::string>::const_iterator  it = this->attributes.find("id");
+    if ( it == this->attributes.end())
         throw AttributeNotPresentException();
 
-    return this->attributes["id"];
+    return it->second;
 
 }
-std::string         Representation::getLang                 () throw(AttributeNotPresentException)
+std::string         Representation::getLang                 () const throw(AttributeNotPresentException)
 {
-    if(this->attributes.find("lang") == this->attributes.end())
+    std::map<std::string, std::string>::const_iterator  it = this->attributes.find("lang");
+    if ( it == this->attributes.end() )
         throw AttributeNotPresentException();
 
-    return this->attributes["lang"];
+    return it->second;
 
 }
-std::string         Representation::getParX                 () throw(AttributeNotPresentException)
+std::string         Representation::getParX                 () const throw(AttributeNotPresentException)
 {
-    if(this->attributes.find("parx") == this->attributes.end())
+    std::map<std::string, std::string>::const_iterator  it = this->attributes.find("parx");
+    if ( it == this->attributes.end())
         throw AttributeNotPresentException();
 
-    return this->attributes["parx"];
+    return it->second;
 
 }
-std::string         Representation::getParY                 () throw(AttributeNotPresentException)
+std::string         Representation::getParY                 () const throw(AttributeNotPresentException)
 {
-    if(this->attributes.find("pary") == this->attributes.end())
+    std::map<std::string, std::string>::const_iterator  it = this->attributes.find("pary");
+    if ( it == this->attributes.end() )
         throw AttributeNotPresentException();
 
-    return this->attributes["pary"];
+    return it->second;
 
 }
-std::string         Representation::getHeight               () throw(AttributeNotPresentException)
+std::string         Representation::getHeight               () const throw(AttributeNotPresentException)
 {
-    if(this->attributes.find("height") == this->attributes.end())
+    std::map<std::string, std::string>::const_iterator  it = this->attributes.find("height");
+    if ( it == this->attributes.end() )
         throw AttributeNotPresentException();
 
-    return this->attributes["height"];
+    return it->second;
 
 }
-std::string         Representation::getWidth                () throw(AttributeNotPresentException)
+std::string         Representation::getWidth                () const throw(AttributeNotPresentException)
 {
-    if(this->attributes.find("width") == this->attributes.end())
+    std::map<std::string, std::string>::const_iterator  it = this->attributes.find("width");
+    if ( it == this->attributes.end())
         throw AttributeNotPresentException();
 
-    return this->attributes["width"];
+    return it->second;
 
 }
-std::string         Representation::getBandwidth            () throw(AttributeNotPresentException)
+std::string         Representation::getBandwidth            () const throw(AttributeNotPresentException)
 {
-    if(this->attributes.find("bandwidth") == this->attributes.end())
+    std::map<std::string, std::string>::const_iterator  it = this->attributes.find("bandwidth");
+    if ( it == this->attributes.end())
         throw AttributeNotPresentException();
 
-    return this->attributes["bandwidth"];
+    return it->second;
 
 }
-std::string         Representation::getNumberOfChannels     () throw(AttributeNotPresentException)
+std::string         Representation::getNumberOfChannels     () const throw(AttributeNotPresentException)
 {
-    if(this->attributes.find("numberOfChannels") == this->attributes.end())
+    std::map<std::string, std::string>::const_iterator  it = this->attributes.find("numberOfChannels");
+    if( it == this->attributes.end() )
         throw AttributeNotPresentException();
 
-    return this->attributes["numberOfChannels"];
+    return it->second;
 
 }
-SegmentInfo*        Representation::getSegmentInfo          () throw(ElementNotPresentException)
+SegmentInfo*        Representation::getSegmentInfo          () const throw(ElementNotPresentException)
 {
     if(this->segmentInfo == NULL)
         throw ElementNotPresentException();
 
     return this->segmentInfo;
 }
-TrickModeType*      Representation::getTrickModeType        () throw(ElementNotPresentException)
+TrickModeType*      Representation::getTrickModeType        () const throw(ElementNotPresentException)
 {
     if(this->segmentInfo == NULL)
         throw ElementNotPresentException();
 
     return this->trickModeType;
 }
-ContentProtection*  Representation::getContentProtection    () throw(ElementNotPresentException)
+ContentProtection*  Representation::getContentProtection    () const throw(ElementNotPresentException)
 {
     if(this->contentProtection == NULL)
         throw ElementNotPresentException();

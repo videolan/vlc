@@ -42,23 +42,23 @@ namespace dash
         class Representation
         {
             public:
-                Representation          (std::map<std::string, std::string>  attributes);
+                Representation          ( const std::map<std::string, std::string>&  attributes);
                 virtual ~Representation ();
 
-                std::string         getWidth                () throw(dash::exception::AttributeNotPresentException);
-                std::string         getHeight               () throw(dash::exception::AttributeNotPresentException);
-                std::string         getParX                 () throw(dash::exception::AttributeNotPresentException);
-                std::string         getParY                 () throw(dash::exception::AttributeNotPresentException);
-                std::string         getLang                 () throw(dash::exception::AttributeNotPresentException);
-                std::string         getFrameRate            () throw(dash::exception::AttributeNotPresentException);
-                std::string         getId                   () throw(dash::exception::AttributeNotPresentException);
-                std::string         getBandwidth            () throw(dash::exception::AttributeNotPresentException);
-                std::string         getDependencyId         () throw(dash::exception::AttributeNotPresentException);
-                std::string         getNumberOfChannels     () throw(dash::exception::AttributeNotPresentException);
-                std::string         getSamplingRate         () throw(dash::exception::AttributeNotPresentException);
-                SegmentInfo*        getSegmentInfo          () throw(dash::exception::ElementNotPresentException);
-                TrickModeType*      getTrickModeType        () throw(dash::exception::ElementNotPresentException);
-                ContentProtection*  getContentProtection    () throw(dash::exception::ElementNotPresentException);
+                std::string         getWidth                () const throw(dash::exception::AttributeNotPresentException);
+                std::string         getHeight               () const throw(dash::exception::AttributeNotPresentException);
+                std::string         getParX                 () const throw(dash::exception::AttributeNotPresentException);
+                std::string         getParY                 () const throw(dash::exception::AttributeNotPresentException);
+                std::string         getLang                 () const throw(dash::exception::AttributeNotPresentException);
+                std::string         getFrameRate            () const throw(dash::exception::AttributeNotPresentException);
+                std::string         getId                   () const throw(dash::exception::AttributeNotPresentException);
+                std::string         getBandwidth            () const throw(dash::exception::AttributeNotPresentException);
+                std::string         getDependencyId         () const throw(dash::exception::AttributeNotPresentException);
+                std::string         getNumberOfChannels     () const throw(dash::exception::AttributeNotPresentException);
+                std::string         getSamplingRate         () const throw(dash::exception::AttributeNotPresentException);
+                SegmentInfo*        getSegmentInfo          () const throw(dash::exception::ElementNotPresentException);
+                TrickModeType*      getTrickModeType        () const throw(dash::exception::ElementNotPresentException);
+                ContentProtection*  getContentProtection    () const throw(dash::exception::ElementNotPresentException);
 
                 void    setSegmentInfo         (SegmentInfo *info);
                 void    setTrickModeType       (TrickModeType *trickModeType);
