@@ -189,7 +189,7 @@ struct demux_sys_t
 
     /* */
     int              i_track;
-    live_track_t     **track;   /* XXX mallocated */
+    live_track_t     **track;
 
     /* Weird formats */
     asf_header_t     asfh;
@@ -297,8 +297,7 @@ static int  Open ( vlc_object_t *p_this )
     p_sys->env = NULL;
     p_sys->ms = NULL;
     p_sys->rtsp = NULL;
-    p_sys->i_track = 0;
-    p_sys->track   = NULL;
+    TAB_INIT( p_sys->i_track, p_sys->track );
     p_sys->i_pcr = 0;
     p_sys->i_npt = 0.;
     p_sys->i_npt_start = 0.;
@@ -453,8 +452,7 @@ static void Close( vlc_object_t *p_this )
         free( tk->p_buffer );
         free( tk );
     }
-
-    if( p_sys->i_track ) free( p_sys->track );
+    TAB_CLEAN( p_sys->i_track, p_sys->track );
     if( p_sys->p_out_asf ) stream_Delete( p_sys->p_out_asf );
     delete p_sys->scheduler;
     free( p_sys->p_sdp );
@@ -1069,10 +1067,7 @@ static int SessionsSetup( demux_t *p_demux )
             if( tk->p_es || tk->b_quicktime || ( tk->b_muxed && tk->p_out_muxed ) ||
                 ( tk->b_asf && p_sys->p_out_asf ) )
             {
-                /* Append */
-                p_sys->track = (live_track_t**)xrealloc( p_sys->track,
-                            sizeof( live_track_t ) * ( p_sys->i_track + 1 ) );
-                p_sys->track[p_sys->i_track++] = tk;
+                TAB_APPEND_CAST( (live_track_t **), p_sys->i_track, p_sys->track, tk );
             }
             else
             {
@@ -1580,13 +1575,11 @@ static int RollOverTcp( demux_t *p_demux )
         free( tk->p_buffer );
         free( tk );
     }
-    if( p_sys->i_track ) free( p_sys->track );
+    TAB_CLEAN( p_sys->i_track, p_sys->track );
     if( p_sys->p_out_asf ) stream_Delete( p_sys->p_out_asf );
 
     p_sys->ms = NULL;
     p_sys->rtsp = NULL;
-    p_sys->track = NULL;
-    p_sys->i_track = 0;
     p_sys->b_no_data = true;
     p_sys->i_no_data_ti = 0;
     p_sys->p_out_asf = NULL;
