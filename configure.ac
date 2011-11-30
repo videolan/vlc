@@ -1797,7 +1797,7 @@ fi
 dnl
 dnl  Blu-ray Disc Support with libbluray
 dnl
-PKG_ENABLE_MODULES_VLC([BLURAY], [libbluray], [libbluray >= 0.2 libxml-2.0 >= 2.6 ], (libbluray for Blu-ray disc support ) )
+PKG_ENABLE_MODULES_VLC([BLURAY], [libbluray], [libbluray >= 0.2.1], (libbluray for Blu-ray disc support ) )
 
 dnl
 dnl  OpenCV wrapper and example filters
