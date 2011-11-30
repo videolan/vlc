@@ -165,7 +165,6 @@ pkg-config-$(PKGCFG_VERSION).tar.gz:
 pkgconfig: pkg-config-$(PKGCFG_VERSION).tar.gz .autoconf
 	$(UNPACK)
 	$(MOVE)
-	(cd $@; $(AUTOCONF))
 
 .pkg-config: pkgconfig
 	(cd pkgconfig; ./configure --prefix=$(PREFIX) --disable-shared --enable-static && make && make install)
