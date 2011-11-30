@@ -160,29 +160,22 @@ case "${host_os}" in
         [compile using the SDK in DIR])])
     test "${with_macosx_sdk}" = "" && with_macosx_sdk=/Developer/SDKs/MacOSX10.5.sdk
     ! test -d "${with_macosx_sdk}" && AC_MSG_ERROR([SDK "${with_macosx_sdk}" not found])
-    CPP="${CPP} -isysroot ${with_macosx_sdk}"
-    CC="${CC} -isysroot ${with_macosx_sdk}"
-    CXX="${CXX} -isysroot ${with_macosx_sdk}"
-    OBJC="${OBJC} -isysroot ${with_macosx_sdk}"
-    LD="${LD} -syslibroot ${with_macosx_sdk}"
     AC_ARG_WITH(macosx-version-min,
       [AS_HELP_STRING([--with-macosx-version-min=VERSION],
         [compile for MacOS X VERSION and above])])
     if test "${with_macosx_version_min}" = "" ; then
        with_macosx_version_min=10.5
-    fi 
-    if test "${with_macosx_version_min}" != "" ; then
-        CPP="${CPP} -mmacosx-version-min=${with_macosx_version_min}"
-        CC="${CC} -mmacosx-version-min=${with_macosx_version_min}"
-        CXX="${CXX} -mmacosx-version-min=${with_macosx_version_min}"
-        OBJC="${OBJC} -mmacosx-version-min=${with_macosx_version_min}"
-        LD="${LD} -macosx_version_min=${with_macosx_version_min}"
-        CFLAGS="${CFLAGS} -DMACOSX_DEPLOYMENT_TARGET=${with_macosx_version_min}"
-        CXXFLAGS="${CXXFLAGS} -DMACOSX_DEPLOYMENT_TARGET=${with_macosx_version_min}"
-        OBJCFLAGS="${OBJCFLAGS} -DMACOSX_DEPLOYMENT_TARGET=${with_macosx_version_min}"
-        MACOSX_DEPLOYMENT_TARGET=${with_macosx_version_min}
-        export MACOSX_DEPLOYMENT_TARGET
     fi
+    MACOSX_DEPLOYMENT_TARGET=${with_macosx_version_min}
+    CPP="${CPP} -isysroot ${with_macosx_sdk} -mmacosx-version-min=${with_macosx_version_min}"
+    CC="${CC} -isysroot ${with_macosx_sdk} -mmacosx-version-min=${with_macosx_version_min}"
+    CXX="${CXX} -isysroot ${with_macosx_sdk} -mmacosx-version-min=${with_macosx_version_min}"
+    OBJC="${OBJC} -isysroot ${with_macosx_sdk} -mmacosx-version-min=${with_macosx_version_min}"
+    LD="${LD} -syslibroot ${with_macosx_sdk} -mmacosx_version_min=${with_macosx_version_min}"
+    CFLAGS="${CFLAGS} -DMACOSX_DEPLOYMENT_TARGET=${with_macosx_version_min}"
+    CXXFLAGS="${CXXFLAGS} -DMACOSX_DEPLOYMENT_TARGET=${with_macosx_version_min}"
+    OBJCFLAGS="${OBJCFLAGS} -DMACOSX_DEPLOYMENT_TARGET=${with_macosx_version_min}"
+    export MACOSX_DEPLOYMENT_TARGET
     ;;
   *mingw32* | *cygwin* | *wince* | *mingwce*)
     AC_CHECK_TOOL(WINDRES, windres, :)
