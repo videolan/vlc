@@ -52,7 +52,12 @@ namespace dash
                 std::string         getLang                 () const throw(dash::exception::AttributeNotPresentException);
                 std::string         getFrameRate            () const throw(dash::exception::AttributeNotPresentException);
                 std::string         getId                   () const throw(dash::exception::AttributeNotPresentException);
-                std::string         getBandwidth            () const throw(dash::exception::AttributeNotPresentException);
+                /*
+                 *  @return The bitrate required for this representation
+                 *          in Bytes per seconds.
+                 *          -1 if an error occurs.
+                 */
+                int                 getBandwidth            () const;
                 std::string         getDependencyId         () const throw(dash::exception::AttributeNotPresentException);
                 std::string         getNumberOfChannels     () const throw(dash::exception::AttributeNotPresentException);
                 std::string         getSamplingRate         () const throw(dash::exception::AttributeNotPresentException);

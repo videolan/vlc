@@ -25,6 +25,8 @@
 # include "config.h"
 #endif
 
+#include <cstdlib>
+
 #include "Representation.h"
 
 using namespace dash::mpd;
@@ -126,13 +128,13 @@ std::string         Representation::getWidth                () const throw(Attri
     return it->second;
 
 }
-std::string         Representation::getBandwidth            () const throw(AttributeNotPresentException)
+int     Representation::getBandwidth            () const
 {
     std::map<std::string, std::string>::const_iterator  it = this->attributes.find("bandwidth");
     if ( it == this->attributes.end())
-        throw AttributeNotPresentException();
+        return -1;
 
-    return it->second;
+    return atoi( it->second.c_str() ) / 8;
 
 }
 std::string         Representation::getNumberOfChannels     () const throw(AttributeNotPresentException)

@@ -80,7 +80,7 @@ Representation*         BasicCMManager::getBestRepresentation   (Period *period)
         {
             try
             {
-                long currentBitrate = atol(reps.at(j)->getBandwidth().c_str());
+                long currentBitrate = reps.at(j)->getBandwidth();
                 if(currentBitrate > bitrate)
                 {
                     bitrate = currentBitrate;
@@ -119,7 +119,7 @@ Representation*         BasicCMManager::getRepresentation       (Period *period,
         {
             try
             {
-                long currentBitrate = atol(reps.at(j)->getBandwidth().c_str());
+                long currentBitrate = reps.at(j)->getBandwidth();
                 long dif = bitrate - currentBitrate;
 
                 if(bestDif == -1)
