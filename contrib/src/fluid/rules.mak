@@ -54,6 +54,6 @@ FLUIDCONF := $(HOSTCONF) \
 
 .fluid: fluidsynth
 	$(RECONF)
-	cd $< && $(HOSTVARS) ./configure $(FLUIDCONF)
+	cd $< && $(HOSTVARS) CFLAGS="$(CFLAGS) -DFLUIDSYNTH_NOT_A_DLL" ./configure $(FLUIDCONF)
 	cd $< && $(MAKE) install
 	touch $@
