@@ -126,7 +126,7 @@ EXTRA_LDFLAGS += -m32
 endif
 
 XCODE_FLAGS = -sdk macosx$(OSX_VERSION)
-ifeq ($(xcodebuild -version 2>/dev/null | tee /dev/null|head -1|cut -d\  -f2|cut -d. -f1), 3)
+ifeq ($(shell xcodebuild -version 2>/dev/null | tee /dev/null|head -1|cut -d\  -f2|cut -d. -f1),3)
 # XCode 3 doesn't support -arch
 else
 XCODE_FLAGS += -arch $(ARCH)
