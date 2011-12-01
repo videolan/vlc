@@ -72,12 +72,10 @@ function parse()
 
             -- Try to find out if its a freecaster streaming or just a link to some
             -- other video streaming website
-            -- FIXME: I was unable to find any http-based freecaster streams,
-            -- but I remember there were some a few months back.
-            -- Right now we assume everything is streamed using RTMP, so we feed them to avio.
+            -- We assume freecaster now streams in http
             if string.match( line, "<streams type=\"5\" server=\"(.*)\">" )
                 then
-                _,_,rtmpserver = string.find( line, "<streams type=\"5\" server=\"(.*)\">" )
+                _,_,videoserver = string.find( line, "<streams type=\"5\" server=\"(.*)\">" )
                 gostraight = false
             end
 
@@ -94,7 +92,7 @@ function parse()
                     _,_,height = string.find( line, "height=\"(%d+)\" duration" )
                     _,_,playpath  = string.find( line, "\">(.*)</stream>" )
                     if ( prefres < 0 or tonumber( height ) <= prefres ) then
-                        path = "avio://" .. rtmpserver .. " playpath=" .. playpath
+                        path = videoserver .. playpath
                     end
                 end
             end
