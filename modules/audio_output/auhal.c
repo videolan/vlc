@@ -601,7 +601,7 @@ static int OpenSPDIF( audio_output_t * p_aout )
     UInt32                  i_param_size = 0, b_mix = 0;
     Boolean                 b_writeable = false;
     AudioStreamID           *p_streams = NULL;
-    int                     i_streams = 0;
+    unsigned                i_streams = 0;
 
     /* Start doing the SPDIF setup proces */
     p_sys->b_digital = true;
