@@ -365,6 +365,44 @@ int libvlc_video_set_subtitle_file( libvlc_media_player_t *p_mi,
     return b_ret;
 }
 
+int64_t libvlc_video_get_spu_delay( libvlc_media_player_t *p_mi )
+{
+    input_thread_t *p_input_thread = libvlc_get_input_thread( p_mi );
+    int64_t val = 0;
+
+    if( p_input_thread )
+    {
+        val = var_GetTime( p_input_thread, "spu-delay" );
+        vlc_object_release( p_input_thread );
+    }
+    else
+    {
+        libvlc_printerr( "No active input" );
+    }
+
+    return val;
+}
+
+int libvlc_video_set_spu_delay( libvlc_media_player_t *p_mi,
+                                int64_t i_delay )
+{
+    input_thread_t *p_input_thread = libvlc_get_input_thread( p_mi );
+    int ret = -1;
+
+    if( p_input_thread )
+    {
+        var_SetTime( p_input_thread, "spu-delay", i_delay );
+        vlc_object_release( p_input_thread );
+        ret = 0;
+    }
+    else
+    {
+        libvlc_printerr( "No active input" );
+    }
+
+    return ret;
+}
+
 libvlc_track_description_t *
         libvlc_video_get_title_description( libvlc_media_player_t *p_mi )
 {
