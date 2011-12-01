@@ -11,6 +11,9 @@ CRYSTAL_SOURCES := crystalhd_lgpl_includes.zip
 
 .crystalhd: $(CRYSTAL_SOURCES) .sum-crystalhd
 	mkdir -p -- "$(PREFIX)/include/libcrystalhd"
-	unzip $< -d "$(PREFIX)/include/libcrystalhd"
+	unzip -o $< -d "$(PREFIX)/include/libcrystalhd"
+ifdef HAVE_WIN32 # we want dlopening on win32
+	rm -rf $(PREFIX)/include/libcrystalhd/bc_drv_if.h
+endif
 	patch -p0 -f -d $(PREFIX)/include/libcrystalhd < ../src/crystalhd/mingw.patch
 	touch $@
