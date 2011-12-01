@@ -53,3 +53,7 @@ Representation*         NullManager::getRepresentation       (Period *, long )
 {
     return NULL;
 }
+const MPD*              NullManager::getMPD() const
+{
+    return NULL;
+}
