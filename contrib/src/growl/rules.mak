@@ -12,12 +12,18 @@ $(TARBALLS)/growl-$(GROWL_VERSION).tar.bz2:
 
 .sum-growl: growl-$(GROWL_VERSION).tar.bz2
 
+ifeq ($(shell clang -v 2>/dev/null || echo FAIL),)
+COMPILER=com.apple.compilers.llvm.clang.1_0
+else
+COMPILER=com.apple.compilers.gcc.4_2
+endif
+
 growl: growl-$(GROWL_VERSION).tar.bz2 .sum-growl
 	$(UNPACK)
 	mv Growl-1.2.2-src $@
 	sed -i.orig -e s/"SDKROOT = macosx10.5"/"SDKROOT = macosx$(OSX_VERSION)"/g \
-		-e s/"GCC_VERSION = 4.0"/"GCC_VERSION = com.apple.compilers.llvm.clang.1_0"/g \
-		-e s/com.apple.compilers.gcc.4_0/com.apple.compilers.llvm.clang.1_0/g \
+		-e s/"GCC_VERSION = 4.0"/"GCC_VERSION = $(COMPILER)"/g \
+		-e s/com.apple.compilers.gcc.4_0/$(COMPILER)/g \
 		$@/Growl.xcodeproj/project.pbxproj
 	sed -i.orig -e s/"REVISION \$$REV"/"REVISION 0x\$$REV"/g $@/generateHgRevision.sh
 	touch $@
