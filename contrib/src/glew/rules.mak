@@ -14,6 +14,7 @@ ifdef HAVE_WIN32
 	$(APPLY) $(SRC)/glew/win32.patch
 endif
 	$(MOVE)
+	cd $@ && sed -e 's/.$$//' -iorig config/config.guess
 
 .glew: glew
 	cd $< && $(HOSTVARS) CFLAGS="$(CFLAGS) -DGLEW_STATIC" $(MAKE)

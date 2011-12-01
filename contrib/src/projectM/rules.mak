@@ -2,7 +2,6 @@
 PROJECTM_VERSION := 2.0.1
 PROJECTM_URL := $(SF)/projectm/$(PROJECTM_VERSION)/projectM-$(PROJECTM_VERSION)-Source.tar.gz
 
-# FIXME: glew build rules for non-Win32
 ifdef HAVE_WIN32
 PKGS += projectM
 endif
