@@ -33,38 +33,18 @@ using namespace dash::mpd;
 using namespace dash::exception;
 
 Representation::Representation  (const std::map<std::string, std::string>&  attributes) :
-    attributes( attributes ),
+    CommonAttributesElements( attributes ),
     segmentInfo( NULL ),
-    trickModeType( NULL ),
-    contentProtection( NULL )
+    trickModeType( NULL )
 {
 }
 
 Representation::~Representation ()
 {
     delete(this->segmentInfo);
-    delete(this->contentProtection);
     delete(this->trickModeType);
 }
 
-std::string         Representation::getFrameRate            () const throw(AttributeNotPresentException)
-{
-    std::map<std::string, std::string>::const_iterator  it = this->attributes.find("frameRate");
-    if ( it == this->attributes.end())
-        throw AttributeNotPresentException();
-
-    return it->second;
-
-}
-std::string         Representation::getSamplingRate         () const throw(AttributeNotPresentException)
-{
-    std::map<std::string, std::string>::const_iterator  it = this->attributes.find("samplingRate");
-    if ( it == this->attributes.end() )
-        throw AttributeNotPresentException();
-
-    return it->second;
-
-}
 std::string         Representation::getDependencyId         () const throw(AttributeNotPresentException)
 {
     std::map<std::string, std::string>::const_iterator  it = this->attributes.find("dependencyId");
@@ -83,51 +63,7 @@ std::string         Representation::getId                   () const throw(Attri
     return it->second;
 
 }
-std::string         Representation::getLang                 () const throw(AttributeNotPresentException)
-{
-    std::map<std::string, std::string>::const_iterator  it = this->attributes.find("lang");
-    if ( it == this->attributes.end() )
-        throw AttributeNotPresentException();
 
-    return it->second;
-
-}
-std::string         Representation::getParX                 () const throw(AttributeNotPresentException)
-{
-    std::map<std::string, std::string>::const_iterator  it = this->attributes.find("parx");
-    if ( it == this->attributes.end())
-        throw AttributeNotPresentException();
-
-    return it->second;
-
-}
-std::string         Representation::getParY                 () const throw(AttributeNotPresentException)
-{
-    std::map<std::string, std::string>::const_iterator  it = this->attributes.find("pary");
-    if ( it == this->attributes.end() )
-        throw AttributeNotPresentException();
-
-    return it->second;
-
-}
-std::string         Representation::getHeight               () const throw(AttributeNotPresentException)
-{
-    std::map<std::string, std::string>::const_iterator  it = this->attributes.find("height");
-    if ( it == this->attributes.end() )
-        throw AttributeNotPresentException();
-
-    return it->second;
-
-}
-std::string         Representation::getWidth                () const throw(AttributeNotPresentException)
-{
-    std::map<std::string, std::string>::const_iterator  it = this->attributes.find("width");
-    if ( it == this->attributes.end())
-        throw AttributeNotPresentException();
-
-    return it->second;
-
-}
 int     Representation::getBandwidth            () const
 {
     std::map<std::string, std::string>::const_iterator  it = this->attributes.find("bandwidth");
@@ -137,15 +73,7 @@ int     Representation::getBandwidth            () const
     return atoi( it->second.c_str() ) / 8;
 
 }
-std::string         Representation::getNumberOfChannels     () const throw(AttributeNotPresentException)
-{
-    std::map<std::string, std::string>::const_iterator  it = this->attributes.find("numberOfChannels");
-    if( it == this->attributes.end() )
-        throw AttributeNotPresentException();
 
-    return it->second;
-
-}
 SegmentInfo*        Representation::getSegmentInfo          () const throw(ElementNotPresentException)
 {
     if(this->segmentInfo == NULL)
@@ -160,13 +88,7 @@ TrickModeType*      Representation::getTrickModeType        () const throw(Eleme
 
     return this->trickModeType;
 }
-ContentProtection*  Representation::getContentProtection    () const throw(ElementNotPresentException)
-{
-    if(this->contentProtection == NULL)
-        throw ElementNotPresentException();
 
-    return this->contentProtection;
-}
 void                Representation::setTrickModeType        (TrickModeType *trickModeType)
 {
     this->trickModeType = trickModeType;

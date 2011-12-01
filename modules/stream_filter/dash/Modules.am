@@ -26,6 +26,8 @@ SOURCES_stream_filter_dash = \
     mpd/BasicCMManager.h \
     mpd/BasicCMParser.cpp \
     mpd/BasicCMParser.h \
+    mpd/CommonAttributesElements.cpp \
+    mpd/CommonAttributesElements.h \
     mpd/ContentDescription.cpp \
     mpd/ContentDescription.h \
     mpd/ContentProtection.h \

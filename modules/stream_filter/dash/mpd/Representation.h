@@ -26,9 +26,8 @@
 #define REPRESENTATION_H_
 
 #include <string>
-#include <vector>
-#include <map>
 
+#include "mpd/CommonAttributesElements.h"
 #include "mpd/SegmentInfo.h"
 #include "mpd/TrickModeType.h"
 #include "mpd/ContentProtection.h"
@@ -39,18 +38,12 @@ namespace dash
 {
     namespace mpd
     {
-        class Representation
+        class Representation : public CommonAttributesElements
         {
             public:
                 Representation          ( const std::map<std::string, std::string>&  attributes);
                 virtual ~Representation ();
 
-                std::string         getWidth                () const throw(dash::exception::AttributeNotPresentException);
-                std::string         getHeight               () const throw(dash::exception::AttributeNotPresentException);
-                std::string         getParX                 () const throw(dash::exception::AttributeNotPresentException);
-                std::string         getParY                 () const throw(dash::exception::AttributeNotPresentException);
-                std::string         getLang                 () const throw(dash::exception::AttributeNotPresentException);
-                std::string         getFrameRate            () const throw(dash::exception::AttributeNotPresentException);
                 std::string         getId                   () const throw(dash::exception::AttributeNotPresentException);
                 /*
                  *  @return The bitrate required for this representation
@@ -59,21 +52,16 @@ namespace dash
                  */
                 int                 getBandwidth            () const;
                 std::string         getDependencyId         () const throw(dash::exception::AttributeNotPresentException);
-                std::string         getNumberOfChannels     () const throw(dash::exception::AttributeNotPresentException);
-                std::string         getSamplingRate         () const throw(dash::exception::AttributeNotPresentException);
                 SegmentInfo*        getSegmentInfo          () const throw(dash::exception::ElementNotPresentException);
                 TrickModeType*      getTrickModeType        () const throw(dash::exception::ElementNotPresentException);
-                ContentProtection*  getContentProtection    () const throw(dash::exception::ElementNotPresentException);
 
                 void    setSegmentInfo         (SegmentInfo *info);
                 void    setTrickModeType       (TrickModeType *trickModeType);
                 void    setContentProtection   (ContentProtection *protection);
 
             private:
-                std::map<std::string, std::string>  attributes;
                 SegmentInfo                         *segmentInfo;
                 TrickModeType                       *trickModeType;
-                ContentProtection                   *contentProtection;
 
         };
     }
