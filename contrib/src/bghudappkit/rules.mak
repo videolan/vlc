@@ -1,6 +1,6 @@
 # bghudappkit
 
-BGHUDAPPKIT_GITURL := https://github.com/binarygod/BGHUDAppKit.git
+BGHUDAPPKIT_GITURL := git://github.com/binarygod/BGHUDAppKit.git
 
 ifdef HAVE_MACOSX
 PKGS += bghudappkit
