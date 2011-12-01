@@ -677,7 +677,7 @@ static int SessionsSetup( demux_t *p_demux )
     MediaSubsessionIterator *iter   = NULL;
     MediaSubsession         *sub    = NULL;
 
-    bool           b_rtsp_tcp = false;
+    bool           b_rtsp_tcp;
     int            i_client_port;
     int            i_return = VLC_SUCCESS;
     unsigned int   i_buffer = 0;
@@ -776,6 +776,11 @@ static int SessionsSetup( demux_t *p_demux )
                                  sub->mediumName(), sub->codecName(),
                                  p_sys->env->getResultMsg() );
                         continue;
+                    }
+                    else
+                    {
+                        var_SetBool( p_demux, "rtsp-tcp", true );
+                        b_rtsp_tcp = true;
                     }
                 }
             }
