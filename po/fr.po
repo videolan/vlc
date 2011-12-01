@@ -18487,7 +18487,7 @@ msgstr "[Boucler]"
 #: modules/gui/ncurses.c:1060
 #, c-format
 msgid " Source   : %s"
-msgstr " Source    : %s"
+msgstr " Source   : %s"
 
 #: modules/gui/ncurses.c:1093
 #, c-format
