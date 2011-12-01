@@ -91,7 +91,5 @@ PREFIX=\$(abspath ./build)
 all: $NEEDED
 	@echo "You are ready to build VLC and its contribs"
 
-automake: .autoconf
-
 include tools.mak
 EOF
