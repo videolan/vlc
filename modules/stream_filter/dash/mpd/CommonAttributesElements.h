@@ -41,12 +41,12 @@ namespace dash
             public:
                 CommonAttributesElements( const std::map<std::string, std::string>& attributes );
                 virtual ~CommonAttributesElements();
-                std::string         getWidth                () const throw(dash::exception::AttributeNotPresentException);
-                std::string         getHeight               () const throw(dash::exception::AttributeNotPresentException);
-                std::string         getParX                 () const throw(dash::exception::AttributeNotPresentException);
-                std::string         getParY                 () const throw(dash::exception::AttributeNotPresentException);
+                int                 getWidth                () const;
+                int                 getHeight               () const;
+                int                 getParX                 () const;
+                int                 getParY                 () const;
                 std::string         getLang                 () const throw(dash::exception::AttributeNotPresentException);
-                std::string         getFrameRate            () const throw(dash::exception::AttributeNotPresentException);
+                int                 getFrameRate            () const;
                 std::string         getNumberOfChannels     () const throw(dash::exception::AttributeNotPresentException);
                 std::string         getSamplingRate         () const throw(dash::exception::AttributeNotPresentException);
                 ContentProtection*  getContentProtection    () const throw(dash::exception::ElementNotPresentException);

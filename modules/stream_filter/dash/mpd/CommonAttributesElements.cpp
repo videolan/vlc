@@ -23,6 +23,8 @@
 
 #include "CommonAttributesElements.h"
 
+#include <cstdlib>
+
 using namespace dash::mpd;
 using namespace dash::exception;
 
@@ -37,43 +39,43 @@ CommonAttributesElements::~CommonAttributesElements()
     delete this->contentProtection;
 }
 
-std::string         CommonAttributesElements::getWidth                () const throw(AttributeNotPresentException)
+int     CommonAttributesElements::getWidth                () const
 {
     std::map<std::string, std::string>::const_iterator  it = this->attributes.find("width");
     if ( it == this->attributes.end())
-        throw AttributeNotPresentException();
+        return -1;
 
-    return it->second;
+    return atoi( it->second.c_str() );
 
 }
 
-std::string         CommonAttributesElements::getHeight               () const throw(AttributeNotPresentException)
+int     CommonAttributesElements::getHeight               () const
 {
     std::map<std::string, std::string>::const_iterator  it = this->attributes.find("height");
     if ( it == this->attributes.end() )
-        throw AttributeNotPresentException();
+        return -1;
 
-    return it->second;
+    return atoi( it->second.c_str() );
 
 }
 
-std::string         CommonAttributesElements::getParX                 () const throw(AttributeNotPresentException)
+int     CommonAttributesElements::getParX                 () const
 {
     std::map<std::string, std::string>::const_iterator  it = this->attributes.find("parx");
-    if ( it == this->attributes.end())
-        throw AttributeNotPresentException();
+    if ( it == this->attributes.end() )
+        return 1; //Default value is defined in standard's §5.4.3.2.2
 
-    return it->second;
+    return atoi( it->second.c_str() );
 
 }
 
-std::string         CommonAttributesElements::getParY                 () const throw(AttributeNotPresentException)
+int         CommonAttributesElements::getParY                 () const
 {
     std::map<std::string, std::string>::const_iterator  it = this->attributes.find("pary");
     if ( it == this->attributes.end() )
-        throw AttributeNotPresentException();
+        return 1; //Default value is defined in standard's §5.4.3.2.2
 
-    return it->second;
+    return atoi( it->second.c_str() );
 
 }
 
@@ -84,16 +86,15 @@ std::string         CommonAttributesElements::getLang                 () const t
         throw AttributeNotPresentException();
 
     return it->second;
-
 }
 
-std::string         CommonAttributesElements::getFrameRate            () const throw(AttributeNotPresentException)
+int                 CommonAttributesElements::getFrameRate            () const
 {
     std::map<std::string, std::string>::const_iterator  it = this->attributes.find("frameRate");
     if ( it == this->attributes.end())
-        throw AttributeNotPresentException();
+        return -1;
 
-    return it->second;
+    return atoi( it->second.c_str() );
 
 }
 
