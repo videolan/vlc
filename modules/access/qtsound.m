@@ -288,11 +288,11 @@ static int Open( vlc_object_t *p_this )
 
         goto error;
     }
-    int iaudio;
+    unsigned iaudio;
     for(iaudio = 0; iaudio < [myAudioDevices count]; iaudio++){
         QTCaptureDevice *qtk_audioDevice;
         qtk_audioDevice = [myAudioDevices objectAtIndex:iaudio];
-        msg_Dbg( p_demux, "qtsound audio %d/%d localizedDisplayName: %s uniqueID: %s", iaudio, [myAudioDevices count], [[qtk_audioDevice localizedDisplayName] UTF8String], [[qtk_audioDevice uniqueID] UTF8String]);
+        msg_Dbg( p_demux, "qtsound audio %u/%lu localizedDisplayName: %s uniqueID: %s", iaudio, [myAudioDevices count], [[qtk_audioDevice localizedDisplayName] UTF8String], [[qtk_audioDevice uniqueID] UTF8String]);
         if([[[qtk_audioDevice localizedDisplayName]stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]] isEqualToString:qtk_curraudiodevice_uid]){
             msg_Dbg( p_demux, "Device found" );
             break;
@@ -321,7 +321,7 @@ static int Open( vlc_object_t *p_this )
 
     if( ![p_sys->audiodevice open: &o_returnedAudioError] )
     {
-        msg_Err( p_demux, "Unable to open the audio capture device (%d)", [o_returnedAudioError code] );
+        msg_Err( p_demux, "Unable to open the audio capture device (%ld)", [o_returnedAudioError code] );
         goto error;
     }
 
@@ -470,14 +470,14 @@ static int Open( vlc_object_t *p_this )
     success = [p_sys->session addInput:audioInput error: &o_returnedAudioError];
     if( !success )
     {
-        msg_Err( p_demux, "the audio capture device could not be added to capture session (%d)", [o_returnedAudioError code] );
+        msg_Err( p_demux, "the audio capture device could not be added to capture session (%ld)", [o_returnedAudioError code] );
         goto error;
     }
 
     success = [p_sys->session addOutput:p_sys->audiooutput error: &o_returnedAudioError];
     if( !success )
     {
-        msg_Err( p_demux, "audio output could not be added to capture session (%d)", [o_returnedAudioError code] );
+        msg_Err( p_demux, "audio output could not be added to capture session (%ld)", [o_returnedAudioError code] );
         goto error;
     }
 
