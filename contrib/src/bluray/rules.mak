@@ -20,7 +20,7 @@ libbluray: libbluray-0.2.1.tar.bz2 .sum-bluray
 	$(APPLY) $(SRC)/bluray/pkg-static.patch
 	$(MOVE)
 
-.libbluray: libbluray 
+.libbluray: libbluray
 	cd $< && ./bootstrap
 	cd $< && $(HOSTVARS) ./configure --disable-examples --disable-debug --disable-libxml2 $(HOSTCONF)
 	cd $< && $(MAKE) install
