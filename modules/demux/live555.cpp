@@ -165,6 +165,8 @@ typedef struct
     int64_t         i_pts;
     float           i_npt;
 
+    bool            b_selected;
+
 } live_track_t;
 
 struct timeout_thread_t
@@ -813,6 +815,7 @@ static int SessionsSetup( demux_t *p_demux )
             tk->b_rtcp_sync = false;
             tk->i_pts       = VLC_TS_INVALID;
             tk->i_npt       = 0.;
+            tk->b_selected  = true;
             tk->i_buffer    = 65536;
             tk->p_buffer    = (uint8_t *)malloc( 65536 );
             if( !tk->p_buffer )
@@ -1183,6 +1186,44 @@ static int Demux( demux_t *p_demux )
     for( i = 0; i < p_sys->i_track; i++ )
     {
         live_track_t *tk = p_sys->track[i];
+
+        if( tk->p_es )
+        {
+            bool b;
+            es_out_Control( p_demux->out, ES_OUT_GET_ES_STATE, tk->p_es, &b );
+            if( !b && tk->b_selected )
+            {
+                tk->b_selected = false;
+                p_sys->rtsp->sendTeardownCommand( *tk->sub, NULL );
+            }
+            else if( b && !tk->b_selected)
+            {
+                bool b_rtsp_tcp = var_GetBool( p_demux, "rtsp-tcp" ) ||
+                                  var_GetBool( p_demux, "rtsp-http" );
+                p_sys->rtsp->sendSetupCommand( *tk->sub, default_live555_callback, False,
+                                               toBool( b_rtsp_tcp ),
+                                               toBool( p_sys->b_force_mcast && !b_rtsp_tcp ) );
+                if( !wait_Live555_response( p_demux ) )
+                {
+                    msg_Err( p_demux, "SETUP of'%s/%s' failed %s",
+                             tk->sub->mediumName(), tk->sub->codecName(),
+                             p_sys->env->getResultMsg() );
+                }
+                else
+                {
+                    p_sys->rtsp->sendPlayCommand( *tk->sub, default_live555_callback, -1, -1, p_sys->ms->scale() );
+                    if( !wait_Live555_response(p_demux) )
+                    {
+                        msg_Err( p_demux, "RTSP PLAY failed %s", p_sys->env->getResultMsg() );
+                        p_sys->rtsp->sendTeardownCommand( *tk->sub, NULL );
+                    }
+                    else
+                        tk->b_selected = true;
+                }
+                if( !tk->b_selected )
+                    es_out_Control( p_demux->out, ES_OUT_SET_ES_STATE, tk->p_es, false );
+            }
+        }
 
         if( tk->b_asf || tk->b_muxed )
             b_send_pcr = false;
@@ -1919,12 +1960,10 @@ static void StreamClose( void *p_private )
     live_track_t   *tk = (live_track_t*)p_private;
     demux_t        *p_demux = tk->p_demux;
     demux_sys_t    *p_sys = p_demux->p_sys;
-
-    msg_Dbg( p_demux, "StreamClose" );
-
+    tk->b_selected = false;
+    msg_Dbg( p_demux, "RTSP track Close" );
     p_sys->event_rtsp = 0xff;
     p_sys->event_data = 0xff;
-    p_sys->b_error = true;
 }
 
 
