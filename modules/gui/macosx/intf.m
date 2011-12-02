@@ -636,7 +636,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     [[[NSWorkspace sharedWorkspace] notificationCenter] addObserver:self selector:@selector(computerWillSleep:)
            name:NSWorkspaceWillSleepNotification object:nil];
 
-    [NSThread detachNewThreadSelector:@selector(lookForCrashLog) toTarget:self withObject:nil];
+    [[VLCMain sharedInstance] performSelectorOnMainThread:@selector(lookForCrashLog) withObject:nil waitUntilDone:NO];
 }
 
 - (void)initStrings
