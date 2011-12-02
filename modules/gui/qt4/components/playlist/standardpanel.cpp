@@ -120,7 +120,7 @@ void StandardPLPanel::popupPlView( const QPoint &point )
     QModelIndexList list = selection->selectedIndexes();
 
     if( !model->popup( index, globalPoint, list ) )
-        QVLCMenu::PopupMenu( p_intf, true );
+        QVLCMenuManager::PopupMenu( p_intf, true );
 }
 
 void StandardPLPanel::popupSelectColumn( QPoint )

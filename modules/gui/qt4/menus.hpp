@@ -69,7 +69,7 @@ private:
     int i_val_type;
 };
 
-class QVLCMenu : public QObject
+class QVLCMenuManager : public QObject
 {
     Q_OBJECT
     friend class MenuFunc;
@@ -159,10 +159,10 @@ public:
     {
         switch( id )
         {
-            case 1: QVLCMenu::AudioMenu( p_intf, menu ); break;
-            case 2: QVLCMenu::VideoMenu( p_intf, menu ); break;
-            case 3: QVLCMenu::RebuildNavigMenu( p_intf, menu ); break;
-            case 4: QVLCMenu::ViewMenu( p_intf, menu ); break;
+            case 1: QVLCMenuManager::AudioMenu( p_intf, menu ); break;
+            case 2: QVLCMenuManager::VideoMenu( p_intf, menu ); break;
+            case 3: QVLCMenuManager::RebuildNavigMenu( p_intf, menu ); break;
+            case 4: QVLCMenuManager::ViewMenu( p_intf, menu ); break;
         }
     }
 private:

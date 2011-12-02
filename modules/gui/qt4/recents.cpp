@@ -103,7 +103,7 @@ void RecentsMRL::addRecent( const QString &mrl )
         if( stack->count() > RECENTS_LIST_SIZE )
             stack->takeLast();
     }
-    QVLCMenu::updateRecents( p_intf );
+    QVLCMenuManager::updateRecents( p_intf );
     save();
 }
 
@@ -113,7 +113,7 @@ void RecentsMRL::clear()
         return;
 
     stack->clear();
-    if( isActive ) QVLCMenu::updateRecents( p_intf );
+    if( isActive ) QVLCMenuManager::updateRecents( p_intf );
     save();
 }
 

@@ -85,7 +85,7 @@ enum
 
 static QActionGroup *currentGroup;
 
-QMenu *QVLCMenu::recentsMenu = NULL;
+QMenu *QVLCMenuManager::recentsMenu = NULL;
 
 /**
  * @brief Add static entries to DP in menus
@@ -303,7 +303,7 @@ static inline void addActionWithCheckbox( QMenu *_menu, QVariant val, QString ti
 /**
  * Main Menu Bar Creation
  **/
-void QVLCMenu::createMenuBar( MainInterface *mi,
+void QVLCMenuManager::createMenuBar( MainInterface *mi,
                               intf_thread_t *p_intf )
 {
     /* QMainWindows->menuBar()
@@ -331,7 +331,7 @@ void QVLCMenu::createMenuBar( MainInterface *mi,
  * Media ( File ) Menu
  * Opening, streaming and quit
  **/
-QMenu *QVLCMenu::FileMenu( intf_thread_t *p_intf, QWidget *parent, MainInterface *mi )
+QMenu *QVLCMenuManager::FileMenu( intf_thread_t *p_intf, QWidget *parent, MainInterface *mi )
 {
     QMenu *menu = new QMenu( parent );
     QAction *action;
@@ -395,7 +395,7 @@ QMenu *QVLCMenu::FileMenu( intf_thread_t *p_intf, QWidget *parent, MainInterface
 /**
  * Tools, like Media Information, Preferences or Messages
  **/
-QMenu *QVLCMenu::ToolsMenu( QMenu *menu )
+QMenu *QVLCMenuManager::ToolsMenu( QMenu *menu )
 {
     addDPStaticEntry( menu, qtr( "&Effects and Filters"), ":/menu/settings",
             SLOT( extendedDialog() ), "Ctrl+E" );
@@ -437,7 +437,7 @@ QMenu *QVLCMenu::ToolsMenu( QMenu *menu )
  * Interface modification, load other interfaces, activate Extensions
  * \param current, set to NULL for menu creation, else for menu update
  **/
-QMenu *QVLCMenu::ViewMenu( intf_thread_t *p_intf, QMenu *current, MainInterface *_mi )
+QMenu *QVLCMenuManager::ViewMenu( intf_thread_t *p_intf, QMenu *current, MainInterface *_mi )
 {
     QAction *action;
     QMenu *menu;
@@ -528,7 +528,7 @@ QMenu *QVLCMenu::ViewMenu( intf_thread_t *p_intf, QMenu *current, MainInterface 
 /**
  * Interface Sub-Menu, to list extras interface and skins
  **/
-QMenu *QVLCMenu::InterfacesMenu( intf_thread_t *p_intf, QMenu *current )
+QMenu *QVLCMenuManager::InterfacesMenu( intf_thread_t *p_intf, QMenu *current )
 {
     QVector<vlc_object_t *> objects;
     QVector<const char *> varnames;
@@ -541,7 +541,7 @@ QMenu *QVLCMenu::InterfacesMenu( intf_thread_t *p_intf, QMenu *current )
 /**
  * Extensions menu: populate the current menu with extensions
  **/
-void QVLCMenu::ExtensionsMenu( intf_thread_t *p_intf, QMenu *extMenu )
+void QVLCMenuManager::ExtensionsMenu( intf_thread_t *p_intf, QMenu *extMenu )
 {
     /* Get ExtensionsManager and load extensions if needed */
     ExtensionsManager *extMgr = ExtensionsManager::getInstance( p_intf );
@@ -580,7 +580,7 @@ static inline void VolumeEntries( intf_thread_t *p_intf, QMenu *current )
 /**
  * Main Audio Menu
  **/
-QMenu *QVLCMenu::AudioMenu( intf_thread_t *p_intf, QMenu * current )
+QMenu *QVLCMenuManager::AudioMenu( intf_thread_t *p_intf, QMenu * current )
 {
     QVector<vlc_object_t *> objects;
     QVector<const char *> varnames;
@@ -611,7 +611,7 @@ QMenu *QVLCMenu::AudioMenu( intf_thread_t *p_intf, QMenu * current )
 }
 
 /* Subtitles */
-QMenu *QVLCMenu::SubtitleMenu( QMenu *current )
+QMenu *QVLCMenuManager::SubtitleMenu( QMenu *current )
 {
     QAction *action;
     QMenu *submenu = new QMenu( qtr( "&Subtitles Track" ), current );
@@ -627,7 +627,7 @@ QMenu *QVLCMenu::SubtitleMenu( QMenu *current )
  * Main Video Menu
  * Subtitles are part of Video.
  **/
-QMenu *QVLCMenu::VideoMenu( intf_thread_t *p_intf, QMenu *current, bool b_subtitle )
+QMenu *QVLCMenuManager::VideoMenu( intf_thread_t *p_intf, QMenu *current, bool b_subtitle )
 {
     vout_thread_t *p_vout;
     input_thread_t *p_input;
@@ -684,7 +684,7 @@ QMenu *QVLCMenu::VideoMenu( intf_thread_t *p_intf, QMenu *current, bool b_subtit
  * Navigation Menu
  * For DVD, MP4, MOV and other chapter based format
  **/
-QMenu *QVLCMenu::NavigMenu( intf_thread_t *p_intf, QMenu *menu )
+QMenu *QVLCMenuManager::NavigMenu( intf_thread_t *p_intf, QMenu *menu )
 {
     QAction *action;
     QMenu *submenu;
@@ -712,7 +712,7 @@ QMenu *QVLCMenu::NavigMenu( intf_thread_t *p_intf, QMenu *menu )
     return RebuildNavigMenu( p_intf, menu );
 }
 
-QMenu *QVLCMenu::RebuildNavigMenu( intf_thread_t *p_intf, QMenu *menu )
+QMenu *QVLCMenuManager::RebuildNavigMenu( intf_thread_t *p_intf, QMenu *menu )
 {
     /* */
     input_thread_t *p_object;
@@ -739,7 +739,7 @@ QMenu *QVLCMenu::RebuildNavigMenu( intf_thread_t *p_intf, QMenu *menu )
 /**
  * Help/About Menu
 **/
-QMenu *QVLCMenu::HelpMenu( QWidget *parent )
+QMenu *QVLCMenuManager::HelpMenu( QWidget *parent )
 {
     QMenu *menu = new QMenu( parent );
     addDPStaticEntry( menu, qtr( "&Help..." ) ,
@@ -771,7 +771,7 @@ QMenu *QVLCMenu::HelpMenu( QWidget *parent )
     Populate( p_intf, menu, varnames, objects ); \
     menu->popup( QCursor::pos() ); \
 
-void QVLCMenu::PopupPlayEntries( QMenu *menu,
+void QVLCMenuManager::PopupPlayEntries( QMenu *menu,
                                         intf_thread_t *p_intf,
                                         input_thread_t *p_input )
 {
@@ -793,7 +793,7 @@ void QVLCMenu::PopupPlayEntries( QMenu *menu,
     }
 }
 
-void QVLCMenu::PopupMenuControlEntries( QMenu *menu, intf_thread_t *p_intf,
+void QVLCMenuManager::PopupMenuControlEntries( QMenu *menu, intf_thread_t *p_intf,
                                         bool b_normal )
 {
     QAction *action;
@@ -858,8 +858,7 @@ void QVLCMenu::PopupMenuControlEntries( QMenu *menu, intf_thread_t *p_intf,
     menu->addSeparator();
 }
 
-
-void QVLCMenu::PopupMenuPlaylistControlEntries( QMenu *menu,
+void QVLCMenuManager::PopupMenuPlaylistControlEntries( QMenu *menu,
                                                 intf_thread_t *p_intf )
 {
     bool bEnable = THEMIM->getInput() != NULL;
@@ -879,7 +878,7 @@ void QVLCMenu::PopupMenuPlaylistControlEntries( QMenu *menu,
     menu->addSeparator();
 }
 
-void QVLCMenu::PopupMenuStaticEntries( QMenu *menu )
+void QVLCMenuManager::PopupMenuStaticEntries( QMenu *menu )
 {
     QMenu *openmenu = new QMenu( qtr( "Open a Media" ), menu );
     addDPStaticEntry( openmenu, qtr( "&Open File..." ),
@@ -906,7 +905,7 @@ void QVLCMenu::PopupMenuStaticEntries( QMenu *menu )
 }
 
 /* Video Tracks and Subtitles tracks */
-void QVLCMenu::VideoPopupMenu( intf_thread_t *p_intf, bool show )
+void QVLCMenuManager::VideoPopupMenu( intf_thread_t *p_intf, bool show )
 {
     POPUP_BOILERPLATE
     if( p_input )
@@ -922,7 +921,7 @@ void QVLCMenu::VideoPopupMenu( intf_thread_t *p_intf, bool show )
 }
 
 /* Audio Tracks */
-void QVLCMenu::AudioPopupMenu( intf_thread_t *p_intf, bool show )
+void QVLCMenuManager::AudioPopupMenu( intf_thread_t *p_intf, bool show )
 {
     POPUP_BOILERPLATE
     if( p_input )
@@ -936,7 +935,7 @@ void QVLCMenu::AudioPopupMenu( intf_thread_t *p_intf, bool show )
 }
 
 /* Navigation stuff, and general menus ( open ), used only for skins */
-void QVLCMenu::MiscPopupMenu( intf_thread_t *p_intf, bool show )
+void QVLCMenuManager::MiscPopupMenu( intf_thread_t *p_intf, bool show )
 {
     POPUP_BOILERPLATE
 
@@ -964,7 +963,7 @@ void QVLCMenu::MiscPopupMenu( intf_thread_t *p_intf, bool show )
 }
 
 /* Main Menu that sticks everything together  */
-void QVLCMenu::PopupMenu( intf_thread_t *p_intf, bool show )
+void QVLCMenuManager::PopupMenu( intf_thread_t *p_intf, bool show )
 {
     POPUP_BOILERPLATE
 
@@ -1092,7 +1091,7 @@ void QVLCMenu::PopupMenu( intf_thread_t *p_intf, bool show )
  * Systray Menu                                                         *
  ************************************************************************/
 
-void QVLCMenu::updateSystrayMenu( MainInterface *mi,
+void QVLCMenuManager::updateSystrayMenu( MainInterface *mi,
                                   intf_thread_t *p_intf,
                                   bool b_force_visible )
 {
@@ -1140,7 +1139,7 @@ void QVLCMenu::updateSystrayMenu( MainInterface *mi,
 /*************************************************************************
  * Builders for automenus
  *************************************************************************/
-QMenu * QVLCMenu::Populate( intf_thread_t *p_intf,
+QMenu * QVLCMenuManager::Populate( intf_thread_t *p_intf,
                             QMenu *current,
                             QVector< const char *> & varnames,
                             QVector<vlc_object_t *> & objects )
@@ -1213,7 +1212,7 @@ static bool IsMenuEmpty( const char *psz_var,
 
 #define TEXT_OR_VAR qfu ( text.psz_string ? text.psz_string : psz_var )
 
-void QVLCMenu::UpdateItem( intf_thread_t *p_intf, QMenu *menu,
+void QVLCMenuManager::UpdateItem( intf_thread_t *p_intf, QMenu *menu,
         const char *psz_var, vlc_object_t *p_object, bool b_submenu )
 {
     vlc_value_t val, text;
@@ -1348,7 +1347,7 @@ static bool CheckTitle( vlc_object_t *p_object, const char *psz_var )
 }
 
 
-int QVLCMenu::CreateChoicesMenu( QMenu *submenu, const char *psz_var,
+int QVLCMenuManager::CreateChoicesMenu( QMenu *submenu, const char *psz_var,
         vlc_object_t *p_object, bool b_root )
 {
     vlc_value_t val, val_list, text_list;
@@ -1444,7 +1443,7 @@ int QVLCMenu::CreateChoicesMenu( QMenu *submenu, const char *psz_var,
     return submenu->isEmpty() ? VLC_EGENERIC : VLC_SUCCESS;
 }
 
-void QVLCMenu::CreateAndConnect( QMenu *menu, const char *psz_var,
+void QVLCMenuManager::CreateAndConnect( QMenu *menu, const char *psz_var,
         const QString& text, const QString& help,
         int i_item_type, vlc_object_t *p_obj,
         vlc_value_t val, int i_val_type,
@@ -1491,7 +1490,7 @@ void QVLCMenu::CreateAndConnect( QMenu *menu, const char *psz_var,
         menu->addAction( action );
 }
 
-void QVLCMenu::DoAction( QObject *data )
+void QVLCMenuManager::DoAction( QObject *data )
 {
     MenuItemData *itemData = qobject_cast<MenuItemData *>( data );
     vlc_object_t *p_object = itemData->p_obj;
@@ -1505,7 +1504,7 @@ void QVLCMenu::DoAction( QObject *data )
     var_Set( p_object, itemData->psz_var, itemData->val );
 }
 
-void QVLCMenu::updateRecents( intf_thread_t *p_intf )
+void QVLCMenuManager::updateRecents( intf_thread_t *p_intf )
 {
     if( recentsMenu )
     {
