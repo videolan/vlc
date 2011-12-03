@@ -911,9 +911,10 @@ Equalizer::Equalizer( intf_thread_t *_p_intf, QWidget *_parent ) :
         bands[i] = new QSlider( Qt::Vertical );
         bands[i]->setMaximum( 400 );
         bands[i]->setValue( 200 );
+        bands[i]->setMinimumWidth(34);
         CONNECT( bands[i], valueChanged( int ), this, setCoreBands() );
 
-        band_texts[i] = new QLabel( band_frequencies[i] + "\n0.0dB" );
+        band_texts[i] = new QLabel( band_frequencies[i] + "\n00.0dB" );
         band_texts[i]->setFont( smallFont );
 
         grid->addWidget( bands[i], 0, i );
