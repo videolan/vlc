@@ -754,7 +754,14 @@ static OMX_ERRORTYPE InitialiseComponent(decoder_t *p_dec,
     OMX_INIT_STRUCTURE(definition);
     omx_error = OMX_GetParameter(omx_handle, p_dec->fmt_in.i_cat == VIDEO_ES ?
                                  OMX_IndexParamVideoInit : OMX_IndexParamAudioInit, &param);
-    if(omx_error != OMX_ErrorNone) param.nPorts = 0;
+    if(omx_error != OMX_ErrorNone) {
+#ifdef __ANDROID__
+        param.nPorts = 2;
+        param.nStartPortNumber = 0;
+#else
+        param.nPorts = 0;
+#endif
+    }
 
     for(i = 0; i < param.nPorts; i++)
     {
