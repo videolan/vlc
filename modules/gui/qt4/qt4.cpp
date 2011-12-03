@@ -235,7 +235,7 @@ vlc_module_begin ()
                  UPDATER_DAYS_TEXT, false )
 #endif
 
-    add_bool( "qt-autosave-volume", false, SAVEVOL_TEXT,
+    add_bool( "qt-autosave-volume", true, SAVEVOL_TEXT,
               SAVEVOL_TEXT, true )
 #ifdef WIN32
     add_bool( "qt-disable-volume-keys"             /* name */,
