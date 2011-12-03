@@ -39,7 +39,7 @@ description=
     vlc -I cli --lua-config "cli={hosts={'*console','localhost:4212','telnet://localhost:5678'}}"
 
  Note:
-    -I cli and -I luacli are aliases for -I lua --lua-intf cli
+    -I cli and -I luacli are aliases for -I luaintf --lua-intf cli
 
  Configuration options setable throught the --lua-config option are:
     * hosts: A list of hosts to listen on.

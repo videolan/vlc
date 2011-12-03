@@ -22,7 +22,7 @@ dumpmeta.lua: dump a file's meta data on stdout/stderr
 --]==========================================================================]
 
 --[[ to dump meta data information in the debug output, run:
-       vlc -I lua --lua-intf dumpmeta coolmusic.mp3
+       vlc -I luaintf --lua-intf dumpmeta coolmusic.mp3
      Additional options can improve performance and output readability:
        -V dummy -A dummy --no-video-title --no-media-library --verbose-objects +lua,-all -v=0
 --]]
