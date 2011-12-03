@@ -60,8 +60,7 @@ enum {
     RecordingEvent_Type,
     ProgramChanged_Type,
     RandomChanged_Type,
-    LoopChanged_Type,
-    RepeatChanged_Type,
+    LoopOrRepeatChanged_Type,
     LeafToParent_Type,
     EPGEvent_Type,
 /*    SignalChanged_Type, */
