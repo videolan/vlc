@@ -62,6 +62,93 @@ static inline void luaL_register_submodule( lua_State *L, const char *psz_name,
     lua_setfield( L, -2, psz_name );
 }
 
+static char *MakeConfig( intf_thread_t *p_intf, const char *name )
+{
+    char *psz_config = NULL;
+
+    if( !strcmp( name, "http" ) )
+    {
+        char *psz_http_src = var_CreateGetNonEmptyString( p_intf, "http-src" );
+        bool b_http_index = var_CreateGetBool( p_intf, "http-index" );
+        if( psz_http_src )
+        {
+            char *psz_esc = config_StringEscape( psz_http_src );
+            if( psz_config )
+            {
+                char *psz_tmp;
+                asprintf( &psz_tmp, "%s,dir='%s'", psz_config, psz_esc );
+                free( psz_config );
+                psz_config = psz_tmp;
+            }
+            else
+                asprintf( &psz_config, "http={dir='%s'", psz_esc );
+            free( psz_esc );
+            free( psz_http_src );
+        }
+        if( psz_config )
+        {
+            char *psz_tmp;
+            asprintf( &psz_tmp, "%s,no_index=%s}", psz_config, b_http_index ? "true" : "false" );
+            free( psz_config );
+            psz_config = psz_tmp;
+        }
+        else
+            asprintf( &psz_config, "http={no_index=%s}", b_http_index ? "true" : "false" );
+    }
+    else if( !strcmp( name, "telnet" ) )
+    {
+        char *psz_telnet_host = var_CreateGetString( p_intf, "telnet-host" );
+        if( !strcmp( psz_telnet_host, "*console" ) )
+            ;
+        else
+        {
+            vlc_url_t url;
+            vlc_UrlParse( &url, psz_telnet_host, 0 );
+            int i_telnet_port = var_CreateGetInteger( p_intf, "telnet-port" );
+            if ( url.i_port != 0 )
+            {
+                if ( i_telnet_port == TELNETPORT_DEFAULT )
+                    i_telnet_port = url.i_port;
+                else if ( url.i_port != i_telnet_port )
+                    msg_Warn( p_intf, "ignoring port %d (using %d)", url.i_port, i_telnet_port );
+            }
+
+            char *psz_esc_host = config_StringEscape( url.psz_host );
+            free( psz_telnet_host );
+            vlc_UrlClean( &url );
+
+            asprintf( &psz_telnet_host, "telnet://%s:%d", psz_esc_host ? psz_esc_host : "", i_telnet_port );
+            free( psz_esc_host );
+        }
+
+        char *psz_telnet_passwd = var_CreateGetString( p_intf, "telnet-password" );
+
+        char *psz_esc_passwd = config_StringEscape( psz_telnet_passwd );
+
+        asprintf( &psz_config, "telnet={host='%s',password='%s'}", psz_telnet_host, psz_esc_passwd );
+
+        free( psz_esc_passwd );
+        free( psz_telnet_passwd );
+        free( psz_telnet_host );
+    }
+    else if( !strcmp( name, "cli" ) )
+    {
+        char *psz_rc_host = var_CreateGetNonEmptyString( p_intf, "rc-host" );
+        if( !psz_rc_host )
+            psz_rc_host = var_CreateGetNonEmptyString( p_intf, "cli-host" );
+        if( psz_rc_host )
+        {
+            char *psz_esc_host = config_StringEscape( psz_rc_host );
+            asprintf( &psz_config, "cli={host='%s'}", psz_esc_host );
+
+            free( psz_esc_host );
+            free( psz_rc_host );
+        }
+    }
+
+    return psz_config;
+}
+
 static char *StripPasswords( const char *psz_config )
 {
     unsigned n = 0;
@@ -123,9 +210,6 @@ static int Start_LuaIntf( vlc_object_t *p_this, const char *name )
     lua_State *L;
 
     config_ChainParse( p_intf, "lua-", ppsz_intf_options, p_intf->p_cfg );
-
-    char *psz_config;
-    bool b_config_set = false;
 
     if( name == NULL )
     {
@@ -210,89 +294,10 @@ static int Start_LuaIntf( vlc_object_t *p_this, const char *name )
      * If the string is empty, try with the old http-* or telnet-* options
      * and build the right configuration line
      */
-    psz_config = var_CreateGetNonEmptyString( p_intf, "lua-config" );
+    bool b_config_set = false;
+    char *psz_config = var_InheritString( p_intf, "lua-config" );
     if( !psz_config )
-    {
-        if( !strcmp( name, "http" ) )
-        {
-            char *psz_http_src = var_CreateGetNonEmptyString( p_intf, "http-src" );
-            bool b_http_index = var_CreateGetBool( p_intf, "http-index" );
-            if( psz_http_src )
-            {
-                char *psz_esc = config_StringEscape( psz_http_src );
-                if( psz_config )
-                {
-                    char *psz_tmp;
-                    asprintf( &psz_tmp, "%s,dir='%s'", psz_config, psz_esc );
-                    free( psz_config );
-                    psz_config = psz_tmp;
-                }
-                else
-                    asprintf( &psz_config, "http={dir='%s'", psz_esc );
-                free( psz_esc );
-                free( psz_http_src );
-            }
-            if( psz_config )
-            {
-                char *psz_tmp;
-                asprintf( &psz_tmp, "%s,no_index=%s}", psz_config, b_http_index ? "true" : "false" );
-                free( psz_config );
-                psz_config = psz_tmp;
-            }
-            else
-                asprintf( &psz_config, "http={no_index=%s}", b_http_index ? "true" : "false" );
-        }
-        else if( !strcmp( name, "telnet" ) )
-        {
-            char *psz_telnet_host = var_CreateGetString( p_intf, "telnet-host" );
-            if( !strcmp( psz_telnet_host, "*console" ) )
-                ;
-            else
-            {
-                vlc_url_t url;
-                vlc_UrlParse( &url, psz_telnet_host, 0 );
-                int i_telnet_port = var_CreateGetInteger( p_intf, "telnet-port" );
-                if ( url.i_port != 0 )
-                {
-                    if ( i_telnet_port == TELNETPORT_DEFAULT )
-                        i_telnet_port = url.i_port;
-                    else if ( url.i_port != i_telnet_port )
-                        msg_Warn( p_intf, "ignoring port %d (using %d)", url.i_port, i_telnet_port );
-                }
-
-                char *psz_esc_host = config_StringEscape( url.psz_host );
-                free( psz_telnet_host );
-                vlc_UrlClean( &url );
-
-                asprintf( &psz_telnet_host, "telnet://%s:%d", psz_esc_host ? psz_esc_host : "", i_telnet_port );
-                free( psz_esc_host );
-            }
-
-            char *psz_telnet_passwd = var_CreateGetString( p_intf, "telnet-password" );
-
-            char *psz_esc_passwd = config_StringEscape( psz_telnet_passwd );
-
-            asprintf( &psz_config, "telnet={host='%s',password='%s'}", psz_telnet_host, psz_esc_passwd );
-
-            free( psz_esc_passwd );
-            free( psz_telnet_passwd );
-            free( psz_telnet_host );
-        }
-        else if( !strcmp( name, "cli" ) )
-        {
-            char *psz_rc_host = var_CreateGetNonEmptyString( p_intf, "rc-host" );
-            if( !psz_rc_host )
-                psz_rc_host = var_CreateGetNonEmptyString( p_intf, "cli-host" );
-            if( psz_rc_host )
-            {
-                char *psz_esc_host = config_StringEscape( psz_rc_host );
-                asprintf( &psz_config, "cli={host='%s'}", psz_esc_host );
-
-                free( psz_esc_host );
-                free( psz_rc_host );
-            }
-        }
-    }
+        psz_config = MakeConfig( p_intf, name );
 
     if( psz_config )
     {
