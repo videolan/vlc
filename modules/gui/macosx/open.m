@@ -53,7 +53,7 @@
 NSArray               *qtkvideoDevices;
 #define setEyeTVUnconnected \
 [o_capture_lbl setStringValue: _NS("No device is selected")]; \
-[o_capture_long_lbl setStringValue: _NS("Any device is not selected.\n\nChose abailable device in above pull-down menu\n.")]; \
+[o_capture_long_lbl setStringValue: _NS("No device is selected.\n\nChoose available device in above pull-down menu\n.")]; \
 [o_capture_lbl displayIfNeeded]; \
 [o_capture_long_lbl displayIfNeeded]; \
 [self showCaptureView: o_capture_label_view]
