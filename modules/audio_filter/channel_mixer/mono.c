@@ -87,8 +87,7 @@ struct filter_sys_t
 
 #define MONO_CHANNEL_TEXT N_("Select channel to keep")
 #define MONO_CHANNEL_LONGTEXT N_("This option silences all other channels " \
-    "except the selected channel. Choose one from (0=left, 1=right, " \
-    "2=rear left, 3=rear right, 4=center, 5=left front)")
+    "except the selected channel.")
 
 static const int pi_pos_values[] = { 0, 1, 2, 4, 8, 5 };
 static const char *const ppsz_pos_descriptions[] =
