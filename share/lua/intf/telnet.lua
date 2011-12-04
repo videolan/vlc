@@ -45,5 +45,8 @@ else
     end
 end
 
+--[[ Launch vlm ]]
+vlm = vlc.vlm()
+
 dofile(wrapped_file)
 

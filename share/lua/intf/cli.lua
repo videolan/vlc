@@ -283,6 +283,12 @@ function services_discovery(name,client,arg)
     end
 end
 
+function load_vlm(name, client, value)
+    if vlm == nil then
+        vlm = vlc.vlm()
+    end
+end
+
 function print_text(label,text)
     return function(name,client)
         client:append("+----[ "..label.." ]")
@@ -296,7 +302,7 @@ function print_text(label,text)
 end
 
 function help(name,client,arg)
-    if arg == nil then
+    if arg == nil and vlm ~= nil then
         client:append("+----[ VLM commands ]")
         local message, vlc_err = vlm:execute_command("help")
         vlm_message_to_string( client, message, "|" )
@@ -576,6 +582,7 @@ commands_ordered = {
     { "hotkey"; { func = hotkey; args = "[hotkey name]"; help = "simulate hotkey press"; adv = true; aliases = { "key" } } };
     { "menu"; { func = menu; args = "[on|off|up|down|left|right|select]"; help = "use menu"; adv = true } };
     { "" };
+    { "vlm"; { func = load_vlm; help = "load the VLM" } };
     { "set"; { func = set_env; args = "[var [value]]"; help = "set/get env var"; adv = true } };
     { "save_env"; { func = save_env; help = "save env vars (for future clients)"; adv = true } };
     { "alias"; { func = skip(alias); args = "[cmd]"; help = "set/get command aliases"; adv = true } };
@@ -654,6 +661,9 @@ function call_command(cmd,client,arg)
 end
 
 function call_vlm_command(cmd,client,arg)
+    if vlm == nil then
+        return -1
+    end
     if arg ~= nil then
         cmd = cmd.." "..arg
     end
@@ -782,9 +792,6 @@ h.status_callbacks[host.status.write] = on_write
 
 h:listen( config.hosts or config.host or "*console" )
 password = config.password or "admin"
-
---[[ Launch vlm ]]
-vlm = vlc.vlm()
 
 --[[ The main loop ]]
 while not vlc.misc.should_die() do
