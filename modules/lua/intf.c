@@ -73,24 +73,9 @@ static char *MakeConfig( intf_thread_t *p_intf, const char *name )
         if( psz_http_src )
         {
             char *psz_esc = config_StringEscape( psz_http_src );
-            if( psz_config )
-            {
-                char *psz_tmp;
-                asprintf( &psz_tmp, "%s,dir='%s'", psz_config, psz_esc );
-                free( psz_config );
-                psz_config = psz_tmp;
-            }
-            else
-                asprintf( &psz_config, "http={dir='%s'", psz_esc );
+            asprintf( &psz_config, "http={dir='%s',no_index=%s}", psz_esc, b_http_index ? "true" : "false" );
             free( psz_esc );
             free( psz_http_src );
-        }
-        if( psz_config )
-        {
-            char *psz_tmp;
-            asprintf( &psz_tmp, "%s,no_index=%s}", psz_config, b_http_index ? "true" : "false" );
-            free( psz_config );
-            psz_config = psz_tmp;
         }
         else
             asprintf( &psz_config, "http={no_index=%s}", b_http_index ? "true" : "false" );
