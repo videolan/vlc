@@ -4,7 +4,7 @@ YASM_VERSION=1.2.0
 #YASM_URL=$(CONTRIB_VIDEOLAN)/yasm-$(YASM_VERSION).tar.gz
 YASM_URL=http://www.tortall.net/projects/yasm/releases/yasm-$(YASM_VERSION).tar.gz
 
-CMAKE_VERSION=2.8.3
+CMAKE_VERSION=2.8.6
 CMAKE_URL=http://www.cmake.org/files/v2.8/cmake-$(CMAKE_VERSION).tar.gz
 
 LIBTOOL_VERSION=2.2.10
@@ -16,7 +16,7 @@ AUTOCONF_URL=$(GNU)/autoconf/autoconf-$(AUTOCONF_VERSION).tar.bz2
 AUTOMAKE_VERSION=1.11.1
 AUTOMAKE_URL=$(GNU)/automake/automake-$(AUTOMAKE_VERSION).tar.gz
 
-PKGCFG_VERSION=0.23
+PKGCFG_VERSION=0.26
 #PKGCFG_URL=http://downloads.videolan.org/pub/videolan/testing/contrib/pkg-config-$(PKGCFG_VERSION).tar.gz
 PKGCFG_URL=http://pkgconfig.freedesktop.org/releases/pkg-config-$(PKGCFG_VERSION).tar.gz
 
