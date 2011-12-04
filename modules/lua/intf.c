@@ -36,7 +36,6 @@
 #include <vlc_interface.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <assert.h>
 
 #include <lua.h>        /* Low level lua C API */
 #include <lauxlib.h>    /* Higher level C API */
@@ -123,15 +122,29 @@ static int Start_LuaIntf( vlc_object_t *p_this, const char *name )
     intf_sys_t *p_sys;
     lua_State *L;
 
-    assert( name != NULL );
     config_ChainParse( p_intf, "lua-", ppsz_intf_options, p_intf->p_cfg );
 
     char *psz_config;
     bool b_config_set = false;
 
+    if( name == NULL )
+    {
+        char *n = var_InheritString( p_this, "lua-intf" );
+        if( unlikely(n == NULL) )
+            return VLC_EGENERIC;
+        name = p_intf->psz_header = n;
+    }
+    else
+        /* Cleaned up by vlc_object_release() */
+        p_intf->psz_header = strdup( name );
+
     p_intf->p_sys = (intf_sys_t*)malloc( sizeof(intf_sys_t) );
     if( !p_intf->p_sys )
+    {
+        free( p_intf->psz_header );
+        p_intf->psz_header = NULL;
         return VLC_ENOMEM;
+    }
     p_sys = p_intf->p_sys;
     p_sys->psz_filename = vlclua_find_file( p_this, "intf", name );
     if( !p_sys->psz_filename )
@@ -350,17 +363,12 @@ static int Start_LuaIntf( vlc_object_t *p_this, const char *name )
 
     p_sys->L = L;
 
-    /* Cleaned up by vlc_object_release() */
-    p_intf->psz_header = strdup( name );
-
     vlc_mutex_init( &p_sys->lock );
     vlc_cond_init( &p_sys->wait );
     p_sys->exiting = false;
 
     if( vlc_clone( &p_sys->thread, Run, p_intf, VLC_THREAD_PRIORITY_LOW ) )
     {
-        free( p_intf->psz_header );
-        p_intf->psz_header = NULL;
         vlc_cond_destroy( &p_sys->wait );
         vlc_mutex_destroy( &p_sys->lock );
         lua_close( p_sys->L );
@@ -371,6 +379,8 @@ static int Start_LuaIntf( vlc_object_t *p_this, const char *name )
 error:
     free( p_sys->psz_filename );
     free( p_sys );
+    free( p_intf->psz_header );
+    p_intf->psz_header = NULL;
     return VLC_EGENERIC;
 }
 
@@ -412,13 +422,7 @@ static void *Run( void *data )
 
 int Open_LuaIntf( vlc_object_t *p_this )
 {
-    char *name = var_InheritString( p_this, "lua-intf" );
-    if( unlikely(name == NULL) )
-        return VLC_EGENERIC;
-
-    int ret = Start_LuaIntf( p_this, name );
-    free( name );
-    return ret;
+    return Start_LuaIntf( p_this, NULL );
 }
 
 int Open_LuaHTTP( vlc_object_t *p_this )
