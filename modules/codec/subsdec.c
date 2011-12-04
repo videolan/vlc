@@ -246,36 +246,36 @@ static int OpenDecoder( vlc_object_t *p_this )
     p_sys->iconv_handle = (vlc_iconv_t)-1;
     p_sys->b_autodetect_utf8 = false;
 
-    char *psz_charset = NULL;
+    const char *encoding;
+    char *var = NULL;
 
     /* First try demux-specified encoding */
     if( p_dec->fmt_in.i_codec == VLC_CODEC_ITU_T140 )
-        psz_charset = strdup( "UTF-8" ); /* IUT T.140 is always using UTF-8 */
+        encoding = "UTF-8"; /* IUT T.140 is always using UTF-8 */
     else
     if( p_dec->fmt_in.subs.psz_encoding && *p_dec->fmt_in.subs.psz_encoding )
     {
-        psz_charset = strdup (p_dec->fmt_in.subs.psz_encoding);
+        encoding = p_dec->fmt_in.subs.psz_encoding;
         msg_Dbg (p_dec, "trying demuxer-specified character encoding: %s",
-                 p_dec->fmt_in.subs.psz_encoding ?
-                 p_dec->fmt_in.subs.psz_encoding : "not specified");
+                 encoding);
     }
-
+    else
     /* Second, try configured encoding */
-    if (psz_charset == NULL)
+    if ((var = var_InheritString (p_dec, "subsdec-encoding")) != NULL)
     {
-        psz_charset = var_InheritString (p_dec, "subsdec-encoding");
-        msg_Dbg (p_dec, "trying configured character encoding: %s",
-                 psz_charset ? psz_charset : "not specified");
-        if (psz_charset != NULL && !strcmp (psz_charset, "system"))
+        msg_Dbg (p_dec, "trying configured character encoding: %s", var);
+        if (!strcmp (var, "system"))
         {
-            free (psz_charset);
-            psz_charset = strdup ("");
+            free (var);
+            var = NULL;
+            encoding = "";
             /* ^ iconv() treats "" as nl_langinfo(CODESET) */
         }
+        else
+            encoding = var;
     }
-
+    else
     /* Third, try "local" encoding with optional UTF-8 autodetection */
-    if (psz_charset == NULL)
     {
         /* xgettext:
            The Windows ANSI code page most commonly used for this language.
@@ -287,12 +287,8 @@ static int OpenDecoder( vlc_object_t *p_this )
 
            This MUST be a valid iconv character set. If unsure, please refer
            the VideoLAN translators mailing list. */
-        const char *acp = vlc_pgettext("GetACP", "CP1252");
-
-        psz_charset = strdup (acp);
-        msg_Dbg (p_dec, "trying default character encoding: %s",
-                 psz_charset ? psz_charset : "not specified");
-
+        encoding = vlc_pgettext("GetACP", "CP1252");
+        msg_Dbg (p_dec, "trying default character encoding: %s", encoding);
         if (var_InheritBool (p_dec, "subsdec-autodetect-utf8"))
         {
             msg_Dbg (p_dec, "using automatic UTF-8 detection");
@@ -300,22 +296,13 @@ static int OpenDecoder( vlc_object_t *p_this )
         }
     }
 
-    /* Forth, don't do character decoding, i.e. assume UTF-8 */
-    if (psz_charset == NULL)
+    if (strcasecmp (encoding, "UTF-8") && strcasecmp (encoding, "utf8"))
     {
-        psz_charset = strdup ("UTF-8");
-        msg_Dbg (p_dec, "using UTF-8 character encoding" );
-    }
-
-    if ((psz_charset != NULL)
-     && strcasecmp (psz_charset, "UTF-8")
-     && strcasecmp (psz_charset, "utf8"))
-    {
-        p_sys->iconv_handle = vlc_iconv_open ("UTF-8", psz_charset);
+        p_sys->iconv_handle = vlc_iconv_open ("UTF-8", encoding);
         if (p_sys->iconv_handle == (vlc_iconv_t)(-1))
-            msg_Err (p_dec, "cannot convert from %s: %m", psz_charset);
+            msg_Err (p_dec, "cannot convert from %s: %m", encoding);
     }
-    free (psz_charset);
+    free (var);
 
     p_sys->i_align = var_InheritInteger( p_dec, "subsdec-align" );
 
