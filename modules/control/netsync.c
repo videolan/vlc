@@ -55,13 +55,13 @@ static int  Open (vlc_object_t *);
 static void Close(vlc_object_t *);
 
 #define NETSYNC_TEXT N_("Network master clock")
-#define NETSYNC_LONGTEXT N_("When set then " \
-  "This VLC instance shall dictate its clock for synchronization " \
-  "over clients listening on the masters network ip address")
+#define NETSYNC_LONGTEXT N_("When set, " \
+  "this VLC instance will act as the master clock for synchronization " \
+  "for clients listening")
 
 #define MIP_TEXT N_("Master server ip address")
 #define MIP_LONGTEXT N_("The IP address of " \
-  "The network master clock to use for clock synchronization.")
+  "the network master clock to use for clock synchronization.")
 
 #define NETSYNC_TIMEOUT_TEXT N_("UDP timeout (in ms)")
 #define NETSYNC_TIMEOUT_LONGTEXT N_("Length of time (in ms) " \

@@ -201,7 +201,7 @@ static const char *const ppsz_snap_formats[] =
 #define VERBOSE_OBJECTS_TEXT N_("Choose which objects should print debug " \
     "message")
 #define VERBOSE_OBJECTS_LONGTEXT N_( \
-    "This is a ',' separated string, each objects should be prefixed by " \
+    "This is a ',' separated string, each object should be prefixed by " \
     "a '+' or a '-' to respectively enable or disable it. The keyword " \
     "'all' refers to all objects. Objects can be referred to by their " \
     "type or module name. Rules applying to named objects take precedence " \

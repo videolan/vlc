@@ -149,7 +149,7 @@ static const char *enc_filtering_list_text[] = {
   N_("Gaussian Low Pass Filter"),
   N_("Add Noise"),
   N_("Gaussian Adaptive Low Pass Filter"),
-  N_("Low Pass Ffilter"),
+  N_("Low Pass Filter"),
 };
 
 #define ENC_PREFILTER_STRENGTH "filter-value"
