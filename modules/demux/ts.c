@@ -2025,7 +2025,7 @@ static int Seek( demux_t *p_demux, double f_percent )
         i_head_pos = p_sys->p_pos[i-1];
         i_tail_pos = ( i < p_sys->i_pcrs_num ) ?  p_sys->p_pos[i] : stream_Size( p_demux->s );
     }
-    msg_Dbg( p_demux, "Seek():i_head_pos:%lld, i_tail_pos:%lld", i_head_pos, i_tail_pos);
+    msg_Dbg( p_demux, "Seek():i_head_pos:%"PRId64", i_tail_pos:%"PRId64, i_head_pos, i_tail_pos);
 
     bool b_found = false;
     int i_cnt = 0;
@@ -2125,7 +2125,7 @@ static void GetLastPCR( demux_t *p_demux )
         const int64_t TS_SUPPOSED_MINRATE = 0.5 * 1000 * 1000; //FIXME
         if( i_rate < TS_SUPPOSED_MINRATE || i_rate > TS_SUPPOSED_MAXRATE )
         {
-            msg_Dbg( p_demux, "calculated bitrate (%lldbit/s) is too low or too high. min bitrate (%lldbit/s) max bitrate (%lldbit/s)",
+            msg_Dbg( p_demux, "calculated bitrate (%"PRId64"bit/s) is too low or too high. min bitrate (%lldbit/s) max bitrate (%lldbit/s)",
                      i_rate, TS_SUPPOSED_MINRATE, TS_SUPPOSED_MAXRATE );
             p_sys->i_last_pcr = -1;
         }
