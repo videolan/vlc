@@ -59,7 +59,7 @@ Example use:
         end
     end
 
-For complete examples see existing VLC Lua interface modules (ie telnet.lua)
+For complete examples see existing VLC Lua interface modules (ie cli.lua)
 --]==========================================================================]
 
 module("host",package.seeall)
