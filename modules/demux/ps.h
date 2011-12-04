@@ -584,8 +584,8 @@ static inline int ps_psm_fill( ps_psm_t *p_psm, block_t *p_pkt,
     i_length = (uint16_t)(p_buffer[4] << 8) + p_buffer[5] + 6;
     if( i_length > i_buffer ) return VLC_EGENERIC;
 
-    //i_current_next_indicator = (p_buffer[6] && 0x01);
-    i_version = (p_buffer[6] && 0xf8);
+    //i_current_next_indicator = (p_buffer[6] & 0x01);
+    i_version = (p_buffer[6] & 0xf8);
 
     if( p_psm->i_version == i_version ) return VLC_EGENERIC;
 
