@@ -127,7 +127,7 @@ static const char *enc_gop_structure_list_text[] = {
 
 #define ENC_AU_DISTANCE "gop-length"
 #define ENC_AU_DISTANCE_TEXT N_("GOP length")
-#define ENC_AU_DISTANCE_LONGTEXT N_("Number of pictures between successive sequenence headers i.e. length of the group of pictures")
+#define ENC_AU_DISTANCE_LONGTEXT N_("Number of pictures between successive sequence headers i.e. length of the group of pictures")
 
 
 #define ENC_PREFILTER "filtering"

@@ -31,7 +31,7 @@
 
 #define SRC_CONV_TYPE_TEXT N_("Sample rate converter type")
 #define SRC_CONV_TYPE_LONGTEXT N_( \
-    "Different resampling algorithm are supported. " \
+    "Different resampling algorithms are supported. " \
     "The best one is slower, while the fast one exhibits low quality.")
 static const int conv_type_values[] = {
     SRC_SINC_BEST_QUALITY, SRC_SINC_MEDIUM_QUALITY, SRC_SINC_FASTEST,

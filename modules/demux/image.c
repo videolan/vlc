@@ -57,9 +57,9 @@ static void Close(vlc_object_t *);
     "If non empty and image-decode is true, the image will be " \
     "converted to the specified chroma.")
 
-#define DURATION_TEXT N_("Duration in second")
+#define DURATION_TEXT N_("Duration in seconds")
 #define DURATION_LONGTEXT N_( \
-    "Duration in second before simulating an end of file. " \
+    "Duration in seconds before simulating an end of file. " \
     "A negative value means an unlimited play time.")
 
 #define FPS_TEXT N_("Frame rate")

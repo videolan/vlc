@@ -141,7 +141,7 @@ static void Close ( vlc_object_t * );
 #define SEEK_PERCENT_TEXT N_("Seek based on percent not time")
 #define SEEK_PERCENT_LONGTEXT N_( \
     "Seek and position based on a percent byte position, not a PCR generated " \
-    "time position. If seeking doesn't work propery, turn on this option." )
+    "time position. If seeking doesn't work property, turn on this option." )
 
 
 vlc_module_begin ()
