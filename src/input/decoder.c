@@ -2337,7 +2337,7 @@ static picture_t *vout_new_buffer( decoder_t *p_dec )
         if( vlc_fourcc_IsYUV( fmt.i_chroma ) )
         {
             const vlc_chroma_description_t *dsc = vlc_fourcc_GetChromaDescription( fmt.i_chroma );
-            for( int i = 0; dsc && i < dsc->plane_count; i++ )
+            for( unsigned int i = 0; dsc && i < dsc->plane_count; i++ )
             {
                 while( fmt.i_width % dsc->p[i].w.den )
                     fmt.i_width++;
