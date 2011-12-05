@@ -400,7 +400,6 @@ int picture_Export( vlc_object_t *p_obj,
 void picture_BlendSubpicture(picture_t *dst,
                              filter_t *blend, subpicture_t *src)
 {
-    assert(blend && dst && blend->fmt_out.video.i_chroma == dst->format.i_chroma);
     assert(src && !src->b_fade && src->b_absolute);
 
     for (subpicture_region_t *r = src->p_region; r != NULL; r = r->p_next) {
