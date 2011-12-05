@@ -120,6 +120,8 @@ Interfaces:
  * Mac OS X: support for the native fullscreen mode on OS X Lion
  * Mac OS X: enhanced AppleScript support
  * The rc and telnet lua interfaces were merged into a new "cli" interface
+ * lua: the recommended way to run custom interface scripts is now to pass
+   -I luaintf --lua-intf myscript
  * ncurses: heavy refactor of the complete interface
  * dbus: Rewrite of the main loop to use a more efficient poll-based model
  * dbus: Upgrade to an mpris2 compliant interface, see http://www.mpris.org
