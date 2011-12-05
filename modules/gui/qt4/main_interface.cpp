@@ -689,6 +689,14 @@ void MainInterface::setVideoFullScreen( bool fs )
             msg_Dbg( p_intf, "Moving video to correct screen");
             move( QPoint( screenres.x(), screenres.y() ) );
         }
+
+        /* */
+        if( playlistWidget->artContainer->currentWidget() == videoWidget )
+        {
+            showTab( videoWidget );
+        }
+
+        /* */
         setMinimalView( true );
         setInterfaceFullScreen( true );
     }
