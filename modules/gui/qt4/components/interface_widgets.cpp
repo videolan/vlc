@@ -272,7 +272,7 @@ void BackgroundWidget::paintEvent( QPaintEvent *e )
 
 void BackgroundWidget::contextMenuEvent( QContextMenuEvent *event )
 {
-    QVLCMenuManager::PopupMenu( p_intf, true );
+    VLCMenuBar::PopupMenu( p_intf, true );
     event->accept();
 }
 

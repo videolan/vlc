@@ -102,10 +102,10 @@ DialogsProvider::~DialogsProvider()
     delete menusUpdateMapper;
     delete SDMapper;
 
-    QVLCMenuManager::PopupMenu( p_intf, false );
-    QVLCMenuManager::AudioPopupMenu( p_intf, false );
-    QVLCMenuManager::VideoPopupMenu( p_intf, false );
-    QVLCMenuManager::MiscPopupMenu( p_intf, false );
+    VLCMenuBar::PopupMenu( p_intf, false );
+    VLCMenuBar::AudioPopupMenu( p_intf, false );
+    VLCMenuBar::VideoPopupMenu( p_intf, false );
+    VLCMenuBar::MiscPopupMenu( p_intf, false );
 }
 
 void DialogsProvider::quit()
@@ -152,13 +152,13 @@ void DialogsProvider::customEvent( QEvent *event )
            vlmDialog(); break;
 #endif
         case INTF_DIALOG_POPUPMENU:
-           QVLCMenuManager::PopupMenu( p_intf, (de->i_arg != 0) ); break;
+           VLCMenuBar::PopupMenu( p_intf, (de->i_arg != 0) ); break;
         case INTF_DIALOG_AUDIOPOPUPMENU:
-           QVLCMenuManager::AudioPopupMenu( p_intf, (de->i_arg != 0) ); break;
+           VLCMenuBar::AudioPopupMenu( p_intf, (de->i_arg != 0) ); break;
         case INTF_DIALOG_VIDEOPOPUPMENU:
-           QVLCMenuManager::VideoPopupMenu( p_intf, (de->i_arg != 0) ); break;
+           VLCMenuBar::VideoPopupMenu( p_intf, (de->i_arg != 0) ); break;
         case INTF_DIALOG_MISCPOPUPMENU:
-           QVLCMenuManager::MiscPopupMenu( p_intf, (de->i_arg != 0) ); break;
+           VLCMenuBar::MiscPopupMenu( p_intf, (de->i_arg != 0) ); break;
         case INTF_DIALOG_WIZARD:
         case INTF_DIALOG_STREAMWIZARD:
             openAndStreamingDialogs(); break;
@@ -724,7 +724,7 @@ void DialogsProvider::loadSubtitlesFile()
 
 void DialogsProvider::menuAction( QObject *data )
 {
-    QVLCMenuManager::DoAction( data );
+    VLCMenuBar::DoAction( data );
 }
 
 void DialogsProvider::menuUpdateAction( QObject *data )

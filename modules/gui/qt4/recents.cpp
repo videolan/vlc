@@ -103,7 +103,7 @@ void RecentsMRL::addRecent( const QString &mrl )
         if( stack->count() > RECENTS_LIST_SIZE )
             stack->takeLast();
     }
-    QVLCMenuManager::updateRecents( p_intf );
+    VLCMenuBar::updateRecents( p_intf );
     save();
 }
 
@@ -113,7 +113,7 @@ void RecentsMRL::clear()
         return;
 
     stack->clear();
-    if( isActive ) QVLCMenuManager::updateRecents( p_intf );
+    if( isActive ) VLCMenuBar::updateRecents( p_intf );
     save();
 }
 

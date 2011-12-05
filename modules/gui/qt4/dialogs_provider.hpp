@@ -83,12 +83,12 @@ enum {
 
 class QEvent;
 class QSignalMapper;
-class QVLCMenuManager;
+class VLCMenuBar;
 
 class DialogsProvider : public QObject
 {
     Q_OBJECT
-    friend class QVLCMenuManager;
+    friend class VLCMenuBar;
 
 public:
     static DialogsProvider *getInstance()

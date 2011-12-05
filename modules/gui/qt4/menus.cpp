@@ -82,7 +82,7 @@ enum
 
 static QActionGroup *currentGroup;
 
-QMenu *QVLCMenuManager::recentsMenu = NULL;
+QMenu *VLCMenuBar::recentsMenu = NULL;
 
 /**
  * @brief Add static entries to DP in menus
@@ -113,7 +113,7 @@ QAction *addDPStaticEntry( QMenu *menu,
         else
             action = menu->addAction( text, THEDP, member );
     }
-    action->setData( QVLCMenuManager::ACTION_STATIC );
+    action->setData( VLCMenuBar::ACTION_STATIC );
     return action;
 }
 
@@ -139,9 +139,9 @@ QAction* addMIMStaticEntry( intf_thread_t *p_intf,
     {
         action = menu->addAction( text, THEMIM, member );
     }
-    action->setData( QVLCMenuManager::ACTION_STATIC |
-                     ( bStatic ) ? QVLCMenuManager::ACTION_ALWAYS_ENABLED
-                                 : QVLCMenuManager::ACTION_NONE
+    action->setData( VLCMenuBar::ACTION_STATIC |
+                     ( bStatic ) ? VLCMenuBar::ACTION_ALWAYS_ENABLED
+                                 : VLCMenuBar::ACTION_NONE
                    );
     return action;
 }
@@ -151,7 +151,7 @@ QAction* addMIMStaticEntry( intf_thread_t *p_intf,
  * @param menu the menu in which the entries will be disabled
  * @param enable if false, disable all entries
  **/
-void QVLCMenuManager::EnableStaticEntries( QMenu *menu, bool enable = true )
+void VLCMenuBar::EnableStaticEntries( QMenu *menu, bool enable = true )
 {
     if( !menu ) return;
 
@@ -180,7 +180,7 @@ inline int DeleteNonStaticEntries( QMenu *menu )
     QList< QAction* > actions = menu->actions();
     for( int i = 0; i < actions.count(); ++i )
     {
-        if( actions[i]->data().toInt() & QVLCMenuManager::ACTION_NO_CLEANUP )
+        if( actions[i]->data().toInt() & VLCMenuBar::ACTION_NO_CLEANUP )
             i_ret++;
         else
             delete actions[i];
@@ -306,7 +306,7 @@ static inline void addActionWithCheckbox( QMenu *_menu, QVariant val, QString ti
 /**
  * Main Menu Bar Creation
  **/
-void QVLCMenuManager::createMenuBar( MainInterface *mi,
+void VLCMenuBar::createMenuBar( MainInterface *mi,
                               intf_thread_t *p_intf )
 {
     /* QMainWindows->menuBar()
@@ -334,7 +334,7 @@ void QVLCMenuManager::createMenuBar( MainInterface *mi,
  * Media ( File ) Menu
  * Opening, streaming and quit
  **/
-QMenu *QVLCMenuManager::FileMenu( intf_thread_t *p_intf, QWidget *parent, MainInterface *mi )
+QMenu *VLCMenuBar::FileMenu( intf_thread_t *p_intf, QWidget *parent, MainInterface *mi )
 {
     QMenu *menu = new QMenu( parent );
     QAction *action;
@@ -398,7 +398,7 @@ QMenu *QVLCMenuManager::FileMenu( intf_thread_t *p_intf, QWidget *parent, MainIn
 /**
  * Tools, like Media Information, Preferences or Messages
  **/
-QMenu *QVLCMenuManager::ToolsMenu( QMenu *menu )
+QMenu *VLCMenuBar::ToolsMenu( QMenu *menu )
 {
     addDPStaticEntry( menu, qtr( "&Effects and Filters"), ":/menu/settings",
             SLOT( extendedDialog() ), "Ctrl+E" );
@@ -440,7 +440,7 @@ QMenu *QVLCMenuManager::ToolsMenu( QMenu *menu )
  * Interface modification, load other interfaces, activate Extensions
  * \param current, set to NULL for menu creation, else for menu update
  **/
-QMenu *QVLCMenuManager::ViewMenu( intf_thread_t *p_intf, QMenu *current, MainInterface *_mi )
+QMenu *VLCMenuBar::ViewMenu( intf_thread_t *p_intf, QMenu *current, MainInterface *_mi )
 {
     QAction *action;
     QMenu *menu;
@@ -531,7 +531,7 @@ QMenu *QVLCMenuManager::ViewMenu( intf_thread_t *p_intf, QMenu *current, MainInt
 /**
  * Interface Sub-Menu, to list extras interface and skins
  **/
-QMenu *QVLCMenuManager::InterfacesMenu( intf_thread_t *p_intf, QMenu *current )
+QMenu *VLCMenuBar::InterfacesMenu( intf_thread_t *p_intf, QMenu *current )
 {
     QVector<vlc_object_t *> objects;
     QVector<const char *> varnames;
@@ -544,7 +544,7 @@ QMenu *QVLCMenuManager::InterfacesMenu( intf_thread_t *p_intf, QMenu *current )
 /**
  * Extensions menu: populate the current menu with extensions
  **/
-void QVLCMenuManager::ExtensionsMenu( intf_thread_t *p_intf, QMenu *extMenu )
+void VLCMenuBar::ExtensionsMenu( intf_thread_t *p_intf, QMenu *extMenu )
 {
     /* Get ExtensionsManager and load extensions if needed */
     ExtensionsManager *extMgr = ExtensionsManager::getInstance( p_intf );
@@ -571,19 +571,19 @@ static inline void VolumeEntries( intf_thread_t *p_intf, QMenu *current )
 
         QAction *action = current->addAction( qtr( "Increase Volume" ),
                 ActionsManager::getInstance( p_intf ), SLOT( AudioUp() ) );
-        action->setData( QVLCMenuManager::ACTION_STATIC );
+        action->setData( VLCMenuBar::ACTION_STATIC );
         action = current->addAction( qtr( "Decrease Volume" ),
                 ActionsManager::getInstance( p_intf ), SLOT( AudioDown() ) );
-        action->setData( QVLCMenuManager::ACTION_STATIC );
+        action->setData( VLCMenuBar::ACTION_STATIC );
         action = current->addAction( qtr( "Mute" ),
                 ActionsManager::getInstance( p_intf ), SLOT( toggleMuteAudio() ) );
-        action->setData( QVLCMenuManager::ACTION_STATIC );
+        action->setData( VLCMenuBar::ACTION_STATIC );
 }
 
 /**
  * Main Audio Menu
  **/
-QMenu *QVLCMenuManager::AudioMenu( intf_thread_t *p_intf, QMenu * current )
+QMenu *VLCMenuBar::AudioMenu( intf_thread_t *p_intf, QMenu * current )
 {
     QVector<vlc_object_t *> objects;
     QVector<const char *> varnames;
@@ -614,7 +614,7 @@ QMenu *QVLCMenuManager::AudioMenu( intf_thread_t *p_intf, QMenu * current )
 }
 
 /* Subtitles */
-QMenu *QVLCMenuManager::SubtitleMenu( QMenu *current )
+QMenu *VLCMenuBar::SubtitleMenu( QMenu *current )
 {
     QAction *action;
     QMenu *submenu = new QMenu( qtr( "&Subtitles Track" ), current );
@@ -630,7 +630,7 @@ QMenu *QVLCMenuManager::SubtitleMenu( QMenu *current )
  * Main Video Menu
  * Subtitles are part of Video.
  **/
-QMenu *QVLCMenuManager::VideoMenu( intf_thread_t *p_intf, QMenu *current, bool b_subtitle )
+QMenu *VLCMenuBar::VideoMenu( intf_thread_t *p_intf, QMenu *current, bool b_subtitle )
 {
     vout_thread_t *p_vout;
     input_thread_t *p_input;
@@ -687,7 +687,7 @@ QMenu *QVLCMenuManager::VideoMenu( intf_thread_t *p_intf, QMenu *current, bool b
  * Navigation Menu
  * For DVD, MP4, MOV and other chapter based format
  **/
-QMenu *QVLCMenuManager::NavigMenu( intf_thread_t *p_intf, QMenu *menu )
+QMenu *VLCMenuBar::NavigMenu( intf_thread_t *p_intf, QMenu *menu )
 {
     QAction *action;
     QMenu *submenu;
@@ -715,7 +715,7 @@ QMenu *QVLCMenuManager::NavigMenu( intf_thread_t *p_intf, QMenu *menu )
     return RebuildNavigMenu( p_intf, menu );
 }
 
-QMenu *QVLCMenuManager::RebuildNavigMenu( intf_thread_t *p_intf, QMenu *menu )
+QMenu *VLCMenuBar::RebuildNavigMenu( intf_thread_t *p_intf, QMenu *menu )
 {
     /* */
     input_thread_t *p_object;
@@ -742,7 +742,7 @@ QMenu *QVLCMenuManager::RebuildNavigMenu( intf_thread_t *p_intf, QMenu *menu )
 /**
  * Help/About Menu
 **/
-QMenu *QVLCMenuManager::HelpMenu( QWidget *parent )
+QMenu *VLCMenuBar::HelpMenu( QWidget *parent )
 {
     QMenu *menu = new QMenu( parent );
     addDPStaticEntry( menu, qtr( "&Help..." ) ,
@@ -774,7 +774,7 @@ QMenu *QVLCMenuManager::HelpMenu( QWidget *parent )
     Populate( p_intf, menu, varnames, objects ); \
     menu->popup( QCursor::pos() ); \
 
-void QVLCMenuManager::PopupPlayEntries( QMenu *menu,
+void VLCMenuBar::PopupPlayEntries( QMenu *menu,
                                         intf_thread_t *p_intf,
                                         input_thread_t *p_input )
 {
@@ -796,7 +796,7 @@ void QVLCMenuManager::PopupPlayEntries( QMenu *menu,
     }
 }
 
-void QVLCMenuManager::PopupMenuControlEntries( QMenu *menu, intf_thread_t *p_intf,
+void VLCMenuBar::PopupMenuControlEntries( QMenu *menu, intf_thread_t *p_intf,
                                         bool b_normal )
 {
     QAction *action;
@@ -861,7 +861,7 @@ void QVLCMenuManager::PopupMenuControlEntries( QMenu *menu, intf_thread_t *p_int
     menu->addSeparator();
 }
 
-void QVLCMenuManager::PopupMenuPlaylistControlEntries( QMenu *menu,
+void VLCMenuBar::PopupMenuPlaylistControlEntries( QMenu *menu,
                                                 intf_thread_t *p_intf )
 {
     bool bEnable = THEMIM->getInput() != NULL;
@@ -889,7 +889,7 @@ void QVLCMenuManager::PopupMenuPlaylistControlEntries( QMenu *menu,
     menu->addSeparator();
 }
 
-void QVLCMenuManager::PopupMenuStaticEntries( QMenu *menu )
+void VLCMenuBar::PopupMenuStaticEntries( QMenu *menu )
 {
     QMenu *openmenu = new QMenu( qtr( "Open a Media" ), menu );
     addDPStaticEntry( openmenu, qtr( "&Open File..." ),
@@ -916,7 +916,7 @@ void QVLCMenuManager::PopupMenuStaticEntries( QMenu *menu )
 }
 
 /* Video Tracks and Subtitles tracks */
-void QVLCMenuManager::VideoPopupMenu( intf_thread_t *p_intf, bool show )
+void VLCMenuBar::VideoPopupMenu( intf_thread_t *p_intf, bool show )
 {
     POPUP_BOILERPLATE
     if( p_input )
@@ -932,7 +932,7 @@ void QVLCMenuManager::VideoPopupMenu( intf_thread_t *p_intf, bool show )
 }
 
 /* Audio Tracks */
-void QVLCMenuManager::AudioPopupMenu( intf_thread_t *p_intf, bool show )
+void VLCMenuBar::AudioPopupMenu( intf_thread_t *p_intf, bool show )
 {
     POPUP_BOILERPLATE
     if( p_input )
@@ -946,7 +946,7 @@ void QVLCMenuManager::AudioPopupMenu( intf_thread_t *p_intf, bool show )
 }
 
 /* Navigation stuff, and general menus ( open ), used only for skins */
-void QVLCMenuManager::MiscPopupMenu( intf_thread_t *p_intf, bool show )
+void VLCMenuBar::MiscPopupMenu( intf_thread_t *p_intf, bool show )
 {
     POPUP_BOILERPLATE
 
@@ -974,7 +974,7 @@ void QVLCMenuManager::MiscPopupMenu( intf_thread_t *p_intf, bool show )
 }
 
 /* Main Menu that sticks everything together  */
-void QVLCMenuManager::PopupMenu( intf_thread_t *p_intf, bool show )
+void VLCMenuBar::PopupMenu( intf_thread_t *p_intf, bool show )
 {
     POPUP_BOILERPLATE
 
@@ -1102,7 +1102,7 @@ void QVLCMenuManager::PopupMenu( intf_thread_t *p_intf, bool show )
  * Systray Menu                                                         *
  ************************************************************************/
 
-void QVLCMenuManager::updateSystrayMenu( MainInterface *mi,
+void VLCMenuBar::updateSystrayMenu( MainInterface *mi,
                                   intf_thread_t *p_intf,
                                   bool b_force_visible )
 {
@@ -1150,7 +1150,7 @@ void QVLCMenuManager::updateSystrayMenu( MainInterface *mi,
 /*************************************************************************
  * Builders for automenus
  *************************************************************************/
-QMenu * QVLCMenuManager::Populate( intf_thread_t *p_intf,
+QMenu * VLCMenuBar::Populate( intf_thread_t *p_intf,
                             QMenu *current,
                             QVector< const char *> & varnames,
                             QVector<vlc_object_t *> & objects )
@@ -1223,7 +1223,7 @@ static bool IsMenuEmpty( const char *psz_var,
 
 #define TEXT_OR_VAR qfu ( text.psz_string ? text.psz_string : psz_var )
 
-void QVLCMenuManager::UpdateItem( intf_thread_t *p_intf, QMenu *menu,
+void VLCMenuBar::UpdateItem( intf_thread_t *p_intf, QMenu *menu,
         const char *psz_var, vlc_object_t *p_object, bool b_submenu )
 {
     vlc_value_t val, text;
@@ -1358,7 +1358,7 @@ static bool CheckTitle( vlc_object_t *p_object, const char *psz_var )
 }
 
 
-int QVLCMenuManager::CreateChoicesMenu( QMenu *submenu, const char *psz_var,
+int VLCMenuBar::CreateChoicesMenu( QMenu *submenu, const char *psz_var,
         vlc_object_t *p_object, bool b_root )
 {
     vlc_value_t val, val_list, text_list;
@@ -1454,7 +1454,7 @@ int QVLCMenuManager::CreateChoicesMenu( QMenu *submenu, const char *psz_var,
     return submenu->isEmpty() ? VLC_EGENERIC : VLC_SUCCESS;
 }
 
-void QVLCMenuManager::CreateAndConnect( QMenu *menu, const char *psz_var,
+void VLCMenuBar::CreateAndConnect( QMenu *menu, const char *psz_var,
         const QString& text, const QString& help,
         int i_item_type, vlc_object_t *p_obj,
         vlc_value_t val, int i_val_type,
@@ -1501,7 +1501,7 @@ void QVLCMenuManager::CreateAndConnect( QMenu *menu, const char *psz_var,
         menu->addAction( action );
 }
 
-void QVLCMenuManager::DoAction( QObject *data )
+void VLCMenuBar::DoAction( QObject *data )
 {
     MenuItemData *itemData = qobject_cast<MenuItemData *>( data );
     vlc_object_t *p_object = itemData->p_obj;
@@ -1515,7 +1515,7 @@ void QVLCMenuManager::DoAction( QObject *data )
     var_Set( p_object, itemData->psz_var, itemData->val );
 }
 
-void QVLCMenuManager::updateRecents( intf_thread_t *p_intf )
+void VLCMenuBar::updateRecents( intf_thread_t *p_intf )
 {
     if( recentsMenu )
     {

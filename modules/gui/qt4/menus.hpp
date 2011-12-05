@@ -69,7 +69,7 @@ private:
     int i_val_type;
 };
 
-class QVLCMenuManager : public QObject
+class VLCMenuBar : public QObject
 {
     Q_OBJECT
     friend class MenuFunc;
@@ -155,7 +155,7 @@ private:
 public slots:
     static void updateRecents( intf_thread_t * );
 };
-Q_DECLARE_OPERATORS_FOR_FLAGS(QVLCMenuManager::actionflags)
+Q_DECLARE_OPERATORS_FOR_FLAGS(VLCMenuBar::actionflags)
 
 class MenuFunc : public QObject
 {
@@ -169,10 +169,10 @@ public:
     {
         switch( id )
         {
-            case 1: QVLCMenuManager::AudioMenu( p_intf, menu ); break;
-            case 2: QVLCMenuManager::VideoMenu( p_intf, menu ); break;
-            case 3: QVLCMenuManager::RebuildNavigMenu( p_intf, menu ); break;
-            case 4: QVLCMenuManager::ViewMenu( p_intf, menu ); break;
+            case 1: VLCMenuBar::AudioMenu( p_intf, menu ); break;
+            case 2: VLCMenuBar::VideoMenu( p_intf, menu ); break;
+            case 3: VLCMenuBar::RebuildNavigMenu( p_intf, menu ); break;
+            case 4: VLCMenuBar::ViewMenu( p_intf, menu ); break;
         }
     }
 private:

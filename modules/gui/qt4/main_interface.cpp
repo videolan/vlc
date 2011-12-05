@@ -146,7 +146,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     /************
      * Menu Bar *
      ************/
-    QVLCMenuManager::createMenuBar( this, p_intf );
+    VLCMenuBar::createMenuBar( this, p_intf );
     CONNECT( THEMIM->getIM(), voutListChanged( vout_thread_t **, int ),
              this, destroyPopupMenu() );
 
@@ -570,12 +570,12 @@ inline void MainInterface::showTab( QWidget *widget )
 
 void MainInterface::destroyPopupMenu()
 {
-    QVLCMenuManager::PopupMenu( p_intf, false );
+    VLCMenuBar::PopupMenu( p_intf, false );
 }
 
 void MainInterface::popupMenu( const QPoint & )
 {
-    QVLCMenuManager::PopupMenu( p_intf, true );
+    VLCMenuBar::PopupMenu( p_intf, true );
 }
 
 void MainInterface::toggleFSC()
@@ -1002,7 +1002,7 @@ void MainInterface::createSystray()
     systrayMenu = new QMenu( qtr( "VLC media player" ), this );
     systrayMenu->setIcon( iconVLC );
 
-    QVLCMenuManager::updateSystrayMenu( this, p_intf, true );
+    VLCMenuBar::updateSystrayMenu( this, p_intf, true );
     sysTray->show();
 
     CONNECT( sysTray, activated( QSystemTrayIcon::ActivationReason ),
@@ -1062,7 +1062,7 @@ void MainInterface::toggleUpdateSystrayMenu()
 #endif
     }
     if( sysTray )
-        QVLCMenuManager::updateSystrayMenu( this, p_intf );
+        VLCMenuBar::updateSystrayMenu( this, p_intf );
 }
 
 /* First Item of the systray menu */
@@ -1074,14 +1074,14 @@ void MainInterface::showUpdateSystrayMenu()
         showNormal();
     activateWindow();
 
-    QVLCMenuManager::updateSystrayMenu( this, p_intf );
+    VLCMenuBar::updateSystrayMenu( this, p_intf );
 }
 
 /* First Item of the systray menu */
 void MainInterface::hideUpdateSystrayMenu()
 {
     hide();
-    QVLCMenuManager::updateSystrayMenu( this, p_intf );
+    VLCMenuBar::updateSystrayMenu( this, p_intf );
 }
 
 /* Click on systray Icon */
@@ -1093,7 +1093,7 @@ void MainInterface::handleSystrayClick(
         case QSystemTrayIcon::Trigger:
         case QSystemTrayIcon::DoubleClick:
 #ifdef Q_WS_MAC
-            QVLCMenuManager::updateSystrayMenu( this, p_intf );
+            VLCMenuBar::updateSystrayMenu( this, p_intf );
 #else
             toggleUpdateSystrayMenu();
 #endif
@@ -1128,7 +1128,7 @@ void MainInterface::updateSystrayTooltipName( const QString& name )
         }
     }
 
-    QVLCMenuManager::updateSystrayMenu( this, p_intf );
+    VLCMenuBar::updateSystrayMenu( this, p_intf );
 }
 
 /**
@@ -1149,7 +1149,7 @@ void MainInterface::updateSystrayTooltipStatus( int i_status )
         sysTray->setToolTip( qtr( "VLC media player" ) );
         break;
     }
-    QVLCMenuManager::updateSystrayMenu( this, p_intf );
+    VLCMenuBar::updateSystrayMenu( this, p_intf );
 }
 
 void MainInterface::changeEvent(QEvent *event)
