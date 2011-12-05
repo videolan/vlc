@@ -162,7 +162,7 @@ DISTCLEAN_PKG += automake-$(AUTOMAKE_VERSION).tar.gz
 pkg-config-$(PKGCFG_VERSION).tar.gz:
 	$(download) $(PKGCFG_URL)
 
-pkgconfig: pkg-config-$(PKGCFG_VERSION).tar.gz .autoconf
+pkgconfig: pkg-config-$(PKGCFG_VERSION).tar.gz
 	$(UNPACK)
 	$(MOVE)
 
