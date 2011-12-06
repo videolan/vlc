@@ -94,3 +94,8 @@ int DASHManager::peek   (const uint8_t **pp_peek, size_t i_peek)
     int ret = this->conManager->peek(this->currentChunk, pp_peek, i_peek);
     return ret;
 }
+
+const mpd::IMPDManager* DASHManager::getMpdManager() const
+{
+    return this->mpdManager;
+}
