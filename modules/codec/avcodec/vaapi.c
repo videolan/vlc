@@ -95,7 +95,9 @@ static vlc_va_vaapi_t *vlc_va_vaapi_Get( void *p_va )
 /* */
 static int Open( vlc_va_vaapi_t *p_va, int i_codec_id )
 {
-    VAProfile i_profile;
+    VAProfile i_profile, *p_profiles_list;
+    bool b_supported_profile = false;
+    int i_profiles_nb = 0;
     int i_surface_count;
 
     /* */
@@ -142,6 +144,28 @@ static int Open( vlc_va_vaapi_t *p_va, int i_codec_id )
         goto error;
 
     if( vaInitialize( p_va->p_display, &p_va->i_version_major, &p_va->i_version_minor ) )
+        goto error;
+
+    /* Check if the selected profile is supported */
+    i_profiles_nb = vaMaxNumProfiles( p_va->p_display );
+    p_profiles_list = calloc( i_profiles_nb, sizeof( VAProfile ) );
+    if ( !p_profiles_list )
+        goto error;
+
+    VAStatus i_status = vaQueryConfigProfiles( p_va->p_display, p_profiles_list, &i_profiles_nb );
+    if ( i_status == VA_STATUS_SUCCESS )
+    {
+        for( int i = 0; i < i_profiles_nb; i++ )
+        {
+            if ( p_profiles_list[i] == i_profile )
+            {
+                b_supported_profile = true;
+                break;
+            }
+        }
+    }
+    free( p_profiles_list );
+    if ( !b_supported_profile )
         goto error;
 
     /* Create a VA configuration */
