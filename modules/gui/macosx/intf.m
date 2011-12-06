@@ -1581,10 +1581,10 @@ unsigned int CocoaKeyToVLC( unichar i_key )
     int i_y = (int)videoRect.origin.y;
     unsigned int i_width = (int)videoRect.size.width;
     unsigned int i_height = (int)videoRect.size.height;
-    pi_x = (int *)i_x;
-    pi_y = (int *)i_y;
-    pi_width = (unsigned int*)i_width;
-    pi_height = (unsigned int*)i_height;
+    pi_x = &i_x;
+    pi_y = &i_y;
+    pi_width = &i_width;
+    pi_height = &i_height;
     msg_Dbg( VLCIntf, "returning videoview with x=%i, y=%i, width=%i, height=%i", i_x, i_y, i_width, i_height );
     return videoView;
 }
