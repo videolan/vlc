@@ -230,6 +230,40 @@ VLC_API int vlc_poll(struct pollfd *fds, unsigned nfds, int timeout);
 # define AI_NUMERICSERV 0
 #endif
 
+#ifdef __OS2__
+# ifndef NI_NUMERICHOST
+#  define NI_NUMERICHOST 0x01
+#  define NI_NUMERICSERV 0x02
+#  define NI_NOFQDN      0x04
+#  define NI_NAMEREQD    0x08
+#  define NI_DGRAM       0x10
+# endif
+
+struct addrinfo
+{
+    int ai_flags;
+    int ai_family;
+    int ai_socktype;
+    int ai_protocol;
+    size_t ai_addrlen;
+    struct sockaddr *ai_addr;
+    char *ai_canonname;
+    struct addrinfo *ai_next;
+};
+
+# define AI_PASSIVE     1
+# define AI_CANONNAME   2
+# define AI_NUMERICHOST 4
+
+VLC_API const char *gai_strerror( int errnum );
+
+VLC_API int  getaddrinfo ( const char *, const char *,
+                           const struct addrinfo *, struct addrinfo ** );
+VLC_API void freeaddrinfo( struct addrinfo * );
+VLC_API int  getnameinfo ( const struct sockaddr *, socklen_t,
+                           char *, int, char *, int, int );
+#endif
+
 VLC_API int vlc_getnameinfo( const struct sockaddr *, int, char *, int, int *, int );
 VLC_API int vlc_getaddrinfo( vlc_object_t *, const char *, int, const struct addrinfo *, struct addrinfo ** );
 
