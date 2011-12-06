@@ -3721,12 +3721,12 @@ then
 
   VLC_ADD_LIBS([macosx], [-Wl,-framework,QTKit -Wl,-framework,IOKit -Wl,-framework,AddressBook -Wl,-framework,WebKit])
 
-  VLC_SAVE_FLAGS
-  CFLAGS="-I${CONTRIB_DIR}/Sparkle.framework/Headers ${CFLAGS}"
-  AC_CHECK_HEADERS(Sparkle.h, [
-    VLC_ADD_LIBS([macosx], [-F${CONTRIB_DIR} -Wl,-framework,Sparkle])
-    VLC_ADD_OBJCFLAGS([macosx], [-F${CONTRIB_DIR}])
-  ], VLC_RESTORE_FLAGS)
+  if ! test -d ${CONTRIB_DIR}/Sparkle.framework
+  then
+    AC_MSG_ERROR([Sparkle framework is required and was not found in ${CONTRIB_DIR}])
+  fi
+  VLC_ADD_LIBS([macosx], [-F${CONTRIB_DIR} -Wl,-framework,Sparkle])
+  VLC_ADD_OBJCFLAGS([macosx], [-F${CONTRIB_DIR}])
 
   if ! test -d ${CONTRIB_DIR}/BGHUDAppKit.framework
   then
