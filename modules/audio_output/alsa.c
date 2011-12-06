@@ -602,7 +602,7 @@ static void Play (audio_output_t *aout, block_t *block)
         if (state != SND_PCM_STATE_RUNNING)
         {
             delay = block->i_pts - (mdate () + delay);
-            if (delay > 0)
+            if (delay > 0 && aout->format.i_format != VLC_CODEC_SPDIFL)
             {
                 frames = (delay * aout->format.i_rate) / CLOCK_FREQ;
                 msg_Dbg (aout, "prepending %ld zeroes", frames);
@@ -612,8 +612,12 @@ static void Play (audio_output_t *aout, block_t *block)
                 {
                     snd_pcm_writei (pcm, pad, frames);
                     free (pad);
+                    delay = 0;
                 }
             }
+            /* Lame fallback if zero padding does not work */
+            if (delay > 0)
+                mwait (block->i_pts - delay);
         }
         else
             aout_TimeReport (aout, block->i_pts - delay);
