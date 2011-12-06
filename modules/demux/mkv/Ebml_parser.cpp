@@ -88,10 +88,13 @@ EbmlElement* EbmlParser::UnGet( uint64 i_block_pos, uint64 i_cluster_pos )
     {
         // seek to the previous Cluster
         m_es->I_O().setFilePointer( i_cluster_pos, seek_beginning );
-        mi_level--;
-        mi_user_level--;
-        delete m_el[mi_level];
-        m_el[mi_level] = NULL;
+        while(mi_level > 1)
+        {
+            mi_level--;
+            mi_user_level--;
+            delete m_el[mi_level];
+            m_el[mi_level] = NULL;
+        }
         return NULL;
     }
 }
