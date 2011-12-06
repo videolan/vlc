@@ -392,17 +392,20 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
 
 - (void)volumeUp
 {
-    var_SetInteger( VLCIntf->p_libvlc, "key-action", ACTIONID_VOL_UP );
+    playlist_t * p_playlist = pl_Get( VLCIntf );
+    aout_VolumeUp( p_playlist, 1, NULL );
 }
 
 - (void)volumeDown
 {
-    var_SetInteger( VLCIntf->p_libvlc, "key-action", ACTIONID_VOL_DOWN );
+    playlist_t * p_playlist = pl_Get( VLCIntf );
+    aout_VolumeDown( p_playlist, 1, NULL );
 }
 
 - (void)mute
 {
-    var_SetInteger( VLCIntf->p_libvlc, "key-action", ACTIONID_VOL_MUTE );
+    playlist_t * p_playlist = pl_Get( VLCIntf );
+    aout_ToggleMute( p_playlist, NULL );
 }
 
 - (BOOL)isMuted
