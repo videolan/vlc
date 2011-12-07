@@ -1,4 +1,4 @@
-# DirectX headers
+# DirectX headers, missing from mingw32
 
 DSHOW_HEADERS_URL := $(CONTRIB_VIDEOLAN)/dshow-headers-oss.tar.bz2
 D2D_HASH := b1affb70c021200b410eccd377ad5aeef2c5a85b

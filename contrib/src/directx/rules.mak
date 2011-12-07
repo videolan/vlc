@@ -1,4 +1,4 @@
-# DirectX headers
+# DirectX headers, missing from mingw32
 
 DX_HEADERS_URL := $(CONTRIB_VIDEOLAN)/directx-oss.tar.bz2
 DXVA2_URL := $(CONTRIB_VIDEOLAN)/dxva2api.h
