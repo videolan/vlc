@@ -23,5 +23,6 @@ sparkle: sparkle-$(SPARKLE_VERSION).zip .sum-sparkle
 
 .sparkle: sparkle
 	cd $</Extras/Source\ Code && $(MAKE) && xcodebuild $(XCODE_FLAGS)
-	cd $< && cp -R -L Extras/Source\ Code/build/release/Sparkle.framework "$(PREFIX)"
+	cd $</Extras/Source\ Code && install_name_tool -id @executable_path/../Frameworks/Sparkle.framework/Versions/A/Sparkle build/Release/Sparkle.framework/Sparkle
+	cd $< && cp -R -L Extras/Source\ Code/build/Release/Sparkle.framework "$(PREFIX)"
 	touch $@
