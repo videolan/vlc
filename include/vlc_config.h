@@ -117,13 +117,5 @@
  * Messages and console interfaces configuration
  *****************************************************************************/
 
-/* Maximal size of a message to be stored in the mesage queue,
- * it is needed when vasprintf is not available */
-#define INTF_MAX_MSG_SIZE               512
-
-/* Maximal size of the message queue - in case of overflow, all messages in the
- * queue are printed, but not sent to the threads */
-#define VLC_MSG_QSIZE                   256
-
 /* Maximal depth of the object tree output by vlc_dumpstructure */
 #define MAX_DUMPSTRUCTURE_DEPTH         100
