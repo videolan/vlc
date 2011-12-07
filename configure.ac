@@ -2443,7 +2443,9 @@ AS_IF([test "${enable_dxva2}" != "no"], [
     AS_IF([test "${enable_dxva2}" = "yes"],
           [AC_MSG_ERROR([dxva2 is present but libavcodec/dxva2.h is missing])],
               [AC_MSG_WARN([dxva2 is present but libavcodec/dxva2.h is missing ])])
-        ])
+        ], [#undef _WIN32_WINNT
+            /* DXVA2 is only available in Vista and above */
+            #define _WIN32_WINNT 0x600])
       ],[
     AS_IF([test "${enable_dxva2}" = "yes"],
               [AC_MSG_ERROR([Could not find required dxva2api.h])],

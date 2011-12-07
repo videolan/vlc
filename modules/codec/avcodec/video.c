@@ -29,6 +29,14 @@
 # include "config.h"
 #endif
 
+#if defined(HAVE_LIBAVCODEC_AVCODEC_H) && defined(HAVE_AVCODEC_DXVA2)
+# if _WIN32_WINNT < 0x600
+/* dxva2 needs Vista support */
+#  undef _WIN32_WINNT
+#  define _WIN32_WINNT 0x600
+# endif
+#endif
+
 #include <vlc_common.h>
 #include <vlc_codec.h>
 #include <vlc_avcodec.h>

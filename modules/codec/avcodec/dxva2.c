@@ -27,6 +27,15 @@
 # include "config.h"
 #endif
 
+
+#if defined(HAVE_LIBAVCODEC_AVCODEC_H) && defined(HAVE_AVCODEC_DXVA2)
+# if _WIN32_WINNT < 0x600
+/* dxva2 needs Vista support */
+#  undef _WIN32_WINNT
+#  define _WIN32_WINNT 0x600
+# endif
+#endif
+
 #include <vlc_common.h>
 #include <vlc_picture.h>
 #include <vlc_fourcc.h>
@@ -37,6 +46,7 @@
 #   include <libavcodec/avcodec.h>
 #   ifdef HAVE_AVCODEC_DXVA2
 #       define DXVA2API_USE_BITFIELDS
+#       define COBJMACROS
 #       include <libavcodec/dxva2.h>
 #   endif
 #else
