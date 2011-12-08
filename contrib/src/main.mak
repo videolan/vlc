@@ -107,6 +107,8 @@ endif
 endif
 
 ifdef HAVE_MACOSX
+OSX_VERSION=10.6
+MIN_OSX_VERSION=10.5
 MACOSX_SDK=/Developer/SDKs/MacOSX$(OSX_VERSION).sdk
 CC=gcc-4.2
 CXX=g++-4.2
@@ -114,8 +116,8 @@ AR=ar
 LD=ld
 STRIP=strip
 RANLIB=ranlib
-EXTRA_CFLAGS += -isysroot $(MACOSX_SDK) -mmacosx-version-min=$(OSX_VERSION)
-EXTRA_LDFLAGS += -Wl,-syslibroot,$(MACOSX_SDK) -mmacosx-version-min=$(OSX_VERSION) -isysroot $(MACOSX_SDK)
+EXTRA_CFLAGS += -isysroot $(MACOSX_SDK) -mmacosx-version-min=$(MIN_OSX_VERSION) -DMACOSX_DEPLOYMENT_TARGET=$(MIN_OSX_VERSION)
+EXTRA_LDFLAGS += -Wl,-syslibroot,$(MACOSX_SDK) -mmacosx-version-min=$(MIN_OSX_VERSION) -isysroot $(MACOSX_SDK) -DMACOSX_DEPLOYMENT_TARGET=$(MIN_OSX_VERSION)
 #TODO ppc
 ifeq ($(ARCH),x86_64)
 EXTRA_CFLAGS += -m64
