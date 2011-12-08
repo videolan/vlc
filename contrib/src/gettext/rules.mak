@@ -33,18 +33,7 @@ ifdef HAVE_WIN32
 else
 	(cd $< && $(HOSTVARS) ./configure $(HOSTCONF) --disable-java --disable-native-java --without-emacs)
 endif
-ifneq ($(HOST),$(BUILD))
-  ifndef HAVE_CYGWIN
-    # We'll use the installed gettext and only need to cross-compile libintl, also build autopoint and gettextsize tools need for VLC bootstrap
-	(cd $< && make -C gettext-runtime/intl && make -C gettext-runtime/intl install && make -C gettext-tools/misc install)
-  else
-    # We are compiling for MinGW on Cygwin -- build the full current gettext
-	(cd $< && make && make install)
-  endif
-else
-# Build and install the whole gettext
-	(cd $< && make && make install)
-endif
+	(cd $< && make -C gettext-runtime install && make -C gettext-tools/misc install && make -C gettext-tools/m4 install)
 # Work around another non-sense of autoconf.
 ifdef HAVE_WIN32
 	(cd $(PREFIX)/include; sed -i.orig '314 c #if 0' libintl.h)
