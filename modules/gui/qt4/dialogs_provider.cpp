@@ -401,21 +401,21 @@ QStringList DialogsProvider::showSimpleOpen( const QString& help,
 {
     QString fileTypes = "";
     if( filters & EXT_FILTER_MEDIA ) {
-        ADD_FILTER_MEDIA( fileTypes );
+        ADD_EXT_FILTER( fileTypes, EXTENSIONS_MEDIA );
     }
     if( filters & EXT_FILTER_VIDEO ) {
-        ADD_FILTER_VIDEO( fileTypes );
+        ADD_EXT_FILTER( fileTypes, EXTENSIONS_VIDEO );
     }
     if( filters & EXT_FILTER_AUDIO ) {
-        ADD_FILTER_AUDIO( fileTypes );
+        ADD_EXT_FILTER( fileTypes, EXTENSIONS_AUDIO );
     }
     if( filters & EXT_FILTER_PLAYLIST ) {
-        ADD_FILTER_PLAYLIST( fileTypes );
+        ADD_EXT_FILTER( fileTypes, EXTENSIONS_PLAYLIST );
     }
     if( filters & EXT_FILTER_SUBTITLE ) {
-        ADD_FILTER_SUBTITLE( fileTypes );
+        ADD_EXT_FILTER( fileTypes, EXTENSIONS_SUBTITLE );
     }
-    ADD_FILTER_ALL( fileTypes );
+    ADD_EXT_FILTER( fileTypes, EXTENSIONS_ALL );
     fileTypes.replace( ";*", " *");
 
     QStringList files = QFileDialog::getOpenFileNames( NULL,

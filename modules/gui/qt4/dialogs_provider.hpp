@@ -37,34 +37,17 @@
 #include <QObject>
 #include <QStringList>
 
-#define ADD_FILTER_MEDIA( string )     \
-    string += qtr( "Media Files" );    \
-    string += " ( ";                   \
-    string += EXTENSIONS_MEDIA;        \
-    string += ");;";
-#define ADD_FILTER_VIDEO( string )     \
-    string += qtr( "Video Files" );    \
-    string += " ( ";                   \
-    string += EXTENSIONS_VIDEO;        \
-    string += ");;";
-#define ADD_FILTER_AUDIO( string )     \
-    string += qtr( "Audio Files" );    \
-    string += " ( ";                   \
-    string += EXTENSIONS_AUDIO;        \
-    string += ");;";
-#define ADD_FILTER_PLAYLIST( string )  \
-    string += qtr( "Playlist Files" ); \
-    string += " ( ";                   \
-    string += EXTENSIONS_PLAYLIST;     \
-    string += ");;";
-#define ADD_FILTER_SUBTITLE( string )  \
-    string += qtr( "Subtitles Files" );\
-    string += " ( ";                   \
-    string += EXTENSIONS_SUBTITLE;     \
-    string += ");;";
-#define ADD_FILTER_ALL( string )       \
-    string += qtr( "All Files" );      \
-    string += " (*)";
+#define TITLE_EXTENSIONS_MEDIA qtr( "Media Files" )
+#define TITLE_EXTENSIONS_VIDEO qtr( "Video Files" )
+#define TITLE_EXTENSIONS_AUDIO qtr( "Audio Files" )
+#define TITLE_EXTENSIONS_PLAYLIST qtr( "Playlist Files" )
+#define TITLE_EXTENSIONS_SUBTITLE qtr( "Subtitles Files" )
+#define TITLE_EXTENSIONS_ALL qtr( "All Files" )
+#define EXTENSIONS_ALL "*"
+#define ADD_EXT_FILTER( string, type ) \
+    string = string + QString("%1 ( %2 );;") \
+            .arg( TITLE_##type ) \
+            .arg( QString( type ) );
 
 enum {
     EXT_FILTER_MEDIA     =  0x01,
