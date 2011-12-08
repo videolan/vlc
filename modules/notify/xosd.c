@@ -34,6 +34,7 @@
 #include <vlc_playlist.h>
 #include <vlc_input.h>
 #include <vlc_interface.h>
+#include <vlc_xlib.h>
 
 #include <xosd.h>
 
@@ -108,6 +109,9 @@ static int Open( vlc_object_t *p_this )
     intf_sys_t *p_sys;
     xosd *p_osd;
     char *psz_font, *psz_colour;
+
+    if (!vlc_xlib_init(p_this))
+        return VLC_EGENERIC;
 
     if( getenv( "DISPLAY" ) == NULL )
     {
