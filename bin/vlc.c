@@ -35,11 +35,18 @@
 #include <stdbool.h>
 #include <locale.h>
 #include <signal.h>
-#include <pthread.h>
+#ifdef HAVE_PTHREAD_H
+# include <pthread.h>
+#endif
 #include <unistd.h>
 
 #ifdef __APPLE__
 #include <string.h>
+#endif
+
+#ifdef __OS2__
+# define pthread_t      int
+# define pthread_self() _gettid()
 #endif
 
 
