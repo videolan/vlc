@@ -1160,7 +1160,7 @@ void CaptureOpenPanel::updateMRL()
     }
     emit methodChanged( "live-caching" );
 
-    if( !advMRL.isEmpty() ) mrl += advMRL;
+    if( !advMRL.isEmpty() ) mrl += " " + advMRL;
 
     emit mrlUpdated( fileList, mrl );
 }
