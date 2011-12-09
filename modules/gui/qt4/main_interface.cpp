@@ -691,7 +691,7 @@ void MainInterface::setVideoFullScreen( bool fs )
         }
 
         /* */
-        if( playlistWidget->artContainer->currentWidget() == videoWidget )
+        if( playlistWidget != NULL && playlistWidget->artContainer->currentWidget() == videoWidget )
         {
             showTab( videoWidget );
         }
