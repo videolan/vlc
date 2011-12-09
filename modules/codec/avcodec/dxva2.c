@@ -115,7 +115,7 @@ static const GUID DXVADDI_Intel_ModeH264_A = {
 static const GUID DXVADDI_Intel_ModeH264_C = {
     0x604F8E66, 0x4951,0x4c54, {0x88,0xFE,0xAB,0xD2,0x5C,0x15,0xB3,0xD6}
 };
-static const GUID DXVADDI_Intel_ModeH264_E = { // DXVA_Intel_H264_ClearVideo
+static const GUID DXVADDI_Intel_ModeH264_E = { // DXVA_Intel_H264_NoFGT_ClearVideo
     0x604F8E68, 0x4951,0x4c54, {0x88,0xFE,0xAB,0xD2,0x5C,0x15,0xB3,0xD6}
 };
 static const GUID DXVA2_ModeWMV8_A = {
@@ -158,6 +158,10 @@ static const GUID DXVA_NoEncrypt = {
 static const GUID DXVA_Intel_VC1_ClearVideo = {
     0xBCC5DB6D, 0xA2B6,0x4AF0, {0xAC,0xE4,0xAD,0xB1,0xF7,0x87,0xBC,0x89}
 };
+static const GUID DXVA_Intel_VC1_ClearVideo_2 = {
+    0xE07EC519, 0xE651,0x4CD6, {0xAC,0x84,0x13,0x70,0xCC,0xEE,0xC8,0x51}
+};
+
 
 static const GUID DXVA_nVidia_MPEG4_ASP = {
     0x9947EC6F, 0x689B,0x11DC, {0xA3,0x20,0x00,0x19,0xDB,0xBC,0x41,0x84}
@@ -214,6 +218,7 @@ static const dxva2_mode_t dxva2_modes[] = {
     { "VC-1 post processing",                      &DXVA2_ModeVC1_A, 0 },
 
     { "VC-1 variable-length decoder (Intel)",      &DXVA_Intel_VC1_ClearVideo, 0 },
+    { "VC-1 variable-length decoder 2 (Intel)",    &DXVA_Intel_VC1_ClearVideo_2, 0 },
 
     { "MPEG-4 Part 2 nVidia bitstream decoder",                                                         &DXVA_nVidia_MPEG4_ASP,                 0 },
     { "MPEG-4 Part 2 variable-length decoder, Simple Profile",                                          &DXVA_ModeMPEG4pt2_VLD_Simple,          0 },
