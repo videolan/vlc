@@ -304,7 +304,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
     [o_file_sub_path_fld setStringValue: @""];
     [o_file_sub_btn_settings setTitle: _NS("Choose...")];
     [o_file_sub_btn_browse setTitle: _NS("Browse...")];
-    [o_file_sub_override setTitle: _NS("Override parametters")];
+    [o_file_sub_override setTitle: _NS("Override parameters")];
     [o_file_sub_delay_lbl setStringValue: _NS("Delay")];
     [o_file_sub_delay_stp setEnabled: NO];
     [o_file_sub_fps_lbl setStringValue: _NS("FPS")];
