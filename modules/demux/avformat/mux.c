@@ -172,18 +172,18 @@ void CloseMux( vlc_object_t *p_this )
 {
     sout_mux_t *p_mux = (sout_mux_t*)p_this;
     sout_mux_sys_t *p_sys = p_mux->p_sys;
-    unsigned int i;
 
     if( !p_sys->b_write_header && av_write_trailer( p_sys->oc ) < 0 )
     {
         msg_Err( p_mux, "could not write trailer" );
     }
 
-    /* XXX : use avformat_free_context() */
-    for( i = 0 ; i < p_sys->oc->nb_streams; i++ )
+#if( LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT( 52, 96, 0 ) )
+    avformat_context_free(p_sys->oc);
+#else
+    for( unsigned i = 0 ; i < p_sys->oc->nb_streams; i++ )
     {
-        if( p_sys->oc->streams[i]->codec->extradata )
-            av_free( p_sys->oc->streams[i]->codec->extradata );
+        av_free( p_sys->oc->streams[i]->codec->extradata );
         av_free( p_sys->oc->streams[i]->codec );
 #if( LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT( 50, 32, 3 ) )
         av_free( p_sys->oc->streams[i]->info );
@@ -192,6 +192,7 @@ void CloseMux( vlc_object_t *p_this )
     }
     av_free( p_sys->oc->streams );
     av_free( p_sys->oc );
+#endif
 
     free( p_sys->io_buffer );
     free( p_sys );
