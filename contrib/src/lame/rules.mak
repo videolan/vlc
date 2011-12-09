@@ -14,6 +14,6 @@ lame: lame-$(LAME_VERSION).tar.gz .sum-lame
 	$(MOVE)
 
 .lame: lame
-	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) --disable-analyser-hooks --disable-decoder --disable-gtktest --disable-frontend
+	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) --disable-analyzer-hooks --disable-decoder --disable-gtktest --disable-frontend
 	cd $< && $(MAKE) install
 	touch $@
