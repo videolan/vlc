@@ -184,46 +184,53 @@ typedef struct {
 } dxva2_mode_t;
 /* XXX Prefered modes must come first */
 static const dxva2_mode_t dxva2_modes[] = {
-    { "MPEG-2 variable-length decoder",            &DXVA2_ModeMPEG2_VLD,     CODEC_ID_MPEG2VIDEO },
-    { "MPEG-2 & MPEG-1 variable-length decoder",   &DXVA2_ModeMPEG2and1_VLD, CODEC_ID_MPEG2VIDEO },
-    { "MPEG-2 motion compensation",                &DXVA2_ModeMPEG2_MoComp,  0 },
-    { "MPEG-2 inverse discrete cosine transform",  &DXVA2_ModeMPEG2_IDCT,    0 },
+    /* MPEG-1/2 */
+    { "MPEG-2 variable-length decoder",                                               &DXVA2_ModeMPEG2_VLD,                   CODEC_ID_MPEG2VIDEO },
+    { "MPEG-2 & MPEG-1 variable-length decoder",                                      &DXVA2_ModeMPEG2and1_VLD,               CODEC_ID_MPEG2VIDEO },
+    { "MPEG-2 motion compensation",                                                   &DXVA2_ModeMPEG2_MoComp,                0 },
+    { "MPEG-2 inverse discrete cosine transform",                                     &DXVA2_ModeMPEG2_IDCT,                  0 },
 
-    { "MPEG-1 variable-length decoder",            &DXVA2_ModeMPEG1_VLD,     0 },
+    { "MPEG-1 variable-length decoder",                                               &DXVA2_ModeMPEG1_VLD,                   0 },
 
-    { "H.264 variable-length decoder, film grain technology",                      &DXVA2_ModeH264_F,                   CODEC_ID_H264 },
-    { "H.264 variable-length decoder, no film grain technology",                   &DXVA2_ModeH264_E,                   CODEC_ID_H264 },
-    { "H.264 variable-length decoder, no film grain technology (Intel ClearVideo)",&DXVADDI_Intel_ModeH264_E,           CODEC_ID_H264 },
-    { "H.264 variable-length decoder, no film grain technology, FMO/ASO",          &DXVA_ModeH264_VLD_WithFMOASO_NoFGT, CODEC_ID_H264 },
-    { "H.264 inverse discrete cosine transform, film grain technology",            &DXVA2_ModeH264_D,                   0             },
-    { "H.264 inverse discrete cosine transform, no film grain technology",         &DXVA2_ModeH264_C,                   0             },
-    { "H.264 inverse discrete cosine transform, no film grain technology (Intel)", &DXVADDI_Intel_ModeH264_C,           0             },
-    { "H.264 motion compensation, film grain technology",                          &DXVA2_ModeH264_B,                   0             },
-    { "H.264 motion compensation, no film grain technology",                       &DXVA2_ModeH264_A,                   0             },
-    { "H.264 motion compensation, no film grain technology (Intel)",               &DXVADDI_Intel_ModeH264_A,           0             },
+    /* H.264 */
+    { "H.264 variable-length decoder, film grain technology",                         &DXVA2_ModeH264_F,                      CODEC_ID_H264 },
+    { "H.264 variable-length decoder, no film grain technology",                      &DXVA2_ModeH264_E,                      CODEC_ID_H264 },
+    { "H.264 variable-length decoder, no film grain technology (Intel ClearVideo)",   &DXVADDI_Intel_ModeH264_E,              CODEC_ID_H264 },
+    { "H.264 variable-length decoder, no film grain technology, FMO/ASO",             &DXVA_ModeH264_VLD_WithFMOASO_NoFGT,    CODEC_ID_H264 },
 
-    { "Windows Media Video 8 motion compensation", &DXVA2_ModeWMV8_B, 0 },
-    { "Windows Media Video 8 post processing",     &DXVA2_ModeWMV8_A, 0 },
+    { "H.264 inverse discrete cosine transform, film grain technology",               &DXVA2_ModeH264_D,                      0 },
+    { "H.264 inverse discrete cosine transform, no film grain technology",            &DXVA2_ModeH264_C,                      0 },
+    { "H.264 inverse discrete cosine transform, no film grain technology (Intel)",    &DXVADDI_Intel_ModeH264_C,              0 },
 
-    { "Windows Media Video 9 IDCT",                &DXVA2_ModeWMV9_C, 0 },
-    { "Windows Media Video 9 motion compensation", &DXVA2_ModeWMV9_B, 0 },
-    { "Windows Media Video 9 post processing",     &DXVA2_ModeWMV9_A, 0 },
+    { "H.264 motion compensation, film grain technology",                             &DXVA2_ModeH264_B,                      0 },
+    { "H.264 motion compensation, no film grain technology",                          &DXVA2_ModeH264_A,                      0 },
+    { "H.264 motion compensation, no film grain technology (Intel)",                  &DXVADDI_Intel_ModeH264_A,              0 },
 
-    { "VC-1 variable-length decoder",              &DXVA2_ModeVC1_D, CODEC_ID_VC1 },
-    { "VC-1 variable-length decoder",              &DXVA2_ModeVC1_D, CODEC_ID_WMV3 },
-    { "VC-1 variable-length decoder",              &DXVA2_ModeVC1_D2010, CODEC_ID_VC1 },
-    { "VC-1 variable-length decoder",              &DXVA2_ModeVC1_D2010, CODEC_ID_WMV3 },
-    { "VC-1 inverse discrete cosine transform",    &DXVA2_ModeVC1_C, 0 },
-    { "VC-1 motion compensation",                  &DXVA2_ModeVC1_B, 0 },
-    { "VC-1 post processing",                      &DXVA2_ModeVC1_A, 0 },
+    /* WMV */
+    { "Windows Media Video 8 motion compensation",                                    &DXVA2_ModeWMV8_B,                      0 },
+    { "Windows Media Video 8 post processing",                                        &DXVA2_ModeWMV8_A,                      0 },
 
-    { "VC-1 variable-length decoder (Intel)",      &DXVA_Intel_VC1_ClearVideo, 0 },
-    { "VC-1 variable-length decoder 2 (Intel)",    &DXVA_Intel_VC1_ClearVideo_2, 0 },
+    { "Windows Media Video 9 IDCT",                                                   &DXVA2_ModeWMV9_C,                      0 },
+    { "Windows Media Video 9 motion compensation",                                    &DXVA2_ModeWMV9_B,                      0 },
+    { "Windows Media Video 9 post processing",                                        &DXVA2_ModeWMV9_A,                      0 },
 
-    { "MPEG-4 Part 2 nVidia bitstream decoder",                                                         &DXVA_nVidia_MPEG4_ASP,                 0 },
-    { "MPEG-4 Part 2 variable-length decoder, Simple Profile",                                          &DXVA_ModeMPEG4pt2_VLD_Simple,          0 },
-    { "MPEG-4 Part 2 variable-length decoder, Simple&Advanced Profile, no global motion compensation",  &DXVA_ModeMPEG4pt2_VLD_AdvSimple_NoGMC, 0 },
-    { "MPEG-4 Part 2 variable-length decoder, Simple&Advanced Profile, global motion compensation",     &DXVA_ModeMPEG4pt2_VLD_AdvSimple_GMC,   0 },
+    /* VC-1 */
+    { "VC-1 variable-length decoder",                                                 &DXVA2_ModeVC1_D,                       CODEC_ID_VC1 },
+    { "VC-1 variable-length decoder",                                                 &DXVA2_ModeVC1_D,                       CODEC_ID_WMV3 },
+    { "VC-1 variable-length decoder",                                                 &DXVA2_ModeVC1_D2010,                   CODEC_ID_VC1 },
+    { "VC-1 variable-length decoder",                                                 &DXVA2_ModeVC1_D2010,                   CODEC_ID_WMV3 },
+    { "VC-1 variable-length decoder 2 (Intel)",                                       &DXVA_Intel_VC1_ClearVideo_2,           0 },
+    { "VC-1 variable-length decoder (Intel)",                                         &DXVA_Intel_VC1_ClearVideo,             0 },
+
+    { "VC-1 inverse discrete cosine transform",                                       &DXVA2_ModeVC1_C,                       0 },
+    { "VC-1 motion compensation",                                                     &DXVA2_ModeVC1_B,                       0 },
+    { "VC-1 post processing",                                                         &DXVA2_ModeVC1_A,                       0 },
+
+    /* Xvid/Divx: TODO */
+    { "MPEG-4 Part 2 nVidia bitstream decoder",                                       &DXVA_nVidia_MPEG4_ASP,                 0 },
+    { "MPEG-4 Part 2 variable-length decoder, Simple Profile",                        &DXVA_ModeMPEG4pt2_VLD_Simple,          0 },
+    { "MPEG-4 Part 2 variable-length decoder, Simple&Advanced Profile, no GMC",       &DXVA_ModeMPEG4pt2_VLD_AdvSimple_NoGMC, 0 },
+    { "MPEG-4 Part 2 variable-length decoder, Simple&Advanced Profile, GMC",          &DXVA_ModeMPEG4pt2_VLD_AdvSimple_GMC,   0 },
 
     { NULL, NULL, 0 }
 };
