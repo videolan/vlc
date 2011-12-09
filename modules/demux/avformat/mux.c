@@ -185,7 +185,7 @@ void CloseMux( vlc_object_t *p_this )
     {
         av_free( p_sys->oc->streams[i]->codec->extradata );
         av_free( p_sys->oc->streams[i]->codec );
-#if( LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT( 50, 32, 3 ) )
+#if( LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT( 52, 81, 0 ) )
         av_free( p_sys->oc->streams[i]->info );
 #endif
         av_free( p_sys->oc->streams[i] );
