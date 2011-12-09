@@ -179,7 +179,7 @@ void CloseMux( vlc_object_t *p_this )
     }
 
 #if( LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT( 52, 96, 0 ) )
-    avformat_context_free(p_sys->oc);
+    avformat_free_context(p_sys->oc);
 #else
     for( unsigned i = 0 ; i < p_sys->oc->nb_streams; i++ )
     {
