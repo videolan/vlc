@@ -53,10 +53,15 @@ void SeekPoints::update()
     /* lock here too, as update event is triggered by an external thread */
     if ( !access() ) return;
     pointsList.clear();
-    for ( int i=0; i<p_title->i_seekpoint ; i++ )
-        if ( p_title->seekpoint[i]->i_time_offset > 0 )
-            pointsList << SeekPoint( p_title->seekpoint[i] );
-
+    if ( p_title->i_seekpoint > 0 )
+    {
+        /* first check the last point to see if we have filled time offsets (> 0) */
+        if ( p_title->seekpoint[p_title->i_seekpoint - 1]->i_time_offset > 0 )
+        {
+            for ( int i=0; i<p_title->i_seekpoint ; i++ )
+                pointsList << SeekPoint( p_title->seekpoint[i] );
+        }
+    }
     vlc_input_title_Delete( p_title );
     release();
 }

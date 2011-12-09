@@ -200,6 +200,9 @@ void SeekSlider::mousePressEvent( QMouseEvent* event )
             {
                 QList<SeekPoint> points = chapters->getPoints();
                 int i_selected = -1;
+                bool b_startsnonzero = false; /* as we always starts at 1 */
+                if ( points.count() > 0 ) /* do we need an extra offset ? */
+                    b_startsnonzero = ( points.at(0).time > 0 );
                 int i_min_diff = i_width + 1;
                 for( int i = 0 ; i < points.count() ; i++ )
                 {
@@ -208,7 +211,7 @@ void SeekSlider::mousePressEvent( QMouseEvent* event )
                     if ( diff_x < i_min_diff )
                     {
                         i_min_diff = diff_x;
-                        i_selected = i;
+                        i_selected = i + ( ( b_startsnonzero )? 1 : 0 );
                     } else break;
                 }
                 if ( i_selected && i_min_diff < 4 ) // max 4px around mark
@@ -248,11 +251,14 @@ void SeekSlider::mouseMoveEvent( QMouseEvent *event )
         {
                 QList<SeekPoint> points = chapters->getPoints();
                 int i_selected = -1;
+                bool b_startsnonzero = false;
+                if ( points.count() > 0 )
+                    b_startsnonzero = ( points.at(0).time > 0 );
                 for( int i = 0 ; i < points.count() ; i++ )
                 {
                     int x = points.at(i).time / 1000000.0 / inputLength * size().width();
                     if ( event->x() >= x )
-                        i_selected = i;
+                        i_selected = i + ( ( b_startsnonzero )? 1 : 0 );
                 }
                 if ( i_selected >= 0 )
                     chapterLabel = points.at( i_selected ).name;
