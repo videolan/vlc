@@ -101,6 +101,7 @@ int OpenMux( vlc_object_t *p_this )
 #else
         file_oformat = guess_format( psz_mux, NULL, NULL );
 #endif
+        free( psz_mux );
     }
     else
     {
@@ -178,13 +179,16 @@ void CloseMux( vlc_object_t *p_this )
         msg_Err( p_mux, "could not write trailer" );
     }
 
+    /* XXX : use avformat_free_context() */
     for( i = 0 ; i < p_sys->oc->nb_streams; i++ )
     {
         if( p_sys->oc->streams[i]->codec->extradata )
             av_free( p_sys->oc->streams[i]->codec->extradata );
         av_free( p_sys->oc->streams[i]->codec );
+        av_free( p_sys->oc->streams[i]->info );
         av_free( p_sys->oc->streams[i] );
     }
+    av_free( p_sys->oc->streams );
     av_free( p_sys->oc );
 
     free( p_sys->io_buffer );
