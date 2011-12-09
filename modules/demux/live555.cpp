@@ -1961,9 +1961,20 @@ static void StreamClose( void *p_private )
     demux_t        *p_demux = tk->p_demux;
     demux_sys_t    *p_sys = p_demux->p_sys;
     tk->b_selected = false;
-    msg_Dbg( p_demux, "RTSP track Close" );
     p_sys->event_rtsp = 0xff;
     p_sys->event_data = 0xff;
+
+    es_out_Control( p_demux->out, ES_OUT_SET_ES_STATE, tk->p_es, false );
+
+    int nb_tracks = 0;
+    for( int i = 0; i < p_sys->i_track; i++ )
+    {
+        if( p_sys->track[i]->b_selected )
+            nb_tracks++;
+    }
+    msg_Dbg( p_demux, "RTSP track Close, %d track remaining", nb_tracks );
+    if( !nb_tracks )
+        p_sys->b_error = true;
 }
 
 
