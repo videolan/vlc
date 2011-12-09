@@ -187,9 +187,9 @@ static bool GetEqualizerStatus( intf_thread_t *p_custom_intf,
 
 - (void)setupEqualizer
 {
-    vlc_object_t *p_object= VLC_OBJECT(getAout());
+    vlc_object_t *p_object = VLC_OBJECT(getAout());
     if( p_object == NULL )
-        p_object = (vlc_object_t *)pl_Get( VLCIntf );
+        p_object = VLC_OBJECT(pl_Get( VLCIntf ));
 
     if( p_object )
     {
