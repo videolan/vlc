@@ -1,2 +1,4 @@
 Makefile
 build/
+*.tar.gz
+*.tar.bz2
