@@ -19,6 +19,11 @@ fi
 
 ACLOCAL_ARGS="-I m4 ${ACLOCAL_ARGS}"
 
+# Check for tools directory
+if test -d extras/tools/build/bin; then
+  PATH="`pwd`/extras/tools/build/bin:$PATH"
+fi
+
 ###
 ###  Get a sane environment, just in case
 ###
