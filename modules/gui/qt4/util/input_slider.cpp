@@ -469,7 +469,6 @@ void SeekSlider::paintEvent( QPaintEvent *event )
                     int x = point.time / 1000000.0 / inputLength * size().width();
                     painter.setPen( foreground );
                     painter.setBrush( Qt::NoBrush );
-                    painter.drawLine( x, 0, x, CHAPTERSSPOTSIZE );
                     painter.drawLine( x, height(), x, height() - CHAPTERSSPOTSIZE );
                 }
             }
