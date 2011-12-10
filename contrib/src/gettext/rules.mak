@@ -29,11 +29,12 @@ DEPS_gettext = iconv $(DEPS_iconv)
 	#touch $@
 
 ifdef HAVE_WIN32
-	(cd $< && $(HOSTVARS) ./configure $(HOSTCONF) --disable-relocatable --disable-java --disable-native-java)
+	(cd $< && $(HOSTVARS) ./configure $(HOSTCONF) --disable-relocatable --disable-java --disable-native-java --disable-threads)
+	(cd $< && make -C gettext-runtime install && make -C gettext-tools/misc install && make -C gettext-tools/m4 install)
 else
 	(cd $< && $(HOSTVARS) ./configure $(HOSTCONF) --disable-java --disable-native-java --without-emacs)
+	(cd $< && make -C gettext-runtime install && make -C gettext-tools/intl && make -C gettext-tools/libgrep && make -C gettext-tools/gnulib-lib && make -C gettext-tools/src install && make -C gettext-tools/misc install && make -C gettext-tools/m4 install)
 endif
-	(cd $< && make -C gettext-runtime install && make -C gettext-tools/misc install && make -C gettext-tools/m4 install)
 # Work around another non-sense of autoconf.
 ifdef HAVE_WIN32
 	(cd $(PREFIX)/include; sed -i.orig '314 c #if 0' libintl.h)
