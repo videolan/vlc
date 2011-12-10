@@ -25,20 +25,6 @@ ACLOCAL_ARGS="-I m4 ${ACLOCAL_ARGS}"
 CYGWIN=binmode
 export CYGWIN
 
-# Check for contrib directory
-if test -d extras/contrib/build/bin; then
-  PATH="`pwd`/extras/contrib/build/bin:$PATH"
-  if test -d extras/contrib/build/share/aclocal; then
-    ACLOCAL_ARGS="${ACLOCAL_ARGS} -I extras/contrib/build/share/aclocal"
-  fi
-  if test ".`uname -s`" = ".Darwin"; then
-    LD_LIBRARY_PATH=./extras/contrib/build/lib:$LD_LIBRARY_PATH
-    DYLD_LIBRARY_PATH=./extras/contrib/build/lib:$DYLD_LIBRARY_PATH
-    export LD_LIBRARY_PATH
-    export DYLD_LIBRARY_PATH
-  fi
-fi
-
 # Check for pkg-config
 if ! "${PKG_CONFIG:-pkg-config}" --version >/dev/null 2>&1; then
 	echo 'Error: "pkg-config" is not installed.' >&2
