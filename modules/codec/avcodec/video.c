@@ -147,7 +147,12 @@ static inline picture_t *ffmpeg_NewPictBuf( decoder_t *p_dec,
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    unsigned edge = p_sys->b_direct_rendering ? avcodec_get_edge_width() : 0;
+    unsigned edge = 0;
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 52, 66, 0 )
+    if (p_sys->b_direct_rendering)
+        edge = avcodec_get_edge_width();
+#endif
+
     p_dec->fmt_out.video.i_width = p_context->width + edge;
     p_dec->fmt_out.video.i_height = p_context->height + edge;
 
