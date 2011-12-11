@@ -30,7 +30,7 @@ msgid ""
 "see the file named COPYING for details.\n"
 "Written by the VideoLAN team; see the AUTHORS file.\n"
 msgstr ""
-"Ce programme est fourni SANS AUCUNE GARANTIE, tel que permis par la loi.\n"
+"Ce programme est fourni SANS AUCUNE GARANTIE, tel qu'il est permis par la loi.\n"
 "Vous pouvez le redistribuer selon les termes de la Licence Publique Générale "
 "GNU ;\n"
 "voir le fichier COPYING pour plus de détails.\n"
@@ -782,7 +782,7 @@ msgstr ""
 "charset=utf-8\" /></head><body><h2>Bienvenue sur l'aide du lecteur "
 "multimédia VLC</h2><h3>Documentation</h3><p>Vous pouvez trouver la "
 "documentation de VLC sur le <a href=\"http://wiki.videolan.org\">wiki</a> du "
-"site de VideoLAN.</p><p>Si vous êtes un  nouveau venu au lecteur multimédia "
+"site de VideoLAN.</p><p>Si vous êtes un nouveau venu au lecteur multimédia "
 "VLC, lisez le document<br><a href=\"http://wiki.videolan.org/Documentation :"
 "VLC_for_dummies\"><em>Introduction au lecteur multimédia VLC</em></a>.</"
 "p><p>Vous y trouverez des informations sur l'utilisation du lecteur dans le "
@@ -797,7 +797,7 @@ msgstr ""
 "raccourcis clavier principaux, lisez la page sur les <a href=\"http://wiki."
 "videolan.org/Hotkeys\">raccourcis</a>.</p><h3>Aide</h3><p>Avant de poser une "
 "question, référez vous d'abord à la <a href=\"http://wiki.videolan.org/"
-"Frequently_Asked_Questions\">FAQ</a>.</p><p>Vouxs pouvez ensuite demander "
+"Frequently_Asked_Questions\">FAQ</a>.</p><p>Vous pouvez ensuite demander "
 "(et apporter) de l'aide sur les <a href=\"http://forum.videolan.org"
 "\">Forums</a>, les <a href=\"http://www.videolan.org/vlc/lists.html\">listes "
 "de diffusion</a> ou notre cannal irc ( <a href=\"http://www.videolan.org/"
@@ -971,7 +971,7 @@ msgstr ""
 "  --option  Une option globale.\n"
 "   -option  La version à lettre unique d'une --option globale.\n"
 "   :option  Une option qui ne s'applique qu'au flux la précédant\n"
-"            et qui surcharge les options précédantes.\n"
+"            et qui surcharge les options précédentes.\n"
 "\n"
 "Syntaxe des flux (MRL) :\n"
 "  [[acces]/[demux]://]URL[@[titre][:chapitre][-[titre][:chapitre]]] [:"
@@ -1507,7 +1507,7 @@ msgstr ""
 
 #: src/libvlc-module.c:201
 msgid "Choose which objects should print debug message"
-msgstr "Choisissez les éléments qui peuvent affichers des messages"
+msgstr "Choisissez les éléments qui peuvent afficher des messages"
 
 #: src/libvlc-module.c:204
 msgid ""
@@ -1650,7 +1650,7 @@ msgid ""
 "The step size of the volume is adjustable using this option, in a range from "
 "0 to 1024."
 msgstr ""
-"Cett option permet de modifier le pas de réglage du volume audio, de 0 à 1024"
+"Cette option permet de modifier le pas de réglage du volume audio, de 0 à 1024"
 
 #: src/libvlc-module.c:280
 msgid "Audio output frequency (Hz)"
@@ -1756,7 +1756,7 @@ msgstr "Visualisations audio "
 #: src/libvlc-module.c:328
 msgid "This adds visualization modules (spectrum analyzer, etc.)."
 msgstr ""
-"Ajouter des modules de visualisation audio (analyseur de spectre, etc )."
+"Ajouter des modules de visualisation audio (analyseur de spectre, etc)."
 
 #: src/libvlc-module.c:332
 msgid "Replay gain mode"
@@ -16325,7 +16325,7 @@ msgstr "Messages…"
 
 #: modules/gui/macosx/MainMenu.m:339
 msgid "Errors and Warnings..."
-msgstr "Erreurs et avertissements…Aide u "
+msgstr "Erreurs et avertissements…"
 
 #: modules/gui/macosx/MainMenu.m:341
 msgid "Bring All to Front"
@@ -16610,7 +16610,7 @@ msgstr "Partie gauche du sous-écran :"
 
 #: modules/gui/macosx/open.m:194
 msgid "Subscreen top:"
-msgstr "Parite haute du sous-écran :"
+msgstr "Partie haute du sous-écran :"
 
 #: modules/gui/macosx/open.m:195
 msgid "Subscreen width:"
@@ -24275,7 +24275,7 @@ msgstr ""
 
 #: modules/video_filter/clone.c:47
 msgid "Duplicate your video to multiple windows and/or video output modules"
-msgstr "Duppliquer votre vidéo vers plusieurs fenêtres ou modules de sortie"
+msgstr "Dupliquer votre vidéo vers plusieurs fenêtres ou modules de sortie"
 
 #: modules/video_filter/clone.c:55
 msgid "Clone video filter"
