@@ -110,6 +110,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 #ifdef Q_WS_MAC
     setAttribute( Qt::WA_MacBrushedMetal );
 #endif
+    setAttribute( Qt::WA_QuitOnClose, false );
 
     /* Is video in embedded in the UI or not */
     b_videoEmbedded = var_InheritBool( p_intf, "embedded-video" );
