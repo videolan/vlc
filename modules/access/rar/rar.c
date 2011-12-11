@@ -45,8 +45,10 @@ static const int rar_marker_size = sizeof(rar_marker);
 
 void RarFileDelete(rar_file_t *file)
 {
-    for (int i = 0; i < file->chunk_count; i++)
+    for (int i = 0; i < file->chunk_count; i++) {
+        free(file->chunk[i]->mrl);
         free(file->chunk[i]);
+    }
     free(file->chunk);
     free(file->name);
     free(file);
@@ -153,7 +155,8 @@ static int SkipEnd(stream_t *s, const rar_block_t *hdr)
     return VLC_SUCCESS;
 }
 
-static int SkipFile(stream_t *s, int *count, rar_file_t ***file, const rar_block_t *hdr)
+static int SkipFile(stream_t *s, int *count, rar_file_t ***file,
+                    const rar_block_t *hdr, const char *volume_mrl)
 {
     const uint8_t *peek;
 
@@ -223,6 +226,7 @@ static int SkipFile(stream_t *s, int *count, rar_file_t ***file, const rar_block
     /* Append chunks */
     rar_file_chunk_t *chunk = malloc(sizeof(*chunk));
     if (chunk) {
+        chunk->mrl = strdup(volume_mrl);
         chunk->offset = stream_Tell(s) + hdr->size;
         chunk->size = hdr->add_size;
         chunk->cummulated_size = 0;
@@ -267,42 +271,119 @@ int RarProbe(stream_t *s)
     return VLC_SUCCESS;
 }
 
+typedef struct {
+    const char *match;
+    const char *format;
+    int start;
+    int stop;
+} rar_pattern_t;
+
+static const rar_pattern_t *FindVolumePattern(const char *location)
+{
+    static const rar_pattern_t patterns[] = {
+        { ".part1.rar",   "%s.part%.1d.rar", 2,   9 },
+        { ".part01.rar",  "%s.part%.2d.rar", 2,  99, },
+        { ".part001.rar", "%s.part%.3d.rar", 2, 999 },
+        { ".rar",         "%s.r%.2d",        0,  99 },
+        { NULL, NULL, 0, 0 },
+    };
+
+    const size_t location_size = strlen(location);
+    for (int i = 0; patterns[i].match != NULL; i++) {
+        const size_t match_size = strlen(patterns[i].match);
+
+        if (location_size < match_size)
+            continue;
+        if (!strcmp(&location[location_size - match_size], patterns[i].match))
+            return &patterns[i];
+    }
+    return NULL;
+}
+
 int RarParse(stream_t *s, int *count, rar_file_t ***file)
 {
     *count = 0;
     *file = NULL;
 
-    /* Skip marker */
-    if (IgnoreBlock(s, RAR_BLOCK_MARKER))
+    const rar_pattern_t *pattern = FindVolumePattern(s->psz_path);
+    int volume_offset = 0;
+
+    char *volume_mrl;
+    if (asprintf(&volume_mrl, "%s://%s",
+                 s->psz_access, s->psz_path) < 0)
         return VLC_EGENERIC;
 
-    /* Skip archive  */
-    if (IgnoreBlock(s, RAR_BLOCK_ARCHIVE))
-        return VLC_EGENERIC;
-
-    /* */
+    stream_t *vol = s;
     for (;;) {
-        rar_block_t bk;
-        int ret;
-
-        if (PeekBlock(s, &bk))
-            break;
-
-        switch(bk.type) {
-        case RAR_BLOCK_END:
-            ret = SkipEnd(s, &bk);
-            break;
-        case RAR_BLOCK_FILE:
-            ret = SkipFile(s, count, file, &bk);
-            break;
-        default:
-            ret = SkipBlock(s, &bk);
-            break;
+        /* Skip marker & archive */
+        if (IgnoreBlock(vol, RAR_BLOCK_MARKER) ||
+            IgnoreBlock(vol, RAR_BLOCK_ARCHIVE)) {
+            if (vol != s)
+                stream_Delete(vol);
+            free(volume_mrl);
+            return VLC_EGENERIC;
         }
-        if (ret)
-            break;
-    }
 
-    return VLC_SUCCESS;
+        /* */
+        bool has_next = false;
+        for (;;) {
+            rar_block_t bk;
+            int ret;
+
+            if (PeekBlock(vol, &bk))
+                break;
+
+            switch(bk.type) {
+            case RAR_BLOCK_END:
+                ret = SkipEnd(vol, &bk);
+                has_next = ret && (bk.flags & RAR_BLOCK_END_HAS_NEXT);
+                break;
+            case RAR_BLOCK_FILE:
+                ret = SkipFile(vol, count, file, &bk, volume_mrl);
+                break;
+            default:
+                ret = SkipBlock(vol, &bk);
+                break;
+            }
+            if (ret)
+                break;
+        }
+        if (vol != s)
+            stream_Delete(vol);
+
+        if (!has_next) {
+            free(volume_mrl);
+            return VLC_SUCCESS;
+        }
+
+        /* Open next volume */
+        const int volume_index = pattern->start + volume_offset++;
+        if (volume_index > pattern->stop) {
+            free(volume_mrl);
+            return VLC_SUCCESS;
+        }
+
+        char *volume_base;
+        if (asprintf(&volume_base, "%s://%.*s",
+                     s->psz_access,
+                     (int)(strlen(s->psz_path) - strlen(pattern->match)), s->psz_path) < 0) {
+            free(volume_mrl);
+            return VLC_SUCCESS;
+        }
+
+        free(volume_mrl);
+        if (asprintf(&volume_mrl, pattern->format, volume_base, volume_index) < 0)
+            volume_mrl = NULL;
+        free(volume_base);
+
+        if (!volume_mrl)
+            return VLC_SUCCESS;
+        vol = stream_UrlNew(s, volume_mrl);
+
+        if (!vol) {
+            free(volume_mrl);
+            return VLC_SUCCESS;
+        }
+    }
 }
 

@@ -72,6 +72,7 @@ static int Seek(access_t *access, uint64_t position)
         position = file->real_size;
 
     /* Search the chunk */
+    const rar_file_chunk_t *old_chunk = sys->chunk;
     for (int i = 0; i < file->chunk_count; i++) {
         sys->chunk = file->chunk[i];
         if (position < sys->chunk->cummulated_size + sys->chunk->size)
@@ -82,7 +83,13 @@ static int Seek(access_t *access, uint64_t position)
 
     const uint64_t offset = sys->chunk->offset +
                             (position - sys->chunk->cummulated_size);
-    return stream_Seek(sys->s, offset);
+
+    if (strcmp(old_chunk->mrl, sys->chunk->mrl)) {
+        if (sys->s)
+            stream_Delete(sys->s);
+        sys->s = stream_UrlNew(access, sys->chunk->mrl);
+    }
+    return sys->s ? stream_Seek(sys->s, offset) : VLC_EGENERIC;
 }
 
 static ssize_t Read(access_t *access, uint8_t *data, size_t size)
@@ -96,7 +103,7 @@ static ssize_t Read(access_t *access, uint8_t *data, size_t size)
         if (max <= 0)
             break;
 
-        int r = stream_Read(sys->s, data, max);
+        int r = sys->s ? stream_Read(sys->s, data, max) : -1;
         if (r <= 0)
             break;
 
@@ -117,6 +124,9 @@ static ssize_t Read(access_t *access, uint8_t *data, size_t size)
 static int Control(access_t *access, int query, va_list args)
 {
     stream_t *s = access->p_sys->s;
+    if (!s)
+        return VLC_EGENERIC;
+
     switch (query) {
     case ACCESS_CAN_SEEK: {
         bool *b = va_arg(args, bool *);
@@ -190,6 +200,10 @@ static int Open(vlc_object_t *object)
     access_InitFields(access);
     access->info.i_size = file->size;
 
+    rar_file_chunk_t dummy = {
+        .mrl = base,
+    };
+    sys->chunk = &dummy;
     Seek(access, 0);
 
     free(base);
@@ -207,7 +221,8 @@ static void Close(vlc_object_t *object)
     access_t *access = (access_t*)object;
     access_sys_t *sys = access->p_sys;
 
-    stream_Delete(sys->s);
+    if (sys->s)
+        stream_Delete(sys->s);
     RarFileDelete(sys->file);
     free(sys);
 }

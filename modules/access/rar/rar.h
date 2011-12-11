@@ -22,6 +22,7 @@
  *****************************************************************************/
 
 typedef struct {
+    char     *mrl;
     uint64_t offset;
     uint64_t size;
     uint64_t cummulated_size;
