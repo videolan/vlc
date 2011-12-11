@@ -44,6 +44,7 @@ VLC-tmp.app: vlc
 	cd $(top_builddir)/tmp/extras/package/macosx && \
 		xcodebuild -target vlc SYMROOT=../../../build DSTROOT=../../../build $(silentstd)
 	cp -R -L $(top_builddir)/tmp/build/Default/VLC.bundle $@
+	mkdir -p $@/Contents/Frameworks && cp -R -L $(CONTRIB_DIR)/Growl.framework $@/Contents/Frameworks/
 	mkdir -p $@/Contents/MacOS/share/locale/
 	cp -r $(srcdir)/share/lua $@/Contents/MacOS/share/
 	$(INSTALL) -m 644 $(srcdir)/share/vlc512x512.png $@/Contents/MacOS/share/vlc512x512.png
