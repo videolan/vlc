@@ -667,6 +667,9 @@ bool demux_sys_t::PreloadLinked()
 
                 i_chapters = 0;
                 ( *p_seg->Editions() )[j]->PublishChapters( *p_title, i_chapters, 0 );
+
+                // Input duration into i_length
+                p_title->i_length = ( *p_seg->Editions() )[j]->i_duration;
             }
 
             // create a name if there is none
