@@ -74,10 +74,10 @@ function updateStatus() {
             }
             $('band', data).each(function () {
                 var id = $(this).attr('id');
-                var freq = convertHz($(this).attr('freqency'));
                 var value = $(this).text() ? $(this).text() : 0;
+                var freq = ["60 Hz","170 Hz", "310 Hz", "600 Hz", "1 kHz","3 kHz", "6 kHz", "12 kHz" , "14 kHz" , "16 kHz" ];
                 if (!$('#eq_container' + id).length) {
-                    $('#window_equalizer').append('<div style="float:left;width:44px;" align="center" id="eq_container' + id + '"><div id="eq' + id + '_txt">' + value + 'dB</div><div class="eqBand" id="eq' + id + '" style="font-size: 18px;"></div><div>' + freq + '</div></div>');
+                    $('#window_equalizer').append('<div style="float:left;width:44px;" align="center" id="eq_container' + id + '"><div id="eq' + id + '_txt">' + value + 'dB</div><div class="eqBand" id="eq' + id + '" style="font-size: 18px;"></div><div>' + freq[id] + '</div></div>');
                     $('#eq' + id).slider({
                         min: -20,
                         max: 20,
@@ -342,14 +342,14 @@ function updateStreams() {
 
 function updateEQ() {
     $.ajax({
-        url: 'requests/equalizer.xml',
+        url: 'requests/status.xml',
         success: function (data, status, jqXHR) {
             $('band', data).each(function () {
+                var freq = ["60 Hz","170 Hz", "310 Hz", "600 Hz", "1 kHz","3 kHz", "6 kHz", "12 kHz" , "14 kHz" , "16 kHz" ];
                 var id = $(this).attr('id');
-                var freq = convertHz($(this).attr('freqency'));
                 var value = $(this).text() ? $(this).text() : 0;
                 if (!$('#eq_container' + id).length) {
-                    $('#window_equalizer').append('<div style="float:left;width:44px;" align="center" id="eq_container' + id + '"><div id="eq' + id + '_txt">' + value + 'dB</div><div class="eqBand" id="eq' + id + '" style="font-size: 18px;"></div><div>' + freq + '</div></div>');
+                    $('#window_equalizer').append('<div style="float:left;width:44px;" align="center" id="eq_container' + id + '"><div id="eq' + id + '_txt">' + value + 'dB</div><div class="eqBand" id="eq' + id + '" style="font-size: 18px;"></div><div>' + freq[id] + '</div></div>');
                     $('#eq' + id).slider({
                         min: -20,
                         max: 20,
@@ -436,7 +436,7 @@ function sendBatchVLMCmd(command, append) {
 
 function sendEQCmd(params) {
     $.ajax({
-        url: 'requests/equalizer.xml',
+        url: 'requests/status.xml',
         data: params,
         success: function (data, status, jqXHR) {
             updateEQ();

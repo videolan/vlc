@@ -236,7 +236,14 @@ local printXmlKeyValue = function (k,v,indent)
     end
 
     if (k) then
-        print("</"..xmlString(k)..">")
+        xs=xmlString(k)
+        space_loc=string.find(xs," ")
+        if space_loc == nil then
+            print("</"..xs..">")
+        else
+            xs=string.sub(xs,1,space_loc)
+            print("</"..xs..">")
+        end
     end
 end
 

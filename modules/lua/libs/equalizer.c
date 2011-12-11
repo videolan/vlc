@@ -175,7 +175,7 @@ static int vlclua_equalizer_get( lua_State *L )
             return 0;
         lua_pushstring( L, str );
         free(str);
-        if( asprintf( &str , "band_%d", i++ ) == -1 )
+        if( asprintf( &str , "band id=\"%d\"", i++ ) == -1 )
             return 0;
         lua_setfield( L , -2 , str );
         free( str );
@@ -302,7 +302,7 @@ static int vlclua_equalizer_get_presets( lua_State *L )
     for( int i = 0 ; i < NB_PRESETS ; i++ )
     {
         lua_pushstring( L, preset_list_text[i] );
-        if( asprintf( &str , "id_%d",i ) == -1 )
+        if( asprintf( &str , "preset id=\"%d\"",i ) == -1 )
             return 0;
         lua_setfield( L , -2 , str );
         free(str);
