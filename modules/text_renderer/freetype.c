@@ -625,7 +625,7 @@ static char* Win32_Select( filter_t *p_filter, const char* family,
 {
     VLC_UNUSED( i_size );
 
-    if( strlen( family ) < 1 )
+    if( !family || strlen( family ) < 1 )
         goto fail;
 
     /* */
