@@ -76,7 +76,7 @@ static int Control(stream_t *s, int query, va_list args)
     case STREAM_GET_CONTENT_TYPE: {
         char **mime = va_arg(args, char **);
         *mime = strdup("audio/x-mpegurl");
-        return VLC_EGENERIC;
+        return VLC_SUCCESS;
     }
     default:
         return stream_vaControl(s->p_sys->payload, query, args);
