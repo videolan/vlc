@@ -129,6 +129,7 @@ static int Open(vlc_object_t *object)
         }
         RarFileDelete(f);
     }
+    free(base);
     free(files);
     if (!data)
         return VLC_EGENERIC;
