@@ -167,6 +167,7 @@ int picture_Setup( picture_t *p_picture, vlc_fourcc_t i_chroma,
         if( i_ratio_h < p_dsc->p[i].h.den )
             i_ratio_h = p_dsc->p[i].h.den;
     }
+    i_modulo_h = LCM( i_modulo_h, 32 );
 
     const int i_width_aligned  = ( i_width  + i_modulo_w - 1 ) / i_modulo_w * i_modulo_w;
     const int i_height_aligned = ( i_height + i_modulo_h - 1 ) / i_modulo_h * i_modulo_h;
