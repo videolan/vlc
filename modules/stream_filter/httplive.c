@@ -1957,7 +1957,7 @@ static int Open(vlc_object_t *p_this)
     vlc_UrlParse(&p_sys->m3u8, psz_uri, 0);
     free(psz_uri);
 
-    p_sys->bandwidth = -1;
+    p_sys->bandwidth = 0;
     p_sys->b_live = true;
     p_sys->b_meta = false;
     p_sys->b_error = false;
