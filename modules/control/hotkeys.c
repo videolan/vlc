@@ -301,17 +301,8 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
                 ClearChannels( p_intf, p_vout );
 
                 int state = var_GetInteger( p_input, "state" );
-                if( state != PAUSE_S )
-                {
-                    DisplayIcon( p_vout, OSD_PAUSE_ICON );
-                    state = PAUSE_S;
-                }
-                else
-                {
-                    DisplayIcon( p_vout, OSD_PLAY_ICON );
-                    state = PLAYING_S;
-                }
-                var_SetInteger( p_input, "state", state );
+                DisplayIcon( p_vout, state != PAUSE_S ? OSD_PAUSE_ICON : OSD_PLAY_ICON );
+                playlist_Pause( p_playlist );
             }
             else
                 playlist_Play( p_playlist );

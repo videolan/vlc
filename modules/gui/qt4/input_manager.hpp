@@ -206,7 +206,6 @@ public slots:
     void setAtoB();
 
 private slots:
-    void togglePlayPause();
     void AtoBLoop( float, int64_t, int );
 
 signals:
