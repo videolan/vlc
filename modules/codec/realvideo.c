@@ -124,7 +124,7 @@ static picture_t *DecodeVideo( decoder_t *, block_t ** );
 
 vlc_module_begin ()
     set_description( N_("RealVideo library decoder") )
-    set_capability( "decoder", 10 )
+    set_capability( "decoder", 0 )
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_VCODEC )
     set_callbacks( Open, Close )
