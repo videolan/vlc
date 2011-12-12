@@ -272,7 +272,10 @@ vlc_module_end ()
 static const char *const ppsz_sout_options[] = {
     "dst", "name", "port", "port-audio", "port-video", "*sdp", "ttl", "mux",
     "sap", "description", "url", "email", "phone",
-    "proto", "rtcp-mux", "caching", "key", "salt",
+    "proto", "rtcp-mux", "caching",
+#ifdef HAVE_SRTP
+    "key", "salt",
+#endif
     "mp4a-latm", NULL
 };
 
