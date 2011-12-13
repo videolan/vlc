@@ -1,5 +1,5 @@
 /*****************************************************************************
- * variables.h: variables handling
+ * vlc_variables.h: variables handling
  *****************************************************************************
  * Copyright (C) 2002-2004 VLC authors and VideoLAN
  * $Id$

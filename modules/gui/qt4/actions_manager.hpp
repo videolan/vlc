@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Controller.hpp : Controller for the main interface
+ * actions_manager.hpp : Controller for the main interface
  ****************************************************************************
  * Copyright (C) 2006-2008 the VideoLAN team
  * $Id$

@@ -1,5 +1,5 @@
 /*****************************************************************************
- * screensaver.c : disable screen savers when VLC is playing
+ * xscreensaver.c : disable screen savers when VLC is playing
  *****************************************************************************
  * Copyright (C) 2006-2009 the VideoLAN team
  * $Id$

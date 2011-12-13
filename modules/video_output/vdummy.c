@@ -1,5 +1,5 @@
 /*****************************************************************************
- * vout.c: Dummy video output display method for testing purposes
+ * vdummy.c: Dummy video output display method for testing purposes
  *****************************************************************************
  * Copyright (C) 2000-2009 the VideoLAN team
  * $Id$

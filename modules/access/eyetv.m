@@ -1,5 +1,5 @@
 /*****************************************************************************
- * eyetv.c : Access module to connect to our plugin running within EyeTV
+ * eyetv.m : Access module to connect to our plugin running within EyeTV
  *****************************************************************************
  * Copyright (C) 2006-2007 the VideoLAN team
  * $Id$

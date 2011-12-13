@@ -1,5 +1,5 @@
 /*****************************************************************************
- * va.c: Video Acceleration helpers
+ * dxva2.c: Video Acceleration helpers
  *****************************************************************************
  * Copyright (C) 2009 Geoffroy Couprie
  * Copyright (C) 2009 Laurent Aimar

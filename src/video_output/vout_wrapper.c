@@ -1,5 +1,5 @@
 /*****************************************************************************
- * vout_display.c: "vout display" -> "video output" wrapper
+ * vout_wrapper.c: "vout display" -> "video output" wrapper
  *****************************************************************************
  * Copyright (C) 2009 Laurent Aimar
  * $Id$

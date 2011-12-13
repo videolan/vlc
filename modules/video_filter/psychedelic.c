@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Psychedelic.c : Psychedelic video effect plugin for vlc
+ * psychedelic.c : Psychedelic video effect plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2006 the VideoLAN team
  * $Id$

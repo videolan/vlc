@@ -1,5 +1,5 @@
 /*****************************************************************************
- * core.c: Core functions : init, playlist, stream management
+ * mediacontrol_core.c: Core functions : init, playlist, stream management
  *****************************************************************************
  * Copyright (C) 2005 the VideoLAN team
  * $Id$

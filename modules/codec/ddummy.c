@@ -1,5 +1,5 @@
 /*****************************************************************************
- * dddumy.c: dummy decoder plugin for vlc.
+ * ddummy.c: dummy decoder plugin for vlc.
  *****************************************************************************
  * Copyright (C) 2002 the VideoLAN team
  * $Id$

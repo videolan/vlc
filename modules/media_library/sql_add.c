@@ -1,5 +1,5 @@
 /*****************************************************************************
- * sql_media_library.c: SQL-based media library
+ * sql_add.c: SQL-based media library
  *****************************************************************************
  * Copyright (C) 2008-2010 the VideoLAN Team and AUTHORS
  * $Id$

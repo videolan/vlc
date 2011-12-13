@@ -1,5 +1,5 @@
 /*****************************************************************************
- * bdagraph.h : DirectShow BDA graph builder header for vlc
+ * bdagraph.hpp : DirectShow BDA graph builder header for vlc
  *****************************************************************************
  * Copyright ( C ) 2007 the VideoLAN team
  *

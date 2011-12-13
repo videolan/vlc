@@ -1,5 +1,5 @@
 /*****************************************************************************
- * open.hpp : Panels for the open dialogs
+ * open_panels.hpp : Panels for the open dialogs
  ****************************************************************************
  * Copyright (C) 2006-2009 the VideoLAN team
  * Copyright (C) 2007 Société des arts technologiques

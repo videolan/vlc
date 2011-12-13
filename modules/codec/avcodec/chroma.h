@@ -1,5 +1,5 @@
 /*****************************************************************************
- * avcodec.h: decoder and encoder using libavcodec
+ * chroma.h: decoder and encoder using libavcodec
  *****************************************************************************
  * Copyright (C) 2001-2008 the VideoLAN team
  * $Id$

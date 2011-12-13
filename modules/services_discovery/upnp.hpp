@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Upnp.hpp :  UPnP discovery module (libupnp) header
+ * upnp.hpp :  UPnP discovery module (libupnp) header
  *****************************************************************************
  * Copyright (C) 2004-2010 the VideoLAN team
  * $Id$

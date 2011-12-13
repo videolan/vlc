@@ -1,5 +1,5 @@
 /*****************************************************************************
- * voutagl.c: MacOS X agl OpenGL provider (used by webbrowser.plugin)
+ * voutagl.m: MacOS X agl OpenGL provider (used by webbrowser.plugin)
  *****************************************************************************
  * Copyright (C) 2001-2007 the VideoLAN team
  * $Id$

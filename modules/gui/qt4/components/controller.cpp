@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Controller.cpp : Controller for the main interface
+ * controller.cpp : Controller for the main interface
  ****************************************************************************
  * Copyright (C) 2006-2009 the VideoLAN team
  * $Id$

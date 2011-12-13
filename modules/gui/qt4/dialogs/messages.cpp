@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Messages.cpp : Information about an item
+ * messages.cpp : Information about an item
  ****************************************************************************
  * Copyright (C) 2006-2011 the VideoLAN team
  * $Id$

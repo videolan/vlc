@@ -1,5 +1,5 @@
 /*****************************************************************************
- * video filter: video filter doing chroma conversion and resizing
+ * deinterlace.c: video filter doing chroma conversion and resizing
  *               using the ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 the VideoLAN team

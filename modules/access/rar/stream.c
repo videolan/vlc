@@ -1,5 +1,5 @@
 /*****************************************************************************
- * rar.c: uncompressed RAR stream filter
+ * stream.c: uncompressed RAR stream filter
  *****************************************************************************
  * Copyright (C) 2008-2010 Laurent Aimar
  * $Id$

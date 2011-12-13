@@ -1,5 +1,5 @@
 /*****************************************************************************
- * events.h: events definitions
+ * vlc_events.h: events definitions
  * Interface used to send events.
  *****************************************************************************
  * Copyright (C) 2007 VLC authors and VideoLAN

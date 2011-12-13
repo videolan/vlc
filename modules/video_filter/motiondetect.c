@@ -1,5 +1,5 @@
 /*****************************************************************************
- * motiondetec.c : Second version of a motion detection plugin.
+ * motiondetect.c : Second version of a motion detection plugin.
  *****************************************************************************
  * Copyright (C) 2000-2008 the VideoLAN team
  * $Id$

@@ -1,5 +1,5 @@
 /*
- * AtmoSerialConnection.cpp: Class for communication with the serial hardware of
+ * MoMoConnection.cpp: Class for communication with the serial hardware of
  * Atmo Light, opens and configures the serial port
  *
  * See the README.txt file for copyright information and how to reach the author(s).

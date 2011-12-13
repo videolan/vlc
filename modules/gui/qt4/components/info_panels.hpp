@@ -1,5 +1,5 @@
 /*****************************************************************************
- * infopanels.hpp : Panels for the information dialogs
+ * info_panels.hpp : Panels for the information dialogs
  ****************************************************************************
  * Copyright (C) 2006-2007 the VideoLAN team
  * $Id$

@@ -1,5 +1,5 @@
 /*****************************************************************************
- * renderer.c : dummy text rendering functions
+ * tdummy.c : dummy text rendering functions
  *****************************************************************************
  * Copyright (C) 2000, 2001 the VideoLAN team
  * $Id$

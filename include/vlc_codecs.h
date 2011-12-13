@@ -1,5 +1,5 @@
 /*****************************************************************************
- * codecs.h: codec related structures needed by the demuxers and decoders
+ * vlc_codecs.h: codec related structures needed by the demuxers and decoders
  *****************************************************************************
  * Copyright (C) 1999-2001 VLC authors and VideoLAN
  * $Id$

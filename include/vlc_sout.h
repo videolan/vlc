@@ -1,5 +1,5 @@
 /*****************************************************************************
- * stream_output.h : stream output module
+ * vlc_sout.h : stream output module
  *****************************************************************************
  * Copyright (C) 2002-2008 VLC authors and VideoLAN
  * $Id$

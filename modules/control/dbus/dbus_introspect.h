@@ -1,5 +1,5 @@
 /*****************************************************************************
- * dbus-introspect.h : dbus control module (mpris v2.1) - introspection data
+ * dbus_introspect.h : dbus control module (mpris v2.1) - introspection data
  *****************************************************************************
  * Copyright © 2006-2011 Rafaël Carré
  * Copyright © 2007-2011 Mirsal Ennaime

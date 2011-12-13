@@ -1,5 +1,5 @@
 /*****************************************************************************
- * libvlc.h:  libvlc external API
+ * libvlc_media_discoverer.h:  libvlc external API
  *****************************************************************************
  * Copyright (C) 1998-2009 VLC authors and VideoLAN
  * $Id$

@@ -1,5 +1,5 @@
 /*****************************************************************************
- * dbus-tracklist.h : dbus control module (mpris v1.0) - /TrackList object
+ * dbus_tracklist.h : dbus control module (mpris v1.0) - /TrackList object
  *****************************************************************************
  * Copyright © 2006-2008 Rafaël Carré
  * Copyright © 2007-2010 Mirsal Ennaime

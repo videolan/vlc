@@ -1,5 +1,5 @@
 /*****************************************************************************
- * audio_video.c: Audio/Video management : volume, snapshot, OSD
+ * mediacontrol_audio_video.c: Audio/Video management : volume, snapshot, OSD
  *****************************************************************************
  * Copyright (C) 2005 the VideoLAN team
  * $Id$

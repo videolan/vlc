@@ -1,5 +1,5 @@
 /*****************************************************************************
- * dynamicoverlay_list.h : dynamic overlay list
+ * dynamicoverlay_list.c : dynamic overlay list
  *****************************************************************************
  * Copyright (C) 2008-2009 the VideoLAN team
  * $Id$

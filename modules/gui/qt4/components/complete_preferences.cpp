@@ -1,5 +1,5 @@
 /*****************************************************************************
- * preferences.cpp : "Normal preferences"
+ * complete_preferences.cpp : "Normal preferences"
  ****************************************************************************
  * Copyright (C) 2006-2011 the VideoLAN team
  * $Id$

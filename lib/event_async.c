@@ -1,5 +1,5 @@
 /*****************************************************************************
- * event.c: New libvlc event control API
+ * event_async.c: New libvlc event control API
  *****************************************************************************
  * Copyright (C) 2007 VLC authors and VideoLAN
  * $Id $

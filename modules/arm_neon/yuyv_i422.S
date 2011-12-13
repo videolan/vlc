@@ -1,5 +1,5 @@
  @*****************************************************************************
- @ yuyv_i422_neon.S : ARM NEONv1 packed to planar YUV422 conversion
+ @ yuyv_i422.S : ARM NEONv1 packed to planar YUV422 conversion
  @*****************************************************************************
  @ Copyright (C) 2011 Rémi Denis-Courmont
  @

@@ -1,5 +1,5 @@
 /*****************************************************************************
- * common.h: common definitions
+ * vlc_common.h: common definitions
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998-2011 VLC authors and VideoLAN

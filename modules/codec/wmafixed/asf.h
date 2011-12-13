@@ -1,5 +1,5 @@
 /*****************************************************************************
- * wma.c: wma decoder using integer decoder from Rockbox, based on FFmpeg
+ * asf.h: wma decoder using integer decoder from Rockbox, based on FFmpeg
  *****************************************************************************
  * Copyright (C) 2008 M2X
  *

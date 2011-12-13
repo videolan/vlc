@@ -1,5 +1,5 @@
 /*****************************************************************************
- * customwidgets.cpp: Custom widgets
+ * searchlineedit.cpp: Custom widgets
  ****************************************************************************
  * Copyright (C) 2006 the VideoLAN team
  * Copyright (C) 2004 Daniel Molkentin <molkentin@kde.org>

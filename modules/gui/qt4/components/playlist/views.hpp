@@ -1,5 +1,5 @@
 /*****************************************************************************
- * icon_view.hpp : Icon view for the Playlist
+ * views.hpp : Icon view for the Playlist
  ****************************************************************************
  * Copyright © 2010 the VideoLAN team
  * $Id$

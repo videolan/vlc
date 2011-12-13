@@ -1,5 +1,5 @@
 /*****************************************************************************
- * crossbar.c : DirectShow access module for vlc
+ * crossbar.cpp : DirectShow access module for vlc
  *****************************************************************************
  * Copyright (C) 2002, 2004, 2009 the VideoLAN team
  * $Id$

@@ -1,5 +1,5 @@
 /*
- * FnordlichtConnection.h: class to access a FnordlichtLight Hardware
+ * FnordlichtConnection.cpp: class to access a FnordlichtLight Hardware
  * - the description could be found
  * here: http://github.com/fd0/fnordlicht/raw/master/doc/PROTOCOL
  *

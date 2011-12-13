@@ -1,5 +1,5 @@
 /*****************************************************************************
- * decoder.c: AAC decoder using libfaad2
+ * faad.c: AAC decoder using libfaad2
  *****************************************************************************
  * Copyright (C) 2001, 2003 the VideoLAN team
  * $Id$

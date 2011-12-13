@@ -1,5 +1,5 @@
 /*****************************************************************************
- * quit.c: LibVLC termination event
+ * exit.c: LibVLC termination event
  *****************************************************************************
  * Copyright (C) 2009-2010 VLC authors and VideoLAN
  *

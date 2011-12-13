@@ -1,5 +1,5 @@
 /*****************************************************************************
- * vcd.c : VCD input module for vlc using libcdio, libvcd and libvcdinfo.
+ * access.c : VCD input module for vlc using libcdio, libvcd and libvcdinfo.
  *         vlc-specific things tend to go here.
  *****************************************************************************
  * Copyright (C) 2000, 2003, 2004, 2005 the VideoLAN team

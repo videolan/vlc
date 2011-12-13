@@ -1,5 +1,5 @@
 /*******************************************************************************
- * itml.c : iTunes Music Library import functions
+ * itml.h : iTunes Music Library import functions
  *******************************************************************************
  * Copyright (C) 2007 the VideoLAN team
  * $Id$

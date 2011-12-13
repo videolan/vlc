@@ -1,5 +1,5 @@
 /*****************************************************************************
- * MainWindow.h: MacOS X interface module
+ * MainWindow.m: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2002-2011 VLC authors and VideoLAN
  * $Id$

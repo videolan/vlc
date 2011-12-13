@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Upnp.cpp :  UPnP discovery module (libupnp)
+ * upnp.cpp :  UPnP discovery module (libupnp)
  *****************************************************************************
  * Copyright (C) 2004-2011 the VideoLAN team
  * $Id$

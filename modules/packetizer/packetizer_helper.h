@@ -1,5 +1,5 @@
 /*****************************************************************************
- * packetizer.h: Packetizer helpers
+ * packetizer_helper.h: Packetizer helpers
  *****************************************************************************
  * Copyright (C) 2009 Laurent Aimar
  * $Id$

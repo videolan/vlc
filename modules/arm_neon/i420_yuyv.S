@@ -1,5 +1,5 @@
  @*****************************************************************************
- @ i420_yuyv_neon.S : ARM NEONv1 I420 to YUYV chroma conversion
+ @ i420_yuyv.S : ARM NEONv1 I420 to YUYV chroma conversion
  @*****************************************************************************
  @ Copyright (C) 2009-2011 Rémi Denis-Courmont
  @

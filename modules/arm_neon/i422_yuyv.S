@@ -1,5 +1,5 @@
  @*****************************************************************************
- @ i422_yuyv_neon.S : ARM NEONv1 I422 to YUYV chroma conversion
+ @ i422_yuyv.S : ARM NEONv1 I422 to YUYV chroma conversion
  @*****************************************************************************
  @ Copyright (C) 2011 Rémi Denis-Courmont
  @

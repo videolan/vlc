@@ -1,5 +1,5 @@
 /*****************************************************************************
- * dbus-tracklist.c : dbus control module (mpris v2.1) - TrackList interface
+ * dbus_tracklist.c : dbus control module (mpris v2.1) - TrackList interface
  *****************************************************************************
  * Copyright © 2006-2011 Rafaël Carré
  * Copyright © 2007-2011 Mirsal Ennaime

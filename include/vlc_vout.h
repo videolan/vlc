@@ -1,5 +1,5 @@
 /*****************************************************************************
- * vlc_video.h: common video definitions
+ * vlc_vout.h: common video definitions
  *****************************************************************************
  * Copyright (C) 1999 - 2008 VLC authors and VideoLAN
  * $Id$

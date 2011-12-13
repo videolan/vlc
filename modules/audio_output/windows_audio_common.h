@@ -1,5 +1,5 @@
 /*****************************************************************************
- * windows_common.h: Windows Audio common code
+ * windows_audio_common.h: Windows Audio common code
  *****************************************************************************
  * Copyright (C) 2001-2009 VideoLAN
  * $Id$

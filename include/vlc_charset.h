@@ -1,5 +1,5 @@
 /*****************************************************************************
- * charset.h: Unicode UTF-8 wrappers function
+ * vlc_charset.h: Unicode UTF-8 wrappers function
  *****************************************************************************
  * Copyright (C) 2003-2005 VLC authors and VideoLAN
  * Copyright © 2005-2010 Rémi Denis-Courmont

@@ -1,5 +1,5 @@
 /*****************************************************************************
- * util.c: Utility functions and exceptions management
+ * mediacontrol_util.c: Utility functions and exceptions management
  *****************************************************************************
  * Copyright (C) 2005 the VideoLAN team
  * $Id$

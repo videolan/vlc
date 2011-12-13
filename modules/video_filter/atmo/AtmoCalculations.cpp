@@ -1,5 +1,5 @@
 /*
- * calculations.c: calculations needed by the input devices
+ * AtmoCalculations.cpp: calculations needed by the input devices
  *
  * See the README file for copyright information and how to reach the author.
  *

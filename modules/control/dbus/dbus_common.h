@@ -1,5 +1,5 @@
 /*****************************************************************************
- * dbus-common.h : Common header for D-Bus control modules
+ * dbus_common.h : Common header for D-Bus control modules
  *****************************************************************************
  * Copyright © 2006-2008 Rafaël Carré
  * Copyright © 2007-2010 Mirsal Ennaime

@@ -1,5 +1,5 @@
 /*****************************************************************************
- * preferences_tree.hpp : Tree of modules for preferences
+ * complete_preferences.hpp : Tree of modules for preferences
  ****************************************************************************
  * Copyright (C) 2006-2007 the VideoLAN team
  * $Id$

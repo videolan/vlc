@@ -1,5 +1,5 @@
 /*****************************************************************************
- * iso_lang.h: function to decode language code (in dvd or a52 for instance).
+ * vlc_iso_lang.h: function to decode language code (in dvd or a52 for instance).
  *****************************************************************************
  * Copyright (C) 1998-2001 VLC authors and VideoLAN
  * $Id$

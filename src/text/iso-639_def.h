@@ -1,5 +1,5 @@
 /*****************************************************************************
- * iso_lang.h: languages codes and abbreviations
+ * iso-639_def.h: languages codes and abbreviations
  *****************************************************************************
  * Copyright (C) 1998-2004 VLC authors and VideoLAN
  * $Id$

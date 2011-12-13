@@ -1,5 +1,5 @@
 /*****************************************************************************
- * GotoTime.cpp : GotoTime and About dialogs
+ * gototime.cpp : GotoTime and About dialogs
  ****************************************************************************
  * Copyright (C) 2007 the VideoLAN team
  * $Id$

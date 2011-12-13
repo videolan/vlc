@@ -1,5 +1,5 @@
 /*****************************************************************************
- * libvlc.h:  libvlc_* new external API structures
+ * libvlc_structures.h:  libvlc_* new external API structures
  *****************************************************************************
  * Copyright (C) 1998-2008 VLC authors and VideoLAN
  * $Id $

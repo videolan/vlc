@@ -1,5 +1,5 @@
 /*****************************************************************************
- * dynamicoverlay_commands.c : dynamic overlay plugin commands
+ * dynamicoverlay_queue.c : dynamic overlay plugin commands
  *****************************************************************************
  * Copyright (C) 2008-2009 the VideoLAN team
  * $Id$

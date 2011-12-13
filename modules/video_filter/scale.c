@@ -1,5 +1,5 @@
 /*****************************************************************************
- * resize.c: video scaling module for YUVP/A, I420 and RGBA pictures
+ * scale.c: video scaling module for YUVP/A, I420 and RGBA pictures
  *  Uses the low quality "nearest neighbour" algorithm.
  *****************************************************************************
  * Copyright (C) 2003-2007 the VideoLAN team

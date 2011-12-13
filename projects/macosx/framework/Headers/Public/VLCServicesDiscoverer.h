@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCMediaDiscoverer.h: VLC.framework VLCMediaDiscoverer header
+ * VLCServicesDiscoverer.h: VLC.framework VLCMediaDiscoverer header
  *****************************************************************************
  * Copyright (C) 2007 Pierre d'Herbemont
  * Copyright (C) 2007 the VideoLAN team

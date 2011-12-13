@@ -1,5 +1,5 @@
 /*****************************************************************************
- * panels.hpp : Panels for the playlist
+ * standardpanel.hpp : Panels for the playlist
  ****************************************************************************
  * Copyright (C) 2000-2005 the VideoLAN team
  * $Id$

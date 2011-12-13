@@ -1,5 +1,5 @@
 /*****************************************************************************
- * encoder.c: dummy encoder plugin for vlc.
+ * edummy.c: dummy encoder plugin for vlc.
  *****************************************************************************
  * Copyright (C) 2002 the VideoLAN team
  * $Id$

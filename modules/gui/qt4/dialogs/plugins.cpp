@@ -1,5 +1,5 @@
 /*****************************************************************************
- * plugins.hpp : Plug-ins and extensions listing
+ * plugins.cpp : Plug-ins and extensions listing
  ****************************************************************************
  * Copyright (C) 2008-2010 the VideoLAN team
  * $Id$

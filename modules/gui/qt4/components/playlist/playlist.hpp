@@ -1,5 +1,5 @@
 /*****************************************************************************
- * interface_widgets.hpp : Playlist Widgets
+ * playlist.hpp : Playlist Widgets
  ****************************************************************************
  * Copyright (C) 2006-2009 the VideoLAN team
  * $Id$

@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCMediaListPlayer.m: VLCKit.framework VLCMediaListPlayer implementation
+ * VLCMediaListPlayer.h: VLCKit.framework VLCMediaListPlayer implementation
  *****************************************************************************
  * Copyright (C) 2009 Pierre d'Herbemont
  * Partial Copyright (C) 2009 Felix Paul Kühne

@@ -1,5 +1,5 @@
 /*****************************************************************************
- * event.h: Windows video output header file
+ * events.h: Windows video output header file
  *****************************************************************************
  * Copyright (C) 2001-2009 the VideoLAN team
  * $Id$

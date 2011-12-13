@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCMediaDiscoverer.m: VLC.framework VLCMediaDiscoverer implementation
+ * VLCServicesDiscoverer.m: VLC.framework VLCMediaDiscoverer implementation
  *****************************************************************************
  * Copyright (C) 2007 Pierre d'Herbemont
  * Copyright (C) 2007 the VideoLAN team

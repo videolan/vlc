@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Messages.hpp : Information about a stream
+ * messages.hpp : Information about a stream
  ****************************************************************************
  * Copyright (C) 2006-2007 the VideoLAN team
  * $Id$

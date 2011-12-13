@@ -1,5 +1,5 @@
 /*****************************************************************************
- * external.hpp : Dialogs from other LibVLC core and other plugins
+ * variables.hpp : Dialogs from other LibVLC core and other plugins
  ****************************************************************************
  * Copyright (C) 2009 Rémi Denis-Courmont
  *

@@ -1,5 +1,5 @@
 /*****************************************************************************
- * objects.c: Generic lua<->vlc object wrapper
+ * objects.h: Generic lua<->vlc object wrapper
  *****************************************************************************
  * Copyright (C) 2007-2008 the VideoLAN team
  * $Id$

@@ -1,5 +1,5 @@
 /*****************************************************************************
- * main_interface.cpp : Main interface
+ * main_interface_win32.cpp : Main interface
  ****************************************************************************
  * Copyright (C) 2006-2010 VideoLAN and AUTHORS
  * $Id$

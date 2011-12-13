@@ -1,5 +1,5 @@
 /*****************************************************************************
- * fixups.h: portability fixups included from config.h
+ * vlc_fixups.h: portability fixups included from config.h
  *****************************************************************************
  * Copyright © 1998-2008 the VideoLAN project
  *

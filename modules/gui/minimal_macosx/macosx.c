@@ -1,5 +1,5 @@
 /*****************************************************************************
- * macosx.m: minimal Mac OS X module for vlc
+ * macosx.c: minimal Mac OS X module for vlc
  *****************************************************************************
  * Copyright (C) 2001-2007 the VideoLAN team
  * $Id$

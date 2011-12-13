@@ -1,5 +1,5 @@
 /*****************************************************************************
- * modules.h : Module descriptor and load functions
+ * vlc_modules.h : Module descriptor and load functions
  *****************************************************************************
  * Copyright (C) 2001-2011 VLC authors and VideoLAN
  * $Id$

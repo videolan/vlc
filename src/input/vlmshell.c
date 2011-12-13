@@ -1,5 +1,5 @@
 /*****************************************************************************
- * vlm.c: VLM interface plugin
+ * vlmshell.c: VLM interface plugin
  *****************************************************************************
  * Copyright (C) 2000-2005 VLC authors and VideoLAN
  * $Id$

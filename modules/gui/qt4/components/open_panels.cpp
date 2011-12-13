@@ -1,5 +1,5 @@
 /*****************************************************************************
- * open.cpp : Panels for the open dialogs
+ * open_panels.cpp : Panels for the open dialogs
  ****************************************************************************
  * Copyright (C) 2006-2009 the VideoLAN team
  * Copyright (C) 2007 Société des arts technologiques

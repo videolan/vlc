@@ -1,5 +1,5 @@
 /*****************************************************************************
- * vlc_extension.h: Extensions (meta data, web information, ...)
+ * vlc_extensions.h: Extensions (meta data, web information, ...)
  *****************************************************************************
  * Copyright (C) 2009-2010 VideoLAN and authors
  * $Id$

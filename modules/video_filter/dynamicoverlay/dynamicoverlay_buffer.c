@@ -1,5 +1,5 @@
 /*****************************************************************************
- * dynamicoverlay_buffer.h : dynamic overlay buffer
+ * dynamicoverlay_buffer.c : dynamic overlay buffer
  *****************************************************************************
  * Copyright (C) 2008-2009 the VideoLAN team
  * $Id$

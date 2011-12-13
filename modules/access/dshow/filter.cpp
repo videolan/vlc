@@ -1,5 +1,5 @@
 /*****************************************************************************
- * filter.c : DirectShow access module for vlc
+ * filter.cpp : DirectShow access module for vlc
  *****************************************************************************
  * Copyright (C) 2002-2010 the VideoLAN team
  * $Id$

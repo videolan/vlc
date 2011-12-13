@@ -1,5 +1,5 @@
 /*****************************************************************************
- * mash.c: Video decoder using openmash codec implementations
+ * mash.cpp: Video decoder using openmash codec implementations
  *****************************************************************************
  * Copyright (C) 2004 the VideoLAN team
  * $Id$

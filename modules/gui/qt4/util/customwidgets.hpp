@@ -1,5 +1,5 @@
 /*****************************************************************************
- * customwidgets.h: Custom widgets
+ * customwidgets.hpp: Custom widgets
  ****************************************************************************
  * Copyright (C) 2006 the VideoLAN team
  * Copyright (C) 2004 Daniel Molkentin <molkentin@kde.org>

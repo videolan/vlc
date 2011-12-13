@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Controller_widget.cpp : Controller Widget for the controllers
+ * controller_widget.cpp : Controller Widget for the controllers
  ****************************************************************************
  * Copyright (C) 2006-2008 the VideoLAN team
  * $Id$

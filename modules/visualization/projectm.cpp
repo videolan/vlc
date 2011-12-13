@@ -1,5 +1,5 @@
 /*****************************************************************************
- * projectm: visualization module based on libprojectM
+ * projectm.cpp: visualization module based on libprojectM
  *****************************************************************************
  * Copyright © 2009-2011 the VideoLAN team
  * $Id$

@@ -1,5 +1,5 @@
 /*****************************************************************************
- * control.h: private header for mediacontrol
+ * mediacontrol_internal.h: private header for mediacontrol
  *****************************************************************************
  * Copyright (C) 2005 the VideoLAN team
  * $Id$

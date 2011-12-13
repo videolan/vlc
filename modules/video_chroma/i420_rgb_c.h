@@ -1,5 +1,5 @@
 /*****************************************************************************
- * chroma_common.h: YUV transformation functions
+ * i420_rgb_c.h: YUV transformation functions
  * Provides functions to perform the YUV conversion. The functions provided here
  * are a complete and portable C implementation, and may be replaced in certain
  * case by optimized functions.

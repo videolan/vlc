@@ -1,5 +1,5 @@
 /*****************************************************************************
- * bits.h : Bit handling helpers
+ * vlc_bits.h : Bit handling helpers
  *****************************************************************************
  * Copyright (C) 2003 VLC authors and VideoLAN
  * $Id$
