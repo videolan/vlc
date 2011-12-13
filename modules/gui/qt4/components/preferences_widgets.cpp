@@ -1337,6 +1337,7 @@ void KeySelectorControl::finish()
 
     p_config = module_config_get (p_main, &confsize);
 
+    QMap<QString, QString> global_keys;
     for (size_t i = 0; i < confsize; i++)
     {
         module_config_t *p_item = p_config + i;
@@ -1366,20 +1367,29 @@ void KeySelectorControl::finish()
 
         if( CONFIG_ITEM(p_item->i_type) && p_item->psz_name != NULL
          && !strncmp( p_item->psz_name , "global-key", 10 )
-         && !EMPTY_STR( p_item->psz_text ) )
+         && !EMPTY_STR( p_item->psz_text )
+         && !EMPTY_STR( p_item->value.psz ) )
         {
-            QList<QTreeWidgetItem *> list =
-                table->findItems( qtr( p_item->psz_text ), Qt::MatchExactly );
-            if( list.count() >= 1 )
-            {
-                QString keys = qfu( p_item->value.psz );
-                list[0]->setText( 2, keys );
-                list[0]->setData( 2, Qt::UserRole, keys );
-            }
-            if( list.count() >= 2 )
-                msg_Dbg( p_this, "This is probably wrong, %s", p_item->psz_text );
+            global_keys.insertMulti( qtr( p_item->psz_text ), qfu( p_item->value.psz ) );
         }
     }
+
+    QMap<QString, QString>::const_iterator i = global_keys.constBegin();
+    while (i != global_keys.constEnd())
+    {
+        QList<QTreeWidgetItem *> list = table->findItems( i.key(), Qt::MatchExactly|Qt::MatchWrap, 0 );
+        if( list.count() >= 1 )
+        {
+            QString keys = i.value();
+            list[0]->setText( 2, keys );
+            list[0]->setData( 2, Qt::UserRole, keys );
+        }
+        if( list.count() >= 2 )
+            msg_Dbg( p_this, "This is probably wrong, %s", qtu(i.key()) );
+
+        i++;
+    }
+
     module_config_free (p_config);
 
     table->resizeColumnToContents( 0 );
@@ -1454,10 +1464,12 @@ void KeySelectorControl::doApply()
             config_PutPsz( p_this,
                            qtu( it->data( 0, Qt::UserRole ).toString() ),
                            qtu( it->data( 1, Qt::UserRole ).toString() ) );
-        if( it->data( 2, Qt::UserRole ).toInt() >= 0 )
+        if( !it->data( 2, Qt::UserRole ).toString().isEmpty() )
+        {
             config_PutPsz( p_this,
                            qtu( "global-" + it->data( 0, Qt::UserRole ).toString() ),
                            qtu( it->data( 2, Qt::UserRole ).toString() ) );
+        }
 
     }
 }
