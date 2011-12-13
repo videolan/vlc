@@ -167,7 +167,7 @@ typedef enum vlc_dialog {
 
 #define EXTENSIONS_AUDIO_CSV "a52", "aac", "ac3", "ape", "awb", "dts", "flac", "it", \
                          "m4a", "m4p", "mka", "mlp", "mod", "mp1", "mp2", "mp3",\
-                         "oga", "ogg", "oma", "s3m", "spx" \
+                         "oga", "ogg", "oma", "s3m", "spx", "thd", "tta", \
                          "wav", "wma", "wv", "xm"
 
 #define EXTENSIONS_VIDEO_CSV "asf", "avi", "divx", "dv", "f4v", "flv", "gxf", "iso", \
@@ -211,6 +211,7 @@ typedef enum vlc_dialog {
     "*.rmi;" \
     "*.s3m;" \
     "*.spx;" \
+    "*.thd;" \
     "*.tta;" \
     "*.voc;" \
     "*.vqf;" \
