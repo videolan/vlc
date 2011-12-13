@@ -109,7 +109,7 @@ private:
 };
 
 
-class SoutDialog : public QVLCDialog
+class SoutDialog : public QWizard
 {
     Q_OBJECT
 public:
@@ -125,14 +125,14 @@ private:
     QPushButton *okButton;
     QToolButton *closeTabButton;
 
+    intf_thread_t* p_intf;
+
 public slots:
     void updateMRL();
 
 private slots:
     void ok();
     void cancel();
-    void next();
-    void prev();
     void closeTab();
     void tabChanged( int );
     void addDest();
