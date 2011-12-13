@@ -325,6 +325,47 @@ static aout_buffer_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         {
             msg_Warn( p_dec, "%s", faacDecGetErrorMessage( frame.error ) );
 
+            if( frame.error == 21 )
+            {
+                /*
+                 * Once an "Unexpected channel configuration change" error
+                 * occurs, it will occurs afterwards, and we got no sound.
+                 * Reinitialization of the decoder is required.
+                 */
+                unsigned long i_rate;
+                unsigned char i_channels;
+                faacDecHandle *hfaad;
+                faacDecConfiguration *cfg,*oldcfg;
+
+                oldcfg = faacDecGetCurrentConfiguration( p_sys->hfaad );
+                hfaad = faacDecOpen();
+                cfg = faacDecGetCurrentConfiguration( hfaad );
+                if( oldcfg->defSampleRate )
+                    cfg->defSampleRate = oldcfg->defSampleRate;
+                cfg->defObjectType = oldcfg->defObjectType;
+                cfg->outputFormat = oldcfg->outputFormat;
+                faacDecSetConfiguration( hfaad, cfg );
+
+                if( faacDecInit( hfaad, p_sys->p_buffer, p_sys->i_buffer,
+                                &i_rate,&i_channels ) < 0 )
+                {
+                    /* reinitialization failed */
+                    faacDecClose( hfaad );
+                    faacDecSetConfiguration( p_sys->hfaad, oldcfg );
+                }
+                else
+                {
+                    faacDecClose( p_sys->hfaad );
+                    p_sys->hfaad = hfaad;
+                    p_dec->fmt_out.audio.i_rate = i_rate;
+                    p_dec->fmt_out.audio.i_channels = i_channels;
+                    p_dec->fmt_out.audio.i_physical_channels
+                        = p_dec->fmt_out.audio.i_original_channels
+                        = pi_channels_guessed[i_channels];
+                    date_Init( &p_sys->date, i_rate, 1 );
+                }
+            }
+
             /* Flush the buffer */
             p_sys->i_buffer = 0;
             block_Release( p_block );
