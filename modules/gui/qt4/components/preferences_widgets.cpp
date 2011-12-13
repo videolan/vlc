@@ -1492,6 +1492,12 @@ bool KeySelectorControl::eventFilter( QObject *obj, QEvent *e )
         selectKey( aTable->currentItem(), aTable->currentColumn() );
         return true;
     }
+    else if( keyEv->key() == Qt::Key_Delete )
+    {
+        aTable->currentItem()->setText( aTable->currentColumn(), NULL );
+        aTable->currentItem()->setData( aTable->currentColumn(), Qt::UserRole, QVariant() );
+        return true;
+    }
     else
         return false;
 }
