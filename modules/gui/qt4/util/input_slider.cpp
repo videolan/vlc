@@ -397,10 +397,10 @@ void SeekSlider::paintEvent( QPaintEvent *event )
     barRect.moveCenter( rect().center() );
 
     // set the background color and gradient
-    QColor backgroundBase( 135, 135, 135 );
+    QColor backgroundBase( palette().window().color() );
     QLinearGradient backgroundGradient( 0, 0, 0, height() );
-    backgroundGradient.setColorAt( 0.0, backgroundBase );
-    backgroundGradient.setColorAt( 1.0, backgroundBase.lighter( 150 ) );
+    backgroundGradient.setColorAt( 0.0, backgroundBase.darker( 140 ) );
+    backgroundGradient.setColorAt( 1.0, backgroundBase );
 
     // set the foreground color and gradient
     QColor foregroundBase( 50, 156, 255 );
@@ -501,12 +501,15 @@ void SeekSlider::paintEvent( QPaintEvent *event )
 
             // prepare the handle's gradient
             QLinearGradient handleGradient( 0, 0, 0, hSize.height() );
-            handleGradient.setColorAt( 0.0, p.midlight().color() );
-            handleGradient.setColorAt( 0.9, p.mid().color() );
+            handleGradient.setColorAt( 0.0, p.window().color().lighter( 120 ) );
+            handleGradient.setColorAt( 0.9, p.window().color().darker( 120 ) );
 
             // prepare the handle's shadow gradient
-            QColor shadowDark( p.shadow().color().darker( 150 ) );
-            QColor shadowLight( p.shadow().color().lighter( 180 ) );
+            QColor shadowBase = p.shadow().color();
+            if( shadowBase.lightness() > 100 )
+                shadowBase = QColor( 60, 60, 60 ); // Palette's shadow is too bright
+            QColor shadowDark( shadowBase.darker( 150 ) );
+            QColor shadowLight( shadowBase.lighter( 180 ) );
             shadowLight.setAlpha( 50 );
 
             QRadialGradient shadowGradient( shadowPos.x() + ( sSize.width() / 2 ),
