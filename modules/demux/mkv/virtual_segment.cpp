@@ -531,15 +531,13 @@ int virtual_edition_c::PublishChapters( input_title_t & title, int & i_user_chap
 {
 
     /* HACK for now don't expose edition as a seekpoint if its start time is the same than it's first chapter */
-    if( chapters.size() > 0 && chapters[0]->i_virtual_start_time )
+    if( chapters.size() > 0 &&
+        chapters[0]->i_virtual_start_time && p_edition )
     {
         seekpoint_t *sk = vlc_seekpoint_New();
 
         sk->i_time_offset = 0;
-        if( p_edition )
-            sk->psz_name = strdup( p_edition->psz_name.c_str() );
-        else
-            sk->psz_name = strdup( "Dummy edition" );
+        sk->psz_name = strdup( p_edition->psz_name.c_str() );
 
         title.i_seekpoint++;
         title.seekpoint = (seekpoint_t**)xrealloc( title.seekpoint,
@@ -551,8 +549,9 @@ int virtual_edition_c::PublishChapters( input_title_t & title, int & i_user_chap
         i_seekpoint_num = i_user_chapters;
     }
 
-    for( size_t i = 0; i < chapters.size(); i++ )
-        chapters[i]->PublishChapters( title, i_user_chapters, i_level );
+    if( chapters.size() > 1 )
+        for( size_t i = 0; i < chapters.size(); i++ )
+            chapters[i]->PublishChapters( title, i_user_chapters, i_level );
 
     return i_user_chapters;
 }
