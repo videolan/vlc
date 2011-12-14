@@ -39,7 +39,7 @@ MOVE = mv $(UNPACK_DIR) $@ && touch $@
 # yasm
 
 yasm-$(YASM_VERSION).tar.gz:
-	$(download) $(YASM_URL)
+	$(call download,$(YASM_URL))
 
 yasm: yasm-$(YASM_VERSION).tar.gz
 	$(UNPACK)
@@ -56,7 +56,7 @@ DISTCLEAN_PKG += yasm-$(YASM_VERSION).tar.gz
 # cmake
 
 cmake-$(CMAKE_VERSION).tar.gz:
-	$(download) $(CMAKE_URL)
+	$(call download,$(CMAKE_URL))
 
 cmake: cmake-$(CMAKE_VERSION).tar.gz
 	$(UNPACK)
@@ -73,7 +73,7 @@ DISTCLEAN_PKG += cmake-$(CMAKE_VERSION).tar.gz
 # libtool
 
 libtool-$(LIBTOOL_VERSION).tar.gz:
-	$(download) $(LIBTOOL_URL)
+	$(call download,$(LIBTOOL_URL))
 
 libtool: libtool-$(LIBTOOL_VERSION).tar.gz
 	$(UNPACK)
@@ -92,7 +92,7 @@ CLEAN_FILE += .libtool
 # GNU tar (with xz support)
 
 tar-$(TAR_VERSION).tar.bz2:
-	$(download) $(TAR_URL)
+	$(call download,$(TAR_URL))
 
 tar: tar-$(TAR_VERSION).tar.bz2
 	$(UNPACK)
@@ -109,7 +109,7 @@ CLEAN_FILE += .tar
 # xz
 
 xz-$(XZ_VERSION).tar.bz2:
-	$(download) $(XZ_URL)
+	$(call download,$(XZ_URL))
 
 xz: xz-$(XZ_VERSION).tar.bz2
 	$(UNPACK)
@@ -126,7 +126,7 @@ CLEAN_FILE += .xz
 # autoconf
 
 autoconf-$(AUTOCONF_VERSION).tar.bz2:
-	$(download) $(AUTOCONF_URL)
+	$(call download,$(AUTOCONF_URL))
 
 autoconf: autoconf-$(AUTOCONF_VERSION).tar.bz2
 	$(UNPACK)
@@ -143,7 +143,7 @@ DISTCLEAN_PKG += autoconf-$(AUTOCONF_VERSION).tar.bz2
 # automake
 
 automake-$(AUTOMAKE_VERSION).tar.gz:
-	$(download) $(AUTOMAKE_URL)
+	$(call download,$(AUTOMAKE_URL))
 
 automake: automake-$(AUTOMAKE_VERSION).tar.gz
 	$(UNPACK)
@@ -160,7 +160,7 @@ DISTCLEAN_PKG += automake-$(AUTOMAKE_VERSION).tar.gz
 # pkg-config
 
 pkg-config-$(PKGCFG_VERSION).tar.gz:
-	$(download) $(PKGCFG_URL)
+	$(call download,$(PKGCFG_URL))
 
 pkgconfig: pkg-config-$(PKGCFG_VERSION).tar.gz
 	$(UNPACK)
