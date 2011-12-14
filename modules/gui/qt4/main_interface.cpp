@@ -404,7 +404,7 @@ void MainInterface::createMainWidget( QSettings *settings )
     inputC = new InputControlsWidget( p_intf, this );
 
     mainLayout->insertWidget( 2, inputC );
-    mainLayout->insertWidget( settings->value( "ToolbarPos", 0 ).toInt() ? 0: 3,
+    mainLayout->insertWidget( settings->value( "MainWindow/ToolbarPos", 0 ).toInt() ? 0: 3,
                               controls );
 
     /* Visualisation, disabled for now, they SUCK */
