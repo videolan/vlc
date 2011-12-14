@@ -118,6 +118,10 @@ static const GUID DXVADDI_Intel_ModeH264_C = {
 static const GUID DXVADDI_Intel_ModeH264_E = { // DXVA_Intel_H264_NoFGT_ClearVideo
     0x604F8E68, 0x4951,0x4c54, {0x88,0xFE,0xAB,0xD2,0x5C,0x15,0xB3,0xD6}
 };
+static const GUID DXVA_ModeH264_VLD_NoFGT_Flash = {
+    0x4245F676, 0x2BBC,0x4166, {0xa0,0xBB,0x54,0xE7,0xB8,0x49,0xC3,0x80}
+};
+
 static const GUID DXVA2_ModeWMV8_A = {
     0x1b81be80, 0xa0c7,0x11d3, {0xb9,0x84,0x00,0xc0,0x4f,0x2e,0x73,0xc5}
 };
@@ -175,6 +179,14 @@ static const GUID DXVA_ModeMPEG4pt2_VLD_AdvSimple_NoGMC = {
 static const GUID DXVA_ModeMPEG4pt2_VLD_AdvSimple_GMC = {
     0xab998b5b, 0x4258,0x44a9, {0x9f,0xeb,0x94,0xe5,0x97,0xa6,0xba,0xae}
 };
+static const GUID DXVA_ModeMPEG4pt2_VLD_AdvSimple_Avivo = {
+    0x7C74ADC6, 0xe2ba,0x4ade, {0x86,0xde,0x30,0xbe,0xab,0xb4,0x0c,0xc1}
+};
+
+/* MVC */
+static const GUID DXVA_ModeH264_VLD_Multiview = {
+    0x9901CCD3, 0xca12,0x4b7e, {0x86,0x7a,0xe2,0x22,0x3d,0x92,0x55,0xc3}
+};
 
 /* */
 typedef struct {
@@ -197,6 +209,7 @@ static const dxva2_mode_t dxva2_modes[] = {
     { "H.264 variable-length decoder, no film grain technology",                      &DXVA2_ModeH264_E,                      CODEC_ID_H264 },
     { "H.264 variable-length decoder, no film grain technology (Intel ClearVideo)",   &DXVADDI_Intel_ModeH264_E,              CODEC_ID_H264 },
     { "H.264 variable-length decoder, no film grain technology, FMO/ASO",             &DXVA_ModeH264_VLD_WithFMOASO_NoFGT,    CODEC_ID_H264 },
+    { "H.264 variable-length decoder, no film grain technology, Flash",               &DXVA_ModeH264_VLD_NoFGT_Flash,         CODEC_ID_H264 },
 
     { "H.264 inverse discrete cosine transform, film grain technology",               &DXVA2_ModeH264_D,                      0 },
     { "H.264 inverse discrete cosine transform, no film grain technology",            &DXVA2_ModeH264_C,                      0 },
@@ -231,6 +244,7 @@ static const dxva2_mode_t dxva2_modes[] = {
     { "MPEG-4 Part 2 variable-length decoder, Simple Profile",                        &DXVA_ModeMPEG4pt2_VLD_Simple,          0 },
     { "MPEG-4 Part 2 variable-length decoder, Simple&Advanced Profile, no GMC",       &DXVA_ModeMPEG4pt2_VLD_AdvSimple_NoGMC, 0 },
     { "MPEG-4 Part 2 variable-length decoder, Simple&Advanced Profile, GMC",          &DXVA_ModeMPEG4pt2_VLD_AdvSimple_GMC,   0 },
+    { "MPEG-4 Part 2 variable-length decoder, Simple&Advanced Profile, Avivo",        &DXVA_ModeMPEG4pt2_VLD_AdvSimple_Avivo, 0 },
 
     { NULL, NULL, 0 }
 };
