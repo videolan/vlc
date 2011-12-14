@@ -18429,7 +18429,7 @@ msgstr " /                      Rechercher"
 
 #: modules/gui/ncurses.c:910
 msgid " ;                      Look for the next item"
-msgstr " /                      Rechercher le prochain"
+msgstr " ;                      Rechercher le prochain"
 
 #: modules/gui/ncurses.c:911
 msgid " A                      Add an entry"
