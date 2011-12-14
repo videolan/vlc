@@ -1161,6 +1161,13 @@ static void LoadChapter( demux_t  *p_demux )
             }
         }
     }
+
+    /* Add duration if titles are enabled */
+    if( p_sys->p_title )
+    {
+        p_sys->p_title->i_length = (uint64_t)1000000 *
+                       (uint64_t)p_sys->i_duration / (uint64_t)p_sys->i_timescale;
+    }
 }
 
 /* now create basic chunk data, the rest will be filled by MP4_CreateSamplesIndex */
