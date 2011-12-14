@@ -2,3 +2,4 @@
 *.zip
 *.h
 *.tgz
+*-git/
