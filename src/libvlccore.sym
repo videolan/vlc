@@ -419,6 +419,7 @@ stream_vaControl
 str_format
 str_format_meta
 str_format_time
+str_duration
 subpicture_Delete
 subpicture_New
 subpicture_NewFromPicture

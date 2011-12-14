@@ -53,6 +53,8 @@ VLC_API char * str_format( vlc_object_t *, const char * );
 VLC_API void filename_sanitize( char * );
 VLC_API void path_sanitize( char * );
 
+VLC_API time_t str_duration( const char * );
+
 /**
  * @}
  */
