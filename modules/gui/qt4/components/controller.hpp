@@ -241,6 +241,11 @@ signals:
 /* Default value of opacity for FS controller */
 #define DEFAULT_OPACITY 0.70
 
+/* Used to restore the minimum width after a full-width switch */
+#define FSC_WIDTH 800
+
+#define FSC_HEIGHT 72
+
 /***********************************
  * Fullscreen controller
  ***********************************/
@@ -255,6 +260,7 @@ public:
     void fullscreenChanged( vout_thread_t *, bool b_fs, int i_timeout );
     void mouseChanged( vout_thread_t *, int i_mousex, int i_mousey );
     void toggleFullwidth();
+    void updateFullwidthGeometry( int number );
 
 signals:
     void keyPressed( QKeyEvent * );

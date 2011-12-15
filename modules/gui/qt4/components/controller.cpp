@@ -723,8 +723,8 @@ FullscreenControllerWidget::FullscreenControllerWidget( intf_thread_t *_p_i, QWi
     vout.clear();
 
     setWindowFlags( Qt::ToolTip );
-    setMinimumWidth( 800 );
-    setMinimumHeight( 72 );
+    setMinimumWidth( FSC_WIDTH );
+    setMinimumHeight( FSC_HEIGHT );
     isWideFSC = false;
 
     setFrameShape( QFrame::StyledPanel );
@@ -771,14 +771,12 @@ FullscreenControllerWidget::FullscreenControllerWidget( intf_thread_t *_p_i, QWi
     if( rect == rect1 && rect.contains( pos1, true ) )
     {
         move( pos1 );
-        i_screennumber = number;
         screenRes = QApplication::desktop()->screenGeometry(number);
     }
     else
     {
         centerFSC( number );
     }
-
 }
 
 FullscreenControllerWidget::~FullscreenControllerWidget()
@@ -800,8 +798,6 @@ void FullscreenControllerWidget::centerFSC( int number )
     QPoint pos = QPoint( screenRes.x() + (screenRes.width() / 2) - (sizeHint().width() / 2),
             screenRes.y() + screenRes.height() - sizeHint().height());
     move( pos );
-
-    i_screennumber = number;
 }
 
 /**
@@ -809,16 +805,24 @@ void FullscreenControllerWidget::centerFSC( int number )
  */
 void FullscreenControllerWidget::showFSC()
 {
-    adjustSize();
-
     int number = QApplication::desktop()->screenNumber( p_intf->p_sys->p_mi );
 
     if( number != i_screennumber ||
         screenRes != QApplication::desktop()->screenGeometry(number) )
     {
-        centerFSC( number );
-        msg_Dbg( p_intf, "Recentering the Fullscreen Controller" );
+        i_screennumber = number;
+        if( !isWideFSC )
+        {
+            centerFSC( number );
+            msg_Dbg( p_intf, "Recentering the Fullscreen Controller" );
+        }
+        else
+        {
+            updateFullwidthGeometry( number );
+        }
     }
+
+    adjustSize();
 
 #if HAVE_TRANSPARENCY
     setWindowOpacity( f_opacity );
@@ -882,18 +886,29 @@ void FullscreenControllerWidget::slowHideFSC()
 #endif
 }
 
+void FullscreenControllerWidget::updateFullwidthGeometry( int number )
+{
+    QRect screenGeometry = QApplication::desktop()->screenGeometry( i_screennumber );
+    setMinimumWidth( screenGeometry.width() );
+    setGeometry( screenGeometry.x(), screenGeometry.y() + screenGeometry.height() - FSC_HEIGHT, screenGeometry.width(), FSC_HEIGHT );
+}
+
 void FullscreenControllerWidget::toggleFullwidth() {
-    int fswidth = QApplication::desktop()->screenGeometry( var_InheritInteger( p_intf, "qt-fullscreen-screennumber" ) ).width();
-    int fsheight = QApplication::desktop()->screenGeometry( var_InheritInteger( p_intf, "qt-fullscreen-screennumber" ) ).height();
     if( !isWideFSC ) {
         /* Dock at the bottom of the screen */
-        setMinimumWidth( fswidth );
-        setGeometry(0, fsheight-72, fswidth, 72);
+        updateFullwidthGeometry( i_screennumber );
     } else {
         /* Restore half-bar and re-centre */
-        setMinimumWidth( 600 );
-        setGeometry(fswidth/2 - 300, fsheight-72, 600, 72);
+        setMinimumWidth( FSC_WIDTH );
+        centerFSC( i_screennumber );
     }
+
+    adjustSize();
+
+#ifdef Q_WS_X11
+    // Update the mask to reflect the geometry change
+    setMask( QRegion( 0, 0, width(), height() ) );
+#endif
 
     /* Toggle isWideFSC switch */
     isWideFSC = !isWideFSC;
