@@ -146,6 +146,8 @@ int OpenDemux( vlc_object_t *p_this )
             "mpeg", "vcd", "vob", "mpegts",
             /* libavformat's redirector won't work */
             "redir", "sdp",
+            /* Don't handle subtitles format */
+            "ass", "srt", "microdvd",
             ""
         };
 
