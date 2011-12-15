@@ -1223,7 +1223,7 @@ void MainInterface::dropEventPlay( QDropEvent *event, bool b_play )
                           PLAYLIST_APPEND | (first ? PLAYLIST_GO: PLAYLIST_PREPARSE),
                           PLAYLIST_END, true, pl_Unlocked );
             first = false;
-            RecentsMRL::getInstance( p_intf )->addRecent( url.toString() );
+            RecentsMRL::getInstance( p_intf )->addRecent( mrl );
         }
     }
 
