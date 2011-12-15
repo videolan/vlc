@@ -246,6 +246,7 @@ SOURCES_libvlc_darwin = \
 	network/poll.c \
 	posix/thread.c \
 	posix/darwin_specific.c \
+	posix/rand.c \
 	$(NULL)
 
 SOURCES_libvlc_linux = \
@@ -256,6 +257,7 @@ SOURCES_libvlc_linux = \
 	network/poll.c \
 	posix/thread.c \
 	posix/linux_specific.c \
+	posix/rand.c \
 	$(NULL)
 
 SOURCES_libvlc_win32 = \
@@ -267,6 +269,7 @@ SOURCES_libvlc_win32 = \
 	win32/thread.c \
 	win32/specific.c \
 	win32/winsock.c \
+	win32/rand.c \
 	$(NULL)
 
 SOURCES_libvlc_symbian = \
@@ -274,6 +277,7 @@ SOURCES_libvlc_symbian = \
 	symbian/dirs.c \
 	misc/atomic.c \
 	win32/plugin.c \
+	posix/rand.c \
 	$(NULL)
 
 SOURCES_libvlc_os2 = \
@@ -285,6 +289,7 @@ SOURCES_libvlc_os2 = \
 	os2/poll.c \
 	os2/thread.c \
 	os2/specific.c \
+	os2/rand.c \
 	$(NULL)
 
 SOURCES_libvlc_other = \
@@ -294,6 +299,7 @@ SOURCES_libvlc_other = \
 	network/poll.c \
 	posix/thread.c \
 	posix/specific.c \
+	posix/rand.c \
 	$(NULL)
 
 SOURCES_libvlc_common = \
