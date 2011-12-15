@@ -139,18 +139,24 @@ int OpenDemux( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    /* Don't try to handle MPEG unless forced */
-    if( !p_demux->b_force &&
-        ( !strcmp( fmt->name, "mpeg" ) ||
-          !strcmp( fmt->name, "vcd" ) ||
-          !strcmp( fmt->name, "vob" ) ||
-          !strcmp( fmt->name, "mpegts" ) ||
-          /* libavformat's redirector won't work */
-          !strcmp( fmt->name, "redir" ) ||
-          !strcmp( fmt->name, "sdp" ) ) )
+    if( !p_demux->b_force )
     {
-        free( psz_url );
-        return VLC_EGENERIC;
+        static const char ppsz_blacklist[][16] = {
+            /* Don't handle MPEG unless forced */
+            "mpeg", "vcd", "vob", "mpegts",
+            /* libavformat's redirector won't work */
+            "redir", "sdp",
+            ""
+        };
+
+        for( int i = 0; *ppsz_blacklist[i]; i++ )
+        {
+            if( !strcmp( fmt->name, ppsz_blacklist[i] ) )
+            {
+                free( psz_url );
+                return VLC_EGENERIC;
+            }
+        }
     }
 
     /* Don't trigger false alarms on bin files */
