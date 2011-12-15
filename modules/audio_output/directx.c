@@ -93,6 +93,7 @@ struct aout_sys_t
  *****************************************************************************/
 static int  OpenAudio  ( vlc_object_t * );
 static void CloseAudio ( vlc_object_t * );
+static void CloseAudioCommon ( vlc_object_t * );
 static void Play       ( audio_output_t *, block_t * );
 
 /* local functions */
@@ -161,18 +162,10 @@ static int OpenAudio( vlc_object_t *p_this )
     msg_Dbg( p_aout, "Opening DirectSound Audio Output" );
 
    /* Allocate structure */
-    p_aout->sys = malloc( sizeof( aout_sys_t ) );
-    if( p_aout->sys == NULL )
+    p_aout->sys = calloc( 1, sizeof( aout_sys_t ) );
+    if( unlikely( p_aout->sys == NULL ) )
         return VLC_ENOMEM;
 
-    /* Initialize some variables */
-    p_aout->sys->p_dsobject = NULL;
-    p_aout->sys->p_dsbuffer = NULL;
-    p_aout->sys->p_notif = NULL;
-
-    p_aout->pf_play = Play;
-    p_aout->pf_pause = aout_PacketPause;
-    p_aout->pf_flush = aout_PacketFlush;
     aout_VolumeSoftInit( p_aout );
 
     /* Retrieve config values */
@@ -197,8 +190,6 @@ static int OpenAudio( vlc_object_t *p_this )
     }
     free( psz_speaker );
     p_aout->sys->i_speaker_setup = i;
-
-    p_aout->sys->p_device_guid = 0;
 
     /* Initialise DirectSound */
     if( InitDirectSound( p_aout ) )
@@ -236,8 +227,7 @@ static int OpenAudio( vlc_object_t *p_this )
             != VLC_SUCCESS )
         {
             msg_Err( p_aout, "cannot open directx audio device" );
-            free( p_aout->sys );
-            return VLC_EGENERIC;
+            goto error;
         }
 
         aout_PacketInit( p_aout, &p_aout->sys->packet, A52_FRAME_NB );
@@ -301,6 +291,11 @@ static int OpenAudio( vlc_object_t *p_this )
 
     /* Now we need to setup our DirectSound play notification structure */
     p_aout->sys->p_notif = calloc( 1, sizeof( *p_aout->sys->p_notif ) );
+    if( unlikely( !p_aout->sys->p_notif ) )
+    {
+        CloseAudio( VLC_OBJECT(p_aout) );
+        return VLC_ENOMEM;
+    }
     p_aout->sys->p_notif->p_aout = p_aout;
 
     vlc_atomic_set(&p_aout->sys->p_notif->abort, 0);
@@ -317,13 +312,18 @@ static int OpenAudio( vlc_object_t *p_this )
         CloseHandle( p_aout->sys->p_notif->event );
         free( p_aout->sys->p_notif );
         p_aout->sys->p_notif = NULL;
-        goto error;
+        CloseAudio( VLC_OBJECT(p_aout) );
+        return VLC_EGENERIC;
     }
+
+    p_aout->pf_play = Play;
+    p_aout->pf_pause = aout_PacketPause;
+    p_aout->pf_flush = aout_PacketFlush;
 
     return VLC_SUCCESS;
 
  error:
-    CloseAudio( VLC_OBJECT(p_aout) );
+    CloseAudioCommon( VLC_OBJECT(p_aout) );
     return VLC_EGENERIC;
 }
 
@@ -587,6 +587,13 @@ static void Play( audio_output_t *p_aout, block_t *p_buffer )
 static void CloseAudio( vlc_object_t *p_this )
 {
     audio_output_t * p_aout = (audio_output_t *)p_this;
+    aout_PacketDestroy( p_aout );
+    CloseAudioCommon( p_this );
+}
+
+static void CloseAudioCommon( vlc_object_t *p_this )
+{
+    audio_output_t * p_aout = (audio_output_t *)p_this;
     aout_sys_t *p_sys = p_aout->sys;
 
     msg_Dbg( p_aout, "closing audio device" );
@@ -612,8 +619,9 @@ static void CloseAudio( vlc_object_t *p_this )
     /* free DSOUND.DLL */
     if( p_sys->hdsound_dll ) FreeLibrary( p_sys->hdsound_dll );
 
-    free( p_aout->sys->p_device_guid );
     aout_PacketDestroy( p_aout );
+
+    free( p_aout->sys->p_device_guid );
     free( p_sys );
 }
 
