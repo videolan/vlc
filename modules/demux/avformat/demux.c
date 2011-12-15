@@ -478,7 +478,11 @@ int OpenDemux( vlc_object_t *p_this )
              p_sys->ic->duration * 1000000 / AV_TIME_BASE : -1 );
 
     if( p_sys->ic->nb_chapters > 0 )
+    {
         p_sys->p_title = vlc_input_title_New();
+        p_sys->p_title->i_length = p_sys->ic->duration * 1000000 / AV_TIME_BASE;
+    }
+
     for( i = 0; i < p_sys->ic->nb_chapters; i++ )
     {
         seekpoint_t *s = vlc_seekpoint_New();
