@@ -847,9 +847,20 @@ int ExecuteCommand( vlm_t *p_vlm, const char *psz_command,
                            vlm_message_t **pp_message )
 {
     size_t i_command = 0;
-    char buf[strlen (psz_command) + 1], *psz_buf = buf;
-    char *ppsz_command[3+sizeof (buf) / 2];
+    size_t i_command_len = strlen( psz_command );
+    char *buf = malloc( i_command_len + 1 ), *psz_buf = buf;
+    size_t i_ppsz_command_len = (3 + (i_command_len + 1) / 2);
+    char **ppsz_command = malloc( i_ppsz_command_len * sizeof(char *) );
     vlm_message_t *p_message = NULL;
+    int i_ret = 0;
+
+    if( !psz_buf || !ppsz_command )
+    {
+        p_message = vlm_MessageNew( ppsz_command[0],
+                        "Memory allocation failed for command of length %zu",
+                        i_command_len );
+        goto error;
+    }
 
     /* First, parse the line and cut it */
     while( *psz_command != '\0' )
@@ -877,7 +888,7 @@ int ExecuteCommand( vlm_t *p_vlm, const char *psz_command,
             goto error;
         }
 
-        assert (i_command < (sizeof (ppsz_command) / sizeof (ppsz_command[0])));
+        assert (i_command < i_ppsz_command_len);
 
         ppsz_command[i_command] = psz_buf;
         memcpy (psz_buf, psz_command, psz_temp - psz_command);
@@ -889,7 +900,7 @@ int ExecuteCommand( vlm_t *p_vlm, const char *psz_command,
         psz_buf += psz_temp - psz_command + 1;
         psz_command = psz_temp;
 
-        assert (buf + sizeof (buf) >= psz_buf);
+        assert (buf + i_command_len + 1 >= psz_buf);
     }
 
     /*
@@ -920,13 +931,20 @@ int ExecuteCommand( vlm_t *p_vlm, const char *psz_command,
 
 success:
     *pp_message = p_message;
+    free( buf );
+    free( ppsz_command );
     return VLC_SUCCESS;
 
 syntax_error:
-    return ExecuteSyntaxError( ppsz_command[0], pp_message );
+    i_ret = ExecuteSyntaxError( ppsz_command[0], pp_message );
+    free( buf );
+    free( ppsz_command );
+    return i_ret;
 
 error:
     *pp_message = p_message;
+    free( buf );
+    free( ppsz_command );
     return VLC_EGENERIC;
 }
 
