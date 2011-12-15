@@ -31,8 +31,8 @@ VDR recordings have either of two directory layouts:
             001.vdr, 002.vdr, 003.vdr, ...
             index.vdr, info.vdr, marks.vdr, ...
     2) TS format:
-        /path/to/0000-00-00.00.00.0.0.rec/
-            001.ts, 002.ts, 003.ts, ...
+        /path/to/0000-00-00.00.00.0-0.rec/
+            00001.ts, 00002.ts, 00003.ts, ...
             index, info, marks, ...
 See http://www.vdr-wiki.de/ and http://www.tvdr.de/ for more information.
 ***/
@@ -149,14 +149,12 @@ static int Control( access_t *, int, va_list );
 static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len );
 static int Seek( access_t *p_access, uint64_t i_pos);
 static void FindSeekpoint( access_t *p_access );
-static bool ScanDirectory( access_t *p_access, bool b_strict );
+static bool ScanDirectory( access_t *p_access );
 static char *GetFilePath( access_t *p_access, unsigned i_file );
 static bool ImportNextFile( access_t *p_access );
 static bool SwitchFile( access_t *p_access, unsigned i_file );
 static void OptimizeForRead( int fd );
 static void UpdateFileSize( access_t *p_access );
-static int StatRelativeFile( access_t *p_access, const char *psz_file,
-                            struct stat *p_stat );
 static FILE *OpenRelativeFile( access_t *p_access, const char *psz_file );
 static bool ReadLine( char **ppsz_line, size_t *pi_size, FILE *p_file );
 static void ImportMeta( access_t *p_access );
@@ -164,6 +162,7 @@ static void ImportMarks( access_t *p_access );
 static bool ReadIndexRecord( FILE *p_file, bool b_ts, int64_t i_frame,
                             uint64_t *pi_offset, uint16_t *pi_file_num );
 static int64_t ParseFrameNumber( const char *psz_line, float fps );
+static const char *BaseName( const char *psz_path );
 
 /*****************************************************************************
  * Open a directory
@@ -180,14 +179,17 @@ static int Open( vlc_object_t *p_this )
      * and we can avoid false positives in the general case. */
     bool b_strict = strcmp( p_access->psz_access, "vdr" );
 
-    /* Do a quick test based on the directory extension to see if this
+    /* Do a quick test based on the directory name to see if this
      * directory might contain a VDR recording. We can be reasonably
      * sure if ScanDirectory() actually finds files. */
     if( b_strict )
     {
-        const char *psz_ext = strrchr( p_access->psz_filepath, '.' );
-        if( !psz_ext || ( strcasecmp( psz_ext, ".rec" )
-            && strcasecmp( psz_ext, ".rec" DIR_SEP ) ) )
+        char psz_extension[4];
+        int i_length = 0;
+        const char *psz_name = BaseName( p_access->psz_filepath );
+        if( sscanf( psz_name, "%*u-%*u-%*u.%*u.%*u.%*u%*[-.]%*u.%3s%n",
+            psz_extension, &i_length ) != 1 || strcasecmp( psz_extension, "rec" ) ||
+            ( psz_name[i_length] != DIR_SEP_CHAR && psz_name[i_length] != '\0' ) )
             return VLC_EGENERIC;
     }
 
@@ -204,7 +206,7 @@ static int Open( vlc_object_t *p_this )
     ARRAY_INIT( p_sys->file_sizes );
 
     /* Import all files and prepare playback. */
-    if( !ScanDirectory( p_access, b_strict ) ||
+    if( !ScanDirectory( p_access ) ||
         !SwitchFile( p_access, 0 ) )
     {
         Close( p_this );
@@ -236,7 +238,7 @@ static void Close( vlc_object_t * p_this )
 /*****************************************************************************
  * Determine format and import files
  *****************************************************************************/
-static bool ScanDirectory( access_t *p_access, bool b_strict )
+static bool ScanDirectory( access_t *p_access )
 {
     access_sys_t *p_sys = p_access->p_sys;
 
@@ -246,15 +248,6 @@ static bool ScanDirectory( access_t *p_access, bool b_strict )
     {
         p_sys->b_ts_format = !p_sys->b_ts_format;
         if( !ImportNextFile( p_access ) )
-            return false;
-    }
-
-    /* meta data and index should exist */
-    if( b_strict )
-    {
-        struct stat st;
-        if( StatRelativeFile( p_access, "info", &st ) ||
-            StatRelativeFile( p_access, "index", &st ) )
             return false;
     }
 
@@ -608,27 +601,6 @@ static void UpdateFileSize( access_t *p_access )
 }
 
 /*****************************************************************************
- * Stat file relative to base directory
- *****************************************************************************/
-static int StatRelativeFile( access_t *p_access, const char *psz_file,
-                              struct stat *p_stat )
-{
-    /* build path and add extension */
-    char *psz_path;
-    if( asprintf( &psz_path, "%s" DIR_SEP "%s%s",
-        p_access->psz_filepath, psz_file,
-        p_access->p_sys->b_ts_format ? "" : ".vdr" ) == -1 )
-        return -1;
-
-    int ret = vlc_stat( psz_path, p_stat );
-    if( ret )
-        msg_Dbg( p_access, "could not stat %s: %m", psz_path );
-    free( psz_path );
-
-    return ret;
-}
-
-/*****************************************************************************
  * Open file relative to base directory for reading.
  *****************************************************************************/
 static FILE *OpenRelativeFile( access_t *p_access, const char *psz_file )
@@ -973,4 +945,22 @@ static int64_t ParseFrameNumber( const char *psz_line, float fps )
     /* only a frame number */
     int64_t i_frame = strtoll( psz_line, NULL, 10 );
     return __MAX(1, i_frame) - 1;
+}
+
+/*****************************************************************************
+ * Return the last path component (including trailing separators)
+ *****************************************************************************/
+static const char *BaseName( const char *psz_path )
+{
+    const char *psz_name = psz_path + strlen( psz_path );
+
+    /* skip superfluous separators at the end */
+    while( psz_name > psz_path && psz_name[-1] == DIR_SEP_CHAR )
+        --psz_name;
+
+    /* skip last component */
+    while( psz_name > psz_path && psz_name[-1] != DIR_SEP_CHAR )
+        --psz_name;
+
+    return psz_name;
 }
