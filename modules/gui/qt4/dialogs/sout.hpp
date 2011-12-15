@@ -33,6 +33,8 @@
 #include "ui/sout.h"
 #include "util/qvlcframe.hpp"
 
+#include <QWizard>
+
 class QPushButton;
 class QToolButton;
 class QCheckBox;
