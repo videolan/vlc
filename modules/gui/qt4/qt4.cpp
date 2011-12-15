@@ -514,10 +514,7 @@ static void *Thread( void *obj )
 #endif
 
     /* Last settings */
-    if( p_intf->p_sys->b_isDialogProvider )
-        app.setQuitOnLastWindowClosed( false );
-    else
-        app.setQuitOnLastWindowClosed( true );
+    app.setQuitOnLastWindowClosed( false );
 
     /* Retrieve last known path used in file browsing */
     p_intf->p_sys->filepath =
