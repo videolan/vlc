@@ -1549,6 +1549,7 @@ void VLCMenuBar::updateRecents( intf_thread_t *p_intf )
 
             recentsMenu->addSeparator();
             recentsMenu->addAction( qtr("&Clear"), rmrl, SLOT( clear() ) );
+            recentsMenu->setEnabled( true );
         }
     }
 }
