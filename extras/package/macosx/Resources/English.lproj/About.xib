@@ -21,9 +21,9 @@
     </object>
     <object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
       <bool key="EncodedWithXMLCoder">YES</bool>
+      <integer value="2245"/>
       <integer value="2239"/>
       <integer value="1344"/>
-      <integer value="2245"/>
     </object>
     <object class="NSArray" key="IBDocument.PluginDependencies">
       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -220,7 +220,7 @@
                   <reference key="NSDocView" ref="139161632"/>
                   <reference key="NSBGColor" ref="256701342"/>
                   <object class="NSCursor" key="NSCursor">
-                    <string key="NSHotSpot">{1, -1}</string>
+                    <string key="NSHotSpot">{4, 4}</string>
                     <int key="NSCursorType">0</int>
                   </object>
                   <int key="NScvFlags">4</int>
@@ -360,7 +360,7 @@
             <object class="NSButton" id="165770629">
               <reference key="NSNextResponder" ref="471759747"/>
               <int key="NSvFlags">256</int>
-              <string key="NSFrame">{{69, 12}, {87, 32}}</string>
+              <string key="NSFrame">{{51, 12}, {103, 32}}</string>
               <reference key="NSSuperview" ref="471759747"/>
               <bool key="NSEnabled">YES</bool>
               <object class="NSButtonCell" key="NSCell" id="162066036">
@@ -1205,6 +1205,7 @@
           <string>2241.IBPluginDependency</string>
           <string>2241.ImportedFromIB2</string>
           <string>2244.IBPluginDependency</string>
+          <string>2244.IBViewBoundsToFrameTransform</string>
           <string>2244.ImportedFromIB2</string>
           <string>2245.IBEditorWindowLastContentRect</string>
           <string>2245.IBPluginDependency</string>
@@ -1282,6 +1283,9 @@
           <string>com.apple.WebKitIBPlugin</string>
           <boolean value="YES"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+          <object class="NSAffineTransform">
+            <bytes key="NSTransformStruct">P4AAAL+AAABCigAAwigAAA</bytes>
+          </object>
           <boolean value="YES"/>
           <string>{{452, 330}, {480, 360}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
