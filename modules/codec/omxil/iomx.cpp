@@ -23,11 +23,6 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
-
-#include <vlc_common.h>
 
 #include <media/stagefright/OMXClient.h>
 #include <media/IOMX.h>
@@ -35,9 +30,6 @@
 #include <OMX_Component.h>
 
 #include "iomx.h"
-extern "C" {
-#include "omxil_utils.h"
-}
 
 using namespace android;
 
@@ -147,8 +139,32 @@ static int get_param_size(OMX_INDEXTYPE param_index)
         return sizeof(OMX_PORT_PARAM_TYPE);
     case OMX_IndexParamNumAvailableStreams:
         return sizeof(OMX_PARAM_U32TYPE);
+    case OMX_IndexParamAudioPcm:
+        return sizeof(OMX_AUDIO_PARAM_PCMMODETYPE);
+    case OMX_IndexParamAudioAdpcm:
+        return sizeof(OMX_AUDIO_PARAM_AMRTYPE);
+    case OMX_IndexParamAudioAmr:
+        return sizeof(OMX_AUDIO_PARAM_AMRTYPE);
+    case OMX_IndexParamAudioG723:
+        return sizeof(OMX_AUDIO_PARAM_G723TYPE);
+    case OMX_IndexParamAudioG726:
+        return sizeof(OMX_AUDIO_PARAM_G726TYPE);
+    case OMX_IndexParamAudioG729:
+        return sizeof(OMX_AUDIO_PARAM_G729TYPE);
+    case OMX_IndexParamAudioAac:
+        return sizeof(OMX_AUDIO_PARAM_AACPROFILETYPE);
+    case OMX_IndexParamAudioMp3:
+        return sizeof(OMX_AUDIO_PARAM_MP3TYPE);
+    case OMX_IndexParamAudioSbc:
+        return sizeof(OMX_AUDIO_PARAM_SBCTYPE);
+    case OMX_IndexParamAudioVorbis:
+        return sizeof(OMX_AUDIO_PARAM_VORBISTYPE);
+    case OMX_IndexParamAudioWma:
+        return sizeof(OMX_AUDIO_PARAM_WMATYPE);
+    case OMX_IndexParamAudioRa:
+        return sizeof(OMX_AUDIO_PARAM_RATYPE);
     default:
-        return GetAudioParamSize(param_index);
+        return 0;
     }
 }
 
