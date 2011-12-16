@@ -49,7 +49,7 @@ diff -ru lua.orig/src/luaconf.h lua/src/luaconf.h
 +
 +#define LUAI_UINT32	uint32_t
 +#define LUAI_INT32	int32_t
-+#define LUAI_MAXINT32	0x7ffffff
++#define LUAI_MAXINT32	0x7fffffff
  #define LUAI_UMEM	size_t
 -#define LUAI_MEM	ptrdiff_t
 -#else
@@ -64,7 +64,6 @@ diff -ru lua.orig/src/luaconf.h lua/src/luaconf.h
  
  
  /*
-Seulement dans lua/src: lua.o
 diff -ru lua.orig/src/lundump.c lua/src/lundump.c
 --- lua.orig/src/lundump.c	2011-12-14 19:26:18.000000000 +0200
 +++ lua/src/lundump.c	2011-12-14 19:50:41.000000000 +0200
