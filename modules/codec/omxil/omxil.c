@@ -58,9 +58,13 @@
  *****************************************************************************/
 static const char *ppsz_dll_list[] =
 {
+#if defined(USE_IOMX)
+    "libiomx.so", /* Not used when using IOMX, the lib should already be loaded */
+#else
     "libOMX_Core.so", /* TI OMAP IL core */
     "libOmxCore.so", /* Qualcomm IL core */
     "libomxil-bellagio.so",  /* Bellagio IL core */
+#endif
     0
 };
 
