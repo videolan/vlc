@@ -2244,18 +2244,7 @@ AC_ARG_ENABLE(iomx,
   [  --enable-iomx           iomx codec module (default disabled)])
 if test "${enable_iomx}" = "yes"
 then
-  VLC_SAVE_FLAGS
-  CPPFLAGS="${CPPFLAGS} -I${srcdir}/modules/codec/omxil" # For the OMX headers
-  AC_LANG_PUSH([C++])
-  AC_CHECK_HEADER(media/stagefright/OMXClient.h, [
-    VLC_ADD_PLUGIN([iomx])
-    VLC_ADD_CXXFLAGS([iomx], [-fno-exceptions -fno-rtti])
-    VLC_ADD_LIBS([iomx], [-lstagefright -lmedia -lutils -lbinder])
-  ], [
-    AC_MSG_ERROR("Could not find IOMX headers")
-  ])
-  AC_LANG_POP([C++])
-  VLC_RESTORE_FLAGS
+  VLC_ADD_PLUGIN([iomx])
 fi
 
 dnl
