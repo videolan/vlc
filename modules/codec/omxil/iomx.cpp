@@ -29,8 +29,6 @@
 #include <binder/MemoryDealer.h>
 #include <OMX_Component.h>
 
-#include "iomx.h"
-
 using namespace android;
 
 class IOMXContext {
@@ -272,7 +270,7 @@ static OMX_ERRORTYPE iomx_set_config(OMX_HANDLETYPE component, OMX_INDEXTYPE ind
     return get_error(ctx->iomx->setConfig(node->node, index, param, sizeof(OMX_BOOL)));
 }
 
-static OMX_ERRORTYPE iomx_get_handle(OMX_HANDLETYPE *handle_ptr, const char *component_name, OMX_PTR app_data, const OMX_CALLBACKTYPE *callbacks)
+OMX_ERRORTYPE OMX_GetHandle(OMX_HANDLETYPE *handle_ptr, OMX_STRING component_name, OMX_PTR app_data, OMX_CALLBACKTYPE *callbacks)
 {
     OMXNode* node = new OMXNode();
     node->app_data = app_data;
@@ -310,7 +308,7 @@ static OMX_ERRORTYPE iomx_get_handle(OMX_HANDLETYPE *handle_ptr, const char *com
     return OMX_ErrorNone;
 }
 
-static OMX_ERRORTYPE iomx_free_handle(OMX_HANDLETYPE handle)
+OMX_ERRORTYPE OMX_FreeHandle(OMX_HANDLETYPE handle)
 {
     OMXNode* node = (OMXNode*) ((OMX_COMPONENTTYPE*)handle)->pComponentPrivate;
     ctx->iomx->freeNode( node->node );
@@ -320,24 +318,28 @@ static OMX_ERRORTYPE iomx_free_handle(OMX_HANDLETYPE handle)
     return OMX_ErrorNone;
 }
 
-static OMX_ERRORTYPE iomx_init()
+OMX_ERRORTYPE OMX_Init(void)
 {
     OMXClient client;
     if (client.connect() != OK)
         return OMX_ErrorUndefined;
 
+    if (!ctx)
+        ctx = new IOMXContext();
     ctx->iomx = client.interface();
     ctx->iomx->listNodes(&ctx->components);
     return OMX_ErrorNone;
 }
 
-static OMX_ERRORTYPE iomx_deinit()
+OMX_ERRORTYPE OMX_Deinit(void)
 {
     ctx->iomx = NULL;
+    delete ctx;
+    ctx = NULL;
     return OMX_ErrorNone;
 }
 
-static OMX_ERRORTYPE iomx_component_name_enum(OMX_STRING component_name, OMX_U32 name_length, OMX_U32 index)
+OMX_ERRORTYPE OMX_ComponentNameEnum(OMX_STRING component_name, OMX_U32 name_length, OMX_U32 index)
 {
     if (index >= ctx->components.size())
         return OMX_ErrorNoMore;
@@ -349,7 +351,7 @@ static OMX_ERRORTYPE iomx_component_name_enum(OMX_STRING component_name, OMX_U32
     return OMX_ErrorNone;
 }
 
-static OMX_ERRORTYPE iomx_get_roles_of_component(OMX_STRING component_name, OMX_U32 *num_roles, OMX_U8 **roles)
+OMX_ERRORTYPE OMX_GetRolesOfComponent(OMX_STRING component_name, OMX_U32 *num_roles, OMX_U8 **roles)
 {
     for( List<IOMX::ComponentInfo>::iterator it = ctx->components.begin(); it != ctx->components.end(); it++ ) {
         if (!strcmp(component_name, it->mName.string())) {
@@ -369,36 +371,5 @@ static OMX_ERRORTYPE iomx_get_roles_of_component(OMX_STRING component_name, OMX_
         }
     }
     return OMX_ErrorInvalidComponentName;
-}
-
-void* iomx_dlopen(const char *)
-{
-    if (!ctx)
-        ctx = new IOMXContext();
-    return ctx;
-}
-
-void iomx_dlclose(void *handle)
-{
-    IOMXContext *ctx = (IOMXContext*) handle;
-    delete ctx;
-    ::ctx = NULL;
-}
-
-void *iomx_dlsym(void *, const char *name)
-{
-    if (!strcmp(name, "OMX_Init"))
-        return (void*) iomx_init;
-    if (!strcmp(name, "OMX_Deinit"))
-        return (void*) iomx_deinit;
-    if (!strcmp(name, "OMX_GetHandle"))
-        return (void*) iomx_get_handle;
-    if (!strcmp(name, "OMX_FreeHandle"))
-        return (void*) iomx_free_handle;
-    if (!strcmp(name, "OMX_ComponentNameEnum"))
-        return (void*) iomx_component_name_enum;
-    if (!strcmp(name, "OMX_GetRolesOfComponent"))
-        return (void*) iomx_get_roles_of_component;
-    return NULL;
 }
 

@@ -30,10 +30,10 @@
 
 #include <dlfcn.h>
 #if defined(USE_IOMX)
-# include "iomx.h"
-# define dll_open(name) iomx_dlopen(name)
-# define dll_close(handle) iomx_dlclose(handle)
-# define dlsym(handle, name) iomx_dlsym(handle, name)
+/* On dll_open, just check that the OMX_Init symbol already is loaded */
+# define dll_open(name) dlsym(RTLD_DEFAULT, "OMX_Init")
+# define dll_close(handle) do { } while (0)
+# define dlsym(handle, name) dlsym(RTLD_DEFAULT, name)
 #else
 # define dll_open(name) dlopen( name, RTLD_NOW )
 # define dll_close(handle) dlclose(handle)
