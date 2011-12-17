@@ -19,6 +19,12 @@ include extras/package/npapi.am
 endif
 endif
 
+if HAVE_WIN64
+WINVERSION=vlc-$(VERSION)-win64
+else
+WINVERSION=vlc-$(VERSION)-win32
+endif
+
 package-win-install:
 	$(MAKE) install
 	touch $@
@@ -155,18 +161,18 @@ package-win32-exe: package-win-strip
 	eval "$$MAKENSIS $(win32_destdir)/vlc.win32.nsi"
 
 package-win32-zip: package-win-strip
-	rm -f -- vlc-$(VERSION)-win32.zip
-	zip -r -9 vlc-$(VERSION)-win32.zip vlc-$(VERSION)
+	rm -f -- $(WINVERSION).zip
+	zip -r -9 $(WINVERSION).zip vlc-$(VERSION)
 
 package-win32-debug-zip: package-win-common
-	rm -f -- vlc-$(VERSION)-win32-debug.zip
-	zip -r -9 vlc-$(VERSION)-win32-debug.zip vlc-$(VERSION)
+	rm -f -- $(WINVERSION)-debug.zip
+	zip -r -9 $(WINVERSION)-debug.zip vlc-$(VERSION)
 
 package-win32-7zip: package-win-strip
-	7z a $(7Z_OPTS) vlc-$(VERSION)-win32.7z vlc-$(VERSION)
+	7z a $(7Z_OPTS) $(WINVERSION).7z vlc-$(VERSION)
 
 package-win32-debug-7zip: package-win-common
-	7z a $(7Z_OPTS) vlc-$(VERSION)-win32-debug.7z vlc-$(VERSION)
+	7z a $(7Z_OPTS) $(WINVERSION)-debug.7z vlc-$(VERSION)
 
 package-win32-cleanup:
 	rm -Rf $(win32_destdir) $(win32_debugdir) $(win32_xpi_destdir)
