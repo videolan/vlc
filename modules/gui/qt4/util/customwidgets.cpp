@@ -403,25 +403,66 @@ SpinningIcon::SpinningIcon( QWidget *parent, bool noIdleFrame )
 }
 
 QToolButtonExt::QToolButtonExt(QWidget *parent, int ms )
-               :QToolButton( parent ), longClick( false )
+    : QToolButton( parent ),
+      shortClick( false ),
+      longClick( false )
 {
     setAutoRepeat( true );
     /* default to twice the doubleclick delay */
     setAutoRepeatDelay( ( ms > 0 )? ms : 2 * QApplication::doubleClickInterval() );
     setAutoRepeatInterval( 100 );
     connect( this, SIGNAL(released()), this, SLOT(releasedSlot()) );
+    connect( this, SIGNAL(clicked()), this, SLOT(clickedSlot()) );
 }
+
+/* table illustrating the different scenarios and the events generated
+ * ====================
+ *
+ *  event     isDown()
+ *
+ *  released  false   }
+ *  clicked   false   }= short click
+ *
+ *  released  false    = cancelled click (mouse released outside of button area,
+ *                                        before long click delay kicks in)
+ *
+ *  released  true    }
+ *  clicked   true    }= long click (multiple of these generated)
+ *  released  false    = stop long click (mouse released / moved outside of
+ *                                        button area)
+ * (clicked   false)   = stop long click (additional event if mouse released
+ *                                        inside of button area)
+ */
 
 void QToolButtonExt::releasedSlot()
 {
     if( isDown() )
+    {
+        // we are beginning a long click
         longClick = true;
+        shortClick = false;
+    }
+    else
+    {
+        if( longClick )
+        {
+            // we are stopping a long click
+            longClick = false;
+            shortClick = false;
+        }
+        else
+        {
+            // we are generating a short click
+            longClick = false;
+            shortClick = true;
+        }
+    }
+}
 
+void QToolButtonExt::clickedSlot()
+{
     if( longClick )
         emit longClicked();
-    else
+    else if( shortClick )
         emit shortClicked();
-
-    if( !isDown() )
-        longClick = false;
 }

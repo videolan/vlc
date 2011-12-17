@@ -54,9 +54,11 @@ class QToolButtonExt : public QToolButton
 public:
     QToolButtonExt( QWidget *parent = 0, int ms = 0 );
 private:
+    bool shortClick;
     bool longClick;
 private slots:
     void releasedSlot();
+    void clickedSlot();
 signals:
     void shortClicked();
     void longClicked();
