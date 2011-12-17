@@ -348,7 +348,7 @@ void MediaServer::parseDeviceDescription( IXML_Document* p_doc,
     const char* psz_base_url = p_location;
 
     /* Try to extract baseURL */
-    IXML_NodeList* p_url_list = ixmlDocument_getElementsByTagName( p_doc, "baseURL" );
+    IXML_NodeList* p_url_list = ixmlDocument_getElementsByTagName( p_doc, "URLBase" );
     if ( p_url_list )
     {
 
