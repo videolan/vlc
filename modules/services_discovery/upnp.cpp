@@ -380,7 +380,8 @@ void MediaServer::parseDeviceDescription( IXML_Document* p_doc,
                 continue;
             }
 
-            if ( strcmp( MEDIA_SERVER_DEVICE_TYPE, psz_device_type ) != 0 )
+            if ( strncmp( MEDIA_SERVER_DEVICE_TYPE, psz_device_type,
+                    strlen( MEDIA_SERVER_DEVICE_TYPE ) - 1 ) != 0 )
                 continue;
 
             const char* psz_udn = xml_getChildElementValue( p_device_element, "UDN" );
@@ -437,9 +438,13 @@ void MediaServer::parseDeviceDescription( IXML_Document* p_doc,
                         continue;
                     }
 
-                    if ( strcmp( CONTENT_DIRECTORY_SERVICE_TYPE,
-                                psz_service_type ) != 0 )
+                    int k = strlen( CONTENT_DIRECTORY_SERVICE_TYPE ) - 1;
+                    if ( strncmp( CONTENT_DIRECTORY_SERVICE_TYPE,
+                                psz_service_type, k ) != 0 )
                         continue;
+
+		    p_server->_i_content_directory_service_version =
+			psz_service_type[k];
 
                     const char* psz_event_sub_url =
                         xml_getChildElementValue( p_service_element,
@@ -509,6 +514,7 @@ MediaServer::MediaServer( const char* psz_udn,
 
     _p_contents = NULL;
     _p_input_item = NULL;
+    _i_content_directory_service_version = 1;
 }
 
 MediaServer::~MediaServer()
@@ -596,6 +602,9 @@ IXML_Document* MediaServer::_browseAction( const char* psz_object_id_,
     }
 
     char* psz_service_type = strdup( CONTENT_DIRECTORY_SERVICE_TYPE );
+
+    psz_service_type[strlen( psz_service_type ) - 1] =
+	_i_content_directory_service_version;
 
     int i_res;
 

@@ -87,6 +87,7 @@ private:
     std::string _content_directory_control_url;
 
     int _i_subscription_timeout;
+    int _i_content_directory_service_version;
     Upnp_SID _subscription_id;
 };
 
