@@ -1175,10 +1175,13 @@ int ColorConfigControl::getValue() const
 void ColorConfigControl::selectColor()
 {
     QColor color = QColorDialog::getColor( QColor( i_color ) );
-    i_color = (color.red() << 16) + (color.green() << 8) + color.blue();
+    if( color.isValid() )
+    {
+        i_color = (color.red() << 16) + (color.green() << 8) + color.blue();
 
-    color_px->fill( QColor( i_color ) );
-    color_but->setIcon( QIcon( *color_px ) );
+        color_px->fill( QColor( i_color ) );
+        color_but->setIcon( QIcon( *color_px ) );
+    }
 }
 
 
