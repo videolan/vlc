@@ -2910,7 +2910,7 @@ msgstr ""
 
 #: src/libvlc-module.c:840
 msgid "Subpictures source module"
-msgstr "Module d'incrustations"
+msgstr "Module de source d'incrustations"
 
 #: src/libvlc-module.c:842
 msgid ""
@@ -2922,7 +2922,7 @@ msgstr ""
 
 #: src/libvlc-module.c:845
 msgid "Subpictures filter module"
-msgstr "Module d'incrustations"
+msgstr "Module de filtre d'incrustations"
 
 #: src/libvlc-module.c:847
 msgid ""
