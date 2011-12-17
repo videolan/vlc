@@ -822,6 +822,8 @@ static void ImportMarks( access_t *p_access )
         return;
     }
     p_marks->psz_name = strdup( _("VDR Cut Marks") );
+    p_marks->i_length = i_frame_count * (int64_t)( CLOCK_FREQ / p_sys->fps );
+    p_marks->i_size = p_access->info.i_size;
 
     /* offset for chapter positions */
     int i_chapter_offset = p_sys->fps / 1000 *
