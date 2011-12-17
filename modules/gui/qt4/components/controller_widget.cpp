@@ -210,25 +210,25 @@ void SoundWidget::setMuted( bool mute )
 bool SoundWidget::eventFilter( QObject *obj, QEvent *e )
 {
     VLC_UNUSED( obj );
-    if (e->type() == QEvent::MouseButtonPress  )
+    if( e->type() == QEvent::MouseButtonPress )
     {
-        if( volumeSlider->orientation() ==  Qt::Vertical )
+        QMouseEvent *event = static_cast<QMouseEvent*>(e);
+        if( event->button() != Qt::RightButton )
         {
-            QMouseEvent *event = static_cast<QMouseEvent*>(e);
-            showVolumeMenu( event->pos() );
+            if( volumeSlider->orientation() ==  Qt::Vertical )
+            {
+                showVolumeMenu( event->pos() );
+            }
+            else
+            {
+                setMuted( !b_is_muted );
+            }
+            e->accept();
+            return true;
         }
-        else
-        {
-            setMuted( !b_is_muted );
-        }
-        e->accept();
-        return true;
     }
-    else
-    {
-        e->ignore();
-        return false;
-    }
+    e->ignore();
+    return false;
 }
 
 /**
