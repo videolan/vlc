@@ -369,10 +369,10 @@ static int OpenFilter( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    if( (p_filter->fmt_in.audio.i_format != p_filter->fmt_out.audio.i_format) &&
-        (p_filter->fmt_in.audio.i_rate != p_filter->fmt_out.audio.i_rate) &&
-        (p_filter->fmt_in.audio.i_format != VLC_CODEC_S16N) &&
-        (p_filter->fmt_out.audio.i_format != VLC_CODEC_S16N) &&
+    if( (p_filter->fmt_in.audio.i_format != p_filter->fmt_out.audio.i_format) ||
+        (p_filter->fmt_in.audio.i_rate != p_filter->fmt_out.audio.i_rate) ||
+        (p_filter->fmt_in.audio.i_format != VLC_CODEC_S16N) ||
+        (p_filter->fmt_out.audio.i_format != VLC_CODEC_S16N) ||
         (p_filter->fmt_in.audio.i_bitspersample !=
                                     p_filter->fmt_out.audio.i_bitspersample))
     {
