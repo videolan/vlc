@@ -1655,10 +1655,10 @@ AS_IF([test "${enable_live555}" != "no" -a -n "${CXX}"], [
   ])
   CPPFLAGS="${CPPFLAGS} ${CPPFLAGS_live555}"
 
-  AC_CACHE_CHECK([for live555 version 1322784000 or later], [ac_cv_live555], [
+  AC_CACHE_CHECK([for live555 version 1275091200 or later], [ac_cv_live555], [
     AC_PREPROC_IFELSE([AC_LANG_PROGRAM([
 [#include <liveMedia_version.hh>
-#if !defined (LIVEMEDIA_LIBRARY_VERSION_INT) || (LIVEMEDIA_LIBRARY_VERSION_INT < 1322784000)
+#if !defined (LIVEMEDIA_LIBRARY_VERSION_INT) || (LIVEMEDIA_LIBRARY_VERSION_INT < 1275091200)
 # error BOOM
 #endif]])
     ], [
@@ -1669,13 +1669,39 @@ AS_IF([test "${enable_live555}" != "no" -a -n "${CXX}"], [
   ])
   AS_IF([test "$ac_cv_live555" = "no"], [
     AC_MSG_WARN([liveMedia is missing or its installed version is too old:
-Version 2011.12.02 or later is required to proceed.
+Version 2010.05.29 or later is required to proceed.
 You can get an updated one from http://www.live555.com/liveMedia .])
     AS_IF([test -n "${enable_live555}"], [
       AC_MSG_ERROR([Update live555 or pass --disable-live555 to disable RTSP input support.])
     ])
     ac_cv_live555_usable=""
   ], [
+    dnl Check that live555 is patched correctly.
+    AC_CACHE_CHECK([for live555 usability], [ac_cv_live555_usable], [
+      AC_COMPILE_IFELSE([AC_LANG_PROGRAM([
+[#include <locale.h>
+#ifdef __APPLE__
+# include <xlocale.h>
+#endif
+#undef LC_ALL
+#define LC_ALL BOOM
+#ifdef LC_ALL_MASK
+#include <Locale.hh>
+#endif
+#include <GroupsockHelper.hh>]], [
+[struct in_addr addr;
+our_inet_ntoa(addr, NULL);]])
+      ], [
+        ac_cv_live555_usable="yes"
+      ], [
+        ac_cv_live555_usable="no"
+      ])
+    ])
+    AS_IF([test "$ac_cv_live555_usable" = "no"], [
+      AC_MSG_ERROR([liveMedia lacks patches and is not usable.
+Please apply our patches from the VLC contrib (contrib/src/live555/).
+You can also disable RTSP input with --disable-live555. You were warned.])
+    ])
     other_libs="-lgroupsock -lBasicUsageEnvironment -lUsageEnvironment"
     other_libs_pic="-lgroupsock_pic -lBasicUsageEnvironment_pic -lUsageEnvironment_pic"
     AS_IF([test "${SYS}" = "mingw32"], [
