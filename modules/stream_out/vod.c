@@ -146,27 +146,6 @@ int OpenVoD( vlc_object_t *p_this )
         else
             p_sys->psz_rtsp_path = strdup( url.psz_path );
 
-        /* if( url.psz_host != NULL && *url.psz_host )
-        {
-            msg_Err( p_vod, "\"%s\" RTSP host ignored", url.psz_host );
-            msg_Info( p_vod, "Pass --rtsp-host=%s on the command line "
-                      "instead.", url.psz_host );
-        } */
-
-        var_Create( p_vod, "rtsp-host", VLC_VAR_STRING );
-        var_SetString( p_vod, "rtsp-host", url.psz_host );
-
-        /* if( url.i_port != 0 )
-        {
-            msg_Err( p_vod, "\"%u\" RTSP port ignored", url.i_port );
-            msg_Info( p_vod, "Pass --rtsp-port=%u on the command line "
-                      "instead.", url.i_port );
-        } */
-
-        if( url.i_port <= 0 ) url.i_port = 554;
-        var_Create( p_vod, "rtsp-port", VLC_VAR_INTEGER );
-        var_SetInteger( p_vod, "rtsp-port", url.i_port );
-
         vlc_UrlClean( &url );
     }
 

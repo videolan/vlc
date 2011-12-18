@@ -270,13 +270,6 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->psz_raw_mux = var_CreateGetString( p_this, "rtsp-raw-mux" );
 
-    var_Create( p_vod, "rtsp-host", VLC_VAR_STRING );
-    var_SetString( p_vod, "rtsp-host", url.psz_host );
-
-    if( url.i_port <= 0 ) url.i_port = 554;
-    var_Create( p_vod, "rtsp-port", VLC_VAR_INTEGER );
-    var_SetInteger( p_vod, "rtsp-port", url.i_port );
-
     p_sys->p_rtsp_host = vlc_rtsp_HostNew( VLC_OBJECT(p_vod) );
     if( !p_sys->p_rtsp_host )
     {
