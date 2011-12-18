@@ -1,7 +1,7 @@
 /*****************************************************************************
  * customwidgets.cpp: Custom widgets
  ****************************************************************************
- * Copyright (C) 2006 the VideoLAN team
+ * Copyright (C) 2006-2011 the VideoLAN team
  * Copyright (C) 2004 Daniel Molkentin <molkentin@kde.org>
  * $Id$
  *
@@ -29,7 +29,7 @@
 #endif
 
 #include "customwidgets.hpp"
-#include "qt4.hpp"               /*needed for qtr and CONNECT, but not necessary */
+#include "qt4.hpp"               /* needed for qtr,  but not necessary */
 
 #include <QPainter>
 #include <QRect>
