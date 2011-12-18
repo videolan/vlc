@@ -142,7 +142,6 @@ static int Open( vlc_object_t *p_this )
     config_ChainParse( p_access, SOUT_CFG_PREFIX, ppsz_sout_options, p_access->p_cfg );
 
     const char *path = p_access->psz_path;
-    /* Skip everything before / - backward compatibiltiy with VLC 1.1 */
     path += strcspn( path, "/" );
     if( path > p_access->psz_path )
     {
@@ -152,10 +151,11 @@ static int Open( vlc_object_t *p_this )
         if( port != p_access->psz_path )
         {
             int len = (port ? port : path) - p_access->psz_path;
-            /* msg_Err( p_access, "\"%.*s\" HTTP host ignored", len,
-                     p_access->psz_path );
-            msg_Info( p_access,
-                      "Pass --http-host=IP on the command line instead." ); */
+            msg_Warn( p_access, "\"%.*s\" HTTP host might be ignored in "
+                      "multiple-host configurations, use at your own risks.",
+                      len, p_access->psz_path );
+            msg_Info( p_access, "Consider passing --http-host=IP on the "
+                                "command line instead." );
 
             char host[len + 1];
             strncpy( host, p_access->psz_path, len );
@@ -167,9 +167,9 @@ static int Open( vlc_object_t *p_this )
         if( port != NULL )
         {
             /* int len = path - ++port;
-            msg_Err( p_access, "\"%.*s\" HTTP port ignored", len, port );
-            msg_Info( p_access, "Pass --%s-port=%.*s on the command line "
-                      "instead.", strcasecmp( p_access->psz_access, "https" )
+            msg_Info( p_access, "Consider passing --%s-port=%.*s on the "
+                                "command line instead.",
+                      strcasecmp( p_access->psz_access, "https" )
                       ? "http" : "https", len, port ); */
             port++;
 
