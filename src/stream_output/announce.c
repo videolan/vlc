@@ -92,7 +92,14 @@ sout_AnnounceRegisterSDP( vlc_object_t *obj, const char *psz_sdp,
         goto error;
 
     msg_Dbg (obj, "adding SAP session");
-    SAP_Add (p_sap, p_session );
+    if (SAP_Add (p_sap, p_session))
+    {
+        vlc_mutex_lock (&sap_mutex);
+        vlc_object_release ((vlc_object_t *)p_sap);
+        vlc_mutex_unlock (&sap_mutex);
+        goto error;
+    }
+
     return p_session;
 
 error:
