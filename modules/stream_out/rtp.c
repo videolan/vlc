@@ -164,13 +164,6 @@ static const char *const ppsz_protocols[] = {
 #define RFC3016_LONGTEXT N_( \
     "This allows you to stream MPEG4 LATM audio streams (see RFC3016)." )
 
-#define RTSP_HOST_TEXT N_( "RTSP host address" )
-#define RTSP_HOST_LONGTEXT N_( \
-    "This defines the address, port and path the RTSP VOD server will listen " \
-    "on.\nSyntax is address:port/path. The default is to listen on all "\
-    "interfaces (address 0.0.0.0), on port 554, with no path.\nTo listen " \
-    "only on the local interface, use \"localhost\" as address." )
-
 #define RTSP_TIMEOUT_TEXT N_( "RTSP session timeout (s)" )
 #define RTSP_TIMEOUT_LONGTEXT N_( "RTSP sessions will be closed after " \
     "not receiving any RTSP request for this long. Setting it to a " \
@@ -255,8 +248,6 @@ vlc_module_begin ()
     set_capability( "vod server", 10 )
     set_callbacks( OpenVoD, CloseVoD )
     add_shortcut( "rtsp" )
-    add_string ( "rtsp-host", NULL, RTSP_HOST_TEXT,
-                 RTSP_HOST_LONGTEXT, true )
     add_integer( "rtsp-timeout", 60, RTSP_TIMEOUT_TEXT,
                  RTSP_TIMEOUT_LONGTEXT, true )
     add_string( "sout-rtsp-user", "",

@@ -915,8 +915,15 @@ static const char *const ppsz_prefres[] = {
     "Default TCP connection timeout (in milliseconds). " )
 
 #define HTTP_HOST_TEXT N_( "HTTP server address" )
-#define RTSP_HOST_TEXT N_( "RTSP server address" )
 #define HOST_LONGTEXT N_( \
+    "By default, the server will listen on any local IP address. " \
+    "Specify an IP address (e.g. ::1 or 127.0.0.1) or a host name " \
+    "(e.g. localhost) to restrict them to a specific network interface." )
+
+#define RTSP_HOST_TEXT N_( "RTSP server address" )
+#define RTSP_HOST_LONGTEXT N_( \
+    "This defines the address the RTSP server will listen on, along " \
+    "with the base path of the RTSP VOD media. Syntax is address/path. " \
     "By default, the server will listen on any local IP address. " \
     "Specify an IP address (e.g. ::1 or 127.0.0.1) or a host name " \
     "(e.g. localhost) to restrict them to a specific network interface." )
@@ -1876,7 +1883,7 @@ vlc_module_begin ()
         change_integer_range( 1, 65535 )
     add_integer( "https-port", 8443, HTTPS_PORT_TEXT, HTTPS_PORT_LONGTEXT, true )
         change_integer_range( 1, 65535 )
-    add_string( "rtsp-host", NULL, RTSP_HOST_TEXT, HOST_LONGTEXT, true )
+    add_string( "rtsp-host", NULL, RTSP_HOST_TEXT, RTSP_HOST_LONGTEXT, true )
     add_integer( "rtsp-port", 554, RTSP_PORT_TEXT, RTSP_PORT_LONGTEXT, true )
         change_integer_range( 1, 65535 )
     add_loadfile( "http-cert", NULL, HTTP_CERT_TEXT, CERT_LONGTEXT, true )
