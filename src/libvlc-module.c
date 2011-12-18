@@ -1877,7 +1877,7 @@ vlc_module_begin ()
     add_integer( "https-port", 8443, HTTPS_PORT_TEXT, HTTPS_PORT_LONGTEXT, true )
         change_integer_range( 1, 65535 )
     add_string( "rtsp-host", NULL, RTSP_HOST_TEXT, HOST_LONGTEXT, true )
-    add_integer( "rtsp-port", 8554, RTSP_PORT_TEXT, RTSP_PORT_LONGTEXT, true )
+    add_integer( "rtsp-port", 554, RTSP_PORT_TEXT, RTSP_PORT_LONGTEXT, true )
         change_integer_range( 1, 65535 )
     add_loadfile( "http-cert", NULL, HTTP_CERT_TEXT, CERT_LONGTEXT, true )
     add_obsolete_string( "sout-http-cert" ) /* since 1.2.0 */
