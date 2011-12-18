@@ -1320,8 +1320,8 @@ static const char *const ppsz_albumart_descriptions[] =
 
 #define TOGGLE_FULLSCREEN_KEY_TEXT N_("Fullscreen")
 #define TOGGLE_FULLSCREEN_KEY_LONGTEXT N_("Select the hotkey to use to swap fullscreen state.")
-#define LEAVE_FULLSCREEN_KEY_TEXT N_("Leave fullscreen")
-#define LEAVE_FULLSCREEN_KEY_LONGTEXT N_("Select the hotkey to use to leave fullscreen state.")
+#define LEAVE_FULLSCREEN_KEY_TEXT N_("Exit fullscreen")
+#define LEAVE_FULLSCREEN_KEY_LONGTEXT N_("Select the hotkey to use to exit fullscreen state.")
 #define PLAY_PAUSE_KEY_TEXT N_("Play/Pause")
 #define PLAY_PAUSE_KEY_LONGTEXT N_("Select the hotkey to use to swap paused state.")
 #define PAUSE_KEY_TEXT N_("Pause only")
