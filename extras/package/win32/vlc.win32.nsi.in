@@ -28,7 +28,8 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;
 
 Name "${PRODUCT_NAME} ${PRODUCT_VERSION}"
-OutFile ..\vlc-${VERSION}-win32.exe
+@HAVE_WIN64_FALSE@ OutFile ..\vlc-${VERSION}-win32.exe
+@HAVE_WIN64_TRUE@  OutFile ..\vlc-${VERSION}-win64.exe
 InstallDir "$@PROGRAMFILES@\VideoLAN\VLC"
 !ifdef NSIS_LZMA_COMPRESS_WHOLE
 SetCompressor lzma
