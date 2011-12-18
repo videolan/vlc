@@ -311,6 +311,12 @@ local function load_dir(dir,root,parent_acl)
     return my_acl
 end
 
+if config.host then
+    vlc.msg.err("\""..config.host.."\" HTTP host ignored")
+    local port = string.match(config.host, ":(%d+)[^]]*$")
+    vlc.msg.info("Pass --http-host=IP "..(port and "and --http-port="..port.." " or "").."on the command line instead.")
+end
+
 h = vlc.httpd()
 local root_acl = load_dir( http_dir )
 local a = h:handler("/art",nil,nil,root_acl,callback_art,nil)
