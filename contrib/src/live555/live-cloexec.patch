@@ -1,0 +1,49 @@
+Copyright (C) 2011 Rémi Denis-Courmont.
+Licensed under GNU General Public License version 2 or higher.
+diff -ru live.orig/groupsock/GroupsockHelper.cpp live555/groupsock/GroupsockHelper.cpp
+--- live.orig/groupsock/GroupsockHelper.cpp	2011-08-23 18:19:59.000000000 +0300
++++ live/groupsock/GroupsockHelper.cpp	2011-08-23 18:26:32.000000000 +0300
+@@ -49,13 +49,33 @@
+   reuseFlag = 1;
+ }
+ 
++static int makeSocket(int type)
++{
++  int fd;
++
++#ifdef SOCK_CLOEXEC
++  fd = socket(AF_INET, type|SOCK_CLOEXEC, 0);
++  if (fd != -1 || errno != EINVAL)
++      return fd;
++#endif
++
++  fd = socket(AF_INET, type, 0);
++  if (fd == -1)
++    return -1;
++#ifdef FD_CLOEXEC
++  fcntl(fd, F_SETFD, FD_CLOEXEC);
++#endif
++  return fd;
++}
++
++
+ int setupDatagramSocket(UsageEnvironment& env, Port port) {
+   if (!initializeWinsockIfNecessary()) {
+     socketErr(env, "Failed to initialize 'winsock': ");
+     return -1;
+   }
+ 
+-  int newSocket = socket(AF_INET, SOCK_DGRAM, 0);
++  int newSocket = makeSocket(SOCK_DGRAM);
+   if (newSocket < 0) {
+     socketErr(env, "unable to create datagram socket: ");
+     return newSocket;
+@@ -161,7 +181,7 @@
+     return -1;
+   }
+ 
+-  int newSocket = socket(AF_INET, SOCK_STREAM, 0);
++  int newSocket = makeSocket(SOCK_STREAM);
+   if (newSocket < 0) {
+     socketErr(env, "unable to create stream socket: ");
+     return newSocket;
