@@ -735,23 +735,23 @@ static void SDPHandleUrl( sout_stream_t *p_stream, const char *psz_url )
 
         if( url.psz_host != NULL && *url.psz_host )
         {
-            /* msg_Err( p_stream, "\"%s\" RTSP host ignored", url.psz_host );
-            msg_Info( p_stream, "Pass --rtsp-host=%s on the command line "
-                      "instead.", url.psz_host ); */
+            msg_Warn( p_stream, "\"%s\" RTSP host might be ignored in "
+                      "multiple-host configurations, use at your own risks.",
+                      url.psz_host );
+            msg_Info( p_stream, "Consider passing --rtsp-host=IP on the "
+                                "command line instead." );
 
             var_Create( p_stream, "rtsp-host", VLC_VAR_STRING );
             var_SetString( p_stream, "rtsp-host", url.psz_host );
         }
-        /* if( url.i_port != 0 )
+        if( url.i_port != 0 )
         {
-            msg_Err( p_stream, "\"%u\" RTSP port ignored", url.i_port );
-            msg_Info( p_stream, "Pass --rtsp-port=%u on the command line "
-                      "instead.", url.i_port );
-        } */
+            /* msg_Info( p_stream, "Consider passing --rtsp-port=%u on "
+                      "the command line instead.", url.i_port ); */
 
-        if( url.i_port <= 0 ) url.i_port = 554;
-        var_Create( p_stream, "rtsp-port", VLC_VAR_INTEGER );
-        var_SetInteger( p_stream, "rtsp-port", url.i_port );
+            var_Create( p_stream, "rtsp-port", VLC_VAR_INTEGER );
+            var_SetInteger( p_stream, "rtsp-port", url.i_port );
+        }
 
         p_sys->rtsp = RtspSetup( VLC_OBJECT(p_stream), NULL, url.psz_path );
         if( p_sys->rtsp == NULL )
