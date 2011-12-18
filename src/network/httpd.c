@@ -1061,8 +1061,6 @@ static httpd_host_t *httpd_HostCreate( vlc_object_t *p_this,
         return host;
     }
 
-    host = NULL;
-
     /* create the new host */
     host = (httpd_host_t *)vlc_custom_create( p_this, sizeof (*host),
                                               "http host" );
