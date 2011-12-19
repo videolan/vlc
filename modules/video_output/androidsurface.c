@@ -36,6 +36,9 @@
 #ifndef ANDROID_SYM_S_LOCK
 # define ANDROID_SYM_S_LOCK "_ZN7android7Surface4lockEPNS0_11SurfaceInfoEb"
 #endif
+#ifndef ANDROID_SYM_S_LOCK2
+# define ANDROID_SYM_S_LOCK2 "_ZN7android7Surface4lockEPNS0_11SurfaceInfoEPNS_6RegionE"
+#endif
 #ifndef ANDROID_SYM_S_UNLOCK
 # define ANDROID_SYM_S_UNLOCK "_ZN7android7Surface13unlockAndPostEv"
 #endif
@@ -67,6 +70,8 @@ extern void  jni_SetAndroidSurfaceSize(int width, int height);
 
 // _ZN7android7Surface4lockEPNS0_11SurfaceInfoEb
 typedef void (*Surface_lock)(void *, void *, int);
+// _ZN7android7Surface4lockEPNS0_11SurfaceInfoEPNS_6RegionE
+typedef void (*Surface_lock2)(void *, void *, void *);
 // _ZN7android7Surface13unlockAndPostEv
 typedef void (*Surface_unlockAndPost)(void *);
 
@@ -83,6 +88,7 @@ struct vout_display_sys_t {
     picture_pool_t *pool;
     void *p_library;
     Surface_lock s_lock;
+    Surface_lock2 s_lock2;
     Surface_unlockAndPost s_unlockAndPost;
 
     picture_resource_t resource;
@@ -115,9 +121,10 @@ static inline void *LoadSurface(const char *psz_lib, vout_display_sys_t *sys) {
     void *p_library = dlopen(psz_lib, RTLD_NOW);
     if (p_library) {
         sys->s_lock = (Surface_lock)(dlsym(p_library, ANDROID_SYM_S_LOCK));
+        sys->s_lock2 = (Surface_lock2)(dlsym(p_library, ANDROID_SYM_S_LOCK2));
         sys->s_unlockAndPost =
             (Surface_unlockAndPost)(dlsym(p_library, ANDROID_SYM_S_UNLOCK));
-        if (sys->s_lock && sys->s_unlockAndPost) {
+        if ((sys->s_lock || sys->s_lock2) && sys->s_unlockAndPost) {
             return p_library;
         }
         dlclose(p_library);
@@ -128,6 +135,8 @@ static inline void *LoadSurface(const char *psz_lib, vout_display_sys_t *sys) {
 static void *InitLibrary(vout_display_sys_t *sys) {
     void *p_library;
     if ((p_library = LoadSurface("libsurfaceflinger_client.so", sys)))
+        return p_library;
+    if ((p_library = LoadSurface("libgui.so", sys)))
         return p_library;
     return LoadSurface("libui.so", sys);
 }
@@ -154,7 +163,7 @@ static int Open(vlc_object_t *p_this) {
     sys->p_library = p_library = InitLibrary(sys);
     if (!p_library) {
         free(sys);
-        msg_Err(vd, "Could not initialize libui.so/libsurfaceflinger_client.so!");
+        msg_Err(vd, "Could not initialize libui.so/libgui.so/libsurfaceflinger_client.so!");
         vlc_mutex_unlock(&single_instance);
         return VLC_EGENERIC;
     }
@@ -253,7 +262,10 @@ static int  AndroidLockSurface(picture_t *picture) {
         return VLC_EGENERIC;
     }
 
-    sys->s_lock(surf, info, 1);
+    if (sys->s_lock)
+        sys->s_lock(surf, info, 1);
+    else
+        sys->s_lock2(surf, info, NULL);
 
     // input size doesn't match the surface size,
     // request a resize
