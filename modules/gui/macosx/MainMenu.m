@@ -481,10 +481,8 @@ static VLCMainMenu *_o_sharedInstance = nil;
     if( [o_mi_screen hasSubmenu] )
     {
         y = [[o_mi_screen submenu] numberOfItems] - 1;
-        msg_Dbg( VLCIntf, "%i items in submenu", y );
         while( x != y )
         {
-            msg_Dbg( VLCIntf, "removing item %i of %i", x, y );
             [[o_mi_screen submenu] removeItemAtIndex: x];
             x++;
         }
@@ -927,12 +925,21 @@ static VLCMainMenu *_o_sharedInstance = nil;
             selector:(SEL)pf_callback
 {
     vlc_value_t val, val_list, text_list;
-    int i_type, i, i_nb_items;
+    int i_type, i;
 
     /* remove previous items */
-    i_nb_items = [o_menu numberOfItems];
-    for( i = 0; i < i_nb_items; i++ )
-        [o_menu removeItemAtIndex: 0];
+    if (OSX_LEOPARD)
+    {
+        int i_nb_items;
+        i_nb_items = [o_menu numberOfItems];
+        for( i = 0; i < i_nb_items; i++ )
+            [o_menu removeItemAtIndex: 0];
+    }
+    else
+    {
+        /* this is more efficient then the legacy code, but 10.6+ only */
+        [o_menu removeAllItems];
+    }
 
     /* Check the type of the object variable */
     i_type = var_Type( p_object, psz_variable );
