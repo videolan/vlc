@@ -215,7 +215,7 @@ void vlm_Delete( vlm_t *p_vlm )
     assert( p_vlm->users > 0 );
     if( --p_vlm->users == 0 )
     {
-        assert( libvlc_priv(p_vlm->p_libvlc)->p_vlm = p_vlm );
+        assert( libvlc_priv(p_vlm->p_libvlc)->p_vlm == p_vlm );
         libvlc_priv(p_vlm->p_libvlc)->p_vlm = NULL;
     }
     else
