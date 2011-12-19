@@ -30,6 +30,7 @@
 #include <map>
 
 #include "mpd/Representation.h"
+#include "mpd/CommonAttributesElements.h"
 #include "mpd/ContentProtection.h"
 #include "mpd/Accessibility.h"
 #include "mpd/Viewpoint.h"
@@ -41,25 +42,15 @@ namespace dash
 {
     namespace mpd
     {
-        class Group
+        class Group : public CommonAttributesElements
         {
             public:
-                Group           (std::map<std::string, std::string>  attributes);
+                Group           (const std::map<std::string, std::string>&  attributes);
                 virtual ~Group  ();
 
-                std::string                     getWidth                () throw(dash::exception::AttributeNotPresentException);
-                std::string                     getHeight               () throw(dash::exception::AttributeNotPresentException);
-                std::string                     getParX                 () throw(dash::exception::AttributeNotPresentException);
-                std::string                     getParY                 () throw(dash::exception::AttributeNotPresentException);
-                std::string                     getLang                 () throw(dash::exception::AttributeNotPresentException);
-                std::string                     getMimeType             () throw(dash::exception::AttributeNotPresentException);
-                std::string                     getFrameRate            () throw(dash::exception::AttributeNotPresentException);
-                std::string                     getNumberOfChannels     () throw(dash::exception::AttributeNotPresentException);
-                std::string                     getSamplingRate         () throw(dash::exception::AttributeNotPresentException);
                 std::string                     getSubSegmentAlignment  () throw(dash::exception::AttributeNotPresentException);
                 std::vector<Representation *>   getRepresentations      ();
                 Viewpoint*                      getViewpoint            () throw(dash::exception::ElementNotPresentException);
-                ContentProtection*              getContentProtection    () throw(dash::exception::ElementNotPresentException);
                 Accessibility*                  getAccessibility        () throw(dash::exception::ElementNotPresentException);
                 Rating*                         getRating               () throw(dash::exception::ElementNotPresentException);
 

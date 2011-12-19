@@ -80,6 +80,11 @@ void    BasicCMParser::setGroups            (Node *root, Period *period)
     for(size_t i = 0; i < groups.size(); i++)
     {
         Group *group = new Group(groups.at(i)->getAttributes());
+        if ( this->parseCommonAttributesElements( groups.at( i ), group ) == false )
+        {
+            delete group;
+            continue ;
+        }
         this->setRepresentations(groups.at(i), group);
         period->addGroup(group);
     }
