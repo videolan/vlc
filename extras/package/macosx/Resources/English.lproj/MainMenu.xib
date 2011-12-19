@@ -26,7 +26,7 @@
       <integer value="2730"/>
       <integer value="915"/>
       <integer value="1617"/>
-      <integer value="235"/>
+      <integer value="569"/>
       <integer value="4596"/>
       <integer value="21"/>
     </object>
@@ -11439,7 +11439,7 @@ LCAuLi4</string>
           <boolean value="YES"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
-          <string>{{1004, 603}, {143, 23}}</string>
+          <string>{{684, 529}, {143, 23}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
           <string>{{385, 503}, {267, 233}}</string>
@@ -11455,7 +11455,7 @@ LCAuLi4</string>
           <boolean value="YES"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
-          <string>{{388, 425}, {297, 243}}</string>
+          <string>{{387, 419}, {297, 243}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -14787,6 +14787,7 @@ LCAuLi4</string>
               <string>openDonate:</string>
               <string>openForum:</string>
               <string>openReadMe:</string>
+              <string>openRecentItem:</string>
               <string>openWebsite:</string>
               <string>resizeVideoWindow:</string>
               <string>setPlaybackRate:</string>
@@ -14836,6 +14837,7 @@ LCAuLi4</string>
               <string>id</string>
               <string>id</string>
               <string>id</string>
+              <string>id</string>
             </object>
           </object>
           <object class="NSMutableDictionary" key="actionInfosByName">
@@ -14854,6 +14856,7 @@ LCAuLi4</string>
               <string>openDonate:</string>
               <string>openForum:</string>
               <string>openReadMe:</string>
+              <string>openRecentItem:</string>
               <string>openWebsite:</string>
               <string>resizeVideoWindow:</string>
               <string>setPlaybackRate:</string>
@@ -14920,6 +14923,10 @@ LCAuLi4</string>
               </object>
               <object class="IBActionInfo">
                 <string key="name">openReadMe:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">openRecentItem:</string>
                 <string key="candidateClassName">id</string>
               </object>
               <object class="IBActionInfo">

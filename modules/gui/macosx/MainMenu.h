@@ -199,7 +199,7 @@
 - (void)setRateControlsEnabled:(BOOL)b_enabled;
 
 - (IBAction)clearRecentItems:(id)sender;
-- (void)openRecentItem:(id)item;
+- (IBAction)openRecentItem:(id)item;
 
 - (IBAction)intfOpenFile:(id)sender;
 - (IBAction)intfOpenFileGeneric:(id)sender;

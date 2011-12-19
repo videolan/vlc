@@ -538,15 +538,14 @@ static VLCMainMenu *_o_sharedInstance = nil;
 
 #pragma mark -
 #pragma mark Recent Items
-- (void)openRecentItem:(id)item
+- (IBAction)openRecentItem:(id)item
 {
     [[VLCMain sharedInstance] application: nil openFile: [item title]];
 }
 
 - (IBAction)clearRecentItems:(id)sender
 {
-    [[NSDocumentController sharedDocumentController]
-     clearRecentDocuments: nil];
+    [[NSDocumentController sharedDocumentController] clearRecentDocuments: nil];
 }
 
 #pragma mark -
@@ -1107,15 +1106,22 @@ static VLCMainMenu *_o_sharedInstance = nil;
     {
         NSMenu * o_menu = [o_mi_open_recent submenu];
         int i_nb_items = [o_menu numberOfItems];
-        NSArray * o_docs = [[NSDocumentController sharedDocumentController]
-                            recentDocumentURLs];
+        NSArray * o_docs = [[NSDocumentController sharedDocumentController] recentDocumentURLs];
         UInt32 i_nb_docs = [o_docs count];
 
         if( i_nb_items > 1 )
         {
-            while( --i_nb_items )
+            if (OSX_LEOPARD)
             {
-                [o_menu removeItemAtIndex: 0];
+                while( --i_nb_items )
+                {
+                    [o_menu removeItemAtIndex: 0];
+                }
+            }
+            else
+            {
+                // this is more efficient than removing the items one by one
+                [o_menu removeAllItems];
             }
         }
 
@@ -1123,6 +1129,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
         {
             NSURL * o_url;
             NSString * o_doc;
+            NSMenuItem *o_menuitem;
 
             [o_menu insertItem: [NSMenuItem separatorItem] atIndex: 0];
 
@@ -1137,9 +1144,10 @@ static VLCMainMenu *_o_sharedInstance = nil;
                 else
                     o_doc = [o_url absoluteString];
 
-                [o_menu insertItemWithTitle: o_doc
+                o_menuitem = [o_menu insertItemWithTitle: o_doc
                                      action: @selector(openRecentItem:)
                               keyEquivalent: @"" atIndex: 0];
+                [o_menuitem setTarget: self];
 
                 if( i_nb_docs == 0 )
                     break;

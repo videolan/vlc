@@ -61,6 +61,10 @@ enum {
 extern OSErr UpdateSystemActivity(UInt8 activity);
 #define UsrActivity 1
 #endif
+
+@interface NSMenu (IntroducedInSnowLeopard)
+- (void)removeAllItems;
+@end
 #endif
 
 #pragma mark -
