@@ -1035,9 +1035,9 @@ static OMX_ERRORTYPE PortReconfigure(decoder_t *p_dec, OmxPort *p_port)
     definition.nPortIndex = p_port->i_port_index;
     omx_error = OMX_GetParameter(p_dec->p_sys->omx_handle, OMX_IndexParamPortDefinition,
                                  &definition);
-    if(omx_error != OMX_ErrorNone ||
-       !definition.format.video.nFrameWidth ||
-       !definition.format.video.nFrameHeight )
+    if(omx_error != OMX_ErrorNone || (p_dec->fmt_in.i_cat == VIDEO_ES &&
+       (!definition.format.video.nFrameWidth ||
+       !definition.format.video.nFrameHeight)) )
         return OMX_ErrorUndefined;
 
     omx_error = OMX_SendCommand( p_sys->omx_handle, OMX_CommandPortDisable,
