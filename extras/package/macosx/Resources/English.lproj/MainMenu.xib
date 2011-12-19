@@ -21,14 +21,14 @@
     </object>
     <object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
       <bool key="EncodedWithXMLCoder">YES</bool>
-      <integer value="915"/>
-      <integer value="283"/>
       <integer value="4722"/>
-      <integer value="1617"/>
-      <integer value="4681"/>
-      <integer value="235"/>
+      <integer value="283"/>
       <integer value="2730"/>
+      <integer value="915"/>
+      <integer value="1617"/>
+      <integer value="235"/>
       <integer value="4596"/>
+      <integer value="21"/>
     </object>
     <object class="NSArray" key="IBDocument.PluginDependencies">
       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -676,6 +676,7 @@
               <string key="NSFrame">{{222, 12}, {61, 11}}</string>
               <reference key="NSSuperview" ref="429932428"/>
               <int key="NSViewLayerContentsRedrawPolicy">2</int>
+              <bool key="NSViewCanDrawConcurrently">YES</bool>
               <string key="NSClassName">VLCProgressBarGradientEffect</string>
             </object>
             <object class="NSSplitView" id="302568132">
@@ -10904,7 +10905,7 @@ LCAuLi4</string>
           <boolean value="YES"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
-          <string>{{428, 299}, {222, 363}}</string>
+          <string>{{473, 299}, {222, 363}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -11071,7 +11072,7 @@ LCAuLi4</string>
           <boolean value="YES"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
-          <string>{{284, 662}, {468, 20}}</string>
+          <string>{{329, 662}, {468, 20}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -11088,7 +11089,7 @@ LCAuLi4</string>
           <boolean value="YES"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <object class="NSAffineTransform">
-            <bytes key="NSTransformStruct">P4AAAL+AAABDZgAAweAAAA</bytes>
+            <bytes key="NSTransformStruct">P4AAAL+AAABDlYAAwdAAAA</bytes>
           </object>
           <boolean value="YES"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>

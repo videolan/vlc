@@ -827,7 +827,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 - (void)drawFancyGradientEffectForTimeSlider
 {
     NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
-    float f_value = ([o_time_sld_middle_view frame].size.width -5) * ([o_time_sld intValue] / [o_time_sld maxValue]);
+    float f_value = [o_time_sld_middle_view frame].size.width * ([o_time_sld intValue] / [o_time_sld maxValue]);
     if (f_value > 5.0)
     {
         if (f_value != [o_time_sld_fancygradient_view frame].size.width)
