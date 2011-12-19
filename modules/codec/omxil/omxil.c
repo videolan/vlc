@@ -445,6 +445,18 @@ static OMX_ERRORTYPE GetPortDefinition(decoder_t *p_dec, OmxPort *p_port,
                     strlen("OMX.qcom.video.decoder")))
             def->format.video.eColorFormat = OMX_QCOM_COLOR_FormatYVU420SemiPlanar;
 
+        /* Hack: Galaxy S II (stock firmware) gives a slice height larger
+         * than the video height, but this doesn't imply padding between
+         * the video planes. Nexus S also has a slice height larger than
+         * the video height, but there it actually is real padding, thus
+         * Galaxy S II is the buggy one. The Galaxy S II decoder is
+         * named OMX.SEC.avcdec while the one on Nexus S is
+         * OMX.SEC.AVC.Decoder. Thus do this for any OMX.SEC. that don't
+         * contain the string ".Decoder". */
+        if(!strncmp(p_sys->psz_component, "OMX.SEC.", strlen("OMX.SEC.")) &&
+           !strstr(p_sys->psz_component, ".Decoder"))
+            def->format.video.nSliceHeight = 0;
+
         if(!GetVlcVideoFormat( def->format.video.eCompressionFormat,
                                &p_fmt->i_codec, 0 ) )
         {
