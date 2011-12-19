@@ -7,6 +7,7 @@ Changes between 1.1.12 and 1.2.0:
 ---------------------------------
 
 Important notes:
+ * The licenses of libVLC and libVLCcore have changed from GPLv2+ to LGPLv2.1+
  * Start/end titles/chapters are now specified with # rather than @ to fix
    conflicts with some URLs and file names. For instance, this plays a DVD
    from the 2nd chapter of the 1st title up to the 4th chapter of the 3rd
