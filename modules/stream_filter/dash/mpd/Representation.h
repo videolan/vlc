@@ -60,6 +60,7 @@ namespace dash
                 void    setContentProtection   (ContentProtection *protection);
 
             private:
+                std::map<std::string, std::string>  attributes;
                 SegmentInfo                         *segmentInfo;
                 TrickModeType                       *trickModeType;
 

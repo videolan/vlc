@@ -24,12 +24,10 @@
 #ifndef COMMONATTRIBUTESELEMENTS_H
 #define COMMONATTRIBUTESELEMENTS_H
 
-#include "exceptions/AttributeNotPresentException.h"
-#include "exceptions/ElementNotPresentException.h"
-
-#include <map>
+#include <list>
 #include <string>
 
+#include "exceptions/ElementNotPresentException.h"
 #include "mpd/ContentProtection.h"
 
 namespace dash
@@ -39,20 +37,38 @@ namespace dash
         class CommonAttributesElements
         {
             public:
-                CommonAttributesElements( const std::map<std::string, std::string>& attributes );
+                CommonAttributesElements();
                 virtual ~CommonAttributesElements();
-                int                 getWidth                () const;
-                int                 getHeight               () const;
-                int                 getParX                 () const;
-                int                 getParY                 () const;
-                std::string         getLang                 () const throw(dash::exception::AttributeNotPresentException);
-                int                 getFrameRate            () const;
-                std::string         getNumberOfChannels     () const throw(dash::exception::AttributeNotPresentException);
-                std::string         getSamplingRate         () const throw(dash::exception::AttributeNotPresentException);
-                ContentProtection*  getContentProtection    () const throw(dash::exception::ElementNotPresentException);
+                const std::string&              getMimeType() const;
+                void                            setMimeType( const std::string &mimeType );
+                int                             getWidth() const;
+                void                            setWidth( int width );
+                int                             getHeight() const;
+                void                            setHeight( int height );
+                int                             getParX() const;
+                void                            setParX( int parX );
+                int                             getParY() const;
+                void                            setParY( int parY );
+                int                             getFrameRate() const;
+                void                            setFrameRate( int frameRate );
+                const std::list<std::string>&   getLang() const;
+                void                            addLang( const std::string &lang );
+                const std::list<std::string>&   getNumberOfChannels() const;
+                void                            addChannel( const std::string &channel );
+                const std::list<int>&           getSamplingRates() const;
+                void                            addSampleRate( int sampleRate );
+                ContentProtection*              getContentProtection() const throw(dash::exception::ElementNotPresentException);
 
             protected:
-                std::map<std::string, std::string>  attributes;
+                std::string                         mimeType;
+                int                                 width;
+                int                                 height;
+                int                                 parX;
+                int                                 parY;
+                int                                 frameRate;
+                std::list<std::string>              lang;
+                std::list<std::string>              channels;
+                std::list<int>                      sampleRates;
                 ContentProtection                   *contentProtection;
         };
     }

@@ -23,13 +23,15 @@
 
 #include "CommonAttributesElements.h"
 
-#include <cstdlib>
-
 using namespace dash::mpd;
 using namespace dash::exception;
 
-CommonAttributesElements::CommonAttributesElements( const std::map<std::string, std::string>& attributes ) :
-    attributes( attributes ),
+CommonAttributesElements::CommonAttributesElements() :
+    width( -1 ),
+    height( -1 ),
+    parX( 1 ),
+    parY( 1 ),
+    frameRate( -1 ),
     contentProtection( NULL )
 {
 }
@@ -39,83 +41,102 @@ CommonAttributesElements::~CommonAttributesElements()
     delete this->contentProtection;
 }
 
+const std::string&      CommonAttributesElements::getMimeType() const
+{
+    return this->mimeType;
+}
+
+void                    CommonAttributesElements::setMimeType( const std::string &mimeType )
+{
+    this->mimeType = mimeType;
+}
+
 int     CommonAttributesElements::getWidth                () const
 {
-    std::map<std::string, std::string>::const_iterator  it = this->attributes.find("width");
-    if ( it == this->attributes.end())
-        return -1;
+    return this->width;
+}
 
-    return atoi( it->second.c_str() );
-
+void    CommonAttributesElements::setWidth( int width )
+{
+    if ( width > 0 )
+        this->width = width;
 }
 
 int     CommonAttributesElements::getHeight               () const
 {
-    std::map<std::string, std::string>::const_iterator  it = this->attributes.find("height");
-    if ( it == this->attributes.end() )
-        return -1;
+    return this->height;
+}
 
-    return atoi( it->second.c_str() );
-
+void    CommonAttributesElements::setHeight( int height )
+{
+    if ( height > 0 )
+        this->height = height;
 }
 
 int     CommonAttributesElements::getParX                 () const
 {
-    std::map<std::string, std::string>::const_iterator  it = this->attributes.find("parx");
-    if ( it == this->attributes.end() )
-        return 1; //Default value is defined in standard's §5.4.3.2.2
+    return this->parX;
+}
 
-    return atoi( it->second.c_str() );
-
+void    CommonAttributesElements::setParX( int parX )
+{
+    if ( parX > 0 )
+        this->parX = parX;
 }
 
 int         CommonAttributesElements::getParY                 () const
 {
-    std::map<std::string, std::string>::const_iterator  it = this->attributes.find("pary");
-    if ( it == this->attributes.end() )
-        return 1; //Default value is defined in standard's §5.4.3.2.2
-
-    return atoi( it->second.c_str() );
-
+    return this->parY;
 }
 
-std::string         CommonAttributesElements::getLang                 () const throw(AttributeNotPresentException)
+void        CommonAttributesElements::setParY( int parY )
 {
-    std::map<std::string, std::string>::const_iterator  it = this->attributes.find("lang");
-    if ( it == this->attributes.end() )
-        throw AttributeNotPresentException();
+    if ( parY > 0 )
+        this->setParY( parY );
+}
 
-    return it->second;
+const std::list<std::string>& CommonAttributesElements::getLang() const
+{
+    return this->lang;
+}
+
+void    CommonAttributesElements::addLang( const std::string &lang )
+{
+    if ( lang.empty() == false )
+        this->lang.push_back( lang );
 }
 
 int                 CommonAttributesElements::getFrameRate            () const
 {
-    std::map<std::string, std::string>::const_iterator  it = this->attributes.find("frameRate");
-    if ( it == this->attributes.end())
-        return -1;
-
-    return atoi( it->second.c_str() );
-
+    return this->frameRate;
 }
 
-std::string         CommonAttributesElements::getNumberOfChannels     () const throw(AttributeNotPresentException)
+void            CommonAttributesElements::setFrameRate( int frameRate )
 {
-    std::map<std::string, std::string>::const_iterator  it = this->attributes.find("numberOfChannels");
-    if( it == this->attributes.end() )
-        throw AttributeNotPresentException();
-
-    return it->second;
-
+    if ( frameRate > 0 )
+        this->frameRate = frameRate;
 }
 
-std::string         CommonAttributesElements::getSamplingRate         () const throw(AttributeNotPresentException)
+const std::list<std::string>&   CommonAttributesElements::getNumberOfChannels() const
 {
-    std::map<std::string, std::string>::const_iterator  it = this->attributes.find("samplingRate");
-    if ( it == this->attributes.end() )
-        throw AttributeNotPresentException();
+    return this->channels;
+}
 
-    return it->second;
+void    CommonAttributesElements::addChannel( const std::string &channel )
+{
+    if ( channel.empty() == false )
+        this->channels.push_back( channel );
+}
 
+const std::list<int>&   CommonAttributesElements::getSamplingRates() const
+{
+    return this->sampleRates;
+}
+
+void    CommonAttributesElements::addSampleRate( int sampleRate )
+{
+    if ( sampleRate > 0 )
+        this->sampleRates.push_back( sampleRate );
 }
 
 ContentProtection*  CommonAttributesElements::getContentProtection    () const throw(ElementNotPresentException)
