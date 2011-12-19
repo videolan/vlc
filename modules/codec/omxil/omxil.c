@@ -1062,10 +1062,25 @@ static OMX_ERRORTYPE PortReconfigure(decoder_t *p_dec, OmxPort *p_port)
     /* Get the new port definition */
     omx_error = GetPortDefinition(p_dec, &p_sys->out, p_sys->out.p_fmt);
     if(omx_error != OMX_ErrorNone) goto error;
-    omx_error = OMX_SetParameter(p_dec->p_sys->omx_handle, OMX_IndexParamPortDefinition,
-                                 &definition);
-    CHECK_ERROR(omx_error, "OMX_SetParameter failed (%x : %s)",
-                omx_error, ErrorToString(omx_error));
+
+    if( p_dec->fmt_in.i_cat != AUDIO_ES )
+    {
+        /* Don't explicitly set the new parameters that we got with
+         * OMX_GetParameter above when using audio codecs.
+         * That struct hasn't been changed since, so there should be
+         * no need to set it here, unless some codec expects the
+         * SetParameter call as a trigger event for some part of
+         * the reconfiguration.
+         * This fixes using audio decoders on Samsung Galaxy S II,
+         *
+         * Only skipping this for audio codecs, to minimize the
+         * change for current working configurations for video.
+         */
+        omx_error = OMX_SetParameter(p_dec->p_sys->omx_handle, OMX_IndexParamPortDefinition,
+                                     &definition);
+        CHECK_ERROR(omx_error, "OMX_SetParameter failed (%x : %s)",
+                    omx_error, ErrorToString(omx_error));
+    }
 
     omx_error = OMX_SendCommand( p_sys->omx_handle, OMX_CommandPortEnable,
                                  p_port->i_port_index, NULL);
