@@ -1372,6 +1372,10 @@ aout_buffer_t *DecodeAudio ( decoder_t *p_dec, block_t **pp_block )
 
     /* Send the input buffer to the component */
     OMX_FIFO_GET(&p_sys->in.fifo, p_header);
+
+    if (p_header && p_header->nFlags & OMX_BUFFERFLAG_EOS)
+        goto reconfig;
+
     if(p_header)
     {
         p_header->nFilledLen = p_block->i_buffer;
@@ -1408,6 +1412,7 @@ aout_buffer_t *DecodeAudio ( decoder_t *p_dec, block_t **pp_block )
         *pp_block = NULL; /* Avoid being fed the same packet again */
     }
 
+reconfig:
     /* Handle the PortSettingsChanged events */
     for(i = 0; i < p_sys->ports; i++)
     {
