@@ -1852,10 +1852,8 @@ unsigned int CocoaKeyToVLC( unichar i_key )
 
         o_enum = [o_msg_arr objectEnumerator];
 
-        while( ( o_msg = [o_enum nextObject] ) != nil )
-        {
+        while( ( o_msg = [o_enum nextObject] ) != NULL )
             [o_messages insertText: o_msg];
-        }
 
         b_msg_arr_changed = NO;
         [o_msg_lock unlock];
@@ -1883,7 +1881,7 @@ unsigned int CocoaKeyToVLC( unichar i_key )
         [o_msg_arr removeObjectAtIndex: 1];
     }
 
-    o_attr = [NSDictionary dictionaryWithObject: o_gray forKey: NSForegroundColorAttributeName];
+    o_attr = [NSDictionary dictionaryWithObject: pp_color[3] forKey: NSForegroundColorAttributeName];
     o_msg_color = [[NSAttributedString alloc] initWithString: [NSString stringWithFormat: @"%s%s", item->psz_module, ppsz_type[i_type]] attributes: o_attr];
     [o_msg_arr addObject: [o_msg_color autorelease]];
 
