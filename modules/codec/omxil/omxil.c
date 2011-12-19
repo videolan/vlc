@@ -692,6 +692,14 @@ static OMX_ERRORTYPE InitialiseComponent(decoder_t *p_dec,
             OMX_BOOL enable = OMX_TRUE;
             omx_error = OMX_SetConfig(omx_handle, index, &enable);
             CHECK_ERROR(omx_error, "Unable to set ThumbnailMode");
+        } else {
+            OMX_BOOL enable = OMX_TRUE;
+            /* Needed on Samsung Galaxy S II */
+            omx_error = OMX_SetConfig(omx_handle, OMX_IndexVendorSetYUV420pMode, &enable);
+            if (omx_error == OMX_ErrorNone)
+                msg_Dbg(p_dec, "Set OMX_IndexVendorSetYUV420pMode successfully");
+            else
+                msg_Dbg(p_dec, "Unable to set OMX_IndexVendorSetYUV420pMode: %x", omx_error);
         }
     }
 

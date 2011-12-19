@@ -185,3 +185,5 @@ unsigned int GetAudioParamSize(OMX_INDEXTYPE index);
  * Vendor specific color formats
  *****************************************************************************/
 #define OMX_QCOM_COLOR_FormatYVU420SemiPlanar 0x7FA30C00
+
+#define OMX_IndexVendorSetYUV420pMode 0x7f000003
