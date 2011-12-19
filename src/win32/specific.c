@@ -78,7 +78,6 @@ void system_Init( void )
 
     psz_vlcpath = strdup( psz_path );
 
-    /* Set the default file-translation mode */
 #if !defined( UNDER_CE )
     timeBeginPeriod(5);
 #endif
