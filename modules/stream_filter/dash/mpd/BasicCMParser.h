@@ -62,6 +62,7 @@ namespace dash
                 void    setInitSegment      (dash::xml::Node *root, SegmentInfo *info);
                 void    setSegments         (dash::xml::Node *root, SegmentInfo *info);
                 void    setMPDBaseUrl       (dash::xml::Node *root);
+                bool    parseCommonAttributesElements( dash::xml::Node *node, CommonAttributesElements *common ) const;
         };
     }
 }

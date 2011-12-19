@@ -27,6 +27,9 @@
 
 #include "BasicCMParser.h"
 
+#include <cstdlib>
+#include <sstream>
+
 using namespace dash::mpd;
 using namespace dash::xml;
 
@@ -87,7 +90,14 @@ void    BasicCMParser::setRepresentations   (Node *root, Group *group)
 
     for(size_t i = 0; i < representations.size(); i++)
     {
-        Representation *rep = new Representation(representations.at(i)->getAttributes());
+        const std::map<std::string, std::string>    attributes = representations.at(i)->getAttributes();
+
+        Representation *rep = new Representation( attributes );
+        if ( this->parseCommonAttributesElements( representations.at( i ), rep ) == false )
+        {
+            delete rep;
+            continue ;
+        }
         this->setSegmentInfo(representations.at(i), rep);
         if ( rep->getSegmentInfo() && rep->getSegmentInfo()->getSegments().size() > 0 )
             group->addRepresentation(rep);
@@ -130,4 +140,71 @@ void    BasicCMParser::setSegments          (Node *root, SegmentInfo *info)
 MPD*    BasicCMParser::getMPD               ()
 {
     return this->mpd;
+}
+
+bool    BasicCMParser::parseCommonAttributesElements( Node *node, CommonAttributesElements *common) const
+{
+    const std::map<std::string, std::string>                &attr = node->getAttributes();
+    std::map<std::string, std::string>::const_iterator      it;
+    //Parse mandatory elements first.
+    it = attr.find( "mimeType" );
+    if ( it == attr.end() )
+    {
+        std::cerr << "Missing mandatory attribute: @mimeType" << std::endl;
+        return false;
+    }
+    common->setMimeType( it->second );
+    //Everything else is optionnal.
+    it = attr.find( "width" );
+    if ( it != attr.end() )
+        common->setWidth( atoi( it->second.c_str() ) );
+    it = attr.find( "height" );
+    if ( it != attr.end() )
+        common->setHeight( atoi( it->second.c_str() ) );
+    it = attr.find( "parx" );
+    if ( it != attr.end() )
+        common->setParX( atoi( it->second.c_str() ) );
+    it = attr.find( "pary" );
+    if ( it != attr.end() )
+        common->setParY( atoi( it->second.c_str() ) );
+    it = attr.find( "frameRate" );
+    if ( it != attr.end() )
+        common->setFrameRate( atoi( it->second.c_str() ) );
+    it = attr.find( "lang" );
+
+    if ( it != attr.end() && it->second.empty() == false )
+    {
+        std::istringstream  s( it->second );
+        while ( s )
+        {
+            std::string     lang;
+            s >> lang;
+            common->addLang( lang );
+        }
+    }
+    it = attr.find( "numberOfChannels" );
+    if ( it != attr.end() )
+    {
+        std::istringstream  s( it->second );
+        while ( s )
+        {
+            std::string     channel;
+            s >> channel;
+            common->addChannel( channel );
+        }
+    }
+    it = attr.find( "samplingRate" );
+    if ( it != attr.end() )
+    {
+        std::istringstream  s( it->second );
+        while ( s )
+        {
+            int         rate;
+            s >> rate;
+            common->addSampleRate( rate );
+        }
+    }
+    //FIXME: Handle : group, maximumRAPPeriod startWithRAP attributes
+    //FIXME: Handle : ContentProtection Accessibility Rating Viewpoing MultipleViews elements
+    return true;
 }
