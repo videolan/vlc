@@ -1334,7 +1334,7 @@ unsigned int CocoaKeyToVLC( unichar i_key )
     {
         [o_mainwindow toggleFullScreen: self];
         if(b_fullscreen)
-            [NSApp setPresentationOptions:(NSApplicationPresentationFullScreen)];
+            [NSApp setPresentationOptions:(NSApplicationPresentationFullScreen | NSApplicationPresentationAutoHideDock | NSApplicationPresentationAutoHideMenuBar)];
         else
             [NSApp setPresentationOptions:(NSApplicationPresentationDefault)];
     }
