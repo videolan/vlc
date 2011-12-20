@@ -896,21 +896,26 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
 - (void)setVideoplayEnabled
 {
+    BOOL b_videoPlayback = [[VLCMain sharedInstance] activeVideoPlayback];
+
     if (!b_nonembedded)
-        [o_playlist_btn setEnabled: [[VLCMain sharedInstance] activeVideoPlayback]];
+        [o_playlist_btn setEnabled: b_videoPlayback];
     else
     {
         [o_playlist_btn setEnabled: NO];
-        if (![[VLCMain sharedInstance] activeVideoPlayback])
+        if (!b_videoPlayback)
             [o_nonembedded_window orderOut: nil];
     }
-    if( OSX_LION )
+    if( OSX_LION && b_nativeFullscreenMode )
     {
-        if( [NSApp presentationOptions] | NSApplicationPresentationFullScreen )
-        {
-            [o_bottombar_view setHidden: [[VLCMain sharedInstance] activeVideoPlayback]];
-        }
-        [o_bottombar_view setHidden: NO];
+        if( [NSApp presentationOptions] == NSApplicationPresentationFullScreen )
+            [o_bottombar_view setHidden: b_videoPlayback];
+        else
+            [o_bottombar_view setHidden: NO];
+    }
+    else
+    {
+        [o_fullscreen_btn setEnabled: b_videoPlayback];
     }
 }
 
