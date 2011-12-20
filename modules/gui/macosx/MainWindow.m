@@ -904,11 +904,19 @@ static VLCMainWindow *_o_sharedInstance = nil;
         if (![[VLCMain sharedInstance] activeVideoPlayback])
             [o_nonembedded_window orderOut: nil];
     }
+    if( OSX_LION )
+    {
+        if( [NSApp presentationOptions] | NSApplicationPresentationFullScreen )
+        {
+            [o_bottombar_view setHidden: [[VLCMain sharedInstance] activeVideoPlayback]];
+        }
+        [o_bottombar_view setHidden: NO];
+    }
 }
 
 - (void)resizeWindow
 {
-    if ( !b_fullscreen && !(OSX_LION && [NSApp currentSystemPresentationOptions] == NSApplicationPresentationFullScreen && b_nativeFullscreenMode) )
+    if ( !b_fullscreen && !(OSX_LION && [NSApp presentationOptions] == NSApplicationPresentationFullScreen && b_nativeFullscreenMode) )
     {
         NSPoint topleftbase;
         NSPoint topleftscreen;
@@ -1414,11 +1422,13 @@ static VLCMainWindow *_o_sharedInstance = nil;
 #pragma mark Lion's native fullscreen handling
 - (void)windowWillEnterFullScreen:(NSNotification *)notification
 {
+    [o_video_view setFrame: [[self contentView] frame]];
     [NSCursor setHiddenUntilMouseMoves: YES];
 }
 
 - (void)windowWillExitFullScreen:(NSNotification *)notification
 {
+    [o_video_view setFrame: [o_split_view frame]];
     [NSCursor setHiddenUntilMouseMoves: NO];
 }
 

@@ -461,6 +461,9 @@ static NSMutableArray *blackoutWindows = NULL;
 {
     [self registerForDraggedTypes:[NSArray arrayWithObjects:NSTIFFPboardType,
         NSFilenamesPboardType, nil]];
+    [self setImageScaling: NSScaleToFit];
+    [self setImageFrameStyle: NSImageFrameNone];
+    [self setImageAlignment: NSImageAlignCenter];
 }
 
 - (NSDragOperation)draggingEntered:(id <NSDraggingInfo>)sender
