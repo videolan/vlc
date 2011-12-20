@@ -97,7 +97,11 @@ vlc_module_begin ()
 vlc_module_end ()
 
 /* Shall we use libdvdnav's read ahead cache? */
+#ifdef __OS2__
+#define DVD_READ_CACHE 0
+#else
 #define DVD_READ_CACHE 1
+#endif
 
 /*****************************************************************************
  * Local prototypes
