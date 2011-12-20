@@ -38,6 +38,7 @@
 #include <vlc_services_discovery.h>
 
 #include <assert.h>
+#include <limits.h>
 
 /*
  * Constants
