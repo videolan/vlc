@@ -1887,6 +1887,7 @@ static int get_chunk_header(demux_t *p_demux)
     /*msg_Dbg( p_demux, "chunk has %d records", i_num_recs );*/
 
     free(p_sys->rec_hdrs);
+    p_sys->rec_hdrs = NULL;
 
     /* skip past the 4 bytes we "peeked" earlier */
     stream_Read( p_demux->s, NULL, 4 );
