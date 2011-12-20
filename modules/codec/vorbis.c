@@ -129,7 +129,7 @@ static const uint32_t pi_6channels_in[] =
 
 /* recommended vorbis channel order for 4 channels */
 static const uint32_t pi_4channels_in[] =
-{ AOUT_CHAN_LEFT, AOUT_CHAN_RIGHT, AOUT_CHAN_CENTER, AOUT_CHAN_LFE, 0 };
+{ AOUT_CHAN_LEFT, AOUT_CHAN_RIGHT, AOUT_CHAN_REARLEFT, AOUT_CHAN_REARRIGHT, 0 };
 
 /* recommended vorbis channel order for 3 channels */
 static const uint32_t pi_3channels_in[] =
