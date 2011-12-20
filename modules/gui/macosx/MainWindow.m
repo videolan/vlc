@@ -913,10 +913,6 @@ static VLCMainWindow *_o_sharedInstance = nil;
         else
             [o_bottombar_view setHidden: NO];
     }
-    else
-    {
-        [o_fullscreen_btn setEnabled: b_videoPlayback];
-    }
 }
 
 - (void)resizeWindow

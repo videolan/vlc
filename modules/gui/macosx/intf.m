@@ -1342,7 +1342,7 @@ unsigned int CocoaKeyToVLC( unichar i_key )
     {
         input_thread_t * p_input = pl_CurrentInput( VLCIntf );
 
-        if( p_input != NULL )
+        if( p_input != NULL && [self activeVideoPlayback])
         {
             if(b_fullscreen)
                 [o_mainwindow performSelectorOnMainThread:@selector(enterFullscreen) withObject:nil waitUntilDone:NO];
