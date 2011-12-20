@@ -800,7 +800,7 @@ void VLCMenuBar::PopupMenuControlEntries( QMenu *menu, intf_thread_t *p_intf,
                                         bool b_normal )
 {
     QAction *action;
-    QMenu *rateMenu = new QMenu( "Sp&eed" );
+    QMenu *rateMenu = new QMenu( qtr( "Sp&eed" ) );
     rateMenu->setTearOffEnabled( true );
 
     if( b_normal )
