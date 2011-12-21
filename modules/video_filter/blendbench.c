@@ -153,6 +153,7 @@ static int Create( vlc_object_t *p_this )
     filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys;
     char *psz_temp, *psz_cmd;
+    int i_ret;
 
     /* Allocate structure */
     p_filter->p_sys = malloc( sizeof( filter_sys_t ) );
@@ -178,10 +179,15 @@ static int Create( vlc_object_t *p_this )
     p_sys->i_base_chroma = VLC_FOURCC( psz_temp[0], psz_temp[1],
                                        psz_temp[2], psz_temp[3] );
     psz_cmd = var_CreateGetStringCommand( p_filter, CFG_PREFIX "base-image" );
-    blendbench_LoadImage( p_this, &p_sys->p_base_image, p_sys->i_base_chroma,
-                          psz_cmd, "Base" );
+    i_ret = blendbench_LoadImage( p_this, &p_sys->p_base_image,
+                                  p_sys->i_base_chroma, psz_cmd, "Base" );
     free( psz_temp );
     free( psz_cmd );
+    if( i_ret != VLC_SUCCESS )
+    {
+        free( p_sys );
+        return i_ret;
+    }
 
     psz_temp = var_CreateGetStringCommand( p_filter,
                                            CFG_PREFIX "blend-chroma" );
