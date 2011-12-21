@@ -44,13 +44,17 @@ namespace dash
                 Representation          ( const std::map<std::string, std::string>&  attributes);
                 virtual ~Representation ();
 
-                std::string         getId                   () const throw(dash::exception::AttributeNotPresentException);
+                const std::string&  getId                   () const;
+                void                setId                   ( const std::string &id );
                 /*
                  *  @return The bitrate required for this representation
                  *          in Bytes per seconds.
                  *          -1 if an error occurs.
                  */
                 int                 getBandwidth            () const;
+                void                setBandwidth            ( int bandwidth );
+                int                 getQualityRanking       () const;
+                void                setQualityRanking       ( int qualityRanking );
                 std::string         getDependencyId         () const throw(dash::exception::AttributeNotPresentException);
                 SegmentInfo*        getSegmentInfo          () const throw(dash::exception::ElementNotPresentException);
                 TrickModeType*      getTrickModeType        () const throw(dash::exception::ElementNotPresentException);
@@ -60,10 +64,12 @@ namespace dash
                 void    setContentProtection   (ContentProtection *protection);
 
             private:
+                int                                 bandwidth;
+                std::string                         id;
+                int                                 qualityRanking;
                 std::map<std::string, std::string>  attributes;
                 SegmentInfo                         *segmentInfo;
                 TrickModeType                       *trickModeType;
-
         };
     }
 }

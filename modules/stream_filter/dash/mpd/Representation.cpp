@@ -33,6 +33,7 @@ using namespace dash::mpd;
 using namespace dash::exception;
 
 Representation::Representation  (const std::map<std::string, std::string>&  attributes) :
+    qualityRanking( -1 ),
     attributes( attributes ),
     segmentInfo( NULL ),
     trickModeType( NULL )
@@ -52,26 +53,28 @@ std::string         Representation::getDependencyId         () const throw(Attri
         throw AttributeNotPresentException();
 
     return it->second;
-
 }
-std::string         Representation::getId                   () const throw(AttributeNotPresentException)
+
+const std::string&  Representation::getId                   () const
 {
-    std::map<std::string, std::string>::const_iterator  it = this->attributes.find("id");
-    if ( it == this->attributes.end())
-        throw AttributeNotPresentException();
+    return this->id;
+}
 
-    return it->second;
-
+void    Representation::setId(const std::string &id)
+{
+    if ( id.empty() == false )
+        this->id = id;
 }
 
 int     Representation::getBandwidth            () const
 {
-    std::map<std::string, std::string>::const_iterator  it = this->attributes.find("bandwidth");
-    if ( it == this->attributes.end())
-        return -1;
+    return this->bandwidth;
+}
 
-    return atoi( it->second.c_str() ) / 8;
-
+void    Representation::setBandwidth( int bandwidth )
+{
+    if ( bandwidth >= 0 )
+        this->bandwidth = bandwidth;
 }
 
 SegmentInfo*        Representation::getSegmentInfo          () const throw(ElementNotPresentException)
@@ -100,4 +103,16 @@ void                Representation::setContentProtection    (ContentProtection *
 void                Representation::setSegmentInfo          (SegmentInfo *info)
 {
     this->segmentInfo = info;
+}
+
+
+int Representation::getQualityRanking() const
+{
+    return this->qualityRanking;
+}
+
+void Representation::setQualityRanking( int qualityRanking )
+{
+    if ( qualityRanking > 0 )
+        this->qualityRanking = qualityRanking;
 }

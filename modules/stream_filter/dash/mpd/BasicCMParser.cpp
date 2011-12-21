@@ -73,6 +73,7 @@ void    BasicCMParser::setPeriods           (Node *root)
         this->mpd->addPeriod(period);
     }
 }
+
 void    BasicCMParser::setGroups            (Node *root, Period *period)
 {
     std::vector<Node *> groups = DOMHelper::getElementByTagName(root, "Group", false);
@@ -89,6 +90,7 @@ void    BasicCMParser::setGroups            (Node *root, Period *period)
         period->addGroup(group);
     }
 }
+
 void    BasicCMParser::setRepresentations   (Node *root, Group *group)
 {
     std::vector<Node *> representations = DOMHelper::getElementByTagName(root, "Representation", false);
@@ -97,6 +99,7 @@ void    BasicCMParser::setRepresentations   (Node *root, Group *group)
     {
         const std::map<std::string, std::string>    attributes = representations.at(i)->getAttributes();
 
+        //FIXME: handle @dependencyId afterward
         Representation *rep = new Representation( attributes );
         if ( this->parseCommonAttributesElements( representations.at( i ), rep ) == false )
         {
