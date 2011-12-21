@@ -261,6 +261,7 @@ public:
     void mouseChanged( vout_thread_t *, int i_mousex, int i_mousey );
     void toggleFullwidth();
     void updateFullwidthGeometry( int number );
+    int targetScreen();
 
 signals:
     void keyPressed( QKeyEvent * );
@@ -285,6 +286,7 @@ private slots:
     void planHideFSC();
     void hideFSC() { hide(); }
     void slowHideFSC();
+    void restoreFSC();
     void centerFSC( int );
 
 private:
@@ -300,6 +302,8 @@ private:
     bool b_mouse_over;
     int i_screennumber;
     QRect screenRes;
+    QRect previousScreenRes;
+    QPoint previousPosition;
 
     /* List of vouts currently tracked */
     QList<vout_thread_t *> vout;

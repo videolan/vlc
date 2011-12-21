@@ -761,42 +761,66 @@ FullscreenControllerWidget::FullscreenControllerWidget( intf_thread_t *_p_i, QWi
               this, setVoutList( vout_thread_t **, int ) );
 
     /* First Move */
-    QRect rect1 = getSettings()->value( "FullScreen/screen" ).toRect();
-    QPoint pos1 = getSettings()->value( "FullScreen/pos" ).toPoint();
-    int number =  var_InheritInteger( p_intf, "qt-fullscreen-screennumber" );
-    if( number == -1 || number > QApplication::desktop()->numScreens() )
-        number = QApplication::desktop()->screenNumber( p_intf->p_sys->p_mi );
-
-    QRect rect = QApplication::desktop()->screenGeometry( number );
-    if( rect == rect1 && rect.contains( pos1, true ) )
-    {
-        move( pos1 );
-        screenRes = QApplication::desktop()->screenGeometry(number);
-    }
-    else
-    {
-        centerFSC( number );
-    }
+    previousPosition = getSettings()->value( "FullScreen/pos" ).toPoint();
+    screenRes = getSettings()->value( "FullScreen/screen" ).toRect();
+    isWideFSC = getSettings()->value( "FullScreen/wide" ).toBool();
+    i_screennumber = var_InheritInteger( p_intf, "qt-fullscreen-screennumber" );
 }
 
 FullscreenControllerWidget::~FullscreenControllerWidget()
 {
-    QPoint pos1 = pos();
-    QRect rect1 = QApplication::desktop()->screenGeometry( pos1 );
-    getSettings()->setValue( "FullScreen/pos", pos1 );
-    getSettings()->setValue( "FullScreen/screen", rect1 );
+    getSettings()->setValue( "FullScreen/pos", previousPosition );
+    getSettings()->setValue( "FullScreen/screen", screenRes );
+    getSettings()->setValue( "FullScreen/wide", isWideFSC );
 
     setVoutList( NULL, 0 );
     vlc_mutex_destroy( &lock );
 }
 
+void FullscreenControllerWidget::restoreFSC()
+{
+    if( !isWideFSC )
+    {
+        /* Restore half-bar and re-centre if needed */
+        setMinimumWidth( FSC_WIDTH );
+        adjustSize();
+
+        QRect currentRes = QApplication::desktop()->screenGeometry( targetScreen() );
+
+        if( currentRes == screenRes &&
+            QApplication::desktop()->screen()->geometry().contains( previousPosition, true ) )
+        {
+            /* Restore to the last known position */
+            move( previousPosition );
+        }
+        else
+        {
+            /* FSC is out of screen or screen resolution changed */
+            msg_Dbg( p_intf, "Recentering the Fullscreen Controller" );
+            centerFSC( targetScreen() );
+            screenRes = currentRes;
+            previousPosition = pos();
+        }
+    }
+    else
+    {
+        /* Dock at the bottom of the screen */
+        updateFullwidthGeometry( targetScreen() );
+    }
+
+#ifdef Q_WS_X11
+    // Tell kwin that we do not want a shadow around the fscontroller
+    setMask( QRegion( 0, 0, width(), height() ) );
+#endif
+}
+
 void FullscreenControllerWidget::centerFSC( int number )
 {
-    screenRes = QApplication::desktop()->screenGeometry(number);
+    QRect currentRes = QApplication::desktop()->screenGeometry( number );
 
     /* screen has changed, calculate new position */
-    QPoint pos = QPoint( screenRes.x() + (screenRes.width() / 2) - (width() / 2),
-            screenRes.y() + screenRes.height() - height());
+    QPoint pos = QPoint( currentRes.x() + (currentRes.width() / 2) - (width() / 2),
+            currentRes.y() + currentRes.height() - height());
     move( pos );
 }
 
@@ -805,32 +829,10 @@ void FullscreenControllerWidget::centerFSC( int number )
  */
 void FullscreenControllerWidget::showFSC()
 {
-    int number = QApplication::desktop()->screenNumber( p_intf->p_sys->p_mi );
-
-    if( number != i_screennumber ||
-        screenRes != QApplication::desktop()->screenGeometry(number) )
-    {
-        i_screennumber = number;
-        if( !isWideFSC )
-        {
-            centerFSC( number );
-            msg_Dbg( p_intf, "Recentering the Fullscreen Controller" );
-        }
-        else
-        {
-            updateFullwidthGeometry( number );
-        }
-    }
-
-    adjustSize();
+    restoreFSC();
 
 #if HAVE_TRANSPARENCY
     setWindowOpacity( f_opacity );
-#endif
-
-#ifdef Q_WS_X11
-    // Tell kwin that we do not want a shadow around the fscontroller
-    setMask( QRegion( 0, 0, width(), height() ) );
 #endif
 
     show();
@@ -888,30 +890,25 @@ void FullscreenControllerWidget::slowHideFSC()
 
 void FullscreenControllerWidget::updateFullwidthGeometry( int number )
 {
-    QRect screenGeometry = QApplication::desktop()->screenGeometry( i_screennumber );
+    QRect screenGeometry = QApplication::desktop()->screenGeometry( number );
     setMinimumWidth( screenGeometry.width() );
     setGeometry( screenGeometry.x(), screenGeometry.y() + screenGeometry.height() - FSC_HEIGHT, screenGeometry.width(), FSC_HEIGHT );
+    adjustSize();
 }
 
-void FullscreenControllerWidget::toggleFullwidth() {
-    if( !isWideFSC ) {
-        /* Dock at the bottom of the screen */
-        updateFullwidthGeometry( i_screennumber );
-    } else {
-        /* Restore half-bar and re-centre */
-        setMinimumWidth( FSC_WIDTH );
-        centerFSC( i_screennumber );
-    }
-
-    adjustSize();
-
-#ifdef Q_WS_X11
-    // Update the mask to reflect the geometry change
-    setMask( QRegion( 0, 0, width(), height() ) );
-#endif
-
+void FullscreenControllerWidget::toggleFullwidth()
+{
     /* Toggle isWideFSC switch */
     isWideFSC = !isWideFSC;
+
+    restoreFSC();
+}
+
+int FullscreenControllerWidget::targetScreen()
+{
+    if( i_screennumber == -1 || i_screennumber > QApplication::desktop()->numScreens() )
+        return QApplication::desktop()->screenNumber( p_intf->p_sys->p_mi );
+    return i_screennumber;
 }
 
 /**
@@ -1004,6 +1001,9 @@ void FullscreenControllerWidget::mouseReleaseEvent( QMouseEvent *event )
     i_mouse_last_x = -1;
     i_mouse_last_y = -1;
     event->accept();
+
+    // Save the new FSC position
+    previousPosition = pos();
 }
 
 /**
