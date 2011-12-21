@@ -84,6 +84,20 @@ std::vector<Representation*>    Group::getRepresentations       ()
     return this->representations;
 }
 
+const Representation *Group::getRepresentationById(const std::string &id) const
+{
+    std::vector<Representation*>::const_iterator    it = this->representations.begin();
+    std::vector<Representation*>::const_iterator    end = this->representations.end();
+
+    while ( it != end )
+    {
+        if ( (*it)->getId() == id )
+            return *it;
+        ++it;
+    }
+    return NULL;
+}
+
 void                            Group::addRepresentation        (Representation *rep)
 {
     this->representations.push_back(rep);

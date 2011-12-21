@@ -50,6 +50,7 @@ namespace dash
 
                 std::string                     getSubSegmentAlignment  () throw(dash::exception::AttributeNotPresentException);
                 std::vector<Representation *>   getRepresentations      ();
+                const Representation*           getRepresentationById   ( const std::string &id ) const;
                 Viewpoint*                      getViewpoint            () throw(dash::exception::ElementNotPresentException);
                 Accessibility*                  getAccessibility        () throw(dash::exception::ElementNotPresentException);
                 Rating*                         getRating               () throw(dash::exception::ElementNotPresentException);
