@@ -1,5 +1,5 @@
 /*****************************************************************************
- * algo_yadif.c : Wrapper for MPlayer's Yadif algorithm
+ * algo_yadif.c : Wrapper for FFmpeg's Yadif algorithm
  *****************************************************************************
  * Copyright (C) 2000-2011 the VideoLAN team
  * $Id$
@@ -26,10 +26,6 @@
 #   include "config.h"
 #endif
 
-#ifdef CAN_COMPILE_MMXEXT
-#   include "mmx.h"
-#endif
-
 #include <stdint.h>
 #include <assert.h>
 
@@ -47,23 +43,7 @@
  * Yadif (Yet Another DeInterlacing Filter).
  *****************************************************************************/
 
-/* Yadif's private data struct */
-struct vf_priv_s {
-    /*
-     * 0: Output 1 frame for each frame.
-     * 1: Output 1 frame for each field.
-     * 2: Like 0 but skips spatial interlacing check.
-     * 3: Like 1 but skips spatial interlacing check.
-     *
-     * In vlc, only & 0x02 has meaning, as we do the & 0x01 ourself.
-     */
-    int mode;
-};
-
-/* I am unsure it is the right one */
-typedef intptr_t x86_reg;
-
-/* yadif.h comes from vf_yadif.c of mplayer project.
+/* yadif.h comes from yadif.c of FFmpeg project.
    Necessary preprocessor macros are defined in common.h. */
 #include "yadif.h"
 
@@ -125,15 +105,22 @@ int RenderYadif( filter_t *p_filter, picture_t *p_dst, picture_t *p_src,
     if( p_prev && p_cur && p_next )
     {
         /* */
-        void (*filter)(struct vf_priv_s *p, uint8_t *dst,
-                       uint8_t *prev, uint8_t *cur, uint8_t *next,
-                       int w, int refs, int parity);
+        void (*filter)(uint8_t *dst, uint8_t *prev, uint8_t *cur, uint8_t *next,
+                       int w, int prefs, int mrefs, int parity, int mode);
+
+        filter = yadif_filter_line_c;
+#if defined(HAVE_YADIF_MMX)
+        if( vlc_CPU() & CPU_CAPABILITY_MMX )
+            filter = yadif_filter_line_mmx;
+#endif
 #if defined(HAVE_YADIF_SSE2)
         if( vlc_CPU() & CPU_CAPABILITY_SSE2 )
-            filter = yadif_filter_line_mmx2;
-        else
+            filter = yadif_filter_line_sse2;
 #endif
-            filter = yadif_filter_line_c;
+#if defined(HAVE_YADIF_SSSE3)
+        if( vlc_CPU() & CPU_CAPABILITY_SSSE3 )
+            filter = yadif_filter_line_ssse3;
+#endif
 
         for( int n = 0; n < p_dst->i_planes; n++ )
         {
@@ -151,19 +138,20 @@ int RenderYadif( filter_t *p_filter, picture_t *p_dst, picture_t *p_src,
                 }
                 else
                 {
-                    struct vf_priv_s cfg;
+                    int mode;
                     /* Spatial checks only when enough data */
-                    cfg.mode = (y >= 2 && y < dstp->i_visible_lines - 2) ? 0 : 2;
+                    mode = (y >= 2 && y < dstp->i_visible_lines - 2) ? 0 : 2;
 
                     assert( prevp->i_pitch == curp->i_pitch && curp->i_pitch == nextp->i_pitch );
-                    filter( &cfg,
-                            &dstp->p_pixels[y * dstp->i_pitch],
+                    filter( &dstp->p_pixels[y * dstp->i_pitch],
                             &prevp->p_pixels[y * prevp->i_pitch],
                             &curp->p_pixels[y * curp->i_pitch],
                             &nextp->p_pixels[y * nextp->i_pitch],
                             dstp->i_visible_pitch,
-                            curp->i_pitch,
-                            yadif_parity );
+                            y < dstp->i_visible_lines - 2  ? curp->i_pitch : -curp->i_pitch,
+                            y  - 1  ?  -curp->i_pitch : curp->i_pitch,
+                            yadif_parity,
+                            mode );
                 }
 
                 /* We duplicate the first and last lines */
