@@ -945,6 +945,7 @@ void SPrefsPanel::assoDialog()
     CoUninitialize();
 
     QDialog *d = new QDialog( this );
+    d->setWindowTitle( qtr( "File associations" ) );
     QGridLayout *assoLayout = new QGridLayout( d );
 
     QTreeWidget *filetypeList = new QTreeWidget;
