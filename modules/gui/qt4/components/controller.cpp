@@ -795,8 +795,8 @@ void FullscreenControllerWidget::centerFSC( int number )
     screenRes = QApplication::desktop()->screenGeometry(number);
 
     /* screen has changed, calculate new position */
-    QPoint pos = QPoint( screenRes.x() + (screenRes.width() / 2) - (sizeHint().width() / 2),
-            screenRes.y() + screenRes.height() - sizeHint().height());
+    QPoint pos = QPoint( screenRes.x() + (screenRes.width() / 2) - (width() / 2),
+            screenRes.y() + screenRes.height() - height());
     move( pos );
 }
 
