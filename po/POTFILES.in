@@ -295,6 +295,7 @@ modules/audio_filter/audiobargraph_a.c
 modules/audio_filter/channel_mixer/dolby.c
 modules/audio_filter/channel_mixer/headphone.c
 modules/audio_filter/channel_mixer/mono.c
+modules/audio_filter/channel_mixer/remap.c
 modules/audio_filter/channel_mixer/simple.c
 modules/audio_filter/channel_mixer/trivial.c
 modules/audio_filter/chorus_flanger.c

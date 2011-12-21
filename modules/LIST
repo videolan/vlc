@@ -276,6 +276,7 @@ $Id$
  * rawvideo: Pseudo audio-decoder for raw video
  * real: partial Real audio/video demuxer
  * realvideo: Real video decoder
+ * remap: audio channel remapping filter
  * remoteosd: Remote-OSD over VNC
  * ripple: Ripple video effect
  * rotate: Video rotation filter

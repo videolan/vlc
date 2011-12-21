@@ -4,6 +4,9 @@ Changes between 1.2.x and 1.3.0-git:
 Encoders:
  * high10,high422 and high444 encoding support in h264
 
+Audio Filters:
+ * new remapping channel filter
+
 
 Changes between 1.1.12 and 1.2.0:
 ---------------------------------

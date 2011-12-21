@@ -31,11 +31,13 @@ SOURCES_simple_channel_mixer = channel_mixer/simple.c
 SOURCES_headphone_channel_mixer = channel_mixer/headphone.c
 SOURCES_dolby_surround_decoder = channel_mixer/dolby.c
 SOURCES_mono = channel_mixer/mono.c
+SOURCES_remap = channel_mixer/remap.c
 
 libvlc_LTLIBRARIES += \
 	libdolby_surround_decoder_plugin.la \
 	libheadphone_channel_mixer_plugin.la \
 	libmono_plugin.la \
+	libremap_plugin.la \
 	libsimple_channel_mixer_plugin.la \
 	libtrivial_channel_mixer_plugin.la
 
