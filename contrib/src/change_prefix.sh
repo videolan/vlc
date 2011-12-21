@@ -74,3 +74,5 @@ for file in `find . -type f`; do
     process "$file"
   fi
 done
+
+exit 0
