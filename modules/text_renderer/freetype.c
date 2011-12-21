@@ -573,11 +573,13 @@ static int GetFileFontByName( const char *font_name, char **psz_filename )
     wchar_t vbuffer[MAX_PATH];
     wchar_t dbuffer[256];
 
-    size_t fontname_len = strlen( font_name );
-
     if( RegOpenKeyEx(HKEY_LOCAL_MACHINE, FONT_DIR_NT, 0, KEY_READ, &hKey)
             != ERROR_SUCCESS )
         return 1;
+
+    MultiByteToWideChar( CP_ACP, 0, font_name, -1, dbuffer, 256 );
+    char *font_name_temp = FromWide( dbuffer );
+    size_t fontname_len = strlen( font_name_temp );
 
     for( int index = 0;; index++ )
     {
@@ -596,16 +598,25 @@ static int GetFileFontByName( const char *font_name, char **psz_filename )
 
         /* Manage concatenated font names */
         if( strchr( psz_value, '&') ) {
-            if( strcasestr( psz_value, font_name ) != NULL )
+            if( strcasestr( psz_value, font_name_temp ) != NULL )
+            {
+                free( psz_value );
                 break;
+            }
         }
         else {
-            if( strncasecmp( psz_value, font_name, fontname_len ) == 0 )
+            if( strncasecmp( psz_value, font_name_temp, fontname_len ) == 0 )
+            {
+                free( psz_value );
                 break;
+            }
         }
+
+        free( psz_value );
     }
 
     *psz_filename = FromWide( dbuffer );
+    free( font_name_temp );
     return 0;
 }
 
@@ -635,7 +646,12 @@ static char* Win32_Select( filter_t *p_filter, const char* family,
         lf.lfItalic = true;
     if( b_bold )
         lf.lfWeight = FW_BOLD;
-    strncpy( (LPSTR)&lf.lfFaceName, family, 32);
+
+    char facename[32];
+    wchar_t* psz_fbuffer = ToWide( family );
+    WideCharToMultiByte( CP_ACP, 0, psz_fbuffer, -1, facename, 32, " ", 0 );
+    strncpy( (LPSTR)&lf.lfFaceName, facename, 32 );
+    free( psz_fbuffer );
 
     /* */
     char *psz_filename = NULL;
