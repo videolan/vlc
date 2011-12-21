@@ -76,7 +76,7 @@ typedef struct hls_stream_s
     int         id;         /* program id */
     int         version;    /* protocol version should be 1 */
     int         sequence;   /* media sequence number */
-    int         duration;   /* maximum duration per segment (ms) */
+    int         duration;   /* maximum duration per segment (s) */
     uint64_t    bandwidth;  /* bandwidth usage of segments (bits per second)*/
     uint64_t    size;       /* stream length (segment->duration * hls->bandwidth/8) */
 
@@ -680,9 +680,18 @@ static int parse_MediaSequence(stream_t *s, hls_stream_t *hls, char *p_read)
     }
 
     if (hls->sequence > 0)
-        msg_Err(s, "EXT-X-MEDIA-SEQUENCE already present in playlist (new=%d, old=%d)",
-                    sequence, hls->sequence);
-
+    {
+        if (s->p_sys->b_live)
+        {
+            hls_stream_t *last = hls_GetLast(s->p_sys->hls_stream);
+            if ((last->sequence < sequence) && (sequence - last->sequence != 1))
+                msg_Err(s, "EXT-X-MEDIA-SEQUENCE gap in playlist (new=%d, old=%d)",
+                            sequence, last->sequence);
+        }
+        else
+            msg_Err(s, "EXT-X-MEDIA-SEQUENCE already present in playlist (new=%d, old=%d)",
+                        sequence, hls->sequence);
+    }
     hls->sequence = sequence;
     return VLC_SUCCESS;
 }
@@ -1098,6 +1107,13 @@ static int hls_UpdatePlaylist(stream_t *s, hls_stream_t *hls_new, hls_stream_t *
         }
         vlc_mutex_unlock(&(*hls)->lock);
     }
+
+    /* update meta information */
+    vlc_mutex_lock(&(*hls)->lock);
+    (*hls)->sequence = hls_new->sequence;
+    (*hls)->duration = (hls_new->duration == -1) ? (*hls)->duration : hls_new->duration;
+    (*hls)->b_cache = hls_new->b_cache;
+    vlc_mutex_unlock(&(*hls)->lock);
     return VLC_SUCCESS;
 
 fail_and_unlock:
