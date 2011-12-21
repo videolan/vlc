@@ -46,15 +46,6 @@ Representation::~Representation ()
     delete(this->trickModeType);
 }
 
-std::string         Representation::getDependencyId         () const throw(AttributeNotPresentException)
-{
-    std::map<std::string, std::string>::const_iterator  it = this->attributes.find("dependencyId");
-    if ( it == this->attributes.end() )
-        throw AttributeNotPresentException();
-
-    return it->second;
-}
-
 const std::string&  Representation::getId                   () const
 {
     return this->id;
@@ -115,4 +106,15 @@ void Representation::setQualityRanking( int qualityRanking )
 {
     if ( qualityRanking > 0 )
         this->qualityRanking = qualityRanking;
+}
+
+const std::list<const Representation*>&     Representation::getDependencies() const
+{
+    return this->dependencies;
+}
+
+void Representation::addDependency(const Representation *dep)
+{
+    if ( dep != NULL )
+        this->dependencies.push_back( dep );
 }

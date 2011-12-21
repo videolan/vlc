@@ -99,7 +99,6 @@ void    BasicCMParser::setRepresentations   (Node *root, Group *group)
     {
         const std::map<std::string, std::string>    attributes = representations.at(i)->getAttributes();
 
-        //FIXME: handle @dependencyId afterward
         Representation *rep = new Representation( attributes );
         if ( this->parseCommonAttributesElements( representations.at( i ), rep ) == false )
         {
@@ -130,11 +129,31 @@ void    BasicCMParser::setRepresentations   (Node *root, Group *group)
         if ( it != attributes.end() )
             rep->setQualityRanking( atoi( it->second.c_str() ) );
 
+        it = attributes.find( "dependencyId" );
+        if ( it != attributes.end() )
+            this->handleDependencyId( rep, group, it->second );
+
         this->setSegmentInfo(representations.at(i), rep);
         if ( rep->getSegmentInfo() && rep->getSegmentInfo()->getSegments().size() > 0 )
-            group->addRepresentation(rep);
+            group->addRepresentation(rep);        
     }
 }
+
+void    BasicCMParser::handleDependencyId( Representation *rep, const Group *group, const std::string &dependencyId )
+{
+    if ( dependencyId.empty() == true )
+        return ;
+    std::istringstream  s( dependencyId );
+    while ( s )
+    {
+        std::string     id;
+        s >> id;
+        const Representation    *dep = group->getRepresentationById( id );
+        if ( dep )
+            rep->addDependency( dep );
+    }
+}
+
 void    BasicCMParser::setSegmentInfo       (Node *root, Representation *rep)
 {
     Node    *segmentInfo = DOMHelper::getFirstChildElementByName( root, "SegmentInfo");

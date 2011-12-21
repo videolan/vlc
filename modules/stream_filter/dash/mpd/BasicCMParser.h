@@ -51,6 +51,9 @@ namespace dash
                 MPD*    getMPD ();
 
             private:
+                void    handleDependencyId( Representation* rep, const Group* group, const std::string& dependencyId );
+
+            private:
                 dash::xml::Node *root;
                 MPD             *mpd;
 
