@@ -1585,7 +1585,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         case DEMUX_GET_PTS_DELAY:
             pi64 = (int64_t*)va_arg( args, int64_t * );
             *pi64 = INT64_C(1000)
-                  * var_GetInteger( p_demux, "network-caching" );
+                  * var_InheritInteger( p_demux, "network-caching" );
             return VLC_SUCCESS;
 
         default:
