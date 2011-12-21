@@ -106,6 +106,30 @@ void    BasicCMParser::setRepresentations   (Node *root, Group *group)
             delete rep;
             continue ;
         }
+        std::map<std::string, std::string>::const_iterator  it;
+
+        it = attributes.find( "id" );
+        if ( it == attributes.end() )
+        {
+            std::cerr << "Missing mandatory attribute for Representation: @id" << std::endl;
+            delete rep;
+            continue ;
+        }
+        rep->setId( it->second );
+
+        it = attributes.find( "bandwidth" );
+        if ( it == attributes.end() )
+        {
+            std::cerr << "Missing mandatory attribute for Representation: @bandwidth" << std::endl;
+            delete rep;
+            continue ;
+        }
+        rep->setBandwidth( atoi( it->second.c_str() ) );
+
+        it = attributes.find( "qualityRanking" );
+        if ( it != attributes.end() )
+            rep->setQualityRanking( atoi( it->second.c_str() ) );
+
         this->setSegmentInfo(representations.at(i), rep);
         if ( rep->getSegmentInfo() && rep->getSegmentInfo()->getSegments().size() > 0 )
             group->addRepresentation(rep);
