@@ -1184,7 +1184,8 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [o_fullscreen_btn setState: NO];
 
     /* We always try to do so */
-    [NSScreen unblackoutScreens];
+    if (!(OSX_LION && b_nativeFullscreenMode))
+        [NSScreen unblackoutScreens];
     vout_thread_t *p_vout = getVout();
     if (p_vout)
     {
@@ -1347,10 +1348,11 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
 - (void)orderOut: (id)sender
 {
-    [super orderOut: sender];
-
     /* Make sure we leave fullscreen */
-    [self leaveFullscreenAndFadeOut: YES];
+    if (!(OSX_LION && b_nativeFullscreenMode))
+        [self leaveFullscreenAndFadeOut: YES];
+
+    [super orderOut: sender];
 }
 
 - (void)makeKeyAndOrderFront: (id)sender
