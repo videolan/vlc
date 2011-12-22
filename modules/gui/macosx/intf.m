@@ -166,7 +166,11 @@ static int WindowControl( vout_window_t *p_wnd, int i_query, va_list args )
         [[VLCMain sharedInstance] setNativeVideoSize:NSMakeSize( i_width, i_height )];
     }
     else if( i_query == VOUT_WINDOW_SET_FULLSCREEN )
-        msg_Dbg( p_wnd, "WindowControl:VOUT_WINDOW_SET_FULLSCREEN" );
+    {
+        NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
+        [[VLCMain sharedInstance] fullscreenChanged];
+        [o_pool release];
+    }
     else
         msg_Dbg( p_wnd, "WindowControl: unknown query" );
     return VLC_SUCCESS;
