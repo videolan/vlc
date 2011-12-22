@@ -271,6 +271,15 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
         [o_fullscreen_btn removeFromSuperviewWithoutNeedingDisplay];
     }
+    if (OSX_LION)
+    {
+        /* the default small size of the search field is slightly different on Lion, let's work-around that */
+        NSRect frame;
+        frame = [o_search_fld frame];
+        frame.origin.y = frame.origin.y + 2.0;
+        frame.size.height = frame.size.height - 1.0;
+        [o_search_fld setFrame: frame];
+    }
 
     /* create the sidebar */
     o_sidebaritems = [[NSMutableArray alloc] init];
