@@ -50,6 +50,9 @@
 					$('#libraryContainer').animate({
 						height: 'toggle'
 					});
+					$('#buttonzone').animate({
+						width: 'toggle'
+					});
 					return false;
 				});
 				$('#buttonViewer').click(function(){
@@ -194,9 +197,6 @@
 			<div class="centered">
 			<div id="mainContainer" class="centered">
 			<div id="controlContainer" class="ui-widget">
-				<div class="ui-widget-header" style="text-align: left;">
-					<img src="images/vlc16x16.png" alt="VLC" width="16" height="16"/><?vlc gettext("Controls") ?>
-				</div>
 				<div id="controlTable" class="ui-widget-content">
 					<ul id="controlButtons">
 						<li id="buttonPrev" class="button48  ui-corner-all" title="<?vlc gettext("Previous") ?>"></li>
@@ -230,30 +230,25 @@
 					</div>
 				</div>
 			</div>
+			<div id="libraryContainer" class="ui-widget">
+				<ul id="buttonzone" align="left" class="ui-widget-content" style="overflow:hidden; white-space: nowrap;">
+					<li id="buttonShuffle" class="button ui-widget ui-state-default ui-corner-all" title="<?vlc gettext("Shuffle") ?>"><span class="ui-icon ui-icon-shuffle"></span></li>
+					<li id="buttonLoop" class="button ui-widget ui-state-default ui-corner-all" title="<?vlc gettext("Loop") ?>"><span class="ui-icon ui-icon-refresh"></span></li>
+					<li id="buttonRepeat" class="button ui-widget ui-state-default ui-corner-all" title="<?vlc gettext("Repeat") ?>"><span class="ui-icon ui-icon-arrowreturnthick-1-w"></span></li>
+					<li id="buttonPlEmpty" class="button ui-widget ui-state-default ui-corner-all" title="<?vlc gettext("Empty Playlist") ?>"><span class="ui-icon ui-icon-trash"></span></li>
+					<li id="buttonPlAdd" class="button ui-widget ui-state-default ui-corner-all" title="<?vlc gettext("Queue Selected") ?>"><span class="ui-icon ui-icon-plus"></span></li>
+					<li id="buttonPlPlay" class="button ui-widget ui-state-default ui-corner-all" title="<?vlc gettext("Play Selected") ?>"><span class="ui-icon ui-icon-play"></span></li>
+					<li id="buttonRefresh" class="button ui-widget ui-state-default ui-corner-all" title="<?vlc gettext("Refresh List") ?>"><span class="ui-icon ui-icon-arrowrefresh-1-n"></span></li>
+				</ul>
+				<div id="libraryTree" class="ui-widget-content"></div>
+			</div>
 			<div id="viewContainer" class="ui-widget">
-				<div class="ui-widget-header" style="text-align: left;"><img src="images/vlc16x16.png" alt="VLC" width="16" height="16"/><?vlc gettext("Viewer") ?></div>
 				<div id="mediaViewer" class="ui-widget-content">
 					<div href="http://localhost:8081/stream.flv" style="display:block; width:100%" id="player">
 						<p><?vlc gettext("Loading flowplayer...") ?><br/><?vlc gettext("If nothing appears, check your internet connection.") ?></p>
 					</div>
 				</div>
 			</div>
-			<div id="libraryContainer" class="ui-widget">
-				<div class="ui-widget-header" style="text-align: left;">
-					<img src="images/vlc16x16.png" alt="VLC" width="16" height="16"/><?vlc gettext("Library") ?>
-				</div>
-				<div align="left" class="ui-widget-content" style="overflow:hidden; white-space: nowrap;">
-					<div id="buttonShuffle" class="button ui-widget ui-state-default ui-corner-all" title="<?vlc gettext("Shuffle") ?>"><span class="ui-icon ui-icon-shuffle"></span></div>
-					<div id="buttonLoop" class="button ui-widget ui-state-default ui-corner-all" title="<?vlc gettext("Loop") ?>"><span class="ui-icon ui-icon-refresh"></span></div>
-					<div id="buttonRepeat" class="button ui-widget ui-state-default ui-corner-all" title="<?vlc gettext("Repeat") ?>"><span class="ui-icon ui-icon-arrowreturnthick-1-w"></span></div>
-					<div id="buttonPlEmpty" class="button ui-widget ui-state-default ui-corner-all" title="<?vlc gettext("Empty Playlist") ?>"><span class="ui-icon ui-icon-trash"></span></div>
-					<div id="buttonPlAdd" class="button ui-widget ui-state-default ui-corner-all" title="<?vlc gettext("Queue Selected") ?>"><span class="ui-icon ui-icon-plus"></span></div>
-					<div id="buttonPlPlay" class="button ui-widget ui-state-default ui-corner-all" title="<?vlc gettext("Play Selected") ?>"><span class="ui-icon ui-icon-play"></span></div>
-					<div id="buttonRefresh" class="button ui-widget ui-state-default ui-corner-all" title="<?vlc gettext("Refresh List") ?>"><span class="ui-icon ui-icon-arrowrefresh-1-n"></span></div>
-				</div>
-				<div id="libraryTree" class="ui-widget-content"></div>
-			</div>
-			
 			<div class="footer">
 				VLC <?vlc print(vlc.misc.version() .. ' - Lua Web Interface - <a id="mobileintflink" href="/mobile.html">Mobile Interface</a> - ' .. vlc.misc.copyright()) ?>
 			</div>

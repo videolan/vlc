@@ -3,7 +3,6 @@ root {
 }
 body{
 }
-
 #mainContainer{
 	text-align: center;
 	width: 800px;
@@ -13,10 +12,11 @@ body{
 }
 #libraryContainer{
 	width: 800px;
+	margin-top: 2px;
 }
 #libraryTree{
 	height: 300px;
-	overflow:scroll;
+	overflow: auto;
 	white-space: nowrap;
 	text-align: left;
 }
@@ -25,14 +25,17 @@ body{
 }
 #mediaViewer{
 	min-height: 500px;
+	background-color:#222;
 }
 #player{
+	top:0px;
 	height: 500px;
 	width: 500px;
+	background-color:#222;
 }
 #seekSlider{
 	width: 98%;
-	margin-left:10px;
+	margin-left:5px;
 }
 #volumeSlider{
 	width: 100px;
@@ -41,62 +44,58 @@ body{
 #currentVolume{
 	display: inline-block;
 }
-
 #mediaTitle{
-	overflow: hidden;
-	padding: 5px;
-}
-
-#regular_layout #mediaTitle{
 	position: absolute;
-	top: 60px;
-	left: 0px;
-	width: 500px;
-	text-align: left;
+	top: 0px;
+	left: 10px;
+	width: 600px;
+	text-align: center;
+	padding: 5px;
+	overflow: auto;
 }
-
-#mobile_layout #mediaTitle{
-}
-
 #currentTime{
+	margin-top:-40px;
 	float: left;
 	text-align: left;
 }
+
 #totalTime{
+	margin-top:-40px;
 	float: right;
 	text-align: right;
 }
+
 #controlTable{
 	position:relative;
 	height: 150px;
 }
-
-
 #controlButtons{
+	position: absolute;
+	top: 80px;
+	left: 10px;
+	padding: 0;
+	margin: 0;
 	text-align: left;
 	width: 380px;
 }
-
-/* div layout */
-#regular_layout #controlButtons{
-	position: absolute;
-	top: 0;
-	left: 0;
-	padding: 0;
-	margin: 0;
+#buttonzone {
+	position:absolute;
+	top: 200px;
+	width: 20px;
+	margin-left:-20px;
+	vertical-align:top;
+	padding:0px;
 }
-
-/* still on table layout */
-#mobile_layout #controlButtons{
+#buttonzone li{
+	float:left;
 }
 
 #buttonszone{
 	position: absolute;
-	top: 5px;
-	left: 388px;
-	width: 42px;
+	top: 20px;
+	width: 20px;
 	vertical-align: top;
-	margin: 0;
+	margin-left:-20px;
 	padding: 0;
 }
 #buttonszone li{
@@ -105,19 +104,21 @@ body{
 
 #volumesliderzone{
 	position: absolute;
-	top: 20px;
-	left: 435px;
+	top: 105px;
+	left: 410px;
 	width: 210px;
 }
 
 #volumeSlider{
 	width: 208px;
 }
-
+#libraryTree ul li a {
+	border:none;
+}
 #artszone{
 	position: absolute;
-	top: 0;
-	left: 648px;
+	top: 0px;
+	right: 10px;
 	width: 150px;
 	height: 150px;
 	vertical-align: top;
@@ -125,9 +126,9 @@ body{
 
 #seekContainer{
 	position:absolute;
-	left: 0;
-	top: 100px;
-	width: 645px;
+	left: 5px;
+	top: 55px;
+	width: 79%;
 	vertical-align: bottom;
 }
 
@@ -212,6 +213,11 @@ body{
 	font-size: 11px;
 	padding: 0px;
 }
+
+#window_equalizer {
+	height:80px !important ;
+}
+
 .eqBand{
 	margin-bottom: 10px;
 	margin-top: 10px;
