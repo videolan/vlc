@@ -228,6 +228,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     /* interface builder action */
     [self setDelegate: self];
     [self setExcludedFromWindowsMenu: YES];
+    [self setAcceptsMouseMovedEvents: YES];
     // Set that here as IB seems to be buggy
     [self setContentMinSize:NSMakeSize(500., 288.)];
     [self setTitle: _NS("VLC media player")];
@@ -912,6 +913,8 @@ static VLCMainWindow *_o_sharedInstance = nil;
             [o_bottombar_view setHidden: b_videoPlayback];
         else
             [o_bottombar_view setHidden: NO];
+        if (!b_videoPlayback)
+            [o_fspanel setNonActive: nil];
     }
 }
 
@@ -950,7 +953,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 #pragma mark Fullscreen support
 - (void)showFullscreenController
 {
-    if (b_fullscreen)
+     if (b_fullscreen && [[VLCMain sharedInstance] activeVideoPlayback] )
         [o_fspanel fadeIn];
 }
 
@@ -1425,12 +1428,16 @@ static VLCMainWindow *_o_sharedInstance = nil;
 {
     [o_video_view setFrame: [[self contentView] frame]];
     [NSCursor setHiddenUntilMouseMoves: YES];
+    b_fullscreen = YES;
+    [o_fspanel setVoutWasUpdated: (int)[[self screen] displayID]];
 }
 
 - (void)windowWillExitFullScreen:(NSNotification *)notification
 {
     [o_video_view setFrame: [o_split_view frame]];
     [NSCursor setHiddenUntilMouseMoves: NO];
+    [o_fspanel setNonActive: nil];
+    b_fullscreen = NO;
 }
 
 #pragma mark -
