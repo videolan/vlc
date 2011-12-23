@@ -269,6 +269,8 @@
 		8EDAC3430440F72D0059A3A7 /* README.MacOSX.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; path = README.MacOSX.rtf; sourceTree = SOURCE_ROOT; };
 		8EE1AF9F044465080059A3A7 /* about.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = about.h; path = ../../../modules/gui/macosx/about.h; sourceTree = SOURCE_ROOT; };
 		8EE1AFA0044465080059A3A7 /* about.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = about.m; path = ../../../modules/gui/macosx/about.m; sourceTree = SOURCE_ROOT; };
+		CC017A0B14A4C8AF00C09A4F /* MainWindowTitle.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MainWindowTitle.h; path = ../../../modules/gui/macosx/MainWindowTitle.h; sourceTree = "<group>"; };
+		CC017A0C14A4C8AF00C09A4F /* MainWindowTitle.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = MainWindowTitle.m; path = ../../../modules/gui/macosx/MainWindowTitle.m; sourceTree = "<group>"; };
 		CC04321113B246DF00D7D52E /* back_dark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = back_dark.png; path = Resources/mainwindow_dark/back_dark.png; sourceTree = "<group>"; };
 		CC04321213B246DF00D7D52E /* back-pressed_dark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "back-pressed_dark.png"; path = "Resources/mainwindow_dark/back-pressed_dark.png"; sourceTree = "<group>"; };
 		CC04321313B246DF00D7D52E /* effects-double-buttons_dark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "effects-double-buttons_dark.png"; path = "Resources/mainwindow_dark/effects-double-buttons_dark.png"; sourceTree = "<group>"; };
@@ -622,8 +624,6 @@
 				8ED6C27B03E2EB1C0059A3A7 /* controls.m */,
 				8E6BC6F6041643860059A3A7 /* applescript.h */,
 				8E6BC6F7041643860059A3A7 /* applescript.m */,
-				8ED6C27F03E2EB1C0059A3A7 /* misc.h */,
-				8ED6C28003E2EB1C0059A3A7 /* misc.m */,
 				8EE1AF9F044465080059A3A7 /* about.h */,
 				8EE1AFA0044465080059A3A7 /* about.m */,
 				8ED6C28103E2EB1C0059A3A7 /* open.h */,
@@ -656,6 +656,7 @@
 				CC707EC4137464CD0003010A /* TrackSynchronization.m */,
 				CCCE366D13817E4500694F2A /* VideoEffects.h */,
 				CCCE366E13817E4500694F2A /* VideoEffects.m */,
+				CC017A0E14A4C8B600C09A4F /* custom UI code */,
 				CC0CD0E513DE0FC600B0D90D /* Imported Code */,
 			);
 			name = Classes;
@@ -719,6 +720,17 @@
 				CC0433A713B28B9C00D7D52E /* wmv.icns */,
 			);
 			name = fileicons;
+			sourceTree = "<group>";
+		};
+		CC017A0E14A4C8B600C09A4F /* custom UI code */ = {
+			isa = PBXGroup;
+			children = (
+				8ED6C27F03E2EB1C0059A3A7 /* misc.h */,
+				8ED6C28003E2EB1C0059A3A7 /* misc.m */,
+				CC017A0B14A4C8AF00C09A4F /* MainWindowTitle.h */,
+				CC017A0C14A4C8AF00C09A4F /* MainWindowTitle.m */,
+			);
+			name = "custom UI code";
 			sourceTree = "<group>";
 		};
 		CC0430EE13B2461A00D7D52E /* 10th anniversary ui */ = {

@@ -33,6 +33,7 @@
 #import "open.h"
 #import "controls.h" // TODO: remove me
 #import "SideBarItem.h"
+#import "MainWindowTitle.h"
 #import <vlc_playlist.h>
 #import <vlc_aout_intf.h>
 #import <vlc_url.h>
@@ -69,10 +70,20 @@ static VLCMainWindow *_o_sharedInstance = nil;
 - (id)initWithContentRect:(NSRect)contentRect styleMask:(NSUInteger)styleMask
                   backing:(NSBackingStoreType)backingType defer:(BOOL)flag
 {
-//     styleMask ^= NSTexturedBackgroundWindowMask;
+    b_dark_interface = config_GetInt( VLCIntf, "macosx-interfacestyle" );
 
-    self = [super initWithContentRect:contentRect styleMask:styleMask //& ~NSTitledWindowMask
-                              backing:backingType defer:flag];
+    if (b_dark_interface)
+    {
+        styleMask = NSBorderlessWindowMask;
+        self = [super initWithContentRect:contentRect styleMask:styleMask
+                                  backing:backingType defer:flag];
+    }
+    else
+    {
+        self = [super initWithContentRect:contentRect styleMask:styleMask
+                                  backing:backingType defer:flag];
+    }
+        
 
     [[VLCMain sharedInstance] updateTogglePlaylistState];
 
@@ -106,7 +117,6 @@ static VLCMainWindow *_o_sharedInstance = nil;
 - (void)awakeFromNib
 {
     /* setup the styled interface */
-    b_dark_interface = config_GetInt( VLCIntf, "macosx-interfacestyle" );
     b_nativeFullscreenMode = config_GetInt( VLCIntf, "macosx-nativefullscreenmode" );
     i_lastShownVolume = -1;
 
@@ -173,7 +183,6 @@ static VLCMainWindow *_o_sharedInstance = nil;
     }
     else
     {
-        /* TODO: we also need to change the window style here... */
         [o_bottombar_view setImage: [NSImage imageNamed:@"bottom-background_dark"]];
         [o_bwd_btn setImage: [NSImage imageNamed:@"back_dark"]];
         [o_bwd_btn setAlternateImage: [NSImage imageNamed:@"back-pressed_dark"]];
@@ -233,7 +242,6 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [self setContentMinSize:NSMakeSize(500., 288.)];
     [self setTitle: _NS("VLC media player")];
     [o_playlist_btn setEnabled:NO];
-    [o_video_view setFrame: [o_split_view frame]];
     o_temp_view = [[NSView alloc] init];
     [o_temp_view setAutoresizingMask:NSViewHeightSizable | NSViewWidthSizable];
     [o_dropzone_view setFrame: [o_playlist_table frame]];
@@ -376,6 +384,27 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
     [o_sidebar_view reloadData];
     [o_sidebar_view selectRowIndexes:[NSIndexSet indexSetWithIndex:0] byExtendingSelection:YES];
+
+    if( b_dark_interface )
+    {
+        NSRect winrect;
+        CGFloat f_titleBarHeight = [o_titlebar_view frame].size.height;
+        winrect = [self frame];
+
+        [o_titlebar_view setFrame: NSMakeRect( 0, winrect.size.height - f_titleBarHeight,
+                                              winrect.size.width, f_titleBarHeight )];
+        [[self contentView] addSubview: o_titlebar_view];
+
+        winrect.size.height = winrect.size.height + f_titleBarHeight;
+        [self setFrame: winrect display:NO animate:NO];
+        winrect = [o_split_view frame];
+        winrect.size.height = winrect.size.height - f_titleBarHeight;
+        [o_split_view setFrame: winrect];
+        [o_video_view setFrame: winrect];
+        [self display];
+    }
+    else
+        [o_video_view setFrame: [o_split_view frame]];
 }
 
 #pragma mark -
@@ -631,6 +660,24 @@ static VLCMainWindow *_o_sharedInstance = nil;
 }
 
 #pragma mark -
+#pragma mark overwritten default functionality
+- (BOOL)canBecomeKeyWindow
+{
+    return YES;
+}
+
+- (void)setTitle:(NSString *)title
+{
+    [o_titlebar_view setWindowTitle: title];
+    [super setTitle: title];
+}
+
+- (void)performZoom:(id)sender
+{
+    [super zoom: sender];
+}
+
+#pragma mark -
 #pragma mark Update interface and respond to foreign events
 - (void)showDropZone
 {
@@ -869,7 +916,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
         if ([o_video_view window] != self)
         {
             [o_video_view removeFromSuperviewWithoutNeedingDisplay];
-            [o_video_view setFrame: [o_split_view frame]];
+            [o_video_view setFrame: [o_right_split_view frame]];
             [[self contentView] addSubview:o_video_view positioned:NSWindowAbove relativeTo:nil];
         }
         b_nonembedded = NO;
@@ -943,7 +990,10 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
         /* Calculate the window's new size */
         new_frame.size.width = [self frame].size.width - [o_video_view frame].size.width + nativeVideoSize.width;
-        new_frame.size.height = [self frame].size.height - [o_video_view frame].size.height + nativeVideoSize.height;
+        if (b_dark_interface)
+            new_frame.size.height = [self frame].size.height - [o_video_view frame].size.height + nativeVideoSize.height + [o_titlebar_view frame].size.height;
+        else
+            new_frame.size.height = [self frame].size.height - [o_video_view frame].size.height + nativeVideoSize.height;
 
         new_frame.origin.x = topleftscreen.x;
         new_frame.origin.y = topleftscreen.y - new_frame.size.height;

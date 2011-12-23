@@ -68,6 +68,7 @@
     IBOutlet id o_dropzone_lbl;
 
     IBOutlet VLCFSPanel *o_fspanel;
+    IBOutlet id o_titlebar_view;
 
     BOOL b_dark_interface;
     BOOL b_nativeFullscreenMode;
@@ -128,6 +129,7 @@
 - (IBAction)fullscreen:(id)sender;
 - (IBAction)dropzoneButtonAction:(id)sender;
 
+- (void)setTitle:(NSString *)title;
 - (void)showDropZone;
 - (void)hideDropZone;
 - (void)updateTimeSlider;

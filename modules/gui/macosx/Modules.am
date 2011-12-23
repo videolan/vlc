@@ -66,5 +66,7 @@ SOURCES_macosx = \
 	eyetv.m \
 	VideoView.h \
 	VideoView.m \
+	MainWindowTitle.h \
+	MainWindowTitle.m \
 	$(NULL)
 
