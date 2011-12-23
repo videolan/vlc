@@ -1492,6 +1492,21 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [NSCursor setHiddenUntilMouseMoves: YES];
     b_fullscreen = YES;
     [o_fspanel setVoutWasUpdated: (int)[[self screen] displayID]];
+
+    if (b_dark_interface)
+    {
+        [o_titlebar_view removeFromSuperviewWithoutNeedingDisplay];
+
+        NSRect winrect;
+        CGFloat f_titleBarHeight = [o_titlebar_view frame].size.height;
+        winrect = [self frame];
+
+        winrect.size.height = winrect.size.height - f_titleBarHeight;
+        [self setFrame: winrect display:NO animate:NO];
+        winrect = [o_split_view frame];
+        winrect.size.height = winrect.size.height + f_titleBarHeight;
+        [o_split_view setFrame: winrect];
+    }
 }
 
 - (void)windowWillExitFullScreen:(NSNotification *)notification
@@ -1500,6 +1515,24 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [NSCursor setHiddenUntilMouseMoves: NO];
     [o_fspanel setNonActive: nil];
     b_fullscreen = NO;
+
+    if (b_dark_interface)
+    {
+        NSRect winrect;
+        CGFloat f_titleBarHeight = [o_titlebar_view frame].size.height;
+        winrect = [self frame];
+        
+        [o_titlebar_view setFrame: NSMakeRect( 0, winrect.size.height - f_titleBarHeight,
+                                              winrect.size.width, f_titleBarHeight )];
+        [[self contentView] addSubview: o_titlebar_view];
+        
+        winrect.size.height = winrect.size.height + f_titleBarHeight;
+        [self setFrame: winrect display:NO animate:NO];
+        winrect = [o_split_view frame];
+        winrect.size.height = winrect.size.height - f_titleBarHeight;
+        [o_split_view setFrame: winrect];
+        [o_video_view setFrame: winrect];
+    }
 }
 
 #pragma mark -
