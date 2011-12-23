@@ -287,13 +287,12 @@ EXTRA_DIST += \
 	extras/package/macosx/Resources/prefs/spref_cone_Subtitles_64.png \
 	extras/package/macosx/Resources/prefs/spref_cone_Video_64.png \
 	extras/package/macosx/Resources/README \
-	extras/package/macosx/Resources/sidebar-icons/document-music-playlist.png \
-	extras/package/macosx/Resources/sidebar-icons/film-cast.png \
-	extras/package/macosx/Resources/sidebar-icons/film.png \
-	extras/package/macosx/Resources/sidebar-icons/music-beam.png \
-	extras/package/macosx/Resources/sidebar-icons/network-cloud.png \
-	extras/package/macosx/Resources/sidebar-icons/picture.png \
-	extras/package/macosx/Resources/sidebar-icons/README \
+	extras/package/macosx/Resources/sidebar-icons/local.png \
+	extras/package/macosx/Resources/sidebar-icons/movie.png \
+	extras/package/macosx/Resources/sidebar-icons/music.png \
+	extras/package/macosx/Resources/sidebar-icons/pictures.png \
+	extras/package/macosx/Resources/sidebar-icons/playlist.png \
+	extras/package/macosx/Resources/sidebar-icons/podcast.png \
 	extras/package/macosx/Resources/vlc.scriptSuite \
 	extras/package/macosx/Resources/vlc.scriptTerminology \
 	extras/package/macosx/fullscreen_panel.svg \

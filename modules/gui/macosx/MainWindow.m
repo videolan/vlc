@@ -285,7 +285,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     o_sidebaritems = [[NSMutableArray alloc] init];
     SideBarItem *libraryItem = [SideBarItem itemWithTitle:_NS("LIBRARY") identifier:@"library"];
     SideBarItem *playlistItem = [SideBarItem itemWithTitle:_NS("Playlist") identifier:@"playlist"];
-    [playlistItem setIcon: [NSImage imageNamed:@"document-music-playlist"]];
+    [playlistItem setIcon: [NSImage imageNamed:@"playlist"]];
     SideBarItem *mycompItem = [SideBarItem itemWithTitle:_NS("MY COMPUTER") identifier:@"mycomputer"];
     SideBarItem *devicesItem = [SideBarItem itemWithTitle:_NS("DEVICES") identifier:@"devices"];
     SideBarItem *lanItem = [SideBarItem itemWithTitle:_NS("LOCAL NETWORK") identifier:@"localnetwork"];
@@ -313,7 +313,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
                 {
                     [internetItems addObject: [SideBarItem itemWithTitle: [NSString stringWithCString: *ppsz_longname encoding: NSUTF8StringEncoding] identifier: o_identifier]];
                     if (!strncmp( *ppsz_name, "podcast", 7 ))
-                        [[internetItems lastObject] setIcon: [NSImage imageNamed:@"film-cast"]];
+                        [[internetItems lastObject] setIcon: [NSImage imageNamed:@"podcast"]];
                     else
                         [[internetItems lastObject] setIcon: [NSImage imageNamed:@"NSApplicationIcon"]];
                 }
@@ -327,18 +327,18 @@ static VLCMainWindow *_o_sharedInstance = nil;
             case SD_CAT_LAN:
                 {
                     [lanItems addObject: [SideBarItem itemWithTitle: [NSString stringWithCString: *ppsz_longname encoding: NSUTF8StringEncoding] identifier: o_identifier]];
-                    [[lanItems lastObject] setIcon: [NSImage imageNamed:@"network-cloud"]];
+                    [[lanItems lastObject] setIcon: [NSImage imageNamed:@"local"]];
                 }
                 break;
             case SD_CAT_MYCOMPUTER:
                 {
                     [mycompItems addObject: [SideBarItem itemWithTitle: [NSString stringWithCString: *ppsz_longname encoding: NSUTF8StringEncoding] identifier: o_identifier]];
                     if (!strncmp( *ppsz_name, "video_dir", 9 ))
-                        [[mycompItems lastObject] setIcon: [NSImage imageNamed:@"film"]];
+                        [[mycompItems lastObject] setIcon: [NSImage imageNamed:@"movie"]];
                     else if (!strncmp( *ppsz_name, "audio_dir", 9 ))
-                        [[mycompItems lastObject] setIcon: [NSImage imageNamed:@"music-beam"]];
+                        [[mycompItems lastObject] setIcon: [NSImage imageNamed:@"music"]];
                     else if (!strncmp( *ppsz_name, "picture_dir", 11 ))
-                        [[mycompItems lastObject] setIcon: [NSImage imageNamed:@"picture"]];
+                        [[mycompItems lastObject] setIcon: [NSImage imageNamed:@"pictures"]];
                     else
                         [[mycompItems lastObject] setIcon: [NSImage imageNamed:@"NSApplicationIcon"]];
                 }

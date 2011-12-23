@@ -201,6 +201,12 @@
 		CC9B43B113B29FCF000205AE /* bottom-background_dark.png in Resources */ = {isa = PBXBuildFile; fileRef = CC9B43B013B29FCF000205AE /* bottom-background_dark.png */; };
 		CCB320721423AAEE002CB53B /* shuffle-blue.png in Resources */ = {isa = PBXBuildFile; fileRef = CCB320711423AAEE002CB53B /* shuffle-blue.png */; };
 		CCBE999F0F922C51000705F8 /* CoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CCBE999E0F922C51000705F8 /* CoreServices.framework */; };
+		CCC4A92614A40340006731E4 /* local.png in Resources */ = {isa = PBXBuildFile; fileRef = CCC4A92014A40340006731E4 /* local.png */; };
+		CCC4A92714A40340006731E4 /* movie.png in Resources */ = {isa = PBXBuildFile; fileRef = CCC4A92114A40340006731E4 /* movie.png */; };
+		CCC4A92814A40340006731E4 /* music.png in Resources */ = {isa = PBXBuildFile; fileRef = CCC4A92214A40340006731E4 /* music.png */; };
+		CCC4A92914A40340006731E4 /* pictures.png in Resources */ = {isa = PBXBuildFile; fileRef = CCC4A92314A40340006731E4 /* pictures.png */; };
+		CCC4A92A14A40340006731E4 /* playlist.png in Resources */ = {isa = PBXBuildFile; fileRef = CCC4A92414A40340006731E4 /* playlist.png */; };
+		CCC4A92B14A40340006731E4 /* podcast.png in Resources */ = {isa = PBXBuildFile; fileRef = CCC4A92514A40340006731E4 /* podcast.png */; };
 		CCD83E2D13FE9B90004F1652 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = CCD83E2B13FE9B90004F1652 /* MainMenu.xib */; };
 		CCD83E4413FEA143004F1652 /* About.xib in Resources */ = {isa = PBXBuildFile; fileRef = CCD83E2E13FEA143004F1652 /* About.xib */; };
 		CCD83E4513FEA143004F1652 /* AudioEffects.xib in Resources */ = {isa = PBXBuildFile; fileRef = CCD83E3013FEA143004F1652 /* AudioEffects.xib */; };
@@ -214,12 +220,6 @@
 		CCD83E4D13FEA143004F1652 /* VideoEffects.xib in Resources */ = {isa = PBXBuildFile; fileRef = CCD83E4013FEA143004F1652 /* VideoEffects.xib */; };
 		CCD83E4E13FEA143004F1652 /* Wizard.xib in Resources */ = {isa = PBXBuildFile; fileRef = CCD83E4213FEA143004F1652 /* Wizard.xib */; };
 		CCDB535D13E97D3500A1782F /* dropzone-background.png in Resources */ = {isa = PBXBuildFile; fileRef = CCDB535C13E97D3500A1782F /* dropzone-background.png */; };
-		CCE6439413E8CC170061B5F2 /* document-music-playlist.png in Resources */ = {isa = PBXBuildFile; fileRef = CCE6438E13E8CC170061B5F2 /* document-music-playlist.png */; };
-		CCE6439513E8CC170061B5F2 /* film-cast.png in Resources */ = {isa = PBXBuildFile; fileRef = CCE6438F13E8CC170061B5F2 /* film-cast.png */; };
-		CCE6439613E8CC170061B5F2 /* film.png in Resources */ = {isa = PBXBuildFile; fileRef = CCE6439013E8CC170061B5F2 /* film.png */; };
-		CCE6439713E8CC170061B5F2 /* music-beam.png in Resources */ = {isa = PBXBuildFile; fileRef = CCE6439113E8CC170061B5F2 /* music-beam.png */; };
-		CCE6439813E8CC170061B5F2 /* network-cloud.png in Resources */ = {isa = PBXBuildFile; fileRef = CCE6439213E8CC170061B5F2 /* network-cloud.png */; };
-		CCE6439913E8CC170061B5F2 /* picture.png in Resources */ = {isa = PBXBuildFile; fileRef = CCE6439313E8CC170061B5F2 /* picture.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -498,6 +498,12 @@
 		CCB24D5E0D54BBAE004D780C /* simple_prefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = simple_prefs.h; path = ../../../modules/gui/macosx/simple_prefs.h; sourceTree = SOURCE_ROOT; };
 		CCB320711423AAEE002CB53B /* shuffle-blue.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "shuffle-blue.png"; path = "Resources/mainwindow/shuffle-blue.png"; sourceTree = "<group>"; };
 		CCBE999E0F922C51000705F8 /* CoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreServices.framework; path = /System/Library/Frameworks/CoreServices.framework; sourceTree = "<absolute>"; };
+		CCC4A92014A40340006731E4 /* local.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = local.png; path = "Resources/sidebar-icons/local.png"; sourceTree = "<group>"; };
+		CCC4A92114A40340006731E4 /* movie.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = movie.png; path = "Resources/sidebar-icons/movie.png"; sourceTree = "<group>"; };
+		CCC4A92214A40340006731E4 /* music.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = music.png; path = "Resources/sidebar-icons/music.png"; sourceTree = "<group>"; };
+		CCC4A92314A40340006731E4 /* pictures.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = pictures.png; path = "Resources/sidebar-icons/pictures.png"; sourceTree = "<group>"; };
+		CCC4A92414A40340006731E4 /* playlist.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = playlist.png; path = "Resources/sidebar-icons/playlist.png"; sourceTree = "<group>"; };
+		CCC4A92514A40340006731E4 /* podcast.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = podcast.png; path = "Resources/sidebar-icons/podcast.png"; sourceTree = "<group>"; };
 		CCC895830D9A8A82005AE59C /* eyetv.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = eyetv.m; path = ../../../modules/access/eyetv.m; sourceTree = SOURCE_ROOT; };
 		CCCCDCA01413E1C000FE3DE1 /* VideoView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = VideoView.h; path = ../../../modules/gui/macosx/VideoView.h; sourceTree = "<group>"; };
 		CCCCDCA11413E1C000FE3DE1 /* VideoView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = VideoView.m; path = ../../../modules/gui/macosx/VideoView.m; sourceTree = "<group>"; };
@@ -523,12 +529,6 @@
 		CCD83E4313FEA143004F1652 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/Wizard.xib; sourceTree = "<group>"; };
 		CCDB535C13E97D3500A1782F /* dropzone-background.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "dropzone-background.png"; path = "Resources/mainwindow/dropzone-background.png"; sourceTree = "<group>"; };
 		CCDBA3B313D32E200006127B /* macosx.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = macosx.m; path = ../../../modules/video_output/macosx.m; sourceTree = "<group>"; };
-		CCE6438E13E8CC170061B5F2 /* document-music-playlist.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "document-music-playlist.png"; path = "Resources/sidebar-icons/document-music-playlist.png"; sourceTree = "<group>"; };
-		CCE6438F13E8CC170061B5F2 /* film-cast.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "film-cast.png"; path = "Resources/sidebar-icons/film-cast.png"; sourceTree = "<group>"; };
-		CCE6439013E8CC170061B5F2 /* film.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = film.png; path = "Resources/sidebar-icons/film.png"; sourceTree = "<group>"; };
-		CCE6439113E8CC170061B5F2 /* music-beam.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "music-beam.png"; path = "Resources/sidebar-icons/music-beam.png"; sourceTree = "<group>"; };
-		CCE6439213E8CC170061B5F2 /* network-cloud.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "network-cloud.png"; path = "Resources/sidebar-icons/network-cloud.png"; sourceTree = "<group>"; };
-		CCE6439313E8CC170061B5F2 /* picture.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = picture.png; path = "Resources/sidebar-icons/picture.png"; sourceTree = "<group>"; };
 		CCF0777913659A8000AF19FD /* SPInvocationGrabbing.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SPInvocationGrabbing.h; path = ../../../modules/gui/macosx/SPInvocationGrabbing.h; sourceTree = "<group>"; };
 		CCF0777A13659A8000AF19FD /* SPInvocationGrabbing.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SPInvocationGrabbing.m; path = ../../../modules/gui/macosx/SPInvocationGrabbing.m; sourceTree = "<group>"; };
 		CCF0777B13659A8000AF19FD /* SPMediaKeyTap.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SPMediaKeyTap.h; path = ../../../modules/gui/macosx/SPMediaKeyTap.h; sourceTree = "<group>"; };
@@ -1007,12 +1007,12 @@
 		CCE6438C13E8CC040061B5F2 /* sidebar */ = {
 			isa = PBXGroup;
 			children = (
-				CCE6438E13E8CC170061B5F2 /* document-music-playlist.png */,
-				CCE6438F13E8CC170061B5F2 /* film-cast.png */,
-				CCE6439013E8CC170061B5F2 /* film.png */,
-				CCE6439113E8CC170061B5F2 /* music-beam.png */,
-				CCE6439213E8CC170061B5F2 /* network-cloud.png */,
-				CCE6439313E8CC170061B5F2 /* picture.png */,
+				CCC4A92014A40340006731E4 /* local.png */,
+				CCC4A92114A40340006731E4 /* movie.png */,
+				CCC4A92214A40340006731E4 /* music.png */,
+				CCC4A92314A40340006731E4 /* pictures.png */,
+				CCC4A92414A40340006731E4 /* playlist.png */,
+				CCC4A92514A40340006731E4 /* podcast.png */,
 			);
 			name = sidebar;
 			sourceTree = "<group>";
@@ -1242,12 +1242,6 @@
 				CC9B43AF13B29C79000205AE /* bottom-background.png in Resources */,
 				CC9B43B113B29FCF000205AE /* bottom-background_dark.png in Resources */,
 				CC78DA4413DE056700E9603C /* topbar_background.png in Resources */,
-				CCE6439413E8CC170061B5F2 /* document-music-playlist.png in Resources */,
-				CCE6439513E8CC170061B5F2 /* film-cast.png in Resources */,
-				CCE6439613E8CC170061B5F2 /* film.png in Resources */,
-				CCE6439713E8CC170061B5F2 /* music-beam.png in Resources */,
-				CCE6439813E8CC170061B5F2 /* network-cloud.png in Resources */,
-				CCE6439913E8CC170061B5F2 /* picture.png in Resources */,
 				CC4EFC2D13E96BD00091D19A /* dropzone.png in Resources */,
 				CCDB535D13E97D3500A1782F /* dropzone-background.png in Resources */,
 				CCD83E2D13FE9B90004F1652 /* MainMenu.xib in Resources */,
@@ -1292,6 +1286,12 @@
 				CC58012D1423A85300166912 /* fs_volume_slider_knob_highlight@x1.5.png in Resources */,
 				CC58012E1423A85300166912 /* fs_volume_slider_knob@x1.5.png in Resources */,
 				CCB320721423AAEE002CB53B /* shuffle-blue.png in Resources */,
+				CCC4A92614A40340006731E4 /* local.png in Resources */,
+				CCC4A92714A40340006731E4 /* movie.png in Resources */,
+				CCC4A92814A40340006731E4 /* music.png in Resources */,
+				CCC4A92914A40340006731E4 /* pictures.png in Resources */,
+				CCC4A92A14A40340006731E4 /* playlist.png in Resources */,
+				CCC4A92B14A40340006731E4 /* podcast.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1432,7 +1432,7 @@
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					"../../../contrib/",
+					../../../contrib/,
 				);
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
@@ -1440,7 +1440,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = "";
-				IBC_PLUGINS = "../../../contrib/BGHUDAppKit.framework/Resources/BGHUDAppKitPlugin.ibplugin";
+				IBC_PLUGINS = ../../../contrib/BGHUDAppKit.framework/Resources/BGHUDAppKitPlugin.ibplugin;
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(HOME)/Library/Bundles";
 				JAVAC_SOURCE_FILE_ENCODING = "ISO-8859-1";
@@ -1466,12 +1466,12 @@
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					"../../../contrib",
+					../../../contrib,
 				);
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = "";
-				IBC_PLUGINS = "../../../contrib/BGHUDAppKit.framework/Resources/BGHUDAppKitPlugin.ibplugin";
+				IBC_PLUGINS = ../../../contrib/BGHUDAppKit.framework/Resources/BGHUDAppKitPlugin.ibplugin;
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(HOME)/Library/Bundles";
 				JAVAC_SOURCE_FILE_ENCODING = "ISO-8859-1";
@@ -1497,11 +1497,11 @@
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					"../../../contrib",
+					../../../contrib,
 				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = "";
-				IBC_PLUGINS = "../../../contrib/BGHUDAppKit.framework/Resources/BGHUDAppKitPlugin.ibplugin";
+				IBC_PLUGINS = ../../../contrib/BGHUDAppKit.framework/Resources/BGHUDAppKitPlugin.ibplugin;
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(HOME)/Library/Bundles";
 				JAVAC_SOURCE_FILE_ENCODING = "ISO-8859-1";
