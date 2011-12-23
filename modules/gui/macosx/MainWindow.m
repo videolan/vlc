@@ -788,6 +788,9 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
         /* chapters & titles */
         //FIXME! b_chapters = p_input->stream.i_area_nb > 1;
+
+        if (cachedInputState == PLAYING_S || b_buffering == YES)
+            [self makeKeyAndOrderFront: nil];
         vlc_object_release( p_input );
     }
 

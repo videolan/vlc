@@ -262,7 +262,7 @@ static int InputEvent( vlc_object_t *p_this, const char *psz_var,
             [[VLCMain sharedInstance] updateMainMenu];
             break;
         case INPUT_EVENT_CACHE:
-            [[VLCMain sharedInstance] updateMainWindow];
+            [[VLCMain sharedInstance] performSelectorOnMainThread:@selector(updateMainWindow) withObject: nil waitUntilDone: NO];
             break;
         case INPUT_EVENT_STATISTICS:
             [[[VLCMain sharedInstance] info] performSelectorOnMainThread:@selector(updateStatistics) withObject: nil waitUntilDone: NO];
@@ -1461,6 +1461,8 @@ unsigned int CocoaKeyToVLC( unichar i_key )
         }
         vlc_object_release( p_input );
     }
+
+    [[VLCMain sharedInstance] performSelectorOnMainThread:@selector(updateMainWindow) withObject: nil waitUntilDone: NO];
 }
 
 - (void)playbackModeUpdated
