@@ -132,6 +132,10 @@ void vlc_Log (vlc_object_t *obj, int type, const char *module,
 static void PrintColorMsg (void *, int, const msg_item_t *,
                            const char *, va_list);
 static void PrintMsg (void *, int, const msg_item_t *, const char *, va_list);
+#ifdef WIN32
+static void Win32DebugOutputMsg (void *, int , const msg_item_t *,
+                                 const char *, va_list);
+#endif
 
 /**
  * Emit a log message. This function is the variable argument list equivalent
@@ -230,6 +234,13 @@ void vlc_vaLog (vlc_object_t *obj, int type, const char *module,
         PrintMsg (&priv->i_verbose, type, &msg, format, ap);
     va_end (ap);
 
+#ifdef WIN32
+    va_list dol;
+    va_copy (dol, args);
+    Win32DebugOutputMsg (&priv->i_verbose, type, &msg, format, dol);
+    va_end (dol);
+#endif
+
     vlc_rwlock_rdlock (&msg_lock);
     for (msg_subscription_t *sub = msg_head; sub != NULL; sub = sub->next)
     {
@@ -303,3 +314,35 @@ static void PrintMsg (void *d, int type, const msg_item_t *p_item,
     funlockfile (stream);
     vlc_restorecancel (canc);
 }
+
+#ifdef WIN32
+static void Win32DebugOutputMsg (void* d, int type, const msg_item_t *p_item,
+                                 const char *format, va_list dol)
+{
+    const signed char *pverbose = d;
+    if (pverbose && (*pverbose < 0 || *pverbose < (type - VLC_MSG_ERR)))
+        return;
+
+    va_list dol2;
+    va_copy (dol2, dol);
+    int msg_len = vsnprintf(NULL, 0, format, dol2);
+    va_end (dol2);
+
+    if(msg_len <= 0)
+        return;
+
+    char *msg = malloc(msg_len + 1 + 1);
+    if (!msg)
+        return;
+
+    msg_len = vsnprintf(msg, msg_len+1, format, dol);
+    if (msg_len > 0){
+        if(msg[msg_len-1] != '\n'){
+            msg[msg_len] = '\n';
+            msg[msg_len + 1] = '\0';
+        }
+        OutputDebugString(msg);
+    }
+    free(msg);
+}
+#endif
