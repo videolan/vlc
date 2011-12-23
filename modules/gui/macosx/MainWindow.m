@@ -73,17 +73,14 @@ static VLCMainWindow *_o_sharedInstance = nil;
     b_dark_interface = config_GetInt( VLCIntf, "macosx-interfacestyle" );
 
     if (b_dark_interface)
-    {
+#ifdef MAC_OS_X_VERSION_10_7
+        styleMask = NSBorderlessWindowMask | NSResizableWindowMask;
+#else
         styleMask = NSBorderlessWindowMask;
-        self = [super initWithContentRect:contentRect styleMask:styleMask
-                                  backing:backingType defer:flag];
-    }
-    else
-    {
-        self = [super initWithContentRect:contentRect styleMask:styleMask
-                                  backing:backingType defer:flag];
-    }
-        
+#endif
+
+    self = [super initWithContentRect:contentRect styleMask:styleMask
+                              backing:backingType defer:flag];
 
     [[VLCMain sharedInstance] updateTogglePlaylistState];
 
@@ -401,6 +398,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
         winrect.size.height = winrect.size.height - f_titleBarHeight;
         [o_split_view setFrame: winrect];
         [o_video_view setFrame: winrect];
+
         [self display];
     }
     else
@@ -916,7 +914,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
         if ([o_video_view window] != self)
         {
             [o_video_view removeFromSuperviewWithoutNeedingDisplay];
-            [o_video_view setFrame: [o_right_split_view frame]];
+            [o_video_view setFrame: [o_split_view frame]];
             [[self contentView] addSubview:o_video_view positioned:NSWindowAbove relativeTo:nil];
         }
         b_nonembedded = NO;
