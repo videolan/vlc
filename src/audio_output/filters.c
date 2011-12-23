@@ -208,7 +208,7 @@ void aout_FiltersPlay( filter_t *const *pp_filters,
     block_t *p_block = *pp_block;
 
     /* TODO: use filter chain */
-    for( unsigned i = 0; i < i_nb_filters; i++ )
+    for( unsigned i = 0; (i < i_nb_filters) && (p_block != NULL); i++ )
     {
         filter_t * p_filter = pp_filters[i];
 
