@@ -56,7 +56,7 @@ namespace dash
                 dash::xml::Node *root;
                 MPD             *mpd;
 
-                void    setMPD              ();
+                bool    setMPD              ();
                 void    setPeriods          (dash::xml::Node *root);
                 void    setGroups           (dash::xml::Node *root, Period *period);
                 void    setRepresentations  (dash::xml::Node *root, Group *group);

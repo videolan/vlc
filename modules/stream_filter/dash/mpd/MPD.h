@@ -42,18 +42,27 @@ namespace dash
     {
         class MPD
         {
-            typedef std::map<std::string, std::string>      AttributesMap;
-
             public:
-                MPD         (const AttributesMap& attributes);
+                MPD();
                 virtual ~MPD();
 
                 Profile                         getProfile() const;
                 void                            setProfile( const std::string &strProfile );
                 void                            setProfile( Profile profile );
-                bool                           isLive() const;
-                const std::string&             getDuration             () const throw(dash::exception::AttributeNotPresentException);
-                const std::string&             getMinBufferTime        () const throw(dash::exception::AttributeNotPresentException);
+                bool                            isLive() const;
+                void                            setLive( bool live );
+                time_t                          getAvailabilityStartTime() const;
+                void                            setAvailabilityStartTime( time_t time );
+                time_t                          getAvailabilityEndTime() const;
+                void                            setAvailabilityEndTime( time_t time );
+                time_t                          getDuration() const;
+                void                            setDuration( time_t duration );
+                time_t                          getMinUpdatePeriod() const;
+                void                            setMinUpdatePeriod( time_t period );
+                time_t                          getMinBufferTime() const;
+                void                            setMinBufferTime( time_t time );
+                time_t                          getTimeShiftBufferDepth() const;
+                void                            setTimeShiftBufferDepth( time_t depth );
                 const std::vector<BaseUrl *>&  getBaseUrls      () const;
                 const std::vector<Period *>&   getPeriods       () const;
                 ProgramInformation*     getProgramInformation   () throw(dash::exception::ElementNotPresentException);
@@ -64,7 +73,13 @@ namespace dash
 
             private:
                 Profile                             profile;
-                AttributesMap                       attributes;
+                bool                                live;
+                time_t                              availabilityStartTime;
+                time_t                              availabilityEndTime;
+                time_t                              duration;
+                time_t                              minUpdatePeriod;
+                time_t                              minBufferTime;
+                time_t                              timeShiftBufferDepth;
                 std::vector<Period *>               periods;
                 std::vector<BaseUrl *>              baseUrls;
                 ProgramInformation                  *programInfo;

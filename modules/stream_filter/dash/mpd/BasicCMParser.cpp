@@ -49,17 +49,74 @@ bool    BasicCMParser::parse                ()
     this->setMPD();
     return true;
 }
-void    BasicCMParser::setMPD               ()
+bool    BasicCMParser::setMPD()
 {
     const std::map<std::string, std::string>    attr = this->root->getAttributes();
-    this->mpd = new MPD( attr );
+    this->mpd = new MPD;
 
     std::map<std::string, std::string>::const_iterator  it;
     it = attr.find( "profile" );
     if ( it != attr.end() )
         this->mpd->setProfile( it->second );
+
+    it = attr.find("mediaPresentationDuration");
+    /*
+        Standard specifies a default of "On-Demand",
+        so anything that is not "Live" is "On-Demand"
+    */
+    this->mpd->setLive( it != attr.end() && it->second == "Live" );
+    it = attr.find( "availabilityStartTime" );
+    if ( it == attr.end() && this->mpd->isLive() == true )
+    {
+        std::cerr << "An @availabilityStartTime attribute must be specified when"
+                     " the stream @type is Live" << std::endl;
+        return false;
+    }
+    if ( it != attr.end() )
+    {
+        struct tm   t;
+        char        *res = strptime( it->second.c_str(), "%Y-%m-%dT%T", &t );
+        if ( res == NULL )
+        {
+            if ( this->mpd->isLive() == true )
+            {
+                std::cerr << "An @availabilityStartTime attribute must be specified when"
+                             " the stream @type is Live" << std::endl;
+                return false;
+            }
+        }
+        else
+            this->mpd->setAvailabilityStartTime( mktime( &t ) );
+    }
+    it = attr.find( "availabilityEndTime" );
+    if ( it != attr.end() )
+    {
+        struct tm   t;
+        char        *res = strptime( it->second.c_str(), "%Y-%m-%dT%T", &t );
+        if ( res != NULL )
+            this->mpd->setAvailabilityEndTime( mktime( &t ) );
+    }
+    it = attr.find( "mediaPresentationDuration" );
+    if ( it != attr.end() )
+        this->mpd->setDuration( str_duration( it->second.c_str() ) );
+    it = attr.find( "minimumUpdatePeriodMPD" );
+    if ( it != attr.end() )
+        this->mpd->setMinUpdatePeriod( str_duration( it->second.c_str() ) );
+    it = attr.find( "minBufferTime" );
+    if ( it != attr.end() )
+        this->mpd->setMinBufferTime( str_duration( it->second.c_str() ) );
+
+    if ( this->mpd->isLive() )
+    {
+        //This value is undefined when using type "On-Demand"
+        it = attr.find( "timeshiftBufferDepth" );
+        if ( it != attr.end() )
+            this->mpd->setTimeShiftBufferDepth( str_duration( it->second.c_str() ) );
+    }
+
     this->setMPDBaseUrl(this->root);
     this->setPeriods(this->root);
+    return true;
 }
 void    BasicCMParser::setMPDBaseUrl        (Node *root)
 {
