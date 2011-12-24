@@ -30,7 +30,6 @@
 #import <vlc_input.h>
 #import "misc.h"
 #import "fspanel.h"
-#import "MainWindowTitle.h"
 
 @interface VLCMainWindow : NSWindow <PXSourceListDataSource, PXSourceListDelegate, NSWindowDelegate, NSAnimationDelegate> {
     IBOutlet id o_play_btn;

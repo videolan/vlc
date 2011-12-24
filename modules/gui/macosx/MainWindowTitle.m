@@ -67,4 +67,9 @@
     [o_title_lbl setStringValue: title];
 }
 
+- (void)setFullscreenButtonHidden:(BOOL)b_value
+{
+    [o_fullscreen_btn setHidden: b_value];
+}
+
 @end

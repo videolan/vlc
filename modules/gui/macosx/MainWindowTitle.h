@@ -38,5 +38,6 @@
 
 - (IBAction)buttonAction:(id)sender;
 - (void)setWindowTitle:(NSString *)title;
+- (void)setFullscreenButtonHidden:(BOOL)b_value;
 
 @end

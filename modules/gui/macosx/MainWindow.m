@@ -277,6 +277,9 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
         [o_fullscreen_btn removeFromSuperviewWithoutNeedingDisplay];
     }
+    else
+        [o_titlebar_view setFullscreenButtonHidden: YES];
+
     if (OSX_LION)
     {
         /* the default small size of the search field is slightly different on Lion, let's work-around that */
