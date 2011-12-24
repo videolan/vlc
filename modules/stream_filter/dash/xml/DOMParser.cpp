@@ -74,24 +74,29 @@ Node*   DOMParser::processNode              ()
 {
     const char *data;
     int type = xml_ReaderNextNode(this->vlc_reader, &data);
-    if(type != -1 && type != XML_READER_TEXT && type != XML_READER_NONE && type != XML_READER_ENDELEM)
+    if(type != -1 && type != XML_READER_NONE && type != XML_READER_ENDELEM)
     {
         Node *node = new Node();
+        node->setType( type );
 
-        std::string name    = data;
-        bool        isEmpty = xml_ReaderIsEmptyElement(this->vlc_reader);
-        node->setName(name);
+        if ( type != XML_READER_TEXT )
+        {
+            std::string name    = data;
+            bool        isEmpty = xml_ReaderIsEmptyElement(this->vlc_reader);
+            node->setName(name);
 
-        this->addAttributesToNode(node);
+            this->addAttributesToNode(node);
 
-        if(isEmpty)
-            return node;
+            if(isEmpty)
+                return node;
 
-        Node *subnode = NULL;
+            Node *subnode = NULL;
 
-        while((subnode = this->processNode()) != NULL)
-            node->addSubNode(subnode);
-
+            while((subnode = this->processNode()) != NULL)
+                node->addSubNode(subnode);
+        }
+        else
+            node->setText( data );
         return node;
     }
     return NULL;

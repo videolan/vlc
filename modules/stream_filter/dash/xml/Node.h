@@ -49,13 +49,18 @@ namespace dash
                 std::vector<std::string>            getAttributeKeys    () const;
                 bool                                hasText             () const;
                 const std::string&                  getText             () const;
+                void                                setText( const std::string &text );
                 const std::map<std::string, std::string>& getAttributes () const;
+                int                                 getType() const;
+                void                                setType( int type );
 
             private:
                 static const std::string            EmptyString;
                 std::vector<Node *>                 subNodes;
                 std::map<std::string, std::string>  attributes;
                 std::string                         name;
+                std::string                         text;
+                int                                 type;
 
         };
     }

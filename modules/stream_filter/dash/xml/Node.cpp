@@ -27,11 +27,16 @@
 
 #include "Node.h"
 
+#include <cassert>
+#include <vlc_common.h>
+#include <vlc_xml.h>
+
 using namespace dash::xml;
 
 const std::string   Node::EmptyString = "";
 
-Node::Node  ()
+Node::Node() :
+    type( -1 )
 {
 }
 Node::~Node ()
@@ -89,9 +94,31 @@ bool                                Node::hasText               () const
 
 const std::string&                         Node::getText               () const
 {
-    return EmptyString;
+    if ( this->type == XML_READER_TEXT )
+        return this->text;
+    else
+    {
+        assert( this->subNodes.size() == 1 );
+        return this->subNodes[0]->getText();
+    }
 }
+
+void Node::setText(const std::string &text)
+{
+    this->text = text;
+}
+
 const std::map<std::string,std::string>&   Node::getAttributes         () const
 {
     return this->attributes;
+}
+
+int Node::getType() const
+{
+    return this->type;
+}
+
+void Node::setType(int type)
+{
+    this->type = type;
 }
