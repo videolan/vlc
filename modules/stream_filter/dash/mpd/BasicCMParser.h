@@ -66,6 +66,7 @@ namespace dash
                 void    setMPDBaseUrl       (dash::xml::Node *root);
                 bool    parseCommonAttributesElements( dash::xml::Node *node, CommonAttributesElements *common ) const;
                 bool    parseSegment( Segment *seg, const std::map<std::string, std::string> &attr );
+                ProgramInformation*     parseProgramInformation();
         };
     }
 }

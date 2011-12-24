@@ -116,6 +116,7 @@ bool    BasicCMParser::setMPD()
 
     this->setMPDBaseUrl(this->root);
     this->setPeriods(this->root);
+    this->mpd->setProgramInformation( this->parseProgramInformation() );
     return true;
 }
 void    BasicCMParser::setMPDBaseUrl        (Node *root)
@@ -261,6 +262,29 @@ bool BasicCMParser::parseSegment(Segment *seg, const std::map<std::string, std::
     if ( it != attr.end() )
         seg->setSourceUrl( it->second );
     return true;
+}
+
+ProgramInformation* BasicCMParser::parseProgramInformation()
+{
+    Node*   pInfoNode = DOMHelper::getFirstChildElementByName( this->root, "ProgramInformation" );
+    if ( pInfoNode == NULL )
+        return NULL;
+    ProgramInformation  *pInfo = new ProgramInformation;
+    const std::map<std::string, std::string>    attr = pInfoNode->getAttributes();
+    std::map<std::string, std::string>::const_iterator  it;
+    it = attr.find( "moreInformationURL" );
+    if ( it != attr.end() )
+        pInfo->setMoreInformationUrl( it->second );
+    Node*   title = DOMHelper::getFirstChildElementByName( pInfoNode, "Title" );
+    if ( title )
+        pInfo->setTitle( title->getText() );
+    Node*   source = DOMHelper::getFirstChildElementByName( pInfoNode, "Source" );
+    if ( source )
+        pInfo->setSource( source->getText() );
+    Node*   copyright = DOMHelper::getFirstChildElementByName( pInfoNode, "copyright" );
+    if ( copyright )
+        pInfo->setCopyright( copyright->getText() );
+    return pInfo;
 }
 
 void    BasicCMParser::setInitSegment       (Node *root, SegmentInfo *info)

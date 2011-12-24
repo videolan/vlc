@@ -63,9 +63,9 @@ namespace dash
                 void                            setMinBufferTime( time_t time );
                 time_t                          getTimeShiftBufferDepth() const;
                 void                            setTimeShiftBufferDepth( time_t depth );
-                const std::vector<BaseUrl *>&  getBaseUrls      () const;
-                const std::vector<Period *>&   getPeriods       () const;
-                ProgramInformation*     getProgramInformation   () throw(dash::exception::ElementNotPresentException);
+                const std::vector<BaseUrl *>&   getBaseUrls() const;
+                const std::vector<Period *>&    getPeriods() const;
+                const ProgramInformation*       getProgramInformation() const;
 
                 void    addPeriod               (Period *period);
                 void    addBaseUrl              (BaseUrl *url);

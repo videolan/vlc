@@ -109,13 +109,11 @@ void MPD::setTimeShiftBufferDepth(time_t depth)
         this->timeShiftBufferDepth = depth;
 }
 
-ProgramInformation*     MPD::getProgramInformation  () throw(ElementNotPresentException)
+const ProgramInformation*     MPD::getProgramInformation  () const
 {
-    if(this->programInfo == NULL)
-        throw ElementNotPresentException();
-
     return this->programInfo;
 }
+
 void                    MPD::addBaseUrl             (BaseUrl *url)
 {
     this->baseUrls.push_back(url);

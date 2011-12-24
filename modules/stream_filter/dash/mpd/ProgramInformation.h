@@ -38,23 +38,22 @@ namespace dash
         class ProgramInformation
         {
             public:
-                ProgramInformation          (std::map<std::string, std::string> attr);
-                virtual ~ProgramInformation ();
+                virtual ~ProgramInformation(){}
 
-                std::string getMoreInformationUrl   () throw(dash::exception::AttributeNotPresentException);
-                std::string getTitle                () throw(dash::exception::ElementNotPresentException);
-                std::string getSource               () throw(dash::exception::ElementNotPresentException);
-                std::string getCopyright            () throw(dash::exception::ElementNotPresentException);
-
-                void setTitle       (std::string title);
-                void setSource      (std::string source);
-                void setCopyright   (std::string copyright);
+                const std::string&  getMoreInformationUrl() const;
+                void                setMoreInformationUrl( const std::string &url );
+                const std::string&  getTitle() const;
+                void                setTitle( const std::string &title);
+                const std::string&  getSource() const;
+                void                setSource( const std::string &source);
+                const std::string&  getCopyright() const;
+                void                setCopyright( const std::string &copyright);
 
             private:
-                std::map<std::string, std::string>  attributes;
-                std::string                         title;
-                std::string                         source;
-                std::string                         copyright;
+                std::string         moreInformationUrl;
+                std::string         title;
+                std::string         source;
+                std::string         copyright;
         };
     }
 }

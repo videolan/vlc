@@ -30,52 +30,41 @@
 using namespace dash::mpd;
 using namespace dash::exception;
 
-ProgramInformation::ProgramInformation  (std::map<std::string, std::string> attr)
+const std::string &ProgramInformation::getSource() const
 {
-    this->attributes    = attr;
-}
-ProgramInformation::~ProgramInformation ()
-{
-}
-
-std::string ProgramInformation::getTitle                () throw(ElementNotPresentException)
-{
-    if(this->title.empty())
-        throw ElementNotPresentException();
-
-    return this->title;
-}
-std::string ProgramInformation::getCopyright            () throw(ElementNotPresentException)
-{
-    if(this->copyright.empty())
-        throw ElementNotPresentException();
-
-    return this->copyright;
-}
-std::string ProgramInformation::getSource               () throw(ElementNotPresentException)
-{
-    if(this->source.empty())
-        throw ElementNotPresentException();
-
     return this->source;
 }
-std::string ProgramInformation::getMoreInformationUrl   () throw(AttributeNotPresentException)
-{
-    if(this->attributes.find("moreInformationURL") == this->attributes.end())
-        throw AttributeNotPresentException();
 
-    return this->attributes["moreInformationURL"];
+void ProgramInformation::setSource(const std::string &source)
+{
+    if ( source.empty() == false )
+        this->source = source;
+}
 
-}
-void        ProgramInformation::setTitle                (std::string title)
+const std::string &ProgramInformation::getCopyright() const
 {
-    this->title = title;
+    return this->copyright;
 }
-void        ProgramInformation::setCopyright            (std::string copyright)
+
+void ProgramInformation::setCopyright(const std::string &copyright)
 {
-    this->copyright = copyright;
+    if ( copyright.empty() == false )
+        this->copyright = copyright;
 }
-void        ProgramInformation::setSource               (std::string source)
+
+void ProgramInformation::setMoreInformationUrl(const std::string &url)
 {
-    this->source = source;
+    if ( url.empty() == false )
+        this->moreInformationUrl = url;
+}
+
+const std::string &ProgramInformation::getTitle() const
+{
+    return this->title;
+}
+
+void        ProgramInformation::setTitle                (const std::string &title)
+{
+    if ( title.empty() == false )
+        this->title = title;
 }
