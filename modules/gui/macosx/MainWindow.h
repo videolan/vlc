@@ -30,6 +30,7 @@
 #import <vlc_input.h>
 #import "misc.h"
 #import "fspanel.h"
+#import "MainWindowTitle.h"
 
 @interface VLCMainWindow : NSWindow <PXSourceListDataSource, PXSourceListDelegate, NSWindowDelegate, NSAnimationDelegate> {
     IBOutlet id o_play_btn;
@@ -113,6 +114,7 @@
     NSSize nativeVideoSize;
 
     NSInteger i_originalLevel;
+    NSString *o_previouslySavedFrame;
 }
 + (VLCMainWindow *)sharedInstance;
 
@@ -130,6 +132,8 @@
 - (IBAction)dropzoneButtonAction:(id)sender;
 
 - (void)setTitle:(NSString *)title;
+- (void) customZoom: (id)sender;
+
 - (void)showDropZone;
 - (void)hideDropZone;
 - (void)updateTimeSlider;

@@ -107,6 +107,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 - (void)dealloc
 {
     config_PutInt( VLCIntf->p_libvlc, "volume", i_lastShownVolume );
+    [self saveFrameUsingName: [self frameAutosaveName]];
     [o_sidebaritems release];
     [super dealloc];
 }
@@ -666,13 +667,125 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
 - (void)setTitle:(NSString *)title
 {
-    [o_titlebar_view setWindowTitle: title];
+    if (b_dark_interface)
+        [o_titlebar_view setWindowTitle: title];
     [super setTitle: title];
 }
 
 - (void)performZoom:(id)sender
 {
-    [super zoom: sender];
+    if (b_dark_interface)
+        [self customZoom: sender];
+    else
+        [super performZoom: sender];
+}
+
+- (void)zoom:(id)sender
+{
+    if (b_dark_interface)
+        [self customZoom: sender];
+    else
+        [super zoom: sender];
+}
+
+/**
+ * Given a proposed frame rectangle, return a modified version
+ * which will fit inside the screen.
+ *
+ * This method is based upon NSWindow.m, part of the GNUstep GUI Library, licensed under LGPLv2+.
+ *    Authors:  Scott Christley <scottc@net-community.com>, Venkat Ajjanagadde <venkat@ocbi.com>,   
+ *              Felipe A. Rodriguez <far@ix.netcom.com>, Richard Frith-Macdonald <richard@brainstorm.co.uk>
+ *    Copyright (C) 1996 Free Software Foundation, Inc.
+ */
+- (NSRect) constrainFrameRect: (NSRect)frameRect toScreen: (NSScreen*)screen
+{
+    NSRect screenRect = [screen visibleFrame];
+    float difference;
+
+    /* Move top edge of the window inside the screen */
+    difference = NSMaxY (frameRect) - NSMaxY (screenRect);
+    if (difference > 0)
+    {
+        frameRect.origin.y -= difference;
+    }
+
+    /* If the window is resizable, resize it (if needed) so that the
+     bottom edge is on the screen or can be on the screen when the user moves
+     the window */
+    difference = NSMaxY (screenRect) - NSMaxY (frameRect);
+    if (_styleMask & NSResizableWindowMask)
+    {
+        float difference2;
+
+        difference2 = screenRect.origin.y - frameRect.origin.y;
+        difference2 -= difference;
+        // Take in account the space between the top of window and the top of the 
+        // screen which can be used to move the bottom of the window on the screen
+        if (difference2 > 0)
+        {
+            frameRect.size.height -= difference2;
+            frameRect.origin.y += difference2;
+        }
+
+        /* Ensure that resizing doesn't makewindow smaller than minimum */
+        difference2 = [self minSize].height - frameRect.size.height;
+        if (difference2 > 0)
+        {
+            frameRect.size.height += difference2;
+            frameRect.origin.y -= difference2;
+        }
+    }
+
+    return frameRect;
+}
+
+#define DIST 3
+
+/**
+ Zooms the receiver.   This method calls the delegate method
+ windowShouldZoom:toFrame: to determine if the window should
+ be allowed to zoom to full screen.
+ *
+ * This method is based upon NSWindow.m, part of the GNUstep GUI Library, licensed under LGPLv2+.
+ *    Authors:  Scott Christley <scottc@net-community.com>, Venkat Ajjanagadde <venkat@ocbi.com>,   
+ *              Felipe A. Rodriguez <far@ix.netcom.com>, Richard Frith-Macdonald <richard@brainstorm.co.uk>
+ *    Copyright (C) 1996 Free Software Foundation, Inc.
+ */
+- (void) customZoom: (id)sender
+{
+    NSRect maxRect = [[self screen] visibleFrame];
+    NSRect currentFrame = [self frame];
+
+    if ([[self delegate] respondsToSelector: @selector(windowWillUseStandardFrame:defaultFrame:)])
+    {
+        maxRect = [[self delegate] windowWillUseStandardFrame: self defaultFrame: maxRect];
+    }
+
+    maxRect = [self constrainFrameRect: maxRect toScreen: [self screen]];
+
+    // Compare the new frame with the current one
+    if ((abs(NSMaxX(maxRect) - NSMaxX(currentFrame)) < DIST)
+        && (abs(NSMaxY(maxRect) - NSMaxY(currentFrame)) < DIST)
+        && (abs(NSMinX(maxRect) - NSMinX(currentFrame)) < DIST)
+        && (abs(NSMinY(maxRect) - NSMinY(currentFrame)) < DIST))
+    {
+        // Already in zoomed mode, reset user frame, if stored
+        if ([self frameAutosaveName] != nil)
+        {
+            [self setFrameFromString: o_previouslySavedFrame];
+            [self saveFrameUsingName: [self frameAutosaveName]];
+        }
+        return;
+    }
+
+    if ([self frameAutosaveName] != nil)
+    {
+        [self saveFrameUsingName: [self frameAutosaveName]];
+        [o_previouslySavedFrame release];
+        o_previouslySavedFrame = [[self stringWithSavedFrame] retain];
+    }
+
+    [self setFrame: maxRect display: YES];
 }
 
 #pragma mark -
