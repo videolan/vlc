@@ -30,6 +30,9 @@
 #include <cstdlib>
 #include <sstream>
 
+#include <vlc_common.h>
+#include <vlc_strings.h>
+
 using namespace dash::mpd;
 using namespace dash::xml;
 
@@ -133,9 +136,12 @@ void    BasicCMParser::setRepresentations   (Node *root, Group *group)
         if ( it != attributes.end() )
             this->handleDependencyId( rep, group, it->second );
 
-        this->setSegmentInfo(representations.at(i), rep);
-        if ( rep->getSegmentInfo() && rep->getSegmentInfo()->getSegments().size() > 0 )
-            group->addRepresentation(rep);        
+        if ( this->setSegmentInfo(representations.at(i), rep) == false )
+        {
+            delete rep;
+            continue ;
+        }
+        group->addRepresentation(rep);
     }
 }
 
@@ -154,39 +160,60 @@ void    BasicCMParser::handleDependencyId( Representation *rep, const Group *gro
     }
 }
 
-void    BasicCMParser::setSegmentInfo       (Node *root, Representation *rep)
+bool    BasicCMParser::setSegmentInfo       (Node *root, Representation *rep)
 {
     Node    *segmentInfo = DOMHelper::getFirstChildElementByName( root, "SegmentInfo");
 
     if ( segmentInfo )
     {
-        SegmentInfo *info = new SegmentInfo( segmentInfo->getAttributes() );
+        const std::map<std::string, std::string> attr = segmentInfo->getAttributes();
+
+        SegmentInfo *info = new SegmentInfo();
+        //Init segment is not mandatory.
         this->setInitSegment( segmentInfo, info );
-        this->setSegments(segmentInfo, info );
+        //If we don't have any segment, there's no point keeping this SegmentInfo.
+        if ( this->setSegments(segmentInfo, info ) == false )
+        {
+            delete info;
+            return false;
+        }
+        std::map<std::string, std::string>::const_iterator  it;
+        it = attr.find( "duration" );
+        if ( it != attr.end() )
+            info->setDuration( str_duration( it->second.c_str() ) );
+
         rep->setSegmentInfo(info);
+        return true;
     }
+    return false;
 }
 
 void    BasicCMParser::setInitSegment       (Node *root, SegmentInfo *info)
 {
-    std::vector<Node *> initSeg = DOMHelper::getChildElementByTagName(root, "InitialisationSegmentURL");
+    const std::vector<Node *> initSeg = DOMHelper::getChildElementByTagName(root, "InitialisationSegmentURL");
 
-    for(size_t i = 0; i < initSeg.size(); i++)
+    if (  initSeg.size() > 1 )
+        std::cerr << "There could be at most one InitialisationSegmentURL per SegmentInfo"
+                     " other InitialisationSegmentURL will be dropped." << std::endl;
+    if ( initSeg.size() == 1 )
     {
-        InitSegment *seg = new InitSegment(initSeg.at(i)->getAttributes());
-        info->setInitSegment(seg);
-        return;
+        InitSegment *seg = new InitSegment( initSeg.at(0)->getAttributes() );
+        info->setInitSegment( seg );
     }
 }
-void    BasicCMParser::setSegments          (Node *root, SegmentInfo *info)
+
+bool    BasicCMParser::setSegments          (Node *root, SegmentInfo *info)
 {
     std::vector<Node *> segments = DOMHelper::getElementByTagName(root, "Url", false);
 
+    if ( segments.size() == 0 )
+        return false;
     for(size_t i = 0; i < segments.size(); i++)
     {
         Segment *seg = new Segment(segments.at(i)->getAttributes());
         info->addSegment(seg);
     }
+    return true;
 }
 MPD*    BasicCMParser::getMPD               ()
 {

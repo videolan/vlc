@@ -61,9 +61,9 @@ namespace dash
                 void    setPeriods          (dash::xml::Node *root);
                 void    setGroups           (dash::xml::Node *root, Period *period);
                 void    setRepresentations  (dash::xml::Node *root, Group *group);
-                void    setSegmentInfo      (dash::xml::Node *root, Representation *rep);
+                bool    setSegmentInfo      (dash::xml::Node *root, Representation *rep);
                 void    setInitSegment      (dash::xml::Node *root, SegmentInfo *info);
-                void    setSegments         (dash::xml::Node *root, SegmentInfo *info);
+                bool    setSegments         (dash::xml::Node *root, SegmentInfo *info);
                 void    setMPDBaseUrl       (dash::xml::Node *root);
                 bool    parseCommonAttributesElements( dash::xml::Node *node, CommonAttributesElements *common ) const;
         };
