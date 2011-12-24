@@ -65,6 +65,8 @@ bool    DOMParser::parse                    ()
         return false;
 
     this->root = this->processNode();
+    if ( this->root == NULL )
+        return false;
 
     return true;
 }
