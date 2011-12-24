@@ -54,7 +54,6 @@ namespace dash
                 bool                parse       ();
                 Node*               getRootNode ();
                 void                print       ();
-                dash::mpd::Profile  getProfile  (dash::xml::Node *node);
                 static bool         isDash      (stream_t *stream);
 
             private:

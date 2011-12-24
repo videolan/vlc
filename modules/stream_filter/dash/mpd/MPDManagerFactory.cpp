@@ -30,27 +30,21 @@
 using namespace dash::mpd;
 using namespace dash::xml;
 
-IMPDManager* MPDManagerFactory::create                  (Profile profile, Node *root)
+IMPDManager* MPDManagerFactory::create( Node *root )
 {
-    switch(profile)
+    BasicCMParser parser(root);
+
+    if ( parser.parse() == false )
+        return new NullManager();
+
+    Profile profile = parser.getMPD()->getProfile();
+    switch( profile )
     {
         case mpd::Basic:    return new NullManager();
-        case mpd::BasicCM:  return createBasicCMManager(root);
+        case mpd::BasicCM:  return new BasicCMManager( parser.getMPD() );
         case mpd::Full2011: return new NullManager();
         case mpd::NotValid: return new NullManager();
 
         default:            return new NullManager();
     }
-}
-
-IMPDManager* MPDManagerFactory::createBasicCMManager    (Node *root)
-{
-    BasicCMParser parser(root);
-
-    if(!parser.parse())
-        return new NullManager();
-
-    BasicCMManager *manager =  new BasicCMManager(parser.getMPD());
-
-    return manager;
 }

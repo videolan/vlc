@@ -132,15 +132,7 @@ void    DOMParser::print                    ()
 {
     this->print(this->root, 0);
 }
-Profile DOMParser::getProfile               (dash::xml::Node *node)
-{
-    std::string profile = node->getAttributeValue("profiles");
 
-    if(!profile.compare("urn:mpeg:mpegB:profile:dash:isoff-basic-on-demand:cm"))
-        return dash::mpd::BasicCM;
-
-    return dash::mpd::NotValid;
-}
 bool    DOMParser::isDash                   (stream_t *stream)
 {
     const char* psz_namespace = "urn:mpeg:mpegB:schema:DASH:MPD:DIS2011";

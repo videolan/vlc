@@ -34,13 +34,12 @@ using namespace dash::logic;
 using namespace dash::mpd;
 using namespace dash::exception;
 
-DASHManager::DASHManager    (HTTPConnectionManager *conManager, Node *node, IAdaptationLogic::LogicType type, Profile profile)
+DASHManager::DASHManager    ( HTTPConnectionManager *conManager, Node *node, IAdaptationLogic::LogicType type )
 {
     this->conManager        = conManager;
     this->node              = node;
     this->logicType         = type;
-    this->profile           = profile;
-    this->mpdManager        = mpd::MPDManagerFactory::create(this->profile, this->node);
+    this->mpdManager        = mpd::MPDManagerFactory::create(this->node);
     this->adaptationLogic   = AdaptationLogicFactory::create( this->logicType, this->mpdManager );
     this->currentChunk      = NULL;
 

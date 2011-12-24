@@ -98,9 +98,8 @@ static int Open(vlc_object_t *p_obj)
         new dash::http::HTTPConnectionManager(p_stream);
     dash::xml::Node *p_node = parser.getRootNode();
     dash::DASHManager*p_dashManager =
-        new dash::DASHManager(p_conManager, p_node,
-                              dash::logic::IAdaptationLogic::RateBased,
-                              parser.getProfile(p_node));
+        new dash::DASHManager( p_conManager, p_node,
+                              dash::logic::IAdaptationLogic::RateBased );
 
     p_sys->p_dashManager    = p_dashManager;
     p_sys->p_node           = p_node;

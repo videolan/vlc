@@ -38,7 +38,7 @@ namespace dash
     class DASHManager
     {
         public:
-            DASHManager             (http::HTTPConnectionManager *conManager, xml::Node *node, logic::IAdaptationLogic::LogicType type, mpd::Profile profile);
+            DASHManager             (http::HTTPConnectionManager *conManager, xml::Node *node, logic::IAdaptationLogic::LogicType type);
             virtual ~DASHManager    ();
 
             int read        (void *p_buffer, size_t len);
@@ -50,7 +50,6 @@ namespace dash
             http::Chunk                         *currentChunk;
             logic::IAdaptationLogic             *adaptationLogic;
             logic::IAdaptationLogic::LogicType  logicType;
-            mpd::Profile                        profile;
             xml::Node                           *node;
             mpd::IMPDManager                    *mpdManager;
     };

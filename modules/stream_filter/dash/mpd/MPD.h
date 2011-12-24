@@ -34,6 +34,7 @@
 #include "mpd/ProgramInformation.h"
 #include "exceptions/AttributeNotPresentException.h"
 #include "exceptions/ElementNotPresentException.h"
+#include "mpd/IMPDManager.h"
 
 namespace dash
 {
@@ -47,6 +48,9 @@ namespace dash
                 MPD         (const AttributesMap& attributes);
                 virtual ~MPD();
 
+                Profile                         getProfile() const;
+                void                            setProfile( const std::string &strProfile );
+                void                            setProfile( Profile profile );
                 bool                           isLive() const;
                 const std::string&             getDuration             () const throw(dash::exception::AttributeNotPresentException);
                 const std::string&             getMinBufferTime        () const throw(dash::exception::AttributeNotPresentException);
@@ -59,6 +63,7 @@ namespace dash
                 void    setProgramInformation   (ProgramInformation *progInfo);
 
             private:
+                Profile                             profile;
                 AttributesMap                       attributes;
                 std::vector<Period *>               periods;
                 std::vector<BaseUrl *>              baseUrls;

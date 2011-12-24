@@ -30,7 +30,9 @@
 using namespace dash::mpd;
 using namespace dash::exception;
 
-MPD::MPD    (const AttributesMap& attributes) : attributes( attributes ),
+MPD::MPD    (const AttributesMap& attributes) :
+    profile( dash::mpd::NotValid ),
+    attributes( attributes ),
     programInfo( NULL )
 {
 }
@@ -103,4 +105,22 @@ bool                    MPD::isLive() const
         so anything that is not "Live" is "On-Demand"
     */
     return ( it != this->attributes.end() && it->second == "Live" );
+}
+
+Profile MPD::getProfile() const
+{
+    return this->profile;
+}
+
+void MPD::setProfile(Profile profile)
+{
+    this->profile = profile;
+}
+
+void MPD::setProfile( const std::string &strProfile )
+{
+    if( strProfile == "urn:mpeg:mpegB:profile:dash:isoff-basic-on-demand:cm" )
+        this->profile = dash::mpd::BasicCM;
+    else
+        this->profile = dash::mpd::NotValid;
 }

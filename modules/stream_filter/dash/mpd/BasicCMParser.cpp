@@ -51,7 +51,13 @@ bool    BasicCMParser::parse                ()
 }
 void    BasicCMParser::setMPD               ()
 {
-    this->mpd = new MPD(this->root->getAttributes());
+    const std::map<std::string, std::string>    attr = this->root->getAttributes();
+    this->mpd = new MPD( attr );
+
+    std::map<std::string, std::string>::const_iterator  it;
+    it = attr.find( "profile" );
+    if ( it != attr.end() )
+        this->mpd->setProfile( it->second );
     this->setMPDBaseUrl(this->root);
     this->setPeriods(this->root);
 }
