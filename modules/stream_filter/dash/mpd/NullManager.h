@@ -30,7 +30,6 @@
 #include "mpd/MPD.h"
 #include "mpd/Period.h"
 #include "mpd/Representation.h"
-#include "mpd/ISegment.h"
 #include "mpd/IMPDManager.h"
 
 namespace dash
@@ -44,12 +43,12 @@ namespace dash
                 Period*                 getFirstPeriod          ();
                 Period*                 getNextPeriod           (Period *period);
                 Representation*         getBestRepresentation   (Period *period);
-                std::vector<ISegment *> getSegments             (Representation *rep);
+                std::vector<Segment *> getSegments             (Representation *rep);
                 Representation*         getRepresentation       (Period *period, long bitrate);
                 const MPD*              getMPD                  () const;
             private:
                 std::vector<Period *>   periods;
-                std::vector<ISegment *> segments;
+                std::vector<Segment *>  segments;
         };
     }
 }

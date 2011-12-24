@@ -25,26 +25,21 @@
 #ifndef SEGMENT_H_
 #define SEGMENT_H_
 
-#include <map>
 #include <string>
-
-#include "exceptions/AttributeNotPresentException.h"
-#include "mpd/ISegment.h"
 
 namespace dash
 {
     namespace mpd
     {
-        class Segment : public ISegment
+        class Segment
         {
             public:
-                Segment             (std::map<std::string, std::string>  attributes);
-                virtual ~Segment    ();
-
-                std::string getSourceUrl() throw(dash::exception::AttributeNotPresentException);
+                virtual ~Segment(){}
+                const std::string&  getSourceUrl() const;
+                void                setSourceUrl( const std::string &url );
 
             private:
-                std::map<std::string, std::string>  attributes;
+                std::string         sourceUrl;
         };
     }
 }

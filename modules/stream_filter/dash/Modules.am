@@ -35,9 +35,6 @@ SOURCES_stream_filter_dash = \
     mpd/Group.h \
     mpd/IMPDManager.h \
     mpd/IMPDParser.h \
-    mpd/InitSegment.cpp \
-    mpd/InitSegment.h \
-    mpd/ISegment.h \
     mpd/MPD.cpp \
     mpd/MPD.h \
     mpd/MPDManagerFactory.cpp \

@@ -39,15 +39,15 @@ BasicCMManager::~BasicCMManager ()
     delete this->mpd;
 }
 
-std::vector<ISegment*>  BasicCMManager::getSegments             (Representation *rep)
+std::vector<Segment*>  BasicCMManager::getSegments             (Representation *rep)
 {
-    std::vector<ISegment *> retSegments;
+    std::vector<Segment *> retSegments;
     try
     {
         SegmentInfo* info = rep->getSegmentInfo();
-        InitSegment* init = info->getInitSegment();
+        Segment*     initSegment = info->getInitSegment();
 
-        retSegments.push_back(init);
+        retSegments.push_back(initSegment);
 
         std::vector<Segment *> segments = info->getSegments();
 

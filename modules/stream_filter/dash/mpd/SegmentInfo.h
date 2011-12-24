@@ -30,7 +30,6 @@
 #include <map>
 
 #include "mpd/Segment.h"
-#include "mpd/InitSegment.h"
 #include "exceptions/ElementNotPresentException.h"
 
 namespace dash
@@ -43,15 +42,15 @@ namespace dash
                 SegmentInfo             ();
                 virtual ~SegmentInfo    ();
 
-                InitSegment*            getInitSegment() const;
-                void                    setInitSegment( InitSegment *seg );
+                Segment*                getInitSegment() const;
+                void                    setInitSegment( Segment *seg );
                 time_t                  getDuration() const;
                 void                    setDuration( time_t duration );
-                const std::vector<Segment *>&   getSegments () const;
-                void                    addSegment      (Segment *seg);
+                const std::vector<Segment *>&   getSegments() const;
+                void                    addSegment(Segment *seg);
 
             private:
-                InitSegment                         *initSeg;
+                Segment                             *initSeg;
                 time_t                              duration;
                 std::vector<Segment *>              segments;
         };

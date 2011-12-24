@@ -44,12 +44,12 @@ SegmentInfo::~SegmentInfo   ()
     delete(this->initSeg);
 }
 
-InitSegment*            SegmentInfo::getInitSegment() const
+Segment*            SegmentInfo::getInitSegment() const
 {
     return this->initSeg;
 }
 
-void                    SegmentInfo::setInitSegment( InitSegment *initSeg )
+void                    SegmentInfo::setInitSegment( Segment *initSeg )
 {
     this->initSeg = initSeg;
 }

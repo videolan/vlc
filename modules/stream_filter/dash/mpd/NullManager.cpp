@@ -45,7 +45,7 @@ Representation*         NullManager::getBestRepresentation   (Period *)
 {
     return NULL;
 }
-std::vector<ISegment *> NullManager::getSegments             (Representation *)
+std::vector<Segment *> NullManager::getSegments             (Representation *)
 {
     return this->segments;
 }

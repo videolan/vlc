@@ -32,7 +32,6 @@
 #include "mpd/IMPDManager.h"
 #include "mpd/Period.h"
 #include "mpd/Representation.h"
-#include "mpd/InitSegment.h"
 #include "mpd/Segment.h"
 #include "exceptions/AttributeNotPresentException.h"
 #include "exceptions/EOFException.h"

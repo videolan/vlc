@@ -33,7 +33,6 @@
 #include "mpd/Segment.h"
 #include "exceptions/EOFException.h"
 #include "mpd/BasicCMManager.h"
-#include "mpd/ISegment.h"
 #include <vector>
 
 namespace dash
@@ -49,7 +48,7 @@ namespace dash
                 dash::http::Chunk* getNextChunk () throw(dash::exception::EOFException);
 
             private:
-                std::vector<dash::mpd::ISegment *>  schedule;
+                std::vector<dash::mpd::Segment *>  schedule;
                 dash::mpd::IMPDManager              *mpdManager;
                 size_t                              count;
 

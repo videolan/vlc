@@ -28,20 +28,14 @@
 #include "Segment.h"
 
 using namespace dash::mpd;
-using namespace dash::exception;
 
-Segment::Segment    (std::map<std::string, std::string>  attributes)
+const std::string& Segment::getSourceUrl () const
 {
-    this->attributes = attributes;
-}
-Segment::~Segment   ()
-{
+    return this->sourceUrl;
 }
 
-std::string Segment::getSourceUrl () throw(AttributeNotPresentException)
+void        Segment::setSourceUrl( const std::string &url )
 {
-    if(this->attributes.find("sourceURL") == this->attributes.end())
-        throw AttributeNotPresentException();
-
-    return this->attributes["sourceURL"];
+    if ( url.empty() == false )
+        this->sourceUrl = url;
 }

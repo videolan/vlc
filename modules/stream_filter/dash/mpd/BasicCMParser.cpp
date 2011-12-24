@@ -136,7 +136,7 @@ void    BasicCMParser::setRepresentations   (Node *root, Group *group)
         if ( it != attributes.end() )
             this->handleDependencyId( rep, group, it->second );
 
-        if ( this->setSegmentInfo(representations.at(i), rep) == false )
+        if ( this->setSegmentInfo( representations.at(i), rep ) == false )
         {
             delete rep;
             continue ;
@@ -188,6 +188,18 @@ bool    BasicCMParser::setSegmentInfo       (Node *root, Representation *rep)
     return false;
 }
 
+bool BasicCMParser::parseSegment(Segment *seg, const std::map<std::string, std::string>& attr )
+{
+    std::map<std::string, std::string>::const_iterator  it;
+
+    it = attr.find( "sourceURL" );
+    //FIXME: When not present, the sourceUrl attribute should be computed
+    //using BaseURL and the range attribute.
+    if ( it != attr.end() )
+        seg->setSourceUrl( it->second );
+    return true;
+}
+
 void    BasicCMParser::setInitSegment       (Node *root, SegmentInfo *info)
 {
     const std::vector<Node *> initSeg = DOMHelper::getChildElementByTagName(root, "InitialisationSegmentURL");
@@ -197,7 +209,8 @@ void    BasicCMParser::setInitSegment       (Node *root, SegmentInfo *info)
                      " other InitialisationSegmentURL will be dropped." << std::endl;
     if ( initSeg.size() == 1 )
     {
-        InitSegment *seg = new InitSegment( initSeg.at(0)->getAttributes() );
+        Segment     *seg = new Segment();
+        parseSegment( seg, initSeg.at(0)->getAttributes() );
         info->setInitSegment( seg );
     }
 }
@@ -210,12 +223,14 @@ bool    BasicCMParser::setSegments          (Node *root, SegmentInfo *info)
         return false;
     for(size_t i = 0; i < segments.size(); i++)
     {
-        Segment *seg = new Segment(segments.at(i)->getAttributes());
+        Segment *seg = new Segment();
+        parseSegment( seg, segments.at(i)->getAttributes() );
         info->addSegment(seg);
     }
     return true;
 }
-MPD*    BasicCMParser::getMPD               ()
+
+MPD*    BasicCMParser::getMPD()
 {
     return this->mpd;
 }
