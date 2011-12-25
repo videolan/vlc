@@ -286,7 +286,11 @@ WidgetListing::WidgetListing( intf_thread_t *p_intf, QWidget *_parent )
 
     /* Normal options */
     setViewMode( QListView::IconMode );
-    setSpacing( 20 );
+    setSpacing( 8 );
+    setGridSize( QSize(90, 50) );
+    setWrapping( true );
+    setWordWrap( true );
+    setTextElideMode( Qt::ElideNone );
     setDragEnabled( true );
 
     /* All the buttons do not need a special rendering */
@@ -294,7 +298,8 @@ WidgetListing::WidgetListing( intf_thread_t *p_intf, QWidget *_parent )
     {
         QListWidgetItem *widgetItem = new QListWidgetItem( this );
         widgetItem->setText( qtr( nameL[i] ) );
-        widgetItem->setIcon( QIcon( iconL[i] ) );
+        QPixmap pix( iconL[i] );
+        widgetItem->setIcon( pix.scaled( 16, 16, Qt::KeepAspectRatio, Qt::SmoothTransformation ) );
         widgetItem->setData( Qt::UserRole, QVariant( i ) );
         addItem( widgetItem );
     }
@@ -434,6 +439,7 @@ WidgetListing::WidgetListing( intf_thread_t *p_intf, QWidget *_parent )
                 layout->setForwardButton( next );
                 layout->setRoundButton( play );
             }
+            widgetItem->setText( qtr("Playback Buttons") );
             break;
         default:
             msg_Warn( p_intf, "This should not happen %i", i );
