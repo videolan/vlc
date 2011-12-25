@@ -101,6 +101,14 @@ static int Open(vlc_object_t *p_obj)
         new dash::DASHManager( p_conManager, p_node,
                               dash::logic::IAdaptationLogic::RateBased );
 
+    if ( p_dashManager->getMpdManager()->getMPD() == NULL )
+    {
+        msg_Err( p_obj, "MPD file parsing failed." );
+        delete p_conManager;
+        delete p_dashManager;
+        free( p_sys );
+        return VLC_EGENERIC;
+    }
     p_sys->p_dashManager    = p_dashManager;
     p_sys->p_node           = p_node;
     p_sys->p_conManager     = p_conManager;
