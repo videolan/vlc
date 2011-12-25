@@ -150,6 +150,15 @@
 		CC0433D213B28C8C00D7D52E /* spref_cone_Interface_64.png in Resources */ = {isa = PBXBuildFile; fileRef = CC0433CC13B28C8C00D7D52E /* spref_cone_Interface_64.png */; };
 		CC0433D313B28C8C00D7D52E /* spref_cone_Subtitles_64.png in Resources */ = {isa = PBXBuildFile; fileRef = CC0433CD13B28C8C00D7D52E /* spref_cone_Subtitles_64.png */; };
 		CC0433D413B28C8C00D7D52E /* spref_cone_Video_64.png in Resources */ = {isa = PBXBuildFile; fileRef = CC0433CE13B28C8C00D7D52E /* spref_cone_Video_64.png */; };
+		CC2DB09A14A7550D0050A055 /* window-close-on.png in Resources */ = {isa = PBXBuildFile; fileRef = CC2DB09114A7550D0050A055 /* window-close-on.png */; };
+		CC2DB09B14A7550D0050A055 /* window-close-over.png in Resources */ = {isa = PBXBuildFile; fileRef = CC2DB09214A7550D0050A055 /* window-close-over.png */; };
+		CC2DB09C14A7550D0050A055 /* window-close.png in Resources */ = {isa = PBXBuildFile; fileRef = CC2DB09314A7550D0050A055 /* window-close.png */; };
+		CC2DB09D14A7550D0050A055 /* window-minimize-on.png in Resources */ = {isa = PBXBuildFile; fileRef = CC2DB09414A7550D0050A055 /* window-minimize-on.png */; };
+		CC2DB09E14A7550D0050A055 /* window-minimize-over.png in Resources */ = {isa = PBXBuildFile; fileRef = CC2DB09514A7550D0050A055 /* window-minimize-over.png */; };
+		CC2DB09F14A7550D0050A055 /* window-minimize.png in Resources */ = {isa = PBXBuildFile; fileRef = CC2DB09614A7550D0050A055 /* window-minimize.png */; };
+		CC2DB0A014A7550D0050A055 /* window-zoom-on.png in Resources */ = {isa = PBXBuildFile; fileRef = CC2DB09714A7550D0050A055 /* window-zoom-on.png */; };
+		CC2DB0A114A7550D0050A055 /* window-zoom-over.png in Resources */ = {isa = PBXBuildFile; fileRef = CC2DB09814A7550D0050A055 /* window-zoom-over.png */; };
+		CC2DB0A214A7550D0050A055 /* window-zoom.png in Resources */ = {isa = PBXBuildFile; fileRef = CC2DB09914A7550D0050A055 /* window-zoom.png */; };
 		CC3F9F861350B2A000B0E885 /* Growl.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC3F9F851350B2A000B0E885 /* Growl.framework */; };
 		CC402EB80E00ABBB006A4BA4 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = F69B0CA602E24F6401A80112 /* InfoPlist.strings */; };
 		CC402EB90E00ABBB006A4BA4 /* vlc.scriptSuite in Resources */ = {isa = PBXBuildFile; fileRef = 8EBF3FA303F13FFB0059A3A7 /* vlc.scriptSuite */; };
@@ -420,6 +429,15 @@
 		CC0CD0E213DE0EAE00B0D90D /* PXSourceListDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = PXSourceListDelegate.h; path = ../../../modules/gui/macosx/PXSourceListDelegate.h; sourceTree = "<group>"; };
 		CC1941240B9C1F8400635F6B /* QTKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QTKit.framework; path = /System/Library/Frameworks/QTKit.framework; sourceTree = "<absolute>"; };
 		CC1C41D00D9BAD7F002728FA /* noart.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = noart.png; path = Resources/noart.png; sourceTree = "<group>"; };
+		CC2DB09114A7550D0050A055 /* window-close-on.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "window-close-on.png"; path = "Resources/mainwindow_dark/window-close-on.png"; sourceTree = "<group>"; };
+		CC2DB09214A7550D0050A055 /* window-close-over.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "window-close-over.png"; path = "Resources/mainwindow_dark/window-close-over.png"; sourceTree = "<group>"; };
+		CC2DB09314A7550D0050A055 /* window-close.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "window-close.png"; path = "Resources/mainwindow_dark/window-close.png"; sourceTree = "<group>"; };
+		CC2DB09414A7550D0050A055 /* window-minimize-on.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "window-minimize-on.png"; path = "Resources/mainwindow_dark/window-minimize-on.png"; sourceTree = "<group>"; };
+		CC2DB09514A7550D0050A055 /* window-minimize-over.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "window-minimize-over.png"; path = "Resources/mainwindow_dark/window-minimize-over.png"; sourceTree = "<group>"; };
+		CC2DB09614A7550D0050A055 /* window-minimize.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "window-minimize.png"; path = "Resources/mainwindow_dark/window-minimize.png"; sourceTree = "<group>"; };
+		CC2DB09714A7550D0050A055 /* window-zoom-on.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "window-zoom-on.png"; path = "Resources/mainwindow_dark/window-zoom-on.png"; sourceTree = "<group>"; };
+		CC2DB09814A7550D0050A055 /* window-zoom-over.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "window-zoom-over.png"; path = "Resources/mainwindow_dark/window-zoom-over.png"; sourceTree = "<group>"; };
+		CC2DB09914A7550D0050A055 /* window-zoom.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "window-zoom.png"; path = "Resources/mainwindow_dark/window-zoom.png"; sourceTree = "<group>"; };
 		CC3DC89B0A7CDB9600B53F32 /* ApplicationServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ApplicationServices.framework; path = /System/Library/Frameworks/ApplicationServices.framework; sourceTree = "<absolute>"; };
 		CC3F9F851350B2A000B0E885 /* Growl.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Growl.framework; path = ../../../contrib/Growl.framework; sourceTree = "<absolute>"; };
 		CC402F4B0E00ABBB006A4BA4 /* VLC.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = VLC.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -793,6 +811,15 @@
 				CC04323813B246DF00D7D52E /* volume-low_dark.png */,
 				CC04323913B246DF00D7D52E /* volume-slider-knob_dark.png */,
 				CC04323A13B246DF00D7D52E /* volume-slider-track_dark.png */,
+				CC2DB09114A7550D0050A055 /* window-close-on.png */,
+				CC2DB09214A7550D0050A055 /* window-close-over.png */,
+				CC2DB09314A7550D0050A055 /* window-close.png */,
+				CC2DB09414A7550D0050A055 /* window-minimize-on.png */,
+				CC2DB09514A7550D0050A055 /* window-minimize-over.png */,
+				CC2DB09614A7550D0050A055 /* window-minimize.png */,
+				CC2DB09714A7550D0050A055 /* window-zoom-on.png */,
+				CC2DB09814A7550D0050A055 /* window-zoom-over.png */,
+				CC2DB09914A7550D0050A055 /* window-zoom.png */,
 			);
 			name = "dark variant";
 			sourceTree = "<group>";
@@ -1304,6 +1331,15 @@
 				CCC4A92914A40340006731E4 /* pictures.png in Resources */,
 				CCC4A92A14A40340006731E4 /* playlist.png in Resources */,
 				CCC4A92B14A40340006731E4 /* podcast.png in Resources */,
+				CC2DB09A14A7550D0050A055 /* window-close-on.png in Resources */,
+				CC2DB09B14A7550D0050A055 /* window-close-over.png in Resources */,
+				CC2DB09C14A7550D0050A055 /* window-close.png in Resources */,
+				CC2DB09D14A7550D0050A055 /* window-minimize-on.png in Resources */,
+				CC2DB09E14A7550D0050A055 /* window-minimize-over.png in Resources */,
+				CC2DB09F14A7550D0050A055 /* window-minimize.png in Resources */,
+				CC2DB0A014A7550D0050A055 /* window-zoom-on.png in Resources */,
+				CC2DB0A114A7550D0050A055 /* window-zoom-over.png in Resources */,
+				CC2DB0A214A7550D0050A055 /* window-zoom.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -21,12 +21,12 @@
     </object>
     <object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
       <bool key="EncodedWithXMLCoder">YES</bool>
-      <integer value="4596"/>
-      <integer value="334"/>
       <integer value="1617"/>
+      <integer value="4756"/>
+      <integer value="334"/>
+      <integer value="4596"/>
       <integer value="4758"/>
       <integer value="2730"/>
-      <integer value="2"/>
       <integer value="915"/>
       <integer value="4722"/>
     </object>
@@ -4016,6 +4016,7 @@ LCAuLi4</string>
                   </object>
                   <string key="NSFrame">{{1, 1}, {498, 102}}</string>
                   <reference key="NSSuperview" ref="563453281"/>
+                  <reference key="NSNextKeyView" ref="550703508"/>
                   <reference key="NSDocView" ref="550703508"/>
                   <reference key="NSBGColor" ref="712893775"/>
                   <reference key="NSCursor" ref="1071817267"/>
@@ -4044,6 +4045,7 @@ LCAuLi4</string>
               </object>
               <string key="NSFrame">{{92, 96}, {500, 104}}</string>
               <reference key="NSSuperview" ref="366395044"/>
+              <reference key="NSNextKeyView" ref="1059447005"/>
               <int key="NSsFlags">133650</int>
               <reference key="NSVScroller" ref="444566474"/>
               <reference key="NSHScroller" ref="599664251"/>
@@ -4497,14 +4499,14 @@ LCAuLi4</string>
             <string key="NSReuseIdentifierKey">_NS:610</string>
             <bool key="NSEnabled">YES</bool>
             <object class="NSButtonCell" key="NSCell" id="883426607">
-              <int key="NSCellFlags">-2080244224</int>
+              <int key="NSCellFlags">67239424</int>
               <int key="NSCellFlags2">134217728</int>
               <string key="NSContents"/>
               <reference key="NSSupport" ref="841513812"/>
               <string key="NSCellIdentifier">_NS:610</string>
               <reference key="NSControlView" ref="912813065"/>
-              <int key="NSButtonFlags">-2038284033</int>
-              <int key="NSButtonFlags2">134</int>
+              <int key="NSButtonFlags">-2046672641</int>
+              <int key="NSButtonFlags2">6</int>
               <string key="NSAlternateContents"/>
               <string key="NSKeyEquivalent"/>
               <int key="NSPeriodicDelay">200</int>
@@ -4514,7 +4516,7 @@ LCAuLi4</string>
           <object class="NSButton" id="47797873">
             <reference key="NSNextResponder" ref="471121744"/>
             <int key="NSvFlags">268</int>
-            <string key="NSFrame">{{48, 4.93359375}, {12, 12}}</string>
+            <string key="NSFrame">{{48, 3.93359375}, {15, 14}}</string>
             <reference key="NSSuperview" ref="471121744"/>
             <string key="NSReuseIdentifierKey">_NS:610</string>
             <bool key="NSEnabled">YES</bool>
@@ -4525,8 +4527,8 @@ LCAuLi4</string>
               <reference key="NSSupport" ref="841513812"/>
               <string key="NSCellIdentifier">_NS:610</string>
               <reference key="NSControlView" ref="47797873"/>
-              <int key="NSButtonFlags">-2038284033</int>
-              <int key="NSButtonFlags2">134</int>
+              <int key="NSButtonFlags">-2046672641</int>
+              <int key="NSButtonFlags2">6</int>
               <string key="NSAlternateContents"/>
               <string key="NSKeyEquivalent"/>
               <int key="NSPeriodicDelay">200</int>
@@ -4536,7 +4538,7 @@ LCAuLi4</string>
           <object class="NSButton" id="145580725">
             <reference key="NSNextResponder" ref="471121744"/>
             <int key="NSvFlags">268</int>
-            <string key="NSFrame">{{28, 5}, {12, 12}}</string>
+            <string key="NSFrame">{{28, 4}, {15, 14}}</string>
             <reference key="NSSuperview" ref="471121744"/>
             <string key="NSReuseIdentifierKey">_NS:610</string>
             <bool key="NSEnabled">YES</bool>
@@ -4547,8 +4549,8 @@ LCAuLi4</string>
               <reference key="NSSupport" ref="841513812"/>
               <string key="NSCellIdentifier">_NS:610</string>
               <reference key="NSControlView" ref="145580725"/>
-              <int key="NSButtonFlags">-2038284033</int>
-              <int key="NSButtonFlags2">134</int>
+              <int key="NSButtonFlags">-2046672641</int>
+              <int key="NSButtonFlags2">6</int>
               <string key="NSAlternateContents"/>
               <string key="NSKeyEquivalent"/>
               <int key="NSPeriodicDelay">200</int>
@@ -4558,7 +4560,7 @@ LCAuLi4</string>
           <object class="NSButton" id="369193052">
             <reference key="NSNextResponder" ref="471121744"/>
             <int key="NSvFlags">268</int>
-            <string key="NSFrame">{{8, 5}, {12, 12}}</string>
+            <string key="NSFrame">{{8, 4}, {15, 14}}</string>
             <reference key="NSSuperview" ref="471121744"/>
             <string key="NSReuseIdentifierKey">_NS:610</string>
             <bool key="NSEnabled">YES</bool>
@@ -4569,8 +4571,8 @@ LCAuLi4</string>
               <reference key="NSSupport" ref="841513812"/>
               <string key="NSCellIdentifier">_NS:610</string>
               <reference key="NSControlView" ref="369193052"/>
-              <int key="NSButtonFlags">-2038284033</int>
-              <int key="NSButtonFlags2">134</int>
+              <int key="NSButtonFlags">-2046672641</int>
+              <int key="NSButtonFlags2">6</int>
               <string key="NSAlternateContents"/>
               <string key="NSKeyEquivalent"/>
               <int key="NSPeriodicDelay">200</int>
@@ -10861,12 +10863,15 @@ LCAuLi4</string>
           <string>4758.IBViewBoundsToFrameTransform</string>
           <string>4759.IBPluginDependency</string>
           <string>4759.IBViewBoundsToFrameTransform</string>
+          <string>4760.CustomClassName</string>
           <string>4760.IBPluginDependency</string>
           <string>4761.IBPluginDependency</string>
           <string>4761.IBViewBoundsToFrameTransform</string>
+          <string>4762.CustomClassName</string>
           <string>4762.IBPluginDependency</string>
           <string>4763.IBPluginDependency</string>
           <string>4763.IBViewBoundsToFrameTransform</string>
+          <string>4764.CustomClassName</string>
           <string>4764.IBPluginDependency</string>
           <string>4765.IBPluginDependency</string>
           <string>4765.IBViewBoundsToFrameTransform</string>
@@ -11110,9 +11115,9 @@ LCAuLi4</string>
           <string>{{430, 565}, {137, 103}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
-          <string>{{329, 301}, {604, 310}}</string>
+          <string>{{246, 101}, {604, 310}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-          <string>{{329, 301}, {604, 310}}</string>
+          <string>{{246, 101}, {604, 310}}</string>
           <boolean value="YES"/>
           <boolean value="NO"/>
           <boolean value="YES"/>
@@ -11699,16 +11704,19 @@ LCAuLi4</string>
           <object class="NSAffineTransform">
             <bytes key="NSTransformStruct">P4AAAL+AAABBAAAAwXAAAA</bytes>
           </object>
+          <string>VLCWindowButtonCell</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <object class="NSAffineTransform">
             <bytes key="NSTransformStruct">P4AAAL+AAABB4AAAwXAAAA</bytes>
           </object>
+          <string>VLCWindowButtonCell</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <object class="NSAffineTransform">
             <bytes key="NSTransformStruct">P4AAAL+AAABCQAAAwXAAAA</bytes>
           </object>
+          <string>VLCWindowButtonCell</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <object class="NSAffineTransform">
@@ -16713,7 +16721,7 @@ LCAuLi4</string>
               </object>
             </object>
           </object>
-          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+          <object class="IBClassDescriptionSource" key="sourceIdentifier" id="444352063">
             <string key="majorKey">IBDocumentRelativeSource</string>
             <string key="minorKey">../../../../../modules/gui/macosx/MainWindowTitle.h</string>
           </object>
@@ -16730,6 +16738,11 @@ LCAuLi4</string>
             <string key="majorKey">IBDocumentRelativeSource</string>
             <string key="minorKey">../../../../../modules/gui/macosx/misc.h</string>
           </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">VLCWindowButtonCell</string>
+          <string key="superclassName">NSButtonCell</string>
+          <reference key="sourceIdentifier" ref="444352063"/>
         </object>
       </object>
       <object class="NSMutableArray" key="referencedPartialClassDescriptionsV3.2+">

@@ -40,7 +40,15 @@
     [self setImage: [NSImage imageNamed:@"bottom-background_dark"]];
     [self setAutoresizesSubviews: YES];
 
-    /* TODO: icon setters */
+    [o_red_btn setImage: [NSImage imageNamed:@"window-close"]];
+    [o_red_btn setAlternateImage: [NSImage imageNamed:@"window-close-on"]];
+    [[o_red_btn cell] setShowsBorderOnlyWhileMouseInside: YES];
+    [o_yellow_btn setImage: [NSImage imageNamed:@"window-minimize"]];
+    [o_yellow_btn setAlternateImage: [NSImage imageNamed:@"window-minimize-on"]];
+    [[o_yellow_btn cell] setShowsBorderOnlyWhileMouseInside: YES];
+    [o_green_btn setImage: [NSImage imageNamed:@"window-zoom"]];
+    [o_green_btn setAlternateImage: [NSImage imageNamed:@"window-zoom-on"]];
+    [[o_green_btn cell] setShowsBorderOnlyWhileMouseInside: YES];
 }
 
 - (BOOL)mouseDownCanMoveWindow
@@ -70,6 +78,36 @@
 - (void)setFullscreenButtonHidden:(BOOL)b_value
 {
     [o_fullscreen_btn setHidden: b_value];
+}
+
+- (void)setWindowButtonOver:(BOOL)b_value
+{
+    if( b_value )
+    {
+        [o_red_btn setImage: [NSImage imageNamed:@"window-close-over"]];
+        [o_yellow_btn setImage: [NSImage imageNamed:@"window-minimize-over"]];
+        [o_green_btn setImage: [NSImage imageNamed:@"window-zoom-over"]];
+    }
+    else
+    {
+        [o_red_btn setImage: [NSImage imageNamed:@"window-close"]];
+        [o_yellow_btn setImage: [NSImage imageNamed:@"window-minimize"]];
+        [o_green_btn setImage: [NSImage imageNamed:@"window-zoom"]];
+    }
+}
+
+@end
+
+@implementation VLCWindowButtonCell
+
+- (void)mouseEntered:(NSEvent *)theEvent
+{
+    [(VLCMainWindowTitleView *)[[self controlView] superview] setWindowButtonOver: YES];
+}
+
+- (void)mouseExited:(NSEvent *)theEvent
+{
+    [(VLCMainWindowTitleView *)[[self controlView] superview] setWindowButtonOver: NO];
 }
 
 @end

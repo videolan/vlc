@@ -39,5 +39,11 @@
 - (IBAction)buttonAction:(id)sender;
 - (void)setWindowTitle:(NSString *)title;
 - (void)setFullscreenButtonHidden:(BOOL)b_value;
+- (void)setWindowButtonOver:(BOOL)b_value;
 
+@end
+
+@interface VLCWindowButtonCell : NSButtonCell
+{
+}
 @end

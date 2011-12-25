@@ -279,6 +279,15 @@ EXTRA_DIST += \
 	extras/package/macosx/Resources/mainwindow_dark/volume-low_dark.png \
 	extras/package/macosx/Resources/mainwindow_dark/volume-slider-knob_dark.png \
 	extras/package/macosx/Resources/mainwindow_dark/volume-slider-track_dark.png \
+	extras/package/macosx/Resources/mainwindow_dark/window-close-on.png \
+	extras/package/macosx/Resources/mainwindow_dark/window-close-over.png \
+	extras/package/macosx/Resources/mainwindow_dark/window-close.png \
+	extras/package/macosx/Resources/mainwindow_dark/window-minimize-on.png \
+	extras/package/macosx/Resources/mainwindow_dark/window-minimize-over.png \
+	extras/package/macosx/Resources/mainwindow_dark/window-minimize.png \
+	extras/package/macosx/Resources/mainwindow_dark/window-zoom-on.png \
+	extras/package/macosx/Resources/mainwindow_dark/window-zoom-over.png \
+	extras/package/macosx/Resources/mainwindow_dark/window-zoom.png \
 	extras/package/macosx/Resources/noart.png \
 	extras/package/macosx/Resources/prefs/spref_cone_Audio_64.png \
 	extras/package/macosx/Resources/prefs/spref_cone_Hotkeys_64.png \
