@@ -64,6 +64,9 @@ namespace dash
                 void    setInitSegment      (dash::xml::Node *root, SegmentInfo *info);
                 bool    setSegments         (dash::xml::Node *root, SegmentInfo *info);
                 void    setMPDBaseUrl       (dash::xml::Node *root);
+                void    parseContentDescriptor( xml::Node *node, const std::string &name,
+                                                void (CommonAttributesElements::*addPtr)(ContentDescription*),
+                                                CommonAttributesElements *self ) const;
                 bool    parseCommonAttributesElements( dash::xml::Node *node, CommonAttributesElements *common ) const;
                 bool    parseSegment( Segment *seg, const std::map<std::string, std::string> &attr );
                 ProgramInformation*     parseProgramInformation();

@@ -26,6 +26,7 @@
 #endif
 
 #include "BasicCMParser.h"
+#include "mpd/ContentDescription.h"
 
 #include <cstdlib>
 #include <sstream>
@@ -129,6 +130,7 @@ void    BasicCMParser::setMPDBaseUrl        (Node *root)
         this->mpd->addBaseUrl(url);
     }
 }
+
 void    BasicCMParser::setPeriods           (Node *root)
 {
     std::vector<Node *> periods = DOMHelper::getElementByTagName(root, "Period", false);
@@ -322,6 +324,33 @@ MPD*    BasicCMParser::getMPD()
     return this->mpd;
 }
 
+void BasicCMParser::parseContentDescriptor(Node *node, const std::string &name, void (CommonAttributesElements::*addPtr)(ContentDescription *), CommonAttributesElements *self) const
+{
+    std::vector<Node*>  descriptors = DOMHelper::getChildElementByTagName( node, name );
+    if ( descriptors.empty() == true )
+        return ;
+    std::vector<Node*>::const_iterator  it = descriptors.begin();
+    std::vector<Node*>::const_iterator  end = descriptors.end();
+
+    while ( it != end )
+    {
+        const std::map<std::string, std::string>    attr = (*it)->getAttributes();
+        std::map<std::string, std::string>::const_iterator  itAttr = attr.find( "schemeIdUri" );
+        if  ( itAttr == attr.end() )
+        {
+            ++it;
+            continue ;
+        }
+        ContentDescription  *desc = new ContentDescription;
+        desc->setSchemeIdUri( itAttr->second );
+        Node    *schemeInfo = DOMHelper::getFirstChildElementByName( node, "SchemeInformation" );
+        if ( schemeInfo != NULL )
+            desc->setSchemeInformation( schemeInfo->getText() );
+        (self->*addPtr)( desc );
+        ++it;
+    }
+}
+
 bool    BasicCMParser::parseCommonAttributesElements( Node *node, CommonAttributesElements *common) const
 {
     const std::map<std::string, std::string>                &attr = node->getAttributes();
@@ -384,6 +413,16 @@ bool    BasicCMParser::parseCommonAttributesElements( Node *node, CommonAttribut
             common->addSampleRate( rate );
         }
     }
+    this->parseContentDescriptor( node, "ContentProtection",
+                                  &CommonAttributesElements::addContentProtection,
+                                  common );
+    this->parseContentDescriptor( node, "Accessibility",
+                                  &CommonAttributesElements::addAccessibility,
+                                  common );
+    this->parseContentDescriptor( node, "Rating",
+                                  &CommonAttributesElements::addRating, common );
+    this->parseContentDescriptor( node, "Viewpoint",
+                                  &CommonAttributesElements::addViewpoint, common );
     //FIXME: Handle : group, maximumRAPPeriod startWithRAP attributes
     //FIXME: Handle : ContentProtection Accessibility Rating Viewpoing MultipleViews elements
     return true;

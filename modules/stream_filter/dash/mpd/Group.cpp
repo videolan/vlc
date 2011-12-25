@@ -24,27 +24,20 @@
 
 #include "Group.h"
 
+#include <vlc_common.h>
+#include <vlc_arrays.h>
+
 using namespace dash::mpd;
 using namespace dash::exception;
 
 Group::Group    ( const std::map<std::string, std::string>&  attributes) :
-    attributes( attributes ),
-    contentProtection( NULL ),
-    accessibility( NULL ),
-    viewpoint( NULL ),
-    rating( NULL )
+    attributes( attributes )
 {
 }
 
 Group::~Group   ()
 {
-    for(size_t i = 1; i < this->representations.size(); i++)
-        delete(this->representations.at(i));
-
-    delete(this->contentProtection);
-    delete(this->rating);
-    delete(this->viewpoint);
-    delete(this->accessibility);
+    vlc_delete_all( this->representations );
 }
 
 std::string                     Group::getSubSegmentAlignment   () throw(AttributeNotPresentException)
@@ -53,30 +46,6 @@ std::string                     Group::getSubSegmentAlignment   () throw(Attribu
         throw AttributeNotPresentException();
 
     return this->attributes["subsegmentAlignmentFlag"];
-}
-
-Viewpoint*                      Group::getViewpoint             () throw(ElementNotPresentException)
-{
-    if(this->viewpoint == NULL)
-        throw ElementNotPresentException();
-
-    return this->viewpoint;
-}
-
-Rating*                         Group::getRating                () throw(ElementNotPresentException)
-{
-    if(this->rating == NULL)
-        throw ElementNotPresentException();
-
-    return this->rating;
-}
-
-Accessibility*                  Group::getAccessibility         () throw(ElementNotPresentException)
-{
-    if(this->accessibility == NULL)
-        throw ElementNotPresentException();
-
-    return this->accessibility;
 }
 
 std::vector<Representation*>    Group::getRepresentations       ()
@@ -101,24 +70,4 @@ const Representation *Group::getRepresentationById(const std::string &id) const
 void                            Group::addRepresentation        (Representation *rep)
 {
     this->representations.push_back(rep);
-}
-
-void                            Group::setRating                (Rating *rating)
-{
-    this->rating = rating;
-}
-
-void                            Group::setContentProtection     (ContentProtection *protection)
-{
-    this->contentProtection = protection;
-}
-
-void                            Group::setAccessibility         (Accessibility *accessibility)
-{
-    this->accessibility = accessibility;
-}
-
-void                            Group::setViewpoint             (Viewpoint *viewpoint)
-{
-    this->viewpoint = viewpoint;
 }

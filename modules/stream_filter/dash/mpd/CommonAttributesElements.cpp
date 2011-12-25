@@ -23,22 +23,28 @@
 
 #include "CommonAttributesElements.h"
 
+#include "mpd/ContentDescription.h"
+
+#include <vlc_common.h>
+#include <vlc_arrays.h>
+
 using namespace dash::mpd;
-using namespace dash::exception;
 
 CommonAttributesElements::CommonAttributesElements() :
     width( -1 ),
     height( -1 ),
     parX( 1 ),
     parY( 1 ),
-    frameRate( -1 ),
-    contentProtection( NULL )
+    frameRate( -1 )
 {
 }
 
 CommonAttributesElements::~CommonAttributesElements()
 {
-    delete this->contentProtection;
+    vlc_delete_all( this->contentProtections );
+    vlc_delete_all( this->accessibilities );
+    vlc_delete_all( this->ratings );
+    vlc_delete_all( this->viewpoints );
 }
 
 const std::string&      CommonAttributesElements::getMimeType() const
@@ -139,10 +145,46 @@ void    CommonAttributesElements::addSampleRate( int sampleRate )
         this->sampleRates.push_back( sampleRate );
 }
 
-ContentProtection*  CommonAttributesElements::getContentProtection    () const throw(ElementNotPresentException)
+const std::list<ContentDescription*> &CommonAttributesElements::getContentProtections() const
 {
-    if(this->contentProtection == NULL)
-        throw ElementNotPresentException();
+    return this->contentProtections;
+}
 
-    return this->contentProtection;
+void CommonAttributesElements::addContentProtection(ContentDescription *desc)
+{
+    if ( desc != NULL )
+        this->contentProtections.push_back( desc );
+}
+
+const std::list<ContentDescription*> &CommonAttributesElements::getAccessibilities() const
+{
+    return this->accessibilities;
+}
+
+void CommonAttributesElements::addAccessibility(ContentDescription *desc)
+{
+    if ( desc )
+        this->accessibilities.push_back( desc );
+}
+
+const std::list<ContentDescription*> &CommonAttributesElements::getRatings() const
+{
+    return this->ratings;
+}
+
+void CommonAttributesElements::addRating(ContentDescription *desc)
+{
+    if ( desc )
+        this->ratings.push_back( desc );
+}
+
+const std::list<ContentDescription*> &CommonAttributesElements::getViewpoints() const
+{
+    return this->viewpoints;
+}
+
+void CommonAttributesElements::addViewpoint(ContentDescription *desc)
+{
+    if ( desc )
+        this->viewpoints.push_back( desc );
 }

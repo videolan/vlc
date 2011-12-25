@@ -87,10 +87,7 @@ void                Representation::setTrickModeType        (TrickModeType *tric
 {
     this->trickModeType = trickModeType;
 }
-void                Representation::setContentProtection    (ContentProtection *protection)
-{
-    this->contentProtection = protection;
-}
+
 void                Representation::setSegmentInfo          (SegmentInfo *info)
 {
     this->segmentInfo = info;

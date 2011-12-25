@@ -30,8 +30,6 @@
 #include "mpd/CommonAttributesElements.h"
 #include "mpd/SegmentInfo.h"
 #include "mpd/TrickModeType.h"
-#include "mpd/ContentProtection.h"
-#include "exceptions/AttributeNotPresentException.h"
 #include "exceptions/ElementNotPresentException.h"
 
 namespace dash
@@ -62,7 +60,6 @@ namespace dash
 
                 void    setSegmentInfo         (SegmentInfo *info);
                 void    setTrickModeType       (TrickModeType *trickModeType);
-                void    setContentProtection   (ContentProtection *protection);
 
             private:
                 int                                 bandwidth;

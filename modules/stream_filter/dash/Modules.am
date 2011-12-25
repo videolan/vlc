@@ -20,7 +20,6 @@ SOURCES_stream_filter_dash = \
     http/HTTPConnectionManager.cpp \
     http/HTTPConnectionManager.h \
     http/IHTTPConnection.h \
-    mpd/Accessibility.h \
     mpd/BaseUrl.h \
     mpd/BasicCMManager.cpp \
     mpd/BasicCMManager.h \
@@ -30,7 +29,6 @@ SOURCES_stream_filter_dash = \
     mpd/CommonAttributesElements.h \
     mpd/ContentDescription.cpp \
     mpd/ContentDescription.h \
-    mpd/ContentProtection.h \
     mpd/Group.cpp \
     mpd/Group.h \
     mpd/IMPDManager.h \
@@ -45,18 +43,14 @@ SOURCES_stream_filter_dash = \
     mpd/Period.h \
     mpd/ProgramInformation.cpp \
     mpd/ProgramInformation.h \
-    mpd/Rating.h \
     mpd/Representation.cpp \
     mpd/Representation.h \
-    mpd/SchemeInformation.cpp \
-    mpd/SchemeInformation.h \
     mpd/Segment.cpp \
     mpd/Segment.h \
     mpd/SegmentInfo.cpp \
     mpd/SegmentInfo.h \
     mpd/TrickModeType.cpp \
     mpd/TrickModeType.h \
-    mpd/Viewpoint.h \
     xml/DOMHelper.cpp \
     xml/DOMHelper.h \
     xml/DOMParser.cpp \

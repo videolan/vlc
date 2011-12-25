@@ -31,12 +31,7 @@
 
 #include "mpd/Representation.h"
 #include "mpd/CommonAttributesElements.h"
-#include "mpd/ContentProtection.h"
-#include "mpd/Accessibility.h"
-#include "mpd/Viewpoint.h"
-#include "mpd/Rating.h"
 #include "exceptions/AttributeNotPresentException.h"
-#include "exceptions/ElementNotPresentException.h"
 
 namespace dash
 {
@@ -51,23 +46,12 @@ namespace dash
                 std::string                     getSubSegmentAlignment  () throw(dash::exception::AttributeNotPresentException);
                 std::vector<Representation *>   getRepresentations      ();
                 const Representation*           getRepresentationById   ( const std::string &id ) const;
-                Viewpoint*                      getViewpoint            () throw(dash::exception::ElementNotPresentException);
-                Accessibility*                  getAccessibility        () throw(dash::exception::ElementNotPresentException);
-                Rating*                         getRating               () throw(dash::exception::ElementNotPresentException);
 
                 void addRepresentation      (Representation *rep);
-                void setViewpoint           (Viewpoint *viewpoint);
-                void setContentProtection   (ContentProtection *protection);
-                void setAccessibility       (Accessibility *accessibility);
-                void setRating              (Rating *rating);
 
             private:
                 std::map<std::string, std::string>  attributes;
                 std::vector<Representation *>       representations;
-                ContentProtection                   *contentProtection;
-                Accessibility                       *accessibility;
-                Viewpoint                           *viewpoint;
-                Rating                              *rating;
         };
     }
 }

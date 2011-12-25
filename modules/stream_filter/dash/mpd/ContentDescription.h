@@ -26,11 +26,6 @@
 #define CONTENTDESCRIPTION_H_
 
 #include <string>
-#include <map>
-
-#include "mpd/SchemeInformation.h"
-#include "exceptions/AttributeNotPresentException.h"
-#include "exceptions/ElementNotPresentException.h"
 
 namespace dash
 {
@@ -39,16 +34,14 @@ namespace dash
         class ContentDescription
         {
             public:
-                ContentDescription          (std::map<std::string, std::string>  attributes);
-                virtual ~ContentDescription ();
-
-                std::string         getSchemeIdUri          () throw(dash::exception::AttributeNotPresentException);
-                SchemeInformation*  getSchemeInformation    () throw(dash::exception::ElementNotPresentException);
-                void                setSchemeInformation    (SchemeInformation *schemeInfo);
+                const std::string&          getSchemeIdUri() const;
+                void                        setSchemeIdUri( const std::string &uri );
+                const std::string&          getSchemeInformation() const;
+                void                        setSchemeInformation( const std::string &schemeInfo );
 
             private:
-                std::map<std::string, std::string>  attributes;
-                SchemeInformation                   *schemeInformation;
+                std::string                 schemeIdUri;
+                std::string                 schemeInformation;
         };
     }
 }

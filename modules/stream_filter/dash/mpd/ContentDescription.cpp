@@ -28,34 +28,25 @@
 #include "ContentDescription.h"
 
 using namespace dash::mpd;
-using namespace dash::exception;
 
-ContentDescription::ContentDescription  (std::map<std::string,std::string> attributes)
+void ContentDescription::setSchemeIdUri(const std::string &uri)
 {
-    this->attributes        = attributes;
-    this->schemeInformation = NULL;
-}
-ContentDescription::~ContentDescription ()
-{
-    delete(this->schemeInformation);
+    if ( uri.empty() == false )
+        this->schemeIdUri = uri;
 }
 
-SchemeInformation*  ContentDescription::getSchemeInformation    () throw(ElementNotPresentException)
+const std::string&      ContentDescription::getSchemeIdUri() const
 {
-    if(this->schemeInformation == NULL)
-        throw ElementNotPresentException();
+    return this->schemeIdUri;
+}
 
+const std::string& ContentDescription::getSchemeInformation() const
+{
     return this->schemeInformation;
 }
-std::string         ContentDescription::getSchemeIdUri          () throw(AttributeNotPresentException)
-{
-    if(this->attributes.find("schemeIdUri") == this->attributes.end())
-        throw AttributeNotPresentException();
 
-    return this->attributes["schmeIdUri"];
-
-}
-void                ContentDescription::setSchemeInformation    (SchemeInformation *schemeInfo)
+void                    ContentDescription::setSchemeInformation( const std::string &schemeInfo )
 {
-    this->schemeInformation = schemeInfo;
+    if ( schemeInfo.empty() == false )
+        this->schemeInformation = schemeInfo;
 }

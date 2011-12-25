@@ -27,13 +27,12 @@
 #include <list>
 #include <string>
 
-#include "exceptions/ElementNotPresentException.h"
-#include "mpd/ContentProtection.h"
-
 namespace dash
 {
     namespace mpd
     {
+        class   ContentDescription;
+
         class CommonAttributesElements
         {
             public:
@@ -57,7 +56,14 @@ namespace dash
                 void                            addChannel( const std::string &channel );
                 const std::list<int>&           getSamplingRates() const;
                 void                            addSampleRate( int sampleRate );
-                ContentProtection*              getContentProtection() const throw(dash::exception::ElementNotPresentException);
+                const std::list<ContentDescription*>&   getContentProtections() const;
+                void                                    addContentProtection( ContentDescription *desc );
+                const std::list<ContentDescription*>&   getAccessibilities() const;
+                void                                    addAccessibility( ContentDescription *desc );
+                const std::list<ContentDescription*>&   getRatings() const;
+                void                                    addRating( ContentDescription* desc );
+                const std::list<ContentDescription*>&   getViewpoints() const;
+                void                                    addViewpoint( ContentDescription *desc );
 
             protected:
                 std::string                         mimeType;
@@ -69,7 +75,10 @@ namespace dash
                 std::list<std::string>              lang;
                 std::list<std::string>              channels;
                 std::list<int>                      sampleRates;
-                ContentProtection                   *contentProtection;
+                std::list<ContentDescription*>      contentProtections;
+                std::list<ContentDescription*>      accessibilities;
+                std::list<ContentDescription*>      ratings;
+                std::list<ContentDescription*>      viewpoints;
         };
     }
 }
