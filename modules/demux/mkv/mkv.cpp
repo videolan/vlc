@@ -520,6 +520,14 @@ void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock
     tk->b_inited = true;
 
 
+    size_t frame_size = 0;
+    size_t block_size = 0;
+
+    if( simpleblock != NULL )
+        block_size = simpleblock->GetSize();
+    else
+        block_size = block->GetSize();
+ 
     for( unsigned int i = 0;
          ( block != NULL && i < block->NumberFrames()) || ( simpleblock != NULL && i < simpleblock->NumberFrames() );
          i++ )
@@ -535,9 +543,14 @@ void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock
         else
         {
             data = &block->GetBuffer(i);
+            // condition when the DTS is correct (keyframe or B frame == NOT P frame)
         }
-        if( !data->Buffer() || data->Size() > SIZE_MAX )
+        frame_size += data->Size();
+        if( !data->Buffer() || data->Size() > SIZE_MAX || frame_size > block_size  )
+        {
+            msg_Warn( p_demux, "Cannot read frame (too long or no frame)" );
             break;
+        }
 
         if( tk->i_compression_type == MATROSKA_COMPRESSION_HEADER && tk->p_compression_data != NULL )
             p_block = MemToBlock( data->Buffer(), data->Size(), tk->p_compression_data->GetSize() );
