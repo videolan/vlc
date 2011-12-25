@@ -40,6 +40,7 @@
 - (void)setWindowTitle:(NSString *)title;
 - (void)setFullscreenButtonHidden:(BOOL)b_value;
 - (void)setWindowButtonOver:(BOOL)b_value;
+- (void)setWindowFullscreenButtonOver:(BOOL)b_value;
 
 @end
 

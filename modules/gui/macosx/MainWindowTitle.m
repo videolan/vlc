@@ -43,12 +43,19 @@
     [o_red_btn setImage: [NSImage imageNamed:@"window-close"]];
     [o_red_btn setAlternateImage: [NSImage imageNamed:@"window-close-on"]];
     [[o_red_btn cell] setShowsBorderOnlyWhileMouseInside: YES];
+    [[o_red_btn cell] setTag: 0];
     [o_yellow_btn setImage: [NSImage imageNamed:@"window-minimize"]];
     [o_yellow_btn setAlternateImage: [NSImage imageNamed:@"window-minimize-on"]];
     [[o_yellow_btn cell] setShowsBorderOnlyWhileMouseInside: YES];
+    [[o_yellow_btn cell] setTag: 1];
     [o_green_btn setImage: [NSImage imageNamed:@"window-zoom"]];
     [o_green_btn setAlternateImage: [NSImage imageNamed:@"window-zoom-on"]];
     [[o_green_btn cell] setShowsBorderOnlyWhileMouseInside: YES];
+    [[o_green_btn cell] setTag: 2];
+    [o_fullscreen_btn setImage: [NSImage imageNamed:@"window-fullscreen"]];
+    [o_fullscreen_btn setAlternateImage: [NSImage imageNamed:@"window-fullscreen-on"]];
+    [[o_fullscreen_btn cell] setShowsBorderOnlyWhileMouseInside: YES];
+    [[o_fullscreen_btn cell] setTag: 3];
 }
 
 - (BOOL)mouseDownCanMoveWindow
@@ -96,18 +103,32 @@
     }
 }
 
+- (void)setWindowFullscreenButtonOver:(BOOL)b_value
+{
+    if (b_value)
+        [o_fullscreen_btn setImage: [NSImage imageNamed:@"window-fullscreen-over"]];
+    else
+        [o_fullscreen_btn setImage: [NSImage imageNamed:@"window-fullscreen"]];
+}
+
 @end
 
 @implementation VLCWindowButtonCell
 
 - (void)mouseEntered:(NSEvent *)theEvent
 {
-    [(VLCMainWindowTitleView *)[[self controlView] superview] setWindowButtonOver: YES];
+    if ([self tag] == 3)
+        [(VLCMainWindowTitleView *)[[self controlView] superview] setWindowFullscreenButtonOver: YES];
+    else
+        [(VLCMainWindowTitleView *)[[self controlView] superview] setWindowButtonOver: YES];
 }
 
 - (void)mouseExited:(NSEvent *)theEvent
 {
-    [(VLCMainWindowTitleView *)[[self controlView] superview] setWindowButtonOver: NO];
+    if ([self tag] == 3)
+        [(VLCMainWindowTitleView *)[[self controlView] superview] setWindowFullscreenButtonOver: NO];
+    else
+        [(VLCMainWindowTitleView *)[[self controlView] superview] setWindowButtonOver: NO];
 }
 
 @end

@@ -282,6 +282,9 @@ EXTRA_DIST += \
 	extras/package/macosx/Resources/mainwindow_dark/window-close-on.png \
 	extras/package/macosx/Resources/mainwindow_dark/window-close-over.png \
 	extras/package/macosx/Resources/mainwindow_dark/window-close.png \
+	extras/package/macosx/Resources/mainwindow_dark/window-fullscreen-on.png \
+	extras/package/macosx/Resources/mainwindow_dark/window-fullscreen-over.png \
+	extras/package/macosx/Resources/mainwindow_dark/window-fullscreen.png \
 	extras/package/macosx/Resources/mainwindow_dark/window-minimize-on.png \
 	extras/package/macosx/Resources/mainwindow_dark/window-minimize-over.png \
 	extras/package/macosx/Resources/mainwindow_dark/window-minimize.png \

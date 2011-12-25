@@ -202,6 +202,9 @@
 		CC58012C1423A85300166912 /* fs_volume_slider_bar@x1.5.png in Resources */ = {isa = PBXBuildFile; fileRef = CC5801111423A85300166912 /* fs_volume_slider_bar@x1.5.png */; };
 		CC58012D1423A85300166912 /* fs_volume_slider_knob_highlight@x1.5.png in Resources */ = {isa = PBXBuildFile; fileRef = CC5801121423A85300166912 /* fs_volume_slider_knob_highlight@x1.5.png */; };
 		CC58012E1423A85300166912 /* fs_volume_slider_knob@x1.5.png in Resources */ = {isa = PBXBuildFile; fileRef = CC5801131423A85300166912 /* fs_volume_slider_knob@x1.5.png */; };
+		CC6FA91914A78AE700353C5F /* window-fullscreen-on.png in Resources */ = {isa = PBXBuildFile; fileRef = CC6FA91614A78AE700353C5F /* window-fullscreen-on.png */; };
+		CC6FA91A14A78AE700353C5F /* window-fullscreen-over.png in Resources */ = {isa = PBXBuildFile; fileRef = CC6FA91714A78AE700353C5F /* window-fullscreen-over.png */; };
+		CC6FA91B14A78AE700353C5F /* window-fullscreen.png in Resources */ = {isa = PBXBuildFile; fileRef = CC6FA91814A78AE700353C5F /* window-fullscreen.png */; };
 		CC78DA4413DE056700E9603C /* topbar_background.png in Resources */ = {isa = PBXBuildFile; fileRef = CC78DA4313DE056700E9603C /* topbar_background.png */; };
 		CC8062641021F8790021EB9A /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = CC8062631021F8790021EB9A /* dsa_pub.pem */; };
 		CC84FB2D130083BB00816D38 /* BGHUDAppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC84FB2C130083BB00816D38 /* BGHUDAppKit.framework */; };
@@ -500,6 +503,9 @@
 		CC6D8D9D0A878DED006F2BBE /* AppleRemote.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppleRemote.m; path = ../../../modules/gui/macosx/AppleRemote.m; sourceTree = SOURCE_ROOT; };
 		CC6EDD4F0B9CA2140096068A /* eyetv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = eyetv.h; path = ../../../modules/gui/macosx/eyetv.h; sourceTree = SOURCE_ROOT; };
 		CC6EDD500B9CA2140096068A /* eyetv.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = eyetv.m; path = ../../../modules/gui/macosx/eyetv.m; sourceTree = SOURCE_ROOT; };
+		CC6FA91614A78AE700353C5F /* window-fullscreen-on.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "window-fullscreen-on.png"; path = "Resources/mainwindow_dark/window-fullscreen-on.png"; sourceTree = "<group>"; };
+		CC6FA91714A78AE700353C5F /* window-fullscreen-over.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "window-fullscreen-over.png"; path = "Resources/mainwindow_dark/window-fullscreen-over.png"; sourceTree = "<group>"; };
+		CC6FA91814A78AE700353C5F /* window-fullscreen.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "window-fullscreen.png"; path = "Resources/mainwindow_dark/window-fullscreen.png"; sourceTree = "<group>"; };
 		CC707EC3137464CD0003010A /* TrackSynchronization.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TrackSynchronization.h; path = ../../../modules/gui/macosx/TrackSynchronization.h; sourceTree = "<group>"; };
 		CC707EC4137464CD0003010A /* TrackSynchronization.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TrackSynchronization.m; path = ../../../modules/gui/macosx/TrackSynchronization.m; sourceTree = "<group>"; };
 		CC772DAC10E621C100675C9B /* VLCProgressPanel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCProgressPanel.h; path = ../../../modules/gui/macosx_dialog_provider/VLCProgressPanel.h; sourceTree = SOURCE_ROOT; };
@@ -814,6 +820,9 @@
 				CC2DB09114A7550D0050A055 /* window-close-on.png */,
 				CC2DB09214A7550D0050A055 /* window-close-over.png */,
 				CC2DB09314A7550D0050A055 /* window-close.png */,
+				CC6FA91614A78AE700353C5F /* window-fullscreen-on.png */,
+				CC6FA91714A78AE700353C5F /* window-fullscreen-over.png */,
+				CC6FA91814A78AE700353C5F /* window-fullscreen.png */,
 				CC2DB09414A7550D0050A055 /* window-minimize-on.png */,
 				CC2DB09514A7550D0050A055 /* window-minimize-over.png */,
 				CC2DB09614A7550D0050A055 /* window-minimize.png */,
@@ -1340,6 +1349,9 @@
 				CC2DB0A014A7550D0050A055 /* window-zoom-on.png in Resources */,
 				CC2DB0A114A7550D0050A055 /* window-zoom-over.png in Resources */,
 				CC2DB0A214A7550D0050A055 /* window-zoom.png in Resources */,
+				CC6FA91914A78AE700353C5F /* window-fullscreen-on.png in Resources */,
+				CC6FA91A14A78AE700353C5F /* window-fullscreen-over.png in Resources */,
+				CC6FA91B14A78AE700353C5F /* window-fullscreen.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
