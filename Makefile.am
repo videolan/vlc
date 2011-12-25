@@ -449,6 +449,7 @@ vlc$(EXEEXT):
 ###############################################################################
 install-exec-hook:
 	if test "$(build)" = "$(host)"; then \
+		PATH="$(DESTDIR)$(bindir):$$PATH" \
 		LD_LIBRARY_PATH="$(DESTDIR)$(libdir):$$LD_LIBRARY_PATH" \
 		"$(DESTDIR)$(vlclibdir)/vlc-cache-gen$(EXEEXT)" \
 			 "$(DESTDIR)$(vlclibdir)/plugins" ; \
