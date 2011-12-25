@@ -73,11 +73,13 @@ static VLCMainWindow *_o_sharedInstance = nil;
     b_dark_interface = config_GetInt( VLCIntf, "macosx-interfacestyle" );
 
     if (b_dark_interface)
+    {
 #ifdef MAC_OS_X_VERSION_10_7
         styleMask = NSBorderlessWindowMask | NSResizableWindowMask;
 #else
         styleMask = NSBorderlessWindowMask;
 #endif
+    }
 
     self = [super initWithContentRect:contentRect styleMask:styleMask
                               backing:backingType defer:flag];
@@ -700,7 +702,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
  *              Felipe A. Rodriguez <far@ix.netcom.com>, Richard Frith-Macdonald <richard@brainstorm.co.uk>
  *    Copyright (C) 1996 Free Software Foundation, Inc.
  */
-- (NSRect) constrainFrameRect: (NSRect)frameRect toScreen: (NSScreen*)screen
+- (NSRect) customConstrainFrameRect: (NSRect)frameRect toScreen: (NSScreen*)screen
 {
     NSRect screenRect = [screen visibleFrame];
     float difference;
@@ -764,7 +766,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
         maxRect = [[self delegate] windowWillUseStandardFrame: self defaultFrame: maxRect];
     }
 
-    maxRect = [self constrainFrameRect: maxRect toScreen: [self screen]];
+    maxRect = [self customConstrainFrameRect: maxRect toScreen: [self screen]];
 
     // Compare the new frame with the current one
     if ((abs(NSMaxX(maxRect) - NSMaxX(currentFrame)) < DIST)
@@ -775,7 +777,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
         // Already in zoomed mode, reset user frame, if stored
         if ([self frameAutosaveName] != nil)
         {
-            [self setFrameFromString: o_previouslySavedFrame];
+            [self setFrame: previousSavedFrame display: YES animate: YES];
             [self saveFrameUsingName: [self frameAutosaveName]];
         }
         return;
@@ -784,11 +786,10 @@ static VLCMainWindow *_o_sharedInstance = nil;
     if ([self frameAutosaveName] != nil)
     {
         [self saveFrameUsingName: [self frameAutosaveName]];
-        [o_previouslySavedFrame release];
-        o_previouslySavedFrame = [[self stringWithSavedFrame] retain];
+        previousSavedFrame = [self frame];
     }
 
-    [self setFrame: maxRect display: YES];
+    [self setFrame: maxRect display: YES animate: YES];
 }
 
 #pragma mark -

@@ -113,7 +113,7 @@
     NSSize nativeVideoSize;
 
     NSInteger i_originalLevel;
-    NSString *o_previouslySavedFrame;
+    NSRect previousSavedFrame;
 }
 + (VLCMainWindow *)sharedInstance;
 
