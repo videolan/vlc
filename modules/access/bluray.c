@@ -94,7 +94,7 @@ static int blurayOpen( vlc_object_t *object )
 
     char *pos_title;
     int i_title = -1;
-    char bd_path[PATH_MAX];
+    char bd_path[PATH_MAX] = { '\0' };
     const char *error_msg = NULL;
 
     if (strcmp(p_demux->psz_access, "bluray")) {
@@ -117,8 +117,10 @@ static int blurayOpen( vlc_object_t *object )
     TAB_INIT( p_sys->i_title, p_sys->pp_title );
 
     /* store current bd_path */
-    strncpy(bd_path, p_demux->psz_file, sizeof(bd_path));
-    bd_path[PATH_MAX - 1] = '\0';
+    if (p_demux->psz_file) {
+        strncpy(bd_path, p_demux->psz_file, sizeof(bd_path));
+        bd_path[PATH_MAX - 1] = '\0';
+    }
 
     p_sys->bluray = bd_open(bd_path, NULL);
     if (!p_sys->bluray) {
