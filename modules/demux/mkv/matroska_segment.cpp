@@ -427,7 +427,7 @@ void matroska_segment_c::IndexAppendCluster( KaxCluster *cluster )
     idx.i_track       = -1;
     idx.i_block_number= -1;
     idx.i_position    = cluster->GetElementPosition();
-    idx.i_time        = -1;
+    idx.i_time        = cluster->GlobalTimecode()/ (mtime_t) 1000;
     idx.b_key         = true;
 
     i_index++;
@@ -668,8 +668,9 @@ bool matroska_segment_c::LoadSeekHeadItem( const EbmlCallbacks & ClassInfos, int
 
 struct spoint
 {
-    spoint(unsigned int tk): i_track(tk),i_date(0), i_seek_pos(0), i_cluster_pos(0),
-                             p_next(NULL){}
+    spoint(unsigned int tk, mtime_t date, int64_t pos, int64_t cpos):
+        i_track(tk),i_date(date), i_seek_pos(pos),
+        i_cluster_pos(cpos), p_next(NULL){}
     unsigned int     i_track;
     mtime_t i_date;
     int64_t i_seek_pos;
@@ -693,7 +694,13 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset, int64_t i_
     {
         /* Special case for seeking in files with no cues */
         EbmlElement *el = NULL;
-        es.I_O().setFilePointer( i_start_pos, seek_beginning );
+
+        /* Start from the last known index instead of the beginning eachtime */
+        if( i_index == 0)
+            es.I_O().setFilePointer( i_start_pos, seek_beginning );
+        else
+            es.I_O().setFilePointer( p_indexes[ i_index - 1 ].i_position,
+                                     seek_beginning );
         delete ep;
         ep = new EbmlParser( &es, segment, &sys.demuxer );
         cluster = NULL;
@@ -705,20 +712,16 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset, int64_t i_
                 cluster = (KaxCluster *)el;
                 i_cluster_pos = cluster->GetElementPosition();
                 if( i_index == 0 ||
-                        ( i_index > 0 && p_indexes[i_index - 1].i_position < (int64_t)cluster->GetElementPosition() ) )
+                    ( i_index > 0 &&
+                      p_indexes[i_index - 1].i_position < (int64_t)cluster->GetElementPosition() ) )
                 {
+                    ParseCluster();
                     IndexAppendCluster( cluster );
                 }
                 if( es.I_O().getFilePointer() >= (unsigned) i_global_position )
-                {
-                    ParseCluster();
-                    msg_Dbg( &sys.demuxer, "we found a cluster that is in the neighbourhood" );
-                    return;
-                }
+                    break;
             }
         }
-        msg_Err( &sys.demuxer, "This file has no cues, and we were unable to seek to the requested position by parsing." );
-        return;
     }
 
     /* Don't try complex seek if we seek to 0 */
@@ -766,7 +769,7 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset, int64_t i_
     {
         if( tracks[i_track]->fmt.i_cat == VIDEO_ES )
         {
-            spoint * seekpoint = new spoint(i_track);
+            spoint * seekpoint = new spoint(i_track, i_seek_time, i_seek_position, i_seek_position);
             if( unlikely( !seekpoint ) )
             {
                 for( spoint * sp = p_first; sp; )
@@ -813,7 +816,6 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset, int64_t i_
             i_pts = sys.i_chapter_time + simpleblock->GlobalTimecode() / (mtime_t) 1000;
         else
             i_pts = sys.i_chapter_time + block->GlobalTimecode() / (mtime_t) 1000;
-
         if( i_track < tracks.size() )
         {
             if( tracks[i_track]->fmt.i_cat == VIDEO_ES && b_key_picture )
@@ -1436,13 +1438,6 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
                 cluster = (KaxCluster*)el;
                 i_cluster_pos = cluster->GetElementPosition();
 
-                /* add it to the index */
-                if( i_index == 0 ||
-                    ( i_index > 0 && p_indexes[i_index - 1].i_position < (int64_t)cluster->GetElementPosition() ) )
-                {
-                    IndexAppendCluster( cluster );
-                }
-
                 // reset silent tracks
                 for (size_t i=0; i<tracks.size(); i++)
                 {
@@ -1468,6 +1463,12 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
 
                 ctc.ReadData( es.I_O(), SCOPE_ALL_DATA );
                 cluster->InitTimecode( uint64( ctc ), i_timescale );
+ 
+                /* add it to the index */
+                if( i_index == 0 ||
+                    ( i_index > 0 &&
+                      p_indexes[i_index - 1].i_position < (int64_t)cluster->GetElementPosition() ) )
+                    IndexAppendCluster( cluster );
             }
             else if( MKV_IS_ID( el, KaxClusterSilentTracks ) )
             {

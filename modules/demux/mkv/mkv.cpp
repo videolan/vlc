@@ -410,49 +410,45 @@ static void Seek( demux_t *p_demux, mtime_t i_date, double f_percent, virtual_ch
     msg_Dbg( p_demux, "seek request to %"PRId64" (%f%%)", i_date, f_percent );
     if( i_date < 0 && f_percent < 0 )
     {
-        msg_Warn( p_demux, "cannot seek nowhere !" );
+        msg_Warn( p_demux, "cannot seek nowhere!" );
         return;
     }
     if( f_percent > 1.0 )
     {
-        msg_Warn( p_demux, "cannot seek so far !" );
+        msg_Warn( p_demux, "cannot seek so far!" );
+        return;
+    }
+    if( p_sys->f_duration < 0 )
+    {
+        msg_Warn( p_demux, "cannot seek without duration!");
         return;
     }
 
     /* seek without index or without date */
     if( f_percent >= 0 && (var_InheritBool( p_demux, "mkv-seek-percent" ) || !p_segment->b_cues || i_date < 0 ))
     {
-        if( p_sys->f_duration >= 0 && p_segment->b_cues )
-        {
-            i_date = int64_t( f_percent * p_sys->f_duration * 1000.0 );
-        }
-        else
+        i_date = int64_t( f_percent * p_sys->f_duration * 1000.0 );
+        if( !p_segment->b_cues )
         {
             int64_t i_pos = int64_t( f_percent * stream_Size( p_demux->s ) );
 
-            msg_Dbg( p_demux, "inaccurate way of seeking for pos:%"PRId64, i_pos );
+            msg_Dbg( p_demux, "lengthy way of seeking for pos:%"PRId64, i_pos );
             for( i_index = 0; i_index < p_segment->i_index; i_index++ )
             {
-                if( p_segment->b_cues && p_segment->p_indexes[i_index].i_position < i_pos )
-                    break;
-                if( !p_segment->b_cues && p_segment->p_indexes[i_index].i_position >= i_pos && p_segment->p_indexes[i_index].i_time > 0 )
+                if( p_segment->p_indexes[i_index].i_position >= i_pos &&
+                    p_segment->p_indexes[i_index].i_time > 0 )
                     break;
             }
             if( i_index == p_segment->i_index )
-            {
                 i_index--;
-            }
 
-            i_date = p_segment->p_indexes[i_index].i_time;
-
-            if( !p_segment->b_cues && ( p_segment->p_indexes[i_index].i_position < i_pos || p_segment->p_indexes[i_index].i_position - i_pos > 2000000 ))
+            if( p_segment->p_indexes[i_index].i_position < i_pos )
             {
                 msg_Dbg( p_demux, "no cues, seek request to global pos: %"PRId64, i_pos );
                 i_global_position = i_pos;
             }
         }
     }
-
     p_vsegment->Seek( *p_demux, i_date, i_time_offset, p_chapter, i_global_position );
 }
 
