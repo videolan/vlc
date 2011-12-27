@@ -538,7 +538,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
 #pragma mark Recent Items
 - (IBAction)openRecentItem:(id)item
 {
-    [[VLCMain sharedInstance] application: nil openFile: [item title]];
+    [[VLCMain sharedInstance] application: nil openFile: [[[[NSDocumentController sharedDocumentController] recentDocumentURLs] objectAtIndex: [item tag]] absoluteString]];
 }
 
 - (IBAction)clearRecentItems:(id)sender
@@ -1118,17 +1118,9 @@ static VLCMainMenu *_o_sharedInstance = nil;
 
         if( i_nb_items > 1 )
         {
-            if (OSX_LEOPARD)
+            while( --i_nb_items )
             {
-                while( --i_nb_items )
-                {
-                    [o_menu removeItemAtIndex: 0];
-                }
-            }
-            else
-            {
-                // this is more efficient than removing the items one by one
-                [o_menu removeAllItems];
+                [o_menu removeItemAtIndex: 0];
             }
         }
 
@@ -1147,7 +1139,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
                 o_url = [o_docs objectAtIndex: i_nb_docs];
 
                 if( [o_url isFileURL] )
-                    o_doc = [o_url path];
+                    o_doc = [[NSFileManager defaultManager] displayNameAtPath: [o_url path]];
                 else
                     o_doc = [o_url absoluteString];
 
@@ -1155,6 +1147,12 @@ static VLCMainMenu *_o_sharedInstance = nil;
                                      action: @selector(openRecentItem:)
                               keyEquivalent: @"" atIndex: 0];
                 [o_menuitem setTarget: self];
+                [o_menuitem setTag: i_nb_docs];
+                if ([o_url isFileURL])
+                {
+                    [o_menuitem setImage: [[NSWorkspace sharedWorkspace] iconForFile: [o_url path]]];
+                    [[o_menuitem image] setSize: NSMakeSize(16,16)];
+                }
 
                 if( i_nb_docs == 0 )
                     break;
