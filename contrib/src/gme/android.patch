@@ -1,0 +1,11 @@
+--- game-music-emu/gme/Blip_Buffer.h.orig	2011-12-25 22:27:15.546377001 -0500
++++ game-music-emu/gme/Blip_Buffer.h	2011-12-25 22:27:37.146377002 -0500
+@@ -268,7 +268,7 @@
+ };
+ 
+ 	#if defined (__GNUC__) || _MSC_VER >= 1100
+-		#define BLIP_RESTRICT __restrict
++		#define BLIP_RESTRICT __restrict__
+ 	#else
+ 		#define BLIP_RESTRICT
+ 	#endif
