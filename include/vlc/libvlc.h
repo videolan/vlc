@@ -101,14 +101,14 @@ LIBVLC_API void libvlc_clearerr (void);
  * Any previous error is overridden.
  * \return a nul terminated string in any case
  */
-const char *libvlc_vprinterr (const char *fmt, va_list ap);
+LIBVLC_API const char *libvlc_vprinterr (const char *fmt, va_list ap);
 
 /**
  * Sets the LibVLC error status and message for the current thread.
  * Any previous error is overridden.
  * \return a nul terminated string in any case
  */
-const char *libvlc_printerr (const char *fmt, ...);
+LIBVLC_API const char *libvlc_printerr (const char *fmt, ...);
 
 /**@} */
 
