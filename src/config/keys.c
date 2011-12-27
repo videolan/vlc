@@ -96,8 +96,8 @@ static const struct key_descriptor_s vlc_keys[] =
     { "Tab",               KEY_TAB               },
     { "Unset",             KEY_UNSET             },
     { "Up",                KEY_UP                },
-    { "Volume Mute",       KEY_VOLUME_MUTE       },
     { "Volume Down",       KEY_VOLUME_DOWN       },
+    { "Volume Mute",       KEY_VOLUME_MUTE       },
     { "Volume Up",         KEY_VOLUME_UP         },
 };
 #define KEYS_COUNT (sizeof(vlc_keys)/sizeof(vlc_keys[0]))
