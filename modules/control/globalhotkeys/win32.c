@@ -294,13 +294,15 @@ LRESULT CALLBACK WMHOTKEYPROC( HWND hwnd, UINT uMsg, WPARAM wParam,
     {
         case WM_HOTKEY:
             {
-                char psz_atomName[40];
+                char psz_atomName[44];
 
                 LONG_PTR ret = GetWindowLongPtr( hwnd, GWLP_USERDATA );
                 intf_thread_t *p_intf = (intf_thread_t*)ret;
+                strcpy( psz_atomName, "key-" );
 
                 if( !GlobalGetAtomNameA(
-                        wParam, psz_atomName, sizeof( psz_atomName ) ) )
+                        wParam, psz_atomName + 4,
+                        sizeof( psz_atomName ) - 4 ) )
                     return 0;
 
                 /* search for key associated with VLC */
