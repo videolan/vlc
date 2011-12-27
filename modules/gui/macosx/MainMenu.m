@@ -242,7 +242,6 @@ static VLCMainMenu *_o_sharedInstance = nil;
     [o_mi_open_net setTitle: _NS("Open Network...")];
     [o_mi_open_capture setTitle: _NS("Open Capture Device...")];
     [o_mi_open_recent setTitle: _NS("Open Recent")];
-    [o_mi_open_recent_cm setTitle: _NS("Clear Menu")];
     [o_mi_open_wizard setTitle: _NS("Streaming/Exporting Wizard...")];
 
     [o_mu_edit setTitle: _NS("Edit")];
@@ -532,18 +531,6 @@ static VLCMainMenu *_o_sharedInstance = nil;
         [o_mi_rate_lbl_gray setHidden: NO];
     }
     [o_pool release];
-}
-
-#pragma mark -
-#pragma mark Recent Items
-- (IBAction)openRecentItem:(id)item
-{
-    [[VLCMain sharedInstance] application: nil openFile: [[[[NSDocumentController sharedDocumentController] recentDocumentURLs] objectAtIndex: [item tag]] absoluteString]];
-}
-
-- (IBAction)clearRecentItems:(id)sender
-{
-    [[NSDocumentController sharedDocumentController] clearRecentDocuments: nil];
 }
 
 #pragma mark -
@@ -1108,62 +1095,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
     playlist_t * p_playlist = pl_Get( p_intf );
     input_thread_t * p_input = playlist_CurrentInput( p_playlist );
 
-    /* Recent Items Menu */
-    if( [o_title isEqualToString: _NS("Clear Menu")] )
-    {
-        NSMenu * o_menu = [o_mi_open_recent submenu];
-        int i_nb_items = [o_menu numberOfItems];
-        NSArray * o_docs = [[NSDocumentController sharedDocumentController] recentDocumentURLs];
-        UInt32 i_nb_docs = [o_docs count];
-
-        if( i_nb_items > 1 )
-        {
-            while( --i_nb_items )
-            {
-                [o_menu removeItemAtIndex: 0];
-            }
-        }
-
-        if( i_nb_docs > 0 )
-        {
-            NSURL * o_url;
-            NSString * o_doc;
-            NSMenuItem *o_menuitem;
-
-            [o_menu insertItem: [NSMenuItem separatorItem] atIndex: 0];
-
-            while( TRUE )
-            {
-                i_nb_docs--;
-
-                o_url = [o_docs objectAtIndex: i_nb_docs];
-
-                if( [o_url isFileURL] )
-                    o_doc = [[NSFileManager defaultManager] displayNameAtPath: [o_url path]];
-                else
-                    o_doc = [o_url absoluteString];
-
-                o_menuitem = [o_menu insertItemWithTitle: o_doc
-                                     action: @selector(openRecentItem:)
-                              keyEquivalent: @"" atIndex: 0];
-                [o_menuitem setTarget: self];
-                [o_menuitem setTag: i_nb_docs];
-                if ([o_url isFileURL])
-                {
-                    [o_menuitem setImage: [[NSWorkspace sharedWorkspace] iconForFile: [o_url path]]];
-                    [[o_menuitem image] setSize: NSMakeSize(16,16)];
-                }
-
-                if( i_nb_docs == 0 )
-                    break;
-            }
-        }
-        else
-        {
-            bEnabled = FALSE;
-        }
-    }
-    else if( [o_title isEqualToString: _NS("Stop")] )
+    if( [o_title isEqualToString: _NS("Stop")] )
     {
         if( p_input == NULL )
         {

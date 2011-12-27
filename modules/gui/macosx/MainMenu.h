@@ -61,7 +61,6 @@
     IBOutlet NSMenuItem * o_mi_open_net;
     IBOutlet NSMenuItem * o_mi_open_capture;
     IBOutlet NSMenuItem * o_mi_open_recent;
-    IBOutlet NSMenuItem * o_mi_open_recent_cm;
     IBOutlet NSMenuItem * o_mi_open_wizard;
 
     IBOutlet NSMenu * o_mu_edit;
@@ -197,9 +196,6 @@
 - (void)refreshVoutDeviceMenu:(NSNotification *)o_notification;
 - (void)setSubmenusEnabled:(BOOL)b_enabled;
 - (void)setRateControlsEnabled:(BOOL)b_enabled;
-
-- (IBAction)clearRecentItems:(id)sender;
-- (IBAction)openRecentItem:(id)item;
 
 - (IBAction)intfOpenFile:(id)sender;
 - (IBAction)intfOpenFileGeneric:(id)sender;
