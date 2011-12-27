@@ -150,6 +150,7 @@
 		CC0433D213B28C8C00D7D52E /* spref_cone_Interface_64.png in Resources */ = {isa = PBXBuildFile; fileRef = CC0433CC13B28C8C00D7D52E /* spref_cone_Interface_64.png */; };
 		CC0433D313B28C8C00D7D52E /* spref_cone_Subtitles_64.png in Resources */ = {isa = PBXBuildFile; fileRef = CC0433CD13B28C8C00D7D52E /* spref_cone_Subtitles_64.png */; };
 		CC0433D413B28C8C00D7D52E /* spref_cone_Video_64.png in Resources */ = {isa = PBXBuildFile; fileRef = CC0433CE13B28C8C00D7D52E /* spref_cone_Video_64.png */; };
+		CC11373514A7921A005DF2F3 /* window-resize.png in Resources */ = {isa = PBXBuildFile; fileRef = CC11373414A7921A005DF2F3 /* window-resize.png */; };
 		CC2DB09A14A7550D0050A055 /* window-close-on.png in Resources */ = {isa = PBXBuildFile; fileRef = CC2DB09114A7550D0050A055 /* window-close-on.png */; };
 		CC2DB09B14A7550D0050A055 /* window-close-over.png in Resources */ = {isa = PBXBuildFile; fileRef = CC2DB09214A7550D0050A055 /* window-close-over.png */; };
 		CC2DB09C14A7550D0050A055 /* window-close.png in Resources */ = {isa = PBXBuildFile; fileRef = CC2DB09314A7550D0050A055 /* window-close.png */; };
@@ -430,6 +431,7 @@
 		CC0CD0E013DE0EAE00B0D90D /* PXSourceList.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = PXSourceList.m; path = ../../../modules/gui/macosx/PXSourceList.m; sourceTree = "<group>"; };
 		CC0CD0E113DE0EAE00B0D90D /* PXSourceListDataSource.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = PXSourceListDataSource.h; path = ../../../modules/gui/macosx/PXSourceListDataSource.h; sourceTree = "<group>"; };
 		CC0CD0E213DE0EAE00B0D90D /* PXSourceListDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = PXSourceListDelegate.h; path = ../../../modules/gui/macosx/PXSourceListDelegate.h; sourceTree = "<group>"; };
+		CC11373414A7921A005DF2F3 /* window-resize.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "window-resize.png"; path = "Resources/mainwindow_dark/window-resize.png"; sourceTree = "<group>"; };
 		CC1941240B9C1F8400635F6B /* QTKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QTKit.framework; path = /System/Library/Frameworks/QTKit.framework; sourceTree = "<absolute>"; };
 		CC1C41D00D9BAD7F002728FA /* noart.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = noart.png; path = Resources/noart.png; sourceTree = "<group>"; };
 		CC2DB09114A7550D0050A055 /* window-close-on.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "window-close-on.png"; path = "Resources/mainwindow_dark/window-close-on.png"; sourceTree = "<group>"; };
@@ -826,6 +828,7 @@
 				CC2DB09414A7550D0050A055 /* window-minimize-on.png */,
 				CC2DB09514A7550D0050A055 /* window-minimize-over.png */,
 				CC2DB09614A7550D0050A055 /* window-minimize.png */,
+				CC11373414A7921A005DF2F3 /* window-resize.png */,
 				CC2DB09714A7550D0050A055 /* window-zoom-on.png */,
 				CC2DB09814A7550D0050A055 /* window-zoom-over.png */,
 				CC2DB09914A7550D0050A055 /* window-zoom.png */,
@@ -1352,6 +1355,7 @@
 				CC6FA91914A78AE700353C5F /* window-fullscreen-on.png in Resources */,
 				CC6FA91A14A78AE700353C5F /* window-fullscreen-over.png in Resources */,
 				CC6FA91B14A78AE700353C5F /* window-fullscreen.png in Resources */,
+				CC11373514A7921A005DF2F3 /* window-resize.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -48,3 +48,9 @@
 {
 }
 @end
+
+@interface VLCResizeControl : NSImageView
+{
+}
+
+@end

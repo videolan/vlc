@@ -69,6 +69,7 @@
 
     IBOutlet VLCFSPanel *o_fspanel;
     IBOutlet id o_titlebar_view;
+    IBOutlet id o_resize_view;
 
     BOOL b_dark_interface;
     BOOL b_nativeFullscreenMode;

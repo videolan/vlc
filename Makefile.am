@@ -288,6 +288,7 @@ EXTRA_DIST += \
 	extras/package/macosx/Resources/mainwindow_dark/window-minimize-on.png \
 	extras/package/macosx/Resources/mainwindow_dark/window-minimize-over.png \
 	extras/package/macosx/Resources/mainwindow_dark/window-minimize.png \
+	extras/package/macosx/Resources/mainwindow_dark/window-resize.png \
 	extras/package/macosx/Resources/mainwindow_dark/window-zoom-on.png \
 	extras/package/macosx/Resources/mainwindow_dark/window-zoom-over.png \
 	extras/package/macosx/Resources/mainwindow_dark/window-zoom.png \
