@@ -563,7 +563,7 @@ static char *disc_get_mrl (struct udev_device *dev)
 
     val = udev_device_get_property_value (dev, "ID_CDROM_MEDIA_BD");
     if (val && atoi (val))
-        scheme = "bd";
+        scheme = "bluray";
 #ifdef LOL
     val = udev_device_get_property_value (dev, "ID_CDROM_MEDIA_HDDVD");
     if (val && atoi (val))
