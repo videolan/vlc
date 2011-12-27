@@ -28,6 +28,10 @@
 
 /*****************************************************************************
  * VLCMainWindowTitleView
+ *
+ * this is our title bar, which can do anything a title should do
+ * it relies on the VLCWindowButtonCell to display the correct traffic light
+ * states, since we can't capture the mouse-moved events here correctly
  *****************************************************************************/
 
 @implementation VLCMainWindowTitleView
@@ -113,6 +117,14 @@
 
 @end
 
+/*****************************************************************************
+ * VLCWindowButtonCell
+ *
+ * since the title bar cannot fetch these mouse events (the more top-level
+ * NSButton is unable fetch them as well), we are using a subclass of the
+ * button cell to do so. It's set in the nib for the respective objects.
+ *****************************************************************************/
+
 @implementation VLCWindowButtonCell
 
 - (void)mouseEntered:(NSEvent *)theEvent
@@ -132,6 +144,15 @@
 }
 
 @end
+
+
+/*****************************************************************************
+ * VLCResizeControl
+ *
+ * For Leopard and Snow Leopard, we need to emulate the resize control on the
+ * bottom right of the window, since it is gone by using the borderless window
+ * mask. A proper fix would be Lion-only.
+ *****************************************************************************/
 
 @implementation VLCResizeControl
 
