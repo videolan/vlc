@@ -18,6 +18,9 @@ gnutls: gnutls-$(GNUTLS_VERSION).tar.bz2 .sum-gnutls
 ifdef HAVE_WIN32
 	$(APPLY) $(SRC)/gnutls/gnutls-win32.patch
 endif
+ifdef HAVE_ANDROID
+	$(APPLY) $(SRC)/gnutls/no-gl.patch
+endif
 	$(APPLY) $(SRC)/gnutls/gnutls-no-egd.patch
 	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
@@ -51,6 +54,9 @@ DEPS_gnutls = nettle $(DEPS_nettle)
 endif
 
 .gnutls: gnutls
+ifdef HAVE_ANDROID
+	$(RECONF)
+endif
 	cd $< && $(HOSTVARS) ./configure $(GNUTLS_CONF)
 	cd $</lib && $(MAKE) install
 	touch $@

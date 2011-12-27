@@ -1,0 +1,20 @@
+--- gnutls/lib/Makefile.am.orig	2011-12-25 23:15:45.170377002 -0500
++++ gnutls/lib/Makefile.am	2011-12-25 23:15:54.094377001 -0500
+@@ -23,7 +23,7 @@
+ 
+ ACLOCAL_AMFLAGS = -I m4 -I gl/m4
+ 
+-SUBDIRS = gl po includes x509
++SUBDIRS = po includes x509
+ if ENABLE_MINITASN1
+ SUBDIRS += minitasn1
+ endif
+@@ -120,7 +120,7 @@
+ libgnutls_la_LDFLAGS = -no-undefined \
+ 	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
+ 
+-libgnutls_la_LIBADD = gl/liblgnu.la x509/libgnutls_x509.la \
++libgnutls_la_LIBADD = x509/libgnutls_x509.la \
+ 	$(LTLIBZ)  $(LTLIBINTL) $(LIBSOCKET) $(LTLIBDL) \
+ 	$(LTLIBPTHREAD)
+ 
