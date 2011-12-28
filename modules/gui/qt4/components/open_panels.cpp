@@ -533,7 +533,7 @@ void DiscOpenPanel::updateMRL()
                 mrl+= QString(":%1").arg( ui.chapterSpin->value() );
         }
         else if ( ui.vcdRadioButton->isChecked() )
-            mrl += QString("@%1").arg( ui.titleSpin->value() );
+            mrl += QString("#%1").arg( ui.titleSpin->value() );
     }
 
     emit methodChanged( "disc-caching" );
