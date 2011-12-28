@@ -726,9 +726,9 @@ void _drawFrameInRect(NSRect frameRect)
     leftViewDimensions.size.height = viewDimensions.size.height;
     [[o_subviews objectAtIndex:0] setFrame: leftViewDimensions];
 
+    rightViewDimensions.origin.x = leftViewDimensions.size.width + f_dividerThickness;
     rightViewDimensions.size.width = viewDimensions.size.width - leftViewDimensions.size.width - f_dividerThickness;
     rightViewDimensions.size.height = viewDimensions.size.height;
-    rightViewDimensions.origin.x = leftViewDimensions.size.width + f_dividerThickness;
     [[o_subviews objectAtIndex:1] setFrame: rightViewDimensions];
 }
 @end

@@ -113,9 +113,6 @@
     IBOutlet id o_psychedelic_ckb;
 
     /* misc */
-    IBOutlet id o_clone_ckb;
-    IBOutlet id o_clone_lbl;
-    IBOutlet id o_clone_fld;
     IBOutlet id o_addtext_ckb;
     IBOutlet id o_addtext_text_fld;
     IBOutlet id o_addtext_text_lbl;
@@ -124,10 +121,8 @@
     IBOutlet id o_addlogo_ckb;
     IBOutlet id o_addlogo_logo_lbl;
     IBOutlet id o_addlogo_logo_fld;
-    IBOutlet id o_addlogo_top_lbl;
-    IBOutlet id o_addlogo_top_fld;
-    IBOutlet id o_addlogo_left_lbl;
-    IBOutlet id o_addlogo_left_fld;
+    IBOutlet id o_addlogo_pos_lbl;
+    IBOutlet id o_addlogo_pos_pop;
     IBOutlet id o_addlogo_transparency_lbl;
     IBOutlet id o_addlogo_transparency_sld;
 }
@@ -184,8 +179,6 @@
 - (IBAction)enablePsychedelic:(id)sender;
 
 /* miscellaneous */
-- (IBAction)enableClone:(id)sender;
-- (IBAction)cloneModifierChanged:(id)sender;
 - (IBAction)enableAddText:(id)sender;
 - (IBAction)addTextModifierChanged:(id)sender;
 - (IBAction)enableAddLogo:(id)sender;
