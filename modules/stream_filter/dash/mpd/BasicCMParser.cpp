@@ -150,7 +150,7 @@ void    BasicCMParser::setGroups            (Node *root, Period *period)
     for(size_t i = 0; i < groups.size(); i++)
     {
         Group *group = new Group(groups.at(i)->getAttributes());
-        if ( this->parseCommonAttributesElements( groups.at( i ), group ) == false )
+        if ( this->parseCommonAttributesElements( groups.at( i ), group, NULL ) == false )
         {
             delete group;
             continue ;
@@ -169,7 +169,7 @@ void    BasicCMParser::setRepresentations   (Node *root, Group *group)
         const std::map<std::string, std::string>    attributes = representations.at(i)->getAttributes();
 
         Representation *rep = new Representation( attributes );
-        if ( this->parseCommonAttributesElements( representations.at( i ), rep ) == false )
+        if ( this->parseCommonAttributesElements( representations.at( i ), rep, group ) == false )
         {
             delete rep;
             continue ;
@@ -351,7 +351,7 @@ void BasicCMParser::parseContentDescriptor(Node *node, const std::string &name, 
     }
 }
 
-bool    BasicCMParser::parseCommonAttributesElements( Node *node, CommonAttributesElements *common) const
+bool    BasicCMParser::parseCommonAttributesElements( Node *node, CommonAttributesElements *common, CommonAttributesElements *parent ) const
 {
     const std::map<std::string, std::string>                &attr = node->getAttributes();
     std::map<std::string, std::string>::const_iterator      it;
@@ -359,8 +359,13 @@ bool    BasicCMParser::parseCommonAttributesElements( Node *node, CommonAttribut
     it = attr.find( "mimeType" );
     if ( it == attr.end() )
     {
-        std::cerr << "Missing mandatory attribute: @mimeType" << std::endl;
-        return false;
+        if ( parent && parent->getMimeType().empty() == false )
+            common->setMimeType( parent->getMimeType() );
+        else
+        {
+            std::cerr << "Missing mandatory attribute: @mimeType" << std::endl;
+            return false;
+        }
     }
     common->setMimeType( it->second );
     //Everything else is optionnal.

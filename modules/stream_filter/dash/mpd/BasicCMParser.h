@@ -67,7 +67,9 @@ namespace dash
                 void    parseContentDescriptor( xml::Node *node, const std::string &name,
                                                 void (CommonAttributesElements::*addPtr)(ContentDescription*),
                                                 CommonAttributesElements *self ) const;
-                bool    parseCommonAttributesElements( dash::xml::Node *node, CommonAttributesElements *common ) const;
+                bool    parseCommonAttributesElements( dash::xml::Node *node,
+                                                       CommonAttributesElements *common,
+                                                       CommonAttributesElements *parent ) const;
                 bool    parseSegment( Segment *seg, const std::map<std::string, std::string> &attr );
                 ProgramInformation*     parseProgramInformation();
         };
