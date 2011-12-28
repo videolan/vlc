@@ -72,7 +72,7 @@ package-macosx: VLC-release.app
 	hdiutil create -verbose -srcfolder "$(top_builddir)/vlc-$(VERSION)" "$(top_builddir)/vlc-$(VERSION)-rw.dmg" -scrub -format UDRW
 	mkdir -p ./mount
 	hdiutil attach -readwrite -noverify -noautoopen -mountRoot ./mount "vlc-$(VERSION)-rw.dmg"
-	osascript "$(srcdir)"/extras/package/macosx/dmg_setup.scpt "vlc-$(VERSION)"
+	-osascript "$(srcdir)"/extras/package/macosx/dmg_setup.scpt "vlc-$(VERSION)"
 	hdiutil detach ./mount/"vlc-$(VERSION)"
 # Make sure the image is not writable
 # Note: We can't directly create a read only dmg as we do the bless stuff
