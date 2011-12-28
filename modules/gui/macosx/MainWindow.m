@@ -408,6 +408,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
         winrect.size.height = winrect.size.height - f_titleBarHeight;
         [o_split_view setFrame: winrect];
         [o_video_view setFrame: winrect];
+        previousSavedFrame = winrect;
 
         [self display];
     }

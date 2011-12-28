@@ -79,6 +79,9 @@
         [[VLCCoreInteraction sharedInstance] toggleFullscreen];
     else
         msg_Err( VLCIntf, "unknown button action sender" );
+
+    [self setWindowButtonOver: NO];
+    [self setWindowFullscreenButtonOver: NO];
 }
 
 - (void)setWindowTitle:(NSString *)title
