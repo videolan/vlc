@@ -21,7 +21,7 @@
     </object>
     <object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
       <bool key="EncodedWithXMLCoder">YES</bool>
-      <integer value="4714"/>
+      <integer value="4680"/>
       <integer value="915"/>
       <integer value="4758"/>
       <integer value="1617"/>
@@ -622,7 +622,7 @@
               <int key="NSvFlags">290</int>
               <object class="NSMutableArray" key="NSSubviews">
                 <bool key="EncodedWithXMLCoder">YES</bool>
-                <object class="NSImageView" id="869668783">
+                <object class="NSImageView" id="884724451">
                   <reference key="NSNextResponder" ref="129808516"/>
                   <int key="NSvFlags">289</int>
                   <object class="NSMutableSet" key="NSDragTypes">
@@ -641,7 +641,7 @@
                   <reference key="NSSuperview" ref="129808516"/>
                   <string key="NSReuseIdentifierKey">_NS:2165</string>
                   <bool key="NSEnabled">YES</bool>
-                  <object class="NSImageCell" key="NSCell" id="686558362">
+                  <object class="NSImageCell" key="NSCell" id="655520031">
                     <int key="NSCellFlags">654848</int>
                     <int key="NSCellFlags2">33554432</int>
                     <object class="NSCustomResource" key="NSContents">
@@ -7410,9 +7410,17 @@ LCAuLi4</string>
           <object class="IBOutletConnection" key="connection">
             <string key="label">o_resize_view</string>
             <reference key="source" ref="498338108"/>
-            <reference key="destination" ref="869668783"/>
+            <reference key="destination" ref="884724451"/>
           </object>
           <int key="connectionID">4841</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">delegate</string>
+            <reference key="source" ref="302568132"/>
+            <reference key="destination" ref="498338108"/>
+          </object>
+          <int key="connectionID">4842</int>
         </object>
       </object>
       <object class="IBMutableOrderedSet" key="objectRecords">
@@ -9922,7 +9930,7 @@ LCAuLi4</string>
               <reference ref="291209196"/>
               <reference ref="354459361"/>
               <reference ref="707945673"/>
-              <reference ref="869668783"/>
+              <reference ref="884724451"/>
             </object>
             <reference key="parent" ref="429932428"/>
           </object>
@@ -10193,17 +10201,17 @@ LCAuLi4</string>
           </object>
           <object class="IBObjectRecord">
             <int key="objectID">4839</int>
-            <reference key="object" ref="869668783"/>
+            <reference key="object" ref="884724451"/>
             <object class="NSMutableArray" key="children">
               <bool key="EncodedWithXMLCoder">YES</bool>
-              <reference ref="686558362"/>
+              <reference ref="655520031"/>
             </object>
             <reference key="parent" ref="129808516"/>
           </object>
           <object class="IBObjectRecord">
             <int key="objectID">4840</int>
-            <reference key="object" ref="686558362"/>
-            <reference key="parent" ref="869668783"/>
+            <reference key="object" ref="655520031"/>
+            <reference key="parent" ref="884724451"/>
           </object>
         </object>
       </object>
@@ -11844,7 +11852,7 @@ LCAuLi4</string>
         </object>
       </object>
       <nil key="sourceID"/>
-      <int key="maxID">4841</int>
+      <int key="maxID">4842</int>
     </object>
     <object class="IBClassDescriber" key="IBDocument.Classes">
       <object class="NSMutableArray" key="referencedPartialClassDescriptions">

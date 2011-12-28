@@ -31,7 +31,7 @@
 #import "misc.h"
 #import "fspanel.h"
 
-@interface VLCMainWindow : NSWindow <PXSourceListDataSource, PXSourceListDelegate, NSWindowDelegate, NSAnimationDelegate> {
+@interface VLCMainWindow : NSWindow <PXSourceListDataSource, PXSourceListDelegate, NSWindowDelegate, NSAnimationDelegate, NSSplitViewDelegate> {
     IBOutlet id o_play_btn;
     IBOutlet id o_bwd_btn;
     IBOutlet id o_fwd_btn;

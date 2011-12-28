@@ -42,6 +42,7 @@
 @protocol NSOutlineViewDelegate <NSObject> @end
 @protocol NSOutlineViewDataSource <NSObject> @end
 @protocol NSToolbarDelegate <NSObject> @end
+@protocol NSSplitViewDelegate <NSObject> @end
 
 enum {
     NSApplicationPresentationDefault                    = 0,

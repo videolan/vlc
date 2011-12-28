@@ -1657,6 +1657,24 @@ static VLCMainWindow *_o_sharedInstance = nil;
 }
 
 #pragma mark -
+#pragma mark split view delegate
+- (CGFloat)splitView:(NSSplitView *)splitView constrainMinCoordinate:(CGFloat)proposedMin ofSubviewAt:(NSInteger)dividerIndex
+{
+    if (dividerIndex == 0)
+        return 200.0;
+    else
+        return proposedMin;
+}
+
+- (CGFloat)splitView:(NSSplitView *)splitView constrainMaxCoordinate:(CGFloat)proposedMax ofSubviewAt:(NSInteger)dividerIndex
+{
+    if (dividerIndex == 0)
+        return ([self frame].size.width - 300.0);
+    else
+        return proposedMax;
+}
+
+#pragma mark -
 #pragma mark Side Bar Data handling
 /* taken under BSD-new from the PXSourceList sample project, adapted for VLC */
 - (NSUInteger)sourceList:(PXSourceList*)sourceList numberOfChildrenOfItem:(id)item
