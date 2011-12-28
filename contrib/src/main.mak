@@ -259,6 +259,14 @@ UNPACK_DIR = $(basename $(basename $(notdir $<)))
 APPLY = (cd $(UNPACK_DIR) && patch -p1) <
 MOVE = mv $(UNPACK_DIR) $@ && touch $@
 
+AUTOMAKE_DATA_DIRS=$(abspath $(dir $(shell which automake))/../share/automake*)
+UPDATE_AUTOCONFIG = for dir in $(AUTOMAKE_DATA_DIRS); do \
+		if test -f "$${dir}/config.sub" -a -f "$${dir}/config.guess"; then \
+			cp "$${dir}/config.sub" "$${dir}/config.guess" $@; \
+			break; \
+		fi; \
+	done
+
 RECONF = mkdir -p -- $(PREFIX)/share/aclocal && \
 	cd $< && autoreconf -fiv $(ACLOCAL_AMFLAGS)
 CMAKE = cmake . -DCMAKE_TOOLCHAIN_FILE=$(abspath toolchain.cmake) \
