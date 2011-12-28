@@ -13,6 +13,7 @@ $(TARBALLS)/gmp-$(GMP_VERSION).tar.bz2:
 
 gmp: gmp-$(GMP_VERSION).tar.bz2 .sum-gmp
 	$(UNPACK)
+	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
 
 .gmp: gmp
