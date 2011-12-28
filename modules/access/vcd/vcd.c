@@ -1,7 +1,7 @@
 /*****************************************************************************
  * vcd.c : VCD input module for vlc
  *****************************************************************************
- * Copyright (C) 2000-2004 the VideoLAN team
+ * Copyright © 2000-2011 the VideoLAN team
  * $Id$
  *
  * Author: Johan Bilien <jobi@via.ecp.fr>
@@ -51,7 +51,7 @@ vlc_module_begin ()
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_ACCESS )
 
-    add_usage_hint( N_("[vcd:][device][@[title][,[chapter]]]") )
+    add_usage_hint( N_("[vcd:][device][#[title][,[chapter]]]") )
     add_shortcut( "vcd", "svcd" )
 vlc_module_end ()
 
@@ -70,7 +70,6 @@ struct access_sys_t
     /* Title infos */
     int           i_titles;
     input_title_t *title[99];            /* No more that 99 track in a vcd ? */
-
 
     int         i_sector;                                  /* Current Sector */
     int         *p_sectors;                                 /* Track sectors */
@@ -95,11 +94,10 @@ static int Open( vlc_object_t *p_this )
     char *psz;
     int i_title = 0;
     int i_chapter = 0;
-    int i;
     vcddev_t *vcddev;
 
-    /* Command line: vcd://[dev_path][@title[,chapter]] */
-    if( ( psz = strchr( psz_dup, '@' ) ) )
+    /* Command line: vcd://[dev_path][#title[,chapter]] */
+    if( ( psz = strchr( psz_dup, '#' ) ) )
     {
         *psz++ = '\0';
 
@@ -137,18 +135,8 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
 
     /* Set up p_access */
-    p_access->pf_read = NULL;
-    p_access->pf_block = Block;
-    p_access->pf_control = Control;
-    p_access->pf_seek = Seek;
-    p_access->info.i_update = 0;
-    p_access->info.i_size = 0;
-    p_access->info.i_pos = 0;
-    p_access->info.b_eof = false;
-    p_access->info.i_title = 0;
-    p_access->info.i_seekpoint = 0;
     p_access->p_sys = p_sys = calloc( 1, sizeof( access_sys_t ) );
-    if( !p_sys )
+    if( unlikely(!p_sys ))
         goto error;
     p_sys->vcddev = vcddev;
 
@@ -165,11 +153,12 @@ static int Open( vlc_object_t *p_this )
         msg_Err( p_access, "no movie tracks found" );
         goto error;
     }
+
     /* The first title isn't usable */
     p_sys->i_titles--;
 
     /* Build title table */
-    for( i = 0; i < p_sys->i_titles; i++ )
+    for( int i = 0; i < p_sys->i_titles; i++ )
     {
         input_title_t *t = p_sys->title[i] = vlc_input_title_New();
 
@@ -195,15 +184,24 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_sector = p_sys->p_sectors[1+i_title];
     if( i_chapter > 0 )
     {
-        p_sys->i_sector +=
-            ( p_sys->title[i_title]->seekpoint[i_chapter]->i_byte_offset /
-              VCD_DATA_SIZE );
+        p_sys->i_sector += ( p_sys->title[i_title]->seekpoint[i_chapter]->i_byte_offset /
+                           VCD_DATA_SIZE );
     }
-    p_access->info.i_title = i_title;
+
+    /* p_access */
+    p_access->pf_read    = NULL;
+    p_access->pf_block   = Block;
+    p_access->pf_control = Control;
+    p_access->pf_seek    = Seek;
+
+    p_access->info.i_update    = 0;
+    p_access->info.b_eof       = false;
+
+    p_access->info.i_title     = i_title;
     p_access->info.i_seekpoint = i_chapter;
-    p_access->info.i_size = p_sys->title[i_title]->i_size;
-    p_access->info.i_pos = ( p_sys->i_sector - p_sys->p_sectors[1+i_title] ) *
-        VCD_DATA_SIZE;
+    p_access->info.i_size      = p_sys->title[i_title]->i_size;
+    p_access->info.i_pos       = (uint64_t)( p_sys->i_sector - p_sys->p_sectors[1+i_title] ) *
+                                 VCD_DATA_SIZE;
 
     free( p_access->psz_demux );
     p_access->psz_demux = strdup( "ps" );
@@ -440,7 +438,7 @@ static int EntryPoints( access_t *p_access )
     uint8_t      sector[VCD_DATA_SIZE];
 
     entries_sect_t entries;
-    int i_nb, i;
+    int i_nb;
 
     /* Read the entry point sector */
     if( ioctl_ReadSectors( VLC_OBJECT(p_access), p_sys->vcddev,
@@ -465,7 +463,7 @@ static int EntryPoints( access_t *p_access )
         return VLC_EGENERIC;
     }
 
-    for( i = 0; i < i_nb; i++ )
+    for( int i = 0; i < i_nb; i++ )
     {
         const int i_title = BCD_TO_BIN(entries.entry[i].i_track) - 2;
         const int i_sector =
