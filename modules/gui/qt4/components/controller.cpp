@@ -465,6 +465,9 @@ QWidget *AbstractController::createWidget( buttonType_e button, int options )
         CONNECT_MAP_SET( play, PLAY_ACTION );
         }
         break;
+    case ASPECT_RATIO_COMBOBOX:
+        widget = new AspectRatioComboBox( p_intf );
+        break;
     default:
         msg_Warn( p_intf, "This should not happen %i", button );
         break;

@@ -35,6 +35,10 @@
 #include "util/buttons/BrowseButton.hpp"
 #include "util/buttons/RoundButton.hpp"
 
+#include "qt4.hpp"
+#include "input_manager.hpp"
+#include <vlc_vout.h>                       /* vout_thread_t for aspect ratio combobox */
+
 #include <QScrollArea>
 #include <QGroupBox>
 #include <QLabel>
@@ -440,6 +444,10 @@ WidgetListing::WidgetListing( intf_thread_t *p_intf, QWidget *_parent )
                 layout->setRoundButton( play );
             }
             widgetItem->setText( qtr("Playback Buttons") );
+            break;
+        case ASPECT_RATIO_COMBOBOX:
+            widget = new AspectRatioComboBox( p_intf );
+            widgetItem->setText( qtr("Aspect ratio selector") );
             break;
         default:
             msg_Warn( p_intf, "This should not happen %i", i );

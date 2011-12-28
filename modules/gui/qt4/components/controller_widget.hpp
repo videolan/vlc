@@ -29,9 +29,12 @@
 #endif
 
 #include "qt4.hpp"
+#include "input_manager.hpp"
+#include <vlc_vout.h>                       /* vout_thread_t for aspect ratio combobox */
 
 #include <QWidget>
 #include <QToolButton>
+#include <QComboBox>
 
 class QLabel;
 class QFrame;
@@ -65,6 +68,27 @@ class AtoB_Button : public QToolButton
     Q_OBJECT
 private slots:
     void updateButtonIcons( bool, bool );
+};
+
+class AspectRatioComboBox : public QComboBox
+{
+    Q_OBJECT
+    public:
+    AspectRatioComboBox( intf_thread_t* _p_intf ) {
+        p_intf = _p_intf;
+        CONNECT( THEMIM->getIM(), voutChanged( bool ),
+                 this, updateRatios() );
+        CONNECT( this, currentIndexChanged( int ),
+                 this, updateAspectRatio( int ) );
+        this->updateRatios();
+    }
+
+    public slots:
+    void updateRatios();
+    void updateAspectRatio( int );
+
+    private:
+    intf_thread_t* p_intf;
 };
 
 #define VOLUME_MAX 200

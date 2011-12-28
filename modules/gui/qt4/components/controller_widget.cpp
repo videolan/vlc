@@ -267,3 +267,26 @@ void LoopButton::updateButtonIcons( int value )
     setIcon( ( value == REPEAT_ONE ) ? QIcon( ":/buttons/playlist/repeat_one" )
                                      : QIcon( ":/buttons/playlist/repeat_all" ) );
 }
+
+void AspectRatioComboBox::updateRatios() {
+    /* Clear the list before updating */
+    this->clear();
+    vlc_value_t val_list, text_list;
+    vout_thread_t* p_vout = THEMIM->getVout();
+    /* Disable if there is no vout */
+    if( p_vout == NULL ) {
+        addItem("Aspect Ratio");
+        setDisabled( true );
+        return;
+    }
+    var_Change( p_vout, "aspect-ratio", VLC_VAR_GETLIST, &val_list, &text_list );
+    for( int i = 0; i < val_list.p_list->i_count; i++ )
+        addItem( QString( text_list.p_list->p_values[i].psz_string ), QString( val_list.p_list->p_values[i].psz_string ) );
+    setEnabled( true );
+    var_FreeList( &val_list, &text_list );
+}
+
+void AspectRatioComboBox::updateAspectRatio( int x ) {
+    vout_thread_t* p_vout = THEMIM->getVout();
+    if( p_vout && x >= 0 ) var_SetString( p_vout, "aspect-ratio", qtu( itemData(x).toString() ) );
+}
