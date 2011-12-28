@@ -932,6 +932,11 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
                 p_tk->fmt.i_extra       = GetDWLE( &p_bih->biSize ) - sizeof( BITMAPINFOHEADER );
                 if( p_tk->fmt.i_extra > 0 )
                 {
+                    /* Very unlikely yet possible: bug #5659*/
+                    size_t maxlen = p_tk->i_extra_data - sizeof( BITMAPINFOHEADER );
+                    p_tk->fmt.i_extra = ( p_tk->fmt.i_extra < maxlen )?
+                        p_tk->fmt.i_extra : maxlen;
+
                     p_tk->fmt.p_extra = xmalloc( p_tk->fmt.i_extra );
                     memcpy( p_tk->fmt.p_extra, &p_bih[1], p_tk->fmt.i_extra );
                 }
