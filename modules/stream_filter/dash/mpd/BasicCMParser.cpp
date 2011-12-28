@@ -178,12 +178,9 @@ void    BasicCMParser::setRepresentations   (Node *root, Group *group)
 
         it = attributes.find( "id" );
         if ( it == attributes.end() )
-        {
             std::cerr << "Missing mandatory attribute for Representation: @id" << std::endl;
-            delete rep;
-            continue ;
-        }
-        rep->setId( it->second );
+        else
+            rep->setId( it->second );
 
         it = attributes.find( "bandwidth" );
         if ( it == attributes.end() )
