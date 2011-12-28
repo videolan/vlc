@@ -28,8 +28,6 @@
 #include "DOMParser.h"
 
 using namespace dash::xml;
-using namespace dash::http;
-using namespace dash::mpd;
 
 DOMParser::DOMParser    (stream_t *stream) :
     root( NULL ),
