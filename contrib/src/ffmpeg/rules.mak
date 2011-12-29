@@ -12,15 +12,17 @@ FFMPEGCONF = \
 	--disable-debug \
 	--enable-gpl \
 	--enable-postproc \
-	--disable-ffprobe \
-	--disable-ffserver \
 	--disable-ffmpeg \
-	--disable-ffplay \
 	--disable-avconv \
 	--disable-devices \
 	--disable-protocols \
 	--disable-avfilter \
 	--disable-network
+
+# Those tools are named differently in FFmpeg and Libav
+#	--disable-ffserver \
+#	--disable-ffplay \
+#	--disable-ffprobe
 DEPS_ffmpeg = zlib gsm openjpeg
 
 # Optional dependencies
