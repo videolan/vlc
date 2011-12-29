@@ -28,7 +28,6 @@
 #include "SegmentInfo.h"
 
 using namespace dash::mpd;
-using namespace dash::exception;
 
 SegmentInfo::SegmentInfo() :
     initSeg( NULL ),

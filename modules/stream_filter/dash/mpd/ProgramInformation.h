@@ -29,7 +29,6 @@
 #include <map>
 
 #include "exceptions/AttributeNotPresentException.h"
-#include "exceptions/ElementNotPresentException.h"
 
 namespace dash
 {

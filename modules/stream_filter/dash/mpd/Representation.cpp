@@ -30,7 +30,6 @@
 #include "Representation.h"
 
 using namespace dash::mpd;
-using namespace dash::exception;
 
 Representation::Representation  (const std::map<std::string, std::string>&  attributes) :
     qualityRanking( -1 ),

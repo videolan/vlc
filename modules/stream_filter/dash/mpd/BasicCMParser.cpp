@@ -258,7 +258,7 @@ bool    BasicCMParser::setSegmentInfo       (Node *root, Representation *rep)
         //Init segment is not mandatory.
         this->setInitSegment( segmentInfo, info );
         //If we don't have any segment, there's no point keeping this SegmentInfo.
-        if ( this->setSegments(segmentInfo, info ) == false )
+        if ( this->setSegments( segmentInfo, info ) == false )
         {
             delete info;
             return false;

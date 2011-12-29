@@ -33,7 +33,6 @@
 #include "mpd/BaseUrl.h"
 #include "mpd/ProgramInformation.h"
 #include "exceptions/AttributeNotPresentException.h"
-#include "exceptions/ElementNotPresentException.h"
 #include "mpd/IMPDManager.h"
 
 namespace dash

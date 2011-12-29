@@ -30,7 +30,6 @@
 #include "mpd/CommonAttributesElements.h"
 #include "mpd/SegmentInfo.h"
 #include "mpd/TrickModeType.h"
-#include "exceptions/ElementNotPresentException.h"
 
 namespace dash
 {
@@ -55,6 +54,11 @@ namespace dash
                 void                setQualityRanking       ( int qualityRanking );
                 const std::list<const Representation*>&     getDependencies() const;
                 void                addDependency           ( const Representation* dep );
+                /**
+                 * @return  This SegmentInfo for this Representation.
+                 *          It cannot be NULL, or without any Segments in it.
+                 *          It can however have a NULL InitSegment
+                 */
                 SegmentInfo*        getSegmentInfo          () const;
                 TrickModeType*      getTrickModeType        () const;
 

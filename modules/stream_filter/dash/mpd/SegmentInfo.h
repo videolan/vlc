@@ -30,7 +30,6 @@
 #include <map>
 
 #include "mpd/Segment.h"
-#include "exceptions/ElementNotPresentException.h"
 
 namespace dash
 {

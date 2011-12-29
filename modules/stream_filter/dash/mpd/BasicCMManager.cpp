@@ -41,24 +41,14 @@ BasicCMManager::~BasicCMManager ()
 
 std::vector<Segment*>  BasicCMManager::getSegments             (Representation *rep)
 {
-    std::vector<Segment *> retSegments;
-    try
-    {
-        SegmentInfo* info = rep->getSegmentInfo();
-        Segment*     initSegment = info->getInitSegment();
+    std::vector<Segment *>  retSegments;
+    SegmentInfo*            info = rep->getSegmentInfo();
+    Segment*                initSegment = info->getInitSegment();
 
-        retSegments.push_back(initSegment);
-
-        std::vector<Segment *> segments = info->getSegments();
-
-        for(size_t i = 0; i < segments.size(); i++)
-            retSegments.push_back(segments.at(i));
-    }
-    catch(ElementNotPresentException &e)
-    {
-        /*TODO Debug */
-    }
-
+    if ( initSegment )
+        retSegments.push_back( initSegment );
+    retSegments.insert( retSegments.end(), info->getSegments().begin(),
+                                            info->getSegments().end() );
     return retSegments;
 }
 const std::vector<Period*>&    BasicCMManager::getPeriods              () const
