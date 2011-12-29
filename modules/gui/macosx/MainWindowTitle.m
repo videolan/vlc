@@ -25,6 +25,7 @@
 #import "intf.h"
 #import "MainWindowTitle.h"
 #import "CoreInteraction.h"
+#import "CompatibilityFixes.h"
 
 /*****************************************************************************
  * VLCMainWindowTitleView
@@ -35,31 +36,121 @@
  *****************************************************************************/
 
 @implementation VLCMainWindowTitleView
+- (void)dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver: self];
+
+    [o_red_img release];
+    [o_red_over_img release];
+    [o_red_on_img release];
+    [o_yellow_img release];
+    [o_yellow_over_img release];
+    [o_yellow_on_img release];
+    [o_green_img release];
+    [o_green_over_img release];
+    [o_green_on_img release];
+
+    [super dealloc];
+}
 
 - (void)awakeFromNib
 {
     [self setImageScaling: NSScaleToFit];
     [self setImageFrameStyle: NSImageFrameNone];
     [self setImageAlignment: NSImageAlignCenter];
-    [self setImage: [NSImage imageNamed:@"bottom-background_dark"]];
+    [self setImage: [NSImage imageNamed:@"topbar-dark-center-fill"]];
     [self setAutoresizesSubviews: YES];
 
-    [o_red_btn setImage: [NSImage imageNamed:@"window-close"]];
-    [o_red_btn setAlternateImage: [NSImage imageNamed:@"window-close-on"]];
+    [self loadButtonIcons];
+    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(controlTintChanged:) name: NSControlTintDidChangeNotification object: nil];
+
+    [o_red_btn setImage: o_red_img];
+    [o_red_btn setAlternateImage: o_red_on_img];
     [[o_red_btn cell] setShowsBorderOnlyWhileMouseInside: YES];
     [[o_red_btn cell] setTag: 0];
-    [o_yellow_btn setImage: [NSImage imageNamed:@"window-minimize"]];
-    [o_yellow_btn setAlternateImage: [NSImage imageNamed:@"window-minimize-on"]];
+    [o_yellow_btn setImage: o_yellow_img];
+    [o_yellow_btn setAlternateImage: o_yellow_on_img];
     [[o_yellow_btn cell] setShowsBorderOnlyWhileMouseInside: YES];
     [[o_yellow_btn cell] setTag: 1];
-    [o_green_btn setImage: [NSImage imageNamed:@"window-zoom"]];
-    [o_green_btn setAlternateImage: [NSImage imageNamed:@"window-zoom-on"]];
+    [o_green_btn setImage: o_green_img];
+    [o_green_btn setAlternateImage: o_green_on_img];
     [[o_green_btn cell] setShowsBorderOnlyWhileMouseInside: YES];
     [[o_green_btn cell] setTag: 2];
     [o_fullscreen_btn setImage: [NSImage imageNamed:@"window-fullscreen"]];
     [o_fullscreen_btn setAlternateImage: [NSImage imageNamed:@"window-fullscreen-on"]];
     [[o_fullscreen_btn cell] setShowsBorderOnlyWhileMouseInside: YES];
     [[o_fullscreen_btn cell] setTag: 3];
+}
+
+- (void)controlTintChanged:(NSNotification *)notification
+{
+    [o_red_img release];
+    [o_red_over_img release];
+    [o_red_on_img release];
+    [o_yellow_img release];
+    [o_yellow_over_img release];
+    [o_yellow_on_img release];
+    [o_green_img release];
+    [o_green_over_img release];
+    [o_green_on_img release];
+
+    [self loadButtonIcons];
+
+    [o_red_btn setNeedsDisplay];
+    [o_yellow_btn setNeedsDisplay];
+    [o_green_btn setNeedsDisplay];
+}
+
+- (void)loadButtonIcons
+{
+    if (OSX_LION)
+    {
+        if( [NSColor currentControlTint] == NSBlueControlTint )
+        {
+            o_red_img = [[NSImage imageNamed:@"lion-window-close"] retain];
+            o_red_over_img = [[NSImage imageNamed:@"lion-window-close-over"] retain];
+            o_red_on_img = [[NSImage imageNamed:@"lion-window-close-on"] retain];
+            o_yellow_img = [[NSImage imageNamed:@"lion-window-minimize"] retain];
+            o_yellow_over_img = [[NSImage imageNamed:@"lion-window-minimize-over"] retain];
+            o_yellow_on_img = [[NSImage imageNamed:@"lion-window-minimize-on"] retain];
+            o_green_img = [[NSImage imageNamed:@"lion-window-zoom"] retain];
+            o_green_over_img = [[NSImage imageNamed:@"lion-window-zoom-over"] retain];
+            o_green_on_img = [[NSImage imageNamed:@"lion-window-zoom-on"] retain];
+        } else {
+            o_red_img = [[NSImage imageNamed:@"lion-window-close-graphite"] retain];
+            o_red_over_img = [[NSImage imageNamed:@"lion-window-close-over-graphite"] retain];
+            o_red_on_img = [[NSImage imageNamed:@"lion-window-close-on-graphite"] retain];
+            o_yellow_img = [[NSImage imageNamed:@"lion-window-minimize-graphite"] retain];
+            o_yellow_over_img = [[NSImage imageNamed:@"lion-window-minimize-over-graphite"] retain];
+            o_yellow_on_img = [[NSImage imageNamed:@"lion-window-minimize-on-graphite"] retain];
+            o_green_img = [[NSImage imageNamed:@"lion-window-zoom-graphite"] retain];
+            o_green_over_img = [[NSImage imageNamed:@"lion-window-zoom-over-graphite"] retain];
+            o_green_on_img = [[NSImage imageNamed:@"lion-window-zoom-on-graphite"] retain];            
+        }
+    } else {
+        if( [NSColor currentControlTint] == NSBlueControlTint )
+        {
+            o_red_img = [[NSImage imageNamed:@"snowleo-window-close"] retain];
+            o_red_over_img = [[NSImage imageNamed:@"snowleo-window-close-over"] retain];
+            o_red_on_img = [[NSImage imageNamed:@"snowleo-window-close-on"] retain];
+            o_yellow_img = [[NSImage imageNamed:@"snowleo-window-minimize"] retain];
+            o_yellow_over_img = [[NSImage imageNamed:@"snowleo-window-minimize-over"] retain];
+            o_yellow_on_img = [[NSImage imageNamed:@"snowleo-window-minimize-on"] retain];
+            o_green_img = [[NSImage imageNamed:@"snowleo-window-zoom"] retain];
+            o_green_over_img = [[NSImage imageNamed:@"snowleo-window-zoom-over"] retain];
+            o_green_on_img = [[NSImage imageNamed:@"snowleo-window-zoom-on"] retain];
+        } else {
+            o_red_img = [[NSImage imageNamed:@"snowleo-window-close-graphite"] retain];
+            o_red_over_img = [[NSImage imageNamed:@"snowleo-window-close-over-graphite"] retain];
+            o_red_on_img = [[NSImage imageNamed:@"snowleo-window-close-on-graphite"] retain];
+            o_yellow_img = [[NSImage imageNamed:@"snowleo-window-minimize-graphite"] retain];
+            o_yellow_over_img = [[NSImage imageNamed:@"snowleo-window-minimize-over-graphite"] retain];
+            o_yellow_on_img = [[NSImage imageNamed:@"snowleo-window-minimize-on-graphite"] retain];
+            o_green_img = [[NSImage imageNamed:@"snowleo-window-zoom-graphite"] retain];
+            o_green_over_img = [[NSImage imageNamed:@"snowleo-window-zoom-over-graphite"] retain];
+            o_green_on_img = [[NSImage imageNamed:@"snowleo-window-zoom-on-graphite"] retain];            
+        }
+    }
 }
 
 - (BOOL)mouseDownCanMoveWindow
@@ -98,15 +189,15 @@
 {
     if( b_value )
     {
-        [o_red_btn setImage: [NSImage imageNamed:@"window-close-over"]];
-        [o_yellow_btn setImage: [NSImage imageNamed:@"window-minimize-over"]];
-        [o_green_btn setImage: [NSImage imageNamed:@"window-zoom-over"]];
+        [o_red_btn setImage: o_red_over_img];
+        [o_yellow_btn setImage: o_yellow_over_img];
+        [o_green_btn setImage: o_green_over_img];
     }
     else
     {
-        [o_red_btn setImage: [NSImage imageNamed:@"window-close"]];
-        [o_yellow_btn setImage: [NSImage imageNamed:@"window-minimize"]];
-        [o_green_btn setImage: [NSImage imageNamed:@"window-zoom"]];
+        [o_red_btn setImage: o_red_img];
+        [o_yellow_btn setImage: o_yellow_img];
+        [o_green_btn setImage: o_green_img];
     }
 }
 

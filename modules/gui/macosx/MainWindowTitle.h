@@ -29,6 +29,16 @@
 
 @interface VLCMainWindowTitleView : NSImageView
 {
+    NSImage * o_red_img;
+    NSImage * o_red_over_img;
+    NSImage * o_red_on_img;
+    NSImage * o_yellow_img;
+    NSImage * o_yellow_over_img;
+    NSImage * o_yellow_on_img;
+    NSImage * o_green_img;
+    NSImage * o_green_over_img;
+    NSImage * o_green_on_img;
+
     IBOutlet id o_red_btn;
     IBOutlet id o_yellow_btn;
     IBOutlet id o_green_btn;
@@ -36,6 +46,7 @@
     IBOutlet id o_title_lbl;
 }
 
+- (void)loadButtonIcons;
 - (IBAction)buttonAction:(id)sender;
 - (void)setWindowTitle:(NSString *)title;
 - (void)setFullscreenButtonHidden:(BOOL)b_value;
