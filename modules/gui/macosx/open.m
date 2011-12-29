@@ -824,7 +824,13 @@ static VLCOpen *_o_sharedMainInstance = nil;
         [self showOpticalMediaView: o_disc_audiocd_view withIcon: [[NSWorkspace sharedWorkspace] iconForFile: [o_opticalDevices objectAtIndex: index]]];
         [self setMRL: [NSString stringWithFormat: @"cdda://%@", [self getBSDNodeFromMountPath:[o_opticalDevices objectAtIndex: index]]]];
     }
-    else if (diskType == kVLCMediaVCD || diskType == kVLCMediaSVCD)
+    else if (diskType == kVLCMediaVCD)
+    {
+        [o_disc_vcd_lbl setStringValue: [[NSFileManager defaultManager] displayNameAtPath:[o_opticalDevices objectAtIndex: index]]];
+        [self showOpticalMediaView: o_disc_vcd_view withIcon: [[NSWorkspace sharedWorkspace] iconForFile: [o_opticalDevices objectAtIndex: index]]];
+        [self setMRL: [NSString stringWithFormat: @"vcd://%@#%i:%i", [self getBSDNodeFromMountPath:[o_opticalDevices objectAtIndex: index]], [o_disc_vcd_title intValue], [o_disc_vcd_chapter intValue]]];
+    }
+    else if (diskType == kVLCMediaSVCD)
     {
         [o_disc_vcd_lbl setStringValue: [[NSFileManager defaultManager] displayNameAtPath:[o_opticalDevices objectAtIndex: index]]];
         [self showOpticalMediaView: o_disc_vcd_view withIcon: [[NSWorkspace sharedWorkspace] iconForFile: [o_opticalDevices objectAtIndex: index]]];
