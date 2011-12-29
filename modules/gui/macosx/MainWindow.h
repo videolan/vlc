@@ -133,6 +133,7 @@
 
 - (void)setTitle:(NSString *)title;
 - (void) customZoom: (id)sender;
+- (void)windowResizedOrMoved:(NSNotification *)notification;
 
 - (void)showDropZone;
 - (void)hideDropZone;

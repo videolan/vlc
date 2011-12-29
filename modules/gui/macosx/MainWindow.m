@@ -109,6 +109,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
 - (void)dealloc
 {
+    [[NSNotificationCenter defaultCenter] removeObserver: self];
     config_PutInt( VLCIntf->p_libvlc, "volume", i_lastShownVolume );
     [self saveFrameUsingName: [self frameAutosaveName]];
     [o_sidebaritems release];
@@ -394,6 +395,9 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
     if( b_dark_interface )
     {
+        [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(windowResizedOrMoved:) name: NSWindowDidResizeNotification object: nil];
+        [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(windowResizedOrMoved:) name: NSWindowDidMoveNotification object: nil];
+
         NSRect winrect;
         CGFloat f_titleBarHeight = [o_titlebar_view frame].size.height;
         winrect = [self frame];
@@ -795,6 +799,11 @@ static VLCMainWindow *_o_sharedInstance = nil;
     }
 
     [self setFrame: maxRect display: YES animate: YES];
+}
+
+- (void)windowResizedOrMoved:(NSNotification *)notification
+{
+    [self saveFrameUsingName: [self frameAutosaveName]];
 }
 
 #pragma mark -
