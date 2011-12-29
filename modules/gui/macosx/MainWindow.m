@@ -76,7 +76,6 @@ static VLCMainWindow *_o_sharedInstance = nil;
     {
 #ifdef MAC_OS_X_VERSION_10_7
         styleMask = NSBorderlessWindowMask | NSResizableWindowMask;
-        [o_resize_view removeFromSuperviewWithoutNeedingDisplay];
 #else
         styleMask = NSBorderlessWindowMask;
 #endif
@@ -413,6 +412,12 @@ static VLCMainWindow *_o_sharedInstance = nil;
         [o_split_view setFrame: winrect];
         [o_video_view setFrame: winrect];
         previousSavedFrame = winrect;
+
+        if (OSX_LION)
+            [o_resize_view setImage: NULL];
+
+        if ([self styleMask] & NSResizableWindowMask)
+            [o_resize_view removeFromSuperviewWithoutNeedingDisplay];
 
         [self display];
     }
