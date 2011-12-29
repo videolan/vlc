@@ -335,7 +335,8 @@ bool    BasicCMParser::setSegments          (Node *root, SegmentInfo *info)
     {
         Segment *seg = new Segment();
         parseSegment( seg, segments.at(i)->getAttributes() );
-        info->addSegment(seg);
+        if ( seg->getSourceUrl().empty() == false )
+            info->addSegment(seg);
     }
     return true;
 }
