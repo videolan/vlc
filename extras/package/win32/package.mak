@@ -123,13 +123,12 @@ package-win32-webplugin-common: package-win-strip
 	find $(prefix) -maxdepth 4 -name "*$(LIBEXT)" -exec cp {} "$(win32_xpi_destdir)/" \;
 	cp $(top_builddir)/npapi-vlc/npapi/npvlc.dll.manifest "$(win32_xpi_destdir)/plugins/"
 	cp "$(top_srcdir)/extras/package/win32/libvlc.dll.manifest" "$(win32_xpi_destdir)/plugins/"
-	rm -rf "$(win32_xpi_destdir)/plugins/*qt*"
-	rm -rf "$(win32_xpi_destdir)/plugins/*skins*"
+	rm -rf "$(win32_xpi_destdir)/plugins/gui/"
 
 
 package-win32-xpi: package-win32-webplugin-common
 	cp $(top_builddir)/npapi-vlc/npapi/install.rdf "$(win32_xpi_destdir)/"
-	cd $(win32_xpi_destdir) && zip -r "../vlc-$(VERSION).xpi" install.rdf plugins
+	cd $(win32_xpi_destdir) && zip -r -9 "../vlc-$(VERSION).xpi" install.rdf plugins
 
 
 package-win32-crx: package-win32-webplugin-common
