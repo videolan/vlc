@@ -5,7 +5,7 @@ endif
 
 win32_destdir=$(abs_top_builddir)/vlc-$(VERSION)
 win32_debugdir=$(abs_top_builddir)/symbols-$(VERSION)
-win32_xpi_destdir=$(win32_destdir)/vlc-plugin
+win32_xpi_destdir=$(abs_top_builddir)/vlc-plugin-$(VERSION)
 
 7Z_OPTS=-t7z -m0=lzma -mx=9 -mfb=64 -md=32m -ms=on
 
