@@ -336,8 +336,8 @@ NSString * const PXSLDeleteKeyPressedOnRowsNotification = @"PXSourceListDeleteKe
 	}
 	else
 	{
-		CGFloat leftIndent = [self levelForRow:row]*[self indentationPerLevel]+DISCLOSURE_TRIANGLE_SPACE;
-		
+		CGFloat leftIndent = ([self levelForRow:row] -1)*[self indentationPerLevel]+DISCLOSURE_TRIANGLE_SPACE;
+
 		//Calculate space left for a badge if need be
 		CGFloat rightIndent = [self sizeOfBadgeAtRow:row].width+ROW_RIGHT_MARGIN;
 		
