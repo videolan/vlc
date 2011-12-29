@@ -150,6 +150,12 @@
 		CC0433D213B28C8C00D7D52E /* spref_cone_Interface_64.png in Resources */ = {isa = PBXBuildFile; fileRef = CC0433CC13B28C8C00D7D52E /* spref_cone_Interface_64.png */; };
 		CC0433D313B28C8C00D7D52E /* spref_cone_Subtitles_64.png in Resources */ = {isa = PBXBuildFile; fileRef = CC0433CD13B28C8C00D7D52E /* spref_cone_Subtitles_64.png */; };
 		CC0433D413B28C8C00D7D52E /* spref_cone_Video_64.png in Resources */ = {isa = PBXBuildFile; fileRef = CC0433CE13B28C8C00D7D52E /* spref_cone_Video_64.png */; };
+		CC0586BA14ACF7C000659A99 /* sidebar-local.png in Resources */ = {isa = PBXBuildFile; fileRef = CC0586B414ACF7C000659A99 /* sidebar-local.png */; };
+		CC0586BB14ACF7C000659A99 /* sidebar-movie.png in Resources */ = {isa = PBXBuildFile; fileRef = CC0586B514ACF7C000659A99 /* sidebar-movie.png */; };
+		CC0586BC14ACF7C000659A99 /* sidebar-music.png in Resources */ = {isa = PBXBuildFile; fileRef = CC0586B614ACF7C000659A99 /* sidebar-music.png */; };
+		CC0586BD14ACF7C000659A99 /* sidebar-pictures.png in Resources */ = {isa = PBXBuildFile; fileRef = CC0586B714ACF7C000659A99 /* sidebar-pictures.png */; };
+		CC0586BE14ACF7C000659A99 /* sidebar-playlist.png in Resources */ = {isa = PBXBuildFile; fileRef = CC0586B814ACF7C000659A99 /* sidebar-playlist.png */; };
+		CC0586BF14ACF7C000659A99 /* sidebar-podcast.png in Resources */ = {isa = PBXBuildFile; fileRef = CC0586B914ACF7C000659A99 /* sidebar-podcast.png */; };
 		CC11373514A7921A005DF2F3 /* window-resize.png in Resources */ = {isa = PBXBuildFile; fileRef = CC11373414A7921A005DF2F3 /* window-resize.png */; };
 		CC2DB09A14A7550D0050A055 /* window-close-on.png in Resources */ = {isa = PBXBuildFile; fileRef = CC2DB09114A7550D0050A055 /* window-close-on.png */; };
 		CC2DB09B14A7550D0050A055 /* window-close-over.png in Resources */ = {isa = PBXBuildFile; fileRef = CC2DB09214A7550D0050A055 /* window-close-over.png */; };
@@ -214,12 +220,6 @@
 		CC9B43B113B29FCF000205AE /* bottom-background_dark.png in Resources */ = {isa = PBXBuildFile; fileRef = CC9B43B013B29FCF000205AE /* bottom-background_dark.png */; };
 		CCB320721423AAEE002CB53B /* shuffle-blue.png in Resources */ = {isa = PBXBuildFile; fileRef = CCB320711423AAEE002CB53B /* shuffle-blue.png */; };
 		CCBE999F0F922C51000705F8 /* CoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CCBE999E0F922C51000705F8 /* CoreServices.framework */; };
-		CCC4A92614A40340006731E4 /* local.png in Resources */ = {isa = PBXBuildFile; fileRef = CCC4A92014A40340006731E4 /* local.png */; };
-		CCC4A92714A40340006731E4 /* movie.png in Resources */ = {isa = PBXBuildFile; fileRef = CCC4A92114A40340006731E4 /* movie.png */; };
-		CCC4A92814A40340006731E4 /* music.png in Resources */ = {isa = PBXBuildFile; fileRef = CCC4A92214A40340006731E4 /* music.png */; };
-		CCC4A92914A40340006731E4 /* pictures.png in Resources */ = {isa = PBXBuildFile; fileRef = CCC4A92314A40340006731E4 /* pictures.png */; };
-		CCC4A92A14A40340006731E4 /* playlist.png in Resources */ = {isa = PBXBuildFile; fileRef = CCC4A92414A40340006731E4 /* playlist.png */; };
-		CCC4A92B14A40340006731E4 /* podcast.png in Resources */ = {isa = PBXBuildFile; fileRef = CCC4A92514A40340006731E4 /* podcast.png */; };
 		CCD83E2D13FE9B90004F1652 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = CCD83E2B13FE9B90004F1652 /* MainMenu.xib */; };
 		CCD83E4413FEA143004F1652 /* About.xib in Resources */ = {isa = PBXBuildFile; fileRef = CCD83E2E13FEA143004F1652 /* About.xib */; };
 		CCD83E4513FEA143004F1652 /* AudioEffects.xib in Resources */ = {isa = PBXBuildFile; fileRef = CCD83E3013FEA143004F1652 /* AudioEffects.xib */; };
@@ -427,6 +427,12 @@
 		CC0433CC13B28C8C00D7D52E /* spref_cone_Interface_64.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = spref_cone_Interface_64.png; path = Resources/prefs/spref_cone_Interface_64.png; sourceTree = "<group>"; };
 		CC0433CD13B28C8C00D7D52E /* spref_cone_Subtitles_64.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = spref_cone_Subtitles_64.png; path = Resources/prefs/spref_cone_Subtitles_64.png; sourceTree = "<group>"; };
 		CC0433CE13B28C8C00D7D52E /* spref_cone_Video_64.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = spref_cone_Video_64.png; path = Resources/prefs/spref_cone_Video_64.png; sourceTree = "<group>"; };
+		CC0586B414ACF7C000659A99 /* sidebar-local.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "sidebar-local.png"; path = "Resources/sidebar-icons/sidebar-local.png"; sourceTree = "<group>"; };
+		CC0586B514ACF7C000659A99 /* sidebar-movie.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "sidebar-movie.png"; path = "Resources/sidebar-icons/sidebar-movie.png"; sourceTree = "<group>"; };
+		CC0586B614ACF7C000659A99 /* sidebar-music.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "sidebar-music.png"; path = "Resources/sidebar-icons/sidebar-music.png"; sourceTree = "<group>"; };
+		CC0586B714ACF7C000659A99 /* sidebar-pictures.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "sidebar-pictures.png"; path = "Resources/sidebar-icons/sidebar-pictures.png"; sourceTree = "<group>"; };
+		CC0586B814ACF7C000659A99 /* sidebar-playlist.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "sidebar-playlist.png"; path = "Resources/sidebar-icons/sidebar-playlist.png"; sourceTree = "<group>"; };
+		CC0586B914ACF7C000659A99 /* sidebar-podcast.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "sidebar-podcast.png"; path = "Resources/sidebar-icons/sidebar-podcast.png"; sourceTree = "<group>"; };
 		CC0CD0DF13DE0EAE00B0D90D /* PXSourceList.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = PXSourceList.h; path = ../../../modules/gui/macosx/PXSourceList.h; sourceTree = "<group>"; };
 		CC0CD0E013DE0EAE00B0D90D /* PXSourceList.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = PXSourceList.m; path = ../../../modules/gui/macosx/PXSourceList.m; sourceTree = "<group>"; };
 		CC0CD0E113DE0EAE00B0D90D /* PXSourceListDataSource.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = PXSourceListDataSource.h; path = ../../../modules/gui/macosx/PXSourceListDataSource.h; sourceTree = "<group>"; };
@@ -526,12 +532,6 @@
 		CCB24D5E0D54BBAE004D780C /* simple_prefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = simple_prefs.h; path = ../../../modules/gui/macosx/simple_prefs.h; sourceTree = SOURCE_ROOT; };
 		CCB320711423AAEE002CB53B /* shuffle-blue.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "shuffle-blue.png"; path = "Resources/mainwindow/shuffle-blue.png"; sourceTree = "<group>"; };
 		CCBE999E0F922C51000705F8 /* CoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreServices.framework; path = /System/Library/Frameworks/CoreServices.framework; sourceTree = "<absolute>"; };
-		CCC4A92014A40340006731E4 /* local.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = local.png; path = "Resources/sidebar-icons/local.png"; sourceTree = "<group>"; };
-		CCC4A92114A40340006731E4 /* movie.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = movie.png; path = "Resources/sidebar-icons/movie.png"; sourceTree = "<group>"; };
-		CCC4A92214A40340006731E4 /* music.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = music.png; path = "Resources/sidebar-icons/music.png"; sourceTree = "<group>"; };
-		CCC4A92314A40340006731E4 /* pictures.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = pictures.png; path = "Resources/sidebar-icons/pictures.png"; sourceTree = "<group>"; };
-		CCC4A92414A40340006731E4 /* playlist.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = playlist.png; path = "Resources/sidebar-icons/playlist.png"; sourceTree = "<group>"; };
-		CCC4A92514A40340006731E4 /* podcast.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = podcast.png; path = "Resources/sidebar-icons/podcast.png"; sourceTree = "<group>"; };
 		CCC895830D9A8A82005AE59C /* eyetv.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = eyetv.m; path = ../../../modules/access/eyetv.m; sourceTree = SOURCE_ROOT; };
 		CCCCDCA01413E1C000FE3DE1 /* VideoView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = VideoView.h; path = ../../../modules/gui/macosx/VideoView.h; sourceTree = "<group>"; };
 		CCCCDCA11413E1C000FE3DE1 /* VideoView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = VideoView.m; path = ../../../modules/gui/macosx/VideoView.m; sourceTree = "<group>"; };
@@ -1058,12 +1058,12 @@
 		CCE6438C13E8CC040061B5F2 /* sidebar */ = {
 			isa = PBXGroup;
 			children = (
-				CCC4A92014A40340006731E4 /* local.png */,
-				CCC4A92114A40340006731E4 /* movie.png */,
-				CCC4A92214A40340006731E4 /* music.png */,
-				CCC4A92314A40340006731E4 /* pictures.png */,
-				CCC4A92414A40340006731E4 /* playlist.png */,
-				CCC4A92514A40340006731E4 /* podcast.png */,
+				CC0586B414ACF7C000659A99 /* sidebar-local.png */,
+				CC0586B514ACF7C000659A99 /* sidebar-movie.png */,
+				CC0586B614ACF7C000659A99 /* sidebar-music.png */,
+				CC0586B714ACF7C000659A99 /* sidebar-pictures.png */,
+				CC0586B814ACF7C000659A99 /* sidebar-playlist.png */,
+				CC0586B914ACF7C000659A99 /* sidebar-podcast.png */,
 			);
 			name = sidebar;
 			sourceTree = "<group>";
@@ -1337,12 +1337,6 @@
 				CC58012D1423A85300166912 /* fs_volume_slider_knob_highlight@x1.5.png in Resources */,
 				CC58012E1423A85300166912 /* fs_volume_slider_knob@x1.5.png in Resources */,
 				CCB320721423AAEE002CB53B /* shuffle-blue.png in Resources */,
-				CCC4A92614A40340006731E4 /* local.png in Resources */,
-				CCC4A92714A40340006731E4 /* movie.png in Resources */,
-				CCC4A92814A40340006731E4 /* music.png in Resources */,
-				CCC4A92914A40340006731E4 /* pictures.png in Resources */,
-				CCC4A92A14A40340006731E4 /* playlist.png in Resources */,
-				CCC4A92B14A40340006731E4 /* podcast.png in Resources */,
 				CC2DB09A14A7550D0050A055 /* window-close-on.png in Resources */,
 				CC2DB09B14A7550D0050A055 /* window-close-over.png in Resources */,
 				CC2DB09C14A7550D0050A055 /* window-close.png in Resources */,
@@ -1356,6 +1350,12 @@
 				CC6FA91A14A78AE700353C5F /* window-fullscreen-over.png in Resources */,
 				CC6FA91B14A78AE700353C5F /* window-fullscreen.png in Resources */,
 				CC11373514A7921A005DF2F3 /* window-resize.png in Resources */,
+				CC0586BA14ACF7C000659A99 /* sidebar-local.png in Resources */,
+				CC0586BB14ACF7C000659A99 /* sidebar-movie.png in Resources */,
+				CC0586BC14ACF7C000659A99 /* sidebar-music.png in Resources */,
+				CC0586BD14ACF7C000659A99 /* sidebar-pictures.png in Resources */,
+				CC0586BE14ACF7C000659A99 /* sidebar-playlist.png in Resources */,
+				CC0586BF14ACF7C000659A99 /* sidebar-podcast.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
