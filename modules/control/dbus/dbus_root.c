@@ -351,6 +351,88 @@ DBUS_METHOD( GetProperty )
 #undef PROPERTY_GET_FUNC
 #undef PROPERTY_MAPPING_END
 
+static int
+AddProperty( intf_thread_t *p_intf,
+             DBusMessageIter *p_container,
+             const char* psz_property_name,
+             const char* psz_signature,
+             int (*pf_marshaller) (intf_thread_t*, DBusMessageIter*) )
+{
+    DBusMessageIter entry, v;
+
+    if( !dbus_message_iter_open_container( p_container,
+                                           DBUS_TYPE_DICT_ENTRY, NULL,
+                                           &entry ) )
+        return VLC_ENOMEM;
+
+    if( !dbus_message_iter_append_basic( &entry,
+                                         DBUS_TYPE_STRING,
+                                         &psz_property_name ) )
+        return VLC_ENOMEM;
+
+    if( !dbus_message_iter_open_container( &entry,
+                                           DBUS_TYPE_VARIANT, psz_signature,
+                                           &v ) )
+        return VLC_ENOMEM;
+
+    if( VLC_SUCCESS != pf_marshaller( p_intf, &v ) )
+        return VLC_ENOMEM;
+
+    if( !dbus_message_iter_close_container( &entry, &v) )
+        return VLC_ENOMEM;
+
+    if( !dbus_message_iter_close_container( p_container, &entry ) )
+        return VLC_ENOMEM;
+
+    return VLC_SUCCESS;
+}
+
+#define ADD_PROPERTY( prop, signature ) \
+    if( VLC_SUCCESS != AddProperty( (intf_thread_t*) p_this, \
+                &dict, #prop, signature, Marshal##prop ) ) \
+        return VLC_ENOMEM;
+
+DBUS_METHOD( GetAllProperties )
+{
+    REPLY_INIT;
+    OUT_ARGUMENTS;
+
+    DBusError error;
+    DBusMessageIter dict, entry, v;
+
+    char *const psz_interface_name = NULL;
+
+    dbus_error_init( &error );
+    dbus_message_get_args( p_from, &error,
+            DBUS_TYPE_STRING, &psz_interface_name,
+            DBUS_TYPE_INVALID );
+
+    if( dbus_error_is_set( &error ) )
+    {
+        msg_Err( (vlc_object_t*) p_this, "D-Bus message reading : %s",
+                                         error.message );
+        dbus_error_free( &error );
+        return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
+    }
+
+    msg_Dbg( (vlc_object_t*) p_this, "Getting All properties" );
+
+    dbus_message_iter_open_container( &args, DBUS_TYPE_ARRAY, "{sv}", &dict );
+
+    ADD_PROPERTY( Identity,            "s"  );
+    ADD_PROPERTY( DesktopEntry,        "s"  );
+    ADD_PROPERTY( SupportedMimeTypes,  "as" );
+    ADD_PROPERTY( SupportedUriSchemes, "as" );
+    ADD_PROPERTY( HasTrackList,        "b"  );
+    ADD_PROPERTY( CanQuit,             "b"  );
+    ADD_PROPERTY( CanRaise,            "b"  );
+
+    dbus_message_iter_close_container( &args, &dict );
+    REPLY_SEND;
+}
+
+#undef ADD_PROPERTY
+
 #define METHOD_MAPPING_BEGIN if( 0 ) {}
 #define METHOD_FUNC( interface, method, function ) \
     else if( dbus_message_is_method_call( p_from, interface, method ) )\
@@ -362,6 +444,7 @@ handle_root ( DBusConnection *p_conn, DBusMessage *p_from, void *p_this )
 {
     METHOD_MAPPING_BEGIN
     METHOD_FUNC( DBUS_INTERFACE_PROPERTIES, "Get",          GetProperty );
+    METHOD_FUNC( DBUS_INTERFACE_PROPERTIES, "GetAll",       GetAllProperties );
     METHOD_FUNC( DBUS_MPRIS_ROOT_INTERFACE, "Quit",         Quit );
     METHOD_FUNC( DBUS_MPRIS_ROOT_INTERFACE, "Raise",        Raise );
     METHOD_MAPPING_END
