@@ -2,8 +2,8 @@
  * dbus_root.c : dbus control module (mpris v1.0) - root object
  *****************************************************************************
  * Copyright © 2006-2008 Rafaël Carré
- * Copyright © 2007-2010 Mirsal Ennaime
- * Copyright © 2009-2010 The VideoLAN team
+ * Copyright © 2007-2011 Mirsal Ennaime
+ * Copyright © 2009-2011 The VideoLAN team
  * $Id$
  *
  * Authors:    Mirsal Ennaime <mirsal at mirsal fr>
@@ -68,89 +68,129 @@ static const char const ppsz_supported_mime_types[][26] = {
     "application/xspf+xml"
 };
 
+static int
+MarshalIdentity( intf_thread_t *p_intf, DBusMessageIter *container )
+{
+    VLC_UNUSED( p_intf );
+    const char *psz_id = _("VLC media player");
+
+    dbus_message_iter_append_basic( container, DBUS_TYPE_STRING, &psz_id );
+    return VLC_SUCCESS;
+}
+
 DBUS_METHOD( Identity )
 {
-    VLC_UNUSED(p_this);
     REPLY_INIT;
     OUT_ARGUMENTS;
 
-    const char *psz_identity = _("VLC media player");
-
     DBusMessageIter v;
     dbus_message_iter_open_container( &args, DBUS_TYPE_VARIANT, "s", &v );
-    dbus_message_iter_append_basic( &v, DBUS_TYPE_STRING, &psz_identity );
+
+    MarshalIdentity( p_this, &v );
 
     if( !dbus_message_iter_close_container( &args, &v ) )
         return DBUS_HANDLER_RESULT_NEED_MEMORY;
 
     REPLY_SEND;
+}
+
+static int
+MarshalCanQuit( intf_thread_t *p_intf, DBusMessageIter *container )
+{
+    VLC_UNUSED( p_intf );
+    const dbus_bool_t b_ret = TRUE;
+
+    dbus_message_iter_append_basic( container, DBUS_TYPE_BOOLEAN, &b_ret );
+    return VLC_SUCCESS;
 }
 
 DBUS_METHOD( CanQuit )
 {
-    VLC_UNUSED( p_this );
     REPLY_INIT;
     OUT_ARGUMENTS;
 
-    const dbus_bool_t b_ret = TRUE;
-
     DBusMessageIter v;
     dbus_message_iter_open_container( &args, DBUS_TYPE_VARIANT, "b", &v );
-    dbus_message_iter_append_basic( &v, DBUS_TYPE_BOOLEAN, &b_ret );
+
+    MarshalCanQuit( p_this, &v );
 
     if( !dbus_message_iter_close_container( &args, &v ) )
         return DBUS_HANDLER_RESULT_NEED_MEMORY;
 
     REPLY_SEND;
+}
+
+static int
+MarshalCanRaise( intf_thread_t *p_intf, DBusMessageIter *container )
+{
+    VLC_UNUSED( p_intf );
+    const dbus_bool_t b_ret = FALSE;
+
+    dbus_message_iter_append_basic( container, DBUS_TYPE_BOOLEAN, &b_ret );
+    return VLC_SUCCESS;
 }
 
 DBUS_METHOD( CanRaise )
 {
-    VLC_UNUSED( p_this );
     REPLY_INIT;
     OUT_ARGUMENTS;
 
-    const dbus_bool_t b_ret = FALSE;
-
     DBusMessageIter v;
     dbus_message_iter_open_container( &args, DBUS_TYPE_VARIANT, "b", &v );
-    dbus_message_iter_append_basic( &v, DBUS_TYPE_BOOLEAN, &b_ret );
+
+    MarshalCanRaise( p_this, &v );
 
     if( !dbus_message_iter_close_container( &args, &v ) )
         return DBUS_HANDLER_RESULT_NEED_MEMORY;
 
     REPLY_SEND;
+}
+
+static int
+MarshalHasTrackList( intf_thread_t *p_intf, DBusMessageIter *container )
+{
+    VLC_UNUSED( p_intf );
+    const dbus_bool_t b_ret = FALSE;
+
+    dbus_message_iter_append_basic( container, DBUS_TYPE_BOOLEAN, &b_ret );
+    return VLC_SUCCESS;
 }
 
 DBUS_METHOD( HasTrackList )
 {
-    VLC_UNUSED( p_this );
     REPLY_INIT;
     OUT_ARGUMENTS;
 
-    const dbus_bool_t b_ret = FALSE;
-
     DBusMessageIter v;
     dbus_message_iter_open_container( &args, DBUS_TYPE_VARIANT, "b", &v );
-    dbus_message_iter_append_basic( &v, DBUS_TYPE_BOOLEAN, &b_ret );
+
+    MarshalHasTrackList( p_this, &v );
 
     if( !dbus_message_iter_close_container( &args, &v ) )
         return DBUS_HANDLER_RESULT_NEED_MEMORY;
 
     REPLY_SEND;
+}
+
+static int
+MarshalDesktopEntry( intf_thread_t *p_intf, DBusMessageIter *container )
+{
+    VLC_UNUSED( p_intf );
+    const char* psz_ret = PACKAGE;
+
+    dbus_message_iter_append_basic( container, DBUS_TYPE_STRING, &psz_ret );
+    return VLC_SUCCESS;
 }
 
 DBUS_METHOD( DesktopEntry )
 {
-    VLC_UNUSED( p_this );
     REPLY_INIT;
     OUT_ARGUMENTS;
 
-    const char* psz_ret = PACKAGE;
-
     DBusMessageIter v;
     dbus_message_iter_open_container( &args, DBUS_TYPE_VARIANT, "s", &v );
-    dbus_message_iter_append_basic( &v, DBUS_TYPE_STRING, &psz_ret );
+
+    MarshalDesktopEntry( p_this, &v );
 
     if( !dbus_message_iter_close_container( &args, &v ) )
         return DBUS_HANDLER_RESULT_NEED_MEMORY;
@@ -158,31 +198,79 @@ DBUS_METHOD( DesktopEntry )
     REPLY_SEND;
 }
 
+static int
+MarshalSupportedMimeTypes( intf_thread_t *p_intf, DBusMessageIter *container )
+{
+    VLC_UNUSED( p_intf );
+    DBusMessageIter ret;
+
+    size_t i_len = sizeof( ppsz_supported_mime_types ) /
+        sizeof( *ppsz_supported_mime_types );
+
+    if( !dbus_message_iter_open_container( container,
+                                           DBUS_TYPE_ARRAY, "s",
+                                           &ret ) )
+        return VLC_ENOMEM;
+
+    for( size_t i = 0; i < i_len; ++i )
+    {
+        const char* const psz_mime_type = ppsz_supported_mime_types[i];
+
+        if( !dbus_message_iter_append_basic( &ret, DBUS_TYPE_STRING,
+                                             &psz_mime_type ) )
+            return VLC_ENOMEM;
+    }
+
+    if( !dbus_message_iter_close_container( container, &ret ) )
+        return VLC_ENOMEM;
+
+    return VLC_SUCCESS;
+}
+
 DBUS_METHOD( SupportedMimeTypes )
 {
-    VLC_UNUSED( p_this );
     REPLY_INIT;
     OUT_ARGUMENTS;
 
-    DBusMessageIter ret, v;
-    dbus_message_iter_open_container( &args, DBUS_TYPE_VARIANT, "s", &v );
-    size_t i_len = sizeof( ppsz_supported_mime_types ) / sizeof( char* );
+    DBusMessageIter v;
+    dbus_message_iter_open_container( &args, DBUS_TYPE_VARIANT, "as", &v );
 
-    if( !dbus_message_iter_open_container( &v, DBUS_TYPE_ARRAY, "s", &ret ) )
-        return DBUS_HANDLER_RESULT_NEED_MEMORY;
-
-    for( size_t i = 0; i < i_len; ++i )
-        if( !dbus_message_iter_append_basic( &ret, DBUS_TYPE_STRING,
-                                             &ppsz_supported_mime_types[i] ) )
-            return DBUS_HANDLER_RESULT_NEED_MEMORY;
-
-    if( !dbus_message_iter_close_container( &v, &ret ) )
+    if( VLC_SUCCESS != MarshalSupportedMimeTypes( p_this, &v ) )
         return DBUS_HANDLER_RESULT_NEED_MEMORY;
 
     if( !dbus_message_iter_close_container( &args, &v ) )
         return DBUS_HANDLER_RESULT_NEED_MEMORY;
 
     REPLY_SEND;
+}
+
+static int
+MarshalSupportedUriSchemes( intf_thread_t *p_intf, DBusMessageIter *container )
+{
+    VLC_UNUSED( p_intf );
+    DBusMessageIter ret;
+
+    size_t i_len = sizeof( ppsz_supported_uri_schemes ) /
+        sizeof( *ppsz_supported_uri_schemes );
+
+    if( !dbus_message_iter_open_container( container,
+                                           DBUS_TYPE_ARRAY, "s",
+                                           &ret ) )
+        return VLC_ENOMEM;
+
+    for( size_t i = 0; i < i_len; ++i )
+    {
+        const char* const psz_scheme = ppsz_supported_uri_schemes[i];
+
+        if( !dbus_message_iter_append_basic( &ret, DBUS_TYPE_STRING,
+                                             &psz_scheme ) )
+            return VLC_ENOMEM;
+    }
+
+    if( !dbus_message_iter_close_container( container, &ret ) )
+        return VLC_ENOMEM;
+
+    return VLC_SUCCESS;
 }
 
 DBUS_METHOD( SupportedUriSchemes )
@@ -191,19 +279,10 @@ DBUS_METHOD( SupportedUriSchemes )
     REPLY_INIT;
     OUT_ARGUMENTS;
 
-    DBusMessageIter ret, v;
-    dbus_message_iter_open_container( &args, DBUS_TYPE_VARIANT, "s", &v );
-    size_t i_len = sizeof( ppsz_supported_uri_schemes ) / sizeof( char* );
+    DBusMessageIter v;
+    dbus_message_iter_open_container( &args, DBUS_TYPE_VARIANT, "as", &v );
 
-    if( !dbus_message_iter_open_container( &v, DBUS_TYPE_ARRAY, "s", &ret ) )
-        return DBUS_HANDLER_RESULT_NEED_MEMORY;
-
-    for( size_t i = 0; i < i_len; ++i )
-        if( !dbus_message_iter_append_basic( &ret, DBUS_TYPE_STRING,
-                                             &ppsz_supported_uri_schemes[i] ) )
-            return DBUS_HANDLER_RESULT_NEED_MEMORY;
-
-    if( !dbus_message_iter_close_container( &v, &ret ) )
+    if( VLC_SUCCESS != MarshalSupportedUriSchemes( p_this, &v ) )
         return DBUS_HANDLER_RESULT_NEED_MEMORY;
 
     if( !dbus_message_iter_close_container( &args, &v ) )
