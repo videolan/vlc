@@ -4549,7 +4549,7 @@ LCAuLi4</string>
           <object class="NSButton" id="47797873">
             <reference key="NSNextResponder" ref="471121744"/>
             <int key="NSvFlags">268</int>
-            <string key="NSFrame">{{48, 4}, {15, 14}}</string>
+            <string key="NSFrame">{{48, 1}, {14, 16}}</string>
             <reference key="NSSuperview" ref="471121744"/>
             <string key="NSReuseIdentifierKey">_NS:610</string>
             <bool key="NSEnabled">YES</bool>
@@ -4560,7 +4560,7 @@ LCAuLi4</string>
               <reference key="NSSupport" ref="841513812"/>
               <string key="NSCellIdentifier">_NS:610</string>
               <reference key="NSControlView" ref="47797873"/>
-              <int key="NSButtonFlags">134365439</int>
+              <int key="NSButtonFlags">138690815</int>
               <int key="NSButtonFlags2">6</int>
               <string key="NSAlternateContents"/>
               <string key="NSKeyEquivalent"/>
@@ -4571,7 +4571,7 @@ LCAuLi4</string>
           <object class="NSButton" id="145580725">
             <reference key="NSNextResponder" ref="471121744"/>
             <int key="NSvFlags">268</int>
-            <string key="NSFrame">{{28, 4}, {15, 14}}</string>
+            <string key="NSFrame">{{28, 1}, {14, 16}}</string>
             <reference key="NSSuperview" ref="471121744"/>
             <string key="NSReuseIdentifierKey">_NS:610</string>
             <bool key="NSEnabled">YES</bool>
@@ -4582,7 +4582,7 @@ LCAuLi4</string>
               <reference key="NSSupport" ref="841513812"/>
               <string key="NSCellIdentifier">_NS:610</string>
               <reference key="NSControlView" ref="145580725"/>
-              <int key="NSButtonFlags">134365439</int>
+              <int key="NSButtonFlags">138690815</int>
               <int key="NSButtonFlags2">6</int>
               <string key="NSAlternateContents"/>
               <string key="NSKeyEquivalent"/>
@@ -4593,7 +4593,7 @@ LCAuLi4</string>
           <object class="NSButton" id="369193052">
             <reference key="NSNextResponder" ref="471121744"/>
             <int key="NSvFlags">268</int>
-            <string key="NSFrame">{{8, 4}, {15, 14}}</string>
+            <string key="NSFrame">{{8, 1}, {14, 16}}</string>
             <reference key="NSSuperview" ref="471121744"/>
             <string key="NSReuseIdentifierKey">_NS:610</string>
             <bool key="NSEnabled">YES</bool>
@@ -4604,7 +4604,7 @@ LCAuLi4</string>
               <reference key="NSSupport" ref="841513812"/>
               <string key="NSCellIdentifier">_NS:610</string>
               <reference key="NSControlView" ref="369193052"/>
-              <int key="NSButtonFlags">134365439</int>
+              <int key="NSButtonFlags">138690815</int>
               <int key="NSButtonFlags2">6</int>
               <string key="NSAlternateContents"/>
               <string key="NSKeyEquivalent"/>
