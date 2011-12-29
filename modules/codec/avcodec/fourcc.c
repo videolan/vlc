@@ -235,6 +235,10 @@ static const struct
     { VLC_CODEC_PRORES, CODEC_ID_PRORES, VIDEO_ES },
 #endif
 
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 53, 32, 0 )
+    { VLC_CODEC_PRORES, CODEC_ID_INDEO4, VIDEO_ES },
+#endif
+
 
 #if 0
 /*    UNTESTED VideoGames*/
