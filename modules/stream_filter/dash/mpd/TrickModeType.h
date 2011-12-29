@@ -36,12 +36,12 @@ namespace dash
         {
             public:
                 TrickModeType           ();
-                virtual ~TrickModeType  ();
 
-                std::string getAlternatePlayoutRate();
+                int         getAlternatePlayoutRate() const;
+                void        setAlternatePlayoutRate( int playoutRate );
 
             private:
-                std::map<std::string, std::string>  attributes;
+                int         alternatePlayoutRate;
         };
     }
 }

@@ -29,10 +29,18 @@
 
 using namespace dash::mpd;
 
-TrickModeType::TrickModeType    ()
+TrickModeType::TrickModeType() :
+    alternatePlayoutRate( 1 )
 {
+}
 
-}
-TrickModeType::~TrickModeType   ()
+int TrickModeType::getAlternatePlayoutRate() const
 {
+    return this->alternatePlayoutRate;
 }
+
+void TrickModeType::setAlternatePlayoutRate(int playoutRate)
+{
+    this->alternatePlayoutRate = playoutRate;
+}
+

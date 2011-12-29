@@ -68,22 +68,17 @@ void    Representation::setBandwidth( int bandwidth )
         this->bandwidth = bandwidth;
 }
 
-SegmentInfo*        Representation::getSegmentInfo          () const throw(ElementNotPresentException)
+SegmentInfo*        Representation::getSegmentInfo() const
 {
-    if(this->segmentInfo == NULL)
-        throw ElementNotPresentException();
-
     return this->segmentInfo;
 }
-TrickModeType*      Representation::getTrickModeType        () const throw(ElementNotPresentException)
-{
-    if(this->segmentInfo == NULL)
-        throw ElementNotPresentException();
 
+TrickModeType*      Representation::getTrickModeType        () const
+{
     return this->trickModeType;
 }
 
-void                Representation::setTrickModeType        (TrickModeType *trickModeType)
+void                Representation::setTrickMode        (TrickModeType *trickModeType)
 {
     this->trickModeType = trickModeType;
 }

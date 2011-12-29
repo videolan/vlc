@@ -55,16 +55,15 @@ namespace dash
                 void                setQualityRanking       ( int qualityRanking );
                 const std::list<const Representation*>&     getDependencies() const;
                 void                addDependency           ( const Representation* dep );
-                SegmentInfo*        getSegmentInfo          () const throw(dash::exception::ElementNotPresentException);
-                TrickModeType*      getTrickModeType        () const throw(dash::exception::ElementNotPresentException);
+                SegmentInfo*        getSegmentInfo          () const;
+                TrickModeType*      getTrickModeType        () const;
 
-                void    setSegmentInfo         (SegmentInfo *info);
-                void    setTrickModeType       (TrickModeType *trickModeType);
+                void                setSegmentInfo( SegmentInfo *info );
+                void                setTrickMode( TrickModeType *trickModeType );
 
             private:
                 int                                 bandwidth;
-                std::string                         id;
-                int                                 qualityRanking;
+                std::string                         id; int                                 qualityRanking;
                 std::list<const Representation*>    dependencies;
                 std::map<std::string, std::string>  attributes;
                 SegmentInfo                         *segmentInfo;

@@ -59,6 +59,7 @@ namespace dash
                 bool    setMPD              ();
                 void    setPeriods          (dash::xml::Node *root);
                 void    setGroups           (dash::xml::Node *root, Period *period);
+                void    parseTrickMode( dash::xml::Node *node, Representation *repr );
                 void    setRepresentations  (dash::xml::Node *root, Group *group);
                 bool    setSegmentInfo      (dash::xml::Node *root, Representation *rep);
                 void    setInitSegment      (dash::xml::Node *root, SegmentInfo *info);

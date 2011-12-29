@@ -150,7 +150,7 @@ void    BasicCMParser::setGroups            (Node *root, Period *period)
     for(size_t i = 0; i < groups.size(); i++)
     {
         const std::map<std::string, std::string>    attr = groups.at(i)->getAttributes();
-        Group *group = new Group();
+        Group *group = new Group;
         if ( this->parseCommonAttributesElements( groups.at( i ), group, NULL ) == false )
         {
             delete group;
@@ -162,6 +162,25 @@ void    BasicCMParser::setGroups            (Node *root, Period *period)
         this->setRepresentations(groups.at(i), group);
         period->addGroup(group);
     }
+}
+
+void BasicCMParser::parseTrickMode(Node *node, Representation *repr)
+{
+    std::vector<Node *> trickModes = DOMHelper::getElementByTagName(node, "TrickMode", false);
+
+    if ( trickModes.size() == 0 )
+        return ;
+    if ( trickModes.size() > 1 )
+        std::cerr << "More than 1 TrickMode element. Only the first one will be used." << std::endl;
+
+    Node*                                       trickModeNode = trickModes[0];
+    TrickModeType                               *trickMode = new TrickModeType;
+    const std::map<std::string, std::string>    attr = trickModeNode->getAttributes();
+    std::map<std::string, std::string>::const_iterator    it = attr.find( "alternatePlayoutRate" );
+
+    if ( it != attr.end() )
+        trickMode->setAlternatePlayoutRate( atoi( it->second.c_str() ) );
+    repr->setTrickMode( trickMode );
 }
 
 void    BasicCMParser::setRepresentations   (Node *root, Group *group)
@@ -249,9 +268,10 @@ bool    BasicCMParser::setSegmentInfo       (Node *root, Representation *rep)
         if ( it != attr.end() )
             info->setDuration( str_duration( it->second.c_str() ) );
 
-        rep->setSegmentInfo(info);
+        rep->setSegmentInfo( info );
         return true;
     }
+    std::cerr << "Missing mandatory element: Representation/SegmentInfo" << std::endl;
     return false;
 }
 
