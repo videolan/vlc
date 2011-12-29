@@ -149,12 +149,16 @@ void    BasicCMParser::setGroups            (Node *root, Period *period)
 
     for(size_t i = 0; i < groups.size(); i++)
     {
-        Group *group = new Group(groups.at(i)->getAttributes());
+        const std::map<std::string, std::string>    attr = groups.at(i)->getAttributes();
+        Group *group = new Group();
         if ( this->parseCommonAttributesElements( groups.at( i ), group, NULL ) == false )
         {
             delete group;
             continue ;
         }
+        std::map<std::string, std::string>::const_iterator  it = attr.find( "subsegmentAlignmentFlag" );
+        if ( it != attr.end() && it->second == "true" )
+            group->setSubsegmentAlignmentFlag( true ); //Otherwise it is false by default.
         this->setRepresentations(groups.at(i), group);
         period->addGroup(group);
     }

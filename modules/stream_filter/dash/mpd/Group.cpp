@@ -30,8 +30,8 @@
 using namespace dash::mpd;
 using namespace dash::exception;
 
-Group::Group    ( const std::map<std::string, std::string>&  attributes) :
-    attributes( attributes )
+Group::Group() :
+    subsegmentAlignmentFlag( false )
 {
 }
 
@@ -40,12 +40,14 @@ Group::~Group   ()
     vlc_delete_all( this->representations );
 }
 
-std::string                     Group::getSubSegmentAlignment   () throw(AttributeNotPresentException)
+bool                Group::getSubsegmentAlignmentFlag() const
 {
-    if(this->attributes.find("subsegmentAlignmentFlag") == this->attributes.end())
-        throw AttributeNotPresentException();
+    return this->subsegmentAlignmentFlag;
+}
 
-    return this->attributes["subsegmentAlignmentFlag"];
+void Group::setSubsegmentAlignmentFlag(bool alignment)
+{
+    this->subsegmentAlignmentFlag = alignment;
 }
 
 std::vector<Representation*>    Group::getRepresentations       ()

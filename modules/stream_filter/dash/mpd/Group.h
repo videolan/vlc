@@ -40,17 +40,18 @@ namespace dash
         class Group : public CommonAttributesElements
         {
             public:
-                Group           (const std::map<std::string, std::string>&  attributes);
-                virtual ~Group  ();
+                Group();
+                virtual ~Group();
 
-                std::string                     getSubSegmentAlignment  () throw(dash::exception::AttributeNotPresentException);
+                bool                            getSubsegmentAlignmentFlag() const;
+                void                            setSubsegmentAlignmentFlag( bool alignment );
                 std::vector<Representation *>   getRepresentations      ();
                 const Representation*           getRepresentationById   ( const std::string &id ) const;
 
-                void addRepresentation      (Representation *rep);
+                void addRepresentation( Representation *rep );
 
             private:
-                std::map<std::string, std::string>  attributes;
+                bool                                subsegmentAlignmentFlag;
                 std::vector<Representation *>       representations;
         };
     }
