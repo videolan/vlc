@@ -236,7 +236,7 @@ static const struct
 #endif
 
 #if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 53, 32, 0 )
-    { VLC_CODEC_PRORES, CODEC_ID_INDEO4, VIDEO_ES },
+    { VLC_CODEC_INDEO4, CODEC_ID_INDEO4, VIDEO_ES },
 #endif
 
 
