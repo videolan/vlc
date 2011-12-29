@@ -28,7 +28,6 @@
 #include "MPD.h"
 
 using namespace dash::mpd;
-using namespace dash::exception;
 
 MPD::MPD () :
     profile( dash::mpd::UnknownProfile ),

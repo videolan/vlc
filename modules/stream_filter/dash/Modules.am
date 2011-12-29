@@ -10,7 +10,6 @@ SOURCES_stream_filter_dash = \
     adaptationlogic/NullAdaptationLogic.h \
     adaptationlogic/RateBasedAdaptationLogic.h \
     adaptationlogic/RateBasedAdaptationLogic.cpp \
-    exceptions/AttributeNotPresentException.h \
     exceptions/EOFException.h \
     http/Chunk.cpp \
     http/Chunk.h \

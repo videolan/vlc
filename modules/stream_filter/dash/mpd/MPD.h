@@ -32,7 +32,6 @@
 #include "mpd/Period.h"
 #include "mpd/BaseUrl.h"
 #include "mpd/ProgramInformation.h"
-#include "exceptions/AttributeNotPresentException.h"
 #include "mpd/IMPDManager.h"
 
 namespace dash

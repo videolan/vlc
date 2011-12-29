@@ -31,7 +31,6 @@
 
 #include "mpd/Representation.h"
 #include "mpd/CommonAttributesElements.h"
-#include "exceptions/AttributeNotPresentException.h"
 
 namespace dash
 {

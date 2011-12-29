@@ -27,8 +27,9 @@
 
 #include "BasicCMManager.h"
 
+#include <cassert>
+
 using namespace dash::mpd;
-using namespace dash::exception;
 
 BasicCMManager::BasicCMManager  (MPD *mpd)
 {
@@ -60,7 +61,7 @@ Representation*         BasicCMManager::getBestRepresentation   (Period *period)
 {
     std::vector<Group *> groups = period->getGroups();
 
-    long            bitrate  = 0;
+    int             bitrate  = 0;
     Representation  *best    = NULL;
 
     for(size_t i = 0; i < groups.size(); i++)
@@ -68,22 +69,16 @@ Representation*         BasicCMManager::getBestRepresentation   (Period *period)
         std::vector<Representation *> reps = groups.at(i)->getRepresentations();
         for(size_t j = 0; j < reps.size(); j++)
         {
-            try
+            int currentBitrate = reps.at(j)->getBandwidth();
+            assert( currentBitrate != -1 );
+
+            if( currentBitrate > bitrate)
             {
-                long currentBitrate = reps.at(j)->getBandwidth();
-                if(currentBitrate > bitrate)
-                {
-                    bitrate = currentBitrate;
-                    best    = reps.at(j);
-                }
-            }
-            catch(AttributeNotPresentException &e)
-            {
-                /* TODO DEBUG */
+                bitrate = currentBitrate;
+                best    = reps.at(j);
             }
         }
     }
-
     return best;
 }
 Period*                 BasicCMManager::getFirstPeriod          ()
@@ -95,41 +90,35 @@ Period*                 BasicCMManager::getFirstPeriod          ()
 
     return periods.at(0);
 }
+
 Representation*         BasicCMManager::getRepresentation       (Period *period, long bitrate)
 {
     std::vector<Group *> groups = period->getGroups();
 
     Representation  *best       = NULL;
-    long            bestDif  = -1;
+    int             bestDif  = -1;
 
     for(size_t i = 0; i < groups.size(); i++)
     {
         std::vector<Representation *> reps = groups.at(i)->getRepresentations();
         for(size_t j = 0; j < reps.size(); j++)
         {
-            try
-            {
-                long currentBitrate = reps.at(j)->getBandwidth();
-                long dif = bitrate - currentBitrate;
+            int     currentBitrate = reps.at(j)->getBandwidth();
+            assert( currentBitrate != -1 );
+            int     dif = bitrate - currentBitrate;
 
-                if(bestDif == -1)
+            if( bestDif == -1 )
+            {
+                bestDif = dif;
+                best = reps.at(j);
+            }
+            else
+            {
+                if ( dif >= 0 && dif < bestDif )
                 {
                     bestDif = dif;
                     best = reps.at(j);
                 }
-                else
-                {
-                    if(dif >= 0 && dif < bestDif)
-                    {
-                        bestDif = dif;
-                        best = reps.at(j);
-                    }
-                }
-
-            }
-            catch(AttributeNotPresentException &e)
-            {
-                /* TODO DEBUG */
             }
         }
     }

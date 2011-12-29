@@ -28,7 +28,6 @@
 #include "ProgramInformation.h"
 
 using namespace dash::mpd;
-using namespace dash::exception;
 
 const std::string &ProgramInformation::getSource() const
 {

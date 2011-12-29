@@ -36,7 +36,6 @@
 #include "mpd/SegmentInfo.h"
 #include "mpd/Segment.h"
 #include "mpd/IMPDManager.h"
-#include "exceptions/AttributeNotPresentException.h"
 
 namespace dash
 {

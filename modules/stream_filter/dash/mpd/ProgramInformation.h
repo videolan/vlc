@@ -28,8 +28,6 @@
 #include <string>
 #include <map>
 
-#include "exceptions/AttributeNotPresentException.h"
-
 namespace dash
 {
     namespace mpd

@@ -28,7 +28,6 @@
 #include <vlc_arrays.h>
 
 using namespace dash::mpd;
-using namespace dash::exception;
 
 Group::Group() :
     subsegmentAlignmentFlag( false )

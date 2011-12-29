@@ -33,7 +33,6 @@
 #include "mpd/Period.h"
 #include "mpd/Representation.h"
 #include "mpd/Segment.h"
-#include "exceptions/AttributeNotPresentException.h"
 #include "exceptions/EOFException.h"
 
 namespace dash
