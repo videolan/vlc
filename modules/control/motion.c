@@ -129,11 +129,11 @@ int Open ( vlc_object_t *p_this )
         /* Apple Motion Sensor support */
         p_intf->p_sys->sensor = AMS_SENSOR;
     }
-    else if( access( "/sys/devices/applesmc.768/position", R_OK ) == 0 )
+    else if( access( "/sys/devices/platform/applesmc.768/position", R_OK ) == 0 )
     {
         /* Apple SMC (newer macbooks) */
         /* Should be factorised with HDAPS */
-        f = fopen( "/sys/devices/applesmc.768/calibrate", "r" );
+        f = fopen( "/sys/devices/platform/applesmc.768/calibrate", "r" );
         if( f )
         {
             p_intf->p_sys->i_calibrate = fscanf( f, "(%d,%d)", &i_x, &i_y ) == 2 ? i_x: 0;
@@ -312,7 +312,7 @@ static int GetOrientation( intf_thread_t *p_intf )
             return - i_x * 30; /* FIXME: arbitrary */
 
     case APPLESMC_SENSOR:
-        f = fopen( "/sys/devices/applesmc.768/position", "r" );
+        f = fopen( "/sys/devices/platform/applesmc.768/position", "r" );
         if( !f )
         {
             return 0;
