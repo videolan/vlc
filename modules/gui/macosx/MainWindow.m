@@ -162,9 +162,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
         o_shuffle_pressed_img = [[NSImage imageNamed:@"shuffle-pressed"] retain];
         o_shuffle_on_img = [[NSImage imageNamed:@"shuffle-blue"] retain];
         o_shuffle_on_pressed_img = [[NSImage imageNamed:@"shuffle-blue-pressed"] retain];
-        [o_time_sld_left_view setImage: [NSImage imageNamed:@"progression-track-wrapper-left"]];
-        [o_time_sld_middle_view setImage: [NSImage imageNamed:@"progression-track-wrapper-middle"]];
-        [o_time_sld_right_view setImage: [NSImage imageNamed:@"progression-track-wrapper-right"]];
+        [o_time_sld_background setImagesLeft: [NSImage imageNamed:@"progression-track-wrapper-left"] middle: [NSImage imageNamed:@"progression-track-wrapper-middle"] right: [NSImage imageNamed:@"progression-track-wrapper-right"]];
         [o_volume_down_btn setImage: [NSImage imageNamed:@"volume-low"]];
         [o_volume_track_view setImage: [NSImage imageNamed:@"volume-slider-track"]];
         [o_volume_up_btn setImage: [NSImage imageNamed:@"volume-high"]];
@@ -180,7 +178,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
         }
         [o_fullscreen_btn setImage: [NSImage imageNamed:@"fullscreen-double-buttons"]];
         [o_fullscreen_btn setAlternateImage: [NSImage imageNamed:@"fullscreen-double-buttons-pressed"]];
-        [o_time_sld_fancygradient_view loadImagesInDarkStyle:NO];
+        [o_time_sld_fancygradient_view setImagesLeft:[NSImage imageNamed:@"progression-fill-left"] middle:[NSImage imageNamed:@"progression-fill-middle"] right:[NSImage imageNamed:@"progression-fill-right"]];
     }
     else
     {
@@ -208,9 +206,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
         o_shuffle_on_img = [[NSImage imageNamed:@"shuffle-blue_dark"] retain];
         o_shuffle_on_pressed_img = [[NSImage imageNamed:@"shuffle-blue-pressed_dark"] retain];
         [o_time_fld setTextColor: [NSColor colorWithCalibratedRed:229.0 green:229.0 blue:229.0 alpha:100.0]];
-        [o_time_sld_left_view setImage: [NSImage imageNamed:@"progression-track-wrapper-left_dark"]];
-        [o_time_sld_middle_view setImage: [NSImage imageNamed:@"progression-track-wrapper-middle_dark"]];
-        [o_time_sld_right_view setImage: [NSImage imageNamed:@"progression-track-wrapper-right_dark"]];
+        [o_time_sld_background setImagesLeft: [NSImage imageNamed:@"progression-track-wrapper-left_dark"] middle: [NSImage imageNamed:@"progression-track-wrapper-middle_dark"] right: [NSImage imageNamed:@"progression-track-wrapper-right_dark"]];
         [o_volume_down_btn setImage: [NSImage imageNamed:@"volume-low_dark"]];
         [o_volume_track_view setImage: [NSImage imageNamed:@"volume-slider-track_dark"]];
         [o_volume_up_btn setImage: [NSImage imageNamed:@"volume-high_dark"]];
@@ -226,7 +222,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
         }
         [o_fullscreen_btn setImage: [NSImage imageNamed:@"fullscreen-double-buttons_dark"]];
         [o_fullscreen_btn setAlternateImage: [NSImage imageNamed:@"fullscreen-double-buttons-pressed_dark"]];
-        [o_time_sld_fancygradient_view loadImagesInDarkStyle:YES];
+        [o_time_sld_fancygradient_view setImagesLeft:[NSImage imageNamed:@"progressbar-fill-left_dark"] middle:[NSImage imageNamed:@"progressbar-fill-middle_dark"] right:[NSImage imageNamed:@"progressbar-fill-right_dark"]];
     }
     [o_repeat_btn setImage: o_repeat_img];
     [o_repeat_btn setAlternateImage: o_repeat_pressed_img];
@@ -267,7 +263,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
         moveItem( o_volume_track_view );
         moveItem( o_volume_down_btn );
         moveItem( o_time_fld );
-        moveItem( o_time_sld_right_view );
+        moveItem( o_time_sld_background );
         #undef moveItem
 
         #define enlargeItem( item ) \
@@ -277,7 +273,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
         enlargeItem( o_time_sld );
         enlargeItem( o_progress_bar );
-        enlargeItem( o_time_sld_middle_view );
+        enlargeItem( o_time_sld_background );
         enlargeItem( o_time_sld_fancygradient_view );
         #undef enlargeItem
 
@@ -1021,15 +1017,15 @@ static VLCMainWindow *_o_sharedInstance = nil;
 - (void)drawFancyGradientEffectForTimeSlider
 {
     NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
-    float f_value = [o_time_sld_middle_view frame].size.width * ([o_time_sld intValue] / [o_time_sld maxValue]);
-    if (f_value > 5.0)
+    float f_value = ([o_time_sld frame].size.width - [o_time_sld frame].origin.x - [o_time_sld knobPosition]) * -1.0;
+    if (f_value > 7.5)
     {
-        if (f_value != [o_time_sld_fancygradient_view frame].size.width)
+        NSRect oldFrame = [o_time_sld_fancygradient_view frame];
+        if (f_value != oldFrame.size.width)
         {
             [o_time_sld_fancygradient_view setHidden: NO];
-            [o_time_sld_fancygradient_view setFrame: NSMakeRect( [o_time_sld_fancygradient_view frame].origin.x, [o_time_sld_fancygradient_view frame].origin.y, f_value, [o_time_sld_fancygradient_view frame].size.height )];
+            [o_time_sld_fancygradient_view setFrame: NSMakeRect( oldFrame.origin.x, oldFrame.origin.y, f_value, oldFrame.size.height )];
             [o_time_sld_fancygradient_view setNeedsDisplay:YES];
-            [o_time_sld_middle_view setNeedsDisplay:YES];
         }
     }
     else
@@ -1805,36 +1801,4 @@ static VLCMainWindow *_o_sharedInstance = nil;
 	}
 }
 
-@end
-
-@implementation VLCProgressBarGradientEffect
-- (void)dealloc
-{
-    [o_time_sld_gradient_left_img release];
-    [o_time_sld_gradient_middle_img release];
-    [o_time_sld_gradient_right_img release];
-    [super dealloc];
-}
-
-- (void)loadImagesInDarkStyle: (BOOL)b_value
-{
-    if (b_value)
-    {
-        o_time_sld_gradient_left_img = [[NSImage imageNamed:@"progressbar-fill-left_dark"] retain];
-        o_time_sld_gradient_middle_img = [[NSImage imageNamed:@"progressbar-fill-middle_dark"] retain];
-        o_time_sld_gradient_right_img = [[NSImage imageNamed:@"progressbar-fill-right_dark"] retain];
-    }
-    else
-    {
-        o_time_sld_gradient_left_img = [[NSImage imageNamed:@"progression-fill-left"] retain];
-        o_time_sld_gradient_middle_img = [[NSImage imageNamed:@"progression-fill-middle"] retain];
-        o_time_sld_gradient_right_img = [[NSImage imageNamed:@"progression-fill-right"] retain];
-    }
-}
-
-- (void)drawRect:(NSRect)rect
-{
-    NSRect bnds = [self bounds];
-    NSDrawThreePartImage( bnds, o_time_sld_gradient_left_img, o_time_sld_gradient_middle_img, o_time_sld_gradient_right_img, NO, NSCompositeSourceOver, 1, NO );
-}
 @end

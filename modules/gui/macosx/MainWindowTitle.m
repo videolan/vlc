@@ -55,11 +55,8 @@
 
 - (void)awakeFromNib
 {
-    [self setImageScaling: NSScaleToFit];
-    [self setImageFrameStyle: NSImageFrameNone];
-    [self setImageAlignment: NSImageAlignCenter];
-    [self setImage: [NSImage imageNamed:@"topbar-dark-center-fill"]];
     [self setAutoresizesSubviews: YES];
+    [self setImagesLeft:[NSImage imageNamed:@"topbar-dark-left"] middle: [NSImage imageNamed:@"topbar-dark-center-fill"] right:[NSImage imageNamed:@"topbar-dark-right"]];
 
     [self loadButtonIcons];
     [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(controlTintChanged:) name: NSControlTintDidChangeNotification object: nil];
@@ -208,7 +205,6 @@
     else
         [o_fullscreen_btn setImage: [NSImage imageNamed:@"window-fullscreen"]];
 }
-
 @end
 
 /*****************************************************************************

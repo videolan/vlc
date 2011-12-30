@@ -118,7 +118,10 @@
 
 @interface TimeLineSlider : NSSlider
 {
+    NSImage *o_knob_img;
+    NSRect img_rect;
 }
+- (CGFloat)knobPosition;
 
 - (void)drawRect:(NSRect)rect;
 - (void)drawKnobInRect:(NSRect)knobRect;
@@ -157,4 +160,17 @@
 {
 }
 
+@end
+
+/*****************************************************************************
+ * VLCThreePartImageView interface
+ *****************************************************************************/
+@interface VLCThreePartImageView : NSView
+{
+    NSImage * o_left_img;
+    NSImage * o_middle_img;
+    NSImage * o_right_img;
+}
+
+- (void)setImagesLeft:(NSImage *)left middle: (NSImage *)middle right:(NSImage *)right;
 @end

@@ -51,10 +51,7 @@
     IBOutlet id o_time_fld;
     IBOutlet id o_progress_bar;
     IBOutlet id o_bottombar_view;
-    IBOutlet id o_time_sld_left_view;
-    IBOutlet id o_time_sld_middle_view;
-    IBOutlet id o_time_sld_right_view;
-    // TODO Playlist table, additional ui stuff at the top of the window
+    IBOutlet id o_time_sld_background;
     IBOutlet id o_playlist_table;
     IBOutlet id o_video_view;
     IBOutlet id o_split_view;
@@ -172,12 +169,3 @@
 - (void)windowWillExitFullScreen:(NSNotification *)notification;
 
 @end
-
-@interface VLCProgressBarGradientEffect : NSView {
-    NSImage * o_time_sld_gradient_left_img;
-    NSImage * o_time_sld_gradient_middle_img;
-    NSImage * o_time_sld_gradient_right_img;
-}
-- (void)loadImagesInDarkStyle:(BOOL)b_value;
-@end
-

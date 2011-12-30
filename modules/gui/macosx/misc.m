@@ -601,17 +601,32 @@ void _drawFrameInRect(NSRect frameRect)
 
 @implementation TimeLineSlider
 
+- (void)awakeFromNib
+{
+    o_knob_img = [NSImage imageNamed:@"progression-knob"];
+    img_rect.size = [o_knob_img size];
+    img_rect.origin.x = img_rect.origin.y = 0;
+}
+
+- (void)dealloc
+{
+    [o_knob_img release];
+    [super dealloc];
+}
+
+- (CGFloat)knobPosition
+{
+    NSRect knobRect = [[self cell] knobRectFlipped:NO];
+    knobRect.origin.x += knobRect.size.width / 2;
+    return knobRect.origin.x;
+}
+
 - (void)drawKnobInRect:(NSRect)knobRect
 {
-    NSRect image_rect;
-    NSImage *img = [NSImage imageNamed:@"progression-knob"];
-    image_rect.size = [img size];
-    image_rect.origin.x = 0;
-    image_rect.origin.y = 0;
-    knobRect.origin.x += (knobRect.size.width - image_rect.size.width) / 2;
-    knobRect.size.width = image_rect.size.width;
-    knobRect.size.height = image_rect.size.height;
-    [img drawInRect:knobRect fromRect:image_rect operation:NSCompositeSourceOver fraction:1];
+    knobRect.origin.x += (knobRect.size.width - img_rect.size.width) / 2;
+    knobRect.size.width = img_rect.size.width;
+    knobRect.size.height = img_rect.size.height;
+    [o_knob_img drawInRect:knobRect fromRect:img_rect operation:NSCompositeSourceOver fraction:1];
 }
 
 - (void)drawRect:(NSRect)rect
@@ -731,4 +746,39 @@ void _drawFrameInRect(NSRect frameRect)
     rightViewDimensions.size.height = viewDimensions.size.height;
     [[o_subviews objectAtIndex:1] setFrame: rightViewDimensions];
 }
+@end
+
+/*****************************************************************************
+ * VLCThreePartImageView interface
+ *****************************************************************************/
+@implementation VLCThreePartImageView
+- (void)dealloc
+{
+    [o_left_img release];
+    [o_middle_img release];
+    [o_right_img release];
+
+    [super dealloc];
+}
+
+- (void)setImagesLeft:(NSImage *)left middle: (NSImage *)middle right:(NSImage *)right
+{
+    if (o_left_img)
+        [o_left_img release];
+    if (o_middle_img)
+        [o_middle_img release];
+    if (o_right_img)
+        [o_right_img release];
+
+    o_left_img = [left retain];
+    o_middle_img = [middle retain];
+    o_right_img = [right retain];
+}
+
+- (void)drawRect:(NSRect)rect
+{
+    NSRect bnds = [self bounds];
+    NSDrawThreePartImage( bnds, o_left_img, o_middle_img, o_right_img, NO, NSCompositeSourceOver, 1, NO );
+}
+
 @end

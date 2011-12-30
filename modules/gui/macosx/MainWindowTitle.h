@@ -22,12 +22,13 @@
  *****************************************************************************/
 
 #import <Cocoa/Cocoa.h>
+#import "misc.h"
 
 /*****************************************************************************
  * VLCMainWindowTitleView
  *****************************************************************************/
 
-@interface VLCMainWindowTitleView : NSImageView
+@interface VLCMainWindowTitleView : VLCThreePartImageView
 {
     NSImage * o_red_img;
     NSImage * o_red_over_img;
