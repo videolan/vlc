@@ -263,7 +263,6 @@ static VLCMainWindow *_o_sharedInstance = nil;
         moveItem( o_volume_track_view );
         moveItem( o_volume_down_btn );
         moveItem( o_time_fld );
-        moveItem( o_time_sld_background );
         #undef moveItem
 
         #define enlargeItem( item ) \
@@ -522,11 +521,13 @@ static VLCMainWindow *_o_sharedInstance = nil;
         if ([o_video_view isHidden] && [o_playlist_btn isEnabled]) {
             [o_split_view setHidden: YES];
             [o_video_view setHidden: NO];
+            NSLog( @"showing pl" );
         }
         else
         {
             [o_video_view setHidden: YES];
             [o_split_view setHidden: NO];
+            NSLog( @"show vout" );
         }
     }
     else

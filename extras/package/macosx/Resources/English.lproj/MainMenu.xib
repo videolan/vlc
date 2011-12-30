@@ -21,14 +21,14 @@
     </object>
     <object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
       <bool key="EncodedWithXMLCoder">YES</bool>
-      <integer value="21"/>
-      <integer value="29"/>
-      <integer value="4722"/>
-      <integer value="4596"/>
-      <integer value="1617"/>
-      <integer value="2730"/>
       <integer value="4895"/>
+      <integer value="1617"/>
+      <integer value="4596"/>
+      <integer value="4756"/>
+      <integer value="2730"/>
+      <integer value="4722"/>
       <integer value="915"/>
+      <integer value="29"/>
     </object>
     <object class="NSArray" key="IBDocument.PluginDependencies">
       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -622,6 +622,16 @@
               <int key="NSvFlags">290</int>
               <object class="NSMutableArray" key="NSSubviews">
                 <bool key="EncodedWithXMLCoder">YES</bool>
+                <object class="NSProgressIndicator" id="664576649">
+                  <reference key="NSNextResponder" ref="129808516"/>
+                  <int key="NSvFlags">-2147482334</int>
+                  <object class="NSPSMatrix" key="NSDrawMatrix"/>
+                  <string key="NSFrame">{{217, 13}, {185, 12}}</string>
+                  <reference key="NSSuperview" ref="129808516"/>
+                  <int key="NSViewLayerContentsRedrawPolicy">2</int>
+                  <int key="NSpiFlags">16650</int>
+                  <double key="NSMaxValue">100</double>
+                </object>
                 <object class="NSImageView" id="884724451">
                   <reference key="NSNextResponder" ref="129808516"/>
                   <int key="NSvFlags">289</int>
@@ -1058,16 +1068,6 @@
                     <bool key="NSAnimates">NO</bool>
                   </object>
                   <bool key="NSEditable">YES</bool>
-                </object>
-                <object class="NSProgressIndicator" id="664576649">
-                  <reference key="NSNextResponder" ref="129808516"/>
-                  <int key="NSvFlags">-2147482334</int>
-                  <object class="NSPSMatrix" key="NSDrawMatrix"/>
-                  <string key="NSFrame">{{219, 12}, {180, 12}}</string>
-                  <reference key="NSSuperview" ref="129808516"/>
-                  <int key="NSViewLayerContentsRedrawPolicy">2</int>
-                  <int key="NSpiFlags">16650</int>
-                  <double key="NSMaxValue">100</double>
                 </object>
                 <object class="NSButton" id="809192538">
                   <reference key="NSNextResponder" ref="129808516"/>
