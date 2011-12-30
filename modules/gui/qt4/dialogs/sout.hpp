@@ -125,7 +125,6 @@ private:
 
     QString mrl;
     QPushButton *okButton;
-    QToolButton *closeTabButton;
 
     intf_thread_t* p_intf;
 
@@ -135,8 +134,7 @@ public slots:
 private slots:
     void ok();
     void cancel();
-    void closeTab();
-    void tabChanged( int );
+    void closeTab( int );
     void addDest();
 };
 

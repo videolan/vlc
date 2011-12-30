@@ -60,20 +60,10 @@ SoutDialog::SoutDialog( QWidget *parent, intf_thread_t *_p_intf, const QString& 
                  "when you change the above settings,\n"
                  "but you can change it manually." ) ) ;
 
-#if 0
-    /* This needs Qt4.5 to be cool */
     ui.destTab->setTabsClosable( true );
+    QTabBar* tb = ui.destTab->findChild<QTabBar*>();
+    if( tb != NULL ) tb->tabButton(0, QTabBar::RightSide)->hide();
     CONNECT( ui.destTab, tabCloseRequested( int ), this, closeTab( int ) );
-#else
-    closeTabButton = new QToolButton( this );
-    ui.destTab->setCornerWidget( closeTabButton );
-    closeTabButton->hide();
-    closeTabButton->setAutoRaise( true );
-    closeTabButton->setIcon( QIcon( ":/toolbar/clear" ) );
-    closeTabButton->setToolTip( qtr("Clear") );
-    BUTTONACT( closeTabButton, closeTab() );
-#endif
-    CONNECT( ui.destTab, currentChanged( int ), this, tabChanged( int ) );
     ui.destTab->setTabIcon( 0, QIcon( ":/buttons/playlist/playlist_add" ) );
 
     ui.destBox->addItem( qtr( "File" ) );
@@ -106,17 +96,11 @@ SoutDialog::SoutDialog( QWidget *parent, intf_thread_t *_p_intf, const QString& 
 #undef CB
 }
 
-void SoutDialog::tabChanged( int i )
+void SoutDialog::closeTab( int i )
 {
-    closeTabButton->setVisible( (i != 0) );
-}
-
-void SoutDialog::closeTab()
-{
-    int i = ui.destTab->currentIndex();
     if( i == 0 ) return;
 
-    QWidget *temp = ui.destTab->currentWidget();
+    QWidget* temp = ui.destTab->widget( i );
     ui.destTab->removeTab( i );
     delete temp;
     updateMRL();
