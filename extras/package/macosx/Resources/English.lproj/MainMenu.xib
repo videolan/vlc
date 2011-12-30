@@ -24,7 +24,7 @@
       <integer value="4895"/>
       <integer value="1617"/>
       <integer value="4596"/>
-      <integer value="4756"/>
+      <integer value="2"/>
       <integer value="2730"/>
       <integer value="4722"/>
       <integer value="915"/>
@@ -608,7 +608,7 @@
             </object>
             <object class="NSCustomView" id="515305233">
               <reference key="NSNextResponder" ref="429932428"/>
-              <int key="NSvFlags">-2147483374</int>
+              <int key="NSvFlags">-2147479278</int>
               <string key="NSFrame">{{401, 110}, {163, 96}}</string>
               <reference key="NSSuperview" ref="429932428"/>
               <object class="CIAdditionCompositing" key="NSViewCompositeFilter">

@@ -411,16 +411,16 @@ static VLCMainWindow *_o_sharedInstance = nil;
         [o_video_view setFrame: winrect];
         previousSavedFrame = winrect;
 
-        if (OSX_LION)
-            [o_resize_view setImage: NULL];
-
-        if ([self styleMask] & NSResizableWindowMask)
-            [o_resize_view removeFromSuperviewWithoutNeedingDisplay];
-
         [self display];
     }
     else
         [o_video_view setFrame: [o_split_view frame]];
+
+    if (OSX_LION)
+        [o_resize_view setImage: NULL];
+
+    if ([self styleMask] & NSResizableWindowMask)
+        [o_resize_view removeFromSuperviewWithoutNeedingDisplay];
 }
 
 #pragma mark -
@@ -521,13 +521,11 @@ static VLCMainWindow *_o_sharedInstance = nil;
         if ([o_video_view isHidden] && [o_playlist_btn isEnabled]) {
             [o_split_view setHidden: YES];
             [o_video_view setHidden: NO];
-            NSLog( @"showing pl" );
         }
         else
         {
             [o_video_view setHidden: YES];
             [o_split_view setHidden: NO];
-            NSLog( @"show vout" );
         }
     }
     else
@@ -1021,7 +1019,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 - (void)drawFancyGradientEffectForTimeSlider
 {
     NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
-    float f_value = ([o_time_sld frame].size.width - [o_time_sld frame].origin.x - [o_time_sld knobPosition]) * -1.0;
+    CGFloat f_value = [o_time_sld knobPosition];
     if (f_value > 7.5)
     {
         NSRect oldFrame = [o_time_sld_fancygradient_view frame];
