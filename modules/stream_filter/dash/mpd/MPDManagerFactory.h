@@ -27,8 +27,6 @@
 
 #include "mpd/IMPDManager.h"
 #include "mpd/BasicCMManager.h"
-#include "mpd/BasicCMParser.h"
-#include "xml/Node.h"
 
 namespace dash
 {
@@ -37,7 +35,7 @@ namespace dash
         class MPDManagerFactory
         {
             public:
-                static IMPDManager* create( xml::Node *root );
+                static IMPDManager* create( MPD *mpd );
         };
     }
 }

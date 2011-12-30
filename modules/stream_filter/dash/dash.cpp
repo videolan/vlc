@@ -38,6 +38,7 @@
 #include "xml/DOMParser.h"
 #include "http/HTTPConnectionManager.h"
 #include "adaptationlogic/IAdaptationLogic.h"
+#include "mpd/BasicCMParser.h"
 
 #define SEEK 0
 
@@ -63,7 +64,7 @@ struct stream_sys_t
 {
         dash::DASHManager                   *p_dashManager;
         dash::http::HTTPConnectionManager   *p_conManager;
-        dash::xml::Node                     *p_node;
+        dash::mpd::MPD                      *p_mpd;
         int                                 position;
         bool                                isLive;
 };
@@ -82,35 +83,40 @@ static int Open(vlc_object_t *p_obj)
     if(!dash::xml::DOMParser::isDash(p_stream->p_source))
         return VLC_EGENERIC;
 
-    dash::xml::DOMParser parser(p_stream->p_source);
-    if(!parser.parse())
+    //Build a XML tree
+    dash::xml::DOMParser        parser(p_stream->p_source);
+    if( !parser.parse() )
     {
-        msg_Dbg(p_stream, "could not parse mpd file");
+        msg_Dbg( p_stream, "Could not parse mpd file." );
+        return VLC_EGENERIC;
+    }
+    //Begin the actual MPD parsing:
+    dash::mpd::BasicCMParser    mpdParser( parser.getRootNode(), p_stream->p_source );
+    if ( mpdParser.parse() == false || mpdParser.getMPD() == NULL )
+    {
+        msg_Err( p_obj, "MPD file parsing failed." );
         return VLC_EGENERIC;
     }
 
-    stream_sys_t *p_sys = (stream_sys_t *) malloc(sizeof(stream_sys_t));
-
+    stream_sys_t        *p_sys = (stream_sys_t *) malloc(sizeof(stream_sys_t));
     if (unlikely(p_sys == NULL))
         return VLC_ENOMEM;
 
+    p_sys->p_mpd = mpdParser.getMPD();
     dash::http::HTTPConnectionManager *p_conManager =
-        new dash::http::HTTPConnectionManager(p_stream);
-    dash::xml::Node *p_node = parser.getRootNode();
+                              new dash::http::HTTPConnectionManager( p_stream );
     dash::DASHManager*p_dashManager =
-        new dash::DASHManager( p_conManager, p_node,
-                              dash::logic::IAdaptationLogic::RateBased );
+            new dash::DASHManager( p_conManager, p_sys->p_mpd,
+                                   dash::logic::IAdaptationLogic::RateBased );
 
     if ( p_dashManager->getMpdManager()->getMPD() == NULL )
     {
-        msg_Err( p_obj, "MPD file parsing failed." );
         delete p_conManager;
         delete p_dashManager;
         free( p_sys );
         return VLC_EGENERIC;
     }
     p_sys->p_dashManager    = p_dashManager;
-    p_sys->p_node           = p_node;
     p_sys->p_conManager     = p_conManager;
     p_sys->position         = 0;
     p_sys->isLive           = p_dashManager->getMpdManager()->getMPD()->isLive();

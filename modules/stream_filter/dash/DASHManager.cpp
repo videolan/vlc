@@ -34,15 +34,17 @@ using namespace dash::logic;
 using namespace dash::mpd;
 using namespace dash::exception;
 
-DASHManager::DASHManager    ( HTTPConnectionManager *conManager, Node *node, IAdaptationLogic::LogicType type )
+DASHManager::DASHManager    ( HTTPConnectionManager *conManager, MPD *mpd,
+                              IAdaptationLogic::LogicType type ) :
+    conManager( conManager ),
+    currentChunk( NULL ),
+    adaptationLogic( NULL ),
+    logicType( type ),
+    mpdManager( NULL ),
+    mpd( mpd )
 {
-    this->conManager        = conManager;
-    this->node              = node;
-    this->logicType         = type;
-    this->mpdManager        = mpd::MPDManagerFactory::create(this->node);
+    this->mpdManager        = mpd::MPDManagerFactory::create( mpd );
     this->adaptationLogic   = AdaptationLogicFactory::create( this->logicType, this->mpdManager );
-    this->currentChunk      = NULL;
-
     this->conManager->attach(this->adaptationLogic);
 }
 DASHManager::~DASHManager   ()

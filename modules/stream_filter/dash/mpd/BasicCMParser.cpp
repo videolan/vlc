@@ -32,13 +32,19 @@
 #include <sstream>
 
 #include <vlc_common.h>
+#include <vlc_stream.h>
 #include <vlc_strings.h>
 
 using namespace dash::mpd;
 using namespace dash::xml;
 
-BasicCMParser::BasicCMParser    (Node *root) : root(root), mpd(NULL)
+BasicCMParser::BasicCMParser( Node *root, stream_t *p_stream ) :
+    root( root ),
+    mpd( NULL )
 {
+    this->url = p_stream->psz_access;
+    this->url += "://";
+    this->url += p_stream->psz_path;
 }
 
 BasicCMParser::~BasicCMParser   ()

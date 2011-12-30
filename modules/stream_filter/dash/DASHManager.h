@@ -32,13 +32,15 @@
 #include "mpd/IMPDManager.h"
 #include "mpd/MPDManagerFactory.h"
 #include "exceptions/EOFException.h"
+#include "mpd/MPD.h"
 
 namespace dash
 {
     class DASHManager
     {
         public:
-            DASHManager             (http::HTTPConnectionManager *conManager, xml::Node *node, logic::IAdaptationLogic::LogicType type);
+            DASHManager( http::HTTPConnectionManager *conManager, mpd::MPD *mpd,
+                         logic::IAdaptationLogic::LogicType type );
             virtual ~DASHManager    ();
 
             int read        (void *p_buffer, size_t len);
@@ -50,8 +52,8 @@ namespace dash
             http::Chunk                         *currentChunk;
             logic::IAdaptationLogic             *adaptationLogic;
             logic::IAdaptationLogic::LogicType  logicType;
-            xml::Node                           *node;
             mpd::IMPDManager                    *mpdManager;
+            mpd::MPD                            *mpd;
     };
 }
 

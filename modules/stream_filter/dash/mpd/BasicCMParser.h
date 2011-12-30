@@ -36,6 +36,8 @@
 #include "mpd/SegmentInfo.h"
 #include "mpd/Segment.h"
 
+struct stream_t;
+
 namespace dash
 {
     namespace mpd
@@ -43,8 +45,8 @@ namespace dash
         class BasicCMParser : public IMPDParser
         {
             public:
-                BasicCMParser           (dash::xml::Node *root);
-                virtual ~BasicCMParser  ();
+                BasicCMParser( dash::xml::Node *root, stream_t *p_stream );
+                virtual ~BasicCMParser();
 
                 bool    parse  ();
                 MPD*    getMPD ();
@@ -53,9 +55,6 @@ namespace dash
                 void    handleDependencyId( Representation* rep, const Group* group, const std::string& dependencyId );
 
             private:
-                dash::xml::Node *root;
-                MPD             *mpd;
-
                 bool    setMPD              ();
                 void    setPeriods          (dash::xml::Node *root);
                 void    setGroups           (dash::xml::Node *root, Period *period);
@@ -73,6 +72,11 @@ namespace dash
                                                        CommonAttributesElements *parent ) const;
                 bool    parseSegment( Segment *seg, const std::map<std::string, std::string> &attr );
                 ProgramInformation*     parseProgramInformation();
+
+            private:
+                dash::xml::Node *root;
+                MPD             *mpd;
+                std::string     url;
         };
     }
 }

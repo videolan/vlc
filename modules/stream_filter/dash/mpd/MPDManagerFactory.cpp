@@ -28,21 +28,14 @@
 #include "mpd/MPDManagerFactory.h"
 
 using namespace dash::mpd;
-using namespace dash::xml;
 
-IMPDManager* MPDManagerFactory::create( Node *root )
+IMPDManager* MPDManagerFactory::create( MPD *mpd )
 {
-    BasicCMParser parser(root);
-
-    if ( parser.parse() == false )
-        return NULL;
-
-    Profile profile = parser.getMPD()->getProfile();
-    switch( profile )
+    switch( mpd->getProfile() )
     {
         case mpd::BasicCM:
         case mpd::Full2011:
-            return new BasicCMManager( parser.getMPD() );
+            return new BasicCMManager( mpd );
         case mpd::Basic:
         case mpd::UnknownProfile:
         default:
