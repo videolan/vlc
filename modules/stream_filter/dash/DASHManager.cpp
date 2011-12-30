@@ -44,6 +44,8 @@ DASHManager::DASHManager    ( HTTPConnectionManager *conManager, MPD *mpd,
     mpd( mpd )
 {
     this->mpdManager        = mpd::MPDManagerFactory::create( mpd );
+    if ( this->mpdManager == NULL )
+        return ;
     this->adaptationLogic   = AdaptationLogicFactory::create( this->logicType, this->mpdManager );
     this->conManager->attach(this->adaptationLogic);
 }
