@@ -393,6 +393,9 @@ static VLCMainWindow *_o_sharedInstance = nil;
         [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(windowResizedOrMoved:) name: NSWindowDidResizeNotification object: nil];
         [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(windowResizedOrMoved:) name: NSWindowDidMoveNotification object: nil];
 
+        [self setBackgroundColor: [NSColor clearColor]];
+        [self setOpaque: NO];
+
         NSRect winrect;
         CGFloat f_titleBarHeight = [o_titlebar_view frame].size.height;
         winrect = [self frame];
