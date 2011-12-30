@@ -26,6 +26,7 @@
 
 #include <sys/types.h>
 #include <list>
+#include <stdint.h>
 
 namespace dash
 {

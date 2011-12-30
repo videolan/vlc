@@ -81,6 +81,7 @@ bool    BasicCMParser::setMPD()
                      " the stream @type is Live" << std::endl;
         return false;
     }
+#ifdef HAVE_STRPTIME
     if ( it != attr.end() )
     {
         struct tm   t;
@@ -105,6 +106,7 @@ bool    BasicCMParser::setMPD()
         if ( res != NULL )
             this->mpd->setAvailabilityEndTime( mktime( &t ) );
     }
+#endif
     it = attr.find( "mediaPresentationDuration" );
     if ( it != attr.end() )
         this->mpd->setDuration( str_duration( it->second.c_str() ) );
