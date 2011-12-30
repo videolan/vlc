@@ -31,7 +31,7 @@ using namespace dash::mpd;
 using namespace dash::exception;
 
 MPD::MPD () :
-    profile( dash::mpd::NotValid ),
+    profile( dash::mpd::UnknownProfile ),
     live( false ),
     availabilityStartTime( -1 ),
     availabilityEndTime( -1 ),
@@ -173,6 +173,8 @@ void MPD::setProfile( const std::string &strProfile )
 {
     if( strProfile == "urn:mpeg:mpegB:profile:dash:isoff-basic-on-demand:cm" )
         this->profile = dash::mpd::BasicCM;
+    else if ( strProfile == "urn:mpeg:mpegB:profile:dash:full:2011" )
+        this->profile = dash::mpd::Full2011;
     else
-        this->profile = dash::mpd::NotValid;
+        this->profile = dash::mpd::UnknownProfile;
 }

@@ -35,16 +35,17 @@ IMPDManager* MPDManagerFactory::create( Node *root )
     BasicCMParser parser(root);
 
     if ( parser.parse() == false )
-        return new NullManager();
+        return NULL;
 
     Profile profile = parser.getMPD()->getProfile();
     switch( profile )
     {
-        case mpd::Basic:    return new NullManager();
-        case mpd::BasicCM:  return new BasicCMManager( parser.getMPD() );
-        case mpd::Full2011: return new NullManager();
-        case mpd::NotValid: return new NullManager();
-
-        default:            return new NullManager();
+        case mpd::BasicCM:
+        case mpd::Full2011:
+            return new BasicCMManager( parser.getMPD() );
+        case mpd::Basic:
+        case mpd::UnknownProfile:
+        default:
+            return NULL;
     }
 }

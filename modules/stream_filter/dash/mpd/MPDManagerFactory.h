@@ -26,7 +26,6 @@
 #define MPDMANAGERFACTORY_H_
 
 #include "mpd/IMPDManager.h"
-#include "mpd/NullManager.h"
 #include "mpd/BasicCMManager.h"
 #include "mpd/BasicCMParser.h"
 #include "xml/Node.h"

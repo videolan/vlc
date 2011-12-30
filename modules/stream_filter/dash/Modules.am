@@ -37,8 +37,6 @@ SOURCES_stream_filter_dash = \
     mpd/MPD.h \
     mpd/MPDManagerFactory.cpp \
     mpd/MPDManagerFactory.h \
-    mpd/NullManager.cpp \
-    mpd/NullManager.h \
     mpd/Period.cpp \
     mpd/Period.h \
     mpd/ProgramInformation.cpp \

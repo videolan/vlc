@@ -19,10 +19,10 @@ namespace dash
 
         enum Profile
         {
-            NotValid,
+            UnknownProfile,
             Full2011,
             Basic,
-            BasicCM,
+            BasicCM
         };
         class IMPDManager
         {
