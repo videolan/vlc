@@ -506,16 +506,14 @@ int ioctl_ReadSectors( vlc_object_t *p_this, const vcddev_t *p_vcddev,
                    SEEK_SET ) == -1 )
         {
             msg_Err( p_this, "Could not lseek to sector %d", i_sector );
-            if( i_type == VCD_TYPE ) free( p_block );
-            return -1;
+            goto error;
         }
 
         if( read( p_vcddev->i_vcdimage_handle, p_block, VCD_SECTOR_SIZE * i_nb)
             == -1 )
         {
             msg_Err( p_this, "Could not read sector %d", i_sector );
-            if( i_type == VCD_TYPE ) free( p_block );
-            return -1;
+            goto error;
         }
 
     }
@@ -543,8 +541,7 @@ int ioctl_ReadSectors( vlc_object_t *p_this, const vcddev_t *p_vcddev,
         if( ioctl( p_vcddev->i_device_handle, DKIOCCDREAD, &cd_read ) == -1 )
         {
             msg_Err( p_this, "could not read block %d", i_sector );
-            if( i_type == VCD_TYPE ) free( p_block );
-            return -1;
+            goto error;
         }
 
 #elif defined( WIN32 )
@@ -570,10 +567,7 @@ int ioctl_ReadSectors( vlc_object_t *p_this, const vcddev_t *p_vcddev,
                                      sizeof(RAW_READ_INFO), p_block,
                                      VCD_SECTOR_SIZE * i_nb, &dwBytesReturned,
                                      NULL ) == 0 )
-                {
-                    free( p_block );
-                    return -1;
-                }
+                    goto error;
             }
             else return -1;
         }
@@ -595,11 +589,7 @@ int ioctl_ReadSectors( vlc_object_t *p_this, const vcddev_t *p_vcddev,
         if( rc )
         {
             msg_Err( p_this, "could not read block %d", i_sector );
-
-            if( i_type == VCD_TYPE )
-                free( p_block );
-
-            return -1;
+            goto error;
         }
 
 #elif defined( HAVE_SCSIREQ_IN_SYS_SCSIIO_H )
@@ -630,15 +620,13 @@ int ioctl_ReadSectors( vlc_object_t *p_this, const vcddev_t *p_vcddev,
         if( i_ret == -1 )
         {
             msg_Err( p_this, "SCIOCCOMMAND failed" );
-            if( i_type == VCD_TYPE ) free( p_block );
-            return -1;
+            goto error;
         }
         if( sc.retsts || sc.error )
         {
             msg_Err( p_this, "SCSI command failed: status %d error %d",
                              sc.retsts, sc.error );
-            if( i_type == VCD_TYPE ) free( p_block );
-           return -1;
+            goto error;
         }
 
 #elif defined( HAVE_IOC_TOC_HEADER_IN_SYS_CDIO_H )
@@ -648,24 +636,21 @@ int ioctl_ReadSectors( vlc_object_t *p_this, const vcddev_t *p_vcddev,
             == -1 )
         {
             msg_Err( p_this, "Could not set block size" );
-            if( i_type == VCD_TYPE ) free( p_block );
-            return( -1 );
+            goto error;
         }
 
         if( lseek( p_vcddev->i_device_handle,
                    i_sector * VCD_SECTOR_SIZE, SEEK_SET ) == -1 )
         {
             msg_Err( p_this, "Could not lseek to sector %d", i_sector );
-            if( i_type == VCD_TYPE ) free( p_block );
-            return( -1 );
+            goto error;
         }
 
         if( read( p_vcddev->i_device_handle,
                   p_block, VCD_SECTOR_SIZE * i_nb ) == -1 )
         {
             msg_Err( p_this, "Could not read sector %d", i_sector );
-            if( i_type == VCD_TYPE ) free( p_block );
-            return( -1 );
+            goto error;
         }
 
 #else
@@ -686,11 +671,9 @@ int ioctl_ReadSectors( vlc_object_t *p_this, const vcddev_t *p_vcddev,
                          i_sector );
 
                 if( i == 0 )
-                {
-                    if( i_type == VCD_TYPE ) free( p_block );
-                    return( -1 );
-                }
-                else break;
+                    goto error;
+                else
+                    break;
             }
         }
 #endif
@@ -710,6 +693,11 @@ int ioctl_ReadSectors( vlc_object_t *p_this, const vcddev_t *p_vcddev,
     }
 
     return( 0 );
+
+error:
+    if( i_type == VCD_TYPE )
+        free( p_block );
+    return( -1 );
 }
 
 /****************************************************************************
