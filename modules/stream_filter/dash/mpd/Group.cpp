@@ -68,6 +68,17 @@ const Representation *Group::getRepresentationById(const std::string &id) const
     return NULL;
 }
 
+const SegmentInfoDefault *Group::getSegmentInfoDefault() const
+{
+    return this->segmentInfoDefault;
+}
+
+void Group::setSegmentInfoDefault(const SegmentInfoDefault *seg)
+{
+    if ( seg != NULL )
+        this->segmentInfoDefault = seg;
+}
+
 void                            Group::addRepresentation        (Representation *rep)
 {
     this->representations.push_back(rep);

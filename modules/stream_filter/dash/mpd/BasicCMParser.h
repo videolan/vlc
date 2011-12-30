@@ -57,11 +57,14 @@ namespace dash
             private:
                 bool    setMPD              ();
                 void    setPeriods          (dash::xml::Node *root);
+                void    parseSegmentTimeline( xml::Node* node, SegmentInfoCommon *segmentInfo );
+                void    parseSegmentInfoCommon( xml::Node* node, SegmentInfoCommon *segmentInfo );
+                void    parseSegmentInfoDefault( xml::Node* node, Group* group );
                 void    setGroups           (dash::xml::Node *root, Period *period);
                 void    parseTrickMode( dash::xml::Node *node, Representation *repr );
                 void    setRepresentations  (dash::xml::Node *root, Group *group);
                 bool    setSegmentInfo      (dash::xml::Node *root, Representation *rep);
-                void    setInitSegment      (dash::xml::Node *root, SegmentInfo *info);
+                void    setInitSegment      (dash::xml::Node *root, SegmentInfoCommon *info);
                 bool    setSegments         (dash::xml::Node *root, SegmentInfo *info);
                 void    setMPDBaseUrl       (dash::xml::Node *root);
                 void    parseContentDescriptor( xml::Node *node, const std::string &name,

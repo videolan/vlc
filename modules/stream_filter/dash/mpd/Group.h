@@ -36,6 +36,8 @@ namespace dash
 {
     namespace mpd
     {
+        class SegmentInfoDefault;
+
         class Group : public CommonAttributesElements
         {
             public:
@@ -46,12 +48,15 @@ namespace dash
                 void                            setSubsegmentAlignmentFlag( bool alignment );
                 std::vector<Representation *>   getRepresentations      ();
                 const Representation*           getRepresentationById   ( const std::string &id ) const;
+                const SegmentInfoDefault*       getSegmentInfoDefault() const;
+                void                            setSegmentInfoDefault( const SegmentInfoDefault* seg );
 
                 void addRepresentation( Representation *rep );
 
             private:
                 bool                                subsegmentAlignmentFlag;
                 std::vector<Representation *>       representations;
+                const SegmentInfoDefault*           segmentInfoDefault;
         };
     }
 }

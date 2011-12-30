@@ -27,6 +27,8 @@
 
 #include "BasicCMParser.h"
 #include "mpd/ContentDescription.h"
+#include "mpd/SegmentInfoDefault.h"
+#include "mpd/SegmentTimeline.h"
 
 #include <cstdlib>
 #include <sstream>
@@ -149,6 +151,90 @@ void    BasicCMParser::setPeriods           (Node *root)
     }
 }
 
+void BasicCMParser::parseSegmentTimeline(Node *node, SegmentInfoCommon *segmentInfo)
+{
+    Node*   segmentTimelineNode = DOMHelper::getFirstChildElementByName( node, "SegmentTimeline" );
+    if ( segmentTimelineNode )
+    {
+        SegmentTimeline     *segmentTimeline = new SegmentTimeline;
+        std::vector<Node*>  sNodes = DOMHelper::getChildElementByTagName( segmentTimelineNode, "S" );
+        std::vector<Node*>::const_iterator  it = sNodes.begin();
+        std::vector<Node*>::const_iterator  end = sNodes.end();
+
+        while ( it != end )
+        {
+            SegmentTimeline::Element*    s = new SegmentTimeline::Element;
+            const std::map<std::string, std::string>    sAttr = (*it)->getAttributes();
+            std::map<std::string, std::string>::const_iterator  sIt;
+
+            sIt = sAttr.find( "t" );
+            if ( sIt == sAttr.end() )
+            {
+                std::cerr << "'t' attribute is mandatory for every SegmentTimeline/S element" << std::endl;
+                delete s;
+                ++it;
+                continue ;
+            }
+            s->t = atoll( sIt->second.c_str() );
+            sIt = sAttr.find( "d" );
+            if ( sIt == sAttr.end() )
+            {
+                std::cerr << "'d' attribute is mandatory for every SegmentTimeline/S element" << std::endl;
+                delete s;
+                ++it;
+                continue ;
+            }
+            s->d = atoll( sIt->second.c_str() );
+            sIt = sAttr.find( "r" );
+            if ( sIt != sAttr.end() )
+                s->r = atoi( sIt->second.c_str() );
+            segmentTimeline->addElement( s );
+            ++it;
+        }
+        segmentInfo->setSegmentTimeline( segmentTimeline );
+    }
+}
+
+void BasicCMParser::parseSegmentInfoCommon(Node *node, SegmentInfoCommon *segmentInfo)
+{
+    const std::map<std::string, std::string>            attr = node->getAttributes();
+
+    const std::vector<Node*>            baseUrls = DOMHelper::getChildElementByTagName( node, "BaseURL" );
+    if ( baseUrls.size() > 0 )
+    {
+        std::vector<Node*>::const_iterator  it = baseUrls.begin();
+        std::vector<Node*>::const_iterator  end = baseUrls.end();
+        while ( it != end )
+        {
+            segmentInfo->appendBaseURL( (*it)->getText() );
+            ++it;
+        }
+    }
+    std::map<std::string, std::string>::const_iterator  it = attr.begin();
+
+    this->setInitSegment( node, segmentInfo );
+    it = attr.find( "duration" );
+    if ( it != attr.end() )
+        segmentInfo->setDuration( str_duration( it->second.c_str() ) );
+    it = attr.find( "startIndex" );
+    if ( it != attr.end() )
+        segmentInfo->setStartIndex( atoi( it->second.c_str() ) );
+    this->parseSegmentTimeline( node, segmentInfo );
+}
+
+void BasicCMParser::parseSegmentInfoDefault(Node *node, Group *group)
+{
+    Node*   segmentInfoDefaultNode = DOMHelper::getFirstChildElementByName( node, "SegmentInfoDefault" );
+
+    if ( segmentInfoDefaultNode != NULL )
+    {
+        SegmentInfoDefault* segInfoDef = new SegmentInfoDefault;
+        this->parseSegmentInfoCommon( segmentInfoDefaultNode, segInfoDef );
+
+        group->setSegmentInfoDefault( segInfoDef );
+    }
+}
+
 void    BasicCMParser::setGroups            (Node *root, Period *period)
 {
     std::vector<Node *> groups = DOMHelper::getElementByTagName(root, "Group", false);
@@ -261,19 +347,13 @@ bool    BasicCMParser::setSegmentInfo       (Node *root, Representation *rep)
         const std::map<std::string, std::string> attr = segmentInfo->getAttributes();
 
         SegmentInfo *info = new SegmentInfo();
-        //Init segment is not mandatory.
-        this->setInitSegment( segmentInfo, info );
+        this->parseSegmentInfoCommon( segmentInfo, info );
         //If we don't have any segment, there's no point keeping this SegmentInfo.
         if ( this->setSegments( segmentInfo, info ) == false )
         {
             delete info;
             return false;
         }
-        std::map<std::string, std::string>::const_iterator  it;
-        it = attr.find( "duration" );
-        if ( it != attr.end() )
-            info->setDuration( str_duration( it->second.c_str() ) );
-
         rep->setSegmentInfo( info );
         return true;
     }
@@ -316,7 +396,7 @@ ProgramInformation* BasicCMParser::parseProgramInformation()
     return pInfo;
 }
 
-void    BasicCMParser::setInitSegment       (Node *root, SegmentInfo *info)
+void    BasicCMParser::setInitSegment       (Node *root, SegmentInfoCommon *info)
 {
     const std::vector<Node *> initSeg = DOMHelper::getChildElementByTagName(root, "InitialisationSegmentURL");
 
@@ -327,7 +407,7 @@ void    BasicCMParser::setInitSegment       (Node *root, SegmentInfo *info)
     {
         Segment     *seg = new Segment();
         parseSegment( seg, initSeg.at(0)->getAttributes() );
-        info->setInitSegment( seg );
+        info->setInitialisationSegment( seg );
     }
 }
 
