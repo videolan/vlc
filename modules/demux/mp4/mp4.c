@@ -964,7 +964,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 static const struct { uint32_t xa9_type; char metadata[25]; } xa9typetoextrameta[] =
                 {
                     { ATOM_0xa9wrt, N_("Writer") },
-                    { ATOM_0xa9com, N_("Composr") },
+                    { ATOM_0xa9com, N_("Composer") },
                     { ATOM_0xa9prd, N_("Producer") },
                     { ATOM_0xa9inf, N_("Information") },
                     { ATOM_0xa9dir, N_("Director") },
