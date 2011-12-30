@@ -30,8 +30,7 @@
 using namespace dash::mpd;
 
 SegmentInfo::SegmentInfo() :
-    initSeg( NULL ),
-    duration( -1 )
+    initSeg( NULL )
 {
 }
 
@@ -41,16 +40,6 @@ SegmentInfo::~SegmentInfo   ()
         delete(this->segments.at(i));
 
     delete(this->initSeg);
-}
-
-Segment*            SegmentInfo::getInitSegment() const
-{
-    return this->initSeg;
-}
-
-void                    SegmentInfo::setInitSegment( Segment *initSeg )
-{
-    this->initSeg = initSeg;
 }
 
 const std::vector<Segment*>&   SegmentInfo::getSegments        () const
@@ -63,13 +52,3 @@ void                    SegmentInfo::addSegment         (Segment *seg)
     this->segments.push_back(seg);
 }
 
-time_t      SegmentInfo::getDuration() const
-{
-    return this->duration;
-}
-
-void        SegmentInfo::setDuration( time_t duration )
-{
-    if ( duration >= 0 )
-        this->duration = duration;
-}

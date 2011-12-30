@@ -30,27 +30,23 @@
 #include <map>
 
 #include "mpd/Segment.h"
+#include "mpd/SegmentInfoCommon.h"
 
 namespace dash
 {
     namespace mpd
     {
-        class SegmentInfo
+        class SegmentInfo : public SegmentInfoCommon
         {
             public:
                 SegmentInfo             ();
                 virtual ~SegmentInfo    ();
 
-                Segment*                getInitSegment() const;
-                void                    setInitSegment( Segment *seg );
-                time_t                  getDuration() const;
-                void                    setDuration( time_t duration );
                 const std::vector<Segment *>&   getSegments() const;
                 void                    addSegment(Segment *seg);
 
             private:
                 Segment                             *initSeg;
-                time_t                              duration;
                 std::vector<Segment *>              segments;
         };
     }
