@@ -75,7 +75,7 @@ void    AlwaysBestAdaptationLogic::initSchedule ()
 
             if(best != NULL)
             {
-                std::vector<Segment *> segments = this->mpdManager->getSegments(best);
+                std::vector<const Segment *> segments = this->mpdManager->getSegments(best);
                 for(size_t j = 0; j < segments.size(); j++)
                 {
                     this->schedule.push_back(segments.at(j));

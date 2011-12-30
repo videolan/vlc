@@ -31,7 +31,7 @@ namespace dash
                 virtual Period*                 getFirstPeriod          ()                              = 0;
                 virtual Period*                 getNextPeriod           (Period *period)                = 0;
                 virtual Representation*         getBestRepresentation   (Period *period)                = 0;
-                virtual std::vector<Segment *> getSegments             (Representation *rep)           = 0;
+                virtual std::vector<const Segment *> getSegments        (Representation *rep)           = 0;
                 virtual Representation*         getRepresentation       (Period *period, long bitrate)  = 0;
                 virtual const MPD*              getMPD                  () const = 0;
                 virtual ~IMPDManager(){}

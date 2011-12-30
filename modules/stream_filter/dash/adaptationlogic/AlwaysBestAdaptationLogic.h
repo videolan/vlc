@@ -48,7 +48,7 @@ namespace dash
                 dash::http::Chunk* getNextChunk () throw(dash::exception::EOFException);
 
             private:
-                std::vector<dash::mpd::Segment *>  schedule;
+                std::vector<const mpd::Segment *>   schedule;
                 dash::mpd::IMPDManager              *mpdManager;
                 size_t                              count;
 

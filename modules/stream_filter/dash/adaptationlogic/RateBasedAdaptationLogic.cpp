@@ -56,7 +56,7 @@ Chunk*  RateBasedAdaptationLogic::getNextChunk () throw(EOFException)
     if(rep == NULL)
         throw EOFException();
 
-    std::vector<Segment *> segments = this->mpdManager->getSegments(rep);
+    std::vector<const Segment *> segments = this->mpdManager->getSegments(rep);
 
     if(this->count == segments.size())
     {
