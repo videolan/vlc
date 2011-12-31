@@ -46,6 +46,7 @@ class QSignalMapper;
 class SearchLineEdit;
 class QModelIndex;
 class QStackedWidget;
+class PLSelector;
 
 class PlaylistWidget : public QWidget
 {
@@ -61,6 +62,7 @@ private:
     QSplitter            *leftSplitter;
     QSplitter            *split;
     StandardPLPanel      *mainView;
+    PLSelector           *selector;
 
     QAction *viewActions[ 4 /* StandardPLPanel::VIEW_COUNT*/ ];
 

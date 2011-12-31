@@ -1192,7 +1192,16 @@ void MainInterface::dropEvent(QDropEvent *event)
     dropEventPlay( event, true );
 }
 
-void MainInterface::dropEventPlay( QDropEvent *event, bool b_play )
+/**
+ * dropEventPlay
+ *
+ * Event called if something is dropped onto a VLC window
+ * \param event the event in question
+ * \param b_play whether to play the file immediately
+ * \param b_playlist true to add to playlist, false to add to media library
+ * \return nothing
+ */
+void MainInterface::dropEventPlay( QDropEvent *event, bool b_play, bool b_playlist )
 {
     if( event->possibleActions() & ( Qt::CopyAction | Qt::MoveAction ) )
        event->setDropAction( Qt::CopyAction );
@@ -1221,7 +1230,7 @@ void MainInterface::dropEventPlay( QDropEvent *event, bool b_play )
             QString mrl = toURI( url.toEncoded().constData() );
             playlist_Add( THEPL, qtu(mrl), NULL,
                           PLAYLIST_APPEND | (first ? PLAYLIST_GO: PLAYLIST_PREPARSE),
-                          PLAYLIST_END, true, pl_Unlocked );
+                          PLAYLIST_END, b_playlist, pl_Unlocked );
             first = false;
             RecentsMRL::getInstance( p_intf )->addRecent( mrl );
         }
@@ -1236,7 +1245,7 @@ void MainInterface::dropEventPlay( QDropEvent *event, bool b_play )
         QString mrl = toURI( mimeData->text() );
         playlist_Add( THEPL, qtu(mrl), NULL,
                       PLAYLIST_APPEND | (first ? PLAYLIST_GO: PLAYLIST_PREPARSE),
-                      PLAYLIST_END, true, pl_Unlocked );
+                      PLAYLIST_END, b_playlist, pl_Unlocked );
     }
     event->accept();
 }

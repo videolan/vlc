@@ -117,6 +117,7 @@ public:
     virtual ~PLSelector();
 
     void getCurrentSelectedItem( int *type, QString *name );
+    int getCurrentItemCategory();
 
 protected:
     virtual void drawBranches ( QPainter *, const QRect &, const QModelIndex & ) const;

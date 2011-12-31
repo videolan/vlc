@@ -63,8 +63,8 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QWidget *_par )
     leftSplitter = new QSplitter( Qt::Vertical, this );
 
     /* Source Selector */
-    PLSelector *selector = new PLSelector( this, p_intf );
-    leftSplitter->addWidget( selector);
+    selector = new PLSelector( this, p_intf );
+    leftSplitter->addWidget( selector );
 
     /* Create a Container for the Art Label
        in order to have a beautiful resizing for the selector above it */
@@ -211,8 +211,12 @@ PlaylistWidget::~PlaylistWidget()
 
 void PlaylistWidget::dropEvent( QDropEvent *event )
 {
+    if( !( selector->getCurrentItemCategory() == IS_PL ||
+           selector->getCurrentItemCategory() == IS_ML ) ) return;
+
     if( p_intf->p_sys->p_mi )
-        p_intf->p_sys->p_mi->dropEventPlay( event, false );
+        p_intf->p_sys->p_mi->dropEventPlay( event, false,
+                (selector->getCurrentItemCategory() == IS_PL) );
 }
 void PlaylistWidget::dragEnterEvent( QDragEnterEvent *event )
 {

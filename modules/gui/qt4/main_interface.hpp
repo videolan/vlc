@@ -88,7 +88,8 @@ public:
     bool isInterfaceFullScreen() { return b_interfaceFullScreen; }
 
 protected:
-    void dropEventPlay( QDropEvent *, bool);
+    void dropEventPlay( QDropEvent* event, bool b_play ) { dropEventPlay(event, b_play, true); }
+    void dropEventPlay( QDropEvent *, bool, bool );
 #ifdef WIN32
     virtual bool winEvent( MSG *, long * );
 #endif
