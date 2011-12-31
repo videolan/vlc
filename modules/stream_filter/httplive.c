@@ -78,7 +78,8 @@ typedef struct hls_stream_s
     int         sequence;   /* media sequence number */
     int         duration;   /* maximum duration per segment (s) */
     uint64_t    bandwidth;  /* bandwidth usage of segments (bits per second)*/
-    uint64_t    size;       /* stream length (segment->duration * hls->bandwidth/8) */
+    uint64_t    size;       /* stream length is calculated by taking the sum
+                               foreach segment of (segment->duration * hls->bandwidth/8) */
 
     vlc_array_t *segments;  /* list of segments */
     vlc_url_t   url;        /* uri to m3u8 */
