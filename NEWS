@@ -19,8 +19,8 @@ Important notes:
    - --disc-caching specifies caching for local optical media.
    All values are expressed in milliseconds as in previous versions.
  * HTTP server IP address, port, and TLS configuration is now centralized:
-   - The --http-host option sets the address, e.g. "--http-host=2001:db8::1".
-     By default, both :: and 0.0.0.0 are used.
+   - The --http-host option sets the address, e.g. "--http-host=[2001:db8::1]".
+     By default, both [::] and 0.0.0.0 are used.
    - The --http-port and --https-port options set the port numbers.
      By default, 8080 is used for HTTP, and 8443 for HTTPS.
    - The TLS credentials are configured with --http-cert (public certificate),
