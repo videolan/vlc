@@ -167,8 +167,8 @@ static inline void video_format_Clean( video_format_t *p_src )
 }
 
 /**
- * It will fill up a video_format_tvideo_format_t using the given arguments.
- * Becarefull that the video_format_t must already be initialized.
+ * It will fill up a video_format_t using the given arguments.
+ * Note that the video_format_t must already be initialized.
  */
 VLC_API void video_format_Setup( video_format_t *, vlc_fourcc_t i_chroma, int i_width, int i_height, int i_sar_num, int i_sar_den );
 
@@ -310,7 +310,7 @@ VLC_API void es_format_InitFromVideo( es_format_t *, const video_format_t * );
 VLC_API int es_format_Copy( es_format_t *p_dst, const es_format_t *p_src );
 
 /**
- * This function will clean up a es_format_t and relasing all associated
+ * This function will clean up a es_format_t and release all associated
  * resources.
  * You can call it multiple times on the same structure.
  */
