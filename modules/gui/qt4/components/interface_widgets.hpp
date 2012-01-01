@@ -188,8 +188,9 @@ public:
     SpeedControlWidget( intf_thread_t *, QWidget * );
     void updateControls( float );
 private:
-    intf_thread_t *p_intf;
-    QSlider *speedSlider;
+    intf_thread_t* p_intf;
+    QSlider* speedSlider;
+    QDoubleSpinBox* spinBox;
     int lastValue;
 
 public slots:
@@ -197,6 +198,7 @@ public slots:
 
 private slots:
     void updateRate( int );
+    void updateSpinBoxRate( double );
     void resetRate();
 };
 

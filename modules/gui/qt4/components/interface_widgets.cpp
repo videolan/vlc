@@ -343,11 +343,15 @@ SpeedLabel::SpeedLabel( intf_thread_t *_p_intf, QWidget *parent )
     widgetAction->setDefaultWidget( speedControl );
     speedControlMenu->addAction( widgetAction );
 
-    /* Change the SpeedRate in the Status Bar */
+    /* Change the SpeedRate in the Label */
     CONNECT( THEMIM->getIM(), rateChanged( float ), this, setRate( float ) );
 
     DCONNECT( THEMIM, inputChanged( input_thread_t * ),
               speedControl, activateOnState() );
+
+    setFrameStyle( QFrame::StyledPanel | QFrame::Raised );
+    setLineWidth( 1 );
+
     setRate( var_InheritFloat( p_intf, "rate" ) );
 }
 
@@ -364,7 +368,7 @@ SpeedLabel::~SpeedLabel()
 void SpeedLabel::showSpeedMenu( QPoint pos )
 {
     speedControlMenu->exec( QCursor::pos() - pos
-                          + QPoint( 0, height() ) );
+                            + QPoint( -70 + width()/2, height() ) );
 }
 
 void SpeedLabel::setRate( float rate )
@@ -383,15 +387,14 @@ void SpeedLabel::setRate( float rate )
 SpeedControlWidget::SpeedControlWidget( intf_thread_t *_p_i, QWidget *_parent )
                     : QFrame( _parent ), p_intf( _p_i )
 {
-    QSizePolicy sizePolicy( QSizePolicy::Maximum, QSizePolicy::Fixed );
+    QSizePolicy sizePolicy( QSizePolicy::Fixed, QSizePolicy::Maximum );
     sizePolicy.setHorizontalStretch( 0 );
     sizePolicy.setVerticalStretch( 0 );
 
     speedSlider = new QSlider( this );
     speedSlider->setSizePolicy( sizePolicy );
-    speedSlider->setMaximumSize( QSize( 80, 200 ) );
-    speedSlider->setOrientation( Qt::Vertical );
-    speedSlider->setTickPosition( QSlider::TicksRight );
+    speedSlider->setMinimumSize( QSize( 140, 20 ) );
+    speedSlider->setOrientation( Qt::Horizontal );
 
     speedSlider->setRange( -34, 34 );
     speedSlider->setSingleStep( 1 );
@@ -401,18 +404,28 @@ SpeedControlWidget::SpeedControlWidget( intf_thread_t *_p_i, QWidget *_parent )
     CONNECT( speedSlider, valueChanged( int ), this, updateRate( int ) );
 
     QToolButton *normalSpeedButton = new QToolButton( this );
-    normalSpeedButton->setMaximumSize( QSize( 26, 20 ) );
+    normalSpeedButton->setMaximumSize( QSize( 26, 16 ) );
     normalSpeedButton->setAutoRaise( true );
     normalSpeedButton->setText( "1x" );
     normalSpeedButton->setToolTip( qtr( "Revert to normal play speed" ) );
 
     CONNECT( normalSpeedButton, clicked(), this, resetRate() );
 
-    QVBoxLayout *speedControlLayout = new QVBoxLayout( this );
-    speedControlLayout->setContentsMargins( 4, 4, 4, 4 );
-    speedControlLayout->setSpacing( 4 );
-    speedControlLayout->addWidget( speedSlider );
-    speedControlLayout->addWidget( normalSpeedButton );
+/*    spinBox = new QDoubleSpinBox();
+    spinBox->setDecimals( 2 );
+    spinBox->setMaximum( 32 );
+    spinBox->setMinimum( 0.03F );
+    spinBox->setSingleStep( 0.10F );
+    spinBox->setAlignment( Qt::AlignRight );
+
+    CONNECT( spinBox, valueChanged( double ), this, updateSpinBoxRate( double ) ); */
+
+    QGridLayout* speedControlLayout = new QGridLayout( this );
+    speedControlLayout->addWidget( speedSlider, 0, 0, 1, 3 );
+    speedControlLayout->addWidget( normalSpeedButton, 1, 1 );
+    //speedControlLayout->addWidget( spinBox );
+    speedControlLayout->setContentsMargins( 0, 0, 0, 0 );
+    speedControlLayout->setSpacing( 0 );
 
     lastValue = 0;
 
@@ -422,6 +435,7 @@ SpeedControlWidget::SpeedControlWidget( intf_thread_t *_p_i, QWidget *_parent )
 void SpeedControlWidget::activateOnState()
 {
     speedSlider->setEnabled( THEMIM->getIM()->hasInput() );
+    //spinBox->setEnabled( THEMIM->getIM()->hasInput() );
 }
 
 void SpeedControlWidget::updateControls( float rate )
@@ -446,6 +460,7 @@ void SpeedControlWidget::updateControls( float rate )
     lastValue = sliderValue;
 
     speedSlider->setValue( sliderValue );
+    //spinBox->setValue( rate );
 }
 
 void SpeedControlWidget::updateRate( int sliderValue )
@@ -457,6 +472,12 @@ void SpeedControlWidget::updateRate( int sliderValue )
     int rate = INPUT_RATE_DEFAULT / speed;
 
     THEMIM->getIM()->setRate(rate);
+    //spinBox->setValue( var_InheritFloat( THEPL, "rate" ) );
+}
+
+void SpeedControlWidget::updateSpinBoxRate( double r )
+{
+    var_SetFloat( THEPL, "rate", r );
 }
 
 void SpeedControlWidget::resetRate()

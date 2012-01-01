@@ -468,6 +468,9 @@ QWidget *AbstractController::createWidget( buttonType_e button, int options )
     case ASPECT_RATIO_COMBOBOX:
         widget = new AspectRatioComboBox( p_intf );
         break;
+    case SPEED_LABEL:
+        widget = new SpeedLabel( p_intf, this );
+        break;
     default:
         msg_Warn( p_intf, "This should not happen %i", button );
         break;
