@@ -548,6 +548,7 @@ static void FilterBall( filter_t *p_filter, picture_t *p_inpic,
 
     picture_t *p_converted;
     video_format_t fmt_comp;
+    memset( &fmt_comp, 0, sizeof(fmt_comp) );
 
     switch( p_filter->fmt_in.video.i_chroma )
     {
