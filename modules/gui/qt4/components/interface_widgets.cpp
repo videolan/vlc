@@ -549,17 +549,33 @@ void CoverArtLabel::askForUpdate()
     THEMIM->getIM()->requestArtUpdate();
 }
 
-TimeLabel::TimeLabel( intf_thread_t *_p_intf  )
+TimeLabel::TimeLabel( intf_thread_t *_p_intf, TimeLabel::Display _displayType  )
     : QLabel(), p_intf( _p_intf ), bufTimer( new QTimer(this) ),
-      buffering( false ), showBuffering(false), bufVal( -1 )
+      buffering( false ), showBuffering(false), bufVal( -1 ), displayType( _displayType )
 {
     b_remainingTime = false;
-    setText( " --:--/--:-- " );
+    switch( _displayType ) {
+        case TimeLabel::Elapsed:
+            setText( " --:-- " );
+            setToolTip( qtr("Elapsed time") );
+            break;
+        case TimeLabel::Remaining:
+            setText( " --:-- " );
+            setToolTip( qtr("Total/Remaining time")
+                        + QString("\n-")
+                        + qtr("Click to toggle between total and remaining time")
+                      );
+            break;
+        case TimeLabel::Both:
+            setText( " --:--/--:-- " );
+            setToolTip( QString( "- " )
+                + qtr( "Click to toggle between elapsed and remaining time" )
+                + QString( "\n- " )
+                + qtr( "Double click to jump to a chosen time position" ) );
+            break;
+    }
     setAlignment( Qt::AlignRight | Qt::AlignVCenter );
-    setToolTip( QString( "- " )
-        + qtr( "Click to toggle between elapsed and remaining time" )
-        + QString( "\n- " )
-        + qtr( "Double click to jump to a chosen time position" ) );
+
     bufTimer->setSingleShot( true );
 
     CONNECT( THEMIM->getIM(), positionUpdated( float, int64_t, int ),
@@ -567,6 +583,8 @@ TimeLabel::TimeLabel( intf_thread_t *_p_intf  )
     CONNECT( THEMIM->getIM(), cachingChanged( float ),
               this, updateBuffering( float ) );
     CONNECT( bufTimer, timeout(), this, updateBuffering() );
+
+    this->setContentsMargins( 4, 0, 4, 0 );
 }
 
 void TimeLabel::setDisplayPosition( float pos, int64_t t, int length )
@@ -576,7 +594,10 @@ void TimeLabel::setDisplayPosition( float pos, int64_t t, int length )
 
     if( pos == -1.f )
     {
-        setText( " --:--/--:-- " );
+        if( displayType == TimeLabel::Both )
+            setText( " --:--/--:-- " );
+        else
+            setText( " --:-- " );
         return;
     }
 
@@ -585,14 +606,27 @@ void TimeLabel::setDisplayPosition( float pos, int64_t t, int length )
     secstotimestr( psz_length, length );
     secstotimestr( psz_time, ( b_remainingTime && length ) ? length - time
                                                            : time );
-
-    QString timestr = QString( " %1%2/%3 " )
+    switch( displayType )
+    {
+        case TimeLabel::Elapsed:
+            setText( QString(" ") + QString( psz_time ) + QString(" ") );
+            break;
+        case TimeLabel::Remaining:
+            if( b_remainingTime )
+                setText( QString(" -") + QString( psz_time ) + QString(" ") );
+            else
+                setText( QString(" ") + QString( psz_length ) + QString(" ") );
+            break;
+        case TimeLabel::Both:
+        default:
+            QString timestr = QString( " %1%2/%3 " )
             .arg( QString( (b_remainingTime && length) ? "-" : "" ) )
             .arg( QString( psz_time ) )
             .arg( QString( ( !length && time ) ? "--:--" : psz_length ) );
 
-    setText( timestr );
-
+            setText( timestr );
+            break;
+    }
     cachedLength = length;
 }
 

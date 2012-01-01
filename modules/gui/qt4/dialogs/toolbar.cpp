@@ -453,6 +453,14 @@ WidgetListing::WidgetListing( intf_thread_t *p_intf, QWidget *_parent )
             widget = new SpeedLabel( p_intf, this );
             widgetItem->setText( qtr("Speed selector") );
             break;
+        case TIME_LABEL_ELAPSED:
+            widget = new QLabel( "2:42", this );
+            widgetItem->setText( qtr("Elasped time") );
+            break;
+        case TIME_LABEL_REMAINING:
+            widget = new QLabel( "-2:42", this );
+            widgetItem->setText( qtr("Total/Remaining time") );
+            break;
         default:
             msg_Warn( p_intf, "This should not happen %i", i );
             break;

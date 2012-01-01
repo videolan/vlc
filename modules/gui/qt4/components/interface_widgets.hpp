@@ -122,15 +122,24 @@ class TimeLabel : public QLabel
 {
     Q_OBJECT
 public:
-    TimeLabel( intf_thread_t *_p_intf );
+    enum Display
+    {
+        Elapsed,
+        Remaining,
+        Both
+    };
+
+    TimeLabel( intf_thread_t *_p_intf, TimeLabel::Display _displayType = TimeLabel::Both );
 protected:
     virtual void mousePressEvent( QMouseEvent *event )
     {
+        if( displayType == TimeLabel::Elapsed ) return;
         toggleTimeDisplay();
         event->accept();
     }
     virtual void mouseDoubleClickEvent( QMouseEvent *event )
     {
+        if( displayType != TimeLabel::Both ) return;
         event->accept();
         toggleTimeDisplay();
         emit timeLabelDoubleClicked();
@@ -144,6 +153,7 @@ private:
     bool buffering;
     bool showBuffering;
     float bufVal;
+    TimeLabel::Display displayType;
 
     char psz_length[MSTRTIME_MAX_SIZE];
     char psz_time[MSTRTIME_MAX_SIZE];

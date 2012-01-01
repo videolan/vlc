@@ -471,6 +471,12 @@ QWidget *AbstractController::createWidget( buttonType_e button, int options )
     case SPEED_LABEL:
         widget = new SpeedLabel( p_intf, this );
         break;
+    case TIME_LABEL_ELAPSED:
+        widget = new TimeLabel( p_intf, TimeLabel::Elapsed );
+        break;
+    case TIME_LABEL_REMAINING:
+        widget = new TimeLabel( p_intf, TimeLabel::Remaining );
+        break;
     default:
         msg_Warn( p_intf, "This should not happen %i", button );
         break;
