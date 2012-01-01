@@ -84,6 +84,13 @@ static int Create( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
 
+    const vlc_fourcc_t fourcc = p_filter->fmt_in.video.i_chroma;
+    const vlc_chroma_description_t *p_chroma = vlc_fourcc_GetChromaDescription( fourcc );
+    if( !p_chroma || p_chroma->plane_count != 3 || p_chroma->pixel_size != 1 ) {
+        msg_Err( p_filter, "Unsupported chroma (%4.4s)", (char*)&fourcc );
+        return VLC_EGENERIC;
+    }
+
     /* Allocate structure */
     p_filter->p_sys = malloc( sizeof( filter_sys_t ) );
     if( p_filter->p_sys == NULL )
