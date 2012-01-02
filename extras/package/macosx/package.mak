@@ -79,6 +79,8 @@ package-macosx: VLC-release.app
 	rm -f "$(top_builddir)/vlc-$(VERSION).dmg"
 	hdiutil convert "$(top_builddir)/vlc-$(VERSION)-rw.dmg" -format UDBZ -o "$(top_builddir)/vlc-$(VERSION).dmg"
 	ls -l "$(top_builddir)/vlc-$(VERSION).dmg"
+	rm -f "$(top_builddir)/vlc-$(VERSION)-rw.dmg"
+	rm -rf "$(top_builddir)/vlc-$(VERSION)"
 
 package-macosx-zip: VLC-release.app
 	mkdir -p $(top_builddir)/vlc-$(VERSION)/Goodies/
@@ -87,6 +89,7 @@ package-macosx-zip: VLC-release.app
 		$(abs_top_builddir)/vlc-$(VERSION)/Goodies/
 	cp $(srcdir)/extras/package/macosx/README.MacOSX.rtf $(top_builddir)/vlc-$(VERSION)/Read\ Me.rtf
 	zip -r -y -9 $(top_builddir)/vlc-$(VERSION).zip $(top_builddir)/vlc-$(VERSION)
+	rm -rf "$(top_builddir)/vlc-$(VERSION)"
 
 package-macosx-framework-zip:
 	mkdir -p $(top_builddir)/vlckit-$(VERSION)/Goodies/
