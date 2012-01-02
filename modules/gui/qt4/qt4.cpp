@@ -208,7 +208,7 @@ vlc_module_begin ()
               NOTIFICATION_LONGTEXT, false )
     add_bool( "qt-start-minimized", false, MINIMIZED_TEXT,
               MINIMIZED_LONGTEXT, true)
-    add_bool( "qt-pause-minimized", true, QT_PAUSE_MINIMIZED_TEXT,
+    add_bool( "qt-pause-minimized", false, QT_PAUSE_MINIMIZED_TEXT,
               QT_PAUSE_MINIMIZED_LONGTEXT, false )
 
     add_float_with_range( "qt-opacity", 1., 0.1, 1., OPACITY_TEXT,
