@@ -548,6 +548,15 @@ inline void MainInterface::showTab( QWidget *widget )
             videoWidget->show(); videoWidget->raise();
             stackCentralW->addWidget( videoWidget );
         }
+
+        /* Embedded playlist -> Non-embedded playlist */
+        if( bgWidget == stackCentralOldWidget && widget == videoWidget )
+        {
+            playlistWidget->artContainer->removeWidget( videoWidget );
+            videoWidget->show(); videoWidget->raise();
+            stackCentralW->addWidget( videoWidget );
+            stackCentralW->setCurrentWidget( videoWidget );
+        }
     }
 
     stackCentralW->setCurrentWidget( widget );
@@ -803,6 +812,8 @@ void MainInterface::togglePlaylist()
         /* Playlist is not visible, show it */
         if( stackCentralW->currentWidget() != playlistWidget )
         {
+            if( stackCentralW->indexOf( playlistWidget ) == -1 )
+                stackCentralW->addWidget( playlistWidget );
             showTab( playlistWidget );
         }
         else /* Hide it! */
@@ -829,8 +840,10 @@ void MainInterface::dockPlaylist( bool p_docked )
     b_plDocked = p_docked;
 
     if( !playlistWidget ) return; /* Playlist wasn't created yet */
-    if( !p_docked )
+    if( !p_docked ) /* Previously docked */
     {
+        /* If playlist is invisible don't show it */
+        if( stackCentralW->currentWidget() != playlistWidget ) return;
         stackCentralW->removeWidget( playlistWidget );
 #ifdef WIN32
         playlistWidget->setParent( NULL );
@@ -841,8 +854,11 @@ void MainInterface::dockPlaylist( bool p_docked )
         playlistWidget->show();
         restoreStackOldWidget();
     }
-    else
+    else /* Previously undocked */
     {
+        /* If playlist is invisible don't show it */
+        if( !playlistWidget->isVisible() ) return;
+
         QVLCTools::saveWidgetPosition( p_intf, "Playlist", playlistWidget );
         playlistWidget->setWindowFlags( Qt::Widget ); // Probably a Qt bug here
         // It would be logical that QStackWidget::addWidget reset the flags...
