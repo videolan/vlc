@@ -27,7 +27,7 @@
 
 int dirfd (DIR *dir)
 {
-#if defined (__sun__)
+#if defined (__sun__) || defined (__FreeBSD__)
     return dir->dd_fd;
 #elif defined (__APPLE__)
     return dir->__dd_fd;
