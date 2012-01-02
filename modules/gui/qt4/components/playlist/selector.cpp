@@ -83,6 +83,8 @@ void PLSelItem::addAction( ItemAction act, const QString& tooltip )
         icon = QIcon( ":/buttons/playlist/playlist_add" ); break;
     case RM_ACTION:
         icon = QIcon( ":/buttons/playlist/playlist_remove" ); break;
+    default:
+        return;
     }
 
     lblAction = new SelectorActionButton();
@@ -116,6 +118,14 @@ PLSelector::PLSelector( QWidget *p, intf_thread_t *_p_intf )
     setDropIndicatorShown(true);
     invisibleRootItem()->setFlags( invisibleRootItem()->flags() & ~Qt::ItemIsDropEnabled );
 
+#ifdef Q_WS_MAC
+    setAutoFillBackground( true );
+    QPalette palette;
+    palette.setColor( QPalette::Window, QColor(209,215,226) );
+    setPalette( palette );
+#endif
+    setMinimumHeight( 120 );
+
     /* Podcasts */
     podcastsParent = NULL;
     podcastsParentId = -1;
@@ -140,17 +150,6 @@ PLSelector::PLSelector( QWidget *p, intf_thread_t *_p_intf )
              this, setSource( QTreeWidgetItem *) );
     CONNECT( this, itemClicked( QTreeWidgetItem *, int ),
              this, setSource( QTreeWidgetItem *) );
-
-    /* select the first item */
-//  view->setCurrentIndex( model->index( 0, 0, QModelIndex() ) );
-
-#ifdef Q_WS_MAC
-    setAutoFillBackground( true );
-    QPalette palette;
-    palette.setColor( QPalette::Window, QColor(209,215,226) );
-    setPalette( palette );
-#endif
-    setMinimumHeight( 120 );
 }
 
 PLSelector::~PLSelector()
