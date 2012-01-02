@@ -888,6 +888,19 @@ void PLModel::search( const QString& search_text, const QModelIndex & idx, bool 
     rebuild();
 }
 
+void PLModel::clearPlaylist()
+{
+    if( rowCount() < 1 ) return;
+
+    QModelIndexList l;
+    for( int i = 0; i < rowCount(); i++)
+    {
+        QModelIndex indexrecord = index( i, 0, QModelIndex() );
+        l.append( indexrecord );
+    }
+    doDelete(l);
+}
+
 /*********** Popup *********/
 bool PLModel::popup( const QModelIndex & index, const QPoint &point, const QModelIndexList &list )
 {
@@ -964,6 +977,10 @@ bool PLModel::popup( const QModelIndex & index, const QPoint &point, const QMode
     }
 
     menu.addSeparator();
+
+    menu.addAction( QIcon( ":/toolbar/clear" ), qtr("Clear playlist"),
+                    this, SLOT( clearPlaylist() ) );
+
     /* Playlist sorting */
     if( !sortingMenu )
     {
