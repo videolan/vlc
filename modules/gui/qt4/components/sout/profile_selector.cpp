@@ -143,6 +143,7 @@ void VLCProfileSelector::editProfile( const QString& qs, const QString& value )
 void VLCProfileSelector::deleteProfile()
 {
     profileBox->removeItem( profileBox->currentIndex() );
+    saveProfiles();
 }
 
 void VLCProfileSelector::saveProfiles()
@@ -155,6 +156,7 @@ void VLCProfileSelector::saveProfiles()
 #endif
             QSettings::UserScope, "vlc", "vlc-qt-interface" );
 
+    settings.remove( "codecs-profiles" ); /* Erase old profiles to be rewritten */
     settings.beginWriteArray( "codecs-profiles" );
     for( int i = 0; i < profileBox->count(); i++ )
     {
