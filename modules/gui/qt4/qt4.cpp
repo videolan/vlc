@@ -231,8 +231,8 @@ vlc_module_begin ()
 #ifdef UPDATE_CHECK
     add_bool( "qt-updates-notif", true, UPDATER_TEXT,
               UPDATER_LONGTEXT, false )
-    add_integer( "qt-updates-days", 3, UPDATER_DAYS_TEXT,
-                 UPDATER_DAYS_TEXT, false )
+    add_integer_with_range( "qt-updates-days", 3, 0, 180,
+              UPDATER_DAYS_TEXT, UPDATER_DAYS_TEXT, false )
 #endif
 
     add_bool( "qt-autosave-volume", true, SAVEVOL_TEXT,
