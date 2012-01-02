@@ -36,6 +36,7 @@
 #include "x11_factory.hpp"
 
 #include <assert.h>
+#include <limits.h>
 
 X11Window::X11Window( intf_thread_t *pIntf, GenericWindow &rWindow,
                       X11Display &rDisplay, bool dragDrop, bool playOnDrop,
