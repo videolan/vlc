@@ -51,7 +51,7 @@ AC_DEFUN([RDC_PROG_CXX_FLAGS_IFELSE],
   ])
 
   ac_res=`eval echo '${'$as_ac_var'}'`
-  CFLAGS="${CFLAGS_save}"
+  CXXFLAGS="${CXXFLAGS_save}"
   AS_IF([test "${ac_res}" != "no"], [$2], [$3])
 ])
 
