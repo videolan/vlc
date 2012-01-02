@@ -188,6 +188,7 @@ void PLSelector::createItems()
     PLSelItem *pl = putPLData( addItem( PL_ITEM_TYPE, N_("Playlist"), true ),
                               THEPL->p_playing );
     pl->treeItem()->setData( 0, SPECIAL_ROLE, QVariant( IS_PL ) );
+    setCurrentItem( pl->treeItem() );
 
     /* ML */
     PLSelItem *ml = putPLData( addItem( PL_ITEM_TYPE, N_("Media Library"), true ),
