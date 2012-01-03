@@ -411,6 +411,20 @@ SpeedControlWidget::SpeedControlWidget( intf_thread_t *_p_i, QWidget *_parent )
 
     CONNECT( normalSpeedButton, clicked(), this, resetRate() );
 
+    QToolButton *slowerButton = new QToolButton( this );
+    slowerButton->setMaximumSize( QSize( 26, 16 ) );
+    slowerButton->setAutoRaise( true );
+    slowerButton->setToolTip( tooltipL[SLOWER_BUTTON] );
+    slowerButton->setIcon( QIcon( iconL[SLOWER_BUTTON] ) );
+    CONNECT( slowerButton, clicked(), THEMIM->getIM(), slower() );
+
+    QToolButton *fasterButton = new QToolButton( this );
+    fasterButton->setMaximumSize( QSize( 26, 16 ) );
+    fasterButton->setAutoRaise( true );
+    fasterButton->setToolTip( tooltipL[FASTER_BUTTON] );
+    fasterButton->setIcon( QIcon( iconL[FASTER_BUTTON] ) );
+    CONNECT( fasterButton, clicked(), THEMIM->getIM(), faster() );
+
 /*    spinBox = new QDoubleSpinBox();
     spinBox->setDecimals( 2 );
     spinBox->setMaximum( 32 );
@@ -422,7 +436,9 @@ SpeedControlWidget::SpeedControlWidget( intf_thread_t *_p_i, QWidget *_parent )
 
     QGridLayout* speedControlLayout = new QGridLayout( this );
     speedControlLayout->addWidget( speedSlider, 0, 0, 1, 3 );
-    speedControlLayout->addWidget( normalSpeedButton, 1, 1 );
+    speedControlLayout->addWidget( slowerButton, 1, 0 );
+    speedControlLayout->addWidget( normalSpeedButton, 1, 1, 1, 1, Qt::AlignRight );
+    speedControlLayout->addWidget( fasterButton, 1, 2, 1, 1, Qt::AlignRight );
     //speedControlLayout->addWidget( spinBox );
     speedControlLayout->setContentsMargins( 0, 0, 0, 0 );
     speedControlLayout->setSpacing( 0 );
