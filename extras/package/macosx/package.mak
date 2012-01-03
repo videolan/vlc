@@ -12,7 +12,6 @@ VLC.app: VLC-tmp.app
 	cp -R VLC-tmp.app $@
 	$(INSTALL) -m 0755 $(top_builddir)/bin/.libs/vlc $@/Contents/MacOS/VLC
 	$(LN_S) -f ../../../modules $@/Contents/MacOS/plugins
-	rm -Rf VLC-tmp.app
 
 # VLC-release.app for packaging and giving it to your friends
 # use package-macosx to get a nice dmg
@@ -23,9 +22,8 @@ VLC-release.app: VLC-tmp.app
 	find $@ -type d -exec chmod ugo+rx '{}' \;
 	find $@ -type f -exec chmod ugo+r '{}' \;
 	rm -Rf $@/Contents/Frameworks/BGHUDAppKit.framework/Resources/
-	rm -Rf VLC-tmp.app
 
-# common target to a VLC bundle used by both the dev and the release build
+
 VLC-tmp.app: vlc
 	$(AM_V_GEN)(cd src && $(MAKE) $(AM_MAKEFLAGS) install $(silentstd))
 	(cd lib && $(MAKE) $(AM_MAKEFLAGS) install $(silentstd))
