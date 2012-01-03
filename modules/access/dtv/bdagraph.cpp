@@ -305,28 +305,40 @@ void BDAOutput::Push( block_t *p_block )
 
 ssize_t BDAOutput::Pop(void *buf, size_t len)
 {
-    block_t *block;
+    vlc_mutex_locker l( &lock );
+
+    mtime_t i_deadline = mdate() + 250 * 1000;
+    while( !p_first )
     {
-        vlc_mutex_locker l( &lock );
-
-        if( !p_first )
-            vlc_cond_timedwait( &wait, &lock, mdate() + 250*1000 );
-
-        block = p_first;
-        p_first = NULL;
-        pp_next = &p_first;
+        if( vlc_cond_timedwait( &wait, &lock, i_deadline ) )
+            return -1;
     }
 
-    if(block == NULL)
-        return -1;
+    size_t i_index = 0;
+    while( i_index < len )
+    {
+        size_t i_copy = __MIN( len - i_index, p_first->i_buffer );
+        memcpy( (uint8_t *)buf + i_index, p_first->p_buffer, i_copy );
 
-    if(len < block->i_buffer)
-        msg_Err(p_access, "buffer overflow!");
-    else
-        len = block->i_buffer;
-    vlc_memcpy(buf, block->p_buffer, len);
-    block_Release(block);
-    return len;
+        i_index           += i_copy;
+
+        p_first->p_buffer += i_copy;
+        p_first->i_buffer -= i_copy;
+
+        if( p_first->i_buffer <= 0 )
+        {
+            block_t *p_next = p_first->p_next;
+            block_Release( p_first );
+
+            p_first = p_next;
+            if( !p_first )
+            {
+                pp_next = &p_first;
+                break;
+            }
+        }
+    }
+    return i_index;
 }
 
 void BDAOutput::Empty()
