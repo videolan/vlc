@@ -856,13 +856,13 @@ void MainInterface::dockPlaylist( bool p_docked )
     }
     else /* Previously undocked */
     {
-        /* If playlist is invisible don't show it */
-        if( !playlistWidget->isVisible() ) return;
-
         QVLCTools::saveWidgetPosition( p_intf, "Playlist", playlistWidget );
         playlistWidget->setWindowFlags( Qt::Widget ); // Probably a Qt bug here
         // It would be logical that QStackWidget::addWidget reset the flags...
         stackCentralW->addWidget( playlistWidget );
+
+        /* If playlist is invisible don't show it */
+        if( !playlistWidget->isVisible() ) return;
         showTab( playlistWidget );
     }
     playlistVisible = true;
