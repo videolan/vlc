@@ -351,7 +351,7 @@ int RarParse(stream_t *s, int *count, rar_file_t ***file)
         if (vol != s)
             stream_Delete(vol);
 
-        if (!has_next) {
+        if (!has_next || !pattern) {
             free(volume_mrl);
             return VLC_SUCCESS;
         }
