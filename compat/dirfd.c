@@ -25,12 +25,10 @@
 #include <dirent.h>
 #include <errno.h>
 
-int dirfd (DIR *dir)
+int (dirfd) (DIR *dir)
 {
-#if defined (__sun__) || defined (__FreeBSD__)
-    return dir->dd_fd;
-#elif defined (__APPLE__)
-    return dir->__dd_fd;
+#ifdef dirfd
+    return dirfd (dir);
 #else
     (void) dir;
 # ifdef ENOTSUP
