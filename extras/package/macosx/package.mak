@@ -7,24 +7,24 @@ endif
 
 # This is just for development purposes.
 # The resulting VLC.app will only run in this tree.
-VLC.app: VLC-tmp.app
+VLC.app: VLC-tmp
 	rm -Rf $@
-	cp -R VLC-tmp.app $@
+	cp -R VLC-tmp $@
 	$(INSTALL) -m 0755 $(top_builddir)/bin/.libs/vlc $@/Contents/MacOS/VLC
 	$(LN_S) -f ../../../modules $@/Contents/MacOS/plugins
 
 # VLC-release.app for packaging and giving it to your friends
 # use package-macosx to get a nice dmg
-VLC-release.app: VLC-tmp.app
+VLC-release.app: VLC-tmp
 	rm -Rf $@
-	cp -R VLC-tmp.app $@
+	cp -R VLC-tmp $@
 	PRODUCT="$@" ACTION="release-makefile" src_dir=$(srcdir) build_dir=$(top_builddir) sh $(srcdir)/projects/macosx/framework/Pre-Compile.sh
 	find $@ -type d -exec chmod ugo+rx '{}' \;
 	find $@ -type f -exec chmod ugo+r '{}' \;
 	rm -Rf $@/Contents/Frameworks/BGHUDAppKit.framework/Resources/
 
 
-VLC-tmp.app: vlc
+VLC-tmp: vlc
 	$(AM_V_GEN)(cd src && $(MAKE) $(AM_MAKEFLAGS) install $(silentstd))
 	(cd lib && $(MAKE) $(AM_MAKEFLAGS) install $(silentstd))
 	rm -Rf "$(top_builddir)/tmp" "$@"
