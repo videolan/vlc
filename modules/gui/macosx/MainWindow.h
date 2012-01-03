@@ -110,6 +110,8 @@
     NSRecursiveLock * o_animation_lock;
     NSSize nativeVideoSize;
 
+    NSTimer *t_hide_mouse_timer;
+
     NSInteger i_originalLevel;
     NSRect previousSavedFrame;
 }
@@ -151,6 +153,9 @@
 - (void)setVideoplayEnabled;
 - (void)resizeWindow;
 - (void)setNativeVideoSize:(NSSize)size;
+
+- (void)hideMouseCursor:(NSTimer *)timer;
+- (void)recreateHideMouseTimer;
 
 /* fullscreen handling */
 - (void)showFullscreenController;

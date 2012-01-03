@@ -120,6 +120,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     /* setup the styled interface */
     b_nativeFullscreenMode = config_GetInt( VLCIntf, "macosx-nativefullscreenmode" );
     i_lastShownVolume = -1;
+    t_hide_mouse_timer = nil;
 
     [o_play_btn setToolTip: _NS("Play/Pause")];
     [o_bwd_btn setToolTip: _NS("Backward")];
@@ -1143,6 +1144,35 @@ static VLCMainWindow *_o_sharedInstance = nil;
     }
 }
 
+//  Called automatically if window's acceptsMouseMovedEvents property is true
+- (void)mouseMoved:(NSEvent *)theEvent
+{
+    if (b_fullscreen) {
+        [self recreateHideMouseTimer];
+    }
+}
+
+- (void)recreateHideMouseTimer
+{
+    if (t_hide_mouse_timer != nil) {
+        [t_hide_mouse_timer invalidate];
+        [t_hide_mouse_timer release];
+    }
+
+    t_hide_mouse_timer = [NSTimer scheduledTimerWithTimeInterval:2
+                                                          target:self
+                                                        selector:@selector(hideMouseCursor:)
+                                                        userInfo:nil
+                                                         repeats:NO];
+    [t_hide_mouse_timer retain];
+}
+
+//  NSTimer selectors require this function signature as per Apple's docs
+- (void)hideMouseCursor:(NSTimer *)timer
+{
+    [NSCursor setHiddenUntilMouseMoves: YES];
+}
+
 #pragma mark -
 #pragma mark Fullscreen support
 - (void)showFullscreenController
@@ -1198,7 +1228,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
     [o_fullscreen_btn setState: YES];
 
-    [NSCursor setHiddenUntilMouseMoves: YES];
+    [self recreateHideMouseTimer];
 
     if( blackout_other_displays )
         [screen blackoutOtherScreens];
@@ -1623,9 +1653,10 @@ static VLCMainWindow *_o_sharedInstance = nil;
 - (void)windowWillEnterFullScreen:(NSNotification *)notification
 {
     [o_video_view setFrame: [[self contentView] frame]];
-    [NSCursor setHiddenUntilMouseMoves: YES];
     b_fullscreen = YES;
     [o_fspanel setVoutWasUpdated: (int)[[self screen] displayID]];
+
+    [self recreateHideMouseTimer];
 
     if (b_dark_interface)
     {
