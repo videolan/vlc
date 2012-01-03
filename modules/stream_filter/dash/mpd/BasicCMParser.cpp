@@ -287,7 +287,8 @@ void    BasicCMParser::setRepresentations   (Node *root, Group *group)
     {
         const std::map<std::string, std::string>    attributes = representations.at(i)->getAttributes();
 
-        Representation *rep = new Representation( attributes );
+        Representation *rep = new Representation;
+        rep->setParentGroup( group );
         if ( this->parseCommonAttributesElements( representations.at( i ), rep, group ) == false )
         {
             delete rep;

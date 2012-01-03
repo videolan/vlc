@@ -31,11 +31,11 @@
 
 using namespace dash::mpd;
 
-Representation::Representation  (const std::map<std::string, std::string>&  attributes) :
+Representation::Representation() :
     qualityRanking( -1 ),
-    attributes( attributes ),
     segmentInfo( NULL ),
-    trickModeType( NULL )
+    trickModeType( NULL ),
+    parentGroup( NULL )
 {
 }
 
@@ -80,6 +80,17 @@ TrickModeType*      Representation::getTrickModeType        () const
 void                Representation::setTrickMode        (TrickModeType *trickModeType)
 {
     this->trickModeType = trickModeType;
+}
+
+const Group *Representation::getParentGroup() const
+{
+    return this->parentGroup;
+}
+
+void Representation::setParentGroup(const Group *group)
+{
+    if ( group != NULL )
+        this->parentGroup = group;
 }
 
 void                Representation::setSegmentInfo          (SegmentInfo *info)

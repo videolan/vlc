@@ -35,10 +35,12 @@ namespace dash
 {
     namespace mpd
     {
+        class Group;
+
         class Representation : public CommonAttributesElements
         {
             public:
-                Representation          ( const std::map<std::string, std::string>&  attributes);
+                Representation();
                 virtual ~Representation ();
 
                 const std::string&  getId                   () const;
@@ -65,14 +67,17 @@ namespace dash
 
                 void                setSegmentInfo( SegmentInfo *info );
                 void                setTrickMode( TrickModeType *trickModeType );
+                const Group*        getParentGroup() const;
+                void                setParentGroup( const Group *group );
 
             private:
                 int                                 bandwidth;
-                std::string                         id; int                                 qualityRanking;
+                std::string                         id;
+                int                                 qualityRanking;
                 std::list<const Representation*>    dependencies;
-                std::map<std::string, std::string>  attributes;
                 SegmentInfo                         *segmentInfo;
                 TrickModeType                       *trickModeType;
+                const Group                         *parentGroup;
         };
     }
 }
