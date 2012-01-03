@@ -149,7 +149,7 @@ static int Open( vlc_object_t *p_this )
 
         if( Validate( p_demux, psz_ext ) )
         {
-            msg_Warn( p_demux, "MOD validation failed (ext=%s)", psz_ext ? psz_ext : "");
+            msg_Dbg( p_demux, "MOD validation failed (ext=%s)", psz_ext ? psz_ext : "");
             return VLC_EGENERIC;
         }
     }

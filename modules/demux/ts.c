@@ -555,7 +555,7 @@ static int DetectPacketSize( demux_t *p_demux )
         msg_Warn( p_demux, "this does not look like a TS stream, continuing" );
         return TS_PACKET_SIZE_188;
     }
-    msg_Warn( p_demux, "TS module discarded (lost sync)" );
+    msg_Dbg( p_demux, "TS module discarded (lost sync)" );
     return -1;
 }
 
