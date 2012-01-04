@@ -197,9 +197,11 @@ ZCAT ?= $(error Gunzip client (zcat) not found!)
 endif
 
 ifeq ($(shell sha512sum --version >/dev/null 2>&1 || echo FAIL),)
-SHA512SUM = sha512sum
+SHA512SUM = sha512sum --check
 else ifeq ($(shell shasum --version >/dev/null 2>&1 || echo FAIL),)
-SHA512SUM = shasum -a 512
+SHA512SUM = shasum -a 512 --check
+else ifeq ($(shell openssl version >/dev/null 2>&1 || echo FAIL),)
+SHA512SUM = openssl dgst -sha512
 else
 SHA512SUM = $(error SHA-512 checksumming not found!)
 endif
@@ -247,7 +249,7 @@ checksum = \
 	$(foreach f,$(filter $(TARBALLS)/%,$^), \
 		grep -- " $(f:$(TARBALLS)/%=%)$$" \
 			"$(SRC)/$(patsubst .sum-%,%,$@)/$(2)SUMS" &&) \
-	(cd $(TARBALLS) && $(1) --check /dev/stdin) < \
+	(cd $(TARBALLS) && $(1) /dev/stdin) < \
 		"$(SRC)/$(patsubst .sum-%,%,$@)/$(2)SUMS"
 CHECK_SHA512 = $(call checksum,$(SHA512SUM),SHA512)
 UNPACK = $(RM) -R $@ \
