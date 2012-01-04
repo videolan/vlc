@@ -349,10 +349,10 @@ void vlc_cond_init (vlc_cond_t *p_condvar)
 {
     pthread_condattr_t attr;
 
-    vlc_clock_setup ();
     if (unlikely(pthread_condattr_init (&attr)))
         abort ();
 #if (_POSIX_CLOCK_SELECTION > 0)
+    vlc_clock_setup ();
     pthread_condattr_setclock (&attr, vlc_clock_id);
 #endif
     if (unlikely(pthread_cond_init (p_condvar, &attr)))
