@@ -174,6 +174,24 @@ CLEAN_FILE += .pkg-config
 CLEAN_PKG += pkgconfig
 DISTCLEAN_PKG += pkg-config-$(PKGCFG_VERSION).tar.gz
 
+# openssl
+# we need to use -j1 here, since otherwise compilation fails (at least on Darwin)
+
+openssl-$(OPENSSL_VERSION).tar.gz:
+	$(call download,$(OPENSSL_URL))
+
+openssl: openssl-$(OPENSSL_VERSION).tar.gz
+	$(UNPACK)
+	$(MOVE)
+
+.openssl: openssl
+	(cd openssl; ./config --prefix=$(PREFIX) no-shared no-zlib && make -j1 && make test && make install)
+	touch $@
+
+CLEAN_FILE += .openssl
+CLEAN_PKG += openssl
+DISTCLEAN_PKG += openssl-$(OPENSSL_VERSION).tar.gz
+
 #
 #
 #
