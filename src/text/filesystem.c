@@ -70,6 +70,10 @@ FILE *vlc_fopen (const char *filename, const char *mode)
                 oflags |= O_CREAT | O_TRUNC;
                 break;
 
+            case 'x':
+                oflags |= O_EXCL;
+                break;
+
             case '+':
                 rwflags = O_RDWR;
                 break;
