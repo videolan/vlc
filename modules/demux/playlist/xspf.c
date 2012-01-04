@@ -221,7 +221,7 @@ static bool parse_playlist_node COMPLEX_INTERFACE
         /* attribute: xmlns */
         else if (!strcmp(name, "xmlns") || !strcmp(name, "xmlns:vlc"))
             ;
-        else if (!strcmp(name, "xml:base"))
+        else if (!strcmp(name, "xml:base") && psz_value)
         {
             free(p_demux->p_sys->psz_base);
             p_demux->p_sys->psz_base = strdup(psz_value);
