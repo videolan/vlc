@@ -83,11 +83,11 @@
 #if (_POSIX_TIMERS > 0)
 static unsigned vlc_clock_prec;
 
-# if (_POSIX_MONOTONIC_CLOCK > 0)
+# if (_POSIX_MONOTONIC_CLOCK > 0) && (_POSIX_CLOCK_SELECTION > 0)
 /* Compile-time POSIX monotonic clock support */
 #  define vlc_clock_id (CLOCK_MONOTONIC)
 
-# elif (_POSIX_MONOTONIC_CLOCK == 0)
+# elif (_POSIX_MONOTONIC_CLOCK == 0) && (_POSIX_CLOCK_SELECTION > 0)
 /* Run-time POSIX monotonic clock support (see clock_setup() below) */
 static clockid_t vlc_clock_id;
 
@@ -457,20 +457,6 @@ void vlc_cond_wait (vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex)
 int vlc_cond_timedwait (vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex,
                         mtime_t deadline)
 {
-#if (_POSIX_MONOTONIC_CLOCK > 0) && (_POSIX_CLOCK_SELECTION < 0)
-    /* Without clock selection, the real-time clock is used for the absolute
-     * timeout in pthread_cond_timedwait(). We may need to adjust. */
-# error FIXME: breaks vlc_cond_init_daytime()
-    if (vlc_clock_id != CLOCK_REALTIME)
-    {
-        struct timeval tv;
-
-        deadline -= mdate ();
-        gettimeofday (&tv, NULL);
-        deadline += tv.tv_sec * UINT64_C(1000000) + tv.tv_usec;
-    }
-#endif
-
     struct timespec ts = mtime_to_ts (deadline);
     int val = pthread_cond_timedwait (p_condvar, p_mutex, &ts);
     if (val != ETIMEDOUT)
