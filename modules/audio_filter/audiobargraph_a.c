@@ -39,11 +39,11 @@
 
 #define ADDRESS_TEXT N_("TCP address to use (default localhost)")
 #define ADDRESS_LONGTEXT N_("TCP address to use to communicate with the video "\
-                "part of the Bar Graph (default localhost)." \
+                "part of the Bar Graph (default localhost). " \
                 "In the case of bargraph incrustation, use localhost." )
 #define PORT_TEXT N_("TCP port to use (default 12345)")
 #define PORT_LONGTEXT N_("TCP port to use to communicate with the video "\
-                "part of the Bar Graph (default 12345)." \
+                "part of the Bar Graph (default 12345). " \
                 "Use the same port as the one used in the rc interface." )
 #define BARGRAPH_TEXT N_("Defines if BarGraph information should be sent (default 1)")
 #define BARGRAPH_LONGTEXT N_("Defines if BarGraph information should be sent. "\
