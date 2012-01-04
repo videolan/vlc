@@ -168,8 +168,7 @@ static const char *const ppsz_standards_list_text[] =
     "(0 means default)." )
 #define TVFREQ_TEXT N_("Tuner Frequency")
 #define TVFREQ_LONGTEXT N_(  "This overrides the channel. Measured in Hz." )
-#define STANDARD_TEXT N_( "Standard" )
-#define STANDARD_LONGTEXT N_( "Video standard (Default, SECAM_D, PAL_B, NTSC_M, etc...)." )
+#define STANDARD_TEXT N_( "Video standard" )
 #define COUNTRY_TEXT N_("Tuner country code")
 #define COUNTRY_LONGTEXT N_( \
     "Set the tuner country code that establishes the current " \
@@ -262,7 +261,7 @@ vlc_module_begin ()
     add_integer( CFG_PREFIX "tuner-country", 0, COUNTRY_TEXT, COUNTRY_LONGTEXT,
                 true )
 
-    add_integer( CFG_PREFIX "tuner-standard", 0, STANDARD_TEXT, STANDARD_LONGTEXT,
+    add_integer( CFG_PREFIX "tuner-standard", 0, STANDARD_TEXT, STANDARD_TEXT,
                 false )
         change_integer_list( i_standards_list, ppsz_standards_list_text )
         change_safe()
