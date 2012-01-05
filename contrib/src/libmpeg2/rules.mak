@@ -17,7 +17,7 @@ libmpeg2: libmpeg2-$(LIBMPEG2_VERSION).tar.gz .sum-libmpeg2
 	$(UNPACK)
 	$(APPLY) $(SRC)/libmpeg2/libmpeg2-arm-pld.patch
 	$(APPLY) $(SRC)/libmpeg2/libmpeg2-mc-neon.patch
-	$(UPDATE_AUTOCONFIG)
+	$(UPDATE_AUTOCONFIG) && cd $(UNPACK_DIR) && mv config.guess config.sub .auto
 	$(MOVE)
 
 .libmpeg2: libmpeg2
