@@ -80,6 +80,7 @@ Name[wa]=Djouweu d' media VLC
 GenericName[wa]=Djouweu d' media
 Comment[wa]=Lét, egaloye, evoye vos floûs multimedia
 Name[zh_CN]=VLC media player
+GenericName[zh_CN]=媒体播放器
 Comment[zh_CN]=为您读取、捕获或发送多媒体流
 Exec=@bindir@/vlc %U
 TryExec=@bindir@/vlc
