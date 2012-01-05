@@ -266,6 +266,7 @@ void    BasicCMParser::setGroups            (Node *root, Period *period)
         std::map<std::string, std::string>::const_iterator  it = attr.find( "subsegmentAlignmentFlag" );
         if ( it != attr.end() && it->second == "true" )
             group->setSubsegmentAlignmentFlag( true ); //Otherwise it is false by default.
+        this->parseSegmentInfoDefault( groups.at( i ), group );
         this->setRepresentations(groups.at(i), group);
         period->addGroup(group);
     }
@@ -361,9 +362,7 @@ bool    BasicCMParser::setSegmentInfo       (Node *root, Representation *rep)
 
     if ( segmentInfo )
     {
-        const std::map<std::string, std::string> attr = segmentInfo->getAttributes();
-
-        SegmentInfo *info = new SegmentInfo();
+        SegmentInfo *info = new SegmentInfo;
         this->parseSegmentInfoCommon( segmentInfo, info );
         //If we don't have any segment, there's no point keeping this SegmentInfo.
         if ( this->setSegments( segmentInfo, info ) == false )
