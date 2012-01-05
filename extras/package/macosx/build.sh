@@ -86,7 +86,7 @@ export CC=/Developer/usr/bin/clang
 export CXX="/Developer/usr/bin/clang++"
 export OBJC=/Developer/usr/bin/clang
 export OSX_VERSION=$SDK
-export PATH="${vlcroot}/extras/tools:$PATH"
+export PATH="${vlcroot}/extras/tools/build/bin:$PATH"
 
 TRIPLET=$ARCH-apple-darwin10
 
@@ -132,7 +132,7 @@ spopd
 # vlc/configure
 #
 
-if [ "${vlcroot}/configure" -nt config.log ]; then
+if [ "${vlcroot}/configure" -nt Makefile ]; then
 
   ${vlcroot}/extras/package/macosx/configure.sh \
       --build=$TRIPLET \
