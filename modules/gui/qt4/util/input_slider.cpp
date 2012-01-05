@@ -387,10 +387,10 @@ void SeekSlider::paintEvent( QPaintEvent *event )
     switch ( orientation() )
     {
         case Qt::Horizontal:
-            barRect.setHeight( handleSize().height() /2 );
+            barRect.setHeight( height() /2 );
             break;
         case Qt::Vertical:
-            barRect.setWidth( handleSize().width() /2 );
+            barRect.setWidth( width() /2 );
             break;
     }
 
