@@ -46,13 +46,6 @@ HTTPConnectionManager::~HTTPConnectionManager   ()
     this->closeAllConnections();
 }
 
-IHTTPConnection*    HTTPConnectionManager::getConnection            (std::string url)
-{
-    HTTPConnection *con = new HTTPConnection(url, this->stream);
-    con->init();
-    this->connections.push_back(con);
-    return con;
-}
 bool                HTTPConnectionManager::closeConnection          (IHTTPConnection *con)
 {
     for(std::vector<HTTPConnection *>::iterator it = this->connections.begin(); it != this->connections.end(); ++it)
