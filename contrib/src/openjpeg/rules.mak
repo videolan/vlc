@@ -11,6 +11,7 @@ $(TARBALLS)/openjpeg_v$(OPENJPEG_VERSION).tgz:
 openjpeg: openjpeg_v$(OPENJPEG_VERSION).tgz .sum-openjpeg
 	$(UNPACK)
 	$(APPLY) $(SRC)/openjpeg/pkg-config.patch
+	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
 
 .openjpeg: openjpeg
