@@ -18,7 +18,6 @@ libmodplug: libmodplug-$(MODPLUG_VERSION).tar.gz .sum-modplug
 	$(MOVE)
 
 .modplug: libmodplug
-	$(RECONF)
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF)
 	cd $< && $(MAKE) install
 	touch $@

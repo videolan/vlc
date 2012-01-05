@@ -25,7 +25,7 @@ endif
 	$(MOVE)
 
 .ogg: libogg
-	$(RECONF)
+	#$(RECONF)
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF)
 	cd $< && $(MAKE) install
 	touch $@

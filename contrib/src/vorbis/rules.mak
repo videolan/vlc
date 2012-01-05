@@ -30,7 +30,6 @@ libvorbis: libvorbis-$(VORBIS_VERSION).tar.xz .sum-vorbis
 DEPS_vorbis = ogg $(DEPS_ogg)
 
 .vorbis: libvorbis
-	$(RECONF) -I m4
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) --disable-docs --disable-examples --disable-oggtest
 	cd $< && $(MAKE) install
 	touch $@

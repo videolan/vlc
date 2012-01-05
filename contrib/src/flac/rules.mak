@@ -38,7 +38,6 @@ endif
 DEPS_flac = ogg $(DEPS_ogg)
 
 .flac: flac
-	$(RECONF) -I m4
 	cd $< && $(HOSTVARS) ./configure $(FLACCONF)
 	cd $</src && $(MAKE) -C libFLAC install
 	cd $< && $(MAKE) -C include install
