@@ -37,13 +37,11 @@
 
 #include <vlc_playlist.h>
 
-#include <lua.h>        /* Low level lua C API */
-#include <lauxlib.h>    /* Higher level C API */
 #include <assert.h>
 
+#include "../vlc.h"
 #include "input.h"
 #include "playlist.h"
-#include "../vlc.h"
 #include "../libs.h"
 #include "../extension.h"
 

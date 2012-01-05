@@ -38,9 +38,6 @@
 #include <vlc_input.h>
 #include <vlc_charset.h>
 
-#include <lua.h>        /* Low level lua C API */
-#include <lauxlib.h>    /* Higher level C API */
-
 #include "input.h"
 #include "../libs.h"
 #include "../vlc.h"

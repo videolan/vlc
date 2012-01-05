@@ -38,9 +38,6 @@
 #include <vlc_meta.h>
 #include <vlc_aout.h>
 
-#include <lua.h>        /* Low level lua C API */
-#include <lauxlib.h>    /* Higher level C API */
-
 #include "../vlc.h"
 #include "../libs.h"
 

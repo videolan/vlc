@@ -37,10 +37,6 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#include <lua.h>        /* Low level lua C API */
-#include <lauxlib.h>    /* Higher level C API */
-#include <lualib.h>     /* Lua libs */
-
 #include "vlc.h"
 #include "libs.h"
 

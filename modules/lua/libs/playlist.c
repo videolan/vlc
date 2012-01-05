@@ -37,9 +37,6 @@
 #include <vlc_interface.h>
 #include <vlc_playlist.h>
 
-#include <lua.h>        /* Low level lua C API */
-#include <lauxlib.h>    /* Higher level C API */
-
 #include "../vlc.h"
 #include "../libs.h"
 #include "playlist.h"

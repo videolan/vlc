@@ -35,9 +35,6 @@
 #include <vlc_vout.h>
 #include <vlc_osd.h>
 
-#include <lua.h>        /* Low level lua C API */
-#include <lauxlib.h>    /* Higher level C API */
-
 #include "../vlc.h"
 #include "../libs.h"
 #include "input.h"

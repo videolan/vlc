@@ -32,10 +32,6 @@
 # include "config.h"
 #endif
 
-#include <lua.h>        /* Low level lua C API */
-#include <lauxlib.h>    /* Higher level C API */
-#include <lualib.h>     /* Lua libs */
-
 #include "../vlc.h"
 #include "../libs.h"
 

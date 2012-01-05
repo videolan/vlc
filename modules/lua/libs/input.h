@@ -24,6 +24,8 @@
 #ifndef VLC_LUA_INPUT_H
 #define VLC_LUA_INPUT_H
 
+#include "../vlc.h"
+
 input_thread_t * vlclua_get_input_internal( lua_State * );
 
 #endif
