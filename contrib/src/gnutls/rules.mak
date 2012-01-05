@@ -19,6 +19,7 @@ ifdef HAVE_WIN32
 	$(APPLY) $(SRC)/gnutls/gnutls-win32.patch
 endif
 	$(APPLY) $(SRC)/gnutls/gnutls-no-egd.patch
+	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
 
 GNUTLS_CONF := \

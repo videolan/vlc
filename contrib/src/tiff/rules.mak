@@ -10,6 +10,7 @@ $(TARBALLS)/tiff-$(TIFF_VERSION).tar.gz:
 
 tiff: tiff-$(TIFF_VERSION).tar.gz .sum-tiff
 	$(UNPACK)
+	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
 
 .tiff: tiff
