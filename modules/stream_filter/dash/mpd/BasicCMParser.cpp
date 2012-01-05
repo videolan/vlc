@@ -28,9 +28,11 @@
 #include "BasicCMParser.h"
 #include "mpd/ContentDescription.h"
 #include "mpd/SegmentInfoDefault.h"
+#include "mpd/SegmentTemplate.h"
 #include "mpd/SegmentTimeline.h"
 
 #include <cstdlib>
+#include <sstream>
 #include <sstream>
 
 #include <vlc_common.h>
@@ -43,7 +45,8 @@ using namespace dash::xml;
 BasicCMParser::BasicCMParser( Node *root, stream_t *p_stream ) :
     root( root ),
     mpd( NULL ),
-    p_stream( p_stream )
+    p_stream( p_stream ),
+    currentRepresentation( NULL )
 {
     this->url = p_stream->psz_access;
     this->url += "://";
@@ -297,6 +300,7 @@ void    BasicCMParser::setRepresentations   (Node *root, Group *group)
 
         Representation *rep = new Representation;
         rep->setParentGroup( group );
+        this->currentRepresentation = rep;
         if ( this->parseCommonAttributesElements( representations.at( i ), rep, group ) == false )
         {
             delete rep;
@@ -374,21 +378,39 @@ bool    BasicCMParser::setSegmentInfo       (Node *root, Representation *rep)
     return false;
 }
 
-bool BasicCMParser::parseSegment(Segment *seg, const std::map<std::string, std::string>& attr )
+Segment*    BasicCMParser::parseSegment( Node* node )
 {
+    const std::map<std::string, std::string>    attr = node->getAttributes();
     std::map<std::string, std::string>::const_iterator  it;
 
+    bool        isTemplate = false;
+    Segment*    seg = NULL;
+
+    if ( node->getName() == "UrlTemplate" )
+        isTemplate = true;
     it = attr.find( "sourceURL" );
     //FIXME: When not present, the sourceUrl attribute should be computed
     //using BaseURL and the range attribute.
     if ( it != attr.end() )
     {
         std::string     url = it->second;
+        bool            runtimeToken = false;
+        if ( isTemplate == true )
+        {
+            if ( this->resolveUrlTemplates( url, runtimeToken ) == false )
+            {
+                std::cerr << "Failed to substitute URLTemplate identifier." << std::endl;
+                return NULL;
+            }
+            seg = new SegmentTemplate( runtimeToken, this->currentRepresentation );
+        }
+        else
+            seg = new Segment;
         if ( url.find( this->p_stream->psz_access ) != 0 ) //Relative url
             url = this->url + url;
         seg->setSourceUrl( url );
     }
-    return true;
+    return seg;
 }
 
 ProgramInformation* BasicCMParser::parseProgramInformation()
@@ -423,24 +445,88 @@ void    BasicCMParser::setInitSegment       (Node *root, SegmentInfoCommon *info
                      " other InitialisationSegmentURL will be dropped." << std::endl;
     if ( initSeg.size() == 1 )
     {
-        Segment     *seg = new Segment();
-        parseSegment( seg, initSeg.at(0)->getAttributes() );
-        info->setInitialisationSegment( seg );
+        Segment     *seg = parseSegment( initSeg.at(0) );
+        if ( seg != NULL )
+            info->setInitialisationSegment( seg );
     }
 }
 
 bool    BasicCMParser::setSegments          (Node *root, SegmentInfo *info)
 {
-    std::vector<Node *> segments = DOMHelper::getElementByTagName(root, "Url", false);
+    std::vector<Node *> segments = DOMHelper::getElementByTagName( root, "Url", false );
+    std::vector<Node *> segmentsTemplates = DOMHelper::getElementByTagName( root, "UrlTemplate", false );
 
-    if ( segments.size() == 0 )
+    if ( segments.size() == 0 && segmentsTemplates.size() == 0 )
         return false;
+    segments.insert( segments.end(), segmentsTemplates.begin(), segmentsTemplates.end() );
     for(size_t i = 0; i < segments.size(); i++)
     {
-        Segment *seg = new Segment();
-        parseSegment( seg, segments.at(i)->getAttributes() );
+        Segment*    seg = parseSegment( segments.at( i ) );
+        if ( seg == NULL )
+            continue ;
         if ( seg->getSourceUrl().empty() == false )
             info->addSegment(seg);
+    }
+    return true;
+}
+
+bool    BasicCMParser::resolveUrlTemplates( std::string &url, bool &containRuntimeToken )
+{
+    size_t      it = url.find( '$' );
+    containRuntimeToken = false;
+
+    while ( it != std::string::npos )
+    {
+        size_t  closing = url.find( '$', it + 1 );
+        if ( closing == std::string::npos )
+        {
+            std::cerr << "Unmatched '$' in url template: " << url << std::endl;
+            return false;
+        }
+        std::string     token = std::string( url, it, closing - it + 1 );
+        if ( token == "$$" )
+        {
+            url.replace( it, token.length(), "$" );
+            it = closing + 1;
+        }
+        else if ( token == "$RepresentationID$" )
+        {
+            if ( this->currentRepresentation->getId().empty() == false )
+            {
+                std::cerr << "Representation doesn't have an ID. Can't substitute"
+                             " identifier $RepresentationID$" << std::endl;
+                return false;
+            }
+            url.replace( it, token.length(), this->currentRepresentation->getId() );
+            it = it + this->currentRepresentation->getId().length();
+        }
+        else if ( token == "$Bandwidth$" )
+        {
+            if ( this->currentRepresentation->getBandwidth() < 0 )
+            {
+                std::cerr << "Representation doesn't have a valid bandwidth. "
+                             "Can't substitute tag $Bandwidth$" << std::endl;
+                return false;
+            }
+            std::ostringstream  oss;
+            oss << this->currentRepresentation->getBandwidth();
+            url.replace( it, token.length(), oss.str() );
+            it = it + oss.str().length();
+        }
+        else
+        {
+            if ( token == "$Index$" || token == "$Time$" )
+            {
+                containRuntimeToken = true;
+                it = it + token.length();
+            }
+            else
+            {
+                std::cout << "Unhandled token " << token << std::endl;
+                return false;
+            }
+        }
+        it = url.find( '$', it );
     }
     return true;
 }
