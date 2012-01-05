@@ -27,6 +27,7 @@
 #include <sys/types.h>
 #include <list>
 #include <stdint.h>
+#include <vlc_common.h>
 
 namespace dash
 {
@@ -47,6 +48,7 @@ namespace dash
                 int                     getTimescale() const;
                 void                    setTimescale( int timescale );
                 void                    addElement( Element* e );
+                const Element*          getElement( mtime_t dts ) const;
 
             private:
                 int                     timescale;

@@ -26,6 +26,8 @@
 #include <vlc_common.h>
 #include <vlc_arrays.h>
 
+#include <iostream>
+
 using namespace dash::mpd;
 
 SegmentTimeline::SegmentTimeline() :
@@ -51,6 +53,28 @@ void dash::mpd::SegmentTimeline::setTimescale(int timescale)
 void dash::mpd::SegmentTimeline::addElement(dash::mpd::SegmentTimeline::Element *e)
 {
     this->elements.push_back( e );
+}
+
+const SegmentTimeline::Element*    SegmentTimeline::getElement( mtime_t dts ) const
+{
+    if ( this->elements.size() == 0 )
+        return NULL;
+    int64_t     targetT = dts * this->timescale / 1000000;
+    targetT -= this->elements.front()->t;
+
+    std::list<Element*>::const_iterator     it = this->elements.begin();
+    std::list<Element*>::const_iterator     end = this->elements.end();
+    const Element*  res = NULL;
+
+    while ( it != end )
+    {
+        if ( (*it)->t > targetT )
+            return res;
+        res = *it;
+        ++it;
+    }
+    std::cerr << "No more element to be used." << std::endl;
+    return NULL;
 }
 
 dash::mpd::SegmentTimeline::Element::Element() :
