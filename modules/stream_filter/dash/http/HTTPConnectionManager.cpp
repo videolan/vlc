@@ -127,7 +127,8 @@ int                 HTTPConnectionManager::read                     (Chunk *chun
         this->bytesReadChunk    = 0;
         this->timeSecChunk      = 0;
 
-        this->initConnection(chunk);
+        if ( this->initConnection(chunk) == NULL )
+            return -1;
         return this->read(chunk, p_buffer, len);
     }
 }
@@ -136,13 +137,16 @@ int                 HTTPConnectionManager::peek                     (Chunk *chun
     if(this->chunkMap.find(chunk) != this->chunkMap.end())
         return this->chunkMap[chunk]->peek(pp_peek, i_peek);
 
-    this->initConnection(chunk);
+    if ( this->initConnection(chunk) == NULL )
+        return -1;
     return this->peek(chunk, pp_peek, i_peek);
 }
-HTTPConnection*     HTTPConnectionManager::initConnection           (Chunk *chunk)
+
+IHTTPConnection*     HTTPConnectionManager::initConnection(Chunk *chunk)
 {
     HTTPConnection *con = new HTTPConnection(chunk->getUrl(), this->stream);
-    con->init();
+    if ( con->init() == false )
+        return NULL;
     this->connections.push_back(con);
     this->chunkMap[chunk] = con;
     this->chunkCount++;

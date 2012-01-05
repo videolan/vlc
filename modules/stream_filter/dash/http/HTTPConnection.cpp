@@ -66,11 +66,11 @@ void            HTTPConnection::parseURL        ()
     this->request = "GET " + this->path + " HTTP/1.1\r\n" +
                     "Host: " + this->hostname + "\r\nConnection: close\r\n\r\n";
 }
-bool            HTTPConnection::init            ()
+bool            HTTPConnection::init()
 {
-    this->urlStream = stream_UrlNew(this->stream, this->url.c_str());
+    this->urlStream = stream_UrlNew( this->stream, this->url.c_str() );
 
-    if(!this->urlStream)
+    if( this->urlStream == NULL )
         return false;
 
     return true;

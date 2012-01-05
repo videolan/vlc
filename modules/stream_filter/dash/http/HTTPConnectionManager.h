@@ -69,8 +69,8 @@ namespace dash
                 stream_t                                            *stream;
                 int                                                 chunkCount;
 
-                bool            closeConnection (Chunk *chunk);
-                HTTPConnection* initConnection  (Chunk *chunk);
+                bool                closeConnection( Chunk *chunk );
+                IHTTPConnection*    initConnection( Chunk *chunk );
 
         };
     }
