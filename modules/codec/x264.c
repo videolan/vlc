@@ -727,6 +727,7 @@ struct encoder_sys_t
 
     char            *psz_stat_name;
     int             i_sei_size;
+    uint32_t         i_colorspace;
     uint8_t         *p_sei;
 };
 
@@ -760,13 +761,35 @@ static int  Open ( vlc_object_t *p_this )
 
     p_enc->fmt_out.i_cat = VIDEO_ES;
     p_enc->fmt_out.i_codec = VLC_CODEC_H264;
-    p_enc->fmt_in.i_codec = VLC_CODEC_I420;
-
-    p_enc->pf_encode_video = Encode;
-    p_enc->pf_encode_audio = NULL;
     p_enc->p_sys = p_sys = malloc( sizeof( encoder_sys_t ) );
     if( !p_sys )
         return VLC_ENOMEM;
+
+    p_enc->fmt_in.i_codec = VLC_CODEC_I420;
+    p_sys->i_colorspace = X264_CSP_I420;
+    char *psz_profile = var_GetString( p_enc, SOUT_CFG_PREFIX "profile" );
+    if( psz_profile )
+    {
+        if( !strcmp( psz_profile, "high10" ) )
+        {
+            p_enc->fmt_in.i_codec = VLC_CODEC_I420_10L;
+            p_sys->i_colorspace = X264_CSP_I420 | X264_CSP_HIGH_DEPTH;
+        }
+        if( !strcmp( psz_profile, "high422" ) )
+        {
+            p_enc->fmt_in.i_codec = VLC_CODEC_I422;
+            p_sys->i_colorspace = X264_CSP_I422;
+        }
+        if( !strcmp( psz_profile, "high444" ) )
+        {
+            p_enc->fmt_in.i_codec = VLC_CODEC_I444;
+            p_sys->i_colorspace = X264_CSP_I444;
+        }
+    }
+    free( psz_profile );
+
+    p_enc->pf_encode_video = Encode;
+    p_enc->pf_encode_audio = NULL;
     p_sys->i_initial_delay = 0;
     p_sys->psz_stat_name = NULL;
     p_sys->i_sei_size = 0;
@@ -783,6 +806,7 @@ static int  Open ( vlc_object_t *p_this )
     x264_param_default_preset( &p_sys->param, psz_preset, psz_tune );
     free( psz_preset );
     free( psz_tune );
+    p_sys->param.i_csp = p_sys->i_colorspace;
     p_sys->param.i_width  = p_enc->fmt_in.video.i_width;
     p_sys->param.i_height = p_enc->fmt_in.video.i_height;
 
@@ -1313,7 +1337,7 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pict )
        if( unlikely( p_sys->i_initial_delay == 0 ) )
            p_sys->i_initial_delay = p_pict->date;
        pic.i_pts -= p_sys->i_initial_delay;
-       pic.img.i_csp = X264_CSP_I420;
+       pic.img.i_csp = p_sys->i_colorspace;
        pic.img.i_plane = p_pict->i_planes;
        for( i = 0; i < p_pict->i_planes; i++ )
        {
