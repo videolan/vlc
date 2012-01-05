@@ -21,29 +21,34 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
+
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
 #include "Period.h"
 
+#include <vlc_common.h>
+#include <vlc_arrays.h>
+
 using namespace dash::mpd;
 
-Period::Period  (std::map<std::string, std::string> attributes)
+Period::Period()
 {
-    this->attributes = attributes;
-}
-Period::~Period ()
-{
-    for(size_t i = 0; i < this->groups.size(); i++)
-        delete(this->groups.at(i));
 }
 
-std::vector<Group*> Period::getGroups   ()
+Period::~Period ()
+{
+    vlc_delete_all( this->groups );
+}
+
+const std::vector<Group*>&      Period::getGroups() const
 {
     return this->groups;
 }
-void                Period::addGroup    (Group *group)
+
+void                Period::addGroup(Group *group)
 {
-    this->groups.push_back(group);
+    if ( group != NULL )
+        this->groups.push_back(group);
 }

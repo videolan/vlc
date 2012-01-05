@@ -26,10 +26,8 @@
 
 #include <vector>
 #include <string>
-#include <map>
 
 #include "mpd/Group.h"
-#include "mpd/Representation.h"
 
 namespace dash
 {
@@ -38,17 +36,14 @@ namespace dash
         class Period
         {
             public:
-                Period          (std::map<std::string, std::string> attributes);
+                Period();
                 virtual ~Period ();
 
-                std::vector<Group *>    getGroups   ();
-                void                    addGroup    (Group *group);
+                const std::vector<Group *>&     getGroups() const;
+                void                            addGroup( Group *group );
 
             private:
-                std::map<std::string, std::string>  attributes;
                 std::vector<Group *>                groups;
-
-
         };
     }
 }

@@ -157,7 +157,7 @@ void    BasicCMParser::setPeriods           (Node *root)
 
     for(size_t i = 0; i < periods.size(); i++)
     {
-        Period *period = new Period(periods.at(i)->getAttributes());
+        Period *period = new Period();
         this->setGroups(periods.at(i), period);
         this->mpd->addPeriod(period);
     }
