@@ -33,6 +33,7 @@ lua: lua-$(LUA_VERSION).tar.gz .sum-lua
 	$(UNPACK)
 	$(APPLY) $(SRC)/lua/lua-noreadline.patch
 	$(APPLY) $(SRC)/lua/luac-32bits.patch
+	$(APPLY) $(SRC)/lua/no-localeconv.patch
 ifdef HAVE_MACOSX
 	(cd $(UNPACK_DIR) && \
 	sed -e 's%gcc%$(CC)%' \
