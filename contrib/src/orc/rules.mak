@@ -16,10 +16,12 @@ $(TARBALLS)/orc-$(ORC_VERSION).tar.gz:
 orc: orc-$(ORC_VERSION).tar.gz .sum-orc
 	$(UNPACK)
 	$(APPLY) $(SRC)/orc/orc-stdint.patch
+	$(APPLY) $(SRC)/orc/android.patch
 	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
 
 .orc: orc
+	$(RECONF)
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF)
 	cd $< && $(MAKE) install
 	touch $@
