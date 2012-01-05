@@ -770,20 +770,25 @@ static int  Open ( vlc_object_t *p_this )
     char *psz_profile = var_GetString( p_enc, SOUT_CFG_PREFIX "profile" );
     if( psz_profile )
     {
+#if X264_CSP_HIGH_DEPTH
+        int mask = x264_bit_depth > 8 ? X264_CSP_HIGH_DEPTH : 0;
+#else
+        int mask = 0;
+#endif
         if( !strcmp( psz_profile, "high10" ) )
         {
-            p_enc->fmt_in.i_codec = VLC_CODEC_I420_10L;
-            p_sys->i_colorspace = X264_CSP_I420 | X264_CSP_HIGH_DEPTH;
+            p_enc->fmt_in.i_codec = mask ? VLC_CODEC_I420_10L : VLC_CODEC_I420;
+            p_sys->i_colorspace = X264_CSP_I420 | mask;
         }
         if( !strcmp( psz_profile, "high422" ) )
         {
-            p_enc->fmt_in.i_codec = VLC_CODEC_I422;
-            p_sys->i_colorspace = X264_CSP_I422;
+            p_enc->fmt_in.i_codec = mask ? VLC_CODEC_I422_10L : VLC_CODEC_I422;
+            p_sys->i_colorspace = X264_CSP_I422 | mask;
         }
         if( !strcmp( psz_profile, "high444" ) )
         {
-            p_enc->fmt_in.i_codec = VLC_CODEC_I444;
-            p_sys->i_colorspace = X264_CSP_I444;
+            p_enc->fmt_in.i_codec = mask ? VLC_CODEC_I444_10L : VLC_CODEC_I444;
+            p_sys->i_colorspace = X264_CSP_I444 | mask;
         }
     }
     free( psz_profile );
