@@ -42,11 +42,19 @@ using namespace dash::xml;
 
 BasicCMParser::BasicCMParser( Node *root, stream_t *p_stream ) :
     root( root ),
-    mpd( NULL )
+    mpd( NULL ),
+    p_stream( p_stream )
 {
     this->url = p_stream->psz_access;
     this->url += "://";
-    this->url += p_stream->psz_path;
+    //Only append without the mpd file.
+    std::string path = p_stream->psz_path;
+    size_t      it = path.find_last_of( '/', path.length() - 1 );
+    if ( it != std::string::npos )
+        this->url.append( path, 0, it );
+    else
+        this->url += p_stream->psz_path;
+    this->url += '/';
 }
 
 BasicCMParser::~BasicCMParser   ()
@@ -374,7 +382,12 @@ bool BasicCMParser::parseSegment(Segment *seg, const std::map<std::string, std::
     //FIXME: When not present, the sourceUrl attribute should be computed
     //using BaseURL and the range attribute.
     if ( it != attr.end() )
-        seg->setSourceUrl( it->second );
+    {
+        std::string     url = it->second;
+        if ( url.find( this->p_stream->psz_access ) != 0 ) //Relative url
+            url = this->url + url;
+        seg->setSourceUrl( url );
+    }
     return true;
 }
 

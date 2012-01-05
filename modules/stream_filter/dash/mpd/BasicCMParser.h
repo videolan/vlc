@@ -80,6 +80,7 @@ namespace dash
                 dash::xml::Node *root;
                 MPD             *mpd;
                 std::string     url;
+                stream_t        *p_stream;
         };
     }
 }
