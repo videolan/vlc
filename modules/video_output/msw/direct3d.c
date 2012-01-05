@@ -1254,10 +1254,12 @@ static void Direct3DImportSubpicture(vout_display_t *vd,
         D3DLOCKED_RECT lock;
         hr = IDirect3DTexture9_LockRect(d3dr->texture, 0, &lock, NULL, 0);
         if (SUCCEEDED(hr)) {
-            uint8_t *dst_data  = lock.pBits;
-            int      dst_pitch = lock.Pitch;
-            uint8_t *src_data  = r->p_picture->p->p_pixels;
-            int      src_pitch = r->p_picture->p->i_pitch;
+            uint8_t  *dst_data   = lock.pBits;
+            int       dst_pitch  = lock.Pitch;
+            const int src_offset = r->fmt.i_y_offset * r->p_picture->p->i_pitch +
+                                   r->fmt.i_x_offset * r->p_picture->p->i_pixel_pitch;
+            uint8_t  *src_data   = &r->p_picture->p->p_pixels[src_offset];
+            int       src_pitch  = r->p_picture->p->i_pitch;
             for (unsigned y = 0; y < r->fmt.i_visible_height; y++) {
                 int copy_pitch = __MIN(dst_pitch, r->p_picture->p->i_visible_pitch);
                 if (d3dr->format == D3DFMT_A8B8G8R8) {
