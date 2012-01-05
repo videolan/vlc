@@ -52,7 +52,7 @@ namespace dash
                 long                        getBpsLastChunk         ();
 
             private:
-                long                    bpsAvg;
+                int                     bpsAvg;
                 long                    bpsLastChunk;
                 dash::mpd::IMPDManager  *mpdManager;
         };

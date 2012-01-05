@@ -91,38 +91,30 @@ Period*                 BasicCMManager::getFirstPeriod          ()
     return periods.at(0);
 }
 
-Representation*         BasicCMManager::getRepresentation       (Period *period, long bitrate)
+Representation*         BasicCMManager::getRepresentation(Period *period, int bitrate )
 {
-    std::vector<Group *> groups = period->getGroups();
+    std::vector<Group *>    groups = period->getGroups();
 
-    Representation  *best       = NULL;
-    int             bestDif  = -1;
+    Representation  *best = NULL;
+    std::cout << "Sarching for best representation with bitrate: " << bitrate << std::endl;
 
     for(size_t i = 0; i < groups.size(); i++)
     {
         std::vector<Representation *> reps = groups.at(i)->getRepresentations();
-        for(size_t j = 0; j < reps.size(); j++)
+        for( size_t j = 0; j < reps.size(); j++ )
         {
             int     currentBitrate = reps.at(j)->getBandwidth();
             assert( currentBitrate != -1 );
-            int     dif = bitrate - currentBitrate;
 
-            if( bestDif == -1 )
+            if ( best == NULL || bitrate == -1 ||
+                 ( currentBitrate > best->getBandwidth() &&
+                   currentBitrate < bitrate ) )
             {
-                bestDif = dif;
-                best = reps.at(j);
-            }
-            else
-            {
-                if ( dif >= 0 && dif < bestDif )
-                {
-                    bestDif = dif;
-                    best = reps.at(j);
-                }
+                std::cout << "Found a better Representation (#" << j << ") in group #" << i << std::endl;
+                best = reps.at( j );
             }
         }
     }
-
     return best;
 }
 Period*                 BasicCMManager::getNextPeriod           (Period *period)

@@ -52,7 +52,7 @@ namespace dash
                 Period*                         getNextPeriod( Period *period );
                 Representation*                 getBestRepresentation( Period *period );
                 std::vector<const Segment *>    getSegments( Representation *rep );
-                Representation*                 getRepresentation( Period *period, long bitrate );
+                Representation*                 getRepresentation( Period *period, int bitrate );
                 const MPD*                      getMPD() const;
 
             private:

@@ -161,6 +161,8 @@ void                HTTPConnectionManager::attach                   (IDownloadRa
 }
 void                HTTPConnectionManager::notify                   ()
 {
+    if ( this->bpsAvg <= 0 )
+        return ;
     for(size_t i = 0; i < this->rateObservers.size(); i++)
         this->rateObservers.at(i)->downloadRateChanged(this->bpsAvg, this->bpsLastChunk);
 }

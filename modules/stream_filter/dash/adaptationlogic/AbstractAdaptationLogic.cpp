@@ -34,7 +34,7 @@ using namespace dash::exception;
 
 AbstractAdaptationLogic::AbstractAdaptationLogic    (IMPDManager *mpdManager)
 {
-    this->bpsAvg        = 0;
+    this->bpsAvg        = -1;
     this->bpsLastChunk  = 0;
     this->mpdManager    = mpdManager;
 }
