@@ -648,7 +648,7 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
 #endif
     setAttribute( Qt::WA_MacBrushedMetal);
     QVBoxLayout *controlLayout = new QVBoxLayout( this );
-    controlLayout->setContentsMargins( 4, 1, 0, 0 );
+    controlLayout->setContentsMargins( 3, 1, 0, 1 );
     controlLayout->setSpacing( 0 );
     QHBoxLayout *controlLayout1 = new QHBoxLayout;
     controlLayout1->setSpacing( 0 ); controlLayout1->setMargin( 0 );
