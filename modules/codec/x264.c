@@ -57,7 +57,7 @@ static void Close( vlc_object_t * );
 #define KEYINT_TEXT N_("Maximum GOP size")
 #define KEYINT_LONGTEXT N_( "Sets maximum interval between IDR-frames." \
     "Larger values save bits, thus improving quality for a given bitrate at " \
-    "the cost of seeking precision." )
+    "the cost of seeking precision. Use -1 for infinite." )
 
 #define MIN_KEYINT_TEXT N_("Minimum GOP size")
 #define MIN_KEYINT_LONGTEXT N_( "Sets minimum interval between IDR-frames. " \
@@ -924,6 +924,9 @@ static int  Open ( vlc_object_t *p_this )
 
     i_val = var_GetInteger( p_enc, SOUT_CFG_PREFIX "keyint" );
     if( i_val > 0 && i_val != 250 ) p_sys->param.i_keyint_max = i_val;
+#if X264_BUILD >= 102
+    if( i_val == -1 ) p_sys->param.i_keyint_max = X264_KEYINT_MAX_INFINITE;
+#endif
 
     i_val = var_GetInteger( p_enc, SOUT_CFG_PREFIX "min-keyint" );
     if( i_val > 0 && i_val != 25 ) p_sys->param.i_keyint_min = i_val;
