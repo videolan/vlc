@@ -264,7 +264,7 @@ MOVE = mv $(UNPACK_DIR) $@ && touch $@
 AUTOMAKE_DATA_DIRS=$(abspath $(dir $(shell which automake))/../share/automake*)
 UPDATE_AUTOCONFIG = for dir in $(AUTOMAKE_DATA_DIRS); do \
 		if test -f "$${dir}/config.sub" -a -f "$${dir}/config.guess"; then \
-			cp "$${dir}/config.sub" "$${dir}/config.guess" $@; \
+			cp "$${dir}/config.sub" "$${dir}/config.guess" $(UNPACK_DIR); \
 			break; \
 		fi; \
 	done
