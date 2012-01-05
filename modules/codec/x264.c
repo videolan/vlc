@@ -1331,12 +1331,6 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pict )
 #endif
     if( likely(p_pict) ) {
        pic.i_pts = p_pict->date;
-       /* scale pts starting from 0 as libx264 seems to return dts values
-          assume that
-        */
-       if( unlikely( p_sys->i_initial_delay == 0 ) )
-           p_sys->i_initial_delay = p_pict->date;
-       pic.i_pts -= p_sys->i_initial_delay;
        pic.img.i_csp = p_sys->i_colorspace;
        pic.img.i_plane = p_pict->i_planes;
        for( i = 0; i < p_pict->i_planes; i++ )
@@ -1390,8 +1384,8 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pict )
             p_enc->fmt_in.video.i_frame_rate;
 
     /* scale pts-values back*/
-    p_block->i_pts = pic.i_pts + p_sys->i_initial_delay;
-    p_block->i_dts = pic.i_dts + p_sys->i_initial_delay;
+    p_block->i_pts = pic.i_pts;
+    p_block->i_dts = pic.i_dts;
 
     return p_block;
 }
