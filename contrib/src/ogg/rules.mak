@@ -22,6 +22,7 @@ libogg: libogg-$(OGG_VERSION).tar.xz .sum-ogg
 ifdef HAVE_WINCE
 	$(APPLY) $(SRC)/ogg/libogg-wince.patch
 endif
+	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
 
 .ogg: libogg

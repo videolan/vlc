@@ -21,6 +21,7 @@ ifdef HAVE_WIN32
 	$(APPLY) $(SRC)/upnp/libupnp-win32.patch
 	$(APPLY) $(SRC)/upnp/libupnp-win64.patch
 endif
+	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
 
 .upnp: upnp

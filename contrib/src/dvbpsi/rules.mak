@@ -15,6 +15,7 @@ $(TARBALLS)/libdvbpsi-$(DVBPSI_VERSION).tar.bz2:
 
 libdvbpsi: libdvbpsi-$(DVBPSI_VERSION).tar.bz2 .sum-dvbpsi
 	$(UNPACK)
+	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
 
 .dvbpsi: libdvbpsi

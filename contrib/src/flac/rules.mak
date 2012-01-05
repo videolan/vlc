@@ -20,6 +20,7 @@ flac: flac-$(FLAC_VERSION).tar.gz .sum-flac
 ifdef HAVE_MACOSX
 	cd $(UNPACK_DIR) && sed -e 's,-dynamiclib,-dynamiclib -arch $(ARCH),' -i.orig configure
 endif
+	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
 
 FLACCONF := $(HOSTCONF) \

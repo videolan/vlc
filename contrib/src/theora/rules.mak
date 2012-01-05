@@ -18,6 +18,7 @@ libtheora: libtheora-$(THEORA_VERSION).tar.xz .sum-theora
 	$(UNPACK)
 	$(APPLY) $(SRC)/theora/libtheora-includes.patch
 	echo 'ACLOCAL_AMFLAGS = -I m4' >> $(UNPACK_DIR)/Makefile.am
+	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
 
 THEORACONF := $(HOSTCONF) \
