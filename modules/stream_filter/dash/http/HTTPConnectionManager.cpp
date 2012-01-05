@@ -87,14 +87,27 @@ void                HTTPConnectionManager::closeAllConnections      ()
 
     this->chunkMap.clear();
 }
-int                 HTTPConnectionManager::read                     (Chunk *chunk, void *p_buffer, size_t len)
-{
-    if(this->chunkMap.find(chunk) != this->chunkMap.end())
-    {
-        mtime_t start = mdate();
-        int ret = this->chunkMap[chunk]->read(p_buffer, len);
-        mtime_t end = mdate();
 
+int                 HTTPConnectionManager::read( Chunk *chunk, void *p_buffer, size_t len )
+{
+    if(this->chunkMap.find(chunk) == this->chunkMap.end())
+    {
+        this->bytesReadChunk    = 0;
+        this->timeSecChunk      = 0;
+
+        if ( this->initConnection( chunk ) == NULL )
+            return -1;
+    }
+
+    mtime_t start = mdate();
+    int ret = this->chunkMap[chunk]->read(p_buffer, len);
+    mtime_t end = mdate();
+
+    std::cout << "ret: " << ret << std::endl;
+    if( ret <= 0 )
+        this->closeConnection( chunk );
+    else
+    {
         double time = ((double)(end - start)) / 1000000;
 
         this->bytesReadSession += ret;
@@ -116,30 +129,18 @@ int                 HTTPConnectionManager::read                     (Chunk *chun
             this->bpsLastChunk = 0;
 
         this->notify();
-
-        if(ret <= 0)
-            this->closeConnection(chunk);
-
-        return ret;
     }
-    else
-    {
-        this->bytesReadChunk    = 0;
-        this->timeSecChunk      = 0;
-
-        if ( this->initConnection(chunk) == NULL )
-            return -1;
-        return this->read(chunk, p_buffer, len);
-    }
+    return ret;
 }
+
 int                 HTTPConnectionManager::peek                     (Chunk *chunk, const uint8_t **pp_peek, size_t i_peek)
 {
-    if(this->chunkMap.find(chunk) != this->chunkMap.end())
-        return this->chunkMap[chunk]->peek(pp_peek, i_peek);
-
-    if ( this->initConnection(chunk) == NULL )
-        return -1;
-    return this->peek(chunk, pp_peek, i_peek);
+    if(this->chunkMap.find(chunk) == this->chunkMap.end())
+    {
+        if ( this->initConnection(chunk) == NULL )
+            return -1;
+    }
+    return this->chunkMap[chunk]->peek(pp_peek, i_peek);
 }
 
 IHTTPConnection*     HTTPConnectionManager::initConnection(Chunk *chunk)
