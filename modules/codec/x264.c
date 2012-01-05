@@ -844,12 +844,7 @@ static int  Open ( vlc_object_t *p_this )
                             SOUT_CFG_PREFIX "vbv-bufsize" );
 
     /* max bitrate = average bitrate -> CBR */
-    i_val = var_GetInteger( p_enc, SOUT_CFG_PREFIX "vbv-maxrate" );
-
-    if( !i_val && p_sys->param.rc.i_rc_method == X264_RC_ABR )
-        p_sys->param.rc.i_vbv_max_bitrate = p_sys->param.rc.i_bitrate;
-    else if ( i_val )
-        p_sys->param.rc.i_vbv_max_bitrate = i_val;
+    p_sys->param.rc.i_vbv_max_bitrate = var_GetInteger( p_enc, SOUT_CFG_PREFIX "vbv-maxrate" );
 
 
     if( !var_GetBool( p_enc, SOUT_CFG_PREFIX "cabac" ) )
@@ -1161,21 +1156,6 @@ static int  Open ( vlc_object_t *p_this )
     i_val = var_GetInteger( p_enc, SOUT_CFG_PREFIX "slice-max-mbs" );
     if( i_val > 0 )
         p_sys->param.i_slice_max_mbs = i_val;
-
-
-    /* x264 vbv-bufsize = 0 (default). if not provided set period
-       in seconds for local maximum bitrate (cache/bufsize) based
-       on average bitrate when use has told bitrate.
-       vbv-buffer size is set to bitrate * secods between keyframes */
-    if( !p_sys->param.rc.i_vbv_buffer_size &&
-         p_sys->param.rc.i_rc_method == X264_RC_ABR &&
-         p_sys->param.i_fps_num )
-    {
-        p_sys->param.rc.i_vbv_buffer_size = p_sys->param.rc.i_bitrate *
-            p_sys->param.i_fps_den;
-        p_sys->param.rc.i_vbv_buffer_size *= p_sys->param.i_keyint_max;
-        p_sys->param.rc.i_vbv_buffer_size /= p_sys->param.i_fps_num;
-    }
 
     /* Check if user has given some profile (baseline,main,high) to limit
      * settings, and apply those*/
