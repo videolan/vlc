@@ -847,6 +847,9 @@ static int  Open ( vlc_object_t *p_this )
     p_sys->param.rc.i_vbv_max_bitrate = var_GetInteger( p_enc, SOUT_CFG_PREFIX "vbv-maxrate" );
 
 
+    if( !var_GetBool( p_enc, SOUT_CFG_PREFIX "mbtree" ) )
+       p_sys->param.rc.b_mb_tree = var_GetBool( p_enc, SOUT_CFG_PREFIX "mbtree" );
+
     if( !var_GetBool( p_enc, SOUT_CFG_PREFIX "cabac" ) )
         p_sys->param.b_cabac = var_GetBool( p_enc, SOUT_CFG_PREFIX "cabac" );
 
@@ -1220,9 +1223,6 @@ static int  Open ( vlc_object_t *p_this )
         p_sys->param.rc.b_stat_write = i_val & 1;
         p_sys->param.rc.b_stat_read = i_val & 2;
     }
-
-    if( !var_GetBool( p_enc, SOUT_CFG_PREFIX "mbtree" ) )
-       p_sys->param.rc.b_mb_tree = var_GetBool( p_enc, SOUT_CFG_PREFIX "mbtree" );
 
     /* We need to initialize pthreadw32 before we open the encoder,
        but only once for the whole application. Since pthreadw32
