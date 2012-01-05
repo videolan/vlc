@@ -109,7 +109,7 @@ void BookmarksDialog::update()
     if( !p_input ) return;
 
     seekpoint_t **pp_bookmarks;
-    int i_bookmarks;
+    int i_bookmarks = 0;
 
     if( bookmarksList->topLevelItemCount() > 0 )
     {
