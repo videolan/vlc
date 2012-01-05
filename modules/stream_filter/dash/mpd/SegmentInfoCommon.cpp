@@ -24,11 +24,22 @@
 
 #include "SegmentInfoCommon.h"
 
+#include "Segment.h"
+#include "SegmentTimeline.h"
+
 using namespace dash::mpd;
 
 SegmentInfoCommon::SegmentInfoCommon() :
-    duration( -1 )
+    duration( -1 ),
+    initialisationSegment( NULL ),
+    segmentTimeline( NULL )
 {
+}
+
+SegmentInfoCommon::~SegmentInfoCommon()
+{
+    delete this->segmentTimeline;
+    delete this->initialisationSegment;
 }
 
 time_t      SegmentInfoCommon::getDuration() const

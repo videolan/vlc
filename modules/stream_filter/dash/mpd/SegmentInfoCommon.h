@@ -39,6 +39,7 @@ namespace dash
         {
             public:
                 SegmentInfoCommon();
+                virtual ~SegmentInfoCommon();
                 time_t                  getDuration() const;
                 void                    setDuration( time_t duration );
                 int                     getStartIndex() const;
