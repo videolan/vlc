@@ -41,7 +41,7 @@ namespace dash
                 NullAdaptationLogic         (dash::mpd::IMPDManager *mpdManager) : AbstractAdaptationLogic(mpdManager)  {}
                 virtual ~NullAdaptationLogic()                                                                          {}
 
-                dash::http::Chunk* getNextChunk () throw(dash::exception::EOFException) { throw dash::exception::EOFException(); }
+                dash::http::Chunk* getNextChunk() throw(dash::exception::EOFException) { throw dash::exception::EOFException(); }
         };
     }
 }

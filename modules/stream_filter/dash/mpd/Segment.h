@@ -35,10 +35,17 @@ namespace dash
         {
             public:
                 virtual ~Segment(){}
-                const std::string&  getSourceUrl() const;
-                void                setSourceUrl( const std::string &url );
+                virtual std::string getSourceUrl() const;
+                virtual void        setSourceUrl( const std::string &url );
+                /**
+                 *  @return true if the segment should be dropped after being read.
+                 *          That is basically true when using an Url, and false
+                 *          when using an UrlTemplate
+                 */
+                virtual bool        isSingleShot() const;
+                virtual void        done();
 
-            private:
+            protected:
                 std::string         sourceUrl;
         };
     }

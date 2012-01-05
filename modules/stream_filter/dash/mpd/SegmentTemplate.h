@@ -1,5 +1,5 @@
 /*****************************************************************************
- * SegmentTimeline.cpp: Implement the SegmentTimeline tag.
+ * SegmentTemplate.cpp: Implement the UrlTemplate element.
  *****************************************************************************
  * Copyright (C) 1998-2007 VLC authors and VideoLAN
  * $Id$
@@ -21,40 +21,32 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef SEGMENTTIMELINE_H
-#define SEGMENTTIMELINE_H
+#ifndef SEGMENTTEMPLATE_H
+#define SEGMENTTEMPLATE_H
 
-#include <sys/types.h>
-#include <list>
-#include <stdint.h>
+#include "mpd/Segment.h"
 
 namespace dash
 {
     namespace mpd
     {
-        class SegmentTimeline
+        class   Representation;
+
+        class SegmentTemplate : public Segment
         {
             public:
-                struct  Element
-                {
-                    Element();
-                    Element( const Element& e );
-                    int64_t     t;
-                    int64_t     d;
-                    int         r;
-                };
-                SegmentTimeline();
-                ~SegmentTimeline();
-                int                     getTimescale() const;
-                void                    setTimescale( int timescale );
-                void                    addElement( Element* e );
-                const Element*          getElement( unsigned int index ) const;
-
+                SegmentTemplate( bool containRuntimeIdentifier, Representation *rep );
+                virtual std::string     getSourceUrl() const;
+                virtual void            setSourceUrl( const std::string & url );
+                virtual bool            isSingleShot() const;
+                virtual void            done();
             private:
-                int                     timescale;
-                std::list<Element*>     elements;
+                bool                    containRuntimeIdentifier;
+                Representation*         representation;
+                size_t                  beginTime;
+                size_t                  beginIndex;
+                int                     currentSegmentIndex;
         };
     }
 }
-
-#endif // SEGMENTTIMELINE_H
+#endif // SEGMENTTEMPLATE_H

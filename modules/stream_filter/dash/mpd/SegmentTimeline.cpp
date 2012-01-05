@@ -52,32 +52,44 @@ void dash::mpd::SegmentTimeline::setTimescale(int timescale)
 
 void dash::mpd::SegmentTimeline::addElement(dash::mpd::SegmentTimeline::Element *e)
 {
-    this->elements.push_back( e );
+    int64_t         offset = 0;
+    for ( int i = 0; i <= e->r; ++i )
+    {
+        this->elements.push_back( e );
+        if ( i < e->r )
+        {
+            e = new SegmentTimeline::Element( *e );
+            offset += e->d;
+            e->t += offset;
+        }
+    }
 }
 
-const SegmentTimeline::Element*    SegmentTimeline::getElement( mtime_t dts ) const
+const SegmentTimeline::Element*    SegmentTimeline::getElement( unsigned int index ) const
 {
-    if ( this->elements.size() == 0 )
+    if ( this->elements.size() <= index )
         return NULL;
-    int64_t     targetT = dts * this->timescale / 1000000;
-    targetT -= this->elements.front()->t;
-
     std::list<Element*>::const_iterator     it = this->elements.begin();
     std::list<Element*>::const_iterator     end = this->elements.end();
-    const Element*  res = NULL;
-
+    unsigned int                            i = 0;
     while ( it != end )
     {
-        if ( (*it)->t > targetT )
-            return res;
-        res = *it;
+        if ( i == index )
+            return *it;
         ++it;
+        ++i;
     }
-    std::cerr << "No more element to be used." << std::endl;
     return NULL;
 }
 
 dash::mpd::SegmentTimeline::Element::Element() :
+    r( 0 )
+{
+}
+
+SegmentTimeline::Element::Element(const SegmentTimeline::Element &e) :
+    t( e.t ),
+    d( e.d ),
     r( 0 )
 {
 }

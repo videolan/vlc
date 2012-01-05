@@ -153,7 +153,7 @@ static int  Read            (stream_t *p_stream, void *p_buffer, unsigned int i_
     dash::DASHManager   *p_dashManager  = p_sys->p_dashManager;
     int                 i_ret           = 0;
 
-    i_ret = p_dashManager->read(p_buffer, i_len);
+    i_ret = p_dashManager->read(p_buffer, i_len );
 
     if (i_ret < 0)
     {
@@ -173,13 +173,15 @@ static int  Read            (stream_t *p_stream, void *p_buffer, unsigned int i_
 
     return i_ret;
 }
+
 static int  Peek            (stream_t *p_stream, const uint8_t **pp_peek, unsigned int i_peek)
 {
     stream_sys_t        *p_sys          = (stream_sys_t *) p_stream->p_sys;
     dash::DASHManager   *p_dashManager  = p_sys->p_dashManager;
 
-    return p_dashManager->peek(pp_peek, i_peek);
+    return p_dashManager->peek( pp_peek, i_peek );
 }
+
 static int  Control         (stream_t *p_stream, int i_query, va_list args)
 {
     stream_sys_t *p_sys = p_stream->p_sys;

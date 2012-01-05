@@ -41,7 +41,7 @@ RateBasedAdaptationLogic::RateBasedAdaptationLogic  (IMPDManager *mpdManager) :
 {
 }
 
-Chunk*  RateBasedAdaptationLogic::getNextChunk () throw(EOFException)
+Chunk*  RateBasedAdaptationLogic::getNextChunk() throw(EOFException)
 {
     if(this->mpdManager == NULL)
         throw EOFException();
@@ -53,12 +53,12 @@ Chunk*  RateBasedAdaptationLogic::getNextChunk () throw(EOFException)
 
     Representation *rep = this->mpdManager->getRepresentation(this->currentPeriod, bitrate);
 
-    if(rep == NULL)
+    if ( rep == NULL )
         throw EOFException();
 
-    std::vector<const Segment *> segments = this->mpdManager->getSegments(rep);
+    std::vector<Segment *> segments = this->mpdManager->getSegments(rep);
 
-    if(this->count == segments.size())
+    if ( this->count == segments.size() )
     {
         this->currentPeriod = this->mpdManager->getNextPeriod(this->currentPeriod);
         this->count = 0;
@@ -67,9 +67,13 @@ Chunk*  RateBasedAdaptationLogic::getNextChunk () throw(EOFException)
 
     if ( segments.size() > this->count )
     {
+        Segment *seg = segments.at( this->count );
         Chunk *chunk = new Chunk;
-        chunk->setUrl( segments.at( this->count )->getSourceUrl() );
-        this->count++;
+        chunk->setUrl( seg->getSourceUrl() );
+        //In case of UrlTemplate, we must stay on the same segment.
+        if ( seg->isSingleShot() == true )
+            this->count++;
+        seg->done();
         return chunk;
     }
     return NULL;

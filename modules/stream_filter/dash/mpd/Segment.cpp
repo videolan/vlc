@@ -29,7 +29,7 @@
 
 using namespace dash::mpd;
 
-const std::string& Segment::getSourceUrl () const
+std::string Segment::getSourceUrl() const
 {
     return this->sourceUrl;
 }
@@ -38,4 +38,14 @@ void        Segment::setSourceUrl( const std::string &url )
 {
     if ( url.empty() == false )
         this->sourceUrl = url;
+}
+
+bool        Segment::isSingleShot() const
+{
+    return true;
+}
+
+void Segment::done()
+{
+    //Only used for a SegmentTemplate.
 }

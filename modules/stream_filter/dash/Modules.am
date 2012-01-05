@@ -49,6 +49,8 @@ SOURCES_stream_filter_dash = \
     mpd/SegmentInfoCommon.h \
     mpd/SegmentInfoDefault.cpp \
     mpd/SegmentInfoDefault.h \
+    mpd/SegmentTemplate.cpp \
+    mpd/SegmentTemplate.h \
     mpd/SegmentTimeline.cpp \
     mpd/SegmentTimeline.h \
     mpd/TrickModeType.cpp \

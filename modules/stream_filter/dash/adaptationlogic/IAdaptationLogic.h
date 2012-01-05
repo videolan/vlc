@@ -42,10 +42,10 @@ namespace dash
                     Default,
                     AlwaysBest,
                     AlwaysLowest,
-                    RateBased,
+                    RateBased
                 };
 
-                virtual dash::http::Chunk* getNextChunk() throw(dash::exception::EOFException) = 0;
+                virtual dash::http::Chunk*  getNextChunk() throw(dash::exception::EOFException) = 0;
 
         };
     }

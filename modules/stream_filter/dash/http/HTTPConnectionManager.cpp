@@ -46,9 +46,10 @@ HTTPConnectionManager::~HTTPConnectionManager   ()
     this->closeAllConnections();
 }
 
-bool                HTTPConnectionManager::closeConnection          (IHTTPConnection *con)
+bool                HTTPConnectionManager::closeConnection( IHTTPConnection *con )
 {
-    for(std::vector<HTTPConnection *>::iterator it = this->connections.begin(); it != this->connections.end(); ++it)
+    for(std::vector<HTTPConnection *>::iterator it = this->connections.begin();
+        it != this->connections.end(); ++it)
     {
         if(*it == con)
         {
@@ -60,7 +61,8 @@ bool                HTTPConnectionManager::closeConnection          (IHTTPConnec
     }
     return false;
 }
-bool                HTTPConnectionManager::closeConnection          (Chunk *chunk)
+
+bool                HTTPConnectionManager::closeConnection( Chunk *chunk )
 {
     HTTPConnection *con = this->chunkMap[chunk];
     bool ret = this->closeConnection(con);
@@ -68,6 +70,7 @@ bool                HTTPConnectionManager::closeConnection          (Chunk *chun
     delete(chunk);
     return ret;
 }
+
 void                HTTPConnectionManager::closeAllConnections      ()
 {
     for(std::vector<HTTPConnection *>::iterator it = this->connections.begin(); it != this->connections.end(); ++it)
@@ -103,7 +106,6 @@ int                 HTTPConnectionManager::read( Chunk *chunk, void *p_buffer, s
     int ret = this->chunkMap[chunk]->read(p_buffer, len);
     mtime_t end = mdate();
 
-    std::cout << "ret: " << ret << std::endl;
     if( ret <= 0 )
         this->closeConnection( chunk );
     else

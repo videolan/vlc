@@ -44,8 +44,8 @@ namespace dash
                 void                    setDuration( time_t duration );
                 int                     getStartIndex() const;
                 void                    setStartIndex( int startIndex );
-                const Segment*          getInitialisationSegment() const;
-                void                    setInitialisationSegment( const Segment* seg );
+                Segment*                getInitialisationSegment() const;
+                void                    setInitialisationSegment( Segment* seg );
                 const std::list<std::string>&   getBaseURL() const;
                 void                    appendBaseURL( const std::string& url );
                 const SegmentTimeline*  getSegmentTimeline() const;
@@ -54,7 +54,7 @@ namespace dash
             private:
                 time_t                  duration;
                 int                     startIndex;
-                const Segment*          initialisationSegment;
+                Segment*                initialisationSegment;
                 std::list<std::string>  baseURLs;
                 const SegmentTimeline*  segmentTimeline;
         };

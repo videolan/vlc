@@ -41,7 +41,7 @@ namespace dash
             public:
                 RateBasedAdaptationLogic            (dash::mpd::IMPDManager *mpdManager);
 
-                dash::http::Chunk* getNextChunk () throw(dash::exception::EOFException);
+                dash::http::Chunk*      getNextChunk() throw(dash::exception::EOFException);
 
             private:
                 dash::mpd::IMPDManager  *mpdManager;

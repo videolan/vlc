@@ -55,9 +55,9 @@ DASHManager::~DASHManager   ()
     delete this->mpdManager;
 }
 
-int DASHManager::read   (void *p_buffer, size_t len)
+int     DASHManager::read( void *p_buffer, size_t len )
 {
-    if(this->currentChunk == NULL)
+    if ( this->currentChunk == NULL )
     {
         try
         {
@@ -70,19 +70,19 @@ int DASHManager::read   (void *p_buffer, size_t len)
         }
     }
 
-    int ret = this->conManager->read(this->currentChunk, p_buffer, len);
-
-    if(ret <= 0)
+    int ret = this->conManager->read( this->currentChunk, p_buffer, len );
+    if ( ret == 0 )
     {
         this->currentChunk = NULL;
-        return this->read(p_buffer, len);
+        return this->read(p_buffer, len );
     }
 
     return ret;
 }
-int DASHManager::peek   (const uint8_t **pp_peek, size_t i_peek)
+
+int     DASHManager::peek( const uint8_t **pp_peek, size_t i_peek )
 {
-    if(this->currentChunk == NULL)
+    if ( this->currentChunk == NULL )
     {
         try
         {
@@ -94,7 +94,7 @@ int DASHManager::peek   (const uint8_t **pp_peek, size_t i_peek)
         }
     }
 
-    int ret = this->conManager->peek(this->currentChunk, pp_peek, i_peek);
+    int ret = this->conManager->peek( this->currentChunk, pp_peek, i_peek );
     return ret;
 }
 

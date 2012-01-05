@@ -45,10 +45,10 @@ namespace dash
                 AlwaysBestAdaptationLogic           (dash::mpd::IMPDManager *mpdManager);
                 virtual ~AlwaysBestAdaptationLogic  ();
 
-                dash::http::Chunk* getNextChunk () throw(dash::exception::EOFException);
+                dash::http::Chunk* getNextChunk() throw(dash::exception::EOFException);
 
             private:
-                std::vector<const mpd::Segment *>   schedule;
+                std::vector<mpd::Segment *>         schedule;
                 dash::mpd::IMPDManager              *mpdManager;
                 size_t                              count;
 

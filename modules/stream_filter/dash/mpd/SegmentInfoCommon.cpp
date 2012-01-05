@@ -64,12 +64,12 @@ void        SegmentInfoCommon::setStartIndex(int startIndex)
         this->startIndex = startIndex;
 }
 
-const Segment*  SegmentInfoCommon::getInitialisationSegment() const
+Segment*  SegmentInfoCommon::getInitialisationSegment() const
 {
     return this->initialisationSegment;
 }
 
-void SegmentInfoCommon::setInitialisationSegment(const Segment *seg)
+void SegmentInfoCommon::setInitialisationSegment(Segment *seg)
 {
     if ( seg != NULL )
         this->initialisationSegment = seg;

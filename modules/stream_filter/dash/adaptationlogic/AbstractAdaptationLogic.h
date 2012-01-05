@@ -45,7 +45,6 @@ namespace dash
                 AbstractAdaptationLogic             (dash::mpd::IMPDManager *mpdManager);
                 virtual ~AbstractAdaptationLogic    ();
 
-                virtual dash::http::Chunk*  getNextChunk            () throw(dash::exception::EOFException) = 0;
                 virtual void                downloadRateChanged     (long bpsAvg, long bpsLastChunk);
 
                 long                        getBpsAvg               ();

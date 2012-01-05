@@ -521,7 +521,7 @@ bool    BasicCMParser::resolveUrlTemplates( std::string &url, bool &containRunti
             }
             else
             {
-                std::cout << "Unhandled token " << token << std::endl;
+                std::cerr << "Unhandled token " << token << std::endl;
                 return false;
             }
         }
