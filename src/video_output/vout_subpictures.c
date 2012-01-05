@@ -1042,8 +1042,10 @@ static subpicture_t *SpuRenderSubpictures(spu_t *spu,
             /* Compute region scale AR */
             video_format_t region_fmt = region->fmt;
             if (region_fmt.i_sar_num <= 0 || region_fmt.i_sar_den <= 0) {
-                region_fmt.i_sar_num = fmt_src->i_sar_num;
-                region_fmt.i_sar_den = fmt_src->i_sar_den;
+                region_fmt.i_sar_num = (int64_t)fmt_dst->i_width  * fmt_dst->i_sar_num * subpic->i_original_picture_height;
+                region_fmt.i_sar_den = (int64_t)fmt_dst->i_height * fmt_dst->i_sar_den * subpic->i_original_picture_width;
+                vlc_ureduce(&region_fmt.i_sar_num, &region_fmt.i_sar_den,
+                            region_fmt.i_sar_num, region_fmt.i_sar_den, 65536);
             }
 
             /* Compute scaling from original size to destination size
