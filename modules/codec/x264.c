@@ -1164,23 +1164,7 @@ static int  Open ( vlc_object_t *p_this )
      * settings, and apply those*/
     psz_val = var_GetString( p_enc, SOUT_CFG_PREFIX "profile" );
     if( psz_val )
-    {
-        if( !strcasecmp( psz_val, "baseline" ) )
-        {
-            msg_Dbg( p_enc, "Limiting to baseline profile");
-            p_sys->param.analyse.b_transform_8x8 = 0;
-            p_sys->param.b_cabac = 0;
-            p_sys->param.i_bframe = 0;
-            p_sys->param.analyse.i_weighted_pred = X264_WEIGHTP_NONE;
-            p_sys->param.i_bframe_pyramid = X264_B_PYRAMID_NONE;
-        }
-        else if (!strcasecmp( psz_val, "main" ) )
-        {
-            msg_Dbg( p_enc, "Limiting to main-profile");
-            p_sys->param.analyse.b_transform_8x8 = 0;
-        }
-        /* high profile don't restrict stuff*/
-    }
+        x264_param_apply_profile( &p_sys->param, psz_val );
     free( psz_val );
 
 
