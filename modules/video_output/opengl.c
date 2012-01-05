@@ -569,13 +569,15 @@ int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
                 }
             }
 
+            const int pixels_offset = r->fmt.i_y_offset * r->p_picture->p->i_pitch +
+                                      r->fmt.i_x_offset * r->p_picture->p->i_pixel_pitch;
             if (glr->texture) {
                 glBindTexture(GL_TEXTURE_2D, glr->texture);
                 /* TODO set GL_UNPACK_ALIGNMENT */
                 glPixelStorei(GL_UNPACK_ROW_LENGTH, r->p_picture->p->i_pitch / r->p_picture->p->i_pixel_pitch);
                 glTexSubImage2D(GL_TEXTURE_2D, 0,
                                 0, 0, glr->width, glr->height,
-                                glr->format, glr->type, r->p_picture->p->p_pixels);
+                                glr->format, glr->type, &r->p_picture->p->p_pixels[pixels_offset]);
             } else {
                 glGenTextures(1, &glr->texture);
                 glBindTexture(GL_TEXTURE_2D, glr->texture);
@@ -589,7 +591,7 @@ int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
                 glPixelStorei(GL_UNPACK_ROW_LENGTH, r->p_picture->p->i_pitch / r->p_picture->p->i_pixel_pitch);
                 glTexImage2D(GL_TEXTURE_2D, 0, glr->format,
                              glr->width, glr->height, 0, glr->format, glr->type,
-                             r->p_picture->p->p_pixels);
+                             &r->p_picture->p->p_pixels[pixels_offset]);
             }
         }
     }
