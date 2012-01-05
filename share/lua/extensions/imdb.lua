@@ -237,7 +237,7 @@ function parse_resultspage(data)
                 if not link then break end -- this would not be normal behavior...
                 _, pos, thistitle = string.find(table, "<a href=\"" .. link .. "\"[^>]*>([^<]+)</a>", pos)
                 if not thistitle then break end -- this would not be normal behavior...
-                local _, _, year = string.find(table, "\((%d+)\)", pos)
+                local _, _, year = string.find(table, "%((%d+)%)", pos)
                 -- Add this title to the list
                 count = count + 1
                 local _, _, imdbID = string.find(link, "/([^/]+)/$")

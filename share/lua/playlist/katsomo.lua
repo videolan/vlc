@@ -57,7 +57,7 @@ function parse()
         then
             arturl = "http://www.katsomo.fi"..find( line, " src=\"(.-)\" alt=" )
         end
-        for treeid,name in string.gmatch( line, "/\?treeId=(%d+)\">([^<]+)</a") do
+        for treeid,name in string.gmatch( line, '/%?treeId=(%d+)">([^<]+)</a') do
             name = vlc.strings.resolve_xml_special_chars( name )
             name = vlc.strings.from_charset( "ISO_8859-1", name )
             path = "http://www.katsomo.fi/?treeId="..treeid

@@ -34,14 +34,14 @@ end
 -- Probe function.
 function probe()
     return vlc.access == "http"
-        and string.match( vlc.path, "extreme.com/." )
-        or string.match( vlc.path, "freecaster.tv/." )
-        or string.match( vlc.path, "player.extreme.com/info/.")
+        and string.match( vlc.path, "extreme%.com/." )
+        or string.match( vlc.path, "freecaster%.tv/." )
+        or string.match( vlc.path, "player%.extreme%.com/info/.")
 end
 
 -- Parse function.
 function parse()
-    if (string.match( vlc.path, "extreme\.com/." ) or string.match( vlc.path, "freecaster\.tv/." )) and not string.match( vlc.path, "player.extreme.com/info/") then
+    if (string.match( vlc.path, "extreme%.com/." ) or string.match( vlc.path, "freecaster%.tv/." )) and not string.match( vlc.path, "player%.extreme%.com/info/") then
         while true do
             line = vlc.readline()
             if not line then break end
@@ -54,7 +54,7 @@ function parse()
         return { { path = "http://player.extreme.com/info/" .. vid; name = "extreme.com video"; } }
     end
 
-    if string.match( vlc.path, "player.extreme.com/info/." ) then
+    if string.match( vlc.path, "player%.extreme%.com/info/." ) then
         prefres = get_prefres()
         gostraight = true
         while true do

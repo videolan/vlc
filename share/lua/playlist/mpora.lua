@@ -23,7 +23,7 @@
 -- Probe function.
 function probe()
     return vlc.access == "http"
-        and string.match( vlc.path, "video.mpora.com/watch/" )
+        and string.match( vlc.path, "video%.mpora%.com/watch/" )
 end
 
 -- Parse function.
@@ -40,7 +40,7 @@ function parse()
             _,_,arturl = string.find( line, "image_src\" href=\"(.*)\" />" )
         end
         if string.match( line, "video_src" ) then
-            _,_,video = string.find( line, "href=\"http://video\.mpora\.com/ep/(.*).swf\" />" )
+            _,_,video = string.find( line, 'href="http://video%.mpora%.com/ep/(.*)%.swf" />' )
         end
 
     end

@@ -67,7 +67,7 @@ function parse()
             description = find( line, "h%d.->(.-)</h%d") .. ' '
         end
         if string.match( line, 'img src=') then
-            for img in string.gmatch(line, '<img src="(http://.*\.jpg)" ') do
+            for img in string.gmatch(line, '<img src="(http://.*%.jpg)" ') do
                 art_url = img
             end
             for i,value in pairs(playlist) do
@@ -76,8 +76,8 @@ function parse()
                 else break end
             end
         end
-        if string.match( line, "class=\"hd\".-\.mov") then
-            for urlline,resolution in string.gmatch(line, "class=\"hd\".-href=\"(.-.mov)\".-(%d+.-p)") do
+        if string.match( line, 'class="hd".-%.mov') then
+            for urlline,resolution in string.gmatch(line, 'class="hd".-href="(.-%.mov)".-(%d+.-p)') do
                 urlline = string.gsub( urlline, "_"..resolution, "_h"..resolution )
                 table.insert( playlist, { path = urlline,
                                           name = description ..  '(' .. resolution .. ')',

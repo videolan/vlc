@@ -45,10 +45,10 @@ function parse()
 			end
 			-- Try to find server which has our video
 			if string.match( line, "<link rel=\"videothumbnail\" href=\"http://(.*)/vt/svt-") then
-				_,_,server = string.find (line, "<link rel=\"videothumbnail\"\ href=\"http://(.*)/vt/svt-" )
+				_,_,server = string.find (line, '<link rel="videothumbnail" href="http://(.*)/vt/svt-' )
 			end
 			if string.match( line, "<link rel=\"videothumbnail\" href=\"(.*)\" type=\"image/jpeg\"") then
-				_,_,arturl = string.find (line, "<link rel=\"videothumbnail\" href=\"(.*)\"\ type=\"image/jpeg\"")
+				_,_,arturl = string.find (line, '<link rel="videothumbnail" href="(.*)" type="image/jpeg"')
 			end
 		end
 
