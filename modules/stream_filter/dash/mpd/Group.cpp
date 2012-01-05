@@ -27,15 +27,19 @@
 #include <vlc_common.h>
 #include <vlc_arrays.h>
 
+#include "SegmentInfoDefault.h"
+
 using namespace dash::mpd;
 
 Group::Group() :
-    subsegmentAlignmentFlag( false )
+    subsegmentAlignmentFlag( false ),
+    segmentInfoDefault( NULL )
 {
 }
 
 Group::~Group   ()
 {
+    delete this->segmentInfoDefault;
     vlc_delete_all( this->representations );
 }
 
