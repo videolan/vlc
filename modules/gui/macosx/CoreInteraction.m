@@ -135,10 +135,22 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
 
 - (int)playbackRate
 {
-    playlist_t * p_playlist = pl_Get( VLCIntf );
+    float f_rate;
 
-    float rate = var_GetFloat( p_playlist, "rate" );
-    double value = 17 * log( rate ) / log( 2. );
+    input_thread_t * p_input;
+    p_input = pl_CurrentInput( VLCIntf );
+    if (p_input)
+    {
+        f_rate = var_GetFloat( p_input, "rate" );
+        vlc_object_release( p_input );
+    }
+    else
+    {
+        playlist_t * p_playlist = pl_Get( VLCIntf );
+        NSLog( @"playlist rate = %f", f_rate );
+    }
+
+    double value = 17 * log( f_rate ) / log( 2. );
     int returnValue = (int) ( ( value > 0 ) ? value + .5 : value - .5 );
 
     if( returnValue < -34 )

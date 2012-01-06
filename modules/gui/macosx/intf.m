@@ -252,7 +252,7 @@ static int InputEvent( vlc_object_t *p_this, const char *psz_var,
             [[VLCMain sharedInstance] playbackStatusUpdated];
             break;
         case INPUT_EVENT_RATE:
-            [[VLCMainMenu sharedInstance] performSelectorOnMainThread:@selector(updatePlaybackRate) withObject: nil waitUntilDone:NO];
+            [[[VLCMain sharedInstance] mainMenu] performSelectorOnMainThread:@selector(updatePlaybackRate) withObject: nil waitUntilDone:NO];
             break;
         case INPUT_EVENT_POSITION:
             [[VLCMain sharedInstance] updatePlaybackPosition];
