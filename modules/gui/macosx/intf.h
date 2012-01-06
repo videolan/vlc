@@ -123,6 +123,8 @@ struct intf_sys_t
     BOOL b_msg_arr_changed;                     /* did the array change? */
     IBOutlet NSButton * o_msgs_crashlog_btn;    /* messages open crashlog */
     IBOutlet NSButton * o_msgs_save_btn;        /* save the log as rtf */
+    IBOutlet NSButton * o_msgs_liveUpdate_ckb;  /* always update the panel when visible */
+    BOOL b_msg_live_update;
 
     /* CrashReporter panel */
     IBOutlet NSButton * o_crashrep_dontSend_btn;
@@ -199,6 +201,7 @@ struct intf_sys_t
 - (IBAction)openCrashLog:(id)sender;
 - (IBAction)saveDebugLog:(id)sender;
 - (IBAction)showMessagesPanel:(id)sender;
+- (IBAction)liveUpdateMessagesPanel:(id)sender;
 
 - (void)processReceivedlibvlcMessage:(const msg_item_t *) item ofType: (int)type withStr: (char *)str;
 

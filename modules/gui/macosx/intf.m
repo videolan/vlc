@@ -534,6 +534,11 @@ static VLCMain *_o_sharedMainInstance = nil;
                                                                    object: @"VLCEyeTVSupport"
                                                                  userInfo: NULL
                                                        deliverImmediately: YES];
+
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSDictionary *appDefaults = [NSDictionary dictionaryWithObject:@"NO" forKey:@"LiveUpdateTheMessagesPanel"];
+    [defaults registerDefaults:appDefaults];
+
     return _o_sharedMainInstance;
 }
 
@@ -606,6 +611,9 @@ static VLCMain *_o_sharedMainInstance = nil;
     [o_remote setClickCountEnabledButtons: kRemoteButtonPlay];
     [o_remote setDelegate: _o_sharedMainInstance];
 
+    b_msg_live_update = [[NSUserDefaults standardUserDefaults] boolForKey:@"LiveUpdateTheMessagesPanel"];
+    [o_msgs_liveUpdate_ckb setState: b_msg_live_update];
+
     /* yeah, we are done */
     b_nativeFullscreenMode = config_GetInt( p_intf, "macosx-nativefullscreenmode" );
     nib_main_loaded = TRUE;
@@ -652,6 +660,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     [o_msgs_panel setTitle: _NS("Messages")];
     [o_msgs_crashlog_btn setTitle: _NS("Open CrashLog...")];
     [o_msgs_save_btn setTitle: _NS("Save this Log...")];
+    [o_msgs_liveUpdate_ckb setTitle: _NS("Live Update")];
 
     /* crash reporter panel */
     [o_crashrep_send_btn setTitle: _NS("Send")];
@@ -1837,6 +1846,17 @@ unsigned int CocoaKeyToVLC( unichar i_key )
 
 #pragma mark -
 #pragma mark Errors, warnings and messages
+- (IBAction)liveUpdateMessagesPanel:(id)sender
+{
+    if ([[NSUserDefaults standardUserDefaults] boolForKey:@"LiveUpdateTheMessagesPanel"])
+        [[NSUserDefaults standardUserDefaults] setObject:@"NO" forKey:@"LiveUpdateTheMessagesPanel"];
+    else
+        [[NSUserDefaults standardUserDefaults] setObject:@"YES" forKey:@"LiveUpdateTheMessagesPanel"];
+
+    b_msg_live_update = [[NSUserDefaults standardUserDefaults] boolForKey:@"LiveUpdateTheMessagesPanel"];
+    [o_msgs_liveUpdate_ckb setState: b_msg_live_update];
+}
+
 - (IBAction)showMessagesPanel:(id)sender
 {
     [o_msgs_panel makeKeyAndOrderFront: sender];
@@ -1850,7 +1870,7 @@ unsigned int CocoaKeyToVLC( unichar i_key )
 
 - (void)updateMessageDisplay
 {
-    if( [o_msgs_panel isVisible] && b_msg_arr_changed )
+    if( [o_msgs_panel isVisible] && (b_msg_live_update || [o_msgs_panel isKeyWindow]) && b_msg_arr_changed )
     {
         id o_msg;
         NSEnumerator * o_enum;
@@ -1901,7 +1921,7 @@ unsigned int CocoaKeyToVLC( unichar i_key )
     b_msg_arr_changed = YES;
     [o_msg_lock unlock];
 
-    [self updateMessageDisplay];
+    [self performSelectorOnMainThread:@selector(updateMessageDisplay) withObject: nil waitUntilDone:NO];
 }
 
 - (IBAction)saveDebugLog:(id)sender
