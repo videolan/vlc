@@ -783,7 +783,7 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
             {
                 /* fatal error - end of file */
                 msg_Dbg( p_access, "failed reading chunk-header line" );
-                return 0;
+                goto fatal;
             }
             p_sys->i_chunk = strtoll( psz, NULL, 16 );
             free( psz );
