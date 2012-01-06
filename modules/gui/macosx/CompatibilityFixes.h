@@ -82,7 +82,7 @@ enum {
     NSApplicationPresentationAutoHideToolbar            = (1 << 11)
 };
 
-/* the follow is just to fix warnings, not for implementation! */
+/* the following is just to fix warnings, not for implementation! */
 @interface NSWindow (IntroducedInLion)
 - (void)setRestorable:(BOOL)b_value;
 - (void)toggleFullScreen:(id)id_value;

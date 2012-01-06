@@ -422,6 +422,9 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
     if ([self styleMask] & NSResizableWindowMask)
         [o_resize_view removeFromSuperviewWithoutNeedingDisplay];
+
+    if (OSX_LEOPARD)
+        [o_time_sld_fancygradient_view removeFromSuperviewWithoutNeedingDisplay];
 }
 
 #pragma mark -
@@ -681,6 +684,11 @@ static VLCMainWindow *_o_sharedInstance = nil;
 - (BOOL)canBecomeKeyWindow
 {
     return YES;
+}
+
+- (BOOL)isMainWindow
+{
+	return YES;
 }
 
 - (void)setTitle:(NSString *)title
@@ -1019,6 +1027,9 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
 - (void)drawFancyGradientEffectForTimeSlider
 {
+    if (OSX_LEOPARD)
+        return;
+
     NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
     CGFloat f_value = [o_time_sld knobPosition];
     if (f_value > 7.5)
@@ -1150,6 +1161,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     if (b_fullscreen) {
         [self recreateHideMouseTimer];
     }
+    [super mouseMoved: theEvent];
 }
 
 - (void)recreateHideMouseTimer
