@@ -1,7 +1,7 @@
 /*****************************************************************************
  * intf.m: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2002-2011 VLC authors and VideoLAN
+ * Copyright (C) 2002-2012 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -639,6 +639,9 @@ static VLCMain *_o_sharedMainInstance = nil;
            name:NSWorkspaceWillSleepNotification object:nil];
 
     [[VLCMain sharedInstance] performSelectorOnMainThread:@selector(lookForCrashLog) withObject:nil waitUntilDone:NO];
+
+	/* we will need this, so let's load it here so the interface appears to be more responsive */
+	nib_open_loaded = [NSBundle loadNibNamed:@"Open" owner: NSApp];
 }
 
 - (void)initStrings
