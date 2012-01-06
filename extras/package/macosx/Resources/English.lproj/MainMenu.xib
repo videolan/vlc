@@ -22,14 +22,14 @@
     <object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
       <bool key="EncodedWithXMLCoder">YES</bool>
       <integer value="4722"/>
-      <integer value="1617"/>
-      <integer value="283"/>
-      <integer value="4682"/>
       <integer value="29"/>
-      <integer value="915"/>
-      <integer value="2730"/>
+      <integer value="1617"/>
       <integer value="4596"/>
+      <integer value="2730"/>
       <integer value="4895"/>
+      <integer value="21"/>
+      <integer value="915"/>
+      <integer value="283"/>
     </object>
     <object class="NSArray" key="IBDocument.PluginDependencies">
       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -7377,6 +7377,14 @@ LCAuLi4</string>
           </object>
           <int key="connectionID">4924</int>
         </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_sidebar_scrollview</string>
+            <reference key="source" ref="498338108"/>
+            <reference key="destination" ref="979766179"/>
+          </object>
+          <int key="connectionID">4925</int>
+        </object>
       </object>
       <object class="IBMutableOrderedSet" key="objectRecords">
         <object class="NSArray" key="orderedObjects">
@@ -11113,9 +11121,9 @@ LCAuLi4</string>
           <string>{{430, 565}, {137, 103}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
-          <string>{{329, 81}, {604, 310}}</string>
+          <string>{{1017, 498}, {604, 310}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-          <string>{{329, 81}, {604, 310}}</string>
+          <string>{{1017, 498}, {604, 310}}</string>
           <boolean value="YES"/>
           <boolean value="NO"/>
           <boolean value="YES"/>
@@ -11785,7 +11793,7 @@ LCAuLi4</string>
         </object>
       </object>
       <nil key="sourceID"/>
-      <int key="maxID">4924</int>
+      <int key="maxID">4925</int>
     </object>
     <object class="IBClassDescriber" key="IBDocument.Classes">
       <object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -16379,6 +16387,7 @@ LCAuLi4</string>
               <string>o_right_split_view</string>
               <string>o_search_fld</string>
               <string>o_shuffle_btn</string>
+              <string>o_sidebar_scrollview</string>
               <string>o_sidebar_view</string>
               <string>o_split_view</string>
               <string>o_stop_btn</string>
@@ -16403,6 +16412,7 @@ LCAuLi4</string>
               <string>id</string>
               <string>id</string>
               <string>VLCFSPanel</string>
+              <string>id</string>
               <string>id</string>
               <string>id</string>
               <string>id</string>
@@ -16454,6 +16464,7 @@ LCAuLi4</string>
               <string>o_right_split_view</string>
               <string>o_search_fld</string>
               <string>o_shuffle_btn</string>
+              <string>o_sidebar_scrollview</string>
               <string>o_sidebar_view</string>
               <string>o_split_view</string>
               <string>o_stop_btn</string>
@@ -16548,6 +16559,10 @@ LCAuLi4</string>
               </object>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_shuffle_btn</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_sidebar_scrollview</string>
                 <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">

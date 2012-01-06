@@ -415,7 +415,11 @@ static VLCMainWindow *_o_sharedInstance = nil;
         [self display];
     }
     else
+    {
         [o_video_view setFrame: [o_split_view frame]];
+        [o_playlist_table setBorderType: NSNoBorder];
+        [o_sidebar_scrollview setBorderType: NSNoBorder];
+    }
 
     if (OSX_LION)
         [o_resize_view setImage: NULL];

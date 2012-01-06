@@ -58,6 +58,7 @@
     IBOutlet id o_left_split_view;
     IBOutlet id o_right_split_view;
     IBOutlet id o_sidebar_view;
+    IBOutlet id o_sidebar_scrollview;
     IBOutlet id o_chosen_category_lbl;
 
     IBOutlet id o_dropzone_view;
