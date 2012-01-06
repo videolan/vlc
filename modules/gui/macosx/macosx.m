@@ -84,7 +84,7 @@ void WindowClose  ( vout_window_t * );
 #define USE_MEDIAKEYS_LONGTEXT N_("By default, VLC can be controlled using the media keys on modern Apple " \
                                   "keyboards.")
 
-#define INTERFACE_STYLE_TEXT N_("Run VLC with dark or bright interface style")
+#define INTERFACE_STYLE_TEXT N_("Run VLC with dark interface style")
 #define INTERFACE_STYLE_LONGTEXT N_("By default, VLC will use the dark interface style.")
 
 #define NATIVE_FULLSCREEN_MODE_ON_LION_TEXT N_("Use the native fullscreen mode on OS X Lion")
