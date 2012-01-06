@@ -222,10 +222,11 @@ static const v4l2_std_id standards_v4l2[] = { V4L2_STD_UNKNOWN, V4L2_STD_ALL,
     V4L2_STD_PAL,     V4L2_STD_PAL_BG,   V4L2_STD_PAL_DK,
     V4L2_STD_NTSC,
     V4L2_STD_SECAM,   V4L2_STD_SECAM_DK,
-    V4L2_STD_525_60,  V4L2_STD_625_50,
+    V4L2_STD_MTS,     V4L2_STD_525_60,  V4L2_STD_625_50,
     V4L2_STD_ATSC,
 
-    V4L2_STD_MN,      V4L2_STD_B,        V4L2_STD_GH,       V4L2_STD_DK,
+    V4L2_STD_B,       V4L2_STD_G,        V4L2_STD_H,        V4L2_STD_L,
+    V4L2_STD_GH,      V4L2_STD_DK,       V4L2_STD_BG,       V4L2_STD_MN,
 
     V4L2_STD_PAL_B,   V4L2_STD_PAL_B1,   V4L2_STD_PAL_G,    V4L2_STD_PAL_H,
     V4L2_STD_PAL_I,   V4L2_STD_PAL_D,    V4L2_STD_PAL_D1,   V4L2_STD_PAL_K,
@@ -240,11 +241,12 @@ static const char *const standards_vlc[] = { "", "ALL",
     "PAL", "PAL_BG", "PAL_DK",
     "NTSC",
     "SECAM", "SECAM_DK",
-    "525_60", "625_50",
+    "MTS", "525_60", "625_50",
     "ATSC",
 
-    /* Areas (PAL/NTSC or PAL/SECAM) */
-    "MN", "B", "GH", "DK",
+    /* Chroma-agnostic ITU standards (PAL/NTSC or PAL/SECAM) */
+    "B",              "G",               "H",               "L",
+    "GH",             "DK",              "BG",              "MN",
 
     /* Individual standards */
     "PAL_B",          "PAL_B1",          "PAL_G",           "PAL_H",
@@ -259,11 +261,12 @@ static const char *const standards_user[] = { N_("Undefined"), N_("All"),
     "PAL",            "PAL B/G",         "PAL D/K",
     "NTSC",
     "SECAM",          "SECAM D/K",
+    N_("Multichannel television sound (MTS)"),
     N_("525 lines / 60 Hz"), N_("625 lines / 50 Hz"),
     "ATSC",
 
-    "PAL/NTSC M/N",
-    "PAL/SECAM B",    "PAL/SECAM G/H",   "PAL/SECAM D/K",
+    "PAL/SECAM B",    "PAL/SECAM G",     "PAL/SECAM H",     "PAL/SECAM L",
+    "PAL/SECAM G/H",  "PAL/SECAM D/K",   "PAL/SECAM B/G",   "PAL/NTSC M/N",
 
     "PAL B",          "PAL B1",          "PAL G",           "PAL H",
     "PAL I",          "PAL D",           "PAL D1",          "PAL K",

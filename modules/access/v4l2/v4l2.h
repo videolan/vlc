@@ -32,6 +32,12 @@
 #ifndef V4L2_CTRL_FLAG_VOLATILE /* 3.2 */
 # warning Please update Video4Linux2 headers!
 # define V4L2_CTRL_FLAG_VOLATILE 0x0080
+# define V4L2_STD_G (V4L2_STD_PAL_G|V4L2_STD_SECAM_G)
+# define V4L2_STD_H (V4L2_STD_PAL_H|V4L2_STD_SECAM_H)
+# define V4L2_STD_L (V4L2_STD_SECAM_L|V4L2_STD_SECAM_LC)
+# define V4L2_STD_BG (V4L2_STD_B|V4L2_STD_G)
+# define V4L2_STD_MTS (V4L2_STD_NTSC_M|V4L2_STD_PAL_M|V4L2_STD_PAL_N|\
+                       V4L2_STD_PAL_Nc)
 #endif
 #ifdef __linux__
 # include <linux/version.h>
