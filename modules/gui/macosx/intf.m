@@ -259,7 +259,7 @@ static int InputEvent( vlc_object_t *p_this, const char *psz_var,
             break;
         case INPUT_EVENT_TITLE:
         case INPUT_EVENT_CHAPTER:
-            [[VLCMain sharedInstance] updateMainMenu];
+            [[VLCMain sharedInstance] performSelectorOnMainThread:@selector(updateMainMenu) withObject: nil waitUntilDone:NO];
             break;
         case INPUT_EVENT_CACHE:
             [[VLCMain sharedInstance] performSelectorOnMainThread:@selector(updateMainWindow) withObject: nil waitUntilDone: NO];
@@ -277,7 +277,7 @@ static int InputEvent( vlc_object_t *p_this, const char *psz_var,
             break;
         case INPUT_EVENT_ITEM_META:
         case INPUT_EVENT_ITEM_INFO:
-            [[VLCMain sharedInstance] updateMainMenu];
+            [[VLCMain sharedInstance] performSelectorOnMainThread:@selector(updateMainMenu) withObject: nil waitUntilDone:NO];
             [[VLCMain sharedInstance] updateName];
             [[VLCMain sharedInstance] updateInfoandMetaPanel];
             break;
@@ -287,7 +287,7 @@ static int InputEvent( vlc_object_t *p_this, const char *psz_var,
             [[VLCMain sharedInstance] updateRecordState: var_GetBool( p_this, "record" )];
             break;
         case INPUT_EVENT_PROGRAM:
-            [[VLCMain sharedInstance] updateMainMenu];
+            [[VLCMain sharedInstance] performSelectorOnMainThread:@selector(updateMainMenu) withObject: nil waitUntilDone:NO];
             break;
         case INPUT_EVENT_ITEM_EPG:
             break;
