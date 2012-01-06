@@ -455,7 +455,7 @@ WidgetListing::WidgetListing( intf_thread_t *p_intf, QWidget *_parent )
             break;
         case TIME_LABEL_ELAPSED:
             widget = new QLabel( "2:42", this );
-            widgetItem->setText( qtr("Elasped time") );
+            widgetItem->setText( qtr("Elapsed time") );
             break;
         case TIME_LABEL_REMAINING:
             widget = new QLabel( "-2:42", this );
