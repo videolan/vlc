@@ -102,4 +102,5 @@ sh $VLC_SOURCEDIR/configure --host=arm-eabi-linux --build=x86_64-unknown-linux $
                 --disable-gles1 --disable-gles2 \
                 --disable-goom \
                 --disable-projectm \
-                --enable-iomx
+                --enable-iomx \
+                $*
