@@ -21,14 +21,15 @@
     </object>
     <object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
       <bool key="EncodedWithXMLCoder">YES</bool>
-      <integer value="4722"/>
-      <integer value="29"/>
       <integer value="1617"/>
-      <integer value="4596"/>
-      <integer value="2730"/>
-      <integer value="4895"/>
-      <integer value="21"/>
+      <integer value="4756"/>
       <integer value="915"/>
+      <integer value="4895"/>
+      <integer value="29"/>
+      <integer value="2770"/>
+      <integer value="2730"/>
+      <integer value="4596"/>
+      <integer value="4722"/>
       <integer value="283"/>
     </object>
     <object class="NSArray" key="IBDocument.PluginDependencies">
@@ -914,9 +915,9 @@
                     </object>
                     <reference key="NSSupport" ref="340291444"/>
                     <reference key="NSControlView" ref="788281303"/>
-                    <double key="NSMaxValue">32</double>
+                    <double key="NSMaxValue">512</double>
                     <double key="NSMinValue">0.0</double>
-                    <double key="NSValue">8</double>
+                    <double key="NSValue">256</double>
                     <double key="NSAltIncValue">0.0</double>
                     <int key="NSNumberOfTickMarks">0</int>
                     <int key="NSTickMarkPosition">1</int>
@@ -3431,7 +3432,7 @@
         <nil key="NSUserInterfaceItemIdentifier"/>
         <string key="NSWindowContentMaxSize">{1.7976931348623157e+308, 1.7976931348623157e+308}</string>
         <object class="NSView" key="NSWindowView" id="985395477">
-          <nil key="NSNextResponder"/>
+          <reference key="NSNextResponder"/>
           <int key="NSvFlags">256</int>
           <object class="NSMutableArray" key="NSSubviews">
             <bool key="EncodedWithXMLCoder">YES</bool>
@@ -3821,6 +3822,7 @@
             </object>
           </object>
           <string key="NSFrameSize">{549, 87}</string>
+          <reference key="NSSuperview"/>
         </object>
         <string key="NSScreenRect">{{0, 0}, {1280, 778}}</string>
         <string key="NSMaxSize">{1.7976931348623157e+308, 1.7976931348623157e+308}</string>
@@ -10555,6 +10557,7 @@ LCAuLi4</string>
           <string>2807.IBPluginDependency</string>
           <string>2807.ImportedFromIB2</string>
           <string>2808.IBPluginDependency</string>
+          <string>2808.IBViewBoundsToFrameTransform</string>
           <string>2808.ImportedFromIB2</string>
           <string>282.IBEditorWindowLastContentRect</string>
           <string>282.IBPluginDependency</string>
@@ -11328,6 +11331,7 @@ LCAuLi4</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+          <object class="NSAffineTransform"/>
           <boolean value="YES"/>
           <string>{{329, 372}, {599, 368}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>

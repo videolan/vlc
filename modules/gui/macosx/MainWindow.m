@@ -39,6 +39,7 @@
 #import <vlc_url.h>
 #import <vlc_strings.h>
 #import <vlc_services_discovery.h>
+#import <vlc_aout_intf.h>
 
 @implementation VLCMainWindow
 static VLCMainWindow *_o_sharedInstance = nil;
@@ -665,7 +666,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     else if (sender == o_volume_down_btn)
         [[VLCCoreInteraction sharedInstance] mute];
     else
-        [[VLCCoreInteraction sharedInstance] setVolume: 400];
+        [[VLCCoreInteraction sharedInstance] setVolume: AOUT_VOLUME_MAX];
 }
 
 - (IBAction)effects:(id)sender
@@ -896,11 +897,8 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
     if( i_volume != i_lastShownVolume )
     {
-        i_lastShownVolume = i_volume;
-        int i_volume_step = 0;
-        i_volume_step = config_GetInt( VLCIntf->p_libvlc, "volume-step" );
-        [o_volume_sld setFloatValue: (float)i_lastShownVolume / i_volume_step];
-        [o_fspanel setVolumeLevel: (float)i_lastShownVolume / i_volume_step];
+        [o_volume_sld setIntValue: i_volume];
+        [o_fspanel setVolumeLevel: i_volume];
     }
 }
 

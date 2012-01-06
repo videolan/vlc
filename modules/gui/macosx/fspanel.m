@@ -31,6 +31,7 @@
 #import "misc.h"
 #import "fspanel.h"
 #import "CompatibilityFixes.h"
+#import <vlc_aout_intf.h>
 
 @interface VLCFSPanel ()
 - (void)hideMouse;
@@ -168,9 +169,9 @@
     [[self contentView] setSeekable: b_seekable];
 }
 
-- (void)setVolumeLevel: (float)f_volumeLevel
+- (void)setVolumeLevel: (int)i_volumeLevel
 {
-    [[self contentView] setVolumeLevel: f_volumeLevel];
+    [[self contentView] setVolumeLevel: i_volumeLevel];
 }
 
 - (void)setNonActive:(id)noData
@@ -490,8 +491,8 @@
     s_rc.size.height = 10;
     o_fs_volumeSlider = [[VLCFSVolumeSlider alloc] initWithFrame: s_rc];
     [o_fs_volumeSlider setMinValue:0];
-    [o_fs_volumeSlider setMaxValue:32];
-    [o_fs_volumeSlider setFloatValue: 0];
+    [o_fs_volumeSlider setMaxValue:AOUT_VOLUME_MAX];
+    [o_fs_volumeSlider setIntValue:AOUT_VOLUME_DEFAULT];
     [o_fs_volumeSlider setContinuous: YES];
     [o_fs_volumeSlider setTarget: self];
     [o_fs_volumeSlider setAction: @selector(fsVolumeSliderUpdate:)];
@@ -573,9 +574,9 @@
     [o_fs_timeSlider setEnabled: b_seekable];
 }
 
-- (void)setVolumeLevel: (float)f_volumeLevel
+- (void)setVolumeLevel: (int)i_volumeLevel
 {
-    [o_fs_volumeSlider setFloatValue: f_volumeLevel];
+    [o_fs_volumeSlider setIntValue: i_volumeLevel];
 }
 
 - (IBAction)play:(id)sender

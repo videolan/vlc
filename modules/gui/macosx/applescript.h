@@ -43,8 +43,8 @@
 - (BOOL)scriptFullscreenMode;
 - (void)setScriptFullscreenMode: (BOOL)mode;
 
-- (double)audioVolume;
-- (void)setAudioVolume: (double)mode;
+- (int)audioVolume;
+- (void)setAudioVolume: (int)mode;
 
 - (int)currentTime;
 - (void)setCurrentTime: (int)mode;

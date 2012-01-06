@@ -147,7 +147,7 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
     else
     {
         playlist_t * p_playlist = pl_Get( VLCIntf );
-        NSLog( @"playlist rate = %f", f_rate );
+        f_rate = var_GetFloat( p_playlist, "rate" );
     }
 
     double value = 17 * log( f_rate ) / log( 2. );
@@ -442,10 +442,8 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
 {
     intf_thread_t * p_intf = VLCIntf;
     playlist_t * p_playlist = pl_Get( VLCIntf );
-    audio_volume_t i_volume = (audio_volume_t)i_value;
-    int i_volume_step;
-    i_volume_step = config_GetInt( VLCIntf->p_libvlc, "volume-step" );
-    aout_VolumeSet( p_playlist, i_volume * i_volume_step );
+
+    aout_VolumeSet( p_playlist, i_value );
 }
 
 #pragma mark -

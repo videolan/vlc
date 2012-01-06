@@ -51,7 +51,7 @@
 - (void)setStreamTitle: (NSString *)o_title;
 - (void)setStreamPos: (float)f_pos andTime: (NSString *)o_time;
 - (void)setSeekable: (BOOL)b_seekable;
-- (void)setVolumeLevel: (float)f_volumeLevel;
+- (void)setVolumeLevel: (int)i_volumeLevel;
 
 - (void)setNonActive: (id)noData;
 - (void)setActive: (id)noData;
@@ -93,7 +93,7 @@
 - (void)setStreamTitle: (NSString *)o_title;
 - (void)setStreamPos: (float)f_pos andTime: (NSString *)o_time;
 - (void)setSeekable: (BOOL)b_seekable;
-- (void)setVolumeLevel: (float)f_volumeLevel;
+- (void)setVolumeLevel: (int)i_volumeLevel;
 - (IBAction)play:(id)sender;
 - (IBAction)prev:(id)sender;
 - (IBAction)next:(id)sender;

@@ -483,7 +483,7 @@ static inline char * __config_GetLabel( vlc_object_t *p_this, const char *psz_na
      * audio settings *
      ******************/
     [self setupButton: o_audio_enable_ckb forBoolValue: "audio"];
-    i = (config_GetInt( p_intf, "volume" ) * 0.390625);
+    i = config_GetInt( p_intf, "volume" );
     [o_audio_vol_fld setToolTip: [NSString stringWithUTF8String: config_GetLabel( p_intf, "volume")]];
     [o_audio_vol_fld setIntValue: i];
     [o_audio_vol_sld setToolTip: [o_audio_vol_fld toolTip]];
@@ -829,7 +829,7 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
     if( b_audioSettingChanged )
     {
         config_PutInt( p_intf, "audio", [o_audio_enable_ckb state] );
-        config_PutInt( p_intf, "volume", ([o_audio_vol_sld intValue] * 2.56));
+        config_PutInt( p_intf, "volume", [o_audio_vol_sld intValue]);
         config_PutInt( p_intf, "spdif", [o_audio_spdif_ckb state] );
 
         SaveIntList( o_audio_dolby_pop, "force-dolby-surround" );

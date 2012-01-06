@@ -226,27 +226,12 @@
     return [[VLCCoreInteraction sharedInstance] isPlaying];
 }
 
-- (double) audioVolume {
-    return ( (double)[[VLCCoreInteraction sharedInstance] volume] / (double)AOUT_VOLUME_DEFAULT );
+- (int) audioVolume {
+    return ( [[VLCCoreInteraction sharedInstance] volume] );
 }
 
-- (void) setAudioVolume: (double) d_audioVolume {
-    //1 = 100%, 4 = 400%; 0 <= d_audioVolume  <= 4
-    //0-1024 (but AOUT_VOLUME_MAX == 512)???
-    //AOUT_VOLUME_DEFAULT = 256 = 100%
-    //somehow [[VLCCoreInteraction sharedInstance] setVolume:i_parameter] has 0-32 steps with 32 as stepWidth (0 - 1024)
-    if (d_audioVolume < 0)
-            d_audioVolume = 0;
-
-    if (d_audioVolume > 4)
-            d_audioVolume = 4;
-
-    intf_thread_t * p_intf = VLCIntf;
-    playlist_t * p_playlist = pl_Get( VLCIntf );
-    int i_volume_step = config_GetInt( VLCIntf->p_libvlc, "volume-step" );
-
-    int i_parameter = (int) ( d_audioVolume * i_volume_step / 4 );
-    [[VLCCoreInteraction sharedInstance] setVolume:i_parameter];
+- (void) setAudioVolume: (int) i_audioVolume {
+    [[VLCCoreInteraction sharedInstance] setVolume:(int)i_audioVolume];
 }
 
 - (int) currentTime {
