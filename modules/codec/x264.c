@@ -767,14 +767,11 @@ static int  Open ( vlc_object_t *p_this )
 
     p_enc->fmt_in.i_codec = VLC_CODEC_I420;
     p_sys->i_colorspace = X264_CSP_I420;
+#if X264_BUILD >= 118
     char *psz_profile = var_GetString( p_enc, SOUT_CFG_PREFIX "profile" );
     if( psz_profile )
     {
-#if X264_CSP_HIGH_DEPTH
-        int mask = x264_bit_depth > 8 ? X264_CSP_HIGH_DEPTH : 0;
-#else
-        int mask = 0;
-#endif
+        const int mask = x264_bit_depth > 8 ? X264_CSP_HIGH_DEPTH : 0;
         if( !strcmp( psz_profile, "high10" ) )
         {
             p_enc->fmt_in.i_codec = mask ? VLC_CODEC_I420_10L : VLC_CODEC_I420;
@@ -792,6 +789,7 @@ static int  Open ( vlc_object_t *p_this )
         }
     }
     free( psz_profile );
+#endif //X264_BUILD
 
     p_enc->pf_encode_video = Encode;
     p_enc->pf_encode_audio = NULL;
