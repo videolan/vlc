@@ -60,7 +60,6 @@ vlc_module_end ()
  * Local prototypes
  *****************************************************************************/
 static picture_t *Filter( filter_t *, picture_t * );
-static picture_t *FilterPacked( filter_t *, picture_t * );
 static void GaussianConvolution( uint32_t *, uint32_t *, int, int, int );
 static int FindShapes( uint32_t *, uint32_t *, int, int, int,
                        int *, int *, int *, int *, int *);
@@ -69,6 +68,7 @@ static void Draw( filter_t *p_filter, uint8_t *p_pix, int i_pix_pitch, int i_pix
 
 struct filter_sys_t
 {
+    bool is_yuv_planar;
     bool b_old;
     picture_t *p_old;
     uint32_t *p_buf;
@@ -91,15 +91,16 @@ static int Create( vlc_object_t *p_this )
     filter_t *p_filter = (filter_t *)p_this;
     const video_format_t *p_fmt = &p_filter->fmt_in.video;
     filter_sys_t *p_sys;
+    bool is_yuv_planar;
 
     switch( p_fmt->i_chroma )
     {
         CASE_PLANAR_YUV
-            p_filter->pf_video_filter = Filter;
+            is_yuv_planar = true;
             break;
 
         CASE_PACKED_YUV_422
-            p_filter->pf_video_filter = FilterPacked;
+            is_yuv_planar = false;
             break;
 
         default:
@@ -107,12 +108,14 @@ static int Create( vlc_object_t *p_this )
                      (char*)&(p_fmt->i_chroma) );
             return VLC_EGENERIC;
     }
+    p_filter->pf_video_filter = Filter;
 
     /* Allocate structure */
     p_filter->p_sys = p_sys = malloc( sizeof( filter_sys_t ) );
     if( p_filter->p_sys == NULL )
         return VLC_ENOMEM;
 
+    p_sys->is_yuv_planar = is_yuv_planar;
     p_sys->b_old = false;
     p_sys->p_old = picture_NewFromFormat( p_fmt );
     p_sys->p_buf  = calloc( p_fmt->i_width * p_fmt->i_height, sizeof(*p_sys->p_buf) );
@@ -146,51 +149,26 @@ static void Destroy( vlc_object_t *p_this )
 
 
 /*****************************************************************************
- * Filter YUV Planar
+ * Filter YUV Planar/Packed
  *****************************************************************************/
-static picture_t *Filter( filter_t *p_filter, picture_t *p_inpic )
+static void PreparePlanar( filter_t *p_filter, picture_t *p_inpic )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
     const video_format_t *p_fmt = &p_filter->fmt_in.video;
 
-    picture_t *p_outpic;
-
     uint8_t *p_oldpix   = p_sys->p_old->p[Y_PLANE].p_pixels;
     const int i_old_pitch = p_sys->p_old->p[Y_PLANE].i_pitch;
-    uint32_t *p_buf = p_sys->p_buf;
-    uint32_t *p_buf2= p_sys->p_buf2;
-
-    unsigned x, y;
-
-    if( !p_inpic )
-        return NULL;
 
     const uint8_t *p_inpix = p_inpic->p[Y_PLANE].p_pixels;
     const int i_src_pitch = p_inpic->p[Y_PLANE].i_pitch;
 
-    p_outpic = filter_NewPicture( p_filter );
-    if( !p_outpic )
-    {
-        picture_Release( p_inpic );
-        return NULL;
-    }
-    picture_Copy( p_outpic, p_inpic );
-
-    if( !p_sys->b_old )
-    {
-        picture_Copy( p_sys->p_old, p_inpic );
-        picture_Release( p_inpic );
-        p_sys->b_old = true;
-        return p_outpic;
-    }
-
     /**
      * Substract Y planes
      */
-    for( y = 0; y < p_fmt->i_height; y++ )
+    for( unsigned y = 0; y < p_fmt->i_height; y++ )
     {
-        for( x = 0; x < p_fmt->i_width; x++ )
-            p_buf2[y*p_fmt->i_width+x] = abs( p_inpix[y*i_src_pitch+x] - p_oldpix[y*i_old_pitch+x] );
+        for( unsigned x = 0; x < p_fmt->i_width; x++ )
+            p_sys->p_buf2[y*p_fmt->i_width+x] = abs( p_inpix[y*i_src_pitch+x] - p_oldpix[y*i_old_pitch+x] );
     }
 
     int i_chroma_dx;
@@ -212,85 +190,82 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_inpic )
 
         default:
             msg_Warn( p_filter, "Not taking chroma into account" );
-            i_chroma_dx = 0;
-            i_chroma_dy = 0;
-            break;
+            return;
     }
 
-    if( i_chroma_dx != 0 && i_chroma_dy != 0 )
+    const uint8_t *p_inpix_u = p_inpic->p[U_PLANE].p_pixels;
+    const uint8_t *p_inpix_v = p_inpic->p[V_PLANE].p_pixels;
+    const int i_src_pitch_u = p_inpic->p[U_PLANE].i_pitch;
+    const int i_src_pitch_v = p_inpic->p[V_PLANE].i_pitch;
+
+    const uint8_t *p_oldpix_u = p_sys->p_old->p[U_PLANE].p_pixels;
+    const uint8_t *p_oldpix_v = p_sys->p_old->p[V_PLANE].p_pixels;
+    const int i_old_pitch_u = p_sys->p_old->p[U_PLANE].i_pitch;
+    const int i_old_pitch_v = p_sys->p_old->p[V_PLANE].i_pitch;
+
+    for( unsigned y = 0; y < p_fmt->i_height/i_chroma_dy; y++ )
     {
-        const uint8_t *p_inpix_u = p_inpic->p[U_PLANE].p_pixels;
-        const uint8_t *p_inpix_v = p_inpic->p[V_PLANE].p_pixels;
-        const int i_src_pitch_u = p_inpic->p[U_PLANE].i_pitch;
-        const int i_src_pitch_v = p_inpic->p[V_PLANE].i_pitch;
-
-        const uint8_t *p_oldpix_u = p_sys->p_old->p[U_PLANE].p_pixels;
-        const uint8_t *p_oldpix_v = p_sys->p_old->p[V_PLANE].p_pixels;
-        const int i_old_pitch_u = p_sys->p_old->p[U_PLANE].i_pitch;
-        const int i_old_pitch_v = p_sys->p_old->p[V_PLANE].i_pitch;
-
-        for( y = 0; y < p_fmt->i_height/i_chroma_dy; y++ )
+        for( unsigned x = 0; x < p_fmt->i_width/i_chroma_dx; x ++ )
         {
-            for( x = 0; x < p_fmt->i_width/i_chroma_dx; x ++ )
-            {
-                const int d = abs( p_inpix_u[y*i_src_pitch_u+x] - p_oldpix_u[y*i_old_pitch_u+x] ) +
-                              abs( p_inpix_v[y*i_src_pitch_v+x] - p_oldpix_v[y*i_old_pitch_v+x] );
-                int i, j;
+            const int d = abs( p_inpix_u[y*i_src_pitch_u+x] - p_oldpix_u[y*i_old_pitch_u+x] ) +
+                          abs( p_inpix_v[y*i_src_pitch_v+x] - p_oldpix_v[y*i_old_pitch_v+x] );
+            int i, j;
 
-                for( j = 0; j < i_chroma_dy; j++ )
-                {
-                    for( i = 0; i < i_chroma_dx; i++ )
-                        p_buf2[i_chroma_dy*p_fmt->i_width*j + i_chroma_dx*i] = d;
-                }
+            for( j = 0; j < i_chroma_dy; j++ )
+            {
+                for( i = 0; i < i_chroma_dx; i++ )
+                    p_sys->p_buf2[i_chroma_dy*p_fmt->i_width*j + i_chroma_dx*i] = d;
             }
         }
     }
-
-    /**
-     * Get the areas where movement was detected
-     */
-    p_sys->i_colors = FindShapes( p_buf2, p_buf, p_fmt->i_width, p_fmt->i_width, p_fmt->i_height,
-                                  p_sys->colors, p_sys->color_x_min, p_sys->color_x_max, p_sys->color_y_min, p_sys->color_y_max );
-
-    /**
-     * Count final number of shapes
-     * Draw rectangles (there can be more than 1 moving shape in 1 rectangle)
-     */
-    Draw( p_filter, p_outpic->p[Y_PLANE].p_pixels, p_outpic->p[Y_PLANE].i_pitch, 1 );
-
-    /**
-     * We're done. Lets keep a copy of the picture
-     * TODO we may just picture_Release with a latency of 1 if the filters/vout
-     * handle it correctly */
-    picture_Copy( p_sys->p_old, p_inpic );
-
-    picture_Release( p_inpic );
-    return p_outpic;
 }
 
-/*****************************************************************************
- * Filter YUV Packed
- *****************************************************************************/
-static picture_t *FilterPacked( filter_t *p_filter, picture_t *p_inpic )
+static int PreparePacked( filter_t *p_filter, picture_t *p_inpic, int *pi_pix_offset )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
     const video_format_t *p_fmt = &p_filter->fmt_in.video;
-    picture_t *p_outpic;
 
+    int i_y_offset, i_u_offset, i_v_offset;
+    if( GetPackedYuvOffsets( p_fmt->i_chroma,
+                             &i_y_offset, &i_u_offset, &i_v_offset ) )
+    {
+        msg_Warn( p_filter, "Unsupported input chroma (%4.4s)",
+                  (char*)&p_fmt->i_chroma );
+        return VLC_EGENERIC;
+    }
+    *pi_pix_offset = i_y_offset;
+
+    /* Substract all planes at once */
     uint8_t *p_oldpix   = p_sys->p_old->p[Y_PLANE].p_pixels;
     const int i_old_pitch = p_sys->p_old->p[Y_PLANE].i_pitch;
-    uint32_t *p_buf = p_sys->p_buf;
-    uint32_t *p_buf2= p_sys->p_buf2;
-
-    unsigned x, y;
-
-    if( !p_inpic )
-        return NULL;
 
     const uint8_t *p_inpix = p_inpic->p[Y_PLANE].p_pixels;
     const int i_src_pitch = p_inpic->p[Y_PLANE].i_pitch;
 
-    p_outpic = filter_NewPicture( p_filter );
+    for( unsigned y = 0; y < p_fmt->i_height; y++ )
+    {
+        for( unsigned x = 0; x < p_fmt->i_width; x+=2 )
+        {
+            int d;
+            d = abs( p_inpix[y*i_src_pitch+2*x+i_u_offset] - p_oldpix[y*i_old_pitch+2*x+i_u_offset] ) +
+                abs( p_inpix[y*i_src_pitch+2*x+i_v_offset] - p_oldpix[y*i_old_pitch+2*x+i_v_offset] );
+
+            for( int i = 0; i < 2; i++ )
+                p_sys->p_buf2[y*p_fmt->i_width+x+i] =
+                    abs( p_inpix[y*i_src_pitch+2*(x+i)+i_y_offset] - p_oldpix[y*i_old_pitch+2*(x+i)+i_y_offset] ) + d;
+        }
+    }
+    return VLC_SUCCESS;
+}
+
+static picture_t *Filter( filter_t *p_filter, picture_t *p_inpic )
+{
+    filter_sys_t *p_sys = p_filter->p_sys;
+
+    if( !p_inpic )
+        return NULL;
+
+    picture_t *p_outpic = filter_NewPicture( p_filter );
     if( !p_outpic )
     {
         picture_Release( p_inpic );
@@ -301,50 +276,37 @@ static picture_t *FilterPacked( filter_t *p_filter, picture_t *p_inpic )
     if( !p_sys->b_old )
     {
         picture_Copy( p_sys->p_old, p_inpic );
-        picture_Release( p_inpic );
         p_sys->b_old = true;
-        return p_outpic;
+        goto exit;
     }
 
-    int i_y_offset, i_u_offset, i_v_offset;
-    if( GetPackedYuvOffsets( p_fmt->i_chroma,
-                             &i_y_offset, &i_u_offset, &i_v_offset ) )
+    int i_pix_offset;
+    int i_pix_size;
+    if( p_sys->is_yuv_planar )
     {
-        msg_Warn( p_filter, "Unsupported input chroma (%4.4s)",
-                  (char*)&p_fmt->i_chroma );
-        picture_Release( p_inpic );
-        return p_outpic;
+        PreparePlanar( p_filter, p_inpic );
+        i_pix_offset = 0;
+        i_pix_size = 1;
     }
-
-    /* Substract all planes at once */
-
-    for( y = 0; y < p_fmt->i_height; y++ )
+    else
     {
-        for( x = 0; x < p_fmt->i_width; x+=2 )
-        {
-            int i;
-            int d;
-
-            d = abs( p_inpix[y*i_src_pitch+2*x+i_u_offset] - p_oldpix[y*i_old_pitch+2*x+i_u_offset] ) +
-                abs( p_inpix[y*i_src_pitch+2*x+i_v_offset] - p_oldpix[y*i_old_pitch+2*x+i_v_offset] );
-
-            for( i = 0; i < 2; i++ )
-                p_buf2[y*p_fmt->i_width+x+i] =
-                    abs( p_inpix[y*i_src_pitch+2*(x+i)+i_y_offset] - p_oldpix[y*i_old_pitch+2*(x+i)+i_y_offset] ) + d;
-        }
+        if( PreparePacked( p_filter, p_inpic, &i_pix_offset ) )
+            goto exit;
+        i_pix_size = 2;
     }
 
     /**
      * Get the areas where movement was detected
      */
-    p_sys->i_colors = FindShapes( p_buf2, p_buf, p_fmt->i_width, p_fmt->i_width, p_fmt->i_height,
+    const video_format_t *p_fmt = &p_filter->fmt_in.video;
+    p_sys->i_colors = FindShapes( p_sys->p_buf2, p_sys->p_buf, p_fmt->i_width, p_fmt->i_width, p_fmt->i_height,
                                   p_sys->colors, p_sys->color_x_min, p_sys->color_x_max, p_sys->color_y_min, p_sys->color_y_max );
 
     /**
      * Count final number of shapes
      * Draw rectangles (there can be more than 1 moving shape in 1 rectangle)
      */
-    Draw( p_filter, &p_outpic->p[Y_PLANE].p_pixels[i_y_offset], p_outpic->p[Y_PLANE].i_pitch, 2 );
+    Draw( p_filter, &p_outpic->p[Y_PLANE].p_pixels[i_pix_offset], p_outpic->p[Y_PLANE].i_pitch, i_pix_size );
 
     /**
      * We're done. Lets keep a copy of the picture
@@ -352,10 +314,10 @@ static picture_t *FilterPacked( filter_t *p_filter, picture_t *p_inpic )
      * handle it correctly */
     picture_Copy( p_sys->p_old, p_inpic );
 
+exit:
     picture_Release( p_inpic );
     return p_outpic;
 }
-
 
 
 /*****************************************************************************
