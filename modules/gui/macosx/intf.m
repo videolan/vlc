@@ -1645,7 +1645,7 @@ unsigned int CocoaKeyToVLC( unichar i_key )
 {
     b_active_videoplayback = b_value;
     [o_mainwindow setVideoplayEnabled];
-    [o_mainwindow togglePlaylist:nil];
+    [o_mainwindow performSelectorOnMainThread:@selector(togglePlaylist:) withObject: nil waitUntilDone:NO];
 }
 
 - (BOOL)activeVideoPlayback
