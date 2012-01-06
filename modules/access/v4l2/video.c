@@ -140,9 +140,10 @@ static const int power_freq_vlc[] = { -1,
     V4L2_CID_POWER_LINE_FREQUENCY_DISABLED,
     V4L2_CID_POWER_LINE_FREQUENCY_50HZ,
     V4L2_CID_POWER_LINE_FREQUENCY_60HZ,
+    V4L2_CID_POWER_LINE_FREQUENCY_AUTO,
 };
 static const char *const power_freq_user[] = { N_("Unspecified"),
-    N_("Off"), N_("50 Hz"), N_("60 Hz"),
+    N_("Off"), N_("50 Hz"), N_("60 Hz"), N_("Automatic"),
 };
 #define BKLT_COMPENSATE_TEXT N_( "Backlight compensation" )
 #define BKLT_COMPENSATE_LONGTEXT N_( "Backlight compensation." )
