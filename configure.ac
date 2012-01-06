@@ -4233,21 +4233,27 @@ dnl Generate makefiles
 AC_OUTPUT
 
 dnl Do we have to use make or gmake ?
-USE_MAKE_OR_GMAKE=`case "${SYS}" in openbsd*) echo "gmake";; *) echo "make";; esac`
+if make --version 2>&1|grep -q GNU
+then
+    # GNU make, all seems good
+    MAKE=make
+else
+    # Known GNU make alias (on BSD)
+    MAKE=gmake
+fi
 dnl Shortcut to nice compile message
-rm -f compile
 if test -n $SHELL; then
   SHELL=${CONFIG_SHELL-/bin/sh}
 fi
-echo '#! '$SHELL >compile
-echo rm -f .error\$\$ >>compile
-echo ERROR=0 >>compile
-echo export PATH=$PATH LANG=C >>compile
-echo "($USE_MAKE_OR_GMAKE V=1 \$@ 2>&1 || touch .error\$\$)| \\" >>compile
-echo '`sed -ne "s/^top_srcdir *= *//p" < Makefile`/extras/buildsystem/make.pl' >>compile
-echo test -f .error\$\$ \&\& ERROR=1 >>compile
-echo rm -f .error\$\$ >>compile
-echo exit \$ERROR >>compile
+rm -f compile
+echo "#! $SHELL
+rm -f .error\$\$
+ERROR=0
+export PATH=\"$PATH\" LANG=C
+($MAKE V=1 \$@ 2>&1 || touch .error\$\$)| `sed -ne "s/^top_srcdir *= *//p" < Makefile`/extras/buildsystem/make.pl
+test -f .error\$\$ \&\& ERROR=1
+rm -f .error\$\$
+exit \$ERROR" >compile
 chmod a+x compile
 
 echo "
@@ -4263,4 +4269,4 @@ else
 echo "build vlc executable  : no"
 fi
 echo "
-To build vlc and its plugins, type \`./compile' or \`$USE_MAKE_OR_GMAKE'."
+To build vlc and its plugins, type \`$MAKE', or \`./compile' if you like nice colors."
