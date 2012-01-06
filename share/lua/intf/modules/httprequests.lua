@@ -93,14 +93,14 @@ processcommands = function ()
       if id == -1 then
         vlc.playlist.play()
       else
-        vlc.playlist.goto(id)
+        vlc.playlist.gotoitem(id)
       end
     elseif command == "pl_pause" then
       if vlc.playlist.status() == "stopped" then
         if id == -1 then
           vlc.playlist.play()
         else
-          vlc.playlist.goto(id)
+          vlc.playlist.gotoitem(id)
         end
       else
         vlc.playlist.pause()

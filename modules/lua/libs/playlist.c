@@ -123,7 +123,7 @@ static int vlclua_playlist_random( lua_State * L )
     return i_ret;
 }
 
-static int vlclua_playlist_goto( lua_State * L )
+static int vlclua_playlist_gotoitem( lua_State * L )
 {
     int i_id = luaL_checkint( L, 1 );
     playlist_t *p_playlist = vlclua_get_playlist_internal( L );
@@ -377,7 +377,8 @@ static const luaL_Reg vlclua_playlist_reg[] = {
     { "repeat_", vlclua_playlist_repeat }, // ... provide repeat_ too.
     { "loop", vlclua_playlist_loop },
     { "random", vlclua_playlist_random },
-    { "goto", vlclua_playlist_goto },
+    { "goto", vlclua_playlist_gotoitem },
+    { "gotoitem", vlclua_playlist_gotoitem },
     { "add", vlclua_playlist_add },
     { "enqueue", vlclua_playlist_enqueue },
     { "get", vlclua_playlist_get },

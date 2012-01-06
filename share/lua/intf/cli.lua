@@ -535,7 +535,7 @@ commands_ordered = {
     { "stop"; { func = skip2(vlc.playlist.stop); help = "stop stream" } };
     { "next"; { func = skip2(vlc.playlist.next); help = "next playlist item" } };
     { "prev"; { func = skip2(vlc.playlist.prev); help = "previous playlist item" } };
-    { "goto"; { func = skip2(vlc.playlist.goto); help = "goto item at index" } };
+    { "goto"; { func = skip2(vlc.playlist.gotoitem); help = "goto item at index" ; aliases = { "gotoitem" } } };
     { "repeat"; { func = skip2(vlc.playlist.repeat_); args = "[on|off]"; help = "toggle playlist repeat" } };
     { "loop"; { func = skip2(vlc.playlist.loop); args = "[on|off]"; help = "toggle playlist loop" } };
     { "random"; { func = skip2(vlc.playlist.random); args = "[on|off]"; help = "toggle playlist random" } };
