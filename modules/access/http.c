@@ -745,6 +745,56 @@ static void Close( vlc_object_t *p_this )
     free( p_sys );
 }
 
+/* Read data from the socket taking care of chunked transfer if needed */
+static int ReadData( access_t *p_access, int *pi_read,
+                     uint8_t *p_buffer, size_t i_len )
+{
+    access_sys_t *p_sys = p_access->p_sys;
+    if( p_sys->b_chunked )
+    {
+        if( p_sys->i_chunk < 0 )
+            return VLC_EGENERIC;
+
+        if( p_sys->i_chunk <= 0 )
+        {
+            char *psz = net_Gets( p_access, p_sys->fd, p_sys->p_vs );
+            /* read the chunk header */
+            if( psz == NULL )
+            {
+                /* fatal error - end of file */
+                msg_Dbg( p_access, "failed reading chunk-header line" );
+                return VLC_EGENERIC;
+            }
+            p_sys->i_chunk = strtoll( psz, NULL, 16 );
+            free( psz );
+
+            if( p_sys->i_chunk <= 0 )   /* eof */
+            {
+                p_sys->i_chunk = -1;
+                return VLC_EGENERIC;
+            }
+        }
+
+        if( i_len > p_sys->i_chunk )
+            i_len = p_sys->i_chunk;
+    }
+    *pi_read = net_Read( p_access, p_sys->fd, p_sys->p_vs, p_buffer, i_len, false );
+    if( *pi_read <= 0 )
+        return VLC_SUCCESS;
+
+    if( p_sys->b_chunked )
+    {
+        p_sys->i_chunk -= *pi_read;
+        if( p_sys->i_chunk <= 0 )
+        {
+            /* read the empty line */
+            char *psz = net_Gets( p_access, p_sys->fd, p_sys->p_vs );
+            free( psz );
+        }
+    }
+    return VLC_SUCCESS;
+}
+
 /*****************************************************************************
  * Read: Read up to i_len bytes from the http connection and place in
  * p_buffer. Return the actual number of bytes read
@@ -769,36 +819,6 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
         if( p_sys->i_remaining < i_len )
             i_len = p_sys->i_remaining;
     }
-
-    if( p_sys->b_chunked )
-    {
-        if( p_sys->i_chunk < 0 )
-            goto fatal;
-
-        if( p_sys->i_chunk <= 0 )
-        {
-            char *psz = net_Gets( p_access, p_sys->fd, p_sys->p_vs );
-            /* read the chunk header */
-            if( psz == NULL )
-            {
-                /* fatal error - end of file */
-                msg_Dbg( p_access, "failed reading chunk-header line" );
-                goto fatal;
-            }
-            p_sys->i_chunk = strtoll( psz, NULL, 16 );
-            free( psz );
-
-            if( p_sys->i_chunk <= 0 )   /* eof */
-            {
-                p_sys->i_chunk = -1;
-                goto fatal;
-            }
-        }
-
-        if( i_len > p_sys->i_chunk )
-            i_len = p_sys->i_chunk;
-    }
-
     if( i_len == 0 )
         goto fatal;
 
@@ -816,22 +836,10 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
             i_len = i_next;
     }
 
-    i_read = net_Read( p_access, p_sys->fd, p_sys->p_vs, p_buffer, i_len, false );
+    if( ReadData( p_access, &i_read, p_buffer, i_len ) )
+        goto fatal;
 
-    if( i_read > 0 )
-    {
-        if( p_sys->b_chunked )
-        {
-            p_sys->i_chunk -= i_read;
-            if( p_sys->i_chunk <= 0 )
-            {
-                /* read the empty line */
-                char *psz = net_Gets( p_access, p_sys->fd, p_sys->p_vs );
-                free( psz );
-            }
-        }
-    }
-    else
+    if( i_read <= 0 )
     {
         /*
          * I very much doubt that this will work.
@@ -897,24 +905,26 @@ static int ReadICYMeta( access_t *p_access )
     int i_read;
 
     /* Read meta data length */
-    i_read = net_Read( p_access, p_sys->fd, p_sys->p_vs, &buffer, 1,
-                       true );
-    if( i_read <= 0 )
+    if( ReadData( p_access, &i_read, &buffer, 1 ) )
         return VLC_EGENERIC;
-    if( buffer == 0 )
-        return VLC_SUCCESS;
+    if( i_read != 1 )
+        return VLC_EGENERIC;
+    const int i_size = buffer << 4;
+    /* msg_Dbg( p_access, "ICY meta size=%u", i_size); */
 
-    i_read = buffer << 4;
-    /* msg_Dbg( p_access, "ICY meta size=%u", i_read); */
-
-    psz_meta = malloc( i_read + 1 );
-    if( net_Read( p_access, p_sys->fd, p_sys->p_vs,
-                  (uint8_t *)psz_meta, i_read, true ) != i_read )
+    psz_meta = malloc( i_size + 1 );
+    for( i_read = 0; i_read < i_size; )
     {
-        free( psz_meta );
-        return VLC_EGENERIC;
+        int i_tmp;
+        if( ReadData( p_access, &i_tmp, (uint8_t *)&psz_meta[i_read], i_size - i_read ) )
+        {
+            free( psz_meta );
+            return VLC_EGENERIC;
+        }
+        if( i_tmp <= 0 )
+            return VLC_EGENERIC;
+        i_read += i_tmp;
     }
-
     psz_meta[i_read] = '\0'; /* Just in case */
 
     /* msg_Dbg( p_access, "icy-meta=%s", psz_meta ); */
