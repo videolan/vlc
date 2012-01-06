@@ -29,7 +29,6 @@
 #include "xml/Node.h"
 #include "mpd/IMPDManager.h"
 #include "adaptationlogic/AlwaysBestAdaptationLogic.h"
-#include "adaptationlogic/NullAdaptationLogic.h"
 #include "adaptationlogic/RateBasedAdaptationLogic.h"
 
 namespace dash

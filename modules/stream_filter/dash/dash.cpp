@@ -110,7 +110,8 @@ static int Open(vlc_object_t *p_obj)
                                    dash::logic::IAdaptationLogic::RateBased );
 
     if ( p_dashManager->getMpdManager() == NULL ||
-         p_dashManager->getMpdManager()->getMPD() == NULL )
+         p_dashManager->getMpdManager()->getMPD() == NULL ||
+         p_dashManager->getAdaptionLogic() == NULL )
     {
         delete p_conManager;
         delete p_dashManager;

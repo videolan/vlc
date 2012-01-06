@@ -45,7 +45,8 @@ namespace dash
 
             int read( void *p_buffer, size_t len );
             int peek( const uint8_t **pp_peek, size_t i_peek );
-            const mpd::IMPDManager* getMpdManager() const;
+            const mpd::IMPDManager*         getMpdManager() const;
+            const logic::IAdaptationLogic*  getAdaptionLogic() const;
 
         private:
             http::HTTPConnectionManager         *conManager;

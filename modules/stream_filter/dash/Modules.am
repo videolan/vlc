@@ -7,7 +7,6 @@ SOURCES_stream_filter_dash = \
     adaptationlogic/AlwaysBestAdaptationLogic.h \
     adaptationlogic/IAdaptationLogic.h \
     adaptationlogic/IDownloadRateObserver.h \
-    adaptationlogic/NullAdaptationLogic.h \
     adaptationlogic/RateBasedAdaptationLogic.h \
     adaptationlogic/RateBasedAdaptationLogic.cpp \
     exceptions/EOFException.h \

@@ -47,6 +47,8 @@ DASHManager::DASHManager    ( HTTPConnectionManager *conManager, MPD *mpd,
     if ( this->mpdManager == NULL )
         return ;
     this->adaptationLogic   = AdaptationLogicFactory::create( this->logicType, this->mpdManager );
+    if ( this->adaptationLogic == NULL )
+        return ;
     this->conManager->attach(this->adaptationLogic);
 }
 DASHManager::~DASHManager   ()
@@ -98,7 +100,12 @@ int     DASHManager::peek( const uint8_t **pp_peek, size_t i_peek )
     return ret;
 }
 
-const mpd::IMPDManager* DASHManager::getMpdManager() const
+const mpd::IMPDManager*         DASHManager::getMpdManager() const
 {
     return this->mpdManager;
+}
+
+const logic::IAdaptationLogic*  DASHManager::getAdaptionLogic() const
+{
+    return this->adaptationLogic;
 }
