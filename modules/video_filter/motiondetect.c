@@ -277,32 +277,18 @@ static picture_t *FilterPacked( filter_t *p_filter, picture_t *p_inpic )
     const video_format_t *p_fmt = &p_filter->fmt_in.video;
     picture_t *p_outpic;
 
-    const uint8_t *p_inpix = p_inpic->p[Y_PLANE].p_pixels;
-    const int i_src_pitch = p_inpic->p[Y_PLANE].i_pitch;
-
     uint8_t *p_oldpix   = p_sys->p_old->p[Y_PLANE].p_pixels;
     const int i_old_pitch = p_sys->p_old->p[Y_PLANE].i_pitch;
     uint32_t *p_buf = p_sys->p_buf;
     uint32_t *p_buf2= p_sys->p_buf2;
 
-    int i_y_offset, i_u_offset, i_v_offset;
-
     unsigned x, y;
 
-    if( GetPackedYuvOffsets( p_fmt->i_chroma,
-                             &i_y_offset, &i_u_offset, &i_v_offset ) )
-    {
-        msg_Warn( p_filter, "Unsupported input chroma (%4.4s)",
-                  (char*)&p_fmt->i_chroma );
-        return p_inpic;
-    }
+    if( !p_inpic )
+        return NULL;
 
-    if( !p_sys->b_old )
-    {
-        picture_Copy( p_sys->p_old, p_inpic );
-        p_sys->b_old = true;
-        return p_inpic;
-    }
+    const uint8_t *p_inpix = p_inpic->p[Y_PLANE].p_pixels;
+    const int i_src_pitch = p_inpic->p[Y_PLANE].i_pitch;
 
     p_outpic = filter_NewPicture( p_filter );
     if( !p_outpic )
@@ -311,6 +297,24 @@ static picture_t *FilterPacked( filter_t *p_filter, picture_t *p_inpic )
         return NULL;
     }
     picture_Copy( p_outpic, p_inpic );
+
+    if( !p_sys->b_old )
+    {
+        picture_Copy( p_sys->p_old, p_inpic );
+        picture_Release( p_inpic );
+        p_sys->b_old = true;
+        return p_outpic;
+    }
+
+    int i_y_offset, i_u_offset, i_v_offset;
+    if( GetPackedYuvOffsets( p_fmt->i_chroma,
+                             &i_y_offset, &i_u_offset, &i_v_offset ) )
+    {
+        msg_Warn( p_filter, "Unsupported input chroma (%4.4s)",
+                  (char*)&p_fmt->i_chroma );
+        picture_Release( p_inpic );
+        return p_outpic;
+    }
 
     /* Substract all planes at once */
 
