@@ -25,8 +25,8 @@ cd $WD
 #############################################
 # Config
 
-INTELROOT=$SRCROOT/build32/VLC-release.app
-INTEL64ROOT=$SRCROOT/build64/VLC-release.app
+INTELROOT=$SRCROOT/build32/VLC.app
+INTEL64ROOT=$SRCROOT/build64/VLC.app
 # PPCROOT
 UBROOT=$SRCROOT/build-fat/VLC.app
 
@@ -121,5 +121,5 @@ fi
 
 
 # Now, you need to copy the resulting UBROOT bundle into VLC's build directory
-# and make sure it is named "VLC-release.app".
+# and make sure it is named "VLC.app".
 # Afterwards, run 'make package-macosx' and follow release_howto.txt in /doc

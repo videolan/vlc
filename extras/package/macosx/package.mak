@@ -6,16 +6,16 @@ endif
 endif
 
 # This is just for development purposes.
-# The resulting VLC.app will only run in this tree.
-VLC.app: VLC-tmp
+# The resulting VLC-dev.app will only run in this tree.
+VLC-dev.app: VLC-tmp
 	rm -Rf $@
 	cp -R VLC-tmp $@
 	$(INSTALL) -m 0755 $(top_builddir)/bin/.libs/vlc $@/Contents/MacOS/VLC
 	$(LN_S) -f ../../../modules $@/Contents/MacOS/plugins
 
-# VLC-release.app for packaging and giving it to your friends
+# VLC.app for packaging and giving it to your friends
 # use package-macosx to get a nice dmg
-VLC-release.app: VLC-tmp
+VLC.app: VLC-tmp
 	rm -Rf $@
 	cp -R VLC-tmp $@
 	PRODUCT="$@" ACTION="release-makefile" src_dir=$(srcdir) build_dir=$(top_builddir) sh $(srcdir)/projects/macosx/framework/Pre-Compile.sh
@@ -57,9 +57,9 @@ VLC-tmp: vlc
 	done
 	printf "APPLVLC#" >| $@/Contents/PkgInfo
 
-package-macosx: VLC-release.app
+package-macosx: VLC.app
 	mkdir -p "$(top_builddir)/vlc-$(VERSION)/Goodies/"
-	cp -R "$(top_builddir)/VLC-release.app" "$(top_builddir)/vlc-$(VERSION)/VLC.app"
+	cp -R "$(top_builddir)/VLC.app" "$(top_builddir)/vlc-$(VERSION)/VLC.app"
 	cd $(srcdir); cp AUTHORS COPYING README THANKS NEWS $(abs_top_builddir)/vlc-$(VERSION)/Goodies/
 	cp -R  $(srcdir)/extras/package/macosx/Delete_Preferences.app $(top_builddir)/vlc-$(VERSION)/Goodies/Delete\ VLC\ Preferences.app
 	cp $(srcdir)/extras/package/macosx/README.MacOSX.rtf $(top_builddir)/vlc-$(VERSION)/Read\ Me.rtf
@@ -80,9 +80,9 @@ package-macosx: VLC-release.app
 	rm -f "$(top_builddir)/vlc-$(VERSION)-rw.dmg"
 	rm -rf "$(top_builddir)/vlc-$(VERSION)"
 
-package-macosx-zip: VLC-release.app
+package-macosx-zip: VLC.app
 	mkdir -p $(top_builddir)/vlc-$(VERSION)/Goodies/
-	cp -R $(top_builddir)/VLC-release.app $(top_builddir)/vlc-$(VERSION)/VLC.app
+	cp -R $(top_builddir)/VLC.app $(top_builddir)/vlc-$(VERSION)/VLC.app
 	cd $(srcdir); cp -R AUTHORS COPYING README THANKS NEWS extras/package/macosx/Delete_Preferences.app/ \
 		$(abs_top_builddir)/vlc-$(VERSION)/Goodies/
 	cp $(srcdir)/extras/package/macosx/README.MacOSX.rtf $(top_builddir)/vlc-$(VERSION)/Read\ Me.rtf

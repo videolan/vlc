@@ -4,12 +4,12 @@
 #
 # Script that install libvlc and its modules inside VLCKit.
 #
-# This is for some creepy reasons also used by legacy VLC-release.app or
+# This is for some creepy reasons also used by legacy VLC.app or
 # the moz plugin.
 
 
 #
-# We are building VLC-release.app or the moz plugin
+# We are building VLC.app or the moz plugin
 #
 if test "${ACTION}" = "release-makefile"; then
     echo "running Pre-Compile.sh in release-makefile mode"
@@ -211,8 +211,8 @@ if [ "$RELEASE_MAKEFILE" != "yes" ] ; then
 fi
 
 ##########################
-# Hack for VLC-release.app
-if [ "$FULL_PRODUCT_NAME" = "VLC-release.app" ] ; then
+# Hack for VLC.app
+if [ "$FULL_PRODUCT_NAME" = "VLC.app" ] ; then
     vlc_install "bin/${prefix}" "vlc" "${target}" "bin" "@loader_path/lib"
     mv ${target}/vlc ${target}/VLC
     chmod +x ${target}/VLC
@@ -261,7 +261,7 @@ fi
 
 ##########################
 # Exporting headers
-if [ "$FULL_PRODUCT_NAME" = "VLC-release.app" ] ; then
+if [ "$FULL_PRODUCT_NAME" = "VLC.app" ] ; then
     echo "Exporting headers..."
     mkdir -p ${target_include}/vlc
     $pbxcp ${VLC_SRC_DIR}/include/vlc/*.h ${target_include}/vlc
