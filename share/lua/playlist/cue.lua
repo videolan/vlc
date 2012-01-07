@@ -25,12 +25,9 @@ function probe()
 		return false
 	end
 	header = vlc.peek( 2048 )
-	return string.match( header, "FILE.*WAVE%s[\r\n]+" ) or
-	       string.match( header, "FILE.*AIFF%s[\r\n]+" ) or
-	       string.match( header, "FILE.*MP3%s[\r\n]+" ) or
-	       string.match( header, "FILE.*WAVE%s*[\n]+" ) or
-	       string.match( header, "FILE.*AIFF%s*[\n]+" ) or
-	       string.match( header, "FILE.*MP3%s*[\n]+" )
+	return string.match( header, "FILE.*WAVE%s*[\r\n]+" ) or
+	       string.match( header, "FILE.*AIFF%s*[\r\n]+" ) or
+	       string.match( header, "FILE.*MP3%s*[\r\n]+" )
 end
 
 -- Helpers
