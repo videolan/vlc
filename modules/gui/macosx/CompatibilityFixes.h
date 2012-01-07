@@ -57,6 +57,7 @@ enum {
     NSApplicationPresentationDisableHideApplication     = (1 <<  8),
     NSApplicationPresentationDisableMenuBarTransparency = (1 <<  9)
 };
+typedef NSUInteger NSApplicationPresentationOptions;
 
 #if defined( __LP64__) && !defined(__POWER__) /* Bug in the 10.5.sdk in 64bits */
 extern OSErr UpdateSystemActivity(UInt8 activity);
