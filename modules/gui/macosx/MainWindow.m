@@ -418,6 +418,12 @@ static VLCMainWindow *_o_sharedInstance = nil;
     }
     else
     {
+        NSRect frame;
+        frame = [o_time_sld_fancygradient_view frame];
+        frame.size.height = frame.size.height - 1;
+        frame.origin.y = frame.origin.y + 1;
+        [o_time_sld_fancygradient_view setFrame: frame];
+
         [o_video_view setFrame: [o_split_view frame]];
         [o_playlist_table setBorderType: NSNoBorder];
         [o_sidebar_scrollview setBorderType: NSNoBorder];
