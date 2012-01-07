@@ -783,7 +783,7 @@ static VLCMain *_o_sharedMainInstance = nil;
 {
     [NSApp activateIgnoringOtherApps:YES];
     [o_remote stopListening: self];
-    var_SetInteger( p_intf->p_libvlc, "key-action", ACTIONID_STOP );
+    [[VLCCoreInteraction sharedInstance] stop];
 }
 
 #pragma mark -
@@ -853,16 +853,7 @@ static VLCMain *_o_sharedMainInstance = nil;
 /* Triggered when the computer goes to sleep */
 - (void)computerWillSleep: (NSNotification *)notification
 {
-    input_thread_t * p_input;
-
-    p_input = pl_CurrentInput( p_intf );
-    if( p_input )
-    {
-        int state = var_GetInteger( p_input, "state" );
-        if( state == PLAYING_S )
-            var_SetInteger( p_intf->p_libvlc, "key-action", ACTIONID_PLAY_PAUSE );
-        vlc_object_release( p_input );
-    }
+    [[VLCCoreInteraction sharedInstance] pause];
 }
 
 #pragma mark -

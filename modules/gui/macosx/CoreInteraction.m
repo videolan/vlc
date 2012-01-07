@@ -1,7 +1,7 @@
 /*****************************************************************************
  * CoreInteraction.m: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2011 Felix Paul Kühne
+ * Copyright (C) 2011-2012 Felix Paul Kühne
  * $Id$
  *
  * Authors: Felix Paul Kühne <fkuehne -at- videolan -dot- org>
@@ -89,6 +89,11 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
         [[[VLCMain sharedInstance] open] openFileGeneric];
     
     var_SetInteger( VLCIntf->p_libvlc, "key-action", ACTIONID_PLAY_PAUSE );
+}
+
+- (void)pause
+{
+    var_SetInteger( VLCIntf->p_libvlc, "key-action", ACTIONID_PAUSE );
 }
 
 - (void)stop

@@ -1,7 +1,7 @@
 /*****************************************************************************
  * MainWindow.m: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2002-2011 VLC authors and VideoLAN
+ * Copyright (C) 2002-2012 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Felix Paul Kühne <fkuehne -at- videolan -dot- org>
@@ -709,6 +709,15 @@ static VLCMainWindow *_o_sharedInstance = nil;
     return YES;
 }
 
+- (BOOL)validateMenuItem:(NSMenuItem *)menuItem
+{
+	SEL s_menuAction = [menuItem action];
+	if ((s_menuAction == @selector(performClose:)) || (s_menuAction == @selector(performMiniaturize:)) || (s_menuAction == @selector(performZoom:)))
+        return YES;
+
+	return [super validateMenuItem:menuItem];
+}
+
 - (BOOL)isMainWindow
 {
 	return YES;
@@ -721,6 +730,22 @@ static VLCMainWindow *_o_sharedInstance = nil;
     if (b_nonembedded && [[VLCMain sharedInstance] activeVideoPlayback])
         [o_nonembedded_window setTitle: title];
     [super setTitle: title];
+}
+
+- (void)performClose:(id)sender
+{
+    if (b_dark_interface)
+        [self orderOut: sender];
+    else
+        [super performClose: sender];
+}
+
+- (void)performMiniaturize:(id)sender
+{
+    if (b_dark_interface)
+        [self miniaturize: sender];
+    else
+        [super performMiniaturize: sender];
 }
 
 - (void)performZoom:(id)sender
@@ -1210,7 +1235,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
 - (void)someWindowWillClose:(NSNotification *)notification
 {
-    if([notification object] == o_nonembedded_window)
+    if([notification object] == o_nonembedded_window || [notification object] == self)
         [[VLCCoreInteraction sharedInstance] stop];
 }
 
