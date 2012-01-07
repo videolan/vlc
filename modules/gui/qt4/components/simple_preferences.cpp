@@ -408,7 +408,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             qs_filter = qfu( psz ).split( ':', QString::SkipEmptyParts );
             free( psz );
 
-            bool b_enabled = ( qs_filter.contains( "volnorm" ) );
+            bool b_enabled = ( qs_filter.contains( "normvol" ) );
             ui.volNormBox->setChecked( b_enabled );
             ui.volNormSpin->setEnabled( b_enabled );
 
@@ -829,10 +829,10 @@ void SPrefsPanel::apply()
     {
         bool b_checked =
             qobject_cast<QCheckBox *>(optionWidgets[normalizerChB])->isChecked();
-        if( b_checked && !qs_filter.contains( "volnorm" ) )
-            qs_filter.append( "volnorm" );
-        if( !b_checked && qs_filter.contains( "volnorm" ) )
-            qs_filter.removeAll( "volnorm" );
+        if( b_checked && !qs_filter.contains( "normvol" ) )
+            qs_filter.append( "normvol" );
+        if( !b_checked && qs_filter.contains( "normvol" ) )
+            qs_filter.removeAll( "normvol" );
 
         b_checked =
             qobject_cast<QCheckBox *>(optionWidgets[headphoneB])->isChecked();
