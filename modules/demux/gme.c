@@ -105,10 +105,14 @@ static int Open (vlc_object_t *obj)
         return VLC_ENOMEM;
     }
     if (data)
+    {
         gme_load_custom (sys->emu, ReaderBlock, data->i_buffer, data);
+        block_Release(data);
+    }
     else
+    {
         gme_load_custom (sys->emu, ReaderStream, size, demux->s);
-    block_Release(data);
+    }
     gme_start_track (sys->emu, sys->track_id = 0);
 
     es_format_t fmt;
