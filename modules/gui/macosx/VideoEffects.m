@@ -1,7 +1,7 @@
 /*****************************************************************************
  * VideoEffects.m: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2011 Felix Paul Kühne
+ * Copyright (C) 2011-2012 Felix Paul Kühne
  * $Id$
  *
  * Authors: Felix Paul Kühne <fkuehne -at- videolan -dot- org>
@@ -78,6 +78,7 @@ static VLCVideoEffects *_o_sharedInstance = nil;
     [o_adjust_brightness_ckb setTitle:_NS("Brightness Threshold")];
     [o_adjust_saturation_lbl setStringValue:_NS("Saturation")];
     [o_adjust_gamma_lbl setStringValue:_NS("Gamma")];
+    [o_adjust_reset_btn setTitle: _NS("Reset")];
     [o_sharpen_ckb setTitle:_NS("Sharpen")];
     [o_sharpen_lbl setStringValue:_NS("Sigma")];
     [o_banding_ckb setTitle:_NS("Banding removal")];
@@ -246,6 +247,7 @@ static VLCVideoEffects *_o_sharedInstance = nil;
     [o_adjust_gamma_lbl setEnabled: b_state];
     [o_adjust_hue_lbl setEnabled: b_state];
     [o_adjust_saturation_lbl setEnabled: b_state];
+    [o_adjust_reset_btn setEnabled: b_state];
     [o_sharpen_sld setFloatValue: config_GetFloat( p_intf, "sharpen-sigma" )];
     [o_sharpen_sld setEnabled: [o_sharpen_ckb state]];
     [o_sharpen_lbl setEnabled: [o_sharpen_ckb state]];
@@ -572,11 +574,12 @@ static VLCVideoEffects *_o_sharedInstance = nil;
     [o_adjust_hue_lbl setEnabled: b_state];
     [o_adjust_saturation_sld setEnabled: b_state];
     [o_adjust_saturation_lbl setEnabled: b_state];
+    [o_adjust_reset_btn setEnabled: b_state];
 }
 
 - (IBAction)adjustSliderChanged:(id)sender
 {
-        if( sender == o_adjust_brightness_sld )
+    if( sender == o_adjust_brightness_sld )
         [self setVideoFilterProperty: "brightness" forFilter: "adjust" float: [o_adjust_brightness_sld floatValue]];
     else if( sender == o_adjust_contrast_sld )
         [self setVideoFilterProperty: "contrast" forFilter: "adjust" float: [o_adjust_contrast_sld floatValue]];
@@ -590,7 +593,21 @@ static VLCVideoEffects *_o_sharedInstance = nil;
 
 - (IBAction)enableAdjustBrightnessThreshold:(id)sender
 {
-    config_PutInt( p_intf, "brightness-threshold", [o_adjust_brightness_ckb state] );
+    if (sender == o_adjust_reset_btn)
+    {
+        [o_adjust_brightness_sld setFloatValue: 1.0];
+        [o_adjust_contrast_sld setFloatValue: 1.0];
+        [o_adjust_gamma_sld setFloatValue: 1.0];
+        [o_adjust_hue_sld setIntValue: 0.0];
+        [o_adjust_saturation_sld setFloatValue: 1.0];
+        [self setVideoFilterProperty: "brightness" forFilter: "adjust" float: [o_adjust_brightness_sld floatValue]];
+        [self setVideoFilterProperty: "contrast" forFilter: "adjust" float: [o_adjust_contrast_sld floatValue]];
+        [self setVideoFilterProperty: "gamma" forFilter: "adjust" float: [o_adjust_gamma_sld floatValue]];
+        [self setVideoFilterProperty: "hue" forFilter: "adjust" integer: [o_adjust_hue_sld intValue]];
+        [self setVideoFilterProperty: "saturation" forFilter: "adjust" float: [o_adjust_saturation_sld floatValue]];
+    }
+    else
+        config_PutInt( p_intf, "brightness-threshold", [o_adjust_brightness_ckb state] );
 }
 
 - (IBAction)enableSharpen:(id)sender

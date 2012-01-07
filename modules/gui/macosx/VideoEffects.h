@@ -1,7 +1,7 @@
 /*****************************************************************************
  * VideoEffects.h: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2011 Felix Paul Kühne
+ * Copyright (C) 2011-2012 Felix Paul Kühne
  * $Id$
  *
  * Authors: Felix Paul Kühne <fkuehne -at- videolan -dot- org>
@@ -43,6 +43,7 @@
     IBOutlet id o_adjust_saturation_sld;
     IBOutlet id o_adjust_gamma_lbl;
     IBOutlet id o_adjust_gamma_sld;
+    IBOutlet id o_adjust_reset_btn;
     IBOutlet id o_sharpen_ckb;
     IBOutlet id o_sharpen_lbl;
     IBOutlet id o_sharpen_sld;

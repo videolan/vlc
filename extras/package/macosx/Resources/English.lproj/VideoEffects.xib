@@ -21,7 +21,7 @@
     </object>
     <object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
       <bool key="EncodedWithXMLCoder">YES</bool>
-      <integer value="644"/>
+      <integer value="48"/>
     </object>
     <object class="NSArray" key="IBDocument.PluginDependencies">
       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -68,7 +68,7 @@
                 <object class="BGHUDTabViewItem" id="313931694">
                   <string key="NSIdentifier">basic</string>
                   <object class="NSView" key="NSView" id="1044285835">
-                    <nil key="NSNextResponder"/>
+                    <reference key="NSNextResponder" ref="898819366"/>
                     <int key="NSvFlags">274</int>
                     <object class="NSMutableArray" key="NSSubviews">
                       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -319,6 +319,39 @@
                                   <bool key="NSAllowsTickMarkValuesOnly">NO</bool>
                                   <bool key="NSVertical">NO</bool>
                                   <string key="themeKey">gradientTheme</string>
+                                </object>
+                              </object>
+                              <object class="NSButton" id="370408073">
+                                <reference key="NSNextResponder" ref="627843039"/>
+                                <int key="NSvFlags">268</int>
+                                <string key="NSFrame">{{217, 12}, {73, 17}}</string>
+                                <reference key="NSSuperview" ref="627843039"/>
+                                <string key="NSReuseIdentifierKey">_NS:125</string>
+                                <bool key="NSEnabled">YES</bool>
+                                <object class="BGHUDButtonCell" key="NSCell" id="496532368">
+                                  <int key="NSCellFlags">67239424</int>
+                                  <int key="NSCellFlags2">134479872</int>
+                                  <string key="NSContents">Reset</string>
+                                  <object class="NSFont" key="NSSupport">
+                                    <string key="NSName">LucidaGrande</string>
+                                    <double key="NSSize">9</double>
+                                    <int key="NSfFlags">3600</int>
+                                  </object>
+                                  <string key="NSCellIdentifier">_NS:125</string>
+                                  <reference key="NSControlView" ref="370408073"/>
+                                  <int key="NSButtonFlags">-2038284033</int>
+                                  <int key="NSButtonFlags2">36</int>
+                                  <object class="NSFont" key="NSAlternateImage">
+                                    <string key="NSName">LucidaGrande</string>
+                                    <double key="NSSize">9</double>
+                                    <int key="NSfFlags">16</int>
+                                  </object>
+                                  <string key="NSAlternateContents"/>
+                                  <string key="NSKeyEquivalent"/>
+                                  <int key="NSPeriodicDelay">200</int>
+                                  <int key="NSPeriodicInterval">25</int>
+                                  <string key="themeKey">gradientTheme</string>
+                                  <int key="BGButtonType">0</int>
                                 </object>
                               </object>
                             </object>
@@ -671,6 +704,7 @@
                       </object>
                     </object>
                     <string key="NSFrame">{{10, 33}, {638, 197}}</string>
+                    <reference key="NSSuperview" ref="898819366"/>
                   </object>
                   <string key="NSLabel">Basic</string>
                   <reference key="NSColor" ref="279270326"/>
@@ -2713,7 +2747,7 @@
                 <object class="NSTabViewItem" id="657146767">
                   <string key="NSIdentifier">misc</string>
                   <object class="NSView" key="NSView" id="542129148">
-                    <reference key="NSNextResponder" ref="898819366"/>
+                    <nil key="NSNextResponder"/>
                     <int key="NSvFlags">256</int>
                     <object class="NSMutableArray" key="NSSubviews">
                       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -3110,14 +3144,13 @@
                       </object>
                     </object>
                     <string key="NSFrame">{{10, 33}, {638, 197}}</string>
-                    <reference key="NSSuperview" ref="898819366"/>
                   </object>
                   <string key="NSLabel">Miscellaneous</string>
                   <reference key="NSColor" ref="279270326"/>
                   <reference key="NSTabView" ref="898819366"/>
                 </object>
               </object>
-              <reference key="NSSelectedTabViewItem" ref="657146767"/>
+              <reference key="NSSelectedTabViewItem" ref="313931694"/>
               <object class="NSFont" key="NSFont">
                 <string key="NSName">LucidaGrande</string>
                 <double key="NSSize">13</double>
@@ -3129,7 +3162,7 @@
               <nil key="themeKey"/>
               <object class="NSMutableArray" key="NSSubviews">
                 <bool key="EncodedWithXMLCoder">YES</bool>
-                <reference ref="542129148"/>
+                <reference ref="1044285835"/>
               </object>
             </object>
           </object>
@@ -4356,6 +4389,22 @@
           </object>
           <int key="connectionID">701</int>
         </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">enableAdjustBrightnessThreshold:</string>
+            <reference key="source" ref="707254443"/>
+            <reference key="destination" ref="370408073"/>
+          </object>
+          <int key="connectionID">706</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_adjust_reset_btn</string>
+            <reference key="source" ref="707254443"/>
+            <reference key="destination" ref="370408073"/>
+          </object>
+          <int key="connectionID">707</int>
+        </object>
       </object>
       <object class="IBMutableOrderedSet" key="objectRecords">
         <object class="NSArray" key="orderedObjects">
@@ -4565,6 +4614,7 @@
               <reference ref="685913676"/>
               <reference ref="396951138"/>
               <reference ref="279446133"/>
+              <reference ref="370408073"/>
             </object>
             <reference key="parent" ref="1044285835"/>
           </object>
@@ -6176,6 +6226,20 @@
             <reference key="object" ref="6278927"/>
             <reference key="parent" ref="899288616"/>
           </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">704</int>
+            <reference key="object" ref="370408073"/>
+            <object class="NSMutableArray" key="children">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <reference ref="496532368"/>
+            </object>
+            <reference key="parent" ref="308548124"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">705</int>
+            <reference key="object" ref="496532368"/>
+            <reference key="parent" ref="370408073"/>
+          </object>
         </object>
       </object>
       <object class="NSMutableDictionary" key="flattenedProperties">
@@ -6519,6 +6583,9 @@
           <string>70.IBPluginDependency</string>
           <string>70.IBViewBoundsToFrameTransform</string>
           <string>70.ImportedFromIB2</string>
+          <string>704.IBPluginDependency</string>
+          <string>704.IBViewBoundsToFrameTransform</string>
+          <string>705.IBPluginDependency</string>
           <string>71.IBPluginDependency</string>
           <string>72.IBPluginDependency</string>
           <string>73.IBPluginDependency</string>
@@ -7093,6 +7160,11 @@
             <bytes key="NSTransformStruct">P4AAAL+AAABBcAAAwdAAAA</bytes>
           </object>
           <boolean value="YES"/>
+          <string>com.binarymethod.BGHUDAppKitPlugin</string>
+          <object class="NSAffineTransform">
+            <bytes key="NSTransformStruct">P4AAAL+AAABDWQAAwdgAAA</bytes>
+          </object>
+          <string>com.binarymethod.BGHUDAppKitPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.binarymethod.BGHUDAppKitPlugin</string>
           <string>com.binarymethod.BGHUDAppKitPlugin</string>
@@ -7171,7 +7243,7 @@
         </object>
       </object>
       <nil key="sourceID"/>
-      <int key="maxID">701</int>
+      <int key="maxID">707</int>
     </object>
     <object class="IBClassDescriber" key="IBDocument.Classes">
       <object class="NSMutableArray" key="referencedPartialClassDescriptionsV3.1+">
@@ -7489,6 +7561,7 @@
               <string>o_adjust_gamma_sld</string>
               <string>o_adjust_hue_lbl</string>
               <string>o_adjust_hue_sld</string>
+              <string>o_adjust_reset_btn</string>
               <string>o_adjust_saturation_lbl</string>
               <string>o_adjust_saturation_sld</string>
               <string>o_banding_ckb</string>
@@ -7646,6 +7719,7 @@
               <string>id</string>
               <string>id</string>
               <string>id</string>
+              <string>id</string>
             </object>
           </object>
           <object class="NSMutableDictionary" key="toOneOutletInfosByName">
@@ -7674,6 +7748,7 @@
               <string>o_adjust_gamma_sld</string>
               <string>o_adjust_hue_lbl</string>
               <string>o_adjust_hue_sld</string>
+              <string>o_adjust_reset_btn</string>
               <string>o_adjust_saturation_lbl</string>
               <string>o_adjust_saturation_sld</string>
               <string>o_banding_ckb</string>
@@ -7829,6 +7904,10 @@
               </object>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_adjust_hue_sld</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_adjust_reset_btn</string>
                 <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
