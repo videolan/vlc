@@ -464,7 +464,7 @@ end
 function rate(name,client,value)
     local input = vlc.object.input()
     if name == "rate" then
-        vlc.var.set(input, "rate", tonumber(value))
+        vlc.var.set(input, "rate", common.us_tonumber(value))
     elseif name == "normal" then
         vlc.var.set(input,"rate",1)
     else

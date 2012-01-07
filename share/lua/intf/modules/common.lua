@@ -46,6 +46,19 @@ function table_copy(t)
     return c
 end
 
+-- tonumber() for decimals number, using a dot as decimal separator
+-- regardless of the system locale 
+function us_tonumber(str)
+    local i, d = string.match(str, "([+-]?%d*)%.?(%d*)")
+    if i == nil or i == "" then
+        i = "0"
+    end
+    if d == nil or d == "" then
+        d = "0"
+    end
+    return tonumber(i) + tonumber(d)/(10^string.len(d))
+end
+
 -- strip leading and trailing spaces
 function strip(str)
     return string.gsub(str, "^%s*(.-)%s*$", "%1")
@@ -119,9 +132,9 @@ function seek(value)
     local input = vlc.object.input()
     if input ~= nil and value ~= nil then
         if string.sub(value,-1) == "%" then
-            local number = tonumber(string.sub(value,1,-2))
+            local number = us_tonumber(string.sub(value,1,-2))
             if number ~= nil then
-                local posPercent = tonumber( string.sub(value,1,-2))/100.
+                local posPercent = number/100.
                 if string.sub(value,1,1) == "+" or string.sub(value,1,1) == "-" then
                     vlc.var.set(input,"position",vlc.var.get(input,"position") + posPercent)
                 else
