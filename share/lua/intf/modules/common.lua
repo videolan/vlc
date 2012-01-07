@@ -49,14 +49,23 @@ end
 -- tonumber() for decimals number, using a dot as decimal separator
 -- regardless of the system locale 
 function us_tonumber(str)
-    local i, d = string.match(str, "([+-]?%d*)%.?(%d*)")
-    if i == nil or i == "" then
+    local s, i, d = string.match(str, "^([+-]?)(%d*)%.?(%d*)$")
+    if not s or not i or not d then
+        return nil
+    end
+
+    if s == "-" then
+        s = -1
+    else
+        s = 1
+    end
+    if i == "" then
         i = "0"
     end
     if d == nil or d == "" then
         d = "0"
     end
-    return tonumber(i) + tonumber(d)/(10^string.len(d))
+    return s * (tonumber(i) + tonumber(d)/(10^string.len(d)))
 end
 
 -- strip leading and trailing spaces
