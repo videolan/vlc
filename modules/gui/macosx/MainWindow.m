@@ -396,6 +396,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
         [self setBackgroundColor: [NSColor clearColor]];
         [self setOpaque: NO];
+        [self setHasShadow:YES];
 
         NSRect winrect;
         CGFloat f_titleBarHeight = [o_titlebar_view frame].size.height;
@@ -430,6 +431,8 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
     if (OSX_LEOPARD)
         [o_time_sld_fancygradient_view removeFromSuperviewWithoutNeedingDisplay];
+
+    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(someWindowWillClose:) name: NSWindowWillCloseNotification object: nil];
 }
 
 #pragma mark -
@@ -700,6 +703,8 @@ static VLCMainWindow *_o_sharedInstance = nil;
 {
     if (b_dark_interface)
         [o_titlebar_view setWindowTitle: title];
+    if (b_nonembedded && [[VLCMain sharedInstance] activeVideoPlayback])
+        [o_nonembedded_window setTitle: title];
     [super setTitle: title];
 }
 
@@ -1069,11 +1074,12 @@ static VLCMainWindow *_o_sharedInstance = nil;
     }
     else
     {
-        [o_video_view removeFromSuperviewWithoutNeedingDisplay];
+        if ([o_video_view superview] != NULL)
+            [o_video_view removeFromSuperviewWithoutNeedingDisplay];
         if (o_nonembedded_window)
             [o_nonembedded_window release];
 
-        o_nonembedded_window = [[VLCWindow alloc] initWithContentRect:[o_video_view frame] styleMask: NSBorderlessWindowMask|NSResizableWindowMask backing:NSBackingStoreBuffered defer:YES];
+        o_nonembedded_window = [[VLCWindow alloc] initWithContentRect:[o_video_view frame] styleMask: NSTitledWindowMask|NSClosableWindowMask|NSResizableWindowMask|NSMiniaturizableWindowMask backing:NSBackingStoreBuffered defer:YES];
         [o_nonembedded_window setFrame:[o_video_view frame] display:NO];
         [o_nonembedded_window setBackgroundColor: [NSColor blackColor]];
         [o_nonembedded_window setMovableByWindowBackground: YES];
@@ -1185,6 +1191,12 @@ static VLCMainWindow *_o_sharedInstance = nil;
 - (void)hideMouseCursor:(NSTimer *)timer
 {
     [NSCursor setHiddenUntilMouseMoves: YES];
+}
+
+- (void)someWindowWillClose:(NSNotification *)notification
+{
+    if([notification object] == o_nonembedded_window)
+        [[VLCCoreInteraction sharedInstance] stop];
 }
 
 #pragma mark -
