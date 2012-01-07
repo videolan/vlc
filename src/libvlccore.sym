@@ -405,6 +405,7 @@ spu_ClearChannel
 sql_Create
 sql_Destroy
 stream_Block
+stream_BlockRemaining
 stream_Control
 stream_Delete
 stream_DemuxNew
