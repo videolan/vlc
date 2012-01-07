@@ -21,16 +21,16 @@
     </object>
     <object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
       <bool key="EncodedWithXMLCoder">YES</bool>
-      <integer value="1617"/>
-      <integer value="4756"/>
-      <integer value="915"/>
-      <integer value="4895"/>
-      <integer value="29"/>
       <integer value="2770"/>
-      <integer value="2730"/>
-      <integer value="4596"/>
+      <integer value="1617"/>
+      <integer value="29"/>
+      <integer value="21"/>
       <integer value="4722"/>
+      <integer value="915"/>
+      <integer value="4596"/>
       <integer value="283"/>
+      <integer value="4895"/>
+      <integer value="2730"/>
     </object>
     <object class="NSArray" key="IBDocument.PluginDependencies">
       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -969,7 +969,7 @@
                     <string key="NSContents"/>
                     <reference key="NSSupport" ref="188716167"/>
                     <reference key="NSControlView" ref="474770834"/>
-                    <int key="NSButtonFlags">-2039217921</int>
+                    <int key="NSButtonFlags">141820159</int>
                     <int key="NSButtonFlags2">2</int>
                     <object class="NSCustomResource" key="NSNormalImage" id="267511931">
                       <string key="NSClassName">NSImage</string>
@@ -1020,7 +1020,7 @@
                     <string key="NSContents"/>
                     <reference key="NSSupport" ref="188716167"/>
                     <reference key="NSControlView" ref="963106097"/>
-                    <int key="NSButtonFlags">-2039217921</int>
+                    <int key="NSButtonFlags">141820159</int>
                     <int key="NSButtonFlags2">2</int>
                     <object class="NSCustomResource" key="NSNormalImage" id="112655283">
                       <string key="NSClassName">NSImage</string>

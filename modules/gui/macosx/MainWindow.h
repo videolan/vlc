@@ -73,7 +73,6 @@
     BOOL b_nativeFullscreenMode;
     BOOL b_video_playback_enabled;
     int i_lastShownVolume;
-    BOOL b_mute;
     input_state_e cachedInputState;
 
     NSImage * o_pause_img;
