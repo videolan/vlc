@@ -43,15 +43,14 @@ function cue_path( src )
 	if( string.match( src, "^/" ) or
 		string.match( src, "^\\" ) or
 		string.match( src, "^[%l%u]:\\" ) ) then
-		return src
+		return vlc.strings.make_uri(src)
 	end
 
-	local path = string.gsub( vlc.strings.decode_uri(vlc.path), '\\', '/' )
-	local slash = string.find( string.reverse( path ), '/' )
-	if( path == nil ) then
-		return src
-	end
-	return string.sub( path, 1, -slash-1 ) .. '/' .. src
+	local slash = string.find( string.reverse( vlc.path ), '/' )
+        local prefix = vlc.access .. "://" .. string.sub( vlc.path, 1, -slash )
+        -- FIXME: postfix may not be encoded correctly (esp. slashes)
+        local postfix = vlc.strings.encode_uri_component(src)
+	return prefix .. postfix
 end
 
 function cue_track( global, track )
@@ -60,7 +59,7 @@ function cue_track( global, track )
 	end
 
 	t = {}
-	t.path = vlc.strings.make_uri(cue_path( track.file or global.file ))
+	t.path = cue_path( track.file or global.file )
 	t.title = track.title
 	t.album = global.title
 	t.artist = track.performer or global.performer
