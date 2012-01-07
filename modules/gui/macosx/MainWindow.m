@@ -1126,7 +1126,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     }
     if( OSX_LION && b_nativeFullscreenMode )
     {
-        if( [NSApp presentationOptions] == NSApplicationPresentationFullScreen )
+        if( [NSApp presentationOptions] & NSApplicationPresentationFullScreen )
             [o_bottombar_view setHidden: b_videoPlayback];
         else
             [o_bottombar_view setHidden: NO];
@@ -1704,6 +1704,9 @@ static VLCMainWindow *_o_sharedInstance = nil;
         winrect.size.height = winrect.size.height + f_titleBarHeight;
         [o_split_view setFrame: winrect];
     }
+
+    if ([[VLCMain sharedInstance] activeVideoPlayback])
+        [o_bottombar_view setHidden: YES];
 }
 
 - (void)windowWillExitFullScreen:(NSNotification *)notification
@@ -1730,6 +1733,9 @@ static VLCMainWindow *_o_sharedInstance = nil;
         [o_split_view setFrame: winrect];
         [o_video_view setFrame: winrect];
     }
+
+    if ([[VLCMain sharedInstance] activeVideoPlayback])
+        [o_bottombar_view setHidden: NO];
 }
 
 #pragma mark -
