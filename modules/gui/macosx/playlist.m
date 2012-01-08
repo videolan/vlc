@@ -184,6 +184,7 @@
     playlist_t * p_playlist = pl_Get( VLCIntf );
     //assert( outlineView == o_outline_view );
 
+    PL_LOCK;
     if( !item )
         p_item = p_playlist->p_root_category;
     else
@@ -191,6 +192,7 @@
 
     if( p_item )
         i_return = p_item->i_children;
+    PL_UNLOCK;
 
     return i_return > 0 ? i_return : 0;
 }
@@ -1093,26 +1095,6 @@
         playlist_AddInput( p_playlist, p_input, PLAYLIST_INSERT, i_position == -1 ? PLAYLIST_END : i_position + i_item, true,
          pl_Locked );
 
-/*        if( i_item == 0 && !b_enqueue )
-        {
-            playlist_item_t *p_item = NULL;
-            playlist_item_t *p_node = NULL;
-            p_item = playlist_ItemGetByInput( p_playlist, p_input );
-            if( p_item )
-            {
-                if( p_item->i_children == -1 )
-                    p_node = p_item->p_parent;
-                else
-                {
-                    p_node = p_item;
-                    if( p_node->i_children > 0 && p_node->pp_children[0]->i_children == -1 )
-                        p_item = p_node->pp_children[0];
-                    else
-                        p_item = NULL;
-                }
-                playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, pl_Locked, p_node, p_item );
-            }
-        }*/
         vlc_gc_decref( p_input );
     }
     PL_UNLOCK;
@@ -1120,8 +1102,11 @@
         i_position = [o_outline_dict count] - 1;
 
     [self playlistUpdated];
-    [o_outline_view selectRowIndexes:[NSIndexSet indexSetWithIndex:i_position] byExtendingSelection:NO];
-    [self playItem:nil];
+    if( !b_enqueue )
+    {
+        [o_outline_view selectRowIndexes:[NSIndexSet indexSetWithIndex:i_position] byExtendingSelection:NO];
+        [self playItem:nil];
+    }
 }
 
 - (void)appendNodeArray:(NSArray*)o_array inNode:(playlist_item_t *)p_node atPos:(int)i_position enqueue:(BOOL)b_enqueue
