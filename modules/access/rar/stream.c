@@ -93,7 +93,7 @@ static int Open(vlc_object_t *object)
     int count;
     rar_file_t **files;
     const int64_t position = stream_Tell(s->p_source);
-    if (RarParse(s->p_source, &count, &files) || count <= 0) {
+    if (RarParse(s->p_source, &count, &files)) {
         stream_Seek(s->p_source, position);
         msg_Err(s, "Invalid or unsupported RAR archive");
         free(files);
