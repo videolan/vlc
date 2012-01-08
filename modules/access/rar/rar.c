@@ -209,6 +209,8 @@ static int SkipFile(stream_t *s, int *count, rar_file_t ***file,
         current = NULL;
 
     if (!current) {
+        if (hdr->flags & RAR_BLOCK_FILE_HAS_PREVIOUS)
+            goto exit;
         current = malloc(sizeof(*current));
         if (!current)
             goto exit;
