@@ -1,7 +1,7 @@
 /*****************************************************************************
  * VideoView.h: MacOS X video output module
  *****************************************************************************
- * Copyright (C) 2002-2011 VLC authors and VideoLAN
+ * Copyright (C) 2002-2012 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Derk-Jan Hartman <hartman at videolan dot org>
@@ -30,8 +30,5 @@
  *****************************************************************************/
 @interface VLCVoutView : NSView
 {
-    NSView * o_view;
-
-    id              o_window;
 }
 @end

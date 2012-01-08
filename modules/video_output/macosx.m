@@ -1,7 +1,7 @@
 /*****************************************************************************
  * macosx.m: MacOS X OpenGL provider
  *****************************************************************************
- * Copyright (C) 2001-2011 the VideoLAN team
+ * Copyright (C) 2001-2012 the VideoLAN team
  * $Id$
  *
  * Authors: Colin Delacroix <colin@zoy.org>
@@ -98,6 +98,7 @@ vlc_module_end ()
     BOOL _hasPendingReshape;
 }
 - (void)setVoutDisplay:(vout_display_t *)vd;
+- (vout_display_t *)voutDisplay;
 - (void)setVoutFlushing:(BOOL)flushing;
 @end
 
@@ -512,6 +513,10 @@ static void OpenglSwap(vlc_gl_t *gl)
     }
 }
 
+- (vout_display_t *)voutDisplay
+{
+    return vd;
+}
 
 /**
  * Gets called when the vout will aquire the lock and flush.

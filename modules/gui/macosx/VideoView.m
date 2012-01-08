@@ -1,7 +1,7 @@
 /*****************************************************************************
  * VideoView.m: MacOS X video output module
  *****************************************************************************
- * Copyright (C) 2002-2011 VLC authors and VideoLAN
+ * Copyright (C) 2002-2012 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Derk-Jan Hartman <hartman at videolan dot org>
@@ -41,6 +41,7 @@
 #import <vlc_vout_window.h>
 #import <vlc_vout_display.h>
 #import <vlc_keys.h>
+#import <vlc_mouse.h>
 /*****************************************************************************
  * DeviceCallback: Callback triggered when the video-device variable is changed
  *****************************************************************************/
@@ -60,97 +61,19 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 }
 
 /*****************************************************************************
+ * VLCOpenGLVideoView interface excerpt
+ * full implementation in modules/video_output/macosx.m:95
+ *****************************************************************************/
+@interface VLCOpenGLVideoView : NSOpenGLView
+{
+}
+- (vout_display_t *)voutDisplay;
+@end
+
+/*****************************************************************************
  * VLCVoutView implementation
  *****************************************************************************/
 @implementation VLCVoutView
-- (void)setVoutView:(id)theView
-{
-    vout_thread_t * p_vout = getVout();
-    if( !p_vout )
-        return;
-
-    int i_device;
-    NSArray *o_screens = [NSScreen screens];
-    if( [o_screens count] <= 0 )
-    {
-        msg_Err( VLCIntf, "no OSX screens available" );
-        return;
-    }
-
-    /* Get the pref value when this is the first time, otherwise retrieve the device from the top level video-device var */
-    if( var_Type( p_vout->p_libvlc, "video-device" ) == 0 )
-    {
-        i_device = var_GetInteger( p_vout, "macosx-vdev" );
-    }
-    else
-    {
-        i_device = var_GetInteger( p_vout->p_libvlc, "video-device" );
-    }
-
-    /* Setup the menuitem for the multiple displays. */
-    if( var_Type( p_vout, "video-device" ) == 0 )
-    {
-        int i = 1;
-        vlc_value_t val2, text;
-        NSScreen * o_screen;
-
-        var_Create( p_vout, "video-device", VLC_VAR_INTEGER |
-                   VLC_VAR_HASCHOICE );
-        text.psz_string = _("Fullscreen Video Device");
-        var_Change( p_vout, "video-device", VLC_VAR_SETTEXT, &text, NULL );
-
-        NSEnumerator * o_enumerator = [o_screens objectEnumerator];
-
-        val2.i_int = 0;
-        text.psz_string = _("Default");
-        var_Change( p_vout, "video-device", VLC_VAR_ADDCHOICE, &val2, &text );
-        var_Set( p_vout, "video-device", val2 );
-
-        while( (o_screen = [o_enumerator nextObject]) != NULL )
-        {
-            char psz_temp[255];
-            NSRect s_rect = [o_screen frame];
-
-            snprintf( psz_temp, sizeof(psz_temp)/sizeof(psz_temp[0])-1, "%s %d (%dx%d)", _("Screen"), i, (int)s_rect.size.width, (int)s_rect.size.height );
-
-            text.psz_string = psz_temp;
-            val2.i_int = (int)[o_screen displayID];
-            var_Change( p_vout, "video-device", VLC_VAR_ADDCHOICE, &val2, &text );
-            if( (int)[o_screen displayID] == i_device )
-            {
-                var_Set( p_vout, "video-device", val2 );
-            }
-            i++;
-        }
-
-        var_AddCallback( p_vout, "video-device", DeviceCallback,
-                        NULL );
-
-        val2.b_bool = true;
-        var_Set( p_vout, "intf-change", val2 );
-    }
-
-    /* Add the view. It's automatically resized to fit the window */
-    if (o_view) {
-        [o_view removeFromSuperview];
-        [o_view release];
-    }
-    o_view = theView;
-    [o_view retain];
-    [self addSubview: o_view];
-    [self setAutoresizesSubviews: YES];
-
-    /* make sure that we look alright */
-    [[self window] setAlphaValue: var_CreateGetFloat( p_vout, "macosx-opaqueness" )];
-    vlc_object_release( p_vout );
-}
-
-- (void)resizeSubviewsWithOldSize:(NSSize)oldBoundsSize
-{
-    [super resizeSubviewsWithOldSize: oldBoundsSize];
-    [o_view setFrameSize: [self frame].size];
-}
-
 - (void)closeVout
 {
     vout_thread_t * p_vout = getVout();
@@ -159,11 +82,6 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
         var_DelCallback( p_vout, "video-device", DeviceCallback, NULL );
         vlc_object_release( p_vout );
     }
-
-    /* Make sure we don't see a white flash */
-    [o_view removeFromSuperview];
-    [o_view release];
-    o_view = nil;
 }
 
 - (void)scrollWheel:(NSEvent *)theEvent
@@ -234,9 +152,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
             if( [o_event clickCount] <= 1 )
             {
                 /* single clicking */
-                var_Get( p_vout, "mouse-button-down", &val );
-                val.i_int |= 1;
-                var_Set( p_vout, "mouse-button-down", val );
+                vout_display_SendEventMousePressed( [[[self subviews] objectAtIndex:0] voutDisplay], MOUSE_BUTTON_LEFT );
             }
             else
             {
@@ -266,9 +182,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 
         if (p_vout)
         {
-            var_Get( p_vout, "mouse-button-down", &val );
-            val.i_int |= 2;
-            var_Set( p_vout, "mouse-button-down", val );
+            vout_display_SendEventMousePressed( [[[self subviews] objectAtIndex:0] voutDisplay], MOUSE_BUTTON_CENTER );
         }
         vlc_object_release( p_vout );
     }
@@ -296,15 +210,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
         vout_thread_t * p_vout = getVout();
         if (p_vout)
         {
-            vlc_value_t val;
-            int x, y;
-
-            var_GetCoords( p_vout, "mouse-moved", &x, &y );
-            var_SetCoords( p_vout, "mouse-clicked", x, y );
-
-            var_Get( p_vout, "mouse-button-down", &val );
-            val.i_int &= ~1;
-            var_Set( p_vout, "mouse-button-down", val );
+            vout_display_SendEventMouseReleased( [[[self subviews] objectAtIndex:0] voutDisplay], MOUSE_BUTTON_LEFT );
             vlc_object_release( p_vout );
         }
     }
@@ -319,10 +225,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
         vout_thread_t * p_vout = getVout();
         if (p_vout)
         {
-            vlc_value_t val;
-            var_Get( p_vout, "mouse-button-down", &val );
-            val.i_int &= ~2;
-            var_Set( p_vout, "mouse-button-down", val );
+            vout_display_SendEventMouseReleased( [[[self subviews] objectAtIndex:0] voutDisplay], MOUSE_BUTTON_CENTER );
             vlc_object_release( p_vout );
         }
     }
@@ -363,22 +266,22 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 - (void)mouseMoved:(NSEvent *)o_event
 {
     vout_thread_t * p_vout = getVout();
-    if( p_vout )
+    if (p_vout)
     {
         NSPoint ml;
         NSRect s_rect;
         BOOL b_inside;
 
-        s_rect = [o_view bounds];
-        ml = [o_view convertPoint: [o_event locationInWindow] fromView: nil];
-        b_inside = [o_view mouse: ml inRect: s_rect];
+        s_rect = [self bounds];
+        ml = [self convertPoint: [o_event locationInWindow] fromView: nil];
+        b_inside = [self mouse: ml inRect: s_rect];
 
         if( b_inside )
         {
-            var_SetCoords( p_vout, "mouse-moved", ((int)ml.x), ((int)ml.y) );
+            vout_display_SendEventMouseMoved( [[[self subviews] objectAtIndex:0] voutDisplay], ((int)ml.x), ((int)s_rect.size.height - ((int)ml.y)) );
         }
-        vlc_object_release( p_vout );
         [[VLCMain sharedInstance] showFullscreenController];
+        vlc_object_release( p_vout );
     }
 
     [super mouseMoved: o_event];
@@ -404,12 +307,5 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
     /* We need to stay the first responder or we'll miss some
        events */
     return NO;
-}
-
-- (void)renewGState
-{
-    [[self window] disableScreenUpdatesUntilFlush];
-
-    [super renewGState];
 }
 @end

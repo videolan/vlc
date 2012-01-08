@@ -1172,6 +1172,8 @@ static VLCMainWindow *_o_sharedInstance = nil;
         if (!b_videoPlayback)
             [o_fspanel setNonActive: nil];
     }
+    if (b_videoPlayback)
+        [self makeFirstResponder: o_video_view];
 }
 
 - (void)resizeWindow
@@ -1211,9 +1213,9 @@ static VLCMainWindow *_o_sharedInstance = nil;
 //  Called automatically if window's acceptsMouseMovedEvents property is true
 - (void)mouseMoved:(NSEvent *)theEvent
 {
-    if (b_fullscreen) {
+    if (b_fullscreen)
         [self recreateHideMouseTimer];
-    }
+
     [super mouseMoved: theEvent];
 }
 
