@@ -391,6 +391,9 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
     [o_sidebar_view reloadData];
     [o_sidebar_view selectRowIndexes:[NSIndexSet indexSetWithIndex:0] byExtendingSelection:YES];
+    NSUInteger i_sidebaritem_count = [o_sidebaritems count];
+    for (NSUInteger x = 0; x < i_sidebaritem_count; x++)
+        [o_sidebar_view expandItem: [o_sidebaritems objectAtIndex: x] expandChildren: YES];
 
     if( b_dark_interface )
     {
@@ -1893,10 +1896,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 /* taken under BSD-new from the PXSourceList sample project, adapted for VLC */
 - (BOOL)sourceList:(PXSourceList*)aSourceList isGroupAlwaysExpanded:(id)group
 {
-	if([[group identifier] isEqualToString:@"library"])
-		return YES;
-
-	return NO;
+    return NO;
 }
 
 - (void)sourceListSelectionDidChange:(NSNotification *)notification
