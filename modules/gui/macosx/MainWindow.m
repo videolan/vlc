@@ -442,6 +442,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
         [o_time_sld_fancygradient_view removeFromSuperviewWithoutNeedingDisplay];
 
     [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(someWindowWillClose:) name: NSWindowWillCloseNotification object: nil];
+    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(someWindowWillMiniaturize:) name: NSWindowWillMiniaturizeNotification object:nil];
 }
 
 #pragma mark -
@@ -1054,6 +1055,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     else
         [self showDropZone];
     PL_UNLOCK;
+    [o_sidebar_view setNeedsDisplay:YES];
 }
 
 - (void)setPause
@@ -1237,6 +1239,12 @@ static VLCMainWindow *_o_sharedInstance = nil;
 {
     if([notification object] == o_nonembedded_window || [notification object] == self)
         [[VLCCoreInteraction sharedInstance] stop];
+}
+
+- (void)someWindowWillMiniaturize:(NSNotification *)notification
+{
+    if([notification object] == o_nonembedded_window || [notification object] == self)
+        [[VLCCoreInteraction sharedInstance] pause];
 }
 
 #pragma mark -
@@ -1849,7 +1857,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
         NSInteger i_playlist_size;
 
         PL_LOCK;
-        i_playlist_size = playlist_CurrentSize( p_playlist );
+        i_playlist_size = p_playlist->items.i_size;
         PL_UNLOCK;
 
         return i_playlist_size;
