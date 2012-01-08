@@ -29,8 +29,6 @@
  *****************************************************************************/
 @interface VLCOpen : NSObject
 {
-    IBOutlet id o_playlist;
-
     IBOutlet id o_panel;
 
     IBOutlet id o_mrl_fld;

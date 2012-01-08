@@ -448,9 +448,9 @@ static VLCOpen *_o_sharedMainInstance = nil;
         /* apply the options to our item(s) */
         [o_dic setObject: (NSArray *)[o_options copy] forKey: @"ITEM_OPTIONS"];
         if( b_autoplay )
-            [o_playlist appendArray: [NSArray arrayWithObject: o_dic] atPos: -1 enqueue:NO];
+            [[[VLCMain sharedInstance] playlist] appendArray: [NSArray arrayWithObject: o_dic] atPos: -1 enqueue:NO];
         else
-            [o_playlist appendArray: [NSArray arrayWithObject: o_dic] atPos: -1 enqueue:YES];
+            [[[VLCMain sharedInstance] playlist] appendArray: [NSArray arrayWithObject: o_dic] atPos: -1 enqueue:YES];
     }
 }
 
@@ -1154,9 +1154,9 @@ static VLCOpen *_o_sharedMainInstance = nil;
             [o_array addObject: o_dic];
         }
         if( b_autoplay )
-            [o_playlist appendArray: o_array atPos: -1 enqueue:NO];
+            [[[VLCMain sharedInstance] playlist] appendArray: o_array atPos: -1 enqueue:NO];
         else
-            [o_playlist appendArray: o_array atPos: -1 enqueue:YES];
+            [[[VLCMain sharedInstance] playlist] appendArray: o_array atPos: -1 enqueue:YES];
     }
 }
 
