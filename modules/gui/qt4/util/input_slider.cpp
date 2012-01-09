@@ -260,7 +260,7 @@ void SeekSlider::mouseMoveEvent( QMouseEvent *event )
                     if ( event->x() >= x )
                         i_selected = i + ( ( b_startsnonzero )? 1 : 0 );
                 }
-                if ( i_selected >= 0 )
+                if ( i_selected >= 0 && i_selected < points.size() )
                     chapterLabel = points.at( i_selected ).name;
         }
 
