@@ -222,7 +222,6 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             CONFIG_BOOL( "video-deco", windowDecorations );
             CONFIG_GENERIC( "vout", Module, ui.voutLabel, outputModule );
 
-            CONFIG_BOOL( "video-wallpaper", wallpaperMode );
 #ifdef WIN32
             CONFIG_GENERIC( "directx-device", StringList, ui.dxDeviceLabel,
                             dXdisplayDevice );

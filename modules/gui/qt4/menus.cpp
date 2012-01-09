@@ -652,9 +652,8 @@ QMenu *VLCMenuBar::VideoMenu( intf_thread_t *p_intf, QMenu *current, bool b_subt
         addActionWithCheckbox( current, "direct3d-desktop", qtr( "Display on &Desktop" ) );
 #endif
 
-#ifdef WIN32
         addActionWithCheckbox( current, "video-wallpaper", qtr( "Set as Wall&paper" ) );
-#endif
+
         current->addSeparator();
         /* Size modifiers */
         addActionWithSubmenu( current, "zoom", qtr( "&Zoom" ) );

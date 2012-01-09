@@ -110,10 +110,10 @@
       <property name="spacing">
        <number>6</number>
       </property>
-      <item row="1" column="1" colspan="2">
+      <item row="0" column="1" colspan="2">
        <widget class="QComboBox" name="dXdisplayDevice"/>
       </item>
-      <item row="1" column="0">
+      <item row="0" column="0">
        <widget class="QLabel" name="dxDeviceLabel">
         <property name="text">
          <string>Display device</string>
@@ -123,50 +123,43 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="0" colspan="3">
-       <widget class="QCheckBox" name="wallpaperMode">
-        <property name="text">
-         <string>Enable wallpaper mode</string>
-        </property>
-       </widget>
-      </item>
      </layout>
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="kvaBox" >
-     <property name="title" >
+    <widget class="QGroupBox" name="kvaBox">
+     <property name="title">
       <string>KVA</string>
      </property>
-     <layout class="QGridLayout" >
-      <property name="margin" >
+     <layout class="QGridLayout">
+      <property name="margin">
        <number>9</number>
       </property>
-      <property name="spacing" >
+      <property name="spacing">
        <number>6</number>
       </property>
-      <item row="1" column="1" colspan="2" >
-       <widget class="QComboBox" name="kvaVideoMode" />
+      <item row="1" column="1" colspan="2">
+       <widget class="QComboBox" name="kvaVideoMode"/>
       </item>
-      <item row="1" column="0" >
-       <widget class="QLabel" name="kvaVideoModeLabel" >
-        <property name="text" >
+      <item row="1" column="0">
+       <widget class="QLabel" name="kvaVideoModeLabel">
+        <property name="text">
          <string>Video mode</string>
         </property>
-        <property name="buddy" >
+        <property name="buddy">
          <cstring>kvaVideoMode</cstring>
         </property>
        </widget>
       </item>
-      <item row="0" column="0" colspan="2" >
-       <widget class="QCheckBox" name="kvaFixT23" >
-        <property name="text" >
+      <item row="0" column="0" colspan="2">
+       <widget class="QCheckBox" name="kvaFixT23">
+        <property name="text">
          <string>Enable a workaround for T23</string>
         </property>
        </widget>
       </item>
      </layout>
-     </widget>
+    </widget>
    </item>
    <item>
     <widget class="QGroupBox" name="groupBox_2">
@@ -334,7 +327,6 @@
   <tabstop>alwaysOnTop</tabstop>
   <tabstop>windowDecorations</tabstop>
   <tabstop>outputModule</tabstop>
-  <tabstop>wallpaperMode</tabstop>
   <tabstop>dXdisplayDevice</tabstop>
   <tabstop>kvaFixT23</tabstop>
   <tabstop>kvaVideoMode</tabstop>
