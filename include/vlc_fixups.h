@@ -88,7 +88,11 @@ int putc_unlocked (int, FILE *);
 int putchar_unlocked (int);
 #endif
 
-#ifndef HAVE_GETDELIM
+/* we always need our implementation on Darwin, since native support for getline
+ * was added lately to Darwin 11 (OS X Lion) only.
+ * However, we want binaries created on this OS to be executable on previous
+ * releases. */
+#if !defined HAVE_GETDELIM || defined(__APPLE__)
 ssize_t getdelim (char **, size_t *, int, FILE *);
 ssize_t getline (char **, size_t *, FILE *);
 #endif
