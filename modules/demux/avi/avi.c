@@ -678,7 +678,7 @@ aviindex:
                   "VLC won't repair your file but can temporary fix this "
                   "problem by building an index in memory.\n"
                   "This step might take a long time on a large file.\n"
-                  "What do you want to do ?" ),
+                  "What do you want to do?" ),
                   _( "Build index then play" ), _( "Play as is" ), _( "Do not play") ) )
             {
                 case 1:

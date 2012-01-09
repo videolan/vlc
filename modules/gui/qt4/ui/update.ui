@@ -112,7 +112,7 @@
        <item>
         <widget class="QLabel" name="label_2">
          <property name="text">
-          <string>Do you want to download it ?</string>
+          <string>Do you want to download it?</string>
          </property>
          <property name="wordWrap">
           <bool>true</bool>
