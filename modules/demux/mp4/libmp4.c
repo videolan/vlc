@@ -642,7 +642,8 @@ static int MP4_ReadBox_tkhd(  stream_t *p_stream, MP4_Box_t *p_box )
     MP4_ConvertDate2Str( s_modification_time, p_box->data.p_mvhd->i_modification_time );
     MP4_ConvertDate2Str( s_duration, p_box->data.p_mvhd->i_duration );
 
-    msg_Dbg( p_stream, "read box: \"tkhd\" creation %s modification %s duration %s track ID %d layer %d volume %f width %f height %f",
+    msg_Dbg( p_stream, "read box: \"tkhd\" creation %s modification %s duration %s track ID %d layer %d volume %f width %f height %f. "
+            "Matrix: %i %i %i %i %i %i %i %i %i",
                   s_creation_time,
                   s_modification_time,
                   s_duration,
@@ -650,7 +651,16 @@ static int MP4_ReadBox_tkhd(  stream_t *p_stream, MP4_Box_t *p_box )
                   p_box->data.p_tkhd->i_layer,
                   (float)p_box->data.p_tkhd->i_volume / 256 ,
                   (float)p_box->data.p_tkhd->i_width / 65536,
-                  (float)p_box->data.p_tkhd->i_height / 65536 );
+                  (float)p_box->data.p_tkhd->i_height / 65536,
+                  p_box->data.p_tkhd->i_matrix[0],
+                  p_box->data.p_tkhd->i_matrix[1],
+                  p_box->data.p_tkhd->i_matrix[2],
+                  p_box->data.p_tkhd->i_matrix[3],
+                  p_box->data.p_tkhd->i_matrix[4],
+                  p_box->data.p_tkhd->i_matrix[5],
+                  p_box->data.p_tkhd->i_matrix[6],
+                  p_box->data.p_tkhd->i_matrix[7],
+                  p_box->data.p_tkhd->i_matrix[8] );
 #endif
     MP4_READBOX_EXIT( 1 );
 }
