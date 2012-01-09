@@ -9,3 +9,15 @@
  static const char *backup_suffix_string;
  
  /* Long options.  */
+--- gettext/gettext-tools/configure	2010-06-06 13:12:20.000000000 -0700
++++ gettext/gettext-tools/configure	2010-08-13 23:24:09.000000000 -0700
+@@ -40606,7 +40606,9 @@ else
+ #include <stdlib.h>
+ #include <string.h> /* for strcpy */
+ /* The stpncpy prototype is missing in <string.h> on AIX 4.  */
++#ifndef stpncpy
+ extern char *stpncpy (char *dest, const char *src, size_t n);
++#endif
+ int main () {
+   const char *src = "Hello";
+   char dest[10];
