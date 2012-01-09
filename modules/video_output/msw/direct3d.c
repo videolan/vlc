@@ -70,7 +70,6 @@ vlc_module_begin ()
     set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VOUT)
 
-    add_bool("direct3d-desktop", false, DESKTOP_TEXT, DESKTOP_LONGTEXT, true)
     add_bool("direct3d-hw-blending", true, HW_BLENDING_TEXT, HW_BLENDING_LONGTEXT, true)
 
     set_capability("vout display", 240)
@@ -156,7 +155,7 @@ static int Open(vlc_object_t *object)
         return VLC_EGENERIC;
     }
 
-    sys->use_desktop = var_CreateGetBool(vd, "direct3d-desktop");
+    sys->use_desktop = var_CreateGetBool(vd, "video-wallpaper");
     sys->reset_device = false;
     sys->reset_device = false;
     sys->allow_hw_yuv = var_CreateGetBool(vd, "directx-hw-yuv");
@@ -202,8 +201,8 @@ static int Open(vlc_object_t *object)
 
     vlc_value_t val;
     val.psz_string = _("Desktop");
-    var_Change(vd, "direct3d-desktop", VLC_VAR_SETTEXT, &val, NULL);
-    var_AddCallback(vd, "direct3d-desktop", DesktopCallback, NULL);
+    var_Change(vd, "video-wallpaper", VLC_VAR_SETTEXT, &val, NULL);
+    var_AddCallback(vd, "video-wallpaper", DesktopCallback, NULL);
 
     /* Setup vout_display now that everything is fine */
     vd->fmt  = fmt;
@@ -235,7 +234,7 @@ static void Close(vlc_object_t *object)
 {
     vout_display_t * vd = (vout_display_t *)object;
 
-    var_DelCallback(vd, "direct3d-desktop", DesktopCallback, NULL);
+    var_DelCallback(vd, "video-wallpaper", DesktopCallback, NULL);
     vlc_mutex_destroy(&vd->sys->lock);
 
     Direct3DClose(vd);
@@ -1439,8 +1438,8 @@ static int DesktopCallback(vlc_object_t *object, char const *psz_cmd,
         playlist_t *p_playlist = pl_Get(vd);
         /* Modify playlist as well because the vout might have to be
          * restarted */
-        var_Create(p_playlist, "direct3d-desktop", VLC_VAR_BOOL);
-        var_SetBool(p_playlist, "direct3d-desktop", newval.b_bool);
+        var_Create(p_playlist, "video-wallpaper", VLC_VAR_BOOL);
+        var_SetBool(p_playlist, "video-wallpaper", newval.b_bool);
     }
     return VLC_SUCCESS;
 }

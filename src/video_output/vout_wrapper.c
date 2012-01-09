@@ -74,8 +74,6 @@ int vout_OpenWrapper(vout_thread_t *vout,
 
     /* */
 #ifdef WIN32
-    var_Create(vout, "direct3d-desktop", VLC_VAR_BOOL|VLC_VAR_DOINHERIT);
-    var_AddCallback(vout, "direct3d-desktop", Forward, NULL);
     var_Create(vout, "video-wallpaper", VLC_VAR_BOOL|VLC_VAR_DOINHERIT);
     var_AddCallback(vout, "video-wallpaper", Forward, NULL);
 #endif
@@ -94,7 +92,6 @@ void vout_CloseWrapper(vout_thread_t *vout, vout_display_state_t *state)
     vout_thread_sys_t *sys = vout->p;
 
 #ifdef WIN32
-    var_DelCallback(vout, "direct3d-desktop", Forward, NULL);
     var_DelCallback(vout, "video-wallpaper", Forward, NULL);
 #endif
     sys->decoder_pool = NULL; /* FIXME remove */
