@@ -119,7 +119,7 @@ function parse()
                 if url_map then
                     -- FIXME: do this properly
                     url_map = string.gsub( url_map, "\\u0026", "&" )
-                    for url,itag in string.gmatch( url_map, "url=([^&,]+).-&itag=(%d+)" ) do
+                    for url,itag in string.gmatch( url_map, "url=([^&,]+)[^,]*&itag=(%d+)" ) do
                         -- Apparently formats are listed in quality order,
                         -- so we can afford to simply take the first one
                         if not fmt or tonumber( itag ) == tonumber( fmt ) then
