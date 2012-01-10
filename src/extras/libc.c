@@ -326,6 +326,23 @@ vlc_iconv_t vlc_iconv_open( const char *tocode, const char *fromcode )
         return (vlc_iconv_t)(-2);
 #endif
 #if defined(HAVE_ICONV)
+# if defined(__OS2__) && defined(__INNOTEK_LIBC__)
+    char tocode_ucs2[] = "UCS-2LE";
+    char fromcode_ucs2[] = "UCS-2LE";
+
+    /* Workaround for UTF-16 because OS/2 supports UCS-2 only not UTF-16 */
+    if( !strncmp( tocode, "UTF-16", 6 ))
+    {
+        strncpy( tocode_ucs2 + 5, tocode + 6, 2 );
+        tocode = tocode_ucs2;
+    }
+
+    if( !strncmp( fromcode, "UTF-16", 6 ))
+    {
+        strncpy( fromcode_ucs2 + 5, fromcode + 6, 2 );
+        fromcode = fromcode_ucs2;
+    }
+# endif
     return iconv_open( tocode, fromcode );
 #else
     return (vlc_iconv_t)(-1);
