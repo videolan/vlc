@@ -204,17 +204,6 @@ static const guid_t asf_no_error_correction_guid =
 static const guid_t asf_guid_audio_conceal_spread =
 {0xBFC3CD50, 0x618F, 0x11CF, {0x8B, 0xB2, 0x00, 0xAA, 0x00, 0xB4, 0xE2, 0x20}};
 
-
-#define ASF_OBJECT_COMMON          \
-    int          i_type;           \
-    guid_t       i_object_id;      \
-    uint64_t     i_object_size;    \
-    uint64_t     i_object_pos;     \
-    union asf_object_u *p_father;  \
-    union asf_object_u *p_first;   \
-    union asf_object_u *p_last;    \
-    union asf_object_u *p_next;
-
 /****************************************************************************
  * GUID functions
  ****************************************************************************/
