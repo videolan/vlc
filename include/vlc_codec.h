@@ -102,6 +102,12 @@ struct decoder_t
     void            (*pf_picture_link)   ( decoder_t *, picture_t * );
     void            (*pf_picture_unlink) ( decoder_t *, picture_t * );
 
+    /**
+     * Number of extra (ie in addition to the DPB) picture buffers
+     * needed for decoding.
+     */
+    int             i_extra_picture_buffers;
+
     /* Audio output callbacks
      * XXX use decoder_NewAudioBuffer/decoder_DeleteAudioBuffer */
     aout_buffer_t  *(*pf_aout_buffer_new)( decoder_t *, int );
