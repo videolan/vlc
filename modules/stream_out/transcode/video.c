@@ -680,11 +680,14 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_t *id,
         /* Check if we have a subpicture to overlay */
         if( p_sys->p_spu )
         {
-            video_format_t fmt;
-            if( filter_chain_GetLength( id->p_f_chain ) > 0 )
-                fmt = filter_chain_GetFmtOut( id->p_f_chain )->video;
-            else
-                fmt = id->p_decoder->fmt_out.video;
+            video_format_t fmt = id->p_encoder->fmt_in.video;
+            if( fmt.i_visible_width <= 0 || fmt.i_visible_height <= 0 )
+            {
+                fmt.i_visible_width  = fmt.i_width;
+                fmt.i_visible_height = fmt.i_height;
+                fmt.i_x_offset       = 0;
+                fmt.i_y_offset       = 0;
+            }
 
             subpicture_t *p_subpic = spu_Render( p_sys->p_spu, NULL, &fmt, &fmt,
                                                  p_pic->date, p_pic->date, false );
