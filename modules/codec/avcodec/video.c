@@ -344,7 +344,11 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
 #ifdef HAVE_AVCODEC_MT
     int i_thread_count = var_InheritInteger( p_dec, "ffmpeg-threads" );
     if( i_thread_count <= 0 )
+    {
         i_thread_count = vlc_GetCPUCount();
+        if( i_thread_count > 1 )
+            i_thread_count++;
+    }
     i_thread_count = __MIN( i_thread_count, 16 );
     msg_Dbg( p_dec, "allowing %d thread(s) for decoding", i_thread_count );
     p_sys->p_context->thread_count = i_thread_count;
