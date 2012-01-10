@@ -367,6 +367,11 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
         p_sys->p_context->get_format = ffmpeg_GetFormat;
     }
 #endif
+#ifdef HAVE_AVCODEC_MT
+    if( p_sys->p_context->thread_type & FF_THREAD_FRAME )
+        p_dec->i_extra_picture_buffers = 2 * p_sys->p_context->thread_count;
+#endif
+
 
     /* ***** misc init ***** */
     p_sys->i_pts = VLC_TS_INVALID;
