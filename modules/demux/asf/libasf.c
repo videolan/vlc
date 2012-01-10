@@ -700,6 +700,14 @@ static void ASF_FreeObject_codec_list( asf_object_t *p_obj )
     FREENULL( p_cl->codec );
 }
 
+static inline char *get_wstring( const uint8_t *p_data, size_t i_size )
+{
+    char *psz_str = FromCharset( "UTF-16LE", p_data, i_size );
+    if( psz_str )
+        p_data += i_size;
+    return psz_str;
+}
+
 /* Microsoft should go to hell. This time the length give number of bytes
  * and for the some others object, length give char16 count ... */
 static int ASF_ReadObject_content_description(stream_t *s, asf_object_t *p_obj)
@@ -710,13 +718,6 @@ static int ASF_ReadObject_content_description(stream_t *s, asf_object_t *p_obj)
 
     if( ( i_peek = stream_Peek( s, &p_peek, p_cd->i_object_size ) ) < 34 )
        return VLC_EGENERIC;
-
-/* FIXME i_size*3 is the worst case. */
-#define GETSTRINGW( psz_str, i_size ) do { \
-    psz_str = FromCharset( "UTF-16LE", p_data, i_size ); \
-    if( psz_str ) { \
-        p_data += i_size; \
-    } } while(0)
 
     p_data = p_peek + 24;
 
@@ -729,13 +730,11 @@ static int ASF_ReadObject_content_description(stream_t *s, asf_object_t *p_obj)
     if( !ASF_HAVE( i_title+i_artist+i_copyright+i_description+i_rating ) )
         return VLC_EGENERIC;
 
-    GETSTRINGW( p_cd->psz_title, i_title );
-    GETSTRINGW( p_cd->psz_artist, i_artist );
-    GETSTRINGW( p_cd->psz_copyright, i_copyright );
-    GETSTRINGW( p_cd->psz_description, i_description );
-    GETSTRINGW( p_cd->psz_rating, i_rating );
-
-#undef  GETSTRINGW
+    p_cd->psz_title = get_wstring( p_data, i_title );
+    p_cd->psz_artist = get_wstring( p_data, i_artist );
+    p_cd->psz_copyright = get_wstring( p_data, i_copyright );
+    p_cd->psz_description = get_wstring( p_data, i_description );
+    p_cd->psz_rating = get_wstring( p_data, i_rating );
 
 #ifdef ASF_DEBUG
     msg_Dbg( s,
