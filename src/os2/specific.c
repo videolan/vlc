@@ -32,28 +32,22 @@ extern int _fmode_bin;
 
 void system_Init( void )
 {
-    PPIB ppib;
-    CHAR psz_path[ CCHMAXPATH ];
-    PSZ  psz_dirsep;
+    HMODULE hmod;
+    CHAR    psz_path[ CCHMAXPATH ];
+    PSZ     psz_dirsep;
 
-    DosGetInfoBlocks( NULL, &ppib );
+    DosQueryModFromEIP( &hmod, NULL, 0, NULL, NULL, ( ULONG )system_Init );
+    DosQueryModuleName( hmod, sizeof( psz_path ), psz_path );
 
-    DosQueryModuleName( ppib->pib_hmte, sizeof( psz_path ), psz_path );
-
-    /* remove the executable name */
+    /* remove the DLL name */
     psz_dirsep = strrchr( psz_path, '\\');
-    if( psz_dirsep )
-        *psz_dirsep = '\0';
-
-    /* remove the last directory, i.e, \\bin */
-    psz_dirsep = strrchr( psz_path, '\\' );
     if( psz_dirsep )
         *psz_dirsep = '\0';
 
     DosEnterCritSec();
 
     if( !psz_vlcpath )
-        asprintf( &psz_vlcpath, "%s\\lib\\vlc", psz_path );
+        asprintf( &psz_vlcpath, "%s\\vlc", psz_path );
 
     DosExitCritSec();
 
