@@ -480,8 +480,8 @@ static void transcode_video_encoder_init( sout_stream_t *p_stream,
                      id->p_decoder->fmt_out.video.i_sar_den,
                      0 );
 
-        id->p_encoder->fmt_out.video.i_sar_num = id->p_decoder->fmt_out.video.i_sar_num * i_src_width / i_dst_width;
-        id->p_encoder->fmt_out.video.i_sar_den = id->p_decoder->fmt_out.video.i_sar_den * i_src_height / i_dst_height;
+        id->p_encoder->fmt_out.video.i_sar_num = id->p_decoder->fmt_out.video.i_sar_num * i_src_width  * i_dst_height;
+        id->p_encoder->fmt_out.video.i_sar_den = id->p_decoder->fmt_out.video.i_sar_den * i_src_height * i_dst_width;
     }
     vlc_ureduce( &id->p_encoder->fmt_out.video.i_sar_num,
                  &id->p_encoder->fmt_out.video.i_sar_den,
