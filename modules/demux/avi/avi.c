@@ -59,11 +59,12 @@
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
-static const int pi_index[] = {0,1,2};
+static const int pi_index[] = {0,1,2,3};
 
 static const char *const ppsz_indexes[] = { N_("Ask for action"),
                                             N_("Always fix"),
-                                            N_("Never fix") };
+                                            N_("Never fix"),
+                                            N_("Fix when necessary")};
 
 vlc_module_begin ()
     set_shortname( "AVI" )
@@ -666,29 +667,38 @@ aviindex:
 
         msg_Warn( p_demux, "broken or missing index, 'seek' will be "
                            "approximative or will exhibit strange behavior" );
-        if( i_do_index == 0 && !b_index )
+        if( (i_do_index == 0 || i_do_index == 3) && !b_index )
         {
             if( !p_sys->b_seekable ) {
                 b_index = true;
                 goto aviindex;
             }
-            switch( dialog_Question( p_demux, _("Broken or missing AVI Index") ,
-               _( "Because this AVI file index is broken or missing, "
-                  "seeking will not work correctly.\n"
-                  "VLC won't repair your file but can temporary fix this "
-                  "problem by building an index in memory.\n"
-                  "This step might take a long time on a large file.\n"
-                  "What do you want to do?" ),
-                  _( "Build index then play" ), _( "Play as is" ), _( "Do not play") ) )
+            if( i_do_index == 0 )
             {
-                case 1:
-                    b_index = true;
-                    msg_Dbg( p_demux, "Fixing AVI index" );
-                    goto aviindex;
-                case 3:
-                    /* Kill input */
-                    vlc_object_kill( p_demux->p_parent );
-                    goto error;
+                switch( dialog_Question( p_demux, _("Broken or missing AVI Index") ,
+                   _( "Because this AVI file index is broken or missing, "
+                      "seeking will not work correctly.\n"
+                      "VLC won't repair your file but can temporary fix this "
+                      "problem by building an index in memory.\n"
+                      "This step might take a long time on a large file.\n"
+                      "What do you want to do?" ),
+                      _( "Build index then play" ), _( "Play as is" ), _( "Do not play") ) )
+                {
+                    case 1:
+                        b_index = true;
+                        msg_Dbg( p_demux, "Fixing AVI index" );
+                        goto aviindex;
+                    case 3:
+                        /* Kill input */
+                        vlc_object_kill( p_demux->p_parent );
+                        goto error;
+                }
+            }
+            else
+            {
+                b_index = true;
+                msg_Dbg( p_demux, "Fixing AVI index" );
+                goto aviindex;
             }
         }
     }
