@@ -1604,11 +1604,12 @@ int ASF_CountObject( void *_p_obj, const guid_t *p_guid )
     return i_count;
 }
 
-void *__ASF_FindObject( asf_object_t *p_obj, const guid_t *p_guid,
+void *ASF_FindObject( void *_p_obj, const guid_t *p_guid,
                         int i_number )
 {
-    asf_object_t *p_child;
+    asf_object_t *p_child, *p_obj;
 
+    p_obj = (asf_object_t *)_p_obj;
     p_child = p_obj->common.p_first;
 
     while( p_child )

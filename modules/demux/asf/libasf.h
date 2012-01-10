@@ -361,5 +361,4 @@ void               ASF_FreeObjectRoot( stream_t *, asf_object_root_t *p_root );
 
 int ASF_CountObject ( void *p_obj, const guid_t *p_guid );
 
-#define ASF_FindObject( a, b, c )  __ASF_FindObject( (asf_object_t*)(a), b, c )
-void *__ASF_FindObject( asf_object_t *p_obj, const guid_t *p_guid, int i_number );
+void *ASF_FindObject( void *p_obj, const guid_t *p_guid, int i_number );
