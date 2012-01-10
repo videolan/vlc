@@ -1583,11 +1583,12 @@ void ASF_FreeObjectRoot( stream_t *s, asf_object_root_t *p_root )
     free( p_root );
 }
 
-int  __ASF_CountObject( asf_object_t *p_obj, const guid_t *p_guid )
+int ASF_CountObject( void *_p_obj, const guid_t *p_guid )
 {
     int i_count;
-    asf_object_t *p_child;
+    asf_object_t *p_child, *p_obj;
 
+    p_obj = (asf_object_t *)_p_obj;
     if( !p_obj )
         return 0;
 

@@ -359,8 +359,7 @@ typedef union asf_object_u
 asf_object_root_t *ASF_ReadObjectRoot( stream_t *, int b_seekable );
 void               ASF_FreeObjectRoot( stream_t *, asf_object_root_t *p_root );
 
-#define ASF_CountObject( a, b ) __ASF_CountObject( (asf_object_t*)(a), b )
-int  __ASF_CountObject ( asf_object_t *p_obj, const guid_t *p_guid );
+int ASF_CountObject ( void *p_obj, const guid_t *p_guid );
 
 #define ASF_FindObject( a, b, c )  __ASF_FindObject( (asf_object_t*)(a), b, c )
 void *__ASF_FindObject( asf_object_t *p_obj, const guid_t *p_guid, int i_number );
