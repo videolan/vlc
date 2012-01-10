@@ -152,6 +152,9 @@ case "${host_os}" in
     VLC_ADD_CFLAGS([motion],[-fconstant-cfstrings])
     VLC_ADD_LIBS([libvlccore],[-Wl,-framework,CoreFoundation])
 
+    dnl Allow binaries created on Lion to run on earlier releases
+    AC_LIBOBJ([getdelim])
+
     dnl
     dnl  Check for Mac OS X SDK settings
     dnl
