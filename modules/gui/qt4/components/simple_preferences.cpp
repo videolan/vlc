@@ -69,11 +69,11 @@ SPrefsCatList::SPrefsCatList( intf_thread_t *_p_intf, QWidget *_parent, bool sma
 
     short icon_height = small ? ICON_HEIGHT /2 : ICON_HEIGHT;
 
-#define ADD_CATEGORY( button, label, icon, numb )                           \
+#define ADD_CATEGORY( button, label, ltooltip, icon, numb )                 \
     QToolButton * button = new QToolButton( this );                         \
     button->setIcon( QIcon( ":/prefsmenu/" #icon ) );                       \
     button->setText( label );                                               \
-    button->setToolTip( label + qtr("Preferences") );                       \
+    button->setToolTip( ltooltip );                                         \
     button->setToolButtonStyle( Qt::ToolButtonTextUnderIcon );              \
     button->setIconSize( QSize( icon_height, icon_height ) );               \
     button->resize( icon_height + 6 , icon_height + 6 );                    \
@@ -83,17 +83,17 @@ SPrefsCatList::SPrefsCatList( intf_thread_t *_p_intf, QWidget *_parent, bool sma
     buttonGroup->addButton( button, numb );                                 \
     layout->addWidget( button );
 
-    ADD_CATEGORY( SPrefsInterface, qtr("Interface"),
+    ADD_CATEGORY( SPrefsInterface, qtr("Interface"), qtr("Interface Settings"),
                   cone_interface_64, 0 );
-    ADD_CATEGORY( SPrefsAudio, qtr("Audio"),
+    ADD_CATEGORY( SPrefsAudio, qtr("Audio"), qtr("Audio Settings"),
                   cone_audio_64, 1 );
-    ADD_CATEGORY( SPrefsVideo, qtr("Video"),
+    ADD_CATEGORY( SPrefsVideo, qtr("Video"), qtr("Video Settings"),
                   cone_video_64, 2 );
-    ADD_CATEGORY( SPrefsSubtitles, qtr("Subtitles && OSD"),
+    ADD_CATEGORY( SPrefsSubtitles, qtr("Subtitles && OSD"), qtr("Subtitles & On Screen Display Settings"),
                   cone_subtitles_64, 3 );
-    ADD_CATEGORY( SPrefsInputAndCodecs, qtr("Input && Codecs"),
+    ADD_CATEGORY( SPrefsInputAndCodecs, qtr("Input && Codecs"), qtr("Input & Codecs Settings"),
                   cone_input_64, 4 );
-    ADD_CATEGORY( SPrefsHotkeys, qtr("Hotkeys"),
+    ADD_CATEGORY( SPrefsHotkeys, qtr("Hotkeys"), qtr("Configure Hotkeys"),
                   cone_hotkeys_64, 5 );
 
 #undef ADD_CATEGORY
