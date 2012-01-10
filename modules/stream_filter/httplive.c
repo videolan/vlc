@@ -1065,6 +1065,8 @@ static int hls_UpdatePlaylist(stream_t *s, hls_stream_t *hls_new, hls_stream_t *
             assert(p->url.psz_path);
             assert(segment->url.psz_path);
 
+            vlc_mutex_lock(&segment->lock);
+
             /* they should be the same */
             if ((p->sequence != segment->sequence) ||
                 (p->duration != segment->duration) ||
@@ -1091,6 +1093,8 @@ static int hls_UpdatePlaylist(stream_t *s, hls_stream_t *hls_new, hls_stream_t *
                 segment_Free(p);
                 free(psz_url);
             }
+
+            vlc_mutex_unlock(&segment->lock);
         }
         else
         {
