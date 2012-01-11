@@ -611,8 +611,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     [o_remote setClickCountEnabledButtons: kRemoteButtonPlay];
     [o_remote setDelegate: _o_sharedMainInstance];
 
-    b_msg_live_update = [[NSUserDefaults standardUserDefaults] boolForKey:@"LiveUpdateTheMessagesPanel"];
-    [o_msgs_liveUpdate_ckb setState: b_msg_live_update];
+    [o_msgs_refresh_btn setImage: [NSImage imageNamed: NSImageNameRefreshTemplate]];
 
     /* yeah, we are done */
     b_nativeFullscreenMode = config_GetInt( p_intf, "macosx-nativefullscreenmode" );
@@ -660,7 +659,6 @@ static VLCMain *_o_sharedMainInstance = nil;
     [o_msgs_panel setTitle: _NS("Messages")];
     [o_msgs_crashlog_btn setTitle: _NS("Open CrashLog...")];
     [o_msgs_save_btn setTitle: _NS("Save this Log...")];
-    [o_msgs_liveUpdate_ckb setTitle: _NS("Live Update")];
 
     /* crash reporter panel */
     [o_crashrep_send_btn setTitle: _NS("Send")];
@@ -1837,15 +1835,9 @@ unsigned int CocoaKeyToVLC( unichar i_key )
 
 #pragma mark -
 #pragma mark Errors, warnings and messages
-- (IBAction)liveUpdateMessagesPanel:(id)sender
+- (IBAction)updateMessagesPanel:(id)sender
 {
-    if ([[NSUserDefaults standardUserDefaults] boolForKey:@"LiveUpdateTheMessagesPanel"])
-        [[NSUserDefaults standardUserDefaults] setObject:@"NO" forKey:@"LiveUpdateTheMessagesPanel"];
-    else
-        [[NSUserDefaults standardUserDefaults] setObject:@"YES" forKey:@"LiveUpdateTheMessagesPanel"];
-
-    b_msg_live_update = [[NSUserDefaults standardUserDefaults] boolForKey:@"LiveUpdateTheMessagesPanel"];
-    [o_msgs_liveUpdate_ckb setState: b_msg_live_update];
+    [self windowDidBecomeKey:nil];
 }
 
 - (IBAction)showMessagesPanel:(id)sender
@@ -1855,29 +1847,20 @@ unsigned int CocoaKeyToVLC( unichar i_key )
 
 - (void)windowDidBecomeKey:(NSNotification *)o_notification
 {
-    if( [o_notification object] == o_msgs_panel )
-        [self updateMessageDisplay];
+    [o_msgs_table reloadData];
+    [o_msgs_table scrollRowToVisible: [o_msg_arr count] - 1];
 }
 
-- (void)updateMessageDisplay
+- (NSInteger)numberOfRowsInTableView:(NSTableView *)aTableView
 {
-    if( [o_msgs_panel isVisible] && (b_msg_live_update || [o_msgs_panel isKeyWindow]) && b_msg_arr_changed )
-    {
-        id o_msg;
-        NSEnumerator * o_enum;
+    if (aTableView == o_msgs_table)
+        return [o_msg_arr count];
+    return 0; 
+}
 
-        [o_messages setString: @""];
-
-        [o_msg_lock lock];
-
-        o_enum = [o_msg_arr objectEnumerator];
-
-        while( ( o_msg = [o_enum nextObject] ) != NULL )
-            [o_messages insertText: o_msg];
-
-        b_msg_arr_changed = NO;
-        [o_msg_lock unlock];
-    }
+- (id)tableView:(NSTableView *)aTableView objectValueForTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
+{
+    return [o_msg_arr objectAtIndex: rowIndex];
 }
 
 - (void)processReceivedlibvlcMessage:(const msg_item_t *) item ofType: (int)i_type withStr: (char *)str
@@ -1886,12 +1869,13 @@ unsigned int CocoaKeyToVLC( unichar i_key )
     NSColor *o_red = [NSColor redColor];
     NSColor *o_yellow = [NSColor yellowColor];
     NSColor *o_gray = [NSColor grayColor];
+    NSString * firstString, * secondString;
 
     NSColor * pp_color[4] = { o_white, o_red, o_yellow, o_gray };
     static const char * ppsz_type[4] = { ": ", " error: ", " warning: ", " debug: " };
 
     NSDictionary *o_attr;
-    NSAttributedString *o_msg_color;
+    NSMutableAttributedString *o_msg_color;
 
     [o_msg_lock lock];
 
@@ -1900,19 +1884,17 @@ unsigned int CocoaKeyToVLC( unichar i_key )
         [o_msg_arr removeObjectAtIndex: 0];
         [o_msg_arr removeObjectAtIndex: 1];
     }
+    firstString = [NSString stringWithFormat:@"%s%s", item->psz_module, ppsz_type[i_type]];
+    secondString = [NSString stringWithFormat:@"%@%s\n", firstString, str];
 
+    o_attr = [NSDictionary dictionaryWithObject: pp_color[i_type]  forKey: NSForegroundColorAttributeName];
+    o_msg_color = [[NSMutableAttributedString alloc] initWithString: secondString attributes: o_attr];
     o_attr = [NSDictionary dictionaryWithObject: pp_color[3] forKey: NSForegroundColorAttributeName];
-    o_msg_color = [[NSAttributedString alloc] initWithString: [NSString stringWithFormat: @"%s%s", item->psz_module, ppsz_type[i_type]] attributes: o_attr];
-    [o_msg_arr addObject: [o_msg_color autorelease]];
-
-    o_attr = [NSDictionary dictionaryWithObject: pp_color[i_type] forKey: NSForegroundColorAttributeName];
-    o_msg_color = [[NSAttributedString alloc] initWithString: [NSString stringWithFormat: @"%s\n", str] attributes: o_attr];
+    [o_msg_color setAttributes: o_attr range: NSMakeRange( 0, [firstString length] )];
     [o_msg_arr addObject: [o_msg_color autorelease]];
 
     b_msg_arr_changed = YES;
     [o_msg_lock unlock];
-
-    [self performSelectorOnMainThread:@selector(updateMessageDisplay) withObject: nil waitUntilDone:NO];
 }
 
 - (IBAction)saveDebugLog:(id)sender
@@ -1930,7 +1912,15 @@ unsigned int CocoaKeyToVLC( unichar i_key )
     BOOL b_returned;
     if( returnCode == NSOKButton )
     {
-        b_returned = [o_messages writeRTFDToFile: [[sheet URL] path] atomically: YES];
+        NSUInteger count = [o_msg_arr count];
+        NSMutableAttributedString * string = [[NSMutableAttributedString alloc] init];
+        for (NSUInteger i = 0; i < count; i++)
+        {
+            [string appendAttributedString: [o_msg_arr objectAtIndex: i]];
+        }
+        b_returned = [[string RTFDFileWrapperFromRange:NSMakeRange( 0, [string length] ) documentAttributes:[NSDictionary dictionaryWithObject: NSRTFDTextDocumentType forKey: NSDocumentTypeDocumentAttribute]] writeToFile:[[sheet URL] path] atomically:YES updateFilenames:NO];
+        [string release];
+
         if(! b_returned )
             msg_Warn( p_intf, "Error while saving the debug log" );
     }

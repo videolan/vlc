@@ -1,7 +1,7 @@
 /*****************************************************************************
  * intf.h: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2002-2011 VLC authors and VideoLAN
+ * Copyright (C) 2002-2012 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -116,15 +116,14 @@ struct intf_sys_t
     IBOutlet VLCControls * o_controls;     /* VLCControls    */
     IBOutlet VLCPlaylist * o_playlist;     /* VLCPlaylist    */
 
-    IBOutlet NSTextView * o_messages;           /* messages tv    */
     IBOutlet NSWindow * o_msgs_panel;           /* messages panel */
     NSMutableArray * o_msg_arr;                 /* messages array */
     NSLock * o_msg_lock;                        /* messages lock */
     BOOL b_msg_arr_changed;                     /* did the array change? */
     IBOutlet NSButton * o_msgs_crashlog_btn;    /* messages open crashlog */
     IBOutlet NSButton * o_msgs_save_btn;        /* save the log as rtf */
-    IBOutlet NSButton * o_msgs_liveUpdate_ckb;  /* always update the panel when visible */
-    BOOL b_msg_live_update;
+    IBOutlet NSButton * o_msgs_refresh_btn;     /* update the panel */
+    IBOutlet id o_msgs_table;
 
     /* CrashReporter panel */
     IBOutlet NSButton * o_crashrep_dontSend_btn;
@@ -195,13 +194,11 @@ struct intf_sys_t
 - (void)initStrings;
 - (BOOL)application:(NSApplication *)o_app openFile:(NSString *)o_filename;
 
-- (void)updateMessageDisplay;
-
 - (IBAction)crashReporterAction:(id)sender;
 - (IBAction)openCrashLog:(id)sender;
 - (IBAction)saveDebugLog:(id)sender;
 - (IBAction)showMessagesPanel:(id)sender;
-- (IBAction)liveUpdateMessagesPanel:(id)sender;
+- (IBAction)updateMessagesPanel:(id)sender;
 
 - (void)processReceivedlibvlcMessage:(const msg_item_t *) item ofType: (int)type withStr: (char *)str;
 
