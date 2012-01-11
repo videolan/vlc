@@ -127,6 +127,7 @@ typedef enum vlc_event_type_t {
     /* Service Discovery event */
     vlc_ServicesDiscoveryItemAdded,
     vlc_ServicesDiscoveryItemRemoved,
+    vlc_ServicesDiscoveryItemRemoveAll,
     vlc_ServicesDiscoveryStarted,
     vlc_ServicesDiscoveryEnded
 } vlc_event_type_t;

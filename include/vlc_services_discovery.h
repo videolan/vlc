@@ -157,6 +157,7 @@ VLC_API vlc_event_manager_t * services_discovery_EventManager( services_discover
      * for more options, directly set the (meta) data on the input item */
 VLC_API void services_discovery_AddItem( services_discovery_t * p_this, input_item_t * p_item, const char * psz_category );
 VLC_API void services_discovery_RemoveItem( services_discovery_t * p_this, input_item_t * p_item );
+VLC_API void services_discovery_RemoveAll( services_discovery_t * p_sd );
 
 
 /* SD probing */

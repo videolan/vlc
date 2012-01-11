@@ -120,6 +120,7 @@ services_discovery_t *vlc_sd_Create( vlc_object_t *p_super,
     vlc_event_manager_init( em, p_sd );
     vlc_event_manager_register_event_type(em, vlc_ServicesDiscoveryItemAdded);
     vlc_event_manager_register_event_type(em, vlc_ServicesDiscoveryItemRemoved);
+    vlc_event_manager_register_event_type(em, vlc_ServicesDiscoveryItemRemoveAll);
     vlc_event_manager_register_event_type(em, vlc_ServicesDiscoveryStarted);
     vlc_event_manager_register_event_type(em, vlc_ServicesDiscoveryEnded);
 
@@ -205,6 +206,18 @@ vlc_event_manager_t *
 services_discovery_EventManager ( services_discovery_t * p_sd )
 {
     return &p_sd->event_manager;
+}
+
+/*******************************************************************//**
+ * Remove all items from the Service Discovery listing
+ ***********************************************************************/
+void
+services_discovery_RemoveAll ( services_discovery_t * p_sd )
+{
+    vlc_event_t event;
+    event.type = vlc_ServicesDiscoveryItemRemoveAll;
+
+    vlc_event_send( &p_sd->event_manager, &event );
 }
 
 /*******************************************************************//**
@@ -306,6 +319,17 @@ static void playlist_sd_item_removed( const vlc_event_t * p_event, void * user_d
     PL_UNLOCK;
 }
 
+/* A request to remove all ideas from SD */
+static void playlist_sd_item_removeall( const vlc_event_t * p_event, void * user_data )
+{
+    playlist_item_t* p_sd_node = user_data;
+    if( p_sd_node == NULL ) return;
+    playlist_t* p_playlist = p_sd_node->p_playlist;
+    PL_LOCK;
+    playlist_NodeEmpty( p_playlist, p_sd_node, true );
+    PL_UNLOCK;
+}
+
 int playlist_ServicesDiscoveryAdd( playlist_t *p_playlist,
                                    const char *psz_name )
 {
@@ -354,6 +378,9 @@ int playlist_ServicesDiscoveryAdd( playlist_t *p_playlist,
 
     vlc_event_attach( em, vlc_ServicesDiscoveryItemRemoved,
                       playlist_sd_item_removed, p_node );
+
+    vlc_event_attach( em, vlc_ServicesDiscoveryItemRemoveAll,
+                      playlist_sd_item_removeall, p_node );
 
     if( !vlc_sd_Start( p_sd ) )
     {

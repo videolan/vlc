@@ -129,6 +129,22 @@ static void services_discovery_item_removed( const vlc_event_t * p_event,
 }
 
 /**************************************************************************
+ *       services_discovery_removeall (Private) (VLC event callback)
+ **************************************************************************/
+static void services_discovery_removeall( const vlc_event_t * p_event,
+                                             void * user_data )
+{
+    libvlc_media_discoverer_t * p_mdis = user_data;
+
+    libvlc_media_list_lock( p_mdis->p_mlist );
+    for( int i = 0; i < libvlc_media_list_count( p_mdis->p_mlist ); i++ )
+    {
+        _libvlc_media_list_remove_index( p_mdis->p_mlist, i );
+    }
+    libvlc_media_list_unlock( p_mdis->p_mlist );
+}
+
+/**************************************************************************
  *       services_discovery_started (Private) (VLC event callback)
  **************************************************************************/
 
@@ -226,6 +242,10 @@ libvlc_media_discoverer_new_from_name( libvlc_instance_t * p_inst,
                       vlc_ServicesDiscoveryEnded,
                       services_discovery_ended,
                       p_mdis );
+    vlc_event_attach( services_discovery_EventManager( p_mdis->p_sd ),
+                      vlc_ServicesDiscoveryItemRemoveAll,
+                      services_discovery_removeall,
+                      p_mdis );
 
     /* Here we go */
     if( !vlc_sd_Start( p_mdis->p_sd ) )
@@ -264,6 +284,10 @@ libvlc_media_discoverer_release( libvlc_media_discoverer_t * p_mdis )
     vlc_event_detach( services_discovery_EventManager( p_mdis->p_sd ),
                      vlc_ServicesDiscoveryEnded,
                      services_discovery_ended,
+                     p_mdis );
+    vlc_event_detach( services_discovery_EventManager( p_mdis->p_sd ),
+                     vlc_ServicesDiscoveryItemRemoveAll,
+                     services_discovery_removeall,
                      p_mdis );
 
     libvlc_media_list_release( p_mdis->p_mlist );
