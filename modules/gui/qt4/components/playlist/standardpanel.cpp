@@ -151,8 +151,10 @@ void StandardPLPanel::search( const QString& searchText )
 {
     int type;
     QString name;
-    p_selector->getCurrentSelectedItem( &type, &name );
-    if( type != SD_TYPE )
+    bool can_search;
+    p_selector->getCurrentItemInfos( &type, &can_search, &name );
+
+    if( type != SD_TYPE || !can_search )
     {
         bool flat = ( currentView == iconView ||
                       currentView == listView ||
@@ -167,10 +169,12 @@ void StandardPLPanel::searchDelayed( const QString& searchText )
 {
     int type;
     QString name;
-    p_selector->getCurrentSelectedItem( &type, &name );
+    bool can_search;
+    p_selector->getCurrentItemInfos( &type, &can_search, &name );
 
-    if( type == SD_TYPE )
+    if( type == SD_TYPE && can_search )
     {
+        msg_Err( p_intf, "SEARCHING DELAYED");
         if( !name.isEmpty() && !searchText.isEmpty() )
             playlist_ServicesDiscoveryControl( THEPL, qtu( name ), SD_CMD_SEARCH,
                                               qtu( searchText ) );

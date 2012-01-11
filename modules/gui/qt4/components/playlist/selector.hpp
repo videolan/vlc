@@ -60,7 +60,8 @@ enum {
     PL_ITEM_ROLE,        //playlist_item_t*
     PL_ITEM_ID_ROLE,     //playlist_item_t->i_id
     IN_ITEM_ROLE,        //input_item_t->i_id
-    SPECIAL_ROLE         //SpecialData
+    SPECIAL_ROLE,        //SpecialData
+    CAP_SEARCH_ROLE,
 };
 
 enum ItemAction {
@@ -116,7 +117,7 @@ public:
     PLSelector( QWidget *p, intf_thread_t *_p_intf );
     virtual ~PLSelector();
 
-    void getCurrentSelectedItem( int *type, QString *name );
+    void getCurrentItemInfos( int *type, bool *delayedSearch, QString *name );
     int getCurrentItemCategory();
 
 protected:

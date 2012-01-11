@@ -278,7 +278,14 @@ void PLSelector::setSource( QTreeWidgetItem *item )
         QString qs = item->data( 0, NAME_ROLE ).toString();
         sd_loaded = playlist_IsServicesDiscoveryLoaded( THEPL, qtu( qs ) );
         if( !sd_loaded )
+        {
             playlist_ServicesDiscoveryAdd( THEPL, qtu( qs ) );
+
+            services_discovery_descriptor_t *p_test = new services_discovery_descriptor_t;
+            playlist_ServicesDiscoveryControl( THEPL, qtu( qs ), SD_CMD_DESCRIPTOR, p_test );
+            if( p_test->i_capabilities & SD_CAP_SEARCH )
+                item->setData( 0, CAP_SEARCH_ROLE, true );
+        }
     }
 #ifdef MEDIA_LIBRARY
     else if( i_type == SQL_ML_TYPE )
@@ -528,10 +535,11 @@ void PLSelector::drawBranches ( QPainter * painter, const QRect & rect, const QM
                             QStyle::PE_IndicatorArrowRight, &option, painter );
 }
 
-void PLSelector::getCurrentSelectedItem( int* type, QString *string)
+void PLSelector::getCurrentItemInfos( int* type, bool* can_delay_search, QString *string)
 {
     *type = currentItem()->data( 0, TYPE_ROLE ).toInt();
     *string = currentItem()->data( 0, NAME_ROLE ).toString();
+    *can_delay_search = currentItem()->data( 0, CAP_SEARCH_ROLE ).toBool();
 }
 
 int PLSelector::getCurrentItemCategory()
