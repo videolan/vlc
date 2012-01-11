@@ -336,7 +336,7 @@ sd.remove_item( item ): remove the item.
 
 n = vlc.sd.add_node( {title="Node"} )
 n:add_subitem( ... ): Same as sd.add_item(), but as a subitem of n.
-n:add_node( ... ): Same as sd.add_node(), but as a subnode of n.
+n:add_subnode( ... ): Same as sd.add_node(), but as a subnode of n.
 
 Stream
 ------

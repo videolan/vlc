@@ -46,11 +46,11 @@
  *
  *****************************************************************************/
 static int vlclua_node_add_subitem( lua_State * );
-static int vlclua_node_add_node( lua_State * );
+static int vlclua_node_add_subnode( lua_State * );
 
 static const luaL_Reg vlclua_node_reg[] = {
     { "add_subitem", vlclua_node_add_subitem },
-    { "add_node", vlclua_node_add_node },
+    { "add_subnode", vlclua_node_add_subnode },
     { NULL, NULL }
 };
 
@@ -276,7 +276,7 @@ static int vlclua_node_add_subitem( lua_State *L )
     return 1;
 }
 
-static int vlclua_node_add_node( lua_State *L )
+static int vlclua_node_add_subnode( lua_State *L )
 {
     services_discovery_t *p_sd = (services_discovery_t *)vlclua_get_this( L );
     input_item_t **pp_node = (input_item_t **)luaL_checkudata( L, 1, "node" );
