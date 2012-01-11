@@ -15,9 +15,7 @@ FFMPEGCONF = \
 	--disable-ffmpeg \
 	--disable-avconv \
 	--disable-devices \
-	--disable-protocols \
-	--disable-avfilter \
-	--disable-network
+	--disable-avfilter
 
 # Those tools are named differently in FFmpeg and Libav
 #	--disable-ffserver \
