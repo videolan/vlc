@@ -212,6 +212,7 @@
 - (IBAction)resizeVideoWindow:(id)sender;
 - (IBAction)floatOnTop:(id)sender;
 - (IBAction)createVideoSnapshot:(id)sender;
+- (IBAction)toggleFullscreenDevice:(id)sender;
 
 - (IBAction)showWizard:(id)sender;
 - (IBAction)showVideoEffects:(id)sender;

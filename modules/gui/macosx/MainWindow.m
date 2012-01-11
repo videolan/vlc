@@ -1285,7 +1285,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     BOOL blackout_other_displays = config_GetInt( VLCIntf, "macosx-black" );
 
     if( p_vout )
-        screen = [NSScreen screenWithDisplayID:(CGDirectDisplayID)var_GetInteger( p_vout, "video-device" )];
+        screen = [NSScreen screenWithDisplayID:(CGDirectDisplayID)config_GetInt( VLCIntf, "macosx-vdev" )];
 
     [self lockFullscreenAnimation];
 

@@ -445,9 +445,6 @@ static VLCMainMenu *_o_sharedInstance = nil;
             [self setupVarMenuItem: o_mi_crop target: (vlc_object_t *) p_vout
                                      var: "crop" selector: @selector(toggleVar:)];
 
-            [self setupVarMenuItem: o_mi_screen target: (vlc_object_t *)p_vout
-                                     var: "video-device" selector: @selector(toggleVar:)];
-
             [self setupVarMenuItem: o_mi_deinterlace target: (vlc_object_t *)p_vout
                                      var: "deinterlace" selector: @selector(toggleVar:)];
 
@@ -460,6 +457,9 @@ static VLCMainMenu *_o_sharedInstance = nil;
              @selector(toggleVar:)];
 #endif
             vlc_object_release( (vlc_object_t *)p_vout );
+
+            [self refreshVoutDeviceMenu:nil];
+            [self setSubmenusEnabled: YES];
         }
         vlc_object_release( p_input );
     }
@@ -471,25 +471,37 @@ static VLCMainMenu *_o_sharedInstance = nil;
 
 - (void)refreshVoutDeviceMenu:(NSNotification *)o_notification
 {
-    int x, y = 0;
-    vout_thread_t * p_vout = getVout();
-    if( !p_vout )
-        return;
-
-    /* clean the menu before adding new entries */
-    if( [o_mi_screen hasSubmenu] )
+    NSUInteger count = [o_mu_screen numberOfItems];
+    NSMenu * o_submenu = o_mu_screen;
+    if (count > 0)
     {
-        y = [[o_mi_screen submenu] numberOfItems] - 1;
-        while( x != y )
+        if (OSX_LEOPARD)
         {
-            [[o_mi_screen submenu] removeItemAtIndex: x];
-            x++;
+            NSUInteger count = [o_submenu numberOfItems];
+            for( NSUInteger i = 0; i < count; i++ )
+                [o_submenu removeItemAtIndex: 0];
         }
+        else
+            [o_submenu removeAllItems];
     }
 
-    [self setupVarMenuItem: o_mi_screen target: (vlc_object_t *)p_vout
-                             var: "video-device" selector: @selector(toggleVar:)];
-    vlc_object_release( (vlc_object_t *)p_vout );
+    NSArray * o_screens = [NSScreen screens];
+    count = [o_screens count];
+    [o_submenu addItemWithTitle: _NS("Default") action:@selector(toggleFullscreenDevice:) keyEquivalent:@""];
+    [[o_submenu itemAtIndex: 0] setTag: 0];
+    [[o_submenu itemAtIndex: 0] setEnabled: YES];
+    [[o_submenu itemAtIndex: 0] setTarget: self];
+    NSRect s_rect;
+    for (NSUInteger i = 0; i < count; i++)
+    {
+        s_rect = [[o_screens objectAtIndex: i] frame];
+        [o_submenu addItemWithTitle: [NSString stringWithFormat: @"%@ %i (%ix%i)", _NS("Screen"), i+1,
+                                      (int)s_rect.size.width, (int)s_rect.size.height] action:@selector(toggleFullscreenDevice:) keyEquivalent:@""];
+        [[o_submenu itemAtIndex:i+1] setTag: (int)[[o_screens objectAtIndex: i] displayID]];
+        [[o_submenu itemAtIndex:i+1] setEnabled: YES];
+        [[o_submenu itemAtIndex:i+1] setTarget: self];
+    }
+    [[o_submenu itemWithTag: config_GetInt( VLCIntf, "macosx-vdev" )] setState: NSOnState];
 }
 
 - (void)setSubmenusEnabled:(BOOL)b_enabled
@@ -622,6 +634,12 @@ static VLCMainMenu *_o_sharedInstance = nil;
         }
         vlc_object_release( p_input );
     }
+}
+
+- (IBAction)toggleFullscreenDevice:(id)sender
+{
+    config_PutInt( VLCIntf, "macosx-vdev", [sender tag] );
+    [self refreshVoutDeviceMenu: nil];
 }
 
 - (id)voutMenu
