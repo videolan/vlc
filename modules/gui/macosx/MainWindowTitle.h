@@ -1,7 +1,7 @@
 /*****************************************************************************
  * MainWindowTitle.h: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2011 Felix Paul Kühne
+ * Copyright (C) 2011-2012 Felix Paul Kühne
  * $Id$
  *
  * Authors: Felix Paul Kühne <fkuehne -at- videolan -dot- org>
@@ -64,5 +64,9 @@
 @interface VLCResizeControl : NSImageView
 {
 }
+@end
 
+@interface VLCColorView : NSView
+{
+}
 @end

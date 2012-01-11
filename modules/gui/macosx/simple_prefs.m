@@ -133,6 +133,8 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
 
     if (OSX_LION)
         [o_sprefs_win setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
+    else
+        [o_intf_nativefullscreen_ckb setEnabled:NO];
 #ifndef MAC_OS_X_VERSION_10_7
     [o_intf_nativefullscreen_ckb setEnabled:NO];
 #endif

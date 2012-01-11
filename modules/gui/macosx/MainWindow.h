@@ -30,6 +30,7 @@
 #import <vlc_input.h>
 #import "misc.h"
 #import "fspanel.h"
+#import "MainWindowTitle.h"
 
 @interface VLCMainWindow : NSWindow <PXSourceListDataSource, PXSourceListDelegate, NSWindowDelegate, NSAnimationDelegate, NSSplitViewDelegate> {
     IBOutlet id o_play_btn;
@@ -112,6 +113,7 @@
 
     NSTimer *t_hide_mouse_timer;
 
+    VLCColorView * o_color_backdrop;
     NSInteger i_originalLevel;
     NSRect previousSavedFrame;
 }

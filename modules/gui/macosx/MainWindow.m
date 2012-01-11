@@ -33,7 +33,6 @@
 #import "open.h"
 #import "controls.h" // TODO: remove me
 #import "SideBarItem.h"
-#import "MainWindowTitle.h"
 #import <vlc_playlist.h>
 #import <vlc_aout_intf.h>
 #import <vlc_url.h>
@@ -109,6 +108,9 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
 - (void)dealloc
 {
+    if (b_dark_interface)
+        [o_color_backdrop release];
+
     [[NSNotificationCenter defaultCenter] removeObserver: self];
     config_PutInt( VLCIntf->p_libvlc, "volume", i_lastShownVolume );
     [self saveFrameUsingName: [self frameAutosaveName]];
@@ -423,6 +425,10 @@ static VLCMainWindow *_o_sharedInstance = nil;
         [o_split_view setFrame: winrect];
         [o_video_view setFrame: winrect];
         previousSavedFrame = winrect;
+
+        o_color_backdrop = [[VLCColorView alloc] initWithFrame: [o_split_view frame]];
+        [[self contentView] addSubview: o_color_backdrop positioned: NSWindowBelow relativeTo: o_split_view];
+        [o_color_backdrop setAutoresizingMask:NSViewHeightSizable | NSViewWidthSizable];
 
         [self display];
     }

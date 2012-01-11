@@ -1,7 +1,7 @@
 /*****************************************************************************
  * MainWindowTitle.m: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2011 Felix Paul Kühne
+ * Copyright (C) 2011-2012 Felix Paul Kühne
  * $Id$
  *
  * Authors: Felix Paul Kühne <fkuehne -at- videolan -dot- org>
@@ -269,6 +269,22 @@
     }
 
     [[self window] setFrame: windowFrame display: YES animate: NO];
+}
+
+@end
+
+/*****************************************************************************
+ * VLCColorView
+ *
+ * since we are using a clear window color when using the black window 
+ * style, some filling is needed behind the video and some other elements
+ *****************************************************************************/
+
+@implementation VLCColorView
+
+- (void)drawRect:(NSRect)rect {
+    [[NSColor blackColor] setFill];
+    NSRectFill(rect);
 }
 
 @end
