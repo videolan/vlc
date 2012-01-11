@@ -119,7 +119,11 @@ static VLCMainWindow *_o_sharedInstance = nil;
 - (void)awakeFromNib
 {
     /* setup the styled interface */
+#ifdef MAC_OS_X_VERSION_10_7
     b_nativeFullscreenMode = config_GetInt( VLCIntf, "macosx-nativefullscreenmode" );
+#else
+    b_nativeFullscreenMode = NO;
+#endif
     i_lastShownVolume = -1;
     t_hide_mouse_timer = nil;
 

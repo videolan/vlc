@@ -486,20 +486,23 @@ static VLCMainMenu *_o_sharedInstance = nil;
     }
 
     NSArray * o_screens = [NSScreen screens];
+    NSMenuItem * o_mitem;
     count = [o_screens count];
     [o_submenu addItemWithTitle: _NS("Default") action:@selector(toggleFullscreenDevice:) keyEquivalent:@""];
-    [[o_submenu itemAtIndex: 0] setTag: 0];
-    [[o_submenu itemAtIndex: 0] setEnabled: YES];
-    [[o_submenu itemAtIndex: 0] setTarget: self];
+    o_mitem = [o_submenu itemAtIndex: 0];
+    [o_mitem setTag: 0];
+    [o_mitem setEnabled: YES];
+    [o_mitem setTarget: self];
     NSRect s_rect;
     for (NSUInteger i = 0; i < count; i++)
     {
         s_rect = [[o_screens objectAtIndex: i] frame];
         [o_submenu addItemWithTitle: [NSString stringWithFormat: @"%@ %i (%ix%i)", _NS("Screen"), i+1,
                                       (int)s_rect.size.width, (int)s_rect.size.height] action:@selector(toggleFullscreenDevice:) keyEquivalent:@""];
-        [[o_submenu itemAtIndex:i+1] setTag: (int)[[o_screens objectAtIndex: i] displayID]];
-        [[o_submenu itemAtIndex:i+1] setEnabled: YES];
-        [[o_submenu itemAtIndex:i+1] setTarget: self];
+        o_mitem = [o_submenu itemAtIndex:i+1];
+        [o_mitem setTag: (int)[[o_screens objectAtIndex: i] displayID]];
+        [o_mitem setEnabled: YES];
+        [o_mitem setTarget: self];
     }
     [[o_submenu itemWithTag: config_GetInt( VLCIntf, "macosx-vdev" )] setState: NSOnState];
 }
@@ -1169,7 +1172,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
     }
     else if( [o_title isEqualToString: _NS("Mute")] )
     {
-        //FIXME [o_mi setState: p_intf->p_sys->b_mute ? NSOnState : NSOffState];
+        [o_mi setState: [[VLCCoreInteraction sharedInstance] isMuted] ? NSOnState : NSOffState];
         [self setupMenus]; /* Make sure audio menu is up to date */
     }
     else if( [o_title isEqualToString: _NS("Half Size")] ||
