@@ -26,6 +26,7 @@
 #endif
 
 #include "HTTPConnectionManager.h"
+#include "mpd/Segment.h"
 
 using namespace dash::http;
 using namespace dash::logic;
@@ -48,14 +49,13 @@ HTTPConnectionManager::~HTTPConnectionManager   ()
 
 bool                HTTPConnectionManager::closeConnection( IHTTPConnection *con )
 {
-    for(std::vector<HTTPConnection *>::iterator it = this->connections.begin();
-        it != this->connections.end(); ++it)
+    for(std::map<Chunk*, HTTPConnection *>::iterator it = this->chunkMap.begin();
+        it != this->chunkMap.end(); ++it)
     {
-        if(*it == con)
+        if( it->second == con )
         {
-            (*it)->closeSocket();
-            delete(*it);
-            this->connections.erase(it);
+            delete con;
+            this->chunkMap.erase( it );
             return true;
         }
     }
@@ -73,20 +73,10 @@ bool                HTTPConnectionManager::closeConnection( Chunk *chunk )
 
 void                HTTPConnectionManager::closeAllConnections      ()
 {
-    for(std::vector<HTTPConnection *>::iterator it = this->connections.begin(); it != this->connections.end(); ++it)
-    {
-        (*it)->closeSocket();
-        delete(*it);
-    }
-    this->connections.clear();
-    this->urlMap.clear();
-
     std::map<Chunk *, HTTPConnection *>::iterator it;
 
     for(it = this->chunkMap.begin(); it != this->chunkMap.end(); ++it)
-    {
-        delete(it->first);
-    }
+        delete(it->second);
 
     this->chunkMap.clear();
 }
@@ -150,7 +140,6 @@ IHTTPConnection*     HTTPConnectionManager::initConnection(Chunk *chunk)
     HTTPConnection *con = new HTTPConnection(chunk->getUrl(), this->stream);
     if ( con->init() == false )
         return NULL;
-    this->connections.push_back(con);
     this->chunkMap[chunk] = con;
     this->chunkCount++;
     return con;

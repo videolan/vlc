@@ -56,7 +56,6 @@ namespace dash
                 void                notify              ();
 
             private:
-                std::vector<HTTPConnection *>                       connections;
                 std::map<Chunk *, HTTPConnection *>                 chunkMap;
                 std::map<std::string, HTTPConnection *>             urlMap;
                 std::vector<dash::logic::IDownloadRateObserver *>   rateObservers;
