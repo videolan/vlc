@@ -106,13 +106,14 @@ block_t *block_Alloc( size_t i_size )
      */
     block_sys_t *p_sys;
     uint8_t *buf;
-
 #define ALIGN(x) (((x) + BLOCK_ALIGN - 1) & ~(BLOCK_ALIGN - 1))
 #if 0 /*def HAVE_POSIX_MEMALIGN */
     /* posix_memalign(,16,) is much slower than malloc() on glibc.
      * -- Courmisch, September 2009, glibc 2.5 & 2.9 */
     const size_t i_alloc = ALIGN(sizeof(*p_sys)) + (2 * BLOCK_PADDING)
                          + ALIGN(i_size);
+    if( unlikely(i_alloc <= i_size) )
+        return NULL;
     void *ptr;
 
     if( posix_memalign( &ptr, BLOCK_ALIGN, i_alloc ) )
@@ -124,6 +125,9 @@ block_t *block_Alloc( size_t i_size )
 #else
     const size_t i_alloc = sizeof(*p_sys) + BLOCK_ALIGN + (2 * BLOCK_PADDING)
                          + ALIGN(i_size);
+    if( unlikely(i_alloc <= i_size) )
+        return NULL;
+
     p_sys = malloc( i_alloc );
     if( p_sys == NULL )
         return NULL;
