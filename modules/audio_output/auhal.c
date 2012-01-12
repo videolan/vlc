@@ -249,6 +249,9 @@ static int Open( vlc_object_t * p_this )
         goto error;
     }
 
+    /* If we change the device we want to use, we should renegotiate the audio chain */
+    var_AddCallback( p_aout, "audio-device", AudioDeviceCallback, NULL );
+
     /* Check for Digital mode or Analog output mode */
     if( AOUT_FMT_SPDIF( &p_aout->format ) && b_supports_digital )
     {
@@ -1032,9 +1035,6 @@ static void Probe( audio_output_t * p_aout )
         var_Change( p_aout, "audio-device", VLC_VAR_SETDEFAULT, &val, NULL );
         var_Set( p_aout, "audio-device", val );
     }
-
-    /* If we change the device we want to use, we should renegotiate the audio chain */
-    var_AddCallback( p_aout, "audio-device", AudioDeviceCallback, NULL );
 
     /* Attach a Listener so that we are notified of a change in the Device setup */
     err = AudioObjectAddPropertyListener( kAudioObjectSystemObject, &audioDevicesAddress, HardwareListener, (void *)p_aout );
