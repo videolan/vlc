@@ -675,7 +675,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if test $ACTION = \"clean\"\nthen\nmake clean\nexit 0\nfi\n\necho \"Building tools\"\necho \"\"\ncd $SOURCE_ROOT/../../../extras/tools\n./bootstrap\nmake\n\necho \"Building a set of contribs for $ARCHS...\"\necho \"\"\ncd $SOURCE_ROOT/../../../contrib\n\nfor arch in $ARCHS; do\n\techo \"Making contribs for $arch\"\n\trm -rf vlckit-$arch\t\n\tmkdir vlckit-$arch\n\tcd vlckit-$arch\n\tif test \"$arch\" = \"x86_64\"; then\n          export OSX_VERSION=10.6\n          ../bootstrap --build=x86_64-apple-darwin10 --host=x86_64-apple-darwin10\n\telse\n          ../bootstrap\n\tfi\n\tmake prebuilt\ndone\n";
+			shellScript = "if test $ACTION = \"clean\"\nthen\nmake clean\nexit 0\nfi\n\necho \"Building tools\"\necho \"\"\ncd $SOURCE_ROOT/../../../extras/tools\n./bootstrap\nmake\n\necho \"Building a set of contribs for $ARCHS...\"\necho \"\"\ncd $SOURCE_ROOT/../../../contrib\n\nfor arch in $ARCHS; do\n\techo \"Making contribs for $arch\"\n\trm -rf vlckit-$arch\t\n\tmkdir vlckit-$arch\n\tcd vlckit-$arch\n\tif test \"$arch\" = \"x86_64\"; then\n          export OSX_VERSION=10.6\nexport TRIPLET=x86_64-apple-darwin10\nelse\nexport TRIPLET=i686-apple-darwin9\nfi\n          ../bootstrap --build=$TRIPLET --host=$TRIPLET\n\tmake prebuilt\ndone\n";
 			showEnvVarsInLog = 0;
 		};
 		63FFDBCD0D2AE2AE0092FC96 /* configure */ = {
