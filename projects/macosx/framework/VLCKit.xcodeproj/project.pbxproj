@@ -626,7 +626,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "top_srcdir=`pwd`/../../..\n\nif test $ACTION = \"clean\"\nthen\n    exit 0\nfi\n\nif test \"$arch\" = \"x86_64\"; then\n    export PATH=$top_srcdir/contrib/x86_64-apple-darwin10:$PATH\nfi\n\nexport PATH=$top_srcdir/extras/tools/build/bin:$PATH\n\n";
+			shellScript = "top_srcdir=`pwd`/../../..\n\nif test \"$ACTION\" = \"clean\"\nthen\n    exit 0\nfi\n\nif test \"$arch\" = \"x86_64\"; then\n    export PATH=$top_srcdir/contrib/x86_64-apple-darwin10:$PATH\nfi\n\nexport PATH=$top_srcdir/extras/tools/build/bin:$PATH\ncd \"$top_srcdir\" && ./bootstrap\n";
 			showEnvVarsInLog = 0;
 		};
 		6337548010ED091D0072A0D9 /* make */ = {
