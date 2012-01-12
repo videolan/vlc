@@ -241,7 +241,8 @@ static void PlaneFilter(filter_t *filter,
             if (w >= BLEND_SIZE && h >= BLEND_SIZE)
                 sys->blend(dstp, dst->i_pitch, srcp, src->i_pitch, noise);
             else
-                BlockBlend(dstp, dst->i_pitch, srcp, src->i_pitch, noise, w, h);
+                BlockBlend(dstp, dst->i_pitch, srcp, src->i_pitch, noise,
+                           __MIN(w, BLEND_SIZE), __MIN(h, BLEND_SIZE));
         }
     }
     if (sys->emms)
