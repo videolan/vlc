@@ -33,6 +33,7 @@
 
 #include "libmp4.h"
 #include "drms.h"
+#include <math.h>
 
 /*****************************************************************************
  * Here are defined some macro to make life simpler but before using it
@@ -143,6 +144,13 @@ static void CreateUUID( UUID_t *p_uuid, uint32_t i_fourcc )
     /* FIXME implement this */
     (void)p_uuid;
     (void)i_fourcc;
+}
+
+/* convert 16.16 fixed point to floating point */
+static double conv_fx( int32_t fx ) {
+    double fp = fx;
+    fp /= 65536.;
+    return fp;
 }
 
 /* some functions for mp4 encoding of variables */
@@ -637,12 +645,31 @@ static int MP4_ReadBox_tkhd(  stream_t *p_stream, MP4_Box_t *p_box )
     MP4_GET4BYTES( p_box->data.p_tkhd->i_width );
     MP4_GET4BYTES( p_box->data.p_tkhd->i_height );
 
+    double rotation;    //angle in degrees to be rotated clockwise
+    double scale[2];    // scale factor; sx = scale[0] , sy = scale[1]
+    double translate[2];// amount to translate; tx = translate[0] , ty = translate[1]
+    
+    int *matrix = p_box->data.p_tkhd->i_matrix;
+    
+    translate[0] = conv_fx(matrix[6]);
+    translate[1] = conv_fx(matrix[7]);
+    
+    scale[0] = sqrt(conv_fx(matrix[0]) * conv_fx(matrix[0]) +
+                    conv_fx(matrix[3]) * conv_fx(matrix[3]));
+    scale[1] = sqrt(conv_fx(matrix[1]) * conv_fx(matrix[1]) +
+                    conv_fx(matrix[4]) * conv_fx(matrix[4]));
+    
+    rotation = atan2(conv_fx(matrix[1]) / scale[1], conv_fx(matrix[0]) / scale[0]) * 180 / M_PI;
+    
+    if (rotation < 0)
+        rotation += 360.;
+
 #ifdef MP4_VERBOSE
     MP4_ConvertDate2Str( s_creation_time, p_box->data.p_mvhd->i_creation_time );
     MP4_ConvertDate2Str( s_modification_time, p_box->data.p_mvhd->i_modification_time );
     MP4_ConvertDate2Str( s_duration, p_box->data.p_mvhd->i_duration );
 
-    msg_Dbg( p_stream, "read box: \"tkhd\" creation %s modification %s duration %s track ID %d layer %d volume %f width %f height %f. "
+    msg_Dbg( p_stream, "read box: \"tkhd\" creation %s modification %s duration %s track ID %d layer %d volume %f rotation %f scaleX %f scaleY %f translateX %f translateY %f width %f height %f. "
             "Matrix: %i %i %i %i %i %i %i %i %i",
                   s_creation_time,
                   s_modification_time,
@@ -650,6 +677,11 @@ static int MP4_ReadBox_tkhd(  stream_t *p_stream, MP4_Box_t *p_box )
                   p_box->data.p_tkhd->i_track_ID,
                   p_box->data.p_tkhd->i_layer,
                   (float)p_box->data.p_tkhd->i_volume / 256 ,
+                  rotation,
+                  scale[0],
+                  scale[1],
+                  translate[0],
+                  translate[1],
                   (float)p_box->data.p_tkhd->i_width / 65536,
                   (float)p_box->data.p_tkhd->i_height / 65536,
                   p_box->data.p_tkhd->i_matrix[0],
