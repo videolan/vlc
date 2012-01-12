@@ -40,6 +40,7 @@
 #import "VideoView.h"
 #import "CoreInteraction.h"
 #import "MainWindow.h"
+#import "ExtensionsManager.h"
 
 @implementation VLCMainMenu
 static VLCMainMenu *_o_sharedInstance = nil;
@@ -83,6 +84,8 @@ static VLCMainMenu *_o_sharedInstance = nil;
     if (b_nib_tracksynchro_loaded)
         [o_trackSynchronization release];
 
+    [o_extMgr release];
+
     [super dealloc];
 }
 
@@ -107,6 +110,10 @@ static VLCMainMenu *_o_sharedInstance = nil;
     /* Check if we already did this once. Opening the other nibs calls it too,
      because VLCMain is the owner */
     if( b_mainMenu_setup ) return;
+
+    /* Get ExtensionsManager */
+    o_extMgr = [ExtensionsManager getInstance:p_intf];
+    [o_extMgr retain];
 
     [self initStrings];
 
@@ -218,6 +225,8 @@ static VLCMainMenu *_o_sharedInstance = nil;
 
     [self setupVarMenuItem: o_mi_add_intf target: (vlc_object_t *)p_intf
                              var: "intf-add" selector: @selector(toggleVar:)];
+
+    [self setupExtensionsMenu];
 }
 
 - (void)initStrings
@@ -250,6 +259,8 @@ static VLCMainMenu *_o_sharedInstance = nil;
     [o_mi_paste setTitle: _NS("Paste")];
     [o_mi_clear setTitle: _NS("Clear")];
     [o_mi_select_all setTitle: _NS("Select All")];
+
+    [o_mu_extensions setTitle: _NS("Extensions")];
 
     [o_mu_controls setTitle: _NS("Playback")];
     [o_mi_play setTitle: _NS("Play")];
@@ -546,6 +557,29 @@ static VLCMainMenu *_o_sharedInstance = nil;
         [o_mi_rate_lbl_gray setHidden: NO];
     }
     [o_pool release];
+}
+
+#pragma mark -
+#pragma mark Extensions
+
+- (void)setupExtensionsMenu
+{
+    /* Load extensions if needed */
+    // TODO: Implement preference for autoloading extensions on mac
+
+    // if( !var_InheritBool( p_intf, "qt-autoload-extensions")
+    //     && ![o_extMgr isLoaded] )
+    // {
+    //     return;
+    // }
+
+    if( ![o_extMgr isLoaded] && ![o_extMgr cannotLoad] )
+    {
+        [o_extMgr loadExtensions];
+    }
+
+    /* Let the ExtensionsManager itself build the menu */
+    [o_extMgr buildMenu:o_mu_extensions];
 }
 
 #pragma mark -

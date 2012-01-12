@@ -41,11 +41,15 @@
     id o_trackSynchronization;  /* VLCTrackSynchronization */
     id o_bookmarks;             /* VLCBookmarks */
 
+    id o_extMgr;                /* Extensions Manager */
+
     /* main menu */
 
     IBOutlet NSMenuItem * o_mi_about;
     IBOutlet NSMenuItem * o_mi_prefs;
     IBOutlet NSMenuItem * o_mi_checkForUpdate;
+    IBOutlet NSMenuItem * o_mi_extensions;
+    IBOutlet NSMenu * o_mu_extensions;
     IBOutlet NSMenuItem * o_mi_add_intf;
     IBOutlet NSMenu * o_mu_add_intf;
     IBOutlet NSMenuItem * o_mi_services;
@@ -196,6 +200,7 @@
 - (void)refreshVoutDeviceMenu:(NSNotification *)o_notification;
 - (void)setSubmenusEnabled:(BOOL)b_enabled;
 - (void)setRateControlsEnabled:(BOOL)b_enabled;
+- (void)setupExtensionsMenu;
 
 - (IBAction)intfOpenFile:(id)sender;
 - (IBAction)intfOpenFileGeneric:(id)sender;
