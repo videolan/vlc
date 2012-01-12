@@ -450,9 +450,9 @@ void virtual_segment_c::Seek( demux_t & demuxer, mtime_t i_date, mtime_t i_time_
 
         if( p_current_chapter->p_segment != p_chapter->p_segment )
         {
-            p_current_chapter->p_segment->UnSelect();
             es_out_Control( demuxer.out, ES_OUT_RESET_PCR );
             p_chapter->p_segment->Select( i_date );
+            p_current_chapter->p_segment->UnSelect();
         }
         p_current_chapter = p_chapter;
 
