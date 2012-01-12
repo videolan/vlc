@@ -54,6 +54,64 @@ static const luaL_Reg vlclua_node_reg[] = {
     { NULL, NULL }
 };
 
+#define vlclua_item_luareg( a ) \
+{ "set_" # a, vlclua_item_set_ ## a },
+
+#define vlclua_item_meta( lowercase, normal ) \
+static int vlclua_item_set_ ## lowercase ( lua_State *L )\
+{\
+    services_discovery_t *p_sd = (services_discovery_t *)vlclua_get_this( L );\
+    input_item_t **pp_node = (input_item_t **)luaL_checkudata( L, 1, "input_item_t" );\
+    if( *pp_node )\
+    {\
+        if( lua_isstring( L, -1 ) )\
+        {\
+            input_item_Set ## normal ( *pp_node, lua_tostring( L, -1 ) );\
+        } else\
+            msg_Err( p_sd, "Error parsing set_ " # lowercase " arguments" );\
+    }\
+    return 1;\
+}
+
+vlclua_item_meta(title, Title)
+vlclua_item_meta(artist, Artist)
+vlclua_item_meta(genre, Genre)
+vlclua_item_meta(copyright, Copyright)
+vlclua_item_meta(album, Album)
+vlclua_item_meta(tracknum, TrackNum)
+vlclua_item_meta(description, Description)
+vlclua_item_meta(rating, Rating)
+vlclua_item_meta(date, Date)
+vlclua_item_meta(setting, Setting)
+vlclua_item_meta(url, URL)
+vlclua_item_meta(language, Language)
+vlclua_item_meta(nowplaying, NowPlaying)
+vlclua_item_meta(publisher, Publisher)
+vlclua_item_meta(encodedby, EncodedBy)
+vlclua_item_meta(arturl, ArtworkURL)
+vlclua_item_meta(trackid, TrackID)
+
+static const luaL_Reg vlclua_item_reg[] = {
+    vlclua_item_luareg(title)
+    vlclua_item_luareg(artist)
+    vlclua_item_luareg(genre)
+    vlclua_item_luareg(copyright)
+    vlclua_item_luareg(album)
+    vlclua_item_luareg(tracknum)
+    vlclua_item_luareg(description)
+    vlclua_item_luareg(rating)
+    vlclua_item_luareg(date)
+    vlclua_item_luareg(setting)
+    vlclua_item_luareg(url)
+    vlclua_item_luareg(language)
+    vlclua_item_luareg(nowplaying)
+    vlclua_item_luareg(publisher)
+    vlclua_item_luareg(encodedby)
+    vlclua_item_luareg(arturl)
+    vlclua_item_luareg(trackid)
+    { NULL, NULL }
+};
+
 static int vlclua_sd_get_services_names( lua_State *L )
 {
     playlist_t *p_playlist = vlclua_get_playlist_internal( L );
@@ -185,6 +243,9 @@ static int vlclua_sd_add_item( lua_State *L )
                 *udata = p_input;
                 if( luaL_newmetatable( L, "input_item_t" ) )
                 {
+                    lua_newtable( L );
+                    luaL_register( L, NULL, vlclua_item_reg );
+                    lua_setfield( L, -2, "__index" );
                     lua_pushliteral( L, "none of your business" );
                     lua_setfield( L, -2, "__metatable" );
                 }
@@ -257,6 +318,9 @@ static int vlclua_node_add_subitem( lua_State *L )
                     *udata = p_input;
                     if( luaL_newmetatable( L, "input_item_t" ) )
                     {
+                        lua_newtable( L );
+                        luaL_register( L, NULL, vlclua_item_reg );
+                        lua_setfield( L, -2, "__index" );
                         lua_pushliteral( L, "none of your business" );
                         lua_setfield( L, -2, "__metatable" );
                     }

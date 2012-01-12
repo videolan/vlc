@@ -338,6 +338,26 @@ n = vlc.sd.add_node( {title="Node"} )
 n:add_subitem( ... ): Same as sd.add_item(), but as a subitem of n.
 n:add_subnode( ... ): Same as sd.add_node(), but as a subnode of n.
 
+d = vlc.sd.add_item( ... ) Get an item object to perform following set operations on it:
+d:set_name(): the item's name in playlist
+d:set_title(): the item's Title (OPTIONAL, meta data)
+d:set_artist(): the item's Artist (OPTIONAL, meta data)
+d:set_genre(): the item's Genre (OPTIONAL, meta data)
+d:set_copyright(): the item's Copyright (OPTIONAL, meta data)
+d:set_album(): the item's Album (OPTIONAL, meta data)
+d:set_tracknum(): the item's Tracknum (OPTIONAL, meta data)
+d:set_description(): the item's Description (OPTIONAL, meta data)
+d:set_rating(): the item's Rating (OPTIONAL, meta data)
+d:set_date(): the item's Date (OPTIONAL, meta data)
+d:set_setting(): the item's Setting (OPTIONAL, meta data)
+d:set_url(): the item's URL (OPTIONAL, meta data)
+d:set_language(): the item's Language (OPTIONAL, meta data)
+d:set_nowplaying(): the item's NowPlaying (OPTIONAL, meta data)
+d:set_publisher(): the item's Publisher (OPTIONAL, meta data)
+d:set_encodedby(): the item's EncodedBy (OPTIONAL, meta data)
+d:set_arturl(): the item's ArtURL (OPTIONAL, meta data)
+d:set_trackid(): the item's TrackID (OPTIONAL, meta data)
+
 Stream
 ------
 stream( url ): Instantiate a stream object for specific url.
