@@ -455,6 +455,9 @@ static void Seek( demux_t *p_demux, mtime_t i_date, double f_percent, virtual_ch
 /* Utility function for BlockDecode */
 static block_t *MemToBlock( uint8_t *p_mem, size_t i_mem, size_t offset)
 {
+    if( unlikely( i_mem > SIZE_MAX - offset ) )
+        return NULL;
+
     block_t *p_block = block_New( p_demux, i_mem + offset );
     if( likely(p_block != NULL) )
     {
