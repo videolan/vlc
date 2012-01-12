@@ -37,6 +37,7 @@
 #import "open.h"
 #import "controls.h"
 #import "playlist.h"
+#import "MainMenu.h"
 #import "CoreInteraction.h"
 #import <vlc_keys.h>
 
@@ -400,6 +401,15 @@
             vlc_object_release( p_input );
         }
     }
+}
+
+@end
+
+@implementation VLCControls (NSMenuValidation)
+
+- (BOOL)validateMenuItem:(NSMenuItem *)o_mi
+{
+    return [[VLCMainMenu sharedInstance] validateMenuItem:o_mi];
 }
 
 @end
