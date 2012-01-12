@@ -31,6 +31,7 @@
 #import <vlc_interface.h>
 #import <vlc_dialog.h>
 #import <vlc_modules.h>
+#import <vlc_config_cat.h>
 #import "misc.h"
 #import "intf.h"
 #import "AppleRemote.h"
@@ -185,11 +186,11 @@ create_toolbar_item( NSString * o_itemIdent, NSString * o_name, NSString * o_des
     }
     else if( [o_itemIdent isEqual: VLCOSDSettingToolbarIdentifier] )
     {
-        CreateToolbarItem( _NS("Subtitles & OSD"), _NS("Subtitles & On Screen Display Settings"), @"spref_cone_Subtitles_64", showOSDSettings );
+        CreateToolbarItem( SUBPIC_TITLE, _NS("Subtitles & On Screen Display Settings"), @"spref_cone_Subtitles_64", showOSDSettings );
     }
     else if( [o_itemIdent isEqual: VLCInputSettingToolbarIdentifier] )
     {
-        CreateToolbarItem( _NS("Input & Codecs"), _NS("Input & Codec settings"), @"spref_cone_Input_64", showInputSettings );
+        CreateToolbarItem( INPUT_TITLE, _NS("Input & Codec settings"), @"spref_cone_Input_64", showInputSettings );
     }
     else if( [o_itemIdent isEqual: VLCHotkeysSettingToolbarIdentifier] )
     {
