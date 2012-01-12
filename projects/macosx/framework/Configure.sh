@@ -24,24 +24,29 @@ echo "Building for $ARCHS with sdk=\"$SDKROOT\" in $VLC_BUILD_DIR"
 args="--disable-nls $args"
 
 # Mac OS X related options
-args="--disable-macosx-defaults $args"
 args="--disable-macosx $args" # Disable old gui/macosx
 args="--disable-macosx-vlc-app $args" # Don't build old vlc.app
 
 args="--with-macosx-version-min=10.6 $args"
 
 # optional modules
+args="--enable-merge-ffmpeg $args"
 args="--enable-faad $args"
 args="--enable-flac $args"
 args="--enable-theora $args"
 args="--enable-shout $args"
 args="--enable-caca $args"
-args="--enable-vcdx $args"
 args="--enable-twolame $args"
 args="--enable-realrtsp $args"
 args="--enable-libass $args"
+args="--enable-macosx-audio $args"
+args="--enable-macosx-dialog-provider $args"
+args="--enable-macosx-eyetv $args"
+args="--enable-macosx-qtkit $args"
+args="--enable-macosx-vout $args"
 
 # disabled stuff
+args="--disable-growl $args"
 args="--disable-ncurses $args"
 args="--disable-httpd $args"
 args="--disable-vlm $args"
@@ -90,7 +95,9 @@ for arch in $ARCHS; do
         export CXXFLAGS="-m64 -arch x86_64"
         export OBJCFLAGS="-m64 -arch x86_64"
         export CPPFLAGS="-m64 -arch x86_64"
-        this_args="--with-contrib=${VLC_SRC_DIR}/extras/contrib/hosts/x86_64-apple-darwin10 $this_args"
+        this_args="--with-contrib=$top_srcdir/contrib/x86_64-apple-darwin10 $this_args"
+        export PATH=$top_srcdir/extras/tools/build/bin:$top_srcdir/contrib/x86_64-apple-darwin10/bin:$PATH
+        export PKG_CONFIG_PATH=$top_srcdir/contrib/x86_64-apple-darwin10/lib/pkgconfig
         $top_srcdir/configure --build=x86_64-apple-darwin10 $this_args
     fi
     if test $arch = "i386"; then
@@ -98,15 +105,15 @@ for arch in $ARCHS; do
         export CXXFLAGS="-m32 -arch i386"
         export OBJCFLAGS="-m32 -arch i386"
         export CPPFLAGS="-m32 -arch i386"
-        this_args="--with-contrib=${VLC_SRC_DIR}/extras/contrib/hosts/i686-apple-darwin10 $this_args"
-        $top_srcdir/configure --build=i686-apple-darwin10 $this_args
+        this_args="--with-contrib=$top_srcdir/contrib/i686-apple-darwin9 $this_args"
+        $top_srcdir/configure --build=i686-apple-darwin9 $this_args
     fi
     if test $arch = "ppc"; then
         export CFLAGS="-m32 -arch ppc"
         export CXXFLAGS="-m32 -arch ppc"
         export OBJCFLAGS="-m32 -arch ppc"
         export CPPFLAGS="-m32 -arch ppc"
-        this_args="--with-contrib=${VLC_SRC_DIR}/extras/contrib/hosts/powerpc-apple-darwin9 $this_args"
+        this_args="--with-contrib=$top_srcdir/contrib/powerpc-apple-darwin9 $this_args"
         $top_srcdir/configure --build=powerpc-apple-darwin9 $this_args
     fi
     cd ..
