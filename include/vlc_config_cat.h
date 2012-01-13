@@ -80,7 +80,7 @@
 #define VFILTER_HELP N_( \
     "Video filters are used to process the video stream." )
 
-#define SUBPIC_TITLE N_( "Subtitles/OSD")
+#define SUBPIC_TITLE N_( "Subtitles / OSD")
 #define SUBPIC_HELP N_( "Settings related to On-Screen-Display,"\
         " subtitles and \"overlay subpictures\"")
 /*
