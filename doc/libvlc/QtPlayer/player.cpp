@@ -119,7 +119,7 @@ void Mwindow::openFile() {
 
     /* Integrate the video in the interface */
 #if defined(Q_OS_MAC)
-    libvlc_media_player_set_nsobject(vlcPlayer, videoWidget->winId());
+    libvlc_media_player_set_nsobject(vlcPlayer, (void *) videoWidget->winId());
 #elif defined(Q_OS_UNIX)
     libvlc_media_player_set_xwindow(vlcPlayer, videoWidget->winId());
 #elif defined(Q_OS_WIN)
