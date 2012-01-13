@@ -792,7 +792,7 @@ void VLCMenuBar::PopupMenuControlEntries( QMenu *menu, intf_thread_t *p_intf,
                                         bool b_normal )
 {
     QAction *action;
-    QMenu *rateMenu = new QMenu( qtr( "Sp&eed" ) );
+    QMenu *rateMenu = new QMenu( qtr( "Sp&eed" ), menu );
     rateMenu->setTearOffEnabled( true );
 
     if( b_normal )
@@ -971,7 +971,7 @@ void VLCMenuBar::PopupMenu( intf_thread_t *p_intf, bool show )
     POPUP_BOILERPLATE
 
     /* */
-    menu = new QMenu( );
+    menu = new QMenu();
     QAction *action;
     bool b_isFullscreen = false;
     MainInterface *mi = p_intf->p_sys->p_mi;

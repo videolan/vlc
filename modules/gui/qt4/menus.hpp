@@ -28,7 +28,6 @@
 #include "qt4.hpp"
 
 #include <QObject>
-#include <QAction>
 #include <QMenu>
 #include <QVector>
 
