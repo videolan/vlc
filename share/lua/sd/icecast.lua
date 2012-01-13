@@ -22,7 +22,7 @@
 require "simplexml"
 
 function descriptor()
-    return { title="Icecast Directory" }
+    return { title="Icecast Radio Directory" }
 end
 
 function main()
