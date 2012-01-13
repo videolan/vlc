@@ -36,7 +36,7 @@ public:
     SeekPoint( seekpoint_t *seekpoint )
     {
         time = seekpoint->i_time_offset;
-        name = seekpoint->psz_name;
+        name = qfu( seekpoint->psz_name );
     };
     int64_t time;
     QString name;
