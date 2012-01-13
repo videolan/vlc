@@ -286,6 +286,12 @@
 		1058C7ADFEA557BF11CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
 		2AEF857609A5FEC900130822 /* fspanel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = fspanel.h; path = ../../../modules/gui/macosx/fspanel.h; sourceTree = SOURCE_ROOT; };
 		2AEF857709A5FEC900130822 /* fspanel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = fspanel.m; path = ../../../modules/gui/macosx/fspanel.m; sourceTree = SOURCE_ROOT; };
+		5CCED71014C0D4A90057F8D1 /* ExtensionsDialogProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ExtensionsDialogProvider.h; path = ../../../modules/gui/macosx/ExtensionsDialogProvider.h; sourceTree = SOURCE_ROOT; };
+		5CCED71114C0D4A90057F8D1 /* ExtensionsDialogProvider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ExtensionsDialogProvider.m; path = ../../../modules/gui/macosx/ExtensionsDialogProvider.m; sourceTree = SOURCE_ROOT; };
+		5CCED71214C0D4A90057F8D1 /* ExtensionsManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ExtensionsManager.h; path = ../../../modules/gui/macosx/ExtensionsManager.h; sourceTree = SOURCE_ROOT; };
+		5CCED71314C0D4A90057F8D1 /* ExtensionsManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ExtensionsManager.m; path = ../../../modules/gui/macosx/ExtensionsManager.m; sourceTree = SOURCE_ROOT; };
+		5CCED71414C0D4A90057F8D1 /* VLCUIWidgets.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCUIWidgets.h; path = ../../../modules/gui/macosx/VLCUIWidgets.h; sourceTree = SOURCE_ROOT; };
+		5CCED71514C0D4A90057F8D1 /* VLCUIWidgets.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VLCUIWidgets.m; path = ../../../modules/gui/macosx/VLCUIWidgets.m; sourceTree = SOURCE_ROOT; };
 		8E49720006417F6800370C9F /* playlistinfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = playlistinfo.h; path = ../../../modules/gui/macosx/playlistinfo.h; sourceTree = SOURCE_ROOT; };
 		8E49720106417F6800370C9F /* playlistinfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = playlistinfo.m; path = ../../../modules/gui/macosx/playlistinfo.m; sourceTree = SOURCE_ROOT; };
 		8E55FB7F0459B0FD00FB3317 /* output.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = output.h; path = ../../../modules/gui/macosx/output.h; sourceTree = SOURCE_ROOT; };
@@ -706,6 +712,12 @@
 				CC448A6313B68A0B009F72E0 /* MainWindow.m */,
 				CC4A33220F8CB017000FC4A7 /* coredialogs.h */,
 				CC4A33210F8CB017000FC4A7 /* coredialogs.m */,
+				5CCED71014C0D4A90057F8D1 /* ExtensionsDialogProvider.h */,
+				5CCED71114C0D4A90057F8D1 /* ExtensionsDialogProvider.m */,
+				5CCED71214C0D4A90057F8D1 /* ExtensionsManager.h */,
+				5CCED71314C0D4A90057F8D1 /* ExtensionsManager.m */,
+				5CCED71414C0D4A90057F8D1 /* VLCUIWidgets.h */,
+				5CCED71514C0D4A90057F8D1 /* VLCUIWidgets.m */,
 				8E6BC6FA041684EC0059A3A7 /* controls.h */,
 				8ED6C27B03E2EB1C0059A3A7 /* controls.m */,
 				8E6BC6F6041643860059A3A7 /* applescript.h */,

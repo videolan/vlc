@@ -17,6 +17,12 @@ SOURCES_macosx = \
 	MainWindow.m \
 	CoreInteraction.h \
 	CoreInteraction.m \
+	ExtensionsManager.h \
+	ExtensionsManager.m \
+	ExtensionsDialogProvider.h \
+	ExtensionsDialogProvider.m \
+	VLCUIWidgets.h \
+	VLCUIWidgets.m \
 	about.h \
 	about.m \
 	applescript.h \
