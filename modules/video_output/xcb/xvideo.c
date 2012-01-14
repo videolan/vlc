@@ -335,8 +335,8 @@ FindFormat (vlc_object_t *obj, xcb_connection_t *conn, video_format_t *fmt,
             {
                 dialog_FatalWait (obj, _("Video acceleration not available"),
                     _("Your video output acceleration driver does not support "
-                      "the required resolution: %ux%u pixels. The maximum "
-                      "supported resolution is %"PRIu32"x%"PRIu32".\n"
+                      "the required resolution of %ux%u pixels. The supported "
+                      "resolution is %"PRIu32"x%"PRIu32".\n"
                       "Video output acceleration will be disabled. However, "
                       "rendering videos with overly large resolution "
                       "may cause severe performance degration."),
