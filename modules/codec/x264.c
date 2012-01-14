@@ -44,7 +44,11 @@
 
 #include <assert.h>
 
+#ifdef MODULE_NAME_IS_x26410b
+#define SOUT_CFG_PREFIX "sout-x26410b-"
+#else
 #define SOUT_CFG_PREFIX "sout-x264-"
+#endif
 
 /*****************************************************************************
  * Module descriptor
@@ -433,8 +437,13 @@ static const char *const framepacking_list_text[] =
   { "", N_("checkerboard"), N_("column alternation"), N_("row alternation"), N_("side by side"), N_("top bottom"), N_("frame alternation") };
 
 vlc_module_begin ()
+#ifdef MODULE_NAME_IS_x26410b
+    set_description( N_("H.264/MPEG4 AVC encoder (x264 10-bit)"))
+    set_capability( "encoder", 0 )
+#else
     set_description( N_("H.264/MPEG4 AVC encoder (x264)"))
     set_capability( "encoder", 200 )
+#endif
     set_callbacks( Open, Close )
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_VCODEC )
@@ -793,22 +802,46 @@ static int  Open ( vlc_object_t *p_this )
     if( psz_profile )
     {
         const int mask = x264_bit_depth > 8 ? X264_CSP_HIGH_DEPTH : 0;
+
+#ifdef MODULE_NAME_IS_x26410b
+        if( mask == 0)
+        {
+            msg_Err( p_enc, "Only high bith depth encoding supported, bit depth:%d", x264_bit_depth);
+            return VLC_EGENERIC;
+        }
+#endif
+
         if( !strcmp( psz_profile, "high10" ) )
         {
             p_enc->fmt_in.i_codec = mask ? VLC_CODEC_I420_10L : VLC_CODEC_I420;
             p_sys->i_colorspace = X264_CSP_I420 | mask;
         }
-        if( !strcmp( psz_profile, "high422" ) )
+        else if( !strcmp( psz_profile, "high422" ) )
         {
             p_enc->fmt_in.i_codec = mask ? VLC_CODEC_I422_10L : VLC_CODEC_I422;
             p_sys->i_colorspace = X264_CSP_I422 | mask;
         }
-        if( !strcmp( psz_profile, "high444" ) )
+        else if( !strcmp( psz_profile, "high444" ) )
         {
             p_enc->fmt_in.i_codec = mask ? VLC_CODEC_I444_10L : VLC_CODEC_I444;
             p_sys->i_colorspace = X264_CSP_I444 | mask;
         }
+#ifdef MODULE_NAME_IS_x26410b
+        else
+        {
+            msg_Err( p_enc, "Only high-profiles and 10-bit are supported");
+            return VLC_EGENERIC;
+        }
+
+#endif
     }
+#ifdef MODULE_NAME_IS_x26410b
+    else
+    {
+            msg_Err( p_enc, "Only high-profiles and 10-bit are supported");
+            return VLC_EGENERIC;
+    }
+#endif
     free( psz_profile );
 #endif //X264_BUILD
 

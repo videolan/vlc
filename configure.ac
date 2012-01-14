@@ -152,7 +152,7 @@ case "${host_os}" in
     LDFLAGS="${LDFLAGS} -Wl,-headerpad_max_install_names ${ARCH_flag}"
     VLC_ADD_LIBS([mkv mp4 motion], [-Wl,-framework,IOKit,-framework,CoreFoundation])
     VLC_ADD_LIBS([libvlc vlc],[-Wl,-undefined,dynamic_lookup])
-    VLC_ADD_LIBS([avcodec avformat access_avio swscale postproc i420_rgb_mmx x264],[-Wl,-read_only_relocs,suppress])
+    VLC_ADD_LIBS([avcodec avformat access_avio swscale postproc i420_rgb_mmx x264 x26410b],[-Wl,-read_only_relocs,suppress])
     VLC_ADD_CFLAGS([motion],[-fconstant-cfstrings])
     VLC_ADD_LIBS([libvlccore],[-Wl,-framework,CoreFoundation])
 
@@ -620,7 +620,7 @@ AC_CHECK_FUNC(getopt_long,, [
 AC_SUBST(GNUGETOPT_LIBS)
 
 AC_CHECK_LIB(m,cos,[
-  VLC_ADD_LIBS([adjust wave ripple psychedelic gradient a52tofloat32 dtstofloat32 x264 goom visual panoramix rotate noise grain scene kate flac lua chorus_flanger freetype avcodec avformat access_avio swscale postproc i420_rgb faad twolame equalizer spatializer param_eq samplerate freetype mpc dmo mp4 quicktime qt4 compressor headphone_channel_mixer normvol audiobargraph_a speex mono colorthres extract ball access_imem hotkeys mosaic gaussianblur dbus x264 hqdn3d anaglyph],[-lm])
+  VLC_ADD_LIBS([adjust wave ripple psychedelic gradient a52tofloat32 dtstofloat32 x264 goom visual panoramix rotate noise grain scene kate flac lua chorus_flanger freetype avcodec avformat access_avio swscale postproc i420_rgb faad twolame equalizer spatializer param_eq samplerate freetype mpc dmo mp4 quicktime qt4 compressor headphone_channel_mixer normvol audiobargraph_a speex mono colorthres extract ball access_imem hotkeys mosaic gaussianblur dbus x26410b hqdn3d anaglyph],[-lm])
   LIBM="-lm"
 ], [
   LIBM=""
@@ -2766,6 +2766,58 @@ AC_CHECK_HEADERS(png.h, [
   ])
 fi
 AM_CONDITIONAL(BUILD_OSDMENU, [test "${enable_png}" != "no"])
+
+dnl
+dnl H264 encoder plugin (10-bit lib264)
+dnl
+AC_ARG_ENABLE(x26410b,
+  [  --enable-x26410b           H264 10-bit encoding support with static libx264 (default disabled)])
+if test "${enable_x26410b}" != "no"; then
+AC_ARG_WITH(x26410b-tree,
+  [ --with-x26410b-tree=PATH      H264 10-bit encoding module with libx264 (static linking)],[],[])
+  if test "${with_x26410b_tree}" != "no" -a -n "${with_x26410b_tree}"
+  then
+    real_x26410b_tree="̧`cd ${with_x26410b_tree} 2>/dev/null && pwd`"
+    if test -z "${real_x26410b_tree}"
+    then
+      AC_MSG_RESULT(no)
+      AC_MSG_ERROR([${with_x26410b_tree} directory does not exist])
+    fi
+    AC_MSG_CHECKING(for x264.h in ${real_x26410b_tree})
+    if test -f ${with_x26410b_tree}/x264_config.h
+    then
+      AC_MSG_RESULT(yes)
+      AC_MSG_CHECKING(for 10-bit build of x264)
+      if grep -q "BIT_DEPTH.*10"  ${with_x26410b_tree}/x264_config.h ;then
+        AC_MSG_RESULT(yes)
+        VLC_ADD_PLUGIN([x26410b])
+        VLC_ADD_CFLAGS([x26410b],[-I${with_x26410b_tree}])
+        VLC_ADD_LIBS([x26410b],[-L${with_x26410b_tree} -lm -lpthread -lx264])
+      else
+        AC_MSG_RESULT(no)
+        AC_MSG_ERROR([${with_x26410b_tree} isnt build 10-bit])
+      fi
+    else
+      AC_MSG_RESULT(no)
+      AC_MSG_ERROR([${with_x26410b_tree} doesnt have x264_config.h])
+    fi
+  else
+    PKG_CHECK_MODULES(X26410B, x26410b, [
+        VLC_ADD_PLUGIN([x26410b])
+        VLC_ADD_LDFLAGS([x26410b],[${X26410B_LIBS}])
+        AS_IF([test "${ac_cv_ld_bsymbolic}" != "no"], [
+          VLC_ADD_LIBS([x26410b],[-Wl,-Bsymbolic])
+        ])
+        VLC_ADD_CFLAGS([x26410b],[${X26410B_CFLAGS}])
+        if echo ${X26410B_LIBS} |grep -q 'pthreadGC2'; then
+          VLC_ADD_CFLAGS([x26410b], [-DPTW32_STATIC_LIB])
+        fi
+    ], [
+        AC_MSG_ERROR([x26410b module doesn't work without staticly compiled libx264.a])
+    ])
+  fi
+fi
+
 
 dnl
 dnl H264 encoder plugin (using libx264)
