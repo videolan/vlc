@@ -114,7 +114,7 @@ private:
     static QMenu *NavigMenu( intf_thread_t *p_intf, QWidget *parent ) {
         return NavigMenu( p_intf, new QMenu( parent ) );
     }
-    static QMenu *RebuildNavigMenu( intf_thread_t *, QMenu *);
+    static QMenu *RebuildNavigMenu( intf_thread_t *, QMenu *, bool b_keep = false );
 
     static QMenu *VideoMenu( intf_thread_t *, QMenu *, bool b_subtitle = true );
     static QMenu *VideoMenu( intf_thread_t *p_intf, QWidget *parent ) {

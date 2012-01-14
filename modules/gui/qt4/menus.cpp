@@ -700,15 +700,16 @@ QMenu *VLCMenuBar::NavigMenu( intf_thread_t *p_intf, QMenu *menu )
     action->setData( "bookmark" );
 
     menu->addSeparator();
-    PopupMenuPlaylistControlEntries( menu, p_intf );
+
     PopupMenuControlEntries( menu, p_intf );
 
     EnableStaticEntries( menu, ( THEMIM->getInput() != NULL ) );
-    return RebuildNavigMenu( p_intf, menu );
+    return RebuildNavigMenu( p_intf, menu, true );
 }
 
-QMenu *VLCMenuBar::RebuildNavigMenu( intf_thread_t *p_intf, QMenu *menu )
+QMenu *VLCMenuBar::RebuildNavigMenu( intf_thread_t *p_intf, QMenu *menu, bool b_keep )
 {
+
     /* */
     input_thread_t *p_object;
     QVector<vlc_object_t *> objects;
@@ -719,14 +720,25 @@ QMenu *VLCMenuBar::RebuildNavigMenu( intf_thread_t *p_intf, QMenu *menu )
 
     InputAutoMenuBuilder( p_object, objects, varnames );
 
-    menu->addSeparator();
-
     /* Title and so on */
     PUSH_VAR( "prev-title" );
     PUSH_VAR( "next-title" );
     PUSH_VAR( "prev-chapter" );
     PUSH_VAR( "next-chapter" );
 
+    /* Remove playback actions to recreate them */
+    if( !b_keep )
+    {
+        QList< QAction* > actions = menu->actions();
+        if( actions.count() > 4 )
+            for( int i = actions.count() - 1 ; i >= actions.count() - 1 - 4 ; --i )
+                delete actions[i];
+    }
+
+    PopupPlayEntries( menu, p_intf, p_object );
+    PopupMenuPlaylistControlEntries( menu, p_intf );
+
+    /* */
     EnableStaticEntries( menu, (p_object != NULL ) );
     return Populate( p_intf, menu, varnames, objects );
 }
