@@ -1,10 +1,11 @@
 /*****************************************************************************
- * VLCUIWidgets.h: Widgets for VLC's Minimal Dialog Provider for Mac OS X
+ * VLCUIWidgets.h: Widgets for VLC's extensions dialogs for Mac OS X
  *****************************************************************************
- * Copyright (C) 2009-2012 the VideoLAN team
+ * Copyright (C) 2009-2012 the VideoLAN team and authors
  * $Id$
  *
- * Authors: Pierre d'Herbemont <pdherbemont # videolan dot>
+ * Authors: Pierre d'Herbemont <pdherbemont # videolan dot>,
+ *          Brendon Justin <brendonjustin@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
