@@ -26,30 +26,30 @@
 
 #import <stdlib.h>
 
- at implementation VLCDialogButton
- at synthesize widget;
- at end
+@implementation VLCDialogButton
+@synthesize widget;
+@end
 
 
- at implementation VLCDialogPopUpButton
- at synthesize widget;
- at end
+@implementation VLCDialogPopUpButton
+@synthesize widget;
+@end
 
 
- at implementation VLCDialogTextField
- at synthesize widget;
- at end
+@implementation VLCDialogTextField
+@synthesize widget;
+@end
 
 
- at implementation VLCDialogWindow
- at synthesize dialog;
- at synthesize has_lock;
- at end
+@implementation VLCDialogWindow
+@synthesize dialog;
+@synthesize has_lock;
+@end
 
 
- at implementation VLCDialogList
- at synthesize widget;
- at synthesize contentArray;
+@implementation VLCDialogList
+@synthesize widget;
+@synthesize contentArray;
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)aTableView
 {
@@ -60,10 +60,10 @@
 {
     return [[contentArray objectAtIndex:rowIndex] objectForKey:@"text"];
 }
- at end
+@end
 
 
- at implementation VLCDialogGridView
+@implementation VLCDialogGridView
 
 - (NSUInteger)numViews
 {
@@ -391,4 +391,4 @@
     return size;
 }
 
- at end
+@end

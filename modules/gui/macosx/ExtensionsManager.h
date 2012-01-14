@@ -4,7 +4,7 @@
  * Copyright (C) 2012 VideoLAN and authors
  * $Id$
  *
- * Authors: Brendon Justin <brendonjustin at gmail.com>
+ * Authors: Brendon Justin <brendonjustin@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,13 +32,13 @@
 
 #import <Cocoa/Cocoa.h>
 
- at class ExtensionsDialogProvider;
+@class ExtensionsDialogProvider;
 
- at protocol ExtensionsDelegate <NSObject>
+@protocol ExtensionsDelegate <NSObject>
 - (void)extensionsUpdated;
- at end
+@end
 
- at interface ExtensionsManager : NSObject
+@interface ExtensionsManager : NSObject
 {
     intf_thread_t *p_intf;
     extensions_manager_t *p_extensions_manager;
@@ -70,6 +70,6 @@
 - (BOOL)isLoaded;
 - (BOOL)cannotLoad;
 
- at property (readonly) BOOL isUnloading;
+@property (readonly) BOOL isUnloading;
 
- at end
+@end

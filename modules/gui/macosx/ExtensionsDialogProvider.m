@@ -4,9 +4,9 @@
  * Copyright (C) 2005-2012 VLC authors and VideoLAN
  * $Id$
  *
- * Authors: Brendon Justin <brendonjustin at gmail.com>,
- *          Derk-Jan Hartman <hartman at videolan dot org>,
- *          Felix Paul Kühne <fkuehne at videolan dot org>
+ * Authors: Brendon Justin <brendonjustin@gmail.com>,
+ *          Derk-Jan Hartman <hartman@videolan dot org>,
+ *          Felix Paul Kühne <fkuehne@videolan dot org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -271,7 +271,7 @@ static int dialogCallback( vlc_object_t *p_this, const char *psz_variable,
     return VLC_SUCCESS;
 }
 
- at implementation ExtensionsDialogProvider
+@implementation ExtensionsDialogProvider
 
 static ExtensionsDialogProvider *_o_sharedInstance = nil;
 
@@ -408,7 +408,7 @@ static ExtensionsDialogProvider *_o_sharedInstance = nil;
     FOREACH_ARRAY(widget, dialog->widgets)
     {
         if (!widget)
-            continue; /* Some widgets may be NULL at this point */
+            continue; /* Some widgets may be NULL@this point */
 
         BOOL shouldDestroy = widget->b_kill;
         NSView *control = widget->p_sys_intf;
@@ -594,4 +594,4 @@ static ExtensionsDialogProvider *_o_sharedInstance = nil;
                         waitUntilDone:YES];
 }
 
- at end
+@end

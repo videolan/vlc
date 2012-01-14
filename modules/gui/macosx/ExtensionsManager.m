@@ -4,7 +4,7 @@
  * Copyright (C) 2009-2012 VideoLAN and authors
  * $Id$
  *
- * Authors: Brendon Justin <brendonjustin at gmail.com>,
+ * Authors: Brendon Justin <brendonjustin@gmail.com>,
  *          Jean-Philippe André < jpeg # videolan.org >
  *
  * This program is free software; you can redistribute it and/or modify
@@ -33,11 +33,11 @@
 #define MENU_GET_ACTION(a) ( (uint16_t)( ((uint32_t)a) >> 16 ) )
 #define MENU_GET_EXTENSION(a) ( (uint16_t)( ((uint32_t)a) & 0xFFFF ) )
 
- at implementation ExtensionsManager
+@implementation ExtensionsManager
 
 static ExtensionsManager* instance = nil;
 
- at synthesize isUnloading = b_unloading;
+@synthesize isUnloading = b_unloading;
 
 + (ExtensionsManager *)getInstance:( intf_thread_t *)_p_intf
 {
@@ -369,4 +369,4 @@ static ExtensionsManager* instance = nil;
     return b_unloading || b_failed;
 }
 
- at end
+@end

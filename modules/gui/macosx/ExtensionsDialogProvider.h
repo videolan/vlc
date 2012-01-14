@@ -4,9 +4,9 @@
  * Copyright (C) 2005-2012 VLC authors and VideoLAN
  * $Id$
  *
- * Authors: Brendon Justin <brendonjustin at gmail.com>,
- *          Derk-Jan Hartman <hartman at videolan dot org>,
- *          Felix Paul Kühne <fkuehne at videolan dot org>
+ * Authors: Brendon Justin <brendonjustin@gmail.com>,
+ *          Derk-Jan Hartman <hartman@videolan dot org>,
+ *          Felix Paul Kühne <fkuehne@videolan dot org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,7 +36,7 @@
 /*****************************************************************************
  * ExtensionsDialogProvider interface
  *****************************************************************************/
- at interface ExtensionsDialogProvider : NSObject <NSWindowDelegate>
+@interface ExtensionsDialogProvider : NSObject <NSWindowDelegate>
 {
     intf_thread_t *p_intf;
 }
@@ -61,4 +61,4 @@
 - (VLCDialogWindow *)updateExtensionDialog:(NSValue *)o_value;
 - (void)manageDialog:(extension_dialog_t *)p_dialog;
 
- at end
+@end

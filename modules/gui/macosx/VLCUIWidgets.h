@@ -25,41 +25,41 @@
 #import <Cocoa/Cocoa.h>
 #import <vlc_extensions.h>
 
- at class VLCDialogGridView;
+@class VLCDialogGridView;
 
- at interface VLCDialogButton : NSButton
+@interface VLCDialogButton : NSButton
 
- at property (readwrite) extension_widget_t *widget;
- at end
-
-
- at interface VLCDialogPopUpButton : NSPopUpButton
-
- at property (readwrite) extension_widget_t *widget;
- at end
+@property (readwrite) extension_widget_t *widget;
+@end
 
 
- at interface VLCDialogTextField : NSTextField
+@interface VLCDialogPopUpButton : NSPopUpButton
 
- at property (readwrite) extension_widget_t *widget;
- at end
-
-
- at interface VLCDialogWindow : NSWindow
-
- at property (readwrite) extension_dialog_t *dialog;
- at property (readwrite) BOOL has_lock;
- at end
+@property (readwrite) extension_widget_t *widget;
+@end
 
 
- at interface VLCDialogList : NSTableView <NSTableViewDataSource>
+@interface VLCDialogTextField : NSTextField
 
- at property (readwrite) extension_widget_t *widget;
- at property (readwrite, retain) NSMutableArray *contentArray;
- at end
+@property (readwrite) extension_widget_t *widget;
+@end
 
 
- at interface VLCDialogGridView : NSView {
+@interface VLCDialogWindow : NSWindow
+
+@property (readwrite) extension_dialog_t *dialog;
+@property (readwrite) BOOL has_lock;
+@end
+
+
+@interface VLCDialogList : NSTableView <NSTableViewDataSource>
+
+@property (readwrite) extension_widget_t *widget;
+@property (readwrite, retain) NSMutableArray *contentArray;
+@end
+
+
+@interface VLCDialogGridView : NSView {
     NSUInteger _rowCount, _colCount;
     NSMutableArray *_griddedViews;
 }
@@ -68,6 +68,6 @@
 - (NSSize)flexSize:(NSSize)size;
 - (void)removeSubview:(NSView *)view;
 
- at property (readonly) NSUInteger numViews;
+@property (readonly) NSUInteger numViews;
 
- at end
+@end
