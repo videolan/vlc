@@ -260,7 +260,6 @@ void ToolbarEditDialog::changeProfile( int i )
 
 void ToolbarEditDialog::close()
 {
-    msg_Dbg( p_intf, "Close and save" );
     getSettings()->setValue( "MainWindow/ToolbarPos",
             positionCombo->itemData( positionCombo->currentIndex() ).toInt() );
     getSettings()->setValue( "MainWindow/MainToolbar1", controller1->getValue() );

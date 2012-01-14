@@ -146,7 +146,7 @@ void ConvertDialog::close()
             mrl += "}";
     }
 
-    msg_Warn( p_intf, "Transcode MRL: %s", qtu( mrl ) );
+    msg_Dbg( p_intf, "Transcode MRL: %s", qtu( mrl ) );
     accept();
 }
 

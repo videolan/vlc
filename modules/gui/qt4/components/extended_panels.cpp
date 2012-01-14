@@ -33,7 +33,6 @@
 #include <QString>
 #include <QFont>
 #include <QGridLayout>
-#include <QSignalMapper>
 #include <QComboBox>
 #include <QTimer>
 #include <QFileDialog>
@@ -445,8 +444,7 @@ void ExtVideo::initComboBoxItems( QObject *widget )
     }
     else
     {
-        msg_Err( p_intf, "Couldn't find option \"%s\".",
-                 qtu( option ) );
+        msg_Err( p_intf, "Couldn't find option \"%s\".", qtu( option ) );
     }
 }
 
@@ -516,20 +514,20 @@ void ExtVideo::setWidgetValue( QObject *widget )
         }
         else if( combobox ) combobox->setCurrentIndex(
                             combobox->findData( qlonglong(val.i_int) ) );
-        else msg_Warn( p_intf, "Oops %s %s %d", __FILE__, __func__, __LINE__ );
+        else msg_Warn( p_intf, "Could not find the correct Integer widget" );
     }
     else if( i_type == VLC_VAR_FLOAT )
     {
         if( slider ) slider->setValue( ( int )( val.f_float*( double )slider->tickInterval() ) ); /* hack alert! */
         else if( doublespinbox ) doublespinbox->setValue( val.f_float );
-        else msg_Warn( p_intf, "Oops %s %s %d", __FILE__, __func__, __LINE__ );
+        else msg_Warn( p_intf, "Could not find the correct Float widget" );
     }
     else if( i_type == VLC_VAR_STRING )
     {
         if( lineedit ) lineedit->setText( qfu( val.psz_string ) );
         else if( combobox ) combobox->setCurrentIndex(
                             combobox->findData( qfu( val.psz_string ) ) );
-        else msg_Warn( p_intf, "Oops %s %s %d", __FILE__, __func__, __LINE__ );
+        else msg_Warn( p_intf, "Could not find the correct String widget" );
         free( val.psz_string );
     }
     else
@@ -586,7 +584,7 @@ void ExtVideo::updateFilterOptions()
         else if( dial )     i_int = ( 540-dial->value() )%360;
         else if( lineedit ) i_int = lineedit->text().toInt( NULL,16 );
         else if( combobox ) i_int = combobox->itemData( combobox->currentIndex() ).toInt();
-        else msg_Warn( p_intf, "Oops %s %s %d", __FILE__, __func__, __LINE__ );
+        else msg_Warn( p_intf, "Could not find the correct Integer widget" );
         config_PutInt( p_intf, qtu( option ), i_int );
         if( b_is_command )
         {
@@ -603,7 +601,7 @@ void ExtVideo::updateFilterOptions()
                                          / ( double )slider->tickInterval(); /* hack alert! */
         else if( doublespinbox ) f_float = doublespinbox->value();
         else if( lineedit ) f_float = lineedit->text().toDouble();
-        else msg_Warn( p_intf, "Oops %s %s %d", __FILE__, __func__, __LINE__ );
+        else msg_Warn( p_intf, "Could not find the correct Float widget" );
         config_PutFloat( p_intf, qtu( option ), f_float );
         if( b_is_command )
             var_SetFloat( p_obj, qtu( option ), f_float );
@@ -616,7 +614,7 @@ void ExtVideo::updateFilterOptions()
         else if( combobox )
             val = combobox->itemData( combobox->currentIndex() ).toString();
         else
-            msg_Warn( p_intf, "Oops %s %s %d", __FILE__, __func__, __LINE__ );
+            msg_Warn( p_intf, "Could not find the correct String widget" );
         config_PutPsz( p_intf, qtu( option ), qtu( val ) );
         if( b_is_command )
             var_SetString( p_obj, qtu( option ), qtu( val ) );

@@ -103,13 +103,13 @@ void MainInterface::createTaskBarButtons()
             QBitmap mask4 = img4.createMaskFromColor(Qt::transparent);
 
             if(-1 == ImageList_Add(himl, img.toWinHBITMAP(QPixmap::PremultipliedAlpha),mask.toWinHBITMAP()))
-                msg_Err( p_intf, "ImageList_Add failed" );
+                msg_Err( p_intf, "First ImageList_Add failed" );
             if(-1 == ImageList_Add(himl, img2.toWinHBITMAP(QPixmap::PremultipliedAlpha),mask2.toWinHBITMAP()))
-                msg_Err( p_intf, "ImageList_Add failed" );
+                msg_Err( p_intf, "Second ImageList_Add failed" );
             if(-1 == ImageList_Add(himl, img3.toWinHBITMAP(QPixmap::PremultipliedAlpha),mask3.toWinHBITMAP()))
-                msg_Err( p_intf, "ImageList_Add failed" );
+                msg_Err( p_intf, "Third ImageList_Add failed" );
             if(-1 == ImageList_Add(himl, img4.toWinHBITMAP(QPixmap::PremultipliedAlpha),mask4.toWinHBITMAP()))
-                msg_Err( p_intf, "ImageList_Add failed" );
+                msg_Err( p_intf, "Fourth ImageList_Add failed" );
         }
 
         // Define an array of two buttons. These buttons provide images through an

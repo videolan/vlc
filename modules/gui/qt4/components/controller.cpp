@@ -126,7 +126,7 @@ void AbstractController::parseAndCreate( const QString& config,
         buttonType_e i_type = (buttonType_e)list2.at( 0 ).toInt( &ok );
         if( !ok )
         {
-            msg_Warn( p_intf, "Parsing error 2. Please report this." );
+            msg_Warn( p_intf, "Parsing error 2. Please, report this." );
             continue;
         }
 

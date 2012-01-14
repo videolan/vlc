@@ -174,7 +174,6 @@ void StandardPLPanel::searchDelayed( const QString& searchText )
 
     if( type == SD_TYPE && can_search )
     {
-        msg_Err( p_intf, "SEARCHING DELAYED");
         if( !name.isEmpty() && !searchText.isEmpty() )
             playlist_ServicesDiscoveryControl( THEPL, qtu( name ), SD_CMD_SEARCH,
                                               qtu( searchText ) );
@@ -196,7 +195,6 @@ void StandardPLPanel::setRootItem( playlist_item_t *p_item, bool b )
     Q_UNUSED( b );
 #endif
     {
-        msg_Dbg( p_intf, "Normal PL/ML or SD" );
         if( currentView->model() != model )
             currentView->setModel( model );
         model->rebuild( p_item );

@@ -486,7 +486,7 @@ QModelIndex PLModel::parent( const QModelIndex &index ) const
     PLItem *childItem = getItem( index );
     if( !childItem )
     {
-        msg_Err( p_playlist, "NULL CHILD" );
+        msg_Err( p_playlist, "Item not found" );
         return QModelIndex();
     }
 
@@ -494,8 +494,7 @@ QModelIndex PLModel::parent( const QModelIndex &index ) const
     if( !parentItem || parentItem == rootItem ) return QModelIndex();
     if( !parentItem->parent() )
     {
-        msg_Err( p_playlist, "No parent parent, trying row 0 " );
-        msg_Err( p_playlist, "----- PLEASE REPORT THIS ------" );
+        msg_Err( p_playlist, "No parent found, trying row 0. Please report this" );
         return createIndex( 0, 0, parentItem );
     }
     return createIndex(parentItem->row(), 0, parentItem);
@@ -699,7 +698,6 @@ void PLModel::insertChildren( PLItem *node, QList<PLItem*>& items, int i_pos )
     assert( node );
     int count = items.count();
     if( !count ) return;
-    printf( "Here I am\n");
     beginInsertRows( index( node, 0 ), i_pos, i_pos + count - 1 );
     for( int i = 0; i < count; i++ )
     {
