@@ -1052,16 +1052,17 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
                     info[infolen - 2] = '\0'; /* remove trailing ", " */
                     httpd_MsgAdd( answer, "RTP-Info", "%s", info );
                 }
-                if (vod)
-                {
-                    vod_play(rtsp->vod_media, psz_session, &start, end);
-                    npt = start;
-                }
             }
             vlc_mutex_unlock( &rtsp->lock );
 
             if (ses != NULL)
             {
+                if (vod)
+                {
+                    vod_play(rtsp->vod_media, psz_session, &start, end);
+                    npt = start;
+                }
+
                 double f_npt = (double) npt / CLOCK_FREQ;
                 httpd_MsgAdd( answer, "Range", "npt=%f-", f_npt );
             }
@@ -1089,15 +1090,7 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
             ses = RtspClientGet( rtsp, psz_session );
             if (ses != NULL)
             {
-                if (id == NULL)
-                {
-                    assert(vod);
-                    int64_t npt;
-                    vod_pause(rtsp->vod_media, psz_session, &npt);
-                    double f_npt = (double) npt / CLOCK_FREQ;
-                    httpd_MsgAdd( answer, "Range", "npt=%f-", f_npt );
-                }
-                else /* "Mute" the selected track */
+                if (id != NULL) /* "Mute" the selected track */
                 {
                     bool found = false;
                     for (int i = 0; i < ses->trackc; i++)
@@ -1123,6 +1116,15 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
                 RtspClientAlive(ses);
             }
             vlc_mutex_unlock( &rtsp->lock );
+
+            if (ses != NULL && id == NULL)
+            {
+                assert(vod);
+                int64_t npt = 0;
+                vod_pause(rtsp->vod_media, psz_session, &npt);
+                double f_npt = (double) npt / CLOCK_FREQ;
+                httpd_MsgAdd( answer, "Range", "npt=%f-", f_npt );
+            }
             break;
         }
 
