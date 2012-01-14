@@ -60,7 +60,7 @@ libvlc_la_LIBADD = $(LIBS_libvlc) \
 libvlc_la_LDFLAGS = \
 	$(LDFLAGS_libvlc) \
 	-no-undefined \
-	-version-info 6:0:1 \
+	-version-info 8:0:3 \
 	-export-symbols $(srcdir)/libvlc.sym
 libvlc_la_DEPENDENCIES = libvlc.sym
 if HAVE_WIN32
