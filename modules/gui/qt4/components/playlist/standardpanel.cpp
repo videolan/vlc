@@ -392,6 +392,12 @@ void StandardPLPanel::showView( int i_view )
         {
             treeView->header()->restoreState(getSettings()
                     ->value( "Playlist/headerStateV2" ).toByteArray() );
+            /* if there is allready stuff in playlist, we don't sort it and we reset
+               sorting */
+            if( model->rowCount() )
+            {
+                treeView->header()->setSortIndicator( -1 , Qt::AscendingOrder );
+            }
         }
         else
         {
