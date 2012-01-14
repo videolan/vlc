@@ -564,17 +564,17 @@ void VLCMenuBar::ExtensionsMenu( intf_thread_t *p_intf, QMenu *extMenu )
 
 static inline void VolumeEntries( intf_thread_t *p_intf, QMenu *current )
 {
-        current->addSeparator();
+    current->addSeparator();
 
-        QAction *action = current->addAction( qtr( "Increase Volume" ),
+    QAction *action = current->addAction( qtr( "Increase Volume" ),
                 ActionsManager::getInstance( p_intf ), SLOT( AudioUp() ) );
-        action->setData( VLCMenuBar::ACTION_STATIC );
-        action = current->addAction( qtr( "Decrease Volume" ),
+    action->setData( VLCMenuBar::ACTION_STATIC );
+    action = current->addAction( qtr( "Decrease Volume" ),
                 ActionsManager::getInstance( p_intf ), SLOT( AudioDown() ) );
-        action->setData( VLCMenuBar::ACTION_STATIC );
-        action = current->addAction( qtr( "Mute" ),
+    action->setData( VLCMenuBar::ACTION_STATIC );
+    action = current->addAction( qtr( "Mute" ),
                 ActionsManager::getInstance( p_intf ), SLOT( toggleMuteAudio() ) );
-        action->setData( VLCMenuBar::ACTION_STATIC );
+    action->setData( VLCMenuBar::ACTION_STATIC );
 }
 
 /**
@@ -870,9 +870,8 @@ void VLCMenuBar::PopupMenuPlaylistControlEntries( QMenu *menu,
 {
     bool bEnable = THEMIM->getInput() != NULL;
     bool bPlaylistEmpty = THEMIM->hasEmptyPlaylist();
-    QAction *action =
-            addMIMStaticEntry( p_intf, menu, qtr( "&Stop" ), ":/menu/stop",
-                               SLOT( stop() ), true );
+    QAction *action = addMIMStaticEntry( p_intf, menu, qtr( "&Stop" ),
+                                         ":/menu/stop", SLOT( stop() ), true );
     /* Disable Stop in the right-click popup menu */
     if( !bEnable )
         action->setEnabled( false );
