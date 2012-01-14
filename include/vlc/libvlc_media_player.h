@@ -821,7 +821,8 @@ LIBVLC_API void libvlc_track_description_list_release( libvlc_track_description_
 /**
  * \deprecated Use libvlc_track_description_list_release instead
  */
-LIBVLC_DEPRECATED void libvlc_track_description_release( libvlc_track_description_t *p_track_description );
+LIBVLC_DEPRECATED
+LIBVLC_API void libvlc_track_description_release( libvlc_track_description_t *p_track_description );
 
 /** \defgroup libvlc_video LibVLC video controls
  * @{
@@ -915,7 +916,7 @@ int libvlc_video_get_size( libvlc_media_player_t *p_mi, unsigned num,
  * \param p_mi the media player
  * \return the video pixel height or 0 if not applicable
  */
-LIBVLC_DEPRECATED
+LIBVLC_DEPRECATED LIBVLC_API
 int libvlc_video_get_height( libvlc_media_player_t *p_mi );
 
 /**
@@ -925,7 +926,7 @@ int libvlc_video_get_height( libvlc_media_player_t *p_mi );
  * \param p_mi the media player
  * \return the video pixel width or 0 if not applicable
  */
-LIBVLC_DEPRECATED
+LIBVLC_DEPRECATED LIBVLC_API
 int libvlc_video_get_width( libvlc_media_player_t *p_mi );
 
 /**

@@ -56,9 +56,9 @@ extern "C" {
  * \param i_options the number of options to add to the item
  * \param ppsz_options the options to add to the item
  */
-LIBVLC_DEPRECATED void libvlc_playlist_play( libvlc_instance_t *p_instance,
-                                              int i_id, int i_options,
-                                              char **ppsz_options );
+LIBVLC_DEPRECATED LIBVLC_API
+void libvlc_playlist_play( libvlc_instance_t *p_instance, int i_id,
+                           int i_options, char **ppsz_options );
 
 /** @}*/
 
