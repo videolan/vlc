@@ -36,6 +36,7 @@ struct sout_stream_sys_t
 
     /* Video */
     vlc_fourcc_t    i_vcodec;   /* codec video (0 if not transcode) */
+    video_format_t  fmt_input_video;
     char            *psz_venc;
     config_chain_t  *p_video_cfg;
     int             i_vbitrate;

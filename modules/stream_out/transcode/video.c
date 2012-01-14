@@ -638,12 +638,41 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_t *id,
                 b_need_duplicate = true;
             }
         }
+        if( unlikely (
+             id->p_encoder->p_module &&
+             !video_format_IsSimilar( &p_sys->fmt_input_video, &id->p_decoder->fmt_out.video )
+            )
+          )
+        {
+            msg_Info( p_stream, "aspect-ratio changed, reiniting. %i -> %i : %i -> %i.",
+                        p_sys->fmt_input_video.i_sar_num, id->p_decoder->fmt_out.video.i_sar_num,
+                        p_sys->fmt_input_video.i_sar_den, id->p_decoder->fmt_out.video.i_sar_den
+                    );
+            /* Close filters */
+            if( id->p_f_chain )
+                filter_chain_Delete( id->p_f_chain );
+            id->p_f_chain = NULL;
+            if( id->p_uf_chain )
+                filter_chain_Delete( id->p_uf_chain );
+            id->p_uf_chain = NULL;
+
+            /* Reinitialize filters */
+            id->p_encoder->fmt_out.video.i_width  = p_sys->i_width & ~1;
+            id->p_encoder->fmt_out.video.i_height = p_sys->i_height & ~1;
+            id->p_encoder->fmt_out.video.i_sar_num = id->p_encoder->fmt_out.video.i_sar_den = 0;
+
+            transcode_video_encoder_init( p_stream, id );
+            transcode_video_filter_init( p_stream, id );
+            memcpy( &p_sys->fmt_input_video, &id->p_decoder->fmt_out.video, sizeof(video_format_t));
+        }
+
 
         if( unlikely( !id->p_encoder->p_module ) )
         {
             transcode_video_encoder_init( p_stream, id );
 
             transcode_video_filter_init( p_stream, id );
+            memcpy( &p_sys->fmt_input_video, &id->p_decoder->fmt_out.video, sizeof(video_format_t));
 
             if( transcode_video_encoder_open( p_stream, id ) != VLC_SUCCESS )
             {
