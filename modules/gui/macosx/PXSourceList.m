@@ -9,6 +9,7 @@
 //
 
 #import "PXSourceList.h"
+#import "SideBarItem.h"
 
 //Layout constants
 #define MIN_BADGE_WIDTH							22.0		//The minimum badge width for each item (default 22.0)
@@ -610,7 +611,10 @@ NSString * const PXSLDeleteKeyPressedOnRowsNotification = @"PXSourceListDeleteKe
 		NSPoint clickPoint = [self convertPoint:[theEvent locationInWindow] fromView:nil];
 		NSInteger row = [self rowAtPoint:clickPoint];
 		id clickedItem = [self itemAtRow:row];
-		m = [_secondaryDelegate sourceList:self menuForEvent:theEvent item:clickedItem];
+        if ([clickedItem sdtype] > 0)
+            m = [_secondaryDelegate sourceList:self menuForEvent:theEvent item:clickedItem];
+        else
+            m = [super menuForEvent:theEvent];
 	}
 	if (m == nil) {
 		m = [super menuForEvent:theEvent];

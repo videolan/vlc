@@ -520,6 +520,7 @@
     [[[[VLCMain sharedInstance] bookmarks] dataTable] reloadData];
 
     [self outlineViewSelectionDidChange: nil];
+    [[VLCMain sharedInstance] updateMainWindow];
 }
 
 - (void)outlineViewSelectionDidChange:(NSNotification *)notification

@@ -32,6 +32,7 @@
 	NSString *identifier;
 	NSImage *icon;
 	NSInteger badgeValue;
+    NSInteger sdtype;
 
 	NSArray *children;
 }
@@ -40,6 +41,7 @@
 @property (nonatomic, copy) NSString *identifier;
 @property (nonatomic, retain) NSImage *icon;
 @property NSInteger badgeValue;
+@property NSInteger sdtype;
 
 @property (nonatomic, copy) NSArray *children;
 

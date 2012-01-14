@@ -276,7 +276,7 @@
 /*****************************************************************************
  * VLCColorView
  *
- * since we are using a clear window color when using the black window 
+ * since we are using a clear window color when using the black window
  * style, some filling is needed behind the video and some other elements
  *****************************************************************************/
 

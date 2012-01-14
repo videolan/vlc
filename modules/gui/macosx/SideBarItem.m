@@ -20,6 +20,7 @@
 @synthesize icon;
 @synthesize badgeValue;
 @synthesize children;
+@synthesize sdtype;
 
 #pragma mark -
 #pragma mark Init/Dealloc/Finalize
@@ -29,6 +30,7 @@
 	if(self=[super init])
 	{
 		badgeValue = -1;	//We don't want a badge value by default
+        sdtype = -1; //no sd type set
 	}
 
 	return self;

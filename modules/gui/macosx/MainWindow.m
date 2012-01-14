@@ -328,7 +328,6 @@ static VLCMainWindow *_o_sharedInstance = nil;
     for (; *ppsz_name; ppsz_name++, ppsz_longname++, p_category++)
     {
         o_identifier = [NSString stringWithCString: *ppsz_name encoding: NSUTF8StringEncoding];
-        o_identifier = [[o_identifier componentsSeparatedByString:@"{"] objectAtIndex:0];
         switch (*p_category) {
             case SD_CAT_INTERNET:
                 {
@@ -337,18 +336,21 @@ static VLCMainWindow *_o_sharedInstance = nil;
                         [[internetItems lastObject] setIcon: [NSImage imageNamed:@"sidebar-podcast"]];
                     else
                         [[internetItems lastObject] setIcon: [NSImage imageNamed:@"NSApplicationIcon"]];
+                    [[internetItems lastObject] setSdtype: SD_CAT_INTERNET];
                 }
                 break;
             case SD_CAT_DEVICES:
                 {
                     [devicesItems addObject: [SideBarItem itemWithTitle: [NSString stringWithCString: *ppsz_longname encoding: NSUTF8StringEncoding] identifier: o_identifier]];
                     [[devicesItems lastObject] setIcon: [NSImage imageNamed:@"NSApplicationIcon"]];
+                    [[devicesItems lastObject] setSdtype: SD_CAT_DEVICES];
                 }
                 break;
             case SD_CAT_LAN:
                 {
                     [lanItems addObject: [SideBarItem itemWithTitle: [NSString stringWithCString: *ppsz_longname encoding: NSUTF8StringEncoding] identifier: o_identifier]];
                     [[lanItems lastObject] setIcon: [NSImage imageNamed:@"sidebar-local"]];
+                    [[lanItems lastObject] setSdtype: SD_CAT_LAN];
                 }
                 break;
             case SD_CAT_MYCOMPUTER:
@@ -362,6 +364,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
                         [[mycompItems lastObject] setIcon: [NSImage imageNamed:@"sidebar-pictures"]];
                     else
                         [[mycompItems lastObject] setIcon: [NSImage imageNamed:@"NSApplicationIcon"]];
+                    [[mycompItems lastObject] setSdtype: SD_CAT_MYCOMPUTER];
                 }
                 break;
             default:
@@ -1063,7 +1066,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [o_fspanel setSeekable: b_seekable];
 
     PL_LOCK;
-    if (playlist_CurrentSize( p_playlist ) >= 1)
+    if (p_playlist->items.i_size >= 1)
         [self hideDropZone];
     else
         [self showDropZone];
@@ -1895,12 +1898,39 @@ static VLCMainWindow *_o_sharedInstance = nil;
 - (NSMenu*)sourceList:(PXSourceList*)aSourceList menuForEvent:(NSEvent*)theEvent item:(id)item
 {
 	if ([theEvent type] == NSRightMouseDown || ([theEvent type] == NSLeftMouseDown && ([theEvent modifierFlags] & NSControlKeyMask) == NSControlKeyMask)) {
-		NSMenu * m = [[NSMenu alloc] init];
 		if (item != nil)
-			[m addItemWithTitle:[item title] action:nil keyEquivalent:@""];
-		return [m autorelease];
+        {
+            NSMenu * m;
+            if ([item sdtype] > 0)
+            {
+                m = [[NSMenu alloc] init];
+                playlist_t * p_playlist = pl_Get( VLCIntf );
+                BOOL sd_loaded = playlist_IsServicesDiscoveryLoaded( p_playlist, [[item identifier] UTF8String] );
+                if (!sd_loaded)
+                    [m addItemWithTitle:_NS("Enable") action:@selector(sdmenuhandler:) keyEquivalent:@""];
+                else
+                    [m addItemWithTitle:_NS("Disable") action:@selector(sdmenuhandler:) keyEquivalent:@""];
+                [[m itemAtIndex:0] setRepresentedObject: [item identifier]];
+            }
+            return [m autorelease];
+        }
 	}
 	return nil;
+}
+
+- (IBAction)sdmenuhandler:(id)sender
+{
+    NSString * identifier = [sender representedObject];
+    if ([identifier length] > 0 && ![identifier isEqualToString:@"lua{sd='freebox',longname='Freebox TV'}"])
+    {
+        playlist_t * p_playlist = pl_Get( VLCIntf );
+        BOOL sd_loaded = playlist_IsServicesDiscoveryLoaded( p_playlist, [identifier UTF8String] );
+
+        if (!sd_loaded)
+            playlist_ServicesDiscoveryAdd( p_playlist, [identifier UTF8String] );
+        else
+            playlist_ServicesDiscoveryRemove( p_playlist, [identifier UTF8String] );
+    }
 }
 
 #pragma mark -
@@ -1917,9 +1947,18 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
 	//Set the label text to represent the new selection
     if([selectedIndexes count]==1) {
-		NSString *title = [[o_sidebar_view itemAtRow:[selectedIndexes firstIndex]] title];
+        id item = [o_sidebar_view itemAtRow:[selectedIndexes firstIndex]];
+        if ([item sdtype] > -1)
+        {
+            playlist_t * p_playlist = pl_Get( VLCIntf );
+            BOOL sd_loaded = playlist_IsServicesDiscoveryLoaded( p_playlist, [[item identifier] UTF8String] );
+            if (!sd_loaded)
+            {
+                playlist_ServicesDiscoveryAdd( p_playlist, [[item identifier] UTF8String] );
+            }
+        }
 
-		[o_chosen_category_lbl setStringValue:title];
+		[o_chosen_category_lbl setStringValue:[item title]];
 	}
 	else {
 		[o_chosen_category_lbl setStringValue:@"(none)"];
