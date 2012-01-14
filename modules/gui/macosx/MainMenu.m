@@ -544,9 +544,8 @@ static VLCMainMenu *_o_sharedInstance = nil;
     [o_mi_rate_sld setEnabled: b_enabled];
     [o_mi_rate_sld setIntValue: [[VLCCoreInteraction sharedInstance] playbackRate]];
     int i = [[VLCCoreInteraction sharedInstance] playbackRate];
-    if (i == 0)
-        i = 1;
-    [o_mi_rate_fld setStringValue: [NSString stringWithFormat:@"%ix", i]];
+    double speed =  pow( 2, (double)i / 17 );
+    [o_mi_rate_fld setStringValue: [NSString stringWithFormat:@"%.2fx", speed]];
     if (b_enabled) {
         [o_mi_rate_lbl setHidden: NO];
         [o_mi_rate_lbl_gray setHidden: YES];
@@ -598,17 +597,15 @@ static VLCMainMenu *_o_sharedInstance = nil;
 {
     [[VLCCoreInteraction sharedInstance] setPlaybackRate: [o_mi_rate_sld intValue]];
     int i = [[VLCCoreInteraction sharedInstance] playbackRate];
-    if (i == 0)
-        i = 1;
-    [o_mi_rate_fld setStringValue: [NSString stringWithFormat:@"%ix", i]];
+    double speed =  pow( 2, (double)i / 17 );
+    [o_mi_rate_fld setStringValue: [NSString stringWithFormat:@"%.2fx", speed]];
 }
 
 - (void)updatePlaybackRate
 {
     int i = [[VLCCoreInteraction sharedInstance] playbackRate];
-    if (i == 0)
-        i = 1;
-    [o_mi_rate_fld setStringValue: [NSString stringWithFormat:@"%ix", i]];
+    double speed =  pow( 2, (double)i / 17 );
+    [o_mi_rate_fld setStringValue: [NSString stringWithFormat:@"%.2fx", speed]];
     [o_mi_rate_sld setIntValue: i];
 }
 
