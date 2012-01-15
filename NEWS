@@ -1,4 +1,4 @@
-Changes between 1.2.x and 1.3.0-git:
+Changes between 2.0.0 and 2.1.0-git:
 --------------------------------
 
 Encoders:
@@ -8,7 +8,7 @@ Audio Filters:
  * new remapping channel filter
 
 
-Changes between 1.1.12 and 1.2.0:
+Changes between 1.1.12 and 2.0.0:
 ---------------------------------
 
 Important notes:
@@ -37,6 +37,7 @@ Important notes:
    output interface, use --miface instead, e.g. --miface=eth0.
  * The Windows version will only work with Windows XP SP2 or later.
    Windows 2000 SP4, Windows XP < SP2, Windows 2003 SP0 are now unsupported.
+ * The Mac OS version will new Quartz Extreme compatible machines.
 
 Important changes for packagers:
  * The default builds now assume that the operating system uses UTF-8 for
@@ -48,7 +49,6 @@ Important changes for packagers:
  * The default tarballs are now compressed with XZ/LZMA: .tar.xz
  * OSS support is not compiled on Linux by default, pass --enable-oss to the
    configure script if you use OSSv4 or really want to use OSS emulation.
-
  * The webplugins has moved to git://git.videolan.org/npapi-vlc.git
 
 Core:
@@ -62,26 +62,29 @@ Core:
 
 Access:
  * Multiple files are now supported inside RAR files
- * BDA: experimental support for ClearQam devices
+ * Experimental support for ClearQam devices in the BDA module
  * DVB-S scanning support on Unix
  * DVB-C scanning on Unix scans correct modulation/symbolrate if needed
- * DShow: support for freq and video standard selection
+ * Support for freq and video standard selection in DirectShow
  * Support for VDR recordings (http://www.tvdr.de/) folders
- * Blu-Ray Discs integration using libbluray
+ * Experimental Blu-Ray Discs support using libbluray
  * HTTP Live Streaming (IETF draft) playback support
  * Blackmagic DeckLink SDI cards input support (Linux only currently)
  * Linear Systems (HD-)SDI cards input support (Linux)
  * PulseAudio audio input support
- * RTP: support for dynamic payload types by specifying the payload format
+ * Support for RTP dynamic payload types by specifying the payload format
    in an option (no autodetection): only Theora supported for now
  * Basic HTCPCP implementation for Coffee Pot control
- * QTCapture: added support for all QTKit-compatible video input devices
- * QTSound: added support for all QTKit-compatible audio input devices
- * X11 Screen: support for capturing partially hidden windows
+ * Support for all QTKit-compatible video input devices, aka QTCapture
+ * Support for all QTKit-compatible audio input devices, aka QTSound
+ * Support for capturing partially hidden windows in the X11 Screen input
  * MPEG DASH (Dynamic Adaptive Streaming over HTTP) support
+ * Support for HTTPS is now fixed in the Windows port
 
 Codecs:
- * You can now use ffmpeg-mt in conjunction with vlc
+ * You can now use ffmpeg-mt in conjunction with vlc, to split decoding load
+   on multiple cores. H.264, VP3, VP8, JPEG-2000, Mpeg-4 ASP/DivX and RV3/RV4
+   are notably concerned.
  * Important fixes for RealVideo 3.0 and 4.0 playback, notably in MKV
  * Experimental Hardware decoding using Broadcom CrystalHD cards
  * New module for decoding EBU subtitles (.stl)
@@ -92,8 +95,9 @@ Codecs:
  * Support for WMV Images, aka WMVP and WVP2, as used by Photo Story
  * Support for Lagarith Lossless video codec
  * Support for ProRes 422 video codec in 10bits
+ * Support for DNxHD (VC-3) and JPEG-2000 in 10bits
  * EIA-608 closed captions improvements
- * Support for JPEG 2000 and Motion JPEG 2000 in the Windows and Mac binaries
+ * Support for JPEG-2000 and Motion JPEG-2000 in the Windows and Mac binaries
  * Experimental support of IOMX for OpenMAX IL codecs on Android
  * One can use "mp2 " fourcc to encode in mpeg1/2 layer 2
 
@@ -114,17 +118,19 @@ Interfaces:
  * Qt: effects dialogs rework
  * Qt: new CoverFlow-like view of the playlist
  * Qt: port to MacOS X platform
- * Qt: small look improvements
+ * Qt: minor look improvements, notably on the seek bar
  * Skins2 / Qt: misc improvements and usability fixes
  * Skins2: fullscreen controller support, relative placement support
    and important cleanups and optimisations
  * Mac OS X: re-written Main Window, which also includes the Video Windows
+   It is available in 2 looks, one grey (Lion style) and one black (QTX style)
  * Mac OS X: new Audio Effects panel adding Compressor and Spatializer filters
  * Mac OS X: new Track Synchronization panel
  * Mac OS X: new Video Effects panel for color and geometry adjustments
  * Mac OS X: re-written Open Disc functionality with automatic media detection
  * Mac OS X: support for the native fullscreen mode on OS X Lion
  * Mac OS X: enhanced AppleScript support
+ * Mac OS X: support for lua extensions
  * The rc and telnet lua interfaces were merged into a new "cli" interface
  * lua: the recommended way to run custom interface scripts is now to pass
    -I luaintf --lua-intf myscript
@@ -136,6 +142,7 @@ Interfaces:
  * webUI/http: path values for input and output are deprecated in favour of uri
  * Qt/Win32: the update system now downloads the updates in the temp folder
  * Qt: preferences are now searchable
+ * Qt: the fullscreen controller is now stackable, full-width, at the bottom
 
 Video Output:
  * New video output based on Direct2D for Windows 7 and Vista (with Platform Update)
@@ -144,7 +151,7 @@ Video Output:
  * Adaptation of the OpenGL layer for OpenGL ES 1.1
  * Various vmem improvements
  * OpenGL video output now accepts YUV as input and uses fragment programs for
-   chroma conversion
+   chroma conversion between YUV and RGB
  * New video output for Android platform, based on Surface
  * Support for 9/10bits output in the OpenGL output
  * Updated OpenGL video output for Mac, requires a Quartz Extreme capable machine
@@ -187,7 +194,7 @@ Stream output:
     access=livehttp{index=public_html/iphonestream.m3u8,
     index-url=http://url-to-iphonestreamfile-###.ts},mux=ts{use-key-frames},
     dst=public_html/iphonestreamfile-###.ts}"
- * RTP: support for Vorbis and Theora
+ * Support for Vorbis and Theora in RTP
  * Major rework of VoD support
  * New delay module, to introduce delays of one ES, when streaming:
        #delay{id=12,delay=500}:standard...
