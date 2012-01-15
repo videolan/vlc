@@ -614,7 +614,10 @@ static VLCMain *_o_sharedMainInstance = nil;
     [o_msgs_refresh_btn setImage: [NSImage imageNamed: NSImageNameRefreshTemplate]];
 
     /* yeah, we are done */
+    b_nativeFullscreenMode = NO;
+#ifdef MAC_OS_X_VERSION_10_7
     b_nativeFullscreenMode = config_GetInt( p_intf, "macosx-nativefullscreenmode" );
+#endif
     nib_main_loaded = TRUE;
 }
 

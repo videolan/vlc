@@ -121,10 +121,10 @@ static VLCMainWindow *_o_sharedInstance = nil;
 - (void)awakeFromNib
 {
     /* setup the styled interface */
-#ifdef MAC_OS_X_VERSION_10_7
-    b_nativeFullscreenMode = config_GetInt( VLCIntf, "macosx-nativefullscreenmode" );
-#else
+#ifndef MAC_OS_X_VERSION_10_7
     b_nativeFullscreenMode = NO;
+#else
+    b_nativeFullscreenMode = config_GetInt( VLCIntf, "macosx-nativefullscreenmode" );
 #endif
     i_lastShownVolume = -1;
     t_hide_mouse_timer = nil;
@@ -1491,7 +1491,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [o_fullscreen_btn setState: NO];
 
     /* We always try to do so */
-    if (!(OSX_LION && b_nativeFullscreenMode))
+    if (!(OSX_LION || !b_nativeFullscreenMode))
         [NSScreen unblackoutScreens];
     vout_thread_t *p_vout = getVout();
     if (p_vout)
@@ -1656,7 +1656,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 - (void)orderOut: (id)sender
 {
     /* Make sure we leave fullscreen */
-    if (!(OSX_LION && b_nativeFullscreenMode))
+    if (!(OSX_LION || !b_nativeFullscreenMode))
         [self leaveFullscreenAndFadeOut: YES];
 
     [super orderOut: sender];
