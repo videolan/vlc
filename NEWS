@@ -37,7 +37,7 @@ Important notes:
    output interface, use --miface instead, e.g. --miface=eth0.
  * The Windows version will only work with Windows XP SP2 or later.
    Windows 2000 SP4, Windows XP < SP2, Windows 2003 SP0 are now unsupported.
- * The Mac OS version will new Quartz Extreme compatible machines.
+ * The Mac OS version will require Quartz Extreme compatible machines.
 
 Important changes for packagers:
  * The default builds now assume that the operating system uses UTF-8 for
