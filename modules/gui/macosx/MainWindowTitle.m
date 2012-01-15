@@ -158,7 +158,7 @@
 - (IBAction)buttonAction:(id)sender
 {
     if (sender == o_red_btn)
-        [[self window] orderOut: sender];
+        [[self window] performClose: sender];
     else if (sender == o_yellow_btn)
         [[self window] miniaturize: sender];
     else if (sender == o_green_btn)

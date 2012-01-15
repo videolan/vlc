@@ -752,7 +752,10 @@ static VLCMainWindow *_o_sharedInstance = nil;
 - (void)performClose:(id)sender
 {
     if (b_dark_interface)
+    {
         [self orderOut: sender];
+        [[VLCCoreInteraction sharedInstance] stop];
+    }
     else
         [super performClose: sender];
 }
@@ -760,7 +763,10 @@ static VLCMainWindow *_o_sharedInstance = nil;
 - (void)performMiniaturize:(id)sender
 {
     if (b_dark_interface)
+    {
         [self miniaturize: sender];
+        [[VLCCoreInteraction sharedInstance] pause];
+    }
     else
         [super performMiniaturize: sender];
 }
