@@ -52,7 +52,7 @@
 
 
 @interface VLCDialogWindow : NSWindow {
-    extension_widget_t *widget;
+    extension_dialog_t *dialog;
     BOOL has_lock;
 }
 
@@ -61,7 +61,7 @@
 @end
 
 
-@interface VLCDialogList : NSTableView <NSTableViewDataSource> {
+@interface VLCDialogList : NSTableView {
     extension_widget_t *widget;
     NSMutableArray *contentArray;
 }
