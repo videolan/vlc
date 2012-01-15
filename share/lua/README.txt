@@ -329,8 +329,10 @@ sd.add_node( ... ): Add a node to the service discovery.
   The node object has the following members:
       .title: the node's name
       .arturl: the node's ArtURL (OPTIONAL)
+      .category: the node's category (OPTIONAL)
 sd.add_item( ... ): Add an item to the service discovery.
-  The item object has the same members as the one in playlist.add().
+  The item object has the same members as the one in playlist.add() along with:
+      .category: the item's category (OPTIONAL)
   Returns the input item.
 sd.remove_item( item ): remove the item.
 

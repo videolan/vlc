@@ -186,7 +186,9 @@ static int vlclua_sd_add_node( lua_State *L )
                     input_item_SetArtURL( p_input, psz_value );
                     free( psz_value );
                 }
-                services_discovery_AddItem( p_sd, p_input, NULL );
+                lua_pop( L, 1 );
+                lua_getfield( L, -1, "category" );
+                services_discovery_AddItem( p_sd, p_input, luaL_checkstring( L, -1 ) );
                 input_item_t **udata = (input_item_t **)
                                        lua_newuserdata( L, sizeof( input_item_t * ) );
                 *udata = p_input;
@@ -218,8 +220,12 @@ static int vlclua_sd_add_item( lua_State *L )
             char **ppsz_options = NULL;
             int i_options = 0;
             const char *psz_path = lua_tostring( L, -1 );
+
             vlclua_read_options( p_sd, L, &i_options, &ppsz_options );
-            input_item_t *p_input = input_item_NewExt( psz_path, psz_path,
+            lua_pop( L, 1 );
+            lua_getfield( L, -1, "title" );
+            const char *psz_title = luaL_checkstring( L, -1 ) ? luaL_checkstring( L, -1 ) : psz_path;
+            input_item_t *p_input = input_item_NewExt( psz_path, psz_title,
                                                        i_options,
                                                        (const char **)ppsz_options,
                                                        VLC_INPUT_OPTION_TRUSTED, -1 );
@@ -237,7 +243,9 @@ static int vlclua_sd_add_item( lua_State *L )
                 else if( !lua_isnil( L, -1 ) )
                     msg_Warn( p_sd, "Item duration should be a number (in seconds)." );
                 lua_pop( L, 1 );
-                services_discovery_AddItem( p_sd, p_input, NULL );
+                lua_getfield( L, -1, "category" );
+                services_discovery_AddItem( p_sd, p_input, luaL_checkstring( L, -1 ) );
+                lua_pop( L, 1 );
                 input_item_t **udata = (input_item_t **)
                                        lua_newuserdata( L, sizeof( input_item_t * ) );
                 *udata = p_input;
