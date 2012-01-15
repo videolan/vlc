@@ -80,6 +80,7 @@
     IBOutlet id o_input_rtsp_ckb;
     IBOutlet id o_input_skipLoop_txt;
     IBOutlet id o_input_skipLoop_pop;
+    IBOutlet id o_input_mkv_preload_dir_ckb;
     IBOutlet id o_input_view;
 
     IBOutlet id o_intf_style_txt;

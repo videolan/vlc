@@ -258,6 +258,7 @@ create_toolbar_item( NSString * o_itemIdent, NSString * o_name, NSString * o_des
     [o_input_postproc_txt setStringValue: _NS("Post-Processing Quality")];
     [o_input_rtsp_ckb setTitle: _NS("Use RTP over RTSP (TCP)")];
     [o_input_skipLoop_txt setStringValue: _NS("Skip the loop filter for H.264 decoding")];
+    [o_input_mkv_preload_dir_ckb setTitle: _NS("Preload MKV files in the same directory")];
 
     /* interface */
     [o_intf_style_txt setStringValue: _NS("Interface style")];
@@ -568,6 +569,8 @@ static inline char * __config_GetLabel( vlc_object_t *p_this, const char *psz_na
 
     [self setupButton: o_input_rtsp_ckb forBoolValue: "rtsp-tcp"];
     [self setupButton: o_input_skipLoop_pop forIntList: "ffmpeg-skiploopfilter"];
+
+    [self setupButton: o_input_mkv_preload_dir_ckb forBoolValue: "mkv-preload-local-dir"];
 
     [o_input_cachelevel_pop removeAllItems];
     [o_input_cachelevel_pop addItemsWithTitles:
@@ -894,6 +897,8 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
 
         config_PutInt( p_intf, "rtsp-tcp", [o_input_rtsp_ckb state] );
         SaveIntList( o_input_skipLoop_pop, "ffmpeg-skiploopfilter" );
+
+        config_PutInt( p_intf, "mkv-preload-local-dir", [o_input_mkv_preload_dir_ckb state] );
 
         #define CaCi( name, int ) config_PutInt( p_intf, name, int * [[o_input_cachelevel_pop selectedItem] tag] )
         #define CaC( name ) CaCi( name, 1 )
