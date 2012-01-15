@@ -27,32 +27,44 @@
 
 @class VLCDialogGridView;
 
-@interface VLCDialogButton : NSButton
+@interface VLCDialogButton : NSButton {
+    extension_widget_t *widget;
+}
 
 @property (readwrite) extension_widget_t *widget;
 @end
 
 
-@interface VLCDialogPopUpButton : NSPopUpButton
+@interface VLCDialogPopUpButton : NSPopUpButton {
+    extension_widget_t *widget;
+}
 
 @property (readwrite) extension_widget_t *widget;
 @end
 
 
-@interface VLCDialogTextField : NSTextField
+@interface VLCDialogTextField : NSTextField {
+    extension_widget_t *widget;
+}
 
 @property (readwrite) extension_widget_t *widget;
 @end
 
 
-@interface VLCDialogWindow : NSWindow
+@interface VLCDialogWindow : NSWindow {
+    extension_widget_t *widget;
+    BOOL has_lock;
+}
 
 @property (readwrite) extension_dialog_t *dialog;
 @property (readwrite) BOOL has_lock;
 @end
 
 
-@interface VLCDialogList : NSTableView <NSTableViewDataSource>
+@interface VLCDialogList : NSTableView <NSTableViewDataSource> {
+    extension_widget_t *widget;
+    NSMutableArray *contentArray;
+}
 
 @property (readwrite) extension_widget_t *widget;
 @property (readwrite, retain) NSMutableArray *contentArray;
