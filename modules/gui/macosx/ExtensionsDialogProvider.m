@@ -154,7 +154,7 @@ static void updateControlFromWidget(NSView *control, extension_widget_t *widget,
             assert([control isKindOfClass:[NSTextView class]]);
             NSTextView *textView = (NSTextView *)control;
             NSString *string = [NSString stringWithUTF8String:widget->psz_text];
-            NSAttributedString *attrString = [[NSAttributedString alloc] initWithHTML:[string dataUsingEncoding:NSUTF8StringEncoding] documentAttributes:NULL];
+            NSAttributedString *attrString = [[NSAttributedString alloc] initWithHTML:[string dataUsingEncoding: NSISOLatin1StringEncoding] documentAttributes:NULL];
             [[textView textStorage] setAttributedString:attrString];
             [textView setNeedsDisplay:YES];
             [textView scrollRangeToVisible:NSMakeRange(0, 0)];
@@ -170,8 +170,8 @@ static void updateControlFromWidget(NSView *control, extension_widget_t *widget,
                 break;
             assert([control isKindOfClass:[NSControl class]]);
             NSControl *field = (NSControl *)control;
-            NSString *string = [NSString stringWithUTF8String:widget->psz_text];
-            NSAttributedString *attrString = [[NSAttributedString alloc] initWithHTML:[string dataUsingEncoding:NSUTF8StringEncoding] documentAttributes:NULL];
+            NSString *string = [NSString stringWithCString:widget->psz_text encoding:NSUTF8StringEncoding];
+            NSAttributedString *attrString = [[NSAttributedString alloc] initWithHTML:[string dataUsingEncoding: NSISOLatin1StringEncoding] documentAttributes:NULL];
             [field setAttributedStringValue:attrString];
             [attrString release];
             break;
@@ -552,7 +552,7 @@ static ExtensionsDialogProvider *_o_sharedInstance = nil;
                     p_dialog->psz_title ) != 0 )
         {
             NSString *titleString = [NSString stringWithCString:p_dialog->psz_title 
-                                                       encoding:NSASCIIStringEncoding];
+                                                       encoding:NSUTF8StringEncoding];
 
             [dialogWindow setTitle:titleString];
         }

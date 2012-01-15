@@ -93,7 +93,7 @@ static ExtensionsManager* instance = nil;
         bool b_Active = extension_IsActivated( p_extensions_manager, p_ext );
 
         NSString *titleString = [NSString stringWithCString:p_ext->psz_title 
-                                                   encoding:NSASCIIStringEncoding];
+                                                   encoding:NSUTF8StringEncoding];
 
         if( b_Active && extension_HasMenu( p_extensions_manager, p_ext ) )
         {
@@ -116,7 +116,7 @@ static ExtensionsManager* instance = nil;
                 {
                     ++i_num;
                     titleString = [NSString stringWithCString:ppsz_titles[i]
-                                                     encoding:NSASCIIStringEncoding];
+                                                     encoding:NSUTF8StringEncoding];
                     NSMenuItem *menuItem = [submenu addItemWithTitle:titleString
                                                               action:@selector(triggerMenu:)
                                                        keyEquivalent:@""];
