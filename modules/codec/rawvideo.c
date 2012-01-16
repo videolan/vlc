@@ -104,6 +104,8 @@ static int OpenDecoder( vlc_object_t *p_this )
         case VLC_CODEC_I410:
         case VLC_CODEC_GREY:
         case VLC_CODEC_YUVP:
+        case VLC_CODEC_NV12:
+        case VLC_CODEC_NV21:
 
         /* Packed YUV */
         case VLC_CODEC_YUYV:
