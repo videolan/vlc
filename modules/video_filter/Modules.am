@@ -21,7 +21,7 @@ SOURCES_deinterlace = deinterlace/deinterlace.c deinterlace/deinterlace.h \
 	deinterlace/yadif.h deinterlace/yadif_template.h \
 	deinterlace/algo_phosphor.c deinterlace/algo_phosphor.h \
 	deinterlace/algo_ivtc.c deinterlace/algo_ivtc.h
-SOURCES_blend = blend.c
+SOURCES_blend = blend.cpp
 SOURCES_scale = scale.c
 SOURCES_marq = marq.c
 SOURCES_rss = rss.c
