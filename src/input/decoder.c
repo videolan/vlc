@@ -1072,22 +1072,8 @@ static inline void DecoderUpdatePreroll( int64_t *pi_preroll, const block_t *p )
         *pi_preroll = __MIN( *pi_preroll, p->i_pts );
 }
 
-static mtime_t DecoderTeletextFixTs( mtime_t i_ts )
-{
-    mtime_t current_date = mdate();
-
-    /* FIXME I don't really like that, es_out SHOULD do it using the video pts */
-    if( i_ts <= VLC_TS_INVALID || i_ts > current_date + 10000000 || i_ts < current_date )
-    {
-        /* ETSI EN 300 472 Annex A : do not take into account the PTS
-         * for teletext streams. */
-        return current_date + 400000;
-    }
-    return i_ts;
-}
-
 static void DecoderFixTs( decoder_t *p_dec, mtime_t *pi_ts0, mtime_t *pi_ts1,
-                          mtime_t *pi_duration, int *pi_rate, mtime_t i_ts_bound, bool b_telx )
+                          mtime_t *pi_duration, int *pi_rate, mtime_t i_ts_bound )
 {
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
     input_clock_t   *p_clock = p_owner->p_clock;
@@ -1124,13 +1110,6 @@ static void DecoderFixTs( decoder_t *p_dec, mtime_t *pi_ts0, mtime_t *pi_ts1,
 
         if( pi_rate )
             *pi_rate = i_rate;
-
-        if( b_telx )
-        {
-            *pi_ts0 = DecoderTeletextFixTs( *pi_ts0 );
-            if( pi_ts1 && *pi_ts1 <= VLC_TS_INVALID )
-                *pi_ts1 = *pi_ts0;
-        }
     }
 }
 
@@ -1238,7 +1217,7 @@ static void DecoderPlayAudio( decoder_t *p_dec, aout_buffer_t *p_audio,
         int i_rate = INPUT_RATE_DEFAULT;
 
         DecoderFixTs( p_dec, &p_audio->i_pts, NULL, &p_audio->i_length,
-                      &i_rate, AOUT_MAX_ADVANCE_TIME, false );
+                      &i_rate, AOUT_MAX_ADVANCE_TIME );
 
         vlc_mutex_unlock( &p_owner->lock );
 
@@ -1454,7 +1433,7 @@ static void DecoderPlayVideo( decoder_t *p_dec, picture_t *p_picture,
         const bool b_dated = p_picture->date > VLC_TS_INVALID;
         int i_rate = INPUT_RATE_DEFAULT;
         DecoderFixTs( p_dec, &p_picture->date, NULL, NULL,
-                      &i_rate, DECODER_BOGUS_VIDEO_DELAY, false );
+                      &i_rate, DECODER_BOGUS_VIDEO_DELAY );
 
         vlc_mutex_unlock( &p_owner->lock );
 
@@ -1559,14 +1538,13 @@ static void DecoderDecodeVideo( decoder_t *p_dec, block_t *p_block )
     }
 }
 
-static void DecoderPlaySpu( decoder_t *p_dec, subpicture_t *p_subpic,
-                            bool b_telx )
+static void DecoderPlaySpu( decoder_t *p_dec, subpicture_t *p_subpic )
 {
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
     vout_thread_t *p_vout = p_owner->p_spu_vout;
 
     /* */
-    if( p_subpic->i_start <= VLC_TS_INVALID && !b_telx )
+    if( p_subpic->i_start <= VLC_TS_INVALID )
     {
         msg_Warn( p_dec, "non-dated spu buffer received" );
         subpicture_Delete( p_subpic );
@@ -1619,7 +1597,7 @@ static void DecoderPlaySpu( decoder_t *p_dec, subpicture_t *p_subpic,
 
         /* */
         DecoderFixTs( p_dec, &p_subpic->i_start, &p_subpic->i_stop, NULL,
-                      NULL, INT64_MAX, b_telx );
+                      NULL, INT64_MAX );
 
         vlc_mutex_unlock( &p_owner->lock );
 
@@ -1646,8 +1624,7 @@ static void DecoderPlaySpu( decoder_t *p_dec, subpicture_t *p_subpic,
 }
 
 #ifdef ENABLE_SOUT
-static void DecoderPlaySout( decoder_t *p_dec, block_t *p_sout_block,
-                             bool b_telx )
+static void DecoderPlaySout( decoder_t *p_dec, block_t *p_sout_block )
 {
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
 
@@ -1696,7 +1673,7 @@ static void DecoderPlaySout( decoder_t *p_dec, block_t *p_sout_block,
         p_sout_block->p_next = NULL;
 
         DecoderFixTs( p_dec, &p_sout_block->i_dts, &p_sout_block->i_pts,
-                      &p_sout_block->i_length, NULL, INT64_MAX, b_telx );
+                      &p_sout_block->i_length, NULL, INT64_MAX );
 
         vlc_mutex_unlock( &p_owner->lock );
 
@@ -1779,7 +1756,6 @@ static void DecoderFlushBuffering( decoder_t *p_dec )
 static void DecoderProcessSout( decoder_t *p_dec, block_t *p_block )
 {
     decoder_owner_sys_t *p_owner = (decoder_owner_sys_t *)p_dec->p_owner;
-    const bool b_telx = p_dec->fmt_in.i_codec == VLC_CODEC_TELETEXT;
     block_t *p_sout_block;
 
     while( ( p_sout_block =
@@ -1824,7 +1800,7 @@ static void DecoderProcessSout( decoder_t *p_dec, block_t *p_block )
 
             p_sout_block->p_next = NULL;
 
-            DecoderPlaySout( p_dec, p_sout_block, b_telx );
+            DecoderPlaySout( p_dec, p_sout_block );
 
             p_sout_block = p_next;
         }
@@ -1935,7 +1911,6 @@ static void DecoderProcessAudio( decoder_t *p_dec, block_t *p_block, bool b_flus
 static void DecoderProcessSpu( decoder_t *p_dec, block_t *p_block, bool b_flush )
 {
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
-    const bool b_telx = p_dec->fmt_in.i_codec == VLC_CODEC_TELETEXT;
 
     input_thread_t *p_input = p_owner->p_input;
     vout_thread_t *p_vout;
@@ -1962,7 +1937,7 @@ static void DecoderProcessSpu( decoder_t *p_dec, block_t *p_block, bool b_flush 
             }
             else
             {
-                DecoderPlaySpu( p_dec, p_spu, b_telx );
+                DecoderPlaySpu( p_dec, p_spu );
             }
         }
         else
