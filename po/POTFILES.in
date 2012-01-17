@@ -1070,7 +1070,7 @@ modules/video_filter/atmo/AtmoZoneDefinition.h
 modules/video_filter/audiobargraph_v.c
 modules/video_filter/ball.c
 modules/video_filter/blendbench.c
-modules/video_filter/blend.c
+modules/video_filter/blend.cpp
 modules/video_filter/bluescreen.c
 modules/video_filter/canvas.c
 modules/video_filter/chain.c
