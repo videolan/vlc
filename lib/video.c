@@ -163,6 +163,8 @@ int libvlc_video_get_size( libvlc_media_player_t *p_mi, unsigned num,
 {
     libvlc_media_track_info_t *info;
     int ret = -1;
+    if (!p_mi->p_md)
+        return ret;
     int infos = libvlc_media_get_tracks_info(p_mi->p_md, &info);
     if (infos <= 0)
         return ret;
