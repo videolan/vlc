@@ -147,10 +147,12 @@ typedef enum {
     DATA_UNIT_STUFFING                      = 0xFF,
 } data_unit_id;
 
+#define MAX_SLICES 32
+
 struct decoder_sys_t
 {
     vbi_decoder *     p_vbi_dec;
-    vbi_dvb_demux *   p_dvb_demux;
+    vbi_sliced        p_vbi_sliced[MAX_SLICES];
     unsigned int      i_last_page;
     bool              b_update;
     bool              b_text;   /* Subtitles as text */
@@ -212,12 +214,11 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_key[0] = p_sys->i_key[1] = p_sys->i_key[2] = '*' - '0';
     p_sys->b_update = false;
     p_sys->p_vbi_dec = vbi_decoder_new();
-    p_sys->p_dvb_demux = vbi_dvb_pes_demux_new( NULL, NULL );
     vlc_mutex_init( &p_sys->lock );
 
-    if( (p_sys->p_vbi_dec == NULL) || (p_sys->p_dvb_demux == NULL) )
+    if( p_sys->p_vbi_dec == NULL )
     {
-        msg_Err( p_dec, "VBI decoder/demux could not be created." );
+        msg_Err( p_dec, "VBI decoder could not be created." );
         Close( p_this );
         return VLC_ENOMEM;
     }
@@ -292,19 +293,14 @@ static void Close( vlc_object_t *p_this )
 
     if( p_sys->p_vbi_dec )
         vbi_decoder_delete( p_sys->p_vbi_dec );
-    if( p_sys->p_dvb_demux )
-        vbi_dvb_demux_delete( p_sys->p_dvb_demux );
     free( p_sys );
 }
-
-#define MAX_SLICES 32
 
 #ifdef WORDS_BIGENDIAN
 # define ZVBI_PIXFMT_RGBA32 VBI_PIXFMT_RGBA32_BE
 #else
 # define ZVBI_PIXFMT_RGBA32 VBI_PIXFMT_RGBA32_LE
 #endif
-
 
 /*****************************************************************************
  * Decode:
@@ -317,8 +313,6 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
     video_format_t  fmt;
     bool            b_cached = false;
     vbi_page        p_page;
-    const uint8_t   *p_pos;
-    unsigned int    i_left;
 
     if( (pp_block == NULL) || (*pp_block == NULL) )
         return NULL;
@@ -326,20 +320,44 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
     p_block = *pp_block;
     *pp_block = NULL;
 
-    p_pos = p_block->p_buffer;
-    i_left = p_block->i_buffer;
-
-    while( i_left > 0 )
+    if( p_block->i_buffer > 0 &&
+        ( ( p_block->p_buffer[0] >= 0x10 && p_block->p_buffer[0] <= 0x1f ) ||
+          ( p_block->p_buffer[0] >= 0x99 && p_block->p_buffer[0] <= 0x9b ) ) )
     {
-        vbi_sliced      p_sliced[MAX_SLICES];
-        unsigned int    i_lines = 0;
-        int64_t         i_pts;
+        vbi_sliced   *p_sliced = p_sys->p_vbi_sliced;
+        unsigned int i_lines = 0;
 
-        i_lines = vbi_dvb_demux_cor( p_sys->p_dvb_demux, p_sliced,
-                                     MAX_SLICES, &i_pts, &p_pos, &i_left );
+        p_block->i_buffer--;
+        p_block->p_buffer++;
+        while( p_block->i_buffer >= 2 )
+        {
+            int      i_id   = p_block->p_buffer[0];
+            unsigned i_size = p_block->p_buffer[1];
+
+            if( 2 + i_size > p_block->i_buffer )
+                break;
+
+            if( ( i_id == 0x02 || i_id == 0x03 ) && i_size >= 44 && i_lines < MAX_SLICES )
+            {
+                unsigned line_offset  = p_block->p_buffer[2] & 0x1f;
+                unsigned field_parity = p_block->p_buffer[2] & 0x20;
+
+                p_sliced[i_lines].id = VBI_SLICED_TELETEXT_B;
+                if( line_offset > 0 )
+                    p_sliced[i_lines].line = line_offset + (field_parity ? 0 : 313);
+                else
+                    p_sliced[i_lines].line = 0;
+                for( int i = 0; i < 42; i++ )
+                    p_sliced[i_lines].data[i] = vbi_rev8( p_block->p_buffer[4 + i] );
+                i_lines++;
+            }
+
+            p_block->i_buffer -= 2 + i_size;
+            p_block->p_buffer += 2 + i_size;
+        }
 
         if( i_lines > 0 )
-            vbi_decode( p_sys->p_vbi_dec, p_sliced, i_lines, i_pts / 90000.0 );
+            vbi_decode( p_sys->p_vbi_dec, p_sliced, i_lines, (double)p_block->i_pts / 1000000 );
     }
 
     /* */

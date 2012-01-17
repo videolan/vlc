@@ -1784,10 +1784,7 @@ static void ParsePES( demux_t *p_demux, ts_pid_t *pid )
         /* */
         i_skip += 2;
     }
-#ifdef ZVBI_COMPILED
-    else if( pid->es->fmt.i_codec == VLC_CODEC_TELETEXT )
-        i_skip = 0; /*hack for zvbi support */
-#endif
+
     /* skip header */
     while( p_pes && i_skip > 0 )
     {
