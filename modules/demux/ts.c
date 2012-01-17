@@ -278,6 +278,7 @@ typedef struct
     int             i_number;
     int             i_pid_pcr;
     int             i_pid_pmt;
+    mtime_t         i_pcr_value;
     /* IOD stuff (mpeg4) */
     iod_descriptor_t *iod;
 
@@ -1555,6 +1556,7 @@ static void PIDInit( ts_pid_t *pid, bool b_psi, ts_psi_t *p_owner )
                 prg->i_number   = -1;
                 prg->i_pid_pcr  = -1;
                 prg->i_pid_pmt  = -1;
+                prg->i_pcr_value= -1;
                 prg->iod        = NULL;
                 prg->handle     = NULL;
 
@@ -1833,6 +1835,24 @@ static void ParsePES( demux_t *p_demux, ts_pid_t *pid )
             if( !p_block )
                 abort();
             p_block->p_buffer[p_block->i_buffer -1] = '\0';
+        }
+        else if( pid->es->fmt.i_codec == VLC_CODEC_TELETEXT )
+        {
+            if( p_block->i_pts <= VLC_TS_INVALID )
+            {
+                /* Teletext may have missing PTS (ETSI EN 300 472 Annexe A)
+                 * In this case use the last PCR + 40ms */
+                for( int i = 0; pid->p_owner && i < pid->p_owner->i_prg; i++ )
+                {
+                    if( pid->i_owner_number == pid->p_owner->prg[i]->i_number )
+                    {
+                        mtime_t i_pcr = pid->p_owner->prg[i]->i_pcr_value;
+                        if( i_pcr > VLC_TS_INVALID )
+                            p_block->i_pts = VLC_TS_0 + i_pcr * 100 / 9 + 40000;
+                        break;
+                    }
+                }
+            }
         }
 
         for( i = 0; i < pid->i_extra_es; i++ )
@@ -2189,6 +2209,7 @@ static void PCRHandle( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
             {
                 if( pid->i_pid == p_sys->pmt[i]->psi->prg[i_prg]->i_pid_pcr )
                 {
+                    p_sys->pmt[i]->psi->prg[i_prg]->i_pcr_value = i_pcr;
                     es_out_Control( p_demux->out, ES_OUT_SET_GROUP_PCR,
                                     (int)p_sys->pmt[i]->psi->prg[i_prg]->i_number,
                                     (int64_t)(VLC_TS_0 + i_pcr * 100 / 9) );

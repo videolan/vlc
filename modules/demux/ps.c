@@ -82,6 +82,7 @@ struct demux_sys_t
     ps_track_t  tk[PS_TK_COUNT];
 
     int64_t     i_scr;
+    int64_t     i_last_scr;
     int         i_mux_rate;
     int64_t     i_length;
     int         i_time_track;
@@ -134,6 +135,7 @@ static int OpenCommon( vlc_object_t *p_this, bool b_force )
     /* Init p_sys */
     p_sys->i_mux_rate = 0;
     p_sys->i_scr      = -1;
+    p_sys->i_last_scr = -1;
     p_sys->i_length   = -1;
     p_sys->i_current_pts = (mtime_t) 0;
     p_sys->i_time_track = -1;
@@ -322,6 +324,7 @@ static int Demux( demux_t *p_demux )
     case 0x1ba:
         if( !ps_pkt_parse_pack( p_pkt, &p_sys->i_scr, &i_mux_rate ) )
         {
+            p_sys->i_last_scr = p_sys->i_scr;
             if( !p_sys->b_have_pack ) p_sys->b_have_pack = true;
             /* done later on to work around bad vcd/svcd streams */
             /* es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_sys->i_scr ); */
@@ -395,6 +398,7 @@ static int Demux( demux_t *p_demux )
                   tk->fmt.i_codec == VLC_CODEC_CVD ) )
             {
                 p_sys->i_scr = -1;
+                p_sys->i_last_scr = -1;
             }
 
             if( p_sys->i_scr >= 0 )
@@ -412,6 +416,13 @@ static int Demux( demux_t *p_demux )
                     /* A hack to sync the A/V on PES files. */
                     msg_Dbg( p_demux, "force SCR: %"PRId64, p_pkt->i_pts );
                     es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_pkt->i_pts );
+                }
+                if( tk->fmt.i_codec == VLC_CODEC_TELETEXT &&
+                    p_pkt->i_pts <= VLC_TS_INVALID && p_sys->i_last_scr >= 0 )
+                {
+                    /* Teletext may have missing PTS (ETSI EN 300 472 Annexe A)
+                     * In this case use the last SCR + 40ms */
+                    p_pkt->i_pts = VLC_TS_0 + p_sys->i_last_scr + 40000;
                 }
 
                 if( (int64_t)p_pkt->i_pts > p_sys->i_current_pts )
@@ -465,6 +476,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             f = (double) va_arg( args, double );
             i64 = stream_Size( p_demux->s );
             p_sys->i_current_pts = 0;
+            p_sys->i_last_scr = -1;
 
             return stream_Seek( p_demux->s, (int64_t)(i64 * f) );
 
@@ -511,6 +523,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                     return i64 ? VLC_EGENERIC : VLC_SUCCESS;
 
                 p_sys->i_current_pts = 0;
+                p_sys->i_last_scr = -1;
                 i_pos *= (float)i64 / (float)i_now;
                 stream_Seek( p_demux->s, i_pos );
                 return VLC_SUCCESS;
