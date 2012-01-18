@@ -909,6 +909,7 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
         else
         {
             msg_Dbg( p_intf, "Adjusting all cache values to: %i", (int)[[o_input_cachelevel_pop selectedItem] tag] );
+            CaC( "file-caching" );
             CaC( "network-caching" );
             CaC( "disc-caching" );
             CaC( "live-caching" );
