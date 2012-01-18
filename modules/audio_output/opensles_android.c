@@ -267,10 +267,10 @@ error:
 /*****************************************************************************
  * Close: close our file
  *****************************************************************************/
-static void Close( vlc_object_t * p_this )
+static void Close( vlc_object_t *p_this )
 {
-    audio_output_t *p_aout = (audio_output_t *)p_this;
-    aout_sys_t      *p_sys = p_aout->sys;
+    audio_output_t *p_aout = (audio_output_t*)p_this;
+    aout_sys_t     *p_sys = p_aout->sys;
 
     msg_Dbg( p_aout, "Closing OpenSLES" );
 
