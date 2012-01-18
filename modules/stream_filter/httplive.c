@@ -314,6 +314,12 @@ static uint64_t hls_GetStreamSize(hls_stream_t *hls)
      * then the deviation from exact byte size will be big and the seek/
      * progressbar will not behave entirely as one expects. */
     uint64_t size = 0UL;
+
+    /* If there is no valid bandwidth yet, then there is no point in
+     * computing stream size. */
+    if (hls->bandwidth == 0)
+        return size;
+
     int count = vlc_array_count(hls->segments);
     for (int n = 0; n < count; n++)
     {
@@ -968,7 +974,7 @@ static int parse_M3U8(stream_t *s, vlc_array_t *streams, uint8_t *buffer, const 
         else
         {
             /* No Meta playlist used */
-            hls = hls_New(streams, 0, -1, NULL);
+            hls = hls_New(streams, 0, 0, NULL);
             if (hls)
             {
                 /* Get TARGET-DURATION first */
@@ -2119,6 +2125,8 @@ static uint64_t GetStreamSize(stream_t *s)
     if (hls == NULL) return 0;
 
     vlc_mutex_lock(&hls->lock);
+    if (hls->size == 0)
+        hls->size = hls_GetStreamSize(hls);
     uint64_t size = hls->size;
     vlc_mutex_unlock(&hls->lock);
 
