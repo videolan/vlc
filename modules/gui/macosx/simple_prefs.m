@@ -902,10 +902,17 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
 
         #define CaCi( name, int ) config_PutInt( p_intf, name, int * [[o_input_cachelevel_pop selectedItem] tag] )
         #define CaC( name ) CaCi( name, 1 )
-        msg_Dbg( p_intf, "Adjusting all cache values to: %i", (int)[[o_input_cachelevel_pop selectedItem] tag] );
-        CaC( "network-caching" );
-        CaC( "disc-caching" );
-        CaC( "live-caching" );
+        if ( [[o_input_cachelevel_pop selectedItem] tag] == 0 )
+        {
+            msg_Dbg( p_intf, "Custom chosen, not adjusting cache values" );
+        }
+        else
+        {
+            msg_Dbg( p_intf, "Adjusting all cache values to: %i", (int)[[o_input_cachelevel_pop selectedItem] tag] );
+            CaC( "network-caching" );
+            CaC( "disc-caching" );
+            CaC( "live-caching" );
+        }
         b_inputSettingChanged = NO;
     }
 
