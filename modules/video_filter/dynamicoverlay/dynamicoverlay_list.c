@@ -36,7 +36,7 @@
  * list_t: Command queue
  *****************************************************************************/
 
-int ListInit( list_t *p_list )
+int do_ListInit( list_t *p_list )
 {
     p_list->pp_head = calloc( 16, sizeof( overlay_t * ) );
     if( p_list->pp_head == NULL )
@@ -46,7 +46,7 @@ int ListInit( list_t *p_list )
     return VLC_SUCCESS;
 }
 
-int ListDestroy( list_t *p_list )
+int do_ListDestroy( list_t *p_list )
 {
     for( overlay_t **pp_cur = p_list->pp_head;
          pp_cur < p_list->pp_tail;

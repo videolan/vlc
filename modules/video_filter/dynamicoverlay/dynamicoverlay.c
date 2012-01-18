@@ -106,7 +106,7 @@ static int Create( vlc_object_t *p_this )
     QueueInit( &p_sys->atomic );
     QueueInit( &p_sys->pending );
     QueueInit( &p_sys->processed );
-    ListInit( &p_sys->overlays );
+    do_ListInit( &p_sys->overlays );
 
     p_sys->i_inputfd = -1;
     p_sys->i_outputfd = -1;
@@ -146,7 +146,7 @@ static void Destroy( vlc_object_t *p_this )
     QueueDestroy( &p_sys->atomic );
     QueueDestroy( &p_sys->pending );
     QueueDestroy( &p_sys->processed );
-    ListDestroy( &p_sys->overlays );
+    do_ListDestroy( &p_sys->overlays );
     UnregisterCommand( p_filter );
 
     var_DelCallback( p_filter, "overlay-input", AdjustCallback, p_sys );

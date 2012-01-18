@@ -153,8 +153,8 @@ typedef struct list_t
     overlay_t **pp_head, **pp_tail;
 } list_t;
 
-int ListInit( list_t *p_list );
-int ListDestroy( list_t *p_list );
+int do_ListInit( list_t *p_list );
+int do_ListDestroy( list_t *p_list );
 ssize_t ListAdd( list_t *p_list, overlay_t *p_new );
 int ListRemove( list_t *p_list, size_t i_idx );
 overlay_t *ListGet( list_t *p_list, size_t i_idx );
