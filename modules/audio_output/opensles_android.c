@@ -133,23 +133,17 @@ static void Clear( aout_sys_t *p_sys )
 /*****************************************************************************
  * Open: open a dummy audio device
  *****************************************************************************/
-static int Open( vlc_object_t * p_this )
+static int Open( vlc_object_t *p_this )
 {
     audio_output_t     *p_aout = (audio_output_t *)p_this;
     SLresult            result;
 
     /* Allocate structure */
-    p_aout->sys = malloc( sizeof( aout_sys_t ) );
+    p_aout->sys = calloc( 1, sizeof( aout_sys_t ) );
     if( unlikely( p_aout->sys == NULL ) )
         return VLC_ENOMEM;
 
-    aout_sys_t * p_sys = p_aout->sys;
-
-    p_sys->playerObject     = NULL;
-    p_sys->engineObject     = NULL;
-    p_sys->outputMixObject  = NULL;
-    p_sys->i_toclean_buffer = 0;
-    p_sys->i_toappend_buffer= 0;
+    aout_sys_t *p_sys = p_aout->sys;
 
     //Acquiring LibOpenSLES symbols :
     p_sys->p_so_handle = dlopen( "libOpenSLES.so", RTLD_NOW );
