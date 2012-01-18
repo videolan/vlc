@@ -105,6 +105,7 @@ static int Open (vlc_object_t *p_this)
     {
         const char *lpath = ToLocale (font_path);
 
+        msg_Dbg (p_this, "loading sound fonts file %s", font_path);
         p_sys->soundfont = fluid_synth_sfload (p_sys->synth, font_path, 1);
         LocaleFree (lpath);
         if (p_sys->soundfont == -1)
@@ -116,19 +117,18 @@ static int Open (vlc_object_t *p_this)
     {
         glob_t gl;
 
-        if (!glob ("/usr/share/sounds/sf2/*.sf2", GLOB_NOESCAPE, NULL, &gl))
+        glob ("/usr/share/sounds/sf2/*.sf2", GLOB_NOESCAPE, NULL, &gl);
+        for (size_t i = 0; i < gl.gl_pathc; i++)
         {
-            for (size_t i = 0; i < gl.gl_pathc; i++)
-            {
-                const char *path = gl.gl_pathv[i];
+            const char *path = gl.gl_pathv[i];
 
-                p_sys->soundfont = fluid_synth_sfload (p_sys->synth, path, 1);
-                if (p_sys->soundfont != -1)
-                    break; /* it worked! */
-                msg_Err (p_this, "cannot load sound fonts file %s", path);
-            }
-            globfree (&gl);
+            msg_Dbg (p_this, "loading sound fonts file %s", path);
+            p_sys->soundfont = fluid_synth_sfload (p_sys->synth, path, 1);
+            if (p_sys->soundfont != -1)
+                break; /* it worked! */
+            msg_Err (p_this, "cannot load sound fonts file %s", path);
         }
+        globfree (&gl);
     }
 #endif
 
