@@ -460,44 +460,90 @@ static char *parse_Attributes(const char *line, const char *attr)
     return NULL;
 }
 
-static char *relative_URI(stream_t *s, const char *uri, const char *path)
+static char *relative_URI(stream_t *s, const char *uri, const vlc_url_t *url)
 {
     stream_sys_t *p_sys = s->p_sys;
+    char *psz_password = NULL;
+    char *psz_username = NULL;
+    char *psz_protocol = NULL;
+    char *psz_path = NULL;
+    char *psz_host = NULL;
+    char *psz_uri = NULL;
+    int  i_port = -1;
 
     char *p = strchr(uri, ':');
     if (p != NULL)
         return NULL;
 
-    if (p_sys->m3u8.psz_path == NULL)
-        return NULL;
+    /* Determine protocol to use */
+    if (url && url->psz_protocol)
+    {
+        psz_protocol = strdup(url->psz_protocol);
+        i_port = url->i_port;
+    }
+    else if (p_sys->m3u8.psz_protocol)
+    {
+        psz_protocol = strdup(p_sys->m3u8.psz_protocol);
+        i_port = p_sys->m3u8.i_port;
+    }
 
-    char *psz_path = strdup(p_sys->m3u8.psz_path);
-    if (psz_path == NULL) return NULL;
+    /* Determine host to use */
+    if (url && url->psz_host)
+        psz_host = strdup(url->psz_host);
+    else if (p_sys->m3u8.psz_host)
+        psz_host = strdup(p_sys->m3u8.psz_host);
+
+    /* Determine path to use */
+    if (url && url->psz_path != NULL)
+        psz_path = strdup(url->psz_path);
+    else if (p_sys->m3u8.psz_path != NULL)
+        psz_path = strdup(p_sys->m3u8.psz_path);
+
+    if ((psz_protocol == NULL) ||
+        (psz_path == NULL) ||
+        (psz_host == NULL))
+        goto fail;
+
     p = strrchr(psz_path, '/');
     if (p) *p = '\0';
 
-    char *psz_uri = NULL;
-    if (p_sys->m3u8.psz_password || p_sys->m3u8.psz_username)
+    /* Determine credentials to use */
+    if (url && url->psz_username)
+        psz_username = strdup(url->psz_username);
+    else if (p_sys->m3u8.psz_username)
+        psz_username = strdup(p_sys->m3u8.psz_username);
+
+    if (url && url->psz_password)
+        psz_password = strdup(url->psz_password);
+    else if (p_sys->m3u8.psz_password)
+        psz_password = strdup(p_sys->m3u8.psz_password);
+
+    /* */
+    if (psz_password || psz_username)
     {
-        if (asprintf(&psz_uri, "%s://%s:%s@%s:%d%s/%s", p_sys->m3u8.psz_protocol,
-                     p_sys->m3u8.psz_username, p_sys->m3u8.psz_password,
-                     p_sys->m3u8.psz_host, p_sys->m3u8.i_port,
-                     path ? path : psz_path, uri) < 0)
+        if (asprintf(&psz_uri, "%s://%s:%s@%s:%d%s/%s",
+                     psz_protocol,
+                     psz_username ? psz_username : "",
+                     psz_password ? psz_password : "",
+                     psz_host, i_port,
+                     psz_path, uri) < 0)
             goto fail;
     }
     else
     {
-        if (asprintf(&psz_uri, "%s://%s:%d%s/%s", p_sys->m3u8.psz_protocol,
-                     p_sys->m3u8.psz_host, p_sys->m3u8.i_port,
-                     path ? path : psz_path, uri) < 0)
+        if (asprintf(&psz_uri, "%s://%s:%d%s/%s",
+                     psz_protocol, psz_host, i_port,
+                     psz_path, uri) < 0)
            goto fail;
     }
-    free(psz_path);
-    return psz_uri;
 
 fail:
+    free(psz_password);
+    free(psz_username);
+    free(psz_protocol);
     free(psz_path);
-    return NULL;
+    free(psz_host);
+    return psz_uri;
 }
 
 static char *ConstructUrl(vlc_url_t *url)
@@ -586,25 +632,17 @@ static int parse_AddSegment(stream_t *s, hls_stream_t *hls, const int duration, 
     assert(uri);
 
     /* Store segment information */
-    char *psz_path = NULL;
-    if (hls->url.psz_path != NULL)
-    {
-        psz_path = strdup(hls->url.psz_path);
-        if (psz_path == NULL)
-            return VLC_ENOMEM;
-        char *p = strrchr(psz_path, '/');
-        if (p) *p = '\0';
-    }
-    char *psz_uri = relative_URI(s, uri, psz_path);
-    free(psz_path);
-
     vlc_mutex_lock(&hls->lock);
+
+    char *psz_uri = relative_URI(s, uri, &hls->url);
+
     segment_t *segment = segment_New(hls, duration, psz_uri ? psz_uri : uri);
     if (segment)
         segment->sequence = hls->sequence + vlc_array_count(hls->segments) - 1;
+    free(psz_uri);
+
     vlc_mutex_unlock(&hls->lock);
 
-    free(psz_uri);
     return segment ? VLC_SUCCESS : VLC_ENOMEM;
 }
 
