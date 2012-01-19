@@ -75,7 +75,7 @@ vlc_module_begin ()
         change_volatile ()
 
 #ifdef HAVE_LIBCDDB
-    add_string( "cddb-server", "freedb.freedb.org", N_( "CDDB Server" ),
+    add_string( "cddb-server", "freedb.videolan.org", N_( "CDDB Server" ),
             N_( "Address of the CDDB server to use." ), true )
     add_integer( "cddb-port", 8880, N_( "CDDB port" ),
             N_( "CDDB Server port to use." ), true )
