@@ -485,7 +485,7 @@ picture_pool_t *vout_display_opengl_GetPool(vout_display_opengl_t *vgl, unsigned
 
 error:
     for (unsigned i = 0; i < count; i++)
-        picture_Delete(picture[i]);
+        picture_Release(picture[i]);
     return NULL;
 }
 
