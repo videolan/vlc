@@ -45,7 +45,7 @@ RANLIB="${CROSS_COMPILE}ranlib" \
 AR="${CROSS_COMPILE}ar" \
 PKG_CONFIG_LIBDIR="$VLC_SOURCEDIR/extras/contrib/hosts/arm-eabi/lib/pkgconfig" \
 sh $VLC_SOURCEDIR/configure --host=arm-eabi-linux --build=x86_64-unknown-linux $EXTRA_PARAMS \
-                --disable-live555 --enable-realrtsp \
+                --enable-live555 --enable-realrtsp \
                 --enable-avformat \
                 --enable-swscale \
                 --enable-avcodec \
