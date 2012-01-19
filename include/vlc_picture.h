@@ -151,15 +151,6 @@ typedef struct
 VLC_API picture_t * picture_NewFromResource( const video_format_t *, const picture_resource_t * ) VLC_USED;
 
 /**
- * This function will force the destruction a picture.
- * The value of the picture reference count should be 0 before entering this
- * function.
- * Unless used for reimplementing pf_release, you should not use this
- * function but picture_Release.
- */
-VLC_API void picture_Delete( picture_t * );
-
-/**
  * This function will increase the picture reference count.
  * It will not have any effect on picture obtained from vout
  *

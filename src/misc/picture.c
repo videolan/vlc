@@ -92,6 +92,17 @@ static int AllocatePicture( picture_t *p_pic,
 /*****************************************************************************
  *
  *****************************************************************************/
+static void picture_Delete( picture_t *p_picture )
+{
+    assert( p_picture && p_picture->i_refcount == 0 );
+    assert( p_picture->p_release_sys == NULL );
+
+    free( p_picture->p_q );
+    vlc_free( p_picture->p_data_orig );
+    free( p_picture->p_sys );
+    free( p_picture );
+}
+
 static void PictureReleaseCallback( picture_t *p_picture )
 {
     if( --p_picture->i_refcount > 0 )
@@ -267,16 +278,6 @@ picture_t *picture_New( vlc_fourcc_t i_chroma, int i_width, int i_height, int i_
 /*****************************************************************************
  *
  *****************************************************************************/
-void picture_Delete( picture_t *p_picture )
-{
-    assert( p_picture && p_picture->i_refcount == 0 );
-    assert( p_picture->p_release_sys == NULL );
-
-    free( p_picture->p_q );
-    vlc_free( p_picture->p_data_orig );
-    free( p_picture->p_sys );
-    free( p_picture );
-}
 
 picture_t *picture_Hold( picture_t *p_picture )
 {
