@@ -95,8 +95,8 @@ function parse()
                 _,_,artist = string.find( line, "href=\"/user/([^\"]*)\"" )
             end
             -- JSON parameters, also formerly known as "swfConfig",
-            -- "SWF_ARGS", "swfArgs" ...
-            if string.match( line, "PLAYER_CONFIG" ) then
+            -- "SWF_ARGS", "swfArgs", "PLAYER_CONFIG" ...
+            if string.match( line, "playerConfig" ) then
                 if not fmt then
                     prefres = get_prefres()
                     if prefres >= 0 then
