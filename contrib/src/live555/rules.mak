@@ -20,7 +20,11 @@ live555: $(LIVE555_FILE) .sum-live555
 
 LIVE_TARGET = $(error live555 target not defined!)
 ifdef HAVE_LINUX
+ifeq ($(ARCH),arm)
+LIVE_TARGET := armlinux
+else
 LIVE_TARGET := linux
+endif
 endif
 ifdef HAVE_WIN32
 LIVE_TARGET := mingw
