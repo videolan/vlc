@@ -165,22 +165,13 @@ VLC_API void picture_Delete( picture_t * );
  *
  * It returns the given picture for convenience.
  */
-static inline picture_t *picture_Hold( picture_t *p_picture )
-{
-    if( p_picture->pf_release )
-        p_picture->i_refcount++;
-    return p_picture;
-}
+VLC_API picture_t *picture_Hold( picture_t *p_picture );
+
 /**
  * This function will release a picture.
  * It will not have any effect on picture obtained from vout
  */
-static inline void picture_Release( picture_t *p_picture )
-{
-    /* FIXME why do we let pf_release handle the i_refcount ? */
-    if( p_picture->pf_release )
-        p_picture->pf_release( p_picture );
-}
+VLC_API void picture_Release( picture_t *p_picture );
 
 /**
  * This function will return true if you are not the only owner of the
@@ -188,36 +179,12 @@ static inline void picture_Release( picture_t *p_picture )
  *
  * It is only valid if it is created using picture_New.
  */
-static inline bool picture_IsReferenced( picture_t *p_picture )
-{
-    return p_picture->i_refcount > 1;
-}
-
-/**
- * Cleanup quantization matrix data and set to 0
- */
-static inline void picture_CleanupQuant( picture_t *p_pic )
-{
-    free( p_pic->p_q );
-    p_pic->p_q = NULL;
-    p_pic->i_qstride = 0;
-    p_pic->i_qtype = 0;
-}
+VLC_API bool picture_IsReferenced( picture_t *p_picture );
 
 /**
  * This function will copy all picture dynamic properties.
  */
-static inline void picture_CopyProperties( picture_t *p_dst, const picture_t *p_src )
-{
-    p_dst->date = p_src->date;
-    p_dst->b_force = p_src->b_force;
-
-    p_dst->b_progressive = p_src->b_progressive;
-    p_dst->i_nb_fields = p_src->i_nb_fields;
-    p_dst->b_top_field_first = p_src->b_top_field_first;
-
-    /* FIXME: copy ->p_q and ->p_qstride */
-}
+VLC_API void picture_CopyProperties( picture_t *p_dst, const picture_t *p_src );
 
 /**
  * This function will reset a picture information (properties and quantizers).
@@ -242,11 +209,7 @@ VLC_API void plane_CopyPixels( plane_t *p_dst, const plane_t *p_src );
  * \param p_dst pointer to the destination picture.
  * \param p_src pointer to the source picture.
  */
-static inline void picture_Copy( picture_t *p_dst, const picture_t *p_src )
-{
-    picture_CopyPixels( p_dst, p_src );
-    picture_CopyProperties( p_dst, p_src );
-}
+VLC_API void picture_Copy( picture_t *p_dst, const picture_t *p_src );
 
 /**
  * This function will export a picture to an encoded bitstream.

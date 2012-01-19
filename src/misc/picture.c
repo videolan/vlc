@@ -102,6 +102,14 @@ static void PictureReleaseCallback( picture_t *p_picture )
 /*****************************************************************************
  *
  *****************************************************************************/
+static void picture_CleanupQuant( picture_t *p_pic )
+{
+    free( p_pic->p_q );
+    p_pic->p_q = NULL;
+    p_pic->i_qstride = 0;
+    p_pic->i_qtype = 0;
+}
+
 void picture_Reset( picture_t *p_picture )
 {
     /* */
@@ -274,6 +282,25 @@ void picture_Delete( picture_t *p_picture )
     free( p_picture );
 }
 
+picture_t *picture_Hold( picture_t *p_picture )
+{
+    if( p_picture->pf_release )
+        p_picture->i_refcount++;
+    return p_picture;
+}
+
+void picture_Release( picture_t *p_picture )
+{
+    /* FIXME why do we let pf_release handle the i_refcount ? */
+    if( p_picture->pf_release )
+        p_picture->pf_release( p_picture );
+}
+
+bool picture_IsReferenced( picture_t *p_picture )
+{
+    return p_picture->i_refcount > 1;
+}
+
 /*****************************************************************************
  *
  *****************************************************************************/
@@ -321,6 +348,25 @@ void plane_CopyPixels( plane_t *p_dst, const plane_t *p_src )
         }
     }
 }
+
+void picture_CopyProperties( picture_t *p_dst, const picture_t *p_src )
+{
+    p_dst->date = p_src->date;
+    p_dst->b_force = p_src->b_force;
+
+    p_dst->b_progressive = p_src->b_progressive;
+    p_dst->i_nb_fields = p_src->i_nb_fields;
+    p_dst->b_top_field_first = p_src->b_top_field_first;
+
+    /* FIXME: copy ->p_q and ->p_qstride */
+}
+
+void picture_Copy( picture_t *p_dst, const picture_t *p_src )
+{
+    picture_CopyPixels( p_dst, p_src );
+    picture_CopyProperties( p_dst, p_src );
+}
+
 
 /*****************************************************************************
  *
