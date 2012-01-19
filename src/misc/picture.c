@@ -37,6 +37,7 @@
 #include <vlc_picture.h>
 #include <vlc_image.h>
 #include <vlc_block.h>
+#include <vlc_atomic.h>
 
 /**
  * Allocate a new picture in the heap.
@@ -92,22 +93,16 @@ static int AllocatePicture( picture_t *p_pic,
 /*****************************************************************************
  *
  *****************************************************************************/
-static void picture_Delete( picture_t *p_picture )
+static void PictureDestroy( picture_t *p_picture )
 {
-    assert( p_picture && p_picture->i_refcount == 0 );
-    assert( p_picture->p_release_sys == NULL );
+    assert( p_picture &&
+            vlc_atomic_get( &p_picture->gc.refcount ) == 0 &&
+            p_picture->gc.p_sys == NULL );
 
     free( p_picture->p_q );
     vlc_free( p_picture->p_data_orig );
     free( p_picture->p_sys );
     free( p_picture );
-}
-
-static void PictureReleaseCallback( picture_t *p_picture )
-{
-    if( --p_picture->i_refcount > 0 )
-        return;
-    picture_Delete( p_picture );
 }
 
 /*****************************************************************************
@@ -148,9 +143,9 @@ int picture_Setup( picture_t *p_picture, vlc_fourcc_t i_chroma,
         p->i_pixel_pitch = 0;
     }
 
-    p_picture->pf_release = NULL;
-    p_picture->p_release_sys = NULL;
-    p_picture->i_refcount = 0;
+    vlc_atomic_set( &p_picture->gc.refcount, 0 );
+    p_picture->gc.pf_destroy = NULL;
+    p_picture->gc.p_sys = NULL;
 
     p_picture->i_nb_fields = 2;
 
@@ -255,8 +250,10 @@ picture_t *picture_NewFromResource( const video_format_t *p_fmt, const picture_r
     }
     /* */
     p_picture->format = fmt;
-    p_picture->i_refcount = 1;
-    p_picture->pf_release = PictureReleaseCallback;
+
+    vlc_atomic_set( &p_picture->gc.refcount, 1 );
+    p_picture->gc.pf_destroy = PictureDestroy;
+    p_picture->gc.p_sys = NULL;
 
     return p_picture;
 }
@@ -281,21 +278,20 @@ picture_t *picture_New( vlc_fourcc_t i_chroma, int i_width, int i_height, int i_
 
 picture_t *picture_Hold( picture_t *p_picture )
 {
-    if( p_picture->pf_release )
-        p_picture->i_refcount++;
+    vlc_atomic_inc( &p_picture->gc.refcount );
     return p_picture;
 }
 
 void picture_Release( picture_t *p_picture )
 {
-    /* FIXME why do we let pf_release handle the i_refcount ? */
-    if( p_picture->pf_release )
-        p_picture->pf_release( p_picture );
+    if( vlc_atomic_dec( &p_picture->gc.refcount ) == 0 &&
+        p_picture->gc.pf_destroy )
+        p_picture->gc.pf_destroy( p_picture );
 }
 
 bool picture_IsReferenced( picture_t *p_picture )
 {
-    return p_picture->i_refcount > 1;
+    return vlc_atomic_get( &p_picture->gc.refcount ) > 1;
 }
 
 /*****************************************************************************

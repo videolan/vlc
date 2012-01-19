@@ -56,10 +56,11 @@ typedef struct plane_t
  */
 #define PICTURE_PLANE_MAX (VOUT_MAX_PLANES)
 
+
 /**
  * A private definition to help overloading picture release
  */
-typedef struct picture_release_sys_t picture_release_sys_t;
+typedef struct picture_gc_sys_t picture_gc_sys_t;
 
 /**
  * Video picture
@@ -79,7 +80,6 @@ struct picture_t
      * These properties can be modified using the video output thread API,
      * but should never be written directly */
     /**@{*/
-    unsigned        i_refcount;                  /**< link reference counter */
     mtime_t         date;                                  /**< display date */
     bool            b_force;
     /**@}*/
@@ -101,8 +101,12 @@ struct picture_t
     picture_sys_t * p_sys;
 
     /** This way the picture_Release can be overloaded */
-    void (*pf_release)( picture_t * );
-    picture_release_sys_t *p_release_sys;
+    struct
+    {
+        vlc_atomic_t refcount;
+        void (*pf_destroy)( picture_t * );
+        picture_gc_sys_t *p_sys;
+    } gc;
 
     /** Next picture in a FIFO a pictures */
     struct picture_t *p_next;
