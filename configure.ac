@@ -1663,7 +1663,7 @@ AS_IF([test "${enable_live555}" != "no" -a -n "${CXX}"], [
   ])
   AS_IF([test "$ac_cv_live555" = "no"], [
     AC_MSG_WARN([liveMedia is missing or its installed version is too old:
-Version 2010.05.29 or later is required to proceed.
+Version 2011.12.23 or later is required to proceed.
 You can get an updated one from http://www.live555.com/liveMedia .])
     AS_IF([test -n "${enable_live555}"], [
       AC_MSG_ERROR([Update live555 or pass --disable-live555 to disable RTSP input support.])
