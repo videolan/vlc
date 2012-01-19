@@ -1,0 +1,54 @@
+diff -ur live555.orig/config.armlinux live555/config.armlinux
+--- live555.orig/config.armlinux	2012-01-19 16:56:57.026348234 -0500
++++ live555/config.armlinux	2012-01-19 16:57:42.806348231 -0500
+@@ -1,5 +1,5 @@
+-CROSS_COMPILE?=		arm-elf-
+-COMPILE_OPTS =		$(INCLUDES) -I. -O2 -DSOCKLEN_T=socklen_t -DNO_SSTREAM=1 -D_LARGEFILE_SOURCE=1 -D_FILE_OFFSET_BITS=64
++CROSS_COMPILE?=		arm-linux-androideabi-
++COMPILE_OPTS =     $(INCLUDES) -I. -O2 -DSOCKLEN_T=socklen_t -DNO_SSTREAM=1 -D_LARGEFILE_SOURCE=1 -D_FILE_OFFSET_BITS=64 -I$(ANDROID_NDK)/platforms/android-9/arch-arm/usr/include -DLOCALE_NOT_USED
+ C =			c
+ C_COMPILER =		$(CROSS_COMPILE)gcc
+ C_FLAGS =		$(COMPILE_OPTS)
+diff -ur live555.orig/groupsock/GroupsockHelper.cpp live555/groupsock/GroupsockHelper.cpp
+--- live555.orig/groupsock/GroupsockHelper.cpp	2012-01-19 16:56:57.026348234 -0500
++++ live555/groupsock/GroupsockHelper.cpp	2012-01-19 16:57:10.470348233 -0500
+@@ -466,9 +466,9 @@
+   if (!IsMulticastAddress(groupAddress)) return True; // ignore this case
+ 
+   struct ip_mreq_source imr;
+-  imr.imr_multiaddr.s_addr = groupAddress;
+-  imr.imr_sourceaddr.s_addr = sourceFilterAddr;
+-  imr.imr_interface.s_addr = ReceivingInterfaceAddr;
++  imr.imr_multiaddr = groupAddress;
++  imr.imr_sourceaddr = sourceFilterAddr;
++  imr.imr_interface = ReceivingInterfaceAddr;
+   if (setsockopt(socket, IPPROTO_IP, IP_ADD_SOURCE_MEMBERSHIP,
+ 		 (const char*)&imr, sizeof (struct ip_mreq_source)) < 0) {
+     socketErr(env, "setsockopt(IP_ADD_SOURCE_MEMBERSHIP) error: ");
+@@ -484,9 +484,9 @@
+   if (!IsMulticastAddress(groupAddress)) return True; // ignore this case
+ 
+   struct ip_mreq_source imr;
+-  imr.imr_multiaddr.s_addr = groupAddress;
+-  imr.imr_sourceaddr.s_addr = sourceFilterAddr;
+-  imr.imr_interface.s_addr = ReceivingInterfaceAddr;
++  imr.imr_multiaddr = groupAddress;
++  imr.imr_sourceaddr = sourceFilterAddr;
++  imr.imr_interface = ReceivingInterfaceAddr;
+   if (setsockopt(socket, IPPROTO_IP, IP_DROP_SOURCE_MEMBERSHIP,
+ 		 (const char*)&imr, sizeof (struct ip_mreq_source)) < 0) {
+     return False;
+diff -ur live555.orig/Makefile.tail live555/Makefile.tail
+--- live555.orig/Makefile.tail	2012-01-19 16:56:57.038348232 -0500
++++ live555/Makefile.tail	2012-01-19 16:57:10.470348233 -0500
+@@ -14,8 +14,8 @@
+ 	cd $(GROUPSOCK_DIR) ; $(MAKE)
+ 	cd $(USAGE_ENVIRONMENT_DIR) ; $(MAKE)
+ 	cd $(BASIC_USAGE_ENVIRONMENT_DIR) ; $(MAKE)
+-	cd $(TESTPROGS_DIR) ; $(MAKE)
+-	cd $(MEDIA_SERVER_DIR) ; $(MAKE)
++#	cd $(TESTPROGS_DIR) ; $(MAKE)
++#	cd $(MEDIA_SERVER_DIR) ; $(MAKE)
+ 
+ clean:
+ 	cd $(LIVEMEDIA_DIR) ; $(MAKE) clean
