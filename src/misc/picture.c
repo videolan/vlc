@@ -45,10 +45,10 @@
  * used exactly like a video buffer. The video output thread then manages
  * how it gets displayed.
  */
-static int vout_AllocatePicture( picture_t *p_pic,
-                                 vlc_fourcc_t i_chroma,
-                                 int i_width, int i_height,
-                                 int i_sar_num, int i_sar_den )
+static int AllocatePicture( picture_t *p_pic,
+                            vlc_fourcc_t i_chroma,
+                            int i_width, int i_height,
+                            int i_sar_num, int i_sar_den )
 {
     /* Make sure the real dimensions are a multiple of 16 */
     if( picture_Setup( p_pic, i_chroma, i_width, i_height,
@@ -102,14 +102,6 @@ static void PictureReleaseCallback( picture_t *p_picture )
 /*****************************************************************************
  *
  *****************************************************************************/
-static void picture_CleanupQuant( picture_t *p_pic )
-{
-    free( p_pic->p_q );
-    p_pic->p_q = NULL;
-    p_pic->i_qstride = 0;
-    p_pic->i_qtype = 0;
-}
-
 void picture_Reset( picture_t *p_picture )
 {
     /* */
@@ -118,7 +110,11 @@ void picture_Reset( picture_t *p_picture )
     p_picture->b_progressive = false;
     p_picture->i_nb_fields = 2;
     p_picture->b_top_field_first = false;
-    picture_CleanupQuant( p_picture );
+
+    free( p_picture->p_q );
+    p_picture->p_q = NULL;
+    p_picture->i_qstride = 0;
+    p_picture->i_qtype = 0;
 }
 
 /*****************************************************************************
@@ -238,9 +234,9 @@ picture_t *picture_NewFromResource( const video_format_t *p_fmt, const picture_r
     }
     else
     {
-        if( vout_AllocatePicture( p_picture,
-                                  fmt.i_chroma, fmt.i_width, fmt.i_height,
-                                  fmt.i_sar_num, fmt.i_sar_den ) )
+        if( AllocatePicture( p_picture,
+                             fmt.i_chroma, fmt.i_width, fmt.i_height,
+                             fmt.i_sar_num, fmt.i_sar_den ) )
         {
             free( p_picture );
             return NULL;
@@ -304,14 +300,6 @@ bool picture_IsReferenced( picture_t *p_picture )
 /*****************************************************************************
  *
  *****************************************************************************/
-void picture_CopyPixels( picture_t *p_dst, const picture_t *p_src )
-{
-    int i;
-
-    for( i = 0; i < p_src->i_planes ; i++ )
-        plane_CopyPixels( p_dst->p+i, p_src->p+i );
-}
-
 void plane_CopyPixels( plane_t *p_dst, const plane_t *p_src )
 {
     const unsigned i_width  = __MIN( p_dst->i_visible_pitch,
@@ -359,6 +347,14 @@ void picture_CopyProperties( picture_t *p_dst, const picture_t *p_src )
     p_dst->b_top_field_first = p_src->b_top_field_first;
 
     /* FIXME: copy ->p_q and ->p_qstride */
+}
+
+void picture_CopyPixels( picture_t *p_dst, const picture_t *p_src )
+{
+    int i;
+
+    for( i = 0; i < p_src->i_planes ; i++ )
+        plane_CopyPixels( p_dst->p+i, p_src->p+i );
 }
 
 void picture_Copy( picture_t *p_dst, const picture_t *p_src )
