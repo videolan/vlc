@@ -479,7 +479,7 @@ need_libc=false
 dnl Check for usual libc functions
 AC_CHECK_DECLS([nanosleep],,,[#include <time.h>])
 AC_CHECK_FUNCS([daemon fcntl fstatvfs fork getenv getpwuid_r if_nameindex if_nametoindex isatty lstat memalign mmap openat pread posix_fadvise posix_madvise setlocale stricmp strnicmp strptime uselocale])
-AC_REPLACE_FUNCS([atof atoll dirfd fdopendir flockfile fsync getdelim getpid gmtime_r inet_pton lldiv localtime_r nrand48 rewind setenv strcasecmp strcasestr strdup strlcpy strncasecmp strndup strnlen strsep strtof strtok_r strtoll swab tdestroy])
+AC_REPLACE_FUNCS([atof atoll dirfd fdopendir flockfile fsync getdelim getpid gmtime_r inet_pton lldiv localtime_r nrand48 poll rewind setenv strcasecmp strcasestr strdup strlcpy strncasecmp strndup strnlen strsep strtof strtok_r strtoll swab tdestroy])
 AC_CHECK_FUNCS(fdatasync,,
   [AC_DEFINE(fdatasync, fsync, [Alias fdatasync() to fsync() if missing.])
 ])
@@ -506,15 +506,6 @@ dnl Check for non-standard system calls
 AC_CHECK_FUNCS([accept4 pipe2 eventfd vmsplice sched_getaffinity])
 
 AH_BOTTOM([#include <vlc_fixups.h>])
-
-dnl Check for poll
-AC_SEARCH_LIBS(poll, [poll], [
-  AC_DEFINE(HAVE_POLL, 1, [Define to 1 if the OS has poll().])
-], [
-  AS_IF([test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce" -a "${SYS}" != "os2"], [
-    AC_MSG_ERROR([poll() is required.])
-  ])
-])
 
 dnl Check for struct pollfd
 AC_CHECK_TYPES([struct pollfd],,,

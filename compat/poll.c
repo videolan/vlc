@@ -1,7 +1,7 @@
 /*****************************************************************************
- * poll.c: poll() emulation for Winsock
+ * poll.c: poll() emulation
  *****************************************************************************
- * Copyright © 2007 Rémi Denis-Courmont
+ * Copyright © 2007-2012 Rémi Denis-Courmont
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
@@ -19,32 +19,33 @@
  *****************************************************************************/
 
 #ifdef HAVE_CONFIG_H
-# include "config.h"
+# include <config.h>
 #endif
 
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
 
-#include <vlc_common.h>
-
-#ifdef FD_SETSIZE
+#ifdef WIN32
+# ifdef FD_SETSIZE
 /* Too late for #undef FD_SETSIZE to work: fd_set is already defined. */
-# error Header inclusion order compromised!
+#  error Header inclusion order compromised!
+# endif
+# define FD_SETSIZE 0
+# include <winsock2.h>
+#else
+# include <sys/select.h>
 #endif
-#define FD_SETSIZE 0
-#include <vlc_network.h>
 
-int vlc_poll (struct pollfd *fds, unsigned nfds, int timeout)
+int (poll) (struct pollfd *fds, unsigned nfds, int timeout)
 {
+#ifdef WIN32
     size_t setsize = sizeof (fd_set) + nfds * sizeof (SOCKET);
     fd_set *rdset = malloc (setsize);
     fd_set *wrset = malloc (setsize);
     fd_set *exset = malloc (setsize);
-    struct timeval tv = { 0, 0 };
-    int val;
 
-    if (unlikely(rdset == NULL || wrset == NULL || exset == NULL))
+    if (rdset == NULL || wrset == NULL || exset == NULL)
     {
         free (rdset);
         free (wrset);
@@ -52,14 +53,14 @@ int vlc_poll (struct pollfd *fds, unsigned nfds, int timeout)
         errno = ENOMEM;
         return -1;
     }
-
 /* Winsock FD_SET uses FD_SETSIZE in its expansion */
-#undef FD_SETSIZE
-#define FD_SETSIZE (nfds)
-
-resume:
-    val = -1;
-    vlc_testcancel ();
+# undef FD_SETSIZE
+# define FD_SETSIZE (nfds)
+#else
+    fd_set rdset[1], wrset[1], exset[1];
+#endif
+    struct timeval tv = { 0, 0 };
+    int val = -1;
 
     FD_ZERO (rdset);
     FD_ZERO (wrset);
@@ -87,23 +88,21 @@ resume:
          * Note that Vista has a much nicer WSAPoll(), but Mingw does not
          * support it yet.
          */
+#ifndef WIN32
+        if ((unsigned)fd >= FD_SETSIZE)
+        {
+            errno = EINVAL;
+            return -1;
+        }
+#endif
         if (fds[i].events & POLLIN)
-            FD_SET ((SOCKET)fd, rdset);
+            FD_SET (fd, rdset);
         if (fds[i].events & POLLOUT)
-            FD_SET ((SOCKET)fd, wrset);
+            FD_SET (fd, wrset);
         if (fds[i].events & POLLPRI)
-            FD_SET ((SOCKET)fd, exset);
+            FD_SET (fd, exset);
     }
 
-#ifndef HAVE_ALERTABLE_SELECT
-# warning FIXME! Fix cancellation and remove this crap.
-    if ((timeout < 0) || (timeout > 50))
-    {
-        tv.tv_sec = 0;
-        tv.tv_usec = 50000;
-    }
-    else
-#endif
     if (timeout >= 0)
     {
         div_t d = div (timeout, 1000);
@@ -112,18 +111,7 @@ resume:
     }
 
     val = select (val + 1, rdset, wrset, exset,
-                  /*(timeout >= 0) ?*/ &tv /*: NULL*/);
-
-#ifndef HAVE_ALERTABLE_SELECT
-    if (val == 0)
-    {
-        if (timeout > 0)
-            timeout -= (timeout > 50) ? 50 : timeout;
-        if (timeout != 0)
-            goto resume;
-    }
-#endif
-
+                  (timeout >= 0) ? &tv : NULL);
     if (val == -1)
         return -1;
 
@@ -134,8 +122,10 @@ resume:
                        | (FD_ISSET (fd, wrset) ? POLLOUT : 0)
                        | (FD_ISSET (fd, exset) ? POLLPRI : 0);
     }
+#ifdef WIN32
     free (exset);
     free (wrset);
     free (rdset);
+#endif
     return val;
 }

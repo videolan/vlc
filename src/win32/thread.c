@@ -777,6 +777,21 @@ void vlc_control_cancel (int cmd, ...)
     va_end (ap);
 }
 
+int vlc_poll (struct pollfd *fds, unsigned nfds, int timeout)
+{
+    vlc_testcancel ();
+
+    while (timeout > 50)
+    {
+        int val = poll (fds, nfds, timeout);
+        if (val != 0)
+            return val;
+        timeout -= 50;
+        vlc_testcancel ();
+    }
+
+    return poll (fds, nfds, timeout);
+}
 
 /*** Clock ***/
 mtime_t mdate (void)

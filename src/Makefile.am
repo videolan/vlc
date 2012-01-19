@@ -265,7 +265,6 @@ SOURCES_libvlc_win32 = \
 	win32/atomic.c \
 	win32/filesystem.c \
 	win32/plugin.c \
-	win32/poll.c \
 	win32/thread.c \
 	win32/specific.c \
 	win32/winsock.c \
@@ -286,7 +285,6 @@ SOURCES_libvlc_os2 = \
 	misc/atomic.c \
 	posix/filesystem.c \
 	posix/plugin.c \
-	os2/poll.c \
 	os2/thread.c \
 	os2/specific.c \
 	os2/rand.c \
