@@ -1,7 +1,7 @@
-noinst_LTLIBRARIES = libcompat.la
+pkglib_LTLIBRARIES = libcompat.la
 libcompat_la_SOURCES = dummy.c
 libcompat_la_LIBADD = $(LTLIBOBJS)
-libcompat_la_LDFLAGS = -no-undefined
+libcompat_la_LDFLAGS = -no-undefined -static
 
 BUILT_SOURCES = dummy.c
 CLEANFILES = dummy.c
