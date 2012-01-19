@@ -55,13 +55,6 @@ extern void LocaleFree (const char *);
 extern char *FromLocale (const char *);
 extern void vlc_enable_override (void);
 
-#ifdef HAVE_MAEMO
-static void dummy_handler (int signum)
-{
-    (void) signum;
-}
-#endif
-
 static bool signal_ignored (int signum)
 {
     struct sigaction sa;
@@ -177,13 +170,6 @@ int main( int i_argc, const char *ppsz_argv[] )
      * block SIGCHLD in all threads, and dequeue it below. */
     sigaddset (&set, SIGCHLD);
 
-#ifdef HAVE_MAEMO
-    sigaddset (&set, SIGRTMIN);
-    {
-        struct sigaction act = { .sa_handler = dummy_handler, };
-        sigaction (SIGRTMIN, &act, NULL);
-    }
-#endif
     /* Block all these signals */
     pthread_sigmask (SIG_SETMASK, &set, NULL);
 

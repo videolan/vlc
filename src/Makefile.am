@@ -243,7 +243,6 @@ SOURCES_libvlc_darwin = \
 	misc/atomic.c \
 	posix/filesystem.c \
 	posix/plugin.c \
-	network/poll.c \
 	posix/thread.c \
 	posix/darwin_specific.c \
 	posix/rand.c \
@@ -254,7 +253,6 @@ SOURCES_libvlc_linux = \
 	misc/atomic.c \
 	posix/filesystem.c \
 	posix/plugin.c \
-	network/poll.c \
 	posix/thread.c \
 	posix/linux_specific.c \
 	posix/rand.c \
@@ -294,7 +292,6 @@ SOURCES_libvlc_other = \
 	posix/dirs.c \
 	misc/atomic.c \
 	posix/filesystem.c \
-	network/poll.c \
 	posix/thread.c \
 	posix/plugin.c \
 	posix/specific.c \

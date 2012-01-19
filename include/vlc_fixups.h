@@ -276,9 +276,6 @@ struct pollfd
 #endif
 #ifndef HAVE_POLL
 # define poll(a, b, c) vlc_poll(a, b, c)
-#elif defined (HAVE_MAEMO)
-# include <poll.h>
-# define poll(a, b, c) vlc_poll(a, b, c)
 #endif
 
 #ifndef HAVE_IF_NAMEINDEX
