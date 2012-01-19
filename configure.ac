@@ -1809,7 +1809,18 @@ AC_ARG_ENABLE(pvr, [AS_HELP_STRING([--enable-pvr],
   [support PVR V4L2 cards (default disabled)])])
 have_v4l2="no"
 AC_CHECK_HEADERS([linux/videodev2.h sys/videoio.h], [
-  have_v4l2="yes"
+  AC_PREPROC_IFELSE([
+  #ifdef __linux__
+  # include <linux/version.h>
+  # if LINUX_VERSION_CODE < KERNEL_VERSION(2,6,32)
+  #  error Kernel headers too old
+  # endif
+  #endif
+    ], [
+      have_v4l2="yes"
+      ], [
+      AC_MSG_WARN([Kernel headers too old for V4L2 module. You need at least 2.6.32])
+  ])
 ])
 AS_IF([test "$have_v4l2" = "yes"], [
   AS_IF([test "${enable_libv4l2}" != "no"], [
