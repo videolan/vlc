@@ -767,7 +767,8 @@ static VLCMainWindow *_o_sharedInstance = nil;
     if (b_dark_interface)
     {
         [self miniaturize: sender];
-        [[VLCCoreInteraction sharedInstance] pause];
+        if ([[VLCMain sharedInstance] activeVideoPlayback])
+            [[VLCCoreInteraction sharedInstance] pause];
     }
     else
         [super performMiniaturize: sender];
@@ -1272,7 +1273,10 @@ static VLCMainWindow *_o_sharedInstance = nil;
 - (void)someWindowWillMiniaturize:(NSNotification *)notification
 {
     if([notification object] == o_nonembedded_window || [notification object] == self)
-        [[VLCCoreInteraction sharedInstance] pause];
+    {
+        if([[VLCMain sharedInstance] activeVideoPlayback])
+            [[VLCCoreInteraction sharedInstance] pause];
+    }
 }
 
 #pragma mark -
