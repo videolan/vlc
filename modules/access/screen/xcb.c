@@ -37,7 +37,7 @@
 
 #define LEFT_TEXT N_("Region left column")
 #define LEFT_LONGTEXT N_( \
-    "Abscissa of the capture reion in pixels.")
+    "Abscissa of the capture region in pixels.")
 
 #define TOP_TEXT N_("Region top row")
 #define TOP_LONGTEXT N_( \
