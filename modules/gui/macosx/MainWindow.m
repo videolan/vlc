@@ -559,11 +559,13 @@ static VLCMainWindow *_o_sharedInstance = nil;
         if ([o_video_view isHidden] && [o_playlist_btn isEnabled]) {
             [o_split_view setHidden: YES];
             [o_video_view setHidden: NO];
+            [self makeFirstResponder: o_video_view];
         }
         else
         {
             [o_video_view setHidden: YES];
             [o_split_view setHidden: NO];
+            [self makeFirstResponder: nil];
         }
     }
     else
@@ -1193,6 +1195,8 @@ static VLCMainWindow *_o_sharedInstance = nil;
     }
     if (b_videoPlayback)
         [self makeFirstResponder: o_video_view];
+    else
+        [self makeFirstResponder: nil];
 }
 
 - (void)resizeWindow

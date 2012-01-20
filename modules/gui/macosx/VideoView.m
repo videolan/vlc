@@ -304,8 +304,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 
 - (BOOL)resignFirstResponder
 {
-    /* We need to stay the first responder or we'll miss some
-       events */
-    return NO;
+    /* while we need to be the first responder most of the time, we need to give up that status when toggling the playlist */
+    return YES;
 }
 @end
