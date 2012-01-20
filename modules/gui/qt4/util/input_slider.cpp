@@ -167,6 +167,7 @@ void SeekSlider::mouseReleaseEvent( QMouseEvent *event )
 {
     event->accept();
     b_isSliding = false;
+    bool b_seekPending = seekLimitTimer->isActive();
     seekLimitTimer->stop(); /* We're not sliding anymore: only last seek on release */
     if ( b_is_jumping )
     {
@@ -174,7 +175,8 @@ void SeekSlider::mouseReleaseEvent( QMouseEvent *event )
         return;
     }
     QSlider::mouseReleaseEvent( event );
-    updatePos();
+    if( b_seekPending )
+        updatePos();
 }
 
 void SeekSlider::mousePressEvent( QMouseEvent* event )
@@ -227,6 +229,7 @@ void SeekSlider::mousePressEvent( QMouseEvent* event )
 
     b_isSliding = true ;
     setValue( QStyle::sliderValueFromPosition( MINIMUM, MAXIMUM, event->x(), width(), false ) );
+    emit sliderMoved( value() );
     event->accept();
 }
 
