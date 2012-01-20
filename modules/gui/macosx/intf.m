@@ -279,7 +279,7 @@ static int InputEvent( vlc_object_t *p_this, const char *psz_var,
         case INPUT_EVENT_ITEM_INFO:
             [[VLCMain sharedInstance] performSelectorOnMainThread:@selector(updateMainMenu) withObject: nil waitUntilDone:NO];
             [[VLCMain sharedInstance] updateName];
-            [[VLCMain sharedInstance] updateInfoandMetaPanel];
+            [[VLCMain sharedInstance] performSelectorOnMainThread:@selector(updateInfoandMetaPanel) withObject: nil waitUntilDone:NO];
             break;
         case INPUT_EVENT_BOOKMARK:
             break;
