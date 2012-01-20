@@ -20,19 +20,6 @@
 --]]
 
 function try_query(query)
-    local l = vlc.object.libvlc()
-    local t = vlc.var.get( l, "musicbrainz-previousdate" )
-    if t ~= nil then
-        if t + 2000000. > vlc.misc.mdate() then
-            vlc.msg.warn( "We must wait 2 second between requests unless we want to be blacklisted from the musicbrainz server." )
-            vlc.misc.mwait( t + 2000000. )
-        end
-        vlc.var.set( l, "musicbrainz-previousdate", vlc.misc.mdate() )
-    else
-        vlc.var.create( l, "musicbrainz-previousdate", vlc.misc.mdate() )
-    end
-    l = nil
-    vlc.msg.dbg( query )
     local s = vlc.stream( query )
     if not s then return nil end
     local page = s:read( 65653 )
@@ -40,7 +27,6 @@ function try_query(query)
     -- FIXME: multiple results may be available
     _, _, asin = string.find( page, "<asin>(%w+)</asin>" )
     if asin then
-        vlc.msg.dbg( asin )
         return "http://images.amazon.com/images/P/"..asin..".01._SCLZZZZZZZ_.jpg"
     else
         return nil
