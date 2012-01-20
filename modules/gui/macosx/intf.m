@@ -678,6 +678,9 @@ static VLCMain *_o_sharedMainInstance = nil;
 
 - (void)applicationWillTerminate:(NSNotification *)notification
 {
+    if (notification == nil)
+        [[NSNotificationCenter defaultCenter] postNotificationName: NSApplicationWillTerminateNotification object: nil];
+
     playlist_t * p_playlist;
     vout_thread_t * p_vout;
     int returnedValue = 0;

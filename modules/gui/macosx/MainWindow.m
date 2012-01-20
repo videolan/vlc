@@ -112,8 +112,6 @@ static VLCMainWindow *_o_sharedInstance = nil;
         [o_color_backdrop release];
 
     [[NSNotificationCenter defaultCenter] removeObserver: self];
-    config_PutInt( VLCIntf->p_libvlc, "volume", i_lastShownVolume );
-    [self saveFrameUsingName: [self frameAutosaveName]];
     [o_sidebaritems release];
     [super dealloc];
 }
@@ -427,11 +425,12 @@ static VLCMainWindow *_o_sharedInstance = nil;
         winrect.size.height = winrect.size.height - f_titleBarHeight;
         [o_split_view setFrame: winrect];
         [o_video_view setFrame: winrect];
-        previousSavedFrame = winrect;
 
         o_color_backdrop = [[VLCColorView alloc] initWithFrame: [o_split_view frame]];
         [[self contentView] addSubview: o_color_backdrop positioned: NSWindowBelow relativeTo: o_split_view];
         [o_color_backdrop setAutoresizingMask:NSViewHeightSizable | NSViewWidthSizable];
+
+        previousSavedFrame = winrect;
 
         [self display];
     }
@@ -459,6 +458,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
     [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(someWindowWillClose:) name: NSWindowWillCloseNotification object: nil];
     [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(someWindowWillMiniaturize:) name: NSWindowWillMiniaturizeNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(applicationWillTerminate:) name: NSApplicationWillTerminateNotification object: nil];
 }
 
 #pragma mark -
@@ -894,6 +894,27 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [self saveFrameUsingName: [self frameAutosaveName]];
 }
 
+- (void)applicationWillTerminate:(NSNotification *)notification
+{
+    config_PutInt( VLCIntf->p_libvlc, "volume", i_lastShownVolume );
+    [self saveFrameUsingName: [self frameAutosaveName]];
+}
+
+- (void)someWindowWillClose:(NSNotification *)notification
+{
+    if([notification object] == o_nonembedded_window || [notification object] == self)
+        [[VLCCoreInteraction sharedInstance] stop];
+}
+
+- (void)someWindowWillMiniaturize:(NSNotification *)notification
+{
+    if([notification object] == o_nonembedded_window || [notification object] == self)
+    {
+        if([[VLCMain sharedInstance] activeVideoPlayback])
+            [[VLCCoreInteraction sharedInstance] pause];
+    }
+}
+
 #pragma mark -
 #pragma mark Update interface and respond to foreign events
 - (void)showDropZone
@@ -1262,21 +1283,6 @@ static VLCMainWindow *_o_sharedInstance = nil;
 - (void)hideMouseCursor:(NSTimer *)timer
 {
     [NSCursor setHiddenUntilMouseMoves: YES];
-}
-
-- (void)someWindowWillClose:(NSNotification *)notification
-{
-    if([notification object] == o_nonembedded_window || [notification object] == self)
-        [[VLCCoreInteraction sharedInstance] stop];
-}
-
-- (void)someWindowWillMiniaturize:(NSNotification *)notification
-{
-    if([notification object] == o_nonembedded_window || [notification object] == self)
-    {
-        if([[VLCMain sharedInstance] activeVideoPlayback])
-            [[VLCCoreInteraction sharedInstance] pause];
-    }
 }
 
 #pragma mark -
