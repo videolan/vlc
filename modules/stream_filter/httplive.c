@@ -1034,27 +1034,35 @@ static int parse_M3U8(stream_t *s, vlc_array_t *streams, uint8_t *buffer, const 
                     err = VLC_ENOMEM;
                 else
                 {
-                    hls_stream_t *hls = NULL;
-                    err = parse_StreamInformation(s, &streams, &hls, line, uri);
-                    free(uri);
-
-                    /* Download playlist file from server */
-                    uint8_t *buf = NULL;
-                    ssize_t len = read_M3U8_from_url(s, &hls->url, &buf);
-                    if (len < 0)
-                        err = VLC_EGENERIC;
+                    if (*uri == '#')
+                    {
+                        msg_Info(s, "Skipping invalid stream-inf: %s", uri);
+                        free(uri);
+                    }
                     else
                     {
-                        /* Parse HLS m3u8 content. */
-                        err = parse_M3U8(s, streams, buf, len);
-                        free(buf);
-                    }
+                        hls_stream_t *hls = NULL;
+                        err = parse_StreamInformation(s, &streams, &hls, line, uri);
+                        free(uri);
 
-                    if (hls)
-                    {
-                        hls->version = version;
-                        if (!p_sys->b_live)
-                            hls->size = hls_GetStreamSize(hls); /* Stream size (approximate) */
+                        /* Download playlist file from server */
+                        uint8_t *buf = NULL;
+                        ssize_t len = read_M3U8_from_url(s, &hls->url, &buf);
+                        if (len < 0)
+                            err = VLC_EGENERIC;
+                        else
+                        {
+                            /* Parse HLS m3u8 content. */
+                            err = parse_M3U8(s, streams, buf, len);
+                            free(buf);
+                        }
+
+                        if (hls)
+                        {
+                            hls->version = version;
+                            if (!p_sys->b_live)
+                                hls->size = hls_GetStreamSize(hls); /* Stream size (approximate) */
+                        }
                     }
                 }
                 p_begin = p_read;
