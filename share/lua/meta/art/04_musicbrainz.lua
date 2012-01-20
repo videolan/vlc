@@ -28,18 +28,43 @@ function try_query(query)
     _, _, asin = string.find( page, "<asin>(%w+)</asin>" )
     if asin then
         return "http://images.amazon.com/images/P/"..asin..".01._SCLZZZZZZZ_.jpg"
-    else
-        return nil
     end
+    vlc.msg.dbg("ASIN not found")
+    return nil
+end
+
+-- Return the mbid for first release
+function try_release(query)
+    local s = vlc.stream( query )
+    if not s then return nil end
+    local page = s:read( 65653 )
+
+    -- FIXME: multiple results may be available and the first one is not
+    -- guaranteed to have asin, so if it doesnt, we wouldnt get any art
+    _, _, releaseid = string.find( page, "<release id=\"([%x%-]-)\">" )
+    if releaseid then
+        return releaseid
+    end
+    return nil
 end
 
 -- Return the artwork
 function fetch_art()
     local meta = vlc.item:metas()
-    if not (meta["artist"] and meta["album"]) then
-        return nil
-    end
 
-    local query1 = "http://mb.videolan.org/ws/2/release/?query=artist:"..vlc.strings.encode_uri_component(meta["artist"]).."%20AND%20release:\""..vlc.strings.encode_uri_component(meta["album"].."\"")
-    return try_query(query1)
+    if meta["artist"] and meta["album"] then
+        query = "artist:\"" .. meta["artist"] .. "\" AND release:\"" .. meta["album"] .. "\""
+        relquery = "http://mb.videolan.org/ws/2/release/?query=" .. vlc.strings.encode_uri_component( query )
+        return try_query( relquery )
+    elseif meta["artist"] and meta["title"] then
+        query = "artist:\"" .. meta["artist"] .. "\" AND recording:\"" .. meta["title"] .. "\""
+        recquery = "http://mb.videolan.org/ws/2/recording/?query=" .. vlc.strings.encode_uri_component( query )
+        releaseid = try_release( recquery )
+        if releaseid then
+            relquery = "http://mb.videolan.org/ws/2/release/" .. releaseid
+            return try_query( relquery )
+        else
+            return nil
+        end
+    end
 end
