@@ -38,7 +38,7 @@ function try_query(query)
     local page = s:read( 65653 )
 
     -- FIXME: multiple results may be available
-    asin = string.find( page, "<asin>(%w+)</asin>" )
+    _, _, asin = string.find( page, "<asin>(%w+)</asin>" )
     if asin then
         vlc.msg.dbg( asin )
         return "http://images.amazon.com/images/P/"..asin..".01._SCLZZZZZZZ_.jpg"
