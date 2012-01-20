@@ -249,6 +249,9 @@ void Close(vlc_object_t *this)
     vout_display_t *vd = (vout_display_t *)this;
     vout_display_sys_t *sys = vd->sys;
 
+    if ([[sys->glView window] level] != NSNormalWindowLevel)
+        [[sys->glView window] setLevel: NSNormalWindowLevel];
+
     [sys->glView setVoutDisplay:nil];
 
     var_Destroy(vd, "drawable-nsobject");
