@@ -1219,6 +1219,9 @@ static VLCMainWindow *_o_sharedInstance = nil;
         [self makeFirstResponder: o_video_view];
     else
         [self makeFirstResponder: nil];
+
+    if (!b_videoPlayback && b_fullscreen && !b_nativeFullscreenMode)
+        [self leaveFullscreenAndFadeOut: YES];
 }
 
 - (void)resizeWindow
@@ -1547,7 +1550,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
         if (OSX_LEOPARD)
             SetSystemUIMode( kUIModeNormal, kUIOptionAutoShowMenuBar);
         else
-            [NSApp setPresentationOptions:(NSApplicationPresentationDefault)];
+            [NSApp setPresentationOptions: NSApplicationPresentationDefault];
 
         /* Will release the lock */
         [self hasEndedFullscreen];
