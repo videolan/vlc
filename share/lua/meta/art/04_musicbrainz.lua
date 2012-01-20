@@ -54,6 +54,6 @@ function fetch_art()
         return nil
     end
 
-    local query1 = "http://mb.videolan.org/ws/1/release/?type=xml&artist="..vlc.strings.encode_uri_component(meta["artist"]).."&title=\""..vlc.strings.encode_uri_component(meta["album"].."\"")
+    local query1 = "http://mb.videolan.org/ws/2/release/?query=artist:"..vlc.strings.encode_uri_component(meta["artist"]).."%20AND%20release:\""..vlc.strings.encode_uri_component(meta["album"].."\"")
     return try_query(query1)
 end
