@@ -135,7 +135,6 @@ src/network/acl.c
 src/network/getaddrinfo.c
 src/network/httpd.c
 src/network/io.c
-src/network/poll.c
 src/network/rootbind.c
 src/network/tcp.c
 src/network/tls.c
