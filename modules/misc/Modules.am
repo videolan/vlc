@@ -44,6 +44,11 @@ libmce_plugin_la_DEPENDENCIES =
 EXTRA_LTLIBRARIES += libmce_plugin.la
 libvlc_LTLIBRARIES += $(LTLIBmce)
 
+liblogger_plugin_la_LIBADD = $(AM_LIBADD)
+if HAVE_ANDROID
+liblogger_plugin_la_LIBADD += -llog
+endif
+
 libvlc_LTLIBRARIES += \
 	libaudioscrobbler_plugin.la \
 	liblogger_plugin.la
