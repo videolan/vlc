@@ -577,7 +577,6 @@ vlc_object_hold
 vlc_object_kill
 vlc_object_release
 vlc_object_get_name
-vlc_poll
 vlc_rand_bytes
 vlc_drand48
 vlc_lrand48
