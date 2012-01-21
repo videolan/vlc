@@ -1332,7 +1332,10 @@ static void x264_log( void *data, int i_level, const char *psz, va_list args)
             break;
         case X264_LOG_WARNING:
             i_level = VLC_MSG_WARN;
+            break;
         case X264_LOG_INFO:
+            i_level = VLC_MSG_INFO;
+            break;
         case X264_LOG_DEBUG:
             i_level = VLC_MSG_DBG;
         default:
