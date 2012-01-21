@@ -640,7 +640,7 @@ void PLModel::processItemAppend( int i_item, int i_parent )
         PL_UNLOCK; return;
     }
 
-    for( pos = 0; pos < p_item->p_parent->i_children; pos++ )
+    for( pos = p_item->p_parent->i_children - 1; pos >= 0; pos-- )
         if( p_item->p_parent->pp_children[pos] == p_item ) break;
 
     newItem = new PLItem( p_item, nodeParentItem );
