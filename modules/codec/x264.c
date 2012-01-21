@@ -51,6 +51,7 @@
  *****************************************************************************/
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
+static void x264_log( void *, int i_level, const char *psz, va_list );
 
 /* Frame-type options */
 
@@ -1235,6 +1236,8 @@ static int  Open ( vlc_object_t *p_this )
         p_sys->param.rc.b_stat_read = i_val & 2;
     }
 
+    p_sys->param.pf_log = x264_log;
+    p_sys->param.p_log_private = p_enc;
     /* We need to initialize pthreadw32 before we open the encoder,
        but only once for the whole application. Since pthreadw32
        doesn't keep a refcount, do it ourselves. */
@@ -1314,6 +1317,30 @@ static int  Open ( vlc_object_t *p_this )
 
     return VLC_SUCCESS;
 }
+
+/****************************************************************************
+ * Logging
+ ****************************************************************************/
+static void x264_log( void *data, int i_level, const char *psz, va_list args)
+{
+    encoder_t *p_enc = (encoder_t *)data;
+
+    switch( i_level )
+    {
+        case X264_LOG_ERROR:
+            i_level = VLC_MSG_ERR;
+            break;
+        case X264_LOG_WARNING:
+            i_level = VLC_MSG_WARN;
+        case X264_LOG_INFO:
+        case X264_LOG_DEBUG:
+            i_level = VLC_MSG_DBG;
+        default:
+            i_level = VLC_MSG_DBG;
+    }
+
+    msg_GenericVa( p_enc, i_level, MODULE_STRING, psz, args );
+};
 
 /****************************************************************************
  * Encode:
