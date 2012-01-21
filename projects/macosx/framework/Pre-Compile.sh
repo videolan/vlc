@@ -52,7 +52,6 @@ target_bin="${target}/bin"
 target_lib="${target}/${lib}"            # Should we consider using a different well-known folder like shared resources?
 target_plugins="${target}/${plugins}"    # Should we consider using a different well-known folder like shared resources?
 target_share="${target}/${share}"    # Should we consider using a different well-known folder like shared resources?
-target_include="${target}/${include}"    # Should we consider using a different well-known folder like shared resources?
 linked_libs=""
 prefix=".libs/"
 suffix="dylib"
@@ -250,21 +249,13 @@ popd > /dev/null
 
 ##########################
 # Build the share folder
-echo "Building share folder..."
-pbxcp="/Developer/Library/PrivateFrameworks/DevToolsCore.framework/Resources/pbxcp -exclude .DS_Store -resolve-src-symlinks"
-mkdir -p ${target_share}
-if test "$use_archs" = "no"; then
-    $pbxcp ${VLC_BUILD_DIR}/share/lua ${target_share}
-else
-    $pbxcp ${main_build_dir}/share/lua ${target_share}
-fi
-
-##########################
-# Exporting headers
-if [ "$FULL_PRODUCT_NAME" = "VLC.app" ] ; then
-    echo "Exporting headers..."
-    mkdir -p ${target_include}/vlc
-    $pbxcp ${VLC_SRC_DIR}/include/vlc/*.h ${target_include}/vlc
-else
-    echo "Headers not needed for this product"
+if [ $PRODUCT != "VLC.app" ]; then
+    echo "Building share folder..."
+    pbxcp="/Developer/Library/PrivateFrameworks/DevToolsCore.framework/Resources/pbxcp -exclude .DS_Store -resolve-src-symlinks -v -V"
+    mkdir -p ${target_share}
+    if test "$use_archs" = "no"; then
+        $pbxcp ${VLC_BUILD_DIR}/share/lua ${target_share}
+    else
+        $pbxcp ${main_build_dir}/share/lua ${target_share}
+    fi
 fi
