@@ -12,7 +12,7 @@ VLC_SOURCEDIR="`dirname $0`/../../.."
 # needed for old ndk: change all the arm-linux-androideabi to arm-eabi
 # the --host is kept on purpose because otherwise libtool complains..
 
-CFLAGS="-O2 -mlong-calls -fstrict-aliasing -fprefetch-loop-arrays -ffast-math"
+CFLAGS="-g -O2 -mlong-calls -fstrict-aliasing -fprefetch-loop-arrays -ffast-math"
 LDFLAGS="-Wl,-Bdynamic,-dynamic-linker=/system/bin/linker -Wl,--no-undefined"
 
 if [ -z "$NO_NEON" ]; then
