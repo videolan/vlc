@@ -180,6 +180,7 @@ case "${OS}" in
 	linux-androideabi)
 		check_android_sdk
 		add_make_enabled "HAVE_LINUX" "HAVE_ANDROID"
+		add_make "PATH = ${ANDROID_NDK}/toolchains/arm-linux-androideabi-4.4.3/prebuilt/linux-x86/bin/:${PATH}"
 		;;
 	*linux*)
 		add_make_enabled "HAVE_LINUX"
