@@ -133,6 +133,11 @@ static int Open (vlc_object_t *obj)
     switch (filter->fmt_out.video.i_chroma)
     {
         case VLC_CODEC_RGB32:
+            if(        filter->fmt_out.video.i_rmask != 0x000000ff
+                    || filter->fmt_out.video.i_gmask != 0x0000ff00
+                    || filter->fmt_out.video.i_bmask != 0x00ff0000 )
+                return VLC_EGENERIC;
+
             switch (filter->fmt_in.video.i_chroma)
             {
                 case VLC_CODEC_I420:
