@@ -235,6 +235,11 @@ static VLCVideoEffects *_o_sharedInstance = nil;
     [o_adjust_brightness_sld setFloatValue: config_GetFloat( p_intf, "brightness" )];
     [o_adjust_saturation_sld setFloatValue: config_GetFloat( p_intf, "saturation" )];
     [o_adjust_gamma_sld setFloatValue: config_GetFloat( p_intf, "gamma" )];
+    [o_adjust_brightness_sld setToolTip: [NSString stringWithFormat:@"%0.3f", config_GetFloat( p_intf, "brightness" )]];
+    [o_adjust_contrast_sld setToolTip: [NSString stringWithFormat:@"%0.3f", config_GetFloat( p_intf, "contrast" )]];
+    [o_adjust_gamma_sld setToolTip: [NSString stringWithFormat:@"%0.3f", config_GetFloat( p_intf, "gamma" )]];
+    [o_adjust_hue_sld setToolTip: [NSString stringWithFormat:@"%i", config_GetInt( p_intf, "hue" )]];
+    [o_adjust_saturation_sld setToolTip: [NSString stringWithFormat:@"%0.3f", config_GetFloat( p_intf, "saturation" )]];
     b_state = [o_adjust_ckb state];
     [o_adjust_brightness_sld setEnabled: b_state];
     [o_adjust_brightness_ckb setEnabled: b_state];
@@ -249,12 +254,15 @@ static VLCVideoEffects *_o_sharedInstance = nil;
     [o_adjust_saturation_lbl setEnabled: b_state];
     [o_adjust_reset_btn setEnabled: b_state];
     [o_sharpen_sld setFloatValue: config_GetFloat( p_intf, "sharpen-sigma" )];
+    [o_sharpen_sld setToolTip: [NSString stringWithFormat:@"%0.3f", config_GetFloat( p_intf, "sharpen-sigma" )]];
     [o_sharpen_sld setEnabled: [o_sharpen_ckb state]];
     [o_sharpen_lbl setEnabled: [o_sharpen_ckb state]];
     [o_banding_sld setIntValue: config_GetInt( p_intf, "gradfun-radius" )];
+    [o_banding_sld setToolTip: [NSString stringWithFormat:@"%i", config_GetInt( p_intf, "gradfun-radius" )]];
     [o_banding_sld setEnabled: [o_banding_ckb state]];
     [o_banding_lbl setEnabled: [o_banding_ckb state]];
     [o_grain_sld setFloatValue: config_GetFloat( p_intf, "grain-variance" )];
+    [o_grain_sld setToolTip: [NSString stringWithFormat:@"%0.3f", config_GetFloat( p_intf, "grain-variance" )]];
     [o_grain_sld setEnabled: [o_grain_ckb state]];
     [o_grain_lbl setEnabled: [o_grain_ckb state]];
 
@@ -287,7 +295,9 @@ static VLCVideoEffects *_o_sharedInstance = nil;
 
     [o_threshold_color_fld setStringValue: [[NSString stringWithFormat:@"%x", config_GetInt( p_intf, "colorthres-color" )] uppercaseString]];
     [o_threshold_saturation_sld setIntValue: config_GetInt( p_intf, "colorthres-saturationthres" )];
+    [o_threshold_saturation_sld setToolTip: [NSString stringWithFormat:@"%i", config_GetInt( p_intf, "colorthres-saturationthres" )]];
     [o_threshold_similarity_sld setIntValue: config_GetInt( p_intf, "colorthres-similaritythres" )];
+    [o_threshold_similarity_sld setToolTip: [NSString stringWithFormat:@"%i", config_GetInt( p_intf, "colorthres-similaritythres" )]];
     b_state = [o_threshold_ckb state];
     [o_threshold_color_fld setEnabled: b_state];
     [o_threshold_color_lbl setEnabled: b_state];
@@ -321,6 +331,7 @@ static VLCVideoEffects *_o_sharedInstance = nil;
     [o_posterize_fld setEnabled: [o_posterize_ckb state]];
     [o_posterize_lbl setEnabled: [o_posterize_ckb state]];
     [o_blur_sld setIntValue: config_GetInt( p_intf, "blur-factor" )];
+    [o_blur_sld setToolTip: [NSString stringWithFormat:@"%i", config_GetInt( p_intf, "blur-factor" )]];
     [o_blur_sld setEnabled: [o_blur_ckb state]];
     [o_blur_lbl setEnabled: [o_blur_ckb state]];
 
@@ -345,6 +356,7 @@ static VLCVideoEffects *_o_sharedInstance = nil;
     }
     [o_addlogo_pos_pop selectItemWithTag: config_GetInt( p_intf, "logo-position" )];
     [o_addlogo_transparency_sld setIntValue: config_GetInt( p_intf, "logo-opacity" )];
+    [o_addlogo_transparency_sld setToolTip: [NSString stringWithFormat:@"%i", config_GetInt( p_intf, "logo-opacity" )]];
     b_state = [o_addlogo_ckb state];
     [o_addlogo_pos_pop setEnabled: b_state];
     [o_addlogo_pos_lbl setEnabled: b_state];
@@ -444,6 +456,13 @@ static VLCVideoEffects *_o_sharedInstance = nil;
 
 - (void)restartFilterIfNeeded: (char *)psz_filter option: (char *)psz_name
 {
+    vout_thread_t *p_vout = getVout();
+
+    if (p_vout == NULL)
+        return;
+    else
+        vlc_object_release( p_vout );
+
     vlc_object_t *p_filter = vlc_object_find_name( pl_Get(p_intf), psz_filter );
     int i_type;
     i_type = var_Type( p_filter, psz_name );
@@ -589,6 +608,11 @@ static VLCVideoEffects *_o_sharedInstance = nil;
         [self setVideoFilterProperty: "hue" forFilter: "adjust" integer: [o_adjust_hue_sld intValue]];
     else if( sender == o_adjust_saturation_sld )
         [self setVideoFilterProperty: "saturation" forFilter: "adjust" float: [o_adjust_saturation_sld floatValue]];
+
+    if( sender == o_adjust_hue_sld )
+        [o_adjust_hue_sld setToolTip: [NSString stringWithFormat:@"%i", [o_adjust_hue_sld intValue]]];
+    else
+        [sender setToolTip: [NSString stringWithFormat:@"%0.3f", [sender floatValue]]];
 }
 
 - (IBAction)enableAdjustBrightnessThreshold:(id)sender
@@ -598,13 +622,18 @@ static VLCVideoEffects *_o_sharedInstance = nil;
         [o_adjust_brightness_sld setFloatValue: 1.0];
         [o_adjust_contrast_sld setFloatValue: 1.0];
         [o_adjust_gamma_sld setFloatValue: 1.0];
-        [o_adjust_hue_sld setIntValue: 0.0];
+        [o_adjust_hue_sld setIntValue: 0];
         [o_adjust_saturation_sld setFloatValue: 1.0];
-        [self setVideoFilterProperty: "brightness" forFilter: "adjust" float: [o_adjust_brightness_sld floatValue]];
-        [self setVideoFilterProperty: "contrast" forFilter: "adjust" float: [o_adjust_contrast_sld floatValue]];
-        [self setVideoFilterProperty: "gamma" forFilter: "adjust" float: [o_adjust_gamma_sld floatValue]];
-        [self setVideoFilterProperty: "hue" forFilter: "adjust" integer: [o_adjust_hue_sld intValue]];
-        [self setVideoFilterProperty: "saturation" forFilter: "adjust" float: [o_adjust_saturation_sld floatValue]];
+        [o_adjust_brightness_sld setToolTip: [NSString stringWithFormat:@"%0.3f", 1.0]];
+        [o_adjust_contrast_sld setToolTip: [NSString stringWithFormat:@"%0.3f", 1.0]];
+        [o_adjust_gamma_sld setToolTip: [NSString stringWithFormat:@"%0.3f", 1.0]];
+        [o_adjust_hue_sld setToolTip: [NSString stringWithFormat:@"%i", 0]];
+        [o_adjust_saturation_sld setToolTip: [NSString stringWithFormat:@"%0.3f", 1.0]];
+        [self setVideoFilterProperty: "brightness" forFilter: "adjust" float: 1.0];
+        [self setVideoFilterProperty: "contrast" forFilter: "adjust" float: 1.0];
+        [self setVideoFilterProperty: "gamma" forFilter: "adjust" float: 1.0];
+        [self setVideoFilterProperty: "hue" forFilter: "adjust" integer: 0.0];
+        [self setVideoFilterProperty: "saturation" forFilter: "adjust" float: 1.0];
     }
     else
         config_PutInt( p_intf, "brightness-threshold", [o_adjust_brightness_ckb state] );
@@ -621,7 +650,8 @@ static VLCVideoEffects *_o_sharedInstance = nil;
 
 - (IBAction)sharpenSliderChanged:(id)sender
 {
-    [self setVideoFilterProperty: "sharpen-sigma" forFilter: "sharpen" float: [o_sharpen_sld floatValue]];
+    [self setVideoFilterProperty: "sharpen-sigma" forFilter: "sharpen" float: [sender floatValue]];
+    [sender setToolTip: [NSString stringWithFormat:@"%0.3f", [sender floatValue]]];
 }
 
 - (IBAction)enableBanding:(id)sender
@@ -635,7 +665,8 @@ static VLCVideoEffects *_o_sharedInstance = nil;
 
 - (IBAction)bandingSliderChanged:(id)sender
 {
-    [self setVideoFilterProperty: "gradfun-radius" forFilter: "gradfun" integer: [o_banding_sld intValue]];
+    [self setVideoFilterProperty: "gradfun-radius" forFilter: "gradfun" integer: [sender intValue]];
+    [sender setToolTip: [NSString stringWithFormat:@"%i", [sender intValue]]];
 }
 
 - (IBAction)enableGrain:(id)sender
@@ -649,7 +680,8 @@ static VLCVideoEffects *_o_sharedInstance = nil;
 
 - (IBAction)grainSliderChanged:(id)sender
 {
-    [self setVideoFilterProperty: "grain-variance" forFilter: "grain" float: [o_grain_sld floatValue]];
+    [self setVideoFilterProperty: "grain-variance" forFilter: "grain" float: [sender floatValue]];
+    [sender setToolTip: [NSString stringWithFormat:@"%0.3f", [sender floatValue]]];
 }
 
 
@@ -774,9 +806,15 @@ static VLCVideoEffects *_o_sharedInstance = nil;
     if( sender == o_threshold_color_fld )
         [self setVideoFilterProperty: "colorthres-color" forFilter: "colorthres" integer: [o_threshold_color_fld intValue]];
     else if( sender == o_threshold_saturation_sld )
+    {
         [self setVideoFilterProperty: "colorthres-saturationthres" forFilter: "colorthres" integer: [o_threshold_saturation_sld intValue]];
+        [o_threshold_saturation_sld setToolTip: [NSString stringWithFormat:@"%i", [o_threshold_saturation_sld intValue]]];
+    }
     else
+    {
         [self setVideoFilterProperty: "colorthres-similaritythres" forFilter: "colorthres" integer: [o_threshold_similarity_sld intValue]];
+        [o_threshold_similarity_sld setToolTip: [NSString stringWithFormat:@"%i", [o_threshold_similarity_sld intValue]]];
+    }
 }
 
 - (IBAction)enableSepia:(id)sender
@@ -868,7 +906,8 @@ static VLCVideoEffects *_o_sharedInstance = nil;
 
 - (IBAction)blurModifierChanged:(id)sender
 {
-    [self setVideoFilterProperty: "blur-factor" forFilter: "motionblur" integer: [o_blur_sld intValue]];
+    [self setVideoFilterProperty: "blur-factor" forFilter: "motionblur" integer: [sender intValue]];
+    [sender setToolTip: [NSString stringWithFormat:@"%i", [sender intValue]]];
 }
 
 - (IBAction)enableMotionDetect:(id)sender
@@ -933,7 +972,10 @@ static VLCVideoEffects *_o_sharedInstance = nil;
     else if (sender == o_addlogo_pos_pop)
         [self setVideoFilterProperty: "logo-position" forFilter: "logo" integer: [[o_addlogo_pos_pop selectedItem] tag]];
     else
+    {
         [self setVideoFilterProperty: "logo-opacity" forFilter: "logo" integer: [o_addlogo_transparency_sld intValue]];
+        [o_addlogo_transparency_sld setToolTip: [NSString stringWithFormat:@"%i", [o_addlogo_transparency_sld intValue]]];
+    }
 }
 
 @end
