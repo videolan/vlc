@@ -124,20 +124,12 @@ static const char *const mode_list_text[] = { N_("Text"), "HTML"
 };
 
 #define LOGMODE_TEXT N_("Log format")
-#ifndef HAVE_SYSLOG_H
-#define LOGMODE_LONGTEXT N_("Specify the log format. Available choices are " \
-  "\"text\" (default) and \"html\".")
-#else
+#define LOGMODE_LONGTEXT N_("Specify the logging format.")
 
-#define LOGMODE_LONGTEXT N_("Specify the log format. Available choices are " \
-  "\"text\" (default), \"html\", \"syslog\" (special mode to send to " \
-  "syslog instead of file), and \"android\" (special mode to send to " \
-  "android logging facility).")
-
+#ifdef HAVE_SYSLOG_H
 #define SYSLOG_FACILITY_TEXT N_("Syslog facility")
 #define SYSLOG_FACILITY_LONGTEXT N_("Select the syslog facility where logs " \
-  "will be forwarded. Available choices are \"user\" (default), \"daemon\", " \
-  "and \"local0\" through \"local7\".")
+  "will be forwarded.")
 
 /* First in list is the default facility used. */
 #define DEFINE_SYSLOG_FACILITY \
