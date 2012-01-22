@@ -60,10 +60,6 @@ struct aout_sys_t
     int                             i_toclean_buffer;
     int                             i_toappend_buffer;
 
-    SLInterfaceID                  *SL_IID_ENGINE;
-    SLInterfaceID                  *SL_IID_ANDROIDSIMPLEBUFFERQUEUE;
-    SLInterfaceID                  *SL_IID_VOLUME;
-    SLInterfaceID                  *SL_IID_PLAY;
     void                           *p_so_handle;
 };
 
@@ -153,12 +149,17 @@ static int Open( vlc_object_t *p_this )
 
     slCreateEngine_t    slCreateEnginePtr = NULL;
 
+    SLInterfaceID *SL_IID_ENGINE;
+    SLInterfaceID *SL_IID_ANDROIDSIMPLEBUFFERQUEUE;
+    SLInterfaceID *SL_IID_VOLUME;
+    SLInterfaceID *SL_IID_PLAY;
+
     OPENSL_DLSYM( slCreateEnginePtr, p_sys->p_so_handle, "slCreateEngine" );
-    OPENSL_DLSYM( p_sys->SL_IID_ANDROIDSIMPLEBUFFERQUEUE, p_sys->p_so_handle,
+    OPENSL_DLSYM( SL_IID_ANDROIDSIMPLEBUFFERQUEUE, p_sys->p_so_handle,
                  "SL_IID_ANDROIDSIMPLEBUFFERQUEUE" );
-    OPENSL_DLSYM( p_sys->SL_IID_ENGINE, p_sys->p_so_handle, "SL_IID_ENGINE" );
-    OPENSL_DLSYM( p_sys->SL_IID_PLAY, p_sys->p_so_handle, "SL_IID_PLAY" );
-    OPENSL_DLSYM( p_sys->SL_IID_VOLUME, p_sys->p_so_handle, "SL_IID_VOLUME" );
+    OPENSL_DLSYM( SL_IID_ENGINE, p_sys->p_so_handle, "SL_IID_ENGINE" );
+    OPENSL_DLSYM( SL_IID_PLAY, p_sys->p_so_handle, "SL_IID_PLAY" );
+    OPENSL_DLSYM( SL_IID_VOLUME, p_sys->p_so_handle, "SL_IID_VOLUME" );
 
     // create engine
     result = slCreateEnginePtr( &p_sys->engineObject, 0, NULL, 0, NULL, NULL );
@@ -171,11 +172,11 @@ static int Open( vlc_object_t *p_this )
 
     // get the engine interface, needed to create other objects
     result = (*p_sys->engineObject)->GetInterface( p_sys->engineObject,
-                                        *p_sys->SL_IID_ENGINE, &engineEngine );
+                                        *SL_IID_ENGINE, &engineEngine );
     CHECK_OPENSL_ERROR( result, "Failed to get the engine interface" );
 
     // create output mix, with environmental reverb specified as a non-required interface
-    const SLInterfaceID ids1[] = { *p_sys->SL_IID_VOLUME };
+    const SLInterfaceID ids1[] = { *SL_IID_VOLUME };
     const SLboolean req1[] = { SL_BOOLEAN_FALSE };
     result = (*engineEngine)->CreateOutputMix( engineEngine,
                                         &p_sys->outputMixObject, 1, ids1, req1 );
@@ -212,7 +213,7 @@ static int Open( vlc_object_t *p_this )
     SLDataSink audioSnk = {&loc_outmix, NULL};
 
     //create audio player
-    const SLInterfaceID ids2[] = { *p_sys->SL_IID_ANDROIDSIMPLEBUFFERQUEUE };
+    const SLInterfaceID ids2[] = { *SL_IID_ANDROIDSIMPLEBUFFERQUEUE };
     const SLboolean     req2[] = { SL_BOOLEAN_TRUE };
     result = (*engineEngine)->CreateAudioPlayer( engineEngine,
                                     &p_sys->playerObject, &audioSrc,
@@ -227,12 +228,12 @@ static int Open( vlc_object_t *p_this )
 
     // get the play interface
     result = (*p_sys->playerObject)->GetInterface( p_sys->playerObject,
-                                                  *p_sys->SL_IID_PLAY, &p_sys->playerPlay );
+                                                  *SL_IID_PLAY, &p_sys->playerPlay );
     CHECK_OPENSL_ERROR( result, "Failed to get player interface." );
 
     // get the buffer queue interface
     result = (*p_sys->playerObject)->GetInterface( p_sys->playerObject,
-                                                  *p_sys->SL_IID_ANDROIDSIMPLEBUFFERQUEUE,
+                                                  *SL_IID_ANDROIDSIMPLEBUFFERQUEUE,
                                                   &p_sys->playerBufferQueue );
     CHECK_OPENSL_ERROR( result, "Failed to get buff queue interface" );
 
