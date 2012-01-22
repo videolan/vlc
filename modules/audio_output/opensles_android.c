@@ -156,7 +156,7 @@ static void PlayedCallback (SLAndroidSimpleBufferQueueItf caller, void *pContext
         p_sys->i_toclean_buffer = 0;
 }
 /*****************************************************************************
- * Open: open a dummy audio device
+ * Open
  *****************************************************************************/
 static int Open( vlc_object_t *p_this )
 {
@@ -302,7 +302,7 @@ error:
 }
 
 /*****************************************************************************
- * Close: close our file
+ * Close
  *****************************************************************************/
 static void Close( vlc_object_t *p_this )
 {
