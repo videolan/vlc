@@ -54,15 +54,17 @@ struct aout_sys_t
     SLObjectItf                     outputMixObject;
     SLAndroidSimpleBufferQueueItf   playerBufferQueue;
     SLObjectItf                     playerObject;
+
     SLPlayItf                       playerPlay;
-    aout_buffer_t                 * p_buffer_array[BUFF_QUEUE];
+    aout_buffer_t                  *p_buffer_array[BUFF_QUEUE];
     int                             i_toclean_buffer;
     int                             i_toappend_buffer;
-    SLInterfaceID                 * SL_IID_ENGINE;
-    SLInterfaceID                 * SL_IID_ANDROIDSIMPLEBUFFERQUEUE;
-    SLInterfaceID                 * SL_IID_VOLUME;
-    SLInterfaceID                 * SL_IID_PLAY;
-    void                          * p_so_handle;
+
+    SLInterfaceID                  *SL_IID_ENGINE;
+    SLInterfaceID                  *SL_IID_ANDROIDSIMPLEBUFFERQUEUE;
+    SLInterfaceID                  *SL_IID_VOLUME;
+    SLInterfaceID                  *SL_IID_PLAY;
+    void                           *p_so_handle;
 };
 
 typedef SLresult (*slCreateEngine_t)(
