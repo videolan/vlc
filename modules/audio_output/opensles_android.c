@@ -113,19 +113,15 @@ static void Clear( aout_sys_t *p_sys )
 {
     // Destroy buffer queue audio player object
     // and invalidate all associated interfaces
-    if( p_sys->playerObject != NULL )
-        (*p_sys->playerObject)->Destroy( p_sys->playerObject );
+    (*p_sys->playerObject)->Destroy( p_sys->playerObject );
 
     // destroy output mix object, and invalidate all associated interfaces
-    if( p_sys->outputMixObject != NULL )
-        (*p_sys->outputMixObject)->Destroy( p_sys->outputMixObject );
+    (*p_sys->outputMixObject)->Destroy( p_sys->outputMixObject );
 
     // destroy engine object, and invalidate all associated interfaces
-    if( p_sys->engineObject != NULL )
-        (*p_sys->engineObject)->Destroy( p_sys->engineObject );
+    (*p_sys->engineObject)->Destroy( p_sys->engineObject );
 
-    if( p_sys->p_so_handle != NULL )
-        dlclose( p_sys->p_so_handle );
+    dlclose( p_sys->p_so_handle );
 
     free( p_sys );
 }
@@ -276,8 +272,7 @@ static void Close( vlc_object_t *p_this )
 
     (*p_sys->playerPlay)->SetPlayState( p_sys->playerPlay, SL_PLAYSTATE_STOPPED );
     //Flush remaining buffers if any.
-    if( p_sys->playerBufferQueue != NULL )
-        (*p_sys->playerBufferQueue)->Clear( p_sys->playerBufferQueue );
+    (*p_sys->playerBufferQueue)->Clear( p_sys->playerBufferQueue );
     Clear( p_sys );
 }
 
