@@ -1,6 +1,6 @@
-diff -ur live555.orig/groupsock/GroupsockHelper.cpp live555/groupsock/GroupsockHelper.cpp
---- live555.orig/groupsock/GroupsockHelper.cpp	2012-01-19 16:56:57.026348234 -0500
-+++ live555/groupsock/GroupsockHelper.cpp	2012-01-19 16:57:10.470348233 -0500
+diff -ur live.orig/groupsock/GroupsockHelper.cpp live/groupsock/GroupsockHelper.cpp
+--- live.orig/groupsock/GroupsockHelper.cpp	2012-01-19 16:56:57.026348234 -0500
++++ live/groupsock/GroupsockHelper.cpp	2012-01-19 16:57:10.470348233 -0500
 @@ -466,9 +466,9 @@
    if (!IsMulticastAddress(groupAddress)) return True; // ignore this case
  
@@ -27,9 +27,9 @@ diff -ur live555.orig/groupsock/GroupsockHelper.cpp live555/groupsock/GroupsockH
    if (setsockopt(socket, IPPROTO_IP, IP_DROP_SOURCE_MEMBERSHIP,
  		 (const char*)&imr, sizeof (struct ip_mreq_source)) < 0) {
      return False;
-diff -ur live555.orig/Makefile.tail live555/Makefile.tail
---- live555.orig/Makefile.tail	2012-01-19 16:56:57.038348232 -0500
-+++ live555/Makefile.tail	2012-01-19 16:57:10.470348233 -0500
+diff -ur live.orig/Makefile.tail live/Makefile.tail
+--- live.orig/Makefile.tail	2012-01-19 16:56:57.038348232 -0500
++++ live/Makefile.tail	2012-01-19 16:57:10.470348233 -0500
 @@ -14,8 +14,8 @@
  	cd $(GROUPSOCK_DIR) ; $(MAKE)
  	cd $(USAGE_ENVIRONMENT_DIR) ; $(MAKE)

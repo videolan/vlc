@@ -15,10 +15,10 @@ live555: $(LIVE555_FILE) .sum-live555
 	rm -Rf live
 	$(UNPACK)
 	chmod -R u+w live
-	mv live $@
 ifdef HAVE_ANDROID
 	patch -p0 < $(SRC)/live555/android.patch
 endif
+	mv live $@
 	touch $@
 
 LIVE_TARGET = $(error live555 target not defined!)
