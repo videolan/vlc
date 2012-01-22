@@ -42,6 +42,17 @@
 // Maximum number of buffers to enqueue.
 #define BUFF_QUEUE  42
 
+#define Destroy(a) (*a)->Destroy(a);
+#define SetPlayState(a, b) (*a)->SetPlayState(a, b)
+#define RegisterCallback(a, b, c) (*a)->RegisterCallback(a, b, c)
+#define GetInterface(a, b, c) (*a)->GetInterface(a, b, c)
+#define Realize(a, b) (*a)->Realize(a, b)
+#define CreateOutputMix(a, b, c, d, e) (*a)->CreateOutputMix(a, b, c, d, e)
+#define CreateAudioPlayer(a, b, c, d, e, f, g) \
+    (*a)->CreateAudioPlayer(a, b, c, d, e, f, g)
+#define Enqueue(a, b, c) (*a)->Enqueue(a, b, c)
+#define Clear(a) (*a)->Clear(a)
+
 /*****************************************************************************
  * aout_sys_t: audio output method descriptor
  *****************************************************************************
@@ -106,15 +117,9 @@ vlc_module_end ()
 
 static void Clean( aout_sys_t *p_sys )
 {
-    // Destroy buffer queue audio player object
-    // and invalidate all associated interfaces
-    (*p_sys->playerObject)->Destroy( p_sys->playerObject );
-
-    // destroy output mix object, and invalidate all associated interfaces
-    (*p_sys->outputMixObject)->Destroy( p_sys->outputMixObject );
-
-    // destroy engine object, and invalidate all associated interfaces
-    (*p_sys->engineObject)->Destroy( p_sys->engineObject );
+    Destroy( p_sys->playerObject );
+    Destroy( p_sys->outputMixObject );
+    Destroy( p_sys->engineObject );
 
     dlclose( p_sys->p_so_handle );
 
@@ -131,8 +136,7 @@ static void Play( audio_output_t *p_aout, block_t *p_buffer )
 
     for (;;)
     {
-        SLresult result = (*p_sys->playerBufferQueue)->Enqueue(
-                            p_sys->playerBufferQueue, p_buffer->p_buffer,
+        SLresult result = Enqueue( p_sys->playerBufferQueue, p_buffer->p_buffer,
                             p_buffer->i_buffer );
 
         switch (result)
@@ -213,25 +217,21 @@ static int Open( vlc_object_t *p_this )
     CHECK_OPENSL_ERROR( result, "Failed to create engine" );
 
     // realize the engine in synchronous mode
-    result = (*p_sys->engineObject)->Realize( p_sys->engineObject,
-                                             SL_BOOLEAN_FALSE );
+    result = Realize( p_sys->engineObject, SL_BOOLEAN_FALSE );
     CHECK_OPENSL_ERROR( result, "Failed to realize engine" );
 
     // get the engine interface, needed to create other objects
-    result = (*p_sys->engineObject)->GetInterface( p_sys->engineObject,
-                                        *SL_IID_ENGINE, &engineEngine );
+    result = GetInterface( p_sys->engineObject, *SL_IID_ENGINE, &engineEngine );
     CHECK_OPENSL_ERROR( result, "Failed to get the engine interface" );
 
     // create output mix, with environmental reverb specified as a non-required interface
     const SLInterfaceID ids1[] = { *SL_IID_VOLUME };
     const SLboolean req1[] = { SL_BOOLEAN_FALSE };
-    result = (*engineEngine)->CreateOutputMix( engineEngine,
-                                        &p_sys->outputMixObject, 1, ids1, req1 );
+    result = CreateOutputMix( engineEngine, &p_sys->outputMixObject, 1, ids1, req1 );
     CHECK_OPENSL_ERROR( result, "Failed to create output mix" );
 
     // realize the output mix in synchronous mode
-    result = (*p_sys->outputMixObject)->Realize( p_sys->outputMixObject,
-                                                 SL_BOOLEAN_FALSE );
+    result = Realize( p_sys->outputMixObject, SL_BOOLEAN_FALSE );
     CHECK_OPENSL_ERROR( result, "Failed to realize output mix" );
 
 
@@ -261,38 +261,29 @@ static int Open( vlc_object_t *p_this )
 
     //create audio player
     const SLInterfaceID ids2[] = { *SL_IID_ANDROIDSIMPLEBUFFERQUEUE };
-    const SLboolean     req2[] = { SL_BOOLEAN_TRUE };
-    result = (*engineEngine)->CreateAudioPlayer( engineEngine,
-                                    &p_sys->playerObject, &audioSrc,
+    static const SLboolean req2[] = { SL_BOOLEAN_TRUE };
+    result = CreateAudioPlayer( engineEngine, &p_sys->playerObject, &audioSrc,
                                     &audioSnk, sizeof( ids2 ) / sizeof( *ids2 ),
                                     ids2, req2 );
     CHECK_OPENSL_ERROR( result, "Failed to create audio player" );
 
-    // realize the player
-    result = (*p_sys->playerObject)->Realize( p_sys->playerObject,
-                                              SL_BOOLEAN_FALSE );
+    result = Realize( p_sys->playerObject, SL_BOOLEAN_FALSE );
     CHECK_OPENSL_ERROR( result, "Failed to realize player object." );
 
-    // get the play interface
-    result = (*p_sys->playerObject)->GetInterface( p_sys->playerObject,
-                                                  *SL_IID_PLAY, &p_sys->playerPlay );
+    result = GetInterface( p_sys->playerObject, *SL_IID_PLAY, &p_sys->playerPlay );
     CHECK_OPENSL_ERROR( result, "Failed to get player interface." );
 
-    // get the buffer queue interface
-    result = (*p_sys->playerObject)->GetInterface( p_sys->playerObject,
-                                                  *SL_IID_ANDROIDSIMPLEBUFFERQUEUE,
+    result = GetInterface( p_sys->playerObject, *SL_IID_ANDROIDSIMPLEBUFFERQUEUE,
                                                   &p_sys->playerBufferQueue );
     CHECK_OPENSL_ERROR( result, "Failed to get buff queue interface" );
 
-    result = (*p_sys->playerBufferQueue)->RegisterCallback( p_sys->playerBufferQueue,
-                                                            PlayedCallback,
-                                                            (void*)p_sys);
+    result = RegisterCallback( p_sys->playerBufferQueue, PlayedCallback,
+                                   (void*)p_sys);
     CHECK_OPENSL_ERROR( result, "Failed to register buff queue callback." );
 
 
     // set the player's state to playing
-    result = (*p_sys->playerPlay)->SetPlayState( p_sys->playerPlay,
-                                                 SL_PLAYSTATE_PLAYING );
+    result = SetPlayState( p_sys->playerPlay, SL_PLAYSTATE_PLAYING );
     CHECK_OPENSL_ERROR( result, "Failed to switch to playing state" );
 
     // we want 16bit signed data little endian.
@@ -318,9 +309,8 @@ static void Close( vlc_object_t *p_this )
     audio_output_t *p_aout = (audio_output_t*)p_this;
     aout_sys_t     *p_sys = p_aout->sys;
 
-    (*p_sys->playerPlay)->SetPlayState( p_sys->playerPlay, SL_PLAYSTATE_STOPPED );
+    SetPlayState( p_sys->playerPlay, SL_PLAYSTATE_STOPPED );
     //Flush remaining buffers if any.
-    (*p_sys->playerBufferQueue)->Clear( p_sys->playerBufferQueue );
+    Clear( p_sys->playerBufferQueue );
     Clean( p_sys );
 }
-
