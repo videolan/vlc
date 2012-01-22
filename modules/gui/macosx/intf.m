@@ -1351,15 +1351,19 @@ unsigned int CocoaKeyToVLC( unichar i_key )
     }
     else
     {
-        input_thread_t * p_input = pl_CurrentInput( VLCIntf );
-
-        if( p_input != NULL && [self activeVideoPlayback])
+        if( b_fullscreen )
         {
-            if(b_fullscreen)
+            input_thread_t * p_input = pl_CurrentInput( VLCIntf );
+            if( p_input != NULL && [self activeVideoPlayback] )
+            {
                 [o_mainwindow performSelectorOnMainThread:@selector(enterFullscreen) withObject:nil waitUntilDone:NO];
-            else
-                [o_mainwindow performSelectorOnMainThread:@selector(leaveFullscreen) withObject:nil waitUntilDone:NO];
-            vlc_object_release( p_input );
+                vlc_object_release( p_input );
+            }
+        } 
+        else 
+        {
+            // leaving fullscreen is always allowed
+            [o_mainwindow performSelectorOnMainThread:@selector(leaveFullscreen) withObject:nil waitUntilDone:NO];
         }
     }
 }

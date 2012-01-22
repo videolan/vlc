@@ -1221,7 +1221,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
         [self makeFirstResponder: nil];
 
     if (!b_videoPlayback && b_fullscreen && !b_nativeFullscreenMode)
-        [self leaveFullscreenAndFadeOut: YES];
+        [[VLCCoreInteraction sharedInstance] toggleFullscreen];
 }
 
 - (void)resizeWindow
