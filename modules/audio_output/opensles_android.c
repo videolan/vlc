@@ -74,10 +74,6 @@ struct aout_sys_t
     void                           *p_so_handle;
 };
 
-typedef SLresult (*slCreateEngine_t)(
-        SLObjectItf*, SLuint32, const SLEngineOption*, SLuint32,
-        const SLInterfaceID*, const SLboolean* );
-
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
@@ -99,21 +95,6 @@ vlc_module_begin ()
     set_callbacks( Open, Close )
 vlc_module_end ()
 
-
-#define CHECK_OPENSL_ERROR( res, msg )              \
-    if( unlikely( res != SL_RESULT_SUCCESS ) )      \
-    {                                               \
-        msg_Err( p_aout, msg" (%lu)", res );        \
-        goto error;                                 \
-    }
-
-#define OPENSL_DLSYM( dest, handle, name )                   \
-    dest = (typeof(dest))dlsym( handle, name );              \
-    if( dest == NULL )                                       \
-    {                                                        \
-        msg_Err( p_aout, "Failed to load symbol %s", name ); \
-        goto error;                                          \
-    }
 
 static void Clean( aout_sys_t *p_sys )
 {
@@ -198,12 +179,23 @@ static int Open( vlc_object_t *p_this )
         goto error;
     }
 
+    typedef SLresult (*slCreateEngine_t)(
+            SLObjectItf*, SLuint32, const SLEngineOption*, SLuint32,
+            const SLInterfaceID*, const SLboolean* );
     slCreateEngine_t    slCreateEnginePtr = NULL;
 
     SLInterfaceID *SL_IID_ENGINE;
     SLInterfaceID *SL_IID_ANDROIDSIMPLEBUFFERQUEUE;
     SLInterfaceID *SL_IID_VOLUME;
     SLInterfaceID *SL_IID_PLAY;
+
+#define OPENSL_DLSYM( dest, handle, name )                   \
+    dest = dlsym( handle, name );                            \
+    if( dest == NULL )                                       \
+    {                                                        \
+        msg_Err( p_aout, "Failed to load symbol %s", name ); \
+        goto error;                                          \
+    }
 
     OPENSL_DLSYM( slCreateEnginePtr, p_sys->p_so_handle, "slCreateEngine" );
     OPENSL_DLSYM( SL_IID_ANDROIDSIMPLEBUFFERQUEUE, p_sys->p_so_handle,
@@ -212,27 +204,35 @@ static int Open( vlc_object_t *p_this )
     OPENSL_DLSYM( SL_IID_PLAY, p_sys->p_so_handle, "SL_IID_PLAY" );
     OPENSL_DLSYM( SL_IID_VOLUME, p_sys->p_so_handle, "SL_IID_VOLUME" );
 
+
+#define CHECK_OPENSL_ERROR( msg )                   \
+    if( unlikely( result != SL_RESULT_SUCCESS ) )   \
+    {                                               \
+        msg_Err( p_aout, msg" (%lu)", result );     \
+        goto error;                                 \
+    }
+
     // create engine
     result = slCreateEnginePtr( &p_sys->engineObject, 0, NULL, 0, NULL, NULL );
-    CHECK_OPENSL_ERROR( result, "Failed to create engine" );
+    CHECK_OPENSL_ERROR( "Failed to create engine" );
 
     // realize the engine in synchronous mode
     result = Realize( p_sys->engineObject, SL_BOOLEAN_FALSE );
-    CHECK_OPENSL_ERROR( result, "Failed to realize engine" );
+    CHECK_OPENSL_ERROR( "Failed to realize engine" );
 
     // get the engine interface, needed to create other objects
     result = GetInterface( p_sys->engineObject, *SL_IID_ENGINE, &engineEngine );
-    CHECK_OPENSL_ERROR( result, "Failed to get the engine interface" );
+    CHECK_OPENSL_ERROR( "Failed to get the engine interface" );
 
     // create output mix, with environmental reverb specified as a non-required interface
     const SLInterfaceID ids1[] = { *SL_IID_VOLUME };
     const SLboolean req1[] = { SL_BOOLEAN_FALSE };
     result = CreateOutputMix( engineEngine, &p_sys->outputMixObject, 1, ids1, req1 );
-    CHECK_OPENSL_ERROR( result, "Failed to create output mix" );
+    CHECK_OPENSL_ERROR( "Failed to create output mix" );
 
     // realize the output mix in synchronous mode
     result = Realize( p_sys->outputMixObject, SL_BOOLEAN_FALSE );
-    CHECK_OPENSL_ERROR( result, "Failed to realize output mix" );
+    CHECK_OPENSL_ERROR( "Failed to realize output mix" );
 
 
     // configure audio source - this defines the number of samples you can enqueue.
@@ -265,26 +265,26 @@ static int Open( vlc_object_t *p_this )
     result = CreateAudioPlayer( engineEngine, &p_sys->playerObject, &audioSrc,
                                     &audioSnk, sizeof( ids2 ) / sizeof( *ids2 ),
                                     ids2, req2 );
-    CHECK_OPENSL_ERROR( result, "Failed to create audio player" );
+    CHECK_OPENSL_ERROR( "Failed to create audio player" );
 
     result = Realize( p_sys->playerObject, SL_BOOLEAN_FALSE );
-    CHECK_OPENSL_ERROR( result, "Failed to realize player object." );
+    CHECK_OPENSL_ERROR( "Failed to realize player object." );
 
     result = GetInterface( p_sys->playerObject, *SL_IID_PLAY, &p_sys->playerPlay );
-    CHECK_OPENSL_ERROR( result, "Failed to get player interface." );
+    CHECK_OPENSL_ERROR( "Failed to get player interface." );
 
     result = GetInterface( p_sys->playerObject, *SL_IID_ANDROIDSIMPLEBUFFERQUEUE,
                                                   &p_sys->playerBufferQueue );
-    CHECK_OPENSL_ERROR( result, "Failed to get buff queue interface" );
+    CHECK_OPENSL_ERROR( "Failed to get buff queue interface" );
 
     result = RegisterCallback( p_sys->playerBufferQueue, PlayedCallback,
                                    (void*)p_sys);
-    CHECK_OPENSL_ERROR( result, "Failed to register buff queue callback." );
+    CHECK_OPENSL_ERROR( "Failed to register buff queue callback." );
 
 
     // set the player's state to playing
     result = SetPlayState( p_sys->playerPlay, SL_PLAYSTATE_PLAYING );
-    CHECK_OPENSL_ERROR( result, "Failed to switch to playing state" );
+    CHECK_OPENSL_ERROR( "Failed to switch to playing state" );
 
     // we want 16bit signed data little endian.
     p_aout->format.i_format              = VLC_CODEC_S16L;
