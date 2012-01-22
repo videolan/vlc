@@ -268,8 +268,6 @@ static void Close( vlc_object_t *p_this )
     audio_output_t *p_aout = (audio_output_t*)p_this;
     aout_sys_t     *p_sys = p_aout->sys;
 
-    msg_Dbg( p_aout, "Closing OpenSLES" );
-
     (*p_sys->playerPlay)->SetPlayState( p_sys->playerPlay, SL_PLAYSTATE_STOPPED );
     //Flush remaining buffers if any.
     (*p_sys->playerBufferQueue)->Clear( p_sys->playerBufferQueue );
