@@ -20,9 +20,17 @@ speex: speex-$(SPEEX_VERSION).tar.gz .sum-speex
 
 # TODO: fixed point and ASM opts
 
+CONFIG_OPTS := --without-ogg
+ifndef HAVE_FPU
+CONFIG_OPTS += --enable-fixed-point
+endif
+ifeq ($(ARCH),arm)
+CONFIG_OPTS += --enable-arm5e-asm
+endif
+
 .speex: speex
 	$(RECONF)
-	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) --without-ogg
+	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(CONFIG_OPTS)
 	cd $< && $(MAKE) install
 	touch $@
 
