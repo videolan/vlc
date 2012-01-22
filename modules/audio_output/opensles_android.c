@@ -104,7 +104,7 @@ vlc_module_end ()
         goto error;                                          \
     }
 
-static void Clear( aout_sys_t *p_sys )
+static void Clean( aout_sys_t *p_sys )
 {
     // Destroy buffer queue audio player object
     // and invalidate all associated interfaces
@@ -306,7 +306,7 @@ static int Open( vlc_object_t *p_this )
 
     return VLC_SUCCESS;
 error:
-    Clear( p_sys );
+    Clean( p_sys );
     return VLC_EGENERIC;
 }
 
@@ -321,6 +321,6 @@ static void Close( vlc_object_t *p_this )
     (*p_sys->playerPlay)->SetPlayState( p_sys->playerPlay, SL_PLAYSTATE_STOPPED );
     //Flush remaining buffers if any.
     (*p_sys->playerBufferQueue)->Clear( p_sys->playerBufferQueue );
-    Clear( p_sys );
+    Clean( p_sys );
 }
 
