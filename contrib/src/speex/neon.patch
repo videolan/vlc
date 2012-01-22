@@ -1,0 +1,461 @@
+From 9faa77ebb077e629ad5c5e1a84fa637cda30538d Mon Sep 17 00:00:00 2001
+From: Jyri Sarha <jsarha@ti.com>
+Date: Thu, 1 Sep 2011 15:30:27 +0300
+Subject: [PATCH 1/4] resample: Calculate full sinc table (e.g. no sinc
+ interpolation)
+
+On many systems taking couple of kilo-bytes for full sinc table is not
+a problem. With a straight filter table the number of MAC operations
+needed drops to one quarter. Also the inner loop of the filter becomes
+more simple and easier to optimize. So the full sinc table version
+runs much faster in most cases. The trade off is some kilo-bytes
+bigger memory usage and more CPU needed when initializing the
+resampler.
+
+configure.ac: Add --enable-resample-full-sinc-table conf flag
+
+Use this flag to enable resampling with full sinc table.
+---
+ configure.ac        |    5 +++++
+ libspeex/resample.c |    4 ++++
+ 2 files changed, 9 insertions(+), 0 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 3179521..2f87461 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -198,6 +198,11 @@ AC_ARG_ENABLE(fixed-point-debug, [  --enable-fixed-point-debug  Debug fixed-poin
+   AC_DEFINE([FIXED_DEBUG], , [Debug fixed-point implementation])
+ fi])
+ 
++AC_ARG_ENABLE(resample-full-sinc-table, [  --enable-resample-full-sinc-table Resample full SINC table (no interpolation)],
++[if test "$enableval" = yes; then
++  AC_DEFINE([RESAMPLE_FULL_SINC_TABLE], , [Resample with full SINC table (no interpolation)])
++fi])
++
+ AC_ARG_ENABLE(ti-c55x, [  --enable-ti-c55x        Enable support for TI C55X DSP],
+ [if test "$enableval" = yes; then
+   has_char16=yes;
+diff --git a/libspeex/resample.c b/libspeex/resample.c
+index 7b5a308..3829715 100644
+--- a/libspeex/resample.c
++++ b/libspeex/resample.c
+@@ -585,7 +585,11 @@ static void update_filter(SpeexResamplerState *st)
+    }
+    
+    /* Choose the resampling type that requires the least amount of memory */
++#ifdef RESAMPLE_FULL_SINC_TABLE
++   if (1) 
++#else
+    if (st->den_rate <= st->oversample)
++#endif
+    {
+       spx_uint32_t i;
+       if (!st->sinc_table)
+-- 
+1.7.8.3
+
+From 3da94c7da3357438e39b5b6d110529fdd6796c25 Mon Sep 17 00:00:00 2001
+From: Jyri Sarha <jsarha@ti.com>
+Date: Thu, 1 Sep 2011 15:30:30 +0300
+Subject: [PATCH 2/4] configure.ac: Add ARM NEON support
+
+Use --enable-neon to force NEON optimization on. The auto detection
+should also work if your CFLAGS supports NEON.
+---
+ configure.ac |   30 ++++++++++++++++++++++++++++++
+ 1 files changed, 30 insertions(+), 0 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 2f87461..08d3d5f 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -89,6 +89,23 @@ has_sse=no
+ )
+ AC_MSG_RESULT($has_sse)  
+ 
++AC_MSG_CHECKING(for NEON in current arch/CFLAGS)
++AC_LINK_IFELSE([
++AC_LANG_PROGRAM([[
++#include <arm_neon.h>
++int32x4_t testfunc(int16_t *a, int16_t *b) {
++      return vmull_s16(vld1_s16(a), vld1_s16(b));
++}
++]])],
++[
++has_neon=yes
++],
++[
++has_neon=no
++]
++)
++AC_MSG_RESULT($has_neon)  
++
+ SAVE_CFLAGS="$CFLAGS"
+ CFLAGS="$CFLAGS -fvisibility=hidden"
+ AC_MSG_CHECKING(for ELF visibility)
+@@ -148,6 +165,15 @@ has_sse=no
+ fi
+ ])
+ 
++AC_ARG_ENABLE(neon, [  --enable-neon           Enable NEON support], [
++if test "x$enableval" != xno; then
++has_neon=yes
++CFLAGS="$CFLAGS -O3 -march=armv7-a -mfpu=neon"
++else
++has_neon=no
++fi
++])
++
+ 
+ FFT=smallft
+ 
+@@ -165,6 +191,10 @@ if test "$has_sse" = yes; then
+   AC_DEFINE([_USE_SSE], , [Enable SSE support])
+ fi
+ 
++if test "$has_neon" = yes; then
++  AC_DEFINE([_USE_NEON], , [Enable NEON support])
++fi
++
+ AC_ARG_ENABLE(float-api, [  --disable-float-api     Disable the floating-point API],
+ [if test "$enableval" = no; then
+   AC_DEFINE([DISABLE_FLOAT_API], , [Disable all parts of the API that are using floats])
+-- 
+1.7.8.3
+
+From bf0e909164995b820066111d401c793e121d55ac Mon Sep 17 00:00:00 2001
+From: Jyri Sarha <jsarha@ti.com>
+Date: Thu, 1 Sep 2011 15:30:29 +0300
+Subject: [PATCH 3/4] resample: Add NEON optimized inner_product_single for
+ fixed point
+
+Semantics of inner_product_single have also been changed to contain
+the final right shift and saturation so it can also be implemented in
+the optimal way for the used platform. This change affects fixed point
+calculations only.
+
+I also added a new fixed point macro SATURATE32PSHR(x, shift, a). It
+does pretty much the same thing as SATURATE32(PSHR32(x, shift), a),
+but it avoids over flowing in rounding up phase in the rare occasion
+where x has already been saturated. It should also be slightly faster.
+---
+ libspeex/arch.h          |    1 +
+ libspeex/fixed_generic.h |    4 ++
+ libspeex/resample.c      |   10 ++++-
+ libspeex/resample_neon.h |  100 ++++++++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 113 insertions(+), 2 deletions(-)
+ create mode 100644 libspeex/resample_neon.h
+
+diff --git a/libspeex/arch.h b/libspeex/arch.h
+index 3b47ed9..daa72a7 100644
+--- a/libspeex/arch.h
++++ b/libspeex/arch.h
+@@ -171,6 +171,7 @@ typedef float spx_word32_t;
+ #define VSHR32(a,shift) (a)
+ #define SATURATE16(x,a) (x)
+ #define SATURATE32(x,a) (x)
++#define SATURATE32PSHR(x,shift,a) (x)
+ 
+ #define PSHR(a,shift)       (a)
+ #define SHR(a,shift)       (a)
+diff --git a/libspeex/fixed_generic.h b/libspeex/fixed_generic.h
+index 3fb096e..0e012e9 100644
+--- a/libspeex/fixed_generic.h
++++ b/libspeex/fixed_generic.h
+@@ -52,6 +52,10 @@
+ #define SATURATE16(x,a) (((x)>(a) ? (a) : (x)<-(a) ? -(a) : (x)))
+ #define SATURATE32(x,a) (((x)>(a) ? (a) : (x)<-(a) ? -(a) : (x)))
+ 
++#define SATURATE32PSHR(x,shift,a) (((x)>=(SHL32(a,shift))) ? (a) : \
++                                   (x)<=-(SHL32(a,shift)) ? -(a) : \
++                                   (PSHR32(x, shift)))
++
+ #define SHR(a,shift) ((a) >> (shift))
+ #define SHL(a,shift) ((spx_word32_t)(a) << (shift))
+ #define PSHR(a,shift) (SHR((a)+((EXTEND32(1)<<((shift))>>1)),shift))
+diff --git a/libspeex/resample.c b/libspeex/resample.c
+index 3829715..7957c61 100644
+--- a/libspeex/resample.c
++++ b/libspeex/resample.c
+@@ -99,6 +99,10 @@ static void speex_free (void *ptr) {free(ptr);}
+ #include "resample_sse.h"
+ #endif
+ 
++#ifdef _USE_NEON
++#include "resample_neon.h"
++#endif
++
+ /* Numer of elements to allocate on the stack */
+ #ifdef VAR_ARRAYS
+ #define FIXED_STACK_ALLOC 8192
+@@ -360,11 +364,12 @@ static int resampler_basic_direct_single(SpeexResamplerState *st, spx_uint32_t c
+       }
+       sum = accum[0] + accum[1] + accum[2] + accum[3];
+ */
++      sum = SATURATE32PSHR(sum, 15, 32767);
+ #else
+       sum = inner_product_single(sinc, iptr, N);
+ #endif
+ 
+-      out[out_stride * out_sample++] = SATURATE32(PSHR32(sum, 15), 32767);
++      out[out_stride * out_sample++] = sum;
+       last_sample += int_advance;
+       samp_frac_num += frac_advance;
+       if (samp_frac_num >= den_rate)
+@@ -470,12 +475,13 @@ static int resampler_basic_interpolate_single(SpeexResamplerState *st, spx_uint3
+ 
+       cubic_coef(frac, interp);
+       sum = MULT16_32_Q15(interp[0],SHR32(accum[0], 1)) + MULT16_32_Q15(interp[1],SHR32(accum[1], 1)) + MULT16_32_Q15(interp[2],SHR32(accum[2], 1)) + MULT16_32_Q15(interp[3],SHR32(accum[3], 1));
++      sum = SATURATE32PSHR(sum, 15, 32767);
+ #else
+       cubic_coef(frac, interp);
+       sum = interpolate_product_single(iptr, st->sinc_table + st->oversample + 4 - offset - 2, N, st->oversample, interp);
+ #endif
+       
+-      out[out_stride * out_sample++] = SATURATE32(PSHR32(sum, 14), 32767);
++      out[out_stride * out_sample++] = sum;
+       last_sample += int_advance;
+       samp_frac_num += frac_advance;
+       if (samp_frac_num >= den_rate)
+diff --git a/libspeex/resample_neon.h b/libspeex/resample_neon.h
+new file mode 100644
+index 0000000..ba93e41
+--- /dev/null
++++ b/libspeex/resample_neon.h
+@@ -0,0 +1,100 @@
++/* Copyright (C) 2007-2008 Jean-Marc Valin
++ * Copyright (C) 2008 Thorvald Natvig
++ * Copyright (C) 2011 Texas Instruments
++ *               author Jyri Sarha
++ */
++/**
++   @file resample_neon.h
++   @brief Resampler functions (NEON version)
++*/
++/*
++   Redistribution and use in source and binary forms, with or without
++   modification, are permitted provided that the following conditions
++   are met:
++
++   - Redistributions of source code must retain the above copyright
++   notice, this list of conditions and the following disclaimer.
++
++   - Redistributions in binary form must reproduce the above copyright
++   notice, this list of conditions and the following disclaimer in the
++   documentation and/or other materials provided with the distribution.
++
++   - Neither the name of the Xiph.org Foundation nor the names of its
++   contributors may be used to endorse or promote products derived from
++   this software without specific prior written permission.
++
++   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
++   ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
++   LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
++   A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE FOUNDATION OR
++   CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
++   EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
++   PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
++   PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
++   LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
++   NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
++   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
++*/
++
++#include <arm_neon.h>
++
++#ifdef FIXED_POINT
++#define OVERRIDE_INNER_PRODUCT_SINGLE
++/* Only works when len % 4 == 0 */
++static inline int32_t inner_product_single(const int16_t *a, const int16_t *b, unsigned int len)
++{
++    int32_t ret;
++    uint32_t remainder = len % 16;
++    len = len - remainder;
++
++    asm volatile ("	 cmp %[len], #0\n"
++		  "	 bne 1f\n"
++		  "	 vld1.16 {d16}, [%[b]]!\n"
++		  "	 vld1.16 {d20}, [%[a]]!\n"
++		  "	 subs %[remainder], %[remainder], #4\n"
++		  "	 vmull.s16 q0, d16, d20\n"
++		  "      beq 5f\n" 
++		  "	 b 4f\n"
++		  "1:"
++		  "	 vld1.16 {d16, d17, d18, d19}, [%[b]]!\n"
++		  "	 vld1.16 {d20, d21, d22, d23}, [%[a]]!\n"
++		  "	 subs %[len], %[len], #16\n"
++		  "	 vmull.s16 q0, d16, d20\n"
++		  "	 vmlal.s16 q0, d17, d21\n"
++		  "	 vmlal.s16 q0, d18, d22\n"
++		  "	 vmlal.s16 q0, d19, d23\n"
++		  "	 beq 3f\n"
++		  "2:"
++		  "	 vld1.16 {d16, d17, d18, d19}, [%[b]]!\n"
++		  "	 vld1.16 {d20, d21, d22, d23}, [%[a]]!\n"
++		  "	 subs %[len], %[len], #16\n"
++		  "	 vmlal.s16 q0, d16, d20\n"
++		  "	 vmlal.s16 q0, d17, d21\n"
++		  "	 vmlal.s16 q0, d18, d22\n"
++		  "	 vmlal.s16 q0, d19, d23\n"
++		  "	 bne 2b\n"
++		  "3:"
++		  "	 cmp %[remainder], #0\n"
++		  "	 beq 5f\n"
++		  "4:"
++		  "	 vld1.16 {d16}, [%[b]]!\n"
++		  "	 vld1.16 {d20}, [%[a]]!\n"
++		  "	 subs %[remainder], %[remainder], #4\n"
++		  "	 vmlal.s16 q0, d16, d20\n"
++		  "	 bne 4b\n"
++		  "5:"
++		  "	 vaddl.s32 q0, d0, d1\n"
++		  "	 vadd.s64 d0, d0, d1\n"
++		  "	 vqmovn.s64 d0, q0\n"
++		  "	 vqrshrn.s32 d0, q0, #15\n"
++		  "	 vmov.s16 %[ret], d0[0]\n"
++		  : [ret] "=&r" (ret), [a] "+r" (a), [b] "+r" (b),
++		    [len] "+r" (len), [remainder] "+r" (remainder)
++		  :
++		  : "cc", "q0",
++		    "d16", "d17", "d18", "d19",
++		    "d20", "d21", "d22", "d23");
++
++    return ret;
++}
++#endif
+-- 
+1.7.8.3
+
+From e2127a3db9e43b4336e79e5746f3053c0c799562 Mon Sep 17 00:00:00 2001
+From: Jyri Sarha <jsarha@ti.com>
+Date: Thu, 1 Sep 2011 15:30:31 +0300
+Subject: [PATCH 4/4] resample: Add NEON optimized inner_product_single for
+ floating point
+
+Also adds inline asm implementations of WORD2INT(x) macro for fixed
+and floating point.
+---
+ libspeex/resample_neon.h |  101 ++++++++++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 101 insertions(+), 0 deletions(-)
+
+diff --git a/libspeex/resample_neon.h b/libspeex/resample_neon.h
+index ba93e41..e7e981e 100644
+--- a/libspeex/resample_neon.h
++++ b/libspeex/resample_neon.h
+@@ -39,6 +39,30 @@
+ #include <arm_neon.h>
+ 
+ #ifdef FIXED_POINT
++#ifdef __thumb2__ 
++static inline int32_t saturate_32bit_to_16bit(int32_t a) {
++    int32_t ret;
++    asm ("ssat %[ret], #16, %[a]"
++         : [ret] "=&r" (ret)
++         : [a] "r" (a)
++         : );
++    return ret;
++}
++#else
++static inline int32_t saturate_32bit_to_16bit(int32_t a) {
++    int32_t ret;
++    asm ("vmov.s32 d0[0], %[a]\n"
++         "vqmovn.s32 d0, q0\n"
++         "vmov.s16 %[ret], d0[0]\n"
++         : [ret] "=&r" (ret)
++         : [a] "r" (a)
++         : "q0");
++    return ret;
++}
++#endif
++#undef WORD2INT
++#define WORD2INT(x) (saturate_32bit_to_16bit(x))
++
+ #define OVERRIDE_INNER_PRODUCT_SINGLE
+ /* Only works when len % 4 == 0 */
+ static inline int32_t inner_product_single(const int16_t *a, const int16_t *b, unsigned int len)
+@@ -97,4 +121,81 @@ static inline int32_t inner_product_single(const int16_t *a, const int16_t *b, u
+ 
+     return ret;
+ }
++#elif defined(FLOATING_POINT)
++
++static inline int32_t saturate_float_to_16bit(float a) {
++    int32_t ret;
++    asm ("vmov.f32 d0[0], %[a]\n"
++         "vcvt.s32.f32 d0, d0, #15\n"
++         "vqrshrn.s32 d0, q0, #15\n"
++         "vmov.s16 %[ret], d0[0]\n"
++         : [ret] "=&r" (ret)
++         : [a] "r" (a)
++         : "q0");
++    return ret;
++}
++#undef WORD2INT
++#define WORD2INT(x) (saturate_float_to_16bit(x))
++
++#define OVERRIDE_INNER_PRODUCT_SINGLE
++/* Only works when len % 4 == 0 */
++static inline float inner_product_single(const float *a, const float *b, unsigned int len)
++{
++    float ret;
++    uint32_t remainder = len % 16;
++    len = len - remainder;
++
++    asm volatile ("	 cmp %[len], #0\n"
++		  "	 bne 1f\n"
++		  "	 vld1.32 {q4}, [%[b]]!\n"
++		  "	 vld1.32 {q8}, [%[a]]!\n"
++		  "	 subs %[remainder], %[remainder], #4\n"
++		  "	 vmul.f32 q0, q4, q8\n"
++		  "      bne 4f\n" 
++		  "	 b 5f\n"
++		  "1:"
++		  "	 vld1.32 {q4, q5}, [%[b]]!\n"
++		  "	 vld1.32 {q8, q9}, [%[a]]!\n"
++		  "	 vld1.32 {q6, q7}, [%[b]]!\n"
++		  "	 vld1.32 {q10, q11}, [%[a]]!\n"
++		  "	 subs %[len], %[len], #16\n"
++		  "	 vmul.f32 q0, q4, q8\n"
++		  "	 vmul.f32 q1, q5, q9\n"
++		  "	 vmul.f32 q2, q6, q10\n"
++		  "	 vmul.f32 q3, q7, q11\n"
++		  "	 beq 3f\n"
++		  "2:"
++		  "	 vld1.32 {q4, q5}, [%[b]]!\n"
++		  "	 vld1.32 {q8, q9}, [%[a]]!\n"
++		  "	 vld1.32 {q6, q7}, [%[b]]!\n"
++		  "	 vld1.32 {q10, q11}, [%[a]]!\n"
++		  "	 subs %[len], %[len], #16\n"
++		  "	 vmla.f32 q0, q4, q8\n"
++		  "	 vmla.f32 q1, q5, q9\n"
++		  "	 vmla.f32 q2, q6, q10\n"
++		  "	 vmla.f32 q3, q7, q11\n"
++		  "	 bne 2b\n"
++		  "3:"
++		  "	 vadd.f32 q4, q0, q1\n"
++		  "	 vadd.f32 q5, q2, q3\n"
++		  "	 cmp %[remainder], #0\n"
++		  "	 vadd.f32 q0, q4, q5\n"
++		  "	 beq 5f\n"
++		  "4:"
++		  "	 vld1.32 {q6}, [%[b]]!\n"
++		  "	 vld1.32 {q10}, [%[a]]!\n"
++		  "	 subs %[remainder], %[remainder], #4\n"
++		  "	 vmla.f32 q0, q6, q10\n"
++		  "	 bne 4b\n"
++		  "5:"
++		  "	 vadd.f32 d0, d0, d1\n"
++		  "	 vpadd.f32 d0, d0, d0\n"
++		  "	 vmov.f32 %[ret], d0[0]\n"
++		  : [ret] "=&r" (ret), [a] "+r" (a), [b] "+r" (b),
++		    [len] "+l" (len), [remainder] "+l" (remainder)
++		  :
++		  : "cc", "q0", "q1", "q2", "q3", "q4", "q5", "q6", "q7", "q8",
++                    "q9", "q10", "q11");
++    return ret;
++}
+ #endif
+-- 
+1.7.8.3
+
