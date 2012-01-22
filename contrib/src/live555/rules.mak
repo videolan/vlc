@@ -35,13 +35,12 @@ endif
 ifdef HAVE_WINCE
 	cd live && sed -e 's/-lws2_32/-lws2/g' -i.orig config.mingw
 endif
-ifdef HAVE_MACOSX
+	cd live && sed -e 's%cc%$(CC)%' -e 's%c++%$(CXX)%' -i.orig config.$(LIVE_TARGET)
 	cd live && sed -i.orig -e s/"libtool -s -o"/"ar cr"/g config.macosx*
-endif
 	cd live && sed \
 		-e 's%-DBSD=1%-DBSD=1\ $(EXTRA_CFLAGS)\ $(EXTRA_LDFLAGS)%' \
 		-e 's%cc%$(CC)%' \
-		-e 's%c++%$(CXX)\ $(EXTRA_LDFLAGS)%' \
+		-e 's%$(CXX)%$(CXX)\ $(EXTRA_LDFLAGS)%' \
 		-i.orig config.macosx
 	cd live && sed -e 's%-D_FILE_OFFSET_BITS=64%-D_FILE_OFFSET_BITS=64\ -fPIC\ -DPIC%' -i.orig config.linux
 	mv live $@
