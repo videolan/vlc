@@ -988,6 +988,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
     if( i_volume != i_lastShownVolume )
     {
+        i_lastShownVolume = i_volume;
         [o_volume_sld setIntValue: i_volume];
         [o_fspanel setVolumeLevel: i_volume];
     }
