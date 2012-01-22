@@ -181,7 +181,7 @@ return * gettext ("")$gt_expression_test_code + _nl_msg_cat_cntr + *_nl_domain_b
            [gt_save_CPPFLAGS="$CPPFLAGS"
             CPPFLAGS="$CPPFLAGS $INCINTL"
             gt_save_LIBS="$LIBS"
-            LIBS="$LIBS $LIBINTL"
+            LIBS="$LIBS $LIBINTL $INTL_MACOSX_LIBS"
             dnl Now see whether libintl exists and does not depend on libiconv.
             AC_TRY_LINK([#include <libintl.h>
 $gt_revision_test_code
