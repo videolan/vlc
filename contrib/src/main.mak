@@ -100,7 +100,7 @@ CXX := $(HOST)-g++ --sysroot=$(ANDROID_NDK)/platforms/android-9/arch-arm
 EXTRA_CFLAGS += -D__STDC_VERSION__=199901L
 EXTRA_CFLAGS += -I$(ANDROID_NDK)/sources/cxx-stl/gnu-libstdc++/include
 ifdef HAVE_NEON
-    EXTRA_CFLAGS += -I$(ANDROID_NDK)/sources/cxx-stl/gnu-libstdc++/libs/armeabi-v7a/include
+    EXTRA_CFLAGS += -I$(ANDROID_NDK)/sources/cxx-stl/gnu-libstdc++/libs/armeabi-v7a/include -mfloat-abi=softfp -mfpu=neon -mcpu=cortex-a8
 else
     EXTRA_CFLAGS += -I$(ANDROID_NDK)/sources/cxx-stl/gnu-libstdc++/libs/armeabi/include
 endif
