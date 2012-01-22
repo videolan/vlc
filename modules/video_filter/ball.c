@@ -149,7 +149,7 @@ vlc_module_begin ()
 vlc_module_end ()
 
 static const char *const ppsz_filter_options[] = {
-    "ball-color", "ball-speed", "ball-size",
+    "color", "speed", "size",
     "gradient-threshold", "edge-visible", NULL
 };
 
