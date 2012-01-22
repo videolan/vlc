@@ -1359,8 +1359,8 @@ unsigned int CocoaKeyToVLC( unichar i_key )
                 [o_mainwindow performSelectorOnMainThread:@selector(enterFullscreen) withObject:nil waitUntilDone:NO];
                 vlc_object_release( p_input );
             }
-        } 
-        else 
+        }
+        else
         {
             // leaving fullscreen is always allowed
             [o_mainwindow performSelectorOnMainThread:@selector(leaveFullscreen) withObject:nil waitUntilDone:NO];

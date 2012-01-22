@@ -1770,6 +1770,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [o_video_view setFrame: [[self contentView] frame]];
     b_fullscreen = YES;
     [o_fspanel setVoutWasUpdated: (int)[[self screen] displayID]];
+    [o_fspanel setActive: nil];
 
     [self recreateHideMouseTimer];
 
