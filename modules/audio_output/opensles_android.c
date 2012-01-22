@@ -67,9 +67,10 @@ struct aout_sys_t
     SLObjectItf                     playerObject;
 
     SLPlayItf                       playerPlay;
-    aout_buffer_t                  *p_buffer_array[BUFF_QUEUE];
-    int                             i_toclean_buffer;
-    int                             i_toappend_buffer;
+
+    vlc_mutex_t                     lock;
+    block_t                        *p_chain;
+    block_t                       **pp_last;
 
     void                           *p_so_handle;
 };
@@ -114,6 +115,16 @@ static void Play( audio_output_t *p_aout, block_t *p_buffer )
 {
     aout_sys_t *p_sys = p_aout->sys;
     int tries = 5;
+    block_t **pp_last, *p_block;;
+
+    vlc_mutex_lock( &p_sys->lock );
+
+    /* If something bad happens, we must remove this buffer from the FIFO */
+    pp_last = p_sys->pp_last;
+    p_block = *pp_last;
+
+    block_ChainLastAppend( &p_sys->pp_last, p_buffer );
+    vlc_mutex_unlock( &p_sys->lock );
 
     for (;;)
     {
@@ -122,12 +133,6 @@ static void Play( audio_output_t *p_aout, block_t *p_buffer )
 
         switch (result)
         {
-        case SL_RESULT_SUCCESS:
-            p_sys->p_buffer_array[p_sys->i_toappend_buffer] = p_buffer;
-            if( ++p_sys->i_toappend_buffer == BUFF_QUEUE )
-                p_sys->i_toappend_buffer = 0;
-            return;
-
         case SL_RESULT_BUFFER_INSUFFICIENT:
             msg_Err( p_aout, "buffer insufficient");
 
@@ -140,20 +145,38 @@ static void Play( audio_output_t *p_aout, block_t *p_buffer )
 
         default:
             msg_Warn( p_aout, "Error %lu, dropping buffer", result );
-            aout_BufferFree( p_buffer );
+            vlc_mutex_lock( &p_sys->lock );
+            p_sys->pp_last = pp_last;
+            *pp_last = p_block;
+            vlc_mutex_unlock( &p_sys->lock );
+            block_Release( p_buffer );
+        case SL_RESULT_SUCCESS:
             return;
         }
     }
 }
+
 static void PlayedCallback (SLAndroidSimpleBufferQueueItf caller, void *pContext )
 {
+    block_t *p_block;
     aout_sys_t *p_sys = pContext;
 
     assert (caller == p_sys->playerBufferQueue);
 
-    aout_BufferFree( p_sys->p_buffer_array[p_sys->i_toclean_buffer] );
-    if( ++p_sys->i_toclean_buffer == BUFF_QUEUE )
-        p_sys->i_toclean_buffer = 0;
+    vlc_mutex_lock( &p_sys->lock );
+
+    p_block = p_sys->p_chain;
+    assert( p_block );
+
+    p_sys->p_chain = p_sys->p_chain->p_next;
+    /* if we exhausted our fifo, we must reset the pointer to the last
+     * appended block */
+    if (!p_sys->p_chain)
+        p_sys->pp_last = &p_sys->p_chain;
+
+    vlc_mutex_unlock( &p_sys->lock );
+
+    block_Release( p_block );
 }
 /*****************************************************************************
  * Open
@@ -286,6 +309,10 @@ static int Open( vlc_object_t *p_this )
     result = SetPlayState( p_sys->playerPlay, SL_PLAYSTATE_PLAYING );
     CHECK_OPENSL_ERROR( "Failed to switch to playing state" );
 
+    vlc_mutex_init( &p_sys->lock );
+    p_sys->p_chain = NULL;
+    p_sys->pp_last = &p_sys->p_chain;
+
     // we want 16bit signed data little endian.
     p_aout->format.i_format              = VLC_CODEC_S16L;
     p_aout->format.i_physical_channels   = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
@@ -312,5 +339,7 @@ static void Close( vlc_object_t *p_this )
     SetPlayState( p_sys->playerPlay, SL_PLAYSTATE_STOPPED );
     //Flush remaining buffers if any.
     Clear( p_sys->playerBufferQueue );
+    block_ChainRelease( p_sys->p_chain );
+    vlc_mutex_destroy( &p_sys->lock );
     Clean( p_sys );
 }
