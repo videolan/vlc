@@ -72,8 +72,6 @@ typedef SLresult (*slCreateEngine_t)(
  *****************************************************************************/
 static int  Open        ( vlc_object_t * );
 static void Close       ( vlc_object_t * );
-static void Play        ( audio_output_t *, block_t * );
-static void PlayedCallback ( SLAndroidSimpleBufferQueueItf caller,  void *pContext);
 
 /*****************************************************************************
  * Module descriptor
@@ -123,6 +121,55 @@ static void Clear( aout_sys_t *p_sys )
     free( p_sys );
 }
 
+/*****************************************************************************
+ * Play: play a sound
+ *****************************************************************************/
+static void Play( audio_output_t *p_aout, block_t *p_buffer )
+{
+    aout_sys_t *p_sys = p_aout->sys;
+    int tries = 5;
+
+    for (;;)
+    {
+        SLresult result = (*p_sys->playerBufferQueue)->Enqueue(
+                            p_sys->playerBufferQueue, p_buffer->p_buffer,
+                            p_buffer->i_buffer );
+
+        switch (result)
+        {
+        case SL_RESULT_SUCCESS:
+            p_sys->p_buffer_array[p_sys->i_toappend_buffer] = p_buffer;
+            if( ++p_sys->i_toappend_buffer == BUFF_QUEUE )
+                p_sys->i_toappend_buffer = 0;
+            return;
+
+        case SL_RESULT_BUFFER_INSUFFICIENT:
+            msg_Err( p_aout, "buffer insufficient");
+
+            if (tries--)
+            {
+                // Wait a bit to retry.
+                msleep(CLOCK_FREQ);
+                continue;
+            }
+
+        default:
+            msg_Warn( p_aout, "Error %lu, dropping buffer", result );
+            aout_BufferFree( p_buffer );
+            return;
+        }
+    }
+}
+static void PlayedCallback (SLAndroidSimpleBufferQueueItf caller, void *pContext )
+{
+    aout_sys_t *p_sys = pContext;
+
+    assert (caller == p_sys->playerBufferQueue);
+
+    aout_BufferFree( p_sys->p_buffer_array[p_sys->i_toclean_buffer] );
+    if( ++p_sys->i_toclean_buffer == BUFF_QUEUE )
+        p_sys->i_toclean_buffer = 0;
+}
 /*****************************************************************************
  * Open: open a dummy audio device
  *****************************************************************************/
@@ -277,53 +324,3 @@ static void Close( vlc_object_t *p_this )
     Clear( p_sys );
 }
 
-/*****************************************************************************
- * Play: play a sound
- *****************************************************************************/
-static void Play( audio_output_t *p_aout, block_t *p_buffer )
-{
-    aout_sys_t *p_sys = p_aout->sys;
-    int tries = 5;
-
-    for (;;)
-    {
-        SLresult result = (*p_sys->playerBufferQueue)->Enqueue(
-                            p_sys->playerBufferQueue, p_buffer->p_buffer,
-                            p_buffer->i_buffer );
-
-        switch (result)
-        {
-        case SL_RESULT_SUCCESS:
-            p_sys->p_buffer_array[p_sys->i_toappend_buffer] = p_buffer;
-            if( ++p_sys->i_toappend_buffer == BUFF_QUEUE )
-                p_sys->i_toappend_buffer = 0;
-            return;
-
-        case SL_RESULT_BUFFER_INSUFFICIENT:
-            msg_Err( p_aout, "buffer insufficient");
-
-            if (tries--)
-            {
-                // Wait a bit to retry.
-                msleep(CLOCK_FREQ);
-                continue;
-            }
-
-        default:
-            msg_Warn( p_aout, "Error %lu, dropping buffer", result );
-            aout_BufferFree( p_buffer );
-            return;
-        }
-    }
-}
-
-static void PlayedCallback (SLAndroidSimpleBufferQueueItf caller, void *pContext )
-{
-    aout_sys_t *p_sys = pContext;
-
-    assert (caller == p_sys->playerBufferQueue);
-
-    aout_BufferFree( p_sys->p_buffer_array[p_sys->i_toclean_buffer] );
-    if( ++p_sys->i_toclean_buffer == BUFF_QUEUE )
-        p_sys->i_toclean_buffer = 0;
-}
