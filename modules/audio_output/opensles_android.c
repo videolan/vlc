@@ -51,7 +51,6 @@
 struct aout_sys_t
 {
     SLObjectItf                     engineObject;
-    SLEngineItf                     engineEngine;
     SLObjectItf                     outputMixObject;
     SLAndroidSimpleBufferQueueItf   playerBufferQueue;
     SLObjectItf                     playerObject;
@@ -131,8 +130,9 @@ static void Clear( aout_sys_t *p_sys )
  *****************************************************************************/
 static int Open( vlc_object_t *p_this )
 {
-    audio_output_t     *p_aout = (audio_output_t *)p_this;
-    SLresult            result;
+    audio_output_t *p_aout = (audio_output_t *)p_this;
+    SLresult       result;
+    SLEngineItf    engineEngine;
 
     /* Allocate structure */
     p_aout->sys = calloc( 1, sizeof( aout_sys_t ) );
@@ -169,13 +169,13 @@ static int Open( vlc_object_t *p_this )
 
     // get the engine interface, needed to create other objects
     result = (*p_sys->engineObject)->GetInterface( p_sys->engineObject,
-                                        *p_sys->SL_IID_ENGINE, &p_sys->engineEngine );
+                                        *p_sys->SL_IID_ENGINE, &engineEngine );
     CHECK_OPENSL_ERROR( result, "Failed to get the engine interface" );
 
     // create output mix, with environmental reverb specified as a non-required interface
     const SLInterfaceID ids1[] = { *p_sys->SL_IID_VOLUME };
     const SLboolean req1[] = { SL_BOOLEAN_FALSE };
-    result = (*p_sys->engineEngine)->CreateOutputMix( p_sys->engineEngine,
+    result = (*engineEngine)->CreateOutputMix( engineEngine,
                                         &p_sys->outputMixObject, 1, ids1, req1 );
     CHECK_OPENSL_ERROR( result, "Failed to create output mix" );
 
@@ -212,7 +212,7 @@ static int Open( vlc_object_t *p_this )
     //create audio player
     const SLInterfaceID ids2[] = { *p_sys->SL_IID_ANDROIDSIMPLEBUFFERQUEUE };
     const SLboolean     req2[] = { SL_BOOLEAN_TRUE };
-    result = (*p_sys->engineEngine)->CreateAudioPlayer( p_sys->engineEngine,
+    result = (*engineEngine)->CreateAudioPlayer( engineEngine,
                                     &p_sys->playerObject, &audioSrc,
                                     &audioSnk, sizeof( ids2 ) / sizeof( *ids2 ),
                                     ids2, req2 );
