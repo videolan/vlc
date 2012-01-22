@@ -96,7 +96,6 @@ static int getBallColor( vlc_object_t *p_this, char const *psz_newval );
  * Module descriptor
  *****************************************************************************/
 #define BALL_COLOR_TEXT N_("Ball color")
-#define BALL_COLOR_LONGTEXT N_("Ball color, one of \"red\", \"blue\" and \"green\".")
 
 #define EDGE_VISIBLE_TEXT N_("Edge visible")
 #define EDGE_VISIBLE_LONGTEXT N_("Set edge visibility.")
@@ -129,7 +128,7 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_VIDEO_VFILTER )
 
     add_string( FILTER_PREFIX "color", "red",
-                BALL_COLOR_TEXT, BALL_COLOR_LONGTEXT, false )
+                BALL_COLOR_TEXT, BALL_COLOR_TEXT, false )
     change_string_list( mode_list, mode_list_text, 0 )
 
     add_integer_with_range( FILTER_PREFIX "speed", 4, 1, 15,
