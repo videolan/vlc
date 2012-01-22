@@ -673,6 +673,10 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_t *id,
         if( id->p_f_chain )
             p_pic = filter_chain_VideoFilter( id->p_f_chain, p_pic );
 
+        /* Run user specified filter chain */
+        if( id->p_uf_chain )
+            p_pic = filter_chain_VideoFilter( id->p_uf_chain, p_pic );
+
         /*
          * Encoding
          */
@@ -713,10 +717,6 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_t *id,
                 subpicture_Delete( p_subpic );
             }
         }
-
-        /* Run user specified filter chain */
-        if( id->p_uf_chain )
-            p_pic = filter_chain_VideoFilter( id->p_uf_chain, p_pic );
 
         if( p_sys->i_threads == 0 )
         {
