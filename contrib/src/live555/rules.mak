@@ -29,9 +29,6 @@ live555: $(LIVE555_FILE) .sum-live555
 	rm -Rf live
 	$(UNPACK)
 	chmod -R u+w live
-ifdef HAVE_ANDROID
-	patch -p0 < $(SRC)/live555/android.patch
-endif
 ifdef HAVE_WINCE
 	cd live && sed -e 's/-lws2_32/-lws2/g' -i.orig config.mingw
 endif
@@ -43,6 +40,10 @@ endif
 		-e 's%$(CXX)%$(CXX)\ $(EXTRA_LDFLAGS)%' \
 		-i.orig config.macosx
 	cd live && sed -e 's%-D_FILE_OFFSET_BITS=64%-D_FILE_OFFSET_BITS=64\ -fPIC\ -DPIC%' -i.orig config.linux
+ifdef HAVE_ANDROID
+	cd live && sed -e 's%-DPIC%-DPIC -DNO_SSTREAM=1 -DLOCALE_NOT_USED -I$(ANDROID_NDK)/platforms/android-9/arch-arm/usr/include%' -i.orig config.linux
+	patch -p0 < $(SRC)/live555/android.patch
+endif
 	mv live $@
 	touch $@
 
