@@ -733,6 +733,8 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset, int64_t i_
         delete ep;
         ep = new EbmlParser( &es, segment, &sys.demuxer );
         cluster = NULL;
+        sys.i_start_pts = 0;
+        sys.i_pts = 0;
         return;       
     }
 
