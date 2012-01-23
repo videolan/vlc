@@ -35,12 +35,14 @@
 #include <vlc_plugin.h>
 
 #include <assert.h>
+#include <gcrypt.h>
 
 #include <vlc_threads.h>
 #include <vlc_arrays.h>
 #include <vlc_stream.h>
 #include <vlc_url.h>
 #include <vlc_memory.h>
+#include <vlc_gcrypt.h>
 
 /*****************************************************************************
  * Module descriptor
@@ -59,6 +61,7 @@ vlc_module_end()
 /*****************************************************************************
  *
  *****************************************************************************/
+#define AES_BLOCK_SIZE 16 /* Only support AES-128 */
 typedef struct segment_s
 {
     int         sequence;   /* unique sequence number */
@@ -67,6 +70,10 @@ typedef struct segment_s
     uint64_t    bandwidth;  /* bandwidth usage of segments (bits per second)*/
 
     vlc_url_t   url;
+    char       *psz_key_path;         /* url key path */
+    uint8_t     psz_AES_key[16];      /* AES-128 */
+    bool        b_key_loaded;
+
     vlc_mutex_t lock;
     block_t     *data;      /* data */
 } segment_t;
@@ -85,6 +92,10 @@ typedef struct hls_stream_s
     vlc_url_t   url;        /* uri to m3u8 */
     vlc_mutex_t lock;
     bool        b_cache;    /* allow caching */
+
+    char        *psz_current_key_path;          /* URL path of the encrypted key */
+    uint8_t      psz_AES_IV[AES_BLOCK_SIZE];    /* IV used when decypher the block */
+    bool         b_iv_loaded;
 } hls_stream_t;
 
 struct stream_sys_t
@@ -130,6 +141,7 @@ struct stream_sys_t
     bool        b_meta;     /* meta playlist */
     bool        b_live;     /* live stream? or vod? */
     bool        b_error;    /* parsing error */
+    bool        b_aesmsg;   /* only print one time that the media is encrypted */
 };
 
 /****************************************************************************
@@ -213,6 +225,7 @@ static hls_stream_t *hls_New(vlc_array_t *hls_stream, const int id, const uint64
     hls->version = 1;  /* default protocol version */
     hls->b_cache = true;
     vlc_UrlParse(&hls->url, uri, 0);
+    hls->psz_current_key_path = NULL;
     hls->segments = vlc_array_new();
     vlc_array_append(hls_stream, hls);
     vlc_mutex_init(&hls->lock);
@@ -232,8 +245,8 @@ static void hls_Free(hls_stream_t *hls)
         }
         vlc_array_destroy(hls->segments);
     }
-
     vlc_UrlClean(&hls->url);
+    free(hls->psz_current_key_path);
     free(hls);
     hls = NULL;
 }
@@ -347,6 +360,10 @@ static segment_t *segment_New(hls_stream_t* hls, const int duration, const char 
     segment->data = NULL;
     vlc_array_append(hls->segments, segment);
     vlc_mutex_init(&segment->lock);
+    segment->b_key_loaded = false;
+    segment->psz_key_path = NULL;
+    if (hls->psz_current_key_path)
+        segment->psz_key_path = strdup(hls->psz_current_key_path);
     return segment;
 }
 
@@ -355,6 +372,7 @@ static void segment_Free(segment_t *segment)
     vlc_mutex_destroy(&segment->lock);
 
     vlc_UrlClean(&segment->url);
+    free(segment->psz_key_path);
     if (segment->data)
         block_Release(segment->data);
     free(segment);
@@ -464,6 +482,38 @@ static char *parse_Attributes(const char *line, const char *attr)
     } while(begin < end);
 
     return NULL;
+}
+
+static int hex2int(char c)
+{
+    if (c >= '0' && c <= '9')
+        return c - '0';
+    if (c >= 'A' && c <= 'F')
+        return c - 'A' + 10;
+    if (c >= 'a' && c <= 'f')
+        return c - 'a' + 10;
+    return -1;
+}
+
+static int string_to_IV(const char *string_hexa, uint8_t iv[AES_BLOCK_SIZE])
+{
+    const char *p = string_hexa;
+    uint8_t *d = iv;
+    unsigned int c;
+
+    if (*p++ != '0')
+        return VLC_EGENERIC;
+    if (*p++ != 'x')
+        return VLC_EGENERIC;
+
+    while (*p && *(p+1))
+    {
+        c = hex2int(*p++) << 4;
+        c |= hex2int(*p++);
+        *d++ = c;
+    }
+
+    return VLC_SUCCESS;
 }
 
 static char *relative_URI(stream_t *s, const char *uri, const vlc_url_t *url)
@@ -756,7 +806,6 @@ static int parse_Key(stream_t *s, hls_stream_t *hls, char *p_read)
 
     if (strncasecmp(attr, "NONE", 4) == 0)
     {
-
         char *uri = parse_Attributes(p_read, "URI");
         if (uri != NULL)
         {
@@ -774,6 +823,62 @@ static int parse_Key(stream_t *s, hls_stream_t *hls, char *p_read)
                 err = VLC_EGENERIC;
             }
             free(iv);
+        }
+    }
+    else if (strncasecmp(attr, "AES-128", 7) == 0)
+    {
+        char *value, *uri, *iv;
+        if (s->p_sys->b_aesmsg == false)
+        {
+            msg_Info(s, "playback of AES-128 encrypted HTTP Live media detected.");
+            s->p_sys->b_aesmsg = true;
+        }
+        value = uri = parse_Attributes(p_read, "URI");
+        if (value == NULL)
+        {
+            msg_Err(s, "#EXT-X-KEY: URI not found for encrypted HTTP Live media in AES-128");
+            free(attr);
+            return VLC_EGENERIC;
+        }
+
+        /* Url is put between quotes, remove them */
+        if (*value == '"')
+        {
+            /* We need to strip the "" from the attribute value */
+            uri = value + 1;
+            char* end = strchr(uri, '"');
+            if (end != NULL)
+                *end = 0;
+        }
+        hls->psz_current_key_path = strdup(uri);
+        free(value);
+
+        value = iv = parse_Attributes(p_read, "IV");
+        if (iv == NULL)
+        {
+            /*
+            * If the EXT-X-KEY tag does not have the IV attribute, implementations
+            * MUST use the sequence number of the media file as the IV when
+            * encrypting or decrypting that media file.  The big-endian binary
+            * representation of the sequence number SHALL be placed in a 16-octet
+            * buffer and padded (on the left) with zeros.
+            */
+            hls->b_iv_loaded = false;
+        }
+        else
+        {
+            /*
+            * If the EXT-X-KEY tag has the IV attribute, implementations MUST use
+            * the attribute value as the IV when encrypting or decrypting with that
+            * key.  The value MUST be interpreted as a 128-bit hexadecimal number
+            * and MUST be prefixed with 0x or 0X.
+            */
+
+            if (string_to_IV(iv, hls->psz_AES_IV) == VLC_EGENERIC)
+                err = VLC_EGENERIC;
+            else
+                hls->b_iv_loaded = true;
+            free(value);
         }
     }
     else
@@ -822,9 +927,9 @@ static int parse_Version(stream_t *s, hls_stream_t *hls, char *p_read)
 
     /* Check version */
     hls->version = version;
-    if (hls->version != 1)
+    if (hls->version <= 0 || hls->version > 3)
     {
-        msg_Err(s, "#EXT-X-VERSION should be version 1 iso %d", version);
+        msg_Err(s, "#EXT-X-VERSION should be version 1, 2 or 3 iso %d", version);
         return VLC_EGENERIC;
     }
     return VLC_SUCCESS;
@@ -1045,6 +1150,155 @@ static int parse_M3U8(stream_t *s, vlc_array_t *streams, uint8_t *buffer, const 
     return err;
 }
 
+
+static int hls_DownloadSegmentKey(stream_t *s, segment_t *seg)
+{
+    uint8_t         aeskey[32]; /* AES-512 can use up to 32 bytes */
+    ssize_t len;
+
+    stream_t *p_m3u8 = stream_UrlNew(s, seg->psz_key_path);
+    if (p_m3u8 == NULL)
+    {
+        msg_Err(s, "Failed to load the AES key for segment sequence %d", seg->sequence);
+        return VLC_EGENERIC;
+    }
+
+    len = stream_Read(p_m3u8, aeskey, sizeof(aeskey));
+    if (len != AES_BLOCK_SIZE)
+    {
+        msg_Err(s, "The AES key loaded doesn't have the right size (%d)", len);
+        stream_Delete(p_m3u8);
+        return VLC_EGENERIC;
+    }
+
+    memcpy(seg->psz_AES_key, aeskey, AES_BLOCK_SIZE);
+
+    stream_Delete(p_m3u8);
+
+    return VLC_SUCCESS;
+}
+
+static int hls_ManageSegmentKeys(stream_t *s, hls_stream_t *hls)
+{
+    segment_t   *seg = NULL;
+    segment_t   *prev_seg;
+    int         count = vlc_array_count(hls->segments);
+
+    for (int i = 0; i < count; i++)
+    {
+        prev_seg = seg;
+        seg = segment_GetSegment(hls, i);
+        if (seg->psz_key_path == NULL)
+            continue;   /* No key to load ? continue */
+        if (seg->b_key_loaded)
+            continue;   /* The key is already loaded */
+
+        /* if the key has not changed, and already available from previous segment,
+         * try to copy it, and don't load the key */
+        if (prev_seg && prev_seg->b_key_loaded && strcmp(seg->psz_key_path, prev_seg->psz_key_path) == 0)
+        {
+            memcpy(seg->psz_AES_key, prev_seg->psz_AES_key, AES_BLOCK_SIZE);
+            seg->b_key_loaded = true;
+            continue;
+        }
+        if (hls_DownloadSegmentKey(s, seg) != VLC_SUCCESS)
+            return VLC_EGENERIC;
+       seg->b_key_loaded = true;
+    }
+    return VLC_SUCCESS;
+}
+
+static int hls_DecodeSegmentData(stream_t *s, hls_stream_t *hls, segment_t *segment)
+{
+    /* Did the segment need to be decoded ? */
+    if (segment->psz_key_path == NULL)
+        return VLC_SUCCESS;
+
+    /* Do we have loaded the key ? */
+    if (!segment->b_key_loaded)
+    {
+        /* No ? try to download it now */
+        if (hls_ManageSegmentKeys(s, hls) != VLC_SUCCESS)
+            return VLC_EGENERIC;
+    }
+
+    /* For now, we only decode AES-128 data */
+    gcry_error_t i_gcrypt_err;
+    gcry_cipher_hd_t aes_ctx;
+    /* Setup AES */
+    i_gcrypt_err = gcry_cipher_open(&aes_ctx, GCRY_CIPHER_AES,
+                                     GCRY_CIPHER_MODE_CBC, 0);
+    if (i_gcrypt_err)
+    {
+        msg_Err(s, "gcry_cipher_open failed: %s", gpg_strerror(i_gcrypt_err));
+        gcry_cipher_close(aes_ctx);
+        return VLC_EGENERIC;
+    }
+
+    /* Set key */
+    i_gcrypt_err = gcry_cipher_setkey(aes_ctx, segment->psz_AES_key,
+                                       sizeof(segment->psz_AES_key));
+    if (i_gcrypt_err)
+    {
+        msg_Err(s, "gcry_cipher_setkey failed: %s", gpg_strerror(i_gcrypt_err));
+        gcry_cipher_close(aes_ctx);
+        return VLC_EGENERIC;
+    }
+
+    if (hls->b_iv_loaded == false)
+    {
+        memset(hls->psz_AES_IV, 0, AES_BLOCK_SIZE);
+        hls->psz_AES_IV[15] = segment->sequence & 0xff;
+        hls->psz_AES_IV[14] = (segment->sequence >> 8)& 0xff;
+        hls->psz_AES_IV[13] = (segment->sequence >> 16)& 0xff;
+        hls->psz_AES_IV[12] = (segment->sequence >> 24)& 0xff;
+    }
+
+    i_gcrypt_err = gcry_cipher_setiv(aes_ctx, hls->psz_AES_IV,
+                                      sizeof(hls->psz_AES_IV));
+
+    if (i_gcrypt_err)
+    {
+        msg_Err(s, "gcry_cipher_setiv failed: %s", gpg_strerror(i_gcrypt_err));
+        gcry_cipher_close(aes_ctx);
+        return VLC_EGENERIC;
+    }
+
+    i_gcrypt_err = gcry_cipher_decrypt(aes_ctx,
+                                       segment->data->p_buffer, /* out */
+                                       segment->data->i_buffer,
+                                       NULL, /* in */
+                                       0);
+    if (i_gcrypt_err)
+    {
+        msg_Err(s, "gcry_cipher_decrypt failed:  %s/%s\n", gcry_strsource(i_gcrypt_err), gcry_strerror(i_gcrypt_err));
+        gcry_cipher_close(aes_ctx);
+        return VLC_EGENERIC;
+    }
+    gcry_cipher_close(aes_ctx);
+    /* remove the PKCS#7 padding from the buffer */
+    int pad = segment->data->p_buffer[segment->data->i_buffer-1];
+    if (pad <= 0 || pad > AES_BLOCK_SIZE)
+    {
+        msg_Err(s, "Bad padding character (0x%x), perhaps we failed to decrypt the segment with the correct key", pad);
+        return VLC_EGENERIC;
+    }
+    int count = pad;
+    while (count--)
+    {
+        if (segment->data->p_buffer[segment->data->i_buffer-1-count] != pad)
+        {
+                msg_Err(s, "Bad ending buffer, perhaps we failed to decrypt the segment with the correct key");
+                return VLC_EGENERIC;
+        }
+    }
+
+    /* not all the data is readable because of padding */
+    segment->data->i_buffer -= pad;
+
+    return VLC_SUCCESS;
+}
+
 static int get_HTTPLiveMetaPlaylist(stream_t *s, vlc_array_t **streams)
 {
     stream_sys_t *p_sys = s->p_sys;
@@ -1134,6 +1388,14 @@ static int hls_UpdatePlaylist(stream_t *s, hls_stream_t *hls_new, hls_stream_t *
                 segment->duration = p->duration;
                 vlc_UrlClean(&segment->url);
                 vlc_UrlParse(&segment->url, psz_url, 0);
+                /* We must free the content, because if the key was not downloaded, content can't be decrypted */
+                if (segment->data)
+                {
+                    block_Release(segment->data);
+                    segment->data = NULL;
+                }
+                free(segment->psz_key_path);
+                segment->psz_key_path = p->psz_key_path ? strdup(p->psz_key_path) : NULL;
                 segment_Free(p);
                 free(psz_url);
             }
@@ -1288,6 +1550,13 @@ static int Download(stream_t *s, hls_stream_t *hls, segment_t *segment, int *cur
         return VLC_EGENERIC;
     }
     mtime_t duration = mdate() - start;
+
+    /* If the segment is encrypted, decode it */
+    if (hls_DecodeSegmentData(s, hls, segment) != VLC_SUCCESS)
+    {
+        vlc_mutex_unlock(&segment->lock);
+        return VLC_EGENERIC;
+    }
 
     vlc_mutex_unlock(&segment->lock);
 
@@ -1671,6 +1940,9 @@ static int Open(vlc_object_t *p_this)
 
     msg_Info(p_this, "HTTP Live Streaming (%s)", s->psz_path);
 
+    /* Initialize crypto bit */
+    vlc_gcrypt_init();
+
     /* */
     s->p_sys = p_sys = calloc(1, sizeof(*p_sys));
     if (p_sys == NULL)
@@ -1718,6 +1990,9 @@ static int Open(vlc_object_t *p_this)
     /* Choose first HLS stream to start with */
     int current = p_sys->playback.stream = 0;
     p_sys->playback.segment = p_sys->download.segment = ChooseSegment(s, current);
+
+    /* manage encryption key if needed */
+    hls_ManageSegmentKeys(s, hls_Get(p_sys->hls_stream, current));
 
     if (p_sys->b_live && (p_sys->playback.segment < 0))
     {

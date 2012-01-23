@@ -2,12 +2,19 @@ SUBDIRS = dash
 
 SOURCES_decomp = decomp.c
 SOURCES_stream_filter_record = record.c
-SOURCES_stream_filter_httplive = httplive.c
 
 libvlc_LTLIBRARIES += \
    libstream_filter_record_plugin.la \
-   libstream_filter_httplive_plugin.la \
    $(NULL)
+
+if HAVE_GCRYPT
+libstream_filter_httplive_plugin_la_SOURCES = httplive.c
+libstream_filter_httplive_plugin_la_CFLAGS = $(AM_CFLAGS) $(GCRYPT_CFLAGS)
+libstream_filter_httplive_plugin_la_LIBADD = $(AM_LIBADD) $(GCRYPT_LIBS)
+libstream_filter_httplive_plugin_la_DEPENDENCIES =
+libvlc_LTLIBRARIES += libstream_filter_httplive_plugin.la
+endif
+
 if !HAVE_WIN32
 if !HAVE_WINCE
 libvlc_LTLIBRARIES += libdecomp_plugin.la
