@@ -10,8 +10,8 @@ ifeq ($(call need_pkg,"speex >= 1.0.5"),)
 PKGS_FOUND += speex
 endif
 
-$(TARBALLS)/speex-$(SPEEX_VERSION).tar.gz:
-	$(call download,$(SPEEX_URL))
+#$(TARBALLS)/speex-$(SPEEX_VERSION).tar.gz:
+#	$(call download,$(SPEEX_URL))
 
 $(TARBALLS)/speex-git.tar.gz:
 	$(call download,$(SPEEX_GITURL))
