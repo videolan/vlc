@@ -1360,10 +1360,10 @@ static int hls_UpdatePlaylist(stream_t *s, hls_stream_t *hls_new, hls_stream_t *
         segment_t *segment = segment_Find(*hls, p->sequence);
         if (segment)
         {
+            vlc_mutex_lock(&segment->lock);
+
             assert(p->url.psz_path);
             assert(segment->url.psz_path);
-
-            vlc_mutex_lock(&segment->lock);
 
             /* they should be the same */
             if ((p->sequence != segment->sequence) ||
@@ -1382,6 +1382,7 @@ static int hls_UpdatePlaylist(stream_t *s, hls_stream_t *hls_new, hls_stream_t *
                 {
                     msg_Err(s, "Failed updating segment %d - skipping it",  p->sequence);
                     segment_Free(p);
+                    vlc_mutex_unlock(&segment->lock);
                     continue;
                 }
                 segment->sequence = p->sequence;
@@ -1396,11 +1397,10 @@ static int hls_UpdatePlaylist(stream_t *s, hls_stream_t *hls_new, hls_stream_t *
                 }
                 free(segment->psz_key_path);
                 segment->psz_key_path = p->psz_key_path ? strdup(p->psz_key_path) : NULL;
+                vlc_mutex_unlock(&segment->lock);
                 segment_Free(p);
                 free(psz_url);
             }
-
-            vlc_mutex_unlock(&segment->lock);
         }
         else
         {
