@@ -396,6 +396,24 @@ struct vlc_cleanup_t
         vlc_cleanup_data.proc (vlc_cleanup_data.data); \
     } while (0)
 
+/* poll() with cancellation */
+static inline int vlc_poll (struct pollfd *fds, unsigned nfds, int timeout)
+{
+    vlc_testcancel ();
+
+    while (timeout > 50)
+    {
+        int val = poll (fds, nfds, timeout);
+        if (val != 0)
+            return val;
+        timeout -= 50;
+        vlc_testcancel ();
+    }
+
+    return poll (fds, nfds, timeout);
+}
+# define poll(u,n,t) vlc_poll(u, n, t)
+
 #endif /* LIBVLC_USE_PTHREAD_CANCEL */
 
 static inline void vlc_cleanup_lock (void *lock)

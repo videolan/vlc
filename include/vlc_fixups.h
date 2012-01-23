@@ -274,9 +274,6 @@ struct pollfd
     unsigned revents;
 };
 #endif
-#ifndef HAVE_POLL
-# define poll(a, b, c) vlc_poll(a, b, c)
-#endif
 
 #ifndef HAVE_IF_NAMEINDEX
 #include <errno.h>

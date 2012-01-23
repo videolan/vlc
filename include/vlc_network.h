@@ -160,10 +160,6 @@ VLC_API ssize_t net_Printf( vlc_object_t *p_this, int fd, const v_socket_t *, co
 VLC_API ssize_t net_vaPrintf( vlc_object_t *p_this, int fd, const v_socket_t *, const char *psz_fmt, va_list args );
 #define net_vaPrintf(a,b,c,d,e) net_vaPrintf(VLC_OBJECT(a),b,c,d,e)
 
-struct pollfd;
-VLC_API int vlc_poll(struct pollfd *fds, unsigned nfds, int timeout);
-
-
 #ifdef WIN32
 /* Microsoft: same semantic, same value, different name... go figure */
 # define SHUT_RD SD_RECEIVE
