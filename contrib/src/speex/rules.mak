@@ -28,9 +28,7 @@ speex: speex-$(SPEEX_VERSION).tar.gz .sum-speex
 	$(APPLY) $(SRC)/speex/neon.patch
 	$(MOVE)
 
-# TODO: fixed point and ASM opts
-
-CONFIG_OPTS := --without-ogg
+CONFIG_OPTS := --without-ogg --enable-resample-full-sinc-table
 ifndef HAVE_FPU
 CONFIG_OPTS += --enable-fixed-point
 endif
