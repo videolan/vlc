@@ -1514,7 +1514,7 @@ static int BandwidthAdaptation(stream_t *s, int progid, uint64_t *bandwidth)
     return candidate;
 }
 
-static int Download(stream_t *s, hls_stream_t *hls, segment_t *segment, int *cur_stream)
+static int hls_DownloadSegmentData(stream_t *s, hls_stream_t *hls, segment_t *segment, int *cur_stream)
 {
     stream_sys_t *p_sys = s->p_sys;
 
@@ -1634,7 +1634,7 @@ static void* hls_Thread(void *p_this)
         vlc_mutex_unlock(&hls->lock);
 
         if ((segment != NULL) &&
-            (Download(s, hls, segment, &p_sys->download.stream) != VLC_SUCCESS))
+            (hls_DownloadSegmentData(s, hls, segment, &p_sys->download.stream) != VLC_SUCCESS))
         {
             if (!vlc_object_alive(s)) break;
 
@@ -1733,7 +1733,7 @@ again:
     if (segment == NULL )
         return VLC_EGENERIC;
 
-    if (Download(s, hls, segment, current) != VLC_SUCCESS)
+    if (hls_DownloadSegmentData(s, hls, segment, current) != VLC_SUCCESS)
         return VLC_EGENERIC;
 
     /* Found better bandwidth match, try again */
@@ -1754,7 +1754,7 @@ again:
             continue;
         }
 
-        if (Download(s, hls, segment, current) != VLC_SUCCESS)
+        if (hls_DownloadSegmentData(s, hls, segment, current) != VLC_SUCCESS)
             return VLC_EGENERIC;
 
         p_sys->download.segment++;
