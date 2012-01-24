@@ -257,6 +257,13 @@ static void Close( vlc_object_t *p_this )
 {
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys   = p_demux->p_sys;
+    virtual_segment_c *p_vsegment = p_sys->p_current_segment;
+    if( p_vsegment )
+    {
+        matroska_segment_c *p_segment = p_vsegment->CurrentSegment();
+        if( p_segment )
+            p_segment->UnSelect();
+    }
 
     delete p_sys;
 }
@@ -692,8 +699,6 @@ static int Demux( demux_t *p_demux)
             else
             {
                 msg_Warn( p_demux, "cannot get block EOF?" );
-                p_segment->UnSelect();
-
                 es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
                 break;
             }
