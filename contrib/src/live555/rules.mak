@@ -36,7 +36,6 @@ endif
 	cd live && sed -i.orig -e s/"libtool -s -o"/"ar cr"/g config.macosx*
 	cd live && sed \
 		-e 's%-DBSD=1%-DBSD=1\ $(EXTRA_CFLAGS)\ $(EXTRA_LDFLAGS)%' \
-		-e 's%cc%$(CC)%' \
 		-e 's%$(CXX)%$(CXX)\ $(EXTRA_LDFLAGS)%' \
 		-i.orig config.macosx
 	cd live && sed -e 's%-D_FILE_OFFSET_BITS=64%-D_FILE_OFFSET_BITS=64\ -fPIC\ -DPIC%' -i.orig config.linux
