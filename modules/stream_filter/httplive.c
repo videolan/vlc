@@ -1397,10 +1397,10 @@ static int hls_UpdatePlaylist(stream_t *s, hls_stream_t *hls_new, hls_stream_t *
                 }
                 free(segment->psz_key_path);
                 segment->psz_key_path = p->psz_key_path ? strdup(p->psz_key_path) : NULL;
-                vlc_mutex_unlock(&segment->lock);
                 segment_Free(p);
                 free(psz_url);
             }
+            vlc_mutex_unlock(&segment->lock);
         }
         else
         {
