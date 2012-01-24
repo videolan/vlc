@@ -1326,21 +1326,11 @@ static int get_HTTPLiveMetaPlaylist(stream_t *s, vlc_array_t **streams)
         dst = hls_Copy(src, false);
         if (dst == NULL)
             return VLC_ENOMEM;
-
         vlc_array_append(*streams, dst);
-    }
-
-    /* Download new playlist file from server */
-    for (int i = 0; i < vlc_array_count(*streams); i++)
-    {
-        hls_stream_t *hls;
-        hls = (hls_stream_t *)vlc_array_item_at_index(*streams, i);
-        if (hls == NULL)
-            return VLC_EGENERIC;
 
         /* Download playlist file from server */
         uint8_t *buf = NULL;
-        ssize_t len = read_M3U8_from_url(s, &hls->url, &buf);
+        ssize_t len = read_M3U8_from_url(s, &dst->url, &buf);
         if (len < 0)
             err = VLC_EGENERIC;
         else
