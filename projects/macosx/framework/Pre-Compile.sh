@@ -52,7 +52,7 @@ target_lib="${target}/${lib}"            # Should we consider using a different 
 target_plugins="${target}/${plugins}"    # Should we consider using a different well-known folder like shared resources?
 target_share="${target}/${share}"        # Should we consider using a different well-known folder like shared resources?
 linked_libs=""
-prefix=".libs/"
+prefix=".libs"
 suffix="dylib"
 
 ##########################
