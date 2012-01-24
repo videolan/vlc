@@ -54,6 +54,7 @@ target_share="${target}/${share}"        # Should we consider using a different 
 linked_libs=""
 prefix=".libs"
 suffix="dylib"
+num_archs=$(echo `echo $ARCHS | wc -w`)
 
 ##########################
 # @function vlc_install_object(src_lib, dest_dir, type, lib_install_prefix, destination_name, suffix)
@@ -178,26 +179,32 @@ vlc_install() {
                     rm "$fatdest"
                 fi
 
-                # Create a temporary destination dir to store each ARCH object file
-                local tmp_dest_dir="$VLC_BUILD_DIR/tmp/$type"
-                rm -Rf "${tmp_dest_dir}/*"
-                mkdir -p "$tmp_dest_dir"
+                if test "$num_archs" = "1"; then
+                    echo "Copying $ARCHS $type $fatdest"
+                    local arch_src="$VLC_BUILD_DIR/$ARCHS/$src_dir/$src"
+                    vlc_install_object "$arch_src" "$dest_dir" "$type" "$5" ""
+                else
+                    # Create a temporary destination dir to store each ARCH object file
+                    local tmp_dest_dir="$VLC_BUILD_DIR/tmp/$type"
+                    rm -Rf "${tmp_dest_dir}/*"
+                    mkdir -p "$tmp_dest_dir"
 
-                # Search for each ARCH object file used to construct a fat image
-                local objects=""
-                for arch in $ARCHS; do
-                    local arch_src="$VLC_BUILD_DIR/$arch/$src_dir/$src"
-                    vlc_install_object "$arch_src" "$tmp_dest_dir" "$type" "$5" "" ".$arch"
-                    local dest="$tmp_dest_dir/$src.$arch"
-                    if [ -e ${dest} ]; then
-                        objects="${dest} $objects"
-                    else
-                        echo "Warning: building $arch_src without $arch"
-                    fi
-                done;
+                    # Search for each ARCH object file used to construct a fat image
+                    local objects=""
+                    for arch in $ARCHS; do
+                        local arch_src="$VLC_BUILD_DIR/$arch/$src_dir/$src"
+                        vlc_install_object "$arch_src" "$tmp_dest_dir" "$type" "$5" "" ".$arch"
+                        local dest="$tmp_dest_dir/$src.$arch"
+                        if [ -e ${dest} ]; then
+                            objects="${dest} $objects"
+                        else
+                            echo "Warning: building $arch_src without $arch"
+                        fi
+                    done;
 
-                echo "Creating fat $type $fatdest"
-                lipo $objects -output "$fatdest" -create
+                    echo "Creating fat $type $fatdest"
+                    lipo $objects -output "$fatdest" -create
+                fi
             fi
         fi
     fi
