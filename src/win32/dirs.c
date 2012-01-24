@@ -1,8 +1,8 @@
 /*****************************************************************************
  * dirs.c: directories configuration
  *****************************************************************************
- * Copyright (C) 2001-2007 VLC authors and VideoLAN
- * Copyright © 2007-2008 Rémi Denis-Courmont
+ * Copyright (C) 2001-2010 VLC authors and VideoLAN
+ * Copyright © 2007-2012 Rémi Denis-Courmont
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>
  *
@@ -25,6 +25,7 @@
 # include "config.h"
 #endif
 
+#define UNICODE
 #include <vlc_common.h>
 
 #include <w32api.h>
@@ -41,14 +42,30 @@
 #include <assert.h>
 #include <limits.h>
 
-char *config_GetDataDirDefault( void )
+char *config_GetLibDir (void)
 {
-    return strdup (psz_vlcpath);
+    /* Get our full path */
+    MEMORY_BASIC_INFORMATION mbi;
+    if (!VirtualQuery (config_GetLibDir, &mbi, sizeof(mbi)))
+        goto error;
+
+    wchar_t wpath[MAX_PATH];
+    if (!GetModuleFileName ((HMODULE) mbi.AllocationBase, wpath, MAX_PATH))
+        goto error;
+
+    wchar_t *file = wcsrchr (wpath, L'\\');
+    if (file == NULL)
+        goto error;
+    *file = L'\0';
+
+    return FromWide (wpath);
+error:
+    abort ();
 }
 
-const char *config_GetLibDir (void)
+char *config_GetDataDirDefault( void )
 {
-    abort ();
+    return config_GetLibDir ();
 }
 
 const char *config_GetConfDir (void)

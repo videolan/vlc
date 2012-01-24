@@ -45,38 +45,6 @@
 void system_Init( void )
 {
     WSADATA Data;
-    MEMORY_BASIC_INFORMATION mbi;
-
-    /* Get our full path */
-    char psz_path[MAX_PATH];
-    char *psz_vlc;
-
-    wchar_t psz_wpath[MAX_PATH];
-    if( VirtualQuery(system_Init, &mbi, sizeof(mbi) ) )
-    {
-        HMODULE hMod = (HMODULE) mbi.AllocationBase;
-        if( GetModuleFileName( hMod, psz_wpath, MAX_PATH ) )
-        {
-            WideCharToMultiByte( CP_UTF8, 0, psz_wpath, -1,
-                                psz_path, MAX_PATH, NULL, NULL );
-        }
-        else psz_path[0] = '\0';
-    }
-    else psz_path[0] = '\0';
-
-    psz_vlc = strrchr( psz_path, '\\' );
-    if( psz_vlc )
-        *psz_vlc = '\0';
-
-    {
-        /* remove trailing \.libs from executable dir path if seen,
-           we assume we are running vlc through libtool wrapper in build dir */
-        size_t len = strlen(psz_path);
-        if( len >= 5 && !stricmp(psz_path + len - 5, "\\.libs" ) )
-            psz_path[len - 5] = '\0';
-    }
-
-    psz_vlcpath = strdup( psz_path );
 
 #if !defined( UNDER_CE )
     timeBeginPeriod(5);
@@ -365,9 +333,6 @@ LRESULT CALLBACK WMCOPYWNDPROC( HWND hwnd, UINT uMsg, WPARAM wParam,
 void system_End( void )
 {
     HWND ipcwindow;
-
-    free( psz_vlcpath );
-    psz_vlcpath = NULL;
 
     /* FIXME: thread-safety... */
     if (p_helper)

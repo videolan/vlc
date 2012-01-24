@@ -245,8 +245,6 @@ module_t **module_list_get (size_t *n)
     return tab;
 }
 
-char *psz_vlcpath = NULL;
-
 #ifdef HAVE_DYNAMIC_PLUGINS
 typedef enum { CACHE_USE, CACHE_RESET, CACHE_IGNORE } cache_mode_t;
 
@@ -262,7 +260,6 @@ static void AllocatePluginPath (vlc_object_t *, const char *, cache_mode_t);
  */
 static void AllocateAllPlugins (vlc_object_t *p_this)
 {
-    const char *vlcpath = psz_vlcpath;
     char *paths;
     cache_mode_t mode;
 
@@ -275,13 +272,14 @@ static void AllocateAllPlugins (vlc_object_t *p_this)
 
     /* Contruct the special search path for system that have a relocatable
      * executable. Set it to <vlc path>/plugins. */
-    assert( vlcpath );
-
-    if( asprintf( &paths, "%s" DIR_SEP "plugins", vlcpath ) != -1 )
+    char *vlcpath = config_GetLibDir ();
+    if (likely(vlcpath != NULL)
+     && likely(asprintf (&paths, "%s" DIR_SEP "plugins", vlcpath) != -1))
     {
         AllocatePluginPath (p_this, paths, mode);
         free( paths );
     }
+    free (vlcpath);
 
     /* If the user provided a plugin path, we add it to the list */
     paths = getenv( "VLC_PLUGIN_PATH" );

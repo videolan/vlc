@@ -2,7 +2,7 @@
  * darwin_dirs.c: Mac OS X directories configuration
  *****************************************************************************
  * Copyright (C) 2001-2009 VLC authors and VideoLAN
- * Copyright © 2007-2009 Rémi Denis-Courmont
+ * Copyright © 2007-2012 Rémi Denis-Courmont
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>
  *          Felix Paul Kühne <fkuehne at videolan dot org>
@@ -35,6 +35,10 @@
 #include <vlc_configuration.h>
 #include "config/configuration.h"
 
+#include <libgen.h>
+#include <dlfcn.h>
+#include <mach-o/dyld.h>
+
 static char *configdir = NULL;
 
 static pthread_once_t once = PTHREAD_ONCE_INIT;
@@ -50,18 +54,78 @@ const char *config_GetConfDir( void )
     return configdir;
 }
 
-char *config_GetDataDirDefault (void)
+static char *config_GetLibPath (void)
 {
-    char *datadir;
+    /* Get the full program path and name */
+    /* First try to see if we are linked to the framework */
+    for (unsigned i = 0; i < _dyld_image_count(); i++)
+    {
+        const char *psz_img_name = _dyld_get_image_name(i);
+        const char *p = strstr( psz_img_name, "VLCKit.framework/Versions/" );
 
-    if (asprintf (&datadir, "%s/share", psz_vlcpath) == -1)
-        return NULL;
-    return datadir;
+        /* Check for "VLCKit.framework/Versions/Current/VLCKit",
+         * as well as "VLCKit.framework/Versions/A/VLCKit" and
+         * "VLC.framework/Versions/B/VLCKit" */
+        if( p != NULL )
+        {
+            /* Look for the next forward slash */
+            p += 26; /* p_char += strlen(" VLCKit.framework/Versions/" ) */
+            p += strcspn( p, "/" );
+
+            /* If the string ends with VLC then we've found a winner */
+            if ( !strcmp( p, "/VLCKit" ) )
+                return strdup( psz_img_name );
+        }
+
+        /* Do we end by "VLC"? If so we are the legacy VLC.app that doesn't
+         * link to VLCKit. */
+        size_t len = strlen(psz_img_name);
+        if( len >= 3 && !strcmp( psz_img_name + len - 3, "VLC") )
+            return strdup( psz_img_name );
+    }
+
+    /* We are not linked to the VLC.framework, let's use dladdr to figure
+     * libvlc path */
+    Dl_info info;
+    if( dladdr(system_Init, &info) )
+        return strdup(dirname( info.dli_fname ));
+
+    char path[MAXPATHLEN+1];
+    uint32_t path_len = sizeof(path) - 1;
+
+    if ( !_NSGetExecutablePath(path, &path_len) )
+         return strdup(path);
+    return NULL;
 }
 
-const char *config_GetLibDir (void)
+char *config_GetLibDir (void)
 {
+    char *path = config_GetLibPath ();
+    if (path != NULL)
+    {
+        char *p = strrchr (p, '/');
+        if (p != NULL)
+        {
+            *p = '\0';
+            return path;
+        }
+        free (path);
+    }
+
+    /* should never happen */
     abort ();
+}
+
+char *config_GetDataDirDefault (void)
+{
+    char *vlcpath = config_GetLibDir ();
+    char *datadir;
+
+    if (asprintf (&datadir, "%s/share", vlcpath) == -1)
+        datadir = NULL;
+
+    free (vlcpath);
+    return datadir;
 }
 
 static char *config_GetHomeDir (void)

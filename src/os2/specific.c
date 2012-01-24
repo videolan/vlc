@@ -32,25 +32,6 @@ extern int _fmode_bin;
 
 void system_Init( void )
 {
-    HMODULE hmod;
-    CHAR    psz_path[ CCHMAXPATH ];
-    PSZ     psz_dirsep;
-
-    DosQueryModFromEIP( &hmod, NULL, 0, NULL, NULL, ( ULONG )system_Init );
-    DosQueryModuleName( hmod, sizeof( psz_path ), psz_path );
-
-    /* remove the DLL name */
-    psz_dirsep = strrchr( psz_path, '\\');
-    if( psz_dirsep )
-        *psz_dirsep = '\0';
-
-    DosEnterCritSec();
-
-    if( !psz_vlcpath )
-        asprintf( &psz_vlcpath, "%s\\vlc", psz_path );
-
-    DosExitCritSec();
-
     /* Set the default file-translation mode */
     _fmode_bin = 1;
     setmode( fileno( stdin ), O_BINARY ); /* Needed for pipes */
@@ -74,6 +55,4 @@ void system_Configure( libvlc_int_t *p_this, int i_argc, const char *const ppsz_
 
 void system_End( void )
 {
-    free( psz_vlcpath );
-    psz_vlcpath = NULL;
 }

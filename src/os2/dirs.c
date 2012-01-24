@@ -30,9 +30,20 @@
 #include <vlc_charset.h>
 #include "config/configuration.h"
 
-static char *config_GetVlcDir (void)
+char *config_GetLibDir (void)
 {
-    return FromLocaleDup (psz_vlcpath);
+    HMODULE hmod;
+    CHAR    psz_path[CCHMAXPATH + 4];
+
+    DosQueryModFromEIP( &hmod, NULL, 0, NULL, NULL, ( ULONG )system_Init );
+    DosQueryModuleName( hmod, sizeof( psz_path ), psz_path );
+
+    /* remove the DLL name */
+    char *slash = strrchr( psz_path, '\\');
+    if( slash == NULL )
+        abort();
+    strcpy(slash + 1, PACKAGE);
+    return FromLocaleDup(psz_path);
 }
 
 /**
@@ -42,7 +53,7 @@ static char *config_GetVlcDir (void)
  */
 char *config_GetDataDirDefault (void)
 {
-    char *datadir = config_GetVlcDir();
+    char *datadir = config_GetLibDir();
 
     if (datadir)
         /* replace last lib\vlc with share */
@@ -52,23 +63,14 @@ char *config_GetDataDirDefault (void)
 }
 
 /**
- * Determines the architecture-dependent data directory
- *
- * @return a string (always succeeds).
- */
-const char *config_GetLibDir (void)
-{
-    abort ();
-}
-
-/**
  * Determines the system configuration directory.
  *
  * @return a string (always succeeds).
  */
 const char *config_GetConfDir( void )
 {
-    return config_GetVlcDir ();
+#warning FIXME: memory leak
+    return config_GetLibDir ();
 }
 
 char *config_GetUserDir (vlc_userdir_t type)
@@ -89,5 +91,5 @@ char *config_GetUserDir (vlc_userdir_t type)
         case VLC_VIDEOS_DIR:
             break;
     }
-    return config_GetVlcDir ();
+    return config_GetLibDir ();
 }

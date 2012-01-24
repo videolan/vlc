@@ -24,18 +24,9 @@
 
 #include <vlc_common.h>
 #include "../libvlc.h"
-#include <pthread.h>
-
-static void set_libvlc_path (void)
-{
-    psz_vlcpath = (char *)PKGLIBDIR;
-}
 
 void system_Init (void)
 {
-    pthread_once_t once = PTHREAD_ONCE_INIT;
-
-    pthread_once (&once, set_libvlc_path);
 }
 
 void system_Configure (libvlc_int_t *libvlc,

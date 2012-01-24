@@ -31,10 +31,7 @@
 #include <vlc_common.h>
 #include "../libvlc.h"
 #include <dirent.h>                                                /* *dir() */
-#include <libgen.h>
-#include <dlfcn.h>
 #include <CoreFoundation/CoreFoundation.h>
-#include <mach-o/dyld.h>
 
 #ifdef HAVE_LOCALE_H
 #   include <locale.h>
@@ -49,78 +46,6 @@
  *****************************************************************************/
 void system_Init(void)
 {
-    char i_dummy;
-    char *p_char = NULL;
-    char *p_oldchar = &i_dummy;
-    unsigned int i;
-
-    /* Get the full program path and name */
-    /* First try to see if we are linked to the framework */
-    for (i = 0; i < _dyld_image_count(); i++)
-    {
-        const char * psz_img_name = _dyld_get_image_name(i);
-        /* Check for "VLCKit.framework/Versions/Current/VLCKit",
-         * as well as "VLCKit.framework/Versions/A/VLCKit" and
-         * "VLC.framework/Versions/B/VLCKit" */
-        if( (p_char = strstr( psz_img_name, "VLCKit.framework/Versions/" )) )
-        {
-            /* Look for the next forward slash */
-            p_char += 26; /* p_char += strlen(" VLCKit.framework/Versions/" ) */
-            while( *p_char != '\0' && *p_char != '/')
-                p_char++;
-
-            /* If the string ends with VLC then we've found a winner */
-            if ( !strcmp( p_char, "/VLCKit" ) )
-            {
-                p_char = strdup( psz_img_name );
-                break;
-            }
-            else
-                p_char = NULL;
-        }
-        else
-        {
-            size_t len = strlen(psz_img_name);
-            /* Do we end by "VLC"? If so we are the legacy VLC.app that doesn't
-             * link to VLCKit. */
-            if( !strcmp( psz_img_name + len - 3, "VLC") )
-            {
-                p_char = strdup( psz_img_name );
-                break;
-            }
-        }
-    }
-    if ( !p_char )
-    {
-        /* We are not linked to the VLC.framework, let's use dladdr to figure
-         * libvlc path */
-        Dl_info info;
-        if( dladdr(system_Init, &info) )
-            p_char = strdup(dirname( info.dli_fname ));
-    }
-    if( !p_char )
-    {
-        char path[MAXPATHLEN+1];
-        uint32_t path_len = MAXPATHLEN;
-        if ( !_NSGetExecutablePath(path, &path_len) )
-            p_char = strdup(path);
-    }
-
-    free(psz_vlcpath);
-    psz_vlcpath = p_char;
-
-    /* Remove trailing program name */
-    for( ; *p_char ; )
-    {
-        if( *p_char == '/' )
-        {
-            *p_oldchar = '/';
-            *p_char = '\0';
-            p_oldchar = p_char;
-        }
-        p_char++;
-    }
-
 #ifdef ENABLE_NLS
     /* Check if $LANG is set. */
     if( NULL == getenv("LANG") )
@@ -168,7 +93,5 @@ void system_Configure( libvlc_int_t *p_this,
  *****************************************************************************/
 void system_End( void )
 {
-    free( psz_vlcpath );
-    psz_vlcpath = NULL;
 }
 

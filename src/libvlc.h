@@ -119,8 +119,6 @@ void vlc_object_set_destructor (vlc_object_t *, vlc_destructor_t);
 /*
  * To be cleaned-up module stuff:
  */
-extern char *psz_vlcpath;
-
 module_t *module_find_by_shortcut (const char *psz_shortcut);
 
 /**

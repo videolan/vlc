@@ -230,9 +230,14 @@ int vlclua_dir_list( vlc_object_t *p_this, const char *luadirname,
     free( datadir );
 
 #if !(defined(__APPLE__) || defined(WIN32) || defined(__OS2__))
-    if( likely(asprintf( &ppsz_dir_list[i], "%s"DIR_SEP"lua"DIR_SEP"%s",
-                         config_GetLibDir(), luadirname ) != -1) )
+    char *psz_libpath = config_GetLibDir();
+    if( likely(psz_libpath != NULL) )
+    {
+        if( likely(asprintf( &ppsz_dir_list[i], "%s"DIR_SEP"lua"DIR_SEP"%s",
+                             psz_libpath, luadirname ) != -1) )
             i++;
+        free( psz_libpath );
+    }
 #endif
 
     char *psz_datapath = config_GetDataDir( p_this );

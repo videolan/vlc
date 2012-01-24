@@ -46,15 +46,17 @@ char *config_GetDataDirDefault (void)
     return strdup (DATA_PATH);
 }
 
+#if !defined (__linux__)
 /**
  * Determines the architecture-dependent data directory
  *
  * @return a string (always succeeds).
  */
-const char *config_GetLibDir (void)
+char *config_GetLibDir (void)
 {
-    return PKGLIBDIR;
+    return strdup (PKGLIBDIR);
 }
+#endif
 
 /**
  * Determines the system configuration directory.
