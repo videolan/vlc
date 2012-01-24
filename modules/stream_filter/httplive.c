@@ -1176,7 +1176,7 @@ static int hls_DownloadSegmentKey(stream_t *s, segment_t *seg)
     len = stream_Read(p_m3u8, aeskey, sizeof(aeskey));
     if (len != AES_BLOCK_SIZE)
     {
-        msg_Err(s, "The AES key loaded doesn't have the right size (%d)", len);
+        msg_Err(s, "The AES key loaded doesn't have the right size (%zd)", len);
         stream_Delete(p_m3u8);
         return VLC_EGENERIC;
     }
@@ -1861,7 +1861,7 @@ static ssize_t read_M3U8_from_stream(stream_t *s, uint8_t **buffer)
             if (total_allocated)
                 total_allocated *= 2;
             else
-                total_allocated = __MIN(bytes+1, sizeof(buf));
+                total_allocated = __MIN((uint64_t)bytes+1, sizeof(buf));
 
             p = realloc_or_free(p, total_allocated);
             if (p == NULL)
