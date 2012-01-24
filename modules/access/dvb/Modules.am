@@ -1,7 +1,0 @@
-EXTRA_DIST += \
-	access.c \
-	http.c \
-	linux_dvb.c \
-	scan.c scan.h \
-	dvb.h \
-	$(NULL)

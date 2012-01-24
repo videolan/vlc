@@ -200,7 +200,6 @@ modules/access/dshow/dshow.cpp
 modules/access/dshow/filter.cpp
 modules/access/dshow/filter.h
 modules/access/dtv/access.c
-modules/access/dvb/access.c
 modules/access/dv.c
 modules/access/dvdnav.c
 modules/access/dvdread.c

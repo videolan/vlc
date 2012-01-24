@@ -4,7 +4,7 @@
 LIBTOOL=@LIBTOOL@ --tag=CC
 
 BASE_SUBDIRS = bd mms rtp rtsp screen vcd vcdx zip
-EXTRA_SUBDIRS = dshow dvb
+EXTRA_SUBDIRS = dshow
 SUBDIRS = $(BASE_SUBDIRS)
 DIST_SUBDIRS = $(BASE_SUBDIRS) $(EXTRA_SUBDIRS)
 
