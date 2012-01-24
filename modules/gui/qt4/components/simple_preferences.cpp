@@ -539,6 +539,8 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 #endif
 #ifdef MEDIA_LIBRARY
             BUTTONACT( ui.sqlMLbtn, configML() );
+#else
+            ui.sqlMLbtn->hide();
 #endif
 
             /* interface */
