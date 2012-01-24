@@ -67,8 +67,6 @@ if test "$CONFIGURATION" = "Debug"; then
     args="--enable-debug $args"
 fi
 
-top_srcdir="$VLC_SRC_DIR"
-
 # 64 bits switches
 for arch in $ARCHS; do
     this_args="$args"
@@ -76,7 +74,7 @@ for arch in $ARCHS; do
     # where to install
     this_args="--prefix=${VLC_BUILD_DIR}/$arch/vlc_install_dir $this_args"
 
-    input="$top_srcdir/configure"
+    input="$VLC_SRC_DIR/configure"
     output="$arch/Makefile"
     if test -e ${output} && test ${output} -nt ${input}; then
         echo "No need to re-run configure for $arch"
@@ -93,26 +91,26 @@ for arch in $ARCHS; do
         export CXXFLAGS="-m64 -arch x86_64"
         export OBJCFLAGS="-m64 -arch x86_64"
         export CPPFLAGS="-m64 -arch x86_64"
-        this_args="--build=x86_64-apple-darwin10 --with-contrib=$top_srcdir/contrib/x86_64-apple-darwin10 $this_args"
-        export PATH=$top_srcdir/extras/tools/build/bin:$top_srcdir/contrib/x86_64-apple-darwin10/bin:$PATH
-        export PKG_CONFIG_PATH=$top_srcdir/contrib/x86_64-apple-darwin10/lib/pkgconfig
+        this_args="--build=x86_64-apple-darwin10 --with-contrib=$VLC_SRC_DIR/contrib/x86_64-apple-darwin10 $this_args"
+        export PATH=$VLC_SRC_DIR/extras/tools/build/bin:$VLC_SRC_DIR/contrib/x86_64-apple-darwin10/bin:$PATH
+        export PKG_CONFIG_PATH=$VLC_SRC_DIR/contrib/x86_64-apple-darwin10/lib/pkgconfig
     fi
     if test $arch = "i386"; then
         export CFLAGS="-m32 -arch i386"
         export CXXFLAGS="-m32 -arch i386"
         export OBJCFLAGS="-m32 -arch i386"
         export CPPFLAGS="-m32 -arch i386"
-        this_args="--build=i686-apple-darwin9 --with-contrib=$top_srcdir/contrib/i686-apple-darwin9 $this_args"
+        this_args="--build=i686-apple-darwin9 --with-contrib=$VLC_SRC_DIR/contrib/i686-apple-darwin9 $this_args"
     fi
     if test $arch = "ppc"; then
         export CFLAGS="-m32 -arch ppc"
         export CXXFLAGS="-m32 -arch ppc"
         export OBJCFLAGS="-m32 -arch ppc"
         export CPPFLAGS="-m32 -arch ppc"
-        this_args="--build=powerpc-apple-darwin9 --with-contrib=$top_srcdir/contrib/powerpc-apple-darwin9 $this_args"
+        this_args="--build=powerpc-apple-darwin9 --with-contrib=$VLC_SRC_DIR/contrib/powerpc-apple-darwin9 $this_args"
     fi
 
-    $top_srcdir/configure $this_args
+    $VLC_SRC_DIR/configure $this_args
     err=$?
     if test $err != 0; then
         exit $err
