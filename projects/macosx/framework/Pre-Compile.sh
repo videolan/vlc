@@ -148,34 +148,54 @@ vlc_install() {
             vlc_install_object "$main_build_dir/$src_dir/$src" "$dest_dir" "$type" $5
         else
             local fatdest="$dest_dir/$2"
-            local shouldUpdateFat="no"
+            local shouldUpdate="no"
 
-            local objects=""
+            # Determine what architectures are available in the destination image
+            local fatdest_archs=""
+            if [ -e ${fatdest} ]; then
+                fatdest_archs=`lipo -info "${fatdest}" 2> /dev/null | sed -E -e 's/[[:space:]]+$//' -e 's/.+:[[:space:]]*//' -e 's/[^[:space:]]+/(&)/g'`
 
-            # Create a temporary destination dir to store each ARCH object file
-            local tmp_dest_dir="$VLC_BUILD_DIR/tmp/$type"
-            rm -Rf "${tmp_dest_dir}/*"
-            mkdir -p "$tmp_dest_dir"
+                # Check to see if the destination image needs to be reconstructed
+                for arch in $ARCHS; do
+                    # Only install if the new image is newer than the one we have installed or the required arch is missing.
+                    if test $shouldUpdate = "no"  && (! [[ "$fatdest_archs" =~ \($arch\) ]] || test "$VLC_BUILD_DIR/$arch/$src_dir/$src" -nt "${fatdest}"); then
+                        shouldUpdate="yes"
+                    fi
+                    fatdest_archs=${fatdest_archs//\($arch\)/}
+                done
 
-            for arch in $ARCHS; do
-                local arch_src="$VLC_BUILD_DIR/$arch/$src_dir/$src"
+                # Reconstruct the destination image, if the update flag is set or if there are more archs in the desintation then we need
+                fatdest_archs=${fatdest_archs// /}
+            else
+                # If the destination image does not exist, then we have to reconstruct it
+                shouldUpdate="yes"
+            fi
 
-                # Only install if the new image is newer than the one we have installed.
-                if ( (! test -e ${fatdest}) || test ${arch_src} -nt ${fatdest} ); then
+            # If we should update the destination image or if there were unexpected archs in the destination image, then reconstruct it
+            if test "$shouldUpdate" = "yes" || test -n "${fatdest_archs}"; then
+                # If the destination image exists, get rid of it so we can copy over the newly constructed image
+                if test -e ${fatdest}; then
+                    rm "$fatdest"
+                fi
+
+                # Create a temporary destination dir to store each ARCH object file
+                local tmp_dest_dir="$VLC_BUILD_DIR/tmp/$type"
+                rm -Rf "${tmp_dest_dir}/*"
+                mkdir -p "$tmp_dest_dir"
+
+                # Search for each ARCH object file used to construct a fat image
+                local objects=""
+                for arch in $ARCHS; do
+                    local arch_src="$VLC_BUILD_DIR/$arch/$src_dir/$src"
                     vlc_install_object "$arch_src" "$tmp_dest_dir" "$type" "$5" "" ".$arch"
                     local dest="$tmp_dest_dir/$src.$arch"
-                    if test -e ${dest}; then
-                        if (! test "$dest_dir/$arch_src" -nt "${dest}"); then
-                            shouldUpdateFat="yes"
-                        fi
+                    if [ -e ${dest} ]; then
                         objects="${dest} $objects"
                     else
                         echo "Warning: building $arch_src without $arch"
                     fi
-                fi
-            done;
+                done;
 
-            if test "$shouldUpdateFat" = "yes"; then
                 echo "Creating fat $type $fatdest"
                 lipo $objects -output "$fatdest" -create
             fi
