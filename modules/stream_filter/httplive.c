@@ -248,7 +248,6 @@ static void hls_Free(hls_stream_t *hls)
     vlc_UrlClean(&hls->url);
     free(hls->psz_current_key_path);
     free(hls);
-    hls = NULL;
 }
 
 static hls_stream_t *hls_Copy(hls_stream_t *src, const bool b_cp_segments)
@@ -378,7 +377,6 @@ static void segment_Free(segment_t *segment)
     if (segment->data)
         block_Release(segment->data);
     free(segment);
-    segment = NULL;
 }
 
 static segment_t *segment_GetSegment(hls_stream_t *hls, const int wanted)
