@@ -32,7 +32,7 @@ live555: $(LIVE555_FILE) .sum-live555
 ifdef HAVE_WINCE
 	cd live && sed -e 's/-lws2_32/-lws2/g' -i.orig config.mingw
 endif
-	cd live && sed -e 's%cc%$(CC)%' -e 's%c++%$(CXX)%' -i.orig config.$(LIVE_TARGET)
+	cd live && sed -e 's%cc%$(CC)%' -e 's%c++%$(CXX)%' -e 's%ar%$(AR)%' -i.orig config.$(LIVE_TARGET)
 	cd live && sed -i.orig -e s/"libtool -s -o"/"ar cr"/g config.macosx*
 	cd live && sed \
 		-e 's%-DBSD=1%-DBSD=1\ $(EXTRA_CFLAGS)\ $(EXTRA_LDFLAGS)%' \
