@@ -240,7 +240,7 @@ static void hls_Free(hls_stream_t *hls)
     {
         for (int n = 0; n < vlc_array_count(hls->segments); n++)
         {
-            segment_t *segment = (segment_t *)vlc_array_item_at_index(hls->segments, n);
+            segment_t *segment = segment_GetSegment(hls, n);
             if (segment) segment_Free(segment);
         }
         vlc_array_destroy(hls->segments);
@@ -310,7 +310,7 @@ static hls_stream_t *hls_Find(vlc_array_t *hls_stream, hls_stream_t *hls_new)
     int count = vlc_array_count(hls_stream);
     for (int n = 0; n < count; n++)
     {
-        hls_stream_t *hls = vlc_array_item_at_index(hls_stream, n);
+        hls_stream_t *hls = hls_Get(hls_stream, n);
         if (hls)
         {
             /* compare */
@@ -401,7 +401,7 @@ static segment_t *segment_Find(hls_stream_t *hls, const int sequence)
     if (count <= 0) return NULL;
     for (int n = 0; n < count; n++)
     {
-        segment_t *segment = vlc_array_item_at_index(hls->segments, n);
+        segment_t *segment = segment_GetSegment(hls, n);
         if (segment == NULL) break;
         if (segment->sequence == sequence)
             return segment;
@@ -1319,7 +1319,7 @@ static int get_HTTPLiveMetaPlaylist(stream_t *s, vlc_array_t **streams)
     for (int i = 0; i < vlc_array_count(p_sys->hls_stream); i++)
     {
         hls_stream_t *src, *dst;
-        src = (hls_stream_t *)vlc_array_item_at_index(p_sys->hls_stream, i);
+        src = hls_Get(p_sys->hls_stream, i);
         if (src == NULL)
             return VLC_EGENERIC;
 
@@ -1449,7 +1449,7 @@ static int hls_ReloadPlaylist(stream_t *s)
         for (int i = 0; i < vlc_array_count(hls_streams); i++)
         {
             hls_stream_t *hls;
-            hls = (hls_stream_t *)vlc_array_item_at_index(hls_streams, i);
+            hls = hls_Get(hls_streams, i);
             if (hls) hls_Free(hls);
         }
         vlc_array_destroy(hls_streams);
@@ -2049,8 +2049,7 @@ fail:
     /* Free hls streams */
     for (int i = 0; i < vlc_array_count(p_sys->hls_stream); i++)
     {
-        hls_stream_t *hls;
-        hls = (hls_stream_t *)vlc_array_item_at_index(p_sys->hls_stream, i);
+        hls_stream_t *hls = hls_Get(p_sys->hls_stream, i);
         if (hls) hls_Free(hls);
     }
     vlc_array_destroy(p_sys->hls_stream);
@@ -2086,8 +2085,7 @@ static void Close(vlc_object_t *p_this)
     /* Free hls streams */
     for (int i = 0; i < vlc_array_count(p_sys->hls_stream); i++)
     {
-        hls_stream_t *hls;
-        hls = (hls_stream_t *)vlc_array_item_at_index(p_sys->hls_stream, i);
+        hls_stream_t *hls = hls_Get(p_sys->hls_stream, i);
         if (hls) hls_Free(hls);
     }
     vlc_array_destroy(p_sys->hls_stream);
@@ -2450,7 +2448,7 @@ static int segment_Seek(stream_t *s, const uint64_t pos)
 
     for (int n = 0; n < count; n++)
     {
-        segment_t *segment = vlc_array_item_at_index(hls->segments, n);
+        segment_t *segment = segment_GetSegment(hls, n);
         if (segment == NULL)
         {
             vlc_mutex_unlock(&hls->lock);
