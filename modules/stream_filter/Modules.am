@@ -10,7 +10,7 @@ libvlc_LTLIBRARIES += \
 if HAVE_GCRYPT
 libstream_filter_httplive_plugin_la_SOURCES = httplive.c
 libstream_filter_httplive_plugin_la_CFLAGS = $(AM_CFLAGS) $(GCRYPT_CFLAGS)
-libstream_filter_httplive_plugin_la_LIBADD = $(AM_LIBADD) $(GCRYPT_LIBS)
+libstream_filter_httplive_plugin_la_LIBADD = $(AM_LIBADD) $(GCRYPT_LIBS) -lgpg-error
 libstream_filter_httplive_plugin_la_DEPENDENCIES =
 libvlc_LTLIBRARIES += libstream_filter_httplive_plugin.la
 endif
