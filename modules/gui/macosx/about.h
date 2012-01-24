@@ -60,7 +60,6 @@
 
 + (VLAboutBox *)sharedInstance;
 - (void)showAbout;
-- (void)VLCWillTerminate;
 - (void)showHelp;
 - (IBAction)showGPL:(id)sender;
 - (IBAction)helpGoHome:(id)sender;

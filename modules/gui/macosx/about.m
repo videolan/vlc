@@ -82,12 +82,6 @@ static VLAboutBox *_o_sharedInstance = nil;
 {
     if(! b_isSetUp )
     {
-        /* we want to know when VLC wants to quit to prevent a crash while scrolling our credits */
-        [[NSNotificationCenter defaultCenter] addObserver: self
-                                                 selector: @selector(VLCWillTerminate)
-                                                     name: NSApplicationWillTerminateNotification
-                                                   object: nil];
-
         /* Get the localized info dictionary (InfoPlist.strings) */
         NSDictionary *o_local_dict;
         o_local_dict = [[NSBundle mainBundle] localizedInfoDictionary];
@@ -192,12 +186,6 @@ static VLAboutBox *_o_sharedInstance = nil;
                 f_end = [o_credits_textview bounds].size.height - [o_credits_scrollview bounds].size.height;
         }
     }
-}
-
-- (void)VLCWillTerminate
-{
-    [o_scroll_timer invalidate];
-    [[NSNotificationCenter defaultCenter] removeObserver: self];
 }
 
 /*****************************************************************************
