@@ -39,6 +39,10 @@
 #include <dlfcn.h>
 #include <mach-o/dyld.h>
 
+#ifndef MAXPATHLEN
+# define MAXPATHLEN 1024
+#endif
+
 static char *configdir = NULL;
 
 static pthread_once_t once = PTHREAD_ONCE_INIT;

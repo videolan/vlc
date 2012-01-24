@@ -37,10 +37,6 @@
 #   include <locale.h>
 #endif
 
-#ifndef MAXPATHLEN
-# define MAXPATHLEN 1024
-#endif
-
 /*****************************************************************************
  * system_Init: fill in program path & retrieve language
  *****************************************************************************/
