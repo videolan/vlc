@@ -7,7 +7,6 @@
 # This is for some creepy reasons also used by legacy VLC.app or
 # the moz plugin.
 
-
 #
 # We are building VLC.app or the moz plugin
 #
@@ -51,11 +50,10 @@ target="${TARGET_BUILD_DIR}/${CONTENTS_FOLDER_PATH}"
 target_bin="${target}/bin"
 target_lib="${target}/${lib}"            # Should we consider using a different well-known folder like shared resources?
 target_plugins="${target}/${plugins}"    # Should we consider using a different well-known folder like shared resources?
-target_share="${target}/${share}"    # Should we consider using a different well-known folder like shared resources?
+target_share="${target}/${share}"        # Should we consider using a different well-known folder like shared resources?
 linked_libs=""
 prefix=".libs/"
 suffix="dylib"
-
 
 ##########################
 # @function vlc_install_object(src_lib, dest_dir, type, lib_install_prefix, destination_name, suffix)
@@ -63,7 +61,6 @@ suffix="dylib"
 # @param src_lib     source library to copy to the destination directory
 # @param dest_dir    destination directory where the src_lib should be copied to
 vlc_install_object() {
-
     local src_lib=${1}
     local dest_dir=${2}
     local type=${3}
@@ -94,7 +91,7 @@ vlc_install_object() {
         return
     fi
 
-    if ((! test -e ${lib_dest}) || test ${src_lib} -nt ${lib_dest} ); then
+    if ( (! test -e ${lib_dest}) || test ${src_lib} -nt ${lib_dest} ); then
 
         mkdir -p ${dest_dir}
 
@@ -130,7 +127,7 @@ vlc_install_object() {
         fi
      fi
 }
-# @function vlc_install
+# @function vlc_install_object
 ##########################
 
 ##########################
@@ -164,7 +161,7 @@ vlc_install() {
                 local arch_src="$VLC_BUILD_DIR/$arch/$src_dir/$src"
 
                 # Only install if the new image is newer than the one we have installed.
-                if ((! test -e ${fatdest}) || test ${arch_src} -nt ${fatdest} ); then
+                if ( (! test -e ${fatdest}) || test ${arch_src} -nt ${fatdest} ); then
                     vlc_install_object "$arch_src" "$tmp_dest_dir" "$type" "$5" "" ".$arch"
                     local dest="$tmp_dest_dir/$src.$arch"
                     if test -e ${dest}; then
@@ -224,7 +221,6 @@ else
     vlc_install "bin/${prefix}" "vlc" "${target}/bin" "bin" "@loader_path/../lib"
 fi
 
-
 ##########################
 # Build the plugins folder (Same as VLCKit.framework/plugins in Makefile)
 echo "Building plugins folder..."
@@ -238,7 +234,6 @@ done
 
 ##########################
 # Build the lib folder
-
 vlc_install "lib/${prefix}" "libvlc.5.dylib" "${target_lib}" "library"
 vlc_install "src/${prefix}" "libvlccore.5.dylib" "${target_lib}" "library"
 pushd `pwd` > /dev/null
