@@ -33,7 +33,7 @@
 /* On dll_open, just check that the OMX_Init symbol already is loaded */
 # define dll_open(name) dlsym(RTLD_DEFAULT, "OMX_Init")
 # define dll_close(handle) do { } while (0)
-# define dlsym(handle, name) dlsym(RTLD_DEFAULT, name)
+# define dlsym(handle, name) dlsym(RTLD_DEFAULT, "I" name)
 #else
 # define dll_open(name) dlopen( name, RTLD_NOW )
 # define dll_close(handle) dlclose(handle)

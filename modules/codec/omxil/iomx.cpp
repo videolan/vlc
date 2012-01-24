@@ -29,6 +29,8 @@
 #include <binder/MemoryDealer.h>
 #include <OMX_Component.h>
 
+#define PREFIX(x) I ## x
+
 using namespace android;
 
 class IOMXContext {
@@ -270,7 +272,8 @@ static OMX_ERRORTYPE iomx_set_config(OMX_HANDLETYPE component, OMX_INDEXTYPE ind
     return get_error(ctx->iomx->setConfig(node->node, index, param, sizeof(OMX_BOOL)));
 }
 
-OMX_ERRORTYPE OMX_GetHandle(OMX_HANDLETYPE *handle_ptr, OMX_STRING component_name, OMX_PTR app_data, OMX_CALLBACKTYPE *callbacks)
+extern "C" {
+OMX_ERRORTYPE PREFIX(OMX_GetHandle)(OMX_HANDLETYPE *handle_ptr, OMX_STRING component_name, OMX_PTR app_data, OMX_CALLBACKTYPE *callbacks)
 {
     OMXNode* node = new OMXNode();
     node->app_data = app_data;
@@ -308,7 +311,7 @@ OMX_ERRORTYPE OMX_GetHandle(OMX_HANDLETYPE *handle_ptr, OMX_STRING component_nam
     return OMX_ErrorNone;
 }
 
-OMX_ERRORTYPE OMX_FreeHandle(OMX_HANDLETYPE handle)
+OMX_ERRORTYPE PREFIX(OMX_FreeHandle)(OMX_HANDLETYPE handle)
 {
     OMXNode* node = (OMXNode*) ((OMX_COMPONENTTYPE*)handle)->pComponentPrivate;
     ctx->iomx->freeNode( node->node );
@@ -318,7 +321,7 @@ OMX_ERRORTYPE OMX_FreeHandle(OMX_HANDLETYPE handle)
     return OMX_ErrorNone;
 }
 
-OMX_ERRORTYPE OMX_Init(void)
+OMX_ERRORTYPE PREFIX(OMX_Init)(void)
 {
     OMXClient client;
     if (client.connect() != OK)
@@ -331,7 +334,7 @@ OMX_ERRORTYPE OMX_Init(void)
     return OMX_ErrorNone;
 }
 
-OMX_ERRORTYPE OMX_Deinit(void)
+OMX_ERRORTYPE PREFIX(OMX_Deinit)(void)
 {
     ctx->iomx = NULL;
     delete ctx;
@@ -339,7 +342,7 @@ OMX_ERRORTYPE OMX_Deinit(void)
     return OMX_ErrorNone;
 }
 
-OMX_ERRORTYPE OMX_ComponentNameEnum(OMX_STRING component_name, OMX_U32 name_length, OMX_U32 index)
+OMX_ERRORTYPE PREFIX(OMX_ComponentNameEnum)(OMX_STRING component_name, OMX_U32 name_length, OMX_U32 index)
 {
     if (index >= ctx->components.size())
         return OMX_ErrorNoMore;
@@ -351,7 +354,7 @@ OMX_ERRORTYPE OMX_ComponentNameEnum(OMX_STRING component_name, OMX_U32 name_leng
     return OMX_ErrorNone;
 }
 
-OMX_ERRORTYPE OMX_GetRolesOfComponent(OMX_STRING component_name, OMX_U32 *num_roles, OMX_U8 **roles)
+OMX_ERRORTYPE PREFIX(OMX_GetRolesOfComponent)(OMX_STRING component_name, OMX_U32 *num_roles, OMX_U8 **roles)
 {
     for( List<IOMX::ComponentInfo>::iterator it = ctx->components.begin(); it != ctx->components.end(); it++ ) {
         if (!strcmp(component_name, it->mName.string())) {
@@ -371,5 +374,6 @@ OMX_ERRORTYPE OMX_GetRolesOfComponent(OMX_STRING component_name, OMX_U32 *num_ro
         }
     }
     return OMX_ErrorInvalidComponentName;
+}
 }
 
