@@ -147,13 +147,13 @@ vlc_install() {
         if test $type = "data"; then
             vlc_install_object "$main_build_dir/$src_dir/$src" "$dest_dir" "$type" $5
         else
-            fatdest="$dest_dir/$2"
-            shouldUpdateFat="no"
+            local fatdest="$dest_dir/$2"
+            local shouldUpdateFat="no"
 
-            objects=""
+            local objects=""
 
             # Create a temporary destination dir to store each ARCH object file
-            tmp_dest_dir="$VLC_BUILD_DIR/tmp/$type"
+            local tmp_dest_dir="$VLC_BUILD_DIR/tmp/$type"
             rm -Rf "${tmp_dest_dir}/*"
             mkdir -p "$tmp_dest_dir"
 
