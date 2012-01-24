@@ -93,26 +93,29 @@ for arch in $ARCHS; do
         export CXXFLAGS="-m64 -arch x86_64"
         export OBJCFLAGS="-m64 -arch x86_64"
         export CPPFLAGS="-m64 -arch x86_64"
-        this_args="--with-contrib=$top_srcdir/contrib/x86_64-apple-darwin10 $this_args"
+        this_args="--build=x86_64-apple-darwin10 --with-contrib=$top_srcdir/contrib/x86_64-apple-darwin10 $this_args"
         export PATH=$top_srcdir/extras/tools/build/bin:$top_srcdir/contrib/x86_64-apple-darwin10/bin:$PATH
         export PKG_CONFIG_PATH=$top_srcdir/contrib/x86_64-apple-darwin10/lib/pkgconfig
-        $top_srcdir/configure --build=x86_64-apple-darwin10 $this_args
     fi
     if test $arch = "i386"; then
         export CFLAGS="-m32 -arch i386"
         export CXXFLAGS="-m32 -arch i386"
         export OBJCFLAGS="-m32 -arch i386"
         export CPPFLAGS="-m32 -arch i386"
-        this_args="--with-contrib=$top_srcdir/contrib/i686-apple-darwin9 $this_args"
-        $top_srcdir/configure --build=i686-apple-darwin9 $this_args
+        this_args="--build=i686-apple-darwin9 --with-contrib=$top_srcdir/contrib/i686-apple-darwin9 $this_args"
     fi
     if test $arch = "ppc"; then
         export CFLAGS="-m32 -arch ppc"
         export CXXFLAGS="-m32 -arch ppc"
         export OBJCFLAGS="-m32 -arch ppc"
         export CPPFLAGS="-m32 -arch ppc"
-        this_args="--with-contrib=$top_srcdir/contrib/powerpc-apple-darwin9 $this_args"
-        $top_srcdir/configure --build=powerpc-apple-darwin9 $this_args
+        this_args="--build=powerpc-apple-darwin9 --with-contrib=$top_srcdir/contrib/powerpc-apple-darwin9 $this_args"
+    fi
+
+    $top_srcdir/configure $this_args
+    err=$?
+    if test $err != 0; then
+        exit $err
     fi
     cd ..
 done
