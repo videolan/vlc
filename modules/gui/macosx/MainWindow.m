@@ -411,16 +411,15 @@ static VLCMainWindow *_o_sharedInstance = nil;
         [self setOpaque: NO];
         [self setHasShadow:YES];
 
-        NSRect winrect;
+        NSRect winrect = [self frame];
         CGFloat f_titleBarHeight = [o_titlebar_view frame].size.height;
-        winrect = [self frame];
 
         [o_titlebar_view setFrame: NSMakeRect( 0, winrect.size.height - f_titleBarHeight,
                                               winrect.size.width, f_titleBarHeight )];
         [[self contentView] addSubview: o_titlebar_view];
 
-        winrect.size.height = winrect.size.height + f_titleBarHeight;
-        [self setFrame: winrect display:NO animate:NO];
+        [self setFrame: winrect display:YES animate:YES];
+        previousSavedFrame = winrect;
         winrect = [o_split_view frame];
         winrect.size.height = winrect.size.height - f_titleBarHeight;
         [o_split_view setFrame: winrect];
@@ -429,10 +428,6 @@ static VLCMainWindow *_o_sharedInstance = nil;
         o_color_backdrop = [[VLCColorView alloc] initWithFrame: [o_split_view frame]];
         [[self contentView] addSubview: o_color_backdrop positioned: NSWindowBelow relativeTo: o_split_view];
         [o_color_backdrop setAutoresizingMask:NSViewHeightSizable | NSViewWidthSizable];
-
-        previousSavedFrame = winrect;
-
-        [self display];
     }
     else
     {
@@ -891,6 +886,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
 - (void)windowResizedOrMoved:(NSNotification *)notification
 {
+    previousSavedFrame = [self frame];
     [self saveFrameUsingName: [self frameAutosaveName]];
 }
 
