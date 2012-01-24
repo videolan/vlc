@@ -99,11 +99,15 @@ vlc_module_end ()
 
 static void Clean( aout_sys_t *p_sys )
 {
-    Destroy( p_sys->playerObject );
-    Destroy( p_sys->outputMixObject );
-    Destroy( p_sys->engineObject );
+    if( p_sys->playerObject )
+        Destroy( p_sys->playerObject );
+    if( p_sys->outputMixObject )
+        Destroy( p_sys->outputMixObject );
+    if( p_sys->engineObject )
+        Destroy( p_sys->engineObject );
 
-    dlclose( p_sys->p_so_handle );
+    if( p_sys->p_so_handle )
+        dlclose( p_sys->p_so_handle );
 
     free( p_sys );
 }
