@@ -2196,6 +2196,20 @@ check:
     return segment;
 }
 
+static int segment_RestorePos( segment_t *segment )
+{
+    if( segment->data )
+    {
+        uint64_t size = segment->size -segment->data->i_buffer;
+        if( size > 0 )
+        {
+            segment->data->i_buffer += size;
+            segment->data->p_buffer -= size;
+        }
+    }
+    return VLC_SUCCESS;
+}
+
 static ssize_t hls_Read(stream_t *s, uint8_t *p_read, unsigned int i_read)
 {
     stream_sys_t *p_sys = s->p_sys;
@@ -2219,14 +2233,8 @@ static ssize_t hls_Read(stream_t *s, uint8_t *p_read, unsigned int i_read)
                 segment->data = NULL;
             }
             else
-            {   /* reset playback pointer to start of buffer */
-                uint64_t size = segment->size - segment->data->i_buffer;
-                if (size > 0)
-                {
-                    segment->data->i_buffer += size;
-                    segment->data->p_buffer -= size;
-                }
-            }
+                segment_RestorePos( segment );
+
             p_sys->playback.segment++;
             vlc_mutex_unlock(&segment->lock);
 
@@ -2421,6 +2429,7 @@ static uint64_t GetStreamSize(stream_t *s)
     return size;
 }
 
+
 static int segment_Seek(stream_t *s, const uint64_t pos)
 {
     stream_sys_t *p_sys = s->p_sys;
@@ -2435,6 +2444,17 @@ static int segment_Seek(stream_t *s, const uint64_t pos)
     uint64_t length = 0;
     uint64_t size = hls->size;
     int count = vlc_array_count(hls->segments);
+
+    /* restore current segment to start position */
+    segment_t *segment = segment_GetSegment(hls, p_sys->playback.segment);
+    if (segment == NULL)
+    {
+        vlc_mutex_unlock(&hls->lock);
+        return VLC_EGENERIC;
+    }
+    vlc_mutex_lock(&segment->lock);
+    segment_RestorePos( segment );
+    vlc_mutex_unlock(&segment->lock);
 
     for (int n = 0; n < count; n++)
     {
@@ -2480,17 +2500,8 @@ static int segment_Seek(stream_t *s, const uint64_t pos)
             vlc_mutex_unlock(&hls->lock);
             return VLC_EGENERIC;
         }
-
         vlc_mutex_lock(&segment->lock);
-        if (segment->data)
-        {
-            uint64_t size = segment->size -segment->data->i_buffer;
-            if (size > 0)
-            {
-                segment->data->i_buffer += size;
-                segment->data->p_buffer -= size;
-            }
-        }
+        segment_RestorePos( segment );
         vlc_mutex_unlock(&segment->lock);
 
         /* start download at current playback segment */
