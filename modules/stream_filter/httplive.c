@@ -1196,6 +1196,8 @@ static int hls_ManageSegmentKeys(stream_t *s, hls_stream_t *hls)
     {
         prev_seg = seg;
         seg = segment_GetSegment(hls, i);
+        if (seg == NULL )
+            continue;
         if (seg->psz_key_path == NULL)
             continue;   /* No key to load ? continue */
         if (seg->b_key_loaded)
