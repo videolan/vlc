@@ -28,7 +28,7 @@ if test "${ACTION}" = "release-makefile"; then
     main_build_dir="${VLC_BUILD_DIR}"
 else
     use_archs="yes"
-    main_build_dir="${VLC_BUILD_DIR}/x86_64"
+    main_build_dir="${VLC_BUILD_DIR}/${ARCHS%% *}"
     echo "Building for $ARCHS"
 fi
 
