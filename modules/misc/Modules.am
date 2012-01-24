@@ -3,7 +3,6 @@ BASE_SUBDIRS = playlist stats osd
 SUBDIRS = $(BASE_SUBDIRS)
 DIST_SUBDIRS = $(BASE_SUBDIRS)
 
-SOURCES_logger = logger.c
 SOURCES_vod_rtsp = rtsp.c
 SOURCES_audioscrobbler = audioscrobbler.c
 SOURCES_inhibit = inhibit.c
@@ -44,6 +43,8 @@ libmce_plugin_la_DEPENDENCIES =
 EXTRA_LTLIBRARIES += libmce_plugin.la
 libvlc_LTLIBRARIES += $(LTLIBmce)
 
+liblogger_plugin_la_SOURCES = logger.c
+liblogger_plugin_la_CFLAGS = $(AM_CFLAGS)
 liblogger_plugin_la_LIBADD = $(AM_LIBADD)
 if HAVE_ANDROID
 liblogger_plugin_la_LIBADD += -llog
