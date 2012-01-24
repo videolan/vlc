@@ -60,7 +60,7 @@ public:
             return static_cast<MLItem*>( index.internalPointer() );
         else return NULL;
     }
-    virtual int getId( QModelIndex index ) const;
+    virtual int itemId( const QModelIndex & ) const;
 
     QVariant data( const QModelIndex &idx, const int role = Qt::DisplayRole ) const;
     bool setData( const QModelIndex &idx, const QVariant &value,

@@ -237,7 +237,7 @@ void MLModel::doDelete( QModelIndexList list )
 {
     for (int i = 0; i < list.count(); ++i)
     {
-        int id = getId( list.at(i) );
+        int id = itemId( list.at(i) );
         ml_DeleteSimple( p_ml, id );
     }
 }
@@ -254,7 +254,7 @@ void MLModel::remove( QModelIndex idx )
     }
 }
 
-int MLModel::getId( QModelIndex index ) const
+int MLModel::itemId( const QModelIndex &index ) const
 {
     return getItem( index )->id();
 }
