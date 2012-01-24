@@ -1,10 +1,11 @@
 /*****************************************************************************
  * wizard.m: MacOS X Streaming Wizard
  *****************************************************************************
- * Copyright (C) 2005-2009 VLC authors and VideoLAN
+ * Copyright (C) 2005-2012 VLC authors and VideoLAN
  * $Id$
  *
- * Authors: Felix Kühne <fkuehne at videolan dot org>
+ * Authors: Felix Kühne <fkuehne at videolan dot org>,
+ *          Brendon Justin <brendonjustin at gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -1252,9 +1253,10 @@ static VLCWizard *_o_sharedInstance = nil;
                 [[[o_userSelections objectForKey:@"pathToStrm"]
                 objectAtIndex:x] UTF8String],
                 [tempString UTF8String] );
-            input_item_AddOption( p_input, [[[o_userSelections
-                objectForKey:@"opts"] objectAtIndex: x] UTF8String],
-                VLC_INPUT_OPTION_TRUSTED );
+
+            /* use the MRL from the text field, in case the user
+             * modified it */
+            input_item_AddOption( p_input, [[o_t8_fld_mrl stringValue] UTF8String], VLC_INPUT_OPTION_TRUSTED );
 
             if(! [[o_userSelections objectForKey:@"partExtractFrom"]
                 isEqualToString:@""] )
@@ -1262,7 +1264,7 @@ static VLCWizard *_o_sharedInstance = nil;
                 input_item_AddOption( p_input, [[NSString
                     stringWithFormat: @"start-time=%@", [o_userSelections
                     objectForKey: @"partExtractFrom"]] UTF8String],
-					VLC_INPUT_OPTION_TRUSTED );
+                    VLC_INPUT_OPTION_TRUSTED );
             }
 
             if(! [[o_userSelections objectForKey:@"partExtractTo"]
