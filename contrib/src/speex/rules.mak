@@ -38,7 +38,7 @@ endif
 
 .speex: speex
 	$(RECONF)
-	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(CONFIG_OPTS)
+	cd $< && $(HOSTVARS) CFLAGS="$(CFLAGS) $(NOTHUMB)" ./configure $(HOSTCONF) $(CONFIG_OPTS)
 	cd $< && $(MAKE) install
 	touch $@
 
