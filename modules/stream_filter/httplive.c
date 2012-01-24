@@ -293,7 +293,7 @@ static hls_stream_t *hls_Get(vlc_array_t *hls_stream, const int wanted)
 
 static inline hls_stream_t *hls_GetFirst(vlc_array_t *hls_stream)
 {
-    return (hls_stream_t*) hls_Get(hls_stream, 0);
+    return hls_Get(hls_stream, 0);
 }
 
 static hls_stream_t *hls_GetLast(vlc_array_t *hls_stream)
@@ -302,7 +302,7 @@ static hls_stream_t *hls_GetLast(vlc_array_t *hls_stream)
     if (count <= 0)
         return NULL;
     count--;
-    return (hls_stream_t *) hls_Get(hls_stream, count);
+    return hls_Get(hls_stream, count);
 }
 
 static hls_stream_t *hls_Find(vlc_array_t *hls_stream, hls_stream_t *hls_new)
