@@ -13,13 +13,12 @@ if test "$ACTION" = "clean"; then
     exit 0
 fi
 
-# Contruct the vlc_build_dir
+# Construct the vlc_build_dir
 mkdir -p $VLC_BUILD_DIR
 cd $VLC_BUILD_DIR
 
-# Contruct the argument list
+# Construct the argument list
 echo "Building for $ARCHS with sdk=\"$SDKROOT\" in $VLC_BUILD_DIR"
-
 
 args="--disable-nls $args"
 
@@ -60,12 +59,12 @@ args="--disable-visual $args"
 
 if test "x$SDKROOT" != "x"
 then
-	args="--with-macosx-sdk=$SDKROOT $args"
+    args="--with-macosx-sdk=$SDKROOT $args"
 fi
 
 # Debug Flags
 if test "$CONFIGURATION" = "Debug"; then
-	args="--enable-debug $args"
+    args="--enable-debug $args"
 fi
 
 top_srcdir="$VLC_SRC_DIR"
@@ -79,13 +78,12 @@ for arch in $ARCHS; do
 
     input="$top_srcdir/configure"
     output="$arch/Makefile"
-    echo `pwd`"/${output}"
     if test -e ${output} && test ${output} -nt ${input}; then
         echo "No need to re-run configure for $arch"
         continue;
     fi
 
-    # Contruct the vlc_build_dir/$arch
+    # Construct the vlc_build_dir/$arch
     mkdir -p $arch
     cd $arch
 
