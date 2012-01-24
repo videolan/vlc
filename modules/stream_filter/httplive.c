@@ -266,6 +266,8 @@ static hls_stream_t *hls_Copy(hls_stream_t *src, const bool b_cp_segments)
     dst->sequence = src->sequence;
     dst->version = src->version;
     dst->b_cache = src->b_cache;
+    dst->psz_current_key_path = src->psz_current_key_path ?
+                strdup( src->psz_current_key_path ) : NULL;
     char *uri = ConstructUrl(&src->url);
     if (uri == NULL)
     {
