@@ -274,6 +274,10 @@ struct pollfd
     unsigned revents;
 };
 #endif
+#ifndef HAVE_POLL
+struct pollfd;
+int poll (struct pollfd *, unsigned, int);
+#endif
 
 #ifndef HAVE_IF_NAMEINDEX
 #include <errno.h>
