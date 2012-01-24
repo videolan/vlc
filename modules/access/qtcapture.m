@@ -79,6 +79,7 @@ vlc_module_end ()
     CVImageBufferRef currentImageBuffer;
     mtime_t currentPts;
     mtime_t previousPts;
+    long timeScale;
 }
 - (id)init;
 - (void)outputVideoFrame:(CVImageBufferRef)videoFrame withSampleBuffer:(QTSampleBuffer *)sampleBuffer fromConnection:(QTCaptureConnection *)connection;
@@ -94,6 +95,7 @@ vlc_module_end ()
         currentImageBuffer = nil;
         currentPts = 0;
         previousPts = 0;
+        timeScale = 0;
     }
     return self;
 }
@@ -105,6 +107,11 @@ vlc_module_end ()
         currentImageBuffer = nil;
     }
     [super dealloc];
+}
+
+- (long)timeScale
+{
+    return timeScale;
 }
 
 - (void)outputVideoFrame:(CVImageBufferRef)videoFrame withSampleBuffer:(QTSampleBuffer *)sampleBuffer fromConnection:(QTCaptureConnection *)connection
@@ -119,7 +126,9 @@ vlc_module_end ()
     {
         imageBufferToRelease = currentImageBuffer;
         currentImageBuffer = videoFrame;
-        currentPts = (mtime_t)(1000000L / [sampleBuffer presentationTime].timeScale * [sampleBuffer presentationTime].timeValue);
+        QTTime timeStamp = [sampleBuffer presentationTime];
+        timeScale = timeStamp.timeScale;
+        currentPts = (mtime_t)(1000000L / timeScale * timeStamp.timeValue);
 
         /* Try to use hosttime of the sample if available, because iSight Pts seems broken */
         NSNumber *hosttime = (NSNumber *)[sampleBuffer attributeForKey:QTSampleBufferHostTimeAttribute];
@@ -170,6 +179,8 @@ struct demux_sys_t {
     VLCDecompressedVideoOutput * output;
     int height, width;
     es_out_id_t * p_es_video;
+    BOOL b_es_setup;
+    es_format_t fmt;
 };
 
 
@@ -206,7 +217,6 @@ static int Open( vlc_object_t *p_this )
 {
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys = NULL;
-    es_format_t fmt;
     int i;
     int i_width;
     int i_height;
@@ -256,7 +266,7 @@ static int Open( vlc_object_t *p_this )
         }
     }
 
-    memset( &fmt, 0, sizeof( es_format_t ) );
+    memset( &p_sys->fmt, 0, sizeof( es_format_t ) );
 
     QTCaptureDeviceInput * input = nil;
     NSError *o_returnedError;
@@ -318,7 +328,7 @@ static int Open( vlc_object_t *p_this )
     int chroma = VLC_CODEC_UYVY;
 
     /* Now we can init */
-    es_format_Init( &fmt, VIDEO_ES, chroma );
+    es_format_Init( &p_sys->fmt, VIDEO_ES, chroma );
 
     NSSize encoded_size = [[camera_format attributeForKey:QTFormatDescriptionVideoEncodedPixelsSizeAttribute] sizeValue];
     NSSize display_size = [[camera_format attributeForKey:QTFormatDescriptionVideoCleanApertureDisplaySizeAttribute] sizeValue];
@@ -329,12 +339,13 @@ static int Open( vlc_object_t *p_this )
     par_size.height = display_size.height = encoded_size.height
         = var_InheritInteger (p_this, "qtcapture-height");
 
-    fmt.video.i_width = p_sys->width = encoded_size.width;
-    fmt.video.i_height = p_sys->height = encoded_size.height;
+    p_sys->fmt.video.i_width = p_sys->width = encoded_size.width;
+    p_sys->fmt.video.i_height = p_sys->height = encoded_size.height;
+    p_sys->fmt.video.i_frame_rate = 25.0; // cave: check with setMinimumVideoFrameInterval (see below)
     if( par_size.width != encoded_size.width )
     {
-        fmt.video.i_sar_num = (int64_t)encoded_size.height * par_size.width / encoded_size.width;
-        fmt.video.i_sar_den = encoded_size.width;
+        p_sys->fmt.video.i_sar_num = (int64_t)encoded_size.height * par_size.width / encoded_size.width;
+        p_sys->fmt.video.i_sar_den = encoded_size.width;
     }
 
     msg_Dbg(p_demux, "encoded_size %i %i", (int)encoded_size.width, (int)encoded_size.height );
@@ -347,6 +358,8 @@ static int Open( vlc_object_t *p_this )
         [NSNumber numberWithInt: p_sys->width], kCVPixelBufferWidthKey,
         [NSNumber numberWithBool:YES], (id)kCVPixelBufferOpenGLCompatibilityKey,
         nil]];
+    [p_sys->output setAutomaticallyDropsLateVideoFrames:YES];
+    [p_sys->output setMinimumVideoFrameInterval: (1/25)]; // 25 fps
 
     p_sys->session = [[QTCaptureSession alloc] init];
 
@@ -365,11 +378,6 @@ static int Open( vlc_object_t *p_this )
     }
 
     [p_sys->session startRunning];
-
-    msg_Dbg( p_demux, "added new video es %4.4s %dx%d",
-            (char*)&fmt.i_codec, fmt.video.i_width, fmt.video.i_height );
-
-    p_sys->p_es_video = es_out_Add( p_demux->out, &fmt );
 
     [input release];
     [pool release];
@@ -421,8 +429,7 @@ static int Demux( demux_t *p_demux )
     demux_sys_t *p_sys = p_demux->p_sys;
     block_t *p_block;
 
-    p_block = block_New( p_demux, p_sys->width *
-                            p_sys->height * 2 /* FIXME */ );
+    p_block = block_New( p_demux, p_sys->width * p_sys->height * 2 /* FIXME */ );
     if( !p_block )
     {
         msg_Err( p_demux, "cannot get block" );
@@ -443,6 +450,14 @@ static int Demux( demux_t *p_demux )
         [pool release];
         msleep( 10000 );
         return 1;
+    }
+    else if( !p_sys->b_es_setup )
+    {
+        p_sys->fmt.video.i_frame_rate_base = [p_sys->output timeScale];
+        msg_Dbg( p_demux, "using frame rate base: %i", p_sys->fmt.video.i_frame_rate_base );
+        p_sys->p_es_video = es_out_Add( p_demux->out, &p_sys->fmt );
+        msg_Dbg( p_demux, "added new video es %4.4s %dx%d", (char*)&p_sys->fmt.i_codec, p_sys->fmt.video.i_width, p_sys->fmt.video.i_height );
+        p_sys->b_es_setup = YES;
     }
 
     es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_block->i_pts );
@@ -473,8 +488,13 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_GET_PTS_DELAY:
            pi64 = (int64_t*)va_arg( args, int64_t * );
-           *pi64 = (int64_t)DEFAULT_PTS_DELAY;
+           *pi64 = INT64_C(1000) * var_InheritInteger( p_demux, "live-caching" );
            return VLC_SUCCESS;
+
+        case DEMUX_GET_TIME:
+            pi64 = (int64_t*)va_arg( args, int64_t * );
+            *pi64 = mdate();
+            return VLC_SUCCESS;
 
         default:
            return VLC_EGENERIC;
