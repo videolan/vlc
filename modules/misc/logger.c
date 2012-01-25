@@ -42,10 +42,6 @@
 # include <android/log.h>
 #endif
 
-#ifdef __APPLE__
-#define LOG_DIR "Library/Logs/"
-#endif
-
 #define LOG_FILE_TEXT "vlc-log.txt"
 #define LOG_FILE_HTML "vlc-log.html"
 
@@ -268,6 +264,7 @@ static int Open( vlc_object_t *p_this )
         if( !psz_file )
         {
 #ifdef __APPLE__
+# define LOG_DIR "Library/Logs/"
             char *home = config_GetUserDir(VLC_DOCUMENTS_DIR);
             if( home == NULL
              || asprintf( &psz_file, "%s/"LOG_DIR"/%s", home,
