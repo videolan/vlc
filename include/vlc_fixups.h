@@ -329,18 +329,6 @@ long jrand48 (unsigned short subi[3]);
 long nrand48 (unsigned short subi[3]);
 #endif
 
-#ifdef __ANDROID__
-# undef __linux__
-# ifndef __cplusplus
-#  define __cplusplus 0
-# endif
-# include <pthread.h>
-# if __cplusplus == 0
-#  undef __cplusplus
-# endif
-char *tempnam(const char *, const char *);
-#endif // ANDROID
-
 #ifdef __OS2__
 # undef HAVE_FORK   /* Implementation of fork() is imperfect on OS/2 */
 #endif
