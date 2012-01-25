@@ -42,10 +42,6 @@
 # include <android/log.h>
 #endif
 
-#define MODE_TEXT 0
-#define MODE_HTML 1
-#define MODE_SYSLOG 2
-
 #ifdef __APPLE__
 #define LOG_DIR "Library/Logs/"
 #endif
