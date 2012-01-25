@@ -109,7 +109,14 @@ vlc_module_begin ()
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_VCODEC )
     set_section( N_("Decoding") , NULL )
+#if defined(USE_IOMX)
+    /* For IOMX, don't enable it automatically via priorities,
+     * enable it only via the --codec iomx command line parameter when
+     * wanted. */
+    set_capability( "decoder", 0 )
+#else
     set_capability( "decoder", 80 )
+#endif
     set_callbacks( OpenDecoder, CloseGeneric )
 
     add_submodule ()
