@@ -9,9 +9,6 @@ ANDROID_API=android-9
 
 VLC_SOURCEDIR="`dirname $0`/../../.."
 
-# needed for old ndk: change all the arm-linux-androideabi to arm-eabi
-# the --host is kept on purpose because otherwise libtool complains..
-
 CFLAGS="-g -O2 -mlong-calls -fstrict-aliasing -fprefetch-loop-arrays -ffast-math"
 LDFLAGS="-Wl,-Bdynamic,-dynamic-linker=/system/bin/linker -Wl,--no-undefined"
 
@@ -44,7 +41,7 @@ STRIP="${CROSS_COMPILE}strip" \
 RANLIB="${CROSS_COMPILE}ranlib" \
 AR="${CROSS_COMPILE}ar" \
 PKG_CONFIG_LIBDIR="$VLC_SOURCEDIR/extras/contrib/hosts/arm-eabi/lib/pkgconfig" \
-sh $VLC_SOURCEDIR/configure --host=arm-eabi-linux --build=x86_64-unknown-linux $EXTRA_PARAMS \
+sh $VLC_SOURCEDIR/configure --host=arm-linux-androideabi --build=x86_64-unknown-linux $EXTRA_PARAMS \
                 --enable-live555 --enable-realrtsp \
                 --enable-avformat \
                 --enable-swscale \
