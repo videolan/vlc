@@ -35,10 +35,11 @@ namespace dash
 {
     namespace mpd
     {
+        class Representation;
         class Segment
         {
             public:
-                Segment();
+                Segment( const Representation *parent );
                 virtual ~Segment(){}
                 virtual std::string getSourceUrl() const;
                 virtual void        setSourceUrl( const std::string &url );
@@ -55,12 +56,14 @@ namespace dash
                 virtual int                             getStartByte    () const;
                 virtual int                             getEndByte      () const;
                 virtual dash::http::Chunk*              toChunk         ();
+                const Representation*                   getParentRepresentation() const;
 
             protected:
                 std::string             sourceUrl;
                 std::vector<BaseUrl *>  baseUrls;
                 int                     startByte;
                 int                     endByte;
+                const Representation*   parentRepresentation;
         };
     }
 }

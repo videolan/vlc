@@ -34,7 +34,8 @@ using namespace dash::xml;
 IsoffMainParser::IsoffMainParser    (Node *root, stream_t *p_stream) :
                  root               (root),
                  p_stream           (p_stream),
-                 mpd                (NULL)
+                 mpd                (NULL),
+                 currentRepresentation( NULL )
 {
 }
 IsoffMainParser::~IsoffMainParser   ()
@@ -113,6 +114,7 @@ void    IsoffMainParser::setRepresentations (Node *adaptationSetNode, Adaptation
     for(size_t i = 0; i < representations.size(); i++)
     {
         Representation *rep = new Representation;
+        this->currentRepresentation = rep;
         this->setSegmentBase(representations.at(i), rep);
         this->setSegmentList(representations.at(i), rep);
         rep->setBandwidth(atoi(representations.at(i)->getAttributeValue("bandwidth").c_str()));
@@ -148,7 +150,7 @@ void    IsoffMainParser::setInitSegment     (dash::xml::Node *segBaseNode, Segme
 
     if(initSeg.size() > 0)
     {
-        Segment *seg = new Segment();
+        Segment *seg = new Segment( this->currentRepresentation );
         seg->setSourceUrl(initSeg.at(0)->getAttributeValue("sourceURL"));
 
         if(initSeg.at(0)->hasAttribute("range"))
@@ -170,7 +172,7 @@ void    IsoffMainParser::setSegments        (dash::xml::Node *segListNode, Segme
 
     for(size_t i = 0; i < segments.size(); i++)
     {
-        Segment *seg = new Segment();
+        Segment *seg = new Segment( this->currentRepresentation );
         seg->setSourceUrl(segments.at(i)->getAttributeValue("media"));
 
         if(segments.at(0)->hasAttribute("mediaRange"))

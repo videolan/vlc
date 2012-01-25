@@ -30,11 +30,11 @@
 using namespace dash::mpd;
 using namespace dash::http;
 
-Segment::Segment    () :
-         startByte  (-1),
-         endByte    (-1)
+Segment::Segment(const Representation *parent) :
+        startByte  (-1),
+        endByte    (-1),
+        parentRepresentation( parent )
 {
-
 }
 
 std::string             Segment::getSourceUrl   () const
@@ -99,7 +99,6 @@ dash::http::Chunk*      Segment::toChunk        ()
             chunk->addOptionalUrl(ss.str());
             ss.clear();
         }
-
     }
     else
     {
@@ -107,4 +106,9 @@ dash::http::Chunk*      Segment::toChunk        ()
     }
 
     return chunk;
+}
+
+const Representation *Segment::getParentRepresentation() const
+{
+    return this->parentRepresentation;
 }

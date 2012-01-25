@@ -39,8 +39,8 @@ using namespace dash::mpd;
 
 SegmentTemplate::SegmentTemplate( bool containRuntimeIdentifier,
                                   Representation* representation ) :
+    Segment( representation ),
     containRuntimeIdentifier( containRuntimeIdentifier ),
-    representation( representation ),
     beginTime( std::string::npos ),
     beginIndex( std::string::npos ),
     currentSegmentIndex( 0 )
@@ -60,10 +60,10 @@ std::string     SegmentTemplate::getSourceUrl() const
     {
         //FIXME: This should use the current representation SegmentInfo
         //which "inherits" the SegmentInfoDefault values.
-        if ( this->representation->getParentGroup()->getSegmentInfoDefault() != NULL &&
-             this->representation->getParentGroup()->getSegmentInfoDefault()->getSegmentTimeline() != NULL )
+        if ( this->parentRepresentation->getParentGroup()->getSegmentInfoDefault() != NULL &&
+             this->parentRepresentation->getParentGroup()->getSegmentInfoDefault()->getSegmentTimeline() != NULL )
         {
-            const SegmentTimeline::Element  *el = this->representation->getParentGroup()->
+            const SegmentTimeline::Element  *el = this->parentRepresentation->getParentGroup()->
                     getSegmentInfoDefault()->getSegmentTimeline()->getElement( this->currentSegmentIndex );
             if ( el != NULL )
             {

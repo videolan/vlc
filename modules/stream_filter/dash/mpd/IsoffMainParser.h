@@ -62,6 +62,7 @@ namespace dash
                 dash::xml::Node *root;
                 stream_t        *p_stream;
                 MPD             *mpd;
+                Representation  *currentRepresentation;
 
                 void    setMPDAttributes    ();
                 void    setMPDBaseUrl       ();

@@ -404,7 +404,7 @@ Segment*    BasicCMParser::parseSegment( Node* node )
             seg = new SegmentTemplate( runtimeToken, this->currentRepresentation );
         }
         else
-            seg = new Segment;
+            seg = new Segment( this->currentRepresentation );
         if ( url.find( this->p_stream->psz_access ) != 0 ) //Relative url
             url = this->url + url;
         seg->setSourceUrl( url );
