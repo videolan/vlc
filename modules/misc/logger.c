@@ -69,6 +69,17 @@
 #include <syslog.h>
 #endif
 
+enum logmode {
+    LOGGER_TEXT,
+    LOGGER_HTML,
+#ifdef HAVE_SYSLOG_H
+    LOGGER_SYSLOG,
+#endif
+#ifdef __ANDROID__
+    LOGGER_ANDROID,
+#endif
+};
+
 /*****************************************************************************
  * intf_sys_t: description and status of log interface
  *****************************************************************************/
@@ -77,6 +88,7 @@ struct intf_sys_t
     msg_subscription_t *p_sub;
     FILE *p_file;
     const char *footer;
+    enum logmode logmode;
 };
 
 /*****************************************************************************
@@ -196,6 +208,7 @@ static int Open( vlc_object_t *p_this )
     msg_callback_t cb = TextPrint;
     const char *filename = LOG_FILE_TEXT, *header = TEXT_HEADER;
     p_sys->footer = TEXT_FOOTER;
+    p_sys->logmode = LOGGER_TEXT;
 
     char *mode = var_InheritString( p_intf, "logmode" );
     if( mode != NULL )
@@ -205,14 +218,21 @@ static int Open( vlc_object_t *p_this )
             p_sys->footer = HTML_FOOTER;
             header = HTML_HEADER;
             cb = HtmlPrint;
+            p_sys->logmode = LOGGER_HTML;
         }
 #ifdef HAVE_SYSLOG_H
         else if( !strcmp( mode, "syslog" ) )
+        {
             cb = SyslogPrint;
+            p_sys->logmode = LOGGER_SYSLOG;
+        }
 #endif
 #ifdef __ANDROID__
         else if( !strcmp( mode, "android" ) )
+        {
             cb = AndroidPrint;
+            p_sys->logmode = LOGGER_ANDROID;
+        }
 #endif
         else if( strcmp( mode, "text" ) )
             msg_Warn( p_intf, "invalid log mode `%s', using `text'", mode );
@@ -220,7 +240,7 @@ static int Open( vlc_object_t *p_this )
     }
 
 #ifdef HAVE_SYSLOG_H
-    if( cb == SyslogPrint )
+    if( p_sys->logmode == LOGGER_SYSLOG )
     {
         int i_facility;
         char *psz_facility = var_InheritString( p_intf, "syslog-facility" );
@@ -257,7 +277,7 @@ static int Open( vlc_object_t *p_this )
     else
 #endif
 #ifdef __ANDROID__
-    if( cb == AndroidPrint )
+    if( p_sys->logmode == LOGGER_ANDROID )
     {
         /* nothing to do */
     }
@@ -314,10 +334,11 @@ static void Close( vlc_object_t *p_this )
 
     /* Close the log file */
 #ifdef HAVE_SYSLOG_H
-    if( p_sys->p_file == NULL )
+    if( p_sys->logmode == LOGGER_SYSLOG )
         closelog();
     else
 #endif
+    if( p_sys->logmode == LOGGER_TEXT || p_sys->logmode == LOGGER_HTML )
     {
         fputs( p_sys->footer, p_sys->p_file );
         fclose( p_sys->p_file );
