@@ -91,7 +91,11 @@ VLC_API unsigned vlc_CPU( void );
 #  define HAVE_FPU 1
 
 # elif defined (__arm__)
-#  define HAVE_FPU 0 /* revisit later? */
+#  if defined (__VFP_FP__) && !defined (__SOFTFP__)
+#   define HAVE_FPU 1
+#  else
+#   define HAVE_FPU 0
+#  endif
 
 # elif defined (__sparc__)
 #  define HAVE_FPU 1
