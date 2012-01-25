@@ -47,6 +47,7 @@ namespace dash
             int peek( const uint8_t **pp_peek, size_t i_peek );
             const mpd::IMPDManager*         getMpdManager() const;
             const logic::IAdaptationLogic*  getAdaptionLogic() const;
+            const http::Chunk *getCurrentChunk() const;
 
         private:
             http::HTTPConnectionManager         *conManager;

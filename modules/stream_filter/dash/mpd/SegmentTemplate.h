@@ -42,7 +42,6 @@ namespace dash
                 virtual void            done();
             private:
                 bool                    containRuntimeIdentifier;
-                Representation*         representation;
                 size_t                  beginTime;
                 size_t                  beginIndex;
                 int                     currentSegmentIndex;

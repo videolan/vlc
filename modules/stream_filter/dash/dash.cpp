@@ -199,9 +199,20 @@ static int  Control         (stream_t *p_stream, int i_query, va_list args)
         case STREAM_SET_POSITION:
             return VLC_EGENERIC;
         case STREAM_GET_SIZE:
+        {
+            uint64_t*   res = (va_arg (args, uint64_t *));
             if(p_sys->isLive)
-                *(va_arg (args, uint64_t *)) = 0;
+                *res = 0;
+            else
+            {
+                const dash::mpd::Representation *rep = p_sys->p_dashManager->getAdaptionLogic()->getCurrentRepresentation();
+                if ( rep == NULL )
+                    *res = 0;
+                else
+                    *res = p_sys->p_mpd->getDuration() * rep->getBandwidth();
+            }
             break;
+        }
         default:
             return VLC_EGENERIC;
     }

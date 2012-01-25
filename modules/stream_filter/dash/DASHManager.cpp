@@ -109,3 +109,8 @@ const logic::IAdaptationLogic*  DASHManager::getAdaptionLogic() const
 {
     return this->adaptationLogic;
 }
+
+const Chunk *DASHManager::getCurrentChunk() const
+{
+    return this->currentChunk;
+}
