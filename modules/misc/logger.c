@@ -257,7 +257,11 @@ static int Open( vlc_object_t *p_this )
     else
 #endif
 #ifdef __ANDROID__
-    if( cb != AndroidPrint )
+    if( cb == AndroidPrint )
+    {
+        /* nothing to do */
+    }
+    else
 #endif
     {
         char *psz_file = var_InheritString( p_intf, "logfile" );
