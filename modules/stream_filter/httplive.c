@@ -2112,13 +2112,16 @@ static segment_t *GetSegment(stream_t *s)
         segment = segment_GetSegment(hls, p_sys->playback.segment);
         if (segment != NULL)
         {
+            vlc_mutex_lock(&segment->lock);
             /* This segment is ready? */
             if (segment->data != NULL)
             {
+                vlc_mutex_unlock(&segment->lock);
                 p_sys->b_cache = hls->b_cache;
                 vlc_mutex_unlock(&hls->lock);
                 goto check;
             }
+            vlc_mutex_unlock(&segment->lock);
         }
         vlc_mutex_unlock(&hls->lock);
     }
@@ -2144,15 +2147,18 @@ static segment_t *GetSegment(stream_t *s)
         int i_segment = p_sys->download.segment;
         vlc_mutex_unlock(&p_sys->download.lock_wait);
 
+        vlc_mutex_lock(&segment->lock);
         /* This segment is ready? */
         if ((segment->data != NULL) &&
             (p_sys->playback.segment < i_segment))
         {
             p_sys->playback.stream = i_stream;
             p_sys->b_cache = hls->b_cache;
+            vlc_mutex_unlock(&segment->lock);
             vlc_mutex_unlock(&hls->lock);
             goto check;
         }
+        vlc_mutex_unlock(&segment->lock);
         vlc_mutex_unlock(&hls->lock);
 
         if (!p_sys->b_meta)
