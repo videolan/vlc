@@ -392,7 +392,6 @@ struct demux_sys_t
     char        *psz_file;  /* file to dump data in */
     FILE        *p_file;    /* filehandle */
     uint64_t    i_write;    /* bytes written */
-    bool        b_file_out; /* dump mode enabled */
 
     /* */
     bool        b_start_record;
@@ -590,12 +589,9 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_write = 0;
     p_sys->buffer = NULL;
     p_sys->p_file = NULL;
-    p_sys->b_file_out = false;
-    p_sys->psz_file = var_CreateGetString( p_demux, "ts-dump-file" );
-    if( *p_sys->psz_file != '\0' )
+    p_sys->psz_file = var_InheritString( p_demux, "ts-dump-file" );
+    if( p_sys->psz_file != NULL )
     {
-        p_sys->b_file_out = true;
-
         b_append = var_CreateGetBool( p_demux, "ts-dump-append" );
         if ( b_append )
             psz_mode = "ab";
@@ -607,31 +603,33 @@ static int Open( vlc_object_t *p_this )
             msg_Info( p_demux, "dumping raw stream to standard output" );
             p_sys->p_file = stdout;
         }
-        else if( ( p_sys->p_file = vlc_fopen( p_sys->psz_file, psz_mode ) ) == NULL )
+        else
         {
-            msg_Err( p_demux, "cannot create `%s' for writing", p_sys->psz_file );
-            p_sys->b_file_out = false;
-        }
-
-        if( p_sys->b_file_out )
-        {
-            /* Determine how many packets to read. */
-            int bufsize = var_CreateGetInteger( p_demux, "ts-dump-size" );
-            p_sys->i_ts_read = (int) (bufsize / p_sys->i_packet_size);
-            if( p_sys->i_ts_read <= 0 )
+            p_sys->p_file = vlc_fopen( p_sys->psz_file, psz_mode );
+            if( p_sys->p_file == NULL )
             {
-                p_sys->i_ts_read = 1500 / p_sys->i_packet_size;
+                msg_Err( p_demux, "cannot write to file `%s': %m",
+                         p_sys->psz_file );
+                free( p_sys->psz_file );
+                vlc_mutex_destroy( &p_sys->csa_lock );
+                free( p_sys );
+                return VLC_EGENERIC;
             }
-            p_sys->buffer = xmalloc( p_sys->i_packet_size * p_sys->i_ts_read );
-            msg_Info( p_demux, "%s raw stream to file `%s' reading packets %d",
-                      b_append ? "appending" : "dumping", p_sys->psz_file,
-                      p_sys->i_ts_read );
         }
-    }
 
-    /* Fill p_demux field */
-    if( p_sys->b_file_out )
+        /* Determine how many packets to read. */
+        int bufsize = var_CreateGetInteger( p_demux, "ts-dump-size" );
+        p_sys->i_ts_read = (int) (bufsize / p_sys->i_packet_size);
+        if( p_sys->i_ts_read <= 0 )
+        {
+            p_sys->i_ts_read = 1500 / p_sys->i_packet_size;
+        }
+        p_sys->buffer = xmalloc( p_sys->i_packet_size * p_sys->i_ts_read );
+        msg_Info( p_demux, "%s raw stream to file `%s' reading packets %d",
+                  b_append ? "appending" : "dumping", p_sys->psz_file,
+                  p_sys->i_ts_read );
         p_demux->pf_demux = DemuxFile;
+    }
     else
         p_demux->pf_demux = Demux;
     p_demux->pf_control = Control;
@@ -709,7 +707,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->b_es_id_pid = var_CreateGetBool( p_demux, "ts-es-id-pid" );
 
     char* psz_string = var_CreateGetString( p_demux, "ts-out" );
-    if( psz_string && *psz_string && !p_sys->b_file_out )
+    if( psz_string && *psz_string && !p_sys->p_file )
     {
         char *psz = strchr( psz_string, ':' );
         int   i_port = 0;
@@ -822,13 +820,14 @@ static int Open( vlc_object_t *p_this )
         p_sys->b_force_seek_per_percent = true;
     }
 
-    while( !p_sys->b_file_out && p_sys->i_pmt_es <= 0 &&
-           vlc_object_alive( p_demux ) )
+    if( p_sys->p_file != NULL )
+        return VLC_SUCCESS;
+
+    while( p_sys->i_pmt_es <= 0 && vlc_object_alive( p_demux ) )
     {
         if( p_demux->pf_demux( p_demux ) != 1 )
             break;
     }
-
 
     return VLC_SUCCESS;
 }
@@ -900,15 +899,12 @@ static void Close( vlc_object_t *p_this )
     free( p_sys->programs_list.p_values );
 
     /* If in dump mode, then close the file */
-    if( p_sys->b_file_out )
+    if( p_sys->p_file != NULL )
     {
         msg_Info( p_demux ,"closing %s (%"PRId64" KiB dumped)",
                   p_sys->psz_file, p_sys->i_write / 1024 );
-
         if( p_sys->p_file != stdout )
-        {
             fclose( p_sys->p_file );
-        }
     }
     /* When streaming, close the port */
     if( p_sys->fd > -1 )
@@ -1178,7 +1174,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     int64_t *pi64;
     int i_int;
 
-    if( p_sys->b_file_out )
+    if( p_sys->p_file != NULL )
         return demux_vaControlHelper( p_demux->s, 0, -1, 0, 1, i_query, args );
 
     switch( i_query )
