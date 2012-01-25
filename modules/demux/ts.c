@@ -120,19 +120,6 @@ static void Close ( vlc_object_t * );
     "The decryption routines subtract the TS-header from the value before " \
     "decrypting. " )
 
-#define TSDUMP_TEXT N_("Filename of dump")
-#define TSDUMP_LONGTEXT N_("Specify a filename where to dump the TS in.")
-
-#define APPEND_TEXT N_("Append")
-#define APPEND_LONGTEXT N_( \
-    "If the file exists and this option is selected, the existing file " \
-    "will not be overwritten." )
-
-#define DUMPSIZE_TEXT N_("Dump buffer size")
-#define DUMPSIZE_LONGTEXT N_( \
-    "Tweak the buffer size for reading and writing an integer number of packets. " \
-    "Specify the size of the buffer here and not the number of packets." )
-
 #define SPLIT_ES_TEXT N_("Separate sub-streams")
 #define SPLIT_ES_LONGTEXT N_( \
     "Separate teletex/dvbs pages into independent ES. " \
@@ -166,10 +153,6 @@ vlc_module_begin ()
 
     add_bool( "ts-silent", false, SILENT_TEXT, SILENT_LONGTEXT, true )
 
-    add_savefile( "ts-dump-file", NULL, TSDUMP_TEXT, TSDUMP_LONGTEXT, false )
-    add_bool( "ts-dump-append", false, APPEND_TEXT, APPEND_LONGTEXT, false )
-    add_integer( "ts-dump-size", 16384, DUMPSIZE_TEXT,
-                 DUMPSIZE_LONGTEXT, true )
     add_bool( "ts-split-es", true, SPLIT_ES_TEXT, SPLIT_ES_LONGTEXT, false )
     add_bool( "ts-seek-percent", false, SEEK_PERCENT_TEXT, SEEK_PERCENT_LONGTEXT, true )
 
@@ -388,15 +371,11 @@ struct demux_sys_t
     int         i_current_program;
     vlc_list_t  programs_list;
 
-    /* TS dump */
-    FILE        *p_file;    /* filehandle */
-
     /* */
     bool        b_start_record;
 };
 
 static int Demux    ( demux_t *p_demux );
-static int DemuxFile( demux_t *p_demux );
 static int Control( demux_t *p_demux, int i_query, va_list args );
 
 static void PIDInit ( ts_pid_t *pid, bool b_psi, ts_psi_t *p_owner );
@@ -581,46 +560,8 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_packet_size = i_packet_size;
     vlc_mutex_init( &p_sys->csa_lock );
 
-    /* Fill dump mode fields */
     p_sys->buffer = NULL;
-    p_sys->p_file = NULL;
-    char *psz_file = var_InheritString( p_demux, "ts-dump-file" );
-    if( psz_file != NULL )
-    {
-        if( !strcmp( psz_file, "-" ) )
-        {
-            msg_Info( p_demux, "dumping raw stream to standard output" );
-            p_sys->p_file = stdout;
-        }
-        else
-        {
-            bool b_append = var_InheritBool( p_demux, "ts-dump-append" );
-            p_sys->p_file = vlc_fopen( psz_file, b_append ? "ab" : "wb" );
-            if( p_sys->p_file == NULL )
-            {
-                msg_Err( p_demux, "cannot write to file `%s': %m", psz_file );
-                free( psz_file );
-                vlc_mutex_destroy( &p_sys->csa_lock );
-                free( p_sys );
-                return VLC_EGENERIC;
-            }
-        }
-
-        /* Determine how many packets to read. */
-        int bufsize = var_CreateGetInteger( p_demux, "ts-dump-size" );
-        p_sys->i_ts_read = (int) (bufsize / p_sys->i_packet_size);
-        if( p_sys->i_ts_read <= 0 )
-        {
-            p_sys->i_ts_read = 1500 / p_sys->i_packet_size;
-        }
-        p_sys->buffer = xmalloc( p_sys->i_packet_size * p_sys->i_ts_read );
-        msg_Info( p_demux, "writing raw stream to file `%s' reading packets %d",
-                  psz_file, p_sys->i_ts_read );
-        free( psz_file );
-        p_demux->pf_demux = DemuxFile;
-    }
-    else
-        p_demux->pf_demux = Demux;
+    p_demux->pf_demux = Demux;
     p_demux->pf_control = Control;
 
     /* Init p_sys field */
@@ -696,7 +637,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->b_es_id_pid = var_CreateGetBool( p_demux, "ts-es-id-pid" );
 
     char* psz_string = var_CreateGetString( p_demux, "ts-out" );
-    if( psz_string && *psz_string && !p_sys->p_file )
+    if( psz_string && *psz_string )
     {
         char *psz = strchr( psz_string, ':' );
         int   i_port = 0;
@@ -809,9 +750,6 @@ static int Open( vlc_object_t *p_this )
         p_sys->b_force_seek_per_percent = true;
     }
 
-    if( p_sys->p_file != NULL )
-        return VLC_SUCCESS;
-
     while( p_sys->i_pmt_es <= 0 && vlc_object_alive( p_demux ) )
     {
         if( p_demux->pf_demux( p_demux ) != 1 )
@@ -887,9 +825,6 @@ static void Close( vlc_object_t *p_this )
 
     free( p_sys->programs_list.p_values );
 
-    /* If in dump mode, then close the file */
-    if( p_sys->p_file != NULL && p_sys->p_file != stdout )
-       fclose( p_sys->p_file );
     /* When streaming, close the port */
     if( p_sys->fd > -1 )
     {
@@ -925,105 +860,6 @@ static int ChangeKeyCallback( vlc_object_t *p_this, char const *psz_cmd,
 
     vlc_mutex_unlock( &p_sys->csa_lock );
     return i_tmp;
-}
-
-/*****************************************************************************
- * DemuxFile:
- *****************************************************************************/
-static int DemuxFile( demux_t *p_demux )
-{
-    demux_sys_t *p_sys = p_demux->p_sys;
-    const int i_bufsize = p_sys->i_packet_size * p_sys->i_ts_read;
-    uint8_t   *p_buffer = p_sys->buffer; /* Put first on sync byte */
-    const int i_data = stream_Read( p_demux->s, p_sys->buffer, i_bufsize );
-
-    if( i_data <= 0 && i_data < p_sys->i_packet_size )
-    {
-        msg_Dbg( p_demux, "error reading malformed packets" );
-        return i_data;
-    }
-
-    /* Test continuity counter */
-    for( int i_pos = 0; i_pos < i_data;  )
-    {
-        if( p_sys->buffer[i_pos] != 0x47 )
-        {
-            msg_Warn( p_demux, "lost sync" );
-            while( vlc_object_alive (p_demux) && (i_pos < i_data) )
-            {
-                i_pos++;
-                if( p_sys->buffer[i_pos] == 0x47 )
-                    break;
-            }
-            if( vlc_object_alive (p_demux) )
-                msg_Warn( p_demux, "sync found" );
-        }
-
-        /* continuous when (one of this):
-         * diff == 1
-         * diff == 0 and payload == 0
-         * diff == 0 and duplicate packet (playload != 0) <- should we
-         *   test the content ?
-         */
-        const int i_cc  = p_buffer[i_pos+3]&0x0f;
-        const bool b_payload = p_buffer[i_pos+3]&0x10;
-        const bool b_adaptation = p_buffer[i_pos+3]&0x20;
-
-        /* Get the PID */
-        ts_pid_t *p_pid = &p_sys->pid[ ((p_buffer[i_pos+1]&0x1f)<<8)|p_buffer[i_pos+2] ];
-
-        /* Detect discontinuity indicator in adaptation field */
-        if( b_adaptation && p_buffer[i_pos + 4] > 0 )
-        {
-            if( p_buffer[i_pos+5]&0x80 )
-                msg_Warn( p_demux, "discontinuity indicator (pid=%d) ", p_pid->i_pid );
-            if( p_buffer[i_pos+5]&0x40 )
-                msg_Warn( p_demux, "random access indicator (pid=%d) ", p_pid->i_pid );
-        }
-
-        const int i_diff = ( i_cc - p_pid->i_cc )&0x0f;
-        if( b_payload && i_diff == 1 )
-        {
-            p_pid->i_cc = ( p_pid->i_cc + 1 ) & 0xf;
-        }
-        else
-        {
-            if( p_pid->i_cc == 0xff )
-            {
-                msg_Warn( p_demux, "first packet for pid=%d cc=0x%x",
-                        p_pid->i_pid, i_cc );
-                p_pid->i_cc = i_cc;
-            }
-            else if( i_diff != 0 )
-            {
-                /* FIXME what to do when discontinuity_indicator is set ? */
-                msg_Warn( p_demux, "transport error detected 0x%x instead of 0x%x",
-                          i_cc, ( p_pid->i_cc + 1 )&0x0f );
-
-                p_pid->i_cc = i_cc;
-                /* Mark transport error in the TS packet. */
-                p_buffer[i_pos+1] |= 0x80;
-            }
-        }
-
-        /* Test if user wants to decrypt it first */
-        if( p_sys->csa )
-        {
-            vlc_mutex_lock( &p_sys->csa_lock );
-            csa_Decrypt( p_demux->p_sys->csa, &p_buffer[i_pos], p_demux->p_sys->i_csa_pkt_size );
-            vlc_mutex_unlock( &p_sys->csa_lock );
-        }
-
-        i_pos += p_sys->i_packet_size;
-    }
-
-    /* Then write */
-    if( fwrite( p_sys->buffer, 1, i_data, p_sys->p_file ) < 0 )
-    {
-        msg_Err( p_demux, "failed to write data: %m" );
-        return -1;
-    }
-    return 1;
 }
 
 /*****************************************************************************
@@ -1153,9 +989,6 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     int64_t i64;
     int64_t *pi64;
     int i_int;
-
-    if( p_sys->p_file != NULL )
-        return demux_vaControlHelper( p_demux->s, 0, -1, 0, 1, i_query, args );
 
     switch( i_query )
     {
