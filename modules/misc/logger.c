@@ -193,6 +193,7 @@ static int Open( vlc_object_t *p_this )
     if( p_sys == NULL )
         return VLC_ENOMEM;
 
+    p_sys->p_file = NULL;
     msg_callback_t cb = TextPrint;
     const char *filename = LOG_FILE_TEXT, *header = TEXT_HEADER;
     p_sys->footer = TEXT_FOOTER;
@@ -318,6 +319,7 @@ static void Close( vlc_object_t *p_this )
         closelog();
     else
 #endif
+    if( p_sys->p_file )
     {
         fputs( p_sys->footer, p_sys->p_file );
         fclose( p_sys->p_file );
