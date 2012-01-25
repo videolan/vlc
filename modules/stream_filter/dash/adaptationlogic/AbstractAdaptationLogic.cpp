@@ -47,11 +47,11 @@ void AbstractAdaptationLogic::downloadRateChanged    (long bpsAvg, long bpsLastC
     this->bpsAvg        = bpsAvg;
     this->bpsLastChunk  = bpsLastChunk;
 }
-long AbstractAdaptationLogic::getBpsAvg              ()
+long AbstractAdaptationLogic::getBpsAvg              () const
 {
     return this->bpsAvg;
 }
-long AbstractAdaptationLogic::getBpsLastChunk        ()
+long AbstractAdaptationLogic::getBpsLastChunk        () const
 {
     return this->bpsLastChunk;
 }

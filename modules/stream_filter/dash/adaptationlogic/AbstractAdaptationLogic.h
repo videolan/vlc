@@ -47,8 +47,8 @@ namespace dash
 
                 virtual void                downloadRateChanged     (long bpsAvg, long bpsLastChunk);
 
-                long                        getBpsAvg               ();
-                long                        getBpsLastChunk         ();
+                long                        getBpsAvg               () const;
+                long                        getBpsLastChunk         () const;
 
             private:
                 int                     bpsAvg;

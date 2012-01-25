@@ -46,7 +46,11 @@ namespace dash
                 };
 
                 virtual dash::http::Chunk*  getNextChunk() throw(dash::exception::EOFException) = 0;
-
+                /**
+                 *  \return     The average bitrate in Bytes per second.
+                 */
+                virtual long                    getBpsAvg               () const = 0;
+                virtual long                    getBpsLastChunk         () const = 0;
         };
     }
 }
