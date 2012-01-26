@@ -24,7 +24,7 @@
  *****************************************************************************/
 
 #include "demux.hpp"
-
+#include "stream_io_callback.hpp"
 #include "Ebml_parser.hpp"
 
 event_thread_t::event_thread_t(demux_t *p_demux) : p_demux(p_demux)
@@ -463,7 +463,8 @@ matroska_stream_c *demux_sys_t::AnalyseAllSegmentsFound( demux_t *p_demux, EbmlS
     bool b_keep_stream = false, b_keep_segment = false;
 
     // verify the EBML Header
-    p_l0 = p_estream->FindNextID(EBML_INFO(EbmlHead), 0xFFFFFFFFL);
+    vlc_stream_io_callback & io_stream = (vlc_stream_io_callback &) p_estream->I_O();
+    p_l0 = p_estream->FindNextID(EBML_INFO(EbmlHead), io_stream.toRead());
     if (p_l0 == NULL)
     {
         msg_Err( p_demux, "No EBML header found" );
@@ -491,7 +492,7 @@ matroska_stream_c *demux_sys_t::AnalyseAllSegmentsFound( demux_t *p_demux, EbmlS
 
 
     // find all segments in this file
-    p_l0 = p_estream->FindNextID(EBML_INFO(KaxSegment), 0xFFFFFFFFFLL);
+    p_l0 = p_estream->FindNextID(EBML_INFO(KaxSegment), io_stream.toRead());
     if (p_l0 == NULL)
     {
         return NULL;
@@ -565,7 +566,7 @@ matroska_stream_c *demux_sys_t::AnalyseAllSegmentsFound( demux_t *p_demux, EbmlS
         if (p_l0->IsFiniteSize() )
         {
             p_l0->SkipData(*p_estream, KaxMatroska_Context);
-            p_l0 = p_estream->FindNextID(EBML_INFO(KaxSegment), 0xFFFFFFFFL);
+            p_l0 = p_estream->FindNextID(EBML_INFO(KaxSegment), io_stream.toRead());
         }
         else
         {
