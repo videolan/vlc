@@ -262,12 +262,10 @@ void SeekSlider::mouseMoveEvent( QMouseEvent *event )
                     chapterLabel = points.at( i_selected ).name;
         }
 
+        QPoint target( event->globalX() - ( event->x() - posX ),
+                  QWidget::mapToGlobal( pos() ).y() );
         secstotimestr( psz_length, ( posX * inputLength ) / size().width() );
-        mTimeTooltip->setText( psz_length, chapterLabel );
-
-        QPoint p( event->globalX() - ( event->x() - posX ) - ( mTimeTooltip->width() / 2 ),
-                  QWidget::mapToGlobal( pos() ).y() - ( mTimeTooltip->height() + 2 ) );
-        mTimeTooltip->move( p );
+        mTimeTooltip->setTip( target, psz_length, chapterLabel );
     }
     event->accept();
 }

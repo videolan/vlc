@@ -26,6 +26,7 @@
 #include <QPainterPath>
 #include <QBitmap>
 #include <QFontMetrics>
+#include <QDesktopWidget>
 
 #define TIP_HEIGHT 5
 
@@ -51,29 +52,47 @@ TimeTooltip::TimeTooltip( QWidget *parent ) :
 
     // Inherit from the system default font size -5
     mFont = QFont( "Verdana", qMax( qApp->font().pointSize() - 5, 7 ) );
-    mPreviousMetricsWidth = 0;
+    mTipX = -1;
+}
 
-    // Set default text
-    setText( "00:00:00", "" );
+void TimeTooltip::adjustPosition()
+{
+    // Get the bounding box required to print the text and add some padding
+    QFontMetrics metrics( mFont );
+    QRect textbox = metrics.boundingRect( mDisplayedText );
+    textbox.adjust( -2, -2, 2, 2 );
+    textbox.moveTo( 0, 0 );
+
+    // Resize the widget to fit our needs
+    QSize size( textbox.width() + 1, textbox.height() + TIP_HEIGHT + 1 );
+
+    // The desired label position is just above the target
+    QPoint position( mTarget.x() - size.width() / 2,
+        mTarget.y() - size.height() + TIP_HEIGHT / 2 );
+
+    // Keep the tooltip on the same screen if possible
+    QRect screen = QApplication::desktop()->screenGeometry( mTarget );
+    position.setX( qMax( screen.left(), qMin( position.x(),
+        screen.left() + screen.width() - size.width() ) ) );
+    position.setY( qMax( screen.top(), qMin( position.y(),
+        screen.top() + screen.height() - size.height() ) ) );
+
+    move( position );
+
+    int tipX = mTarget.x() - position.x();
+    if( mBox != textbox || mTipX != tipX )
+    {
+        mBox = textbox;
+        mTipX = tipX;
+
+        resize( size );
+        buildPath();
+        setMask( mMask );
+    }
 }
 
 void TimeTooltip::buildPath()
 {
-    QFontMetrics metrics( mFont );
-
-    // Get the bounding box required to print the text and add some padding
-    QRect textbox = metrics.boundingRect( mDisplayedText ).adjusted( -2, -2, 2, 2 );
-
-    if ( mPreviousMetricsWidth == textbox.width() )
-        return; //same width == same path
-    else
-        mPreviousMetricsWidth = textbox.width();
-
-    mBox = QRect( 0, 0, textbox.width(), textbox.height() );
-
-    // Resize the widget to fit our needs
-    resize( mBox.width() + 1, mBox.height() + TIP_HEIGHT + 1 );
-
     // Prepare the painter path for future use so
     // we only have to generate the text at runtime.
 
@@ -82,12 +101,10 @@ void TimeTooltip::buildPath()
     mPainterPath.addRect( mBox );
 
     // Draw the tip
-    int center = mBox.width() / 2;
     QPolygon polygon;
-    polygon << QPoint( center - 3,   mBox.height() )
-            << QPoint( center,       mBox.height() + TIP_HEIGHT )
-            << QPoint( center + 3,   mBox.height() );
-
+    polygon << QPoint( qMax( 0, mTipX - 3 ), mBox.height() )
+            << QPoint( mTipX, mBox.height() + TIP_HEIGHT )
+            << QPoint( qMin( mTipX + 3, mBox.width() ), mBox.height() );
     mPainterPath.addPolygon( polygon );
 
     // Store the simplified version of the path
@@ -98,25 +115,26 @@ void TimeTooltip::buildPath()
     mMask = QBitmap( size() );
     QPainter painter( &mMask );
     painter.fillRect( mMask.rect(), Qt::white );
-    painter.setPen( QColor( 0, 0, 0 ) );
-    painter.setBrush( QColor( 0, 0, 0 ) );
+    painter.setPen( Qt::black );
+    painter.setBrush( Qt::black );
     painter.drawPath( mPainterPath );
     painter.end();
-
-    setMask( mMask );
 }
 
-void TimeTooltip::setText( const QString& time, const QString& text )
+void TimeTooltip::setTip( const QPoint& target, const QString& time, const QString& text )
 {
     mDisplayedText = time;
     if ( !text.isEmpty() )
         mDisplayedText.append( " - " ).append( text );
 
-    if ( time.length() != mTime.length() || mText != text )
-        buildPath();
+    if( mTarget != target || time.length() != mTime.length() || mText != text )
+    {
+        mTarget = target;
+        mTime = time;
+        mText = text;
+        adjustPosition();
+    }
 
-    mTime = time;
-    mText = text;
     update();
 }
 
@@ -133,5 +151,3 @@ void TimeTooltip::paintEvent( QPaintEvent * )
     p.setPen( QPen( qApp->palette().text(), 1 ) );
     p.drawText( mBox, Qt::AlignCenter, mDisplayedText );
 }
-
-#undef TIP_HEIGHT
