@@ -710,14 +710,20 @@ void matroska_segment_c::ParseInfo( KaxInfo *info )
         else if( MKV_IS_ID( l, KaxPrevUID ) )
         {
             if ( p_prev_segment_uid == NULL )
+            {
                 p_prev_segment_uid = new KaxPrevUID(*static_cast<KaxPrevUID*>(l));
+                b_ref_external_segments = true;
+            }
 
             msg_Dbg( &sys.demuxer, "|   |   + PrevUID=%d", *(uint32*)p_prev_segment_uid->GetBuffer() );
         }
         else if( MKV_IS_ID( l, KaxNextUID ) )
         {
             if ( p_next_segment_uid == NULL )
+            {
                 p_next_segment_uid = new KaxNextUID(*static_cast<KaxNextUID*>(l));
+                b_ref_external_segments = true;
+            }
 
             msg_Dbg( &sys.demuxer, "|   |   + NextUID=%d", *(uint32*)p_next_segment_uid->GetBuffer() );
         }
@@ -860,6 +866,7 @@ void matroska_segment_c::ParseChapterAtom( int i_level, KaxChapterAtom *ca, chap
         else if( MKV_IS_ID( l, KaxChapterSegmentUID ) )
         {
             chapters.p_segment_uid = new KaxChapterSegmentUID( *static_cast<KaxChapterSegmentUID*>(l) );
+            b_ref_external_segments = true;
             msg_Dbg( &sys.demuxer, "|   |   |   |   + ChapterSegmentUID= %u", *(uint32*)chapters.p_segment_uid->GetBuffer() );
         }
         else if( MKV_IS_ID( l, KaxChapterSegmentEditionUID ) )

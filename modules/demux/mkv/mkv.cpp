@@ -58,7 +58,7 @@ vlc_module_begin ()
             N_("Chapter codecs"),
             N_("Use chapter codecs found in the segment."), true );
 
-    add_bool( "mkv-preload-local-dir", false,
+    add_bool( "mkv-preload-local-dir", true,
             N_("Preload MKV files in the same directory"),
             N_("Preload matroska files in the same directory to find linked segments (not good for broken files)."), false );
 
@@ -92,6 +92,7 @@ static int Open( vlc_object_t * p_this )
     std::string         s_path, s_filename;
     vlc_stream_io_callback *p_io_callback;
     EbmlStream         *p_io_stream;
+    bool                b_need_preload = false;
 
     /* peek the begining */
     if( stream_Peek( p_demux->s, &p_peek, 4 ) < 4 ) return VLC_EGENERIC;
@@ -130,6 +131,7 @@ static int Open( vlc_object_t * p_this )
     for (size_t i=0; i<p_stream->segments.size(); i++)
     {
         p_stream->segments[i]->Preload();
+        b_need_preload |= p_stream->segments[i]->b_ref_external_segments;
     }
 
     p_segment = p_stream->segments[0];
@@ -139,8 +141,9 @@ static int Open( vlc_object_t * p_this )
         goto error;
     }
 
-    if (var_InheritBool( p_demux, "mkv-preload-local-dir" ))
+    if (b_need_preload && var_InheritBool( p_demux, "mkv-preload-local-dir" ))
     {
+        msg_Dbg( p_demux, "Preloading local dir" );
         /* get the files from the same dir from the same family (based on p_demux->psz_path) */
         if ( p_demux->psz_file && !strcmp( p_demux->psz_access, "file" ) )
         {
@@ -233,6 +236,8 @@ static int Open( vlc_object_t * p_this )
 
         p_sys->PreloadFamily( *p_segment );
     }
+    else if (b_need_preload)
+        msg_Warn( p_demux, "This file references other files, you may want to enable the preload of local directory");
 
     if ( !p_sys->PreloadLinked() ||
          !p_sys->PreparePlayback( NULL ) )

@@ -97,6 +97,7 @@ public:
     demux_sys_t                    & sys;
     EbmlParser                     *ep;
     bool                           b_preloaded;
+    bool                           b_ref_external_segments;
 
     bool Preload();
     bool PreloadFamily( const matroska_segment_c & segment );

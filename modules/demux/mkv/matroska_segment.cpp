@@ -76,6 +76,7 @@ matroska_segment_c::matroska_segment_c( demux_sys_t & demuxer, EbmlStream & estr
     ,sys(demuxer)
     ,ep(NULL)
     ,b_preloaded(false)
+    ,b_ref_external_segments(false)
 {
     p_indexes = (mkv_index_t*)malloc( sizeof( mkv_index_t ) * i_index_max );
 }
