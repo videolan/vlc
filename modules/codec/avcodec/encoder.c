@@ -607,6 +607,8 @@ int OpenEncoder( vlc_object_t *p_this )
                                     SAMPLE_FMT_S16;
         p_enc->fmt_in.i_codec  = VLC_CODEC_S16N;
         p_context->sample_rate = p_enc->fmt_out.audio.i_rate;
+        p_context->time_base.num = 1;
+        p_context->time_base.den = p_context->sample_rate;
         p_context->channels    = p_enc->fmt_out.audio.i_channels;
 
         if ( p_enc->fmt_out.i_codec == VLC_CODEC_MP4A )

@@ -382,6 +382,8 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
         }
 
         id->ff_enc_c->sample_rate = p_fmt->audio.i_rate;
+        id->ff_enc_c->time_base.num = 1;
+        id->ff_enc_c->time_base.den = p_fmt->audio.i_rate;
         id->ff_enc_c->channels    = p_fmt->audio.i_channels;
         id->ff_enc_c->bit_rate    = p_fmt->i_bitrate;
 
