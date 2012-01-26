@@ -244,8 +244,6 @@ void SeekSlider::mouseMoveEvent( QMouseEvent *event )
         int posX = qMax( rect().left(), qMin( rect().right(), event->x() ) );
 
         QString chapterLabel;
-        QPoint p( event->globalX() - ( event->x() - posX ) - ( mTimeTooltip->width() / 2 ),
-                  QWidget::mapToGlobal( pos() ).y() - ( mTimeTooltip->height() + 2 ) );
 
         if ( orientation() == Qt::Horizontal ) /* TODO: vertical */
         {
@@ -266,6 +264,9 @@ void SeekSlider::mouseMoveEvent( QMouseEvent *event )
 
         secstotimestr( psz_length, ( posX * inputLength ) / size().width() );
         mTimeTooltip->setText( psz_length, chapterLabel );
+
+        QPoint p( event->globalX() - ( event->x() - posX ) - ( mTimeTooltip->width() / 2 ),
+                  QWidget::mapToGlobal( pos() ).y() - ( mTimeTooltip->height() + 2 ) );
         mTimeTooltip->move( p );
     }
     event->accept();
