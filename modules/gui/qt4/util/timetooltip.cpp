@@ -109,7 +109,8 @@ void TimeTooltip::buildPath()
 void TimeTooltip::setText( const QString& time, const QString& text )
 {
     mDisplayedText = time;
-    if ( !mText.isEmpty() ) mDisplayedText.append( " - " + text );
+    if ( !text.isEmpty() )
+        mDisplayedText.append( " - " ).append( text );
 
     if ( time.length() != mTime.length() || mText != text )
         buildPath();
