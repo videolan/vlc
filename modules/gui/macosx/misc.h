@@ -134,6 +134,8 @@
 
 @interface ITSlider : NSSlider
 {
+    NSImage *img;
+    NSRect image_rect;
 }
 
 - (void)drawRect:(NSRect)rect;

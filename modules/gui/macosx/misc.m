@@ -603,7 +603,10 @@ void _drawFrameInRect(NSRect frameRect)
 
 - (void)awakeFromNib
 {
-    o_knob_img = [NSImage imageNamed:@"progression-knob"];
+    if (config_GetInt( VLCIntf, "macosx-interfacestyle" ))
+        o_knob_img = [NSImage imageNamed:@"progression-knob_dark"];
+    else
+        o_knob_img = [NSImage imageNamed:@"progression-knob"];
     img_rect.size = [o_knob_img size];
     img_rect.origin.x = img_rect.origin.y = 0;
 }
@@ -650,13 +653,25 @@ void _drawFrameInRect(NSRect frameRect)
 
 @implementation ITSlider
 
-- (void)drawKnobInRect:(NSRect)knobRect
+- (void)awakeFromNib
 {
-    NSRect image_rect;
-    NSImage *img = [NSImage imageNamed:@"volume-slider-knob"];
+    BOOL b_dark = config_GetInt( VLCIntf, "macosx-interfacestyle" );
+    if (b_dark)
+        img = [NSImage imageNamed:@"volume-slider-knob_dark"];
+    else
+        img = [NSImage imageNamed:@"volume-slider-knob"];
+
     image_rect.size = [img size];
     image_rect.origin.x = 0;
-    image_rect.origin.y = 0;
+
+    if (b_dark)
+        image_rect.origin.y = -1;
+    else
+        image_rect.origin.y = 0;
+}
+
+- (void)drawKnobInRect:(NSRect)knobRect
+{
     knobRect.origin.x += (knobRect.size.width - image_rect.size.width) / 2;
     knobRect.size.width = image_rect.size.width;
     knobRect.size.height = image_rect.size.height;
