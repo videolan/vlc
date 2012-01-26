@@ -49,9 +49,9 @@ namespace dash
                 void                setId                   ( const std::string &id );
                 /*
                  *  @return The bitrate required for this representation
-                 *          in Bytes per seconds.
+                 *          in bits per seconds.
                  *          Will be a valid value, as the parser refuses Representation
-                 *          without bandwith.
+                 *          without bandwidth.
                  */
                 int                 getBandwidth            () const;
                 void                setBandwidth            ( int bandwidth );

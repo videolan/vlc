@@ -209,7 +209,7 @@ static int  Control         (stream_t *p_stream, int i_query, va_list args)
                 if ( rep == NULL )
                     *res = 0;
                 else
-                    *res = p_sys->p_mpd->getDuration() * rep->getBandwidth();
+                    *res = p_sys->p_mpd->getDuration() * rep->getBandwidth() / 8;
             }
             break;
         }
