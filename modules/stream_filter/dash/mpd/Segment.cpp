@@ -26,6 +26,9 @@
 #endif
 
 #include "Segment.h"
+#include "Representation.h"
+
+#include <cassert>
 
 using namespace dash::mpd;
 using namespace dash::http;
@@ -35,6 +38,11 @@ Segment::Segment(const Representation *parent) :
         endByte    (-1),
         parentRepresentation( parent )
 {
+    assert( parent != NULL );
+    if ( parent->getSegmentInfo() != NULL && parent->getSegmentInfo()->getDuration() >= 0 )
+        this->size = parent->getBandwidth() * parent->getSegmentInfo()->getDuration();
+    else
+        this->size = -1;
 }
 
 std::string             Segment::getSourceUrl   () const
@@ -111,4 +119,9 @@ dash::http::Chunk*      Segment::toChunk        ()
 const Representation *Segment::getParentRepresentation() const
 {
     return this->parentRepresentation;
+}
+
+int Segment::getSize() const
+{
+    return this->size;
 }

@@ -57,6 +57,7 @@ namespace dash
                 virtual int                             getEndByte      () const;
                 virtual dash::http::Chunk*              toChunk         ();
                 const Representation*                   getParentRepresentation() const;
+                virtual int                             getSize() const;
 
             protected:
                 std::string             sourceUrl;
@@ -64,6 +65,7 @@ namespace dash
                 int                     startByte;
                 int                     endByte;
                 const Representation*   parentRepresentation;
+                int                     size;
         };
     }
 }
