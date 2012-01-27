@@ -23,6 +23,10 @@ LIVE_TARGET := mingw
 endif
 ifdef HAVE_MACOSX
 LIVE_TARGET := macosx
+else
+ifdef HAVE_BSD
+LIVE_TARGET := freebsd
+endif
 endif
 
 live555: $(LIVE555_FILE) .sum-live555
