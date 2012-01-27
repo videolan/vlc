@@ -24,11 +24,11 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <ctype.h>
-
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
+
+#include <ctype.h>
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
