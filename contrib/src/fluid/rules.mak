@@ -33,6 +33,7 @@ endif
 ifneq ($(FLUID_VERSION),1.0.9)
 	$(APPLY) $(SRC)/fluid/fluid-pkg-static.patch
 endif
+	cd $(UNPACK_DIR)/m4/ && rm -f libtool.m4 lt*m4 # 1.1.3 ships symlinks to /usr/share/aclocal
 	$(MOVE)
 
 FLUIDCONF := $(HOSTCONF) \
