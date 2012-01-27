@@ -12,7 +12,6 @@ FFMPEGCONF = \
 	--disable-debug \
 	--enable-gpl \
 	--enable-postproc \
-	--disable-avconv \
 	--disable-devices \
 	--disable-avfilter
 
