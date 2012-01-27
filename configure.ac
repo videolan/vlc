@@ -663,17 +663,9 @@ if test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"; then
   ])
 fi # end "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"
 
-dnl Check for misc headers
-AC_MSG_CHECKING(for strncasecmp in strings.h)
-AC_EGREP_HEADER(strncasecmp,strings.h,[
-  AC_MSG_RESULT(yes)
-  AC_DEFINE(STRNCASECMP_IN_STRINGS_H, 1,
-            Define if <strings.h> defines strncasecmp.)],[
-  AC_MSG_RESULT(no)])
-
 dnl Check for headers
 AC_CHECK_HEADERS([search.h])
-AC_CHECK_HEADERS(getopt.h strings.h locale.h xlocale.h)
+AC_CHECK_HEADERS(getopt.h locale.h xlocale.h)
 AC_CHECK_HEADERS(fcntl.h sys/time.h sys/ioctl.h sys/stat.h)
 AC_CHECK_HEADERS([arpa/inet.h netinet/udplite.h sys/eventfd.h])
 AC_CHECK_HEADERS([net/if.h], [], [],
