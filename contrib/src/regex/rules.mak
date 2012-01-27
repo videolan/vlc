@@ -18,6 +18,6 @@ regex: regex-$(REGEX_VERSION).tar.gz .sum-regex
 
 .regex: regex
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF)
-	cd $< && make subirs=
+	cd $< && $(MAKE) subirs=
 	cd $< && $(AR) rcvu libregex.a regex.o && $(RANLIB) libregex.a && cp -v regex.h $(PREFIX)/include && cp -v libregex.a $(PREFIX)/lib
 	touch $@

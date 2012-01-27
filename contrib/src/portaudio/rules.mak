@@ -22,5 +22,5 @@ portaudio: portaudio-$(PORTAUDIO_VERSION).tar.gz .sum-portaudio
 
 .portaudio: portaudio
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF)
-	cd $< && make && make install
+	cd $< && $(MAKE) && $(MAKE) install
 	touch $@

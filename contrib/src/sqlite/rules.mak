@@ -20,5 +20,5 @@ sqlite: sqlite-$(SQLITE_VERSION).tar.gz .sum-sqlite
 
 .sqlite: sqlite
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF)
-	cd $< && make && make install
+	cd $< && $(MAKE) && $(MAKE) install
 	touch $@
