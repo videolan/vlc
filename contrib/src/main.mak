@@ -184,6 +184,11 @@ download = rm -f $@.tmp && \
 	wget --passive -c -p -O $@.tmp "$(1)" && \
 	touch $@.tmp && \
 	mv $@.tmp $@
+else ifeq ($(which fetch >/dev/null 2>&1 || echo FAIL),)
+download = rm -f $@.tmp && \
+	fetch -p -o $@.tmp "$(1)" && \
+	touch $@.tmp && \
+	mv $@.tmp $@
 else
 download = $(error Neither curl nor wget found!)
 endif
