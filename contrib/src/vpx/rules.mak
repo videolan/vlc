@@ -8,12 +8,19 @@ $(TARBALLS)/libvpx-$(VPX_VERSION).tar.bz2:
 
 .sum-vpx: libvpx-$(VPX_VERSION).tar.bz2
 
+ifneq ($(which bash),/bin/bash)
+PATCH_BASH_LOCATION=sed -i.orig s,^\#!/bin/bash,\#!`which bash`,g `grep -Rl ^\#!/bin/bash libvpx-$(VPX_VERSION)`
+else
+PATCH_BASH_LOCATION=true #bash is in /bin
+endif
+
 libvpx: libvpx-$(VPX_VERSION).tar.bz2 .sum-vpx
 	$(UNPACK)
 	$(APPLY) $(SRC)/vpx/libvpx-no-cross.patch
 	$(APPLY) $(SRC)/vpx/libvpx-no-abi.patch
 	$(APPLY) $(SRC)/vpx/libvpx-win64.patch
 	$(APPLY) $(SRC)/vpx/libvpx-darwin10.patch
+	$(PATCH_BASH_LOCATION)
 	$(MOVE)
 
 DEPS_vpx =
@@ -58,6 +65,8 @@ else ifdef HAVE_WIN64 # must be before WIN32
 VPX_OS := win64
 else ifdef HAVE_WIN32
 VPX_OS := win32
+else ifdef HAVE_BSD
+VPX_OS := linux
 endif
 
 VPX_TARGET := generic-gnu
