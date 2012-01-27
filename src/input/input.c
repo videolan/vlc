@@ -34,6 +34,9 @@
 #include <limits.h>
 #include <assert.h>
 #include <errno.h>
+#ifdef HAVE_SYS_STAT_H
+#   include <sys/stat.h>
+#endif
 
 #include "input_internal.h"
 #include "event.h"
@@ -54,10 +57,6 @@
 #include <vlc_fs.h>
 #include <vlc_strings.h>
 #include <vlc_modules.h>
-
-#ifdef HAVE_SYS_STAT_H
-#   include <sys/stat.h>
-#endif
 
 /*****************************************************************************
  * Local prototypes

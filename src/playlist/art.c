@@ -27,6 +27,10 @@
 #endif
 
 #include <assert.h>
+#ifdef HAVE_SYS_STAT_H
+#   include <sys/stat.h>
+#endif
+
 #include <vlc_common.h>
 #include <vlc_playlist.h>
 #include <vlc_fs.h>
@@ -34,10 +38,6 @@
 #include <vlc_stream.h>
 #include <vlc_url.h>
 #include <vlc_md5.h>
-
-#ifdef HAVE_SYS_STAT_H
-#   include <sys/stat.h>
-#endif
 
 #include "../libvlc.h"
 #include "playlist_internal.h"

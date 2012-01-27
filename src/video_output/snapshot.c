@@ -26,17 +26,17 @@
 # include "config.h"
 #endif
 
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <dirent.h>
+#include <time.h>
+
 #include <vlc_common.h>
 #include <vlc_fs.h>
 #include <vlc_strings.h>
 #include <vlc_block.h>
 
 #include "snapshot.h"
-
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <dirent.h>
-#include <time.h>
 
 /* */
 void vout_snapshot_Init(vout_snapshot_t *snap)

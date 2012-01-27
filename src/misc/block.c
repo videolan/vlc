@@ -28,7 +28,6 @@
 # include "config.h"
 #endif
 
-#include <vlc_common.h>
 #include <sys/stat.h>
 #include <assert.h>
 #include <errno.h>
@@ -36,7 +35,8 @@
 # include <unistd.h>
 #endif
 
-#include "vlc_block.h"
+#include <vlc_common.h>
+#include <vlc_block.h>
 
 /**
  * @section Block handling functions.

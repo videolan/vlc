@@ -30,18 +30,6 @@
 #endif
 
 #include <assert.h>
-#include <vlc_common.h>
-#include <vlc_plugin.h>
-#include <vlc_input.h>
-#include <vlc_access.h>
-#include <vlc_demux.h>
-#include <vlc_charset.h>
-#include <vlc_fs.h>
-#include <vlc_url.h>
-#include <vlc_vout.h>
-
-#include <vlc_dialog.h>
-
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
 #endif
@@ -54,6 +42,16 @@
 #endif
 #include <errno.h>
 
+#include <vlc_common.h>
+#include <vlc_plugin.h>
+#include <vlc_input.h>
+#include <vlc_access.h>
+#include <vlc_demux.h>
+#include <vlc_charset.h>
+#include <vlc_fs.h>
+#include <vlc_url.h>
+#include <vlc_vout.h>
+#include <vlc_dialog.h>
 #include <vlc_keys.h>
 #include <vlc_iso_lang.h>
 

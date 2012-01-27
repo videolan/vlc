@@ -24,30 +24,24 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#ifndef  _GNU_SOURCE
-#   define  _GNU_SOURCE
-#endif
-
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
+#include <errno.h>
 #ifdef WIN32
 #include <io.h>
 #endif
+#ifdef HAVE_POLL
+#include <poll.h>       /* poll structures and defines */
+#endif
+#include <sys/stat.h>
 
 #include <vlc_common.h>
 #include <vlc_network.h>
 #include <vlc_url.h>
 #include <vlc_fs.h>
 
-#ifdef HAVE_POLL
-#include <poll.h>       /* poll structures and defines */
-#endif
-
-#include <sys/stat.h>
-
-#include<errno.h>
 #include "../vlc.h"
 #include "../libs.h"
 

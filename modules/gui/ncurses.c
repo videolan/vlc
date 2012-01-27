@@ -34,11 +34,16 @@
 # include "config.h"
 #endif
 
+#define _XOPEN_SOURCE_EXTENDED 1
+
+#include <assert.h>
+#include <wchar.h>
+#ifdef HAVE_SYS_STAT_H
+#   include <sys/stat.h>
+#endif
+
 #include <vlc_common.h>
 #include <vlc_plugin.h>
-
-#define _XOPEN_SOURCE_EXTENDED 1
-#include <wchar.h>
 
 #include <ncurses.h>
 
@@ -52,12 +57,6 @@
 #include <vlc_meta.h>
 #include <vlc_fs.h>
 #include <vlc_url.h>
-
-#include <assert.h>
-
-#ifdef HAVE_SYS_STAT_H
-#   include <sys/stat.h>
-#endif
 
 /*****************************************************************************
  * Local prototypes.

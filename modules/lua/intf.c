@@ -24,18 +24,15 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#ifndef  _GNU_SOURCE
-#   define  _GNU_SOURCE
-#endif
-
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
-#include <vlc_common.h>
-#include <vlc_interface.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+
+#include <vlc_common.h>
+#include <vlc_interface.h>
 
 #include "vlc.h"
 #include "libs.h"

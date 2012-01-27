@@ -25,15 +25,12 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#ifndef  _GNU_SOURCE
-#   define  _GNU_SOURCE
-#endif
-
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
 #include <assert.h>
+#include <sys/stat.h>
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
@@ -43,7 +40,6 @@
 #include <vlc_aout.h>
 #include <vlc_services_discovery.h>
 #include <vlc_stream.h>
-#include <sys/stat.h>
 
 #include "vlc.h"
 

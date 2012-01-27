@@ -28,21 +28,21 @@
 # include "config.h"
 #endif
 
-#include <vlc_common.h>
-#include "libvlc.h"
-
-#include <stdlib.h>                                      /* free(), strtol() */
-#include <stdio.h>                                              /* sprintf() */
-#include <string.h>                                              /* strdup() */
-#include <vlc_plugin.h>
-#include <errno.h>
-
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
 #endif
 #include <assert.h>
+
+#include <vlc_common.h>
+#include "libvlc.h"
+
+#include <vlc_plugin.h>
+#include <errno.h>
 
 #include "config/configuration.h"
 

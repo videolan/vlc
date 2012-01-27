@@ -26,36 +26,29 @@
 # include "config.h"
 #endif
 
-#include <vlc_common.h>
-#include <vlc_md5.h>
-#include "libmp4.h"
-#include <vlc_fs.h>
-
+/* In Solaris (and perhaps others) PATH_MAX is in limits.h. */
+#include <limits.h>
 #ifdef WIN32
 #   include <io.h>
-#else
-#   include <stdio.h>
-#endif
-
-#include <errno.h>
-
-#ifdef WIN32
 #   if !defined( UNDER_CE )
 #       include <direct.h>
 #   endif
 #   include <tchar.h>
 #   include <shlobj.h>
 #   include <windows.h>
+#else
+#   include <stdio.h>
 #endif
-
+#include <errno.h>
+#include <sys/types.h>
 #ifdef HAVE_SYS_STAT_H
 #   include <sys/stat.h>
 #endif
-#include <sys/types.h>
 
-/* In Solaris (and perhaps others) PATH_MAX is in limits.h. */
-#include <limits.h>
-
+#include <vlc_common.h>
+#include <vlc_md5.h>
+#include "libmp4.h"
+#include <vlc_fs.h>
 #ifdef __APPLE__
 #include "TargetConditionals.h"
 #ifndef TARGET_OS_IPHONE

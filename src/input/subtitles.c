@@ -31,17 +31,15 @@
 # include "config.h"
 #endif
 
-#include <vlc_common.h>
-#include <vlc_fs.h>
-#include <vlc_url.h>
-
+#include <ctype.h> /* isalnum() */
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
 #endif
-
 #include <sys/stat.h>
 
-#include <ctype.h> /* isalnum */
+#include <vlc_common.h>
+#include <vlc_fs.h>
+#include <vlc_url.h>
 
 #include "input_internal.h"
 

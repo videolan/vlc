@@ -30,12 +30,6 @@
 # include "config.h"
 #endif
 
-#include <vlc_common.h>
-#include <vlc_plugin.h>
-#include <vlc_input.h>
-#include <vlc_access.h>
-#include <vlc_dialog.h>
-
 #include <assert.h>
 #include <errno.h>
 #include <sys/types.h>
@@ -45,10 +39,14 @@
 #ifdef HAVE_FCNTL_H
 #   include <fcntl.h>
 #endif
-
 #include <unistd.h>
 #include <poll.h>
 
+#include <vlc_common.h>
+#include <vlc_plugin.h>
+#include <vlc_input.h>
+#include <vlc_access.h>
+#include <vlc_dialog.h>
 #include <vlc_fs.h>
 
 #include "libmtp.h"

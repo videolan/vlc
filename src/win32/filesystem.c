@@ -28,11 +28,6 @@
 # include "config.h"
 #endif
 
-#include <vlc_common.h>
-#include <vlc_charset.h>
-#include <vlc_fs.h>
-#include "libvlc.h" /* vlc_mkdir */
-
 #include <assert.h>
 
 #include <stdio.h>
@@ -47,6 +42,11 @@
 #else
 # include <tchar.h>
 #endif
+
+#include <vlc_common.h>
+#include <vlc_charset.h>
+#include <vlc_fs.h>
+#include "libvlc.h" /* vlc_mkdir */
 
 static wchar_t *widen_path (const char *path)
 {

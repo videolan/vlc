@@ -25,26 +25,26 @@
 # include "config.h"
 #endif
 
-#include <vlc_common.h>
-#include <vlc_charset.h>
-#include <vlc_fs.h>
-#include "libvlc.h" /* vlc_mkdir */
-
 #include <assert.h>
 
 #include <stdio.h>
 #include <limits.h> /* NAME_MAX */
 #include <errno.h>
+
 #include <sys/types.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/stat.h>
+#ifndef HAVE_LSTAT
+# define lstat(a, b) stat(a, b)
+#endif
 #include <dirent.h>
 #include <sys/socket.h>
 
-#ifndef HAVE_LSTAT
-# define lstat( a, b ) stat(a, b)
-#endif
+#include <vlc_common.h>
+#include <vlc_charset.h>
+#include <vlc_fs.h>
+#include "libvlc.h" /* vlc_mkdir */
 
 /**
  * Opens a system file handle.

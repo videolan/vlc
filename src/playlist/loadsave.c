@@ -24,6 +24,10 @@
 # include "config.h"
 #endif
 
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+
 #include <vlc_common.h>
 #include <vlc_playlist.h>
 #include <vlc_events.h>
@@ -32,10 +36,6 @@
 #include <vlc_fs.h>
 #include <vlc_url.h>
 #include <vlc_modules.h>
-
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
 
 int playlist_Export( playlist_t * p_playlist, const char *psz_filename,
                      playlist_item_t *p_export_root, const char *psz_type )

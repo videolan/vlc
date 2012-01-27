@@ -29,14 +29,13 @@
 # include "config.h"
 #endif
 
+#include <sys/stat.h>
+
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_url.h>
 #include <vlc_fs.h>
 #include <vlc_services_discovery.h>
-
-#include <sys/stat.h>
-
 
 /*****************************************************************************
  * Module descriptor

@@ -26,6 +26,16 @@
 # include "config.h"
 #endif
 
+#ifdef HAVE_FCNTL_H
+#   include <fcntl.h>
+#endif
+#ifdef HAVE_SYS_STAT_H
+#   include <sys/stat.h>
+#endif
+#ifdef HAVE_UNISTD_H
+#   include <unistd.h>
+#endif
+
 #include <vlc_common.h>
 #include <vlc_fs.h>
 
@@ -36,16 +46,6 @@
 #include "../src/os_factory.hpp"
 #include "../src/vlcproc.hpp"
 #include "../src/window_manager.hpp"
-
-#ifdef HAVE_FCNTL_H
-#   include <fcntl.h>
-#endif
-#ifdef HAVE_SYS_STAT_H
-#   include <sys/stat.h>
-#endif
-#ifdef HAVE_UNISTD_H
-#   include <unistd.h>
-#endif
 
 #if defined( HAVE_ZLIB_H )
 #   include <zlib.h>

@@ -34,16 +34,9 @@
 #   define INCL_DOSDEVIOCTL
 #endif
 
-#include <vlc_common.h>
-#include <vlc_access.h>
-#include <vlc_charset.h>
-#include <vlc_fs.h>
-#include <limits.h>
-
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
 #endif
-
 #include <sys/types.h>
 #ifdef HAVE_SYS_STAT_H
 #   include <sys/stat.h>
@@ -54,6 +47,12 @@
 #ifdef HAVE_ARPA_INET_H
 #   include <arpa/inet.h>
 #endif
+
+#include <vlc_common.h>
+#include <vlc_access.h>
+#include <vlc_charset.h>
+#include <vlc_fs.h>
+#include <limits.h>
 
 #if defined( SYS_BSDI )
 #   include <dvd.h>

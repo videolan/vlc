@@ -28,11 +28,7 @@
 # include "config.h"
 #endif
 
-#include <vlc_common.h>
-#include <vlc_fs.h>
-#include <vlc_plugin.h>
-#include <vlc_access.h>
-
+#include <errno.h>
 #ifdef WIN32
 #   ifdef HAVE_FCNTL_H
 #       include <fcntl.h>
@@ -50,7 +46,10 @@
 #   include <libsmbclient.h>
 #endif
 
-#include <errno.h>
+#include <vlc_common.h>
+#include <vlc_fs.h>
+#include <vlc_plugin.h>
+#include <vlc_access.h>
 
 /*****************************************************************************
  * Module descriptor

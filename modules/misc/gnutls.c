@@ -26,13 +26,11 @@
 # include "config.h"
 #endif
 
-#include <vlc_common.h>
-#include <vlc_plugin.h>
 #include <errno.h>
 #include <time.h>
-
 #include <sys/types.h>
 #include <errno.h>
+
 #ifdef HAVE_SYS_STAT_H
 # include <sys/stat.h>
 #endif
@@ -42,9 +40,10 @@
 #else
 # include <unistd.h>
 #endif
-# include <fcntl.h>
+#include <fcntl.h>
 
-
+#include <vlc_common.h>
+#include <vlc_plugin.h>
 #include <vlc_tls.h>
 #include <vlc_charset.h>
 #include <vlc_fs.h>

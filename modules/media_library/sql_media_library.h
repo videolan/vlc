@@ -28,17 +28,16 @@
 #ifndef SQL_MEDIA_LIBRARY_H
 #define SQL_MEDIA_LIBRARY_H
 
-
-#ifdef HAVE_CONFIG_H
-# include "config.h"
+#include <stdarg.h>
+#include <assert.h>
+#include <errno.h>
+#ifdef HAVE_SYS_STAT_H
+#   include <sys/stat.h>
 #endif
 
 #include <vlc_common.h>
-#include <vlc/vlc.h>
-
 #include <vlc_sql.h>
 #include <vlc_media_library.h>
-
 #include <vlc_playlist.h>
 #include <vlc_input.h>
 #include <vlc_arrays.h>
@@ -47,16 +46,7 @@
 #include <vlc_interface.h>
 #include <vlc_modules.h>
 
-#include <stdarg.h>
-#include <assert.h>
-#include <errno.h>
-
 #include "item_list.h"
-
-#ifdef HAVE_SYS_STAT_H
-#   include <sys/stat.h>
-#endif
-
 
 /*****************************************************************************
  * Static parameters

@@ -27,12 +27,6 @@
 # include "config.h"
 #endif
 
-#include <vlc_common.h>
-#include "fs.h"
-#include <vlc_input.h>
-#include <vlc_access.h>
-#include <vlc_dialog.h>
-
 #include <assert.h>
 #include <errno.h>
 #include <sys/types.h>
@@ -58,7 +52,6 @@
 #   include <io.h>
 #   include <ctype.h>
 #   include <shlwapi.h>
-#   include <vlc_charset.h>
 #else
 #   include <unistd.h>
 #endif
@@ -71,6 +64,14 @@
 #   define lseek _lseeki64
 #endif
 
+#include <vlc_common.h>
+#include "fs.h"
+#include <vlc_input.h>
+#include <vlc_access.h>
+#include <vlc_dialog.h>
+#ifdef WIN32
+# include <vlc_charset.h>
+#endif
 #include <vlc_fs.h>
 #include <vlc_url.h>
 
