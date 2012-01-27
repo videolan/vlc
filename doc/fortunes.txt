@@ -964,3 +964,6 @@ reactor leaks ionizing radiations."
 < mru> that is a very good question
  -- #videolan, sunday philosophy
 %
+< jesuitx> consider unblocking safari. mac users are people too.
+ -- #videolan, it's a conspiracy!
+%
