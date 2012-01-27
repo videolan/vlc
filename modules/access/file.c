@@ -30,9 +30,7 @@
 #include <assert.h>
 #include <errno.h>
 #include <sys/types.h>
-#ifdef HAVE_SYS_STAT_H
-#   include <sys/stat.h>
-#endif
+#include <sys/stat.h>
 #include <fcntl.h>
 #ifdef HAVE_FSTATVFS
 #   include <sys/statvfs.h>
@@ -313,7 +311,6 @@ ssize_t FileRead( access_t *p_access, uint8_t *p_buffer, size_t i_len )
     if ((p_access->info.i_size && !(p_sys->i_nb_reads % INPUT_FSTAT_NB_READS))
      || (p_access->info.i_pos > p_access->info.i_size))
     {
-#ifdef HAVE_SYS_STAT_H
         struct stat st;
 
         if ((fstat (fd, &st) == 0)
@@ -322,7 +319,6 @@ ssize_t FileRead( access_t *p_access, uint8_t *p_buffer, size_t i_len )
             p_access->info.i_size = st.st_size;
             p_access->info.i_update |= INPUT_UPDATE_SIZE;
         }
-#endif
     }
     return i_ret;
 }

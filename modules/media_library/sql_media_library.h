@@ -31,9 +31,7 @@
 #include <stdarg.h>
 #include <assert.h>
 #include <errno.h>
-#ifdef HAVE_SYS_STAT_H
-#   include <sys/stat.h>
-#endif
+#include <sys/stat.h>
 
 #include <vlc_common.h>
 #include <vlc_sql.h>

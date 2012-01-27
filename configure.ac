@@ -666,7 +666,7 @@ fi # end "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"
 dnl Check for headers
 AC_CHECK_HEADERS([search.h])
 AC_CHECK_HEADERS(getopt.h locale.h xlocale.h)
-AC_CHECK_HEADERS([sys/time.h sys/ioctl.h sys/stat.h])
+AC_CHECK_HEADERS([sys/time.h sys/ioctl.h])
 AC_CHECK_HEADERS([arpa/inet.h netinet/udplite.h sys/eventfd.h])
 AC_CHECK_HEADERS([net/if.h], [], [],
   [

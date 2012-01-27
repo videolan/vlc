@@ -271,7 +271,6 @@ static int vlclua_fd_read( lua_State *L )
  *****************************************************************************/
 static int vlclua_stat( lua_State *L )
 {
-#ifdef HAVE_SYS_STAT_H
     const char *psz_path = luaL_checkstring( L, 1 );
     struct stat s;
     if( vlc_stat( psz_path, &s ) )
@@ -320,10 +319,6 @@ static int vlclua_stat( lua_State *L )
     lua_pushinteger( L, s.st_ctime );
     lua_setfield( L, -2, "creation_time" );
     return 1;
-#else
-#   warning "Woops, looks like we don't have stat on your platform"
-    return luaL_error( L, "System is missing <sys/stat.h>" );
-#endif
 }
 
 static int vlclua_opendir( lua_State *L )

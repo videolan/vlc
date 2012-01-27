@@ -34,9 +34,7 @@
 #include <limits.h>
 #include <assert.h>
 #include <errno.h>
-#ifdef HAVE_SYS_STAT_H
-#   include <sys/stat.h>
-#endif
+#include <sys/stat.h>
 
 #include "input_internal.h"
 #include "event.h"

@@ -25,9 +25,7 @@
 #include "../src/os_factory.hpp"
 #include <vlc_url.h>
 
-#ifdef HAVE_SYS_STAT_H
-#   include <sys/stat.h>
-#endif
+#include <sys/stat.h>
 
 XMLParser::XMLParser( intf_thread_t *pIntf, const string &rFileName )
     : SkinObject( pIntf ), m_pXML( NULL ), m_pReader( NULL ), m_pStream( NULL )
@@ -79,7 +77,6 @@ void XMLParser::LoadCatalog()
     const string &sep = pOSFactory->getDirSeparator();
     list<string>::const_iterator it;
 
-#ifdef HAVE_SYS_STAT_H
     struct stat statBuf;
 
     // Try to load the catalog first (needed at least on win32 where
@@ -119,7 +116,6 @@ void XMLParser::LoadCatalog()
     {
         msg_Err( getIntf(), "cannot find the skins DTD");
     }
-#endif
 }
 
 bool XMLParser::parse()

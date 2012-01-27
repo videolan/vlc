@@ -34,9 +34,7 @@
 #   include <unistd.h>
 #endif
 #include <sys/types.h>
-#ifdef HAVE_SYS_STAT_H
-#   include <sys/stat.h>
-#endif
+#include <sys/stat.h>
 #include <fcntl.h>
 #include <errno.h>
 
@@ -1452,20 +1450,17 @@ static int ProbeDVD( const char *psz_name )
 #endif
 
     int ret = VLC_EGENERIC;
-
-#ifdef HAVE_SYS_STAT_H
     struct stat stat_info;
 
     if( fstat( fd, &stat_info ) == -1 )
          goto bailout;
-
     if( !S_ISREG( stat_info.st_mode ) )
     {
         if( S_ISDIR( stat_info.st_mode ) || S_ISBLK( stat_info.st_mode ) )
             ret = VLC_SUCCESS; /* Let dvdnav_open() do the probing */
         goto bailout;
     }
-#endif
+
     /* Match extension as the anchor exhibits too many false positives */
     const char *ext = strrchr( psz_name, '.' );
     if( ext == NULL )

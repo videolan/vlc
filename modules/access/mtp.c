@@ -33,9 +33,7 @@
 #include <assert.h>
 #include <errno.h>
 #include <sys/types.h>
-#ifdef HAVE_SYS_STAT_H
-#   include <sys/stat.h>
-#endif
+#include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <poll.h>
@@ -158,14 +156,10 @@ static int Open( vlc_object_t *p_this )
     }
     p_sys->fd = fd;
 
-#ifdef HAVE_SYS_STAT_H
     struct stat st;
     if( fstat( fd, &st ) )
         msg_Err( p_access, "fstat(%d): %m", fd );
     p_access->info.i_size = st.st_size;
-#else
-# warning File size not known!
-#endif
 
     return VLC_SUCCESS;
 }

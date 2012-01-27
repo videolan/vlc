@@ -46,9 +46,7 @@ See http://www.vdr-wiki.de/ and http://www.tvdr.de/ for more information.
 #endif
 
 #include <sys/types.h>
-#ifdef HAVE_SYS_STAT_H
-#   include <sys/stat.h>
-#endif
+#include <sys/stat.h>
 #include <fcntl.h>
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>

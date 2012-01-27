@@ -31,9 +31,7 @@
 #include <sys/types.h>
 #include <errno.h>
 
-#ifdef HAVE_SYS_STAT_H
-# include <sys/stat.h>
-#endif
+#include <sys/stat.h>
 #ifdef WIN32
 # include <io.h>
 # include <wincrypt.h>

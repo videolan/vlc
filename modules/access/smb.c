@@ -31,9 +31,7 @@
 #include <errno.h>
 #ifdef WIN32
 #   include <fcntl.h>
-#   ifdef HAVE_SYS_STAT_H
-#       include <sys/stat.h>
-#   endif
+#   include <sys/stat.h>
 #   include <io.h>
 #   define smbc_open(a,b,c) vlc_open(a,b,c)
 #   define smbc_fstat(a,b) _fstati64(a,b)

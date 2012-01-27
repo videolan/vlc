@@ -38,9 +38,7 @@
 #   include <unistd.h>
 #endif
 #include <sys/types.h>
-#ifdef HAVE_SYS_STAT_H
-#   include <sys/stat.h>
-#endif
+#include <sys/stat.h>
 #include <fcntl.h>
 #ifdef HAVE_ARPA_INET_H
 #   include <arpa/inet.h>
