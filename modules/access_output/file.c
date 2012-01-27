@@ -42,10 +42,7 @@
 #include <vlc_fs.h>
 #include <vlc_strings.h>
 
-#if defined( WIN32 ) && !defined( UNDER_CE )
-#   include <io.h>
-#   define lseek _lseeki64
-#elif defined( __OS2__ )
+#if defined( WIN32 ) || defined( __OS2__ )
 #   include <io.h>
 #else
 #   include <unistd.h>
