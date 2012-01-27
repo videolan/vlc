@@ -528,6 +528,8 @@ static const struct {
     vlc_fourcc_t     src;
     blend_function_t blend;
 } blends[] = {
+#undef RGB
+#undef YUV
 #define RGB(csp, picture, cvt) \
     { csp, VLC_CODEC_YUVA, Blend<picture, CPictureYUVA, compose<cvt, convertYuv8ToRgb> > }, \
     { csp, VLC_CODEC_RGBA, Blend<picture, CPictureRGBA, compose<cvt, convertNone> > }, \
