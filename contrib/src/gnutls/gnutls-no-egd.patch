@@ -1,6 +1,6 @@
-diff -ru gnutls.orig//lib/nettle/Makefile.am gnutls//lib/nettle/Makefile.am
---- gnutls.orig//lib/nettle/Makefile.am	2011-07-19 20:25:09.000000000 +0300
-+++ gnutls//lib/nettle/Makefile.am	2011-07-19 20:25:39.000000000 +0300
+diff -ru gnutls.orig/lib/nettle/Makefile.am gnutls/lib/nettle/Makefile.am
+--- gnutls.orig/lib/nettle/Makefile.am	2011-07-19 20:25:09.000000000 +0300
++++ gnutls/lib/nettle/Makefile.am	2011-07-19 20:25:39.000000000 +0300
 @@ -35,4 +35,4 @@
  
  noinst_LTLIBRARIES = libcrypto.la
@@ -36,9 +36,9 @@ diff -ru gnutls.orig//lib/nettle/Makefile.am gnutls//lib/nettle/Makefile.am
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/init.Plo@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mac.Plo@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mpi.Plo@am__quote@
-diff -ru gnutls.orig//lib/nettle/rnd.c gnutls//lib/nettle/rnd.c
---- gnutls.orig//lib/nettle/rnd.c	2011-07-19 20:25:09.000000000 +0300
-+++ gnutls//lib/nettle/rnd.c	2011-07-19 20:26:47.000000000 +0300
+diff -ru gnutls.orig/lib/nettle/rnd.c gnutls/lib/nettle/rnd.c
+--- gnutls.orig/lib/nettle/rnd.c	2011-07-19 20:25:09.000000000 +0300
++++ gnutls/lib/nettle/rnd.c	2011-07-19 20:26:47.000000000 +0300
 @@ -159,7 +159,7 @@
  #ifdef HAVE_GETRUSAGE
  #include <sys/resource.h>
