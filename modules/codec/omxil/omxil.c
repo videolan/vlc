@@ -921,6 +921,9 @@ loaded:
         /* ignore OpenCore software codecs */
         if (!strncmp(p_sys->ppsz_components[i], "OMX.PV.", 7))
             continue;
+        /* The same sw codecs, renamed in ICS (perhaps also in honeycomb) */
+        if (!strncmp(p_sys->ppsz_components[i], "OMX.google.", 11))
+            continue;
 #endif
         omx_error = InitialiseComponent(p_dec, p_sys->ppsz_components[i],
                                         &p_sys->omx_handle);
