@@ -1,0 +1,11 @@
+--- openjpeg/libopenjpeg/opj_malloc.h.orig	2011-01-02 19:14:45.000000000 +0100
++++ openjpeg/libopenjpeg/opj_malloc.h	2012-01-27 17:18:30.000000000 +0100
+@@ -83,6 +83,8 @@
+ #else /* Not _WIN32 */
+ 	#if defined(__sun)
+ 		#define HAVE_MEMALIGN
++	#elif defined(__FreeBSD__)
++		#define HAVE_POSIX_MEMALIGN
+ 	/* Linux x86_64 and OSX always align allocations to 16 bytes */
+ 	#elif !defined(__amd64__) && !defined(__APPLE__)	
+ 		#define HAVE_MEMALIGN
