@@ -33,6 +33,7 @@
 
 #include <sys/stat.h>
 #ifdef WIN32
+# include <windows.h>
 # include <io.h>
 # include <wincrypt.h>
 #else
