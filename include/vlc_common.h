@@ -388,16 +388,6 @@ typedef struct update_iterator_t update_iterator_t;
 /* Meta engine */
 typedef struct meta_engine_t meta_engine_t;
 
-#ifdef WIN32
-# include <sys/stat.h>
-
-# ifndef UNDER_CE
-struct _stati64;
-#  define stat _stati64
-#  define fstat _fstati64
-#endif
-#endif
-
 /**
  * VLC value structure
  */

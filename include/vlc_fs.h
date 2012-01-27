@@ -46,9 +46,6 @@ VLC_API int vlc_rename( const char *oldpath, const char *newpath );
 VLC_API char *vlc_getcwd( void ) VLC_USED;
 
 #if defined( WIN32 )
-# ifndef UNDER_CE
-#  define stat _stati64
-# endif
 static inline int vlc_closedir( DIR *dir )
 {
     _WDIR *wdir = *(_WDIR **)dir;
