@@ -580,6 +580,9 @@ static int OpenClient (vlc_tls_t *session, int fd, const char *hostname)
 #else /* WIN32 */
     gnutls_loadOSCAList (VLC_OBJECT(session), sys->x509_cred);
 #endif
+    gnutls_certificate_set_verify_flags (sys->x509_cred,
+                                         GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT);
+
     session->handshake = gnutls_HandshakeAndValidate;
     /*session->_handshake = gnutls_ContinueHandshake;*/
 
