@@ -660,8 +660,8 @@ static VLCMain *_o_sharedMainInstance = nil;
 
     [[VLCMain sharedInstance] performSelectorOnMainThread:@selector(lookForCrashLog) withObject:nil waitUntilDone:NO];
 
-	/* we will need this, so let's load it here so the interface appears to be more responsive */
-	nib_open_loaded = [NSBundle loadNibNamed:@"Open" owner: NSApp];
+    /* we will need this, so let's load it here so the interface appears to be more responsive */
+    nib_open_loaded = [NSBundle loadNibNamed:@"Open" owner: NSApp];
 }
 
 - (void)initStrings
@@ -850,8 +850,8 @@ static VLCMain *_o_sharedMainInstance = nil;
 - (void)applicationDidBecomeActive:(NSNotification *)aNotification
 {
     if( !p_intf ) return;
-	if( config_GetInt( p_intf, "macosx-appleremote" ) == YES )
-		[o_remote startListening: self];
+    if( config_GetInt( p_intf, "macosx-appleremote" ) == YES )
+        [o_remote startListening: self];
 }
 - (void)applicationDidResignActive:(NSNotification *)aNotification
 {
@@ -1484,6 +1484,15 @@ unsigned int CocoaKeyToVLC( unichar i_key )
     }
 
     [[VLCMain sharedInstance] performSelectorOnMainThread:@selector(updateMainWindow) withObject: nil waitUntilDone: NO];
+    [self performSelectorOnMainThread:@selector(sendDistributedNotificationWithUpdatedPlaybackStatus) withObject: nil waitUntilDone: NO];
+}
+
+- (void)sendDistributedNotificationWithUpdatedPlaybackStatus
+{
+    [[NSDistributedNotificationCenter defaultCenter] postNotificationName:@"VLCPlayerStateDidChange"
+                                                                   object:nil
+                                                                 userInfo:nil
+                                                       deliverImmediately:YES];
 }
 
 - (void)playbackModeUpdated
@@ -1647,7 +1656,7 @@ unsigned int CocoaKeyToVLC( unichar i_key )
 
 - (id)appleRemoteController
 {
-	return o_remote;
+    return o_remote;
 }
 
 - (void)setActiveVideoPlayback:(BOOL)b_value

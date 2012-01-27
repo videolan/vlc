@@ -180,6 +180,7 @@ struct intf_sys_t
 - (void)fullscreenChanged;
 - (void)PlaylistItemChanged;
 - (void)playbackStatusUpdated;
+- (void)sendDistributedNotificationWithUpdatedPlaybackStatus;
 - (void)playbackModeUpdated;
 - (void)updateVolume;
 - (void)updatePlaybackPosition;
