@@ -21,6 +21,10 @@
 #ifndef QVLC_VARIABLES_H_
 #define QVLC_VARIABLES_H_ 1
 
+#ifdef HAVE_CONFIG_H
+# include <config.h>
+#endif
+
 #include <QObject>
 #include <vlc_common.h>
 

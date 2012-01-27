@@ -21,6 +21,10 @@
 #ifndef QVLC_DIALOGS_EXTERNAL_H_
 #define QVLC_DIALOGS_EXTERNAL_H_ 1
 
+#ifdef HAVE_CONFIG_H
+# include <config.h>
+#endif
+
 #include <QObject>
 #include <vlc_common.h>
 #include "variables.hpp"

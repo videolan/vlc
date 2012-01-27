@@ -26,6 +26,10 @@
 #ifndef _INPUTSLIDER_H_
 #define _INPUTSLIDER_H_
 
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
 #include <vlc_common.h>
 #include "timetooltip.hpp"
 
