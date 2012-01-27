@@ -68,6 +68,8 @@ static inline void vlc_rewinddir( DIR *dir )
 # define rewinddir vlc_rewinddir
 #endif
 
+struct stat;
+
 VLC_API int vlc_stat( const char *filename, struct stat *buf );
 VLC_API int vlc_lstat( const char *filename, struct stat *buf );
 

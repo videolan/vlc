@@ -388,7 +388,6 @@ typedef struct update_iterator_t update_iterator_t;
 /* Meta engine */
 typedef struct meta_engine_t meta_engine_t;
 
-/* stat/lstat/fstat */
 #ifdef WIN32
 # include <sys/stat.h>
 
@@ -397,10 +396,6 @@ struct _stati64;
 #  define stat _stati64
 #  define fstat _fstati64
 #endif
-
-/* You should otherwise use vlc_stat and vlc_lstat. */
-#else
-struct stat;
 #endif
 
 /**
