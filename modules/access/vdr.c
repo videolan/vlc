@@ -45,9 +45,7 @@ See http://www.vdr-wiki.de/ and http://www.tvdr.de/ for more information.
 # include "config.h"
 #endif
 
-#ifdef HAVE_SYS_TYPES_H
-#   include <sys/types.h>
-#endif
+#include <sys/types.h>
 #ifdef HAVE_SYS_STAT_H
 #   include <sys/stat.h>
 #endif
