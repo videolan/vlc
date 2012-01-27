@@ -374,7 +374,16 @@ static int ShowController( vlc_object_t *p_this, const char *psz_variable,
     intf_thread_t * p_intf = VLCIntf;
     if( p_intf && p_intf->p_sys )
     {
-//        [[[VLCMain sharedInstance] fspanel] makeKeyAndOrderFront: nil];
+        playlist_t * p_playlist = pl_Get( p_intf );
+        BOOL b_fullscreen = var_GetBool( p_playlist, "fullscreen" );
+        if( strcmp(psz_variable, "intf-toggle-fscontrol") || b_fullscreen )
+        {
+            [[VLCMain sharedInstance] performSelectorOnMainThread:@selector(showFullscreenController) withObject:nil waitUntilDone:NO];
+        }
+        else
+        {
+            [[VLCMain sharedInstance] performSelectorOnMainThread:@selector(showMainWindow) withObject:nil waitUntilDone:NO];
+        }
     }
     return VLC_SUCCESS;
 }
@@ -570,7 +579,8 @@ static VLCMain *_o_sharedMainInstance = nil;
 
     var_AddCallback(p_playlist, "fullscreen", FullscreenChanged, self);
     var_AddCallback( p_intf->p_libvlc, "intf-toggle-fscontrol", ShowController, self);
-//    var_AddCallback(p_playlist, "item-change", PLItemChanged, self);
+    var_AddCallback( p_intf->p_libvlc, "intf-show", ShowController, self);
+    //    var_AddCallback(p_playlist, "item-change", PLItemChanged, self);
     var_AddCallback(p_playlist, "item-current", PLItemChanged, self);
     var_AddCallback(p_playlist, "activity", PLItemChanged, self);
     var_AddCallback(p_playlist, "leaf-to-parent", PlaylistUpdated, self);
@@ -728,6 +738,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     var_DelCallback(p_playlist, "mute", VolumeUpdated, self);
     var_DelCallback(p_playlist, "fullscreen", FullscreenChanged, self);
     var_DelCallback(p_intf->p_libvlc, "intf-toggle-fscontrol", ShowController, self);
+    var_DelCallback(p_intf->p_libvlc, "intf-show", ShowController, self);
 
     /* remove global observer watching for vout device changes correctly */
     [[NSNotificationCenter defaultCenter] removeObserver: self];
@@ -1398,9 +1409,14 @@ unsigned int CocoaKeyToVLC( unichar i_key )
     [o_mainwindow updateWindow];
 }
 
+- (void)showMainWindow
+{
+    [o_mainwindow performSelectorOnMainThread:@selector(makeKeyAndOrderFront:) withObject:nil waitUntilDone:NO];
+}
+
 - (void)showFullscreenController
 {
-    [o_mainwindow showFullscreenController];
+    [o_mainwindow performSelectorOnMainThread:@selector(showFullscreenController) withObject:nil waitUntilDone:NO];
 }
 
 - (void)updateDelays

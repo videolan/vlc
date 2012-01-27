@@ -189,6 +189,7 @@ struct intf_sys_t
 - (void)updateInfoandMetaPanel;
 - (void)updateMainMenu;
 - (void)updateMainWindow;
+- (void)showMainWindow;
 - (void)showFullscreenController;
 - (void)updateDelays;
 - (void)initStrings;
