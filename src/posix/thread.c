@@ -1204,7 +1204,8 @@ unsigned vlc_GetCPUCount(void)
         count = sysconf (_SC_NPROCESSORS_ONLN);
     free (cpulist);
     return count ? count : 1;
-
+#elif defined(__ANDROID__)
+    return sysconf(_SC_NPROCESSORS_CONF);
 #else
 #   warning "vlc_GetCPUCount is not implemented for your platform"
     return 1;
