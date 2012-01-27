@@ -107,7 +107,7 @@ char *config_GetLibDir (void)
     char *path = config_GetLibPath ();
     if (path != NULL)
     {
-        char *p = strrchr (p, '/');
+        char *p = strrchr (path, '/');
         if (p != NULL)
         {
             *p = '\0';
