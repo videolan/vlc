@@ -1097,6 +1097,28 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
     [self showSettingsForCategory: o_osd_view];
 }
 
+- (void)controlTextDidChange:(NSNotification *)o_notification
+{
+    id notificationObject = [o_notification object];
+    if( notificationObject == o_audio_lang_fld ||
+       notificationObject ==  o_audio_lastpwd_sfld ||
+       notificationObject ==  o_audio_lastuser_fld ||
+       notificationObject == o_audio_vol_fld )
+        b_audioSettingChanged = YES;
+    else if( notificationObject == o_input_record_fld ||
+             notificationObject == o_input_httpproxy_fld ||
+            notificationObject == o_input_httpproxypwd_sfld ||
+            notificationObject == o_input_postproc_fld )
+        b_inputSettingChanged = YES;
+    else if( notificationObject == o_osd_font_fld ||
+            notificationObject == o_osd_lang_fld ||
+            notificationObject == o_osd_opacity_fld)
+        b_osdSettingChanged = YES;
+    else if( notificationObject == o_video_snap_folder_fld ||
+            notificationObject == o_video_snap_prefix_fld )
+        b_videoSettingChanged = YES;
+}
+
 - (IBAction)showFontPicker:(id)sender
 {
     char * font = config_GetPsz( p_intf, "freetype-font" );
