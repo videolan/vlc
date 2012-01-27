@@ -27,6 +27,8 @@
 
 #include "DOMParser.h"
 
+#include <vector>
+
 using namespace dash::xml;
 using namespace dash::mpd;
 

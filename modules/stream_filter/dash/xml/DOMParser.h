@@ -26,20 +26,11 @@
 #define DOMPARSER_H_
 
 #include <vlc_common.h>
-#include <vlc_plugin.h>
 #include <vlc_stream.h>
 #include <vlc_xml.h>
 
-#include <string.h>
-#include <vector>
-#include <iostream>
-#include <cstdio>
-#include <fstream>
-#include <stdio.h>
-
-#include "xml/Node.h"
-#include "http/IHTTPConnection.h"
 #include "mpd/IMPDManager.h"
+#include "xml/Node.h"
 
 namespace dash
 {
