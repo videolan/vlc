@@ -67,6 +67,8 @@ sh $VLC_SOURCEDIR/configure --host=arm-linux-androideabi --build=x86_64-unknown-
                 --disable-dv \
                 --disable-mod \
                 --disable-sid \
+                --disable-gme \
+                --enable-tremor --disable-vorbis \
                 --disable-x264 \
                 --disable-mad \
                 --disable-schroedinger --disable-dirac \
@@ -77,6 +79,7 @@ sh $VLC_SOURCEDIR/configure --host=arm-linux-androideabi --build=x86_64-unknown-
                 --disable-pulse \
                 --disable-alsa \
                 --disable-portaudio \
+                --disable-samplerate \
                 --disable-sdl \
                 --disable-xcb \
                 --disable-atmo \
