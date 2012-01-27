@@ -21,6 +21,10 @@ CONFIGURE_OPTS += --disable-asm
 endif
 ifdef HAVE_MACOSX
 CONFIGURE_OPTS += --disable-aesni-support
+else
+ifdef HAVE_BSD
+CONFIGURE_OPTS += --disable-asm --disable-aesni-support
+endif
 endif
 .gcrypt: libgcrypt
 	#$(RECONF)
