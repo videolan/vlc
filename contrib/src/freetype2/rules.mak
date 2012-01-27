@@ -18,6 +18,6 @@ freetype: freetype-$(FREETYPE2_VERSION).tar.gz .sum-freetype2
 	$(MOVE)
 
 .freetype2: freetype
-	cd $< && $(HOSTVARS) ./configure $(HOSTCONF)
+	cd $< && GNUMAKE=$(MAKE) $(HOSTVARS) ./configure $(HOSTCONF)
 	cd $< && $(MAKE) install
 	touch $@
