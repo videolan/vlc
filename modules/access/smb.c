@@ -30,9 +30,7 @@
 
 #include <errno.h>
 #ifdef WIN32
-#   ifdef HAVE_FCNTL_H
-#       include <fcntl.h>
-#   endif
+#   include <fcntl.h>
 #   ifdef HAVE_SYS_STAT_H
 #       include <sys/stat.h>
 #   endif

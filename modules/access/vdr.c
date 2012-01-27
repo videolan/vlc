@@ -51,9 +51,7 @@ See http://www.vdr-wiki.de/ and http://www.tvdr.de/ for more information.
 #ifdef HAVE_SYS_STAT_H
 #   include <sys/stat.h>
 #endif
-#ifdef HAVE_FCNTL_H
-#   include <fcntl.h>
-#endif
+#include <fcntl.h>
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
 #elif defined( WIN32 ) && !defined( UNDER_CE )
