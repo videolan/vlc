@@ -4,7 +4,7 @@ VORBIS_VERSION := 1.3.2
 VORBIS_URL := http://downloads.xiph.org/releases/vorbis/libvorbis-$(VORBIS_VERSION).tar.xz
 #VORBIS_URL := $(CONTRIB_VIDEOLAN)/libvorbis-$(VORBIS_VERSION).tar.gz
 
-ifndef HAVE_FPU
+ifdef HAVE_FPU
 PKGS += vorbis
 endif
 ifeq ($(call need_pkg,"vorbis >= 1.1"),)
