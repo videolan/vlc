@@ -388,7 +388,6 @@ void vlc_rwlock_init (vlc_rwlock_t *lock)
     vlc_mutex_init (&lock->mutex);
     vlc_cond_init (&lock->wait);
     lock->readers = 0; /* active readers */
-    lock->writers = 0; /* waiting writers */
     lock->writer = 0; /* ID of active writer */
 }
 
@@ -401,13 +400,8 @@ void vlc_rwlock_destroy (vlc_rwlock_t *lock)
 void vlc_rwlock_rdlock (vlc_rwlock_t *lock)
 {
     vlc_mutex_lock (&lock->mutex);
-    /* Recursive read-locking is allowed. With the infos available:
-     *  - the loosest possible condition (no active writer) is:
-     *     (lock->writer != 0)
-     *  - the strictest possible condition is:
-     *     (lock->writer != 0 || (lock->readers == 0 && lock->writers > 0))
-     *  or (lock->readers == 0 && (lock->writer != 0 || lock->writers > 0))
-     */
+    /* Recursive read-locking is allowed. We only need to ensure that there is
+     * no active writer. */
     while (lock->writer != 0)
     {
         assert (lock->readers == 0);
@@ -425,7 +419,7 @@ static void vlc_rwlock_rdunlock (vlc_rwlock_t *lock)
     assert (lock->readers > 0);
 
     /* If there are no readers left, wake up a writer. */
-    if (--lock->readers == 0 && lock->writers > 0)
+    if (--lock->readers == 0)
         vlc_cond_signal (&lock->wait);
     vlc_mutex_unlock (&lock->mutex);
 }
@@ -433,13 +427,9 @@ static void vlc_rwlock_rdunlock (vlc_rwlock_t *lock)
 void vlc_rwlock_wrlock (vlc_rwlock_t *lock)
 {
     vlc_mutex_lock (&lock->mutex);
-    if (unlikely(lock->writers == ULONG_MAX))
-        abort ();
-    lock->writers++;
     /* Wait until nobody owns the lock in either way. */
     while ((lock->readers > 0) || (lock->writer != 0))
         vlc_cond_wait (&lock->wait, &lock->mutex);
-    lock->writers--;
     assert (lock->writer == 0);
     lock->writer = GetCurrentThreadId ();
     vlc_mutex_unlock (&lock->mutex);
