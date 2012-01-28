@@ -59,6 +59,7 @@ AC_DEFINE([_FILE_OFFSET_BITS], 64, [Define to 64 for large files support.])
 AC_DEFINE([_REENTRANT],, [Define to expose reentrant functions.])
 AC_DEFINE([_THREAD_SAFE],, [Same as _REENTANT for some other OSes.])
 AC_DEFINE([__LIBVLC__],, [Define within the LibVLC source code tree.])
+AC_DEFINE([WIN32_LEAN_AND_MEAN],, [Define to limit the scope of <windows.h>.])
 
 AM_PROG_CC_C_O
 AC_PROG_CXX

@@ -449,9 +449,6 @@ typedef int ( * vlc_callback_t ) ( vlc_object_t *,      /* variable's object */
  * OS-specific headers and thread types
  *****************************************************************************/
 #if defined( WIN32 ) || defined( UNDER_CE )
-/* WIN32_LEAN_AND_MEAN is needed to be able to include winsock2.h because else,
- * windows.h will also include winsock.h and declarations will conflict */
-# define WIN32_LEAN_AND_MEAN
 # include <windows.h>
 #endif
 
