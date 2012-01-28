@@ -92,7 +92,7 @@ static char *ParseText(uint8_t *data, int size, const char *charset)
         char tmp[16] = "";
         char *t = tmp;
         if ((code >= 0x20 && code <= 0x7e) ||
-            (code >= 0xa0 && code <= 0xff) )
+            (code >= 0xa0) )
             snprintf(tmp, sizeof(tmp), "%c", code);
 #if 0
         else if (code == 0x80)
