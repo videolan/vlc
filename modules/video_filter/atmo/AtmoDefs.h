@@ -59,8 +59,8 @@ typedef unsigned long DWORD;
 
 #define BI_RGB 0L
 
-#if !defined(_VLC_BITMAPFILEHEADER_)
-#define _VLC_BITMAPFILEHEADER_
+#if !defined(_BITMAPFILEHEADER_)
+#define _BITMAPFILEHEADER_
 typedef struct
 #ifdef HAVE_ATTRIBUTE_PACKED
     __attribute__((__packed__))
@@ -71,7 +71,7 @@ typedef struct
         uint16_t   bfReserved1;
         uint16_t   bfReserved2;
         uint32_t   bfOffBits;
-} VLC_BITMAPFILEHEADER, *VLC_LPBITMAPFILEHEADER, *VLC_PBITMAPFILEHEADER;
+} BITMAPFILEHEADER, *LPBITMAPFILEHEADER, *PBITMAPFILEHEADER;
 #endif
 
 #endif

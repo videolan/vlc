@@ -2193,7 +2193,7 @@ void SaveBitmap(filter_sys_t *p_sys, uint8_t *p_pixels, char *psz_filename)
 {
     /* for debug out only used*/
     VLC_BITMAPINFO bmp_info;
-    VLC_BITMAPFILEHEADER  bmp_fileheader;
+    BITMAPFILEHEADER  bmp_fileheader;
     FILE *fp_bitmap;
 
     memset(&bmp_info, 0, sizeof(VLC_BITMAPINFO));
@@ -2208,17 +2208,17 @@ void SaveBitmap(filter_sys_t *p_sys, uint8_t *p_pixels, char *psz_filename)
 
     bmp_fileheader.bfReserved1 = 0;
     bmp_fileheader.bfReserved2 = 0;
-    bmp_fileheader.bfSize = sizeof(VLC_BITMAPFILEHEADER) +
+    bmp_fileheader.bfSize = sizeof(BITMAPFILEHEADER) +
                             sizeof(VLC_BITMAPINFOHEADER) +
                             bmp_info.bmiHeader.biSizeImage;
     bmp_fileheader.bfType = VLC_TWOCC('B','M');
-    bmp_fileheader.bfOffBits = sizeof(VLC_BITMAPFILEHEADER) +
+    bmp_fileheader.bfOffBits = sizeof(BITMAPFILEHEADER) +
                                sizeof(VLC_BITMAPINFOHEADER);
 
     fp_bitmap = fopen(psz_filename,"wb");
     if( fp_bitmap != NULL)
     {
-        fwrite(&bmp_fileheader, sizeof(VLC_BITMAPFILEHEADER), 1, fp_bitmap);
+        fwrite(&bmp_fileheader, sizeof(BITMAPFILEHEADER), 1, fp_bitmap);
         fwrite(&bmp_info.bmiHeader, sizeof(VLC_BITMAPINFOHEADER), 1, fp_bitmap);
         fwrite(p_pixels, bmp_info.bmiHeader.biSizeImage, 1, fp_bitmap);
         fclose(fp_bitmap);

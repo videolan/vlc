@@ -192,7 +192,7 @@ int CAtmoZoneDefinition::LoadGradientFromBitmap(char *pszBitmap)
   // into m_basicWeight or use the GREEN value of a 24bit image!
   // channel of a true color bitmap!
   VLC_BITMAPINFO bmpInfo;
-  VLC_BITMAPFILEHEADER  bmpFileHeader;
+  BITMAPFILEHEADER  bmpFileHeader;
 
   /*
   ATMO_LOAD_GRADIENT_FILENOTFOND
@@ -206,7 +206,7 @@ int CAtmoZoneDefinition::LoadGradientFromBitmap(char *pszBitmap)
    if(!bmp)
     return ATMO_LOAD_GRADIENT_FILENOTFOND;
 
-    if(fread(&bmpFileHeader, sizeof(VLC_BITMAPFILEHEADER), 1, bmp) != 1)
+    if(fread(&bmpFileHeader, sizeof(BITMAPFILEHEADER), 1, bmp) != 1)
     {
         fclose(bmp);
         return ATMO_LOAD_GRADIENT_FAILED_SIZE;
