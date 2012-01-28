@@ -564,7 +564,6 @@ static char* FontConfig_Select( FcConfig* config, const char* family,
 #endif
 
 #ifdef WIN32
-#define UNICODE
 #define FONT_DIR_NT "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Fonts"
 
 static int GetFileFontByName( const char *font_name, char **psz_filename )
