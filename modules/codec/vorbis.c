@@ -43,9 +43,12 @@
 
 #ifdef MODULE_NAME_IS_tremor
 #include <tremor/ivorbiscodec.h>
+#define INTERLEAVE_TYPE int32_t
 
 #else
 #include <vorbis/vorbisenc.h>
+#define INTERLEAVE_TYPE float
+#define HAVE_VORBIS_ENCODER
 
 # ifndef OV_ECTL_RATEMANAGE_AVG
 #   define OV_ECTL_RATEMANAGE_AVG 0x0
@@ -153,13 +156,7 @@ static void ParseVorbisComments( decoder_t * );
 
 static void ConfigureChannelOrder(int *, int, uint32_t, bool );
 
-#ifdef MODULE_NAME_IS_tremor
-static void Interleave   ( int32_t *, const int32_t **, int, int, int * );
-#else
-static void Interleave   ( float *, const float **, int, int, int * );
-#endif
-
-#ifndef MODULE_NAME_IS_tremor
+#ifdef HAVE_VORBIS_ENCODER
 static int OpenEncoder   ( vlc_object_t * );
 static void CloseEncoder ( vlc_object_t * );
 static block_t *Encode   ( encoder_t *, aout_buffer_t * );
@@ -199,7 +196,7 @@ vlc_module_begin ()
     set_capability( "packetizer", 100 )
     set_callbacks( OpenPacketizer, CloseDecoder )
 
-#ifndef MODULE_NAME_IS_tremor
+#ifdef HAVE_VORBIS_ENCODER
 #   define ENC_CFG_PREFIX "sout-vorbis-"
     add_submodule ()
     set_description( N_("Vorbis audio encoder") )
@@ -219,7 +216,7 @@ vlc_module_begin ()
 
 vlc_module_end ()
 
-#ifndef MODULE_NAME_IS_tremor
+#ifdef HAVE_VORBIS_ENCODER
 static const char *const ppsz_enc_options[] = {
     "quality", "max-bitrate", "min-bitrate", "cbr", NULL
 };
@@ -470,6 +467,23 @@ static void *ProcessPacket( decoder_t *p_dec, ogg_packet *p_oggpacket,
 }
 
 /*****************************************************************************
+ * Interleave: helper function to interleave channels
+ *****************************************************************************/
+static void Interleave( INTERLEAVE_TYPE *p_out, const INTERLEAVE_TYPE **pp_in,
+                        int i_nb_channels, int i_samples, int *pi_chan_table)
+{
+    int i, j;
+
+    for ( j = 0; j < i_samples; j++ )
+        for ( i = 0; i < i_nb_channels; i++ )
+            p_out[j * i_nb_channels + pi_chan_table[i]] = pp_in[i][j]
+#ifdef MODULE_NAME_IS_tremor
+                * (FIXED32_ONE >> 24)
+#endif
+            ;
+}
+
+/*****************************************************************************
  * DecodePacket: decodes a Vorbis packet.
  *****************************************************************************/
 static aout_buffer_t *DecodePacket( decoder_t *p_dec, ogg_packet *p_oggpacket )
@@ -477,11 +491,7 @@ static aout_buffer_t *DecodePacket( decoder_t *p_dec, ogg_packet *p_oggpacket )
     decoder_sys_t *p_sys = p_dec->p_sys;
     int           i_samples;
 
-#ifdef MODULE_NAME_IS_tremor
-    int32_t       **pp_pcm;
-#else
-    float         **pp_pcm;
-#endif
+    INTERLEAVE_TYPE **pp_pcm;
 
     if( p_oggpacket->bytes &&
         vorbis_synthesis( &p_sys->vb, p_oggpacket ) == 0 )
@@ -503,13 +513,8 @@ static aout_buffer_t *DecodePacket( decoder_t *p_dec, ogg_packet *p_oggpacket )
         if( p_aout_buffer == NULL ) return NULL;
 
         /* Interleave the samples */
-#ifdef MODULE_NAME_IS_tremor
-        Interleave( (int32_t *)p_aout_buffer->p_buffer,
-                    (const int32_t **)pp_pcm, p_sys->vi.channels, i_samples, p_sys->pi_chan_table);
-#else
-        Interleave( (float *)p_aout_buffer->p_buffer,
-                    (const float **)pp_pcm, p_sys->vi.channels, i_samples, p_sys->pi_chan_table);
-#endif
+        Interleave( (INTERLEAVE_TYPE*)p_aout_buffer->p_buffer,
+                    (const INTERLEAVE_TYPE**)pp_pcm, p_sys->vi.channels, i_samples, p_sys->pi_chan_table);
 
         /* Tell libvorbis how many samples we actually consumed */
         vorbis_synthesis_read( &p_sys->vd, i_samples );
@@ -662,31 +667,6 @@ static void ConfigureChannelOrder(int *pi_chan_table, int i_channels, uint32_t i
 }
 
 /*****************************************************************************
- * Interleave: helper function to interleave channels
- *****************************************************************************/
-#ifdef MODULE_NAME_IS_tremor
-static void Interleave( int32_t *p_out, const int32_t **pp_in,
-                        int i_nb_channels, int i_samples, int *pi_chan_table)
-{
-    int i, j;
-
-    for ( j = 0; j < i_samples; j++ )
-        for ( i = 0; i < i_nb_channels; i++ )
-            p_out[j * i_nb_channels + pi_chan_table[i]] = pp_in[i][j] * (FIXED32_ONE >> 24);
-}
-#else
-static void Interleave( float *p_out, const float **pp_in,
-                        int i_nb_channels, int i_samples, int *pi_chan_table )
-{
-    int i, j;
-
-    for ( j = 0; j < i_samples; j++ )
-        for ( i = 0; i < i_nb_channels; i++ )
-            p_out[j * i_nb_channels + pi_chan_table[i]] = pp_in[i][j];
-}
-#endif
-
-/*****************************************************************************
  * CloseDecoder: vorbis decoder destruction
  *****************************************************************************/
 static void CloseDecoder( vlc_object_t *p_this )
@@ -706,8 +686,7 @@ static void CloseDecoder( vlc_object_t *p_this )
     free( p_sys );
 }
 
-#ifndef MODULE_NAME_IS_tremor
-
+#ifdef HAVE_VORBIS_ENCODER
 /*****************************************************************************
  * encoder_sys_t : vorbis encoder descriptor
  *****************************************************************************/
@@ -938,4 +917,4 @@ static void CloseEncoder( vlc_object_t *p_this )
     free( p_sys );
 }
 
-#endif /* HAVE_VORBIS_VORBISENC_H && !MODULE_NAME_IS_tremor */
+#endif /* HAVE_VORBIS_ENCODER */
