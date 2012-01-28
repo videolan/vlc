@@ -53,13 +53,6 @@
 
 #ifdef __APPLE__
 # include <mach/mach_init.h> /* mach_task_self in semaphores */
-# include <sys/sysctl.h>
-#endif
-
-#if defined(__OpenBSD__)
-# include <sys/param.h>
-# include <sys/sysctl.h>
-# include <machine/cpu.h>
 #endif
 
 #if defined(__SunOS)
@@ -1167,23 +1160,6 @@ unsigned vlc_GetCPUCount(void)
 
     return CPU_COUNT (&cpu);
 
-#elif defined(__APPLE__)
-    int count;
-    size_t size = sizeof(count) ;
-
-    if (sysctlbyname ("hw.ncpu", &count, &size, NULL, 0))
-        return 1; /* Failure */
-    return count;
-
-#elif defined(__OpenBSD__)
-    int selectors[2] = { CTL_HW, HW_NCPU };
-    int count;
-    size_t size = sizeof(count);
-
-    if (sysctl (selectors, 2, &count, &size, NULL, 0))
-        return 1; /* Failure */
-    return count;
-
 #elif defined(__SunOS)
     unsigned count = 0;
     int type;
@@ -1204,7 +1180,7 @@ unsigned vlc_GetCPUCount(void)
         count = sysconf (_SC_NPROCESSORS_ONLN);
     free (cpulist);
     return count ? count : 1;
-#elif defined(__ANDROID__)
+#elif defined(_SC_NPROCESSORS_CONF)
     return sysconf(_SC_NPROCESSORS_CONF);
 #else
 #   warning "vlc_GetCPUCount is not implemented for your platform"
