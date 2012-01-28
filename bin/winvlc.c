@@ -31,6 +31,7 @@
 #define UNICODE
 #include <vlc/vlc.h>
 #include <windows.h>
+#include <shellapi.h>
 
 #if !defined(UNDER_CE)
 # ifndef _WIN32_IE
