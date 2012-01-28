@@ -79,6 +79,14 @@ static inline wchar_t *ToWide (const char *utf8)
         MultiByteToWideChar (CP_UTF8, 0, utf8, -1, out, len);
     return out;
 }
+
+# ifdef UNICODE
+#  define FromT FromWide
+#  define ToT   ToWide
+# else
+#  define FromT FromLocaleDup
+#  define ToT   ToLocaleDup
+# endif
 #endif
 
 /**
