@@ -27,6 +27,7 @@
 
 #ifdef WIN32
 
+#include <stdlib.h>
 #include "registry.hpp"
 
 QVLCRegistry::QVLCRegistry( HKEY rootKey )
