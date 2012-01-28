@@ -615,7 +615,7 @@ static void ParseVorbisComments( decoder_t *p_dec )
 }
 
 /*****************************************************************************
- * Interleave: helper function to interleave channels
+ *
  *****************************************************************************/
 static void ConfigureChannelOrder(int *pi_chan_table, int i_channels, uint32_t i_channel_mask, bool b_decode)
 {
