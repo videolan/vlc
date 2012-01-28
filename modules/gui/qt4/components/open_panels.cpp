@@ -513,7 +513,7 @@ void DiscOpenPanel::updateMRL()
         if( !ui.dvdsimple->isChecked() )
             mrl = "dvd://" LOCALHOST;
         else
-            mrl = "dvdsimple://" LOCALHOST + discPath;
+            mrl = "dvdsimple://" LOCALHOST;
     } else if ( ui.bdRadioButton->isChecked() )
         mrl = "bluray://" LOCALHOST;
     /* VCD */
