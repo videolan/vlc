@@ -61,7 +61,7 @@ MediaInfoDialog::MediaInfoDialog( intf_thread_t *_p_intf,
     EMP = new ExtraMetaPanel( infoTabW, p_intf );
     infoTabW->addTab( EMP, qtr( "&Metadata" ) );
     IP = new InfoPanel( infoTabW, p_intf );
-    infoTabW->addTab( IP, qtr( "&Codec" ) );
+    infoTabW->addTab( IP, qtr( "Co&dec" ) );
     if( isMainInputInfo )
     {
         ISP = new InputStatsPanel( infoTabW, p_intf );
