@@ -29,6 +29,8 @@ CONTRIB_VIDEOLAN := $(VIDEOLAN)/testing/contrib
 #
 # Machine-dependent variables
 #
+cppcheck = $(shell $(CC) $(CFLAGS) -E -dM - < /dev/null | grep -E $(1))
+
 PREFIX ?= $(TOPDST)/$(HOST)
 PREFIX := $(abspath $(PREFIX))
 ifneq ($(HOST),$(BUILD))
@@ -38,6 +40,12 @@ ARCH := $(shell $(SRC)/get-arch.sh $(HOST))
 ifneq ($(findstring $(ARCH),i386 sparc sparc64 ppc ppc64 x86_64),)
 # This should be consistent with include/vlc_cpu.h
 HAVE_FPU = 1
+else ifneq ($(findstring $(ARCH),arm),)
+ifneq ($(call cppcheck, __VFP_FP__)),)
+ifeq ($(call cppcheck, __SOFT_FP__),)
+HAVE_FPU = 1
+endif
+endif
 endif
 ifeq ($(ARCH)-$(HAVE_WIN32),x86_64-1)
 HAVE_WIN64 := 1
