@@ -14,6 +14,7 @@
 #if defined(__LIBVLC__)
 
 #   include <vlc_common.h>
+#   include <vlc_codecs.h>
 
 /* some things need to be changed if this code is used inside VideoLan Filter Module */
 #   define _ATMO_VLC_PLUGIN_
