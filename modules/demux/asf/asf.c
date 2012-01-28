@@ -35,7 +35,7 @@
 
 #include <vlc_meta.h>                  /* vlc_meta_Set*, vlc_meta_New */
 #include <vlc_access.h>                /* GET_PRIVATE_ID_STATE */
-#include <vlc_codecs.h>                /* BITMAPINFOHEADER, WAVEFORMATEX */
+#include <vlc_codecs.h>                /* VLC_BITMAPINFOHEADER, WAVEFORMATEX */
 
 #include "libasf.h"
 
@@ -859,7 +859,7 @@ static int DemuxInit( demux_t *p_demux )
         else if( guidcmp( &p_sp->i_stream_type,
                               &asf_object_stream_type_video ) &&
                  p_sp->i_type_specific_data_length >= 11 +
-                 sizeof( BITMAPINFOHEADER ) )
+                 sizeof( VLC_BITMAPINFOHEADER ) )
         {
             uint8_t      *p_data = &p_sp->p_type_specific_data[11];
 
@@ -883,13 +883,13 @@ static int DemuxInit( demux_t *p_demux )
             }
 
             if( p_sp->i_type_specific_data_length > 11 +
-                sizeof( BITMAPINFOHEADER ) )
+                sizeof( VLC_BITMAPINFOHEADER ) )
             {
                 fmt.i_extra = __MIN( GetDWLE( p_data ),
                                      p_sp->i_type_specific_data_length - 11 -
-                                     sizeof( BITMAPINFOHEADER ) );
+                                     sizeof( VLC_BITMAPINFOHEADER ) );
                 fmt.p_extra = malloc( fmt.i_extra );
-                memcpy( fmt.p_extra, &p_data[sizeof( BITMAPINFOHEADER )],
+                memcpy( fmt.p_extra, &p_data[sizeof( VLC_BITMAPINFOHEADER )],
                         fmt.i_extra );
             }
 

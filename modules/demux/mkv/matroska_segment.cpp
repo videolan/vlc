@@ -919,24 +919,24 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
 
         if( !strcmp( p_tk->psz_codec, "V_MS/VFW/FOURCC" ) )
         {
-            if( p_tk->i_extra_data < (int)sizeof( BITMAPINFOHEADER ) )
+            if( p_tk->i_extra_data < (int)sizeof( VLC_BITMAPINFOHEADER ) )
             {
-                msg_Err( &sys.demuxer, "missing/invalid BITMAPINFOHEADER" );
+                msg_Err( &sys.demuxer, "missing/invalid VLC_BITMAPINFOHEADER" );
                 p_tk->fmt.i_codec = VLC_FOURCC( 'u', 'n', 'd', 'f' );
             }
             else
             {
-                BITMAPINFOHEADER *p_bih = (BITMAPINFOHEADER*)p_tk->p_extra_data;
+                VLC_BITMAPINFOHEADER *p_bih = (VLC_BITMAPINFOHEADER*)p_tk->p_extra_data;
 
                 p_tk->fmt.video.i_width = GetDWLE( &p_bih->biWidth );
                 p_tk->fmt.video.i_height= GetDWLE( &p_bih->biHeight );
                 p_tk->fmt.i_codec       = GetFOURCC( &p_bih->biCompression );
 
-                p_tk->fmt.i_extra       = GetDWLE( &p_bih->biSize ) - sizeof( BITMAPINFOHEADER );
+                p_tk->fmt.i_extra       = GetDWLE( &p_bih->biSize ) - sizeof( VLC_BITMAPINFOHEADER );
                 if( p_tk->fmt.i_extra > 0 )
                 {
                     /* Very unlikely yet possible: bug #5659*/
-                    size_t maxlen = p_tk->i_extra_data - sizeof( BITMAPINFOHEADER );
+                    size_t maxlen = p_tk->i_extra_data - sizeof( VLC_BITMAPINFOHEADER );
                     p_tk->fmt.i_extra = ( p_tk->fmt.i_extra < maxlen )?
                         p_tk->fmt.i_extra : maxlen;
 

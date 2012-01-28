@@ -75,8 +75,8 @@ typedef struct avi_stream_s
     float   f_fps;
     int     i_bitrate;
 
-    BITMAPINFOHEADER    *p_bih;
-    WAVEFORMATEX        *p_wf;
+    VLC_BITMAPINFOHEADER    *p_bih;
+    WAVEFORMATEX            *p_wf;
 
 } avi_stream_t;
 
@@ -370,7 +370,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
                 p_sys->i_stream_video = p_sys->i_streams;
             }
             p_stream->p_wf  = NULL;
-            p_stream->p_bih = malloc( sizeof( BITMAPINFOHEADER ) +
+            p_stream->p_bih = malloc( sizeof( VLC_BITMAPINFOHEADER ) +
                                       p_input->p_fmt->i_extra );
             if( !p_stream->p_bih )
             {
@@ -378,7 +378,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
                 return VLC_ENOMEM;
             }
 #define p_bih p_stream->p_bih
-            p_bih->biSize  = sizeof( BITMAPINFOHEADER ) +
+            p_bih->biSize  = sizeof( VLC_BITMAPINFOHEADER ) +
                              p_input->p_fmt->i_extra;
             if( p_input->p_fmt->i_extra > 0 )
             {
@@ -478,7 +478,7 @@ static int Mux      ( sout_mux_t *p_mux )
                                == VLC_FOURCC( 'X', 'V', 'I', 'D' ) )
                {
                    int i_header_length =
-                       p_stream->p_bih->biSize - sizeof(BITMAPINFOHEADER);
+                       p_stream->p_bih->biSize - sizeof(VLC_BITMAPINFOHEADER);
                    p_data = block_Realloc( p_data,
                                    i_header_length, p_data->i_buffer );
                    if( !p_data)
@@ -811,7 +811,7 @@ static int avi_HeaderAdd_strf( buffer_out_t *p_bo, avi_stream_t *p_stream )
             bo_AddDWordLE( p_bo, p_stream->p_bih->biClrUsed );
             bo_AddDWordLE( p_bo, p_stream->p_bih->biClrImportant );
             bo_AddMem( p_bo,
-                       p_stream->p_bih->biSize - sizeof( BITMAPINFOHEADER ),
+                       p_stream->p_bih->biSize - sizeof( VLC_BITMAPINFOHEADER ),
                        (uint8_t*)&p_stream->p_bih[1] );
             break;
     }

@@ -88,7 +88,7 @@ ATMO_BOOL CAtmoExternalCaptureInput::Close(void)
   5. let the thread wake up and return imediately to the caller
   so that the real videoout wouldn't be stop for a too long time
 */
-void CAtmoExternalCaptureInput::DeliverNewSourceDataPaket(BITMAPINFOHEADER *bmpInfoHeader,void *pixelData)
+void CAtmoExternalCaptureInput::DeliverNewSourceDataPaket(VLC_BITMAPINFOHEADER *bmpInfoHeader,void *pixelData)
 {
     /*
        normaly we should protect this area of code by critical_section or a mutex,

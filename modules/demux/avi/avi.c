@@ -531,8 +531,8 @@ static int Open( vlc_object_t * p_this )
                 fmt.video.i_frame_rate = tk->i_rate;
                 fmt.video.i_frame_rate_base = tk->i_scale;
                 fmt.i_extra =
-                    __MIN( p_vids->p_bih->biSize - sizeof( BITMAPINFOHEADER ),
-                           p_vids->i_chunk_size - sizeof(BITMAPINFOHEADER) );
+                    __MIN( p_vids->p_bih->biSize - sizeof( VLC_BITMAPINFOHEADER ),
+                           p_vids->i_chunk_size - sizeof(VLC_BITMAPINFOHEADER) );
                 if( fmt.i_extra > 0 )
                 {
                     fmt.p_extra = malloc( fmt.i_extra );
@@ -560,7 +560,7 @@ static int Open( vlc_object_t * p_this )
                 if( fmt.video.i_bits_per_pixel > 0 && fmt.video.i_bits_per_pixel <= 8 )
                 {
                     /* The palette is not always included in biSize */
-                    fmt.i_extra = p_vids->i_chunk_size - sizeof(BITMAPINFOHEADER);
+                    fmt.i_extra = p_vids->i_chunk_size - sizeof(VLC_BITMAPINFOHEADER);
                     if( fmt.i_extra > 0 && fmt.p_extra )
                     {
                         const uint8_t *p_pal = fmt.p_extra;

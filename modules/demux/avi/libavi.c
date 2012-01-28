@@ -27,7 +27,7 @@
 
 #include <vlc_common.h>
 #include <vlc_demux.h>
-#include <vlc_codecs.h>                                /* BITMAPINFOHEADER */
+#include <vlc_codecs.h>                            /* VLC_BITMAPINFOHEADER */
 
 #include "libavi.h"
 
@@ -401,11 +401,11 @@ static int AVI_ChunkRead_strf( stream_t *s, avi_chunk_t *p_chk )
             {
                 p_chk->strf.vids.p_bih->biSize = p_chk->common.i_chunk_size;
             }
-            if( p_chk->common.i_chunk_size > sizeof(BITMAPINFOHEADER) )
+            if( p_chk->common.i_chunk_size > sizeof(VLC_BITMAPINFOHEADER) )
             {
                 memcpy( &p_chk->strf.vids.p_bih[1],
-                        p_buff + 8 + sizeof(BITMAPINFOHEADER), /* 8=fourrc+size */
-                        p_chk->common.i_chunk_size -sizeof(BITMAPINFOHEADER) );
+                        p_buff + 8 + sizeof(VLC_BITMAPINFOHEADER), /* 8=fourrc+size */
+                        p_chk->common.i_chunk_size -sizeof(VLC_BITMAPINFOHEADER) );
             }
 #ifdef AVI_DEBUG
             msg_Dbg( (vlc_object_t*)s,

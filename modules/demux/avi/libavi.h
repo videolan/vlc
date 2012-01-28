@@ -124,8 +124,8 @@ typedef struct avi_chunk_strf_auds_s
 typedef struct avi_chunk_strf_vids_s
 {
     AVI_CHUNK_COMMON
-    int              i_cat;
-    BITMAPINFOHEADER *p_bih;
+    int                     i_cat;
+    VLC_BITMAPINFOHEADER    *p_bih;
 } avi_chunk_strf_vids_t;
 
 typedef union avi_chunk_strf_u

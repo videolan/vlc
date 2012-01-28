@@ -106,8 +106,9 @@ _WAVEHEADER {
 } WAVEHEADER;
 #endif /* _WAVEHEADER_ */
 
-#if !defined(_BITMAPINFOHEADER_) && !defined(WIN32)
-#define _BITMAPINFOHEADER_
+#ifndef _VLC_BITMAPINFOHEADER_
+#define _VLC_BITMAPINFOHEADER_
+
 typedef struct
 ATTR_PACKED
 {
@@ -122,14 +123,14 @@ ATTR_PACKED
     uint32_t   biYPelsPerMeter;
     uint32_t   biClrUsed;
     uint32_t   biClrImportant;
-} BITMAPINFOHEADER, *PBITMAPINFOHEADER, *LPBITMAPINFOHEADER;
+} VLC_BITMAPINFOHEADER, *VLC_PBITMAPINFOHEADER, *VLC_LPBITMAPINFOHEADER;
 
 typedef struct
 ATTR_PACKED
 {
-    BITMAPINFOHEADER bmiHeader;
-    int        bmiColors[1];
-} BITMAPINFO, *LPBITMAPINFO;
+    VLC_BITMAPINFOHEADER bmiHeader;
+    int                  bmiColors[1];
+} VLC_BITMAPINFO, *VLC_LPBITMAPINFO;
 #endif
 
 #ifndef _RECT32_
@@ -151,12 +152,12 @@ typedef int64_t REFERENCE_TIME;
 typedef struct
 ATTR_PACKED
 {
-    RECT32            rcSource;
-    RECT32            rcTarget;
-    uint32_t          dwBitRate;
-    uint32_t          dwBitErrorRate;
-    REFERENCE_TIME    AvgTimePerFrame;
-    BITMAPINFOHEADER  bmiHeader;
+    RECT32                  rcSource;
+    RECT32                  rcTarget;
+    uint32_t                dwBitRate;
+    uint32_t                dwBitErrorRate;
+    REFERENCE_TIME          AvgTimePerFrame;
+    VLC_BITMAPINFOHEADER    bmiHeader;
 } VIDEOINFOHEADER;
 #endif
 
@@ -187,12 +188,12 @@ ATTR_PACKED
 typedef struct
 ATTR_PACKED
 {
-    RECT32            rcSource;
-    RECT32            rcTarget;
-    uint32_t          dwBitRate;
-    uint32_t          dwBitErrorRate;
-    REFERENCE_TIME    AvgTimePerFrame;
-    BITMAPINFOHEADER  bmiHeader;
+    RECT32                  rcSource;
+    RECT32                  rcTarget;
+    uint32_t                dwBitRate;
+    uint32_t                dwBitErrorRate;
+    REFERENCE_TIME          AvgTimePerFrame;
+    VLC_BITMAPINFOHEADER    bmiHeader;
 
     union
     {

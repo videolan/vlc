@@ -774,7 +774,7 @@ struct filter_sys_t
     /* storage for temporal settings "volatile" */
     CAtmoDynData *p_atmo_dyndata;
     /* initialized for buildin driver with AtmoCreateTransferBuffers */
-    BITMAPINFOHEADER mini_image_format;
+    VLC_BITMAPINFOHEADER mini_image_format;
     /* is only use buildin driver! */
     uint8_t *p_atmo_transfer_buffer;
     /* end buildin driver */
@@ -991,9 +991,9 @@ static void AtmoCreateTransferBuffers(filter_t *p_filter,
         p_sys->p_atmo_transfer_buffer = (uint8_t *)malloc(bytePerPixel *
                                                           width *  height);
 
-        memset(&p_sys->mini_image_format,0,sizeof(BITMAPINFOHEADER));
+        memset(&p_sys->mini_image_format,0,sizeof(VLC_BITMAPINFOHEADER));
 
-        p_sys->mini_image_format.biSize = sizeof(BITMAPINFOHEADER);
+        p_sys->mini_image_format.biSize = sizeof(VLC_BITMAPINFOHEADER);
         p_sys->mini_image_format.biWidth = width;
         p_sys->mini_image_format.biHeight = height;
         p_sys->mini_image_format.biBitCount = bytePerPixel*8;
@@ -2192,12 +2192,12 @@ static void ExtractMiniImage_YUV(filter_sys_t *p_sys,
 void SaveBitmap(filter_sys_t *p_sys, uint8_t *p_pixels, char *psz_filename)
 {
     /* for debug out only used*/
-    BITMAPINFO bmp_info;
-    BITMAPFILEHEADER  bmp_fileheader;
+    VLC_BITMAPINFO bmp_info;
+    VLC_BITMAPFILEHEADER  bmp_fileheader;
     FILE *fp_bitmap;
 
-    memset(&bmp_info, 0, sizeof(BITMAPINFO));
-    bmp_info.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+    memset(&bmp_info, 0, sizeof(VLC_BITMAPINFO));
+    bmp_info.bmiHeader.biSize = sizeof(VLC_BITMAPINFOHEADER);
     bmp_info.bmiHeader.biSizeImage   = p_sys->i_atmo_height *
                                        p_sys->i_atmo_width * 4;
     bmp_info.bmiHeader.biCompression = BI_RGB;
@@ -2208,18 +2208,18 @@ void SaveBitmap(filter_sys_t *p_sys, uint8_t *p_pixels, char *psz_filename)
 
     bmp_fileheader.bfReserved1 = 0;
     bmp_fileheader.bfReserved2 = 0;
-    bmp_fileheader.bfSize = sizeof(BITMAPFILEHEADER) +
-                            sizeof(BITMAPINFOHEADER) +
+    bmp_fileheader.bfSize = sizeof(VLC_BITMAPFILEHEADER) +
+                            sizeof(VLC_BITMAPINFOHEADER) +
                             bmp_info.bmiHeader.biSizeImage;
     bmp_fileheader.bfType = VLC_TWOCC('B','M');
-    bmp_fileheader.bfOffBits = sizeof(BITMAPFILEHEADER) +
-                               sizeof(BITMAPINFOHEADER);
+    bmp_fileheader.bfOffBits = sizeof(VLC_BITMAPFILEHEADER) +
+                               sizeof(VLC_BITMAPINFOHEADER);
 
     fp_bitmap = fopen(psz_filename,"wb");
     if( fp_bitmap != NULL)
     {
-        fwrite(&bmp_fileheader, sizeof(BITMAPFILEHEADER), 1, fp_bitmap);
-        fwrite(&bmp_info.bmiHeader, sizeof(BITMAPINFOHEADER), 1, fp_bitmap);
+        fwrite(&bmp_fileheader, sizeof(VLC_BITMAPFILEHEADER), 1, fp_bitmap);
+        fwrite(&bmp_info.bmiHeader, sizeof(VLC_BITMAPINFOHEADER), 1, fp_bitmap);
         fwrite(p_pixels, bmp_info.bmiHeader.biSizeImage, 1, fp_bitmap);
         fclose(fp_bitmap);
     }

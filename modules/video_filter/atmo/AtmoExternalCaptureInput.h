@@ -36,7 +36,7 @@ protected:
     CRITICAL_SECTION m_BufferLock;
 #endif
 
-    BITMAPINFOHEADER m_CurrentFrameHeader;
+    VLC_BITMAPINFOHEADER m_CurrentFrameHeader;
     void *m_pCurrentFramePixels;
 
     virtual DWORD Execute(void);
@@ -47,7 +47,7 @@ public:
        this method is called from the com server AtmoLiveViewControlImpl!
        or inside videolan from the filter method to start a new processing
     */
-    void DeliverNewSourceDataPaket(BITMAPINFOHEADER *bmpInfoHeader,void *pixelData);
+    void DeliverNewSourceDataPaket(VLC_BITMAPINFOHEADER *bmpInfoHeader,void *pixelData);
 
 public:
     CAtmoExternalCaptureInput(CAtmoDynData *pAtmoDynData);
