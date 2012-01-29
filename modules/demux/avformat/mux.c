@@ -55,8 +55,6 @@ struct sout_mux_sys_t
     uint8_t        *io_buffer;
 
     AVFormatContext *oc;
-    URLContext     url;
-    URLProtocol    prot;
 
     bool     b_write_header;
     bool     b_error;
@@ -131,19 +129,8 @@ int OpenMux( vlc_object_t *p_this )
     /* Create I/O wrapper */
     p_sys->io_buffer_size = 32768;  /* FIXME */
     p_sys->io_buffer = malloc( p_sys->io_buffer_size );
-    p_sys->url.priv_data = p_mux;
-    p_sys->url.prot = &p_sys->prot;
-    p_sys->url.prot->name = "VLC I/O wrapper";
-    p_sys->url.prot->url_open = 0;
-    p_sys->url.prot->url_read = 0;
-    p_sys->url.prot->url_write =
-                    (int (*) (URLContext *, unsigned char *, int))IOWrite;
-    p_sys->url.prot->url_seek =
-                    (int64_t (*) (URLContext *, int64_t, int))IOSeek;
-    p_sys->url.prot->url_close = 0;
-    p_sys->url.prot->next = 0;
     init_put_byte( &p_sys->io, p_sys->io_buffer, p_sys->io_buffer_size,
-                   1, &p_sys->url, NULL, IOWrite, IOSeek );
+                   1, p_mux, NULL, IOWrite, IOSeek );
 
     memset( ap, 0, sizeof(*ap) );
     if( av_set_parameters( p_sys->oc, ap ) < 0 )
@@ -438,8 +425,7 @@ static int Control( sout_mux_t *p_mux, int i_query, va_list args )
  *****************************************************************************/
 static int IOWrite( void *opaque, uint8_t *buf, int buf_size )
 {
-    URLContext *p_url = opaque;
-    sout_mux_t *p_mux = p_url->priv_data;
+    sout_mux_t *p_mux = opaque;
     int i_ret;
 
 #ifdef AVFORMAT_DEBUG
@@ -458,8 +444,7 @@ static int IOWrite( void *opaque, uint8_t *buf, int buf_size )
 
 static int64_t IOSeek( void *opaque, int64_t offset, int whence )
 {
-    URLContext *p_url = opaque;
-    sout_mux_t *p_mux = p_url->priv_data;
+    sout_mux_t *p_mux = opaque;
 
 #ifdef AVFORMAT_DEBUG
     msg_Dbg( p_mux, "IOSeek offset: %"PRId64", whence: %i", offset, whence );

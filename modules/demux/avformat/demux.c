@@ -66,8 +66,6 @@ struct demux_sys_t
 
     AVInputFormat  *fmt;
     AVFormatContext *ic;
-    URLContext     url;
-    URLProtocol    prot;
 
     int             i_tk;
     es_out_id_t     **tk;
@@ -206,19 +204,8 @@ int OpenDemux( vlc_object_t *p_this )
     /* Create I/O wrapper */
     p_sys->io_buffer_size = 32768;  /* FIXME */
     p_sys->io_buffer = malloc( p_sys->io_buffer_size );
-    p_sys->url.priv_data = p_demux;
-    p_sys->url.prot = &p_sys->prot;
-    p_sys->url.prot->name = "VLC I/O wrapper";
-    p_sys->url.prot->url_open = 0;
-    p_sys->url.prot->url_read =
-                    (int (*) (URLContext *, unsigned char *, int))IORead;
-    p_sys->url.prot->url_write = 0;
-    p_sys->url.prot->url_seek =
-                    (int64_t (*) (URLContext *, int64_t, int))IOSeek;
-    p_sys->url.prot->url_close = 0;
-    p_sys->url.prot->next = 0;
     init_put_byte( &p_sys->io, p_sys->io_buffer, p_sys->io_buffer_size,
-                   0, &p_sys->url, IORead, NULL, IOSeek );
+                   0, p_demux, IORead, NULL, IOSeek );
 
     stream_Control( p_demux->s, STREAM_CAN_SEEK, &b_can_seek );
     if( !b_can_seek )
@@ -227,7 +214,6 @@ int OpenDemux( vlc_object_t *p_this )
        when trying av_find_stream_info() trying to seek all the wrong places
        init_put_byte defaults io.is_streamed=0, so thats why we set them after it
        */
-       p_sys->url.is_streamed = 1;
        p_sys->io.is_streamed = 1;
 #if defined(AVIO_SEEKABLE_NORMAL)
        p_sys->io.seekable = 0;
@@ -899,8 +885,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
  *****************************************************************************/
 static int IORead( void *opaque, uint8_t *buf, int buf_size )
 {
-    URLContext *p_url = opaque;
-    demux_t *p_demux = p_url->priv_data;
+    demux_t *p_demux = opaque;
     if( buf_size < 0 ) return -1;
     int i_ret = stream_Read( p_demux->s, buf, buf_size );
     return i_ret ? i_ret : -1;
@@ -908,8 +893,7 @@ static int IORead( void *opaque, uint8_t *buf, int buf_size )
 
 static int64_t IOSeek( void *opaque, int64_t offset, int whence )
 {
-    URLContext *p_url = opaque;
-    demux_t *p_demux = p_url->priv_data;
+    demux_t *p_demux = opaque;
     int64_t i_absolute;
     int64_t i_size = stream_Size( p_demux->s );
 
