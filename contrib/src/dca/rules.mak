@@ -23,5 +23,6 @@ libdca: libdca-$(DCA_VERSION).tar.bz2 .sum-dca
 
 .dca: libdca
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF)
-	cd $< && $(MAKE) install
+	cd $< && $(MAKE) -C include install
+	cd $< && $(MAKE) -C libdca install
 	touch $@
