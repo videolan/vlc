@@ -1094,7 +1094,11 @@ static int parse_M3U8(stream_t *s, vlc_array_t *streams, uint8_t *buffer, const 
         else
         {
             /* No Meta playlist used */
-            hls = hls_New(streams, 0, 0, NULL);
+            char*   uri = ConstructUrl( &s->p_sys->m3u8 );
+            if ( uri == NULL )
+                return VLC_EGENERIC;
+            hls = hls_New(streams, 0, 0, uri);
+            free( uri );
             if (hls)
             {
                 /* Get TARGET-DURATION first */
