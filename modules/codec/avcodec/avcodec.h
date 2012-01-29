@@ -314,12 +314,12 @@ int ffmpeg_OpenCodec( decoder_t *p_dec );
 #   define AV_PICTURE_TYPE_I        FF_I_TYPE
 #   define AV_PICTURE_TYPE_P        FF_P_TYPE
 
-#   define SAMPLE_FMT_NONE          AV_SAMPLE_FMT_NONE
-#   define SAMPLE_FMT_U8            AV_SAMPLE_FMT_U8
-#   define SAMPLE_FMT_S16           AV_SAMPLE_FMT_S16
-#   define SAMPLE_FMT_S32           AV_SAMPLE_FMT_S32
-#   define SAMPLE_FMT_FLT           AV_SAMPLE_FMT_FLT
-#   define SAMPLE_FMT_DBL           AV_SAMPLE_FMT_DBL
+#   define AV_SAMPLE_FMT_NONE       SAMPLE_FMT_NONE
+#   define AV_SAMPLE_FMT_U8         SAMPLE_FMT_U8
+#   define AV_SAMPLE_FMT_S16        SAMPLE_FMT_S16
+#   define AV_SAMPLE_FMT_S32        SAMPLE_FMT_S32
+#   define AV_SAMPLE_FMT_FLT        SAMPLE_FMT_FLT
+#   define AV_SAMPLE_FMT_DBL        SAMPLE_FMT_DBL
 
 #ifndef AV_CH_FRONT_LEFT
 #   define AV_CH_FRONT_LEFT         CH_FRONT_LEFT
