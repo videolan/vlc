@@ -46,6 +46,13 @@
 #include "../xiph.h"
 #include "../vobsub.h"
 
+/* Support for deprecated APIs */
+
+#if LIBAVFORMAT_VERSION_MAJOR < 54
+# define AVDictionaryEntry AVMetadataTag
+# define av_dict_get av_metadata_get
+#endif
+
 //#define AVFORMAT_DEBUG 1
 
 /* Version checking */
@@ -354,7 +361,7 @@ int OpenDemux( vlc_object_t *p_this )
                 psz_type = "attachment";
                 if( cc->codec_id == CODEC_ID_TTF )
                 {
-                    AVMetadataTag *filename = av_metadata_get( s->metadata, "filename", NULL, 0 );
+                    AVDictionaryEntry *filename = av_dict_get( s->metadata, "filename", NULL, 0 );
                     if( filename && filename->value )
                     {
                         p_attachment = vlc_input_attachment_New(
@@ -377,7 +384,7 @@ int OpenDemux( vlc_object_t *p_this )
             break;
         }
 
-        AVMetadataTag *language = av_metadata_get( s->metadata, "language", NULL, 0 );
+        AVDictionaryEntry *language = av_dict_get( s->metadata, "language", NULL, 0 );
         if ( language && language->value )
             fmt.psz_language = strdup( language->value );
 
@@ -481,7 +488,7 @@ int OpenDemux( vlc_object_t *p_this )
     {
         seekpoint_t *s = vlc_seekpoint_New();
 
-        AVMetadataTag *title = av_metadata_get( p_sys->ic->metadata, "title", NULL, 0);
+        AVDictionaryEntry *title = av_dict_get( p_sys->ic->metadata, "title", NULL, 0);
         if( title && title->value )
         {
             s->psz_name = strdup( title->value );
@@ -795,11 +802,11 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         {
             vlc_meta_t *p_meta = (vlc_meta_t*)va_arg( args, vlc_meta_t* );
 
-            AVMetadataTag *title = av_metadata_get( p_sys->ic->metadata, "language", NULL, 0 );
-            AVMetadataTag *artist = av_metadata_get( p_sys->ic->metadata, "artist", NULL, 0 );
-            AVMetadataTag *copyright = av_metadata_get( p_sys->ic->metadata, "copyright", NULL, 0 );
-            AVMetadataTag *comment = av_metadata_get( p_sys->ic->metadata, "comment", NULL, 0 );
-            AVMetadataTag *genre = av_metadata_get( p_sys->ic->metadata, "genre", NULL, 0 );
+            AVDictionaryEntry *title = av_dict_get( p_sys->ic->metadata, "language", NULL, 0 );
+            AVDictionaryEntry *artist = av_dict_get( p_sys->ic->metadata, "artist", NULL, 0 );
+            AVDictionaryEntry *copyright = av_dict_get( p_sys->ic->metadata, "copyright", NULL, 0 );
+            AVDictionaryEntry *comment = av_dict_get( p_sys->ic->metadata, "comment", NULL, 0 );
+            AVDictionaryEntry *genre = av_dict_get( p_sys->ic->metadata, "genre", NULL, 0 );
 
             if( title && title->value )
                 vlc_meta_SetTitle( p_meta, title->value );
