@@ -1514,8 +1514,8 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [o_fullscreen_btn setState: NO];
 
     /* We always try to do so */
-    if (!(OSX_LION || !b_nativeFullscreenMode))
-        [NSScreen unblackoutScreens];
+    [NSScreen unblackoutScreens];
+
     vout_thread_t *p_vout = getVout();
     if (p_vout)
     {
