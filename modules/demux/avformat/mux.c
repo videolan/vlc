@@ -39,6 +39,11 @@
 #include "../../codec/avcodec/avcodec.h"
 #include "../../codec/avcodec/avutil.h"
 
+/* Support for deprecated APIs */
+#if LIBAVFORMAT_VERSION_INT < ((52<<16)+(105<<8)+0)
+# define avio_flush put_flush_packet
+#endif
+
 //#define AVFORMAT_DEBUG 1
 
 static const char *const ppsz_mux_options[] = {
@@ -365,9 +370,9 @@ static int Mux( sout_mux_t *p_mux )
         }
 
 #if LIBAVFORMAT_VERSION_INT >= ((52<<16)+(0<<8)+0)
-        put_flush_packet( p_sys->oc->pb );
+        avio_flush( p_sys->oc->pb );
 #else
-        put_flush_packet( &p_sys->oc->pb );
+        avio_flush( &p_sys->oc->pb );
 #endif
         p_sys->b_write_header = false;
     }
