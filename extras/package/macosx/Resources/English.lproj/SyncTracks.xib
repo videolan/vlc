@@ -674,7 +674,7 @@
             <object class="BGHUDLabel" id="935777657">
               <reference key="NSNextResponder" ref="1006"/>
               <int key="NSvFlags">268</int>
-              <string key="NSFrame">{{25, 111}, {86, 14}}</string>
+              <string key="NSFrame">{{25, 111}, {366, 14}}</string>
               <reference key="NSSuperview" ref="1006"/>
               <bool key="NSEnabled">YES</bool>
               <object class="NSTextFieldCell" key="NSCell" id="486082572">
@@ -691,7 +691,7 @@
             <object class="BGHUDLabel" id="623990527">
               <reference key="NSNextResponder" ref="1006"/>
               <int key="NSvFlags">268</int>
-              <string key="NSFrame">{{25, 172}, {86, 14}}</string>
+              <string key="NSFrame">{{25, 172}, {366, 14}}</string>
               <reference key="NSSuperview" ref="1006"/>
               <bool key="NSEnabled">YES</bool>
               <object class="NSTextFieldCell" key="NSCell" id="8830534">
@@ -708,7 +708,7 @@
             <object class="NSButton" id="857991618">
               <reference key="NSNextResponder" ref="1006"/>
               <int key="NSvFlags">268</int>
-              <string key="NSFrame">{{20, 18}, {46, 17}}</string>
+              <string key="NSFrame">{{20, 18}, {73, 17}}</string>
               <reference key="NSSuperview" ref="1006"/>
               <bool key="NSEnabled">YES</bool>
               <object class="BGHUDButtonCell" key="NSCell" id="176843412">

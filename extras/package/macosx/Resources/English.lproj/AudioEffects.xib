@@ -2,10 +2,10 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.10">
   <data>
     <int key="IBDocument.SystemTarget">1050</int>
-    <string key="IBDocument.SystemVersion">11D42</string>
+    <string key="IBDocument.SystemVersion">11C74</string>
     <string key="IBDocument.InterfaceBuilderVersion">851</string>
-    <string key="IBDocument.AppKitVersion">1138.32</string>
-    <string key="IBDocument.HIToolboxVersion">568.00</string>
+    <string key="IBDocument.AppKitVersion">1138.23</string>
+    <string key="IBDocument.HIToolboxVersion">567.00</string>
     <object class="NSMutableDictionary" key="IBDocument.PluginVersions">
       <bool key="EncodedWithXMLCoder">YES</bool>
       <object class="NSArray" key="dict.sortedKeys">
@@ -21,7 +21,7 @@
     </object>
     <object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
       <bool key="EncodedWithXMLCoder">YES</bool>
-      <integer value="170"/>
+      <integer value="1"/>
     </object>
     <object class="NSArray" key="IBDocument.PluginDependencies">
       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -68,7 +68,7 @@
                 <object class="BGHUDTabViewItem" id="459886568">
                   <string key="NSIdentifier">equalizer</string>
                   <object class="NSView" key="NSView" id="327218412">
-                    <reference key="NSNextResponder" ref="876119583"/>
+                    <nil key="NSNextResponder"/>
                     <int key="NSvFlags">256</int>
                     <object class="NSMutableArray" key="NSSubviews">
                       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -837,7 +837,6 @@
                       </object>
                     </object>
                     <string key="NSFrame">{{10, 33}, {404, 177}}</string>
-                    <reference key="NSSuperview" ref="876119583"/>
                   </object>
                   <string key="NSLabel">Graphic Equalizer</string>
                   <reference key="NSColor" ref="423257821"/>
@@ -1255,7 +1254,7 @@
                       <object class="NSButton" id="235290804">
                         <reference key="NSNextResponder" ref="605508444"/>
                         <int key="NSvFlags">268</int>
-                        <string key="NSFrame">{{341, 156}, {46, 17}}</string>
+                        <string key="NSFrame">{{314, 156}, {73, 17}}</string>
                         <reference key="NSSuperview" ref="605508444"/>
                         <bool key="NSEnabled">YES</bool>
                         <object class="BGHUDButtonCell" key="NSCell" id="846216840">
@@ -1361,7 +1360,7 @@ AADzUQABAAAAARbMY3VydgAAAAAAAAABAc0AAA</bytes>
                       <object class="NSButton" id="188755332">
                         <reference key="NSNextResponder" ref="322923036"/>
                         <int key="NSvFlags">268</int>
-                        <string key="NSFrame">{{341, 156}, {46, 17}}</string>
+                        <string key="NSFrame">{{314, 156}, {73, 17}}</string>
                         <reference key="NSSuperview" ref="322923036"/>
                         <bool key="NSEnabled">YES</bool>
                         <object class="BGHUDButtonCell" key="NSCell" id="995442362">
@@ -1703,7 +1702,7 @@ AADzUQABAAAAARbMY3VydgAAAAAAAAABAc0AAA</bytes>
                 <object class="NSTabViewItem" id="305143588">
                   <string key="NSIdentifier">filter</string>
                   <object class="NSView" key="NSView" id="195046814">
-                    <nil key="NSNextResponder"/>
+                    <reference key="NSNextResponder" ref="876119583"/>
                     <int key="NSvFlags">256</int>
                     <object class="NSMutableArray" key="NSSubviews">
                       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -1795,13 +1794,14 @@ AADzUQABAAAAARbMY3VydgAAAAAAAAABAc0AAA</bytes>
                       </object>
                     </object>
                     <string key="NSFrame">{{10, 33}, {404, 177}}</string>
+                    <reference key="NSSuperview" ref="876119583"/>
                   </object>
                   <string key="NSLabel">Filter</string>
                   <reference key="NSColor" ref="423257821"/>
                   <reference key="NSTabView" ref="876119583"/>
                 </object>
               </object>
-              <reference key="NSSelectedTabViewItem" ref="459886568"/>
+              <reference key="NSSelectedTabViewItem" ref="305143588"/>
               <object class="NSFont" key="NSFont">
                 <string key="NSName">LucidaGrande</string>
                 <double key="NSSize">13</double>
@@ -1813,7 +1813,7 @@ AADzUQABAAAAARbMY3VydgAAAAAAAAABAc0AAA</bytes>
               <nil key="themeKey"/>
               <object class="NSMutableArray" key="NSSubviews">
                 <bool key="EncodedWithXMLCoder">YES</bool>
-                <reference ref="327218412"/>
+                <reference ref="195046814"/>
               </object>
             </object>
           </object>
@@ -5416,8 +5416,8 @@ AADzUQABAAAAARbMY3VydgAAAAAAAAABAc0AAA</bytes>
       </object>
       <object class="NSMutableArray" key="dict.values">
         <bool key="EncodedWithXMLCoder">YES</bool>
-        <string>{11, 11}</string>
-        <string>{10, 3}</string>
+        <string>{9, 8}</string>
+        <string>{7, 2}</string>
         <string>{15, 15}</string>
       </object>
     </object>
