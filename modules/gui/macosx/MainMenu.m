@@ -236,6 +236,8 @@ static VLCMainMenu *_o_sharedInstance = nil;
                            stringByAppendingString: @"..."]];
     [o_mi_checkForUpdate setTitle: _NS("Check for Update...")];
     [o_mi_prefs setTitle: _NS("Preferences...")];
+    [o_mi_extensions setTitle: _NS("Extensions")];
+    [o_mu_extensions setTitle: _NS("Extensions")];
     [o_mi_add_intf setTitle: _NS("Add Interface")];
     [o_mu_add_intf setTitle: _NS("Add Interface")];
     [o_mi_services setTitle: _NS("Services")];
@@ -259,8 +261,6 @@ static VLCMainMenu *_o_sharedInstance = nil;
     [o_mi_paste setTitle: _NS("Paste")];
     [o_mi_clear setTitle: _NS("Clear")];
     [o_mi_select_all setTitle: _NS("Select All")];
-
-    [o_mu_extensions setTitle: _NS("Extensions")];
 
     [o_mu_controls setTitle: _NS("Playback")];
     [o_mi_play setTitle: _NS("Play")];
