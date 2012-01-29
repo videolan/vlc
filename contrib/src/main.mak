@@ -42,7 +42,7 @@ ifneq ($(findstring $(ARCH),i386 sparc sparc64 ppc ppc64 x86_64),)
 HAVE_FPU = 1
 else ifneq ($(findstring $(ARCH),arm),)
 ifneq ($(call cppcheck, __VFP_FP__)),)
-ifeq ($(call cppcheck, __SOFT_FP__),)
+ifeq ($(call cppcheck, __SOFTFP__),)
 HAVE_FPU = 1
 endif
 endif
