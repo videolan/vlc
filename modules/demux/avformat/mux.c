@@ -218,7 +218,11 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
         return VLC_EGENERIC;
     }
 
+#if (LIBAVFORMAT_VERSION_INT >= ((53<<16)+(10<<8)+0))
+    stream = avformat_new_stream( p_sys->oc, NULL);
+#else
     stream = av_new_stream( p_sys->oc, p_sys->oc->nb_streams);
+#endif
     if( !stream )
     {
         free( p_input->p_sys );
