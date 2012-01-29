@@ -154,7 +154,13 @@ case "${host_os}" in
     VLC_ADD_LIBS([libvlccore],[-Wl,-framework,CoreFoundation])
 
     dnl Allow binaries created on Lion to run on earlier releases
-    AC_LIBOBJ([getdelim])
+    AC_EGREP_CPP(yes,
+           [#import <Cocoa/Cocoa.h>
+            #ifdef MAC_OS_X_VERSION_10_7
+            yes
+            #endif],
+            [AC_MSG_RESULT([yes])
+            AC_LIBOBJ([getdelim strndup strnlen])],)
 
     dnl
     dnl  Check for Mac OS X SDK settings
