@@ -231,7 +231,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     codec = stream->codec;
 
     /* This is used by LibavutilCallback (avutil.h) to print messages */
-    codec->opaque = (void*)p_mux;
+    codec->opaque = p_mux;
 
     switch( p_input->p_fmt->i_cat )
     {
