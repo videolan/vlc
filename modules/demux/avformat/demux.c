@@ -243,7 +243,7 @@ int OpenDemux( vlc_object_t *p_this )
     psz_url = NULL;
 
     vlc_avcodec_lock(); /* avformat calls avcodec behind our back!!! */
-#if LIBAVFORMAT_VERSION_INT >= ((53<<16)+(17<<8)+0)
+#if LIBAVFORMAT_VERSION_INT >= ((53<<16)+(26<<8)+0)
     error = avformat_find_stream_info( p_sys->ic, NULL /* options */ );
 #else
     error = av_find_stream_info( p_sys->ic );
@@ -529,7 +529,7 @@ void CloseDemux( vlc_object_t *p_this )
     free( p_sys->tk_pcr );
 
     if( p_sys->ic )
-#if LIBAVFORMAT_VERSION_INT >= ((53<<16)+(17<<8)+0)
+#if LIBAVFORMAT_VERSION_INT >= ((53<<16)+(26<<8)+0)
         avformat_close_input( &p_sys->ic );
 #else
         av_close_input_stream( p_sys->ic );
