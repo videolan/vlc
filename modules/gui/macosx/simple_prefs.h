@@ -46,7 +46,9 @@
     IBOutlet id o_audio_visual_txt;
     IBOutlet id o_audio_vol_fld;
     IBOutlet id o_audio_vol_sld;
-    IBOutlet id o_audio_vol_txt;
+    IBOutlet id o_audio_autosavevol_matrix;
+    IBOutlet id o_audio_autosavevol_yes_bcell;
+    IBOutlet id o_audio_autosavevol_no_bcell;
 
     IBOutlet id o_hotkeys_change_btn;
     IBOutlet id o_hotkeys_change_lbl;

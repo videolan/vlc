@@ -895,7 +895,9 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
 - (void)applicationWillTerminate:(NSNotification *)notification
 {
-    config_PutInt( VLCIntf->p_libvlc, "volume", i_lastShownVolume );
+    if( config_GetInt( VLCIntf, "macosx-autosave-volume" ))
+        config_PutInt( VLCIntf->p_libvlc, "volume", i_lastShownVolume );
+
     [self saveFrameUsingName: [self frameAutosaveName]];
 }
 

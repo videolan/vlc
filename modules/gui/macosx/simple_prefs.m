@@ -29,6 +29,7 @@
 #import "prefs.h"
 #import <vlc_keys.h>
 #import <vlc_interface.h>
+#import <vlc_aout_intf.h>
 #import <vlc_dialog.h>
 #import <vlc_modules.h>
 #import <vlc_config_cat.h>
@@ -231,7 +232,8 @@ create_toolbar_item( NSString * o_itemIdent, NSString * o_name, NSString * o_des
     [o_audio_lastuser_txt setStringValue: _NS("User name")];
     [o_audio_spdif_ckb setTitle: _NS("Use S/PDIF when available")];
     [o_audio_visual_txt setStringValue: _NS("Visualization")];
-    [o_audio_vol_txt setStringValue: _NS("Default Volume")];
+    [o_audio_autosavevol_yes_bcell setTitle: _NS("Keep audio level between sessions")];
+    [o_audio_autosavevol_no_bcell setTitle: _NS("Always reset audio start level to:")];
 
     /* hotkeys */
     [o_hotkeys_change_btn setTitle: _NS("Change")];
@@ -488,11 +490,29 @@ static inline char * __config_GetLabel( vlc_object_t *p_this, const char *psz_na
      * audio settings *
      ******************/
     [self setupButton: o_audio_enable_ckb forBoolValue: "audio"];
-    i = config_GetInt( p_intf, "volume" );
-    [o_audio_vol_fld setToolTip: [NSString stringWithUTF8String: config_GetLabel( p_intf, "volume")]];
-    [o_audio_vol_fld setIntValue: i];
-    [o_audio_vol_sld setToolTip: [o_audio_vol_fld toolTip]];
-    [o_audio_vol_sld setIntValue: i];
+
+    if ( config_GetInt( p_intf, "macosx-autosave-volume" ))
+    {
+        [o_audio_autosavevol_yes_bcell setState: NSOnState];
+        [o_audio_autosavevol_no_bcell setState: NSOffState];
+        [o_audio_vol_fld setEnabled: NO];
+        [o_audio_vol_sld setEnabled: NO];
+
+        [o_audio_vol_sld setIntValue: 100];
+        [o_audio_vol_fld setIntValue: 100];
+    }
+    else
+    {
+        [o_audio_autosavevol_yes_bcell setState: NSOffState];
+        [o_audio_autosavevol_no_bcell setState: NSOnState];
+        [o_audio_vol_fld setEnabled: YES];
+        [o_audio_vol_sld setEnabled: YES];
+
+        i = config_GetInt( p_intf, "volume" );
+        i = i * 200 / AOUT_VOLUME_MAX;
+        [o_audio_vol_sld setIntValue: i];
+        [o_audio_vol_fld setIntValue: i];
+    }
 
     [self setupButton: o_audio_spdif_ckb forBoolValue: "spdif"];
 
@@ -836,7 +856,8 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
     if( b_audioSettingChanged )
     {
         config_PutInt( p_intf, "audio", [o_audio_enable_ckb state] );
-        config_PutInt( p_intf, "volume", [o_audio_vol_sld intValue]);
+        config_PutInt( p_intf, "volume", [o_audio_vol_fld intValue] * AOUT_VOLUME_MAX / 200 );
+        config_PutInt( p_intf, "macosx-autosave-volume", [o_audio_autosavevol_yes_bcell state] );
         config_PutInt( p_intf, "spdif", [o_audio_spdif_ckb state] );
 
         SaveIntList( o_audio_dolby_pop, "force-dolby-surround" );
@@ -1026,6 +1047,13 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
             [o_audio_lastpwd_sfld setEnabled: NO];
             [o_audio_lastuser_fld setEnabled: NO];
         }
+    }
+
+    if( sender == o_audio_autosavevol_matrix )
+    {
+        BOOL enableVolumeSlider = [o_audio_autosavevol_matrix selectedTag] == 1;
+        [o_audio_vol_fld setEnabled: enableVolumeSlider];
+        [o_audio_vol_sld setEnabled: enableVolumeSlider];
     }
 
     b_audioSettingChanged = YES;
