@@ -125,7 +125,7 @@ int OpenDemux( vlc_object_t *p_this )
     msg_Dbg( p_demux, "trying url: %s", psz_url );
     /* Init Probe data */
     pd.filename = psz_url;
-    if( ( pd.buf_size = stream_Peek( p_demux->s, &pd.buf, 2048 + 213 ) ) <= 0 )
+    if( ( pd.buf_size = stream_Peek( p_demux->s, (const uint8_t**)&pd.buf, 2048 + 213 ) ) <= 0 )
     {
         free( psz_url );
         msg_Warn( p_demux, "cannot peek" );
