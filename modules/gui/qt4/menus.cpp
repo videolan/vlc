@@ -894,7 +894,7 @@ void VLCMenuBar::PopupMenuPlaylistControlEntries( QMenu *menu,
 
 void VLCMenuBar::PopupMenuStaticEntries( QMenu *menu )
 {
-    QMenu *openmenu = new QMenu( qtr( "Open a Media" ), menu );
+    QMenu *openmenu = new QMenu( qtr( "Open Media" ), menu );
     addDPStaticEntry( openmenu, qtr( "&Open File..." ),
         ":/type/file-asym", SLOT( openFileDialog() ) );
     addDPStaticEntry( openmenu, qtr( I_OP_OPDIR ),
@@ -1138,7 +1138,7 @@ void VLCMenuBar::updateSystrayMenu( MainInterface *mi,
 
     VolumeEntries( p_intf, sysMenu );
     sysMenu->addSeparator();
-    addDPStaticEntry( sysMenu, qtr( "&Open a Media" ),
+    addDPStaticEntry( sysMenu, qtr( "Open Media" ),
             ":/type/file-wide", SLOT( openFileDialog() ) );
     addDPStaticEntry( sysMenu, qtr( "&Quit" ) ,
             ":/menu/quit", SLOT( quit() ) );
