@@ -332,7 +332,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
         switch (*p_category) {
             case SD_CAT_INTERNET:
                 {
-                    [internetItems addObject: [SideBarItem itemWithTitle: [NSString stringWithCString: *ppsz_longname encoding: NSUTF8StringEncoding] identifier: o_identifier]];
+                    [internetItems addObject: [SideBarItem itemWithTitle: _NS(*ppsz_longname) identifier: o_identifier]];
                     if (!strncmp( *ppsz_name, "podcast", 7 ))
                         [[internetItems lastObject] setIcon: [NSImage imageNamed:@"sidebar-podcast"]];
                     else
@@ -342,21 +342,21 @@ static VLCMainWindow *_o_sharedInstance = nil;
                 break;
             case SD_CAT_DEVICES:
                 {
-                    [devicesItems addObject: [SideBarItem itemWithTitle: [NSString stringWithCString: *ppsz_longname encoding: NSUTF8StringEncoding] identifier: o_identifier]];
+                    [devicesItems addObject: [SideBarItem itemWithTitle: _NS(*ppsz_longname) identifier: o_identifier]];
                     [[devicesItems lastObject] setIcon: [NSImage imageNamed:@"NSApplicationIcon"]];
                     [[devicesItems lastObject] setSdtype: SD_CAT_DEVICES];
                 }
                 break;
             case SD_CAT_LAN:
                 {
-                    [lanItems addObject: [SideBarItem itemWithTitle: [NSString stringWithCString: *ppsz_longname encoding: NSUTF8StringEncoding] identifier: o_identifier]];
+                    [lanItems addObject: [SideBarItem itemWithTitle: _NS(*ppsz_longname) identifier: o_identifier]];
                     [[lanItems lastObject] setIcon: [NSImage imageNamed:@"sidebar-local"]];
                     [[lanItems lastObject] setSdtype: SD_CAT_LAN];
                 }
                 break;
             case SD_CAT_MYCOMPUTER:
                 {
-                    [mycompItems addObject: [SideBarItem itemWithTitle: [NSString stringWithCString: *ppsz_longname encoding: NSUTF8StringEncoding] identifier: o_identifier]];
+                    [mycompItems addObject: [SideBarItem itemWithTitle: _NS(*ppsz_longname) identifier: o_identifier]];
                     if (!strncmp( *ppsz_name, "video_dir", 9 ))
                         [[mycompItems lastObject] setIcon: [NSImage imageNamed:@"sidebar-movie"]];
                     else if (!strncmp( *ppsz_name, "audio_dir", 9 ))

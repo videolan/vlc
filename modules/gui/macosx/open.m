@@ -346,8 +346,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
         for ( i_index = 0; i_index < p_item->i_list; i_index++ )
         {
             [o_file_sub_align_pop addItemWithTitle:
-                [NSString stringWithUTF8String:
-                p_item->ppsz_list_text[i_index]]];
+             _NS(p_item->ppsz_list_text[i_index])];
         }
         [o_file_sub_align_pop selectItemAtIndex: p_item->value.i];
     }
@@ -358,9 +357,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
     {
         for ( i_index = 0; i_index < p_item->i_list; i_index++ )
         {
-            [o_file_sub_size_pop addItemWithTitle:
-                [NSString stringWithUTF8String:
-                p_item->ppsz_list_text[i_index]]];
+            [o_file_sub_size_pop addItemWithTitle: _NS(p_item->ppsz_list_text[i_index])];
             if ( p_item->value.i == p_item->pi_list[i_index] )
             {
                 [o_file_sub_size_pop selectItemAtIndex: i_index];
