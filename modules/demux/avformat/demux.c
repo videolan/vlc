@@ -114,6 +114,7 @@ int OpenDemux( vlc_object_t *p_this )
     int64_t       i_start_time = -1;
     bool          b_can_seek;
     char         *psz_url;
+    int           error;
 
     if( p_demux->psz_file )
         psz_url = strdup( p_demux->psz_file );
@@ -242,9 +243,15 @@ int OpenDemux( vlc_object_t *p_this )
     psz_url = NULL;
 
     vlc_avcodec_lock(); /* avformat calls avcodec behind our back!!! */
-    if( av_find_stream_info( p_sys->ic ) < 0 )
+#if LIBAVFORMAT_VERSION_INT >= ((53<<16)+(17<<8)+0)
+    error = avformat_find_stream_info( p_sys->ic, NULL /* options */ );
+#else
+    error = av_find_stream_info( p_sys->ic );
+#endif
+    if( error < 0 )
     {
-        msg_Warn( p_demux, "av_find_stream_info failed" );
+        errno = AVUNERROR(error);
+        msg_Warn( p_demux, "Could not find stream info: %m" );
     }
     vlc_avcodec_unlock();
 
@@ -521,7 +528,12 @@ void CloseDemux( vlc_object_t *p_this )
     FREENULL( p_sys->tk );
     free( p_sys->tk_pcr );
 
-    if( p_sys->ic ) av_close_input_stream( p_sys->ic );
+    if( p_sys->ic )
+#if LIBAVFORMAT_VERSION_INT >= ((53<<16)+(17<<8)+0)
+        avformat_close_input( &p_sys->ic );
+#else
+        av_close_input_stream( p_sys->ic );
+#endif
 
     for( int i = 0; i < p_sys->i_attachments; i++ )
         free( p_sys->attachments[i] );
