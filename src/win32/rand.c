@@ -52,11 +52,11 @@ void vlc_rand_bytes (void *buf, size_t len)
 
     /* acquire default encryption context */
     if( CryptAcquireContext(
-        &hProv,            // Variable to hold returned handle.
-        NULL,              // Use default key container.
-        MS_DEF_PROV,       // Use default CSP.
-        PROV_RSA_FULL,     // Type of provider to acquire.
-        0) )
+        &hProv,                 // Variable to hold returned handle.
+        NULL,                   // Use default key container.
+        MS_DEF_PROV,            // Use default CSP.
+        PROV_RSA_FULL,          // Type of provider to acquire.
+        CRYPT_VERIFYCONTEXT) )  // Flag values
     {
         /* fill buffer with pseudo-random data, intial buffer content
            is used as auxillary random seed */
