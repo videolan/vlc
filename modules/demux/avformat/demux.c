@@ -67,7 +67,10 @@
  *****************************************************************************/
 struct demux_sys_t
 {
+#if LIBAVFORMAT_VERSION_INT < ((53<<16)+(2<<8)+0)
     ByteIOContext   io;
+#endif
+
     int             io_buffer_size;
     uint8_t        *io_buffer;
 
@@ -132,6 +135,7 @@ int OpenDemux( vlc_object_t *p_this )
         msg_Warn( p_demux, "cannot peek" );
         return VLC_EGENERIC;
     }
+    stream_Control( p_demux->s, STREAM_CAN_SEEK, &b_can_seek );
 
     vlc_avcodec_lock();
     av_register_all(); /* Can be called several times */
@@ -212,35 +216,36 @@ int OpenDemux( vlc_object_t *p_this )
     /* Create I/O wrapper */
     p_sys->io_buffer_size = 32768;  /* FIXME */
     p_sys->io_buffer = malloc( p_sys->io_buffer_size );
-    init_put_byte( &p_sys->io, p_sys->io_buffer, p_sys->io_buffer_size,
-                   0, p_demux, IORead, NULL, IOSeek );
 
-    stream_Control( p_demux->s, STREAM_CAN_SEEK, &b_can_seek );
-    if( !b_can_seek )
+#if LIBAVFORMAT_VERSION_INT >= ((53<<16)+(2<<8)+0)
+    AVIOContext *io = avio_alloc_context( p_sys->io_buffer,
+        p_sys->io_buffer_size, 0, p_demux, IORead, NULL, IOSeek );
+    io->seekable = b_can_seek ? AVIO_SEEKABLE_NORMAL : 0;
+    error = avformat_open_input(&p_sys->ic, psz_url, p_sys->fmt, NULL);
+    if (error == 0)
     {
-       /* Tell avformat that input is stream, so it doesn't get stuck
-       when trying av_find_stream_info() trying to seek all the wrong places
-       init_put_byte defaults io.is_streamed=0, so thats why we set them after it
-       */
-       p_sys->io.is_streamed = 1;
-#if defined(AVIO_SEEKABLE_NORMAL)
-       p_sys->io.seekable = 0;
-#endif
+        p_sys->ic->flags |= AVFMT_FLAG_CUSTOM_IO;
+        p_sys->ic->pb = io;
     }
+#else
+    init_put_byte( &p_sys->io, p_sys->io_buffer, p_sys->io_buffer_size, 0,
+        p_demux, IORead, NULL, IOSeek );
+    p_sys->io.is_streamed = !b_can_seek;
+# if defined(AVIO_SEEKABLE_NORMAL)
+    p_sys->io.seekable = !!b_can_seek;
+# endif
+    error = av_open_input_stream(&p_sys->ic, &p_sys->io, psz_url, p_sys->fmt, NULL);
+#endif
 
-
-    /* Open it */
-    if( av_open_input_stream( &p_sys->ic, &p_sys->io, psz_url,
-                              p_sys->fmt, NULL ) )
+    free( psz_url );
+    if( error < 0 )
     {
-        msg_Err( p_demux, "av_open_input_stream failed" );
+        errno = AVUNERROR(error);
+        msg_Err( p_demux, "Could not open %s: %m", psz_url );
         p_sys->ic = NULL;
-        free( psz_url );
         CloseDemux( p_this );
         return VLC_EGENERIC;
     }
-    free( psz_url );
-    psz_url = NULL;
 
     vlc_avcodec_lock(); /* avformat calls avcodec behind our back!!! */
 #if LIBAVFORMAT_VERSION_INT >= ((53<<16)+(26<<8)+0)
@@ -529,11 +534,16 @@ void CloseDemux( vlc_object_t *p_this )
     free( p_sys->tk_pcr );
 
     if( p_sys->ic )
+    {
+#if LIBAVFORMAT_VERSION_INT >= ((53<<16)+(2<<8)+0)
+        av_free( p_sys->ic->pb );
+#endif
 #if LIBAVFORMAT_VERSION_INT >= ((53<<16)+(26<<8)+0)
         avformat_close_input( &p_sys->ic );
 #else
         av_close_input_stream( p_sys->ic );
 #endif
+    }
 
     for( int i = 0; i < p_sys->i_attachments; i++ )
         free( p_sys->attachments[i] );
