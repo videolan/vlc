@@ -1,6 +1,6 @@
 # libvpx
 
-VPX_VERSION := v0.9.7-p1
+VPX_VERSION := v1.0.0
 VPX_URL := http://webm.googlecode.com/files/libvpx-$(VPX_VERSION).tar.bz2
 
 $(TARBALLS)/libvpx-$(VPX_VERSION).tar.bz2:
@@ -18,8 +18,6 @@ libvpx: libvpx-$(VPX_VERSION).tar.bz2 .sum-vpx
 	$(UNPACK)
 	$(APPLY) $(SRC)/vpx/libvpx-no-cross.patch
 	$(APPLY) $(SRC)/vpx/libvpx-no-abi.patch
-	$(APPLY) $(SRC)/vpx/libvpx-win64.patch
-	$(APPLY) $(SRC)/vpx/libvpx-darwin10.patch
 	$(PATCH_BASH_LOCATION)
 	$(MOVE)
 
