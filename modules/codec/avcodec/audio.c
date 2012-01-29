@@ -41,7 +41,9 @@
 #   include <avcodec.h>
 #endif
 
-#include "libavutil/audioconvert.h"
+#if LIBAVUTIL_VERSION_INT >= ((52<<16)+(38<<8)+0)
+# include "libavutil/audioconvert.h"
+#endif
 
 #include "avcodec.h"
 
