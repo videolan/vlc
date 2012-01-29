@@ -75,7 +75,10 @@ static VLCMainWindow *_o_sharedInstance = nil;
     if (b_dark_interface)
     {
 #ifdef MAC_OS_X_VERSION_10_7
-        styleMask = NSBorderlessWindowMask | NSResizableWindowMask;
+        if (OSX_LION)
+            styleMask = NSBorderlessWindowMask | NSResizableWindowMask;
+        else
+            styleMask = NSBorderlessWindowMask;
 #else
         styleMask = NSBorderlessWindowMask;
 #endif
