@@ -64,7 +64,7 @@ MetaPanel::MetaPanel( QWidget *parent,
     metaLayout->setVerticalSpacing( 0 );
 
     QFont smallFont = QApplication::font();
-    smallFont.setPointSize( smallFont.pointSize() - 2 );
+    smallFont.setPointSize( smallFont.pointSize() - 1 );
     smallFont.setBold( true );
 
     int line = 0; /* Counter for GridLayout */
