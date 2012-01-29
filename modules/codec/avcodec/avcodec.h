@@ -321,26 +321,66 @@ int ffmpeg_OpenCodec( decoder_t *p_dec );
 #   define SAMPLE_FMT_FLT           AV_SAMPLE_FMT_FLT
 #   define SAMPLE_FMT_DBL           AV_SAMPLE_FMT_DBL
 
+#ifndef AV_CH_FRONT_LEFT
 #   define AV_CH_FRONT_LEFT         CH_FRONT_LEFT
+#endif
+#ifndef AV_CH_FRONT_RIGHT
 #   define AV_CH_FRONT_RIGHT        CH_FRONT_RIGHT
+#endif
+#ifndef AV_CH_FRONT_CENTER
 #   define AV_CH_FRONT_CENTER       CH_FRONT_CENTER
+#endif
+#ifndef AV_CH_LOW_FREQUENCY
 #   define AV_CH_LOW_FREQUENCY      CH_LOW_FREQUENCY
+#endif
+#ifndef AV_CH_BACK_LEFT
 #   define AV_CH_BACK_LEFT          CH_BACK_LEFT
+#endif
+#ifndef AV_CH_BACK_RIGHT
 #   define AV_CH_BACK_RIGHT         CH_BACK_RIGHT
+#endif
+#ifndef AV_CH_FRONT_LEFT_OF_CENTER
 #   define AV_CH_FRONT_LEFT_OF_CENTER  CH_FRONT_LEFT_OF_CENTER
+#endif
+#ifndef AV_CH_FRONT_RIGHT_OF_CENTER
 #   define AV_CH_FRONT_RIGHT_OF_CENTER CH_FRONT_RIGHT_OF_CENTER
+#endif
+#ifndef AV_CH_BACK_CENTER
 #   define AV_CH_BACK_CENTER        CH_BACK_CENTER
+#endif
+#ifndef AV_CH_SIDE_LEFT
 #   define AV_CH_SIDE_LEFT          CH_SIDE_LEFT
+#endif
+#ifndef AV_CH_SIDE_RIGHT
 #   define AV_CH_SIDE_RIGHT         CH_SIDE_RIGHT
+#endif
+#ifndef AV_CH_TOP_CENTER
 #   define AV_CH_TOP_CENTER         CH_TOP_CENTER
+#endif
+#ifndef AV_CH_TOP_FRONT_LEFT
 #   define AV_CH_TOP_FRONT_LEFT     CH_TOP_FRONT_LEFT
+#endif
+#ifndef AV_CH_TOP_FRONT_CENTER
 #   define AV_CH_TOP_FRONT_CENTER   CH_TOP_FRONT_CENTER
+#endif
+#ifndef AV_CH_TOP_FRONT_RIGHT
 #   define AV_CH_TOP_FRONT_RIGHT    CH_TOP_FRONT_RIGHT
+#endif
+#ifndef AV_CH_TOP_BACK_LEFT
 #   define AV_CH_TOP_BACK_LEFT      CH_TOP_BACK_LEFT
+#endif
+#ifndef AV_CH_TOP_BACK_CENTER
 #   define AV_CH_TOP_BACK_CENTER    CH_TOP_BACK_CENTER
+#endif
+#ifndef AV_CH_TOP_BACK_RIGHT
 #   define AV_CH_TOP_BACK_RIGHT     CH_TOP_BACK_RIGHT
+#endif
+#ifndef AV_CH_STEREO_LEFT
 #   define AV_CH_STEREO_LEFT        CH_STEREO_LEFT
+#endif
+#ifndef AV_CH_STEREO_RIGHT
 #   define AV_CH_STEREO_RIGHT       CH_STEREO_RIGHT
+#endif
 
 
 #endif
