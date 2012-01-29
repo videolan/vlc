@@ -566,13 +566,13 @@ static inline void VolumeEntries( intf_thread_t *p_intf, QMenu *current )
 {
     current->addSeparator();
 
-    QAction *action = current->addAction( qtr( "Increase Volume" ),
+    QAction *action = current->addAction( qtr( "&Increase Volume" ),
                 ActionsManager::getInstance( p_intf ), SLOT( AudioUp() ) );
     action->setData( VLCMenuBar::ACTION_STATIC );
-    action = current->addAction( qtr( "Decrease Volume" ),
+    action = current->addAction( qtr( "&Decrease Volume" ),
                 ActionsManager::getInstance( p_intf ), SLOT( AudioDown() ) );
     action->setData( VLCMenuBar::ACTION_STATIC );
-    action = current->addAction( qtr( "Mute" ),
+    action = current->addAction( qtr( "&Mute" ),
                 ActionsManager::getInstance( p_intf ), SLOT( toggleMuteAudio() ) );
     action->setData( VLCMenuBar::ACTION_STATIC );
 }
@@ -787,7 +787,7 @@ void VLCMenuBar::PopupPlayEntries( QMenu *menu,
     /* Play or Pause action and icon */
     if( !p_input || var_GetInteger( p_input, "state" ) != PLAYING_S )
     {
-        action = menu->addAction( qtr( "Play" ),
+        action = menu->addAction( qtr( "&Play" ),
                 ActionsManager::getInstance( p_intf ), SLOT( play() ) );
 #ifndef __APPLE__ /* No icons in menus in Mac */
         action->setIcon( QIcon( ":/menu/play" ) );
@@ -1120,13 +1120,13 @@ void VLCMenuBar::updateSystrayMenu( MainInterface *mi,
     if( mi->isVisible() || b_force_visible )
     {
         sysMenu->addAction( QIcon( ":/logo/vlc16.png" ),
-                            qtr( "Hide VLC media player in taskbar" ), mi,
+                            qtr( "&Hide VLC media player in taskbar" ), mi,
                             SLOT( hideUpdateSystrayMenu() ) );
     }
     else
     {
         sysMenu->addAction( QIcon( ":/logo/vlc16.png" ),
-                            qtr( "Show VLC media player" ), mi,
+                            qtr( "Sho&w VLC media player" ), mi,
                             SLOT( showUpdateSystrayMenu() ) );
     }
     sysMenu->addSeparator();
@@ -1138,7 +1138,7 @@ void VLCMenuBar::updateSystrayMenu( MainInterface *mi,
 
     VolumeEntries( p_intf, sysMenu );
     sysMenu->addSeparator();
-    addDPStaticEntry( sysMenu, qtr( "Open Media" ),
+    addDPStaticEntry( sysMenu, qtr( "&Open Media" ),
             ":/type/file-wide", SLOT( openFileDialog() ) );
     addDPStaticEntry( sysMenu, qtr( "&Quit" ) ,
             ":/menu/quit", SLOT( quit() ) );
