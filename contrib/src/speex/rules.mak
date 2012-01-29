@@ -31,9 +31,9 @@ speex: speex-$(SPEEX_VERSION).tar.gz .sum-speex
 CONFIG_OPTS := --without-ogg --enable-resample-full-sinc-table
 ifndef HAVE_FPU
 CONFIG_OPTS += --enable-fixed-point
-endif
 ifeq ($(ARCH),arm)
 CONFIG_OPTS += --enable-arm5e-asm
+endif
 endif
 
 .speex: speex
