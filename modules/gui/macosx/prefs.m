@@ -420,11 +420,11 @@ static VLCPrefs *_o_sharedMainInstance = nil;
 }
 - (id)initWithCategory:(int)category
 {
-    NSString * name = [[VLCMain sharedInstance] localizedString: config_CategoryNameGet( category )];
+    NSString * name = _NS(config_CategoryNameGet( category ));
     if(self = [super initWithName:name])
     {
         _category = category;
-        //_help = [[[VLCMain sharedInstance] localizedString: config_CategoryHelpGet( category )] retain];
+        //_help = [_NS(config_CategoryHelpGet( category )) retain];
     }
     return self;
 }
@@ -452,11 +452,11 @@ static VLCPrefs *_o_sharedMainInstance = nil;
 @implementation VLCTreeSubCategoryItem
 - (id)initWithSubCategory:(int)subCategory
 {
-    NSString * name = [[VLCMain sharedInstance] localizedString: config_CategoryNameGet( subCategory )];
+    NSString * name = _NS(config_CategoryNameGet( subCategory ));
     if(self = [super initWithName:name])
     {
         _subCategory = subCategory;
-        //_help = [[[VLCMain sharedInstance] localizedString: config_CategoryHelpGet( subCategory )] retain];
+        //_help = [_NS(config_CategoryHelpGet( subCategory )) retain];
     }
     return self;
 }
@@ -478,12 +478,12 @@ static VLCPrefs *_o_sharedMainInstance = nil;
 @implementation VLCTreePluginItem
 - (id)initWithPlugin:(module_t *)plugin
 {
-    NSString * name = [[VLCMain sharedInstance] localizedString: module_get_name( plugin, false )?:""];
+    NSString * name = _NS( module_get_name( plugin, false )?:"" );
     if(self = [super initWithName:name])
     {
         _configItems = module_config_get( plugin, &_configSize );
         //_plugin = plugin;
-        //_help = [[[VLCMain sharedInstance] localizedString: config_CategoryHelpGet( subCategory )] retain];
+        //_help = [_NS(config_CategoryHelpGet( subCategory )) retain];
     }
     return self;
 }
@@ -516,7 +516,7 @@ static VLCPrefs *_o_sharedMainInstance = nil;
 
 - (id)initWithConfigItem: (module_config_t *) configItem
 {
-    NSString * name = [[VLCMain sharedInstance] localizedString:configItem->psz_name];
+    NSString * name = _NS(configItem->psz_name);
     self = [super initWithName:name];
     [name release];
     if( self != nil )
