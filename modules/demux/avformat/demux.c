@@ -218,15 +218,11 @@ int OpenDemux( vlc_object_t *p_this )
     p_sys->io_buffer = malloc( p_sys->io_buffer_size );
 
 #if LIBAVFORMAT_VERSION_INT >= ((53<<16)+(2<<8)+0)
-    AVIOContext *io = avio_alloc_context( p_sys->io_buffer,
+    p_sys->ic = avformat_alloc_context();
+    p_sys->ic->pb = avio_alloc_context( p_sys->io_buffer,
         p_sys->io_buffer_size, 0, p_demux, IORead, NULL, IOSeek );
-    io->seekable = b_can_seek ? AVIO_SEEKABLE_NORMAL : 0;
+    p_sys->ic->pb->seekable = b_can_seek ? AVIO_SEEKABLE_NORMAL : 0;
     error = avformat_open_input(&p_sys->ic, psz_url, p_sys->fmt, NULL);
-    if (error == 0)
-    {
-        p_sys->ic->flags |= AVFMT_FLAG_CUSTOM_IO;
-        p_sys->ic->pb = io;
-    }
 #else
     init_put_byte( &p_sys->io, p_sys->io_buffer, p_sys->io_buffer_size, 0,
         p_demux, IORead, NULL, IOSeek );
