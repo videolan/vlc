@@ -160,7 +160,9 @@ case "${host_os}" in
             yes
             #endif],
             [AC_MSG_RESULT([yes])
-            AC_LIBOBJ([getdelim strndup strnlen])],)
+            AC_LIBOBJ([getdelim])
+            AC_LIBOBJ([strndup])
+            AC_LIBOBJ([strnlen])],)
 
     dnl
     dnl  Check for Mac OS X SDK settings
