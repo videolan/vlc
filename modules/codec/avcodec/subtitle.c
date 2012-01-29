@@ -90,8 +90,14 @@ int InitSubtitleDec(decoder_t *dec, AVCodecContext *context,
     context->extradata = NULL;
 
     /* */
+    int ret;
     vlc_avcodec_lock();
-    if (avcodec_open(context, codec) < 0) {
+#if LIBAVCODEC_VERSION_MAJOR < 54
+    ret = avcodec_open(context, codec);
+#else
+    ret = avcodec_open2(context, codec, NULL /* options */);
+#endif
+    if (ret < 0) {
         vlc_avcodec_unlock();
         msg_Err(dec, "cannot open codec (%s)", namecodec);
         free(context->extradata);

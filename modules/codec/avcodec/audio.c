@@ -41,6 +41,8 @@
 #   include <avcodec.h>
 #endif
 
+#include "libavutil/audioconvert.h"
+
 #include "avcodec.h"
 
 /*****************************************************************************
@@ -415,24 +417,24 @@ void GetVlcAudioFormat( vlc_fourcc_t *pi_codec, unsigned *pi_bits, int i_sample_
 {
     switch( i_sample_fmt )
     {
-    case SAMPLE_FMT_U8:
+    case AV_SAMPLE_FMT_U8:
         *pi_codec = VLC_CODEC_U8;
         *pi_bits = 8;
         break;
-    case SAMPLE_FMT_S32:
+    case AV_SAMPLE_FMT_S32:
         *pi_codec = VLC_CODEC_S32N;
         *pi_bits = 32;
         break;
-    case SAMPLE_FMT_FLT:
+    case AV_SAMPLE_FMT_FLT:
         *pi_codec = VLC_CODEC_FL32;
         *pi_bits = 32;
         break;
-    case SAMPLE_FMT_DBL:
+    case AV_SAMPLE_FMT_DBL:
         *pi_codec = VLC_CODEC_FL64;
         *pi_bits = 64;
         break;
 
-    case SAMPLE_FMT_S16:
+    case AV_SAMPLE_FMT_S16:
     default:
         *pi_codec = VLC_CODEC_S16N;
         *pi_bits = 16;
@@ -442,26 +444,26 @@ void GetVlcAudioFormat( vlc_fourcc_t *pi_codec, unsigned *pi_bits, int i_sample_
 
 static const uint64_t pi_channels_map[][2] =
 {
-    { CH_FRONT_LEFT,        AOUT_CHAN_LEFT },
-    { CH_FRONT_RIGHT,       AOUT_CHAN_RIGHT },
-    { CH_FRONT_CENTER,      AOUT_CHAN_CENTER },
-    { CH_LOW_FREQUENCY,     AOUT_CHAN_LFE },
-    { CH_BACK_LEFT,         AOUT_CHAN_REARLEFT },
-    { CH_BACK_RIGHT,        AOUT_CHAN_REARRIGHT },
-    { CH_FRONT_LEFT_OF_CENTER, 0 },
-    { CH_FRONT_RIGHT_OF_CENTER, 0 },
-    { CH_BACK_CENTER,       AOUT_CHAN_REARCENTER },
-    { CH_SIDE_LEFT,         AOUT_CHAN_MIDDLELEFT },
-    { CH_SIDE_RIGHT,        AOUT_CHAN_MIDDLERIGHT },
-    { CH_TOP_CENTER,        0 },
-    { CH_TOP_FRONT_LEFT,    0 },
-    { CH_TOP_FRONT_CENTER,  0 },
-    { CH_TOP_FRONT_RIGHT,   0 },
-    { CH_TOP_BACK_LEFT,     0 },
-    { CH_TOP_BACK_CENTER,   0 },
-    { CH_TOP_BACK_RIGHT,    0 },
-    { CH_STEREO_LEFT,       0 },
-    { CH_STEREO_RIGHT,      0 },
+    { AV_CH_FRONT_LEFT,        AOUT_CHAN_LEFT },
+    { AV_CH_FRONT_RIGHT,       AOUT_CHAN_RIGHT },
+    { AV_CH_FRONT_CENTER,      AOUT_CHAN_CENTER },
+    { AV_CH_LOW_FREQUENCY,     AOUT_CHAN_LFE },
+    { AV_CH_BACK_LEFT,         AOUT_CHAN_REARLEFT },
+    { AV_CH_BACK_RIGHT,        AOUT_CHAN_REARRIGHT },
+    { AV_CH_FRONT_LEFT_OF_CENTER, 0 },
+    { AV_CH_FRONT_RIGHT_OF_CENTER, 0 },
+    { AV_CH_BACK_CENTER,       AOUT_CHAN_REARCENTER },
+    { AV_CH_SIDE_LEFT,         AOUT_CHAN_MIDDLELEFT },
+    { AV_CH_SIDE_RIGHT,        AOUT_CHAN_MIDDLERIGHT },
+    { AV_CH_TOP_CENTER,        0 },
+    { AV_CH_TOP_FRONT_LEFT,    0 },
+    { AV_CH_TOP_FRONT_CENTER,  0 },
+    { AV_CH_TOP_FRONT_RIGHT,   0 },
+    { AV_CH_TOP_BACK_LEFT,     0 },
+    { AV_CH_TOP_BACK_CENTER,   0 },
+    { AV_CH_TOP_BACK_RIGHT,    0 },
+    { AV_CH_STEREO_LEFT,       0 },
+    { AV_CH_STEREO_RIGHT,      0 },
 };
 
 static void SetupOutputFormat( decoder_t *p_dec, bool b_trust )

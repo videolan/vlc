@@ -94,8 +94,13 @@ struct decoder_sys_t
     /* Hack to force display of still pictures */
     bool b_first_frame;
 
+
     /* */
+#if LIBAVCODEC_VERSION_MAJOR < 54
     AVPaletteControl palette;
+#else
+# warning FIXME
+#endif
 
     /* */
     bool b_flush;
@@ -113,9 +118,6 @@ struct decoder_sys_t
 #   define wait_mt(s)
 #   define post_mt(s)
 #endif
-
-/* FIXME (dummy palette for now) */
-static const AVPaletteControl palette_control;
 
 /*****************************************************************************
  * Local prototypes
@@ -233,8 +235,12 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
     /*  ***** Get configuration of ffmpeg plugin ***** */
     p_sys->p_context->workaround_bugs =
         var_InheritInteger( p_dec, "ffmpeg-workaround-bugs" );
+#if LIBAVCODEC_VERSION_MAJOR < 54
     p_sys->p_context->error_recognition =
         var_InheritInteger( p_dec, "ffmpeg-error-resilience" );
+#else
+# warning FIXME (moved to AVFormat)
+#endif
 
     if( var_CreateGetBool( p_dec, "grayscale" ) )
         p_sys->p_context->flags |= CODEC_FLAG_GRAY;
@@ -400,6 +406,7 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
     }
     p_dec->fmt_out.i_codec = p_dec->fmt_out.video.i_chroma;
 
+#if LIBAVCODEC_VERSION_MAJOR < 54
     /* Setup palette */
     memset( &p_sys->palette, 0, sizeof(p_sys->palette) );
     if( p_dec->fmt_in.video.p_palette )
@@ -429,6 +436,9 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
     {
         p_sys->p_context->palctrl = &p_sys->palette;
     }
+#else
+# warning FIXME
+#endif
 
     /* ***** init this codec with special data ***** */
     ffmpeg_InitCodec( p_dec );
@@ -650,7 +660,7 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
         }
 
         /* Sanity check (seems to be needed for some streams) */
-        if( p_sys->p_ff_pic->pict_type == FF_B_TYPE )
+        if( p_sys->p_ff_pic->pict_type == AV_PICTURE_TYPE_B)
         {
             p_sys->b_has_b_frames = true;
         }
@@ -983,8 +993,10 @@ static int ffmpeg_GetFrameBuf( struct AVCodecContext *p_context,
 
         /* */
         p_ff_pic->type = FF_BUFFER_TYPE_USER;
-        /* FIXME what is that, should give good value */
-        p_ff_pic->age = 256*256*256*64; // FIXME FIXME from ffmpeg
+
+#if LIBAVCODEC_VERSION_MAJOR < 54
+        p_ff_pic->age = 256*256*256*64;
+#endif
 
         if( vlc_va_Get( p_sys->p_va, p_ff_pic ) )
         {
@@ -1074,8 +1086,9 @@ static int ffmpeg_GetFrameBuf( struct AVCodecContext *p_context,
     p_ff_pic->linesize[2] = p_pic->p[2].i_pitch;
     p_ff_pic->linesize[3] = 0;
 
-    /* FIXME what is that, should give good value */
-    p_ff_pic->age = 256*256*256*64; // FIXME FIXME from ffmpeg
+#if LIBAVCODEC_VERSION_MAJOR < 54
+    p_ff_pic->age = 256*256*256*64;
+#endif
 
     post_mt( p_sys );
     return 0;

@@ -309,6 +309,42 @@ int ffmpeg_OpenCodec( decoder_t *p_dec );
 #   define AVMEDIA_TYPE_ATTACHMENT CODEC_TYPE_ATTACHMENT
 #endif
 
+#if LIBAVCODEC_VERSION_MAJOR < 54
+#   define AV_PICTURE_TYPE_B        FF_B_TYPE
+#   define AV_PICTURE_TYPE_I        FF_I_TYPE
+#   define AV_PICTURE_TYPE_P        FF_P_TYPE
+
+#   define SAMPLE_FMT_NONE          AV_SAMPLE_FMT_NONE
+#   define SAMPLE_FMT_U8            AV_SAMPLE_FMT_U8
+#   define SAMPLE_FMT_S16           AV_SAMPLE_FMT_S16
+#   define SAMPLE_FMT_S32           AV_SAMPLE_FMT_S32
+#   define SAMPLE_FMT_FLT           AV_SAMPLE_FMT_FLT
+#   define SAMPLE_FMT_DBL           AV_SAMPLE_FMT_DBL
+
+#   define CH_FRONT_LEFT            AV_CH_FRONT_LEFT
+#   define CH_FRONT_RIGHT           AV_CH_FRONT_RIGHT
+#   define CH_FRONT_CENTER          AV_CH_FRONT_CENTER
+#   define CH_LOW_FREQUENCY         AV_CH_LOW_FREQUENCY
+#   define CH_BACK_LEFT             AV_CH_BACK_LEFT
+#   define CH_BACK_RIGHT            AV_CH_BACK_RIGHT
+#   define CH_FRONT_LEFT_OF_CENTER  AV_CH_FRONT_LEFT_OF_CENTER
+#   define CH_FRONT_RIGHT_OF_CENTER AV_CH_FRONT_RIGHT_OF_CENTER
+#   define CH_BACK_CENTER           AV_CH_BACK_CENTER
+#   define CH_SIDE_LEFT             AV_CH_SIDE_LEFT
+#   define CH_SIDE_RIGHT            AV_CH_SIDE_RIGHT
+#   define CH_TOP_CENTER            AV_CH_TOP_CENTER
+#   define CH_TOP_FRONT_LEFT        AV_CH_TOP_FRONT_LEFT
+#   define CH_TOP_FRONT_CENTER      AV_CH_TOP_FRONT_CENTER
+#   define CH_TOP_FRONT_RIGHT       AV_CH_TOP_FRONT_RIGHT
+#   define CH_TOP_BACK_LEFT         AV_CH_TOP_BACK_LEFT
+#   define CH_TOP_BACK_CENTER       AV_CH_TOP_BACK_CENTER
+#   define CH_TOP_BACK_RIGHT        AV_CH_TOP_BACK_RIGHT
+#   define CH_STEREO_LEFT           AV_CH_STEREO_LEFT
+#   define CH_STEREO_RIGHT          AV_CH_STEREO_RIGHT
+
+
+#endif
+
 #ifndef AV_PKT_FLAG_KEY
 #   define AV_PKT_FLAG_KEY         PKT_FLAG_KEY
 #endif

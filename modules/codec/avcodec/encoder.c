@@ -304,7 +304,12 @@ int OpenEncoder( vlc_object_t *p_this )
     p_sys->p_buffer_out = NULL;
     p_sys->i_buffer_out = 0;
 
-    p_sys->p_context = p_context = avcodec_alloc_context();
+#if LIBAVCODEC_VERSION_MAJOR < 54
+    p_context = avcodec_alloc_context();
+#else
+    p_context = avcodec_alloc_context3(p_codec);
+#endif
+    p_sys->p_context = p_context;
     p_sys->p_context->codec_id = p_sys->p_codec->id;
     p_context->debug = var_InheritInteger( p_enc, "ffmpeg-debug" );
     p_context->opaque = (void *)p_this;
@@ -604,7 +609,7 @@ int OpenEncoder( vlc_object_t *p_this )
         p_context->codec_type  = AVMEDIA_TYPE_AUDIO;
         p_context->sample_fmt  = p_codec->sample_fmts ?
                                     p_codec->sample_fmts[0] :
-                                    SAMPLE_FMT_S16;
+                                    AV_SAMPLE_FMT_S16;
         p_enc->fmt_in.i_codec  = VLC_CODEC_S16N;
         p_context->sample_rate = p_enc->fmt_out.audio.i_rate;
         p_context->time_base.num = 1;
@@ -694,7 +699,11 @@ int OpenEncoder( vlc_object_t *p_this )
 
     int ret;
     vlc_avcodec_lock();
+#if LIBAVCODEC_VERSION_MAJOR < 54
     ret = avcodec_open( p_context, p_codec );
+#else
+    ret = avcodec_open2( p_context, p_codec, NULL /* options */ );
+#endif
     vlc_avcodec_unlock();
     if( ret )
     {
@@ -748,7 +757,11 @@ int OpenEncoder( vlc_object_t *p_this )
 
             p_context->codec = NULL;
             vlc_avcodec_lock();
+#if LIBAVCODEC_VERSION_MAJOR < 54
             ret = avcodec_open( p_context, p_codec );
+#else
+            ret = avcodec_open2( p_context, p_codec, NULL /* options */ );
+#endif
             vlc_avcodec_unlock();
             if( ret )
             {
@@ -929,7 +942,7 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
 
                 if ( current_date + HURRY_UP_GUARD1 > frame.pts )
                 {
-                    frame.pict_type = FF_P_TYPE;
+                    frame.pict_type = AV_PICTURE_TYPE_P;
                     /* msg_Dbg( p_enc, "hurry up mode 1 %lld", current_date + HURRY_UP_GUARD1 - frame.pts ); */
                 }
             }
@@ -1015,8 +1028,8 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
         }
         /* End work-around */
 
-        if( p_sys->p_context->coded_frame->pict_type != FF_I_TYPE &&
-            p_sys->p_context->coded_frame->pict_type != FF_P_TYPE )
+        if( p_sys->p_context->coded_frame->pict_type != AV_PICTURE_TYPE_I &&
+            p_sys->p_context->coded_frame->pict_type != AV_PICTURE_TYPE_P )
         {
             p_block->i_dts = p_block->i_pts;
         }
@@ -1044,15 +1057,16 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
 
     switch ( p_sys->p_context->coded_frame->pict_type )
     {
-    case FF_I_TYPE:
+    case AV_PICTURE_TYPE_I:
         p_block->i_flags |= BLOCK_FLAG_TYPE_I;
         break;
-    case FF_P_TYPE:
+    case AV_PICTURE_TYPE_P:
         p_block->i_flags |= BLOCK_FLAG_TYPE_P;
         break;
-    case FF_B_TYPE:
+    case AV_PICTURE_TYPE_B:
         p_block->i_flags |= BLOCK_FLAG_TYPE_B;
         break;
+
     }
 
     return p_block;
