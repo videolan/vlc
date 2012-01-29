@@ -55,7 +55,11 @@ static const char *const ppsz_mux_options[] = {
  *****************************************************************************/
 struct sout_mux_sys_t
 {
+#if LIBAVFORMAT_VERSION_INT >= ((52<<16)+(105<<8)+0)
+    AVIOContext     *io;
+#else
     ByteIOContext   io;
+#endif
     int             io_buffer_size;
     uint8_t        *io_buffer;
 
@@ -86,7 +90,6 @@ int OpenMux( vlc_object_t *p_this )
     AVOutputFormat *file_oformat;
     sout_mux_t *p_mux = (sout_mux_t*)p_this;
     sout_mux_sys_t *p_sys;
-    AVFormatParameters params, *ap = &params;
     char *psz_mux;
 
     /* Should we call it only once ? */
@@ -134,9 +137,18 @@ int OpenMux( vlc_object_t *p_this )
     /* Create I/O wrapper */
     p_sys->io_buffer_size = 32768;  /* FIXME */
     p_sys->io_buffer = malloc( p_sys->io_buffer_size );
-    init_put_byte( &p_sys->io, p_sys->io_buffer, p_sys->io_buffer_size,
-                   1, p_mux, NULL, IOWrite, IOSeek );
 
+#if (LIBAVFORMAT_VERSION_INT >= ((52<<16)+(105<<8)+0))
+    p_sys->io = avio_alloc_context(
+#else
+    init_put_byte( &p_sys->io,
+#endif
+        p_sys->io_buffer, p_sys->io_buffer_size,
+        1, p_mux, NULL, IOWrite, IOSeek );
+
+
+#if (LIBAVFORMAT_VERSION_INT < ((52<<16)+(105<<8)+0))
+    AVFormatParameters params, *ap = &params;
     memset( ap, 0, sizeof(*ap) );
     if( av_set_parameters( p_sys->oc, ap ) < 0 )
     {
@@ -146,8 +158,13 @@ int OpenMux( vlc_object_t *p_this )
         free( p_sys );
         return VLC_EGENERIC;
     }
+#endif
 
+#if (LIBAVFORMAT_VERSION_INT >= ((52<<16)+(105<<8)+0))
+    p_sys->oc->pb = p_sys->io;
+#else
     p_sys->oc->pb = &p_sys->io;
+#endif
     p_sys->oc->nb_streams = 0;
 
     p_sys->b_write_header = true;
