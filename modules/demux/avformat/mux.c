@@ -363,11 +363,18 @@ static int Mux( sout_mux_t *p_mux )
 
     if( p_sys->b_write_header )
     {
+        int error;
         msg_Dbg( p_mux, "writing header" );
 
-        if( av_write_header( p_sys->oc ) < 0 )
+#if (LIBAVFORMAT_VERSION_INT >= ((53<<16)+(2<<8)+0))
+        error = avformat_write_header( p_sys->oc, NULL /* options */ );
+#else
+        error = av_write_header( p_sys->oc );
+#endif
+        if( error < 0 )
         {
-            msg_Err( p_mux, "could not write header" );
+            errno = AVUNERROR(error);
+            msg_Err( p_mux, "could not write header: %m" );
             p_sys->b_write_header = false;
             p_sys->b_error = true;
             return VLC_EGENERIC;
