@@ -18,6 +18,7 @@ $(TARBALLS)/libdca-$(DCA_VERSION).tar.bz2:
 libdca: libdca-$(DCA_VERSION).tar.bz2 .sum-dca
 	$(UNPACK)
 	#$(APPLY) $(SRC)/dca/libdca-llvm-gcc.patch
+	$(UPDATE_AUTOCONFIG) && cd $(UNPACK_DIR) && mv config.guess config.sub autotools
 	$(MOVE)
 
 .dca: libdca
