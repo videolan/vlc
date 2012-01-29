@@ -21,16 +21,16 @@
     </object>
     <object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
       <bool key="EncodedWithXMLCoder">YES</bool>
-      <integer value="4596"/>
-      <integer value="2770"/>
-      <integer value="1617"/>
+      <integer value="4722"/>
       <integer value="283"/>
+      <integer value="2730"/>
+      <integer value="1617"/>
+      <integer value="29"/>
+      <integer value="2770"/>
+      <integer value="4895"/>
       <integer value="4717"/>
       <integer value="915"/>
-      <integer value="2730"/>
-      <integer value="4722"/>
-      <integer value="29"/>
-      <integer value="4895"/>
+      <integer value="4596"/>
     </object>
     <object class="NSArray" key="IBDocument.PluginDependencies">
       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -3938,7 +3938,7 @@ LCAuLi4</string>
                         <int key="NSTCFlags">1</int>
                       </object>
                       <object class="NSTextViewSharedData" key="NSSharedData">
-                        <int key="NSFlags">33566691</int>
+                        <int key="NSFlags">100675555</int>
                         <int key="NSTextCheckingTypes">0</int>
                         <nil key="NSMarkedAttributes"/>
                         <reference key="NSBackgroundColor" ref="712893775"/>
@@ -4296,7 +4296,7 @@ LCAuLi4</string>
                   <object class="NSTextField" id="551534796">
                     <reference key="NSNextResponder" ref="457727486"/>
                     <int key="NSvFlags">301</int>
-                    <string key="NSFrame">{{16, 69}, {202, 22}}</string>
+                    <string key="NSFrame">{{16, 69}, {416, 22}}</string>
                     <reference key="NSSuperview" ref="457727486"/>
                     <int key="NSViewLayerContentsRedrawPolicy">2</int>
                     <bool key="NSEnabled">YES</bool>
@@ -4329,7 +4329,7 @@ LCAuLi4</string>
                         <string>NeXT TIFF v4.0 pasteboard type</string>
                       </object>
                     </object>
-                    <string key="NSFrame">{{64, 108}, {108, 108}}</string>
+                    <string key="NSFrame">{{171, 108}, {108, 108}}</string>
                     <reference key="NSSuperview" ref="457727486"/>
                     <int key="NSViewLayerContentsRedrawPolicy">2</int>
                     <bool key="NSEnabled">YES</bool>
@@ -4350,7 +4350,7 @@ LCAuLi4</string>
                   <object class="NSButton" id="959811945">
                     <reference key="NSNextResponder" ref="457727486"/>
                     <int key="NSvFlags">301</int>
-                    <string key="NSFrame">{{41, 14}, {153, 25}}</string>
+                    <string key="NSFrame">{{148, 14}, {153, 25}}</string>
                     <reference key="NSSuperview" ref="457727486"/>
                     <int key="NSViewLayerContentsRedrawPolicy">2</int>
                     <bool key="NSEnabled">YES</bool>
@@ -4369,12 +4369,12 @@ LCAuLi4</string>
                     </object>
                   </object>
                 </object>
-                <string key="NSFrameSize">{234, 229}</string>
+                <string key="NSFrameSize">{448, 229}</string>
                 <reference key="NSSuperview" ref="83235998"/>
                 <int key="NSViewLayerContentsRedrawPolicy">2</int>
               </object>
             </object>
-            <string key="NSFrame">{{124, 11}, {234, 229}}</string>
+            <string key="NSFrame">{{17, 11}, {448, 229}}</string>
             <reference key="NSSuperview" ref="256817023"/>
             <int key="NSViewLayerContentsRedrawPolicy">2</int>
             <string key="NSOffsets">{0, 0}</string>
