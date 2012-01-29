@@ -48,7 +48,7 @@ unsigned int CocoaKeyToVLC( unichar i_key );
 
 #define VLCIntf [[VLCMain sharedInstance] intf]
 
-#define _NS(s) [[VLCMain sharedInstance] localizedString: _(s)]
+#define _NS(s) [[VLCMain sharedInstance] localizedString: s]
 /* Get an alternate version of the string.
  * This string is stored as '1:string' but when displayed it only displays
  * the translated string. the translation should be '1:translatedstring' though */
