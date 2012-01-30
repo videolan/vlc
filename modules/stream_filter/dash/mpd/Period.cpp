@@ -42,13 +42,23 @@ Period::~Period ()
     vlc_delete_all( this->groups );
 }
 
-const std::vector<Group*>&      Period::getGroups() const
+const std::vector<Group*>&          Period::getGroups() const
 {
     return this->groups;
 }
 
-void                Period::addGroup(Group *group)
+void                                Period::addGroup(Group *group)
 {
     if ( group != NULL )
         this->groups.push_back(group);
+}
+const std::vector<AdaptationSet*>&  Period::getAdaptationSets() const
+{
+    return this->adaptationSets;
+}
+
+void                                Period::addAdaptationSet(AdaptationSet *adaptationSet)
+{
+    if ( adaptationSet != NULL )
+        this->adaptationSets.push_back(adaptationSet);
 }
