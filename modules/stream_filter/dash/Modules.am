@@ -32,6 +32,8 @@ SOURCES_stream_filter_dash = \
     mpd/Group.h \
     mpd/IMPDManager.h \
     mpd/IMPDParser.h \
+    mpd/IsoffMainParser.cpp \
+    mpd/IsoffMainParser.h \
     mpd/MPD.cpp \
     mpd/MPD.h \
     mpd/MPDManagerFactory.cpp \
