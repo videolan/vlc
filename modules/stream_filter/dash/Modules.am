@@ -42,6 +42,8 @@ SOURCES_stream_filter_dash = \
     mpd/Representation.h \
     mpd/Segment.cpp \
     mpd/Segment.h \
+    mpd/SegmentBase.cpp \
+    mpd/SegmentBase.h \
     mpd/SegmentInfo.cpp \
     mpd/SegmentInfo.h \
     mpd/SegmentInfoCommon.cpp \
