@@ -31,11 +31,14 @@
 
 using namespace dash::mpd;
 
-Representation::Representation() :
-    qualityRanking( -1 ),
-    segmentInfo( NULL ),
-    trickModeType( NULL ),
-    parentGroup( NULL )
+Representation::Representation  () :
+                qualityRanking  ( -1 ),
+                segmentInfo     ( NULL ),
+                trickModeType   ( NULL ),
+                parentGroup     ( NULL ),
+                segmentBase     ( NULL ),
+                segmentList     ( NULL )
+
 {
 }
 
@@ -119,4 +122,20 @@ void Representation::addDependency(const Representation *dep)
 {
     if ( dep != NULL )
         this->dependencies.push_back( dep );
+}
+SegmentList*        Representation::getSegmentList          () const
+{
+    return this->segmentList;
+}
+void                Representation::setSegmentList          (SegmentList *list)
+{
+    this->segmentList = list;
+}
+SegmentBase*        Representation::getSegmentBase          () const
+{
+    return this->segmentBase;
+}
+void                Representation::setSegmentBase          (SegmentBase *base)
+{
+    this->segmentBase = base;
 }

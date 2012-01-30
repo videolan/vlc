@@ -30,6 +30,8 @@
 #include "mpd/CommonAttributesElements.h"
 #include "mpd/SegmentInfo.h"
 #include "mpd/TrickModeType.h"
+#include "mpd/SegmentBase.h"
+#include "mpd/SegmentList.h"
 
 namespace dash
 {
@@ -70,6 +72,11 @@ namespace dash
                 const Group*        getParentGroup() const;
                 void                setParentGroup( const Group *group );
 
+                SegmentList*        getSegmentList          () const;
+                void                setSegmentList          (SegmentList *list);
+                SegmentBase*        getSegmentBase          () const;
+                void                setSegmentBase          (SegmentBase *base);
+
             private:
                 int                                 bandwidth;
                 std::string                         id;
@@ -78,6 +85,8 @@ namespace dash
                 SegmentInfo                         *segmentInfo;
                 TrickModeType                       *trickModeType;
                 const Group                         *parentGroup;
+                SegmentBase                         *segmentBase;
+                SegmentList                         *segmentList;
         };
     }
 }
