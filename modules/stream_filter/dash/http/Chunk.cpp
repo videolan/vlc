@@ -34,28 +34,31 @@ Chunk::Chunk() : startByte( 0 ),
 {
 }
 
-int         Chunk::getEndByte   () const
+int                 Chunk::getEndByte       () const
 {
     return endByte;
 }
-int         Chunk::getStartByte () const
+int                 Chunk::getStartByte     () const
 {
     return startByte;
 }
-
-const std::string& Chunk::getUrl       () const
+const std::string&  Chunk::getUrl           () const
 {
     return url;
 }
-void        Chunk::setEndByte   (int endByte)
+void                Chunk::setEndByte       (int endByte)
 {
     this->endByte = endByte;
 }
-void        Chunk::setStartByte (int startByte)
+void                Chunk::setStartByte     (int startByte)
 {
     this->startByte = startByte;
 }
-void        Chunk::setUrl       ( const std::string& url )
+void                Chunk::setUrl           (const std::string& url )
 {
     this->url = url;
+}
+void                Chunk::addOptionalUrl   (const std::string& url)
+{
+    this->optionalUrls.push_back(url);
 }

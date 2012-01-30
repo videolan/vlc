@@ -43,6 +43,7 @@ namespace dash
                 void                setEndByte      (int endByte);
                 void                setStartByte    (int startByte);
                 void                setUrl          (const std::string& url);
+                void                addOptionalUrl  (const std::string& url);
 
             private:
                 std::string                 url;
