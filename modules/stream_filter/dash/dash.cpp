@@ -38,7 +38,7 @@
 #include "xml/DOMParser.h"
 #include "http/HTTPConnectionManager.h"
 #include "adaptationlogic/IAdaptationLogic.h"
-#include "mpd/BasicCMParser.h"
+#include "mpd/MPDFactory.h"
 
 #define SEEK 0
 
@@ -90,19 +90,18 @@ static int Open(vlc_object_t *p_obj)
         msg_Dbg( p_stream, "Could not parse mpd file." );
         return VLC_EGENERIC;
     }
+
     //Begin the actual MPD parsing:
-    dash::mpd::BasicCMParser    mpdParser( parser.getRootNode(), p_stream->p_source );
-    if ( mpdParser.parse() == false || mpdParser.getMPD() == NULL )
-    {
-        msg_Err( p_obj, "MPD file parsing failed." );
+    dash::mpd::MPD *mpd = dash::mpd::MPDFactory::create(parser.getRootNode(), p_stream->p_source, parser.getProfile());
+
+    if(mpd == NULL)
         return VLC_EGENERIC;
-    }
 
     stream_sys_t        *p_sys = (stream_sys_t *) malloc(sizeof(stream_sys_t));
     if (unlikely(p_sys == NULL))
         return VLC_ENOMEM;
 
-    p_sys->p_mpd = mpdParser.getMPD();
+    p_sys->p_mpd = mpd;
     dash::http::HTTPConnectionManager *p_conManager =
                               new dash::http::HTTPConnectionManager( p_stream );
     dash::DASHManager*p_dashManager =
