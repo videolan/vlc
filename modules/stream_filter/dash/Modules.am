@@ -48,6 +48,8 @@ SOURCES_stream_filter_dash = \
     mpd/SegmentInfoCommon.h \
     mpd/SegmentInfoDefault.cpp \
     mpd/SegmentInfoDefault.h \
+    mpd/SegmentList.cpp \
+    mpd/SegmentList.h \
     mpd/SegmentTemplate.cpp \
     mpd/SegmentTemplate.h \
     mpd/SegmentTimeline.cpp \
