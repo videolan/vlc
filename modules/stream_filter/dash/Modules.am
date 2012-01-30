@@ -38,6 +38,8 @@ SOURCES_stream_filter_dash = \
     mpd/IsoffMainManager.h \
     mpd/MPD.cpp \
     mpd/MPD.h \
+    mpd/MPDFactory.cpp \
+    mpd/MPDFactory.h \
     mpd/MPDManagerFactory.cpp \
     mpd/MPDManagerFactory.h \
     mpd/Period.cpp \
