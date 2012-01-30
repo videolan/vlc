@@ -26,6 +26,10 @@
 #define SEGMENT_H_
 
 #include <string>
+#include <sstream>
+#include <vector>
+#include "mpd/BaseUrl.h"
+#include "http/Chunk.h"
 
 namespace dash
 {
@@ -34,6 +38,7 @@ namespace dash
         class Segment
         {
             public:
+                Segment();
                 virtual ~Segment(){}
                 virtual std::string getSourceUrl() const;
                 virtual void        setSourceUrl( const std::string &url );
@@ -42,11 +47,20 @@ namespace dash
                  *          That is basically true when using an Url, and false
                  *          when using an UrlTemplate
                  */
-                virtual bool        isSingleShot() const;
-                virtual void        done();
+                virtual bool                            isSingleShot    () const;
+                virtual void                            done            ();
+                virtual void                            addBaseUrl      (BaseUrl *url);
+                virtual const std::vector<BaseUrl *>&   getBaseUrls     () const;
+                virtual void                            setByteRange    (int start, int end);
+                virtual int                             getStartByte    () const;
+                virtual int                             getEndByte      () const;
+                virtual dash::http::Chunk*              toChunk         ();
 
             protected:
-                std::string         sourceUrl;
+                std::string             sourceUrl;
+                std::vector<BaseUrl *>  baseUrls;
+                int                     startByte;
+                int                     endByte;
         };
     }
 }

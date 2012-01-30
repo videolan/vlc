@@ -28,24 +28,83 @@
 #include "Segment.h"
 
 using namespace dash::mpd;
+using namespace dash::http;
 
-std::string Segment::getSourceUrl() const
+Segment::Segment    () :
+         startByte  (-1),
+         endByte    (-1)
+{
+
+}
+
+std::string             Segment::getSourceUrl   () const
 {
     return this->sourceUrl;
 }
 
-void        Segment::setSourceUrl( const std::string &url )
+void                    Segment::setSourceUrl   ( const std::string &url )
 {
     if ( url.empty() == false )
         this->sourceUrl = url;
 }
-
-bool        Segment::isSingleShot() const
+bool                    Segment::isSingleShot   () const
 {
     return true;
 }
-
-void Segment::done()
+void                    Segment::done           ()
 {
     //Only used for a SegmentTemplate.
+}
+void                    Segment::addBaseUrl     (BaseUrl *url)
+{
+    this->baseUrls.push_back(url);
+}
+const std::vector<BaseUrl *>&  Segment::getBaseUrls    () const
+{
+    return this->baseUrls;
+}
+void                    Segment::setByteRange   (int start, int end)
+{
+    this->startByte = start;
+    this->endByte   = end;
+}
+int                     Segment::getStartByte   () const
+{
+    return this->startByte;
+}
+int                     Segment::getEndByte     () const
+{
+    return this->endByte;
+}
+dash::http::Chunk*      Segment::toChunk        ()
+{
+    Chunk *chunk = new Chunk();
+
+    if(this->startByte != -1 && this->endByte != -1)
+    {
+        chunk->setStartByte(this->startByte);
+        chunk->setEndByte(this->endByte);
+    }
+
+    if(this->baseUrls.size() > 0)
+    {
+        std::stringstream ss;
+        ss << this->baseUrls.at(0)->getUrl() << this->sourceUrl;
+        chunk->setUrl(ss.str());
+        ss.clear();
+
+        for(size_t i = 1; i < this->baseUrls.size(); i++)
+        {
+            ss << this->baseUrls.at(i)->getUrl() << this->sourceUrl;
+            chunk->addOptionalUrl(ss.str());
+            ss.clear();
+        }
+
+    }
+    else
+    {
+        chunk->setUrl(this->sourceUrl);
+    }
+
+    return chunk;
 }
