@@ -68,8 +68,7 @@ Chunk*  RateBasedAdaptationLogic::getNextChunk() throw(EOFException)
     if ( segments.size() > this->count )
     {
         Segment *seg = segments.at( this->count );
-        Chunk *chunk = new Chunk;
-        chunk->setUrl( seg->getSourceUrl() );
+        Chunk *chunk = seg->toChunk();
         //In case of UrlTemplate, we must stay on the same segment.
         if ( seg->isSingleShot() == true )
             this->count++;
