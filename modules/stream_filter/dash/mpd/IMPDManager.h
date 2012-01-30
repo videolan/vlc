@@ -22,7 +22,8 @@ namespace dash
             UnknownProfile,
             Full2011,
             Basic,
-            BasicCM
+            BasicCM,
+            IsoffMain
         };
         class IMPDManager
         {

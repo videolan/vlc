@@ -174,6 +174,8 @@ void MPD::setProfile( const std::string &strProfile )
         this->profile = dash::mpd::BasicCM;
     else if ( strProfile == "urn:mpeg:mpegB:profile:dash:full:2011" )
         this->profile = dash::mpd::Full2011;
+    else if ( strProfile == "urn:mpeg:dash:profile:isoff-main:2011" )
+        this->profile = dash::mpd::IsoffMain;
     else
         this->profile = dash::mpd::UnknownProfile;
 }
