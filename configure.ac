@@ -3402,8 +3402,8 @@ dnl  Open Sound System module
 dnl
 AC_ARG_ENABLE(oss,
   [AS_HELP_STRING([--enable-oss],
-    [support the Open Sound System OSS (default enabled on BSD)])],, [
-  AS_IF([test "$SYS" = "mingw32" -o "$SYS" = "mingwce" -o "$SYS" = "linux"], [
+    [support the Open Sound System OSS (default enabled on FreeBSD/NetBSD/DragonFlyBSD)])],, [
+  AS_IF([test "$SYS" = "mingw32" -o "$SYS" = "mingwce" -o "$SYS" = "linux" -o "$SYS" = "openbsd"], [
     enable_oss="no"
   ])
 ])
