@@ -2741,11 +2741,11 @@ AC_ARG_ENABLE(png,
 if test "${enable_png}" != "no"; then
 AC_CHECK_HEADERS(png.h, [
   VLC_SAVE_FLAGS
-  LDFLAGS="${LDFLAGS} -lz"
+  LDFLAGS="${LDFLAGS} -lz $LIBM"
   AC_CHECK_LIB(png, png_set_rows, [
-    VLC_ADD_LIBS([png],[-lpng -lz -lm])
+    VLC_ADD_LIBS([png],[-lpng -lz $LIBM])
     VLC_ADD_PLUGIN([png osdmenu osd_parser])],
-    [],[-lz])
+    [],[-lz $LIBM] )
   VLC_RESTORE_FLAGS
   ])
 fi
