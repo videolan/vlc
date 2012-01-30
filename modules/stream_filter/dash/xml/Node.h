@@ -44,6 +44,7 @@ namespace dash
                 void                                addSubNode          (Node *node);
                 const std::string&                  getName             () const;
                 void                                setName             (const std::string& name);
+                bool                                hasAttribute        (const std::string& name);
                 void                                addAttribute        (const std::string& key, const std::string& value);
                 const std::string&                  getAttributeValue   (const std::string& key) const;
                 std::vector<std::string>            getAttributeKeys    () const;

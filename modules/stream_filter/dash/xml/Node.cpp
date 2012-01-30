@@ -45,7 +45,7 @@ Node::~Node ()
         delete(this->subNodes.at(i));
 }
 
-const std::vector<Node*>&            Node::getSubNodes           () const
+const std::vector<Node*>&           Node::getSubNodes           () const
 {
     return this->subNodes;
 }
@@ -62,6 +62,13 @@ void                                Node::setName               (const std::stri
     this->name = name;
 }
 
+bool                                Node::hasAttribute        (const std::string& name)
+{
+    if(this->attributes.find(name) != this->attributes.end())
+        return true;
+
+    return false;
+}
 const std::string&                  Node::getAttributeValue     (const std::string& key) const
 {
     std::map<std::string, std::string>::const_iterator  it = this->attributes.find( key );
