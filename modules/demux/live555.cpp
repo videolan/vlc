@@ -591,7 +591,7 @@ createnew:
         goto bailout;
     }
 
-    if( var_InheritBool( p_demux, "rtsp-http" ) )
+    if( var_CreateGetBool( p_demux, "rtsp-http" ) )
         i_http_port = var_InheritInteger( p_demux, "rtsp-http-port" );
 
     p_sys->rtsp = new RTSPClientVlc( *p_sys->env, psz_url,
@@ -686,7 +686,7 @@ static int SessionsSetup( demux_t *p_demux )
     unsigned const thresh = 200000; /* RTP reorder threshold .2 second (default .1) */
 
     b_rtsp_tcp    = var_CreateGetBool( p_demux, "rtsp-tcp" ) ||
-                    var_InheritBool( p_demux, "rtsp-http" );
+                    var_GetBool( p_demux, "rtsp-http" );
     i_client_port = var_InheritInteger( p_demux, "rtp-client-port" );
 
     /* Create the session from the SDP */
