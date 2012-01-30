@@ -316,6 +316,10 @@ static int Seek(access_t *access, uint64_t position)
     access_sys_t *sys = access->p_sys;
     int ret;
 
+#ifndef EOVERFLOW
+# define EOVERFLOW EFBIG
+#endif
+
     if (position > INT64_MAX)
         ret = AVERROR(EOVERFLOW);
     else
