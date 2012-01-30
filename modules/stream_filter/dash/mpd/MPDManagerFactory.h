@@ -27,6 +27,7 @@
 
 #include "mpd/IMPDManager.h"
 #include "mpd/BasicCMManager.h"
+#include "mpd/IsoffMainManager.h"
 
 namespace dash
 {

@@ -34,8 +34,8 @@ IMPDManager* MPDManagerFactory::create( MPD *mpd )
     switch( mpd->getProfile() )
     {
         case mpd::BasicCM:
-        case mpd::Full2011:
-            return new BasicCMManager( mpd );
+        case mpd::Full2011:         return new BasicCMManager   (mpd);
+        case mpd::IsoffMain:        return new IsoffMainManager (mpd);
         case mpd::Basic:
         case mpd::UnknownProfile:
         default:
