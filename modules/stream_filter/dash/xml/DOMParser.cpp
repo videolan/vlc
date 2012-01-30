@@ -28,6 +28,7 @@
 #include "DOMParser.h"
 
 using namespace dash::xml;
+using namespace dash::mpd;
 
 DOMParser::DOMParser    (stream_t *stream) :
     root( NULL ),
@@ -132,21 +133,35 @@ void    DOMParser::print                    (Node *node, int offset)
         this->print(node->getSubNodes().at(i), offset);
     }
 }
-
 void    DOMParser::print                    ()
 {
     this->print(this->root, 0);
 }
-
 bool    DOMParser::isDash                   (stream_t *stream)
 {
-    const char* psz_namespace = "urn:mpeg:mpegB:schema:DASH:MPD:DIS2011";
+    const char* psz_namespaceDIS = "urn:mpeg:mpegB:schema:DASH:MPD:DIS2011";
+    const char* psz_namespaceIS  = "urn:mpeg:DASH:schema:MPD:2011";
 
     const uint8_t *peek;
     int peek_size = stream_Peek(stream, &peek, 1024);
-    if (peek_size < (int)strlen(psz_namespace))
+    if (peek_size < (int)strlen(psz_namespaceDIS))
         return false;
 
     std::string header((const char*)peek, peek_size);
-    return header.find(psz_namespace) != std::string::npos;
+    return (header.find(psz_namespaceDIS) != std::string::npos) || (header.find(psz_namespaceIS) != std::string::npos);
+}
+Profile DOMParser::getProfile               ()
+{
+    if(this->root == NULL)
+        return dash::mpd::UnknownProfile;
+
+    const std::string profile = this->root->getAttributeValue("profiles");
+
+    if(!profile.compare("urn:mpeg:mpegB:profile:dash:isoff-basic-on-demand:cm"))
+        return dash::mpd::BasicCM;
+
+    if(!profile.compare("urn:mpeg:dash:profile:isoff-main:2011"))
+        return dash::mpd::IsoffMain;
+
+    return dash::mpd::UnknownProfile;
 }
