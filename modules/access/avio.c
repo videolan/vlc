@@ -34,6 +34,20 @@
 
 #include "avio.h"
 
+#if LIBAVFORMAT_VERSION_MAJOR < 54
+# define AVIOContext URLContext
+
+# define avio_open url_open
+# define avio_close url_close
+# define avio_read url_read
+# define avio_seek url_seek
+# define avio_pause av_url_read_pause
+
+# define AVIO_FLAG_READ URL_RDONLY
+# define AVIO_FLAG_WRITE URL_WRONLY
+# define avio_size url_filesize
+#endif
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -53,38 +67,58 @@ static ssize_t Write(sout_access_out_t *, block_t *);
 static int     OutControl(sout_access_out_t *, int, va_list);
 static int     OutSeek (sout_access_out_t *, off_t);
 
-static int     SetupAvio(vlc_object_t *);
+static int UrlInterruptCallback(void *access)
+{
+    return !vlc_object_alive((vlc_object_t*)access);
+}
 
 struct access_sys_t {
-    URLContext *context;
+    AVIOContext *context;
 };
 
 struct sout_access_out_sys_t {
-    URLContext *context;
+    AVIOContext *context;
 };
 
+
 /* */
+
+#if LIBAVFORMAT_VERSION_MAJOR < 54
+static vlc_object_t *current_access = NULL;
+
+static int UrlInterruptCallbackSingle(void)
+{
+    return UrlInterruptCallback(current_access);
+}
+
+static int SetupAvioCb(vlc_object_t *access)
+{
+    static vlc_mutex_t avio_lock = VLC_STATIC_MUTEX;
+    vlc_mutex_lock(&avio_lock);
+    assert(!access != !current_access);
+    if (access && current_access) {
+        vlc_mutex_unlock(&avio_lock);
+        return VLC_EGENERIC;
+    }
+    url_set_interrupt_cb(access ? UrlInterruptCallback : NULL);
+
+    current_access = access;
+
+    vlc_mutex_unlock(&avio_lock);
+
+    return VLC_SUCCESS;
+}
+#endif
+
+/* */
+
 int OpenAvio(vlc_object_t *object)
 {
     access_t *access = (access_t*)object;
-    access_sys_t *sys;
-
-    /* */
-    access->p_sys = sys = malloc(sizeof(*sys));
+    access_sys_t *sys = malloc(sizeof(*sys));
     if (!sys)
         return VLC_ENOMEM;
-
-    /* We can either accept only one user (actually) or multiple ones
-     * with an exclusive lock */
-    if (SetupAvio(VLC_OBJECT(access))) {
-        msg_Err(access, "Module aready in use");
-        return VLC_EGENERIC;
-    }
-
-    /* */
-    vlc_avcodec_lock();
-    av_register_all();
-    vlc_avcodec_unlock();
+    sys->context = NULL;
 
     /* We accept:
      * - avio://full_url
@@ -97,20 +131,51 @@ int OpenAvio(vlc_object_t *object)
                       access->psz_location) < 0)
         url = NULL;
 
-    if (!url)
-        goto error;
+    if (!url) {
+        free(sys);
+        return VLC_ENOMEM;
+    }
 
-    msg_Dbg(access, "Opening '%s'", url);
-    if (url_open(&sys->context, url, URL_RDONLY) < 0)
-        sys->context = NULL;
-    free(url);
+    /* */
+    vlc_avcodec_lock();
+    av_register_all();
+    vlc_avcodec_unlock();
 
-    if (!sys->context) {
-        msg_Err(access, "Failed to open url using libavformat");
+    int ret;
+#if LIBAVFORMAT_VERSION_MAJOR < 54
+    ret = avio_open(&sys->context, url, AVIO_FLAG_READ);
+#else
+    AVIOInterruptCB cb = {
+        .callback = UrlInterruptCallback,
+        .opaque = access,
+    };
+    ret = avio_open2(&sys->context, url, AVIO_FLAG_READ, &cb, NULL /* options */);
+#endif
+    if (ret < 0) {
+        errno = AVUNERROR(ret);
+        msg_Err(access, "Failed to open %s: %m", url);
+        free(url);
         goto error;
     }
-    const int64_t size = url_filesize(sys->context);
-    msg_Dbg(access, "is_streamed=%d size=%"PRIi64, sys->context->is_streamed, size);
+    free(url);
+
+#if LIBAVFORMAT_VERSION_MAJOR < 54
+    /* We can accept only one active user at any time */
+    if (SetupAvioCb(VLC_OBJECT(access))) {
+        msg_Err(access, "Module aready in use");
+        avio_close(sys->context);
+        goto error;
+    }
+#endif
+
+    int64_t size = avio_size(sys->context);
+    bool seekable;
+#if LIBAVFORMAT_VERSION_MAJOR < 54
+    seekable = !sys->context->is_streamed;
+#else
+    seekable = sys->context->seekable;
+#endif
+    msg_Dbg(access, "%sseekable, size=%"PRIi64, seekable ? "" : "not ", size);
 
     /* */
     access_InitFields(access);
@@ -125,7 +190,6 @@ int OpenAvio(vlc_object_t *object)
     return VLC_SUCCESS;
 
 error:
-    SetupAvio(NULL);
     free(sys);
     return VLC_EGENERIC;
 }
@@ -134,42 +198,43 @@ error:
 int OutOpenAvio(vlc_object_t *object)
 {
     sout_access_out_t *access = (sout_access_out_t*)object;
-    sout_access_out_sys_t *sys;
-
-    /* */
-    access->p_sys = sys = malloc(sizeof(*sys));
+    sout_access_out_sys_t *sys = malloc(sizeof(*sys));
     if (!sys)
         return VLC_ENOMEM;
-
-    /* We can either accept only one user (actually) or multiple ones
-     * with an exclusive lock */
-    if (SetupAvio(VLC_OBJECT(access))) {
-        msg_Err(access, "Module aready in use");
-        free(sys);
-        return VLC_EGENERIC;
-    }
+    sys->context = NULL;
 
     /* */
     vlc_avcodec_lock();
     av_register_all();
     vlc_avcodec_unlock();
 
-    char *url = NULL;
-    if (access->psz_path)
-        url = strdup(access->psz_path);
-
-    if (!url)
+    if (!access->psz_path)
         goto error;
 
-    msg_Dbg(access, "avio_output Opening '%s'", url);
-    if (url_open(&sys->context, url, URL_WRONLY) < 0)
-        sys->context = NULL;
-    free(url);
-
-    if (!sys->context) {
-        msg_Err(access, "Failed to open url using libavformat");
+    int ret;
+#if LIBAVFORMAT_VERSION_MAJOR < 54
+    ret = avio_open(&sys->context, access->psz_path, AVIO_FLAG_WRITE);
+#else
+    AVIOInterruptCB cb = {
+        .callback = UrlInterruptCallback,
+        .opaque = access,
+    };
+    ret = avio_open2(&sys->context, access->psz_path, AVIO_FLAG_WRITE,
+                     &cb, NULL /* options */);
+#endif
+    if (ret < 0) {
+        errno = AVUNERROR(ret);
+        msg_Err(access, "Failed to open %s", access->psz_path);
         goto error;
     }
+
+#if LIBAVFORMAT_VERSION_MAJOR < 54
+    /* We can accept only one active user at any time */
+    if (SetupAvioCb(VLC_OBJECT(access))) {
+        msg_Err(access, "Module aready in use");
+        goto error;
+    }
+#endif
 
     access->pf_write = Write;
     access->pf_control = OutControl;
@@ -179,7 +244,6 @@ int OutOpenAvio(vlc_object_t *object)
     return VLC_SUCCESS;
 
 error:
-    SetupAvio(NULL);
     free(sys);
     return VLC_EGENERIC;
 }
@@ -189,10 +253,11 @@ void CloseAvio(vlc_object_t *object)
     access_t *access = (access_t*)object;
     access_sys_t *sys = access->p_sys;
 
-    url_close(sys->context);
+#if LIBAVFORMAT_VERSION_MAJOR < 54
+    SetupAvioCb(NULL);
+#endif
 
-    SetupAvio(NULL);
-
+    avio_close(sys->context);
     free(sys);
 }
 
@@ -201,23 +266,21 @@ void OutCloseAvio(vlc_object_t *object)
     sout_access_out_t *access = (sout_access_out_t*)object;
     sout_access_out_sys_t *sys = access->p_sys;
 
-    url_close(sys->context);
+#if LIBAVFORMAT_VERSION_MAJOR < 54
+    SetupAvioCb(NULL);
+#endif
 
-    SetupAvio(NULL);
-
+    avio_close(sys->context);
     free(sys);
 }
 
 static ssize_t Read(access_t *access, uint8_t *data, size_t size)
 {
-    /* FIXME I am unsure of the meaning of the return value in case
-     * of error.
-     */
-    int r = url_read(access->p_sys->context, data, size);
-    access->info.b_eof = r <= 0;
-    if (r < 0)
-        return -1;
-    access->info.i_pos += r;
+    int r = avio_read(access->p_sys->context, data, size);
+    if (r > 0)
+        access->info.i_pos += r;
+    else
+        access->info.b_eof = true;
     return r;
 }
 
@@ -232,7 +295,14 @@ static ssize_t Write(sout_access_out_t *p_access, block_t *p_buffer)
     while (p_buffer != NULL) {
         block_t *p_next = p_buffer->p_next;;
 
+#if LIBAVFORMAT_VERSION_MAJOR < 54
         i_write += url_write(p_sys->context, p_buffer->p_buffer, p_buffer->i_buffer);
+#else
+        /* FIXME : how are errors notified ?? */
+        avio_write(p_sys->context, p_buffer->p_buffer, p_buffer->i_buffer);
+        i_write += p_buffer->i_buffer;
+#endif
+
         block_Release(p_buffer);
 
         p_buffer = p_next;
@@ -244,10 +314,15 @@ static ssize_t Write(sout_access_out_t *p_access, block_t *p_buffer)
 static int Seek(access_t *access, uint64_t position)
 {
     access_sys_t *sys = access->p_sys;
+    int ret;
 
-    if (position > INT64_MAX ||
-        url_seek(sys->context, position, SEEK_SET) < 0) {
-        msg_Err(access, "Seek to %"PRIu64" failed\n", position);
+    if (position > INT64_MAX)
+        ret = AVERROR(EOVERFLOW);
+    else
+        ret = avio_seek(sys->context, position, SEEK_SET);
+    if (ret < 0) {
+        errno = AVUNERROR(ret);
+        msg_Err(access, "Seek to %"PRIu64" failed: %m", position);
         if (access->info.i_size <= 0 || position != access->info.i_size)
             return VLC_EGENERIC;
     }
@@ -260,7 +335,7 @@ static int OutSeek(sout_access_out_t *p_access, off_t i_pos)
 {
     sout_access_out_sys_t *sys = p_access->p_sys;
 
-    if (url_seek(sys->context, i_pos, SEEK_SET) < 0)
+    if (avio_seek(sys->context, i_pos, SEEK_SET) < 0)
         return VLC_EGENERIC;
     return VLC_SUCCESS;
 }
@@ -287,31 +362,38 @@ static int OutControl(sout_access_out_t *p_access, int i_query, va_list args)
 static int Control(access_t *access, int query, va_list args)
 {
     access_sys_t *sys = access->p_sys;
+    bool *b;
 
     switch (query) {
     case ACCESS_CAN_SEEK:
-    case ACCESS_CAN_FASTSEEK: { /* FIXME how to do that ? */
-        bool *b = va_arg(args, bool *);
+    case ACCESS_CAN_FASTSEEK: /* FIXME how to do that ? */
+        b = va_arg(args, bool *);
+#if LIBAVFORMAT_VERSION_MAJOR < 54
         *b = !sys->context->is_streamed;
+#else
+        *b = sys->context->seekable;
+#endif
         return VLC_SUCCESS;
-    }
-    case ACCESS_CAN_PAUSE: {
-        bool *b = va_arg(args, bool *);
-        *b = sys->context->prot->url_read_pause != NULL; /* FIXME Unsure */
+    case ACCESS_CAN_PAUSE:
+        b = va_arg(args, bool *);
+#if LIBAVFORMAT_VERSION_MAJOR < 54
+        *b = sys->context->prot->url_read_pause != NULL;
+#else
+        *b = sys->context->read_pause != NULL;
+#endif
         return VLC_SUCCESS;
-    }
-    case ACCESS_CAN_CONTROL_PACE: {
-        bool *b = va_arg(args, bool *);
+    case ACCESS_CAN_CONTROL_PACE:
+        b = va_arg(args, bool *);
         *b = true; /* FIXME */
         return VLC_SUCCESS;
-    }
     case ACCESS_GET_PTS_DELAY: {
         int64_t *delay = va_arg(args, int64_t *);
         *delay = DEFAULT_PTS_DELAY; /* FIXME */
+        return VLC_SUCCESS;
     }
     case ACCESS_SET_PAUSE_STATE: {
         bool is_paused = va_arg(args, int);
-        if (av_url_read_pause(sys->context, is_paused)< 0)
+        if (avio_pause(sys->context, is_paused)< 0)
             return VLC_EGENERIC;
         return VLC_SUCCESS;
     }
@@ -327,31 +409,4 @@ static int Control(access_t *access, int query, va_list args)
     default:
         return VLC_EGENERIC;
     }
-}
-
-/* */
-static vlc_mutex_t avio_lock = VLC_STATIC_MUTEX;
-static vlc_object_t *current_access = NULL;
-
-
-static int UrlInterruptCallback(void)
-{
-    assert(current_access);
-    return !vlc_object_alive(current_access);
-}
-
-
-static int SetupAvio(vlc_object_t *access)
-{
-    vlc_mutex_lock(&avio_lock);
-    assert(!access != !current_access);
-    if (access && current_access) {
-        vlc_mutex_unlock(&avio_lock);
-        return VLC_EGENERIC;
-    }
-    url_set_interrupt_cb(access ? UrlInterruptCallback : NULL);
-    current_access = access;
-    vlc_mutex_unlock(&avio_lock);
-
-    return VLC_SUCCESS;
 }
