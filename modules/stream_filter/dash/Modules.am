@@ -17,6 +17,8 @@ SOURCES_stream_filter_dash = \
     http/HTTPConnectionManager.cpp \
     http/HTTPConnectionManager.h \
     http/IHTTPConnection.h \
+    mpd/AdaptationSet.cpp \
+    mpd/AdaptationSet.h \
     mpd/BaseUrl.h \
     mpd/BasicCMManager.cpp \
     mpd/BasicCMManager.h \
