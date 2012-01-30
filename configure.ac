@@ -108,19 +108,22 @@ case "${host_os}" in
     CFLAGS="${CFLAGS} -pthread"
     VLC_ADD_LIBS([vcd cdda vcdx],[-ldvd])
     ;;
-  *bsd*)
-    SYS="${host_os}"
+  freebsd*)
+    SYS=freebsd
     CFLAGS="${CFLAGS} -pthread"
-    case "${host_os}" in
-      freebsd*)
-        CPPFLAGS="${CPPFLAGS} -I/usr/local/include"
-        LDFLAGS="${LDFLAGS} -L/usr/local/lib"
-        ;;
-      openbsd*)
-        CPPFLAGS="${CPPFLAGS} -I/usr/local/include -I/usr/X11R6/include"
-        LDFLAGS="${LDFLAGS} -L/usr/local/lib -L/usr/X11R6/lib/"
-        ;;
-    esac
+    CPPFLAGS="${CPPFLAGS} -I/usr/local/include"
+    LDFLAGS="${LDFLAGS} -L/usr/local/lib"
+    ;;
+  openbsd*)
+    SYS=openbsd
+    CPPFLAGS="${CPPFLAGS} -I/usr/local/include -I/usr/X11R6/include"
+    LDFLAGS="${LDFLAGS} -L/usr/local/lib -L/usr/X11R6/lib/"
+    ;;
+  netbsd*)
+    SYS=netbsd
+    ;;
+  dragonfly*)
+    SYS=dragonfly
     ;;
   darwin*)
 
