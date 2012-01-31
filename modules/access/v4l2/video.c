@@ -916,10 +916,12 @@ static int InitVideo( vlc_object_t *p_obj, int i_fd, demux_sys_t *p_sys,
         {
             const size_t n = sizeof(standards_vlc) / sizeof(*standards_vlc);
 
-            static_assert(n == sizeof (standards_v4l2)
-                / sizeof (*standards_v4l2), "Inconsistent standards tables");
-            static_assert(n == sizeof (standards_user)
-                / sizeof (*standards_user), "Inconsistent standards tables");
+            static_assert(sizeof(standards_vlc) / sizeof(*standards_vlc)
+                         == sizeof (standards_v4l2) / sizeof (*standards_v4l2),
+                          "Inconsistent standards tables");
+            static_assert(sizeof(standards_vlc) / sizeof(*standards_vlc)
+                         == sizeof (standards_user) / sizeof (*standards_user),
+                          "Inconsistent standards tables");
 
             for( size_t i = 0; i < n; i++ )
                 if( strcasecmp( stdname, standards_vlc[i] ) == 0 )
