@@ -211,7 +211,7 @@ function rawfile(h,path,url,acl_)
             else
                 vlc.msg.dbg("Reloading `"..filename.."'")
             end
-            page = io.open(filename):read("*a")
+            page = io.open(filename,"rb"):read("*a")
             mtime = new_mtime
         end
         return page
