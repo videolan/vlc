@@ -100,7 +100,7 @@ static int SetupAvioCb(vlc_object_t *access)
         vlc_mutex_unlock(&avio_lock);
         return VLC_EGENERIC;
     }
-    url_set_interrupt_cb(access ? UrlInterruptCallback : NULL);
+    url_set_interrupt_cb(access ? UrlInterruptCallbackSingle : NULL);
 
     current_access = access;
 
