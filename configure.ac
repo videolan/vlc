@@ -511,6 +511,20 @@ AC_LINK_IFELSE([
             c = NULL;
     ])],[AC_DEFINE([HAVE_VASPRINTF],[1],[Define to 1 if you have asprintf function])],[AC_LIBOBJ([vasprintf])])
 
+dnl C11 static_assert()
+AC_MSG_CHECKING([for static_assert in assert.h])
+AC_PREPROC_IFELSE([AC_LANG_SOURCE([
+#include <assert.h>
+#ifndef static_assert
+# error BOOM!
+#endif
+])], [
+  AC_MSG_RESULT([yes])
+  AC_DEFINE([HAVE_STATIC_ASSERT], [1], [Define to 1 if <assert.h> defines static_assert.])
+], [
+  AC_MSG_RESULT([no])
+])
+
 # Windows CE does not have strcoll()
 AC_FUNC_STRCOLL
 
