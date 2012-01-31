@@ -249,13 +249,13 @@ static int InputEvent( vlc_object_t *p_this, const char *psz_var,
     NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
     switch (new_val.i_int) {
         case INPUT_EVENT_STATE:
-            [[VLCMain sharedInstance] playbackStatusUpdated];
+            [[VLCMain sharedInstance] performSelectorOnMainThread:@selector(playbackStatusUpdated) withObject: nil waitUntilDone:NO];
             break;
         case INPUT_EVENT_RATE:
             [[[VLCMain sharedInstance] mainMenu] performSelectorOnMainThread:@selector(updatePlaybackRate) withObject: nil waitUntilDone:NO];
             break;
         case INPUT_EVENT_POSITION:
-            [[VLCMain sharedInstance] updatePlaybackPosition];
+            [[VLCMain sharedInstance] performSelectorOnMainThread:@selector(updatePlaybackPosition) withObject: nil waitUntilDone:NO];
             break;
         case INPUT_EVENT_TITLE:
         case INPUT_EVENT_CHAPTER:
@@ -296,22 +296,22 @@ static int InputEvent( vlc_object_t *p_this, const char *psz_var,
 
         case INPUT_EVENT_ITEM_NAME:
             [[VLCMain sharedInstance] updateName];
-            [[VLCMain sharedInstance] playlistUpdated];
+            [[VLCMain sharedInstance] performSelectorOnMainThread:@selector(playlistUpdated) withObject: nil waitUntilDone:NO];
             break;
 
         case INPUT_EVENT_AUDIO_DELAY:
         case INPUT_EVENT_SUBTITLE_DELAY:
-            [[VLCMain sharedInstance] updateDelays];
+            [[VLCMain sharedInstance] performSelectorOnMainThread:@selector(updateDelays) withObject:nil waitUntilDone:NO];
             break;
 
         case INPUT_EVENT_DEAD:
             [[VLCMain sharedInstance] updateName];
-            [[VLCMain sharedInstance] updatePlaybackPosition];
+            [[VLCMain sharedInstance] performSelectorOnMainThread:@selector(updatePlaybackPosition) withObject:nil waitUntilDone:NO];
             break;
 
         case INPUT_EVENT_ABORT:
             [[VLCMain sharedInstance] updateName];
-            [[VLCMain sharedInstance] updatePlaybackPosition];
+            [[VLCMain sharedInstance] performSelectorOnMainThread:@selector(updatePlaybackPosition) withObject:nil waitUntilDone:NO];
             break;
 
         default:
