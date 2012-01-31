@@ -83,7 +83,7 @@ vlc_module_begin ()
         set_shortname( N_("Lua") )
         set_description( N_("Lua interpreter") )
         set_category( CAT_INTERFACE )
-        set_subcategory( SUBCAT_INTERFACE_CONTROL )
+        set_subcategory( SUBCAT_INTERFACE_MAIN )
         add_string( "lua-intf", "dummy",
                     INTF_TEXT, INTF_LONGTEXT, false )
         add_string( "lua-config", "",
