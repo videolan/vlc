@@ -93,9 +93,11 @@ void vlc_tdestroy (void *root, void (*freenode) (void *))
     vlc_mutex_lock (&smallest.lock);
     for (size_t i = 0; i < count; i++)
     {
-         smallest.node = tab[i];
-         if (tdelete (smallest.node, &root, cmp_smallest) == NULL)
-             abort ();
+         void *node  = tab[i];
+
+         smallest.node = node;
+         node = tdelete (node, &root, cmp_smallest);
+         assert (node != NULL);
     }
     vlc_mutex_unlock (&smallest.lock);
     assert (root == NULL);
