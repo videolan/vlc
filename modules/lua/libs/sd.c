@@ -188,7 +188,10 @@ static int vlclua_sd_add_node( lua_State *L )
                 }
                 lua_pop( L, 1 );
                 lua_getfield( L, -1, "category" );
-                services_discovery_AddItem( p_sd, p_input, luaL_checkstring( L, -1 ) );
+                if( lua_isstring( L, -1 ) )
+                    services_discovery_AddItem( p_sd, p_input, luaL_checkstring( L, -1 ) );
+                else
+                    services_discovery_AddItem( p_sd, p_input, NULL );
                 input_item_t **udata = (input_item_t **)
                                        lua_newuserdata( L, sizeof( input_item_t * ) );
                 *udata = p_input;
@@ -244,7 +247,10 @@ static int vlclua_sd_add_item( lua_State *L )
                     msg_Warn( p_sd, "Item duration should be a number (in seconds)." );
                 lua_pop( L, 1 );
                 lua_getfield( L, -1, "category" );
-                services_discovery_AddItem( p_sd, p_input, luaL_checkstring( L, -1 ) );
+                if( lua_isstring( L, -1 ) )
+                    services_discovery_AddItem( p_sd, p_input, luaL_checkstring( L, -1 ) );
+                else
+                    services_discovery_AddItem( p_sd, p_input, NULL );
                 lua_pop( L, 1 );
                 input_item_t **udata = (input_item_t **)
                                        lua_newuserdata( L, sizeof( input_item_t * ) );
