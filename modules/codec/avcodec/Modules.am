@@ -5,7 +5,6 @@ libavcodec_plugin_la_SOURCES = \
 	subtitle.c \
 	audio.c \
 	deinterlace.c \
-	avutil.h \
 	fourcc.c \
 	chroma.h \
 	chroma.c \

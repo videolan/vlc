@@ -44,7 +44,6 @@
 #endif
 
 #include "avcodec.h"
-#include "avutil.h"
 #include "chroma.h"
 
 #if LIBAVCODEC_VERSION_INT < AV_VERSION_INT( 52, 25, 0 )
@@ -398,7 +397,6 @@ void InitLibavcodec( vlc_object_t *p_object )
         avcodec_init();
 #endif
         avcodec_register_all();
-        av_log_set_callback( LibavutilCallback );
         b_ffmpeginit = true;
 
         msg_Dbg( p_object, "libavcodec initialized (interface 0x%x)",

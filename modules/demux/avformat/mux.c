@@ -37,7 +37,6 @@
 
 #include "avformat.h"
 #include "../../codec/avcodec/avcodec.h"
-#include "../../codec/avcodec/avutil.h"
 
 /* Support for deprecated APIs */
 #if LIBAVFORMAT_VERSION_INT < ((52<<16)+(105<<8)+0)
@@ -94,7 +93,6 @@ int OpenMux( vlc_object_t *p_this )
 
     /* Should we call it only once ? */
     av_register_all();
-    av_log_set_callback( LibavutilCallback );
 
     config_ChainParse( p_mux, "ffmpeg-", ppsz_mux_options, p_mux->p_cfg );
 
@@ -247,7 +245,6 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     }
     codec = stream->codec;
 
-    /* This is used by LibavutilCallback (avutil.h) to print messages */
     codec->opaque = p_mux;
 
     switch( p_input->p_fmt->i_cat )

@@ -349,7 +349,6 @@ modules/codec/araw.c
 modules/codec/avcodec/audio.c
 modules/codec/avcodec/avcodec.c
 modules/codec/avcodec/avcodec.h
-modules/codec/avcodec/avutil.h
 modules/codec/avcodec/chroma.c
 modules/codec/avcodec/deinterlace.c
 modules/codec/avcodec/encoder.c
