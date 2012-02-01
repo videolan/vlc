@@ -293,13 +293,23 @@ static ssize_t Write(sout_access_out_t *p_access, block_t *p_buffer)
     size_t i_write = 0;
 
     while (p_buffer != NULL) {
-        block_t *p_next = p_buffer->p_next;;
+        block_t *p_next = p_buffer->p_next;
 
 #if LIBAVFORMAT_VERSION_MAJOR < 54
-        i_write += url_write(p_sys->context, p_buffer->p_buffer, p_buffer->i_buffer);
+        int written = url_write(p_sys->context, p_buffer->p_buffer, p_buffer->i_buffer);
+        if (written < 0) {
+            errno = AVUNERROR(written);
+            goto error;
+        }
+        i_write += written;
 #else
-        /* FIXME : how are errors notified ?? */
         avio_write(p_sys->context, p_buffer->p_buffer, p_buffer->i_buffer);
+        avio_flush(p_sys->context);
+        if (p_sys->context->error) {
+            errno = AVUNERROR(p_sys->context->error);
+            p_sys->context->error = 0; /* FIXME? */
+            goto error;
+        }
         i_write += p_buffer->i_buffer;
 #endif
 
@@ -308,6 +318,11 @@ static ssize_t Write(sout_access_out_t *p_access, block_t *p_buffer)
         p_buffer = p_next;
     }
 
+    return i_write;
+
+error:
+    msg_Err(p_access, "Wrote only %zu bytes (%m)", i_write);
+    block_ChainRelease( p_buffer );
     return i_write;
 }
 
