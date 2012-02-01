@@ -2193,6 +2193,7 @@ static int segment_RestorePos( segment_t *segment )
     return VLC_SUCCESS;
 }
 
+/* p_read might be NULL if caller wants to skip data */
 static ssize_t hls_Read(stream_t *s, uint8_t *p_read, unsigned int i_read)
 {
     stream_sys_t *p_sys = s->p_sys;
@@ -2240,7 +2241,8 @@ static ssize_t hls_Read(stream_t *s, uint8_t *p_read, unsigned int i_read)
 
         if (len > 0)
         {
-            memcpy(p_read + copied, segment->data->p_buffer, len);
+            if( p_read ) /* otherwise caller skips data */
+                memcpy(p_read + copied, segment->data->p_buffer, len);
             segment->data->i_buffer -= len;
             segment->data->p_buffer += len;
             copied += len;
@@ -2262,15 +2264,6 @@ static int Read(stream_t *s, void *buffer, unsigned int i_read)
 
     if (p_sys->b_error)
         return 0;
-
-    if (buffer == NULL)
-    {
-        /* caller skips data, get big enough buffer */
-        msg_Warn(s, "buffer is NULL (allocate %d)", i_read);
-        buffer = calloc(1, i_read);
-        if (buffer == NULL)
-            return 0; /* NO MEMORY left*/
-    }
 
     length = hls_Read(s, (uint8_t*) buffer, i_read);
     if (length < 0)
