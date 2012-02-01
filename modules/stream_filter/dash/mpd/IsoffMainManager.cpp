@@ -39,7 +39,7 @@ IsoffMainManager::~IsoffMainManager ()
     delete this->mpd;
 }
 
-std::vector<Segment*>       IsoffMainManager::getSegments           (Representation *rep)
+std::vector<Segment*>       IsoffMainManager::getSegments           (const Representation *rep)
 {
     std::vector<Segment *>  retSegments;
     SegmentList*            list= rep->getSegmentList();
