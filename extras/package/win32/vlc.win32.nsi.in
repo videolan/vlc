@@ -605,7 +605,7 @@ Section $Name_Section02b SEC02b
 SectionEnd
 
 !ifdef INSTALL_MOZILLA
-Section /o $Name_Section03 SEC03
+Section $Name_Section03 SEC03
   SectionIn 3
 
   SetOutPath "$INSTDIR"
