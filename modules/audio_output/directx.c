@@ -164,8 +164,6 @@ static int OpenAudio( vlc_object_t *p_this )
     if( unlikely( p_aout->sys == NULL ) )
         return VLC_ENOMEM;
 
-    aout_VolumeSoftInit( p_aout );
-
     /* Retrieve config values */
     var_Create( p_aout, "directx-audio-float32",
                 VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
