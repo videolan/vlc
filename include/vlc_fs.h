@@ -69,6 +69,9 @@ static inline void vlc_rewinddir( DIR *dir )
 #  ifndef stat
 #   define stat _stati64
 #  endif
+#  ifndef fstat
+#   define fstat _fstati64
+#  endif
 # endif
 #endif
 
