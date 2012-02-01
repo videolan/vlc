@@ -36,8 +36,6 @@
 #include "menus.hpp"                              /* Popup */
 #include "input_manager.hpp"                      /* THEMIM */
 
-#include "sorting.h"                              /* Columns order */
-
 #include <vlc_services_discovery.h>               /* SD_CMD_SEARCH */
 
 #include <QHeaderView>
