@@ -92,7 +92,6 @@ struct aout_sys_t
  *****************************************************************************/
 static int  OpenAudio  ( vlc_object_t * );
 static void CloseAudio ( vlc_object_t * );
-static void CloseAudioCommon ( vlc_object_t * );
 static void Play       ( audio_output_t *, block_t * );
 
 /* local functions */
@@ -278,8 +277,7 @@ static int OpenAudio( vlc_object_t *p_this )
             != VLC_SUCCESS )
         {
             msg_Err( p_aout, "cannot open directx audio device" );
-            free( p_aout->sys );
-            return VLC_EGENERIC;
+            goto error;
         }
 
         /* Calculate the frame size in bytes */
@@ -303,8 +301,8 @@ static int OpenAudio( vlc_object_t *p_this )
         msg_Err( p_aout, "cannot create DirectSoundThread" );
         CloseHandle( p_aout->sys->notif.event );
         p_aout->sys->notif.event = NULL;
-        CloseAudio( VLC_OBJECT(p_aout) );
-        return VLC_EGENERIC;
+        aout_PacketDestroy( p_aout );
+        goto error;
     }
 
     p_aout->pf_play = Play;
@@ -314,7 +312,7 @@ static int OpenAudio( vlc_object_t *p_this )
     return VLC_SUCCESS;
 
  error:
-    CloseAudioCommon( VLC_OBJECT(p_aout) );
+    CloseAudio( VLC_OBJECT(p_aout) );
     return VLC_EGENERIC;
 }
 
@@ -578,13 +576,6 @@ static void Play( audio_output_t *p_aout, block_t *p_buffer )
 static void CloseAudio( vlc_object_t *p_this )
 {
     audio_output_t * p_aout = (audio_output_t *)p_this;
-    aout_PacketDestroy( p_aout );
-    CloseAudioCommon( p_this );
-}
-
-static void CloseAudioCommon( vlc_object_t *p_this )
-{
-    audio_output_t * p_aout = (audio_output_t *)p_this;
     aout_sys_t *p_sys = p_aout->sys;
 
     msg_Dbg( p_aout, "closing audio device" );
@@ -599,6 +590,7 @@ static void CloseAudioCommon( vlc_object_t *p_this )
 
         vlc_join( p_sys->notif.thread, NULL );
         CloseHandle( p_sys->notif.event );
+        aout_PacketDestroy( p_aout );
     }
 
     /* release the secondary buffer */
@@ -609,8 +601,6 @@ static void CloseAudioCommon( vlc_object_t *p_this )
 
     /* free DSOUND.DLL */
     if( p_sys->hdsound_dll ) FreeLibrary( p_sys->hdsound_dll );
-
-    aout_PacketDestroy( p_aout );
 
     free( p_aout->sys->p_device_guid );
     free( p_sys );
