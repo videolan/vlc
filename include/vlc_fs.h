@@ -65,6 +65,9 @@ static inline void vlc_rewinddir( DIR *dir )
 # define rewinddir vlc_rewinddir
 
 # include <sys/stat.h>
+# ifndef stat
+#  define stat _stati64
+# endif
 #endif
 
 struct stat;
