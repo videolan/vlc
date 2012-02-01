@@ -291,12 +291,12 @@ static void CommonChangeThumbnailClip(vout_display_t *vd, bool show)
     CoInitialize(0);
 
     void *ptr;
-    if (S_OK == CoCreateInstance(&clsid_ITaskbarList,
+    if (S_OK == CoCreateInstance(&CLSID_TaskbarList,
                                  NULL, CLSCTX_INPROC_SERVER,
                                  &IID_ITaskbarList3,
                                  &ptr)) {
-        LPTASKBARLIST3 taskbl = ptr;
-        taskbl->vt->HrInit(taskbl);
+        ITaskbarList3 *taskbl = ptr;
+        taskbl->lpVtbl->HrInit(taskbl);
 
         HWND hroot = GetAncestor(sys->hwnd,GA_ROOT);
         RECT relative;
@@ -310,11 +310,11 @@ static void CommonChangeThumbnailClip(vout_display_t *vd, bool show)
             relative.right  = video.right  - video.left + relative.left;
             relative.bottom = video.bottom - video.top  + relative.top - 25;
         }
-        if (S_OK != taskbl->vt->SetThumbnailClip(taskbl, hroot,
+        if (S_OK != taskbl->lpVtbl->SetThumbnailClip(taskbl, hroot,
                                                  show ? &relative : NULL))
             msg_Err(vd, "SetThumbNailClip failed");
 
-        taskbl->vt->Release(taskbl);
+        taskbl->lpVtbl->Release(taskbl);
     }
     CoUninitialize();
 #endif

@@ -928,15 +928,15 @@ bool SPrefsPanel::addType( const char * psz_ext, QTreeWidgetItem* current,
 
 void SPrefsPanel::assoDialog()
 {
-    LPAPPASSOCREGUI p_appassoc;
+    IApplicationAssociationRegistrationUI *p_appassoc;
     CoInitialize( 0 );
 
-    if( S_OK == CoCreateInstance( &clsid_IApplication2,
+    if( S_OK == CoCreateInstance(CLSID_ApplicationAssociationRegistrationUI,
                 NULL, CLSCTX_INPROC_SERVER,
                 IID_IApplicationAssociationRegistrationUI,
                 (void **)&p_appassoc) )
     {
-        if(S_OK == p_appassoc->vt->LaunchAdvancedAssociationUI(p_appassoc, L"VLC" ) )
+        if(S_OK == p_appassoc->LaunchAdvancedAssociationUI(L"VLC" ) )
         {
             CoUninitialize();
             return;

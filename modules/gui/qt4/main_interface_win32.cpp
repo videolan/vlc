@@ -79,12 +79,12 @@ void MainInterface::createTaskBarButtons()
 
     CoInitialize( 0 );
 
-    if( S_OK == CoCreateInstance( &clsid_ITaskbarList,
+    if( S_OK == CoCreateInstance( CLSID_TaskbarList,
                 NULL, CLSCTX_INPROC_SERVER,
                 IID_ITaskbarList3,
                 (void **)&p_taskbl) )
     {
-        p_taskbl->vt->HrInit(p_taskbl);
+        p_taskbl->HrInit();
 
         if( (himl = ImageList_Create( 20, //cx
                         20, //cy
@@ -114,7 +114,7 @@ void MainInterface::createTaskBarButtons()
 
         // Define an array of two buttons. These buttons provide images through an
         // image list and also provide tooltips.
-        DWORD dwMask = THB_BITMAP | THB_FLAGS;
+        THUMBBUTTONMASK dwMask = THUMBBUTTONMASK(THB_BITMAP | THB_FLAGS);
 
         THUMBBUTTON thbButtons[3];
         thbButtons[0].dwMask = dwMask;
@@ -132,12 +132,12 @@ void MainInterface::createTaskBarButtons()
         thbButtons[2].iBitmap = 3;
         thbButtons[2].dwFlags = THBF_HIDDEN;
 
-        HRESULT hr = p_taskbl->vt->ThumbBarSetImageList(p_taskbl, winId(), himl );
+        HRESULT hr = p_taskbl->ThumbBarSetImageList(winId(), himl );
         if(S_OK != hr)
             msg_Err( p_intf, "ThumbBarSetImageList failed with error %08lx", hr );
         else
         {
-            hr = p_taskbl->vt->ThumbBarAddButtons(p_taskbl, winId(), 3, thbButtons);
+            hr = p_taskbl->ThumbBarAddButtons(winId(), 3, thbButtons);
             if(S_OK != hr)
                 msg_Err( p_intf, "ThumbBarAddButtons failed with error %08lx", hr );
         }
@@ -244,7 +244,7 @@ void MainInterface::changeThumbbarButtons( int i_status )
 
     // Define an array of three buttons. These buttons provide images through an
     // image list and also provide tooltips.
-    DWORD dwMask = THB_BITMAP | THB_FLAGS;
+    THUMBBUTTONMASK dwMask = THUMBBUTTONMASK(THB_BITMAP | THB_FLAGS);
 
     THUMBBUTTON thbButtons[3];
     //prev
@@ -285,7 +285,7 @@ void MainInterface::changeThumbbarButtons( int i_status )
         default:
             return;
     }
-    HRESULT hr =  p_taskbl->vt->ThumbBarUpdateButtons(p_taskbl, this->winId(), 3, thbButtons);
+    HRESULT hr =  p_taskbl->ThumbBarUpdateButtons(this->winId(), 3, thbButtons);
     if(S_OK != hr)
         msg_Err( p_intf, "ThumbBarUpdateButtons failed with error %08lx", hr );
 }

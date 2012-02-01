@@ -172,7 +172,7 @@ private:
 
 #ifdef WIN32
     HIMAGELIST himl;
-    LPTASKBARLIST3 p_taskbl;
+    ITaskbarList3 *p_taskbl;
     UINT taskbar_wmsg;
     void createTaskBarButtons();
 #endif

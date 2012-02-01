@@ -3195,7 +3195,7 @@ if test "${enable_directx}" != "no"; then
       [ VLC_ADD_PLUGIN([direct3d])
         VLC_ADD_LIBS([direct3d],[-lgdi32])
       ])
-      VLC_ADD_LIBS([direct3d directx glwin32],[-lole32])
+      VLC_ADD_LIBS([direct3d directx glwin32],[-lole32 -luuid])
   fi
 fi
 
@@ -3225,7 +3225,7 @@ AC_ARG_ENABLE(wingdi,
 if test "${enable_wingdi}" != "no"; then
   if test "${SYS}" = "mingw32"; then
     VLC_ADD_PLUGIN([wingdi])
-    VLC_ADD_LIBS([wingdi],[-lgdi32 -lole32])
+    VLC_ADD_LIBS([wingdi],[-lgdi32 -lole32 -luuid])
   fi
   if test "${SYS}" = "mingwce"; then
     VLC_ADD_PLUGIN([wingdi wingapi])

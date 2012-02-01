@@ -267,7 +267,7 @@ MainInterface::~MainInterface()
     if( himl )
         ImageList_Destroy( himl );
     if(p_taskbl)
-        p_taskbl->vt->Release(p_taskbl);
+        p_taskbl->Release();
     CoUninitialize();
 #endif
 
