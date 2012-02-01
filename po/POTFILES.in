@@ -338,7 +338,6 @@ modules/audio_output/jack.c
 modules/audio_output/kai.c
 modules/audio_output/opensles_android.c
 modules/audio_output/oss.c
-modules/audio_output/portaudio.c
 modules/audio_output/pulse.c
 modules/audio_output/waveout.c
 modules/audio_output/windows_audio_common.h

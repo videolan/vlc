@@ -3435,11 +3435,6 @@ AC_SUBST(OSS_LIBS)
 AM_CONDITIONAL([HAVE_OSS], [test "${have_oss}" = "yes"])
 
 dnl
-dnl  Portaudio module
-dnl
-PKG_ENABLE_MODULES_VLC([PORTAUDIO], [], [portaudio-2.0], [Portaudio library support], [auto])
-
-dnl
 dnl  win32 waveOut plugin
 dnl
 AC_ARG_ENABLE(waveout,
