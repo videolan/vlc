@@ -992,7 +992,6 @@ static void* DirectSoundThread( void *data )
     audio_output_t *p_aout = (audio_output_t *)data;
     notification_thread_t *p_notif = &p_aout->sys->notif;
     mtime_t last_time;
-    int canc = vlc_savecancel ();
 
     msg_Dbg( p_aout, "DirectSoundThread ready" );
 
@@ -1082,7 +1081,6 @@ static void* DirectSoundThread( void *data )
     /* make sure the buffer isn't playing */
     IDirectSoundBuffer_Stop( p_aout->sys->p_dsbuffer );
 
-    vlc_restorecancel (canc);
     msg_Dbg( p_aout, "DirectSoundThread exiting" );
     return NULL;
 }
