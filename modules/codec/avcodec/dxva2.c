@@ -709,7 +709,7 @@ static char *DxDescribe(vlc_va_dxva2_t *va)
     }
 
     char *description;
-    if (asprintf(&description, "DXVA2 (%.*s, vendor %d(%s), device %d, revision %d)",
+    if (asprintf(&description, "DXVA2 (%.*s, vendor %lu(%s), device %lu, revision %lu)",
                  sizeof(id->Description), id->Description,
                  id->VendorId, vendor, id->DeviceId, id->Revision) < 0)
         return NULL;
