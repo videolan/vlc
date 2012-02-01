@@ -723,22 +723,22 @@ ModuleListConfigControl::~ModuleListConfigControl()
     delete groupBox;
 }
 
-#define CHECKBOX_LISTS \
-{ \
-        QCheckBox *cb = new QCheckBox( qtr( module_GetLongName( p_parser ) ) );\
-        checkBoxListItem *cbl = new checkBoxListItem; \
-\
-        CONNECT( cb, stateChanged( int ), this, onUpdate() );\
-        const char *help = module_get_help( p_parser ); \
-        if( help != NULL ) \
-            cb->setToolTip( formatTooltip( qtr( help ) ) ); \
-        cbl->checkBox = cb; \
-\
-        cbl->psz_module = strdup( module_get_object( p_parser ) ); \
-        modules.append( cbl ); \
-\
+void ModuleListConfigControl::checkbox_lists( module_t *p_parser )
+{
+        QCheckBox *cb = new QCheckBox( qtr( module_GetLongName( p_parser ) ) );
+        checkBoxListItem *cbl = new checkBoxListItem;
+
+        CONNECT( cb, stateChanged( int ), this, onUpdate() );
+        const char *help = module_get_help( p_parser );
+        if( help != NULL )
+            cb->setToolTip( formatTooltip( qtr( help ) ) );
+        cbl->checkBox = cb;
+
+        cbl->psz_module = strdup( module_get_object( p_parser ) );
+        modules.append( cbl );
+
         if( p_item->value.psz && strstr( p_item->value.psz, cbl->psz_module ) ) \
-            cbl->checkBox->setChecked( true ); \
+            cbl->checkBox->setChecked( true );
 }
 
 
@@ -764,14 +764,14 @@ void ModuleListConfigControl::finish( bool bycat )
                 if( p_cfg->i_type == CONFIG_SUBCATEGORY &&
                         p_cfg->value.i == p_item->min.i )
                 {
-                    CHECKBOX_LISTS;
+                    checkbox_lists( p_parser );
                 }
             }
             module_config_free (p_config);
         }
         else if( module_provides( p_parser, p_item->psz_type ) )
         {
-            CHECKBOX_LISTS;
+            checkbox_lists(p_parser);
         }
     }
     module_list_free( p_list );
@@ -785,7 +785,6 @@ void ModuleListConfigControl::finish( bool bycat )
         groupBox->setToolTip( formatTooltip(tipText) );
    }
 }
-#undef CHECKBOX_LISTS
 
 QString ModuleListConfigControl::getValue() const
 {

@@ -394,6 +394,7 @@ public slots:
     void onUpdate();
 private:
     void finish( bool );
+    void checkbox_lists(module_t*);
     QList<checkBoxListItem*> modules;
     QGroupBox *groupBox;
     QLineEdit *text;
