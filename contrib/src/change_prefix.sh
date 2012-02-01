@@ -2,10 +2,9 @@
 # ***************************************************************************
 # change_prefix.sh : allow to transfer a contrib dir
 # ***************************************************************************
-# Copyright (C) 2003 the VideoLAN team
-# $Id$
+# Copyright © 2012 VideoLAN and its authors
 #
-# Authors: Christophe Massiot <massiot@via.ecp.fr>
+# Authors: Rafaël Carré
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -22,57 +21,38 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
 # ***************************************************************************
 
+set -e
+
 LANG=C
 export LANG
 
 if test "$1" = "-h" -o "$1" = "--help" -o $# -gt 2; then
-  echo "Usage: $0 [new_prefix] [old prefix]"
-  exit 1
+  echo "Usage: $0 [new_prefix] [old prefix]
+
+Without arguments, this script assumes old prefix = @@CONTRIB_PREFIX@@,
+and new prefix = current directory.
+"
 fi
 
-if test -z "$1" -a -z "$2"
+if [ $# != 2 ]
 then
+    old_prefix=@@CONTRIB_PREFIX@@
     new_prefix=`pwd`
-    prefix=@@CONTRIB_PREFIX@@
 else
-    prefix=$1
+    old_prefix=$1
     new_prefix=$2
 fi
 
+# process [dir] [filemask]
 process() {
-    grep -q "$prefix" "$1" || return
-    echo "Fixing up $file"
-    cp $file $file.tmp
-    sed -e "s,$prefix,$new_prefix,g" < $file > $file.tmp
-    mv -f $file.tmp $file
+    for file in `find $1 -maxdepth 1 -type f -name "$2"`
+    do
+        echo "Fixing up $file"
+        sed -i.orig -e "s,$old_prefix,$new_prefix,g" $file
+        rm -f $file.orig
+    done
 }
 
-for file in `find . -type f`; do
- if ! test -e $file; then
-   echo "$file doesn't exist"
-   continue
- fi
- if test ".`file $file | grep Mach-O`" != "." ; then
-    echo "Changing prefixes of '$file'"
-    islib=n
-    if test ".`file $file | grep 'dynamically linked shared library'`" != "." ; then
-      islib=y
-    fi
-    libs=`otool -L $file 2>/dev/null | grep $prefix | cut -d\  -f 1`
-    first=y
-    for i in "" $libs; do
-      if ! test -z $i; then
-        if test $islib = y -a $first = y; then
-            install_name_tool -id `echo $i | sed -e "s,$prefix,$new_prefix,"` $file
-            first=n
-        else
-            install_name_tool -change $i `echo $i | sed -e "s,$prefix,$new_prefix,"` $file
-        fi
-      fi
-    done
-  elif test -n "`file $file | grep \"text\|shell\"`" -o -n "`echo $file | grep -E \"(pc|la)\"$`"; then
-    process "$file"
-  fi
-done
-
-exit 0
+process bin/ "*"
+process lib/ "*.la"
+process lib/pkgconfig/ "*.pc"
