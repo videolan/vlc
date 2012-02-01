@@ -36,6 +36,9 @@
 #include <basetyps.h>
 #include <objbase.h>
 
+/* rpcndr.h defines small not only for idl */
+#undef small
+
 /* mingw.org fails to define this */
 #ifndef __ITaskbarList3_INTERFACE_DEFINED__
 #define __ITaskbarList3_INTERFACE_DEFINED__
