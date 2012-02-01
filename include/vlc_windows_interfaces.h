@@ -84,10 +84,6 @@ typedef enum THUMBBUTTONFLAGS {
     THBF_NONINTERACTIVE = 0x10
 } THUMBBUTTONFLAGS;
 
-#ifndef THBN_CLICKED
-# define THBN_CLICKED        0x1800
-#endif
-
 #ifdef __cplusplus
 interface ITaskbarList : public IUnknown {
 public:
@@ -226,7 +222,12 @@ struct ITaskbarList3Vtbl
 #endif /* __cplusplus */
 #endif /* __ITaskbarList3_INTERFACE_DEFINED__ */
 
-/* mingw-w64 also fails to define this as of 2.0.1 */
+/* mingw-w64 also fails to define these as of 2.0.1 */
+
+#ifndef THBN_CLICKED
+# define THBN_CLICKED        0x1800
+#endif
+
 #ifndef __IApplicationAssociationRegistrationUI_INTERFACE_DEFINED__
 #define __IApplicationAssociationRegistrationUI_INTERFACE_DEFINED__
 const GUID IID_IApplicationAssociationRegistrationUI = {0x1f76a169,0xf994,0x40ac, {0x8f,0xc8,0x09,0x59,0xe8,0x87,0x47,0x10}};
