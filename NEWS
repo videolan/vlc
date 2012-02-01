@@ -7,6 +7,8 @@ Encoders:
 Audio Filters:
  * new remapping channel filter
 
+Removed modules:
+ * portaudio audio output
 
 Changes between 1.1.12 and 2.0.0:
 ---------------------------------
