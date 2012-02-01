@@ -298,6 +298,7 @@ $Id$
  * simple_channel_mixer: channel mixer
  * skins2: Skinnable interface, new generation
  * smf: Standard MIDI file demuxer
+ * sndio: OpenBSD sndio audio output
  * spatializer: A spatializer audio filter
  * speex: a speex audio decoder/packetizer using the libspeex library
  * speex_resampler: audio resampler using the libspeexdsp library

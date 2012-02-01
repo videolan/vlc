@@ -3435,6 +3435,24 @@ AC_SUBST(OSS_LIBS)
 AM_CONDITIONAL([HAVE_OSS], [test "${have_oss}" = "yes"])
 
 dnl
+dnl  OpenBSD sndio module
+dnl
+AC_ARG_ENABLE([sndio],
+  [AS_HELP_STRING([--disable-sndio],
+    [support the OpenBSD sndio (default auto)])],, [
+  AS_IF([test "$SYS" = "opensd"], [
+    enable_sndio="yes"
+  ])
+])
+have_sndio="no"
+AS_IF([test "$enable_sndio" != "no"], [
+  AC_CHECK_HEADER([sndio.h], [
+    have_sndio="yes"
+  ])
+])
+AM_CONDITIONAL([HAVE_SNDIO], [test "${have_sndio}" = "yes"])
+
+dnl
 dnl  win32 waveOut plugin
 dnl
 AC_ARG_ENABLE(waveout,

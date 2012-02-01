@@ -52,3 +52,11 @@ libkai_plugin_la_DEPENDENCIES =
 if HAVE_KAI
 libvlc_LTLIBRARIES += libkai_plugin.la
 endif
+
+libsndio_plugin_la_SOURCES = sndio.c
+libsndio_plugin_la_CFLAGS = $(AM_CFLAGS)
+libsndio_plugin_la_LIBADD = $(AM_LIBADD) -lsndio
+libsndio_plugin_la_DEPENDENCIES =
+if HAVE_SNDIO
+libvlc_LTLIBRARIES += libsndio_plugin.la
+endif
