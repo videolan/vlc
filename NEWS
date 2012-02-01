@@ -1,6 +1,9 @@
 Changes between 2.0.0 and 2.1.0-git:
 --------------------------------
 
+Audio output:
+ * OpenBSD sndio audio output support
+
 Encoders:
  * high10,high422 and high444 encoding support in h264
 
