@@ -45,14 +45,6 @@
 
 #include <fluidsynth.h>
 
-#if (FLUIDSYNTH_VERSION_MAJOR < 1) \
- || (FLUIDSYNTH_VERSION_MAJOR == 1 && FLUIDSYNTH_VERSION_MINOR < 1)
-# define FLUID_FAILED (-1)
-# define fluid_synth_sysex(synth, ptr, len, d, e, f, g) (FLUID_FAILED)
-# define fluid_synth_system_reset(synth) (FLUID_FAILED)
-# define fluid_synth_channel_pressure(synth, channel, p) (FLUID_FAILED)
-#endif
-
 #define SOUNDFONT_TEXT N_("Sound fonts")
 #define SOUNDFONT_LONGTEXT N_( \
     "A sound fonts file is required for software synthesis." )

@@ -2830,7 +2830,7 @@ fi
 dnl
 dnl libfluidsynth (MIDI synthetizer) plugin
 dnl
-PKG_ENABLE_MODULES_VLC([FLUIDSYNTH], [], [fluidsynth], [MIDI synthetiser with libfluidsynth], [auto])
+PKG_ENABLE_MODULES_VLC([FLUIDSYNTH], [], [fluidsynth >= 1.1.0], [MIDI synthetiser with libfluidsynth], [auto])
 
 dnl
 dnl Teletext Modules
