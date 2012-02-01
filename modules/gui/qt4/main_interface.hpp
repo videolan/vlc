@@ -152,7 +152,7 @@ private:
     QMap<QWidget *, QSize> stackWidgetsSizes;
 
     /* Flags */
-    bool                 b_notificationEnabled; /// Systray Notifications
+    unsigned             i_notificationSetting; /// Systray Notifications
     bool                 b_autoresize;          ///< persistent resizable window
     bool                 b_videoEmbedded;       ///< Want an external Video Window
     bool                 b_videoFullScreen;     ///< --fullscreen

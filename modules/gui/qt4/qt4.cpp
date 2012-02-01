@@ -204,8 +204,18 @@ vlc_module_begin ()
             true,
 #endif
             SYSTRAY_TEXT, SYSTRAY_LONGTEXT, false)
-    add_bool( "qt-notification", true, NOTIFICATION_TEXT,
-              NOTIFICATION_LONGTEXT, false )
+
+    static const int i_notification_list[] =
+        { NOTIFICATION_NEVER, NOTIFICATION_MINIMIZED, NOTIFICATION_ALWAYS };
+
+    static const char *const psz_notification_list_text[] =
+        { N_("Never"), N_("When minimized"), N_("Always") };
+
+    add_integer( "qt-notification", NOTIFICATION_MINIMIZED,
+                 NOTIFICATION_TEXT,
+                 NOTIFICATION_LONGTEXT, false )
+            change_integer_list( i_notification_list, psz_notification_list_text )
+
     add_bool( "qt-start-minimized", false, MINIMIZED_TEXT,
               MINIMIZED_LONGTEXT, true)
     add_bool( "qt-pause-minimized", false, QT_PAUSE_MINIMIZED_TEXT,

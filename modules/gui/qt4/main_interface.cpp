@@ -121,7 +121,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     b_minimalView = var_InheritBool( p_intf, "qt-minimal-view" );
 
     /* Do we want anoying popups or not */
-    b_notificationEnabled = var_InheritBool( p_intf, "qt-notification" );
+    i_notificationSetting = var_InheritInteger( p_intf, "qt-notification" );
 
     /* */
     b_pauseOnMinimize = var_InheritBool( p_intf, "qt-pause-minimized" );
@@ -353,7 +353,7 @@ void MainInterface::recreateToolbars()
 
 void MainInterface::reloadPrefs()
 {
-    b_notificationEnabled = var_InheritBool( p_intf, "qt-notification" );
+    i_notificationSetting = var_InheritInteger( p_intf, "qt-notification" );
     b_pauseOnMinimize = var_InheritBool( p_intf, "qt-pause-minimized" );
 #ifdef WIN32
     p_intf->p_sys->disable_volume_keys = var_InheritBool( p_intf, "qt-disable-volume-keys" );
@@ -1137,7 +1137,8 @@ void MainInterface::updateSystrayTooltipName( const QString& name )
     else
     {
         sysTray->setToolTip( name );
-        if( b_notificationEnabled && ( isHidden() || isMinimized() ) )
+        if( ( i_notificationSetting == NOTIFICATION_ALWAYS ) ||
+            ( i_notificationSetting == NOTIFICATION_MINIMIZED && (isMinimized() || isHidden()) ) )
         {
             sysTray->showMessage( qtr( "VLC media player" ), name,
                     QSystemTrayIcon::NoIcon, 3000 );

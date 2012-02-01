@@ -49,6 +49,12 @@ enum {
     MsgEventType    = 300,
 };
 
+enum{
+    NOTIFICATION_NEVER = 0,
+    NOTIFICATION_MINIMIZED = 1,
+    NOTIFICATION_ALWAYS = 2,
+};
+
 class QVLCApp;
 class QMenu;
 class MainInterface;
