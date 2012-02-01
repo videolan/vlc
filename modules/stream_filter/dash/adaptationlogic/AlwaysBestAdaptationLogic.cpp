@@ -51,15 +51,12 @@ Chunk*  AlwaysBestAdaptationLogic::getNextChunk() throw(EOFException)
     if(this->count == this->schedule.size())
         throw EOFException();
 
-    for(size_t i = 0; i < this->schedule.size(); i++)
+    if ( this->count < this->schedule.size() )
     {
-        if(this->count == i)
-        {
-            Chunk *chunk = new Chunk();
-            chunk->setUrl(this->schedule.at(i)->getSourceUrl());
-            this->count++;
-            return chunk;
-        }
+        Chunk *chunk = new Chunk();
+        chunk->setUrl(this->schedule.at( this->count )->getSourceUrl());
+        this->count++;
+        return chunk;
     }
     return NULL;
 }
