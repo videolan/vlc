@@ -1289,7 +1289,8 @@ void MainInterface::keyPressEvent( QKeyEvent *e )
 
 void MainInterface::handleKeyPress( QKeyEvent *e )
 {
-    if( ( e->modifiers() &  Qt::ControlModifier ) && ( e->key() == Qt::Key_H ) )
+    if( ( ( e->modifiers() & Qt::ControlModifier ) && ( e->key() == Qt::Key_H ) ) ||
+        ( b_minimalView && !b_videoFullScreen && e->key() == Qt::Key_Escape ) )
     {
         toggleMinimalView( !b_minimalView );
         e->accept();
