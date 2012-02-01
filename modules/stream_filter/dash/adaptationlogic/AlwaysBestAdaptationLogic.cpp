@@ -63,6 +63,14 @@ Chunk*  AlwaysBestAdaptationLogic::getNextChunk() throw(EOFException)
     }
     return NULL;
 }
+
+const Representation *AlwaysBestAdaptationLogic::getCurrentRepresentation() const
+{
+    if ( this->count < this->schedule.size() )
+        return this->schedule.at( this->count )->getParentRepresentation();
+    return NULL;
+}
+
 void    AlwaysBestAdaptationLogic::initSchedule ()
 {
     if(this->mpdManager != NULL)

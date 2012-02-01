@@ -77,3 +77,8 @@ Chunk*  RateBasedAdaptationLogic::getNextChunk() throw(EOFException)
     }
     return NULL;
 }
+
+const Representation *RateBasedAdaptationLogic::getCurrentRepresentation() const
+{
+    return this->mpdManager->getRepresentation( this->currentPeriod, this->getBpsAvg() );
+}

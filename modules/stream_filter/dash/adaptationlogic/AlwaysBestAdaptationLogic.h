@@ -46,11 +46,13 @@ namespace dash
                 virtual ~AlwaysBestAdaptationLogic  ();
 
                 dash::http::Chunk* getNextChunk() throw(dash::exception::EOFException);
+                const mpd::Representation *getCurrentRepresentation() const;
 
             private:
                 std::vector<mpd::Segment *>         schedule;
                 dash::mpd::IMPDManager              *mpdManager;
                 size_t                              count;
+                dash::mpd::Representation           *bestRepresentation;
 
                 void initSchedule();
         };
