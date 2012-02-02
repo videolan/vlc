@@ -1,6 +1,9 @@
 Changes between 2.0.0 and 2.1.0-git:
 --------------------------------
 
+3rd party libraries (contrib):
+ * /extras/contrib has been replaced by a better system in /contrib
+
 Audio output:
  * OpenBSD sndio audio output support
 
