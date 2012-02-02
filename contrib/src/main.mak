@@ -147,6 +147,12 @@ endif
 
 endif
 
+ifdef HAVE_WIN32
+ifneq ($(shell $(CC) $(CFLAGS) -E -dM -include _mingw.h - < /dev/null | grep -E __MINGW64_VERSION_MAJOR),)
+HAVE_MINGW_W64 := 1
+endif
+endif
+
 cppcheck = $(shell $(CC) $(CFLAGS) -E -dM - < /dev/null | grep -E $(1))
 
 EXTRA_CFLAGS += -I$(PREFIX)/include
