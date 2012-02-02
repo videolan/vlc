@@ -167,20 +167,7 @@ static void Play (audio_output_t *aout, block_t *block)
         mtime_t delay = par.bufsz * CLOCK_FREQ / aout->format.i_rate;
 
         delay = block->i_pts - (mdate () - delay);
-        if (delay > 0)
-        {
-            size_t frames = (delay * aout->format.i_rate) / CLOCK_FREQ;
-            msg_Dbg (aout, "prepending %zu zeroes", frames);
-
-            void *pad = calloc (frames, aout->format.i_bytes_per_frame);
-            if (likely(pad != NULL))
-            {
-                sio_write (sio, pad, frames * aout->format.i_bytes_per_frame);
-                free (pad);
-            }
-        }
-        else
-            aout_TimeReport (aout, block->i_pts - delay);
+        aout_TimeReport (aout, block->i_pts - delay);
     }
 
     while (block->i_buffer > 0 && !sio_eof (sio))
