@@ -1724,35 +1724,21 @@ static void* hls_Reload(void *p_this)
 static int Prefetch(stream_t *s, int *current)
 {
     stream_sys_t *p_sys = s->p_sys;
-    int stream;
+    int stream = *current;
 
-    /* Try to pick best matching stream */;
-again:
-    stream = *current;
-
-    hls_stream_t *hls = hls_Get(p_sys->hls_stream, *current);
+    hls_stream_t *hls = hls_Get(p_sys->hls_stream, stream);
     if (hls == NULL)
         return VLC_EGENERIC;
 
-    segment_t *segment = segment_GetSegment(hls, p_sys->download.segment);
-    if (segment == NULL )
-        return VLC_EGENERIC;
-
-    if (hls_DownloadSegmentData(s, hls, segment, current) != VLC_SUCCESS)
-        return VLC_EGENERIC;
-
-    /* Found better bandwidth match, try again */
-    if (*current != stream)
-        goto again;
-
     /* Download first 2 segments of this HLS stream */
-    stream = *current;
     for (int i = 0; i < 2; i++)
     {
         segment_t *segment = segment_GetSegment(hls, p_sys->download.segment);
         if (segment == NULL )
             return VLC_EGENERIC;
 
+        /* It is useless to lock the segment here, as Prefetch is called before
+           download and playlit thread are started. */
         if (segment->data)
         {
             p_sys->download.segment++;
