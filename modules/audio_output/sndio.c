@@ -82,7 +82,7 @@ static int Open (vlc_object_t *obj)
 
     audio_format_t f;
 
-    switch (par.bps)
+    switch (par.bits)
     {
         case 8:
             f.i_format = par.sig ? VLC_CODEC_S8 : VLC_CODEC_U8;
