@@ -51,6 +51,9 @@
 #include "access.h"
 #include "filter.h"
 
+#define INSTANCEDATA_OF_PROPERTY_PTR(x) ((PKSPROPERTY((x))) + 1)
+#define INSTANCEDATA_OF_PROPERTY_SIZE(x) (sizeof((x)) - sizeof(KSPROPERTY))
+
 /*****************************************************************************
  * Access: local prototypes
  *****************************************************************************/
