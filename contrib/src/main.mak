@@ -29,7 +29,6 @@ CONTRIB_VIDEOLAN := $(VIDEOLAN)/testing/contrib
 #
 # Machine-dependent variables
 #
-cppcheck = $(shell $(CC) $(CFLAGS) -E -dM - < /dev/null | grep -E $(1))
 
 PREFIX ?= $(TOPDST)/$(HOST)
 PREFIX := $(abspath $(PREFIX))
@@ -148,6 +147,7 @@ endif
 
 endif
 
+cppcheck = $(shell $(CC) $(CFLAGS) -E -dM - < /dev/null | grep -E $(1))
 
 EXTRA_CFLAGS += -I$(PREFIX)/include
 CPPFLAGS := $(CPPFLAGS) $(EXTRA_CFLAGS)
