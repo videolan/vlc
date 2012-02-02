@@ -386,8 +386,7 @@ bool virtual_segment_c::UpdateCurrentToChapter( demux_t & demux )
                         ( p_current_chapter->p_chapter->i_end_time != p_cur_chapter->p_chapter->i_start_time ) ||
                         ( p_current_chapter && p_current_chapter->p_segment != p_cur_chapter->p_segment ) )
                     {
-                        /* hack : we have to use input to seek in order to clean buffers */
-                        var_SetTime( demux.p_sys->p_input, "time", p_cur_chapter->i_virtual_start_time );
+                        Seek( demux, p_cur_chapter->i_virtual_start_time, 0, p_cur_chapter, -1 );
                         return true;
                     }
                 }
@@ -450,7 +449,6 @@ void virtual_segment_c::Seek( demux_t & demuxer, mtime_t i_date, mtime_t i_time_
 
         if( p_current_chapter->p_segment != p_chapter->p_segment )
         {
-            es_out_Control( demuxer.out, ES_OUT_RESET_PCR );
             p_chapter->p_segment->Select( i_date );
             p_current_chapter->p_segment->UnSelect();
         }
