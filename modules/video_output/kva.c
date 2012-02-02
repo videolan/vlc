@@ -57,9 +57,9 @@ static void Close( vlc_object_t * );
     "Select a proper video mode to be used by KVA." )
 
 static const char *const ppsz_kva_video_mode[] = {
-    "auto", "snap", "wo", "dive" };
+    "auto", "snap", "wo", "vman", "dive" };
 static const char *const ppsz_kva_video_mode_text[] = {
-    N_("Auto"), N_("SNAP"), N_("WarpOverlay!"), N_("DIVE") };
+    N_("Auto"), N_("SNAP"), N_("WarpOverlay!"), N_("VMAN"), N_("DIVE") };
 
 vlc_module_begin ()
     set_shortname( "KVA" )
@@ -138,7 +138,8 @@ static MRESULT EXPENTRY WndProc       ( HWND, ULONG, MPARAM, MPARAM );
 #define WM_VLC_FULLSCREEN_CHANGE    ( WM_USER + 2 )
 #define WM_VLC_SIZE_CHANGE          ( WM_USER + 3 )
 
-static const char *psz_video_mode[ 3 ] = {"DIVE", "WarpOverlay!", "SNAP"};
+static const char *psz_video_mode[ 4 ] = {"DIVE", "WarpOverlay!", "SNAP",
+                                          "VMAN"};
 
 static void PMThread( void *arg )
 {
@@ -246,6 +247,8 @@ static void PMThread( void *arg )
         i_kva_mode = KVAM_SNAP;
     else if( strcmp( psz_mode, "wo" ) == 0 )
         i_kva_mode = KVAM_WO;
+    else if( strcmp( psz_mode, "vman" ) == 0 )
+        i_kva_mode = KVAM_VMAN;
     else if( strcmp( psz_mode, "dive" ) == 0 )
         i_kva_mode = KVAM_DIVE;
 
