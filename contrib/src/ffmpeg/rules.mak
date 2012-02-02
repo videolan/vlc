@@ -69,7 +69,9 @@ endif
 
 # Windows
 ifdef HAVE_WIN32
+ifndef HAVE_MINGW_W64
 DEPS_ffmpeg += directx
+endif
 FFMPEGCONF += --target-os=mingw32 --enable-memalign-hack
 FFMPEGCONF += --enable-w32threads \
 	--disable-bzlib --disable-bsfs \

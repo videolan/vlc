@@ -4,7 +4,9 @@ DX_HEADERS_URL := $(CONTRIB_VIDEOLAN)/directx-oss.tar.bz2
 DXVA2_URL := $(CONTRIB_VIDEOLAN)/dxva2api.h
 
 ifdef HAVE_WIN32
+ifndef HAVE_MINGW_W64
 PKGS += directx
+endif
 endif
 
 $(TARBALLS)/directx-oss.tar.bz2:

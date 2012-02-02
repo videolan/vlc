@@ -6,7 +6,9 @@ D2D_URL := http://nodeload.github.com/2of1/d2d1headers/tarball/master
 # FIXME: ^ D2D not working
 
 ifdef HAVE_WIN32
+ifndef HAVE_MINGW_W64
 PKGS += dshow
+endif
 endif
 
 $(TARBALLS)/dshow-headers-oss.tar.bz2:
