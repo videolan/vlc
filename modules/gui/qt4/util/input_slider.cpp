@@ -55,11 +55,6 @@
 #define FADEDURATION 300
 #define FADEOUTDELAY 2000
 
-SeekSlider::SeekSlider( QWidget *_parent ) : QSlider( _parent )
-{
-    SeekSlider( Qt::Horizontal, _parent );
-}
-
 SeekSlider::SeekSlider( Qt::Orientation q, QWidget *_parent )
           : QSlider( q, _parent )
 {
