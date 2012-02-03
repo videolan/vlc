@@ -20,7 +20,6 @@ OPTIONS="
       --enable-shout
       --enable-goom
       --enable-caca
-      --disable-portaudio
       --disable-sdl
       --enable-qt4
       --enable-skins2
