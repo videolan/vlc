@@ -25,30 +25,17 @@
  *****************************************************************************/
 
 using namespace std;
-#ifndef _MSC_VER
-#   include <wtypes.h>
-#   include <unknwn.h>
-#   include <ole2.h>
-#   include <limits.h>
-#   ifdef _WINGDI_
-#      undef _WINGDI_
-#   endif
-#   define _WINGDI_ 1
-#   define AM_NOVTABLE
-#   define _OBJBASE_H_
-#   undef _X86_
-#   ifndef _I64_MAX
-#      define _I64_MAX 0x7FFFFFFFFFFFFFFFLL
-#   endif
-#   define LONGLONG long long
-/* Work-around a bug in w32api-2.5 */
-/* #   define QACONTAINERFLAGS QACONTAINERFLAGS_SOMETHINGELSE */
-#endif
 
-/* Needed to call CoInitializeEx */
-#define _WIN32_DCOM
+#include <wtypes.h>
+#include <unknwn.h>
+#include <ole2.h>
+#include <limits.h>
 
+/* FIXME: mingw.org doesn't define secure versions of
+ * http://msdn.microsoft.com/en-us/library/f30dzcf6.aspxu */
+#define NO_DSHOW_STRSAFE
 #include <dshow.h>
+
 #include <comcat.h>
 #include "dtv/bdadefs.h"
 
