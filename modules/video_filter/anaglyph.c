@@ -38,7 +38,7 @@ static void make_projection_matrix(filter_t *, int, int *);
 static void combine_side_by_side_yuv420(picture_t *, picture_t *, int, int);
 
 #define SCHEME_TEXT N_("Color scheme")
-#define SCHEME_LONGTEXT N_("Define the glasse's color scheme")
+#define SCHEME_LONGTEXT N_("Define the glasses' color scheme")
 
 #define FILTER_PREFIX "anaglyph-"
 
