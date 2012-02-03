@@ -662,8 +662,11 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
 # endif
 #endif
 
-    if( var_InheritBool( p_libvlc, "file-logging" ) &&
-        !var_InheritBool( p_libvlc, "syslog" ) )
+    if( var_InheritBool( p_libvlc, "file-logging" )
+#ifdef HAVE_SYSLOG_H
+        && !var_InheritBool( p_libvlc, "syslog" )
+#endif
+        )
     {
         intf_Create( p_libvlc, "logger,none" );
     }
