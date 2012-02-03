@@ -32,7 +32,11 @@
 
 #include <vlc_common.h>
 #include <vlc_cpu.h>
+#include "libvlc.h"
 
+#include <assert.h>
+
+#ifndef __linux__
 #include <sys/types.h>
 #ifndef WIN32
 #include <unistd.h>
@@ -41,13 +45,10 @@
 #else
 #include <errno.h>
 #endif
-#include <assert.h>
 
 #ifdef __APPLE__
 #include <sys/sysctl.h>
 #endif
-
-#include "libvlc.h"
 
 static uint32_t cpu_flags;
 
@@ -284,45 +285,6 @@ void vlc_CPU_init (void)
     }
 out:
 
-#elif defined (__arm__)
-
-# if defined (__ARM_NEON__)
-    i_capabilities |= CPU_CAPABILITY_NEON;
-# elif defined (CAN_COMPILE_NEON)
-#  define NEED_RUNTIME_CPU_CHECK 1
-# endif
-
-# ifdef NEED_RUNTIME_CPU_CHECK
-#  if defined (__linux__)
-    FILE *info = fopen ("/proc/cpuinfo", "rt");
-    if (info != NULL)
-    {
-        char *line = NULL;
-        size_t linelen = 0;
-
-        while (getline (&line, &linelen, info) != -1)
-        {
-            const char *cap;
-
-            if (strncmp (line, "Features\t:", 10))
-                continue;
-
-            /* TODO: detect other CPU features when we use them */
-#   if defined (CAN_COMPILE_NEON) && !defined (__ARM_NEON__)
-                cap = strstr (line + 10, " neon");
-            if (cap != NULL && (cap[5] == '\0' || cap[5] == ' '))
-                i_capabilities |= CPU_CAPABILITY_NEON;
-#   endif
-            break;
-        }
-        fclose (info);
-        free (line);
-    }
-#  else
-#   warning Run-time CPU detection missing: optimizations disabled!
-#  endif
-# endif
-
 #elif defined( __powerpc__ ) || defined( __ppc__ ) || defined( __powerpc64__ ) \
     || defined( __ppc64__ )
 
@@ -363,6 +325,7 @@ unsigned vlc_CPU (void)
 #endif
     return cpu_flags;
 }
+#endif
 
 void vlc_CPU_dump (vlc_object_t *obj)
 {
