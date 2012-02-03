@@ -3211,7 +3211,7 @@ AC_ARG_ENABLE(direct2d,
 AS_IF([test "${enable_direct2d}" != "no"], [
   AC_CHECK_HEADERS(d2d1.h, [
     VLC_ADD_PLUGIN([direct2d])
-    VLC_ADD_LIBS([direct2d],[-lgdi32 -lole32])
+    VLC_ADD_LIBS([direct2d],[-lgdi32 -lole32 -luuid])
   ], [
     AC_MSG_WARN([Cannot find Direct2D headers!])
   ])
