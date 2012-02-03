@@ -29,27 +29,6 @@
 #include <deque>
 using namespace std;
 
-#ifndef _MSC_VER
-#   include <wtypes.h>
-#   include <unknwn.h>
-#   include <ole2.h>
-#   include <limits.h>
-#   ifdef _WINGDI_
-#      undef _WINGDI_
-#   endif
-#   define _WINGDI_ 1
-#   define AM_NOVTABLE
-#   define _OBJBASE_H_
-#   undef _X86_
-#   ifndef _I64_MAX
-#     define _I64_MAX LONG_LONG_MAX
-#   endif
-#   define LONGLONG long long
-#endif
-
-#include <dshow.h>
-#include "vlc_dshow.h"
-
 typedef struct VLCMediaSample
 {
     IMediaSample *p_sample;

@@ -24,29 +24,30 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-
-#ifndef _MSC_VER
-#   include <wtypes.h>
-#   include <unknwn.h>
-#   include <ole2.h>
-#   include <limits.h>
-#   ifdef _WINGDI_
-#      undef _WINGDI_
-#   endif
-#   define _WINGDI_ 1
-#   define AM_NOVTABLE
-#   define _OBJBASE_H_
-#   undef _X86_
-#   ifndef _I64_MAX
-#     define _I64_MAX LONG_LONG_MAX
-#   endif
-#   define LONGLONG long long
-#endif
-
-#include <dshow.h>
-
 #ifndef VLC_DSHOW_H
 #define VLC_DSHOW_H
+
+#ifdef __MINGW32__
+# include <_mingw.h>
+#endif
+
+#include <wtypes.h>
+#include <unknwn.h>
+#include <ole2.h>
+#include <limits.h>
+#include <strmif.h>
+#include <ksmedia.h>
+#include <ddraw.h>
+
+#ifdef __MINGW64_VERSION_MAJOR
+
+#if __MINGW64_VERSION_MAJOR < 3
+DEFINE_GUID(MEDIASUBTYPE_I420,0x30323449,0x0000,0x0010,0x80,0x00,0x00,0xaa,0x00,0x38,0x9b,0x71);
+#endif
+
+#else /* !__MINGW64_VERSION_MAJOR */
+
+#include <dshow.h>
 
 /*****************************************************************************
  * DirectShow GUIDs.
@@ -374,4 +375,5 @@ DECLARE_INTERFACE_(IAMTVAudio, IUnknown)
     STDMETHOD(UnRegisterNotificationCallBack) (THIS_ IAMTunerNotification*);
 };
 
+#endif /* __MINGW64_VERSION_MAJOR */
 #endif /* VLC_DSHOW_H */

@@ -1774,7 +1774,7 @@ then
       AC_CHECK_HEADERS(dshow.h,
       [ VLC_ADD_PLUGIN([dshow])
         VLC_ADD_CXXFLAGS([dshow],[])
-        VLC_ADD_LIBS([dshow],[-lole32 -loleaut32 -luuid]) ])
+        VLC_ADD_LIBS([dshow],[-lole32 -loleaut32 -luuid -lstrmiids -lksuser])])
     AC_LANG_POP(C++)
   fi
 fi
