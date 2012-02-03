@@ -1863,9 +1863,11 @@ static int ASeek( stream_t *s, uint64_t i_pos )
 
 /**
  * Try to read "i_read" bytes into a buffer pointed by "p_read".  If
- * "p_read" is NULL then data are skipped instead of read.  The return
- * value is the real numbers of bytes read/skip. If this value is less
+ * "p_read" is NULL then data are skipped instead of read.
+ * \return The real number of bytes read/skip. If this value is less
  * than i_read that means that it's the end of the stream.
+ * \note stream_Read increments the stream position, and when p_read is NULL,
+ * this is its only task.
  */
 int stream_Read( stream_t *s, void *p_read, int i_read )
 {
@@ -1874,12 +1876,15 @@ int stream_Read( stream_t *s, void *p_read, int i_read )
 
 /**
  * Store in pp_peek a pointer to the next "i_peek" bytes in the stream
- * \return The real numbers of valid bytes, if it's less
+ * \return The real number of valid bytes. If it's less
  * or equal to 0, *pp_peek is invalid.
  * \note pp_peek is a pointer to internal buffer and it will be invalid as
  * soons as other stream_* functions are called.
- * \note Due to input limitation, it could be less than i_peek without meaning
- * the end of the stream (but only when you have i_peek >=
+ * \note Contrary to stream_Read, stream_Peek doesn't modify the stream
+ * position, and doesn't necessarily involve copying of data. It's mainly
+ * used by the modules to quickly probe the (head of the) stream.
+ * \note Due to input limitation, the return value could be less than i_peek
+ * without meaning the end of the stream (but only when you have i_peek >=
  * p_input->i_bufsize)
  */
 int stream_Peek( stream_t *s, const uint8_t **pp_peek, int i_peek )
