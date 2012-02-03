@@ -99,6 +99,8 @@ static void vlc_CPU_init (void)
             if (!strcmp (cap, "sse4_2"))
                 core_caps |= CPU_CAPABILITY_SSE4_1;
 # endif
+            if (!strcmp (cap, "sse4a"))
+                core_caps |= CPU_CAPABILITY_SSE4A;
 # ifndef __3dNOW__
             if (!strcmp (cap, "3dnow"))
                 core_caps |= CPU_CAPABILITY_3DNOW;
