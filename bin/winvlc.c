@@ -206,6 +206,7 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
     vlc = libvlc_new (argc, (const char **)argv);
     if (vlc != NULL)
     {
+        libvlc_set_user_agent (vlc, "VLC media player", "VLC/"PACKAGE_VERSION);
         libvlc_add_intf (vlc, "globalhotkeys,none");
         libvlc_add_intf (vlc, NULL);
         libvlc_playlist_play (vlc, -1, 0, NULL);
