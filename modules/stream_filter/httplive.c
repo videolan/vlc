@@ -953,6 +953,13 @@ static int parse_Discontinuity(stream_t *s, hls_stream_t *hls, char *p_read)
     return VLC_SUCCESS;
 }
 
+static int hls_CompareStreams( const void* a, const void* b )
+{
+    hls_stream_t*   stream_a = *(hls_stream_t**)a;
+    hls_stream_t*   stream_b = *(hls_stream_t**)b;
+    return stream_a->bandwidth > stream_b->bandwidth;
+}
+
 /* The http://tools.ietf.org/html/draft-pantos-http-live-streaming-04#page-8
  * document defines the following new tags: EXT-X-TARGETDURATION,
  * EXT-X-MEDIA-SEQUENCE, EXT-X-KEY, EXT-X-PROGRAM-DATE-TIME, EXT-X-
@@ -1977,6 +1984,10 @@ static int Open(vlc_object_t *p_this)
         goto fail;
     }
     free(buffer);
+    /* HLS standard doesn't provide any guaranty about streams
+       being sorted by bandwidth, so we sort them */
+    qsort( p_sys->hls_stream->pp_elems, p_sys->hls_stream->i_count,
+           sizeof( hls_stream_t* ), &hls_CompareStreams );
 
     /* Choose first HLS stream to start with */
     int current = p_sys->playback.stream = 0;
