@@ -66,6 +66,14 @@
 #include <shlwapi.h>
 #include <d3d9.h>
 
+#ifdef __MINGW32__
+# include <_mingw.h>
+# if defined(__MINGW64_VERSION_MAJOR) && __MINGW64_VERSION_MAJOR < 3
+#  undef  IDirect3DDeviceManager9_Release
+#  define IDirect3DDeviceManager9_Release(This) (This)->lpVtbl->Release(This)
+# endif
+#endif
+
 /* */
 #define DXVA2_E_NOT_INITIALIZED     MAKE_HRESULT(1, 4, 4096)
 #define DXVA2_E_NEW_VIDEO_DEVICE    MAKE_HRESULT(1, 4, 4097)
