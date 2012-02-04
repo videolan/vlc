@@ -1,7 +1,7 @@
 /*****************************************************************************
  * httplive.c: HTTP Live Streaming stream filter
  *****************************************************************************
- * Copyright (C) 2010-2011 M2X BV
+ * Copyright (C) 2010-2012 M2X BV
  * $Id$
  *
  * Author: Jean-Paul Saman <jpsaman _AT_ videolan _DOT_ org>
@@ -422,7 +422,7 @@ static int ChooseSegment(stream_t *s, const int current)
     int count = vlc_array_count(hls->segments);
     int i = p_sys->b_live ? count - 1 : 0;
 
-    while((i >= 0) && (i < count) && vlc_object_alive(s))
+    while((i >= 0) && (i < count))
     {
         segment_t *segment = segment_GetSegment(hls, i);
         assert(segment);
@@ -1081,7 +1081,7 @@ static int parse_M3U8(stream_t *s, vlc_array_t *streams, uint8_t *buffer, const 
             if (p_begin >= p_end)
                 break;
 
-        } while ((err == VLC_SUCCESS) && vlc_object_alive(s));
+        } while (err == VLC_SUCCESS);
 
     }
     else
@@ -1161,7 +1161,7 @@ static int parse_M3U8(stream_t *s, vlc_array_t *streams, uint8_t *buffer, const 
             if (p_begin >= p_end)
                 break;
 
-        } while ((err == VLC_SUCCESS) && vlc_object_alive(s));
+        } while (err == VLC_SUCCESS);
 
         free(line);
     }
@@ -2126,9 +2126,8 @@ static segment_t *GetSegment(stream_t *s)
     }
 
     /* Was the HLS stream changed to another bitrate? */
-    int i_stream = 0;
     segment = NULL;
-    while(vlc_object_alive(s))
+    for (int i_stream = 0; i_stream < vlc_array_count(p_sys->hls_stream); i_stream++)
     {
         /* Is the next segment ready */
         hls_stream_t *hls = hls_Get(p_sys->hls_stream, i_stream);
@@ -2159,11 +2158,6 @@ static segment_t *GetSegment(stream_t *s)
         vlc_mutex_unlock(&hls->lock);
 
         if (!p_sys->b_meta)
-            break;
-
-        /* Was the stream changed to another bitrate? */
-        i_stream++;
-        if (i_stream >= vlc_array_count(p_sys->hls_stream))
             break;
     }
     /* */
@@ -2256,7 +2250,7 @@ static ssize_t hls_Read(stream_t *s, uint8_t *p_read, unsigned int i_read)
         }
         vlc_mutex_unlock(&segment->lock);
 
-    } while ((i_read > 0) && vlc_object_alive(s));
+    } while (i_read > 0);
 
     return copied;
 }
@@ -2339,7 +2333,7 @@ static int Peek(stream_t *s, const uint8_t **pp_peek, unsigned int i_peek)
         p_buff = peeked->p_buffer;
         *pp_peek = p_buff;
 
-        while ((curlen < i_peek) && vlc_object_alive(s))
+        while (curlen < i_peek)
         {
             nsegment = GetSegment(s);
             if (nsegment == NULL)
