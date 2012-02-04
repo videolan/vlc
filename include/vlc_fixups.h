@@ -118,6 +118,10 @@ char *strdup (const char *);
 int strncasecmp (const char *, const char *, size_t);
 #endif
 
+#ifndef HAVE_STRVERSCMP
+int strverscmp (const char *, const char *);
+#endif
+
 #ifndef HAVE_STRNLEN
 size_t strnlen (const char *, size_t);
 #endif
