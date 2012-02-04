@@ -42,7 +42,6 @@
 #include <vlc_charset.h>   /* FromCharset, for EIT */
 
 #include <vlc_network.h>   /* net_ for ts-out mode */
-#include <vlc_fs.h>        /* vlc_fopen for file-dump mode */
 
 #include "../mux/mpeg/csa.h"
 
