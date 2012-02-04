@@ -79,6 +79,7 @@ struct access_sys_t
     bool header;
     int i_item_count;
     char *xspf_ext;
+    int (*compar)(const char **a, const char **b);
 };
 
 /* Select non-hidden files only */
@@ -94,6 +95,11 @@ static int collate (const char **a, const char **b)
 #else
     return strcmp  (*a, *b);
 #endif
+}
+
+static int version (const char **a, const char **b)
+{
+    return strverscmp (*a, *b);
 }
 
 /*****************************************************************************
@@ -137,10 +143,16 @@ int DirInit (access_t *p_access, DIR *handle)
         free (uri);
         goto error;
     }
+
+    if (var_InheritBool (p_access, "directory-version-sort"))
+        p_sys->compar = version;
+    else
+        p_sys->compar = collate;
+
     root->parent = NULL;
     root->handle = handle;
     root->uri = uri;
-    root->filec = vlc_loaddir (handle, &root->filev, visible, collate);
+    root->filec = vlc_loaddir (handle, &root->filev, visible, p_sys->compar);
     if (root->filec < 0)
         root->filev = NULL;
     root->i = 0;
@@ -348,7 +360,7 @@ block_t *DirBlock (access_t *p_access)
         }
         sub->parent = current;
         sub->handle = handle;
-        sub->filec = vlc_loaddir (handle, &sub->filev, visible, collate);
+        sub->filec = vlc_loaddir (handle, &sub->filev, visible, p_sys->compar);
         if (sub->filec < 0)
             sub->filev = NULL;
         sub->i = 0;
