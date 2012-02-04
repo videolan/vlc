@@ -295,7 +295,7 @@ static int InputEvent( vlc_object_t *p_this, const char *psz_var,
             break;
 
         case INPUT_EVENT_ITEM_NAME:
-            [[VLCMain sharedInstance] updateName];
+            [[VLCMain sharedInstance] performSelectorOnMainThread:@selector(updateName) withObject: nil waitUntilDone:NO];
             [[VLCMain sharedInstance] performSelectorOnMainThread:@selector(playlistUpdated) withObject: nil waitUntilDone:NO];
             break;
 
@@ -305,12 +305,12 @@ static int InputEvent( vlc_object_t *p_this, const char *psz_var,
             break;
 
         case INPUT_EVENT_DEAD:
-            [[VLCMain sharedInstance] updateName];
+            [[VLCMain sharedInstance] performSelectorOnMainThread:@selector(updateName) withObject: nil waitUntilDone:NO];
             [[VLCMain sharedInstance] performSelectorOnMainThread:@selector(updatePlaybackPosition) withObject:nil waitUntilDone:NO];
             break;
 
         case INPUT_EVENT_ABORT:
-            [[VLCMain sharedInstance] updateName];
+            [[VLCMain sharedInstance] performSelectorOnMainThread:@selector(updateName) withObject: nil waitUntilDone:NO];
             [[VLCMain sharedInstance] performSelectorOnMainThread:@selector(updatePlaybackPosition) withObject:nil waitUntilDone:NO];
             break;
 
@@ -347,7 +347,7 @@ static int PlaybackModeUpdated( vlc_object_t *p_this, const char *psz_var,
                          vlc_value_t oldval, vlc_value_t new_val, void *param )
 {
     NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
-    [[VLCMain sharedInstance] playbackModeUpdated];
+    [[VLCMain sharedInstance] performSelectorOnMainThread:@selector(playbackModeUpdated) withObject:nil waitUntilDone:NO];
 
     [o_pool release];
     return VLC_SUCCESS;
@@ -399,7 +399,7 @@ static int FullscreenChanged( vlc_object_t *p_this, const char *psz_variable,
     if (p_intf)
     {
         NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
-        [[VLCMain sharedInstance] fullscreenChanged];
+        [[VLCMain sharedInstance] performSelectorOnMainThread:@selector(fullscreenChanged) withObject:nil waitUntilDone:NO];
         [o_pool release];
     }
     return VLC_SUCCESS;
