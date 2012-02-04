@@ -1,5 +1,6 @@
 #!/bin/sh
 set -e
+set -x
 
 info()
 {
@@ -20,7 +21,7 @@ Build vlc in the current directory
 
 OPTIONS:
    -h            Show some help
-   -v            Be verbose
+   -q            Be quiet
    -k <sdk>      Use the specified sdk (default: $SDK)
    -a <arch>     Use the specified arch (default: $ARCH)
 EOF
@@ -44,9 +45,9 @@ do
              usage
              exit 1
              ;;
-         v)
-             set -x
-             VERBOSE="yes"
+         q)
+             set +x
+             QUIET="yes"
          ;;
          a)
              ARCH=$OPTARG
@@ -67,9 +68,9 @@ fi
 # Various initialization
 #
 
-out="/dev/null"
-if [ "$VERBOSE" = "yes" ]; then
-    out="/dev/stdout"
+out="/dev/stdout"
+if [ "$QUIET" = "yes" ]; then
+    out="/dev/null"
 fi
 
 info "Building VLC for the Mac OS X"
