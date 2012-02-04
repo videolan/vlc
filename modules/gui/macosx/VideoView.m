@@ -279,8 +279,8 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
         if( b_inside )
         {
             vout_display_SendEventMouseMoved( [[[self subviews] objectAtIndex:0] voutDisplay], ((int)ml.x), ((int)s_rect.size.height - ((int)ml.y)) );
+            [[VLCMain sharedInstance] showFullscreenController];
         }
-        [[VLCMain sharedInstance] showFullscreenController];
         vlc_object_release( p_vout );
     }
 
