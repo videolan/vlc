@@ -7,13 +7,16 @@ FFMPEGCONF = \
 	--cc="$(CC)" \
 	--disable-doc \
 	--disable-decoder=libvpx \
+	--disable-decoder=bink \
 	--enable-libgsm \
 	--enable-libopenjpeg \
 	--disable-debug \
 	--enable-gpl \
 	--enable-postproc \
+	--disable-avdevice \
 	--disable-devices \
-	--disable-avfilter
+	--disable-avfilter \
+	--disable-filters
 
 # Those tools are named differently in FFmpeg and Libav
 #	--disable-ffserver \
