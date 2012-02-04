@@ -445,7 +445,7 @@ static int ChooseSegment(stream_t *s, const int current)
         if (p_sys->b_live)
             i-- ;
         else
-          i++;
+            i++;
     }
 
     msg_Info(s, "Choose segment %d/%d (sequence=%d)", wanted, count, sequence);
@@ -678,7 +678,6 @@ static int parse_SegmentInformation(hls_stream_t *hls, char *p_read, int *durati
     }
 
     /* Ignore the rest of the line */
-
     return VLC_SUCCESS;
 }
 
@@ -1094,8 +1093,8 @@ static int parse_M3U8(stream_t *s, vlc_array_t *streams, uint8_t *buffer, const 
         else
         {
             /* No Meta playlist used */
-            char*   uri = ConstructUrl( &s->p_sys->m3u8 );
-            if ( uri == NULL )
+            char* uri = ConstructUrl( &s->p_sys->m3u8 );
+            if (uri == NULL)
                 return VLC_EGENERIC;
             hls = hls_New(streams, 0, 0, uri);
             free( uri );
@@ -2011,7 +2010,6 @@ static int Open(vlc_object_t *p_this)
         goto fail;
     }
 
-
     p_sys->download.stream = current;
     p_sys->playback.stream = current;
     p_sys->download.seek = -1;
@@ -2413,7 +2411,6 @@ static uint64_t GetStreamSize(stream_t *s)
 
     return size;
 }
-
 
 static int segment_Seek(stream_t *s, const uint64_t pos)
 {
