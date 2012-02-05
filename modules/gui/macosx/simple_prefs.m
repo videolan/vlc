@@ -438,14 +438,14 @@ static inline char * __config_GetLabel( vlc_object_t *p_this, const char *psz_na
 - (void)setupButton: (NSButton *)object forBoolValue: (const char *)name
 {
     [object setState: config_GetInt( p_intf, name )];
-    [object setToolTip: [NSString stringWithUTF8String: config_GetLabel( p_intf, name ) ?: ""]];
+    [object setToolTip: _NS(config_GetLabel( p_intf, name ) ?: "")];
 }
 
 - (void)setupField:(NSTextField *)o_object forOption:(const char *)psz_option
 {
     char *psz_tmp = config_GetPsz( p_intf, psz_option );
     [o_object setStringValue: [NSString stringWithUTF8String: psz_tmp ?: ""]];
-    [o_object setToolTip: [NSString stringWithUTF8String: config_GetLabel( p_intf, psz_option )]];
+    [o_object setToolTip: _NS(config_GetLabel( p_intf, psz_option ))];
     free( psz_tmp );
 }
 
@@ -587,7 +587,7 @@ static inline char * __config_GetLabel( vlc_object_t *p_this, const char *psz_na
     [self setupField: o_input_httpproxy_fld forOption:"http-proxy"];
     [self setupField: o_input_httpproxypwd_sfld forOption:"http-proxy-pwd"];
     [o_input_postproc_fld setIntValue: config_GetInt( p_intf, "postproc-q")];
-    [o_input_postproc_fld setToolTip: [NSString stringWithUTF8String: config_GetLabel( p_intf, "postproc-q")]];
+    [o_input_postproc_fld setToolTip: _NS(config_GetLabel( p_intf, "postproc-q"))];
 
     [self setupButton: o_input_avi_pop forIntList: "avi-index"];
 
@@ -647,7 +647,7 @@ static inline char * __config_GetLabel( vlc_object_t *p_this, const char *psz_na
     i = config_GetInt( p_intf, "freetype-opacity" );
     [o_osd_opacity_fld setIntValue: i];
     [o_osd_opacity_sld setIntValue: i];
-    [o_osd_opacity_sld setToolTip: [NSString stringWithUTF8String: config_GetLabel( p_intf, "freetype-opacity")]];
+    [o_osd_opacity_sld setToolTip: _NS(config_GetLabel( p_intf, "freetype-opacity"))];
     [o_osd_opacity_fld setToolTip: [o_osd_opacity_sld toolTip]];
     [self setupButton: o_osd_forcebold_ckb forBoolValue: "freetype-bold"];
 
