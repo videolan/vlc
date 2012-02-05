@@ -47,12 +47,9 @@
 #include <vlc_dialog.h>
 #include "opengl.h"
 
-#ifndef MAC_OS_X_VERSION_10_7
-enum {
-    NSApplicationPresentationFullScreen                 = (1 << 10),
-    NSApplicationPresentationAutoHideToolbar            = (1 << 11)
-};
-#endif
+@interface NSWindow (VLCCustomCode)
+- (BOOL)isFullscreen;
+@end
 
 /**
  * Forward declarations
@@ -496,7 +493,7 @@ static void OpenglSwap(vlc_gl_t *gl)
  */
 - (void)setWindowFrameWithValue:(NSValue *)value
 {
-    if (!(NSAppKitVersionNumber >= 1115.2 && [NSApp currentSystemPresentationOptions] == NSApplicationPresentationFullScreen))
+    if (![[self window] isFullscreen])
     {
         NSRect frame = [value rectValue];
         if (frame.origin.x <= 0.0 && frame.origin.y <= 0.0)

@@ -360,6 +360,11 @@ static NSMutableArray *blackoutWindows = NULL;
             [invoc invoke];
     }
 }
+
+- (BOOL)isFullscreen
+{
+    return YES;
+}
 @end
 
 /*****************************************************************************

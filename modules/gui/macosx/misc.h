@@ -77,6 +77,8 @@
 
 /* animate mode is only supported in >=10.4 */
 - (void)closeAndAnimate: (BOOL)animate;
+
+- (BOOL)isFullscreen;
 @end
 
 
