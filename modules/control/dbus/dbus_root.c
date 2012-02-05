@@ -398,7 +398,7 @@ DBUS_METHOD( GetAllProperties )
     OUT_ARGUMENTS;
 
     DBusError error;
-    DBusMessageIter dict, entry, v;
+    DBusMessageIter dict;
 
     char *const psz_interface_name = NULL;
 
