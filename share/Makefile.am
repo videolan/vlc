@@ -149,7 +149,6 @@ luac_verbose_0 = @echo "  LUAC   $@";
 
 if BUILD_LUA
 nobase_vlclib_DATA = \
-	lua/extensions/allocine-fr.luac \
 	lua/intf/cli.luac \
 	lua/intf/dummy.luac \
 	lua/intf/dumpmeta.luac \
@@ -213,7 +212,6 @@ MOSTLYCLEANFILES += $(nobase_vlclib_DATA)
 EXTRA_DIST += \
 	lua/README.txt \
 	lua/extensions/README.txt \
-	lua/extensions/allocine-fr.lua \
 	lua/intf/README.txt \
 	lua/intf/cli.lua \
 	lua/intf/dummy.lua \
