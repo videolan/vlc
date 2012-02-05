@@ -92,6 +92,16 @@ void WindowClose  ( vout_window_t * );
 
 #define SAVEVOL_TEXT N_( "Automatically save the volume on exit" )
 
+#define KEEPSIZE_TEXT N_( "Resize interface to the native video size" )
+#define KEEPSIZE_LONGTEXT N_( "You have two choices:\n" \
+" - The interface will resize to the native video size\n" \
+" - The video will fit to the interface size\n " \
+"By default, interface resize to the native video size." )
+
+#define PAUSE_MINIMIZED_TEXT N_( "Pause the video playback when minimized" )
+#define PAUSE_MINIMIZED_LONGTEXT N_( \
+"With this option enabled, the playback will be automatically paused when minimizing the window." )
+
 vlc_module_begin ()
     set_description( N_("Mac OS X interface") )
     set_capability( "interface", 200 )
@@ -110,6 +120,8 @@ vlc_module_begin ()
     add_obsolete_bool( "macosx-stretch" ) /* since 2.0.0 */
     add_obsolete_bool( "macosx-background" ) /* since 2.0.0 */
     add_obsolete_bool( "macosx-eq-keep" ) /* since 2.0.0 */
+    add_bool( "macosx-video-autoresize", true, KEEPSIZE_TEXT, KEEPSIZE_LONGTEXT, false )
+    add_bool( "macosx-pause-minimized", false, PAUSE_MINIMIZED_TEXT, PAUSE_MINIMIZED_LONGTEXT, false )
 
     add_submodule ()
         set_description( "Mac OS X Video Output Provider" )

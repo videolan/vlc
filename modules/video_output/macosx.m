@@ -336,6 +336,11 @@ static int Control (vout_display_t *vd, int query, va_list ap)
         case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
         case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
         {
+            if (query == VOUT_DISPLAY_CHANGE_DISPLAY_SIZE)
+            {
+                if (!config_GetInt( vd, "macosx-video-autoresize" ))
+                    return VLC_SUCCESS;
+            }
             NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
             NSPoint topleftbase;
             NSPoint topleftscreen;
