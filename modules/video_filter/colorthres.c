@@ -101,7 +101,7 @@ struct filter_sys_t
     int i_simthres;
     int i_satthres;
     int i_color;
-    vlc_mutex_t lock;
+    vlc_spinlock_t lock;
 };
 
 /*****************************************************************************
@@ -149,7 +149,7 @@ static int Create( vlc_object_t *p_this )
     p_sys->i_satthres = var_CreateGetIntegerCommand( p_filter,
                                                      CFG_PREFIX "saturationthres" );
 
-    vlc_mutex_init( &p_sys->lock );
+    vlc_spin_init( &p_sys->lock );
 
     var_AddCallback( p_filter, CFG_PREFIX "color", FilterCallback, NULL );
     var_AddCallback( p_filter, CFG_PREFIX "similaritythres", FilterCallback, NULL );
@@ -171,7 +171,7 @@ static void Destroy( vlc_object_t *p_this )
     var_DelCallback( p_filter, CFG_PREFIX "similaritythres", FilterCallback, NULL );
     var_DelCallback( p_filter, CFG_PREFIX "saturationthres", FilterCallback, NULL );
 
-    vlc_mutex_destroy( &p_filter->p_sys->lock );
+    vlc_spin_destroy( &p_filter->p_sys->lock );
     free( p_filter->p_sys );
 }
 
@@ -213,11 +213,11 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     picture_t *p_outpic;
     filter_sys_t *p_sys = p_filter->p_sys;
 
-    vlc_mutex_lock( &p_sys->lock );
+    vlc_spin_lock( &p_sys->lock );
     int i_simthres = p_sys->i_simthres;
     int i_satthres = p_sys->i_satthres;
     int i_color = p_sys->i_color;
-    vlc_mutex_unlock( &p_sys->lock );
+    vlc_spin_unlock( &p_sys->lock );
 
     if( !p_pic ) return NULL;
 
@@ -272,11 +272,11 @@ static picture_t *FilterPacked( filter_t *p_filter, picture_t *p_pic )
     picture_t *p_outpic;
     filter_sys_t *p_sys = p_filter->p_sys;
 
-    vlc_mutex_lock( &p_sys->lock );
+    vlc_spin_lock( &p_sys->lock );
     int i_simthres = p_sys->i_simthres;
     int i_satthres = p_sys->i_satthres;
     int i_color = p_sys->i_color;
-    vlc_mutex_unlock( &p_sys->lock );
+    vlc_spin_unlock( &p_sys->lock );
 
     if( !p_pic ) return NULL;
 
@@ -342,21 +342,21 @@ static int FilterCallback ( vlc_object_t *p_this, char const *psz_var,
 
     if( !strcmp( psz_var, CFG_PREFIX "color" ) )
     {
-        vlc_mutex_lock( &p_sys->lock );
+        vlc_spin_lock( &p_sys->lock );
         p_sys->i_color = newval.i_int;
-        vlc_mutex_unlock( &p_sys->lock );
+        vlc_spin_unlock( &p_sys->lock );
     }
     else if( !strcmp( psz_var, CFG_PREFIX "similaritythres" ) )
     {
-        vlc_mutex_lock( &p_sys->lock );
+        vlc_spin_lock( &p_sys->lock );
         p_sys->i_simthres = newval.i_int;
-        vlc_mutex_unlock( &p_sys->lock );
+        vlc_spin_unlock( &p_sys->lock );
     }
     else /* CFG_PREFIX "saturationthres" */
     {
-        vlc_mutex_lock( &p_sys->lock );
+        vlc_spin_lock( &p_sys->lock );
         p_sys->i_satthres = newval.i_int;
-        vlc_mutex_unlock( &p_sys->lock );
+        vlc_spin_unlock( &p_sys->lock );
     }
 
     return VLC_SUCCESS;
