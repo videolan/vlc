@@ -105,7 +105,7 @@ vlc_module_begin ()
             add_string( "rc-host", NULL, RCHOST_TEXT, RCHOST_LONGTEXT, true )
             add_string( "cli-host", NULL, CLIHOST_TEXT, CLIHOST_LONGTEXT, true )
         set_capability( "interface", 25 )
-        set_description( N_("Remote control interface") )
+        set_description( N_("Command-line interface") )
         set_callbacks( Open_LuaCLI, Close_LuaIntf )
 #ifndef WIN32
         add_shortcut( "luacli", "luarc", "cli", "rc" )
