@@ -692,7 +692,6 @@ static VLCMain *_o_sharedMainInstance = nil;
         [[NSNotificationCenter defaultCenter] postNotificationName: NSApplicationWillTerminateNotification object: nil];
 
     playlist_t * p_playlist;
-    vout_thread_t * p_vout;
     int returnedValue = 0;
 
     if( !p_intf )
@@ -714,8 +713,6 @@ static VLCMain *_o_sharedMainInstance = nil;
 
     msg_Dbg( p_intf, "Terminating" );
 
-    /* Make sure the intf object is getting killed */
-    vlc_object_kill( p_intf );
     p_playlist = pl_Get( p_intf );
 
     /* unsubscribe from the interactive dialogues */
@@ -783,9 +780,6 @@ static VLCMain *_o_sharedMainInstance = nil;
     [o_mainmenu releaseRepresentedObjects:[NSApp mainMenu]];
     [o_mainmenu release];
 
-    /* Kill the playlist, so that it doesn't accept new request
-     * such as the play request from vlc.c (we are a blocking interface). */
-    vlc_object_kill( p_playlist );
     libvlc_Quit( p_intf->p_libvlc );
 
     [self setIntf:nil];
