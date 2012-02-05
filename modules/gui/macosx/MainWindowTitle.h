@@ -39,6 +39,8 @@
     NSImage * o_green_img;
     NSImage * o_green_over_img;
     NSImage * o_green_on_img;
+    NSShadow * o_window_title_shadow;
+    NSDictionary * o_window_title_attributes_dict;
 
     IBOutlet id o_red_btn;
     IBOutlet id o_yellow_btn;

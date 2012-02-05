@@ -214,7 +214,6 @@ static VLCMainWindow *_o_sharedInstance = nil;
         o_shuffle_pressed_img = [[NSImage imageNamed:@"shuffle-pressed_dark"] retain];
         o_shuffle_on_img = [[NSImage imageNamed:@"shuffle-blue_dark"] retain];
         o_shuffle_on_pressed_img = [[NSImage imageNamed:@"shuffle-blue-pressed_dark"] retain];
-        [o_time_fld setTextColor: [NSColor colorWithCalibratedRed:229.0 green:229.0 blue:229.0 alpha:100.0]];
         [o_time_sld_background setImagesLeft: [NSImage imageNamed:@"progression-track-wrapper-left_dark"] middle: [NSImage imageNamed:@"progression-track-wrapper-middle_dark"] right: [NSImage imageNamed:@"progression-track-wrapper-right_dark"]];
         [o_volume_down_btn setImage: [NSImage imageNamed:@"volume-low_dark"]];
         [o_volume_track_view setImage: [NSImage imageNamed:@"volume-slider-track_dark"]];

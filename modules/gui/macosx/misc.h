@@ -151,7 +151,10 @@
 
 @interface VLCTimeField : NSTextField
 {
+    NSShadow * o_string_shadow;
+    NSDictionary * o_string_attributes_dict;
 }
+
 - (BOOL)timeRemaining;
 @end
 

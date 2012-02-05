@@ -707,6 +707,42 @@ void _drawFrameInRect(NSRect frameRect)
     [defaults registerDefaults:appDefaults];
 }
 
+- (void)awakeFromNib
+{
+    NSColor *o_string_color;
+    if (!config_GetInt( VLCIntf, "macosx-interfacestyle"))
+        o_string_color = [NSColor colorWithCalibratedRed:0.229 green:0.229 blue:0.229 alpha:100.0];
+    else
+        o_string_color = [NSColor colorWithCalibratedRed:0.64 green:0.64 blue:0.64 alpha:100.0];
+
+    o_string_attributes_dict = [[NSDictionary dictionaryWithObjectsAndKeys: o_string_color, NSForegroundColorAttributeName, [NSFont titleBarFontOfSize:10.0], NSFontAttributeName, nil] retain];
+}
+
+- (void)dealloc
+{
+    [o_string_shadow release];
+    [o_string_attributes_dict release];
+}
+
+- (void)setStringValue:(NSString *)string
+{
+    if (!o_string_shadow)
+    {
+        o_string_shadow = [[NSShadow alloc] init];
+        [o_string_shadow setShadowColor: [NSColor colorWithCalibratedWhite:1.0 alpha:0.5]];
+        [o_string_shadow setShadowOffset:NSMakeSize(0.0, -1.5)];
+        [o_string_shadow setShadowBlurRadius:0.0];
+    }
+
+    NSMutableAttributedString *o_attributed_string = [[NSMutableAttributedString alloc] initWithString:string attributes: o_string_attributes_dict];
+    NSUInteger i_stringLength = [string length];
+
+    [o_attributed_string addAttribute: NSShadowAttributeName value: o_string_shadow range: NSMakeRange(0, i_stringLength)];
+    [o_attributed_string setAlignment: NSCenterTextAlignment range: NSMakeRange(0, i_stringLength)];
+    [self setAttributedStringValue: o_attributed_string];
+    [o_attributed_string release];
+}
+
 - (void)mouseDown: (NSEvent *)ourEvent
 {
     if( [ourEvent clickCount] > 1 )

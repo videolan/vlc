@@ -36,6 +36,13 @@
  *****************************************************************************/
 
 @implementation VLCMainWindowTitleView
+- (id)init
+{
+    o_window_title_attributes_dict = [[NSDictionary dictionaryWithObjectsAndKeys: [NSColor whiteColor], NSForegroundColorAttributeName, [NSFont titleBarFontOfSize:12.0], NSFontAttributeName, nil] retain];
+
+    return [super init];
+}
+
 - (void)dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver: self];
@@ -49,6 +56,9 @@
     [o_green_img release];
     [o_green_over_img release];
     [o_green_on_img release];
+
+    [o_window_title_shadow release];
+    [o_window_title_attributes_dict release];
 
     [super dealloc];
 }
@@ -174,7 +184,22 @@
 
 - (void)setWindowTitle:(NSString *)title
 {
-    [o_title_lbl setStringValue: title];
+    if (!o_window_title_shadow)
+    {
+        o_window_title_shadow = [[NSShadow alloc] init];
+        [o_window_title_shadow setShadowColor:[NSColor colorWithCalibratedWhite:1.0 alpha:0.5]];
+        [o_window_title_shadow setShadowOffset:NSMakeSize(0.0, -1.5)];
+        [o_window_title_shadow setShadowBlurRadius:0.5];
+        [o_window_title_shadow retain];
+    }
+
+    NSMutableAttributedString *o_attributed_title = [[NSMutableAttributedString alloc] initWithString:title attributes: o_window_title_attributes_dict];
+    NSUInteger i_titleLength = [title length];
+
+    [o_attributed_title addAttribute:NSShadowAttributeName value:o_window_title_shadow range:NSMakeRange(0, i_titleLength)];
+    [o_attributed_title setAlignment: NSCenterTextAlignment range:NSMakeRange(0, i_titleLength)];
+    [o_title_lbl setAttributedStringValue:o_attributed_title];
+    [o_attributed_title release];
 }
 
 - (void)setFullscreenButtonHidden:(BOOL)b_value
