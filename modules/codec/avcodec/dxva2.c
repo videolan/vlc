@@ -1070,11 +1070,4 @@ static void DxDestroyVideoConversion(vlc_va_dxva2_t *va)
 {
     CopyCleanCache(&va->surface_cache);
 }
-#else
-vlc_va_t *vlc_va_NewDxva2(vlc_object_t *log, int codec_id)
-{
-    (void)log;
-    (void)codec_id;
-    return NULL;
-}
 #endif
