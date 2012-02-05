@@ -1594,7 +1594,7 @@ vlc_module_begin ()
     add_integer_with_range( "volume-step", AOUT_VOLUME_STEP, 0,
                             AOUT_VOLUME_MAX, VOLUME_STEP_TEXT,
                             VOLUME_STEP_LONGTEXT, true )
-    add_obsolete_integer( "aout-rate" ) /* since 1.2.0 */
+    add_obsolete_integer( "aout-rate" ) /* since 2.0.0 */
 #if HAVE_FPU && !defined( __APPLE__ )
     add_bool( "hq-resampling", 1, AOUT_RESAMP_TEXT,
               AOUT_RESAMP_LONGTEXT, true )
@@ -1758,7 +1758,7 @@ vlc_module_begin ()
                 VIDEO_FILTER_TEXT, VIDEO_FILTER_LONGTEXT, false )
     add_module_list_cat( "video-splitter", SUBCAT_VIDEO_VFILTER, NULL,
                         VIDEO_SPLITTER_TEXT, VIDEO_SPLITTER_LONGTEXT, false )
-    add_obsolete_string( "vout-filter" ) /* since 1.2.0 */
+    add_obsolete_string( "vout-filter" ) /* since 2.0.0 */
 #if 0
     add_string( "pixel-ratio", "1", PIXEL_RATIO_TEXT, PIXEL_RATIO_TEXT )
 #endif
@@ -1873,8 +1873,8 @@ vlc_module_begin ()
     set_section( N_( "Network settings" ), NULL )
 
     add_integer( "mtu", MTU_DEFAULT, MTU_TEXT, MTU_LONGTEXT, true )
-    add_obsolete_bool( "ipv6" ) /* since 1.2.0 */
-    add_obsolete_bool( "ipv4" ) /* since 1.2.0 */
+    add_obsolete_bool( "ipv6" ) /* since 2.0.0 */
+    add_obsolete_bool( "ipv4" ) /* since 2.0.0 */
     add_integer( "ipv4-timeout", 5 * 1000, TIMEOUT_TEXT,
                  TIMEOUT_LONGTEXT, true )
 
@@ -1887,13 +1887,13 @@ vlc_module_begin ()
     add_integer( "rtsp-port", 554, RTSP_PORT_TEXT, RTSP_PORT_LONGTEXT, true )
         change_integer_range( 1, 65535 )
     add_loadfile( "http-cert", NULL, HTTP_CERT_TEXT, CERT_LONGTEXT, true )
-    add_obsolete_string( "sout-http-cert" ) /* since 1.2.0 */
+    add_obsolete_string( "sout-http-cert" ) /* since 2.0.0 */
     add_loadfile( "http-key", NULL, HTTP_KEY_TEXT, KEY_LONGTEXT, true )
-    add_obsolete_string( "sout-http-key" ) /* since 1.2.0 */
+    add_obsolete_string( "sout-http-key" ) /* since 2.0.0 */
     add_loadfile( "http-ca", NULL, HTTP_CA_TEXT, CA_LONGTEXT, true )
-    add_obsolete_string( "sout-http-ca" ) /* since 1.2.0 */
+    add_obsolete_string( "sout-http-ca" ) /* since 2.0.0 */
     add_loadfile( "http-crl", NULL, HTTP_CRL_TEXT, CRL_LONGTEXT, true )
-    add_obsolete_string( "sout-http-crl" ) /* since 1.2.0 */
+    add_obsolete_string( "sout-http-crl" ) /* since 2.0.0 */
 
     set_section( N_( "Socks proxy") , NULL )
     add_string( "socks", NULL,
@@ -1936,48 +1936,48 @@ vlc_module_begin ()
                  CACHING_TEXT, CACHING_LONGTEXT, true )
         change_integer_range( 0, 60000 )
         change_safe()
-    add_obsolete_integer( "vdr-caching" ) /* 1.2.0 */
+    add_obsolete_integer( "vdr-caching" ) /* 2.0.0 */
     add_integer( "live-caching", DEFAULT_PTS_DELAY / 1000,
                  CAPTURE_CACHING_TEXT, CAPTURE_CACHING_LONGTEXT, true )
         change_integer_range( 0, 60000 )
         change_safe()
-    add_obsolete_integer( "alsa-caching" ) /* 1.2.0 */
-    add_obsolete_integer( "dshow-caching" ) /* 1.2.0 */
-    add_obsolete_integer( "dv-caching" ) /* 1.2.0 */
-    add_obsolete_integer( "dvb-caching" ) /* 1.2.0 */
-    add_obsolete_integer( "eyetv-caching" ) /* 1.2.0 */
-    add_obsolete_integer( "gnomevfs-caching" ) /* 1.2.0 */
-    add_obsolete_integer( "jack-input-caching" ) /* 1.2.0 */
-    add_obsolete_integer( "linsys-hdsdi-caching" ) /* 1.2.0 */
-    add_obsolete_integer( "linsys-sdi-caching" ) /* 1.2.0 */
-    add_obsolete_integer( "oss-caching" ) /* 1.2.0 */
-    add_obsolete_integer( "pvr-caching" ) /* 1.2.0 */
-    add_obsolete_integer( "screen-caching" ) /* 1.2.0 */
-    add_obsolete_integer( "v4l2-caching" ) /* 1.2.0 */
+    add_obsolete_integer( "alsa-caching" ) /* 2.0.0 */
+    add_obsolete_integer( "dshow-caching" ) /* 2.0.0 */
+    add_obsolete_integer( "dv-caching" ) /* 2.0.0 */
+    add_obsolete_integer( "dvb-caching" ) /* 2.0.0 */
+    add_obsolete_integer( "eyetv-caching" ) /* 2.0.0 */
+    add_obsolete_integer( "gnomevfs-caching" ) /* 2.0.0 */
+    add_obsolete_integer( "jack-input-caching" ) /* 2.0.0 */
+    add_obsolete_integer( "linsys-hdsdi-caching" ) /* 2.0.0 */
+    add_obsolete_integer( "linsys-sdi-caching" ) /* 2.0.0 */
+    add_obsolete_integer( "oss-caching" ) /* 2.0.0 */
+    add_obsolete_integer( "pvr-caching" ) /* 2.0.0 */
+    add_obsolete_integer( "screen-caching" ) /* 2.0.0 */
+    add_obsolete_integer( "v4l2-caching" ) /* 2.0.0 */
     add_integer( "disc-caching", DEFAULT_PTS_DELAY / 1000,
                  DISC_CACHING_TEXT, DISC_CACHING_LONGTEXT, true )
         change_integer_range( 0, 60000 )
         change_safe()
-    add_obsolete_integer( "bd-caching" ) /* 1.2.0 */
-    add_obsolete_integer( "bluray-caching" ) /* 1.2.0 */
-    add_obsolete_integer( "cdda-caching" ) /* 1.2.0 */
-    add_obsolete_integer( "dvdnav-caching" ) /* 1.2.0 */
-    add_obsolete_integer( "dvdread-caching" ) /* 1.2.0 */
-    add_obsolete_integer( "vcd-caching" ) /* 1.2.0 */
+    add_obsolete_integer( "bd-caching" ) /* 2.0.0 */
+    add_obsolete_integer( "bluray-caching" ) /* 2.0.0 */
+    add_obsolete_integer( "cdda-caching" ) /* 2.0.0 */
+    add_obsolete_integer( "dvdnav-caching" ) /* 2.0.0 */
+    add_obsolete_integer( "dvdread-caching" ) /* 2.0.0 */
+    add_obsolete_integer( "vcd-caching" ) /* 2.0.0 */
     add_integer( "network-caching", CLOCK_FREQ / 1000,
                  NETWORK_CACHING_TEXT, NETWORK_CACHING_LONGTEXT, true )
         change_integer_range( 0, 60000 )
         change_safe()
-    add_obsolete_integer( "ftp-caching" ) /* 1.2.0 */
-    add_obsolete_integer( "http-caching" ) /* 1.2.0 */
-    add_obsolete_integer( "mms-caching" ) /* 1.2.0 */
-    add_obsolete_integer( "realrtsp-caching" ) /* 1.2.0 */
-    add_obsolete_integer( "rtp-caching" ) /* 1.2.0 */
-    add_obsolete_integer( "rtsp-caching" ) /* 1.2.0 */
-    add_obsolete_integer( "sftp-caching" ) /* 1.2.0 */
-    add_obsolete_integer( "smb-caching" ) /* 1.2.0 */
-    add_obsolete_integer( "tcp-caching" ) /* 1.2.0 */
-    add_obsolete_integer( "udp-caching" ) /* 1.2.0 */
+    add_obsolete_integer( "ftp-caching" ) /* 2.0.0 */
+    add_obsolete_integer( "http-caching" ) /* 2.0.0 */
+    add_obsolete_integer( "mms-caching" ) /* 2.0.0 */
+    add_obsolete_integer( "realrtsp-caching" ) /* 2.0.0 */
+    add_obsolete_integer( "rtp-caching" ) /* 2.0.0 */
+    add_obsolete_integer( "rtsp-caching" ) /* 2.0.0 */
+    add_obsolete_integer( "sftp-caching" ) /* 2.0.0 */
+    add_obsolete_integer( "smb-caching" ) /* 2.0.0 */
+    add_obsolete_integer( "tcp-caching" ) /* 2.0.0 */
+    add_obsolete_integer( "udp-caching" ) /* 2.0.0 */
 
     add_integer( "cr-average", 40, CR_AVERAGE_TEXT,
                  CR_AVERAGE_LONGTEXT, true )
@@ -2080,18 +2080,18 @@ vlc_module_begin ()
     add_category_hint( N_("CPU"), CPU_CAT_LONGTEXT, true )
     add_obsolete_bool( "fpu" )
 #if defined( __i386__ ) || defined( __x86_64__ )
-    add_obsolete_bool( "mmx" ) /* since 1.2.0 */
-    add_obsolete_bool( "3dn" ) /* since 1.2.0 */
-    add_obsolete_bool( "mmxext" ) /* since 1.2.0 */
-    add_obsolete_bool( "sse" ) /* since 1.2.0 */
-    add_obsolete_bool( "sse2" ) /* since 1.2.0 */
-    add_obsolete_bool( "sse3" ) /* since 1.2.0 */
-    add_obsolete_bool( "ssse3" ) /* since 1.2.0 */
-    add_obsolete_bool( "sse41" ) /* since 1.2.0 */
-    add_obsolete_bool( "sse42" ) /* since 1.2.0 */
+    add_obsolete_bool( "mmx" ) /* since 2.0.0 */
+    add_obsolete_bool( "3dn" ) /* since 2.0.0 */
+    add_obsolete_bool( "mmxext" ) /* since 2.0.0 */
+    add_obsolete_bool( "sse" ) /* since 2.0.0 */
+    add_obsolete_bool( "sse2" ) /* since 2.0.0 */
+    add_obsolete_bool( "sse3" ) /* since 2.0.0 */
+    add_obsolete_bool( "ssse3" ) /* since 2.0.0 */
+    add_obsolete_bool( "sse41" ) /* since 2.0.0 */
+    add_obsolete_bool( "sse42" ) /* since 2.0.0 */
 #endif
 #if defined( __powerpc__ ) || defined( __ppc__ ) || defined( __ppc64__ )
-    add_obsolete_bool( "altivec" ) /* since 1.2.0 */
+    add_obsolete_bool( "altivec" ) /* since 2.0.0 */
 #endif
 
 /* Misc options */

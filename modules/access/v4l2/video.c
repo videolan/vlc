@@ -328,7 +328,7 @@ vlc_module_begin ()
                  AUDIO_INPUT_LONGTEXT, true )
         change_integer_range( -1, 0xFFFFFFFE )
         change_safe()
-    add_obsolete_integer( CFG_PREFIX "io" ) /* since 1.2.0 */
+    add_obsolete_integer( CFG_PREFIX "io" ) /* since 2.0.0 */
     add_integer( CFG_PREFIX "width", DEFAULT_WIDTH, WIDTH_TEXT,
                 WIDTH_LONGTEXT, true )
         change_safe()
@@ -386,7 +386,7 @@ vlc_module_begin ()
     add_integer( CFG_PREFIX "auto-white-balance", -1,
                  AUTOWHITEBALANCE_TEXT, AUTOWHITEBALANCE_LONGTEXT, true )
         change_integer_list( tristate_vlc, tristate_user )
-    add_obsolete_integer( CFG_PREFIX"do-white-balance" ) /* since 1.2.0 */
+    add_obsolete_integer( CFG_PREFIX"do-white-balance" ) /* since 2.0.0 */
     add_integer( CFG_PREFIX "red-balance", -1, REDBALANCE_TEXT,
                  REDBALANCE_LONGTEXT, true )
     add_integer( CFG_PREFIX "blue-balance", -1, BLUEBALANCE_TEXT,

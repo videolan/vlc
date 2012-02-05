@@ -55,7 +55,7 @@ vlc_module_begin ()
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_ACCESS )
 
-    add_obsolete_integer( "server-port" ) /* since 1.2.0 */
+    add_obsolete_integer( "server-port" ) /* since 2.0.0 */
 
     set_capability( "access", 0 )
     add_shortcut( "udp", "udpstream", "udp4", "udp6" )

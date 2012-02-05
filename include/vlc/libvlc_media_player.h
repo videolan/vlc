@@ -351,7 +351,7 @@ void libvlc_video_set_format( libvlc_media_player_t *mp, const char *chroma,
  * \param mp the media player
  * \param setup callback to select the video format (cannot be NULL)
  * \param cleanup callback to release any allocated resources (or NULL)
- * \version LibVLC 1.2.0 or later
+ * \version LibVLC 2.0.0 or later
  */
 LIBVLC_API
 void libvlc_video_set_format_callbacks( libvlc_media_player_t *mp,
@@ -526,7 +526,7 @@ typedef void (*libvlc_audio_set_volume_cb)(void *data,
  * \param flush callback to flush audio buffers (or NULL to ignore)
  * \param drain callback to drain audio buffers (or NULL to ignore)
  * \param opaque private pointer for the audio callbacks (as first parameter)
- * \version LibVLC 1.2.0 or later
+ * \version LibVLC 2.0.0 or later
  */
 LIBVLC_API
 void libvlc_audio_set_callbacks( libvlc_media_player_t *mp,
@@ -545,7 +545,7 @@ void libvlc_audio_set_callbacks( libvlc_media_player_t *mp,
  * \param mp the media player
  * \param set_volume callback to apply audio volume,
  *                   or NULL to apply volume in software
- * \version LibVLC 1.2.0 or later
+ * \version LibVLC 2.0.0 or later
  */
 LIBVLC_API
 void libvlc_audio_set_volume_callback( libvlc_media_player_t *mp,
@@ -578,7 +578,7 @@ typedef void (*libvlc_audio_cleanup_cb)(void *data);
  * \param mp the media player
  * \param setup callback to select the audio format (cannot be NULL)
  * \param cleanup callback to release any allocated resources (or NULL)
- * \version LibVLC 1.2.0 or later
+ * \version LibVLC 2.0.0 or later
  */
 LIBVLC_API
 void libvlc_audio_set_format_callbacks( libvlc_media_player_t *mp,
@@ -595,7 +595,7 @@ void libvlc_audio_set_format_callbacks( libvlc_media_player_t *mp,
  *               (e.g. "S16N" or "FL32")
  * \param rate sample rate (expressed in Hz)
  * \param channels channels count
- * \version LibVLC 1.2.0 or later
+ * \version LibVLC 2.0.0 or later
  */
 LIBVLC_API
 void libvlc_audio_set_format( libvlc_media_player_t *mp, const char *format,
@@ -806,7 +806,7 @@ LIBVLC_API void libvlc_media_player_next_frame( libvlc_media_player_t *p_mi );
  *
  * \param p_mi the Media Player
  * \param navigate the Navigation mode
- * \version libVLC 1.2.0 or later
+ * \version libVLC 2.0.0 or later
  */
 LIBVLC_API void libvlc_media_player_navigate( libvlc_media_player_t* p_mi,
                                               unsigned navigate );
@@ -1045,7 +1045,7 @@ LIBVLC_API int libvlc_video_set_subtitle_file( libvlc_media_player_t *p_mi, cons
  *
  * \param p_mi media player
  * \return time (in microseconds) the display of subtitles is being delayed
- * \version LibVLC 1.2.0 or later
+ * \version LibVLC 2.0.0 or later
  */
 LIBVLC_API int64_t libvlc_video_get_spu_delay( libvlc_media_player_t *p_mi );
 
@@ -1059,7 +1059,7 @@ LIBVLC_API int64_t libvlc_video_get_spu_delay( libvlc_media_player_t *p_mi );
  * \param p_mi media player
  * \param i_delay time (in microseconds) the display of subtitles should be delayed
  * \return 0 on success, -1 on error
- * \version LibVLC 1.2.0 or later
+ * \version LibVLC 2.0.0 or later
  */
 LIBVLC_API int libvlc_video_set_spu_delay( libvlc_media_player_t *p_mi, int64_t i_delay );
 

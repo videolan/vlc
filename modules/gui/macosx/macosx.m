@@ -107,9 +107,9 @@ vlc_module_begin ()
     add_bool( "macosx-interfacestyle", true, INTERFACE_STYLE_TEXT, INTERFACE_STYLE_LONGTEXT, false )
     add_bool( "macosx-nativefullscreenmode", true, NATIVE_FULLSCREEN_MODE_ON_LION_TEXT, NATIVE_FULLSCREEN_MODE_ON_LION_LONGTEXT, false )
     add_bool( "macosx-autosave-volume", true, SAVEVOL_TEXT, SAVEVOL_TEXT, true )
-    add_obsolete_bool( "macosx-stretch" ) /* since 1.2.0 */
-    add_obsolete_bool( "macosx-background" ) /* since 1.2.0 */
-    add_obsolete_bool( "macosx-eq-keep" ) /* since 1.2.0 */
+    add_obsolete_bool( "macosx-stretch" ) /* since 2.0.0 */
+    add_obsolete_bool( "macosx-background" ) /* since 2.0.0 */
+    add_obsolete_bool( "macosx-eq-keep" ) /* since 2.0.0 */
 
     add_submodule ()
         set_description( "Mac OS X Video Output Provider" )

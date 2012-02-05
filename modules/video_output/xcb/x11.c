@@ -52,7 +52,7 @@ vlc_module_begin ()
     set_callbacks (Open, Close)
     add_shortcut ("xcb-x11", "x11", "xid")
 
-    add_obsolete_bool ("x11-shm") /* obsoleted since 1.2.0 */
+    add_obsolete_bool ("x11-shm") /* obsoleted since 2.0.0 */
 vlc_module_end ()
 
 /* This must be large enough to absorb the server display jitter.

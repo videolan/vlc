@@ -2,7 +2,7 @@
 /* A video thumbnailer compatible with nautilus */
 /* Copyright © 2007-2011 Rafaël Carré <funman@videolanorg> */
 
-/* Works with : libvlc 1.2.0
+/* Works with : libvlc 2.0.0
    gcc -pedantic -Wall -Werror -Wextra `pkg-config --cflags --libs libvlc` -lpthread
 
   # to register the thumbnailer on gnome 3.x:

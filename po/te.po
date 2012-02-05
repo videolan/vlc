@@ -5,7 +5,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 1.2.0-git\n"
+"Project-Id-Version: vlc 2.0.0-git\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2011-11-24 23:30+0000\n"
 "PO-Revision-Date: 2011-10-31 07:33+0530\n"

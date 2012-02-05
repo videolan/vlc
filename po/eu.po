@@ -8,7 +8,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: VLC 1.2.0 (Basque Translation)\n"
+"Project-Id-Version: VLC 2.0.0 (Basque Translation)\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2011-11-24 23:30+0000\n"
 "PO-Revision-Date: 2011-11-13 11:06+0100\n"
