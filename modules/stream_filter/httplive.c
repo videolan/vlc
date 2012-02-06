@@ -2163,6 +2163,7 @@ static segment_t *GetSegment(stream_t *s)
 
 check:
     /* sanity check */
+    assert(segment->data);
     if (segment->data->i_buffer == 0)
     {
         vlc_mutex_lock(&hls->lock);
@@ -2179,12 +2180,12 @@ check:
     return segment;
 }
 
-static int segment_RestorePos( segment_t *segment )
+static int segment_RestorePos(segment_t *segment)
 {
-    if( segment->data )
+    if (segment->data)
     {
-        uint64_t size = segment->size -segment->data->i_buffer;
-        if( size > 0 )
+        uint64_t size = segment->size - segment->data->i_buffer;
+        if (size > 0)
         {
             segment->data->i_buffer += size;
             segment->data->p_buffer -= size;
@@ -2197,7 +2198,7 @@ static int segment_RestorePos( segment_t *segment )
 static ssize_t hls_Read(stream_t *s, uint8_t *p_read, unsigned int i_read)
 {
     stream_sys_t *p_sys = s->p_sys;
-    ssize_t copied = 0;
+    ssize_t used = 0;
 
     do
     {
@@ -2217,7 +2218,7 @@ static ssize_t hls_Read(stream_t *s, uint8_t *p_read, unsigned int i_read)
                 segment->data = NULL;
             }
             else
-                segment_RestorePos( segment );
+                segment_RestorePos(segment);
 
             p_sys->playback.segment++;
             vlc_mutex_unlock(&segment->lock);
@@ -2241,18 +2242,18 @@ static ssize_t hls_Read(stream_t *s, uint8_t *p_read, unsigned int i_read)
 
         if (len > 0)
         {
-            if( p_read ) /* otherwise caller skips data */
-                memcpy(p_read + copied, segment->data->p_buffer, len);
+            if (p_read) /* if NULL, then caller skips data */
+                memcpy(p_read + used, segment->data->p_buffer, len);
             segment->data->i_buffer -= len;
             segment->data->p_buffer += len;
-            copied += len;
+            used += len;
             i_read -= len;
         }
         vlc_mutex_unlock(&segment->lock);
 
     } while (i_read > 0);
 
-    return copied;
+    return used;
 }
 
 static int Read(stream_t *s, void *buffer, unsigned int i_read)
@@ -2265,6 +2266,7 @@ static int Read(stream_t *s, void *buffer, unsigned int i_read)
     if (p_sys->b_error)
         return 0;
 
+    /* NOTE: buffer might be NULL if caller wants to skip data */
     length = hls_Read(s, (uint8_t*) buffer, i_read);
     if (length < 0)
         return 0;
@@ -2428,7 +2430,7 @@ static int segment_Seek(stream_t *s, const uint64_t pos)
         return VLC_EGENERIC;
     }
     vlc_mutex_lock(&segment->lock);
-    segment_RestorePos( segment );
+    segment_RestorePos(segment);
     vlc_mutex_unlock(&segment->lock);
 
     for (int n = 0; n < count; n++)
@@ -2475,8 +2477,9 @@ static int segment_Seek(stream_t *s, const uint64_t pos)
             vlc_mutex_unlock(&hls->lock);
             return VLC_EGENERIC;
         }
+
         vlc_mutex_lock(&segment->lock);
-        segment_RestorePos( segment );
+        segment_RestorePos(segment);
         vlc_mutex_unlock(&segment->lock);
 
         /* start download at current playback segment */
