@@ -178,13 +178,6 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    char psz_service_name[sizeof(DBUS_MPRIS_BUS_NAME) + 12];
-    if( var_InheritBool( p_intf, "dbus-unique-service-id" ) )
-        snprintf( psz_service_name, sizeof( psz_service_name ),
-                  DBUS_MPRIS_BUS_NAME"-%d", getpid() );
-    else
-        strcpy( psz_service_name, DBUS_MPRIS_BUS_NAME );
-
     DBusError error;
     dbus_error_init( &error );
 
@@ -204,16 +197,21 @@ static int Open( vlc_object_t *p_this )
     dbus_connection_set_exit_on_disconnect( p_conn, FALSE );
 
     /* register a well-known name on the bus */
-    dbus_bus_request_name( p_conn, psz_service_name, 0, &error );
+    char unique_service[sizeof (DBUS_MPRIS_BUS_NAME) + 10];
+    snprintf( unique_service, sizeof (unique_service),
+              DBUS_MPRIS_BUS_NAME"-%"PRIu32, (uint32_t)getpid() );
+    dbus_bus_request_name( p_conn, unique_service, 0, &error );
     if( dbus_error_is_set( &error ) )
     {
-        msg_Err( p_this, "Error requesting service %s: %s",
-                 psz_service_name, error.message );
+        msg_Err( p_this, "Error requesting service name %s: %s",
+                 unique_service, error.message );
         dbus_error_free( &error );
         free( p_sys );
         return VLC_EGENERIC;
     }
-    msg_Info( p_intf, "listening on dbus as: %s", psz_service_name );
+    msg_Info( p_intf, "listening on dbus as: %s", unique_service );
+
+    dbus_bus_request_name( p_conn, DBUS_MPRIS_BUS_NAME, 0, NULL );
 
     /* Register the entry point object path */
     dbus_connection_register_object_path( p_conn, DBUS_MPRIS_OBJECT_PATH,
