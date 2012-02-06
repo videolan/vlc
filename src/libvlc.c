@@ -646,22 +646,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
      */
     intf_Create( p_libvlc, "hotkeys,none" );
 
-#ifdef HAVE_DBUS
-    /* loads dbus control interface if in one-instance mode
-     * we do it only when playlist exists, because dbus module needs it */
-    if( var_InheritBool( p_libvlc, "one-instance" )
-     || ( var_InheritBool( p_libvlc, "one-instance-when-started-from-file" )
-       && var_InheritBool( p_libvlc, "started-from-file" ) ) )
-        intf_Create( p_libvlc, "dbus,none" );
-
-# if !defined (HAVE_MAEMO)
-    /* Prevents the power management daemon from suspending the system
-     * when VLC is active */
-    if( var_InheritBool( p_libvlc, "inhibit" ) > 0 )
-        intf_Create( p_libvlc, "inhibit,none" );
-# endif
-#endif
-
     if( var_InheritBool( p_libvlc, "file-logging" )
 #ifdef HAVE_SYSLOG_H
         && !var_InheritBool( p_libvlc, "syslog" )
