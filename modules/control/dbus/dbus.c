@@ -134,11 +134,6 @@ static void DispatchDBusMessages( intf_thread_t *p_intf );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define DBUS_UNIQUE_TEXT N_("Unique DBUS service id (org.mpris.vlc-<pid>)")
-#define DBUS_UNIQUE_LONGTEXT N_( \
-    "Use a unique dbus service id to identify this VLC instance on the DBUS bus. " \
-    "The process identifier (PID) is added to the service name: org.mpris.vlc-<pid>" )
-
 vlc_module_begin ()
     set_shortname( N_("dbus"))
     set_category( CAT_INTERFACE )
@@ -146,8 +141,6 @@ vlc_module_begin ()
     set_description( N_("D-Bus control interface") )
     set_capability( "interface", 0 )
     set_callbacks( Open, Close )
-    add_bool( "dbus-unique-service-id", false,
-              DBUS_UNIQUE_TEXT, DBUS_UNIQUE_LONGTEXT, true )
 vlc_module_end ()
 
 /*****************************************************************************
