@@ -209,7 +209,7 @@ static int Open( vlc_object_t *p_this )
         free( p_sys );
         return VLC_EGENERIC;
     }
-    msg_Info( p_intf, "listening on dbus as: %s", unique_service );
+    msg_Dbg( p_intf, "listening on dbus as: %s", unique_service );
 
     dbus_bus_request_name( p_conn, DBUS_MPRIS_BUS_NAME, 0, NULL );
 
