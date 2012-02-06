@@ -29,7 +29,6 @@
 #include <assert.h>
 
 #include <xcb/xcb.h>
-#include <X11/Xlib-xcb.h>
 #include <GL/glx.h>
 #include <GL/glxext.h>
 
@@ -227,23 +226,29 @@ static int Open (vlc_object_t *obj)
     }
 
     /* Connect to X server */
-    Display *dpy = XOpenDisplay (sys->embed->display.x11);
-    if (dpy == NULL)
+    xcb_connection_t *conn = xcb_connect (sys->embed->display.x11, NULL);
+    if (unlikely(xcb_connection_has_error (conn)))
     {
         vout_display_DeleteWindow (vd, sys->embed);
         free (sys);
         return VLC_EGENERIC;
     }
+
+    Display *dpy = XOpenDisplay (sys->embed->display.x11);
+    if (dpy == NULL)
+    {
+        xcb_disconnect (conn);
+        vout_display_DeleteWindow (vd, sys->embed);
+        free (sys);
+        return VLC_EGENERIC;
+    }
     sys->display = dpy;
+    sys->conn = conn;
     sys->ctx = NULL;
-    XSetEventQueueOwner (dpy, XCBOwnsEventQueue);
 
     if (!CheckGLX (vd, dpy, &sys->v1_3))
         goto error;
 
-    xcb_connection_t *conn = XGetXCBConnection (dpy);
-    assert (conn != NULL);
-    sys->conn = conn;
     RegisterMouseEvents (obj, conn, sys->embed->handle.xid);
 
     /* Find window parameters */
@@ -450,13 +455,14 @@ static void Close (vlc_object_t *obj)
         if (sys->v1_3)
             glXDestroyWindow (dpy, sys->glwin);
     }
+    XCloseDisplay (dpy);
 
     /* show the default cursor */
     xcb_change_window_attributes (sys->conn, sys->embed->handle.xid,
                                XCB_CW_CURSOR, &(uint32_t) { XCB_CURSOR_NONE });
     xcb_flush (sys->conn);
+    xcb_disconnect (sys->conn);
 
-    XCloseDisplay (dpy);
     vout_display_DeleteWindow (vd, sys->embed);
     free (sys);
 }

@@ -70,9 +70,9 @@ libxcb_glx_plugin_la_SOURCES = \
 	opengl.c \
 	xcb/events.c
 libxcb_glx_plugin_la_CFLAGS = $(AM_CFLAGS) \
-	$(XLIB_XCB_CFLAGS) $(GL_CFLAGS)
+	$(XCB_CFLAGS) $(GL_CFLAGS)
 libxcb_glx_plugin_la_LIBADD = $(AM_LIBADD) \
-	$(XLIB_XCB_LIBS) $(GL_LIBS)
+	$(XCB_LIBS) $(GL_LIBS) $(X_LIBS) $(X_PRE_LIBS) -lX11
 libxcb_glx_plugin_la_DEPENDENCIES =
 
 libxcb_window_plugin_la_SOURCES = xcb/window.c xcb/keys.c xcb/keysym.h xcb/xcb_keysym.h

@@ -3010,11 +3010,6 @@ AS_IF([test "${enable_xcb}" != "no"], [
     AS_IF([test "${have_gl}" != "yes"], [
       AC_MSG_ERROR([${GL_PKG_ERRORS}. Pass --disable-glx if you do not need OpenGL X11 support.])
     ])
-    PKG_CHECK_MODULES(XLIB_XCB, [x11-xcb], [
-      VLC_ADD_PLUGIN([xcb_glx])
-    ], [
-      AC_MSG_ERROR([${XLIB_XCB_PKG_ERRORS}. Pass --disable-glx if you do not need OpenGL X11 support.])
-    ])
   ])
 ])
 AM_CONDITIONAL([HAVE_XCB], [test "${have_xcb}" = "yes"])
