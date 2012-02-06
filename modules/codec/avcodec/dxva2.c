@@ -215,6 +215,7 @@ typedef struct {
 static const d3d_format_t d3d_formats[] = {
     { "YV12",   MAKEFOURCC('Y','V','1','2'),    VLC_CODEC_YV12 },
     { "NV12",   MAKEFOURCC('N','V','1','2'),    VLC_CODEC_NV12 },
+    { "IMC3",   MAKEFOURCC('I','M','C','3'),    VLC_CODEC_YV12 },
 
     { NULL, 0, 0 }
 };
@@ -380,18 +381,29 @@ static int Extract(vlc_va_t *external, picture_t *picture, AVFrame *ff)
         return VLC_EGENERIC;
     }
 
-    if (va->render == MAKEFOURCC('Y','V','1','2')) {
-        uint8_t *plane[3] = {
-            lock.pBits,
-            (uint8_t*)lock.pBits + lock.Pitch * va->surface_height,
-            (uint8_t*)lock.pBits + lock.Pitch * va->surface_height
-                                 + (lock.Pitch/2) * (va->surface_height/2)
-        };
-        size_t  pitch[3] = {
+    if (va->render == MAKEFOURCC('Y','V','1','2') ||
+        va->render == MAKEFOURCC('I','M','C','3')) {
+        bool imc3 = va->render == MAKEFOURCC('I','M','C','3');
+        size_t chroma_pitch = imc3 ? lock.Pitch : lock.Pitch / 2;
+
+        size_t pitch[3] = {
             lock.Pitch,
-            lock.Pitch / 2,
-            lock.Pitch / 2,
+            chroma_pitch,
+            chroma_pitch,
         };
+
+        uint8_t *plane[3] = {
+            (uint8_t*)lock.pBits,
+            (uint8_t*)lock.pBits + pitch[0] * va->surface_height,
+            (uint8_t*)lock.pBits + pitch[0] * va->surface_height
+                                 + pitch[1] * va->surface_height / 2,
+        };
+
+        if (imc3) {
+            uint8_t *V = plane[1];
+            plane[1] = plane[2];
+            plane[2] = V;
+        }
         CopyFromYv12(picture, plane, pitch,
                      va->width, va->height,
                      &va->surface_cache);
@@ -990,6 +1002,7 @@ static void DxCreateVideoConversion(vlc_va_dxva2_t *va)
 {
     switch (va->render) {
     case MAKEFOURCC('N','V','1','2'):
+    case MAKEFOURCC('I','M','C','3'):
         va->output = MAKEFOURCC('Y','V','1','2');
         break;
     default:
