@@ -179,8 +179,7 @@ static int Open( vlc_object_t *p_this )
     }
 
     char psz_service_name[sizeof(DBUS_MPRIS_BUS_NAME) + 12];
-    p_sys->b_unique = var_CreateGetBool( p_intf, "dbus-unique-service-id" );
-    if( p_sys->b_unique )
+    if( var_InheritBool( p_intf, "dbus-unique-service-id" ) )
         snprintf( psz_service_name, sizeof( psz_service_name ),
                   DBUS_MPRIS_BUS_NAME"-%d", getpid() );
     else

@@ -103,7 +103,6 @@ struct intf_sys_t
     input_thread_t *p_input;
     mtime_t         i_last_input_pos; /* Only access it from the input thread */
     mtime_t         i_last_input_pos_event; /* idem */
-    bool            b_unique;
 };
 
 enum
