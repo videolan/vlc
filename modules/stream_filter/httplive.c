@@ -2322,6 +2322,7 @@ static int Peek(stream_t *s, const uint8_t **pp_peek, unsigned int i_peek)
             peeked = block_Realloc (peeked, 0, i_peek);
         if (peeked == NULL)
             return 0;
+        p_sys->peeked = peeked;
 
         memcpy(peeked->p_buffer, p_buff, i_buff);
         curlen = i_buff;
