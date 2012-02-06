@@ -1,0 +1,17 @@
+diff -ru a52dec.orig/liba52/imdct.c a52dec/liba52/imdct.c
+--- a52dec.orig/liba52/imdct.c	2012-02-06 19:40:21.000000000 +0200
++++ a52dec/liba52/imdct.c	2012-02-06 19:40:53.000000000 +0200
+@@ -419,13 +419,11 @@
+ 
+ #ifdef LIBA52_DJBFFT
+     if (mm_accel & MM_ACCEL_DJBFFT) {
+-	fprintf (stderr, "Using djbfft for IMDCT transform\n");
+ 	ifft128 = (void (*) (complex_t *)) fftc4_un128;
+ 	ifft64 = (void (*) (complex_t *)) fftc4_un64;
+     } else
+ #endif
+     {
+-	fprintf (stderr, "No accelerated IMDCT transform found\n");
+ 	ifft128 = ifft128_c;
+ 	ifft64 = ifft64_c;
+     }
