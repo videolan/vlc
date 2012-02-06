@@ -62,6 +62,7 @@ vlc_module_end ()
 struct vout_display_sys_t
 {
     Display *display; /* Xlib instance */
+    xcb_connection_t *conn; /**< XCB connection */
     vout_window_t *embed; /* VLC window (when windowed) */
 
     xcb_cursor_t cursor; /* blank cursor */
@@ -241,7 +242,8 @@ static int Open (vlc_object_t *obj)
         goto error;
 
     xcb_connection_t *conn = XGetXCBConnection (dpy);
-    assert (conn);
+    assert (conn != NULL);
+    sys->conn = conn;
     RegisterMouseEvents (obj, conn, sys->embed->handle.xid);
 
     /* Find window parameters */
@@ -450,10 +452,9 @@ static void Close (vlc_object_t *obj)
     }
 
     /* show the default cursor */
-    xcb_change_window_attributes (XGetXCBConnection (sys->display),
-                                  sys->embed->handle.xid, XCB_CW_CURSOR,
-                                  &(uint32_t) { XCB_CURSOR_NONE });
-    xcb_flush (XGetXCBConnection (sys->display));
+    xcb_change_window_attributes (sys->conn, sys->embed->handle.xid,
+                               XCB_CW_CURSOR, &(uint32_t) { XCB_CURSOR_NONE });
+    xcb_flush (sys->conn);
 
     XCloseDisplay (dpy);
     vout_display_DeleteWindow (vd, sys->embed);
@@ -530,7 +531,6 @@ static int Control (vout_display_t *vd, int query, va_list ap)
     case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
     case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
     {
-        xcb_connection_t *conn = XGetXCBConnection (sys->display);
         const vout_display_cfg_t *cfg;
         const video_format_t *source;
         bool is_forced = false;
@@ -565,11 +565,11 @@ static int Control (vout_display_t *vd, int query, va_list ap)
         const uint32_t values[] = { place.x, place.y,
                                     place.width, place.height, };
         xcb_void_cookie_t ck =
-            xcb_configure_window_checked (conn, sys->window,
+            xcb_configure_window_checked (sys->conn, sys->window,
                             XCB_CONFIG_WINDOW_X | XCB_CONFIG_WINDOW_Y
                           | XCB_CONFIG_WINDOW_WIDTH | XCB_CONFIG_WINDOW_HEIGHT,
                               values);
-        if (CheckError (vd, conn, "cannot resize X11 window", ck))
+        if (CheckError (vd, sys->conn, "cannot resize X11 window", ck))
             return VLC_EGENERIC;
 
         glViewport (0, 0, place.width, place.height);
@@ -579,14 +579,10 @@ static int Control (vout_display_t *vd, int query, va_list ap)
     /* Hide the mouse. It will be send when
      * vout_display_t::info.b_hide_mouse is false */
     case VOUT_DISPLAY_HIDE_MOUSE:
-    {
-        xcb_connection_t *conn = XGetXCBConnection (sys->display);
-
-        xcb_change_window_attributes (conn, sys->embed->handle.xid,
+        xcb_change_window_attributes (sys->conn, sys->embed->handle.xid,
                                     XCB_CW_CURSOR, &(uint32_t){ sys->cursor });
-        xcb_flush (conn);
+        xcb_flush (sys->conn);
         return VLC_SUCCESS;
-    }
 
     case VOUT_DISPLAY_GET_OPENGL:
     {
@@ -606,7 +602,6 @@ static int Control (vout_display_t *vd, int query, va_list ap)
 static void Manage (vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
-    xcb_connection_t *conn = XGetXCBConnection (sys->display);
 
-    ManageEvent (vd, conn, &sys->visible);
+    ManageEvent (vd, sys->conn, &sys->visible);
 }
