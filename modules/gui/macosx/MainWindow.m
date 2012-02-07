@@ -1366,8 +1366,8 @@ static VLCMainWindow *_o_sharedInstance = nil;
         /* We can't change the styleMask of an already created NSWindow, so we create another window, and do eye catching stuff */
 
         rect = [[o_video_view superview] convertRect: [o_video_view frame] toView: nil]; /* Convert to Window base coord */
-        rect.origin.x += [self frame].origin.x;
-        rect.origin.y += [self frame].origin.y;
+        rect.origin.x += [[o_video_view window] frame].origin.x;
+        rect.origin.y += [[o_video_view window] frame].origin.y;
         o_fullscreen_window = [[VLCWindow alloc] initWithContentRect:rect styleMask: NSBorderlessWindowMask backing:NSBackingStoreBuffered defer:YES];
         [o_fullscreen_window setBackgroundColor: [NSColor blackColor]];
         [o_fullscreen_window setCanBecomeKeyWindow: YES];
@@ -1598,8 +1598,9 @@ static VLCMainWindow *_o_sharedInstance = nil;
     }
 
     frame = [[o_temp_view superview] convertRect: [o_temp_view frame] toView: nil]; /* Convert to Window base coord */
-    frame.origin.x += [self frame].origin.x;
-    frame.origin.y += [self frame].origin.y;
+    id targetWindow = b_nonembedded ? o_nonembedded_window : self;
+    frame.origin.x += [targetWindow frame].origin.x;
+    frame.origin.y += [targetWindow frame].origin.y;
 
     dict2 = [[NSMutableDictionary alloc] initWithCapacity:2];
     [dict2 setObject:self forKey:NSViewAnimationTargetKey];
