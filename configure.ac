@@ -1100,7 +1100,7 @@ have_mmxext="no"
 AS_IF([test "${enable_mmx}" != "no"], [
   ARCH="${ARCH} mmx"
   VLC_SAVE_FLAGS
-  CFLAGS="${CFLAGS} -O -mmmx"
+  CFLAGS="${CFLAGS} -mmmx"
   AC_CACHE_CHECK([if $CC groks MMX intrinsics], [ac_cv_c_mmx_intrinsics], [
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM([
 [#include <mmintrin.h>
@@ -1184,7 +1184,7 @@ AS_IF([test "${enable_sse}" != "no"], [
   ARCH="${ARCH} sse sse2"
 
   VLC_SAVE_FLAGS
-  CFLAGS="${CFLAGS} -O -msse2"
+  CFLAGS="${CFLAGS} -msse2"
   AC_CACHE_CHECK([if $CC groks SSE2 intrinsics], [ac_cv_c_sse2_intrinsics], [
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM([
 [#include <emmintrin.h>
