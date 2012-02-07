@@ -1079,12 +1079,8 @@ static VLCMainWindow *_o_sharedInstance = nil;
         //FIXME! b_chapters = p_input->stream.i_area_nb > 1;
 
         if (cachedInputState == PLAYING_S || b_buffering == YES)
-        {
-            if( b_fullscreen && o_fullscreen_window != nil )
-                [o_fullscreen_window makeKeyAndOrderFront: nil];
-            else
-                [self makeKeyAndOrderFront: nil];
-        }
+            [[o_video_view window] makeKeyAndOrderFront: nil];
+
         vlc_object_release( p_input );
     }
 
