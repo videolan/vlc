@@ -331,16 +331,19 @@ static int Control (vout_display_t *vd, int query, va_list ap)
             [[sys->glView window] performSelectorOnMainThread:@selector(zoom:) withObject: nil waitUntilDone:NO];
             return VLC_SUCCESS;
         }
-        case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
         case VOUT_DISPLAY_CHANGE_ZOOM:
         case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
         case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
         {
-            if (query == VOUT_DISPLAY_CHANGE_DISPLAY_SIZE)
-            {
-                if (!config_GetInt( vd, "macosx-video-autoresize" ))
-                    return VLC_SUCCESS;
-            }
+            return VLC_SUCCESS;
+        }
+            case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
+        {
+            [sys->glView performSelectorOnMainThread:@selector(reshapeView:) withObject:nil waitUntilDone:NO];
+
+            if (!config_GetInt( vd, "macosx-video-autoresize" ))
+                return VLC_SUCCESS;
+
             NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
             NSPoint topleftbase;
             NSPoint topleftscreen;
@@ -596,6 +599,11 @@ static void OpenglSwap(vlc_gl_t *gl)
     }
     else
         glClear(GL_COLOR_BUFFER_BIT);
+}
+
+- (void)reshapeView:(id)sender
+{
+    [self reshape];
 }
 
 /**
