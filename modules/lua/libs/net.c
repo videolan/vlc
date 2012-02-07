@@ -215,10 +215,11 @@ static int vlclua_net_poll( lua_State *L )
         lua_pop( L, 1 );
         i++;
     }
+    int i_timeout = luaL_optint( L, 2, -1 );
 
     int i_ret;
     do
-        i_ret = poll( p_fds, i_fds, -1 );
+        i_ret = poll( p_fds, i_fds, i_timeout );
     while( i_ret == -1 );
 
     for( i = 0; i < i_fds; i++ )

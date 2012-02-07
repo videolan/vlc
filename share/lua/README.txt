@@ -191,7 +191,7 @@ net.connect_tcp( host, port ): open a connection to the given host:port (TCP).
 net.close( fd ): Close file descriptor.
 net.send( fd, string, [length] ): Send data on fd.
 net.recv( fd, [max length] ): Receive data from fd.
-net.poll( { fd = events } ): Implement poll function.
+net.poll( { fd = events }, [timeout in ms] ): Implement poll function.
   Returns the numbers of file descriptors with a non 0 revent. The function
   modifies the input table to { fd = revents }. See "man poll".
 net.POLLIN/POLLPRI/POLLOUT/POLLRDHUP/POLLERR/POLLHUP/POLLNVAL: poll event flags
@@ -442,6 +442,15 @@ volume.set( level ): Set volume to an absolute level between 0 and 1024.
   256 is 100%.
 volume.up( [n] ): Increment volume by n steps of 32. n defaults to 1.
 volume.down( [n] ): Decrement volume by n steps of 32. n defaults to 1.
+
+Win
+---
+This module is only available on Windows builds
+win.console_init(): Initialize the windows console.
+win.console_wait([timeout]): Wait for input on the console for timeout ms.
+                             Returns true if console input is available.
+win.console_read(): Read input from the windows console. Note that polling and
+                    reading from stdin does not work under windows.
 
 XML
 ---

@@ -254,6 +254,9 @@ static int Start_LuaIntf( vlc_object_t *p_this, const char *name )
     luaopen_gettext( L );
     luaopen_xml( L );
     luaopen_equalizer( L );
+#ifdef WIN32
+    luaopen_win( L );
+#endif
 
     /* clean up */
     lua_pop( L, 1 );

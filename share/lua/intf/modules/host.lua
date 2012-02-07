@@ -1,7 +1,7 @@
 --[==========================================================================[
  host.lua: VLC Lua interface command line host module
 --[==========================================================================[
- Copyright (C) 2007 the VideoLAN team
+ Copyright (C) 2007-2012 the VideoLAN team
  $Id$
 
  Authors: Antoine Cellerier <dionoea at videolan dot org>
@@ -114,6 +114,21 @@ function host()
         end
     end
 
+	local function write_console( client, data )
+		-- FIXME: this method shouldn't be needed. vlc.net.write should just work
+		io.write(data or client.buffer)
+		return string.len(data or client.buffer)
+	end
+
+    local function read_console( client, len )
+        -- Read stdin from a windows console (beware: select/poll doesn't work!)
+		if vlc.win.console_wait(0) then
+			return vlc.win.console_read()
+        else
+			return 0
+		end
+    end
+
     local function del_client( client )
         if client.type == client_type.stdio then
             client:send( "Cannot delete stdin/stdout client.\n" )
@@ -155,11 +170,18 @@ function host()
             w = send
             r = recv
         else if t == client_type.stdio or t == client_type.fifo then
-            w = write
-            r = read
+            if vlc.win and t == client_type.stdio then
+                vlc.win.console_init()
+				w = write_console
+                r = read_console
+            else
+				w = write
+                r = read
+            end
         else
             error("Unknown client type", t )
         end end
+
         local client = { -- data
                          rfd = fd,
                          wfd = wfd or fd,
@@ -249,7 +271,14 @@ function host()
             end
         end
 
-        local ret = vlc.net.poll( pollfds )
+        local timeout = -1
+        if vlc.win and listeners.stdio then
+            timeout = 50
+        end
+        local ret = 0
+        if not vlc.win or listeners.tcp then
+            ret = vlc.net.poll( pollfds, timeout )
+        end
         local wclients = {}
         local rclients = {}
         if ret > 0 then
@@ -259,9 +288,9 @@ function host()
                 or is_flag_set(pollfds[client:fd()], vlc.net.POLLNVAL) then
                     del_client(client)
                 elseif is_flag_set(pollfds[client:fd()], vlc.net.POLLOUT) then
-                    table.insert(wclients,client)
+                    table.insert(wclients, client)
                 elseif is_flag_set(pollfds[client:fd()], vlc.net.POLLIN) then
-                    table.insert(rclients,client)
+                    table.insert(rclients, client)
                 end
             end
             if listeners.tcp then
@@ -277,14 +306,26 @@ function host()
             end
         end
 
+        if vlc.win and listeners.stdio then
+            for _, client in pairs(clients) do
+                if client.type == client_type.stdio then
+                    if client.status == status.read or client.status == status.password then
+                        if vlc.win.console_wait(50) then
+                            table.insert(rclients, client)
+                        end
+                    else
+                        table.insert(wclients, client)
+                    end
+                end
+            end
+        end
+
         return wclients, rclients
     end
 
-    -- FIXME: this is never called, client sockets are leaked
     local function destructor( h )
-        print "destructor"
         for _,client in pairs(clients) do
-            --client:send("Shutting down.")
+            client:send("Shutting down.")
             if client.type == client_type.net
             or client.type == client_type.telnet then
                 if client.wfd ~= client.rfd then
@@ -302,7 +343,8 @@ function host()
     end
 
     -- the instance
-    local h = { -- data
+    local h = setmetatable(
+              { -- data
                 status_callbacks = status_callbacks,
                 -- methods
                 listen = _listen,
@@ -310,7 +352,10 @@ function host()
                 listen_stdio = _listen_stdio,
                 accept_and_select = _accept_and_select,
                 broadcast = _broadcast,
-              }
-
+              },
+              { -- metatable
+                __gc = destructor,
+                __metatable = "",
+              })
     return h
 end

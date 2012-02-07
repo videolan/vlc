@@ -839,6 +839,9 @@ static lua_State* GetLuaState( extensions_manager_t *p_mgr,
             luaopen_vlm( L );
             luaopen_volume( L );
             luaopen_xml( L );
+#ifdef WIN32
+            luaopen_win( L );
+#endif
 
             /* Register extension specific functions */
             lua_getglobal( L, "vlc" );
