@@ -489,16 +489,9 @@ void DiscOpenPanel::updateButtons()
 
 #undef setDrive
 
-#if !defined( WIN32 ) && !defined( __OS2__ )
-# define LOCALHOST ""
-#else
-# define LOCALHOST "/"
-#endif
-
 /* Update the current MRL */
 void DiscOpenPanel::updateMRL()
 {
-    QString mrl;
     QString discPath;
     QStringList fileList;
 
@@ -508,56 +501,61 @@ void DiscOpenPanel::updateMRL()
         discPath = ui.deviceCombo->currentText();
 
     /* MRL scheme */
+    const char *scheme;
     /* DVD */
     if( ui.dvdRadioButton->isChecked() ) {
         if( !ui.dvdsimple->isChecked() )
-            mrl = "dvd://" LOCALHOST;
+            scheme = "dvd";
         else
-            mrl = "dvdsimple://" LOCALHOST;
+            scheme = "dvdsimple";
     } else if ( ui.bdRadioButton->isChecked() )
-        mrl = "bluray://" LOCALHOST;
+        scheme = "bluray";
     /* VCD */
     else if ( ui.vcdRadioButton->isChecked() )
-        mrl = "vcd://" LOCALHOST;
+        scheme = "vcd";
     /* CDDA */
     else
-        mrl = "cdda://" LOCALHOST;
+        scheme = "cdda";
 
-    mrl += discPath;
+    char *mrl = make_URI( qtu(discPath), scheme );
+    if( unlikely(mrl == NULL) )
+        return;
 
     /* Title/chapter encoded in MRL */
+    QString anchor = "";
     if( ui.titleSpin->value() > 0 ) {
         if( ui.dvdRadioButton->isChecked() || ui.bdRadioButton->isChecked() ) {
-            mrl += QString("#%1").arg( ui.titleSpin->value() );
+            anchor = QString("#%1").arg( ui.titleSpin->value() );
             if ( ui.chapterSpin->value() > 0 )
-                mrl+= QString(":%1").arg( ui.chapterSpin->value() );
+                anchor += QString(":%1").arg( ui.chapterSpin->value() );
         }
         else if ( ui.vcdRadioButton->isChecked() )
-            mrl += QString("#%1").arg( ui.titleSpin->value() );
+            anchor = QString("#%1").arg( ui.titleSpin->value() );
     }
 
     emit methodChanged( "disc-caching" );
 
-    fileList << mrl; mrl = "";
+    fileList << (qfu(mrl) + anchor);
+    free(mrl);
+
+    QString opts = "";
 
     /* Input item options */
     if ( ui.dvdRadioButton->isChecked() || ui.vcdRadioButton->isChecked() )
     {
-        if ( ui.audioSpin->value() >= 0 ) {
-            mrl += " :audio-track=" +
+        if ( ui.audioSpin->value() >= 0 )
+            opts += " :audio-track=" +
                 QString("%1").arg( ui.audioSpin->value() );
-        }
-        if ( ui.subtitlesSpin->value() >= 0 ) {
-            mrl += " :sub-track=" +
+        if ( ui.subtitlesSpin->value() >= 0 )
+            opts += " :sub-track=" +
                 QString("%1").arg( ui.subtitlesSpin->value() );
-        }
     }
     if( ui.audioCDRadioButton->isChecked() )
     {
         if( ui.titleSpin->value() > 0 )
-            mrl += QString(" :cdda-track=%1").arg( ui.titleSpin->value() );
+            opts += QString(" :cdda-track=%1").arg( ui.titleSpin->value() );
     }
-    emit mrlUpdated( fileList, mrl );
+    emit mrlUpdated( fileList, opts );
 }
 
 void DiscOpenPanel::browseDevice()
