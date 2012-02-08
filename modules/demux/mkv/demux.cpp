@@ -464,7 +464,7 @@ matroska_stream_c *demux_sys_t::AnalyseAllSegmentsFound( demux_t *p_demux, EbmlS
 
     // verify the EBML Header
     vlc_stream_io_callback & io_stream = (vlc_stream_io_callback &) p_estream->I_O();
-    p_l0 = p_estream->FindNextID(EBML_INFO(EbmlHead), io_stream.toRead());
+    p_l0 = p_estream->FindNextID(EBML_INFO(EbmlHead), UINT64_MAX);
     if (p_l0 == NULL)
     {
         msg_Err( p_demux, "No EBML header found" );
@@ -492,7 +492,7 @@ matroska_stream_c *demux_sys_t::AnalyseAllSegmentsFound( demux_t *p_demux, EbmlS
 
 
     // find all segments in this file
-    p_l0 = p_estream->FindNextID(EBML_INFO(KaxSegment), io_stream.toRead());
+    p_l0 = p_estream->FindNextID(EBML_INFO(KaxSegment), UINT64_MAX);
     if (p_l0 == NULL)
     {
         return NULL;
@@ -566,7 +566,7 @@ matroska_stream_c *demux_sys_t::AnalyseAllSegmentsFound( demux_t *p_demux, EbmlS
         if (p_l0->IsFiniteSize() )
         {
             p_l0->SkipData(*p_estream, KaxMatroska_Context);
-            p_l0 = p_estream->FindNextID(EBML_INFO(KaxSegment), io_stream.toRead());
+            p_l0 = p_estream->FindNextID(EBML_INFO(KaxSegment), UINT64_MAX);
         }
         else
         {
