@@ -117,7 +117,7 @@ AboutDialog::AboutDialog( intf_thread_t *_p_intf)
             + qtr( "You are using the Qt4 Interface.\n\n" )
             + qtr( "Copyright (C) " ) + COPYRIGHT_YEARS
             + qtr( " by the VideoLAN Team.\n" )
-            + "vlc@videolan.org, http://www.videolan.org" );
+            + "http://www.videolan.org" );
 
     /* GPL License */
     ui.licenseEdit->setText( qfu( psz_license ) );
