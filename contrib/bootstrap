@@ -28,6 +28,7 @@ usage()
 	echo "  --enable-FOO     configure to build package FOO"
 	echo "  --disable-disc   configure to not build optical discs packages"
 	echo "  --disable-sout   configure to not build stream output packages"
+	echo "  --enable-small   optimize libraries for size with slight speed decrease [DANGEROUS]"
 }
 
 BUILD=
@@ -65,6 +66,9 @@ do
 			;;
 		--disable-sout)
 			BUILD_ENCODERS=
+			;;
+		--enable-small)
+			ENABLE_SMALL=1
 			;;
 		--disable-*)
 			PKGS_DISABLE="${PKGS_DISABLE} ${1#--disable-}"
@@ -161,6 +165,7 @@ check_android_sdk()
 test -z "$PREFIX" || add_make "PREFIX := $PREFIX"
 test -z "$BUILD_DISCS" || add_make_enabled "BUILD_DISCS"
 test -z "$BUILD_ENCODERS" || add_make_enabled "BUILD_ENCODERS"
+test -z "$ENABLE_SMALL" || add_make_enabled "ENABLE_SMALL"
 
 #
 # Checks

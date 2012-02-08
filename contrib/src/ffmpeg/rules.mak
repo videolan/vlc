@@ -30,7 +30,10 @@ FFMPEGCONF += --enable-libmp3lame --enable-libvpx
 DEPS_ffmpeg += lame $(DEPS_lame) vpx $(DEPS_vpx)
 else
 FFMPEGCONF += --disable-encoders --disable-muxers
-# XXX: REVISIT --enable-small ?
+endif
+
+ifdef ENABLE_SMALL
+FFMPEGCONF += --enable-small --optflags=-O2
 endif
 
 # XXX: REVISIT
