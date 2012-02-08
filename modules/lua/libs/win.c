@@ -116,7 +116,6 @@ static int vlclua_console_init( lua_State *L )
     freopen( "CONOUT$", "w", stdout );
     freopen( "CONOUT$", "w", stderr );
     freopen( "CONIN$", "r", stdin );
-    fprintf(stdout, "Tadam!\n");
     fflush(stdout);
     return 0;
 }
