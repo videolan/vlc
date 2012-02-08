@@ -114,7 +114,6 @@ struct subsys
     const char *name;
     char * (*get_mrl) (struct udev_device *dev);
     char * (*get_name) (struct udev_device *dev);
-    char * (*get_cat) (struct udev_device *dev);
     int item_type;
 };
 
@@ -193,10 +192,8 @@ static int AddDevice (services_discovery_t *sd, struct udev_device *dev)
         *dp = d;
     }
 
-    name = p_sys->subsys->get_cat (dev);
-    services_discovery_AddItem (sd, item, name ? name : "Generic");
+    services_discovery_AddItem (sd, item, NULL);
     d->sd = sd;
-    free (name);
     return 0;
 }
 
@@ -434,15 +431,10 @@ static char *v4l_get_name (struct udev_device *dev)
     return prd ? strdup (prd) : NULL;
 }
 
-static char *v4l_get_cat (struct udev_device *dev)
-{
-    return decode_property (dev, "ID_VENDOR_ENC");
-}
-
 int OpenV4L (vlc_object_t *obj)
 {
     static const struct subsys subsys = {
-        "video4linux", v4l_get_mrl, v4l_get_name, v4l_get_cat, ITEM_TYPE_CARD,
+        "video4linux", v4l_get_mrl, v4l_get_name, ITEM_TYPE_CARD,
     };
 
     return Open (obj, &subsys);
@@ -513,25 +505,10 @@ out:
     return name;
 }
 
-static char *alsa_get_cat (struct udev_device *dev)
-{
-    const char *vnd;
-
-    dev = udev_device_get_parent (dev);
-    if (dev == NULL)
-        return NULL;
-
-    vnd = udev_device_get_property_value (dev, "ID_VENDOR_FROM_DATABASE");
-    if (vnd == NULL)
-        /* FIXME: USB may take time to settle... the parent device */
-        vnd = udev_device_get_property_value (dev, "ID_BUS");
-    return vnd ? strdup (vnd) : NULL;
-}
-
 int OpenALSA (vlc_object_t *obj)
 {
     static const struct subsys subsys = {
-        "sound", alsa_get_mrl, alsa_get_name, alsa_get_cat, ITEM_TYPE_CARD,
+        "sound", alsa_get_mrl, alsa_get_name, ITEM_TYPE_CARD,
     };
 
     return Open (obj, &subsys);
@@ -581,11 +558,7 @@ static char *disc_get_mrl (struct udev_device *dev)
 
 static char *disc_get_name (struct udev_device *dev)
 {
-    return decode_property (dev, "ID_FS_LABEL_ENC");
-}
-
-static char *disc_get_cat (struct udev_device *dev)
-{
+    char *name = NULL;
     struct udev_list_entry *list, *entry;
 
     list = udev_device_get_properties_list_entry (dev);
@@ -618,13 +591,21 @@ static char *disc_get_cat (struct udev_device *dev)
 
     if (cat == NULL)
         cat = N_("Unknown type");
-    return strdup (vlc_gettext (cat));
+
+    const char *label = decode_property (dev, "ID_FS_LABEL_ENC");
+
+    if (label)
+        if (asprintf(&name, "%s (%s)", label, vlc_gettext(cat)) < 0)
+            name = NULL;
+    free(label);
+
+    return name;
 }
 
 int OpenDisc (vlc_object_t *obj)
 {
     static const struct subsys subsys = {
-        "block", disc_get_mrl, disc_get_name, disc_get_cat, ITEM_TYPE_DISC,
+        "block", disc_get_mrl, disc_get_name, ITEM_TYPE_DISC,
     };
 
     return Open (obj, &subsys);
