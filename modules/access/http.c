@@ -449,6 +449,7 @@ static int OpenWithCookies( vlc_object_t *p_this, const char *psz_access,
             }
             else
                 msg_Dbg( p_access, "HTTP proxy disabled (MSIE)" );
+            RegCloseKey( h_key );
         }
     }
 #else

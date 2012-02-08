@@ -588,7 +588,10 @@ static int GetFileFontByName( const char *font_name, char **psz_filename )
         LONG i_result = RegEnumValueW( hKey, index, vbuffer, &vbuflen,
                                        NULL, NULL, (LPBYTE)dbuffer, &dbuflen);
         if( i_result != ERROR_SUCCESS )
+        {
+            RegCloseKey( hKey );
             return i_result;
+        }
 
         char *psz_value = FromWide( vbuffer );
 
@@ -616,6 +619,7 @@ static int GetFileFontByName( const char *font_name, char **psz_filename )
 
     *psz_filename = FromWide( dbuffer );
     free( font_name_temp );
+    RegCloseKey( hKey );
     return 0;
 }
 
