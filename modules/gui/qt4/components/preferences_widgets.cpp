@@ -741,6 +741,22 @@ void ModuleListConfigControl::checkbox_lists( module_t *p_parser )
             cbl->checkBox->setChecked( true );
 }
 
+void ModuleListConfigControl::checkbox_lists( QString label, QString help, const char* psz_module )
+{
+    QCheckBox *cb = new QCheckBox( label );
+    checkBoxListItem *cbl = new checkBoxListItem;
+
+    CONNECT( cb, stateChanged( int ), this, onUpdate() );
+    if( !help.isEmpty() )
+        cb->setToolTip( formatTooltip( help ) );
+    cbl->checkBox = cb;
+
+    cbl->psz_module = strdup( psz_module );
+    modules.append( cbl );
+
+    if( p_item->value.psz && strstr( p_item->value.psz, cbl->psz_module ) )
+        cbl->checkBox->setChecked( true );
+}
 
 void ModuleListConfigControl::finish( bool bycat )
 {
