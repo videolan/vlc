@@ -725,20 +725,10 @@ ModuleListConfigControl::~ModuleListConfigControl()
 
 void ModuleListConfigControl::checkbox_lists( module_t *p_parser )
 {
-        QCheckBox *cb = new QCheckBox( qtr( module_GetLongName( p_parser ) ) );
-        checkBoxListItem *cbl = new checkBoxListItem;
-
-        CONNECT( cb, stateChanged( int ), this, onUpdate() );
-        const char *help = module_get_help( p_parser );
-        if( help != NULL )
-            cb->setToolTip( formatTooltip( qtr( help ) ) );
-        cbl->checkBox = cb;
-
-        cbl->psz_module = strdup( module_get_object( p_parser ) );
-        modules.append( cbl );
-
-        if( p_item->value.psz && strstr( p_item->value.psz, cbl->psz_module ) ) \
-            cbl->checkBox->setChecked( true );
+    const char *help = module_get_help( p_parser );
+    checkbox_lists( qtr( module_GetLongName( p_parser ) ),
+                    help != NULL ? qtr( help ): "",
+                    module_get_object( p_parser ) );
 }
 
 void ModuleListConfigControl::checkbox_lists( QString label, QString help, const char* psz_module )
