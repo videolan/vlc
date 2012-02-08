@@ -13,6 +13,10 @@ Encoders:
 Audio Filters:
  * new remapping channel filter
 
+Video Filters:
+ * new anaglyph video filter which transforms side by side 3D video streams in
+   anaglyph glasses (aka red/blue) compatible images.
+
 Removed modules:
  * portaudio audio output
 
