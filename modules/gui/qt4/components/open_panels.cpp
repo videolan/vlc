@@ -338,6 +338,18 @@ DiscOpenPanel::DiscOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     ui.deviceCombo->setToolTip( qtr(I_DEVICE_TOOLTIP) );
     ui.deviceCombo->setInsertPolicy( QComboBox::InsertAtTop );
 
+#ifndef WIN32
+    char const * const ppsz_discdevices[] = {
+        "sr*",
+        "sg*",
+        "scd*",
+        "dvd*",
+        "cd*"
+    };
+    QComboBox *discCombo = ui.deviceCombo; /* avoid namespacing in macro */
+    POPULATE_WITH_DEVS( ppsz_discdevices, discCombo );
+#endif
+
     /* CONNECTs */
     BUTTONACT( ui.dvdRadioButton,     updateButtons() );
     BUTTONACT( ui.bdRadioButton,      updateButtons() );
@@ -388,19 +400,7 @@ void DiscOpenPanel::onFocus()
         }
         SetErrorMode(oldMode);
     }
-#else /* Linux */
-    char const * const ppsz_discdevices[] = {
-        "sr*",
-        "sg*",
-        "scd*",
-        "dvd*",
-        "cd*"
-    };
-    QComboBox *discCombo = ui.deviceCombo; /* avoid namespacing in macro */
-    POPULATE_WITH_DEVS( ppsz_discdevices, discCombo );
 #endif
-
-
 }
 
 DiscOpenPanel::~DiscOpenPanel()
