@@ -42,7 +42,7 @@ QVLCRegistry::~QVLCRegistry( void )
 bool QVLCRegistry::RegistryKeyExists( const char *path )
 {
     HKEY keyHandle;
-    if(  RegOpenKeyEx( m_RootKey, path, 0, KEY_READ, &keyHandle ) == ERROR_SUCCESS )
+    if( RegOpenKeyEx( m_RootKey, path, 0, KEY_READ, &keyHandle ) == ERROR_SUCCESS )
     {
         RegCloseKey( keyHandle );
         return true;
@@ -57,7 +57,7 @@ bool QVLCRegistry::RegistryValueExists( const char *path, const char *valueName 
     DWORD size1;
     DWORD valueType;
 
-    if(  RegOpenKeyEx( m_RootKey, path, 0, KEY_READ, &keyHandle ) == ERROR_SUCCESS )
+    if( RegOpenKeyEx( m_RootKey, path, 0, KEY_READ, &keyHandle ) == ERROR_SUCCESS )
     {
         if( RegQueryValueEx( keyHandle, valueName, NULL,
                              &valueType, NULL, &size1 ) == ERROR_SUCCESS )
@@ -73,7 +73,7 @@ void QVLCRegistry::WriteRegistryInt( const char *path, const char *valueName, in
 {
     HKEY keyHandle;
 
-    if(  RegCreateKeyEx( m_RootKey, path, 0, NULL, REG_OPTION_NON_VOLATILE,
+    if( RegCreateKeyEx( m_RootKey, path, 0, NULL, REG_OPTION_NON_VOLATILE,
                          KEY_WRITE, NULL, &keyHandle, NULL )  == ERROR_SUCCESS )
     {
         RegSetValueEx( keyHandle, valueName, 0, REG_DWORD,
@@ -86,7 +86,7 @@ void QVLCRegistry::WriteRegistryString( const char *path, const char *valueName,
 {
     HKEY keyHandle;
 
-    if(  RegCreateKeyEx( m_RootKey, path, 0, NULL, REG_OPTION_NON_VOLATILE,
+    if( RegCreateKeyEx( m_RootKey, path, 0, NULL, REG_OPTION_NON_VOLATILE,
                          KEY_WRITE, NULL, &keyHandle, NULL )  == ERROR_SUCCESS )
     {
         RegSetValueEx( keyHandle, valueName, 0, REG_SZ, (LPBYTE)value,
@@ -112,7 +112,7 @@ int QVLCRegistry::ReadRegistryInt( const char *path, const char *valueName, int 
     DWORD size1;
     DWORD valueType;
 
-    if(  RegOpenKeyEx( m_RootKey, path, 0, KEY_READ, &keyHandle ) == ERROR_SUCCESS )
+    if( RegOpenKeyEx( m_RootKey, path, 0, KEY_READ, &keyHandle ) == ERROR_SUCCESS )
     {
         if( RegQueryValueEx(  keyHandle, valueName, NULL, &valueType, NULL, &size1 ) == ERROR_SUCCESS )
         {
