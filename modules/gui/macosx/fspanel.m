@@ -505,9 +505,9 @@
     s_rc.size.width = 352;
     s_rc.size.height = 14;
     addTextfield( NSTextField, o_streamTitle_txt, NSCenterTextAlignment, systemFontOfSize, whiteColor );
-    s_rc.origin.x = 481;
+    s_rc.origin.x = 471;
     s_rc.origin.y = 64;
-    s_rc.size.width = 55;
+    s_rc.size.width = 65;
     addTextfield( VLCTimeField, o_streamPosition_txt, NSRightTextAlignment, systemFontOfSize, whiteColor );
 
     return view;
@@ -692,7 +692,7 @@
         restyleButton( o_fullscreen, @"fs_exit_fullscreen", @"fs_exit_fullscreen_hightlight", 507, 13 );
         restyleTextfieldOrSlider( o_streamTitle_txt, 98, 64, 352, 14 );
         [o_streamTitle_txt setFont:[NSFont systemFontOfSize:[NSFont smallSystemFontSize]]];
-        restyleTextfieldOrSlider( o_streamPosition_txt, 481, 64, 55, 14);
+        restyleTextfieldOrSlider( o_streamPosition_txt, 471, 64, 65, 14);
         [o_streamPosition_txt setFont:[NSFont systemFontOfSize:[NSFont smallSystemFontSize]]];
         restyleTextfieldOrSlider( o_fs_timeSlider, 15, 55, 518, 9 );
         restyleTextfieldOrSlider( o_fs_volumeSlider, 26, 20, 95, 10);

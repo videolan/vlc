@@ -743,7 +743,7 @@ void _drawFrameInRect(NSRect frameRect)
     NSUInteger i_stringLength = [string length];
 
     [o_attributed_string addAttribute: NSShadowAttributeName value: o_string_shadow range: NSMakeRange(0, i_stringLength)];
-    [o_attributed_string setAlignment: NSCenterTextAlignment range: NSMakeRange(0, i_stringLength)];
+    [o_attributed_string setAlignment: NSRightTextAlignment range: NSMakeRange(0, i_stringLength)];
     [self setAttributedStringValue: o_attributed_string];
     [o_attributed_string release];
 }
