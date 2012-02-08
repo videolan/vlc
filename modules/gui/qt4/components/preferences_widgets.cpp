@@ -772,6 +772,19 @@ void ModuleListConfigControl::finish( bool bycat )
                 {
                     checkbox_lists( p_parser );
                 }
+
+                /* Parental Advisory HACK:
+                 * Selecting HTTP, RC and Telnet interfaces is difficult now
+                 * since they are just the lua interface module */
+                if( p_cfg->i_type == CONFIG_SUBCATEGORY &&
+                    !strcmp( module_get_object( p_parser ), "lua" ) &&
+                    !strcmp( p_item->psz_name, "extraintf" ) &&
+                    p_cfg->value.i == p_item->min.i )
+                {
+                    checkbox_lists( "Web", "Lua HTTP", "http" );
+                    checkbox_lists( "Telnet", "Lua Telnet", "telnet" );
+                    checkbox_lists( "Console", "Lua CLI", "cli" );
+                }
             }
             module_config_free (p_config);
         }
