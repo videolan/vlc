@@ -229,7 +229,7 @@ OpenDialog::~OpenDialog()
 QString OpenDialog::getMRL( bool b_all )
 {
     if( itemsMRL.count() == 0 ) return "";
-    return b_all ? itemsMRL[0] + ui.advancedLineInput->text()
+    return b_all ? itemsMRL[0] + getOptions()
                  : itemsMRL[0];
 }
 
@@ -373,7 +373,7 @@ void OpenDialog::enqueue( bool b_enqueue )
         p_input = input_item_New( qtu( itemsMRL[i] ), NULL );
 
         /* Take options from the UI, not from what we stored */
-        QStringList optionsList = ui.advancedLineInput->text().split( " :" );
+        QStringList optionsList = getOptions().split( " :" );
 
         /* Insert options */
         for( int j = 0; j < optionsList.count(); j++ )
@@ -415,7 +415,7 @@ void OpenDialog::stream( bool b_transcode_only )
     /* Dbg and send :D */
     msg_Dbg( p_intf, "MRL passed to the Sout: %s", qtu( soutMRL ) );
     THEDP->streamingDialog( this, soutMRL, b_transcode_only,
-                            ui.advancedLineInput->text().split( " :" ) );
+                            getOptions().split( " :" ) );
 }
 
 /* Update the MRL items from the panels */
