@@ -891,7 +891,6 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
 - (void)windowResizedOrMoved:(NSNotification *)notification
 {
-    previousSavedFrame = [self frame];
     [self saveFrameUsingName: [self frameAutosaveName]];
 }
 

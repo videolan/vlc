@@ -573,7 +573,7 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
                 {
                     bool b_autoscale = !var_GetBool( p_vout, "autoscale" );
                     var_SetBool( p_vout, "autoscale", b_autoscale );
-                    if( b_autoscale )
+                    if( !b_autoscale )
                         DisplayMessage( p_vout, SPU_DEFAULT_CHANNEL,
                                         "%s", _("Scaled to screen") );
                     else

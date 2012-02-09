@@ -328,21 +328,18 @@ static int Control (vout_display_t *vd, int query, va_list ap)
         }
         case VOUT_DISPLAY_CHANGE_DISPLAY_FILLED:
         {
-            [[sys->glView window] performSelectorOnMainThread:@selector(zoom:) withObject: nil waitUntilDone:NO];
+            [[sys->glView window] performSelectorOnMainThread:@selector(performZoom:) withObject: nil waitUntilDone:NO];
             return VLC_SUCCESS;
         }
         case VOUT_DISPLAY_CHANGE_ZOOM:
         case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
         case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
+        case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
         {
-            return VLC_SUCCESS;
-        }
-            case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
-        {
-            [sys->glView performSelectorOnMainThread:@selector(reshapeView:) withObject:nil waitUntilDone:NO];
-
             if (!config_GetInt( vd, "macosx-video-autoresize" ))
                 return VLC_SUCCESS;
+
+            [sys->glView performSelectorOnMainThread:@selector(reshapeView:) withObject:nil waitUntilDone:NO];
 
             NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
             NSPoint topleftbase;
