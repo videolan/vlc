@@ -899,17 +899,26 @@ static int ActiveKeyCallback( vlc_object_t *p_this, char const *psz_cmd,
     VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval); VLC_UNUSED(p_data);
     sout_mux_t      *p_mux = (sout_mux_t*)p_this;
     sout_mux_sys_t  *p_sys = p_mux->p_sys;
-    int             i_res = VLC_EBADVAR;
+    int             i_res, use_odd = -1;
+
+    if( !strcmp(newval.psz_string, "odd" ) ||
+        !strcmp(newval.psz_string, "first" ) ||
+        !strcmp(newval.psz_string, "1" ) )
+    {
+        use_odd = 1;
+    }
+    else if( !strcmp(newval.psz_string, "even" ) ||
+             !strcmp(newval.psz_string, "second" ) ||
+             !strcmp(newval.psz_string, "2" ) )
+    {
+        use_odd = 0;
+    }
+
+    if (use_odd < 0)
+        return VLC_EBADVAR;
 
     vlc_mutex_lock( &p_sys->csa_lock );
-    if( !strcmp(newval.psz_string, "odd" ) || !strcmp(newval.psz_string, "first" ) || !strcmp(newval.psz_string, "1" ) )
-    {
-        i_res = csa_UseKey( (vlc_object_t*)p_mux, p_sys->csa, 1 );
-    }
-    else if( !strcmp(newval.psz_string, "even" ) || !strcmp(newval.psz_string, "second" ) || !strcmp(newval.psz_string, "2" ) )
-    {
-        i_res = csa_UseKey( (vlc_object_t*)p_mux, p_sys->csa, 0 );
-    }
+    i_res = csa_UseKey( p_this, p_sys->csa, use_odd );
     vlc_mutex_unlock( &p_sys->csa_lock );
 
     return i_res;
@@ -1159,7 +1168,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
                 p_stream->lang[i*3+0] = pl->psz_iso639_2T[0];
                 p_stream->lang[i*3+1] = pl->psz_iso639_2T[1];
                 p_stream->lang[i*3+2] = pl->psz_iso639_2T[2];
- 
+
                 msg_Dbg( p_mux, "    - lang=%c%c%c",
                          p_stream->lang[i*3+0], p_stream->lang[i*3+1],
                          p_stream->lang[i*3+2] );
