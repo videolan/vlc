@@ -1940,15 +1940,6 @@ static void TSDate( sout_mux_t *p_mux, sout_buffer_chain_t *p_chain_ts,
                       i_pcr_dts + p_sys->i_shaping_delay * 3 / 2 - mdate(),
                       i_bitrate, i_packet_count, i_pcr_length);
         }
-#if 0
-        else
-        {
-            msg_Dbg( p_mux, "starting at %"PRId64
-                     " (%d bi/s for %d packets in %"PRId64" us)",
-                     i_pcr_dts + p_sys->i_shaping_delay * 3 / 2 - mdate(),
-                     i_bitrate, i_packet_count, i_pcr_length);
-        }
-#endif
     }
     else
     {
@@ -2121,94 +2112,6 @@ static void TSSetPCR( block_t *p_ts, mtime_t i_dts )
     p_ts->p_buffer[9]  = ( i_pcr >> 1  )&0xff;
     p_ts->p_buffer[10]|= ( i_pcr << 7  )&0x80;
 }
-
-#if 0
-static void TSSetConstraints( sout_mux_t *p_mux, sout_buffer_chain_t *c,
-                              mtime_t i_length, int i_bitrate_min,
-                              int i_bitrate_max )
-{
-    sout_mux_sys_t  *p_sys = p_mux->p_sys;
-    sout_buffer_chain_t s = *c;
-
-    int i_packets = 0;
-    int i_packets_min = 0;
-    int i_packets_max = 0;
-
-    if( i_length <= 0 )
-    {
-        return;
-    }
-
-    i_packets     = c->i_depth;
-    i_packets_min = ( (int64_t)i_bitrate_min * i_length / 8 / 1000000  + 187 ) / 188;
-    i_packets_max = ( (int64_t)i_bitrate_max * i_length / 8 / 1000000  + 187 ) / 188;
-
-    if( i_packets < i_packets_min && i_packets_min > 0 )
-    {
-        block_t *p_pk;
-        int i_div = ( i_packets_min - i_packets ) / i_packets;
-        int i_mod = ( i_packets_min - i_packets ) % i_packets;
-        int i_rest = 0;
-
-        /* We need to pad with null packets (pid=0x1fff)
-         * We try to melt null packets with true packets */
-        msg_Dbg( p_mux,
-                 "packets=%d but min=%d -> adding %d packets of padding",
-                 i_packets, i_packets_min, i_packets_min - i_packets );
-
-        BufferChainInit( c );
-        while( ( p_pk = BufferChainGet( &s ) ) )
-        {
-            int i, i_null;
-
-            BufferChainAppend( c, p_pk );
-
-            i_null = i_div + ( i_rest + i_mod ) / i_packets;
-
-            for( i = 0; i < i_null; i++ )
-            {
-                block_t *p_null;
-
-                p_null = sout_BufferNew( p_mux->p_sout, 188 );
-                p_null->p_buffer[0] = 0x47;
-                p_null->p_buffer[1] = 0x1f;
-                p_null->p_buffer[2] = 0xff;
-                p_null->p_buffer[3] = 0x10 | p_sys->i_null_continuity_counter;
-                memset( &p_null->p_buffer[4], 0, 184 );
-                p_sys->i_null_continuity_counter =
-                    ( p_sys->i_null_continuity_counter + 1 ) % 16;
-
-                BufferChainAppend( c, p_null );
-            }
-
-            i_rest = ( i_rest + i_mod ) % i_packets;
-        }
-    }
-    else if( i_packets > i_packets_max && i_packets_max > 0 )
-    {
-        block_t *p_pk;
-        int           i;
-
-        /* Arg, we need to drop packets, I don't do something clever (like
-         * dropping complete pid, b frames, ... ), I just get the right amount
-         * of packets and discard the others */
-        msg_Warn( p_mux,
-                  "packets=%d but max=%d -> removing %d packets -> stream broken",
-                  i_packets, i_packets_max, i_packets - i_packets_max );
-
-        BufferChainInit( c );
-        for( i = 0; i < i_packets_max; i++ )
-        {
-            BufferChainAppend( c, BufferChainGet( &s ) );
-        }
-
-        while( ( p_pk = BufferChainGet( &s ) ) )
-        {
-            sout_BufferDelete( p_mux->p_sout, p_pk );
-        }
-    }
-}
-#endif
 
 static void PEStoTS( sout_instance_t *p_sout,
                      sout_buffer_chain_t *c, block_t *p_pes,
@@ -2599,22 +2502,8 @@ static void GetPMT( sout_mux_t *p_mux, sout_buffer_chain_t *c )
                     GetDescriptorLength24b( bits.i_data -
                                             bits_fix_IOD.i_data - 3 ) );
 
-#if 0 /* FIXME!!! This can't possibly work */
-        i_pidinput = p_mux->pp_inputs[i]->p_fmt->i_id;
-        p_usepid = bsearch( &i_pidinput, p_sys->pmtmap, p_sys->i_pmtslots,
-                            sizeof(pmt_map_t), intcompare );
-        p_usepid = bsearch( &p_usepid, p_sys->pmtmap, p_sys->i_num_pmt,
-                            sizeof(pmt_map_t), pmtcompare );
-        if( p_usepid != NULL )
-            dvbpsi_PMTAddDescriptor(
-                    &p_sys->dvbpmt[((pmt_map_t *)p_usepid)->i_prog], 0x1d,
-                    bits.i_data, bits.p_data );
-        else
-            msg_Err( p_mux, "Received an unmapped PID" );
-#else
         dvbpsi_PMTAddDescriptor( &p_sys->dvbpmt[0], 0x1d, bits.i_data,
                                  bits.p_data );
-#endif
     }
 
     for( i_stream = 0; i_stream < p_mux->i_nb_inputs; i_stream++ )
