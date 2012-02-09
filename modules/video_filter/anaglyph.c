@@ -34,7 +34,6 @@
 static int Create(vlc_object_t *);
 static void Destroy(vlc_object_t *);
 static picture_t *Filter(filter_t *, picture_t *);
-static void make_projection_matrix(filter_t *, int, int *);
 static void combine_side_by_side_yuv420(picture_t *, picture_t *, int, int);
 
 #define SCHEME_TEXT N_("Color scheme")
