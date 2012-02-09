@@ -320,7 +320,7 @@ static long VLCEyeTVPluginPacketsArrived(VLCEyeTVPluginGlobals_t *globals, EyeTV
                                             if( sent == -1 )
                                                 printf("data sending failed (errno=%d)\n", errno);
                                             else
-                                                printf("data sending incomplete (sent=%d)\n", sent);
+                                                printf("data sending incomplete (sent=%zd)\n", sent);
                                             close(i_vlcSock);
                                             i_vlcSock = -1;
                                             return 0;
@@ -370,7 +370,7 @@ static long VLCEyeTVPluginPacketsArrived(VLCEyeTVPluginGlobals_t *globals, EyeTV
                             if( sent == -1 )
                                 printf("data sending failed (errno=%d)\n", errno);
                             else
-                                printf("data sending incomplete (sent=%d)\n", sent);
+                                printf("data sending incomplete (sent=%zd)\n", sent);
                             close(i_vlcSock);
                             i_vlcSock = -1;
                             return 0;
@@ -411,7 +411,7 @@ static long VLCEyeTVPluginServiceChanged(VLCEyeTVPluginGlobals_t *globals,
     
     if( globals ) 
     {
-        printf("DeviceID: %ld, ", deviceID);
+        printf("DeviceID: %ld, ", (long)deviceID);
         printf("HeadendID: %ld, ", headendID);
         printf("TransponderID: %ld, ", transponderID);
         printf("ServiceID: %ld\n\n", serviceID);
