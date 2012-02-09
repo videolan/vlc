@@ -372,25 +372,20 @@ void OpenDialog::enqueue( bool b_enqueue )
         input_item_t *p_input;
         p_input = input_item_New( qtu( itemsMRL[i] ), NULL );
 
-        /* Insert options only for the first element.
-           We don't know how to edit that anyway. */
-        if( i == 0 )
-        {
-            /* Take options from the UI, not from what we stored */
-            QStringList optionsList = ui.advancedLineInput->text().split( " :" );
+        /* Take options from the UI, not from what we stored */
+        QStringList optionsList = ui.advancedLineInput->text().split( " :" );
 
-            /* Insert options */
-            for( int j = 0; j < optionsList.count(); j++ )
+        /* Insert options */
+        for( int j = 0; j < optionsList.count(); j++ )
+        {
+            QString qs = colon_unescape( optionsList[j] );
+            if( !qs.isEmpty() )
             {
-                QString qs = colon_unescape( optionsList[j] );
-                if( !qs.isEmpty() )
-                {
-                    input_item_AddOption( p_input, qtu( qs ),
-                                          VLC_INPUT_OPTION_TRUSTED );
+                input_item_AddOption( p_input, qtu( qs ),
+                                      VLC_INPUT_OPTION_TRUSTED );
 #ifdef DEBUG_QT
-                    msg_Warn( p_intf, "Input option: %s", qtu( qs ) );
+                msg_Warn( p_intf, "Input option: %s", qtu( qs ) );
 #endif
-                }
             }
         }
 
