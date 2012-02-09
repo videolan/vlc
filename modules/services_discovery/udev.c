@@ -592,7 +592,7 @@ static char *disc_get_name (struct udev_device *dev)
     if (cat == NULL)
         cat = N_("Unknown type");
 
-    const char *label = decode_property (dev, "ID_FS_LABEL_ENC");
+    char *label = decode_property (dev, "ID_FS_LABEL_ENC");
 
     if (label)
         if (asprintf(&name, "%s (%s)", label, vlc_gettext(cat)) < 0)
