@@ -1,0 +1,13 @@
+<pkmkdoc spec="1.12"><properties><title>VLC Plugin for EyeTV</title><build>/Users/fpk/Desktop/VLC Plugin for EyeTV.pkg</build><organization>org.videolan</organization><userSees ui="easy"/><min-target os="3"/><domain anywhere="true"/></properties><distribution><versions min-spec="1.000000"/><scripts></scripts></distribution><contents><choice title="VLC EyeTV Plug-In" id="choice2" starts_selected="true" starts_enabled="true" starts_hidden="false"><pkgref id="org.videolan.vlcPluginForEyetv"/></choice></contents><resources bg-scale="none" bg-align="topleft"><locale lang="en"><resource relative="true" mod="true" type="license">../../../../COPYING</resource><resource mime-type="text/rtf" kind="embedded" type="readme"><![CDATA[{\rtf1\ansi\ansicpg1252\cocoartf1138\cocoasubrtf320
+{\fonttbl\f0\fnil\fcharset0 LucidaGrande;}
+{\colortbl;\red255\green255\blue255;}
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural
+
+\f0\fs26 \cf0 This installer adds a plugin to your EyeTV installation to play and process TV streams with VLC.\
+\
+Please note that you might have to re-run this installer in case that you update your EyeTV installation.}]]></resource><resource mime-type="text/rtf" kind="embedded" type="conclusion"><![CDATA[{\rtf1\ansi\ansicpg1252\cocoartf1138\cocoasubrtf320
+{\fonttbl\f0\fnil\fcharset0 LucidaGrande;}
+{\colortbl;\red255\green255\blue255;}
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural
+
+\f0\fs26 \cf0 Please restart EyeTV to use the VLC plugin.}]]></resource></locale></resources><requirements><requirement id="filt" operator="eq" value="true"><file>/Applications/EyeTV.app</file><message>Please install EyeTV at its default location prior to installing this plugin.</message></requirement></requirements><flags/><item type="file">01vlc.xml</item><mod>properties.title</mod></pkmkdoc>
