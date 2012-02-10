@@ -50,6 +50,12 @@
 #include <sys/sysctl.h>
 #endif
 
+#if defined(__OpenBSD__) && defined(__powerpc__)
+#include <sys/param.h>
+#include <sys/sysctl.h>
+#include <machine/cpu.h>
+#endif
+
 static uint32_t cpu_flags;
 
 #if defined (__i386__) || defined (__x86_64__) || defined (__powerpc__) \
