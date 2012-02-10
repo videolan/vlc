@@ -1257,13 +1257,11 @@ static bool MuxStreams(sout_mux_t *p_mux )
 
         block_t *p_data;
         if( p_stream == p_pcr_stream || p_sys->b_data_alignment
-             || p_input->p_fmt->i_codec !=
-                 VLC_CODEC_MPGA )
+             || p_input->p_fmt->i_codec != VLC_CODEC_MPGA )
         {
             p_data = block_FifoGet( p_input->p_fifo );
 
-            if( p_input->p_fmt->i_codec ==
-                    VLC_CODEC_MP4A )
+            if( p_input->p_fmt->i_codec == VLC_CODEC_MP4A )
                 p_data = Add_ADTS( p_data, p_input->p_fmt );
         }
         else
@@ -1462,8 +1460,7 @@ static bool MuxStreams(sout_mux_t *p_mux )
                 continue;
             }
 
-            if( i_stream == -1 ||
-                p_stream->i_pes_dts < i_dts )
+            if( i_stream == -1 || p_stream->i_pes_dts < i_dts )
             {
                 i_stream = i;
                 i_dts = p_stream->i_pes_dts;
@@ -1666,39 +1663,35 @@ static void TSSchedule( sout_mux_t *p_mux, sout_buffer_chain_t *p_chain_ts,
 
         BufferChainAppend( &new_chain, p_ts );
 
-        if( p_ts->i_dts &&
-            p_ts->i_dts + p_sys->i_dts_delay * 2/3 < i_new_dts )
+        if (!p_ts->i_dts || p_ts->i_dts + p_sys->i_dts_delay * 2/3 >= i_new_dts)
+            continue;
+
+        mtime_t i_max_diff = i_new_dts - p_ts->i_dts;
+        mtime_t i_cut_dts = p_ts->i_dts;
+
+        p_ts = BufferChainPeek( p_chain_ts );
+        i++;
+        i_new_dts = i_pcr_dts + i_pcr_length * i / i_packet_count;
+        while ( p_ts != NULL && i_new_dts - p_ts->i_dts >= i_max_diff )
         {
-            mtime_t i_max_diff = i_new_dts - p_ts->i_dts;
-            mtime_t i_cut_dts = p_ts->i_dts;
+            p_ts = BufferChainGet( p_chain_ts );
+            i_max_diff = i_new_dts - p_ts->i_dts;
+            i_cut_dts = p_ts->i_dts;
+            BufferChainAppend( &new_chain, p_ts );
 
             p_ts = BufferChainPeek( p_chain_ts );
             i++;
             i_new_dts = i_pcr_dts + i_pcr_length * i / i_packet_count;
-            while ( p_ts != NULL && i_new_dts - p_ts->i_dts >= i_max_diff )
-            {
-                p_ts = BufferChainGet( p_chain_ts );
-                i_max_diff = i_new_dts - p_ts->i_dts;
-                i_cut_dts = p_ts->i_dts;
-                BufferChainAppend( &new_chain, p_ts );
-
-                p_ts = BufferChainPeek( p_chain_ts );
-                i++;
-                i_new_dts = i_pcr_dts + i_pcr_length * i / i_packet_count;
-            }
-            msg_Dbg( p_mux, "adjusting rate at %"PRId64"/%"PRId64" (%d/%d)",
-                     i_cut_dts - i_pcr_dts, i_pcr_length, new_chain.i_depth,
-                     p_chain_ts->i_depth );
-            if ( new_chain.i_depth )
-                TSDate( p_mux, &new_chain,
-                        i_cut_dts - i_pcr_dts,
-                        i_pcr_dts );
-            if ( p_chain_ts->i_depth )
-                TSSchedule( p_mux,
-                            p_chain_ts, i_pcr_dts + i_pcr_length - i_cut_dts,
-                            i_cut_dts );
-            return;
         }
+        msg_Dbg( p_mux, "adjusting rate at %"PRId64"/%"PRId64" (%d/%d)",
+                 i_cut_dts - i_pcr_dts, i_pcr_length, new_chain.i_depth,
+                 p_chain_ts->i_depth );
+        if ( new_chain.i_depth )
+            TSDate( p_mux, &new_chain, i_cut_dts - i_pcr_dts, i_pcr_dts );
+        if ( p_chain_ts->i_depth )
+            TSSchedule( p_mux, p_chain_ts, i_pcr_dts + i_pcr_length - i_cut_dts,
+                        i_cut_dts );
+        return;
     }
 
     if ( new_chain.i_depth )
