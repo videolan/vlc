@@ -2273,13 +2273,12 @@ static void GetPMT( sout_mux_t *p_mux, sout_buffer_chain_t *c )
         ts_stream_t *p_stream = (ts_stream_t*)p_mux->pp_inputs[i_stream]->p_sys;
 
         int i_pidinput = p_mux->pp_inputs[i_stream]->p_fmt->i_id;
-        int *p_usepid = bsearch( &i_pidinput, p_sys->pmtmap, p_sys->i_pmtslots,
-                            sizeof(pmt_map_t), intcompare );
+        pmt_map_t *p_usepid = bsearch( &i_pidinput, p_sys->pmtmap,
+                    p_sys->i_pmtslots, sizeof(pmt_map_t), intcompare );
 
         dvbpsi_pmt_es_t *p_es;
         if( p_usepid != NULL )
-            p_es = dvbpsi_PMTAddES(
-                    &p_sys->dvbpmt[((pmt_map_t *)p_usepid)->i_prog],
+            p_es = dvbpsi_PMTAddES( &p_sys->dvbpmt[p_usepid->i_prog],
                     p_stream->i_stream_type, p_stream->i_pid );
         else
             /* If there's an error somewhere, dump it to the first pmt */
