@@ -506,24 +506,16 @@ static int Open( vlc_object_t *p_this )
 
     config_ChainParse( p_mux, SOUT_CFG_PREFIX, ppsz_sout_options, p_mux->p_cfg );
 
-    p_sys = malloc( sizeof( sout_mux_sys_t ) );
+    p_sys = calloc( 1, sizeof( sout_mux_sys_t ) );
     if( !p_sys )
         return VLC_ENOMEM;
-    p_sys->i_pmtslots = p_sys->b_sdt = 0;
     p_sys->i_num_pmt = 1;
-    p_sys->dvbpmt = NULL;
-    memset( &p_sys->pmtmap, 0, sizeof(p_sys->pmtmap) );
 
     p_mux->pf_control   = Control;
     p_mux->pf_addstream = AddStream;
     p_mux->pf_delstream = DelStream;
     p_mux->pf_mux       = Mux;
     p_mux->p_sys        = p_sys;
-
-    for (int i = 0; i < MAX_PMT; i++ )
-        p_sys->sdt_descriptors[i].psz_service_name
-            = p_sys->sdt_descriptors[i].psz_provider = NULL;
-    memset( p_sys->sdt_descriptors, 0, sizeof(sdt_desc_t) );
 
     p_sys->b_es_id_pid = var_GetBool( p_mux, SOUT_CFG_PREFIX "es-id-pid" );
 
@@ -581,9 +573,6 @@ static int Open( vlc_object_t *p_this )
     unsigned short subi[3];
     vlc_rand_bytes(subi, sizeof(subi));
     p_sys->i_pat_version_number = nrand48(subi) & 0x1f;
-    p_sys->pat.i_pid = 0;
-    p_sys->pat.i_continuity_counter = 0;
-    p_sys->pat.b_discontinuity = false;
 
     vlc_value_t val;
     var_Get( p_mux, SOUT_CFG_PREFIX "tsid", &val );
@@ -599,15 +588,7 @@ static int Open( vlc_object_t *p_this )
         p_sys->i_netid = val.i_int;
 
     p_sys->i_pmt_version_number = nrand48(subi) & 0x1f;
-    for (unsigned i = 0; i < p_sys->i_num_pmt; i++ )
-    {
-        p_sys->pmt[i].i_continuity_counter = 0;
-        p_sys->pmt[i].b_discontinuity = false;
-    }
-
     p_sys->sdt.i_pid = 0x11;
-    p_sys->sdt.i_continuity_counter = 0;
-    p_sys->sdt.b_discontinuity = false;
 
     char *sdtdesc = var_GetNonEmptyString( p_mux, SOUT_CFG_PREFIX "sdtdesc" );
 
@@ -704,9 +685,6 @@ static int Open( vlc_object_t *p_this )
     }
 
     p_sys->i_pcr_pid = 0x1fff;
-    p_sys->p_pcr_input = NULL;
-
-    p_sys->i_mpeg4_streams = 0;
 
     /* Allow to create constrained stream */
     p_sys->i_bitrate_min = var_GetInteger( p_mux, SOUT_CFG_PREFIX "bmin" );
@@ -755,9 +733,6 @@ static int Open( vlc_object_t *p_this )
              p_sys->i_shaping_delay, p_sys->i_pcr_delay, p_sys->i_dts_delay );
 
     p_sys->b_use_key_frames = var_GetBool( p_mux, SOUT_CFG_PREFIX "use-key-frames" );
-
-    /* for TS generation */
-    p_sys->i_pcr = 0;
 
     p_sys->csa = csaSetup(p_this);
 
