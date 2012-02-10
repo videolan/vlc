@@ -583,23 +583,17 @@ static int Open( vlc_object_t *p_this )
 
         char *psz_sdttoken = sdtdesc;
 
-        for (int i = 0; psz_sdttoken; i++)
+        for (int i = 0; i < MAX_PMT * 2 && psz_sdttoken; i++)
         {
+            sdt_desc_t *sdt = &p_sys->sdt_descriptors[i/2];
             char *psz_end = strchr( psz_sdttoken, ',' );
-            if( psz_end != NULL )
-            {
+            if ( psz_end )
                 *psz_end++ = '\0';
-            }
-            if ( !(i % 2) )
-            {
-                p_sys->sdt_descriptors[i/2].psz_provider
-                    = strdup(psz_sdttoken);
-            }
+
+            if (i % 2)
+                sdt->psz_service_name = strdup(psz_sdttoken);
             else
-            {
-                p_sys->sdt_descriptors[i/2].psz_service_name
-                    = strdup(psz_sdttoken);
-            }
+                sdt->psz_provider = strdup(psz_sdttoken);
 
             psz_sdttoken = psz_end;
         }
@@ -608,7 +602,7 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->b_data_alignment = var_GetBool( p_mux, SOUT_CFG_PREFIX "alignment" );
 
-    char *pgrpmt = var_GetNonEmptyString( p_mux, SOUT_CFG_PREFIX "program-pmt" );
+    char *pgrpmt = var_GetNonEmptyString(p_mux, SOUT_CFG_PREFIX "program-pmt");
     if( pgrpmt )
     {
         char *psz = pgrpmt;
