@@ -803,10 +803,9 @@ static int ChangeKeyCallback( vlc_object_t *p_this, char const *psz_cmd,
     sout_mux_sys_t  *p_sys = p_mux->p_sys;
     int ret;
 
-    vlc_mutex_lock( &p_sys->csa_lock );
-    ret = csa_SetCW( p_this, p_sys->csa, newval.psz_string,
-                     !!(intptr_t)p_data );
-    vlc_mutex_unlock( &p_sys->csa_lock );
+    vlc_mutex_lock(&p_sys->csa_lock);
+    ret = csa_SetCW(p_this, p_sys->csa, newval.psz_string, !!(intptr_t)p_data);
+    vlc_mutex_unlock(&p_sys->csa_lock);
 
     return ret;
 }
@@ -906,8 +905,8 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     ts_stream_t         *p_stream;
 
     p_input->p_sys = p_stream = calloc( 1, sizeof( ts_stream_t ) );
-    if( !p_input->p_sys )
-        return VLC_ENOMEM;
+    if( !p_stream )
+        goto oom;
 
     if ( p_sys->b_es_id_pid )
         p_stream->i_pid = p_input->p_fmt->i_id & 0x1fff;
@@ -1022,10 +1021,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     p_stream->i_langs = 1 + p_input->p_fmt->i_extra_languages;
     p_stream->lang = calloc(1, p_stream->i_langs * 4);
     if( !p_stream->lang )
-    {
-        free( p_stream );
-        return VLC_ENOMEM;
-    }
+        goto oom;
 
     msg_Dbg( p_mux, "adding input codec=%4.4s pid=%d",
              (char*)&p_stream->i_codec, p_stream->i_pid );
@@ -1052,65 +1048,60 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     {
         p_stream->i_extra = 55;
         p_stream->p_extra = malloc( p_stream->i_extra );
-        if( p_stream->p_extra )
-        {
-            uint8_t *p = p_stream->p_extra;
-            p[0] = 0x10;    /* textFormat, 0x10 for 3GPP TS 26.245 */
-            p[1] = 0x00;    /* flags: 1b: associated video info flag
-                                    3b: reserved
-                                    1b: duration flag
-                                    3b: reserved */
-            p[2] = 52;      /* remaining size */
+        if (!p_stream->p_extra)
+            goto oom;
 
-            p += 3;
+        uint8_t *p = p_stream->p_extra;
+        p[0] = 0x10;    /* textFormat, 0x10 for 3GPP TS 26.245 */
+        p[1] = 0x00;    /* flags: 1b: associated video info flag
+                                3b: reserved
+                                1b: duration flag
+                                3b: reserved */
+        p[2] = 52;      /* remaining size */
 
-            p[0] = p[1] = p[2] = p[3] = 0; p+=4;    /* display flags */
-            *p++ = 0;  /* horizontal justification (-1: left, 0 center, 1 right) */
-            *p++ = 1;  /* vertical   justification (-1: top, 0 center, 1 bottom) */
+        p += 3;
 
-            p[0] = p[1] = p[2] = 0x00; p+=3;/* background rgb */
-            *p++ = 0xff;                    /* background a */
+        p[0] = p[1] = p[2] = p[3] = 0; p+=4;    /* display flags */
+        *p++ = 0;  /* horizontal justification (-1: left, 0 center, 1 right) */
+        *p++ = 1;  /* vertical   justification (-1: top, 0 center, 1 bottom) */
 
-            p[0] = p[1] = 0; p += 2;        /* text box top */
-            p[0] = p[1] = 0; p += 2;        /* text box left */
-            p[0] = p[1] = 0; p += 2;        /* text box bottom */
-            p[0] = p[1] = 0; p += 2;        /* text box right */
+        p[0] = p[1] = p[2] = 0x00; p+=3;/* background rgb */
+        *p++ = 0xff;                    /* background a */
 
-            p[0] = p[1] = 0; p += 2;        /* start char */
-            p[0] = p[1] = 0; p += 2;        /* end char */
-            p[0] = p[1] = 0; p += 2;        /* default font id */
+        p[0] = p[1] = 0; p += 2;        /* text box top */
+        p[0] = p[1] = 0; p += 2;        /* text box left */
+        p[0] = p[1] = 0; p += 2;        /* text box bottom */
+        p[0] = p[1] = 0; p += 2;        /* text box right */
 
-            *p++ = 0;                       /* font style flags */
-            *p++ = 12;                      /* font size */
+        p[0] = p[1] = 0; p += 2;        /* start char */
+        p[0] = p[1] = 0; p += 2;        /* end char */
+        p[0] = p[1] = 0; p += 2;        /* default font id */
 
-            p[0] = p[1] = p[2] = 0x00; p+=3;/* foreground rgb */
-            *p++ = 0x00;                    /* foreground a */
+        *p++ = 0;                       /* font style flags */
+        *p++ = 12;                      /* font size */
 
-            p[0] = p[1] = p[2] = 0; p[3] = 22; p += 4;
-            memcpy( p, "ftab", 4 ); p += 4;
-            *p++ = 0; *p++ = 1;             /* entry count */
-            p[0] = p[1] = 0; p += 2;        /* font id */
-            *p++ = 9;                       /* font name length */
-            memcpy( p, "Helvetica", 9 );    /* font name */
-        }
-        else
-            p_stream->i_extra = 0;
+        p[0] = p[1] = p[2] = 0x00; p+=3;/* foreground rgb */
+        *p++ = 0x00;                    /* foreground a */
+
+        p[0] = p[1] = p[2] = 0; p[3] = 22; p += 4;
+        memcpy( p, "ftab", 4 ); p += 4;
+        *p++ = 0; *p++ = 1;             /* entry count */
+        p[0] = p[1] = 0; p += 2;        /* font id */
+        *p++ = 9;                       /* font name length */
+        memcpy( p, "Helvetica", 9 );    /* font name */
     }
     else
     {
         /* Copy extra data (VOL for MPEG-4 and extra BitMapInfoHeader for VFW */
-        p_stream->i_extra = p_input->p_fmt->i_extra;
-        if( p_stream->i_extra > 0 )
+        es_format_t *fmt = p_input->p_fmt;
+        if( fmt->i_extra > 0 )
         {
-            p_stream->p_extra = malloc( p_stream->i_extra );
-            if( p_stream->p_extra )
-            {
-                memcpy( p_stream->p_extra,
-                        p_input->p_fmt->p_extra,
-                        p_input->p_fmt->i_extra );
-            }
-            else
-                p_stream->i_extra = 0;
+            p_stream->i_extra = fmt->i_extra;
+            p_stream->p_extra = malloc( fmt->i_extra );
+            if( !p_stream->p_extra )
+                goto oom;
+
+            memcpy( p_stream->p_extra, fmt->p_extra, fmt->i_extra );
         }
     }
 
@@ -1136,6 +1127,11 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     }
 
     return VLC_SUCCESS;
+
+oom:
+    free(p_stream->lang);
+    free(p_stream);
+    return VLC_ENOMEM;
 }
 
 /*****************************************************************************
@@ -1808,19 +1804,17 @@ static block_t *TSNew( sout_mux_t *p_mux, ts_stream_t *p_stream,
 {
     VLC_UNUSED(p_mux);
     block_t *p_pes = p_stream->chain_pes.p_first;
-    block_t *p_ts;
 
     bool b_new_pes = false;
     bool b_adaptation_field = false;
 
     int i_payload_max = 184 - ( b_pcr ? 8 : 0 );
-    int i_payload;
 
     if( p_stream->i_pes_used <= 0 )
     {
         b_new_pes = true;
     }
-    i_payload = __MIN( (int)p_pes->i_buffer - p_stream->i_pes_used,
+    int i_payload = __MIN( (int)p_pes->i_buffer - p_stream->i_pes_used,
                        i_payload_max );
 
     if( b_pcr || i_payload < i_payload_max )
@@ -1828,7 +1822,7 @@ static block_t *TSNew( sout_mux_t *p_mux, ts_stream_t *p_stream,
         b_adaptation_field = true;
     }
 
-    p_ts = block_New( p_mux, 188 );
+    block_t *p_ts = block_New( p_mux, 188 );
 
     if (b_new_pes && !(p_pes->i_flags & BLOCK_FLAG_NO_KEYFRAME) && p_pes->i_flags & BLOCK_FLAG_TYPE_I)
     {
@@ -1845,14 +1839,13 @@ static block_t *TSNew( sout_mux_t *p_mux, ts_stream_t *p_stream,
         p_stream->i_continuity_counter;
 
     p_stream->i_continuity_counter = (p_stream->i_continuity_counter+1)%16;
-    p_stream->b_discontinuity = (p_pes->i_flags & BLOCK_FLAG_DISCONTINUITY);
+    p_stream->b_discontinuity = p_pes->i_flags & BLOCK_FLAG_DISCONTINUITY;
 
     if( b_adaptation_field )
     {
+        int i_stuffing = i_payload_max - i_payload;
         if( b_pcr )
         {
-            int     i_stuffing = i_payload_max - i_payload;
-
             p_ts->i_flags |= BLOCK_FLAG_CLOCK;
 
             p_ts->p_buffer[4] = 7 + i_stuffing;
@@ -1862,11 +1855,11 @@ static block_t *TSNew( sout_mux_t *p_mux, ts_stream_t *p_stream,
                 p_ts->p_buffer[5] |= 0x80; /* flag TS dicontinuity */
                 p_stream->b_discontinuity = false;
             }
-            p_ts->p_buffer[6] = ( 0 )&0xff;
-            p_ts->p_buffer[7] = ( 0 )&0xff;
-            p_ts->p_buffer[8] = ( 0 )&0xff;
-            p_ts->p_buffer[9] = ( 0 )&0xff;
-            p_ts->p_buffer[10]= ( ( 0 )&0x80 ) | 0x7e;
+            p_ts->p_buffer[6] = 0 &0xff;
+            p_ts->p_buffer[7] = 0 &0xff;
+            p_ts->p_buffer[8] = 0 &0xff;
+            p_ts->p_buffer[9] = 0 &0xff;
+            p_ts->p_buffer[10]= ( 0 &0x80 ) | 0x7e;
             p_ts->p_buffer[11]= 0;
 
             for (int i = 12; i < 12 + i_stuffing; i++ )
@@ -1876,8 +1869,6 @@ static block_t *TSNew( sout_mux_t *p_mux, ts_stream_t *p_stream,
         }
         else
         {
-            int i_stuffing = i_payload_max - i_payload;
-
             p_ts->p_buffer[4] = i_stuffing - 1;
             if( i_stuffing > 1 )
             {
@@ -1901,25 +1892,22 @@ static block_t *TSNew( sout_mux_t *p_mux, ts_stream_t *p_stream,
 
     if( p_stream->i_pes_used >= (int)p_pes->i_buffer )
     {
-        p_pes = BufferChainGet( &p_stream->chain_pes );
-        block_Release( p_pes );
+        block_Release(BufferChainGet( &p_stream->chain_pes ));
 
         p_pes = p_stream->chain_pes.p_first;
+        p_stream->i_pes_length = 0;
         if( p_pes )
         {
-            p_stream->i_pes_dts    = p_pes->i_dts;
-            p_stream->i_pes_length = 0;
+            p_stream->i_pes_dts = p_pes->i_dts;
             while( p_pes )
             {
                 p_stream->i_pes_length += p_pes->i_length;
-
                 p_pes = p_pes->p_next;
             }
         }
         else
         {
             p_stream->i_pes_dts = 0;
-            p_stream->i_pes_length = 0;
         }
         p_stream->i_pes_used = 0;
     }
