@@ -248,6 +248,33 @@ Removed modules:
  * removal of the OSSO screensave module, use the MCE one
 
 
+Changes between 1.1.12 and 1.1.13:
+----------------------------------
+
+Security:
+ * Heap overflow in TiVo demuxer fixed.
+ * Same default ACL for HTTP requests as for the rest of the HTTP interface.
+
+Audio outputs:
+ * PulseAudio channels mapping (non-stereo) fix.
+ * PulseAudio stream accidental overflow recovery.
+
+Video outputs:
+ * XVideo support for mixed CPU/GPU endianess (especially on PowerPC).
+ * XVideo support for automatic color keying.
+ * xosd Xlib initialization failure fix.
+
+Decoders:
+ * Camtasia decoding fix.
+
+Qt interface:
+ * Rare crash while seeking fixed.
+ * V4L2 video standard selection fixed.
+
+Translations:
+ * Update of Chinese simplified, Estonian, German and Polish languages.
+
+
 Changes between 1.1.11 and 1.1.12:
 ----------------------------------
 
