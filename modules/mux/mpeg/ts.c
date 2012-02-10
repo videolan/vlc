@@ -916,7 +916,6 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
 {
     sout_mux_sys_t      *p_sys = p_mux->p_sys;
     ts_stream_t         *p_stream;
-    int                  i;
 
     p_input->p_sys = p_stream = malloc( sizeof( ts_stream_t ) );
     if( !p_input->p_sys )
@@ -1065,7 +1064,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
         free( p_stream );
         return VLC_ENOMEM;
     }
-    i = 1;
+
     p_stream->lang[0] =
     p_stream->lang[1] =
     p_stream->lang[2] = '\0';
@@ -1097,36 +1096,35 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
                      p_stream->lang[2] );
         }
     }
-    while( i < p_stream->i_langs ) {
-        if( p_input->p_fmt->p_extra_languages[i-1].psz_language )
+    for (int i = 1; i < p_stream->i_langs; i++) {
+        char *psz = p_input->p_fmt->p_extra_languages[i-1].psz_language;
+        if (!psz)
+            continue;
+
+        const iso639_lang_t *pl = NULL;
+
+        if( strlen( psz ) == 2 )
         {
-            char *psz = p_input->p_fmt->p_extra_languages[i-1].psz_language;
-            const iso639_lang_t *pl = NULL;
-
-            if( strlen( psz ) == 2 )
+            pl = GetLang_1( psz );
+        }
+        else if( strlen( psz ) == 3 )
+        {
+            pl = GetLang_2B( psz );
+            if( !strcmp( pl->psz_iso639_1, "??" ) )
             {
-                pl = GetLang_1( psz );
-            }
-            else if( strlen( psz ) == 3 )
-            {
-                pl = GetLang_2B( psz );
-                if( !strcmp( pl->psz_iso639_1, "??" ) )
-                {
-                    pl = GetLang_2T( psz );
-                }
-            }
-            if( pl && strcmp( pl->psz_iso639_1, "??" ) )
-            {
-                p_stream->lang[i*3+0] = pl->psz_iso639_2T[0];
-                p_stream->lang[i*3+1] = pl->psz_iso639_2T[1];
-                p_stream->lang[i*3+2] = pl->psz_iso639_2T[2];
-
-                msg_Dbg( p_mux, "    - lang=%c%c%c",
-                         p_stream->lang[i*3+0], p_stream->lang[i*3+1],
-                         p_stream->lang[i*3+2] );
+                pl = GetLang_2T( psz );
             }
         }
-        i++;
+        if( pl && strcmp( pl->psz_iso639_1, "??" ) )
+        {
+            p_stream->lang[i*3+0] = pl->psz_iso639_2T[0];
+            p_stream->lang[i*3+1] = pl->psz_iso639_2T[1];
+            p_stream->lang[i*3+2] = pl->psz_iso639_2T[2];
+
+            msg_Dbg( p_mux, "    - lang=%c%c%c",
+                     p_stream->lang[i*3+0], p_stream->lang[i*3+1],
+                     p_stream->lang[i*3+2] );
+        }
     }
 
     /* Create decoder specific info for subt */
