@@ -2276,13 +2276,10 @@ static void GetPMT( sout_mux_t *p_mux, sout_buffer_chain_t *c )
         pmt_map_t *p_usepid = bsearch( &i_pidinput, p_sys->pmtmap,
                     p_sys->i_pmtslots, sizeof(pmt_map_t), intcompare );
 
-        dvbpsi_pmt_es_t *p_es;
-        if( p_usepid != NULL )
-            p_es = dvbpsi_PMTAddES( &p_sys->dvbpmt[p_usepid->i_prog],
-                    p_stream->i_stream_type, p_stream->i_pid );
-        else
-            /* If there's an error somewhere, dump it to the first pmt */
-            p_es = dvbpsi_PMTAddES( &p_sys->dvbpmt[0],
+        /* If there's an error somewhere, dump it to the first pmt */
+        unsigned prog = p_usepid ? p_usepid->i_prog : 0;
+
+        dvbpsi_pmt_es_t *p_es = dvbpsi_PMTAddES( &p_sys->dvbpmt[prog],
                     p_stream->i_stream_type, p_stream->i_pid );
 
         if( p_stream->i_stream_id == 0xfa || p_stream->i_stream_id == 0xfb )
