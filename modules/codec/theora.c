@@ -1,7 +1,7 @@
 /*****************************************************************************
  * theora.c: theora decoder module making use of libtheora.
  *****************************************************************************
- * Copyright (C) 1999-2001 the VideoLAN team
+ * Copyright (C) 1999-2012 the VideoLAN team
  * $Id$
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>
@@ -37,7 +37,12 @@
 
 #include <ogg/ogg.h>
 
-#include <theora/theora.h>
+#include <theora/codec.h>
+#include <theora/theoradec.h>
+#include <theora/theoraenc.h>
+
+#include <assert.h>
+#include <limits.h>
 
 /*****************************************************************************
  * decoder_sys_t : theora decoder descriptor
@@ -55,9 +60,9 @@ struct decoder_sys_t
     /*
      * Theora properties
      */
-    theora_info      ti;                        /* theora bitstream settings */
-    theora_comment   tc;                            /* theora comment header */
-    theora_state     td;                   /* theora bitstream user comments */
+    th_info          ti;       /* theora bitstream settings */
+    th_comment       tc;       /* theora comment information */
+    th_dec_ctx       *tcx;     /* theora decoder context */
 
     /*
      * Decoding properties
@@ -84,7 +89,7 @@ static void *ProcessPacket ( decoder_t *, ogg_packet *, block_t ** );
 static picture_t *DecodePacket( decoder_t *, ogg_packet * );
 
 static void ParseTheoraComments( decoder_t * );
-static void theora_CopyPicture( picture_t *, yuv_buffer * );
+static void theora_CopyPicture( picture_t *, th_ycbcr_buffer );
 
 static int  OpenEncoder( vlc_object_t *p_this );
 static void CloseEncoder( vlc_object_t *p_this );
@@ -148,6 +153,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     p_sys->b_has_headers = false;
     p_sys->i_pts = VLC_TS_INVALID;
     p_sys->b_decoded_first_keyframe = false;
+    p_sys->tcx = NULL;
 
     /* Set output properties */
     p_dec->fmt_out.i_cat = VIDEO_ES;
@@ -160,8 +166,8 @@ static int OpenDecoder( vlc_object_t *p_this )
         DecodeBlock;
 
     /* Init supporting Theora structures needed in header parsing */
-    theora_comment_init( &p_sys->tc );
-    theora_info_init( &p_sys->ti );
+    th_comment_init( &p_sys->tc );
+    th_info_init( &p_sys->ti );
 
     return VLC_SUCCESS;
 }
@@ -225,6 +231,7 @@ static int ProcessHeaders( decoder_t *p_dec )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     ogg_packet oggpacket;
+    th_setup_info *ts = NULL; /* theora setup information */
 
     unsigned pi_size[XIPH_MAX_HEADER_COUNT];
     void     *pp_data[XIPH_MAX_HEADER_COUNT];
@@ -243,7 +250,7 @@ static int ProcessHeaders( decoder_t *p_dec )
     oggpacket.b_o_s  = 1; /* yes this actually is a b_o_s packet :) */
     oggpacket.bytes  = pi_size[0];
     oggpacket.packet = pp_data[0];
-    if( theora_decode_header( &p_sys->ti, &p_sys->tc, &oggpacket ) < 0 )
+    if( th_decode_headerin( &p_sys->ti, &p_sys->tc, &ts, &oggpacket ) < 0 )
     {
         msg_Err( p_dec, "this bitstream does not contain Theora video data" );
         goto error;
@@ -251,32 +258,35 @@ static int ProcessHeaders( decoder_t *p_dec )
 
     /* Set output properties */
     if( !p_sys->b_packetizer )
-    switch( p_sys->ti.pixelformat )
+
+    switch( p_sys->ti.pixel_fmt )
     {
-      case OC_PF_420:
+      case TH_PF_420:
         p_dec->fmt_out.i_codec = VLC_CODEC_I420;
         break;
-      case OC_PF_422:
+      case TH_PF_422:
         p_dec->fmt_out.i_codec = VLC_CODEC_I422;
         break;
-      case OC_PF_444:
+      case TH_PF_444:
         p_dec->fmt_out.i_codec = VLC_CODEC_I444;
         break;
-      case OC_PF_RSVD:
+      case TH_PF_RSVD:
       default:
         msg_Err( p_dec, "unknown chroma in theora sample" );
         break;
     }
-    p_dec->fmt_out.video.i_width = p_sys->ti.width;
-    p_dec->fmt_out.video.i_height = p_sys->ti.height;
-    if( p_sys->ti.frame_width && p_sys->ti.frame_height )
+
+    p_dec->fmt_out.video.i_width = p_sys->ti.frame_width;
+    p_dec->fmt_out.video.i_height = p_sys->ti.frame_height;
+    if( p_sys->ti.pic_width && p_sys->ti.pic_height )
     {
-        p_dec->fmt_out.video.i_visible_width = p_sys->ti.frame_width;
-        p_dec->fmt_out.video.i_visible_height = p_sys->ti.frame_height;
-        if( p_sys->ti.offset_x || p_sys->ti.offset_y )
+        p_dec->fmt_out.video.i_visible_width = p_sys->ti.pic_width;
+        p_dec->fmt_out.video.i_visible_height = p_sys->ti.pic_height;
+
+        if( p_sys->ti.pic_x || p_sys->ti.pic_y )
         {
-            p_dec->fmt_out.video.i_x_offset = p_sys->ti.offset_x;
-            p_dec->fmt_out.video.i_y_offset = p_sys->ti.offset_y;
+            p_dec->fmt_out.video.i_x_offset = p_sys->ti.pic_x;
+            p_dec->fmt_out.video.i_y_offset = p_sys->ti.pic_y;
         }
     }
 
@@ -299,31 +309,40 @@ static int ProcessHeaders( decoder_t *p_dec )
 
     msg_Dbg( p_dec, "%dx%d %.02f fps video, frame content "
              "is %dx%d with offset (%d,%d)",
-             p_sys->ti.width, p_sys->ti.height,
-             (double)p_sys->ti.fps_numerator/p_sys->ti.fps_denominator,
              p_sys->ti.frame_width, p_sys->ti.frame_height,
-             p_sys->ti.offset_x, p_sys->ti.offset_y );
+             (double)p_sys->ti.fps_numerator/p_sys->ti.fps_denominator,
+             p_sys->ti.pic_width, p_sys->ti.pic_height,
+             p_sys->ti.pic_x, p_sys->ti.pic_y );
+
+    /* Some assertions based on the documentation.  These are mandatory restrictions. */
+    assert( p_sys->ti.frame_height % 16 == 0 && p_sys->ti.frame_height < 1048576 );
+    assert( p_sys->ti.frame_width % 16 == 0 && p_sys->ti.frame_width < 1048576 );
+    assert( p_sys->ti.keyframe_granule_shift >= 0 && p_sys->ti.keyframe_granule_shift <= 31 );
+    assert( p_sys->ti.pic_x <= __MIN( p_sys->ti.frame_width - p_sys->ti.pic_width, 255 ) );
+    assert( p_sys->ti.pic_y <= p_sys->ti.frame_height - p_sys->ti.pic_height);
+    assert( p_sys->ti.frame_height - p_sys->ti.pic_height - p_sys->ti.pic_y <= 255 );
 
     /* Sanity check that seems necessary for some corrupted files */
-    if( p_sys->ti.width < p_sys->ti.frame_width ||
-        p_sys->ti.height < p_sys->ti.frame_height )
+    if( p_sys->ti.frame_width < p_sys->ti.pic_width ||
+        p_sys->ti.frame_height < p_sys->ti.pic_height )
     {
         msg_Warn( p_dec, "trying to correct invalid theora header "
                   "(frame size (%dx%d) is smaller than frame content (%d,%d))",
-                  p_sys->ti.width, p_sys->ti.height,
-                  p_sys->ti.frame_width, p_sys->ti.frame_height );
+                  p_sys->ti.frame_width, p_sys->ti.frame_height,
+                  p_sys->ti.pic_width, p_sys->ti.pic_height );
 
-        if( p_sys->ti.width < p_sys->ti.frame_width )
-            p_sys->ti.width = p_sys->ti.frame_width;
-        if( p_sys->ti.height < p_sys->ti.frame_height )
-            p_sys->ti.height = p_sys->ti.frame_height;
+        if( p_sys->ti.frame_width < p_sys->ti.pic_width )
+          p_sys->ti.frame_width = p_sys->ti.pic_width;
+        if( p_sys->ti.frame_height < p_sys->ti.pic_height )
+            p_sys->ti.frame_height = p_sys->ti.pic_height;
     }
 
     /* The next packet in order is the comments header */
     oggpacket.b_o_s  = 0;
     oggpacket.bytes  = pi_size[1];
     oggpacket.packet = pp_data[1];
-    if( theora_decode_header( &p_sys->ti, &p_sys->tc, &oggpacket ) < 0 )
+
+    if( th_decode_headerin( &p_sys->ti, &p_sys->tc, &ts, &oggpacket ) < 0 )
     {
         msg_Err( p_dec, "2nd Theora header is corrupted" );
         goto error;
@@ -337,7 +356,7 @@ static int ProcessHeaders( decoder_t *p_dec )
     oggpacket.b_o_s  = 0;
     oggpacket.bytes  = pi_size[2];
     oggpacket.packet = pp_data[2];
-    if( theora_decode_header( &p_sys->ti, &p_sys->tc, &oggpacket ) < 0 )
+    if( th_decode_headerin( &p_sys->ti, &p_sys->tc, &ts, &oggpacket ) < 0 )
     {
         msg_Err( p_dec, "3rd Theora header is corrupted" );
         goto error;
@@ -346,7 +365,11 @@ static int ProcessHeaders( decoder_t *p_dec )
     if( !p_sys->b_packetizer )
     {
         /* We have all the headers, initialize decoder */
-        theora_decode_init( &p_sys->td, &p_sys->ti );
+        if ( ( p_sys->tcx = th_decode_alloc( &p_sys->ti, ts ) ) == NULL )
+        {
+            msg_Err( p_dec, "Could not allocate Theora decoder" );
+            goto error;
+        }
     }
     else
     {
@@ -359,11 +382,15 @@ static int ProcessHeaders( decoder_t *p_dec )
 
     for( unsigned i = 0; i < i_count; i++ )
         free( pp_data[i] );
+    /* Clean up the decoder setup info... we're done with it */
+    th_setup_free( ts );
     return VLC_SUCCESS;
 
 error:
     for( unsigned i = 0; i < i_count; i++ )
         free( pp_data[i] );
+    /* Clean up the decoder setup info... we're done with it */
+    th_setup_free( ts );
     return VLC_EGENERIC;
 }
 
@@ -423,9 +450,12 @@ static picture_t *DecodePacket( decoder_t *p_dec, ogg_packet *p_oggpacket )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     picture_t *p_pic;
-    yuv_buffer yuv;
+    th_ycbcr_buffer ycbcr;
 
-    theora_decode_packetin( &p_sys->td, p_oggpacket );
+    /* TODO: Implement _granpos (3rd parameter here) and add the
+     * call to TH_DECCTL_SET_GRANDPOS after seek */
+    if (th_decode_packetin( p_sys->tcx, p_oggpacket, NULL )) /* 0 on success */
+        return NULL; /* bad packet */
 
     /* Check for keyframe */
     if( !(p_oggpacket->packet[0] & 0x80) /* data packet */ &&
@@ -437,16 +467,17 @@ static picture_t *DecodePacket( decoder_t *p_dec, ogg_packet *p_oggpacket )
      * in the general case, but can happen if e.g. we play a network stream
      * using a timed URL, such that the server doesn't start the video with a
      * keyframe). */
-    if( p_sys->b_decoded_first_keyframe )
-        theora_decode_YUVout( &p_sys->td, &yuv );
-    else
+    if( !p_sys->b_decoded_first_keyframe )
+        return NULL; /* Wait until we've decoded the first keyframe */
+
+    if( th_decode_ycbcr_out( p_sys->tcx, ycbcr ) ) /* returns 0 on success */
         return NULL;
 
     /* Get a new picture */
     p_pic = decoder_NewPicture( p_dec );
     if( !p_pic ) return NULL;
 
-    theora_CopyPicture( p_pic, &yuv );
+    theora_CopyPicture( p_pic, ycbcr );
 
     p_pic->date = p_sys->i_pts;
 
@@ -460,12 +491,29 @@ static void ParseTheoraComments( decoder_t *p_dec )
 {
     char *psz_name, *psz_value, *psz_comment;
     int i = 0;
+    /* Regarding the th_comment structure: */
 
+    /* The metadata is stored as a series of (tag, value) pairs, in
+       length-encoded string vectors. The first occurrence of the '='
+       character delimits the tag and value. A particular tag may
+       occur more than once, and order is significant. The character
+       set encoding for the strings is always UTF-8, but the tag names
+       are limited to ASCII, and treated as case-insensitive. See the
+       Theora specification, Section 6.3.3 for details. */
+
+    /* In filling in this structure, th_decode_headerin() will
+       null-terminate the user_comment strings for safety. However,
+       the bitstream format itself treats them as 8-bit clean vectors,
+       possibly containing null characters, and so the length array
+       should be treated as their authoritative length. */
     while ( i < p_dec->p_sys->tc.comments )
     {
-        psz_comment = strdup( p_dec->p_sys->tc.user_comments[i] );
+        int clen = p_dec->p_sys->tc.comment_lengths[i];
+        if ( clen <= 0 || clen >= INT_MAX ) { i++; continue; }
+        psz_comment = (char *)malloc( clen + 1 );
         if( !psz_comment )
             break;
+        memcpy( (void*)psz_comment, (void*)p_dec->p_sys->tc.user_comments[i], clen + 1 );
         psz_name = psz_comment;
         psz_value = strchr( psz_comment, '=' );
         if( psz_value )
@@ -475,6 +523,8 @@ static void ParseTheoraComments( decoder_t *p_dec )
 
             if( !p_dec->p_description )
                 p_dec->p_description = vlc_meta_New();
+            /* TODO:  Since psz_value can contain NULLs see if there is an
+             * instance where we need to preserve the full length of this string */
             if( p_dec->p_description )
                 vlc_meta_AddExtra( p_dec->p_description, psz_name, psz_value );
         }
@@ -491,9 +541,10 @@ static void CloseDecoder( vlc_object_t *p_this )
     decoder_t *p_dec = (decoder_t *)p_this;
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    theora_info_clear( &p_sys->ti );
-    theora_comment_clear( &p_sys->tc );
-
+    th_info_clear(&p_sys->ti);
+    th_comment_clear(&p_sys->tc);
+    th_decode_free(p_sys->tcx);
+    p_sys->tcx = NULL;
     free( p_sys );
 }
 
@@ -502,22 +553,43 @@ static void CloseDecoder( vlc_object_t *p_this )
  *                     picture_t structure.
  *****************************************************************************/
 static void theora_CopyPicture( picture_t *p_pic,
-                                yuv_buffer *yuv )
+                                th_ycbcr_buffer ycbcr )
 {
-    int i_plane, i_line, i_dst_stride, i_src_stride;
+    int i_plane, i_planes, i_line, i_dst_stride, i_src_stride;
     uint8_t *p_dst, *p_src;
+    /* th_img_plane
+       int  width   The width of this plane.
+       int  height  The height of this plane.
+       int  stride  The offset in bytes between successive rows.
+       unsigned char *data  A pointer to the beginning of the first row.
 
-    for( i_plane = 0; i_plane < p_pic->i_planes; i_plane++ )
+       Detailed Description
+
+       A buffer for a single color plane in an uncompressed image.
+
+       This contains the image data in a left-to-right, top-down
+       format. Each row of pixels is stored contiguously in memory,
+       but successive rows need not be. Use stride to compute the
+       offset of the next row. The encoder accepts both positive
+       stride values (top-down in memory) and negative (bottom-up in
+       memory). The decoder currently always generates images with
+       positive strides.
+
+       typedef th_img_plane th_ycbcr_buffer[3]
+    */
+
+    i_planes = p_pic->i_planes < 3 ? p_pic->i_planes : 3;
+    for( i_plane = 0; i_plane < i_planes; i_plane++ )
     {
         p_dst = p_pic->p[i_plane].p_pixels;
-        p_src = i_plane ? (i_plane - 1 ? yuv->v : yuv->u ) : yuv->y;
+        p_src = ycbcr[i_plane].data;
         i_dst_stride  = p_pic->p[i_plane].i_pitch;
-        i_src_stride  = i_plane ? yuv->uv_stride : yuv->y_stride;
-
-        for( i_line = 0; i_line < p_pic->p[i_plane].i_lines; i_line++ )
+        i_src_stride  = ycbcr[i_plane].stride;
+        for( i_line = 0;
+             i_line < __MIN(p_pic->p[i_plane].i_lines, ycbcr[i_plane].height);
+             i_line++ )
         {
-            vlc_memcpy( p_dst, p_src,
-                        i_plane ? yuv->uv_width : yuv->y_width );
+            vlc_memcpy( p_dst, p_src, ycbcr[i_plane].width );
             p_src += i_src_stride;
             p_dst += i_dst_stride;
         }
@@ -537,10 +609,9 @@ struct encoder_sys_t
     /*
      * Theora properties
      */
-    theora_info      ti;                        /* theora bitstream settings */
-    theora_comment   tc;                            /* theora comment header */
-    theora_state     td;                   /* theora bitstream user comments */
-
+    th_info      ti;                     /* theora bitstream settings */
+    th_comment   tc;                     /* theora comment header */
+    th_enc_ctx   *tcx;                   /* theora context */
     int i_width, i_height;
 };
 
@@ -552,6 +623,11 @@ static int OpenEncoder( vlc_object_t *p_this )
     encoder_t *p_enc = (encoder_t *)p_this;
     encoder_sys_t *p_sys;
     int i_quality;
+    int t_flags;
+    int max_enc_level = 0;
+    int keyframe_freq_force = 64;
+    ogg_packet header;
+    int status;
 
     if( p_enc->fmt_out.i_codec != VLC_CODEC_THEORA &&
         !p_enc->b_force )
@@ -574,30 +650,30 @@ static int OpenEncoder( vlc_object_t *p_this )
     if( i_quality > 10 ) i_quality = 10;
     if( i_quality < 0 ) i_quality = 0;
 
-    theora_info_init( &p_sys->ti );
-
-    p_sys->ti.width = p_enc->fmt_in.video.i_width;
-    p_sys->ti.height = p_enc->fmt_in.video.i_height;
-
-    if( p_sys->ti.width % 16 || p_sys->ti.height % 16 )
-    {
-        /* Pictures from the transcoder should always have a pitch
-         * which is a multiple of 16 */
-        p_sys->ti.width = (p_sys->ti.width + 15) >> 4 << 4;
-        p_sys->ti.height = (p_sys->ti.height + 15) >> 4 << 4;
-
-        msg_Dbg( p_enc, "padding video from %dx%d to %dx%d",
-                 p_enc->fmt_in.video.i_width, p_enc->fmt_in.video.i_height,
-                 p_sys->ti.width, p_sys->ti.height );
-    }
+    th_info_init( &p_sys->ti );
 
     p_sys->ti.frame_width = p_enc->fmt_in.video.i_width;
     p_sys->ti.frame_height = p_enc->fmt_in.video.i_height;
-    p_sys->ti.offset_x = 0 /*frame_x_offset*/;
-    p_sys->ti.offset_y = 0 /*frame_y_offset*/;
 
-    p_sys->i_width = p_sys->ti.width;
-    p_sys->i_height = p_sys->ti.height;
+    if( p_sys->ti.frame_width % 16 || p_sys->ti.frame_height % 16 )
+    {
+        /* Pictures from the transcoder should always have a pitch
+         * which is a multiple of 16 */
+        p_sys->ti.frame_width = (p_sys->ti.frame_width + 15) >> 4 << 4;
+        p_sys->ti.frame_height = (p_sys->ti.frame_height + 15) >> 4 << 4;
+
+        msg_Dbg( p_enc, "padding video from %dx%d to %dx%d",
+                 p_enc->fmt_in.video.i_width, p_enc->fmt_in.video.i_height,
+                 p_sys->ti.frame_width, p_sys->ti.frame_height );
+    }
+
+    p_sys->ti.pic_width = p_enc->fmt_in.video.i_width;
+    p_sys->ti.pic_height = p_enc->fmt_in.video.i_height;
+    p_sys->ti.pic_x = 0 /*frame_x_offset*/;
+    p_sys->ti.pic_y = 0 /*frame_y_offset*/;
+
+    p_sys->i_width = p_sys->ti.frame_width;
+    p_sys->i_height = p_sys->ti.frame_height;
 
     if( !p_enc->fmt_in.video.i_frame_rate ||
         !p_enc->fmt_in.video.i_frame_rate_base )
@@ -629,6 +705,12 @@ static int OpenEncoder( vlc_object_t *p_this )
     p_sys->ti.target_bitrate = p_enc->fmt_out.i_bitrate;
     p_sys->ti.quality = ((float)i_quality) * 6.3;
 
+
+    p_sys->tcx = th_encode_alloc( &p_sys->ti );
+    th_comment_init( &p_sys->tc );
+
+    /* These are no longer supported here: */
+    /*
     p_sys->ti.dropframes_p = 0;
     p_sys->ti.quick_p = 1;
     p_sys->ti.keyframe_auto_p = 1;
@@ -638,22 +720,25 @@ static int OpenEncoder( vlc_object_t *p_this )
     p_sys->ti.keyframe_auto_threshold = 80;
     p_sys->ti.keyframe_mindistance = 8;
     p_sys->ti.noise_sensitivity = 1;
+    */
 
-    theora_encode_init( &p_sys->td, &p_sys->ti );
-    theora_comment_init( &p_sys->tc );
+    t_flags = TH_RATECTL_CAP_OVERFLOW; /* default is TH_RATECTL_CAP_OVERFLOW | TL_RATECTL_DROP_FRAMES */
+    /* Turn off dropframes */
+    th_encode_ctl( p_sys->tcx, TH_ENCCTL_SET_RATE_FLAGS, &t_flags, sizeof(t_flags) );
+
+    /* turn on fast encoding */
+    if ( !th_encode_ctl( p_sys->tcx, TH_ENCCTL_GET_SPLEVEL_MAX, &max_enc_level,
+                sizeof(max_enc_level) ) ) /* returns 0 on success */
+        th_encode_ctl( p_sys->tcx, TH_ENCCTL_SET_SPLEVEL, &max_enc_level, sizeof(max_enc_level) );
+
+    /* Set forced distance between key frames */
+    th_encode_ctl( p_sys->tcx, TH_ENCCTL_SET_KEYFRAME_FREQUENCY_FORCE,
+                   &keyframe_freq_force, sizeof(keyframe_freq_force) );
 
     /* Create and store headers */
-    for( int i = 0; i < 3; i++ )
+    while ( ( status = th_encode_flushheader( p_sys->tcx, &p_sys->tc, &header ) ) )
     {
-        ogg_packet header;
-
-        if( i == 0 )
-            theora_encode_header( &p_sys->td, &header );
-        else if( i == 1 )
-            theora_encode_comment( &p_sys->tc, &header );
-        else
-            theora_encode_tables( &p_sys->td, &header );
-
+        if ( status < 0 ) return VLC_EGENERIC;
         if( xiph_AppendHeaders( &p_enc->fmt_out.i_extra, &p_enc->fmt_out.p_extra,
                                 header.bytes, header.packet ) )
         {
@@ -674,7 +759,7 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pict )
     encoder_sys_t *p_sys = p_enc->p_sys;
     ogg_packet oggpacket;
     block_t *p_block;
-    yuv_buffer yuv;
+    th_ycbcr_buffer ycbcr;
     int i;
 
     if( !p_pict ) return NULL;
@@ -734,32 +819,35 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pict )
     /* Theora is a one-frame-in, one-frame-out system. Submit a frame
      * for compression and pull out the packet. */
 
-    yuv.y_width  = p_sys->i_width;
-    yuv.y_height = p_sys->i_height;
-    yuv.y_stride = p_pict->p[0].i_pitch;
+    ycbcr[0].width = p_sys->i_width;
+    ycbcr[0].height = p_sys->i_height;
+    ycbcr[0].stride = p_pict->p[0].i_pitch;
+    ycbcr[0].data = p_pict->p[0].p_pixels;
 
-    yuv.uv_width  = p_sys->i_width / 2;
-    yuv.uv_height = p_sys->i_height / 2;
-    yuv.uv_stride = p_pict->p[1].i_pitch;
+    ycbcr[1].width = p_sys->i_width / 2;
+    ycbcr[1].height = p_sys->i_height / 2;
+    ycbcr[1].stride = p_pict->p[1].i_pitch;
+    ycbcr[1].data = p_pict->p[1].p_pixels;
 
-    yuv.y = p_pict->p[0].p_pixels;
-    yuv.u = p_pict->p[1].p_pixels;
-    yuv.v = p_pict->p[2].p_pixels;
+    ycbcr[2].width = p_sys->i_width / 2;
+    ycbcr[2].height = p_sys->i_height / 2;
+    ycbcr[2].stride = p_pict->p[1].i_pitch;
+    ycbcr[2].data = p_pict->p[2].p_pixels;
 
-    if( theora_encode_YUVin( &p_sys->td, &yuv ) < 0 )
+    if( th_encode_ycbcr_in( p_sys->tcx, ycbcr ) < 0 )
     {
         msg_Warn( p_enc, "failed encoding a frame" );
         return NULL;
     }
 
-    theora_encode_packetout( &p_sys->td, 0, &oggpacket );
+    th_encode_packetout( p_sys->tcx, 0, &oggpacket );
 
     /* Ogg packet to block */
     p_block = block_New( p_enc, oggpacket.bytes );
     memcpy( p_block->p_buffer, oggpacket.packet, oggpacket.bytes );
     p_block->i_dts = p_block->i_pts = p_pict->date;
 
-    if( theora_packet_iskeyframe( &oggpacket ) )
+    if( th_packet_iskeyframe( &oggpacket ) )
     {
         p_block->i_flags |= BLOCK_FLAG_TYPE_I;
     }
@@ -775,8 +863,9 @@ static void CloseEncoder( vlc_object_t *p_this )
     encoder_t *p_enc = (encoder_t *)p_this;
     encoder_sys_t *p_sys = p_enc->p_sys;
 
-    theora_info_clear( &p_sys->ti );
-    theora_comment_clear( &p_sys->tc );
-
+    th_info_clear(&p_sys->ti);
+    th_comment_clear(&p_sys->tc);
+    th_encode_free(p_sys->tcx);
+    p_sys->tcx = NULL;
     free( p_sys );
 }
