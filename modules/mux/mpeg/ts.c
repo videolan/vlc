@@ -903,6 +903,26 @@ static int Control( sout_mux_t *p_mux, int i_query, va_list args )
     }
 }
 
+/* returns a pointer to a valid string, with length 0 or 3 */
+static const char *GetIso639_2LangCode(const char *lang)
+{
+    const iso639_lang_t *pl;
+
+    if (strlen(lang) == 2)
+    {
+        pl = GetLang_1(lang);
+    }
+    else
+    {
+        pl = GetLang_2B(lang);      /* try native code first */
+        if (!*pl->psz_iso639_2T)
+            pl = GetLang_2T(lang);  /* else fallback to english code */
+
+    }
+
+    return pl->psz_iso639_2T;   /* returns the english code */
+}
+
 /*****************************************************************************
  * AddStream: called for each stream addition
  *****************************************************************************/
@@ -1029,72 +1049,26 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     }
 
     p_stream->i_langs = 1+p_input->p_fmt->i_extra_languages;
-    p_stream->lang = malloc(p_stream->i_langs*3);
+    p_stream->lang = calloc(1, p_stream->i_langs*3);
     if( !p_stream->lang )
     {
         free( p_stream );
         return VLC_ENOMEM;
     }
 
-    p_stream->lang[0] =
-    p_stream->lang[1] =
-    p_stream->lang[2] = '\0';
-    if( p_input->p_fmt->psz_language )
-    {
-        char *psz = p_input->p_fmt->psz_language;
-        const iso639_lang_t *pl = NULL;
+    for (int i = 0; i < p_stream->i_langs; i++) {
+        char *lang = (i == 0)
+            ? p_input->p_fmt->psz_language
+            : p_input->p_fmt->p_extra_languages[i-1].psz_language;
 
-        if( strlen( psz ) == 2 )
-        {
-            pl = GetLang_1( psz );
-        }
-        else if( strlen( psz ) == 3 )
-        {
-            pl = GetLang_2B( psz );
-            if( !strcmp( pl->psz_iso639_1, "??" ) )
-            {
-                pl = GetLang_2T( psz );
-            }
-        }
-        if( pl && strcmp( pl->psz_iso639_1, "??" ) )
-        {
-            p_stream->lang[0] = pl->psz_iso639_2T[0];
-            p_stream->lang[1] = pl->psz_iso639_2T[1];
-            p_stream->lang[2] = pl->psz_iso639_2T[2];
-
-            msg_Dbg( p_mux, "    - lang=%c%c%c",
-                     p_stream->lang[0], p_stream->lang[1],
-                     p_stream->lang[2] );
-        }
-    }
-    for (int i = 1; i < p_stream->i_langs; i++) {
-        char *psz = p_input->p_fmt->p_extra_languages[i-1].psz_language;
-        if (!psz)
+        if (!lang)
             continue;
 
-        const iso639_lang_t *pl = NULL;
-
-        if( strlen( psz ) == 2 )
+        const char *code = GetIso639_2LangCode(lang);
+        if (*code)
         {
-            pl = GetLang_1( psz );
-        }
-        else if( strlen( psz ) == 3 )
-        {
-            pl = GetLang_2B( psz );
-            if( !strcmp( pl->psz_iso639_1, "??" ) )
-            {
-                pl = GetLang_2T( psz );
-            }
-        }
-        if( pl && strcmp( pl->psz_iso639_1, "??" ) )
-        {
-            p_stream->lang[i*3+0] = pl->psz_iso639_2T[0];
-            p_stream->lang[i*3+1] = pl->psz_iso639_2T[1];
-            p_stream->lang[i*3+2] = pl->psz_iso639_2T[2];
-
-            msg_Dbg( p_mux, "    - lang=%c%c%c",
-                     p_stream->lang[i*3+0], p_stream->lang[i*3+1],
-                     p_stream->lang[i*3+2] );
+            memcpy(&p_stream->lang[i*3], code, 3);
+            msg_Dbg( p_mux, "    - lang=%3.3s", &p_stream->lang[i*3] );
         }
     }
 
