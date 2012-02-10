@@ -339,8 +339,8 @@ typedef struct ts_stream_t
     /* Specific to mpeg4 in mpeg2ts */
     int             i_es_id;
 
-    int             i_decoder_specific_info;
-    uint8_t         *p_decoder_specific_info;
+    int             i_extra;
+    uint8_t         *p_extra;
 
     /* language is iso639-2T */
     int             i_langs;
@@ -917,25 +917,20 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     sout_mux_sys_t      *p_sys = p_mux->p_sys;
     ts_stream_t         *p_stream;
 
-    p_input->p_sys = p_stream = malloc( sizeof( ts_stream_t ) );
+    p_input->p_sys = p_stream = calloc( 1, sizeof( ts_stream_t ) );
     if( !p_input->p_sys )
         return VLC_ENOMEM;
 
-    /* Init this new stream */
     if ( p_sys->b_es_id_pid )
         p_stream->i_pid = p_input->p_fmt->i_id & 0x1fff;
     else
         p_stream->i_pid = AllocatePID( p_sys, p_input->p_fmt->i_cat );
+
     p_stream->i_codec = p_input->p_fmt->i_codec;
-    p_stream->i_continuity_counter    = 0;
-    p_stream->b_discontinuity         = false;
-    p_stream->i_decoder_specific_info = 0;
-    p_stream->p_decoder_specific_info = NULL;
 
     msg_Dbg( p_mux, "adding input codec=%4.4s pid=%d",
-             (char*)&p_input->p_fmt->i_codec, p_stream->i_pid );
+             (char*)&p_stream->i_codec, p_stream->i_pid );
 
-    /* All others fields depand on codec */
     switch( p_input->p_fmt->i_cat )
     {
     case VIDEO_ES:
@@ -1060,7 +1055,6 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     p_stream->lang = malloc(p_stream->i_langs*3);
     if( !p_stream->lang )
     {
-        p_stream->i_langs = 0;
         free( p_stream );
         return VLC_ENOMEM;
     }
@@ -1130,13 +1124,11 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     /* Create decoder specific info for subt */
     if( p_stream->i_codec == VLC_CODEC_SUBT )
     {
-        uint8_t *p;
-
-        p_stream->i_decoder_specific_info = 55;
-        p_stream->p_decoder_specific_info = p =
-            malloc( p_stream->i_decoder_specific_info );
-        if( p )
+        p_stream->i_extra = 55;
+        p_stream->p_extra = malloc( p_stream->i_extra );
+        if( p_stream->p_extra )
         {
+            uint8_t *p = p_stream->p_extra;
             p[0] = 0x10;    /* textFormat, 0x10 for 3GPP TS 26.245 */
             p[1] = 0x00;    /* flags: 1b: associated video info flag
                                     3b: reserved
@@ -1175,32 +1167,29 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
             *p++ = 9;                       /* font name length */
             memcpy( p, "Helvetica", 9 );    /* font name */
         }
-        else p_stream->i_decoder_specific_info = 0;
+        else
+            p_stream->i_extra = 0;
     }
     else
     {
         /* Copy extra data (VOL for MPEG-4 and extra BitMapInfoHeader for VFW */
-        p_stream->i_decoder_specific_info = p_input->p_fmt->i_extra;
-        if( p_stream->i_decoder_specific_info > 0 )
+        p_stream->i_extra = p_input->p_fmt->i_extra;
+        if( p_stream->i_extra > 0 )
         {
-            p_stream->p_decoder_specific_info =
-                malloc( p_stream->i_decoder_specific_info );
-            if( p_stream->p_decoder_specific_info )
+            p_stream->p_extra = malloc( p_stream->i_extra );
+            if( p_stream->p_extra )
             {
-                memcpy( p_stream->p_decoder_specific_info,
+                memcpy( p_stream->p_extra,
                         p_input->p_fmt->p_extra,
                         p_input->p_fmt->i_extra );
             }
-            else p_stream->i_decoder_specific_info = 0;
+            else
+                p_stream->i_extra = 0;
         }
     }
 
     /* Init pes chain */
     BufferChainInit( &p_stream->chain_pes );
-    p_stream->i_pes_dts    = 0;
-    p_stream->i_pes_length = 0;
-    p_stream->i_pes_used   = 0;
-    p_stream->b_key_frame  = 0;
 
     /* We only change PMT version (PAT isn't changed) */
     p_sys->i_pmt_version_number = ( p_sys->i_pmt_version_number + 1 )%32;
@@ -1273,7 +1262,7 @@ static int DelStream( sout_mux_t *p_mux, sout_input_t *p_input )
     BufferChainClean( &p_stream->chain_pes );
 
     free(p_stream->lang);
-    free( p_stream->p_decoder_specific_info );
+    free( p_stream->p_extra );
     if( p_stream->i_stream_id == 0xfa ||
         p_stream->i_stream_id == 0xfb ||
         p_stream->i_stream_id == 0xfe )
@@ -2390,17 +2379,17 @@ static void GetPMT( sout_mux_t *p_mux, sout_buffer_chain_t *c )
                 bits_write( &bits, 32,  0x7fffffff );   /* maxBitrate */
                 bits_write( &bits, 32,  0 );            /* avgBitrate */
 
-                if( p_stream->i_decoder_specific_info > 0 )
+                if( p_stream->i_extra > 0 )
                 {
                     /* DecoderSpecificInfo */
                     bits_align( &bits );
                     bits_write( &bits, 8,   0x05 ); /* tag */
                     bits_write( &bits, 24, GetDescriptorLength24b(
-                                p_stream->i_decoder_specific_info ) );
-                    for (int i = 0; i < p_stream->i_decoder_specific_info; i++ )
+                                p_stream->i_extra ) );
+                    for (int i = 0; i < p_stream->i_extra; i++ )
                     {
                         bits_write( &bits, 8,
-                            ((uint8_t*)p_stream->p_decoder_specific_info)[i] );
+                            ((uint8_t*)p_stream->p_extra)[i] );
                     }
                 }
                 /* fix Decoder length */
@@ -2466,7 +2455,7 @@ static void GetPMT( sout_mux_t *p_mux, sout_buffer_chain_t *c )
         else if( p_stream->i_stream_type == 0xa0 )
         {
             uint8_t data[512];
-            int i_extra = __MIN( p_stream->i_decoder_specific_info, 502 );
+            int i_extra = __MIN( p_stream->i_extra, 502 );
 
             /* private DIV3 descripor */
             memcpy( &data[0], &p_stream->i_bih_codec, 4 );
@@ -2478,7 +2467,7 @@ static void GetPMT( sout_mux_t *p_mux, sout_buffer_chain_t *c )
             data[9] = ( i_extra      )&0xff;
             if( i_extra > 0 )
             {
-                memcpy( &data[10], p_stream->p_decoder_specific_info, i_extra );
+                memcpy( &data[10], p_stream->p_extra, i_extra );
             }
 
             /* 0xa0 is private */
@@ -2513,23 +2502,23 @@ static void GetPMT( sout_mux_t *p_mux, sout_buffer_chain_t *c )
         }
         else if( p_stream->i_codec == VLC_CODEC_TELETEXT )
         {
-            if( p_stream->i_decoder_specific_info )
+            if( p_stream->i_extra )
             {
                 dvbpsi_PMTESAddDescriptor( p_es, 0x56,
-                                           p_stream->i_decoder_specific_info,
-                                           p_stream->p_decoder_specific_info );
+                                           p_stream->i_extra,
+                                           p_stream->p_extra );
             }
             continue;
         }
         else if( p_stream->i_codec == VLC_CODEC_DVBS )
         {
             /* DVB subtitles */
-            if( p_stream->i_decoder_specific_info )
+            if( p_stream->i_extra )
             {
                 /* pass-through from the TS demux */
                 dvbpsi_PMTESAddDescriptor( p_es, 0x59,
-                                           p_stream->i_decoder_specific_info,
-                                           p_stream->p_decoder_specific_info );
+                                           p_stream->i_extra,
+                                           p_stream->p_extra );
             }
             else
             {
