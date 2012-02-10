@@ -471,6 +471,58 @@ static void TSSetPCR( block_t *p_ts, mtime_t i_dts );
 
 static void PEStoTS  ( sout_instance_t *, sout_buffer_chain_t *, block_t *, ts_stream_t * );
 
+static csa_t *csaSetup( vlc_object_t *p_this )
+{
+    sout_mux_t *p_mux = (sout_mux_t*)p_this;
+    sout_mux_sys_t *p_sys = p_mux->p_sys;
+    char *csack = var_CreateGetNonEmptyStringCommand( p_mux, SOUT_CFG_PREFIX "csa-ck" );
+    if( !csack )
+        return NULL;
+
+    csa_t *csa = csa_New();
+
+    if( csa_SetCW( p_this, csa, csack, true ) )
+    {
+        free(csack);
+        csa_Delete( csa );
+        return NULL;
+    }
+
+    vlc_mutex_init( &p_sys->csa_lock );
+    p_sys->b_crypt_audio = var_GetBool( p_mux, SOUT_CFG_PREFIX "crypt-audio" );
+    p_sys->b_crypt_video = var_GetBool( p_mux, SOUT_CFG_PREFIX "crypt-video" );
+
+    char *csa2ck = var_CreateGetNonEmptyStringCommand( p_mux, SOUT_CFG_PREFIX "csa2-ck");
+    if (!csa2ck || csa_SetCW( p_this, p_sys->csa, csa2ck, false ) )
+        csa_SetCW( p_this, p_sys->csa, csack, false );
+    free(csa2ck);
+
+    var_Create( p_mux, SOUT_CFG_PREFIX "csa-use", VLC_VAR_STRING | VLC_VAR_DOINHERIT | VLC_VAR_ISCOMMAND );
+    var_AddCallback( p_mux, SOUT_CFG_PREFIX "csa-use", ActiveKeyCallback, NULL );
+    var_AddCallback( p_mux, SOUT_CFG_PREFIX "csa-ck", ChangeKeyCallback, (void *)1 );
+    var_AddCallback( p_mux, SOUT_CFG_PREFIX "csa2-ck", ChangeKeyCallback, NULL );
+
+    vlc_value_t use_val;
+    var_Get( p_mux, SOUT_CFG_PREFIX "csa-use", &use_val );
+    if ( var_Set( p_mux, SOUT_CFG_PREFIX "csa-use", use_val ) )
+        var_SetString( p_mux, SOUT_CFG_PREFIX "csa-use", "odd" );
+    free( use_val.psz_string );
+
+    p_sys->i_csa_pkt_size = var_GetInteger( p_mux, SOUT_CFG_PREFIX "csa-pkt" );
+    if( p_sys->i_csa_pkt_size < 12 || p_sys->i_csa_pkt_size > 188 )
+    {
+        msg_Err( p_mux, "wrong packet size %d specified",
+            p_sys->i_csa_pkt_size );
+        p_sys->i_csa_pkt_size = 188;
+    }
+
+    msg_Dbg( p_mux, "encrypting %d bytes of packet", p_sys->i_csa_pkt_size );
+
+    free(csack);
+
+    return csa;
+}
+
 /*****************************************************************************
  * Open:
  *****************************************************************************/
@@ -488,8 +540,6 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_num_pmt = 1;
     p_sys->dvbpmt = NULL;
     memset( &p_sys->pmtmap, 0, sizeof(p_sys->pmtmap) );
-
-    vlc_mutex_init( &p_sys->csa_lock );
 
     p_mux->pf_control   = Control;
     p_mux->pf_addstream = AddStream;
@@ -739,56 +789,9 @@ static int Open( vlc_object_t *p_this )
     p_sys->b_use_key_frames = var_GetBool( p_mux, SOUT_CFG_PREFIX "use-key-frames" );
 
     /* for TS generation */
-    p_sys->i_pcr    = 0;
+    p_sys->i_pcr = 0;
 
-    p_sys->csa      = NULL;
-    char *csack = var_CreateGetNonEmptyStringCommand( p_mux, SOUT_CFG_PREFIX "csa-ck" );
-    if( csack )
-    {
-        p_sys->csa = csa_New();
-
-        if( !csa_SetCW( p_this, p_sys->csa, csack, true ) )
-        {
-            char *csa2ck = var_CreateGetNonEmptyStringCommand( p_mux, SOUT_CFG_PREFIX "csa2-ck");
-            if (!csa2ck || csa_SetCW( p_this, p_sys->csa, csa2ck, false ) )
-                csa_SetCW( p_this, p_sys->csa, csack, false );
-            free(csa2ck);
-
-            vlc_value_t use_val;
-
-            var_Create( p_mux, SOUT_CFG_PREFIX "csa-use", VLC_VAR_STRING | VLC_VAR_DOINHERIT | VLC_VAR_ISCOMMAND );
-            var_Get( p_mux, SOUT_CFG_PREFIX "csa-use", &use_val );
-            var_AddCallback( p_mux, SOUT_CFG_PREFIX "csa-use", ActiveKeyCallback, NULL );
-            var_AddCallback( p_mux, SOUT_CFG_PREFIX "csa-ck", ChangeKeyCallback, (void *)1 );
-            var_AddCallback( p_mux, SOUT_CFG_PREFIX "csa2-ck", ChangeKeyCallback, NULL );
-
-            if ( var_Set( p_mux, SOUT_CFG_PREFIX "csa-use", use_val ) != VLC_SUCCESS )
-            {
-                var_SetString( p_mux, SOUT_CFG_PREFIX "csa-use", "odd" );
-            }
-            free( use_val.psz_string );
-
-            p_sys->i_csa_pkt_size = var_GetInteger( p_mux, SOUT_CFG_PREFIX "csa-pkt" );
-            if( p_sys->i_csa_pkt_size < 12 || p_sys->i_csa_pkt_size > 188 )
-            {
-                msg_Err( p_mux, "wrong packet size %d specified",
-                    p_sys->i_csa_pkt_size );
-                p_sys->i_csa_pkt_size = 188;
-            }
-            msg_Dbg( p_mux, "encrypting %d bytes of packet",
-                p_sys->i_csa_pkt_size );
-        }
-        else
-        {
-            csa_Delete( p_sys->csa );
-            p_sys->csa = NULL;
-        }
-        free(csack);
-    }
-
-    p_sys->b_crypt_audio = var_GetBool( p_mux, SOUT_CFG_PREFIX "crypt-audio" );
-
-    p_sys->b_crypt_video = var_GetBool( p_mux, SOUT_CFG_PREFIX "crypt-video" );
+    p_sys->csa = csaSetup(p_this);
 
     return VLC_SUCCESS;
 }
@@ -807,6 +810,7 @@ static void Close( vlc_object_t * p_this )
         var_DelCallback( p_mux, SOUT_CFG_PREFIX "csa2-ck", ChangeKeyCallback, NULL );
         var_DelCallback( p_mux, SOUT_CFG_PREFIX "csa-use", ActiveKeyCallback, NULL );
         csa_Delete( p_sys->csa );
+        vlc_mutex_destroy( &p_sys->csa_lock );
     }
 
     for (int i = 0; i < MAX_PMT; i++ )
@@ -815,7 +819,6 @@ static void Close( vlc_object_t * p_this )
         free( p_sys->sdt_descriptors[i].psz_provider );
     }
 
-    vlc_mutex_destroy( &p_sys->csa_lock );
     free( p_sys->dvbpmt );
     free( p_sys );
 }
