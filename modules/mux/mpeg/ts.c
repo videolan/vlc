@@ -681,7 +681,7 @@ static int Open( vlc_object_t *p_this )
     if( !val.i_int ) /* Does this make any sense? */
         val.i_int = 0x42;
     for (int i = 0; i < p_sys->i_num_pmt; i++ )
-        p_sys->pmt[i].i_pid = val.i_int + i; 
+        p_sys->pmt[i].i_pid = val.i_int + i;
 
     p_sys->i_pid_free = p_sys->pmt[p_sys->i_num_pmt - 1].i_pid + 1;
 
@@ -1019,8 +1019,8 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
         return VLC_EGENERIC;
     }
 
-    p_stream->i_langs = 1+p_input->p_fmt->i_extra_languages;
-    p_stream->lang = calloc(1, p_stream->i_langs*3);
+    p_stream->i_langs = 1 + p_input->p_fmt->i_extra_languages;
+    p_stream->lang = calloc(1, p_stream->i_langs * 4);
     if( !p_stream->lang )
     {
         free( p_stream );
@@ -1041,8 +1041,9 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
         const char *code = GetIso639_2LangCode(lang);
         if (*code)
         {
-            memcpy(&p_stream->lang[i*3], code, 3);
-            msg_Dbg( p_mux, "    - lang=%3.3s", &p_stream->lang[i*3] );
+            memcpy(&p_stream->lang[i*4], code, 3);
+            p_stream->lang[i*4+3] = 0x00; /* audio type: 0x00 undefined */
+            msg_Dbg( p_mux, "    - lang=%3.3s", &p_stream->lang[i*4] );
         }
     }
 
@@ -1256,9 +1257,9 @@ static bool MuxStreams(sout_mux_t *p_mux )
             p_input = p_mux->pp_inputs[i];
         ts_stream_t *p_stream = (ts_stream_t*)p_input->p_sys;
 
-        if( ( p_stream != p_pcr_stream || 
+        if( ( p_stream != p_pcr_stream ||
               p_stream->i_pes_length >= i_shaping_delay ) &&
-            p_stream->i_pes_dts + p_stream->i_pes_length >= 
+            p_stream->i_pes_dts + p_stream->i_pes_length >=
             p_pcr_stream->i_pes_dts + p_pcr_stream->i_pes_length )
             continue;
 
@@ -2397,20 +2398,10 @@ static void GetPMT( sout_mux_t *p_mux, sout_buffer_chain_t *c )
             continue;
         }
 
-        if( p_stream->lang[0] != 0 )
+        if( p_stream->i_langs )
         {
-            uint8_t data[4*p_stream->i_langs];
-
-            /* I construct the content myself, way faster than looking at
-             * over complicated/mind broken libdvbpsi way */
-            for (int i = 0; i < p_stream->i_langs; i++ )
-            {
-                data[i*4+0] = p_stream->lang[i*3+0];
-                data[i*4+1] = p_stream->lang[i*3+1];
-                data[i*4+2] = p_stream->lang[i*3+2];
-                data[i*4+3] = 0x00; /* audio type: 0x00 undefined */
-            }
-            dvbpsi_PMTESAddDescriptor( p_es, 0x0a, 4*p_stream->i_langs, data );
+            dvbpsi_PMTESAddDescriptor( p_es, 0x0a, 4*p_stream->i_langs,
+                p_stream->lang);
         }
     }
 
