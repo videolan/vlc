@@ -478,7 +478,6 @@ static int Open( vlc_object_t *p_this )
 {
     sout_mux_t          *p_mux =(sout_mux_t*)p_this;
     sout_mux_sys_t      *p_sys = NULL;
-    vlc_value_t         val;
 
     config_ChainParse( p_mux, SOUT_CFG_PREFIX, ppsz_sout_options, p_mux->p_cfg );
 
@@ -508,15 +507,15 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->b_es_id_pid = var_GetBool( p_mux, SOUT_CFG_PREFIX "es-id-pid" );
 
-    var_Get( p_mux, SOUT_CFG_PREFIX "muxpmt", &val );
     /*
        fetch string of pmts. Here's a sample: --sout-ts-muxpmt="0x451,0x200,0x28a,0x240,,0x450,0x201,0x28b,0x241,,0x452,0x202,0x28c,0x242"
        This would mean 0x451, 0x200, 0x28a, 0x240 would fall under one pmt (program), 0x450,0x201,0x28b,0x241 would fall under another
     */
-    if( val.psz_string != NULL && *val.psz_string )
+    char *muxpmt = var_GetNonEmptyString(p_mux, SOUT_CFG_PREFIX "muxpmt");
+    if( muxpmt )
     {
         char *psz_next;
-        char *psz = val.psz_string;
+        char *psz = muxpmt;
         uint16_t i_pid;
         psz_next = psz;
 
@@ -556,8 +555,8 @@ static int Open( vlc_object_t *p_this )
             if ( !*psz_next )
                 psz = NULL;
         }
+        free(muxpmt);
     }
-    free( val.psz_string );
 
     unsigned short subi[3];
     vlc_rand_bytes(subi, sizeof(subi));
@@ -566,6 +565,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->pat.i_continuity_counter = 0;
     p_sys->pat.b_discontinuity = false;
 
+    vlc_value_t val;
     var_Get( p_mux, SOUT_CFG_PREFIX "tsid", &val );
     if ( val.i_int )
         p_sys->i_tsid = val.i_int;
@@ -589,15 +589,14 @@ static int Open( vlc_object_t *p_this )
     p_sys->sdt.i_continuity_counter = 0;
     p_sys->sdt.b_discontinuity = false;
 
-    var_Get( p_mux, SOUT_CFG_PREFIX "sdtdesc", &val );
-    p_sys->b_sdt = val.psz_string && *val.psz_string ? true : false;
+    char *sdtdesc = var_GetNonEmptyString( p_mux, SOUT_CFG_PREFIX "sdtdesc" );
 
     /* Syntax is provider_sdt1,service_name_sdt1,provider_sdt2,service_name_sdt2... */
-    if( p_sys->b_sdt )
+    if( sdtdesc )
     {
+        p_sys->b_sdt = true;
 
-        char *psz = val.psz_string;
-        char *psz_sdttoken = psz;
+        char *psz_sdttoken = sdtdesc;
 
         for (int i = 0; psz_sdttoken; i++)
         {
@@ -619,15 +618,15 @@ static int Open( vlc_object_t *p_this )
 
             psz_sdttoken = psz_end;
         }
+        free(sdtdesc);
     }
-    free( val.psz_string );
 
     p_sys->b_data_alignment = var_GetBool( p_mux, SOUT_CFG_PREFIX "alignment" );
 
-    var_Get( p_mux, SOUT_CFG_PREFIX "program-pmt", &val );
-    if( val.psz_string && *val.psz_string )
+    char *pgrpmt = var_GetNonEmptyString( p_mux, SOUT_CFG_PREFIX "program-pmt" );
+    if( pgrpmt )
     {
-        char *psz = val.psz_string;
+        char *psz = pgrpmt;
         char *psz_next = psz;
 
         for (int i = 0; psz; )
@@ -649,6 +648,7 @@ static int Open( vlc_object_t *p_this )
                 i++;
             }
         }
+        free(pgrpmt);
     }
     else
     {
@@ -656,19 +656,12 @@ static int Open( vlc_object_t *p_this )
         for (int i = 0; i < p_sys->i_num_pmt; i++ )
             p_sys->i_pmt_program_number[i] = i + 1;
     }
-    free( val.psz_string );
 
     var_Get( p_mux, SOUT_CFG_PREFIX "pid-pmt", &val );
-    if( val.i_int )
-    {
-        for (int i = 0; i < p_sys->i_num_pmt; i++ )
-            p_sys->pmt[i].i_pid = val.i_int + i; /* Does this make any sense? */
-    }
-    else
-    {
-        for (int i = 0; i < p_sys->i_num_pmt; i++ )
-            p_sys->pmt[i].i_pid = 0x42 + i;
-    }
+    if( !val.i_int ) /* Does this make any sense? */
+        val.i_int = 0x42;
+    for (int i = 0; i < p_sys->i_num_pmt; i++ )
+        p_sys->pmt[i].i_pid = val.i_int + i; 
 
     p_sys->i_pid_free = p_sys->pmt[p_sys->i_num_pmt - 1].i_pid + 1;
 
@@ -717,7 +710,7 @@ static int Open( vlc_object_t *p_this )
     }
 
     var_Get( p_mux, SOUT_CFG_PREFIX "shaping", &val );
-    p_sys->i_shaping_delay = (int64_t)val.i_int * 1000;
+    p_sys->i_shaping_delay = val.i_int * 1000;
     if( p_sys->i_shaping_delay <= 0 )
     {
         msg_Err( p_mux,
@@ -727,7 +720,7 @@ static int Open( vlc_object_t *p_this )
     }
 
     var_Get( p_mux, SOUT_CFG_PREFIX "pcr", &val );
-    p_sys->i_pcr_delay = (int64_t)val.i_int * 1000;
+    p_sys->i_pcr_delay = val.i_int * 1000;
     if( p_sys->i_pcr_delay <= 0 ||
         p_sys->i_pcr_delay >= p_sys->i_shaping_delay )
     {
@@ -738,7 +731,7 @@ static int Open( vlc_object_t *p_this )
     }
 
     var_Get( p_mux, SOUT_CFG_PREFIX "dts-delay", &val );
-    p_sys->i_dts_delay = (int64_t)val.i_int * 1000;
+    p_sys->i_dts_delay = val.i_int * 1000;
 
     msg_Dbg( p_mux, "shaping=%"PRId64" pcr=%"PRId64" dts_delay=%"PRId64,
              p_sys->i_shaping_delay, p_sys->i_pcr_delay, p_sys->i_dts_delay );
@@ -749,38 +742,19 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_pcr    = 0;
 
     p_sys->csa      = NULL;
-    var_Create( p_mux, SOUT_CFG_PREFIX "csa-ck", VLC_VAR_STRING | VLC_VAR_DOINHERIT | VLC_VAR_ISCOMMAND );
-    var_Get( p_mux, SOUT_CFG_PREFIX "csa-ck", &val );
-    if( val.psz_string && *val.psz_string )
+    char *csack = var_CreateGetNonEmptyStringCommand( p_mux, SOUT_CFG_PREFIX "csa-ck" );
+    if( csack )
     {
-        int i_res;
-        vlc_value_t csa2;
-
         p_sys->csa = csa_New();
 
-        var_Create( p_mux, SOUT_CFG_PREFIX "csa2-ck", VLC_VAR_STRING | VLC_VAR_DOINHERIT | VLC_VAR_ISCOMMAND );
-        var_Get( p_mux, SOUT_CFG_PREFIX "csa2-ck", &csa2 );
-        i_res = csa_SetCW( (vlc_object_t*)p_mux, p_sys->csa, val.psz_string, true );
-        if( i_res == VLC_SUCCESS && csa2.psz_string && *csa2.psz_string )
+        if( !csa_SetCW( p_this, p_sys->csa, csack, true ) )
         {
-            if( csa_SetCW( (vlc_object_t*)p_mux, p_sys->csa, csa2.psz_string, false ) != VLC_SUCCESS )
-            {
-                csa_SetCW( (vlc_object_t*)p_mux, p_sys->csa, val.psz_string, false );
-            }
-        }
-        else if( i_res == VLC_SUCCESS )
-        {
-            csa_SetCW( (vlc_object_t*)p_mux, p_sys->csa, val.psz_string, false );
-        }
-        else
-        {
-            csa_Delete( p_sys->csa );
-            p_sys->csa = NULL;
-        }
+            char *csa2ck = var_CreateGetNonEmptyStringCommand( p_mux, SOUT_CFG_PREFIX "csa2-ck");
+            if (!csa2ck || csa_SetCW( p_this, p_sys->csa, csa2ck, false ) )
+                csa_SetCW( p_this, p_sys->csa, csack, false );
+            free(csa2ck);
 
-        if( p_sys->csa )
-        {
-            vlc_value_t use_val, pkt_val;
+            vlc_value_t use_val;
 
             var_Create( p_mux, SOUT_CFG_PREFIX "csa-use", VLC_VAR_STRING | VLC_VAR_DOINHERIT | VLC_VAR_ISCOMMAND );
             var_Get( p_mux, SOUT_CFG_PREFIX "csa-use", &use_val );
@@ -794,20 +768,23 @@ static int Open( vlc_object_t *p_this )
             }
             free( use_val.psz_string );
 
-            var_Get( p_mux, SOUT_CFG_PREFIX "csa-pkt", &pkt_val );
-            if( pkt_val.i_int < 12 || pkt_val.i_int > 188 )
+            p_sys->i_csa_pkt_size = var_GetInteger( p_mux, SOUT_CFG_PREFIX "csa-pkt" );
+            if( p_sys->i_csa_pkt_size < 12 || p_sys->i_csa_pkt_size > 188 )
             {
-                msg_Err( p_mux, "wrong packet size %"PRId64" specified.",
-                         pkt_val.i_int );
-                msg_Warn( p_mux, "using default packet size of 188 bytes" );
+                msg_Err( p_mux, "wrong packet size %d specified",
+                    p_sys->i_csa_pkt_size );
                 p_sys->i_csa_pkt_size = 188;
             }
-            else p_sys->i_csa_pkt_size = pkt_val.i_int;
-            msg_Dbg( p_mux, "encrypting %d bytes of packet", p_sys->i_csa_pkt_size );
+            msg_Dbg( p_mux, "encrypting %d bytes of packet",
+                p_sys->i_csa_pkt_size );
         }
-        free( csa2.psz_string );
+        else
+        {
+            csa_Delete( p_sys->csa );
+            p_sys->csa = NULL;
+        }
+        free(csack);
     }
-    free( val.psz_string );
 
     p_sys->b_crypt_audio = var_GetBool( p_mux, SOUT_CFG_PREFIX "crypt-audio" );
 
@@ -1253,10 +1230,9 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
 static int DelStream( sout_mux_t *p_mux, sout_input_t *p_input )
 {
     sout_mux_sys_t  *p_sys = p_mux->p_sys;
-    ts_stream_t     *p_stream;
-    vlc_value_t     val;
+    ts_stream_t     *p_stream = (ts_stream_t*)p_input->p_sys;
+    int              pid;
 
-    p_stream = (ts_stream_t*)p_input->p_sys;
     msg_Dbg( p_mux, "removing input pid=%d", p_stream->i_pid );
 
     if( p_sys->i_pcr_pid == p_stream->i_pid )
@@ -1306,40 +1282,30 @@ static int DelStream( sout_mux_t *p_mux, sout_input_t *p_input )
         p_sys->i_mpeg4_streams--;
     }
 
-    var_Get( p_mux, SOUT_CFG_PREFIX "pid-video", &val );
-    if( val.i_int > 0 )
+    pid = var_GetInteger( p_mux, SOUT_CFG_PREFIX "pid-video" );
+    if ( pid > 0 && pid == p_stream->i_pid )
     {
-        int i_pid_video = val.i_int;
-        if ( i_pid_video == p_stream->i_pid )
-        {
-            p_sys->i_pid_video = i_pid_video;
-            msg_Dbg( p_mux, "freeing video PID %d", i_pid_video );
-        }
+        p_sys->i_pid_video = pid;
+        msg_Dbg( p_mux, "freeing video PID %d", pid);
     }
-    var_Get( p_mux, SOUT_CFG_PREFIX "pid-audio", &val );
-    if( val.i_int > 0 )
+    pid = var_GetInteger( p_mux, SOUT_CFG_PREFIX "pid-audio" );
+    if ( pid > 0 && pid == p_stream->i_pid )
     {
-        int i_pid_audio = val.i_int;
-        if ( i_pid_audio == p_stream->i_pid )
-        {
-            p_sys->i_pid_audio = i_pid_audio;
-            msg_Dbg( p_mux, "freeing audio PID %d", i_pid_audio );
-        }
+        p_sys->i_pid_audio = pid;
+        msg_Dbg( p_mux, "freeing audio PID %d", pid);
     }
-    var_Get( p_mux, SOUT_CFG_PREFIX "pid-spu", &val );
-    if( val.i_int > 0 )
+    pid = var_GetInteger( p_mux, SOUT_CFG_PREFIX "pid-spu" );
+    if ( pid > 0 && pid == p_stream->i_pid )
     {
-        int i_pid_spu = val.i_int;
-        if ( i_pid_spu == p_stream->i_pid )
-        {
-            p_sys->i_pid_spu = i_pid_spu;
-            msg_Dbg( p_mux, "freeing spu PID %d", i_pid_spu );
-        }
+        p_sys->i_pid_spu = pid;
+        msg_Dbg( p_mux, "freeing spu PID %d", pid);
     }
+
     free( p_stream );
 
     /* We only change PMT version (PAT isn't changed) */
-    p_sys->i_pmt_version_number++; p_sys->i_pmt_version_number %= 32;
+    p_sys->i_pmt_version_number++;
+    p_sys->i_pmt_version_number %= 32;
 
     return VLC_SUCCESS;
 }
