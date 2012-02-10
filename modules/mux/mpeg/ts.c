@@ -183,53 +183,32 @@ vlc_module_begin ()
     set_capability( "sout mux", 120 )
     add_shortcut( "ts" )
 
-    add_integer( SOUT_CFG_PREFIX "pid-video", 0,VPID_TEXT, VPID_LONGTEXT,
-                                  true )
-    add_integer( SOUT_CFG_PREFIX "pid-audio", 0, APID_TEXT,
-                 APID_LONGTEXT, true )
-    add_integer( SOUT_CFG_PREFIX "pid-spu", 0, SPUPID_TEXT,
-                 SPUPID_LONGTEXT, true )
-    add_integer( SOUT_CFG_PREFIX "pid-pmt", 0, PMTPID_TEXT,
-                 PMTPID_LONGTEXT, true )
-    add_integer( SOUT_CFG_PREFIX "tsid", 0, TSID_TEXT,
-                 TSID_LONGTEXT, true )
-    add_integer( SOUT_CFG_PREFIX "netid", 0, NETID_TEXT,
-                 NETID_LONGTEXT, true )
-    add_string( SOUT_CFG_PREFIX "program-pmt", NULL, PMTPROG_TEXT,
-                PMTPROG_LONGTEXT, true )
-    add_bool( SOUT_CFG_PREFIX "es-id-pid", false, PID_TEXT, PID_LONGTEXT,
-              true )
-    add_string( SOUT_CFG_PREFIX "muxpmt", NULL, MUXPMT_TEXT, MUXPMT_LONGTEXT, true )
-    add_string( SOUT_CFG_PREFIX "sdtdesc", NULL, SDTDESC_TEXT, SDTDESC_LONGTEXT, true )
-    add_bool( SOUT_CFG_PREFIX "alignment", true, ALIGNMENT_TEXT,
-              ALIGNMENT_LONGTEXT, true )
+    add_integer(SOUT_CFG_PREFIX "pid-video", 0, VPID_TEXT, VPID_LONGTEXT, true)
+    add_integer(SOUT_CFG_PREFIX "pid-audio", 0, APID_TEXT, APID_LONGTEXT, true)
+    add_integer(SOUT_CFG_PREFIX "pid-spu",   0, SPUPID_TEXT, SPUPID_LONGTEXT, true)
+    add_integer(SOUT_CFG_PREFIX "pid-pmt", 0, PMTPID_TEXT, PMTPID_LONGTEXT, true)
+    add_integer(SOUT_CFG_PREFIX "tsid",  0, TSID_TEXT, TSID_LONGTEXT, true)
+    add_integer(SOUT_CFG_PREFIX "netid", 0, NETID_TEXT, NETID_LONGTEXT, true)
+    add_string(SOUT_CFG_PREFIX "program-pmt", NULL, PMTPROG_TEXT, PMTPROG_LONGTEXT, true)
+    add_bool(SOUT_CFG_PREFIX "es-id-pid", false, PID_TEXT, PID_LONGTEXT, true)
+    add_string(SOUT_CFG_PREFIX "muxpmt",  NULL, MUXPMT_TEXT, MUXPMT_LONGTEXT, true)
+    add_string(SOUT_CFG_PREFIX "sdtdesc", NULL, SDTDESC_TEXT, SDTDESC_LONGTEXT, true)
+    add_bool(SOUT_CFG_PREFIX "alignment", true, ALIGNMENT_TEXT, ALIGNMENT_LONGTEXT, true)
 
-    add_integer( SOUT_CFG_PREFIX "shaping", 200, SHAPING_TEXT,
-                 SHAPING_LONGTEXT, true )
-    add_bool( SOUT_CFG_PREFIX "use-key-frames", false, KEYF_TEXT,
-              KEYF_LONGTEXT, true )
+    add_integer(SOUT_CFG_PREFIX "shaping", 200, SHAPING_TEXT, SHAPING_LONGTEXT, true)
+    add_bool(SOUT_CFG_PREFIX "use-key-frames", false, KEYF_TEXT, KEYF_LONGTEXT, true)
 
-    add_integer( SOUT_CFG_PREFIX "pcr", 70, PCR_TEXT, PCR_LONGTEXT,
-                 true )
-    add_integer( SOUT_CFG_PREFIX "bmin", 0, BMIN_TEXT, BMIN_LONGTEXT,
-                 true )
-    add_integer( SOUT_CFG_PREFIX "bmax", 0, BMAX_TEXT, BMAX_LONGTEXT,
-                 true )
-    add_integer( SOUT_CFG_PREFIX "dts-delay", 400, DTS_TEXT,
-                 DTS_LONGTEXT, true )
+    add_integer( SOUT_CFG_PREFIX "pcr", 70, PCR_TEXT, PCR_LONGTEXT, true)
+    add_integer( SOUT_CFG_PREFIX "bmin", 0, BMIN_TEXT, BMIN_LONGTEXT, true)
+    add_integer( SOUT_CFG_PREFIX "bmax", 0, BMAX_TEXT, BMAX_LONGTEXT, true)
+    add_integer( SOUT_CFG_PREFIX "dts-delay", 400, DTS_TEXT, DTS_LONGTEXT, true)
 
-    add_bool( SOUT_CFG_PREFIX "crypt-audio", true, ACRYPT_TEXT,
-              ACRYPT_LONGTEXT, true )
-    add_bool( SOUT_CFG_PREFIX "crypt-video", true, VCRYPT_TEXT,
-              VCRYPT_LONGTEXT, true )
-
-    add_string( SOUT_CFG_PREFIX "csa-ck", NULL, CK_TEXT, CK_LONGTEXT,
-                true )
-    add_string( SOUT_CFG_PREFIX "csa2-ck", NULL, CK2_TEXT, CK2_LONGTEXT,
-                true )
-    add_string( SOUT_CFG_PREFIX "csa-use", "1", CU_TEXT, CU_LONGTEXT,
-                true )
-    add_integer( SOUT_CFG_PREFIX "csa-pkt", 188, CPKT_TEXT, CPKT_LONGTEXT, true )
+    add_bool( SOUT_CFG_PREFIX "crypt-audio", true, ACRYPT_TEXT, ACRYPT_LONGTEXT, true)
+    add_bool( SOUT_CFG_PREFIX "crypt-video", true, VCRYPT_TEXT, VCRYPT_LONGTEXT, true)
+    add_string( SOUT_CFG_PREFIX "csa-ck",  NULL, CK_TEXT,   CK_LONGTEXT,   true)
+    add_string( SOUT_CFG_PREFIX "csa2-ck", NULL, CK2_TEXT,  CK2_LONGTEXT,  true)
+    add_string( SOUT_CFG_PREFIX "csa-use", "1",  CU_TEXT,   CU_LONGTEXT,   true)
+    add_integer(SOUT_CFG_PREFIX "csa-pkt", 188,  CPKT_TEXT, CPKT_LONGTEXT, true)
 
     set_callbacks( Open, Close )
 vlc_module_end ()
