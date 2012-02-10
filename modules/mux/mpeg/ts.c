@@ -466,8 +466,6 @@ static void GetPMT( sout_mux_t *p_mux, sout_buffer_chain_t *c );
 static block_t *TSNew( sout_mux_t *p_mux, ts_stream_t *p_stream, bool b_pcr );
 static void TSSetPCR( block_t *p_ts, mtime_t i_dts );
 
-static void PEStoTS  ( sout_instance_t *, sout_buffer_chain_t *, block_t *, ts_stream_t * );
-
 static csa_t *csaSetup( vlc_object_t *p_this )
 {
     sout_mux_t *p_mux = (sout_mux_t*)p_this;
@@ -1270,7 +1268,7 @@ static int Mux( sout_mux_t *p_mux )
     }
     p_pcr_stream = (ts_stream_t*)p_sys->p_pcr_input->p_sys;
 
-    for (;; )
+    for (;;)
     {
         sout_buffer_chain_t chain_ts;
         int                 i_packet_count;
@@ -1289,10 +1287,9 @@ static int Mux( sout_mux_t *p_mux )
         }
 
         /* 1: get enough PES packet for all input */
-        for (;; )
+        for (;;)
         {
             bool b_ok = true;
-            block_t *p_data;
 
             /* Accumulate enough data in the pcr stream (>i_shaping_delay) */
             /* Accumulate enough data in all other stream ( >= length of pcr)*/
@@ -1354,6 +1351,7 @@ static int Mux( sout_mux_t *p_mux )
                     }
                     b_ok = false;
 
+                    block_t *p_data;
                     if( p_stream == p_pcr_stream || p_sys->b_data_alignment
                          || p_input->p_fmt->i_codec !=
                              VLC_CODEC_MPGA )
@@ -1997,23 +1995,14 @@ static void PEStoTS( sout_instance_t *p_sout,
                      ts_stream_t *p_stream )
 {
     VLC_UNUSED(p_sout);
-    uint8_t *p_data;
-    int     i_size;
-    int     b_new_pes;
-
     /* get PES total size */
-    i_size = p_pes->i_buffer;
-    p_data = p_pes->p_buffer;
+    uint8_t *p_data = p_pes->p_buffer;
+    int      i_size = p_pes->i_buffer;
 
-    b_new_pes = true;
+    bool    b_new_pes = true;
 
-    for (;; )
+    for (;;)
     {
-        int           b_adaptation_field;
-        int           i_copy;
-        block_t *p_ts;
-
-        p_ts = block_New( p_sout, 188 );
         /* write header
          * 8b   0x47    sync byte
          * 1b           transport_error_indicator
@@ -2025,8 +2014,9 @@ static void PEStoTS( sout_instance_t *p_sout,
          * 4b           continuity_counter
          */
 
-        i_copy    = __MIN( i_size, 184 );
-        b_adaptation_field = i_size < 184 ? true : false;
+        int i_copy = __MIN( i_size, 184 );
+        bool b_adaptation_field = i_size < 184;
+        block_t *p_ts = block_New( p_sout, 188 );
 
         p_ts->p_buffer[0] = 0x47;
         p_ts->p_buffer[1] = ( b_new_pes ? 0x40 : 0x00 )|
@@ -2071,17 +2061,14 @@ static void PEStoTS( sout_instance_t *p_sout,
             p_pes->p_next = NULL;
             block_Release( p_pes );
             if( p_next == NULL )
-            {
-                break;
-            }
+                return;
+
             b_new_pes = true;
             p_pes = p_next;
             i_size = p_pes->i_buffer;
             p_data = p_pes->p_buffer;
         }
     }
-
-    return;
 }
 
 static block_t *WritePSISection( sout_instance_t *p_sout,
@@ -2092,10 +2079,8 @@ static block_t *WritePSISection( sout_instance_t *p_sout,
 
     while( p_section )
     {
-        int             i_size;
-
-        i_size =  (uint32_t)( p_section->p_payload_end - p_section->p_data )+
-                  ( p_section->b_syntax_indicator ? 4 : 0 );
+        int i_size = (uint32_t)(p_section->p_payload_end - p_section->p_data) +
+                  (p_section->b_syntax_indicator ? 4 : 0);
 
         p_psi = block_New( p_sout, i_size + 1 );
         p_psi->i_pts = 0;
@@ -2128,12 +2113,10 @@ static void GetPAT( sout_mux_t *p_mux,
                     1 );      /* b_current_next */
     /* add all programs */
     for (int i = 0; i < p_sys->i_num_pmt; i++ )
-        dvbpsi_PATAddProgram( &pat,
-                              p_sys->i_pmt_program_number[i],
+        dvbpsi_PATAddProgram( &pat, p_sys->i_pmt_program_number[i],
                               p_sys->pmt[i].i_pid );
 
-    p_section = dvbpsi_GenPATSections( &pat,
-                                       0 );     /* max program per section */
+    p_section = dvbpsi_GenPATSections( &pat, 0 /* max program per section */ );
 
     p_pat = WritePSISection( p_mux->p_sout, p_section );
 
