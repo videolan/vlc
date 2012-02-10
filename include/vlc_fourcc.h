@@ -120,6 +120,7 @@
 #define VLC_CODEC_LAGARITH  VLC_FOURCC('L','A','G','S')
 #define VLC_CODEC_FLASHSV2  VLC_FOURCC('F','S','V','2')
 #define VLC_CODEC_PRORES    VLC_FOURCC('a','p','c','n')
+#define VLC_CODEC_MXPEG     VLC_FOURCC('M','X','P','G')
 
 /* Planar YUV 4:1:0 Y:V:U */
 #define VLC_CODEC_YV9       VLC_FOURCC('Y','V','U','9')

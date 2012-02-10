@@ -206,6 +206,10 @@ static const struct
     { VLC_CODEC_LAGARITH, CODEC_ID_LAGARITH, VIDEO_ES },
 #endif
 
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 52, 117, 0 )
+    { VLC_CODEC_MXPEG, CODEC_ID_MXPEG, VIDEO_ES },
+#endif
+
     /* Videogames Codecs */
 
     { VLC_CODEC_INTERPLAY, CODEC_ID_INTERPLAY_VIDEO, VIDEO_ES },
