@@ -384,7 +384,6 @@ struct sout_mux_sys_t
 
     int             i_mpeg4_streams;
 
-    int             i_null_continuity_counter;  /* Needed ? */
     ts_stream_t     sdt;
     dvbpsi_pmt_t    *dvbpmt;
 
@@ -729,8 +728,6 @@ static int Open( vlc_object_t *p_this )
     p_sys->p_pcr_input = NULL;
 
     p_sys->i_mpeg4_streams = 0;
-
-    p_sys->i_null_continuity_counter = 0;
 
     /* Allow to create constrained stream */
     p_sys->i_bitrate_min = var_GetInteger( p_mux, SOUT_CFG_PREFIX "bmin" );
