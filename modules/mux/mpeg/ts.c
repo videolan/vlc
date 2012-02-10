@@ -444,22 +444,15 @@ static int  AllocatePID( sout_mux_sys_t *p_sys, int i_cat )
 
 static int pmtcompare( const void *pa, const void *pb )
 {
-    if ( ((pmt_map_t *)pa)->i_pid  < ((pmt_map_t *)pb)->i_pid )
-        return -1;
-    else if ( ((pmt_map_t *)pa)->i_pid  > ((pmt_map_t *)pb)->i_pid )
-        return 1;
-    else
-        return 0;
+    int id1 = ((pmt_map_t *)pa)->i_pid;
+    int id2 = ((pmt_map_t *)pb)->i_pid;
+
+    return id1 - id2;
 }
 
 static int intcompare( const void *pa, const void *pb )
 {
-    if ( *(int *)pa  < *(int *)pb )
-        return -1;
-    else if ( *(int *)pa > *(int *)pb )
-        return 1;
-    else
-        return 0;
+    return *(int*)pa - *(int*)pb;
 }
 
 /*****************************************************************************
@@ -566,7 +559,7 @@ static int Open( vlc_object_t *p_this )
 
             /* Now sort according to pids for fast search later on */
             qsort( (void *)p_sys->pmtmap, p_sys->i_pmtslots,
-                   sizeof(pmt_map_t), &pmtcompare );
+                   sizeof(pmt_map_t), pmtcompare );
             if ( !*psz_next )
                 psz = NULL;
         }
