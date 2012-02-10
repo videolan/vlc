@@ -2330,7 +2330,7 @@ static void GetPMT( sout_mux_t *p_mux, sout_buffer_chain_t *c )
         }
         else if( p_stream->i_stream_type == 0x81 )
         {
-            uint8_t format[4] = { 0x41, 0x43, 0x2d, 0x33 };
+            uint8_t format[4] = { 'A', 'C', '-', '3'};
 
             /* "registration" descriptor : "AC-3" */
             dvbpsi_PMTESAddDescriptor( p_es, 0x05, 4, format );
@@ -2347,7 +2347,7 @@ static void GetPMT( sout_mux_t *p_mux, sout_buffer_chain_t *c )
             /* DTS registration descriptor (ETSI TS 101 154 Annex F) */
 
             /* DTS format identifier, frame size 1024 - FIXME */
-            uint8_t data[4] = { 0x44, 0x54, 0x53, 0x32 };
+            uint8_t data[4] = { 'D', 'T', 'S', '2' };
             dvbpsi_PMTESAddDescriptor( p_es, 0x05, 4, data );
         }
         else if( p_stream->i_codec == VLC_CODEC_EAC3 )
