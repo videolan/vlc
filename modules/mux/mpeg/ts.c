@@ -479,7 +479,6 @@ static int Open( vlc_object_t *p_this )
     sout_mux_t          *p_mux =(sout_mux_t*)p_this;
     sout_mux_sys_t      *p_sys = NULL;
     vlc_value_t         val;
-    int i;
 
     config_ChainParse( p_mux, SOUT_CFG_PREFIX, ppsz_sout_options, p_mux->p_cfg );
 
@@ -499,7 +498,7 @@ static int Open( vlc_object_t *p_this )
     p_mux->pf_mux       = Mux;
     p_mux->p_sys        = p_sys;
 
-    for ( i = 0; i < MAX_PMT; i++ )
+    for (int i = 0; i < MAX_PMT; i++ )
         p_sys->sdt_descriptors[i].psz_service_name
             = p_sys->sdt_descriptors[i].psz_provider = NULL;
     memset( p_sys->sdt_descriptors, 0, sizeof(sdt_desc_t) );
@@ -580,7 +579,7 @@ static int Open( vlc_object_t *p_this )
         p_sys->i_netid = val.i_int;
 
     p_sys->i_pmt_version_number = nrand48(subi) & 0x1f;
-    for( i = 0; i < p_sys->i_num_pmt; i++ )
+    for (int i = 0; i < p_sys->i_num_pmt; i++ )
     {
         p_sys->pmt[i].i_continuity_counter = 0;
         p_sys->pmt[i].b_discontinuity = false;
@@ -600,8 +599,7 @@ static int Open( vlc_object_t *p_this )
         char *psz = val.psz_string;
         char *psz_sdttoken = psz;
 
-        i = 0;
-        while ( psz_sdttoken != NULL )
+        for (int i = 0; psz_sdttoken; i++)
         {
             char *psz_end = strchr( psz_sdttoken, ',' );
             if( psz_end != NULL )
@@ -619,7 +617,6 @@ static int Open( vlc_object_t *p_this )
                     = strdup(psz_sdttoken);
             }
 
-            i++;
             psz_sdttoken = psz_end;
         }
     }
@@ -630,15 +627,12 @@ static int Open( vlc_object_t *p_this )
     var_Get( p_mux, SOUT_CFG_PREFIX "program-pmt", &val );
     if( val.psz_string && *val.psz_string )
     {
-        char *psz_next;
         char *psz = val.psz_string;
-        uint16_t i_pid;
+        char *psz_next = psz;
 
-        psz_next = psz;
-        i = 0;
-        while ( psz != NULL )
+        for (int i = 0; psz; )
         {
-            i_pid = strtoul( psz, &psz_next, 0 );
+            uint16_t i_pid = strtoul( psz, &psz_next, 0 );
             if( psz_next[0] != '\0' )
                 psz = &psz_next[1];
             else
@@ -647,8 +641,7 @@ static int Open( vlc_object_t *p_this )
             if( i_pid == 0 )
             {
                 if( i > MAX_PMT )
-                    msg_Err( p_mux, "Number of PMTs > maximum (%d)",
-                             MAX_PMT );
+                    msg_Err( p_mux, "Number of PMTs > maximum (%d)", MAX_PMT );
             }
             else
             {
@@ -660,7 +653,7 @@ static int Open( vlc_object_t *p_this )
     else
     {
         /* Option not specified, use 1, 2, 3... */
-        for( i = 0; i < p_sys->i_num_pmt; i++ )
+        for (int i = 0; i < p_sys->i_num_pmt; i++ )
             p_sys->i_pmt_program_number[i] = i + 1;
     }
     free( val.psz_string );
@@ -668,12 +661,12 @@ static int Open( vlc_object_t *p_this )
     var_Get( p_mux, SOUT_CFG_PREFIX "pid-pmt", &val );
     if( val.i_int )
     {
-        for( i = 0; i < p_sys->i_num_pmt; i++ )
+        for (int i = 0; i < p_sys->i_num_pmt; i++ )
             p_sys->pmt[i].i_pid = val.i_int + i; /* Does this make any sense? */
     }
     else
     {
-        for( i = 0; i < p_sys->i_num_pmt; i++ )
+        for (int i = 0; i < p_sys->i_num_pmt; i++ )
             p_sys->pmt[i].i_pid = 0x42 + i;
     }
 
@@ -830,7 +823,6 @@ static void Close( vlc_object_t * p_this )
 {
     sout_mux_t          *p_mux = (sout_mux_t*)p_this;
     sout_mux_sys_t      *p_sys = p_mux->p_sys;
-    int i;
 
     if( p_sys->csa )
     {
@@ -840,7 +832,7 @@ static void Close( vlc_object_t * p_this )
         csa_Delete( p_sys->csa );
     }
 
-    for( i = 0; i < MAX_PMT; i++ )
+    for (int i = 0; i < MAX_PMT; i++ )
     {
         free( p_sys->sdt_descriptors[i].psz_service_name );
         free( p_sys->sdt_descriptors[i].psz_provider );
@@ -1269,12 +1261,10 @@ static int DelStream( sout_mux_t *p_mux, sout_input_t *p_input )
 
     if( p_sys->i_pcr_pid == p_stream->i_pid )
     {
-        int i;
-
         /* Find a new pcr stream (Prefer Video Stream) */
         p_sys->i_pcr_pid = 0x1fff;
         p_sys->p_pcr_input = NULL;
-        for( i = 0; i < p_mux->i_nb_inputs; i++ )
+        for (int i = 0; i < p_mux->i_nb_inputs; i++ )
         {
             if( p_mux->pp_inputs[i] == p_input )
             {
@@ -1366,8 +1356,7 @@ static int Mux( sout_mux_t *p_mux )
 
     if( p_sys->i_pcr_pid == 0x1fff )
     {
-        int i;
-        for( i = 0; i < p_mux->i_nb_inputs; i++ )
+        for (int i = 0; i < p_mux->i_nb_inputs; i++ )
         {
             block_FifoEmpty( p_mux->pp_inputs[i]->p_fifo );
         }
@@ -1376,7 +1365,7 @@ static int Mux( sout_mux_t *p_mux )
     }
     p_pcr_stream = (ts_stream_t*)p_sys->p_pcr_input->p_sys;
 
-    for( ;; )
+    for (;; )
     {
         sout_buffer_chain_t chain_ts;
         int                 i_packet_count;
@@ -1384,7 +1373,6 @@ static int Mux( sout_mux_t *p_mux )
         mtime_t             i_pcr_dts;
         mtime_t             i_pcr_length;
         mtime_t             i_shaping_delay;
-        int i;
 
         if( p_pcr_stream->b_key_frame )
         {
@@ -1396,14 +1384,14 @@ static int Mux( sout_mux_t *p_mux )
         }
 
         /* 1: get enough PES packet for all input */
-        for( ;; )
+        for (;; )
         {
             bool b_ok = true;
             block_t *p_data;
 
             /* Accumulate enough data in the pcr stream (>i_shaping_delay) */
             /* Accumulate enough data in all other stream ( >= length of pcr)*/
-            for( i = -1; i < p_mux->i_nb_inputs; i++ )
+            for (int i = -1; i < p_mux->i_nb_inputs; i++ )
             {
                 sout_input_t *p_input;
                 ts_stream_t *p_stream;
@@ -1637,13 +1625,12 @@ static int Mux( sout_mux_t *p_mux )
         /* msg_Dbg( p_mux, "starting muxing %lldms", i_pcr_length / 1000 ); */
         /* 2: calculate non accurate total size of muxed ts */
         i_packet_count = 0;
-        for( i = 0; i < p_mux->i_nb_inputs; i++ )
+        for (int i = 0; i < p_mux->i_nb_inputs; i++ )
         {
             ts_stream_t *p_stream = (ts_stream_t*)p_mux->pp_inputs[i]->p_sys;
-            block_t *p_pes;
 
             /* False for pcr stream but it will be enough to do PCR algo */
-            for( p_pes = p_stream->chain_pes.p_first; p_pes != NULL;
+            for (block_t *p_pes = p_stream->chain_pes.p_first; p_pes != NULL;
                  p_pes = p_pes->p_next )
             {
                 int i_size = p_pes->i_buffer;
@@ -1674,17 +1661,17 @@ static int Mux( sout_mux_t *p_mux )
         i_packet_count += chain_ts.i_depth;
         /* msg_Dbg( p_mux, "estimated pck=%d", i_packet_count ); */
 
-        for( ;; )
+        for (;; )
         {
-            int          i_stream;
-            mtime_t      i_dts;
+            int          i_stream = -1;
+            mtime_t      i_dts = 0;
             ts_stream_t  *p_stream;
             sout_input_t *p_input;
             block_t      *p_ts;
             bool         b_pcr;
 
             /* Select stream (lowest dts) */
-            for( i = 0, i_stream = -1, i_dts = 0; i < p_mux->i_nb_inputs; i++ )
+            for (int i = 0; i < p_mux->i_nb_inputs; i++ )
             {
                 p_stream = (ts_stream_t*)p_mux->pp_inputs[i]->p_sys;
 
@@ -1858,7 +1845,6 @@ static void TSSchedule( sout_mux_t *p_mux, sout_buffer_chain_t *p_chain_ts,
     sout_mux_sys_t  *p_sys = p_mux->p_sys;
     sout_buffer_chain_t new_chain;
     int i_packet_count = p_chain_ts->i_depth;
-    int i;
 
     BufferChainInit( &new_chain );
 
@@ -1867,7 +1853,7 @@ static void TSSchedule( sout_mux_t *p_mux, sout_buffer_chain_t *p_chain_ts,
         i_pcr_length = i_packet_count;
     }
 
-    for( i = 0; i < i_packet_count; i++ )
+    for (int i = 0; i < i_packet_count; i++ )
     {
         block_t *p_ts = BufferChainGet( p_chain_ts );
         mtime_t i_new_dts = i_pcr_dts + i_pcr_length * i / i_packet_count;
@@ -1918,7 +1904,6 @@ static void TSDate( sout_mux_t *p_mux, sout_buffer_chain_t *p_chain_ts,
 {
     sout_mux_sys_t  *p_sys = p_mux->p_sys;
     int i_packet_count = p_chain_ts->i_depth;
-    int i;
 
     if ( i_pcr_length / 1000 > 0 )
     {
@@ -1940,7 +1925,7 @@ static void TSDate( sout_mux_t *p_mux, sout_buffer_chain_t *p_chain_ts,
     }
 
     /* msg_Dbg( p_mux, "real pck=%d", i_packet_count ); */
-    for( i = 0; i < i_packet_count; i++ )
+    for (int i = 0; i < i_packet_count; i++ )
     {
         block_t *p_ts = BufferChainGet( p_chain_ts );
         mtime_t i_new_dts = i_pcr_dts + i_pcr_length * i / i_packet_count;
@@ -2013,8 +1998,6 @@ static block_t *TSNew( sout_mux_t *p_mux, ts_stream_t *p_stream,
 
     if( b_adaptation_field )
     {
-        int i;
-
         if( b_pcr )
         {
             int     i_stuffing = i_payload_max - i_payload;
@@ -2035,7 +2018,7 @@ static block_t *TSNew( sout_mux_t *p_mux, ts_stream_t *p_stream,
             p_ts->p_buffer[10]= ( ( 0 )&0x80 ) | 0x7e;
             p_ts->p_buffer[11]= 0;
 
-            for( i = 12; i < 12 + i_stuffing; i++ )
+            for (int i = 12; i < 12 + i_stuffing; i++ )
             {
                 p_ts->p_buffer[i] = 0xff;
             }
@@ -2048,7 +2031,7 @@ static block_t *TSNew( sout_mux_t *p_mux, ts_stream_t *p_stream,
             if( i_stuffing > 1 )
             {
                 p_ts->p_buffer[5] = 0x00;
-                for( i = 6; i < 6 + i_stuffing - 2; i++ )
+                for (int i = 6; i < 6 + i_stuffing - 2; i++ )
                 {
                     p_ts->p_buffer[i] = 0xff;
                 }
@@ -2119,7 +2102,7 @@ static void PEStoTS( sout_instance_t *p_sout,
 
     b_new_pes = true;
 
-    for( ;; )
+    for (;; )
     {
         int           b_adaptation_field;
         int           i_copy;
@@ -2153,7 +2136,6 @@ static void PEStoTS( sout_instance_t *p_sout,
         if( b_adaptation_field )
         {
             int i_stuffing = 184 - i_copy;
-            int i;
 
             p_ts->p_buffer[4] = i_stuffing - 1;
             if( i_stuffing > 1 )
@@ -2164,7 +2146,7 @@ static void PEStoTS( sout_instance_t *p_sout,
                     p_ts->p_buffer[5] |= 0x80;
                     p_stream->b_discontinuity = false;
                 }
-                for( i = 6; i < 6 + i_stuffing - 2; i++ )
+                for (int i = 6; i < 6 + i_stuffing - 2; i++ )
                 {
                     p_ts->p_buffer[i] = 0xff;
                 }
@@ -2236,12 +2218,11 @@ static void GetPAT( sout_mux_t *p_mux,
     block_t              *p_pat;
     dvbpsi_pat_t         pat;
     dvbpsi_psi_section_t *p_section;
-    int i;
 
     dvbpsi_InitPAT( &pat, p_sys->i_tsid, p_sys->i_pat_version_number,
                     1 );      /* b_current_next */
     /* add all programs */
-    for ( i = 0; i < p_sys->i_num_pmt; i++ )
+    for (int i = 0; i < p_sys->i_num_pmt; i++ )
         dvbpsi_PATAddProgram( &pat,
                               p_sys->i_pmt_program_number[i],
                               p_sys->pmt[i].i_pid );
@@ -2277,8 +2258,6 @@ static void GetPMT( sout_mux_t *p_mux, sout_buffer_chain_t *c )
     dvbpsi_psi_section_t *p_section[MAX_PMT];
 
     int             i_pidinput;
-    int             i_stream;
-    int             i;
     int             *p_usepid = NULL;
 
     block_t         *p_sdt;
@@ -2301,7 +2280,7 @@ static void GetPMT( sout_mux_t *p_mux, sout_buffer_chain_t *c )
     if( p_sys->b_sdt )
         dvbpsi_InitSDT( &sdt, p_sys->i_tsid, 1, 1, p_sys->i_netid );
 
-    for( i = 0; i < p_sys->i_num_pmt; i++ )
+    for (int i = 0; i < p_sys->i_num_pmt; i++ )
     {
         dvbpsi_InitPMT( &p_sys->dvbpmt[i],
                         p_sys->i_pmt_program_number[i],   /* program number */
@@ -2383,7 +2362,7 @@ static void GetPMT( sout_mux_t *p_mux, sout_buffer_chain_t *c )
         bits_write( &bits, 8,   0xfe );     /* audioProfile (unspecified) */
         bits_write( &bits, 8,   0xfe );     /* visualProfile( // ) */
         bits_write( &bits, 8,   0xff );     /* graphicProfile (no ) */
-        for( i_stream = 0; i_stream < p_mux->i_nb_inputs; i_stream++ )
+        for (int i_stream = 0; i_stream < p_mux->i_nb_inputs; i_stream++ )
         {
             ts_stream_t *p_stream;
             p_stream = (ts_stream_t*)p_mux->pp_inputs[i_stream]->p_sys;
@@ -2448,13 +2427,12 @@ static void GetPMT( sout_mux_t *p_mux, sout_buffer_chain_t *c )
 
                 if( p_stream->i_decoder_specific_info > 0 )
                 {
-                    int i;
                     /* DecoderSpecificInfo */
                     bits_align( &bits );
                     bits_write( &bits, 8,   0x05 ); /* tag */
                     bits_write( &bits, 24, GetDescriptorLength24b(
                                 p_stream->i_decoder_specific_info ) );
-                    for( i = 0; i < p_stream->i_decoder_specific_info; i++ )
+                    for (int i = 0; i < p_stream->i_decoder_specific_info; i++ )
                     {
                         bits_write( &bits, 8,
                             ((uint8_t*)p_stream->p_decoder_specific_info)[i] );
@@ -2492,7 +2470,7 @@ static void GetPMT( sout_mux_t *p_mux, sout_buffer_chain_t *c )
                                  bits.p_data );
     }
 
-    for( i_stream = 0; i_stream < p_mux->i_nb_inputs; i_stream++ )
+    for (int i_stream = 0; i_stream < p_mux->i_nb_inputs; i_stream++ )
     {
         ts_stream_t *p_stream;
 
@@ -2617,7 +2595,7 @@ static void GetPMT( sout_mux_t *p_mux, sout_buffer_chain_t *c )
 
             /* I construct the content myself, way faster than looking at
              * over complicated/mind broken libdvbpsi way */
-            for(i = 0; i < p_stream->i_langs; i++ )
+            for (int i = 0; i < p_stream->i_langs; i++ )
             {
                 data[i*4+0] = p_stream->lang[i*3+0];
                 data[i*4+1] = p_stream->lang[i*3+1];
@@ -2628,7 +2606,7 @@ static void GetPMT( sout_mux_t *p_mux, sout_buffer_chain_t *c )
         }
     }
 
-    for( i = 0; i < p_sys->i_num_pmt; i++ )
+    for (int i = 0; i < p_sys->i_num_pmt; i++ )
     {
         p_section[i] = dvbpsi_GenPMTSections( &p_sys->dvbpmt[i] );
         p_pmt[i] = WritePSISection( p_mux->p_sout, p_section[i] );
