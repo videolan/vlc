@@ -15,7 +15,7 @@ SOURCES_ps = ps.c ps.h
 SOURCES_mod = mod.c dummy.cpp
 SOURCES_pva = pva.c
 SOURCES_aiff = aiff.c
-SOURCES_mjpeg = mjpeg.c
+SOURCES_mjpeg = mjpeg.c mxpeg_helper.h
 SOURCES_subtitle = subtitle.c
 SOURCES_ty = ty.c ../codec/cc.h
 SOURCES_vobsub = vobsub.c vobsub.h
@@ -31,7 +31,7 @@ SOURCES_smf = smf.c
 SOURCES_gme = gme.c dummy.cpp
 SOURCES_sid = sid.cpp
 SOURCES_dirac = dirac.c
-SOURCES_image = image.c
+SOURCES_image = image.c mxpeg_helper.h
 SOURCES_demux_stl = stl.c
 
 libvlc_LTLIBRARIES += \

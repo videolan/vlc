@@ -35,6 +35,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_demux.h>
+#include "mxpeg_helper.h"
 
 /*****************************************************************************
  * Module descriptor
@@ -315,6 +316,12 @@ static int Open( vlc_object_t * p_this )
 
     p_sys->psz_separator = NULL;
     p_sys->i_frame_size_estimate = 15 * 1024;
+
+    if( IsMxpeg( p_demux->s ) && !p_demux->b_force )
+    {
+        // let avformat handle this case
+        goto error;
+    }
 
     b_matched = CheckMimeHeader( p_demux, &i_size);
     if( b_matched )
