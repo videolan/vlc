@@ -1381,56 +1381,48 @@ static bool MuxStreams(sout_mux_t *p_mux )
         int i_header_size = 0;
         int i_max_pes_size = 0;
         int b_data_alignment = 0;
-        if( p_input->p_fmt->i_cat == SPU_ES )
+        if( p_input->p_fmt->i_cat == SPU_ES ) switch (p_input->p_fmt->i_codec)
         {
-            if( p_input->p_fmt->i_codec == VLC_CODEC_SUBT )
+        case VLC_CODEC_SUBT:
+            /* Prepend header */
+            p_data = block_Realloc( p_data, 2, p_data->i_buffer );
+            p_data->p_buffer[0] = ( (p_data->i_buffer - 2) >> 8) & 0xff;
+            p_data->p_buffer[1] = ( (p_data->i_buffer - 2)     ) & 0xff;
+
+            /* remove trailling \0 if any */
+            if( p_data->i_buffer > 2 && !p_data->p_buffer[p_data->i_buffer-1] )
+                p_data->i_buffer--;
+
+            /* Append a empty sub (sub text only) */
+            if( p_data->i_length > 0 &&
+                ( p_data->i_buffer != 1 || *p_data->p_buffer != ' ' ) )
             {
-                /* Prepend header */
-                p_data = block_Realloc( p_data, 2,
-                                        p_data->i_buffer );
-                p_data->p_buffer[0] =
-                    ( (p_data->i_buffer - 2) >> 8) & 0xff;
-                p_data->p_buffer[1] =
-                    ( (p_data->i_buffer - 2)     ) & 0xff;
+                block_t *p_spu = block_New( p_mux, 3 );
 
-                /* remove trailling \0 if any */
-                if( p_data->i_buffer > 2 &&
-                    p_data->p_buffer[p_data->i_buffer -1] ==
-                    '\0' )
-                    p_data->i_buffer--;
+                p_spu->i_dts = p_data->i_dts + p_data->i_length;
+                p_spu->i_pts = p_spu->i_dts;
+                p_spu->i_length = 1000;
 
-                /* Append a empty sub (sub text only) */
-                if( p_data->i_length > 0 &&
-                    ( p_data->i_buffer != 1 || *p_data->p_buffer != ' ' ) )
-                {
-                    block_t *p_spu = block_New( p_mux, 3 );
+                p_spu->p_buffer[0] = 0;
+                p_spu->p_buffer[1] = 1;
+                p_spu->p_buffer[2] = ' ';
 
-                    p_spu->i_dts = p_data->i_dts + p_data->i_length;
-                    p_spu->i_pts = p_spu->i_dts;
-                    p_spu->i_length = 1000;
-
-                    p_spu->p_buffer[0] = 0;
-                    p_spu->p_buffer[1] = 1;
-                    p_spu->p_buffer[2] = ' ';
-
-                    EStoPES( p_mux->p_sout, &p_spu, p_spu,
-                                 p_input->p_fmt,
-                                 p_stream->i_stream_id, 1,
-                                 0, 0, 0 );
-                    p_data->p_next = p_spu;
-                }
+                EStoPES( p_mux->p_sout, &p_spu, p_spu, p_input->p_fmt,
+                             p_stream->i_stream_id, 1, 0, 0, 0 );
+                p_data->p_next = p_spu;
             }
-            else if( p_input->p_fmt->i_codec == VLC_CODEC_TELETEXT )
-            {
-                /* EN 300 472 */
-                i_header_size = 0x24;
-                b_data_alignment = 1;
-            }
-            else if( p_input->p_fmt->i_codec == VLC_CODEC_DVBS )
-            {
-                /* EN 300 743 */
-                b_data_alignment = 1;
-            }
+            break;
+
+        case VLC_CODEC_TELETEXT:
+            /* EN 300 472 */
+            i_header_size = 0x24;
+            b_data_alignment = 1;
+            break;
+
+        case VLC_CODEC_DVBS:
+            /* EN 300 743 */
+            b_data_alignment = 1;
+            break;
         }
         else if( p_data->i_length < 0 || p_data->i_length > 2000000 )
         {
