@@ -942,9 +942,6 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
 
     p_stream->i_codec = p_input->p_fmt->i_codec;
 
-    msg_Dbg( p_mux, "adding input codec=%4.4s pid=%d",
-             (char*)&p_stream->i_codec, p_stream->i_pid );
-
     p_stream->i_stream_type = -1;
     switch( p_input->p_fmt->i_codec )
     {
@@ -1055,6 +1052,9 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
         free( p_stream );
         return VLC_ENOMEM;
     }
+
+    msg_Dbg( p_mux, "adding input codec=%4.4s pid=%d",
+             (char*)&p_stream->i_codec, p_stream->i_pid );
 
     for (int i = 0; i < p_stream->i_langs; i++) {
         char *lang = (i == 0)
