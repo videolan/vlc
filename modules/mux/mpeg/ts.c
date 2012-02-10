@@ -228,7 +228,7 @@ static const char *const ppsz_sout_options[] = {
 typedef struct pmt_map_t   /* Holds the mapping between the pmt-pid/pmt table */
 {
     int i_pid;
-    unsigned long i_prog;
+    unsigned i_prog;
 } pmt_map_t;
 
 typedef struct sdt_desc_t
@@ -349,7 +349,7 @@ struct sout_mux_sys_t
 
     int             i_tsid;
     int             i_netid;
-    int             i_num_pmt;
+    unsigned        i_num_pmt;
     int             i_pmtslots;
     int             i_pat_version_number;
     ts_stream_t     pat;
@@ -599,7 +599,7 @@ static int Open( vlc_object_t *p_this )
         p_sys->i_netid = val.i_int;
 
     p_sys->i_pmt_version_number = nrand48(subi) & 0x1f;
-    for (int i = 0; i < p_sys->i_num_pmt; i++ )
+    for (unsigned i = 0; i < p_sys->i_num_pmt; i++ )
     {
         p_sys->pmt[i].i_continuity_counter = 0;
         p_sys->pmt[i].b_discontinuity = false;
@@ -673,14 +673,14 @@ static int Open( vlc_object_t *p_this )
     else
     {
         /* Option not specified, use 1, 2, 3... */
-        for (int i = 0; i < p_sys->i_num_pmt; i++ )
+        for (unsigned i = 0; i < p_sys->i_num_pmt; i++ )
             p_sys->i_pmt_program_number[i] = i + 1;
     }
 
     var_Get( p_mux, SOUT_CFG_PREFIX "pid-pmt", &val );
     if( !val.i_int ) /* Does this make any sense? */
         val.i_int = 0x42;
-    for (int i = 0; i < p_sys->i_num_pmt; i++ )
+    for (unsigned i = 0; i < p_sys->i_num_pmt; i++ )
         p_sys->pmt[i].i_pid = val.i_int + i;
 
     p_sys->i_pid_free = p_sys->pmt[p_sys->i_num_pmt - 1].i_pid + 1;
@@ -2048,7 +2048,7 @@ static void GetPAT( sout_mux_t *p_mux,
     dvbpsi_InitPAT( &pat, p_sys->i_tsid, p_sys->i_pat_version_number,
                     1 );      /* b_current_next */
     /* add all programs */
-    for (int i = 0; i < p_sys->i_num_pmt; i++ )
+    for (unsigned i = 0; i < p_sys->i_num_pmt; i++ )
         dvbpsi_PATAddProgram( &pat, p_sys->i_pmt_program_number[i],
                               p_sys->pmt[i].i_pid );
 
@@ -2223,7 +2223,7 @@ static void GetPMT( sout_mux_t *p_mux, sout_buffer_chain_t *c )
     if( p_sys->b_sdt )
         dvbpsi_InitSDT( &sdt, p_sys->i_tsid, 1, 1, p_sys->i_netid );
 
-    for (int i = 0; i < p_sys->i_num_pmt; i++ )
+    for (unsigned i = 0; i < p_sys->i_num_pmt; i++ )
     {
         dvbpsi_InitPMT( &p_sys->dvbpmt[i],
                         p_sys->i_pmt_program_number[i],   /* program number */
@@ -2282,8 +2282,8 @@ static void GetPMT( sout_mux_t *p_mux, sout_buffer_chain_t *c )
                     p_stream->i_stream_type, p_stream->i_pid );
         else
             /* If there's an error somewhere, dump it to the first pmt */
-            p_es = dvbpsi_PMTAddES( &p_sys->dvbpmt[0], p_stream->i_stream_type,
-                                    p_stream->i_pid );
+            p_es = dvbpsi_PMTAddES( &p_sys->dvbpmt[0],
+                    p_stream->i_stream_type, p_stream->i_pid );
 
         if( p_stream->i_stream_id == 0xfa || p_stream->i_stream_id == 0xfb )
         {
@@ -2392,7 +2392,7 @@ static void GetPMT( sout_mux_t *p_mux, sout_buffer_chain_t *c )
         }
     }
 
-    for (int i = 0; i < p_sys->i_num_pmt; i++ )
+    for (unsigned i = 0; i < p_sys->i_num_pmt; i++ )
     {
         dvbpsi_psi_section_t *sect = dvbpsi_GenPMTSections( &p_sys->dvbpmt[i] );
         block_t *pmt = WritePSISection( p_mux->p_sout, sect );
