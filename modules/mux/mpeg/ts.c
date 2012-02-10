@@ -2086,22 +2086,7 @@ static uint32_t GetDescriptorLength24b( int i_length )
 
 static void GetPMT( sout_mux_t *p_mux, sout_buffer_chain_t *c )
 {
-    sout_mux_sys_t  *p_sys = p_mux->p_sys;
-    block_t   *p_pmt[MAX_PMT];
-
-    dvbpsi_pmt_es_t     *p_es;
-    dvbpsi_psi_section_t *p_section[MAX_PMT];
-
-    int             i_pidinput;
-    int             *p_usepid = NULL;
-
-    block_t         *p_sdt;
-    dvbpsi_sdt_t    sdt;
-
-    dvbpsi_psi_section_t* p_section2;
-    dvbpsi_sdt_service_t *p_service;
-
-    uint8_t         *psz_sdt_desc;
+    sout_mux_sys_t *p_sys = p_mux->p_sys;
 
     if( p_sys->dvbpmt == NULL )
     {
@@ -2112,6 +2097,7 @@ static void GetPMT( sout_mux_t *p_mux, sout_buffer_chain_t *c )
         }
     }
 
+    dvbpsi_sdt_t sdt;
     if( p_sys->b_sdt )
         dvbpsi_InitSDT( &sdt, p_sys->i_tsid, 1, 1, p_sys->i_netid );
 
@@ -2125,7 +2111,7 @@ static void GetPMT( sout_mux_t *p_mux, sout_buffer_chain_t *c )
 
         if( p_sys->b_sdt )
         {
-            p_service = dvbpsi_SDTAddService( &sdt,
+            dvbpsi_sdt_service_t *p_service = dvbpsi_SDTAddService( &sdt,
                 p_sys->i_pmt_program_number[i],  /* service id */
                 0,         /* eit schedule */
                 0,         /* eit present */
@@ -2138,7 +2124,7 @@ static void GetPMT( sout_mux_t *p_mux, sout_buffer_chain_t *c )
             /* FIXME: Ineffecient malloc's & ugly code......  */
             if( ( psz_sdtprov != NULL ) && ( psz_sdtserv != NULL ) )
             {
-                psz_sdt_desc = malloc( 3 + strlen(psz_sdtprov)
+                uint8_t *psz_sdt_desc = malloc( 3 + strlen(psz_sdtprov)
                                          + strlen(psz_sdtserv) );
                 if( psz_sdt_desc )
                 {
@@ -2307,14 +2293,13 @@ static void GetPMT( sout_mux_t *p_mux, sout_buffer_chain_t *c )
 
     for (int i_stream = 0; i_stream < p_mux->i_nb_inputs; i_stream++ )
     {
-        ts_stream_t *p_stream;
+        ts_stream_t *p_stream = (ts_stream_t*)p_mux->pp_inputs[i_stream]->p_sys;
 
-        p_stream = (ts_stream_t *)p_mux->pp_inputs[i_stream]->p_sys;
-
-        i_pidinput = p_mux->pp_inputs[i_stream]->p_fmt->i_id;
-        p_usepid = bsearch( &i_pidinput, p_sys->pmtmap, p_sys->i_pmtslots,
+        int i_pidinput = p_mux->pp_inputs[i_stream]->p_fmt->i_id;
+        int *p_usepid = bsearch( &i_pidinput, p_sys->pmtmap, p_sys->i_pmtslots,
                             sizeof(pmt_map_t), intcompare );
 
+        dvbpsi_pmt_es_t *p_es;
         if( p_usepid != NULL )
             p_es = dvbpsi_PMTAddES(
                     &p_sys->dvbpmt[((pmt_map_t *)p_usepid)->i_prog],
@@ -2443,19 +2428,19 @@ static void GetPMT( sout_mux_t *p_mux, sout_buffer_chain_t *c )
 
     for (int i = 0; i < p_sys->i_num_pmt; i++ )
     {
-        p_section[i] = dvbpsi_GenPMTSections( &p_sys->dvbpmt[i] );
-        p_pmt[i] = WritePSISection( p_mux->p_sout, p_section[i] );
-        PEStoTS( p_mux->p_sout, c, p_pmt[i], &p_sys->pmt[i] );
-        dvbpsi_DeletePSISections( p_section[i] );
+        dvbpsi_psi_section_t *sect = dvbpsi_GenPMTSections( &p_sys->dvbpmt[i] );
+        block_t *pmt = WritePSISection( p_mux->p_sout, sect );
+        PEStoTS( p_mux->p_sout, c, pmt, &p_sys->pmt[i] );
+        dvbpsi_DeletePSISections(sect);
         dvbpsi_EmptyPMT( &p_sys->dvbpmt[i] );
     }
 
     if( p_sys->b_sdt )
     {
-        p_section2 = dvbpsi_GenSDTSections( &sdt );
-        p_sdt = WritePSISection( p_mux->p_sout, p_section2 );
+        dvbpsi_psi_section_t *sect = dvbpsi_GenSDTSections( &sdt );
+        block_t *p_sdt = WritePSISection( p_mux->p_sout, sect );
         PEStoTS( p_mux->p_sout, c, p_sdt, &p_sys->sdt );
-        dvbpsi_DeletePSISections( p_section2 );
+        dvbpsi_DeletePSISections( sect );
         dvbpsi_EmptySDT( &sdt );
     }
 }
