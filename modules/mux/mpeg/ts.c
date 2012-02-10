@@ -361,9 +361,6 @@ struct sout_mux_sys_t
 
     vlc_mutex_t     csa_lock;
 
-    int             i_audio_bound;
-    int             i_video_bound;
-
     bool            b_es_id_pid;
     bool            b_sdt;
     int             i_pid_video;
@@ -551,9 +548,6 @@ static int Open( vlc_object_t *p_this )
         p_sys->sdt_descriptors[i].psz_service_name
             = p_sys->sdt_descriptors[i].psz_provider = NULL;
     memset( p_sys->sdt_descriptors, 0, sizeof(sdt_desc_t) );
-
-    p_sys->i_audio_bound = 0;
-    p_sys->i_video_bound = 0;
 
     p_sys->b_es_id_pid = var_GetBool( p_mux, SOUT_CFG_PREFIX "es-id-pid" );
 
@@ -975,7 +969,6 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
             free( p_stream );
             return VLC_EGENERIC;
         }
-        p_sys->i_video_bound++;
         break;
 
     case AUDIO_ES:
@@ -1015,7 +1008,6 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
             free( p_stream );
             return VLC_EGENERIC;
         }
-        p_sys->i_audio_bound++;
         break;
 
     case SPU_ES:
