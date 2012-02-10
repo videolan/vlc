@@ -77,7 +77,6 @@
 #cmakedefine HAVE_DL_WINDOWS
 #cmakedefine HAVE_DSHOW_H
 #cmakedefine HAVE_DVBPSI_DR_H
-#cmakedefine HAVE_DVBPSI_SDT
 #cmakedefine HAVE_DVDREAD_DVD_READER_H
 #cmakedefine HAVE_DYNAMIC_PLUGINS
 #cmakedefine HAVE_EBML_EBMLVERSION_H
