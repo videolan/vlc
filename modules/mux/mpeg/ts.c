@@ -901,7 +901,7 @@ static int Control( sout_mux_t *p_mux, int i_query, va_list args )
 
     case MUX_GET_MIME:
         ppsz = (char**)va_arg( args, char ** );
-        *ppsz = strdup( "video/mpeg" );  /* FIXME not sure */
+        *ppsz = strdup( "video/mp2t" );
         return VLC_SUCCESS;
 
     default:
