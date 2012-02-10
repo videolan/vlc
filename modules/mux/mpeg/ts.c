@@ -524,51 +524,35 @@ static int Open( vlc_object_t *p_this )
        This would mean 0x451, 0x200, 0x28a, 0x240 would fall under one pmt (program), 0x450,0x201,0x28b,0x241 would fall under another
     */
     char *muxpmt = var_GetNonEmptyString(p_mux, SOUT_CFG_PREFIX "muxpmt");
-    if( muxpmt )
+    for (char *psz = muxpmt; psz; )
     {
         char *psz_next;
-        char *psz = muxpmt;
-        uint16_t i_pid;
-        psz_next = psz;
+        uint16_t i_pid = strtoul( psz, &psz_next, 0 );
+        psz = *psz_next ? &psz_next[1] : NULL;
 
-        while( psz != NULL )
+        if ( i_pid == 0 )
         {
-            i_pid = strtoul( psz, &psz_next, 0 );
-
-            if ( psz_next[0] != '\0' )
-                psz = &psz_next[1];
-            if ( i_pid == 0 )
+            if ( ++p_sys->i_num_pmt > MAX_PMT )
             {
-                p_sys->i_num_pmt++;
-                if ( p_sys->i_num_pmt > MAX_PMT )
-                {
-                    msg_Err( p_mux,
-             "Number of PMTs greater than compiled maximum (%d)", MAX_PMT );
-                    p_sys->i_num_pmt = MAX_PMT;
-                }
+                msg_Err( p_mux, "Number of PMTs > %d)", MAX_PMT );
+                p_sys->i_num_pmt = MAX_PMT;
             }
-            else
-            {
-                p_sys->pmtmap[p_sys->i_pmtslots].i_pid = i_pid;
-                p_sys->pmtmap[p_sys->i_pmtslots].i_prog = p_sys->i_num_pmt - 1;
-                p_sys->i_pmtslots++;
-                if ( p_sys->i_pmtslots > MAX_PMT_PID )
-                {
-                    msg_Err( p_mux,
-             "Number of pids in PMT greater than compiled maximum (%d)",
-                             MAX_PMT_PID );
-                    p_sys->i_pmtslots = MAX_PMT_PID;
-                }
-            }
-
-            /* Now sort according to pids for fast search later on */
-            qsort( (void *)p_sys->pmtmap, p_sys->i_pmtslots,
-                   sizeof(pmt_map_t), pmtcompare );
-            if ( !*psz_next )
-                psz = NULL;
         }
-        free(muxpmt);
+        else
+        {
+            p_sys->pmtmap[p_sys->i_pmtslots].i_pid = i_pid;
+            p_sys->pmtmap[p_sys->i_pmtslots].i_prog = p_sys->i_num_pmt - 1;
+            if ( ++p_sys->i_pmtslots > MAX_PMT_PID )
+            {
+                msg_Err( p_mux, "Number of pids in PMT > %d", MAX_PMT_PID );
+                p_sys->i_pmtslots = MAX_PMT_PID;
+            }
+        }
     }
+    /* Now sort according to pids for fast search later on */
+    qsort( (void *)p_sys->pmtmap, p_sys->i_pmtslots,
+            sizeof(pmt_map_t), pmtcompare );
+    free(muxpmt);
 
     unsigned short subi[3];
     vlc_rand_bytes(subi, sizeof(subi));
