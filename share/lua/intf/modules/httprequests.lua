@@ -177,6 +177,16 @@ processcommands = function ()
       if val == '0' then vlc.equalizer.enable(false) else vlc.equalizer.enable(true) end
     elseif command == "setpreset" then
       vlc.equalizer.setpreset(val)
+    elseif command == "title" then
+  	  vlc.var.set(vlc.object.input(), "title", val)
+	elseif command == "chapter" then
+  	  vlc.var.set(vlc.object.input(), "chapter", val)
+  	elseif command == "audio_track" then
+  	  vlc.var.set(vlc.object.input(), "audio-es", val)
+	elseif command == "video_track" then
+  	  vlc.var.set(vlc.object.input(), "video-es", val)
+	elseif command == "subtitle_track" then
+  	  vlc.var.set(vlc.object.input(), "spu-es", val)
     end
 
     local input = nil
@@ -423,7 +433,7 @@ local aout = vlc.object.aout()
     local s ={}
 
     --update api version when new data/commands added
-    s.apiversion=1
+    s.apiversion=2
     s.version=vlc.misc.version()
     s.volume=vlc.volume.get()
 
@@ -505,6 +515,10 @@ local aout = vlc.object.aout()
             local tag = string.gsub(k,"_","")
         s.stats[tag]=v
       end
+
+      	s.information.chapters=vlc.var.get_list(input, "chapter")
+      	s.information.titles=vlc.var.get_list(input, "title")
+
     end
     return s
 end

@@ -149,6 +149,25 @@ Band 0: 60 Hz, 1: 170 Hz, 2: 310 Hz, 3: 600 Hz, 4: 1 kHz,
 
 <Display the list of presets available for the equalizer
 
+---
+Commands available from API version 2
+---
+
+> select the title
+  ?command=title&val=<val>
+
+> select the chapter
+  ?command=title&val=<val>
+
+> select the audio track (use the number from the stream)
+  ?command=audio_track&val=<val>
+
+> select the video track (use the number from the stream)
+  ?command=video_track&val=<val>
+
+> select the sibtitle track (use the number from the stream)
+  ?command=subtitle_track&val=<val>
+
 playlist.xml or playlist.json:
 =============
 < get the full playlist tree
