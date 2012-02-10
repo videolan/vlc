@@ -232,7 +232,8 @@ vlc_module_begin ()
     add_shortcut ("dtv", "tv", "dvb", /* "radio", "dab",*/
                   "cable", "dvb-c", "cqam", "isdb-c",
                   "satellite", "dvb-s", "dvb-s2", "isdb-s",
-                  "terrestrial", "dvb-t", "dvb-t2", "isdb-t", "atsc")
+                  "terrestrial", "dvb-t", "dvb-t2", "isdb-t", "atsc",
+                  "dvbt")
 
 #ifdef __linux__
     add_integer ("dvb-adapter", 0, ADAPTER_TEXT, ADAPTER_LONGTEXT, false)
