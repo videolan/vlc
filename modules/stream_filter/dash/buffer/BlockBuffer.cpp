@@ -79,12 +79,9 @@ int     BlockBuffer::peek                 (const uint8_t **pp_peek, unsigned int
     if(ret > this->peekBlock->i_buffer)
         this->peekBlock = block_Realloc(this->peekBlock, 0, ret);
 
-    std::cout << "Peek Bytes: " << ret << " from buffer length: " << this->sizeBytes << std::endl;
-
     block_PeekBytes(&this->buffer, this->peekBlock->p_buffer, ret);
     *pp_peek = this->peekBlock->p_buffer;
 
-    std::cout << "Buffer length Sec: " << this->sizeMicroSec << " Bytes: " << this->sizeBytes<< std::endl;
     vlc_mutex_unlock(&this->monitorMutex);
     return ret;
 }
@@ -106,12 +103,8 @@ int     BlockBuffer::get                  (void *p_data, unsigned int len)
 
     this->reduceBufferMilliSec(ret);
 
-    std::cout << "Get Bytes: " << ret << " from buffer length: " << this->sizeBytes << std::endl;
-
     block_GetBytes(&this->buffer, (uint8_t *)p_data, ret);
     block_BytestreamFlush(&this->buffer);
-
-    std::cout << "Buffer length: " << this->sizeMicroSec << " Bytes: " << this->sizeBytes << std::endl;
 
     vlc_cond_signal(&this->empty);
     vlc_mutex_unlock(&this->monitorMutex);
@@ -131,13 +124,11 @@ void    BlockBuffer::put                  (block_t *block)
         return;
     }
 
-    std::cout << "Put MilliSec: " << block->i_length << " Bytes: " << block->i_buffer << " into buffer" << std::endl;
-    this->sizeMicroSec   += block->i_length;
-    this->sizeBytes += block->i_buffer;
+    this->sizeMicroSec  += block->i_length;
+    this->sizeBytes     += block->i_buffer;
 
     block_BytestreamPush(&this->buffer, block);
 
-    std::cout << "Buffer length: " << this->sizeMicroSec << " Bytes: " << this->sizeBytes << std::endl;
     vlc_cond_signal(&this->full);
     vlc_mutex_unlock(&this->monitorMutex);
 }
@@ -198,7 +189,6 @@ void    BlockBuffer::reduceBufferMilliSec (size_t bytes)
         }
     }
 
-    std::cout << "Reduce: " << microsec << std::endl;
     this->sizeMicroSec  -= microsec;
     this->sizeBytes     -= bytes;
 
