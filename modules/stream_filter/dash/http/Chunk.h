@@ -46,6 +46,8 @@ namespace dash
                 void                addOptionalUrl  (const std::string& url);
                 bool                useByteRange    ();
                 void                setUseByteRange (bool value);
+                void                setBitrate      (int bitrate);
+                int                 getBitrate      ();
 
             private:
                 std::string                 url;
@@ -53,6 +55,7 @@ namespace dash
                 int                         startByte;
                 int                         endByte;
                 bool                        hasByteRange;
+                int                         bitrate;
 
         };
     }

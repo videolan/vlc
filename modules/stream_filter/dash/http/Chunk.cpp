@@ -72,3 +72,11 @@ void                Chunk::setUseByteRange  (bool value)
 {
     this->hasByteRange = value;
 }
+void                Chunk::setBitrate       (int bitrate)
+{
+    this->bitrate = bitrate;
+}
+int                 Chunk::getBitrate       ()
+{
+    return this->bitrate;
+}

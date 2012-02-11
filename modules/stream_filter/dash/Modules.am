@@ -76,6 +76,8 @@ SOURCES_stream_filter_dash = \
     xml/Node.cpp \
     xml/Node.h \
     dash.cpp \
+    DASHDownloader.cpp \
+    DASHDownloader.h \
     DASHManager.cpp \
     DASHManager.h \
     $(NULL)
