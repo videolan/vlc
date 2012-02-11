@@ -191,7 +191,7 @@ net.connect_tcp( host, port ): open a connection to the given host:port (TCP).
 net.close( fd ): Close file descriptor.
 net.send( fd, string, [length] ): Send data on fd.
 net.recv( fd, [max length] ): Receive data from fd.
-net.poll( { fd = events }, [timeout in ms] ): Implement poll function.
+net.poll( { fd = events } ): Implement poll function.
   Returns the numbers of file descriptors with a non 0 revent. The function
   modifies the input table to { fd = revents }. See "man poll".
 net.POLLIN/POLLPRI/POLLOUT/POLLRDHUP/POLLERR/POLLHUP/POLLNVAL: poll event flags

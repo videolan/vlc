@@ -122,11 +122,7 @@ function host()
 
     local function read_console( client, len )
         -- Read stdin from a windows console (beware: select/poll doesn't work!)
-		if vlc.win.console_wait(0) then
-			return vlc.win.console_read()
-        else
-			return 0
-		end
+        return vlc.win.console_read()
     end
 
     local function del_client( client )
@@ -208,6 +204,9 @@ function host()
                          and listeners.tcp[host][port] then
             error("Already listening on tcp host `"..host..":"..tostring(port).."'")
         end
+        if listeners.stdio and vlc.win then
+            error("Cannot listen on console and sockets concurrently on Windows")
+        end
         if not listeners.tcp then
             listeners.tcp = {}
         end
@@ -230,6 +229,9 @@ function host()
         if listeners.stdio then
             error("Already listening on stdio")
         end
+        if listeners.tcp and vlc.win then
+            error("Cannot listen on console and sockets concurrently on Windows")
+        end
         new_client( h, 0, 1, client_type.stdio )
         listeners.stdio = true
     end
@@ -250,63 +252,56 @@ function host()
         end
     end
 
-    local function _accept_and_select( h, timeout )
-        local function filter_client( fds, status, event )
-            for _, client in pairs(clients) do
-                if client.status == status then
-                    fds[client:fd()] = event
-                end
-            end
-        end
-
-        local pollfds = {}
-        filter_client( pollfds, status.read, vlc.net.POLLIN )
-        filter_client( pollfds, status.password, vlc.net.POLLIN )
-        filter_client( pollfds, status.write, vlc.net.POLLOUT )
-        if listeners.tcp then
-            for _, listener in pairs(listeners.tcp.list) do
-                for _, fd in pairs({listener.data:fds()}) do
-                    pollfds[fd] = vlc.net.POLLIN
-                end
-            end
-        end
-
-        local timeout = -1
-        if vlc.win and listeners.stdio then
-            timeout = 50
-        end
-        local ret = 0
-        if not vlc.win or listeners.tcp then
-            ret = vlc.net.poll( pollfds, timeout )
-        end
+    local function _accept_and_select( h )
         local wclients = {}
         local rclients = {}
-        if ret > 0 then
-            for _, client in pairs(clients) do
-                if is_flag_set(pollfds[client:fd()], vlc.net.POLLERR)
-                or is_flag_set(pollfds[client:fd()], vlc.net.POLLHUP)
-                or is_flag_set(pollfds[client:fd()], vlc.net.POLLNVAL) then
-                    del_client(client)
-                elseif is_flag_set(pollfds[client:fd()], vlc.net.POLLOUT) then
-                    table.insert(wclients, client)
-                elseif is_flag_set(pollfds[client:fd()], vlc.net.POLLIN) then
-                    table.insert(rclients, client)
+        if not (vlc.win and listeners.stdio) then
+            local function filter_client( fds, status, event )
+                for _, client in pairs(clients) do
+                    if client.status == status then
+                        fds[client:fd()] = event
+                    end
                 end
             end
+
+            local pollfds = {}
+            filter_client( pollfds, status.read, vlc.net.POLLIN )
+            filter_client( pollfds, status.password, vlc.net.POLLIN )
+            filter_client( pollfds, status.write, vlc.net.POLLOUT )
             if listeners.tcp then
                 for _, listener in pairs(listeners.tcp.list) do
                     for _, fd in pairs({listener.data:fds()}) do
-                        if is_flag_set(pollfds[fd], vlc.net.POLLIN) then
-                            local afd = listener.data:accept()
-                            new_client( h, afd, afd, listener.type )
-                            break
+                        pollfds[fd] = vlc.net.POLLIN
+                    end
+                end
+            end
+
+            local ret = vlc.net.poll( pollfds )
+            if ret > 0 then
+                for _, client in pairs(clients) do
+                    if is_flag_set(pollfds[client:fd()], vlc.net.POLLERR)
+                    or is_flag_set(pollfds[client:fd()], vlc.net.POLLHUP)
+                    or is_flag_set(pollfds[client:fd()], vlc.net.POLLNVAL) then
+                        del_client(client)
+                    elseif is_flag_set(pollfds[client:fd()], vlc.net.POLLOUT) then
+                        table.insert(wclients, client)
+                    elseif is_flag_set(pollfds[client:fd()], vlc.net.POLLIN) then
+                        table.insert(rclients, client)
+                    end
+                end
+                if listeners.tcp then
+                    for _, listener in pairs(listeners.tcp.list) do
+                        for _, fd in pairs({listener.data:fds()}) do
+                            if is_flag_set(pollfds[fd], vlc.net.POLLIN) then
+                                local afd = listener.data:accept()
+                                new_client( h, afd, afd, listener.type )
+                                break
+                            end
                         end
                     end
                 end
             end
-        end
-
-        if vlc.win and listeners.stdio then
+        else
             for _, client in pairs(clients) do
                 if client.type == client_type.stdio then
                     if client.status == status.read or client.status == status.password then
@@ -319,7 +314,6 @@ function host()
                 end
             end
         end
-
         return wclients, rclients
     end
 
