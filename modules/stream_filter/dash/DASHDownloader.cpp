@@ -42,13 +42,9 @@ DASHDownloader::DASHDownloader  (HTTPConnectionManager *conManager, IAdaptationL
 }
 DASHDownloader::~DASHDownloader ()
 {
-    std::cout << "Downloader set eof" << std::endl;
     this->t_sys->buffer->setEOF(true);
-    std::cout << "Downloader try to join" << std::endl;
     vlc_join(this->dashDLThread, NULL);
     free(this->t_sys);
-
-    std::cout << "Downloader thread joined tsys freed" << std::endl;
 }
 
 bool        DASHDownloader::start       ()
@@ -92,16 +88,11 @@ void*       DASHDownloader::download    (void *thread_sys)
                 block_t *bufBlock = block_Alloc(ret);
                 memcpy(bufBlock->p_buffer, block->p_buffer, ret);
                 bufBlock->i_length = (mtime_t)((ret * 8) / ((float)currentChunk->getBitrate() / 1000000));
-
-                std::cout << "Put block into buffer MilliSeconds: " << bufBlock->i_length
-                          << " Bytes: " << bufBlock->i_buffer
-                          << " Bitrate: " << currentChunk->getBitrate() << std::endl;
                 buffer->put(bufBlock);
             }
         }
     }while(!buffer->getEOF());
 
-    std::cout << "Downloader end: " << std::endl;
     block_Release(block);
 
     return NULL;
