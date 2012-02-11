@@ -38,8 +38,8 @@ static const int conv_type_values[] = {
     SRC_ZERO_ORDER_HOLD, SRC_LINEAR,
 };
 static const char *const conv_type_texts[] = {
-    "Sinc function (best quality)", "Sinc function (medium quality)",
-    "Sinc function (fast)", "Zero Order Hold (fastest)", "Linear (fastest)",
+    N_("Sinc function (best quality)"), N_("Sinc function (medium quality)"),
+    N_("Sinc function (fast)"), N_("Zero Order Hold (fastest)"), N_("Linear (fastest)"),
 };
 
 static int Open (vlc_object_t *);
