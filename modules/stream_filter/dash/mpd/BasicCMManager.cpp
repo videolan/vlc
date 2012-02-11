@@ -106,7 +106,7 @@ Representation*         BasicCMManager::getRepresentation(Period *period, int bi
             int     currentBitrate = reps.at(j)->getBandwidth();
             assert( currentBitrate != -1 );
 
-            if ( best == NULL || bitrate == -1 ||
+            if ( best == NULL ||
                  ( currentBitrate > best->getBandwidth() &&
                    currentBitrate < bitrate ) )
             {
