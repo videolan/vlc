@@ -89,6 +89,9 @@ Period*                     IsoffMainManager::getFirstPeriod        ()
 }
 Representation*             IsoffMainManager::getRepresentation     (Period *period, int bitrate) const
 {
+    if(period == NULL)
+        return NULL;
+
     std::vector<AdaptationSet *> adaptationSets = period->getAdaptationSets();
 
     Representation  *best = NULL;
@@ -128,6 +131,9 @@ const MPD*                  IsoffMainManager::getMPD                () const
 }
 Representation*             IsoffMainManager::getRepresentation     (Period *period, int bitrate, int width, int height) const
 {
+    if(period == NULL)
+        return NULL;
+
     std::vector<AdaptationSet *> adaptationSets = period->getAdaptationSets();
 
     std::cout << "Searching for best representation with bitrate: " << bitrate << " and resolution: " << width << "x" << height << std::endl;
