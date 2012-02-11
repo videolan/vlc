@@ -271,29 +271,51 @@
 
 @implementation VLCResizeControl
 
-- (void)mouseDragged:(NSEvent *)theEvent
-{
-    NSRect windowFrame = [[self window] frame];
-    CGFloat deltaX, deltaY, oldOriginY;
-    deltaX = [theEvent deltaX];
-    deltaY = [theEvent deltaY];
-    oldOriginY = windowFrame.origin.y;
+- (void)mouseDown:(NSEvent *)theEvent {
+    BOOL keepOn = YES;
 
-    windowFrame.origin.y = (oldOriginY + windowFrame.size.height) - (windowFrame.size.height + deltaY);
-    windowFrame.size.width += deltaX;
-    windowFrame.size.height += deltaY;
+    while (keepOn) {
+        theEvent = [[self window] nextEventMatchingMask: NSLeftMouseUpMask |
+                    NSLeftMouseDraggedMask];
 
-    NSSize winMinSize = [self window].minSize;
-    if (windowFrame.size.width < winMinSize.width)
-        windowFrame.size.width = winMinSize.width;
+        switch ([theEvent type]) {
+            case NSLeftMouseDragged:
+            {
+                NSRect windowFrame = [[self window] frame];
+                CGFloat deltaX, deltaY, oldOriginY;
+                deltaX = [theEvent deltaX];
+                deltaY = [theEvent deltaY];
+                oldOriginY = windowFrame.origin.y;
 
-    if (windowFrame.size.height < winMinSize.height)
-    {
-        windowFrame.size.height = winMinSize.height;
-        windowFrame.origin.y = oldOriginY;
-    }
+                windowFrame.origin.y = (oldOriginY + windowFrame.size.height) - (windowFrame.size.height + deltaY);
+                windowFrame.size.width += deltaX;
+                windowFrame.size.height += deltaY;
 
-    [[self window] setFrame: windowFrame display: YES animate: NO];
+                NSSize winMinSize = [self window].minSize;
+                if (windowFrame.size.width < winMinSize.width)
+                    windowFrame.size.width = winMinSize.width;
+
+                if (windowFrame.size.height < winMinSize.height)
+                {
+                    windowFrame.size.height = winMinSize.height;
+                    windowFrame.origin.y = oldOriginY;
+                }
+
+                [[self window] setFrame: windowFrame display: YES animate: NO];
+                break;
+            }
+                break;
+            case NSLeftMouseUp:
+                keepOn = NO;
+                break;
+            default:
+                /* Ignore any other kind of event. */
+                break;
+        }
+
+    };
+
+    return;
 }
 
 @end
