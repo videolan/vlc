@@ -37,11 +37,11 @@ function search( string )
     for _,item in ipairs( channel.children ) do
         if( item.name == 'item' ) then
             simplexml.add_name_maps( item )
-            local url = string.gsub( item.children_map['link'][1].children[1], '&amp;', '&' )
-            local title = item.children_map['title'][1].children[1]
+            local url = vlc.strings.resolve_xml_special_chars( item.children_map['link'][1].children[1] )
+            local title = vlc.strings.resolve_xml_special_chars( item.children_map['title'][1].children[1] )
             local arturl = nil
             if item.children_map['media:thumbnail'] ~= nil then
-                arturl = item.children_map['media:thumbnail'][1].attributes['url']
+                arturl = vlc.strings.resolve_xml_special_chars( item.children_map['media:thumbnail'][1].attributes['url'] )
                 if( arturl == '/images/thumb_channel_default.jpg' ) then
                     arturl = 'http://www.metachannels.com/images/thumb_channel_default.jpg'
                 end
@@ -60,11 +60,11 @@ function main()
     for _,item in ipairs( channel.children ) do
         if( item.name == 'item' ) then
             simplexml.add_name_maps( item )
-            local url = string.gsub( item.children_map['link'][1].children[1], '&amp;', '&' )
-            local title = item.children_map['title'][1].children[1]
+            local url = vlc.strings.resolve_xml_special_chars( item.children_map['link'][1].children[1] )
+            local title = vlc.strings.resolve_xml_special_chars( item.children_map['title'][1].children[1] )
             local arturl = nil
             if item.children_map['image'] ~= nil then
-                arturl = item.children_map['image'][1].children_map['url'][1].children[1]
+                arturl = vlc.strings.resolve_xml_special_chars( item.children_map['image'][1].children_map['url'][1].children[1] )
             end
             local node = vlc.sd.add_item( { path = url,
                                             title = title,
