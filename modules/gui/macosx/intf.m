@@ -662,6 +662,7 @@ static VLCMain *_o_sharedMainInstance = nil;
 
     /* we will need this, so let's load it here so the interface appears to be more responsive */
     nib_open_loaded = [NSBundle loadNibNamed:@"Open" owner: NSApp];
+    [self initStrings];
 }
 
 - (void)initStrings
