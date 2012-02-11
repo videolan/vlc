@@ -73,6 +73,7 @@ Chunk*  RateBasedAdaptationLogic::getNextChunk() throw(EOFException)
     {
         Segment *seg = segments.at( this->count );
         Chunk *chunk = seg->toChunk();
+        chunk->setBitrate(rep->getBandwidth());
         //In case of UrlTemplate, we must stay on the same segment.
         if ( seg->isSingleShot() == true )
             this->count++;
