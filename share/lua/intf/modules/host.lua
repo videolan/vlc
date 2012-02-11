@@ -125,25 +125,24 @@ function host()
         return vlc.win.console_read()
     end
 
-    local function del_client( client )
+    local function del_client( client, nostdioerror )
+        --client:send("Cleaning up.\r\n")
         if client.type == client_type.stdio then
-            client:send( "Cannot delete stdin/stdout client.\n" )
-            return
-        end
-        for i, c in pairs(clients) do
-            if c == client then
-                if client.type == client_type.net
-                or client.type == client_type.telnet then
-                    if client.wfd ~= client.rfd then
-                        vlc.net.close( client.rfd )
-                    end
-                    vlc.net.close( client.wfd )
-                end
-                clients[i] = nil
-                return
+            if not nostdioerror then
+                client:send( "Cannot delete stdin/stdout client.\n" )
             end
+        elseif clients[client] then
+            if client.type == client_type.net
+            or client.type == client_type.telnet then
+                if client.wfd ~= client.rfd then
+                    vlc.net.close( client.rfd )
+                end
+                vlc.net.close( client.wfd )
+            end
+            clients[client] = nil
+        else
+            vlc.msg.err("couldn't find client to remove.")
         end
-        vlc.msg.err("couldn't find client to remove.")
     end
 
     local function switch_status( client, s )
@@ -194,7 +193,7 @@ function host()
                          append = append,
                        }
         client:send( "VLC media player "..vlc.misc.version().."\n" )
-        table.insert(clients, client)
+        clients[client] = client
         client:switch_status(status.password)
     end
 
@@ -282,7 +281,7 @@ function host()
                     if is_flag_set(pollfds[client:fd()], vlc.net.POLLERR)
                     or is_flag_set(pollfds[client:fd()], vlc.net.POLLHUP)
                     or is_flag_set(pollfds[client:fd()], vlc.net.POLLNVAL) then
-                        del_client(client)
+                        client:del()
                     elseif is_flag_set(pollfds[client:fd()], vlc.net.POLLOUT) then
                         table.insert(wclients, client)
                     elseif is_flag_set(pollfds[client:fd()], vlc.net.POLLIN) then
@@ -319,14 +318,7 @@ function host()
 
     local function destructor( h )
         for _,client in pairs(clients) do
-            --client:send("Cleaning up.")
-            if client.type == client_type.net
-            or client.type == client_type.telnet then
-                if client.wfd ~= client.rfd then
-                    vlc.net.close(client.rfd)
-                end
-                vlc.net.close(client.wfd)
-            end
+            client:del(true)
         end
     end
 
