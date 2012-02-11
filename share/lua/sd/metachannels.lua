@@ -38,13 +38,15 @@ function search( string )
         if( item.name == 'item' ) then
             simplexml.add_name_maps( item )
             local url = string.gsub( item.children_map['link'][1].children[1], '&amp;', '&' )
-            local arturl = item.children_map['media:thumbnail'][1].attributes['url']
-            if( arturl == '/images/thumb_channel_default.jpg' ) then
-                arturl = 'http://www.metachannels.com/images/thumb_channel_default.jpg'
+            local title = item.children_map['title'][1].children[1]
+            local arturl = nil
+            if item.children_map['media:thumbnail'] ~= nil then
+                arturl = item.children_map['media:thumbnail'][1].attributes['url']
+                if( arturl == '/images/thumb_channel_default.jpg' ) then
+                    arturl = 'http://www.metachannels.com/images/thumb_channel_default.jpg'
+                end
             end
-            node:add_subitem( { path = url,
-                                title = item.children_map['title'][1].children[1],
-                                arturl = arturl } )
+            node:add_subitem( { path = url, title = title, arturl = arturl } )
         end
     end
 end
