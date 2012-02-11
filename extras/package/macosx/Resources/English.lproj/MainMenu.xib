@@ -669,7 +669,7 @@
                 </object>
                 <object class="NSCustomView" id="202538583">
                   <reference key="NSNextResponder" ref="129808516"/>
-                  <int key="NSvFlags">292</int>
+                  <int key="NSvFlags">-2147483356</int>
                   <string key="NSFrame">{{218, 12}, {60, 12}}</string>
                   <reference key="NSSuperview" ref="129808516"/>
                   <int key="NSViewLayerContentsRedrawPolicy">2</int>
@@ -764,7 +764,7 @@
                     <reference key="NSControlView" ref="704525034"/>
                     <double key="NSMaxValue">10000</double>
                     <double key="NSMinValue">0.0</double>
-                    <double key="NSValue">9259.0232749896932</double>
+                    <double key="NSValue">6017.9640718562878</double>
                     <double key="NSAltIncValue">0.0</double>
                     <int key="NSNumberOfTickMarks">0</int>
                     <int key="NSTickMarkPosition">1</int>
