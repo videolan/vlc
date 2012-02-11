@@ -59,9 +59,14 @@ function main()
         if( item.name == 'item' ) then
             simplexml.add_name_maps( item )
             local url = string.gsub( item.children_map['link'][1].children[1], '&amp;', '&' )
+            local title = item.children_map['title'][1].children[1]
+            local arturl = nil
+            if item.children_map['image'] ~= nil then
+                arturl = item.children_map['image'][1].children_map['url'][1].children[1]
+            end
             local node = vlc.sd.add_item( { path = url,
-                                            title = item.children_map['title'][1].children[1],
-                                            arturl = item.children_map['image'][1].children_map['url'][1].children[1] } )
+                                            title = title,
+                                            arturl = arturl } )
         end
     end
 end
