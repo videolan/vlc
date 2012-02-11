@@ -850,7 +850,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
         [o_disc_bd_lbl setStringValue: [[NSFileManager defaultManager] displayNameAtPath: o_currentOpticalDevice]];
         [self showOpticalMediaView: o_disc_bd_view withIcon: [[NSWorkspace sharedWorkspace] iconForFile: o_currentOpticalDevice]];
         if (diskType == kVLCMediaBD)
-            [self setMRL: [NSString stringWithFormat: @"bluray://%@", [self getBSDNodeFromMountPath: o_currentOpticalDevice]]];
+            [self setMRL: [NSString stringWithFormat: @"bluray://%@", o_currentOpticalDevice]];
         else
             [self setMRL: [NSString stringWithFormat: @"bluray://%@", o_currentOpticalDevice]];
     }
