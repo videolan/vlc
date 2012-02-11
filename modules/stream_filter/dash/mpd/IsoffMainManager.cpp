@@ -101,9 +101,7 @@ Representation*             IsoffMainManager::getRepresentation     (Period *per
         {
             int currentBitrate = reps.at(j)->getBandwidth();
 
-            if(best == NULL || bitrate == -1 ||
-                 ( currentBitrate > best->getBandwidth() &&
-                   currentBitrate < bitrate ) )
+            if(best == NULL || (currentBitrate > best->getBandwidth() && currentBitrate < bitrate))
             {
                 std::cout << "Found a better Representation bandwidth=" << reps.at(j)->getBandwidth() << " in adaptationSet #" << i << std::endl;
                 best = reps.at( j );

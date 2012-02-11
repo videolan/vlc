@@ -90,6 +90,7 @@ dash::http::Chunk*      Segment::toChunk        ()
 
     if(this->startByte != -1 && this->endByte != -1)
     {
+        chunk->setUseByteRange(true);
         chunk->setStartByte(this->startByte);
         chunk->setEndByte(this->endByte);
     }

@@ -29,8 +29,10 @@
 
 using namespace dash::http;
 
-Chunk::Chunk() : startByte( 0 ),
-    endByte( 0 )
+Chunk::Chunk        () :
+       startByte    (0),
+       endByte      (0),
+       hasByteRange (false)
 {
 }
 
@@ -61,4 +63,12 @@ void                Chunk::setUrl           (const std::string& url )
 void                Chunk::addOptionalUrl   (const std::string& url)
 {
     this->optionalUrls.push_back(url);
+}
+bool                Chunk::useByteRange     ()
+{
+    return this->hasByteRange;
+}
+void                Chunk::setUseByteRange  (bool value)
+{
+    this->hasByteRange = value;
 }

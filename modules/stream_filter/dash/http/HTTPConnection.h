@@ -36,6 +36,9 @@
 #include <sstream>
 
 #include "http/IHTTPConnection.h"
+#include "http/Chunk.h"
+
+#define PEEKBUFFER 4096
 
 namespace dash
 {
@@ -44,7 +47,7 @@ namespace dash
         class HTTPConnection : public IHTTPConnection
         {
             public:
-                HTTPConnection          ( const std::string& url, stream_t *stream );
+                HTTPConnection          ( Chunk *chunk, stream_t *stream );
                 virtual ~HTTPConnection ();
 
                 bool        init            ();
@@ -60,12 +63,15 @@ namespace dash
                 std::string             path;
                 std::string             request;
                 stream_t                *stream;
-                stream_t                *urlStream;
+                Chunk                   *chunk;
+                uint8_t                 *peekBuffer;
+                size_t                  peekBufferLen;
 
                 void            parseURL        ();
                 bool            sendData        (const std::string& data);
                 bool            parseHeader     ();
                 std::string     readLine        ();
+                void            prepareRequest  ();
         };
     }
 }

@@ -157,7 +157,7 @@ void    IsoffMainParser::setInitSegment     (dash::xml::Node *segBaseNode, Segme
         {
             std::string range = initSeg.at(0)->getAttributeValue("range");
             size_t pos = range.find("-");
-            seg->setByteRange(atoi(range.substr(0, pos).c_str()), atoi(range.substr(pos, range.size()).c_str()));
+            seg->setByteRange(atoi(range.substr(0, pos).c_str()), atoi(range.substr(pos + 1, range.size()).c_str()));
         }
 
         for(size_t i = 0; i < this->mpd->getBaseUrls().size(); i++)
@@ -175,11 +175,11 @@ void    IsoffMainParser::setSegments        (dash::xml::Node *segListNode, Segme
         Segment *seg = new Segment( this->currentRepresentation );
         seg->setSourceUrl(segments.at(i)->getAttributeValue("media"));
 
-        if(segments.at(0)->hasAttribute("mediaRange"))
+        if(segments.at(i)->hasAttribute("mediaRange"))
         {
-            std::string range = segments.at(0)->getAttributeValue("mediaRange");
+            std::string range = segments.at(i)->getAttributeValue("mediaRange");
             size_t pos = range.find("-");
-            seg->setByteRange(atoi(range.substr(0, pos).c_str()), atoi(range.substr(pos, range.size()).c_str()));
+            seg->setByteRange(atoi(range.substr(0, pos).c_str()), atoi(range.substr(pos + 1, range.size()).c_str()));
         }
 
         for(size_t i = 0; i < this->mpd->getBaseUrls().size(); i++)

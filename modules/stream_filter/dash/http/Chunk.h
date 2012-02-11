@@ -44,12 +44,15 @@ namespace dash
                 void                setStartByte    (int startByte);
                 void                setUrl          (const std::string& url);
                 void                addOptionalUrl  (const std::string& url);
+                bool                useByteRange    ();
+                void                setUseByteRange (bool value);
 
             private:
                 std::string                 url;
                 std::vector<std::string>    optionalUrls;
                 int                         startByte;
                 int                         endByte;
+                bool                        hasByteRange;
 
         };
     }
