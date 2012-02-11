@@ -278,6 +278,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
 	[[sharedWorkspace notificationCenter] addObserver:self selector:@selector(scanOpticalMedia:) name:NSWorkspaceDidMountNotification object:nil];
 	[[sharedWorkspace notificationCenter] addObserver:self selector:@selector(scanOpticalMedia:) name:NSWorkspaceDidUnmountNotification object:nil];
     [self scanOpticalMedia:nil];
+    [self qtkChanged:nil];
 
     [self setMRL: @""];
 }
@@ -454,7 +455,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
 - (IBAction)qtkChanged:(id)sender
 {
 	NSInteger i_selectedDevice = [o_qtk_device_pop indexOfSelectedItem];
-	if (i_selectedDevice > ([qtkvideoDevices count] - 1))
+	if (i_selectedDevice >= ([qtkvideoDevices count] - 1))
 	{
 		NSValue *sizes = [[[[qtkvideoDevices objectAtIndex:i_selectedDevice] formatDescriptions] objectAtIndex: 0] attributeForKey: QTFormatDescriptionVideoEncodedPixelsSizeAttribute];
 
