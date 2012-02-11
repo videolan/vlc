@@ -144,10 +144,16 @@ int DirInit (access_t *p_access, DIR *handle)
         goto error;
     }
 
-    if (var_InheritBool (p_access, "directory-version-sort"))
+    char *psz_sort = var_InheritString (p_access, "directory-sort");
+    if (!psz_sort)
+        p_sys->compar = collate;
+    else if (!strcasecmp (psz_sort, "version"))
         p_sys->compar = version;
+    else if (!strcasecmp (psz_sort, "none"))
+        p_sys->compar = NULL;
     else
         p_sys->compar = collate;
+    free(psz_sort);
 
     root->parent = NULL;
     root->handle = handle;
