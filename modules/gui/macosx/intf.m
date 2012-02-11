@@ -626,7 +626,8 @@ static VLCMain *_o_sharedMainInstance = nil;
     /* yeah, we are done */
     b_nativeFullscreenMode = NO;
 #ifdef MAC_OS_X_VERSION_10_7
-    b_nativeFullscreenMode = config_GetInt( p_intf, "macosx-nativefullscreenmode" );
+    if( config_GetInt( VLCIntf, "embedded-video" ))
+        b_nativeFullscreenMode = config_GetInt( p_intf, "macosx-nativefullscreenmode" );
 #endif
     nib_main_loaded = TRUE;
 }
