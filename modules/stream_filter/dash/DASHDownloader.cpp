@@ -87,6 +87,10 @@ void*       DASHDownloader::download    (void *thread_sys)
             {
                 block_t *bufBlock = block_Alloc(ret);
                 memcpy(bufBlock->p_buffer, block->p_buffer, ret);
+
+                if(currentChunk->getBitrate() <= 0)
+                    currentChunk->setBitrate(CHUNKDEFAULTBITRATE);
+
                 bufBlock->i_length = (mtime_t)((ret * 8) / ((float)currentChunk->getBitrate() / 1000000));
                 buffer->put(bufBlock);
             }
