@@ -37,7 +37,9 @@ Representation::Representation  () :
                 trickModeType   ( NULL ),
                 parentGroup     ( NULL ),
                 segmentBase     ( NULL ),
-                segmentList     ( NULL )
+                segmentList     ( NULL ),
+                width           (0),
+                height          (0)
 
 {
 }
@@ -138,4 +140,20 @@ SegmentBase*        Representation::getSegmentBase          () const
 void                Representation::setSegmentBase          (SegmentBase *base)
 {
     this->segmentBase = base;
+}
+void                Representation::setWidth                (int width)
+{
+    this->width = width;
+}
+int                 Representation::getWidth                () const
+{
+    return this->width;
+}
+void                Representation::setHeight               (int height)
+{
+    this->height = height;
+}
+int                 Representation::getHeight               () const
+{
+    return this->height;
 }

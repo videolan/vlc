@@ -32,11 +32,13 @@ using namespace dash::xml;
 using namespace dash::mpd;
 using namespace dash::exception;
 
-AbstractAdaptationLogic::AbstractAdaptationLogic    (IMPDManager *mpdManager)
+AbstractAdaptationLogic::AbstractAdaptationLogic    (IMPDManager *mpdManager, stream_t *stream) :
+                         bpsAvg                     (-1),
+                         bpsLastChunk               (0),
+                         mpdManager                 (mpdManager),
+                         stream                     (stream)
+
 {
-    this->bpsAvg        = -1;
-    this->bpsLastChunk  = 0;
-    this->mpdManager    = mpdManager;
 }
 AbstractAdaptationLogic::~AbstractAdaptationLogic   ()
 {

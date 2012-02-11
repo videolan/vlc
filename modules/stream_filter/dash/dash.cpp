@@ -48,12 +48,20 @@
 static int  Open    (vlc_object_t *);
 static void Close   (vlc_object_t *);
 
+#define DASH_WIDTH_TEXT N_("Preferred Width")
+#define DASH_WIDTH_LONGTEXT N_("Preferred Width")
+
+#define DASH_HEIGHT_TEXT N_("Preferred Height")
+#define DASH_HEIGHT_LONGTEXT N_("Preferred Height")
+
 vlc_module_begin ()
         set_shortname( N_("DASH"))
         set_description( N_("Dynamic Adaptive Streaming over HTTP") )
         set_capability( "stream_filter", 19 )
         set_category( CAT_INPUT )
         set_subcategory( SUBCAT_INPUT_STREAM_FILTER )
+        add_integer( "dash-prefwidth",  480, DASH_WIDTH_TEXT,  DASH_WIDTH_LONGTEXT,  true )
+        add_integer( "dash-prefheight", 360, DASH_HEIGHT_TEXT, DASH_HEIGHT_LONGTEXT, true )
         set_callbacks( Open, Close )
 vlc_module_end ()
 
@@ -106,7 +114,7 @@ static int Open(vlc_object_t *p_obj)
                               new dash::http::HTTPConnectionManager( p_stream );
     dash::DASHManager*p_dashManager =
             new dash::DASHManager( p_conManager, p_sys->p_mpd,
-                                   dash::logic::IAdaptationLogic::RateBased );
+                                   dash::logic::IAdaptationLogic::RateBased, p_stream);
 
     if ( p_dashManager->getMpdManager() == NULL ||
          p_dashManager->getMpdManager()->getMPD() == NULL ||

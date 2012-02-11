@@ -33,7 +33,8 @@ using namespace dash::http;
 using namespace dash::mpd;
 using namespace dash::exception;
 
-AlwaysBestAdaptationLogic::AlwaysBestAdaptationLogic    (IMPDManager *mpdManager) : AbstractAdaptationLogic(mpdManager)
+AlwaysBestAdaptationLogic::AlwaysBestAdaptationLogic    (IMPDManager *mpdManager, stream_t *stream) :
+                           AbstractAdaptationLogic      (mpdManager, stream)
 {
     this->mpdManager    = mpdManager;
     this->count         = 0;

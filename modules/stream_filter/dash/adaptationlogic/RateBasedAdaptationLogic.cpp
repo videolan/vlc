@@ -33,12 +33,16 @@ using namespace dash::http;
 using namespace dash::mpd;
 using namespace dash::exception;
 
-RateBasedAdaptationLogic::RateBasedAdaptationLogic  (IMPDManager *mpdManager) :
-    AbstractAdaptationLogic( mpdManager ),
-    mpdManager( mpdManager ),
-    count( 0 ),
-    currentPeriod( mpdManager->getFirstPeriod() )
+RateBasedAdaptationLogic::RateBasedAdaptationLogic  (IMPDManager *mpdManager, stream_t *stream) :
+                          AbstractAdaptationLogic   (mpdManager, stream),
+                          mpdManager                (mpdManager),
+                          count                     (0),
+                          currentPeriod             (mpdManager->getFirstPeriod()),
+                          width                     (0),
+                          height                    (0)
 {
+    this->width  = var_InheritInteger(stream, "dash-prefwidth");
+    this->height = var_InheritInteger(stream, "dash-prefheight");
 }
 
 Chunk*  RateBasedAdaptationLogic::getNextChunk() throw(EOFException)
@@ -51,7 +55,7 @@ Chunk*  RateBasedAdaptationLogic::getNextChunk() throw(EOFException)
 
     long bitrate = this->getBpsAvg();
 
-    Representation *rep = this->mpdManager->getRepresentation(this->currentPeriod, bitrate);
+    Representation *rep = this->mpdManager->getRepresentation(this->currentPeriod, bitrate, this->width, this->height);
 
     if ( rep == NULL )
         throw EOFException();

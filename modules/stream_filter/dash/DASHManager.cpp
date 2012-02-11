@@ -35,18 +35,19 @@ using namespace dash::mpd;
 using namespace dash::exception;
 
 DASHManager::DASHManager    ( HTTPConnectionManager *conManager, MPD *mpd,
-                              IAdaptationLogic::LogicType type ) :
+                              IAdaptationLogic::LogicType type, stream_t *stream) :
     conManager( conManager ),
     currentChunk( NULL ),
     adaptationLogic( NULL ),
     logicType( type ),
     mpdManager( NULL ),
-    mpd( mpd )
+    mpd( mpd ),
+    stream(stream)
 {
     this->mpdManager        = mpd::MPDManagerFactory::create( mpd );
     if ( this->mpdManager == NULL )
         return ;
-    this->adaptationLogic   = AdaptationLogicFactory::create( this->logicType, this->mpdManager );
+    this->adaptationLogic   = AdaptationLogicFactory::create( this->logicType, this->mpdManager, this->stream);
     if ( this->adaptationLogic == NULL )
         return ;
     this->conManager->attach(this->adaptationLogic);

@@ -113,12 +113,21 @@ void    IsoffMainParser::setRepresentations (Node *adaptationSetNode, Adaptation
 
     for(size_t i = 0; i < representations.size(); i++)
     {
-        Representation *rep = new Representation;
-        this->currentRepresentation = rep;
-        this->setSegmentBase(representations.at(i), rep);
-        this->setSegmentList(representations.at(i), rep);
-        rep->setBandwidth(atoi(representations.at(i)->getAttributeValue("bandwidth").c_str()));
-        adaptationSet->addRepresentation(rep);
+        this->currentRepresentation = new Representation;
+        Node *repNode = representations.at(i);
+
+        if(repNode->hasAttribute("width"))
+            this->currentRepresentation->setWidth(atoi(repNode->getAttributeValue("width").c_str()));
+
+        if(repNode->hasAttribute("height"))
+            this->currentRepresentation->setHeight(atoi(repNode->getAttributeValue("height").c_str()));
+
+        if(repNode->hasAttribute("bandwidth"))
+            this->currentRepresentation->setBandwidth(atoi(repNode->getAttributeValue("bandwidth").c_str()));
+
+        this->setSegmentBase(repNode, this->currentRepresentation);
+        this->setSegmentList(repNode, this->currentRepresentation);
+        adaptationSet->addRepresentation(this->currentRepresentation);
     }
 }
 void    IsoffMainParser::setSegmentBase     (dash::xml::Node *repNode, Representation *rep)

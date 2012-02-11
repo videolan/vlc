@@ -40,7 +40,7 @@ namespace dash
     {
         public:
             DASHManager( http::HTTPConnectionManager *conManager, mpd::MPD *mpd,
-                         logic::IAdaptationLogic::LogicType type );
+                         logic::IAdaptationLogic::LogicType type, stream_t *stream);
             virtual ~DASHManager    ();
 
             int read( void *p_buffer, size_t len );
@@ -56,6 +56,7 @@ namespace dash
             logic::IAdaptationLogic::LogicType  logicType;
             mpd::IMPDManager                    *mpdManager;
             mpd::MPD                            *mpd;
+            stream_t                            *stream;
     };
 }
 

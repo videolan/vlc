@@ -35,6 +35,8 @@
 #include "mpd/Segment.h"
 #include "exceptions/EOFException.h"
 
+struct stream_t;
+
 namespace dash
 {
     namespace logic
@@ -42,7 +44,7 @@ namespace dash
         class AbstractAdaptationLogic : public IAdaptationLogic
         {
             public:
-                AbstractAdaptationLogic             (dash::mpd::IMPDManager *mpdManager);
+                AbstractAdaptationLogic             (dash::mpd::IMPDManager *mpdManager, stream_t *stream);
                 virtual ~AbstractAdaptationLogic    ();
 
                 virtual void                downloadRateChanged     (long bpsAvg, long bpsLastChunk);
@@ -54,6 +56,7 @@ namespace dash
                 int                     bpsAvg;
                 long                    bpsLastChunk;
                 dash::mpd::IMPDManager  *mpdManager;
+                stream_t                *stream;
         };
     }
 }

@@ -45,14 +45,17 @@ namespace dash
         class IMPDManager
         {
             public:
-                virtual const std::vector<Period *>&   getPeriods              () const                 = 0;
-                virtual Period*                 getFirstPeriod          ()                              = 0;
-                virtual Period*                 getNextPeriod           (Period *period)                = 0;
-                virtual Representation*         getBestRepresentation   (Period *period)                = 0;
-                virtual std::vector<Segment *>  getSegments( const Representation *rep ) = 0;
-                virtual Representation*         getRepresentation       (Period *period, int bitrate)   = 0;
-                virtual const MPD*              getMPD                  () const = 0;
                 virtual ~IMPDManager(){}
+
+                virtual const std::vector<Period *>&    getPeriods              () const                            = 0;
+                virtual Period*                         getFirstPeriod          ()                                  = 0;
+                virtual Period*                         getNextPeriod           (Period *period)                    = 0;
+                virtual Representation*                 getBestRepresentation   (Period *period)                    = 0;
+                virtual std::vector<Segment *>          getSegments             (const Representation *rep)         = 0;
+                virtual Representation*                 getRepresentation       (Period *period, int bitrate) const = 0;
+                virtual const MPD*                      getMPD                  () const                            = 0;
+                virtual Representation*                 getRepresentation       (Period *period, int bitrate,
+                                                                                 int width, int height) const       = 0;
         };
     }
 }

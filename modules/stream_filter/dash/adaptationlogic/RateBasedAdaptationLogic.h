@@ -32,6 +32,9 @@
 #include "exceptions/EOFException.h"
 #include "mpd/BasicCMManager.h"
 
+#include <vlc_common.h>
+#include <vlc_stream.h>
+
 namespace dash
 {
     namespace logic
@@ -39,7 +42,7 @@ namespace dash
         class RateBasedAdaptationLogic : public AbstractAdaptationLogic
         {
             public:
-                RateBasedAdaptationLogic            (dash::mpd::IMPDManager *mpdManager);
+                RateBasedAdaptationLogic            (dash::mpd::IMPDManager *mpdManager, stream_t *stream);
 
                 dash::http::Chunk*      getNextChunk() throw(dash::exception::EOFException);
                 const dash::mpd::Representation *getCurrentRepresentation() const;
@@ -48,6 +51,8 @@ namespace dash
                 dash::mpd::IMPDManager  *mpdManager;
                 size_t                  count;
                 dash::mpd::Period       *currentPeriod;
+                int                     width;
+                int                     height;
         };
     }
 }

@@ -76,6 +76,10 @@ namespace dash
                 void                setSegmentList          (SegmentList *list);
                 SegmentBase*        getSegmentBase          () const;
                 void                setSegmentBase          (SegmentBase *base);
+                void                setWidth                (int width);
+                int                 getWidth                () const;
+                void                setHeight               (int height);
+                int                 getHeight               () const;
 
             private:
                 int                                 bandwidth;
@@ -87,6 +91,8 @@ namespace dash
                 const Group                         *parentGroup;
                 SegmentBase                         *segmentBase;
                 SegmentList                         *segmentList;
+                int                                 width;
+                int                                 height;
         };
     }
 }

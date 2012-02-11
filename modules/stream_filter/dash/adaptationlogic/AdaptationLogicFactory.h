@@ -31,6 +31,8 @@
 #include "adaptationlogic/AlwaysBestAdaptationLogic.h"
 #include "adaptationlogic/RateBasedAdaptationLogic.h"
 
+struct stream_t;
+
 namespace dash
 {
     namespace logic
@@ -38,7 +40,7 @@ namespace dash
         class AdaptationLogicFactory
         {
             public:
-                static IAdaptationLogic* create (IAdaptationLogic::LogicType logic, dash::mpd::IMPDManager *mpdManager);
+                static IAdaptationLogic* create (IAdaptationLogic::LogicType logic, dash::mpd::IMPDManager *mpdManager, stream_t *stream);
         };
     }
 }

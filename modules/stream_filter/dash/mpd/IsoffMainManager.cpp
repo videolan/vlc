@@ -87,7 +87,7 @@ Period*                     IsoffMainManager::getFirstPeriod        ()
 
     return periods.at(0);
 }
-Representation*             IsoffMainManager::getRepresentation     (Period *period, int bitrate )
+Representation*             IsoffMainManager::getRepresentation     (Period *period, int bitrate) const
 {
     std::vector<AdaptationSet *> adaptationSets = period->getAdaptationSets();
 
@@ -125,4 +125,49 @@ Period*                     IsoffMainManager::getNextPeriod         (Period *per
 const MPD*                  IsoffMainManager::getMPD                () const
 {
     return this->mpd;
+}
+Representation*             IsoffMainManager::getRepresentation     (Period *period, int bitrate, int width, int height) const
+{
+    std::vector<AdaptationSet *> adaptationSets = period->getAdaptationSets();
+
+    std::cout << "Searching for best representation with bitrate: " << bitrate << " and resolution: " << width << "x" << height << std::endl;
+
+    std::vector<Representation *> resMatchReps;
+
+    int lowerWidth  = 0;
+    int lowerHeight = 0;
+
+    for(size_t i = 0; i < adaptationSets.size(); i++)
+    {
+        std::vector<Representation *> reps = adaptationSets.at(i)->getRepresentations();
+        for( size_t j = 0; j < reps.size(); j++ )
+        {
+            if(reps.at(j)->getWidth() == width && reps.at(j)->getHeight() == height)
+                resMatchReps.push_back(reps.at(j));
+
+            if(reps.at(j)->getHeight() < height)
+            {
+                lowerWidth  = reps.at(j)->getWidth();
+                lowerHeight = reps.at(j)->getHeight();
+            }
+        }
+    }
+
+    if(resMatchReps.size() == 0)
+        return this->getRepresentation(period, bitrate, lowerWidth, lowerHeight);
+
+    Representation  *best = NULL;
+    for( size_t j = 0; j < resMatchReps.size(); j++ )
+    {
+        int currentBitrate = resMatchReps.at(j)->getBandwidth();
+
+        if(best == NULL || (currentBitrate > best->getBandwidth() && currentBitrate < bitrate))
+        {
+            std::cout << "Found a better Representation bandwidth=" << resMatchReps.at(j)->getBandwidth()
+                      << " and resolution: " << resMatchReps.at(j)->getWidth() << "x" << resMatchReps.at(j)->getHeight() << std::endl;
+            best = resMatchReps.at(j);
+        }
+    }
+
+    return best;
 }
