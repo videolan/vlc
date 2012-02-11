@@ -1781,6 +1781,8 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [o_fspanel setActive: nil];
 
     [self recreateHideMouseTimer];
+    i_originalLevel = [self level];
+    [self setLevel:NSNormalWindowLevel];
 
     if (b_dark_interface)
     {
@@ -1806,6 +1808,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [o_video_view setFrame: [o_split_view frame]];
     [NSCursor setHiddenUntilMouseMoves: NO];
     [o_fspanel setNonActive: nil];
+    [self setLevel:i_originalLevel];
     b_fullscreen = NO;
 
     if (b_dark_interface)
