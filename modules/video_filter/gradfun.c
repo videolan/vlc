@@ -55,7 +55,7 @@ static void Close(vlc_object_t *);
 vlc_module_begin()
     set_description(N_("Gradfun video filter"))
     set_shortname(N_("Gradfun"))
-    set_help("Debanding algorithm")
+    set_help(N_("Debanding algorithm"))
     set_capability("video filter2", 0)
     set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VFILTER)
