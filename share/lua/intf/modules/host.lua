@@ -319,7 +319,7 @@ function host()
 
     local function destructor( h )
         for _,client in pairs(clients) do
-            client:send("Shutting down.")
+            --client:send("Cleaning up.")
             if client.type == client_type.net
             or client.type == client_type.telnet then
                 if client.wfd ~= client.rfd then
@@ -336,6 +336,14 @@ function host()
         end
     end
 
+    if setfenv then
+        -- We're running Lua 5.1
+        -- See http://lua-users.org/wiki/HiddenFeatures for more info.
+        local proxy = newproxy(true)
+        getmetatable(proxy).__gc = destructor
+        destructor = proxy
+    end
+
     -- the instance
     local h = setmetatable(
               { -- data
@@ -348,7 +356,7 @@ function host()
                 broadcast = _broadcast,
               },
               { -- metatable
-                __gc = destructor,
+                __gc = destructor, -- Should work in Lua 5.2 without the new proxytrick as __gc is also called on tables (needs to be tested)
                 __metatable = "",
               })
     return h
