@@ -47,9 +47,11 @@ EXTRA_DIST += \
 	$(DIST_skins2) \
 	$(DIST_http_lua) \
 	$(DIST_lua) \
+	osdmenu/default.cfg.in \
 	$(DIST_osdmenu_default) \
 	$(DIST_maemo) \
 	$(DIST_solid)
+CLEANFILES += osdmenu/default.cfg
 
 nobase_vlcdata_DATA =
 if BUILD_SKINS
@@ -58,6 +60,7 @@ nobase_vlcdata_DATA += $(DIST_skins2)
 endif
 if BUILD_OSDMENU
 nobase_vlcdata_DATA += \
+	osdmenu/default.cfg \
 	$(DIST_osdmenu_default)
 endif
 if BUILD_HILDON
@@ -66,6 +69,10 @@ endif
 if KDE_SOLID
 soliddata_DATA = $(DIST_solid)
 endif
+
+osdmenu/default.cfg: osdmenu/default.cfg.in $(top_builddir)/config.status
+	$(AM_V_GEN)mkdir -p osdmenu; \
+	  	   sed -e 's,\@vlcdatadir\@,$(vlcdatadir),g' < "$<" > $@
 
 DIST_rsrc = \
 	newres.h \
@@ -98,7 +105,6 @@ skins2/default.vlt: $(skins2_default_vlt_FILES)
 		tar cvv --exclude .svn --no-recursion --null -T -) | \
 	gzip -n > skins2/default.vlt
 DIST_osdmenu_default = \
-	osdmenu/default.cfg \
 	osdmenu/default/unselected.png \
 	osdmenu/default/selection/bw.png \
 	osdmenu/default/selection/esc.png \

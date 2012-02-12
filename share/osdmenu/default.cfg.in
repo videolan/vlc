@@ -1,4 +1,4 @@
-dir share/osdmenu/default
+dir @vlcdatadir@/osdmenu/default
 action	key-play-pause (0,0)
 	unselect unselected.png
 	select   selection/play_pause.png
