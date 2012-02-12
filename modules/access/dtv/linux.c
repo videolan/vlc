@@ -634,7 +634,11 @@ int dvb_set_dvbc (dvb_device_t *d, uint32_t freq, const char *modstr,
     if (dvb_find_frontend (d, FE_QAM, FE_IS_STUPID))
         return -1;
     return dvb_set_props (d, 6, DTV_CLEAR, 0,
+#if DVBv5(5)
+                          DTV_DELIVERY_SYSTEM, SYS_DVBC_ANNEX_A,
+#else
                           DTV_DELIVERY_SYSTEM, SYS_DVBC_ANNEX_AC,
+#endif
                           DTV_FREQUENCY, freq, DTV_MODULATION, mod,
                           DTV_SYMBOL_RATE, srate, DTV_INNER_FEC, fec);
 }
@@ -922,7 +926,12 @@ int dvb_set_isdbc (dvb_device_t *d, uint32_t freq, const char *modstr,
     if (dvb_find_frontend (d, FE_QAM, FE_IS_STUPID))
         return -1;
     return dvb_set_props (d, 6, DTV_CLEAR, 0,
+#if DVBv5(5)
+                          DTV_DELIVERY_SYSTEM, SYS_DVBC_ANNEX_C,
+#else
+# warning ISDB-C might need Linux DVB version 5.5 or later.
                           DTV_DELIVERY_SYSTEM, SYS_DVBC_ANNEX_AC,
+#endif
                           DTV_FREQUENCY, freq, DTV_MODULATION, mod,
                           DTV_SYMBOL_RATE, srate, DTV_INNER_FEC, fec);
 }
