@@ -43,9 +43,14 @@ function parse()
         if( item.name == 'item' ) then
             simplexml.add_name_maps( item )
             local url = string.gsub( item.children_map['link'][1].children[1], '&amp;', '&' )
+            local title = item.children_map['title'][1].children[1]
+            local arturl = nil
+            if item.children_map['media:thumbnail'] then
+                arturl = item.children_map['media:thumbnail'][1].attributes['url']
+            end
             table.insert( tracks, { path = url,
-                                    title = item.children_map['title'][1].children[1],
-                                    arturl = item.children_map['media:thumbnail'][1].attributes['url'],
+                                    title = title,
+                                    arturl = arturl,
                                     options = {':play-and-pause'} } )
         end
     end
