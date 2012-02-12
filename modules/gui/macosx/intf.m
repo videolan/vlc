@@ -614,8 +614,6 @@ static VLCMain *_o_sharedMainInstance = nil;
     var_AddCallback( p_intf, "dialog-progress-bar", DialogCallback, self );
     dialog_Register( p_intf );
 
-    [self playbackModeUpdated];
-
     /* init Apple Remote support */
     o_remote = [[AppleRemote alloc] init];
     [o_remote setClickCountEnabledButtons: kRemoteButtonPlay];
@@ -636,6 +634,11 @@ static VLCMain *_o_sharedMainInstance = nil;
 {
     if( !p_intf ) return;
 
+    [o_mainwindow updateWindow];
+    [o_mainwindow updateTimeSlider];
+    [o_mainwindow updateVolumeSlider];
+    [o_mainwindow makeKeyAndOrderFront: self];
+
     /* init media key support */
     b_mediaKeySupport = config_GetInt( VLCIntf, "macosx-mediakeys" );
     if( b_mediaKeySupport )
@@ -649,11 +652,6 @@ static VLCMain *_o_sharedMainInstance = nil;
     [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(coreChangedMediaKeySupportSetting:) name: @"VLCMediaKeySupportSettingChanged" object: nil];
 
     [self _removeOldPreferences];
-
-    [o_mainwindow updateWindow];
-    [o_mainwindow updateTimeSlider];
-    [o_mainwindow updateVolumeSlider];
-    [o_mainwindow makeKeyAndOrderFront: self];
 
     /* Handle sleep notification */
     [[[NSWorkspace sharedWorkspace] notificationCenter] addObserver:self selector:@selector(computerWillSleep:)
@@ -690,20 +688,11 @@ static VLCMain *_o_sharedMainInstance = nil;
 
 - (void)applicationWillTerminate:(NSNotification *)notification
 {
-    if (notification == nil)
-        [[NSNotificationCenter defaultCenter] postNotificationName: NSApplicationWillTerminateNotification object: nil];
-
-    playlist_t * p_playlist;
-    int returnedValue = 0;
-
     if( !p_intf )
         return;
 
-    // save stuff
-    config_SaveConfigFile( p_intf );
-
-    // don't allow a double termination call. If the user has
-    // already invoked the quit then simply return this time.
+    /* don't allow a double termination call. If the user has
+     * already invoked the quit then simply return this time. */
     int isTerminating = false;
 
     [o_appLock lock];
@@ -713,9 +702,21 @@ static VLCMain *_o_sharedMainInstance = nil;
     if (isTerminating)
         return;
 
-    msg_Dbg( p_intf, "Terminating" );
+    if (notification == nil)
+        [[NSNotificationCenter defaultCenter] postNotificationName: NSApplicationWillTerminateNotification object: nil];
 
-    p_playlist = pl_Get( p_intf );
+    playlist_t * p_playlist = pl_Get( p_intf );;
+    int returnedValue = 0;
+
+    /* Save some interface state in configuration, at module quit */
+    config_PutInt( p_intf, "random", var_GetBool( p_playlist, "random" ) );
+    config_PutInt( p_intf, "loop", var_GetBool( p_playlist, "loop" ) );
+    config_PutInt( p_intf, "repeat", var_GetBool( p_playlist, "repeat" ) );
+
+    // save stuff
+    config_SaveConfigFile( p_intf );
+
+    msg_Dbg( p_intf, "Terminating" );
 
     /* unsubscribe from the interactive dialogues */
     dialog_Unregister( p_intf );
