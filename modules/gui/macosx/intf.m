@@ -705,7 +705,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     if (notification == nil)
         [[NSNotificationCenter defaultCenter] postNotificationName: NSApplicationWillTerminateNotification object: nil];
 
-    playlist_t * p_playlist = pl_Get( p_intf );;
+    playlist_t * p_playlist = pl_Get( p_intf );
     int returnedValue = 0;
 
     /* Save some interface state in configuration, at module quit */

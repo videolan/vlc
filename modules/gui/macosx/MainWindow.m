@@ -32,6 +32,7 @@
 #import "MainMenu.h"
 #import "open.h"
 #import "controls.h" // TODO: remove me
+#import "playlist.h"
 #import "SideBarItem.h"
 #import <vlc_playlist.h>
 #import <vlc_aout_intf.h>
@@ -307,6 +308,8 @@ static VLCMainWindow *_o_sharedInstance = nil;
     SideBarItem *libraryItem = [SideBarItem itemWithTitle:_NS("LIBRARY") identifier:@"library"];
     SideBarItem *playlistItem = [SideBarItem itemWithTitle:_NS("Playlist") identifier:@"playlist"];
     [playlistItem setIcon: [NSImage imageNamed:@"sidebar-playlist"]];
+    SideBarItem *medialibraryItem = [SideBarItem itemWithTitle:_NS("Media Library") identifier:@"medialibrary"];
+    [medialibraryItem setIcon: [NSImage imageNamed:@"sidebar-playlist"]];
     SideBarItem *mycompItem = [SideBarItem itemWithTitle:_NS("MY COMPUTER") identifier:@"mycomputer"];
     SideBarItem *devicesItem = [SideBarItem itemWithTitle:_NS("DEVICES") identifier:@"devices"];
     SideBarItem *lanItem = [SideBarItem itemWithTitle:_NS("LOCAL NETWORK") identifier:@"localnetwork"];
@@ -333,10 +336,12 @@ static VLCMainWindow *_o_sharedInstance = nil;
                 {
                     [internetItems addObject: [SideBarItem itemWithTitle: _NS(*ppsz_longname) identifier: o_identifier]];
                     if (!strncmp( *ppsz_name, "podcast", 7 ))
-                        [[internetItems lastObject] setIcon: [NSImage imageNamed:@"sidebar-podcast"]];
+                        [internetItems removeLastObject]; // we don't support podcasts at this point (see #6017)
+//                        [[internetItems lastObject] setIcon: [NSImage imageNamed:@"sidebar-podcast"]];
                     else
                         [[internetItems lastObject] setIcon: [NSImage imageNamed:@"NSApplicationIcon"]];
                     [[internetItems lastObject] setSdtype: SD_CAT_INTERNET];
+                    [[internetItems lastObject] setUntranslatedTitle: [NSString stringWithUTF8String: *ppsz_longname]];
                 }
                 break;
             case SD_CAT_DEVICES:
@@ -344,6 +349,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
                     [devicesItems addObject: [SideBarItem itemWithTitle: _NS(*ppsz_longname) identifier: o_identifier]];
                     [[devicesItems lastObject] setIcon: [NSImage imageNamed:@"NSApplicationIcon"]];
                     [[devicesItems lastObject] setSdtype: SD_CAT_DEVICES];
+                    [[devicesItems lastObject] setUntranslatedTitle: [NSString stringWithUTF8String: *ppsz_longname]];
                 }
                 break;
             case SD_CAT_LAN:
@@ -351,6 +357,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
                     [lanItems addObject: [SideBarItem itemWithTitle: _NS(*ppsz_longname) identifier: o_identifier]];
                     [[lanItems lastObject] setIcon: [NSImage imageNamed:@"sidebar-local"]];
                     [[lanItems lastObject] setSdtype: SD_CAT_LAN];
+                    [[lanItems lastObject] setUntranslatedTitle: [NSString stringWithUTF8String: *ppsz_longname]];
                 }
                 break;
             case SD_CAT_MYCOMPUTER:
@@ -364,6 +371,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
                         [[mycompItems lastObject] setIcon: [NSImage imageNamed:@"sidebar-pictures"]];
                     else
                         [[mycompItems lastObject] setIcon: [NSImage imageNamed:@"NSApplicationIcon"]];
+                    [[mycompItems lastObject] setUntranslatedTitle: [NSString stringWithUTF8String: *ppsz_longname]];
                     [[mycompItems lastObject] setSdtype: SD_CAT_MYCOMPUTER];
                 }
                 break;
@@ -387,7 +395,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     free( ppsz_longnames );
     free( p_categories );
 
-    [libraryItem setChildren: [NSArray arrayWithObject: playlistItem]];
+    [libraryItem setChildren: [NSArray arrayWithObjects: playlistItem, medialibraryItem, nil]];
     [o_sidebaritems addObject: libraryItem];
     if ([mycompItem hasChildren])
         [o_sidebaritems addObject: mycompItem];
@@ -399,10 +407,10 @@ static VLCMainWindow *_o_sharedInstance = nil;
         [o_sidebaritems addObject: internetItem];
 
     [o_sidebar_view reloadData];
-    [o_sidebar_view selectRowIndexes:[NSIndexSet indexSetWithIndex:0] byExtendingSelection:YES];
     NSUInteger i_sidebaritem_count = [o_sidebaritems count];
     for (NSUInteger x = 0; x < i_sidebaritem_count; x++)
         [o_sidebar_view expandItem: [o_sidebaritems objectAtIndex: x] expandChildren: YES];
+    [o_sidebar_view selectRowIndexes:[NSIndexSet indexSetWithIndex:1] byExtendingSelection:NO];
 
     if( b_dark_interface )
     {
@@ -1104,7 +1112,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [o_fspanel setSeekable: b_seekable];
 
     PL_LOCK;
-    if (p_playlist->items.i_size >= 1)
+    if ([[[VLCMain sharedInstance] playlist] currentPlaylistRoot] != p_playlist->p_local_category || p_playlist->p_local_category->i_children > 0)
         [self hideDropZone];
     else
         [self showDropZone];
@@ -1897,7 +1905,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
 - (BOOL)sourceList:(PXSourceList*)aSourceList itemHasBadge:(id)item
 {
-    if ([[item identifier] isEqualToString: @"playlist"])
+    if ([[item identifier] isEqualToString: @"playlist"] || [[item identifier] isEqualToString: @"medialibrary"])
         return YES;
 
 	return [item hasBadge];
@@ -1906,12 +1914,21 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
 - (NSInteger)sourceList:(PXSourceList*)aSourceList badgeValueForItem:(id)item
 {
-    if ([[item identifier] isEqualToString: @"playlist"]) {
-        playlist_t * p_playlist = pl_Get( VLCIntf );
-        NSInteger i_playlist_size;
+    playlist_t * p_playlist = pl_Get( VLCIntf );
+    NSInteger i_playlist_size;
 
+    if ([[item identifier] isEqualToString: @"playlist"])
+    {
         PL_LOCK;
-        i_playlist_size = p_playlist->items.i_size;
+        i_playlist_size = p_playlist->p_local_category->i_children;
+        PL_UNLOCK;
+
+        return i_playlist_size;
+    }
+    if ([[item identifier] isEqualToString: @"medialibrary"])
+    {
+        PL_LOCK;
+        i_playlist_size = p_playlist->p_ml_category->i_children;
         PL_UNLOCK;
 
         return i_playlist_size;
@@ -1979,26 +1996,45 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
 - (void)sourceListSelectionDidChange:(NSNotification *)notification
 {
+    playlist_t * p_playlist = pl_Get( VLCIntf );
 	NSIndexSet *selectedIndexes = [o_sidebar_view selectedRowIndexes];
+    id item = [o_sidebar_view itemAtRow:[selectedIndexes firstIndex]];
 
 	//Set the label text to represent the new selection
-    if([selectedIndexes count]==1) {
-        id item = [o_sidebar_view itemAtRow:[selectedIndexes firstIndex]];
-        if ([item sdtype] > -1)
+    if ([item sdtype] > -1)
+    {
+        BOOL sd_loaded = playlist_IsServicesDiscoveryLoaded( p_playlist, [[item identifier] UTF8String] );
+        if (!sd_loaded)
         {
-            playlist_t * p_playlist = pl_Get( VLCIntf );
-            BOOL sd_loaded = playlist_IsServicesDiscoveryLoaded( p_playlist, [[item identifier] UTF8String] );
-            if (!sd_loaded)
-            {
-                playlist_ServicesDiscoveryAdd( p_playlist, [[item identifier] UTF8String] );
-            }
+            playlist_ServicesDiscoveryAdd( p_playlist, [[item identifier] UTF8String] );
         }
+    }
 
-		[o_chosen_category_lbl setStringValue:[item title]];
-	}
-	else {
-		[o_chosen_category_lbl setStringValue:@"(none)"];
-	}
+    [o_chosen_category_lbl setStringValue:[item title]];
+
+    if ([[item identifier] isEqualToString:@"playlist"])
+    {
+        [[[VLCMain sharedInstance] playlist] setPlaylistRoot:p_playlist->p_local_category];
+    }
+    else if([[item identifier] isEqualToString:@"medialibrary"])
+    {
+        [[[VLCMain sharedInstance] playlist] setPlaylistRoot:p_playlist->p_ml_category];
+    }
+    else
+    {
+        playlist_item_t * pl_item;
+        PL_LOCK;
+        pl_item = playlist_ChildSearchName( p_playlist->p_root, [[item untranslatedTitle] UTF8String] );
+        PL_UNLOCK;
+        [[[VLCMain sharedInstance] playlist] setPlaylistRoot: pl_item];
+    }
+
+    PL_LOCK;
+    if ([[[VLCMain sharedInstance] playlist] currentPlaylistRoot] != p_playlist->p_local_category || p_playlist->p_local_category->i_children > 0)
+        [self hideDropZone];
+    else
+        [self showDropZone];
+    PL_UNLOCK;
 }
 
 @end

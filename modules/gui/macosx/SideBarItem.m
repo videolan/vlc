@@ -16,6 +16,7 @@
 @implementation SideBarItem
 
 @synthesize title;
+@synthesize untranslatedTitle;
 @synthesize identifier;
 @synthesize icon;
 @synthesize badgeValue;

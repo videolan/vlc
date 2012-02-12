@@ -1,12 +1,13 @@
 /*****************************************************************************
  * playlist.m: MacOS X interface module
  *****************************************************************************
-* Copyright (C) 2002-2009 VLC authors and VideoLAN
+* Copyright (C) 2002-2012 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Derk-Jan Hartman <hartman at videola/n dot org>
  *          Benjamin Pracht <bigben at videolab dot org>
+ *          Felix Paul Kühne <fkuehne at videolan dot org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -107,6 +108,9 @@
 
 - (id)init
 {
+    playlist_t * p_playlist = pl_Get( VLCIntf );
+    p_current_root_item = p_playlist->p_local_category;
+
     self = [super init];
     if ( self != nil )
     {
@@ -114,6 +118,7 @@
     }
     return self;
 }
+
 - (void)awakeFromNib
 {
     playlist_t * p_playlist = pl_Get( VLCIntf );
@@ -140,6 +145,18 @@
 	[[o_tc_name_other headerCell] setStringValue:_NS("Name")];
     [[o_tc_author_other headerCell] setStringValue:_NS("Author")];
     [[o_tc_duration_other headerCell] setStringValue:_NS("Duration")];
+}
+
+- (void)setPlaylistRoot: (playlist_item_t *)root_item
+{
+    p_current_root_item = root_item;
+    [o_outline_view reloadData];
+    [o_outline_view_other reloadData];
+}
+
+- (playlist_item_t *)currentPlaylistRoot
+{
+    return p_current_root_item;
 }
 
 - (void)swapPlaylists:(id)newList
@@ -175,7 +192,6 @@
 @end
 
 @implementation VLCPlaylistCommon (NSOutlineViewDataSource)
-
 /* return the number of children for Obj-C pointer item */ /* DONE */
 - (NSInteger)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item
 {
@@ -186,7 +202,9 @@
 
     PL_LOCK;
     if( !item )
-        p_item = p_playlist->p_root_category;
+    {
+        p_item = p_current_root_item;
+    }
     else
         p_item = (playlist_item_t *)[item pointerValue];
 
@@ -208,7 +226,7 @@
     if( item == nil )
     {
         /* root object */
-        p_item = p_playlist->p_root_category;
+        p_item = p_current_root_item;
     }
     else
     {
@@ -240,9 +258,9 @@
     if( item == nil )
     {
         /* root object */
-        if( p_playlist->p_root_category )
+        if( p_current_root_item )
         {
-            i_return = p_playlist->p_root_category->i_children;
+            i_return = p_current_root_item->i_children;
         }
     }
     else
@@ -415,7 +433,7 @@
     o_descendingSortingImage = [[NSOutlineView class] _defaultTableHeaderReverseSortImage];
 
     o_tc_sortColumn = nil;
-
+#if 0
     char ** ppsz_name;
     char ** ppsz_services = vlc_sd_GetNames( VLCIntf, &ppsz_name, NULL );
     if( !ppsz_services )
@@ -453,6 +471,7 @@
     }
     free( ppsz_services );
     free( ppsz_name );
+#endif
 }
 
 - (void)searchfieldChanged:(NSNotification *)o_notification
@@ -974,7 +993,7 @@
     else
     /*If no item is selected, sort the whole playlist*/
     {
-        p_item = p_playlist->p_root_category;
+        p_item = [self currentPlaylistRoot];
     }
 
     PL_LOCK;
@@ -1079,6 +1098,11 @@
 {
     playlist_t * p_playlist = pl_Get( VLCIntf );
     NSUInteger count = [o_array count];
+    BOOL b_usingPlaylist;
+    if ([self currentPlaylistRoot] == p_playlist->p_ml_category)
+        b_usingPlaylist = NO;
+    else
+        b_usingPlaylist = YES;
 
     PL_LOCK;
     for( NSUInteger i_item = 0; i_item < count; i_item++ )
@@ -1097,7 +1121,7 @@
         /* Add the item */
         /* FIXME: playlist_AddInput() can fail */
 
-        playlist_AddInput( p_playlist, p_input, PLAYLIST_INSERT, i_position == -1 ? PLAYLIST_END : i_position + i_item, true,
+        playlist_AddInput( p_playlist, p_input, PLAYLIST_INSERT, i_position == -1 ? PLAYLIST_END : i_position + i_item, b_usingPlaylist,
          pl_Locked );
 
         vlc_gc_decref( p_input );
@@ -1224,11 +1248,11 @@
 
         /*First, only search after the selected item:*
          *(b_selected_item_met = NO)                 */
-    o_result = [self subSearchItem:p_playlist->p_root_category];
+    o_result = [self subSearchItem:[self currentPlaylistRoot]];
     if( o_result == NULL )
     {
         /* If the first search failed, search again from the beginning */
-        o_result = [self subSearchItem:p_playlist->p_root_category];
+        o_result = [self subSearchItem:[self currentPlaylistRoot]];
     }
     if( o_result != NULL )
     {
@@ -1344,7 +1368,7 @@
     }
 
     PL_LOCK;
-    playlist_RecursiveNodeSort( p_playlist, p_playlist->p_root_category, i_mode, i_type );
+    playlist_RecursiveNodeSort( p_playlist, [self currentPlaylistRoot], i_mode, i_type );
     PL_UNLOCK;
 
     [self playlistUpdated];
