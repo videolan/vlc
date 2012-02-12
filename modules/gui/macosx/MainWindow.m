@@ -249,9 +249,9 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [self setAcceptsMouseMovedEvents: YES];
     // Set that here as IB seems to be buggy
     if (b_dark_interface)
-        [self setContentMinSize:NSMakeSize(500., (288. + [o_titlebar_view frame].size.height))];
+        [self setContentMinSize:NSMakeSize(604., (288. + [o_titlebar_view frame].size.height))];
     else
-        [self setContentMinSize:NSMakeSize(500., 288.)];
+        [self setContentMinSize:NSMakeSize(604., 288.)];
     [self setTitle: _NS("VLC media player")];
     [o_playlist_btn setEnabled:NO];
     o_temp_view = [[NSView alloc] init];
