@@ -42,11 +42,11 @@ function parse()
     for _,item in ipairs( channel.children ) do
         if( item.name == 'item' ) then
             simplexml.add_name_maps( item )
-            local url = string.gsub( item.children_map['link'][1].children[1], '&amp;', '&' )
-            local title = item.children_map['title'][1].children[1]
+            local url = vlc.strings.resolve_xml_special_chars( item.children_map['link'][1].children[1] )
+            local title = vlc.strings.resolve_xml_special_chars( item.children_map['title'][1].children[1] )
             local arturl = nil
             if item.children_map['media:thumbnail'] then
-                arturl = item.children_map['media:thumbnail'][1].attributes['url']
+                arturl = vlc.strings.resolve_xml_special_chars( item.children_map['media:thumbnail'][1].attributes['url'] )
             end
             table.insert( tracks, { path = url,
                                     title = title,
