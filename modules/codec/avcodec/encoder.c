@@ -874,20 +874,10 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
      * This is done here instead of OpenEncoder() because we need the actual
      * bits_per_pixel value, without having to assume anything.
      */
-    if ( p_sys->p_buffer_out == NULL )
-    {
-        int bytesPerPixel = p_enc->fmt_out.video.i_bits_per_pixel ?
-                            p_enc->fmt_out.video.i_bits_per_pixel / 8 : 3;
-
-        p_sys->i_buffer_out = p_sys->p_context->height * p_sys->p_context->width
-            * bytesPerPixel + 200;  /* some room for potential headers (such as BMP) */
-
-        if( p_sys->i_buffer_out < FF_MIN_BUFFER_SIZE )
-            p_sys->i_buffer_out = FF_MIN_BUFFER_SIZE;
-        p_sys->p_buffer_out = malloc( p_sys->i_buffer_out );
-        if ( p_sys->p_buffer_out == NULL )
-            return NULL;
-    }
+    const int bytesPerPixel = p_enc->fmt_out.video.i_bits_per_pixel ?
+                         p_enc->fmt_out.video.i_bits_per_pixel / 8 : 3;
+    const int blocksize = __MAX( FF_MIN_BUFFER_SIZE,bytesPerPixel * p_sys->p_context->height * p_sys->p_context->width + 200 );
+    block_t *p_block = block_New( p_enc, blocksize );
 
     if( likely(p_pict) ) {
         AVFrame frame;
@@ -984,20 +974,22 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
         frame.pts /= p_enc->fmt_in.video.i_frame_rate;
         /* End work-around */
 
-        i_out = avcodec_encode_video( p_sys->p_context, p_sys->p_buffer_out,
-                                     p_sys->i_buffer_out, &frame );
+        i_out = avcodec_encode_video( p_sys->p_context, p_block->p_buffer,
+                                     p_block->i_buffer, &frame );
     }
     else
     {
-        i_out = avcodec_encode_video( p_sys->p_context, p_sys->p_buffer_out,
-                                     p_sys->i_buffer_out, NULL);
+        i_out = avcodec_encode_video( p_sys->p_context, p_block->p_buffer,
+                                     p_block->i_buffer, NULL);
     }
 
     if( i_out <= 0 )
+    {
+        block_Release( p_block );
         return NULL;
+    }
 
-    block_t *p_block = block_New( p_enc, i_out );
-    memcpy( p_block->p_buffer, p_sys->p_buffer_out, i_out );
+    p_block->i_buffer = i_out;
 
     /* FIXME, 3-2 pulldown is not handled correctly */
     p_block->i_length = INT64_C(1000000) *
@@ -1095,6 +1087,7 @@ static block_t *EncodeAudio( encoder_t *p_enc, aout_buffer_t *p_aout_buf )
     {
         void *p_samples;
         int i_out;
+        p_block = block_New( p_enc, p_sys->i_buffer_out );
 
         if( i_samples_delay )
         {
@@ -1116,8 +1109,8 @@ static block_t *EncodeAudio( encoder_t *p_enc, aout_buffer_t *p_aout_buf )
             p_samples = p_buffer;
         }
 
-        i_out = avcodec_encode_audio( p_sys->p_context, p_sys->p_buffer_out,
-                                      p_sys->i_buffer_out, p_samples );
+        i_out = avcodec_encode_audio( p_sys->p_context, p_block->p_buffer,
+                                      p_block->i_buffer, p_samples );
 
 #if 0
         msg_Warn( p_enc, "avcodec_encode_audio: %d", i_out );
@@ -1127,10 +1120,12 @@ static block_t *EncodeAudio( encoder_t *p_enc, aout_buffer_t *p_aout_buf )
         i_samples -= p_sys->i_frame_size;
 
         if( i_out <= 0 )
+        {
+            block_Release( p_block );
             continue;
+        }
 
-        p_block = block_New( p_enc, i_out );
-        memcpy( p_block->p_buffer, p_sys->p_buffer_out, i_out );
+        p_block->i_buffer = i_out;
 
         p_block->i_length = (mtime_t)1000000 *
             (mtime_t)p_sys->i_frame_size /
