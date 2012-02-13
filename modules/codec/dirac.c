@@ -252,7 +252,7 @@ vlc_module_begin()
     change_integer_range(-1, INT_MAX);
 
     add_integer( ENC_CFG_PREFIX ENC_MCBLK_HEIGHT, -1,
-                 ENC_MCBLK_HEIGHT, ENC_MCBLK_HEIGHT_LONGTEXT, false )
+                 ENC_MCBLK_HEIGHT_TEXT, ENC_MCBLK_HEIGHT_LONGTEXT, false )
     change_integer_range(-1, INT_MAX);
 
     add_integer( ENC_CFG_PREFIX ENC_MCBLK_OVERLAP, -1,
