@@ -25,6 +25,7 @@ function probe()
     return vlc.access == "http"
         and string.match( vlc.path, "pluzz.fr/%w+" )
         or string.match( vlc.path, "info.francetelevisions.fr/.+")
+        or string.match( vlc.path, "france4.fr/%w+")
 end
 
 -- Helpers
@@ -46,6 +47,19 @@ function parse()
             line = vlc.readline()
             if not line then break end
             if string.match( line, "id=\"current_video\"" ) then
+                _,_,redirect = string.find (line, "href=\"(.-)\"" )
+                print ("redirecting to: " .. redirect )
+                return { { path = redirect } }
+            end
+        end
+    end
+
+    if string.match ( vlc.path, "www.france4.fr/%w+" ) then
+        while true do
+            line = vlc.readline()
+            if not line then break end
+	    -- maybe we should get id from tags having video/cappuccino type instead
+            if string.match( line, "id=\"lavideo\"" ) then
                 _,_,redirect = string.find (line, "href=\"(.-)\"" )
                 print ("redirecting to: " .. redirect )
                 return { { path = redirect } }
