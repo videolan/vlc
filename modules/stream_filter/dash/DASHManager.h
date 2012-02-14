@@ -31,6 +31,8 @@
 #include "adaptationlogic/AdaptationLogicFactory.h"
 #include "mpd/IMPDManager.h"
 #include "mpd/MPDManagerFactory.h"
+#include "buffer/BlockBuffer.h"
+#include "DASHDownloader.h"
 #include "exceptions/EOFException.h"
 #include "mpd/MPD.h"
 
@@ -43,9 +45,11 @@ namespace dash
                          logic::IAdaptationLogic::LogicType type, stream_t *stream);
             virtual ~DASHManager    ();
 
-            int read( void *p_buffer, size_t len );
-            int peek( const uint8_t **pp_peek, size_t i_peek );
-            const mpd::IMPDManager*         getMpdManager() const;
+            bool    start   ();
+            int     read    ( void *p_buffer, size_t len );
+            int     peek    ( const uint8_t **pp_peek, size_t i_peek );
+
+            const mpd::IMPDManager*         getMpdManager   () const;
             const logic::IAdaptationLogic*  getAdaptionLogic() const;
             const http::Chunk *getCurrentChunk() const;
 
@@ -57,6 +61,8 @@ namespace dash
             mpd::IMPDManager                    *mpdManager;
             mpd::MPD                            *mpd;
             stream_t                            *stream;
+            DASHDownloader                      *downloader;
+            buffer::BlockBuffer                 *buffer;
     };
 }
 

@@ -32,17 +32,18 @@ using namespace dash::http;
 using namespace dash::xml;
 using namespace dash::logic;
 using namespace dash::mpd;
+using namespace dash::buffer;
 using namespace dash::exception;
 
 DASHManager::DASHManager    ( HTTPConnectionManager *conManager, MPD *mpd,
                               IAdaptationLogic::LogicType type, stream_t *stream) :
-    conManager( conManager ),
-    currentChunk( NULL ),
-    adaptationLogic( NULL ),
-    logicType( type ),
-    mpdManager( NULL ),
-    mpd( mpd ),
-    stream(stream)
+             conManager     ( conManager ),
+             currentChunk   ( NULL ),
+             adaptationLogic( NULL ),
+             logicType      ( type ),
+             mpdManager     ( NULL ),
+             mpd            ( mpd ),
+             stream         (stream)
 {
     this->mpdManager        = mpd::MPDManagerFactory::create( mpd );
     if ( this->mpdManager == NULL )
@@ -51,54 +52,30 @@ DASHManager::DASHManager    ( HTTPConnectionManager *conManager, MPD *mpd,
     if ( this->adaptationLogic == NULL )
         return ;
     this->conManager->attach(this->adaptationLogic);
+
+    this->buffer    = new BlockBuffer(this->stream);
+    this->downloader = new DASHDownloader(this->conManager, this->adaptationLogic, this->buffer);
 }
 DASHManager::~DASHManager   ()
 {
+    delete this->downloader;
+    delete this->buffer;
     delete this->adaptationLogic;
     delete this->mpdManager;
 }
 
+bool    DASHManager::start()
+{
+    return this->downloader->start();
+}
 int     DASHManager::read( void *p_buffer, size_t len )
 {
-    if ( this->currentChunk == NULL )
-    {
-        try
-        {
-            this->currentChunk = this->adaptationLogic->getNextChunk();
-        }
-        catch(EOFException &e)
-        {
-            this->currentChunk = NULL;
-            return 0;
-        }
-    }
-
-    int ret = this->conManager->read( this->currentChunk, p_buffer, len );
-    if ( ret == 0 )
-    {
-        this->currentChunk = NULL;
-        return this->read(p_buffer, len );
-    }
-
-    return ret;
+    return this->buffer->get(p_buffer, len);
 }
 
 int     DASHManager::peek( const uint8_t **pp_peek, size_t i_peek )
 {
-    if ( this->currentChunk == NULL )
-    {
-        try
-        {
-            this->currentChunk = this->adaptationLogic->getNextChunk();
-        }
-        catch(EOFException &e)
-        {
-            return 0;
-        }
-    }
-
-    int ret = this->conManager->peek( this->currentChunk, pp_peek, i_peek );
-    return ret;
+    return this->buffer->peek(pp_peek, i_peek);
 }
 
 const mpd::IMPDManager*         DASHManager::getMpdManager() const
