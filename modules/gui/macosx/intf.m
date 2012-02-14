@@ -192,16 +192,6 @@ static int f_appExit = 0;           // set to 1 when application termination sig
 
 static void Run( intf_thread_t *p_intf )
 {
-    sigset_t set;
-
-    /* Make sure the "force quit" menu item does quit instantly.
-     * VLC overrides SIGTERM which is sent by the "force quit"
-     * menu item to make sure daemon mode quits gracefully, so
-     * we un-override SIGTERM here. */
-    sigemptyset( &set );
-    sigaddset( &set, SIGTERM );
-    pthread_sigmask( SIG_UNBLOCK, &set, NULL );
-
     NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
     [VLCApplication sharedApplication];
 
@@ -712,9 +702,6 @@ static VLCMain *_o_sharedMainInstance = nil;
     config_PutInt( p_intf, "random", var_GetBool( p_playlist, "random" ) );
     config_PutInt( p_intf, "loop", var_GetBool( p_playlist, "loop" ) );
     config_PutInt( p_intf, "repeat", var_GetBool( p_playlist, "repeat" ) );
-
-    // save stuff
-    config_SaveConfigFile( p_intf );
 
     msg_Dbg( p_intf, "Terminating" );
 
