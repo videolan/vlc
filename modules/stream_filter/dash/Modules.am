@@ -9,6 +9,9 @@ SOURCES_stream_filter_dash = \
     adaptationlogic/IDownloadRateObserver.h \
     adaptationlogic/RateBasedAdaptationLogic.h \
     adaptationlogic/RateBasedAdaptationLogic.cpp \
+    buffer/BlockBuffer.cpp \
+    buffer/BlockBuffer.h \
+    buffer/IBufferObserver.h \
     exceptions/EOFException.h \
     http/Chunk.cpp \
     http/Chunk.h \
