@@ -74,6 +74,7 @@ vlc_module_end ()
 {
     demux_t *p_qtsound;
     AudioBuffer *currentAudioBuffer;
+    block_t *rawAudioData;
     UInt32 numberOfSamples;
     date_t date;
     mtime_t currentPts;
@@ -82,6 +83,7 @@ vlc_module_end ()
 - (id)initWithDemux:(demux_t *)p_demux;
 - (void)outputAudioSampleBuffer:(QTSampleBuffer *)sampleBuffer fromConnection:(QTCaptureConnection *)connection;
 - (BOOL)checkCurrentAudioBuffer;
+- (void)freeAudioMem;
 - (mtime_t)getCurrentPts;
 - (void *)getCurrentAudioBufferData;
 - (UInt32)getCurrentTotalDataSize;
@@ -105,18 +107,12 @@ vlc_module_end ()
 }
 - (void)dealloc
 {
-    @synchronized (self)
-    {
-        free(currentAudioBuffer);
-        currentAudioBuffer = nil;
-    }
     [super dealloc];
 }
 
 - (void)outputAudioSampleBuffer:(QTSampleBuffer *)sampleBuffer fromConnection:(QTCaptureConnection *)connection
 {
     AudioBufferList *tempAudioBufferList;
-    block_t *rawAudioData;
     UInt32 totalDataSize = 0;
     UInt32 count = 0;
 
@@ -190,13 +186,22 @@ vlc_module_end ()
             currentAudioBuffer->mDataByteSize = totalDataSize;
             currentAudioBuffer->mData = rawAudioData;
         }
-        free(rawAudioData);
     }
 }
 
 - (BOOL)checkCurrentAudioBuffer
 {
     return (currentAudioBuffer) ? 1 : 0;
+}
+
+- (void)freeAudioMem
+{
+    @synchronized (self)
+    {
+        if (rawAudioData) {
+            free(rawAudioData);
+        }
+    }
 }
 
 - (mtime_t)getCurrentPts
@@ -293,7 +298,7 @@ static int Open( vlc_object_t *p_this )
         QTCaptureDevice *qtk_audioDevice;
         qtk_audioDevice = [myAudioDevices objectAtIndex:iaudio];
         msg_Dbg( p_demux, "qtsound audio %u/%lu localizedDisplayName: %s uniqueID: %s", iaudio, [myAudioDevices count], [[qtk_audioDevice localizedDisplayName] UTF8String], [[qtk_audioDevice uniqueID] UTF8String]);
-        if([[[qtk_audioDevice localizedDisplayName]stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]] isEqualToString:qtk_curraudiodevice_uid]){
+        if([[[qtk_audioDevice uniqueID]stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]] isEqualToString:qtk_curraudiodevice_uid]){
             msg_Dbg( p_demux, "Device found" );
             break;
         }
@@ -545,8 +550,6 @@ static int Demux( demux_t *p_demux )
         return 0;
     }
 
-    pool = [[NSAutoreleasePool alloc] init];
-
     @synchronized (p_sys->audiooutput)
     {
         if ( [p_sys->audiooutput checkCurrentAudioBuffer] )
@@ -562,17 +565,26 @@ static int Demux( demux_t *p_demux )
     {
         // Nothing to transfer yet, just forget
         block_Release( p_blocka );
-        [pool release];
         msleep( 10000 );
         return 1;
     }
-
-    [pool release];
 
     if( p_blocka )
     {
         es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_blocka->i_pts );
         es_out_Send( p_demux->out, p_sys->p_es_audio, p_blocka );
+    }
+
+    @synchronized (p_sys->audiooutput)
+    {
+        /*
+         * Free Memory
+         *
+         * Wait before freeing memory, so we don't get no crackling sound
+         * crackling sound artefacts start at 100 ms and below
+         */
+        msleep( 200 );
+        [p_sys->audiooutput freeAudioMem];
     }
 
     return 1;
