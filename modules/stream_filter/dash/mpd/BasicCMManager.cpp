@@ -134,7 +134,7 @@ const MPD*      BasicCMManager::getMPD() const
 {
     return this->mpd;
 }
-Representation*         BasicCMManager::getRepresentation (Period *period, int bitrate, int width, int height) const
+Representation*         BasicCMManager::getRepresentation (Period *period, int bitrate, int, int ) const
 {
     return this->getRepresentation(period, bitrate);
 }
