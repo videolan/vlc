@@ -1590,7 +1590,6 @@ static void ParsePES( demux_t *p_demux, ts_pid_t *pid )
     if( p_pes )
     {
         block_t *p_block;
-        int i;
 
         if( i_dts >= 0 )
             p_pes->i_dts = VLC_TS_0 + i_dts * 100 / 9;
@@ -1632,7 +1631,7 @@ static void ParsePES( demux_t *p_demux, ts_pid_t *pid )
             }
         }
 
-        for( i = 0; i < pid->i_extra_es; i++ )
+        for( int i = 0; i < pid->i_extra_es; i++ )
         {
             es_out_Send( p_demux->out, pid->extra_es[i]->id,
                          block_Duplicate( p_block ) );
@@ -2310,12 +2309,12 @@ static uint32_t IODGetDWord( int *pi_data, uint8_t **pp_data )
 static char* IODGetURL( int *pi_data, uint8_t **pp_data )
 {
     char *url;
-    int i_url_len, i;
+    int i_url_len;
 
     i_url_len = IODGetByte( pi_data, pp_data );
     url = malloc( i_url_len + 1 );
     if( !url ) return NULL;
-    for( i = 0; i < i_url_len; i++ )
+    for( int i = 0; i < i_url_len; i++ )
     {
         url[i] = IODGetByte( pi_data, pp_data );
     }
@@ -2326,7 +2325,6 @@ static char* IODGetURL( int *pi_data, uint8_t **pp_data )
 static iod_descriptor_t *IODNew( int i_data, uint8_t *p_data )
 {
     iod_descriptor_t *p_iod;
-    int i;
     int i_es_index;
     uint8_t i_flags, i_iod_tag, byte1, byte2, byte3;
     bool  b_url;
@@ -2338,7 +2336,7 @@ static iod_descriptor_t *IODNew( int i_data, uint8_t *p_data )
 
     ts_debug( "\n************ IOD ************" );
 
-    for( i = 0; i < 255; i++ )
+    for( int i = 0; i < 255; i++ )
     {
         p_iod->es_descr[i].b_ok = 0;
     }
@@ -2490,15 +2488,12 @@ static iod_descriptor_t *IODNew( int i_data, uint8_t *p_data )
                 ts_debug( "\n*     * avgBitrate:%d", dec_descr.i_avgBitrate );
                 if( i_decoderConfigDescr_length > 13 && IODGetByte( &i_data, &p_data ) == 0x05 )
                 {
-                    int i;
-                    dec_descr.i_extra =
-                        IODDescriptorLength( &i_data, &p_data );
+                    dec_descr.i_extra = IODDescriptorLength( &i_data, &p_data );
                     if( dec_descr.i_extra > 0 )
                     {
-                        dec_descr.p_extra =
-                            xmalloc( dec_descr.i_extra );
+                        dec_descr.p_extra = xmalloc( dec_descr.i_extra );
                     }
-                    for( i = 0; i < dec_descr.i_extra; i++ )
+                    for( int i = 0; i < dec_descr.i_extra; i++ )
                     {
                         dec_descr.p_extra[i] = IODGetByte( &i_data, &p_data );
                     }
@@ -2552,8 +2547,6 @@ static iod_descriptor_t *IODNew( int i_data, uint8_t *p_data )
 
 static void IODFree( iod_descriptor_t *p_iod )
 {
-    int i;
-
     if( p_iod->psz_url )
     {
         free( p_iod->psz_url );
@@ -2562,7 +2555,7 @@ static void IODFree( iod_descriptor_t *p_iod )
         return;
     }
 
-    for( i = 0; i < 255; i++ )
+    for( int i = 0; i < 255; i++ )
     {
 #define es_descr p_iod->es_descr[i]
         if( es_descr.b_ok )
@@ -2788,7 +2781,6 @@ static int64_t vlc_timegm( int i_year, int i_month, int i_mday, int i_hour, int 
 {
     static const int pn_day[12+1] = { 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334 };
     int64_t i_day;
-    int i;
 
     if( i_year < 70 ||
         i_month < 0 || i_month > 11 || i_mday < 1 || i_mday > 31 ||
@@ -2798,7 +2790,7 @@ static int64_t vlc_timegm( int i_year, int i_month, int i_mday, int i_hour, int 
     /* Count the number of days */
     i_day = 365 * (i_year-70) + pn_day[i_month] + i_mday - 1;
 #define LEAP(y) ( ((y)%4) == 0 && (((y)%100) != 0 || ((y)%400) == 0) ? 1 : 0)
-    for( i = 70; i < i_year; i++ )
+    for( int i = 70; i < i_year; i++ )
         i_day += LEAP(1900+i);
     if( i_month > 1 )
         i_day += LEAP(1900+i_year);
@@ -3096,8 +3088,7 @@ static void PMTSetupEsISO14496( demux_t *p_demux, ts_pid_t *pid,
         {
             iod_descriptor_t *iod = prg->iod;
 
-            if( iod->es_descr[i].b_ok &&
-                iod->es_descr[i].i_es_id == i_es_id )
+            if( iod->es_descr[i].b_ok && iod->es_descr[i].i_es_id == i_es_id )
             {
                 pid->es->p_mpeg4desc = &iod->es_descr[i];
                 break;
@@ -3182,9 +3173,7 @@ static void PMTSetupEsISO14496( demux_t *p_demux, ts_pid_t *pid,
         {
             p_fmt->p_extra = malloc( p_fmt->i_extra );
             if( p_fmt->p_extra )
-                memcpy( p_fmt->p_extra,
-                        dcd->p_extra,
-                        p_fmt->i_extra );
+                memcpy( p_fmt->p_extra, dcd->p_extra, p_fmt->i_extra );
             else
                 p_fmt->i_extra = 0;
         }
@@ -3820,8 +3809,7 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
     /* First find this PMT declared in PAT */
     for( int i = 0; i < p_sys->i_pmt; i++ )
     {
-        int i_prg;
-        for( i_prg = 0; i_prg < p_sys->pmt[i]->psi->i_prg; i_prg++ )
+        for( int i_prg = 0; i_prg < p_sys->pmt[i]->psi->i_prg; i_prg++ )
         {
             const int i_pmt_number = p_sys->pmt[i]->psi->prg[i_prg]->i_number;
             if( i_pmt_number != TS_USER_PMT_NUMBER && i_pmt_number == p_pmt->i_program_number )
@@ -4204,8 +4192,7 @@ static void PATCallBack( demux_t *p_demux, dvbpsi_pat_t *p_pat )
 
             if( pmt->b_valid )
             {
-                int i_prg;
-                for( i_prg = 0; i_prg < pmt->psi->i_prg; i_prg++ )
+                for( int i_prg = 0; i_prg < pmt->psi->i_prg; i_prg++ )
                 {
                     if( pmt->psi->prg[i_prg]->i_number == p_program->i_number )
                     {
