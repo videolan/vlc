@@ -1950,7 +1950,7 @@ static void GetLastPCR( demux_t *p_demux )
         const int64_t TS_SUPPOSED_MINRATE = 0.5 * 1000 * 1000; //FIXME
         if( i_rate < TS_SUPPOSED_MINRATE || i_rate > TS_SUPPOSED_MAXRATE )
         {
-            msg_Dbg( p_demux, "calculated bitrate (%"PRId64"bit/s) is too low or too high. min bitrate (%lldbit/s) max bitrate (%lldbit/s)",
+            msg_Dbg( p_demux, "calculated bitrate (%"PRId64"bit/s) is too low or too high. min bitrate (%"PRId64"bit/s) max bitrate (%"PRId64"bit/s)",
                      i_rate, TS_SUPPOSED_MINRATE, TS_SUPPOSED_MAXRATE );
             p_sys->i_last_pcr = -1;
         }
@@ -1981,7 +1981,7 @@ static void CheckPCR( demux_t *p_demux )
         p_sys->p_pos[i] = stream_Tell( p_demux->s );
         if( p_sys->p_pcrs[i-1] > p_sys->p_pcrs[i] )
         {
-            msg_Dbg( p_demux, "PCR Wrap Around found between %d%% and %d%% (pcr:%lld(0x%09llx) pcr:%lld(0x%09llx))",
+            msg_Dbg( p_demux, "PCR Wrap Around found between %d%% and %d%% (pcr:%"PRId64"(0x%09"PRIx64") pcr:%"PRId64"(0x%09"PRIx64"))",
                     (int)((i-1)*100/p_sys->i_pcrs_num), (int)(i*100/p_sys->i_pcrs_num), p_sys->p_pcrs[i-1], p_sys->p_pcrs[i-1], p_sys->p_pcrs[i], p_sys->p_pcrs[i] );
         }
     }
