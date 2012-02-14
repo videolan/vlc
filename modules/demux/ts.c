@@ -181,8 +181,8 @@ typedef struct
     uint32_t                i_maxBitrate;
     uint32_t                i_avgBitrate;
 
-    int                     i_decoder_specific_info_len;
-    uint8_t                 *p_decoder_specific_info;
+    int                     i_extra;
+    uint8_t                 *p_extra;
 
 } decoder_config_descriptor_t;
 
@@ -1579,9 +1579,9 @@ static void ParsePES( demux_t *p_demux, ts_pid_t *pid )
     {
         decoder_config_descriptor_t *dcd = &pid->es->p_mpeg4desc->dec_descr;
 
-        if( dcd->i_decoder_specific_info_len > 2 &&
-            dcd->p_decoder_specific_info[0] == 0x10 &&
-            ( dcd->p_decoder_specific_info[1]&0x10 ) )
+        if( dcd->i_extra > 2 &&
+            dcd->p_extra[0] == 0x10 &&
+            ( dcd->p_extra[1]&0x10 ) )
         {
             /* display length */
             if( p_pes->i_buffer + 2 <= i_skip )
@@ -2549,22 +2549,22 @@ static iod_descriptor_t *IODNew( int i_data, uint8_t *p_data )
                 if( i_decoderConfigDescr_length > 13 && IODGetByte( &i_data, &p_data ) == 0x05 )
                 {
                     int i;
-                    dec_descr.i_decoder_specific_info_len =
+                    dec_descr.i_extra =
                         IODDescriptorLength( &i_data, &p_data );
-                    if( dec_descr.i_decoder_specific_info_len > 0 )
+                    if( dec_descr.i_extra > 0 )
                     {
-                        dec_descr.p_decoder_specific_info =
-                            xmalloc( dec_descr.i_decoder_specific_info_len );
+                        dec_descr.p_extra =
+                            xmalloc( dec_descr.i_extra );
                     }
-                    for( i = 0; i < dec_descr.i_decoder_specific_info_len; i++ )
+                    for( i = 0; i < dec_descr.i_extra; i++ )
                     {
-                        dec_descr.p_decoder_specific_info[i] = IODGetByte( &i_data, &p_data );
+                        dec_descr.p_extra[i] = IODGetByte( &i_data, &p_data );
                     }
                 }
                 else
                 {
-                    dec_descr.i_decoder_specific_info_len = 0;
-                    dec_descr.p_decoder_specific_info = NULL;
+                    dec_descr.i_extra = 0;
+                    dec_descr.p_extra = NULL;
                 }
             }
 #undef  dec_descr
@@ -2675,9 +2675,9 @@ static void IODFree( iod_descriptor_t *p_iod )
             }
             else
             {
-                free( es_descr.dec_descr.p_decoder_specific_info );
-                es_descr.dec_descr.p_decoder_specific_info = NULL;
-                es_descr.dec_descr.i_decoder_specific_info_len = 0;
+                free( es_descr.dec_descr.p_extra );
+                es_descr.dec_descr.p_extra = NULL;
+                es_descr.dec_descr.i_extra = 0;
             }
         }
         es_descr.b_ok = 0;
@@ -3283,13 +3283,13 @@ static void PMTSetupEsISO14496( demux_t *p_demux, ts_pid_t *pid,
 
     if( p_fmt->i_cat != UNKNOWN_ES )
     {
-        p_fmt->i_extra = dcd->i_decoder_specific_info_len;
+        p_fmt->i_extra = dcd->i_extra;
         if( p_fmt->i_extra > 0 )
         {
             p_fmt->p_extra = malloc( p_fmt->i_extra );
             if( p_fmt->p_extra )
                 memcpy( p_fmt->p_extra,
-                        dcd->p_decoder_specific_info,
+                        dcd->p_extra,
                         p_fmt->i_extra );
             else
                 p_fmt->i_extra = 0;
