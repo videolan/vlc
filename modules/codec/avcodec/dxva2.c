@@ -384,7 +384,7 @@ static int Extract(vlc_va_t *external, picture_t *picture, AVFrame *ff)
     if (va->render == MAKEFOURCC('Y','V','1','2') ||
         va->render == MAKEFOURCC('I','M','C','3')) {
         bool imc3 = va->render == MAKEFOURCC('I','M','C','3');
-        size_t chroma_pitch = imc3 ? lock.Pitch : lock.Pitch / 2;
+        size_t chroma_pitch = imc3 ? lock.Pitch : (lock.Pitch / 2);
 
         size_t pitch[3] = {
             lock.Pitch,
