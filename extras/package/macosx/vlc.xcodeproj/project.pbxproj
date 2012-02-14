@@ -639,6 +639,7 @@
 		CCF0777A13659A8000AF19FD /* SPInvocationGrabbing.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SPInvocationGrabbing.m; path = ../../../modules/gui/macosx/SPInvocationGrabbing.m; sourceTree = "<group>"; };
 		CCF0777B13659A8000AF19FD /* SPMediaKeyTap.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SPMediaKeyTap.h; path = ../../../modules/gui/macosx/SPMediaKeyTap.h; sourceTree = "<group>"; };
 		CCF0777C13659A8000AF19FD /* SPMediaKeyTap.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SPMediaKeyTap.m; path = ../../../modules/gui/macosx/SPMediaKeyTap.m; sourceTree = "<group>"; };
+		DC1A176914E2778A001477C6 /* qtsound.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = qtsound.m; path = ../../../modules/access/qtsound.m; sourceTree = "<group>"; };
 		DC769AB7085DF0DB001A838D /* wizard.m */ = {isa = PBXFileReference; fileEncoding = 5; indentWidth = 4; lastKnownFileType = sourcecode.c.objc; name = wizard.m; path = ../../../modules/gui/macosx/wizard.m; sourceTree = SOURCE_ROOT; tabWidth = 4; usesTabs = 0; };
 		DC769AB8085DF0DB001A838D /* wizard.h */ = {isa = PBXFileReference; fileEncoding = 5; lastKnownFileType = sourcecode.c.h; name = wizard.h; path = ../../../modules/gui/macosx/wizard.h; sourceTree = SOURCE_ROOT; };
 		DCDA5E6408F94518009D93A8 /* about_bg.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = about_bg.png; path = Resources/about_bg.png; sourceTree = "<group>"; };
@@ -1148,6 +1149,7 @@
 				CC6C01BA0DDF3EEC00C7D754 /* auhal.c */,
 				CCC895830D9A8A82005AE59C /* eyetv.m */,
 				CC9E3E7913D1CFCF00429A71 /* qtcapture.m */,
+				DC1A176914E2778A001477C6 /* qtsound.m */,
 				CCDBA3B313D32E200006127B /* macosx.m */,
 			);
 			name = "OSX-specific source files";

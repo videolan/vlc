@@ -50,7 +50,8 @@
 
 #import <vlc_url.h>
 
-NSArray               *qtkvideoDevices;
+NSArray *qtkvideoDevices;
+NSArray *qtkaudioDevices;
 #define setEyeTVUnconnected \
 [o_capture_lbl setStringValue: _NS("No device is selected")]; \
 [o_capture_long_lbl setStringValue: _NS("No device is selected.\n\nChoose available device in above pull-down menu\n.")]; \
@@ -88,7 +89,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
         _o_sharedMainInstance = [super init];
         p_intf = VLCIntf;
     }
- 
+
     return _o_sharedMainInstance;
 }
 
@@ -186,6 +187,8 @@ static VLCOpen *_o_sharedMainInstance = nil;
 
     [o_capture_mode_pop removeAllItems];
     [o_capture_mode_pop addItemWithTitle: _NS("Capture Device")];
+    [o_capture_mode_pop addItemWithTitle: _NS("Video Device")];
+    [o_capture_mode_pop addItemWithTitle: _NS("Audio Device")];
 
     // our screen capture module isn't Lion-compatible, so let's hide it from the user if needed (trac #4799)
     if( NSAppKitVersionNumber < 1115.2 )
@@ -207,13 +210,13 @@ static VLCOpen *_o_sharedMainInstance = nil;
     [o_eyetv_noInstanceLong_lbl setStringValue: _NS("VLC could not connect to EyeTV.\nMake sure that you installed VLC's EyeTV plugin.")];
     [o_eyetv_launchEyeTV_btn setTitle: _NS("Launch EyeTV now")];
     [o_eyetv_getPlugin_btn setTitle: _NS("Download Plugin")];
-    [o_qtk_long_lbl setStringValue: _NS("This input allows you to process input signals from QuickTime-compatible video devices.\nLive Audio input is not supported.")];
+    [o_qtk_long_lbl setStringValue: _NS("This input allows you to process input signals from QuickTime-compatible video devices.\nSimultaneous live Audio input is not supported.")];
     [o_capture_width_lbl setStringValue: _NS("Image width:")];
     [o_capture_height_lbl setStringValue: _NS("Image height:")];
 
     [self qtkvideoDevices];
     [o_qtk_device_pop removeAllItems];
-    msg_Dbg( VLCIntf, "Found %lu capture devices", [qtkvideoDevices count] );
+    msg_Dbg( VLCIntf, "Found %lu video capture devices", [qtkvideoDevices count] );
     
     if([qtkvideoDevices count] >= 1)
     {
@@ -235,6 +238,32 @@ static VLCOpen *_o_sharedMainInstance = nil;
     {
         [o_qtk_device_pop addItemWithTitle: _NS("None")];
         [qtk_currdevice_uid release];
+    }
+
+    [self qtkaudioDevices];
+    [o_qtkaudio_device_pop removeAllItems];
+    msg_Dbg( VLCIntf, "Found %lu audio capture devices", [qtkaudioDevices count] );
+
+    if([qtkaudioDevices count] >= 1)
+    {
+        if (!qtkaudio_currdevice_uid) {
+            qtkaudio_currdevice_uid = [[[QTCaptureDevice defaultInputDeviceWithMediaType: QTMediaTypeSound] uniqueID]
+                                  stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+        }
+        NSUInteger deviceCount = [qtkaudioDevices count];
+        for(int iaudio = 0; iaudio < deviceCount; iaudio++){
+            QTCaptureDevice *qtkaudio_device;
+            qtkaudio_device = [qtkaudioDevices objectAtIndex:iaudio];
+            [o_qtkaudio_device_pop addItemWithTitle: [qtkaudio_device localizedDisplayName]];
+            if([[[qtkaudio_device uniqueID]stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]] isEqualToString:qtkaudio_currdevice_uid]){
+                [o_qtkaudio_device_pop selectItemAtIndex:iaudio];
+            }
+        }
+    }
+    else
+    {
+        [o_qtkaudio_device_pop addItemWithTitle: _NS("None")];
+        [qtkaudio_currdevice_uid release];
     }
 
     [self setSubPanel];
@@ -378,7 +407,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
 
     [o_tabview selectTabViewItemAtIndex: i_type];
     [o_file_sub_ckbox setState: NSOffState];
- 
+
     i_result = [NSApp runModalForWindow: o_panel];
     [o_panel close];
 
@@ -439,7 +468,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
                 else
                     [o_options addObject: @"no-screen-follow-mouse"];
             }
-            else if( [[[o_capture_mode_pop selectedItem] title] isEqualToString: _NS("Capture Device")] )
+            else if( [[[o_capture_mode_pop selectedItem] title] isEqualToString: _NS("Video Device")] )
             {
                 [o_options addObject: [NSString stringWithFormat: @"qtcapture-width=%i", [o_capture_width_fld intValue]]];
                 [o_options addObject: [NSString stringWithFormat: @"qtcapture-height=%i", [o_capture_height_fld intValue]]];
@@ -458,18 +487,21 @@ static VLCOpen *_o_sharedMainInstance = nil;
 - (IBAction)qtkChanged:(id)sender
 {
     NSInteger i_selectedDevice = [o_qtk_device_pop indexOfSelectedItem];
+    NSValue *sizes = [[[[qtkvideoDevices objectAtIndex:i_selectedDevice] formatDescriptions] objectAtIndex: 0] attributeForKey: QTFormatDescriptionVideoEncodedPixelsSizeAttribute];
 
-    if (i_selectedDevice >= ([qtkvideoDevices count] - 1))
-    {
-        NSValue *sizes = [[[[qtkvideoDevices objectAtIndex:i_selectedDevice] formatDescriptions] objectAtIndex: 0] attributeForKey: QTFormatDescriptionVideoEncodedPixelsSizeAttribute];
-        [o_capture_width_fld setIntValue: [sizes sizeValue].width];
-        [o_capture_height_fld setIntValue: [sizes sizeValue].height];
-        [o_capture_width_stp setIntValue: [o_capture_width_fld intValue]];
-        [o_capture_height_stp setIntValue: [o_capture_height_fld intValue]];
-        qtk_currdevice_uid = [[(QTCaptureDevice *)[qtkvideoDevices objectAtIndex:i_selectedDevice] uniqueID] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+    [o_capture_width_fld setIntValue: [sizes sizeValue].width];
+    [o_capture_height_fld setIntValue: [sizes sizeValue].height];
+    [o_capture_width_stp setIntValue: [o_capture_width_fld intValue]];
+    [o_capture_height_stp setIntValue: [o_capture_height_fld intValue]];
+    qtk_currdevice_uid = [[(QTCaptureDevice *)[qtkvideoDevices objectAtIndex:i_selectedDevice] uniqueID] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+    [self setMRL:[NSString stringWithFormat:@"qtcapture://%@", qtk_currdevice_uid]];
+}
 
-        [self setMRL:[NSString stringWithFormat:@"qtcapture://%@", qtk_currdevice_uid]];
-    }
+- (IBAction)qtkAudioChanged:(id)sender
+{
+    NSInteger i_selectedDevice = [o_qtkaudio_device_pop indexOfSelectedItem];
+    qtkaudio_currdevice_uid = [[(QTCaptureDevice *)[qtkaudioDevices objectAtIndex:i_selectedDevice] uniqueID] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+    [self setMRL:[NSString stringWithFormat:@"qtsound://%@", qtkaudio_currdevice_uid]];
 }
 
 - (void)tabView:(NSTabView *)o_tv didSelectTabViewItem:(NSTabViewItem *)o_tvi
@@ -624,7 +656,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
 - (IBAction)openFileBrowse:(id)sender
 {
     NSOpenPanel *o_open_panel = [NSOpenPanel openPanel];
- 
+
     [o_open_panel setAllowsMultipleSelection: NO];
     [o_open_panel setCanChooseDirectories: YES];
     [o_open_panel setTitle: _NS("Open File")];
@@ -1126,7 +1158,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
     [o_open_panel setCanChooseDirectories: YES];
     [o_open_panel setTitle: _NS("Open File")];
     [o_open_panel setPrompt: _NS("Open")];
- 
+
     if( [o_open_panel runModal] == NSOKButton )
     {
         NSArray * o_urls = [o_open_panel URLs];
@@ -1171,7 +1203,9 @@ static VLCOpen *_o_sharedMainInstance = nil;
         [o_currentCaptureView release];
     }
     else
-         [[[[o_tabview tabViewItemAtIndex: 3] view] animator] addSubview: theView];
+    {
+        [[[[o_tabview tabViewItemAtIndex: 3] view] animator] addSubview: theView];
+    }
     o_currentCaptureView = theView;
     [o_currentCaptureView retain];
 }
@@ -1195,7 +1229,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
         else
             [self showCaptureView: o_eyetv_notLaunched_view];
         [self setMRL: @""];
-    } 
+    }
     else if( [[[o_capture_mode_pop selectedItem] title] isEqualToString: _NS("Screen")] )
     {
         [self showCaptureView: o_screen_view];
@@ -1207,7 +1241,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
         [o_screen_top_fld setIntValue: config_GetInt( p_intf, "screen-top" )];
         [o_screen_follow_mouse_ckb setIntValue: config_GetInt( p_intf, "screen-follow-mouse" )];
     }
-    else if( [[[o_capture_mode_pop selectedItem] title] isEqualToString: _NS("Capture Device")] )
+    else if( [[[o_capture_mode_pop selectedItem] title] isEqualToString: _NS("Video Device")] )
     {
         [self showCaptureView: o_qtk_view];
         if ([o_capture_width_fld intValue] <= 0)
@@ -1217,6 +1251,16 @@ static VLCOpen *_o_sharedMainInstance = nil;
             [self setMRL: @""];
         else
             [self setMRL:[NSString stringWithFormat:@"qtcapture://%@", qtk_currdevice_uid]];
+    }
+    else if( [[[o_capture_mode_pop selectedItem] title] isEqualToString: _NS("Audio Device")] )
+    {
+        [self showCaptureView: o_qtkaudio_view];
+        [self qtkAudioChanged:nil];
+
+        if(!qtkaudio_currdevice_uid)
+            [self setMRL: @""];
+        else
+            [self setMRL:[NSString stringWithFormat:@"qtsound://%@", qtkaudio_currdevice_uid]];
     }
 }
 
@@ -1307,7 +1351,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
     [o_eyetv_chn_bgbar animate: self];
     [o_eyetv_chn_status_txt setStringValue: _NS("Retrieving Channel Info...")];
     [o_eyetv_chn_status_txt setHidden: NO];
- 
+
     /* retrieve info */
     NSEnumerator *channels = [[[VLCMain sharedInstance] eyeTVController] allChannels];
     int x = -2;
@@ -1317,7 +1361,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
     [[[o_eyetv_channels_pop menu] addItemWithTitle: _NS("S-Video input")
                                                action: nil
                                         keyEquivalent: @""] setTag:x++];
-    if( channels ) 
+    if( channels )
     {
         NSString *channel;
         [[o_eyetv_channels_pop menu] addItem: [NSMenuItem separatorItem]];
@@ -1332,7 +1376,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
         /* make Tuner the default */
         [o_eyetv_channels_pop selectItemWithTag:[[[VLCMain sharedInstance] eyeTVController] currentChannel]];
     }
- 
+
     /* clean up GUI */
     [o_eyetv_chn_bgbar setHidden: YES];
     [o_eyetv_chn_status_txt setHidden: YES];
@@ -1434,15 +1478,28 @@ static VLCOpen *_o_sharedMainInstance = nil;
 
 - (NSArray *)qtkvideoDevices
 {
-    if (!qtkvideoDevices)
-        [self qtkrefreshDevices];
+    if ( !qtkvideoDevices )
+        [self qtkrefreshVideoDevices];
     return qtkvideoDevices;
 }
 
-- (void)qtkrefreshDevices
+- (void)qtkrefreshVideoDevices
 {
     [qtkvideoDevices release];
     qtkvideoDevices = [[[QTCaptureDevice inputDevicesWithMediaType:QTMediaTypeVideo] arrayByAddingObjectsFromArray:[QTCaptureDevice inputDevicesWithMediaType:QTMediaTypeMuxed]] retain];
+}
+
+- (NSArray *)qtkaudioDevices
+{
+    if ( !qtkaudioDevices )
+        [self qtkrefreshAudioDevices];
+    return qtkaudioDevices;
+}
+
+- (void)qtkrefreshAudioDevices
+{
+    [qtkaudioDevices release];
+    qtkaudioDevices = [[[QTCaptureDevice inputDevicesWithMediaType:QTMediaTypeSound] arrayByAddingObjectsFromArray:[QTCaptureDevice inputDevicesWithMediaType:QTMediaTypeMuxed]] retain];
 }
 
 @end
