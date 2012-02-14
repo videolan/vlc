@@ -822,7 +822,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
             [self setMRL: [NSString stringWithFormat: @"dvdnav://%@", pathToOpen]];
             [self showOpticalMediaView: o_disc_dvd_view withIcon: [[NSWorkspace sharedWorkspace] iconForFile: o_currentOpticalDevice]];
         } else {
-            [self setMRL: [NSString stringWithFormat: @"dvdread://%@@%i:%i-", pathToOpen, [o_disc_dvdwomenus_title intValue], [o_disc_dvdwomenus_chapter intValue]]];
+            [self setMRL: [NSString stringWithFormat: @"dvdread://%@#%i:%i-", pathToOpen, [o_disc_dvdwomenus_title intValue], [o_disc_dvdwomenus_chapter intValue]]];
             [self showOpticalMediaView: o_disc_dvdwomenus_view withIcon: [[NSWorkspace sharedWorkspace] iconForFile: o_currentOpticalDevice]];
         }
     }
