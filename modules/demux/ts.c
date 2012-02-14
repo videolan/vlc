@@ -59,12 +59,7 @@
 # include <dvbpsi/eit.h>
 
 /* TDT support */
-#ifdef _DVBPSI_DR_58_H_
-#   define TS_USE_TDT 1
-#   include <dvbpsi/tot.h>
-#else
-#   include <time.h>
-#endif
+# include <dvbpsi/tot.h>
 
 #undef TS_DEBUG
 
@@ -610,19 +605,16 @@ static int Open( vlc_object_t *p_this )
         eit->psi->handle =
             dvbpsi_AttachDemux( (dvbpsi_demux_new_cb_t)PSINewTableCallBack,
                                 p_demux );
-#ifdef TS_USE_TDT
+
         ts_pid_t *tdt = &p_sys->pid[0x14];
         PIDInit( tdt, true, NULL );
         tdt->psi->handle =
             dvbpsi_AttachDemux( (dvbpsi_demux_new_cb_t)PSINewTableCallBack,
                                 p_demux );
-#endif
         if( p_sys->b_access_control )
         {
             if( SetPIDFilter( p_demux, 0x11, true ) ||
-#ifdef TS_USE_TDT
                 SetPIDFilter( p_demux, 0x14, true ) ||
-#endif
                 SetPIDFilter( p_demux, 0x12, true ) )
                 p_sys->b_access_control = false;
         }
@@ -962,11 +954,7 @@ static int DVBEventInformation( demux_t *p_demux, int64_t *pi_time, int64_t *pi_
 
     if( p_sys->i_dvb_length > 0 )
     {
-#ifdef TS_USE_TDT
         const int64_t t = mdate() + p_sys->i_tdt_delta;
-#else
-        const int64_t t = CLOCK_FREQ * time ( NULL );
-#endif
 
         if( p_sys->i_dvb_start <= t && t < p_sys->i_dvb_start + p_sys->i_dvb_length )
         {
@@ -2944,7 +2932,6 @@ static int EITConvertDuration( uint32_t i_duration )
 }
 #undef CVT_FROM_BCD
 
-#ifdef TS_USE_TDT
 static void TDTCallBack( demux_t *p_demux, dvbpsi_tot_t *p_tdt )
 {
     demux_sys_t        *p_sys = p_demux->p_sys;
@@ -2953,7 +2940,6 @@ static void TDTCallBack( demux_t *p_demux, dvbpsi_tot_t *p_tdt )
                          - mdate();
     dvbpsi_DeleteTOT(p_tdt);
 }
-#endif
 
 
 static void EITCallBack( demux_t *p_demux,
@@ -3141,7 +3127,6 @@ static void PSINewTableCallBack( demux_t *p_demux, dvbpsi_handle h,
                                     (dvbpsi_eit_callback)EITCallBackSchedule;
         dvbpsi_AttachEIT( h, i_table_id, i_extension, cb, p_demux );
     }
-#ifdef TS_USE_TDT
     else if( p_demux->p_sys->pid[0x11].psi->i_sdt_version != -1 &&
               i_table_id == 0x70 )  /* TDT */
     {
@@ -3150,8 +3135,6 @@ static void PSINewTableCallBack( demux_t *p_demux, dvbpsi_handle h,
          dvbpsi_AttachTOT( h, i_table_id, i_extension,
                            (dvbpsi_tot_callback)TDTCallBack, p_demux);
     }
-#endif
-
 }
 
 /*****************************************************************************
