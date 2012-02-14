@@ -560,7 +560,7 @@ AC_SEARCH_LIBS(connect, [socket], [
 ])
 VLC_RESTORE_FLAGS
 AS_IF([test -n "$SOCKET_LIBS"], [
-  VLC_ADD_LIBS([access_http access_mms access_udp access_tcp access_ftp access_rtmp access_output_udp access_output_shout sap stream_out_select stream_out_standard stream_out_rtp stream_out_raop vod_rtsp access_realrtsp rtp oldrc netsync gnutls flac ts audioscrobbler lua remoteosd zvbi audiobargraph_a netsync],[${SOCKET_LIBS}])
+  VLC_ADD_LIBS([access_http access_mms access_udp access_tcp access_ftp access_rtmp access_output_udp access_output_shout sap stream_out_select stream_out_standard stream_out_rtp stream_out_raop vod_rtsp access_realrtsp rtp oldrc netsync gnutls flac ts audioscrobbler lua remoteosd zvbi audiobargraph_a netsync stream_filter_dash],[${SOCKET_LIBS}])
 ])
 AC_SUBST(SOCKET_LIBS)
 
