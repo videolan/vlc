@@ -194,35 +194,6 @@ typedef struct
 
 typedef struct
 {
-    bool                    b_useAccessUnitStartFlag;
-    bool                    b_useAccessUnitEndFlag;
-    bool                    b_useRandomAccessPointFlag;
-    bool                    b_useRandomAccessUnitsOnlyFlag;
-    bool                    b_usePaddingFlag;
-    bool                    b_useTimeStampsFlags;
-    bool                    b_useIdleFlag;
-    bool                    b_durationFlag;
-    uint32_t                i_timeStampResolution;
-    uint32_t                i_OCRResolution;
-    uint8_t                 i_timeStampLength;
-    uint8_t                 i_OCRLength;
-    uint8_t                 i_AU_Length;
-    uint8_t                 i_instantBitrateLength;
-    uint8_t                 i_degradationPriorityLength;
-    uint8_t                 i_AU_seqNumLength;
-    uint8_t                 i_packetSeqNumLength;
-
-    uint32_t                i_timeScale;
-    uint16_t                i_accessUnitDuration;
-    uint16_t                i_compositionUnitDuration;
-
-    uint64_t                i_startDecodingTimeStamp;
-    uint64_t                i_startCompositionTimeStamp;
-
-} sl_config_descriptor_t;
-
-typedef struct
-{
     bool                    b_ok;
     uint16_t                i_es_id;
 
@@ -236,7 +207,6 @@ typedef struct
     uint16_t                i_OCR_es_id;
 
     decoder_config_descriptor_t    dec_descr;
-    sl_config_descriptor_t         sl_descr;
 
 } es_mpeg4_descriptor_t;
 
@@ -2540,7 +2510,6 @@ static iod_descriptor_t *IODNew( int i_data, uint8_t *p_data )
                 }
             }
 #undef  dec_descr
-#define sl_descr    es_descr.sl_descr
             {
                 int i_SLConfigDescr_length;
                 int i_predefined;
@@ -2558,36 +2527,7 @@ static iod_descriptor_t *IODNew( int i_data, uint8_t *p_data )
                 switch( i_predefined )
                 {
                 case 0x01:
-                    {
-                        sl_descr.b_useAccessUnitStartFlag   = 0;
-                        sl_descr.b_useAccessUnitEndFlag     = 0;
-                        sl_descr.b_useRandomAccessPointFlag = 0;
-                        //sl_descr.b_useRandomAccessUnitsOnlyFlag = 0;
-                        sl_descr.b_usePaddingFlag           = 0;
-                        sl_descr.b_useTimeStampsFlags       = 0;
-                        sl_descr.b_useIdleFlag              = 0;
-                        sl_descr.b_durationFlag     = 0;    // FIXME FIXME
-                        sl_descr.i_timeStampResolution      = 1000;
-                        sl_descr.i_OCRResolution    = 0;    // FIXME FIXME
-                        sl_descr.i_timeStampLength          = 32;
-                        sl_descr.i_OCRLength        = 0;    // FIXME FIXME
-                        sl_descr.i_AU_Length                = 0;
-                        sl_descr.i_instantBitrateLength= 0; // FIXME FIXME
-                        sl_descr.i_degradationPriorityLength= 0;
-                        sl_descr.i_AU_seqNumLength          = 0;
-                        sl_descr.i_packetSeqNumLength       = 0;
-                        if( sl_descr.b_durationFlag )
-                        {
-                            sl_descr.i_timeScale            = 0;    // FIXME FIXME
-                            sl_descr.i_accessUnitDuration   = 0;    // FIXME FIXME
-                            sl_descr.i_compositionUnitDuration= 0;    // FIXME FIXME
-                        }
-                        if( !sl_descr.b_useTimeStampsFlags )
-                        {
-                            sl_descr.i_startDecodingTimeStamp   = 0;    // FIXME FIXME
-                            sl_descr.i_startCompositionTimeStamp= 0;    // FIXME FIXME
-                        }
-                    }
+                    // FIXME
                     break;
                 default:
                     ts_debug( "\n* ERR unsupported SLConfigDescr predefined" );
@@ -2596,7 +2536,6 @@ static iod_descriptor_t *IODNew( int i_data, uint8_t *p_data )
                 }
             }
             break;
-#undef  sl_descr
 #undef  es_descr
         default:
             ts_debug( "\n* - OD tag:0x%x length:%d (Unsupported)", i_tag, i_length );
