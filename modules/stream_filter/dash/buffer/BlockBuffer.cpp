@@ -36,7 +36,7 @@ BlockBuffer::BlockBuffer    (stream_t *stream) :
              isEOF          (false)
 
 {
-    this->capacityMicroSec  = var_InheritInteger(stream, "dash-bufferSize") * 1000000;
+    this->capacityMicroSec  = var_InheritInteger(stream, "dash-buffersize") * 1000000;
 
     if(this->capacityMicroSec <= 0)
         this->capacityMicroSec = DEFAULTBUFFERLENGTH;
