@@ -51,6 +51,8 @@ function parse()
     if string.match ( vlc.path, "vimeo.com/moogaloop" ) then
         prefres = get_prefres()
         ishd = false
+        -- Try to find id of the video
+        _,_,id = string.find (vlc.path, "vimeo.com/moogaloop/load/clip:(.*)/local/")
         while true do
             -- Try to find the video's title
             line = vlc.readline()
@@ -58,8 +60,6 @@ function parse()
             if string.match( line, "<caption>(.*)</caption>" ) then
                 _,_,name = string.find (line, "<caption>(.*)</caption>" )
             end
-            -- Try to find id of the video
-            _,_,id = string.find (vlc.path, "vimeo.com/moogaloop/load/clip:(.*)/local/")
             -- Try to find image for thumbnail
             if string.match( line, "<thumbnail>(.*)</thumbnail>" ) then
                 _,_,arturl = string.find (line, "<thumbnail>(.*)</thumbnail>" )
