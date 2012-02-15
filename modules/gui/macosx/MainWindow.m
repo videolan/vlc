@@ -1345,7 +1345,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     if (!screen)
     {
         msg_Dbg( VLCIntf, "chosen screen isn't present, using current screen for fullscreen mode" );
-        screen = [self screen];
+        screen = [[o_video_view window] screen];
     }
     if (!screen)
     {
