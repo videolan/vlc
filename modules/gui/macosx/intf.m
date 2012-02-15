@@ -188,7 +188,6 @@ void WindowClose( vout_window_t *p_wnd )
  * Run: main loop
  *****************************************************************************/
 static NSLock * o_appLock = nil;    // controls access to f_appExit
-static int f_appExit = 0;           // set to 1 when application termination signaled
 
 static void Run( intf_thread_t *p_intf )
 {
@@ -683,10 +682,12 @@ static VLCMain *_o_sharedMainInstance = nil;
 
     /* don't allow a double termination call. If the user has
      * already invoked the quit then simply return this time. */
-    int isTerminating = false;
+    static bool f_appExit = false;
+    bool isTerminating;
 
     [o_appLock lock];
-    isTerminating = (f_appExit++ > 0 ? 1 : 0);
+    isTerminating = f_appExit;
+    f_appExit = true;
     [o_appLock unlock];
 
     if (isTerminating)
