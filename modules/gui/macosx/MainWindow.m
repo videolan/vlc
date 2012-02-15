@@ -1087,7 +1087,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
         /* chapters & titles */
         //FIXME! b_chapters = p_input->stream.i_area_nb > 1;
 
-        if (cachedInputState == PLAYING_S || b_buffering == YES)
+        if (( cachedInputState == PLAYING_S || b_buffering == YES ) && [[VLCMain sharedInstance] activeVideoPlayback] )
             [[o_video_view window] makeKeyAndOrderFront: nil];
 
         vlc_object_release( p_input );
@@ -1666,7 +1666,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [o_video_view release];
     [o_video_view setFrame:[o_temp_view frame]];
     [[o_video_view window] makeFirstResponder: o_video_view];
-    if ([[o_video_view window] isVisible] )
+    if( [[o_video_view window] isVisible] )
     {
         if( !b_nonembedded )
             [super makeKeyAndOrderFront:self]; /* our version contains a workaround */
@@ -1679,6 +1679,10 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [o_fullscreen_window release];
     o_fullscreen_window = nil;
     [[o_video_view window] setLevel:i_originalLevel];
+
+    // if we quit fullscreen because there is no video anymore, make sure non-embedded window is not visible
+    if( ![[VLCMain sharedInstance] activeVideoPlayback] && b_nonembedded )
+        [o_nonembedded_window orderOut: self];
 
     [self unlockFullscreenAnimation];
 }
