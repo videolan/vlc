@@ -404,6 +404,24 @@ static bool IsSpiff(stream_t *s)
     return true;
 }
 
+static bool IsExif(stream_t *s)
+{
+    const uint8_t *header;
+    int size = stream_Peek(s, &header, 256);
+    int position = 0;
+
+    if (FindJpegMarker(&position, header, size) != 0xd8)
+        return false;
+    if (FindJpegMarker(&position, header, size) != 0xe1)
+        return false;
+    position += 2;  /* Skip size */
+    if (position + 5 > size)
+        return false;
+    if (memcmp(&header[position], "Exif\0", 5))
+        return false;
+    return true;
+}
+
 static bool IsTarga(stream_t *s)
 {
     /* The header is not enough to ensure proper detection, we need
@@ -512,6 +530,9 @@ static const image_format_t formats[] = {
     },
     { .codec = VLC_CODEC_JPEG,
       .detect = IsSpiff,
+    },
+    { .codec = VLC_CODEC_JPEG,
+      .detect = IsExif,
     },
     { .codec = VLC_CODEC_TARGA,
       .detect = IsTarga,
