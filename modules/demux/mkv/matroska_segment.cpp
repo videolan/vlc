@@ -725,6 +725,7 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset, int64_t i_
         }
     }
 
+#ifdef WIN32
     /* Don't try complex seek if we seek to 0 */
     if( i_date == 0 )
     {
@@ -738,6 +739,7 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset, int64_t i_
         sys.i_pts = 0;
         return;       
     }
+#endif
 
     if ( i_index > 0 )
     {
