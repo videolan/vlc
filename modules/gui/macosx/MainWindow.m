@@ -253,6 +253,8 @@ static VLCMainWindow *_o_sharedInstance = nil;
     else
         [self setContentMinSize:NSMakeSize(604., 288.)];
     [self setTitle: _NS("VLC media player")];
+    [o_time_fld setAlignment: NSCenterTextAlignment];
+    [o_time_fld setNeedsDisplay:YES];
     [o_playlist_btn setEnabled:NO];
     o_temp_view = [[NSView alloc] init];
     [o_temp_view setAutoresizingMask:NSViewHeightSizable | NSViewWidthSizable];
@@ -260,8 +262,8 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [o_left_split_view setFrame: [o_sidebar_view frame]];
     if (OSX_LION && b_nativeFullscreenMode)
     {
-        [self setCollectionBehavior: NSWindowCollectionBehaviorFullScreenPrimary];
         NSRect frame;
+        [self setCollectionBehavior: NSWindowCollectionBehaviorFullScreenPrimary];
         float f_width = [o_fullscreen_btn frame].size.width;
 
         #define moveItem( item ) \

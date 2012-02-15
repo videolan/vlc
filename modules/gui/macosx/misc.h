@@ -158,6 +158,7 @@
 {
     NSShadow * o_string_shadow;
     NSDictionary * o_string_attributes_dict;
+    NSTextAlignment textAlignment;
 }
 
 - (BOOL)timeRemaining;

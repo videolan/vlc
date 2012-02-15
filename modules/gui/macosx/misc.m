@@ -727,7 +727,14 @@ void _drawFrameInRect(NSRect frameRect)
     else
         o_string_color = [NSColor colorWithCalibratedRed:0.64 green:0.64 blue:0.64 alpha:100.0];
 
+    textAlignment = NSCenterTextAlignment;
     o_string_attributes_dict = [[NSDictionary dictionaryWithObjectsAndKeys: o_string_color, NSForegroundColorAttributeName, [NSFont titleBarFontOfSize:10.0], NSFontAttributeName, nil] retain];
+}
+
+- (void)setAlignment:(NSTextAlignment)alignment
+{
+    textAlignment = alignment;
+    [self setStringValue:[self stringValue]];
 }
 
 - (void)dealloc
@@ -750,7 +757,7 @@ void _drawFrameInRect(NSRect frameRect)
     NSUInteger i_stringLength = [string length];
 
     [o_attributed_string addAttribute: NSShadowAttributeName value: o_string_shadow range: NSMakeRange(0, i_stringLength)];
-    [o_attributed_string setAlignment: NSRightTextAlignment range: NSMakeRange(0, i_stringLength)];
+    [o_attributed_string setAlignment: textAlignment range: NSMakeRange(0, i_stringLength)];
     [self setAttributedStringValue: o_attributed_string];
     [o_attributed_string release];
 }

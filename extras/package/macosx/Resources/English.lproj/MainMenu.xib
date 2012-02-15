@@ -21,16 +21,16 @@
     </object>
     <object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
       <bool key="EncodedWithXMLCoder">YES</bool>
-      <integer value="29"/>
-      <integer value="1617"/>
       <integer value="4895"/>
-      <integer value="4596"/>
+      <integer value="1617"/>
       <integer value="283"/>
-      <integer value="4722"/>
-      <integer value="2770"/>
+      <integer value="4756"/>
+      <integer value="4596"/>
+      <integer value="29"/>
       <integer value="915"/>
+      <integer value="2770"/>
       <integer value="2730"/>
-      <integer value="21"/>
+      <integer value="4722"/>
     </object>
     <object class="NSArray" key="IBDocument.PluginDependencies">
       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -627,7 +627,7 @@
                   <reference key="NSNextResponder" ref="129808516"/>
                   <int key="NSvFlags">-2147482334</int>
                   <object class="NSPSMatrix" key="NSDrawMatrix"/>
-                  <string key="NSFrame">{{217, 13}, {185, 12}}</string>
+                  <string key="NSFrame">{{217, 12}, {185, 12}}</string>
                   <reference key="NSSuperview" ref="129808516"/>
                   <int key="NSViewLayerContentsRedrawPolicy">2</int>
                   <int key="NSpiFlags">16650</int>
@@ -670,7 +670,7 @@
                 <object class="NSCustomView" id="202538583">
                   <reference key="NSNextResponder" ref="129808516"/>
                   <int key="NSvFlags">-2147483356</int>
-                  <string key="NSFrame">{{218, 12}, {60, 12}}</string>
+                  <string key="NSFrame">{{218, 11}, {60, 12}}</string>
                   <reference key="NSSuperview" ref="129808516"/>
                   <int key="NSViewLayerContentsRedrawPolicy">2</int>
                   <bool key="NSViewCanDrawConcurrently">YES</bool>
@@ -679,7 +679,7 @@
                 <object class="NSButton" id="707945673">
                   <reference key="NSNextResponder" ref="129808516"/>
                   <int key="NSvFlags">260</int>
-                  <string key="NSFrame">{{26, -1}, {39, 39}}</string>
+                  <string key="NSFrame">{{26, -2}, {39, 39}}</string>
                   <reference key="NSSuperview" ref="129808516"/>
                   <int key="NSViewLayerContentsRedrawPolicy">2</int>
                   <bool key="NSEnabled">YES</bool>
@@ -712,7 +712,7 @@
                 <object class="NSButton" id="291209196">
                   <reference key="NSNextResponder" ref="129808516"/>
                   <int key="NSvFlags">292</int>
-                  <string key="NSFrame">{{180, 7}, {33, 23}}</string>
+                  <string key="NSFrame">{{180, 6}, {33, 23}}</string>
                   <reference key="NSSuperview" ref="129808516"/>
                   <int key="NSViewLayerContentsRedrawPolicy">2</int>
                   <bool key="NSEnabled">YES</bool>
@@ -745,7 +745,7 @@
                 <object class="NSSlider" id="704525034">
                   <reference key="NSNextResponder" ref="129808516"/>
                   <int key="NSvFlags">290</int>
-                  <string key="NSFrame">{{218, 11}, {182, 15}}</string>
+                  <string key="NSFrame">{{218, 10}, {182, 15}}</string>
                   <reference key="NSSuperview" ref="129808516"/>
                   <int key="NSViewLayerContentsRedrawPolicy">2</int>
                   <bool key="NSViewCanDrawConcurrently">YES</bool>
@@ -775,7 +775,7 @@
                 <object class="NSButton" id="714984330">
                   <reference key="NSNextResponder" ref="129808516"/>
                   <int key="NSvFlags">289</int>
-                  <string key="NSFrame">{{569, 7}, {29, 23}}</string>
+                  <string key="NSFrame">{{569, 6}, {29, 23}}</string>
                   <reference key="NSSuperview" ref="129808516"/>
                   <int key="NSViewLayerContentsRedrawPolicy">2</int>
                   <bool key="NSEnabled">YES</bool>
@@ -810,7 +810,7 @@
                 <object class="NSButton" id="955174811">
                   <reference key="NSNextResponder" ref="129808516"/>
                   <int key="NSvFlags">292</int>
-                  <string key="NSFrame">{{126, 7}, {28, 23}}</string>
+                  <string key="NSFrame">{{126, 6}, {28, 23}}</string>
                   <reference key="NSSuperview" ref="129808516"/>
                   <int key="NSViewLayerContentsRedrawPolicy">2</int>
                   <bool key="NSEnabled">YES</bool>
@@ -839,7 +839,7 @@
                 <object class="NSButton" id="1051664676">
                   <reference key="NSNextResponder" ref="129808516"/>
                   <int key="NSvFlags">292</int>
-                  <string key="NSFrame">{{154, 7}, {28, 23}}</string>
+                  <string key="NSFrame">{{154, 6}, {28, 23}}</string>
                   <reference key="NSSuperview" ref="129808516"/>
                   <int key="NSViewLayerContentsRedrawPolicy">2</int>
                   <bool key="NSEnabled">YES</bool>
@@ -868,7 +868,7 @@
                 <object class="NSButton" id="1023610457">
                   <reference key="NSNextResponder" ref="129808516"/>
                   <int key="NSvFlags">260</int>
-                  <string key="NSFrame">{{6, 7}, {35, 23}}</string>
+                  <string key="NSFrame">{{6, 6}, {35, 23}}</string>
                   <reference key="NSSuperview" ref="129808516"/>
                   <int key="NSViewLayerContentsRedrawPolicy">2</int>
                   <bool key="NSEnabled">YES</bool>
@@ -899,7 +899,7 @@
                 <object class="NSSlider" id="788281303">
                   <reference key="NSNextResponder" ref="129808516"/>
                   <int key="NSvFlags">289</int>
-                  <string key="NSFrame">{{464, 10}, {58, 15}}</string>
+                  <string key="NSFrame">{{464, 9}, {58, 15}}</string>
                   <reference key="NSSuperview" ref="129808516"/>
                   <object class="CISourceOverCompositing" key="NSViewCompositeFilter">
                     <bool key="CIEnabled">YES</bool>
@@ -907,7 +907,7 @@
                   <int key="NSViewLayerContentsRedrawPolicy">2</int>
                   <bool key="NSEnabled">YES</bool>
                   <object class="NSSliderCell" key="NSCell" id="180862414">
-                    <int key="NSCellFlags">67501824</int>
+                    <int key="NSCellFlags">-2079981824</int>
                     <int key="NSCellFlags2">131072</int>
                     <object class="NSMutableString" key="NSContents">
                       <characters key="NS.bytes"/>
@@ -916,7 +916,7 @@
                     <reference key="NSControlView" ref="788281303"/>
                     <double key="NSMaxValue">512</double>
                     <double key="NSMinValue">0.0</double>
-                    <double key="NSValue">256</double>
+                    <double key="NSValue">148.83720930232559</double>
                     <double key="NSAltIncValue">0.0</double>
                     <int key="NSNumberOfTickMarks">0</int>
                     <int key="NSTickMarkPosition">1</int>
@@ -927,7 +927,7 @@
                 <object class="NSButton" id="38046606">
                   <reference key="NSNextResponder" ref="129808516"/>
                   <int key="NSvFlags">289</int>
-                  <string key="NSFrame">{{538, 7}, {33, 23}}</string>
+                  <string key="NSFrame">{{538, 6}, {33, 23}}</string>
                   <reference key="NSSuperview" ref="129808516"/>
                   <int key="NSViewLayerContentsRedrawPolicy">2</int>
                   <bool key="NSEnabled">YES</bool>
@@ -1009,7 +1009,7 @@
                 <object class="NSButton" id="963106097">
                   <reference key="NSNextResponder" ref="129808516"/>
                   <int key="NSvFlags">289</int>
-                  <string key="NSFrame">{{449, 8}, {20, 20}}</string>
+                  <string key="NSFrame">{{458, 7}, {7, 20}}</string>
                   <reference key="NSSuperview" ref="129808516"/>
                   <int key="NSViewLayerContentsRedrawPolicy">2</int>
                   <bool key="NSEnabled">YES</bool>
@@ -1049,7 +1049,7 @@
                       <string>NeXT TIFF v4.0 pasteboard type</string>
                     </object>
                   </object>
-                  <string key="NSFrame">{{469, 15}, {48, 5}}</string>
+                  <string key="NSFrame">{{469, 14}, {48, 5}}</string>
                   <reference key="NSSuperview" ref="129808516"/>
                   <object class="CISourceOverCompositing" key="NSViewCompositeFilter">
                     <bool key="CIEnabled">YES</bool>
@@ -1073,7 +1073,7 @@
                 <object class="NSButton" id="809192538">
                   <reference key="NSNextResponder" ref="129808516"/>
                   <int key="NSvFlags">260</int>
-                  <string key="NSFrame">{{89, 7}, {33, 23}}</string>
+                  <string key="NSFrame">{{89, 6}, {33, 23}}</string>
                   <reference key="NSSuperview" ref="129808516"/>
                   <int key="NSViewLayerContentsRedrawPolicy">2</int>
                   <bool key="NSEnabled">YES</bool>
@@ -1104,7 +1104,7 @@
                 <object class="NSButton" id="828315098">
                   <reference key="NSNextResponder" ref="129808516"/>
                   <int key="NSvFlags">260</int>
-                  <string key="NSFrame">{{50, 7}, {35, 23}}</string>
+                  <string key="NSFrame">{{50, 6}, {35, 23}}</string>
                   <reference key="NSSuperview" ref="129808516"/>
                   <int key="NSViewLayerContentsRedrawPolicy">2</int>
                   <bool key="NSEnabled">YES</bool>
@@ -1133,7 +1133,7 @@
                 <object class="NSCustomView" id="304081293">
                   <reference key="NSNextResponder" ref="129808516"/>
                   <int key="NSvFlags">290</int>
-                  <string key="NSFrame">{{217, 11}, {185, 14}}</string>
+                  <string key="NSFrame">{{217, 10}, {185, 14}}</string>
                   <reference key="NSSuperview" ref="129808516"/>
                   <string key="NSReuseIdentifierKey">_NS:1109</string>
                   <string key="NSClassName">VLCThreePartImageView</string>
@@ -11198,9 +11198,9 @@ LCAuLi4</string>
           <string>{{430, 565}, {137, 103}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
-          <string>{{524, 446}, {604, 310}}</string>
+          <string>{{364, 446}, {604, 310}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-          <string>{{524, 446}, {604, 310}}</string>
+          <string>{{364, 446}, {604, 310}}</string>
           <boolean value="YES"/>
           <boolean value="NO"/>
           <boolean value="YES"/>
@@ -11407,9 +11407,9 @@ LCAuLi4</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <object class="NSAffineTransform"/>
           <boolean value="YES"/>
-          <string>{{576, 306}, {599, 368}}</string>
+          <string>{{369, 306}, {599, 368}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-          <string>{{576, 306}, {599, 368}}</string>
+          <string>{{369, 306}, {599, 368}}</string>
           <boolean value="YES"/>
           <boolean value="YES"/>
           <string>{599, 368}</string>
@@ -11732,7 +11732,7 @@ LCAuLi4</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-          <string>{{726, 458}, {402, 252}}</string>
+          <string>{{566, 458}, {402, 252}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <object class="NSAffineTransform"/>
           <string>VLBrushedMetalImageView</string>
@@ -11767,7 +11767,7 @@ LCAuLi4</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-          <string>{{363, 752}, {400, 22}}</string>
+          <string>{{363, 734}, {400, 22}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <object class="NSAffineTransform">
