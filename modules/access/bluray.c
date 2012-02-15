@@ -26,6 +26,10 @@
 
 #include <assert.h>
 #include <limits.h>                         /* PATH_MAX */
+#if defined (HAVE_MNTENT_H) && defined(HAVE_SYS_STAT_H)
+#include <mntent.h>
+#include <sys/stat.h>
+#endif
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
@@ -122,6 +126,26 @@ static int blurayOpen( vlc_object_t *object )
         bd_path[PATH_MAX - 1] = '\0';
     }
 
+#if defined (HAVE_MNTENT_H) && defined (HAVE_SYS_STAT_H)
+    /* If we're passed a block device, try to convert it to the mount point. */
+    struct stat st;
+    if ( !stat (bd_path, &st)) {
+        if (S_ISBLK (st.st_mode)) {
+            FILE* mtab = setmntent ("/proc/self/mounts", "r");
+            struct mntent* m;
+            struct mntent mbuf;
+            char buf [8192];
+            while ((m = getmntent_r (mtab, &mbuf, buf, sizeof(buf))) != NULL) {
+                if (!strcmp (m->mnt_fsname, bd_path)) {
+                    strncpy (bd_path, m->mnt_dir, sizeof(bd_path));
+                    bd_path[sizeof(bd_path) - 1] = '\0';
+                    break;
+                }
+            }
+            endmntent (mtab);
+        }
+    }
+#endif /* HAVE_MNTENT_H && HAVE_SYS_STAT_H */
     p_sys->bluray = bd_open(bd_path, NULL);
     if (!p_sys->bluray) {
         free(p_sys);

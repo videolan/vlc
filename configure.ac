@@ -707,7 +707,7 @@ AC_CHECK_HEADERS([sys/mount.h], [], [],
 if test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"; then
   AC_CHECK_HEADERS(machine/param.h sys/shm.h)
   AC_CHECK_HEADERS([linux/version.h linux/dccp.h scsi/scsi.h linux/magic.h])
-  AC_CHECK_HEADERS(syslog.h)
+  AC_CHECK_HEADERS(syslog.h mntent.h)
 fi # end "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"
 
 dnl LP64 and LLP64 architectures had better define ssize_t by themselves...
