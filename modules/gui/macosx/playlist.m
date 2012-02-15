@@ -1124,18 +1124,16 @@
         playlist_AddInput( p_playlist, p_input, PLAYLIST_INSERT, i_position == -1 ? PLAYLIST_END : i_position + i_item, b_usingPlaylist,
          pl_Locked );
 
+        if( i_item == 0 && !b_enqueue )
+        {
+            playlist_item_t *p_item = playlist_ItemGetByInput( p_playlist, p_input );
+            playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, pl_Locked, p_item->p_parent, p_item );
+        }
+
         vlc_gc_decref( p_input );
     }
     PL_UNLOCK;
-    if( i_position == -1 )
-        i_position = [o_outline_dict count] - 1;
-
     [self playlistUpdated];
-    if( !b_enqueue )
-    {
-        [o_outline_view selectRowIndexes:[NSIndexSet indexSetWithIndex:i_position] byExtendingSelection:NO];
-        [self playItem:nil];
-    }
 }
 
 - (void)appendNodeArray:(NSArray*)o_array inNode:(playlist_item_t *)p_node atPos:(int)i_position enqueue:(BOOL)b_enqueue
