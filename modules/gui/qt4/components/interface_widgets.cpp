@@ -550,7 +550,7 @@ void CoverArtLabel::askForUpdate()
 }
 
 TimeLabel::TimeLabel( intf_thread_t *_p_intf, TimeLabel::Display _displayType  )
-    : QLabel(), p_intf( _p_intf ), bufTimer( new QTimer(this) ),
+    : ClickableQLabel(), p_intf( _p_intf ), bufTimer( new QTimer(this) ),
       buffering( false ), showBuffering(false), bufVal( -1 ), displayType( _displayType )
 {
     b_remainingTime = false;

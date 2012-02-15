@@ -459,7 +459,7 @@ inline void MainInterface::createStatusBar()
     QStatusBar *statusBarr = statusBar();
 
     TimeLabel *timeLabel = new TimeLabel( p_intf );
-    nameLabel = new QLabel( this );
+    nameLabel = new ClickableQLabel();
     nameLabel->setTextInteractionFlags( Qt::TextSelectableByMouse
                                       | Qt::TextSelectableByKeyboard );
     SpeedLabel *speedLabel = new SpeedLabel( p_intf, this );
@@ -480,11 +480,12 @@ inline void MainInterface::createStatusBar()
     statusBarr->addPermanentWidget( speedLabel, 0 );
     statusBarr->addPermanentWidget( timeLabel, 0 );
 
+    CONNECT( nameLabel, doubleClicked(), THEDP, epgDialog() );
     /* timeLabel behaviour:
        - double clicking opens the goto time dialog
        - right-clicking and clicking just toggle between remaining and
          elapsed time.*/
-    CONNECT( timeLabel, timeLabelDoubleClicked(), THEDP, gotoTimeDialog() );
+    CONNECT( timeLabel, doubleClicked(), THEDP, gotoTimeDialog() );
 
     CONNECT( THEMIM->getIM(), encryptionChanged( bool ),
              this, showCryptedLabel( bool ) );

@@ -118,7 +118,20 @@ private slots:
 };
 #endif
 
-class TimeLabel : public QLabel
+class ClickableQLabel : public QLabel
+{
+    Q_OBJECT
+public:
+    virtual void mouseDoubleClickEvent( QMouseEvent *event )
+    {
+        Q_UNUSED( event );
+        emit doubleClicked();
+    }
+signals:
+    void doubleClicked();
+};
+
+class TimeLabel : public ClickableQLabel
 {
     Q_OBJECT
 public:
@@ -142,7 +155,7 @@ protected:
         if( displayType != TimeLabel::Both ) return;
         event->accept();
         toggleTimeDisplay();
-        emit timeLabelDoubleClicked();
+        ClickableQLabel::mouseDoubleClickEvent( event );
     }
 private:
     intf_thread_t *p_intf;
@@ -159,8 +172,6 @@ private:
     char psz_time[MSTRTIME_MAX_SIZE];
     void toggleTimeDisplay();
     void paintEvent( QPaintEvent* );
-signals:
-    void timeLabelDoubleClicked();
 private slots:
     void setDisplayPosition( float pos, int64_t time, int length );
     void setDisplayPosition( float pos );
