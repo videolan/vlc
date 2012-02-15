@@ -233,13 +233,22 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
     if (!p_input) return nil;
 
     input_item_t *p_item = input_GetItem( p_input );
-    if (!p_item) return nil;
+    if (!p_item)
+    {
+        vlc_object_release( p_input );
+        return nil;
+    }
 
     char *psz_uri = input_item_GetURI( p_item );
-    if (!psz_uri) return nil;
+    if (!psz_uri)
+    {
+        vlc_object_release( p_input );
+        return nil;
+    }
 
     NSURL *o_url;
     o_url = [NSURL URLWithString:[NSString stringWithUTF8String:psz_uri]];
+    vlc_object_release( p_input );
 
     return o_url;
 }
@@ -250,10 +259,18 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
     if (!p_input) return nil;
 
     input_item_t *p_item = input_GetItem( p_input );
-    if (!p_item) return nil;
+    if (!p_item)
+    {
+        vlc_object_release( p_input );
+        return nil;
+    }
 
     char *psz_uri = input_item_GetURI( p_item );
-    if (!psz_uri) return nil;
+    if (!psz_uri)
+    {
+        vlc_object_release( p_input );
+        return nil;
+    }
 
     NSString *o_name;
     char *format = var_InheritString( VLCIntf, "input-title-format" );
@@ -272,6 +289,7 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
         else
             o_name = [o_url absoluteString];
     }
+    vlc_object_release( p_input );
     return o_name;
 }
 

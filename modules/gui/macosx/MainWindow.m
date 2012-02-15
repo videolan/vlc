@@ -1042,6 +1042,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
         [self setTitle: aString];
         [o_fspanel setStreamTitle: aString];
+        vlc_object_release( p_input );
     }
     else
     {

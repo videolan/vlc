@@ -727,6 +727,13 @@ static VLCMain *_o_sharedMainInstance = nil;
     var_DelCallback(p_intf->p_libvlc, "intf-toggle-fscontrol", ShowController, self);
     var_DelCallback(p_intf->p_libvlc, "intf-show", ShowController, self);
 
+    input_thread_t * p_input = playlist_CurrentInput( p_playlist );
+    if( p_input )
+    {
+        var_DelCallback( p_input, "intf-event", InputEvent, [VLCMain sharedInstance] );
+        vlc_object_release( p_input );
+    }
+
     /* remove global observer watching for vout device changes correctly */
     [[NSNotificationCenter defaultCenter] removeObserver: self];
 
@@ -1352,8 +1359,9 @@ unsigned int CocoaKeyToVLC( unichar i_key )
             if( p_input != NULL && [self activeVideoPlayback] )
             {
                 [o_mainwindow performSelectorOnMainThread:@selector(enterFullscreen) withObject:nil waitUntilDone:NO];
-                vlc_object_release( p_input );
             }
+            if (p_input)
+                vlc_object_release( p_input );
         }
         else
         {
@@ -1372,10 +1380,12 @@ unsigned int CocoaKeyToVLC( unichar i_key )
     {
         var_AddCallback( p_input, "intf-event", InputEvent, [VLCMain sharedInstance] );
         [o_mainmenu setRateControlsEnabled: YES];
-        vlc_object_release( p_input );
     }
     else
         [o_mainmenu setRateControlsEnabled: NO];
+
+    if (p_input)
+        vlc_object_release( p_input );
 
     [o_playlist updateRowSelection];
     [o_mainwindow updateWindow];

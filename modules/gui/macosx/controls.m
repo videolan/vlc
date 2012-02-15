@@ -218,7 +218,11 @@
     if( !p_input ) return;
 
     input_item_t *p_item = input_GetItem( p_input );
-    if( !p_item ) return;
+    if( !p_item )
+    {
+        vlc_object_release( p_input );
+        return;
+    }
 
     char *path = input_item_GetURI( p_item );
     if( !path ) path = strdup( "" );
@@ -247,6 +251,7 @@
                          [[[[openPanel URLs] objectAtIndex: i] path] UTF8String] );
         }
     }
+    vlc_object_release( p_input );
 }
 
 - (void)scrollWheel:(NSEvent *)theEvent
