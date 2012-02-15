@@ -3,7 +3,7 @@ $Id$
 
 See lua/README.txt for generic documentation about Lua usage in VLC.
 
-Examples: See dailymotion.lua, googlevideo.lua, metacafe.lua, youbtube.lua
+Examples: See dailymotion.lua, googlevideo.lua, metacafe.lua, youtube.lua
           and youtube_homepage.lua .
 
 VLC Lua playlist modules should define two functions:
