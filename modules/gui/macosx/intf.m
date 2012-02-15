@@ -677,9 +677,6 @@ static VLCMain *_o_sharedMainInstance = nil;
 
 - (void)applicationWillTerminate:(NSNotification *)notification
 {
-    if( !p_intf )
-        return;
-
     /* don't allow a double termination call. If the user has
      * already invoked the quit then simply return this time. */
     static bool f_appExit = false;
