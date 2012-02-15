@@ -193,6 +193,11 @@ static int blurayOpen( vlc_object_t *object )
         goto error;
     }
 
+    /*
+     * Initialize the event queue, so we can receive events in blurayDemux(Menu).
+     */
+    bd_get_event(p_sys->bluray, NULL);
+
     /* get title request */
     if ((pos_title = strrchr(bd_path, ':'))) {
         /* found character ':' for title information */
@@ -285,6 +290,13 @@ static int blurayInitTitles(demux_t *p_demux )
     return VLC_SUCCESS;
 }
 
+static void blurayUpdateTitle( demux_t *p_demux, int i_title )
+{
+    /* read title info and init some values */
+    p_demux->info.i_title = i_title;
+    p_demux->info.i_seekpoint = 0;
+    p_demux->info.i_update |= INPUT_UPDATE_TITLE | INPUT_UPDATE_SEEKPOINT;
+}
 
 /*****************************************************************************
  * bluraySetTitle: select new BD title
@@ -306,11 +318,7 @@ static int bluraySetTitle(demux_t *p_demux, int i_title)
         msg_Err(p_demux, "cannot select bd title '%d'", p_demux->info.i_title);
         return VLC_EGENERIC;
     }
-
-    /* read title info and init some values */
-    p_demux->info.i_title = i_title;
-    p_demux->info.i_seekpoint = 0;
-    p_demux->info.i_update |= INPUT_UPDATE_TITLE | INPUT_UPDATE_SEEKPOINT;
+    blurayUpdateTitle( p_demux, i_title );
 
     return VLC_SUCCESS;
 }
@@ -381,7 +389,7 @@ static int blurayControl(demux_t *p_demux, int query, va_list args)
         case DEMUX_GET_LENGTH:
         {
             int64_t *pi_length = (int64_t*)va_arg(args, int64_t *);
-            *pi_length = CUR_LENGTH;
+            *pi_length = p_demux->info.i_title < p_sys->i_title ? CUR_LENGTH : 0;
             return VLC_SUCCESS;
         }
         case DEMUX_SET_TIME:
@@ -400,7 +408,8 @@ static int blurayControl(demux_t *p_demux, int query, va_list args)
         case DEMUX_GET_POSITION:
         {
             double *pf_position = (double*)va_arg( args, double * );
-            *pf_position = (double)FROM_TICKS(bd_tell_time(p_sys->bluray))/CUR_LENGTH;
+            *pf_position = p_demux->info.i_title < p_sys->i_title ?
+                        (double)FROM_TICKS(bd_tell_time(p_sys->bluray))/CUR_LENGTH : 0.0;
             return VLC_SUCCESS;
         }
         case DEMUX_SET_POSITION:
@@ -447,6 +456,41 @@ static int blurayControl(demux_t *p_demux, int query, va_list args)
     return VLC_SUCCESS;
 }
 
+static void blurayHandleEvent( demux_t *p_demux, const BD_EVENT *e )
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+
+    switch (e->event)
+    {
+        case BD_EVENT_TITLE:
+            if (e->param < p_sys->i_title)
+                blurayUpdateTitle( p_demux, e->param );
+            break;
+        case BD_EVENT_PLAYITEM:
+            break;
+        case BD_EVENT_AUDIO_STREAM:
+            break;
+        case BD_EVENT_CHAPTER:
+            p_demux->info.i_update |= INPUT_UPDATE_SEEKPOINT;
+            p_demux->info.i_seekpoint = 0;
+            break;
+        case BD_EVENT_ANGLE:
+        case BD_EVENT_IG_STREAM:
+        default:
+            msg_Warn( p_demux, "event: %d param: %d", e->event, e->param );
+            break;
+    }
+}
+
+static void blurayHandleEvents( demux_t *p_demux )
+{
+    BD_EVENT e;
+
+    while (bd_get_event(p_demux->p_sys->bluray, &e))
+    {
+        blurayHandleEvent(p_demux, &e);
+    }
+}
 
 #define BD_TS_PACKET_SIZE (192)
 #define NB_TS_PACKETS (200)
@@ -460,6 +504,7 @@ static int blurayDemux(demux_t *p_demux)
         return -1;
     }
 
+    blurayHandleEvents(p_demux);
     int nread = bd_read(p_sys->bluray, p_block->p_buffer,
                         NB_TS_PACKETS * BD_TS_PACKET_SIZE);
     if (nread < 0) {
