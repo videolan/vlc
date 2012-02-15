@@ -1378,6 +1378,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
         rect.origin.x += [[o_video_view window] frame].origin.x;
         rect.origin.y += [[o_video_view window] frame].origin.y;
         o_fullscreen_window = [[VLCWindow alloc] initWithContentRect:rect styleMask: NSBorderlessWindowMask backing:NSBackingStoreBuffered defer:YES];
+        [o_fullscreen_window setFullscreen: YES];
         [o_fullscreen_window setBackgroundColor: [NSColor blackColor]];
         [o_fullscreen_window setCanBecomeKeyWindow: YES];
 
