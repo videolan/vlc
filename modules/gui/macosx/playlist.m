@@ -1542,6 +1542,7 @@
 
 - (BOOL)outlineView:(NSOutlineView *)outlineView acceptDrop:(id <NSDraggingInfo>)info item:(id)item childIndex:(NSInteger)index
 {
+    NSLog( @"- (BOOL)outlineView:(NSOutlineView *)outlineView acceptDrop:(id <NSDraggingInfo>)info item:(id)item childIndex:(NSInteger)index" );
     playlist_t * p_playlist =  pl_Get( VLCIntf );
     NSPasteboard *o_pasteboard = [info draggingPasteboard];
 
@@ -1629,12 +1630,25 @@
 
     else if( [[o_pasteboard types] containsObject: NSFilenamesPboardType] )
     {
+        NSLog( @"NSFilenamesPboardType" );
         playlist_item_t *p_node = [item pointerValue];
 
         NSArray *o_values = [[o_pasteboard propertyListForType: NSFilenamesPboardType]
                                 sortedArrayUsingSelector: @selector(caseInsensitiveCompare:)];
         NSUInteger count = [o_values count];
         NSMutableArray *o_array = [NSMutableArray arrayWithCapacity:count];
+        input_thread_t * p_input = pl_CurrentInput( VLCIntf );
+        BOOL b_returned = NO;
+
+        if (count == 1 && p_input)
+        {
+            b_returned = input_AddSubtitle( p_input, make_URI([[o_values objectAtIndex:0] UTF8String], NULL), true );
+            vlc_object_release( p_input );
+            if(!b_returned)
+                return YES;
+        }
+        else if( p_input )
+            vlc_object_release( p_input );
 
         for( NSUInteger i = 0; i < count; i++)
         {

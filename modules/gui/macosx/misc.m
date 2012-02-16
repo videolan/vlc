@@ -425,6 +425,19 @@ static NSMutableArray *blackoutWindows = NULL;
             NSArray *o_values = [[o_paste propertyListForType: NSFilenamesPboardType] sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
             NSUInteger count = [o_values count];
 
+            input_thread_t * p_input = pl_CurrentInput( VLCIntf );
+            BOOL b_returned = NO;
+
+            if (count == 1 && p_input)
+            {
+                b_returned = input_AddSubtitle( p_input, make_URI([[o_values objectAtIndex:0] UTF8String], NULL), true );
+                vlc_object_release( p_input );
+                if(!b_returned)
+                    return YES;
+            }
+            else if( p_input )
+                vlc_object_release( p_input );
+
             for( NSUInteger i = 0; i < count; i++)
             {
                 NSDictionary *o_dic;
@@ -511,6 +524,19 @@ static NSMutableArray *blackoutWindows = NULL;
             NSArray *o_array = [NSArray array];
             NSArray *o_values = [[o_paste propertyListForType: NSFilenamesPboardType] sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
             NSUInteger count = [o_values count];
+
+            input_thread_t * p_input = pl_CurrentInput( VLCIntf );
+            BOOL b_returned = NO;
+
+            if (count == 1 && p_input)
+            {
+                b_returned = input_AddSubtitle( p_input, make_URI([[o_values objectAtIndex:0] UTF8String], NULL), true );
+                vlc_object_release( p_input );
+                if(!b_returned)
+                    return YES;
+            }
+            else if( p_input )
+                vlc_object_release( p_input );
 
             for( NSUInteger i = 0; i < count; i++)
             {

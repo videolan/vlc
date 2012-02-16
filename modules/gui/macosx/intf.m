@@ -870,6 +870,22 @@ static VLCMain *_o_sharedMainInstance = nil;
     if( !psz_uri )
         return( FALSE );
 
+    input_thread_t * p_input = pl_CurrentInput( VLCIntf );
+    BOOL b_returned = NO;
+
+    if (p_input)
+    {
+        b_returned = input_AddSubtitle( p_input, psz_uri, true );
+        vlc_object_release( p_input );
+        if(!b_returned)
+        {
+            free( psz_uri );
+            return YES;
+        }
+    }
+    else if( p_input )
+        vlc_object_release( p_input );
+
     NSDictionary *o_dic = [NSDictionary dictionaryWithObject:[NSString stringWithCString:psz_uri encoding:NSUTF8StringEncoding] forKey:@"ITEM_URL"];
 
     free( psz_uri );
