@@ -1008,6 +1008,17 @@ void matroska_segment_c::ParseAttachments( KaxAttachments *attachments )
         {
              memcpy( new_attachment->p_data, img_data.GetBuffer(), img_data.GetSize() );
              sys.stored_attachments.push_back( new_attachment );
+             if( !strncmp( new_attachment->mimeType(), "image/", 6 ) )
+             {
+                 char *psz_url;
+                 if( asprintf( &psz_url, "attachment://%s",
+                             new_attachment->fileName() ) == -1 )
+                     continue;
+                 if( !sys.meta )
+                     sys.meta = vlc_meta_New();
+                 vlc_meta_SetArtURL( sys.meta, psz_url );
+                 free( psz_url );
+             }
         }
         else
         {
