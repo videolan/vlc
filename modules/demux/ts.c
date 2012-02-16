@@ -335,7 +335,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args );
 
 static void PIDInit ( ts_pid_t *pid, bool b_psi, ts_psi_t *p_owner );
 static void PIDClean( demux_t *, ts_pid_t *pid );
-static int  PIDFillFormat( ts_pid_t *pid, int i_stream_type );
+static void PIDFillFormat( ts_es_t *es, int i_stream_type );
 
 static void PATCallBack( demux_t *, dvbpsi_pat_t * );
 static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt );
@@ -1184,7 +1184,7 @@ static int UserPmt( demux_t *p_demux, const char *psz_fmt )
             else
             {
                 const int i_stream_type = strtol( psz_opt, NULL, 0 );
-                PIDFillFormat( pid, i_stream_type );
+                PIDFillFormat( pid->es, i_stream_type );
             }
             pid->es->fmt.i_group = i_number;
             if( p_sys->b_es_id_pid )
@@ -2152,9 +2152,9 @@ static bool GatherPES( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
     return i_ret;
 }
 
-static int PIDFillFormat( ts_pid_t *pid, int i_stream_type )
+static void PIDFillFormat( ts_es_t *es, int i_stream_type )
 {
-    es_format_t *fmt = &pid->es->fmt;
+    es_format_t *fmt = &es->fmt;
 
     switch( i_stream_type )
     {
@@ -2173,7 +2173,7 @@ static int PIDFillFormat( ts_pid_t *pid, int i_stream_type )
         break;
     case 0x10:  /* MPEG4 (video) */
         es_format_Init( fmt, VIDEO_ES, VLC_CODEC_MP4V );
-        pid->es->b_gather = true;
+        es->b_gather = true;
         break;
     case 0x1B:  /* H264 <- check transport syntax/needed descriptor */
         es_format_Init( fmt, VIDEO_ES, VLC_CODEC_H264 );
@@ -2214,7 +2214,7 @@ static int PIDFillFormat( ts_pid_t *pid, int i_stream_type )
 
     case 0xa0:  /* MSCODEC vlc (video) (fixed later) */
         es_format_Init( fmt, UNKNOWN_ES, 0 );
-        pid->es->b_gather = true;
+        es->b_gather = true;
         break;
 
     case 0x06:  /* PES_PRIVATE  (fixed later) */
@@ -2227,8 +2227,6 @@ static int PIDFillFormat( ts_pid_t *pid, int i_stream_type )
 
     /* PES packets usually contain truncated frames */
     fmt->b_packetized = false;
-
-    return fmt->i_cat == UNKNOWN_ES ? VLC_EGENERIC : VLC_SUCCESS ;
 }
 
 /*****************************************************************************
@@ -3809,7 +3807,7 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
         }
 
         PIDInit( pid, false, pmt->psi );
-        PIDFillFormat( pid, p_es->i_type );
+        PIDFillFormat( pid->es, p_es->i_type );
         pid->i_owner_number = prg->i_number;
         pid->i_pid          = p_es->i_pid;
         pid->b_seen         = p_sys->pid[p_es->i_pid].b_seen;
