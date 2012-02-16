@@ -73,6 +73,7 @@
     BOOL b_dark_interface;
     BOOL b_nativeFullscreenMode;
     BOOL b_video_playback_enabled;
+    BOOL b_dropzone_active;
     int i_lastShownVolume;
     input_state_e cachedInputState;
 

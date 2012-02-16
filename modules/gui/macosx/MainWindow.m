@@ -255,7 +255,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [self setTitle: _NS("VLC media player")];
     [o_time_fld setAlignment: NSCenterTextAlignment];
     [o_time_fld setNeedsDisplay:YES];
-    [o_playlist_btn setEnabled:NO];
+    b_dropzone_active = YES;
     o_temp_view = [[NSView alloc] init];
     [o_temp_view setAutoresizingMask:NSViewHeightSizable | NSViewWidthSizable];
     [o_dropzone_view setFrame: [o_playlist_table frame]];
@@ -562,9 +562,16 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
 - (IBAction)togglePlaylist:(id)sender
 {
+    if (b_dropzone_active)
+    {
+        b_dropzone_active = NO;
+        [self hideDropZone];
+        return;
+    }
+
     if (!b_nonembedded)
     {
-        if ([o_video_view isHidden] && [o_playlist_btn isEnabled]) {
+        if ([o_video_view isHidden] && [[VLCMain sharedInstance] activeVideoPlayback]) {
             [o_split_view setHidden: YES];
             [o_video_view setHidden: NO];
             [self makeFirstResponder: o_video_view];
@@ -935,6 +942,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 #pragma mark Update interface and respond to foreign events
 - (void)showDropZone
 {
+    b_dropzone_active = YES;
     [o_right_split_view addSubview: o_dropzone_view];
     [o_dropzone_view setFrame: [o_playlist_table frame]];
     [[o_playlist_table animator] setHidden:YES];
@@ -1217,14 +1225,8 @@ static VLCMainWindow *_o_sharedInstance = nil;
 {
     BOOL b_videoPlayback = [[VLCMain sharedInstance] activeVideoPlayback];
 
-    if (!b_nonembedded)
-        [o_playlist_btn setEnabled: b_videoPlayback];
-    else
-    {
-        [o_playlist_btn setEnabled: NO];
-        if (!b_videoPlayback)
-            [o_nonembedded_window orderOut: nil];
-    }
+    if (!b_videoPlayback)
+        [o_nonembedded_window orderOut: nil];
     if( OSX_LION && b_nativeFullscreenMode )
     {
         if( [NSApp presentationOptions] & NSApplicationPresentationFullScreen )
