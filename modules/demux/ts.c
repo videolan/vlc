@@ -201,17 +201,8 @@ typedef struct
 
 typedef struct
 {
-    uint8_t                 i_iod_label, i_iod_label_scope;
-
     /* IOD */
-    uint16_t                i_od_id;
     char                    *psz_url;
-
-    uint8_t                 i_ODProfileLevelIndication;
-    uint8_t                 i_sceneProfileLevelIndication;
-    uint8_t                 i_audioProfileLevelIndication;
-    uint8_t                 i_visualProfileLevelIndication;
-    uint8_t                 i_graphicsProfileLevelIndication;
 
     es_mpeg4_descriptor_t   es_descr[255];
 
@@ -2309,7 +2300,7 @@ static char* IODGetURL( int *pi_data, uint8_t **pp_data )
 
 static iod_descriptor_t *IODNew( int i_data, uint8_t *p_data )
 {
-    uint8_t i_iod_tag, byte1, byte2, byte3;
+    uint8_t i_iod_tag, i_iod_label, byte1, byte2, byte3;
 
     iod_descriptor_t *p_iod = calloc( 1, sizeof( iod_descriptor_t ) );
     if( !p_iod )
@@ -2327,20 +2318,16 @@ static iod_descriptor_t *IODNew( int i_data, uint8_t *p_data )
     byte3 = IODGetByte( &i_data, &p_data );
     if( byte2 == 0x02 ) //old vlc's buggy implementation of the IOD_descriptor
     {
-        p_iod->i_iod_label_scope = 0x11;
-        p_iod->i_iod_label = byte1;
+        i_iod_label = byte1;
         i_iod_tag = byte2;
     }
     else  //correct implementation of the IOD_descriptor
     {
-        p_iod->i_iod_label_scope = byte1;
-        p_iod->i_iod_label = byte2;
+        i_iod_label = byte2;
         i_iod_tag = byte3;
     }
 
-    ts_debug( "\n* iod_label:%d", p_iod->i_iod_label );
-    ts_debug( "\n* ===========" );
-    ts_debug( "\n* tag:0x%x", i_iod_tag );
+    ts_debug( "\n* iod label:%d tag:0x%x", i_iod_label, i_iod_tag );
 
     if( i_iod_tag != 0x02 )
     {
@@ -2355,10 +2342,10 @@ static iod_descriptor_t *IODNew( int i_data, uint8_t *p_data )
         i_iod_length = i_data;
     }
 
-    p_iod->i_od_id = ( IODGetByte( &i_data, &p_data ) << 2 );
+    uint16_t i_od_id = ( IODGetByte( &i_data, &p_data ) << 2 );
     uint8_t i_flags = IODGetByte( &i_data, &p_data );
-    p_iod->i_od_id |= i_flags >> 6;
-    ts_debug( "\n* od_id:%d", p_iod->i_od_id );
+    i_od_id |= i_flags >> 6;
+    ts_debug( "\n* od_id:%d", i_od_id );
     ts_debug( "\n* includeInlineProfileLevel flag:%d", ( i_flags >> 4 )&0x01 );
     if ((i_flags >> 5) & 0x01)
     {
@@ -2372,16 +2359,16 @@ static iod_descriptor_t *IODNew( int i_data, uint8_t *p_data )
         p_iod->psz_url = NULL;
     }
 
-    p_iod->i_ODProfileLevelIndication = IODGetByte( &i_data, &p_data );
-    p_iod->i_sceneProfileLevelIndication = IODGetByte( &i_data, &p_data );
-    p_iod->i_audioProfileLevelIndication = IODGetByte( &i_data, &p_data );
-    p_iod->i_visualProfileLevelIndication = IODGetByte( &i_data, &p_data );
-    p_iod->i_graphicsProfileLevelIndication = IODGetByte( &i_data, &p_data );
-    ts_debug( "\n* ODProfileLevelIndication:%d", p_iod->i_ODProfileLevelIndication );
-    ts_debug( "\n* sceneProfileLevelIndication:%d", p_iod->i_sceneProfileLevelIndication );
-    ts_debug( "\n* audioProfileLevelIndication:%d", p_iod->i_audioProfileLevelIndication );
-    ts_debug( "\n* visualProfileLevelIndication:%d", p_iod->i_visualProfileLevelIndication );
-    ts_debug( "\n* graphicsProfileLevelIndication:%d", p_iod->i_graphicsProfileLevelIndication );
+    uint8_t i_ODProfileLevelIndication = IODGetByte( &i_data, &p_data );
+    uint8_t i_sceneProfileLevelIndication = IODGetByte( &i_data, &p_data );
+    uint8_t i_audioProfileLevelIndication = IODGetByte( &i_data, &p_data );
+    uint8_t i_visualProfileLevelIndication = IODGetByte( &i_data, &p_data );
+    uint8_t i_graphicsProfileLevelIndication = IODGetByte( &i_data, &p_data );
+    ts_debug( "\n* ODProfileLevelIndication:%d", i_ODProfileLevelIndication );
+    ts_debug( "\n* sceneProfileLevelIndication:%d", i_sceneProfileLevelIndication );
+    ts_debug( "\n* audioProfileLevelIndication:%d", i_audioProfileLevelIndication );
+    ts_debug( "\n* visualProfileLevelIndication:%d", i_visualProfileLevelIndication );
+    ts_debug( "\n* graphicsProfileLevelIndication:%d", i_graphicsProfileLevelIndication );
 
     for (int i_es_index = 0; i_data > 0 && i_es_index < 255; i_es_index++)
     {
