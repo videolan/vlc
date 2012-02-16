@@ -714,8 +714,11 @@ static int Demux( demux_t *p_demux)
             p_sys->i_pts = p_sys->i_chapter_time + ( block->GlobalTimecode() / (mtime_t) 1000 );
 
         /* The blocks are in coding order so we can safely consider that only references are in chronological order */
-        if( simpleblock == NULL || b_key_picture )
-            es_out_Control( p_demux->out, ES_OUT_SET_PCR, VLC_TS_0 + p_sys->i_pts );
+        if( p_sys->i_pts > p_sys->i_pcr + 300000 )
+        {
+            es_out_Control( p_demux->out, ES_OUT_SET_PCR, VLC_TS_0 + p_sys->i_pcr );
+            p_sys->i_pcr = p_sys->i_pts;
+        }
 
         if( p_sys->i_pts >= p_sys->i_start_pts  )
         {

@@ -332,6 +332,7 @@ public:
     demux_sys_t( demux_t & demux )
         :demuxer(demux)
         ,i_pts(0)
+        ,i_pcr(0)
         ,i_start_pts(0)
         ,i_chapter_time(0)
         ,meta(NULL)
@@ -351,6 +352,7 @@ public:
     demux_t                 & demuxer;
 
     mtime_t                 i_pts;
+    mtime_t                 i_pcr;
     mtime_t                 i_start_pts;
     mtime_t                 i_chapter_time;
 
