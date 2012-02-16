@@ -163,7 +163,9 @@ static void Art( playlist_preparser_t *p_preparser, input_item_t *p_item )
         const char *psz_name = vlc_meta_Get( p_item->p_meta, vlc_meta_Title );
 
         if( p_preparser->i_art_policy == ALBUM_ART_ALL &&
-            ( !psz_arturl || strncmp( psz_arturl, "file://", 7 ) ) )
+                ( !psz_arturl ||
+                  ( strncmp( psz_arturl, "file://", 7 ) &&
+                    strncmp( psz_arturl, "attachment://", 13 ) ) ) )
         {
             msg_Dbg( p_playlist, "meta ok for %s, need to fetch art",
                      psz_name ? psz_name : "(null)" );
