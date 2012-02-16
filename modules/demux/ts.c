@@ -1305,36 +1305,29 @@ static void PIDInit( ts_pid_t *pid, bool b_psi, ts_psi_t *p_owner )
         if( p_owner )
         {
             ts_prg_psi_t *prg = malloc( sizeof( ts_prg_psi_t ) );
-            if( prg )
-            {
-                /* PMT */
-                prg->i_version  = -1;
-                prg->i_number   = -1;
-                prg->i_pid_pcr  = -1;
-                prg->i_pid_pmt  = -1;
-                prg->i_pcr_value= -1;
-                prg->iod        = NULL;
-                prg->handle     = NULL;
+            if( !prg )
+                return;
+            /* PMT */
+            prg->i_version  = -1;
+            prg->i_number   = -1;
+            prg->i_pid_pcr  = -1;
+            prg->i_pid_pmt  = -1;
+            prg->i_pcr_value= -1;
+            prg->iod        = NULL;
+            prg->handle     = NULL;
 
-                TAB_APPEND( pid->psi->i_prg, pid->psi->prg, prg );
-            }
+            TAB_APPEND( pid->psi->i_prg, pid->psi->prg, prg );
         }
     }
     else
     {
         pid->psi = NULL;
-        pid->es  = malloc( sizeof( ts_es_t ) );
-        if( pid->es )
-        {
-            es_format_Init( &pid->es->fmt, UNKNOWN_ES, 0 );
-            pid->es->id      = NULL;
-            pid->es->p_pes   = NULL;
-            pid->es->i_pes_size= 0;
-            pid->es->i_pes_gathered= 0;
-            pid->es->pp_last = &pid->es->p_pes;
-            pid->es->p_mpeg4desc = NULL;
-            pid->es->b_gather = false;
-        }
+        pid->es  = calloc( 1, sizeof( ts_es_t ) );
+        if( !pid->es )
+            return;
+
+        es_format_Init( &pid->es->fmt, UNKNOWN_ES, 0 );
+        pid->es->pp_last = &pid->es->p_pes;
     }
 }
 
