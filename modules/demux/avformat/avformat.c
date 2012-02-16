@@ -32,6 +32,9 @@
 
 #include "avformat.h"
 
+#define FORMAT_TEXT N_( "Format name" )
+#define FORMAT_LONGTEXT N_( "Internal libavcodec format name" )
+
 vlc_module_begin ()
 #endif /* MERGE_FFMPEG */
     add_shortcut( "ffmpeg", "avformat" )
@@ -41,6 +44,7 @@ vlc_module_begin ()
     set_shortname( N_("Avformat") )
     set_capability( "demux", 2 )
     set_callbacks( OpenDemux, CloseDemux )
+    add_string( "ffmpeg-format", NULL, FORMAT_TEXT, FORMAT_LONGTEXT, true )
 
 #ifdef ENABLE_SOUT
     /* mux submodule */

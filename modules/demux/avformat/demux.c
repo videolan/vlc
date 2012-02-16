@@ -112,7 +112,7 @@ int OpenDemux( vlc_object_t *p_this )
     demux_t       *p_demux = (demux_t*)p_this;
     demux_sys_t   *p_sys;
     AVProbeData   pd;
-    AVInputFormat *fmt;
+    AVInputFormat *fmt = NULL;
     unsigned int  i;
     int64_t       i_start_time = -1;
     bool          b_can_seek;
@@ -141,8 +141,16 @@ int OpenDemux( vlc_object_t *p_this )
     av_register_all(); /* Can be called several times */
     vlc_avcodec_unlock();
 
+    char *psz_format = var_InheritString( p_this, "ffmpeg-format" );
+    if( psz_format )
+    {
+        if( fmt = av_find_input_format(psz_format) )
+            msg_Dbg( p_demux, "forcing format: %s", fmt->name );
+        free( psz_format );
+    }
+
     /* Guess format */
-    if( !( fmt = av_probe_input_format( &pd, 1 ) ) )
+    if( !fmt && !( fmt = av_probe_input_format( &pd, 1 ) ) )
     {
         msg_Dbg( p_demux, "couldn't guess format" );
         free( psz_url );
