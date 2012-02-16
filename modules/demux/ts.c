@@ -182,10 +182,6 @@ typedef struct
 {
     uint8_t                 i_objectTypeIndication;
     uint8_t                 i_streamType;
-    bool                    b_upStream;
-    uint32_t                i_bufferSizeDB;
-    uint32_t                i_maxBitrate;
-    uint32_t                i_avgBitrate;
 
     int                     i_extra;
     uint8_t                 *p_extra;
@@ -2476,16 +2472,17 @@ static iod_descriptor_t *IODNew( int i_data, uint8_t *p_data )
                 dec_descr.i_objectTypeIndication = IODGetByte( &i_data, &p_data );
                 i_flags = IODGetByte( &i_data, &p_data );
                 dec_descr.i_streamType = i_flags >> 2;
-                dec_descr.b_upStream = ( i_flags >> 1 )&0x01;
-                dec_descr.i_bufferSizeDB = IODGet3Bytes( &i_data, &p_data );
-                dec_descr.i_maxBitrate = IODGetDWord( &i_data, &p_data );
-                dec_descr.i_avgBitrate = IODGetDWord( &i_data, &p_data );
+
+                bool b_upStream = ( i_flags >> 1 )&0x01;
+                uint32_t i_bufferSizeDB = IODGet3Bytes( &i_data, &p_data );
+                uint32_t i_maxBitrate = IODGetDWord( &i_data, &p_data );
+                uint32_t i_avgBitrate = IODGetDWord( &i_data, &p_data );
                 ts_debug( "\n*     * objectTypeIndication:0x%x", dec_descr.i_objectTypeIndication  );
                 ts_debug( "\n*     * streamType:0x%x", dec_descr.i_streamType );
-                ts_debug( "\n*     * upStream:%d", dec_descr.b_upStream );
-                ts_debug( "\n*     * bufferSizeDB:%d", dec_descr.i_bufferSizeDB );
-                ts_debug( "\n*     * maxBitrate:%d", dec_descr.i_maxBitrate );
-                ts_debug( "\n*     * avgBitrate:%d", dec_descr.i_avgBitrate );
+                ts_debug( "\n*     * upStream:%d", b_upStream );
+                ts_debug( "\n*     * bufferSizeDB:%d", i_bufferSizeDB );
+                ts_debug( "\n*     * maxBitrate:%d", i_maxBitrate );
+                ts_debug( "\n*     * avgBitrate:%d", i_avgBitrate );
                 if( i_decoderConfigDescr_length > 13 && IODGetByte( &i_data, &p_data ) == 0x05 )
                 {
                     dec_descr.i_extra = IODDescriptorLength( &i_data, &p_data );
