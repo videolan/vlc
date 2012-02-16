@@ -3479,10 +3479,8 @@ static void PMTSetupEs0xA0( demux_t *p_demux, ts_pid_t *pid,
     p_fmt->b_packetized = true;
 }
 
-static void PMTSetupEsHDMV( demux_t *p_demux, ts_pid_t *pid,
-                           const dvbpsi_pmt_es_t *p_es )
+static void PMTSetupEsHDMV( ts_pid_t *pid, const dvbpsi_pmt_es_t *p_es )
 {
-    VLC_UNUSED(p_demux);
     es_format_t *p_fmt = &pid->es->fmt;
 
     /* Blu-Ray mapping */
@@ -3547,11 +3545,27 @@ static void PMTSetupEsRegistration( demux_t *p_demux, ts_pid_t *pid,
         {
             p_fmt->i_cat   = p_regs[i].i_cat;
             p_fmt->i_codec = p_regs[i].i_codec;
-            break;
+            return;
         }
     }
 }
 
+static char *GetAudioTypeDesc(demux_t *p_demux, int type)
+{
+    static const char *audio_type[] = {
+        NULL,
+        N_("clean effects"),
+        N_("hearing impaired"),
+        N_("visual impaired commentary"),
+    };
+
+    if (type < 0 || type > 3)
+        msg_Dbg( p_demux, "unknown audio type: %d", type);
+    else if (type > 0)
+        return strdup(audio_type[type - 1]);
+
+    return NULL;
+}
 static void PMTParseEsIso639( demux_t *p_demux, ts_pid_t *pid,
                               const dvbpsi_pmt_es_t *p_es )
 {
@@ -3572,35 +3586,15 @@ static void PMTParseEsIso639( demux_t *p_demux, ts_pid_t *pid,
     pid->es->fmt.psz_language = malloc( 4 );
     if( pid->es->fmt.psz_language )
     {
-        memcpy( pid->es->fmt.psz_language,
-                p_decoded->code[0].iso_639_code, 3 );
+        memcpy( pid->es->fmt.psz_language, p_decoded->code[0].iso_639_code, 3 );
         pid->es->fmt.psz_language[3] = 0;
         msg_Dbg( p_demux, "found language: %s", pid->es->fmt.psz_language);
     }
-    switch( p_decoded->code[0].i_audio_type )
-    {
-    case 0:
+    int type = p_decoded->code[0].i_audio_type;
+    pid->es->fmt.psz_description = GetAudioTypeDesc(p_demux, type);
+    if (type == 0)
         pid->es->fmt.i_priority = 1; // prioritize normal audio tracks
-        pid->es->fmt.psz_description = NULL;
-        break;
-    case 1:
-        pid->es->fmt.psz_description =
-            strdup(_("clean effects"));
-        break;
-    case 2:
-        pid->es->fmt.psz_description =
-            strdup(_("hearing impaired"));
-        break;
-    case 3:
-        pid->es->fmt.psz_description =
-            strdup(_("visual impaired commentary"));
-        break;
-    default:
-        msg_Dbg( p_demux, "unknown audio type: %d",
-                 p_decoded->code[0].i_audio_type);
-        pid->es->fmt.psz_description = NULL;
-        break;
-    }
+
     pid->es->fmt.i_extra_languages = p_decoded->i_code_count-1;
     if( pid->es->fmt.i_extra_languages > 0 )
         pid->es->fmt.p_extra_languages =
@@ -3610,40 +3604,15 @@ static void PMTParseEsIso639( demux_t *p_demux, ts_pid_t *pid,
     {
         for( int i = 0; i < pid->es->fmt.i_extra_languages; i++ )
         {
-            msg_Dbg( p_demux, "bang" );
-            pid->es->fmt.p_extra_languages[i].psz_language =
-                malloc(4);
+            pid->es->fmt.p_extra_languages[i].psz_language = malloc(4);
             if( pid->es->fmt.p_extra_languages[i].psz_language )
             {
                 memcpy( pid->es->fmt.p_extra_languages[i].psz_language,
                     p_decoded->code[i+1].iso_639_code, 3 );
                 pid->es->fmt.p_extra_languages[i].psz_language[3] = '\0';
             }
-            switch( p_decoded->code[i].i_audio_type )
-            {
-            case 0:
-                pid->es->fmt.p_extra_languages[i].psz_description =
-                    NULL;
-                break;
-            case 1:
-                pid->es->fmt.p_extra_languages[i].psz_description =
-                    strdup(_("clean effects"));
-                break;
-            case 2:
-                pid->es->fmt.p_extra_languages[i].psz_description =
-                    strdup(_("hearing impaired"));
-                break;
-            case 3:
-                pid->es->fmt.p_extra_languages[i].psz_description =
-                    strdup(_("visual impaired commentary"));
-                break;
-            default:
-                msg_Dbg( p_demux, "unknown audio type: %d",
-                        p_decoded->code[i].i_audio_type);
-                pid->es->fmt.psz_description = NULL;
-                break;
-            }
-
+            int type = p_decoded->code[i].i_audio_type;
+            pid->es->fmt.psz_description = GetAudioTypeDesc(p_demux, type);
         }
     }
 #else
@@ -3659,36 +3628,26 @@ static void PMTParseEsIso639( demux_t *p_demux, ts_pid_t *pid,
 
 static void PMTCallBack( void *data, dvbpsi_pmt_t *p_pmt )
 {
-    demux_t              *p_demux = data;
-    demux_sys_t          *p_sys = p_demux->p_sys;
-    dvbpsi_descriptor_t  *p_dr;
-    dvbpsi_pmt_es_t      *p_es;
+    demux_t      *p_demux = data;
+    demux_sys_t  *p_sys = p_demux->p_sys;
 
-    ts_pid_t             *pmt = NULL;
-    ts_prg_psi_t         *prg = NULL;
-
-    ts_pid_t             **pp_clean = NULL;
-    int                  i_clean = 0;
-    bool                 b_hdmv = false;
+    ts_pid_t     *pmt = NULL;
+    ts_prg_psi_t *prg;
 
     msg_Dbg( p_demux, "PMTCallBack called" );
 
     /* First find this PMT declared in PAT */
-    for( int i = 0; i < p_sys->i_pmt; i++ )
-    {
-        for( int i_prg = 0; i_prg < p_sys->pmt[i]->psi->i_prg; i_prg++ )
+    for( int i = 0; !pmt && i < p_sys->i_pmt; i++ )
+        for( int i_prg = 0; !pmt && i_prg < p_sys->pmt[i]->psi->i_prg; i_prg++ )
         {
             const int i_pmt_number = p_sys->pmt[i]->psi->prg[i_prg]->i_number;
-            if( i_pmt_number != TS_USER_PMT_NUMBER && i_pmt_number == p_pmt->i_program_number )
+            if( i_pmt_number != TS_USER_PMT_NUMBER &&
+                i_pmt_number == p_pmt->i_program_number )
             {
                 pmt = p_sys->pmt[i];
                 prg = p_sys->pmt[i]->psi->prg[i_prg];
-                break;
             }
         }
-        if( pmt )
-            break;
-    }
 
     if( pmt == NULL )
     {
@@ -3697,6 +3656,7 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_pmt )
         return;
     }
 
+
     if( prg->i_version != -1 &&
         ( !p_pmt->b_current_next || prg->i_version == p_pmt->i_version ) )
     {
@@ -3704,6 +3664,8 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_pmt )
         return;
     }
 
+    ts_pid_t **pp_clean = NULL;
+    int      i_clean = 0;
     /* Clean this program (remove all es) */
     for( int i = 0; i < 8192; i++ )
     {
@@ -3728,30 +3690,25 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_pmt )
 
     ValidateDVBMeta( p_demux, prg->i_pid_pcr );
     if( ProgramIsSelected( p_demux, prg->i_number ) )
-    {
-        /* Set demux filter */
-        SetPIDFilter( p_demux, prg->i_pid_pcr, true );
-    }
+        SetPIDFilter( p_demux, prg->i_pid_pcr, true ); /* Set demux filter */
 
     /* Parse descriptor */
+    bool b_hdmv = false;
+    dvbpsi_descriptor_t  *p_dr;
     for( p_dr = p_pmt->p_first_descriptor; p_dr != NULL; p_dr = p_dr->p_next )
-    {
-        if( p_dr->i_tag == 0x1d )
+        switch(p_dr->i_tag)
         {
-            /* We have found an IOD descriptor */
+        case 0x1d: /* We have found an IOD descriptor */
             msg_Dbg( p_demux, " * descriptor : IOD (0x1d)" );
-
             prg->iod = IODNew( p_dr->i_length, p_dr->p_data );
-        }
-        else if( p_dr->i_tag == 0x9 )
-        {
-            uint16_t i_sysid = ((uint16_t)p_dr->p_data[0] << 8)
-                                | p_dr->p_data[1];
-            msg_Dbg( p_demux, " * descriptor : CA (0x9) SysID 0x%x", i_sysid );
-        }
-        else if( p_dr->i_tag == 0x05 )
-        {
-            /* Registration Descriptor */
+            break;
+
+        case 0x9:
+            msg_Dbg( p_demux, " * descriptor : CA (0x9) SysID 0x%x",
+                    (p_dr->p_data[0] << 8) | p_dr->p_data[1] );
+            break;
+
+        case 0x5: /* Registration Descriptor */
             if( p_dr->i_length != 4 )
             {
                 msg_Warn( p_demux, "invalid Registration Descriptor" );
@@ -3760,18 +3717,15 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_pmt )
             {
                 msg_Dbg( p_demux, " * descriptor : registration %4.4s", p_dr->p_data );
                 if( !memcmp( p_dr->p_data, "HDMV", 4 ) )
-                {
-                    /* Blu-Ray */
-                    b_hdmv = true;
-                }
+                    b_hdmv = true; /* Blu-Ray */
             }
-        }
-        else
-        {
+            break;
+
+        default:
             msg_Dbg( p_demux, " * descriptor : unknown (0x%x)", p_dr->i_tag );
         }
-    }
 
+    dvbpsi_pmt_es_t      *p_es;
     for( p_es = p_pmt->p_first_es; p_es != NULL; p_es = p_es->p_next )
     {
         ts_pid_t tmp_pid, *old_pid = 0, *pid = &tmp_pid;
@@ -3830,7 +3784,7 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_pmt )
         }
         else if( b_hdmv )
         {
-            PMTSetupEsHDMV( p_demux, pid, p_es );
+            PMTSetupEsHDMV( pid, p_es );
         }
         else if( p_es->i_type >= 0x80 )
         {
@@ -3912,17 +3866,13 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_pmt )
         p_dr = PMTEsFindDescriptor( p_es, 0x09 );
         if( p_dr && p_dr->i_length >= 2 )
         {
-            uint16_t i_sysid = (p_dr->p_data[0] << 8) | p_dr->p_data[1];
             msg_Dbg( p_demux, "   * descriptor : CA (0x9) SysID 0x%x",
-                     i_sysid );
+                     (p_dr->p_data[0] << 8) | p_dr->p_data[1] );
         }
 
         if( ProgramIsSelected( p_demux, prg->i_number ) &&
             ( pid->es->id != NULL || p_sys->b_udp_out ) )
-        {
-            /* Set demux filter */
-            SetPIDFilter( p_demux, p_es->i_pid, true );
-        }
+            SetPIDFilter( p_demux, p_es->i_pid, true ); /* Set demux filter */
     }
 
     /* Set CAM descrambling */
@@ -3934,9 +3884,7 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_pmt )
     for( int i = 0; i < i_clean; i++ )
     {
         if( ProgramIsSelected( p_demux, prg->i_number ) )
-        {
             SetPIDFilter( p_demux, pp_clean[i]->i_pid, false );
-        }
 
         PIDClean( p_demux, pp_clean[i] );
     }
