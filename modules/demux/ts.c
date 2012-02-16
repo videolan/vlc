@@ -368,7 +368,6 @@ static void GetLastPCR( demux_t *p_demux );
 static void CheckPCR( demux_t *p_demux );
 static void PCRHandle( demux_t *p_demux, ts_pid_t *, block_t * );
 
-static iod_descriptor_t *IODNew( int , uint8_t * );
 static void              IODFree( iod_descriptor_t * );
 
 #define TS_USER_PMT_NUMBER (0)
@@ -2297,11 +2296,8 @@ static uint32_t IODGetDWord( int *pi_data, uint8_t **pp_data )
 
 static char* IODGetURL( int *pi_data, uint8_t **pp_data )
 {
-    char *url;
-    int i_url_len;
-
-    i_url_len = IODGetByte( pi_data, pp_data );
-    url = malloc( i_url_len + 1 );
+    int i_url_len = IODGetByte( pi_data, pp_data );
+    char *url = malloc( i_url_len + 1 );
     if( !url ) return NULL;
     for( int i = 0; i < i_url_len; i++ )
     {
@@ -2313,23 +2309,13 @@ static char* IODGetURL( int *pi_data, uint8_t **pp_data )
 
 static iod_descriptor_t *IODNew( int i_data, uint8_t *p_data )
 {
-    iod_descriptor_t *p_iod;
-    int i_es_index;
-    uint8_t i_flags, i_iod_tag, byte1, byte2, byte3;
-    bool  b_url;
-    int   i_iod_length;
+    uint8_t i_iod_tag, byte1, byte2, byte3;
 
-    p_iod = malloc( sizeof( iod_descriptor_t ) );
-    if( !p_iod ) return NULL;
-    memset( p_iod, 0, sizeof( iod_descriptor_t ) );
+    iod_descriptor_t *p_iod = calloc( 1, sizeof( iod_descriptor_t ) );
+    if( !p_iod )
+        return NULL;
 
     ts_debug( "\n************ IOD ************" );
-
-    for( int i = 0; i < 255; i++ )
-    {
-        p_iod->es_descr[i].b_ok = 0;
-    }
-    i_es_index = 0;
 
     if( i_data < 3 )
     {
@@ -2362,7 +2348,7 @@ static iod_descriptor_t *IODNew( int i_data, uint8_t *p_data )
         return p_iod;
     }
 
-    i_iod_length = IODDescriptorLength( &i_data, &p_data );
+    int i_iod_length = IODDescriptorLength( &i_data, &p_data );
     ts_debug( "\n* length:%d", i_iod_length );
     if( i_iod_length > i_data )
     {
@@ -2370,13 +2356,11 @@ static iod_descriptor_t *IODNew( int i_data, uint8_t *p_data )
     }
 
     p_iod->i_od_id = ( IODGetByte( &i_data, &p_data ) << 2 );
-    i_flags = IODGetByte( &i_data, &p_data );
+    uint8_t i_flags = IODGetByte( &i_data, &p_data );
     p_iod->i_od_id |= i_flags >> 6;
-    b_url = ( i_flags >> 5  )&0x01;
     ts_debug( "\n* od_id:%d", p_iod->i_od_id );
-    ts_debug( "\n* url flag:%d", b_url );
     ts_debug( "\n* includeInlineProfileLevel flag:%d", ( i_flags >> 4 )&0x01 );
-    if( b_url )
+    if ((i_flags >> 5) & 0x01)
     {
         p_iod->psz_url = IODGetURL( &i_data, &p_data );
         ts_debug( "\n* url string:%s", p_iod->psz_url );
@@ -2399,17 +2383,13 @@ static iod_descriptor_t *IODNew( int i_data, uint8_t *p_data )
     ts_debug( "\n* visualProfileLevelIndication:%d", p_iod->i_visualProfileLevelIndication );
     ts_debug( "\n* graphicsProfileLevelIndication:%d", p_iod->i_graphicsProfileLevelIndication );
 
-    while( i_data > 0 && i_es_index < 255)
+    for (int i_es_index = 0; i_data > 0 && i_es_index < 255; i_es_index++)
     {
-        int i_tag, i_length;
-        int     i_data_sav;
-        uint8_t *p_data_sav;
+        int i_tag = IODGetByte( &i_data, &p_data );
+        int i_length = IODDescriptorLength( &i_data, &p_data );
 
-        i_tag = IODGetByte( &i_data, &p_data );
-        i_length = IODDescriptorLength( &i_data, &p_data );
-
-        i_data_sav = i_data;
-        p_data_sav = p_data;
+        int i_data_sav = i_data;
+        uint8_t *p_data_sav = p_data;
 
         i_data = i_length;
 
@@ -2425,7 +2405,6 @@ static iod_descriptor_t *IODNew( int i_data, uint8_t *p_data )
                 es_descr.i_es_id = IODGetWord( &i_data, &p_data );
                 i_flags = IODGetByte( &i_data, &p_data );
                 bool b_streamDependenceFlag = ( i_flags >> 7 )&0x01;
-                b_url = ( i_flags >> 6 )&0x01;
                 bool b_OCRStreamFlag = ( i_flags >> 5 )&0x01;
                 uint8_t i_streamPriority = i_flags & 0x1f;
                 ts_debug( "\n*   * streamDependenceFlag:%d", b_streamDependenceFlag );
@@ -2437,7 +2416,7 @@ static iod_descriptor_t *IODNew( int i_data, uint8_t *p_data )
                     ts_debug( "\n*   * dependOn_es_id:%d", i_dependOn_es_id );
                 }
 
-                if( b_url )
+                if( (i_flags >> 6) & 0x01 )
                 {
                     es_descr.psz_url = IODGetURL( &i_data, &p_data );
                     ts_debug( "\n* url string:%s", es_descr.psz_url );
@@ -2529,7 +2508,6 @@ static iod_descriptor_t *IODNew( int i_data, uint8_t *p_data )
 
         p_data = p_data_sav + i_length;
         i_data = i_data_sav - i_length;
-        i_es_index++;
     }
     ts_debug( "\n*****************************\n" );
     return p_iod;
@@ -2540,7 +2518,6 @@ static void IODFree( iod_descriptor_t *p_iod )
     if( p_iod->psz_url )
     {
         free( p_iod->psz_url );
-        p_iod->psz_url = NULL;
         free( p_iod );
         return;
     }
@@ -2551,18 +2528,10 @@ static void IODFree( iod_descriptor_t *p_iod )
         if( es_descr.b_ok )
         {
             if( es_descr.psz_url )
-            {
                 free( es_descr.psz_url );
-                es_descr.psz_url = NULL;
-            }
             else
-            {
                 free( es_descr.dec_descr.p_extra );
-                es_descr.dec_descr.p_extra = NULL;
-                es_descr.dec_descr.i_extra = 0;
-            }
         }
-        es_descr.b_ok = 0;
 #undef  es_descr
     }
     free( p_iod );
