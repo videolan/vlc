@@ -3095,7 +3095,6 @@ static void PMTSetupEsTeletext( demux_t *p_demux, ts_pid_t *pid,
     }
 #endif
 
-#ifdef _DVBPSI_DR_59_H_
     dvbpsi_descriptor_t *p_dr = PMTEsFindDescriptor( p_es, 0x59 );
     if( p_dr )
     {
@@ -3127,7 +3126,6 @@ static void PMTSetupEsTeletext( demux_t *p_demux, ts_pid_t *pid,
             memcpy( p_dst->p_iso639, p_src->i_iso6392_language_code, 3 );
         }
     }
-#endif
 
     /* */
     es_format_Init( p_fmt, SPU_ES, VLC_CODEC_TELETEXT );
@@ -3213,7 +3211,6 @@ static void PMTSetupEsDvbSubtitle( demux_t *p_demux, ts_pid_t *pid,
 
     dvbpsi_descriptor_t *p_dr = PMTEsFindDescriptor( p_es, 0x59 );
     int i_page = 0;
-#ifdef _DVBPSI_DR_59_H_
     dvbpsi_subtitling_dr_t *p_sub = dvbpsi_DecodeSubtitlingDr( p_dr );
     for( int i = 0; p_sub && i < p_sub->i_subtitles_number; i++ )
     {
@@ -3222,7 +3219,6 @@ static void PMTSetupEsDvbSubtitle( demux_t *p_demux, ts_pid_t *pid,
             ( i_type >= 0x20 && i_type <= 0x24 ) )
             i_page++;
     }
-#endif
 
     if( !p_demux->p_sys->b_split_es  || i_page <= 0 )
     {
@@ -3242,7 +3238,6 @@ static void PMTSetupEsDvbSubtitle( demux_t *p_demux, ts_pid_t *pid,
     }
     else
     {
-#ifdef _DVBPSI_DR_59_H_
         for( int i = 0; i < p_sub->i_subtitles_number; i++ )
         {
             ts_es_t *p_es;
@@ -3302,7 +3297,6 @@ static void PMTSetupEsDvbSubtitle( demux_t *p_demux, ts_pid_t *pid,
             p_es->fmt.subs.dvb.i_id = ( p->i_composition_page_id <<  0 ) |
                                       ( p->i_ancillary_page_id   << 16 );
         }
-#endif
     }
 }
 static void PMTSetupEs0x06( demux_t *p_demux, ts_pid_t *pid,
@@ -3343,7 +3337,6 @@ static void PMTSetupEs0x06( demux_t *p_demux, ts_pid_t *pid,
         /* Subtitle/Teletext/VBI fallbacks */
         dvbpsi_descriptor_t *p_dr = PMTEsFindDescriptor( p_es, 0x59 );
 
-#ifdef _DVBPSI_DR_59_H_
         dvbpsi_subtitling_dr_t *p_sub;
         if( p_dr && ( p_sub = dvbpsi_DecodeSubtitlingDr( p_dr ) ) )
         {
@@ -3378,10 +3371,7 @@ static void PMTSetupEs0x06( demux_t *p_demux, ts_pid_t *pid,
                 }
             }
         }
-#else
-        if( p_fmt->i_cat == UNKNOWN_ES && p_dr )
-            PMTSetupEsDvbSubtitle( p_demux, pid, p_es );
-#endif
+
         if( p_fmt->i_cat == UNKNOWN_ES &&
             ( PMTEsFindDescriptor( p_es, 0x45 ) ||  /* VBI Data descriptor */
               PMTEsFindDescriptor( p_es, 0x46 ) ||  /* VBI Teletext descriptor */
@@ -3392,7 +3382,6 @@ static void PMTSetupEs0x06( demux_t *p_demux, ts_pid_t *pid,
         }
     }
 
-#ifdef _DVBPSI_DR_52_H_
     /* FIXME is it useful ? */
     if( PMTEsFindDescriptor( p_es, 0x52 ) )
     {
@@ -3401,7 +3390,6 @@ static void PMTSetupEs0x06( demux_t *p_demux, ts_pid_t *pid,
 
         msg_Dbg( p_demux, "    * Stream Component Identifier: %d", p_si->i_component_tag );
     }
-#endif
 }
 
 static void PMTSetupEs0xEA( demux_t *p_demux, ts_pid_t *pid,
