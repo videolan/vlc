@@ -337,8 +337,8 @@ static void PIDInit ( ts_pid_t *pid, bool b_psi, ts_psi_t *p_owner );
 static void PIDClean( demux_t *, ts_pid_t *pid );
 static void PIDFillFormat( ts_es_t *es, int i_stream_type );
 
-static void PATCallBack( demux_t *, dvbpsi_pat_t * );
-static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt );
+static void PATCallBack( void*, dvbpsi_pat_t * );
+static void PMTCallBack( void *data, dvbpsi_pmt_t *p_pmt );
 static void PSINewTableCallBack( demux_t *, dvbpsi_handle,
                                  uint8_t  i_table_id, uint16_t i_extension );
 static int ChangeKeyCallback( vlc_object_t *, char const *, vlc_value_t, vlc_value_t, void * );
@@ -550,8 +550,7 @@ static int Open( vlc_object_t *p_this )
     /* Init PAT handler */
     pat = &p_sys->pid[0];
     PIDInit( pat, true, NULL );
-    pat->psi->handle = dvbpsi_AttachPAT( (dvbpsi_pat_callback)PATCallBack,
-                                         p_demux );
+    pat->psi->handle = dvbpsi_AttachPAT( PATCallBack, p_demux );
     if( p_sys->b_dvb_meta )
     {
         ts_pid_t *sdt = &p_sys->pid[0x11];
@@ -1129,7 +1128,9 @@ static int UserPmt( demux_t *p_demux, const char *psz_fmt )
     prg->i_pid_pmt  = -1;
     prg->i_version  = -1;
     prg->i_number   = i_number != 0 ? i_number : TS_USER_PMT_NUMBER;
-    prg->handle     = dvbpsi_AttachPMT( i_number != TS_USER_PMT_NUMBER ? i_number : 1, (dvbpsi_pmt_callback)PMTCallBack, p_demux );
+    prg->handle     = dvbpsi_AttachPMT(
+        i_number != TS_USER_PMT_NUMBER ? i_number : 1,
+        PMTCallBack, p_demux );
     TAB_APPEND( pmt->psi->i_prg, pmt->psi->prg, prg );
 
     psz = strchr( psz, '=' );
@@ -3656,8 +3657,9 @@ static void PMTParseEsIso639( demux_t *p_demux, ts_pid_t *pid,
 #endif
 }
 
-static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
+static void PMTCallBack( void *data, dvbpsi_pmt_t *p_pmt )
 {
+    demux_t              *p_demux = data;
     demux_sys_t          *p_sys = p_demux->p_sys;
     dvbpsi_descriptor_t  *p_dr;
     dvbpsi_pmt_es_t      *p_es;
@@ -3942,8 +3944,9 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
         free( pp_clean );
 }
 
-static void PATCallBack( demux_t *p_demux, dvbpsi_pat_t *p_pat )
+static void PATCallBack( void *data, dvbpsi_pat_t *p_pat )
 {
+    demux_t              *p_demux = data;
     demux_sys_t          *p_sys = p_demux->p_sys;
     dvbpsi_pat_program_t *p_program;
     ts_pid_t             *pat = &p_sys->pid[0];
@@ -3974,29 +3977,21 @@ static void PATCallBack( demux_t *p_demux, dvbpsi_pat_t *p_pat )
             ts_pid_t *pmt = p_sys->pmt[i];
             bool b_keep = false;
 
-            for( p_program = p_pat->p_first_program; p_program != NULL;
+            for( p_program = p_pat->p_first_program; !b_keep && p_program;
                  p_program = p_program->p_next )
             {
-                if( p_program->i_pid == pmt->i_pid )
-                {
-                    for( int i_prg = 0; i_prg < pmt->psi->i_prg; i_prg++ )
-                    {
-                        if( p_program->i_number ==
-                            pmt->psi->prg[i_prg]->i_number )
-                        {
-                            b_keep = true;
-                            break;
-                        }
-                    }
-                    if( b_keep )
-                        break;
-                }
+                if( p_program->i_pid != pmt->i_pid )
+                    continue;
+
+                for( int i_prg = 0; !b_keep && i_prg < pmt->psi->i_prg; i_prg++ )
+                    if( p_program->i_number == pmt->psi->prg[i_prg]->i_number )
+                        b_keep = true;
             }
 
-            if( !b_keep )
-            {
-                TAB_APPEND( i_pmt_rm, pmt_rm, pmt );
-            }
+            if( b_keep )
+                continue;
+
+            TAB_APPEND( i_pmt_rm, pmt_rm, pmt );
         }
 
         /* Delete all ES attached to thoses PMT */
@@ -4048,51 +4043,42 @@ static void PATCallBack( demux_t *p_demux, dvbpsi_pat_t *p_pat )
     {
         msg_Dbg( p_demux, "  * number=%d pid=%d", p_program->i_number,
                  p_program->i_pid );
-        if( p_program->i_number != 0 )
+        if( p_program->i_number == 0 )
+            continue;
+
+        ts_pid_t *pmt = &p_sys->pid[p_program->i_pid];
+
+        ValidateDVBMeta( p_demux, p_program->i_pid );
+
+        if( pmt->b_valid )
         {
-            ts_pid_t *pmt = &p_sys->pid[p_program->i_pid];
             bool b_add = true;
+            for( int i_prg = 0; b_add && i_prg < pmt->psi->i_prg; i_prg++ )
+                if( pmt->psi->prg[i_prg]->i_number == p_program->i_number )
+                    b_add = false;
 
-            ValidateDVBMeta( p_demux, p_program->i_pid );
+            if( !b_add )
+                continue;
+        }
+        else
+        {
+            TAB_APPEND( p_sys->i_pmt, p_sys->pmt, pmt );
+        }
 
-            if( pmt->b_valid )
-            {
-                for( int i_prg = 0; i_prg < pmt->psi->i_prg; i_prg++ )
-                {
-                    if( pmt->psi->prg[i_prg]->i_number == p_program->i_number )
-                    {
-                        b_add = false;
-                        break;
-                    }
-                }
-            }
-            else
-            {
-                TAB_APPEND( p_sys->i_pmt, p_sys->pmt, pmt );
-            }
+        PIDInit( pmt, true, pat->psi );
+        ts_prg_psi_t *prg = pmt->psi->prg[pmt->psi->i_prg-1];
+        prg->handle = dvbpsi_AttachPMT(p_program->i_number, PMTCallBack, p_demux);
+        prg->i_number = p_program->i_number;
+        prg->i_pid_pmt = p_program->i_pid;
 
-            if( b_add )
-            {
-                PIDInit( pmt, true, pat->psi );
-                pmt->psi->prg[pmt->psi->i_prg-1]->handle =
-                    dvbpsi_AttachPMT( p_program->i_number,
-                                      (dvbpsi_pmt_callback)PMTCallBack,
-                                      p_demux );
-                pmt->psi->prg[pmt->psi->i_prg-1]->i_number =
-                    p_program->i_number;
-                pmt->psi->prg[pmt->psi->i_prg-1]->i_pid_pmt =
-                    p_program->i_pid;
+        /* Now select PID at access level */
+        if( ProgramIsSelected( p_demux, p_program->i_number ) )
+        {
+            if( p_sys->i_current_program == 0 )
+                p_sys->i_current_program = p_program->i_number;
 
-                /* Now select PID at access level */
-                if( ProgramIsSelected( p_demux, p_program->i_number ) )
-                {
-                    if( p_sys->i_current_program == 0 )
-                        p_sys->i_current_program = p_program->i_number;
-
-                    if( SetPIDFilter( p_demux, p_program->i_pid, true ) )
-                        p_sys->b_access_control = false;
-                }
-            }
+            if( SetPIDFilter( p_demux, p_program->i_pid, true ) )
+                p_sys->b_access_control = false;
         }
     }
     pat->psi->i_pat_version = p_pat->i_version;
