@@ -1553,10 +1553,17 @@
         NSArray *o_all_items = [o_nodes_array arrayByAddingObjectsFromArray:
                                                                 o_items_array];
         /* If the item is to be dropped as root item of the outline, make it a
-           child of the General node.
+           child of the respective general node, if is either the pl or the ml
            Else, choose the proposed parent as parent. */
-        if( item == nil ) p_new_parent = p_playlist->p_local_category;
-        else p_new_parent = [item pointerValue];
+        if( item == nil )
+        {
+            if ([self currentPlaylistRoot] == p_playlist->p_local_category || [self currentPlaylistRoot] == p_playlist->p_ml_category) 
+                p_new_parent = [self currentPlaylistRoot];
+            else
+                p_new_parent = p_playlist->p_local_category;
+        }
+        else
+            p_new_parent = [item pointerValue];
 
         /* Make sure the proposed parent is a node.
            (This should never be true) */
