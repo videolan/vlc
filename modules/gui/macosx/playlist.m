@@ -1542,7 +1542,6 @@
 
 - (BOOL)outlineView:(NSOutlineView *)outlineView acceptDrop:(id <NSDraggingInfo>)info item:(id)item childIndex:(NSInteger)index
 {
-    NSLog( @"- (BOOL)outlineView:(NSOutlineView *)outlineView acceptDrop:(id <NSDraggingInfo>)info item:(id)item childIndex:(NSInteger)index" );
     playlist_t * p_playlist =  pl_Get( VLCIntf );
     NSPasteboard *o_pasteboard = [info draggingPasteboard];
 
@@ -1630,7 +1629,6 @@
 
     else if( [[o_pasteboard types] containsObject: NSFilenamesPboardType] )
     {
-        NSLog( @"NSFilenamesPboardType" );
         playlist_item_t *p_node = [item pointerValue];
 
         NSArray *o_values = [[o_pasteboard propertyListForType: NSFilenamesPboardType]

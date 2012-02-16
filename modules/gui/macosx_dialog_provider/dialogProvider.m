@@ -463,7 +463,6 @@ bool checkProgressPanel (void *priv)
 #pragma mark Last.FM support
 - (void)globalNotificationReceived: (NSNotification *)theNotification
 {
-    NSLog(@"globalNotificationReceived");
     NSDictionary *userData = [theNotification userInfo];
     BOOL lastFMEnabled = [[userData objectForKey:@"enabled"] intValue];
     NSString *lastFMUsername = [userData objectForKey:@"username"];
@@ -491,7 +490,6 @@ bool checkProgressPanel (void *priv)
     VLCDialogButton *button = sender;
     extension_widget_t *widget = [button widget];
 
-    NSLog(@"(triggerClick)");
     vlc_mutex_lock(&widget->p_dialog->lock);
     extension_WidgetClicked(widget->p_dialog, widget);
     vlc_mutex_unlock(&widget->p_dialog->lock);
@@ -677,7 +675,6 @@ static void updateControlFromWidget(NSView *control, extension_widget_t *widget,
 //            NSString *string = [NSString stringWithUTF8String:widget->psz_text];
 //            NSAttributedString *attrString = [[NSAttributedString alloc] initWithHTML:[string dataUsingEncoding:NSISOLatin1StringEncoding] documentAttributes:NULL];
 //            [[textView textStorage] setAttributedString:[[NSAttributedString alloc] initWithString:@"Hello"]];
-//            NSLog(@"%@", string);
 //            [textView setNeedsDisplay:YES];
 //            [textView scrollRangeToVisible:NSMakeRange(0, 0)];
 //            [attrString release];
@@ -762,7 +759,6 @@ static void updateControlFromWidget(NSView *control, extension_widget_t *widget,
             NSImageView *imageView = (NSImageView *)control;
             NSString *string = widget->psz_text ? [NSString stringWithUTF8String:widget->psz_text] : nil;
             NSImage *image = nil;
-            NSLog(@"Setting image to %@", string);
             if (string)
                 image = [[NSImage alloc] initWithContentsOfURL:[NSURL fileURLWithPath:string]];
             [imageView setImage:image];
