@@ -1944,28 +1944,22 @@ static void PCRHandle( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
         return;
 
     mtime_t i_pcr = GetPCR( p_bk );
-    if( i_pcr >= 0 )
-    {
-        if( p_sys->i_pid_ref_pcr == pid->i_pid )
-        {
-            p_sys->i_current_pcr = AdjustPCRWrapAround( p_demux, i_pcr );
-        }
+    if( i_pcr < 0 )
+        return;
 
-        /* Search program and set the PCR */
-        for( int i = 0; i < p_sys->i_pmt; i++ )
-        {
-            for( int i_prg = 0; i_prg < p_sys->pmt[i]->psi->i_prg; i_prg++ )
+    if( p_sys->i_pid_ref_pcr == pid->i_pid )
+        p_sys->i_current_pcr = AdjustPCRWrapAround( p_demux, i_pcr );
+
+    /* Search program and set the PCR */
+    for( int i = 0; i < p_sys->i_pmt; i++ )
+        for( int i_prg = 0; i_prg < p_sys->pmt[i]->psi->i_prg; i_prg++ )
+            if( pid->i_pid == p_sys->pmt[i]->psi->prg[i_prg]->i_pid_pcr )
             {
-                if( pid->i_pid == p_sys->pmt[i]->psi->prg[i_prg]->i_pid_pcr )
-                {
-                    p_sys->pmt[i]->psi->prg[i_prg]->i_pcr_value = i_pcr;
-                    es_out_Control( p_demux->out, ES_OUT_SET_GROUP_PCR,
-                                    (int)p_sys->pmt[i]->psi->prg[i_prg]->i_number,
-                                    (int64_t)(VLC_TS_0 + i_pcr * 100 / 9) );
-                }
+                p_sys->pmt[i]->psi->prg[i_prg]->i_pcr_value = i_pcr;
+                es_out_Control( p_demux->out, ES_OUT_SET_GROUP_PCR,
+                                (int)p_sys->pmt[i]->psi->prg[i_prg]->i_number,
+                                (int64_t)(VLC_TS_0 + i_pcr * 100 / 9) );
             }
-        }
-    }
 }
 
 static bool GatherPES( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
