@@ -193,14 +193,7 @@ typedef struct
     bool                    b_ok;
     uint16_t                i_es_id;
 
-    bool                    b_streamDependenceFlag;
-    bool                    b_OCRStreamFlag;
-    uint8_t                 i_streamPriority;
-
     char                    *psz_url;
-
-    uint16_t                i_dependOn_es_id;
-    uint16_t                i_OCR_es_id;
 
     decoder_config_descriptor_t    dec_descr;
 
@@ -2431,17 +2424,17 @@ static iod_descriptor_t *IODNew( int i_data, uint8_t *p_data )
 
                 es_descr.i_es_id = IODGetWord( &i_data, &p_data );
                 i_flags = IODGetByte( &i_data, &p_data );
-                es_descr.b_streamDependenceFlag = ( i_flags >> 7 )&0x01;
+                bool b_streamDependenceFlag = ( i_flags >> 7 )&0x01;
                 b_url = ( i_flags >> 6 )&0x01;
-                es_descr.b_OCRStreamFlag = ( i_flags >> 5 )&0x01;
-                es_descr.i_streamPriority = i_flags & 0x1f;
-                ts_debug( "\n*   * streamDependenceFlag:%d", es_descr.b_streamDependenceFlag );
-                ts_debug( "\n*   * OCRStreamFlag:%d", es_descr.b_OCRStreamFlag );
-                ts_debug( "\n*   * streamPriority:%d", es_descr.i_streamPriority );
-                if( es_descr.b_streamDependenceFlag )
+                bool b_OCRStreamFlag = ( i_flags >> 5 )&0x01;
+                uint8_t i_streamPriority = i_flags & 0x1f;
+                ts_debug( "\n*   * streamDependenceFlag:%d", b_streamDependenceFlag );
+                ts_debug( "\n*   * OCRStreamFlag:%d", b_OCRStreamFlag );
+                ts_debug( "\n*   * streamPriority:%d", i_streamPriority );
+                if( b_streamDependenceFlag )
                 {
-                    es_descr.i_dependOn_es_id = IODGetWord( &i_data, &p_data );
-                    ts_debug( "\n*   * dependOn_es_id:%d", es_descr.i_dependOn_es_id );
+                    uint16_t i_dependOn_es_id = IODGetWord( &i_data, &p_data );
+                    ts_debug( "\n*   * dependOn_es_id:%d", i_dependOn_es_id );
                 }
 
                 if( b_url )
@@ -2454,10 +2447,10 @@ static iod_descriptor_t *IODNew( int i_data, uint8_t *p_data )
                     es_descr.psz_url = NULL;
                 }
 
-                if( es_descr.b_OCRStreamFlag )
+                if( b_OCRStreamFlag )
                 {
-                    es_descr.i_OCR_es_id = IODGetWord( &i_data, &p_data );
-                    ts_debug( "\n*   * OCR_es_id:%d", es_descr.i_OCR_es_id );
+                    uint16_t i_OCR_es_id = IODGetWord( &i_data, &p_data );
+                    ts_debug( "\n*   * OCR_es_id:%d", i_OCR_es_id );
                 }
 
                 if( IODGetByte( &i_data, &p_data ) != 0x04 )
