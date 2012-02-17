@@ -108,6 +108,7 @@ static int Open( vlc_object_t *p_this )
     vlc_cond_init( &p_intf->p_sys->init_wait );
 
     vlc_mutex_lock( &p_intf->p_sys->init_lock );
+    p_intf->p_sys->b_error = false;
     p_intf->p_sys->b_ready = false;
 
     if( vlc_clone( &p_intf->p_sys->thread, Run, p_intf,
@@ -124,6 +125,17 @@ static int Open( vlc_object_t *p_this )
     while( !p_intf->p_sys->b_ready )
         vlc_cond_wait( &p_intf->p_sys->init_wait, &p_intf->p_sys->init_lock );
     vlc_mutex_unlock( &p_intf->p_sys->init_lock );
+
+    if( p_intf->p_sys->b_error )
+    {
+        vlc_join( p_intf->p_sys->thread, NULL );
+
+        vlc_mutex_destroy( &p_intf->p_sys->init_lock );
+        vlc_cond_destroy( &p_intf->p_sys->init_wait );
+
+        free( p_intf->p_sys );
+        return VLC_EGENERIC;
+    }
 
     vlc_mutex_lock( &skin_load.mutex );
     skin_load.intf = p_intf;
@@ -252,6 +264,7 @@ static void *Run( void * p_obj )
     loop = OSFactory::instance( p_intf )->getOSLoop();
 
     // Signal the main thread this thread is now ready
+    p_intf->p_sys->b_error = false;
     p_intf->p_sys->b_ready = true;
     vlc_cond_signal( &p_intf->p_sys->init_wait );
     vlc_mutex_unlock( &p_intf->p_sys->init_lock );
@@ -290,11 +303,10 @@ end:
 
     if( b_error )
     {
+        p_intf->p_sys->b_error = true;
         p_intf->p_sys->b_ready = true;
         vlc_cond_signal( &p_intf->p_sys->init_wait );
         vlc_mutex_unlock( &p_intf->p_sys->init_lock );
-
-        libvlc_Quit( p_intf->p_libvlc );
     }
 
     vlc_restorecancel(canc);

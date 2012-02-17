@@ -142,6 +142,7 @@ struct intf_sys_t
     vlc_thread_t thread;
     vlc_mutex_t  init_lock;
     vlc_cond_t   init_wait;
+    bool         b_error;
     bool         b_ready;
 };
 
