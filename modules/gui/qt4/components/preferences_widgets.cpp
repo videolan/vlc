@@ -1315,7 +1315,7 @@ KeySelectorControl::KeySelectorControl( vlc_object_t *_p_this,
     QGridLayout *gLayout = new QGridLayout( keyContainer );
 
     label = new QLabel(
-            qtr( "Select an action to change the associated hotkey") );
+        qtr( "Select or double click an action to change the associated hotkey") );
 
     QLabel *searchLabel = new QLabel( qtr( "Search" ) );
     SearchLineEdit *actionSearch = new SearchLineEdit( keyContainer );
@@ -1385,6 +1385,8 @@ void KeySelectorControl::finish()
 
             QString keys = qfu( p_item->value.psz );
             treeItem->setText( 1, keys );
+            treeItem->setToolTip( 1, qtr("Double click to change") );
+            treeItem->setToolTip( 2, qtr("Double click to change") );
             treeItem->setData( 1, Qt::UserRole, QVariant( keys ) );
             table->addTopLevelItem( treeItem );
             continue;
