@@ -562,11 +562,10 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
 - (IBAction)togglePlaylist:(id)sender
 {
-    if (b_dropzone_active)
+    if (b_dropzone_active && ![[VLCMain sharedInstance] activeVideoPlayback])
     {
         b_dropzone_active = NO;
         [self hideDropZone];
-        return;
     }
 
     if (!b_nonembedded)
