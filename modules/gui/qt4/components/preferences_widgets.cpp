@@ -1543,12 +1543,13 @@ KeyInputDialog::KeyInputDialog( QTreeWidget *_table,
     conflicts = false;
 
     table = _table;
-    setWindowTitle( b_global ? qtr( "Global" ): ""
-                    + qtr( "Hotkey for " ) + keyToChange );
+    setWindowTitle( ( b_global ? qtr( "Global" ) + QString(" ") : "" )
+                    + qtr( "Hotkey change" ) );
     setWindowRole( "vlc-key-input" );
 
     QVBoxLayout *vLayout = new QVBoxLayout( this );
-    selected = new QLabel( qtr( "Press the new keys for " ) + keyToChange );
+    selected = new QLabel( qtr( "Press the new key or combination for " )
+                           + QString("<b>%1</b>").arg( keyToChange ) );
     vLayout->addWidget( selected , Qt::AlignCenter );
 
     warning = new QLabel;
@@ -1579,8 +1580,8 @@ void KeyInputDialog::checkForConflicts( int i_vlckey )
         !conflictList[0]->data( b_global ? 2 : 1, Qt::UserRole ).toString().isEmpty() &&
          conflictList[0]->data( b_global ? 2 : 1, Qt::UserRole ).toString() != "Unset" )
     {
-        warning->setText( qtr("Warning: the key is already assigned to \"") +
-                conflictList[0]->text( 0 ) + "\"" );
+        warning->setText( qtr("Warning: this key or combination is already assigned to ") +
+                QString( "\"<b>%1</b>\"" ).arg( conflictList[0]->text( 0 ) ) );
         warning->show();
         buttonBox->show();
 
@@ -1599,7 +1600,8 @@ void KeyInputDialog::keyPressEvent( QKeyEvent *e )
         e->key() == Qt::Key_AltGr )
         return;
     int i_vlck = qtEventToVLCKey( e );
-    selected->setText( qtr( "Key: " ) + VLCKeyToString( i_vlck ) );
+    selected->setText( qtr( "Key or combination: " )
+                + QString("<b>%1</b>").arg( VLCKeyToString( i_vlck ) ) );
     checkForConflicts( i_vlck );
     keyValue = i_vlck;
 }
