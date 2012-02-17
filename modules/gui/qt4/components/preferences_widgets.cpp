@@ -1324,7 +1324,9 @@ KeySelectorControl::KeySelectorControl( vlc_object_t *_p_this,
     table->setColumnCount(3);
     table->headerItem()->setText( 0, qtr( "Action" ) );
     table->headerItem()->setText( 1, qtr( "Hotkey" ) );
+    table->headerItem()->setToolTip( 1, qtr( "Application level hotkey" ) );
     table->headerItem()->setText( 2, qtr( "Global" ) );
+    table->headerItem()->setToolTip( 2, qtr( "Desktop level hotkey" ) );
     table->setAlternatingRowColors( true );
     table->setSelectionBehavior( QAbstractItemView::SelectItems );
 
