@@ -390,6 +390,7 @@ bool virtual_segment_c::UpdateCurrentToChapter( demux_t & demux )
                         return true;
                     }
                 }
+                sys.i_start_pts = p_cur_chapter->p_chapter->i_start_time;
             }
 
             p_current_chapter = p_cur_chapter;
