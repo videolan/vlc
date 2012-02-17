@@ -1556,7 +1556,7 @@ KeyInputDialog::KeyInputDialog( QTreeWidget *_table,
     vLayout->insertWidget( 1, warning );
 
     buttonBox = new QDialogButtonBox;
-    QPushButton *ok = new QPushButton( qtr("OK") );
+    QPushButton *ok = new QPushButton( qtr("Assign") );
     QPushButton *cancel = new QPushButton( qtr("Cancel") );
     buttonBox->addButton( ok, QDialogButtonBox::AcceptRole );
     buttonBox->addButton( cancel, QDialogButtonBox::RejectRole );
