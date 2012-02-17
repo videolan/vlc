@@ -34,3 +34,5 @@ void CloseMux( vlc_object_t * );
 
 #define MUX_TEXT N_("Avformat mux")
 #define MUX_LONGTEXT N_("Force use of a specific avformat muxer.")
+#define FORMAT_TEXT N_( "Format name" )
+#define FORMAT_LONGTEXT N_( "Internal libavcodec format name" )

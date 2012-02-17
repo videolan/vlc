@@ -32,9 +32,6 @@
 
 #include "avformat.h"
 
-#define FORMAT_TEXT N_( "Format name" )
-#define FORMAT_LONGTEXT N_( "Internal libavcodec format name" )
-
 vlc_module_begin ()
 #endif /* MERGE_FFMPEG */
     add_shortcut( "ffmpeg", "avformat" )
