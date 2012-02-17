@@ -421,6 +421,8 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
         [self setBackgroundColor: [NSColor clearColor]];
         [self setOpaque: NO];
+        [self display];
+        [self setHasShadow:NO];
         [self setHasShadow:YES];
 
         NSRect winrect = [self frame];
