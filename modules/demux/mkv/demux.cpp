@@ -528,10 +528,10 @@ matroska_stream_c *demux_sys_t::AnalyseAllSegmentsFound( demux_t *p_demux, EbmlS
                         {
                             KaxSegmentUID *p_uid = static_cast<KaxSegmentUID*>(l);
                             b_keep_segment = (FindSegment( *p_uid ) == NULL);
-                            if ( !b_keep_segment )
-                                break; // this segment is already known
                             delete p_segment1->p_segment_uid;
                             p_segment1->p_segment_uid = new KaxSegmentUID(*p_uid);
+                            if ( !b_keep_segment )
+                                break; // this segment is already known
                         }
                         else if( MKV_IS_ID( l, KaxPrevUID ) )
                         {
