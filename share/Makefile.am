@@ -188,7 +188,6 @@ nobase_vlclib_DATA = \
 	lua/playlist/katsomo.luac \
 	lua/playlist/koreus.luac \
 	lua/playlist/lelombrik.luac \
-	lua/playlist/megavideo.luac \
 	lua/playlist/metacafe.luac \
 	lua/playlist/metachannels.luac \
 	lua/playlist/mpora.luac \
@@ -259,7 +258,6 @@ EXTRA_DIST += \
 	lua/playlist/katsomo.lua \
 	lua/playlist/koreus.lua \
 	lua/playlist/lelombrik.lua \
-	lua/playlist/megavideo.lua \
 	lua/playlist/metacafe.lua \
 	lua/playlist/metachannels.lua \
 	lua/playlist/mpora.lua \
