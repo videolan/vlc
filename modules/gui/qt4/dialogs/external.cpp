@@ -199,7 +199,7 @@ QVLCProgressDialog::QVLCProgressDialog (DialogHandler *parent,
         setWindowTitle (qfu(data->title));
 
     setWindowRole ("vlc-progress");
-    setMinimumDuration (300);
+    setMinimumDuration (1200);
     setValue( 0 );
 
     connect (this, SIGNAL(progressed(int)), SLOT(setValue(int)));
