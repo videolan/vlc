@@ -258,6 +258,7 @@ FunctionEnd
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 !macro MacroAudioExtensions _action
+  !insertmacro ${_action} ".3ga"
   !insertmacro ${_action} ".a52"
   !insertmacro ${_action} ".aac"
   !insertmacro ${_action} ".ac3"
