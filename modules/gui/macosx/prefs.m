@@ -478,13 +478,20 @@ static VLCPrefs *_o_sharedMainInstance = nil;
 @implementation VLCTreePluginItem
 - (id)initWithPlugin:(module_t *)plugin
 {
-    NSString * name = _NS( module_get_name( plugin, false )?:"" );
+    const char * psz_name = module_get_name( plugin, false );
+    NSString * name;
+    if (psz_name)
+        name = _NS(psz_name);
+    else
+        name = @"";
+
     if(self = [super initWithName:name])
     {
         _configItems = module_config_get( plugin, &_configSize );
         //_plugin = plugin;
         //_help = [_NS(config_CategoryHelpGet( subCategory )) retain];
     }
+
     return self;
 }
 
