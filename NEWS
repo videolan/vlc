@@ -23,7 +23,7 @@ Interfaces:
 Removed modules:
  * portaudio audio output
 
-Changes between 1.1.12 and 2.0.0:
+Changes between 1.1.13 and 2.0.0:
 ---------------------------------
 
 Important notes:
@@ -64,20 +64,20 @@ Important changes for packagers:
  * The default tarballs are now compressed with XZ/LZMA: .tar.xz
  * OSS support is not compiled on Linux by default, pass --enable-oss to the
    configure script if you use OSSv4 or really want to use OSS emulation.
- * The webplugins has moved to git://git.videolan.org/npapi-vlc.git
+ * The webplugins have moved to: git://git.videolan.org/npapi-vlc.git
 
 Core:
  * Major Video Core and Outputs rework and rewrite:
-   Subtitles, subpictures and OSD can now be sized and blent inside video outputs
+   Subtitles, subpictures and OSD can now be sized and blent inside outputs
    x11 (Unix), OpenGL (Unix) and Direct3D (Windows) are such video outputs.
  * Almost every video filter can now be transcoded
  * Playback rate doesn't get resetted to 1 between items anymore
  * Option --sub-filter was renamed --sub-source
- * Port to Android, iOS, OS/2 and Win64
+ * Port to Android, iOS, OS/2 and Win64.
 
 Access:
  * Multiple files are now supported inside RAR files
- * Experimental support for ClearQam devices in the BDA module
+ * Experimental support for ClearQam devices in the BDA/DTV module
  * DVB-S scanning support on Unix
  * DVB-C scanning on Unix scans correct modulation/symbolrate if needed
  * Support for freq and video standard selection in DirectShow
@@ -97,7 +97,7 @@ Access:
  * Support for HTTPS is now fixed in the Windows port
 
 Codecs:
- * You can now use ffmpeg-mt in conjunction with vlc, to split decoding load
+ * One can now use ffmpeg-mt in conjunction with vlc, to split decoding load
    on multiple cores. H.264, VP3, VP8, JPEG-2000, Mpeg-4 ASP/DivX and RV3/RV4
    are notably concerned.
  * Important fixes for RealVideo 3.0 and 4.0 playback, notably in MKV
@@ -128,12 +128,13 @@ Demuxers:
  * Support for duration and better seeking in Mpeg-TS files (.ts, .m2ts, .mts)
  * Mov improvements, notably for aspect-ratio handling and Audio DV tracks
  * Improved support of tracker files
+ * Real Media (.rm and .rmvb) demuxer is now based on libavformat
 
 Interfaces:
  * Qt: effects dialogs rework
  * Qt: new CoverFlow-like view of the playlist
  * Qt: port to MacOS X platform
- * Qt: minor look improvements, notably on the seek bar
+ * Qt: various interface improvements, notably on the seek bar
  * Skins2 / Qt: misc improvements and usability fixes
  * Skins2: fullscreen controller support, relative placement support
    and important cleanups and optimisations
@@ -150,8 +151,8 @@ Interfaces:
  * lua: the recommended way to run custom interface scripts is now to pass
    -I luaintf --lua-intf myscript
  * ncurses: heavy refactor of the complete interface
- * dbus: Rewrite of the main loop to use a more efficient poll-based model
  * dbus: Upgrade to an mpris2 compliant interface, see http://www.mpris.org
+ * dbus: Rewrite of the main loop to use a more efficient poll-based model
  * webUI/http: Rewrite of the web interface, using jQuery
  * webUI/http: some requests are now supported in JSON in addition to XML
  * webUI/http: path values for input and output are deprecated in favour of uri
@@ -188,7 +189,7 @@ Video Filter:
  * New gradfun filter for debanding videos using dithering
  * Rewrite of the grain filter, faster and with better quality
  * New posterize filter for lowering the number of colors
- * Atmo ambilight: improve Fnordlicht up to 254 channels
+ * Atmo ambilight: improve Fnordlicht support up to 254 channels
  * New sepia filter for creating sepia effect in videos
  * New deinterlacer mode Phosphor, a framerate doubling CRT TV simulator
  * New deinterlacer mode IVTC, to do live inverse telecine for NTSC films
@@ -236,8 +237,7 @@ libVLC:
      allow grabbing audio data from a chosen memory location in real-time.
 
 Removed modules:
- * asademux: use libass only
- * subsass: use libass
+ * asademux, subsass: use libass
  * fake, invmem: use the new image demuxers
  * hal, v4l, gapi, omapfb, hd1000a, hd1000v: obsolete unmaintained modules
  * id3tag: use taglib
@@ -249,6 +249,10 @@ Removed modules:
  * growl_udp: use Growl for local notifications on the Mac. UDP support will be
               removed in Growl's next release, too.
  * removal of the OSSO screensave module, use the MCE one
+
+Translations:
+ * Update of translations for most languages.
+ * New Telugu and Kurmanji translations.
 
 
 Changes between 1.1.12 and 1.1.13:
