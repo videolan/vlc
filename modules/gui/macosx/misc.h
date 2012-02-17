@@ -185,3 +185,13 @@
 
 - (void)setImagesLeft:(NSImage *)left middle: (NSImage *)middle right:(NSImage *)right;
 @end
+
+/*****************************************************************************
+ * VLCThreePartImageView interface
+ *****************************************************************************/
+@interface VLCThreePartDropView : VLCThreePartImageView
+{
+
+}
+
+@end

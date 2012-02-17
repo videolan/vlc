@@ -149,7 +149,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [o_dropzone_lbl setStringValue: _NS("Drop media here")];
 
     if (!b_dark_interface) {
-        [o_bottombar_view setImage: [NSImage imageNamed:@"bottom-background"]];
+        [o_bottombar_view setImagesLeft: [NSImage imageNamed:@"bottom-background"] middle: [NSImage imageNamed:@"bottom-background"] right: [NSImage imageNamed:@"bottom-background"]];
         [o_bwd_btn setImage: [NSImage imageNamed:@"back"]];
         [o_bwd_btn setAlternateImage: [NSImage imageNamed:@"back-pressed"]];
         o_play_img = [[NSImage imageNamed:@"play"] retain];
@@ -192,7 +192,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     }
     else
     {
-        [o_bottombar_view setImage: [NSImage imageNamed:@"bottom-background_dark"]];
+        [o_bottombar_view setImagesLeft: [NSImage imageNamed:@"bottomdark-left"] middle: [NSImage imageNamed:@"bottom-background_dark"] right: [NSImage imageNamed:@"bottomdark-right"]];
         [o_bwd_btn setImage: [NSImage imageNamed:@"back_dark"]];
         [o_bwd_btn setAlternateImage: [NSImage imageNamed:@"back-pressed_dark"]];
         o_play_img = [[NSImage imageNamed:@"play_dark"] retain];
