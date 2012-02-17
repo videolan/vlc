@@ -9,6 +9,6 @@ VLC Lua "meta reader" modules should define one of the following functions:
  * read_meta(): returns a path to an artwork for the given item
 
 Available VLC specific Lua modules: msg, stream, strings, variables, item,
-objects and misc. See lua/README.txt
+objects and xml. See lua/README.txt
 
 Note, those scripts are supposed to be fast. Read non blocking, no IO.

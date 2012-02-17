@@ -15,5 +15,5 @@ User defined modules stored in the share/lua/modules/ directory are
 available. For example, to use the sandbox module, just use
 'require "sandbox"' in your interface.
 
-Available VLC specific Lua modules: input, msg, misc, net, object, sd,
+Available VLC specific Lua modules: input, msg, net, object, sd,
 strings, variables, stream, gettext, xml. See lua/README.txt.
