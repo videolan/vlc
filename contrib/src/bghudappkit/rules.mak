@@ -24,5 +24,5 @@ bghudappkit: bghudappkit-git.tar.xz .sum-bghudappkit
 	install_name_tool -change @loader_path/../../../../../../../BGHUDAppKit.framework/Versions/A/BGHUDAppKit \
 								@loader_path/../../../../Versions/A/BGHUDAppKit \
 		$</build/Release/BGHUDAppKit.framework/Resources/BGHUDAppKitPlugin.ibplugin/Contents/MacOS/BGHUDAppKitPlugin
-	cd $< && cp -R -L build/Release/BGHUDAppKit.framework "$(PREFIX)"
+	cd $< && cp -R build/Release/BGHUDAppKit.framework "$(PREFIX)"
 	touch $@
