@@ -438,19 +438,7 @@ static inline char * __config_GetLabel( vlc_object_t *p_this, const char *psz_na
 - (void)setupButton: (NSButton *)object forBoolValue: (const char *)name
 {
     [object setState: config_GetInt( p_intf, name )];
-
-    char * psz_label = config_GetLabel( p_intf, name );
-    NSString * o_label;
-
-    if (psz_label)
-    {
-        o_label = _NS(psz_label);
-        free( psz_label );
-    }
-    else
-        o_label = @"";
-
-    [object setToolTip: o_label];
+    [object setToolTip: _NS(config_GetLabel( p_intf, name ) ?: "")];
 }
 
 - (void)setupField:(NSTextField *)o_object forOption:(const char *)psz_option
