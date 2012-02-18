@@ -45,12 +45,10 @@
 #include <QDialogButtonBox>
 #include <QLineEdit>
 #include <QStackedLayout>
-#include <QListView>
 #include <QCompleter>
 #include <QDirModel>
 #include <QScrollArea>
 #include <QUrl>
-#include <QStringListModel>
 #include <QDropEvent>
 
 #define I_DEVICE_TOOLTIP \
