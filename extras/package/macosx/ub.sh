@@ -25,10 +25,10 @@ cd $WD
 #############################################
 # Config
 
-INTELROOT=$SRCROOT/build32/VLC.app
-INTEL64ROOT=$SRCROOT/build64/VLC.app
+INTELROOT=$SRCROOT/32bit/VLC.app
+INTEL64ROOT=$SRCROOT/64bit/VLC.app
 # PPCROOT
-UBROOT=$SRCROOT/build-fat/VLC.app
+UBROOT=$SRCROOT/VLC.app
 
 #
 #############################################
@@ -39,9 +39,15 @@ cp -Rf $INTEL64ROOT $UBROOT
 
 LIBS=Contents/MacOS/lib
 PLUGINS=Contents/MacOS/plugins
-rm -Rf $SRCROOT/build-fat/VLC.app/$LIBS/*
-rm -Rf $SRCROOT/build-fat/VLC.app/Contents/MacOS/VLC
-rm -Rf $SRCROOT/build-fat/VLC.app/$PLUGINS/*
+FRAMEWORKS=Contents/Frameworks
+rm -Rf $SRCROOT/VLC.app/$LIBS/*
+rm -Rf $SRCROOT/VLC.app/Contents/MacOS/VLC
+rm -Rf $SRCROOT/VLC.app/$PLUGINS/*
+rm -Rf $SRCROOT/VLC.app/$FRAMEWORKS/Growl.framework/Versions/A/Growl
+rm -Rf $SRCROOT/VLC.app/$FRAMEWORKS/BGHUDAppKit.framework/BGHUDAppKit
+rm -Rf $SRCROOT/VLC.app/$FRAMEWORKS/BGHUDAppKit.framework/Versions/A/BGHUDAppKit
+rm -Rf $SRCROOT/VLC.app/$FRAMEWORKS/Sparkle.framework/Versions/A/Sparkle
+rm -Rf $SRCROOT/VLC.app/$FRAMEWORKS/Sparkle.framework/Resources/relaunch
 
 function do_lipo {
     file="$1"
@@ -79,6 +85,12 @@ do
     do_lipo $PLUGINS/$i
 done
 
+echo "Installing frameworks"
+do_lipo $FRAMEWORKS/Growl.framework/Versions/A/Growl
+do_lipo $FRAMEWORKS/BGHUDAppKit.framework/BGHUDAppKit
+do_lipo $FRAMEWORKS/BGHUDAppKit.framework/Versions/A/BGHUDAppKit
+do_lipo $FRAMEWORKS/Sparkle.framework/Versions/A/Sparkle
+do_lipo $FRAMEWORKS/Sparkle.framework/Resources/relaunch
 
 echo "Installing VLC"
 do_lipo Contents/MacOS/VLC
