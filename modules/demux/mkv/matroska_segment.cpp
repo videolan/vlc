@@ -690,6 +690,7 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset, int64_t i_
     mtime_t     i_pts = 0;
     spoint *p_first = NULL;
     spoint *p_last = NULL;
+    int i_cat;
 
     if( i_global_position >= 0 )
     {
@@ -772,33 +773,42 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset, int64_t i_
     es_out_Control( sys.demuxer.out, ES_OUT_SET_NEXT_DISPLAY_TIME, i_date );
 
     /* now parse until key frame */
-    for( i_track = 0; i_track < tracks.size(); i_track++ )
+    const int es[3] = { VIDEO_ES, AUDIO_ES, SPU_ES };
+    for( int i = 0, i_cat = es[0]; i < 2; i_cat = es[++i] )
     {
-        if( tracks[i_track]->fmt.i_cat == VIDEO_ES )
+        for( i_track = 0; i_track < tracks.size(); i_track++ )
         {
-            spoint * seekpoint = new spoint(i_track, i_seek_time, i_seek_position, i_seek_position);
-            if( unlikely( !seekpoint ) )
+            if( tracks[i_track]->fmt.i_cat == i_cat )
             {
-                for( spoint * sp = p_first; sp; )
+                spoint * seekpoint = new spoint(i_track, i_seek_time, i_seek_position, i_seek_position);
+                if( unlikely( !seekpoint ) )
                 {
-                    spoint * tmp = sp;
-                    sp = sp->p_next;
-                    delete tmp;                    
+                    for( spoint * sp = p_first; sp; )
+                    {
+                        spoint * tmp = sp;
+                        sp = sp->p_next;
+                        delete tmp;                    
+                    }
+                    return;
                 }
-                return;
-            }
-            if( unlikely( !p_first ) )
-            {
-                p_first = seekpoint;
-                p_last = seekpoint;
-            }
-            else
-            {
-                p_last->p_next = seekpoint;
-                p_last = seekpoint;
+                if( unlikely( !p_first ) )
+                {
+                    p_first = seekpoint;
+                    p_last = seekpoint;
+                }
+                else
+                {
+                    p_last->p_next = seekpoint;
+                    p_last = seekpoint;
+                }
             }
         }
+        if( likely( p_first ) )
+            break;
     }
+    /*Neither video nor audio track... no seek further*/
+    if( unlikely( !p_first ) )
+        return; 
 
     while( i_pts < i_date )
     {
@@ -825,7 +835,7 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset, int64_t i_
             i_pts = sys.i_chapter_time + block->GlobalTimecode() / (mtime_t) 1000;
         if( i_track < tracks.size() )
         {
-            if( tracks[i_track]->fmt.i_cat == VIDEO_ES && b_key_picture )
+            if( tracks[i_track]->fmt.i_cat == i_cat && b_key_picture )
             {
                 /* get the seekpoint */
                 spoint * sp;
