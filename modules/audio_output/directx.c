@@ -201,7 +201,7 @@ static int OpenAudio( vlc_object_t *p_this )
 
     if( var_Get( p_aout, "audio-device", &val ) < 0 )
     {
-        /* Probe() has failed. */
+        msg_Err( p_aout, "DirectSound Probe failed()" );
         goto error;
     }
 
