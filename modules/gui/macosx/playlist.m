@@ -1392,7 +1392,13 @@
                                 forTableColumn:(NSTableColumn *)tableColumn
                                 item:(id)item
 {
-    playlist_t *p_playlist = pl_Get( VLCIntf );
+    /* this method can be called when VLC is already dead, hence the extra checks */
+    intf_thread_t * p_intf = VLCIntf;
+    if (!p_intf)
+        return;
+    playlist_t *p_playlist = pl_Get( p_intf );
+    if (!p_playlist)
+        return;
 
     id o_playing_item;
 
