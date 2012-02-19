@@ -696,6 +696,13 @@ static VLCMain *_o_sharedMainInstance = nil;
     playlist_t * p_playlist = pl_Get( p_intf );
     int returnedValue = 0;
 
+    /* always exit fullscreen on quit, otherwise we get ugly artifacts on the next launch */
+    if (OSX_LION && b_nativeFullscreenMode)
+    {
+        [o_mainwindow toggleFullScreen: self];
+        [NSApp setPresentationOptions:(NSApplicationPresentationDefault)];
+    }
+
     /* Save some interface state in configuration, at module quit */
     config_PutInt( p_intf, "random", var_GetBool( p_playlist, "random" ) );
     config_PutInt( p_intf, "loop", var_GetBool( p_playlist, "loop" ) );
