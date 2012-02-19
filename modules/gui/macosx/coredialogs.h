@@ -87,6 +87,7 @@
 -(void)showLoginDialog: (NSValue *)o_value;
 -(IBAction)loginDialogAction:(id)sender;
 
+-(void)showProgressDialogOnMainThread: (NSValue *)o_value;
 -(void)showProgressDialog: (NSValue *)o_value;
 -(IBAction)progDialogAction:(id)sender;
 -(BOOL)progressCancelled;
