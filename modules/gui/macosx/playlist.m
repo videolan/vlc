@@ -64,7 +64,7 @@
 
 - (NSMenu *)menuForEvent:(NSEvent *)o_event
 {
-    return( [[self delegate] menuForEvent: o_event] );
+    return( [(VLCPlaylist *)[self delegate] menuForEvent: o_event] );
 }
 
 - (void)keyDown:(NSEvent *)o_event
@@ -82,7 +82,7 @@
         case NSDeleteFunctionKey:
         case NSDeleteCharFunctionKey:
         case NSBackspaceCharacter:
-            [[self delegate] deleteItem:self];
+            [(VLCPlaylist *)[self delegate] deleteItem:self];
             break;
 
         case NSEnterCharacter:
