@@ -134,7 +134,7 @@ VLMDialog::VLMDialog( intf_thread_t *_p_intf ) : QVLCDialog( (QWidget*)_p_intf->
     ui.buttonBox->addButton( exportButton, QDialogButtonBox::ActionRole );
 
     QPushButton *closeButton = new QPushButton( qtr( "&Close" ) );
-    ui.buttonBox->addButton( closeButton, QDialogButtonBox::AcceptRole );
+    ui.buttonBox->addButton( closeButton, QDialogButtonBox::RejectRole );
 
 
     showScheduleWidget( QVLM_Broadcast );
