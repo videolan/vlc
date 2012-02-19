@@ -267,7 +267,7 @@ static int InputEvent( vlc_object_t *p_this, const char *psz_var,
         case INPUT_EVENT_ITEM_META:
         case INPUT_EVENT_ITEM_INFO:
             [[VLCMain sharedInstance] performSelectorOnMainThread:@selector(updateMainMenu) withObject: nil waitUntilDone:NO];
-            [[VLCMain sharedInstance] updateName];
+            [[VLCMain sharedInstance] performSelectorOnMainThread:@selector(updateName) withObject: nil waitUntilDone:NO];
             [[VLCMain sharedInstance] performSelectorOnMainThread:@selector(updateInfoandMetaPanel) withObject: nil waitUntilDone:NO];
             break;
         case INPUT_EVENT_BOOKMARK:
@@ -1401,6 +1401,8 @@ unsigned int CocoaKeyToVLC( unichar i_key )
     {
         var_AddCallback( p_input, "intf-event", InputEvent, [VLCMain sharedInstance] );
         [o_mainmenu setRateControlsEnabled: YES];
+        if ([self activeVideoPlayback] && [[o_mainwindow videoView] isHidden])
+            [o_mainwindow performSelectorOnMainThread:@selector(togglePlaylist:) withObject: nil waitUntilDone:NO];
     }
     else
         [o_mainmenu setRateControlsEnabled: NO];
