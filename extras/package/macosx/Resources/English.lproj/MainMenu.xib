@@ -21,16 +21,16 @@
     </object>
     <object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
       <bool key="EncodedWithXMLCoder">YES</bool>
-      <integer value="21"/>
-      <integer value="4895"/>
-      <integer value="915"/>
-      <integer value="283"/>
-      <integer value="29"/>
       <integer value="1617"/>
       <integer value="2770"/>
-      <integer value="4722"/>
+      <integer value="29"/>
+      <integer value="21"/>
       <integer value="2730"/>
       <integer value="4596"/>
+      <integer value="283"/>
+      <integer value="4850"/>
+      <integer value="915"/>
+      <integer value="4722"/>
     </object>
     <object class="NSArray" key="IBDocument.PluginDependencies">
       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -4494,7 +4494,7 @@ LCAuLi4</string>
             <string key="NSReuseIdentifierKey">_NS:610</string>
             <bool key="NSEnabled">YES</bool>
             <object class="NSButtonCell" key="NSCell" id="113847949">
-              <int key="NSCellFlags">67239424</int>
+              <int key="NSCellFlags">-2080244224</int>
               <int key="NSCellFlags2">134217728</int>
               <string key="NSContents"/>
               <reference key="NSSupport" ref="841513812"/>
@@ -10934,12 +10934,16 @@ LCAuLi4</string>
           <string>4846.IBPluginDependency</string>
           <string>4850.IBEditorWindowLastContentRect</string>
           <string>4850.IBPluginDependency</string>
+          <string>4895.CustomClassName</string>
           <string>4895.IBPluginDependency</string>
           <string>4895.IBViewBoundsToFrameTransform</string>
+          <string>4896.CustomClassName</string>
           <string>4896.IBPluginDependency</string>
           <string>4896.IBViewBoundsToFrameTransform</string>
+          <string>4897.CustomClassName</string>
           <string>4897.IBPluginDependency</string>
           <string>4897.IBViewBoundsToFrameTransform</string>
+          <string>4898.CustomClassName</string>
           <string>4898.IBPluginDependency</string>
           <string>4898.IBViewBoundsToFrameTransform</string>
           <string>4899.IBPluginDependency</string>
@@ -11769,18 +11773,22 @@ LCAuLi4</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>{{363, 734}, {400, 22}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+          <string>VLCCustomWindowCloseButton</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <object class="NSAffineTransform">
             <bytes key="NSTransformStruct">P4AAAL+AAABBAAAAwXAAAA</bytes>
           </object>
+          <string>VLCCustomWindowMinimizeButton</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <object class="NSAffineTransform">
             <bytes key="NSTransformStruct">P4AAAL+AAABB4AAAwXAAAA</bytes>
           </object>
+          <string>VLCCustomWindowZoomButton</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <object class="NSAffineTransform">
             <bytes key="NSTransformStruct">P4AAAL+AAABCQAAAwXAAAA</bytes>
           </object>
+          <string>VLCCustomWindowFullscreenButton</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <object class="NSAffineTransform">
             <bytes key="NSTransformStruct">P4AAAL+AAABDv4AAwYAAAA</bytes>
@@ -14828,9 +14836,111 @@ LCAuLi4</string>
           <reference key="sourceIdentifier" ref="386911354"/>
         </object>
         <object class="IBPartialClassDescription">
+          <string key="className">VLCCustomWindowButtonPrototype</string>
+          <string key="superclassName">NSButton</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier" id="672431580">
+            <string key="majorKey">IBDocumentRelativeSource</string>
+            <string key="minorKey">../../../../../modules/gui/macosx/MainWindowTitle.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">VLCCustomWindowCloseButton</string>
+          <string key="superclassName">VLCCustomWindowButtonPrototype</string>
+          <reference key="sourceIdentifier" ref="672431580"/>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">VLCCustomWindowFullscreenButton</string>
+          <string key="superclassName">VLCCustomWindowButtonPrototype</string>
+          <reference key="sourceIdentifier" ref="672431580"/>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">VLCCustomWindowMinimizeButton</string>
+          <string key="superclassName">VLCCustomWindowButtonPrototype</string>
+          <reference key="sourceIdentifier" ref="672431580"/>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">VLCCustomWindowZoomButton</string>
+          <string key="superclassName">VLCCustomWindowButtonPrototype</string>
+          <reference key="sourceIdentifier" ref="672431580"/>
+        </object>
+        <object class="IBPartialClassDescription">
           <string key="className">VLCMainWindowSplitView</string>
           <string key="superclassName">NSSplitView</string>
           <reference key="sourceIdentifier" ref="386911354"/>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">VLCMainWindowTitleView</string>
+          <string key="superclassName">VLCThreePartImageView</string>
+          <object class="NSMutableDictionary" key="actions">
+            <string key="NS.key.0">buttonAction:</string>
+            <string key="NS.object.0">id</string>
+          </object>
+          <object class="NSMutableDictionary" key="actionInfosByName">
+            <string key="NS.key.0">buttonAction:</string>
+            <object class="IBActionInfo" key="NS.object.0">
+              <string key="name">buttonAction:</string>
+              <string key="candidateClassName">id</string>
+            </object>
+          </object>
+          <object class="NSMutableDictionary" key="outlets">
+            <bool key="EncodedWithXMLCoder">YES</bool>
+            <object class="NSArray" key="dict.sortedKeys">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <string>o_fullscreen_btn</string>
+              <string>o_green_btn</string>
+              <string>o_red_btn</string>
+              <string>o_title_lbl</string>
+              <string>o_yellow_btn</string>
+            </object>
+            <object class="NSMutableArray" key="dict.values">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+              <string>id</string>
+            </object>
+          </object>
+          <object class="NSMutableDictionary" key="toOneOutletInfosByName">
+            <bool key="EncodedWithXMLCoder">YES</bool>
+            <object class="NSArray" key="dict.sortedKeys">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <string>o_fullscreen_btn</string>
+              <string>o_green_btn</string>
+              <string>o_red_btn</string>
+              <string>o_title_lbl</string>
+              <string>o_yellow_btn</string>
+            </object>
+            <object class="NSMutableArray" key="dict.values">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_fullscreen_btn</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_green_btn</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_red_btn</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_title_lbl</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_yellow_btn</string>
+                <string key="candidateClassName">id</string>
+              </object>
+            </object>
+          </object>
+          <reference key="sourceIdentifier" ref="672431580"/>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">VLCResizeControl</string>
+          <string key="superclassName">NSImageView</string>
+          <reference key="sourceIdentifier" ref="672431580"/>
         </object>
         <object class="IBPartialClassDescription">
           <string key="className">VLCThreePartDropView</string>
@@ -14846,6 +14956,11 @@ LCAuLi4</string>
           <string key="className">VLCTimeField</string>
           <string key="superclassName">NSTextField</string>
           <reference key="sourceIdentifier" ref="386911354"/>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">VLCWindowButtonCell</string>
+          <string key="superclassName">NSButtonCell</string>
+          <reference key="sourceIdentifier" ref="672431580"/>
         </object>
       </object>
       <object class="NSMutableArray" key="referencedPartialClassDescriptionsV3.2+">

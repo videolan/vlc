@@ -72,3 +72,34 @@
 {
 }
 @end
+
+@interface VLCCustomWindowButtonPrototype: NSButton
+{
+}
+- (NSArray*)extendedAccessibilityAttributeNames: (NSArray*)theAttributeNames;
+- (id)extendedAccessibilityAttributeValue: (NSString*)theAttributeName;
+- (NSNumber*)extendedAccessibilityIsAttributeSettable: (NSString*)theAttributeName;
+
+@end
+
+@interface VLCCustomWindowCloseButton: VLCCustomWindowButtonPrototype
+{
+}
+@end
+
+
+@interface VLCCustomWindowMinimizeButton: VLCCustomWindowButtonPrototype
+{
+}
+@end
+
+
+@interface VLCCustomWindowZoomButton: VLCCustomWindowButtonPrototype
+{
+}
+@end
+
+@interface VLCCustomWindowFullscreenButton : VLCCustomWindowButtonPrototype
+{
+}
+@end

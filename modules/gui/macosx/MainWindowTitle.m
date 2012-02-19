@@ -258,6 +258,35 @@
         [(VLCMainWindowTitleView *)[[self controlView] superview] setWindowButtonOver: NO];
 }
 
+/* accessibility stuff */
+- (NSArray*)accessibilityAttributeNames {
+    NSArray *theAttributeNames = [super accessibilityAttributeNames];
+    id theControlView = [self controlView];
+    return ([theControlView respondsToSelector: @selector(extendedAccessibilityAttributeNames:)] ? [theControlView extendedAccessibilityAttributeNames: theAttributeNames] : theAttributeNames);	// ask the cell's control view (i.e., the button) for additional attribute values
+}
+
+- (id)accessibilityAttributeValue: (NSString*)theAttributeName {
+    id theControlView = [self controlView];
+    if ([theControlView respondsToSelector: @selector(extendedAccessibilityAttributeValue:)]) {
+        id theValue = [theControlView extendedAccessibilityAttributeValue: theAttributeName];
+        if (theValue) {
+            return theValue;	// if this is an extended attribute value we added, return that -- otherwise, fall back to super's implementation
+        }
+    }
+    return [super accessibilityAttributeValue: theAttributeName];
+}
+
+- (BOOL)accessibilityIsAttributeSettable: (NSString*)theAttributeName {
+    id theControlView = [self controlView];
+    if ([theControlView respondsToSelector: @selector(extendedAccessibilityIsAttributeSettable:)]) {
+        NSNumber *theValue = [theControlView extendedAccessibilityIsAttributeSettable: theAttributeName];
+        if (theValue) {
+            return [theValue boolValue];	// same basic strategy we use in -accessibilityAttributeValue:
+        }
+    }
+    return [super accessibilityIsAttributeSettable: theAttributeName];
+}
+
 @end
 
 
@@ -332,6 +361,69 @@
 - (void)drawRect:(NSRect)rect {
     [[NSColor blackColor] setFill];
     NSRectFill(rect);
+}
+
+@end
+
+/*****************************************************************************
+ * custom window buttons to support the accessibility stuff
+ *****************************************************************************/
+
+@implementation VLCCustomWindowButtonPrototype
++ (Class)cellClass {
+    return [VLCWindowButtonCell class];
+}
+
+- (NSArray*)extendedAccessibilityAttributeNames: (NSArray*)theAttributeNames {
+    return ([theAttributeNames containsObject: NSAccessibilitySubroleAttribute] ? theAttributeNames : [theAttributeNames arrayByAddingObject: NSAccessibilitySubroleAttribute]);	// run-of-the-mill button cells don't usually have a Subrole attribute, so we add that attribute
+}
+
+- (id)extendedAccessibilityAttributeValue: (NSString*)theAttributeName {
+    return nil;
+}
+
+- (NSNumber*)extendedAccessibilityIsAttributeSettable: (NSString*)theAttributeName {
+    return ([theAttributeName isEqualToString: NSAccessibilitySubroleAttribute] ? [NSNumber numberWithBool: NO] : nil);	// make the Subrole attribute we added non-settable
+}
+
+- (void)accessibilityPerformAction: (NSString*)theActionName {
+    if ([theActionName isEqualToString: NSAccessibilityPressAction]) {
+        if ([self isEnabled]) {
+            [self performClick: nil];
+        }
+    } else {
+        [super accessibilityPerformAction: theActionName];
+    }
+}
+
+@end
+
+@implementation VLCCustomWindowCloseButton
+- (id)extendedAccessibilityAttributeValue: (NSString*)theAttributeName {
+    return ([theAttributeName isEqualToString: NSAccessibilitySubroleAttribute] ? NSAccessibilityCloseButtonAttribute : nil);
+}
+
+@end
+
+
+@implementation VLCCustomWindowMinimizeButton
+- (id)extendedAccessibilityAttributeValue: (NSString*)theAttributeName {
+    return ([theAttributeName isEqualToString: NSAccessibilitySubroleAttribute] ? NSAccessibilityMinimizeButtonAttribute : nil);
+}
+
+@end
+
+
+@implementation VLCCustomWindowZoomButton
+- (id)extendedAccessibilityAttributeValue: (NSString*)theAttributeName {
+    return ([theAttributeName isEqualToString: NSAccessibilitySubroleAttribute] ? NSAccessibilityZoomButtonAttribute : nil);
+}
+
+@end
+
+@implementation VLCCustomWindowFullscreenButton
+- (id)extendedAccessibilityAttributeValue: (NSString*)theAttributeName {
+    return ([theAttributeName isEqualToString: NSAccessibilitySubroleAttribute] ? NSAccessibilityFullScreenButtonAttribute : nil);
 }
 
 @end
