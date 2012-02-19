@@ -681,6 +681,8 @@ void _drawFrameInRect(NSRect frameRect)
     NSRect knobRect = [[self cell] knobRectFlipped:NO];
     knobRect.origin.y+=1;
     [self drawKnobInRect: knobRect];
+
+    [(VLCMainWindow *)[self window] drawFancyGradientEffectForTimeSlider];
 }
 
 @end

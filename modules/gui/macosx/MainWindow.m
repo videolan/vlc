@@ -703,7 +703,6 @@ static VLCMainWindow *_o_sharedInstance = nil;
         [o_fspanel setStreamPos: f_updated andTime: o_time];
         vlc_object_release( p_input );
     }
-    [self drawFancyGradientEffectForTimeSlider];
 }
 
 - (IBAction)volumeAction:(id)sender
@@ -984,9 +983,11 @@ static VLCMainWindow *_o_sharedInstance = nil;
         if (dur == -1) {
             [o_time_sld setEnabled: NO];
             [o_time_sld setHidden: YES];
+            [o_time_sld_fancygradient_view setHidden: YES];
         } else {
             [o_time_sld setEnabled: YES];
             [o_time_sld setHidden: NO];
+            [o_time_sld_fancygradient_view setHidden: NO];
         }
 
         [o_time_fld setStringValue: o_time];
@@ -1000,9 +1001,8 @@ static VLCMainWindow *_o_sharedInstance = nil;
         [o_time_fld setStringValue: @"00:00"];
         [o_time_sld setEnabled: NO];
         [o_time_sld setHidden: YES];
+        [o_time_sld_fancygradient_view setHidden: YES];
     }
-        
-    [self performSelectorOnMainThread:@selector(drawFancyGradientEffectForTimeSlider) withObject:nil waitUntilDone:NO];
 }
 
 - (void)updateVolumeSlider
