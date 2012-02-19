@@ -79,7 +79,7 @@ extern OSErr UpdateSystemActivity(UInt8 activity);
 #pragma Fixes for OS X Snow Leopard (10.6)
 
 #ifndef MAC_OS_X_VERSION_10_7
-extern NSString *const NSAccessibilityFullScreenButtonSubrole;
+extern NSString *const NSAccessibilityFullScreenButtonAttribute;
 
 enum {
     NSWindowCollectionBehaviorFullScreenPrimary = 1 << 7,
