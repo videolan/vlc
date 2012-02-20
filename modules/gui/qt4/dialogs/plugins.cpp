@@ -195,7 +195,7 @@ ExtensionTab::ExtensionTab( intf_thread_t *p_intf )
 
     QLabel *notice = new QLabel( qtr("Get more extensions from")
             + QString( " <a href=\"http://addons.videolan.org/\">"
-                       "addons.videolan.org</a>" ) );
+                       "addons.videolan.org</a>." ) );
     notice->setOpenExternalLinks( true );
     layout->addWidget( notice );
 
