@@ -549,13 +549,9 @@ ExtensionInfoDialog::ExtensionInfoDialog( const ExtensionCopy& extension,
     // URL
     label = new QLabel( "<b>" + qtr( "Website" ) + ":</b>", this );
     layout->addWidget( label, 5, 0, 1, 2 );
-    QString txt = "<a href=\"";
-    txt += extension.url;
-    txt += "\">";
-    txt += extension.url;
-    txt += "</a>";
-    label = new QLabel( txt, this );
-    label->setText( txt );
+    label = new QLabel( QString("<a href=\"%1\">%2</a>")
+                        .arg( extension.url ).arg( extension.url )
+                        , this );
     label->setOpenExternalLinks( true );
     layout->addWidget( label, 5, 2, 1, -1 );
 
