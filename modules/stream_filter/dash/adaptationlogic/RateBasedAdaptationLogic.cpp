@@ -55,6 +55,9 @@ Chunk*  RateBasedAdaptationLogic::getNextChunk() throw(EOFException)
 
     long bitrate = this->getBpsAvg();
 
+    if(this->getBufferPercent() < MINBUFFER)
+        bitrate = 0;
+
     Representation *rep = this->mpdManager->getRepresentation(this->currentPeriod, bitrate, this->width, this->height);
 
     if ( rep == NULL )

@@ -52,6 +52,7 @@ namespace dash
 
                 long                        getBpsAvg               () const;
                 long                        getBpsLastChunk         () const;
+                int                         getBufferPercent        () const;
 
             private:
                 int                     bpsAvg;

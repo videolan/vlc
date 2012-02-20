@@ -64,3 +64,7 @@ long AbstractAdaptationLogic::getBpsLastChunk        () const
 {
     return this->bpsLastChunk;
 }
+int AbstractAdaptationLogic::getBufferPercent        () const
+{
+    return this->bufferedPercent;
+}

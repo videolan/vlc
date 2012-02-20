@@ -35,6 +35,8 @@
 #include <vlc_common.h>
 #include <vlc_stream.h>
 
+#define MINBUFFER 30
+
 namespace dash
 {
     namespace logic
