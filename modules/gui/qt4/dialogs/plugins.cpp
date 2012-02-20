@@ -72,7 +72,7 @@ PluginDialog::PluginDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
 
     QDialogButtonBox *box = new QDialogButtonBox;
     QPushButton *okButton = new QPushButton( qtr( "&Close" ), this );
-    box->addButton( okButton, QDialogButtonBox::AcceptRole );
+    box->addButton( okButton, QDialogButtonBox::RejectRole );
     layout->addWidget( box );
     BUTTONACT( okButton, close() );
     readSettings( "PluginsDialog", QSize( 435, 280 ) );
@@ -565,7 +565,7 @@ ExtensionInfoDialog::ExtensionInfoDialog( const ExtensionCopy& extension,
     // Close button
     QDialogButtonBox *group = new QDialogButtonBox( this );
     QPushButton *closeButton = new QPushButton( qtr( "&Close" ) );
-    group->addButton( closeButton, QDialogButtonBox::AcceptRole );
+    group->addButton( closeButton, QDialogButtonBox::RejectRole );
     BUTTONACT( closeButton, close() );
 
     layout->addWidget( group, 7, 0, 1, -1 );
