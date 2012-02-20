@@ -1454,7 +1454,7 @@ unsigned int CocoaKeyToVLC( unichar i_key )
     p_input = pl_CurrentInput( p_intf );
     if( p_input )
     {
-        if( var_GetInteger( p_input, "state" ) == PLAYING_S )
+        if( var_GetInteger( p_input, "state" ) == PLAYING_S && [self activeVideoPlayback] )
             UpdateSystemActivity( UsrActivity );
         vlc_object_release( p_input );
     }
