@@ -114,6 +114,8 @@ dash::http::Chunk*      Segment::toChunk        ()
         chunk->setUrl(this->sourceUrl);
     }
 
+    chunk->setBitrate(this->parentRepresentation->getBandwidth());
+
     return chunk;
 }
 
