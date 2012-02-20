@@ -77,7 +77,7 @@ vlc_module_begin ()
 #ifdef HAVE_LIBCDDB
     add_string( "cddb-server", "freedb.videolan.org", N_( "CDDB Server" ),
             N_( "Address of the CDDB server to use." ), true )
-    add_integer( "cddb-port", 8880, N_( "CDDB port" ),
+    add_integer( "cddb-port", 80, N_( "CDDB port" ),
             N_( "CDDB Server port to use." ), true )
 #endif
 
@@ -602,6 +602,9 @@ static cddb_disc_t *GetCDDBInfo( access_t *p_access, int i_titles, int *p_sector
     }
 
     /* */
+
+    cddb_http_enable( p_cddb );
+
     char *psz_tmp = var_InheritString( p_access, "cddb-server" );
     if( psz_tmp )
     {
@@ -613,6 +616,9 @@ static cddb_disc_t *GetCDDBInfo( access_t *p_access, int i_titles, int *p_sector
 
     cddb_set_email_address( p_cddb, "vlc@videolan.org" );
 
+    cddb_set_http_path_query( p_cddb, "/~cddb/cddb.cgi" );
+    cddb_set_http_path_submit( p_cddb, "/~cddb/submit.cgi" );
+
     /// \todo
     cddb_cache_disable( p_cddb );
 
@@ -621,9 +627,6 @@ static cddb_disc_t *GetCDDBInfo( access_t *p_access, int i_titles, int *p_sector
 //                                    MODULE_STRING "-cddb-cachedir") );
 
     cddb_set_timeout( p_cddb, 10 );
-
-    /// \todo
-    cddb_http_disable( p_cddb );
 
     /* */
     cddb_disc_t *p_disc = cddb_disc_new();
