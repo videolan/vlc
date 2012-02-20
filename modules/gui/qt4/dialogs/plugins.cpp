@@ -563,6 +563,7 @@ ExtensionInfoDialog::ExtensionInfoDialog( const ExtensionCopy& extension,
     label = new QLabel( "<b>" + qtr( "File" ) + ":</b>", this );
     layout->addWidget( label, 6, 0, 1, 2 );
     QLineEdit *line = new QLineEdit( extension.name, this );
+    line->setReadOnly( true );
     layout->addWidget( line, 6, 2, 1, -1 );
 
     // Close button
