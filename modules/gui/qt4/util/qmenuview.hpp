@@ -32,12 +32,15 @@ class QMenuView : public QMenu
     Q_OBJECT;
 
 public:
-    QMenuView( QWidget * parent = 0 );
+    QMenuView( QWidget * parent = 0, int iMaxVisibleCount = 0 );
     virtual ~QMenuView(){}
 
     /* Model */
     void setModel( QAbstractItemModel * model ) { m_model = model; }
     QAbstractItemModel * model() const { return m_model; }
+
+    /* Size limit */
+    void setMaximumItemCount( int count ) { iMaxVisibleCount = count; }
 
 private:
     QAbstractItemModel *m_model;
@@ -45,6 +48,8 @@ private:
     QAction *createActionFromIndex( QModelIndex index );
 
     void build( const QModelIndex &parent );
+
+    int iMaxVisibleCount;
 
 private slots:
     void rebuild();
