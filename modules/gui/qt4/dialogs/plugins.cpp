@@ -193,6 +193,12 @@ ExtensionTab::ExtensionTab( intf_thread_t *p_intf )
     // Layout
     QVBoxLayout *layout = new QVBoxLayout( this );
 
+    QLabel *notice = new QLabel( qtr("Get more extensions from")
+            + QString( " <a href=\"http://addons.videolan.org/\">"
+                       "addons.videolan.org</a>" ) );
+    notice->setOpenExternalLinks( true );
+    layout->addWidget( notice );
+
     // ListView
     extList = new QListView( this );
     CONNECT( extList, activated( const QModelIndex& ),
