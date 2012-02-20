@@ -34,7 +34,7 @@ namespace dash
         class IBufferObserver
         {
             public:
-                virtual void bufferLevelChanged(mtime_t bufferedSeconds, int bufferedPercent) = 0;
+                virtual void bufferLevelChanged(mtime_t bufferedMicroSec, int bufferedPercent) = 0;
         };
     }
 }
