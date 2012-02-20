@@ -100,6 +100,7 @@ private:
 
 private slots:
     void moreInformation();
+    void updateButtons();
 
 private:
     QListView *extList;

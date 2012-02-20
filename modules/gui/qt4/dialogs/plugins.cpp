@@ -227,8 +227,7 @@ ExtensionTab::ExtensionTab( intf_thread_t *p_intf )
     butMoreInfo = new QPushButton( QIcon( ":/menu/info" ),
                                    qtr( "More information..." ),
                                    this );
-    CONNECT( butMoreInfo, clicked(),
-             this, moreInformation() );
+    CONNECT( butMoreInfo, clicked(), this, moreInformation() );
     hbox->addWidget( butMoreInfo );
 
     // Reload button
@@ -236,16 +235,26 @@ ExtensionTab::ExtensionTab( intf_thread_t *p_intf )
     QPushButton *reload = new QPushButton( QIcon( ":/update" ),
                                            qtr( "Reload extensions" ),
                                            this );
-    CONNECT( reload, clicked(),
-             EM, reloadExtensions() );
+    CONNECT( reload, clicked(), EM, reloadExtensions() );
+    CONNECT( reload, clicked(), this, updateButtons() );
+    CONNECT( extList->selectionModel(),
+             selectionChanged( const QItemSelection &, const QItemSelection & ),
+             this,
+             updateButtons() );
     hbox->addWidget( reload );
 
     // Add buttons hbox
     layout->addItem( hbox );
+    updateButtons();
 }
 
 ExtensionTab::~ExtensionTab()
 {
+}
+
+void ExtensionTab::updateButtons()
+{
+    butMoreInfo->setEnabled( extList->selectionModel()->hasSelection() );
 }
 
 // Do not close on ESC or ENTER
@@ -261,13 +270,6 @@ void ExtensionTab::keyPressEvent( QKeyEvent *keyEvent )
 // Show more information
 void ExtensionTab::moreInformation()
 {
-    if( !extList->selectionModel() ||
-        extList->selectionModel()->selectedIndexes().isEmpty() )
-
-    {
-        return;
-    }
-
     QModelIndex index = extList->selectionModel()->selectedIndexes().first();
     ExtensionCopy *ext = (ExtensionCopy*) index.internalPointer();
     if( !ext )
