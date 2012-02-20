@@ -49,7 +49,7 @@ namespace dash
                 virtual dash::http::Chunk*  getNextChunk() throw(dash::exception::EOFException) = 0;
                 virtual const dash::mpd::Representation *getCurrentRepresentation() const = 0;
                 /**
-                 *  \return     The average bitrate in Bytes per second.
+                 *  \return     The average bitrate in bits per second.
                  */
                 virtual long                    getBpsAvg               () const = 0;
                 virtual long                    getBpsLastChunk         () const = 0;
