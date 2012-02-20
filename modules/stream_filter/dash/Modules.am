@@ -80,5 +80,7 @@ SOURCES_stream_filter_dash = \
     DASHDownloader.h \
     DASHManager.cpp \
     DASHManager.h \
+    Helper.cpp \
+    Helper.h \
     $(NULL)
 libvlc_LTLIBRARIES += libstream_filter_dash_plugin.la
