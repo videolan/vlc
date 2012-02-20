@@ -51,10 +51,12 @@ DASHManager::DASHManager    ( HTTPConnectionManager *conManager, MPD *mpd,
     this->adaptationLogic   = AdaptationLogicFactory::create( this->logicType, this->mpdManager, this->stream);
     if ( this->adaptationLogic == NULL )
         return ;
-    this->conManager->attach(this->adaptationLogic);
 
-    this->buffer    = new BlockBuffer(this->stream);
+    this->buffer     = new BlockBuffer(this->stream);
     this->downloader = new DASHDownloader(this->conManager, this->adaptationLogic, this->buffer);
+
+    this->conManager->attach(this->adaptationLogic);
+    this->buffer->attach(this->adaptationLogic);
 }
 DASHManager::~DASHManager   ()
 {

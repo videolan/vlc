@@ -36,7 +36,9 @@ AbstractAdaptationLogic::AbstractAdaptationLogic    (IMPDManager *mpdManager, st
                          bpsAvg                     (-1),
                          bpsLastChunk               (0),
                          mpdManager                 (mpdManager),
-                         stream                     (stream)
+                         stream                     (stream),
+                         bufferedMicroSec           (0),
+                         bufferedPercent            (0)
 
 {
 }
@@ -44,6 +46,11 @@ AbstractAdaptationLogic::~AbstractAdaptationLogic   ()
 {
 }
 
+void AbstractAdaptationLogic::bufferLevelChanged     (mtime_t bufferedMicroSec, int bufferedPercent)
+{
+    this->bufferedMicroSec = bufferedMicroSec;
+    this->bufferedPercent  = bufferedPercent;
+}
 void AbstractAdaptationLogic::downloadRateChanged    (long bpsAvg, long bpsLastChunk)
 {
     this->bpsAvg        = bpsAvg;

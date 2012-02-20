@@ -105,6 +105,7 @@ int     BlockBuffer::get                  (void *p_data, unsigned int len)
 
     block_GetBytes(&this->buffer, (uint8_t *)p_data, ret);
     block_BytestreamFlush(&this->buffer);
+    this->notify();
 
     vlc_cond_signal(&this->empty);
     vlc_mutex_unlock(&this->monitorMutex);
@@ -128,6 +129,7 @@ void    BlockBuffer::put                  (block_t *block)
     this->sizeBytes     += block->i_buffer;
 
     block_BytestreamPush(&this->buffer, block);
+    this->notify();
 
     vlc_cond_signal(&this->full);
     vlc_mutex_unlock(&this->monitorMutex);
@@ -154,7 +156,7 @@ void    BlockBuffer::attach               (IBufferObserver *observer)
 void    BlockBuffer::notify               ()
 {
     for(size_t i = 0; i < this->bufferObservers.size(); i++)
-        this->bufferObservers.at(i)->bufferLevelChanged(this->sizeMicroSec, this->sizeMicroSec / this->capacityMicroSec);
+        this->bufferObservers.at(i)->bufferLevelChanged(this->sizeMicroSec, ((float)this->sizeMicroSec / this->capacityMicroSec) * 100);
 }
 void    BlockBuffer::reduceBufferMilliSec (size_t bytes)
 {

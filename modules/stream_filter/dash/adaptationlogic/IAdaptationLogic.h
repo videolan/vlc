@@ -29,12 +29,13 @@
 #include <adaptationlogic/IDownloadRateObserver.h>
 #include <exceptions/EOFException.h>
 #include "mpd/Representation.h"
+#include "buffer/IBufferObserver.h"
 
 namespace dash
 {
     namespace logic
     {
-        class IAdaptationLogic : public IDownloadRateObserver
+        class IAdaptationLogic : public IDownloadRateObserver, public dash::buffer::IBufferObserver
         {
             public:
 

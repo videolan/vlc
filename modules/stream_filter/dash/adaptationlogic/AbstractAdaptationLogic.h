@@ -48,6 +48,7 @@ namespace dash
                 virtual ~AbstractAdaptationLogic    ();
 
                 virtual void                downloadRateChanged     (long bpsAvg, long bpsLastChunk);
+                virtual void                bufferLevelChanged      (mtime_t bufferedMicroSec, int bufferedPercent);
 
                 long                        getBpsAvg               () const;
                 long                        getBpsLastChunk         () const;
@@ -57,6 +58,8 @@ namespace dash
                 long                    bpsLastChunk;
                 dash::mpd::IMPDManager  *mpdManager;
                 stream_t                *stream;
+                mtime_t                 bufferedMicroSec;
+                int                     bufferedPercent;
         };
     }
 }
