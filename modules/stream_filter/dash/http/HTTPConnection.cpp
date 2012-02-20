@@ -74,8 +74,16 @@ int             HTTPConnection::peek            (const uint8_t **pp_peek, size_t
 }
 void            HTTPConnection::parseURL        ()
 {
-    this->hostname = this->url;
-    this->hostname.erase(0, 7);
+    if(this->url.compare(0, 4, "http"))
+    {
+        this->hostname = Helper::combinePaths(Helper::getDirectoryPath(stream->psz_path), this->url);
+    }
+    else
+    {
+        this->hostname = this->url;
+        this->hostname.erase(0, 7);
+    }
+
     this->path = this->hostname;
 
     size_t pos = this->hostname.find("/");

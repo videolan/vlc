@@ -37,6 +37,7 @@
 
 #include "http/IHTTPConnection.h"
 #include "http/Chunk.h"
+#include "Helper.h"
 
 #define PEEKBUFFER 4096
 
