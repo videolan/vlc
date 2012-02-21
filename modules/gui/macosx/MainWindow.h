@@ -43,6 +43,7 @@
     IBOutlet id o_effects_btn;
     IBOutlet id o_fullscreen_btn;
     IBOutlet id o_search_fld;
+    IBOutlet id o_topbar_view;
     IBOutlet id o_volume_sld;
     IBOutlet id o_volume_track_view;
     IBOutlet id o_volume_down_btn;
@@ -74,6 +75,8 @@
     BOOL b_nativeFullscreenMode;
     BOOL b_video_playback_enabled;
     BOOL b_dropzone_active;
+    BOOL b_splitview_removed;
+    int i_lastSplitViewHeight;
     int i_lastShownVolume;
     input_state_e cachedInputState;
 

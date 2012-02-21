@@ -562,33 +562,71 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [[VLCCoreInteraction sharedInstance] stop];
 }
 
+- (void)resizePlaylistAfterCollapse
+{
+    NSRect plrect;
+    plrect = [[o_playlist_table animator] frame];
+    plrect.size.height = i_lastSplitViewHeight - 22.0; // actual pl top bar height, which differs from its frame
+    [[o_playlist_table animator] setFrame: plrect];
+}
+
 - (IBAction)togglePlaylist:(id)sender
 {
-    if (b_dropzone_active && ![[VLCMain sharedInstance] activeVideoPlayback])
+    if ((([[NSApp currentEvent] modifierFlags] & NSAlternateKeyMask) != 0) && !b_splitview_removed)
     {
-        b_dropzone_active = NO;
-        [self hideDropZone];
-    }
-
-    if (!b_nonembedded)
-    {
-        if ([o_video_view isHidden] && [[VLCMain sharedInstance] activeVideoPlayback]) {
-            [o_split_view setHidden: YES];
-            [o_video_view setHidden: NO];
-            [self makeFirstResponder: o_video_view];
-        }
-        else
-        {
-            [o_video_view setHidden: YES];
-            [o_split_view setHidden: NO];
-            [self makeFirstResponder: nil];
-        }
+        NSRect winrect = [self frame];
+        i_lastSplitViewHeight = [o_split_view frame].size.height;
+        winrect.size.height = winrect.size.height - i_lastSplitViewHeight;
+        winrect.origin.y = winrect.origin.y + i_lastSplitViewHeight;
+        [self setFrame: winrect display: YES animate: YES];
+        [self performSelector:@selector(hideDropZone) withObject:nil afterDelay:0.1];
+        b_splitview_removed = YES;
     }
     else
     {
-        [o_split_view setHidden: NO];
-        [o_playlist_table setHidden: NO];
-        [o_video_view setHidden: ![[VLCMain sharedInstance] activeVideoPlayback]];
+        if (b_splitview_removed)
+        {
+            NSRect winrect;
+
+            winrect = [self frame];
+            winrect.size.height = winrect.size.height + i_lastSplitViewHeight;
+            winrect.origin.y = winrect.origin.y - i_lastSplitViewHeight;
+            [self setFrame: winrect display: YES animate: YES];
+
+            [self performSelector:@selector(resizePlaylistAfterCollapse) withObject: nil afterDelay:0.75];
+            if (b_dropzone_active)
+                [self performSelector:@selector(showDropZone) withObject: nil afterDelay:0.3];
+
+            b_splitview_removed = NO;
+            return;
+        }
+
+        if (b_dropzone_active && ![[VLCMain sharedInstance] activeVideoPlayback])
+        {
+            b_dropzone_active = NO;
+            [self hideDropZone];
+        }
+
+        if (!b_nonembedded)
+        {
+            if ([o_video_view isHidden] && [[VLCMain sharedInstance] activeVideoPlayback]) {
+                [o_split_view setHidden: YES];
+                [o_video_view setHidden: NO];
+                [self makeFirstResponder: o_video_view];
+            }
+            else
+            {
+                [o_video_view setHidden: YES];
+                [o_split_view setHidden: NO];
+                [self makeFirstResponder: nil];
+            }
+        }
+        else
+        {
+            [o_split_view setHidden: NO];
+            [o_playlist_table setHidden: NO];
+            [o_video_view setHidden: ![[VLCMain sharedInstance] activeVideoPlayback]];
+        }
     }
 }
 
