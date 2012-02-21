@@ -50,7 +50,7 @@ class SeekSlider : public QSlider
     Q_OBJECT
     Q_PROPERTY(qreal handleOpacity READ handleOpacity WRITE setHandleOpacity)
 public:
-    SeekSlider( Qt::Orientation q, QWidget *_parent );
+    SeekSlider( Qt::Orientation q, QWidget *_parent = 0 );
     ~SeekSlider();
     void setChapters( SeekPoints * );
 
@@ -67,16 +67,17 @@ protected:
     virtual bool eventFilter( QObject *obj, QEvent *event );
 
     QSize handleSize() const;
-    QSize sizeHint() const;
+    virtual QSize sizeHint() const;
+
     bool isAnimationRunning() const;
     qreal handleOpacity() const;
     void setHandleOpacity( qreal opacity );
 
 private:
-    bool b_isSliding;       /* Whether we are currently sliding by user action */
-    bool b_is_jumping;      /* if we requested a jump to another chapter */
-    int inputLength;        /* InputLength that can change */
-    char psz_length[MSTRTIME_MAX_SIZE]; /* Used for the ToolTip */
+    bool isSliding;        /* Whether we are currently sliding by user action */
+    bool isJumping;              /* if we requested a jump to another chapter */
+    int inputLength;                           /* InputLength that can change */
+    char psz_length[MSTRTIME_MAX_SIZE];               /* Used for the ToolTip */
     QTimer *seekLimitTimer;
     TimeTooltip *mTimeTooltip;
     float f_buffering;
@@ -122,7 +123,7 @@ protected:
     virtual void mouseReleaseEvent( QMouseEvent * );
 
 private:
-    bool b_isSliding; /* Whether we are currently sliding by user action */
+    bool isSliding; /* Whether we are currently sliding by user action */
     bool b_mouseOutside; /* Whether the mouse is outside or inside the Widget */
     int i_oldvalue; /* Store the old Value before changing */
     float f_step; /* How much do we increase each time we wheel */

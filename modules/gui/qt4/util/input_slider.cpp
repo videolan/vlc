@@ -58,7 +58,7 @@
 SeekSlider::SeekSlider( Qt::Orientation q, QWidget *_parent )
           : QSlider( q, _parent )
 {
-    b_isSliding = false;
+    isSliding = false;
     f_buffering = 1.0;
     mHandleOpacity = 1.0;
     chapters = NULL;
@@ -128,12 +128,12 @@ void SeekSlider::setPosition( float pos, int64_t time, int length )
     if( pos == -1.0 )
     {
         setEnabled( false );
-        b_isSliding = false;
+        isSliding = false;
     }
     else
         setEnabled( true );
 
-    if( !b_isSliding )
+    if( !isSliding )
         setValue( (int)( pos * 1000.0 ) );
 
     inputLength = length;
@@ -142,7 +142,7 @@ void SeekSlider::setPosition( float pos, int64_t time, int length )
 void SeekSlider::startSeekTimer()
 {
     /* Only fire one update, when sliding, every 150ms */
-    if( b_isSliding && !seekLimitTimer->isActive() )
+    if( isSliding && !seekLimitTimer->isActive() )
         seekLimitTimer->start( 150 );
 }
 
@@ -161,12 +161,12 @@ void SeekSlider::updateBuffering( float f_buffering_ )
 void SeekSlider::mouseReleaseEvent( QMouseEvent *event )
 {
     event->accept();
-    b_isSliding = false;
+    isSliding = false;
     bool b_seekPending = seekLimitTimer->isActive();
     seekLimitTimer->stop(); /* We're not sliding anymore: only last seek on release */
-    if ( b_is_jumping )
+    if ( isJumping )
     {
-        b_is_jumping = false;
+        isJumping = false;
         return;
     }
     QSlider::mouseReleaseEvent( event );
@@ -184,7 +184,7 @@ void SeekSlider::mousePressEvent( QMouseEvent* event )
         return;
     }
 
-    b_is_jumping = false;
+    isJumping = false;
     /* handle chapter clicks */
     int i_width = size().width();
     if ( chapters && inputLength && i_width)
@@ -215,14 +215,14 @@ void SeekSlider::mousePressEvent( QMouseEvent* event )
                 {
                     chapters->jumpTo( i_selected );
                     event->accept();
-                    b_is_jumping = true;
+                    isJumping = true;
                     return;
                 }
             }
         }
     }
 
-    b_isSliding = true ;
+    isSliding = true ;
     setValue( QStyle::sliderValueFromPosition( MINIMUM, MAXIMUM, event->x(), width(), false ) );
     emit sliderMoved( value() );
     event->accept();
@@ -230,7 +230,7 @@ void SeekSlider::mousePressEvent( QMouseEvent* event )
 
 void SeekSlider::mouseMoveEvent( QMouseEvent *event )
 {
-    if( b_isSliding )
+    if( isSliding )
     {
         setValue( QStyle::sliderValueFromPosition( MINIMUM, MAXIMUM, event->x(), width(), false) );
         emit sliderMoved( value() );
@@ -271,7 +271,7 @@ void SeekSlider::mouseMoveEvent( QMouseEvent *event )
 void SeekSlider::wheelEvent( QWheelEvent *event )
 {
     /* Don't do anything if we are for somehow reason sliding */
-    if( !b_isSliding )
+    if( !isSliding )
     {
         setValue( value() + event->delta() / 12 ); /* 12 = 8 * 15 / 10
          Since delta is in 1/8 of ° and mouse have steps of 15 °
@@ -573,7 +573,7 @@ SoundSlider::SoundSlider( QWidget *_parent, int _i_step, bool b_hard,
     f_step = ( _i_step * 100 ) / AOUT_VOLUME_MAX ;
     setRange( SOUNDMIN, b_hard ? (2 * SOUNDMAX) : SOUNDMAX  );
     setMouseTracking( true );
-    b_isSliding = false;
+    isSliding = false;
     b_mouseOutside = true;
     b_isMuted = false;
 
@@ -652,7 +652,7 @@ void SoundSlider::mousePressEvent( QMouseEvent *event )
     if( event->button() != Qt::RightButton )
     {
         /* We enter the sliding mode */
-        b_isSliding = true;
+        isSliding = true;
         i_oldvalue = value();
         emit sliderPressed();
         changeValue( event->x() - paddingL );
@@ -670,14 +670,14 @@ void SoundSlider::mouseReleaseEvent( QMouseEvent *event )
             setValue( value() );
             emit sliderMoved( value() );
         }
-        b_isSliding = false;
+        isSliding = false;
         b_mouseOutside = false;
     }
 }
 
 void SoundSlider::mouseMoveEvent( QMouseEvent *event )
 {
-    if( b_isSliding )
+    if( isSliding )
     {
         QRect rect( paddingL - 15,    -1,
                     WLENGTH + 15 * 2 , WHEIGHT + 5 );
