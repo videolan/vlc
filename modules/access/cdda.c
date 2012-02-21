@@ -24,7 +24,7 @@
 
 /**
  * Todo:
- *   - Improve CDDB support (non-blocking, cache, ...)
+ *   - Improve CDDB support (non-blocking, ...)
  *   - Fix tracknumber in MRL
  */
 
@@ -619,12 +619,16 @@ static cddb_disc_t *GetCDDBInfo( access_t *p_access, int i_titles, int *p_sector
     cddb_set_http_path_query( p_cddb, "/~cddb/cddb.cgi" );
     cddb_set_http_path_submit( p_cddb, "/~cddb/submit.cgi" );
 
-    /// \todo
-    cddb_cache_disable( p_cddb );
 
-//    cddb_cache_set_dir( p_cddb,
-//                     var_InheritString( p_access,
-//                                    MODULE_STRING "-cddb-cachedir") );
+    char *psz_cachedir;
+    char *psz_temp = config_GetUserDir( VLC_CACHE_DIR );
+
+    if( asprintf( &psz_cachedir, "%s" DIR_SEP "cddb", psz_temp ) > 0 ) {
+        cddb_cache_enable( p_cddb );
+        cddb_cache_set_dir( p_cddb, psz_cachedir );
+        free( psz_cachedir );
+    }
+    free( psz_temp );
 
     cddb_set_timeout( p_cddb, 10 );
 
