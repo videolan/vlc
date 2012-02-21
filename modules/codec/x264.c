@@ -153,6 +153,15 @@ static void x264_log( void *, int i_level, const char *psz, va_list );
 #define INTERLACED_TEXT N_("Interlaced mode")
 #define INTERLACED_LONGTEXT N_( "Pure-interlaced mode.")
 
+#define FRAMEPACKING_TEXT N_("Frame packing")
+#define FRAMEPACKING_LONGTEXT N_( "For stereoscopic videos define frame arrangement:\n" \
+    " 0: checkerboard - pixels are alternatively from L and R\n" \
+    " 1: column alternation - L and R are interlaced by column\n" \
+    " 2: row alternation - L and R are interlaced by row\n" \
+    " 3: side by side - L is on the left, R on the right\n" \
+    " 4: top bottom - L is on top, R on bottom\n" \
+    " 5: frame alternation - one view per frame" )
+
 #define INTRAREFRESH_TEXT N_("Use Periodic Intra Refresh")
 #define INTRAREFRESH_LONGTEXT N_("Use Periodic Intra Refresh instead of IDR frames")
 
@@ -499,6 +508,11 @@ vlc_module_begin ()
     add_bool( SOUT_CFG_PREFIX "interlaced", false, INTERLACED_TEXT, INTERLACED_LONGTEXT,
               true )
 
+#if X264_BUILD >= 111
+    add_integer( SOUT_CFG_PREFIX "frame-packing", -1, FRAMEPACKING_TEXT, FRAMEPACKING_LONGTEXT, true )
+        change_integer_range( -1, 5)
+#endif
+
     add_integer( SOUT_CFG_PREFIX "slices", 0, SLICE_COUNT, SLICE_COUNT_LONGTEXT, true )
     add_integer( SOUT_CFG_PREFIX "slice-max-size", 0, SLICE_MAX_SIZE, SLICE_MAX_SIZE_LONGTEXT, true )
     add_integer( SOUT_CFG_PREFIX "slice-max-mbs", 0, SLICE_MAX_MBS, SLICE_MAX_MBS_LONGTEXT, true )
@@ -714,7 +728,7 @@ static const char *const ppsz_sout_options[] = {
     "verbose", "vbv-bufsize", "vbv-init", "vbv-maxrate", "weightb", "weightp",
     "aq-mode", "aq-strength", "psy-rd", "psy", "profile", "lookahead", "slices",
     "slice-max-size", "slice-max-mbs", "intra-refresh", "mbtree", "hrd",
-    "tune","preset", "opengop", "bluray-compat", NULL
+    "tune","preset", "opengop", "bluray-compat", "frame-packing", NULL
 };
 
 static block_t *Encode( encoder_t *, picture_t * );
@@ -935,6 +949,11 @@ static int  Open ( vlc_object_t *p_this )
        p_sys->param.rc.i_aq_mode = var_GetInteger( p_enc, SOUT_CFG_PREFIX "aq-mode" );
     if( fabs( var_GetFloat( p_enc, SOUT_CFG_PREFIX "aq-strength" ) - 1.0) > 0.005 )
        p_sys->param.rc.f_aq_strength = var_GetFloat( p_enc, SOUT_CFG_PREFIX "aq-strength" );
+
+#if X264_BUILD >= 111
+    if( var_GetInteger( p_enc, SOUT_CFG_PREFIX "frame-packing" ) > -1 )
+       p_sys->param.i_frame_packing = var_GetInteger( p_enc, SOUT_CFG_PREFIX "frame-packing" );
+#endif
 
     if( var_GetBool( p_enc, SOUT_CFG_PREFIX "verbose" ) )
         p_sys->param.i_log_level = X264_LOG_DEBUG;
