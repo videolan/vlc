@@ -804,7 +804,8 @@ static VLCMainWindow *_o_sharedInstance = nil;
     if (b_dark_interface)
     {
         [self orderOut: sender];
-        [[VLCCoreInteraction sharedInstance] stop];
+        if ([[VLCMain sharedInstance] activeVideoPlayback] && !b_nonembedded)
+            [[VLCCoreInteraction sharedInstance] stop];
     }
     else
         [super performClose: sender];
@@ -955,8 +956,11 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
 - (void)someWindowWillClose:(NSNotification *)notification
 {
-    if([notification object] == o_nonembedded_window || [notification object] == self)
-        [[VLCCoreInteraction sharedInstance] stop];
+    if([notification object] == o_nonembedded_window || ([notification object] == self && !b_nonembedded))
+    {
+        if ([[VLCMain sharedInstance] activeVideoPlayback])
+            [[VLCCoreInteraction sharedInstance] stop];
+    }
 }
 
 - (void)someWindowWillMiniaturize:(NSNotification *)notification
