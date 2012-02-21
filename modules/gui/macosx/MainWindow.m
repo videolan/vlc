@@ -2013,6 +2013,9 @@ static VLCMainWindow *_o_sharedInstance = nil;
 /* taken under BSD-new from the PXSourceList sample project, adapted for VLC */
 - (BOOL)sourceList:(PXSourceList*)aSourceList isGroupAlwaysExpanded:(id)group
 {
+    if ([[group identifier] isEqualToString:@"library"])
+        return YES;
+
     return NO;
 }
 
