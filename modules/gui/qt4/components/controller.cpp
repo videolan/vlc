@@ -467,6 +467,7 @@ QWidget *AbstractController::createWidget( buttonType_e button, int options )
         break;
     case ASPECT_RATIO_COMBOBOX:
         widget = new AspectRatioComboBox( p_intf );
+        widget->setMinimumHeight( 26 );
         break;
     case SPEED_LABEL:
         widget = new SpeedLabel( p_intf, this );
