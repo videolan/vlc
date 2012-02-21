@@ -55,8 +55,8 @@
 #define FADEDURATION 300
 #define FADEOUTDELAY 2000
 
-SeekSlider::SeekSlider( Qt::Orientation q, QWidget *_parent )
-          : QSlider( q, _parent )
+SeekSlider::SeekSlider( Qt::Orientation q, QWidget *_parent, bool _static )
+          : QSlider( q, _parent ), b_classic( _static )
 {
     isSliding = false;
     f_buffering = 1.0;
@@ -350,7 +350,8 @@ QSize SeekSlider::handleSize() const
 
 void SeekSlider::paintEvent( QPaintEvent *event )
 {
-    Q_UNUSED( event );
+    if( b_classic )
+        return QSlider::paintEvent( event );
 
     QStyleOptionSlider option;
     initStyleOption( &option );

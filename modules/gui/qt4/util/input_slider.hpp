@@ -50,7 +50,7 @@ class SeekSlider : public QSlider
     Q_OBJECT
     Q_PROPERTY(qreal handleOpacity READ handleOpacity WRITE setHandleOpacity)
 public:
-    SeekSlider( Qt::Orientation q, QWidget *_parent = 0 );
+    SeekSlider( Qt::Orientation q, QWidget *_parent = 0, bool _classic = false );
     ~SeekSlider();
     void setChapters( SeekPoints * );
 
@@ -82,6 +82,7 @@ private:
     TimeTooltip *mTimeTooltip;
     float f_buffering;
     SeekPoints* chapters;
+    bool b_classic;
 
     /* Handle's animation */
     qreal mHandleOpacity;
