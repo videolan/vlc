@@ -950,6 +950,14 @@ MainInputManager::MainInputManager( intf_thread_t *_p_intf )
     DCONNECT( this, inputChanged( input_thread_t * ),
               im, setInput( input_thread_t * ) );
 
+    /* initialize p_input (an input can already be running) */
+    p_input = playlist_CurrentInput( pl_Get(p_intf) );
+    if( p_input )
+    {
+        if( !p_intf->p_sys->b_isDialogProvider )
+            var_AddCallback( p_input, "state", PLItemChanged, this );
+        emit inputChanged( p_input );
+    }
 }
 
 MainInputManager::~MainInputManager()
