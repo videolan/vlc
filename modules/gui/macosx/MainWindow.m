@@ -2023,7 +2023,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     id item = [o_sidebar_view itemAtRow:[selectedIndexes firstIndex]];
 
 	//Set the label text to represent the new selection
-    if ([item sdtype] > -1)
+    if ([item sdtype] > -1 && [[item identifier] length] > 0)
     {
         BOOL sd_loaded = playlist_IsServicesDiscoveryLoaded( p_playlist, [[item identifier] UTF8String] );
         if (!sd_loaded)
