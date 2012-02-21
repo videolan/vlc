@@ -312,6 +312,7 @@ FunctionEnd
   !insertmacro ${_action} ".asf"
   !insertmacro ${_action} ".avi"
   !insertmacro ${_action} ".divx"
+  !insertmacro ${_action} ".drc"
   !insertmacro ${_action} ".dv"
   !insertmacro ${_action} ".f4v"
   !insertmacro ${_action} ".flv"
