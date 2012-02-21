@@ -73,21 +73,21 @@ private slots:
 class AspectRatioComboBox : public QComboBox
 {
     Q_OBJECT
-    public:
-    AspectRatioComboBox( intf_thread_t* _p_intf ) {
-        p_intf = _p_intf;
+public:
+    AspectRatioComboBox( intf_thread_t* _p_intf ) : p_intf( _p_intf )
+    {
         CONNECT( THEMIM->getIM(), voutChanged( bool ),
                  this, updateRatios() );
         CONNECT( this, currentIndexChanged( int ),
                  this, updateAspectRatio( int ) );
-        this->updateRatios();
+        updateRatios();
     }
 
-    public slots:
+public slots:
     void updateRatios();
     void updateAspectRatio( int );
 
-    private:
+private:
     intf_thread_t* p_intf;
 };
 
