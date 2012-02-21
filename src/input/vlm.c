@@ -214,16 +214,15 @@ void vlm_Delete( vlm_t *p_vlm )
     vlc_mutex_lock( &vlm_mutex );
     assert( p_vlm->users > 0 );
     if( --p_vlm->users == 0 )
-    {
         assert( libvlc_priv(p_vlm->p_libvlc)->p_vlm == p_vlm );
-        libvlc_priv(p_vlm->p_libvlc)->p_vlm = NULL;
-    }
     else
         p_vlm = NULL;
-    vlc_mutex_unlock( &vlm_mutex );
 
     if( p_vlm == NULL )
+    {
+        vlc_mutex_unlock( &vlm_mutex );
         return;
+    }
 
     /* Destroy and release VLM */
     vlc_mutex_lock( &p_vlm->lock );
@@ -241,6 +240,9 @@ void vlm_Delete( vlm_t *p_vlm )
         module_unneed( p_vlm->p_vod, p_vlm->p_vod->p_module );
         vlc_object_release( p_vlm->p_vod );
     }
+
+    libvlc_priv(p_vlm->p_libvlc)->p_vlm = NULL;
+    vlc_mutex_unlock( &vlm_mutex );
 
     vlc_mutex_lock( &p_vlm->lock_manage );
     p_vlm->input_state_changed = true;
